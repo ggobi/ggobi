@@ -374,15 +374,15 @@ projection_ok (gint m, displayd *display)
   if (m <= COTOUR) {
     switch (m) {
       case COTOUR:
-        if (d->ncols < 4)
+        if (d->ncols < 2) /* di changed these from 4 to 2 */
           ok = false;
       break;
       case TOUR2D:
-        if (d->ncols < 3)
+        if (d->ncols < 2) /* di changed these from 3 to 2 */
           ok = false;
       break;
       case TOUR1D:
-        if (d->ncols < 3)
+        if (d->ncols < 1) /* di changed these from 3 to 1 */
           ok = false;
       break;
       case XYPLOT:

@@ -564,13 +564,14 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
-  extern void path(array_f, array_f, array_f, gint, gint, array_f, 
+  extern gint path(array_f, array_f, array_f, gint, gint, array_f, 
     array_f, array_f, vector_f, array_f, array_f,
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
   extern void tour_reproject(vector_f, array_f, array_f, array_f, 
     array_f, array_f, gint, gint);
   extern void copy_mat(gfloat **, gfloat **, gint, gint);
   gint i, nv;
+  gint pathprob = 0;
 
   if (!dsp->tcorr1.get_new_target && 
       !reached_target(dsp->tcorr1.nsteps, dsp->tcorr1.stepcntr, 0, 0, 0)) {
@@ -600,7 +601,8 @@ tourcorr_run(displayd *dsp, ggobid *gg)
     else {
       gt_basis(dsp->tcorr1.u1, dsp->tcorr1.nvars, dsp->tcorr1.vars, d->ncols, 
         (gint) 1);
-      path(dsp->tcorr1.u0, dsp->tcorr1.u1, dsp->tcorr1.u, d->ncols, (gint) 1, 
+      pathprob = path(dsp->tcorr1.u0, dsp->tcorr1.u1, dsp->tcorr1.u, 
+       d->ncols, (gint) 1, 
        dsp->tcorr1.v0, dsp->tcorr1.v1, dsp->tcorr1.v, dsp->tcorr1.lambda, 
        dsp->tcorr1.tv, dsp->tcorr1.uvevec,
        dsp->tcorr1.tau, dsp->tcorr1.tinc, &dsp->tcorr1.nsteps, 

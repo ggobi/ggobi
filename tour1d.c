@@ -415,7 +415,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
-  extern void path(array_f, array_f, array_f, gint, gint, array_f, 
+  extern gint path(array_f, array_f, array_f, gint, gint, array_f, 
     array_f, array_f, vector_f, array_f, array_f,
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
   extern void tour_reproject(vector_f, array_f, array_f, array_f, 
@@ -426,6 +426,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
   static gint count = 0;
   gboolean revert_random = false;
   static gfloat oindxval = -999.0;
+  gint pathprob = 0;
 
   gint i, j, nv;
 
@@ -519,7 +520,8 @@ tour1d_run(displayd *dsp, ggobid *gg)
         }
         
       }
-      path(dsp->t1d.u0, dsp->t1d.u1, dsp->t1d.u, d->ncols, (gint) 1, dsp->t1d.v0,
+      pathprob = path(dsp->t1d.u0, dsp->t1d.u1, dsp->t1d.u, d->ncols, 
+        (gint) 1, dsp->t1d.v0,
         dsp->t1d.v1, dsp->t1d.v, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.uvevec,
         dsp->t1d.tau, dsp->t1d.tinc, &dsp->t1d.nsteps, &dsp->t1d.stepcntr, 
         &dsp->t1d.dv, dsp->t1d.delta);

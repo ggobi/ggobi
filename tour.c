@@ -254,7 +254,7 @@ eigen_clear (array_f v0, array_f v1, vector_f lambda, vector_f tau,
  * nc = num vars
  * nd = proj dim
  */
-void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
+gint path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
   array_f v1, array_f v, vector_f lambda, array_f tv, array_f uvevec, 
   vector_f tau, vector_f tinc, gint *ns, gint *stcn, gfloat *pdv, 
   gfloat delta) {
@@ -299,17 +299,26 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
     
   /* Check that u0 and u1 are both orthonormal. */
   if (!checkcolson(u0.vals, nc, nd)) {
-    printf("Columns of u0 are not orthonormal\n");
-    doit = false;
+    printf("Columns of u0 are not orthonormal: generating random u0\n");
+g_printerr ("u0: ");
+for (i=0; i<nc; i++) g_printerr ("%f ", u0.vals[0][i]);
+g_printerr ("\n    ");
+for (i=0; i<nc; i++) g_printerr ("%f ", u0.vals[1][i]);
+g_printerr ("\n");
+    return(1);
+    /*    doit = false;*/
   }
   if (!checkcolson(u1.vals, nc, nd)) {
-    printf("Columns of u1 are not orthonormal\n");
-    doit = false;
+    printf("Columns of u1 are not orthonormal: generating random u1\n");
+    return(2);
+    /*    doit = false;*/
   }
 
   /* Check that u0 and u1 are the same */
   if (!checkequiv(u0.vals, u1.vals, nc, nd)) {
-    doit = false;
+    printf("u0 equiv u1: generating random u1\n");
+    return(3);
+    /*    doit = false;*/
   }
 
   /* Do SVD of u0'u1: span(u0,u1).*/
@@ -480,7 +489,7 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
         if ((gint) floor((gdouble)(dG/delta)) < nsteps) 
           nsteps = (gint) floor((gdouble)(dG/delta));
       }*/
-      stepcntr = 0;
+      stepcntr = 1;
       *ns = nsteps;
       *stcn = stepcntr;
   }
@@ -511,7 +520,8 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
   g_free (ptinc);
   g_free (e);
 
-}
+  return(0);
+} /* path */
 
 /* Generate the interpolation frame. No preprojection is done */
 /*void tour_reproject(displayd *dsp, gint nd)*/
@@ -543,7 +553,7 @@ void tour_reproject(vector_f tinc, array_f v, array_f v0, array_f v1,
 
   matmult_uvt(v.vals, uvevec.vals, nc, nd, nd, nd, u.vals);
 
-  /* orthonormal to correct round-off errors */
+  /* orthonormalize to correct round-off errors */
   for (i=0; i<nd; i++)
     norm(u.vals[i], nc); 
 
@@ -575,6 +585,7 @@ increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn,
     printf("%f ",tinc[i]);
   printf("\n");*/
 
+  /* Why do I need to do this? Di */
   for (i=0; i<nd; i++) 
     if (tinc.els[i] > tau.els[i]) {
       attheend = true;
@@ -611,6 +622,32 @@ reached_target(gint nsteps, gint stepcntr, gint basmeth,
     }
     else
       *oindxval = *indxval;
+  }
+
+  return(arewethereyet);
+}
+
+gboolean
+reached_target2(vector_f tinc, vector_f tau, gint basmeth, 
+  gfloat *indxval, gfloat *oindxval, gint nd) 
+{
+  gboolean arewethereyet = false;
+  gfloat tol=0.01;
+  gint i;
+
+  if (basmeth == 1) {
+    if (*indxval < *oindxval)
+    {
+      arewethereyet = true;
+      *indxval = *oindxval;
+    }
+    else
+      *oindxval = *indxval;
+  }
+  else {
+    for (i=0; i<nd; i++) 
+    if (fabs(tinc.els[i]-tau.els[i]) < tol) 
+      arewethereyet = true;
   }
 
   return(arewethereyet);

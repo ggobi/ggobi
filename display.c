@@ -214,7 +214,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
           case TOUR1D:
           case TOUR2D:
           case COTOUR:
-            display_plot (display, QUICK, gg);
+            display_plot (display, FULL, gg); /* di changed QUICK to FULL */
           break;
           default:
           break;

@@ -385,10 +385,11 @@ void
 tour2d_run(displayd *dsp, ggobid *gg)
 {
   extern gboolean reached_target(gint, gint, gint, gfloat *, gfloat *);
+  extern gboolean reached_target2(vector_f, vector_f, gint, gfloat *, gfloat *, gint);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
-  extern void path(array_f, array_f, array_f, gint, gint, array_f, 
+  extern gint path(array_f, array_f, array_f, gint, gint, array_f, 
     array_f, array_f, vector_f, array_f, array_f,
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
   extern void tour_reproject(vector_f, array_f, array_f, array_f, 
@@ -400,104 +401,17 @@ tour2d_run(displayd *dsp, ggobid *gg)
   static gint count = 0;
   gboolean revert_random = false;
   static gfloat oindxval = -999.0;
-/*
   gint k;
   gboolean chosen;
-  gfloat eps = .02;
-*/
-
-/* dfsdebug */
-{
-  gfloat indxval;
-  gboolean chosen, k;
-  gfloat eps = .02;
-  if (reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, 
-         dsp->t2d.target_basis_method, &dsp->t2d.ppval, &indxval))
-  {
-/*
-g_printerr ("v: ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v.vals[0][i]);
-g_printerr ("\n    ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v.vals[1][i]);
-g_printerr ("\n");
-
-g_printerr ("v0: ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v0.vals[0][i]);
-g_printerr ("\n    ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v0.vals[1][i]);
-g_printerr ("\n");
-
-g_printerr ("v1: ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v1.vals[0][i]);
-g_printerr ("\n    ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v1.vals[1][i]);
-g_printerr ("\n");
-
-g_printerr ("u: ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u.vals[0][i]);
-g_printerr ("\n    ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u.vals[1][i]);
-g_printerr ("\n");
-
-g_printerr ("uvevec: ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.uvevec.vals[0][i]);
-g_printerr ("\n    ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.uvevec.vals[1][i]);
-g_printerr ("\n");
-*/
-
-    /*    for (i=0; i<d->ncols; i++) {
-      chosen = false;
-      for (k=0; k<dsp->t2d.nvars; k++) {
-        if (dsp->t2d.vars.els[k] == i) {
-          chosen = true;
-          break;
-        }
-      }
-      if (!chosen) {
-        if (dsp->t2d.v.vals[0][i] < eps && dsp->t2d.v.vals[1][i] < eps)
-          dsp->t2d.v.vals[0][i] = dsp->t2d.v.vals[1][i] = 0.0;
-        if (dsp->t2d.v0.vals[0][i] < eps && dsp->t2d.v0.vals[1][i] < eps)
-          dsp->t2d.v0.vals[0][i] = dsp->t2d.v0.vals[1][i] = 0.0;
-        if (dsp->t2d.v1.vals[0][i] < eps && dsp->t2d.v1.vals[1][i] < eps)
-          dsp->t2d.v1.vals[0][i] = dsp->t2d.v1.vals[1][i] = 0.0;
-        if (dsp->t2d.u.vals[0][i] < eps && dsp->t2d.u.vals[1][i] < eps)
-          dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
-      }
-      } */
-  }
-}
-/* dfsdebug end */
+  gfloat eps = .01;
+  gint pathprob = 0;
 
   if (!dsp->t2d.get_new_target && 
        !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, 
-         dsp->t2d.target_basis_method, &dsp->t2d.ppval, &oindxval)) {
+       dsp->t2d.target_basis_method, &dsp->t2d.ppval, &oindxval)) {
+    /*      !reached_target2(dsp->t2d.tinc, dsp->t2d.tau, 
+	    dsp->t2d.target_basis_method, &dsp->t2d.ppval, &oindxval, (gint) 2)) {*/
 
-    /*    for (i=0; i<d->ncols; i++) {
-      chosen = false;
-      for (k=0; k<dsp->t2d.nvars; k++) {
-        if (dsp->t2d.vars.els[k] == i) {
-          chosen = true;
-          break;
-        }
-	}*/
-
-      /*
-       * If the variable has been de-selected, and it's close to
-       * gone, take it all the way out.
-      */
-    /*      if (!chosen) {
-        gfloat eps = .02;
-        if (dsp->t2d.v.vals[0][i] < eps && dsp->t2d.v.vals[1][i] < eps)
-          dsp->t2d.v.vals[0][i] = dsp->t2d.v.vals[1][i] = 0.0;
-        if (dsp->t2d.v0.vals[0][i] < eps && dsp->t2d.v0.vals[1][i] < eps)
-          dsp->t2d.v0.vals[0][i] = dsp->t2d.v0.vals[1][i] = 0.0;
-        if (dsp->t2d.v1.vals[0][i] < eps && dsp->t2d.v1.vals[1][i] < eps)
-          dsp->t2d.v1.vals[0][i] = dsp->t2d.v1.vals[1][i] = 0.0;
-        if (dsp->t2d.u.vals[0][i] < eps && dsp->t2d.u.vals[1][i] < eps)
-          dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
-      }
-      }*/
     increment_tour(dsp->t2d.tinc, dsp->t2d.tau, &dsp->t2d.nsteps, 
       &dsp->t2d.stepcntr, dsp->t2d.dv, dsp->t2d.delta, (gint) 2);
     tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1, 
@@ -538,22 +452,52 @@ g_printerr ("\n");
         do_last_increment(dsp->t2d.tinc, dsp->t2d.tau, (gint) 2);
         tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1,
           dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
+
+	/*g_printerr ("u: ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u.vals[0][i]);
+g_printerr ("\n    ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u.vals[1][i]);
+g_printerr ("\n");
+
+g_printerr ("u1: ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u1.vals[0][i]);
+g_printerr ("\n    ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u1.vals[1][i]);
+g_printerr ("\n");
+
+g_printerr("%d %d %f\n", dsp->t2d.stepcntr, dsp->t2d.nsteps, dsp->t2d.dv);*/
+      }
+    }
+    nv = 0;
+    for (i=0; i<d->ncols; i++) {
+      chosen = false;
+      for (k=0; k<dsp->t2d.nvars; k++) {
+        if (dsp->t2d.vars.els[k] == i) {
+          chosen = true;
+          break;
+        }
+      }
+      if (!chosen) {
+        if (dsp->t2d.u.vals[0][i] < eps && dsp->t2d.u.vals[1][i] < eps)
+          dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
+        if (fabs(dsp->t2d.u.vals[0][i]) > eps || 
+          fabs(dsp->t2d.u.vals[1][i]) > eps) {
+          nv++;
+	}
       }
     }
     copy_mat(dsp->t2d.u0.vals, dsp->t2d.u.vals, d->ncols, 2);
-    nv = 0;
-    for (i=0; i<d->ncols; i++)
-      if (fabs(dsp->t2d.u0.vals[0][i]) > 0.01 || 
-          fabs(dsp->t2d.u0.vals[1][i]) > 0.01) {
-        nv++;
-      }
-    if (nv <= 2 && dsp->t2d.nvars <= 2) /* only generate new dir if num of
-                                           active/used variables is > 2 */
+    if (nv == 0 && dsp->t2d.nvars <= 2) /* only generate new dir if num of
+                                           active/used variables is > 2 -
+                                           this code allows for motion to
+                                           continue while a variable is 
+                                           fading out. */
       dsp->t2d.get_new_target = true;
     else {
       if (dsp->t2d.target_basis_method == 0) {
         gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
           d->ncols, (gint) 2);
+	/*	g_printerr("GETTING NEW BASIS\n");*/
       }
       else if (dsp->t2d.target_basis_method == 1) {
         /* pp guided tour  */
@@ -595,11 +539,29 @@ g_printerr ("\n");
         }
         
       }
-      path(dsp->t2d.u0, dsp->t2d.u1, dsp->t2d.u, d->ncols, (gint) 2, dsp->t2d.v0,
-      dsp->t2d.v1, dsp->t2d.v, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.uvevec,
-      dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 
-      &dsp->t2d.dv, dsp->t2d.delta);
-      dsp->t2d.get_new_target = false;
+      pathprob = path(dsp->t2d.u0, dsp->t2d.u1, dsp->t2d.u, d->ncols, 
+        (gint) 2, dsp->t2d.v0,
+        dsp->t2d.v1, dsp->t2d.v, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.uvevec,
+        dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 
+        &dsp->t2d.dv, dsp->t2d.delta);
+      if (pathprob != 0) {
+        if (pathprob == 1) {
+          gt_basis(dsp->t2d.u0, dsp->t2d.nvars, dsp->t2d.vars, 
+            d->ncols, (gint) 2);
+          copy_mat(dsp->t2d.u.vals, dsp->t2d.u0.vals, d->ncols, 2);
+	}
+        else if (pathprob == 2) {
+          gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
+            d->ncols, (gint) 2);
+	}
+        else if (pathprob == 3) {
+          gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
+            d->ncols, (gint) 2);
+	}
+        dsp->t2d.get_new_target = true;
+      }
+      else 
+        dsp->t2d.get_new_target = false;
     }
   }
   
