@@ -18,6 +18,11 @@ RedrawStyle viewmode_activate (splotd *, PipelineMode, gboolean, ggobid *);
 RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
 
 /* sort -t":" -k1.12 */
+void       vartable_copy_var (gint jfrom, gint jto, datad *d);
+gboolean   array_contains (gint* arr, gint n, gint el);
+void       vartable_element_new (datad *d);
+void       transform_values_copy (gint jfrom, gint jto, datad *d);
+GtkCList*  vartable_clist_get (ggobid *gg);
 GtkWidget* CreateMenuCheck (GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
 ggobid*    GGobiFromDisplay (displayd *display);
@@ -555,8 +560,7 @@ void       vartable_limits_set (datad *);
 void       vartable_limits_set_by_var (gint j, datad *d);
 void       vartable_open (ggobid *);
 void       vartable_realloc (gint, datad *);
-void       vartable_row_append (datad *, ggobid *);
-void       vartable_select_var (gint, gboolean, datad *, ggobid *);
+void       vartable_row_append (gint j, datad *, ggobid *);
 void       vartable_show_page (displayd*, ggobid*);
 void       vartable_stats_set (datad *);
 void       vartable_stats_set_by_var (gint j, datad *);
