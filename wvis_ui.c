@@ -43,6 +43,9 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
 {
   ggobid *gg = GGobiFromWidget (GTK_WIDGET(w), true);
   gboolean rval = false;
+  GtkWidget *clist;
+  datad *d;
+  gint selected_var;
 
 /*
  * gg->wvis sometimes has its own color_table.  If it's null, use
@@ -75,8 +78,9 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
   }
   else {
     gg->wvis.scheme = NULL;
-    gg->wvis.ncolors = NCOLORS;
-    gg->wvis.color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
+    gg->wvis.ncolors = MAXNCOLORS;
+    gg->wvis.color_table = (GdkColor *)
+      g_malloc (MAXNCOLORS * sizeof (GdkColor));
     color_table_init_from_default (gg->wvis.color_table,
       &gg->wvis.bg_color, &gg->wvis.accent_color);
   }
@@ -85,15 +89,18 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
   displays_plot (NULL, FULL, gg);
 
   /*-- rebuild the drawing area in this window --*/
-  {
-  GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_one_selection_from_clist (clist);
+/*
+ * This is using two expose events, which is odd:  it's something
+ * to do with getting the numbers of points in each bin to appear,
+ * and there's probably a way to do it better.
+*/
+  clist = get_clist_from_object (GTK_OBJECT (w));
+  d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  selected_var = get_one_selection_from_clist (clist);
   if (d && selected_var != -1) {
     gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
       (gpointer) gg, (gpointer) &rval);
     bin_counts_reset (selected_var, d, gg);
-  }
   }
   gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
     (gpointer) gg, (gpointer) &rval);
@@ -523,12 +530,14 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
       if (gg->wvis.scheme) {
         colorschemed *scheme = gg->wvis.scheme;
         gg->ncolors = scheme->n;
-        gg->color_table = (GdkColor *) g_malloc (scheme->n * sizeof (GdkColor));
+        gg->color_table = (GdkColor *)
+          g_malloc (scheme->n * sizeof (GdkColor));
         color_table_init_from_scheme (scheme, gg->color_table,
           &gg->bg_color, &gg->accent_color);
       } else {
-        gg->ncolors = NCOLORS;
-        gg->color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
+        gg->ncolors = MAXNCOLORS;
+        gg->color_table = (GdkColor *)
+          g_malloc (MAXNCOLORS * sizeof (GdkColor));
         color_table_init_from_default (gg->color_table,
           &gg->bg_color, &gg->accent_color);
       }
@@ -566,6 +575,11 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
     bin_counts_reset (selected_var, d, gg);
     gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
       (gpointer) gg, (gpointer) &rval);
+
+    {
+    extern void symbol_window_redraw (ggobid *);
+    symbol_window_redraw (gg);
+    }
   }
 }
 

@@ -3,6 +3,8 @@
 
 <colormaps num="23">
 
+<!-- Diverging schemes -->
+
 <colormap name="Brown -- Blue Green 7" ncolors="7"
           type="diverging" criticalvalue="4"
           system="rgb" system_min="0" system_max="1">
@@ -379,6 +381,8 @@
 </annotations>
 </colormap>
 
+<!-- Sequential schemes -->
+
 <colormap name="Reds and Yellows 7" ncolors="7"
           type="sequential"
           system="rgb" system_min="0" system_max="1">
@@ -661,6 +665,8 @@
 </annotations>
 </colormap>
 
+<!-- Qualitative schemes -->
+
 <colormap name="Pink,Gold,...,Blue 5" ncolors="5"
           type="qualitative"
           system="rgb" system_min="0" system_max="1">
@@ -724,6 +730,8 @@
  <color><red>1.000</red><green>1.000</green><blue>1.000</blue> </color>
 </annotations>
 </colormap>
+
+<!-- Spectral schemes, adjusted by Cindy -->
 
 <colormap name="Spectrum 7" ncolors="7"
           type="spectral"

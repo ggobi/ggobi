@@ -23,7 +23,7 @@ symbol_table_zero (datad *d)
 
   for (j=0; j<NGLYPHTYPES; j++)
     for (k=0; k<NGLYPHSIZES; k++)
-      for (m=0; m<NCOLORS; m++)
+      for (m=0; m<MAXNCOLORS; m++)
         d->symbol_table[j][k][m].n =
           d->symbol_table[j][k][m].nhidden = 
           d->symbol_table[j][k][m].nshown = 0;
@@ -77,11 +77,11 @@ clusters_set (datad *d, ggobid *gg) {
   n = 0;
   for (j=0; j<NGLYPHTYPES; j++) {
     for (k=0; k<NGLYPHSIZES; k++) {
-      for (m=0; m<NCOLORS; m++) {
+      for (m=0; m<gg->ncolors; m++) {
         if (d->symbol_table[j][k][m].n > 0) {
           d->clusv[n].glyphtype = j;  g_assert (j>=0 && j<NGLYPHTYPES);
           d->clusv[n].glyphsize = k;  g_assert (k>=0 && k<NGLYPHSIZES);
-          d->clusv[n].color = m;      g_assert (m>=0 && m<NCOLORS);
+          d->clusv[n].color = m;      g_assert (m>=0 && m<MAXNCOLORS);
           d->clusv[n].nhidden = d->symbol_table[j][k][m].nhidden;
           d->clusv[n].nshown = d->symbol_table[j][k][m].nshown;
           d->clusv[n].n = d->symbol_table[j][k][m].n;

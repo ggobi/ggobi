@@ -129,6 +129,7 @@
 49429   8/15  pretty stable for a while despite continuous tuning
 49720   8/28  work on missing values code; reading colorschemes.
 49871   8/31  linking by categorical variable seems to work.
+52542   10/31 color scales, for one ...
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

@@ -20,7 +20,7 @@
 #include "externs.h"
 #include "colorscheme.h"
 
-static const gfloat default_rgb[NCOLORS][3] = {
+static const gfloat default_rgb[MAXNCOLORS][3] = {
   {0.73, 0.33, 0.83},
   {0.51, 0.44, 1.00},
   {0.00, 0.75, 1.00},
@@ -37,13 +37,13 @@ static const gfloat bg_rgb  []    = {0, 0, 0};  /* -> bg_color */
 static const gfloat accent_rgb [] = {1, 1, 1};  /* -> fg_color */
 
 /* API */
-static guint m[NCOLORS][3];
+static guint m[MAXNCOLORS][3];
 guint **
 getColorTable (ggobid *gg)
 {
   gint k;
 
-  for (k=0; k<NCOLORS; k++) {
+  for (k=0; k<MAXNCOLORS; k++) {
     m[k][0] = gg->color_table[k].red;
     m[k][1] = gg->color_table[k].green;
     m[k][2] = gg->color_table[k].blue;
@@ -56,8 +56,8 @@ void
 color_table_init_from_default (GdkColor *color_table,
   GdkColor *bg_color, GdkColor *accent_color)
 {
-  gint i, ncolors = NCOLORS;
-  gboolean writeable = false, best_match = true, success[NCOLORS];
+  gint i, ncolors = MAXNCOLORS;
+  gboolean writeable = false, best_match = true, success[MAXNCOLORS];
 
   for (i=0; i<ncolors; i++) {
     color_table[i].red   = (guint16) (default_rgb[i][0]*65535.0);
@@ -113,8 +113,8 @@ void
 color_table_init (ggobid *gg) {
   gboolean writeable = false, best_match = true;
 
-  gg->color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
-  gg->ncolors = NCOLORS;
+  gg->color_table = (GdkColor *) g_malloc (MAXNCOLORS * sizeof (GdkColor));
+  gg->ncolors = MAXNCOLORS;
   color_table_init_from_default (gg->color_table,
     &gg->bg_color, &gg->accent_color);
 
@@ -140,6 +140,7 @@ void
 init_plot_GC (GdkWindow *w, ggobid *gg) {
   GdkColor white, black, *bblack, *wwhite;
 
+#ifdef USE_XML
   if(!sessionOptions->info || !sessionOptions->info->fgColor) {
      gdk_color_white (gdk_colormap_get_system (), &white);
      wwhite = &white;
@@ -147,13 +148,22 @@ init_plot_GC (GdkWindow *w, ggobid *gg) {
     wwhite = sessionOptions->info->fgColor;
     gg->accent_color = *wwhite;
   }
+#else
+   gdk_color_white (gdk_colormap_get_system (), &white);
+   wwhite = &white;
+#endif
 
+#ifdef USE_XML
   if(!sessionOptions->info || !sessionOptions->info->bgColor) {
     gdk_color_black (gdk_colormap_get_system (), &black);
     bblack = &black;
   } else {
     bblack = sessionOptions->info->bgColor;
   }
+#else
+   gdk_color_black (gdk_colormap_get_system (), &black);
+   bwhite = &black;
+#endif
 
   gg->plot_GC = gdk_gc_new (w);
   gdk_gc_set_foreground (gg->plot_GC, wwhite);

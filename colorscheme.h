@@ -15,7 +15,7 @@ typedef struct {
 
   gfloat system_min, system_max;  /*-- min and max for system; relevant for rgb --*/
 
-  gint n;               /*-- n <= NCOLORS --*/
+  gint n;               /*-- n <= MAXNCOLORS --*/
   gfloat **data;        /*-- the data in the colortable, in its original system and dimensions --*/
   GdkColor *rgb;         /*-- the data converted to rgb, nx3 --*/
   GArray *colorNames;   /*-- in case we have them --*/

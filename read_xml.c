@@ -653,7 +653,7 @@ setColor(const xmlChar **attrs, XMLParserData *data, int i)
     value = strToInteger(tmp);
   }
 
-  if(value < 0 || value > NCOLORS) {
+  if(value < 0 || value > MAXNCOLORS) {
     if(tmp)
       xml_warning("color", tmp, "Out of range", data);
   } else {
@@ -1080,7 +1080,7 @@ setColorMap(const xmlChar **attrs, XMLParserData *data)
 
  /*
   * This appends the colors, but I don't want to allow more than
-  * NCOLORS colors no matter what the user asks for, so I'll be
+  * MAXNCOLORS colors no matter what the user asks for, so I'll be
   * ignoring some of the colors in the set.  -- dfs
  */
  if(size > 0 || file) {

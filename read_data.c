@@ -516,7 +516,7 @@ point_colors_read (InputDescription *desc, gboolean reinit,
       while (i < d->nrows) {  /* should there be a test on k as well? */
 
         retval = fscanf (fp, "%d", &id);
-        if (retval <= 0 || id < 0 || id >= NCOLORS) {
+        if (retval <= 0 || id < 0 || id >= MAXNCOLORS) {
           ok = false;
           g_printerr ("!!Error in reading colors file; using defaults.\n");
           break;

@@ -178,7 +178,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 #endif
   gushort current_color;
   gint ncolors_used;
-  gushort colors_used[NCOLORS+2];  /* treat as MAXNCOLORS */
+  gushort colors_used[MAXNCOLORS+2];
   GtkWidget *da = sp->da;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
@@ -299,7 +299,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 
   gushort current_color;
   gint ncolors_used;
-  gushort colors_used[NCOLORS+2];
+  gushort colors_used[MAXNCOLORS+2];
 
   if (gg->plot_GC == NULL)
     init_plot_GC (sp->pixmap0, gg);
@@ -790,9 +790,9 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
                        display->options.edges_arrowheads_show_p);
   if (!gg->mono_p && (edges_show_p || arrowheads_show_p)) {
 
-    gint symbols_used[NGLYPHSIZES][NEDGETYPES][NCOLORS];
+    gint symbols_used[NGLYPHSIZES][NEDGETYPES][MAXNCOLORS];
     gint nl = 0;
-    gint ncolors = MIN(NCOLORS, gg->ncolors);
+    gint ncolors = MIN(MAXNCOLORS, gg->ncolors);
     gint k_prev = -1, n_prev = -1, p_prev = -1;
 
     endpoints = e->edge.endpoints;

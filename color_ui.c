@@ -423,6 +423,7 @@ static gint
 color_expose_fg (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 {
   gint k = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w), "index"));
+
   redraw_fg (w, k, gg);
   return FALSE;
 }
@@ -607,7 +608,7 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
     gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
   }
   else {
-      for (i=0; i<NCOLORS; i++) {
+      for (i=0; i<MAXNCOLORS; i++) {
       if (w == gg->color_ui.fg_da[i]) {
         color[0] = (gdouble) gg->color_table[i].red / 65535.0;
         color[1] = (gdouble) gg->color_table[i].green / 65535.0;
@@ -651,6 +652,20 @@ delete_symbol_window_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   hide_symbol_window (gg);
 }
 
+/*------------------------------------------------------------------------*/
+/*                   redraw the window                                    */
+/*------------------------------------------------------------------------*/
+
+void
+symbol_window_redraw (ggobid *gg)
+{
+/*
+ * Send expose events where necessary; show the appropriate
+ * number of fg_da widgets.
+*/
+
+
+}
 
 /*------------------------------------------------------------------------*/
 /*                    build the window                                    */
@@ -768,8 +783,7 @@ make_symbol_window (ggobid *gg) {
     ebox = gtk_event_box_new ();
     gtk_container_add (GTK_CONTAINER (fg_frame), ebox);
 
-    /*-- treat NCOLORS as if it meant MAX_NCOLORS --*/
-    ncolors = MIN(gg->ncolors, NCOLORS);
+    ncolors = MIN(gg->ncolors, MAXNCOLORS);
 
     fg_table = gtk_table_new (1, ncolors, true);
     gtk_container_add (GTK_CONTAINER (ebox), fg_table);

@@ -95,7 +95,7 @@ struct _datad {
 
  /*--------------- clusters: hiding, excluding ----------------------*/
 
- symbol_cell symbol_table[NGLYPHTYPES][NGLYPHSIZES][NCOLORS];
+ symbol_cell symbol_table[NGLYPHTYPES][NGLYPHSIZES][MAXNCOLORS];
 
  GtkWidget *cluster_table;  /*-- table of symbol groups from brushing --*/
  

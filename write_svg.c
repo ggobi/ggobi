@@ -46,7 +46,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
 
   gushort current_color;
   gint ncolors_used = 0;
-  gushort colors_used[NCOLORS+2];
+  gushort colors_used[MAXNCOLORS+2];
   GtkWidget *da = sp->da;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
