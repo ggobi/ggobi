@@ -139,7 +139,7 @@ lib libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
 
 
 ../bin/xmlConvert xmlConvert: xmlConvert.o libggobi.so
-	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi -lgtkext $(XML_LIBS)
+	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi -lgtkext $(XML_LIBS) $(shell $(GTK_CONFIG) --libs) 
 
 
 clean:
