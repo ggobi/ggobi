@@ -30,10 +30,17 @@ static GtkWidget *param_vb, *param_lbl, *param_scale;
 static GtkAdjustment *param_adj;
 */
 
-static void
-hide_cb (GtkWidget *w) {
+/*-- called when closed from the close menu item --*/
+static void close_menuitem_cb (ggobid *gg, gint action, GtkWidget *w) {
   /*  free_optimize0_p(&dsp->t1d_pp_op);  should this go here */
-  gtk_widget_hide(w);
+  displayd *dsp = gg->current_display;
+  gtk_widget_hide (dsp->t1d_window);
+}
+/*-- called when closed from the window manager --*/
+static void
+close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
+  displayd *dsp = gg->current_display;
+  gtk_widget_hide (dsp->t1d_window);
 }
 
 static void
@@ -197,7 +204,7 @@ ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",         NULL,         NULL, 0, "<Branch>" },
   { "/File/Close",  
-         "",         (GtkItemFactoryCallback) hide_cb,        0, "<Item>" },
+         "",         (GtkItemFactoryCallback) close_menuitem_cb, 0, "<Item>" },
   { "/_Options",      NULL,         NULL, 0, "<Branch>" },
   { "/Options/Show controls",  
          "v",         (GtkItemFactoryCallback) options_cb, 0, "<CheckItem>" },
@@ -248,8 +255,8 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_window_set_title (GTK_WINDOW (dsp->t1d_window), 
       "projection pursuit - 1D");
     gtk_signal_connect (GTK_OBJECT (dsp->t1d_window), "delete_event",
-                        GTK_SIGNAL_FUNC (hide_cb), (gpointer) NULL);
-    /*    gtk_window_set_policy (GTK_WINDOW (dsp->t1d_window), true, true, false);*/
+                        GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) gg);
+    /*gtk_window_set_policy (GTK_WINDOW (dsp->t1d_window), true, true, false);*/
     gtk_container_set_border_width (GTK_CONTAINER (dsp->t1d_window), 10);
 
 /*
@@ -261,7 +268,8 @@ tour1dpp_window_open (ggobid *gg) {
 
     dsp->t1d_pp_accel_group = gtk_accel_group_new ();
     get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                   dsp->t1d_pp_accel_group, dsp->t1d_window, &dsp->t1d_mbar, (gpointer) NULL);
+                   dsp->t1d_pp_accel_group, dsp->t1d_window, &dsp->t1d_mbar,
+                   (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (vbox), dsp->t1d_mbar, false, true, 0);
 
 /*
