@@ -3,12 +3,17 @@
 
 #include <stdio.h>
 
+#ifdef USE_CLASSES
+extern datad *datad_new (ggobid *);
+#endif
+
+extern datad *datad_new(datad *d, ggobid *gg);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern displayd * datad_init (datad *, ggobid *, gboolean);
-extern datad * datad_new (ggobid *);
 extern GtkWidget* CreateMenuCheck (displayd *, GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 extern GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
 extern ggobid* GGobiFromDisplay (displayd *display);
