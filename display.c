@@ -30,7 +30,7 @@ DisplayOptions DefaultDisplayOptions = {
                                          true,  /* whiskers_show_p*/
                                          true,  /* axes_show_p */
                                          false, /* axes_label_p */
-                                         true, /* axes_values_p */
+                                         false, /* axes_values_p */
 /* unused
                                          true,  * missings_show_p  * 
                                          true,  * axes_center_p *

@@ -514,6 +514,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
       count = 0;*/
         t2d_ppdraw(dsp->t2d.ppval, gg);
 /*      }*/
+     
     }
   }
   else { /* do final clean-up and get new target */
