@@ -88,7 +88,8 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
     record_add (cpanel->ee_mode, -1, -1, label, id, raw, d, e, gg);
   }
 
-  g_free (raw);
+  if (raw)
+    g_free (raw);
 
   gg->edgeedit.a = -1;
   gtk_widget_destroy (dialog);
