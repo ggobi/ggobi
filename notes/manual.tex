@@ -376,9 +376,9 @@ inventory of interactive graphics operations:
 \itemsep 0em
 \item 1DPlot: 1-D dotplots and average shifted histograms,
 \item XYPlot: 2-D scatterplots,
-\item 1DTour: random 1-Dimensional tour,
-\item 2DTour: random 2-Dimensional tour,
-\item 2x1DTour: correlation tour, random and guided,
+\item 1DTour: 1-D tour,
+\item 2DTour: 2-D tour,
+\item 2x1DTour: correlation tour, which is independent 1-D tours on horizontal and vertical axes, 
 \item Scale: axis scaling,
 \item Brush: setting point glyphs and point and edge colors,
 \item Identify: labelling points
@@ -683,11 +683,94 @@ with a left click, and vertically if you use a middle or right click.
 \subsection{1D Tour}
 \label{slbl:1DTour}
 
+The 1D tour generates a continuous sequence of 1-D projections of the
+active variable space. The projected data are displayed as an average
+shifted histogram, horizontally or vertically. The scrollbar at the
+top of the controls allows the speed of rotation to be adjusted. The
+pause checkbox stops and starts the tour. Reinit initializes the tour
+to the projection of the first active variable. A rudimentary guided
+tour is available from the projection pursuit control panel. Currently
+only the principal component index is implemented.
+
+Variables can be toggled into the tour by clicking on the variable
+circles. The active variable space is the subset of variables
+currently entered into a tour. When a variable is toggled out of the
+tour it fades out gradually, to maintain continuity of the tour.
+
+The variable projection coefficients can be manually manipulated using
+manual controls. To select the variable to manipulate, click on the
+purple {\bf Manip} button and then click on the variable circle. Then
+using mouse motion in the plot window the coefficient for the
+manipulation variable can be altered, constrained by the values of the
+coefficients of other active variables.
+
+The variable axes can be toggled on or off using the options menu at
+the top of the plot window.
+
 \subsection{2D Tour}
 \label{slbl:2DTour}
 
+The 2D tour generates a continuous sequence of 2-D projections of the
+active variable space. The projected data are displayed as a
+scatterplot. The scrollbar at the top of the controls allows the speed
+of rotation to be adjusted. The pause checkbox stops and starts the
+tour. Reinit initializes the tour to the projection of the first two
+active variables. A rudimentary guided tour is available from the
+projection pursuit control panel. Currently only the holes and central
+mass indices are implemented.
+
+Variables can be toggled into the tour by clicking on the variable
+circles. The active variable space is the subset of variables
+currently entered into a tour. When a variable is toggled out of the
+tour it fades out gradually, to maintain continuity of the tour.
+
+The variable projection coefficients can be manually manipulated using
+manual controls. To select the variable to manipulate, click on the
+purple {\bf Manip} button and then click on the variable circle. Then
+using mouse motion in the plot window the coefficient for the
+manipulation variable can be altered, constrained by the values of the
+coefficients of other active variables. There are 5 manipulation
+modes: oblique is unconstrained manipulation, horizontal and vertical
+constrain manipulation along the axes, radial constrains manipulation
+to the current direction of the variable keeping angle fixed, and
+angular manipulation allows rotating the variable axis in the plane of
+the plot window, keeping the length of the axis fixed.
+
+The variable axes can be toggled on or off using the options menu at
+the top of the plot window.
+
 \subsection{2x1D Tour}
 \label{slbl:2x1DTour}
+
+The 1x1D tour generates 2 independent continuous sequences of 1D
+projections of 2 active variable spaces, plotting the results
+horizontally and vertically generating a scatterplot. The scrollbar at
+the top of the controls allows the speed of rotation to be
+adjusted. The pause checkbox stops and starts the tour. Reinit
+initializes the tour to the projection of the first two active
+variables.
+
+Variables can be toggled into the tour by clicking on the variable
+circles. A click with the left mouse toggles a variable in the
+horizontal direction, and a click with the middle mouse toggles a
+variable in the vertical direction. The active variable space is the
+subset of variables currently entered into a tour. When a variable is
+toggled out of the tour it fades out gradually, to maintain continuity
+of the tour.
+
+The variable projection coefficients can be manually manipulated using
+manual controls. To select the variable to manipulate, click on the
+purple {\bf Manip} button and then click on the variable circle. Then
+using mouse motion in the plot window the coefficient for the
+manipulation variable can be altered, constrained by the values of the
+coefficients of other active variables. There are 4 manipulation
+modes: combined is changes both horizontal and vertical manipulation
+variable coefficients, equal combined constrains the horizontal and
+vertical changes to be equal, horizontal and vertical constrain
+manipulation along the axes.
+
+The variable axes can be toggled on or off using the options menu at
+the top of the plot window.
 
 \subsection{Scaling of axes}
 \label{slbl:Scaling}
@@ -723,7 +806,7 @@ segment which is anchored at the center of the plot (just where the
 center of the crosshair is in Drag style).  When you press the space
 bar, you'll cause the plot to pan so that the endpoint becomes the
 new center -- ie, short segments yield small movements.  Repeated
-presses repeat the mostion in the same direction -- convenient for
+presses repeat the motion in the same direction -- convenient for
 browsing time-dependent data, for instance.
 
 With {\bf Zoom} selected, the visual guide changes again:  this time,
@@ -960,7 +1043,8 @@ sphering} to create new variables and add them ggobi's variable selection
 panels.  The names of the selected variables will be added to the
 ``sphered variables'' to help you remember which variables you sphered.
 
-[And I forget what 'Restore scree plot' is for -- dfs]
+Restore scree plot can be used to refresh the plot when a new subset
+of variables is chosen.
 
 \subsection{Inference}
 
