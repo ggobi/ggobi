@@ -133,14 +133,44 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
 }
 
 gboolean
+write_edge_record_p (gint i, datad *e, ggobid *gg)
+{
+/*
+ * If e is an edge set, then
+ * loop over all other datads and test their rowids to decide
+ * whether this case should be drawn.  Use sampled and hidden.
+*/
+  gboolean save_case = true;
+  datad *d;
+  GSList *l;
+  gint a, b;
+
+  if (e->edge.n == e->nrows) {
+    for (l = gg->d; l; l=l->next) {
+      d = (datad *) l->data;
+      if (d != e) {
+        if (d->rowid.idv.nels > e->edge.endpoints[i].a &&
+            d->rowid.idv.nels > e->edge.endpoints[i].b)
+        {
+          a = d->rowid.idv.els[e->edge.endpoints[i].a];
+          b = d->rowid.idv.els[e->edge.endpoints[i].b];
+          if (!d->sampled.els[a] || !d->sampled.els[b] ||
+              d->hidden.els[a] || d->hidden.els[b])
+          {
+            save_case = false;
+            break;
+          }
+        }
+      }
+    }
+  }
+  return save_case;
+}
+
+gboolean
 write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  gint i, m, n;
-
-/*
- * I'm not sure this does the right thing for invisible edges;
- * testing is called for.
-*/
 
 /*
  * if saving visible records only, find out how many there are
@@ -150,8 +180,15 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
  else if (gg->save.row_ind == DISPLAYEDROWS) {
    n = 0;
    for (i=0; i<d->nrows_in_plot; i++) {
-     if (!d->hidden.els[ d->rows_in_plot[i] ])
-       n++;
+     if (!d->hidden.els[ d->rows_in_plot[i] ]) {
+       if (d->edge.n == d->nrows) {
+         if (d->edge.n == d->nrows)
+           if (write_edge_record_p (i, d, gg))
+             n++;
+       } else {
+         n++;
+       }
+     }
    }
  }
 
@@ -178,8 +215,8 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
    for (i=0; i<d->nrows_in_plot; i++) {
      m = d->rows_in_plot[i];
      if (!d->hidden.els[m]) {
-       write_xml_record (f, d, gg, m, xmlWriteInfo);
-       fprintf(f, "\n");
+       if (write_xml_record (f, d, gg, m, xmlWriteInfo))
+         fprintf(f, "\n");
      }
    }
  }
@@ -193,15 +230,17 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
 {
   gint j;
   gchar *gstr, *gtypestr = NULL;
-/*
-  gboolean gsize_p = false, gtype_p = false;
-*/
+
+  if (d->edge.n == d->nrows) {
+    if (!write_edge_record_p (i, d, gg))
+      return false;
+  }
 
   fprintf(f, "<record");
 
   /*-- ids if present --*/
-  if (d->rowid.id.nels != 0 && d->rowid.idv.nels != 0) {
-    fprintf(f, " id=\"%d\"", d->rowid.idv.els[i]);
+  if (d->rowid.id.nels != 0) {
+    fprintf(f, " id=\"%d\"", d->rowid.id.els[i]);
   }
 
   /*-- edges if present and requested --*/
