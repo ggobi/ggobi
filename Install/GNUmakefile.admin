@@ -45,7 +45,8 @@ C_HEADER_FILES=\
   externs ggobi noop-checkbutton read_mysql read_xml  \
   splot types vars varseldata write_xml writedata vartable gtkext fileio \
   print tour1d_pp tour2d_pp tour_pp splash read_init write_state \
-  plugin colorscheme
+  plugin colorscheme \
+  dbms dbms_ui
 
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)

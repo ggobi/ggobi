@@ -111,6 +111,7 @@ SRC=\
     xyplot.c \
     xyplot_ui.c \
     print.c \
+    dbms.c dbms_ui.c \
     @XML_SRC@ @MYSQL_SRC@
 
 #    mt19937-1.c \
