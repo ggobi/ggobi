@@ -40,6 +40,8 @@ const char *const GGOBI(OpModeNames)[] = {
 
 static const char *const *mode_name = GGOBI(OpModeNames);
 
+void addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg);
+
 void
 make_control_panels (ggobid *gg) {
 
@@ -582,6 +584,8 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) writeall_window_open,    
        2 },
 
+  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
+
 #ifdef PRINTING_IMPLEMENTED
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Print",
@@ -591,10 +595,13 @@ static GtkItemFactoryEntry menu_items[] = {
 #endif
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
+
   { "/File/Quit",   
        "<ctrl>Q",   
        (GtkItemFactoryCallback) quit_ggobi, 
        0 },
+
+  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
 
   { "/_Tools",        NULL,         NULL, 0, "<Branch>" },
   { "/Tools/Variable manipulation ...", 
@@ -711,6 +718,12 @@ make_ui (ggobid *gg) {
                             gg->main_accel_group, window,
                             &gg->main_menubar, (gpointer) gg);
 
+  {
+   GtkWidget *w;
+      w = gtk_item_factory_get_widget(gg->main_menu_factory, "/File");
+      addPreviousFilesMenu(w, sessionOptions->info, gg);
+  }
+
   display_menu_init (gg);
 
   gtk_box_pack_start (GTK_BOX (vbox), gg->main_menubar, false, false, 0);
@@ -755,3 +768,70 @@ GGOBI(getOpModeNames)(int *n)
   *n = sizeof(GGOBI(OpModeNames))/sizeof(GGOBI(OpModeNames)[0]);
   return (GGOBI(OpModeNames));
 }
+
+void load_previous_file(GtkWidget *w, gpointer cbd);
+
+/*
+
+ */
+void
+addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
+{
+  int i;
+  GtkWidget *el;
+  
+  if(info) {
+    for(i = 0 ; i < info->numInputs ; i++) {
+     if(info->inputs[i].fileName) {
+       el = gtk_menu_item_new_with_label(info->inputs[i].fileName);
+       gtk_signal_connect(GTK_OBJECT(el), "activate", GTK_SIGNAL_FUNC(load_previous_file),
+                            info->inputs + i);
+       GGobi_widget_set(el, gg, true);
+       gtk_menu_insert(GTK_MENU(parent), el, 2 + i + 1);
+     }
+   }
+  }
+}
+
+ggobid *create_ggobi(InputDescription *desc);
+
+void
+load_previous_file(GtkWidget *w, gpointer cbd)
+{
+  InputDescription *desc;
+  ggobid *gg;
+
+   gg = GGobiFromWidget(w, false);
+   desc = (InputDescription*) cbd;
+
+   if(g_slist_length(gg->d) > 0)
+      create_ggobi(desc);
+   else
+      read_input(desc, gg);
+}
+
+/*
+ This replicates code elsewhere and the two should be
+ merged.
+ */
+ggobid *
+create_ggobi(InputDescription *desc)
+{
+  gboolean init_data = true;
+  ggobid *gg;
+
+  gg = ggobi_alloc();
+
+     /*-- some initializations --*/
+  gg->displays = NULL;
+  globals_init (gg); /*-- variables that don't depend on the data --*/
+  color_table_init (gg);
+  make_ui (gg);
+
+  read_input(desc, gg);
+
+  start_ggobi(gg, init_data);
+
+  return(gg);
+}
+

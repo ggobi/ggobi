@@ -409,7 +409,7 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
      * Try fname.bin before fname, to see whether there is a binary
      * data file available.  If there is, call read_binary ().
     */
-    if(gg->input->mode == binary_data) {
+    if(desc->mode == binary_data) {
       if ((fp = fopen (desc->fileName, "rb")) != NULL) {
         read_binary (fp, d, gg);
         d->name = g_strdup(fname);
@@ -419,7 +419,7 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
       if ( (fp = fopen(desc->fileName, "r")) != NULL) {
         gchar *sep = g_strdup_printf ("%c", G_DIR_SEPARATOR);
         gchar *name = NULL;
-        gchar **words = g_strsplit ((const gchar *) gg->input->baseName,
+        gchar **words = g_strsplit ((const gchar *) desc->baseName,
           (const gchar *) sep, 0);
         gchar **p;
 

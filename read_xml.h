@@ -3,8 +3,11 @@
 
 #include "vars.h"
 
-/*#include <libxml/parser.h>*/
+#if 1
+#include <libxml/parser.h>
+#else
 #include <parser.h>
+#endif
 
 enum xmlDataState { 
   TOP = 0, 

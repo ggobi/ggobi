@@ -364,6 +364,10 @@ struct _ggobid {
  PrintOptions *printOptions;
 }; /*  ggobid; */
 
+#ifdef USE_XML
+#include "read_init.h"
+#endif
+
 
 typedef struct {
 
@@ -375,7 +379,17 @@ typedef struct {
 
   char **cmdArgs;
   int numArgs;
+
+#ifdef USE_XML
+  struct _GGobiInitInfo *info;
+  char *initializationFile;
+#endif
 } GGobiOptions;
+
+
+gboolean read_input(InputDescription *desc, ggobid *gg);
+void start_ggobi(ggobid *gg, gboolean init_data);
+void process_initialization_files();
 
 extern GGobiOptions *sessionOptions;
 

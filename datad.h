@@ -17,7 +17,7 @@
 #include "vartable.h"
 
 #ifdef USE_XML
-#include <parser.h>
+#include <libxml/parser.h>
 struct _XMLUserData;
 #endif
 

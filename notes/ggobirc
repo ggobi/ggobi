@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobirc>
+<ggobirc>
+
+<previousFiles count="4">
+<file name="/home2/FlowData/AltProjects/ggobi/data/flea.xml" mode="xml" />
+<file name="/home2/FlowData/AltProjects/ggobi/data/flea.dat" mode="ascii" />
+<url name="http://www.ggobi.org/data/flea.xml" mode="xml" />
+<database>
+ <host>
+   <name>tuolomne</name>
+ </host>
+ <login>duncan</login>
+ <query>select * from flea;</query>
+</database>
+</previousFiles>
+
+</ggobirc>
+
+

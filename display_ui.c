@@ -250,3 +250,6 @@ display_menu_init (ggobid *gg)
 
   submenu_insert (gg->display_menu_item, gg->main_menubar, 1);
 }
+
+
+

@@ -27,6 +27,8 @@
 #include "read_mysql.h"
 #endif
 
+gboolean read_input(InputDescription *desc, ggobid *gg);
+
 /*-- initialize variables which don't depend on the size of the data --*/
 void globals_init (ggobid *gg) {
   gg->glyph_id.type = gg->glyph_0.type = FILLED_CIRCLE;
@@ -90,8 +92,18 @@ fileset_read (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
 
   gg->input = desc;
 
+  ok = read_input(desc, gg);
+
+  return ok;  /* need to check return codes of reading routines */
+}
+
+gboolean
+read_input(InputDescription *desc, ggobid *gg)
+{
+  gboolean ok = false;
   switch (desc->mode) {
     case xml_data:
+    case url_data:
 #ifdef USE_XML
      ok = data_xml_read (desc, gg);
 #else
@@ -119,7 +131,7 @@ fileset_read (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
     break;
 
     case ascii_data:
-      read_ascii_data(desc, gg);
+      ok = read_ascii_data(desc, gg);
     break;
    default:
      g_printerr("Unknown data type in fileset_read\n");
@@ -130,7 +142,7 @@ fileset_read (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
     showInputDescription(desc, gg);
   }
 
-  return ok;  /* need to check return codes of reading routines */
+  return(ok);
 }
 
 void
@@ -169,9 +181,9 @@ pipeline_init (datad *d, ggobid *gg)
  * event handlers there as well
 */
 void
-make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) {
+make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) 
+{
   gboolean init_data = false;
-  datad *d;
 
   /*-- some initializations --*/
   gg->displays = NULL;
@@ -192,6 +204,18 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) {
 #endif
   }
 
+  start_ggobi(gg, init_data);
+
+
+  if (processEvents) {
+    gtk_main ();
+  }
+}
+
+void
+start_ggobi(ggobid *gg, gboolean init_data)
+{
+  datad *d;
   if (init_data) {
     GSList *l;
     gboolean firstd = true;
@@ -214,10 +238,6 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) {
         gg->prev_mode = gg->projection = gg->prev_projection = gg->mode;
       }
     }
-  }
-
-  if (processEvents) {
-    gtk_main ();
   }
 }
 

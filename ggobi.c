@@ -25,6 +25,9 @@
 
 #include "print.h"
 
+#ifdef USE_XML
+#include "read_init.h"
+#endif
 
 static GGobiOptions sessionoptions;
 GGobiOptions *sessionOptions;
@@ -104,9 +107,10 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
     else if (strcmp (av[1], "--version") == 0) {
       g_printerr ("%s\n", GGOBI(getVersionString()));
       exit (0);
+    } else if(strcmp(av[1], "-init") == 0) {
+	sessionOptions->initializationFile = g_strdup(av[2]);
+        (*argc)--; av++;
     }
-
-
   }
 
   (*argc)--;
@@ -276,6 +280,8 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
                vis->type == GDK_VISUAL_GRAYSCALE);
 
   parse_command_line (&argc, argv, gg);
+
+  process_initialization_files();
 
   if(sessionOptions->verbose)
     g_printerr("progname = %s\n", g_get_prgname());
@@ -454,3 +460,43 @@ ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal)
 
  return(NULL); 
 }
+
+#ifdef USE_XML
+/*
+  Determines which initialization file to use
+  Checks for the one specified by
+    1) the -init command line option
+    2) the GGOBIRC environment variable
+    3) the $HOME/.ggobirc file.
+ */
+void
+process_initialization_files()
+{
+  GGobiInitInfo *info;
+  char buf[100];
+  const char *fileName = NULL;
+
+  if(sessionOptions->initializationFile)
+      fileName = sessionOptions->initializationFile;
+  else {
+           /* This use of getenv() is not portable. */
+     fileName = getenv("GGOBIRC");
+     if(!fileName || !fileName[0]) {
+       char *tmp;
+            /* HOME doesn't necessarily make sense in Windows. */
+         tmp = getenv("HOME");
+         if(tmp) {
+           sprintf(buf, "%s/.ggobirc", tmp);
+           fileName = buf;
+	 }
+     }
+     if(fileName)
+     sessionOptions->initializationFile = g_strdup(fileName);
+  }
+     
+  if(fileName) {
+    info = read_init_file(fileName);
+    sessionOptions->info = info;
+  }
+}
+#endif

@@ -54,7 +54,7 @@ gboolean endsWith(const char *str, const char *what);
 InputDescription* fileset_generate(const char *fileName, DataMode guess);
 
 
-gchar * findAssociatedFile(InputDescription *desc, const gchar * const *suffixes, int numSuffixes, gint *which, gboolean isError);
+gchar *findAssociatedFile(InputDescription *desc, const gchar * const *suffixes, int numSuffixes, gint *which, gboolean isError);
 int addInputSuffix(InputDescription *desc, const gchar *suffix);
 int addInputFile(InputDescription *desc, const gchar *file);
 

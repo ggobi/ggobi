@@ -77,7 +77,7 @@ fileset_generate(const char *fileName, DataMode guess)
   if(access(fileName, ft) != 0) {
 #endif
     if(isURL(fileName)) {
-      desc->mode = xml_data;
+      desc->mode = url_data;
       desc->fileName = g_strdup(fileName);
       completeFileDesc(fileName, desc);
       return(desc);
@@ -227,6 +227,7 @@ verifyDataMode(const char *fileName, DataMode mode, InputDescription *desc)
   switch (mode) {
 #ifdef USE_XML
     case xml_data:
+    case url_data:
       if(!isXMLFile(fileName, desc))
         mode = unknown_data;
      break;
