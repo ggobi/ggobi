@@ -99,9 +99,9 @@ SRC=array.c ash1d.c \
  main_ui.c make_ggobi.c menus.c missing.c \
  movepts.c movepts_ui.c noop-toggle.c \
  p1d.c p1d_ui.c \
- parcoords.c parcoords_ui.c parcoordsClass.c pipeline.c \
+ parcoords.c parcoords_ui.c parcoordsClass.c pipeline.c plugin.c \
  ppcorr_ui.c \
- read_array.c read_data.c record_id.c  \
+ read_array.c read_color.c read_data.c read_init.c read_xml.c record_id.c  \
  scale_api.c scale_click.c scale_drag.c scale_ui.c \
  scatmat.c scatmat_ui.c scatmatClass.c \
  scatterplot.c scatterplot_ui.c scatterplotClass.c \
@@ -117,73 +117,27 @@ SRC=array.c ash1d.c \
  varchange.c varcircles.c varpanel_ui.c \
  vartable.c vartable_nbook.c vartable_ui.c \
  vector.c wvis.c wvis_ui.c win32_draw.c \
- writedata.c writedata_ui.c write_svg.c \
+ writedata.c writedata_ui.c write_state.c write_svg.c write_xml.c \
  xlines.c xyplot.c xyplot_ui.c \
 \
  mt19937ar.c cokus.c \
  print.c
 
-OB=array.o ash1d.o \
- barchart.o barchart_ui.o barchartClass.o \
- brush_api.o brush_bins.o brush.o brush_init.o brush_link.o brush_ui.o \
- color.o color_ui.o cpanel.o \
- datad.o display.o display_tree.o display_ui.o \
- edges.o exclusion.o exclusion_ui.o extendedDisplay.o fileio.o \
- ggobi-API.o ggobi.o ggobiClass.o \
- help.o identify.o identify_ui.o \
- impute.o impute_ui.o io.o jitter.o jitter_ui.o \
- limits.o lineedit.o lineedit_ui.o \
- main_ui.o make_ggobi.o menus.o missing.o \
- movepts.o movepts_ui.o noop-toggle.o \
- p1d.o p1d_ui.o \
- parcoords.o parcoords_ui.o parcoordsClass.o pipeline.o \
- ppcorr_ui.o \
- read_array.o read_data.o record_id.o \
- scale_api.o scale_click.o scale_drag.o scale_ui.o \
- scatmat.o scatmat_ui.o scatmatClass.o \
- scatterplot.o scatterplot_ui.o scatterplotClass.o \
- smooth_ui.o sphere.o sphere_ui.o splash.o \
- splot.o sp_plot.o subset.o subset_ui.o svd.o \
- texture.o timeplot.o time_ui.o tsdisplay.o tsPlot.o \
- tour1d.o tour1d_pp.o tour1d_pp_ui.o tour1d_ui.o tour_pp.o\
- tour2d.o tour2d_ui.o tour2d_pp.o tour2d_pp_ui.o \
- tour2d3.o tour2d3_ui.o \
- tour.o tourcorr.o tourcorr_ui.o \
- transform.o transform_ui.o \
- utils.o utils_gdk.o utils_ui.o \
- varchange.o varcircles.o varpanel_ui.o \
- vartable.o vartable_nbook.o vartable_ui.o \
- vector.o wvis.o wvis_ui.o win32_draw.o \
- writedata.o writedata_ui.o write_svg.o \
- xlines.o xyplot.o xyplot_ui.o \
-\
- print.o
 
 ifdef GTK_2
  SRC+=marshal.c
- OB+= marshal.o
 else
  SRC+=gtkextruler.c gtkexthruler.c gtkextvruler.c 
- OB+=gtkextruler.o gtkexthruler.o gtkextvruler.o 
 endif
-
-
 
 ifdef TEST_EVENTS
   SRC+=  testEvents.c
-  OB+= testEvents.o
   CFLAGS+= -DTEST_GGOBI_EVENTS -DTEST_BRUSH_MOTION_CB=1
 endif
-
-XML_SRC= read_xml.c write_xml.c  read_init.c write_state.c read_color.c plugin.c
-XML_OB= read_xml.o write_xml.o read_init.o write_state.o read_color.o plugin.o
 
 # XML_FLAGS+= -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
 CFLAGS+= $(XML_INC_DIRS:%=-I%) $(XML_FLAGS) -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
 CFLAGS+=$(DEFINES)
-
-SRC+=$(XML_SRC)
-OB+= $(XML_OB)
 
 ifdef DL_RESOLVE_FLAG
  DL_RESOLVE_PATH+=$(XML_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %)
@@ -194,12 +148,12 @@ XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml$(XML_LIB_NO) -lz
 main_ui.o: write_xml.h
 read_xml.o: read_xml.h
 
-OB+=mt19937ar.o cokus.o  
-
 ifdef USE_DBMS
  SRC+= dbms.c dbms_ui.c
- OB+= dbms.o dbms_ui.o
 endif
+
+# After all appropriate optional files have been appended to
+OB=$(SRC:%.c=%.o)
 
 ggobi: $(OB) $(EXTRA_OB)
 	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS)  $(EXTRA_LIBS) ${GTK_LIBS}  $(DL_RESOLVE_PATH)
