@@ -1270,6 +1270,16 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
     tmp = strtok (NULL, " \t\n");
   }
 
+  if (data->current_element < d->ncols) {
+    ggobi_XML_error_handler (data, "Not enough elements\n");
+    /*
+    g_printerr ("Record %d has insufficient elements: %d < %d\n",
+		data->current_record, data->current_element,
+		d->ncols);
+    */
+  }
+
+
   applyRandomUniforms(d, data);
   return (true);
 }
