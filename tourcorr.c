@@ -155,6 +155,9 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
   GList *l;
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
+    if (dsp->displaytype != scatterplot)
+      continue;
+
     if (dsp->d == d) {
       arrayf_add_cols (&dsp->tcorr1.u0, nc);
       arrayf_add_cols (&dsp->tcorr1.u1, nc);

@@ -104,6 +104,7 @@ tour2d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
 }
 
 /*-- append columns for a total of nc columns --*/
+/*-- we don't know for certain that tour has been initialized, do we? --*/
 void
 tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
 {
@@ -113,8 +114,14 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
 
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
-  
+    if (dsp->displaytype != scatterplot)
+      continue;
+
     old_ncols = dsp->t2d.u0.ncols;
+
+    if (old_ncols < 2 && nc >= 2) {
+      /* what? */
+    }
 
     if (dsp->d == d) {
       arrayf_add_cols (&dsp->t2d.u0, nc);
