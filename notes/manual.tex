@@ -243,9 +243,7 @@ Now change to {\bf Persistent} brushing and paint the 3 Regions
 different colors. You may also want to use different symbols to
 represent the different Areas. 
 
-Hiding subsets.
-
-Next use the Tools menu to open the {\bf Variable manipulation tool},
+Next use the Tools menu to open the {\bf Variable manipulation} tool,
 a central part of the ggobi graphical user interface (Figure
 \ref{fig4}).  It contains a table with a few basic statistics for each
 variable, and the buttons below the table allow you to set variable
@@ -254,10 +252,19 @@ mouse in the table -- you can select one row of the table at a time,
 or use the control and shift keys as modifiers to select more than
 one.  Hold the control key down while clicking to select variables
 that are not contiguous in the table; use the shift key if you want to
-select a contiguous range of variables.
+select a contiguous range of variables. Select all of the fatty acid
+variables. Now open up the {\bf Variable transformation} tool, and
+choose {\bf Standardize} in the stage 2 transformation panel to
+standardize all the variables to have mean 0 and variance 1. The
+transformation tool has numerous transformation operations to perform
+on variables as appropriate. Stage 0 is a domain adjustment operation
+adjust variables values into an acceptable range as needed for some
+stage 1 transformations. Stage 2 transformations allow for
+post-processing of stage 1 transformations, so that the variables can
+be logged and then standardized, for example.
 
 \begin{figure}[htp]
-\vspace{-0.5in}
+%\vspace{-0.5in}
 %\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
 \pdfimage width 5in {olive-var.jpg}
 %\vspace{.15in} \centerline{ \parbox{6in}
@@ -268,18 +275,73 @@ for other modes.
 \label{fig4}
 \end{figure}
 
-You select variables in this fashion when you want to use one of
-the tools to operate on them.  For example, select just the GILTS
-variable, and then click on {\bf Clone} at the bottom of the tool.
-You have just added a duplicate of the GILTS variable to the dataset,
-and you'll see it at the bottom of the table in this tool, and in
-the variable selection region of the ggobi control panel, too.
-Select that new GILTS variable in the {\bf Variable manipulation tool},
-then return to the Tools menu and open the {\bf Variable transformation
-tool.}
+Now look at the plot of linoleic vs eicosenoic. Open up the {\bf Case
+clusters ...} panel, and use the Hide/Show chack boxes to toggle
+groups of points on and off (Figure \ref{fig5}). Hide the cases from
+geographic region 1, and then {\bf Recale}. 
 
-[etc, do a transformation]
+\begin{figure}[htp]
+\hbox{\pdfimage width 3in {olive-brush3.jpg}\pdfimage width 3in {olive-brush4.jpg}}
+\caption{Toggling clusters of points on and off according to color/glyph value.}
+\label{fig5}
+\end{figure}
 
+Now switch into {\bf 2D Tour} using the {\bf ViewMode} menu. The
+variable checkboxes change to variable circles. Click on the circles
+for Region adn Area to toggle these variables out of the tour. And
+then click {\bf Reinit}. Also remove eicosenoic acid from the tour,
+using similar mouse action. The scrollbar at the top of the tour
+controls allows the speed of the tour to be adjusted. Drag it to the
+right to speed up the rotation.  The circle in the bottom of the plot
+window displays the axes for the tour. These can be toggled off the
+plot by selecting the {\bf Options} menu on the plot window. Pause the
+tour when you see a separation of the green and purple points, that
+is, regions 2 and 3 (for example, Figure \ref{fig6}). Now you are
+going to use manula tour controls to sharpen up the separation by
+manually changing the coefficients of the variables in the
+projection. On the main control window click on the {\bf Manip}
+(purple) button, and then click on linoleic acid (a purple circle will
+be seen now in the variable circle for linoleic acid). Now in the plot
+window click and drag the cursor. The coefficent corresponding to
+linoleic acid will increase and decrease inducing a rotation of the
+scattercloud. Similarly rotate oleic acid and arachidic acid in and
+out of the plot, with the aim to find a projection where the two
+regions are better separated (for example, Figure \ref{fig6}).  There
+are 5 choices of manipulation mode (unconstrained oblique, vertical,
+horizontal, radial and angular) to explore.
+
+\begin{figure}[htp]
+\hbox{\pdfimage width 3in {olive-tour1.jpg}\pdfimage width 3in {olive-tour2.jpg}}
+\caption{Tour plots revealing difference between regions 2 and 3 of the
+olive oils.}
+\label{fig6}
+\end{figure}
+
+Now open up a {\bf New parallel coordinates display} using the {\bf
+Display} menu. Using the {\bf Selection Mode:} menu on the control
+panel select {\bf Delete} mode to remove Region and Area from the
+parallel coordinates plot. Then switch to {\bf Append} mode and add
+the remaining acid variables. Now select the first plot in the
+parallel coordinates display by clicking on it, and using the {\bf
+ViewMode} menu switch to {\bf Brush} mode. Choose a new color (say
+yellow) and large closed glyph, and transiently paint the case with a
+very low value on palmitic (Figure \ref{fig7}). This case also has a
+very high value for oleic acid, and low value for linolenic acid.
+
+\begin{figure}[htp]
+\hbox{\pdfimage width 6in {olive-par.jpg}}
+\caption{Brushing in a parallel coordinates display reveals and outlier in 
+palmitic, oleic and linolenic acids.}
+\label{fig7}
+\end{figure}
+
+Using the {\bf Case clusters} panel from the {\bf Brush} controls
+click on the show check box to bring the Region 1 cases back into the
+plot. Now using the {\bf File} menu output the data, saving the colors
+and glyphs that have been created during this session.
+
+This has been a brief introduction to the use of ggobi. The following
+section contains more detailed information on the full functionality.
 
 \section{Layout and functionality}
 
