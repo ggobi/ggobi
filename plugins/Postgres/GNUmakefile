@@ -34,10 +34,6 @@ pg: pgInput.c
 local.config:  configure
 	./configure
 
-configure: configure.in
-	autoconf
-
-
 clean:
 	-rm pgInput.o
 
