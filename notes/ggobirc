@@ -21,7 +21,10 @@
       -->
   <color max="1"><red>0</red><green>0</green><blue>1</blue></color>
   </background>
-
+  <foreground>
+    <color max="1"><red>1</red><green>0</green><blue>0</blue></color>
+  </foreground>
+  <glyph type="x" size="2" />
 </preferences>
 
 <previousFiles count="4">

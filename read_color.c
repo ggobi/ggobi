@@ -225,7 +225,7 @@ getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col)
   col->green = vals[1];
   col->blue = vals[2];
 
-  gdk_colormap_alloc_color(gdk_colormap_get_system (), col, true, true);
+/*  gdk_colormap_alloc_color(gdk_colormap_get_system (), col, true, true); */
 
 
   return(numElements);

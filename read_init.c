@@ -2,6 +2,7 @@
   Reads initialization file.
  */
 #include "read_init.h"
+#include "read_xml.h" /* for asNumber() */
 
 #if USE_XML == 1
 extern int xmlDoValidityCheckingDefaultValue;
@@ -126,9 +127,37 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
     info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
     getColor(el, doc, NULL, info->bgColor);
     if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
-      info->bgColor, false, true) == false)
+      info->bgColor, true, true) == false)
     {
       g_printerr ("Can't allocate background color\n");
+    }
+  }
+
+  info->fgColor = NULL;  /*-- this needs to be initialized --*/
+  el = getXMLElement(node, "foreground");
+  if(el) {
+    el = getXMLElement(el, "color");
+    info->fgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
+    getColor(el, doc, NULL, info->fgColor);
+    if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
+      info->fgColor, true, true) == false)
+    {
+      g_printerr ("Can't allocate foreground color\n");
+    }
+  }
+
+
+  el = getXMLElement(node, "glyph");
+  if(el) {
+    char *tmp;
+
+    tmp = xmlGetProp(el, "type");
+    if(tmp) {
+	info->glyph.type = mapGlyphName(tmp);
+    }
+    tmp = xmlGetProp(el, "size");
+    if(tmp) {
+	info->glyph.size = asNumber(tmp);
     }
   }
 

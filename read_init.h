@@ -39,6 +39,8 @@ typedef struct _GGobiInitInfo {
 
     char *colorSchemeFile; /* */
     GdkColor *bgColor;
+    GdkColor *fgColor;
+    glyphd    glyph;
 } GGobiInitInfo;
 
 GGobiInitInfo *read_init_file(const char *filename, GGobiInitInfo *info);

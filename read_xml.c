@@ -215,8 +215,13 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->rowIds = NULL;
   data->handlers = handler;
   data->defaults.color = -1;
+#ifndef SUPPORT_PLUGINS
   data->defaults.glyphType = -1;
   data->defaults.glyphSize = -1;
+#else
+  data->defaults.glyphType = sessionOptions->info->glyph.type;
+  data->defaults.glyphSize = sessionOptions->info->glyph.size;
+#endif
   data->defaults.edgeWidth = -1;  /*-- this has no home in ggobi --*/
   data->defaults.hidden = false;
 }

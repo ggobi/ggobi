@@ -129,9 +129,15 @@ color_table_init (ggobid *gg) {
 
 void
 init_plot_GC (GdkWindow *w, ggobid *gg) {
-  GdkColor white, black, *bblack;
+  GdkColor white, black, *bblack, *wwhite;
 
-  gdk_color_white (gdk_colormap_get_system (), &white);
+  if(!sessionOptions->info || !sessionOptions->info->fgColor) {
+     gdk_color_white (gdk_colormap_get_system (), &white);
+     wwhite = &white;
+  } else {
+      wwhite = sessionOptions->info->fgColor;
+      gg->accent_color = *wwhite;
+  }
 
   if(!sessionOptions->info || !sessionOptions->info->bgColor) {
       gdk_color_black (gdk_colormap_get_system (), &black);
