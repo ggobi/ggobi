@@ -21,6 +21,14 @@
 #define WIDTH   370
 #define HEIGHT  370
 
+/*-- as long as these are static, they can probably stay here --*/
+static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp);
+static void ruler_down_cb (GtkWidget *w, GdkEventButton *event, splotd *sp);
+
+/*-- move these into displayd.h, probably, next to scatterplot stuff?  --*/
+static gfloat drag_start_x = 0;
+static gfloat drag_start_y = 0;
+
 void
 scatterplot_show_hrule (displayd *display, gboolean show) 
 {
@@ -236,14 +244,21 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
 
 
   /*
-   * The horizontal ruler goes on top. As the mouse moves across the
-   * drawing area, a motion_notify_event is passed to the
+   * The horizontal ruler goes on the bottom. As the mouse moves
+   * across the drawing area, a motion_notify_event is passed to the
    * appropriate event handler for the ruler.
   */
   display->hrule = gtk_ext_hruler_new ();
   gtk_signal_connect_object (GTK_OBJECT (sp->da), "motion_notify_event",
     (GtkSignalFunc) EVENT_METHOD (display->hrule, motion_notify_event),
     GTK_OBJECT (display->hrule));
+
+  /*-- Enable panning and zooming using the rulers --*/
+  gtk_signal_connect (GTK_OBJECT (display->hrule),
+    "motion_notify_event", ruler_shift_cb, sp);
+  gtk_signal_connect (GTK_OBJECT (display->hrule),
+    "button_press_event", ruler_down_cb, sp);
+
 
   gtk_table_attach (GTK_TABLE (table),
                     display->hrule, 1, 2, 1, 2,
@@ -262,6 +277,12 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
     (GtkSignalFunc) EVENT_METHOD (display->vrule, motion_notify_event),
     GTK_OBJECT (display->vrule));
 
+  /*-- Enable panning and zooming using the rulers --*/
+  gtk_signal_connect (GTK_OBJECT (display->vrule),
+    "motion_notify_event", ruler_shift_cb, sp);
+  gtk_signal_connect (GTK_OBJECT (display->vrule),
+    "button_press_event", ruler_down_cb, sp);
+
   gtk_table_attach (GTK_TABLE (table),
                     display->vrule, 0, 1, 0, 1,
                     (GtkAttachOptions) GTK_FILL, 
@@ -275,4 +296,73 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   ruler_ranges_set (true, display, sp, gg);
 
   return display;
+}
+
+/*--------------------------------------------------------------------
+         Responding to the rulers
+----------------------------------------------------------------------*/
+
+static void ruler_down_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
+{
+  displayd *display = (displayd *) sp->displayptr;
+  if (w == display->hrule)
+    drag_start_x = event->x;
+  else
+    drag_start_y = event->y;
+}
+
+static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
+{
+  displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
+  ggobid *gg = display->ggobi;
+  gboolean button1_p, button2_p;
+  gint direction = (w == display->hrule) ? HORIZONTAL : VERTICAL;
+
+  /*-- find out if any buttons are pressed --*/
+  mousepos_get_motion (w, event,  &button1_p, &button2_p, sp);
+
+  if (button1_p) {
+
+    if (direction == HORIZONTAL) {
+      gfloat scale_x;
+      gint dx = (gint) (event->x - drag_start_x);
+      /*-- exactly as in pan_by_drag --*/
+      scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
+      scale_x /= 2;
+      sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
+      sp->pmid.x -= ((dx * PRECISION1) / sp->iscale.x);
+      /* */
+      drag_start_x = event->x;
+    } else {
+      gfloat scale_y;
+      gint dy = -1 * (gint) (event->y - drag_start_y);
+
+      /*-- exactly as in pan_by_drag --*/
+      scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
+      scale_y /= 2;
+      sp->iscale.y = (glong) ((gfloat) sp->max.y * scale_y);
+      sp->pmid.y -= ((dy * PRECISION1) / sp->iscale.y);
+      /* */
+
+      drag_start_y = event->y;
+    }
+
+/*
+ In motion_notify in scale_ui.c, ruler_ranges_set is also
+ executed, but I presumably don't have to do that here.
+*/
+    splot_plane_to_screen (display, &display->cpanel, sp, gg);
+    splot_redraw (sp, FULL, gg);
+  } else if (button2_p) {
+
+/*
+ * Something extra is required here, because the rulers only
+ * scale if button3 is down, not if button2 is down.
+*/
+
+g_printerr ("zooming not yet implemented\n");
+
+  }
+
 }
