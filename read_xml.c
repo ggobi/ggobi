@@ -375,6 +375,33 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
   return(data->current_level);
 }
 
+/*
+ * If the user hasn't supplied level names and values, fill in
+ * default values:  Level 0 .... Level (nlevels-1)
+*/
+void
+completeCategoricalLevels (XMLParserData *data)
+{
+  datad *d = getCurrentXMLData(data);
+  vartabled *el = vartable_element_get (data->current_variable, d);
+
+  if (data->current_level == -1) {
+    gint k;
+
+    /*-- Alert the user what we're about to do --*/
+    g_print ("Supplying default level values for \"%s\" ranging from 1:%d\n",
+      el->collab, el->nlevels);
+    for (k=0; k<el->nlevels; k++) {
+      el->level_values[k] = k+1;
+/* XXX
+ * To be really correct, we should probably free any level_names
+ * that may have been already created ...
+*/
+      el->level_names[k] = g_strdup_printf ("L %d", k+1);
+    }
+  }
+}
+
 void
 categoricalLevels(const xmlChar **attrs, XMLParserData *data)
 {
@@ -463,6 +490,7 @@ void endXMLElement(void *user_data, const xmlChar *name)
         GGOBI(registerColorMap)(data->gg);
     break;
     case CATEGORICAL_LEVELS:
+      completeCategoricalLevels (data);
     break;
     case CATEGORICAL_LEVEL:
     break;
@@ -976,8 +1004,8 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
       if(d->missing.vals &&
          d->missing.vals[data->current_record][data->current_element])
       {
-        sprintf(buf, "%s", "NA");
-        tmp1 = g_strdup(buf);
+        /* sprintf(buf, "%s", "NA"); */
+        tmp1 = g_strdup("NA");
       }
       else {
         if(vt && vt->categorical_p) {
@@ -1071,9 +1099,8 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
     el->lim_specified_tform.max = el->lim_specified.max;
 
     if(mn > mx) {
-      fprintf(stderr,
-        "Minimum is greater than maximum for variable %s\n", el->collab);
-      fflush(stderr);
+      g_printerr ("Minimum is greater than maximum for variable %s\n",
+        el->collab);
     }
     el->lim_specified_p = true;
   }
