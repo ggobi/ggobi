@@ -167,7 +167,7 @@ GGOBI(destroyCurrentDisplay)(ggobid *gg)
 void
 GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
                 gint nr, gint nc, datad *d, gboolean cleanup, ggobid *gg,
-                long *ids,  InputDescription *desc)
+                gchar **ids, gboolean duplicate, InputDescription *desc)
 {
   gint i, j;
   gchar *lbl;
@@ -202,12 +202,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   arrayf_alloc(&d->raw, nr, nc);
 
   if(ids) {
-    d->rowid.maxId = ids[0];
-    rowids_alloc(d);
-    for(j = 0; j < nr; j++) {
-      d->rowid.id.els[j] = (gint) ids[j];
-      if (ids[j] > d->rowid.maxId) d->rowid.maxId = (gint) ids[j];
-    }
+    datad_record_ids_set(d, ids, duplicate);
   }
 
   rowlabels_alloc (d, gg);
@@ -1132,7 +1127,7 @@ GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update,
        creation of a plot. Probably not, but just mention it here
        so we don't forget.
      */
-    GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg, NULL, d->input);
+    GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg, NULL, false, d->input);
     for (i = 0; i < num; i++)
       g_free (rnames[i]);
     g_free (rnames);

@@ -124,7 +124,7 @@ extern DataMode GGobi_setDataMode(DataMode newMode, ggobid *gg);
 */
 extern void GGobi_setData(gdouble *values, gchar **rownames, gchar **colnames,
   gint nr, gint nc, datad *d, gboolean initPlot, ggobid *gg,
-  long *ids, InputDescription *);
+  gchar **ids, gboolean duplicate, InputDescription *);
 
 
 /** 

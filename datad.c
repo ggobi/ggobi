@@ -104,6 +104,7 @@ datad_create(gint nr, gint nc, ggobid *gg)
 
   return(d);
 }
+
 void
 datad_free (datad *d, ggobid *gg) 
 {
@@ -180,6 +181,25 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   gtk_signal_emit (GTK_OBJECT (gg), GGobiSignals[DATAD_ADDED_SIGNAL], d); 
 
   return (display);
+}
+
+
+void
+datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate)
+{
+  gint i;
+  guint *index;
+  gchar *tmp;
+
+  d->idTable = g_hash_table_new(g_str_hash, g_str_equal);
+  d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
+  for(i = 0; i < d->nrows; i++) {
+     tmp = duplicate ? g_strdup(ids[i]) : ids[i];
+     index = (guint *) g_malloc(sizeof(guint));
+     *index = i;
+     g_hash_table_insert(d->idTable, tmp, index);
+     d->rowIds[i] = tmp;     
+  }
 }
 
 /*

@@ -247,4 +247,6 @@ extern endpointsd *resolveEdgePoints(datad *e, datad *d);
 extern gboolean edge_add (gint, gint, datad *, datad *);
 extern void setOldEdgePartners (endpointsd *endpoints, gint n);
 
+void datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate);
+
 #endif
