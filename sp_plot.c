@@ -1306,7 +1306,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
       break;
       case COTOUR:
-        if (d->ncols < 4)
+        if (d->ncols < MIN_NVARS_FOR_COTOUR)
           break;
 
         /*-- use string height to place the labels --*/
