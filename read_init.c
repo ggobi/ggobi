@@ -127,7 +127,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
     info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
     getColor(el, doc, NULL, info->bgColor);
     if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
-      info->bgColor, true, true) == false)
+      info->bgColor, false, true) == false)
     {
       g_printerr ("Can't allocate background color\n");
     }
@@ -140,7 +140,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
     info->fgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
     getColor(el, doc, NULL, info->fgColor);
     if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
-      info->fgColor, true, true) == false)
+      info->fgColor, false, true) == false)
     {
       g_printerr ("Can't allocate foreground color\n");
     }
@@ -280,16 +280,18 @@ getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info)
   GGobiDescription *desc = NULL;
   gint i;
   node = getXMLDocElement(doc, "ggobis"); 
-  el = XML_CHILDREN(node);
-  i = 0;
-  while(el) {
-    if(el->type != XML_TEXT_NODE && strcmp(el->name,"ggobi") == 0) {
-        /* Need to match these with the input source ids. */
-      desc = info->descriptions + i;
-      getPreviousDisplays(el, desc);
-      i++;
+  if (node) {
+    el = XML_CHILDREN(node);
+    i = 0;
+    while(el) {
+      if(el->type != XML_TEXT_NODE && strcmp(el->name,"ggobi") == 0) {
+          /* Need to match these with the input source ids. */
+        desc = info->descriptions + i;
+        getPreviousDisplays(el, desc);
+        i++;
+      }
+      el = el->next;
     }
-    el = el->next;
   }
 
   if(!desc)
@@ -351,8 +353,9 @@ getDisplayDescription(xmlNodePtr node)
 
   dpy->varNames = (gchar **) g_malloc(dpy->numVars*sizeof(gchar*));
   for(i = 0, el = XML_CHILDREN(node); i < dpy->numVars; el = el->next) {
-    if(el->type != XML_TEXT_NODE && strcmp(el->name, "variable") == 0) 
+    if(el->type != XML_TEXT_NODE && strcmp(el->name, "variable") == 0) {
       dpy->varNames[i++] = g_strdup(xmlGetProp(el, "name"));
+    }
   }
 
   return(dpy);
