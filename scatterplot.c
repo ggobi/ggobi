@@ -208,24 +208,7 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
 displayd *
 scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, datad *d, ggobid *gg)
 {
-
   return(createScatterplot(missing_p, NULL, numVars, vars, d, gg));
-#if 00
-  splotd *sp;
-  displayd *display = NULL;
-  if(numVars < 2)
-     return(NULL);
-/*XXX display needs to be non-null here. Need to get the order correct. Change scatterplot_new! */
-  sp = gtk_scatter_plot_new(NULL, 400, 400, gg);
-  sp->xyvars.x = vars[0];
-  sp->xyvars.y = vars[1];
- 
-  display = scatterplot_new(missing_p, sp, d, gg); 
-  sp->displayptr = display;
-  splot_alloc(sp, display, gg);
-
-  return(display);
-#endif
 }
 
 displayd *
@@ -249,8 +232,8 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
     return (NULL);
 
   if (sp == NULL || sp->displayptr == NULL) {
-     display = gtk_type_new(GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY);
-     display_set_values(display, d, gg);
+    display = gtk_type_new(GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY);
+    display_set_values(display, d, gg);
   } else {
     display = (displayd*) sp->displayptr;
     display->d = d;
@@ -264,36 +247,36 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
   projection = (d->ncols >= 2) ? XYPLOT : P1PLOT;
   scatterplot_cpanel_init (&display->cpanel, projection, gg);
 
-  display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);  /*-- 3 = width = any small int --*/
-
-  /*-- Add the main menu bar --*/
   vbox = GTK_WIDGET(display); /* gtk_vbox_new (false, 1); */
-  gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-    vbox);
 
-  gg->app.sp_accel_group = gtk_accel_group_new ();
-  factory = get_main_menu (menu_items,
-    sizeof (menu_items) / sizeof (menu_items[0]),
-    gg->app.sp_accel_group, 
-    GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
-    &display->menubar,
-    (gpointer) display);
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
+    display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);  /*-- 3 = width = any small int --*/
+
+    /*-- Add the main menu bar --*/
+    gtk_container_border_width (GTK_CONTAINER (vbox), 1);
+    gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
+
+    gg->app.sp_accel_group = gtk_accel_group_new ();
+    factory = get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
+			     gg->app.sp_accel_group, 
+			     GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
+			     &display->menubar,
+			     (gpointer) display);
 
   /*-- add a tooltip to the file menu --*/
-  w = gtk_item_factory_get_widget (factory, "<main>/File");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    gtk_menu_get_attach_widget (GTK_MENU(w)),
-    "File menu for this display", NULL);
+    w = gtk_item_factory_get_widget (factory, "<main>/File");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+			  gtk_menu_get_attach_widget (GTK_MENU(w)),
+			  "File menu for this display", NULL);
 
   /*
    * After creating the menubar, and populating the file menu,
    * add the other menus manually
   */
-  scatterplot_display_menus_make (display, gg->app.sp_accel_group,
-    (GtkSignalFunc) display_options_cb, gg);
-  gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
-
+    scatterplot_display_menus_make (display, gg->app.sp_accel_group,
+				    (GtkSignalFunc) display_options_cb, gg);
+    gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
+  }
 
   /*-- Initialize a single splot --*/
   if (sp == NULL) {
@@ -393,7 +376,8 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
                     (GtkAttachOptions) (GTK_EXPAND|GTK_SHRINK|GTK_FILL),
                     0, 0 );
 
-  gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display)) 
+     gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
 
    /*-- hide any extraneous rulers --*/
   scatterplot_show_rulers (display, projection);

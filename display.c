@@ -149,6 +149,13 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
   displayd *display = (displayd *)
     gtk_object_get_data (GTK_OBJECT (w), "display");
+
+  set_display_option(action, display, gg);
+}
+
+void
+set_display_option(guint action, displayd *display, ggobid *gg)
+{
   gchar *title;
   gint ne = 0;
   datad *onlye = NULL;

@@ -759,6 +759,9 @@ gboolean registerPlugin(ggobid *gg, GGobiPluginInfo *plugin);
 
 GGobiOptions *GGOBI_getSessionOptions();
 
+
+void set_display_option(guint action, displayd *display, ggobid *gg);
+
 #ifdef WIN32
 /* needed by transform.c */
 extern double erf(double x);

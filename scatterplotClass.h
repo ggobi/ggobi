@@ -56,5 +56,8 @@ void scatterSPlotClassInit(GtkGGobiScatterSPlotClass *klass);
 void scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *display);
 void scatterplotDisplayInit(scatterplotDisplayd *display);
 
+
+displayd *createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg);
+
 #endif
 
