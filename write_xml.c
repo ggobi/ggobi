@@ -140,9 +140,20 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
    fprintf(f, " />");
 */
 
-  fprintf(f, "<variable>");
-  fprintf(f,"%s", vt->collab);
-  fprintf(f, "</variable>");
+  if (vt->categorical_p) {
+    gint k;
+    fprintf(f, "  <categoricalvariable name=\"%s\">\n", vt->collab);
+    fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
+    for (k=0; k<vt->nlevels; k++) {
+      fprintf(f, "      <level value=\"%d\"> %s </level>\n",
+        GPOINTER_TO_INT (g_list_nth_data (vt->level_values, k)),
+        g_array_index (vt->level_names, gchar *, k));
+    }
+    fprintf(f, "    </levels>\n");
+    fprintf(f, "  </categoricalvariable>");
+  } else {
+    fprintf(f, "  <realvariable name=\"%s\" />", vt->collab);
+  }
 
   return(true);
 }
@@ -266,7 +277,19 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
 
   if(d->rowlab && d->rowlab->data
        && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) {  
-     fprintf(f, " label=\"%s\"", gstr);
+     /*-- if the label contains an ampersand, write it as &amp; --*/
+     if (strchr (gstr, (gint) '&')) {
+       gchar *next = strtok (gstr, "&");
+       fprintf(f, " label=\"%s", next);
+       while (next) {
+         next = strtok(NULL, "&");
+         if (next)
+           fprintf(f, "&amp;%s", next);
+       }
+       fprintf(f, "\"");
+     } else {
+       fprintf(f, " label=\"%s\"", gstr);
+     }
   }
 
  if (!xmlWriteInfo->useDefault ||
