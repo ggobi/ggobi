@@ -949,8 +949,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
           dsp->t2d_manbasis.vals[2][j]*dsp->t2d_mvar_3dbasis.vals[1][2];
       }
     }
-    /*display_tailpipe (dsp, FULL, gg);*/
-    display_tailpipe (dsp, FULL_1PIXMAP, gg);
+    display_tailpipe (dsp, FULL, gg);
     varcircles_refresh (d, gg);
   }
 }
