@@ -162,8 +162,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   gint i, m, n;
 #endif
   gushort current_color;
-  gint npoint_colors_used = 0;
-  gushort point_colors_used[NCOLORS+2];
+  gint ncolors_used;
+  gushort colors_used[NCOLORS+2];
   GtkWidget *da = sp->da;
 #ifndef _WIN32
   displayd *display = (displayd *) sp->displayptr;
@@ -182,16 +182,15 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
                       da->allocation.height);
 
   if (!gg->mono_p) {
-    splot_point_colors_used_get (sp, &npoint_colors_used,
-      point_colors_used, false, gg);
+    splot_point_colors_used_get (sp, &ncolors_used, colors_used, false, gg);
 
     /*
-     * Now loop through point_colors_used[], plotting the points of each
+     * Now loop through colors_used[], plotting the points of each
      * color.  This avoids the need to reset the foreground so often.
      * On the other hand, it requires more looping.
     */
-    for (k=0; k<npoint_colors_used; k++) {
-      current_color = point_colors_used[k];
+    for (k=0; k<ncolors_used; k++) {
+      current_color = colors_used[k];
       gdk_gc_set_foreground (gg->plot_GC,
         &gg->default_color_table[current_color]);
 
@@ -245,8 +244,8 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   icoords *loc1 = &gg->plot.loc1;
 
   gushort current_color;
-  static gint npoint_colors_used = 0;
-  static gushort point_colors_used[NCOLORS+2];
+  gint ncolors_used;
+  gushort colors_used[NCOLORS+2];
 
   if (gg->plot_GC == NULL)
     init_plot_GC (sp->pixmap0, gg);
@@ -292,15 +291,15 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   if (display->options.points_show_p) {
     if (!gg->mono_p) {
 
-      splot_point_colors_used_get (sp, &npoint_colors_used,
-        point_colors_used, true, gg);  /* true = binned */
+      splot_point_colors_used_get (sp, &ncolors_used, colors_used, true, gg); 
+                                                            /* true = binned */
 
       /*
-       * Now loop through point_colors_used[], plotting the points of each
+       * Now loop through colors_used[], plotting the points of each
        * color in a group.
       */
-      for (k=0; k<npoint_colors_used; k++) {
-        current_color = point_colors_used[k];
+      for (k=0; k<ncolors_used; k++) {
+        current_color = colors_used[k];
         gdk_gc_set_foreground (gg->plot_GC,
           &gg->default_color_table[current_color]);
 
@@ -522,7 +521,7 @@ splot_draw_border (splotd *sp, ggobid *gg) {
 /*                   line drawing routines                                */
 /*------------------------------------------------------------------------*/
 
-static void
+void
 splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
  gushort *colors_used, ggobid *gg)
 {
@@ -530,7 +529,7 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
   gint i, k;
   displayd *display = (displayd *) sp->displayptr;
 
-  if(gg->nedges == 0)
+  if (gg->nedges == 0)
     return;
 
   /*
@@ -570,21 +569,21 @@ edges_draw (splotd *sp, ggobid *gg)
   gint from, to;
   gint nl;
   gushort current_color;
-  static gushort line_colors_used[NCOLORS+2];
-  static gint nline_colors_used = 1;
+  gushort colors_used[NCOLORS+2];
+  gint ncolors_used;
   gboolean doit;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
 
   if (!gg->mono_p) {
-    splot_line_colors_used_get (sp, &nline_colors_used, line_colors_used, gg);
+    splot_line_colors_used_get (sp, &ncolors_used, colors_used, gg);
 
     /*
-     * Now loop through line_colors_used[], plotting the glyphs of each
+     * Now loop through colors_used[], plotting the glyphs of each
      * color in a group.
     */
-    for (k=0; k<nline_colors_used; k++) {
-      current_color = line_colors_used[k];
+    for (k=0; k<ncolors_used; k++) {
+      current_color = colors_used[k];
       nl = 0;
 
       for (j=0; j<gg->nedges; j++) {

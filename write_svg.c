@@ -45,13 +45,14 @@ splot_write_svg (splotd *sp, ggobid *gg)
   gint i, m;
 
   gushort current_color;
-  gint npoint_colors_used = 0;
-  gushort point_colors_used[NCOLORS+2];
+  gint ncolors_used = 0;
+  gushort colors_used[NCOLORS+2];
   GtkWidget *da = sp->da;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   gboolean draw_case;
   icoords minpix, maxpix;
+  gchar *cx;
 
   FILE *f = fopen ("foo.svg", "w");
 
@@ -120,17 +121,18 @@ splot_write_svg (splotd *sp, ggobid *gg)
 <text x="15" y="345" > 146 </text>
 */
 
+  /*-- draw points --*/
   if (!gg->mono_p) {
-    splot_point_colors_used_get (sp, &npoint_colors_used,
-      point_colors_used, false, gg);
+    splot_point_colors_used_get (sp, &ncolors_used, colors_used, false, gg);
 
     /*
-     * Now loop through point_colors_used[], plotting the points of each
+     * Now loop through colors_used[], plotting the points of each
      * color.  This avoids the need to reset the foreground so often.
      * On the other hand, it requires more looping.
     */
-    for (k=0; k<npoint_colors_used; k++) {
-      current_color = point_colors_used[k];
+    for (k=0; k<ncolors_used; k++) {
+      current_color = colors_used[k];
+      cx = hexcolor (&gg->default_color_table[current_color]);
 
 
 #ifdef _WIN32
@@ -141,7 +143,6 @@ splot_write_svg (splotd *sp, ggobid *gg)
 
         if (draw_case && d->color_now[m] == current_color) {
           if (display->options.points_show_p) {
-            gchar *cx = hexcolor (&gg->default_color_table[current_color]);
             fprintf (f, "<circle style=\"fill: %s; stroke: %s\"", cx, cx);
             /*-- write out sp->screen values --*/
             fprintf (f, " cx=\"%d\" cy=\"%d\" r=\"%d\"/>\n",
@@ -151,6 +152,51 @@ splot_write_svg (splotd *sp, ggobid *gg)
       }
 #endif
     }  /* deal with mono later */
+  }
+
+
+  /*-- draw edges --*/
+  if (!gg->mono_p) {
+    gint j, nl, to, from;
+    gboolean doit;
+    extern void splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
+      gushort *colors_used, ggobid *gg);
+
+    splot_line_colors_used_get (sp, &ncolors_used, colors_used, gg);
+
+    /*
+     * Now loop through colors_used[], plotting the points of each
+     * color.  This avoids the need to reset the foreground so often.
+     * On the other hand, it requires more looping.
+    */
+    for (k=0; k<ncolors_used; k++) {
+      current_color = colors_used[k];
+      cx = hexcolor (&gg->default_color_table[current_color]);
+      nl = 0;
+
+      for (j=0; j<gg->nedges; j++) {
+        if (gg->line.hidden_now.vals[j]) {
+          doit = false;
+        } else {
+          from = gg->edge_endpoints[j].a - 1;
+          to = gg->edge_endpoints[j].b - 1;
+          doit = (!d->hidden_now[from] && !d->hidden_now[to]);
+        }
+        if (doit) {
+          if (gg->line.color_now.vals[j] == current_color) {
+            fprintf (f,
+              "<path style=\"stroke: %s\" d=\"M %d %d L %d %d z\"/>\n",
+              cx,
+              sp->screen[from].x, sp->screen[from].y,
+              sp->screen[to].x, sp->screen[to].y);
+
+            if (display->options.edges_directed_show_p) {
+            }
+            nl++;
+          }
+        }
+      }
+    }
   }
 
   fprintf (f, "</g>\n");
