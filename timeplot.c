@@ -258,11 +258,6 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
 
   } else if (button == 2 || button == 3) {
 
-    /*
-     * If jvar is plotted, delete it.
-     * We don't care what the current splot, and we don't use the
-     * argument sp.
-     */
     if (tsplot_var_selected (jvar, display)) {
 
       /* If jvar is one of the plotted variables, its corresponding plot */
@@ -296,7 +291,7 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
           gtk_widget_ref (w);
           /*-- shrink each plot --*/
           gtk_widget_set_usize (w, -1, -1);
-                 gtk_widget_set_usize (w, width, height);
+          gtk_widget_set_usize (w, width, height);
           /* */
           l = l->next ;
         }
@@ -330,7 +325,6 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
       if (cpanel->tsplot_selection_mode == VAR_REPLACE) {
         *jvar_prev = sp->xyvars.y;
         sp->xyvars.y = jvar;
-        /*sp->xyvars.x = 0 */
         redraw = true;
 
       } else {
