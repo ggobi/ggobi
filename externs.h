@@ -758,6 +758,8 @@ GGobiPluginInfo *readPluginFile(const char * const fileName, GGobiInitInfo *info
 gboolean registerPlugin(ggobid *gg, GGobiPluginInfo *plugin);
 
 
+GGobiOptions *GGOBI_getSessionOptions();
+
 #ifdef WIN32
 /* needed by transform.c */
 extern double erf(double x);
