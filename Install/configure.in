@@ -13,8 +13,12 @@ dnl executable is.
 
 AC_INIT(src/ggobi.c)
 
-
+# Get the version information.
 . src/VersionInfo
+
+if test -d CVS ; then
+ GGOBI_VERSION_STRING="CVS version (`date`)"
+fi
 
 GGOBI_HOME=`pwd` 
 

@@ -1,7 +1,7 @@
 Mail to ggobi-bugs@franz.stat.wisc.edu
 
 Operating System: @OS_INFO@
-ggobi version: @GGOBI_VERSION@
+ggobi version: @GGOBI_VERSION_STRING@
 
 Problem area:  
  (Please select one)

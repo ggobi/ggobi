@@ -7,6 +7,7 @@ createDist:
 
 TMP_INSTALL_DIR=/tmp/Install/ggobi
 
+include VersionInfo
 
 PDFLATEX=pdflatex
 TAR=tar
@@ -91,8 +92,8 @@ lgpl lgpl.tar.gz:
 
 
 
-tar $(PKG_NAME).tar.gz: createDist
-	(cd $(TMP_INSTALL_DIR)/.. ; $(TAR) zcvf $(CUR_DIR)/$(PKG_NAME).tar.gz $(PKG_NAME))
+$(TAR_FILE) tar $(PKG_NAME).tar.gz: createDist
+	(cd $(TMP_INSTALL_DIR)/.. ; $(TAR) zcvf $(CUR_DIR)/$(TAR_FILE) $(PKG_NAME))
 
 
 %.pdf: %.tex
