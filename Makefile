@@ -28,7 +28,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  p1d_ui.c p1d.c ash1d.c texture.c \
  xyplot_ui.c xyplot.c \
  rotate_ui.c \
- tour2d_ui.c tour2d. tour.c pp_ui.c \
+ tour2d_ui.c tour2d.c tour.c pp_ui.c \
  ctour_ui.c cpp_ui.c \
  brush_ui.c brush.c brush_init.c brush_bins.c brush_api.c color_ui.c xlines.c \
  exclusion_ui.c exclusion.c \
