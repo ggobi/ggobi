@@ -318,6 +318,11 @@ computeResolvedEdgePoints(datad *e, datad *d)
   gboolean resolved_p = false;
 
   ans = g_malloc( sizeof(endpointsd) * e->edge.n);
+
+  if (tbl == NULL) {
+    ans = &DegenerateEndpoints;
+    return ans;
+  }
  
   for(i = 0; i < e->edge.n; i++, ctr++) {
     tmp = (guint *) g_hash_table_lookup(tbl, e->edge.sym_endpoints[i].a);
