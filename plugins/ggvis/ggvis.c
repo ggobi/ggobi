@@ -549,7 +549,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
 
   /*-- table --*/
-  table = gtk_table_new (1, 2, false);
+  table = gtk_table_new (2, 2, false);
   gtk_container_set_border_width (GTK_CONTAINER (table), 2);
   gtk_box_pack_start (GTK_BOX (vbox), table, false, false, 1);
 
@@ -558,7 +558,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   /*-- MDS Dimension --*/
   label = gtk_label_new ("Dimension (k)");
   /*gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);*/
-  gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     1, 1);
@@ -570,15 +570,20 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_scale_set_digits (GTK_SCALE(hscale), 0);
-  gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,
+  gtk_table_attach (GTK_TABLE (table), hscale, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     1, 1);
 
-  /* Run, step, reinit and scramble in an hbox */
+  top++;
 
-  hbox = gtk_hbox_new (false, 1);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
+  /* Stepsize */
+  label = gtk_label_new ("Step size");
+  /*gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);*/
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, top, top+1,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
 
   adj = gtk_adjustment_new (0.01, 0.0001, 0.2, 0.02, 0.2, 0.10);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
@@ -590,23 +595,34 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_scale_set_digits (GTK_SCALE(hscale), 4);
+  /*
   gtk_box_pack_start (GTK_BOX (hbox), hscale, true, true, 2);
+  */
+  gtk_table_attach (GTK_TABLE (table), hscale, 1, 2, top, top+1,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
 
-  btn = gtk_button_new_with_label ("Step");
-  gtk_widget_set_name (btn, "Step");
-  gtk_widget_set_sensitive (btn, false);  /* make sensitive after
-					     running */
-  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (mds_step_cb), inst);
+  /* Run and step */
+
+  hbox = gtk_hbox_new (false, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
   /*-- run --*/
   btn = gtk_check_button_new_with_label ("Run MDS");
   gtk_widget_set_name (btn, "RunMDS");
+
   /*gtk_widget_set_sensitive (btn, false);*/
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (mds_run_cb), inst);
+
+  btn = gtk_button_new_with_label ("Step once");
+  gtk_widget_set_name (btn, "Step");
+  gtk_widget_set_sensitive (btn, false); /* make sensitive after running */
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (mds_step_cb), inst);
 
   label = gtk_label_new ("Run");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
