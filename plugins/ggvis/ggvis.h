@@ -29,7 +29,7 @@ typedef struct {
   gint nStepsToLeaf;
   gint nStepsToCenter;
   noded *nodes;
-  gint nnodessq;
+  datad *d;
 } radiald;
 
 typedef struct {
