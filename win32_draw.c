@@ -13,6 +13,10 @@
 #include "vars.h"
 #include "externs.h"
 
+#include "scatterplotClass.h"
+#include "parcoordsClass.h"
+#include "tsdisplay.h"
+
 
 /*
  * Batched drawing:   I may need to continue drawing this
@@ -251,10 +255,11 @@ build_glyph (glyphd *gl, icoords *xypos, gint jpos,
 }
 
 void
-build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp) {
+build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp) 
+{
   displayd *display = (displayd *) sp->displayptr;
   gint n;
-  if (display->displaytype == parcoords){
+  if (GTK_IS_GGOBI_PARCOORDS_DISPLAY(display)) {
     n = 2*j;
     sp->win32.whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
     sp->win32.whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
@@ -268,7 +273,7 @@ build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp) {
     sp->win32.whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
     *nwhisker_segs += 1;
   }
-  else if (display->displaytype == tsplot) {
+  else if (GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display)) {
     sp->win32.whisker_segs[*nwhisker_segs].x1 = sp->whiskers[j].x1;
     sp->win32.whisker_segs[*nwhisker_segs].y1 = sp->whiskers[j].y1;
     sp->win32.whisker_segs[*nwhisker_segs].x2 = sp->whiskers[j].x2;
@@ -332,12 +337,14 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
+
   gint i, m;
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;
   gint nwhisker_segs = 0;
   gint nash_segs = 0;
-  gint dtype = display->displaytype;
-
+#if OLD
+  gint dtype = display->displaytype; 
+#endif
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
   if (sp->win32.npoints < d->nrows)
@@ -355,11 +362,11 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
           sp->win32.open_rects, &nr_open,   sp->win32.filled_rects, &nr_filled,
           sp->win32.open_arcs, &nc_open,    sp->win32.filled_arcs, &nc_filled);
 
-        if ((dtype == parcoords || dtype == tsplot) &&
+        if ((GTK_IS_GGOBI_PARCOORDS_DISPLAY(display) || GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display)) &&
             display->options.whiskers_show_p)
         {
           build_whisker_segs (m, &nwhisker_segs, sp);
-        } else if (dtype == scatterplot &&
+        } else if (GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(display) &&
                    projection_get(gg) == P1PLOT &&
                    cpanel->p1d.type == ASH &&
                    cpanel->p1d.ASH_add_lines_p) {
@@ -407,8 +414,8 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
             sp->win32.open_arcs, &nc_open,   
             sp->win32.filled_arcs, &nc_filled);
 
-          if (display->displaytype == parcoords ||
-              display->displaytype == tsplot)
+          if (GTK_IS_GGOBI_PARCOORDS_DISPLAY(display) ||
+              GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display))
           {
             build_whisker_segs (j, &nwhisker_segs, sp);
           }
