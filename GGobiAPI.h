@@ -956,6 +956,12 @@ extern gboolean GGobi_setShowLines(gboolean val);
 
 extern GtkWidget *GGobi_addDisplayMenuItem(const char *label, ggobid *gg);
 
+
+/**
+ @group Creation
+ */
+ggobid* ggobi_alloc();
+
 #ifdef __cplusplus
 }
 #endif

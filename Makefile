@@ -2,9 +2,9 @@ ifdef ADMIN
  include Install/GNUmakefile.admin
 endif
 
-ggobi:
-
 include local.config
+
+ggobi:
 
 CC = gcc
 #CC = cc

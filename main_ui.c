@@ -690,7 +690,8 @@ make_ui (ggobid *gg) {
     viewmode_submenus_initialize (gg->viewmode, gg);
   }
 
-  gtk_widget_show_all (window);
+  if(sessionOptions->showControlPanel)
+      gtk_widget_show_all (window);
 }
 
 

@@ -397,6 +397,8 @@ typedef struct {
   gchar **cmdArgs;
   gint numArgs;
 
+  gboolean showControlPanel;
+
 #ifdef USE_XML
   struct _GGobiInitInfo *info;
   gchar *initializationFile;

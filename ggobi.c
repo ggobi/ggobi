@@ -352,6 +352,8 @@ initSessionOptions()
   sessionOptions = &sessionoptions;
   sessionOptions->data_mode = unknown_data;
 
+  sessionOptions->showControlPanel = true;
+
   sessionOptions->info = (GGobiInitInfo*) g_malloc(sizeof(GGobiInitInfo));
   memset(sessionOptions->info, '\0', sizeof(GGobiInitInfo));
   sessionOptions->info->glyph.size = sessionOptions->info->glyph.type = -1;
