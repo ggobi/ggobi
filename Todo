@@ -39,8 +39,8 @@ Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
   couple that with a thumbnail view that sits just below the scaling controls
 
-Imputation of missing values -- only the simple-minded stuff, and leave
-  the rest to R
+Imputation of missing values -- simple imputation is done; extend
+  the API for the rest.
 
 Use a set of decoration arrays (points and lines) instead of nlinkable
 

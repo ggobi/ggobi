@@ -3,8 +3,8 @@
   See data/flea.xml in the distribution for an example.
  -->
 
-<!ENTITY % glyphTypes " + | x | or | fr | oc | fc | . ">
-<!ENTITY % Boolean (true | T | TRUE | false | F | FALSE)>
+<!ENTITY % glyphTypes " plus | x | or | fr | oc | fc | . ">
+<!ENTITY % Boolean    " true | T | TRUE | false | F | FALSE ">
 
 <!ELEMENT description ( #PCDATA )>
 
@@ -19,7 +19,7 @@
 <!ELEMENT segments ( segment )*>
 <!ELEMENT segment EMPTY>
 
-<!ELEMENT ggobidata (description, (colormap)?, variables, records, (segments)*)
+<!ELEMENT ggobidata (description, (colormap)?, variables, records, (segments)*)>
 
 <!ELEMENT color ( #PCDATA) >
 <!-- id is a number or either of "fg" and "bg" -->
@@ -36,7 +36,7 @@
       size  CDATA  #REQUIRED
       range CDATA  #IMPLIED
       file  CDATA   #IMPLIED
-      type  CDATA   (xml | table)
+      type  CDATA   "(xml | table)"
 >
          
 
@@ -59,7 +59,7 @@
    color     CDATA                     #IMPLIED
    glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
    glyphType ( %glyphTypes; )          #IMPLIED
-   hidden    %Boolean;                 FALSE
+   hidden    ( %Boolean; )             "FALSE"
    group     CDATA                     #IMPLIED
 >   
 
