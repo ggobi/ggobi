@@ -152,8 +152,8 @@ endif
 # After all appropriate optional files have been appended to
 OB=$(SRC:%.c=%.o)
 
-ggobi: $(OB) $(EXTRA_OB)
-	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS)  $(EXTRA_LIBS) ${GTK_LIBS}  $(DL_RESOLVE_PATH)
+ggobi: $(OB) $(EXTRA_OB) ggobiMain.o
+	$(LD) ggobiMain.o $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS)  $(EXTRA_LIBS) ${GTK_LIBS}  $(DL_RESOLVE_PATH)
 
 pure: ggobi.o $(OB) $(EXTRA_OB)
 	purify -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
