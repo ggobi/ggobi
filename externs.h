@@ -10,7 +10,7 @@ datad *datad_new (ggobid *);
 datad *datad_new(datad *d, ggobid *gg);
 
 #ifdef __cplusplus
-"C" {
+extern "C" {
 #endif
 
 /* sort +1 */
