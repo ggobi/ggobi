@@ -70,22 +70,22 @@ treeLabel(splotd *splot, datad *d, ggobid *gg)
 }
 
 static GdkSegment *
-allocWhiskers(splotd *sp, gint nr, datad *d)
+allocWhiskers(GdkSegment *whiskers, splotd *sp, gint nr, datad *d)
 {
-     return((GdkSegment *) g_malloc (2 * nr * sizeof (GdkSegment)));
+  return((GdkSegment *) g_realloc (whiskers, 2 * nr * sizeof (GdkSegment)));
 }
 
 void
 worldToPlane(splotd *sp, datad *d, ggobid *gg)
 {
-      p1d_reproject (sp, d->world.vals, d, gg);
+  p1d_reproject (sp, d->world.vals, d, gg);
 }
 
 
 void
 withinPlaneToScreen(splotd *sp, displayd *display, datad *d, ggobid *gg)
 {
-      sp_whiskers_make (sp, display, gg);
+  sp_whiskers_make (sp, display, gg);
 }
 
 

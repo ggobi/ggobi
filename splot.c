@@ -451,7 +451,7 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg)
     GtkGGobiExtendedSPlotClass *klass;
     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
     if(klass->alloc_whiskers)
-      sp->whiskers = klass->alloc_whiskers(sp, nr, d);
+      sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp, nr, d);
   }
 }
 

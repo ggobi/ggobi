@@ -187,7 +187,7 @@ typedef struct
    gint (*active_paint_points)(splotd *, datad *, ggobid *);
 
 
-   GdkSegment *(*alloc_whiskers)(splotd *sp, gint nrows, datad *d);
+   GdkSegment *(*alloc_whiskers)(GdkSegment *, splotd *sp, gint nrows, datad *d);
 
 	/** called from splot_plot_edge */
    gboolean (*draw_edge_p)(splotd *sp, gint m, datad *d, datad *e, ggobid *gg);

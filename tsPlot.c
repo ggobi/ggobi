@@ -12,7 +12,7 @@ static gboolean tsDrawCase_p(splotd *sp, gint m, datad *d, ggobid *gg);
 static void tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg) ;
 static void tsWithinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
 static void tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
-static GdkSegment * tsAllocWhiskers(splotd *sp, gint nrows, datad *d);
+static GdkSegment * tsAllocWhiskers(GdkSegment *, splotd *sp, gint nrows, datad *d);
 static gchar *tsTreeLabel(splotd *sp, datad *d, ggobid *gg);
 
 
@@ -128,7 +128,8 @@ void
 tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 {
   displayd *dpy = sp->displayptr;
-  if (dpy->options.whiskers_show_p && m < dpy->d->nrows_in_plot-1)  /*-- there are n-1 whiskers --*/
+     /*-- there are n-1 whiskers --*/
+  if (dpy->options.whiskers_show_p && m < dpy->d->nrows_in_plot-1) 
      gdk_draw_line (drawable, gc,
        sp->whiskers[m].x1, sp->whiskers[m].y1,
        sp->whiskers[m].x2, sp->whiskers[m].y2);
@@ -136,9 +137,9 @@ tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 
 
 GdkSegment * 
-tsAllocWhiskers(splotd *sp, gint nrows, datad *d)
+tsAllocWhiskers(GdkSegment *whiskers, splotd *sp, gint nrows, datad *d)
 {
-  return((GdkSegment *) g_malloc ((nrows-1) * sizeof (GdkSegment)));
+  return((GdkSegment *) g_realloc (whiskers, (nrows-1) * sizeof (GdkSegment)));
 }
 
 gchar *
