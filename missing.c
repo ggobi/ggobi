@@ -165,7 +165,6 @@ missing_rejitter (gint *vars, gint nvars, datad *d, ggobid *gg) {
   displays_tailpipe (REDISPLAY_MISSING, FULL, gg); 
 }
 
-#ifdef GENERATE_MISSINGS_DATAD
 /*
  * For the datad currently selected in gg->impute.notebook,
  * generate a new datad using d->missing.
@@ -214,4 +213,3 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
   }
 
 }
-#endif

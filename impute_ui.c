@@ -87,9 +87,6 @@ impute_window_open (ggobid *gg)
 /**/return;
 
   if (gg->impute.window == NULL) {
-#ifdef GENERATE_MISSINGS_DATAD
-extern void missings_datad_cb (GtkWidget *w, ggobid *gg);
-#endif
     
     gg->impute.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->impute.window),
