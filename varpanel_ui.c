@@ -412,7 +412,8 @@ varpanel_tooltips_set (ggobid *gg)
     d = (datad*) g_slist_nth_data (gg->d, k);
     /*-- for each variable --*/
     for (j=0; j<d->ncols; j++) {
-
+      g_return_if_fail (d->varpanel_ui.checkbox != NULL);
+      
       switch (display->displaytype) {
 
         case parcoords:

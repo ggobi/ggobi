@@ -67,18 +67,6 @@ delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
   deleteit (gg);
 }
 
-void
-sphere_tform_clear (ggobid *gg) {
-/*-- remove the sphering transformation from all variables --*/
-  gint j;
-  datad *d = gg->current_display->d;
-  for (j=0; j<d->ncols; j++) {
-    if (d->vartable[j].tform2 == SPHERE) {
-      transform_variable (2, NO_TFORM2, 0, j, d, gg);
-    }
-  }
-}
-
 static void
 sphere_apply_cb (GtkWidget *w, ggobid *gg) { 
 /*
@@ -99,8 +87,6 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
     return;
   }
 
-  sphere_tform_clear (gg);
-
   if (d->sphere.npcs > 0 && d->sphere.npcs <= d->sphere.nvars)
   {
     if (lastpc == 0.0 || firstpc/lastpc > 10000.0) {
@@ -112,18 +98,6 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
       sphere_varcovar_set (d, gg);
 /*    pc_axes_sensitive_set (true);*/
 
-      /*-- set transform2 to SPHERE for the first npcs variables --*/
-      for (j=0; j<d->sphere.npcs; j++) {
-/*      d->vartable[ d->sphere.vars[j] ].tform2 = SPHERE;*/
-        transform2_values_set (SPHERE, d->sphere.vars[j], d, gg);
-        tform_label_update (d->sphere.vars[j], d, gg);
-      }
-      /*-- --*/
-
-/*
-      for (j=0; j<d->sphere.nvars; j++)
-        tform_label_update (d->sphere.vars[j], d, gg);
-*/
 
       /*-- these three lines replicated from transform.c --*/
       vartable_lim_update (d, gg);
@@ -139,7 +113,6 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
 */
 static void
 sphere_reset_cb (GtkWidget *w, ggobid *gg) { 
-  sphere_tform_clear (gg);
   scree_plot_make (gg);
 }
 

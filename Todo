@@ -14,6 +14,9 @@ API code needed:
 missings:
  I still want a show/hide missings button somewhere
 
+broken:
+  reading in new data
+
 datad work:
 output:
 *  the 'create file set' panel needs thought:  specify
