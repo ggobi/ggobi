@@ -1,0 +1,16 @@
+ifndef GGOBI_HOME
+ GGOBI_HOME=../..
+endif
+
+DIR_NAME=R
+
+R_SRC=fileSelection.R randomInput.R testPlugin.R
+DOCS=overview.pdf
+
+include $(GGOBI_HOME)/plugins/GNUmakefile.Plugin
+
+createDist:: $(DOCS:%=Docs/%)
+	if test ! -d $(INSTALL_DIR)/$(DIR_NAME)/R ; then mkdir $(INSTALL_DIR)/$(DIR_NAME)/R ; fi
+	cp $(R_SRC:%=R/%) $(INSTALL_DIR)/$(DIR_NAME)/R
+	if test ! -d $(INSTALL_DIR)/$(DIR_NAME)/Docs ; then mkdir $(INSTALL_DIR)/$(DIR_NAME)/Docs ; fi
+	cp $(DOCS:%=Docs/%) $(INSTALL_DIR)/$(DIR_NAME)/Docs
