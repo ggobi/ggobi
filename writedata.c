@@ -238,7 +238,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
   }
 
   /*
-   * Save .dat first:  ascii or binary, raw or tform, missings as
+   * Save .dat first:  ascii_data or binary_data, raw or tform, missings as
    * 'na' or as currently imputed values
   */
   if (gg->save.format == BINARYDATA) { 

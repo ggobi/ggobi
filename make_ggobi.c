@@ -74,12 +74,13 @@ fileset_read (gchar *ldata_in, ggobid *gg)
   strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
 
   switch (gg->data_mode) {
-    case xml:
+    case xml_data:
 #ifdef USE_XML
       ok = data_xml_read (gg->fname, gg);
 #endif
     break;
-    case mysql:
+
+    case mysql_data:
 #ifdef USE_MYSQL
     {
       extern MySQLLoginInfo DefaultMySQLInfo;
@@ -89,13 +90,13 @@ fileset_read (gchar *ldata_in, ggobid *gg)
 #endif
     break;
 
-    case binary:
+    case binary_data:
     break;
 
-    case Sprocess:
+    case Sprocess_data:
     break;
 
-    case ascii:
+    case ascii_data:
     {
       datad *d; /* datad_new (gg);*/
 #ifdef USE_CLASSES

@@ -44,7 +44,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
      * -s:  ggobi initiated from inside S
     */
     if (strcmp (av[1], "-s") == 0)
-      gg->data_mode = Sprocess;
+      gg->data_mode = Sprocess_data;
 
 #ifdef USE_XML
     else if (strcmp (av[1], "-xml") == 0)
@@ -84,7 +84,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
  * Test the values
 */
 
-  /* (gg->data_mode == ascii || gg->data_mode == binary) */
+  /* (gg->data_mode == ascii_data || gg->data_mode == binary_data) */
   if (*argc == 0)
     gg->data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
   else
@@ -207,7 +207,7 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
 
   g_print ("progname = %s\n", g_get_prgname());
 
-  gg->data_mode = ascii;
+  gg->data_mode = ascii_data;
 
   parse_command_line (&argc, argv, gg);
   g_print ("data_in = %s\n", gg->data_in);
