@@ -96,7 +96,11 @@ load_plugin_library(GGobiPluginDetails *plugin)
       fprintf(stderr, "error on loading plugin library %s: %s\n", plugin->dllName, buf);fflush(stderr);
    }
 
-   plugin->loaded = (handle != NULL);
+   /* Set loaded to true even if we fail. This will cause us not to try to load it again! 
+      The code that is interested in whether it is actually loaded and the symbols available
+      should check the `library' handle being non-NULL.
+    */
+   plugin->loaded = true;  /* (handle != NULL); */
 
    if(fileName != plugin->dllName)
       g_free(fileName);

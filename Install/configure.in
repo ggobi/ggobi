@@ -32,7 +32,6 @@ AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
 dnl AC_ARG_WITH(prefix, [--with-prefix          Specify where the files are to be installed (default /usr/local/).],INSTALL_DIR=${with_prefix},INSTALL_DIR="/usr/local")
 
 AC_ARG_WITH(xml, --with-xml          Enable reading and writing of XML datasets (yes),,with_xml="yes")
-LIBXML_VERSION="2.4.1"
 
 AC_ARG_WITH(mysql, --with-mysql          Enable plugin for reading data from MySQL databases, 
               MYSQL_PLUGIN=1; PLUGIN_DIRS="MySQL"; ENABLE_PLUGINS=1)
@@ -126,6 +125,7 @@ if test -n "${with_xml}" && test "${with_xml}" != "no" ; then
  if test -f libxml.tar.gz && test -z "${XML_CONFIG}" ; then
    echo "Building ggobi-specific version of libxml"
    (gunzip -c libxml.tar.gz | tar xf -)
+   LIBXML_VERSION=`tar tzvf libxml.tar.gz | head -n 1 | sed 's/^.*libxml2-//' | sed 's|/$||'`
    cd libxml2-${LIBXML_VERSION} 
    echo "Configuring libxml, to be installed in ${TOP_DIR}/libxml-install"
    ./configure --prefix=${TOP_DIR}/libxml-install
@@ -140,6 +140,7 @@ if test -n "${with_xml}" && test "${with_xml}" != "no" ; then
    dnl the libxml is when we install ggobi into a system
    dnl location (rather than locally).
    LOCAL_LIBXML_INSTALLATION="${TOP_DIR}/libxml-install"
+   XML_LIB_DIRS_PATH=${LOCAL_LIBXML_INSTALLATION}/lib   
    cd ..
  fi
 
@@ -295,6 +296,11 @@ if test -n "${with_R}" && test "${with_R}" != "no" ; then
     echo "and then un-tarring it"
     echo ""
   fi
+fi
+
+if test -n "${with_Python}" && test "${with_Python}" != "no" ; then
+  PACKAGES="${PACKAGES} Python"
+  (GGOBI_CONFIG=`pwd`/bin/ggobi-config ; export GGOBI_CONFIG ; cd Python ; ./configure )
 fi
 
 

@@ -39,6 +39,9 @@ install:
 Rggobi: lib/libggobi.so
 	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)
 
+Python: lib/libggobi.so
+	$(MAKE) -C Python
+
 
 Plugins:  @EMBED_LIB@
 	if test -n "${PLUGIN_DIRS}" ; then \
