@@ -34,7 +34,6 @@ read_colorscheme(char *fileName, GList **list)
   colorschemed *scheme;
 
 /*  xmlSubstituteEntitiesDefault(1);    */
-  /* xmlDoValidityCheckingDefaultValue = false; */
   doc = xmlParseFile(fileName); 
   if(doc == NULL)
       return(NULL);

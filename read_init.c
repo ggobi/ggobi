@@ -44,6 +44,7 @@ read_init_file(const char *filename)
 {
   xmlDocPtr  doc;
   GGobiInitInfo *info;
+  int oldValiditySetting = xmlDoValidityCheckingDefaultValue;
 
   xmlSubstituteEntitiesDefault(1);   
   xmlDoValidityCheckingDefaultValue = false;
@@ -60,6 +61,8 @@ read_init_file(const char *filename)
   getPreviousFiles(doc, info);
   getPreviousGGobiDisplays(doc, info);
   getPlugins(doc, info);
+
+  xmlDoValidityCheckingDefaultValue = oldValiditySetting;
 
   return(info);
 }
