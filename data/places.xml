@@ -91,7 +91,7 @@ costs, income growth, job growth.
 <variable>StNum</variable>
 </variables>
 <records
- count="329" glyph="fr 1" color="0">
+ count="329" glyph="fr 1" color="5">
 <record label="Abilene, TX">
 521.000 6200.000 237.000 923.000 4031.000 2757.000 996.000 1405.000 7633.000 1.000 -99.689 32.559 110932.000 44.000
 </record>
