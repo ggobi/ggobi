@@ -1064,9 +1064,9 @@ in one display, all coastal cities in this and all other displays will
 be highlighted.  In this linking mode, displays of different datasets
 can be linked if they have a chosen categorical variable in common.
 
-\subsubsection{Color by variable ...}
+\subsubsection{Color schemes ...}
 
-See the description in section \ref{slbl:ColorByVariable}.
+See the description in section \ref{slbl:ColorSchemes}.
 
 \subsubsection{Color \& glyph groups ...}
 
@@ -1175,7 +1175,9 @@ Its first purpose is to report information about each variable:
 whether the variable is categorical (and if so, the number of levels
 it has), the current variable transformation (if any); the minimum,
 maximum, mean, and median of the raw data; the number of missing values
-per variable.
+per variable.  (Note: we plan to extend the information supplied about
+categorical variables so that we also show the names of the levels
+and their corresponding numerical values.)
 
 You can also use it to select variables -- not for plotting, but to
 specify subsets when launching a parallel coordinates or scatterplot
@@ -1262,30 +1264,31 @@ and normal random jitter, and then set the degree of jitter using the
 slider.  To rejitter without changing the degree of jitter, simply click
 on the {\bf Jitter} button.
 
-\subsection{Color by variable}
-\label{slbl:ColorByVariable}
+\subsection{Color schemes}
+\label{slbl:ColorSchemes}
 
-The {\bf Color by variable} tool is used to automatically color points
-using the current color scale.  To use it, first select a variable.
-This adds two sets of numbers to the display:  along the bottom of the
-display, at the center of each stripe of color, is shown the number of
-points that will be drawn with this color once {\bf Apply} is pressed.
-Along the top of the display, at the boundaries between the stripes of
-color, appear the values of the chosen variable that define the boundaries
-between colors.  To adjust the boundaries, grab one of the sliders,
-and notice that both the values and the counts adjust as you move it.
+The {\bf Color schemes} tool has two purposes: to select a
+new color scheme, and to automatically color points
+using the current color scheme.
 
-Try it with the olive oil data used in the tutorial, and select the {\it
-Area} variable.  It can be a real time-saver.
+\subsubsection{Choosing a color scheme}
 
-\subsubsection{Color schemes}
+Preview a new color scheme by selecting from the menu.  If you would
+like to apply it, click on the button ``Apply color scheme to brushing
+colors.''  That replaces the current set of colors visible in the
+``Choose color \& glyph'' menu and used in all the displays.
 
-You can also use this tool to select from a menu of color schemes,
-which is populated using a file specified in your .ggobirc file.
-Here is a minimal .ggobirc file, in which the relevant line specifies
-the file {\tt colorschemes.xml}, which is included in the GGobi
-distribution.  (You will probably need to modify the path name, of
-course.)
+If you are currently using \math{n} colors and the color scheme
+you have selected
+has fewer than \math{n} colors, you'll be prohibited from applying
+the new scheme.  If you want to use that scheme, you must either
+use brushing to reduce of colors in use.
+
+The menu of color schemes is populated using a file specified in your
+.ggobirc file.  Here is a minimal .ggobirc file, in which the relevant
+line specifies the file {\tt colorschemes.xml}, which is included in the
+GGobi distribution.  (You will probably need to modify the path name,
+of course.)
 
 \begin{quote}
 <?xml version="1.0"?>
@@ -1313,8 +1316,35 @@ The four types represented are
       color impairments.
 \end{itemize}
 
-When you choose a color scheme, the colors will remain local to
-the  {\em Color by variable} tool until you press {\em Apply}.
+\subsubsection{Applying the color scheme by variable}
+
+To brush the data according to the values of a variable, first select
+a variable in the list at the top of the tool window.  This adds two
+sets of numbers to the display:  along the bottom of the display, at
+the center of each stripe of color, is shown the number of points that
+will be drawn with this color once {\bf Apply color scheme by variable}
+is pressed.  Along the top of the display, at the boundaries between the
+stripes of color, appear the values of the chosen variable that define
+the boundaries between colors. 
+
+There are two methods available for defining the bin boundaries, and
+a menu for choosing between them.  The ``constant bin width'' method
+simply partitions the range of the selected variable into equal-sized
+sub-ranges, and maps points into those bins.  The ``constant bin
+count'' method attempts to map the values into \math{n} bins of equal
+size.  Since it also tries to assign all equal values into the same
+bin, it usually doesn't produce uniform bins if the variable has many
+equal values.
+
+To adjust the boundaries between stripes of color, grab one of the
+sliders, and notice that both the values and the counts adjust as you
+move it.  The displays will respond as the sliders are moved:  either
+continuously, or only when you release the mouse.  If you your data set
+has a large number of cases, continuous updating will lag behind the
+mouse, so it is probably more effective to update only on mouse release.
+
+Try it with the olive oil data used in the tutorial, and select the {\it
+Area} variable.  It can be a real time-saver.
 
 \subsection{Color \& glyph groups}
 \label{slbl:ColorAndGlyphGroups}
@@ -1603,6 +1633,10 @@ can change the background color as well as any of the foreground
 colors, and notice that changing the glyph also changes the line
 type to be used in edge brushing.
 
+The {\bf Color schemes} tool has extended brushing considerably,
+by allowing a choice of color schemes and enabling a form of
+automatic brushing.  See \ref{slbl:ColorSchemes}.
+
 {\bf Scale} has also changed.  The direct manipulation shifting and
 scaling methods work as they did in XGobi, but we've added what we
 call ``Click-style interaction'' for more precise control.  See section
@@ -1635,7 +1669,7 @@ the {\bf Options} menu.
 
 \begin{itemize}
 \item The combination of linking by variable and edge brushing
-      doesn't work yet.
+      doesn't work yet.  [Or does it?]
 \end{itemize}
 
 \section{Future work}
@@ -1644,7 +1678,6 @@ Soon:
 
 \begin{itemize}
 \item A two-button toggle widget for variable selection
-\item Reading a set of color scales
 \item Categorical data displays
 \item Graph layout
 \end{itemize}
