@@ -2,8 +2,69 @@
 
 \begin{document}
 
+\begin{abstract}
+  A common source of data is Database Management Systems (DBMS), and
+  specifically relational databases.  We describe the facilities
+  currently provided by Ggobi for reading data from MySQL
+  (\URL{http://www.mysql.org}), a particular DBMS.
+\end{abstract}
+
 The ability to read GGobi input from a single XML opens a large number
-of possibilities.  But, a common source of data is Database Management
-Systems (DBMS), and specifically relational databases.
+of possibilities.  Reading data from a database however is also a
+powerful extension to any system.  Databases offer many conveniences
+for storing values in comparison with files, URLs, etc.
+These advantages include
+\begin{itemize}
+
+\item Large quantities of data can be managed by software
+ designed for that purpose. 
+
+\item Only a single instance of the data is needed, as applications
+  can dynamically query the segment of that data they are interested
+  \textsl{when they need it}.  These client applications can be
+  written in any of numerous languages that provide a library or
+  bindings for the DBMS.  Support for many of these systems is
+  provided in Python, Perl, Java, C, etc.
+
+\item Data can be updated dynamically and made available to clients.
+
+\item Updates to the data (e.g. correction of errors) need be
+  performed in a single location, simplifying administration
+and providing greater data integrity.
+
+\item Many of the common, basic computations can be performed
+using SQL specified in a client process and performed locally on the
+data within the DBMS.
+
+\item Most DBMS provide a security model for limiting access
+to the data, allowing great resolution for the administrators.
+
+\end{itemize}
+
+
+\section{MySQL}
+MySQL is a database management system ...
+
+\section{GGobi \& MySQL}
+When one starts GGobi, one can instruct it
+to use a connection to a MySQL database
+using the \flag{-mysql}.
+\begin{verbatim}
+ ggobi -mysql
+\end{verbatim}
+(No argument should be specified after the 
+\flag{-mysql} argument.)
+
+In this case, a dialog is displayed that allows one to specify any and
+all of the details about the database and the data that one wants.
+The fields are described in table \
+
+
+
+
+\section{Default Settings}
+
+\section{Describing the Source of the Data}
+
 
 \end{document}

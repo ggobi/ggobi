@@ -7,7 +7,6 @@ CFLAGS= -g -ansi -Wall -fpic
 SHARED_LD_FLAGS= -shared
 LDFLAGS=
 
-
 #DEPENDS_FLAG=-MM
 
 SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
@@ -78,8 +77,19 @@ ifdef USE_XML
  XML_LIBS=-lxml -lz
 endif
 
+USE_MYSQL=1
+ifdef USE_MYSQL
+ MYSQL_DIST=/usr/local/src/mysql-3.23.16-alpha/
+ MYSQL_INCLUDE_DIRS=$(MYSQL_DIST)/include
+ MYSQL_LIB_DIRS=$(MYSQL_DIST)/libmysql/.libs
+ CFLAGS+= -I$(MYSQL_INCLUDE_DIRS) -DUSE_MYSQL=1 -Wall
+ MYSQL_LIBS=-lmysqlclient $(MYSQL_LIB_DIRS:%=-L%) $(MYSQL_LIB_DIRS:%=-Xlinker -rpath -Xlinker %)
+ SRC+=read_mysql.c
+ OB+=read_mysql.o
+endif
+
 ggobi: $(OB)
-	$(CC) $(OB) $(LDFLAGS) -o ggobi $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --cflags --libs`
+	$(CC) $(OB) $(LDFLAGS) -o ggobi $(XML_LIB_DIRS) $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`
 
 pure: ggobi.o $(OB)
 	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
@@ -130,6 +140,18 @@ local.config:
 ifdef USE_XML
 xmlConvert: xmlConvert.o libGGobi.so
 	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS) -L. -lGGobi 
+endif
+
+
+ifdef USE_MYSQL
+
+read_mysql.o: read_mysql.h
+
+sql: read_mysql.o
+	$(CC) -o $@ read_mysql.o $(MYSQL_LIBS)
+
+sqldep:
+	$(CC) -M $(CFLAGS) read_mysql.c
 endif
 
 # include .depends

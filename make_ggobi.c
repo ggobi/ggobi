@@ -13,6 +13,10 @@
 #include "read_xml.h"
 #endif
 
+#ifdef USE_XML
+#include "read_mysql.h"
+#endif
+
 
 /*-- initialize variables which don't depend on the size of the data --*/
 void globals_init (ggobid *gg) {
@@ -96,6 +100,11 @@ fileset_read (gchar *ldata_in, ggobid *gg)
      ok = data_xml_read (gg->fname, gg);
 #endif
      break;
+   case mysql:
+#ifdef USE_MYSQL
+     ok = read_mysql_data(NULL, gg);
+#endif
+    break;
    case binary:
      break;
    case Sprocess:
@@ -171,6 +180,10 @@ make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
   if (ldata_in != NULL) {
     if (fileset_read (ldata_in, gg)) {
       dataset_init(gg, true);
+    }
+  } else {
+    if(gg->data_mode == mysql) {
+      GGOBI(get_mysql_login_info)(gg);
     }
   }
 

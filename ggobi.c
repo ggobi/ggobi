@@ -18,7 +18,7 @@ const gchar * const ViewTypes[] =
   {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
 const gint ViewTypeIndeces[] = { scatterplot, scatmat, parcoords};           
 
-const gchar *const ModeNames[] = {"ASCII", "R/S data", "binary", "XML"};
+const gchar *const ModeNames[] = {"ASCII", "R/S data", "binary", "XML", "MySQL"};
 
 gint
 parse_command_line (gint *argc, gchar **av, ggobid *gg)
@@ -39,6 +39,8 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 
     else if (strcmp (av[1], "-x") == 0)
       gg->data_mode = xml;
+    else if (strcmp (av[1], "-mysql") == 0)
+      gg->data_mode = mysql;
 
     /*
      * -:  look to stdin for the input data

@@ -6,10 +6,12 @@
 
 static GtkWidget *window = NULL;
 
-static gchar *format_lbl[] = {"XML", "File set (binary)", "File set (ascii)"};
+static gchar *format_lbl[] = {"XML", "File set (binary)", "File set (ascii)", "MySQL"};
 #define XMLDATA    0
 #define ASCIIDATA  1
 #define BINARYDATA 2
+#define MYSQL_DATA 3
+
 void format_set (gint fmt, ggobid *gg) { gg->save.format = fmt; }
 static void format_set_cb (GtkWidget *w, gpointer cbd)
 {
