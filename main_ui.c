@@ -170,7 +170,6 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
 void
 mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
 {
-
   if (state == off) {
 
     switch (m) {
@@ -180,33 +179,32 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case LINEED:
       case MOVEPTS:
       case COTOUR:
-        break;
+      break;
 
       case ROTATE:
         submenu_destroy (gg->mode_menu.io_item);
-        break;
+      break;
 
       case TOUR1D:
         submenu_destroy (gg->mode_menu.io_item);
-        break;
+      break;
 
       case TOUR2D:
         submenu_destroy (gg->mode_menu.io_item);
-        break;
+      break;
 
       case SCALE:
         submenu_destroy (gg->mode_menu.reset_item);
-        break;
+      break;
 
       case BRUSH:
         submenu_destroy (gg->mode_menu.reset_item);
         submenu_destroy (gg->mode_menu.link_item);
-        break;
+      break;
 
       case IDENT:
         submenu_destroy (gg->mode_menu.link_item);
-        break;
-
+      break;
     }
   } else if (state == on) {
 
@@ -217,7 +215,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case COTOUR:
       case LINEED:
       case MOVEPTS:
-        break;
+      break;
 
       case ROTATE:
         rotation_menus_make (gg);
@@ -230,20 +228,20 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_io = false;
         }
-        break;
+      break;
 
       case TOUR1D:
         tour1d_menus_make (gg);
 
-	/*        gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
+        gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
           gg->tour1d.io_menu); 
         if (gg->mode_menu.firsttime_io) {
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_io = false;
-        }*/
-        break;
+        }
+      break;
 
       case TOUR2D:
         tour2d_menus_make (gg);
@@ -256,7 +254,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_io = false;
         }
-        break;
+      break;
 
       case SCALE :
         scale_menus_make (gg);
@@ -269,7 +267,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
           submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_reset = false;
         }
-        break;
+      break;
 
       case BRUSH :
         brush_menus_make (gg);
@@ -291,8 +289,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
           submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_link = false;
         }
-
-        break;
+      break;
 
       case IDENT:
         identify_menus_make (gg);
@@ -305,8 +302,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
           submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_link = false;
         }
-        break;
-
+      break;
     }
   }
 }
@@ -508,7 +504,7 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
     mode_submenus_activate (sp, gg->mode, on, gg);
 
     display_tailpipe (display, gg);
-    return(action);
+    return (action);
   } else
     return(-1);
 }
