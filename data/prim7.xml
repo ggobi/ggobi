@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE xgobidata SYSTEM "xgobi.dtd">
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="2">
 <data numRecords="500">

@@ -119,7 +119,7 @@ via ftp and http.
 Being able to specify file-specific defaults allows one to easily
 change the characterstics of the plots without excessive editing of
 the contents of the file.  For example, to use a different glyph type,
-we need only specify a different value for the \texttt{glyph}
+we need only specify a different value for the \texttt{glyphType}
 attribute in the \texttt{records} tag.  This greatly simplifies
 experimenting with different parameter values.
 
@@ -143,16 +143,17 @@ interface for the user for specifying files.
 \section{The File Format}
 
 The format of the file is described by the DTD (Document Type
-Definition) \texttt{ggobi.dtd}.  [Not at the moment, I bet.]
-The file starts with the usual XML declarations that identify it as
+Definition) \texttt{ggobi.dtd}, though it may be easier to learn about
+the file format by looking at the examples in the data directory.
+Each file starts with the usual XML declarations that identify it as
 XML (and its version) and the particular document type and associated
 DTD.
 
-% This doesn't work now; I get a core dump.
-%<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 \begin{verbatim}
 <?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
 <ggobidata>
 \end{verbatim}
 %
@@ -196,6 +197,8 @@ within this \texttt{data} element.
 
 \subsection{Colormap}
 
+[The use of colormaps is in the process of being redesigned.]
+
 The user can specify rows of a color table in RGB format.  (Perhaps
 different formats such HSV, etc. can be supported directly by GTK
 also.)  The idea is that colors for records, etc.  are specified as
@@ -217,21 +220,21 @@ Then, a reference to
 \begin{verbatim}
  <colormap file="stdColorMap.xml">
 \end{verbatim}
-is found as \file{data/stdColorMap.xml}.
-Similalry, if a colormap file named \file{map.xml} is located
-in the directory \dir{color} parallel to \dir{data},
-then
+is found as \file{data/stdColorMap.xml}.  Similalry, if a colormap
+file named \file{map.xml} is located in the directory \dir{color}
+parallel to \dir{data}, then
 \begin{verbatim}
  <colormap file="../color/map.xml">
 \end{verbatim}
 would find it for the same input file \file{data/flea.xml}.
 
-When an external colormap file is used in conjunction with local
-values, there are two size specifications.  One is in the colormap of
-the external file and the other is local. Both refer to the number of
-local entries, i.e. entries under their control.  By default, these
-are accumulated so that the size of the table is the sum of the two
-sizes.  This can lead to oversized tables.
+%  I don't want this to happen.  - dfs
+%When an external colormap file is used in conjunction with local
+%values, there are two size specifications.  One is in the colormap of
+%the external file and the other is local. Both refer to the number of
+%local entries, i.e. entries under their control.  By default, these
+%are accumulated so that the size of the table is the sum of the two
+%sizes.  This can lead to oversized tables.
 
 
 External color map files can be formatted using XML (see
@@ -273,7 +276,7 @@ creating the file does not facilitate such rescaling.
 \subsection{Description}
 
 The second of the sub-elements within the \texttt{data} tag is
-a description of the datasets.
+a description of the dataset.
 
 \begin{verbatim}
 <description>
@@ -346,14 +349,32 @@ element, which must include the \texttt{count} attribute, specifying
 the number of records in the data.
 
 \begin{verbatim}
-<records count="74" color="2" glyphType="fc" glyphSize="3" missingValue=".">
-
+<records count="74" color="2" glyphType="3" glyphSize="3" missingValue=".">
 </records>
 \end{verbatim}
 %
 It may optionally include tags specifying the default color (the
 index in the color table), glyph type and size, or the character to
 interpret as a missing value.
+
+Glyph type and size can also be specified in a single string:
+\begin{verbatim}
+glyph="fc 3"
+\end{verbatim}
+GlyphSize can range from 0 to 7; legal values for glyphType and
+for the first part of the glyph tag are described in this table:
+
+\begin{tabular}{l|l|l}
+glyphType & glyph specifier & resulting glyph \\
+\hline
+0 & plus & glyph resembling a ``+'' \\
+1 & x    & glyph resembling an ``x'' \\
+2 & or   & open rectangle \\
+3 & fr   & filled rectangle \\
+4 & oc   & open circle \\
+5 & fc   & filled circle \\
+6 & .    & point
+\end{tabular}
 
 The body or content of each \texttt{record} is a simply ASCII listing
 of the values. Each value is separated by white space (space

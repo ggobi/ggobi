@@ -12,14 +12,15 @@ gint
 main (gint argc, gchar *argv[])
 {
   ggobid *gg;
-  char *fileName;
+  gchar *fileName;
   XmlWriteInfo info;
-  gtk_init (&argc, &argv);
-  gg = ggobi_alloc ();
 
   initSessionOptions();
   sessionOptions->cmdArgs = argv;
   sessionOptions->numArgs = argc;
+
+  gtk_init (&argc, &argv);
+  gg = ggobi_alloc ();
 
   parse_command_line(&argc, argv, gg);
 

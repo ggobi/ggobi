@@ -70,7 +70,7 @@ write_xml_header (FILE *f, int numDatasets, ggobid *gg, XmlWriteInfo *xmlWriteIn
 
  fprintf(f, "<?xml version=\"1.0\"?>");
  fprintf(f, "\n");
- fprintf(f, "<!DOCTYPE xgobidata SYSTEM \"xgobi.dtd\">");
+ fprintf(f, "<!DOCTYPE ggobidata SYSTEM \"ggobi.dtd\">");
  fprintf(f, "\n\n");
 
  if(numDatasets < 0)
