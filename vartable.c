@@ -210,30 +210,27 @@ vartable_row_append (gint j, datad *d, ggobid *gg)
   }
 }
 
+/*
 void
 variable_clone (gint jvar, const gchar *newName, gboolean update,
   datad *d, ggobid *gg) 
 {
   gint nc = d->ncols + 1;
-  
-/*-- vartable_ui --*/
-  /*-- set a view of the data values before adding the new label --*/
-  vartable_row_append (d->ncols-1, d, gg);
 
-/*-- vartable --*/
   vartable_realloc (nc, d, gg);
   d->vartable[nc-1].collab =
     g_strdup ((newName && newName[0]) ? newName : d->vartable[jvar].collab);
   d->vartable[nc-1].collab_tform =
     g_strdup ((newName && newName[0]) ? newName : d->vartable[jvar].collab);
+  
+  *-- set a view of the data values before adding the new label --*
+  vartable_row_append (d->ncols-1, d, gg);
 
-/*-- varpanel_ui  --*/
   d->varpanel_ui.checkbox = (GtkWidget **)
     g_realloc (d->varpanel_ui.checkbox, nc * sizeof (GtkWidget *));
   varpanel_checkbox_add (nc-1, d, gg);
 
-/*-- vartable --*/
-  /*-- now the rest of the variables --*/
+  *-- now the rest of the variables --*
   d->vartable[nc-1].jitter_factor = d->vartable[jvar].jitter_factor;
   d->vartable[nc-1].nmissing = d->vartable[jvar].nmissing;
 
@@ -243,52 +240,84 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
 
   gtk_widget_show_all (gg->varpanel_ui.notebook);
 }
-
-gboolean
-vartable_update_cloned_var (gint nc, gint jvar, datad *d, ggobid *gg)
-{
-  gint i;
-  gint *cols = g_malloc (1 * sizeof (gint));
-
-  if (jvar > -1) {
-    d->vartable[nc-1].mean = d->vartable[jvar].mean;
-    d->vartable[nc-1].median = d->vartable[jvar].median;
-    d->vartable[nc-1].lim.min =
-      d->vartable[nc-1].lim_raw.min = d->vartable[nc-1].lim_tform.min = 
-      d->vartable[jvar].lim_raw.min;
-    d->vartable[nc-1].lim.max =
-      d->vartable[nc-1].lim_raw.max = d->vartable[nc-1].lim_tform.max = 
-      d->vartable[jvar].lim_raw.max;
-  } 
-
-  transform_values_init (nc-1, d, gg);
-
-/*-- pipeline --*/
-/*
-  pipeline_arrays_add_column (jvar, d, gg);
 */
 
-  /*-- this replaces pipeline_arrays_add_column for now --*/
-  arrayf_add_cols (&d->raw, nc);  /*-- adding exactly one column --*/
-  arrayf_add_cols (&d->tform, nc);
-  for (i=0; i<d->nrows; i++)
-    d->raw.vals[i][nc-1] = d->tform.vals[i][nc-1] = d->raw.vals[i][jvar];
-  /*-- --*/
-
-  missing_arrays_add_column (jvar, d, gg);
-
-  d->ncols++;
-  tform_to_world_by_var (jvar, d, gg);
-
-  g_free (cols);
-  return (true);
-}
-
-
-void clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
+/*
+ * n: the index of the new variable
+ * jvar: the index of the variable being cloned
+*/
+gboolean
+vartable_update_cloned_var (gint jvar, gint n, datad *d, ggobid *gg)
 {
+  if (n >= 0 && jvar > n) {
+    d->vartable[jvar].jref = n;
+    d->vartable[jvar].collab = g_strdup (d->vartable[n].collab_tform);
+    d->vartable[jvar].collab_tform = g_strdup (d->vartable[n].collab_tform);
+    d->vartable[jvar].mean = d->vartable[n].mean;
+    d->vartable[jvar].median = d->vartable[n].median;
+    d->vartable[jvar].lim.min =
+      d->vartable[jvar].lim_raw.min =
+      d->vartable[jvar].lim_tform.min = d->vartable[n].lim_raw.min;
+    d->vartable[jvar].lim.max =
+      d->vartable[jvar].lim_raw.max =
+      d->vartable[jvar].lim_tform.max = d->vartable[n].lim_raw.max;
 
+    return (true);
+
+  } else return (false); 
 }
+
+void
+clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
+{
+  gint i, k, n, jvar;
+
+  vartable_realloc (d->ncols+ncols, d, gg);
+  for (k=0; k<ncols; k++) {
+    n = cols[k];     /*-- variable being cloned --*/
+    jvar = d->ncols+k;  /*-- its new index --*/
+
+    /*-- fill in the values in d->vartable --*/
+    vartable_update_cloned_var (jvar, n, d, gg);
+
+    transform_values_init (n, d, gg);
+  }
+
+  /*-- pipeline --*/
+  arrayf_add_cols (&d->raw, d->ncols+ncols);
+  arrayf_add_cols (&d->tform, d->ncols+ncols);
+
+  for (k=0; k<ncols; k++) {
+    n = cols[k];        /*-- variable being cloned --*/
+    jvar = d->ncols+k;  /*-- its new index --*/
+    for (i=0; i<d->nrows; i++)
+      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = d->tform.vals[i][n];
+
+    tform_to_world_by_var (jvar, d, gg);
+
+    /*-- update the vartable display --*/
+    vartable_row_append (n, d, gg);
+  }
+  /*-- --*/
+/*
+    missing_arrays_add_column (jvar, d, gg);
+*/
+
+  /*-- variable checkboxes --*/
+  /*-- should be in varpanel_ui.c: checkboxes_add --*/
+  d->varpanel_ui.checkbox = (GtkWidget **)
+    g_realloc (d->varpanel_ui.checkbox, d->ncols+ncols * sizeof (GtkWidget *));
+  for (k=0; k<ncols; k++)
+    varpanel_checkbox_add (d->ncols+k, d, gg);
+
+  /*-- variable circles --*/
+/*
+  varcircles_add (d->ncols+ncols, d, gg);
+*/
+
+  d->ncols += ncols;
+}
+
 void delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 {
 

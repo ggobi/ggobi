@@ -990,9 +990,12 @@ GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update,
       /* Add a warning here. */
     }
 
+    /*
+     * I'm breaking this section for now, reworking cloning -- dfs
     variable_clone (0, name, true, d, gg);
     which = d->ncols-1;
     GGOBI(setVariableValues)(which, vals, num, update, d, gg);
+    */
   }
 
   if (update)

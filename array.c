@@ -387,12 +387,12 @@ arrayl_add_rows (array_l *arrp, gint nr)
 void
 arrayl_add_cols (array_l *arrp, gint nc)
 {
-  int i;
+  gint i;
 
   if (nc > arrp->ncols) {
     for (i=0; i<arrp->nrows; i++)
-      arrp->vals[i] = (glong *)
-        g_realloc (arrp->vals[i], nc * sizeof (glong));
+      arrp->vals[i] = (glong *) g_realloc (arrp->vals[i],
+                                           nc * sizeof (glong));
     arrp->ncols = nc;
   }
 }

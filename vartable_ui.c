@@ -37,6 +37,8 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
 
   if (ncols > 0)
     clone_vars (cols, ncols, d, gg);
+
+  g_free (cols);
 }
 static void
 delete_vars_cb (GtkWidget *w, ggobid *gg)
@@ -48,6 +50,8 @@ delete_vars_cb (GtkWidget *w, ggobid *gg)
 
   if (ncols > 0)
     delete_vars (cols, ncols, d, gg);
+
+  g_free (cols);
 }
 
 static GtkCList *

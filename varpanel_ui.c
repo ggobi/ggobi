@@ -33,7 +33,7 @@ varpanel_checkbutton_set_active (gint jvar, gboolean active, datad *d)
 
   if (jvar >= 0 && jvar < d->ncols) {
     GtkWidget *w = GTK_WIDGET (d->varpanel_ui.checkbox[jvar]);
-    if (GTK_WIDGET_REALIZED (d->varpanel_ui.checkbox[jvar])) {
+    if (GTK_WIDGET_REALIZED (w)) {
 
       active_prev = GTK_TOGGLE_BUTTON (w)->active;
       GTK_TOGGLE_BUTTON (w)->active = active;
@@ -227,8 +227,10 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 void
 varpanel_checkbox_add (gint j, datad *d, ggobid *gg) 
 {
+g_printerr ("(before) cbox[%d] = %d\n", j, (gint) d->varpanel_ui.checkbox[j]);
   d->varpanel_ui.checkbox[j] =
     gtk_noop_check_button_new_with_label (d->vartable[j].collab);
+g_printerr ("(after) cbox[%d] = %d\n", j, (gint) d->varpanel_ui.checkbox[j]);
   GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.checkbox[j]), gg, true);
 
   gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.checkbox[j]),
@@ -260,6 +262,7 @@ varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
 void
 varpanel_make (GtkWidget *parent, ggobid *gg) {
 
+  gg->varpanel_ui.layoutByRow = true;  /*-- for the circles --*/
   gg->selvarfg_GC = NULL;
 
 /*

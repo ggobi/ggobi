@@ -6,7 +6,8 @@
 
 #define VAR_CIRCLE_DIAM 40
 
-static void varcircle_add (gint, gint, gint, datad *, ggobid *gg);
+static void varcircle_create (gint, datad *, ggobid *gg);
+static void varcircle_attach (gint, gint, gint, datad *);
 static void varcircle_draw (gint, datad *, ggobid *gg); 
 
 static gboolean da_expose_cb (GtkWidget *, GdkEventExpose *, gpointer cbd);
@@ -14,6 +15,7 @@ static gboolean da_expose_cb (GtkWidget *, GdkEventExpose *, gpointer cbd);
 /*
  * This is unfortunately needed for now because no widgets have
  * been realized yet when this is first called.
+ * Now that ..._reset has an escape hatch, it might not be needed.
  *
  * I'm not sure which layout should be first; this does it row-wise.
 */
@@ -31,7 +33,7 @@ varcircles_layout_init (datad *d, ggobid *gg) {
 }
 
 void
-varcircles_layout_reset (datad *d, ggobid *gg) {
+varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
   gint j;
   GtkWidget *vb;
   gint tnrows, tncols;
@@ -44,6 +46,7 @@ varcircles_layout_reset (datad *d, ggobid *gg) {
     );
   gdk_flush();
 
+
   if (gg->varpanel_ui.layoutByRow) {
     gint vport_width, vb_width;
 
@@ -52,10 +55,12 @@ varcircles_layout_reset (datad *d, ggobid *gg) {
     vport_width = adj->page_size;
 
     vb_width = d->varpanel_ui.vb[0]->allocation.width;
+    if (vb_width < 5) vb_width = VAR_CIRCLE_DIAM;
 
-    tncols = MIN (vport_width / vb_width, d->ncols);
-    tnrows = d->ncols / tncols;
-    if (tnrows * tncols < d->ncols) tnrows++;
+    tncols = MIN (vport_width / vb_width, ncols);
+    tnrows = ncols / tncols;
+    if (tnrows * tncols < ncols) tnrows++;
+
   } else {
     gint vport_height, vb_height;
 
@@ -64,26 +69,32 @@ varcircles_layout_reset (datad *d, ggobid *gg) {
     vport_height = adj->page_size;
 
     vb_height = d->varpanel_ui.vb[0]->allocation.height;
+    if (vb_height < 5) vb_height = VAR_CIRCLE_DIAM;  /*-- a bit low ... --*/
 
-    tnrows = MIN (vport_height / vb_height, d->ncols);
-    tncols = d->ncols / tnrows;
-    if (tnrows * tnrows < d->ncols) tncols++;
+    tnrows = MIN (vport_height / vb_height, ncols);
+    tncols = ncols / tnrows;
+    if (tnrows * tnrows < ncols) tncols++;
   }
   d->varpanel_ui.tncols = tncols;
   d->varpanel_ui.tnrows = tnrows;
 
 
-  for (j=0; j<d->ncols; j++) {
-    gtk_widget_ref (d->varpanel_ui.vb[j]);
-    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.table),
-                          d->varpanel_ui.vb[j]);
+  for (j=0; j<ncols; j++) {
+    /*-- if they're in the container, ref and remove them --*/
+    if (d->varpanel_ui.vb[j]->parent != NULL &&
+        d->varpanel_ui.vb[j]->parent == d->varpanel_ui.table)
+    {
+      gtk_widget_ref (d->varpanel_ui.vb[j]);
+      gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.table),
+                            d->varpanel_ui.vb[j]);
+    }
   }
 
   gtk_table_resize (GTK_TABLE (d->varpanel_ui.table),
                     d->varpanel_ui.tnrows, d->varpanel_ui.tncols);
 
   left_attach = top_attach = 0;
-  for (j=0; j<d->ncols; j++) {
+  for (j=0; j<ncols; j++) {
     vb = d->varpanel_ui.vb[j];
 
     /*-- attach the first one at 0,0 --*/
@@ -130,13 +141,13 @@ void varcircles_populate (datad *d, ggobid *gg)
 
   d->varpanel_ui.da_pix = (GdkPixmap **)
     g_malloc (d->ncols * sizeof (GdkPixmap *));
-  for (j=0; j<d->ncols; j++) d->varpanel_ui.da_pix[j] = NULL;
 
 
   k = 0;
   for (i=0; i<d->varpanel_ui.tnrows; i++) {
     for (j=0; j<d->varpanel_ui.tncols; j++) {
-      varcircle_add (i, j, k, d, gg);
+      varcircle_create (k, d, gg);
+      varcircle_attach (i, j, k, d);
       k++;
       if (k == d->ncols) break;
     }
@@ -159,7 +170,7 @@ varcircles_delete (gint nc, gint jcol, datad *d, ggobid *gg) {
   }
 
   /*-- this may not be enough; time will tell --*/
-  varcircles_layout_reset (d, gg);
+  varcircles_layout_reset (d->ncols, d, gg);
 }
 
 void
@@ -210,13 +221,6 @@ varcircle_sel_cb (GtkWidget *w, GdkEvent *event, gint jvar)
     ctrl_mod = ((bevent->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK);
 /* */
 
-/*
-    if (ctrl_mod) {
-      variable_clone (jvar, NULL, true, d, gg);
-      return (true);
-    }
-*/
-    
     /*-- general variable selection --*/
     varsel (cpanel, sp, jvar, button, alt_mod, ctrl_mod, shift_mod, d, gg);
     varcircles_refresh (d, gg);
@@ -227,18 +231,18 @@ varcircle_sel_cb (GtkWidget *w, GdkEvent *event, gint jvar)
 }
 
 static void
-varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
+varcircle_create (gint k, datad *d, ggobid *gg)
 {
+  d->varpanel_ui.da_pix[k] = NULL;
+
   d->varpanel_ui.vb[k] = gtk_vbox_new (false, 0);
   gtk_container_border_width (GTK_CONTAINER (d->varpanel_ui.vb[k]), 1);
-  gtk_widget_show (d->varpanel_ui.vb[k]);
 
-  d->varpanel_ui.label[k] =
-    gtk_button_new_with_label (d->vartable[k].collab);
-
-  gtk_widget_show (d->varpanel_ui.label[k]);
+  d->varpanel_ui.label[k] = gtk_button_new_with_label (d->vartable[k].collab);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
     d->varpanel_ui.label[k], "Click left to select", NULL);
+  gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.label[k]), "datad", d);
+  GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.label[k]), gg, true);
   gtk_container_add (GTK_CONTAINER (d->varpanel_ui.vb[k]),
     d->varpanel_ui.label[k]);
 
@@ -248,8 +252,6 @@ varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
     GTK_SIGNAL_FUNC (popup_varmenu), GINT_TO_POINTER (k));
 */
 
-  gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.label[k]), "datad", d);
-  GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.label[k]), gg, true);
 
   /*
    * a drawing area to contain the variable circle
@@ -265,19 +267,21 @@ varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
     d->varpanel_ui.da[k], "Click to select; see menu", NULL);
-
   gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.da[k]), "expose_event",
     GTK_SIGNAL_FUNC (da_expose_cb), GINT_TO_POINTER (k));
-
   gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.da[k]), "button_press_event",
     GTK_SIGNAL_FUNC (varcircle_sel_cb), GINT_TO_POINTER (k));
-
   gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.da[k]), "datad", d);
   GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.da[k]), gg, true);
-
-  gtk_widget_show (d->varpanel_ui.da[k]);
   gtk_container_add (GTK_CONTAINER (d->varpanel_ui.vb[k]),
     d->varpanel_ui.da[k]);
+
+  gtk_widget_show_all (d->varpanel_ui.vb[k]);
+}
+
+void
+varcircle_attach (gint i, gint j, gint k, datad *d)
+{
   gtk_table_attach (GTK_TABLE (d->varpanel_ui.table),
     d->varpanel_ui.vb[k], j, j+1, i, i+1,
     GTK_FILL, GTK_FILL, 0, 0);
@@ -405,43 +409,25 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
   return true;
 }
 
+/*-- used in cloning and appending variables; see vartable.c --*/
 void
-varcircle_clone (gint jvar, const gchar *newName, gboolean update,
-  datad *d, ggobid *gg) 
+varcircles_add (gint nc, datad *d, ggobid *gg) 
 {
-  gint nc = d->ncols + 1;
-  gint i, j, k = 0;
+  gint j;
   
-  /*
-   * Follow the algorithm by which the table has been populated
-  if (d->varpanel_ui.tnrows*d->varpanel_ui.vncols <= d->ncols) {
-    d->varpanel_ui.tnrows++;
-    gtk_table_resize (GTK_TABLE (d->varpanel_ui.table),
-                      d->varpanel_ui.tnrows, d->varpanel_ui.vncols);
-  }
-  */
+  d->varpanel_ui.vb = (GtkWidget **)
+    g_realloc (d->varpanel_ui.vb, nc * sizeof (GtkWidget *));
+  d->varpanel_ui.da = (GtkWidget **)
+    g_realloc (d->varpanel_ui.da, nc * sizeof (GtkWidget *));
+  d->varpanel_ui.da_pix = (GdkPixmap **)
+    g_realloc (d->varpanel_ui.da_pix, nc * sizeof (GdkPixmap *));
+  d->varpanel_ui.label = (GtkWidget **)
+    g_realloc (d->varpanel_ui.label, nc * sizeof (GtkWidget *));
 
-  k = 0;
-  for (i=0; i<d->varpanel_ui.tnrows; i++) {
-    for (j=0; j<d->varpanel_ui.tncols; j++) {
-      if (k < d->ncols)
-        ;
-      else {
-        d->varpanel_ui.da = (GtkWidget **)
-          g_realloc (d->varpanel_ui.da, nc * sizeof (GtkWidget *));
-
-        d->varpanel_ui.da_pix = (GdkPixmap **)
-          g_realloc (d->varpanel_ui.da_pix, nc * sizeof (GdkPixmap *));
-        d->varpanel_ui.da_pix[nc-1] = NULL;
-
-        d->varpanel_ui.label = (GtkWidget **)
-          g_realloc (d->varpanel_ui.label, nc * sizeof (GtkWidget *));
-/*        varcircle_add (i, j, k, d, gg);*/
-      }
-      k++;
-      if (k == d->ncols+1) break;
-    }
-  }
+  /*-- create the variable circles --*/
+  for (j=d->ncols; j<nc; j++)
+    varcircle_create (j, d, gg);
+  varcircles_layout_reset (nc, d, gg);
 
   gtk_widget_show_all (gg->varpanel_ui.notebook);
 }

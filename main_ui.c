@@ -140,7 +140,7 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
       gg->varpanel_ui.layoutByRow = !gg->varpanel_ui.layoutByRow;
       for (l = gg->d; l; l = l->next) {
         d = (datad *) l->data;
-        varcircles_layout_reset (d, gg);
+        varcircles_layout_reset (d->ncols, d, gg);
       }
     break;
 

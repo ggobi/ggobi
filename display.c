@@ -253,6 +253,9 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
 
   varpanel_refresh (gg);
 
+  /*-- don't I need this? --*/
+  g_free (selected_vars);
+
   return (display);
 }
 
