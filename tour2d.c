@@ -448,7 +448,7 @@ for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.uvevec.vals[1][i]);
 g_printerr ("\n");
 */
 
-    for (i=0; i<d->ncols; i++) {
+    /*    for (i=0; i<d->ncols; i++) {
       chosen = false;
       for (k=0; k<dsp->t2d.nvars; k++) {
         if (dsp->t2d.vars.els[k] == i) {
@@ -466,7 +466,7 @@ g_printerr ("\n");
         if (dsp->t2d.u.vals[0][i] < eps && dsp->t2d.u.vals[1][i] < eps)
           dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
       }
-    }
+      } */
   }
 }
 /* dfsdebug end */
