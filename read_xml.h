@@ -9,17 +9,19 @@
 #include <parser.h>
 #endif
 
-enum xmlDataState { 
-  TOP = 0, 
+enum xmlDataState {
+  TOP = 0,
   DATASET, DESCRIPTION,
   RECORD, RECORDS, VARIABLES, VARIABLE,
-  COLORMAP, COLOR, 
+  COLORMAP, COLOR,
   REAL_VARIABLE, CATEGORICAL_VARIABLE,
   CATEGORICAL_LEVELS, CATEGORICAL_LEVEL,
   COLORSCHEME,
+  BRUSHSTYLE,
   REAL, INT, NA,
 /* HELP, DESCRIPTION */
-  UNKNOWN};
+  UNKNOWN
+};
 
 typedef enum xmlDataState XmlTagType;
 
@@ -28,24 +30,24 @@ typedef struct {
   int color;
   int glyphType;
   int glyphSize;
-  int edgeWidth;  /*-- this has no home in ggobi yet --*/
+  int edgeWidth;  /*-- this has no home in ggobi --*/
   int hidden;
 
 } DataOptions;
 
 typedef struct _XMLUserData {
   enum xmlDataState state;
-  gint current_variable; /* Indexes the current variable. */
-  gint current_record;   /* Indexes the record we are currently working on. */
-  gint current_element;  /* Indexes the values within a record. */
-  gint current_level;    /* */
+  gint current_variable;        /* Indexes the current variable. */
+  gint current_record;          /* Indexes the record we are currently working on. */
+  gint current_element;         /* Indexes the values within a record. */
+  gint current_level;           /* */
 
-  gint current_color;    /* The index of the current element
-                            being processed in the colormap */
+  gint current_color;           /* The index of the current element
+                                   being processed in the colormap */
 
-    xmlChar *recordString;
-    int recordStringLength;
- 
+  xmlChar *recordString;
+  int recordStringLength;
+
   /* Flag that says we are reading color entries from another file via a
    * sub-parser.  This allows us to reuse the same instance of user data
    * and the same handlers.
@@ -72,7 +74,7 @@ typedef struct _XMLUserData {
    */
   gboolean terminateStrings_p;
 
-   /* The datasets global missing value identifier. */
+  /* The datasets global missing value identifier. */
   gchar *NA_identifier;
   /* The identifier for a missing value that is currently in effect.
      This might be specified per record and will be discarded
@@ -81,10 +83,10 @@ typedef struct _XMLUserData {
    */
   gchar *current_NA_identifier;
 
-    /* A set of values that apply to records when an attribute
-       is not specified for that specific record but is set
-       in the ggobidata tag.
-     */
+  /* A set of values that apply to records when an attribute
+     is not specified for that specific record but is set
+     in the ggobidata tag.
+   */
   DataOptions defaults;
 
   /* Local set of record identifiers that are used here
@@ -117,70 +119,80 @@ typedef struct _XMLUserData {
 extern "C" {
 #endif
 
-enum xmlDataState tagType(const xmlChar *name, gboolean endTag);
-gboolean newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName);
-gboolean newEdgeVariable(const xmlChar **attrs, XMLParserData *data);
-gboolean setDatasetInfo(const xmlChar **attrs, XMLParserData *data);
-gboolean setGeneralInfo (const xmlChar **attrs, XMLParserData *data);
-gboolean allocVariables(const xmlChar **attrs, XMLParserData *data);
-gboolean newRecord(const xmlChar **attrs, XMLParserData *data);
-gboolean setDataset(const xmlChar **attrs, XMLParserData *parserData);
+  enum xmlDataState tagType(const xmlChar * name, gboolean endTag);
+  gboolean newVariable(const xmlChar ** attrs, XMLParserData * data,
+                       const xmlChar * tagName);
+  gboolean newEdgeVariable(const xmlChar ** attrs, XMLParserData * data);
+  gboolean setDatasetInfo(const xmlChar ** attrs, XMLParserData * data);
+  gboolean setGeneralInfo(const xmlChar ** attrs, XMLParserData * data);
+  gboolean allocVariables(const xmlChar ** attrs, XMLParserData * data);
+  gboolean newRecord(const xmlChar ** attrs, XMLParserData * data);
+  gboolean setDataset(const xmlChar ** attrs, XMLParserData * parserData);
+  gboolean setBrushStyle(const xmlChar ** attrs, XMLParserData * parserData);
 
-gboolean setRecordValues(XMLParserData *data, const xmlChar *line, gint len);
-gboolean setVariableName(XMLParserData *data, const xmlChar *name, gint len);
+  gboolean setRecordValues(XMLParserData * data, const xmlChar * line,
+                           gint len);
+  gboolean setVariableName(XMLParserData * data, const xmlChar * name,
+                           gint len);
 
-gboolean setDefaultDatasetValues(const xmlChar **attrs, XMLParserData *data);
+  gboolean setDefaultDatasetValues(const xmlChar ** attrs,
+                                   XMLParserData * data);
 
-const xmlChar *skipWhiteSpace(const xmlChar *ch, gint *len);
+  const xmlChar *skipWhiteSpace(const xmlChar * ch, gint * len);
 
-const gchar *getAttribute(const xmlChar **attrs, gchar *name);
-
-
-void xml_warning(const gchar *attribute, const gchar *value, const gchar *msg, XMLParserData *data);
-
-void initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg);
-
-gboolean setGlyph(const xmlChar **attrs, XMLParserData *data, gint i);
-gboolean setColor(const xmlChar **attrs, XMLParserData *data, gint i);
+  const gchar *getAttribute(const xmlChar ** attrs, gchar * name);
 
 
+  void xml_warning(const gchar * attribute, const gchar * value,
+                   const gchar * msg, XMLParserData * data);
 
-void categoricalLevels(const xmlChar **attrs, XMLParserData *data);
-int setLevelIndex(const xmlChar **attrs, XMLParserData *data);
-void addLevel(XMLParserData *data, const char *c, int len);
+  void initParserData(XMLParserData * data, xmlSAXHandlerPtr handler,
+                      ggobid * gg);
 
-
-gint rowId(const gchar *tmp, XMLParserData *data);
-
-gboolean data_xml_read (InputDescription *desc, ggobid *gg);
-
-gboolean setHidden(const xmlChar **attrs, XMLParserData *data, gint i);
-
-gboolean setColorValue(XMLParserData *data, const xmlChar *name, gint len);
-gboolean setColormapEntry(const xmlChar **attrs, XMLParserData *data);
-gboolean setColorMap(const xmlChar **attrs, XMLParserData *data);
-void setColorValues(GdkColor *color, double *values);
-
-gboolean registerColorMap(ggobid *gg);
-
-gboolean xmlParseColorMap(const gchar *fileName, int size, XMLParserData *data);
-gboolean asciiParseColorMap(const gchar *fileName, int size, XMLParserData *data);
-
-gchar *find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg);
-gchar *getFileDirectory(const gchar *filename);
+  gboolean setGlyph(const xmlChar ** attrs, XMLParserData * data, gint i);
+  gboolean setColor(const xmlChar ** attrs, XMLParserData * data, gint i);
 
 
 
-int asInteger(const gchar *tmp);
-double asNumber(const char *sval);
-gboolean asLogical(const gchar *sval);
+  void categoricalLevels(const xmlChar ** attrs, XMLParserData * data);
+  int setLevelIndex(const xmlChar ** attrs, XMLParserData * data);
+  void addLevel(XMLParserData * data, const char *c, int len);
 
-datad *getCurrentXMLData(XMLParserData* parserData);
 
-gboolean readXMLRecord(const xmlChar **attrs, XMLParserData *data);
+  gint rowId(const gchar * tmp, XMLParserData * data);
+
+  gboolean data_xml_read(InputDescription * desc, ggobid * gg);
+
+  gboolean setHidden(const xmlChar ** attrs, XMLParserData * data, gint i);
+
+  gboolean setColorValue(XMLParserData * data, const xmlChar * name,
+                         gint len);
+  gboolean setColormapEntry(const xmlChar ** attrs, XMLParserData * data);
+  gboolean setColorMap(const xmlChar ** attrs, XMLParserData * data);
+  void setColorValues(GdkColor * color, double *values);
+
+  gboolean registerColorMap(ggobid * gg);
+
+  gboolean xmlParseColorMap(const gchar * fileName, int size,
+                            XMLParserData * data);
+  gboolean asciiParseColorMap(const gchar * fileName, int size,
+                              XMLParserData * data);
+
+  gchar *find_xml_file(const gchar * filename, const gchar * dir,
+                       ggobid * gg);
+  gchar *getFileDirectory(const gchar * filename);
+
+
+
+  int asInteger(const gchar * tmp);
+  double asNumber(const char *sval);
+  gboolean asLogical(const gchar * sval);
+
+  datad *getCurrentXMLData(XMLParserData * parserData);
+
+  gboolean readXMLRecord(const xmlChar ** attrs, XMLParserData * data);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

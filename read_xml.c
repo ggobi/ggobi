@@ -92,12 +92,16 @@ const gchar * const xmlDataTagNames[] = {
   "variable",
   "colormap",
   "color",
-/* New for handling categorical variables. */
+/* variables */
   "realvariable",
   "categoricalvariable",
   "levels",
   "level",
+/* color scheme */
   "activeColorScheme",
+/* brushing attributes: color first; later, glyph type and size */
+  "brush",
+/* data values */
   "real",
   "int",
   "na",
@@ -284,6 +288,9 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     case COLORMAP:
       /*setColorMap(attrs, data);*/  /* requires some thought ... */
     break;
+    case BRUSHSTYLE:
+      setBrushStyle (attrs, data);
+    break;
     case COLOR:
       /*setColormapEntry(attrs, data);*/  /* ditto .... */
     break;
@@ -297,8 +304,8 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     case REAL:   
     case INT:   
     case NA:  
-	if(data->recordString)
-	    setRecordValues(data, data->recordString, data->recordStringLength);
+      if(data->recordString)
+        setRecordValues(data, data->recordString, data->recordStringLength);
     break;
     default:
       fprintf(stderr, "Unrecognized XML state %s\n", name); fflush(stderr);    
@@ -854,7 +861,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
               d->glyph_prev.els[i].type = value;       
         }
       } else {  /* size */
-        value = atoi(next);
+        value = strToInteger(next);
         if(i < 0) {
           if (value >= 0 && value < NGLYPHTYPES) {
             data->defaults.glyphSize = value;
@@ -1160,7 +1167,7 @@ gint
 rowId (const gchar *tmp, XMLParserData *data)
 {
   datad *d = getCurrentXMLData(data);
-  gint value = atoi(tmp) - 1;
+  gint value = strToInteger(tmp) - 1;
 
   if (value < 0) {
    /* Now look up the ids for the rows. */
@@ -1618,4 +1625,93 @@ checkLevelValue(vartabled *vt, double value)
   }
 
   return(false);
+}
+
+
+gboolean
+setBrushStyle(const xmlChar ** attrs, XMLParserData * data)
+{
+  const gchar *tmp;
+  gint value;
+  gboolean retval = true;
+
+  tmp = getAttribute(attrs, "color");
+  if (tmp != NULL) {
+    colorschemed *scheme = data->gg->activeColorScheme;
+    value = strToInteger(tmp);
+    if (value >=0 && value < scheme->n) {
+      data->gg->color_id = value;
+    } else {
+      xml_warning("File error:", tmp, "brushing color improperly specified",
+        data);
+      return false;
+    } 
+  }
+
+/*
+ * glyphType  0:6
+*/
+  tmp = getAttribute(attrs, "glyphType");
+  if (tmp != NULL) {
+    /*
+     * make sure this attribute is an integer; if someone puts a
+     * string here, like "plus" or "fc", value = 0 and the mistake
+     * isn't caught later when value is tested.
+    */
+    if (tmp[0] < '0' || tmp[0] > '6') {
+      xml_warning ("brushing glyphType", tmp, "Must be on [0,6]\n", data);
+      return false;
+    }
+    value = strToInteger(tmp);
+
+    if(value < 0 || value >= NGLYPHTYPES) {
+      xml_warning("glyphType", tmp, "Out of range", data);
+      return false;
+    } else {
+      data->gg->glyph_id.type = value;
+    }
+  }
+
+/*
+ * glyphSize  0:7
+*/
+  tmp = getAttribute(attrs, "glyphSize");
+  if (tmp != NULL) {
+    value = strToInteger(tmp);
+
+    if (value < 0 || value >= NGLYPHSIZES) {
+      xml_warning ("glyphSize", tmp, "Out of range", data);
+    } else {
+      data->gg->glyph_id.size = value;
+    }
+  }
+
+
+  tmp = getAttribute(attrs, "glyph");
+  if (tmp != NULL) {
+    const gchar *next;
+    gint j;
+    next = tmp;
+    next = strtok((gchar *)tmp, " ");
+    j = 0;
+    while(next) {
+      if(j == 0) {  /* type */
+        value = mapGlyphName(next);
+        data->gg->glyph_id.type = value;
+      } else {     /* size */
+        value = strToInteger(next);
+        if (value >= 0 && value < NGLYPHTYPES) {
+          data->gg->glyph_id.size = value;
+        } else {
+          xml_warning("File error:", next,
+           "brushing glyph improperly specified", data);
+          retval = false;
+        } 
+      }
+      j++;
+      next = strtok(NULL, " ");
+    }
+  }
+
+  return retval;
 }
