@@ -102,7 +102,7 @@ typedef struct _XMLUserData {
   GHashTable *idNamesTable;
 
   GHashTable *idTable;
-  gboolean usesStringIds;
+  gboolean usesStringIds;  /* this is now unused; it's always true */
 
   gint recordLabelsVariable;
 
