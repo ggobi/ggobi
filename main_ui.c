@@ -117,153 +117,6 @@ axes_show_cb (GtkCheckMenuItem *w, guint action)
 }
 */
 
-void
-mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
-{
-  extern void pcplot_menus_make (ggobid *);
-  extern void scatmat_menus_make (ggobid *);
-  extern void tsplot_menus_make (ggobid *);
-  extern void xyplot_menus_make (ggobid *);
-  extern void p1dplot_menus_make (ggobid *);
-#ifdef EDIT_EDGES_IMPLEMENTED
-  extern void edgeedit_menus_make (ggobid *);
-#endif
-  extern void movepts_menus_make (ggobid *);
-  extern void brush_menus_make (ggobid *);
-  extern void identify_menus_make (ggobid *);
-  extern void scale_menus_make (ggobid *);
-  extern void tour1d_menus_make (ggobid *);
-  extern void tour2d_menus_make (ggobid *);
-  extern void tourcorr_menus_make (ggobid *);
-
-  if (state == off) {
-
-    switch (m) {
-      case PCPLOT:
-        submenu_destroy (gg->menus.options_item);
-      break;
-      case TSPLOT:
-        submenu_destroy (gg->menus.options_item);
-      break;
-      case SCATMAT:
-        submenu_destroy (gg->menus.options_item);
-      break;
-
-      case P1PLOT:
-        submenu_destroy (gg->menus.options_item);
-      break;
-      case XYPLOT:
-        submenu_destroy (gg->menus.options_item);
-      break;
-      case EDGEED:
-        submenu_destroy (gg->menus.options_item);
-      break;
-      case MOVEPTS:
-        submenu_destroy (gg->menus.options_item);
-      break;
-
-#ifdef ROTATION_IMPLEMENTED
-      case ROTATE:
-      break;
-#endif
-
-      case TOUR1D:
-        submenu_destroy (gg->menus.io_item);
-        submenu_destroy (gg->menus.options_item);
-      break;
-
-      case TOUR2D:
-        submenu_destroy (gg->menus.io_item);
-        submenu_destroy (gg->menus.options_item);
-      break;
-
-      case COTOUR:
-        submenu_destroy (gg->menus.io_item);
-        submenu_destroy (gg->menus.options_item);
-      break;
-
-      case SCALE:
-        submenu_destroy (gg->menus.reset_item);
-        submenu_destroy (gg->menus.options_item);
-      break;
-
-      case BRUSH:
-        submenu_destroy (gg->menus.reset_item);
-        submenu_destroy (gg->menus.options_item);
-      break;
-
-      case IDENT:
-        submenu_destroy (gg->menus.options_item);
-      break;
-
-#ifdef EDIT_EDGES_IMPLEMENTED
-      case EDGEED:
-        submenu_destroy (gg->menus.options_item);
-      break;
-#endif
-    }
-  } else if (state == on) {
-
-    switch (m) {
-      case PCPLOT:
-        pcplot_menus_make (gg);
-      break;
-      case TSPLOT:
-        tsplot_menus_make (gg);
-      break;
-      case SCATMAT:
-        scatmat_menus_make (gg);
-      break;
-
-      case P1PLOT:
-        p1dplot_menus_make (gg);
-      break;
-      case XYPLOT:
-        xyplot_menus_make (gg);
-      break;
-#ifdef EDIT_EDGES_IMPLEMENTED
-      case EDGEED:
-        edgeedit_menus_make (gg);
-      break;
-#endif
-      case MOVEPTS:
-        movepts_menus_make (gg);
-      break;
-
-#ifdef ROTATION_IMPLEMENTED
-      case ROTATE:
-      break;
-#endif
-
-      case TOUR1D:
-        tour1d_menus_make (gg);
-      break;
-
-      case TOUR2D:
-        tour2d_menus_make (gg);
-      break;
-
-      case COTOUR:
-        tourcorr_menus_make (gg);
-      break;
-
-      case SCALE :
-        scale_menus_make (gg);
-      break;
-
-      case BRUSH :
-        brush_menus_make (gg);
-      break;
-
-      case IDENT:
-        identify_menus_make (gg);
-      break;
-
-      case NULLMODE:
-      break;
-    }
-  }
-}
 
 gint
 mode_get (ggobid* gg) {
@@ -553,7 +406,7 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
     if (projection_ok (action, display)) {
       sp_event_handlers_toggle (sp, off);
       redraw_style = mode_activate (sp, gg->mode, off, gg);
-      mode_submenus_activate (sp, gg->mode, off, gg);
+      /*mode_submenus_activate (sp, gg->mode, off, gg);*/
       procs_activate (off, display, gg);
 
       display->cpanel.mode = action;
@@ -561,14 +414,14 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
 
       sp_event_handlers_toggle (sp, on);
       mode_activate (sp, gg->mode, on, gg);
-      mode_submenus_activate (sp, gg->mode, on, gg);
+      /*mode_submenus_activate (sp, gg->mode, on, gg);*/
       procs_activate (on, display, gg);
 
       /*
        * work out which mode menus (Options, Reset, I/O) need
        * to be present, and add the needed callbacks.
-      mode_submenus_update (prev_mode, action, gg);
       */
+      mode_submenus_update (prev_mode, action, gg);
 
       /*-- redraw this display --*/
       display_tailpipe (display, gg);
@@ -784,7 +637,11 @@ make_ui (ggobid *gg) {
   gtk_widget_show_all (hbox);
 
   /*-- at this point, the mode could be NULLMODE, P1PLOT, or XYPLOT --*/
-  mode_submenus_activate (NULL, gg->mode, on, gg);
+  /*mode_submenus_activate (NULL, gg->mode, on, gg);*/
+  {
+    void mode_submenus_initialize (gint mode, ggobid *gg);
+    mode_submenus_initialize (gg->mode, gg);
+  }
 
   gtk_widget_show_all (window);
 }

@@ -16,6 +16,7 @@
 #include "brushing.h"
 #include "display.h"
 #include "display_tree.h"
+#include "read_init.h"
 
 #include "varseldata.h"
 

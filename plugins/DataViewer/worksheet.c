@@ -1,5 +1,6 @@
 #include <gtk/gtk.h>
 #include "ggobi.h"
+#include "externs.h"
 #include "GGobiAPI.h"
 
 #include <stdio.h>
@@ -31,8 +32,6 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin)
 
   GGOBI_addPluginInstance(inst, gg);
 
-
-
   menu = gtk_menu_new();
   entry = gtk_menu_item_new_with_label("View");
 
@@ -43,9 +42,16 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin)
                                    (gpointer) inst);
   gtk_widget_show(entry);
 
+/*
   data_item = gtk_menu_item_new_with_label("Data");
   gtk_widget_show(data_item);
+  gtk_widget_add_accelerator (data_item, "activate",
+    gg->main_accel_group, (guint) 'A',
+    GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
+*/
+  data_item = submenu_make ("D_ata", 'A', gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (data_item), menu);
+
 
 /*
   We can append to the menubar but this puts the Data entry after

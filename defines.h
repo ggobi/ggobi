@@ -46,9 +46,6 @@ enum redrawStyle {NONE, EXPOSE, QUICK, BINNED, FULL};
 
 #define NDISPLAYTYPES 3
 
-#define VIEWMODE_MENU_POS     2
-#define OPTIONS_MENU_POS      3
-
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};
 

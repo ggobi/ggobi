@@ -291,7 +291,7 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
     sp_event_handlers_toggle (sp, state);
 
     mode_activate (sp, cpanel->mode, state, gg);
-    mode_submenus_activate (sp, cpanel->mode, state, gg);
+    /*mode_submenus_activate (sp, cpanel->mode, state, gg);*/
 
     /*
      * this is now the only place varpanel_refresh is called in
@@ -324,6 +324,8 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
 
     gg->current_splot = sp;
     splot_set_current (sp, on, gg);
+
+    mode_submenus_update (prev_mode, mode_get (gg), gg);
 
     /*
      * if the previous splot is in transient brushing mode, a FULL

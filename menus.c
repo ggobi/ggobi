@@ -13,39 +13,6 @@
 #include "vars.h"
 #include "externs.h"
 
-/*-- every mode has an options meny --*/
-gboolean
-mode_has_options_menu (gint mode)
-{
-  return (mode == P1PLOT ||
-          mode == XYPLOT ||
-          mode == SCALE  ||
-          mode == BRUSH  ||
-          mode == TOUR1D ||
-          mode == TOUR2D ||
-          mode == COTOUR ||
-          mode == IDENT  ||
-          mode == MOVEPTS ||
-          mode == PCPLOT ||
-          mode == TSPLOT);
-}
-
-gboolean
-mode_has_reset_menu (gint mode)
-{
-  return (mode == SCALE  ||
-          mode == BRUSH);
-}
-
-gboolean
-mode_has_io_menu (gint mode)
-{
-  return (mode == TOUR1D ||
-          mode == TOUR2D ||
-          mode == COTOUR);
-}
-
-
 /*--------------------------------------------------------------------*/
 /*                   Plot1D: Options menu                             */
 /*--------------------------------------------------------------------*/
@@ -53,8 +20,10 @@ mode_has_io_menu (gint mode)
 void
 p1dplot_menus_make (ggobid *gg)
 {
+/*
   gg->menus.options_item = submenu_make ("_Options", 'O',
     gg->main_accel_group);
+*/
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -67,7 +36,6 @@ p1dplot_menus_make (ggobid *gg)
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/
@@ -77,8 +45,10 @@ p1dplot_menus_make (ggobid *gg)
 void
 xyplot_menus_make (ggobid *gg)
 {
+/*
   gg->menus.options_item = submenu_make ("_Options", 'O',
     gg->main_accel_group);
+*/
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -91,7 +61,6 @@ xyplot_menus_make (ggobid *gg)
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/
@@ -105,8 +74,6 @@ tour1d_menus_make (ggobid *gg) {
   void tour1d_io_cb (GtkWidget *w, gpointer *cbd);
 
   /*-- I/O menu --*/
-  gg->menus.io_item = submenu_make ("_I/O", 'I',
-    gg->main_accel_group);
   gg->menus.io_menu = gtk_menu_new ();
 
 /*-- these could use CreateMenuItem --*/
@@ -133,11 +100,8 @@ tour1d_menus_make (ggobid *gg) {
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
     gg->menus.io_menu); 
-  submenu_insert (gg->menus.io_item, gg->main_menubar, 4);
 
   /*-- Options menu --*/ 
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -159,7 +123,6 @@ tour1d_menus_make (ggobid *gg) {
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/
@@ -196,15 +159,10 @@ tour2d_menus_make (ggobid *gg)
 
   gtk_widget_show_all (gg->menus.io_menu);
 
-  gg->menus.io_item = submenu_make ("_I/O", 'I',
-    gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
     gg->menus.io_menu); 
-  submenu_insert (gg->menus.io_item, gg->main_menubar, 4);
 
   /*-- Options menu --*/
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -225,7 +183,6 @@ tour2d_menus_make (ggobid *gg)
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/
@@ -262,15 +219,10 @@ tourcorr_menus_make (ggobid *gg)
 
   gtk_widget_show_all (gg->menus.io_menu);
 
-  gg->menus.io_item = submenu_make ("_I/O", 'I',
-    gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
     gg->menus.io_menu); 
-  submenu_insert (gg->menus.io_item, gg->main_menubar, 4);
 
   /*-- Options menu --*/
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -291,7 +243,6 @@ tourcorr_menus_make (ggobid *gg)
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/
@@ -321,16 +272,10 @@ scale_menus_make (ggobid *gg) {
 
   gtk_widget_show_all (gg->menus.reset_menu);
 
-  gg->menus.reset_item = submenu_make ("_Reset", 'R',
-    gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.reset_item),
     gg->menus.reset_menu); 
-  submenu_insert (gg->menus.reset_item, gg->main_menubar, 4);
 
   /*-- Options menu --*/
-
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -343,7 +288,6 @@ scale_menus_make (ggobid *gg) {
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/
@@ -408,16 +352,10 @@ brush_menus_make (ggobid *gg)
 
   gtk_widget_show_all (gg->menus.reset_menu);
 
-
-  gg->menus.reset_item = submenu_make ("_Reset", 'R',
-    gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.reset_item),
     gg->menus.reset_menu);
-  submenu_insert (gg->menus.reset_item, gg->main_menubar, 4);
 
   /*-- Options menu --*/
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -438,7 +376,6 @@ brush_menus_make (ggobid *gg)
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/
@@ -448,8 +385,6 @@ brush_menus_make (ggobid *gg)
 void
 identify_menus_make (ggobid *gg)
 {
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -462,7 +397,6 @@ identify_menus_make (ggobid *gg)
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/
@@ -470,9 +404,8 @@ identify_menus_make (ggobid *gg)
 /*--------------------------------------------------------------------*/
 
 void
-movepts_menus_make (ggobid *gg) {
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
+movepts_menus_make (ggobid *gg)
+{
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -485,7 +418,6 @@ movepts_menus_make (ggobid *gg) {
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 
@@ -494,10 +426,8 @@ movepts_menus_make (ggobid *gg) {
 /*--------------------------------------------------------------------*/
 
 void
-edgeedit_menus_make (ggobid *gg) {
-
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
+edgeedit_menus_make (ggobid *gg)
+{
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -510,7 +440,6 @@ edgeedit_menus_make (ggobid *gg) {
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 
 }
 
@@ -519,9 +448,8 @@ edgeedit_menus_make (ggobid *gg) {
 /*--------------------------------------------------------------------*/
 
 void
-scatmat_menus_make (ggobid *gg) {
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
+scatmat_menus_make (ggobid *gg)
+{
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -534,7 +462,6 @@ scatmat_menus_make (ggobid *gg) {
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/
@@ -544,8 +471,6 @@ scatmat_menus_make (ggobid *gg) {
 void
 pcplot_menus_make (ggobid *gg)
 {
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -558,7 +483,6 @@ pcplot_menus_make (ggobid *gg)
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 
@@ -567,9 +491,8 @@ pcplot_menus_make (ggobid *gg)
 /*--------------------------------------------------------------------*/
 
 void
-tsplot_menus_make (ggobid *gg) {
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
+tsplot_menus_make (ggobid *gg)
+{
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -582,5 +505,161 @@ tsplot_menus_make (ggobid *gg) {
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
+}
+
+/*--------------------------------------------------------------------*/
+/*               Routines to manage the mode menus                    */
+/*--------------------------------------------------------------------*/
+
+/*-- every mode has an options meny --*/
+gboolean
+mode_has_options_menu (gint mode)
+{
+  return (mode == P1PLOT || mode == XYPLOT || mode == SCALE  ||
+          mode == BRUSH  || mode == TOUR1D || mode == TOUR2D ||
+          mode == COTOUR || mode == IDENT  || mode == MOVEPTS ||
+          mode == PCPLOT || mode == TSPLOT);
+}
+
+gboolean
+mode_has_reset_menu (gint mode)
+{
+  return (mode == SCALE  || mode == BRUSH);
+}
+
+gboolean
+mode_has_io_menu (gint mode)
+{
+  return (mode == TOUR1D || mode == TOUR2D || mode == COTOUR);
+}
+
+
+/*-- make the menu items once, and then show/hide them as necessary --*/
+void
+mode_submenus_initialize (gint mode, ggobid *gg)
+{
+  gg->menus.options_item = NULL;
+  gg->menus.reset_item = NULL;
+  gg->menus.io_item = NULL;
+}
+
+void
+mode_submenus_update (gint prev_mode, gint mode, ggobid *gg)
+{
+  /*-- remove any previous submenus --*/
+  if (mode_has_options_menu (prev_mode)) {
+    gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.options_item));
+    /*-- destroy menu items if called for --*/
+    if (!mode_has_options_menu (mode)) {
+      if (gg->menus.options_item != NULL) {
+        gtk_widget_destroy (gg->menus.options_item);
+        gg->menus.options_item = NULL;
+      }
+    }
+  } else {
+    /*-- create and insert menu items if called for --*/
+    if (mode_has_options_menu (mode)) {
+      gg->menus.options_item = submenu_make ("_Options", 'O',
+        gg->main_accel_group);
+      submenu_insert (gg->menus.options_item,
+        gg->main_menubar, 4);
+    }
+  }
+
+  /*-- remove any previous submenus --*/
+  if (mode_has_io_menu (prev_mode)) {
+    gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.io_item));
+    /*-- destroy menu items if called for --*/
+    if (!mode_has_io_menu (mode)) {
+      if (gg->menus.io_item != NULL) {
+        gtk_widget_destroy (gg->menus.io_item);
+        gg->menus.io_item = NULL;
+      }
+    }
+  } else {
+    /*-- create and insert menu items if called for --*/
+    if (mode_has_io_menu (mode)) {
+      gg->menus.io_item = submenu_make ("_I/O", 'I',
+        gg->main_accel_group);
+      submenu_insert (gg->menus.io_item,
+        gg->main_menubar, 5);
+    }
+  }
+
+  if (mode_has_reset_menu (prev_mode)) {
+    gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.reset_item));
+    if (!mode_has_reset_menu (mode)) {
+      if (gg->menus.reset_item != NULL) {
+        gtk_widget_destroy (gg->menus.reset_item);
+        gg->menus.reset_item = NULL;
+      }
+    }
+  } else {
+    if (mode_has_reset_menu (mode)) {
+      gg->menus.reset_item = submenu_make ("_Reset", 'R',
+        gg->main_accel_group);
+      submenu_insert (gg->menus.reset_item,
+        gg->main_menubar, 5);
+    }
+  }
+
+  /*-- add any new submenus --*/
+  switch (mode) {
+    case PCPLOT:
+      pcplot_menus_make (gg);
+    break;
+    case TSPLOT:
+      tsplot_menus_make (gg);
+    break;
+    case SCATMAT:
+      scatmat_menus_make (gg);
+    break;
+
+    case P1PLOT:
+      p1dplot_menus_make (gg);
+    break;
+    case XYPLOT:
+      xyplot_menus_make (gg);
+    break;
+#ifdef EDIT_EDGES_IMPLEMENTED
+    case EDGEED:
+      edgeedit_menus_make (gg);
+    break;
+#endif
+    case MOVEPTS:
+      movepts_menus_make (gg);
+    break;
+
+#ifdef ROTATION_IMPLEMENTED
+    case ROTATE:
+    break;
+#endif
+
+    case TOUR1D:
+      tour1d_menus_make (gg);
+    break;
+
+    case TOUR2D:
+      tour2d_menus_make (gg);
+    break;
+
+    case COTOUR:
+      tourcorr_menus_make (gg);
+    break;
+
+    case SCALE :
+      scale_menus_make (gg);
+    break;
+
+    case BRUSH :
+      brush_menus_make (gg);
+    break;
+
+    case IDENT:
+      identify_menus_make (gg);
+    break;
+
+    case NULLMODE:
+    break;
+  }
 }

@@ -242,6 +242,8 @@ start_ggobi(ggobid *gg, gboolean init_data, gboolean createPlot)
       if (d->ncols > 0) {
         gg->mode = (d->ncols == 1) ? P1PLOT : XYPLOT;
         gg->prev_mode = gg->projection = gg->prev_projection = gg->mode;
+        /*-- initialize the mode menus for the new mode --*/
+        mode_submenus_update (NULLMODE, gg->mode, gg);
       }
     }
   }
