@@ -701,7 +701,6 @@ make_symbol_window (ggobid *gg) {
   GtkWidget *fg_table, *bg_table, *accent_table, *ebox, *hbox;
   gint i, j, k;
   gint width, height;
-  gint ncolors;
 
   /*
    * This seems to handle the case where a the window was
@@ -755,7 +754,9 @@ make_symbol_window (ggobid *gg) {
       true, true, 0);
 
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-      gg->color_ui.symbol_display, "Click to select glyph type and size -- which also selects the line type", NULL);
+      gg->color_ui.symbol_display,
+      "Click to select glyph type and size -- which also selects the line type",
+      NULL);
 
     gtk_signal_connect (GTK_OBJECT (gg->color_ui.symbol_display),
       "expose_event",
@@ -806,15 +807,12 @@ make_symbol_window (ggobid *gg) {
     ebox = gtk_event_box_new ();
     gtk_container_add (GTK_CONTAINER (fg_frame), ebox);
 
-/*
-    ncolors = MIN(gg->ncolors, MAXNCOLORS);
-*/
     /*-- create MAXNCOLORS drawing areas, showing gg->ncolors of them --*/
     fg_table = gtk_table_new (1, MAXNCOLORS, true);
     gtk_container_add (GTK_CONTAINER (ebox), fg_table);
 
     k = 0;
-    for (i=0, j=0; i<ncolors; i++) {
+    for (i=0, j=0; i<MAXNCOLORS; i++) {
       gg->color_ui.fg_da[k] = gtk_drawing_area_new ();
       gtk_object_set_data (GTK_OBJECT (gg->color_ui.fg_da[k]),
                            "index",
@@ -863,7 +861,8 @@ make_symbol_window (ggobid *gg) {
     gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.bg_da),
       PSIZE, PSIZE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-      gg->color_ui.bg_da, "Double click to reset background color (Note: your color selection will have no visible effect unless you also reset the 'Value')",
+      gg->color_ui.bg_da,
+      "Double click to reset background color (Note: your color selection will have no visible effect unless you also reset the 'Value')",
       NULL);
     gtk_widget_set_events (gg->color_ui.bg_da,
                            GDK_EXPOSURE_MASK
@@ -930,6 +929,10 @@ make_symbol_window (ggobid *gg) {
 
   gtk_widget_show_all (gg->color_ui.symbol_window);
 
+  /*
+   * In case the default colorscheme has fewer colors than the
+   * default, hide the extra fg_da's. 
+  */
   for (k=gg->ncolors; k<MAXNCOLORS; k++)
     gtk_widget_hide (gg->color_ui.fg_da[k]);
 }
