@@ -107,11 +107,6 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
 
     for (j=ncols_prev, k=0; j<d->ncols; j++) {
       d->sphere.pcvars.vals[k++] = j;
-/*
-      lbl = g_strdup_printf ("PC%d", k);
-      variable_set_label (d, j, lbl);
-      g_free (lbl);
-*/
     }
 
 /*
@@ -130,7 +125,6 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
     /*-- add just the additional required variables? --*/
 
     /*-- try deleting them all and starting fresh? --*/
-    extern void delete_vars (gint *, gint, datad *, ggobid *);
     delete_vars (d->sphere.pcvars.vals, d->sphere.pcvars.nels, d, gg);
     ncols_prev = d->ncols;
 
@@ -146,7 +140,19 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
 
   /*-- if the number has decreased --*/
   } else if (d->sphere.pcvars.nels > d->sphere.npcs) {
-    /*-- delete variables --*/
+    /*-- delete the last few variables --*/
+    gint ncols = d->sphere.pcvars.nels - d->sphere.npcs;
+    gint *cols = (gint *) g_malloc (ncols * sizeof (gint));
+    for (j=d->sphere.pcvars.nels-1, k=ncols-1; j>=d->sphere.npcs; j--)
+      cols[k--] = d->sphere.pcvars.vals[j];
+    delete_vars (cols, ncols, d, gg);
+
+    /*-- then behave as above, when the lengths were the same --*/
+    if (d->sphere.vars_sphered.nels != d->sphere.vars.nels)
+      vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
+    vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
+
+    g_free (cols);
   }
 
   for (k=0; k<d->sphere.pcvars.nels; k++) {

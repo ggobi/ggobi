@@ -104,6 +104,7 @@ void ctourpp_window_open (ggobid *);
 void datad_free (datad *, ggobid *);
 datad* datad_get_from_notebook (GtkWidget *notebook, ggobid *);
 displayd* datad_init (datad *, ggobid *, gboolean);
+void delete_vars (gint *, gint, datad *, ggobid *);
 gint display_add(displayd *display, ggobid *);
 void display_close_cb (displayd *d, guint, GtkWidget *);
 displayd* display_create (gint displaytype, gboolean missing_p, datad *, ggobid *);
