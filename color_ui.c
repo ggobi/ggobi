@@ -189,7 +189,8 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
 {
   gdouble color[3];
   GdkColor gdk_color;
-  GdkColormap *cmap = gdk_colormap_get_system ();
+/*  GdkColormap *cmap = gdk_colormap_get_system ();*/
+  GdkColormap *cmap = gdk_rgb_get_cmap ();
   splotd *sp = gg->current_splot;
   GtkWidget *wheel = GTK_COLOR_SELECTION (colorsel)->wheel_area;
 

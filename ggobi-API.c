@@ -812,13 +812,13 @@ GGOBI(setColorMap)(double *vals, int nr, ggobid *gg)
 gboolean
 GGOBI(registerColorMap)(ggobid *gg)
 {
- GdkColormap *cmap;
- gboolean *success;
+  gboolean *success;
 
- cmap = gdk_colormap_get_system ();
-   success = (gboolean *) g_malloc(sizeof(gboolean) * gg->ncolors);
-   gdk_colormap_alloc_colors (cmap, gg->default_color_table, gg->ncolors,
-         false, true, success);
+/*  GdkColormap *cmap = gdk_colormap_get_system ();*/
+  GdkColormap *cmap = gdk_rgb_get_cmap ();
+  success = (gboolean *) g_malloc(sizeof(gboolean) * gg->ncolors);
+  gdk_colormap_alloc_colors (cmap, gg->default_color_table, gg->ncolors,
+    false, true, success);
 
   g_free(success);
 

@@ -147,6 +147,7 @@ struct _ggobid {
  GdkColor *default_color_table, *color_table;  /* brushing colors */
  GdkColor bg_color;          /* background color */
  GdkColor accent_color;      /* color for axes and labels */
+ GdkColor vcirc_freeze_color, vcirc_manip_color;  /* for variable circles */
  gshort color_id, color_0;   /* 0:ncolors-1 */
  gboolean mono_p;
 

@@ -298,42 +298,42 @@ brush_menus_make (ggobid *gg) {
   gg->brush.reset_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Show all points");
-  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
+  GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (0));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset point colors");
-  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
+  GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (1));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset glyphs");
-  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
+  GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (2));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Show all lines");
-  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
+  GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (3));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset linecolors");
-  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
+  GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER(4));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset brush size");
-  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
+  GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (5));

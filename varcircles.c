@@ -202,7 +202,6 @@ varcircles_cursor_set_default (datad *d)
 static gint
 manip_select_cb (GtkWidget *w, GdkEvent *event, datad *d)
 {
-/*  ggobid *gg = (ggobid *) d->gg;*/
   GdkWindow *window = GTK_WIDGET (d->varpanel_ui.ebox)->window;
 
   d->vcirc_ui.cursor = gdk_cursor_new (GDK_HAND2);
@@ -223,14 +222,10 @@ g_printerr ("not yet implemented\n");
 static gint
 da_manip_expose_cb (GtkWidget *w, GdkEvent *event, datad *d)
 {
-/*  ggobid *gg = d->gg;*/
-  GdkColormap *cmap = gdk_colormap_get_system ();
+  ggobid *gg = GGobiFromWidget (w, true);
   GdkGC *gc = gdk_gc_new (w->window);
-  GdkColor color = {0, 0xffff, 0x0000, 0xffff};
-  gboolean writeable = false, best_match = true;
 
-  gdk_colormap_alloc_color  (cmap, &color, writeable, best_match);
-  gdk_gc_set_foreground (gc, &color);
+  gdk_gc_set_foreground (gc, &gg->vcirc_manip_color);
   gdk_draw_rectangle (w->window, gc,
                       true,  /* fill */
                       0, 0,
@@ -244,14 +239,10 @@ da_manip_expose_cb (GtkWidget *w, GdkEvent *event, datad *d)
 static gint
 da_freeze_expose_cb (GtkWidget *w, GdkEvent *event, datad *d)
 {
-/*  ggobid *gg = d->gg;*/
-  GdkColormap *cmap = gdk_colormap_get_system ();
+  ggobid *gg = GGobiFromWidget (w, true);
   GdkGC *gc = gdk_gc_new (w->window);
-  GdkColor color = {0, 0x0000, 0xffff, 0x0000};
-  gboolean writeable = false, best_match = true;
 
-  gdk_colormap_alloc_color  (cmap, &color, writeable, best_match);
-  gdk_gc_set_foreground (gc, &color);
+  gdk_gc_set_foreground (gc, &gg->vcirc_freeze_color);
   gdk_draw_rectangle (w->window, gc,
                       true,  /* fill */
                       0, 0,
@@ -317,6 +308,7 @@ varcircles_populate (datad *d, ggobid *gg)
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da,
     false, false, 2);
+  GGobi_widget_set (da, gg, true);
   gtk_signal_connect (GTK_OBJECT (da), "expose_event",
     GTK_SIGNAL_FUNC (da_manip_expose_cb), d);
 
@@ -335,6 +327,7 @@ varcircles_populate (datad *d, ggobid *gg)
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da,
     false, false, 2);
+  GGobi_widget_set (da, gg, true);
   gtk_signal_connect (GTK_OBJECT (da), "expose_event",
     GTK_SIGNAL_FUNC (da_freeze_expose_cb), d);
 
