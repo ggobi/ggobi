@@ -124,7 +124,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   if(el) {
     el = getXMLElement(el, "color");
     info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
-    getColor(el, doc, NULL, info->bgColor);
+    getColor(el, doc, NULL, info->bgColor, 0, 1);
     if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
       info->bgColor, false, true) == false)
     {
@@ -137,7 +137,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   if(el) {
     el = getXMLElement(el, "color");
     info->fgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
-    getColor(el, doc, NULL, info->fgColor);
+    getColor(el, doc, NULL, info->fgColor, 0, 1);
     if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
       info->fgColor, false, true) == false)
     {

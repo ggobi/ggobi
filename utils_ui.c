@@ -352,7 +352,7 @@ get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist)
 
 /*
 * Notice that this callback could be used to respond to any
-* change in the varialbe list, because it doesn't count the
+* change in the variable list, because it doesn't count the
 * number of variables; it just clears the list and then
 * rebuilds it.
 */

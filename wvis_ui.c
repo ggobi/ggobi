@@ -577,6 +577,10 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
       }
     }
     clusters_set (d, gg);
+
+    /*-- before calling displays_plot, reset brushing color if needed --*/
+    if (gg->color_id >= gg->ncolors) gg->color_id = gg->ncolors - 1;
+
     displays_plot (NULL, FULL, gg);
 
     bin_counts_reset (selected_var, d, gg);
@@ -627,7 +631,7 @@ wvis_window_open (ggobid *gg) {
   /*
    * section on choosing new colormap
   */
-    frame = gtk_frame_new ("Choose colormap");
+    frame = gtk_frame_new ("Choose color scheme");
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, true, false, 1);
 

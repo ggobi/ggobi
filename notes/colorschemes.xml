@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE colormaps>
 
-<colormaps num="23">
+<colormaps num="24">
 
 <!-- Diverging schemes -->
 
@@ -728,6 +728,41 @@
 </background>
 <annotations>
  <color><red>1.000</red><green>1.000</green><blue>1.000</blue> </color>
+</annotations>
+</colormap>
+
+<colormap name="New 6" ncolors="6"
+          type="qualitative"
+          system="rgb" system_min="0" system_max="255">
+<description>
+  From Cindy Brewer, a qualitative color scheme ranging
+  including pink, yellow, light green, green, and blue
+</description>
+<foreground>
+  <color name="Pink">
+    <red>27</red><green>158</green><blue>119</blue>
+  </color>
+  <color name="Light Yellow">
+    <red>217</red><green>95</green><blue>2</blue>
+  </color>
+  <color name="Light Green">
+    <red>117</red><green>112</green><blue>179</blue>
+  </color>
+  <color name="Green">
+    <red>197</red><green>1</green><blue>108</blue>
+  </color>
+  <color name="Light Blue">
+    <red>102</red><green>166</green><blue>30</blue>
+  </color>
+  <color name="Light Blue">
+    <red>230</red><green>171</green><blue>2</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0</red><green>0</green><blue>0</blue></color>
+</background>
+<annotations>
+ <color><red>255</red><green>255</green><blue>255</blue> </color>
 </annotations>
 </colormap>
 

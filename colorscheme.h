@@ -32,7 +32,7 @@ colorschemed *read_colorscheme(char *fileName, GList **);
 colorschemed *findColorSchemeByName(GList *schemes, const gchar *name);
 
 #ifdef USE_XML
-int getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col);
+gint getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col, gfloat min, gfloat max);
 #endif
 
 #endif

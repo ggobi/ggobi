@@ -21,14 +21,14 @@ colorschemed *process_colorscheme(xmlNodePtr root, xmlDocPtr doc);
 colorscaletype getColorSchemeType(const xmlChar *type);
 colorsystem getColorSchemeSystem(const xmlChar *type);
 
-int getForegroundColor(int index, xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme);
+gint getForegroundColor(gint index, xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme);
 void getForegroundColors(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme);
-int getAnnotationColor(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme);
-int getBackgroundColor(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme);
-int getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col);
+gint getAnnotationColor(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme);
+gint getBackgroundColor(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme);
+gint getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col, gfloat min, gfloat max);
 
 colorschemed *
-read_colorscheme(char *fileName, GList **list)
+read_colorscheme(gchar *fileName, GList **list)
 {
   xmlDocPtr  doc;
   xmlNodePtr node;
@@ -77,6 +77,15 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
   scheme->name = g_strdup(xmlGetProp(root, "name"));
   scheme->type = getColorSchemeType(xmlGetProp(root, "type"));
   scheme->system = getColorSchemeSystem(xmlGetProp(root, "system"));
+
+  scheme->system_min = 0.0;
+  tmp = xmlGetProp(root, "system_min");
+  if(tmp)
+    scheme->system_min = (gfloat) asNumber(tmp);
+  scheme->system_max = 1.0;
+  tmp = xmlGetProp(root, "system_max");
+  if(tmp)
+    scheme->system_max = (gfloat) asNumber(tmp);
 
   tmp = xmlGetProp(root, "criticalvalue");
   if(tmp)
@@ -172,19 +181,22 @@ gint
 getForegroundColor(gint index, xmlNodePtr node, xmlDocPtr doc,
   colorschemed *scheme)
 {
-  return(getColor(node, doc, &(scheme->data[index]), &scheme->rgb[index]));
+  return(getColor(node, doc, &(scheme->data[index]), &scheme->rgb[index],
+     scheme->system_min, scheme->system_max));
 }
 
 gint
 getBackgroundColor(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme)
 {
-  return(getColor(node, doc, &scheme->bg, &scheme->rgb_bg));
+  return(getColor(node, doc, &scheme->bg, &scheme->rgb_bg,
+     scheme->system_min, scheme->system_max));
 }
 
-int
+gint
 getAnnotationColor(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme)
 {
-   return(getColor(node, doc, &scheme->accent, &scheme->rgb_accent));
+  return(getColor(node, doc, &scheme->accent, &scheme->rgb_accent,
+    scheme->system_min, scheme->system_max));
 }
 
 /**
@@ -193,13 +205,15 @@ getAnnotationColor(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme)
  Puts the actual values into original and fills in the RGB settings for `col'.
  */
 gint 
-getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col)
+getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col,
+ gfloat smin, gfloat smax)
 {
   xmlNodePtr tmp;
   gint i = 0, numElements = 3; /* RGB only at present. */
   gfloat *vals;
   gfloat max = 65535;
 
+/* what's this code for?  dfs */
   gchar *tmpVal;
   tmpVal = xmlGetProp(node, "max");
   if(tmpVal) {
@@ -221,9 +235,9 @@ getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col)
   if(original)
     *original = vals;
 
-  col->red = (guint16) vals[0];
-  col->green = (guint16) vals[1];
-  col->blue = (guint16) vals[2];
+  col->red = (guint16) ((vals[0] - smin)/(smax - smin));
+  col->green = (guint16) ((vals[1] - smin)/(smax - smin));
+  col->blue = (guint16) ((vals[2] - smin)/(smax - smin));
 
   return(numElements);
 }
