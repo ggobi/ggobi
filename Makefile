@@ -53,6 +53,8 @@ marshal.c: marshal.list
 	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --body > $@
 
 make_ggobi.o: marshal.h GtkSignalDef.c
+
+ggobiClass.o: marshal.h
 endif
 
 # used to comment out sections of code for incompletely
@@ -130,7 +132,7 @@ endif
 
 ifdef TEST_EVENTS
   SRC+=  testEvents.c
-  CFLAGS+= -DTEST_GGOBI_EVENTS -DTEST_BRUSH_MOTION_CB=1
+  CFLAGS+= -DTEST_GGOBI_EVENTS -DTEST_BRUSH_MOTION_CB=1 -DCHECK_EVENT_SIGNATURES=1
 endif
 
 # XML_FLAGS+= -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
@@ -306,3 +308,4 @@ apiDoc: Install/apiDocConfig
 	$(DOXYGEN) Install/apiDocConfig
 
 # DO NOT DELETE
+
