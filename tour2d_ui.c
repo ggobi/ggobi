@@ -186,7 +186,7 @@ cpanel_tour2d_make (ggobid *gg) {
 */
   btn = gtk_button_new_with_label ("Projection pursuit ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Open panel for grand tour projection pursuit. Requires selected variables to be sphered.", NULL);
+    "Open panel for grand tour projection pursuit. Requires selected variables to be sphered (see the tools menu).", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",

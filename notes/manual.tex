@@ -54,7 +54,7 @@
 
 \begin {document}
 
-\title {ggobi manual}
+\title {{\tt ggobi} Manual}
 \author{
 Deborah F. Swayne, AT\&T Labs -- Research \\
 Dianne Cook, Iowa State University \\
@@ -99,18 +99,21 @@ be examined.
 This paper gives an overview of the layout and functionality of ggobi,
 interactive graphical software for exploratory data analysis.  Readers
 who are familiar with xgobi will find much that is familiar in ggobi's
-design, and might want to read section \ref{slbl:xgobi} first,
-where key differences between the two programs are described.
+design, and might want to read section \ref{slbl:xgobi} first, where
+key differences between the two programs are described. There are
+several papers that describe parts of the functionality existing in
+both packages
+\cite{BCS95,SCB97,SB98,BAHM88,CBC93,CBCH95,CB95,BCAH95c}.
 
 You will find that you can use ggobi for simple tasks with virtually
 no instruction.  All that a user needs is some cursory knowledge of
 the developments in interactive statistical graphics of the last 15
 years, as well as a willingness to experiment with the sample data
-provided guided by the tooltips.  In parallel with the hands-on learning
-process, it is probably useful to acquire a basic understanding of
-the overall layout and functionality of the system.  The greatest
-success is obtained by users who have gained experience with the
-system and combine it with creativity and data analytic
+provided and guided by the tooltips.  In parallel with the hands-on
+learning process, it is probably useful to acquire a basic
+understanding of the overall layout and functionality of the system.
+The greatest success is obtained by users who have gained experience
+with the system and combine it with creativity and data analytic
 sophistication.
 
 We begin with a tutorial, and move on to describe ggobi in detail.
@@ -120,12 +123,12 @@ We begin with a tutorial, and move on to describe ggobi in detail.
 Several sample data files are included with the ggobi distribution, in
 a directory called {\bf data,} and there you will find the file {\bf
 olive.xml}, a dataset on olive oil samples from Italy \cite{FALT83}.
-(This data set takes advantage of an XML input/output format, a
-feature in ggobi that wasn't available in xgobi. It requires that
-ggobi has been compiled with XML support. If ggobi has been compiled
-without XML support, the set of files olive.dat, olive.col, olive.row,
-similar to the xgobi data file input, can be used.) This data consists
-of the percentage composition of 8 fatty acids (palmitic, palmitoleic,
+This data set takes advantage of an XML input/output format, a feature
+in ggobi that wasn't available in xgobi. It requires that ggobi has
+been compiled with XML support. If ggobi has been compiled without XML
+support, the set of files olive.dat, olive.col, olive.row, similar to
+the xgobi data file input, can be used. The olive oil data consists of
+the percentage composition of 8 fatty acids (palmitic, palmitoleic,
 stearic, oleic, linoleic, linolenic, arachidic, eicosenoic) found in
 the lipid fraction of 572 Italian olive oils. There are 9 collection
 areas, 4 from southern Italy (North and South Apulia, Calabria,
@@ -205,15 +208,14 @@ main menubar: in the Reset menu and at the bottom of the Options menu.
 
 The rectangle that appears in the current plot is the ``paintbrush,''
 and dragging it over points changes their color. Change the color of
-the brush to, say, yellow, by opening up the {\bf Choose symbol} panel
-(Figure \ref{fig2}). Now change the size of the brush.  Use the left
-button to drag it and the middle or right button to resize it.  Make
-it almost as tall as the window but very thin, and paint the first
-region, then the second and third regions.  While you do that, keep an
-eye on the plot of linoleic vs eicosenoic, and notice where the
-painted points fall in that scatterplot (Figure \ref{fig3}).  Using two
-linked 2d plots is one way to explore the relationship among three
-variables.
+the brush by opening up the {\bf Choose symbol} panel (Figure
+\ref{fig2}). Now change the size of the brush.  Use the left button to
+drag it and the middle or right button to resize it.  Make it almost
+as tall as the window but very thin, and paint the first region, then
+the second and third regions.  While you do that, keep an eye on the
+plot of linoleic vs eicosenoic, and notice where the painted points
+fall in that scatterplot (Figure \ref{fig3}).  Using two linked 2d
+plots is one way to explore the relationship among three variables.
 
 \begin{figure}[htp]
 \vspace{-0.5in}
@@ -258,7 +260,7 @@ choose {\bf Standardize} in the stage 2 transformation panel to
 standardize all the variables to have mean 0 and variance 1. The
 transformation tool has numerous transformation operations to perform
 on variables as appropriate. Stage 0 is a domain adjustment operation
-adjust variables values into an acceptable range as needed for some
+to adjust variables values into an acceptable range as needed for some
 stage 1 transformations. Stage 2 transformations allow for
 post-processing of stage 1 transformations, so that the variables can
 be logged and then standardized, for example.
@@ -266,7 +268,7 @@ be logged and then standardized, for example.
 \begin{figure}[htp]
 %\vspace{-0.5in}
 %\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
-\pdfimage width 5in {olive-var.jpg}
+\pdfimage width 6in {olive-var.jpg}
 %\vspace{.15in} \centerline{ \parbox{6in}
 \caption{Variable manipulation panel contains basic summary 
 statistics of variables. It also is central to variable subset selection
@@ -277,18 +279,19 @@ for other modes.
 
 Now look at the plot of linoleic vs eicosenoic. Open up the {\bf Case
 clusters ...} panel, and use the Hide/Show chack boxes to toggle
-groups of points on and off (Figure \ref{fig5}). Hide the cases from
-geographic region 1, and then {\bf Recale}. 
+groups of points on and off (Figure \ref{fig5}). Finally, use these
+controls hide to the cases from geographic region 1, and then {\bf
+Recale} the plot.
 
 \begin{figure}[htp]
-\hbox{\pdfimage width 3in {olive-brush3.jpg}\pdfimage width 3in {olive-brush4.jpg}}
+\hbox{\pdfimage width 3in {olive-brush3.jpg}\pdfimage width 3.5in {olive-brush4.jpg}}
 \caption{Toggling clusters of points on and off according to color/glyph value.}
 \label{fig5}
 \end{figure}
 
 Now switch into {\bf 2D Tour} using the {\bf ViewMode} menu. The
 variable checkboxes change to variable circles. Click on the circles
-for Region adn Area to toggle these variables out of the tour. And
+for Region and Area to toggle these variables out of the tour. And
 then click {\bf Reinit}. Also remove eicosenoic acid from the tour,
 using similar mouse action. The scrollbar at the top of the tour
 controls allows the speed of the tour to be adjusted. Drag it to the
@@ -297,18 +300,19 @@ window displays the axes for the tour. These can be toggled off the
 plot by selecting the {\bf Options} menu on the plot window. Pause the
 tour when you see a separation of the green and purple points, that
 is, regions 2 and 3 (for example, Figure \ref{fig6}). Now you are
-going to use manula tour controls to sharpen up the separation by
+going to use manual tour controls to sharpen up the separation by
 manually changing the coefficients of the variables in the
 projection. On the main control window click on the {\bf Manip}
-(purple) button, and then click on linoleic acid (a purple circle will
-be seen now in the variable circle for linoleic acid). Now in the plot
-window click and drag the cursor. The coefficent corresponding to
-linoleic acid will increase and decrease inducing a rotation of the
-scattercloud. Similarly rotate oleic acid and arachidic acid in and
-out of the plot, with the aim to find a projection where the two
-regions are better separated (for example, Figure \ref{fig6}).  There
-are 5 choices of manipulation mode (unconstrained oblique, vertical,
-horizontal, radial and angular) to explore.
+(purple) button, below the plot, and then click on linoleic acid (a
+purple circle will be seen now in the variable circle for linoleic
+acid). Now in the plot window click and drag the cursor. The
+coefficent corresponding to linoleic acid will increase and decrease
+inducing a rotation of the scattercloud. Similarly rotate oleic acid
+and arachidic acid in and out of the plot, with the aim to find a
+projection where the two regions are better separated (for example,
+Figure \ref{fig6}).  There are 5 choices of manipulation mode
+(unconstrained oblique, vertical, horizontal, radial and angular) to
+explore.
 
 \begin{figure}[htp]
 \hbox{\pdfimage width 3in {olive-tour1.jpg}\pdfimage width 3in {olive-tour2.jpg}}
@@ -341,7 +345,7 @@ plot. Now using the {\bf File} menu output the data, saving the colors
 and glyphs that have been created during this session.
 
 This has been a brief introduction to the use of ggobi. The following
-section contains more detailed information on the full functionality.
+section contains more detailed information on the functionality.
 
 \section{Layout and functionality}
 
@@ -405,15 +409,15 @@ The {\bf Tools} menu gives access to
 
 Each tool is discussed in section ~\ref{Tools}.
 
-There are a couple of distinctions between view modes and tools
-The view mode functions determine the mouse interactions in the
-display windows, while none of the Tools does.  Furthermore,
-view mode functions populate the control panel in the main ggobi
-window, while tools create their own permanent control panels
-or views of the data in separate windows, as shown in figure~?.  For
-example, the {\bf variable manipulation tool} is a window containing
-a table of data each variable and several buttons, and the {\bf
-variable transformation tool} is also a separate window.
+There are a couple of distinctions between view modes and tools.  The
+view mode functions determine the mouse interactions in the display
+windows, while none of the Tools does.  Furthermore, view mode
+functions populate the control panel in the main ggobi window, while
+tools create their own permanent control panels or views of the data
+in separate windows, as shown in Figure~\ref{fig4}.  For example,
+the {\bf variable manipulation tool} is a window containing a table of
+data each variable and several buttons, and the {\bf variable
+transformation tool} is also a separate window.
 
 The {\bf Options} menu allows users to set some options for the
 main control window:  whether tooltips are displayed, for instance,
@@ -490,14 +494,14 @@ symmetric, and that constraint affects its variable selection behavior.
 
 The {\bf parallel coordinates} display contains a single parallel
 coordinates plot, which can be arranged horizontally or vertically.
-(To understand this plot if you are encountering it for the first time, 
-imagine deconstructing a high-dimensional scatterplot and arranging
-its axes in parallel instead of orthogonally.  To represent case $i$,
-think of drawing a dot on axis $j$ at that point's value for variable
-$j$, and then connecting the dots into one set of connected line segments.
-For a more detailed explanation, see [].)  The line segments are drawn
-by default, but you can turn them off using the {\bf Options} menu
-on the display menubar.
+(To understand this plot if you are encountering it for the first
+time, imagine deconstructing a high-dimensional scatterplot and
+arranging its axes in parallel instead of orthogonally.  To represent
+case $i$, think of drawing a dot on axis $j$ at that point's value for
+variable $j$, and then connecting the dots into one set of connected
+line segments \cite{In85,We90}.)  The line segments are drawn by
+default, but you can turn them off using the {\bf Options} menu on the
+display menubar.
 
 By default, the plots are simple dotplots, but they can also be drawn
 using one of the other two methods for 1D plots:  as a textured dot
@@ -563,9 +567,8 @@ some changes.
 The only essential file is the one containing the data itself.  Each
 line in the file contains one row of the input data matrix, and lines
 must be separated by carriage returns.  Columns, or variables, can be
-separated by any number of tabs or spaces.  The file can have the
-suffix {\em .dat}, but no suffix is required, so it is named either
-{\bf filename.dat} or just {\em filename}.
+separated by any number of tabs or spaces.  The file needs to have the
+suffix {\em .dat}.
 
 You can supply variable and case labels in associated files.
 Variable (column) labels can be in a file named {\bf datafile.col}
@@ -596,8 +599,8 @@ $8 \times (type-1) + size$.
 \label{slbl:XML}
 
 The XML format is described in {\em Using XML Input Formats},
-which you should find where you found this manual.  The XML format
-allows more detailed specification, such as
+available from the web site.  The XML format allows more detailed
+specification, such as
 
 \begin{itemize}
 \item multiple datasets within a single process,
@@ -609,8 +612,18 @@ allows more detailed specification, such as
 \subsection {Database access}
 \label{slbl:MySQL}
 
+It is possible to interface ggobi with a mysql database. Details of
+this are described in the document {\em GGobi and Database Management
+Systems from GGobi Reading data from MySQL}, available through the web
+site.
+
 \section{Integration of ggobi with other software systems}
 \label{slbl:Integration}
+
+The application programming interface (API) makes it possible to
+access ggobi from other software. The main example that currently
+exists is the integration of ggobi in R. This is described in the
+document {\em Using the R-GGobi Link} available through the web site.
 
 \section{View modes: projection and interaction}
 \label{slbl:ViewModes}
@@ -679,6 +692,12 @@ The 1D plot will be arranged horizontally if you select a variable
 with a left click, and vertically if you use a middle or right click.
 
 \subsection{XY plots}
+
+The XY plots are the rudimentary 2 variable scatterplot (or
+draughtsman plot) displays. Two variables are chosen, one to be
+plotted horizontally and the other vertically. Controls allow for
+variables to be cycled and out of the plot, generating an animation
+through all pairwise plots.
 
 \subsection{1D Tour}
 \label{slbl:1DTour}
@@ -803,16 +822,17 @@ more precise.
 
 With {\bf Pan} selected, the mouse controls the endpoint of a line
 segment which is anchored at the center of the plot (just where the
-center of the crosshair is in Drag style).  When you press the space
-bar, you'll cause the plot to pan so that the endpoint becomes the
-new center -- ie, short segments yield small movements.  Repeated
+center of the crosshair is in Drag style).  When you press the {\bf
+Space} bar, you'll cause the plot to pan so that the endpoint becomes
+the new center -- ie, short segments yield small movements.  Repeated
 presses repeat the motion in the same direction -- convenient for
 browsing time-dependent data, for instance.
 
-With {\bf Zoom} selected, the visual guide changes again:  this time,
-the mouse controls a rectangle, and two keys are used:  ``<'' to
-zoom in and ``>'' to zoom out an amount inversely proportional to the size
-of the rectangle -- ie, large rectangles yield small movements.
+With {\bf Zoom} selected, the visual guide changes again: this time,
+the mouse controls a rectangle, and two keys are used: {\boldmath $<$}
+to zoom in and {\boldmath $>$} to zoom out an amount inversely
+proportional to the size of the rectangle -- ie, large rectangles
+yield small movements.
 
 \subsubsection{Reset}
 
@@ -849,9 +869,7 @@ change the points.
 
 This is useful if you are plotting a very large number of points,
 and you want to position the brush before painting, because you
-can move it much more quickly across the plot.  [This isn't true
-in the default mode, where the brush jumps to the cursor.  Shall
-I re-add the other mode?]
+can move it much more quickly across the plot.  
 
 \subsubsection{Points and edges}
 %
@@ -1151,6 +1169,13 @@ button to perform the imputation or assignment of values.
 
 \section{Multiple datasets}
 
+Several datasets can be open in ggobi simultaneously. The {\bf File}
+menu interfaces reading in additional data sets. Data tabs
+corresponding to each open data set are generated above the variable
+selection window on the main controls window. Linking between these
+data sets is facilitated though the interface described in Section
+\ref{LinkingRules}.
+
 \section{Linking}
 \label{LinkingRules}
 
@@ -1177,7 +1202,7 @@ This is described in more detail in the XML documentation.
 
 \section{Edges}
 
-\section{Implementation}
+*** Debby, I'm not sure what you want to say here???
 
 \newpage
 \section{Differences from xgobi}
@@ -1243,9 +1268,12 @@ awkward in xgobi.
 Before we describe other key changes in the visible design, we'll
 introduce the changes in data format.  The xgobi format, in which a
 set of files with a common base name is used, is still supported,
-though some file formats have changed ({\em .colors}), and some are
-no longer supported ({\em .bin}, {\em .vgroups}, {\em .lines}). 
-(See section \ref{slbl:DataFormat} for more detail.)
+though some file formats have changed ({\em .colors}), and some are no
+longer supported ({\em .bin}, {\em .vgroups}, {\em .lines}).  (See
+section \ref{slbl:DataFormat} for more detail.) The non-supported
+features have mostly been changed to more sophisticated approaches,
+for example, the simple from-to line structure has been replaced with
+a fully linkable, brushable edges format.
 
 The new format, in which all the data lives in one file, is written
 in XML.  XML (Extensible Markup Language) is a widely used language
@@ -1332,11 +1360,10 @@ scaling methods work as they did in xgobi, but we've added  what we
 call ``Click-style interaction'' for more precise control.  See section
 \ref{slbl:Scaling}.
 
-The tour methods in ggobi are still evolving:  many things are not
-yet implemented, such as projection pursuit, but new things are
-beginning to appear.  In the {\bf 1DTour}, a projection of several
-variables is viewed an an average shifted histogram, as described
-in section \ref{slbl:1DTour}.
+The tour methods in ggobi are still evolving: many things are not yet
+implemented, but new things are beginning to appear.  In the {\bf
+1DTour}, a projection of several variables is viewed an an average
+shifted histogram, as described in section \ref{slbl:1DTour}.
 
 The redesign of the tour methods is reflected in the {\bf Sphering}
 tool, which also appears in the most recent versions of xgobi.
@@ -1346,7 +1373,7 @@ decide which variables to sphere.  Since this method makes use of
 variable cloning, it creates new variables, allowing you to look at
 plots of principal components against the original data.
 
-See section \ref{slbl:Sphering} for details and pictures.
+See section \ref{slbl:Sphering} for details.
 
 \subsection{Linking}
 
@@ -1365,9 +1392,19 @@ seconds brings up a phrase describing the function of that widget.
 If the tooltips annoy you, you can turn then off using a
 checkbox on the {\bf Options} menu.
 
+\section*{Web Links}
+
+The web site for ggobi:
+
+\centerline{{\tt ggobi}: {\tt www.ggobi.org}}
+
+contains details on downloading and installing software, related
+documentation and a picture gallery.
+
 \newpage
 \bibliography{manual}
 %\addcontentsline{toc}{section}{References}
+
 
 \end {document}
 

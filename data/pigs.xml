@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<!DOCTYPE xgobidata SYSTEM "xgobi.dtd">
+<!DOCTYPE ggobidata SYSTEM "xgobi.dtd">
 
-<ggobidata count="1">
+<ggobidata count="2">
 <data name="pigs" numRecords="48">
 <description>
 United Kingdom Pig Production, from the book 'Data' by Andrews and
@@ -32,150 +32,203 @@ HERDSZ: breeding herd size
 </variables>
 <records
  count="48" glyphSize="3" glyphType="fc" color="4">
-<record>
+<record id="1">
 1.000 1967.000 1.000 1.000 0.000 0.000 105.000 8.075 10.800 2645.000 703.000
 </record>
-<record>
+<record id="2">
 2.000 1967.000 2.000 0.000 1.000 0.000 119.000 7.819 9.160 2540.000 722.000
 </record>
-<record>
+<record id="3">
 3.000 1967.000 3.000 0.000 0.000 1.000 119.000 7.366 9.380 2565.000 738.000
 </record>
-<record>
+<record id="4">
 4.000 1967.000 4.000 0.000 0.000 0.000 109.000 8.113 10.390 2776.000 747.000
 </record>
-<record>
+<record id="5">
 5.000 1968.000 1.000 1.000 0.000 0.000 117.000 7.380 9.440 2725.000 755.000
 </record>
-<record>
+<record id="6">
 6.000 1968.000 2.000 0.000 1.000 0.000 135.000 7.134 8.690 2623.000 780.000
 </record>
-<record>
+<record id="7">
 7.000 1968.000 3.000 0.000 0.000 1.000 126.000 7.222 9.600 2722.000 806.000
 </record>
-<record>
+<record id="8">
 8.000 1968.000 4.000 0.000 0.000 0.000 112.000 7.768 11.280 3004.000 807.000
 </record>
-<record>
+<record id="9">
 9.000 1969.000 1.000 1.000 0.000 0.000 116.000 7.386 11.200 2952.000 805.000
 </record>
-<record>
+<record id="10">
 10.000 1969.000 2.000 0.000 1.000 0.000 122.000 6.965 9.940 2968.000 801.000
 </record>
-<record>
+<record id="11">
 11.000 1969.000 3.000 0.000 0.000 1.000 115.000 6.478 11.210 2961.000 821.000
 </record>
-<record>
+<record id="12">
 12.000 1969.000 4.000 0.000 0.000 0.000 115.000 8.105 11.690 3243.000 809.000
 </record>
-<record>
+<record id="13">
 13.000 1970.000 1.000 1.000 0.000 0.000 122.000 8.060 9.670 3027.000 797.000
 </record>
-<record>
+<record id="14">
 14.000 1970.000 2.000 0.000 1.000 0.000 138.000 7.684 7.870 2902.000 831.000
 </record>
-<record>
+<record id="15">
 15.000 1970.000 3.000 0.000 0.000 1.000 135.000 7.580 8.150 3057.000 867.000
 </record>
-<record>
+<record id="16">
 16.000 1970.000 4.000 0.000 0.000 0.000 125.000 7.093 8.830 3331.000 862.000
 </record>
-<record>
+<record id="17">
 17.000 1971.000 1.000 1.000 0.000 0.000 115.000 6.129 10.510 3266.000 871.000
 </record>
-<record>
+<record id="18">
 18.000 1971.000 2.000 0.000 1.000 0.000 108.000 6.026 9.030 3290.000 864.000
 </record>
-<record>
+<record id="19">
 19.000 1971.000 3.000 0.000 0.000 1.000 100.000 6.679 9.930 3223.000 854.000
 </record>
-<record>
+<record id="20">
 20.000 1971.000 4.000 0.000 0.000 0.000 96.000 7.414 10.270 3501.000 846.000
 </record>
-<record>
+<record id="21">
 21.000 1972.000 1.000 1.000 0.000 0.000 107.000 7.112 9.560 3402.000 854.000
 </record>
-<record>
+<record id="22">
 22.000 1972.000 2.000 0.000 1.000 0.000 115.000 7.762 8.740 3278.000 851.000
 </record>
-<record>
+<record id="23">
 23.000 1972.000 3.000 0.000 0.000 1.000 123.000 7.645 10.320 3258.000 876.000
 </record>
-<record>
+<record id="24">
 24.000 1972.000 4.000 0.000 0.000 0.000 122.000 8.639 10.310 3400.000 876.000
 </record>
-<record>
+<record id="25">
 25.000 1973.000 1.000 1.000 0.000 0.000 128.000 7.667 9.970 3303.000 888.000
 </record>
-<record>
+<record id="26">
 26.000 1973.000 2.000 0.000 1.000 0.000 136.000 8.080 8.990 3228.000 903.000
 </record>
-<record>
+<record id="27">
 27.000 1973.000 3.000 0.000 0.000 1.000 140.000 6.678 12.220 3269.000 922.000
 </record>
-<record>
+<record id="28">
 28.000 1973.000 4.000 0.000 0.000 0.000 122.000 6.739 12.900 3396.000 902.000
 </record>
-<record>
+<record id="29">
 29.000 1974.000 1.000 1.000 0.000 0.000 102.000 5.569 14.000 3396.000 820.000
 </record>
-<record>
+<record id="30">
 30.000 1974.000 2.000 0.000 1.000 0.000 103.000 5.049 12.770 3386.000 819.000
 </record>
-<record>
+<record id="31">
 31.000 1974.000 3.000 0.000 0.000 1.000 89.000 5.642 12.610 3385.000 797.000
 </record>
-<record>
+<record id="32">
 32.000 1974.000 4.000 0.000 0.000 0.000 77.000 6.808 12.160 3262.000 751.000
 </record>
-<record>
+<record id="33">
 33.000 1975.000 1.000 1.000 0.000 0.000 89.000 6.636 11.160 3113.000 743.000
 </record>
-<record>
+<record id="34">
 34.000 1975.000 2.000 0.000 1.000 0.000 94.000 8.241 8.900 2851.000 744.000
 </record>
-<record>
+<record id="35">
 35.000 1975.000 3.000 0.000 0.000 1.000 104.000 7.968 10.240 2752.000 747.000
 </record>
-<record>
+<record id="36">
 36.000 1975.000 4.000 0.000 0.000 0.000 108.000 8.044 10.290 2919.000 764.000
 </record>
-<record>
+<record id="37">
 37.000 1976.000 1.000 1.000 0.000 0.000 119.000 7.791 10.030 2842.000 759.000
 </record>
-<record>
+<record id="38">
 38.000 1976.000 2.000 0.000 1.000 0.000 126.000 7.024 9.050 2834.000 807.000
 </record>
-<record>
+<record id="39">
 39.000 1976.000 3.000 0.000 0.000 1.000 119.000 6.102 12.000 2957.000 798.000
 </record>
-<record>
+<record id="40">
 40.000 1976.000 4.000 0.000 0.000 0.000 103.000 6.053 12.700 3305.000 811.000
 </record>
-<record>
+<record id="41">
 41.000 1977.000 1.000 1.000 0.000 0.000 96.000 5.941 12.950 3256.000 752.000
 </record>
-<record>
+<record id="42">
 42.000 1977.000 2.000 0.000 1.000 0.000 95.000 5.386 11.690 3151.000 761.000
 </record>
-<record>
+<record id="43">
 43.000 1977.000 3.000 0.000 0.000 1.000 80.000 5.811 12.650 3141.000 719.000
 </record>
-<record>
+<record id="44">
 44.000 1977.000 4.000 0.000 0.000 0.000 88.000 6.716 12.210 3266.000 741.000
 </record>
-<record>
+<record id="45">
 45.000 1978.000 1.000 1.000 0.000 0.000 93.000 6.923 10.680 3061.000 745.000
 </record>
-<record>
+<record id="46">
 46.000 1978.000 2.000 0.000 1.000 0.000 105.000 6.939 10.470 3018.000 764.000
 </record>
-<record>
+<record id="47">
 47.000 1978.000 3.000 0.000 0.000 1.000 107.000 6.705 11.050 3085.000 764.000
 </record>
-<record>
+<record id="48">
 48.000 1978.000 4.000 0.000 0.000 0.000 100.000 6.914 10.310 3242.000 786.000
 </record>
 </records>
 </data>
+
+<data name="edges">
+<records count="48">
+<record source="1" destination="2" color="2"> </record>
+<record source="2" destination="3" color="2"> </record>
+<record source="3" destination="4" color="2"> </record>
+<record source="4" destination="5" color="2"> </record>
+<record source="5" destination="6" color="2"> </record>
+<record source="6" destination="7" color="2"> </record>
+<record source="7" destination="8" color="2"> </record>
+<record source="8" destination="9" color="2"> </record>
+<record source="9" destination="10" color="2"> </record>
+<record source="10" destination="11" color="2"> </record>
+<record source="11" destination="12" color="2"> </record>
+<record source="12" destination="13" color="2"> </record>
+<record source="13" destination="14" color="2"> </record>
+<record source="14" destination="15" color="2"> </record>
+<record source="15" destination="16" color="2"> </record>
+<record source="16" destination="17" color="2"> </record>
+<record source="17" destination="18" color="2"> </record>
+<record source="18" destination="19" color="2"> </record>
+<record source="19" destination="20" color="2"> </record>
+<record source="20" destination="21" color="2"> </record>
+<record source="21" destination="22" color="2"> </record>
+<record source="22" destination="23" color="2"> </record>
+<record source="23" destination="24" color="2"> </record>
+<record source="24" destination="25" color="2"> </record>
+<record source="25" destination="26" color="2"> </record>
+<record source="26" destination="27" color="2"> </record>
+<record source="27" destination="28" color="2"> </record>
+<record source="28" destination="29" color="2"> </record>
+<record source="29" destination="30" color="2"> </record>
+<record source="30" destination="31" color="2"> </record>
+<record source="31" destination="32" color="2"> </record>
+<record source="32" destination="33" color="2"> </record>
+<record source="33" destination="34" color="2"> </record>
+<record source="34" destination="35" color="2"> </record>
+<record source="35" destination="36" color="2"> </record>
+<record source="36" destination="37" color="2"> </record>
+<record source="37" destination="38" color="2"> </record>
+<record source="38" destination="39" color="2"> </record>
+<record source="39" destination="40" color="2"> </record>
+<record source="40" destination="41" color="2"> </record>
+<record source="41" destination="42" color="2"> </record>
+<record source="42" destination="43" color="2"> </record>
+<record source="43" destination="44" color="2"> </record>
+<record source="44" destination="45" color="2"> </record>
+<record source="45" destination="46" color="2"> </record>
+<record source="46" destination="47" color="2"> </record>
+<record source="47" destination="48" color="2"> </record>
+</records>
+</data>
+
 </ggobidata>

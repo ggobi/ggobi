@@ -404,7 +404,9 @@ tsplot_rewhisker (splotd *sp, ggobid *gg) {
           (d->missing.vals[i][sp->xyvars.x] || 
            d->missing.vals[i][sp->xyvars.y] ||
            d->missing.vals[n][sp->xyvars.x] || 
-           d->missing.vals[n][sp->xyvars.y]))
+           d->missing.vals[n][sp->xyvars.y]) &&
+           (sp->screen[i].x > sp->screen[n].x))/* to keep time going
+                                                  forwards */
     {
       draw_whisker = false;
     }
