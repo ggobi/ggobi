@@ -19,9 +19,6 @@ various stuff not yet implemented:
 
 display_tree doesn't update itself when splots change
 
-datad
-  add notebook controls to the exclusion window
-
 when brushing or identifying in parcoords, use leave/enter events to
   change the current_splot.
 
@@ -45,6 +42,8 @@ old-style I/O -- the biggest part is now in place.  extend
   dtd has been redesigned to handle multiple datad objects)
 
 In progress:  writing out plots as .svg files
+  work out how to do nested transformations for printing parcoords
+    and scatmat plots
 
 Graphs
   Edges with data: a separate region of the variable selection panel
@@ -144,3 +143,5 @@ Food for thought:
 ! sphering: redesigned the tool window
 
 ! check for note in transform.c : static variables eliminated
+
+! add notebook controls to the exclusion window

@@ -84,7 +84,7 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
     transform1_apply (j, d, gg);
     transform2_apply (j, d, gg);
 
-    transform_opt_menus_set_history (j, d, gg);
+    tform_label_update (j, d, gg);
   }
 
   vartable_lim_update (d, gg);
@@ -218,13 +218,26 @@ transform_window_open (ggobid *gg)
   gdk_window_raise (gg->tform_ui.window->window);
 }
 
+/*
+ * These routines are used to set the values of the option menus.
+ * They're used when the transformations are set from somewhere
+ * other than those option menus, such as the reset button.
+*/
 void
-transform_opt_menus_set_history (gint j, datad *d, ggobid *gg)
+transform0_opt_menu_set_value (gint j, datad *d, ggobid *gg)
 {
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform_ui.stage0_opt),
     d->vartable[j].tform0);
+}
+void
+transform1_opt_menu_set_value (gint j, datad *d, ggobid *gg)
+{
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform_ui.stage1_opt),
     d->vartable[j].tform1);
+}
+void
+transform2_opt_menu_set_value (gint j, datad *d, ggobid *gg)
+{
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform_ui.stage2_opt),
     d->vartable[j].tform2);
 }

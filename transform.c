@@ -118,7 +118,7 @@ qnorm (gdouble pr)
   if (pr <= 0. || pr >= 1.) 
     g_printerr ("Probability out of range (0,1): %f", pr);
   p = pr;
-  if(p > 0.5) p = 1.0 - pr;
+  if (p > 0.5) p = 1.0 - pr;
 
   /*  depending on the size of pr this may error in log or sqrt */
   eta  = sqrt (-2.0 * log (p));
@@ -182,6 +182,9 @@ transform0_values_set (gint tform0, gint jcol, datad *d, ggobid *gg)
   d->vartable[jcol].domain_incr = domain_incr;
   d->vartable[jcol].domain_adj = domain_adj;
   d->vartable[jcol].inv_domain_adj = inv_domain_adj;
+
+  /*-- set explicitly in case the routine is not called from the ui --*/
+  transform0_opt_menu_set_value (jcol, d, gg);
 }
 
 void
@@ -190,6 +193,9 @@ transform1_values_set (gint tform1, gfloat expt, gint jcol,
 {
   d->vartable[jcol].tform1 = tform1;
   d->vartable[jcol].param = expt;
+
+  /*-- set explicitly in case the routine is not called from the ui --*/
+  transform1_opt_menu_set_value (jcol, d, gg);
 }
 
 gboolean 
@@ -480,6 +486,9 @@ void
 transform2_values_set (gint tform2, gint jcol, datad *d, ggobid *gg)
 {
   d->vartable[jcol].tform2 = tform2;
+
+  /*-- set explicitly in case the routine is not called from the ui --*/
+  transform2_opt_menu_set_value (jcol, d, gg);
 }
 
 gboolean 
@@ -617,7 +626,7 @@ void tform_label_update (gint jcol, datad *d, ggobid *gg)
   vartable_tform_set (jcol, d, gg);
 
   /*-- adjust the settings on the transformation panel --*/
-  transform_opt_menus_set_history (jcol, d, gg);
+/*  transform_opt_menus_set_history (jcol, d, gg);*/
 }
 
 /*---------------------------------------------------------------------*/
