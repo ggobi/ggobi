@@ -66,6 +66,10 @@ pure: ggobi.o $(OB)
 	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
 	${CC} -o ggobi $(OB) `gtk-config --cflags --libs`
 
+DM=/usr/dfs/src/dmalloc-4.5.1
+dm: $(OB)
+	$(CC) `gtk-config --cflags` $(OB) -o ggobi `gtk-config --libs` -L$(DM) -ldmalloc
+
 # No gthread here in the call to gtk-config.
 # R is not compiled for threads.
 libGGobi.so: $(OB)
@@ -76,7 +80,6 @@ clean:
 
 .c.o:
 	$(CC) -c $(CFLAGS) -I. `gtk-config --cflags` $*.c
-
 
 
 # depends: $(SRC)

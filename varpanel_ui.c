@@ -619,9 +619,15 @@ void varpanel_populate ()
   gint i, j, k;
 
   /*-- realloc in case they've been alloc'ed before --*/
-  da = (GtkWidget **) g_realloc (da, gg.ncols * sizeof (GtkWidget *));
-  varlabel = (GtkWidget **) g_realloc (varlabel,
-                                       gg.ncols * sizeof (GtkWidget *));
+  if (da == NULL) {
+    da = (GtkWidget **) g_malloc (gg.ncols * sizeof (GtkWidget *));
+    varlabel = (GtkWidget **) g_malloc (gg.ncols * sizeof (GtkWidget *));
+  } else {
+    da = (GtkWidget **) g_realloc (da, gg.ncols * sizeof (GtkWidget *));
+    varlabel = (GtkWidget **) g_realloc (varlabel,
+                                         gg.ncols * sizeof (GtkWidget *));
+  }
+
   k = 0;
   for (i=0; i<vnrows; i++) {
     for (j=0; j<vncols; j++) {

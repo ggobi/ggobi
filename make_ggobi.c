@@ -53,7 +53,6 @@ dataset_init(ggobid *gg)
 
     pipeline_init ();
 
-
     /*-- initialize the first display --*/
     display = scatterplot_new (false, NULL);
     /* Need to make certain this is the only one there.
@@ -64,7 +63,6 @@ dataset_init(ggobid *gg)
     gg->current_splot = (splotd *)
       g_list_nth_data (gg->current_display->splots, 0);
 }
-
 
 gboolean
 fileset_read (gchar *ldata_in)

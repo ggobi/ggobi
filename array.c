@@ -170,14 +170,18 @@ arrays_alloc (array_s *arrp, gint nr, gint nc)
 {
   int i;
 
-  if ((arrp->nrows != 0)||(arrp->ncols != 0))
-    arrays_free (arrp, 0, 0);
+  /*-- if the dimensions match, then the allocated size is surely ok --*/
+  if (arrp->nrows != nr || arrp->ncols != nc) {
+    
+    if (arrp->nrows != 0 || arrp->ncols != 0)
+      arrays_free (arrp, 0, 0);
 
-  arrp->data = (gshort **) g_malloc (nr * sizeof (gshort *));
-  for (i = 0; i < nr; i++)
-    arrp->data[i] = (gshort *) g_malloc (nc * sizeof (gshort));
-  arrp->nrows = nr;
-  arrp->ncols = nc;
+    arrp->data = (gshort **) g_malloc (nr * sizeof (gshort *));
+    for (i = 0; i < nr; i++)
+      arrp->data[i] = (gshort *) g_malloc (nc * sizeof (gshort));
+    arrp->nrows = nr;
+    arrp->ncols = nc;
+  }
 }
 
 /* allocate a short integer array populated with 0 */

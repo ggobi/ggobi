@@ -2,7 +2,6 @@ Bugs:
 
   the axes aren't being initialized properly for cloned variables.
   reading from stdin in stopped working
-  reading missings gives a core dump
 
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
@@ -11,6 +10,8 @@ Scaling:
 Imputation of missing values
 
 Erase/hiding/exclusion  (could use a redo button; no big deal)
+
+Leave rgroups alone, but use a decoration array instead of nlinkable?
 
 Smoothing
 

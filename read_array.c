@@ -455,11 +455,10 @@ read_ascii (FILE *fp)
            * allocate space to contain the missing values matrix.
            * Initialize all previous values to 0.
           */
-          if (gg.file_read_type == read_all) {
+          if (gg.file_read_type == read_all)
             arrays_alloc (&gg.missing, nblocks*BLOCKSIZE, gg.ncols);
-          } else {
+          else
             arrays_alloc (&gg.missing, gg.nrows, gg.ncols);
-          }
         }
 
         gg.nmissing++;
@@ -523,7 +522,8 @@ read_ascii (FILE *fp)
        * the amount of space they need.
       */
       arrayf_free (&gg.raw, gg.nrows, gg.ncols);
-      arrays_free (&gg.missing, gg.nrows, gg.ncols);
+      if (gg.nmissing)
+        arrays_free (&gg.missing, gg.nrows, gg.ncols);
     }
   }
 }
