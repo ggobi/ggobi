@@ -101,7 +101,7 @@ SRC=array.c ash1d.c \
  p1d.c p1d_ui.c \
  parcoords.c parcoords_ui.c parcoordsClass.c pipeline.c plugin.c \
  ppcorr_ui.c \
- read_array.c read_color.c read_data.c read_init.c read_xml.c record_id.c  \
+ read_array.c read_color.c read_data.c read_init.c read_xml.c \
  scale_api.c scale_click.c scale_drag.c scale_ui.c \
  scatmat.c scatmat_ui.c scatmatClass.c \
  scatterplot.c scatterplot_ui.c scatterplotClass.c \
@@ -159,9 +159,12 @@ ggobi: $(OB) $(EXTRA_OB)
 	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS)  $(EXTRA_LIBS) ${GTK_LIBS}  $(DL_RESOLVE_PATH)
 
 pure: ggobi.o $(OB) $(EXTRA_OB)
-	purify.new -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
-	-user-path=/usr/dfs/ggobi/ggobi \
+	purify -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
+	-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/GraphAction \
 	$(LD) $(OB) $(EXTRA_OB) \
+	/usr/dfs/ggobi/ggobi/plugins/GraphAction/graphact.o \
+	/usr/dfs/ggobi/ggobi/plugins/GraphAction/init.o \
+	/usr/dfs/ggobi/ggobi/plugins/GraphAction/ga_cbacks.o \
 	$(LDFLAGS) -o ggobi \
 	/usr/dfs/cc/lib/libxml2.so \
 	`gtk-config --libs`

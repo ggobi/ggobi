@@ -46,7 +46,7 @@ SRC= ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
  subset_ui.c subset.c jitter_ui.c jitter.c smooth_ui.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  display_tree.c \
- noop-checkbutton.c \
+ noop-toggle.c \
  ggobi-API.c  s_erf.c  \
  limits.c timeplot.c  edges.c \
 \
@@ -87,21 +87,20 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  mt19937-1.o  mt19937ar.o \
  write_svg.o \
  impute.o impute_ui.o \
- noop-checkbutton.o \
+ noop-toggle.o \
  ggobi-API.o s_erf.o \
 \
  limits.o timeplot.o edges.o \
  varcircles.o varchange.o \
  tour1d.o tour1d_pp.o print.o \
  tour1d_ui.o fileio.o tourcorr.o tourcorr_ui.o \
- brush_link.o time_ui.o record_id.o \
+ brush_link.o time_ui.o \
  cokus.o \
  read_color.o read_init.o \
  wvis_ui.o write_state.o  \
  plugin.o  \
  wvis.o \
- dbms.o dbms_ui.o \
- noop-toggle.o
+ dbms.o dbms_ui.o
 
 # eispack.o
 # pp_ui.o

@@ -58,7 +58,6 @@ SRC=\
     ppcorr_ui.c \
     read_array.c \
     read_data.c \
-    record_id.c \
     rotate_ui.c \
     scale_api.c \
     scale_click.c \
@@ -132,8 +131,6 @@ ifdef USE_XML
 endif
 
 GTK_EXT_LD=-lgtkext
-
-
 
 OBJ=$(SRC:%.c=%.o)
 
