@@ -71,6 +71,7 @@
 29798   6/29  removed command line sampling; better to use R or a db
 29964   7/7   beginnings of extending to multiple pipelines
 30147   7/11  more on multiple pipelines; ggobi works again, in simple case
+30292   7/11  added random number generator
 
 note: There are about 40.8K lines in xgobi,
 subtracting the rpc, xgvis and tour code.
