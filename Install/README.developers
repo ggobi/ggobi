@@ -35,10 +35,10 @@ when attempting to start ggobi.
 
 bin/ggobi data/flea
 
-Creating new modules on franz
-=============================
+Creating new modules
+====================
 
-Logon to ssh www.ggobi.org and change directory to 
+Logon with ssh to www.ggobi.org and change directory to 
   ~xgobi/CVSRoot
 
 Then do 
@@ -75,15 +75,20 @@ directory because these will be loaded up from this directory.
 
 To checkout the CVS module,  use
    cvs co Web
-with the CVSROOT variable set to
-   franz.stat.wisc.edu:/home/xgobi/CVSRoot
-and CVS_RSH set to
-   ssh
+
+Use scp to copy relevant binaries to their appropriate place:
+
+   scp file www.ggobi.org:/home3/WebSites/ggobi/Download
+
+Make the relevant pieces, and install using:
+   make configure
+   make Download.html
+   make install
 
 Next, to get it to appear on the Web site, you can install the
 new version of the pages. To do this, from within the 
 checked out version of the Web/ module, type
-  gmake
+  make
 
 (You may need to set GGOBI_SRC to the location of the src code, and
 hence the notes directory which contains pieces for the web site. And
