@@ -14,7 +14,7 @@ CC = gcc
 LD=$(CXX)
 LD=$(CC)
 
-CFLAGS+= -g2 -ansi -Wall -fPIC -DHAVE_CONFIG_H
+CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H $(EXTRA_CFLAGS)
 #CFLAGS= -g -w -DHAVE_CONFIG_H # when using Irix cc, suppress warnings
 CXXFLAGS=$(CFLAGS)
 

@@ -1,3 +1,15 @@
+Installation:
+  End up rebuilding Rggobi when make and then make install
+
+
+General:
+
+Splash screen content should be dynamically generated and rendered
+rather than hard-coding the text.  This will remove compiler warnings
+and give (different) flexibility.
+
+
+
 ExcelReader is for windows only. Make certain
 we don't try to build this on Unix.
 

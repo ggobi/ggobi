@@ -24,7 +24,7 @@ LOCAL_INCLUDES=.
 DEBUG=-g
 #DEBUG=-O2
 
-DEFINES=-DGGOBI_MAIN -DHAVE_CONFIG_H=1
+DEFINES=-DGGOBI_MAIN -DHAVE_CONFIG_H=1 -DHAVE_GGOBI_CONFIG_H=1
 
 CFLAGS= $(DEBUG) -ansi -Wall  -mno-cygwin -mpentium \
          -fnative-struct -mwindows   $(INCLUDES:%=-I%) \
@@ -74,7 +74,7 @@ SRC+=read_xml.c write_xml.c  read_init.c write_state.c read_color.c plugin.c
 
 # SRC+=dbms.c dbms_ui.c
 
-# vardata.c vdialog_ui.c \ 
+# vardata.c vdialog_ui.c \
 #  ctour_ui.c cpp_ui.c \
 # pp_ui.c
 

@@ -781,4 +781,8 @@ InputDescription *read_csv_input_description(const char * const fileName, const 
 					     ggobid *gg, GGobiPluginInfo *info);
 InputDescription *read_ascii_input_description(const char * const fileName, const char * const modeName, 
 					       ggobid *gg, GGobiPluginInfo *info);
+
+
+void resetDataMode();
+
 #endif

@@ -266,8 +266,9 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
     registerPlugins(gg, sessionOptions->info->plugins);
 #endif
 
-  start_ggobi(gg, init_data,
-              sessionOptions->info->createInitialScatterPlot);
+  resetDataMode();
+
+  start_ggobi(gg, init_data, sessionOptions->info->createInitialScatterPlot);
 
   if (sessionOptions->restoreFile) {
     processRestoreFile(sessionOptions->restoreFile, gg);
@@ -283,6 +284,15 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
   if (processEvents) {
     gtk_main();
   }
+}
+
+void
+resetDataMode()
+{
+    if(sessionOptions->data_type)
+	free(sessionOptions->data_type);
+    sessionOptions->data_type = NULL;
+    sessionOptions->data_mode = unknown_data;
 }
 
 void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)

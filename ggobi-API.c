@@ -1552,7 +1552,7 @@ GGOBI(removeNumberedKeyEventHandler)(ggobid *gg)
  return(GGOBI(registerNumberedKeyEventHandler(NULL, NULL, NULL, NULL, gg, C)));
 }
 
-#ifdef HAVE_CONFIG_H
+#ifdef HAVE_GGOBI_CONFIG_H
 #include "config.h"
 static gchar *version_date = GGOBI_RELEASE_DATE;
 int GgobiVersionNumbers[] = {MAJOR_VERSION, MINOR_VERSION, PATCH_LEVEL};
