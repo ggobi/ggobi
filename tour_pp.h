@@ -34,7 +34,7 @@ gint optimize0 (optimize0_param *op,
 
 /* Utility routines */
 gdouble ludcmp(gdouble *a, gint n, gint *Pivot); 
-gdouble solve(gdouble *a, gdouble *b, gint n, gint *Pivot); 
+gdouble tour_pp_solve(gdouble *a, gdouble *b, gint n, gint *Pivot); 
 void inverse(gdouble *a, gint n);
 
 /* Arbitrary dimensional indices */

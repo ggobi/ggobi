@@ -440,7 +440,7 @@ void inverse(gdouble *a, gint n)
     {  
       if(i == j) b[j] = 1.0; else b[j] = 0.0;
     }
-    d=solve(a,b,n,P);
+    d=tour_pp_solve(a,b,n,P);
      for(j=0; j<n; j++)
        inv[j*n+i] = b[j];
   }
@@ -450,7 +450,8 @@ void inverse(gdouble *a, gint n)
   free(inv);
 }    
 
-gdouble solve(gdouble *a,gdouble *b,gint n,gint *Pivot) 
+gdouble
+tour_pp_solve(gdouble *a,gdouble *b,gint n,gint *Pivot) 
 {
   gint i,j,k;
   gdouble temp;
