@@ -18,19 +18,19 @@
 #define GTK_IS_GGOBI_BARCHART_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_BARCHART_DISPLAY))
 
 GtkType gtk_ggobi_barchart_display_get_type();
-displayd *gtk_ggobi_barchart_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+displayd *gtk_ggobi_barchart_display_new(gint type, gboolean missing_p,
+                                         datad * d, ggobid * gg);
 
-typedef struct 
-{
-    GtkGGobiExtendedDisplayClass parent_class;
+typedef struct {
+  GtkGGobiExtendedDisplayClass parent_class;
 
 } GtkGGobiBarChartDisplayClass;
 
 
 typedef struct {
 
- extendedDisplayd extendedDpy;
- 
+  extendedDisplayd extendedDpy;
+
 } barchartDisplayd;
 
 
@@ -43,29 +43,30 @@ typedef struct {
 
 GtkType gtk_ggobi_barchart_splot_get_type(void);
 
-typedef struct 
-{
-    GtkGGobiExtendedSPlotClass extendedSPlotClass;
+typedef struct {
+  GtkGGobiExtendedSPlotClass extendedSPlotClass;
 
 } GtkGGobiBarChartSPlotClass;
 
-typedef  struct {
+typedef struct {
 
-    extendedSPlotd extendedSPlot;
+  extendedSPlotd extendedSPlot;
 
-    barchartd *bar;
+  barchartd *bar;
 } barchartSPlotd;
 
 
 
 
-extern void barchart_display_menus_make (displayd *display, GtkAccelGroup *, GtkSignalFunc, ggobid *);
-extern splotd *gtk_barchart_splot_new(displayd *dpy, gint width, gint height, ggobid *gg);
+extern void barchart_display_menus_make(displayd * display,
+                                        GtkAccelGroup *, GtkSignalFunc,
+                                        ggobid *);
+extern splotd *gtk_barchart_splot_new(displayd * dpy, gint width,
+                                      gint height, ggobid * gg);
 
 /* Make these available to ggobiClass.c. 
   (Could put the _get_type routines in the barchartClass.h file.) */
 
-void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass *klass);
-void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass *klass);
+void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass * klass);
+void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass);
 #endif
-
