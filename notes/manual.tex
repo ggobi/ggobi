@@ -1254,68 +1254,71 @@ sphering} to create new variables and add them ggobi's variable selection
 panels.  The names of the selected variables will be added to the
 ``sphered variables'' to help you remember which variables you sphered.
 
-% dfs here %
 \subsection{Jittering}
 
 Select {\em Variable jittering ...} to open a panel that allows
 random noise to be added to selected variables.  This ameliorates
 overplotting in scatterplots of data with many ties.
 
-First specify the variables you wish to jitter.
-
-Choose between uniform and normal random jitter, and then set the degree of
-jitter using the slider.  To rejitter without changing the degree of
-jitter, simply click on the {\bf Jitter} button.
+First specify the variables you wish to jitter.  Choose between uniform
+and normal random jitter, and then set the degree of jitter using the
+slider.  To rejitter without changing the degree of jitter, simply click
+on the {\bf Jitter} button.
 
 \subsection{Brush by variable}
 \label{slbl:BrushByVariable}
 
-The ``Brush by variable'' tool is used to automatically color points
-using the color scale.  To use it, first select a variable.  This
-adds two sets of numbers to the display:  along the bottom of the
-display, at the center of each stripe of color, is shown the number
-of points that will be drawn with this color once ``Apply'' is
-pressed.  Along the top of the display, at the boundaries between
-stripes of color, appears the value of the chosen variable that 
-defines the boundary.
+The {\bf Brush by variable} tool is used to automatically color points
+using the current color scale.  To use it, first select a variable.
+This adds two sets of numbers to the display:  along the bottom of the
+display, at the center of each stripe of color, is shown the number of
+points that will be drawn with this color once {\bf Apply} is pressed.
+Along the top of the display, at the boundaries between the stripes of
+color, appear the values of the chosen variable that define the boundaries
+between colors.  To adjust the boundaries, grab one of the sliders,
+and notice that both the values and the counts adjust as you move it.
 
-To adjust the boundaries, grab one of the sliders, and notice that
-both the values and the counts adjust as you move it.
+Try it with the olive oil data used in the tutorial, and select the {\it
+Area} variable.  It can be a real time-saver.
 
-[We plan to support multiple color scales of different sizes,
-and then this tool will become increasingly useful.]
+[We plan to support multiple color scales of different sizes, and then
+this tool will become increasingly useful.]
 
 \subsection{Color \& glyph groups}
 \label{slbl:ColorAndGlyphGroups}
 
-The `Color \& glyph groups' tool displays a table.  Each unique
-symbol in the data (combination of color and clyph) occupies a row,
+The {\bf Color \& glyph groups} tool displays a table.  Each unique
+symbol in the data (combination of color and glyph) occupies a row,
 and for each row there are three buttons:  {\bf H} hides all points
-drawn in the chosen symbol, {\bf S} shows them all, and {\bf C} hides
+drawn in the chosen symbol, {\bf S} shows them all, and {\bf C} 
+(complement) hides
 what's shown and shows what's hidden.  The three remaining columns
 report the number of cases hidden, the number shown, and the sum.
 
 The {\bf Update} button at the bottom of the window will reset the
 contents of the table in case it isn't responding to changes in the
-displays.  The {\bf Rescale} button will cause the views to be
-redrawn as if any hidden points are no longer in the data:  that is,
-the points that are shown will be scaled to fill the viewing area of
-the plot.
+displays as you continue to brush.  The {\bf Rescale} button will cause
+the views to be redrawn as if any hidden points are no longer in the
+data:  that is, the points that are shown will be scaled to fill the
+viewing area of the plot.
 
 See \ref{NewVariable} to read how you can add a new variable to the
 existing data which serves as an indicator for these ``clusters.''
 
 \subsection{Subsetting}
 
-Select {\em Case subsetting and sampling ...} to open a panel
+Select {\bf Case subsetting and sampling ...} to open a panel
 that allows subsets to be specified in one of five ways.
 
 {\bf Random sample without replacement}:  Specify the number of
      cases to be in the sample.
 \\{\bf Consecutive block}:  Specify the first and last row of the block.
+     (The two controls in the second row control the increment used
+     in the control in the first row.)
 \\{\bf Every nth case}:  Specify the interval and the first row.
 \\{\bf Sticky labels}:  All cases with a ``sticky'' label will
-  be in the subset.  (See {\em Identification} for a description
+  be in the subset.  If no points have a sticky label, this
+  will have no effect. (See {\em Identification} for a description
   of sticky labels.)
 \\{\bf Row labels}: Type in a row label, and all cases with that
   label will be in the subset.
@@ -1324,15 +1327,13 @@ Select one of those five, then click on {\bf Subset} in the
 bottom row of the panel.  If you want to re-include all rows, 
 select the {\bf Include all} button in the bottom row.
 
-If the {\bf Rescale} button is checked, then the plots will be
-rescaled to exclude all points not in the subset.  If it is
-not checked, the points will be hidden but not excluded from
-plot scaling operations.
+Click the {\bf Rescale} button to rescale all plots excluding
+the points not in the subset.
 
 One purpose of subsetting is to allow the use of ggobi on data matrices
 that are so large that dynamic and interactive operations begin to
 become painfully slow.  By selecting a smaller subset, a user can
-work on that subset at a comfortable speed of rotation and
+work on that subset at a comfortable speed of tour motion and
 interaction.  Another purpose is to do graphical cross-validation:
 if the feature you see is still there in repeated subsamples, there's
 a good chance it's not just an artifact of visualization.
@@ -1341,14 +1342,14 @@ a good chance it's not just an artifact of visualization.
 %
 By default, missing values are assigned the value $0$, but you
 may sometimes find that to be an inconvenient choice.  Use the
-{\em Missing values} panel to assign alternative numbers.
+{\bf Missing values} panel to assign alternative numbers.
 
-By default, all missings in all variables will be affected
-together, but you can choose to assign values only for selected
-variables using the menu at the top of the panel.
+Select the variable or variables whose ``imputed'' value you
+wish to change, then select a method and fill in the text window
+if necessary, and click {\bf Impute.}
 
-Below the menu, a notebook widget allows you to specify the
-type of imputation you'd like to use.
+Below the list of variables, a notebook widget allows you to specify
+the type of imputation you'd like to use.
 
 {\bf Random imputation}: Sample from the present values for each variable
   to populate the missing values.  If you have done some brushing to
@@ -1362,14 +1363,14 @@ type of imputation you'd like to use.
 \\{\bf Percentage above minimum}: Specify a value that is $x$ percent
 above the maximum.
 
-If you want all plots to rescale immediately when you assign new
-values, turn on {\em Rescale} toggle.  Finally, click on the {\em Impute}
-button to perform the imputation or assignment of values.
+Click the resale button when you want to update the view to
+respond to the new values.
 
 %
 % End of tools section, so end of working through the main menubar
 %
 
+% dfs here %
 \section{Multiple datasets}
 
 Several datasets can be open in ggobi simultaneously. The {\bf File}
