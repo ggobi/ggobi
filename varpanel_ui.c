@@ -52,8 +52,12 @@ varpanel_label_set (gint j, datad *d)
 {
   GtkWidget *label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
   vartabled *vt = vartable_element_get (j, d);
+  /*-- the label is actually a button; this is the label --*/
+  GtkWidget *labelw = GTK_BIN(label)->child;
 
-  gtk_label_set_text (GTK_LABEL (GTK_BIN (label)->child), vt->collab_tform);
+  /*-- make sure it stays left-aligned --*/
+  gtk_misc_set_alignment (GTK_MISC(labelw), 0, .5);
+  gtk_label_set_text (GTK_LABEL(labelw), vt->collab_tform);
 }
 
 GtkWidget *
