@@ -1,49 +1,49 @@
-<ggobidata count="3">
+<ggobidata count="1">
 
-<data name="nodes">
+<polygondata name="US Map">
 <description>
-  These are the points that define the polygons in the map.
-  They are not data points per se, and we have no interest
-  in plotting them in a conventional ggobi scatterplot,
-  because it's the polygons we're interested in and not the
-  nodes or edges.
+  We think it makes sense to separate the data to be read
+  by the plugin from the data to be read by ggobi -- in
+  particular, the polygon definitions themselves.
 
-  In that sense, it's a bit of a kludge to use this very
-  general setup to define a map.
+  In some cases, the "polypoints" that are used to define the
+  polygons will be in here -- in that case, the points will
+  not be sensitive to brushing and identification and can not
+  be plotted.  That makes sense for maps.
 
-  There might be a very large number of nodes.
+  In other cases, the polydata element will not have any 
+  points, and the polygons will be defined in terms of points
+  that exist in some ggobi data element.  (I'll put together
+  polyexample.xml to show what that might look like.)
+
+  polypoints usually live in 2D, but they may occasionally
+  live in higher-dimensional spaces; in that sense, they may
+  need variables.  They must specify an id.
+
+  polygons may be nested, and because of that, they may need
+  more than one categorical variable.
 </description>
 
-<variables count="2">
-  <realvariable name="latitude" />
-  <realvariable name="longitude" />
-</variables>
+<!-- the points that will be used to define the polygons -->
+
+<polypoints>
+<dimensions count="2">
+  <dimension name="latitude" />
+  <dimension name="longitude" />
+</dimensions>
 
 <records count="40000">
- <record id="0"> 2 4 </record>
- <record id="1"> 3 5 </record>
- <record id="2"> 4 7 </record>
+ <record id="0"> 2.5 4.7 </record>
+ <record id="1"> 3.3 -5.7 </record>
+ <record id="2"> 4.7 7.3 </record>
  ...
 </records>
+</polypoints>
 
-<data name="polygons">
-<description>
-  These are the polygon definitions, which are made by listing
-  some number of ids defined in the nodes datad.
+<!-- the polygons themselves, using polypoints -->
 
-  A group of polygons taken together may define a political entity
-  (think of the islands of Hawaii) so we may still need a third datad
-  to specify those entities.
-
-  In any case, we may have variables on these polygons -- categorical
-  variables defining geographic entities, or other data.
-
-  This is an odd datad from the point of view of ggobi -- ggobi,
-  excluding the plugin, might want to read the variables on the
-  polygon records, but it should ignore the geometric information.
-</description>
-
-<variables count="1">
+<polygons>
+<variables count="2">
   <categorical variable name="state">
     <levels count="50">
       <level value="0"> Hawaii </level>
@@ -51,21 +51,35 @@
       ...
      </levels>
   </categoricalvariable>
+  <categorical variable name="county">
+    <levels count="50">
+      <level value="0"> Lanai </level>
+      <level value="1"> Oahu </level>
+      ...
+     </levels>
+  </categoricalvariable>
 </variables>
   
-<records count="60">
-<record label="Oahu" polygonpts="4" pt="1" pt="2" pt="3" pt="7"> 0 </record>
-<record label="Lanai" polygonpts="4" pt="1" pt="2" pt="3" pt="7"> 0 </record>
-...
+<records count="6000">
+<record label="Oahu"> 0 1 
+  <polypts num="4"> <ppt>1</ppt>  <ppt>2</ppt> ... </polypts>
+</record>
+<record label="Lanai"> 0 0 
+  <polypts num="4"> <ppt>3</ppt>  <ppt>5</ppt> ... </polypts>
+</record>
 </records>
-</data>
 
+</polygons>
+</polygondata>
+
+<!--
+  there could, of course, be multiple datad's: eg, one for state data,
+  another for county data.
+-->
 
 <data name="state data">
 <description>
-  This third datad contains the covariates on the data, the variables
-  measured for each state.  This is the only one of the three that
-  is unambiguously of interest to ggobi without the plugin.
+  Covariates corresponding to geographic areas.
 </description>
 
 <variables count="6">
