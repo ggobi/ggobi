@@ -594,7 +594,6 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   gint n1vars = dsp->t2d.nvars;
   gfloat ftmp, tol = 0.01; 
   gdouble dtmp1;
-  gboolean dontdoit = false;
   extern void gram_schmidt(gfloat *, gfloat*, gint);
   extern gfloat calc_norm(gfloat *, gint);
   extern void gt_basis(array_f, gint, vector_i, gint, gint);
@@ -652,7 +651,6 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
     }
 
     while (ftmp < tol) {
-      /*      dontdoit = true;*/
       printf("in fixit routine\n");
         gt_basis(dsp->t2d.tv, dsp->t2d.nvars, dsp->t2d.vars, 
           d->ncols, (gint) 1);
@@ -684,8 +682,6 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
     }
   }
 
-  /*  if (dontdoit)
-      disconnect_motion_signal (sp);*/
 }
 
 void
