@@ -69,6 +69,9 @@ given in this call to be passed as the first argument to the callback.
 The routine \Croutine{gtk_signal_connect} puts it as the last
 argument. See \cite{pennington99} or \cite{gtkTutorial}.
 
+See the file GGobiEvents.h for the declarations of the different
+callback prototypes given in the form used with
+\Croutine{gtk_signal_connect}.
 
 \begin{description}
 \item[new data] The \SignalName{datad_added} signal is generated each
@@ -76,9 +79,13 @@ argument. See \cite{pennington99} or \cite{gtkTutorial}.
 for this event are given two arguments
 in addition to the user-defined data provided when
 one registers the callback.
+The signature is
 \begin{verbatim}
- void (*callback)(void *userData, datad *data, ggobid *gg, GtkWidget *w);
+ void (*callback)(void *userData, datad *data, ggobid *gg);
 \end{verbatim}
+and the datad object is a reference to the new 
+datad object being added. The ggobid parameter is the source of the event.
+
 \item[brush movement] 
 The signal name is \SignalName{brush_motion}.
 This event is generated when the user moves (or

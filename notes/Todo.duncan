@@ -1,3 +1,23 @@
+Vertical ruler under Gtk+-2.4 does not display correctly - ticks are not there.
+ Is this a scale calculation problem? The thumb is at the top and doesn't
+ seem to move with the mouse.
+
+Take care of the message
+  Display has already been added to the displays list of this ggobi
+Open a Scatterplot matrix display.
+
+
+Check all the signal definitions in GtkSignalDef.c to ensure
+that the signatures are correct and that we haven't added an additional
+argument.
+   Use TEST_GGOBI_EVENTS=1 in the local.config file.
+
+
+Add whether it was an X or a Y that was selected in the select_variable/VARIABLE_SELECTION_SIGNAL
+signal.
+
+When switching between plots on the cycle view (main panel), emit a signal?
+
 
 Abstraction of the projection pursuit (from xgobi and with Di) so that
 one can add new ones without explicitly adding it to the ggobi

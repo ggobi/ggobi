@@ -1,12 +1,26 @@
 #ifndef GGOBI_EVENTS_H
 #define GGOBI_EVENTS_H
 
+/*
+ The CHECK_EVENT_SIGNATURE is for testing routines used with gtk_signal_connect.
+ The CHECK_R_EVENT_SIGNATURE is for testing routines used with gtk_signal_connect_object.
+
+ Similarly, the ggev_r_... are for the routines used with gtk_signal_connect_object.
+*/
+
 typedef void (*ggev_datad_added_f)(ggobid *, datad *, void *);
 typedef void (*ggev_brush_motion_f)(ggobid *, splotd *, GdkEventMotion *ev, datad *, void*);
+typedef void (*ggev_r_brush_motion_f)(void *,  splotd *, GdkEventMotion *ev, datad *, ggobid *);
+
 typedef void (*ggev_move_point_f)(ggobid *, splotd *, gint, datad *, void*);
+typedef void (*ggev_r_move_point_f)(void*, splotd *, gint, datad *, ggobid *);
+
 typedef void (*ggev_identify_point_f)(ggobid *, splotd *, gint, datad *, void*);
 typedef void (*ggev_select_variable_f)(ggobid *, datad *, gint, splotd *, void*);
+
 typedef void (*ggev_splot_new_f)(ggobid *, splotd *, void*);
+typedef void (*ggev_r_splot_new_f)(void *, splotd *, ggobid *);
+
 typedef void (*ggev_variable_added_f)(ggobid *, vartabled*, gint, datad *, void*);
 typedef void (*ggev_variable_list_changed_f)(ggobid *, datad *, void*);
 
@@ -16,7 +30,8 @@ typedef void (*ggev_sticky_point_removed_f)(ggobid *, gint, gint, datad *, void*
 typedef void (*ggev_clusters_changed_f)(ggobid *, datad *, void *);
 
 #ifdef CHECK_EVENT_SIGNATURES
-#define CHECK_EVENT_SIGNATURE(x,y)  static ggev_#y __check##x##y = &x;
+#define CHECK_EVENT_SIGNATURE(x,y)  static ggev_##y __check ## x ## y __attribute__ ((unused)) = & x;
+#define CHECK_R_EVENT_SIGNATURE(x,y)  static ggev_r_##y __check ## x ## y __attribute__ ((unused)) = & x;
 #else
 #define CHECK_EVENT_SIGNATURE(x,y) 
 #endif
