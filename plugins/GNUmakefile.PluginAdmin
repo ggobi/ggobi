@@ -13,5 +13,9 @@ createDist:: configure
 configure: configure.in 
 	autoconf
 
+ifndef PDFLATEX
+ PDFLATEX=pdflatex
+endif
+
 %.pdf: %.tex
 	(TEXINPUTS=.:$(OMEGA_HOME)/Docs:: export TEXINPUTS ; cd $(@D) ; $(PDFLATEX) $(<F))
