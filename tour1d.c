@@ -21,40 +21,40 @@ alloc_tour1d (displayd *dsp, ggobid *gg)
   datad *d = dsp->d;
   gint nc = d->ncols;
 
-  arrayf_init(&dsp->t1d.u0);
+  arrayf_null(&dsp->t1d.u0);
   arrayf_alloc(&dsp->t1d.u0, nc, nc);
 
-  arrayf_init(&dsp->t1d.u1);
+  arrayf_null(&dsp->t1d.u1);
   arrayf_alloc(&dsp->t1d.u1, nc, nc);
 
-  arrayf_init(&dsp->t1d.u);
+  arrayf_null(&dsp->t1d.u);
   arrayf_alloc(&dsp->t1d.u, nc, nc);
 
-  /*  arrayf_init(&dsp->t1d.uold);
+  /*  arrayf_null(&dsp->t1d.uold);
   arrayf_alloc(&dsp->t1d.uold, nc, nc);*/
 
-  arrayf_init(&dsp->t1d.v0);
+  arrayf_null(&dsp->t1d.v0);
   arrayf_alloc(&dsp->t1d.v0, nc, nc);
 
-  arrayf_init(&dsp->t1d.v1);
+  arrayf_null(&dsp->t1d.v1);
   arrayf_alloc(&dsp->t1d.v1, nc, nc);
 
-  arrayf_init(&dsp->t1d.v);
+  arrayf_null(&dsp->t1d.v);
   arrayf_alloc(&dsp->t1d.v, nc, nc);
 
-  arrayf_init(&dsp->t1d.uvevec);
+  arrayf_null(&dsp->t1d.uvevec);
   arrayf_alloc(&dsp->t1d.uvevec, nc, nc);
 
-  arrayf_init(&dsp->t1d.tv);
+  arrayf_null(&dsp->t1d.tv);
   arrayf_alloc(&dsp->t1d.tv, nc, nc);
 
-  vectori_init(&dsp->t1d.vars);
+  vectori_null(&dsp->t1d.vars);
   vectori_alloc(&dsp->t1d.vars, nc);
-  vectorf_init(&dsp->t1d.lambda);
+  vectorf_null(&dsp->t1d.lambda);
   vectorf_alloc(&dsp->t1d.lambda, nc);
-  vectorf_init(&dsp->t1d.tau);
+  vectorf_null(&dsp->t1d.tau);
   vectorf_alloc(&dsp->t1d.tau, nc);
-  vectorf_init(&dsp->t1d.tinc);
+  vectorf_null(&dsp->t1d.tinc);
   vectorf_alloc(&dsp->t1d.tinc, nc);
 }
 

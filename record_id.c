@@ -18,11 +18,16 @@
 /*                   Memory allocation, initialization                */
 /*--------------------------------------------------------------------*/
 
+void rowids_null (datad *d)
+{
+  vectori_null (&d->rowid.id);
+  vectori_null (&d->rowid.idv);
+}
+
 void rowids_free (datad *d)
 {
   vectori_free (&d->rowid.id);
 }
-
 
 void
 rowids_alloc (datad *d) 
@@ -30,3 +35,30 @@ rowids_alloc (datad *d)
   vectori_alloc (&d->rowid.id, d->nrows);
 }
 
+void
+rowidv_init (datad *d) {
+  gint i, k;
+
+  if (d->rowid.id.nels > 0) {
+
+    /*
+     * assume sorting, use the maximum value of rowid.id.els
+     * to dimension rowid.idv
+    */
+    gint nels = 1 + d->rowid.id.els[ d->rowid.id.nels-1 ]; 
+
+    vectori_alloc (&d->rowid.idv, nels);
+    for (i=0; i<nels; i++)
+      d->rowid.idv.els[i] = -1;
+
+    /*
+     *  example: 
+     *   row.id.els = {1,3,5}
+     *   row.idv.els = {-1,0,-1,1,-1,2}
+    */  
+    for (i=0; i<d->nrows; i++) {
+      k = d->rowid.id.els[i];
+      d->rowid.idv.els[k] = i;
+    }
+  }
+}

@@ -433,7 +433,6 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
   d->nrgroups = 0;              /*-- for now --*/
 
   rowlabels_alloc (d, data->gg);
-  d->rowid.id.els = NULL;  /*-- dfs; alloc only if ids are present --*/
   br_glyph_ids_alloc (d);
   br_glyph_ids_init (d, data->gg);
 

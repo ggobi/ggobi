@@ -20,77 +20,77 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
   gint nc = d->ncols;
 
   /* first index is the projection dimensions, second dimension is ncols */
-  arrayf_init(&dsp->tcorr1.u0);
+  arrayf_null(&dsp->tcorr1.u0);
   arrayf_alloc(&dsp->tcorr1.u0, 2, nc);
 
-  arrayf_init(&dsp->tcorr1.u1);
+  arrayf_null(&dsp->tcorr1.u1);
   arrayf_alloc(&dsp->tcorr1.u1, 2, nc);
 
-  arrayf_init(&dsp->tcorr1.u);
+  arrayf_null(&dsp->tcorr1.u);
   arrayf_alloc(&dsp->tcorr1.u, 2, nc);
 
-  arrayf_init(&dsp->tcorr1.v0);
+  arrayf_null(&dsp->tcorr1.v0);
   arrayf_alloc(&dsp->tcorr1.v0, 2, nc);
 
-  arrayf_init(&dsp->tcorr1.v1);
+  arrayf_null(&dsp->tcorr1.v1);
   arrayf_alloc(&dsp->tcorr1.v1, 2, nc);
 
-  arrayf_init(&dsp->tcorr1.v);
+  arrayf_null(&dsp->tcorr1.v);
   arrayf_alloc(&dsp->tcorr1.v, 2, nc);
 
-  arrayf_init(&dsp->tcorr1.uvevec);
+  arrayf_null(&dsp->tcorr1.uvevec);
   arrayf_alloc(&dsp->tcorr1.uvevec, 2, nc);
 
-  arrayf_init(&dsp->tcorr1.tv);
+  arrayf_null(&dsp->tcorr1.tv);
   arrayf_alloc(&dsp->tcorr1.tv, 2, nc);
 
-  vectori_init(&dsp->tcorr1.vars);
+  vectori_null(&dsp->tcorr1.vars);
   vectori_alloc(&dsp->tcorr1.vars, nc);
-  vectorf_init(&dsp->tcorr1.lambda);
+  vectorf_null(&dsp->tcorr1.lambda);
   vectorf_alloc(&dsp->tcorr1.lambda, nc);
-  vectorf_init(&dsp->tcorr1.tau);
+  vectorf_null(&dsp->tcorr1.tau);
   vectorf_alloc(&dsp->tcorr1.tau, nc);
-  vectorf_init(&dsp->tcorr1.tinc);
+  vectorf_null(&dsp->tcorr1.tinc);
   vectorf_alloc(&dsp->tcorr1.tinc, nc);
 
   /* manipulation controls */
-  arrayf_init(&dsp->tc1_manbasis);
+  arrayf_null(&dsp->tc1_manbasis);
   arrayf_alloc(&dsp->tc1_manbasis, 2, nc);
-  arrayf_init(&dsp->tc2_manbasis);
+  arrayf_null(&dsp->tc2_manbasis);
   arrayf_alloc(&dsp->tc2_manbasis, 2, nc);
 
   /* first index is the projection dimensions, second dimension is ncols */
-  arrayf_init(&dsp->tcorr2.u0);
+  arrayf_null(&dsp->tcorr2.u0);
   arrayf_alloc(&dsp->tcorr2.u0, 2, nc);
 
-  arrayf_init(&dsp->tcorr2.u1);
+  arrayf_null(&dsp->tcorr2.u1);
   arrayf_alloc(&dsp->tcorr2.u1, 2, nc);
 
-  arrayf_init(&dsp->tcorr2.u);
+  arrayf_null(&dsp->tcorr2.u);
   arrayf_alloc(&dsp->tcorr2.u, 2, nc);
 
-  arrayf_init(&dsp->tcorr2.v0);
+  arrayf_null(&dsp->tcorr2.v0);
   arrayf_alloc(&dsp->tcorr2.v0, 2, nc);
 
-  arrayf_init(&dsp->tcorr2.v1);
+  arrayf_null(&dsp->tcorr2.v1);
   arrayf_alloc(&dsp->tcorr2.v1, 2, nc);
 
-  arrayf_init(&dsp->tcorr2.v);
+  arrayf_null(&dsp->tcorr2.v);
   arrayf_alloc(&dsp->tcorr2.v, 2, nc);
 
-  arrayf_init(&dsp->tcorr2.uvevec);
+  arrayf_null(&dsp->tcorr2.uvevec);
   arrayf_alloc(&dsp->tcorr2.uvevec, 2, nc);
 
-  arrayf_init(&dsp->tcorr2.tv);
+  arrayf_null(&dsp->tcorr2.tv);
   arrayf_alloc(&dsp->tcorr2.tv, 2, nc);
 
-  vectori_init(&dsp->tcorr2.vars);
+  vectori_null(&dsp->tcorr2.vars);
   vectori_alloc(&dsp->tcorr2.vars, nc);
-  vectorf_init(&dsp->tcorr2.lambda);
+  vectorf_null(&dsp->tcorr2.lambda);
   vectorf_alloc(&dsp->tcorr2.lambda, nc);
-  vectorf_init(&dsp->tcorr2.tau);
+  vectorf_null(&dsp->tcorr2.tau);
   vectorf_alloc(&dsp->tcorr2.tau, nc);
-  vectorf_init(&dsp->tcorr2.tinc);
+  vectorf_null(&dsp->tcorr2.tinc);
   vectorf_alloc(&dsp->tcorr2.tinc, nc);
 
 }

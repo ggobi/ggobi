@@ -384,7 +384,7 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
-  vectorf_init (&sp->p1d_data);
+  vectorf_null (&sp->p1d_data);
   vectorf_alloc (&sp->p1d_data, nr);
 
   switch (display->displaytype) {

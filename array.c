@@ -20,7 +20,7 @@
 /*-------------------------------------------------------------------------*/
 
 void
-arrayf_init (array_f *arrp)
+arrayf_null (array_f *arrp)
 {
   arrp->nrows = arrp->ncols = 0;
   arrp->vals = (gfloat **) NULL;
@@ -171,7 +171,7 @@ arrayf_copy (array_f *arrp_from, array_f *arrp_to)
 /*-------------------------------------------------------------------------*/
 
 void
-arrays_init (array_s *arrp)
+arrays_null (array_s *arrp)
 {
   arrp->nrows = arrp->ncols = 0;
   arrp->vals = (gshort **) NULL;
@@ -311,7 +311,7 @@ arrays_delete_cols (array_s *arrp, gint nc, gint *cols)
 /*-------------------------------------------------------------------------*/
 
 void
-arrayl_init (array_l *arrp)
+arrayl_null (array_l *arrp)
 {
   arrp->nrows = arrp->ncols = 0;
   arrp->vals = (glong **) NULL;

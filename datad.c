@@ -43,30 +43,20 @@ datad_new(datad *d, ggobid *gg)
   memset(d, 0, sizeof(datad));
 
   /*-- initialize arrays to NULL --*/
-  arrayf_init (&d->raw);
-  arrayf_init (&d->tform);
-  arrayl_init (&d->world);
-  arrayl_init (&d->jitdata);
+  arrayf_null (&d->raw);
+  arrayf_null (&d->tform);
+  arrayl_null (&d->world);
+  arrayl_null (&d->jitdata);
 
-  arrays_init (&d->missing);
-  arrayl_init (&d->missing_world);
-  arrayl_init (&d->missing_jitter);
+  arrays_null (&d->missing);
+  arrayl_null (&d->missing_world);
+  arrayl_null (&d->missing_jitter);
 
-  vectori_init (&d->clusterid);
+  vectori_null (&d->clusterid);
 
-  /*-- linking --*/
-  vectori_init (&d->rowid.id);
-
-  /*-- edges --*/
-/*
- *vectors_init (&d->edge.color);
- *vectors_init (&d->edge.color_now);
- *vectors_init (&d->edge.color_prev);
- *vectorb_init (&d->edge.hidden);
- *vectorb_init (&d->edge.hidden_now);
- *vectorb_init (&d->edge.hidden_prev);
-*/
-  vectorb_init (&d->edge.xed_by_brush);
+  /*-- brushing and linking --*/
+  rowids_null (d);
+  vectorb_null (&d->edge.xed_by_brush);
 
   sphere_init (d);
 
@@ -91,27 +81,16 @@ displayd *
 datad_init (datad *d, ggobid *gg, gboolean cleanup)
 {
   displayd *display = NULL;
-  extern void row_ids_init (datad *d);
 
   if (cleanup) {
     void varpanel_clear (datad *, ggobid *);
     varpanel_clear (d, gg);
   }
 
-  /*-- ids for records, whether points (nodes) or edges --*/
-/*
- * This needs considerably more thought ...
-  row_ids_init (d);   
-*/
-
-  /*-- ids for edges with specified sources and destinations --*/
-  if (d->edgeData) {
-    /*edge_ids_init (d, gg);*/
-  }
-  /*-- --*/
-
   varpanel_checkboxes_populate (d, gg);    /*-- checkboxes --*/
   varcircles_populate (d, gg);  /*-- circles: build but don't show --*/
+
+  rowidv_init (d);  /*-- initialize the rowid vector --*/
 
   pipeline_init (d, gg);
   clusters_set (d, gg);  /*-- find the clusters for data just read in --*/

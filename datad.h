@@ -59,6 +59,7 @@ class datad {
  /*-- row ids to support generalized linking --*/
  struct _RowID {
    vector_i id;
+   vector_i idv;
  } rowid;
  /*-- --*/
 

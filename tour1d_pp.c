@@ -610,9 +610,9 @@ gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols)
   op->success        =  0;
   op->temp           =  1;
   op->maxproj        =  op->restart*(1+log(op->temp_end/op->temp_start)/log(op->cooling)); /* :) */
-  arrayf_init (&op->proj_best);
+  arrayf_null (&op->proj_best);
   arrayf_alloc_zero (&op->proj_best, nrows, ncols);
-  arrayf_init (&op->data);
+  arrayf_null (&op->data);
 
   return 0;
 }
@@ -703,9 +703,9 @@ gint optimize0 (optimize0_param *op,
   int i,j, m, k;
 
   proj = &(op->proj_best);
-  arrayf_init (&proj_work);
+  arrayf_null (&proj_work);
   arrayf_alloc_zero (&proj_work, proj->nrows, proj->ncols);
-  arrayf_init (&pdata);
+  arrayf_null (&pdata);
   arrayf_alloc_zero (&pdata, op->data.nrows, proj->ncols);
 
   if (iszero(proj))
