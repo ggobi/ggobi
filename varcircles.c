@@ -579,8 +579,22 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
     for (k=len; k<d->ncols; k++) {
       d->vcirc_ui.da_pix = g_slist_append (d->vcirc_ui.da_pix,
         gdk_pixmap_new (da->window, VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1, -1));
+      /*
+       * clear and initialize each pixmap here, because they may be
+       * exposed out of sequence, and then noise is drawn to the
+       * variable circle on the screen.
+      */
+      da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, k);
+      gdk_draw_rectangle (da_pix, gg->unselvarbg_GC, true,
+        0, 0, VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
+      gdk_draw_arc (da_pix, gg->selvarbg_GC, true,
+        0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM,
+        0, 64 * 360);
+      gdk_draw_arc (da_pix, gg->unselvarfg_GC, false,
+        0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
     }
   }
+
   da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, jvar);
 
   /*-- clear the pixmap --*/
@@ -746,9 +760,9 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
   if (j >= d->ncols)  
     return false;
 
-  if (da_pix == NULL)
+  if (da_pix == NULL) {
     varcircle_draw (j, d, gg); 
-  else {
+  } else {
     gdk_draw_pixmap (da->window, gg->unselvarfg_GC,
       da_pix, 0, 0, 0, 0,
       VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
