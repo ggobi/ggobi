@@ -297,7 +297,12 @@ typedef enum {NULLMODE = -1,
 
 /*-- macros --*/
 
+#ifdef GTK_2_0
+#define EVENT_METHOD(i,x) GTK_OBJECT_GET_CLASS(GTK_OBJECT(i))->x
+#else
 #define EVENT_METHOD(i,x) GTK_WIDGET_CLASS(GTK_OBJECT(i)->klass)->x
+#endif
+
 #define MISSING_P(i,j) (d->missing.vals[i][j] != 0)
 #define BETWEEN(a,b,x) ( ((a)<=(x) && (x)<=(b)) || ((a)>=(x) && (x)>=(b)) )
 
