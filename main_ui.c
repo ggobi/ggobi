@@ -667,12 +667,20 @@ make_ui (ggobid *gg)
    "sticky_point_removed", test_sticky_points, NULL);
 #endif
 
-  gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
+/*
+ * I used to set allow_shrink to true, but somehow it causes what we experience as
+ * auto_shrink-ing.  That is, when changing viewmode or selecting variables, the size
+ * of the ggobi console window can suddenly change.  This seems to fix that, with the
+ * perhaps undesirable side effect that I can't reduce the size of the console below
+ * its initial size.  -- dfs
+*/
+/*gtk_window_set_policy (GTK_WINDOW (window), allow_shrink, allow_grow, auto_shrink);*/
+  gtk_window_set_policy (GTK_WINDOW (window), false,        true,       false);
 
   gtk_signal_connect(GTK_OBJECT (window), "delete_event",
-                      GTK_SIGNAL_FUNC (ggobi_close), gg);
+                     GTK_SIGNAL_FUNC (ggobi_close), gg);
   gtk_signal_connect(GTK_OBJECT (window), "destroy_event",
-                      GTK_SIGNAL_FUNC (ggobi_close), gg); 
+                     GTK_SIGNAL_FUNC (ggobi_close), gg); 
 
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
@@ -711,7 +719,7 @@ make_ui (ggobid *gg)
  * and contents, using the default mode for the default display.
 */
   gg->viewmode_frame = gtk_frame_new ((gg->viewmode == NULLMODE) 
-                                        ? "" : viewmode_name[gg->viewmode]);
+                                       ? "" : viewmode_name[gg->viewmode]);
 
   gtk_box_pack_start (GTK_BOX (hbox), gg->viewmode_frame, false, false, 3);
   gtk_container_set_border_width (GTK_CONTAINER (gg->viewmode_frame), 3);
