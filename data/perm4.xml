@@ -9,71 +9,71 @@
   <realvariable name="Pos3" />
 </variables>
 <records count="24">
-<record id="1" label="0123">	1.000000 0.500000 1 </record>
-<record id="2" label="0132">	0.982963 0.629410 2 </record>
-<record id="3" label="0213">	0.933013 0.750000 3 </record>
-<record id="4" label="0231">	0.853553 0.853553 4 </record>
-<record id="5" label="0312">	0.750000 0.933013 5 </record>
-<record id="6" label="0321">	0.629410 0.982963 6 </record>
-<record id="7" label="1023">	0.500000 1.000000 7 </record>
-<record id="8" label="1032">	0.370590 0.982963 8 </record>
-<record id="9" label="1203">	0.250000 0.933013 9 </record>
-<record id="10" label="1230">	0.146447 0.853553 10 </record>
-<record id="11" label="1302">	0.066987 0.750000 11 </record>
-<record id="12" label="1320">	0.017037 0.629410 12 </record>
-<record id="13" label="2013">	0.000000 0.500000 12 </record>
-<record id="14" label="2031">	0.017037 0.370590 13 </record>
-<record id="15" label="2103">	0.066987 0.250000 14 </record>
-<record id="16" label="2130">	0.146447 0.146447 15 </record>
-<record id="17" label="2301">	0.250000 0.066987 17 </record>
-<record id="18" label="2310">	0.370590 0.017037 18 </record>
-<record id="19" label="3012">	0.500000 0.000000 19 </record>
-<record id="20" label="3021">	0.629409 0.017037 20 </record>
-<record id="21" label="3102">	0.750000 0.066987 21 </record>
-<record id="22" label="3120">	0.853553 0.146447 22 </record>
-<record id="23" label="3201">	0.933013 0.250000 23 </record>
-<record id="24" label="3210">	0.982963 0.370590 24 </record>
+<record id="0123">	1.000000 0.500000 1 </record>
+<record id="0132">	0.982963 0.629410 2 </record>
+<record id="0213">	0.933013 0.750000 3 </record>
+<record id="0231">	0.853553 0.853553 4 </record>
+<record id="0312">	0.750000 0.933013 5 </record>
+<record id="0321">	0.629410 0.982963 6 </record>
+<record id="1023">	0.500000 1.000000 7 </record>
+<record id="1032">	0.370590 0.982963 8 </record>
+<record id="1203">	0.250000 0.933013 9 </record>
+<record id="1230">	0.146447 0.853553 10 </record>
+<record id="1302">	0.066987 0.750000 11 </record>
+<record id="1320">	0.017037 0.629410 12 </record>
+<record id="2013">	0.000000 0.500000 12 </record>
+<record id="2031">	0.017037 0.370590 13 </record>
+<record id="2103">	0.066987 0.250000 14 </record>
+<record id="2130">	0.146447 0.146447 15 </record>
+<record id="2301">	0.250000 0.066987 17 </record>
+<record id="2310">	0.370590 0.017037 18 </record>
+<record id="3012">	0.500000 0.000000 19 </record>
+<record id="3021">	0.629409 0.017037 20 </record>
+<record id="3102">	0.750000 0.066987 21 </record>
+<record id="3120">	0.853553 0.146447 22 </record>
+<record id="3201">	0.933013 0.250000 23 </record>
+<record id="3210">	0.982963 0.370590 24 </record>
 </records>
 </data>
 
 <data name="edges">
 <records count="36">
-<record source="1" destination="2" />
-<record source="1" destination="3" />
-<record source="3" destination="4" />
-<record source="2" destination="5" />
-<record source="5" destination="6" />
-<record source="4" destination="6" />
-<record source="1" destination="7" />
-<record source="7" destination="8" />
-<record source="2" destination="8" />
-<record source="7" destination="9" />
-<record source="9" destination="10" />
-<record source="8" destination="11" />
-<record source="11" destination="12" />
-<record source="10" destination="12" />
-<record source="3" destination="13" />
-<record source="13" destination="14" />
-<record source="4" destination="14" />
-<record source="13" destination="15" />
-<record source="9" destination="15" />
-<record source="15" destination="16" />
-<record source="10" destination="16" />
-<record source="14" destination="17" />
-<record source="17" destination="18" />
-<record source="16" destination="18" />
-<record source="5" destination="19" />
-<record source="19" destination="20" />
-<record source="6" destination="20" />
-<record source="19" destination="21" />
-<record source="11" destination="21" />
-<record source="21" destination="22" />
-<record source="12" destination="22" />
-<record source="20" destination="23" />
-<record source="17" destination="23" />
-<record source="23" destination="24" />
-<record source="22" destination="24" />
-<record source="18" destination="24" />
+<record source="0123" destination="0132" />
+<record source="0123" destination="0213" />
+<record source="0213" destination="0231" />
+<record source="0132" destination="0312" />
+<record source="0312" destination="0321" />
+<record source="0231" destination="0321" />
+<record source="0123" destination="1023" />
+<record source="1023" destination="1032" />
+<record source="0132" destination="1032" />
+<record source="1023" destination="1203" />
+<record source="1203" destination="1230" />
+<record source="1032" destination="1302" />
+<record source="1302" destination="1320" />
+<record source="1230" destination="1320" />
+<record source="0213" destination="2013" />
+<record source="2013" destination="2031" />
+<record source="0231" destination="2031" />
+<record source="2013" destination="2103" />
+<record source="1203" destination="2103" />
+<record source="2103" destination="2130" />
+<record source="1230" destination="2130" />
+<record source="2031" destination="2301" />
+<record source="2301" destination="2310" />
+<record source="2130" destination="2310" />
+<record source="0312" destination="3012" />
+<record source="3012" destination="3021" />
+<record source="0321" destination="3021" />
+<record source="3012" destination="3102" />
+<record source="1302" destination="3102" />
+<record source="3102" destination="3120" />
+<record source="1320" destination="3120" />
+<record source="3021" destination="3201" />
+<record source="2301" destination="3201" />
+<record source="3201" destination="3210" />
+<record source="3120" destination="3210" />
+<record source="2310" destination="3210" />
 </records>
 </data>
 </ggobidata>
