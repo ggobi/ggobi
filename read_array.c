@@ -63,7 +63,7 @@ read_binary (FILE *fp, datad *d, ggobid *gg)
       if (out != 1) {
         g_printerr ("problem in reading the binary data file\n");
         fclose (fp);
-        exit (0);
+        (*FatalError)(1);
 
       } else if (d->raw.vals[i][j] == FLT_MAX) {
         d->raw.vals[i][j] = 0.0;
@@ -129,7 +129,7 @@ find_data_start (FILE *fp)
     {
       g_printerr ("Comment lines must begin with # or %%;\n");
       g_printerr ("I found a line beginning with '%c'\n", ch);
-      exit (1);
+      (*FatalError)(1);
     }
     else
     {
@@ -168,7 +168,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, datad *d, ggobid *gg) {
       else if (ungetc (ch, fp) == EOF || fscanf (fp, "%s", word) < 0 ) {
         g_printerr ("error in reading first row of data\n");
         fclose (fp);
-        exit (0);
+        (*FatalError)(0);
 
       } else {
 
@@ -188,7 +188,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, datad *d, ggobid *gg) {
             "This file has more than %d columns.  In order to read\n",
             MAXNCOLS);
           g_printerr ("it in, increase MAXNCOLS in defines.h and recompile.\n");
-          exit (0);
+          (*FatalError)(0);
         }
       }
     }
@@ -311,10 +311,10 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
     g_printerr ("read_ascii: nrows*ncols != nitems read\n");
     g_printerr ("(nrows= %d, ncols= %d, nitems read= %d)\n",
       d->nrows, d->ncols, nitems);
-    exit (0);
+    (*FatalError)(0);
   } else if (nitems == 0) {
     g_printerr ("No data was read\n");
-    exit (0);
+    (*FatalError)(0);
   }
   else {  /*-- nitems ok --*/
     /*

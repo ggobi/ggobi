@@ -207,7 +207,7 @@ collabels_process_word (gchar *word, gint field, gint j, datad *d)
     default:
       /*-- bail out: too many fields --*/
       g_printerr ("Too many fields in row %d of collab file\n", j+1);
-      exit (1);
+      (*FatalError)(1);
   }
 }
 

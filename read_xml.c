@@ -609,7 +609,7 @@ void endXMLElement(void *user_data, const xmlChar *name)
       if (data->current_record < d->nrows) {
         g_printerr ("There are fewer records than declared for '%s'; exiting.\n",
           d->name);
-        exit(101);
+        (*FatalError)(101);
       }
     }
     break;
@@ -844,7 +844,7 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
 
   if (tmp == NULL) {
     g_printerr ("No count attribute\n");
-    exit(101);
+    (*FatalError)(101);
   }
 
   d->nrows = strToInteger(tmp);
@@ -1037,7 +1037,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
     if (value == UNKNOWN_GLYPH) {
      if(tmp[0] < '0' || tmp[0] > '6') {
        g_printerr ("%s is an illegal value for glyphType; it must be on [0,6]\n", tmp);
-       exit(101);
+       (*FatalError)(101);
      }
 
      value = strToInteger(tmp);
@@ -1408,7 +1408,7 @@ allocVariables (const xmlChar **attrs, XMLParserData *data)
 
   if(tmp == NULL) {
     g_printerr ("No count for variables attribute\n");
-    exit(101);
+    (*FatalError)(101);
   }
 
   d->ncols = strToInteger(tmp);
@@ -1896,7 +1896,7 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   if (i == d->nrows) {
     g_printerr ("There are more records than declared for '%s'; exiting.\n",
       d->name);
-    exit(101);
+    (*FatalError)(101);
   }
 
   data->current_element = 0;
