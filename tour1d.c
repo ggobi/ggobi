@@ -281,6 +281,7 @@ tour1d_all_vars_cb (GtkCheckMenuItem *w, guint action)
     dsp->t1d.get_new_target = true;
     zero_tau(dsp->t1d.tau, 1);
     varcircles_visibility_set (dsp, gg);
+    varpanel_refresh (dsp, gg);
 
     if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
       free_optimize0_p(&dsp->t1d_pp_op);

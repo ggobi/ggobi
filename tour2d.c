@@ -284,6 +284,7 @@ tour2d_all_vars_cb (GtkCheckMenuItem *w, guint action)
     dsp->t2d.get_new_target = true;
     zero_tau(dsp->t2d.tau, 2);
     varcircles_visibility_set (dsp, gg);
+    varpanel_refresh (dsp, gg);
 
     if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
       free_optimize0_p(&dsp->t2d_pp_op);
