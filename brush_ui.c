@@ -485,7 +485,7 @@ cpanel_brush_set (cpaneld *cpanel, ggobid *gg) {
   GtkWidget *pnl = gg->control_panel[BRUSH];
 
   btn = widget_find_by_name (pnl, "BRUSH:brush_on_button");
-  GTK_TOGGLE_BUTTON (btn)->active = cpanel->brush_on_p;
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->brush_on_p);
 
   w = widget_find_by_name (pnl, "BRUSH:mode_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->br_mode);
