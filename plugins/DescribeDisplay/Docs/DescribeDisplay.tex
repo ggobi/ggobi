@@ -1,0 +1,59 @@
+\documentclass[11pt]{article}
+\usepackage{graphics}
+
+\begin{document}
+
+\title{DescribeDisplay plugin for {\tt ggobi}}
+\author{Deborah F. Swayne and Di Cook}
+\maketitle
+
+\section{Output}
+
+On the ``Tools'' menu select ``Save Display Description''. This brings
+up the panel:
+
+\bigskip
+\centerline{\pdfimage width 2.5in {DescribeDisplay.jpg}}
+\bigskip
+
+Saving the display generates output that can be read into R (or
+Splus). For example, the 2D tour window prints out as follows:
+
+\begin{verbatim}
+display = list(colormap = list(name='Set1 9',
+ncolors=9,
+type=3,
+system='rgb',
+backgroundColor = c(0.000,0.000,0.000),
+hiddenColor = c(0.300,0.300,0.300),
+accentColor = c(1.000,1.000,1.000),
+foregroundColors = list(c(1.000,1.000,0.200),...),
+title='NCI tour 1',type='scatterplot',nplots=1,
+plots = list(list(type='scatterplot',projection='2D Tour',scale=c(0.700, 0.700),
+tformLims=c(xmin=0.000, xmax=0.000, ymin=0.000, ymax=0.000),
+planarLims=c(xmin=-19924.561, xmax=27163.439, ymin=19924.561, ymax=-19924.561),
+points = list(index = c(0,1,2,3,...)
+x = c(7133.96,9223.29,6434.39,10577.8,...)
+y = c(-10675.4,-8255.06,-10565.8,-12073,...)
+color = c(0,0,0,0,...)
+glyphtype = c(6,6,6,6,...)
+glyphsize = c(1,1,1,1,...)
+hidden = c(0,0,0,0,...)
+),
+tour2dparams = list(F = c(0.011,-0.172,-0.019,...))
+showMissing=1,showPoints=1,showDirectedEdges=0,
+  showUndirectedEdges=0,showArrowheads=0,)
+\end{verbatim}
+
+\section{Using R}
+
+The file can be read directly into R using: 
+
+\verb#plot1<-source(filename)#
+
+\noindent and elements accessed with commands such as:
+
+\verb#F1<-matrix(plot1$value$plots[[1]]$tour2dparams$F,ncol=2,byrow=F)#
+
+
+\end{document}
