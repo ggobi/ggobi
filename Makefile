@@ -222,7 +222,7 @@ pure: ggobi.o $(OB) $(EXTRA_OB)
 	#`gtk-config --cflags --libs` \
 
 %.sched: %.c
-	$(CC) -dS -c $(CFLAGS) -I. `gtk-config --cflags` $*.c
+	$(CC) -dS -c $(CFLAGS) -I. $(GTK_CFLAGS) $*.c
 
 ggobi.sched: $(OB)
 	$(CC) -S $(OB) $(LDFLAGS)  $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --cflags --libs`
@@ -232,11 +232,11 @@ mt19937ar.o: mt19937ar.c
 
 efence: $(OB)
 	MALLOC_CHECK_=2
-	$(CC) $(OB) $(LDFLAGS) $(EFENCE_LIBS) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --cflags --libs`
+	$(CC) $(OB) $(LDFLAGS) $(EFENCE_LIBS) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) $(GTK_LIBS)
 
 lib: libggobi.so
 libggobi.so: $(OB)
-	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --libs` $(DL_RESOLVE_PATH)
+	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) $(GTK_LIBS) $(DL_RESOLVE_PATH)
 
 
 ggobi-API.o ggobi.o: config.h
@@ -262,7 +262,7 @@ clean:
 
 ifdef DEPENDS_FLAG
 depends: $(SRC)
-	$(CC) $(DEPENDS_FLAG) $(CFLAGS) -I. `gtk-config --cflags` $(SRC) > $@	
+	$(CC) $(DEPENDS_FLAG) $(CFLAGS) -I. $(GTK_CFLAGS) $(SRC) > $@	
 
 include depends
 
