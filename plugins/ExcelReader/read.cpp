@@ -60,7 +60,11 @@ ExcelDataDescription(const char * const fileName, const char * const modeName,
                              ggobid *gg, GGobiPluginInfo *info)
 {
   InputDescription *desc;
- 
+
+#ifdef DEBUG_EXCEL_PLUGIN
+  fprintf(stderr, "Looking for %s in excel reader\n", fileName);fflush(stderr);
+#endif
+
   if(!fileName || !fileName[0]) {
     fprintf(stderr, "No file name specified for the ExcelReader plugin to read.\n"); fflush(stderr);
     return(NULL);
@@ -104,6 +108,11 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
 
   IDispatch *iface;
 
+
+#ifdef DEBUG_EXCEL_PLUGIN
+  fprintf(stderr, "Reading file %s\n", fileName);fflush(stderr);
+#endif
+
   hr = CLSIDFromString(L"Excel.Application", &classID);
   
   if(FAILED(hr)) {
@@ -141,29 +150,6 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
 
   s = call(books, L"Open", v, 1);
 
-#if 0
-  getProperty(s, L"ActiveSheet", v = &vars[2]);
-    sheet = V_DISPATCH(v);  
-
-  getProperty(sheet, L"UsedRange", v = &vars[3]);
-    cells = V_DISPATCH(v);
-  getProperty(cells, L"Value", v = &vars[4]);
-
-  datad *d = createDataset(v, gg);
-  d->name = g_strdup(fileName);
-
-  releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), 0);
-
-  call(s, L"Close", NULL, 0);
-#ifdef DEBUG_EXCEL_PLUGIN
-  fprintf(stderr, "Closed() the sheet\n"); fflush(stderr);
-#endif
-
-  cells->Release();
-  sheet->Release();
-  s->Release();
-  releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), true);
-#else
 
   getProperty(s, L"Sheets", v = &vars[2]);
   IDispatch *sheets = V_DISPATCH(v); 
@@ -198,7 +184,7 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   sheets->Release();
   releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), false);
   call(s, L"Close", NULL, 0);
-#endif
+
 
 #ifdef DEBUG_EXCEL_PLUGIN
   fprintf(stderr, "Releasing books\n");fflush(stderr);
@@ -361,12 +347,43 @@ setLevels(vartabled *var, GHashTable *levels, int numLevels)
   g_hash_table_foreach(levels, (GHFunc) setLevel, &tmp);
 }
 
+gboolean
+readRowNames(SAFEARRAY *arr, gboolean hasColNames, long dim[2][2], datad *d)
+{
+  long indices[2];
+  VARIANT value;
+  int i, ctr = 0;
+
+    indices[1] = dim[1][0];
+    for(i = dim[0][0] + (hasColNames ? 1 : 0), ctr = 0;  i <= dim[0][1]; i++, ctr++) {
+      char *str;
+      indices[0] = i;
+#ifdef DEBUG_EXCEL_PLUGIN
+      fprintf(stderr, "%d %d    %d %d\n", i, ctr, (int)indices[0], (int)indices[1]);fflush(stderr);
+#endif
+      SafeArrayGetElement(arr, indices, &value);
+#ifdef DEBUG_EXCEL_PLUGIN
+      fprintf(stderr, "Type %d\n", (int) V_VT(&value));fflush(stderr);
+#endif
+      if(V_VT(&value) == VT_BSTR) {
+        str = g_strdup(FromBstr(V_BSTR(&value)));
+#ifdef DEBUG_EXCEL_PLUGIN
+        fprintf(stderr, "Row name %d %s\n", ctr, str);fflush(stderr);
+#endif
+	g_array_insert_val(d->rowlab, ctr, str);      
+      }
+      VariantClear(&value);
+    }
+
+  return(true);
+}
+
 datad *
 createDataset(VARIANT *var, ggobid *gg)
 {
   SAFEARRAY *arr;
   VARIANT value;
-  gboolean hasColNames = true;
+  gboolean hasColNames = true, hasRowNames = false;
   vartabled *variable;
   GHashTable *levels = NULL;
   int numLevels;
@@ -398,6 +415,7 @@ createDataset(VARIANT *var, ggobid *gg)
   fprintf(stderr, "Dimensions: %d %d %d %d\n", 
 	  (int) dim[0][0], (int) dim[0][1],
 	  (int) dim[1][0], (int) dim[1][1]);fflush(stderr);
+
 #endif
 
     /* Degenerate/empty range. */
@@ -408,29 +426,56 @@ createDataset(VARIANT *var, ggobid *gg)
   indices[0] = dim[0][0];
   indices[1] = dim[1][0];
   SafeArrayGetElement(arr, indices, &value);
-  hasColNames = (V_VT(&value) == VT_BSTR);
+
+  if(V_VT(&value) == VT_EMPTY)
+    hasRowNames = true;
+  else
+    hasColNames = (V_VT(&value) == VT_BSTR);
   VariantClear(&value);
 
+  if(hasRowNames == false) {
+    /* Check */
+    indices[1]++;
+    SafeArrayGetElement(arr, indices, &value);
+    hasColNames = (V_VT(&value) == VT_BSTR);
+    VariantClear(&value);    
+  }
+
   int nrow = dim[0][1] - dim[0][0] + (hasColNames ? 0 : 1);
-  int ncol =  dim[1][1] - dim[1][0] + 1;
+  int ncol =  dim[1][1] - dim[1][0] + 1 - (hasRowNames ? 1 : 0);
 
   d = datad_create(nrow, ncol, gg);
 
-  /* Loop over columns. */
-  for(j = dim[1][0], col = 0;  j <= dim[1][1]; j++, col++) {
+#ifdef DEBUG_EXCEL_PLUGIN
+  fprintf(stderr, "Has row names? %d, column names? %d. Start = %d\n", 
+	       hasRowNames, hasColNames, dim[0][0] + (hasColNames ? 1 : 0));
+  fflush(stderr);
+#endif
+
+  if(hasRowNames)
+    readRowNames(arr, hasColNames, dim, d);
+
+#ifdef DEBUG_EXCEL_PLUGIN
+  fprintf(stderr, "Doing values\n");fflush(stderr);
+#endif
+
+    /* Loop over columns. */
+  for(j = dim[1][0] + (hasRowNames ? 1 : 0), col = 0;  j <= dim[1][1]; j++, col++) {
     variable = vartable_element_get (col, d);
-    
     indices[1] =j;
+
     for(ctr = 0, i = dim[0][0] + 1; i <= dim[0][1]; i++, ctr++) {
-      indices[0] =i;
+      indices[0] = i;
+      //      fprintf(stderr, "%d %d    %d %d\n", ctr, col, (int)indices[0], (int)indices[1]);fflush(stderr);
       SafeArrayGetElement(arr, indices, &value);
       if(V_VT(&value) == VT_VOID) {
-	/* This doesn't work. Instead we get a value of 0.00, not VT_VOID */
+  	   /* This doesn't work. Instead we get a value of 0.00, not VT_VOID */
 	fprintf(stderr, "Missing value %d, %d\n", ctr+1, col+1);fflush(stderr);
 	d->raw.vals[ctr][col] = -1.0;
       } else if(isVTNumber(&value)) {
         d->raw.vals[ctr][col] = asReal(&value);
       } else if(V_VT(&value) == VT_BSTR) {
+	/* String value so we are dealing with a categorical variable. */
 	gpointer ptr;
 	int *val;
 	gchar *str;
@@ -470,6 +515,7 @@ createDataset(VARIANT *var, ggobid *gg)
       VariantClear(&value);
     }
 
+    /* If the levels table is non-NULL, then we transfer them to the variable. */
     if(levels) {
       setLevels(variable, levels, numLevels);
       g_hash_table_foreach(levels, freeLevelHashEntry, NULL);
@@ -477,24 +523,53 @@ createDataset(VARIANT *var, ggobid *gg)
       levels = NULL;
     }
 
+       /* Get the name for this column */
     gchar *varName = NULL;
     if(hasColNames) {
       indices[0] = dim[0][0];
-      indices[1] = col; // dim[0][0];
+      indices[1] = j;
+#ifdef DEBUG_EXCEL_PLUGIN
+      fprintf(stderr, "Getting name %d %d    %d %d\n", j, col, (int)indices[0], (int)indices[1]);fflush(stderr);
+#endif
       SafeArrayGetElement(arr, indices, &value);
       if(V_VT(&value) == VT_BSTR)
          varName = g_strdup(FromBstr(V_BSTR(&value)));
 
       VariantClear(&value);
     }
-
+    
+    /* May not have gotten anything, so do this even if hasColNames is true. */
     if(!varName)
       varName = g_strdup_printf("Var %d", col+1);
 
     GGOBI(setVariableName)(col, varName, false, d, gg);
+#ifdef DEBUG_EXCEL_PLUGIN
+    fprintf(stderr, "Set name %s\n",  varName);fflush(stderr);
+#endif
   }
 
+#ifdef DEBUG_EXCEL_PLUGIN
+  fprintf(stderr, "Finished values\n");fflush(stderr);
+#endif
+
   datad_init(d, gg, 0);
+
+  if(!hasRowNames) {
+    //    datad_record_ids_set(d, NULL, true);
+    char buf[10], *str;
+    for(i = 0; i < d->nrows; i++) {
+        sprintf(buf, "%d", i+1);
+        str = g_strdup(buf);
+	g_array_insert_val(d->rowlab, i, str);            
+    }
+  }
+
+#ifdef DEBUG_EXCEL_PLUGIN
+  fprintf(stderr, "id table %p, row ids %p\n", d->idTable, d->rowIds);fflush(stderr);
+  for(i = 0; i < d->nrows; i++)
+    fprintf(stderr, "%d %s\n", i, d->rowIds[i]);fflush(stderr);    
+#endif
+
 
   SafeArrayDestroyData(arr);
 

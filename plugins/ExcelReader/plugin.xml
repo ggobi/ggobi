@@ -29,7 +29,7 @@
   </footnote>. If the data came to be in Excel
   from a database query, or some other input mechanism such as from a
   URL, there need be no local file.
-
+  Additionally, we can read multiple datasets, one per worksheet.
  <para/>
 
 Examples for other input sources include ADO, OIM files from MSSQL and
