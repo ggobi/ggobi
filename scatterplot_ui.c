@@ -94,16 +94,20 @@ scatterplot_display_edge_menu_update (displayd *display,
 {
   datad *d = display->d;  /*-- this dataset --*/
   gint nd = g_slist_length (gg->d);
-  datad *e;
+  datad *e, *onlye;
   gint k, ne = 0;
   GtkWidget *item;
+  GtkWidget *submenu, *anchor;
+  gchar *lbl;
 
   /*-- If this datad has ids, find the number of other datad's with edges --*/
   if (d->rowIds) {
     for (k=0; k<nd; k++) { 
       e = (datad*) g_slist_nth_data (gg->d, k);
-      if (/* e != d && */ e->edge.n > 0)
+      if (/* e != d && */ e->edge.n > 0) {
         ne++;
+        onlye = e;  /* meaningful if there's only one */
+      }
     }
   }
 
@@ -132,13 +136,23 @@ scatterplot_display_edge_menu_update (displayd *display,
     /*-- build the menu --*/
     display->edge_menu = gtk_menu_new ();
 
+    /*-- when there's only one edge set, indicate that on the menu
+         with an inactive menu item naming the edge set --*/
+    if (ne == 1) {
+      lbl = g_strdup_printf ("Select edge set (%s)", onlye->name);
+      item = CreateMenuItem (display->edge_menu, lbl,
+        NULL, NULL, NULL, gg->main_accel_group,
+        NULL, NULL, gg);
+      gtk_widget_set_sensitive (item, false);
+      g_free (lbl);
+    }
+
     /*-- if there's only one edge set, there's no need for this menu --*/
-    if (ne > 1) {  /*-- add cascading menu --*/
-      GtkWidget *submenu, *anchor;
-      gchar *lbl;
+    else if (ne > 1) {  /*-- add cascading menu --*/
 
       submenu = gtk_menu_new ();
-      anchor = CreateMenuItem (display->edge_menu, "Select edge set",
+      anchor = CreateMenuItem (display->edge_menu,
+       "Select edge set",
         NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
 
       for (k=0; k<nd; k++) { 
