@@ -1,3 +1,12 @@
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{pstricks}
+\input{pst-beta}
+\input{WebMacros}
+\input{CMacros}
+
+\begin{document}
+
 
 This describes the basic setup for embedding GGobi/XGobi in another
 application.  It relates specifically to R and S, but should be of
@@ -61,7 +70,7 @@ the R input source management.
 \end{verbatim}
 The routine is registered for the file descriptor computed from
 \CPPMacro{ConnectionNumber} called with the value of
-\Cvariable{gdk_display}. This latter variable is available by
+\CVariable{gdk_display}. This latter variable is available by
 including \file{gdk/gdkx.h}. ({\red Something will need to be done for
 windows.})
 
@@ -272,10 +281,10 @@ implement this approach.
 
 \section{Resetting the data}
 
-Change vardata_init to set the group identifier to 0.
+Change \Escape{vardata_init} to set the group identifier to 0.
 
 
-Need to change dataset_init to make certain that there is only
+Need to change \Escape{dataset_init} to make certain that there is only
 one display in the list when this is finished..
 
 
@@ -301,31 +310,4 @@ variables involved.
 we set the active plot.}
 
 
-\section{}
-
-
-\section{API Routines}
-
-\subsection{getData}
-Since the user can load data in a non-programmatic way, there is an
-opportunity for XGobi to have data that has not been introduced to the
-R/S session.  As a result, we need a mechanism to retrieve the current
-values of the active data set.  This is especially important if we
-allow the data to be edited in any way.
-
-The return value is a matrix of numeric values containing the data
-values.  The names of the rows and columns are the XGobi row labels
-and variable names respectively.
-
-
-\subsection{getColors}
-
-
-\subsection{set}
-
-\subsection{getGlyphs}
-
-
-\subsection{getSelectedIndices}
-This needs attention to access the correct
-variable in the xgobi structure.
+\end{document}

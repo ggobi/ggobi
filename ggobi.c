@@ -159,7 +159,8 @@ gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents);
 
 gint main (gint argc, gchar *argv[])
 { 
- return (GGOBI(main)(argc, argv, true));
+ GGOBI(main)(argc, argv, true);
+ return (0);
 }
 
 
@@ -196,8 +197,6 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
   GdkVisual *vis;
   ggobid *gg;
 
-/*  g_thread_init (NULL);*/
-
   gtk_init (&argc, &argv);
 
   vis = gdk_visual_get_system ();
@@ -221,12 +220,5 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
   make_ggobi (gg->data_in, processEvents, gg);
 
   g_free (gg->data_in);
-  return (0);
+ return (num_ggobis);
 }
-
-
-
-
-
-
-

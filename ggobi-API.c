@@ -10,6 +10,8 @@
 #include "externs.h"
 #include "display.h"
 
+ extern const gchar *GlyphNames[];
+
 void warning(const char *msg);
 
 void GGOBI(displays_release)(ggobid *gg);
@@ -413,9 +415,25 @@ warning(const char *msg)
 gint *
 GGOBI(getGlyphTypes)(int *n)
 {
+ static gint *glyphIds = NULL;
+ *n = UNKNOWN_GLYPH-1; /* -1 since we start at 1 */
 
+  if(glyphIds == NULL){
+   int i;
+   glyphIds = (gint*) g_malloc(*n* sizeof(gint));
+   for(i = 0; i < *n ; i++) {
+    glyphIds[i] = mapGlyphName(GlyphNames[i]);
+   }
+  }
 
- return(NULL);
+ return(glyphIds);
+}
+
+const gchar **const
+GGOBI(getGlyphTypeNames)(int *n)
+{
+  *n = UNKNOWN_GLYPH-1; /* -1 since we start at 1 */
+  return(GlyphNames);
 }
 
 
@@ -423,7 +441,7 @@ gchar const*
 GGOBI(getGlyphTypeName)(int type)
 {
  gchar const *ans;
-  ans = "Foo";
+  ans = GlyphNames[type-1];
 
  return(ans);
 }
@@ -638,4 +656,12 @@ GGOBI(getPlot)(displayd *display, int which)
 {
   splotd *sp = (splotd *) g_list_nth_data(display->splots, which);
   return(sp);
+}
+
+
+int
+GGOBI(getNumGGobis)()
+{
+ extern int num_ggobis;
+ return(num_ggobis);
 }

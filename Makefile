@@ -88,7 +88,7 @@ dm: $(OB)
 # No gthread here in the call to gtk-config.
 # R is not compiled for threads.
 libGGobi.so: $(OB)
-	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) `gtk-config --libs`
+	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --libs`
 
 clean: 
 	rm -f *.o ggobi libGGobi.so
