@@ -247,10 +247,14 @@ writeall_window_open (ggobid *gg) {
     populate_option_menu (opt, edges_lbl,
       sizeof (edges_lbl) / sizeof (gchar *),
       (GtkSignalFunc) edgesp_set_cb, "GGobi", gg);
+    /*-- initialize variable corresponding to option menu --*/
+    /*
+     * This is pretty simple-minded:  if any edgesets are present,
+     * let the default be to save edges.  Otherwise not.
+     */
+    gg->save.edges_p = (edgesets_count(gg) > 0);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
-      false);
-    /*-- initialize variable to correspond to option menu --*/
-    gg->save.edges_p = false;
+      gg->save.edges_p);
 
     gtk_table_attach (GTK_TABLE (table),
       gtk_label_new ("Edges?:"),

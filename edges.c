@@ -281,7 +281,23 @@ edge_endpoints_get (gint k, gint *a, gint *b, datad *d, endpointsd *endpoints, d
   return ok;
 }
 
-/*****************************************************************************************/
+gint
+edgesets_count (ggobid *gg)
+{
+  gint k, ne = 0;
+  gint nd = g_slist_length (gg->d);
+  datad *e;
+
+  for (k=0; k<nd; k++) { 
+    e = (datad*) g_slist_nth_data (gg->d, k);
+    if (e->edge.n > 0)
+      ne++;
+  }
+
+  return ne;
+}
+
+/******************************************************************************/
 
 /* A constant used to identify that we have resolved the edgepoints and there were none. */
 static endpointsd DegenerateEndpoints;
