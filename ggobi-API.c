@@ -167,7 +167,7 @@ GGOBI(destroyCurrentDisplay)(ggobid *gg)
 void
 GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
                 gint nr, gint nc, datad *d, gboolean cleanup, ggobid *gg,
-                int *ids,  InputDescription *desc)
+                long *ids,  InputDescription *desc)
 {
   gint i, j;
   gchar *lbl;
@@ -203,10 +203,10 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   arrayf_alloc(&d->raw, nr, nc);
 
   if(ids) {
-      rowids_alloc(d);
-      for(j = 0; j < nr; j++) {
-	  d->rowid.id.els[j] = ids[j];
-      }
+    rowids_alloc(d);
+    for(j = 0; j < nr; j++) {
+      d->rowid.id.els[j] = (gint) ids[j];
+    }
   }
 
   rowlabels_alloc (d, gg);
@@ -219,7 +219,6 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
 
   br_color_ids_alloc (d, gg);
   br_color_ids_init (d, gg);
-
 
   hidden_alloc (d);
 
