@@ -53,8 +53,7 @@
 <variables count="1">
   <realvariable name="D" />
 </variables>
-<records count="1296">
-<record source="1" destination="1"> 0 </record>
+<records count="1260">
 <record source="1" destination="2"> 167 </record>
 <record source="1" destination="3"> 169 </record>
 <record source="1" destination="4"> 159 </record>
@@ -91,7 +90,6 @@
 <record source="1" destination="35"> 178 </record>
 <record source="1" destination="36"> 174 </record>
 <record source="2" destination="1"> 167 </record>
-<record source="2" destination="2"> 0 </record>
 <record source="2" destination="3"> 96 </record>
 <record source="2" destination="4"> 79 </record>
 <record source="2" destination="5"> 163 </record>
@@ -128,7 +126,6 @@
 <record source="2" destination="36"> 171 </record>
 <record source="3" destination="1"> 169 </record>
 <record source="3" destination="2"> 96 </record>
-<record source="3" destination="3"> 0 </record>
 <record source="3" destination="4"> 141 </record>
 <record source="3" destination="5"> 166 </record>
 <record source="3" destination="6"> 115 </record>
@@ -165,7 +162,6 @@
 <record source="4" destination="1"> 159 </record>
 <record source="4" destination="2"> 79 </record>
 <record source="4" destination="3"> 141 </record>
-<record source="4" destination="4"> 0 </record>
 <record source="4" destination="5"> 172 </record>
 <record source="4" destination="6"> 136 </record>
 <record source="4" destination="7"> 100 </record>
@@ -202,7 +198,6 @@
 <record source="5" destination="2"> 163 </record>
 <record source="5" destination="3"> 166 </record>
 <record source="5" destination="4"> 172 </record>
-<record source="5" destination="5"> 0 </record>
 <record source="5" destination="6"> 183 </record>
 <record source="5" destination="7"> 182 </record>
 <record source="5" destination="8"> 171 </record>
@@ -239,7 +234,6 @@
 <record source="6" destination="3"> 115 </record>
 <record source="6" destination="4"> 136 </record>
 <record source="6" destination="5"> 183 </record>
-<record source="6" destination="6"> 0 </record>
 <record source="6" destination="7"> 156 </record>
 <record source="6" destination="8"> 116 </record>
 <record source="6" destination="9"> 170 </record>
@@ -276,7 +270,6 @@
 <record source="7" destination="4"> 100 </record>
 <record source="7" destination="5"> 182 </record>
 <record source="7" destination="6"> 156 </record>
-<record source="7" destination="7"> 0 </record>
 <record source="7" destination="8"> 163 </record>
 <record source="7" destination="9"> 172 </record>
 <record source="7" destination="10"> 135 </record>
@@ -313,7 +306,6 @@
 <record source="8" destination="5"> 171 </record>
 <record source="8" destination="6"> 116 </record>
 <record source="8" destination="7"> 163 </record>
-<record source="8" destination="8"> 0 </record>
 <record source="8" destination="9"> 158 </record>
 <record source="8" destination="10"> 157 </record>
 <record source="8" destination="11"> 158 </record>
@@ -350,7 +342,6 @@
 <record source="9" destination="6"> 170 </record>
 <record source="9" destination="7"> 172 </record>
 <record source="9" destination="8"> 158 </record>
-<record source="9" destination="9"> 0 </record>
 <record source="9" destination="10"> 171 </record>
 <record source="9" destination="11"> 174 </record>
 <record source="9" destination="12"> 154 </record>
@@ -387,7 +378,6 @@
 <record source="10" destination="7"> 135 </record>
 <record source="10" destination="8"> 157 </record>
 <record source="10" destination="9"> 171 </record>
-<record source="10" destination="10"> 0 </record>
 <record source="10" destination="11"> 127 </record>
 <record source="10" destination="12"> 110 </record>
 <record source="10" destination="13"> 162 </record>
@@ -424,7 +414,6 @@
 <record source="11" destination="8"> 158 </record>
 <record source="11" destination="9"> 174 </record>
 <record source="11" destination="10"> 127 </record>
-<record source="11" destination="11"> 0 </record>
 <record source="11" destination="12"> 117 </record>
 <record source="11" destination="13"> 154 </record>
 <record source="11" destination="14"> 156 </record>
@@ -461,7 +450,6 @@
 <record source="12" destination="9"> 154 </record>
 <record source="12" destination="10"> 110 </record>
 <record source="12" destination="11"> 117 </record>
-<record source="12" destination="12"> 0 </record>
 <record source="12" destination="13"> 168 </record>
 <record source="12" destination="14"> 169 </record>
 <record source="12" destination="15"> 153 </record>
@@ -498,7 +486,6 @@
 <record source="13" destination="10"> 162 </record>
 <record source="13" destination="11"> 154 </record>
 <record source="13" destination="12"> 168 </record>
-<record source="13" destination="13"> 0 </record>
 <record source="13" destination="14"> 68 </record>
 <record source="13" destination="15"> 167 </record>
 <record source="13" destination="16"> 164 </record>
@@ -535,7 +522,6 @@
 <record source="14" destination="11"> 156 </record>
 <record source="14" destination="12"> 169 </record>
 <record source="14" destination="13"> 68 </record>
-<record source="14" destination="14"> 0 </record>
 <record source="14" destination="15"> 166 </record>
 <record source="14" destination="16"> 161 </record>
 <record source="14" destination="17"> 173 </record>
@@ -572,7 +558,6 @@
 <record source="15" destination="12"> 153 </record>
 <record source="15" destination="13"> 167 </record>
 <record source="15" destination="14"> 166 </record>
-<record source="15" destination="15"> 0 </record>
 <record source="15" destination="16"> 111 </record>
 <record source="15" destination="17"> 120 </record>
 <record source="15" destination="18"> 151 </record>
@@ -609,7 +594,6 @@
 <record source="16" destination="13"> 164 </record>
 <record source="16" destination="14"> 161 </record>
 <record source="16" destination="15"> 111 </record>
-<record source="16" destination="16"> 0 </record>
 <record source="16" destination="17"> 80 </record>
 <record source="16" destination="18"> 118 </record>
 <record source="16" destination="19"> 164 </record>
@@ -646,7 +630,6 @@
 <record source="17" destination="14"> 173 </record>
 <record source="17" destination="15"> 120 </record>
 <record source="17" destination="16"> 80 </record>
-<record source="17" destination="17"> 0 </record>
 <record source="17" destination="18"> 159 </record>
 <record source="17" destination="19"> 182 </record>
 <record source="17" destination="20"> 180 </record>
@@ -683,7 +666,6 @@
 <record source="18" destination="15"> 151 </record>
 <record source="18" destination="16"> 118 </record>
 <record source="18" destination="17"> 159 </record>
-<record source="18" destination="18"> 0 </record>
 <record source="18" destination="19"> 149 </record>
 <record source="18" destination="20"> 177 </record>
 <record source="18" destination="21"> 117 </record>
@@ -720,7 +702,6 @@
 <record source="19" destination="16"> 164 </record>
 <record source="19" destination="17"> 182 </record>
 <record source="19" destination="18"> 149 </record>
-<record source="19" destination="19"> 0 </record>
 <record source="19" destination="20"> 176 </record>
 <record source="19" destination="21"> 82 </record>
 <record source="19" destination="22"> 153 </record>
@@ -757,7 +738,6 @@
 <record source="20" destination="17"> 180 </record>
 <record source="20" destination="18"> 177 </record>
 <record source="20" destination="19"> 176 </record>
-<record source="20" destination="20"> 0 </record>
 <record source="20" destination="21"> 175 </record>
 <record source="20" destination="22"> 177 </record>
 <record source="20" destination="23"> 174 </record>
@@ -794,7 +774,6 @@
 <record source="21" destination="18"> 117 </record>
 <record source="21" destination="19"> 82 </record>
 <record source="21" destination="20"> 175 </record>
-<record source="21" destination="21"> 0 </record>
 <record source="21" destination="22"> 96 </record>
 <record source="21" destination="23"> 126 </record>
 <record source="21" destination="24"> 155 </record>
@@ -831,7 +810,6 @@
 <record source="22" destination="19"> 153 </record>
 <record source="22" destination="20"> 177 </record>
 <record source="22" destination="21"> 96 </record>
-<record source="22" destination="22"> 0 </record>
 <record source="22" destination="23"> 141 </record>
 <record source="22" destination="24"> 109 </record>
 <record source="22" destination="25"> 130 </record>
@@ -868,7 +846,6 @@
 <record source="23" destination="20"> 174 </record>
 <record source="23" destination="21"> 126 </record>
 <record source="23" destination="22"> 141 </record>
-<record source="23" destination="23"> 0 </record>
 <record source="23" destination="24"> 134 </record>
 <record source="23" destination="25"> 126 </record>
 <record source="23" destination="26"> 139 </record>
@@ -905,7 +882,6 @@
 <record source="24" destination="21"> 155 </record>
 <record source="24" destination="22"> 109 </record>
 <record source="24" destination="23"> 134 </record>
-<record source="24" destination="24"> 0 </record>
 <record source="24" destination="25"> 85 </record>
 <record source="24" destination="26"> 116 </record>
 <record source="24" destination="27"> 146 </record>
@@ -942,7 +918,6 @@
 <record source="25" destination="22"> 130 </record>
 <record source="25" destination="23"> 126 </record>
 <record source="25" destination="24"> 85 </record>
-<record source="25" destination="25"> 0 </record>
 <record source="25" destination="26"> 108 </record>
 <record source="25" destination="27"> 125 </record>
 <record source="25" destination="28"> 101 </record>
@@ -979,7 +954,6 @@
 <record source="26" destination="23"> 139 </record>
 <record source="26" destination="24"> 116 </record>
 <record source="26" destination="25"> 108 </record>
-<record source="26" destination="26"> 0 </record>
 <record source="26" destination="27"> 133 </record>
 <record source="26" destination="28"> 142 </record>
 <record source="26" destination="29"> 134 </record>
@@ -1016,7 +990,6 @@
 <record source="27" destination="24"> 146 </record>
 <record source="27" destination="25"> 125 </record>
 <record source="27" destination="26"> 133 </record>
-<record source="27" destination="27"> 0 </record>
 <record source="27" destination="28"> 48 </record>
 <record source="27" destination="29"> 139 </record>
 <record source="27" destination="30"> 160 </record>
@@ -1053,7 +1026,6 @@
 <record source="28" destination="25"> 101 </record>
 <record source="28" destination="26"> 142 </record>
 <record source="28" destination="27"> 48 </record>
-<record source="28" destination="28"> 0 </record>
 <record source="28" destination="29"> 57 </record>
 <record source="28" destination="30"> 132 </record>
 <record source="28" destination="31"> 164 </record>
@@ -1090,7 +1062,6 @@
 <record source="29" destination="26"> 134 </record>
 <record source="29" destination="27"> 139 </record>
 <record source="29" destination="28"> 57 </record>
-<record source="29" destination="29"> 0 </record>
 <record source="29" destination="30"> 100 </record>
 <record source="29" destination="31"> 123 </record>
 <record source="29" destination="32"> 107 </record>
@@ -1127,7 +1098,6 @@
 <record source="30" destination="27"> 160 </record>
 <record source="30" destination="28"> 132 </record>
 <record source="30" destination="29"> 100 </record>
-<record source="30" destination="30"> 0 </record>
 <record source="30" destination="31"> 68 </record>
 <record source="30" destination="32"> 109 </record>
 <record source="30" destination="33"> 127 </record>
@@ -1164,7 +1134,6 @@
 <record source="31" destination="28"> 164 </record>
 <record source="31" destination="29"> 123 </record>
 <record source="31" destination="30"> 68 </record>
-<record source="31" destination="31"> 0 </record>
 <record source="31" destination="32"> 119 </record>
 <record source="31" destination="33"> 139 </record>
 <record source="31" destination="34"> 160 </record>
@@ -1201,7 +1170,6 @@
 <record source="32" destination="29"> 107 </record>
 <record source="32" destination="30"> 109 </record>
 <record source="32" destination="31"> 119 </record>
-<record source="32" destination="32"> 0 </record>
 <record source="32" destination="33"> 43 </record>
 <record source="32" destination="34"> 133 </record>
 <record source="32" destination="35"> 163 </record>
@@ -1238,7 +1206,6 @@
 <record source="33" destination="30"> 127 </record>
 <record source="33" destination="31"> 139 </record>
 <record source="33" destination="32"> 43 </record>
-<record source="33" destination="33"> 0 </record>
 <record source="33" destination="34"> 44 </record>
 <record source="33" destination="35"> 114 </record>
 <record source="33" destination="36"> 149 </record>
@@ -1275,7 +1242,6 @@
 <record source="34" destination="31"> 160 </record>
 <record source="34" destination="32"> 133 </record>
 <record source="34" destination="33"> 44 </record>
-<record source="34" destination="34"> 0 </record>
 <record source="34" destination="35"> 63 </record>
 <record source="34" destination="36"> 105 </record>
 <record source="35" destination="1"> 178 </record>
@@ -1312,7 +1278,6 @@
 <record source="35" destination="32"> 163 </record>
 <record source="35" destination="33"> 114 </record>
 <record source="35" destination="34"> 63 </record>
-<record source="35" destination="35"> 0 </record>
 <record source="35" destination="36"> 26 </record>
 <record source="36" destination="1"> 174 </record>
 <record source="36" destination="2"> 171 </record>
@@ -1349,7 +1314,6 @@
 <record source="36" destination="33"> 149 </record>
 <record source="36" destination="34"> 105 </record>
 <record source="36" destination="35"> 26 </record>
-<record source="36" destination="36"> 0 </record>
 </records>
 </data>
 
