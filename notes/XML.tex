@@ -1,5 +1,13 @@
 \documentclass{article}
 
+\input{pstricks}
+\input{WebMacros}
+\def\directory#1{\dir{#1}}
+
+\def\XMLAttribute#1{\Escape{#1}}
+\def\XMLTag#1{\Escape{#1}}
+\def\XMLElement#1{\XMLTag{#1}}
+
 \usepackage{fullpage}
 \title{XML Input Format}
 \begin{document}
@@ -233,7 +241,7 @@ sets the $5$ entry (in position $4$) to blue ($0 0 1$) since the
 previous set entry was indexed explicitly as $4$.
 
 
-The attribute \XMLRange{range} value can be specified for the entire
+The attribute \XMLAttribute{range} value can be specified for the entire
 colormap or on a per-entry basis.  If this is present, it is
 interpreted as a numeric value and each value in the entry (or all
 entries if specified for the entire colormap) is divided by that
@@ -360,14 +368,14 @@ to process the command line arguments and look for a -o flag).
 Note that this dynamically loads the libraries libGGobi.so and
 libxml.so.  Thus the directories that contain these libraries must be
 referenced in the environment variable 
-\texttt{LD_LIBRARY_PATH}.
+\Env{LD_LIBRARY_PATH}.
 Alternatively, the makefile can be edited to statically link these
 libraries.
 
 
 \section{Compilation}
 To activate the XML mechanism, define the variable
-\texttt{USE_XML} in  local.config.
+\Env{USE_XML} in  local.config.
 
 When we use autoconf, this can be done by
 \begin{verbatim}
@@ -376,7 +384,7 @@ When we use autoconf, this can be done by
 
 This requires the XML parsing libray libxml (also know as gnome-xml) by Daniel Veillard.
 (\texttt{Daniel.Veillard@w3.org}).
-See \texttt{http://xmlsoft.org/#Downloads}
+See \Escape{http://xmlsoft.org}
 \section{References}
 The XML Handbook, Charles F Goldfarb and Paul Prescod
  Prentice Hall.
