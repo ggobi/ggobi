@@ -18,7 +18,7 @@ Binaries and source code can be downloaded from
 There are also instructions on how to download code from the cvs
 archive, using anonymous cvs.
 
-Ways to build GGobi under linux or unix 
+Ways to build GGobi under Linux or Unix 
 =======================================
 
 There are various ways to use ggobi and hence different features that
@@ -41,20 +41,21 @@ one can enable when compiling ggobi.
   f) Perl   interface
       (allowing ggobi to be controlled from Perl)       
 
-There is also optional support for reading data directly from a MySQL
-database. (The configuration for this has not been ironed out yet.)
+Regardless of how the GGobi distribution is compiled, 
+one can choose to activate one or all of
+
+
 
 We strongly recommend compiling with XML support, because it provides
 more flexibility for file input and output and facilitates
 portability. For this option, you will need to have Daniel Veillard's
-libxml installed and you will need to indicate where the development
-header files are located. See instructions for getting this library
-and building it below.
+libxml installed. See instructions for getting this library
+and building it in INSTALL-xml.html (& below).
 
 Nevertheless we provide instructions for all the different build
-methods, starting with the simplest. (Note that gmake is really used,
-but make should default to this on linux. You may need to force make
-to be gmake on other unix systems.)
+methods, starting with the simplest. (Note that GNU make is really necessary,
+but on several systems, make should default to this. You may need to 
+explicitly use gmake on other systems.)
 
 a) Stand-alone
 

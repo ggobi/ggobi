@@ -24,17 +24,17 @@ fi
 
 GGOBI_HOME=`pwd` 
 
-AC_ARG_ENABLE(embed, [--enable-embed          Build the ggobi library for embedding in other applications (e.g. R)])
+AC_ARG_ENABLE(embed, [--enable-embed          Build the ggobi library for embedding in other applications (e.g. R) (yes)])
 
 AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
 
 
 dnl AC_ARG_WITH(prefix, [--with-prefix          Specify where the files are to be installed (default /usr/local/).],INSTALL_DIR=${with_prefix},INSTALL_DIR="/usr/local")
 
-AC_ARG_WITH(xml, --with-xml          Enable reading and writing of XML datasets.,,with_xml="yes")
+AC_ARG_WITH(xml, --with-xml          Enable reading and writing of XML datasets (yes),,with_xml="yes")
 LIBXML_VERSION="2.4.1"
 
-AC_ARG_WITH(mysql, --with-mysql          Enable plugin for reading data from MySQL databases., 
+AC_ARG_WITH(mysql, --with-mysql          Enable plugin for reading data from MySQL databases, 
               MYSQL_PLUGIN=1; PLUGIN_DIRS="MySQL"; ENABLE_PLUGINS=1)
 
 AC_ARG_WITH(postgres, --with-postgres          Enable plugin reading data from Postgres databases., 
@@ -44,6 +44,8 @@ AC_ARG_WITH(dataviewer, --with-dataviewer          Enable plugin for viewig data
 AC_ARG_WITH(fileselector,--with-fileselector          Enable GtkExtra file selector plugin, 
               FILESELECTOR_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} FileSelect" ; ENABLE_PLUGINS=1)
 
+
+AC_ARG_WITH(plugins, [--with-plugins          Enable all the plugins (no)], ENABLE_ALL_PLUGINS=1)
 
 AC_ARG_WITH(R,--with-R          Install the Rggobi package)
 AC_ARG_WITH(Python,--with-Python          Install the Pythonggobi module)
@@ -327,7 +329,7 @@ AC_SUBST(UNAME)
 AC_SUBST(XML_UTILS)
 AC_SUBST(USE_XML)
 AC_SUBST(XML_CFLAG_DEFINES)
-AC_SUBST(USE_MYSQL)
+
 
 if test -n "${USE_XML}" ; then
   SUPPORTS_XML="yes"
@@ -338,14 +340,12 @@ fi
 AC_SUBST(SUPPORTS_XML)
 
 AC_SUBST(XML_SRC)
-AC_SUBST(MYSQL_SRC)
+
 
 AC_SUBST(XML_INC_DIRS)
 AC_SUBST(XML_LIB_DIRS)
 AC_SUBST(XML_LIB_DIRS_PATH)
 
-AC_SUBST(MYSQL_INC_DIRS)
-AC_SUBST(MYSQL_LIB_DIRS)
 
 AC_SUBST(GGOBI_HOME)
 
@@ -387,11 +387,6 @@ AC_SUBST(GGOBI_VERSION_STRING)
 AC_SUBST(GGOBI_RELEASE_DATE)
 
 
-if test -n "${PLUGIN_DIRS}" ; then
- PLUGIN_DIRS="${PLUGIN_DIRS} TestPlugin TestInput"
-fi
-AC_SUBST(PLUGIN_DIRS)
-
  dnl These go into config.h as #define entries.
 AC_DEFINE_UNQUOTED(GGOBI_VERSION_STRING, "$GGOBI_VERSION_STRING")
 AC_DEFINE_UNQUOTED(GGOBI_RELEASE_DATE, "$GGOBI_RELEASE_DATE")
@@ -400,6 +395,20 @@ AC_DEFINE_UNQUOTED(MINOR_VERSION, $MINOR_VERSION)
 AC_DEFINE_UNQUOTED(PATCH_LEVEL, $PATCH_LEVEL)
 
 AC_CONFIG_HEADER(src/config.h)
+
+
+if test -n "${ENABLE_ALL_PLUGINS}" ; then
+ MYSQL_PLUGIN=1
+ POSTGRES_PLUGIN=1
+ DATAVIEWER_PLUGIN=1
+ FILESELECTOR_PLUGIN=1
+ PLUGIN_DIRS="MySQL Postgres DataViewer FileSelect"
+fi
+
+if test -n "${PLUGIN_DIRS}" ; then
+ PLUGIN_DIRS="${PLUGIN_DIRS} TestPlugin TestInput"
+fi
+AC_SUBST(PLUGIN_DIRS)
 
 if test -n "$MYSQL_PLUGIN" ; then 
  mysql_xml=plugins/MySQL/plugin.xml
@@ -463,4 +472,4 @@ dnl might do the same thing.
  done 
 fi
 
-echo "Installation directory: $INSTALL_DIR, $prefix"
+echo "Installation directory: $INSTALL_DIR"

@@ -31,8 +31,10 @@ bin/xmlConvert:
 
 # Should use install command.
 install:
-	cp bin/xmlConvert  bin/ggobi bin/ggobi.bin $(INSTALL_DIR)/bin
-	cp lib/libggobi.so $(INSTALL_DIR)/lib
+	echo "Installation into a system directory is not implemented yet"
+
+	#cp bin/xmlConvert  bin/ggobi bin/ggobi.bin $(INSTALL_DIR)/bin
+	#cp lib/libggobi.so $(INSTALL_DIR)/lib
 
 Rggobi: lib/libggobi.so
 	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)

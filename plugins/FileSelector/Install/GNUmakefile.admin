@@ -6,3 +6,5 @@ DIR_NAME=FileSelect
 
 include $(GGOBI_HOME)/plugins/GNUmakefile.Plugin
 
+createDist::
+	cp icon.xpm $(INSTALL_DIR)/$(DIR_NAME)
