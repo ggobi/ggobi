@@ -32,7 +32,82 @@ extern void color_table_init_from_scheme (colorschemed *scheme,
   GdkColor *color_table, GdkColor *bg_color, GdkColor *accent_color);
 extern void color_table_init_from_default (GdkColor *color_table,
   GdkColor *bg_color, GdkColor *accent_color);
+void selection_made_cb (GtkWidget *clist, gint row, gint column,
+  GdkEventButton *event, ggobid *gg);
+extern void variable_notebook_addvar_cb (GtkWidget *notebook, ggobid *gg);
+extern void variable_notebook_subwindow_add (datad *d, GtkSelectionMode mode, 
+  GtkSignalFunc func, GtkWidget *notebook, ggobid *gg);
 
+/*--------------------------------------------------------------------*/
+/*      Notebook containing the variable list for each datad          */
+/*--------------------------------------------------------------------*/
+
+/*
+ * Apparently I have to override these functions from utils_ui.c
+ * so that I can add a signal appropriately to the new page in
+ * the notebook.
+ * Only one line is different:
+    GtkSignalFunc func = selection_made_cb;
+*/
+
+static void wvis_variable_notebook_adddata_cb (GtkObject *obj, datad *d,
+  ggobid *gg, GtkWidget *notebook)
+{
+  GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0);
+  if (swin) {
+    GtkWidget *clist;
+    GtkSelectionMode mode = GTK_SELECTION_SINGLE;
+    GtkSignalFunc func = selection_made_cb;
+    clist = GTK_BIN (swin)->child;
+    if (clist) {
+      mode = GTK_CLIST(clist)->selection_mode;
+      /*
+       * should also be possible to retrieve the signal function that
+       * responds to "select_row" signal
+      */
+    }
+    variable_notebook_subwindow_add (d, mode, func, notebook, gg);
+    gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
+                                g_slist_length (gg->d) > 1);
+  }
+}
+
+GtkWidget *
+wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
+  GtkSignalFunc func, ggobid *gg)
+{
+  GtkWidget *notebook;
+  gint nd = g_slist_length (gg->d);
+  GSList *l;
+  datad *d;
+
+  /* Create a notebook, set the position of the tabs */
+  notebook = gtk_notebook_new ();
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
+  gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
+
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (g_slist_length (d->vartable)) {
+      variable_notebook_subwindow_add (d, mode, func, notebook, gg);
+    }
+  }
+
+  /*-- listen for variable_added events on main_window --*/
+  gtk_signal_connect_object (GTK_OBJECT (gg->main_window),
+    "variable_added", GTK_SIGNAL_FUNC (variable_notebook_addvar_cb),
+     GTK_OBJECT (notebook));
+
+  /*-- listen for variable_added events on main_window --*/
+  gtk_signal_connect (GTK_OBJECT (gg->main_window),
+    "datad_added", GTK_SIGNAL_FUNC (wvis_variable_notebook_adddata_cb),
+     GTK_OBJECT (notebook));
+
+  return notebook;
+}
+
+/*--------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------*/
 /*             Using colorschemed objects                            */
@@ -936,7 +1011,7 @@ wvis_window_open (ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (frame1), vb1);
 
     /* Create a notebook, set the position of the tabs */
-    notebook = create_variable_notebook (vb1, GTK_SELECTION_SINGLE,
+    notebook = wvis_create_variable_notebook (vb1, GTK_SELECTION_SINGLE,
       (GtkSignalFunc) selection_made_cb, gg);
 
     /*-- Insert an option menu for choosing the method of binning --*/

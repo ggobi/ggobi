@@ -299,7 +299,7 @@ void scale_set_default_values (GtkScale *scale)
 /*      Notebook containing the variable list for each datad          */
 /*--------------------------------------------------------------------*/
 
-static void
+void
 variable_notebook_subwindow_add (datad *d, GtkSelectionMode mode, 
   GtkSignalFunc func, GtkWidget *notebook, ggobid *gg)
 {
@@ -308,13 +308,15 @@ variable_notebook_subwindow_add (datad *d, GtkSelectionMode mode,
   gchar *row[1];
   vartabled *vt;
 
+  if (d->ncols == 0)
+    return;
+
   /* Create a scrolled window to pack the CList widget into */
   swin = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                             swin, gtk_label_new (d->name));
-  gtk_widget_show (swin);
 
   /* add the CList */
   clist = gtk_clist_new (1);
@@ -331,6 +333,7 @@ variable_notebook_subwindow_add (datad *d, GtkSelectionMode mode,
     g_free (row[0]);
   }
   gtk_container_add (GTK_CONTAINER (swin), clist);
+  gtk_widget_show_all (swin);
 }
 
 static void variable_notebook_adddata_cb (GtkObject *obj, datad *d,
@@ -341,16 +344,17 @@ static void variable_notebook_adddata_cb (GtkObject *obj, datad *d,
    * func is null except in wvis_ui.c
   */
   GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0);
+  GtkSelectionMode mode = GTK_SELECTION_SINGLE;
+  GtkSignalFunc func = NULL;
   if (swin) {
     GtkWidget *clist;
-    GtkSelectionMode mode = GTK_SELECTION_SINGLE;
-    GtkSignalFunc func = NULL;
     clist = GTK_BIN (swin)->child;
     if (clist) {
       mode = GTK_CLIST(clist)->selection_mode;
       /*
        * should also be possible to retrieve the signal function that
-       * responds to "select_row" signal
+       * responds to "select_row" signal  ... but alas, it isn't.
+       * See wvis_ui.c to see how to handle this.
       */
     }
     variable_notebook_subwindow_add (d, mode, func, notebook, gg);
@@ -416,7 +420,7 @@ get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist)
 * number of variables; it just clears the list and then
 * rebuilds it.
 */
-static void variable_notebook_addvar_cb (GtkWidget *notebook, ggobid *gg)
+void variable_notebook_addvar_cb (GtkWidget *notebook, ggobid *gg)
 {
   GtkWidget *swin, *clist;
 
