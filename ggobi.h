@@ -13,6 +13,8 @@
 
 #ifdef WIN32
 #define GGOBI_EXPORT __declspec(dllexport) 
+#else
+#define GGOBI_EXPORT 
 #endif
 
 
