@@ -9,6 +9,13 @@
 #include "defines.h"
 #include "ggvis.h"
 
+void ggv_dsource_cb (GtkWidget *w, PluginInstance *inst)
+{
+/*
+  ggvisd *ggv = ggvisFromInst (inst);
+*/
+}
+
 void ggv_stepsize_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);

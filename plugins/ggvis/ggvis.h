@@ -3,12 +3,12 @@
 #include "defines.h"
 #include "plugin.h"
 
-#define STRESSPLOT_WIDTH  300
-#define STRESSPLOT_HEIGHT 150
+#define STRESSPLOT_WIDTH  250
+#define STRESSPLOT_HEIGHT 100
 #define STRESSPLOT_MARGIN  10
 
 #define HISTOGRAM_WIDTH  250
-#define HISTOGRAM_HEIGHT 150
+#define HISTOGRAM_HEIGHT 100
 #define HISTOGRAM_MARGIN  10
 
 typedef enum {deflt, within, between, anchorscales, anchorfixed} MDSGroupInd;
@@ -55,6 +55,7 @@ typedef struct {
 /*                          functions                                   */
 /*----------------------------------------------------------------------*/
 
+void ggv_dsource_cb (GtkWidget *w, PluginInstance *inst);
 void ggvis_init (ggvisd *);
 ggvisd* ggvisFromInst (PluginInstance *inst);
 gint ggv_stressplot_configure_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
