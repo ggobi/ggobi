@@ -22,7 +22,7 @@
  * edges and arrowheads arrays are handled in splot.c
 */
 
-void edges_alloc(gint nsegs, datad * d, gboolean old)
+void edges_alloc(gint nsegs, datad * d)
 {
   d->edge.n = nsegs;
   d->edge.sym_endpoints = (SymbolicEndpoints*)
@@ -52,20 +52,26 @@ void edges_free(datad * d, ggobid * gg)
 gboolean edge_add(gint a, gint b, datad * d, datad * e)
 {
   /*-- check whether (a,b) exists before adding?  Not for the moment --*/
-  endpointsd *endpoints;
-  edges_alloc(e->edge.n + 1, e, true);
+
+g_printerr ("(edge_add) not yet adding edges\n");
+return false;
 
 /*
- * yi.  This means adding a record to e
- * How many row-wise vectors have to grow by one?
- * If it should have data values, what would we do?
+  gint n = e->edge.n;
+  edges_alloc(e->edge.n + 1, e);
+  e->edge.sym_endpoints[n].a = g_strdup (d->rowIds[a]);
+  e->edge.sym_endpoints[n].b = g_strdup (d->rowIds[b]);
+  e->edge.endpoints[n].jpartner = -1;  XXX
 */
-  /*pipeline_arrays_add_rows (e->edge.n, e); */
+
+  /*pipeline_arrays_add_row (n+1, e); */
 
 /*XXX This should be done on all the datasets and the symbolic datapoints too perhaps. */
-  endpoints = resolveEdgePoints(e, d);
+/*
+  resolveEdgePoints(e, d);
+  ... this won't recalculate the endpoints; find out from Duncan what to do ..
+*/
 
-/*XXX don't we need to do something with jpartner, etc. */
   return true;
 }
 

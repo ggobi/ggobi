@@ -68,7 +68,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   k = find_nearest_point (&sp->mousepos, sp, d, gg);
   d->nearest_point = k;
 
-  if (cpanel->ee_adding_p) {
+  if (cpanel->ee_adding_p && k != d->nearest_point_prev) {
     if (gg->edgeedit.a == -1) {  /*-- looking for starting point --*/
 
       if (k != d->nearest_point_prev) {
@@ -79,7 +79,6 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
       displays_plot (NULL, QUICK, gg);
       /*-- add a dotted line from gg->edgeedit.a to gg->nearest_point --*/
-
     }
   }
 
@@ -125,17 +124,38 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
    * If record indices are in use, use them; if not, initialize
    * indices for display->d.
   */
-  g_printerr ("add the edge from %d to %d\n",
-    d->nearest_point, gg->edgeedit.a);
+  if (d->nearest_point >= 0) {
+    g_printerr ("add the edge from %d to %d\n",
+      gg->edgeedit.a, d->nearest_point);
 
-  if (e == NULL)
-    g_printerr ("Not yet initializing a new edge set\n");
-  else if (d->rowIds == NULL)
-    g_printerr ("Not yet initializing new rowids\n");
-  else {  
+    if (e == NULL) {
+      /*-- Initialize a new edge set --*/
+      g_printerr ("Not yet initializing a new edge set\n");
+    }
+
+    if (d->rowIds == NULL) {
+      /*-- Add rowids to d --*/
+      g_printerr ("Not yet initializing new rowids\n");
+    }
+
+
+    /*-- Add the new edge to e --*/
+/* Ask the user for information before adding?
+d:  We're not making any changes to d.
+
+e:
+  record label
+  if e has rowIds, a rowId
+  if e has variables, variable values -- we don't have a clue what to use
+*/
+/*
     edge_add (gg->edgeedit.a, d->nearest_point, d, e);
+*/
   }
+  gg->edgeedit.a = -1;
 
+  /*-- Release the pointer so the button press can be detected --*/
+  gdk_pointer_ungrab (event->time);
   return retval;
 }
 
