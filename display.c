@@ -314,9 +314,6 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
 
   display->ggobi = gg;
   display->d = d;
-/*
-g_printerr ("display = %d d = %d\n", (gint)display, (gint)display->d);
-*/
   display->e = NULL;
   display->embeddedIn = NULL;
 
