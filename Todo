@@ -28,7 +28,9 @@ Missings:
     types of missingness: left censored, missing, etc.
   We don't yet have a show/hide missings button
 
-Bugs: 
+ASH:
+  Add an option to connect the points?  This could be done
+    either in a single line or as lines down to a baseline.
 
 Reading in new data
   add an option:  add a new datad or replace an existing one
@@ -78,8 +80,18 @@ Tour:
   correlation tour
   history controls
 
+Tour (dfs):
+  Change the tour control panels.  Let there be a scrolling
+    column of checkboxes, just as there is now, and then add
+    a table of variable circles (separately scrolled) to the
+    right of it, which contains a circle for each variable
+    checked to the left.  (Need to clarify some features of
+    this design -- is there any need for variable selection
+    in the variable circles?)
 
-keep working on array and vector management
+  Add a button that allows variables to be cloned based on the
+    current tour projection.  (Clarification:  from what data
+    do I construct the new variable(s)?  How many are there?)
 
 when brushing or identifying in parcoords, use leave/enter events to
   change the current_splot?
