@@ -47,11 +47,11 @@ checkbox_get_nth (gint jvar, datad *d)
 }
 
 void
-varlabel_set (gint jvar, datad *d)
+varlabel_set (gint j, datad *d)
 {
-  GtkWidget *w = checkbox_get_nth (jvar, d);
-  gtk_label_set_text (GTK_LABEL (GTK_BIN (w)->child),
-                      d->vartable[jvar].collab_tform);
+  GtkWidget *w = checkbox_get_nth (j, d);
+  vartabled *vt = vartable_element_get (j, d);
+  gtk_label_set_text (GTK_LABEL (GTK_BIN (w)->child), vt->collab_tform);
 }
 
 
@@ -307,7 +307,8 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 static void
 varpanel_checkbox_add (gint j, datad *d, ggobid *gg) 
 {
-  GtkWidget *w = gtk_noop_check_button_new_with_label (d->vartable[j].collab);
+  vartabled *vt = vartable_element_get (j, d);
+  GtkWidget *w = gtk_noop_check_button_new_with_label (vt->collab);
   GGobi_widget_set (w, gg, true);
   gtk_signal_connect (GTK_OBJECT (w),
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);

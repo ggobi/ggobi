@@ -26,8 +26,9 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
 {
   gint i, k, m;
   gfloat val;
-  gfloat min = d->vartable[jvar].lim_tform.min;
-  gfloat max = d->vartable[jvar].lim_tform.max;
+  vartabled *vt = vartable_element_get (jvar, d);
+  gfloat min = vt->lim_tform.min;
+  gfloat max = vt->lim_tform.max;
 
   for (k=0; k<gg->wvis.npct; k++)
     gg->wvis.n[k] = 0;
@@ -204,6 +205,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gint y = ymargin;
   GdkPoint *points;
   gfloat diff;
+  vartabled *vt;
 
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
@@ -323,12 +325,15 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
   /*-- add the variable limits in the top margin --*/
   if (d && selected_var != -1) {
-    gfloat min = d->vartable[selected_var].lim_tform.min;
-    gfloat max = d->vartable[selected_var].lim_tform.max;
+    gfloat min, max;
     gfloat val;
     gchar *str;
     gint lbearing, rbearing, width, ascent, descent;
     GtkStyle *style = gtk_widget_get_style (da);
+
+    vt = vartable_element_get (selected_var, d);
+    min = vt->lim_tform.min;
+    max = vt->lim_tform.max;
 
     gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
     y = ymargin;
@@ -389,12 +394,16 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint selected_var = get_one_selection_from_clist (clist);
+  vartabled *vt;
 
   if (d && selected_var != -1) {
     gint i, m, k;
-    gfloat min = d->vartable[selected_var].lim_tform.min;
-    gfloat max = d->vartable[selected_var].lim_tform.max;
+    gfloat min, max;
     gfloat val;
+
+    vt = vartable_element_get (selected_var, d);
+    min = vt->lim_tform.min;
+    max = vt->lim_tform.max;
 
     for (m=0; m<d->nrows_in_plot; m++) {
       i = d->rows_in_plot[m];

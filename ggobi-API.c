@@ -98,14 +98,14 @@ gchar **
 GGOBI(getVariableNames)(gint transformed, datad *d, ggobid *gg)
 {
   gchar **names;
-  gint nc = d->ncols, i;
-  vartabled *form;
+  gint nc = d->ncols, j;
+  vartabled *vt;
 
   names = (gchar**) g_malloc (sizeof(gchar*)*nc);
 
-  for (i = 0; i < nc; i++) {
-    form = d->vartable + i;
-    names[i] = transformed ? form->collab_tform : form->collab;
+  for (j = 0; j < nc; j++) {
+    vt = vartable_element_get (j, d);
+    names[j] = transformed ? vt->collab_tform : vt->collab;
   }
 
   return (names);
@@ -113,20 +113,22 @@ GGOBI(getVariableNames)(gint transformed, datad *d, ggobid *gg)
 
 
 void
-GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed,
+GGOBI(setVariableName)(gint j, gchar *name, gboolean transformed,
   datad *d, ggobid *gg)
 {
+  vartabled *vt = vartable_element_get (j, d);
+
   if (!transformed)
-    g_free (d->vartable[jvar].collab);
-  g_free (d->vartable[jvar].collab_tform);
+    g_free (vt->collab);
+  g_free (vt->collab_tform);
 
   if (transformed)
-    d->vartable[jvar].collab_tform = g_strdup(name);
+    vt->collab_tform = g_strdup(name);
   else {
     extern GtkWidget *checkbox_get_nth (gint, datad *);
-    d->vartable[jvar].collab = g_strdup(name);
-    d->vartable[jvar].collab_tform = g_strdup(name);
-    gtk_object_set (GTK_OBJECT(checkbox_get_nth (jvar, d)),
+    vt->collab = g_strdup(name);
+    vt->collab_tform = g_strdup(name);
+    gtk_object_set (GTK_OBJECT(checkbox_get_nth (j, d)),
       "label", name, NULL);
   }
 }
@@ -164,6 +166,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
 {
   gint i, j;
   gchar *lbl;
+  vartabled *vt;
 
   GGOBI(displays_release)(gg);
   GGOBI(data_release)(d, gg);
@@ -199,8 +202,9 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   hidden_alloc (d);
 
   for (j = 0; j < nc ; j++) {
-    d->vartable[j].collab = g_strdup(colnames[j]);
-    d->vartable[j].collab_tform = g_strdup(colnames[j]);
+    vt = vartable_element_get (j, d);
+    vt->collab = g_strdup(colnames[j]);
+    vt->collab_tform = g_strdup(colnames[j]);
     for (i = 0; i < nr ; i++) {
       if (j == 0) {
         lbl = g_strdup (rownames[i]);
@@ -270,6 +274,8 @@ GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg)
 void
 GGOBI(data_release)(datad *d, ggobid *gg)
 {
+  void vartable_free (datad *d);
+
   if(d == NULL)
     return;
   if (d->rowlab) {
@@ -277,21 +283,24 @@ GGOBI(data_release)(datad *d, ggobid *gg)
     d->rowlab = NULL;
   }
 
-  GGOBI(vartable_free)(d, gg);
+  /*GGOBI(vartable_free)(d, gg);*/
+  vartable_free (d);
 }
 
+/*
 void
 GGOBI(vartable_free)(datad *d, ggobid *gg)
 {
   gint i;
-
   for(i = 0; i < d->ncols ; i++) {
-    GGOBI(vardatum_free)(d->vartable+i, gg);
+    vartable_free_element (d->vartable+i, gg);
   }
-  g_free (d->vartable);
+  g_array_free (d->vartable);
   d->vartable = NULL;
 }
+*/
 
+/*
 void 
 GGOBI(vardatum_free)(vartabled *var, ggobid *gg)
 {
@@ -300,6 +309,7 @@ GGOBI(vardatum_free)(vartabled *var, ggobid *gg)
   if (var->collab_tform)
     g_free (var->collab_tform);
 }
+*/
 
 
 const gchar * const*
@@ -994,7 +1004,7 @@ gint
 GGOBI(setMode)(const gchar *name, ggobid *gg)
 {
   PipelineMode old = viewmode_get(gg);
-  PipelineMode newMode =   GGOBI(getModeId)(name);
+  PipelineMode newMode = (PipelineMode) GGOBI(getModeId)(name);
   if(newMode != NULLMODE)
     GGOBI(full_viewmode_set)(newMode, gg);
 
@@ -1149,10 +1159,14 @@ GGOBI(removeVariableByIndex)(gint which, datad *d, ggobid *gg)
 gint 
 GGOBI(getVariableIndex)(const gchar *name, datad *d, ggobid *gg)
 {
-  gint i;
-  for (i = 0; i < d->ncols; i++)
-    if (strcmp (d->vartable[i].collab, name) == 0)
-      return (i);
+  gint j;
+  vartabled *vt;
+
+  for (j = 0; j < d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    if (strcmp (vt->collab, name) == 0)
+      return (j);
+  }
 
   return(-1);
 }

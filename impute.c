@@ -26,6 +26,7 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
   gint *selected_cols;
   gint nselected_cols = 0;
   gboolean ok = true;
+  vartabled *vt;
 
   selected_cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   nselected_cols = selected_cols_get (selected_cols, d, gg);
@@ -64,10 +65,11 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
 
     for (k=0; k<nselected_cols; k++) {
        j = selected_cols[k];
+       vt = vartable_element_get (j, d);
 
       /* First find the maximum and minimum values of the non-missing data */
-      maxval = d->vartable[j].lim_raw.min;
-      maxval = d->vartable[j].lim_raw.max;
+      maxval = vt->lim_raw.min;
+      maxval = vt->lim_raw.max;
 
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];

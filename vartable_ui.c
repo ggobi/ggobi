@@ -100,6 +100,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   gchar *val_str;
   gfloat min_val, max_val;
   gboolean min_p = false, max_p = false;
+  vartabled *vt;
 
   umin_entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "umin_entry");
   if (umin_entry == NULL || !GTK_IS_ENTRY(umin_entry)) {
@@ -137,18 +138,17 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
 
     for (k=0; k<ncols; k++) {
       j = cols[k];
+      vt = vartable_element_get (j, d);
 
-      d->vartable[j].lim_specified.min =
-        d->vartable[j].lim_specified_tform.min = min_val;
-      d->vartable[j].lim_specified.max =
-        d->vartable[j].lim_specified_tform.max = max_val;
+      vt->lim_specified.min = vt->lim_specified_tform.min = min_val;
+      vt->lim_specified.max = vt->lim_specified_tform.max = max_val;
 
       gtk_clist_set_text (clist, j, CLIST_USER_MIN,
         g_strdup_printf("%8.3f", min_val));
       gtk_clist_set_text (clist, j, CLIST_USER_MAX,
         g_strdup_printf("%8.3f", max_val));
 
-      d->vartable[j].lim_specified_p = min_p && max_p;
+      vt->lim_specified_p = min_p && max_p;
     }
 
     /*
@@ -202,11 +202,13 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
   gboolean ok = true;
+  vartabled *vt;
 
   for (k=0; k<ncols; k++) {
-    if (d->vartable[cols[k]].tform0 != NO_TFORM0 ||
-        d->vartable[cols[k]].tform1 != NO_TFORM1 ||
-        d->vartable[cols[k]].tform2 != NO_TFORM2)
+    vt = vartable_element_get (cols[k], d);
+    if (vt->tform0 != NO_TFORM0 ||
+        vt->tform1 != NO_TFORM1 ||
+        vt->tform2 != NO_TFORM2)
     {
       ok = false;
       quick_message ("Sorry, can't set the range for a transformed variable\n",
@@ -345,10 +347,12 @@ void range_unset (ggobid *gg)
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
   gint j, k;
+  vartabled *vt;
 
   for (k=0; k<ncols; k++) {
     j = cols[k];
-    d->vartable[j].lim_specified_p = false;
+    vt = vartable_element_get (j, d);
+    vt->lim_specified_p = false;
     /*-- then null out the two entries in the table --*/
     gtk_clist_set_text (clist, j, CLIST_USER_MIN, g_strdup(""));
     gtk_clist_set_text (clist, j, CLIST_USER_MAX, g_strdup(""));
@@ -487,6 +491,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
   gchar *vname;
   gint *selected_vars, nselected_vars = 0;
   gint jvar;
+  vartabled *vt;
 
   /*-- find out what variables are selected in the var statistics panel --*/
   selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
@@ -504,7 +509,8 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
   jvar = selected_vars[0];
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 1) {
-    d->vartable[jvar].collab = g_strdup (vname);
+    vt = vartable_element_get (jvar, d);
+    vt->collab = g_strdup (vname);
 
     vartable_collab_set_by_var (jvar, d);
     tform_label_update (jvar, d, gg);
@@ -518,6 +524,7 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
   GtkWidget *okay_btn, *cancel_btn;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *selected_vars, nselected_vars = 0;
+  vartabled *vt;
 
   /*-- find out what variables are selected in the var statistics panel --*/
   selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
@@ -538,9 +545,10 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
   gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Variable name: "),
     true, true, 2);
   entry = gtk_entry_new();
+
   /*-- label it with the name of the variable being renamed --*/
-  gtk_entry_set_text (GTK_ENTRY (entry),
-    d->vartable[selected_vars[0]].collab);
+  vt = vartable_element_get (selected_vars[0], d);
+  gtk_entry_set_text (GTK_ENTRY (entry), vt->collab);
   gtk_widget_set_name (entry, "rename_entry");
 
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
@@ -585,6 +593,7 @@ vartable_select_var (gint jvar, gboolean selected, datad *d, ggobid *gg)
 {
   gint j, varno;
   gchar *varno_str;
+  vartabled *vt;
 
   /*-- loop over the rows in the table, looking for jvar --*/
   for (j=0; j<d->ncols; j++) {
@@ -600,7 +609,8 @@ vartable_select_var (gint jvar, gboolean selected, datad *d, ggobid *gg)
         else
           gtk_clist_unselect_row (GTK_CLIST (d->vartable_clist), jvar, 1);
       }
-      d->vartable[jvar].selected = selected;
+      vt = vartable_element_get (jvar, d);
+      vt->selected = selected;
     }
   }
 }
@@ -612,10 +622,12 @@ selection_made (GtkWidget *cl, gint row, gint column,
   gint varno;
   gchar *varno_str;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  vartabled *vt;
 
   gtk_clist_get_text (GTK_CLIST (d->vartable_clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
-  d->vartable[varno].selected = true;
+  vt = vartable_element_get (varno, d);
+  vt->selected = true;
 
   return;
 }
@@ -627,10 +639,12 @@ deselection_made (GtkWidget *cl, gint row, gint column,
   gint varno;
   gchar *varno_str;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  vartabled *vt;
 
   gtk_clist_get_text (GTK_CLIST (d->vartable_clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
-  d->vartable[varno].selected = false;
+  vt = vartable_element_get (varno, d);
+  vt->selected = false;
 
   return;
 }
@@ -920,11 +934,13 @@ void
 vartable_collab_set_by_var (gint j, datad *d)
 {
   gchar *ind;
+  vartabled *vt;
 
   if (d->vartable_clist != NULL) {
+    vt = vartable_element_get (j, d);
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-      CLIST_VARNAME, d->vartable[j].collab);
-    ind = (d->vartable[j].categorical_p) ? g_strdup ("y") :
+      CLIST_VARNAME, vt->collab);
+    ind = (vt->categorical_p) ? g_strdup ("y") :
                                            g_strdup ("");
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
       CLIST_TYPE, ind);
@@ -936,16 +952,19 @@ vartable_collab_set_by_var (gint j, datad *d)
 void
 vartable_collab_tform_set_by_var (gint j, datad *d)
 {
+  vartabled *vt;
+
   if (d->vartable_clist != NULL) {
-    if (d->vartable[j].tform0 == NO_TFORM0 &&
-        d->vartable[j].tform1 == NO_TFORM1 &&
-        d->vartable[j].tform2 == NO_TFORM2)
+    vt = vartable_element_get (j, d);
+    if (vt->tform0 == NO_TFORM0 &&
+        vt->tform1 == NO_TFORM1 &&
+        vt->tform2 == NO_TFORM2)
     {
       gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
         CLIST_TFORM, g_strdup(""));
     } else {
       gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-        CLIST_TFORM, d->vartable[j].collab_tform);
+        CLIST_TFORM, vt->collab_tform);
     }
   }
 }
@@ -954,13 +973,16 @@ vartable_collab_tform_set_by_var (gint j, datad *d)
 void
 vartable_limits_set_by_var (gint j, datad *d)
 {
+  vartabled *vt;
+
   if (d->vartable_clist != NULL) {
+    vt = vartable_element_get (j, d);
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
       CLIST_DATA_MIN,
-      g_strdup_printf ("%8.3f", d->vartable[j].lim_tform.min));
+      g_strdup_printf ("%8.3f", vt->lim_tform.min));
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
       CLIST_DATA_MAX,
-      g_strdup_printf ("%8.3f", d->vartable[j].lim_tform.max));
+      g_strdup_printf ("%8.3f", vt->lim_tform.max));
   }
 }
 void
@@ -975,11 +997,14 @@ vartable_limits_set (datad *d)
 /*-- sets the mean, median for a variable --*/
 void
 vartable_stats_set_by_var (gint j, datad *d) {
+  vartabled *vt;
+
   if (d->vartable_clist != NULL) {
+    vt = vartable_element_get (j, d);
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-      CLIST_MEAN, g_strdup_printf ("%8.3f", d->vartable[j].mean));
+      CLIST_MEAN, g_strdup_printf ("%8.3f", vt->mean));
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-      CLIST_MEDIAN, g_strdup_printf ("%8.3f", d->vartable[j].median));
+      CLIST_MEDIAN, g_strdup_printf ("%8.3f", vt->median));
   }
 }
 void

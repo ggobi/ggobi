@@ -60,7 +60,10 @@ struct _datad {
  /*-- --*/
 
  gint ncols;
+/*
  vartabled *vartable;
+*/
+ GSList *vartable;
  GtkWidget *vartable_clist;
  gboolean single_column;  /*-- not handling single-column case now --*/
 

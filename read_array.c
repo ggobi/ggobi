@@ -41,6 +41,7 @@ read_binary (FILE *fp, datad *d, ggobid *gg)
   gint i, j, nr, nc;
   gint onesize = sizeof (gfloat);
   gint out;
+  vartabled *vt;
 
   fread ((gchar *) &nr, sizeof (gint), 1, fp);
   fread ((gchar *) &nc, sizeof (gint), 1, fp);
@@ -71,7 +72,8 @@ read_binary (FILE *fp, datad *d, ggobid *gg)
         if (d->nmissing == 0)
           arrays_alloc (&d->missing, d->nrows, d->ncols);
         d->missing.vals[i][j] = 1;
-        d->vartable[j].nmissing++;
+        vt = vartable_element_get (j, d);
+        vt->nmissing++;
         d->nmissing++;
       }
     }
@@ -204,6 +206,7 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
   gchar word[64];
   gfloat row1[MAXNCOLS];
   gshort row1_missing[MAXNCOLS];
+  vartabled *vt;
 
   /*-- Read in the first row of the data and calculate ncols. --*/
   d->ncols = row1_read (fp, row1, row1_missing, d, gg);
@@ -265,7 +268,8 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
         }
 
         d->nmissing++;
-        d->vartable[jcols].nmissing++;
+        vt = vartable_element_get (jcols, d);
+        vt->nmissing++;
         d->missing.vals[nrows][jcols] = 1;
         d->raw.vals[nrows][jcols] = 0.0;
       }

@@ -111,19 +111,21 @@ write_xml_variables (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 }
 
 gboolean
-write_xml_variable(FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo)
+write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
+  XmlWriteInfo *xmlWriteInfo)
 {
+  vartabled *vt = vartable_element_get (j, d);
 /*
    fprintf(f, "<variable");
-   fprintf(f," name=\"%s\"", gg->vartable[i].collab);
-   if(strcmp(gg->vartable[i].collab, gg->vartable[i].collab_tform) != 0) {
-     fprintf(f," transformName=\"%s\"", gg->vartable[i].collab_tform);
+   fprintf(f," name=\"%s\"", vt->collab);
+   if(strcmp(vt->collab, vt->collab_tform) != 0) {
+     fprintf(f," transformName=\"%s\"", vt->collab_tform);
    }
    fprintf(f, " />");
 */
 
   fprintf(f, "<variable>");
-  fprintf(f,"%s", d->vartable[i].collab);
+  fprintf(f,"%s", vt->collab);
   fprintf(f, "</variable>");
 
   return(true);

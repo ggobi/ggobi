@@ -45,6 +45,26 @@ array_contains (gint* arr, gint n, gint el)
   return false;
 }
 
+vartabled *
+vartable_element_get (gint j, datad *d)
+{
+/*
+  return ((vartabled *) (d->vartable->data + j*sizeof(vartabled *)));
+*/
+  return ((vartabled *) g_slist_nth_data (d->vartable, j));
+}
+void
+vartable_element_append (vartabled *vt, datad *d)
+{
+  d->vartable = g_slist_append (d->vartable, vt);
+}
+void
+vartable_element_remove (gint j, datad *d)
+{
+  vartabled *vt = vartable_element_get (j, d);
+  d->vartable = g_slist_remove (d->vartable, vt);
+}
+
 gint
 selected_cols_get (gint *cols, datad *d, ggobid *gg)
 {
@@ -52,10 +72,13 @@ selected_cols_get (gint *cols, datad *d, ggobid *gg)
  * Figure out which columns are selected.
 */
   gint j, ncols = 0;
+  vartabled *vt;
 
-  for (j=0; j<d->ncols; j++) 
-    if (d->vartable[j].selected)
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    if (vt->selected)
       cols[ncols++] = j;
+  }
 
   return (ncols);
 }
@@ -164,25 +187,26 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-vartable_free_var (gint j, datad *d)
+vartable_free_element (gint j, datad *d)
 {
-  if (d->vartable[j].collab != NULL)
-    g_free (d->vartable[j].collab);
-  if (d->vartable[j].collab_tform != NULL)
-    g_free (d->vartable[j].collab_tform);
+  vartabled *vt = vartable_element_get (j, d); 
 
-  d->vartable[j].collab = NULL;
-  d->vartable[j].collab_tform = NULL;
+  if (vt->collab != NULL)
+    g_free (vt->collab);
+  if (vt->collab_tform != NULL)
+    g_free (vt->collab_tform);
+
+  vartable_element_remove (j, d);
 }
 
-static void
+void
 vartable_free (datad *d)
 {
   gint j;
   for (j=0; j<d->ncols; j++) {
-    vartable_free_var (j, d);
+    vartable_free_element (j, d);
   }
-  g_free (d->vartable);
+  g_slist_free (d->vartable);
   d->vartable = NULL;
 }
 
@@ -192,85 +216,84 @@ vartable_alloc (datad *d)
   if (d->vartable != NULL)
     vartable_free (d);
 
-  d->vartable = (vartabled *) g_malloc (d->ncols * sizeof (vartabled));
-}
-
-void
-vartable_realloc (gint n, datad *d)
-{
-  d->vartable = (vartabled *) g_realloc ((gpointer) d->vartable,
-    n * sizeof (vartabled));
+  d->vartable = NULL;
 }
 
 void
 vartable_copy_var (gint jfrom, gint jto, datad *d)
 {
-  g_assert (d->vartable[jfrom].collab != NULL);
-  g_assert (d->vartable[jfrom].collab_tform != NULL);
+  vartabled *vt_from = vartable_element_get (jfrom, d);
+  vartabled *vt_to = vartable_element_get (jto, d);
 
-  d->vartable[jto].jref = d->vartable[jfrom].jref;  /*-- jref or jfrom? --*/
+  g_assert (vt_from->collab != NULL);
+  g_assert (vt_from->collab_tform != NULL);
 
-  d->vartable[jto].collab = g_strdup (d->vartable[jfrom].collab);
-  d->vartable[jto].collab_tform = g_strdup (d->vartable[jfrom].collab_tform);
+  vt_to->jref = vt_from->jref;  /*-- jref or jfrom? --*/
 
-  d->vartable[jto].mean = d->vartable[jfrom].mean;
-  d->vartable[jto].median = d->vartable[jfrom].median;
-  d->vartable[jto].lim.min =
-    d->vartable[jto].lim_raw.min =
-    d->vartable[jto].lim_tform.min = d->vartable[jfrom].lim_tform.min;
-  d->vartable[jto].lim.max =
-    d->vartable[jto].lim_raw.max =
-    d->vartable[jto].lim_tform.max = d->vartable[jfrom].lim_tform.max;
+  vt_to->collab = g_strdup (vt_from->collab);
+  vt_to->collab_tform = g_strdup (vt_from->collab_tform);
 
-  d->vartable[jto].nmissing = d->vartable[jfrom].nmissing;
-  d->vartable[jto].lim_specified_p = d->vartable[jfrom].lim_specified_p;
+  vt_to->mean = vt_from->mean;
+  vt_to->median = vt_from->median;
+  vt_to->lim.min =
+    vt_to->lim_raw.min =
+    vt_to->lim_tform.min = vt_from->lim_tform.min;
+  vt_to->lim.max =
+    vt_to->lim_raw.max =
+    vt_to->lim_tform.max = vt_from->lim_tform.max;
 
-  /*transform_values_copy (jfrom, jto, d);*/
+  vt_to->nmissing = vt_from->nmissing;
+  vt_to->lim_specified_p = vt_from->lim_specified_p;
 }
 
 
 /*-------------------------------------------------------------------------*/
 
-void
-vartable_init_var (gint j, datad *d) 
+vartabled *
+vartable_element_new (datad *d) 
 {
-  d->vartable[j].selected = false;
-  d->vartable[j].nmissing = 0;
+  vartabled *vt = (vartabled *) g_malloc (sizeof (vartabled));
 
-  d->vartable[j].categorical_p = false;  /*-- real-valued by default --*/
-  d->vartable[j].nlevels = 0;
+  vt->selected = false;
+  vt->nmissing = 0;
 
-  d->vartable[j].jref = -1;  /*-- not cloned --*/
+  vt->categorical_p = false;  /*-- real-valued by default --*/
+  vt->nlevels = 0;
 
-  d->vartable[j].mean = 0.0;
-  d->vartable[j].median = 0.0;
+  vt->jref = -1;  /*-- not cloned --*/
 
-  d->vartable[j].lim_specified_p = false;  /*-- no user-specified limits --*/
+  vt->mean = 0.0;
+  vt->median = 0.0;
 
-  d->vartable[j].lim_raw.min = 0.0;
-  d->vartable[j].lim_raw.max = 0.0;
-  d->vartable[j].lim_tform.min = 0.0;
-  d->vartable[j].lim_tform.max = 0.0;
+  vt->lim_specified_p = false;  /*-- no user-specified limits --*/
 
-  d->vartable[j].tform0 = NO_TFORM0;
-  d->vartable[j].domain_incr = 0.;
-  d->vartable[j].domain_adj = no_change;
-  d->vartable[j].inv_domain_adj = no_change;
-  d->vartable[j].tform1 = NO_TFORM1;
-  d->vartable[j].param = 0.;
-  d->vartable[j].tform2 = NO_TFORM2;
+  vt->lim_raw.min = 0.0;
+  vt->lim_raw.max = 0.0;
+  vt->lim_tform.min = 0.0;
+  vt->lim_tform.max = 0.0;
 
-  d->vartable[j].jitter_factor = 0.0;
+  vt->tform0 = NO_TFORM0;
+  vt->domain_incr = 0.;
+  vt->domain_adj = no_change;
+  vt->inv_domain_adj = no_change;
+  vt->tform1 = NO_TFORM1;
+  vt->param = 0.;
+  vt->tform2 = NO_TFORM2;
 
-  d->vartable[j].collab = NULL;
-  d->vartable[j].collab_tform = NULL;
+  vt->jitter_factor = 0.0;
+
+  vt->collab = NULL;
+  vt->collab_tform = NULL;
+
+  vartable_element_append (vt, d);
+  return vt;
 }
 
 void vartable_init (datad *d)
 {
   gint j;
   for (j=0; j<d->ncols; j++)
-    vartable_init_var (j, d);
+    vartable_element_new (d);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -281,11 +304,13 @@ void
 vartable_stats_print (datad *d, ggobid *gg) 
 {
   gint j;
+  vartabled *vt;
+
   for (j=0; j<d->ncols; j++) {
-    g_printerr ("mean=%f, median=%f\n",
-      d->vartable[j].mean, d->vartable[j].median);
+    vt = vartable_element_get (j, d);
+    g_printerr ("mean=%f, median=%f\n", vt->mean, vt->median);
     g_printerr ("lims: %7.2f %7.2f %7.2f %7.2f\n",
-      d->vartable[j].lim_raw.min, d->vartable[j].lim_raw.max,
-      d->vartable[j].lim_tform.min, d->vartable[j].lim_tform.max);
+      vt->lim_raw.min, vt->lim_raw.max,
+      vt->lim_tform.min, vt->lim_tform.max);
   }
 }

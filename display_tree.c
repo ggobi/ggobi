@@ -211,6 +211,7 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
 {
   gchar *buf;
   gint n;
+  vartabled *vt, *vtx, *vty;
 
   switch (type) {
     case scatterplot:
@@ -221,18 +222,19 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
      switch (cpanel->projection) {
         case P1PLOT:
         case TOUR1D:
-          n = strlen (d->vartable[splot->p1dvar].collab);
+          vt = vartable_element_get (splot->p1dvar, d);
+          n = strlen (vt->collab);
           buf = (gchar*) g_malloc(n* sizeof (gchar*));
-          sprintf(buf, "%s", d->vartable[splot->p1dvar].collab);
+          sprintf(buf, "%s", vt->collab);
         break;
 
         case XYPLOT:
-          n = strlen (d->vartable[splot->xyvars.x].collab) +
-              strlen (d->vartable[splot->xyvars.y].collab) + 5;
+          vtx = vartable_element_get (splot->xyvars.x, d);
+          vty = vartable_element_get (splot->xyvars.y, d);
+
+          n = strlen (vtx->collab) + strlen (vty->collab) + 5;
           buf = (gchar*) g_malloc (n * sizeof (gchar*));
-          sprintf (buf, "%s v %s",
-            d->vartable[splot->xyvars.x].collab,
-            d->vartable[splot->xyvars.y].collab);
+          sprintf (buf, "%s v %s", vtx->collab, vtx->collab);
         break;
 
         case TOUR2D:
@@ -252,22 +254,24 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
     }
     break;
     case scatmat:
-      n = strlen (d->vartable[splot->xyvars.x].collab) +
-          strlen (d->vartable[splot->xyvars.y].collab) + 5;
+      vtx = vartable_element_get (splot->xyvars.x, d);
+      vty = vartable_element_get (splot->xyvars.y, d);
+
+      n = strlen (vtx->collab) + strlen (vty->collab) + 5;
       buf = (gchar*) g_malloc (n * sizeof (gchar*));
-      sprintf (buf, "%s v %s",
-        d->vartable[splot->xyvars.x].collab,
-        d->vartable[splot->xyvars.y].collab);
+      sprintf (buf, "%s v %s", vtx->collab, vty->collab);
     break;
     case parcoords:
-      n = strlen (d->vartable[splot->p1dvar].collab);
-      buf = (gchar*) g_malloc(n* sizeof (gchar*));
-      sprintf(buf, "%s", d->vartable[splot->p1dvar].collab);
+      vt = vartable_element_get (splot->p1dvar, d);
+      n = strlen (vt->collab);
+      buf = (gchar*) g_malloc(n * sizeof (gchar*));
+      sprintf(buf, "%s", vt->collab);
     break;
     case tsplot:
-      n = strlen (d->vartable[splot->xyvars.y].collab);
+      vty = vartable_element_get (splot->xyvars.y, d);
+      n = strlen (vty->collab);
       buf = (gchar*) g_malloc(n* sizeof (gchar*));
-      sprintf(buf, "%s", d->vartable[splot->xyvars.y].collab);
+      sprintf(buf, "%s", vty->collab);
     break;
     case unknown_display_type:
     break;

@@ -345,29 +345,32 @@ void
 transform0_opt_menu_set_value (gint j, datad *d, ggobid *gg)
 {
   GtkWidget *stage0_option_menu;
+  vartabled *vt = vartable_element_get (j, d);
 
   stage0_option_menu = widget_find_by_name (gg->tform_ui.window,
                                             "TRANSFORM:stage0_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU (stage0_option_menu),
-    d->vartable[j].tform0);
+    vt->tform0);
 }
 void
 transform1_opt_menu_set_value (gint j, datad *d, ggobid *gg)
 {
   GtkWidget *stage1_option_menu;
+  vartabled *vt = vartable_element_get (j, d);
 
   stage1_option_menu = widget_find_by_name (gg->tform_ui.window,
                                             "TRANSFORM:stage1_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU (stage1_option_menu),
-    d->vartable[j].tform1);
+    vt->tform1);
 }
 void
 transform2_opt_menu_set_value (gint j, datad *d, ggobid *gg)
 {
   GtkWidget *stage2_option_menu;
+  vartabled *vt = vartable_element_get (j, d);
 
   stage2_option_menu = widget_find_by_name (gg->tform_ui.window,
                                             "TRANSFORM:stage2_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU (stage2_option_menu),
-    d->vartable[j].tform2);
+    vt->tform2);
 }

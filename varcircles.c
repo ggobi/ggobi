@@ -203,8 +203,9 @@ void
 varcircle_label_set (gint j, datad *d)
 {
   GtkWidget *w = varcircles_get_nth (LBL, j, d);
+  vartabled *vt = vartable_element_get (j, d);
   if (w != NULL)
-    gtk_label_set_text (GTK_LABEL(w), d->vartable[j].collab_tform);
+    gtk_label_set_text (GTK_LABEL(w), vt->collab_tform);
 }
 
 /*-- called from the Options menu --*/
@@ -484,15 +485,16 @@ varcircle_sel_cb (GtkWidget *w, GdkEvent *event, gint jvar)
 }
 
 static GtkWidget *
-varcircle_create (gint k, datad *d, ggobid *gg)
+varcircle_create (gint j, datad *d, ggobid *gg)
 {
   GtkWidget *vb, *lbl, *da;
+  vartabled *vt = vartable_element_get (j, d);
 
   vb = gtk_vbox_new (false, 0);
   d->vcirc_ui.vb = g_slist_append (d->vcirc_ui.vb, vb);
   gtk_container_border_width (GTK_CONTAINER (vb), 1);
 
-  lbl = gtk_label_new (d->vartable[k].collab);
+  lbl = gtk_label_new (vt->collab);
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, .5);  /*- x: left, y: middle --*/
   d->vcirc_ui.label = g_slist_append (d->vcirc_ui.label, lbl);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
@@ -516,9 +518,9 @@ varcircle_create (gint k, datad *d, ggobid *gg)
     "Click left to select or deselect", NULL);
 
   gtk_signal_connect (GTK_OBJECT (da), "expose_event",
-    GTK_SIGNAL_FUNC (da_expose_cb), GINT_TO_POINTER (k));
+    GTK_SIGNAL_FUNC (da_expose_cb), GINT_TO_POINTER (j));
   gtk_signal_connect (GTK_OBJECT (da), "button_press_event",
-    GTK_SIGNAL_FUNC (varcircle_sel_cb), GINT_TO_POINTER (k));
+    GTK_SIGNAL_FUNC (varcircle_sel_cb), GINT_TO_POINTER (j));
   gtk_object_set_data (GTK_OBJECT (da), "datad", d);
   GGobi_widget_set (GTK_WIDGET (da), gg, true);
   gtk_container_add (GTK_CONTAINER (vb), da);

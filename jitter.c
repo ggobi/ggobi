@@ -75,9 +75,11 @@ rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
   gint i, j, k, m;
   gfloat frand, fworld, fjit;
   gfloat precis = (gfloat) PRECISION1;
+  vartabled *vt;
 
   for (j=0; j<nselected_cols; j++) {
     k = selected_cols[j];
+    vt = vartable_element_get (k, d);
 
     for (i=0; i<d->nrows_in_plot; i++) {
       m = d->rows_in_plot[i];
@@ -91,10 +93,10 @@ rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
       */
       if (d->jitter.convex) {
         fworld = (gfloat) (d->world.vals[m][k] - d->jitdata.vals[m][k]);
-        fjit = d->vartable[k].jitter_factor * (frand - fworld);
+        fjit = vt->jitter_factor * (frand - fworld);
       }
       else
-        fjit = d->vartable[k].jitter_factor * frand;
+        fjit = vt->jitter_factor * frand;
 
       d->jitdata.vals[m][k] = (glong) fjit;
     }
@@ -108,20 +110,15 @@ rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
 void
 jitter_value_set (gfloat value, datad *d, ggobid *gg) {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars = get_selections_from_clist (d->ncols, vars, clist);
-
   gint j;
-/*
- *gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
- *gint ncols = selected_cols_get (cols, d, gg);
- *if (ncols == 0)
- *  ncols = plotted_cols_get (cols, d, gg);
-*/
+  vartabled *vt;
 
-  for (j=0; j<nvars; j++)
-    d->vartable[vars[j]].jitter_factor = value;
+  for (j=0; j<nvars; j++) {
+    vt = vartable_element_get (vars[j], d);
+    vt->jitter_factor = value;
+  }
 
   g_free ((gpointer) vars);
 }

@@ -151,7 +151,7 @@ subset_block (gint bstart, gint bsize, datad *d, ggobid *gg)
   }
   else quick_message ("The limits aren't correctly specified.", false);
  
-  return true;
+  return doneit;
 }
 
 gboolean

@@ -260,32 +260,34 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 void
 categoricalLevels(const xmlChar **attrs, XMLParserData *data)
 {
-    datad *d = getCurrentXMLData(data);
-    vartabled *el = &(d->vartable[data->current_variable]);
+  datad *d = getCurrentXMLData(data);
+  vartabled *el = vartable_element_get (data->current_variable, d);
 
-    const char *tmp = getAttribute(attrs, "count");
+  const char *tmp = getAttribute(attrs, "count");
 
-    if (tmp != NULL) {
-	el->nlevels = strToInteger(tmp);
-        el->levels = g_array_new(false, false, sizeof(gchar *));       
-        g_array_set_size(el->levels, el->nlevels);
-    }
+  if (tmp != NULL) {
+    el->nlevels = strToInteger(tmp);
+    el->levels = g_array_new(false, false, sizeof(gchar *));       
+    g_array_set_size(el->levels, el->nlevels);
+  }
 
-    data->current_level = -1; /* We'll increment the first one. */
+  data->current_level = -1; /* We'll increment the first one. */
 
-    if(el->nlevels < 1) {
-	fprintf(stderr, "Levels for %s mis-specified\n", el->collab);fflush(stderr); 
-    }
+  if(el->nlevels < 1) {
+    fprintf(stderr, "Levels for %s mis-specified\n", el->collab);
+    fflush(stderr); 
+  }
 }
 
 void
-addLevel(XMLParserData *data, const char *c, int len)
+addLevel(XMLParserData *data, const gchar *c, gint len)
 {
-    datad *d = getCurrentXMLData(data);
-    vartabled *el = &(d->vartable[data->current_variable]);
-    char *val = g_strdup(c);
+  datad *d = getCurrentXMLData(data);
+  vartabled *el = vartable_element_get (data->current_variable, d);
+
+  gchar *val = g_strdup(c);
 /*    g_array_append_val(el->levels, c); */
-    g_array_insert_val(el->levels, data->current_level, val);
+  g_array_insert_val(el->levels, data->current_level, val);
 }
 
 
@@ -736,24 +738,24 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
 {
   const gchar *tmp;
   datad *d = getCurrentXMLData(data);
+  vartabled *el = vartable_element_get (data->current_variable, d);
 
   data->variable_transform_name_as_attribute = false;
   tmp = getAttribute(attrs, "transformName");
   if (tmp) {
     data->variable_transform_name_as_attribute = true;
-
-    d->vartable[data->current_variable].collab_tform = g_strdup(tmp);
+    el->collab_tform = g_strdup(tmp);
   }
 
  tmp = getAttribute(attrs, "name");
  if(tmp != NULL) {
-  d->vartable[data->current_variable].collab = g_strdup(tmp);
-  if (data->variable_transform_name_as_attribute == false)
-      d->vartable[data->current_variable].collab_tform = g_strdup(tmp);
+   el->collab = g_strdup(tmp);
+   if (data->variable_transform_name_as_attribute == false)
+      el->collab_tform = g_strdup(tmp);
  }
 
- if(strcmp(tagName, "categoricalvariable") == 0) {
-     d->vartable[data->current_variable].categorical_p = true;
+ if (strcmp(tagName, "categoricalvariable") == 0) {
+     el->categorical_p = true;
  }
 
   return (true);
@@ -803,8 +805,8 @@ gboolean
 setVariableName(XMLParserData *data, const xmlChar *name, gint len)
 {
   gchar *tmp = (gchar *) g_malloc (sizeof(gchar) * (len+1));
-  gint j = data->current_variable;
   datad *d = getCurrentXMLData(data);
+  vartabled *el = vartable_element_get (data->current_variable, d);
 
   tmp[len] = '\0';
   memcpy (tmp, name, len);
@@ -812,11 +814,11 @@ setVariableName(XMLParserData *data, const xmlChar *name, gint len)
   /* Handle the case where we have multiple calls to the characters
      handler for the same variable because the data is split
    */
-  if (d->vartable[j].collab != NULL) {
+  if (el->collab != NULL) {
     /* need to append tmp to the existing value.*/
   }
 
-  d->vartable[j].collab = tmp;
+  el->collab = tmp;
 
   /* Note that if we do have multiple calls to this for the same
      variable then we cannot handle the case where the 
@@ -824,8 +826,8 @@ setVariableName(XMLParserData *data, const xmlChar *name, gint len)
      unless we use a flag in XMLParserData. This is
      variable_transform_name_as_attribute.
    */
-  if (d->vartable[j].collab_tform == NULL) {
-    d->vartable[j].collab_tform = g_strdup (tmp);
+  if (el->collab_tform == NULL) {
+    el->collab_tform = g_strdup (tmp);
   }
 
   return (true);

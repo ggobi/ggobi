@@ -358,6 +358,7 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   datad *d;
   gint j;
   gchar *row[1];
+  vartabled *vt;
 
   /* Create a notebook, set the position of the tabs */
   notebook = gtk_notebook_new ();
@@ -385,7 +386,8 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
                        gg);
 
     for (j=0; j<d->ncols; j++) {
-      row[0] = g_strdup_printf (d->vartable[j].collab_tform);
+      vt = vartable_element_get (j, d);
+      row[0] = g_strdup_printf (vt->collab_tform);
       gtk_clist_append (GTK_CLIST (clist), row);
     }
     gtk_container_add (GTK_CONTAINER (swin), clist);

@@ -425,6 +425,7 @@ save_collabels (gchar *rootname, gint *colv, gint nc, datad *d, ggobid *gg)
   gint j;
   FILE *fp;
   gchar *fname;
+  vartabled *vt;
 
   fname = g_strdup_printf ("%s.col", rootname);
   fp = fopen (fname, "w");
@@ -439,11 +440,15 @@ save_collabels (gchar *rootname, gint *colv, gint nc, datad *d, ggobid *gg)
   }
   else {
     if (gg->save.stage == RAWDATA) {
-      for (j=0; j<nc; j++)
-        fprintf (fp, "%s\n", d->vartable[colv[j]].collab);
+      for (j=0; j<nc; j++) {
+        vt = vartable_element_get (colv[j], d);
+        fprintf (fp, "%s\n", vt->collab);
+      }
     } else {  /*-- TFORMDATA --*/
-      for (j=0; j<nc; j++)
-        fprintf (fp, "%s\n", d->vartable[colv[j]].collab_tform);
+      for (j=0; j<nc; j++) {
+        vt = vartable_element_get (colv[j], d);
+        fprintf (fp, "%s\n", vt->collab_tform);
+      }
     }
     fclose (fp);
     return true;

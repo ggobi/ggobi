@@ -338,7 +338,7 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
 { discriminant_param *dp = (discriminant_param *) param;
   gint i, j, k, lda, n, job;
   /*gint info, inert[3];*/  /*eispack*/
-  gfloat detw[2], detwb[2];
+  /*gfloat detw[2], detwb[2];*/
 
   /* Compute means */
 

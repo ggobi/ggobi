@@ -131,13 +131,14 @@ vars_stdized_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
 {
   gboolean stdized = false;
   datad *d = datad_get_from_window (gg->sphere_ui.window);
+  vartabled *vt;
 
   if (d != NULL && d->sphere.vars.nels > 0) {
-    gint el, k;
+    gint k;
     stdized = true;
     for (k=0; k<d->sphere.vars.nels; k++) {
-      el = d->sphere.vars.els[k];
-      if (d->vartable[el].tform2 != STANDARDIZE) {
+      vt = vartable_element_get (d->sphere.vars.els[k], d);
+      if (vt->tform2 != STANDARDIZE) {
         stdized = false;
         break;
       }

@@ -19,24 +19,20 @@
 
 #include "vartable.h"
 
-void vartable_free_var (gint j, datad *d);
 void vartable_copy_var (gint jfrom, gint jto, datad *d);
 gboolean array_contains (gint* arr, gint n, gint el);
-void vartable_init_var (gint j, datad *d);
+void vartable_element_new (datad *d);
 void transform_values_copy (gint jfrom, gint jto, datad *d);
 
 static void
 addvar_vartable_expand (gint ncols, datad *d, ggobid *gg)
 {
-  gint jvar, k;
+  gint j;
 
-  vartable_realloc (d->ncols+ncols, d);
-  for (k=0; k<ncols; k++) {
-    jvar = d->ncols+k; /*-- its new index --*/
-
-    /*-- initialize d->vartable struct with default values --*/
-    vartable_init_var (jvar, d);
-    transform_values_init (jvar, d, gg);
+  for (j=d->ncols; j<d->ncols+ncols; j++) {
+    /*-- allocate the new vartable element, initialize with default values --*/
+    vartable_element_new (d);
+    transform_values_init (j, d, gg);
   }
 }
 
@@ -88,6 +84,7 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
   gint i;
   gint d_ncols_prev = d->ncols;
   gint jvar = d_ncols_prev;
+  vartabled *vt;
 
   addvar_vartable_expand (1, d, gg);  /*-- add one variable --*/
 
@@ -104,10 +101,10 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
         (float) d->clusterid.els[i];
   }
   
+  vt = vartable_element_get (jvar, d);
   /*-- update the vartable struct --*/
   limits_set_by_var (jvar, true, true, d, gg);
-  d->vartable[jvar].collab = 
-    d->vartable[jvar].collab_tform = g_strdup (vname);
+  vt->collab = vt->collab_tform = g_strdup (vname);
   /*-- --*/
 
   addvar_propagate (d_ncols_prev, 1, d, gg);
@@ -125,6 +122,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   gint i;
   gint d_ncols_prev = d->ncols;
   gint jvar = d_ncols_prev;
+  vartabled *vt;
 
   if (nvals != d->nrows)
     return;
@@ -139,8 +137,8 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   
   /*-- update the vartable struct --*/
   limits_set_by_var (jvar, true, true, d, gg);
-  d->vartable[jvar].collab = 
-    d->vartable[jvar].collab_tform = g_strdup (vname);
+  vt = vartable_element_get (jvar, d);
+  vt->collab = vt->collab_tform = g_strdup (vname);
   /*-- --*/
 
   addvar_propagate (d_ncols_prev, 1, d, gg);
@@ -332,7 +330,7 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
 gboolean
 delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg) 
 {
-  gint j, jfrom, jto;
+  gint j;
   gint *keepers, nkeepers;
   GList *l;
   GtkCListRow *row;
@@ -349,8 +347,9 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   */
   if ((j = plotted (cols, ncols, d, gg)) != -1) {
     gchar *message;
+    vartabled *vt = vartable_element_get (j, d);
     message = g_strdup_printf ("Deletion failed; the variable '%s' is currently plotted\n",
-      d->vartable[j].collab);
+      vt->collab);
     quick_message (message, false);
     g_free (message);
 
@@ -360,21 +359,9 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
   nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
 
-  /*-- copy and reallocate the array of vartabled structures --*/
-  /*-- delete elements from d->vartable array --*/
-  for (j=0; j<nkeepers; j++) {
-    jto = j;
-    jfrom = keepers[j];
-    if (jto != jfrom) {
-      vartable_free_var (jto, d);  /*-- free collab and collab_tform --*/
-      vartable_copy_var (jfrom, jto, d);
-    }
+  for (j=0; j<ncols; j++) {
+    vartable_element_remove (cols[j], d);
   }
-
-  /*-- having copied the keepers, free the last ncols elements --*/
-  for (j=nkeepers; j<d->ncols; j++)
-    vartable_free_var (j, d);
-  vartable_realloc (nkeepers, d);
 
   /*-- delete rows from clist; no copying is called for --*/
   if (d->vartable_clist != NULL) {

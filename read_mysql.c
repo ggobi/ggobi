@@ -164,34 +164,35 @@ GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
    from its meta-data and then the values for each observation.
  */
 int
-GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched,
+GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, gint preFetched,
                             datad *d, ggobid *gg)
 {
-  unsigned long i, rownum = 0;
-  unsigned long nrows, ncols;
+  unsigned glong j, rownum = 0;
+  unsigned glong nrows, ncols;
   MYSQL_ROW row;
+  vartabled *vt;
 
+  nrows =  mysql_num_rows(res);
+  ncols = mysql_num_fields(res);
 
-   nrows =  mysql_num_rows(res);
-   ncols = mysql_num_fields(res);
+  GGOBI(setDimensions)(nrows, ncols, gg);
 
-   GGOBI(setDimensions)(nrows, ncols, gg);
-
-   for(i = 0; i < ncols; i++) {
+   for(j = 0; j < ncols; j++) {
     MYSQL_FIELD *field = mysql_fetch_field(res);
-    d->vartable[i].collab = g_strdup(field->name);
-    d->vartable[i].collab_tform = g_strdup(field->name);
- //XXX    d->vartable[i].groupid = d->vartable[i].groupid_ori = i;
+    vt = vartable_element_get (j, d);
+    vt->collab = g_strdup(field->name);
+    vt->collab_tform = g_strdup(field->name);
+ //XXX    vt->groupid = vt->groupid_ori = i;
    }
 
     while((row = mysql_fetch_row(res)) != NULL) { 
-      for(i = 0; i < ncols; i++) {
-        d->raw.vals[rownum][i] = atof(row[i]);
+      for(j = 0; j < ncols; j++) {
+        d->raw.vals[rownum][i] = atof(row[j]);
       }
       rownum++;
     }
 
- return(i);
+ return(j);
 }
 
 /**

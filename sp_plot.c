@@ -373,6 +373,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   cpaneld *cpanel = &display->cpanel;
   gint dtype = display->displaytype;
   datad *d = display->d;
+  vartabled *vt, *vtx, *vty;
 
   gboolean proceed = (cpanel->projection == XYPLOT ||
                       cpanel->projection == P1PLOT ||
@@ -388,69 +389,69 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
     if ((dtype == scatterplot && cpanel->projection == XYPLOT) ||
         (dtype == scatmat && sp->p1dvar == -1))
     {
+      vtx = vartable_element_get (sp->xyvars.x, d);
       gdk_text_extents (style->font, 
-        d->vartable[ sp->xyvars.x ].collab_tform,
-        strlen (d->vartable[ sp->xyvars.x ].collab_tform),
+        vtx->collab_tform, strlen (vtx->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (drawable, style->font, gg->plot_GC,
         sp->max.x/2 - width/2,
         sp->max.y - 5,
-        d->vartable[ sp->xyvars.x ].collab_tform);
+        vtx->collab_tform);
 
+      vty = vartable_element_get (sp->xyvars.y, d);
       gdk_text_extents (style->font, 
-        d->vartable[ sp->xyvars.y ].collab_tform,
-        strlen (d->vartable[ sp->xyvars.y ].collab_tform),
+        vty->collab_tform, strlen (vty->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (drawable, style->font, gg->plot_GC,
         5, 5 + ascent + descent,
-        d->vartable[ sp->xyvars.y ].collab_tform);
+        vty->collab_tform);
     }
 
     if ((dtype == scatterplot && cpanel->projection == P1PLOT) ||
         (dtype == scatmat && sp->p1dvar != -1))
     {
+      vt = vartable_element_get (sp->p1dvar, d);
       gdk_text_extents (style->font,
-        d->vartable[ sp->p1dvar ].collab_tform,
-        strlen (d->vartable[ sp->p1dvar ].collab_tform),
+        vt->collab_tform, strlen (vt->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (drawable, style->font, gg->plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
-        d->vartable[ sp->p1dvar ].collab_tform);
+        vt->collab_tform);
     }
 
   } else if (dtype == parcoords) {
 
+    vt = vartable_element_get (sp->p1dvar, d);
     gdk_text_extents (style->font,
-      d->vartable[ sp->p1dvar ].collab_tform,
-      strlen (d->vartable[ sp->p1dvar ].collab_tform),
+      vt->collab_tform, strlen (vt->collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
     gdk_draw_string (drawable, style->font, gg->plot_GC,
       /*5,*/  /*-- Is there some reason I wasn't centering?  Dunno --*/
       sp->max.x/2 - width/2,
       sp->max.y - 5,
-      d->vartable[ sp->p1dvar ].collab_tform);
+      vt->collab_tform);
 
   } else if (dtype ==tsplot) {
 
     GList *l = display->splots;
     if (l->data == sp) {
+      vtx = vartable_element_get (sp->xyvars.x, d);
       gdk_text_extents (style->font, 
-        d->vartable[ sp->xyvars.x ].collab_tform,
-        strlen (d->vartable[ sp->xyvars.x ].collab_tform),
+        vt->collab_tform, strlen (vt->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (drawable, style->font, gg->plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
-        d->vartable[ sp->xyvars.x ].collab_tform);
+        vt->collab_tform);
     }
+    vty = vartable_element_get (sp->xyvars.y, d);
     gdk_text_extents (style->font, 
-      d->vartable[ sp->xyvars.y ].collab_tform,
-      strlen (d->vartable[ sp->xyvars.y ].collab_tform),
+      vt->collab_tform, strlen (vt->collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
     gdk_draw_string (drawable, style->font, gg->plot_GC,
       5, 5 + ascent + descent,
-      d->vartable[ sp->xyvars.y ].collab_tform);
+      vt->collab_tform);
   }
 
 }
@@ -1087,6 +1088,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gchar *varlab;
   gint dawidth = sp->da->allocation.width;
   gint daheight = sp->da->allocation.height;
+  vartabled *vt;
 
   if (!dsp->options.axes_show_p)
     return;
@@ -1123,13 +1125,13 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
  * the left if negative.
 */
           if (ix != dawidth/2) {
+            vt = vartable_element_get (j, d);
             gdk_text_extents (style->font, 
-              d->vartable[j].collab_tform,
-              strlen (d->vartable[j].collab_tform),
+              vt->collab_tform, strlen (vt->collab_tform),
               &lbearing, &rbearing, &width, &ascent, &descent);
             gdk_draw_string (drawable, style->font, gg->plot_GC,
               (ix > dawidth/2) ? 3*dawidth/4 + 10 : dawidth/4 - width -10,
-              iy, d->vartable[j].collab_tform);
+              iy, vt->collab_tform);
           }
         }     
         gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
@@ -1206,6 +1208,8 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
         for (j=0; j<d->ncols; j++) {
+          vt = vartable_element_get (j, d);
+
           /* horizontal */
           ix = dawidth/2 + 
             (gint) (dsp->tcorr1.u.vals[0][j]*
@@ -1218,12 +1222,11 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
           gdk_text_extents (style->font, 
-            d->vartable[j].collab_tform,
-            strlen (d->vartable[j].collab_tform),
+            vt->collab_tform, strlen (vt->collab_tform),
             &lbearing, &rbearing, &width, &ascent, &descent);
           gdk_draw_string (drawable, style->font, gg->plot_GC,
             dawidth/2+dawidth/4+10,
-            iy, d->vartable[j].collab_tform);
+            iy, vt->collab_tform);
   
           /* vertical */
           ix = 10 + j*textheight;

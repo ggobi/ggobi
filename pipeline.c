@@ -230,12 +230,12 @@ tform_to_world_by_var (gint j, datad *d, ggobid *gg)
   gint i, m;
   gfloat max, min, range, ftmp;
   gfloat precis = PRECISION1;
+  vartabled *vt = vartable_element_get (j, d);
 
   pipeline_arrays_check_dimensions (d);  /*-- realloc as necessary --*/
 
-
-  max = d->vartable[j].lim.max;
-  min = d->vartable[j].lim.min;
+  max = vt->lim.max;
+  min = vt->lim.min;
   range = max - min;
 
   for (i=0; i<d->nrows_in_plot; i++) {
@@ -292,26 +292,27 @@ rows_in_plot_set (datad *d, ggobid *gg) {
 /*-------------------------------------------------------------------------*/
 
 void
-world_to_raw_by_var (gint pt, gint var, displayd *display, datad *d, ggobid *gg)
+world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg)
 {
   gfloat precis = PRECISION1;
   gfloat ftmp, max, min, rdiff;
   gfloat x;
+  vartabled *vt = vartable_element_get (j, d);
 
   if (display->missing_p) {
     max = d->missing_lim.max;
     min = d->missing_lim.min;
   } else {
-    max = d->vartable[var].lim.max;
-    min = d->vartable[var].lim.min;
+    max = vt->lim.max;
+    min = vt->lim.min;
   }
   rdiff = max - min;
 
-  ftmp = d->world.vals[pt][var] / precis;
+  ftmp = d->world.vals[pt][j] / precis;
   x = (ftmp + 1.0) * .5 * rdiff;
   x += min;
 
-  d->raw.vals[pt][var] = d->tform.vals[pt][var] = x;
+  d->raw.vals[pt][j] = d->tform.vals[pt][j] = x;
 }
 
 /*

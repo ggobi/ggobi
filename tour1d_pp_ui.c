@@ -38,7 +38,7 @@ hide_cb (GtkWidget *w) {
 
 static void
 options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
-  ggobid *gg = GGobiFromWidget (w, true);
+  ggobid *gg = GGobiFromWidget (GTK_WIDGET(w), true);
   displayd *dsp = gg->current_display; 
 
   switch (action) {

@@ -139,31 +139,36 @@ qnorm (gdouble pr)
 void
 transform_values_init (gint j, datad *d, ggobid *gg) 
 {
-  d->vartable[j].tform0 = NO_TFORM0;
-  d->vartable[j].tform1 = NO_TFORM1;
-  d->vartable[j].tform2 = NO_TFORM2;
-  d->vartable[j].domain_incr = 0.;
-  d->vartable[j].param = 0.;
-  d->vartable[j].domain_adj = no_change;
-  d->vartable[j].inv_domain_adj = no_change;
+  vartabled *vt = vartable_element_get (j, d);
+  vt->tform0 = NO_TFORM0;
+  vt->tform1 = NO_TFORM1;
+  vt->tform2 = NO_TFORM2;
+  vt->domain_incr = 0.;
+  vt->param = 0.;
+  vt->domain_adj = no_change;
+  vt->inv_domain_adj = no_change;
 }
 void
 transform_values_copy (gint jfrom, gint jto, datad *d) 
 {
-  d->vartable[jto].tform1 = d->vartable[jfrom].tform1;
-  d->vartable[jto].tform2 = d->vartable[jfrom].tform2;
-  d->vartable[jto].domain_incr = d->vartable[jfrom].domain_incr;
-  d->vartable[jto].param = d->vartable[jfrom].param;
-  d->vartable[jto].domain_adj = d->vartable[jfrom].domain_adj;
-  d->vartable[jto].inv_domain_adj = d->vartable[jfrom].inv_domain_adj;
+  vartabled *vtf = vartable_element_get (jfrom, d);
+  vartabled *vtt = vartable_element_get (jto, d);
+
+  vtt->tform1 = vtf->tform1;
+  vtt->tform2 = vtf->tform2;
+  vtt->domain_incr = vtf->domain_incr;
+  vtt->param = vtf->param;
+  vtt->domain_adj = vtf->domain_adj;
+  vtt->inv_domain_adj = vtf->inv_domain_adj;
 }
 
 void
-transform0_values_set (gint tform0, gint jcol, datad *d, ggobid *gg)
+transform0_values_set (gint tform0, gint j, datad *d, ggobid *gg)
 {
   gfloat domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = no_change;
   gfloat (*inv_domain_adj) (gfloat x, gfloat incr) = no_change;
+  vartabled *vt = vartable_element_get (j, d);
 
   switch (tform0) {
 
@@ -171,25 +176,25 @@ transform0_values_set (gint tform0, gint jcol, datad *d, ggobid *gg)
       domain_incr = 0;
       domain_adj = no_change;
       inv_domain_adj = no_change;
-      break;
+    break;
 
     case RAISE_MIN_TO_0:
-      domain_incr = fabs (d->vartable[jcol].lim_raw.min);
+      domain_incr = fabs (vt->lim_raw.min);
       domain_adj = raise_min_to_0;
       inv_domain_adj = inv_raise_min_to_0;
-      break;
+    break;
 
     case RAISE_MIN_TO_1:
-      domain_incr = fabs (d->vartable[jcol].lim_raw.min);
+      domain_incr = fabs (vt->lim_raw.min);
       domain_adj = raise_min_to_1;
       inv_domain_adj = inv_raise_min_to_1;
-      break;
+    break;
 
     case NEGATE:
       domain_incr = 0.0;
       domain_adj = negate;
       inv_domain_adj = negate;
-      break;
+    break;
 
     default:
       domain_incr = 0;
@@ -197,28 +202,30 @@ transform0_values_set (gint tform0, gint jcol, datad *d, ggobid *gg)
       inv_domain_adj = no_change;
   }
 
-  d->vartable[jcol].tform0 = tform0;
-  d->vartable[jcol].domain_incr = domain_incr;
-  d->vartable[jcol].domain_adj = domain_adj;
-  d->vartable[jcol].inv_domain_adj = inv_domain_adj;
+  vt->tform0 = tform0;
+  vt->domain_incr = domain_incr;
+  vt->domain_adj = domain_adj;
+  vt->inv_domain_adj = inv_domain_adj;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
-  transform0_opt_menu_set_value (jcol, d, gg);
+  transform0_opt_menu_set_value (j, d, gg);
 }
 
 void
-transform1_values_set (gint tform1, gfloat expt, gint jcol, 
+transform1_values_set (gint tform1, gfloat expt, gint j, 
   datad *d, ggobid *gg)
 {
-  d->vartable[jcol].tform1 = tform1;
-  d->vartable[jcol].param = expt;
+  vartabled *vt = vartable_element_get (j, d);
+
+  vt->tform1 = tform1;
+  vt->param = expt;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
-  transform1_opt_menu_set_value (jcol, d, gg);
+  transform1_opt_menu_set_value (j, d, gg);
 }
 
 gboolean 
-transform1_apply (gint jcol, datad *d, ggobid *gg)
+transform1_apply (gint j, datad *d, ggobid *gg)
 {
   gint i, m, n;
   gfloat min, max, diff;
@@ -230,14 +237,15 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
                                             "TRANSFORM:stage1_option_menu");
   gint tform1 = option_menu_index (GTK_OPTION_MENU (stage1_option_menu));
   gfloat boxcoxparam = gg->tform_ui.boxcox_adj->value;
-  gfloat incr = d->vartable[jcol].domain_incr;
-  gfloat (*domain_adj) (gfloat x, gfloat incr) = d->vartable[jcol].domain_adj;
+  vartabled *vt = vartable_element_get (j, d);
+  gfloat incr = vt->domain_incr;
+  gfloat (*domain_adj) (gfloat x, gfloat incr) = vt->domain_adj;
 
   
   /*-- adjust the transformed value of the user-supplied limits --*/
-  if (d->vartable[jcol].lim_specified_p) {
-    slim.min = d->vartable[jcol].lim_specified.min;
-    slim.max = d->vartable[jcol].lim_specified.max;
+  if (vt->lim_specified_p) {
+    slim.min = vt->lim_specified.min;
+    slim.max = vt->lim_specified.max;
   }
 
   switch (tform1)
@@ -245,10 +253,10 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
     case NO_TFORM1:    /*-- Apply the stage0 transformation --*/
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
-        d->tform.vals[m][jcol] = (*domain_adj)(d->raw.vals[m][jcol], incr);
+        d->tform.vals[m][j] = (*domain_adj)(d->raw.vals[m][j], incr);
       }
       /*-- apply the same transformation to the specified limits --*/
-      if (d->vartable[jcol].lim_specified_p) {
+      if (vt->lim_specified_p) {
         slim_tform.min = (*domain_adj)(slim.min, incr);
         slim_tform.max = (*domain_adj)(slim.max, incr);
       }
@@ -258,17 +266,17 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
       if (fabs (boxcoxparam-0) < .001) {       /* Natural log */
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot[i];
-          if ((*domain_adj)(d->raw.vals[m][jcol], incr) <= 0) {
+          if ((*domain_adj)(d->raw.vals[m][j], incr) <= 0) {
             g_printerr ("%f %f\n",
-              d->raw.vals[m][jcol],
-              (*domain_adj)(d->raw.vals[m][jcol], incr));
+              d->raw.vals[m][j],
+              (*domain_adj)(d->raw.vals[m][j], incr));
             quick_message (domain_error_message, false);
             tform_ok = false;
             break;
           }
         }
         /*-- apply the same domain test to the specified limits --*/
-        if (d->vartable[jcol].lim_specified_p) {
+        if (vt->lim_specified_p) {
           if (((*domain_adj)(slim_tform.min, incr) <= 0) ||
               ((*domain_adj)(slim_tform.max, incr) <= 0))
           {
@@ -280,12 +288,12 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         if (tform_ok) {  /*-- if all values are in the domain of log --*/
           for (i=0; i<d->nrows_in_plot; i++) {
             m = d->rows_in_plot[i];
-            d->tform.vals[m][jcol] = (gfloat)
-              log ((gdouble) ((*domain_adj)(d->raw.vals[m][jcol], incr)));
+            d->tform.vals[m][j] = (gfloat)
+              log ((gdouble) ((*domain_adj)(d->raw.vals[m][j], incr)));
           }
 
           /*-- apply the same transformation to the specified limits --*/
-          if (d->vartable[jcol].lim_specified_p) {
+          if (vt->lim_specified_p) {
             slim_tform.min = (gfloat)
               log ((gdouble) ((*domain_adj)(slim.min, incr)));
             slim_tform.max = (gfloat)
@@ -299,7 +307,7 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         for (i=0; i<d->nrows_in_plot; i++) {
 
           m = d->rows_in_plot[i];
-          dtmp = pow ((gdouble) (*domain_adj)(d->raw.vals[m][jcol], incr),
+          dtmp = pow ((gdouble) (*domain_adj)(d->raw.vals[m][j], incr),
                       boxcoxparam);
           dtmp = (dtmp - 1.0) / boxcoxparam;
 
@@ -310,19 +318,19 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
           if (!finite (dtmp)) {
 #endif
             g_printerr ("%f %f %f (breaking, i=%d)\n",
-              d->raw.vals[m][jcol],
-              (*domain_adj)(d->raw.vals[m][jcol], incr),
+              d->raw.vals[m][j],
+              (*domain_adj)(d->raw.vals[m][j], incr),
               dtmp, i);
             quick_message (domain_error_message, false);
             tform_ok = false;
             break;
           } else {
-            d->tform.vals[m][jcol] = (gfloat) dtmp;
+            d->tform.vals[m][j] = (gfloat) dtmp;
           }
         }
 
         /*-- apply the same transformation to the specified limits --*/
-        if (d->vartable[jcol].lim_specified_p) {
+        if (vt->lim_specified_p) {
           dtmp = pow ((gdouble) (*domain_adj)(slim.min, incr), boxcoxparam);
 #ifdef WIN32
           if (!_finite (dtmp)) {
@@ -350,14 +358,14 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
     case LOG10:    /* Base 10 log */
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
-        if ((*domain_adj)(d->raw.vals[m][jcol], incr) <= 0) {
+        if ((*domain_adj)(d->raw.vals[m][j], incr) <= 0) {
           quick_message (domain_error_message, false);
           tform_ok = false;
           break;
         }
       }
       /*-- apply the same domain test to the specified limits --*/
-      if (d->vartable[jcol].lim_specified_p) {
+      if (vt->lim_specified_p) {
         if (((*domain_adj)(slim_tform.min, incr) <= 0) ||
             ((*domain_adj)(slim_tform.max, incr) <= 0))
         {
@@ -369,11 +377,11 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
       if (tform_ok) {  /*-- if all values are in the domain of log10 --*/
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot[i];
-          d->tform.vals[m][jcol] = (gfloat)
-            log10 ((gdouble) (*domain_adj)(d->raw.vals[m][jcol], incr));
+          d->tform.vals[m][j] = (gfloat)
+            log10 ((gdouble) (*domain_adj)(d->raw.vals[m][j], incr));
         }
         /*-- apply the same transformation to the specified limits --*/
-        if (d->vartable[jcol].lim_specified_p) {
+        if (vt->lim_specified_p) {
           slim_tform.min = (gfloat)
             log10 ((gdouble) (*domain_adj)(slim.min, incr));
           slim_tform.max = (gfloat)
@@ -386,8 +394,8 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
       for (i=0; i<d->nrows_in_plot-1; i++) {
         m = d->rows_in_plot[i];
         n = d->rows_in_plot[i+1];
-        if (SIGNUM((*domain_adj)(d->raw.vals[m][jcol], incr)) !=
-            SIGNUM((*domain_adj)(d->raw.vals[n][jcol], incr)))
+        if (SIGNUM((*domain_adj)(d->raw.vals[m][j], incr)) !=
+            SIGNUM((*domain_adj)(d->raw.vals[n][j], incr)))
         {
           quick_message (domain_error_message, false);
           tform_ok = false;
@@ -395,7 +403,7 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         }
       }
       /*-- apply the same domain test to the specified limits --*/
-      if (d->vartable[jcol].lim_specified_p) {
+      if (vt->lim_specified_p) {
         if (SIGNUM((*domain_adj)(slim_tform.min, incr)) !=
             SIGNUM((*domain_adj)(slim_tform.max, incr)))
         {
@@ -407,13 +415,13 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
       if (tform_ok) {
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot[i];
-          d->tform.vals[m][jcol] = (gfloat)
-            pow ((gdouble) (*domain_adj)(d->raw.vals[m][jcol], incr),
+          d->tform.vals[m][j] = (gfloat)
+            pow ((gdouble) (*domain_adj)(d->raw.vals[m][j], incr),
               (gdouble) (-1.0));
         }
 
         /*-- apply the same transformation to the specified limits --*/
-        if (d->vartable[jcol].lim_specified_p) {
+        if (vt->lim_specified_p) {
           slim_tform.min = (gfloat)
             pow ((gdouble) (*domain_adj)(slim.min, incr), (gdouble) (-1.0));
           slim_tform.max = (gfloat)
@@ -425,11 +433,11 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
     case ABSVALUE:
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
-        ftmp = (*domain_adj)(d->raw.vals[m][jcol], incr);
-        d->tform.vals[m][jcol] = (ftmp >= 0 ? ftmp : -1 * ftmp);
+        ftmp = (*domain_adj)(d->raw.vals[m][j], incr);
+        d->tform.vals[m][j] = (ftmp >= 0 ? ftmp : -1 * ftmp);
       }
       /*-- apply the same transformation to the specified limits --*/
-      if (d->vartable[jcol].lim_specified_p) {
+      if (vt->lim_specified_p) {
         ftmp = (*domain_adj)(slim.min, incr);
         slim_tform.min = (ftmp >= 0 ? ftmp : -1 * ftmp);
 
@@ -455,14 +463,14 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
       gfloat ftmp;
 
       /*-- Either use user-defined limits, or data min and max --*/
-      if (d->vartable[jcol].lim_specified_p) {
+      if (vt->lim_specified_p) {
         min = slim_tform.min;
         max = slim_tform.max;
       } else {
-        min = max = (*domain_adj)(d->raw.vals[0][jcol], incr);
+        min = max = (*domain_adj)(d->raw.vals[0][j], incr);
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot[i];
-          ref = (*domain_adj)(d->raw.vals[m][jcol], incr);
+          ref = (*domain_adj)(d->raw.vals[m][j], incr);
           if (ref < min) min = ref;
           if (ref > max) max = ref;
         }
@@ -473,8 +481,8 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
 
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
-        ftmp = ((*domain_adj)(d->raw.vals[m][jcol], incr) - min)/diff;
-        d->tform.vals[m][jcol] = (ftmp * bminusa) + a;
+        ftmp = ((*domain_adj)(d->raw.vals[m][j], incr) - min)/diff;
+        d->tform.vals[m][j] = (ftmp * bminusa) + a;
       }
     }
     break;
@@ -483,21 +491,23 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
     break;
   }
 
-  if (tform_ok && d->vartable[jcol].lim_specified_p) {
-    d->vartable[jcol].lim_specified_tform.min = slim_tform.min;
-    d->vartable[jcol].lim_specified_tform.max = slim_tform.max;
+  if (tform_ok && vt->lim_specified_p) {
+    vt->lim_specified_tform.min = slim_tform.min;
+    vt->lim_specified_tform.max = slim_tform.max;
   }
 
   return (tform_ok);
 }
 
 void
-transform2_values_set (gint tform2, gint jcol, datad *d, ggobid *gg)
+transform2_values_set (gint tform2, gint j, datad *d, ggobid *gg)
 {
-  d->vartable[jcol].tform2 = tform2;
+  vartabled *vt = vartable_element_get (j, d);
+
+  vt->tform2 = tform2;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
-  transform2_opt_menu_set_value (jcol, d, gg);
+  transform2_opt_menu_set_value (j, d, gg);
 }
 
 gboolean 
@@ -674,25 +684,26 @@ void
 collab_tform_update (gint j, datad *d, ggobid *gg)
 {
   gchar *lbl0, *lbl1;
+  vartabled *vt = vartable_element_get (j, d);
 
-  g_free ((gpointer) d->vartable[j].collab_tform);
+  g_free ((gpointer) vt->collab_tform);
 
   /*-- skip the stage0 changes except negation --*/
-  switch (d->vartable[j].tform0) {
+  switch (vt->tform0) {
     case NEGATE:
-      lbl0 = g_strdup_printf ("-%s", d->vartable[j].collab);
+      lbl0 = g_strdup_printf ("-%s", vt->collab);
       break;
     default:
-      lbl0 = g_strdup (d->vartable[j].collab);
+      lbl0 = g_strdup (vt->collab);
       break;
   }
 
-  switch (d->vartable[j].tform1) {
+  switch (vt->tform1) {
     case NO_TFORM1:
       lbl1 = g_strdup (lbl0);
       break;
     case BOXCOX:
-      lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, d->vartable[j].param);
+      lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, vt->param);
       break;
     case LOG10:
       lbl1 = g_strdup_printf ("log10(%s)", lbl0);
@@ -708,47 +719,47 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
       break;
   }
 
-  switch (d->vartable[j].tform2) {
+  switch (vt->tform2) {
     case NO_TFORM2:
-      d->vartable[j].collab_tform = g_strdup (lbl1);
-      break;
+      vt->collab_tform = g_strdup (lbl1);
+    break;
     case STANDARDIZE:
-      d->vartable[j].collab_tform = g_strdup_printf ("(%s-m)/s", lbl1);
-      break;
+      vt->collab_tform = g_strdup_printf ("(%s-m)/s", lbl1);
+    break;
     case SORT:
-      d->vartable[j].collab_tform = g_strdup_printf ("sort(%s)", lbl1);
-      break;
+      vt->collab_tform = g_strdup_printf ("sort(%s)", lbl1);
+    break;
     case RANK:
-      d->vartable[j].collab_tform = g_strdup_printf ("rank(%s)", lbl1);
-      break;
+      vt->collab_tform = g_strdup_printf ("rank(%s)", lbl1);
+    break;
     case NORMSCORE:
-      d->vartable[j].collab_tform = g_strdup_printf ("normsc(%s)", lbl1);
-      break;
+      vt->collab_tform = g_strdup_printf ("normsc(%s)", lbl1);
+    break;
     case ZSCORE:
-      d->vartable[j].collab_tform = g_strdup_printf ("zsc(%s)", lbl1);
-      break;
+      vt->collab_tform = g_strdup_printf ("zsc(%s)", lbl1);
+    break;
     case DISCRETE2:
-      d->vartable[j].collab_tform = g_strdup_printf ("%s:0,1", lbl1);
-      break;
+      vt->collab_tform = g_strdup_printf ("%s:0,1", lbl1);
+    break;
   }
 
   g_free ((gpointer) lbl0);
   g_free ((gpointer) lbl1);
 }
 
-void tform_label_update (gint jcol, datad *d, ggobid *gg)
+void tform_label_update (gint j, datad *d, ggobid *gg)
 {
   /*-- update the values of the variable labels --*/
-  collab_tform_update (jcol, d, gg);
+  collab_tform_update (j, d, gg);
 
   /*-- update the displayed checkbox label --*/
-  varlabel_set (jcol, d);
+  varlabel_set (j, d);
 
   /*-- update the displayed variable circle labels --*/
-  varcircle_label_set (jcol, d);
+  varcircle_label_set (j, d);
 
   /*-- update the variable statistics table --*/
-  vartable_collab_tform_set_by_var (jcol, d);
+  vartable_collab_tform_set_by_var (j, d);
 }
 
 /*---------------------------------------------------------------------*/

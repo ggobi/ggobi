@@ -437,6 +437,7 @@ tsplot_whiskers_make (splotd *sp, displayd *display, ggobid *gg) {
   for (splist = display->splots; splist; splist = splist->next) {
     splot = (splotd *) splist->data;
     if (splot == sp) {
+/*-- interesting -- what's sp_next used for?   dfs --*/
       sp_next = (splist->next == NULL) ? NULL : (splotd *) splist->next->data;
     }
   }

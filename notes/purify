@@ -27,10 +27,12 @@ export GLIB_CONFIG=/usr/dfs/cc/bin/glib-config
 LD_LIBRARY_PATH=/usr/dfs/cc/lib:$LD_LIBRARY_PATH
 LD_LIBRARYN32_PATH=/usr/dfs/cc/lib:$LD_LIBRARYN32_PATH
 PATH=/usr/dfs/cc/bin:$PATH
-
-use the above settings and add this:
-
 export GTK_CONFIG=/usr/dfs/cc/bin/gtk-config
+
+Makefile:
+  CC=cc
+local.config
+  undef XML
 
 I had to turn xml off, because that inserts /usr/common/include and
 /usr/common/lib into the search path when I'm trying to get them out

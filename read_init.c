@@ -432,10 +432,13 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
 gint
 resolveVariableName(const char *name, datad *d)
 { 
-  gint i;
-  for(i = 0; i < d->ncols; i++) {
-  if(strcmp(d->vartable[i].collab, name) == 0)
-    return(i);
+  gint j;
+  vartabled *vt;
+
+  for (j = 0; j < d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    if (strcmp (vt->collab, name) == 0)
+      return(j);
   }
 
   return(-1);

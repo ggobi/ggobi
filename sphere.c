@@ -64,9 +64,10 @@ void
 variable_set_label (datad *d, gint j, gchar *lbl) 
 {
   extern void varcircle_label_set (gint jvar, datad *d);
+  vartabled *vt = vartable_element_get (j, d);
 
-  d->vartable[j].collab = g_strdup (lbl);
-  d->vartable[j].collab_tform = g_strdup (lbl);
+  vt->collab = g_strdup (lbl);
+  vt->collab_tform = g_strdup (lbl);
   vartable_collab_set_by_var (j, d);
   varlabel_set (j, d);         /*-- checkboxes --*/
   varcircle_label_set (j, d);  /*-- variable circles --*/
@@ -88,6 +89,7 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   gint j, k;
   gchar *lbl;
   /*-- for updating the clist --*/
+  vartabled *vt;
   GtkCList *clist = GTK_CLIST (gg->sphere_ui.clist);
   gchar *row[] = {""};
   /*-- --*/
@@ -166,7 +168,8 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   /*-- add the new labels to the clist --*/
   gtk_clist_freeze (clist);
   for (j=0; j<d->sphere.vars_sphered.nels; j++) {
-    row[0] = g_strdup (d->vartable[d->sphere.vars_sphered.els[j]].collab);
+    vt = vartable_element_get (d->sphere.vars_sphered.els[j], d);
+    row[0] = g_strdup (vt->collab);
     gtk_clist_append (clist, row);
     g_free (row[0]);
   }

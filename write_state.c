@@ -183,12 +183,14 @@ add_xml_scatterplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
  */
 
 const char *
-addVariable(xmlNodePtr node, int which, datad *d)
+addVariable(xmlNodePtr node, gint j, datad *d)
 {
+  extern vartabled * vartable_element_get (gint, datad *);
   const char *name;
+  vartabled *vt = vartable_element_get (j, d);
 
   node = xmlNewChild(node, NULL,"variable", NULL);
-  name = d->vartable[which].collab;
+  name = vt->collab;
   xmlSetProp(node, "name", name);
 
   return(name);   

@@ -180,16 +180,6 @@ brush_reset(ggobid *gg, gint action)
   }
 }
 
-/* Options from the Options menu in the main menubar */
-/*
-void
-brush_options_cb (gpointer data, guint action, GtkCheckMenuItem *w)
-{
- * action 1 : Update linked brushing continuously
-  g_printerr ("action: %d, state: %d\n", action,  w->active);
-}
-*/
-
 /*--------------------------------------------------------------------*/
 /*      Handling keyboard and mouse events in the plot window         */
 /*--------------------------------------------------------------------*/

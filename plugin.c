@@ -44,16 +44,16 @@ registerPlugins(ggobid *gg, GList *plugins)
   GGobiPluginInfo *plugin;
   gboolean ok = true;
 
-    while(el) {
-	plugin = (GGobiPluginInfo *) el->data;
-        if(plugin->onCreate) {
-	  f = (OnCreate) getPluginSymbol(plugin->onCreate, plugin);
-          if(f) {
-	     ok = f(gg, plugin);
-	  }
-	}
-        el = el->next;
+  while(el) {
+    plugin = (GGobiPluginInfo *) el->data;
+    if(plugin->onCreate) {
+      f = (OnCreate) getPluginSymbol(plugin->onCreate, plugin);
+      if(f) {
+        ok = f(gg, plugin);
+      }
     }
+    el = el->next;
+  }
 
   return(ok);
 }
@@ -145,22 +145,22 @@ addPlugin(GGobiPluginInfo *info, GtkWidget *list)
 void
 closePlugins(ggobid *gg)
 {
-    GList *el, *tmp;
-    PluginInstance *plugin;
+  GList *el, *tmp;
+  PluginInstance *plugin;
 
-    el = gg->pluginInstances;
-    while(el) { 
-        plugin = (PluginInstance *) el->data;
-        if(plugin->info->onClose) {
-	  DLFUNC f =  getPluginSymbol(plugin->info->onClose, plugin->info);
-          f(gg, plugin);
-	}
-        tmp = el;
-	el = el->next;
-        g_free(plugin);    
-/*        g_free(tmp); */
+  el = gg->pluginInstances;
+  while(el) { 
+    plugin = (PluginInstance *) el->data;
+    if(plugin->info->onClose) {
+      DLFUNC f =  getPluginSymbol(plugin->info->onClose, plugin->info);
+      f(gg, plugin);
     }
-    gg->pluginInstances = NULL;
+    tmp = el;
+    el = el->next;
+    g_free(plugin);    
+/*  g_free(tmp); */
+  }
+  gg->pluginInstances = NULL;
 }
 
 

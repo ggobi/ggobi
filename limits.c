@@ -87,9 +87,10 @@ limits_adjust (gfloat *min, gfloat *max)
 static void
 limits_raw_set_by_var (gint j, datad *d, ggobid *gg) {
   gint i, m;
+  vartabled *vt = vartable_element_get (j, d);
 
-  d->vartable[j].lim_raw.min = d->raw.vals[d->rows_in_plot[0]][j];
-  d->vartable[j].lim_raw.max = d->raw.vals[d->rows_in_plot[0]][j];
+  vt->lim_raw.min = d->raw.vals[d->rows_in_plot[0]][j];
+  vt->lim_raw.max = d->raw.vals[d->rows_in_plot[0]][j];
 
   if (gg->lims_use_visible) {  /*-- if using visible cases only --*/
 
@@ -98,10 +99,10 @@ limits_raw_set_by_var (gint j, datad *d, ggobid *gg) {
       if (d->nmissing > 0 && MISSING_P(i,j))
         ;
       else {
-        if (d->raw.vals[i][j] < d->vartable[j].lim_raw.min)
-          d->vartable[j].lim_raw.min = d->raw.vals[i][j];
-        else if (d->raw.vals[i][j] > d->vartable[j].lim_raw.max)
-          d->vartable[j].lim_raw.max = d->raw.vals[i][j];
+        if (d->raw.vals[i][j] < vt->lim_raw.min)
+          vt->lim_raw.min = d->raw.vals[i][j];
+        else if (d->raw.vals[i][j] > vt->lim_raw.max)
+          vt->lim_raw.max = d->raw.vals[i][j];
       }
     }
   } else {
@@ -110,10 +111,10 @@ limits_raw_set_by_var (gint j, datad *d, ggobid *gg) {
       if (d->nmissing > 0 && MISSING_P(i,j))
         ;
       else {
-        if (d->raw.vals[i][j] < d->vartable[j].lim_raw.min)
-          d->vartable[j].lim_raw.min = d->raw.vals[i][j];
-        else if (d->raw.vals[i][j] > d->vartable[j].lim_raw.max)
-          d->vartable[j].lim_raw.max = d->raw.vals[i][j];
+        if (d->raw.vals[i][j] < vt->lim_raw.min)
+          vt->lim_raw.min = d->raw.vals[i][j];
+        else if (d->raw.vals[i][j] > vt->lim_raw.max)
+          vt->lim_raw.max = d->raw.vals[i][j];
       }
     }
   }
@@ -133,21 +134,22 @@ limits_tform_set_by_var (gint j, datad *d, ggobid *gg)
   gint i, m, np = 0;
   gfloat sum = 0.0;
   gfloat *x = (gfloat *) g_malloc (d->nrows * sizeof (gfloat));
+  vartabled *vt = vartable_element_get (j, d);
 
-  d->vartable[j].lim_tform.min = d->tform.vals[d->rows_in_plot[0]][j];
-  d->vartable[j].lim_tform.max = d->tform.vals[d->rows_in_plot[0]][j];
+  vt->lim_tform.min = d->tform.vals[d->rows_in_plot[0]][j];
+  vt->lim_tform.max = d->tform.vals[d->rows_in_plot[0]][j];
 
   if (gg->lims_use_visible) {
 
     for (m=0; m<d->nrows_in_plot; m++) {
       i = d->rows_in_plot[m];
       if (d->nmissing > 0 && MISSING_P(i,j))
-      ;
+        ;
       else {
-        if (d->tform.vals[i][j] < d->vartable[j].lim_tform.min)
-          d->vartable[j].lim_tform.min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > d->vartable[j].lim_tform.max)
-          d->vartable[j].lim_tform.max = d->tform.vals[i][j];
+        if (d->tform.vals[i][j] < vt->lim_tform.min)
+          vt->lim_tform.min = d->tform.vals[i][j];
+        else if (d->tform.vals[i][j] > vt->lim_tform.max)
+          vt->lim_tform.max = d->tform.vals[i][j];
 
         sum += d->tform.vals[i][j];
         x[np] = d->tform.vals[i][j];
@@ -160,10 +162,10 @@ limits_tform_set_by_var (gint j, datad *d, ggobid *gg)
       if (d->nmissing > 0 && MISSING_P(i,j))
         ;
       else {
-        if (d->tform.vals[i][j] < d->vartable[j].lim_tform.min)
-          d->vartable[j].lim_tform.min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > d->vartable[j].lim_tform.max)
-          d->vartable[j].lim_tform.max = d->tform.vals[i][j];
+        if (d->tform.vals[i][j] < vt->lim_tform.min)
+          vt->lim_tform.min = d->tform.vals[i][j];
+        else if (d->tform.vals[i][j] > vt->lim_tform.max)
+          vt->lim_tform.max = d->tform.vals[i][j];
 
         sum += d->tform.vals[i][j];
         x[np] = d->tform.vals[i][j];
@@ -172,12 +174,11 @@ limits_tform_set_by_var (gint j, datad *d, ggobid *gg)
     }
   }
 
-  d->vartable[j].mean = sum / np;
+  vt->mean = sum / np;
 
   /*-- median: sort the temporary vector, and find its center --*/
   qsort((void *) x, np, sizeof (gfloat), fcompare);
-  d->vartable[j].median = 
-    ((np % 2) != 0) ?  x[(np-1)/2] : (x[np/2-1] + x[np/2])/2. ;
+  vt->median = ((np % 2) != 0) ?  x[(np-1)/2] : (x[np/2-1] + x[np/2])/2. ;
 
   g_free ((gpointer) x);
 }
@@ -197,6 +198,7 @@ limits_set (gboolean do_raw, gboolean do_tform, datad *d, ggobid *gg)
 {
   gint j;
   gfloat min, max;
+  vartabled *vt;
 
   /*-- compute the limits for the raw data --*/
   if (do_raw)
@@ -207,19 +209,20 @@ limits_set (gboolean do_raw, gboolean do_tform, datad *d, ggobid *gg)
 
   /*-- specify the limits used: from data or user specification --*/
   for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
 
-    if (d->vartable[j].lim_specified_p) {
-      min = d->vartable[j].lim_specified_tform.min;
-      max = d->vartable[j].lim_specified_tform.max;
+    if (vt->lim_specified_p) {
+      min = vt->lim_specified_tform.min;
+      max = vt->lim_specified_tform.max;
     } else {
-      min = d->vartable[j].lim_tform.min;
-      max = d->vartable[j].lim_tform.max;
+      min = vt->lim_tform.min;
+      max = vt->lim_tform.max;
     }
 
     limits_adjust (&min, &max);
 
-    d->vartable[j].lim.min = min;
-    d->vartable[j].lim.max = max;
+    vt->lim.min = min;
+    vt->lim.max = max;
   }
 }
 
@@ -228,6 +231,7 @@ limits_set_by_var (gint j, gboolean do_raw, gboolean do_tform,
   datad *d, ggobid *gg)
 {
   gfloat min, max;
+  vartabled *vt = vartable_element_get (j, d);
 
   /*-- compute the limits for the raw data --*/
   if (do_raw)
@@ -237,17 +241,17 @@ limits_set_by_var (gint j, gboolean do_raw, gboolean do_tform,
     limits_tform_set_by_var (j, d, gg);
 
   /*-- specify the limits used: from data or user specification --*/
-  if (d->vartable[j].lim_specified_p) {
-    min = d->vartable[j].lim_specified_tform.min;
-    max = d->vartable[j].lim_specified_tform.max;
+  if (vt->lim_specified_p) {
+    min = vt->lim_specified_tform.min;
+    max = vt->lim_specified_tform.max;
   } else {
-    min = d->vartable[j].lim_tform.min;
-    max = d->vartable[j].lim_tform.max;
+    min = vt->lim_tform.min;
+    max = vt->lim_tform.max;
   }
 
   limits_adjust (&min, &max);
 
-  d->vartable[j].lim.min = min;
-  d->vartable[j].lim.max = max;
+  vt->lim.min = min;
+  vt->lim.max = max;
 }
 

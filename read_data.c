@@ -170,33 +170,34 @@ rowlabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
 /*------------------------------------------------------------------------*/
 
 static void
-collabels_process_word (gchar *word, gint field, gint nvar, datad *d) 
+collabels_process_word (gchar *word, gint field, gint j, datad *d) 
 {
   gfloat var;
+  vartabled *vt = vartable_element_get (j, d);
 
   /*-- remove leading and trailing whitespace --*/
   g_strstrip (word);
 
   switch (field) {
     case 0:
-      d->vartable[nvar].lim_specified_p = false;
-      d->vartable[nvar].collab = g_strdup (word) ;
-      break;
+      vt->lim_specified_p = false;
+      vt->collab = g_strdup (word) ;
+    break;
     case 1:
       var = atof (word);
       /*-- don't set lim_specified_p to true unless both are present --*/
-      d->vartable[nvar].lim_specified.min =
-        d->vartable[nvar].lim_specified_tform.min = var;
-      break;
+      vt->lim_specified.min =
+        vt->lim_specified_tform.min = var;
+    break;
     case 2:
       var = atof (word);
-      d->vartable[nvar].lim_specified_p = true;
-      d->vartable[nvar].lim_specified.max =
-        d->vartable[nvar].lim_specified_tform.max = var;
-      break;
+      vt->lim_specified_p = true;
+      vt->lim_specified.max =
+        vt->lim_specified_tform.max = var;
+    break;
     default:
       /*-- bail out: too many fields --*/
-      g_printerr ("Too many fields in row %d of collab file\n", nvar+1);
+      g_printerr ("Too many fields in row %d of collab file\n", j+1);
       exit (1);
   }
 }
@@ -215,12 +216,11 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
   gint j, nvar = 0;
   gboolean found = true;
   FILE *fp;
+  vartabled *vt;
 
   gchar *fileName;
   gint whichSuffix;
-
   gchar str[INITSTRSIZE];
-
 
   fileName = findAssociatedFile(desc, suffixes,
     sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
@@ -245,7 +245,7 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
     while ((ch = fgetc (fp)) != EOF) {
 
       /*-- blank or tab --*/
-      /*if (ch == ' ' || ch == '	') {*/
+      /*if (ch == ' ' || ch == '	') */
       if (ch == '|') {
         fieldsep = true;
 
@@ -253,7 +253,6 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
         /*-- process preceding string --*/
         str[len] = '\0';
         collabels_process_word (str, field, nvar, d);
-
         field = len = 0;
         nvar++;
         if (nvar >= d->ncols)
@@ -287,22 +286,26 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
     if (init && nvar != d->ncols) {
       g_printerr ("number of labels = %d, number of cols = %d\n",
         nvar, d->ncols);
-      for (j=nvar; j<d->ncols; j++)
-        d->vartable[j].collab = g_strdup_printf ("Var %d", j+1);
+      for (j=nvar; j<d->ncols; j++) {
+        vt = vartable_element_get (j, d);
+        vt->collab = g_strdup_printf ("Var %d", j+1);
+      }
     }
   }
   else
   {
     if (init) {
       for (j=0; j<d->ncols; j++) {
-        d->vartable[j].lim_specified_p = false;
-        d->vartable[j].collab = g_strdup_printf ("Var %d", j+1);
+        vt = vartable_element_get (j, d);
+        vt->lim_specified_p = false;
+        vt->collab = g_strdup_printf ("Var %d", j+1);
       }
     }
   }
 
   for (j=0; j<d->ncols; j++) {
-    d->vartable[j].collab_tform = g_strdup (d->vartable[j].collab);
+    vt = vartable_element_get (j, d);
+    vt->collab_tform = g_strdup (vt->collab);
   }
 
   if(found) {
@@ -605,6 +608,7 @@ missing_values_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg
   gint i, j, ok, itmp, row, col;
   gint nmissing = 0;
   FILE *fp;
+  vartabled *vt;
  
   gint whichSuffix;
   gchar *fileName;
@@ -622,8 +626,10 @@ missing_values_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg
     if (init || d->nmissing == 0)
       arrays_alloc (&d->missing, d->nrows, d->ncols);
 
-    for (j=0; j<d->ncols; j++)
-      d->vartable[j].nmissing = 0;
+    for (j=0; j<d->ncols; j++) {
+      vt = vartable_element_get (j, d);
+      vt->nmissing = 0;
+    }
 
     j = 0;
     i = 0;
@@ -648,7 +654,8 @@ missing_values_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg
       d->missing.vals[row][col] = itmp;
       if (itmp != 0) {
         nmissing++;
-        d->vartable[col].nmissing++;
+        vt = vartable_element_get (col, d);
+        vt->nmissing++;
       }
     }
 
