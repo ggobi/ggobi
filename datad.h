@@ -3,7 +3,38 @@
 
 #include "defines.h"
 
-typedef struct /*-- datad --*/ {
+#ifdef USE_XML
+#include <parser.h>
+struct _XMLUserData;
+#endif
+
+struct _ggobid;
+
+/*
+  This is now changed so that datad is a class rather than a structure.
+  The intention is that this allows us to create different derived classes
+  which can read their data in different ways. For example, we may read node
+  records in one way (i.e. what attributes they expect) and edge records
+  in another. 
+
+  See the methods at the bottom of the class definition.
+ */
+#ifndef USE_CLASSES
+struct _datad {
+#else
+class datad {
+#endif
+
+  /* All the variables are left public since this the way they were in the
+     C structure. Adding accessor routines and using those would be "good",
+     but tedious.
+   */
+
+  /* Holds the name given to the dataset in an XML file and by which it
+     can be indexed in the list of data elements within the ggobid structure.
+   */
+ const gchar *name;
+
  gint nrows;
  GArray *rowlab;
 
@@ -108,6 +139,75 @@ typedef struct /*-- datad --*/ {
    gfloat *tform1_mean;
  } sphere;
 
-} datad;
+
+#ifdef USE_CLASSES
+ public:
+   datad() {};
+   datad(struct _ggobid *gg);
+
+
+   /* The following are methods that one might want to override in order to 
+      modify how records are handled.
+      As more are needed, migrate the bodies of the C routines in read_xml.c, etc.
+      to here.
+    */
+#ifdef USE_XML
+  virtual gboolean readXMLRecord(const CHAR **attrs, struct _XMLUserData *data);
+#endif
+
+#else
+
+      /* Instead of a method, use a function pointer which can be set
+         for the different types.
+       */
+#ifdef USE_XML
+   gboolean (*readXMLRecord)(const CHAR **attrs, struct _XMLUserData *data);
+#endif 
+
+   gboolean edgeData;
+   guint *sourceID;
+   guint *destinationID;   
+   struct _datad *nodeData; 
+
+#endif /* end of USE_CLASSES */
+};
+
+#ifndef USE_CLASSES
+typedef struct _datad datad;
+gint alloc_edgeIDs(datad *d);
+#endif
+
+
+
+
+
+extern datad *datad_new(datad *, struct _ggobid *);
+
+#ifdef USE_CLASSES
+class EdgeDatad : public datad 
+{
+ public:
+  EdgeDatad() : datad() { sourceID = NULL; 
+                          destinationID = NULL;
+                        }
+
+  EdgeDatad(struct _ggobid *gg) : datad(gg) { 
+  }
+
+
+#if 1
+#ifdef USE_XML
+  gboolean readXMLRecord(const CHAR **attrs, XMLParserData *data);
+#endif
+#endif
+
+ protected:
+  int *sourceID;
+  int *destinationID;
+  datad *nodeData;
+};
+#endif
+
+
 
 #endif

@@ -5,9 +5,29 @@
 #include "vars.h"
 #include "externs.h"
 
+#include <string.h> /* for memset() declaration */
+
+#ifdef USE_CLASSES
+datad::datad(ggobid *gg) 
+{
+  datad_new(this, gg);
+}
+
+
 datad *
-datad_new (ggobid *gg) {
+datad_new (ggobid *gg) 
+{
   datad *d = (datad *) g_malloc (sizeof (datad));
+  return(datad_new(d, gg));
+}
+#endif
+
+datad *
+datad_new(datad *d, ggobid *gg)
+{ 
+  if(d == NULL)
+    d = (datad *) g_malloc (sizeof (datad));
+
   memset(d, 0, sizeof(datad));
 
   d->std_type = 0;
