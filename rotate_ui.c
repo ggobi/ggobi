@@ -173,7 +173,7 @@ cpanel_rotation_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (1.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+  adj = gtk_adjustment_new (1.0, 0.0, MAX_TOUR_SPEED, 1.0, 1.0, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (rotation_speed_cb), NULL);
 
