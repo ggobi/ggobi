@@ -377,20 +377,22 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   vartable_realloc (nkeepers, d);
 
   /*-- delete rows from clist; no copying is called for --*/
-  l = g_list_last (GTK_CLIST (d->vartable_clist)->row_list);
-  while (l) {
-    row = GTK_CLIST_ROW (l);
-    /*-- grab the text in the invisible cell of the row to get the index --*/
-    varstr = GTK_CELL_TEXT(row->cell[CLIST_VARNO])->text;
-    if (varstr != NULL && strlen (varstr) > 0) {
-      irow = atoi (varstr);
-      if (!array_contains (keepers, nkeepers, irow)) {
-        gtk_clist_freeze (GTK_CLIST (d->vartable_clist));
-        gtk_clist_remove (GTK_CLIST (d->vartable_clist), irow);
-        gtk_clist_thaw (GTK_CLIST (d->vartable_clist));
+  if (d->vartable_clist != NULL) {
+    l = g_list_last (GTK_CLIST (d->vartable_clist)->row_list);
+    while (l) {
+      row = GTK_CLIST_ROW (l);
+      /*-- grab the text in the invisible cell of the row to get the index --*/
+      varstr = GTK_CELL_TEXT(row->cell[CLIST_VARNO])->text;
+      if (varstr != NULL && strlen (varstr) > 0) {
+        irow = atoi (varstr);
+        if (!array_contains (keepers, nkeepers, irow)) {
+          gtk_clist_freeze (GTK_CLIST (d->vartable_clist));
+          gtk_clist_remove (GTK_CLIST (d->vartable_clist), irow);
+          gtk_clist_thaw (GTK_CLIST (d->vartable_clist));
+        }
       }
+      l = l->prev;
     }
-    l = l->prev;
   }
 
   /*-- delete columns from pipeline arrays --*/

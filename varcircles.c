@@ -21,20 +21,9 @@ static gboolean da_expose_cb (GtkWidget *, GdkEventExpose *, gpointer cbd);
 #define LBL 1
 #define DA  2
 
-void
-varcircles_delete_nth (gint jvar, datad *d)
-{
-  GtkWidget *w;
-  w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.vb, jvar);
-  if (w != NULL) {
-    d->vcirc_ui.vb = g_slist_remove (d->vcirc_ui.vb, (gpointer) w);
-    gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
-  }
-}
-
 GtkWidget *
 varcircles_get_nth (gint which, gint jvar, datad *d) {
-  GtkWidget *w;
+  GtkWidget *w = NULL;
 
   switch (which) {
     case VB:
@@ -46,10 +35,35 @@ varcircles_get_nth (gint which, gint jvar, datad *d) {
     case DA:
       w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.da, jvar);
     break;
+    default:
+    break;
   }
 
   return w;
 }
+
+void
+varcircles_delete_nth (gint jvar, datad *d)
+{
+  GtkWidget *w;
+  GdkPixmap *pix;
+
+  w = varcircles_get_nth (LBL, jvar, d);
+  d->vcirc_ui.label = g_slist_remove (d->vcirc_ui.label, (gpointer) w);
+  w = varcircles_get_nth (DA, jvar, d);
+  d->vcirc_ui.da = g_slist_remove (d->vcirc_ui.da, (gpointer) w);
+
+  pix = (GdkPixmap *) g_slist_nth_data (d->vcirc_ui.da_pix, jvar);
+  d->vcirc_ui.da_pix = g_slist_remove (d->vcirc_ui.da_pix, (gpointer) w);
+
+
+  w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.vb, jvar);
+  if (w != NULL) {
+    d->vcirc_ui.vb = g_slist_remove (d->vcirc_ui.vb, (gpointer) w);
+    gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
+  }
+}
+
 
 /*
  * This is unfortunately needed for now because no widgets have
@@ -708,12 +722,16 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
   GtkWidget *da = varcircles_get_nth (DA, j, d);
   GdkPixmap *da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, j);
 
+  if (j >= d->ncols)  
+    return false;
+
   if (da_pix == NULL)
     varcircle_draw (j, d, gg); 
-  else
+  else {
     gdk_draw_pixmap (da->window, gg->unselvarfg_GC,
       da_pix, 0, 0, 0, 0,
       VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
+  }
 
   return true;
 }
