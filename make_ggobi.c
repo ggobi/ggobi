@@ -19,6 +19,11 @@
 #include "vars.h"
 #include "externs.h"
 
+#ifdef GTK_2_0
+#undef __gtk_marshal_MARSHAL_H__
+#include "marshal.h"
+#endif
+
 #ifdef USE_XML
 #include "read_xml.h"
 #endif
@@ -39,6 +44,7 @@ guint GGobiSignals[MAX_GGOBI_SIGNALS];
   a marshalling function of the appropriate form!
  */
 
+#ifndef GTK_2_0
 void
 gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject *object,
   GtkSignalFunc func, gpointer func_data, GtkArg *args)
@@ -47,7 +53,7 @@ gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject *object,
                    GTK_VALUE_POINTER(args[2]),GTK_VALUE_POINTER(args[3]),
                    func_data);
 }
-
+#endif
 
 gboolean read_input(InputDescription *desc, ggobid *gg);
 
@@ -71,6 +77,7 @@ void globals_init (ggobid *gg) {
 
   gg->save.window = NULL;
 
+#ifndef GTK_2_0
        /*-- If this signal has not been initialized yet, do it now --*/
   if (gtk_signal_lookup ("datad_added", GTK_TYPE_WIDGET) == 0) {
     GGobiSignals[DATAD_ADDED_SIGNAL] =
@@ -162,6 +169,9 @@ void globals_init (ggobid *gg) {
         GTK_TYPE_NONE, 3,
         GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER);  /* record index and datad pointer **/
   }
+#else
+#include "GtkSignalDef.c"
+#endif
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/

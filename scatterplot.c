@@ -15,11 +15,18 @@
 #include <string.h>
 #include <gtk/gtk.h>
 #include "vars.h"
+
+#ifndef GTK_2_0
 #include "gtkext.h"
+#else
+#define GTK_EXT_RULER GTK_RULER
+#endif
+
 #include "externs.h"
 
 #define WIDTH   370
 #define HEIGHT  370
+
 
 /*-- as long as these are static, they can probably stay here --*/
 static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp);
@@ -119,8 +126,16 @@ ruler_ranges_set (gboolean force, displayd *display, splotd *sp, ggobid *gg) {
     if (((gfloat) GTK_EXT_RULER (display->hrule)->lower != tfmin.x) ||
         ((gfloat) GTK_EXT_RULER (display->hrule)->upper != tfmax.x))
     {
+#ifndef GTK_2_0
       gtk_ext_ruler_set_range (GTK_EXT_RULER (display->hrule),
                                (gdouble) tfmin.x, (gdouble) tfmax.x);
+#else
+      /* What should the final 2 arguments be. */
+      gtk_ruler_set_range (GTK_EXT_RULER (display->hrule),
+                               (gdouble) tfmin.x, (gdouble) tfmax.x,
+                               (gdouble) (tfmax.x - tfmin.x)/2 + tfmin.x,
+                               tfmax.x);
+#endif
     }
   }
 
@@ -128,8 +143,15 @@ ruler_ranges_set (gboolean force, displayd *display, splotd *sp, ggobid *gg) {
     if (((gfloat) GTK_EXT_RULER (display->vrule)->upper != tfmin.y) ||
         ((gfloat) GTK_EXT_RULER (display->vrule)->lower != tfmax.y))
     {
+#ifndef GTK_2_0
       gtk_ext_ruler_set_range (GTK_EXT_RULER (display->vrule),
                                (gdouble) tfmax.y, (gdouble) tfmin.y);
+#else
+      gtk_ruler_set_range (GTK_EXT_RULER (display->hrule),
+                               (gdouble) tfmin.y, (gdouble) tfmax.y,
+                               (gdouble) (tfmax.y - tfmin.y)/2 + tfmin.y,
+                               tfmax.y);
+#endif
     }
   }
 }
@@ -244,6 +266,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
    * across the drawing area, a motion_notify_event is passed to the
    * appropriate event handler for the ruler.
   */
+#ifndef GTK_2_0
   display->hrule = gtk_ext_hruler_new ();
   gtk_signal_connect_object (GTK_OBJECT (sp->da), "motion_notify_event",
     (GtkSignalFunc) EVENT_METHOD (display->hrule, motion_notify_event),
@@ -254,7 +277,10 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
     "motion_notify_event", ruler_shift_cb, sp);
   gtk_signal_connect (GTK_OBJECT (display->hrule),
     "button_press_event", ruler_down_cb, sp);
-
+#else
+  display->hrule = gtk_hruler_new ();
+   /* What about the events above. */
+#endif
 
   gtk_table_attach (GTK_TABLE (table),
                     display->hrule, 1, 2, 1, 2,
@@ -267,6 +293,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
    * the drawing area, a motion_notify_event is passed to the
    * appropriate event handler for the ruler.
   */
+#ifndef GTK_2_0
   display->vrule = gtk_ext_vruler_new ();
   gtk_signal_connect_object (GTK_OBJECT (sp->da),
     "motion_notify_event",
@@ -278,6 +305,9 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
     "motion_notify_event", ruler_shift_cb, sp);
   gtk_signal_connect (GTK_OBJECT (display->vrule),
     "button_press_event", ruler_down_cb, sp);
+#else
+  display->vrule = gtk_vruler_new ();
+#endif
 
   gtk_table_attach (GTK_TABLE (table),
                     display->vrule, 0, 1, 0, 1,
