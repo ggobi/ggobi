@@ -34,7 +34,7 @@ SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
  subset_ui.c subset.c jitter_ui.c jitter.c smooth_ui.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  display_tree.c \
- ggobi-API.c
+ ggobi-API.c 
 
 OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  utils_ui.o utils.o utils_gdk.o \

@@ -177,7 +177,8 @@ extern gboolean point_in_which_bin (gint, gint, gint *, gint *, ggobid *gg);
 extern void populate_option_menu (GtkWidget *, gchar **, gint, GtkSignalFunc, ggobid *gg);
 extern gint projection_get (ggobid* gg);
 extern void quick_message (gchar *, gboolean);
-extern void quit_ggobi(void);
+/* extern void quit_ggobi(void); */
+extern void quit_ggobi(ggobid *gg, gint action, GtkWidget *w);
 extern gdouble randvalue (void);
 extern void raw_to_tform_copy (void);
 extern void rejitter (ggobid *gg);

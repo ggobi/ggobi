@@ -477,7 +477,7 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Print",       NULL,     NULL,          0 },
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-  { "/File/Quit",    "<ctrl>Q",     quit_ggobi, 0 },
+  { "/File/Quit",    "<ctrl>Q",     quit_ggobi,  0 },
 
   { "/_Window",                            NULL,   
     NULL,        0,    "<Branch>" },
@@ -547,7 +547,7 @@ static GtkItemFactoryEntry menu_items[] = {
   the Quit button.
  */
 void
-quit_ggobi(void)
+quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
 {
  gtk_main_quit();
 }

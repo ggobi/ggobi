@@ -74,8 +74,10 @@ GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed, ggobid *gg)
 
  if(transformed)
    gg->vardata[jvar].collab_tform = g_strdup(name);
- else
+ else {
    gg->vardata[jvar].collab = g_strdup(name);
+   gtk_object_set(GTK_OBJECT(gg->varpanel_ui.varlabel[jvar]), "label", name, NULL);
+ }
 }
 
 
@@ -847,6 +849,7 @@ void GGOBI(setBrushSize)(int w, int h, ggobid *gg)
  gg->brush.brush_pos.x2 =  gg->brush.brush_pos.x1 + w;
  gg->brush.brush_pos.y2 =  gg->brush.brush_pos.y1 + h;
 
+ brush_once(true,gg);
  redraw(gg);
  display_plot(gg->current_display, FULL, gg);
 }
@@ -860,7 +863,15 @@ void GGOBI(setBrushLocation)(int x, int y, ggobid *gg)
 
  gg->brush.brush_pos.x1 = x;
  gg->brush.brush_pos.y1 = y;
+
+ gg->brush.brush_pos.x2 = x + wd;
+ gg->brush.brush_pos.y2 = y + ht;
+
+ /*
  GGOBI(setBrushSize)(wd, ht, gg);
+ */
+
+ brush_once(true,gg);
 
  redraw(gg);
 }
@@ -1041,17 +1052,22 @@ GGOBI(getVariableIndex)(const gchar *name, ggobid *gg)
 void
 GGOBI(setPlotRange)(double *x, double *y, int displayNum, int plotNum, ggobid *gg)
 {
+extern void splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *gg);
   splotd *sp;
   displayd *display;
 
+  display = GGOBI(getDisplay)(displayNum, gg);
+  sp = GGOBI(getPlot)(display, plotNum);
+
+  splot_zoom(sp, *x, *y, gg);
+
+
+ /*
   fcoords tfmin, tfmax;
   tfmin.x = x[0];
   tfmin.y = y[0];
   tfmax.x = x[1];
   tfmax.y = y[1];
-
-  display = GGOBI(getDisplay)(displayNum, gg);
-  sp = GGOBI(getPlot)(display, plotNum);
 
   if (GTK_WIDGET_VISIBLE (display->hrule)) {
     if (((gfloat) GTK_EXT_RULER (display->hrule)->lower != tfmin.x) ||
@@ -1070,5 +1086,7 @@ GGOBI(setPlotRange)(double *x, double *y, int displayNum, int plotNum, ggobid *g
                                (gdouble) tfmax.y, (gdouble) tfmin.y);
     }
   }
+*/
 
 }
+
