@@ -134,13 +134,14 @@ static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
 {
   gboolean button1_p, button2_p;
-  ggobid *gg = GGobiFromWidget(w, true);
+  ggobid *gg = GGobiFromWidget (w, true);
+  splotd *sp = gg->current_splot;
 
   /*-- get the mouse position and find out which buttons are pressed --*/
-  mousepos_get_motion (w, event, &button1_p, &button2_p, gg);
+  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
 
   if (button1_p || button2_p)
-    brush_motion (&gg->mousepos, button1_p, button2_p, cpanel, gg);
+    brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, gg);
 
   return true;
 }
@@ -164,7 +165,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   point_brush_prev_vectors_update (d, gg);
   line_brush_prev_vectors_update (gg);
 
-  mousepos_get_pressed (w, event, &button1_p, &button2_p, gg);
+  mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                      "motion_notify_event",
@@ -175,7 +176,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   brush_set_pos (event->x, event->y, gg);
 
-  brush_motion (&gg->mousepos, button1_p, button2_p, cpanel, gg);
+  brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, gg);
 
   return retval;
 }
@@ -184,10 +185,9 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot(sp);
 
-  gg->mousepos.x = event->x;
-  gg->mousepos.y = event->y;
+  sp->mousepos.x = event->x;
+  sp->mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 

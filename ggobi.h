@@ -47,8 +47,6 @@ struct _ggobid {
 
  GSList *d;  /*-- first is default: cases, nodes; second might be edges --*/
 
- icoords mousepos, mousepos_o;
-
  /* main_ui */
  GtkWidget *control_panel[NMODES];
  GtkWidget *main_window, *main_menubar;

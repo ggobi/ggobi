@@ -59,10 +59,10 @@ typedef struct {
 /*
  * touring
 */
- gboolean is_tour_paused;
- gboolean is_tour_local_scan;
- gboolean is_tour_stepping;
- gboolean is_tour_backtracking;
+ gboolean tour_paused_p;
+ gboolean tour_local_scan_p;
+ gboolean tour_stepping_p;
+ gboolean tour_backtracking_p;
  gfloat tour_step; 
  gint tour_ls_dir;
  gfloat tour_path_len;

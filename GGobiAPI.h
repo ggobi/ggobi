@@ -158,7 +158,7 @@ extern void GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, datad *, ggobid *gg
 extern void GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, datad *, ggobid *gg);
 
 extern gboolean  GGOBI(isConnectedEdge)(gint a, gint b, ggobid *gg);
-extern void GGOBI(setObservationEdge)(gint x, gint y, ggobid *gg, gboolean update);
+extern void GGOBI(setObservationEdge)(gint x, gint y, datad *, ggobid *, gboolean update);
 
 extern gboolean GGOBI(getShowLines)();
 extern gboolean GGOBI(setShowLines)(gboolean val);
@@ -174,9 +174,9 @@ extern displayd * GGOBI(getCurrentDisplay)(ggobid *gg);
 extern gint GGOBI(getCurrentDisplayIndex)(ggobid *gg);
 extern gint GGOBI(getCurrentPlotIndex)(ggobid *gg);
 
-extern displayd *GGOBI(setCurrentDisplay)(int which, ggobid *gg);
+extern displayd *GGOBI(setCurrentDisplay)(gint which, ggobid *gg);
 
-extern splotd *GGOBI(getPlot)(displayd *display, int which);
+extern splotd *GGOBI(getPlot)(displayd *display, gint which);
 
 
 extern void GGOBI(moveBrush) (gint ulx, gint uly, ggobid *gg);
@@ -184,7 +184,7 @@ extern void GGOBI(sizeBrush) (gint width, gint height, ggobid *gg);
 
 extern int GGOBI(getNumGGobis)();
 
-gboolean GGOBI(setColorMap)(double *vals, int nr, ggobid *gg);
+gboolean GGOBI(setColorMap)(gdouble *vals, gint nr, ggobid *gg);
 gboolean GGOBI(registerColorMap)(ggobid *gg);
 
 gboolean GGOBI(close)(ggobid *gg, gboolean closeWindow);
@@ -208,21 +208,21 @@ extern splotd *GGOBI(getSPlot)(gint which, displayd *display);
 extern const gchar * const* GGOBI(getModeNames)();
 extern gint GGOBI(getModeId)(const gchar *name);
 extern gint GGOBI(setMode)(const gchar *name, ggobid *gg);
-extern const gchar *GGOBI(getModeName)(int which);
-extern int GGOBI(full_mode_set)(int action, ggobid *gg);
+extern const gchar *GGOBI(getModeName)(gint which);
+extern int GGOBI(full_mode_set)(gint action, ggobid *gg);
 
-extern int GGOBI(setBrushColor)(int cid, ggobid *gg);
-extern gboolean GGOBI(setBrushGlyph)(int type, int size, ggobid *gg);
+extern int GGOBI(setBrushColor)(gint cid, ggobid *gg);
+extern gboolean GGOBI(setBrushGlyph)(gint type, gint size, ggobid *gg);
 extern int GGOBI(getVariableIndex)(const gchar *name, datad *, ggobid *gg);
 extern int GGOBI(removeVariableByIndex)(gint which, datad *, ggobid *gg);
 
 extern gboolean GGOBI(setVariableValues)(gint whichVar, gdouble *vals, gint num, gboolean update, datad *d, ggobid *gg);
 
 /* Need len just in case there is no data in the instance*/
-extern int GGOBI(addVariable)(double *vals, int len, char *name, gboolean update, datad *d, ggobid *gg);
+extern int GGOBI(addVariable)(gdouble *vals, gint len, gchar *name, gboolean update, datad *d, ggobid *gg);
 
 extern void GGOBI(update_data)(datad *, ggobid *gg);
-extern gboolean GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg);
+extern gboolean GGOBI(raiseWindow)(gint which, gboolean raiseOrIcon, gboolean up, ggobid *gg);
 
 
 extern gchar *GGOBI(getDescription)(ggobid *gg);

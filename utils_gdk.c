@@ -88,13 +88,13 @@ draw_glyph (GdkDrawable *drawable, glyphv *gl, icoords *xypos, gint jpos, ggobid
 
 void
 mousepos_get_pressed (GtkWidget *w, GdkEventButton *event,
-                      gboolean *btn1_down_p, gboolean *btn2_down_p, ggobid *gg)
+                      gboolean *btn1_down_p, gboolean *btn2_down_p, splotd *sp)
 {
   *btn1_down_p = false;
   *btn2_down_p = false;
 
-  gg->mousepos.x = event->x;
-  gg->mousepos.y = event->y;
+  sp->mousepos.x = event->x;
+  sp->mousepos.y = event->y;
   if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
     *btn1_down_p = true;
   else if ((event->state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
@@ -105,7 +105,7 @@ mousepos_get_pressed (GtkWidget *w, GdkEventButton *event,
 
 void
 mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
-                     gboolean *btn1_down_p, gboolean *btn2_down_p, ggobid *gg)
+                     gboolean *btn1_down_p, gboolean *btn2_down_p, splotd *sp)
 {
   GdkModifierType state;
 
@@ -115,7 +115,7 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
   /*-- that is, if using motion hints --*/
   if (event->is_hint) {
 
-    gdk_window_get_pointer (w->window, &gg->mousepos.x, &gg->mousepos.y,
+    gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y,
       &state);
     if ((state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
       *btn1_down_p = true;
@@ -126,8 +126,8 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
 
   } else {
 
-    gg->mousepos.x = event->x;
-    gg->mousepos.y = event->y;
+    sp->mousepos.x = event->x;
+    sp->mousepos.y = event->y;
     if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
       *btn1_down_p = true;
     else if ((event->state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
@@ -138,8 +138,8 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
 }
 
 gboolean
-mouseinwindow (splotd *sp, ggobid *gg) {
-  return ( 0 < gg->mousepos.x && gg->mousepos.x < sp->max.x &&
-           0 < gg->mousepos.y && gg->mousepos.y < sp->max.y) ;
+mouseinwindow (splotd *sp) {
+  return (0 < sp->mousepos.x && sp->mousepos.x < sp->max.x &&
+          0 < sp->mousepos.y && sp->mousepos.y < sp->max.y) ;
 
 }

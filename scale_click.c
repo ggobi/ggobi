@@ -8,10 +8,10 @@ void
 pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 {
   if (pan_opt == P_OBLIQUE || pan_opt == P_HORIZ)  /* pan horizontally */
-    sp->ishift.x += (gg->mousepos.x - sp->max.x/2);
+    sp->ishift.x += (sp->mousepos.x - sp->max.x/2);
 
   if (pan_opt == P_OBLIQUE || pan_opt == P_VERT)  /* pan vertically */
-    sp->ishift.y += (gg->mousepos.y - sp->max.y/2);
+    sp->ishift.y += (sp->mousepos.y - sp->max.y/2);
 }
 
 void

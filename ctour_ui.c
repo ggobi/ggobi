@@ -241,12 +241,12 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  ggobid *gg = GGobiFromSPlot (sp);
   gg->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
-  gg->mousepos.x = event->x;
-  gg->mousepos.y = event->y;
+  sp->mousepos.x = event->x;
+  sp->mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -259,10 +259,9 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot(sp);
 
-  gg->mousepos.x = event->x;
-  gg->mousepos.y = event->y;
+  sp->mousepos.x = event->x;
+  sp->mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 

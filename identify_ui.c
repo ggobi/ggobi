@@ -65,11 +65,12 @@ displays_add_point_labels (splotd *splot, gint k, ggobid *gg) {
 
 
 static gint
-motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
+motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   gint k;
   ggobid *gg = GGobiFromSPlot(sp);
   datad *d = gg->current_display->d;
+  gboolean button1_p, button2_p;
 
 /*
  * w = sp->da
@@ -77,10 +78,11 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 */
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
-/*-- use mousepos_get_motion for this --*/
-  gdk_window_get_pointer (w->window,
-    &gg->mousepos.x, &gg->mousepos.y, NULL);
-  k = find_nearest_point (&gg->mousepos, sp, d, gg);
+  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
+/*
+  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, NULL);
+*/
+  k = find_nearest_point (&sp->mousepos, sp, d, gg);
   d->nearest_point = k;
 
   if (k != d->nearest_point_prev) {

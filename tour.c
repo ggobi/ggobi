@@ -112,10 +112,10 @@ zero_tinc(displayd *dsp, ggobid *gg) {
 
 void 
 cpanel_tour_init (cpaneld *cpanel, ggobid *gg) {
-    cpanel->is_tour_paused = false;
-    cpanel->is_tour_local_scan = false;
-    cpanel->is_tour_stepping = false;
-    cpanel->is_tour_backtracking = false;
+    cpanel->tour_paused_p = false;
+    cpanel->tour_local_scan_p = false;
+    cpanel->tour_stepping_p = false;
+    cpanel->tour_backtracking_p = false;
     cpanel->tour_step = TOURSTEP0;
     cpanel->tour_ls_dir = TOUR_LS_IN;
     cpanel->tour_path_len = 1.;
@@ -639,7 +639,7 @@ void * tour_thread (void *args)
   cpaneld *cpanel = &dsp->cpanel;
 
   while (true) {
-    if (mode_get () == TOUR2D && !cpanel->is_tour_paused) {
+    if (mode_get () == TOUR2D && !cpanel->tour_paused_p) {
       gdk_threads_enter ();
       run_tour (dsp);
       gdk_threads_leave ();
@@ -656,7 +656,7 @@ tour_idle_func (ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
-  gboolean doit = !cpanel->is_tour_paused;
+  gboolean doit = !cpanel->tour_paused_p;
 
   if (doit) {
     run_tour (dsp, gg);

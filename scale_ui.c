@@ -152,10 +152,10 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   cpaneld *cpanel = &display->cpanel;
 
   /*-- get the mouse position and find out which buttons are pressed --*/
-  mousepos_get_motion (w, event, &button1_p, &button2_p, gg);
+  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
 
   /*-- I'm not sure this could ever happen --*/
-  if (gg->mousepos.x == gg->mousepos_o.x && gg->mousepos.y == gg->mousepos_o.y)
+  if (sp->mousepos.x == sp->mousepos_o.x && sp->mousepos.y == sp->mousepos_o.y)
     return false;
 
   switch (cpanel->scale_style) {
@@ -179,8 +179,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
   }  /*-- end switch (scale_style) --*/
 
-  gg->mousepos_o.x = gg->mousepos.x;
-  gg->mousepos_o.y = gg->mousepos.y;
+  sp->mousepos_o.x = sp->mousepos.x;
+  sp->mousepos_o.y = sp->mousepos.y;
 
   return true;
 }
@@ -243,8 +243,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gg->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
-  gg->mousepos_o.x = gg->mousepos.x = event->x;
-  gg->mousepos_o.y = gg->mousepos.y = event->y;
+  sp->mousepos_o.x = sp->mousepos.x = event->x;
+  sp->mousepos_o.y = sp->mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -257,10 +257,9 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot(sp);
 
-  gg->mousepos.x = event->x;
-  gg->mousepos.y = event->y;
+  sp->mousepos.x = event->x;
+  sp->mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -455,22 +454,22 @@ scale_click_zoom_rect_calc (splotd *sp, gint sc_zoom_opt, ggobid *gg) {
   mid.x = sp->max.x / 2;
   mid.y = sp->max.y / 2;
 
-  if (gg->mousepos.x <= mid.x && gg->mousepos.y <= mid.y) {
+  if (sp->mousepos.x <= mid.x && sp->mousepos.y <= mid.y) {
     /* upper left quadrant of plot, based on the value of mid */
-    gg->scale.click_rect.x = gg->mousepos.x;
-    gg->scale.click_rect.y = gg->mousepos.y;
-  } else if (gg->mousepos.x <= mid.x && gg->mousepos.y > mid.y) {
+    gg->scale.click_rect.x = sp->mousepos.x;
+    gg->scale.click_rect.y = sp->mousepos.y;
+  } else if (sp->mousepos.x <= mid.x && sp->mousepos.y > mid.y) {
     /* lower left quadrant of plot */
-    gg->scale.click_rect.x = gg->mousepos.x;
-    gg->scale.click_rect.y = mid.y - (gg->mousepos.y - mid.y);
-  } else if (gg->mousepos.x > mid.x && gg->mousepos.y > mid.y) {
+    gg->scale.click_rect.x = sp->mousepos.x;
+    gg->scale.click_rect.y = mid.y - (sp->mousepos.y - mid.y);
+  } else if (sp->mousepos.x > mid.x && sp->mousepos.y > mid.y) {
     /* lower right quadrant of plot */
-    gg->scale.click_rect.x = mid.x - (gg->mousepos.x - mid.x);
-    gg->scale.click_rect.y = mid.y - (gg->mousepos.y - mid.y);
-  } else if (gg->mousepos.x > mid.x && gg->mousepos.y <= mid.y) {
+    gg->scale.click_rect.x = mid.x - (sp->mousepos.x - mid.x);
+    gg->scale.click_rect.y = mid.y - (sp->mousepos.y - mid.y);
+  } else if (sp->mousepos.x > mid.x && sp->mousepos.y <= mid.y) {
     /* upper right quadrant of plot */
-    gg->scale.click_rect.x = mid.x - (gg->mousepos.x - mid.x);
-    gg->scale.click_rect.y = gg->mousepos.y;
+    gg->scale.click_rect.x = mid.x - (sp->mousepos.x - mid.x);
+    gg->scale.click_rect.y = sp->mousepos.y;
   }
   gg->scale.click_rect.x = (mid.x - gg->scale.click_rect.x < 20) ?
                        (mid.x - 20) :
@@ -527,7 +526,7 @@ scaling_visual_cues_draw (splotd *sp, ggobid *gg) {
         case PAN:
           gdk_draw_line (sp->pixmap1, gg->plot_GC,
             sp->max.x/2, sp->max.y/2,
-            gg->mousepos.x, gg->mousepos.y);
+            sp->mousepos.x, sp->mousepos.y);
           break;
         case ZOOM:
           scale_click_zoom_rect_calc (sp, cpanel->scale_zoom_opt, gg);

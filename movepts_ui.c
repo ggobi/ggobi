@@ -64,22 +64,22 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   d = display->d;
 
   /*-- try defining wasinwindow before the new mousepos is calculated --*/
-  wasinwindow = mouseinwindow (sp, gg);
+  wasinwindow = mouseinwindow (sp);
 
   /*-- get the mouse position and find out which buttons are pressed --*/
-  mousepos_get_motion (w, event, &button1_p, &button2_p, gg);
+  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
 
-  inwindow = mouseinwindow (sp, gg);
+  inwindow = mouseinwindow (sp);
 
   /*-- If the pointer is inside the plotting region ... --*/
   if (inwindow) {
     /*-- If the pointer has moved ...--*/
-    if ((gg->mousepos.x != gg->mousepos_o.x) ||
-        (gg->mousepos.y != gg->mousepos_o.y))
+    if ((sp->mousepos.x != sp->mousepos_o.x) ||
+        (sp->mousepos.y != sp->mousepos_o.y))
     {
       pointer_moved = true;
-      gg->mousepos_o.x = gg->mousepos.x;
-      gg->mousepos_o.y = gg->mousepos.y;
+      sp->mousepos_o.x = sp->mousepos.x;
+      sp->mousepos_o.y = sp->mousepos.y;
     }
   }
 
@@ -92,8 +92,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
     */
     if (d->nearest_point != -1) {
       move_pt (d->nearest_point,
-               gg->mousepos.x,
-               gg->mousepos.y,
+               sp->mousepos.x,
+               sp->mousepos.y,
                sp, d, gg);
     }
   }
@@ -126,13 +126,13 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   if ((display->displaytype == scatterplot && cpanel->projection == XYPLOT) ||
       (display->displaytype == scatmat && sp->p1dvar == -1))
   {
-    gg->mousepos.x = event->x;
-    gg->mousepos.y = event->y;
+    sp->mousepos.x = event->x;
+    sp->mousepos.y = event->y;
     sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                         "motion_notify_event",
                                         (GtkSignalFunc) motion_notify_cb,
                                         (gpointer) sp);
-    d->nearest_point = find_nearest_point (&gg->mousepos, sp, d, gg);
+    d->nearest_point = find_nearest_point (&sp->mousepos, sp, d, gg);
     if (d->nearest_point != -1) {
       movepts_history_add (d->nearest_point, sp, d, gg);
 
@@ -174,8 +174,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gg->current_splot = sp;
 
   if (cpanel->projection == XYPLOT) {
-    gg->mousepos.x = event->x;
-    gg->mousepos.y = event->y;
+    sp->mousepos.x = event->x;
+    sp->mousepos.y = event->y;
     gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
   }
 

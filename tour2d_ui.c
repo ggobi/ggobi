@@ -24,9 +24,9 @@ static void scale_set_default_values (GtkScale *scale )
 
 void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
   extern void tour_func (gboolean, ggobid *);
-  cpanel->is_tour_paused = state;
+  cpanel->tour_paused_p = state;
 
-  tour_func (!cpanel->is_tour_paused, gg);
+  tour_func (!cpanel->tour_paused_p, gg);
 }
 
 static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
@@ -472,12 +472,12 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  ggobid *gg = GGobiFromSPlot (sp);
   gg->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
-  gg->mousepos.x = event->x;
-  gg->mousepos.y = event->y;
+  sp->mousepos.x = event->x;
+  sp->mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -490,10 +490,9 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot(sp);
 
-  gg->mousepos.x = event->x;
-  gg->mousepos.y = event->y;
+  sp->mousepos.x = event->x;
+  sp->mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
