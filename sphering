@@ -49,11 +49,26 @@ set_sph_labs (int numpcs) {
 
 /* sphere.c */
 
+static gboolean is_sphere_mapped = false;
+static GdkPixmap *scree_plot_pixmap;
 static gfloat *evals;
 static gint numpcs = 0;
 static gchar *snumpcs;
 static gchar str[20];
 
+close_sphere_cback (Widget w, xgobidata *xg, XtPointer callback_data)
+{
+  XtDestroyWidget (spopup);
+  spopup = NULL;
+  is_sphere_mapped = False;
+}
+
+scree_expose_cback(Widget w, xgobidata *xg, XtPointer callback_data)
+{
+  XCopyArea(display, scree_plot_pixmap, scree_plot_window, copy_GC,
+    0, 0, scree_wksp.width, scree_wksp.height, 0, 0);
+}
+   
 select_npc_cback(Widget w, xgobidata *xg, XtPointer callback_data)
 {
   int j;
@@ -130,6 +145,51 @@ do_sph_cback (Widget w, xgobidata *xg, XtPointer callback_data)
 
 open_sphere_popup_cback(Widget w, xgobidata *xg, XtPointer callback_data)
 {
+  register int j, k;
+  Boolean do_svd = false;
+  char npc_lab[5], tickmk[5];
+  int xstrt, ystrt, xpos, ypos;
+  char message[MSGLENGTH];
+  
+  Dimension maxwidth = 0;
+
+  if (!is_sphere_mapped) {
+     
+    if (spopup == NULL) {
+
+      spopup = XtVaCreatePopupShell("Sphere Selected Variables",
+        XtNtitle,    "Sphere variables",
+        XtNiconName, "Sphere",
+        NULL);
+      if (mono) set_mono(spopup);
+
+      select_npc = (Widget) CreateCommand(xg, "Select Num PCs",
+        True, NULL, NULL, box[0], "Sphere");
+      XtAddCallback(select_npc, XtNcallback,
+        (XtCallbackProc) select_npc_cback, (XtPointer) xg);
+
+      sprintf(npc_lab,"%d %",xg->nsph_vars);
+      npc = XtVaCreateManagedWidget("Inference",
+        XtNstring, (String) npc_lab,
+        NULL);
+
+      (void) sprintf(str, "Tot. Var: %5.1f ", 100.0);
+      (void) sprintf(str, "Cond. Num.: %.2e  ", 0.0);
+
+      do_sph = (Widget) CreateCommand(xg, "Do Sphering",
+        NULL);
+
+    }
+
+    is_sphere_mapped = True;
+
+    scree_plot_window = XtWindow(scree_plot_wksp);
+    scree_plot_pixmap = XCreatePixmap(display, scree_plot_window,
+      scree_wksp.width, scree_wksp.height, depth);
+    XFillRectangle(display, scree_plot_pixmap, clear_GC,
+      0, 0, scree_wksp.width, scree_wksp.height);
+  }
+
   /* Now calculate the svd and display results */
   get_sph_vars ();
   set_sph_tform_tp ();

@@ -19,6 +19,11 @@ typedef struct {
     gint x1, y1, x2, y2;
 } brush_coords;
 
+typedef struct {  /*-- used for obtaining ranks --*/
+  gfloat f;
+  gint indx;
+} paird;
+
 /* column-wise data that will appear in the variable table */
 typedef struct {
  gint groupid_ori, groupid;

@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+extern gint pcompare (const void *, const void *);
 extern GtkWidget* CreateMenuCheck (displayd *display, GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean);
 extern GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer);
 extern void array_read (void);

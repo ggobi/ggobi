@@ -67,7 +67,6 @@ rejitter () {
   gint i, j, k, m, nselected_cols = 0;
   gfloat frand, fworld, fjit;
   gfloat precis = (gfloat) PRECISION1;
-  displayd *display = (displayd *) current_splot->displayptr;
 
 /*
  * First determine the variables to be jittered:
@@ -78,33 +77,6 @@ rejitter () {
   nselected_cols = selected_cols_get (selected_cols, xg.jitter_vgroup);
   if (nselected_cols == 0)
     nselected_cols = plotted_cols_get (selected_cols, false);
-
-/*
-  gboolean clear_vartable = false;
-  if (nselected_cols == 0) {
-    gint mode = mode_get ();
-    clear_vartable = true;
-    for (j=0; j<xg.ncols; j++) {
-      switch (display->displaytype) {
-        case scatterplot:
-          switch (mode) {
-            case P1PLOT:
-              vartable_select_var (current_splot->p1dvar, true);
-              break;
-            case XYPLOT:
-              vartable_select_var (current_splot->xyvars.x, true);
-              vartable_select_var (current_splot->xyvars.y, true);
-              break;
-          }
-          break;
-        case scatmat:
-          break;
-        case parcoords:
-          break;
-      }
-    }
-  }
-*/
 
   for (j=0; j<nselected_cols; j++) {
     k = selected_cols[j];

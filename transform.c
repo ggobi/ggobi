@@ -37,26 +37,6 @@ gfloat inv_raise_min_to_0 (gfloat x) { return (x - domain_incr); }
 gfloat inv_raise_min_to_1 (gfloat x) { return (x - domain_incr - 1.0); }
 static gfloat (*inv_domain_adj) (gfloat x) = no_change;
 
-typedef struct {
-  gfloat f;
-  gint indx;
-} paird;
-
-static gint
-pcompare (const void *val1, const void *val2)
-{
-  const paird *pair1 = (const paird *) val1;
-  const paird *pair2 = (const paird *) val2;
-
-  if (pair1->f < pair2->f)
-    return (-1);
-  else if (pair1->f == pair2->f)
-    return (0);
-  else
-    return (1);
-}
-
-
 gint
 cols_in_group (gint *cols, gint varno) {
 /*
@@ -500,13 +480,11 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
   return (tform_ok);
 }
 
-static gboolean 
+void
 transform2_values_set (gint tform_type, gint jcol)
 {
   tform2 = tform_type;
   xg.vardata[jcol].tform2 = tform_type;
-
-  return true;
 }
 
 static gboolean 
@@ -718,36 +696,6 @@ transform (gint stage, gint tform_type, gfloat param)
   if (nselected_cols == 0)
     nselected_cols = plotted_cols_get (selected_cols, false);
 
-  /*-- if ncols == 0, choose all currently plotted columns --*/
-/*
-  gboolean clear_vartable;
-  clear_vartable = false;
-  if (nselected_cols == 0) {
-    gint mode = mode_get ();
-    clear_vartable = true;
-    for (j=0; j<xg.ncols; j++) {
-      switch (display->displaytype) {
-        case scatterplot:
-          switch (mode) {
-            case P1PLOT:
-              vartable_select_var (current_splot->p1dvar, true);
-              break;
-            case XYPLOT:
-              vartable_select_var (current_splot->xyvars.x, true);
-              vartable_select_var (current_splot->xyvars.y, true);
-              break;
-          }
-          break;
-        case scatmat:
-          break;
-        case parcoords:
-          break;
-      }
-    }
-    nselected_cols = get_selected_cols (selected_cols, false);
-  }
-*/
-
   /*-- loop over selected columns, getting vgroup members --*/
   for (j=0; j<nselected_cols; j++) {
     n = selected_cols[j];
@@ -765,11 +713,6 @@ transform (gint stage, gint tform_type, gfloat param)
         transform_variable (stage, tform_type, param, cols[k]);
     }
   }
-
-/*
-  if (clear_vartable) 
-    vartable_unselect_all ();
-*/
 
   g_free ((gpointer) cols);
   g_free ((gpointer) selected_cols);

@@ -72,7 +72,6 @@ rnorm2 (gdouble *drand, gdouble *dsave) {
 #endif
 }
 
-
 gint
 fcompare (const void *x1, const void *x2)
 {
@@ -88,6 +87,20 @@ fcompare (const void *x1, const void *x2)
   return (val);
 }
 
+/*-- used to find ranks --*/
+gint
+pcompare (const void *val1, const void *val2)
+{
+  const paird *pair1 = (const paird *) val1;
+  const paird *pair2 = (const paird *) val2;
+
+  if (pair1->f < pair2->f)
+    return (-1);
+  else if (pair1->f == pair2->f)
+    return (0);
+  else
+    return (1);
+}
 
 /* Not used anywhere yet ... */
 void

@@ -298,5 +298,5 @@ dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v)
     }
   }
   g_free (rv1);
-  return(1);
+  return (1);
 }

@@ -9,78 +9,50 @@ static GtkAdjustment *npcs_adj;
 static GtkWidget *totvar_entry, *condnum_entry;
 static GtkWidget *sphere_apply_btn;
 
-extern gint xg_nspherevars;
-extern gint *xg_spherevars;
-extern gfloat *xg_eigenval;
-
-gint sphere_npcs;
-
-extern void vc_set (gint);
-extern void vc_active_set (gint, gint*);
-extern gint sphere_svd (gint, gint*);
+/*-- these will all be moved to externs.h --*/
+extern gint sphere_npcs_get (void);
+extern void sphere_npcs_set (gint);
+extern void spherevars_set (void);
+extern gint spherevars_get (gint *);
+extern gint nspherevars_get (void);
+extern void sphere_transform_set (void);
+extern void pca_diagnostics_set ();
+extern void eigenvals_get (gfloat *);
+extern gboolean pca_calc (void);
+extern void sphere_apply_cb (void);
 
 /*-------------------------------------------------------------------------*/
+/*                   routines for manipulating the gui                     */
+/*-------------------------------------------------------------------------*/
 
-void sphere_npcs_set (gint n)
-{
-  sphere_npcs = n;
-}
-
-void
-sphere_enable (gboolean sens)
+void sphere_enable (gboolean sens)
 {
   gtk_widget_set_sensitive (sphere_apply_btn, sens);
 }
 
-void sphere_transform_set (void)
-{
-   gint j;
-
-   for (j=0; j<xg_nspherevars; j++)
-     xg.vardata[xg_spherevars[j]].tform2 = SPHERE;
-}
-
-void sphere_set_condnum (gfloat x)
+void sphere_condnum_set (gfloat x)
 {
   gchar *lbl = g_strdup_printf ("%5.1f", x);
   gtk_entry_set_text (GTK_ENTRY (condnum_entry), lbl);
   g_free (lbl);
 }
 
-void sphere_set_totvar (gfloat x)
+void sphere_totvar_set (gfloat x)
 {
   gchar *lbl = g_strdup_printf ("%.2e", x);
   gtk_entry_set_text (GTK_ENTRY (totvar_entry), lbl);
   g_free (lbl);
 }
 
-void select_npc_cb ()
+/*-------------------------------------------------------------------------*/
+/*                          callbacks                                      */
+/*-------------------------------------------------------------------------*/
+
+void
+sphere_npcs_set_cb (GtkAdjustment *adj, GtkWidget *w) 
 {
-  gint j;
-  gfloat ftmp1=0.0, ftmp2=0.0;
-
-  if (sphere_npcs<1) {
-     quick_message ("Need to choose at least 1 PC.", false);
-     sphere_enable (false);
-
-  } else if (sphere_npcs > xg_nspherevars) {
-     gchar *msg = g_strdup_printf ("Need to choose at most %d PCs.\n",
-       xg_nspherevars);
-     quick_message (msg, false);
-     sphere_enable (false);
-     g_free (msg);
-
-  } else {
-     
-    for (j=0; j<sphere_npcs; j++)
-      ftmp1 += xg_eigenval[j];
-    for (j=0; j<xg_nspherevars; j++)
-      ftmp2 += xg_eigenval[j];
-
-    sphere_set_totvar (ftmp1/ftmp2);
-    sphere_set_condnum (xg_eigenval[0]/xg_eigenval[sphere_npcs-1]);
-    sphere_enable (true);
-  }
+  gint n = (gint) adj->value;
+  sphere_npcs_set (n);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -90,15 +62,20 @@ void select_npc_cb ()
 #define SCREE_WIDTH 200
 #define SCREE_HEIGHT 100
 
-static GtkWidget *scree_da;
+static GtkWidget *scree_da = NULL;
 static GdkPixmap *scree_pixmap;
+
+gboolean scree_mapped_p (void) {
+  return (scree_da != NULL);
+}
 
 static gint
 scree_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 {
-  if (scree_pixmap == NULL)
+  if (scree_pixmap == NULL) {
     scree_pixmap = gdk_pixmap_new (w->window,
       w->allocation.width, w->allocation.height, -1);
+  }
 
   return false;
 }
@@ -110,6 +87,15 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   gchar *tickmk;
   GtkStyle *style = gtk_widget_get_style (scree_da);
 
+  gint *sphvars = (gint *) g_malloc (xg.ncols * sizeof (gint));
+  gfloat *evals = (gfloat *) g_malloc (xg.ncols * sizeof (gfloat));
+
+  gint nsphvars = spherevars_get (sphvars);
+  eigenvals_get (evals);
+
+for (j=0; j<nsphvars; j++)
+g_printerr ("(expose) sphvar %d eval %f\n", sphvars[j], evals[j]);
+
   /* clear the pixmap */
   gdk_gc_set_foreground (plot_GC, &xg.bg_color);
   gdk_draw_rectangle (scree_pixmap, plot_GC,
@@ -117,12 +103,13 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
                       w->allocation.width,
                       w->allocation.height);
 
+  gdk_gc_set_foreground (plot_GC, &xg.accent_color);
   gdk_draw_line (scree_pixmap, plot_GC, 10, 90, 190, 90);
   gdk_draw_line (scree_pixmap, plot_GC, 10, 90, 10, 10);
 
-  for (j=0; j<xg_nspherevars; j++) {
-    xpos = (gint) (180./(gfloat)(xg_nspherevars-1)*j+10);
-    ypos = (gint) (90. - xg_eigenval[j]/xg_eigenval[0]*80.);
+  for (j=0; j<nsphvars; j++) {
+    xpos = (gint) (180./(gfloat)(nsphvars-1)*j+10);
+    ypos = (gint) (90. - evals[j]/evals[0]*80.);
 
     tickmk = g_strdup_printf ("%d", j+1);
     gdk_draw_string (scree_pixmap, style->font, plot_GC, xpos, 95, tickmk);
@@ -139,6 +126,10 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
                    0, 0, 0, 0,
                    w->allocation.width,
                    w->allocation.height);
+
+  g_free ((gpointer) sphvars);
+  g_free ((gpointer) evals);
+
   return false;
 }
 
@@ -147,53 +138,31 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 */
 void scree_plot_make (void)  /*-- when sphere panel is opened --*/
 {
-  gint svd_ok;
-  gint j;
-
-  xg_nspherevars = selected_cols_get (xg_spherevars, false);
-  if (xg_nspherevars == 0)
-    xg_nspherevars = plotted_cols_get (xg_spherevars, false);
-
-  sphere_transform_set ();
-  for (j=0; j<xg_nspherevars; j++)
-    vc_set (xg_spherevars[j]);
-  
-   /* If xg_nspherevars > 1 use svd routine, otherwise just standardize */
-  if (xg_nspherevars > 1) {
-    vc_active_set (xg_nspherevars, xg_spherevars);
-    svd_ok = sphere_svd (xg_nspherevars, xg_spherevars);
-    if (!svd_ok) {
-       quick_message ("Variance-covariance is identity already!\n", false);
-    } else {
-      gboolean rval = false;
-      gtk_signal_emit_by_name (GTK_OBJECT (scree_da), "expose_event",
-        (gpointer) NULL, (gpointer) &rval);
-    }
+g_printerr ("(scree_plot_make)\n");
+  if (pca_calc ()) {
+    gboolean rval = false;
+    gtk_signal_emit_by_name (GTK_OBJECT (scree_da), "expose_event",
+      (gpointer) NULL, (gpointer) &rval);
+    pca_diagnostics_set ();
   } else {
-    /*scale to variance=1*/
+     quick_message ("Variance-covariance is identity already!\n", false);
   }
 }
 
 /*-------------------------------------------------------------------------*/
-
-
-void
-sphere_npcs_set_cb (GtkAdjustment *adj, GtkWidget *w) 
-{
-  gint n = (gint) adj->value;
-g_printerr ("numpcs=%d\n", n);
-
-  sphere_npcs_set (n);
-}
-
-
+/*                     Create and map the sphere panel                     */
+/*-------------------------------------------------------------------------*/
 
 void
-sphere_panel_open ()
+sphere_panel_open (void)
 {
   GtkWidget *hbox, *vbox, *frame, *frame_vb;
   GtkWidget *vb, *label;
   GtkWidget *hb, *npcs_spinner;
+  gint nvars;
+
+  spherevars_set ();
+  nvars = nspherevars_get ();
 
   if (window == NULL) {
     
@@ -223,7 +192,8 @@ sphere_panel_open ()
     
     /*-- the parameters of the adjustment should be reset each time --*/
     npcs_adj = (GtkAdjustment *)
-      gtk_adjustment_new (1.0, 1.0, xg.ncols-1, 1.0, 5.0, 0.0);
+      gtk_adjustment_new ((gfloat) nvars, 1.0, (gfloat) xg.ncols,
+                          1.0, 5.0, 0.0);
     gtk_signal_connect (GTK_OBJECT (npcs_adj), "value_changed",
 		                GTK_SIGNAL_FUNC (sphere_npcs_set_cb),
 		                NULL);
@@ -242,10 +212,8 @@ sphere_panel_open ()
     gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), sphere_apply_btn,
       "Perform principal components transformation for the first n variables",
       NULL);
-/*
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (reset_tform_cb), NULL);
-*/
+    gtk_signal_connect (GTK_OBJECT (sphere_apply_btn), "clicked",
+                        GTK_SIGNAL_FUNC (sphere_apply_cb), NULL);
 
     /*-- the labels, in a frame --*/
     frame = gtk_frame_new (NULL);
@@ -311,12 +279,7 @@ sphere_panel_open ()
                         (gpointer) NULL);
   }
 
-/* I'm not sure which of these should come first so that the
- * expose_cb works properly
-*/
-
-  scree_plot_make ();
-
   gtk_widget_show_all (window);
 
+  scree_plot_make ();
 }
