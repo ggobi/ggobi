@@ -222,6 +222,9 @@ vartable_init_var (gint j, datad *d)
   d->vartable[j].selected = false;
   d->vartable[j].nmissing = 0;
 
+  d->vartable[j].categorical_p = false;  /*-- real-valued by default --*/
+  d->vartable[j].nlevels = 0;
+
   d->vartable[j].jref = -1;  /*-- not cloned --*/
 
   d->vartable[j].mean = 0.0;

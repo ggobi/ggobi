@@ -33,6 +33,11 @@ typedef struct {
  gchar *collab, *collab_tform;
  gint nmissing;
 
+ /*-- is this variable categorical? --*/
+ gboolean categorical_p;
+ gint nlevels;
+ gchar **levels;
+
  /*-- reference variable:  jref=-1 except for cloned or sphered variables --*/
  gint jref;
 
