@@ -83,7 +83,6 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot (sp);
   displayd *display = sp->displayptr;
   datad *d = display->d;
-  cpaneld *cpanel = &display->cpanel;
   gboolean button1_p, button2_p;
   gboolean inwindow, wasinwindow;
 
@@ -91,11 +90,10 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
   /*
    * allow point motion only for
-   *   scatterplots in xyplot mode
+   *   scatterplots 
    *   the splotd members of a scatmat that are xyplots.
   */
-  if ((display->displaytype == scatterplot &&
-        (cpanel->projection == XYPLOT || cpanel->projection == TOUR2D)) ||
+  if (display->displaytype == scatterplot ||
       (display->displaytype == scatmat && sp->p1dvar == -1))
   {
 
@@ -151,7 +149,6 @@ static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   displayd *display = (displayd *) sp->displayptr;
-  cpaneld *cpanel = &display->cpanel;
   ggobid *gg = GGobiFromSPlot (sp);
   datad *d = gg->current_display->d;
   
@@ -160,19 +157,12 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   /*
    * allow point motion only for
-   *   scatterplots in xyplot mode
+   *   scatterplots  
    *   the splotd members of a scatmat that are xyplots.
   */
-  if ((display->displaytype == scatterplot &&
-        (cpanel->projection == XYPLOT || cpanel->projection == TOUR2D)) ||
+  if (display->displaytype == scatterplot ||
       (display->displaytype == scatmat && sp->p1dvar == -1))
   {
-/*
-    gboolean button1_p, button2_p;
-    mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
-    d->nearest_point = find_nearest_point (&sp->mousepos, sp, d, gg);
-*/
-
     if (d->nearest_point != -1) {
       movepts_history_add (d->nearest_point, sp, d, gg);
 
@@ -197,7 +187,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       splot_redraw (sp, QUICK, gg);  
     }
   } else {
-    g_printerr ("You can only move points in an xy plot\n");
+    g_printerr ("Sorry, you can not points in this display or plot\n");
   }
 
   return true;
@@ -207,16 +197,11 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
-  displayd *display = (displayd *) sp->displayptr;
-  cpaneld *cpanel = &display->cpanel;
   ggobid *gg = GGobiFromSPlot (sp);
 
   gg->buttondown = 0;
 
-  if (cpanel->projection == XYPLOT || cpanel->projection == TOUR2D)
-  {
-    gdk_pointer_ungrab (event->time);  /*-- grabbed in mousepos_get_pressed --*/
-  }
+  gdk_pointer_ungrab (event->time);  /*-- grabbed in mousepos_get_pressed --*/
 
   displays_plot (NULL, QUICK, gg);
 

@@ -222,8 +222,8 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
     common_event = false;
   }
 
-  if (action >= 0 && display_type_handles_action (display,
-    (PipelineMode) action))
+  if (action >= 0 &&
+      display_type_handles_action (display, (PipelineMode) action))
   {
     etime = event->time;
     GGOBI(full_viewmode_set)((PipelineMode) action, gg);
@@ -959,9 +959,29 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
   datad *d = display->d;
 
   switch (cpanel->projection) {
+    case P1PLOT:
+      if (display->p1d_orientation == VERTICAL)
+        d->world.vals[ipt][sp->p1dvar] = sp->planar[ipt].y;
+      else
+        d->world.vals[ipt][sp->p1dvar] = sp->planar[ipt].x;
+    break;
+
     case XYPLOT:
       d->world.vals[ipt][sp->xyvars.x] = sp->planar[ipt].x;
       d->world.vals[ipt][sp->xyvars.y] = sp->planar[ipt].y;
+    break;
+
+    case TOUR1D:
+    {
+      gint j, var;
+      /*if (!gg->is_pp) {*/
+        for (j=0; j<display->t1d.nactive; j++) {
+          var = display->t1d.active_vars.els[j];
+          d->world.vals[ipt][var] += 
+           ((gfloat)gg->movepts.eps.x * display->t1d.F.vals[0][var]);
+        }
+      /*}*/
+    }
     break;
 
     case TOUR2D:
@@ -978,8 +998,39 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
     }
     break;
 
+    case COTOUR:
+    {
+      gint j, var;
+      /*if (!gg->is_pp) {*/
+        for (j=0; j<display->tcorr1.nactive; j++) {
+          var = display->tcorr1.active_vars.els[j];
+          d->world.vals[ipt][var] += 
+           ((gfloat)gg->movepts.eps.x * display->tcorr1.F.vals[0][var]);
+        }
+        for (j=0; j<display->tcorr2.nactive; j++) {
+          var = display->tcorr2.active_vars.els[j];
+          d->world.vals[ipt][var] += 
+           ((gfloat)gg->movepts.eps.y * display->tcorr2.F.vals[0][var]);
+        }
+      /*}*/
+    }
+/* xgobi
+    for (j=0; j<xg->ncorr_xvars; j++) {
+      var = xg->corr_xvars[j];
+      xg->world_data[pt][var] += 
+       ((float)eps->x * xg->cu[0][var] + (float)eps->y * xg->cu[1][var]);
+    }
+    for (j=0; j<xg->ncorr_yvars; j++) {
+      var = xg->corr_yvars[j];
+      xg->world_data[pt][var] += 
+       ((float)eps->x * xg->cu[0][var] + (float)eps->y * xg->cu[1][var]);
+    }
+*/
+
+    break;
+
     default:
-      g_printerr ("reverse pipeline only implemented for xyplotting\n");
+      g_printerr ("reverse pipeline not yet implemented for this projection\n");
   }
 }
 
