@@ -45,7 +45,8 @@ C_SRC_FILES=$(SRC) $(XML_SRC) xmlConvert.c
 C_HEADER_FILES=\
   GGobiAPI cpanel datad defines display display_tree \
   externs ggobi noop-checkbutton read_mysql read_xml  \
-  splot types vars varseldata write_xml writedata vartable gtkext fileio 
+  splot types vars varseldata write_xml writedata vartable gtkext fileio \
+  print
 
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)

@@ -47,8 +47,6 @@ SRC=\
     missing.c \
     movepts.c \
     movepts_ui.c \
-    mt19937-1.c \
-    cokus.c \
     noop-checkbutton.c \
     p1d.c \
     p1d_ui.c \
@@ -103,9 +101,11 @@ SRC=\
     xlines.c \
     xyplot.c \
     xyplot_ui.c \
+    print.c \
     @XML_SRC@ @MYSQL_SRC@
 
-
+#    mt19937-1.c \
+#    cokus.c \
 
 ifdef USE_XML
  XML_INC_DIRS=$(foreach el,@XML_INC_DIRS@, -I$(el))
