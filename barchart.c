@@ -237,7 +237,7 @@ void barchart_clean_init(barchartSPlotd * sp)
     }
   }
   for (i = 0; i < sp->bar->nbins + 2; i++)
-    sp->bar->bar_hit[i] = false;
+    sp->bar->bar_hit[i] = sp->bar->old_bar_hit[i] = false;
 /* */
 
   barchart_set_initials(sp, d);
@@ -1536,6 +1536,10 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
   PipelineMode mode = viewmode_get (gg);
   gint level;
   gint j;
+
+  /*
+  g_printerr ("in barchart_add_bar_cues: mode == IDENT? %d\n", mode == IDENT);
+  */
 
   if (mode != IDENT)
     return;
