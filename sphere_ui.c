@@ -167,33 +167,26 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
     }
     else {
       /*-- set up the variables into which sphered data will be written --*/
-      spherize_set_pcvars (d, gg);
+      if (spherize_set_pcvars (d, gg)) {
 
-      /*
-       * sphere the variables in d->sphere.vars
-       * into the variables in d->sphere.pcvars
-      */
-      spherize_data (&d->sphere.vars, &d->sphere.pcvars, d, gg);
-      sphere_varcovar_set (d, gg);
-/*    pc_axes_sensitive_set (true);*/
+        /*
+         * sphere the variables in d->sphere.vars
+         * into the variables in d->sphere.pcvars
+        */
+        spherize_data (&d->sphere.vars, &d->sphere.pcvars, d, gg);
+        sphere_varcovar_set (d, gg);
+/*      pc_axes_sensitive_set (true);*/
 
-      /*-- these three lines replicated from transform.c --*/
-      limits_set (false, true, d, gg);
-      vartable_limits_set (d);
-      vartable_stats_set (d);
+        /*-- these three lines replicated from transform.c --*/
+        limits_set (false, true, d, gg);
+        vartable_limits_set (d);
+        vartable_stats_set (d);
 
-/*
-  gboolean rval = false;
-  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->sphere_ui.window));
-      gtk_signal_emit_by_name (GTK_OBJECT (clist),
-        "expose_event",
-        (gpointer) gg, (gpointer) &rval);
-*/
-
-      tform_to_world (d, gg);
-      displays_tailpipe (FULL, gg);
+        tform_to_world (d, gg);
+        displays_tailpipe (FULL, gg);
+      }
     }
-  }  /*-and send an expose event to the clist--*/
+  }
 }
 
 /*

@@ -83,7 +83,7 @@ variable_set_label (datad *d, gint j, gchar *lbl)
  *   add npcs new variables; populate pcvars
  * }
 */
-void
+gboolean
 spherize_set_pcvars (datad *d, ggobid *gg)
 {
   gint ncols_prev = d->ncols;
@@ -92,6 +92,7 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   /*-- for newvar_add.. the variable notebooks --*/
   gchar *vname;
   gdouble *dtmp;
+  gboolean succeeded = true;
 
   /*-- for updating the clist --*/
   vartabled *vt;
@@ -99,9 +100,14 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   gchar *row[] = {""};
   /*-- --*/
 
-/*g_printerr ("npcs=%d\n", d->sphere.npcs);*/
+/*
+g_printerr ("pcvars.nels %d sphere->npcs %d\n",
+d->sphere.pcvars.nels, d->sphere.npcs);
+g_printerr ("npcs=%d\n", d->sphere.npcs);
+*/
+
   if (d->sphere.npcs == 0)
-    return;
+    return false;
 
   /*-- the null case: sphering for the first time --*/
   if (d->sphere.pcvars.els == NULL || d->sphere.pcvars.nels == 0) {
@@ -138,26 +144,33 @@ spherize_set_pcvars (datad *d, ggobid *gg)
     /*-- add just the additional required variables? --*/
 
     /*-- try deleting them all and starting fresh? --*/
-    delete_vars (d->sphere.pcvars.els, d->sphere.pcvars.nels, d, gg);
-    ncols_prev = d->ncols;
+    if (delete_vars (d->sphere.pcvars.els, d->sphere.pcvars.nels, d, gg)) {
+   
+      ncols_prev = d->ncols;
 
-    vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
-    vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
+      vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
+      vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
 
-    vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
+      vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
+
+      /*-- variable labels updated at the end of this function;
+            data updated when sphere_apply_cb calls spherize_data --*/
+      clone_vars (d->sphere.vars.els, d->sphere.npcs, d, gg);
 /*
-    clone_vars (d->sphere.vars.els, d->sphere.npcs, d, gg);
+      dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gfloat));
+      for (j=0; j<d->sphere.npcs; j++) {
+        vname = g_strdup_printf ("PC%d", j+1);
+        newvar_add_with_values (dtmp, d->nrows, vname, d, gg);
+        g_free (vname);
+      }
+      g_free (dtmp);
 */
-    dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gfloat));
-    for (j=0; j<d->sphere.npcs; j++) {
-      vname = g_strdup_printf ("PC%d", j+1);
-      newvar_add_with_values (dtmp, d->nrows, vname, d, gg);
-      g_free (vname);
-    }
-    g_free (dtmp);
 
-    for (j=ncols_prev, k=0; j<d->ncols; j++) {
-      d->sphere.pcvars.els[k++] = j;
+      for (j=ncols_prev, k=0; j<d->ncols; j++)
+        d->sphere.pcvars.els[k++] = j;
+
+    } else {
+      succeeded = false;
     }
 
   /*-- if the number has decreased --*/
@@ -167,38 +180,46 @@ spherize_set_pcvars (datad *d, ggobid *gg)
     gint *cols = (gint *) g_malloc (ncols * sizeof (gint));
     for (j=d->sphere.pcvars.nels-1, k=ncols-1; j>=d->sphere.npcs; j--)
       cols[k--] = d->sphere.pcvars.els[j];
-    delete_vars (cols, ncols, d, gg);
 
-    /*-- then behave as above, when the lengths were the same --*/
-    if (d->sphere.vars_sphered.nels != d->sphere.vars.nels)
-      vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
+    if (delete_vars (cols, ncols, d, gg)) {
 
-    /*-- should I also realloc pcvars? --*/
-    vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
+      /*-- then behave as above, when the lengths were the same --*/
+      if (d->sphere.vars_sphered.nels != d->sphere.vars.nels)
+        vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
 
-    vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
+      /*-- should I also realloc pcvars? --*/
+      vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
+
+      vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
+    } else succeeded = false;
 
     g_free (cols);
   }
 
-  for (k=0; k<d->sphere.pcvars.nels; k++) {
-    j = d->sphere.pcvars.els[k];
-    lbl = g_strdup_printf ("PC%d", (k+1));
-    variable_set_label (d, j, lbl);
-    g_free (lbl);
+  if (succeeded) {
+
+    /*-- update the variable labels --*/
+    for (k=0; k<d->sphere.pcvars.nels; k++) {
+      j = d->sphere.pcvars.els[k];
+      lbl = g_strdup_printf ("PC%d", (k+1));
+      variable_set_label (d, j, lbl);
+      g_free (lbl);
+    }
+
+    /*-- clear the clist --*/
+    gtk_clist_clear (clist);
+    /*-- add the new labels to the 'sphered variables' clist --*/
+    gtk_clist_freeze (clist);
+    for (j=0; j<d->sphere.vars_sphered.nels; j++) {
+      vt = vartable_element_get (d->sphere.vars_sphered.els[j], d);
+      row[0] = g_strdup (vt->collab);
+      gtk_clist_append (clist, row);
+      g_free (row[0]);
+    }
+    gtk_clist_thaw (clist);
   }
 
-  /*-- clear the clist --*/
-  gtk_clist_clear (clist);
-  /*-- add the new labels to the 'sphered variables' clist --*/
-  gtk_clist_freeze (clist);
-  for (j=0; j<d->sphere.vars_sphered.nels; j++) {
-    vt = vartable_element_get (d->sphere.vars_sphered.els[j], d);
-    row[0] = g_strdup (vt->collab);
-    gtk_clist_append (clist, row);
-    g_free (row[0]);
-  }
-  gtk_clist_thaw (clist);
+  return succeeded;
 }
 
 /*-------------------------------------------------------------------------*/
