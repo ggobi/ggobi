@@ -214,9 +214,10 @@ ggv_anchor_table_build (PluginInstance *inst)
   /* I won't do anything to change the status of the existing clusters */
   if (ggv->anchor_group.nels < d->nclusters) {
     vectorb_realloc (&ggv->anchor_group, d->nclusters);
-    /* this shouldn't change, but it can't hurt ... */
-    ggv->n_anchors = recount_anchor_groups (ggv);
   }
+
+  /* this shouldn't change, but it can't hurt ... */
+  ggv->n_anchors = recount_anchor_groups (ggv);
 
   ggv->anchor_table =  gtk_table_new (nrows, ncols, true);
   gtk_container_set_border_width (GTK_CONTAINER (ggv->anchor_table), 2);
@@ -233,6 +234,7 @@ ggv_anchor_table_build (PluginInstance *inst)
   }
 
   gtk_container_add (GTK_CONTAINER (ggv->anchor_frame), ggv->anchor_table);
+  gtk_widget_show_all (ggv->anchor_table);
 }
 
 CHECK_EVENT_SIGNATURE(clusters_changed_cb, clusters_changed_f)
