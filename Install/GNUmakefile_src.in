@@ -81,6 +81,7 @@ SRC=\
     tour1d_ui.c \
     tour2d.c \
     tour2d_ui.c \
+    tourcorr.c \
     tourcorr_ui.c \
     transform.c \
     transform_ui.c \
