@@ -12,7 +12,12 @@ Checking installation:
 
 make ADMIN=1 DOC_TEX_FILES= NO_XGOBI_GROUP=1
 cd /tmp/ggobi/Install/ggobi
-./configure or ./configure  --with-xml=/usr/lib/libxml2
+./configure 
+
+or for plugins 
+./configure --with-ggvis --with-graphlayout
+./configure --with-plugins
+
 make (or gmake)
 
 Become superuser and 

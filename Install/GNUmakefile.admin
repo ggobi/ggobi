@@ -21,7 +21,7 @@ TOOLS=Install/plugin.in
 PLUGIN_DIRS=ImageLib MySQL Postgres DataViewer FileSelector \
             R GraphLayout ggvis JVM GraphAction ExcelReader \
 	    ImageLib Perl Python PluginManager \
-	    TestInput TestPlugin 
+	    TestInput TestPlugin DescribeDisplay
 #Help
 
 
@@ -146,10 +146,10 @@ notes/%.ps: notes/%.tex
 	$(MAKE) -C $(@D) $(@F)
 
 copyPlugins:
+	cp plugins/GNUmakefile.plugin $(TMP_INSTALL_DIR)/plugins
 	for f in $(PLUGIN_DIRS) ; do \
 	   $(MAKE) ADMIN=1 -C plugins/$$f createDist INSTALL_DIR=$(TMP_INSTALL_DIR)/plugins ; \
 	done
-	cp plugins/GNUmakefile.plugin $(TMP_INSTALL_DIR)/plugins
 	cp Install/plugin.in $(TMP_INSTALL_DIR)/share/tools
 	chmod +x $(TMP_INSTALL_DIR)/share/tools/plugin.in
 

@@ -17,8 +17,11 @@ installation. Some of the tools may not be installed by default, eg
 autoconf, but you can come back to this site and install the missed
 pieces at any time.
 
-Get supporting development files from the ggobi web site. These are
-stored in src_zip.zip. Unzip this into a temporary directory.
+Installing all the development packages:
+
+Get supporting development files from Di Cook's web site
+http://www.public.iastate.edu/~dicook/ggobi/ggobi-developers-pack.tar.gz.
+Unpack this into a temporary directory.
 
 Installing MingW:
 
@@ -112,7 +115,7 @@ from the tar.gz!)
 
 Copy all the dlls from src_zip/dlls to ggobi/src/.
 
-The final step is to type "make -f Makefile.win32.1.0-1-beta". 
+The final step is to type "make -f Makefile.win32". 
 
 If you have trouble send email to ggobi-help@ggobi.org, complete with
 the error messages you got in the cygwin window. We'll aim to help as
