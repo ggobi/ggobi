@@ -321,14 +321,16 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
         nplots--;
       }
 
-    } else if(cpanel->tsplot_selection_mode != VAR_DELETE) {
+    } 
+    else if (cpanel->tsplot_selection_mode != VAR_DELETE) {
 
       if (cpanel->tsplot_selection_mode == VAR_REPLACE) {
         *jvar_prev = sp->xyvars.y;
         sp->xyvars.y = jvar;
         redraw = true;
 
-      } else {
+      } 
+      else {
 
         /*-- prepare to reset the current plot --*/
         sp_event_handlers_toggle (sp, off);
@@ -341,8 +343,11 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
         height = (gint) (ratio * (gfloat) height);
         /* */
         l = display->splots;
+        s = (splotd *) l->data; /* this sets the x var for the new plot
+				   to be the same as that of the first plot. */
         sp_new = splot_new (display, width, height, gg);
         sp_new->xyvars.y = jvar;
+        sp_new->xyvars.x = s->xyvars.x;
 
         if (cpanel->tsplot_selection_mode == VAR_INSERT)
           display->splots = g_list_insert (display->splots,
