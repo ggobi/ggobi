@@ -85,7 +85,7 @@ show_fileselector(InputDescription *desc, ggobid *gg)
     gint type;
     DialogInput *data;
     char buf[1000];
-
+    fprintf(stderr, "Building file selector\n");fflush(stderr);
     data = (DialogInput *) g_malloc(sizeof(DialogInput));
 
     w = gtk_icon_file_selection_new("Select GGobi input file");
