@@ -93,7 +93,6 @@ scatterplot_display_menus_make (displayd *display,
   datad *e;
   datad *d = display->d;  /*-- this dataset --*/
   gint k, ne = 0;
-  extern void edgeset_add_cb (GtkWidget *w, datad *e);
 
   /*-- If this datad has ids, find the number of other datad's with edges --*/
   if (d->rowid.idv.nels > 0) {
@@ -110,25 +109,13 @@ scatterplot_display_menus_make (displayd *display,
       topmenu = submenu_make ("_Edges", 'E', accel_group);
       edges_menu = gtk_menu_new ();
 
-      if (ne == 1) {  
-
-        for (k=0; k<nd; k++) { 
-          e = (datad*) g_slist_nth_data (gg->d, k);
-          if (e != d && e->edge.n > 0) {
-            /*-- add a single menu item --*/
-            item = CreateMenuItem (edges_menu, "Add edge set",
-              NULL, NULL, NULL, gg->main_accel_group,
-              GTK_SIGNAL_FUNC (edgeset_add_cb), (gpointer) e, gg);
-            gtk_object_set_data (GTK_OBJECT (item),
-              "display", GINT_TO_POINTER (display));
-          }
-        }
-      } else if (ne > 1) {  /*-- add cascading menu --*/
+      if (ne > 1) {  /*-- add cascading menu --*/
         GtkWidget *submenu, *anchor;
         gchar *lbl;
+        extern void edgeset_add_cb (GtkWidget *w, datad *e);
 
         submenu = gtk_menu_new ();
-        anchor = CreateMenuItem (edges_menu, "Add edge set",
+        anchor = CreateMenuItem (edges_menu, "Select edge set",
           NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
 
         for (k=0; k<nd; k++) { 
@@ -145,17 +132,27 @@ scatterplot_display_menus_make (displayd *display,
         }
 
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
+
+        /* Add a separator */
+        CreateMenuItem (edges_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
       }
+
+      item = CreateMenuCheck (edges_menu,
+        "Show edges (undirected)",
+        func, GINT_TO_POINTER (DOPT_EDGES_U), off, gg);
+      gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+
+      item = CreateMenuCheck (edges_menu,
+        "Show 'arrowheads' (for directed edges)",
+        func, GINT_TO_POINTER (DOPT_EDGES_A), off, gg);
+      gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
       /* Add a separator */
       CreateMenuItem (edges_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
-      item = CreateMenuCheck (edges_menu, "Show lines (undirected)",
-        func, GINT_TO_POINTER (DOPT_SEGS_U), off, gg);
-      gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
       item = CreateMenuCheck (edges_menu,
-        "Show arrowheads (for directed lines)",
-        func, GINT_TO_POINTER (DOPT_SEGS_D), off, gg);
+        "Show directed edges (both edges and 'arrowheads')",
+        func, GINT_TO_POINTER (DOPT_EDGES_D), off, gg);
       gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (topmenu), edges_menu);

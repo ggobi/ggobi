@@ -201,40 +201,41 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
   gdk_color.blue = (guint16)(color[2]*65535.0);
 
   /* Allocate color */
-  gdk_color_alloc (cmap, &gdk_color);
+  if (gdk_color_alloc (cmap, &gdk_color)) {
 
-  if (gg->color_ui.current_da == gg->color_ui.bg_da) {
-    gg->bg_color = gdk_color;
-    redraw_bg (gg->color_ui.bg_da, gg);
-  } else if (gg->color_ui.current_da == gg->color_ui.accent_da) {
-    gg->accent_color = gdk_color;
-    redraw_accent (gg->color_ui.accent_da, gg);
-  } else {
-    gg->default_color_table[gg->color_id] = gdk_color;
-    redraw_fg (gg->color_ui.fg_da[gg->color_id], gg->color_id, gg);
-  }
+    if (gg->color_ui.current_da == gg->color_ui.bg_da) {
+      gg->bg_color = gdk_color;
+      redraw_bg (gg->color_ui.bg_da, gg);
+    } else if (gg->color_ui.current_da == gg->color_ui.accent_da) {
+      gg->accent_color = gdk_color;
+      redraw_accent (gg->color_ui.accent_da, gg);
+    } else {
+      gg->default_color_table[gg->color_id] = gdk_color;
+      redraw_fg (gg->color_ui.fg_da[gg->color_id], gg->color_id, gg);
+    }
 
-  redraw_symbol_display (gg->color_ui.symbol_display, gg);
+    redraw_symbol_display (gg->color_ui.symbol_display, gg);
 
-  if (sp->da != NULL) {
-    gboolean rval = false;
-    gtk_signal_emit_by_name (GTK_OBJECT (sp->da), "expose_event",
-      (gpointer) sp, (gpointer) &rval);
-  }
+    if (sp->da != NULL) {
+      gboolean rval = false;
+      gtk_signal_emit_by_name (GTK_OBJECT (sp->da), "expose_event",
+        (gpointer) sp, (gpointer) &rval);
+    }
 
-  /*
-   * If wheel doesn't have the grab, it means that the button
-   * has been released:  update all plots.
-  */
-  if (!GTK_WIDGET_HAS_GRAB (wheel)) {
-    displays_plot ((splotd *) NULL, FULL, gg);
+    /*
+     * If wheel doesn't have the grab, it means that the button
+     * has been released:  update all plots.
+    */
+    if (!GTK_WIDGET_HAS_GRAB (wheel)) {
+      displays_plot ((splotd *) NULL, FULL, gg);
+    }
   }
 }
 
 static gint
 color_expose_fg (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 {
-  int k = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w), "index"));
+  gint k = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w), "index"));
   redraw_fg (w, k, gg);
   return FALSE;
 }
@@ -285,29 +286,29 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
   } else {
 
     colorsel = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->colorsel;
+  }
 
-    if (w == gg->color_ui.bg_da) {
-      color[0] = (gdouble) gg->bg_color.red / 65535.0;
-      color[1] = (gdouble) gg->bg_color.green / 65535.0;
-      color[2] = (gdouble) gg->bg_color.blue / 65535.0;
+  if (w == gg->color_ui.bg_da) {
+    color[0] = (gdouble) gg->bg_color.red / 65535.0;
+    color[1] = (gdouble) gg->bg_color.green / 65535.0;
+    color[2] = (gdouble) gg->bg_color.blue / 65535.0;
 
-      gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
+    gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
 
-    } else if (w == gg->color_ui.accent_da) {
-      color[0] = (gdouble) gg->accent_color.red / 65535.0;
-      color[1] = (gdouble) gg->accent_color.green / 65535.0;
-      color[2] = (gdouble) gg->accent_color.blue / 65535.0;
+  } else if (w == gg->color_ui.accent_da) {
+    color[0] = (gdouble) gg->accent_color.red / 65535.0;
+    color[1] = (gdouble) gg->accent_color.green / 65535.0;
+    color[2] = (gdouble) gg->accent_color.blue / 65535.0;
 
-      gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
-    }
-    else {
+    gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
+  }
+  else {
       for (i=0; i<NCOLORS; i++) {
-        if (w == gg->color_ui.fg_da[i]) {
-          color[0] = (gdouble) gg->default_color_table[i].red / 65535.0;
-          color[1] = (gdouble) gg->default_color_table[i].green / 65535.0;
-          color[2] = (gdouble) gg->default_color_table[i].blue / 65535.0;
+      if (w == gg->color_ui.fg_da[i]) {
+        color[0] = (gdouble) gg->default_color_table[i].red / 65535.0;
+        color[1] = (gdouble) gg->default_color_table[i].green / 65535.0;
+        color[2] = (gdouble) gg->default_color_table[i].blue / 65535.0;
           gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
-        }
       }
     }
   }
@@ -611,21 +612,24 @@ make_symbol_window (ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (ebox), bg_table);
 
     gg->color_ui.bg_da = gtk_drawing_area_new ();
-    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.bg_da), PSIZE, PSIZE);
+    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.bg_da),
+      PSIZE, PSIZE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-      gg->color_ui.bg_da, "Double click to reset", NULL);
+      gg->color_ui.bg_da, "Double click to reset background color (Note: your color selection will have no visible effect unless you also reset the 'Value')",
+      NULL);
     gtk_widget_set_events (gg->color_ui.bg_da,
                            GDK_EXPOSURE_MASK
                            | GDK_ENTER_NOTIFY_MASK
                            | GDK_LEAVE_NOTIFY_MASK
                            | GDK_BUTTON_PRESS_MASK);
 
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.bg_da), "expose_event",
-      GTK_SIGNAL_FUNC (color_expose_bg), gg);
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.bg_da), "button_press_event",
-      GTK_SIGNAL_FUNC (set_color_id), gg);
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.bg_da),
+      "expose_event", GTK_SIGNAL_FUNC (color_expose_bg), gg);
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.bg_da),
+      "button_press_event", GTK_SIGNAL_FUNC (set_color_id), gg);
 
-    gtk_table_attach (GTK_TABLE (bg_table), gg->color_ui.bg_da, 0, 1, 0, 1,
+    gtk_table_attach (GTK_TABLE (bg_table),
+      gg->color_ui.bg_da, 0, 1, 0, 1,
       GTK_FILL, GTK_FILL, 10, 10);
 
     /*-- Accent color --*/

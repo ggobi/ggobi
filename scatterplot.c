@@ -155,8 +155,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   GtkWidget *mbar;
   displayd *display;
   extern void scatterplot_display_menus_make (displayd *display,
-    GtkAccelGroup *accel_group, GtkSignalFunc func, GtkWidget *mbar,
-    ggobid *gg);
+    GtkAccelGroup *, GtkSignalFunc, GtkWidget *mbar, ggobid *);
 
   if (d == NULL || d->ncols < 1)
     return (NULL);
@@ -171,7 +170,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
 
   /* Want to make certain this is true, and perhaps it may be different
      for other plot types and so not be set appropriately in DefaultOptions.
-    display->options.axes_center_p = true; 
+    display->options.axes_center_p = true;
    */
 
   scatterplot_cpanel_init (&display->cpanel,

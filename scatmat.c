@@ -63,12 +63,17 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
   item = CreateMenuCheck (options_menu, "Show points",
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-  item = CreateMenuCheck (options_menu, "Show lines (undirected)",
-    func, GINT_TO_POINTER (DOPT_SEGS_U), off, gg);
+/*  -- once the scatterplot is working, consider this --
+  item = CreateMenuCheck (options_menu, "Show edges (undirected)",
+    func, GINT_TO_POINTER (DOPT_EDGES_U), off, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-  item = CreateMenuCheck (options_menu, "Show lines (directed)",
-    func, GINT_TO_POINTER (DOPT_SEGS_D), off, gg);
+  item = CreateMenuCheck (options_menu, "Show 'arrowheads'",
+    func, GINT_TO_POINTER (DOPT_EDGES_U), off, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  item = CreateMenuCheck (options_menu, "Show edges (directed)",
+    func, GINT_TO_POINTER (DOPT_EDGES_D), off, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+*/
 /*
   if (!display->missing_p) {
     item = CreateMenuCheck (options_menu, "Show missings",

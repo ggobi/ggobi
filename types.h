@@ -148,9 +148,9 @@ typedef struct {
  gboolean points_show_p;              /* scatterplot, scatmat, parcoords */
  
  /*-- two options here may be plenty --*/
- gboolean edges_directed_show_p;      /* scatterplot, scatmat */
- gboolean edges_undirected_show_p;    /* scatterplot, scatmat */
- gboolean edges_show_p;               /* scatterplot, scatmat? */
+ gboolean edges_undirected_show_p;    /* scatterplot */
+ gboolean edges_arrowheads_show_p;    /* scatterplot */
+ gboolean edges_directed_show_p;      /* scatterplot: both of the above */
  /*-- --*/
 
  gboolean whiskers_show_p;            /* parcoords, time series */

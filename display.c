@@ -24,9 +24,9 @@
 
 DisplayOptions DefaultDisplayOptions = {
                                          true,  /* points_show_p */
-                                         false, /* edges_directed_show_p */
                                          false, /* edges_undirected_show_p */
-                                         true,  /* edges_show_p*/
+                                         false, /* edges_arrowheads_show_p */
+                                         false, /* edges_directed_show_p */
                                          true,  /* whiskers_show_p*/
                                          true,  /* missings_show_p  */
                                          true,  /* axes_show_p */
@@ -105,17 +105,40 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
       display->options.points_show_p = w->active;
       display_plot (display, FULL, gg);
       break;
-    case DOPT_SEGS_D:
-      display->options.edges_directed_show_p = w->active;
+    case DOPT_EDGES_U:  /*-- undirected: edges only --*/
+      if (display->e == NULL)
+        edgeset_add (display);
+      if (display->e != NULL)
+        display->options.edges_undirected_show_p = w->active;
+
+      if (!w->active)
+        display->options.edges_directed_show_p = false;
+
       display_plot (display, QUICK, gg);
       break;
-    case DOPT_SEGS_U:
-      display->options.edges_undirected_show_p = w->active;
+    case DOPT_EDGES_A:  /*-- arrowheads only --*/
+      if (display->e == NULL)
+        edgeset_add (display);
+      if (display->e != NULL)
+        display->options.edges_arrowheads_show_p = w->active;
+
+      if (!w->active)
+        display->options.edges_directed_show_p = false;
+
       display_plot (display, QUICK, gg);
       break;
-    case DOPT_SEGS:
-      display->options.edges_show_p = w->active;
-      display_plot (display, FULL, gg);
+    case DOPT_EDGES_D:  /*-- directed: both edges and arrowheads --*/
+      if (display->e == NULL)
+        edgeset_add (display);
+      if (display->e != NULL)
+        display->options.edges_directed_show_p = w->active;
+
+      if (!w->active) {
+        display->options.edges_undirected_show_p = false;
+        display->options.edges_arrowheads_show_p = false;
+      }
+
+      display_plot (display, QUICK, gg);
       break;
     case DOPT_WHISKERS:
       display->options.whiskers_show_p = w->active;

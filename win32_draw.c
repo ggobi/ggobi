@@ -298,7 +298,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
           open_arcs, &nc_open,    filled_arcs, &nc_filled);
 
         if ((dtype == parcoords || dtype == tsplot) &&
-            display->options.edges_show_p)
+            display->options.whiskers_show_p)
         {
           build_whisker_segs (m, &nwhisker_segs, sp);
         }

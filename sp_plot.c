@@ -308,7 +308,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 
                 /* parallel coordinate plot whiskers */
                 if (display->displaytype == parcoords) {
-                  if (display->options.edges_show_p) {
+                  if (display->options.whiskers_show_p) {
                     n = 2*i;
                     gdk_draw_line (sp->pixmap0, gg->plot_GC,
                       sp->whiskers[n].x1, sp->whiskers[n].y1,
@@ -453,7 +453,7 @@ splot_add_point_label (splotd *sp, GdkDrawable *drawable,
   /*-- draw a thickened line to highlight the current case --*/
   if (nearest) {
     if (dsp->displaytype == parcoords) {
-      if (dsp->options.edges_show_p) {
+      if (dsp->options.whiskers_show_p) {
         gint n;
         gdk_gc_set_line_attributes (gg->plot_GC,
           3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
@@ -574,21 +574,24 @@ edges_draw (splotd *sp, ggobid *gg)
   datad *d = display->d;
   datad *e = display->e;
   endpointsd *endpoints;
+  gboolean edges_show_p, arrowheads_show_p;
+  gint nels = d->rowid.idv.nels;
 
   if (e == (datad *) NULL || e->edge.n == 0) {
 /**/return;
   }
 
-  if (d->rowid.idv.nels == 0) {  /*-- d has no record ids --*/
+  if (nels == 0) {  /*-- d has no record ids --*/
 /**/return;
   }
 
-  if (!gg->mono_p) {
-    if (display->options.edges_directed_show_p ||
-        display->options.edges_undirected_show_p)
-    {
-      splot_colors_used_get (sp, &ncolors_used, colors_used, e, gg);
-    }
+  edges_show_p = (display->options.edges_directed_show_p ||
+                  display->options.edges_undirected_show_p);
+  arrowheads_show_p = (display->options.edges_directed_show_p ||
+                       display->options.edges_arrowheads_show_p);
+  if (!gg->mono_p && (edges_show_p || arrowheads_show_p)) {
+
+    splot_colors_used_get (sp, &ncolors_used, colors_used, e, gg);
 
     /*
      * Now loop through colors_used[], plotting the glyphs of each
@@ -603,9 +606,7 @@ edges_draw (splotd *sp, ggobid *gg)
         if (e->hidden_now.els[j]) {
           doit = false;
         } else {
-          if (endpoints[j].a >= d->rowid.idv.nels || 
-              endpoints[j].b >= d->rowid.idv.nels)
-          {
+          if (endpoints[j].a >= nels || endpoints[j].b >= nels) {
             doit = false;
             break;
           }
@@ -624,14 +625,14 @@ edges_draw (splotd *sp, ggobid *gg)
         if (doit) {
           if (e->color_now.els[j] == current_color) {
 
-            if (display->options.edges_undirected_show_p) {
+            if (edges_show_p) {
               sp->edges[nl].x1 = sp->screen[a].x;
               sp->edges[nl].y1 = sp->screen[a].y;
               sp->edges[nl].x2 = sp->screen[b].x;
               sp->edges[nl].y2 = sp->screen[b].y;
             }
 
-            if (display->options.edges_directed_show_p) {
+            if (arrowheads_show_p) {
               /*
                * Add thick piece of the lines to suggest a directional arrow
               */
@@ -650,10 +651,10 @@ edges_draw (splotd *sp, ggobid *gg)
         gdk_gc_set_foreground (gg->plot_GC,
           &gg->default_color_table[current_color]);
 
-      if (display->options.edges_undirected_show_p)
+      if (edges_show_p)
         gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->edges, nl);
 
-      if (display->options.edges_directed_show_p) {
+      if (arrowheads_show_p) {
         gdk_gc_set_line_attributes (gg->plot_GC,
           3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
         gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->arrowheads, nl);
@@ -664,6 +665,7 @@ edges_draw (splotd *sp, ggobid *gg)
   }
 }
 
+/*-- is this supposed to work for whiskers, too? --*/
 void
 splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) {
   displayd *dsp = (displayd *) sp->displayptr;
@@ -673,6 +675,7 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
   GtkStyle *style = gtk_widget_get_style (sp->da);
   gchar *lbl;
   gint xp, yp;
+  gboolean draw_edge;
 
   if (k >= e->edge.n)
     return;
@@ -681,8 +684,11 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
   if (e->hidden_now.els[k])
     return;
 
+  draw_edge = (dsp->options.edges_undirected_show_p ||
+               dsp->options.edges_directed_show_p);
+
   /*-- draw a thickened line, and add a label if nearest==true --*/
-  if (dsp->options.edges_show_p) {
+  if (draw_edge) {
     endpointsd *endpoints = e->edge.endpoints;
     gint a = d->rowid.idv.els[endpoints[k].a];
     gint b = d->rowid.idv.els[endpoints[k].b];
@@ -750,8 +756,9 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
                       1 + loc1->x - loc0->x, 1 + loc1->y - loc0->y);
   }
 
-  if (display->options.edges_directed_show_p ||
-      display->options.edges_undirected_show_p)
+  if (display->options.edges_undirected_show_p ||
+      display->options.edges_arrowheads_show_p ||
+      display->options.edges_directed_show_p)
   {
     if (display->displaytype == scatterplot || display->displaytype == scatmat)
     {

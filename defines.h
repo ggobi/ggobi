@@ -58,9 +58,9 @@ extern const gint ViewTypeIndeces[3];
 
 /* display options */
 #define DOPT_POINTS    0
-#define DOPT_SEGS_D    1
-#define DOPT_SEGS_U    2
-#define DOPT_SEGS      3
+#define DOPT_EDGES_U   1
+#define DOPT_EDGES_A   2
+#define DOPT_EDGES_D   3
 #define DOPT_WHISKERS  4
 #define DOPT_MISSINGS  5
 #define DOPT_GRIDLINES 6

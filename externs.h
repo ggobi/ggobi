@@ -17,6 +17,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+gboolean edgeset_add (displayd *);
 void splash_show (ggobid *gg, guint action, GtkWidget *w);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 displayd * display_alloc_init (enum displaytyped, gboolean, datad *, ggobid *);

@@ -81,10 +81,15 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg)
   gint left_attach, top_attach;
   GtkAdjustment *adj;
 
+  /*-- let's see if this works ---*/
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
+    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+/*
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
     (gg->varpanel_ui.layoutByRow) ? GTK_POLICY_NEVER : GTK_POLICY_ALWAYS,
     (gg->varpanel_ui.layoutByRow) ? GTK_POLICY_ALWAYS : GTK_POLICY_NEVER
     );
+*/
   gdk_flush();
 
   /*-- we need any old vb; loop in case the first vars were deleted --*/
@@ -289,8 +294,12 @@ varcircles_populate (datad *d, ggobid *gg)
 
   /*-- the first child of the vbox: the scrolled window, with table --*/
   d->vcirc_ui.swin = gtk_scrolled_window_new (NULL, NULL);
+/*
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+*/
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
+    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.vbox), d->vcirc_ui.swin,
     true, true, 2);
 
@@ -468,7 +477,7 @@ varcircle_create (gint k, datad *d, ggobid *gg)
   d->vcirc_ui.vb = g_slist_append (d->vcirc_ui.vb, vb);
   gtk_container_border_width (GTK_CONTAINER (vb), 1);
 
-  lbl = gtk_button_new_with_label (d->vartable[k].collab);
+  lbl = gtk_label_new (d->vartable[k].collab);
   d->vcirc_ui.label = g_slist_append (d->vcirc_ui.label, lbl);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
     lbl, "Click left on the circle to select or deselect", NULL);
@@ -476,15 +485,14 @@ varcircle_create (gint k, datad *d, ggobid *gg)
   GGobi_widget_set (GTK_WIDGET (lbl), gg, true);
   gtk_container_add (GTK_CONTAINER (vb), lbl);
 
-/*
+/*  -- if we want menus (built on the fly) for the variable circle labels --
+  lbl = gtk_button_new_with_label (d->vartable[k].collab);
   gtk_signal_connect (GTK_OBJECT (lbl), "button_press_event",
     GTK_SIGNAL_FUNC (popup_varmenu), GINT_TO_POINTER (k));
 */
 
 
-  /*
-   * a drawing area to contain the variable circle
-  */
+  /*-- a drawing area to contain the variable circle --*/
   da = gtk_drawing_area_new ();
   d->vcirc_ui.da = g_slist_append (d->vcirc_ui.da, da);
   gtk_drawing_area_size (GTK_DRAWING_AREA (da),
@@ -800,6 +808,9 @@ tour2d_menu_build (gint jvar, datad *d, ggobid *gg)
 */
 
 /*
+
+sample code for creating and destroying menus on the fly
+
 static gint
 popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd) 
 {

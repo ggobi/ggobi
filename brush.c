@@ -189,7 +189,7 @@ binning_permitted (displayd *display)
     if (e != NULL && e->edge.n > 0) {
       if (display->options.edges_undirected_show_p ||
           display->options.edges_directed_show_p ||
-          display->options.edges_show_p)
+          display->options.whiskers_show_p)
       {
         permitted = false;
       }
