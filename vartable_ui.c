@@ -19,6 +19,8 @@
 
 #include "vartable.h"
 
+static void vartable_subwindow_init (datad *d, ggobid *gg);
+
 static void close_wmgr_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
 {
   gtk_widget_hide (gg->vartable_ui.window);
@@ -44,6 +46,14 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
     clone_vars (cols, ncols, d, gg);
 
   g_free (cols);
+}
+
+static void vartable_notebook_adddata_cb (GtkObject *obj, datad *d,
+  ggobid *gg, GtkWidget *notebook)
+{
+  vartable_subwindow_init (d, gg);
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
+    g_slist_length (gg->d) > 1);
 }
 
 /* not implemented
@@ -765,12 +775,12 @@ vartable_row_append (datad *d, ggobid *gg)
   }
 }
 
-void
-vartable_open (ggobid *gg)
-{                                  
+static void
+vartable_subwindow_init (datad *d, ggobid *gg)
+{
   gint j, k;
-  GtkWidget *vbox, *hbox, *hb, *btn;
   GtkWidget *scrolled_window;
+  gchar *lbl;
   gchar *titles[NCOLS_CLIST] =
     {"varno",          /*-- varno will be an invisible column --*/
      "Variable",
@@ -780,9 +790,86 @@ vartable_open (ggobid *gg)
      "Min (data)", "Max (data)",
      "Mean", "Median",
      "N NAs"};
+
+    /* Create a scrolled window to pack the CList widget into */
+    scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+    /*
+     * We're showing all datasets for now, whether they have variables
+     * or not.  That could change.
+    */
+    lbl = datasetName (d, gg);
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->vartable_ui.notebook),
+                              scrolled_window, gtk_label_new (lbl));
+    g_free (lbl);
+
+    gtk_widget_show (scrolled_window);
+
+    d->vartable_clist = gtk_clist_new_with_titles (NCOLS_CLIST, titles);
+    gtk_clist_set_selection_mode (GTK_CLIST (d->vartable_clist),
+      GTK_SELECTION_EXTENDED);
+
+/*-- trying to add tooltips to the headers; it doesn't seem to work --*/
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+      gtk_clist_get_column_widget (
+        GTK_CLIST (d->vartable_clist), CLIST_USER_MIN),
+      "User specified minimum; untransformed", NULL);
+/*---*/
+
+    /*-- right justify all the numerical columns --*/
+    for (k=0; k<NCOLS_CLIST; k++)
+      gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
+        k, GTK_JUSTIFY_RIGHT);
+
+    /*-- make the first column invisible --*/
+    gtk_clist_set_column_visibility (GTK_CLIST (d->vartable_clist),
+      CLIST_VARNO, false);
+
+    /*-- set the column width automatically --*/
+    for (k=0; k<NCOLS_CLIST; k++)
+      gtk_clist_set_column_auto_resize (GTK_CLIST (d->vartable_clist),
+                                        k, true);
+
+    /*-- populate the table --*/
+    for (j=0 ; j<d->ncols ; j++) {
+      vartable_row_append (d, gg);
+      vartable_cells_set_by_var (j, d);  /*-- then populate --*/
+    }
+    
+    /*-- track selections --*/
+    gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "select_row",
+                       GTK_SIGNAL_FUNC (selection_made),
+                       gg);
+    gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "unselect_row",
+                       GTK_SIGNAL_FUNC (deselection_made),
+                       gg);
+
+    /*-- re-sort when receiving a mouse click on a column header --*/
+    gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "click_column",
+                       GTK_SIGNAL_FUNC (sortbycolumn_cb),
+                       gg);
+
+    /* It isn't necessary to shadow the border, but it looks nice :) */
+    gtk_clist_set_shadow_type (GTK_CLIST (d->vartable_clist), GTK_SHADOW_OUT);
+
+    gtk_container_add (GTK_CONTAINER (scrolled_window), d->vartable_clist);
+    gtk_widget_show (d->vartable_clist);
+
+  /*-- 3 = COLUMN_INSET --*/
+  gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
+    d->vartable_clist->requisition.width + 3 +
+    GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
+    150);
+}
+
+void
+vartable_open (ggobid *gg)
+{                                  
+  GtkWidget *vbox, *hbox, *hb, *btn;
   GSList *l;
   datad *d;
-  gchar *lbl;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
@@ -815,80 +902,13 @@ vartable_open (ggobid *gg)
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
-
-    /* Create a scrolled window to pack the CList widget into */
-    scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-
-/*
- * We're showing all datasets for now, whether they have variables
- * or not.  That could change.
-*/
-    lbl = datasetName (d, gg);
-    gtk_notebook_append_page (GTK_NOTEBOOK (gg->vartable_ui.notebook),
-                              scrolled_window, gtk_label_new (lbl));
-    g_free (lbl);
-
-    gtk_widget_show (scrolled_window);
-
-    d->vartable_clist = gtk_clist_new_with_titles (NCOLS_CLIST, titles);
-    gtk_clist_set_selection_mode (GTK_CLIST (d->vartable_clist),
-      GTK_SELECTION_EXTENDED);
-
-/*-- trying to add tooltips to the headers; it doesn't seem to work --*/
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-      gtk_clist_get_column_widget (
-        GTK_CLIST (d->vartable_clist), CLIST_USER_MIN),
-      "User specified minimum; untransformed", NULL);
-/*-- --*/
-
-    /*-- right justify all the numerical columns --*/
-    for (k=0; k<NCOLS_CLIST; k++)
-      gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
-        k, GTK_JUSTIFY_RIGHT);
-
-    /*-- make the first column invisible --*/
-    gtk_clist_set_column_visibility (GTK_CLIST (d->vartable_clist),
-      CLIST_VARNO, false);
-
-    /*-- set the column width automatically --*/
-    for (k=0; k<NCOLS_CLIST; k++)
-      gtk_clist_set_column_auto_resize (GTK_CLIST (d->vartable_clist),
-                                        k, true);
-
-    /*-- populate the table --*/
-    for (j=0 ; j<d->ncols ; j++) {
-      vartable_row_append (d, gg);
-      vartable_cells_set_by_var (j, d);  /*-- then populate --*/
-    }
-    
-
-    /*-- track selections --*/
-    gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "select_row",
-                       GTK_SIGNAL_FUNC (selection_made),
-                       gg);
-    gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "unselect_row",
-                       GTK_SIGNAL_FUNC (deselection_made),
-                       gg);
-
-    /*-- re-sort when receiving a mouse click on a column header --*/
-    gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "click_column",
-                       GTK_SIGNAL_FUNC (sortbycolumn_cb),
-                       gg);
-
-    /* It isn't necessary to shadow the border, but it looks nice :) */
-    gtk_clist_set_shadow_type (GTK_CLIST (d->vartable_clist), GTK_SHADOW_OUT);
-
-    gtk_container_add (GTK_CONTAINER (scrolled_window), d->vartable_clist);
-    gtk_widget_show (d->vartable_clist);
+    vartable_subwindow_init (d, gg);
   }
 
-  /*-- 3 = COLUMN_INSET --*/
-  gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
-    d->vartable_clist->requisition.width + 3 +
-    GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
-    150);
+  /*-- listen for variable_added events on main_window --*/
+  gtk_signal_connect (GTK_OBJECT (gg->main_window),
+    "datad_added", GTK_SIGNAL_FUNC (vartable_notebook_adddata_cb),
+     GTK_OBJECT (gg->vartable_ui.notebook));
 
   /*-- hbox for the buttons along the bottom --*/
   hbox = gtk_hbox_new (false, 12);
