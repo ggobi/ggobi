@@ -47,7 +47,7 @@ typedef enum { RESET_UNHIDE_POINTS, RESET_UNHIDE_EDGES, BRUSH_RESET_SCALE,
                RESET_POINT_COLORS,  /* unused */
                RESET_POINT_GLYPHS,  /* unused */
                RESET_EDGE_COLORS,   /* unused */
-               RESET_EDGE_TYPES,   /* unused */
+               RESET_EDGE_TYPES    /* unused */
              } BrushReset;
 
 typedef struct {
