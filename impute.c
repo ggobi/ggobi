@@ -124,32 +124,88 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
   return ok;
 }
 
-/* this is not conditioning on symbol and color, and it
- * most certainly could.  It's more work:  work one
- * group at a time.
-
-*/
 gboolean
 impute_mean_or_median (gint type, gint nvars, gint *vars, 
    datad *d, ggobid *gg)
 {
-  gint i, j, k, m;
+  gint i, j, k, m, n;
+  gint np, nmissing;
+  greal sum, val;
+  greal *x;
+  gint *missv;
   vartabled *vt;
   gboolean redraw = false;
 
   if (d->nmissing == 0)
 /**/return false;
 
-  for (m=0; m<nvars; m++) {
-    j = vars[m];
-    vt = vartable_element_get (j, d);
-    for (i=0; i<d->nrows_in_plot; i++) {
-      k = d->rows_in_plot.els[i];
-      if (!d->hidden_now.els[k]) {   /* ignore erased values altogether */
-        if (d->missing.vals[k][j]) {
-          d->raw.vals[k][j] = d->tform.vals[k][j] = (type == IMP_MEAN) ?
-            vt->mean : vt->median;
-          redraw = true;
+
+  /* If responding to brushing group ... */
+  if (gg->impute.bgroup_p && d->nclusters > 1) {
+
+    missv = (gint *) g_malloc(d->nrows_in_plot * sizeof(gint));
+    x = (greal *) g_malloc(d->nrows_in_plot * sizeof(greal));
+
+    /* Loop over the number of brushing groups */
+    for (n=0; n<d->nclusters; n++) {
+
+      /* Then loop over the number of columns */
+      for (m=0; m<nvars; m++) {
+        np = nmissing = 0;
+        j = vars[m];
+        sum = 0;
+
+        /*
+         * And finally over the rows, including only those rows
+         * which belong to the current cluster
+        */
+        for (i=0; i<d->nrows_in_plot; i++) {
+          k = d->rows_in_plot.els[i];
+          if (d->clusterid.els[k] == n) {
+            if (!d->hidden_now.els[k]) {   /* ignore erased values */
+              if (d->missing.vals[k][j])
+                missv[nmissing++] = k;
+              else {
+                sum += d->tform.vals[k][j];  /* for mean */
+                x[np++] = d->tform.vals[k][j];  /* for median */
+              }
+            }
+          }
+        }
+	/*         
+	g_printerr ("cluster %d np %d nmissing %d\n",
+	n, np, nmissing); */
+        if (np && nmissing) {
+          if (gg->impute.type == IMP_MEAN) {
+            val = sum/(greal)np;
+          } else if (gg->impute.type == IMP_MEDIAN) {
+            qsort ((void *) x, np, sizeof (gfloat), fcompare);
+            val = ((np % 2) != 0) ?  x[(np-1)/2] : (x[np/2-1] + x[np/2])/2. ;
+          }
+
+          /*g_printerr ("type %d val %g\n", gg->impute.type, val);*/
+          for (i=0; i<nmissing; i++)
+	    d->raw.vals[missv[i]][j] = d->tform.vals[missv[i]][j] = val;
+        }
+      }
+    }
+    g_free(missv);
+    g_free(x);
+    redraw = true;
+
+  } else {
+
+    for (m=0; m<nvars; m++) {
+      j = vars[m];
+      vt = vartable_element_get (j, d);
+      for (i=0; i<d->nrows_in_plot; i++) {
+        k = d->rows_in_plot.els[i];
+        if (!d->hidden_now.els[k]) {   /* ignore erased values altogether */
+          if (d->missing.vals[k][j]) {
+            d->raw.vals[k][j] = d->tform.vals[k][j] = (type == IMP_MEAN) ?
+              vt->mean : vt->median;
+            redraw = true;
+          }
         }
       }
     }
