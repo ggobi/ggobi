@@ -271,7 +271,7 @@ void rowlabels_alloc (datad *d, ggobid *) ;
 void rowlabels_free (datad *d, ggobid *);
 gboolean rowlabels_read (InputDescription *desc, gboolean, datad *, ggobid *);
 void rows_in_plot_set (datad *d, ggobid *);
-void ruler_ranges_set (displayd *, splotd *, ggobid *);
+void ruler_ranges_set (gboolean force, displayd *, splotd *, ggobid *);
 void scale_event_handlers_toggle (splotd *, gboolean);
 void scaling_visual_cues_draw (splotd *, GdkDrawable *, ggobid *);
 void scatmat_cpanel_init (cpaneld *, ggobid *);

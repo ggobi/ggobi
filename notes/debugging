@@ -1,0 +1,6 @@
+run ggobi in the debugger like this:
+
+run --sync --g-fatal-warnings [datafile]
+
+This causes it to break when the first gtk/gdk error occurs,
+so the backtrace will be informative.

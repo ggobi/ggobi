@@ -255,17 +255,8 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
     if (init && nvar != d->ncols) {
       g_printerr ("number of labels = %d, number of cols = %d\n",
         nvar, d->ncols);
-
-      if (d->single_column) { /*-- will this be triggered? --*/
-        g_free (d->vartable[1].collab);
-        d->vartable[1].collab = g_strdup_printf ("%s", d->vartable[0].collab);
-        g_free (d->vartable[0].collab);
-        d->vartable[0].collab = g_strdup ("Index");
-
-      } else {
-        for (j=nvar; j<d->ncols; j++)
-          d->vartable[j].collab = g_strdup_printf ("Var %d", j+1);
-      }
+      for (j=nvar; j<d->ncols; j++)
+        d->vartable[j].collab = g_strdup_printf ("Var %d", j+1);
     }
   }
   else

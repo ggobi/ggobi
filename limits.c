@@ -201,7 +201,7 @@ limits_set (gboolean do_raw, gboolean do_tform, datad *d, ggobid *gg)
   /*-- compute the limits for the raw data --*/
   if (do_raw)
     limits_raw_set (d, gg);
-  /*-- compute the limits for the transformed data --*/
+
   if (do_tform)
     limits_tform_set (d, gg);
 

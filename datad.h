@@ -62,7 +62,7 @@ struct _datad {
  gint ncols;
  vartabled *vartable;
  GtkWidget *vartable_clist;
- gboolean single_column;
+ gboolean single_column;  /*-- not handling single-column case now --*/
 
  array_f raw, tform;
  array_l world, jitdata;

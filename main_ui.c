@@ -470,6 +470,14 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) display_write_svg,         
        0 },
 #endif
+#ifdef USE_XML
+  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
+  { "/File/Store session",   
+       NULL,   
+       (GtkItemFactoryCallback) store_session, 
+       0 },
+#endif
+
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
 
@@ -477,13 +485,6 @@ static GtkItemFactoryEntry menu_items[] = {
        "<ctrl>Q",   
        (GtkItemFactoryCallback) quit_ggobi, 
        0 },
-
-#ifdef USE_XML
-  { "/File/Store",   
-       NULL,   
-       (GtkItemFactoryCallback) store_session, 
-       0 },
-#endif
 
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },

@@ -401,10 +401,10 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
   entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "newvar_entry");
   if (entry == NULL || !GTK_IS_ENTRY(entry)) {
     g_printerr ("found the wrong widget; bail out\n");
-    return;
+/**/return;
   }
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-  if (vname != NULL && strlen(vname) > 1) {
+  if (vname != NULL && strlen(vname) > 0) {
     void newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg);
     newvar_add (vtype, vname, d, gg);
   }

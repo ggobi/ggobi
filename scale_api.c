@@ -40,7 +40,7 @@ splot_pan (splotd *sp, gint xstep, gint ystep, ggobid *gg)
   }
 
   splot_plane_to_screen (display, cpanel, sp, gg);
-  ruler_ranges_set (gg->current_display, sp, gg);
+  ruler_ranges_set (false, gg->current_display, sp, gg);
   splot_redraw (sp, FULL, gg);
 }
 */
@@ -67,6 +67,6 @@ splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *gg) {
   }
 
   splot_plane_to_screen (display, &display->cpanel, sp, gg);
-  ruler_ranges_set (gg->current_display, sp, gg);
+  ruler_ranges_set (false, gg->current_display, sp, gg);
   splot_redraw (sp, FULL, gg);
 }

@@ -322,25 +322,6 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
       arrays_free (&d->missing, d->nrows, d->ncols);
   }
 
-  /*-- finally handle the 1-column case: insert a column --*/
-  d->single_column = (d->ncols == 1);
-  if (d->single_column) {
-    gint i;
-    arrayf_add_cols (&d->raw, 2);
-    for (i=0; i<d->nrows; i++) {
-      d->raw.vals[i][1] = d->raw.vals[i][0];
-      d->raw.vals[i][0] = (gfloat) (i+1);
-    }
-
-    if (d->nmissing) {
-      arrays_add_cols (&d->missing, 2);
-      for (i=0; i<d->nrows; i++) {
-        d->missing.vals[i][1] = d->missing.vals[i][0];
-        d->missing.vals[i][0] = 0;
-      }
-    }
-  }
-
   return(true);
 }
 

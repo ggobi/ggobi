@@ -29,7 +29,7 @@ scale_pan_reset (ggobid *gg) {
   sp->pmid.x = sp->pmid.y = 0;
 
   splot_plane_to_screen (display, &display->cpanel, sp, gg);
-  ruler_ranges_set (gg->current_display, sp, gg);
+  ruler_ranges_set (false, gg->current_display, sp, gg);
   splot_redraw (sp, FULL, gg);
 }
 void
@@ -49,7 +49,7 @@ scale_zoom_reset (ggobid *gg) {
     sp->scale.x = sp->scale.y = SCALE_DEFAULT;
 
   splot_plane_to_screen (dsp, &dsp->cpanel, sp, gg);
-  ruler_ranges_set (dsp, sp, gg);
+  ruler_ranges_set (false, dsp, sp, gg);
   splot_redraw (sp, FULL, gg);
 }
 void
@@ -252,7 +252,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
       /*-- redisplay this plot --*/
       splot_plane_to_screen (display, &display->cpanel, sp, gg);
-      ruler_ranges_set (gg->current_display, sp, gg);
+      ruler_ranges_set (false, gg->current_display, sp, gg);
       splot_redraw (sp, FULL, gg);
       break;
 

@@ -673,7 +673,7 @@ display_tailpipe (displayd *display, ggobid *gg) {
     }
 
     if (display->displaytype == scatterplot)
-      ruler_ranges_set (display, sp, gg);
+      ruler_ranges_set (false, display, sp, gg);
 
     splot_redraw (sp, FULL, gg);
     splist = splist->next;

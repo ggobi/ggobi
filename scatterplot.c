@@ -69,6 +69,7 @@ scatterplot_show_rulers (displayd *display, gint projection)
       scatterplot_show_hrule (display, true);
       break;
 */
+    break;
 
     default:  /* in any other projection, no rulers */
       scatterplot_show_vrule (display, false);
@@ -78,11 +79,12 @@ scatterplot_show_rulers (displayd *display, gint projection)
 }
 
 void
-ruler_ranges_set (displayd *display, splotd *sp, ggobid *gg) {
+ruler_ranges_set (gboolean force, displayd *display, splotd *sp, ggobid *gg) {
   /*
    * Run 0 and sp->max through the reverse pipeline to find out
    * what their values should be in terms of the data.  Set the
    * ruler min and max to those values.
+   * Force the ranges to be set when a display is being initialized.
   */
   icoords scr;
   fcoords tfmin, tfmax;
@@ -100,9 +102,9 @@ ruler_ranges_set (displayd *display, splotd *sp, ggobid *gg) {
 
   /*
    * Reset only if necessary:  if the ruler is visible and the
-   * ranges have changed
+   * ranges have changed.  Force when initializing display.
   */
-  if (GTK_WIDGET_VISIBLE (display->hrule)) {
+  if (force || GTK_WIDGET_VISIBLE (display->hrule)) {
     if (((gfloat) GTK_EXT_RULER (display->hrule)->lower != tfmin.x) ||
         ((gfloat) GTK_EXT_RULER (display->hrule)->upper != tfmax.x))
     {
@@ -111,7 +113,7 @@ ruler_ranges_set (displayd *display, splotd *sp, ggobid *gg) {
     }
   }
 
-  if (GTK_WIDGET_VISIBLE (display->vrule)) {
+  if (force || GTK_WIDGET_VISIBLE (display->vrule)) {
     if (((gfloat) GTK_EXT_RULER (display->vrule)->upper != tfmin.y) ||
         ((gfloat) GTK_EXT_RULER (display->vrule)->lower != tfmax.y))
     {
@@ -262,7 +264,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   
   /*-- hide any extraneous rulers --*/
   scatterplot_show_rulers (display, projection_get (gg));
-  ruler_ranges_set (display, sp, gg);
+  ruler_ranges_set (true, display, sp, gg);
 
   return display;
 }
