@@ -21,4 +21,5 @@ glayout_init (glayoutd *gl) {
 
   gl->neato_dim = 2;
   gl->neato_model = neato_shortest_path;
+  gl->neato_use_edge_length_p = false;
 }

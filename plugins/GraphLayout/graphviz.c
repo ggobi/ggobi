@@ -30,6 +30,37 @@ char *Info[] = {
     DATE                  /* Build Date */
 };
 
+#ifdef DEBUG
+static void
+test_edge_length (Agraph_t *graph, glayoutd *gl, ggobid *gg)
+{
+  gint i, a, b;
+  datad *d = gl->dsrc;
+  datad *e = gl->e;
+  Agnode_t *head, *tail;
+  Agedge_t *edge;
+  gchar *name;
+
+  for (i=0; i<e->edge.n; i++) {
+    a = d->rowid.idv.els[e->edge.endpoints[i].a];
+    name = (gchar *) g_array_index (d->rowlab, gchar *, a);
+    tail = agfindnode (graph, name);
+
+    b = d->rowid.idv.els[e->edge.endpoints[i].b];
+    name = (gchar *) g_array_index (d->rowlab, gchar *, b);
+    head = agfindnode (graph, name);
+
+    if (head && tail) {
+      edge = agfindedge (graph, tail, head);
+      if (edge) {
+        if (edge->u.dist > 1)
+          g_printerr ("dist: %f\n", edge->u.dist);
+      }
+    }
+  }
+}
+#endif
+
 void neato_model_cb (GtkWidget *w, gpointer cbd)
 {
   PluginInstance *inst = (PluginInstance *) gtk_object_get_data (GTK_OBJECT (w),
@@ -37,12 +68,101 @@ void neato_model_cb (GtkWidget *w, gpointer cbd)
   glayoutd *gl = glayoutFromInst (inst);
   gl->neato_model = GPOINTER_TO_INT (cbd);
 }
+void neato_use_edge_length_cb (GtkToggleButton *button, PluginInstance *inst)
+{
+  glayoutd *gl = glayoutFromInst (inst);
+  gl->neato_use_edge_length_p = button->active;
+}
 
 void neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   glayoutd *gl = glayoutFromInst (inst);
   gl->neato_dim = (gint) (adj->value);
 }
+
+static gint
+neato_get_weight_var (Agraph_t *graph, GtkWidget *w, glayoutd *gl, ggobid *gg)
+{
+  gint weightvar;
+  datad *e = gl->e;
+  datad *e_clist;
+  GtkWidget *clist;
+
+  /*-- find the variable which will define the edge lengths --*/
+  /*-- first get the list of variables from the 'apply' button --*/
+  clist = get_clist_from_object (GTK_OBJECT (w));
+  if (!clist) {
+    quick_message ("I can't identify a set of edges", false);
+    return false;
+  }
+  e_clist = gtk_object_get_data (GTK_OBJECT(clist), "datad");
+  if (e_clist == NULL || e_clist != e) {
+    quick_message ("This isn't the same set of edges you're using", false);
+    return false;
+  }
+  weightvar = get_one_selection_from_clist (clist, e);
+  if (weightvar == -1) {
+    quick_message ("Please specify a variable", false);
+    return false;
+  }
+  return weightvar;
+}
+
+/*
+static gboolean
+neato_apply_edge_length (Agraph_t *graph, GtkWidget *w,
+  glayoutd *gl, ggobid *gg)
+{
+  gint i, a, b, selected_var;
+  datad *d = gl->dsrc;
+  datad *e = gl->e;
+  datad *e_clist;
+  Agnode_t *head, *tail;
+  Agedge_t *edge;
+  gchar *name;
+  GtkWidget *clist;
+
+  clist = get_clist_from_object (GTK_OBJECT (w));
+  if (!clist) {
+    quick_message ("I can't identify a set of edges", false);
+    return false;
+  }
+  e_clist = gtk_object_get_data (GTK_OBJECT(clist), "datad");
+  if (e_clist == NULL || e_clist != e) {
+    quick_message ("This isn't the same set of edges you're using", false);
+    return false;
+  }
+  selected_var = get_one_selection_from_clist (clist, e);
+  if (selected_var == -1) {
+    quick_message ("Please specify a variable", false);
+    return false;
+  }
+
+  for (i=0; i<e->edge.n; i++) {
+    a = d->rowid.idv.els[e->edge.endpoints[i].a];
+    name = (gchar *) g_array_index (d->rowlab, gchar *, a);
+    tail = agfindnode (graph, name);
+
+    b = d->rowid.idv.els[e->edge.endpoints[i].b];
+    name = (gchar *) g_array_index (d->rowlab, gchar *, b);
+    head = agfindnode (graph, name);
+
+    if (head && tail) {
+      edge = agfindedge (graph, tail, head);
+      if (edge) {
+        if (e->tform.vals[i][selected_var] < 1) {
+          quick_message ("The minimum length is 1.0; perform a variable transformation before doing the layout.", false);
+          return false;
+        } else {
+          edge->u.dist = e->tform.vals[i][selected_var];
+        }
+      }
+    }
+  }
+  return true;
+}
+*/
+
 
 void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 {
@@ -52,6 +172,9 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   datad *d = gl->dsrc;
   datad *e = gl->e;
   Agnode_t *node, *head, *tail;
+  Agedge_t *edge;
+  Agedge_t **edgev;
+  gint *intv;
   gchar *name;
   gint kind = AGRAPH;
   gint i, k;
@@ -71,7 +194,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   glong *visible, *rowids;
   displayd *dspnew;
   gboolean edges_displayed;
-  gint dim;
+  gint dim, weightvar = -1, nedges;
 
   if (e == NULL) {
     g_printerr ("Trouble:  no edge set is specified\n");
@@ -81,8 +204,11 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   visible = (glong *) g_malloc (d->nrows_in_plot * sizeof (glong));
   nvisible = visible_set (visible, d);
 
-  if (strcmp (gtk_widget_get_name (button), "neato") == 0)
+  if (strcmp (gtk_widget_get_name (button), "neato") == 0) {
     layout_type = NEATO_LAYOUT;
+    if (gl->neato_use_edge_length_p)
+      weightvar = neato_get_weight_var (graph, button, gl, gg);
+  }
 
   aginit();
 
@@ -96,6 +222,9 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     agnode(graph, name);
   }
 
+  intv = (gint *) g_malloc (e->edge.n * sizeof(gint));
+  edgev = (Agedge_t **) g_malloc (e->edge.n * sizeof (Agedge_t *));
+  nedges = 0;
   /*-- create new edges, add to graph --*/
   for (i=0; i<e->edge.n; i++) {
 
@@ -109,8 +238,12 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     head = agfindnode (graph, name);
 
     /*-- if head and tail are both in the visible subset --*/
-    if (head && tail)
-      agedge(graph, tail, head);
+    if (head && tail) {
+      edge = agedge(graph, tail, head);
+      intv[nedges] = i;
+      edgev[nedges] = edge;
+      nedges++;
+    }
   }
 
   pos = (gdouble **) g_malloc0 (nvisible * sizeof (gdouble *));
@@ -158,18 +291,26 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     graph->u.drawing->engine = NEATO;
     neato_init_node_edge(graph);
     nG = scan_graph(graph);
+
+    if (weightvar >= 0) {
+      for (i=0; i<nedges; i++) {
+        if (e->tform.vals[intv[i]][weightvar] < 1) {
+          quick_message ("The minimum length is 1.0; perform a variable transformation before doing the layout.", false);
+          g_printerr ("len: %f\n", e->tform.vals[intv[i]][weightvar]);
+          break;  /*-- free arrays and quit?  --*/
+        }
+        edgev[intv[i]]->u.dist = e->tform.vals[intv[i]][weightvar];
+      }
+      g_free (intv);
+      g_free (edgev);
+    }
+
     if (Nop) {
       initial_positions(graph, nG);
     }
     else {
-/*
-      char *p;
-      p = agget(graph,"model");
-      if (p && (streq(p,"circuit"))) {
-*/
       if (gl->neato_model == neato_circuit_resistance) {
          circuit_model(graph,nG);
-         g_printerr ("using circuit model\n");
       } else shortest_path(graph, nG);
       initial_positions(graph, nG);
       diffeq_model(graph, nG);
@@ -195,14 +336,6 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 #endif
     neato_cleanup (graph);
   }
-
-/*
-  for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
-    name = (gchar *) g_array_index (d->rowlab, gchar *, m);
-    node = agfindnode (graph, name);
-  }
-*/
 
 /*
  * create a new datad with the new variables.  include only
@@ -243,6 +376,10 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   dnew->name = (layout_type == DOT_LAYOUT) ?
     g_strdup ("dot") :
     g_strdup_printf ("neato %dd%c", gl->neato_dim,
+     (gl->neato_model == neato_circuit_resistance) ? 'c' : 's');
+  dnew->nickname = (layout_type == DOT_LAYOUT) ?
+    g_strdup ("dot") :
+    g_strdup_printf ("nto%dd%c", gl->neato_dim,
      (gl->neato_model == neato_circuit_resistance) ? 'c' : 's');
 
   GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,

@@ -161,12 +161,12 @@ GtkWidget *
 create_glayout_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
-  GtkWidget *hb, *entry, *hscale, *vb, *opt;
+  GtkWidget *hb, *entry, *hscale, *vb, *opt, *apply_btn;
   GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
   gchar *clist_titles[2] = {"node sets", "edge sets"};
   datad *d;
-  GtkWidget *hbox, *swin, *clist;
+  GtkWidget *hbox, *swin, *clist, *varnotebook;
   gchar *row[1];
   GSList *l;
   glayoutd *gl = glayoutFromInst (inst);
@@ -313,9 +313,13 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   frame = gtk_frame_new ("Neato layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
+  hbox = gtk_hbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER(hbox), 5); 
+  gtk_container_add (GTK_CONTAINER(frame), hbox);
+
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
-  gtk_container_add (GTK_CONTAINER(frame), vbox);
+  gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 0);
 
 /*
 Add an option:  Model either 'circuit resistance' or 'shortest path'
@@ -337,8 +341,12 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
     (GtkSignalFunc) neato_model_cb, "PluginInst", inst);
 
   /*-- neato scale --*/
-  hbox = gtk_hbox_new (false, 2);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 3);
+  vb = gtk_vbox_new (false, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 1);
+
+  label = gtk_label_new ("Dimension:");
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
+  gtk_box_pack_start (GTK_BOX (vb), label, false, false, 3);
 
   adj = gtk_adjustment_new ((gfloat)gl->neato_dim, 2.0, 11.0, 1.0, 1.0, 1.0);
 #ifdef GRAPHVIZ
@@ -354,23 +362,38 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   gtk_scale_set_draw_value (GTK_SCALE(hscale), TRUE);
 
   gtk_scale_set_digits (GTK_SCALE(hscale), 0);
-  gtk_box_pack_start (GTK_BOX (hbox), hscale, false, false, 3);
-
-  label = gtk_label_new ("Dimension");
-  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
-  gtk_box_pack_start (GTK_BOX (hbox), label, false, false, 3);
+  gtk_box_pack_start (GTK_BOX (vb), hscale, false, false, 3);
   /*-- --*/
 
-  btn = gtk_button_new_with_label ("apply");
-  gtk_widget_set_name (btn, "neato");
+  apply_btn = gtk_button_new_with_label ("apply");
+  gtk_widget_set_name (apply_btn, "neato");
 #ifdef GRAPHVIZ
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+  gtk_signal_connect (GTK_OBJECT (apply_btn), "clicked",
                       GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
 #else
-  gtk_widget_set_sensitive (btn, false);
+  gtk_widget_set_sensitive (apply_btn, false);
 #endif
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+  gtk_box_pack_start (GTK_BOX (vbox), apply_btn, false, false, 3);
 
+
+  /*-- second child of the neato hbox, to contain the list of variables --*/
+  vbox = gtk_vbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
+  gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 0);
+
+  btn = gtk_check_button_new_with_label ("Use edge length");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "Have neato use edge length in determining node positions, and use the selected variable as a source of lengths",
+    NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+    GTK_SIGNAL_FUNC (neato_use_edge_length_cb), inst);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
+
+  /*-- include only edge sets.  --*/
+  varnotebook = create_variable_notebook (vbox,
+    GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
+    (GtkSignalFunc) NULL, inst->gg);
+  gtk_object_set_data (GTK_OBJECT(apply_btn), "notebook", varnotebook);
 
   label = gtk_label_new ("Neato");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);

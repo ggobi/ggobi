@@ -51,6 +51,7 @@ typedef struct {
 
   gint neato_dim;
   NeatoModel neato_model;
+  gboolean neato_use_edge_length_p;
 
 } glayoutd;
 
@@ -76,6 +77,7 @@ void spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos);
 void neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst);
 void neato_model_cb (GtkWidget *w, gpointer cbd);
 void dot_neato_layout_cb (GtkWidget *, PluginInstance *inst);
+void neato_use_edge_length_cb (GtkToggleButton *button, PluginInstance *inst);
 #endif
 
 #define GLAYOUT_H
