@@ -426,7 +426,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
       strlen (d->vartable[ sp->p1dvar ].collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
     gdk_draw_string (drawable, style->font, gg->plot_GC,
-      /*5,*/
+      /*5,*/  /*-- Is there some reason I wasn't centering?  Dunno --*/
       sp->max.x/2 - width/2,
       sp->max.y - 5,
       d->vartable[ sp->p1dvar ].collab_tform);
@@ -1038,11 +1038,13 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     splot_draw_border (sp, drawable, gg);
 
   /*-- draw these cues whether this is the current plot or not --*/
-  if (cpanel->viewmode == BRUSH) {
-    brush_draw_brush (sp, drawable, d, gg);
-    brush_draw_label (sp, drawable, d, gg);
-  } else if (cpanel->viewmode == SCALE) {
-    scaling_visual_cues_draw (sp, drawable, gg);
+  if (sp == gg->current_splot || display->displaytype == scatterplot) {
+    if (cpanel->viewmode == BRUSH) {
+      brush_draw_brush (sp, drawable, d, gg);
+      brush_draw_label (sp, drawable, d, gg);
+    } else if (cpanel->viewmode == SCALE) {
+      scaling_visual_cues_draw (sp, drawable, gg);
+    }
   }
 }
 
