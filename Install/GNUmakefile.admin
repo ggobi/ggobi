@@ -19,6 +19,7 @@ DIRS=\
 DATA_SRC_FILES=\
    flea.col flea.colors flea.dat flea.doc flea.glyphs flea.row \
    flea.xml \
+   pigs.xml \
    ratcns.xml \
    sat.xml \
    stdColorMap.xml \
