@@ -25,13 +25,13 @@ GGOBI_LIB=
 CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
 
 ifdef GRAPHVIZ
-ARCH=linux.i386
 GVINC=-I$(GVIZ)/include -I$(GVIZ_SRC) -I$(GVIZ_SRC)/dotneato/common
-GVLIB=-L$(GVIZ)/build/$(ARCH)/lib
+GVLIB=$(GVIZ)/lib
 
 CFLAGS+= -DGRAPHVIZ=1 $(GVINC)
-LDFLAGS+=$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan -lgd -lcdt $(GVIZ_EXTLIB_LIB)
-LDFLAGS+=$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan $(GVIZ)/build/$(ARCH)/lib/libgd.a -lcdt $(GVIZ_EXTLIB_LIB)
+LDFLAGS+=-L$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan
+LDFLAGS+=$(GVLIB)/libgd.a
+LDFLAGS+=-L$(GVLIB) -lcdt $(GVIZ_EXTLIB_LIB)
 endif
 
 ifdef BINARY_IO_IMPLEMENTED
