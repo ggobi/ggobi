@@ -271,17 +271,19 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
   wvis_init (gg);
   make_ui (gg);
 
+    /* If the user specified a data file on the command line, then 
+       try to load that. If not, then look through the input plugins
+       for the first interactive one (i.e. with an interactive="true" attribute)
+       and then we try to run that. This allows input plugins that provide
+       a user interface to query the user as to what to do.
+     */
   if (options->data_in != NULL) {
     if (fileset_read (options->data_in, gg) > 0) {
       init_data = true;
     }
   } else {
-#ifdef USE_MYSQL
-/*    -- gg->data_mode no longer exists --
-    if(gg->data_mode == mysql) {
-      GGOBI(get_mysql_login_info)(NULL, gg);
-    }
-*/
+#ifdef SUPPORT_PLUGINS
+      runInteractiveInputPlugin(gg);
 #endif
   }
 

@@ -570,6 +570,11 @@ getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr do
     xmlNodePtr c, ptr;
     const xmlChar *tmp;
 
+    tmp = xmlGetProp(node, "interactive");
+    if(tmp) {
+	plugin->interactive = (tmp[0] == 'T' || tmp[0] == 't');
+    }
+
     c = getXMLElement(node,"dll");
     if(!c)
 	return;

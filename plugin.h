@@ -49,6 +49,8 @@ struct   _GGobiInputPluginInfo {
     char *probe_symbol_name;
     char *getDescription;
 
+    gboolean interactive;
+
     InputReader read_input;
     InputProbe  probe;
 };
@@ -94,4 +96,7 @@ int      GGOBI_addPluginInstance(PluginInstance *inst, ggobid *gg);
 gboolean GGOBI_removePluginInstance(PluginInstance *inst, ggobid *gg);
 
 void closePlugins(ggobid *gg);
+
+GGobiInputPluginInfo *runInteractiveInputPlugin(ggobid *gg);
+
 #endif
