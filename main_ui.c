@@ -312,13 +312,65 @@ projection_get (ggobid* gg) {
 }
 
 /*
+ * Use the mode to determine whether the variable selection
+ * panel should display checkboxes or circles
+*/
+gboolean
+varpanel_uses_circles (gint mode)
+{
+  return (mode == TOUR1D || mode == TOUR2D || mode == COTOUR);
+}
+
+static void
+varpanel_reinit (ggobid *gg)
+{
+  GSList *l;
+  datad *d;
+
+  if (varpanel_uses_circles(gg->mode) &&
+     !varpanel_uses_circles(gg->prev_mode))
+  {
+    for (l = gg->d; l; l = l->next) {
+      d = (datad *) l->data;
+      /*
+       * add a reference to the checkboxes' scrolled window
+       * (so it won't disappear), then remove it from the ebox.
+      */
+      gtk_widget_ref (d->vcbox_ui.swin);
+      gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
+                                           d->vcbox_ui.swin);
+      /*
+       * Now add the parent vbox for the table of variable circles
+       * to the ebox
+      */
+      gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
+                                        d->vcirc_ui.vbox);
+      /*-- update the reference count for the vbox --*/
+      if (GTK_OBJECT (d->vcirc_ui.vbox)->ref_count > 1)
+        gtk_widget_unref (d->vcirc_ui.vbox);
+    }
+  } else if (!varpanel_uses_circles(gg->mode) &&
+              varpanel_uses_circles(gg->prev_mode))
+  {  /*-- remove circles and add checkboxes --*/
+    for (l = gg->d; l; l = l->next) {
+      d = (datad *) l->data;
+      gtk_widget_ref (d->vcirc_ui.vbox);
+      gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
+                                           d->vcirc_ui.vbox);
+      gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
+                                        d->vcbox_ui.swin);
+      if (GTK_OBJECT (d->vcbox_ui.swin)->ref_count > 1)
+        gtk_widget_unref (d->vcbox_ui.swin);
+    }
+  }
+}
+
+/*
  * Set the mode for the current display
 */
 void 
 mode_set (gint m, ggobid *gg) {
   displayd *display = gg->current_display;
-  GSList *l;
-  datad *d;
 
   gg->mode = m;
   if (gg->mode != gg->prev_mode) {
@@ -336,62 +388,16 @@ mode_set (gint m, ggobid *gg) {
       gtk_widget_unref (gg->control_panel[gg->mode]);
 
 
-/*
- * This section is going to get awfully ugly as we add more
- * alternatives to checkboxes and variable circles; it may
- * need some rethinking.
-*/
-
     /* 
      * If moving between modes whose variable selection interface
      * differs, swap in the correct display.
-     *
-     * Luckily, this isn't even possible if the current display
-     * is scatmat or parcoords.
-    */
-    if ((gg->mode == TOUR1D || gg->mode == TOUR2D ||
-         gg->mode == COTOUR) &&
-        (gg->prev_mode != TOUR1D && gg->prev_mode != TOUR2D &&
-         gg->prev_mode != COTOUR))
-    {
-      for (l = gg->d; l; l = l->next) {
-        d = (datad *) l->data;
-        /*
-         * add a reference to the vbox (so it won't disappear),
-         * then remove it from the ebox.
-        */
-        gtk_widget_ref (d->varpanel_ui.vbox);
-        gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
-                              d->varpanel_ui.vbox);
-        /*
-         * Now add the table of variable circles to the ebox
-        */
-        gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
-                           d->varpanel_ui.table);
-        if (GTK_OBJECT (d->varpanel_ui.table)->ref_count > 1)
-          gtk_widget_unref (d->varpanel_ui.table);
-      }
-    } else if ((gg->mode != TOUR1D && gg->mode != TOUR2D &&
-                gg->mode != COTOUR) &&
-               (gg->prev_mode == TOUR1D || gg->prev_mode == TOUR2D ||
-                gg->prev_mode == COTOUR))
-    {
-      for (l = gg->d; l; l = l->next) {
-        d = (datad *) l->data;
-        gtk_widget_ref (d->varpanel_ui.table);
-        gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
-                              d->varpanel_ui.table);
-        gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
-                           d->varpanel_ui.vbox);
-        if (GTK_OBJECT (d->varpanel_ui.vbox)->ref_count > 1)
-          gtk_widget_unref (d->varpanel_ui.vbox);
-      }
-    }
+     */
+    varpanel_reinit (gg);
   }
 
   /*
    * The projection type is one of P1PLOT, XYPLOT, ROTATE,
-   * TOUR2D or COTOUR.  It only changes if another projection
+   * TOUR1D, TOUR2D or COTOUR.  It only changes if another projection
    * type is selected.  (For parcoords and scatmat plots, the
    * value of projection is irrelevant.)
   */
@@ -411,50 +417,76 @@ mode_set (gint m, ggobid *gg) {
   varpanel_refresh (gg);
 }
 
+/*
+ * Turn the tour procs on and off here
+*/
+static void
+procs_activate (gboolean state, displayd *display, ggobid *gg)
+{
+  switch (gg->mode) {
+    case TOUR2D:
+      if (!display->cpanel.t2d_paused)
+        tour2d_func (state, display, gg);
+    break;
+    case TOUR1D:
+      if (!display->cpanel.t1d_paused)
+        tour1d_func (state, display, gg);
+    break;
+    case COTOUR:
+      if (!display->cpanel.tcorr1_paused)
+        tourcorr_func (state, display, gg);
+    break;
+    default:
+    break;
+  }
+}
+
+/*
+    if (gg->mode == TOUR2D || prev_mode == TOUR2D) {
+      if (gg->mode == TOUR2D && prev_mode != TOUR2D) {
+        if (!display->cpanel.t2d_paused)
+          tour2d_func (on, display, gg);
+      } else if (prev_mode == TOUR2D && gg->mode != TOUR2D) {
+        tour2d_func (off, display, gg);
+      }
+    }
+
+    if (gg->mode == TOUR1D || prev_mode == TOUR1D) {
+      if (gg->mode == TOUR1D && prev_mode != TOUR1D) {
+        if (!display->cpanel.t1d_paused)
+          tour1d_func (on, display, gg);
+      } else if (prev_mode == TOUR1D && gg->mode != TOUR1D) {
+        tour1d_func (off, display, gg);
+      }
+    }
+
+    if (gg->mode == COTOUR || prev_mode == COTOUR) {
+      if (gg->mode == COTOUR && prev_mode != COTOUR) {
+        if (!display->cpanel.tcorr1_paused)
+          tourcorr_func (on, display, gg);
+      } else if (prev_mode == COTOUR && gg->mode != COTOUR) {
+        tourcorr_func (off, display, gg);
+      }
+    }
+*/
+
 void
 mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
 
   if (state == off) {
-
     switch (m) {
-      case PCPLOT:
-      case P1PLOT:
-      case TSPLOT:
-      case XYPLOT:
-      case LINEED:
-      case MOVEPTS:
-      case COTOUR:
-      case ROTATE:
-      case TOUR1D:
-      case TOUR2D:
-      case SCALE:
-      case IDENT:
-        break;
-
-      case BRUSH:
-        break;
+      default:
+      break;
     }
   } else if (state == on) {
     switch (m) {
-      case PCPLOT:
-      case P1PLOT:
-      case TSPLOT:
-      case XYPLOT:
-      case LINEED:
-      case MOVEPTS:
-      case COTOUR:
-      case ROTATE:
-      case TOUR1D:
-      case TOUR2D:
-      case SCALE:
-      case IDENT:
-        break;
-
       case BRUSH:
         brush_activate (state, d, gg);
-        break;
+      break;
+      default:
+      break;
     }
   }
 }
@@ -472,56 +504,19 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
     displayd *display = gg->current_display;
-    gint prev_mode = gg->mode;
 
     sp_event_handlers_toggle (sp, off);
     mode_activate (sp, gg->mode, off, gg);
     mode_submenus_activate (sp, gg->mode, off, gg);
+    procs_activate (off, display, gg);
 
     display->cpanel.mode = action;
     mode_set (action, gg);  /* mode = action */
 
-    /*
-     * Turn the tour procs on and off here
-    */
-/*-- dfs: check whether these can be moved to mode_activate --*/
-
-    if (gg->mode == TOUR2D || prev_mode == TOUR2D) {
-      /*-- if turning on the 2d tour --*/
-      if (gg->mode == TOUR2D && prev_mode != TOUR2D) {
-        if (!display->cpanel.t2d_paused)
-          tour2d_func (on, display, gg);
-      /*-- if turning off the 2d tour --*/
-      } else if (prev_mode == TOUR2D && gg->mode != TOUR2D) {
-        tour2d_func (off, display, gg);
-      }
-    }
-
-    if (gg->mode == TOUR1D || prev_mode == TOUR1D) {
-      /*-- if turning on the 1d tour --*/
-      if (gg->mode == TOUR1D && prev_mode != TOUR1D) {
-        if (!display->cpanel.t1d_paused)
-          tour1d_func (on, display, gg);
-      /*-- if turning off the 1d tour --*/
-      } else if (prev_mode == TOUR1D && gg->mode != TOUR1D) {
-        tour1d_func (off, display, gg);
-      }
-    }
-
-    if (gg->mode == COTOUR || prev_mode == COTOUR) {
-      /*-- if turning on the 1d tour --*/
-      if (gg->mode == COTOUR && prev_mode != COTOUR) {
-        if (!display->cpanel.tcorr1_paused)
-          tourcorr_func (on, display, gg);
-      /*-- if turning off the 1d tour --*/
-      } else if (prev_mode == COTOUR && gg->mode != COTOUR) {
-        tourcorr_func (off, display, gg);
-      }
-    }
-
     sp_event_handlers_toggle (sp, on);
     mode_activate (sp, gg->mode, on, gg);
     mode_submenus_activate (sp, gg->mode, on, gg);
+    procs_activate (on, display, gg);
 
     display_tailpipe (display, gg);
     return (action);

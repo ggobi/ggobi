@@ -29,9 +29,9 @@ void
 checkbox_delete_nth (gint jvar, datad *d)
 {
   GtkWidget *w;
-  w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.checkbox, jvar);
+  w = (GtkWidget *) g_slist_nth_data (d->vcbox_ui.checkbox, jvar);
   if (w != NULL) {
-    d->varpanel_ui.checkbox = g_slist_remove (d->varpanel_ui.checkbox,
+    d->vcbox_ui.checkbox = g_slist_remove (d->vcbox_ui.checkbox,
                                               (gpointer) w);
     gtk_widget_destroy (w);
   }
@@ -42,7 +42,7 @@ GtkWidget *
 checkbox_get_nth (gint jvar, datad *d)
 {
   GtkWidget *w;
-  w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.checkbox, jvar);
+  w = (GtkWidget *) g_slist_nth_data (d->vcbox_ui.checkbox, jvar);
   return w;
 }
 
@@ -87,7 +87,6 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   displayd *display = (displayd *) sp->displayptr;
   gboolean redraw;
   gint jvar_prev = -1;
-  extern void tour2d_varsel (ggobid *, gint, gint);
 
   if (display == NULL || !GTK_IS_WIDGET (display->window)) {
     g_printerr ("Bug?  I see no active display\n");
@@ -117,13 +116,13 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
           redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
         break;
         case TOUR2D:
-          tour2d_varsel (gg, jvar, btn);
+          tour2d_varsel (jvar, btn, d, gg);
         break;
         case TOUR1D:
-          tour1d_varsel (gg, jvar, btn);
+          tour1d_varsel (jvar, btn, d, gg);
         break;
         case COTOUR:
-          tourcorr_varsel (gg, jvar, btn);
+          tourcorr_varsel (jvar, btn, d, gg);
         break;
         default:
         break;
@@ -286,10 +285,10 @@ varpanel_checkbox_add (gint j, datad *d, ggobid *gg)
   GGobi_widget_set (w, gg, true);
   gtk_signal_connect (GTK_OBJECT (w),
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
-  gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
+  gtk_box_pack_start (GTK_BOX (d->vcbox_ui.vbox),
     w, false, false, 0);
 
-  d->varpanel_ui.checkbox = g_slist_append (d->varpanel_ui.checkbox, w);
+  d->vcbox_ui.checkbox = g_slist_append (d->vcbox_ui.checkbox, w);
   gtk_widget_show (w);
 }
 
@@ -302,7 +301,7 @@ varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
   if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every checkbox --*/
     for (j=jcol; j<jcol+nc; j++) {
       w = checkbox_get_nth (jcol, d);
-      d->varpanel_ui.checkbox = g_slist_remove (d->varpanel_ui.checkbox, w);
+      d->vcbox_ui.checkbox = g_slist_remove (d->vcbox_ui.checkbox, w);
       gtk_widget_destroy (w);  /*-- maybe not necessary? --*/
     }
   }
@@ -313,7 +312,8 @@ varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
 /*-------------------------------------------------------------------------*/
 
 /*
- * build the notebook to contain one scrolled window and vbox for each d
+ * build the notebook to contain an ebox which will be switched
+ * between checkboxes and circles
 */
 void
 varpanel_make (GtkWidget *parent, ggobid *gg) {
@@ -350,9 +350,8 @@ varpanel_clear (datad *d, ggobid *gg)
 }
 
 
-/*-- should rename varpanel_checkboxes_populate --*/
 /*-- for each datad, a scrolled window, vbox, and column of check buttons --*/
-void varpanel_populate (datad *d, ggobid *gg)
+void varpanel_checkboxes_populate (datad *d, ggobid *gg)
 {
   gint j;
 
@@ -360,29 +359,28 @@ void varpanel_populate (datad *d, ggobid *gg)
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
     g_slist_length (gg->d) > 1);
 
-  /*-- create a scrolled window --*/
-  d->varpanel_ui.swin = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->varpanel_ui.swin),
-    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-
-  gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                            d->varpanel_ui.swin, gtk_label_new (d->name));
-
-
-  /*-- add an ebox to the scrolled window: needed for tooltips? --*/
+  /*-- create an ebox: needed for tooltips? --*/
   d->varpanel_ui.ebox = gtk_event_box_new ();
-  gtk_scrolled_window_add_with_viewport (
-    GTK_SCROLLED_WINDOW (d->varpanel_ui.swin),
-    d->varpanel_ui.ebox);
-  
-  /*-- add a vbox to the ebox --*/
-  d->varpanel_ui.vbox = gtk_vbox_new (false, 0);
-  gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox), d->varpanel_ui.vbox);
+  gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
+                            d->varpanel_ui.ebox,
+                            gtk_label_new (d->name));
 
-  gtk_widget_show_all (d->varpanel_ui.swin);
+  /*-- create a scrolled window, and put it in the ebox --*/
+  d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+  gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox), d->vcbox_ui.swin);
+
+  /*-- add a vbox to the swin --*/
+  d->vcbox_ui.vbox = gtk_vbox_new (false, 0);
+  gtk_scrolled_window_add_with_viewport (
+    GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
+    d->vcbox_ui.vbox);
+  
+  gtk_widget_show_all (d->varpanel_ui.ebox);
   gdk_flush ();
 
-  d->varpanel_ui.checkbox = NULL;
+  d->vcbox_ui.checkbox = NULL;
 
   for (j=0; j<d->ncols; j++)
     varpanel_checkbox_add (j, d, gg);
@@ -471,21 +469,18 @@ varpanel_tooltips_set (ggobid *gg)
             case TOUR2D:
               gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
                 checkbox_get_nth (j, d),
-/*                d->varpanel_ui.checkbox.vals[j],*/
                 "Click to select a variable to be available for touring",
                 NULL);
             break;
             case TOUR1D:
               gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
                 checkbox_get_nth (j, d),
-/*                d->varpanel_ui.checkbox.vals[j],*/
                 "Click to select a variable to be available for touring",
                 NULL);
             break;
             case COTOUR:
               gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
                 checkbox_get_nth (j, d),
-/*                d->varpanel_ui.checkbox.vals[j],*/
                 "Click to select a variable to be available for touring",
                 NULL);
             break;

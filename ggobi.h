@@ -39,9 +39,10 @@ typedef struct {
  presses of the numbered keys 0, 1, ..., 9.
  It gets the events from the regular event handler and also the key identifier.
  See scatterplot_event_handled() in splot.c.
- The idea is that people can register routines in a programming language interface
- to ggobi such as Rggobi, or the Perl or Python interfaces, and provide customized
- callbacks/handlers for the numbered keys. 
+ The idea is that people can register routines in a programming
+ language interface to ggobi such as Rggobi, or the Perl or Python
+ interfaces, and provide customized callbacks/handlers for the
+ numbered keys.
  Note that if you register a handler for any of these keys, you have to handle
  them all (i.e. 0, ..., 9).  You can discard the ones you are not interested in.
  In the future, we may set it up so that one can refuse to handle an event

@@ -25,10 +25,10 @@ void
 varcircles_delete_nth (gint jvar, datad *d)
 {
   GtkWidget *w;
-  w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.vb, jvar);
+  w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.vb, jvar);
   if (w != NULL) {
-    d->varpanel_ui.vb = g_slist_remove (d->varpanel_ui.vb, (gpointer) w);
-    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.table), w);
+    d->vcirc_ui.vb = g_slist_remove (d->vcirc_ui.vb, (gpointer) w);
+    gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
   }
 }
 
@@ -38,13 +38,13 @@ varcircles_get_nth (gint which, gint jvar, datad *d) {
 
   switch (which) {
     case VB:
-      w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.vb, jvar);
+      w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.vb, jvar);
     break;
     case LBL:
-      w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.label, jvar);
+      w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.label, jvar);
     break;
     case DA:
-      w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.da, jvar);
+      w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.da, jvar);
     break;
   }
 
@@ -66,8 +66,8 @@ varcircles_layout_init (datad *d, ggobid *gg) {
   tnrows = d->ncols / tncols;
   if (tnrows * tncols < d->ncols) tnrows++;
 
-  d->varpanel_ui.tncols = tncols;
-  d->varpanel_ui.tnrows = tnrows;
+  d->vcirc_ui.tncols = tncols;
+  d->vcirc_ui.tnrows = tnrows;
 }
 
 void
@@ -78,7 +78,7 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
   gint left_attach, top_attach;
   GtkAdjustment *adj;
 
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->varpanel_ui.swin),
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
     (gg->varpanel_ui.layoutByRow) ? GTK_POLICY_NEVER : GTK_POLICY_ALWAYS,
     (gg->varpanel_ui.layoutByRow) ? GTK_POLICY_ALWAYS : GTK_POLICY_NEVER
     );
@@ -94,7 +94,7 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
     gint vport_width, vb_width;
 
     adj = gtk_scrolled_window_get_hadjustment (
-      GTK_SCROLLED_WINDOW (d->varpanel_ui.swin));
+      GTK_SCROLLED_WINDOW (d->vcirc_ui.swin));
     vport_width = adj->page_size;
 
     vb_width = vb->allocation.width;
@@ -108,7 +108,7 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
     gint vport_height, vb_height;
 
     adj = gtk_scrolled_window_get_vadjustment (
-      GTK_SCROLLED_WINDOW (d->varpanel_ui.swin));
+      GTK_SCROLLED_WINDOW (d->vcirc_ui.swin));
     vport_height = adj->page_size;
 
     vb_height = vb->allocation.height;
@@ -118,28 +118,28 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
     tncols = ncols / tnrows;
     if (tnrows * tnrows < ncols) tncols++;
   }
-  d->varpanel_ui.tncols = tncols;
-  d->varpanel_ui.tnrows = tnrows;
+  d->vcirc_ui.tncols = tncols;
+  d->vcirc_ui.tnrows = tnrows;
 
   for (j=0; j<ncols; j++) {
     /*-- if they're in the container, ref and remove them --*/
     vb = varcircles_get_nth (VB, j, d);
-    if (vb != NULL && vb->parent != NULL && vb->parent == d->varpanel_ui.table)
+    if (vb != NULL && vb->parent != NULL && vb->parent == d->vcirc_ui.table)
     {
       gtk_widget_ref (vb);
-      gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.table), vb);
+      gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), vb);
     }
   }
 
-  gtk_table_resize (GTK_TABLE (d->varpanel_ui.table),
-                    d->varpanel_ui.tnrows, d->varpanel_ui.tncols);
+  gtk_table_resize (GTK_TABLE (d->vcirc_ui.table),
+                    d->vcirc_ui.tnrows, d->vcirc_ui.tncols);
 
   left_attach = top_attach = 0;
   for (j=0; j<ncols; j++) {
     vb = varcircles_get_nth (VB, j, d);
 
     /*-- attach the first one at 0,0 --*/
-    gtk_table_attach (GTK_TABLE (d->varpanel_ui.table),
+    gtk_table_attach (GTK_TABLE (d->vcirc_ui.table),
       vb,
       left_attach, left_attach+1, top_attach, top_attach+1,
       GTK_FILL, GTK_FILL, 0, 0);
@@ -148,13 +148,13 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
 
     if (gg->varpanel_ui.layoutByRow) {
       left_attach++; 
-      if (left_attach == d->varpanel_ui.tncols) {
+      if (left_attach == d->vcirc_ui.tncols) {
         left_attach = 0;
         top_attach++;
       }
     } else {
       top_attach++; 
-      if (top_attach == d->varpanel_ui.tnrows) {
+      if (top_attach == d->vcirc_ui.tnrows) {
         top_attach = 0;
         left_attach++;
       }
@@ -165,14 +165,39 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
 void
 varcircle_label_set (gint j, datad *d)
 {
-  GtkWidget *w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.label, j);
+  GtkWidget *w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.label, j);
 
   g_assert (w != NULL);
 
   gtk_label_set_text (GTK_LABEL (GTK_BIN(w)->child), d->vartable[j].collab);
 }
 
-/*-- create a grid of buttons in the table --*/
+/*
+ * Return to the default cursor
+*/
+void
+varcircles_cursor_set_default (datad *d)
+{
+  GdkWindow *window = GTK_WIDGET (d->varpanel_ui.ebox)->window;
+  gdk_cursor_destroy (d->vcirc_ui.cursor);
+  d->vcirc_ui.jcursor = NULL;
+  gdk_window_set_cursor (window, NULL);
+}
+
+static gint
+manip_select_cb (GtkWidget *w, GdkEvent *event, datad *d)
+{
+/*  ggobid *gg = (ggobid *) d->gg;*/
+  GdkWindow *window = GTK_WIDGET (d->varpanel_ui.ebox)->window;
+
+  d->vcirc_ui.cursor = gdk_cursor_new (GDK_HAND2);
+  gdk_window_set_cursor (window, d->vcirc_ui.cursor);
+  d->vcirc_ui.jcursor = GDK_HAND2;
+  
+  return true;
+}
+
+/*-- create the variable circles interface --*/
 void
 varcircles_populate (datad *d, ggobid *gg)
 {
@@ -180,20 +205,33 @@ varcircles_populate (datad *d, ggobid *gg)
   GtkWidget *vb;
 
   varcircles_layout_init (d, gg);
+  d->vcirc_ui.jcursor = NULL;  /*-- start with the default cursor --*/
+  d->vcirc_ui.cursor = NULL;
 
-  d->varpanel_ui.table = gtk_table_new (d->varpanel_ui.tnrows,
-                                        d->varpanel_ui.tncols, true);
+  d->vcirc_ui.vbox = gtk_vbox_new (false, 0);
+
+  /*-- the first child of the vbox: the scrolled window, with table --*/
+  d->vcirc_ui.swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+  gtk_box_pack_start (GTK_BOX (d->vcirc_ui.vbox), d->vcirc_ui.swin,
+    true, true, 2);
+
+  d->vcirc_ui.table = gtk_table_new (d->vcirc_ui.tnrows,
+                                     d->vcirc_ui.tncols, true);
+  gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
+    d->vcirc_ui.table);
 
   /*-- da and label are freed in varcircle_clear --*/
-  d->varpanel_ui.vb = NULL;
-  d->varpanel_ui.da = NULL;
-  d->varpanel_ui.label = NULL;
-  d->varpanel_ui.da_pix = NULL;
+  d->vcirc_ui.vb = NULL;
+  d->vcirc_ui.da = NULL;
+  d->vcirc_ui.label = NULL;
+  d->vcirc_ui.da_pix = NULL;
 
 
   k = 0;
-  for (i=0; i<d->varpanel_ui.tnrows; i++) {
-    for (j=0; j<d->varpanel_ui.tncols; j++) {
+  for (i=0; i<d->vcirc_ui.tnrows; i++) {
+    for (j=0; j<d->vcirc_ui.tncols; j++) {
       vb = varcircle_create (k, d, gg);
       varcircle_attach (vb, i, j, d);
       k++;
@@ -201,7 +239,21 @@ varcircles_populate (datad *d, ggobid *gg)
     }
   }
 
-  gtk_widget_show_all (d->varpanel_ui.table);
+  /*-- the second child of the vbox: an hbox with buttons --*/
+  d->vcirc_ui.hbox = gtk_hbox_new (false, 5);
+  gtk_box_pack_start (GTK_BOX (d->vcirc_ui.vbox), d->vcirc_ui.hbox,
+    false, false, 2);
+
+  d->vcirc_ui.manip_btn = gtk_button_new_with_label ("Manip");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), d->vcirc_ui.manip_btn,
+    "Click here, then click on the variable you wish to manipulate",
+    NULL);
+  gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), d->vcirc_ui.manip_btn,
+    true, true, 2);
+  gtk_signal_connect (GTK_OBJECT (d->vcirc_ui.manip_btn),
+    "button_press_event", GTK_SIGNAL_FUNC (manip_select_cb), d);
+
+  gtk_widget_show_all (d->vcirc_ui.vbox);
 }
 
 void
@@ -214,18 +266,18 @@ varcircles_delete (gint nc, gint jvar, datad *d, ggobid *gg)
   if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every circle --*/
     for (j=jvar; j<jvar+nc; j++) {
       w = varcircles_get_nth (LBL, j, d);
-      d->varpanel_ui.label = g_slist_remove (d->varpanel_ui.label, w);
+      d->vcirc_ui.label = g_slist_remove (d->vcirc_ui.label, w);
 
       w = varcircles_get_nth (DA, j, d);
-      d->varpanel_ui.da = g_slist_remove (d->varpanel_ui.da, w);
+      d->vcirc_ui.da = g_slist_remove (d->vcirc_ui.da, w);
 
       w = varcircles_get_nth (VB, j, d);
-      d->varpanel_ui.vb = g_slist_remove (d->varpanel_ui.vb, w);
+      d->vcirc_ui.vb = g_slist_remove (d->vcirc_ui.vb, w);
       /*-- without a ref, this will be destroyed --*/
-      gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.table), w);
+      gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
 
-      pix = (GdkPixmap *) g_slist_nth_data (d->varpanel_ui.da, jvar);
-      d->varpanel_ui.da_pix = g_slist_remove (d->varpanel_ui.da_pix, pix);
+      pix = (GdkPixmap *) g_slist_nth_data (d->vcirc_ui.da, jvar);
+      d->vcirc_ui.da_pix = g_slist_remove (d->vcirc_ui.da_pix, pix);
       gdk_pixmap_unref (pix);
     }
   }
@@ -234,7 +286,7 @@ varcircles_delete (gint nc, gint jvar, datad *d, ggobid *gg)
   varcircles_layout_reset (d->ncols, d, gg);
 }
 
-/*-- this destroys them all --*/
+/*-- this destroys them all -- it's not yet called anywhere --*/
 void
 varcircles_clear (ggobid *gg) {
   GtkWidget *w;
@@ -245,23 +297,24 @@ varcircles_clear (ggobid *gg) {
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
-    for (j=0; j<d->varpanel_ui.nvars; j++) {
+    for (j=0; j<d->vcirc_ui.nvars; j++) {  /*-- variable not initialized --*/
       w = varcircles_get_nth (LBL, j, d);
-      d->varpanel_ui.label = g_slist_remove (d->varpanel_ui.label, w);
+      d->vcirc_ui.label = g_slist_remove (d->vcirc_ui.label, w);
 
       w = varcircles_get_nth (DA, j, d);
-      d->varpanel_ui.da = g_slist_remove (d->varpanel_ui.da, w);
+      d->vcirc_ui.da = g_slist_remove (d->vcirc_ui.da, w);
 
       w = varcircles_get_nth (VB, j, d);
-      d->varpanel_ui.vb = g_slist_remove (d->varpanel_ui.vb, w);
-      gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.table), w);
+      d->vcirc_ui.vb = g_slist_remove (d->vcirc_ui.vb, w);
+      gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
 
-      pix = (GdkPixmap *) g_slist_nth_data (d->varpanel_ui.da, j);
-      d->varpanel_ui.da_pix = g_slist_remove (d->varpanel_ui.da_pix, pix);
+      pix = (GdkPixmap *) g_slist_nth_data (d->vcirc_ui.da, j);
+      d->vcirc_ui.da_pix = g_slist_remove (d->vcirc_ui.da_pix, pix);
       gdk_pixmap_unref (pix);
     }
   }
 }
+
 
 /*-- responds to a button_press_event --*/
 static gint
@@ -306,13 +359,13 @@ varcircle_create (gint k, datad *d, ggobid *gg)
   GtkWidget *vb, *lbl, *da;
 
   vb = gtk_vbox_new (false, 0);
-  d->varpanel_ui.vb = g_slist_append (d->varpanel_ui.vb, vb);
+  d->vcirc_ui.vb = g_slist_append (d->vcirc_ui.vb, vb);
   gtk_container_border_width (GTK_CONTAINER (vb), 1);
 
   lbl = gtk_button_new_with_label (d->vartable[k].collab);
-  d->varpanel_ui.label = g_slist_append (d->varpanel_ui.label, lbl);
+  d->vcirc_ui.label = g_slist_append (d->vcirc_ui.label, lbl);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    lbl, "Click left to select", NULL);
+    lbl, "Click left to select or deselect", NULL);
   gtk_object_set_data (GTK_OBJECT (lbl), "datad", d);
   GGobi_widget_set (GTK_WIDGET (lbl), gg, true);
   gtk_container_add (GTK_CONTAINER (vb), lbl);
@@ -327,7 +380,7 @@ varcircle_create (gint k, datad *d, ggobid *gg)
    * a drawing area to contain the variable circle
   */
   da = gtk_drawing_area_new ();
-  d->varpanel_ui.da = g_slist_append (d->varpanel_ui.da, da);
+  d->vcirc_ui.da = g_slist_append (d->vcirc_ui.da, da);
   gtk_drawing_area_size (GTK_DRAWING_AREA (da),
                          VAR_CIRCLE_DIAM+2, VAR_CIRCLE_DIAM+2);
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK
@@ -337,7 +390,7 @@ varcircle_create (gint k, datad *d, ggobid *gg)
              | GDK_BUTTON_RELEASE_MASK);
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), da,
-    "Click to select", NULL);
+    "Click left to select or deselect", NULL);
     /*"Click to select; see menu", NULL);*/
   gtk_signal_connect (GTK_OBJECT (da), "expose_event",
     GTK_SIGNAL_FUNC (da_expose_cb), GINT_TO_POINTER (k));
@@ -354,7 +407,7 @@ varcircle_create (gint k, datad *d, ggobid *gg)
 void
 varcircle_attach (GtkWidget *vb, gint i, gint j, datad *d)
 {
-  gtk_table_attach (GTK_TABLE (d->varpanel_ui.table),
+  gtk_table_attach (GTK_TABLE (d->vcirc_ui.table),
     vb, j, j+1, i, i+1,
     GTK_FILL, GTK_FILL, 0, 0);
 }
@@ -397,13 +450,13 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
   if (gg->selvarfg_GC == NULL) 
     init_var_GCs (da, gg);
 
-  if ((len=g_slist_length (d->varpanel_ui.da_pix)) < d->ncols) {
+  if ((len=g_slist_length (d->vcirc_ui.da_pix)) < d->ncols) {
     for (k=len; k<d->ncols; k++) {
-      d->varpanel_ui.da_pix = g_slist_append (d->varpanel_ui.da_pix,
+      d->vcirc_ui.da_pix = g_slist_append (d->vcirc_ui.da_pix,
         gdk_pixmap_new (da->window, VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1, -1));
     }
   }
-  da_pix = g_slist_nth_data (d->varpanel_ui.da_pix, jvar);
+  da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, jvar);
 
   /*-- clear the pixmap --*/
   gdk_draw_rectangle (da_pix, gg->unselvarbg_GC, true,
@@ -525,7 +578,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
   gint j = GPOINTER_TO_INT (cbd);
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (w), "datad");
   GtkWidget *da = varcircles_get_nth (DA, j, d);
-  GdkPixmap *da_pix = g_slist_nth_data (d->varpanel_ui.da_pix, j);
+  GdkPixmap *da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, j);
 
   if (da_pix == NULL)
     varcircle_draw (j, d, gg); 
@@ -543,7 +596,7 @@ varcircles_add (gint nc, datad *d, ggobid *gg)
 {
   gint j;
   GtkWidget *vb;
-  gint n = g_slist_length (d->varpanel_ui.vb);
+  gint n = g_slist_length (d->vcirc_ui.vb);
   
   /*-- create the variable circles --*/
   for (j=n; j<nc; j++)

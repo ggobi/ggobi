@@ -189,7 +189,7 @@ void tour1d_speed_set(gint slidepos, ggobid *gg) {
 
 
 void 
-set_tour1dvar(ggobid *gg, gint jvar)
+tour1dvar_set (gint jvar, ggobid *gg)
 {
   gint j, jtmp, k;
   gboolean active=false;
@@ -241,11 +241,23 @@ set_tour1dvar(ggobid *gg, gint jvar)
   dsp->t1d.get_new_target = true;
 }
 
+static void
+tour1d_manip_var_set (gint j, ggobid *gg)
+{
+  g_printerr ("set the manipulation variable; not yet implemented\n");
+}
+
 void
-tour1d_varsel (ggobid *gg, gint jvar, gint button)
+tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
   if (button == 1 || button == 2) {
-    set_tour1dvar(gg, jvar);
+    if (d->vcirc_ui.jcursor == GDK_HAND2) {
+      tour1d_manip_var_set (jvar, gg);
+      varcircles_cursor_set_default (d);
+
+    } else {
+      tour1dvar_set (jvar, gg);
+    }
   }
 }
 

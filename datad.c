@@ -97,7 +97,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
     varpanel_clear (d, gg);
   }
 
-  varpanel_populate (d, gg);    /*-- checkboxes --*/
+  varpanel_checkboxes_populate (d, gg);    /*-- checkboxes --*/
   varcircles_populate (d, gg);  /*-- circles: build but don't show --*/
 
   pipeline_init (d, gg);

@@ -273,7 +273,7 @@ void tourcorr_speed_set(gint slidepos, ggobid *gg) {
 }
 
 void 
-set_tourcorr_horvar(ggobid *gg, gint jvar)
+tourcorr_horvar_set (gint jvar, ggobid *gg)
 {
   gint j, jtmp, k;
   gboolean active=false;
@@ -336,7 +336,7 @@ set_tourcorr_horvar(ggobid *gg, gint jvar)
 }
 
 void 
-set_tourcorr_vervar(ggobid *gg, gint jvar)
+tourcorr_vervar_set (gint jvar, ggobid *gg)
 {
   gint j, jtmp, k;
   gboolean active=false;
@@ -388,14 +388,27 @@ set_tourcorr_vervar(ggobid *gg, gint jvar)
   dsp->tcorr2.get_new_target = true;
 }
 
-void
-tourcorr_varsel (ggobid *gg, gint jvar, gint button)
+static void
+tourcorr_manip_var_set (gint j, ggobid *gg)
 {
-  if (button == 1) { 
-    set_tourcorr_horvar(gg, jvar);
-  }
-  else if ( button == 2) {
-    set_tourcorr_vervar(gg, jvar);
+  g_printerr ("set the manipulation variable; not yet implemented\n");
+}
+
+void
+tourcorr_varsel (gint jvar, gint button, datad *d, ggobid *gg)
+{
+  if (button == 1 || button == 2) {
+    if (d->vcirc_ui.jcursor == GDK_HAND2)
+      tourcorr_manip_var_set (jvar, gg);
+
+    else {
+      if (button == 1) { 
+        tourcorr_horvar_set (jvar, gg);
+      }
+      else if ( button == 2) {
+        tourcorr_vervar_set (jvar, gg);
+      }
+    }
   }
 }
 

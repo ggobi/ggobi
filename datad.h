@@ -158,22 +158,41 @@ class datad {
 
 /*----------------- variable selection panel -------------------------*/
 
- struct _Varpaneld {
-   GtkWidget *swin;       /*-- child of the notebook --*/
-   GtkWidget *ebox;       /*-- child of the scrolled_window --*/
-
-   /*-- widgets for the simplest modes: checkboxes --*/
-   GtkWidget *vbox;      /*-- child of the ebox --*/
+ struct _Varpanel_cboxd {
+   GtkWidget *swin;
+   GtkWidget *vbox;      /*-- child of swin --*/
    GSList *checkbox;     /*-- single column of checkboxes --*/
+ } vcbox_ui;
+ struct _Varpanel_circd {
+   GtkWidget *vbox;
+   GtkWidget *swin, *hbox;  /*-- children of vb --*/
+   GtkWidget *table;        /*-- sole child of swin --*/
+   GtkWidget *manip_btn, *freeze_btn;  /*-- children of hbox --*/
 
-   /*-- widgets for the richest modes: variable circles --*/
-   GtkWidget *table;    /*-- replaces the vbox for circles --*/
-   gint tnrows, tncols; /*-- table dimensions --*/
+   GdkCursor *cursor;
+   gint jcursor;
+
+   /*-- components and properties of the table --*/
+   gint tnrows, tncols;     /*-- table dimensions --*/
    GSList *vb, *da, *label;
-   GSList *da_pix;  /*-- backing pixmaps --*/
-
-   /*-- don't know if I need this, but it may be useful --*/
+   GSList *da_pix;          /*-- backing pixmaps --*/
    gint nvars;
+ } vcirc_ui;
+
+ struct _Varpaneld {
+   GtkWidget *ebox;       /*-- child of the scrolled_window --*//*keep*/
+
+/*
+   GtkWidget *swin;
+   GtkWidget *vbox;
+   GSList *checkbox;
+
+   GtkWidget *table;
+   gint tnrows, tncols;
+   GSList *vb, *da, *label;
+   GSList *da_pix;
+   gint nvars;
+*/
 
  } varpanel_ui;
 

@@ -221,7 +221,7 @@ void tour2d_speed_set(gint slidepos, ggobid *gg) {
 }
 
 void 
-set_tour2dvar(ggobid *gg, gint jvar)
+tour2dvar_set (gint jvar, ggobid *gg)
 {
   gint j, jtmp, k;
   gboolean selected=false;
@@ -276,11 +276,24 @@ set_tour2dvar(ggobid *gg, gint jvar)
   dsp->t2d.get_new_target = true;
 }
 
+static void
+tour2d_manip_var_set (gint j, ggobid *gg)
+{
+  g_printerr ("set the manipulation variable; not yet implemented\n");
+}
+
 void
-tour2d_varsel (ggobid *gg, gint jvar, gint button)
+tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
   if (button == 1 || button == 2) {
-    set_tour2dvar(gg, jvar);
+
+    if (d->vcirc_ui.jcursor == GDK_HAND2) {
+      tour2d_manip_var_set (jvar, gg);
+      varcircles_cursor_set_default (d);
+
+    } else {
+      tour2dvar_set (jvar, gg);
+    }
   }
 }
 
