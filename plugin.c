@@ -108,13 +108,8 @@ load_plugin_library(GGobiPluginDetails *plugin, gboolean recurse)
     return(NULL);
   }
 
-  if(canRead(fileName) == false) {
-    fileName = (char *)
-      g_malloc((strlen(fileName)+ strlen(DLL_EXTENSION) + 1)*sizeof(char));
-    strcpy(fileName, plugin->dllName);
-    strcpy(fileName+strlen(plugin->dllName), DLL_EXTENSION);
-    fileName[strlen(plugin->dllName) + strlen(DLL_EXTENSION)] = '\0';
-  }
+  if(canRead(fileName) == false)
+    fileName = g_strdup_printf("%s%s", plugin->dllName, DLL_EXTENSION);
 
   if(canRead(fileName) == false && recurse) {
    char *tmp = plugin->dllName;  
