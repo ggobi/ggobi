@@ -336,6 +336,7 @@ tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
         gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
           d->ncols, (gint) 2);
         arrayd_copy(&dsp->t2d.Fa, &dsp->t2d.F);
+        zero_tau(dsp->t2d.tau, 2);
       }
 
       dsp->t2d.active_vars_p.els[jvar] = false;
@@ -1206,6 +1207,7 @@ tour2d_manip_end(splotd *sp)
   disconnect_motion_signal (sp);
 
   arrayd_copy(&dsp->t2d.F, &dsp->t2d.Fa);
+  zero_tau(dsp->t2d.tau, 2);
   dsp->t2d.get_new_target = true;
 
   /* need to turn on tour? */

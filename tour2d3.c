@@ -243,6 +243,8 @@ void tour2d3_speed_set(gint slidepos, ggobid *gg) {
 }
 
 void tour2d3_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
+  displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
   cpanel->t2d3.paused = state;
 
   tour2d3_func (!cpanel->t2d3.paused, gg->current_display, gg);
@@ -250,6 +252,7 @@ void tour2d3_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
   if (cpanel->t2d3.paused) {
     /*-- whenever motion stops, we need a FULL redraw --*/
     display_tailpipe (gg->current_display, FULL, gg);
+    varcircles_refresh (d, gg);
   }
 }
 
@@ -297,14 +300,25 @@ tour2d3_subset_var_set (gint jvar, gint *jprev, gint toggle, datad *d,
     changed = true;
   }
 
-  /*-- reset subset_vars_p based on subset_vars: unlike other tour modes --*/
+  /*-- reset subset_vars_p and active_vars based on subset_vars: 
+   unlike other tour modes --*/
   if (changed) {
-    for (j=0; j<d->ncols; j++)
+    dsp->t2d3_manipvar_inc = false;
+    for (j=0; j<d->ncols; j++) {
       dsp->t2d3.subset_vars_p.els[j] = false;
+    }
     for (j=0; j<3; j++) {
       k = dsp->t2d3.subset_vars.els[j];
       dsp->t2d3.subset_vars_p.els[k] = true;
+      if (dsp->t2d3.active_vars.els[j] == dsp->t2d3_manip_var)
+        dsp->t2d3_manipvar_inc = true;
     }
+    /*-- Manip var needs to be one of the active vars --*/
+    if (!dsp->t2d3_manipvar_inc) 
+      dsp->t2d3_manip_var = dsp->t2d3.active_vars.els[0];
+
+    zero_tau(dsp->t2d3.tau, 2);
+    dsp->t2d3.get_new_target = true;
   }
 
   return changed;
@@ -339,12 +353,11 @@ tour2d3_active_vars_swap (gint jvar_out, gint jvar_in, datad *d,
         dsp->t2d3.active_vars.els[k] = jvar_in;
   }
 
-/*
   gt_basis(dsp->t2d3.Fa, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
     d->ncols, (gint) 2);
   arrayd_copy(&dsp->t2d3.Fa, &dsp->t2d3.F);
-*/
 
+  zero_tau(dsp->t2d3.tau, 2);
   dsp->t2d3.get_new_target = true;
 }
 
@@ -371,6 +384,8 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d,
     if (changed) {
       varcircles_visibility_set (dsp, gg);
       tour2d3_active_vars_swap (jprev, jvar, d, dsp, gg);
+      display_tailpipe (gg->current_display, FULL, gg);
+      varcircles_refresh (d, gg);
     }
   } else if (GTK_IS_BUTTON(w)) {  /*-- it's the label --*/
 
@@ -379,6 +394,8 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d,
     if (changed) {
       varcircles_visibility_set (dsp, gg);
       tour2d3_active_vars_swap (jprev, jvar, d, dsp, gg);
+      display_tailpipe (gg->current_display, FULL, gg);
+      varcircles_refresh (d, gg);
     }
 
   } else if (GTK_IS_DRAWING_AREA(w)) {
@@ -656,6 +673,13 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
       dsp->t2d3_manipvar_inc = true;
       n1vars--;
     }
+  /* the manip var has to be one of the active variables in this
+     mode, so if it is not, then set it to be the first active variable */
+  if (!dsp->t2d3_manipvar_inc) {
+    dsp->t2d3_manip_var = dsp->t2d3.active_vars.els[0];
+    dsp->t2d3_manipvar_inc = true;
+    n1vars--;
+  }
 
   /* here need to check if the manip var is wholly contained in u, and
      if so do some check */
@@ -1082,6 +1106,7 @@ tour2d3_manip_end(splotd *sp)
   disconnect_motion_signal (sp);
 
   arrayd_copy(&dsp->t2d3.F, &dsp->t2d3.Fa);
+  zero_tau(dsp->t2d3.tau, 2);
   dsp->t2d3.get_new_target = true;
 
   /* need to turn on tour? */

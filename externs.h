@@ -613,6 +613,7 @@ displayd* tsplot_new (gboolean, gint, gint *, datad *, ggobid *);
 void      tsplot_reset_arrangement (displayd *, gint, ggobid *);
 gboolean  tsplot_varsel (GtkWidget *, displayd *display, splotd *sp, gint jvar, gint toggle, gint mouse, cpaneld *cpanel,  ggobid *gg);
 void      tsplot_whiskers_make (splotd *, displayd *, ggobid *);
+void      zero_tau(vector_f, gint);
 
 /* The new way of handling window closures, so that we don't just exit. */
 gboolean  ggobi_close (ggobid *gg, GdkEvent *ev, GtkObject *w);

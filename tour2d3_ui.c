@@ -52,6 +52,11 @@ cpanel_tour2d3_set (cpaneld *cpanel, ggobid* gg)
   /*-- paused --*/
   btn = widget_find_by_name (pnl, "TOUR2D3:pause_button");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->t2d3.paused);
+
+  /*-- manual manip --*/
+  w = widget_find_by_name (pnl, "TOUR2D3:manip");
+  if (w)
+    gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->t2d3.manip_mode);
 }
 
 

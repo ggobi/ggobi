@@ -1181,7 +1181,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   GtkStyle *style = gtk_widget_get_style (sp->da);
   datad *d = dsp->d;
   gfloat dst;
-  gint textheight = 0;
+  gint textheight = 0, textheight2;
   gchar *varlab, *varval;
   gint dawidth = sp->da->allocation.width;
   gint daheight = sp->da->allocation.height;
@@ -1272,6 +1272,10 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             (gint) (dsp->t2d3.F.vals[1][j]* (gfloat) daheight/8));
           gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
+          if (j == dsp->t2d_manip_var)
+            gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
+          else
+            gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
             dawidth/8+axindent, daheight-daheight/8-axindent,
             ix, iy);
@@ -1320,6 +1324,34 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 #endif
               gg->plot_GC, ix, iy, varlab);
             g_free (varlab);
+          }
+          /* Drawing the axes values now */
+          if (dsp->options.axes_values_p) {
+            varval = g_strdup_printf ("%d:%4.3f,%4.3f",j+1,
+              dsp->t2d3.F.vals[0][j],dsp->t2d3.F.vals[1][j]);
+            if (j == 0) {
+              gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+                gtk_style_get_font (style),
+#else
+                style->font,
+#endif
+                varval, strlen(varval),
+                &lbearing, &rbearing, &width2, &ascent, &descent);
+              textheight2 = ascent+descent+5;
+	    }
+
+            ix = dawidth - width2 - axindent;
+            iy = daheight - (d->ncols-j-1)*textheight2 - axindent;
+            gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+              gtk_style_get_font (style),
+#else
+              style->font,
+#endif
+            gg->plot_GC, ix, iy, varval);
+
+            g_free (varval);
           }
         }
         gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID, 
@@ -1408,11 +1440,11 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 #endif
                 varval, strlen(varval),
                 &lbearing, &rbearing, &width2, &ascent, &descent);
+              textheight2 = ascent+descent+5;
 	    }
 
-            textheight = ascent+descent+5;
             ix = dawidth - width2 - axindent;
-            iy = daheight - (j)*textheight - axindent;
+            iy = daheight - (d->ncols-j-1)*textheight2 - axindent;
             gdk_draw_string (drawable,
 #if GTK_MAJOR_VERSION == 2
               gtk_style_get_font (style),
