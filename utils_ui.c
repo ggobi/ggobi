@@ -360,6 +360,10 @@ variable_notebook_subwindow_add (datad *d, GtkSignalFunc func,
         (vtype == integer && vt->vartype == integer) ||
         (vtype == real && vt->vartype == real))
     {
+      /*
+       * I can't use collab_tform, because then I can't find
+       * the variable indices later using only the name.
+      */
       row[0] = g_strdup (vt->collab);
       gtk_clist_append (GTK_CLIST (clist), row);
       g_free (row[0]);
@@ -489,6 +493,10 @@ variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
     for (j=0; j<d->ncols; j++) {
       vt = vartable_element_get (j, d);
       if (vt) {
+        /*
+         * I can't use collab_tform, because then I can't find
+         * the variable indices later using only the name.
+        */
         row[0] = g_strdup_printf (vt->collab);
         gtk_clist_append (GTK_CLIST (clist), row);
       }
