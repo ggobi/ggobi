@@ -92,31 +92,6 @@ cpanel_show_cb (GtkCheckMenuItem *w, guint action)
     gtk_widget_hide (gg->pipeline_mode_frame);
 }
 
-/* this should be done per display
-void
-axes_show_cb (GtkCheckMenuItem *w, guint action) 
-{
-  ggobid *gg = GGobiFromWidget (GTK_WIDGET(w), true);
-
-  if (gg->current_display != NULL) {
-    displayd *display = gg->current_display;
-
-    if (display->displaytype == scatterplot) {
-      if (display->hrule != NULL && display->cpanel.projection == XYPLOT) {
-        if (w->active) {
-          gtk_widget_show (display->hrule);
-          gtk_widget_show (display->vrule);
-        }
-        else {
-          gtk_widget_hide (display->hrule);
-          gtk_widget_hide (display->vrule);
-        }
-      }
-    }
-  }
-}
-*/
-
 
 PipelineMode
 pipeline_mode_get (ggobid* gg) {
@@ -215,7 +190,6 @@ pipeline_mode_set (PipelineMode m, ggobid *gg)
   displayd *display = gg->current_display;
 
   gg->pipeline_mode = m;
-g_printerr ("(pipeline_mode_set) mode = %d\n", m);
   if (gg->pipeline_mode != gg->prev_pipeline_mode) {
 
     if (gg->prev_pipeline_mode != NULLMODE) {
@@ -362,7 +336,6 @@ pipeline_mode_set_cb (GtkWidget *widget, gint action)
 {
   ggobid *gg = GGobiFromWidget(widget,true);
   GGOBI(full_pipeline_mode_set)((PipelineMode) action, gg);
-g_printerr ("(pipeline_mode_set_cb) action=%d mode=%d\n", action, gg->pipeline_mode);
 }
 
 /*

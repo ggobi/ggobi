@@ -103,7 +103,7 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
   gboolean common_event = true;
   gint action = -1;
   displayd *display = (displayd *) sp->displayptr;
-  extern gboolean display_type_handles_action (displayd *, gint viewmode);
+  extern gboolean display_type_handles_action (displayd *, PipelineMode m);
 
 /*
  * I can't say this is the best way to handle this bug, but it
@@ -201,9 +201,11 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
     common_event = false;
   }
 
-  if (action >= 0 && display_type_handles_action (display, action)) {
+  if (action >= 0 && display_type_handles_action (display,
+    (PipelineMode) action))
+  {
     etime = event->time;
-    GGOBI(full_pipeline_mode_set)(action, gg);
+    GGOBI(full_pipeline_mode_set)((PipelineMode) action, gg);
   }
 
   return common_event;
@@ -605,9 +607,10 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
         case NMODES:
         break;
       }
+      
+      break;
 
     case scatmat:
-
       if (sp->p1dvar == -1)
         xy_reproject (sp,
           (display->missing_p) ? d->missing_world.vals : d->world.vals,
@@ -616,21 +619,21 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
         p1d_reproject (sp,
           (display->missing_p) ? d->missing_world.vals : d->world.vals,
           d, gg);
-      break;
+    break;
 
     case parcoords:
       p1d_reproject (sp,
         (display->missing_p) ? d->missing_world.vals : d->world.vals,
         d, gg);
-      break;
+    break;
 
     case tsplot:
       xy_reproject (sp,
         (display->missing_p) ? d->missing_world.vals : d->world.vals,
         d, gg);
-      break;
+    break;
     default:
-      break;
+    break;
   }
 }
 

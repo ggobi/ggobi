@@ -213,6 +213,11 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
               else
                 scatterplot_show_hrule (display, w->active);
             }
+          case TOUR1D:
+          case TOUR2D:
+          case COTOUR:
+            display_plot (display, QUICK, gg);
+          break;
           default:
           break;
         }
@@ -394,7 +399,7 @@ display_add (displayd *display, ggobid *gg)
 
   /*-- if starting from the API, the first mode menu needs to be shown --*/
   if (prev_pipeline_mode == NULLMODE)
-      pipeline_mode_submenus_update (prev_pipeline_mode, gg);
+    pipeline_mode_submenus_update (prev_pipeline_mode, gg);
 
   /*-- Make sure the border for the previous plot is turned off --*/
   if (prev_splot != NULL) {
@@ -554,7 +559,7 @@ display_set_current (displayd *new_display, ggobid *gg)
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->pipeline_mode_item),
                                    gg->app.scatterplot_mode_menu); 
         submenu_insert (gg->pipeline_mode_item, gg->main_menubar, 2);
-        break;
+      break;
 
       case scatmat:
         scatmat_mode_menu_make (gg->main_accel_group,
@@ -564,7 +569,7 @@ display_set_current (displayd *new_display, ggobid *gg)
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->pipeline_mode_item),
                                    gg->app.scatmat_mode_menu); 
         submenu_insert (gg->pipeline_mode_item, gg->main_menubar, 2);
-        break;
+      break;
 
       case parcoords:
         parcoords_mode_menu_make (gg->main_accel_group,
@@ -574,7 +579,7 @@ display_set_current (displayd *new_display, ggobid *gg)
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->pipeline_mode_item),
                                    gg->parcoords.mode_menu); 
         submenu_insert (gg->pipeline_mode_item, gg->main_menubar, 2);
-        break;
+      break;
 
       case tsplot:
         tsplot_mode_menu_make (gg->main_accel_group,
@@ -584,9 +589,9 @@ display_set_current (displayd *new_display, ggobid *gg)
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->pipeline_mode_item),
                                    gg->tsplot.mode_menu); 
         submenu_insert (gg->pipeline_mode_item, gg->main_menubar, 2);
-        break;
+      break;
       default:
-        break;
+      break;
     }
   }
 
@@ -612,13 +617,13 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
 
   switch (display->displaytype) {
     case scatterplot:
-       if (current_p)
-         tmp = display->missing_p ?   "*** scatterplot display (missings) *** " 
+      if (current_p)
+        tmp = display->missing_p ?   "*** scatterplot display (missings) *** " 
                                   :   "*** scatterplot display ***";
-       else
-         tmp = display->missing_p ?   "scatterplot display (missings) " 
+      else
+        tmp = display->missing_p ?   "scatterplot display (missings) " 
                                   :   "scatterplot display ";
-      break;
+    break;
     case scatmat:
       if (current_p)
         tmp = display->missing_p ?   "*** scatterplot matrix (missings) *** " 
@@ -626,22 +631,22 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
       else
         tmp = display->missing_p ?   "scatterplot matrix (missings) " 
                                  :   "scatterplot matrix ";
-      break;
+    break;
     case parcoords:
-       if (current_p)
-         tmp = "*** parallel coordinates display *** " ;
-       else 
-         tmp = "parallel coordinates display " ;
-      break;
+      if (current_p)
+        tmp = "*** parallel coordinates display *** " ;
+      else 
+        tmp = "parallel coordinates display " ;
+    break;
     case tsplot:
-       if (current_p)
-         tmp = "*** time series display *** " ;
-       else 
-         tmp = "time series display display " ;
-      break;
+      if (current_p)
+        tmp = "*** time series display *** " ;
+      else 
+        tmp = "time series display display " ;
+    break;
 
     default:
-        break;
+    break;
   }
 
   if (display->d->name != NULL) {

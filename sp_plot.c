@@ -1116,6 +1116,9 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   GtkStyle *style = gtk_widget_get_style (sp->da);
   datad *d = dsp->d;
   gfloat dst;
+
+  if (!dsp->options.axes_show_p)
+    return;
   
   if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
     switch (proj) {
