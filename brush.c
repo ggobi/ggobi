@@ -576,7 +576,12 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   return (doit);
 }
 
-/*-- the opposite of hide --*/
+/*
+ * the opposite of hide: note that persistent selection doesn't
+ * really work because it keeps overwriting the hidden vectors.
+ * If we need persistent selection, I'll have to create a new
+ * vector that's only used here, or use some temporary vector.
+*/
 static gboolean
 update_selected_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   datad *d, ggobid *gg)
@@ -747,11 +752,13 @@ active_paint_points (datad *d, ggobid *gg)
            * If we're doing hide or un-hide brushing, we can't ignore hidden
            * cases; otherwise it's ok (I think).
           */
-          if (splot_plot_case (pt,
-            cpanel->br_point_targets != br_hide &&
-            cpanel->br_point_targets != br_select,
-            d, sp, display, gg))
+          if (d->hidden_now.els[pt] &&
+            (cpanel->br_point_targets != br_hide &&
+            cpanel->br_point_targets != br_select))
           {
+              continue;
+          }
+          if (splot_plot_case (pt, d, sp, display, gg)) {
             if (under_brush (pt, sp)) {
               d->npts_under_brush++ ;
               d->pts_under_brush.els[pt] = 1;
