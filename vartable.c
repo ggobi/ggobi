@@ -305,7 +305,7 @@ vartable_element_new (datad *d)
 {
   vartabled *vt = (vartabled *) g_malloc (sizeof (vartabled));
 
-  vt->d = d;
+  vt->d = (struct datad *) d; /* the compiler insists */
 
   vt->selected = false;
   vt->nmissing = 0;
