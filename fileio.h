@@ -73,6 +73,8 @@ gchar *findAssociatedFile(InputDescription *desc, const gchar * const *suffixes,
 gint addInputSuffix(InputDescription *desc, const gchar *suffix);
 gint addInputFile(InputDescription *desc, const gchar *file);
 
+extern gboolean canRead(const char * const fileName);
+
 #ifdef __cplusplus
 }
 #endif
