@@ -106,10 +106,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   colorschemed *scheme = gg->activeColorScheme;
   gushort maxcolorid;
 
-#ifndef WIN32
   gint i, m;
   gboolean (*f)(splotd *, datad*, ggobid*, gboolean) = NULL;
-#endif
 
   GtkGGobiExtendedSPlotClass *klass = NULL;
   GtkGGobiExtendedDisplayClass *displayKlass = NULL;
@@ -151,10 +149,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
 
-#ifdef WIN32
-      win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
-#else
-
+      /*
+      */
       if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
         klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
         f = klass->redraw;
@@ -164,6 +160,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
       }
 
       if (!f) {
+#ifdef WIN32
+      win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
+#else
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot.els[i];
           if (d->hidden_now.els[m] && splot_plot_case (m, d, sp, display, gg)) {
@@ -173,9 +172,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
               klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
           }
         }
-      }
 #endif
-
+      }
     } else {  /*-- un-hidden points --*/
 
       maxcolorid = datad_colors_used_get (&ncolors_used, colors_used, d, gg);
@@ -190,10 +188,6 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         current_color = colors_used[k];
         gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
 
-#ifdef WIN32
-        win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
-#else
-
         if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
           klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
           f = klass->redraw;
@@ -203,6 +197,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         }
 
         if(!f) {
+#ifdef WIN32
+        win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
+#else
           for (i=0; i<d->nrows_in_plot; i++) {
             m = d->rows_in_plot.els[i];
             if (d->color_now.els[m] == current_color &&
@@ -215,8 +212,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
                 klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
             }
           }
-        }
 #endif
+        }
       }
     }
 
