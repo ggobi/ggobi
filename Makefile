@@ -30,6 +30,10 @@ ifdef TEST_KEYS
  CFLAGS+= -DTEST_KEYS=1
 endif
 
+ifdef TESTING_ROWS_IN_PLOT_CB
+ CFLAGS+= -DTESTING_ROWS_IN_PLOT_CB=1
+endif
+
 ifndef DOXYGEN
   DOXYGEN=doxygen
 endif

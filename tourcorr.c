@@ -877,7 +877,6 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggo
 {
   displayd *dsp = gg->current_display;
   gboolean changed = true;
-  splotd *sp = gg->current_splot;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
     /*-- w is either one of the x or y toggle buttons --*/
@@ -906,7 +905,6 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggo
       tourcorr_active_var_set (jvar, d, dsp, gg);
     }
   }
-  sp->tourcorr.initmax = true;
   return changed;
 }
 

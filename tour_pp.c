@@ -40,10 +40,9 @@ gfloat randomval, nrand;
 gint nset;
 
 /* reset pp variables */
-void reset_pp(displayd *dsp)
+void reset_pp(datad *d, gint nprev, gint b, ggobid *gg, void *data)
 {
-  ggobid *gg = GGobiFromDisplay (dsp);
-  datad *d = dsp->d;
+  displayd *dsp = gg->current_display; 
 
   if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
     free_optimize0_p(&dsp->t1d_pp_op);

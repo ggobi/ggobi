@@ -233,7 +233,7 @@ scatterplot_display_menus_make (displayd *display,
     func, GINT_TO_POINTER (DOPT_AXESLAB), off, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
-  item = CreateMenuCheck (options_menu, "Show 2D tour axes values",
+  item = CreateMenuCheck (options_menu, "Show 2D tour proj vals",
     func, GINT_TO_POINTER (DOPT_AXESVALS), off, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 

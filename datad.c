@@ -21,10 +21,14 @@
 void rows_in_plot_test_cb (datad *d, gint nprev, gint b, ggobid *gg,
   void *data)
 {
+  displayd *dsp = gg->current_display; 
+
+  /*  reset_pp(dsp); * This reinitializes pp arrays for changes in 
+                    nrows_in_plot - doesn't work here */
+
   g_printerr ("d->nrows_in_plot = %d nprev %d\n", d->nrows_in_plot, nprev);
 }
 #endif
-
 
 
 datad *

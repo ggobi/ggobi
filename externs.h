@@ -323,7 +323,8 @@ gint       realloc_optimize0_p(optimize0_param *, gint, vector_i);
 void       recenter_data (gint, datad *, ggobid *);
 void       reinit_transient_brushing (displayd *, ggobid *);
 void       rejitter (gint *, gint, datad *, ggobid *);
-void       reset_pp(displayd *);
+  /*void       reset_pp(displayd *);*/
+void       reset_pp(datad *, gint, gint, ggobid *, void *);
 void       rnorm2 (gdouble *, gdouble *);
 void       rotation_event_handlers_toggle (splotd *, gboolean);
 void       rowids_alloc (datad *);

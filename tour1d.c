@@ -430,7 +430,6 @@ gboolean
 tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
-  splotd *sp = gg->current_splot;
   gboolean redraw = true;
 
   if (GTK_IS_TOGGLE_BUTTON(w) || GTK_IS_BUTTON(w)) {  /* toggle or 'label' */
@@ -470,8 +469,6 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobi
           1);
         t1d_pp_reinit(gg);
       }
-      /* Reinits the vertical height for the ashes */
-      sp->tour1d.initmax = true;
     }
   }
 

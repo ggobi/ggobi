@@ -51,9 +51,6 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
   assign_points_to_bins(d, gg);
   clusters_set(d, gg);
 
-  reset_pp(display); /* This reinitializes pp arrays for changes in 
-                    nrows_in_plot */
-
   /*-- --*/
 
   if (gg->cluster_ui.window != NULL)
@@ -164,9 +161,6 @@ void brush_reset(ggobid * gg, gint action)
     cluster_table_labels_update(d, gg);
     rows_in_plot_set(d, gg);
 
-    reset_pp(display); /* This reinitializes pp arrays for changes in 
-                    nrows_in_plot */
-
     tform_to_world(d, gg);
     displays_tailpipe(FULL, gg);
       /*-- --*/
@@ -182,9 +176,6 @@ void brush_reset(ggobid * gg, gint action)
       clusters_set(e, gg);
       cluster_table_labels_update(e, gg);
       rows_in_plot_set(e, gg);
-
-      reset_pp(display); /* This reinitializes pp arrays for changes in 
-                        nrows_in_plot */
 
       tform_to_world(e, gg);
       displays_tailpipe(FULL, gg);
@@ -338,9 +329,6 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
 
   if (cpanel->br_mode == BR_PERSISTENT) {
     rows_in_plot_set(d, gg);
-
-    reset_pp(display); /* This reinitializes pp arrays for changes in 
-                    nrows_in_plot */
 
     assign_points_to_bins(d, gg);
     /*-- reset the number and properties of the brush groups --*/

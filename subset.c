@@ -60,12 +60,8 @@ subset_clear (datad *d, ggobid *gg) {
 
 void
 subset_apply (datad *d, ggobid *gg) {
-  displayd *dsp = gg->current_display; 
 
   rows_in_plot_set (d, gg);
-
-  reset_pp(dsp); /* This reinitializes pp arrays for changes in 
-                    nrows_in_plot */
 
   clusters_set (d, gg);
 

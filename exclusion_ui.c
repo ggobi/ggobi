@@ -118,13 +118,11 @@ static void rescale_cb(GtkWidget * w, ggobid * gg)
 
   if (cpanel->projection == TOUR1D) {
     dsp->t1d.get_new_target = true;
-    reset_pp(dsp);
   }
   if (cpanel->projection == TOUR2D3) 
     dsp->t2d3.get_new_target = true;
   if (cpanel->projection == TOUR2D) {
     dsp->t2d.get_new_target = true;
-    reset_pp(dsp);
   }
   if (cpanel->projection == COTOUR) {
     dsp->tcorr1.get_new_target = true;
@@ -142,7 +140,6 @@ static gint hide_cluster_cb(GtkToggleButton * btn, gpointer cbd)
   gint i;
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(btn), true);
   datad *d = datad_get_from_notebook(gg->cluster_ui.notebook, gg);
-  displayd *dsp = gg->current_display; 
 
   /*-- operating on the current sample, whether hidden or shown --*/
   for (i = 0; i < d->nrows; i++) {
@@ -157,9 +154,6 @@ static gint hide_cluster_cb(GtkToggleButton * btn, gpointer cbd)
   assign_points_to_bins(d, gg);
   clusters_set(d, gg);
 
-  reset_pp(dsp); /* This reinitializes pp arrays for changes in 
-                    nrows_in_plot */
-
   cluster_table_labels_update(d, gg);
   displays_plot(NULL, FULL, gg);
 
@@ -172,7 +166,6 @@ static gint show_cluster_cb(GtkToggleButton * btn, gpointer cbd)
   gint i;
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(btn), true);
   datad *d = datad_get_from_notebook(gg->cluster_ui.notebook, gg);
-  displayd *dsp = gg->current_display; 
 
   /*-- operating on the current sample, whether hidden or shown --*/
   for (i = 0; i < d->nrows; i++) {
@@ -187,9 +180,6 @@ static gint show_cluster_cb(GtkToggleButton * btn, gpointer cbd)
   cluster_table_labels_update(d, gg);
 
   rows_in_plot_set(d, gg);
-
-  reset_pp(dsp); /* This reinitializes pp arrays for changes in 
-                    nrows_in_plot - not sure if this should be done here */
 
   /*
    * Don't re-set the limits, but re-run the pipeline in case

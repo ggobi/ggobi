@@ -1031,6 +1031,12 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
 
   gdata  = g_malloc (nrows*sizeof(gfloat));
 
+  gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
+    reset_pp, gg);
+
+  if (d->nrows_in_plot == 1)  /* can't do pp on no data! */
+    return(false);
+
   for (i=0; i<d->nrows_in_plot; i++)
     for (j=0; j<dsp->t1d.nactive; j++)
       dsp->t1d_pp_op.data.vals[i][j] = 
