@@ -138,11 +138,11 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       agxset (graph, sym->index, "");
 
     graph_init(graph);
-/*
-  New:
-	g->u.ndim = late_int(g,agfindattr(g,"dim"),2,2);
-	Ndim = g->u.ndim = MIN(g->u.ndim,MAXDIM);
-*/
+
+/* -- here's where I can have some fun -- */
+	graph->u.ndim = 2;
+	Ndim = graph->u.ndim = MIN(graph->u.ndim,MAXDIM);
+
     graph->u.drawing->engine = NEATO;
     neato_init_node_edge(graph);
     nG = scan_graph(graph);
