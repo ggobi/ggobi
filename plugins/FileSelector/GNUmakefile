@@ -1,10 +1,15 @@
 PKG=FileSelect
 
+ifndef GGOBI_HOME
+ GGOBI_HOME=../..
+endif
+
 ifdef ADMIN
  include Install/GNUmakefile.admin
 endif
 
 -include local.config
+-include $(GGOBI_HOME)/local.config
 
 GTK_EXTRA_INCLUDE_DIR=$(shell $(GTK_EXTRA_CONFIG) --cflags)
 GTK_EXTRA_LIB_DIR=$(shell $(GTK_EXTRA_CONFIG) --libs)
@@ -20,13 +25,13 @@ endif
 GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
 GGOBI_LIB=
 
-CFLAGS+=-g $(GTK_EXTRA_INCLUDE_DIR) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags)
+CFLAGS+=-g $(GTK_EXTRA_INCLUDE_DIR) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags) $(XML_INC_DIRS:%=-I%)
 
 SRC=fileSelect
 OBJS=$(SRC:%=%.o)
 
 $(PKG).so: $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) $(GTK_EXTRA_LIB_DIR) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs)
+	$(CC) -shared -o $@ $(OBJS) $(GTK_EXTRA_LIB_DIR) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%)
 
 local.config:  configure
 	./configure

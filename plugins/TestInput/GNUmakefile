@@ -1,4 +1,9 @@
+ifndef GGOBI_HOME
+ GGOBI_HOME=../..
+endif
+
 -include local.config
+-include $(GGOBI_HOME)/local.config
 
 ifdef ADMIN
  include Install/GNUmakefile.admin
@@ -14,10 +19,10 @@ endif
 
 SRC=testInput
 
-CFLAGS+=-g $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags)
+CFLAGS+=-g $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags) $(XML_INC_DIRS:%=-I%)
 
 TestInput.so: testInput.o
-	$(CC) -shared -o $@ testInput.o $(GGOBI_LIB)
+	$(CC) -shared -o $@ testInput.o $(GGOBI_LIB) $(XML_LIB_DIRS=%-L%)
 
 
 local.config:  configure
