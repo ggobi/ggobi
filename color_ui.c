@@ -756,6 +756,14 @@ symbol_window_redraw (ggobid *gg)
   }
 }
 
+void
+close_symbol_window_cb(GtkWidget *w, GdkEventButton *event, ggobid *gg)
+{
+	fprintf(stderr, "Closing the color scheme window\n");fflush(stderr);
+   gtk_widget_destroy(gg->color_ui.symbol_window);
+   gg->color_ui.symbol_window = NULL;
+}
+
 /*------------------------------------------------------------------------*/
 /*                    build the window                                    */
 /*------------------------------------------------------------------------*/
@@ -788,6 +796,13 @@ make_symbol_window (ggobid *gg) {
     gtk_signal_connect (GTK_OBJECT (gg->color_ui.symbol_window),
                         "delete_event",
                         GTK_SIGNAL_FUNC (delete_symbol_window_cb),
+                        (gpointer) gg);
+
+
+    /* Track when the ggobid instance is closed and shut this one down too. */
+    gtk_signal_connect (GTK_OBJECT (gg->main_window),
+                        "delete_event",
+                        GTK_SIGNAL_FUNC (close_symbol_window_cb),
                         (gpointer) gg);
 
     vbox = gtk_vbox_new (false, 2);

@@ -817,6 +817,14 @@ entry_set_scheme_name (ggobid *gg)
 }
 
 void
+close_wvis_window_cb(GtkWidget *w, GdkEventButton *event, ggobid *gg)
+{
+fprintf(stderr, "Closing the color scheme window\n");fflush(stderr);
+   gtk_widget_destroy(gg->wvis.window);
+   gg->wvis.window = NULL;
+}
+
+void
 wvis_window_open (ggobid *gg) 
 {
   GtkWidget *vbox;
@@ -849,6 +857,11 @@ wvis_window_open (ggobid *gg)
       "color schemes");
     gtk_signal_connect (GTK_OBJECT (gg->wvis.window),
       "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), gg);
+
+    gtk_signal_connect (GTK_OBJECT (gg->main_window),
+                        "delete_event",
+                        GTK_SIGNAL_FUNC (close_wvis_window_cb),
+                        (gpointer) gg);
 
     hpane = gtk_hpaned_new();
     gtk_container_add (GTK_CONTAINER (gg->wvis.window), hpane);
