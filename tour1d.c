@@ -401,6 +401,11 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg)
             sp->p1d_data.els, &min, &max, &mean);
   if (sp->tour1d.firsttime) {
     sp->tour1d.keepmin = min;
+/*
+   before I can draw the TOUR1D lines, I need to find where 0
+   falls in screen coordinates  -- dfs
+*/
+    /*sp->tour1d.keepmin = 0.0;*/
     sp->tour1d.keepmax = max;
     sp->tour1d.firsttime = false;
   }
