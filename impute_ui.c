@@ -16,8 +16,8 @@
 #include "externs.h"
 
 static void
-delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data) {
-  gtk_widget_hide (w);
+close_window_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
+  gtk_widget_hide (gg->impute.window);
 }
 
 static void rescale_cb (GtkButton *button, ggobid *gg)
@@ -76,7 +76,7 @@ static void whichvars_set_cb (GtkWidget *w, gpointer cbd)
 void
 impute_window_open (ggobid *gg) {
 
-  GtkWidget *button, *tgl, *opt;
+  GtkWidget *btn, *tgl, *opt;
   GtkWidget *vbox, *frame, *hb;
   GtkWidget *label;
   datad *d;
@@ -93,7 +93,7 @@ impute_window_open (ggobid *gg) {
     gtk_window_set_title (GTK_WINDOW (gg->impute.window),
       "assign values");
     gtk_signal_connect (GTK_OBJECT (gg->impute.window),
-      "delete_event", GTK_SIGNAL_FUNC (delete_cb), NULL);
+      "delete_event", GTK_SIGNAL_FUNC (close_window_cb), NULL);
   
     gtk_container_set_border_width (GTK_CONTAINER (gg->impute.window), 5);
 
@@ -200,21 +200,33 @@ impute_window_open (ggobid *gg) {
 
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
 
-    button = gtk_button_new_with_label ("Impute");
-    gtk_signal_connect (GTK_OBJECT (button),
+    btn = gtk_button_new_with_label ("Impute");
+    gtk_signal_connect (GTK_OBJECT (btn),
                         "clicked",
                         GTK_SIGNAL_FUNC (impute_cb),
                         (gpointer) gg);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Impute or assign values to missings", NULL);
-    gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
+    gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
 
-    button = gtk_button_new_with_label ("Rescale");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
+    btn = gtk_button_new_with_label ("Rescale");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
                           "Rescale the data after imputing", NULL);
-    gtk_signal_connect (GTK_OBJECT (button), "clicked",
+    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (rescale_cb), (gpointer) gg);
-    gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
+    gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
+
+    /*-- add a close button --*/
+    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(), false, true, 2);
+    hb = gtk_hbox_new (false, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
+
+    btn = gtk_button_new_with_label ("Close");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Close the window", NULL);
+    gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 2);
+    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                        GTK_SIGNAL_FUNC (close_window_cb), gg);
   }
 
   gtk_widget_show_all (gg->impute.window);

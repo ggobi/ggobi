@@ -19,7 +19,7 @@
 /*-- catch the delete (close) event from the window manager --*/
 static void
 close_window_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
-  gtk_widget_hide (w);
+  gtk_widget_hide (gg->tform_ui.window);
 }
 
 static gchar *stage0_lbl[] = {"No transformation",
@@ -286,17 +286,26 @@ transform_window_open (ggobid *gg)
     /*
      * A button or two
     */
-    hb = gtk_hbox_new (false, 5);
-    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
 
     btn = gtk_button_new_with_label ("Reset all");
-    gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Set all transformation stages to 'no transformation' for the selected variables",
       NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (tform_reset_cb), gg);
 
+    /*-- add a close button --*/
+    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(), false, true, 2);
+    hb = gtk_hbox_new (false, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
+
+    btn = gtk_button_new_with_label ("Close");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Close the window", NULL);
+    gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 1);
+    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                        GTK_SIGNAL_FUNC (close_window_cb), gg);
   } 
 
   gtk_widget_show_all (gg->tform_ui.window);

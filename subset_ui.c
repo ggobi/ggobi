@@ -23,9 +23,9 @@
 
 
 static void
-delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data)
+close_window_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
-  gtk_widget_hide (w);
+  gtk_widget_hide (gg->subset_ui.window);
 }
 
 static void
@@ -153,7 +153,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
   GtkWidget *button, *t;
   GtkWidget *vbox, *frame, *hb, *vb;
-  GtkWidget *label;
+  GtkWidget *label, *btn;
   datad *d;
   gboolean firsttime = false;  /*-- first time for this d? --*/
 
@@ -196,7 +196,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_window_set_title (GTK_WINDOW (gg->subset_ui.window),
         "subset data");
       gtk_signal_connect (GTK_OBJECT (gg->subset_ui.window),
-        "delete_event", GTK_SIGNAL_FUNC (delete_cb), NULL);
+        "delete_event", GTK_SIGNAL_FUNC (close_window_cb), NULL);
   
       gtk_container_set_border_width (GTK_CONTAINER (gg->subset_ui.window), 5);
 
@@ -226,8 +226,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_box_pack_start (GTK_BOX (hb), gg->subset_ui.random_entry,
         true, true, 2);
 
-      gtk_box_pack_start (GTK_BOX (hb),
-        gtk_label_new ("out of"),
+      gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("out of"),
         false, false, 2);
 
       /*-- data size --*/
@@ -434,6 +433,17 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
                           GTK_SIGNAL_FUNC (include_all_cb),
                           (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
+
+      /*-- Close button --*/
+      gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(), false, true, 2);
+      hb = gtk_hbox_new (false, 2);
+      gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
+
+      btn = gtk_button_new_with_label ("Close");
+      gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                          GTK_SIGNAL_FUNC (close_window_cb), (ggobid *) gg);
+      gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
+
     }  /*-- if window == NULL --*/
 
     /*

@@ -61,13 +61,8 @@ degree_cb (GtkAdjustment *adj, ggobid *gg) {
   }
 }
 
-/*-- called when closed from the button --*/
 static void
-close_cb (GtkWidget *w ) {
-  gtk_widget_hide (w);
-}
-/*-- called when closed from the window manager --*/
-static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
+close_window_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
   gtk_widget_hide (gg->jitter_ui.window);
 }
 
@@ -96,7 +91,7 @@ void
 jitter_window_open (ggobid *gg) {
 
   GtkWidget *btn, *lbl;
-  GtkWidget *vbox, *vb;
+  GtkWidget *vbox, *vb, *hb;
   GtkWidget *sbar, *opt;
   GtkObject *adj;
   datad *d;
@@ -123,7 +118,7 @@ jitter_window_open (ggobid *gg) {
 
       gg->jitter_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
       gtk_signal_connect (GTK_OBJECT (gg->jitter_ui.window), "delete_event",
-                          GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
+                          GTK_SIGNAL_FUNC (close_window_cb), (gpointer) gg);
       gtk_window_set_title (GTK_WINDOW (gg->jitter_ui.window), "jitter data");
     
       gtk_container_set_border_width (GTK_CONTAINER (gg->jitter_ui.window), 10);
@@ -170,11 +165,14 @@ jitter_window_open (ggobid *gg) {
                             (GtkSignalFunc) type_cb, gg);
 
       /*-- Close button --*/
+      gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(), false, true, 2);
+      hb = gtk_hbox_new (false, 2);
+      gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
+
       btn = gtk_button_new_with_label ("Close");
-      gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
-                                 (GtkSignalFunc) GTK_SIGNAL_FUNC (close_cb),
-                                 (GtkObject*) gg->jitter_ui.window);
-      gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);
+      gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                          GTK_SIGNAL_FUNC (close_window_cb), gg);
+      gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
     }
 
     gtk_widget_show_all (gg->jitter_ui.window);

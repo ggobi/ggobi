@@ -344,7 +344,7 @@ void scree_plot_make (datad *d, ggobid *gg)
 void
 sphere_panel_open (ggobid *gg)
 {
-  GtkWidget *frame0, *main_vbox, *vbox, *table, *frame, *hbox;
+  GtkWidget *frame0, *vbox, *vb, *hb, *table, *frame, *hbox;
   GtkWidget *label;
   GtkWidget *spinner;
   datad *d;
@@ -372,13 +372,13 @@ sphere_panel_open (ggobid *gg)
     gtk_container_set_border_width (GTK_CONTAINER (gg->sphere_ui.window), 10);
 
     /*-- partition the screen vertically: scree plot, choose nPCs, apply --*/
-    main_vbox = gtk_vbox_new (false, 2);
-    gtk_container_add (GTK_CONTAINER (gg->sphere_ui.window), main_vbox);
+    vbox = gtk_vbox_new (false, 2);
+    gtk_container_add (GTK_CONTAINER (gg->sphere_ui.window), vbox);
 
     /*-- element 1: update scree plot when n selected vars changes --*/
     btn = gtk_button_new_with_label ("Update scree plot");
     GGobi_widget_set (btn, gg, true);
-    gtk_box_pack_start (GTK_BOX (main_vbox), btn,
+    gtk_box_pack_start (GTK_BOX (vbox), btn,
       false, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Update scree plot when a new set of variables is selected, or when variables are transformed",
@@ -387,7 +387,7 @@ sphere_panel_open (ggobid *gg)
                         GTK_SIGNAL_FUNC (scree_update_cb), d);
 
     hbox = gtk_hbox_new (false, 2);
-    gtk_box_pack_start (GTK_BOX (main_vbox), hbox, false, false, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
 
     gtk_box_pack_start (GTK_BOX (hbox),
       gtk_label_new ("Variables standardized?"),
@@ -405,21 +405,21 @@ sphere_panel_open (ggobid *gg)
                         (GtkSignalFunc) vars_stdized_cb,
                         (gpointer) d);
 
-    /*-- element 2 of main_vbox: scree plot --*/
+    /*-- element 2 of vbox: scree plot --*/
     frame = gtk_frame_new ("Scree plot");
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
-    gtk_box_pack_start (GTK_BOX (main_vbox), frame, true, true, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 2);
 
     /*-- stick a box in here so we can control the border width --*/
-    vbox = gtk_vbox_new (false, 2);
-    gtk_container_set_border_width (GTK_CONTAINER (vbox), 4);
-    gtk_container_add (GTK_CONTAINER (frame), vbox);
+    vb = gtk_vbox_new (false, 2);
+    gtk_container_set_border_width (GTK_CONTAINER (vb), 4);
+    gtk_container_add (GTK_CONTAINER (frame), vb);
  
     gg->sphere_ui.scree_da = gtk_drawing_area_new ();
     gtk_drawing_area_size (GTK_DRAWING_AREA (gg->sphere_ui.scree_da),
       SCREE_WIDTH, SCREE_HEIGHT);
-    gtk_box_pack_start (GTK_BOX (vbox), gg->sphere_ui.scree_da,
+    gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.scree_da,
                         true, true, 1);
 
     gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.scree_da),
@@ -431,10 +431,10 @@ sphere_panel_open (ggobid *gg)
                         (GtkSignalFunc) scree_configure_cb,
                         (gpointer) gg);
 
-    /*-- element 3 of main_vbox: controls in a labelled frame --*/
+    /*-- element 3 of vbox: controls in a labelled frame --*/
     frame0 = gtk_frame_new ("Prepare to sphere");
     gtk_frame_set_shadow_type (GTK_FRAME (frame0), GTK_SHADOW_ETCHED_OUT);
-    gtk_box_pack_start (GTK_BOX (main_vbox), frame0, false, false, 1);
+    gtk_box_pack_start (GTK_BOX (vbox), frame0, false, false, 1);
 
     table = gtk_table_new (3, 2, false);
     gtk_table_set_col_spacings (GTK_TABLE (table), 4);
@@ -503,15 +503,15 @@ sphere_panel_open (ggobid *gg)
     frame = gtk_frame_new ("Sphere");
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
-    gtk_box_pack_start (GTK_BOX (main_vbox), frame, false, false, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 2);
 
-    vbox = gtk_vbox_new (false, 2);
-    gtk_container_set_border_width (GTK_CONTAINER (vbox), 4);
-    gtk_container_add (GTK_CONTAINER (frame), vbox);
+    vb = gtk_vbox_new (false, 2);
+    gtk_container_set_border_width (GTK_CONTAINER (vb), 4);
+    gtk_container_add (GTK_CONTAINER (frame), vb);
 
     /*-- last: after choosing nPCs, the apply button --*/
     gg->sphere_ui.apply_btn = gtk_button_new_with_label ("Apply sphering");
-    gtk_box_pack_start (GTK_BOX (vbox), gg->sphere_ui.apply_btn,
+    gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.apply_btn,
       false, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.apply_btn,
       "Apply principal components transformation to the selected variables",
@@ -523,7 +523,7 @@ sphere_panel_open (ggobid *gg)
     scrolled_window = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
       GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_box_pack_start (GTK_BOX (vbox), scrolled_window,
+    gtk_box_pack_start (GTK_BOX (vb), scrolled_window,
       true, true, 0);
 
     gg->sphere_ui.clist = gtk_clist_new_with_titles (1, titles);
@@ -545,13 +545,16 @@ sphere_panel_open (ggobid *gg)
       NULL);
     gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.restore_btn), "clicked",
                         GTK_SIGNAL_FUNC (scree_restore_cb), d);
-    gtk_box_pack_start (GTK_BOX (vbox), gg->sphere_ui.restore_btn,
+    gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.restore_btn,
       false, false, 0);
 
     /*-- close button --*/
+    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(), false, true, 2);
+    hb = gtk_hbox_new (false, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
+
     btn = gtk_button_new_with_label ("Close");
-    gtk_box_pack_start (GTK_BOX (main_vbox), btn,
-      false, false, 0);
+    gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Close the sphering window", NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",

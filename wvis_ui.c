@@ -73,9 +73,9 @@ wvis_init (ggobid  *gg)
 
 
 static void
-delete_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
+close_window_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
-  gtk_widget_hide (w);
+  gtk_widget_hide (gg->wvis.window);
 }
 
 /*
@@ -454,7 +454,7 @@ wvis_window_open (ggobid *gg) {
     gtk_window_set_title (GTK_WINDOW (gg->wvis.window),
       "brushing by weights");
     gtk_signal_connect (GTK_OBJECT (gg->wvis.window),
-      "delete_event", GTK_SIGNAL_FUNC (delete_cb), gg);
+      "delete_event", GTK_SIGNAL_FUNC (close_window_cb), gg);
 
     vbox = gtk_vbox_new (false, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 3);
@@ -566,6 +566,17 @@ wvis_window_open (ggobid *gg) {
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (scale_apply_cb), gg);
 
+    /*-- add a close button --*/
+    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(), false, true, 2);
+    hb = gtk_hbox_new (false, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
+
+    btn = gtk_button_new_with_label ("Close");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Close the window", NULL);
+    gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 2);
+    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                        GTK_SIGNAL_FUNC (close_window_cb), gg);
   }
 
   gtk_widget_show_all (gg->wvis.window);
