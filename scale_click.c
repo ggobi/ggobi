@@ -9,22 +9,52 @@
     it without violating AT&T's intellectual property rights.
 */
 
+#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include <math.h>
 #include "vars.h"
 #include "externs.h"
+
+
+void
+pan_step_key (splotd *sp, guint keyval, ggobid *gg)
+{
+  greal dx, dy;
+  greal scale_x, scale_y;
+  greal precis = (greal) PRECISION1;
+  greal diff;
+
+  if (keyval == GDK_Left || keyval == GDK_Right) {
+    dx = (greal) fabs(sp->mousepos.x - sp->max.x/2);
+    scale_x = (greal) sp->scale.x;
+    scale_x /= 2;
+    sp->iscale.x = (greal) sp->max.x * scale_x;
+    diff = (dx * precis / sp->iscale.x);
+    if (keyval == GDK_Left)
+      sp->pmid.x += diff;
+    else sp->pmid.x -= diff;
+  } else if (keyval == GDK_Down || keyval == GDK_Up) {
+    dy = (greal) fabs(sp->mousepos.y - sp->max.y/2);
+    scale_y = (greal) sp->scale.y;
+    scale_y /= 2;
+    sp->iscale.y = (greal) sp->max.y * scale_y;
+    diff = (dy * precis / sp->iscale.y);
+    if (keyval == GDK_Down)
+      sp->pmid.y += diff;
+    else sp->pmid.y -= diff;
+  }
+
+}
 
 void
 pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 {
   greal dx, dy;
   greal scale_x, scale_y;
-  /*cpaneld *cpanel = &gg->current_display->cpanel;*/
   greal precis = (greal) PRECISION1;
 
   if (pan_opt == P_OBLIQUE || pan_opt == P_HORIZ) {
     dx = (greal) (sp->mousepos.x - sp->max.x/2);
-    /*    scale_x = (greal)
-	  ((cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x);*/
     scale_x = (greal) sp->scale.x;
     scale_x /= 2;
     sp->iscale.x = (greal) sp->max.x * scale_x;
@@ -34,8 +64,6 @@ pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 
   if (pan_opt == P_OBLIQUE || pan_opt == P_VERT) {
     dy = (greal) (sp->mousepos.y - sp->max.y/2);
-    /*    scale_y = (greal)
-	  ((cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y);*/
     scale_y = (greal) sp->scale.y;
     scale_y /= 2;
     sp->iscale.y = (greal) sp->max.y * scale_y;
@@ -46,11 +74,6 @@ pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 void
 zoom_step (splotd *sp, gint zoom_opt, gint in_or_out, rectd *rect, ggobid* gg)
 {
-/*
-  gint projection = projection_get (gg);
-  gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
-  gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;
-*/
   gfloat *scale_x = &sp->scale.x;
   gfloat *scale_y = &sp->scale.y;
   gfloat scalefac_x = 1.0, scalefac_y = 1.0;

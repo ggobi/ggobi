@@ -333,6 +333,7 @@ gboolean   p1d_varsel (splotd *, gint, gint *, gint, gint);
 gint       p1dcycle_func (ggobid *gg);
 void       pan_by_drag (splotd *, ggobid *);
 void       pan_step (splotd *, gint, ggobid *);
+void       pan_step_key (splotd *sp, guint keyval, ggobid *gg);
 void       parcoords_cpanel_init (cpaneld*, ggobid *);
 void       parcoords_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *, gboolean);
 displayd*  parcoords_new (gboolean, gint, gint *, datad *, ggobid *);

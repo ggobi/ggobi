@@ -196,7 +196,7 @@ static void zoomoptions_cb (GtkWidget *w, gpointer cbd)
 }
 
 /*--------------------------------------------------------------------*/
-/*      Handling keyboard and mouse events in the plot window         */
+/*      Handling keyooooboard and mouse events in the plot window         */
 /*--------------------------------------------------------------------*/
 
 static gint
@@ -221,6 +221,13 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
           if (event->keyval == GDK_space) {
             pan_step (sp, cpanel->scale_pan_opt, gg);
             redraw = true;
+          } else if (event->keyval == GDK_Up || 
+                     event->keyval == GDK_Down || 
+                     event->keyval == GDK_Left ||
+		     event->keyval == GDK_Right) 
+          {
+	    pan_step_key (sp, event->keyval, gg);
+	    redraw = true;
           }
           break;
         case ZOOM:
@@ -445,7 +452,7 @@ cpanel_scale_make (ggobid *gg) {
   gtk_widget_set_sensitive (pan_radio, false);
   GTK_TOGGLE_BUTTON (pan_radio)->active = true;
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), pan_radio,
-    "Pan: Hit the space bar to pan. A vector drawn on the plot dictates direction and distance. Drag the mouse to control the vector, and keep it small.  To reset, use `Reset pan' under the main menubar",
+    "Pan: Hit the space bar to pan. A vector drawn on the plot dictates direction and distance. Drag the mouse to control the vector, and keep it small. The arrow keys work, too.  To reset, use `Reset pan' under the main menubar",
     NULL);
   gtk_signal_connect (GTK_OBJECT (pan_radio), "toggled",
                       GTK_SIGNAL_FUNC (clickoptions_cb), gg);
