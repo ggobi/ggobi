@@ -198,7 +198,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   const gchar *const *gnames = GGOBI(getOpModeNames)(&k);
   datad *d = display->d;
   datad *e = display->e;
-  gboolean missing;
+  /*gboolean missing;*/
   icoords scr;
   fcoords tfmin, tfmax;
   fcoords pmin, pmax;
@@ -332,6 +332,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
 
   /* missingness */
+  /*
   if (d->nmissing > 0) {
     OPEN_NAMED_C(fp, "missing");
     for (m=0; m<d->nrows_in_plot; m++) {
@@ -347,6 +348,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     }
     CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
   }
+  */
   CLOSE_LIST(fp);  /* points */
   ADD_COMMA(fp);
   ADD_CR(fp);
@@ -356,7 +358,13 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   if (projection == P1PLOT) {
     OPEN_NAMED_LIST(fp, "p1plotparams");
     vt = vartable_element_get (sp->p1dvar, d);
-    fprintf (fp, "label='%s'", vt->collab_tform);
+    fprintf (fp, "label='%s',", vt->collab_tform);
+    /* type: TEXTURE=0, ASH=1 */
+    fprintf (fp, "type=%d,", cpanel->p1d.type);
+    /* plot orientation: HORIZONTAL=0, VERTICAL=1 */
+    fprintf (fp, "orientation=%d,", display->p1d_orientation);
+    /* whether we're drawing line segments */
+    fprintf (fp, "lines=%d", cpanel->p1d.ASH_add_lines_p);
     CLOSE_LIST(fp); /* p1plotparams */
   } else if (projection == XYPLOT) {
     OPEN_NAMED_LIST(fp, "xyplotparams");
