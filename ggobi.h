@@ -239,9 +239,10 @@ struct _ggobid {
 */
 
  struct _Transformation {
+   GtkWidget *window;
    GtkWidget *stage0_opt, *stage1_opt, *stage2_opt;
    GtkAdjustment *boxcox_adj;
- } tform;
+ } tform_ui;
 
  struct _Sphere {
    GtkWidget *window;
@@ -252,6 +253,8 @@ struct _ggobid {
    GtkWidget *scree_da;
    GdkPixmap *scree_pixmap;
 
+   /*-- a pointer to be compared with current_display->d --*/
+   datad *d;
  } sphere_ui;
 
 /*-------------------- subsetting ------------------------------------*/

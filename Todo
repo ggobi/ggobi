@@ -11,9 +11,10 @@ API code needed:
   sticky labels
   imputation of missing values
 
-datad:
+sphering:
   sphering needs to check whether the d it's working with has
-  changed
+     changed
+  the interface is still a bit confusing; talk to Andreas
 
 various stuff not yet implemented: 
   1d, xy cycling  .... or leave it as a demo in R for now?
@@ -21,8 +22,6 @@ various stuff not yet implemented:
   row groups are only partially implemented; line groups
     will wait until we know what we want to do about lines.
 
-the sphering transformation has some bugs, and the interface
- is still confusing
 
 when brushing or identifying in parcoords, use leave/enter events to
   change the current_splot.
