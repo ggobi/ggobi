@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1></h1>
+
+<dl>
+
+  <dt> Support for listing dependent plugins.
+  <dd>
+       In the GGobiPluginDetails structure
+       but not utilized yet.
+
+  <dt> Figure out where the Gtk-CRITICAL errors are coming from
+      
+  <dd> Use the RandomPlugin class.
+       ggobi --datamode=jrand
+</dl>
+
+
+<h2>Fixed</h2>
+<dl>
+
+  <dt> Implement general plugin methods.
+
+  <dd> 
+  Done.
+<br>
+      Need way to invoke the onLoad and onUnload.
+      <br>
+      We can really do away with the OnCreate method.
+      It is the constructor
+        
+  
+  <dt> Mechanism to force the immediate loading of a class.
+  <dd> Can hijack the PluginDetails for the JVM plugin.
+      <br>
+   Usual mechanism works now that we have a separate Details
+      section for each plugin.
+      
+  <dt> Fix the class names if they have . instead of /
+  <dd> fixJavaClassName()
+
+      
+</dl>
+
+
+<hr>
+<address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Mon Nov 19 15:47:09 EST 2001
+<!-- hhmts end -->
+</body> </html>

@@ -475,12 +475,12 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 
   getPluginSymbols(node, plugin, doc);
 
+     /* Weird casting going on here to avoid a void*. */
+  getPluginLanguage(node, (GGobiInputPluginInfo*) plugin, GENERAL_PLUGIN, info);
+
   if(load) {
     loadPluginLibrary(plugin->details, plugin);
   }
-
-     /* Weird casting going on here to avoid a void*. */
-  getPluginLanguage(node, (GGobiInputPluginInfo*) plugin, GENERAL_PLUGIN, info);
 
   return(plugin);
 }
@@ -573,6 +573,17 @@ getPluginDetails(xmlNodePtr node, GGobiPluginDetails *plugin, xmlDocPtr doc)
  return(load);
 }
 
+void
+fixJavaClassName(char *name)
+{
+    char *p = name;
+    
+    while(p && (p = strchr(p, '.')) != NULL) {
+        p[0] = '/';
+	p++;
+    }
+}
+
 void *
 getPluginLanguage(xmlNodePtr node,GGobiInputPluginInfo *iplugin, GGobiPluginType type, GGobiInitInfo *info)
 {
@@ -589,6 +600,8 @@ getPluginLanguage(xmlNodePtr node,GGobiInputPluginInfo *iplugin, GGobiPluginType
 
 	  tmp = xmlGetProp(node, "class");
 	  data->className = g_strdup(tmp); 
+          fixJavaClassName(data->className);
+
           if(type == INPUT_PLUGIN) {
 	      iplugin->data = data;
 	      iplugin->getDescription = g_strdup("JavaGetInputDescription");
