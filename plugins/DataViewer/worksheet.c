@@ -397,7 +397,8 @@ monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkSheet *sheet)
 void 
 add_ggobi_data(datad *data, GtkWidget *w)
 {
-  gint i, j;
+  gint i, j, k, level;
+  gboolean level_ok;
   GtkSheet *sheet;
   const gfloat **raw;
   vartabled *vt;
@@ -436,16 +437,28 @@ add_ggobi_data(datad *data, GtkWidget *w)
     /* */
 
     for(j = 0; j < data->ncols; j++) {
-      char buf[40];
+      char buf[128];
       vartabled *vt;
       vt = g_slist_nth_data(data->vartable, j);
       if(data->nmissing && data->missing.vals[i][j])
            sprintf(buf, "<NA>");
       else {
-         if(vt->vartype == categorical) 
-          sprintf(buf,"%s", vt->level_names[(int) raw[i][j]]);
-         else 
+         if(vt->vartype == categorical)  {
+          level_ok = false;
+          for (k=0; k<vt->nlevels; k++) {
+            if ((gint)raw[i][j] == vt->level_values[k]) {
+              level = k;
+              level_ok = true;
+              break;
+            }
+          }
+          if (level_ok)
+            sprintf(buf, "%s", vt->level_names[level]);
+          else
+            sprintf(buf, "%s", "improper level");
+         } else  {
           sprintf(buf, "%.3g", raw[i][j]);
+         }
       }
       gtk_sheet_set_cell(sheet, i, j, GTK_JUSTIFY_RIGHT, buf);
     }
