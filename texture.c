@@ -281,7 +281,7 @@ CurrentGGobi = NULL;
      /*for(k = h; k-mid+window < ny; k = k+window)*/ /* bug */
      for (k = h; k-mid+window < ny && k+window < ny; k = k+window)
        if (yy[k+window] > yy[h] + 10.*delta)
-  	    break;
+          break;
     if (k-mid+window >= ny)
       break;
     hh = h - mid;
@@ -308,8 +308,8 @@ CurrentGGobi = NULL;
 */
   for (i=1; i<ny-1; i++) {
     if (( yy[i] - yy[i-1] > delta) && (yy[i+1] - yy[i] > delta)) {
-  	  shft[i] = 50;
-  	}
+      shft[i] = 50;
+    }
   }
 
   for (i=1; i<ny-2; i++) {
@@ -317,9 +317,9 @@ CurrentGGobi = NULL;
         (yy[i+2] - yy[i+1] > delta) &&
         (yy[i+1] - yy[i] < delta))
     {
-  	  shft[i]   = 30;
-  	  shft[i+1] = 70;
-  	}
+      shft[i]   = 30;
+      shft[i+1] = 70;
+    }
   }
 
 
