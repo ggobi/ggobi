@@ -11,6 +11,7 @@ Plugins
   they are loaded. Need to set the loaded flag when we indirectly
   call load library.
 
+Demo data files:  Where should they go?  R-ggobi?  Docs?
 
 If read xml file from a URL, then want to compute the relative files
 by filling out the InputDescription. See fileset_generate....
@@ -24,6 +25,7 @@ Colors:
        1) resolve file references relative to the data file being read;
        2) can read <colormap> (or whatever they should be named) inlined within
           the <activeColorScheme>.
+    Should this and other specifications be in ggobidata or data?
 
   Fix the names and ids in the color map specification. Need to
   determine what is the relationship between these.
@@ -128,12 +130,6 @@ I/O -- the biggest part is now in place.  extend
   user options to write_xml.  Add the ability to extend the
   current file set by one or more files.  (wait until the
   dtd has been redesigned to handle multiple datad objects)
-
-Variable manipulation table
-  If a variable is categorical, show the mapping between its
-    numerical values and its level names.  Another popup?
-    Maybe the variable table can be represented in a tree in
-    gtk2.0.
 
 saving plots as .svg files
   work out how to do nested transformations for printing parcoords
@@ -384,3 +380,9 @@ Food for thought:
 !   in the variable circles?)
 
 ! Do we need rotation at all?  -- added
+
+!Variable manipulation table
+!  If a variable is categorical, show the mapping between its
+!    numerical values and its level names.  Another popup?
+!    Maybe the variable table can be represented in a tree in
+!    gtk2.0.
