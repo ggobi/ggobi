@@ -7,7 +7,7 @@ endif
 # -rpath or --rpath?  The compiler on fry accepts -rpath.
 
 -include $(GGOBI_HOME)/local.config
-include local.config
+-include local.config
 
 
 # On some platforms, we will need to link the plugin against libggobi.so
