@@ -69,8 +69,7 @@
 #include "GGobiAPI.h"
 
 
-/* Make unstatic/global if need arises. */
-static gboolean checkLevelValue(vartabled *vt, double value);
+gint checkLevelValue(vartabled *vt, double value);
 
 void setColorScheme(const xmlChar **attrs, XMLParserData *data);
 
