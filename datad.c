@@ -111,8 +111,9 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
     varpanel_clear (d, gg);
   }
 
-  varpanel_checkboxes_populate (d, gg);    /*-- checkboxes --*/
-  varcircles_populate (d, gg);  /*-- circles: build but don't show --*/
+  varpanel_checkboxes_populate (d, gg);
+  /*-- circles: build but don't show --*/
+  varcircles_populate (d, gg);
 
   rowidv_init (d);  /*-- initialize the rowid vector --*/
 
@@ -127,26 +128,27 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
     /*-- initialize the first display --*/
     if(sessionOptions->info->createInitialScatterPlot) {
-	display = scatterplot_new (false, NULL, d, gg);
+      display = scatterplot_new (false, NULL, d, gg);
         /* Need to make certain this is the only one there. */
 
-	if (display != NULL) {
-	    gg->displays = g_list_append (gg->displays, (gpointer) display);
-	    display_set_current (display, gg);
-	    gg->current_splot = (splotd *)
-		g_list_nth_data (gg->current_display->splots, 0);
-	    display->current_splot = gg->current_splot;
+      if (display != NULL) {
+        gg->displays = g_list_append (gg->displays, (gpointer) display);
+        display_set_current (display, gg);
+        gg->current_splot = (splotd *)
+        g_list_nth_data (gg->current_display->splots, 0);
+        display->current_splot = gg->current_splot;
 
-	    /*-- turn on event handling in the very first plot --*/
-	    /*-- ... but will it cause trouble for later plots?  ok so far --*/
-	    sp_event_handlers_toggle (gg->current_splot, on);
-	}
+        /*-- turn on event handling in the very first plot --*/
+        /*-- ... but will it cause trouble for later plots?  ok so far --*/
+        sp_event_handlers_toggle (gg->current_splot, on);
+      }
     }
   }
 
   varpanel_refresh (gg);
 
-  gtk_signal_emit (GTK_OBJECT (gg->main_window), GGobiSignals[DATAD_ADDED_SIGNAL], d, gg); 
+  gtk_signal_emit (GTK_OBJECT (gg->main_window),
+    GGobiSignals[DATAD_ADDED_SIGNAL], d, gg); 
 
   return (display);
 }

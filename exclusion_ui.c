@@ -23,9 +23,11 @@ static void destroyit (gboolean kill, ggobid *gg) {
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
-    nrows = GTK_TABLE (d->cluster_table)->nrows;
-    for (n=0; n<nrows-1; n++)
-      cluster_free (n, d, gg);
+    if (d->cluster_table) {
+      nrows = GTK_TABLE (d->cluster_table)->nrows;
+      for (n=0; n<nrows-1; n++)
+        cluster_free (n, d, gg);
+    }
   }
 
   if (kill) {
@@ -108,7 +110,7 @@ static void rescale_cb (GtkWidget *w, ggobid *gg) {
   vartable_stats_set (d);
 
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);  /*-- points rebinned in here --*/
+  displays_tailpipe (REDISPLAY_ALL, FULL, gg);  /*-- points rebinned --*/
 }
 
 

@@ -6,15 +6,17 @@
 void
 test_variable_select(GtkWidget *w, gint whichVar, datad *d, splotd *sp, ggobid *gg, char *val)
 {
-    vartabled *vartab = g_slist_nth_data(d->vartable, whichVar);
-    fprintf(stderr, "Selected variable: %d %s in %s.  User value %s. # plots in display %d\n", 
-                      whichVar, vartab->collab, d->name, val, g_list_length(sp->displayptr->splots));
+  vartabled *vartab = g_slist_nth_data(d->vartable, whichVar);
+  fprintf(stderr,
+    "Selected variable: %d %s in %s.  User value %s. # plots in display %d\n", 
+    whichVar, vartab->collab, d->name, val,
+    g_list_length(sp->displayptr->splots));
 }
 
 void
 test_point_move_cb(char *userData, splotd *sp, GdkEventMotion *ev, ggobid *gg, GtkWidget *w)
 {
-    fprintf(stderr, "Moving a point\n");fflush(stderr);
+  fprintf(stderr, "Moving a point\n");fflush(stderr);
 }
 
 void
@@ -40,5 +42,6 @@ test_new_plot_cb(void *userData, splotd *sp, ggobid *gg, GtkWidget *srcWidget)
 void
 test_data_add_cb(GtkWidget *w, datad *d,  ggobid *gg, gpointer data)
 {
+  g_printerr ("(test_data_add_cb) adding datad\n");
   gtk_signal_connect(GTK_OBJECT(gg->main_window), "select_variable", test_variable_select, "My String");
 }

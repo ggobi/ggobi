@@ -616,10 +616,31 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
 
   if (k < 0 || k >= d->nrows) return;
 
+/*
+ * Should I put this stuff into a separate function and put
+ * the function back into identify_ui.c ??  Probably.
+ * Something like this:
+
+  lbl = identify_label_fetch (k, cpanel, d, gg);
+
+*/
+  
+
   /*-- add the label last so it will be in front of other markings --*/
   if (cpanel->identify_display_type == ID_CASE_LABEL)
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
-  else {
+  else if (cpanel->identify_display_type == ID_VAR_LABELS) {
+    GtkWidget *clist =
+      get_clist_from_object (GTK_OBJECT (gg->control_panel[IDENT]));
+    gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+    gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+    for (j=0; j<nvars; j++) {
+      if (j == 0)
+        lbl = g_strdup_printf ("%g", d->tform.vals[k][vars[j]]);
+      else
+        lbl = g_strdup_printf ("%s, %g", lbl, d->tform.vals[k][vars[j]]);
+    }
+  } else {
     switch (proj) {
       case P1PLOT:
         lbl = g_strdup_printf ("%g", d->tform.vals[k][sp->p1dvar]);

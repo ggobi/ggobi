@@ -300,13 +300,15 @@ void scale_set_default_values (GtkScale *scale)
 /*--------------------------------------------------------------------*/
 
 void
-variable_notebook_subwindow_add (datad *d, GtkSelectionMode mode, 
+variable_notebook_subwindow_add (datad *d,
   GtkSignalFunc func, GtkWidget *notebook, ggobid *gg)
 {
   GtkWidget *swin, *clist;
   gint j;
   gchar *row[1];
   vartabled *vt;
+  GtkSelectionMode mode = (GtkSelectionMode)
+    gtk_object_get_data (GTK_OBJECT(notebook), "SELECTION");
 
   if (d->ncols == 0)
     return;
@@ -339,28 +341,10 @@ variable_notebook_subwindow_add (datad *d, GtkSelectionMode mode,
 static void variable_notebook_adddata_cb (GtkObject *obj, datad *d,
   ggobid *gg, GtkWidget *notebook)
 {
-  /*
-   * Get the mode and func from the first notebook page?
-   * func is null except in wvis_ui.c
-  */
-  GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0);
-  GtkSelectionMode mode = GTK_SELECTION_SINGLE;
   GtkSignalFunc func = NULL;
-  if (swin) {
-    GtkWidget *clist;
-    clist = GTK_BIN (swin)->child;
-    if (clist) {
-      mode = GTK_CLIST(clist)->selection_mode;
-      /*
-       * should also be possible to retrieve the signal function that
-       * responds to "select_row" signal  ... but alas, it isn't.
-       * See wvis_ui.c to see how to handle this.
-      */
-    }
-    variable_notebook_subwindow_add (d, mode, func, notebook, gg);
-    gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
-                                g_slist_length (gg->d) > 1);
-  }
+  variable_notebook_subwindow_add (d, func, notebook, gg);
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
+                              g_slist_length (gg->d) > 1);
 }
 
 GtkWidget *
@@ -458,11 +442,12 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
+  gtk_object_set_data (GTK_OBJECT(notebook), "SELECTION", (gpointer) mode);
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (g_slist_length (d->vartable)) {
-      variable_notebook_subwindow_add (d, mode, func, notebook, gg);
+      variable_notebook_subwindow_add (d, func, notebook, gg);
     }
   }
 

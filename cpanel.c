@@ -110,7 +110,8 @@ barchart_cpanel_init (cpaneld* cpanel, ggobid *gg) {
 #endif
 
 void
-cpanel_set (displayd *display, ggobid *gg) {
+cpanel_set (displayd *display, ggobid *gg)
+{
   cpaneld *cpanel = &display->cpanel;
   extern void cpanel_tour1d_set (cpaneld *, ggobid *);
   extern void cpanel_tour2d_set (cpaneld *, ggobid *);

@@ -2,7 +2,7 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="1">
-<data numRecords="64">
+<data name="laser">
 <description>
 This data came from an investigation of an experimental laser at
 Bellcore.  It was a tunable laser, in the sense that both its

@@ -3,7 +3,7 @@
 
 <ggobidata count="2">
 
-<data name="/usr/dfs/xgobi/data_xgobi/cube6 1">
+<data name="cube6">
 <description>
 </description>
 <variables count="6">
@@ -211,7 +211,7 @@
 
 </data>
 
-<data name="/usr/dfs/xgobi/data_xgobi/cube6 2">
+<data name="cube6 edges">
 <description>
 </description>
 <variables count="0">

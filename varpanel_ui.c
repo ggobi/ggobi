@@ -167,7 +167,8 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   }
 
     /* Change the source object for this event to something more meaningful! */
-  gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[VARIABLE_SELECTION_SIGNAL], jvar, display->d, sp, gg);
+  gtk_signal_emit(GTK_OBJECT(gg->main_window),
+    GGobiSignals[VARIABLE_SELECTION_SIGNAL], jvar, display->d, sp, gg);
 
   /*-- overkill for scatmat: could redraw one row, one column --*/
   /*-- overkill for parcoords: need to redraw at most 3 plots --*/
@@ -434,9 +435,16 @@ varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
 
 /*-- respond to the addition of a new datad --*/
 #ifdef DATAD_ADDED_SIGNAL_IMPLEMENTED
-static void datad_added_cb (GtkWidget *w, ggobid *gg)
+static void datad_added_cb (GtkObject *obj, datad *d, ggobid *gg,
+  GtkWidget *notebook)
 {
+/*
   g_printerr ("varpanel_ui.notebook responds to datad_added signal\n");
+   I wanted to be able to move the calls to varpanel_checkboxes_populate()
+   and varcircles_populate() from datad_init() to here, but then the
+   sequence of functions gets messsed up and things break.  So it won't
+   be that simple.
+*/
 }
 #endif
 

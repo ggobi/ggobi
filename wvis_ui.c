@@ -35,7 +35,7 @@ extern void color_table_init_from_default (GdkColor *color_table,
 void selection_made_cb (GtkWidget *clist, gint row, gint column,
   GdkEventButton *event, ggobid *gg);
 extern void variable_notebook_addvar_cb (GtkWidget *notebook, ggobid *gg);
-extern void variable_notebook_subwindow_add (datad *d, GtkSelectionMode mode, 
+extern void variable_notebook_subwindow_add (datad *d,
   GtkSignalFunc func, GtkWidget *notebook, ggobid *gg);
 
 /*--------------------------------------------------------------------*/
@@ -66,7 +66,7 @@ static void wvis_variable_notebook_adddata_cb (GtkObject *obj, datad *d,
        * responds to "select_row" signal
       */
     }
-    variable_notebook_subwindow_add (d, mode, func, notebook, gg);
+    variable_notebook_subwindow_add (d, func, notebook, gg);
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
                                 g_slist_length (gg->d) > 1);
   }
@@ -90,7 +90,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (g_slist_length (d->vartable)) {
-      variable_notebook_subwindow_add (d, mode, func, notebook, gg);
+      variable_notebook_subwindow_add (d, func, notebook, gg);
     }
   }
 

@@ -22,6 +22,7 @@ else
  GGOBI_LIB=-L../.. -lggobi
 endif
 
+CFLAGS+=-INLINE:=ON
 
 ifdef GTK_EXTRA_CONFIG
  GTKEXTRA_INCLUDES=$(shell $(GTK_EXTRA_CONFIG) --cflags)

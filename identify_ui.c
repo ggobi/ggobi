@@ -109,7 +109,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
     gboolean changed = barchart_identify_bars (sp->mousepos, sp, d, gg);
 
     if (changed) {
-        displays_plot (NULL, QUICK, gg);
+      displays_plot (NULL, QUICK, gg);
     }
   } else {
 #endif
@@ -130,10 +130,10 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
     }
 
     {
-	GGobiPointMoveEvent ev;
-        ev.d = d;
-	ev.id = k;
-        gtk_signal_emit(GTK_OBJECT(w), GGobiSignals[IDENTIFY_POINT_SIGNAL], sp, &ev, gg); 
+      GGobiPointMoveEvent ev;
+      ev.d = d;
+      ev.id = k;
+      gtk_signal_emit(GTK_OBJECT(w), GGobiSignals[IDENTIFY_POINT_SIGNAL], sp, &ev, gg); 
     }
     d->nearest_point_prev = k;
   }
@@ -201,14 +201,25 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
 /*                   Making the control panel                           */
 /*----------------------------------------------------------------------*/
 
-static gchar *display_lbl[] = {"Case label", "Point coords"};
+static gchar *display_lbl[] = {
+  "Case label",
+  "Variable labels",
+  "Point coords"};
 void
 cpanel_identify_make(ggobid *gg) {
-  GtkWidget *btn;
-  GtkWidget *opt;
+  GtkWidget *btn, *opt;
+  GtkWidget *notebook;
   
   gg->control_panel[IDENT] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER(gg->control_panel[IDENT]), 5);
+
+  /*-- provide a variable list so that any variable can be the label --*/
+  notebook = create_variable_notebook (gg->control_panel[IDENT],
+    GTK_SELECTION_EXTENDED, (GtkSignalFunc) NULL, gg);
+    /*-- this comes out with single selection; think about it --*/
+    /*-- can make it a property of the notebook itself, actually --*/
+  gtk_object_set_data (GTK_OBJECT (gg->control_panel[IDENT]),
+    "notebook", notebook);
 
   /*-- option menu --*/
   opt = gtk_option_menu_new ();
