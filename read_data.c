@@ -22,10 +22,10 @@
 #define INITSTRSIZE 512
 
 
-/* Make certain this matches GlyphTypes. */
+/* Make certain this matches GlyphType. */
 const gchar * const GlyphNames[] = {
-/*          "+", "x", "or", "fr", "oc", "fc", ".", ""*/
-          "plus", "x", "or", "fr", "oc", "fc", ".", ""
+/*        ".", "plus", "x", "or", "fr", "oc", "fc", "" */
+          ".", "plus", "x", "or", "fr", "oc", "fc", ""
         };
 
 
