@@ -50,10 +50,8 @@ configure: configure.in
 endif
 
 
-distclean: clean
-	-rm -f $(PKG).so local.config
-	-rm -f configure config.status config.cache config.log
-
+distclean::
+	-rm -f local.config
 
 tmp:
 	@echo "$(XML_LIBS)"

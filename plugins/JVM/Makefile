@@ -54,20 +54,9 @@ OBJS=$(SRC:%=%.o)
 $(PKG).so: $(OBJS)
 	$(CC) -shared $(OBJS) -o $@ $(GGOBI_LIB)  $(EXTRA_LIBS)  $(shell $(GTK_CONFIG) --libs)
 
-clean:
-	rm -f *.o 
+distClean:: 
+	rm -f ggobi.class 
 
-distClean: clean
-	rm -f configure config.cache config.log config.status ggobi.class $(PKG).so
-
-local.config: configure local.config.in
-	if test -r local.config ; then cp local.config local.config.bak ; fi
-	./configure
-
-ifndef ADMIN
-configure: configure.in
-	autoconf
-endif
 
 
 ggobiAccess.o: ggobi_ggobi.h ggobi_datad.h

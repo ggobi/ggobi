@@ -77,8 +77,12 @@ clean:
 
 ifndef ADMIN
 local.config: local.config.in configure
-	if test -r local.config ; then cp local.config local.config.bak ; fi
-	./configure
+	if test -r local.config.in ; then \
+	   if test -r local.config ; then cp local.config local.config.bak ; fi  \
+	   ./configure \
+	else \
+	   touch $@
+	fi
 endif
 
 ifndef ADMIN
