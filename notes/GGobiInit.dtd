@@ -2,13 +2,13 @@
   This is the DTD for the GGobi initialization file.
  -->
 
-<!ENTITY % Boolean         " true | T | TRUE | false | F | FALSE ">
-<!ENTITY % PluginElements "(description, (version)?,author,dll,(dependencies)?)">
+<!ENTITY % Boolean         " (true | T | TRUE | false | F | FALSE )">
+<!ENTITY % PluginElements  "(description, (version)?, author, (options)?, (dll)?, (dependencies)?)">
 
-<!ELEMENT modename PCDATA>
+<!ELEMENT modeName (#PCDATA)>
 
-<!ELEMENT description #PCDATA>
-<!ELEMENT author      #PCDATA>
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT author      (#PCDATA)>
 <!ELEMENT dll         (init)>
 <!ATTLIST dll
    name CDATA #REQUIRED
@@ -25,10 +25,16 @@
    onCreate   		 CDATA #IMPLIED
    onClose    		 CDATA #IMPLIED
    onLoad     		 CDATA #IMPLIED
-   onUnLoad   		 CDATA #IMPLIED
+   onUnload   		 CDATA #IMPLIED
    onUpdateDisplayMenu   CDATA #IMPLIED
    description           CDATA #IMPLIED
+
+   read                  CDATA #IMPLIED
+   probe                 CDATA #IMPLIED
 >
+
+<!ELEMENT options ( (named)*,(args)*)>
+<!ELEMENT named   ANY>
 
 
 <!-- A plugin should have a name
@@ -42,17 +48,28 @@
      by which the user can specify the data, e.g. a database query, etc.
   -->
 
-<!ELEMENT inputPlugin  %PluginElements; >
+<!ELEMENT inputPlugin  (description, (version)?, author, modeName, (options)?, (dll)?, (dependencies)?) >
 <!ATTLIST inputPlugin
     name        CDATA     #REQUIRED
     interactive %Boolean;  #IMPLIED
     immediate   %Boolean;  #IMPLIED
+    load        (immediate|demand) #IMPLIED
+
+    language    CDATA     #IMPLIED
+    class       CDATA     #IMPLIED
 >
+
+
+<!ELEMENT plugins (plugin|inputPlugin)*>
 
 <!ELEMENT plugin  %PluginElements;>
 <!ATTLIST plugin
     name        CDATA     #REQUIRED
     immediate   %Boolean;  #IMPLIED
+    load        (immediate|demand) #IMPLIED
+
+    language    CDATA     #IMPLIED
+    class       CDATA     #IMPLIED
 >
 
 <!ELEMENT dependencies (dependency)*>
@@ -67,18 +84,23 @@
    data CDATA #IMPLIED
 >
 
+<!ELEMENT variable EMPTY>
+<!ATTLIST variable
+  name CDATA #REQUIRED
+>
+
 <!ELEMENT ggobi (display)*>
 <!ATTLIST ggobi
-    id  ID  #REQUIRED
+    id  NMTOKEN  #REQUIRED
 >
 
 <!ELEMENT ggobis (ggobi)*>
 
-<!ELEMENT host name>
-<!ELEMENT name PCDATA>
+<!ELEMENT host (name)>
+<!ELEMENT name (#PCDATA)>
 
-<!ELEMENT login PCDATA>
-<!ELEMENT query PCDATA>
+<!ELEMENT login (#PCDATA)>
+<!ELEMENT query (#PCDATA)>
 
 <!ELEMENT database (host,login,query)>
 <!ATTLIST database
@@ -100,18 +122,58 @@
 >
 
 
-<!ELEMENT preferences (browser*,colorschemes*,background*,foreground*,glyph*)>
+
+<!ELEMENT preferences (( (browser)| autoplot?| (allowNoDisplays)? | (quitOnLastGGobi)?| (numDefaultPlotVars)? | (colorschemes)?| (background)?|(foreground)?| (sessionFile)? | (glyph)?)*)>
+<!ELEMENT autoplot EMPTY>
+<!ELEMENT allowNoDisplays EMPTY>
+<!ELEMENT quitOnLastGGobi EMPTY>
+<!ELEMENT numDefaultPlotVars EMPTY>
+<!ATTLIST numDefaultPlotVars
+  scatmat   CDATA #IMPLIED
+  parcoords CDATA #IMPLIED
+>
+
+<!ELEMENT sessionFile EMPTY>
+<!ATTLIST sessionFile
+ name     CDATA #REQUIRED
+ compress CDATA #IMPLIED
+>
+
+<!ATTLIST autoplot 
+  on %Boolean; #REQUIRED
+>
+
+<!ATTLIST allowNoDisplays
+  on %Boolean; #REQUIRED
+>
+
+
+<!ATTLIST quitOnLastGGobi
+  on %Boolean; #REQUIRED
+>
+
+
+<!ELEMENT filename EMPTY>
+
+
 <!ELEMENT browser (executable,args)>
 <!ELEMENT args (arg)*>
-<!ELEMENT executable PCDATA>
+<!ELEMENT arg ANY>
+<!ELEMENT executable (#PCDATA)>
 
 <!ELEMENT colorschemes (colorscheme)*>
 <!ATTLIST colorschemes 
     file CDATA #IMPLIED
 >
 
-<!ELEMENT background (color)>
+<!ELEMENT background (color)?>
+
 <!ELEMENT foreground (color)>
+
+<!ELEMENT red (#PCDATA)>
+<!ELEMENT green (#PCDATA)>
+<!ELEMENT blue (#PCDATA)>
+
 
 <!ELEMENT color (red,green,blue)>
 <!ATTLIST color
@@ -130,3 +192,6 @@
 >
 
 <!ELEMENT ggobirc (preferences?, previousFiles, ggobis, plugins)>
+
+
+<!ELEMENT classpath (#PCDATA)>

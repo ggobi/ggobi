@@ -1,3 +1,5 @@
+XMLLINT=xmllint
+
 ifndef DVIPS
  DVIPS=dvips
 endif
@@ -28,3 +30,6 @@ endif
 	(TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $<)
 	-$(BIBTEX) $*
 	(TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $<)
+
+check:
+	$(XMLLINT) -dtdvalid GGobiInit.dtd -noout ggobirc
