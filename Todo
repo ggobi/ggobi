@@ -18,12 +18,21 @@ Smoothing
 
 API code
 
-Line editing
 Move points
+Line editing
+Rotation
 
 I/O
 
-Rotation
+Other displays
+
+Graphs
+  Edges with data: a separate region of the variable selection panel
+  Linking points to edges
+
+Maps
+  polygonal data
+
 
 ! it now works to start ggobi without an argument; a necessary step
 ! in the API preparation.
