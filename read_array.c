@@ -396,16 +396,20 @@ array_read (datad *d, ggobid *gg)
     strcpy (fname, (gchar *) gg->fname);
     strcat (fname, ".bin");
 
-    if ((fp = fopen (fname, "rb")) != NULL)
+    if ((fp = fopen (fname, "rb")) != NULL) {
       read_binary (fp, d, gg);
+      d->name = g_strdup(fname);
+    }
 
     /*
      * If not, look for an ASCII file
     */
     else {
       static gchar *suffixes[] = {"", ".dat"};
-      if ( (fp=open_ggobi_file_r (gg->fname, 2, suffixes, false)) != NULL)
+      if ( (fp=open_ggobi_file_r (gg->fname, 2, suffixes, false)) != NULL) {
         read_ascii (fp, d, gg);
+        d->name = g_strdup(gg->fname);
+      }
       else
         exit (1);
         
