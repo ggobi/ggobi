@@ -226,6 +226,7 @@ scatterplot_display_menus_make (displayd *display,
 
   /*-- Options menu --*/
   topmenu = submenu_make ("_Options", 'O', accel_group);
+  gtk_widget_set_name (topmenu, "DISPLAY:options_topmenu");
   /*-- add a tooltip --*/
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), topmenu,
     "Options menu for this display", NULL);
@@ -240,7 +241,8 @@ scatterplot_display_menus_make (displayd *display,
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
   item = CreateMenuCheck (options_menu, "Show axes",
-    func, GINT_TO_POINTER (DOPT_AXES), on, gg);
+    func, GINT_TO_POINTER (DOPT_AXES), display->options.axes_show_p, gg);
+  gtk_widget_set_name (item, "DISPLAY:show_axes");
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
   item = CreateMenuCheck (options_menu, "Show 2D tour axes as text",
