@@ -56,7 +56,7 @@ typedef struct {
  gboolean brush_on_p;
  gint br_mode;
  gint br_linkby;
- gint br_point_targets, br_edge_targets;
+ BrushTargetType br_point_targets, br_edge_targets;
 
 
  /*-- scaling --*/

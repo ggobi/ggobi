@@ -27,12 +27,7 @@
 #define BR_PERSISTENT 0
 #define BR_TRANSIENT  1
 /* br_point_targets and br_edge_targets */
-#define BR_OFF   0  /* don't respond */
-#define BR_CANDG 1  /* color and glyph (point or edge glyph) */
-#define BR_COLOR 2
-#define BR_GLYPH 3  /*-- glyph type and size --*/
-#define BR_GSIZE 4  /*-- glyph size only --*/
-#define BR_HIDE  5
+typedef enum {br_off, br_candg, br_color, br_glyph, br_gsize, br_hide, br_select} BrushTargetType;
 /* for binning the screen */
 #define BRUSH_NBINS  20
 #define BRUSH_MARGIN 10

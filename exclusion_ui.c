@@ -246,47 +246,51 @@ cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   for (k = 0; k < nclusters; k++) {
     if (k != n) {
       switch (targets) {
-      case BR_CANDG:
-        if (d->clusv[k].glyphtype == gg->glyph_id.type &&
-            d->clusv[k].glyphsize == gg->glyph_id.size &&
-            d->clusv[k].color == gg->color_id) {
-          proceed = false;
-          break;
-        }
+        case br_candg:
+          if (d->clusv[k].glyphtype == gg->glyph_id.type &&
+              d->clusv[k].glyphsize == gg->glyph_id.size &&
+              d->clusv[k].color == gg->color_id)
+          {
+            proceed = false;
+            break;
+          }
         break;
-      case BR_COLOR:
+        case br_color:
         /*
          * This would produce an identical cluster if the glyph
          * types and sizes of the clusters are already equal, and
          * the new glyph sizes would complete the match.
          */
-        if (d->clusv[k].glyphtype == d->clusv[n].glyphtype &&
-            d->clusv[k].glyphsize == d->clusv[n].glyphsize &&
-            d->clusv[k].color == gg->color_id) {
-          proceed = false;
-          break;
-        }
+          if (d->clusv[k].glyphtype == d->clusv[n].glyphtype &&
+              d->clusv[k].glyphsize == d->clusv[n].glyphsize &&
+              d->clusv[k].color == gg->color_id)
+          {
+            proceed = false;
+            break;
+          }
         break;
-      case BR_GLYPH:
-        if (d->clusv[k].color == d->clusv[n].color &&
-            d->clusv[k].glyphtype == gg->glyph_id.type &&
-            d->clusv[k].glyphsize == gg->glyph_id.size) {
-          proceed = false;
-          break;
-        }
+        case br_glyph:
+          if (d->clusv[k].color == d->clusv[n].color &&
+              d->clusv[k].glyphtype == gg->glyph_id.type &&
+              d->clusv[k].glyphsize == gg->glyph_id.size)
+          {
+            proceed = false;
+            break;
+          }
         break;
-      case BR_GSIZE:
+        case br_gsize:
         /*
          * This would produce an identical cluster if the colors
          * and glyph types of the clusters are already equal, and
          * the new glyph sizes would complete the match.
          */
-        if (d->clusv[k].color == d->clusv[n].color &&
-            d->clusv[k].glyphsize == d->clusv[n].glyphsize &&
-            d->clusv[k].glyphsize == gg->glyph_id.size) {
-          proceed = false;
-          break;
-        }
+          if (d->clusv[k].color == d->clusv[n].color &&
+              d->clusv[k].glyphsize == d->clusv[n].glyphsize &&
+              d->clusv[k].glyphsize == gg->glyph_id.size)
+          {
+            proceed = false;
+            break;
+          }
         break;
       }
     }
@@ -305,12 +309,12 @@ cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];
     if (d->clusterid.els[i] == n) {
-      if (targets == BR_CANDG || targets == BR_COLOR) {
+      if (targets == br_candg || targets == br_color) {
         d->color.els[i] = d->color_now.els[i] = gg->color_id;
         /*-- this will be done multiple times, but who cares? --*/
         d->clusv[n].color = gg->color_id;
       }
-      if (targets == BR_CANDG || targets == BR_GLYPH) {
+      if (targets == br_candg || targets == br_glyph) {
         d->glyph.els[i].type = d->glyph_now.els[i].type =
             gg->glyph_id.type;
         d->glyph.els[i].size = d->glyph_now.els[i].size =
@@ -319,7 +323,7 @@ cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
         d->clusv[n].glyphtype = gg->glyph_id.type;
         d->clusv[n].glyphsize = gg->glyph_id.size;
       }
-      if (targets == BR_GSIZE) {
+      if (targets == br_gsize) {
         d->glyph.els[i].size = d->glyph_now.els[i].size =
             gg->glyph_id.size;
         /*-- this will be done multiple times, but who cares? --*/

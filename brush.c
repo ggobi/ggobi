@@ -152,8 +152,8 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
   datad *d = dsp->d;
   datad *e = dsp->e;
   cpaneld *cpanel = &dsp->cpanel;
-  gboolean point_painting_p = (cpanel->br_point_targets != BR_OFF);
-  gboolean edge_painting_p = (cpanel->br_edge_targets != BR_OFF);
+  gboolean point_painting_p = (cpanel->br_point_targets != br_off);
+  gboolean edge_painting_p = (cpanel->br_edge_targets != br_off);
 
   if (point_painting_p) {
     for (m=0; m<d->nrows_in_plot; m++) {
@@ -381,8 +381,8 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
 */
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  gboolean point_painting_p = (cpanel->br_point_targets != BR_OFF);
-  gboolean edge_painting_p = (cpanel->br_edge_targets != BR_OFF);
+  gboolean point_painting_p = (cpanel->br_point_targets != br_off);
+  gboolean edge_painting_p = (cpanel->br_edge_targets != br_off);
   colorschemed *scheme = gg->activeColorScheme;
 
   brush_coords *brush_pos = &sp->brush_pos;
@@ -462,14 +462,14 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
       doit = (d->glyph_now.els[i].size != gg->glyph_id.size);
 
       /*-- ... and if not ignoring type --*/
-      if (!doit && cpanel->br_point_targets != BR_GSIZE) 
+      if (!doit && cpanel->br_point_targets != br_gsize) 
         doit = doit || (d->glyph_now.els[i].type != gg->glyph_id.type);
 
     } else {
 
       doit = (d->glyph_now.els[i].size != d->glyph.els[i].size);
       /*-- ... if not ignoring type --*/
-      if (cpanel->br_point_targets != BR_GSIZE) 
+      if (cpanel->br_point_targets != br_gsize) 
         doit = doit || (d->glyph_now.els[i].type != d->glyph.els[i].type);
     }
   }
@@ -482,21 +482,21 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
         case BR_PERSISTENT:
           d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
           /*-- ... if not ignoring type --*/
-          if (cpanel->br_point_targets != BR_GSIZE) 
+          if (cpanel->br_point_targets != br_gsize) 
             d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
         break;
 
         case BR_TRANSIENT:
           d->glyph_now.els[i].size = gg->glyph_id.size;
           /*-- ... if not ignoring type --*/
-          if (cpanel->br_point_targets != BR_GSIZE) 
+          if (cpanel->br_point_targets != br_gsize) 
             d->glyph_now.els[i].type = gg->glyph_id.type;
         break;
       }
     } else {
       d->glyph_now.els[i].size = d->glyph.els[i].size;
       /*-- ... if not ignoring type --*/
-      if (cpanel->br_point_targets != BR_GSIZE) 
+      if (cpanel->br_point_targets != br_gsize) 
         d->glyph_now.els[i].type = d->glyph.els[i].type;
     }
   }
@@ -589,7 +589,46 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   return (doit);
 }
 
+/*-- the opposite of hide --*/
+static gboolean
+update_selected_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
+  datad *d, ggobid *gg)
+{
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  gboolean doit = true;
 
+  /*
+   * First find out if this will result in a change; this in
+   * order to be able to return that information.
+  */
+  if (!changed) {
+    if (hit_by_brush[i])
+      doit = (d->hidden_now.els[i] == true);
+    else
+      doit = (d->hidden_now.els[i] == d->hidden.els[i]);
+  }
+  /* */
+
+/*
+ * If doit is false, it's guaranteed that there will be no change.
+*/
+
+  if (doit) {
+    if (hit_by_brush[i]) {
+      switch (cpanel->br_mode) {
+        case BR_PERSISTENT:
+          d->hidden.els[i] = d->hidden_now.els[i] = false;
+        break;
+        case BR_TRANSIENT:
+          d->hidden_now.els[i] = false;
+        break;
+      }
+    /*} else d->hidden_now.els[i] = d->hidden.els[i];*/
+    } else d->hidden_now.els[i] = true;
+  }
+
+  return (doit);
+}
 
 
 /*----------------------------------------------------------------------*/
@@ -615,7 +654,7 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+  if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     gboolean (*f)(datad *, ggobid *);
     f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->build_symbol_vectors; 
     if(f)
@@ -633,26 +672,30 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
         j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
 
         switch (cpanel->br_point_targets) {
-          case BR_CANDG:  /*-- color and glyph --*/
+          case br_candg:  /*-- color and glyph --*/
             changed = update_color_vectors (j, changed,
               d->pts_under_brush.els, d, gg);
             changed = update_glyph_vectors (j, changed,
               d->pts_under_brush.els, d, gg);
           break;
-          case BR_COLOR:
+          case br_color:
             changed = update_color_vectors (j, changed,
               d->pts_under_brush.els, d, gg);
           break;
-          case BR_GLYPH:  /*-- glyph type and size --*/
-          case BR_GSIZE:  /*-- glyph size only --*/
+          case br_glyph:  /*-- glyph type and size --*/
+          case br_gsize:  /*-- glyph size only --*/
             changed = update_glyph_vectors (j, changed,
               d->pts_under_brush.els, d, gg);
           break;
-          case BR_HIDE:  /*-- hidden --*/
+          case br_hide:  /*-- hidden --*/
             changed = update_hidden_vectors (j, changed,
               d->pts_under_brush.els, d, gg);
           break;
-          case BR_OFF:
+          case br_select:
+            changed = update_selected_vectors (j, changed,
+              d->pts_under_brush.els, d, gg);
+          break;
+          case br_off:
             ;
           break;
         }
@@ -689,47 +732,49 @@ active_paint_points (datad *d, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   gint (*f)(splotd *sp, datad *) = NULL;
 
-  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+  if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     f = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->active_paint_points;
     if(f)
        d->npts_under_brush = f(sp, d);
   }
 
-  if(!f) {
+  if (!f) {
     /* Zero out pts_under_brush[] before looping */
-   d->npts_under_brush = 0;
-   for (j=0; j<d->nrows_in_plot; j++)
-     d->pts_under_brush.els[d->rows_in_plot[j]] = 0;
+    d->npts_under_brush = 0;
+    for (j=0; j<d->nrows_in_plot; j++)
+      d->pts_under_brush.els[d->rows_in_plot[j]] = 0;
  
-   /*
-    * d->brush.binarray[][] only represents the
-    * cases in rows_in_plot[] so there's no need to test for that.
-   */
+    /*
+     * d->brush.binarray[][] only represents the
+     * cases in rows_in_plot[] so there's no need to test for that.
+    */
 
-   for (ih=d->brush.bin0.x; ih<=d->brush.bin1.x; ih++) {
-    for (iv=d->brush.bin0.y; iv<=d->brush.bin1.y; iv++) {
-      for (j=0; j<d->brush.binarray[ih][iv].nels; j++) {
-        pt = d->rows_in_plot[d->brush.binarray[ih][iv].els[j]];
+    for (ih=d->brush.bin0.x; ih<=d->brush.bin1.x; ih++) {
+      for (iv=d->brush.bin0.y; iv<=d->brush.bin1.y; iv++) {
+        for (j=0; j<d->brush.binarray[ih][iv].nels; j++) {
+          pt = d->rows_in_plot[d->brush.binarray[ih][iv].els[j]];
 
-        /*
-         * if a case is hidden, or it's missing and we aren't
-         * displaying missings, don't count it as being under the brush.
-         * Caution:
-         * If we're doing hide brushing, we can't ignore hidden
-         * cases; otherwise it's ok (I think).
-        */
-        if (splot_plot_case (pt, cpanel->br_point_targets != BR_HIDE,
-          d, sp, display, gg))
-        {
-          if (under_brush (pt, sp)) {
-            d->npts_under_brush++ ;
-            d->pts_under_brush.els[pt] = 1;
+          /*
+           * if a case is hidden, or it's missing and we aren't
+           * displaying missings, don't count it as being under the brush.
+           * Caution:
+           * If we're doing hide or un-hide brushing, we can't ignore hidden
+           * cases; otherwise it's ok (I think).
+          */
+          if (splot_plot_case (pt,
+            cpanel->br_point_targets != br_hide &&
+            cpanel->br_point_targets != br_select,
+            d, sp, display, gg))
+          {
+            if (under_brush (pt, sp)) {
+              d->npts_under_brush++ ;
+              d->pts_under_brush.els[pt] = 1;
+            }
           }
         }
       }
     }
   }
-  } 
 
   changed = false;
 
@@ -812,26 +857,30 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
   for (i=0; i<e->edge.n; i++) {
 
     switch (cpanel->br_edge_targets) {
-      case BR_CANDG:  /*-- color and glyph --*/
+      case br_candg:  /*-- color and glyph --*/
         changed = update_color_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
         changed = update_glyph_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
-      case BR_COLOR:  /*-- color --*/
+      case br_color:  /*-- color --*/
         changed = update_color_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
-      case BR_GLYPH:  /*-- line width and line type --*/
-      case BR_GSIZE:  /*-- line width only --*/
+      case br_glyph:  /*-- line width and line type --*/
+      case br_gsize:  /*-- line width only --*/
         changed = update_glyph_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
-      case BR_HIDE:  /*-- hidden --*/
+      case br_hide:  /*-- hidden --*/
         changed = update_hidden_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
-      case BR_OFF:
+      case br_select:
+        changed = update_selected_vectors (i, changed,
+          e->edge.xed_by_brush.els, e, gg);
+      break;
+      case br_off:
         ;
       break;
     }

@@ -31,12 +31,12 @@ void symbol_link_by_id(gint k, datad * sd, ggobid * gg)
   if(sd->rowIds) {
     gpointer ptr = g_hash_table_lookup(sd->idTable, sd->rowIds[k]);
     if(ptr)
-        id = * ((guint *)ptr);
+      id = * ((guint *)ptr);
   } else if (sd->rowid.id.nels > 0) 
     id = sd->rowid.id.els[k];
 
   if (id < 0)      /*-- this would indicate a bug --*/
-     return;
+/**/return;
 
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
@@ -64,7 +64,7 @@ void symbol_link_by_id(gint k, datad * sd, ggobid * gg)
           switch (cpanel->br_mode) {
 
             /*-- if persistent, handle all target types --*/
-          case BR_PERSISTENT:
+            case BR_PERSISTENT:
 
             /*
              * make it link for everything, no matter
@@ -73,94 +73,24 @@ void symbol_link_by_id(gint k, datad * sd, ggobid * gg)
              * gets messed up.
              */
 
-            if (!d->hidden_now.els[i]) {
-              d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
-              d->glyph.els[i].size = d->glyph_now.els[i].size =
+              if (!d->hidden_now.els[i]) {
+                d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
+                d->glyph.els[i].size = d->glyph_now.els[i].size =
                   sd->glyph.els[k].size;
-              d->glyph.els[i].type = d->glyph_now.els[i].type =
+                d->glyph.els[i].type = d->glyph_now.els[i].type =
                   sd->glyph.els[k].type;
-            }
-            d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
-/*
-              switch (cpanel->br_point_targets) {
-                case BR_CANDG:
-                  if (!d->hidden_now.els[i]) {
-                    d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
-                    d->glyph.els[i].size = d->glyph_now.els[i].size =
-                      sd->glyph.els[k].size;
-                    d->glyph.els[i].type = d->glyph_now.els[i].type =
-                      sd->glyph.els[k].type;
-                  }
-                break;
-                case BR_COLOR:
-                  if (!d->hidden_now.els[i])
-                    d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
-                break;
-                case BR_GLYPH:
-                  if (!d->hidden_now.els[i]) {
-                    d->glyph.els[i].size = d->glyph_now.els[i].size =
-                      sd->glyph.els[k].size;
-                    d->glyph.els[i].type = d->glyph_now.els[i].type =
-                      sd->glyph.els[k].type;
-                  }
-                break;
-                case BR_GSIZE: 
-                  if (!d->hidden_now.els[i]) {
-                    d->glyph.els[i].size = d->glyph_now.els[i].size =
-                      sd->glyph.els[k].size;
-                  }
-                break;
-                case BR_HIDE:
-                  d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
-                break;
-                case BR_OFF:
-                  ;
-                break;
               }
-*/
-            break;
+              d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
+              break;
 
             /*-- if transient, handle all target types --*/
-          case BR_TRANSIENT:
-            if (!d->hidden_now.els[i]) {
-              d->color_now.els[i] = sd->color_now.els[k];
-              d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
-              d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
-            }
-            d->hidden_now.els[i] = sd->hidden_now.els[k];
-/*
-              switch (cpanel->br_point_targets) {
-                case BR_CANDG:
-                  if (!d->hidden_now.els[i]) {
-                    d->color_now.els[i] = sd->color_now.els[k];
-                    d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
-                    d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
-                  }
-                break;
-                case BR_COLOR:
-                  if (!d->hidden_now.els[i])
-                    d->color_now.els[i] = sd->color_now.els[k];
-                break;
-                case BR_GLYPH:
-                  if (!d->hidden_now.els[i]) {
-                    d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
-                    d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
-                  }
-                break;
-                case BR_GSIZE: 
-                  if (!d->hidden_now.els[i]) {
-                    d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
-                  }
-                break;
-                case BR_HIDE:
-                  d->hidden_now.els[i] = sd->hidden_now.els[k];
-                break;
-                case BR_OFF:
-                  ;
-                break;
+            case BR_TRANSIENT:
+              if (!d->hidden_now.els[i]) {
+                d->color_now.els[i] = sd->color_now.els[k];
+                d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
+                d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
               }
-*/
-
+              d->hidden_now.els[i] = sd->hidden_now.els[k];
             break;
           }
         }
@@ -234,54 +164,60 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
     if (levelv->els[level_value]) {  /*-- if it's to acquire the new symbol --*/
       if (cpanel->br_mode == BR_PERSISTENT) {
         switch (cpanel->br_point_targets) {
-        case BR_CANDG:   /*-- color and glyph, type and size --*/
-          d->color.els[i] = d->color_now.els[i] = gg->color_id;
-          d->glyph.els[i].size = d->glyph_now.els[i].size =
+          case br_candg:   /*-- color and glyph, type and size --*/
+            d->color.els[i] = d->color_now.els[i] = gg->color_id;
+            d->glyph.els[i].size = d->glyph_now.els[i].size =
+                gg->glyph_id.size;
+            d->glyph.els[i].type = d->glyph_now.els[i].type =
+                gg->glyph_id.type;
+          break;
+          case br_color:   /*-- color only --*/
+            d->color.els[i] = d->color_now.els[i] = gg->color_id;
+          break;
+          case br_glyph:   /*-- glyph type and size --*/
+            d->glyph.els[i].size = d->glyph_now.els[i].size =
               gg->glyph_id.size;
-          d->glyph.els[i].type = d->glyph_now.els[i].type =
+            d->glyph.els[i].type = d->glyph_now.els[i].type =
               gg->glyph_id.type;
           break;
-        case BR_COLOR:   /*-- color only --*/
-          d->color.els[i] = d->color_now.els[i] = gg->color_id;
-          break;
-        case BR_GLYPH:   /*-- glyph type and size --*/
-          d->glyph.els[i].size = d->glyph_now.els[i].size =
-              gg->glyph_id.size;
-          d->glyph.els[i].type = d->glyph_now.els[i].type =
-              gg->glyph_id.type;
-          break;
-        case BR_GSIZE:   /*-- glyph size only --*/
-          d->glyph.els[i].size = d->glyph_now.els[i].size =
+          case br_gsize:   /*-- glyph size only --*/
+            d->glyph.els[i].size = d->glyph_now.els[i].size =
               gg->glyph_id.size;
           break;
-        case BR_HIDE:   /*-- hidden --*/
-          d->hidden.els[i] = d->hidden_now.els[i] = true;
+          case br_hide:   /*-- hidden --*/
+            d->hidden.els[i] = d->hidden_now.els[i] = true;
           break;
-        default:
+          case br_select:   /*-- un-hidden --*/
+            d->hidden.els[i] = d->hidden_now.els[i] = false;
+          break;
+          default:
           break;
         }
 
       } else if (cpanel->br_mode == BR_TRANSIENT) {
         switch (cpanel->br_point_targets) {
-        case BR_CANDG:
-          d->color_now.els[i] = gg->color_id;
-          d->glyph_now.els[i].size = gg->glyph_id.size;
-          d->glyph_now.els[i].type = gg->glyph_id.type;
+          case br_candg:
+            d->color_now.els[i] = gg->color_id;
+            d->glyph_now.els[i].size = gg->glyph_id.size;
+            d->glyph_now.els[i].type = gg->glyph_id.type;
           break;
-        case BR_COLOR:
-          d->color_now.els[i] = gg->color_id;
+          case br_color:
+            d->color_now.els[i] = gg->color_id;
           break;
-        case BR_GLYPH:   /*-- glyph type and size --*/
-          d->glyph_now.els[i].size = gg->glyph_id.size;
-          d->glyph_now.els[i].type = gg->glyph_id.type;
+          case br_glyph:   /*-- glyph type and size --*/
+            d->glyph_now.els[i].size = gg->glyph_id.size;
+            d->glyph_now.els[i].type = gg->glyph_id.type;
           break;
-        case BR_GSIZE:   /*-- glyph size only --*/
-          d->glyph_now.els[i].size = gg->glyph_id.size;
+          case br_gsize:   /*-- glyph size only --*/
+            d->glyph_now.els[i].size = gg->glyph_id.size;
           break;
-        case BR_HIDE:   /*-- hidden --*/
-          d->hidden_now.els[i] = true;
+          case br_hide:   /*-- hidden --*/
+            d->hidden_now.els[i] = true;
           break;
-        default:
+          case br_select: /*-- un-hidden --*/
+            d->hidden_now.els[i] = false;
+          break;
+          default:
           break;
         }
 
@@ -290,25 +226,28 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
     } else {  /*-- if it's to revert to the previous symbol --*/
       /*-- should only matter if transient, right? --*/
       switch (cpanel->br_point_targets) {
-      case BR_CANDG:
-        d->color_now.els[i] = d->color.els[i];
-        d->glyph_now.els[i].size = d->glyph.els[i].size;
-        d->glyph_now.els[i].type = d->glyph.els[i].type;
+        case br_candg:
+          d->color_now.els[i] = d->color.els[i];
+          d->glyph_now.els[i].size = d->glyph.els[i].size;
+          d->glyph_now.els[i].type = d->glyph.els[i].type;
         break;
-      case BR_COLOR:
-        d->color_now.els[i] = d->color.els[i];
+        case br_color:
+          d->color_now.els[i] = d->color.els[i];
         break;
-      case BR_GLYPH:   /*-- glyph type and size --*/
-        d->glyph_now.els[i].size = d->glyph.els[i].size;
-        d->glyph_now.els[i].type = d->glyph.els[i].type;
+        case br_glyph:   /*-- glyph type and size --*/
+          d->glyph_now.els[i].size = d->glyph.els[i].size;
+          d->glyph_now.els[i].type = d->glyph.els[i].type;
         break;
-      case BR_GSIZE:   /*-- glyph size only --*/
-        d->glyph_now.els[i].size = d->glyph.els[i].size;
+        case br_gsize:   /*-- glyph size only --*/
+          d->glyph_now.els[i].size = d->glyph.els[i].size;
         break;
-      case BR_HIDE:   /*-- hidden --*/
-        d->hidden_now.els[i] = d->hidden.els[i];
+        case br_hide:   /*-- hidden --*/
+          d->hidden_now.els[i] = d->hidden.els[i];
         break;
-      default:
+        case br_select: /*-- un-hidden --*/
+          d->hidden_now.els[i] = d->hidden.els[i];
+        break;
+        default:
         break;
       }
     }

@@ -678,29 +678,30 @@ void
 scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
   datad *d = gg->current_display->d;
-    if (d->nearest_point != -1) {
-      movepts_history_add (d->nearest_point, sp, d, gg);
 
-      /*-- add the history information for the cluster here --*/
-      if (gg->movepts.cluster_p) {
-        clusters_set (d, gg);
-        if (d->nclusters > 1) {
-          gint i, k, id = d->nearest_point;
-          gfloat cur_clust = d->clusterid.els[id];
-          for (i=0; i<d->nrows_in_plot; i++) {
-            k = d->rows_in_plot[i];
-            if (k == id)
-              ;
-            else
-              if (d->clusterid.els[k] == cur_clust)
-                if (!d->hidden_now.els[k])
-                  movepts_history_add (k, sp, d, gg);
-          }
+  if (d->nearest_point != -1) {
+    movepts_history_add (d->nearest_point, sp, d, gg);
+
+    /*-- add the history information for the cluster here --*/
+    if (gg->movepts.cluster_p) {
+      clusters_set (d, gg);
+      if (d->nclusters > 1) {
+        gint i, k, id = d->nearest_point;
+        gfloat cur_clust = d->clusterid.els[id];
+        for (i=0; i<d->nrows_in_plot; i++) {
+          k = d->rows_in_plot[i];
+          if (k == id)
+            ;
+          else
+            if (d->clusterid.els[k] == cur_clust)
+              if (!d->hidden_now.els[k])
+                movepts_history_add (k, sp, d, gg);
         }
       }
-
-      splot_redraw (sp, QUICK, gg);  
     }
+
+    splot_redraw (sp, QUICK, gg);  
+  }
 }
 
 void
@@ -710,48 +711,47 @@ scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidget *w, GdkEv
   gboolean button1_p, button2_p;
   gboolean inwindow, wasinwindow;
 
-    /*-- define wasinwindow before the new mousepos is calculated --*/
-    wasinwindow = mouseinwindow (sp);
-    /*-- get the mouse position and find out which buttons are pressed --*/
-    mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
-    inwindow = mouseinwindow (sp);
+  /*-- define wasinwindow before the new mousepos is calculated --*/
+  wasinwindow = mouseinwindow (sp);
+  /*-- get the mouse position and find out which buttons are pressed --*/
+  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
+  inwindow = mouseinwindow (sp);
 
-    if (gg->buttondown == 0) {
+  if (gg->buttondown == 0) {
 
-      gint k = find_nearest_point (&sp->mousepos, sp, d, gg);
-      d->nearest_point = k;
-      if (k != d->nearest_point_prev) {
-        displays_plot (NULL, QUICK, gg);
-        d->nearest_point_prev = k;
+    gint k = find_nearest_point (&sp->mousepos, sp, d, gg);
+    d->nearest_point = k;
+    if (k != d->nearest_point_prev) {
+      displays_plot (NULL, QUICK, gg);
+      d->nearest_point_prev = k;
+    }
+
+  } else {
+
+    /*-- If the pointer is inside the plotting region ... --*/
+    if (inwindow) {
+      /*-- ... and if the pointer has moved ...--*/
+      if ((sp->mousepos.x != sp->mousepos_o.x) ||
+          (sp->mousepos.y != sp->mousepos_o.y))
+      {
+        /*
+         * move the point: compute the data pipeline in reverse,
+         * (then run it forward again?) and draw the plot.
+        */
+        if (d->nearest_point != -1) {
+          move_pt (d->nearest_point, sp->mousepos.x, sp->mousepos.y,
+                   sp, d, gg);
+        }
+        sp->mousepos_o.x = sp->mousepos.x;
+        sp->mousepos_o.y = sp->mousepos.y;
       }
-
-    } else {
-
-
-      /*-- If the pointer is inside the plotting region ... --*/
-      if (inwindow) {
-        /*-- ... and if the pointer has moved ...--*/
-        if ((sp->mousepos.x != sp->mousepos_o.x) ||
-            (sp->mousepos.y != sp->mousepos_o.y))
-        {
-          /*
-           * move the point: compute the data pipeline in reverse,
-           * (then run it forward again?) and draw the plot.
-          */
-          if (d->nearest_point != -1) {
-            move_pt (d->nearest_point, sp->mousepos.x, sp->mousepos.y,
-                     sp, d, gg);
-          }
-          sp->mousepos_o.x = sp->mousepos.x;
-          sp->mousepos_o.y = sp->mousepos.y;
-        }
-      } else {  /*-- if !inwindow --*/
-        if (wasinwindow) {
-          d->nearest_point = -1;
-          splot_redraw (sp, QUICK, gg);  
-        }
+    } else {  /*-- if !inwindow --*/
+      if (wasinwindow) {
+        d->nearest_point = -1;
+        splot_redraw (sp, QUICK, gg);  
       }
     }
+  }
 }
 
 static void
@@ -803,6 +803,9 @@ binningPermitted(displayd* dpy)
   if (projection_get(gg) == P1PLOT &&
        cpanel->p1d.type == ASH &&
        cpanel->p1d.ASH_add_lines_p)
+     return(false);
+
+  if (cpanel->br_point_targets == br_select)
      return(false);
 
   /*-- if we're drawing edges --*/

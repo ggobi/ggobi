@@ -61,27 +61,42 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
 
 
 static gchar *point_targets_lbl[] =
-    { "Off", "Color and glyph", "Color only", "Glyph only",
-  "Glyph size only", "Hide"
+{ "Off", "Color and glyph", "Color only", "Glyph only",
+  "Glyph size only", "Hide", "Select"
 };
-static void brush_point_targets_cb(GtkWidget * w, gpointer cbd)
+static void
+brush_point_targets_cb (GtkWidget * w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
+
+  if (cpanel->br_mode == BR_TRANSIENT)
+    reinit_transient_brushing (gg->current_display, gg);
+
   cpanel->br_point_targets = GPOINTER_TO_INT(cbd);
-  splot_redraw(gg->current_splot, QUICK, gg);
+
+  /* binning not permitted here */
+  brush_once_and_redraw (false, gg->current_splot, gg->current_display, gg);
+  /*splot_redraw(gg->current_splot, QUICK, gg);*/
 }
 
 static gchar *edge_targets_lbl[] =
-    { "Off", "Color and line", "Color only", "Line only",
-  "Line width only", "Hide"
+{ "Off", "Color and line", "Color only", "Line only",
+  "Line width only", "Hide", "Select"
 };
 static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
+
+  if (cpanel->br_mode == BR_TRANSIENT)
+    reinit_transient_brushing (gg->current_display, gg);
+
   cpanel->br_edge_targets = GPOINTER_TO_INT(cbd);
-  splot_redraw(gg->current_splot, QUICK, gg);
+
+  /* binning not permitted here */
+  brush_once_and_redraw (false, gg->current_splot, gg->current_display, gg);
+  /*splot_redraw(gg->current_splot, QUICK, gg);*/
 }
 
 static gchar *mode_lbl[] = { "Persistent", "Transient" };
@@ -340,7 +355,7 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
  */
 
     /*-- If we've also been brushing an edge set, set its clusters --*/
-    if (display->e != NULL && cpanel->br_edge_targets != BR_OFF) {
+    if (display->e != NULL && cpanel->br_edge_targets != br_off) {
       clusters_set(display->e, gg);
     }
     /*-- If we've been brushing by variable, set everybody's clusters --*/
@@ -609,8 +624,8 @@ void cpanel_brush_init(cpaneld * cpanel, ggobid * gg)
   cpanel->br_linkby = BR_LINKBYID;
 
   /*-- point brushing on, edge brushing off --*/
-  cpanel->br_point_targets = BR_CANDG;
-  cpanel->br_edge_targets = BR_OFF;
+  cpanel->br_point_targets = br_candg;
+  cpanel->br_edge_targets = br_off;
 }
 
 void cpanel_brush_set(cpaneld * cpanel, ggobid * gg)

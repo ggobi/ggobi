@@ -15,23 +15,29 @@ splot1DVariablesGet(splotd *sp, gint *cols, datad *d)
 static gboolean
 parcoordsBinningPermitted(displayd *dpy)
 {
+  cpaneld *cpanel = &dpy->cpanel;
+
+  if (cpanel->br_point_targets == br_select)
+     return(false);
+
    return(!dpy->options.whiskers_show_p);
 }
 
 static gboolean
 cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 {
-      GtkWidget *w;
-      w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
-      if(!w) {
-        GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =  cpanel_parcoords_make(gg);
-      }
+  GtkWidget *w;
+  w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  if (!w) {
+    GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =
+      cpanel_parcoords_make(gg);
+  }
 
-      cpanel_parcoords_set (cpanel, w, gg);
-      cpanel_brush_set (cpanel, gg);
-      cpanel_identify_set (cpanel, gg);
+  cpanel_parcoords_set (cpanel, w, gg);
+  cpanel_brush_set (cpanel, gg);
+  cpanel_identify_set (cpanel, gg);
 
-      return(true);/* XX */
+  return(true);/* XX */
 }
 
 /**
