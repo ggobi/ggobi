@@ -336,13 +336,9 @@ gtk_ggobi_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg)
   return(display_alloc_init(type, missing_p, d, gg));
 }
 
-displayd *
-display_alloc_init (enum displaytyped type, gboolean missing_p,
-  datad *d, ggobid *gg)
+void
+display_set_values(displayd *display, enum displaytyped type, datad *d, ggobid *gg)
 {
-  displayd *display;
-/*  display = (displayd *) g_malloc (sizeof (displayd)); */
-  display = gtk_type_new(GTK_TYPE_GGOBI_WINDOW_DISPLAY);
   display->displaytype = type; 
 
   if (type == scatterplot)
@@ -350,7 +346,7 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   else if (type == parcoords)
     display->p1d_orientation = VERTICAL;
 
-  /* Copy in the contents of DefaultOptions to create
+  /* Should copy in the contents of DefaultOptions to create
      an indepedently modifiable configuration copied from
      the current template.
    */
@@ -358,20 +354,15 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
 
   display->ggobi = gg;
   display->d = d;
-  display->e = NULL;
+}
 
-  /*-- for dragging in the rulers --*/
-  display->drag_start.x = display->drag_start.y = 0;
+displayd *
+display_alloc_init (enum displaytyped type, gboolean missing_p, datad *d, ggobid *gg)
+{
+  displayd *display;
 
-  display->t1d_manip_var = -1;
-  display->t2d_manip_var = -1;
-  display->tc1_manip_var = -1;
-  display->tc2_manip_var = -1;
-
-  display->t1d_window = NULL;
-  display->t2d_window = NULL;
-  display->t1d_pp_pixmap = NULL;
-  display->t2d_pp_pixmap = NULL;
+  display = gtk_type_new(GTK_TYPE_GGOBI_WINDOW_DISPLAY);
+  display_set_values(display, type, d, gg);
 
   return (display);
 }

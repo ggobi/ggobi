@@ -3,6 +3,9 @@
 
 #include "externs.h"
 
+#include "tsdisplay.h"
+#include "barchartDisplay.h"
+
 extern gint num_ggobis, totalNumGGobis;
 extern ggobid **all_ggobis;
 
@@ -217,8 +220,23 @@ gtk_ggobi_display_class_init(GtkGGobiDisplayClass *klass)
 }
 
 static void
-display_init(displayd *dpy)
+display_init(displayd *display)
 {
+
+  display->e = NULL;
+
+  /*-- for dragging in the rulers --*/
+  display->drag_start.x = display->drag_start.y = 0;
+
+  display->t1d_manip_var = -1;
+  display->t2d_manip_var = -1;
+  display->tc1_manip_var = -1;
+  display->tc2_manip_var = -1;
+
+  display->t1d_window = NULL;
+  display->t2d_window = NULL;
+  display->t1d_pp_pixmap = NULL;
+  display->t2d_pp_pixmap = NULL;
 
 }
 
@@ -289,6 +307,12 @@ gtk_splot_init(splotd *sp)
     /*sp->tour1d.firsttime = true;*//* Ensure that the 1D tour should be initialized. */
 }
 
+static void
+splotClassInit(GtkGGobiSPlotClass *klass)
+{
+   klass->redraw = QUICK;
+}
+
 
 GtkType
 gtk_ggobi_splot_get_type (void)
@@ -302,7 +326,7 @@ gtk_ggobi_splot_get_type (void)
 	"GtkGGobiSPlot",
 	sizeof (splotd),
 	sizeof (GtkGGobiSPlotClass),
-	(GtkClassInitFunc) NULL, /*XX register any GGobi events. */
+	(GtkClassInitFunc) splotClassInit, 
 	(GtkObjectInitFunc) gtk_splot_init,
 	/* reserved_1 */ NULL,
         /* reserved_2 */ NULL,
@@ -310,6 +334,144 @@ gtk_ggobi_splot_get_type (void)
       };
 
       data_type = gtk_type_unique (gtk_drawing_area_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
+
+/********************************************/
+
+
+GtkType
+gtk_ggobi_extended_display_get_type (void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiExtendedDisplay",
+	sizeof (extendedDisplayd),
+	sizeof (GtkGGobiExtendedDisplayClass),
+	(GtkClassInitFunc) NULL, 
+	(GtkObjectInitFunc) NULL,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_window_display_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
+static void 
+timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass)
+{
+    klass->parent_class.treeLabel = "Time Series";
+}
+
+GtkType
+gtk_ggobi_time_series_display_get_type (void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiTimeSerieDisplay",
+	sizeof (timeSeriesDisplayd),
+	sizeof (GtkGGobiTimeSeriesDisplayClass),
+	(GtkClassInitFunc) timeSeriesClassInit,
+	(GtkObjectInitFunc) NULL,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_extended_display_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
+
+/***********************************************************************/
+
+static void 
+barchartDisplayClassInit(GtkGGobiBarChartDisplayClass *klass)
+{
+    klass->parent_class.treeLabel = "Barchart";
+}
+
+GtkType
+gtk_ggobi_barchart_display_get_type (void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiBarChartDisplay",
+	sizeof (barchartDisplayd),
+	sizeof (GtkGGobiBarChartDisplayClass),
+	(GtkClassInitFunc) barchartDisplayClassInit,
+	(GtkObjectInitFunc) NULL,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_extended_display_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
+
+
+static void 
+barchartSPlotClassInit(GtkGGobiBarChartSPlotClass *klass)
+{
+      /* barcharts need more attention than redrawing the brush */
+    klass->splotClass.redraw = FULL;
+}
+
+static void
+barchartSPlotInit(barchartSPlotd *sp)
+{
+  sp->bar = (barchartd *) g_malloc (1 * sizeof (barchartd)); 
+  sp->bar->index_to_rank = NULL;
+  sp->bar->is_spine = FALSE;
+
+  barchart_init_vectors(sp);
+}
+
+GtkType
+gtk_ggobi_barchart_splot_get_type (void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiBarChartSPlot",
+	sizeof (barchartSPlotd),
+	sizeof (GtkGGobiBarChartSPlotClass),
+	(GtkClassInitFunc) barchartSPlotClassInit,
+	(GtkObjectInitFunc) barchartSPlotInit,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_splot_get_type (), &data_info);
     }
 
   return data_type;

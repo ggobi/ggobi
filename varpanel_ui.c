@@ -187,8 +187,8 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
         displayd *display = (displayd *) sp->displayptr;
         datad *d = display->d;
 
-        barchart_clean_init (sp);
-        barchart_recalc_counts (sp,d,gg);
+        barchart_clean_init (GTK_GGOBI_BARCHART_SPLOT(sp));
+        barchart_recalc_counts (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
       }
     break;
 #endif

@@ -174,4 +174,39 @@ typedef struct _windowDisplayd {
 gboolean isEmbeddedDisplay(displayd *dpy);
 
 
+
+/**
+ This is used as a trivial class for its type information so that we can detect whether 
+ we have one of the new style classes.
+ We might remove it when we are finished the construction.
+*/
+
+#define GTK_TYPE_GGOBI_EXTENDED_DISPLAY	 (gtk_ggobi_extended_display_get_type ())
+#define GTK_GGOBI_EXTENDED_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_EXTENDED_DISPLAY, extendedDisplayd))
+#define GTK_GGOBI_EXTENDED_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_EXTENDED_DISPLAY, GtkGGobiExtendedDisplayClass))
+#define GTK_IS_GGOBI_EXTENDED_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_EXTENDED_DISPLAY))
+#define GTK_IS_GGOBI_EXTENDED_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_EXTENDED_DISPLAY))
+
+GtkType gtk_ggobi_extended_display_get_type();
+
+typedef struct 
+{
+    GtkGGobiWindowDisplayClass parent_class;
+
+    gchar const * treeLabel;
+    gchar * const (*tree_label)(displayd *dpy);
+
+} GtkGGobiExtendedDisplayClass;
+
+
+typedef struct {
+
+   windowDisplayd dpy;
+   
+} extendedDisplayd;
+
+void display_set_values(displayd *display, enum displaytyped type, datad *d, ggobid *gg);
+
+gchar * const gtk_display_tree_label(displayd *dpy);
+
 #endif

@@ -1,3 +1,5 @@
+-include ../local.config
+
 XMLLINT=xmllint
 
 ifndef DVIPS

@@ -40,12 +40,13 @@
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};
 
+enum displaytyped {scatterplot, scatmat, parcoords, tsplot, 
 #ifdef BARCHART_IMPLEMENTED
-enum displaytyped {scatterplot, scatmat, parcoords, tsplot, barchart, unknown_display_type};
+		   barchart,
 #endif
-#ifndef BARCHART_IMPLEMENTED
-enum displaytyped {scatterplot, scatmat, parcoords, tsplot,unknown_display_type};
-#endif
+                   unknown_display_type};
+
+
 
 
 extern const gchar* const ViewTypes[3];

@@ -704,7 +704,7 @@ active_paint_points (datad *d, ggobid *gg)
 
 #ifdef BARCHART_IMPLEMENTED
   if (display->displaytype == barchart) {
-    d->npts_under_brush = barchart_active_paint_points (sp, d);
+    d->npts_under_brush = barchart_active_paint_points (GTK_GGOBI_BARCHART_SPLOT(sp), d);
 
   } else {
 #endif

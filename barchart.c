@@ -20,16 +20,16 @@
 #include "gtkext.h"
 #include "externs.h"
 
+#include "barchartDisplay.h"
+
 #define WIDTH   370
 #define HEIGHT  370
 
-gfloat barchart_sort_index (gfloat *yy, gint ny, ggobid *gg, splotd *sp);
-void barchart_clean_init (splotd *sp);
-void barchart_init_categorical (splotd *sp, datad *d);
-void barchart_set_initials (splotd *sp, datad *d);
+gfloat barchart_sort_index (gfloat *yy, gint ny, ggobid *gg, barchartSPlotd *sp);
+void barchart_init_categorical (barchartSPlotd *sp, datad *d);
+void barchart_set_initials (barchartSPlotd *sp, datad *d);
 void rectangle_inset (gbind *bin);
-void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg);
-void barchart_allocate_structure (splotd *sp, datad *d);
+void barchart_allocate_structure (barchartSPlotd *sp, datad *d);
 void button_draw_with_shadows (GdkPoint *region, GdkDrawable *drawable, ggobid *gg);
 
 /*----------------------------------------------------------------------*/
@@ -60,17 +60,17 @@ static const GtkItemFactoryEntry menu_items[] = {
 };
 
 displayd *
-barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
+barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) 
+{
   GtkWidget *table, *vbox;
   displayd *display;
-  extern void barchart_display_menus_make (displayd *display,
-    GtkAccelGroup *, GtkSignalFunc, ggobid *);
 
   if (d == NULL || d->ncols < 1)
     return (NULL);
 
   if (sp == NULL) {
-    display = display_alloc_init (barchart, missing_p, d, gg);
+    display = gtk_type_new(GTK_TYPE_GGOBI_BARCHART_DISPLAY);
+    display_set_values(display, barchart, d, gg);
   } else {
     display = (displayd*) sp->displayptr;
     display->d = d;
@@ -99,24 +99,15 @@ barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
    * add the other menus manually
   */
   barchart_display_menus_make (display, gg->app.sp_accel_group,
-   (GtkSignalFunc) display_options_cb, gg);
+			       (GtkSignalFunc) display_options_cb, gg);
 
   gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
 
 
   /*-- Initialize a single splot --*/
   if (sp == NULL) { 
-    sp = splot_new (display, WIDTH, HEIGHT, gg);
+     sp = gtk_barchart_splot_new(display, WIDTH, HEIGHT, gg);
   } 
-  sp->bar = (barchartd *) g_malloc (1 * sizeof (barchartd)); 
-  sp->bar->index_to_rank = NULL;
-  sp->bar->is_spine = FALSE;
-
-
-  barchart_init_vectors(sp);
-  barchart_clean_init (sp);
-  barchart_recalc_counts (sp,d,gg);
-
 
 
   display->splots = NULL;
@@ -179,10 +170,14 @@ barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   return display;
 }
 
-void barchart_clean_init (splotd *sp) {
-  displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+void barchart_clean_init (barchartSPlotd *sp) 
+{
+  displayd *display;
+  datad *d;
   gint i, j;
+
+  display = (displayd *) GTK_GGOBI_SPLOT(sp)->displayptr;
+  d = display->d;
 
   sp->bar->nbins = -1;
 
@@ -202,17 +197,18 @@ void barchart_clean_init (splotd *sp) {
 
   barchart_set_initials (sp,d);
   sp->bar->offset = 0;
-  sp->pmid.y = 0;
+  GTK_GGOBI_SPLOT(sp)->pmid.y = 0;
 
   if (sp->bar->index_to_rank) {
     g_free ((gpointer) sp->bar->index_to_rank);
   }
   sp->bar->index_to_rank = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
   barchart_init_categorical (sp,d);
- 
 }
 
-void barchart_recalc_group_counts (splotd *sp, datad *d, ggobid *gg) {
+static void 
+barchart_recalc_group_counts (barchartSPlotd *sp, datad *d, ggobid *gg) 
+{
   gint i, j,m,bin;
 
   for (i=0; i<sp->bar->nbins; i++) 
@@ -234,10 +230,10 @@ void barchart_recalc_group_counts (splotd *sp, datad *d, ggobid *gg) {
     m = d->rows_in_plot[i];
 
     /*-- skip missings?  --*/
-    if (d->nmissing > 0 && !d->missings_show_p && MISSING_P(m,sp->p1dvar))
+    if (d->nmissing > 0 && !d->missings_show_p && MISSING_P(m, GTK_GGOBI_SPLOT(sp)->p1dvar))
       continue;
 
-    bin = sp->planar[m].x;
+    bin = GTK_GGOBI_SPLOT(sp)->planar[m].x;
     if (( bin >= 0) && (bin < sp->bar->nbins)) {
       sp->bar->cbins[bin][d->color_now.els[m]].count++;
     }
@@ -254,7 +250,7 @@ void barchart_recalc_group_counts (splotd *sp, datad *d, ggobid *gg) {
 
 
 
-void barchart_recalc_group_dimensions (splotd *sp, ggobid *gg) {
+void barchart_recalc_group_dimensions (barchartSPlotd *sp, ggobid *gg) {
   gint colorwidth, i, j, xoffset;
 
   for (i=0; i< sp->bar->nbins; i++) {
@@ -391,7 +387,7 @@ void rectangle_inset (gbind *bin) {
   bin->rect.width += 1;
 }
 
-void barchart_init_vectors (splotd *sp) {
+void barchart_init_vectors (barchartSPlotd *sp) {
 /* shouldn't be necessary ...*/
   if (sp->bar != NULL) {
     sp->bar->bins = NULL;
@@ -406,7 +402,9 @@ void barchart_init_vectors (splotd *sp) {
   }
 }
 
-void barchart_free_structure (splotd *sp) {
+void 
+barchart_free_structure (barchartSPlotd *sp) 
+{
   gint i;
 
 /* free all previously allocated pointers */
@@ -445,13 +443,16 @@ void barchart_free_structure (splotd *sp) {
   barchart_init_vectors (sp); 
 }
 
-void barchart_allocate_structure (splotd *sp, datad *d) {
+void 
+barchart_allocate_structure(barchartSPlotd *sp, datad *d) 
+{
   vartabled *vtx;
   gint i, nbins;
-  ggobid *gg = GGobiFromSPlot(sp);
+  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  ggobid *gg = GGobiFromSPlot(rawsp);
   colorschemed *scheme = gg->activeColorScheme;
 
-  vtx = vartable_element_get (sp->p1dvar, d);
+  vtx = vartable_element_get (rawsp->p1dvar, d);
 
   if (sp->bar->new_nbins < 0) {
     if (vtx->categorical_p) {
@@ -464,8 +465,8 @@ void barchart_allocate_structure (splotd *sp, datad *d) {
   } else nbins = sp->bar->new_nbins;
   sp->bar->new_nbins =-1;
 
-  sp->p1d.lim.min = vtx->lim_raw.min;
-  sp->p1d.lim.max = vtx->lim_raw.max;
+  rawsp->p1d.lim.min = vtx->lim_raw.min;
+  rawsp->p1d.lim.max = vtx->lim_raw.max;
 
   if (sp->bar->nbins && nbins == sp->bar->nbins) return; /* nothing else to be done */ 
 
@@ -492,11 +493,13 @@ void barchart_allocate_structure (splotd *sp, datad *d) {
     sp->bar->breaks = (gfloat *) g_malloc ((nbins+1)* sizeof(nbins)); 
 }
 
-void barchart_init_categorical (splotd *sp, datad *d) {
+void barchart_init_categorical (barchartSPlotd *sp, datad *d) 
+{
+    splotd *rawsp = GTK_GGOBI_SPLOT(sp);
     gfloat *yy;
-    gint i,jvar = sp->p1dvar;
-    ggobid *gg = GGobiFromSPlot(sp);
-    vartabled *vtx = vartable_element_get (sp->p1dvar, d);
+    gint i,jvar = rawsp->p1dvar;
+    ggobid *gg = GGobiFromSPlot(rawsp);
+    vartabled *vtx = vartable_element_get (rawsp->p1dvar, d);
     gfloat mindist, maxheight;
 
     yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
@@ -507,13 +510,16 @@ void barchart_init_categorical (splotd *sp, datad *d) {
 
     g_free ((gpointer) yy);
     maxheight = vtx->lim_raw.max - vtx->lim_raw.min;
-    sp->scale.y = SCALE_DEFAULT * maxheight/(maxheight + mindist);
+    rawsp->scale.y = SCALE_DEFAULT * maxheight/(maxheight + mindist);
 }
 
 
-void barchart_redraw (splotd *sp, datad *d, ggobid *gg) {
+void 
+barchart_redraw(barchartSPlotd *sp, datad *d, ggobid *gg) 
+{
   gint i, j;
   colorschemed *scheme = gg->activeColorScheme;
+  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
 
   barchart_recalc_group_counts (sp, d, gg);
 
@@ -522,9 +528,9 @@ void barchart_redraw (splotd *sp, datad *d, ggobid *gg) {
 
     for (i=0; i<sp->bar->nbins; i++) {
       if (sp->bar->cbins[i][j].count>0)
-        gdk_draw_rectangle  (sp->pixmap0, gg->plot_GC, TRUE,
-          sp->bar->cbins[i][j].rect.x,sp->bar->cbins[i][j].rect.y,
-          sp->bar->cbins[i][j].rect.width,sp->bar->cbins[i][j].rect.height);
+        gdk_draw_rectangle  (rawsp->pixmap0, gg->plot_GC, TRUE,
+          sp->bar->cbins[i][j].rect.x, sp->bar->cbins[i][j].rect.y,
+          sp->bar->cbins[i][j].rect.width, sp->bar->cbins[i][j].rect.height);
     }
   }
 
@@ -534,7 +540,7 @@ void barchart_redraw (splotd *sp, datad *d, ggobid *gg) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
 
       if (sp->bar->col_high_bin[j].count>0) {
-        gdk_draw_rectangle  (sp->pixmap0, gg->plot_GC, TRUE,
+        gdk_draw_rectangle  (rawsp->pixmap0, gg->plot_GC, TRUE,
         sp->bar->col_high_bin[j].rect.x,sp->bar->col_high_bin[j].rect.y,
         sp->bar->col_high_bin[j].rect.width,sp->bar->col_high_bin[j].rect.height);
       }
@@ -545,7 +551,7 @@ void barchart_redraw (splotd *sp, datad *d, ggobid *gg) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
 
       if (sp->bar->col_low_bin[j].count>0) {
-        gdk_draw_rectangle  (sp->pixmap0, gg->plot_GC, TRUE,
+        gdk_draw_rectangle  (rawsp->pixmap0, gg->plot_GC, TRUE,
         sp->bar->col_low_bin[j].rect.x,sp->bar->col_low_bin[j].rect.y,
         sp->bar->col_low_bin[j].rect.width,sp->bar->col_low_bin[j].rect.height);
       }
@@ -559,10 +565,10 @@ void barchart_redraw (splotd *sp, datad *d, ggobid *gg) {
   for (i=0; i<sp->bar->nbins; i++) {
     if (sp->bar->bins[i].count==0) {
       gint radius = sp->bar->bins[i].rect.height/4;
-      gdk_draw_line (sp->pixmap0, gg->plot_GC,
+      gdk_draw_line (rawsp->pixmap0, gg->plot_GC,
                      sp->bar->bins[i].rect.x,sp->bar->bins[i].rect.y,
                      sp->bar->bins[i].rect.x,sp->bar->bins[i].rect.y+sp->bar->bins[i].rect.height);
-      gdk_draw_arc (sp->pixmap0, gg->plot_GC, FALSE,
+      gdk_draw_arc (rawsp->pixmap0, gg->plot_GC, FALSE,
                     sp->bar->bins[i].rect.x-radius/2, 
                     sp->bar->bins[i].rect.y+sp->bar->bins[i].rect.height/2-radius/2,
                     radius,radius,0,64*360);
@@ -572,7 +578,9 @@ void barchart_redraw (splotd *sp, datad *d, ggobid *gg) {
 
 }
 
-void barchart_splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
+void 
+barchart_splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) 
+{
   GtkStyle *style = gtk_widget_get_style (sp->da);
   gint lbearing, rbearing, width, ascent, descent;
   displayd *display = (displayd *) sp->displayptr;
@@ -604,6 +612,8 @@ void barchart_splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *
   if (vtx->categorical_p) {
       gint i;
       gchar catname[100];
+      barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+
       for (i=0; i < vtx->nlevels; i++) {
         strcpy (catname, vtx->level_names[i]);
 
@@ -614,18 +624,21 @@ void barchart_splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *
           style->font,
 #endif
           gg->plot_GC,
-          sp->bar->bins[i].rect.x+2,
-          sp->bar->bins[i].rect.y + sp->bar->bins[i].rect.height/2 + 2,
+          bsp->bar->bins[i].rect.x+2,
+          bsp->bar->bins[i].rect.y + bsp->bar->bins[i].rect.height/2 + 2,
           catname);
     } 
   }
 }
 
-void barchart_set_breakpoints (gfloat width, splotd *sp, datad *d ) {
+void 
+barchart_set_breakpoints (gfloat width, barchartSPlotd *sp, datad *d ) 
+{
   gfloat rdiff; 
   gint i, nbins;
+  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
 
-  rdiff = sp->p1d.lim.max - sp->p1d.lim.min;
+  rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
   nbins = (gint) (rdiff/width + 1);
 
 
@@ -633,34 +646,40 @@ void barchart_set_breakpoints (gfloat width, splotd *sp, datad *d ) {
   barchart_allocate_structure (sp, d);
 
   for (i=0; i <= sp->bar->nbins; i++) {
-    sp->bar->breaks[i] = sp->p1d.lim.min + width*i;
+    sp->bar->breaks[i] = rawsp->p1d.lim.min + width*i;
   }
 
 }
 
-void barchart_set_initials (splotd *sp, datad *d) {
-  vartabled *vtx = vartable_element_get (sp->p1dvar, d);
+void 
+barchart_set_initials (barchartSPlotd *sp, datad *d) 
+{
+  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  vartabled *vtx = vartable_element_get (rawsp->p1dvar, d);
 
   
   if (vtx->categorical_p) {
   } else {
     gint i;
-    gfloat rdiff = sp->p1d.lim.max - sp->p1d.lim.min;
+    gfloat rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
 
     for (i=0; i < sp->bar->nbins; i++) {
-      sp->bar->breaks[i] = sp->p1d.lim.min + rdiff/sp->bar->nbins*i; 
+      sp->bar->breaks[i] = rawsp->p1d.lim.min + rdiff/sp->bar->nbins*i; 
     }
-    sp->bar->breaks[sp->bar->nbins] = sp->p1d.lim.max;
+    sp->bar->breaks[sp->bar->nbins] = rawsp->p1d.lim.max;
 
   }
 }
 
-void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
+void 
+barchart_recalc_counts(barchartSPlotd *sp, datad *d, ggobid *gg) 
+{
   gfloat yy;
   gint i, bin, m;
-  vartabled *vtx = vartable_element_get (sp->p1dvar, d);
+  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  vartabled *vtx = vartable_element_get (rawsp->p1dvar, d);
   
-  if (!vtx->categorical_p) sp->scale.y = SCALE_DEFAULT;
+  if (!vtx->categorical_p) rawsp->scale.y = SCALE_DEFAULT;
   for (i=0; i<sp->bar->nbins; i++) sp->bar->bins[i].count = 0;
 
   sp->bar->high_pts_missing = sp->bar->low_pts_missing = FALSE;
@@ -670,28 +689,28 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
       m = d->rows_in_plot[i];
 
       /*-- skip missings?  --*/
-      if (d->nmissing > 0 && !d->missings_show_p && MISSING_P(m,sp->p1dvar))
+      if (d->nmissing > 0 && !d->missings_show_p && MISSING_P(m, rawsp->p1dvar))
         continue;
 
       bin = sp->bar->index_to_rank[i];
       if (( bin >= 0) && (bin < sp->bar->nbins)) {
         sp->bar->bins[bin].count++;
       }
-      sp->planar[m].x = bin;
+      rawsp->planar[m].x = bin;
     }
   } else {
     gint index, rank = 0; 
 
     index = sp->bar->index_to_rank[rank];
-    yy = d->tform.vals[index][sp->p1dvar];
+    yy = d->tform.vals[index][rawsp->p1dvar];
 
     while ((yy < sp->bar->breaks[0]+sp->bar->offset) &&
            (rank < d->nrows_in_plot-1))
     {
-      sp->planar[index].x = -1; 
+      rawsp->planar[index].x = -1; 
       rank++;
       index = sp->bar->index_to_rank[rank];
-      yy = d->tform.vals[index][sp->p1dvar];
+      yy = d->tform.vals[index][rawsp->p1dvar];
     }
     if (rank > 0) {
       sp->bar->low_pts_missing = TRUE;
@@ -704,7 +723,7 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
     bin = 0;
     while (rank < d->nrows_in_plot) {
       index = sp->bar->index_to_rank[rank];
-      yy = d->tform.vals[index][sp->p1dvar];
+      yy = d->tform.vals[index][rawsp->p1dvar];
       while ((bin < sp->bar->nbins) &&
              (sp->bar->breaks[bin+1]+sp->bar->offset < yy)) 
       {
@@ -731,7 +750,7 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
       } else { 
         sp->bar->bins[bin].count++; 
       }
-      sp->planar[index].x = bin;
+      rawsp->planar[index].x = bin;
       rank++;
     } 
   }
@@ -752,30 +771,34 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
 
 
   barchart_recalc_dimensions (sp, d, gg);
-
 }
 
-void barchart_recalc_dimensions (splotd *sp, datad *d, ggobid *gg) {
+void 
+barchart_recalc_dimensions (barchartSPlotd *sp, datad *d, ggobid *gg) 
+{
   gint i, maxbincount = 0, maxbin = -1;
   gfloat precis = PRECISION1;
   glong ltmp;
   vartabled *vtx;
 
-  gfloat scale_y = sp->scale.y;
+  gfloat scale_y;
   gint index;
   gint minwidth; 
   gfloat rdiff, ftmp;
 
   GdkRectangle *rect;
+  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+
+  scale_y = rawsp->scale.y;
 
   /*
    * Calculate is, a scale factor.  Scale so as to use the entire
    * plot window (well, as much of the plot window as scale.x and
    * scale.y permit.)
   */
-  vtx = vartable_element_get (sp->p1dvar, d);
+  vtx = vartable_element_get (rawsp->p1dvar, d);
 
-  rdiff = sp->p1d.lim.max - sp->p1d.lim.min;
+  rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
   index = 0;
   for (i=0; i < sp->bar->nbins; i++) {
     if (sp->bar->bins[i].count> maxbincount) {
@@ -786,7 +809,7 @@ void barchart_recalc_dimensions (splotd *sp, datad *d, ggobid *gg) {
     sp->bar->bins[i].planar.x = -1;
     if (vtx->categorical_p) {
       index = sp->bar->bins[i].index;
-      sp->bar->bins[i].planar.y = (glong) d->world.vals[index][sp->p1dvar];
+      sp->bar->bins[i].planar.y = (glong) d->world.vals[index][rawsp->p1dvar];
     } else { 
       ftmp = -1.0 + 2.0*(sp->bar->breaks[i]- sp->bar->breaks[0])/rdiff;
       sp->bar->bins[i].planar.y = (glong) (precis * ftmp);
@@ -797,23 +820,23 @@ void barchart_recalc_dimensions (splotd *sp, datad *d, ggobid *gg) {
 if (!sp->bar->is_spine) {
   scale_y /= 2;
 
-  sp->iscale.y = (glong) (-1 * (gfloat) sp->max.y * scale_y);
+  rawsp->iscale.y = (glong) (-1 * (gfloat) rawsp->max.y * scale_y);
 
-  minwidth = sp->max.y; 
+  minwidth = rawsp->max.y; 
   for (i=0; i<sp->bar->nbins; i++) {
     rect = &sp->bar->bins[i].rect;
-    ltmp = sp->bar->bins[i].planar.y - sp->pmid.y;
-    rect->y = (gint) ((ltmp * sp->iscale.y) >> EXP1);
+    ltmp = sp->bar->bins[i].planar.y - rawsp->pmid.y;
+    rect->y = (gint) ((ltmp * rawsp->iscale.y) >> EXP1);
 
     rect->x = 10;
-    rect->y += (sp->max.y / 2);
-    if (i == 0) minwidth = 2*(sp->max.y-rect->y);
+    rect->y += (rawsp->max.y / 2);
+    if (i == 0) minwidth = 2*(rawsp->max.y-rect->y);
     if (i > 0) {
       minwidth = MIN(minwidth,sp->bar->bins[i-1].rect.y - rect->y-2);
       sp->bar->bins[i-1].rect.height = sp->bar->bins[i-1].rect.y - rect->y-2;
     }
 
-    rect->width = MAX(1, (gint) ((gfloat) (sp->max.x -2*rect->x)
+    rect->width = MAX(1, (gint) ((gfloat) (rawsp->max.x -2*rect->x)
                                   * sp->bar->bins[i].count/ sp->bar->maxbincounts));
 
   }
@@ -824,14 +847,14 @@ if (!sp->bar->is_spine) {
   if (sp->bar->low_pts_missing) {
     sp->bar->low_bin->rect.height = minwidth;
     sp->bar->low_bin->rect.x = 10;
-    sp->bar->low_bin->rect.width = MAX(1, (gint) ((gfloat) (sp->max.x -2*sp->bar->low_bin->rect.x)
+    sp->bar->low_bin->rect.width = MAX(1, (gint) ((gfloat) (rawsp->max.x -2*sp->bar->low_bin->rect.x)
                                   * sp->bar->low_bin->count/ sp->bar->maxbincounts));
     sp->bar->low_bin->rect.y = sp->bar->bins[0].rect.y + 2;
   }
   if (sp->bar->high_pts_missing) {
     sp->bar->high_bin->rect.height = minwidth;
     sp->bar->high_bin->rect.x = 10;
-    sp->bar->high_bin->rect.width = MAX(1, (gint) ((gfloat) (sp->max.x -2*sp->bar->high_bin->rect.x)
+    sp->bar->high_bin->rect.width = MAX(1, (gint) ((gfloat) (rawsp->max.x -2*sp->bar->high_bin->rect.x)
                                   * sp->bar->high_bin->count/ sp->bar->maxbincounts));
     i = sp->bar->nbins-1;
     sp->bar->high_bin->rect.y = sp->bar->bins[i].rect.y - 2*sp->bar->bins[i].rect.height - 1; 
@@ -855,13 +878,13 @@ if (!sp->bar->is_spine) {
   gint n = d->nrows_in_plot; 
 
   scale_y = SCALE_DEFAULT;
-  maxheight = (sp->max.y-(sp->bar->nbins-1)*bindist)*scale_y;
-  yoffset = (gint)(sp->max.y*.5*(1+scale_y));
+  maxheight = (rawsp->max.y-(sp->bar->nbins-1)*bindist)*scale_y;
+  yoffset = (gint)(rawsp->max.y*.5*(1+scale_y));
 
   for (i=0; i<sp->bar->nbins; i++) {
     rect = &sp->bar->bins[i].rect;
     rect->x = 10;
-    rect->width = sp->max.x -2*rect->x;
+    rect->width = rawsp->max.x -2*rect->x;
     
     rect->height = (gint)((gfloat) sp->bar->bins[i].count/n *maxheight);
     rect->y = yoffset;
@@ -875,24 +898,26 @@ if (!sp->bar->is_spine) {
 
 /* draw overflow bins */
   if (sp->bar->high_pts_missing) {
-    sp->bar->high_bin->rect.width = sp->max.x -2*rect->x;
+    sp->bar->high_bin->rect.width = rawsp->max.x -2*rect->x;
     sp->bar->high_bin->rect.x = 10;
     sp->bar->high_bin->rect.height = (gint)((gfloat) sp->bar->high_bin->count/n *maxheight);
     i = sp->bar->nbins-1;
-    sp->bar->high_bin->rect.y = (gint)(sp->max.y*.5*(1-scale_y))-sp->bar->high_bin->rect.height-2; 
+    sp->bar->high_bin->rect.y = (gint)(rawsp->max.y*.5*(1-scale_y))-sp->bar->high_bin->rect.height-2; 
   }
   if (sp->bar->low_pts_missing) {
     sp->bar->low_bin->rect.x = 10;
-    sp->bar->low_bin->rect.width = sp->max.x -2*rect->x;
+    sp->bar->low_bin->rect.width = rawsp->max.x -2*rect->x;
     sp->bar->low_bin->rect.height = (gint)((gfloat) sp->bar->low_bin->count/n *maxheight); 
-    sp->bar->low_bin->rect.y = (gint)(sp->max.y*.5*(1+scale_y))+2;
+    sp->bar->low_bin->rect.y = (gint)(rawsp->max.y*.5*(1+scale_y))+2;
   }
 }
 }
 
-gboolean barchart_active_paint_points (splotd *sp, datad *d) {
-
-  brush_coords *brush_pos = &sp->brush_pos;
+gboolean 
+barchart_active_paint_points (barchartSPlotd *sp, datad *d) 
+{
+  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  brush_coords *brush_pos = &rawsp->brush_pos;
   gint i;
   GdkRectangle brush_rect;
   GdkRectangle dummy;
@@ -933,11 +958,11 @@ gboolean barchart_active_paint_points (splotd *sp, datad *d) {
       m = d->rows_in_plot[i];
 
       /*-- skip missings?  --*/
-      if (d->nmissing > 0 && !d->missings_show_p && MISSING_P(m,sp->p1dvar))
+      if (d->nmissing > 0 && !d->missings_show_p && MISSING_P(m, rawsp->p1dvar))
         continue;
 
-      d->pts_under_brush.els[m] = hits[sp->planar[i].x+1];
-      if (hits[sp->planar[i].x+1]) d->npts_under_brush++;
+      d->pts_under_brush.els[m] = hits[rawsp->planar[i].x+1];
+      if (hits[rawsp->planar[i].x+1]) d->npts_under_brush++;
     }
 }
   g_free((gpointer) hits);
@@ -968,7 +993,9 @@ barpsort (const void *arg1, const void *arg2)
 }
 
 
-gfloat barchart_sort_index (gfloat *yy, gint ny, ggobid *gg, splotd *sp) {
+gfloat 
+barchart_sort_index (gfloat *yy, gint ny, ggobid *gg, barchartSPlotd *sp) 
+{
   gint i, *indx;
   gint rank;
   gfloat mindist;
@@ -1022,12 +1049,13 @@ CurrentGGobi = NULL;
 }
 
 void
-barchart_scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
+barchart_scaling_visual_cues_draw (barchartSPlotd *sp, GdkDrawable *drawable, ggobid *gg) 
+{
   vartabled *vtx;
   displayd *display = gg->current_display;
   datad *d = display->d;
 
-  vtx = vartable_element_get (sp->p1dvar, d);
+  vtx = vartable_element_get (GTK_GGOBI_SPLOT(sp)->p1dvar, d);
 
   if (!vtx->categorical_p) { 
 /* calculate & draw anchor_rgn */
@@ -1120,7 +1148,9 @@ gboolean pt_in_rect (icoords pt, GdkRectangle rect) {
   return ((pt.x >= rect.x) && (pt.x <= rect.x+rect.width) && (pt.y >= rect.y) && (pt.y <= rect.y+rect.height));
 }
 
-gboolean barchart_identify_bars (icoords mousepos, splotd *sp, datad *d, ggobid *gg) {
+gboolean 
+barchart_identify_bars (icoords mousepos, barchartSPlotd *sp, datad *d, ggobid *gg) 
+{
 /* returns 0 if nothing has changed from the last time */
 /*         1 if different bars are hit */
   gint i, nbins;
@@ -1160,12 +1190,16 @@ gboolean barchart_identify_bars (icoords mousepos, splotd *sp, datad *d, ggobid 
   return TRUE;
 }
 
-void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
-  GtkStyle *style = gtk_widget_get_style (sp->da);
+void 
+barchart_add_bar_cues (barchartSPlotd *sp, GdkDrawable *drawable, ggobid *gg) 
+{
+  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  GtkStyle *style = gtk_widget_get_style (rawsp->da);
   gint i, nbins;
   gchar string[100];
-  icoords mousepos = sp->mousepos;
+  icoords mousepos = rawsp->mousepos;
   colorschemed *scheme = gg->activeColorScheme;
+
 
   nbins = sp->bar->nbins;
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
@@ -1198,7 +1232,7 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 	} else {
 	    char *levelName;
             vartabled *var;
-	    var = (vartabled *) g_slist_nth_data(sp->displayptr->d->vartable, sp->p1dvar);
+	    var = (vartabled *) g_slist_nth_data(rawsp->displayptr->d->vartable, rawsp->p1dvar);
 	    levelName = var->level_names[i-1];
 	    sprintf(string,"%ld point%s for level %s", sp->bar->bins[i-1].count,
 		    sp->bar->bins[i-1].count == 1 ? "" : "s", levelName);
@@ -1235,5 +1269,24 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   }
   
 }
+
+/*XX    sp = splot_new (display, WIDTH, HEIGHT, gg); */
+
+splotd *
+gtk_barchart_splot_new(displayd *dpy, gint width, gint height, ggobid *gg)
+{
+  barchartSPlotd *bsp;
+  splotd *sp;
+
+  bsp = gtk_type_new(GTK_TYPE_GGOBI_BARCHART_SPLOT);
+  sp = GTK_GGOBI_SPLOT(bsp);
+
+  splot_init(sp, dpy, width, height, gg);
+  barchart_clean_init (bsp);
+  barchart_recalc_counts (bsp, dpy->d, gg);
+
+  return(sp);
+}
+
 
 #endif

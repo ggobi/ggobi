@@ -463,7 +463,8 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
   }
 }
 void
-splot_free (splotd *sp, displayd *display, ggobid *gg) {
+splot_free (splotd *sp, displayd *display, ggobid *gg) 
+{
 
   gtk_widget_hide (sp->da);
 
@@ -488,9 +489,12 @@ splot_free (splotd *sp, displayd *display, ggobid *gg) {
     break;
 #ifdef BARCHART_IMPLEMENTED
     case barchart:
-      barchart_free_structure (sp);
-      g_free ((gpointer) sp->bar->index_to_rank);
-      g_free ((gpointer) sp->bar);
+    {
+      barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+      barchart_free_structure (bsp);
+      g_free ((gpointer) bsp->bar->index_to_rank);
+      g_free ((gpointer) bsp->bar);
+    }
     break;
 #endif
     default:
@@ -515,23 +519,22 @@ splot_dimension_set (splotd* sp, gint width, gint height)
 }
 
 splotd *
-splot_new (displayd *display, gint width, gint height, ggobid *gg) {
+splot_new (displayd *display, gint width, gint height, ggobid *gg) 
+{
   splotd *sp;
-/*XXX  = (splotd *) g_malloc (sizeof (splotd)); */
-  sp = gtk_type_new(GTK_TYPE_GGOBI_SPLOT);
 
+  sp = gtk_type_new(GTK_TYPE_GGOBI_SPLOT);
+  splot_init(sp, display, width, height, gg);
+
+  return(sp);
+}
+
+void
+splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg) 
+{
 /*
  * Initialize the widget portion of the splot object
 */
-/*XX  sp->da = gtk_drawing_area_new (); */
-
-
-#ifdef BARCHART_IMPLEMENTED
-/* initialize barchart data */
-  if (display->displaytype == barchart) {
-    sp->bar = NULL;
-  }
-#endif
 
   brush_pos_init (sp);
   
@@ -593,8 +596,6 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   sp->motion_id = 0;
 
   gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[SPLOT_NEW_SIGNAL], sp, gg);
-
-  return sp;
 }
 
 void
@@ -685,7 +686,7 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 
 #ifdef BARCHART_IMPLEMENTED
     case barchart:
-      barchart_recalc_dimensions (sp,d,gg);
+      barchart_recalc_dimensions (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
     break;
 #endif
 
@@ -711,10 +712,11 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
 
 #ifdef BARCHART_IMPLEMENTED
   if  (display->displaytype == barchart) {
-    barchart_recalc_dimensions (sp, d, gg);
-    barchart_recalc_group_dimensions (sp,gg);
+    barchartSPlotd *bsp =  GTK_GGOBI_BARCHART_SPLOT(sp);
+    barchart_recalc_dimensions (bsp, d, gg);
+    barchart_recalc_group_dimensions (bsp,gg);
 
-/**/    return;
+    return;
   }
 #endif
 

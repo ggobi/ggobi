@@ -117,7 +117,7 @@ SRC=array.c ash1d.c \
  fileio.c print.c \
  xlines.c \
  help.c \
- ggobiClass.c
+ ggobiClass.c extendedDisplay.c
 
 OB=array.o ash1d.o \
  barchart.o barchart_ui.o \
@@ -151,7 +151,7 @@ OB=array.o ash1d.o \
  fileio.o print.o \
  xlines.o \
  help.o \
- ggobiClass.o
+ ggobiClass.o extendedDisplay.o
 
 ifdef GTK_2
  SRC+=marshal.c

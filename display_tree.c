@@ -104,23 +104,14 @@ plot_tree_display(ggobid *gg)
   gtk_window_set_title(GTK_WINDOW(plot_tree_window), "GGobi Displays");
   gtk_widget_set_usize(plot_tree_window, 250, 300);
 
-/*  replacing with gtk_signal_connect  -- dfs
- *gtk_signal_connect_object(GTK_OBJECT(gg->main_window),
- *  "select_variable",
- *  update_display_tree_plots_by_variable,
- *  (gpointer) &gg->display_tree);
-*/
   gtk_signal_connect (GTK_OBJECT(gg->main_window),
     "select_variable",
     (GtkSignalFunc) update_display_tree_plots_by_variable,
     (gpointer) &gg->display_tree);
 
  } else {
-
-  fprintf(stderr,
-    "The display tree is already visible. It should be correct!\n");
-  fflush(stderr);
-  return(NULL);
+   g_printerr("The display tree is already visible. It should be correct!\n");
+   return(NULL);
  }
 
   tree = gtk_tree_new();
@@ -132,10 +123,6 @@ plot_tree_display(ggobid *gg)
     sub = display_add_tree(display, numItems, tree, gg);
   }
 
-  /*
- gtk_signal_connect (GTK_OBJECT(tree), "select_child",
-                      GTK_SIGNAL_FUNC(display_tree_child_select), NULL);
-  */
  sw = gtk_scrolled_window_new(NULL, NULL);
  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(sw), tree);
  gtk_container_add(GTK_CONTAINER( plot_tree_window ), sw);
@@ -171,6 +158,7 @@ display_add_tree(displayd *display, gint entry, GtkWidget *tree, ggobid *gg)
 
 
   subTree = splot_subtree_create(display, gg);
+
   gtk_tree_set_view_mode (GTK_TREE(subTree), GTK_TREE_VIEW_ITEM);
   gtk_tree_item_set_subtree(GTK_TREE_ITEM( item ), subTree);
 
@@ -219,7 +207,8 @@ gtk_signal_connect (GTK_OBJECT(tree), "select_child",
     /*-- buf is allocated in splot_tree_label, but freed here --*/
     buf = splot_tree_label (sp, ctr, display->displaytype, d, gg);
     item = gtk_tree_item_new_with_label (buf);
-    if (buf) g_free (buf);
+    if(buf) 
+      g_free (buf);
 
     gtk_signal_connect (GTK_OBJECT(item), "select",
                         GTK_SIGNAL_FUNC(display_tree_splot_child_select), sp);
@@ -241,27 +230,25 @@ display_tree_label(displayd *display)
 {
  gchar *val, *tmp;
 
+ if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display))
+    val = gtk_display_tree_label(display);
+ else
   switch(display->displaytype) {
     case scatterplot:
       val = "Scatterplot";
-    break;
+      break;
     case scatmat:
       val = "Scatterplot Matrix";
-    break;
+      break;
     case parcoords:
       val = "Parallel Coordinates";
-    break;
-    case tsplot:
-      val = "Time Series";
-    break;
-#ifdef BARCHART_IMPLEMENTED
-    case barchart: 
-      val = "Barchart";
-    break;
-#endif
+      break;
+
     case unknown_display_type:
       val = (gchar *) NULL;
-    break;
+      break;
+    default:
+      break;
   }
 
   if(val) {
@@ -279,8 +266,7 @@ display_tree_label(displayd *display)
   type `type'.
  */
 gchar *
-splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
-  datad *d, ggobid *gg)
+splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,  datad *d, ggobid *gg)
 {
   gchar *buf;
   gint n;

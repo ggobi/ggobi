@@ -17,7 +17,7 @@ typedef struct _displayd displayd;
 
 #define GTK_TYPE_GGOBI_SPLOT     (gtk_ggobi_splot_get_type ())
 #define GTK_GGOBI_SPLOT(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_SPLOT, splotd))
-#define GTK_GGOBI_SPLOT_CLASS(klass)	 (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_SPLOT, GtkGGobiSplotClass))
+#define GTK_GGOBI_SPLOT_CLASS(klass)	 (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_SPLOT, GtkGGobiSPlotClass))
 #define GTK_IS_GGOBI_SPLOT(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_SPLOT))
 #define GTK_IS_GGOBI_SPLOT_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_SPLOT))
 
@@ -26,10 +26,14 @@ GtkType gtk_ggobi_splot_get_type(void);
 typedef struct 
 {
     GtkDrawingAreaClass parent_class;
+
+    RedrawStyle redraw; /* used by barchart to indicate it needs to do a full redraw from set_color_id. */
+
 } GtkGGobiSPlotClass;
 
 
-typedef struct {
+typedef struct 
+{
 
  GtkDrawingArea canvas;
 
@@ -110,29 +114,7 @@ typedef struct {
  struct {gint x, y, z;} spinvars;
 #endif
 
-/*
- * barcharts and histograms
-*/
- barchartd *bar;
-
-#ifdef WIN32
-#endif
-/*
- * for Windows drawing -- this or GArrays?  
- * Do I really need to keep doing this?
- struct _win32 {
-   struct {GdkPoint *data; gint n;} points;
-   struct {rectd *data; gint n;} orects;
-   struct {rectd *data; gint n;} frects;
-   struct {arcd *data; gint n;} oarcs;
-   struct {arcd *data; gint n;} farcs;
-   struct {GdkSegment *data; gint n;} segs;
-   struct {GdkSegment *data; gint n;} whisker_segs;
-   struct {GdkSegment *data; gint n;} ash_segs;
- } win32;
-*/
-
 } splotd;
 
-
+void splot_init(splotd *sp, displayd *display, gint width, gint height, struct _ggobid *gg);
 #endif

@@ -10,14 +10,13 @@ static gchar *display_mode_lbl[] = {"Barchart", "Spineplot"};
 
 
 void barchart_set_initials (splotd *sp, datad *d);
-void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg);
 void barchart_allocate_structure (splotd *sp, datad *d);
 
 static void display_mode_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  splotd *sp = gg->current_splot;
+  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(gg->current_splot);
   displayd *display = gg->current_display;
 
   cpanel->barchart_display_mode = GPOINTER_TO_INT (cbd);
@@ -138,6 +137,9 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   vartabled *vtx;
+
+  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+
   vtx = vartable_element_get (sp->p1dvar, d);
 
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
@@ -148,15 +150,15 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   switch (event->keyval) {
     case GDK_plus:
       if (!vtx->categorical_p) { 
-        sp->bar->new_nbins = sp->bar->nbins + 1;
+        bsp->bar->new_nbins = bsp->bar->nbins + 1;
         reallocate = TRUE;
       }
     break;
 
     case GDK_minus:
       if (!vtx->categorical_p) {
-        if (sp->bar->nbins > 2) {
-          sp->bar->new_nbins = sp->bar->nbins -1;
+        if (bsp->bar->nbins > 2) {
+          bsp->bar->new_nbins = bsp->bar->nbins -1;
           reallocate = TRUE;
         }
       }
@@ -170,7 +172,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 
     barchart_allocate_structure (sp, d);
     barchart_set_initials (sp,d);
-    barchart_recalc_counts (sp,d,gg);
+    barchart_recalc_counts (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
     sp->redraw_style = FULL;
     splot_redraw (sp, sp->redraw_style, gg); 
   }
@@ -200,7 +202,7 @@ static gint
 mouse_motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   gboolean button1_p, button2_p;
-
+  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
 
   /*-- get the mouse position and find out which buttons are pressed --*/
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
@@ -209,11 +211,11 @@ mouse_motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   if (sp->mousepos.x == sp->mousepos_o.x && sp->mousepos.y == sp->mousepos_o.y)
     return false;
 
-  if (sp->bar->is_histogram) {
+  if (bsp->bar->is_histogram) {
     GdkRegion *region;
     gboolean cursor_set = FALSE;
     
-    region = gdk_region_polygon (sp->bar->anchor_rgn, 3, GDK_WINDING_RULE);
+    region = gdk_region_polygon (bsp->bar->anchor_rgn, 3, GDK_WINDING_RULE);
     if (gdk_region_point_in (region, sp->mousepos.x,sp->mousepos.y)) {
       splot_cursor_set (GDK_SPIDER, sp);
  
@@ -221,8 +223,8 @@ mouse_motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
     }
     gdk_region_destroy(region);
 
-    region = gdk_region_polygon (sp->bar->offset_rgn, 3, GDK_WINDING_RULE);
-    if (gdk_region_point_in (region,sp->mousepos.x,sp->mousepos.y)) {
+    region = gdk_region_polygon (bsp->bar->offset_rgn, 3, GDK_WINDING_RULE);
+    if (gdk_region_point_in (region, sp->mousepos.x, sp->mousepos.y)) {
       splot_cursor_set (GDK_UMBRELLA, sp);
 
       cursor_set = TRUE;
@@ -251,6 +253,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
+  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
 
   /*-- get the mouse position and find out which buttons are pressed --*/
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
@@ -263,8 +266,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   if (sp->mousepos.x == sp->mousepos_o.x && sp->mousepos.y == sp->mousepos_o.y)
     return false;
 
-  if (sp->bar->is_histogram) {
-    if (sp->bar->anchor_drag) {
+  if (bsp->bar->is_histogram) {
+    if (bsp->bar->anchor_drag) {
       gint dy;
       gfloat scale_y;
       cpaneld *cpanel = &display->cpanel;
@@ -276,7 +279,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
         displayd *display = (displayd *) sp->displayptr;
         datad *d = display->d;
         gboolean set_anchor = TRUE; 
-        gfloat offset_old = sp->bar->offset;
+        gfloat offset_old = bsp->bar->offset;
         gint pmid_old = sp->pmid.y;
 
         scr.x = scr.y = 0;
@@ -287,25 +290,25 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
         splot_screen_to_tform (cpanel, sp, &scr, &pts1, gg);
         sp->pmid.y -= ((dy * PRECISION1) / sp->iscale.y);
         splot_screen_to_tform (cpanel, sp, &scr, &pts2, gg);
-        sp->bar->offset +=  (pts1.y - pts2.y);
+        bsp->bar->offset +=  (pts1.y - pts2.y);
 
 /* moving the anchor more than one binwidth up or down doesn't make sense */
-        if (sp->bar->offset > offset_old) {
+        if (bsp->bar->offset > offset_old) {
           /* not too high */
-          set_anchor = (sp->bar->offset < (sp->bar->breaks[1]-sp->bar->breaks[0]));
+          set_anchor = (bsp->bar->offset < (bsp->bar->breaks[1] - bsp->bar->breaks[0]));
         }
-        if (sp->bar->offset < offset_old) {
+        if (bsp->bar->offset < offset_old) {
           /* and not too low */
-          set_anchor = (sp->bar->offset > -(sp->bar->breaks[1]-sp->bar->breaks[0])); 
+          set_anchor = (bsp->bar->offset > -(bsp->bar->breaks[1] - bsp->bar->breaks[0])); 
         }
  
      
         if (set_anchor) {
-          barchart_recalc_counts (sp, d, gg);
+          barchart_recalc_counts (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
           splot_redraw (sp, FULL, gg);
         } else {
           sp->pmid.y = pmid_old;
-          sp->bar->offset = offset_old;
+          bsp->bar->offset = offset_old;
         }
       }
 
@@ -314,7 +317,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
 /**/  return true; 
     }
-    if (sp->bar->width_drag) {
+    if (bsp->bar->width_drag) {
       gint dy;
       cpaneld *cpanel = &display->cpanel;
       fcoords pts1, pts2;
@@ -328,21 +331,21 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
         splot_screen_to_tform (cpanel, sp, &sp->mousepos_o, &pts1, gg);
         splot_screen_to_tform (cpanel, sp, &sp->mousepos, &pts2, gg);
 
-        oldwidth = sp->bar->breaks[1]- sp->bar->breaks[0];
+        oldwidth = bsp->bar->breaks[1] - bsp->bar->breaks[0];
         width = oldwidth -(pts1.y - pts2.y);
         if (width > 0.) {
           extern void barchart_set_breakpoints (gfloat width, splotd *sp, datad *d );
           gboolean set_breaks = TRUE; 
-          gint pix_width = sp->bar->bins[0].rect.y - sp->bar->bins[1].rect.y; 
+          gint pix_width = bsp->bar->bins[0].rect.y - bsp->bar->bins[1].rect.y; 
           if (width > oldwidth)  {
-            set_breaks = sp->bar->bins[0].rect.y > (sp->max.y/2+1); /* not too big */
+            set_breaks = bsp->bar->bins[0].rect.y > (sp->max.y/2+1); /* not too big */
           }
           if (width < oldwidth) {
             set_breaks = pix_width > 6;  /* not too small */
           }
           if (set_breaks) {       
-            barchart_set_breakpoints (width,sp,d);
-            barchart_recalc_counts (sp,d,gg);
+            barchart_set_breakpoints (width, sp, d);
+            barchart_recalc_counts (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
             splot_redraw (sp, FULL, gg);
           }
         }
@@ -390,27 +393,28 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   gboolean button1_p, button2_p;
   GdkRegion *region;
+  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
   gg->current_splot = sp->displayptr->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
 
-  if (sp->bar->is_histogram) {
-    sp->bar->anchor_drag = FALSE;
-    sp->bar->width_drag = FALSE;
+  if (bsp->bar->is_histogram) {
+    bsp->bar->anchor_drag = FALSE;
+    bsp->bar->width_drag = FALSE;
 
-    region = gdk_region_polygon (sp->bar->anchor_rgn, 3, GDK_WINDING_RULE); 
-    if (gdk_region_point_in (region, sp->mousepos.x,sp->mousepos.y)) {
-      sp->bar->anchor_drag = TRUE;
+    region = gdk_region_polygon (bsp->bar->anchor_rgn, 3, GDK_WINDING_RULE); 
+    if (gdk_region_point_in (region, sp->mousepos.x, sp->mousepos.y)) {
+      bsp->bar->anchor_drag = TRUE;
 
     }
     gdk_region_destroy(region);
 
-    region = gdk_region_polygon (sp->bar->offset_rgn, 3, GDK_WINDING_RULE);
-    if (gdk_region_point_in (region,
-                           sp->mousepos.x,sp->mousepos.y)) {
-      sp->bar->width_drag = TRUE;
+    region = gdk_region_polygon (bsp->bar->offset_rgn, 3, GDK_WINDING_RULE);
+    if (gdk_region_point_in (region, sp->mousepos.x,sp->mousepos.y)) {
+      bsp->bar->width_drag = TRUE;
     }
     gdk_region_destroy(region);
   }
@@ -446,7 +450,8 @@ barchart_event_handlers_toggle (splotd *sp, gboolean state) {
 
 
 void
-barchart_scale_event_handlers_toggle (splotd *sp, gboolean state) {
+barchart_scale_event_handlers_toggle (splotd *sp, gboolean state) 
+{
   displayd *display = (displayd *) sp->displayptr;
 
   if (state == on) {

@@ -119,7 +119,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
 #ifdef BARCHART_IMPLEMENTED
   if (gg->current_display->displaytype == barchart) {
-    gboolean changed = barchart_identify_bars (sp->mousepos, sp, d, gg);
+    gboolean changed = barchart_identify_bars (sp->mousepos, GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
 
     if (changed) {
       displays_plot (NULL, QUICK, gg);

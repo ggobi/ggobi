@@ -1,6 +1,16 @@
 \documentclass{article}
+\usepackage{times}
+\usepackage{fullpage}
+\input{pstricks}
+\input{WebMacros}
+\input{CMacros}
+\input{GtkMacros}
+
+\title{Adding GGobi display and plot type}
+\author{Duncan Temple Lang}
 
 \begin{document}
+\maketitle
 
 This document describes some of the issues related to introducing a
 new plot type for ggobi.  Since we have designed ggobi to be
@@ -10,12 +20,88 @@ important that the plots provide an easy and consistent API so that
 they can share common facilities and simplify the task of developers
 integrating into these other languages.
 
+We are now using the (horrible) C-based class system via Gtk. This is
+extremely error-prone, verbose and tedious,
+but we are using it neverthless.
+This is motivated by two reasons:
+\begin{itemize}
+\item our reliance on Gtk and the willingness to use it to its fullest
+given our original use of it;
+\item the desire to make the objects accessible 
+ to R, Python, Perl, etc. via simple machine-generated bindings.
+\end{itemize}
+
+
+Extensibility is the goal here. We want to allow developers to add new
+plots without needing to alter the existing GGobi source code.  This
+makes maintaining such additions across different releases easier for
+the developer and also simplifies testing, etc. within the central
+GGobi development.
+
+There is a difference but close connection between the concept of a
+display and a plot in GGobi.  A display can be thought of as a
+container for multiple related plots.  An example is the scatterplot
+matrix display.  Another is the single scatterplot window.  In the
+first case, the display contains a grid of plot elements.  In the
+latter, there is a single plot object.  Due to the way the parallel
+coordinates ``plot'' was implemented, it is a display that houses a
+plot for each variable.
+
+To complicate things further, it is possible in the
+current Rggobi package to create embedded plots
+that are not initially associated with any display.
+They can then be located within a Gtk container
+in different ways to get user-defined layouts.
+This is one of the motivations for creating a
+class system for plots and displays. This will 
+allow us to create the objects as regular Gtk elements
+and place them directly within Gtk GUIs.
+And all of this can be done trivially using 
+bindings for ones favorite programming language,
+e.g. RGtk for R, PyGtk for Python, etc.
+
+
+Let's start with the simplest case first, namely creating a new
+top-level display class.  By this, we mean that it has a top-level
+window.  In this case, we will want to derive our class from the
+\GtkClass{GtkGGobiWindowDisplayClass}.  For safety and simplicity in
+developing the extended display mechanism, we have created an
+intermediate class -- \GtkClass{GtkGGobiExtendedDisplayClass} -- which
+we can use to form the basis of the extended classes.  This extends
+\GtkClass{GtkGGobiWindowDisplayClass} and we will extend this class.
+
+The barchart and time series plots in \headerFile{barchartDisplay.h}
+\headerFile{tsdisplay.h}
+illustrate how this is done.
+
+In the \Croutine{get_type} routine for the new Gtk class/type, we
+specify a routine that is called to initialize the class structure for
+this Gtk class.  In the initialization of the extended class, we set
+the methods and any class-specific fields.  For example, we can
+specify the string to use in the GGobi display tree to identify this
+type of top-level display.  We do this by specifying a value for the
+\Cfield{treeLabel}. In the unlikely case that the computation is more
+dynamic and complicated than a single constant value, then we can
+compute the string at run-time by calling the \Croutine{tree_label}
+method in the class. Again, one specifies a value for this field in
+the class in the class initialization method.
+
+The fact that we have to access the fields from the inherited class
+indirectly via the \Cfield{parent_class} field in the class structure
+is one of the several frustrating aspects of the C-based class
+mechanism.
+
+
+\section{Functionality}
 \begin{description}
 \item[name] 
 \item[description]
 \item[setVariable]
 \item[multiple variables]
 \end{description}
+
+
+\section{Things to keep in mind}
 
 
 Please keep the user interface material in a separate file from the
@@ -28,7 +114,11 @@ ggobi API. This allows the developers of interfaces to other languages
 easily provide connections for this plot type.
 
 Use enumerations for a list of possible types,
-e.g. the \Cvariable{tsplot_arrangement}.
+e.g. the \CVariable{tsplot_arrangement}.
 
+
+The redraw field in the splot class allows the plot type to indicate
+if it needs to do a full redraw when the color id is reset.
+This avoids conditionals in the code.
 
 \end{document}

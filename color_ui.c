@@ -394,13 +394,9 @@ set_color_id (GtkWidget *w, GdkEventButton *event, ggobid *gg)
   else
     set_color_fg (w, event, gg);
 
-#ifdef BARCHART_IMPLEMENTED
-  /* barcharts need more attention than redrawing the brush */
-  if (gg->current_splot->bar) {
-    splot_redraw (gg->current_splot, FULL, gg);
-  } else
-#endif
-  splot_redraw (gg->current_splot, QUICK, gg);  /*-- redraw brush --*/
+  splot_redraw (gg->current_splot, 
+                GTK_GGOBI_SPLOT_CLASS(GTK_OBJECT(gg->current_splot)->klass)->redraw,
+                gg);  /*-- redraw brush --*/
 
   return FALSE;
 }

@@ -4,6 +4,8 @@
 #include "vars.h"
 #include "externs.h"
 
+#include "tsdisplay.h"
+
 /* initial plot sizes */
 #define WIDTH   150
 #define HEIGHT  100
@@ -121,8 +123,7 @@ tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
 #define MAXNTSPLOTS 6
 displayd *
-tsplot_new (gboolean missing_p, gint nvars, gint *vars,
-  datad *d, ggobid *gg) 
+tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   GtkWidget *mbar, *w;
@@ -132,7 +133,11 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars,
   gint nplots;
   displayd *display;
 
-  display = display_alloc_init (tsplot, missing_p, d, gg);
+/*XX  display = display_alloc_init (tsplot, missing_p, d, gg); */
+  display = gtk_type_new(GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY);
+  display_set_values(display, tsplot, d, gg);
+
+
   if (nvars == 0) {
     nplots = MIN ((d->ncols-1), sessionOptions->info->numTimePlotVars);
     if(nplots < 0)
@@ -150,20 +155,20 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars,
 /*
  * Add the main menu bar
 */
-  vbox = GTK_WIDGET(display); /*XX gtk_vbox_new (FALSE, 1); */
+  vbox = GTK_WIDGET(display); 
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
   gg->tsplot.accel_group = gtk_accel_group_new ();
   factory = get_main_menu (menu_items,
-    sizeof (menu_items) / sizeof (menu_items[0]),
-    gg->tsplot.accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, &mbar, (gpointer) display);
+			   sizeof (menu_items) / sizeof (menu_items[0]),
+			   gg->tsplot.accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
+			   &mbar, (gpointer) display);
 
   /*-- add a tooltip to the file menu --*/
   w = gtk_item_factory_get_widget (factory, "<main>/File");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    gtk_menu_get_attach_widget (GTK_MENU(w)),
-    "File menu for this display", NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gtk_menu_get_attach_widget (GTK_MENU(w)),
+			"File menu for this display", NULL);
 
   /*
    * After creating the menubar, and populating the file menu,

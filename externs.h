@@ -579,20 +579,21 @@ void      subset_init (datad *d, ggobid *gg);
 
 
 #ifdef BARCHART_IMPLEMENTED
-gboolean barchart_active_paint_points (splotd *sp, datad *d); 
-void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg);
-void barchart_clean_init (splotd *sp);
+#include "barchartDisplay.h"
+gboolean barchart_active_paint_points (barchartSPlotd *sp, datad *d); 
+void barchart_add_bar_cues (barchartSPlotd *sp, GdkDrawable *drawable, ggobid *gg);
+void barchart_clean_init (barchartSPlotd *sp);
 void barchart_cpanel_init (cpaneld *, ggobid *);
 void barchart_event_handlers_toggle (splotd *, gboolean state);
-void barchart_free_structure (splotd *sp);
-gboolean barchart_identify_bars (icoords mousepos, splotd *sp, datad *d, ggobid *gg);
-void barchart_init_vectors(splotd *sp);
+void barchart_free_structure (barchartSPlotd *sp);
+gboolean barchart_identify_bars (icoords mousepos, barchartSPlotd *sp, datad *d, ggobid *gg);
+void barchart_init_vectors(barchartSPlotd *sp);
 void barchart_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds);
 displayd *barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
-void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg);
-void barchart_recalc_dimensions (splotd *sp, datad *d, ggobid *gg);
-void barchart_recalc_group_dimensions (splotd *sp, ggobid *gg);
-void barchart_redraw (splotd *sp, datad *d, ggobid *gg);
+void barchart_recalc_counts (barchartSPlotd *sp, datad *d, ggobid *gg);
+void barchart_recalc_dimensions (barchartSPlotd *sp, datad *d, ggobid *gg);
+void barchart_recalc_group_dimensions (barchartSPlotd *sp, ggobid *gg);
+void barchart_redraw (barchartSPlotd *sp, datad *d, ggobid *gg);
 void barchart_splot_add_plot_labels (splotd *, GdkDrawable *, ggobid *);
 void cpanel_barchart_make (ggobid *gg);
 void cpanel_barchart_set (cpaneld *cpanel, ggobid *gg);

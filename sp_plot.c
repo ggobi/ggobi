@@ -370,7 +370,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 #else
 #ifdef BARCHART_IMPLEMENTED
       if (dtype == barchart) {
-        barchart_redraw (sp, d, gg);
+        barchart_redraw (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
       }
       else {
 #endif
@@ -474,7 +474,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
     gint dtype = display->displaytype;
 
     if (dtype == barchart) {
-      barchart_redraw (sp, d, gg);
+      barchart_redraw (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
       return;
     }
   }
@@ -1425,7 +1425,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   
 #ifdef BARCHART_IMPLEMENTED
   if (display->displaytype == barchart)
-    barchart_add_bar_cues (sp, drawable, gg);
+    barchart_add_bar_cues (GTK_GGOBI_BARCHART_SPLOT(sp), drawable, gg);
 #endif
    
   splot_add_plot_labels (sp, drawable, gg);  /*-- axis labels --*/
