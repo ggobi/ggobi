@@ -53,6 +53,10 @@ EXPORTS
  GGobi_getDefaultDisplayOptions
  getDefaultRowNamesPtr
  datad_init
+ sticky_id_link_by_id
+ GGobi_getVariableIndex
+ limits_set_by_var
+ GGobiSignals
+ getGGobiSignal
 
- 
  

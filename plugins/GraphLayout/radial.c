@@ -454,7 +454,7 @@ void radial_center_set_cb (ggobid *gg, gint index,
       g_slist_nth_data (d->sticky_ids, 0));
         sticky_id_link_by_id (STICKY_REMOVE, 0, d, gg);
       gtk_signal_emit(GTK_OBJECT(gg),
-        GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], 0,
+        getGGobiSignal(STICKY_POINT_REMOVED_SIGNAL), 0,
         (gint) UNSTICKY, d);
     }
 

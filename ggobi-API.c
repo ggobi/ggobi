@@ -1712,4 +1712,12 @@ GGOBI(edge_menus_update)(ggobid *gg)
 }
 */
 
+guint 
+getGGobiSignal(GGobiSignalType which)
+{
+  /*
+XXX  assert(which > -1 && which < MAX_GGOBI_SIGNALS);
+  */
+  return(GGobiSignals[which]);
+}
 
