@@ -70,6 +70,40 @@ vartable_clist_get (ggobid *gg) {
   return ((GtkCList *) g_list_nth_data (swin_children, 0));
 }
 
+void
+vartable_show_page (displayd *display, ggobid *gg)
+{
+  GtkNotebook *nb;
+  gint page, page_new;
+  datad *d = display->d;
+  GList *l, *children;
+  GtkWidget *child, *tab_label;
+
+  if (display == NULL || gg == NULL || gg->vartable_ui.notebook == NULL)
+    return;
+
+  nb = GTK_NOTEBOOK (gg->vartable_ui.notebook);
+  page = gtk_notebook_get_current_page (nb);
+
+  if (page < 0)
+    return;
+
+  page_new = 0;
+  children = gtk_container_children (GTK_CONTAINER (gg->vartable_ui.notebook));
+  for (l = children; l; l = l->next) {
+    child = l->data;
+    tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
+    if (tab_label && GTK_IS_LABEL (tab_label)) {
+      if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
+        if (page != page_new) {
+          gtk_notebook_set_page (nb, page_new);
+          break;
+        }
+      }
+    }
+    page_new++;
+  }
+}
 /*-------------------------------------------------------------------------*/
 /*--------------- Setting and clearing variable ranges --------------------*/
 /*-------------------------------------------------------------------------*/
@@ -930,6 +964,9 @@ vartable_open (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 1);
 
   gtk_widget_show_all (gg->vartable_ui.window);
+
+  /*-- set it to the page corresponding to the current display --*/
+  vartable_show_page (gg->current_display, gg);
 }
 
 /*-------------------------------------------------------------------------*/
