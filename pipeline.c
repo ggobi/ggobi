@@ -306,7 +306,7 @@ world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg)
 
   rdiff = vt->lim.max - vt->lim.min;
 
-  ftmp = d->world.vals[pt][j] / precis;
+  ftmp = (d->world.vals[pt][j] - d->jitdata.vals[pt][j]) / precis;
   x = (ftmp + 1.0) * .5 * rdiff;
   x += vt->lim.min;
 
