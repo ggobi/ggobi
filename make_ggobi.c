@@ -131,6 +131,15 @@ void globals_init (ggobid *gg) {
         GTK_TYPE_NONE, 2,
         GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
+  if (gtk_signal_lookup ("variable_list_changed", GTK_TYPE_WIDGET) == 0) {
+    GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL] =
+      gtk_object_class_user_signal_new (gtk_type_class (GTK_TYPE_WIDGET),
+        "variable_list_changed",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER_POINTER,
+        GTK_TYPE_NONE, 2,
+        GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+  }
 
   if (gtk_signal_lookup ("sticky_point_added", GTK_TYPE_WIDGET) == 0) {
     GGobiSignals[STICKY_POINT_ADDED_SIGNAL] =
