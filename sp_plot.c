@@ -212,16 +212,24 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
             draw_glyph (sp->pixmap0, &d->glyph_now[m], sp->screen, m, gg);
 
           /*-- parallel coordinate plot whiskers --*/
-          if (display->displaytype == parcoords) {
+          if (display->displaytype == parcoords ||
+	      display->displaytype == tsplot) {
             if (display->options.edges_show_p) {
-              n = 2*m;
-              gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                sp->whiskers[n].x1, sp->whiskers[n].y1,
-                sp->whiskers[n].x2, sp->whiskers[n].y2);
-              n++;
-              gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                sp->whiskers[n].x1, sp->whiskers[n].y1,
-                sp->whiskers[n].x2, sp->whiskers[n].y2);
+	      if (display->displaytype == parcoords){
+                n = 2*m;
+                gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                  sp->whiskers[n].x1, sp->whiskers[n].y1,
+                  sp->whiskers[n].x2, sp->whiskers[n].y2);
+                n++;
+                gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                  sp->whiskers[n].x1, sp->whiskers[n].y1,
+                  sp->whiskers[n].x2, sp->whiskers[n].y2);
+  	      }
+	      else{
+		gdk_draw_line (sp->pixmap0, gg->plot_GC,
+			       sp->whiskers[m].x1, sp->whiskers[m].y1,
+			       sp->whiskers[m].x2, sp->whiskers[m].y2);
+	      }
             }
           }
 
@@ -335,6 +343,11 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
                       sp->whiskers[n].x2, sp->whiskers[n].y2);
                   }
                 }
+		else if(display->displaytype == tsplot){
+		   gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                    sp->whiskers[m].x1, sp->whiskers[m].y1,
+                    sp->whiskers[m].x2, sp->whiskers[m].y2);
+		}
               }
             }
           }

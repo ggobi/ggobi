@@ -103,8 +103,11 @@ static gchar *manip_lbl[] = {"Vertical", "Horizontal", "Comb",
                              "EqualComb"};
 static void manip_cb (GtkWidget *w, gpointer cbd)
 {
-  gint indx = GPOINTER_TO_INT (cbd);
-  g_printerr ("cbd: %s\n", manip_lbl[indx]);
+  ggobid *gg = GGobiFromWidget(w, true);
+  displayd *dsp = gg->current_display;
+
+  dsp->tc_manip_mode = GPOINTER_TO_INT (cbd);
+  /*  g_printerr ("cbd: %s\n", manip_lbl[indx]);*/
 }
 static gchar *pathlen_lbl[] = {"1/10", "1/5", "1/4", "1/3", "1/2", "1",
                                "2", "10", "Infinite"};
@@ -315,7 +318,16 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 static gint
 motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+  ggobid *gg = GGobiFromSPlot(sp);
+  extern void tourcorr_manip(gint, gint, splotd *, ggobid *);
+  /*  extern void tourcorr_manip(gint, gint, splotd *);*/
   g_printerr ("(ct_motion_notify_cb)\n");
+
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
+  /*  printf("%d %d \n",sp->mousepos.x,sp->mousepos.y);*/
+  tourcorr_manip(sp->mousepos.x, sp->mousepos.y, sp, gg);
+  /*  tourcorr_manip(sp->mousepos.x, sp->mousepos.y, sp);*/
 
   return true;
 }
@@ -323,9 +335,7 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
-  gg->current_splot = sp;
-  gg->current_display = (displayd *) sp->displayptr;
+  extern void tourcorr_manip_init(gint, gint, splotd *);
 
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
@@ -335,16 +345,23 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
                                       (GtkSignalFunc) motion_notify_cb,
                                       (gpointer) sp);
 
+  printf("%d %d \n",sp->mousepos.x,sp->mousepos.y);
+  tourcorr_manip_init(sp->mousepos.x, sp->mousepos.y, sp);
+
   return true;
 }
 static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+  extern void tourcorr_manip_end(splotd *);
   gboolean retval = true;
 
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
 
+  gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+
+  tourcorr_manip_end(sp);
   if (sp->motion_id)
     gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 

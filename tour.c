@@ -293,7 +293,6 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
 
   /* Check that u0 and u1 are the same */
   if (!checkequiv(u0.vals, u1.vals, nc, nd)) {
-    printf("Start and target planes are equal\n");
     doit = false;
   }
 
@@ -467,7 +466,6 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
       *ns = nsteps;
       *stcn = stepcntr;
 
-      printf("in not doit part \n");
     }
 
 /* free temporary arrays */

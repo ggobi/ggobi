@@ -83,7 +83,11 @@ struct _displayd {
 /*
  * Correlation Tour
 */
-  gint ncorrvars_x, *corrvars_x, ncorrvars_y, *corrvars_y;
+  array_f tc1_manbasis, tc2_manbasis;
+  gint tc1_manip_var, tc2_manip_var;
+  gint tc1_pos_old, tc1_pos, tc2_pos_old, tc2_pos;
+  gint tc_manip_mode;
+  gboolean tc1_manipvar_inc, tc2_manipvar_inc;
 
 /*
  * 2d tour

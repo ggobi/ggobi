@@ -609,7 +609,6 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   gfloat scale_x, scale_y;
   datad *d = display->d;
 
-
   scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
   scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
 
@@ -645,6 +644,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
     extern void tsplot_whiskers_make (splotd *, displayd *, ggobid *);
     tsplot_whiskers_make (sp, display, gg);
   }
+
 }
 
 /*----------------------------------------------------------------------*/

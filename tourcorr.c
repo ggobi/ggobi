@@ -50,6 +50,12 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
   vectorf_init(&dsp->tcorr1.tinc);
   vectorf_alloc(&dsp->tcorr1.tinc, nc);
 
+  /* manipulation controls */
+  arrayf_init(&dsp->tc1_manbasis);
+  arrayf_alloc(&dsp->tc1_manbasis,2,nc);
+  arrayf_init(&dsp->tc2_manbasis);
+  arrayf_alloc(&dsp->tc2_manbasis,2,nc);
+
   /* first index is the projection dimensions, second dimension is ncols */
   arrayf_init(&dsp->tcorr2.u0);
   arrayf_alloc(&dsp->tcorr2.u0, nc, nc);
@@ -109,6 +115,9 @@ tourcorr_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
       vectorf_delete_els (&dsp->tcorr1.tau, nc, cols);
       vectorf_delete_els (&dsp->tcorr1.tinc, nc, cols);
 
+      arrayf_delete_cols (&dsp->tc1_manbasis, (gint) 2, cols);
+      arrayf_delete_cols (&dsp->tc2_manbasis, (gint) 2, cols);
+
       arrayf_delete_cols (&dsp->tcorr2.u0, nc, cols);
       arrayf_delete_cols (&dsp->tcorr2.u1, nc, cols);
       arrayf_delete_cols (&dsp->tcorr2.u, nc, cols);
@@ -149,6 +158,9 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
       vectorf_realloc (&dsp->tcorr1.tau, nc);
       vectorf_realloc (&dsp->tcorr1.tinc, nc);
 
+      arrayf_add_cols (&dsp->tc1_manbasis, (gint) 2);
+      arrayf_add_cols (&dsp->tc2_manbasis, (gint) 2);
+
       arrayf_add_cols (&dsp->tcorr2.u0, nc);
       arrayf_add_cols (&dsp->tcorr2.u1, nc);
       arrayf_add_cols (&dsp->tcorr2.u, nc);
@@ -188,6 +200,9 @@ free_tourcorr(displayd *dsp)
 
   arrayf_free(&dsp->tcorr1.uvevec, 0, 0);
   arrayf_free(&dsp->tcorr1.tv, 0, 0);
+
+  arrayf_free(&dsp->tc1_manbasis, 0, 0);
+  arrayf_free(&dsp->tc2_manbasis, 0, 0);
 
   vectori_free(&dsp->tcorr2.vars);
   vectorf_free(&dsp->tcorr2.lambda);
@@ -296,10 +311,10 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
 	}
       }
       dsp->tcorr1.nvars--;
-      printf("active %d: ",dsp->tcorr1.nvars);
+      /*      printf("active %d: ",dsp->tcorr1.nvars);
       for (j=0; j<dsp->tcorr1.nvars; j++)
         printf("%d ",dsp->tcorr1.vars.els[j]);
-      printf("\n");
+	printf("\n");*/
     }
   }
   else { /* not active, so add the variable */
@@ -325,10 +340,10 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
       dsp->tcorr1.vars.els[jtmp] = jvar;
     }
     dsp->tcorr1.nvars++;
-    printf("not active %d: ",dsp->tcorr1.nvars);
+    /*    printf("not active %d: ",dsp->tcorr1.nvars);
     for (j=0; j<dsp->tcorr1.nvars; j++)
       printf("%d ",dsp->tcorr1.vars.els[j]);
-    printf("\n");
+      printf("\n");*/
   }
 
   dsp->tcorr1.get_new_target = true;
@@ -615,8 +630,219 @@ void tourcorr_reinit(ggobid *gg)
 
 }
 
+/* Variable manipulation */
+void
+tourcorr_manip_init(gint p1, gint p2, splotd *sp) 
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  gint j;
+  gint n1vars = dsp->tcorr1.nvars, n2vars = dsp->tcorr2.nvars;
+  extern void gram_schmidt(gfloat *, gfloat*, gint);
+  extern void copy_mat(gfloat **, gfloat **, gint, gint);
 
+  dsp->tc1_pos = dsp->tc1_pos_old = p1;
+  dsp->tc2_pos = dsp->tc2_pos_old = p2;
+  dsp->tc1_manipvar_inc = false;
+  dsp->tc2_manipvar_inc = false;
 
+  /* need to turn off tour? */
+  for (j=0; j<dsp->tcorr1.nvars; j++)
+    if (dsp->tcorr1.vars.els[j] == dsp->tc1_manip_var) {
+      dsp->tc1_manipvar_inc = true;
+      n1vars--;
+    }
+  for (j=0; j<dsp->tcorr2.nvars; j++)
+    if (dsp->tcorr2.vars.els[j] == dsp->tc2_manip_var) {
+      dsp->tc2_manipvar_inc = true;
+      n2vars--;
+    }
+  /*  printf("manip var %d n1vars %d \n",dsp->tc1_manip_var,n1vars);*/
+  /* make manip basis */
+  for (j=0; j<d->ncols; j++) {
+    dsp->tc1_manbasis.vals[0][j] = dsp->tcorr1.u.vals[0][j];
+    dsp->tc1_manbasis.vals[1][j] = 0.;
+  }
+  for (j=0; j<d->ncols; j++) {
+    dsp->tc2_manbasis.vals[0][j] = dsp->tcorr2.u.vals[0][j];
+    dsp->tc2_manbasis.vals[1][j] = 0.;
+  }
+  dsp->tc1_manbasis.vals[1][dsp->tc1_manip_var]=1.;
+  dsp->tc2_manbasis.vals[1][dsp->tc2_manip_var]=1.;
+  /*  for (j=0; j<d->ncols; j++)
+  {
+  printf("man basis %f %f\n",dsp->tc1_manbasis.vals[0][j],dsp->tc2_manbasis.vals[0][j]);*/
+    /*    dsp->tcorr1.u.vals[0][j] = dsp->tc1_manbasis.vals[0][j];
+	  dsp->tcorr2.u.vals[0][j] = dsp->tc2_manbasis.va1s[0][j];*/
+  /*  }*/
+  if (n1vars > 0)
+  {
+    gram_schmidt(dsp->tc1_manbasis.vals[1],  dsp->tc1_manbasis.vals[0],
+      d->ncols);
+    /*    ftmp = calc_norm(dsp->tc1_manbasis.vals[1], d->ncols);
+    while (ftmp < tol)
+    {
+      gen_norm_variates(1, xg->ncorr_xvars, xg->tv[0]);
+      for (j=0; j<d->ncols; j++)
+        dsp->tc1_manbasis.vals[1][j] = 0.;
+      for (j=0; j<xg->ncorr_xvars; j++)
+        dsp->tc1_manbasis.vals[1][xg->corr_xvars[j]] = xg->tv[0][j];
+      norm(dsp->tc1_manbasis.vals[1], d->ncols);
+      gram_schmidt(dsp->tc1_manbasis.vals[0],  dsp->tc1_manbasis.vals[1],
+        d->ncols);
+      ftmp = calc_norm(dsp->tc1_manbasis.vals[1], d->ncols);
+      }*/
+  }
+  if (n2vars > 0)
+  {
+    gram_schmidt(dsp->tc2_manbasis.vals[1],  dsp->tc2_manbasis.vals[0],
+      d->ncols);
+    /*    ftmp = calc_norm(dsp->tc2_manbasis.vals[1], d->ncols);
+    while (ftmp < tol)
+    {
+      gen_norm_variates(1, xg->ncorr_yvars, xg->tv[0]);
+      for (j=0; j<d->ncols; j++)
+        dsp->tc2_manbasis.vals[1][j] = 0.;
+      for (j=0; j<xg->ncorr_yvars; j++)
+        dsp->tc2_manbasis.vals[1][xg->corr_yvars[j]] = xg->tv[0][j];
+      norm(dsp->tc2_manbasis.vals[1], d->ncols);
+      gram_schmidt(dsp->tc2_manbasis.vals[0],  dsp->tc2_manbasis.vals[1],
+        d->ncols);
+      ftmp = calc_norm(dsp->tc2_manbasis.vals[1], d->ncols);
+      }*/
+  } 
+  copy_mat(dsp->tcorr1.u.vals, dsp->tcorr1.u0.vals, d->ncols, 1);
+  copy_mat(dsp->tcorr2.u.vals, dsp->tcorr2.u0.vals, d->ncols, 1);
 
+}
 
+void
+tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg) 
+     /*tourcorr_manip(gint p1, gint p2, splotd *sp) */
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  gfloat xphi = 0., yphi=0., xcosphi=1., xsinphi=0., ycosphi=1., ysinphi=0.;
+  gfloat distx, disty;
+  gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
+  gint actual_nxvars = dsp->tcorr1.nvars, actual_nyvars = dsp->tcorr2.nvars;
+  gint j;
 
+  printf("denom %f sp dim %d %d \n",denom,sp->max.x,sp->max.y);
+
+  if (dsp->tc1_manipvar_inc)
+    actual_nxvars = dsp->tcorr1.nvars-1;
+  if (dsp->tc2_manipvar_inc)
+    actual_nyvars = dsp->tcorr2.nvars-1;
+
+  dsp->tc1_pos_old = dsp->tc1_pos;
+  dsp->tc2_pos_old = dsp->tc2_pos;
+
+  dsp->tc1_pos = p1;
+  dsp->tc2_pos = p2;
+
+  /*  printf("%d %d %d %d\n",dsp->tc1_pos_old, dsp->tc1_pos, dsp->tc2_pos_old, 
+    dsp->tc2_pos);
+    printf("%d %d\n",actual_nxvars, actual_nyvars);*/
+
+  if (actual_nxvars > 0 || actual_nyvars > 0)
+  {
+    if (dsp->tc_manip_mode == CMANIP_VERT)
+    {
+      distx = 0.;
+      if (actual_nyvars > 0)
+        disty = dsp->tc2_pos_old - dsp->tc2_pos;
+    }
+    else if (dsp->tc_manip_mode == CMANIP_HOR)
+    {
+      if (actual_nxvars > 0)
+        distx = dsp->tc1_pos - dsp->tc1_pos_old;
+      disty = 0.;
+    }
+    else if (dsp->tc_manip_mode == CMANIP_COMB)
+    {
+      if (actual_nxvars > 0)
+        distx = dsp->tc1_pos - dsp->tc1_pos_old;
+      if (actual_nyvars > 0)
+        disty = dsp->tc2_pos_old - dsp->tc2_pos;
+    }
+    else if (dsp->tc_manip_mode == CMANIP_EQUAL)
+    {
+      if (actual_nxvars > 0)
+        distx = dsp->tc1_pos - dsp->tc1_pos_old;
+      if (actual_nyvars > 0)
+        disty = dsp->tc2_pos_old - dsp->tc2_pos;
+      if (fabs(distx) != fabs(disty))
+      {
+        distx = (distx+disty)/1.414214;
+        disty = distx;
+      }
+    }
+    
+    xphi = xphi + distx / denom;
+    yphi = yphi + disty / denom;
+ 
+    xcosphi = (gfloat) cos((gdouble) xphi);
+    xsinphi = (gfloat) sin((gdouble) xphi);
+    if (xcosphi > 1.0)
+    {
+      xcosphi = 1.0;
+      xsinphi = 0.0;
+    }
+    else if (xcosphi < -1.0)
+    {
+      xcosphi = -1.0;
+      xsinphi = 0.0;
+    }
+    ycosphi = (float) cos((double) yphi);
+    ysinphi = (float) sin((double) yphi);
+    if (ycosphi > 1.0)
+    {
+      ycosphi = 1.0;
+      ysinphi = 0.0;
+    }
+    else if (ycosphi < -1.0)
+    {
+      ycosphi = -1.0;
+      ysinphi = 0.0;
+    }
+  }
+
+  printf("phi %f %f %f %f dist %f %f\n",xphi,yphi,xcosphi,xsinphi,distx,disty);
+
+  /* generate the projection basis */
+  if (actual_nxvars > 0) 
+  {
+    for (j=0; j<d->ncols; j++)
+      dsp->tcorr1.u.vals[0][j] = xcosphi * dsp->tc1_manbasis.vals[1][j] + 
+       xsinphi * dsp->tc1_manbasis.vals[0][j];
+    printf("manip x\n");
+  }
+
+  if (actual_nyvars > 0)
+  {
+    for (j=0; j<d->ncols; j++)
+      dsp->tcorr2.u.vals[1][j] = ycosphi * dsp->tc2_manbasis.vals[1][j] + 
+       ysinphi * dsp->tc2_manbasis.vals[0][j];
+    printf("manip y\n");
+  }
+
+  for (j=0; j<d->ncols; j++)
+  {
+    printf("u %f %f\n",dsp->tcorr1.u.vals[0][j],dsp->tcorr2.u.vals[0][j]);
+    }
+  display_tailpipe (dsp, gg);
+
+  /*  varcircles_refresh (d, gg);*/
+}
+
+void
+tourcorr_manip_end(splotd *sp) 
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  extern void copy_mat(gfloat **, gfloat **, gint, gint);
+
+  copy_mat(dsp->tcorr1.u.vals, dsp->tcorr1.u0.vals, d->ncols, 1);
+  copy_mat(dsp->tcorr2.u.vals, dsp->tcorr2.u0.vals, d->ncols, 1);
+}
