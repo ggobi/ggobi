@@ -1300,7 +1300,10 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
   gchar string[100];
   icoords mousepos = rawsp->mousepos;
   colorschemed *scheme = gg->activeColorScheme;
+  PipelineMode mode = viewmode_get (gg);
 
+  if (mode != IDENT)
+    return;
 
   nbins = sp->bar->nbins;
   gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
