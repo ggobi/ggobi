@@ -326,7 +326,6 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
   }
 
   data->state = type;
-
 }
 
 void
@@ -494,6 +493,7 @@ void endXMLElement(void *user_data, const xmlChar *name)
        /* This is the individual setRecordValue(), i.e. not with an 's' at the end.
            */
       setRecordValue(data->recordString, data->current_data, data);
+      data->current_element++;
     break;
     case VARIABLE:
     case REAL_VARIABLE:
@@ -519,8 +519,11 @@ void endXMLElement(void *user_data, const xmlChar *name)
       data = NULL; /* just any code so we can stop.*/
     break;
   }
-  if(data)
+
+  if(data) {
     resetRecordInfo(data);
+    data->state = UNKNOWN; 
+  }
 }
 
 
@@ -607,6 +610,7 @@ Characters(void *user_data, const xmlChar *ch, gint len)
     case REAL:
     case STRING:
     case INT:
+    case UNKNOWN:
         /* Now we call
             setRecordValues (data, c, dlen); 
            after gathering the entire string for the record so that we
@@ -1611,6 +1615,7 @@ releaseCurrentDataInfo(XMLParserData *parserData)
   	     g_hash_table_destroy(parserData->autoLevels[i]); 
 	 }
       }
+      parserData->autoLevels = NULL;
    }
 }
 
