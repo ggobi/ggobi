@@ -53,7 +53,7 @@ show_glayout_window (GtkWidget *widget, PluginInstance *inst)
 
   } else {
     gl = (glayoutd *) inst->data;
-    if (window)
+    if (gl->window)
       gtk_widget_show_now ((GtkWidget*) gl->window);
   }
 }
