@@ -12,6 +12,9 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#ifdef SUPPORT_PLUGINS  
+#include "plugin.h"
+#endif
 
 void
 display_set_position (displayd *display, ggobid *gg)
@@ -245,8 +248,9 @@ display_menu_build (ggobid *gg)
   }
 
 #ifdef SUPPORT_PLUGINS  
-  if (sessionOptions->info != NULL)
+  if (sessionOptions->info != NULL) {
     pluginsUpdateDisplayMenu(gg, gg->pluginInstances);
+  }
 #endif
 
   /*-- these two lines replace gtk_menu_popup --*/

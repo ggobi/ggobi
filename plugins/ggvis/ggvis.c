@@ -6,7 +6,6 @@
 #include <stdio.h>
 
 #include "plugin.h"
-
 #include "ggvis.h"
 
 

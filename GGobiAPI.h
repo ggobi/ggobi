@@ -954,7 +954,7 @@ extern gboolean GGobi_setShowLines(gboolean val);
 
  */
 
-extern GtkWidget *GGobi_addDisplayMenuItem(ggobid *gg, const char *label);
+extern GtkWidget *GGobi_addDisplayMenuItem(const char *label, ggobid *gg);
 
 #ifdef __cplusplus
 }

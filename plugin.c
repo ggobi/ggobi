@@ -124,9 +124,10 @@ pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins)
   while(el) {
     plugin = (PluginInstance *) el->data;
     if(plugin->info->onUpdateDisplay) {
-      f = (OnUpdateDisplayMenu) getPluginSymbol(plugin->info->onUpdateDisplay, plugin->info);
+      f = (OnUpdateDisplayMenu) getPluginSymbol(plugin->info->onUpdateDisplay,
+                                                plugin->info);
       if(f) {
-	  ok = f(gg, plugin);
+        ok = f(gg, plugin);
       }
     }
     el = el->next;

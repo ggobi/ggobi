@@ -23,7 +23,7 @@
 */
 
 
-GtkWidget *addDisplayMenuItem(ggobid *gg, const char *label);
+GtkWidget *addDisplayMenuItem(const char *label, ggobid *gg);
 
 /**
  Callback for when the user selects the "Barplot" menu item on the
@@ -70,16 +70,14 @@ show_barplot_display(PluginInstance *inst, GtkWidget *widget)
  user selects this entry.
  */
 gboolean
-addBarplotMenuItems(ggobid *gg, PluginInstance *inst)
+addBarplotMenuItems (ggobid *gg, PluginInstance *inst)
 {
+  GtkWidget *entry = NULL;
 
-
-  GtkWidget *entry;
-
-  entry = GGobi_addDisplayMenuItem(gg, "Barplot");    
-  gtk_signal_connect_object (GTK_OBJECT(entry), "activate",
-                             GTK_SIGNAL_FUNC (show_barplot_display),
-                             (gpointer) inst);
+  entry = GGobi_addDisplayMenuItem ("Barplot", gg);    
+  if (entry != NULL)
+    gtk_signal_connect_object (GTK_OBJECT(entry), "activate",
+      GTK_SIGNAL_FUNC (show_barplot_display), (gpointer) inst);
 
   return(true);
 }

@@ -404,24 +404,25 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-GGobi_addDisplayMenuItem(ggobid *gg, const char *label)
+GGobi_addDisplayMenuItem (const char *label, ggobid *gg)
 {
-  GtkWidget *entry;
+  GtkWidget *entry = NULL;
 
-  /*GtkItemFactory *factory;*/
-  GtkWidget *dpy_menu = gg->display_menu;
+  GtkWidget *dpy_menu = gg->display_menu;  /*-- this is null --*/
   datad *data;
 
-  entry = gtk_menu_item_new_with_label (label);
-  data = GGobi_data_get(0, gg);
-  gtk_object_set_data(GTK_OBJECT(entry), "data", (gpointer) data);
+  if (dpy_menu != NULL) {
+    entry = gtk_menu_item_new_with_label (label);
+    data = GGobi_data_get(0, gg);
+    gtk_object_set_data(GTK_OBJECT(entry), "data", (gpointer) data);
 
-  gtk_widget_show (entry);
+    gtk_widget_show (entry);
 
-  /* Add a separator */
-  CreateMenuItem (dpy_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
+    /* Add a separator */
+    CreateMenuItem (dpy_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
-  gtk_menu_append (GTK_MENU (dpy_menu), entry);
+    gtk_menu_append (GTK_MENU (dpy_menu), entry);
+  }
 
   return(entry);
 }
@@ -429,20 +430,21 @@ GGobi_addDisplayMenuItem(ggobid *gg, const char *label)
 GtkWidget *
 GGobi_addToolsMenuItem (const char *label, ggobid *gg)
 {
-  GtkWidget *entry, *tools_menu;
+  GtkWidget *entry = NULL, *tools_menu = NULL;
   GtkItemFactory *factory;
-
-  entry = gtk_menu_item_new_with_label (label);
-  gtk_widget_show (entry);
 
   factory = gtk_item_factory_from_path ("<main>");
   tools_menu = gtk_item_factory_get_widget (factory, "<main>/Tools");
 
+  if (tools_menu != NULL) {
 
-  /* Add a separator */
-  CreateMenuItem (tools_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
+    entry = gtk_menu_item_new_with_label (label);
+    gtk_widget_show (entry);
 
-  gtk_menu_append (GTK_MENU (tools_menu), entry);
+    /* Add a separator */
+    CreateMenuItem (tools_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
+    gtk_menu_append (GTK_MENU (tools_menu), entry);
+  }
 
   return (entry);
 }
