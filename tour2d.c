@@ -74,3 +74,92 @@ tour2d_varsel (ggobid *gg, gint jvar, gint button)
   }
 }
 
+void
+tour2d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
+  int i, j, m;
+  displayd *dsp = (displayd *) sp->displayptr;
+
+  for (m=0; m<d->nrows_in_plot; m++)
+  {
+    i = d->rows_in_plot[m];
+    sp->planar[i].x = 0;
+    sp->planar[i].y = 0;
+    for (j=0; j<d->ncols; j++)
+    {
+      sp->planar[i].x += (gint)(dsp->u[0][j]*world_data[i][j]);
+      sp->planar[i].y += (gint)(dsp->u[1][j]*world_data[i][j]);
+    }
+  }
+}
+
+void
+tour2d_run(displayd *dsp, ggobid *gg)
+{
+  extern gboolean reached_target(displayd *);
+  extern void increment_tour(displayd *, gint);
+  extern void do_last_increment(displayd *, gint);
+  extern void gt_basis(displayd *, ggobid *, gint);
+  extern void path(displayd *, gint);
+  extern void tour_reproject(displayd *, gint);
+
+  if (!dsp->tour_get_new_target && reached_target(dsp)) {
+    increment_tour(dsp, 2);
+  }
+  else { /* do final clean-up and get new target */
+    if (!dsp->tour_get_new_target)
+      do_last_increment(dsp, (gint) 2);
+    gt_basis(dsp, gg, (gint) 2);
+    path(dsp, (gint) 2);
+    dsp->tour_get_new_target = false;
+  }
+  
+  tour_reproject(dsp, (gint) 2);
+  display_tailpipe (dsp, gg);
+}
+
+void
+tour2d_do_step(displayd *dsp, ggobid *gg)
+{
+  tour2d_run(dsp, gg);
+}
+
+gint
+tour2d_idle_func (ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  cpaneld *cpanel = &dsp->cpanel;
+  gboolean doit = !cpanel->tour_paused_p;
+
+  if (doit) {
+    tour2d_run(dsp, gg);
+    gdk_flush ();
+  }
+
+  return (doit);
+}
+
+/*static gint idled = 0;  *-- could be at display level --*/
+void tour2d_func (gboolean state, ggobid *gg)
+{
+  displayd *dsp = gg->current_display; 
+
+  if (state) {
+    dsp->tour_idled = gtk_idle_add_priority (G_PRIORITY_LOW,
+                                   (GtkFunction) tour2d_idle_func, gg);
+    gg->tour2d.idled = 1;
+  } else {
+    gtk_idle_remove (dsp->tour_idled);
+    gg->tour2d.idled = 0;
+  }
+
+/*
+   if (state)
+     tour_idle = gtk_timeout_add (40, tour_idle_func, NULL);
+   else
+     gtk_timeout_remove (tour_idle);
+*/
+}
+
+
+
+

@@ -407,7 +407,8 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
           break;
 
         case TOUR2D:
-          tour_reproject (sp,
+	  /*          tour_reproject (sp,*/
+            tour2d_projdata(sp,
             (display->missing_p) ? d->missing_world.vals : d->world.vals,
             d, gg);
           break;

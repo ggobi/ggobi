@@ -79,9 +79,8 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
           redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
         break;
         case TOUR2D:
-/*
           tour2d_varsel (gg, jvar, btn);
-*/
+
         break;
         default:
         break;

@@ -16,38 +16,48 @@ alloc_tour (displayd *dsp, ggobid *gg)
   gint nc = d->ncols;
   gint i;
 
-/* 2 x ncols */
+/* ncols x ncols */
+/* first index is the projection dimension, second index is the num vars */
 
-  dsp->u0 = (gfloat **) g_malloc((gint) 2 * sizeof(gfloat *));
-  for (i=0; i<2; i++)
+  dsp->u0 = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  for (i=0; i<nc; i++)
     dsp->u0[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->u1 = (gfloat **) g_malloc((gint) 2 * sizeof(gfloat *));
-  for (i=0; i<2; i++)
+  dsp->u1 = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  for (i=0; i<nc; i++)
     dsp->u1[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->u = (gfloat **) g_malloc((gint) 2 * sizeof(gfloat *));
-  for (i=0; i<2; i++)
+  dsp->u = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  for (i=0; i<nc; i++)
     dsp->u[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->uold = (gfloat **) g_malloc((gint) 2 * sizeof(gfloat *));
-  for (i=0; i<2; i++)
+  dsp->uold = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  for (i=0; i<nc; i++)
     dsp->uold[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->v0 = (gfloat **) g_malloc((gint) 2 * sizeof(gfloat *));
-  for (i=0; i<2; i++)
+  dsp->v0 = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  for (i=0; i<nc; i++)
     dsp->v0[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->v1 = (gfloat **) g_malloc((gint) 2 * sizeof(gfloat *));
-  for (i=0; i<2; i++)
+  dsp->v1 = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  for (i=0; i<nc; i++)
     dsp->v1[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->tv = (gfloat **) g_malloc((gint) 2 * sizeof(gfloat *));
-  for (i=0; i<2; i++)
+  dsp->v = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  for (i=0; i<nc; i++)
+    dsp->v[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
+
+  dsp->uvevec = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  for (i=0; i<nc; i++)
+    dsp->uvevec[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
+
+  dsp->tv = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  for (i=0; i<nc; i++)
     dsp->tv[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
   dsp->tour_vars = (gint *) g_malloc0(nc * sizeof(gint));
 
+  dsp->lambda = (gfloat *) g_malloc0(nc * sizeof(gfloat));
   dsp->tau = (gfloat *) g_malloc0(nc * sizeof(gfloat));
   dsp->tinc = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
@@ -57,31 +67,40 @@ void
 free_tour(displayd *dsp)
 {
   gint k;
+  datad *d = dsp->d;
+  gint nc = d->ncols;
 
   g_free((gpointer) dsp->tour_vars);
+  g_free((gpointer) dsp->lambda);
   g_free((gpointer) dsp->tau);
   g_free((gpointer) dsp->tinc);
 
-  for (k=0; k<2; k++)
+  for (k=0; k<nc; k++)
     g_free((gpointer) dsp->u[k]);
   g_free((gpointer) dsp->u);
-  for (k=0; k<2; k++)
+  for (k=0; k<nc; k++)
     g_free((gpointer) dsp->u0[k]);
   g_free((gpointer) dsp->u0);
-  for (k=0; k<2; k++)
+  for (k=0; k<nc; k++)
     g_free((gpointer) dsp->u1[k]);
   g_free((gpointer) dsp->u1);
-  for (k=0; k<2; k++)
+  for (k=0; k<nc; k++)
     g_free((gpointer) dsp->uold[k]);
   g_free((gpointer) dsp->uold);
 
-  for (k=0; k<2; k++)
+  for (k=0; k<nc; k++)
     g_free((gpointer) dsp->v0[k]);
   g_free((gpointer) dsp->v0);
-  for (k=0; k<2; k++)
+  for (k=0; k<nc; k++)
     g_free((gpointer) dsp->v1[k]);
   g_free((gpointer) dsp->v1);
-  for (k=0; k<2; k++)
+  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->v[k]);
+  g_free((gpointer) dsp->v);
+  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->uvevec[k]);
+  g_free((gpointer) dsp->uvevec);
+  for (k=0; k<nc; k++)
     g_free((gpointer) dsp->tv[k]);
   g_free((gpointer) dsp->tv);
 
@@ -93,6 +112,7 @@ zero_tau (displayd *dsp, ggobid *gg) {
   datad *d = dsp->d;
 
   for (k=0; k<d->ncols; k++) {
+    dsp->lambda[k]  = 0.0;
     dsp->tau[k]  = 0.0;
     dsp->tinc[k] = 0.0;
   }
@@ -127,29 +147,30 @@ void
 display_tour_init (displayd *dsp, ggobid *gg) {
   gint i, j;
   datad *d = dsp->d;
+  gint nc = d->ncols;
 
   alloc_tour(dsp, gg);
  
     /* Initialize starting subset of active variables */
-  dsp->ntour_vars = 3;
+  dsp->ntour_vars = nc;
   dsp->tour_vars[0] = 0;
   dsp->tour_vars[1] = 1;
   dsp->tour_vars[2] = 2;
 
-  /* declare starting base as first two chosen variables */
-  for (i=0; i<2; i++)
-    for (j=0; j<d->ncols; j++)
+  /* declare starting base as first p chosen variables */
+  for (i=0; i<nc; i++)
+    for (j=0; j<nc; j++)
       dsp->u0[i][j] = dsp->u1[i][j] = dsp->u[i][j] = dsp->uold[i][j] =
         dsp->v0[i][j] = dsp->v1[i][j] = 0.0;
 
-  dsp->u1[0][dsp->tour_vars[0]] =
-    dsp->u0[0][dsp->tour_vars[0]] = dsp->u[0][dsp->tour_vars[0]] =
-    dsp->v0[0][dsp->tour_vars[0]] = dsp->v1[0][dsp->tour_vars[0]] = 1.0;
-  dsp->u1[1][dsp->tour_vars[1]] = dsp->u[1][dsp->tour_vars[1]] =
-    dsp->u0[1][dsp->tour_vars[1]] =
-    dsp->v0[1][dsp->tour_vars[1]] = dsp->v1[1][dsp->tour_vars[1]] = 1.0;
+  for (i=0; i<nc; i++)
+  {
+    dsp->u1[i][dsp->tour_vars[i]] =
+      dsp->u0[i][dsp->tour_vars[i]] = dsp->u[i][dsp->tour_vars[i]] =
+      dsp->v0[i][dsp->tour_vars[i]] = dsp->v1[i][dsp->tour_vars[i]] = 1.0;
+  }
 
-  dsp->ts[0] = 0;
+  /*  dsp->ts[0] = 0;
   dsp->ts[1] = M_PI_2;
   dsp->coss[0] = 1.0;
   dsp->coss[1] = 0.0;
@@ -158,104 +179,17 @@ display_tour_init (displayd *dsp, ggobid *gg) {
   dsp->icoss[0] = PRECISION2;
   dsp->icoss[1] = 0;
   dsp->isins[1] = PRECISION2;
-  dsp->isins[0] = 0;
+  dsp->isins[0] = 0;*/
 
   zero_tau(dsp, gg);
   dsp->delta = 0.0;
   dsp->dv = 1.0;
+  dsp->tour_nsteps = 0; 
+  dsp->tour_stepcntr = 0;
 
   dsp->tour_idled = 0;
   dsp->tour_get_new_target = true;
 }
-
-void
-tour_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
-/*
- * This routine uses the data projected ginto the span of
- * the starting basis and ending basis, and then rotates in this
- * space.
-*/
-{
-  gint i, j, m, n=d->ncols;
-  gfloat costf[2], sintf[2];
-  gint costi[2], sinti[2];
-  displayd *dsp = (displayd *) sp->displayptr;
-
-  for (i=0; i<2; i++)
-  {
-    costf[i] = (gfloat) cos( (gdouble) dsp->tinc[i]);
-    sintf[i] = (gfloat) sin( (gdouble) dsp->tinc[i]);
-    costi[i] = (gint)(costf[i] * PRECISION2);
-    sinti[i] = (gint) (sintf[i] * PRECISION2);
-  }
-
-  /* basically do calculations ready for use in drawing
-   * segments in variable circles */
-  /* do these in integer to speed calculations? */
-  for (i=0; i<n; i++)
-  {
-    dsp->tv[0][i] = costf[0]*dsp->v0[0][i] + sintf[0]*dsp->v1[0][i];
-    dsp->tv[1][i] = costf[1]*dsp->v0[1][i] + sintf[1]*dsp->v1[1][i];
-  }
-
-  for (i=0; i<n; i++)
-  {
-    dsp->u[0][i] = dsp->coss[0] * dsp->tv[0][i] - dsp->sins[0]*dsp->tv[1][i];
-    dsp->u[1][i] = -dsp->coss[1] * dsp->tv[0][i] + dsp->sins[1]*dsp->tv[1][i];
-  }
-
-  /* This version of tour doesn't use preprojection */
-  for (m=0; m<d->nrows_in_plot; m++)
-  {
-    i = d->rows_in_plot[m];
-
-    sp->planar[i].x = 0;
-    sp->planar[i].y = 0;
-    for (j=0; j<n; j++)
-    {
-      sp->planar[i].x += (gint)(dsp->u[0][j]*world_data[i][j]);
-      sp->planar[i].y += (gint)(dsp->u[1][j]*world_data[i][j]);
-    }
-  }
-}
-
-void
-do_last_increment(displayd *dsp, cpaneld *cpanel, ggobid *gg)
-{
-  gboolean doit = false;
-
-  if ((dsp->tinc[0] != cpanel->tour_path_len*dsp->tau[0]) ||
-      (dsp->tinc[1] != cpanel->tour_path_len*dsp->tau[1]))
-  {
-    dsp->tinc[0] = cpanel->tour_path_len*dsp->tau[0];
-    dsp->tinc[1] = cpanel->tour_path_len*dsp->tau[1];
-    doit = true;
-  }
-  if (doit) {
-    display_tailpipe (dsp, gg);
-  }
-}
-
-void
-copy_basis(gfloat **source, gfloat **target, gint n, gint d)
-{
-  gint i, j;
-
-  for (i=0; i<d; i++)
-    for (j=0; j<n; j++)
-      target[i][j] = source[i][j];
-}
-
-void
-init_basis(displayd *dsp, ggobid *gg)
-{
-/*
- * Set u0 (old first basis) to be u(t) (new first basis)
-*/
-  datad *d = dsp->d;
-  copy_basis(dsp->u, dsp->u0, d->ncols, 2);
-}
-
 
 void
 norm(gfloat *x, gint n)
@@ -284,18 +218,6 @@ calc_norm(gfloat *x, gint n)
 }
 
 gfloat
-calc_norm_sq(gfloat *x, gint n)
-{
-  gint j;
-  gdouble xn = 0;
-
-  for (j=0; j<n; j++)
-    xn = xn + (gdouble)(x[j]*x[j]);
-
-  return((gfloat)xn);
-}
-
-gfloat
 inner_prod(gfloat *x1, gfloat *x2, gint n)
 {
   gdouble xip;
@@ -305,18 +227,6 @@ inner_prod(gfloat *x1, gfloat *x2, gint n)
   for (j=0; j<n; j++)
     xip = xip + (gdouble)x1[j]*(gdouble)x2[j];
   return((gfloat)xip);
-}
-
-gfloat
-sq_inner_prod(gfloat *x1, gfloat *x2, gint n)
-{
-  gfloat xip;
-  gint j;
-
-  xip = 0;
-  for (j=0; j<n; j++)
-    xip = xip + x1[j]*x2[j];
-  return(xip*xip);
 }
 
 void
@@ -332,356 +242,364 @@ gram_schmidt(gfloat *x1, gfloat *x2, gint n)
   norm(x2, n);
 }
 
-gint
-check_proximity(gfloat **base1, gfloat **base2, gint n)
-/*
- * This routine checks if two bases are close to identical
-*/
-{
-  gfloat diff, ssq1 = 0.0, ssq2 = 0.0;
-  gint i, indic = 0;
-  gfloat tol = 0.001;
+/* checks columns of matrix are orthonormal */
+gboolean checkcolson(gfloat **ut, gint nc, gint nd) {
+  gint j, k;
+  gfloat tol = 0.01;
+  gboolean ok = true;
 
-  for (i=0; i<n; i++)
-  {
-    diff = base1[0][i] - base2[0][i];
-    ssq1 = ssq1 + (diff * diff);
-
-    diff = base1[1][i] - base2[1][i];
-    ssq2 = ssq2 + (diff * diff);
+  for (j=0; j<nd; j++) {
+    if (fabs(1.-calc_norm(ut[j], nc)) > tol) {
+      ok = false;
+      return(ok);
+    }
   }
 
-  if ((ssq1 < tol) && (ssq2 < tol))
-    indic = 1;
-
-  return(indic);
-}
-
-void
-gt_basis (displayd *dsp, ggobid *gg)
-/*
- * Generate two random p dimensional vectors to form new ending basis
-*/
-{
-  datad *d = dsp->d;
-  gint j, check = 1;
-  gdouble frunif[2];
-  gdouble r, fac, frnorm[2];
-
-/*
- * Method suggested by Press, Flannery, Teukolsky, and Vetterling (1986)
- * "Numerical Recipes" p.202-3, for generating random normal variates .
-*/
-
-  /* Zero out u1 before filling; this might fix a bug we are
-     encountering with returning from a receive tour.
-  */
-  for (j=0; j<d->ncols; j++)
-    dsp->u1[0][j] = dsp->u1[1][j] = 0.0 ;
-
-  if (dsp->ntour_vars > 2) {
-    for (j=0; j<dsp->ntour_vars; j++) {
-      while (check) {
-
-        rnorm2(&frunif[0], &frunif[1]);
-        r = frunif[0] * frunif[0] + frunif[1] * frunif[1];
-  
-        if (r < 1)
-        {
-          check = 0;
-          fac = sqrt(-2. * log(r) / r);
-          frnorm[0] = frunif[0] * fac;
-          frnorm[1] = frunif[1] * fac;
-        }
+  for (j=0; j<nd-1; j++) {
+    for (k=j+1; k<nd; k++) {
+      if (fabs(inner_prod(ut[j],ut[k],nc)) > tol) {
+        ok = false;
+        return(ok);
       }
-      check = 1;
-      dsp->u1[0][dsp->tour_vars[j]] = (gfloat) frnorm[0];
-      dsp->u1[1][dsp->tour_vars[j]] = (gfloat) frnorm[1];
     }
-    norm(dsp->u1[0], d->ncols);
-    norm(dsp->u1[1], d->ncols);
-/*
- * Orthogonalize the second vector on the first using Gram-Schmidt
-*/
-    gram_schmidt(dsp->u1[0], dsp->u1[1], d->ncols);
   }
-  else
-  {
-    dsp->u1[0][dsp->tour_vars[0]] = 1.;
-    dsp->u1[1][dsp->tour_vars[1]] = 1.;
-  }
+
+  return(ok);
 }
 
-void
-basis_dir_ang (displayd *dsp, ggobid *gg)
-{
-  datad *d = dsp->d;
-  gfloat x, y ;
-  gint k;
-  gint n = d->ncols;
-  static gfloat angle_tol = 0.001;
+/* matrix multiplication UV */
+gboolean matmult_uv(gfloat **ut, gfloat **vt, gint ur, gint uc, 
+  gint vr, gint vc, gfloat **ot) {
+  gint i, j, k;
+  gboolean ok = true;
 
-/* calculate values to minimize angle between two base pairs */
-  x = sq_inner_prod(dsp->u0[0], dsp->u1[0], n) +
-    sq_inner_prod(dsp->u0[0], dsp->u1[1], n) -
-    inner_prod(dsp->u0[1], dsp->u1[0], n) *
-    inner_prod(dsp->u0[1], dsp->u1[0], n) -
-    inner_prod(dsp->u0[1], dsp->u1[1], n) *
-    inner_prod(dsp->u0[1], dsp->u1[1], n);
-
-  y = inner_prod(dsp->u0[0], dsp->u1[0], n) *
-    inner_prod(dsp->u0[1], dsp->u1[0], n) +
-    inner_prod(dsp->u0[0], dsp->u1[1], n) *
-    inner_prod(dsp->u0[1], dsp->u1[1], n);
-
-/* calculate angles of rotation from bases (u) to princ dirs (v) */
-  if (fabs(x) < angle_tol)
-  {
-    dsp->ts[0] = 0.0;
-    dsp->ts[1] = M_PI_2;
-  }
-  else
-  {
-    dsp->ts[0] = (gfloat) atan2((gdouble)(2.*y),(gdouble)x)/2.;
-    dsp->ts[1] = dsp->ts[0] + M_PI_2;
+  if (uc != vr) {
+    ok = false;
+    return(ok);
   }
 
-/* calculate cosines and sines of s */
-  for (k=0; k<2; k++)
-  {
-    dsp->coss[k] = (gfloat) cos((gdouble)dsp->ts[k]);
-    dsp->sins[k] = (gfloat) sin( (gdouble) dsp->ts[k]);
-    dsp->icoss[k] = (gint) (dsp->coss[k] * PRECISION2);
-    dsp->isins[k] = (gint) (dsp->sins[k] * PRECISION2);
-  }
-}
-
-void
-princ_dirs(displayd *dsp, ggobid *gg)
-{
-  gint j;
-  datad *d = dsp->d;
-  gint n = d->ncols;
-  
-/* calculate first princ dirs */ /* if there are frozen vars u0 won't
-                                     have norm 1, but since this is just
-                                     rotation it should be ok */
-  for (j=0; j<n; j++)
-  {
-    dsp->v0[0][j] = dsp->coss[0]*dsp->u0[0][j] + dsp->sins[0]*dsp->u0[1][j];
-    dsp->v0[1][j] = dsp->coss[1]*dsp->u0[0][j] + dsp->sins[1]*dsp->u0[1][j];
-  }
-  norm(dsp->v0[0], n);
-  norm(dsp->v0[1], n);
-  
-/* calculate second princ dirs by projecting v0 onto v1 */
-  for (j=0; j<n; j++)
-  {
-    dsp->v1[0][j] = inner_prod(dsp->v0[0], dsp->u1[0], n) * dsp->u1[0][j] +
-          inner_prod(dsp->v0[0], dsp->u1[1], n) * dsp->u1[1][j] ;
-    dsp->v1[1][j] = inner_prod(dsp->v0[1], dsp->u1[0], n) * dsp->u1[0][j] +
-          inner_prod(dsp->v0[1], dsp->u1[1], n) * dsp->u1[1][j] ;
-  }
-
-}
-
-void
-princ_angs (displayd *dsp, cpaneld *cpanel, ggobid *gg)
-{
-  datad *d = dsp->d;
-  gint j, k, n=d->ncols;
-  gfloat tmpf1, tmpf2;
-  gfloat tol2 = 0.01;
-  static gfloat angle_tol = 0.001;
-
-/*
- * if the norms vanish need to regenerate another basis and new
- * princ dirs, otherwise no rotation occurs - to be put in code
- * where new basis is generated between consecutive tours
-*/
-
-  if (calc_norm(dsp->v1[0], n) < angle_tol)
-    for (j=0; j<n; j++)
-      dsp->v1[0][j] = dsp->u1[0][j];
-  if (calc_norm(dsp->v1[1], n) < angle_tol)
-    for (j=0; j<n; j++)
-      dsp->v1[1][j] = dsp->u1[1][j];
-  norm(dsp->v1[0], n);
-  norm(dsp->v1[1], n);
-
-/* calculate principle angles for movement, and calculate stepsize */
-/* put in check for outside of cos domain, ie >1, <-1. */
-  tmpf1 = inner_prod(dsp->v0[0], dsp->v1[0], n);
-  tmpf2 = inner_prod(dsp->v0[1], dsp->v1[1], n);
-  if (tmpf1 > 1.0)
-    tmpf1 = 1.0;
-  else if (tmpf1 < -1.0)
-    tmpf1 = -1.0;
-  if (tmpf2 > 1.0)
-    tmpf2 = 1.0;
-  else if (tmpf2 < -1.0)
-    tmpf2 = -1.0;
-  dsp->tau[0] = (gfloat) acos((gdouble) tmpf1);
-  dsp->tau[1] = (gfloat) acos((gdouble) tmpf2);
-
-  if ((dsp->tau[0] < tol2) && (dsp->tau[1] < tol2))
-  {
-    zero_tau(dsp, gg);
-    k = 0;
-    for (j=0; j<dsp->ntour_vars; j++)
-    {
-      dsp->u1[0][j] = dsp->u1[1][j] = 0.0;
-      if (j == dsp->tour_vars[k])
-      {
-        k++;
+  for (j=0; j<ur; j++) {
+    for (k=0; k<vc; k++) {
+      ot[k][j] = 0.0;
+      for (i=0; i<uc; i++) {
+        ot[j][k] += ut[i][j]*vt[k][i];
       }
-      else
-        dsp->u0[0][j] = dsp->u0[1 ][j] = 0.;
     }
-
   }
 
-  if (dsp->tau[0] < tol2)
-    dsp->tau[0] = 0.;
-  if (dsp->tau[1] < tol2)
-    dsp->tau[1] = 0.;
-  zero_tinc(dsp, gg);
-  
-  dsp->dv = sqrt(dsp->tau[0]*dsp->tau[0] + dsp->tau[1]*dsp->tau[1]);
-  dsp->delta = cpanel->tour_step/dsp->dv;
-  
-  /* orthogonalize v1 wrt v0 by Gram-Schmidt and normalize */
-  if (dsp->tau[0] > angle_tol)
-    gram_schmidt(dsp->v0[0], dsp->v1[0], n);
-  if (dsp->tau[1] > angle_tol)
-    gram_schmidt(dsp->v0[1], dsp->v1[1], n);
+  return(ok);
+}
+
+/* matrix multiplication U'V */
+gboolean matmult_utv(gfloat **ut, gfloat **vt, gint ur, gint uc, 
+  gint vr, gint vc, gfloat **ot) {
+  gint i, j, k;
+  gboolean ok = true;
+
+  if (ur != vr) {
+    ok = false;
+    return(ok);
+  }
+
+  for (j=0; j<uc; j++) {
+    for (k=0; k<vc; k++) {
+      ot[k][j] = 0.0;
+      for (i=0; i<ur; i++) {
+        ot[j][k] += ut[j][i]*vt[k][i];
+      }
+    }
+  }
+
+  return(ok);
+}
+
+/* copy matrix */
+void copy_mat(gfloat **ot, gfloat **it, gint nr, gint nc) {
+  gint j, k;
+
+  for (j=0; j<nr; j++)
+    for (k=0; k<nc; k++)
+      ot[k][j] = it[k][j];
+}
+
+/* orthonormalize x2 on x2, just by diagonals should be enough for this
+   tour code */
+void
+matgram_schmidt(gfloat **x1, gfloat **x2, gint nr, gint nc)
+{
+  gint j, k;
+  gfloat ip;
+
+  for (j=0; j<nc; j++) {
+    ip = inner_prod(x1[j], x2[j], nr);
+    for (k=0; k<nr; k++)
+      x2[j][k] = x2[j][k] - ip*x1[j][k];
+    norm(x2[j], nr);
+  }
+
 }
 
 void
-geodesic_tour_path (displayd *dsp, cpaneld *cpanel, ggobid *gg) {
-  basis_dir_ang (dsp, gg);
-  princ_dirs (dsp, gg);
-  princ_angs (dsp, cpanel, gg);
-}
-
-void
-determine_endbasis_and_path (displayd *dsp, cpaneld *cpanel, ggobid *gg)
+eigen_clear (displayd *dsp)
 {
   datad *d = dsp->d;
+  gint nc = d->ncols;
+  gint j, k;
 
-  /* general scan tour */
-  if (!check_proximity(dsp->u, dsp->u0, d->ncols))
-  {
-    init_basis (dsp, gg);
-  }
-  gt_basis (dsp, gg);
-
-/*
- * Calculate path.
-*/
-  zero_tau(dsp, gg);
-  geodesic_tour_path(dsp, cpanel, gg);
-}
-
-void
-increment_tour (displayd *dsp, ggobid *gg)
-{
-  display_tailpipe (dsp, gg);
-
-  /*  tour_var_lines(gg);*/
-}
-
-gint
-check_tour (displayd *dsp, cpaneld *cpanel)
-{
-  gint return_val = 1;
-
-  dsp->tinc[0] += (dsp->delta * dsp->tau[0]);
-  dsp->tinc[1] += (dsp->delta * dsp->tau[1]);
-
-  if ((dsp->tinc[0] > cpanel->tour_path_len*dsp->tau[0]) || 
-      (dsp->tinc[1] > cpanel->tour_path_len*dsp->tau[1]) ||
-      ((dsp->tinc[0] == cpanel->tour_path_len*dsp->tau[0]) && 
-       (dsp->tinc[1] == cpanel->tour_path_len*dsp->tau[1])))
-      return_val = 0;
-
-  return (return_val);
-}
-
-void
-run_tour (displayd *dsp, ggobid *gg)
-{
-
-/*
- *datad *d = dsp->d;
- *extern void tour_draw_circles (datad *, ggobid *);
-*/
-  cpaneld *cpanel = &dsp->cpanel;
-
-/*
- * This controls the tour, effectively. It checks if we are at the end of 
- * the current path, if not then increments the tour a step.
-*/
-  if (!dsp->tour_get_new_target && check_tour (dsp, cpanel)) {
-    increment_tour (dsp, gg);
-/*
- *  tour_draw_circles (d, gg);
-*/
-  }
-/*
- * Calculation of new path for various different modes.
-*/
-  else {
-/*
- * Do a final projection into the ending plane if just finished a tour
-*/
-      if (!dsp->tour_get_new_target)
-        do_last_increment (dsp, cpanel, gg);
-      determine_endbasis_and_path (dsp, cpanel, gg);
-      dsp->tour_get_new_target = false;
-/*
- *    tour_draw_circles (d, gg);
-*/
-  }
-}
-
-void 
-tour_do_step (displayd *dsp, ggobid *gg) {
-  run_tour (dsp, gg);
-}
-
-/*
-void * tour_thread (void *args)
-{
-  displayd *dsp = gg->current_display;
-  cpaneld *cpanel = &dsp->cpanel;
-
-  while (true) {
-    if (mode_get () == TOUR2D && !cpanel->tour_paused_p) {
-      gdk_threads_enter ();
-      run_tour (dsp);
-      gdk_threads_leave ();
+  for (j=0; j<nc; j++) {
+    for (k=0; k<nc; k++) {
+      dsp->v0[j][k] = 0.;
+      dsp->v1[j][k] = 0.;
     }
+    dsp->lambda[j] = 0.;
+    dsp->tau[j] = 0.;
+    dsp->tinc[j] = 0.;
   }
 
-  return (NULL);
 }
-*/
 
+/* u0 = starting projection
+ * u1 = target projection
+ * u = interpolated projection
+ * nc = num vars
+ * nd = proj dim
+ */
+void path(displayd *dsp, gint nd) {
 
-gint
-tour_idle_func (ggobid *gg)
-{
-  displayd *dsp = gg->current_display;
-  cpaneld *cpanel = &dsp->cpanel;
-  gboolean doit = !cpanel->tour_paused_p;
+  datad *d = dsp->d;
+  gint nc = d->ncols;
+  gint i, j, k, rank;
+  gdouble tol = 0.01;
+  gdouble tmpd1, tmpd2, tmpd;
+  gboolean doit = true;
+  paird *pairs = (paird *) g_malloc (nd * sizeof (paird));
+  gfloat *e = (gfloat *) g_malloc (nd * sizeof (gfloat));
+  gint dI; /* dimension of intersection of base pair */
+  gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
 
+  for (i=0; i<2; i++)
+    ptinc[i] = (gfloat *) g_malloc (nd * sizeof (gfloat));
+    
+    /* Check that u0 and u1 are both orthonormal. */
+  if (!checkcolson(dsp->u0, nc, nd)) {
+    printf("Columns of u0 are not orthonormal");
+    doit = false;
+  }
+  if (!checkcolson(dsp->u1, nc, nd)) {
+    printf("Columns of u1 are not orthonormal");
+    doit = false;
+  }
+
+  /* Do SVD of u0'u1: span(u0,u1).*/
   if (doit) {
-    run_tour (dsp, gg);
-    gdk_flush ();
+    if (!matmult_utv(dsp->u0, dsp->u1, nc, nd, nc, nd, dsp->tv))
+      printf("#cols != #rows in the two matrices");
+      
+      dsvd(dsp->tv, nd, nd, dsp->lambda, dsp->v1);
+
+      copy_mat(dsp->v0, dsp->tv, nd, nd);
+
+      /*-- obtain ranks to use in sorting eigenvals and eigenvec --*/
+      for (i=0; i<nd; i++) {
+        pairs[i].f = (gfloat) dsp->lambda[i];
+        pairs[i].indx = i;
+      }
+      qsort ((gchar *) pairs, dsp->lambda, sizeof (paird), pcompare);
+
+     /*-- sort the eigenvalues and eigenvectors into temporary arrays --*/
+     for (i=0; i<nd; i++) {
+       k = (nd - i) - 1;  /*-- to reverse the order --*/
+       rank = pairs[i].indx;
+       e[k] = dsp->lambda[rank];
+       for (j=0; j<nd; j++)
+         dsp->tv[j][k] = dsp->v0[j][rank];
+     }
+
+     /*-- copy the sorted eigenvalues and eigenvectors back --*/
+     for (i=0; i<nd; i++) {
+       dsp->lambda[i] = e[i];
+       for (j=0; j<nd; j++)
+         dsp->v0[j][i] = dsp->tv[j][i];
+     }
+
+     /* need to do v1 too */
+     for (i=0; i<nd; i++) {
+       k = (nd - i) - 1;  /*-- to reverse the order --*/
+       rank = pairs[i].indx;
+       for (j=0; j<nd; j++)
+         dsp->tv[j][k] = dsp->v1[j][rank];
+     }
+     for (i=0; i<nd; i++) {
+       for (j=0; j<nd; j++)
+         dsp->v1[j][i] = dsp->tv[j][i];
+     }
+
+     /* copy the eigenvectors into a permanent structure. need this
+        for reprojection */
+     copy_mat(dsp->uvevec, dsp->v0, nd, nd);
+
+/*      SingularValueDecomposition svd = temp.svd();
+      Va = svd.getU();
+      Vz = svd.getV();
+      lambda = svd.getSingularValues();*/
+     /* Returns the sv's in order largest to smallest.*/
+
+      /*  Check span of <Fa,Fz>
+       If dI=ndim we should stop here, and set Ft to be Fa but this is
+       equivalent to setting the lambda's to be 1.0 at this stage.*/
+      dI = 0;
+      for (i=0; i<nd; i++) {
+	if (dsp->lambda[i] > 1.0-tol) {
+	  dI++;
+	  dsp->lambda[i] = 1.0;
+	}
+      }
+    
+      /*  Compute principal angles */
+      for (i=0; i<nd; i++)
+	dsp->tau[i] = (gfloat) acos((gdouble) dsp->lambda[i]);
+      
+      /*  Calculate principal directions */
+      if (nd > dI) {
+        copy_mat(dsp->tv, dsp->v0, nc, nd);
+        matmult_uv(dsp->u0, dsp->tv, nc, nd, nc, nd, dsp->v0);
+        copy_mat(dsp->tv, dsp->v1, nc, nd);
+        matmult_uv(dsp->u1, dsp->tv, nc, nd, nc, nd, dsp->v1);
+	/*  Orthonormalize v1 on v0*/
+        matgram_schmidt(dsp->v0, dsp->v1, nc, nd);
+
+      }
+      else {
+        copy_mat(dsp->v0, dsp->u0, nc, nd);
+        copy_mat(dsp->v1, dsp->u0, nc, nd);
+	for (i=0; i<nd; i++)
+	  dsp->tau[i] = 0.0;
+      }
+
+      /* Construct current basis*/
+      for (i=0; i<nd; i++)
+	dsp->tinc[i]=0.0;
+      for (i=0; i<nd; i++) {
+	ptinc[0][i] = (gfloat) cos((gdouble) dsp->tinc[i]);
+	ptinc[1][i] = (gfloat) sin((gdouble) dsp->tinc[i]);
+      }
+
+      for (i=0; i<nd; i++) {
+	tmpd1 = ptinc[0][i];
+	tmpd2 = ptinc[1][i];
+	for (j=0; j<nc; j++) {
+	  tmpd = dsp->v0[i][j]*tmpd1 + dsp->v1[i][j]*tmpd2;
+          dsp->v[i][j] = tmpd;
+	}
+      }
+
+      matmult_utv(dsp->uvevec, dsp->v, nc, nd, nc, nd, dsp->u);
+
+      /* Calculate Euclidean norm of principal angles.*/
+      dsp->dv = 0.0;
+      for (i=0; i<nd; i++)
+	dsp->dv += (dsp->tau[i]*dsp->tau[i]);
+      dsp->dv = (gfloat)sqrt((gdouble)dsp->dv);
+
+      /* Reset increment counters.*/
+      dsp->tour_nsteps = (gint) floor((gdouble)(dsp->dv/dsp->delta));
+      /*      for (i=1; i<nd; i++) {
+	if ((gint) floor((gdouble)(dG/delta)) < nsteps) 
+	  nsteps = (gint) floor((gdouble)(dG/delta));
+      }*/
+      dsp->tour_stepcntr = 0;
+    }
+    else {
+      for (i=0; i<nd; i++)
+	dsp->tau[i] = 0.0;
+      copy_mat(dsp->u0, dsp->v0, nc, nd);
+      copy_mat(dsp->u0, dsp->v1, nc, nd);
+      dsp->tour_nsteps = 0;
+    }
+
+/* free temporary arrays */
+  g_free ((gpointer) pairs);
+  for (j=0; j<2; j++)
+    g_free (ptinc[j]);
+  g_free (ptinc);
+  g_free (e);
+
+}
+
+/* Generate the interpolation frame. No preprojection is done */
+void tour_reproject(displayd *dsp, gint nd)
+{
+  datad *d = dsp->d;
+  gint nc = d->ncols;
+  gint i, j;
+  gdouble tmpd1, tmpd2, tmpd;
+  gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
+
+  for (i=0; i<2; i++)
+    ptinc[i] = (gfloat *) g_malloc (nd * sizeof (gfloat));
+
+  for (i=0; i<nd; i++) {
+    ptinc[0][i] = (gfloat) cos((gdouble) dsp->tinc[i]);
+    ptinc[1][i] = (gfloat) sin((gdouble) dsp->tinc[i]);
   }
 
-  return (doit);
+  for (i=0; i<nd; i++) {
+    tmpd1 = ptinc[0][i];
+    tmpd2 = ptinc[1][i];
+    for (j=0; j<nc; j++) {
+      tmpd = dsp->v0[i][j]*tmpd1 + dsp->v1[i][j]*tmpd2;
+      dsp->v[i][j] = tmpd;
+    }
+  }
+
+  matmult_utv(dsp->uvevec, dsp->v, nc, nd, nc, nd, dsp->u);
+
+}
+
+/* this routine increments the interpolation */
+void
+increment_tour(displayd *dsp, gint nd)
+{
+  int i;
+  gboolean attheend = false;
+
+  dsp->tour_stepcntr++;
+
+  for (i=0; i<nd; i++) 
+    if (dsp->tinc[i] > dsp->tau[i]) {
+      attheend = true;
+      dsp->tour_nsteps = dsp->tour_stepcntr;
+    }
+
+  if (attheend || dsp->tour_nsteps == 0 || 
+      dsp->tour_nsteps == dsp->tour_stepcntr) {
+    for (i=0; i<nd; i++)
+      dsp->tinc[i] = dsp->tau[i];
+  }
+  else {
+    for (i=0; i<nd; i++)
+      dsp->tinc[i] += dsp->delta*dsp->tau[i]/dsp->dv;
+  }
+}
+
+gboolean
+reached_target(displayd *dsp) {
+  gboolean arewethereyet = false;
+
+  if (dsp->tour_nsteps == 0 || dsp->tour_stepcntr == dsp->tour_nsteps)
+    arewethereyet = true;
+
+  return(arewethereyet);
+}
+
+void
+do_last_increment(displayd *dsp, gint nd)
+{
+  int j;
+
+  for (j=0; j<nd; j++)
+    dsp->tinc[j] = dsp->tau[j];
+
 }
 
 void speed_set (gint slidepos, ggobid *gg) {
@@ -715,24 +633,63 @@ void speed_set (gint slidepos, ggobid *gg) {
   dsp->delta = cpanel->tour_step/dsp->dv;
 }
 
-/*static gint idled = 0;  *-- could be at display level --*/
-void tour_func (gboolean state, ggobid *gg)
+void
+gt_basis (displayd *dsp, ggobid *gg, gint nd)
+/*
+ * Generate d random p dimensional vectors to form new ending basis
+*/
 {
-  displayd *dsp = gg->current_display; 
-
-  if (state) {
-    dsp->tour_idled = gtk_idle_add_priority (G_PRIORITY_LOW,
-                                   (GtkFunction) tour_idle_func, gg);
-    gg->tour2d.idled = 1;
-  } else {
-    gtk_idle_remove (dsp->tour_idled);
-    gg->tour2d.idled = 0;
-  }
+  datad *d = dsp->d;
+  gint j, k, check = 1;
+  gdouble frunif[2];
+  gdouble r, fac, frnorm[2];
 
 /*
-   if (state)
-     tour_idle = gtk_timeout_add (40, tour_idle_func, NULL);
-   else
-     gtk_timeout_remove (tour_idle);
+ * Method suggested by Press, Flannery, Teukolsky, and Vetterling (1986)
+ * "Numerical Recipes" p.202-3, for generating random normal variates .
 */
+
+  /* Zero out u1 before filling; this might fix a bug we are
+     encountering with returning from a receive tour.
+  */
+  for (j=0; j<d->ncols; j++)
+    for (k=0; k<nd; k++)
+      dsp->u1[k][j] = 0.0 ;
+
+  if (dsp->ntour_vars > 2) {
+    for (j=0; j<dsp->ntour_vars; j++) {
+      for (k=0; k<nd/2; k++) {
+        while (check) {
+
+          rnorm2(&frunif[0], &frunif[1]);
+          r = frunif[0] * frunif[0] + frunif[1] * frunif[1];
+   
+          if (r < 1)
+          {
+            check = 0;
+            fac = sqrt(-2. * log(r) / r);
+            frnorm[0] = frunif[0] * fac;
+            frnorm[1] = frunif[1] * fac;
+          }
+        }
+        check = 1;
+        dsp->u1[2*k][dsp->tour_vars[j]] = (gfloat) frnorm[0];
+        dsp->u1[2*k+1][dsp->tour_vars[j]] = (gfloat) frnorm[1];
+      }
+    }
+    for (k=0; k<nd; k++)
+      norm(dsp->u1[k], d->ncols);
+
+    /*
+     * Orthogonalize the basis on the first using Gram-Schmidt
+    */
+    for (k=0; k<nd; k++)
+      for (j=1; j<nd; j++)
+        gram_schmidt(dsp->u1[k], dsp->u1[j], d->ncols);
+  }
+  else
+  {
+    for (k=0; k<nd; k++) 
+      dsp->u1[k][dsp->tour_vars[k]] = 1.;
+  }
 }

@@ -299,8 +299,9 @@ extern void tour2d_event_handlers_toggle (splotd *, gboolean);
 extern void tour2d_menus_make (ggobid *);
 extern void tour2dpp_window_open (ggobid *);
 extern void tour_do_step (displayd *, ggobid *);
-extern void tour_func (gboolean, ggobid *);
-extern void tour_reproject (splotd *, glong **, datad *, ggobid *);
+extern void tour2d_func (gboolean, ggobid *);
+extern void tour2d_projdata (splotd *, glong **, datad *, ggobid *);
+/*extern void tour_reproject (splotd *, glong **, datad *, ggobid *);*/
 extern void transform (gint, gint, gfloat, datad *, ggobid *);
 extern void transform0_opt_menu_set_value (gint j, datad *d, ggobid *gg);
 extern void transform0_values_set (gint, gint, datad *, ggobid *);

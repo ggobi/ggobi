@@ -351,7 +351,7 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
         break;
 
       case TOUR2D:
-        tour_func (off, gg);
+        tour2d_func (off, gg);
         break;
 
       case SCALE:
@@ -373,7 +373,7 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
         break;
 
       case TOUR2D:
-        tour_func (on, gg);
+        tour2d_func (on, gg);
         break;
 
       case SCALE:

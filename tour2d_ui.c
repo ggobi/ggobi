@@ -30,7 +30,7 @@ static void scale_set_default_values (GtkScale *scale )
 void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
   cpanel->tour_paused_p = state;
 
-  tour_func (!cpanel->tour_paused_p, gg);
+  tour2d_func (!cpanel->tour_paused_p, gg);
 }
 
 static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
@@ -218,11 +218,12 @@ static void step_cb (GtkToggleButton *tgl, GtkWidget *btn)
 static void go_cb (GtkButton *button, ggobid *gg)
 {
   displayd *dsp = gg->current_display; 
+  extern void tour2d_do_step(displayd *,ggobid *);
 
   g_printerr ("go\n");
   g_printerr ("in go_cb %f \n",dsp->tau[0]);
 
-  tour_do_step (dsp, gg);
+  tour2d_do_step (dsp, gg);
 }
 
 static void storebases_cb (GtkToggleButton *button)

@@ -70,13 +70,14 @@ struct _displayd {
  * Tour display
  */
   gint ntour_vars, *tour_vars;
-  gfloat **u0, **u1, **u, **uold, **v0, **v1;
-  gfloat *tau, *tinc, dv, delta;
+  gfloat **u0, **u1, **u, **uold, **v0, **v1, **v, **uvevec;
+  gfloat *lambda, *tau, *tinc, dv, delta;
   gfloat **tv;
-  gfloat ts[2], coss[2], sins[2];
-  gint icoss[2], isins[2];
+  /*  gfloat ts[2], coss[2], sins[2];
+  gint icoss[2], isins[2];*//* di - not sure i need this in the new code.*/
   gint tour_idled;
   gboolean tour_get_new_target;
+  gint tour_nsteps, tour_stepcntr;
 
 /*
  * Correlation Tour
