@@ -240,10 +240,12 @@ struct _ggobid {
 
   struct _Ash {
      GtkWidget *type_opt;
-     GtkObject *ash_smoothness_adj;
+     GtkObject *smoothness_adj;
+  } ash;
+  struct _P1D {
      GtkObject *cycle_speed_adj;
      gboolean cycle_p;
-  } ash;
+  } p1d;
 
   struct _Parcoords {
     GtkAccelGroup *pc_accel_group;

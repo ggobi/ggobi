@@ -569,14 +569,16 @@ void
 GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, ggobid *gg)
 {
   gg->hidden[pt] = gg->hidden_now[pt] = hidden_p;
+  displays_plot (NULL, gg);
 }
 
 void 
 GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, ggobid *gg)
 {
- gint i;
- for (i = 0; i < howMany ; i++)
-   GGOBI(setCaseHidden)(pts[i], hidden_p, gg);
+  gint i;
+  for (i = 0; i < howMany ; i++)
+    GGOBI(setCaseHidden)(pts[i], hidden_p, gg);
+  displays_plot (NULL, gg);
 }
 
 gboolean

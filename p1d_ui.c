@@ -15,21 +15,19 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   display_tailpipe (gg->current_display, gg);
 }
 
-
 static void ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg) 
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
-  /*-- adj->value ranges from .01 to .5 --*/
+  /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
   cpanel->nASHes = (gint) ((gfloat) cpanel->nbins * (adj->value / 2.0));
 
   display_tailpipe (gg->current_display, gg);
 }
 
-
 static void cycle_cb (GtkToggleButton *button, ggobid* gg)
 {
-  gg->ash.cycle_p = button->active;
+  gg->p1d.cycle_p = button->active;
 }
 static void cycle_speed_cb (GtkAdjustment *adj, gpointer cbd) {
   g_printerr ("%d\n", ((gint) adj->value));
@@ -78,11 +76,11 @@ cpanel_p1dplot_make (ggobid *gg) {
     false, false, 0);
 
   /*-- value, lower, upper, step --*/
-  gg->ash.ash_smoothness_adj = gtk_adjustment_new (0.19, 0.01, 0.5, 0.01, .01, 0.0);
-  gtk_signal_connect (GTK_OBJECT (gg->ash.ash_smoothness_adj), "value_changed",
+  gg->ash.smoothness_adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
+  gtk_signal_connect (GTK_OBJECT (gg->ash.smoothness_adj), "value_changed",
                       GTK_SIGNAL_FUNC (ash_smoothness_cb), gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.ash_smoothness_adj));
+  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.smoothness_adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust ASH smoothness", NULL);
   gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
@@ -107,11 +105,11 @@ cpanel_p1dplot_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  gg->ash.cycle_speed_adj = gtk_adjustment_new (1.0, 0.0, 100.0, 1.0, 1.0, 0.0);
-  gtk_signal_connect (GTK_OBJECT (gg->ash.cycle_speed_adj), "value_changed",
+  gg->p1d.cycle_speed_adj = gtk_adjustment_new (1.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+  gtk_signal_connect (GTK_OBJECT (gg->p1d.cycle_speed_adj), "value_changed",
                       GTK_SIGNAL_FUNC (cycle_speed_cb), gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.cycle_speed_adj));
+  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->p1d.cycle_speed_adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust cycling speed", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
@@ -151,7 +149,7 @@ cpanel_p1d_set (cpaneld *cpanel, ggobid* gg)
                                cpanel->p1d_type);
 
   /*-- ASH smoothness parameter --*/
-  gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->ash.ash_smoothness_adj),
+  gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->ash.smoothness_adj),
     2 * (gfloat) cpanel->nASHes / (gfloat) cpanel->nbins);
 
   /*-- Cycling on or off --*/
