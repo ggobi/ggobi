@@ -393,7 +393,17 @@ void
 tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gint j, jtmp, k;
+  gboolean in_subset = dsp->t2d.subset_vars_p.els[jvar];
   gboolean active = dsp->t2d.active_vars_p.els[jvar];
+
+  /*
+   * This covers the case where we've just removed a variable
+   * from the subset and then called tour2d_active_var_set ..
+   * but the variable is already inactive, so we don't need to
+   * do anything.
+  */
+  if (!active && !in_subset)
+/**/return;
 
   /* deselect var if t2d.nactive > 2 */
   if (active) {
@@ -426,19 +436,21 @@ tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     }
     else if (jvar < dsp->t2d.active_vars.els[0]) {
       for (j=dsp->t2d.nactive; j>0; j--) {
-          dsp->t2d.active_vars.els[j] = dsp->t2d.active_vars.els[j-1];
+        dsp->t2d.active_vars.els[j] = dsp->t2d.active_vars.els[j-1];
       }
       dsp->t2d.active_vars.els[0] = jvar;
     }
     else {
       for (j=0; j<dsp->t2d.nactive-1; j++) {
-        if (jvar > dsp->t2d.active_vars.els[j] && jvar < dsp->t2d.active_vars.els[j+1]) {
+        if (jvar > dsp->t2d.active_vars.els[j] &&
+            jvar < dsp->t2d.active_vars.els[j+1])
+        {
           jtmp = j+1;
           break;
         }
       }
       for (j=dsp->t2d.nactive-1;j>=jtmp; j--) 
-          dsp->t2d.active_vars.els[j+1] = dsp->t2d.active_vars.els[j];
+        dsp->t2d.active_vars.els[j+1] = dsp->t2d.active_vars.els[j];
       dsp->t2d.active_vars.els[jtmp] = jvar;
     }
     dsp->t2d.nactive++;
@@ -451,13 +463,11 @@ tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
      and re-initialize as necessary */
   if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
     free_optimize0_p(&dsp->t2d_pp_op);
-    alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
-      2);
+    alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 2);
     free_pp(&dsp->t2d_pp_param);
     alloc_pp(&dsp->t2d_pp_param, d->nrows_in_plot, dsp->t2d.nactive, 2);
     t2d_pp_reinit(dsp, gg);
   }
-
 }
 
 static void
@@ -485,7 +495,7 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse,
     if (changed) {
       varcircles_visibility_set (dsp, gg);
 
-      /*-- now add/remove the variable to/from the active set, too --*/
+      /*-- Add/remove the variable to/from the active set, too. --*/
       gg->tour2d.fade_vars = false;
       tour2d_active_var_set (jvar, d, dsp, gg);
       gg->tour2d.fade_vars = fade;

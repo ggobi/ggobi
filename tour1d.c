@@ -45,6 +45,15 @@ extern gdouble erf (gdouble);  /*-- not defined on all unixes --*/
 #define T1DON true
 #define T1DOFF false
 
+#ifdef TESTING_TOUR_STEP
+void tour1d_step_cb(displayd *dsp, tour td, gint projdim, ggobid *gg,
+  void *display)
+{
+  g_printerr ("tour_step\n");
+}
+#endif
+
+
 void
 display_tour1d_init_null (displayd *dsp, ggobid *gg)
 {
@@ -246,6 +255,7 @@ display_tour1d_init (displayd *dsp, ggobid *gg)
   dsp->t1d.target_selection_method = TOUR_RANDOM;
   dsp->t1d_ppda = NULL;
   dsp->t1d_axes = true;
+
   dsp->t1d_pp_op.temp_start = 1.0;
   dsp->t1d_pp_op.cooling = 0.99;
 }
@@ -377,7 +387,17 @@ void
 tour1d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
+  gboolean in_subset = dsp->t1d.subset_vars_p.els[jvar];
   gboolean active = dsp->t1d.active_vars_p.els[jvar];
+
+  /*
+   * This covers the case where we've just removed a variable
+   * from the subset and then called tour1d_active_var_set ..
+   * but the variable is already inactive, so we don't need to
+   * do anything.
+  */
+  if (!active && !in_subset)
+/**/return;
 
   /* deselect var if t1d.nactive > 2 */
   if (active) {
@@ -466,17 +486,25 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobi
     if (redraw) {
       varcircles_visibility_set (dsp, gg);
 
-      /*-- now add/remove the variable to/from the active set, too --*/
-      gg->tour1d.fade_vars = false;
-      tour1d_active_var_set (jvar, d, dsp, gg);
-      gg->tour1d.fade_vars = fade;
-      if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
-        free_optimize0_p(&dsp->t1d_pp_op);
-        alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
-          1);
-        free_pp(&dsp->t1d_pp_param);
-        alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
-        t1d_pp_reinit(dsp, gg);
+      /*-- Add/remove the variable to/from the active set, too.
+           But: if we just removed it from the subset, but it was
+           already inactive, there's no need to do anything --*/
+      if (dsp->t1d.subset_vars_p.els[jvar] == false &&
+          dsp->t1d.active_vars_p.els[jvar] == false)
+        ;
+      else {
+        gg->tour1d.fade_vars = false;
+        tour1d_active_var_set (jvar, d, dsp, gg);
+        gg->tour1d.fade_vars = fade;
+
+        if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+          free_optimize0_p(&dsp->t1d_pp_op);
+          alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot,
+            dsp->t1d.nactive, 1);
+          free_pp(&dsp->t1d_pp_param);
+          alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
+          t1d_pp_reinit(dsp, gg);
+        }
       }
     }
 
@@ -707,7 +735,6 @@ g_printerr ("\n");*/
             d->ncols, (gint) 1);
 	    g_printerr ("Using random projection 2\n");*/
         }
-        
       }
       pathprob = tour_path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
         (gint) 1, dsp->t1d.Ga, dsp->t1d.Gz, dsp->t1d.G, 
@@ -744,7 +771,6 @@ g_printerr ("\n");*/
   display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
-
 }
 
 void

@@ -22,8 +22,9 @@
 #define CTON true
 #define CTOFF false
 
-void tourcorr_active_horvar_set (gint jvar, datad *, displayd *, ggobid *);
-void tourcorr_active_vervar_set (gint jvar, datad *, displayd *, ggobid *);
+static void tourcorr_active_horvar_set (gint jvar, datad *, displayd *, ggobid *);
+static void tourcorr_active_vervar_set (gint jvar, datad *, displayd *, ggobid *);
+static void tourcorr_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg);
 
 void
 display_tourcorr_init_null (displayd *dsp, ggobid *gg)
@@ -493,11 +494,21 @@ tourcorr_subset_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   return changed;
 }
 
-void 
+static void 
 tourcorr_active_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
+  gboolean in_subset = dsp->tcorr1.subset_vars_p.els[jvar];
   gboolean active = dsp->tcorr1.active_vars_p.els[jvar];
+
+  /*
+   * This covers the case where we've just removed a variable
+   * from the subset and then called tour2d_active_var_set ..
+   * but the variable is already inactive, so we don't need to
+   * do anything.
+  */
+  if (!active && !in_subset)
+/**/return;
 
   /* deselect var if tcorr1.nactive > 1 */
   if (active) {
@@ -688,11 +699,21 @@ tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 }
 #endif
 
-void 
+static void 
 tourcorr_active_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
+  gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
   gboolean active = dsp->tcorr2.active_vars_p.els[jvar];
+
+  /*
+   * This covers the case where we've just removed a variable
+   * from the subset and then called tour2d_active_var_set ..
+   * but the variable is already inactive, so we don't need to
+   * do anything.
+  */
+  if (!active && !in_subset)
+/**/return;
 
   /* deselect var if tcorr2.nactive > 1 */
   if (active) {
@@ -749,7 +770,7 @@ tourcorr_active_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   dsp->tcorr2.get_new_target = true;
 }
 
-void 
+static void 
 tourcorr_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subsethor = dsp->tcorr1.subset_vars_p.els[jvar];
@@ -758,8 +779,8 @@ tourcorr_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   gboolean activever = dsp->tcorr2.active_vars_p.els[jvar];
   gint j, k;
 
-  /* Taking care of horzontal variables first */ 
-  if (in_subsethor & activehor & (dsp->tcorr1.nactive>1)) {
+  /* Taking care of horizontal variables first */ 
+  if (in_subsethor && activehor && (dsp->tcorr1.nactive>1)) {
     /* remove variable */
     for (j=0; j<dsp->tcorr1.nactive; j++) {
       if (jvar == dsp->tcorr1.active_vars.els[j]) 
@@ -779,7 +800,7 @@ tourcorr_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     }
     dsp->tcorr1.active_vars_p.els[jvar] = false;
   }
-  else if (in_subsethor & !activehor) {
+  else if (in_subsethor && !activehor) {
     /* add variable */
     if (jvar > dsp->tcorr1.active_vars.els[dsp->tcorr1.nactive-1]) {
       dsp->tcorr1.active_vars.els[dsp->tcorr1.nactive] = jvar;
@@ -808,7 +829,7 @@ tourcorr_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   }
 
   /* Now vertical variables */
-  if (in_subsetver & activever & (dsp->tcorr2.nactive>1)) {
+  if (in_subsetver && activever && (dsp->tcorr2.nactive>1)) {
     /* remove variable */
     for (j=0; j<dsp->tcorr2.nactive; j++) {
       if (jvar == dsp->tcorr2.active_vars.els[j]) 
@@ -829,7 +850,7 @@ tourcorr_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     }
     dsp->tcorr2.active_vars_p.els[jvar] = false;
   }
-  else if (in_subsetver & !activever) {
+  else if (in_subsetver && !activever) {
     /* add variable */
     if (jvar > dsp->tcorr2.active_vars.els[dsp->tcorr2.nactive-1]) {
       dsp->tcorr2.active_vars.els[dsp->tcorr2.nactive] = jvar;
@@ -905,6 +926,7 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggo
       tourcorr_active_var_set (jvar, d, dsp, gg);
     }
   }
+
   return changed;
 }
 
