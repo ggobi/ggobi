@@ -78,7 +78,7 @@ familiar extensible environment for statistical data analysis.
 
 It has the same graphical functionality whether it is running
 standalone or embedded in other software.  That functionality
-includes 2-D displays of projections of points and lines in
+includes 2-D displays of projections of points and edges in
 high-dimensional spaces, as well as scatterplot matrices, parallel
 coordinate and time series plots.  Projection tools include average
 shifted histograms of single variables, plots of pairs of variables,
@@ -605,7 +605,7 @@ moving or rescaling vertically and horizontally with each action.
 The pan and zoom options allow it to be constrained so that only
 one axis is affected, convenient for browsing one variable at a time.
 
-\subsection{Brush: brushing of points and lines}
+\subsection{Brush: brushing of points and edges}
 \label{slbl:Brush}
 
 Brushing is often performed when only a single display is visible,
@@ -640,8 +640,8 @@ brush are redrawn using the currently selected glyph and color.  If
 {\bf Edges} is selected, the brush is drawn as a crosshair, and as
 the brush is moved in the window, any edges (line segments)
 intersecting either the vertical or horizontal ``hair'' are redrawn
-in the chosen color.  (There is no line brushing implementation for
-line types yet.) If both {\bf Points} and {\bf Edges} are selected,
+in the chosen color.  (There is no edge brushing implementation for
+edge types yet.) If both {\bf Points} and {\bf Edges} are selected,
 the brush is drawn as a crosshair inside a rectangle, and both point
 and edge brushing are performed.
 
@@ -687,7 +687,7 @@ menu bar contains these items:
 %{\bf Reset point colors} \> Restore all points to the default color. \\
 %{\bf Reset glyphs} \> Restore all points to the default glyph. \\
  {\bf Show all edges} \> Make all edges visible. \\
-%{\bf Reset line colors} \> Restore all lines to the default color. \\
+%{\bf Reset edge colors} \> Restore all edges to the default color. \\
  {\bf Reset brush size} \> Reset the brush to its default size and position. \\
 \end{tabbing}
 %
@@ -716,7 +716,9 @@ cursor.  It is also possible to restore all labels to unsticky status
 by clicking on the {\bf Remove labels} button.  You can also see all
 the labels at once by clicking on {\bf Make all sticky}.
 
-\subsection{Line editing}
+\subsection{Edge editing}
+
+Not implemented.
 
 
 \newpage
@@ -755,6 +757,7 @@ useful for a data set where several of the variables have the same units.
 The selected variables can also be cloned, and the new variables
 you create will be added to the table as well as the main control panel.
 
+\label{NewVariable}
 There's another way to add new variables, and that relies on the {\em New
 ...} button, which brings up a small panel.  Use that panel to specify
 the variable's name and to set its values:  either the row numbers or
@@ -781,48 +784,6 @@ transformation, and you can either type the Box-Cox parameter into
 the text box and hit return, or use the spin button to gradually
 increase or decrease the parameter.  Many of the stage 2
 transformations are not linear; they include sorting and ranking.
-
-\subsection{Jittering}
-
-Select {\em Variable jittering ...} to open a panel that allows
-random noise to be added to selected variables.
-
-First specify the variables you wish to jitter.  By default, the
-variables plotted in the current display will be affected; if you
-wish to select others, use the {\bf Variable manipulation tool.}
-
-Choose between uniform and random jitter, and then set the degree of
-jitter using the slider.  To rejitter without changing the degree of
-jitter, simply click on the {\bf Jitter} button.
-
-\subsection{Controls for missing data}
-%
-By default, missing values are assigned the value $0$, but you
-may sometimes find that to be an inconvenient choice.  Use the
-{\em Missing values} panel to assign alternative numbers.
-
-By default, all missings in all variables will be affected
-together, but you can choose to assign values only for selected
-variables using the menu at the top of the panel.
-
-Below the menu, a notebook widget allows you to specify the
-type of imputation you'd like to use.
-
-{\bf Random imputation}: Sample from the present values for each variable
-  to populate the missing values.  If you have done some brushing to
-  partition the cases, you can specify that you want the sampling to be
-  done using only cases brushed with the same color and glyph.
-\\{\bf Fixed value}: Specify any value to use instead of the default.
-\\{\bf Percentage below minimum}: Specify a value that is $x$ percent
-  above the minimum value.  For example, if the variable ranges from
- $40$ to $80$, specifying 10 will assign the missings the value $40 - (10\%
- * 40) = 36$.
-\\{\bf Percentage above minimum}: Specify a value that is $x$ percent
-above the maximum.
-
-If you want all plots to rescale immediately when you assign new
-values, turn on {\em Rescale} toggle.  Finally, click on the {\em Impute}
-button to perform the imputation or assignment of values.
 
 \subsection{Sphering}
 \label{slbl:Sphering}
@@ -857,6 +818,43 @@ panels.  The names of the selected variables will be added to the
 
 [And I forget what 'Restore scree plot' is for -- dfs]
 
+\subsection{Inference}
+
+Not implemented.
+
+\subsection{Jittering}
+
+Select {\em Variable jittering ...} to open a panel that allows
+random noise to be added to selected variables.
+
+First specify the variables you wish to jitter.  By default, the
+variables plotted in the current display will be affected; if you
+wish to select others, use the {\bf Variable manipulation tool.}
+
+Choose between uniform and random jitter, and then set the degree of
+jitter using the slider.  To rejitter without changing the degree of
+jitter, simply click on the {\bf Jitter} button.
+
+\subsection{Case clusters}
+
+The case clusters tool displays a table.  Each unique
+symbol in the data (combination of color and clyph) occupies
+a row, and for each row there are three buttons:  {\bf H}
+hides all points drawn in the chosen symbol, {\bf S} shows
+them all, and {\bf C} hides what's shown and shows what's
+hidden.  The three remaining columns report the number of
+cases hidden, the number shown, and the sum.
+
+The {\bf Update} button at the bottom of the window will reset
+the contents of the table in case it isn't responding to changes
+in the displays.  The {\bf Rescale} button will cause the views
+to be redrawn as if any hidden points are no longer in the data:
+that is, the points that are shown will be scaled to fill the
+viewing area of the plot.
+
+See \ref{NewVariable} to read how you can add a new variable to the
+existing data which serves as an indicator for these ``clusters.''
+
 \subsection{Subsetting}
 
 Select {\em Case subsetting and sampling ...} to open a panel
@@ -888,6 +886,35 @@ work on that subset at a comfortable speed of rotation and
 interaction.  Another purpose is to do graphical cross-validation:
 if the feature you see is still there in repeated subsamples, there's
 a good chance it's not just an artifact of visualization.
+
+\subsection{Controls for missing data}
+%
+By default, missing values are assigned the value $0$, but you
+may sometimes find that to be an inconvenient choice.  Use the
+{\em Missing values} panel to assign alternative numbers.
+
+By default, all missings in all variables will be affected
+together, but you can choose to assign values only for selected
+variables using the menu at the top of the panel.
+
+Below the menu, a notebook widget allows you to specify the
+type of imputation you'd like to use.
+
+{\bf Random imputation}: Sample from the present values for each variable
+  to populate the missing values.  If you have done some brushing to
+  partition the cases, you can specify that you want the sampling to be
+  done using only cases brushed with the same color and glyph.
+\\{\bf Fixed value}: Specify any value to use instead of the default.
+\\{\bf Percentage below minimum}: Specify a value that is $x$ percent
+  above the minimum value.  For example, if the variable ranges from
+ $40$ to $80$, specifying 10 will assign the missings the value $40 - (10\%
+ * 40) = 36$.
+\\{\bf Percentage above minimum}: Specify a value that is $x$ percent
+above the maximum.
+
+If you want all plots to rescale immediately when you assign new
+values, turn on {\em Rescale} toggle.  Finally, click on the {\em Impute}
+button to perform the imputation or assignment of values.
 
 %
 % End of tools section, so end of working through the main menubar
@@ -1001,7 +1028,7 @@ be easily extended, too, by adding to the set of tags in use.
 
 As ggobi grows and develops, we expect to favor the XML format:  it
 will become increasingly difficult to keep the old format up to
-date.  For instance, it's no longer possible to specify line segments
+date.  For instance, it's no longer possible to specify edges
 in the ascii data format, but they can be specified in XML -- and
 they can have associated data values.
 
@@ -1097,7 +1124,7 @@ See section \ref{slbl:Sphering} for details and pictures.
 The rules for linking in xgobi had evolved into a rather complicated
 hodge-podge with special handling of ``row groups,'' the
 ``nlinkable'' notion to exclude points from linking, and linking
-points to line segments.  This has been replaced with a single set
+points to line segments (edges).  This has been replaced with a single set
 of rules that can be specified in the xml file.  See section 
 \ref{LinkingRules} for details.
 
