@@ -213,7 +213,6 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   gchar *lbl;
   vartabled *vt;
 
-  fprintf(stderr, "[setData] %d %d\n", nr,nc);fflush(stderr);
   if(cleanup) {
       /* Release all the displays associated with this datad
          and then release all the GUI components and memory
