@@ -7,6 +7,14 @@
 #include "vars.h"
 #include "externs.h"
 
+/*
+The memory bug is fixed.  whew.
+
+The labels are not being updated.
+When I go from 2 to 3 variables, I don't get a third variable
+  in the table or the checkbox list.
+*/
+
 
 /*-------------------------------------------------------------------------*/
 /*      dynamic memory allocation routines                                 */
@@ -167,11 +175,9 @@ spherevars_set (datad *d, ggobid *gg) {
     ncols = plotted_cols_get (cols, d, gg);
 
   if (d->sphere.vars.vals == NULL || d->sphere.vars.nels != ncols) {
-g_printerr ("(spherevars_set) reallocating sphere vars: %d\n", ncols);
     sphere_malloc (ncols, d, gg);
   }
 
-  d->sphere.vars.nels = ncols;
   for (j=0; j<ncols; j++)
     d->sphere.vars.vals[j] = cols[j];
 

@@ -38,7 +38,6 @@ arrayf_free (array_f *arrp, gint nr, gint nc)
       g_free (arrp->vals[i]);
 
   if (nr == 0) {
-g_printerr ("(arrayf_free) freeing all\n");
     if (arrp->vals != NULL)
       g_free (arrp->vals);
     arrp->vals = (gfloat **) NULL;
@@ -83,21 +82,15 @@ arrayf_alloc_zero (array_f *arrp, gint nr, gint nc)
 {
   gint i;
 
-g_printerr ("(arrayf_alloc_zero) current nrows=%d, ncols=%d\n",
-arrp->nrows, arrp->ncols);
-
   if ((arrp->nrows != 0)||(arrp->ncols != 0)) {
-g_printerr ("(arrayf_alloc_zero) freeing\n");
     arrayf_free (arrp, 0, 0);
   }
 
-g_printerr ("(arrayf_alloc_zero) allocating nr=%d, nc=%d\n", nr, nc);
   arrp->vals = (gfloat **) g_malloc (nr * sizeof (gfloat *));
   for (i = 0; i < nr; i++)
     arrp->vals[i] = (gfloat *) g_malloc0 (nc * sizeof (gfloat));
   arrp->nrows = nr;
   arrp->ncols = nc;
-g_printerr ("(arrayf_alloc_zero) finished\n");
 }
 
 /* increase the number of rows in a floating point array */

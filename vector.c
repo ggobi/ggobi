@@ -14,11 +14,6 @@
 
 #include "externs.h"
 
-/*
- * Made changes in vectorf and vectori, not in the rest
-*/
-
-
 /*-------------------------------------------------------------------------*/
 /*                    floating point vector management                     */
 /*-------------------------------------------------------------------------*/
@@ -35,6 +30,7 @@ vectorf_free (vector_f *vecp)
 {
  if (vecp->vals != NULL)
     g_free ((gpointer) vecp->vals);
+  vecp->vals = NULL;
   vecp->nels = 0;
 }
 
@@ -53,6 +49,7 @@ vectorf_alloc (vector_f *vecp, gint nels)
 {
   if (vecp->vals != NULL)
     g_free (vecp->vals);
+  vecp->vals = NULL;
 
   vecp->nels = nels;
   if (nels > 0)
@@ -70,6 +67,7 @@ vectorf_realloc (vector_f *vecp, gint nels)
   } else {
     if (vecp->vals != NULL)
       g_free (vecp->vals);
+    vecp->vals = NULL;
   }
 
   vecp->nels = nels;
@@ -81,6 +79,7 @@ vectorf_alloc_zero (vector_f *vecp, gint nels)
 {
   if (vecp->vals != NULL)
     g_free (vecp->vals);
+  vecp->vals = NULL;
 
   vecp->nels = nels;
   if (nels > 0)
@@ -116,6 +115,7 @@ vectori_free (vector_i *vecp)
 {
   if (vecp->vals != NULL)
     g_free ((gpointer) vecp->vals);
+  vecp->vals = NULL;
   vecp->nels = 0;
 }
 
@@ -134,6 +134,7 @@ vectori_alloc (vector_i *vecp, gint nels)
 {
   if (vecp->vals != NULL)
     g_free (vecp->vals);
+  vecp->vals = NULL;
 
   vecp->nels = nels;
   if (nels > 0)
@@ -146,6 +147,7 @@ vectori_alloc_zero (vector_i *vecp, gint nels)
 {
   if (vecp->vals != NULL)
     g_free (vecp->vals);
+  vecp->vals = NULL;
 
   vecp->nels = nels;
   if (nels > 0)
@@ -163,6 +165,7 @@ vectori_realloc (vector_i *vecp, gint nels)
   } else {
     if (vecp->vals != NULL)
       g_free (vecp->vals);
+    vecp->vals = NULL;
   }
 
   vecp->nels = nels;
@@ -195,33 +198,62 @@ void vectorb_free (vector_b *vecp)
 {
   if (vecp->vals == NULL)
     g_free ((gpointer) vecp->vals);
+  vecp->vals = NULL;
   vecp->nels = 0;
 }
 
-void vectorb_zero (vector_b *vecp)
+void
+vectorb_zero (vector_b *vecp)
 {
   gint i;
   for (i=0; i<vecp->nels; i++)
     vecp->vals[i] = false;
 }
 
-void vectorb_realloc (vector_b *vecp, gint nels)
+void
+vectorb_alloc (vector_b *vecp, gint nels)
 {
-  if (vecp->vals == NULL)
+  if (vecp->vals != NULL)
+    g_free (vecp->vals);
+  vecp->vals = NULL;
+
+  vecp->nels = nels;
+  if (nels > 0)
     vecp->vals = (gboolean *) g_malloc (nels * sizeof (gboolean));
-  else
-    vecp->vals = (gboolean *) g_realloc (vecp->vals, nels * sizeof (gboolean));
+}
+
+void
+vectorb_realloc (vector_b *vecp, gint nels)
+{
+  if (nels > 0) {
+    if (vecp->vals == NULL)
+      vecp->vals = (gboolean *) g_malloc (nels * sizeof (gboolean));
+    else 
+      vecp->vals = (gboolean *)
+        g_realloc (vecp->vals, nels * sizeof (gboolean));
+  } else {
+    if (vecp->vals != NULL)
+      g_free (vecp->vals);
+    vecp->vals = NULL;
+  }
 
   vecp->nels = nels;
 }
 
-void vectorb_realloc_zero (vector_b *vecp, gint nels)
+void
+vectorb_alloc_zero (vector_b *vecp, gint nels)
 {
-  vectorb_realloc (vecp, nels);
-  vectorb_zero (vecp);
+  if (vecp->vals != NULL)
+    g_free (vecp->vals);
+  vecp->vals = NULL;
+
+  vecp->nels = nels;
+  if (nels > 0)
+    vecp->vals = (gboolean *) g_malloc0 (nels * sizeof (gboolean));
 }
 
-void vectorb_copy (vector_b *vecp_from, vector_b *vecp_to)
+void
+vectorb_copy (vector_b *vecp_from, vector_b *vecp_to)
 {
   gint i;
   if (vecp_from->nels == vecp_to->nels)
@@ -246,6 +278,7 @@ void vectors_free (vector_s *vecp)
 {
   if (vecp->vals == NULL)
     g_free ((gpointer) vecp->vals);
+  vecp->vals = NULL;
   vecp->nels = 0;
 }
 
@@ -256,23 +289,49 @@ void vectors_zero (vector_s *vecp)
     vecp->vals[i] = 0;
 }
 
-void vectors_realloc (vector_s *vecp, gint nels)
+void
+vectors_alloc (vector_s *vecp, gint nels)
 {
-  if (vecp->vals == NULL)
+  if (vecp->vals != NULL)
+    g_free (vecp->vals);
+  vecp->vals = NULL;
+
+  vecp->nels = nels;
+  if (nels > 0)
     vecp->vals = (gshort *) g_malloc (nels * sizeof (gshort));
-  else
-    vecp->vals = (gshort *) g_realloc (vecp->vals, nels * sizeof (gshort));
+}
+
+void
+vectors_realloc (vector_s *vecp, gint nels)
+{
+  if (nels > 0) {
+    if (vecp->vals == NULL)
+      vecp->vals = (gshort *) g_malloc (nels * sizeof (gshort));
+    else 
+      vecp->vals = (gshort *) g_realloc (vecp->vals, nels * sizeof (gshort));
+  } else {
+    if (vecp->vals != NULL)
+      g_free (vecp->vals);
+    vecp->vals = NULL;
+  }
 
   vecp->nels = nels;
 }
 
-void vectors_realloc_zero (vector_s *vecp, gint nels)
+void
+vectors_alloc_zero (vector_s *vecp, gint nels)
 {
-  vectors_realloc (vecp, nels);
-  vectors_zero (vecp);
+  if (vecp->vals != NULL)
+    g_free (vecp->vals);
+  vecp->vals = NULL;
+
+  vecp->nels = nels;
+  if (nels > 0)
+    vecp->vals = (gshort *) g_malloc0 (nels * sizeof (gshort));
 }
 
-void vectors_copy (vector_s *vecp_from, vector_s *vecp_to)
+void
+vectors_copy (vector_s *vecp_from, vector_s *vecp_to)
 {
   gint i;
   if (vecp_from->nels == vecp_to->nels)
