@@ -511,6 +511,17 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg)
   return(sp);
 }
 
+
+/* 
+  Key action callback to raise the control panel window.
+ */
+void
+raise_control_panel(GtkWidget *w, GdkEventKey *ev, ggobid *gg)
+{
+    if(ev->type == GDK_KEY_PRESS && ev->keyval == GDK_w)
+	gdk_window_raise(gg->main_window->window);
+}
+
 void
 splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg) 
 {
@@ -588,8 +599,14 @@ splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg)
   sp->win32.npoints = 0;
 #endif
 
+  gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+		      "key_press_event",
+		      (GtkSignalFunc) raise_control_panel,
+		      (gpointer) gg);
+
   gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[SPLOT_NEW_SIGNAL], sp);
 }
+
 
 void
 splot_get_dimensions (splotd *sp, gint *width, gint *height) {
