@@ -2,58 +2,61 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="3">
-
 <data name="morsecodes">
+<description>
+</description>
 <variables count="3">
- <realvariable name="Length" />
- <realvariable name="Dashes" />
- <realvariable name="Pos1" />
+  <realvariable name="Length" nickname="Le" />
+  <realvariable name="Dashes" nickname="Da" />
+  <realvariable name="Pos1" nickname="Po" />
 </variables>
-<records count="36">
-<record id="1"   label="A .-"  >  0.250 0.200 0.000 </record>
-<record id="2"   label="B -...">  0.750 0.600 1.000 </record>
-<record id="3"   label="C -.-.">  0.750 0.400 1.000 </record>
-<record id="4"   label="D -.." >  0.500 0.400 1.000 </record>
-<record id="5"   label="E ."   >  0.000 0.200 0.000 </record>
-<record id="6"   label="F ..-.">  0.750 0.600 0.000 </record>
-<record id="7"   label="G --." >  0.500 0.200 1.000 </record>
-<record id="8"   label="H ....">  0.750 0.800 0.000 </record>
-<record id="9"   label="I .."  >  0.250 0.400 0.000 </record>
-<record id="10"  label="J .---">  0.750 0.200 0.000 </record>
-<record id="11"  label="K -.-" >  0.500 0.200 1.000 </record>
-<record id="12"  label="L .-..">  0.750 0.600 0.000 </record>
-<record id="13"  label="M --"  >  0.250 0.000 1.000 </record>
-<record id="14"  label="N -."  >  0.250 0.200 1.000 </record>
-<record id="15"  label="O ---" >  0.500 0.000 1.000 </record>
-<record id="16"  label="P .--.">  0.750 0.400 0.000 </record>
-<record id="17"  label="Q --.-">  0.750 0.400 1.000 </record>
-<record id="18"  label="R .-." >  0.500 0.400 0.000 </record>
-<record id="19"  label="S ..." >  0.500 0.600 0.000 </record>
-<record id="20"  label="T -"   >  0.000 0.000 1.000 </record>
-<record id="21"  label="U ..-" >  0.500 0.400 0.000 </record>
-<record id="22"  label="V ...-">  0.750 0.600 0.000 </record>
-<record id="23"  label="W .--" >  0.500 0.200 0.000 </record>
-<record id="24"  label="X -..-">  0.750 0.400 1.000 </record>
-<record id="25"  label="Y -.--">  0.750 0.200 1.000 </record>
-<record id="26"  label="Z --..">  0.750 0.400 1.000 </record>
-<record id="27"  label="1 .----"> 1.000 0.200 0.000 </record>
-<record id="28"  label="2 ..---"> 1.000 0.400 0.000 </record>
-<record id="29"  label="3 ...--"> 1.000 0.600 0.000 </record>
-<record id="30"  label="4 ....-"> 1.000 0.800 0.000 </record>
-<record id="31"  label="5 ....."> 1.000 1.000 0.000 </record>
-<record id="32"  label="6 -...."> 1.000 0.800 1.000 </record>
-<record id="33"  label="7 --..."> 1.000 0.600 1.000 </record>
-<record id="34"  label="8 ---.."> 1.000 0.400 1.000 </record>
-<record id="35"  label="9 ----."> 1.000 0.200 1.000 </record>
-<record id="36"  label="0 -----"> 1.000 0.000 1.000 </record>
+<records count="36" glyph="fr 1" color="3">
+<record id="1"  label="A .-"    color="1"> 0.250 0.200 0.000 </record>
+<record id="2"  label="B -..."  color="3"> 0.750 0.600 1.000 </record>
+<record id="3"  label="C -.-."  color="3"> 0.750 0.400 1.000 </record>
+<record id="4"  label="D -.."   color="2"> 0.500 0.400 1.000 </record>
+<record id="5"  label="E ."     color="0"> 0.000 0.200 0.000 </record>
+<record id="6"  label="F ..-."  color="3"> 0.750 0.600 0.000 </record>
+<record id="7"  label="G --."   color="2"> 0.500 0.200 1.000 </record>
+<record id="8"  label="H ...."  color="3"> 0.750 0.800 0.000 </record>
+<record id="9"  label="I .."    color="1"> 0.250 0.400 0.000 </record>
+<record id="10" label="J .---"  color="3"> 0.750 0.200 0.000 </record>
+<record id="11" label="K -.-"   color="2"> 0.500 0.200 1.000 </record>
+<record id="12" label="L .-.."  color="3"> 0.750 0.600 0.000 </record>
+<record id="13" label="M --"    color="1"> 0.250 0.000 1.000 </record>
+<record id="14" label="N -."    color="1"> 0.250 0.200 1.000 </record>
+<record id="15" label="O ---"   color="2"> 0.500 0.000 1.000 </record>
+<record id="16" label="P .--."  color="3"> 0.750 0.400 0.000 </record>
+<record id="17" label="Q --.-"  color="3"> 0.750 0.400 1.000 </record>
+<record id="18" label="R .-."   color="2"> 0.500 0.400 0.000 </record>
+<record id="19" label="S ..."   color="2"> 0.500 0.600 0.000 </record>
+<record id="20" label="T -"     color="0"> 0.000 0.000 1.000 </record>
+<record id="21" label="U ..-"   color="2"> 0.500 0.400 0.000 </record>
+<record id="22" label="V ...-"  color="3"> 0.750 0.600 0.000 </record>
+<record id="23" label="W .--"   color="2"> 0.500 0.200 0.000 </record>
+<record id="24" label="X -..-"  color="3"> 0.750 0.400 1.000 </record>
+<record id="25" label="Y -.--"  color="3"> 0.750 0.200 1.000 </record>
+<record id="26" label="Z --.."  color="3"> 0.750 0.400 1.000 </record>
+<record id="27" label="1 .----" color="8"> 1.000 0.200 0.000 </record>
+<record id="28" label="2 ..---" color="8"> 1.000 0.400 0.000 </record>
+<record id="29" label="3 ...--" color="8"> 1.000 0.600 0.000 </record>
+<record id="30" label="4 ....-" color="8"> 1.000 0.800 0.000 </record>
+<record id="31" label="5 ....." color="8"> 1.000 1.000 0.000 </record>
+<record id="32" label="6 -...." color="8"> 1.000 0.800 1.000 </record>
+<record id="33" label="7 --..." color="8"> 1.000 0.600 1.000 </record>
+<record id="34" label="8 ---.." color="8"> 1.000 0.400 1.000 </record>
+<record id="35" label="9 ----." color="8"> 1.000 0.200 1.000 </record>
+<record id="36" label="0 -----" color="8"> 1.000 0.000 1.000 </record>
 </records>
 </data>
 
 <data name="distance">
+<description>
+</description>
 <variables count="1">
-  <realvariable name="D" />
+  <realvariable name="D" nickname="D" />
 </variables>
-<records count="1260">
+<records count="1260" glyph="fr 1" color="0">
 <record source="1" destination="2"> 167 </record>
 <record source="1" destination="3"> 169 </record>
 <record source="1" destination="4"> 159 </record>
@@ -1318,40 +1321,44 @@
 </data>
 
 <data name="edges">
-<records count="33">
-<record source="1" destination="9" />
-<record source="1" destination="14" />
-<record source="2" destination="12" />
-<record source="2" destination="22" />
-<record source="3" destination="16" />
-<record source="3" destination="24" />
-<record source="4" destination="11" />
-<record source="4" destination="21" />
-<record source="5" destination="20" />
-<record source="6" destination="12" />
-<record source="6" destination="22" />
-<record source="7" destination="15" />
-<record source="7" destination="23" />
-<record source="8" destination="22" />
-<record source="10" destination="17" />
-<record source="10" destination="25" />
-<record source="11" destination="18" />
-<record source="13" destination="14" />
-<record source="16" destination="26" />
-<record source="17" destination="25" />
-<record source="18" destination="23" />
-<record source="19" destination="21" />
-<record source="24" destination="26" />
-<record source="27" destination="28" />
-<record source="27" destination="36" />
-<record source="28" destination="29" />
-<record source="29" destination="30" />
-<record source="30" destination="31" />
-<record source="31" destination="32" />
-<record source="32" destination="33" />
-<record source="33" destination="34" />
-<record source="34" destination="35" />
-<record source="35" destination="36" />
+<description>
+</description>
+<variables count="0">
+</variables>
+<records count="33" glyph="fr 1" color="0">
+<record source="1" destination="9"  color="1"> </record>
+<record source="1" destination="14" color="1"> </record>
+<record source="2" destination="12" color="3"> </record>
+<record source="2" destination="22" color="3"> </record>
+<record source="3" destination="16" color="3"> </record>
+<record source="3" destination="24" color="3"> </record>
+<record source="4" destination="11" color="2"> </record>
+<record source="4" destination="21" color="2"> </record>
+<record source="5" destination="20" color="0"> </record>
+<record source="6" destination="12" color="3"> </record>
+<record source="6" destination="22" color="3"> </record>
+<record source="7" destination="15" color="2"> </record>
+<record source="7" destination="23" color="2"> </record>
+<record source="8" destination="22" color="3"> </record>
+<record source="10" destination="17" color="3"> </record>
+<record source="10" destination="25" color="3"> </record>
+<record source="11" destination="18" color="2"> </record>
+<record source="13" destination="14" color="1"> </record>
+<record source="16" destination="26" color="3"> </record>
+<record source="17" destination="25" color="3"> </record>
+<record source="18" destination="23" color="2"> </record>
+<record source="19" destination="21" color="2"> </record>
+<record source="24" destination="26" color="3"> </record>
+<record source="27" destination="28" color="8"> </record>
+<record source="27" destination="36" color="8"> </record>
+<record source="28" destination="29" color="8"> </record>
+<record source="29" destination="30" color="8"> </record>
+<record source="30" destination="31" color="8"> </record>
+<record source="31" destination="32" color="8"> </record>
+<record source="32" destination="33" color="8"> </record>
+<record source="33" destination="34" color="8"> </record>
+<record source="34" destination="35" color="8"> </record>
+<record source="35" destination="36" color="8"> </record>
 </records>
 </data>
 
