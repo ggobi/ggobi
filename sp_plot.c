@@ -1118,6 +1118,7 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
   datad *d = dsp->d;
+  gfloat dst;
   
   if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
     switch (proj) {
@@ -1125,46 +1126,65 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         for (j=0; j<d->ncols; j++) {
           ix = sp->da->allocation.width/2 + 
             (gint) (dsp->t1d.u.vals[0][j]*
-            (gfloat) sp->da->allocation.width/3);
-          iy = sp->da->allocation.height - 10 - j*10;
+            (gfloat) sp->da->allocation.width/4);
+          iy = sp->da->allocation.height - 10 - (d->ncols-1-j)*10;
           gdk_draw_line(drawable, gg->plot_GC,
-            sp->da->allocation.width/2,sp->da->allocation.height - 10 - j*10,
-            ix, iy);
-          if (abs(ix - sp->da->allocation.width/2) > 5)
-          {
-            gdk_text_extents (style->font, 
-              d->vartable[j].collab_tform,
-              strlen (d->vartable[j].collab_tform),
-              &lbearing, &rbearing, &width, &ascent, &descent);
-            if (dsp->t1d.u.vals[0][j] < 0)
-              gdk_draw_string (drawable, style->font, gg->plot_GC,
-                ix - 20, iy - 5,
-                d->vartable[j].collab_tform);
-            else
-              gdk_draw_string (drawable, style->font, gg->plot_GC,
-                ix + 5, iy - 5,
-                d->vartable[j].collab_tform);
-	  }
+            sp->da->allocation.width/2,sp->da->allocation.height - 10 - 
+            (d->ncols-1-j)*10, ix, iy);
+          gdk_draw_rectangle(drawable, gg->plot_GC, FALSE, 
+            sp->da->allocation.width/2-sp->da->allocation.width/4,
+            sp->da->allocation.height - 10*d->ncols-10,
+            2*sp->da->allocation.width/4,  
+            10*d->ncols+10);
+          gdk_text_extents (style->font, 
+            d->vartable[j].collab_tform,
+            strlen (d->vartable[j].collab_tform),
+            &lbearing, &rbearing, &width, &ascent, &descent);
+          gdk_draw_string (drawable, style->font, gg->plot_GC,
+            sp->da->allocation.width/2+sp->da->allocation.width/4+10,
+            iy, d->vartable[j].collab_tform);
 	}     
         break;
       case TOUR2D:
+        gdk_draw_arc(drawable,gg->plot_GC,FALSE,
+          10, sp->da->allocation.height-sp->da->allocation.height/4-10,
+          sp->da->allocation.width/4,sp->da->allocation.height/4,0,360*64);
         for (j=0; j<d->ncols; j++) {
-          ix = sp->da->allocation.width/2 + 
+	  /*          ix = sp->da->allocation.width/2 + 
             (gint) (dsp->t2d.u.vals[0][j]*
             (gfloat) sp->da->allocation.width/3);
           iy = sp->da->allocation.height - (sp->da->allocation.height/2 + 
             (gint) (dsp->t2d.u.vals[1][j]*
-            (gfloat) sp->da->allocation.height/3));
+            (gfloat) sp->da->allocation.height/3));*/
+          ix = sp->da->allocation.width/8 + 10 +
+            (gint) (dsp->t2d.u.vals[0][j]*
+            (gfloat) sp->da->allocation.width/8);
+          iy = sp->da->allocation.height - 10 - (sp->da->allocation.height/8 + 
+            (gint) (dsp->t2d.u.vals[1][j]*
+            (gfloat) sp->da->allocation.height/8));
           gdk_draw_line(drawable, gg->plot_GC,
-            sp->da->allocation.width/2,sp->da->allocation.height/2,
+            sp->da->allocation.width/8+10,
+            sp->da->allocation.height-sp->da->allocation.height/8-10,
             ix, iy);
-          if (abs(ix - sp->da->allocation.width/2) > 5 ||
-	      abs(iy - sp->da->allocation.height/2) > 5)
+          if (abs(ix - 10 - sp->da->allocation.width/8) > 5 ||
+	      abs(iy + 10 - (sp->da->allocation.height-
+              sp->da->allocation.height/8)) > 5)
           {
             gdk_text_extents (style->font, 
               d->vartable[j].collab_tform,
               strlen (d->vartable[j].collab_tform),
               &lbearing, &rbearing, &width, &ascent, &descent);
+            ix = ix - 10 - sp->da->allocation.width/8;
+            iy = iy - 
+              (sp->da->allocation.height-sp->da->allocation.height/8-10);
+            dst = sqrt(ix*ix + iy*iy);
+            ix = 10 + sp->da->allocation.width/8 + 
+               (gint) ((gfloat) ix / dst *
+               (gfloat) sp->da->allocation.width/8);
+            iy = sp->da->allocation.height - 10 - 
+               sp->da->allocation.height/8 + 
+               (gint) ((gfloat) iy / dst *
+               (gfloat) sp->da->allocation.height/8);
             gdk_draw_string (drawable, style->font, gg->plot_GC,
               ix + 5, iy - 5,
               d->vartable[j].collab_tform);
@@ -1176,49 +1196,44 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           /* horizontal */
           ix = sp->da->allocation.width/2 + 
             (gint) (dsp->tcorr1.u.vals[0][j]*
-            (gfloat) sp->da->allocation.width/3);
-          iy = sp->da->allocation.height - 10 - j*10;
+            (gfloat) sp->da->allocation.width/4);
+          iy = sp->da->allocation.height - 10 - (d->ncols-1-j)*10;
           gdk_draw_line(drawable, gg->plot_GC,
-            sp->da->allocation.width/2,sp->da->allocation.height - 10 - j*10,
-            ix, iy);
-          if (abs(ix - sp->da->allocation.width/2) > 5)
-          {
-            gdk_text_extents (style->font, 
-              d->vartable[j].collab_tform,
-              strlen (d->vartable[j].collab_tform),
-              &lbearing, &rbearing, &width, &ascent, &descent);
-            if (dsp->tcorr1.u.vals[0][j] < 0)
-              gdk_draw_string (drawable, style->font, gg->plot_GC,
-                ix - 20, iy - 5,
-                d->vartable[j].collab_tform);
-            else
-              gdk_draw_string (drawable, style->font, gg->plot_GC,
-                ix + 5, iy - 5,
-                d->vartable[j].collab_tform);
-	  }
+            sp->da->allocation.width/2,sp->da->allocation.height - 10 - 
+            (d->ncols-1-j)*10, ix, iy);
+          gdk_draw_rectangle(drawable, gg->plot_GC, FALSE, 
+            sp->da->allocation.width/2-sp->da->allocation.width/4,
+            sp->da->allocation.height - 10*d->ncols-10,
+            2*sp->da->allocation.width/4,  
+            10*d->ncols+10);
+          gdk_text_extents (style->font, 
+            d->vartable[j].collab_tform,
+            strlen (d->vartable[j].collab_tform),
+            &lbearing, &rbearing, &width, &ascent, &descent);
+          gdk_draw_string (drawable, style->font, gg->plot_GC,
+            sp->da->allocation.width/2+sp->da->allocation.width/4+10,
+            iy, d->vartable[j].collab_tform);
+	  
           /* vertical */
           ix = 10 + j*10;
           iy = sp->da->allocation.height - (sp->da->allocation.height/2 + 
             (gint) (dsp->tcorr2.u.vals[0][j]*
-            (gfloat) sp->da->allocation.height/3));
+            (gfloat) sp->da->allocation.height/4));
           gdk_draw_line(drawable, gg->plot_GC,
             10+j*10,sp->da->allocation.height/2,
             ix, iy);
-          if (abs(iy - sp->da->allocation.height/2) > 5)
-          {
-            gdk_text_extents (style->font, 
-              d->vartable[j].collab_tform,
-              strlen (d->vartable[j].collab_tform),
-              &lbearing, &rbearing, &width, &ascent, &descent);
-            if (dsp->tcorr2.u.vals[0][j] < 0)
-              gdk_draw_string (drawable, style->font, gg->plot_GC,
-                ix + 5, iy + 5,
-                d->vartable[j].collab_tform);
-            else
-              gdk_draw_string (drawable, style->font, gg->plot_GC,
-                ix + 5, iy - 5,
-                d->vartable[j].collab_tform);
-	  }
+          gdk_draw_rectangle(drawable, gg->plot_GC, FALSE, 
+            0, sp->da->allocation.height - 
+            sp->da->allocation.height/2-sp->da->allocation.height/4,
+            10*d->ncols+10,
+            2*sp->da->allocation.height/4);
+	  /*          gdk_text_extents (style->font, 
+            d->vartable[j].collab_tform,
+            strlen (d->vartable[j].collab_tform),
+            &lbearing, &rbearing, &width, &ascent, &descent);
+          gdk_draw_string (drawable, style->font, gg->plot_GC,
+            ix + 5, iy + 5,
+            d->vartable[j].collab_tform);*/
 	}     
         break;
     }

@@ -100,16 +100,19 @@ struct _displayd {
  * 2d tour
 */
  tour t2d;
+ gboolean t2d_axes;
 
 /*
  * 1d tour
 */
  tour t1d;
+ gboolean t1d_axes;
 
 /*
  * corr tour
 */
  tour tcorr1, tcorr2;
+ gboolean tcorr_axes;
 
 /* projection pursuit */
  GtkWidget *t1d_pplabel, *t2d_pplabel;

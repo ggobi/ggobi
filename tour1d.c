@@ -196,6 +196,7 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
   /* pp */
   dsp->t1d.target_basis_method = 0;
   dsp->t1d_ppda = NULL;
+  dsp->t1d_axes = true;
 }
 
 void tour1d_speed_set(gint slidepos, ggobid *gg) {
@@ -396,10 +397,9 @@ tour1d_run(displayd *dsp, ggobid *gg)
       {
         dsp->t1d_pp_op.index_best = dsp->t1d.ppval;
         oindxval = dsp->t1d.ppval;
-        for (i=0; i<2; i++)
-          for (j=0; j<dsp->t1d.nvars; j++)
-            dsp->t1d_pp_op.proj_best.vals[j][i] = 
-              dsp->t1d.u.vals[i][dsp->t1d.vars.els[j]];
+        for (j=0; j<dsp->t1d.nvars; j++)
+          dsp->t1d_pp_op.proj_best.vals[j][0] = 
+            dsp->t1d.u.vals[0][dsp->t1d.vars.els[j]];
       }
     }
     else 

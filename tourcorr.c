@@ -293,6 +293,7 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   /* pp */
   dsp->tcorr1.target_basis_method = 0;
   dsp->tcorr2.target_basis_method = 0;
+  dsp->tcorr_axes = true;
 }
 
 void tourcorr_speed_set(gint slidepos, ggobid *gg) {

@@ -222,6 +222,7 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   /* pp */
   dsp->t2d.target_basis_method = 0;
   dsp->t2d_ppda = NULL;
+  dsp->t2d_axes = true;
 }
 
 void tour2d_speed_set(gint slidepos, ggobid *gg) {
