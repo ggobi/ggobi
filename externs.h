@@ -256,7 +256,7 @@ void       globals_init (ggobid *);
 gboolean   gram_schmidt (gdouble *, gdouble*, gint);
 void       gt_basis (array_d, gint, vector_i, gint, gint);
 void       hidden_alloc (datad *);
-void       hidden_init (datad *, ggobid *);
+void       hidden_init (datad *);
 gboolean   hidden_read (InputDescription *desc, gboolean, datad *, ggobid *);
 void       identify_event_handlers_toggle (splotd *, gboolean);
 gchar *    identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *);
