@@ -285,6 +285,11 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
     fprintf(f, " id=\"%d\"", d->rowid.id.els[i]);
   }
 
+  /*-- if the record is hidden, indicate that --*/
+  if (gg->save.row_ind == ALLROWS && d->hidden_now.els[i]) {
+    fprintf(f, " hidden=\"true\"");
+  }
+
   /*-- edges if present and requested --*/
   if (gg->save.edges_p && d->edge.n == d->nrows) {
     fprintf(f, " source=\"%d\"", d->edge.endpoints[i].a);
