@@ -111,7 +111,7 @@ load_plugin_library(GGobiPluginDetails *plugin)
     }
     if(fileName != plugin->dllName)
       g_free(fileName);
-    plugin->loaded = true;
+    plugin->loaded = DL_LOADED;
     return(NULL);
   }
 
@@ -138,7 +138,7 @@ load_plugin_library(GGobiPluginDetails *plugin)
 DLFUNC 
 getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
 {
-  if(plugin->library == NULL && plugin->loaded == false) {
+  if(plugin->library == NULL && plugin->loaded != DL_LOADED) {
      plugin->library = load_plugin_library(plugin);   
   }
   return(dynload->resolve(plugin->library, name));

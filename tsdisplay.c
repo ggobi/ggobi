@@ -204,6 +204,7 @@ tsplotSPlotKeyEventHandler(displayd *dpy, splotd *sp, gint keyval)
        action = EXTENDED_DISPLAY_MODE;
     break;
     default:
+    break;
   }
   return(action);
 }
