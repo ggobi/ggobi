@@ -4,11 +4,19 @@
 
 GdkColor *
 NewColor (glong red, glong green, glong blue) {
+  gboolean writeable = false, best_match = true;
   GdkColor *c = (GdkColor *) g_malloc (sizeof (GdkColor));
+
   c->red = red;
   c->green = green;
   c->blue = blue;
-  gdk_color_alloc (gdk_colormap_get_system (), c);
+
+  if (gdk_colormap_alloc_color(gdk_colormap_get_system (),
+    c, writeable, best_match) == false)
+  {
+    g_printerr("Unable to allocate color\n");
+    c = NULL;
+  }
 
   return (c);
 }
