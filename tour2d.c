@@ -111,7 +111,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
   else { /* do final clean-up and get new target */
     if (!dsp->tour_get_new_target)
       do_last_increment(dsp, (gint) 2);
-    copy_mat(dsp->u0, dsp->u, d->ncols, 2);
+    copy_mat(dsp->u0.vals, dsp->u, d->ncols, 2);
     tour_reproject(dsp, 2);
     gt_basis(dsp, gg, (gint) 2);
     path(dsp, (gint) 2);
@@ -173,10 +173,10 @@ void tour2d_reinit(ggobid *gg)
 
   for (i=0; i<2; i++) {
     for (j=0; j<dsp->ntour_vars; j++) {
-      dsp->u0[i][j] = 0.;
+      dsp->u0.vals[i][j] = 0.;
       dsp->u[i][j] = 0.;
     }
-    dsp->u0[i][i] = 1.;
+    dsp->u0.vals[i][i] = 1.;
     dsp->u[i][i] = 1.;
   }
 

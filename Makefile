@@ -63,7 +63,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  p1d_ui.o p1d.o ash1d.o texture.o \
  xyplot_ui.o xyplot.o \
  rotate_ui.o \
- tour2d_ui.o tour2d.o tour.o pp_ui.o tour1d_ui.c tour1d.c\
+ tour2d_ui.o tour2d.o tour.o pp_ui.o tour1d_ui.o tour1d.o \
  ctour_ui.o cpp_ui.o \
  brush_ui.o brush.o brush_init.o brush_bins.o brush_api.o color_ui.o xlines.o \
  exclusion_ui.o exclusion.o \

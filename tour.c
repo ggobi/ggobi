@@ -81,7 +81,7 @@ free_tour(displayd *dsp)
   g_free((gpointer) dsp->tau);
   g_free((gpointer) dsp->tinc);
 
-  arrayf_free(dsp->u0, 0, 0);
+  arrayf_free(&dsp->u0, 0, 0);
 
   for (k=0; k<nc; k++)
     g_free((gpointer) dsp->u[k]);
@@ -171,13 +171,13 @@ display_tour_init (displayd *dsp, ggobid *gg) {
   /* declare starting base as first p chosen variables */
   for (i=0; i<nc; i++)
     for (j=0; j<nc; j++)
-      dsp->u0[i][j] = dsp->u1[i][j] = dsp->u[i][j] = dsp->uold[i][j] =
+      dsp->u0.vals[i][j] = dsp->u1[i][j] = dsp->u[i][j] = dsp->uold[i][j] =
         dsp->v0[i][j] = dsp->v1[i][j] = 0.0;
 
   for (i=0; i<nc; i++)
   {
     dsp->u1[i][dsp->tour_vars[i]] =
-      dsp->u0[i][dsp->tour_vars[i]] = dsp->u[i][dsp->tour_vars[i]] =
+      dsp->u0.vals[i][dsp->tour_vars[i]] = dsp->u[i][dsp->tour_vars[i]] =
       dsp->v0[i][dsp->tour_vars[i]] = dsp->v1[i][dsp->tour_vars[i]] = 1.0;
   }
 
@@ -413,7 +413,7 @@ void path(displayd *dsp, gint nd) {
 
   printf("u0 \n");
   for (i=0; i<d->ncols; i++)
-    printf("%f ",dsp->u0[0][i]);
+    printf("%f ",dsp->u0.vals[0][i]);
   printf("\n");
 
   printf("u1 \n");
@@ -427,7 +427,7 @@ void path(displayd *dsp, gint nd) {
     ptinc[i] = (gfloat *) g_malloc (nd * sizeof (gfloat));
     
   /* Check that u0 and u1 are both orthonormal. */
-  if (!checkcolson(dsp->u0, nc, nd)) {
+  if (!checkcolson(dsp->u0.vals, nc, nd)) {
     printf("Columns of u0 are not orthonormal");
     doit = false;
   }
@@ -438,7 +438,7 @@ void path(displayd *dsp, gint nd) {
 
   /* Do SVD of u0'u1: span(u0,u1).*/
   if (doit) {
-    if (!matmult_utv(dsp->u0, dsp->u1, nc, nd, nc, nd, dsp->tv))
+    if (!matmult_utv(dsp->u0.vals, dsp->u1, nc, nd, nc, nd, dsp->tv))
       printf("#cols != #rows in the two matrices");
       
       dsvd(dsp->tv, nd, nd, dsp->lambda, dsp->v1);
@@ -529,7 +529,7 @@ void path(displayd *dsp, gint nd) {
       /*  Calculate principal directions */
       if (nd > dI) {
         copy_mat(dsp->tv, dsp->v0, nc, nd);
-        if (!matmult_uv(dsp->u0, dsp->tv, nc, nd, nd, nd, dsp->v0))
+        if (!matmult_uv(dsp->u0.vals, dsp->tv, nc, nd, nd, nd, dsp->v0))
           printf("Could not multiply u and v, cols!=rows \n");
         copy_mat(dsp->tv, dsp->v1, nc, nd);
         if (!matmult_uv(dsp->u1, dsp->tv, nc, nd, nd, nd, dsp->v1))
@@ -539,8 +539,8 @@ void path(displayd *dsp, gint nd) {
 
       }
       else {
-        copy_mat(dsp->v0, dsp->u0, nc, nd);
-        copy_mat(dsp->v1, dsp->u0, nc, nd);
+        copy_mat(dsp->v0, dsp->u0.vals, nc, nd);
+        copy_mat(dsp->v1, dsp->u0.vals, nc, nd);
 	for (i=0; i<nd; i++)
 	  dsp->tau[i] = 0.0;
       }
@@ -589,8 +589,8 @@ void path(displayd *dsp, gint nd) {
     else {
       for (i=0; i<nd; i++)
 	dsp->tau[i] = 0.0;
-      copy_mat(dsp->v0, dsp->u0, nc, nd);
-      copy_mat(dsp->v1, dsp->u0, nc, nd);
+      copy_mat(dsp->v0, dsp->u0.vals, nc, nd);
+      copy_mat(dsp->v1, dsp->u0.vals, nc, nd);
       dsp->tour_nsteps = 0;
     }
 

@@ -407,7 +407,7 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
         case TOUR1D:
           x = 0;
           y = (gint) (display->u[0][jvar]*(gfloat)r);
-          gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+          gdk_draw_line (da_pix,
             gg->selvarfg_GC, r, r, r+x, r-y);
 
           for (k=0; k<display->ntour_vars; k++) {
