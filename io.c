@@ -36,8 +36,9 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
   const gchar *fname;
   ggobid *gg;
   guint action, len;
-  gchar *filename;
+  gchar *filename, *pluginModeName;
   gboolean firsttime;
+  GtkWidget *combo;
 
   gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), key_get());
   fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
@@ -46,10 +47,14 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 
   switch (action) {
     case READ_FILESET:
+      combo = (GtkWidget *)gtk_object_get_data(GTK_OBJECT(fs), "PluginTypeCombo");
+      pluginModeName = gtk_editable_get_chars(GTK_EDITABLE(GTK_COMBO(combo)->entry), 0, -1);
       firsttime = (g_slist_length (gg->d) == 0);
-      if (fileset_read_init (fname, gg)) 
+      if (fileset_read_init (fname, pluginModeName, gg)) 
         /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
+
+      g_free(pluginModeName);
 
       /*
        * If this is the first data read in, we need a call to
@@ -119,7 +124,8 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 }
 
 static void
-filename_get_configure (GtkWidget *fs, guint type, ggobid *gg) {
+filename_get_configure (GtkWidget *fs, guint type, ggobid *gg) 
+{
   extern const gchar* const key_get (void);
 
   const gchar *key = key_get();
@@ -140,6 +146,62 @@ filename_get_configure (GtkWidget *fs, guint type, ggobid *gg) {
                              (GtkObject*) fs);
 }
 
+
+GtkWidget *
+getFileSelectionWorkContainer(GtkWidget *fs)
+{
+       GtkWidget *dlg, *vbox = NULL;
+#if 0
+       gtk_widget_realize(dlg);
+       dlg = GTK_FILE_SELECTION(fs)->fileop_dialog;
+       vbox = GTK_DIALOG(dlg)->vbox;
+#else
+       GList *kids;
+       kids = gtk_container_children(GTK_CONTAINER(fs));
+       dlg = g_list_nth_data(kids, 0);
+       return(dlg);
+/*
+       kids = gtk_container_children(GTK_CONTAINER(dlg));
+       vbox = g_list_nth_data(kids, 0);
+       if(!GTK_IS_VBOX(vbox)) {
+          g_printerr("Not vbox\n");
+       }
+*/
+#endif
+
+       return(vbox);
+}
+
+GtkWidget*
+createInputFileSelectionDialog(gchar *title, ggobid *gg, GtkWidget **ocombo)
+{
+       GtkWidget *fs, *vbox, *combo, *box;
+       GList *els;
+
+       els = getInputPluginSelections(gg);
+
+       fs = gtk_file_selection_new(title);
+       vbox = getFileSelectionWorkContainer(fs);
+
+
+       box = gtk_frame_new("Reader Type");
+
+       combo = gtk_combo_new();
+       gtk_object_set_data(GTK_OBJECT(fs), "PluginTypeCombo", combo);
+       if(ocombo)
+           *ocombo = combo;
+       gtk_combo_set_popdown_strings(GTK_COMBO(combo), els);
+
+       gtk_container_add(GTK_CONTAINER(box), combo);
+       gtk_widget_show_all(box);
+
+
+       gtk_box_pack_start(GTK_BOX(vbox), box, false, false, 3);
+        /* Shouldn't need to do this if we had a real dialog with action area and work area. */
+       gtk_box_reorder_child(GTK_BOX(vbox), combo, 4);
+
+       return(fs);
+}
 /*--------------------------------------------------------------------------*/
 /*                    reading files                                         */
 /*--------------------------------------------------------------------------*/
@@ -147,7 +209,8 @@ filename_get_configure (GtkWidget *fs, guint type, ggobid *gg) {
 void
 filename_get_r (ggobid *gg, guint action, GtkWidget *w) 
 {
-  GtkWidget *fs = gtk_file_selection_new ("read ggobi data");
+  GtkWidget *fs, *combo;
+  fs = createInputFileSelectionDialog("read ggobi data", gg, &combo);
   gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs)); 
 
   /*

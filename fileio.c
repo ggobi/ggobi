@@ -86,6 +86,14 @@ GSList *initFileTypeGroups(void)
   return (FileTypeGroups);
 }
 
+static gboolean
+isUnknownInputMode(const gchar *modeName)
+{
+  gboolean status;
+  status = !modeName || modeName == "" || strcmp(modeName, DefaultUnknownInputModeName)==0;
+  return(status);
+}
+
 /*----------------------------------------------------------------------
   Initialize and populate in an InputDescription:  work out the
     mode of the data, the fully expanded name of the file, the
@@ -93,10 +101,11 @@ GSList *initFileTypeGroups(void)
 ----------------------------------------------------------------------*/
 
 InputDescription *
-fileset_generate(const gchar * fileName, DataMode guess,
-                                   ggobid * gg)
+fileset_generate(const gchar * fileName,
+		 const gchar *modeName, ggobid * gg)
 {
   InputDescription *desc;
+  DataMode guess = unknown_data;
 #ifndef WIN32
   struct stat buf;
 #else
@@ -105,11 +114,14 @@ fileset_generate(const gchar * fileName, DataMode guess,
   gint i, j;
   gint numGroups;
   GSList *groups;
+  gboolean isUnknownMode;
 
   if (FileTypeGroups == NULL)
     initFileTypeGroups();
 
   groups = FileTypeGroups;
+
+  isUnknownMode = isUnknownInputMode(modeName);
 
   desc = (InputDescription *) calloc(1, sizeof(InputDescription));
 
@@ -128,17 +140,15 @@ fileset_generate(const gchar * fileName, DataMode guess,
 
          /* Use the probe only if the user has not given us a 
             specific format/plugin. */
-	if(sessionOptions->data_mode == unknown_data) {
+	if(isUnknownMode) {
           if(info->probe) 
      	    handlesFile = info->probe(fileName, gg, plugin);
 	  else
             handlesFile = true;
 	}
 
-        if ((sessionOptions->data_mode == unknown_data && handlesFile) 
-             ||  sessionOptions->data_mode == info->mode 
-             || (sessionOptions->data_type && info->modeName &&
-					   strcmp(info->modeName, sessionOptions->data_type) == 0)) 
+        if ((isUnknownMode && handlesFile) 
+             || inputPluginSupportsMode(plugin, info, modeName)) 
 	{
           InputGetDescription f;
           f = (InputGetDescription) getPluginSymbol(info->getDescription,
@@ -175,7 +185,7 @@ fileset_generate(const gchar * fileName, DataMode guess,
        If such a file exists, we assume it is of that format.
      */
     numGroups = g_slist_length(groups);
-    if (guess == unknown_data) {
+    if (isUnknownMode) {
       for (i = 0; i < numGroups; i++) {
         gchar buf[1000];
         ExtensionList *group;

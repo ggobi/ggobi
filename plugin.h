@@ -141,4 +141,6 @@ gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlug
 gboolean GGobi_checkPlugin(GGobiPluginDetails *plugin);
 gboolean setLanguagePluginInfo(GGobiPluginDetails *details, const char *language, GGobiInitInfo *info);
 
+gboolean inputPluginSupportsMode(GGobiPluginInfo *plugin, GGobiInputPluginInfo *info, const gchar *modeName);
+
 #endif

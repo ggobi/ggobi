@@ -628,3 +628,31 @@ registerDefaultPlugins(GGobiInitInfo *info)
   plugin = createGGobiInputPluginInfo(&ASCIIInputPluginInfo);
   info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 }
+
+const gchar DefaultUnknownInputModeName[] =  "unknown/guess";
+
+GList *
+getInputPluginSelections(ggobid *gg)
+{
+       GList *els = NULL, *plugins;
+       GGobiPluginInfo *plugin;
+       int i, n;
+
+       els = g_list_append(els, DefaultUnknownInputModeName);
+       plugins = sessionOptions->info->inputPlugins;
+       n = g_list_length(plugins);
+       for(i = 0; i < n; i++) {
+	   plugin = g_list_nth_data(plugins, i);
+	   els = g_list_append(els, plugin->info.i->modeName);
+       }
+
+       return(els);
+}
+
+gboolean
+inputPluginSupportsMode(GGobiPluginInfo *plugin, GGobiInputPluginInfo *info, const gchar *modeName)
+{
+  gboolean status;
+  status = modeName && (strcmp(info->modeName, modeName) == 0);
+  return(status);
+}

@@ -607,6 +607,12 @@ void ggobi_sleep(guint interval);
 
 void setMissingValue(int i, int j, datad *d, vartabled *vt);
 
+
+GList *getInputPluginSelections(ggobid *gg);
+
+extern const gchar DefaultUnknownInputModeName[];
+	
+
 #include "GGobiEvents.h"
 
 

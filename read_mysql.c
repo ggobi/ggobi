@@ -149,7 +149,7 @@ GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
     }
 
   d = datad_new(NULL, gg);
-  d->input = fileset_generate(query, mysql_data, gg);  
+  d->input = fileset_generate(query, "mysql", gg);  
   if(d->input) {
     d->input->baseName = g_strdup(query);
   }

@@ -1066,7 +1066,6 @@ GGobiPluginInfo *
 readPluginFile(const char * const fileName, GGobiInitInfo *info)
 {
   xmlDocPtr doc;
-  xmlNodePtr node;
   GGobiPluginInfo *plugin = NULL;
   int n;
 

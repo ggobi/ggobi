@@ -95,12 +95,13 @@ static void viewmodes_init(datad * d, ggobid * gg)
   brush_init(d, gg);
 }
 
-gboolean fileset_read_init(const gchar * ldata_in, ggobid * gg)
+gboolean fileset_read_init(const gchar * ldata_in, const gchar *pluginModeName, ggobid * gg)
 {
   gint howMany;
   gboolean ans;
+
   howMany = g_slist_length(gg->d);
-  ans = fileset_read(ldata_in, gg);
+  ans = fileset_read(ldata_in, pluginModeName, gg);
   if (ans) {
     datad *d;
     gint n, i;
@@ -119,12 +120,12 @@ gboolean fileset_read_init(const gchar * ldata_in, ggobid * gg)
 
 
 gboolean 
-fileset_read(const gchar * ldata_in, ggobid * gg)
+fileset_read(const gchar * ldata_in, const gchar *pluginModeName, ggobid * gg)
 {
   InputDescription *desc;
   gboolean ok = true;
 
-  desc = fileset_generate(ldata_in, sessionOptions->data_mode, gg);
+  desc = fileset_generate(ldata_in, pluginModeName, gg);
 
   if (desc == NULL) {
     g_printerr("Cannot locate the file %s\n", ldata_in);
@@ -240,7 +241,7 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
      a user interface to query the user as to what to do.
    */
   if (options->data_in != NULL) {
-    if (fileset_read(options->data_in, gg) > 0) {
+    if (fileset_read(options->data_in, sessionOptions->data_type, gg) > 0) {
       init_data = true;
     }
   } else {
