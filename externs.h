@@ -29,6 +29,7 @@ displayd *createDisplayFromDescription (ggobid *, GGobiDisplayDescription *desc)
 GtkItemFactory *get_main_menu (GtkItemFactoryEntry[], gint, GtkAccelGroup *, GtkWidget  *, GtkWidget **, gpointer);
 vartabled *vartable_element_get (gint j, datad *d);
 vartabled *vartable_element_get_by_name (gchar *collab, datad *d);
+gint vartable_index_get_by_name (gchar *collab, datad *d);
 GtkWidget* CreateMenuCheck (GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
 ggobid* GGobiFromDisplay (displayd *display);

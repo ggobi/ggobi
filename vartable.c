@@ -50,6 +50,21 @@ vartable_element_get (gint j, datad *d)
 {
   return ((vartabled *) g_slist_nth_data (d->vartable, j));
 }
+gint
+vartable_index_get_by_name (gchar *collab, datad *d)
+{
+  gint j = -1;
+  vartabled *vt;
+
+  for (j=0; j<g_slist_length (d->vartable); j++) {
+    vt = (vartabled *) g_slist_nth_data (d->vartable, j);
+    if (strcmp (vt->collab, collab) == 0) {
+      break;
+    }
+  }
+
+  return j;
+}
 vartabled *
 vartable_element_get_by_name (gchar *collab, datad *d)
 {
