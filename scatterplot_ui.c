@@ -98,8 +98,8 @@ scatterplot_display_edge_menu_update (displayd *display,
   gint k, ne = 0;
   GtkWidget *item;
 
-    /*-- If this datad has ids, find the number of other datad's with edges --*/
-  if (d->rowid.idv.nels > 0 || d->rowIds) {
+  /*-- If this datad has ids, find the number of other datad's with edges --*/
+  if (d->rowIds) {
     for (k=0; k<nd; k++) { 
       e = (datad*) g_slist_nth_data (gg->d, k);
       if (/* e != d && */ e->edge.n > 0)

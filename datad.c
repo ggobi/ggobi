@@ -48,7 +48,6 @@ datad_new(datad *d, ggobid *gg)
   vectori_init_null (&d->clusterid);
 
   /*-- brushing and linking --*/
-  rowids_init_null (d);
   vectorb_init_null (&d->edge.xed_by_brush);
 
   /*-- linking by categorical variable --*/
@@ -141,8 +140,6 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   varpanel_populate (d, gg);   /*-- toggles */
   /*-- circles: build but don't show --*/
   varcircles_populate (d, gg);
-
-  rowidv_init (d);  /*-- initialize the rowid vector --*/
 
   pipeline_init (d, gg);
   clusters_set (d, gg);  /*-- find the clusters for data just read in --*/

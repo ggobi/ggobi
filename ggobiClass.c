@@ -246,7 +246,6 @@ void datad_instance_init(datad * d)
   vectori_init_null(&d->clusterid);
 
   /*-- brushing and linking --*/
-  rowids_init_null(d);
   vectorb_init_null(&d->edge.xed_by_brush);
 
   /*-- linking by categorical variable --*/

@@ -25,12 +25,8 @@
 void edges_alloc(gint nsegs, datad * d, gboolean old)
 {
   d->edge.n = nsegs;
-  if(old == true)
-    d->edge.old_endpoints = (endpointsd *)
-         g_realloc(d->edge.old_endpoints, nsegs * sizeof(endpointsd));
-  else
-    d->edge.sym_endpoints = (SymbolicEndpoints*)
-         g_realloc(d->edge.sym_endpoints, nsegs * sizeof(SymbolicEndpoints));
+  d->edge.sym_endpoints = (SymbolicEndpoints*)
+     g_realloc(d->edge.sym_endpoints, nsegs * sizeof(SymbolicEndpoints));
 
   vectorb_alloc(&d->edge.xed_by_brush, nsegs);
 }
@@ -38,8 +34,9 @@ void edges_alloc(gint nsegs, datad * d, gboolean old)
 void edges_free(datad * d, ggobid * gg)
 {
   gpointer ptr;
+
   vectorb_free(&d->edge.xed_by_brush);
-  ptr = d->edge.old_endpoints ? d->edge.old_endpoints : (gpointer) d->edge.sym_endpoints;
+  ptr = (gpointer) d->edge.sym_endpoints;
   g_free(ptr);
   d->edge.n = 0;
 }
@@ -49,13 +46,12 @@ void edges_free(datad * d, ggobid * gg)
 /* --------------------------------------------------------------- */
 
 /**
-  Allocated space for another edge observation and set the
+  Allocate space for another edge observation and set the
   locations of the rows.
  */
 gboolean edge_add(gint a, gint b, datad * d, datad * e)
 {
   /*-- check whether (a,b) exists before adding?  Not for the moment --*/
-  gint n = e->edge.n;
   endpointsd *endpoints;
   edges_alloc(e->edge.n + 1, e, true);
 
@@ -69,8 +65,11 @@ gboolean edge_add(gint a, gint b, datad * d, datad * e)
 /*XXX This should be done on all the datasets and the symbolic datapoints too perhaps. */
   endpoints = resolveEdgePoints(e, d);
 
+#ifdef OLD_STYLE_IDS
+  gint n = e->edge.n;
   endpoints[n].a = d->rowid.idv.els[a];
   endpoints[n].b = d->rowid.idv.els[b];
+#endif
 /*XXX don't we need to do something with jpartner, etc. */
   return true;
 }
@@ -125,7 +124,7 @@ gboolean edgeset_add(displayd * display)
   if (gg->d != NULL) {
     gint nd = g_slist_length(gg->d);
 
-    if (d->rowid.idv.nels > 0 || d->idTable) {
+    if (d->idTable) {
       for (k = 0; k < nd; k++) {
         e = (datad *) g_slist_nth_data(gg->d, k);
         if (/* e != d && */ e->edge.n > 0) {
@@ -198,15 +197,8 @@ edge_endpoints_get (gint k, gint *a, gint *b, datad *d, endpointsd *endpoints, d
 {
   gboolean ok;
 
-  if(e->edge.old_endpoints) {
-    if(d->rowid.idv.nels == 0)
-        return(false);
-    *a = d->rowid.idv.els[endpoints[k].a];
-    *b = d->rowid.idv.els[endpoints[k].b];
-  } else {
-    *a = endpoints[k].a;
-    *b = endpoints[k].b;
-  }
+  *a = endpoints[k].a;
+  *b = endpoints[k].b;
 
   ok = (*a >= 0 && *a < d->nrows && *b >= 0 && *b < d->nrows);
 
@@ -249,7 +241,6 @@ computeResolvedEdgePoints(datad *e, datad *d)
       continue;
     }
     ans[ctr].b = *tmp;
-
     ans[ctr].jpartner = e->edge.sym_endpoints[i].jpartner;
   }
 
@@ -257,8 +248,6 @@ computeResolvedEdgePoints(datad *e, datad *d)
     g_free(ans);
     ans = &DegenerateEndpoints;
   }
-
-  setOldEdgePartners(ans, ctr);
 
   return(ans);
 }
@@ -277,10 +266,6 @@ resolveEdgePoints(datad *e, datad *d)
   GList *tmp;
   if(e->edge.n < 1)
     return(NULL);
-
-  if(e->edge.old_endpoints)
-    return(e->edge.old_endpoints);
-  
 
   /* Get the entry in the table for this dataset (d). Use the name for now. */
   for(tmp = e->edge.endpointList; tmp ; tmp = tmp->next) {

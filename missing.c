@@ -91,30 +91,12 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
      * ids to support linking: if the current datad doesn't
      * have ids, they need to be assigned.
     */
-    if (d->rowid.id.nels == 0) {
-      /*-- find the highest id among all datads to avoid overlap --*/
-      GSList *l;
-      datad *dd;
-      gint start = 0;
-      for (l = gg->d; l; l = l->next) {
-        dd = (datad *) l->data;
-        if (dd->rowid.id.nels != 0) {
-          start = MAX (start, dd->rowid.id.els[ dd->rowid.id.nels-1 ]);
-        }
-      }
-      start += 1;
-
-      rowids_alloc (d);
+    if (d->rowIds == NULL) {
+      d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
       for (i=0; i<d->nrows; i++)
-        d->rowid.id.els[i] = start + i;
-      rowidv_init (d);
+        d->rowIds[i] = g_strdup_printf ("%d", i);
     }
-    rowids_alloc (dnew);
-    for (i=0; i<dnew->nrows; i++) {
-      dnew->rowid.id.els[i] = d->rowid.id.els[i];
-    }
-    dnew->rowid.maxId = d->rowid.maxId;
-    /*rowidv_init (dnew);*/  /* called in datad_init */
+    datad_record_ids_set (dnew, d->rowIds, true);
     /*-- --*/
     
 /*

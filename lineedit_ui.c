@@ -130,7 +130,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   if (e == NULL)
     g_printerr ("Not yet initializing a new edge set\n");
-  else if (d->rowid.id.nels == 0)
+  else if (d->rowIds == NULL)
     g_printerr ("Not yet initializing new rowids\n");
   else {  
     edge_add (gg->edgeedit.a, d->nearest_point, d, e);
@@ -149,24 +149,16 @@ edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
   cpaneld *cpanel = &display->cpanel;
 
   if (state == on) {
-      if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-	  sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-						 "key_press_event",
-						 (GtkSignalFunc) key_press_cb,
-						 (gpointer) sp);
+    if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+      sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+        "key_press_event", (GtkSignalFunc) key_press_cb, (gpointer) sp);
     sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                       "button_press_event",
-                                       (GtkSignalFunc) button_press_cb,
-                                       (gpointer) sp);
+      "button_press_event", (GtkSignalFunc) button_press_cb, (gpointer) sp);
     sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                         "button_release_event",
-                                         (GtkSignalFunc) button_release_cb,
-                                         (gpointer) sp);
+      "button_release_event", (GtkSignalFunc) button_release_cb, (gpointer) sp);
     if (cpanel->ee_adding_p) {
       sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                          "motion_notify_event",
-                                          (GtkSignalFunc) motion_notify_cb,
-                                          (gpointer) sp);
+        "motion_notify_event", (GtkSignalFunc) motion_notify_cb, (gpointer) sp);
     }
 
   } else {
@@ -227,8 +219,8 @@ cpanel_edgeedit_make (ggobid *gg) {
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_edgeedit_init (cpaneld *cpanel, ggobid *gg) {
-
+cpanel_edgeedit_init (cpaneld *cpanel, ggobid *gg)
+{
   cpanel->ee_adding_p = true;
   cpanel->ee_deleting_p = false;
 }

@@ -183,20 +183,12 @@ write_edge_record_p (gint i, datad *e, ggobid *gg)
       endpointsd *endpoints = resolveEdgePoints(e, d);
       d = (datad *) l->data;
       if (endpoints) {
-        if (d->rowid.idv.nels > endpoints[i].a &&
-            d->rowid.idv.nels > endpoints[i].b)
+        if (!edge_endpoints_get (i, &a, &b, d, endpoints, e) ||
+            !d->sampled.els[a] || !d->sampled.els[b] ||
+            d->excluded.els[a] || d->excluded.els[b])
         {
-/*
- *        a = d->rowid.idv.els[e->edge.endpoints[i].a];
- *        b = d->rowid.idv.els[e->edge.endpoints[i].b];
-*/
-          if (!edge_endpoints_get (i, &a, &b, d, endpoints, e) ||
-              !d->sampled.els[a] || !d->sampled.els[b] ||
-              d->hidden.els[a] || d->hidden.els[b])
-          {
-            save_case = false;
-            break;
-          }
+          save_case = false;
+          break;
         }
       }
     }
@@ -285,8 +277,8 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
   fprintf(f, "<record");
 
   /*-- ids if present --*/
-  if (d->rowid.id.nels != 0) {
-    fprintf(f, " id=\"%d\"", d->rowid.id.els[i]);
+  if (d->rowIds) {
+    fprintf(f, " id=\"%s\"", d->rowIds[i]);
   }
 
   /*-- if the record is hidden, indicate that --*/
@@ -296,13 +288,8 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
 
   /*-- edges if present and requested --*/
   if (gg->save.edges_p && d->edge.n == d->nrows) {
-      if(d->edge.old_endpoints) {
-         fprintf(f, " source=\"%d\"", d->edge.old_endpoints[i].a);
-	 fprintf(f, " destination=\"%d\"", d->edge.old_endpoints[i].b);
-      } else {
-         fprintf(f, " source=\"%s\"", d->edge.sym_endpoints[i].a);
-	 fprintf(f, " destination=\"%s\"", d->edge.sym_endpoints[i].b);
-      }
+    fprintf(f, " source=\"%s\"", d->edge.sym_endpoints[i].a);
+    fprintf(f, " destination=\"%s\"", d->edge.sym_endpoints[i].b);
   }
 
   if(d->rowlab && d->rowlab->data
@@ -436,17 +423,12 @@ write_xml_edges (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 gboolean
 write_xml_edge(FILE *f, datad *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
 {
- fprintf(f, "<edge ");
- if(d->edge.old_endpoints) {
-   fprintf(f, "source=\"%d\" destination=\"%d\"", d->edge.old_endpoints[i].a
-                                                , d->edge.old_endpoints[i].b);
- } else {
-   fprintf(f, "source=\"%s\" destination=\"%s\"", d->edge.sym_endpoints[i].a
-                                                , d->edge.sym_endpoints[i].b);
- }
- fprintf(f, " />");
+  fprintf(f, "<edge ");
+  fprintf(f, "source=\"%s\" destination=\"%s\"", d->edge.sym_endpoints[i].a
+                                               , d->edge.sym_endpoints[i].b);
+  fprintf(f, " />");
 
- return(true);
+  return(true);
 }
 
 void

@@ -107,7 +107,6 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
 {
   datad *d;
   GSList *l;
-  gint i, id;
   gboolean inrange;
 
   /*-- k is the row number in source_d --*/
@@ -121,7 +120,7 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
     return;
   }
 
-  if(source_d->rowIds) {
+  if (source_d->rowIds) {
            /* if there is no */
     if(!source_d->rowIds[k]) {
        return;
@@ -148,52 +147,6 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
     }
     return;
   }
-
-
-  if (source_d->rowid.id.nels > 0) {
-    id = source_d->rowid.id.els[k];
-    if (id < 0)  /*-- this would indicate a bug --*/
-      return;
-
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-      inrange = false;
-
-      if (d == source_d)
-        continue;        /*-- skip the originating datad --*/
-    
-      /*-- if this id exists is in the range of d's ids ... --*/
-      if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
-        /*-- i is the row number, irrespective of rows_in_plot --*/
-        i = d->rowid.idv.els[id];
-        if (i < 0)   /*-- then no cases in d have this id --*/
-          ;
-
-        else {
-
-          /*-- if we get here, d has one case with the indicated id --*/
-          if (i < d->nrows && !d->hidden_now.els[i] && d->sampled.els[i]) {
-            inrange = true;
-            if (i != d->nearest_point) {
-              d->nearest_point_prev = d->nearest_point;
-              d->nearest_point = i;
-            }
-          }
-        }
-      }
-
-      /*
-       * if this id does not exist, or is not in the range of d's ids,
-       * or does not have a match, then make sure d->nearest_point is
-       * set to -1
-      */
-      if (!inrange) {
-        d->nearest_point_prev = d->nearest_point;
-        d->nearest_point = -1;
-      }
-    }  /*-- end for --*/
-
-  }  /*-- end if --*/
 }
 
 void
@@ -213,50 +166,46 @@ sticky_id_link_by_id (gint whattodo, gint k, datad *source_d, ggobid *gg)
       ptr = g_hash_table_lookup(source_d->idTable, source_d->rowIds[k]);
       if(ptr) 
          id = *(guint *) ptr;
-  } else if (source_d->rowid.id.nels > 0) 
-    id = source_d->rowid.id.els[k];
+  }
 
   if (id < 0)  /*-- this would indicate a bug --*/
-     return;
+    return;
 
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-      if (d == source_d)
-        continue;        /*-- skip the originating datad --*/
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (d == source_d)
+      continue;        /*-- skip the originating datad --*/
 
-      i = -1;
- 
-      /*-- if this id exists is in the range of d's ids ... --*/
-      if(d->idTable) {
-        gpointer ptr = g_hash_table_lookup(d->idTable, source_d->rowIds[k]);
-        if(ptr) 
-           i = *(guint *) ptr;        
-      } else if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
-        /*-- i is the row number, irrespective of rows_in_plot --*/
-        i = d->rowid.idv.els[id];
-      }
+    i = -1;
 
-      if (i < 0)  /*-- then no cases in d have this id --*/
-          continue;
+    /*-- if this id exists is in the range of d's ids ... --*/
+    if(d->idTable) {
+      gpointer ptr = g_hash_table_lookup(d->idTable, source_d->rowIds[k]);
+      if(ptr) 
+         i = *(guint *) ptr;        
+    }
 
-      if (g_slist_length (d->sticky_ids) > 0) {
-        for (ll = d->sticky_ids; ll; ll = ll->next) {
-          n = GPOINTER_TO_INT (ll->data);
-          if (n == i) {  /*-- the row number of the id --*/
-            i_in_list = true;
-            ptr = ll->data;
-            break;
-          }
+    if (i < 0)  /*-- then no cases in d have this id --*/
+      continue;
+
+    if (g_slist_length (d->sticky_ids) > 0) {
+      for (ll = d->sticky_ids; ll; ll = ll->next) {
+        n = GPOINTER_TO_INT (ll->data);
+        if (n == i) {  /*-- the row number of the id --*/
+          i_in_list = true;
+          ptr = ll->data;
+          break;
         }
       }
-
-      if (i_in_list && whattodo == STICKY_REMOVE) {
-        d->sticky_ids = g_slist_remove (d->sticky_ids, ptr);
-      } else if (!i_in_list && whattodo == STICKY_ADD) {
-        ptr = GINT_TO_POINTER (i);
-        d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
-      }
     }
+
+    if (i_in_list && whattodo == STICKY_REMOVE) {
+      d->sticky_ids = g_slist_remove (d->sticky_ids, ptr);
+    } else if (!i_in_list && whattodo == STICKY_ADD) {
+      ptr = GINT_TO_POINTER (i);
+      d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
+    }
+  }
 }
 
 /*----------------------------------------------------------------------*/
@@ -347,7 +296,7 @@ g_printerr ("selected variables don't correspond to what is identified\n");
     if (d->rowIds && d->rowIds[k]) {
       lbl = g_strdup_printf ("%s", d->rowIds[k]);
     } else {
-      lbl = g_strdup_printf ("%d", d->rowid.id.els[k]);
+      lbl = g_strdup ("");
     }
   }
 
