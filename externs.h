@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void       missings_datad_cb (GtkWidget *w, ggobid *gg);
 gint       symbol_table_populate (datad *d);
 void       arrayd_add_cols (array_d *, gint);
 void       arrayd_add_rows (array_d *, gint);
