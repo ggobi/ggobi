@@ -1062,9 +1062,9 @@ in one display, all coastal cities in this and all other displays will
 be highlighted.  In this linking mode, displays of different datasets
 can be linked if they have a chosen categorical variable in common.
 
-\subsubsection{Brush by variable ...}
+\subsubsection{Color by variable ...}
 
-See the description in section \ref{slbl:BrushByVariable}.
+See the description in section \ref{slbl:ColorByVariable}.
 
 \subsubsection{Color \& glyph groups ...}
 
@@ -1260,10 +1260,10 @@ and normal random jitter, and then set the degree of jitter using the
 slider.  To rejitter without changing the degree of jitter, simply click
 on the {\bf Jitter} button.
 
-\subsection{Brush by variable}
-\label{slbl:BrushByVariable}
+\subsection{Color by variable}
+\label{slbl:ColorByVariable}
 
-The {\bf Brush by variable} tool is used to automatically color points
+The {\bf Color by variable} tool is used to automatically color points
 using the current color scale.  To use it, first select a variable.
 This adds two sets of numbers to the display:  along the bottom of the
 display, at the center of each stripe of color, is shown the number of
@@ -1276,8 +1276,43 @@ and notice that both the values and the counts adjust as you move it.
 Try it with the olive oil data used in the tutorial, and select the {\it
 Area} variable.  It can be a real time-saver.
 
-[We plan to support multiple color scales of different sizes, and then
-this tool will become increasingly useful.]
+\subsubsection{Color schemes}
+
+You can also use this tool to select from a menu of color schemes,
+which is populated using a file specified in your .ggobirc file.
+Here is a minimal .ggobirc file, in which the relevant line specifies
+the file {\tt colorschemes.xml}, which is included in the GGobi
+distribution.  (You will probably need to modify the path name, of
+course.)
+
+\begin{quote}
+<?xml version="1.0"?>
+<!DOCTYPE ggobirc>
+<ggobirc>
+<preferences>
+  <colorschemes file="/usr/ggobi/data/colorschemes.xml" />
+</preferences>
+</ggobirc>
+\end{quote}
+
+The sample file presently contains 20 or so color schemes, of
+different types and sizes, and they're based on the work of
+Brewer (\cite{Brewer99}, www.personal.psu.edu/faculty/c/a/cab38/).
+The four types represented are
+
+\begin{itemize}
+\item diverging: used when the range of the coloring variable has
+      a meaningful midpoint;
+\item sequential: used to highlight a continuous progression of values;
+\item qualitative: used when the coloring variable is categorical;
+\item spectral: Brewer's modifications of the popular spectral scale
+      to reduce its drawbacks.  She has made the perceptual steps
+      more uniform, and made the scales more friendly for people with
+      color impairments.
+\end{itemize}
+
+When you choose a color scheme, the colors will remain local to
+the  {\em Color by variable} tool until you press {\em Apply}.
 
 \subsection{Color \& glyph groups}
 \label{slbl:ColorAndGlyphGroups}
