@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
+<ggobidata count="2">
+<data name="perm4">
+<variables count="3">
+  <realvariable name="Pos1" />
+  <realvariable name="Pos2" />
+  <realvariable name="Pos3" />
+</variables>
+<records count="24">
+<record id="1" label="0123">	1.000000 0.500000 1 </record>
+<record id="2" label="0132">	0.982963 0.629410 2 </record>
+<record id="3" label="0213">	0.933013 0.750000 3 </record>
+<record id="4" label="0231">	0.853553 0.853553 4 </record>
+<record id="5" label="0312">	0.750000 0.933013 5 </record>
+<record id="6" label="0321">	0.629410 0.982963 6 </record>
+<record id="7" label="1023">	0.500000 1.000000 7 </record>
+<record id="8" label="1032">	0.370590 0.982963 8 </record>
+<record id="9" label="1203">	0.250000 0.933013 9 </record>
+<record id="10" label="1230">	0.146447 0.853553 10 </record>
+<record id="11" label="1302">	0.066987 0.750000 11 </record>
+<record id="12" label="1320">	0.017037 0.629410 12 </record>
+<record id="13" label="2013">	0.000000 0.500000 12 </record>
+<record id="14" label="2031">	0.017037 0.370590 13 </record>
+<record id="15" label="2103">	0.066987 0.250000 14 </record>
+<record id="16" label="2130">	0.146447 0.146447 15 </record>
+<record id="17" label="2301">	0.250000 0.066987 17 </record>
+<record id="18" label="2310">	0.370590 0.017037 18 </record>
+<record id="19" label="3012">	0.500000 0.000000 19 </record>
+<record id="20" label="3021">	0.629409 0.017037 20 </record>
+<record id="21" label="3102">	0.750000 0.066987 21 </record>
+<record id="22" label="3120">	0.853553 0.146447 22 </record>
+<record id="23" label="3201">	0.933013 0.250000 23 </record>
+<record id="24" label="3210">	0.982963 0.370590 24 </record>
+</records>
+</data>
+
+<data name="edges">
+<records count="36">
+<record source="1" destination="2" />
+<record source="1" destination="3" />
+<record source="3" destination="4" />
+<record source="2" destination="5" />
+<record source="5" destination="6" />
+<record source="4" destination="6" />
+<record source="1" destination="7" />
+<record source="7" destination="8" />
+<record source="2" destination="8" />
+<record source="7" destination="9" />
+<record source="9" destination="10" />
+<record source="8" destination="11" />
+<record source="11" destination="12" />
+<record source="10" destination="12" />
+<record source="3" destination="13" />
+<record source="13" destination="14" />
+<record source="4" destination="14" />
+<record source="13" destination="15" />
+<record source="9" destination="15" />
+<record source="15" destination="16" />
+<record source="10" destination="16" />
+<record source="14" destination="17" />
+<record source="17" destination="18" />
+<record source="16" destination="18" />
+<record source="5" destination="19" />
+<record source="19" destination="20" />
+<record source="6" destination="20" />
+<record source="19" destination="21" />
+<record source="11" destination="21" />
+<record source="21" destination="22" />
+<record source="12" destination="22" />
+<record source="20" destination="23" />
+<record source="17" destination="23" />
+<record source="23" destination="24" />
+<record source="22" destination="24" />
+<record source="18" destination="24" />
+</records>
+</data>
+</ggobidata>
