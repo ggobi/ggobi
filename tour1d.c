@@ -419,9 +419,9 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg)
 void
 tour1d_run(displayd *dsp, ggobid *gg)
 {
-  extern gboolean reached_target(gint, gint, gint, gfloat *, gfloat *);
+  extern gboolean reached_target(gint, gint, gfloat, gint, gfloat *, gfloat *);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
-    gfloat, gint);
+    gfloat, gfloat *, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
   extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
     array_d, array_d, vector_f, array_d, array_d, array_d,
@@ -439,10 +439,11 @@ tour1d_run(displayd *dsp, ggobid *gg)
   gint i, j, nv;
 
   if (!dsp->t1d.get_new_target && 
-      !reached_target(dsp->t1d.nsteps, dsp->t1d.stepcntr, 
+      !reached_target(dsp->t1d.nsteps, dsp->t1d.stepcntr, dsp->t1d.tang,
         dsp->t1d.target_selection_method,&dsp->t1d.ppval, &oindxval)) {
     increment_tour(dsp->t1d.tinc, dsp->t1d.tau, &dsp->t1d.nsteps, 
-      &dsp->t1d.stepcntr, dsp->t1d.dist_az, dsp->t1d.delta, (gint) 1);
+      &dsp->t1d.stepcntr, dsp->t1d.dist_az, dsp->t1d.delta, &dsp->t1d.tang, 
+      (gint) 1);
     tour_reproject(dsp->t1d.tinc, dsp->t1d.G, dsp->t1d.Ga, dsp->t1d.Gz,
       dsp->t1d.F, dsp->t1d.Va, d->ncols, (gint) 1);
 
@@ -541,6 +542,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
         &dsp->t1d.dist_az, dsp->t1d.delta);
       dsp->t1d.get_new_target = false;
     }
+    dsp->t1d.tang = 0.0;
   }
   /*  tour_reproject(dsp, 2);*/
   display_tailpipe (dsp, FULL, gg);

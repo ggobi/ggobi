@@ -100,7 +100,7 @@ typedef struct {
   vector_i active_vars;
   array_d Fa, Fz, F, Ga, Gz, G, Va, Vz, tv;
   vector_f lambda, tau, tinc;
-  gfloat dist_az, delta;
+  gfloat dist_az, delta, tang;
   gint target_selection_method;
   gint idled;
   gboolean get_new_target;

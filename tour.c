@@ -465,14 +465,14 @@ g_printerr ("\n");
       *pdist_az = dist_az;
 
       /* Reset increment counters.*/
-      nsteps = (gint) floor((gdouble)(dist_az/delta))+1;
+      /*      nsteps = (gint) floor((gdouble)(dist_az/delta))+1;*/
       /*      for (i=1; i<projdim; i++) {
         if ((gint) floor((gdouble)(dG/delta)) < nsteps) 
           nsteps = (gint) floor((gdouble)(dG/delta));
-      }*/
+      }
       stepcntr = 1;
       *ns = nsteps;
-      *stcn = stepcntr;
+      *stcn = stepcntr;*/
   }
   else {
     arrayd_copy(&Fa, &F);
@@ -542,46 +542,57 @@ void tour_reproject(vector_f tinc, array_d G, array_d Ga, array_d Gz,
 /* this routine increments the interpolation */
 void
 increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn, 
-  gfloat dist_az, gfloat delta, gint projdim)
+  gfloat dist_az, gfloat delta, gfloat *ptang, gint projdim)
 {
   int i;
   gboolean attheend = false;
-
+  gfloat tang = *ptang;
   gint nsteps = *ns;
   gint stepcntr = *stcn;
 
-  stepcntr++;
+  /*  stepcntr++;*/
+
+  tang += delta;
 
   /* Why do I need to do this? Di */
-  for (i=0; i<projdim; i++) 
-    if (tinc.els[i] > tau.els[i]) {
+  /*g_printerr("tinc ");   */
+  /*  for (i=0; i<projdim; i++) 
+      if (tinc.els[i] > tau.els[i]) {*/
+  if (tang >= 1.0)
       attheend = true;
-      nsteps = stepcntr;
-    }
+      /*      nsteps = stepcntr;*/
+  /*    }
+	printf("\n ");   */
 
-  if (attheend || nsteps == 1 || 
-      nsteps == stepcntr) {
+  if (attheend) {
+    /* || nsteps == 1 || 
+       nsteps == stepcntr) {*/
     for (i=0; i<projdim; i++)
       tinc.els[i] = tau.els[i];
   }
   else {
     for (i=0; i<projdim; i++)
-      tinc.els[i] += (delta*tau.els[i]/dist_az);
+      tinc.els[i] = (tang*tau.els[i]);
+    /*      tinc.els[i] += (delta*tau.els[i]/dist_az);*/
   }
+  /*  printf("%f %f %f %f \n ",tang, delta, tinc.els[0], tau.els[0]);   */
 
+  *ptang = tang;
   *ns = nsteps;
   *stcn = stepcntr;
 }
 
 gboolean
-reached_target(gint nsteps, gint stepcntr, gint basmeth, 
+reached_target(gint nsteps, gint stepcntr, gfloat tang, gint basmeth, 
   gfloat *indxval, gfloat *oindxval) 
 {
   gboolean arewethereyet = false;
 
-  if (nsteps == 1 || stepcntr == nsteps)
+  /*  if (nsteps == 1 || stepcntr == nsteps)*/
+  if (basmeth == 0) 
+    if (tang >= 1.0)
     arewethereyet = true;
-  if (basmeth == 1) {
+  else if (basmeth == 1) {
     if (*indxval < *oindxval)
     {
       arewethereyet = true;
@@ -642,10 +653,10 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dist_az,
 
   if (slidepos < 5)
   {
-    step = 0.0;
     delta = 0.0;
+    /*    step = 0.0;
     nsteps = 1;
-    stepcntr = 1;
+	  stepcntr = 1;*/
   }
   else
   {
@@ -660,14 +671,14 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dist_az,
     /*    else
 	  step = (gfloat) sqrt((double)(slidepos-50)) + 0.1868;*/
 
-    delta = step*M_PI_2/10.0;
-    if (nsteps > 1)
+    delta = step/dist_az*M_PI_2/10.0;
+    /*    if (nsteps > 1)
       fracpath = stepcntr/nsteps;
     else 
       fracpath = 1.0;
 
     nsteps = (gint) floor((gdouble)(dist_az/delta))+1;
-    stepcntr = (gint) floor(fracpath*nsteps);
+    stepcntr = (gint) floor(fracpath*nsteps);*/
 
   }
 

@@ -580,9 +580,9 @@ void
 tourcorr_run(displayd *dsp, ggobid *gg)
 {
   datad *d = dsp->d;
-  extern gboolean reached_target(gint, gint, gint, gfloat *, gfloat *);
+  extern gboolean reached_target(gint, gint, gfloat, gint, gfloat *, gfloat *);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
-    gfloat, gint);
+    gfloat, gfloat *, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
   extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
     array_d, array_d, vector_f, array_d, array_d, array_d,
@@ -594,10 +594,12 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   gint pathprob = 0;
 
   if (!dsp->tcorr1.get_new_target && 
-      !reached_target(dsp->tcorr1.nsteps, dsp->tcorr1.stepcntr, 0, 0, 0)) {
+      !reached_target(dsp->tcorr1.nsteps, dsp->tcorr1.stepcntr, 
+        dsp->tcorr1.tang, 0, 0, 0)) {
 
     increment_tour(dsp->tcorr1.tinc, dsp->tcorr1.tau, &dsp->tcorr1.nsteps, 
-      &dsp->tcorr1.stepcntr, dsp->tcorr1.dist_az, dsp->tcorr1.delta, (gint) 1);
+      &dsp->tcorr1.stepcntr, dsp->tcorr1.dist_az, dsp->tcorr1.delta, 
+      &dsp->tcorr1.tang, (gint) 1);
 
     tour_reproject(dsp->tcorr1.tinc, dsp->tcorr1.G, dsp->tcorr1.Ga, 
       dsp->tcorr1.Gz, dsp->tcorr1.F, dsp->tcorr1.Va, d->ncols, (gint) 1);
@@ -632,12 +634,15 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         &dsp->tcorr1.dist_az, dsp->tcorr1.delta);
       dsp->tcorr1.get_new_target = false;
     }
+    dsp->tcorr1.tang = 0.0;
   }
 
   if (!dsp->tcorr2.get_new_target && 
-      !reached_target(dsp->tcorr2.nsteps, dsp->tcorr2.stepcntr, 0, 0, 0)) {
+      !reached_target(dsp->tcorr2.nsteps, dsp->tcorr2.stepcntr, 
+        dsp->tcorr2.tang, 0, 0, 0)) {
     increment_tour(dsp->tcorr2.tinc, dsp->tcorr2.tau, &dsp->tcorr2.nsteps, 
-      &dsp->tcorr2.stepcntr, dsp->tcorr2.dist_az, dsp->tcorr2.delta, (gint) 1);
+      &dsp->tcorr2.stepcntr, dsp->tcorr2.dist_az, dsp->tcorr2.delta, 
+      &dsp->tcorr2.tang, (gint) 1);
 
     tour_reproject(dsp->tcorr2.tinc, dsp->tcorr2.G, dsp->tcorr2.Ga, 
       dsp->tcorr2.Gz, dsp->tcorr2.F, dsp->tcorr2.Va, d->ncols, (gint) 1);
@@ -669,6 +674,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         &dsp->tcorr2.stepcntr, &dsp->tcorr2.dist_az, dsp->tcorr2.delta);
       dsp->tcorr2.get_new_target = false;
     }
+    dsp->tcorr2.tang = 0.0;
   }
   
   display_tailpipe (dsp, FULL, gg);

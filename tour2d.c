@@ -241,6 +241,7 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
 
   dsp->t2d.dist_az = 1.0;
   dsp->t2d.delta = cpanel->t2d_step*M_PI_2/10.0;
+  dsp->t2d.tang = 0.0;
   dsp->t2d.nsteps = 1; 
   dsp->t2d.stepcntr = 1;
 
@@ -427,10 +428,10 @@ void tour2d_scramble(ggobid *gg)
 void
 tour2d_run(displayd *dsp, ggobid *gg)
 {
-  extern gboolean reached_target(gint, gint, gint, gfloat *, gfloat *);
+  extern gboolean reached_target(gint, gint, gfloat, gint, gfloat *, gfloat *);
   extern gboolean reached_target2(vector_f, vector_f, gint, gfloat *, gfloat *, gint);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
-    gfloat, gint);
+    gfloat, gfloat *, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
   extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
     array_d, array_d, vector_f, array_d, array_d, array_d,
@@ -452,11 +453,12 @@ tour2d_run(displayd *dsp, ggobid *gg)
   gint pathprob = 0;
 
   if (!dsp->t2d.get_new_target && 
-       !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, 
+      !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, dsp->t2d.tang,
        dsp->t2d.target_selection_method, &dsp->t2d.ppval, &oindxval)) {
 
     increment_tour(dsp->t2d.tinc, dsp->t2d.tau, &dsp->t2d.nsteps, 
-      &dsp->t2d.stepcntr, dsp->t2d.dist_az, dsp->t2d.delta, (gint) 2);
+      &dsp->t2d.stepcntr, dsp->t2d.dist_az, dsp->t2d.delta, &dsp->t2d.tang, 
+      (gint) 2);
     tour_reproject(dsp->t2d.tinc, dsp->t2d.G, dsp->t2d.Ga, dsp->t2d.Gz, 
       dsp->t2d.F, dsp->t2d.Va, d->ncols, (gint) 2);
 
@@ -591,6 +593,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
       else 
         dsp->t2d.get_new_target = false;
     }
+    dsp->t2d.tang = 0.0;
   }
   
   display_tailpipe (dsp, FULL_1PIXMAP, gg);
