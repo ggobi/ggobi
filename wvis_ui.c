@@ -864,12 +864,13 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 
 void
 wvis_window_open (ggobid *gg) {
-  GtkWidget *vbox, *hb;
+  GtkWidget *vbox;
+  GtkWidget *frame1, *vb1, *hb;
   GtkWidget *notebook;
   GtkWidget *btn, *vb;
 #ifdef USE_XML
   /*-- for colorscales --*/
-  GtkWidget *frame, *vbs, *opt, *menu;
+  GtkWidget *frame2, *vbs, *opt, *menu;
   GList *l;
   colorschemed *scheme;
   static gchar *colorscaletype_lbl[] = {
@@ -899,10 +900,43 @@ wvis_window_open (ggobid *gg) {
 
     vbox = gtk_vbox_new (false, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
+    gtk_box_set_spacing (GTK_BOX(vbox), 5);
     gtk_container_add (GTK_CONTAINER (gg->wvis.window), vbox);
 
+/*
+ * First the frame for the section on choosing new colormaps,
+ * then the graphics, and finally the section on applying
+ * the colorscheme by variable -- does this make sense?
+ *
+ * The awkwardness in sequencing here is that the notebook
+ * has to be defined early because it's used by the color
+ * scheme section, but I prefer to show it later.
+*/
+
+#ifdef USE_XML
+  /*
+   * preview of section on choosing new colormap: place the frame
+  */
+    frame2 = gtk_frame_new ("Choose color scheme");
+    gtk_frame_set_shadow_type (GTK_FRAME (frame2), GTK_SHADOW_ETCHED_OUT);
+    gtk_box_pack_start (GTK_BOX (vbox), frame2, false, false, 1);
+#endif
+
+    /*-- preview of section on colors, symbols --*/
+    vb = gtk_vbox_new (false, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
+
+    frame1 = gtk_frame_new ("Apply color scheme by variable");
+    gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_ETCHED_OUT);
+    gtk_box_pack_start (GTK_BOX (vbox), frame1, true, true, 1);
+
+/*  */
+    vb1 = gtk_vbox_new (false, 0);
+    gtk_container_set_border_width (GTK_CONTAINER (vb1), 5);
+    gtk_container_add (GTK_CONTAINER (frame1), vb1);
+
     /* Create a notebook, set the position of the tabs */
-    notebook = create_variable_notebook (vbox, GTK_SELECTION_SINGLE,
+    notebook = create_variable_notebook (vb1, GTK_SELECTION_SINGLE,
       (GtkSignalFunc) selection_made_cb, gg);
 
     /*-- Insert an option menu for choosing the method of binning --*/
@@ -910,7 +944,7 @@ wvis_window_open (ggobid *gg) {
     gtk_widget_set_name (opt, "WVIS:binning_method");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Select a binning method", NULL);
-    gtk_box_pack_start (GTK_BOX (vbox), opt,
+    gtk_box_pack_start (GTK_BOX (vb1), opt,
       false, false, 0);
     populate_option_menu (opt, (gchar**) binning_method_lbl,
                           sizeof (binning_method_lbl) / sizeof (gchar *),
@@ -920,13 +954,10 @@ wvis_window_open (ggobid *gg) {
   /*
    * section on choosing new colormap
   */
-    frame = gtk_frame_new ("Choose color scheme");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-    gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 1);
 
     vbs = gtk_vbox_new (false, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbs), 5);
-    gtk_container_add (GTK_CONTAINER (frame), vbs);
+    gtk_container_add (GTK_CONTAINER (frame2), vbs);
 
     opt = gtk_option_menu_new ();
     menu = gtk_menu_new ();
@@ -963,11 +994,12 @@ wvis_window_open (ggobid *gg) {
 #endif
   /**/
 
-
     /*-- colors, symbols --*/
     /*-- now we get fancy:  draw the scale, with glyphs and colors --*/
+/*
     vb = gtk_vbox_new (false, 0);
     gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
+*/
     gg->wvis.da = gtk_drawing_area_new ();
     gtk_drawing_area_size (GTK_DRAWING_AREA (gg->wvis.da), 400, 200);
     gtk_object_set_data (GTK_OBJECT (gg->wvis.da), "notebook", notebook);
@@ -996,9 +1028,9 @@ wvis_window_open (ggobid *gg) {
 
     /*-- add an hbox to hold a button and a menu --*/
     hb = gtk_hbox_new (false, 2);
-    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
+    gtk_box_pack_start (GTK_BOX (vb1), hb, false, false, 0);
 
-    btn = gtk_button_new_with_label ("Apply color scheme by variable");
+    btn = gtk_button_new_with_label ("Apply");
     gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Apply the color scale, using the values of the variable selected in the list above",
