@@ -1,0 +1,16 @@
+Adding new files to depository:
+==============================
+
+Edit Install/GNUmakfile_src.in 
+  to add the new .c files
+
+Edit Install/GNUmakefile.admin
+  to add new .h files
+
+Checking installation:
+=====================
+
+make ADMIN=1 DOC_TEX_FILES=
+cd /tmp/Install/ggobi
+./configure
+make (or gmake)
