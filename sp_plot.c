@@ -1123,6 +1123,7 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   GtkStyle *style = gtk_widget_get_style (sp->da);
   datad *d = dsp->d;
   gfloat dst;
+  gint textheight = 0;
   gchar *varlab;
 
   if (!dsp->options.axes_show_p)
@@ -1132,32 +1133,62 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
     gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
     switch (proj) {
       case TOUR1D:
+        /*-- use stringheight to place the labels --*/
+        gdk_text_extents (style->font, "yA", strlen("yA"),
+          &lbearing, &rbearing, &width, &ascent, &descent);
+        textheight = ascent + descent;
+/*
+ * instead of the rectangle, try drawing just the limits
+*/
+        gdk_draw_line(drawable, gg->plot_GC,
+          sp->da->allocation.width/2-sp->da->allocation.width/4,
+          sp->da->allocation.height - textheight*d->ncols - 10,
+          sp->da->allocation.width/2-sp->da->allocation.width/4,
+          sp->da->allocation.height);
+        gdk_draw_line(drawable, gg->plot_GC,
+          3*sp->da->allocation.width/4,
+          sp->da->allocation.height - textheight*d->ncols - 10,
+          3*sp->da->allocation.width/4,
+          sp->da->allocation.height);
+
         for (j=0; j<d->ncols; j++) {
           ix = sp->da->allocation.width/2 + 
             (gint) (dsp->t1d.u.vals[0][j]*
             (gfloat) sp->da->allocation.width/4);
-          iy = sp->da->allocation.height - 10 - (d->ncols-1-j)*10;
+          iy = sp->da->allocation.height - 10 - (d->ncols-1-j)*textheight;
           gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
           gdk_draw_line(drawable, gg->plot_GC,
             sp->da->allocation.width/2,sp->da->allocation.height - 10 - 
-            (d->ncols-1-j)*10, ix, iy);
+            (d->ncols-1-j)*textheight, ix, iy);
           gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
+/*
           gdk_draw_rectangle(drawable, gg->plot_GC, FALSE, 
             sp->da->allocation.width/2-sp->da->allocation.width/4,
             sp->da->allocation.height - 10*d->ncols-10,
             2*sp->da->allocation.width/4,  
             10*d->ncols+10);
-          gdk_text_extents (style->font, 
-            d->vartable[j].collab_tform,
-            strlen (d->vartable[j].collab_tform),
-            &lbearing, &rbearing, &width, &ascent, &descent);
-          gdk_draw_string (drawable, style->font, gg->plot_GC,
-            sp->da->allocation.width/2+sp->da->allocation.width/4+10,
-            iy, d->vartable[j].collab_tform);
-	}     
-        break;
+*/
+
+/*
+ * An experiment:  add the labels only for those variables with
+ * non-zero multipliers.  Add them on the right if positive, on
+ * the left if negative.
+*/
+          if (ix != sp->da->allocation.width/2) {
+            gdk_text_extents (style->font, 
+              d->vartable[j].collab_tform,
+              strlen (d->vartable[j].collab_tform),
+              &lbearing, &rbearing, &width, &ascent, &descent);
+            gdk_draw_string (drawable, style->font, gg->plot_GC,
+              (ix > sp->da->allocation.width/2) ?
+              sp->da->allocation.width/2+sp->da->allocation.width/4+10 :
+              sp->da->allocation.width/4 - width -10,
+              iy, d->vartable[j].collab_tform);
+          }
+	    }     
+      break;
       case TOUR2D:
         gdk_draw_arc(drawable,gg->plot_GC,FALSE,
           10, sp->da->allocation.height-sp->da->allocation.height/4-10,
