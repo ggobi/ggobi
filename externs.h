@@ -473,6 +473,7 @@ void       transform (gint, gint, gfloat, gint *, gint, datad *, ggobid *);
 void       transform_values_init (gint j, datad *, ggobid *);
 void       transform_variable (gint, gint, gfloat, gint, datad *, ggobid *);
 void       transform_window_open (ggobid *);
+gboolean   update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush, datad *d, ggobid *gg);
 datad*     ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 displayd*  ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal);
 ggobid*    ValidateGGobiRef (ggobid *gg, gboolean fatal);
@@ -482,7 +483,6 @@ void       varcircles_add (gint ncols, datad *, ggobid *);
 void       varcircles_cursor_set_default (datad *d);
 void       varcircles_delete_nth (gint j, datad *);
 void       varcircles_layout_cb (GtkCheckMenuItem *w, guint action);
-void       varcircles_layout_reset (gint ncols, datad *, ggobid *);
 void       varcircles_populate (datad *, ggobid *);
 void       varcircles_refresh (datad *, ggobid *);
 void       varcircles_visibility_set (displayd *display, ggobid *gg);
@@ -713,9 +713,10 @@ void barchart_scale_event_handlers_toggle(splotd *sp, gboolean state);
 displayd *barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, datad * d, ggobid * gg);
 #endif
 
+#ifdef CIRCLES_IN_TABLE
+void       varcircles_layout_reset (gint ncols, datad *, ggobid *);
+#endif
 
-gboolean update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
-			       datad *d, ggobid *gg);
 
 #ifdef WIN32
 void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);

@@ -152,10 +152,6 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
 void
 free_tour2d(displayd *dsp)
 {
-  /*  gint k;*/
-  /*  datad *d = dsp->d;*/
-  /*  gint nc = d->ncols;*/
-
   vectori_free(&dsp->t2d.subset_vars);
   vectorb_free(&dsp->t2d.subset_vars_p);
   vectori_free(&dsp->t2d.active_vars);
@@ -380,7 +376,7 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
     */
     gboolean fade = gg->tour2d.fade_vars;
 
-    tour2d_subset_var_set (jvar, d, dsp, gg);
+    tour2d_subset_var_set(jvar, d, dsp, gg);
     varcircles_visibility_set (dsp, gg);
 
     /*-- now add/remove the variable to/from the active set, too --*/

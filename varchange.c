@@ -67,10 +67,13 @@ addvar_propagate (gint ncols_prev, gint ncols, datad *d, ggobid *gg)
     tform_to_world_by_var (jvar, d, gg);
   }
 
-  /*-- variable checkboxes and circles --*/
-  /*varpanel_checkboxes_add (d->ncols, d, gg);*/
+  /*-- variable toggle buttons and circles --*/
   varpanel_widgets_add (d->ncols, d, gg);
   varcircles_add (d->ncols, d, gg);
+
+  /*-- make sure the right toggle widgets and circles are showing --*/
+  varpanel_refresh (gg->current_display, gg);
+  varcircles_visibility_set (gg->current_display, gg);
 }
 
 
@@ -329,7 +332,9 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   for (j=ncols-1; j>=0; j--) {
     varcircles_delete_nth (cols[j], d);
   }
+#ifdef CIRCLES_IN_TABLE
   varcircles_layout_reset (d->ncols-ncols, d, gg);
+#endif
 
   d->ncols -= ncols;
 

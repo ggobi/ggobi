@@ -310,7 +310,11 @@ tourCorrRealloc(displayd *dsp, gint nc, datad *d)
         arrayd_add_cols (&dsp->tcorr1.Vz, nc);
         arrayd_add_cols (&dsp->tcorr1.tv, nc);
 
+        vectori_realloc (&dsp->tcorr1.subset_vars, nc);
+        vectorb_realloc (&dsp->tcorr1.subset_vars_p, nc);
         vectori_realloc (&dsp->tcorr1.active_vars, nc);
+        vectorb_realloc (&dsp->tcorr1.active_vars_p, nc);
+
         vectorf_realloc (&dsp->tcorr1.lambda, nc);
         vectorf_realloc (&dsp->tcorr1.tau, nc);
         vectorf_realloc (&dsp->tcorr1.tinc, nc);
@@ -328,7 +332,11 @@ tourCorrRealloc(displayd *dsp, gint nc, datad *d)
         arrayd_add_cols (&dsp->tcorr2.Vz, nc);
         arrayd_add_cols (&dsp->tcorr2.tv, nc);
 
+        vectori_realloc (&dsp->tcorr2.subset_vars, nc);
+        vectorb_realloc (&dsp->tcorr2.subset_vars_p, nc);
         vectori_realloc (&dsp->tcorr2.active_vars, nc);
+        vectorb_realloc (&dsp->tcorr2.active_vars_p, nc);
+
         vectorf_realloc (&dsp->tcorr2.lambda, nc);
         vectorf_realloc (&dsp->tcorr2.tau, nc);
         vectorf_realloc (&dsp->tcorr2.tinc, nc);
@@ -344,7 +352,12 @@ tourCorrRealloc(displayd *dsp, gint nc, datad *d)
           dsp->tcorr1.Va.vals[0][i] = 0.0;
           dsp->tcorr1.Vz.vals[0][i] = 0.0;
           dsp->tcorr1.tv.vals[0][i] = 0.0;
+
+          dsp->tcorr1.subset_vars.els[i] = 0;
+          dsp->tcorr1.subset_vars_p.els[i] = false;
           dsp->tcorr1.active_vars.els[i] = 0;
+          dsp->tcorr1.active_vars_p.els[i] = false;
+
           dsp->tcorr1.lambda.els[i] = 0.0;
           dsp->tcorr1.tau.els[i] = 0.0;
           dsp->tcorr1.tinc.els[i] = 0.0;
@@ -358,7 +371,12 @@ tourCorrRealloc(displayd *dsp, gint nc, datad *d)
           dsp->tcorr2.Va.vals[0][i] = 0.0;
           dsp->tcorr2.Vz.vals[0][i] = 0.0;
           dsp->tcorr2.tv.vals[0][i] = 0.0;
+
+          dsp->tcorr2.subset_vars.els[i] = 0;
+          dsp->tcorr2.subset_vars_p.els[i] = false;
           dsp->tcorr2.active_vars.els[i] = 0;
+          dsp->tcorr2.active_vars_p.els[i] = false;
+
           dsp->tcorr2.lambda.els[i] = 0.0;
           dsp->tcorr2.tau.els[i] = 0.0;
           dsp->tcorr2.tinc.els[i] = 0.0;
@@ -371,52 +389,59 @@ static void
 tour2dRealloc(displayd *dsp, gint nc, datad *d)
 {
   gint old_ncols, i;
-    /*
-     * because display_tour2d_init_null has been performed even if
-     * alloc_tour2d has not, Fa.ncols has been initialized.
-    */
-    old_ncols = dsp->t2d.Fa.ncols;
+  /*
+   * because display_tour2d_init_null has been performed even if
+   * alloc_tour2d has not, Fa.ncols has been initialized.
+  */
+  old_ncols = dsp->t2d.Fa.ncols;
 
-    if (nc >= MIN_NVARS_FOR_TOUR2D) {
-      if (old_ncols < MIN_NVARS_FOR_TOUR2D)       
-        display_tour2d_init(dsp, d->gg);
+  if (nc >= MIN_NVARS_FOR_TOUR2D) {
+    if (old_ncols < MIN_NVARS_FOR_TOUR2D)       
+      display_tour2d_init(dsp, d->gg);
 
-      if (dsp->d == d) {
-        arrayd_add_cols (&dsp->t2d.Fa, nc);
-        arrayd_add_cols (&dsp->t2d.Fz, nc);
-        arrayd_add_cols (&dsp->t2d.F, nc);
-        arrayd_add_cols (&dsp->t2d.Ga, nc);
-        arrayd_add_cols (&dsp->t2d.Gz, nc);
-        arrayd_add_cols (&dsp->t2d.G, nc);
-        arrayd_add_cols (&dsp->t2d.Va, nc);
-        arrayd_add_cols (&dsp->t2d.Vz, nc);
-        arrayd_add_cols (&dsp->t2d.tv, nc);
+    if (dsp->d == d) {
+      arrayd_add_cols (&dsp->t2d.Fa, nc);
+      arrayd_add_cols (&dsp->t2d.Fz, nc);
+      arrayd_add_cols (&dsp->t2d.F, nc);
+      arrayd_add_cols (&dsp->t2d.Ga, nc);
+      arrayd_add_cols (&dsp->t2d.Gz, nc);
+      arrayd_add_cols (&dsp->t2d.G, nc);
+      arrayd_add_cols (&dsp->t2d.Va, nc);
+      arrayd_add_cols (&dsp->t2d.Vz, nc);
+      arrayd_add_cols (&dsp->t2d.tv, nc);
 
-        vectori_realloc (&dsp->t2d.active_vars, nc);
-        vectorf_realloc (&dsp->t2d.lambda, nc);
-        vectorf_realloc (&dsp->t2d.tau, nc);
-        vectorf_realloc (&dsp->t2d.tinc, nc);
+      vectori_realloc (&dsp->t2d.subset_vars, nc);
+      vectorb_realloc (&dsp->t2d.subset_vars_p, nc);
+      vectori_realloc (&dsp->t2d.active_vars, nc);
+      vectorb_realloc (&dsp->t2d.active_vars_p, nc);
 
-        arrayd_add_cols (&dsp->t2d_manbasis, (gint) nc);
+      vectorf_realloc (&dsp->t2d.lambda, nc);
+      vectorf_realloc (&dsp->t2d.tau, nc);
+      vectorf_realloc (&dsp->t2d.tinc, nc);
 
-        /* need to zero extra cols */
-        for (i=old_ncols; i<nc; i++) {
-          dsp->t2d.Fa.vals[0][i] = dsp->t2d.Fa.vals[1][i] = 0.0;
-          dsp->t2d.Fz.vals[0][i] = dsp->t2d.Fz.vals[1][i] = 0.0;
-          dsp->t2d.F.vals[0][i] = dsp->t2d.F.vals[1][i] = 0.0;
-          dsp->t2d.Ga.vals[0][i] = dsp->t2d.Ga.vals[1][i] = 0.0;
-          dsp->t2d.Gz.vals[0][i] = dsp->t2d.Gz.vals[1][i] = 0.0;
-          dsp->t2d.G.vals[0][i] = dsp->t2d.G.vals[1][i] = 0.0;
-          dsp->t2d.Va.vals[0][i] = dsp->t2d.Va.vals[1][i] = 0.0;
-          dsp->t2d.Vz.vals[0][i] = dsp->t2d.Vz.vals[1][i] = 0.0;
-          dsp->t2d.tv.vals[0][i] = dsp->t2d.tv.vals[1][i] = 0.0;
-          dsp->t2d.active_vars.els[i] = 0;
-          dsp->t2d.lambda.els[i] = 0.0;
-          dsp->t2d.tau.els[i] = 0.0;
-          dsp->t2d.tinc.els[i] = 0.0;
-        }
+      arrayd_add_cols (&dsp->t2d_manbasis, (gint) nc);
+
+      /* need to zero extra cols */
+      for (i=old_ncols; i<nc; i++) {
+        dsp->t2d.Fa.vals[0][i] = dsp->t2d.Fa.vals[1][i] = 0.0;
+        dsp->t2d.Fz.vals[0][i] = dsp->t2d.Fz.vals[1][i] = 0.0;
+        dsp->t2d.F.vals[0][i] = dsp->t2d.F.vals[1][i] = 0.0;
+        dsp->t2d.Ga.vals[0][i] = dsp->t2d.Ga.vals[1][i] = 0.0;
+        dsp->t2d.Gz.vals[0][i] = dsp->t2d.Gz.vals[1][i] = 0.0;
+        dsp->t2d.G.vals[0][i] = dsp->t2d.G.vals[1][i] = 0.0;
+        dsp->t2d.Va.vals[0][i] = dsp->t2d.Va.vals[1][i] = 0.0;
+        dsp->t2d.Vz.vals[0][i] = dsp->t2d.Vz.vals[1][i] = 0.0;
+        dsp->t2d.tv.vals[0][i] = dsp->t2d.tv.vals[1][i] = 0.0;
+        dsp->t2d.subset_vars.els[i] = 0;
+        dsp->t2d.subset_vars_p.els[i] = false;
+        dsp->t2d.active_vars.els[i] = 0;
+        dsp->t2d.active_vars_p.els[i] = false;
+        dsp->t2d.lambda.els[i] = 0.0;
+        dsp->t2d.tau.els[i] = 0.0;
+        dsp->t2d.tinc.els[i] = 0.0;
       }
     }
+  }
 }
 
 static void
@@ -444,7 +469,11 @@ tour1dRealloc(displayd *dsp, gint nc, datad *d)
       arrayd_add_cols (&dsp->t1d.Vz, nc);
       arrayd_add_cols (&dsp->t1d.tv, nc);
 
+      vectori_realloc (&dsp->t1d.subset_vars, nc);
+      vectorb_realloc (&dsp->t1d.subset_vars_p, nc);
       vectori_realloc (&dsp->t1d.active_vars, nc);
+      vectorb_realloc (&dsp->t1d.active_vars_p, nc);
+
       vectorf_realloc (&dsp->t1d.lambda, nc);
       vectorf_realloc (&dsp->t1d.tau, nc);
       vectorf_realloc (&dsp->t1d.tinc, nc);
@@ -462,7 +491,10 @@ tour1dRealloc(displayd *dsp, gint nc, datad *d)
         dsp->t1d.Va.vals[0][i] = 0.0;
         dsp->t1d.Vz.vals[0][i] = 0.0;
         dsp->t1d.tv.vals[0][i] = 0.0;
+        dsp->t1d.subset_vars.els[i] = 0;
+        dsp->t1d.subset_vars_p.els[i] = false;
         dsp->t1d.active_vars.els[i] = 0;
+        dsp->t1d.active_vars_p.els[i] = false;
         dsp->t1d.lambda.els[i] = 0.0;
         dsp->t1d.tau.els[i] = 0.0;
         dsp->t1d.tinc.els[i] = 0.0;
@@ -594,14 +626,14 @@ scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidget *w, GdkEv
 static void
 viewmodeSet(displayd *display, ggobid *gg)
 {
-    if (gg->viewmode <= COTOUR)
-      display->cpanel.projection = gg->viewmode;
-    gg->projection = display->cpanel.projection;
+  if (gg->viewmode <= COTOUR)
+    display->cpanel.projection = gg->viewmode;
+  gg->projection = display->cpanel.projection;
 
-    if (gg->projection != gg->prev_projection) {
-      scatterplot_show_rulers (display, gg->projection);
-      gg->prev_projection = gg->projection;
-    }
+  if (gg->projection != gg->prev_projection) {
+    scatterplot_show_rulers (display, gg->projection);
+    gg->prev_projection = gg->projection;
+  }
 }
 
 static gboolean

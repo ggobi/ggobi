@@ -4,13 +4,13 @@
 #include "vars.h"
 #include "externs.h"
 
-GtkWidget *varcircles_get_nth (gint which, gint jvar, datad *d);
 
 static GtkWidget * varcircle_create (gint, datad *, ggobid *gg);
-static void varcircle_attach (GtkWidget *, gint, gint, datad *);
 static void varcircle_draw (gint, datad *, ggobid *gg); 
 static gboolean da_expose_cb (GtkWidget *, GdkEventExpose *, gpointer cbd);
 
+GtkWidget *varcircles_get_nth (gint which, gint jvar, datad *d);
+static void varcircle_pack (GtkWidget *, datad *);
 
 /*-------------------------------------------------------------------------*/
 /*                         utilities                                       */
@@ -68,7 +68,12 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
                                 false, false, 2);
             gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
             gtk_widget_show_all (box);
-            gtk_widget_unref (box);
+#if GTK_MAJOR_VERSION == 1
+            if (GTK_OBJECT (box)->ref_count > 1)
+#else
+            if (G_OBJECT (box)->ref_count > 1)
+#endif
+              gtk_widget_unref (box);
           }
           n++;
 
@@ -97,7 +102,12 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
                                 false, false, 2);
             gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
             gtk_widget_show_all (box);
-            gtk_widget_unref (box);
+#if GTK_MAJOR_VERSION == 1
+            if (GTK_OBJECT (box)->ref_count > 1)
+#else
+            if (G_OBJECT (box)->ref_count > 1)
+#endif
+              gtk_widget_unref (box);
           }
           n++;
 
@@ -185,6 +195,7 @@ varcircles_layout_init (datad *d, ggobid *gg)
   d->vcirc_ui.tnrows = d->ncols;
 }
 
+#ifdef CIRCLES_IN_TABLE
 void
 varcircles_layout_reset (gint ncols, datad *d, ggobid *gg)
 {
@@ -296,6 +307,7 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg)
     }
   }
 }
+#endif
 
 void
 varcircle_label_set (gint j, datad *d)
@@ -398,11 +410,12 @@ da_freeze_expose_cb (GtkWidget *w, GdkEvent *event, datad *d)
 void
 varcircles_populate (datad *d, ggobid *gg)
 {
-  gint i, j, k;
-  GtkWidget *vb;
-  GtkWidget *da;
+  gint j;
+  GtkWidget *vb, *da;
 
+#ifdef CIRCLES_IN_TABLE 
   varcircles_layout_init (d, gg);
+#endif
   d->vcirc_ui.jcursor = (gint) NULL;  /*-- start with the default cursor --*/
   d->vcirc_ui.cursor = (gint) NULL;
 
@@ -422,9 +435,6 @@ varcircles_populate (datad *d, ggobid *gg)
     true, true, 2);
   gtk_widget_show (d->vcirc_ui.swin);
 
-  /*-- vardesign --*/
-  /*-- Suppose I'd rather use a vbox than a table --*/
-
 /*
   d->vcirc_ui.table = gtk_table_new (d->vcirc_ui.tnrows,
                                      d->vcirc_ui.tncols, true);
@@ -441,16 +451,21 @@ varcircles_populate (datad *d, ggobid *gg)
   d->vcirc_ui.label = NULL;
   d->vcirc_ui.da_pix = NULL;
 
-
+/*
   k = 0;
   for (i=0; i<d->vcirc_ui.tnrows; i++) {
     for (j=0; j<d->vcirc_ui.tncols; j++) {
-      vb = varcircle_create (k, d, gg);
-      varcircle_attach (vb, i, j, d);
+*/
+  for (j=0; j<d->ncols; j++) {
+    vb = varcircle_create (j, d, gg);
+    varcircle_pack (vb, d);
+  }
+/*
       k++;
       if (k == d->ncols) break;
     }
   }
+*/
 
   /*-- the second child of the vbox: an hbox with buttons --*/
   d->vcirc_ui.hbox = gtk_hbox_new (false, 0);
@@ -529,8 +544,10 @@ varcircles_delete (gint nc, gint jvar, datad *d, ggobid *gg)
     }
   }
 
+#ifdef CIRCLES_IN_TABLE
   /*-- this may not be enough; time will tell --*/
   varcircles_layout_reset (d->ncols, d, gg);
+#endif
 }
 
 /*-- this destroys them all -- it's not yet called anywhere --*/
@@ -648,16 +665,16 @@ varcircle_create (gint j, datad *d, ggobid *gg)
   return (vb);
 }
 
-void
-varcircle_attach (GtkWidget *vb, gint i, gint j, datad *d)
+static void
+varcircle_pack (GtkWidget *vb, datad *d)
 {
-  /* vardesign */
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.table), vb, false, false, 2);
-/*
+
+#ifdef CIRCLES_IN_TABLE
   gtk_table_attach (GTK_TABLE (d->vcirc_ui.table),
     vb, j, j+1, i, i+1,
     GTK_FILL, GTK_FILL, 0, 0);
-*/
+#endif
 }
 
 void
@@ -795,9 +812,14 @@ varcircles_add (gint nc, datad *d, ggobid *gg)
   gint n = g_slist_length (d->vcirc_ui.vb);
   
   /*-- create the variable circles --*/
-  for (j=n; j<nc; j++)
+  for (j=n; j<nc; j++) {
     vb = varcircle_create (j, d, gg);
+    /*varcircle_pack (vb, d);*/
+  }
+
+#ifdef CIRCLES_IN_TABLE
   varcircles_layout_reset (nc, d, gg);
+#endif
 
   gtk_widget_show_all (gg->varpanel_ui.notebook);
 }
