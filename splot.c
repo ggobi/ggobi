@@ -103,8 +103,8 @@ static gint key_press_cb (GtkWidget *w, GdkEventKey *event)
 
 void
 sp_event_handlers_toggle (splotd *sp, gboolean state) {
-  displayd *d = (displayd *) sp->displayptr;
-  gint m = d->cpanel.mode;
+  displayd *display = (displayd *) sp->displayptr;
+  gint m = display->cpanel.mode;
 
   switch (m) {
     case PCPLOT:

@@ -23,6 +23,24 @@ DisplayOptions DefaultDisplayOptions = {
                                          true   /* link_p */
                                        };
 
+/*-- debugging utility --*/
+/*
+static void
+displays_print (ggobid *gg) {
+  GList *l;
+  displayd *dsp;
+
+  g_printerr ("n displays = %d\n", g_list_length (gg->displays));
+  for (l=gg->displays; l; l=l->next) {
+    dsp = (displayd *) l->data;
+    if (dsp != NULL)
+      g_printerr ("  display %d (type=%d)\n", (gint) dsp, dsp->displaytype);
+    else
+      g_printerr ("  dsp = NULL!\n");
+  }
+}
+*/
+
 
 /*----------------------------------------------------------------------*/
 /*               Drawing routines                                       */
@@ -258,7 +276,7 @@ display_add (displayd *display, ggobid *gg)
     gtk_widget_queue_draw (prev_splot->da);
   }
 
- return(g_list_length(gg->displays));
+  return (g_list_length (gg->displays));
 }
 
 
@@ -272,38 +290,41 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
   splotd *sp = NULL;
   extern gint num_ggobis;
   gint count;
+  displayd *dsp;
 /*
  * If the current splot belongs to this display, turn off its
  * event handlers before freeing all the splots belonging to this
  * display.
 */
-  displayd *d = (displayd *) gg->current_splot->displayptr;
-  if (d == display) {
+  dsp = (displayd *) gg->current_splot->displayptr;
+  if (dsp == display) {
      sp_event_handlers_toggle (gg->current_splot, off);
   }
 
   if (num_ggobis > 1 || force || g_list_length (gg->displays) > 1) {
 
     /*-- If the display tree is active, remove the corresponding entry. --*/
-    tree_display_entry_remove(display, gg->display_tree.tree, gg); 
+    tree_display_entry_remove (display, gg->display_tree.tree, gg); 
 
-    g_list_remove (gg->displays, display);
+    gg->displays = g_list_remove (gg->displays, display);
 
+    /*-- if the current_display was just removed, assign a new one --*/
     /*-- list length only has to be >=0 because a display was just removed --*/
     if (display == gg->current_display && (g_list_length (gg->displays) > 0)) {
-      display_set_current ((displayd *) g_list_nth_data (gg->displays, 0), gg);
+      dsp = (displayd *) g_list_nth_data (gg->displays, 0);
+      display_set_current (dsp, gg);
+
       gg->current_splot = (splotd *)
         g_list_nth_data (gg->current_display->splots, 0);
       splot_set_current (gg->current_splot, on, gg);
-
       sp = gg->current_splot;
-      if(sp != NULL) {
+      if (sp != NULL) {
         sp->redraw_style = QUICK;
         gtk_widget_queue_draw (sp->da);
       }
     }
 
-    count = g_list_length(display->splots);
+    count = g_list_length (display->splots);
     if (isEmbeddedDisplay (display) == false) {
       for (l=display->splots; count > 0 && l; l=l->next, count--) {
         sp = (splotd *) l->data;
@@ -346,7 +367,7 @@ display_set_current (displayd *new_display, ggobid *gg)
   gchar *title;
 
   if (new_display == NULL)
-   return;
+    return;
 
   gtk_accel_group_unlock (gg->main_accel_group);
 
