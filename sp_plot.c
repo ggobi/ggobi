@@ -17,7 +17,7 @@
 #include "vars.h"
 #include "externs.h"
 
-static void splot_draw_border (splotd *, GdkDrawable *d, ggobid *);
+static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
 static void edges_draw (splotd *, ggobid *gg);
 
 #ifdef _WIN32
@@ -338,7 +338,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 
 
 /*------------------------------------------------------------------------*/
-/*                   plot labels: variables, cases                        */
+/*                   plot labels: variables                               */
 /*------------------------------------------------------------------------*/
 
 static void
@@ -430,66 +430,71 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 
 }
 
-/*-- add the nearest_point and sticky labels, plus a diamond for emphasis --*/
-void
-splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
-  gint k, gboolean nearest, ggobid *gg)
+/*------------------------------------------------------------------------*/
+/*               case highlighting for points (and edges?)                */
+/*------------------------------------------------------------------------*/
+
+static void
+splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
-  displayd *dsp = (displayd *) sp->displayptr;
+  gint n;
+  displayd *display = sp->displayptr;
+  datad *d = display->d;
+
+  if (display->options.whiskers_show_p) {
+    gdk_gc_set_line_attributes (gg->plot_GC,
+      3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+    gdk_gc_set_foreground (gg->plot_GC,
+      &gg->default_color_table[d->color_now.els[k]]);
+
+    n = 2*k;
+    gdk_draw_line (drawable, gg->plot_GC,
+      sp->whiskers[n].x1, sp->whiskers[n].y1,
+      sp->whiskers[n].x2, sp->whiskers[n].y2);
+    n++;
+    gdk_draw_line (drawable, gg->plot_GC,
+      sp->whiskers[n].x1, sp->whiskers[n].y1,
+      sp->whiskers[n].x2, sp->whiskers[n].y2);
+
+    gdk_gc_set_line_attributes (gg->plot_GC,
+      0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+  }
+}
+
+#define DIAMOND_DIM 5
+
+/*-- draw a diamond around the current case --*/
+static void
+splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
+{
+  gint diamond_dim = DIAMOND_DIM;
+  GdkPoint diamond[5];
+
+  diamond[0].x = diamond[4].x = sp->screen[k].x - diamond_dim;
+  diamond[0].y = diamond[4].y = sp->screen[k].y;
+  diamond[1].x = sp->screen[k].x;
+  diamond[1].y = sp->screen[k].y - diamond_dim;
+  diamond[2].x = sp->screen[k].x + diamond_dim;
+  diamond[2].y = sp->screen[k].y;
+  diamond[3].x = sp->screen[k].x;
+  diamond[3].y = sp->screen[k].y + diamond_dim;
+
+  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_draw_lines (drawable, gg->plot_GC, diamond, 5);
+}
+
+static void
+splot_add_record_label (gboolean nearest, gint k, splotd *sp,
+  GdkDrawable *drawable, ggobid *gg)
+{
+  displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
   datad *d = dsp->d;
+  gint j;
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
-  GdkPoint diamond[5];
-  gint diamond_dim = 5;
+  gint diamond_dim = DIAMOND_DIM;
   gchar *lbl;
-
-/*--
-   unsatisfactory: use ids and work out whether we're talking
-   about display->d or display->e.  nearest has to be 
-   propagated for linking.  [don't quite understand this comment;
-   time will tell]
---*/
-  if (k >= d->nrows)
-    return;
-
-  /*-- draw a thickened line to highlight the current case --*/
-  if (nearest) {
-    if (dsp->displaytype == parcoords) {
-      if (dsp->options.whiskers_show_p) {
-        gint n;
-        gdk_gc_set_line_attributes (gg->plot_GC,
-          3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-        gdk_gc_set_foreground (gg->plot_GC,
-          &gg->default_color_table[d->color_now.els[k]]);
-
-        n = 2*k;
-        gdk_draw_line (drawable, gg->plot_GC,
-          sp->whiskers[n].x1, sp->whiskers[n].y1,
-          sp->whiskers[n].x2, sp->whiskers[n].y2);
-        n++;
-        gdk_draw_line (drawable, gg->plot_GC,
-          sp->whiskers[n].x1, sp->whiskers[n].y1,
-          sp->whiskers[n].x2, sp->whiskers[n].y2);
-
-        gdk_gc_set_line_attributes (gg->plot_GC,
-          0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-        gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
-      }
-    } else {  /*-- for any display other than the parcoords plot --*/
-
-      /*-- draw a diamond around the current case --*/
-      diamond[0].x = diamond[4].x = sp->screen[k].x - diamond_dim;
-      diamond[0].y = diamond[4].y = sp->screen[k].y;
-      diamond[1].x = sp->screen[k].x;
-      diamond[1].y = sp->screen[k].y - diamond_dim;
-      diamond[2].x = sp->screen[k].x + diamond_dim;
-      diamond[2].y = sp->screen[k].y;
-      diamond[3].x = sp->screen[k].x;
-      diamond[3].y = sp->screen[k].y + diamond_dim;
-      gdk_draw_lines (drawable, gg->plot_GC, diamond, 5);
-    }
-  }
 
   /*-- add the label last so it will be in front of other markings --*/
   if (cpanel->identify_display_type == ID_CASE_LABEL)
@@ -506,19 +511,44 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
       break;
 
       case TOUR1D:
+        for (j=0; j<dsp->t1d.nvars; j++) {
+          if (j == 0)
+            lbl = g_strdup_printf ("%g",
+              d->tform.vals[k][dsp->t1d.vars.els[j]]);
+          else
+            lbl = g_strdup_printf ("%s, %g", lbl,
+              d->tform.vals[k][dsp->t1d.vars.els[j]]);
+        }
+      break;
+
       case TOUR2D:
+        for (j=0; j<dsp->t2d.nvars; j++) {
+          if (j == 0)
+            lbl = g_strdup_printf ("%g",
+              d->tform.vals[k][dsp->t2d.vars.els[j]]);
+          else
+            lbl = g_strdup_printf ("%s, %g", lbl,
+              d->tform.vals[k][dsp->t2d.vars.els[j]]);
+        }
+      break;
+
       case COTOUR:
-      {
-/*
-        icoords scr;
-        fcoords tf;
-        scr.x = sp->screen[k].x;
-        scr.y = sp->screen[k].y;
-        splot_screen_to_tform (cpanel, sp, &scr, &tf, gg);
-        lbl = g_strdup_printf ("%g, %g", tf.x, tf.y);
-*/
-        lbl = "?";
-      }
+        for (j=0; j<dsp->tcorr1.nvars; j++) {
+          if (j == 0)
+            lbl = g_strdup_printf ("%g",
+              d->tform.vals[k][dsp->tcorr1.vars.els[j]]);
+          else
+            lbl = g_strdup_printf ("%s, %g", lbl,
+              d->tform.vals[k][dsp->tcorr1.vars.els[j]]);
+        }
+        for (j=0; j<dsp->tcorr2.nvars; j++) {
+          if (j == 0)
+            lbl = g_strdup_printf ("%s; %g", lbl,
+              d->tform.vals[k][dsp->tcorr2.vars.els[j]]);
+          else
+            lbl = g_strdup_printf ("%s, %g", lbl,
+              d->tform.vals[k][dsp->tcorr2.vars.els[j]]);
+        }
       break;
     }
   }
@@ -546,12 +576,51 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
         sp->screen[k].x - width - diamond_dim, sp->screen[k].y - diamond_dim+1,
         sp->screen[k].x - diamond_dim, sp->screen[k].y - diamond_dim+1);
   }
+
+}
+
+/*-- add the nearest_point and sticky labels, plus a diamond for emphasis --*/
+void
+splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
+  gint k, gboolean nearest, ggobid *gg)
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+
+/*--
+   unsatisfactory: use ids and work out whether we're talking
+   about display->d or display->e.  nearest has to be 
+   propagated for linking.  [don't quite understand this comment;
+   time will tell]
+--*/
+  if (k >= d->nrows)
+    return;
+
+  /*-- draw a thickened line to highlight the current case --*/
+  if (nearest) {
+    if (dsp->displaytype == parcoords) {
+      splot_add_whisker_cues (k, sp, drawable, gg);
+    } else {  /*-- for all displays other than the parcoords plot --*/
+      splot_add_diamond_cue (k, sp, drawable, gg);
+    }
+  }
+
+  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  splot_add_record_label (nearest, k, sp, drawable, gg);
 }
 
 void
 splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest, ggobid *gg)
 {
+  displayd *display = sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
+
+  if (cpanel->ee_adding_p) {
+    if (gg->edgeedit.a == -1) {  /*-- looking for starting point --*/
+      splot_add_diamond_cue (k, sp, drawable, gg);
+    }
+  }
 }
 
 static void
@@ -577,23 +646,6 @@ splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
       /*-- false = !nearest --*/
       splot_add_identify_cues (sp, drawable, id, false, gg);
     }
-  }
-}
-
-
-static void
-splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
-{
-  if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
-    gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
-    gdk_gc_set_line_attributes (gg->plot_GC,
-      3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-
-    gdk_draw_rectangle (drawable, gg->plot_GC,
-      FALSE, 1, 1, sp->da->allocation.width-3, sp->da->allocation.height-3);
-
-    gdk_gc_set_line_attributes (gg->plot_GC,
-      0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
   }
 }
 
@@ -707,7 +759,6 @@ edges_draw (splotd *sp, ggobid *gg)
   }
 }
 
-/*-- is this supposed to work for whiskers, too? --*/
 void
 splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) {
   displayd *dsp = (displayd *) sp->displayptr;
@@ -770,6 +821,27 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
     }
   }
 }
+
+/*------------------------------------------------------------------------*/
+/*                 draw the border indicating current splot               */
+/*------------------------------------------------------------------------*/
+
+static void
+splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
+{
+  if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
+    gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+    gdk_gc_set_line_attributes (gg->plot_GC,
+      3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+
+    gdk_draw_rectangle (drawable, gg->plot_GC,
+      FALSE, 1, 1, sp->da->allocation.width-3, sp->da->allocation.height-3);
+
+    gdk_gc_set_line_attributes (gg->plot_GC,
+      0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+  }
+}
+
 
 /*------------------------------------------------------------------------*/
 /*    getting from pixmap0 to pixmap1, then pixmap1 to the window         */
