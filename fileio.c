@@ -257,7 +257,8 @@ fileset_generate(const gchar * fileName,
     desc->fileName = g_strdup(fileName);
     desc->mode = guess = verifyDataMode(desc->fileName, desc->mode, desc);
     if (desc->mode == unknown_data) {
-      return (NULL);
+	g_printerr("Cannot determine mode of data file %s\n", desc->fileName);
+	return (NULL);
     }
   }
 
