@@ -1,17 +1,25 @@
-You will need to have the libxml library, version 1.8.8 or higher (in
-the 1.8.* series). You can download this from
+GGobi Installation
+==================
 
-   ftp.gnome.org/pub/GNOME/stable/sources/libxml
+Downloads
+---------
 
-(Untar it, change directory to the top level of that
-source tree and give the two commands
-      ./configure
-      make
-)
+Binaries and source code can be downloaded from 
+   http://www.ggobi.org
 
-There is also optional support for reading data directly from a MySQL
-database. (The configuration for this has not been ironed out yet.)
+--GGobi--
+  Windows binary
+  tar'd gzip'd source code (for linux)
 
+--Rggobi--
+  Rggobi.tar.gz  file containing the necessary pieces to build the
+                 link between R and ggobi
+
+There are also instructions on how to download code from the cvs
+archive, using anonymous cvs.
+
+Ways to build GGobi under linux or unix 
+=======================================
 
 There are various ways to use ggobi and hence different features that
 one can enable when compiling ggobi.
@@ -32,61 +40,123 @@ one can enable when compiling ggobi.
 
   f) Perl   interface
       (allowing ggobi to be controlled from Perl)       
-  
-We strongly recommend b), i.e. compiling with XML support.  You will
-need to have Daniel Veillard's libxml installed and you will need to
-indicate where the development header files are located.
 
-Now, configure the distribution for compilation.
+There is also optional support for reading data directly from a MySQL
+database. (The configuration for this has not been ironed out yet.)
 
-  ./configure --with-xml='directory into which you untarred libxml' --enable-embed
+We strongly recommend compiling with XML support, because it provides
+more flexibility for file input and output and facilitates
+portability. For this option, you will need to have Daniel Veillard's
+libxml installed and you will need to indicate where the development
+header files are located. See instructions for getting this library
+and building it below.
 
-So on my machine, I give the command
-  ./configure --with-xml=$HOME/XML/libxml-1.8.9 --enable-embed 
+Nevertheless we provide instructions for all the different build
+methods, starting with the simplest. (Note that gmake is really used,
+but make should default to this on linux. You may need to force make
+to be gmake on other unix systems.)
 
-The packages in d), e) and f) are not included directly in this
-distribution. They can be downloaded separately from the ggobi Web
-site (http://www.ggobi.org). Having downloaded them and untarred them
-from within this directory, the basic configuration can arrange to
-compile these, in addition to the core application.
+a) Stand-alone
 
-For example, to configure ggobi and R, with support for XML, the
-following steps work (if the ggobi.tar.gz and Rggobi.tar.gz are in the
-same directory.)
+Download the tar.gz version of the code, unpack it. The type:
 
-   tar zxvf ggobi_0.5-0.tar.gz
-   cd ggobi
-   tar zxvf ../Rggobi_0.1-0.tar.gz
-   ./configure --with-R --with-xml=$HOME/XML/libxml-1.8.10
-   make
+./configure
+make
 
-When configuring the Rggobi library, it is often convenient to be 
-able to specify the target directory into which the package will be
-installed, i.e. the -l argument to R's INSTALL command. This can be done
-by specifying the directory as the value of the --with-R flag. For example,
+Then to run ggobi type:
 
-       --with-R=/tmp/R/pkg
+ggobi <datafilename> 
 
+b) Stand-alone with XML support
+
+You need to build the libxml library before starting (instructions below).
+Then type:
+
+./configure --with-xml=$HOME/XML/libxml-1.8.9
+make
+
+where $HOME/XML/libxml-1.8.9 is replaces as necessary by the directory
+and version of libxml you downloaded and unpacked.
+
+c) Stand-alone and embeddable ggobi library
+
+./configure --enable-embed
+make 
+
+OR
+./configure
+make
+make lib
+
+d) Stand-alone and embeddable ggobi library with XML support
+
+./configure --with-xml=$HOME/XML/libxml-1.8.9 --enable-embed
+make or gmake
+
+e) R interface
+
+Install R after downloading and following instructions from
+  http://www.R-project.org
+
+From the ggobi web site, download Rggobi_0.1-0.tar.gz.
+
+Set various system parameters:
+
+% setenv R_HOME /usr/local/lib/R (where R got installed)
+% setenv GGOBI_ROOT $HOME/ggobi   (or wherever ggobi lives)
+% setenv R_LIBS /usr/local/lib/R/library 
+
+(You may need to use the export command rather than setenv in some
+shells.)
+
+Become root:
+
+% su
+
+Set a symbolic link to the ggobi library in the R directory:
+
+% ln -s $GGOBI_ROOT/libggobi.so /usr/local/lib/.
+
+Install the Rggobi library:
+
+% R CMD INSTALL Rggobi_0.1.tar.gz
+
+which will create a directory called Rggobi in the
+/usr/local/lib/R/library directory.
+
+Exit superuser status.
+
+% exit              
+
+You are now ready to test out the link. Start R:
+
+% R
+> library(Rggobi)
+> ggobi("/home/dicook/ggobi/data/flea.dat") # or ggobi()
+> ls(pos=2)      # lists the ggobi functionality available
 
 XML support:
 ============
-  Some Linux systems have a version of libxml installed by default in
+
+Some Linux systems have a version of libxml installed by default in
 /usr/lib or /usr/local/lib and headers in
 /usr/local/include/gnome-xml.  In some cases, these are older versions
-of libxml and will not work (easily) with ggobi. While it would be simpler
-to install libxml-1.8.9 on your system and replace the existing one, that
-approach may break other applications. 
+of libxml and will not work (easily) with ggobi. While it would be
+simpler to install libxml-1.8.9 on your system and replace the
+existing one, that approach may break other applications.
 
-  To deal with this need for a more recent version of libxml while
+To deal with this need for a more recent version of libxml while
 leaving the older version as the installed default library, one has
 to follow these steps:
    
-   1) download libxml and compile libxml in non-system directory as described above. 
-      This directory might be in your home directory. The compilation should 
-      leave you with a directory libxml-1.8.9/ which contains (amongst other things)
-          a) a libmxml/ directory in which the header files such as parser.h and tree.h reside;
+   1) download libxml and compile libxml in non-system directory as
+      described above.  This directory might be in your home
+      directory. The compilation should leave you with a directory
+      libxml-1.8.9/ which contains (amongst other things)
+          a) a libmxml/ directory in which the header files such as
+             parser.h and tree.h reside;
           b) a .libs/ directory in which libxml.so resides.
-      Note the name of this top-level directory. 
+             Note the name of this top-level directory. 
 
    2) configure the ggobi distribution using the --with-xml flag as
        cd ggobi
@@ -94,37 +164,136 @@ to follow these steps:
 
        make
 
- This should be sufficient to _compile_ ggobi with the correct include
+This should be sufficient to _compile_ ggobi with the correct include
 and library files. However, when one runs ggobi, it will not
 necessarily find that newer library, but instead may use the system
 default one in /usr/lib or wherever.  The ggobi script in bin/ however
-takes care of this by setting the LD_LIBRARY_PATH appropriately
-to refer to the .libs/ directory.
+takes care of this by setting the LD_LIBRARY_PATH appropriately to
+refer to the .libs/ directory.
 
-
-
-
-
-
-
-Running ggobi:
+Getting libxml:
 ==============
 
-To run ggobi or any application that uses the ggobi library
-(e.g. xmlConvert, the R package, etc.), one must be able to find the
-libgtkext.so and libggobi.so libraries.  The same applies for the XML
-library, libxml.so. This can be done by installing them into a place
-that `ldconfig' searches or by having that directory referenced in
-your LD_LIBRARY_PATH.  Scripts to set the LD_LIBRARY_PATH variable
-appropriately is given in the bin/ directory. There is one for the
-Bourne shell and another for the C shell. Invoke these scripts as
- 
-       . bin/setLD.bsh
+You will need to have the libxml library, version 1.8.8 or higher (in
+the 1.8.* series). You can download this from
 
-       source bin/setLD.bsh
+   ftp.gnome.org/pub/GNOME/stable/sources/libxml
+
+Untar it, change directory to the top level of that
+source tree and give the two commands
+      ./configure
+      make
+
+Building GGobi under Windows 
+============================
+
+Win-GGobi is the native windows port of GGobi.  
+
+Installation from Binary
+------------------------
+
+Unzip the binary in the directory of your choice, and double-click on
+the icon winggobi\bin\ggobi.exe
+
+RSGGobi - Running GGobi from R
+-----------------------------
+
+The RSGGobi package is an add on package for R
+(http://www.r-project.org) 
+an open source statistical package simailar to S+. GGobi can be run and
+exchange data with an R session.
+
+To install Rggobi you will first need to download and install the R
+binaries from http://cran.r-project.org.
+
+Once R is installed unzip Rggobi.zip in the directory rw10xx/library. Next
+you will need to install winggobi. The last
+step is to put the directory winggobi/bin in your path. If you are running
+windows 95 or 98 you will need to edit the file C:\AUTOEXEC.BAT. If you
+are running windows NT or 2000 go to Start->Control Panel-> System->Environment
+and select PATH, and add the winggobi/bin directory to the path.
+
+Now fire up R
+
+> library(Rggobi)
+> ggobi()
+
+Compiling ggobi on windows
+--------------------------
+
+Using the Mingw32 compiler
+
+>The following notes include the set-up I used to compile ggobi on windows.
+I have successfully compiled it on win98 and winnt. I am sure there is
+an easier way but everything I have used in the process is GPL or LGPL
+so I assume there are no licensing issues.
+
+What is needed
+--------------
+
+Mingw32 (gcc for windows) download the latest stable snapshot
+gcc-2.95.2-1 at
+ftp://ftp.nanotech.wisc.edu/pub/khan/gnu-win32/mingw32/snapshots/gcc-2.95.2-1/
+
+Download all the files for msvcrt (mingw-msvcrt-20000203.zip,
+gcc-2.95.2-1-msvcrt.zip, binutils-19990818-1-msvcrt.zip,
+binutils-fixes-msvcrt.zip, ld-msvcrt.zip) from
+http://user.sgic.fi/~tml/gimp/win32/ 
+
+Download the current development version of gtk+ for windows.
+(libiconv-dev-20001007.zip, glib-dev-20001023.zip,
+gtk+-dev-20001023.zip) 
+
+and finally at http://www.penguin.at0.net/~fredo/
+you need libxml2-2.1.1-mingw.zip 
+
+optional: get
+the cygwin 1.1 distribution. The bash shell is really helpful at
+http://sourceware.cygnus.com/cygwin/mirrors.html
+phew! (Note, when i find or compile a version of mysql I
+will add that too)
+
+Installation
+------------
+
+I will pretend everything is being installed in c:\
+
+First if you are going to use cygnus download everything but the
+cygwin distribution of gcc manually from the ftp site and then use the
+install script for a local install. Install in C:\cygnus using the
+installer, and use the option install from local source.
+
+Now install gcc, say in C:\mingw, now gcc needs to be added to your
+path, if you did not heed my advice and downloaded cygwin gcc when you
+installed bash then gcc needs to be in your path BEFORE the cygwin
+stuff. This is because people still seem to have some problems with
+the -mno-cygwin flag. Unzip the mingw files in the order listed above
+in the mingw directory
+
+Next unzip the gtk stuff say in C:\gtkwin.
+Now if you do not have gimp installed I found it easiest to make a
+folder under gtkwin say C:\gtkwin\bin and copy all the dlls from the various
+gtk and extra stuff to that folder and put that folder in your path. Now
+all gtk+ applications will run without having to have a copy of the dll
+in each folder. Since the gtk+ distribution is changing rapidly it is not
+a good idea to put this stuff in your system folder.
+
+Lastly unzip libxml, everything is compiled for windows already so it
+just needs to be unzipped.
+
+Compiling
+---------
+
+For compiling here is the link to the makefile I have been using, also
+the following source needs to be there, since erf is not in the Mingw
+math libraries. (http://www.public.iastate.edu/~nlewin/ggobi/Makefile.win32, 
+ s_erf.c)
+
+Now just fireup bash, copy s_erf.c and Makefile.win32 over to your ggobi
+directory (note you will need to change the paths in the
+makefile to reflect your system) and make. Email me when nothing works
+at kohnicho@comp.nus.edu.sg
 
 
-Note that on many machines, there is already a version of the libxml
-library installed in /usr/lib/ and this will be found by default.
-In most cases, this is ok. In others, compiling against one version
-and loading another will cause obscure failures.
+
+
