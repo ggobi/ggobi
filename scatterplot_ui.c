@@ -98,13 +98,26 @@ scatterplot_display_edge_menu_update (displayd *display,
   GtkWidget *submenu, *anchor;
   gchar *lbl;
 
-  /*-- If this datad has ids, find the number of other datad's with edges --*/
+  /*-- If this datad has ids, find the number of other datad's with
+       edges --*/
+/*
+  If I wanted to verify that they were compatible, how would I
+  do that?  Could I try to resolve them?  Yes, with
+    resolveEdgePoints (e, d)
+  If it returns NULL, there's no match.
+  I just have to decide whether I want to expend the computing time.
+*/
   if (d->rowIds) {
+    endpointsd *endpoints;
     for (k=0; k<nd; k++) { 
       e = (datad*) g_slist_nth_data (gg->d, k);
       if (/* e != d && */ e->edge.n > 0) {
-        ne++;
-        onlye = e;  /* meaningful if there's only one */
+        endpoints = resolveEdgePoints(e, d);
+        if (endpoints != NULL) {
+          ne++;
+          onlye = e;  /* meaningful if there's only one */
+        }
+        /* I don't know whether I need to unresolveEdgePoints afterwards */
       }
     }
   }
