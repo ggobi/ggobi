@@ -103,7 +103,7 @@ create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
   gtk_widget_set_usize(GTK_WIDGET(window), 600, 400);
 
   gtk_signal_connect (GTK_OBJECT (window), "destroy",
-		      GTK_SIGNAL_FUNC (close_worksheet_window), inst);
+                      GTK_SIGNAL_FUNC (close_worksheet_window), inst);
 
 
   main_vbox=gtk_vbox_new(FALSE,1);
@@ -147,58 +147,59 @@ add_ggobi_sheets(ggobid *gg, GtkWidget *notebook)
 GtkWidget*
 create_ggobi_sheet(datad *data, ggobid *gg)
 {
-    GtkWidget *sheet, *scrolled_window;
+  GtkWidget *sheet, *scrolled_window;
 
-    sheet = gtk_sheet_new(data->nrows, data->ncols, data->name);  
-    scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+  sheet = gtk_sheet_new(data->nrows, data->ncols, data->name);  
+  scrolled_window = gtk_scrolled_window_new(NULL, NULL);
 
-    gtk_container_add(GTK_CONTAINER(scrolled_window), sheet);
+  gtk_container_add(GTK_CONTAINER(scrolled_window), sheet);
 
-    gtk_widget_show(sheet);
+  gtk_widget_show(sheet);
 
-    add_ggobi_data(data, sheet);
+  add_ggobi_data(data, sheet);
 
-    gtk_widget_show(scrolled_window);
+  gtk_widget_show(scrolled_window);
 
-    return(scrolled_window);
+  return(scrolled_window);
 }
 
 void 
 add_ggobi_data(datad *data, GtkWidget *w)
 {
-    int i, j;
-    GtkSheet *sheet;
-    const gfloat **raw;
-    sheet = GTK_SHEET(w);
+  gint i, j;
+  GtkSheet *sheet;
+  const gfloat **raw;
+  sheet = GTK_SHEET(w);
 
+  for(i = 0; i < data->ncols; i++) {
+    char *name = data->vartable[i].collab;
+    gtk_sheet_column_button_add_label(sheet, i, name);
+    gtk_sheet_set_column_title(sheet, i, name);
+  }
 
-    for(i = 0; i < data->ncols; i++) {
-      char *name = data->vartable[i].collab;
-      gtk_sheet_column_button_add_label(sheet, i, name);
-      gtk_sheet_set_column_title(sheet, i, name);
+  raw = GGOBI(getRawData)(data, data->gg);
+  for(i = 0; i < data->nrows; i++) {
+    gtk_sheet_row_button_add_label(sheet, i,
+      (gchar *) g_array_index(data->rowlab, gchar*, i));
+
+    for(j = 0; j < data->ncols; j++) {
+      char buf[10];
+      sprintf(buf, "%.3g", raw[i][j]);
+      gtk_sheet_set_cell(sheet, i, j, GTK_JUSTIFY_RIGHT, buf);
     }
-
-    raw = GGOBI(getRawData)(data, data->gg);
-    for(i = 0; i < data->nrows; i++) {
-       gtk_sheet_row_button_add_label(sheet, i, (gchar *) g_array_index(data->rowlab, gchar*, i));
-
-       for(j = 0; j < data->ncols; j++) {
-	   char buf[10];
-           sprintf(buf, "%.3f", raw[i][j]);
-	   gtk_sheet_set_cell(sheet, i, j, GTK_JUSTIFY_RIGHT, buf);
-       }
-    }
+  }
 }
 
 void close_worksheet_window(GtkWidget *w, PluginInstance *inst)
 {
-    inst->data = NULL;
+  inst->data = NULL;
 }
 
 void closeWindow(ggobid *gg, PluginInstance *inst)
 {
-    if(inst->data) {
-      gtk_signal_disconnect_by_func(GTK_OBJECT(inst->data),GTK_SIGNAL_FUNC (close_worksheet_window), inst);
-      gtk_widget_destroy((GtkWidget*) inst->data);
-    }
+  if(inst->data) {
+    gtk_signal_disconnect_by_func(GTK_OBJECT(inst->data),
+      GTK_SIGNAL_FUNC (close_worksheet_window), inst);
+    gtk_widget_destroy((GtkWidget*) inst->data);
+  }
 }

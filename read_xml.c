@@ -514,10 +514,10 @@ setDefaultDatasetValues(const CHAR **attrs, XMLParserData *data)
  return(true);
 }
 
-int
+gint
 asInteger(const gchar *tmp)
 {
- int value;
+ gint value;
 
   value = atoi(tmp);
 

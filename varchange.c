@@ -321,6 +321,8 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
           }
         }
       break;
+      case unknown_display_type:
+      break;
     }
   }
 

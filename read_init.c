@@ -23,6 +23,8 @@ extern int xmlDoValidityCheckingDefaultValue;
 #include "plugin.h"
 #include "GGobiAPI.h"
 
+#include "externs.h"
+
 int getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
 xmlNode *getXMLElement(const xmlDocPtr doc, const char *tagName);
 DataMode getPreviousInput(xmlNode *node, InputDescription *input);
@@ -49,7 +51,7 @@ read_init_file(const char *filename)
   filename = g_strdup(filename);
   doc = xmlParseFile(filename); 
   if(doc == NULL)
-      return((GGobiInitInfo *) NULL);
+/**/return((GGobiInitInfo *) NULL);
   info = g_malloc(sizeof(GGobiInitInfo));
 
   info->numInputs = 0;
@@ -67,14 +69,14 @@ read_init_file(const char *filename)
 xmlNode *
 getXMLElement(const xmlDocPtr doc, const char *tagName)
 {
-    xmlNode *node = xmlDocGetRootElement(doc);
-    node = node->children;
-    while(node) {
-	if(strcmp(node->name, tagName) == 0) {
-            return(node);
-	}
-	node = node->next;
+  xmlNode *node = xmlDocGetRootElement(doc);
+  node = node->children;
+  while(node) {
+    if(strcmp(node->name, tagName) == 0) {
+      return(node);
     }
+    node = node->next;
+  }
 
   return(node);
 }
@@ -82,30 +84,30 @@ getXMLElement(const xmlDocPtr doc, const char *tagName)
 int
 getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
 {
-    xmlNode *node, *el;
-    int n, i;
-    node = getXMLElement(doc, "previousFiles");
+  xmlNode *node, *el;
+  int n, i;
+  node = getXMLElement(doc, "previousFiles");
 
-    n = 0;
-    el = node->children;
-    while(el) {
-        if(el->type != XML_TEXT_NODE)
-	  n++;
-        el = el->next;
+  n = 0;
+  el = node->children;
+  while(el) {
+    if(el->type != XML_TEXT_NODE)
+       n++;
+     el = el->next;
+  }
+
+  info->descriptions = g_malloc(n*sizeof(GGobiDescription));
+  info->numInputs = n;
+
+  el = node->children;
+  for(i = 0; el ; el = el->next) {
+    if(el->type != XML_TEXT_NODE) {
+   
+      getPreviousInput(el, &(info->descriptions[i].input));
+      i++;
     }
-
-    info->descriptions = g_malloc(n*sizeof(GGobiDescription));
-    info->numInputs = n;
-
-    el = node->children;
-    for(i = 0; el ; el = el->next) {
-	if(el->type != XML_TEXT_NODE) {
-	   
-	  getPreviousInput(el, &(info->descriptions[i].input));
-          i++;
-	}
-    }
-    return(n);
+  }
+  return(n);
 }
 
 
@@ -124,23 +126,23 @@ getPreviousInput(xmlNode *node, InputDescription *input)
         completeFileDesc(input->fileName, input);
    */
    if(input->fileName) {
-       char *ptr, *tmp1, *tmp2;
-       int i;
-         tmp1 = strrchr(input->fileName, G_DIR_SEPARATOR);
-         tmp2 = strrchr(tmp1, '.');
-         if(tmp2)
-            input->givenExtension = g_strdup(tmp2+1);
-	 input->baseName = g_malloc((tmp2 - tmp1 +1)*sizeof(char));
-         for(i = 0, ptr = tmp1 + 1 ; ptr < tmp2; ptr++, i++) {   
-	     input->baseName[i] = *ptr;
-	 }
-	 input->baseName[i] = '\0';
-         input->dirName = g_malloc((tmp1 - input->fileName +1)*sizeof(char));
-         for(i=0, ptr = input->fileName; ptr < tmp1; ptr++, i++) {   
-	     input->dirName[i] = *ptr;
-	 }
-         input->dirName[i] = '\0';
+     char *ptr, *tmp1, *tmp2;
+     int i;
+     tmp1 = strrchr(input->fileName, G_DIR_SEPARATOR);
+     tmp2 = strrchr(tmp1, '.');
+     if(tmp2)
+       input->givenExtension = g_strdup(tmp2+1);
+     input->baseName = g_malloc((tmp2 - tmp1 +1)*sizeof(char));
+     for(i = 0, ptr = tmp1 + 1 ; ptr < tmp2; ptr++, i++) {   
+       input->baseName[i] = *ptr;
      }
+     input->baseName[i] = '\0';
+     input->dirName = g_malloc((tmp1 - input->fileName +1)*sizeof(char));
+     for(i=0, ptr = input->fileName; ptr < tmp1; ptr++, i++) {   
+       input->dirName[i] = *ptr;
+     }
+     input->dirName[i] = '\0';
+   }
 
    input->canVerify = 0;
 
@@ -150,27 +152,27 @@ getPreviousInput(xmlNode *node, InputDescription *input)
 DataMode
 getInputType(xmlNode *node)
 {
-    const CHAR *tag;
-    const CHAR *mode;
-    DataMode val = unknown_data;
+  const CHAR *tag;
+  const CHAR *mode;
+  DataMode val = unknown_data;
 
-    tag = node->name;
+  tag = node->name;
 
-    if(strcmp(tag,"url") == 0) {
-	val = url_data;
-    } else if(strcmp(tag,"database") == 0)
-	val = mysql_data;
-    else {
-      mode = xmlGetProp(node, "mode");
-      if(strcmp(tag,"file") == 0) {
-	  if(strcmp(mode, "xml") == 0)
-     	     val = xml_data; 
-          else if(strcmp(mode, "ascii") == 0)
-      	     val = ascii_data; 
-      }
+  if(strcmp(tag,"url") == 0) {
+    val = url_data;
+  } else if(strcmp(tag,"database") == 0)
+    val = mysql_data;
+  else {
+    mode = xmlGetProp(node, "mode");
+    if(strcmp(tag,"file") == 0) {
+      if(strcmp(mode, "xml") == 0)
+        val = xml_data; 
+      else if(strcmp(mode, "ascii") == 0)
+        val = ascii_data; 
     }
+  }
     
-    return(val);
+  return(val);
 }
 
 /*****************************************************************/
@@ -181,20 +183,20 @@ getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info)
   xmlNode *node, *el;
   GGobiDescription *desc;
   int i;
-   node = getXMLElement(doc, "ggobis"); 
-   el = node->children;
-   i = 0;
-   while(el) {
-     if(el->type != XML_TEXT_NODE && strcmp(el->name,"ggobi") == 0) {
- 	   /* Need to match these with the input source ids. */
-         desc = info->descriptions + i;
-	 getPreviousDisplays(el, desc);
-         i++;
-     }
-     el = el->next;
-   }
+  node = getXMLElement(doc, "ggobis"); 
+  el = node->children;
+  i = 0;
+  while(el) {
+    if(el->type != XML_TEXT_NODE && strcmp(el->name,"ggobi") == 0) {
+    /* Need to match these with the input source ids. */
+      desc = info->descriptions + i;
+      getPreviousDisplays(el, desc);
+      i++;
+    }
+    el = el->next;
+  }
 
-   return(g_list_length(desc->displays));
+  return(g_list_length(desc->displays));
 }
 
 int
@@ -205,13 +207,13 @@ getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc)
   int n = 0;
   desc->displays = NULL;
   while(el) {
-      if(el->type != XML_TEXT_NODE && strcmp(el->name, "display") == 0) {
-        dpy = getDisplayDescription(el) ;
-        if(dpy) {
-          desc->displays = g_list_append(desc->displays, dpy);
-          n++;
-	}    
-      }
+    if(el->type != XML_TEXT_NODE && strcmp(el->name, "display") == 0) {
+      dpy = getDisplayDescription(el) ;
+      if(dpy) {
+        desc->displays = g_list_append(desc->displays, dpy);
+        n++;
+      }    
+    }
 
     el = el->next;
   }
@@ -222,55 +224,55 @@ getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc)
 GGobiDisplayDescription*
 getDisplayDescription(xmlNodePtr node)
 {
- GGobiDisplayDescription *dpy;
- xmlNodePtr el;
- int i;
- CHAR *tmp;
+  GGobiDisplayDescription *dpy;
+  xmlNodePtr el;
+  int i;
+  CHAR *tmp;
 
- dpy = (GGobiDisplayDescription*) g_malloc(sizeof(GGobiDisplayDescription*));
- dpy->type = getDisplayType(xmlGetProp(node, "type"));
- tmp = xmlGetProp(node, "data");
- if(tmp) {
-   dpy->data = asInteger(tmp) - 1;
- } else
-     dpy->data = 0;
+  dpy = (GGobiDisplayDescription*) g_malloc(sizeof(GGobiDisplayDescription*));
+  dpy->type = getDisplayType(xmlGetProp(node, "type"));
+  tmp = xmlGetProp(node, "data");
+  if(tmp) {
+    dpy->data = asInteger(tmp) - 1;
+  } else
+    dpy->data = 0;
 
- dpy->numVars = 0;
+  dpy->numVars = 0;
  
- if(dpy->type == unknown_display_type) {
+  if(dpy->type == unknown_display_type) {
+   return(dpy);
+  }
+
+  el = node->children;
+  while(el) {
+    if(el->type != XML_TEXT_NODE && strcmp(el->name, "variable") == 0) 
+      dpy->numVars++;
+    el = el->next;
+  }
+
+  dpy->varNames = (gchar **) g_malloc(dpy->numVars*sizeof(gchar*));
+  for(i = 0, el = node->children; i < dpy->numVars; el = el->next) {
+    if(el->type != XML_TEXT_NODE && strcmp(el->name, "variable") == 0) 
+      dpy->varNames[i++] = g_strdup(xmlGetProp(el, "name"));
+  }
+
   return(dpy);
- }
-
- el = node->children;
- while(el) {
-     if(el->type != XML_TEXT_NODE && strcmp(el->name, "variable") == 0) 
-	 dpy->numVars++;
-     el = el->next;
- }
-
- dpy->varNames = (gchar **) g_malloc(dpy->numVars*sizeof(gchar*));
- for(i = 0, el = node->children; i < dpy->numVars; el = el->next) {
-   if(el->type != XML_TEXT_NODE && strcmp(el->name, "variable") == 0) 
-     dpy->varNames[i++] = g_strdup(xmlGetProp(el, "name"));
- }
-
-
- return(dpy);
 }
 
 enum displaytyped
 getDisplayType(const CHAR *type)
 {
-    enum displaytyped val = unknown_display_type;
-       if(strcmp(type, "scatterplot") == 0) 
-	   val = scatterplot;
-       else if(strcmp(type, "scatmatrix") == 0)
-	   val = scatmat;
-       else if(strcmp(type, "parcoords") == 0)
-	   val = parcoords;
-       else if(strcmp(type,"tsplot") == 0)
-	   val = tsplot;
-   return(val);
+  enum displaytyped val = unknown_display_type;
+  if(strcmp(type, "scatterplot") == 0) 
+    val = scatterplot;
+  else if(strcmp(type, "scatmatrix") == 0)
+    val = scatmat;
+  else if(strcmp(type, "parcoords") == 0)
+    val = parcoords;
+  else if(strcmp(type,"tsplot") == 0)
+    val = tsplot;
+
+  return(val);
 }
 
 
@@ -284,22 +286,22 @@ getDisplayType(const CHAR *type)
 void
 getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
 {
-   xmlNode *node, *el;
-   GGobiPluginInfo *plugin;
+  xmlNode *node, *el;
+  GGobiPluginInfo *plugin;
 
-    node = getXMLElement(doc, "plugins");
+  node = getXMLElement(doc, "plugins");
 
-    info->plugins = NULL;
+  info->plugins = NULL;
   
-    el = node->children;
-    while(el) {
-        if(el->type != XML_TEXT_NODE && strcmp(el->name, "plugin") == 0) {
-          plugin = processPlugin(el, info, doc);
-          if(plugin)
-	     info->plugins = g_list_append(info->plugins, plugin);
-	}
-        el = el->next;
+  el = node->children;
+  while(el) {
+    if(el->type != XML_TEXT_NODE && strcmp(el->name, "plugin") == 0) {
+      plugin = processPlugin(el, info, doc);
+      if(plugin)
+        info->plugins = g_list_append(info->plugins, plugin);
     }
+    el = el->next;
+  }
 }
 
 /*
@@ -318,72 +320,73 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   GGobiPluginInfo *plugin;
   xmlChar * val;
 
-    plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
+  plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
 
-    plugin->onLoad = NULL;
-    plugin->onCreate = NULL;
-    plugin->onClose = NULL;
-    plugin->onUnload = NULL;
+  plugin->onLoad = NULL;
+  plugin->onCreate = NULL;
+  plugin->onClose = NULL;
+  plugin->onUnload = NULL;
 
-    tmp = xmlGetProp(node, "name");
-    if(tmp) {
-      plugin->name = g_strdup((char *) tmp);
-    }
+  tmp = xmlGetProp(node, "name");
+  if(tmp) {
+    plugin->name = g_strdup((char *) tmp);
+  }
 
-    tmp = xmlGetProp(node, "load");
-    if(tmp) {
-      load = strcmp((char*)tmp, "immediate") == 0;
-    }
+  tmp = xmlGetProp(node, "load");
+  if(tmp) {
+    load = strcmp((char*)tmp, "immediate") == 0;
+  }
 
-    el = node->children;
-    while(el) {
-      if(el->type != XML_TEXT_NODE) {
-	  if(strcmp(el->name, "author") == 0) {
-              val = xmlNodeListGetString(doc, el->children, 1);
-	      plugin->author = g_strdup((char*) val);
-	  } else if(strcmp(el->name, "description") == 0) {
-              val = xmlNodeListGetString(doc, el->children, 1);
-	      plugin->description = g_strdup((char*) val);
-	  } else if(strcmp(el->name, "dll") == 0) {
-	      plugin->dllName = g_strdup((char*) xmlGetProp(el, "name"));
-	      if(el->children) {
-		  xmlNodePtr c = el->children;
-                  while(c) {
-                      if(el->type != XML_TEXT_NODE && strcmp(c->name, "init") == 0) {
-                          GET_PROP_VALUE(onLoad, "onLoad");
-                          GET_PROP_VALUE(onCreate, "onCreate");
-                          GET_PROP_VALUE(onClose, "onClose");
-                          GET_PROP_VALUE(onUnload, "onUnload");
+  el = node->children;
+  while(el) {
+    if(el->type != XML_TEXT_NODE) {
+      if(strcmp(el->name, "author") == 0) {
+        val = xmlNodeListGetString(doc, el->children, 1);
+        plugin->author = g_strdup((char*) val);
+      } else if(strcmp(el->name, "description") == 0) {
+        val = xmlNodeListGetString(doc, el->children, 1);
+        plugin->description = g_strdup((char*) val);
+      } else if(strcmp(el->name, "dll") == 0) {
+        plugin->dllName = g_strdup((char*) xmlGetProp(el, "name"));
+        if(el->children) {
+          xmlNodePtr c = el->children;
+          while(c) {
+            if(el->type != XML_TEXT_NODE && strcmp(c->name, "init") == 0) {
+               GET_PROP_VALUE(onLoad, "onLoad");
+               GET_PROP_VALUE(onCreate, "onCreate");
+               GET_PROP_VALUE(onClose, "onClose");
+               GET_PROP_VALUE(onUnload, "onUnload");
 /*
-                          plugin->onLoad = g_strdup((char *) xmlGetProp(c, "onLoad"));
-                          plugin->onCreate = g_strdup((char *) xmlGetProp(c, "onCreate"));
+               plugin->onLoad = g_strdup((char *) xmlGetProp(c, "onLoad"));
+               plugin->onCreate = g_strdup((char *) xmlGetProp(c, "onCreate"));
 */
-			  break;
-		      }
-		      c = c->next;
-		  }
-	      }
-	  }
-      }
-
-      el = el->next;
-    }
-
-    if(load) {
-      plugin->library = load_plugin_library(plugin);
-      if(plugin->onLoad) {
-	OnLoad f = (OnLoad) getPluginSymbol(plugin->onLoad, plugin);
-        if(f) {
-           f(0, plugin);
-	} else {
-           char buf[1000];
-             dynload->getError(buf, plugin);
-             fprintf(stderr, "error on loading plugin library %s: %s", plugin->dllName, buf);fflush(stderr);
-	}
+               break;
+            }
+            c = c->next;
+          }
+        }
       }
     }
 
-   return(plugin);
+    el = el->next;
+ }
+
+  if(load) {
+    plugin->library = load_plugin_library(plugin);
+    if(plugin->onLoad) {
+      OnLoad f = (OnLoad) getPluginSymbol(plugin->onLoad, plugin);
+      if(f) {
+        f(0, plugin);
+      } else {
+        char buf[1000];
+        dynload->getError(buf, plugin);
+        fprintf(stderr, "error on loading plugin library %s: %s",
+          plugin->dllName, buf);fflush(stderr);
+      }
+    }
+  }
+
+  return(plugin);
 }
 
 int resolveVariableName(const char *name, datad *d);
@@ -391,29 +394,32 @@ int resolveVariableName(const char *name, datad *d);
 displayd *
 createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc) 
 {
-    displayd *dpy;
-    datad *data;
-    gint *vars, i;
+  displayd *dpy;
+  datad *data;
+  gint *vars, i;
 
-    data = (datad*) gg->d->data;
+  data = (datad*) gg->d->data;
 
-    vars = (gint*) g_malloc(sizeof(gint) * desc->numVars);
-    for(i = 0; i < desc->numVars; i++)
-      vars[i] = resolveVariableName(desc->varNames[i], data);
-    switch(desc->type) {
-	case scatterplot:
-	    dpy = GGOBI(newScatterplot)(vars[0], vars[1], data, gg);
-          break;
-	case parcoords:
-            dpy = GGOBI(newParCoords)(vars, desc->numVars, data, gg);
-          break;
-	case scatmat:
-            dpy = GGOBI(newScatmat)(vars, vars, desc->numVars, desc->numVars, data, gg);
-          break;
-	case tsplot:
-            dpy = GGOBI(newTimeSeries)(vars, desc->numVars, data, gg);
-          break;
-    }
+  vars = (gint*) g_malloc(sizeof(gint) * desc->numVars);
+  for (i = 0; i < desc->numVars; i++)
+    vars[i] = resolveVariableName(desc->varNames[i], data);
+  switch(desc->type) {
+    case scatterplot:
+      dpy = GGOBI(newScatterplot)(vars[0], vars[1], data, gg);
+    break;
+    case parcoords:
+      dpy = GGOBI(newParCoords)(vars, desc->numVars, data, gg);
+    break;
+    case scatmat:
+      dpy = GGOBI(newScatmat)(vars, vars, desc->numVars,
+                              desc->numVars, data, gg);
+    break;
+    case tsplot:
+      dpy = GGOBI(newTimeSeries)(vars, desc->numVars, data, gg);
+    break;
+    case unknown_display_type:
+    break;
+  }
 
   g_free(vars);
 
@@ -423,11 +429,11 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
 int
 resolveVariableName(const char *name, datad *d)
 { 
-    int i;
-    for(i = 0; i < d->ncols; i++) {
-	if(strcmp(d->vartable[i].collab, name) == 0)
-	    return(i);
-    }
+  gint i;
+  for(i = 0; i < d->ncols; i++) {
+  if(strcmp(d->vartable[i].collab, name) == 0)
+    return(i);
+  }
 
-    return(-1);
+  return(-1);
 }

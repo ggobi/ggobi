@@ -543,6 +543,8 @@ projection_ok (gint m, displayd *display)
 gint
 GGOBI(full_mode_set)(gint action, ggobid *gg)
 {
+  gint prev_mode = gg->mode;
+
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
     displayd *display = gg->current_display;
@@ -561,6 +563,12 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
       mode_activate (sp, gg->mode, on, gg);
       mode_submenus_activate (sp, gg->mode, on, gg);
       procs_activate (on, display, gg);
+
+      /*
+       * work out which mode menus (Options, Reset, I/O) need
+       * to be present, and add the needed callbacks.
+      mode_submenus_update (prev_mode, action, gg);
+      */
 
       /*-- redraw this display --*/
       display_tailpipe (display, gg);
@@ -685,7 +693,10 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) splash_show,
        0 },
   { "/Help/About help ...",  NULL, NULL, 0, NULL },
-  { "/Help/About plugins ...",  NULL, (GtkItemFactoryCallback) show_plugin_list, NULL },
+  { "/Help/About plugins ...",
+       NULL,
+       (GtkItemFactoryCallback) show_plugin_list,
+       (gint) NULL },
 };
 
 
@@ -821,29 +832,29 @@ load_previous_file(GtkWidget *w, gpointer cbd)
   GGobiDescription *gdesc;
   ggobid *gg;
 
-   gg = GGobiFromWidget(w, false);
-   gdesc = (GGobiDescription*) cbd;
-   desc =  &(gdesc->input);
+  gg = GGobiFromWidget(w, false);
+  gdesc = (GGobiDescription*) cbd;
+  desc =  &(gdesc->input);
 
-   fprintf(stderr, "Number of displays %d\n", g_list_length(gdesc->displays));
+  fprintf(stderr, "Number of displays %d\n", g_list_length(gdesc->displays));
 
-   if(g_slist_length(gg->d) > 0)
-      create_ggobi(desc);
-   else {
-      read_input(desc, gg);
-       /* Need to avoid the initial scatterplot. */
-      start_ggobi(gg, true, gdesc->displays == NULL);
-   }
+  if(g_slist_length(gg->d) > 0)
+     create_ggobi(desc);
+  else {
+    read_input(desc, gg);
+     /* Need to avoid the initial scatterplot. */
+    start_ggobi(gg, true, gdesc->displays == NULL);
+  }
 
-   if(gdesc->displays) {
-    int i, n;
+  if (gdesc->displays) {
+    gint i, n;
     GGobiDisplayDescription* dpy;
     n = g_list_length(gdesc->displays);
-    for(i = 0; i < n ; i++) {    
-	dpy = (GGobiDisplayDescription*) g_list_nth_data(gdesc->displays, i);
-        createDisplayFromDescription(gg, dpy);
+    for (i = 0; i < n ; i++) {    
+      dpy = (GGobiDisplayDescription*) g_list_nth_data(gdesc->displays, i);
+      createDisplayFromDescription(gg, dpy);
     }
-   } 
+  } 
 }
 
 /*
@@ -874,6 +885,7 @@ create_ggobi(InputDescription *desc)
 void
 show_plugin_list(void *garbage, gint action, GtkWidget *w)
 {
+  extern GtkWidget * showPluginInfo (GList *plugins);
   showPluginInfo(sessionOptions->info->plugins);
 }
 

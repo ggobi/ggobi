@@ -139,6 +139,8 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
       }
     }
     break;
+    case unknown_display_type:
+    break;
   }
 
   return ncols;

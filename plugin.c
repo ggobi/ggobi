@@ -100,7 +100,8 @@ showPluginInfo(GList *plugins)
   gtk_widget_show(main_vbox);
 
 
-  list = gtk_clist_new_with_titles(sizeof(titles)/sizeof(titles[0]), titles);
+  list = gtk_clist_new_with_titles(sizeof(titles)/sizeof(titles[0]),
+    (gchar **) titles);
 
   gtk_clist_set_column_width(GTK_CLIST(list), 0, 100); 
   gtk_clist_set_column_width(GTK_CLIST(list), 1, 225); 

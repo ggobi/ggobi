@@ -158,7 +158,8 @@ cpanel_ctour_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (tourcorr_reinit_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
+    box, false, false, 1);
 
 
 /*
@@ -240,7 +241,6 @@ cpanel_ctour_make (ggobid *gg) {
 /*----------------------------------------------------------------------*/
 
 /*
-
 The following are considered advanced features for now:
   history
 */
@@ -261,17 +261,12 @@ ctouradv_window_open (void) {
     vbox = gtk_vbox_new (false, 2);
     gtk_container_add (GTK_CONTAINER (window), vbox);
     
-
-/*
- * tour history functions
-*/
+    /*-- tour history functions --*/
     frame = gtk_frame_new ("History");
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 0);
 
-/*
- * Close button
-*/
+    /*-- Close button --*/
     btn = gtk_button_new_with_label ("Close");
     gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
                    GTK_SIGNAL_FUNC (hide_cb), (GtkObject*) window);

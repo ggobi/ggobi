@@ -483,8 +483,8 @@ static void tour1dadv_window_open (ggobid *gg) {
 
 /*-- called from the Options menu --*/
 void tour1d_io_cb (GtkWidget *w, gpointer *cbd) {
-  gchar *lbl = (gchar *) cbd;
 /*
+  gchar *lbl = (gchar *) cbd;
   g_printerr ("cbd: %s\n", lbl);
 */
 }
