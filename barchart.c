@@ -157,10 +157,14 @@ createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d,
    * appropriate event handler for the ruler.
    */
   display->hrule = gtk_ext_hruler_new();
+#ifndef GTK_2_0
   gtk_signal_connect_object(GTK_OBJECT(sp->da), "motion_notify_event",
-                            (GtkSignalFunc) EVENT_METHOD(display->hrule,
-                                                         motion_notify_event),
-                            GTK_OBJECT(display->hrule));
+    (GtkSignalFunc) EVENT_METHOD(display->hrule, motion_notify_event),
+    GTK_OBJECT(display->hrule));
+#else
+  display->hrule = gtk_hruler_new ();
+   /* What about the events above. */
+#endif
 
   gtk_table_attach(GTK_TABLE(table),
                    display->hrule, 1, 2, 1, 2,
@@ -174,11 +178,15 @@ createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d,
    * appropriate event handler for the ruler.
    */
   display->vrule = gtk_ext_vruler_new();
+#ifndef GTK_2_0
   gtk_signal_connect_object(GTK_OBJECT(sp->da),
-                            "motion_notify_event",
-                            (GtkSignalFunc) EVENT_METHOD(display->vrule,
-                                                         motion_notify_event),
-                            GTK_OBJECT(display->vrule));
+    "motion_notify_event",
+    (GtkSignalFunc) EVENT_METHOD(display->vrule, motion_notify_event),
+    GTK_OBJECT(display->vrule));
+#else
+  display->vrule = gtk_vruler_new ();
+   /* What about the events above. */
+#endif
 
   gtk_table_attach(GTK_TABLE(table),
                    display->vrule, 0, 1, 0, 1,
