@@ -41,7 +41,7 @@ The authors can be contacted at the following email addresses:
 
 static gchar msg[1024];
 static gfloat ppindx_mat[100]; /* needs to be global for easy
-				  initialization/clearing */
+                                  initialization/clearing */
 static gint ppindx_count;
 static gfloat indx_min, indx_max;
 
@@ -166,7 +166,7 @@ void distance (array_f *pdata, gint i, gfloat *dist)
   { dist[j]  = 0;
     for (k=0; k<pdata->ncols; k++)
       dist[j] += (pdata->vals[i][k] - pdata->vals[j][k])
-	        *(pdata->vals[i][k] - pdata->vals[j][k]);
+            *(pdata->vals[i][k] - pdata->vals[j][k]);
   }
 }
 
@@ -186,7 +186,7 @@ void covariance (array_f *pdata, gint *index, int j, gfloat *mean, gfloat *cov)
     { *(cov+p*pdata->ncols+q) = 0.0;
       for (k=0; k<=j; k++)
       { *(cov+p*pdata->ncols+q) += (pdata->vals[index[k]][p]-mean[p])
-	                          *(pdata->vals[index[k]][q]-mean[q]);
+                              *(pdata->vals[index[k]][q]-mean[q]);
       }
       *(cov+p*pdata->ncols+q) /= j;
       *(cov+q*pdata->ncols+p) = *(cov+p*pdata->ncols+q);
@@ -247,11 +247,11 @@ gint subd (array_f *pdata, void *param, gfloat *val)
       {
         for (k = 0; k<pdata->ncols; k++) sp->mean[k] = sp->nmean[k]/(j+1);
         covariance (pdata, sp->index, j, sp->mean, sp->cov);
-	/*	printf ("cov=%f,%f,%f,%f\n", cov[0], cov[1], cov[2], cov[3]); */
+        /* printf ("cov=%f,%f,%f,%f\n", cov[0], cov[1], cov[2], cov[3]); */
         eigenvalues (sp->cov, pdata->ncols, sp->ew, matz, sp->ev, sp->fv1, sp->fv2);
-	/* printf ("ew[0]=%f ew[1]=%f\n", ew[0], ew[1]); */
+        /* printf ("ew[0]=%f ew[1]=%f\n", ew[0], ew[1]); */
         varexp = variance_explained (sp->ew, sp->dim, pdata->ncols);
-	/* printf ("varexp=%f\n", varexp); */
+        /* printf ("varexp=%f\n", varexp); */
         dimmax = (varexp>dimmax ? varexp : dimmax);
       }
     }
@@ -372,7 +372,7 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
     { for (k=0; k<=pdata->ncols; k++)
       { dp->cov[k*pdata->ncols+j] += 
         (pdata->vals[i][j]-dp->mean[j*pdata->nrows+dp->group[i]])*
-	(pdata->vals[i][k]-dp->mean[k*pdata->nrows+dp->group[i]])/
+        (pdata->vals[i][k]-dp->mean[k*pdata->nrows+dp->group[i]])/
          dp->ngroup[dp->group[i]];
       }
       dp->cov[j*pdata->ncols+k] = dp->cov[k*pdata->ncols+j];
@@ -747,7 +747,7 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
 
 /********************************************************************
 
-	                     INDEX CALCULATION
+                             INDEX CALCULATION
 
 The index function has to be defined as
 

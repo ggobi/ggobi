@@ -210,7 +210,7 @@ struct _ggobid {
 /*---------------------- touring -------------------------------------*/
 
  struct _Tour2d {
-   gint idled; 
+   gint idled;
  } tour2d;
 
  struct _Tour1d {

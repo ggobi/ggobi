@@ -11,7 +11,12 @@
 <variables count="3">
  <realvariable name="avgusage" />
  <realvariable name="fraudp" />
- <realvariable name="bizres" />
+ <categoricalvariable name="bizres"
+   <levels count="2">
+     <level value="0"> false </level>
+     <level value="1"> true </level>
+   </levels>
+ </categoricalvariable>
 </variables>
 <records  count="5">
  <record id="0">  8 0 0  </record>

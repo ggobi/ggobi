@@ -21,11 +21,12 @@ Bugs:
    fixed and is not scaled and points enter the region but are
    not "brushed."
 
-  is adding and removing plots in scatmat still problematic?
+  It's no longer possible to read an ascii file that doesn't
+    have the .dat suffix -- I regard this as a bug.
 
-If a new datad is added, the transformation, jittering, and 
-  brush_by_variable tools are not going to show it in their
-  notebooks.
+  If a new datad is added, the transformation, jittering, and 
+    brush_by_variable tools are not going to show it in their
+    notebooks.
 
 Reading in new data
   add an option:  add a new datad or replace an existing one

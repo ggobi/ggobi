@@ -491,10 +491,13 @@ symmetric, and that constraint affects its variable selection behavior.
 \item Replace:  First select one of the plots along the diagonal
   to tell ggobi uniquely which variable to replace, then click on
   one of the checkboxes in the variable selection region.
-\item Insert (Append):  First select one of the plots along the
-  diagonal to tell ggobi uniquely where to insert (append) the new
-  variable, then click on one of the variable checkboxes.  (GGobi will
+\item Insert:  First select one of the plots along the
+  diagonal to tell ggobi uniquely where to insert the new plot,
+  then click on one of the variable checkboxes.  (GGobi will
   not add a variable that's already plotted.)
+\item Append:  Click on one of the variable checkboxes to append
+  a new plot after all other plots.  (GGobi will not add a variable
+  that's already plotted.)
 \item Delete:  No plot selection is required; just click on the
   variable you want to delete.
 \end{itemize}
@@ -519,10 +522,13 @@ The variable selection behavior works as follows:
 \begin{itemize}
 \item Replace:  First select one of the plots, then click on one
   of the variable checkboxes to replace its plotted variable.
-\item Insert (Append):  First select one of the plots, then click on
-  one of the variable checkboxes to insert (append) a new plot before
-  (after) the current plot.  (GGobi will not add a variable that's
+\item Insert:  First select one of the plots, then click on
+  one of the variable checkboxes to insert a new plot before
+  the current plot.  (GGobi will not add a variable that's
   already plotted.)
+\item Append:  Click on one of the variable checkboxes to append
+  a new plot after all other plots.  (GGobi will not add a variable
+  that's already plotted.)
 \item Delete:  No plot selection is required; just click on the
   variable whose plot you want to delete.
 \end{itemize}
@@ -542,10 +548,13 @@ and the behavior of the checkboxes depends on the state of the
   plot you want to change, and then click right or middle on the
   variable you want.  (For now, ggobi won't let you use a variable
   that's already plotted.)
-\item Insert (Append):  Select a plot in the display, and then click
+\item Insert:  Select a plot in the display, and then click
   middle or right on a variable checkbox to add a new plot before
-  (after) the current plot.  (This applies to vertically plotted
+  the current plot.  (This applies to vertically plotted
   variables only.)
+\item Append:  Click on one of the variable checkboxes to append
+  a new plot after all other plots.  (GGobi will not add a variable
+  that's already plotted.)
 \item Delete: No plot selection is required; just click middle or
   right on the variable checkbox for the variable you want to
   delete.  (This applies to vertically plotted variables only.)
