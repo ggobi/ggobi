@@ -759,7 +759,15 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
 {
   gint n;
   gchar *title = NULL, *description;
-  const char *tmp = NULL, *stars;
+  const char *tmp = NULL;
+
+  /*
+     I was going to use this value to avoid displaying "(current)" when
+     there's only one display, but the value of ndisplays is almost never
+     right.  This is weird.  dfs.
+  gint ndisplays = g_list_length(gg->displays);
+  g_printerr ("ndisplays %d\n", ndisplays);
+  */
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     tmp = gtk_display_title_label(display);
@@ -774,11 +782,12 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
     description = GGOBI (getDescription)(gg);
   }
 
-  stars = current_p ? "***" : "";
-  n = strlen (tmp) + strlen (description) + 5 + (current_p ? strlen(stars)*2 : 0);
+  n = strlen (tmp) + strlen (description) + 5 +
+   (current_p ? strlen("(current)") : 0);
   title = (gchar *) g_malloc(sizeof(gchar) * n);
   memset (title, '\0', n);
-  sprintf (title, "%s: %s %s %s", description, stars, tmp, stars);
+  sprintf (title, "%s: %s %s", description, tmp,
+   (current_p ? "(current)":""));
   g_free (description);
 
   return (title);
