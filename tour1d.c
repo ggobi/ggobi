@@ -19,6 +19,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#ifdef WIN32 
+#include <windows.h>
+#endif
+
 #include "vars.h"
 #include "externs.h"
 
@@ -511,7 +515,11 @@ tour1d_run(displayd *dsp, ggobid *gg)
           }
           t1d_ppdraw(dsp->t1d.ppval, gg);
           count = 0;
+#ifndef WIN32
           sleep(2);
+#else
+          Sleep(2);
+#endif
         }
         else
         {
