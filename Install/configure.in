@@ -20,6 +20,8 @@ GGOBI_HOME=`pwd`
 
 AC_ARG_ENABLE(embed, [--enable-embed Build the ggobi library for embedding in other applications (e.g. R)])
 
+AC_ARG_ENABLE(debug, [--enable-debug Compile with debugging symbols])
+
 
 AC_ARG_WITH(prefix, [--with-prefix Specify where the files are to be installed (default /usr/local/).],INSTALL_DIR=${with_prefix},INSTALL_DIR="/usr/local")
 
@@ -232,6 +234,11 @@ AC_SUBST(MINOR_VERSION)
 AC_SUBST(PATCH_LEVEL)
 
 AC_SUBST(GTK_CONFIG)
+
+if test -n "${enable_debug}" && test "${enable_debug}" != "no" ;  then
+ SRC_DEBUG=-g
+fi
+AC_SUBST(SRC_DEBUG)
 
 SRC_CFLAGS="-I${TOP}/include"
 SRC_LIBS="-L${TOP}/lib -lggobi"
