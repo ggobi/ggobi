@@ -364,6 +364,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       if (e == NULL) {
         /*-- Initialize a new edge set --*/
         g_printerr ("Not yet initializing a new edge set\n");
+        gdk_pointer_ungrab (event->time);
         return false;
       }
 /*
@@ -382,6 +383,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
     if (d->rowIds == NULL) {
       /*-- Add rowids to d --*/
       g_printerr ("Not yet initializing new rowids\n");
+      gdk_pointer_ungrab (event->time);
       return false;
     }
     /*-- Open a dialog window to ask for label, rowId, data ... --*/
