@@ -32,7 +32,7 @@ DataMode getInputType(xmlNode *node);
 
 gboolean getLogicalPreference(xmlNodePtr node, const char *elName, gboolean defaultValue);
 
-int getPlugins(xmlDocPtr doc, GGobiInitInfo *info);
+int getPlugins(xmlDocPtr doc, GGobiInitInfo *info, gboolean single);
 GGobiPluginInfo *processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
 GGobiPluginInfo *processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
 void getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc, gboolean isLanguage);
@@ -90,7 +90,7 @@ read_init_file(const gchar *filename, GGobiInitInfo *info)
   getPreviousGGobiDisplays(doc, info);
 #if SUPPORT_PLUGINS
   info->plugins = NULL;
-  getPlugins(doc, info);
+  getPlugins(doc, info, false);
 #endif
 
 #ifndef WIN32
@@ -489,35 +489,50 @@ getLanguagePlugin(GList *plugins, const char* name)
 }
 
 
-int
-getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
+static gboolean processXMLPluginNode(xmlNodePtr el, GGobiInitInfo *info, xmlDocPtr doc)
 {
-  xmlNode *node, *el;
-  GGobiPluginInfo *plugin;
-  int count = 0;
-
-  node = getXMLDocElement(doc, "plugins");
-  if(node == NULL)  
-      return(-1);
-
-  el = XML_CHILDREN(node);
-  while(el) {
+   GGobiPluginInfo *plugin;
+   gboolean ans = true;
    if(el->type != XML_TEXT_NODE) {
      if(strcmp((char *)el->name, "plugin") == 0) {
        plugin = processPlugin(el, info, doc);
        if(plugin) {
          info->plugins = g_list_append(info->plugins, plugin);
-	 count++;
        }
      } else if(strcmp((char *)el->name, "inputPlugin") == 0) {
        GGobiPluginInfo *inputPlugin = processInputPlugin(el, info, doc);
        if(inputPlugin) {
            info->inputPlugins = g_list_append(info->inputPlugins, inputPlugin);
-	   count++;
        }
-     }
-   }
-   el = el->next;
+     } else
+        ans = false;
+   } else 
+        ans = false;
+
+   return(ans);
+}
+
+int
+getPlugins(xmlDocPtr doc, GGobiInitInfo *info, gboolean single)
+{
+  xmlNode *node, *el = NULL;
+  int count = 0;
+
+  if(single) {
+    el = getXMLDocElement(doc, "plugin");
+  } else {
+    node = getXMLDocElement(doc, "plugins");
+    if(node)
+       el = XML_CHILDREN(node);
+  }
+
+  if(el == NULL)  
+      return(-1);
+
+  while(el) {
+      if(processXMLPluginNode(el, info, doc)) 
+          count++;
+      el = el->next;
   }
 
   return(count);
@@ -1041,7 +1056,7 @@ readPluginFile(const char * const fileName, GGobiInitInfo *info)
      return(NULL);
   }
 
-  n = getPlugins(doc, sessionOptions->info);
+  n = getPlugins(doc, sessionOptions->info, true);
 
   xmlFreeDoc(doc); 
 
