@@ -495,6 +495,9 @@ display_set_current (displayd *new_display, ggobid *gg)
       case tsplot:
         submenu_destroy (gg->mode_item);
       break;
+      case unknown_display_type:
+/**/    return;
+      break;
     }
   }
 

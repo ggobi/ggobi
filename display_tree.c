@@ -174,24 +174,27 @@ gtk_signal_connect (GTK_OBJECT(tree), "select_child",
    Need to find out how to get the title from a GtkWindow.
    For now, use a string associated with the displaytype.
  */
-char *
+gchar *
 display_tree_label(displayd *display)
 {
- char *val;
+ gchar *val;
 
   switch(display->displaytype) {
     case scatterplot:
       val = "Scatterplot";
-     break;
+    break;
     case scatmat:
       val = "Scatterplot Matrix";
-     break;
+    break;
     case parcoords:
       val = "Parallel Coordinates";
-     break;
+    break;
     case tsplot:
       val = "Time Series";
-     break;
+    break;
+    case unknown_display_type:
+      val = (gchar *) NULL;
+    break;
   }
 
  return(val);
@@ -255,17 +258,19 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
       sprintf (buf, "%s v %s",
         d->vartable[splot->xyvars.x].collab,
         d->vartable[splot->xyvars.y].collab);
-     break;
+    break;
     case parcoords:
       n = strlen (d->vartable[splot->p1dvar].collab);
       buf = (gchar*) g_malloc(n* sizeof (gchar*));
       sprintf(buf, "%s", d->vartable[splot->p1dvar].collab);
-     break;
+    break;
     case tsplot:
       n = strlen (d->vartable[splot->xyvars.y].collab);
       buf = (gchar*) g_malloc(n* sizeof (gchar*));
       sprintf(buf, "%s", d->vartable[splot->xyvars.y].collab);
-     break;
+    break;
+    case unknown_display_type:
+    break;
   }
 
   return (buf);

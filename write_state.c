@@ -88,17 +88,19 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
   plots = dpy->splots;
   switch(dpy->displaytype) {
     case scatterplot:
-	add_xml_scatterplot_variables(node, plots, dpy);
-      break;
+      add_xml_scatterplot_variables(node, plots, dpy);
+    break;
     case scatmat:
-	add_xml_scatmat_variables(node, plots, dpy);
-      break;
+      add_xml_scatmat_variables(node, plots, dpy);
+    break;
     case parcoords:
-	add_xml_parcoords_variables(node, plots, dpy);
-      break;
+      add_xml_parcoords_variables(node, plots, dpy);
+    break;
     case tsplot:
-	add_xml_tsplot_variables(node, plots, dpy);
-      break;
+      add_xml_tsplot_variables(node, plots, dpy);
+    break;
+    case unknown_display_type:
+    break;
   }
 
  return(node);

@@ -124,9 +124,19 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
         case COTOUR:
           tourcorr_varsel (jvar, btn, d, gg);
         break;
-        default:
+        /*-- to pacify compiler if we change these to an enum --*/
+        case ROTATE:
+        case SCALE:
+        case BRUSH:
+        case IDENT:
+        case EDGEED:
+        case MOVEPTS:
+        case SCATMAT:
+        case PCPLOT:
+        case TSPLOT:
         break;
     }
+    case unknown_display_type:
     break;
   }
 
@@ -222,9 +232,22 @@ varpanel_refresh (ggobid *gg) {
                   varpanel_checkbutton_set_active (j,
                     (j == sp->xyvars.x || j == sp->xyvars.y), d);
               break;
-              default:
+              /*-- to pacify compiler if we change these to an enum --*/
+              case TOUR2D:
+              case TOUR1D:
+              case COTOUR:
+              case ROTATE:
+              case SCALE:
+              case BRUSH:
+              case IDENT:
+              case EDGEED:
+              case MOVEPTS:
+              case SCATMAT:
+              case PCPLOT:
+              case TSPLOT:
               break;
           }
+          case unknown_display_type:
           break;
         }
       }
@@ -496,9 +519,19 @@ varpanel_tooltips_set (ggobid *gg)
                 "Click to select a variable to be available for touring",
                 NULL);
             break;
-            default:
+            /*-- to pacify compiler if we change these to an enum --*/
+            case ROTATE:
+            case SCALE:
+            case BRUSH:
+            case IDENT:
+            case EDGEED:
+            case MOVEPTS:
+            case SCATMAT:
+            case PCPLOT:
+            case TSPLOT:
             break;
         }
+        case unknown_display_type:
         break;
       }
     }

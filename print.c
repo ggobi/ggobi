@@ -3,6 +3,7 @@
 #include <gtk/gtk.h>
 #include <gtk/gtkdialog.h>
 
+#include <string.h>
 
 
 #if 0
