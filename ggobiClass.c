@@ -445,6 +445,11 @@ gtk_splot_init(splotd * sp)
 /*sp->tour1d.firsttime = true; *//* Ensure that the 1D tour should be initialized. */
 }
 
+/* In a version of a Gtk on my (DTL) Mac, there is no definition for GTK_TYPE_DRAWING_AREA */
+#ifndef GTK_TYPE_DRAWING_AREA
+#define GTK_TYPE_DRAWING_AREA gtk_drawing_area_get_type
+#endif
+
 static void
 splotDestroy(GtkObject *obj)
 {
