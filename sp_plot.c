@@ -150,10 +150,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
 
-#ifdef WIN32  /*-- draw hiddens somehow --*/
-/*
-        win32_draw_to_pixmap_unbinned (current_color, sp, gg);
-*/
+#ifdef WIN32
+      win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
 #else
 
       if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
@@ -190,7 +188,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
 
 #ifdef WIN32
-        win32_draw_to_pixmap_unbinned (current_color, sp, gg);
+        win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
 #else
 
         if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
@@ -323,10 +321,9 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
 
-#ifdef WIN32  /*-- XXX  --*/
-/*
-      win32_draw_to_pixmap_binned (bin0, bin1, current_color, sp, gg);
-*/
+#ifdef WIN32
+      win32_draw_to_pixmap_binned (bin0, bin1, current_color, sp,
+        draw_hidden, gg);
 #else
       for (ih=bin0->x; ih<=bin1->x; ih++) {
         for (iv=bin0->y; iv<=bin1->y; iv++) {
@@ -365,7 +362,8 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
 
 #ifdef WIN32
-        win32_draw_to_pixmap_binned (bin0, bin1, current_color, sp, gg);
+        win32_draw_to_pixmap_binned (bin0, bin1, current_color,
+          sp, draw_hidden, gg);
 #else
 
         for (ih=bin0->x; ih<=bin1->x; ih++) {

@@ -689,8 +689,8 @@ displayd *barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, dat
 
 
 #ifdef WIN32
-void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
-void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
+void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, gboolean draw_hidden, ggobid *gg);
+void win32_draw_to_pixmap_unbinned (gint, splotd *, gboolean draw_hidden, ggobid *gg);
 void win32_drawing_arrays_free (splotd *sp);
 #endif
 
