@@ -1,5 +1,7 @@
 #include <gtk/gtk.h>
+
 #include "vars.h"
+#include "externs.h"
 
 /*
  * Batched drawing:   I may need to continue drawing this
@@ -202,18 +204,20 @@ build_glyph (glyphv *gl, icoords *xypos, gint jpos,
 }
 
 void
-build_whisker_segs (gint j, splotd *sp) {
+build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp) {
   gint n = 2*j;
 
-  whisker_segs[n].x1 = sp->whiskers[n].x1;
-  whisker_segs[n].y1 = sp->whiskers[n].y1;
-  whisker_segs[n].x2 = sp->whiskers[n].x2;
-  whisker_segs[n].y2 = sp->whiskers[n].y2;
+  whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
+  whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
+  whisker_segs[*nwhisker_segs].x2 = sp->whiskers[n].x2;
+  whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
   n++;
-  whisker_segs[n].x1 = sp->whiskers[n].x1;
-  whisker_segs[n].y1 = sp->whiskers[n].y1;
-  whisker_segs[n].x2 = sp->whiskers[n].x2;
-  whisker_segs[n].y2 = sp->whiskers[n].y2;
+  *nwhisker_segs += 1;
+  whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
+  whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
+  whisker_segs[*nwhisker_segs].x2 = sp->whiskers[n].x2;
+  whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
+  *nwhisker_segs += 1;
 }
 
 void
@@ -274,13 +278,13 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
         if (display->displaytype == parcoords &&
             display->options.edges_show_p)
         {
-          build_whisker_segs (m, sp);
-          nwhisker_segs += 2;
+          build_whisker_segs (m, &nwhisker_segs, sp);
         }
       }
     }
   }
-  gdk_draw_segments (sp->pixmap0, gg->plot_GC, whisker_segs, nwhisker_segs);
+  if (nwhisker_segs)
+    gdk_draw_segments (sp->pixmap0, gg->plot_GC, whisker_segs, nwhisker_segs);
   draw_glyphs (sp->pixmap0,
     points, npt,           segs, nseg,
     open_rects, nr_open,   filled_rects, nr_filled,
@@ -311,8 +315,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
             open_arcs, &nc_open,    filled_arcs, &nc_filled);
 
           if (display->displaytype == parcoords) {
-            build_whisker_segs (j, sp);
-            nwhisker_segs += 2;
+            build_whisker_segs (j, &nwhisker_segs, sp);
           }
         }
       }

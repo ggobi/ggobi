@@ -156,9 +156,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   gint npoint_colors_used = 0;
   gushort point_colors_used[NCOLORS+2];
   GtkWidget *da = sp->da;
+#ifndef _WIN32
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   gboolean draw_case;
+#endif
 
   if (gg->plot_GC == NULL)
     init_plot_GC (sp->pixmap0, gg);
