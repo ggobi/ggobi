@@ -210,10 +210,41 @@ binning_permitted (displayd *display, ggobid *gg)
 }
 
 void
+brush_once_and_redraw (splotd *sp, displayd *display, ggobid *gg) 
+{
+  cpaneld *cpanel = &display->cpanel;
+  gboolean changed = false;
+
+  if (cpanel->brush_on_p) {
+    changed = brush_once (false, sp, gg);
+
+    if (!binning_permitted (display, gg)) {
+      splot_redraw (sp, FULL, gg);  
+      if (gg->brush.updateAlways_p)
+        displays_plot (sp, FULL, gg);  
+
+    } else {  /*-- if we can get away with binning --*/
+
+      if (changed) {
+        splot_redraw (sp, BINNED, gg);
+
+        if (gg->brush.updateAlways_p)
+          displays_plot (sp, FULL, gg);
+
+      } else {  /*-- just redraw the brush --*/
+        splot_redraw (sp, QUICK, gg);  
+      }
+    }
+
+  } else {  /*-- we're not brushing, and we just need to redraw the brush --*/
+    splot_redraw (sp, QUICK, gg);
+  }
+}
+
+void
 brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   cpaneld *cpanel, splotd *sp, ggobid *gg)
 {
-  gboolean changed = false;
   displayd *display = sp->displayptr;
   brush_coords *brush_pos = &sp->brush_pos;
 
@@ -244,31 +275,7 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
     brush_pos->y2 = mouse->y ;
   }
 
-
-  if (cpanel->brush_on_p) {
-    changed = brush_once (false, sp, gg);
-
-    if (!binning_permitted (display, gg)) {
-      splot_redraw (sp, FULL, gg);  
-      if (gg->brush.updateAlways_p)
-        displays_plot (sp, FULL, gg);  
-
-    } else {  /*-- if we can get away with binning --*/
-
-      if (changed) {
-        splot_redraw (sp, BINNED, gg);
-
-        if (gg->brush.updateAlways_p)
-          displays_plot (sp, FULL, gg);
-
-      } else {  /*-- just redraw the brush --*/
-        splot_redraw (sp, QUICK, gg);  
-      }
-    }
-
-  } else {  /*-- we're not brushing, and we just need to redraw the brush --*/
-    splot_redraw (sp, QUICK, gg);
-  }
+  brush_once_and_redraw (sp, display, gg);
 }
 
 
