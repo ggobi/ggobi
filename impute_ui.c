@@ -99,9 +99,7 @@ impute_window_open (ggobid *gg)
     vbox = gtk_vbox_new (false, 2);
     gtk_container_add (GTK_CONTAINER (gg->impute.window), vbox);
 
-/*-- experimenting with initiating a new datad for missings --*/
-#ifdef GENERATE_MISSINGS_DATAD
-
+    /*-- add a button to generate a new datad --*/
     btn = gtk_button_new_with_label ("Add missings as new dataset");
     gtk_signal_connect (GTK_OBJECT (btn),
                         "clicked",
@@ -111,8 +109,6 @@ impute_window_open (ggobid *gg)
       "Generate a new dataset representing the missingness information",
       NULL);
     gtk_box_pack_start (GTK_BOX (vbox), btn, true, true, 2);
-
-#endif
 
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox,
