@@ -10,8 +10,6 @@
 #define HEIGHT 200
 #define MAXNVARS 4   /* only used to set up the initial matrix */
 
-static GtkAccelGroup *scatmat_accel_group;
-
 static GtkItemFactoryEntry menu_items[] = {
   { "/_FFile",         NULL,     NULL,     0,                    "<Branch>" },
   { "/FFile/Print",    "",       (GtkItemFactoryCallback) display_print_cb, 0, "<Item>" },
@@ -95,8 +93,15 @@ scatmat_new (gboolean missing_p,
   gint scatmat_nrows, scatmat_ncols;
   splotd *sp;
   displayd *display;
+  GtkAccelGroup *scatmat_accel_group;
 
   display = display_alloc_init (scatmat, missing_p, d, gg);
+  /* If the caller didn't specify the rows and columns, 
+     use the default which is the number of variables
+     in the dataset or the maximum number of columns
+     within a scatterplot matrix.
+     ! Need to check rows and cols are allocated. !
+   */
   if (numRows == 0 || numCols == 0) {
     scatmat_nrows = scatmat_ncols = MIN (d->ncols, MAXNVARS);
     for (j=0; j<scatmat_nrows; j++)
@@ -486,6 +491,88 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
   }
 
   return redraw;
+}
+
+
+/**
+  This creates the scatter matrix window contents using static
+  variables within this file.
+
+  The corresponding code in scatmat_new should be deprecated and
+  that routine should be made to call this one.
+ */
+gint *
+createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gboolean useWindow)
+{
+  GtkWidget *vbox, *frame;
+  GtkWidget *mbar;
+  gint width, height;
+  gint scr_width, scr_height;
+  gint scatmat_nrows=1, scatmat_ncols=1; /* Not used really! */
+  GtkAccelGroup *scatmat_accel_group;
+  gint *dims = NULL;
+
+
+  display->p1d_orientation = HORIZONTAL;
+
+  scatmat_cpanel_init (&display->cpanel, gg);
+
+  if(useWindow) {
+    display_window_init (display, 5, gg);
+
+
+/*
+ * Add the main menu bar
+*/
+  vbox = gtk_vbox_new (FALSE, 1);
+  gtk_container_border_width (GTK_CONTAINER (vbox), 1);
+  gtk_container_add (GTK_CONTAINER (display->window), vbox);
+
+  scatmat_accel_group = gtk_accel_group_new ();
+  get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
+                 scatmat_accel_group, display->window, &mbar,
+                 (gpointer) display);
+  /*
+   * After creating the menubar, and populating the file menu,
+   * add the Display Options and Link menus another way
+  */
+  scatmat_display_menus_make (display, scatmat_accel_group,
+                               (GtkSignalFunc) display_options_cb, mbar, gg);
+  gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+
+/*
+ * splots in a table 
+*/
+  frame = gtk_frame_new (NULL);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 3);
+  gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 1);
+
+  gtk_widget_show (frame);
+  }
+  /*
+   * make the matrix take up no more than some fraction
+   * the screen by default, and make the plots square.
+  */
+  scr_width = gdk_screen_width () / 2;
+  scr_height = gdk_screen_height () / 2;
+  width = (WIDTH * scatmat_ncols > scr_width) ?
+    (scr_width / scatmat_ncols) : WIDTH;
+  height = (HEIGHT * scatmat_nrows > scr_height) ?
+    (scr_height / scatmat_nrows) : HEIGHT;
+  width = height = MIN (width, height);
+  /* */
+
+  display->table = gtk_table_new (nrows, ncols, false);
+  if(useWindow)
+    gtk_container_add (GTK_CONTAINER (frame), display->table);
+
+
+  dims = (gint *) g_malloc(sizeof(gint) * 2);
+  dims[0] = width;
+  dims[1] = height;
+
+  return(dims);
 }
 
 
