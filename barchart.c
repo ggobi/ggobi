@@ -446,8 +446,9 @@ void barchart_allocate_structure (splotd *sp, datad *d) {
   vartabled *vtx;
   gint i, nbins;
   ggobid *gg = GGobiFromSPlot(sp);
-  vtx = vartable_element_get (sp->p1dvar, d);
   colorschemed *scheme = gg->activeColorScheme;
+
+  vtx = vartable_element_get (sp->p1dvar, d);
 
   if (sp->bar->new_nbins < 0) {
     if (vtx->categorical_p) {
