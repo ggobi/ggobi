@@ -12,8 +12,9 @@ MV=@MV@
 
 LO_DIR=@LO_DIR@
 
-@c_rules_frag@
-
 %.o: %.c
 	$(CC) $(CFLAGS) $(OTHER_CFLAGS) -c $< -o $@
+
+@c_rules_frag@
+
 

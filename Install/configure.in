@@ -69,8 +69,15 @@ if test "${GCC}" = "yes" ; then
 
 
 cat << \EOF > ${c_rules_frag}
-%.lo: %.c
+%.o: %.c
 	$(CC) $(CFLAGS) $(OTHER_FLAGS) -c $< -o $@
+
+# Just copy the .o to .lo since the .o is position independent
+# and relocatable by default with gcc.
+# (Could be a symbolic link also)
+%.lo: %.o
+	cp $*.o $@
+
 EOF
 else
    dnl assume Solari's cc compiler

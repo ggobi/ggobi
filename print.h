@@ -100,7 +100,7 @@ GtkWidget *
 createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintDialogHandler print, void *userData);
 
 void setStandardPrintHandlers();
-PrintOptions *getDefaultPrintOptions();
+PrintOptions *getDefaultPrintOptions(PrintOptions *opts);
 
 gboolean PrintAsSVG(PrintOptions *options, PrintInfo *info, void *userData);
 #endif

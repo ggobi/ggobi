@@ -166,7 +166,7 @@ display_print_cb (displayd *display, guint action, GtkWidget *w)
   gg = display->ggobi;
 
   if(gg->printOptions == NULL) {
-    gg->printOptions = getDefaultPrintOptions();
+    gg->printOptions = getDefaultPrintOptions(NULL);
   }
 
   if(DefaultPrintHandler.callback)

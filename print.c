@@ -73,9 +73,12 @@ handlePrintOptions(GtkButton *button, PrintInfo *info)
   PrintOptions localOptions;
   PrintOptions *opts;
 
-  opts =  (info->handler != NULL) ? &localOptions : info->ggobi->printOptions ;
+  opts =  (info->handler == NULL) ? &localOptions : info->ggobi->printOptions ;
 
-    /* Get the settings from the dialog elements. */    
+    /* Get the settings from the dialog elements. 
+       For the moment, just grab them from the defaults.
+     */    
+  getDefaultPrintOptions(opts);
 
   if(info->handler) {
     ok = info->handler(opts, info, info->userData);
@@ -147,18 +150,23 @@ PrintAsSVG(PrintOptions *options, PrintInfo *info, void *userData)
 void 
 setStandardPrintHandlers()
 {
- DefaultPrintHandler.callback = &showPrintDialog;
- DefaultPrintHandler.dialog = PrintAsSVG;
- DefaultPrintHandler.userData = NULL;
+  if(DefaultPrintHandler.callback == NULL && DefaultPrintHandler.dialog == NULL) {
+   DefaultPrintHandler.userData = NULL;
+  }
+  if(DefaultPrintHandler.callback == NULL)
+   DefaultPrintHandler.callback = &showPrintDialog;
+  if(DefaultPrintHandler.dialog == NULL)
+    DefaultPrintHandler.dialog = PrintAsSVG;
 }
 
 
 PrintOptions*
-getDefaultPrintOptions()
+getDefaultPrintOptions(PrintOptions *opts)
 {
  GdkColor black, white;
 
- PrintOptions *opts = (PrintOptions *) g_malloc(sizeof(PrintOptions));
+ if(opts == NULL)
+   opts = (PrintOptions *) g_malloc(sizeof(PrintOptions));
 
  opts->width = 480;
  opts->height = 400;
