@@ -6,6 +6,8 @@
 #define STRESSPLOT_WIDTH  250
 #define STRESSPLOT_HEIGHT 100
 #define STRESSPLOT_MARGIN  10
+#define NSTRESSVALUES    1000
+#define STRESSPLOT_MARGIN  10
 
 #define HISTOGRAM_WIDTH  250
 #define HISTOGRAM_HEIGHT 100
@@ -35,7 +37,11 @@ typedef struct {
   array_d Dtarget;  /*-- D in the documentation; dist in the xgvis code --*/
   array_d pos;
 
+  GtkWidget *stressplot_da;
   GdkPixmap *stressplot_pix;
+  vector_d stressvalues;  /*-- allocated to hold NSTRESSVALUES values --*/
+  gint nstressvalues;     /*-- the number of stress values */
+
   GdkPixmap *histogram_pix;
 
   gint mds_dims;
@@ -117,7 +123,7 @@ void ggv_weight_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_center_scale_pos (ggvisd *ggv);
 
 void mds_func (gboolean, PluginInstance *);
-void mds_once (gboolean doit, ggvisd *ggv);
+void mds_once (gboolean doit, ggvisd *ggv, ggobid *gg);
 
 #define GGVIS_H
 #endif

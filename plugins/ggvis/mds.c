@@ -21,7 +21,7 @@
 #include "ggvis.h"
 
 extern void add_stress_value (gdouble, ggvisd *);  /* in stressplot.c */
-extern void draw_stress (void);
+extern void draw_stress (ggvisd *ggv, ggobid *gg);
 /*extern void update_shepard_labels (gint);*/
 extern void Myqsort(void* bot, int nmemb, int size, CompareFunc compar);
    /* in ggv_qsort.c */
@@ -267,7 +267,7 @@ set_random_selection (ggvisd *ggv)
 
 
 void
-update_stress (ggvisd *ggv)
+update_stress (ggvisd *ggv, ggobid *gg)
 {
   gint i, j;
   gdouble this_weight, dist_config, dist_trans;
@@ -296,10 +296,10 @@ update_stress (ggvisd *ggv)
       stress = pow( 1.0 - stress_dx * stress_dx / stress_xx / stress_dd, 0.5);
 g_printerr ("stress: %3.3f\n", stress);
       add_stress_value (stress, ggv);
-      draw_stress ();
+      draw_stress (ggv, gg);
     } else {
-      printf ("didn't draw stress: stress_dx = %5.5g   stress_dd = %5.5g   stress_xx = %5.5g\n",
-             stress_dx, stress_dd, stress_xx);
+      g_printerr ("didn't draw stress: stress_dx = %5.5g   stress_dd = %5.5g   stress_xx = %5.5g\n",
+        stress_dx, stress_dd, stress_xx);
     }
 } /* end update_stress() */
 
@@ -552,7 +552,7 @@ mds_idle_func (PluginInstance *inst)
   gboolean doit = ggv->mds_running;
 
   if (doit) {
-    mds_once (true, ggv);
+    mds_once (true, ggv, gg);
     update_ggobi (ggv, gg);
   }
 
@@ -588,7 +588,7 @@ void mds_func (gboolean state, PluginInstance *inst)
  * stress function without doing anything to the gradient
 */
 void
-mds_once (gboolean doit, ggvisd *ggv)
+mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
 {
   gint num_active_dist_prev = ggv->num_active_dist;
   gdouble dist_config, dist_trans, resid, weight;
@@ -757,7 +757,6 @@ mds_once (gboolean doit, ggvisd *ggv)
   /* ------------ end collecting active dissimilarities ------------------ */
 
 
-g_printerr ("num_active_dist: %d\n", ggv->num_active_dist);
   /* ---------- for active dissimilarities, do some work ------------------ */ 
   if (ggv->num_active_dist > 0) {
     /*-- power transform for metric MDS; isotonic transform for nonmetric --*/
@@ -766,7 +765,7 @@ g_printerr ("num_active_dist: %d\n", ggv->num_active_dist);
     else
       isotonic_transform (ggv);
     /*-- stress (always lags behind gradient by one step) --*/
-    update_stress (ggv);
+    update_stress (ggv, gg);
   }
 
   /* --- for active dissimilarities, do the gradient push if asked for ----*/
@@ -875,12 +874,6 @@ g_printerr ("num_active_dist: %d\n", ggv->num_active_dist);
         }
       }
     }
-
-for (i=0; i<ggv->pos.nrows; i++) {
- for (k=0; k<ggv->mds_dims; k++) {
-  g_printerr ("%d,%d  %2.3f\n", i, k, ggv->gradient.vals[i][k]); 
- }
-}
 
     /* gradient normalizing factor to scale gradient to a fraction of
        the size of the configuration */

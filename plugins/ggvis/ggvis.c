@@ -306,15 +306,15 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
   gtk_container_add (GTK_CONTAINER(frame), vb);
 
-  da = gtk_drawing_area_new ();
-  gtk_drawing_area_size (GTK_DRAWING_AREA (da),
+  ggv->stressplot_da = gtk_drawing_area_new ();
+  gtk_drawing_area_size (GTK_DRAWING_AREA (ggv->stressplot_da),
     STRESSPLOT_WIDTH, STRESSPLOT_HEIGHT);
-  gtk_signal_connect (GTK_OBJECT (da), "expose_event",
+  gtk_signal_connect (GTK_OBJECT (ggv->stressplot_da), "expose_event",
     GTK_SIGNAL_FUNC(ggv_stressplot_expose_cb), inst);
-  gtk_signal_connect (GTK_OBJECT (da), "configure_event",
+  gtk_signal_connect (GTK_OBJECT (ggv->stressplot_da), "configure_event",
     GTK_SIGNAL_FUNC(ggv_stressplot_configure_cb), inst);
-  gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
-  gtk_box_pack_start (GTK_BOX (vb), da, true, true, 2);
+  gtk_widget_set_events (ggv->stressplot_da, GDK_EXPOSURE_MASK);
+  gtk_box_pack_start (GTK_BOX (vb), ggv->stressplot_da, true, true, 2);
 
 
   /*-- MDS parameters that should stay in view at all times --*/

@@ -367,7 +367,16 @@ void mds_step_cb (GtkToggleButton *btn, PluginInstance *inst)
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
 
-  mds_once (true, ggv);
+  if (ggv->Dtarget.nrows == 0) {
+    quick_message ("I can't identify a distance matrix", false);
+    return;
+  }
+  if (!ggv->dpos) {
+    /*-- initialize, allocate and populate dpos --*/
+    ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, ggv, gg);
+    ggv_pos_init (ggv);
+  }
+  mds_once (true, ggv, gg);
   update_ggobi (ggv, gg);
 }
 void mds_reinit_cb (GtkToggleButton *btn, PluginInstance *inst)
@@ -375,6 +384,15 @@ void mds_reinit_cb (GtkToggleButton *btn, PluginInstance *inst)
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
 
+  if (ggv->Dtarget.nrows == 0) {
+    quick_message ("I can't identify a distance matrix", false);
+    return;
+  }
+  if (!ggv->dpos) {
+    /*-- initialize, allocate and populate dpos --*/
+    ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, ggv, gg);
+    ggv_pos_init (ggv);
+  }
   ggv_scramble (ggv, gg);
   update_ggobi (ggv, gg);
 }

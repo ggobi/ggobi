@@ -23,6 +23,10 @@ ggvis_init (ggvisd *ggv)
   arrayd_init_null (&ggv->pos);
 
   ggv->stressplot_pix = NULL;
+  ggv->nstressvalues = 0;
+  vectord_init_null (&ggv->stressvalues);
+  vectord_alloc (&ggv->stressvalues, NSTRESSVALUES);
+
   ggv->histogram_pix = NULL;
 
   ggv->mds_dims = 3;
