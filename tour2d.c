@@ -220,6 +220,10 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   dsp->t2d.idled = 0;
   dsp->t2d.get_new_target = true;
 
+  /* manip */
+  dsp->t2d_manip_mode = MANIP_OBLIQUE;
+  dsp->t2d_manip_var = 0;
+
   /* pp */
   dsp->t2d.target_basis_method = 0;
   dsp->t2d_ppda = NULL;

@@ -193,6 +193,9 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
   dsp->t1d.idled = 0;
   dsp->t1d.get_new_target = true;
 
+  /* manip */
+  dsp->t1d_manip_var = 0;
+
   /* pp */
   dsp->t1d.target_basis_method = 0;
   dsp->t1d_ppda = NULL;
