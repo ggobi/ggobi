@@ -161,6 +161,9 @@ display_tour_init (displayd *dsp, ggobid *gg) {
   zero_tau(dsp, gg);
   dsp->delta = 0.0;
   dsp->dv = 1.0;
+
+  dsp->tour_idled = 0;
+  dsp->tour_get_new_target = true;
 }
 
 void
@@ -606,14 +609,18 @@ check_tour (displayd *dsp, cpaneld *cpanel)
 void
 run_tour (displayd *dsp, ggobid *gg)
 {
+  datad *d = dsp->d;
+
+  extern void tour_draw_circles(datad *, ggobid *);
   cpaneld *cpanel = &dsp->cpanel;
 
 /*
  * This controls the tour, effectively. It checks if we are at the end of 
  * the current path, if not then increments the tour a step.
 */
-  if (check_tour (dsp, cpanel)) {
+  if (!dsp->tour_get_new_target && check_tour (dsp, cpanel)) {
     increment_tour (dsp, gg);
+    tour_draw_circles(d, gg);
   }
 /*
  * Calculation of new path for various different modes.
@@ -622,8 +629,11 @@ run_tour (displayd *dsp, ggobid *gg)
 /*
  * Do a final projection into the ending plane if just finished a tour
 */
-      do_last_increment (dsp, cpanel, gg);
+      if (!dsp->tour_get_new_target)
+        do_last_increment (dsp, cpanel, gg);
       determine_endbasis_and_path (dsp, cpanel, gg);
+      dsp->tour_get_new_target = false;
+      tour_draw_circles(d, gg);
   }
 }
 
@@ -666,15 +676,48 @@ tour_idle_func (ggobid *gg)
   return (doit);
 }
 
-static gint idled = 0;  /*-- could be at display level --*/
+void speed_set (gint slidepos, ggobid *gg) {
+
+  displayd *dsp = gg->current_display; 
+  cpaneld *cpanel = &dsp->cpanel;
+
+  if (slidepos < 5)
+  {
+    /*   cpanel->is_tour_paused = true;*/
+    cpanel->tour_step = 0.0;
+    /* probably need to turn off thread. */
+  }
+  else
+  {
+     /*    if (!cpanel->is_tour_paused) {
+	       cpanel->tour_paused = false;
+     }*/
+
+    /*
+     * To cause tour to speed up wildly at the right of the
+     * scrollbar range.
+    */
+    if (slidepos < 80)
+      cpanel->tour_step = ((float) slidepos - 5.) / 2000. ;
+    else if ((slidepos >= 80) && (slidepos < 90))
+      cpanel->tour_step = pow((double)(slidepos-80)/100.,(double)0.9) + 0.0375;
+    else
+      cpanel->tour_step = sqrt((double)(slidepos-80)) + 0.0375;
+  }
+  dsp->delta = cpanel->tour_step/dsp->dv;
+}
+
+/*static gint idled = 0;  *-- could be at display level --*/
 void tour_func (gboolean state, ggobid *gg)
 {
+  displayd *dsp = gg->current_display; 
+
   if (state) {
-    idled = gtk_idle_add_priority (G_PRIORITY_LOW,
+    dsp->tour_idled = gtk_idle_add_priority (G_PRIORITY_LOW,
                                    (GtkFunction) tour_idle_func, gg);
     gg->tour2d.idled = 1;
   } else {
-    gtk_idle_remove (idled);
+    gtk_idle_remove (dsp->tour_idled);
     gg->tour2d.idled = 0;
   }
 

@@ -69,7 +69,7 @@ extern void cluster_free (gint, datad *, ggobid *);
 extern void clusters_set (datad *, ggobid *);
 extern gboolean collabels_read (gchar *, gboolean, datad *, ggobid *);
 extern void color_table_init (ggobid *);
-extern gchar* computeTitle(displayd *display, ggobid *);
+extern gchar* computeTitle (gboolean, displayd *, ggobid *);
 extern void cpanel_brush_init (cpaneld *, ggobid *);
 extern void cpanel_brush_make (ggobid *);
 extern void cpanel_brush_set (cpaneld *, ggobid *);

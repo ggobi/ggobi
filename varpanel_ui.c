@@ -27,6 +27,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   displayd *display = (displayd *) sp->displayptr;
   gboolean redraw;
   gint jvar_prev = -1;
+  extern void tour2d_varsel (ggobid *, gint, gint);
 
   if (display == NULL || !GTK_IS_WIDGET (display->window)) {
     g_printerr ("Bug?  I see no active display\n");
@@ -52,7 +53,8 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
             redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
             break;
           case TOUR2D:
-/*            tour2d_varsel (sp, jvar, &jvar_prev, btn);*/
+            tour2d_varsel (gg, jvar, btn);
+            break;
           default:
             break;
       }
@@ -531,6 +533,7 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
   /*--  a single pixmap is shared among all variable circles --*/
   static GdkPixmap *vpixmap = NULL;
   gint r = VAR_CIRCLE_DIAM/2;
+  gint x,y;
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
   gboolean chosen = false;
@@ -594,7 +597,13 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
           } else if (jvar == sp->xyvars.y) {
             gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r, 0);
             chosen = true;
-          }
+	  }
+          break;
+        case TOUR2D:
+          x = (gint) (gg->current_display->u[0][jvar]*(float)r);
+          y = (gint) (gg->current_display->u[1][jvar]*(float)r);
+          gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r+x, r-y);
+          chosen = true;
           break;
       }
       break;
@@ -640,6 +649,14 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
   gdk_draw_pixmap (d->varpanel_ui.da[jvar]->window, gg->unselvarfg_GC,
                    vpixmap, 0, 0, 0, 0,
                    VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
+}
+
+void tour_draw_circles(datad *d, ggobid *gg)
+{
+  gint j;
+
+  for (j=0; j<-d->ncols; j++)
+    varcircle_draw(j, d, gg);
 }
 
 gboolean

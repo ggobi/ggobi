@@ -353,62 +353,62 @@ display_set_current (displayd *new_display, ggobid *gg)
   if (gg->firsttime == false &&
       isEmbeddedDisplay (gg->current_display) == false)
   {
+    title = computeTitle (false, gg->current_display, gg);
+    if (title) {
+      gtk_window_set_title (GTK_WINDOW (gg->current_display->window), title);
+      g_free (title); 
+    }
+
     switch (gg->current_display->displaytype) {
       case scatterplot:
-        gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
-          (gg->current_display->missing_p) ? "scatterplot display (missings)" :
-                                             "scatterplot display"); 
         submenu_destroy (gg->mode_item);
         break;
 
       case scatmat:
-        gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
-          (gg->current_display->missing_p) ? "scatterplot matrix (missings)" :
-                                             "scatterplot matrix"); 
         submenu_destroy (gg->mode_item);
         break;
 
       case parcoords:
-        gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
-                              "parallel coordinates display");
         submenu_destroy (gg->mode_item);
         break;
     }
   }
 
   if (isEmbeddedDisplay (new_display) == false) {
-   title = computeTitle (new_display, gg);
-   if (title) {
+    title = computeTitle (true, new_display, gg);
+    if (title) {
       gtk_window_set_title (GTK_WINDOW (new_display->window), title);   
-      g_free(title); 
-   }
+      g_free (title); 
+    }
 
-  switch (new_display->displaytype) {
-    case scatterplot:
-      scatterplot_main_menus_make (gg->main_accel_group,
+    switch (new_display->displaytype) {
+      case scatterplot:
+        scatterplot_main_menus_make (gg->main_accel_group,
+                                     (GtkSignalFunc) mode_set_cb, gg, true);
+        gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
+                                   gg->app.scatterplot_mode_menu); 
+        submenu_insert (gg->mode_item, gg->main_menubar, 2);
+        break;
+
+      case scatmat:
+        scatmat_main_menus_make (gg->main_accel_group,
+          (GtkSignalFunc) mode_set_cb, gg, true);
+        gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
+                                   gg->app.scatmat_mode_menu); 
+        submenu_insert (gg->mode_item, gg->main_menubar, 2);
+        break;
+
+      case parcoords:
+        parcoords_main_menus_make (gg->main_accel_group,
                                    (GtkSignalFunc) mode_set_cb, gg, true);
-      gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
-                                 gg->app.scatterplot_mode_menu); 
-      submenu_insert (gg->mode_item, gg->main_menubar, 2);
-      break;
-
-    case scatmat:
-      scatmat_main_menus_make (gg->main_accel_group, (GtkSignalFunc) mode_set_cb, gg, true);
-      gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
-                                 gg->app.scatmat_mode_menu); 
-      submenu_insert (gg->mode_item, gg->main_menubar, 2);
-      break;
-
-    case parcoords:
-      parcoords_main_menus_make (gg->main_accel_group, (GtkSignalFunc) mode_set_cb, gg, true);
-      gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
-                                 gg->parcoords.mode_menu); 
-      submenu_insert (gg->mode_item, gg->main_menubar, 2);
-      break;
-  }
+        gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
+                                   gg->parcoords.mode_menu); 
+        submenu_insert (gg->mode_item, gg->main_menubar, 2);
+        break;
+    }
   }
 
   gg->current_display = new_display;
@@ -426,23 +426,34 @@ display_set_current (displayd *new_display, ggobid *gg)
    Caller must free the return value.
  */
 gchar *
-computeTitle (displayd *display, ggobid *gg)
+computeTitle (gboolean current_p, displayd *display, ggobid *gg)
 {
   gint n;
   gchar *title = NULL, *description;
   const char *tmp = NULL;
 
-  switch(display->displaytype) {
+  switch (display->displaytype) {
     case scatterplot:
-       tmp = display->missing_p ?   "*** scatterplot display (missings) *** " 
-                                :   "*** scatterplot display ***";
+       if (current_p)
+         tmp = display->missing_p ?   "*** scatterplot display (missings) *** " 
+                                  :   "*** scatterplot display ***";
+       else
+         tmp = display->missing_p ?   "scatterplot display (missings) " 
+                                  :   "scatterplot display ";
       break;
     case scatmat:
-       tmp = display->missing_p ?   "*** scatterplot matrix (missings) *** " 
-                                :   "*** scatterplot matrix ***";
+      if (current_p)
+        tmp = display->missing_p ?   "*** scatterplot matrix (missings) *** " 
+                                 :   "*** scatterplot matrix ***";
+      else
+        tmp = display->missing_p ?   "scatterplot matrix (missings) " 
+                                 :   "scatterplot matrix ";
       break;
     case parcoords:
-       tmp = "*** parallel coordinates display *** " ;
+       if (current_p)
+         tmp = "*** parallel coordinates display *** " ;
+       else 
+         tmp = "parallel coordinates display " ;
       break;
   }
 
@@ -455,7 +466,7 @@ computeTitle (displayd *display, ggobid *gg)
   n = strlen (tmp) + strlen (description) + 4;
   title = (gchar *) g_malloc(sizeof(gchar) * n);
   memset (title, '\0', n);
-  sprintf (title, "%s %s", description, tmp);
+  sprintf (title, "%s: %s", description, tmp);
   g_free (description);
 
   return (title);

@@ -65,6 +65,8 @@ struct _displayd {
   gfloat **tv;
   gfloat ts[2], coss[2], sins[2];
   gint icoss[2], isins[2];
+  gint tour_idled;
+  gboolean tour_get_new_target;
 
 /*
  * Correlation Tour

@@ -8,11 +8,13 @@
 
 static void tour2dadv_window_open (ggobid *gg);
 
-void speed_set (gint speed) {
+/*void speed_set (gint speed) {
   g_printerr ("speed=%d\n", speed);
-}
-static void speed_set_cb (GtkAdjustment *adj, gpointer cbd) {
-  speed_set ((gint)adj->value);
+}*/
+static void speed_set_cb (GtkAdjustment *adj, ggobid *gg) {
+  extern void speed_set(gint, ggobid *);
+
+  speed_set ((gint)adj->value, gg);
 }
 
 /*-- not a callback, but an initialization routine for the scrollbar --*/
@@ -77,9 +79,9 @@ cpanel_tour2d_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (1.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+  adj = gtk_adjustment_new (10.0, 0.0, 100.0, 1.0, 1.0, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (speed_set_cb), NULL);
+                      GTK_SIGNAL_FUNC (speed_set_cb), (gpointer) gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
