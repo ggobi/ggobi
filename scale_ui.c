@@ -93,6 +93,7 @@ scale_click_init (splotd *sp, ggobid *gg)
       sp->mousepos.y = pos;
     break;
     default:
+    break;
   }
 }
 

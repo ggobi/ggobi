@@ -74,6 +74,7 @@ SRC=\
     sp_plot.c \
     sphere.c \
     sphere_ui.c \
+    splash.c \
     splot.c \
     subset.c \
     subset_ui.c \

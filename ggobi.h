@@ -269,8 +269,6 @@ struct _ggobid {
 
 /*---------------------- identification ------------------------------*/
 
- struct _Identify {
- } identify;
 
 /*--------------------- submenu management ---------------------------*/
 

@@ -555,8 +555,10 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
       mode_submenus_activate (sp, gg->mode, on, gg);
       procs_activate (on, display, gg);
 
-      /*-- redraw as needed for transient brushing and identify --*/
+      /*-- redraw this display --*/
       display_tailpipe (display, gg);
+
+      /*-- redraw as needed for transient brushing and identify --*/
       if (redraw_style != NONE) {
         displays_plot (sp, redraw_style, gg);
       }
@@ -656,7 +658,8 @@ static GtkItemFactoryEntry menu_items[] = {
 
 
   { "/_Help",                NULL, NULL, 0, "<LastBranch>" },
-  { "/Help/About GGobi",     NULL, NULL, 0, NULL },
+  { "/Help/About GGobi",
+       NULL, (GtkItemFactoryCallback) splash_show, NULL },
   { "/Help/About help ...",  NULL, NULL, 0, NULL },
 };
 
