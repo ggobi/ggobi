@@ -16,7 +16,6 @@ void
 initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
   gint i, k, nn;
   noded *na, *nb;
-  radiald *radial = ggv->radial;
   gint nnodes = d->nrows_in_plot;
   gint nnodessq = nnodes * nnodes;
   gint nedges = e->edge.n;
@@ -24,18 +23,18 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
   endpointsd *endpoints = e->edge.endpoints;
   gint a, b;
 
-  if (radial != NULL) {
-    nn = sizeof (radial->nodes) / sizeof (radial);
+  if (ggv->radial != NULL) {
+    nn = sizeof (ggv->radial->nodes) / sizeof (ggv->radial);
     for (i=0; i < nn; i++) {
-      g_list_free (radial->nodes[i].edges);
-      g_list_free (radial->nodes[i].connectedNodes);
+      g_list_free (ggv->radial->nodes[i].edges);
+      g_list_free (ggv->radial->nodes[i].connectedNodes);
     }
-    g_free (radial->nodes);
+    g_free (ggv->radial->nodes);
   }
 
-  radial = (radiald *) g_malloc (sizeof (radiald));
-  radial->nodes = (noded *) g_malloc (nnodes * sizeof (noded));
-  nodes = radial->nodes;
+  ggv->radial = (radiald *) g_malloc (sizeof (radiald));
+  ggv->radial->nodes = (noded *) g_malloc (nnodes * sizeof (noded));
+  nodes = ggv->radial->nodes;
 
   for (i = 0; i <d->nrows_in_plot; i++) {
     k = d->rows_in_plot[i];
@@ -44,6 +43,8 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
     nodes[k].nChildren = 0;
     nodes[k].nStepsToCenter = nnodessq;
     nodes[k].i = k;
+    nodes[k].connectedNodes = NULL;
+    nodes[k].parentNode = NULL;
 
     if (nedges <= 1) {
       nodes[k].nStepsToLeaf = 0;
@@ -69,8 +70,10 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
       if (d->sampled.els[a] && d->sampled.els[b]) {
         /*-- add b to edges for a, and vice versa --*/
         /*-- alternative:  add a pointer to the endpoints object --*/
+        /*
         na->edges = g_list_append (na->edges, GINT_TO_POINTER (b));
         nb->edges = g_list_append (nb->edges, GINT_TO_POINTER (a));
+        */
 
         /*-- add b to connectedNodes for a, and vice versa --*/
         na = &ggv->radial->nodes[a];
@@ -111,7 +114,7 @@ setParentNodes (ggvisd *ggv, datad *d) {
   gint i;
   noded *n;
 
-  noded *centerNode = &ggv->radial->centerNode;
+  noded *centerNode = ggv->radial->centerNode;
 
   centerNode->nStepsToCenter = 0;
   centerNode->parentNode = NULL;
@@ -124,7 +127,6 @@ setParentNodes (ggvisd *ggv, datad *d) {
     if (n->nStepsToCenter > ggv->radial->nStepsToCenter) {
       ggv->radial->nStepsToCenter = n->nStepsToCenter;
     }
-    g_printerr ("node %d parent %d\n", n->i, n->parentNode->i);
   }
 }
 
@@ -136,11 +138,35 @@ void setNChildren (ggvisd *ggv, datad *d)
 
   for (i=0; i<d->nrows_in_plot; i++) {
     n = &ggv->radial->nodes[i];
-    if (n->parentNode != NULL)
+    if (n->parentNode != NULL) {
       n->parentNode->nChildren++;
+    }
+  }
+
+  /*-- debug --*/
+  for (i=0; i<d->nrows_in_plot; i++) {
+    n = &ggv->radial->nodes[i];
+    g_printerr ("node %d children %d\n", n->i, n->nChildren);
   }
 }
 
+/*
+ * This is currently being computed three times; once ought
+ * to be enough.
+*/
+static void
+childNodes (GList **children, noded *n) {
+  GList *l;
+  noded *n1;
+
+  for (l = n->connectedNodes; l; l = l->next) {
+    n1 = (noded *) l->data;
+
+    if (n1->parentNode != NULL && n1->parentNode->i == n->i)
+      if (g_list_index (*children, n1) == -1)
+        *children = g_list_append (*children, n1);
+  }
+}
 
 /*
  * Once the parent node is irrevocably set (once setParentNodes and
@@ -151,18 +177,20 @@ void setNChildren (ggvisd *ggv, datad *d)
 */
 gint
 setSubtreeSize (noded *n, ggvisd *ggv, datad *d) {
-  gint i;
   noded *nchild;
+  GList *l, *children = NULL;
 
-  for (i=0; i<d->nrows_in_plot; i++) {
-    n = &ggv->radial->nodes[i];
+  childNodes (&children, n);
+
+  for (l = children; l; l = l->next) {
+    nchild = (noded *) l->data;
 
     if (nchild->nChildren == 0)
       n->subtreeSize += 1;
     else
       n->subtreeSize += setSubtreeSize (nchild, ggv, d);
   }
-  // System.out.println (n +" " + n.subtreeSize);
+  g_printerr ("node %d subtreeSize %d\n", n->i, n->subtreeSize);
   return (n->subtreeSize);
 }
 
@@ -171,11 +199,13 @@ setSubtreeSize (noded *n, ggvisd *ggv, datad *d) {
 static void
 setChildSubtreeSpans (noded *n, ggvisd *ggv, datad *d)
 {
-  gint i;
   noded *nchild;
+  GList *l, *children = NULL;
 
-  for (i=0; i<d->nrows_in_plot; i++) {
-    nchild = &ggv->radial->nodes[i];
+  childNodes (&children, n);
+
+  for (l = children; l; l = l->next) {
+    nchild = (noded *) l->data;
 
     nchild->span = n->span * nchild->subtreeSize / n->subtreeSize;
 
@@ -188,30 +218,16 @@ setChildSubtreeSpans (noded *n, ggvisd *ggv, datad *d)
 
 void
 setSubtreeSpans (ggvisd *ggv, datad *d) {
-  ggv->radial->centerNode.span = 2*M_PI;
-  setChildSubtreeSpans (&ggv->radial->centerNode, ggv, d);
+  ggv->radial->centerNode->span = 2*M_PI;
+  setChildSubtreeSpans (ggv->radial->centerNode, ggv, d);
 }
 
 /*---------------------------------------------------------------------*/
 
-static void
-childNodes (GList *l, noded *n) {
-  noded *n1;
-
-  for (l = n->connectedNodes; l; l = l->next) {
-    n1 = (noded *) l->data;
-
-    if (n1->parentNode->i == n->i)
-      if (g_list_index (l, n1) == -1)
-        l = g_list_append (l, n1);
-  }
-}
-
   // Set the node positions for the 2nd and later rings.
 static void
-setChildPositions (noded *n, ggvisd *ggv, datad *d)
+setChildNodePositions (noded *n, ggvisd *ggv, datad *d)
 {
-  gint i;
   noded *nchild;
   gdouble theta;
   GList *l, *children = NULL;
@@ -225,7 +241,7 @@ setChildPositions (noded *n, ggvisd *ggv, datad *d)
   gdouble symbolSpan = atan (y/x);
 
   // theta is the boundary of the fan
-  if (n->i == ggv->radial->centerNode.i) theta = 0;
+  if (n->i == ggv->radial->centerNode->i) theta = 0;
   else if (n->nChildren == 1) theta = n->theta;
   else {
     // With 2*symbolSpan, I get the behavior I would expect to
@@ -239,9 +255,9 @@ setChildPositions (noded *n, ggvisd *ggv, datad *d)
   // Build an array of the child nodes -- for the purpose
   // of sorting them -- how about an alphabetical sorting
   // by label?  Do I have one?
-  childNodes (children, n);
+  childNodes (&children, n);
 
-  for (l = children; l; l->next) {
+  for (l = children; l; l = l->next) {
     nchild = (noded *) l->data;
 
     nchild->theta = theta + nchild->span/2.0 ;
@@ -255,19 +271,19 @@ setChildPositions (noded *n, ggvisd *ggv, datad *d)
       theta += (n->span - 3*symbolSpan)/(n->subtreeSize-1);
 
     if (nchild->nChildren > 0)
-      setChildPositions(nchild, ggv, d);
+      setChildNodePositions(nchild, ggv, d);
   }
 }
 
 
 void
-setPositions (ggvisd *ggv, datad *d) {
+setNodePositions (ggvisd *ggv, datad *d) {
 
   // Set the position of the center node
-  ggv->radial->centerNode.pos.x = 0;
-  ggv->radial->centerNode.pos.y = 0;
-  ggv->radial->centerNode.theta = 0;
+  ggv->radial->centerNode->pos.x = 0;
+  ggv->radial->centerNode->pos.y = 0;
+  ggv->radial->centerNode->theta = 0;
 
-  setChildPositions (&ggv->radial->centerNode, ggv, d);
+  setChildNodePositions (ggv->radial->centerNode, ggv, d);
 }
 

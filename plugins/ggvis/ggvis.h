@@ -30,7 +30,7 @@ typedef struct _noded {
 } noded;
 
 typedef struct {
-  noded centerNode;
+  noded *centerNode;
   gint nStepsToLeaf;
   gint nStepsToCenter;
   noded *nodes;
@@ -60,7 +60,7 @@ typedef struct {
   gdouble mds_threshold_low;
   gint    mds_dims;
   gint    mds_freeze_var;
-/*
+*/
 
 /*
  * Used in scaling during each mds loop; set in reset_data

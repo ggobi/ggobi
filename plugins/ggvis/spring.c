@@ -1,7 +1,7 @@
 /* molecule.c: run as part of xgvis ML 2/92. */
 /* molecule.c: find layout with attraction/repulsion.
-/* dists.c: called by netpad: writes out distance matrix.
-/* ML: 11/91. */
+ * dists.c: called by netpad: writes out distance matrix.
+ * ML: 11/91. */
 
 /* Includes. */
 #include <gtk/gtk.h>

@@ -162,6 +162,7 @@ static void radial_cb (GtkButton *button, PluginInstance *inst)
   extern void setNChildren (ggvisd *ggv, datad *d);
   extern gint setSubtreeSize (noded *, ggvisd *, datad *);
   extern void setSubtreeSpans (ggvisd *, datad *);
+  extern void setNodePositions (ggvisd *, datad *);
 
   if (d == NULL || e == NULL)
     return;
@@ -169,16 +170,25 @@ static void radial_cb (GtkButton *button, PluginInstance *inst)
   initLayout (gg, ggv, d, e);
 
   /*-- initial default:  let the first node be the center node --*/
-  ggv->radial->centerNode = ggv->radial->nodes[0];
-  ggv->radial->centerNode.i = 0;
+  ggv->radial->centerNode = &ggv->radial->nodes[0];
+  ggv->radial->centerNode->i = 0;
 
   setParentNodes (ggv, d);
   setNChildren (ggv, d);
-  setSubtreeSize (&ggv->radial->centerNode, ggv, d);
+  setSubtreeSize (ggv->radial->centerNode, ggv, d);
 
-  setSubtreeSpans (ggv, d);
+  setSubtreeSpans (ggv, d);  /*-- ok --*/
 
-  setNodePositions ( );
+  setNodePositions (ggv, d);
+
+{
+gint i;
+noded *n;
+for (i=0; i<d->nrows; i++) {
+  g_printerr ("%f %f\n",
+    ggv->radial->nodes[i].pos.x, ggv->radial->nodes[i].pos.y);
+}
+}
 }
 
 static void cmds_cb (GtkButton *button, PluginInstance *inst)

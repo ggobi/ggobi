@@ -81,7 +81,7 @@ triangle of a, except for its diagonal elements which are returned in p[1..n]. *
       
       if (i == j) {
         if (sum < 0.0) { /*  a, with rounding errors, is not positive definite. */
-      /*  if (sum <= 0.0) /*  a, with rounding errors, is not positive definite. */
+      /*  if (sum <= 0.0)  a, with rounding errors, is not positive definite. */
           printf("%.10lf < 0  (%lf)\n",sum, sum-0);
           nrerror("choldc failed");
         }
