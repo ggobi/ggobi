@@ -63,7 +63,7 @@ options_cb(ggobid *gg, guint action, GtkCheckMenuItem *w) {
   }
 }
 
-static void
+/*static void
 line_options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
   g_printerr ("action = %d\n", action);
 
@@ -74,8 +74,9 @@ line_options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
     default:
       fprintf(stderr, "Unhandled switch-case in line_options_cb\n");
   }
-}
-static void
+  }*/
+
+/*static void
 bitmap_size_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
   g_printerr ("action = %d\n", action);
 
@@ -86,8 +87,9 @@ bitmap_size_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
     default:
       fprintf(stderr, "Unhandled switch-case in bitmap_size_cb\n");
   }
-}
-static void
+  }*/
+
+/*static void
 replot_freq_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
   g_printerr ("action = %d\n", action);
 
@@ -101,7 +103,7 @@ replot_freq_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
     default:
       fprintf(stderr, "Unhandled switch-case in replot_freq_cb\n");
   }
-}
+  }*/
 
 static void
 t1d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
@@ -129,7 +131,8 @@ void t1d_pp_func_cb (GtkWidget *w, gpointer cbd)
   cpanel->t1d.pp_indx = indx;
   dsp->t1d.get_new_target = true;
 
-  dsp->t1d.ppval = 0.00;
+  dsp->t1d.ppval = -100.00;
+  dsp->t1d.oppval = -999.0;
   dsp->t1d_pp_op.index_best = -100.0;
   sprintf(label, "PP index: (%3.1f) %5.3f (%3.1f) ",0.0,dsp->t1d.ppval,0.0);
   gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
@@ -185,13 +188,13 @@ ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
   datad *d = gg->current_display->d;
 */
   gint wid = w->allocation.width, hgt = w->allocation.height;
-  static gboolean init = true;
+  /*  static gboolean init = true;*/
   extern void t1d_clear_ppda(ggobid *);
 
-  if (init) {
+  /*  if (init) {
     t1d_clear_ppda(gg);
     init=false;
-  }
+    }*/
 
   gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
                    0, 0, 0, 0,

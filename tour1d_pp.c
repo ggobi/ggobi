@@ -400,8 +400,8 @@ double ludcomp(double *a,int n)
 gint discriminant (array_f *pdata, void *param, gfloat *val)
 { 
   discriminant_param *dp = (discriminant_param *) param;
-  gint i, j, k, lda, job, right, left;
-  gint n, p, g, dd;
+  gint i, j, k;
+  gint n, p;
   gdouble det;
 
   n = pdata->nrows;
@@ -696,6 +696,7 @@ gint cartvariance (array_f *pdata, void *param, gfloat *val)
 
 /* End of inclusion of Sigbert's tour1d_pp.c */
 
+
 /* This function interacts with control  buttons in ggobi */
 void t1d_optimz(gint optimz_on, gboolean *nt, gint *bm) {
   gboolean new_target = *nt;
@@ -827,6 +828,21 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
   }
 
   g_free (label);
+}
+
+void t1d_pp_reinit(ggobid *gg)
+{
+  gint i, j;
+  displayd *dsp = gg->current_display;
+
+  for (i=0; i<dsp->t1d_pp_op.proj_best.nrows; i++)
+    for (j=0; j<dsp->t1d_pp_op.proj_best.ncols; j++)
+      dsp->t1d_pp_op.proj_best.vals[i][j] = 0.;
+  dsp->t1d.ppval = -100.0;
+  dsp->t1d.oppval = -999.0;
+  dsp->t1d_pp_op.index_best = -100.0;
+
+  t1d_clear_ppda(gg);
 }
 
 /********************************************************************

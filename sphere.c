@@ -510,6 +510,10 @@ gboolean sphere_svd (datad *d, ggobid *gg)
       eigenvec[j][i] = b[j][i];
     }
   }
+  for (i=0; i<nels; i++)
+    if (eigenvec[0][i] < 0)
+      for (j=0; j<nels; j++) 
+      eigenvec[j][i] = -eigenvec[j][i];
 
   /*-- free temporary variables --*/
   g_free ((gpointer) pairs);

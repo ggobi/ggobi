@@ -378,6 +378,7 @@ tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   extern gint realloc_optimize0_p(optimize0_param *, gint, gint, gint);
+  extern void t2d_pp_reinit(ggobid *);
 
 /*-- we don't care which button it is --*/
   if (d->vcirc_ui.jcursor == GDK_HAND2) {
@@ -387,8 +388,13 @@ tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
   } else {
     tour2dvar_set (jvar, gg);
     /*    if (dsp->t2d.target_selection_method == 1)*/
+    /* Check if pp indices are being calculated, if so re-allocate
+       and re-initialize as necessary */
+    if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
       realloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, 
         dsp->t2d.nactive, 2);
+      t2d_pp_reinit(gg);
+    }
   }
 }
 
@@ -458,9 +464,8 @@ tour2d_run(displayd *dsp, ggobid *gg)
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint i, j, nv;
-  static gint count = 0;
+  /*  static gint count = 0;*/
   gboolean revert_random = false;
-  static gfloat oindxval = -999.0;
   gint k;
   gboolean chosen;
   gfloat eps = .01;
@@ -469,7 +474,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
   if (!dsp->t2d.get_new_target && 
       !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, dsp->t2d.tang,
        dsp->t2d.dist_az,
-       dsp->t2d.target_selection_method, &dsp->t2d.ppval, &oindxval)) {
+       dsp->t2d.target_selection_method, &dsp->t2d.ppval, &dsp->t2d.oppval)) {
 
     increment_tour(dsp->t2d.tinc, dsp->t2d.tau, &dsp->t2d.nsteps, 
       &dsp->t2d.stepcntr, dsp->t2d.dist_az, dsp->t2d.delta, &dsp->t2d.tang, 
@@ -482,11 +487,11 @@ tour2d_run(displayd *dsp, ggobid *gg)
 
       revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
         0, gg);
-      count++;
+      /*      count++;
       if (count == 10) {
-        count = 0;
+      count = 0;*/
         t2d_ppdraw(dsp->t2d.ppval, gg);
-      }
+	/*      }*/
     }
   }
   else { /* do final clean-up and get new target */
@@ -494,7 +499,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
       if (dsp->t2d.target_selection_method == 1)
       {
         dsp->t2d_pp_op.index_best = dsp->t2d.ppval;
-        oindxval = dsp->t2d.ppval;
+        dsp->t2d.oppval = dsp->t2d.ppval;
         for (i=0; i<2; i++)
           for (j=0; j<dsp->t2d.nactive; j++)
             dsp->t2d_pp_op.proj_best.vals[j][i] = 
@@ -572,7 +577,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
               dsp->t2d.target_selection_method, gg);
           }
           t2d_ppdraw(dsp->t2d.ppval, gg);
-          count = 0;
+	  /*          count = 0;*/
 #ifndef WIN32
           sleep(2);
 #else
@@ -658,6 +663,7 @@ void tour2d_reinit(ggobid *gg)
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
   gint nc = d->ncols;
+  extern void t2d_pp_reinit(ggobid *);
 
   for (i=0; i<2; i++)
     for (j=0; j<nc; j++)
@@ -689,6 +695,9 @@ void tour2d_reinit(ggobid *gg)
   display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
+
+  if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) 
+    t2d_pp_reinit(gg);
 }
 
 /* Variable manipulation */

@@ -117,7 +117,7 @@ typedef struct {
   gboolean get_new_target;
   gint nsteps, stepcntr;
   gint index; /* this is for counting planes passed */
-  gfloat ppval; /* for projection pursuit */
+  gfloat ppval, oppval; /* for projection pursuit */
 } tour;
 
 /* Sigbert's code for pp */

@@ -361,6 +361,10 @@ tour1d_manip_var_set (gint j, gint btn, ggobid *gg)
 void
 tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
+  displayd *dsp = gg->current_display;
+  extern gint realloc_optimize0_p(optimize0_param *, gint, gint, gint);
+  extern void t1d_pp_reinit(ggobid *);
+
 /*-- any button --*/
   if (d->vcirc_ui.jcursor == GDK_HAND2) {
     tour1d_manip_var_set (jvar, button, gg);
@@ -368,6 +372,12 @@ tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 
   } else {
     tour1dvar_set (jvar, gg);
+
+    if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+      realloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, 
+        dsp->t1d.nactive, 1);
+      t1d_pp_reinit(gg);
+    }
   }
 }
 
@@ -443,9 +453,8 @@ tour1d_run(displayd *dsp, ggobid *gg)
   extern void t1d_ppdraw(gfloat, ggobid *);
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  static gint count = 0;
+  /*  static gint count = 0;*/
   gboolean revert_random = false;
-  static gfloat oindxval = -999.0;
   gint pathprob = 0;
 
   gint i, j, nv;
@@ -453,7 +462,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
   if (!dsp->t1d.get_new_target && 
       !reached_target(dsp->t1d.nsteps, dsp->t1d.stepcntr, dsp->t1d.tang,
         dsp->t1d.dist_az, 
-        dsp->t1d.target_selection_method,&dsp->t1d.ppval, &oindxval)) {
+        dsp->t1d.target_selection_method,&dsp->t1d.ppval, &dsp->t1d.oppval)) {
     increment_tour(dsp->t1d.tinc, dsp->t1d.tau, &dsp->t1d.nsteps, 
       &dsp->t1d.stepcntr, dsp->t1d.dist_az, dsp->t1d.delta, &dsp->t1d.tang, 
       (gint) 1);
@@ -465,11 +474,11 @@ tour1d_run(displayd *dsp, ggobid *gg)
 
       revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
         0, gg);
-      count++;
+      /*      count++;
       if (count == 10) {
-        count = 0;
+      count = 0;*/
         t1d_ppdraw(dsp->t1d.ppval, gg);
-      }
+	/*      }*/
     }
 
   }
@@ -478,7 +487,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
       if (dsp->t1d.target_selection_method == 1)
       {
         dsp->t1d_pp_op.index_best = dsp->t1d.ppval;
-        oindxval = dsp->t1d.ppval;
+        dsp->t1d.oppval = dsp->t1d.ppval;
         for (j=0; j<dsp->t1d.nactive; j++)
           dsp->t1d_pp_op.proj_best.vals[j][0] = 
             dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]];
@@ -508,10 +517,12 @@ tour1d_run(displayd *dsp, ggobid *gg)
       dsp->t1d.get_new_target = true;
     else {
       if (dsp->t1d.target_selection_method == 0) {
-        gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, d->ncols, (gint) 1);
+        gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
+          d->ncols, (gint) 1);
       }
       else if (dsp->t1d.target_selection_method == 1) {
         /* pp guided tour  */
+        /* get new target according to the selected pp index */
         revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
           dsp->t1d.target_selection_method, gg);
 
@@ -534,7 +545,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
               dsp->t1d.target_selection_method, gg);
           }
           t1d_ppdraw(dsp->t1d.ppval, gg);
-          count = 0;
+	  /*          count = 0;*/
 #ifndef WIN32
           sleep(2);
 #else
@@ -607,6 +618,7 @@ void tour1d_reinit(ggobid *gg)
   gint i, j;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
+  extern void t1d_pp_reinit(ggobid *);
 
   for (i=0; i<1; i++) {
     for (j=0; j<d->ncols; j++) {
@@ -622,6 +634,9 @@ void tour1d_reinit(ggobid *gg)
   display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
+
+  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) 
+    t1d_pp_reinit(gg);
 }
 
 void tour1d_scramble(ggobid *gg)
@@ -797,7 +812,6 @@ void
 tour1d_manip_end(splotd *sp) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/

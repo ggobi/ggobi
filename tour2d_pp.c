@@ -398,6 +398,21 @@ void t2d_ppdraw(gfloat pp_indx_val, ggobid *gg)
   g_free (label);
 }
 
+void t2d_pp_reinit(ggobid *gg)
+{
+  gint i, j;
+  displayd *dsp = gg->current_display;
+
+  for (i=0; i<dsp->t2d_pp_op.proj_best.nrows; i++)
+    for (j=0; j<dsp->t2d_pp_op.proj_best.ncols; j++)
+      dsp->t2d_pp_op.proj_best.vals[i][j] = 0.;
+  dsp->t2d.ppval = -100.0;
+  dsp->t2d.oppval = -999.0;
+  dsp->t2d_pp_op.index_best = -100.0;
+
+  t2d_clear_ppda(gg);
+}
+
 /********************************************************************
 
                          INDEX CALCULATION
