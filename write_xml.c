@@ -7,6 +7,7 @@
   (More likely to be correct than writing a Perl script!)
  */
 #include <string.h>
+#include "writedata.h"
 
 
 XmlWriteInfo *updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info);
@@ -134,9 +135,28 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
 gboolean
 write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
- gint i;
+ gint i, m, n;
+
+/*
+ * I'm not sure this does the right thing for invisible edges;
+ * testing is called for.
+*/
+
+/*
+ * if saving visible records only, find out how many there are
+*/
+ if (gg->save.row_ind == ALLROWS)
+   n = d->nrows;
+ else if (gg->save.row_ind == DISPLAYEDROWS) {
+   n = 0;
+   for (i=0; i<d->nrows_in_plot; i++) {
+     if (!d->hidden.els[ d->rows_in_plot[i] ])
+       n++;
+   }
+ }
+
  fprintf(f, "<records\n");
- fprintf(f, " count=\"%d\"", d->nrows);
+ fprintf(f, " count=\"%d\"", n);
  if(xmlWriteInfo->useDefault) {
 /*
    fprintf(f, " glyphSize=\"%s\"", xmlWriteInfo->defaultGlyphSizeName);
@@ -148,12 +168,23 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
    fprintf(f, " color=\"%s\"", xmlWriteInfo->defaultColorName);
  }
  fprintf(f, ">\n");
- for(i = 0; i < d->nrows; i++) {
-  write_xml_record(f, d, gg, i, xmlWriteInfo);
-  fprintf(f, "\n");
- }
- fprintf(f, "</records>\n");
 
+ if (gg->save.row_ind == ALLROWS) {
+   for (i = 0; i < d->nrows; i++) {
+     write_xml_record (f, d, gg, i, xmlWriteInfo);
+     fprintf(f, "\n");
+   }
+ } else {
+   for (i=0; i<d->nrows_in_plot; i++) {
+     m = d->rows_in_plot[i];
+     if (!d->hidden.els[m]) {
+       write_xml_record (f, d, gg, m, xmlWriteInfo);
+       fprintf(f, "\n");
+     }
+   }
+ }
+
+ fprintf(f, "</records>\n");
  return(true);
 }
 
