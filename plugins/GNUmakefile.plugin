@@ -20,7 +20,9 @@ ifdef GGOBI_CONFIG
  GGOBI_LIB=$(shell $(GGOBI_CONFIG) --libs)
 else
  GGOBI_INCLUDE_DIR=-I$(GGOBI_HOME)
+ifndef GGOBI_LIB
  GGOBI_LIB=-L$(GGOBI_HOME) -lggobi
+endif
  GGOBI_CFLAGS=$(GGOBI_INCLUDE_DIR)
 endif
 
