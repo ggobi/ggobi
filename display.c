@@ -168,11 +168,11 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
 }
 
 /*
-void
-display_new (ggobid *gg, guint action, GtkWidget *widget)
-{
-  display_create (action, gg);
-}
+*void
+*display_new (ggobid *gg, guint action, GtkWidget *widget)
+*{
+*  display_create (action, gg);
+*}
 */
 
 displayd *

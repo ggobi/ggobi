@@ -13,9 +13,6 @@ display_open_cb (GtkWidget *w, datad *d)
   gboolean missing_p = GPOINTER_TO_INT
     (gtk_object_get_data (GTK_OBJECT (w), "missing_p"));
 
-  /*-- Should the menu be destroyed here?  Doesn't seem to hurt. --*/
-  gtk_widget_destroy (w->parent);
-
   display_create (display_type, missing_p, d, gg);
 }
 
@@ -34,12 +31,6 @@ display_menu_build (ggobid *gg)
 
   if (nd > 0) {
     gg->display_menu = gtk_menu_new ();
-
-/*-- used in positioning popup menus; no longer needed here --*/
-/*
-    gtk_object_set_data (GTK_OBJECT (gg->display_menu),
-      "top", gg->display_menu_item);
-*/
 
     if (nd == 1) {
       item = CreateMenuItem (gg->display_menu, "New scatterplot",

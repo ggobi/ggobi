@@ -148,7 +148,7 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
 
   parcoords_cpanel_init (&display->cpanel, gg);
 
-  display_window_init(display, 3, gg);
+  display_window_init (display, 3, gg);
 
 /*
  * Add the main menu bar
@@ -166,7 +166,7 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
    * add the Display Options and Link menus another way
   */
   parcoords_display_menus_make (display, gg->parcoords.pc_accel_group,
-                                 display_options_cb, mbar, gg);
+                                display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 

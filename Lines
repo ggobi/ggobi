@@ -77,7 +77,7 @@
 30617   7/18  improved behavior of "Windows" menu
 30665   7/21  fixed bugs in sphering
 30711   7/24  did some more polishing of sphering
-30720   7/25  did some more polishing of sphering
+30694   7/25  did some more polishing of sphering; fixed Windows menu bug
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

@@ -420,23 +420,6 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Quit",    "<ctrl>Q",     quit_ggobi,  0 },
 
-/*
- *{ "/_Window",                            NULL,   
- *  NULL,        0,    "<Branch>" },
- *{ "/Window/New scatterplot",                      "",
- *  display_new, scatterplot },
- *{ "/Window/New scatterplot matrix",               "",
- *  display_new, scatmat },
- *{ "/Window/New parallel coordinates plot",        "",
- *  display_new, parcoords },
- *{ "/Window/sep",     NULL,     NULL,          0, "<Separator>" },
- *{ "/Window/MISSING VALUES PLOTS", NULL, NULL, 0, "" },
- *{ "/Window/New scatterplot",        "",
- *  display_new, 3 },
- *{ "/Window/New scatterplot matrix", "",
- *  display_new, 4 },
-*/
-
   { "/_Tools",        NULL,         NULL, 0, "<Branch>" },
   { "/Tools/Variable selection and statistics ...", 
                       NULL,         vartable_open,    0, NULL },

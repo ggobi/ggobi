@@ -193,7 +193,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
 
   scatterplot_cpanel_init (&display->cpanel, XYPLOT, gg);
 
-  display_window_init(display, 3, gg);
+  display_window_init (display, 3, gg);
 
 /*
  * Add the main menu bar
