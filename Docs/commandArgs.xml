@@ -2,7 +2,7 @@
 
 <!DOCTYPE commandArguments>
 
-<arguments>
+<commandArguments>
 
 <arg name="help" type="gnu" novalue="true">
 <description>
@@ -181,6 +181,7 @@ don't terminate if no GGobi windows are open
 </quickHelp>
 </arg>
 
+
 <arg name="restore" type="both">
 <description>
 specifies the name of a file/URL containing 
@@ -202,5 +203,5 @@ name of XML file for single plugin
 </quickHelp>
 </arg>
 
-</arguments>
+</commandArguments>
 

@@ -55,7 +55,8 @@ scatmat_cpanel_init (cpaneld* cpanel, ggobid *gg) {
 }
 
 void
-parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg) {
+parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg) 
+{
   cpanel->viewmode = PCPLOT;
   cpanel->projection = P1PLOT;  /*-- does it need a projection? --*/
 
