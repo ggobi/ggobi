@@ -479,7 +479,8 @@ void cluster_table_update(datad * d, ggobid * gg)
 static void 
 exclusion_notebook_adddata_cb(ggobid *gg, datad * d, void* notebook)
 {
-  cluster_table_update(d, gg);
+  /*cluster_table_update(d, gg);*/
+  cluster_window_open (gg);
 }
 
 CHECK_EVENT_SIGNATURE(exclusion_notebook_adddata_cb, datad_added_f)
@@ -529,6 +530,10 @@ void cluster_window_open(ggobid * gg)
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
+
+    /*-- skip datasets without variables --*/
+    if (!datad_has_variables (d))
+      continue;
 
     /* Create a scrolled window to hold the table */
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
@@ -618,10 +623,12 @@ void cluster_window_open(ggobid * gg)
   }
 
   /*-- listen for datad_added events on main_window --*/
+/*
   gtk_signal_connect(GTK_OBJECT(gg),
     "datad_added",
     GTK_SIGNAL_FUNC(exclusion_notebook_adddata_cb),
     GTK_OBJECT(gg->cluster_ui.notebook));
+*/
 
   /*-- give the window an initial height --*/
   gtk_widget_set_usize(GTK_WIDGET(scrolled_window), -1, 150);
