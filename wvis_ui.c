@@ -722,25 +722,15 @@ gboolean colors_remap (colorschemed *scheme, gboolean force, ggobid *gg)
       false);
 
     remap_ok = false;   
-
   } else if (maxcolorid >= scheme->n) {
     /*-- build the vector that will be used to reset the current indices --*/
     gint *newind = (gint *) g_malloc ((maxcolorid+1) * sizeof (gint));
     gint n = 0;
 
-    /*
-     * just map them into the first few colors for now.  later, might
-     * want to spread the colors out.
-    */
     for (k=0; k<=maxcolorid; k++) {
       if (all_colors_p[k]) {
-        newind[k] = n;  /*-- n can not grow larger than maxcolorid-1 --*/
+        newind[k] = n;
 
-        /*
-         * do not let n grow beyond scheme->n - 1, even if it
-         * means that some clusters disappear.
-        */
-        /*n++;*/
         /*
          * try to achieve a decent spread of the color values,
          * which is helpful in most color maps
@@ -760,6 +750,7 @@ gboolean colors_remap (colorschemed *scheme, gboolean force, ggobid *gg)
         /*-- what about color_prev?  --*/
       }
     }
+    g_free (newind);
 
   } else {
     g_printerr ("nothing else should possibly happen, no?\n");
