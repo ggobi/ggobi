@@ -49,8 +49,8 @@ const char *const GGOBI(OpModeNames)[] = {
 
   "Scatmat",
   "Parcoords",
+#ifdef EXTENDED_MODES
   "TSplot",
-#ifdef BARCHART_IMPLEMENTED
   "Barchart"
 #endif
 };
@@ -65,8 +65,8 @@ void show_plugin_list(void *gg, gint action, GtkWidget *w);
 void create_new_ggobi(ggobid *gg, gint action, GtkWidget *w);
 
 void
-make_control_panels (ggobid *gg) {
-
+make_control_panels (ggobid *gg) 
+{
   cpanel_p1dplot_make (gg);
   cpanel_xyplot_make (gg);
 #ifdef ROTATION_IMPLEMENTED
@@ -86,10 +86,8 @@ make_control_panels (ggobid *gg) {
 
   cpanel_parcoords_make (gg);
   cpanel_scatmat_make (gg);
-  cpanel_tsplot_make (gg);
-#ifdef BARCHART_IMPLEMENTED
-  cpanel_barchart_make (gg);
-#endif
+
+  /* Leave the extendeded display types to be done on demand. */
 }
 
 void
@@ -222,27 +220,37 @@ viewmode_set (PipelineMode m, ggobid *gg)
   if (gg->viewmode != gg->prev_viewmode) {
 
     if (gg->prev_viewmode != NULLMODE) {
-      /* Add a reference to the widget so it isn't destroyed */
-      gtk_widget_ref (gg->control_panel[gg->prev_viewmode]);
-      gtk_container_remove (GTK_CONTAINER (gg->viewmode_frame),
-                            gg->control_panel[gg->prev_viewmode]);
+      GtkWidget *modeBox = gg->current_control_panel;
+      if(modeBox) {
+        gtk_widget_ref (modeBox);
+        gtk_container_remove (GTK_CONTAINER (gg->viewmode_frame), modeBox);
+      }
     }
 
     if (gg->viewmode != NULLMODE) {
-      gint nmodes = sizeof(GGOBI(OpModeNames))/sizeof(GGOBI(OpModeNames)[0]);
-      g_assert (gg->viewmode < nmodes);  /* if a new mode has been partially added ... */
-      gtk_frame_set_label (GTK_FRAME (gg->viewmode_frame),
-        viewmode_name[gg->viewmode]);
-      gtk_container_add (GTK_CONTAINER (gg->viewmode_frame),
-        gg->control_panel[gg->viewmode]);
+      gchar * const modeName = NULL;
+      GtkWidget *panel = NULL;
+
+      if(gg->viewmode < EXTENDED_DISPLAY_MODE) {
+         modeName = viewmode_name[gg->viewmode];
+	 panel = gg->control_panel[gg->viewmode];
+      } else {
+	 GtkGGobiExtendedDisplayClass *klass;
+         klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+         panel = klass->viewmode_control_box(display, gg->viewmode, &modeName, gg);
+      }
+
+      gtk_frame_set_label (GTK_FRAME (gg->viewmode_frame), modeName);
+      gtk_container_add (GTK_CONTAINER (gg->viewmode_frame), panel);
+      gg->current_control_panel = panel;
 
       /*-- avoid increasing the object's ref_count infinitely  --*/
 #if GTK_MAJOR_VERSION == 1
-      if (GTK_OBJECT (gg->control_panel[gg->viewmode])->ref_count > 1)
+      if (GTK_OBJECT (panel)->ref_count > 1)
 #else
-      if (G_OBJECT (gg->control_panel[gg->viewmode])->ref_count > 1)
+      if (G_OBJECT (panel)->ref_count > 1)
 #endif
-        gtk_widget_unref (gg->control_panel[gg->viewmode]);
+        gtk_widget_unref (panel);
     }
   }
 
@@ -253,7 +261,6 @@ viewmode_set (PipelineMode m, ggobid *gg)
    * value of projection is irrelevant.)
   */
   if (display->displaytype == scatterplot) {
-
     if (gg->viewmode <= COTOUR)
       display->cpanel.projection = gg->viewmode;
     gg->projection = display->cpanel.projection;
@@ -470,7 +477,7 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
        * work out which mode menus (Options, Reset, I/O) need
        * to be present, and add the needed callbacks.
       */
-      viewmode_submenus_update (prev_viewmode, gg);
+      viewmode_submenus_update (prev_viewmode, gg->current_display, gg);
 
       /*-- redraw this display --*/
       display_tailpipe (display, FULL, gg);
@@ -875,7 +882,7 @@ store_session_in_file(GtkWidget *btn, GtkWidget *selector)
  fileName = gtk_file_selection_get_filename(GTK_FILE_SELECTION(selector));
  if(fileName && fileName[0]) {
      gg = gtk_object_get_data(GTK_OBJECT(selector), "ggobi");
-     write_ggobi_as_xml(gg, fileName);
+     write_ggobi_as_xml(gg, fileName, NULL);
      gtk_widget_destroy(selector);
  } else {
      quick_message("Pick a file", true);

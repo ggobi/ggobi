@@ -53,6 +53,13 @@ gint totalNumGGobis;
 #define MAXNPCPLOTS 5
 #define MAXNTSPLOTS 6 
 
+#include "ggobiClass.h"
+
+const GtkTypeLoad typeLoaders[] = {gtk_ggobi_time_series_display_get_type,
+#ifdef BARCHART_IMPLEMENTED
+                                   gtk_ggobi_barchart_display_get_type
+#endif
+                                  };
 
 const gchar * const ViewTypes[] =
   {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
@@ -417,6 +424,8 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   sessionOptions->numArgs = argc;
 
   gtk_init (&argc, &argv);
+
+  registerDisplayTypes(typeLoaders, sizeof(typeLoaders)/sizeof(typeLoaders)[0]);
 
   vis = gdk_visual_get_system ();
 

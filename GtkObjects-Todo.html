@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1></h1>
+
+
+<li> Decide whether to create displays for the different types
+that don't really need to be done that way but just cleaner.
+i.e. barchart display, time series.
+    Instead, we can use an a slot in the GtkGGobiExtendDisplay
+    instance (not class) to provide data for some of the things
+    that are specific to the instance but for which we don't
+    want to define an entire class.
+
+
+<dl>
+  <dt> the tsplot_... in cpaneld ?
+  <dd>
+      Seems like it should go into the display.
+      Then when the display is re-activated, it can restore
+      its view of the world.
+
+  <dt> newTimeSeries in ggobi-API.c seems to do 2 display creations
+      and discards one.
+  <dd>
+
+  <dt> What is `<code>tsplot</code>' struct entry in ggobid for accelerators. See ggobi.h
+  <dd>
+      Removed for Barchart. barchart_mode_menu_make() now returns the
+      menu widget it created rather than passes it indirectly.
+      Time series actually uses it!
+
+  <dt> Is display_create being used anywhere. Yes, in the
+       callback for creating a display.
+       However, we now also use the extended_display_open_cb()
+       to handle an extended type.
+      Make certain these are kept in synch.
+  <dd>
+
+  <dt> display_tree.c
+  <dd>
+     The time series names should contain the two variables
+      i.e. the X and Y variables. Perhaps put this in the
+      top-most node for the plot.
+      <br>
+      This is nothing to do with the class system.
+
+
+
+  <dt> splot_free
+
+  <dd> Handle the destroy methods correctly.
+
+  <dt> Split the splot hierarcy into 1d and 2d and move some of the
+      variables
+      into different classes.
+  <dd>
+      pmid p1dvar, etc.
+      <br>
+      And the tour should be split.
+      Also, cpaneld looks like some of it is not needed for all displays.
+
+  <dt> display.c computeTitle() needs to determine the title
+      for the display type, but needs to
+      do it from the type of plots it is displaying.
+  <dd>
+
+  <dt> Free the ExtendedDisplayCreateData objects when destroying the menus.
+  <dd>
+
+  <dt> Options menu in viewmode_submenus_update.
+      Depends on the viewmode, not the display type.
+      So have to figure something out to allow the
+      display to do something.
+  <dd>
+     Add display type to OpModeNames.
+     Perhaps add these dynamically to another list
+     and recognize that it is special.
+      <br>
+      Not needed.
+
+  <dt>
+    Test the deletion of variables and see if the plotted() routine
+      still works.
+      
+  <dd> Is this used except in scatterplots?
+      When is sphering used?
+      <br>
+      The delete_vars callbacks are not in effect.
+      Will they be re-activated?
+
+  <dt>XXX   Finish the barchart destroy method.
+  <dd>
+
+  <dt> submenu_destroy (gg->viewmode_item);
+        in display_set_current() is causing error messages.
+  <dd>
+     Works now.
+
+  <dt> Switching modes doesn't update the
+      control panel contents, just the frame title.
+  <dd> Look at viewmode_set.
+      <br>
+     Working now that we have current_control_panel in the ggobid.
+
+  <dt> Do we need to provide a query for an extended display
+      allowing the addition of plot labels in
+       <code> splot_add_plot_labels</code> in sp_plot.c
+  <dd>
+</dl>
+
+
+<h2>Removing <code>tsplot</code></h2>
+
+<ul>
+  <li> display_set_values shouldn't take a display type but a GtkType
+      or something.
+      see barchart_new in barchart.c 
+  <li> display_alloc_init() takes a display type.
+ newTimeSeries in ggobi-API.c
+  <li> splot_alloc() uses the display type in a switch.
+  <li> splot_free() uses a switch on the display type.
+       Make certain the destroy methods are working.
+  <li> splot_world_to_plane
+  <li> splot_plane_to_screen
+
+  <li> splot_plot_edge
+  <li> splot_plot_case
+  <li> splot_add_plot_labels
+  <li> splot_draw_to_pixmap0_binned handles tsplot segment drawing.
+      and  splot_draw_to_pixmap0_unbinned.
+
+
+  <li> getDisplayType in XML read_init. Needs to use the Gtk type
+      name.
+  <li> createDisplayFromDescription needs to handle extended types.
+</ul>
+
+
+
+
+<dl>
+  <dt> display.c
+  <dd>
+       display_tailpipe &amp;
+      display_type_handles_action
+
+
+</dl>
+
+
+<h3>Fixed</h3>
+<dl>
+
+  <dt> display_tree.c
+  <dd>
+           Get the tsplot_tree_label routine registered for the appropriate
+      method.
+      
+      <ul>
+	<li> Remove other basic plots from display_tree_label. Ok for now.
+	<li> Handle the splot's in splot_tree_label. Okay!
+	<li> Get the names for the time series. (what names?) of the variables!
+      </ul>
+
+    
+  <dt> Options menu on the control panel window is being repeated
+      each time we switch to an extended display.
+  <dd> Fixed.
+      Pass the displayd of interest to mode_has_options_menu.
+       Otherwise, doesn't know that there is one there already.
+      This means computing the old display in higher level routines
+      and passing it down.
+
+  <dt> Add support for extended display modes in mode_has_options_menu.
+  <dd>
+
+  <dt> Set up the control panel for the extended display types.
+  <dd> Working. Done on demand.
+      Not stored in ggobi's array of widgets for panels.
+  <dt> set_color_id looks at class of splot to see if Barchart
+      to do a full redraw.
+  <dd> See a class-specific field to indicate what level of redraw to
+      do.
+      <br>
+       Done with the redraw field in the class.
+
+  <dt> Lines on the time series
+  <dd> Done.
+
+</dl>      
+      
+<hr>
+<address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Sun May 26 10:05:11 EDT 2002
+<!-- hhmts end -->
+</body> </html>

@@ -113,7 +113,7 @@ splot_check_colors (gushort maxcolorid, gint *ncolors_used,
 
 gboolean
 splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
-  splotd *sp, displayd *display, ggobid *gg)
+		 splotd *sp, displayd *display, ggobid *gg)
 {
   gboolean draw_edge;
   endpointsd *endpoints = e->edge.endpoints;
@@ -138,7 +138,14 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
   } else if (e->nmissing > 0 && !e->missings_show_p) {
-    switch (display->displaytype) {
+    if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+      GtkGGobiExtendedSPlotClass *klass;
+      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+      if(klass->draw_edge_p) {
+         draw_edge = klass->draw_edge_p(sp, m, d, e, gg);
+      }
+    } else {
+     switch (display->displaytype) {
       case parcoords:
         if (e->missing.vals[m][sp->p1dvar])
           draw_edge = false;
@@ -155,12 +162,6 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
             draw_edge = false;
           }
         }
-      break;
-
-      case tsplot:
-        if (e->missing.vals[m][sp->xyvars.y]|| 
-            e->missing.vals[m][sp->xyvars.x])
-          draw_edge = false;
       break;
 
       case scatterplot:
@@ -198,6 +199,7 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
       break;
       default:
       break;
+     }
     }
   }
   return draw_edge;
@@ -205,7 +207,7 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
 
 gboolean
 splot_plot_case (gint m, gboolean ignore_hidden, datad *d,
-  splotd *sp, displayd *display, ggobid *gg)
+		 splotd *sp, displayd *display, ggobid *gg)
 {
   gboolean draw_case;
 
@@ -222,6 +224,14 @@ splot_plot_case (gint m, gboolean ignore_hidden, datad *d,
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
   } else if (d->nmissing > 0 && !d->missings_show_p) {
+    if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+      GtkGGobiExtendedSPlotClass *klass;
+      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+      if(klass->draw_case_p) {
+         draw_case = klass->draw_case_p(sp, m, d, gg);
+      }
+    } else {
+
     switch (display->displaytype) {
       case parcoords:
         if (d->missing.vals[m][sp->p1dvar])
@@ -241,11 +251,6 @@ splot_plot_case (gint m, gboolean ignore_hidden, datad *d,
         }
       break;
 
-      case tsplot:
-        if (d->missing.vals[m][sp->xyvars.y]|| 
-            d->missing.vals[m][sp->xyvars.x])
-          draw_case = false;
-      break;
 
       case scatterplot:
       {
@@ -283,6 +288,7 @@ splot_plot_case (gint m, gboolean ignore_hidden, datad *d,
       default:
       break;
     }
+   }
   }
   return draw_case;
 }
@@ -309,7 +315,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   cpaneld *cpanel = &display->cpanel;
   gint proj = cpanel->projection;
   gint i, m, n;
+  gboolean (*f)(splotd *, datad*, ggobid*, gboolean) = NULL;
 #endif
+
+  GtkGGobiExtendedSPlotClass *klass = NULL;
+
 
   /*
    * since parcoords and tsplot each have their own weird way
@@ -317,17 +327,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
    * colors before drawing those lines even if we're not drawing
    * points.
   */
-  gboolean loop_over_points =
-    display->options.points_show_p || dtype == parcoords || dtype == tsplot;
-
-#ifdef BARCHART_IMPLEMENTED
-/*  dfs-barchart
- * Leaving this line in place prevents me from getting a display!
-  if (dtype == barchart) {
-    loop_over_points = false;
-  }
-*/
-#endif
+  gboolean loop_over_points;
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+   loop_over_points = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->loop_over_points;
+  } else
+   loop_over_points =  display->options.points_show_p || dtype == parcoords;
 
   if (gg->plot_GC == NULL) {
     init_plot_GC (sp->pixmap0, gg);
@@ -368,16 +372,19 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 #ifdef WIN32
       win32_draw_to_pixmap_unbinned (current_color, sp, gg);
 #else
-#ifdef BARCHART_IMPLEMENTED
-      if (dtype == barchart) {
-        barchart_redraw (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
-      }
-      else {
-#endif
 
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        if (d->color_now.els[m] == current_color &&
+      if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+        klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+        f = klass->redraw;
+	if(f) {
+   	   f(sp, d, gg, false);
+        }
+      }
+
+      if(!f) {
+       for (i=0; i<d->nrows_in_plot; i++) {
+          m = d->rows_in_plot[i];
+          if (d->color_now.els[m] == current_color &&
             splot_plot_case (m, true, d, sp, display, gg))
         {
           if (display->options.points_show_p) {
@@ -406,9 +413,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 /* */
 
           /*-- whiskers: parallel coordinate and time series plots --*/
-          } else if (dtype == parcoords || dtype == tsplot) {
+          } else if (dtype == parcoords) {
             if (display->options.whiskers_show_p) {
-              if (dtype == parcoords) {
                 n = 2*m;
                 gdk_draw_line (sp->pixmap0, gg->plot_GC,
                   sp->whiskers[n].x1, sp->whiskers[n].y1,
@@ -417,20 +423,14 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
                 gdk_draw_line (sp->pixmap0, gg->plot_GC,
                   sp->whiskers[n].x1, sp->whiskers[n].y1,
                   sp->whiskers[n].x2, sp->whiskers[n].y2);
-              }
-              else { /*-- if time series plot --*/
-                if (m < d->nrows_in_plot-1)  /*-- there are n-1 whiskers --*/
-                  gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                    sp->whiskers[m].x1, sp->whiskers[m].y1,
-                    sp->whiskers[m].x2, sp->whiskers[m].y2);
-              }
             }
-          }
+          } else if(klass && klass->within_draw_to_unbinned) {
+		  klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+	  }
         }
       }
-#ifdef BARCHART_IMPLEMENTED
-      }
-#endif
+     }
+
 
 
 #endif
@@ -464,21 +464,24 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   gint ncolors_used;
   gushort colors_used[MAXNCOLORS+2];
 
+  GtkGGobiExtendedSPlotClass *klass = NULL;
+
+
   if (gg->plot_GC == NULL)
     init_plot_GC (sp->pixmap0, gg);
 
-#ifdef BARCHART_IMPLEMENTED
-  {
-    displayd *display = (displayd *) sp->displayptr;
-    datad *d = display->d;
-    gint dtype = display->displaytype;
-
-    if (dtype == barchart) {
-      barchart_redraw (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
-      return;
+    /* Allow the extended plot to take over the entire thing.
+       If it wants to take over just a small part, see below.*/
+  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+    if(klass->redraw) {
+        displayd *display = (displayd *) sp->displayptr;
+       	datad *d = display->d;
+	if(klass->redraw(sp, d, gg, true))
+  	  return;
     }
   }
-#endif
+
 
 /*
  * Instead of clearing and redrawing the entire pixmap0, only
@@ -538,7 +541,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 #else
         for (ih=bin0->x; ih<=bin1->x; ih++) {
           for (iv=bin0->y; iv<=bin1->y; iv++) {
-            for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
+            for (m=0; m<d->brush.binarray[ih][iv].nels ; m++) {
               i = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
               if (d->color_now.els[i] == current_color &&
                   splot_plot_case (i, true, d, sp, display, gg))
@@ -558,10 +561,10 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
                       sp->whiskers[n].x1, sp->whiskers[n].y1,
                       sp->whiskers[n].x2, sp->whiskers[n].y2);
                   }
-                } else if(display->displaytype == tsplot) {
-                  gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                    sp->whiskers[m].x1, sp->whiskers[m].y1,
-                    sp->whiskers[m].x2, sp->whiskers[m].y2);
+                } else if(klass) { /* Handle the extended splot case. */
+  		  if(klass->within_draw_to_binned) {
+ 		      klass->within_draw_to_binned(sp, m, sp->pixmap0, gg->plot_GC);
+		  }
                 }
               }
             }
@@ -585,7 +588,8 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 /*------------------------------------------------------------------------*/
 
 static void
-splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
+splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) 
+{
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
   displayd *display = (displayd *) sp->displayptr;
@@ -598,11 +602,8 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   gboolean proceed = (cpanel->projection == XYPLOT ||
                       cpanel->projection == P1PLOT ||
                       cpanel->projection == PCPLOT ||
-                      cpanel->projection == TSPLOT ||
-#ifdef BARCHART_IMPLEMENTED
-                      cpanel->projection == BARCHART ||
-#endif
-                      cpanel->projection == SCATMAT);
+                      cpanel->projection == SCATMAT ||
+                      cpanel->projection == EXTENDED_DISPLAY_MODE);
   if (!proceed)
     return;
 
@@ -711,55 +712,25 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 #endif
         gg->plot_GC, 5, 5+ascent+descent, vt->collab_tform);
 
-  } else if (dtype == tsplot) {
+  }
 
-    GList *l = display->splots;
-    if (l->data == sp) {
-      vtx = vartable_element_get (sp->xyvars.x, d);
-      gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        vtx->collab_tform, strlen (vtx->collab_tform),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC,
-        sp->max.x - width - 5,
-        sp->max.y - 5,
-        vtx->collab_tform);
+  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+    void (*f)(splotd *, GdkDrawable*, ggobid*);
+    f =  GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->add_plot_labels;
+    if(f) {
+      f(sp, drawable, gg);
+      return;
     }
-    vty = vartable_element_get (sp->xyvars.y, d);
-    gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font (style),
-#else
-      style->font,
-#endif
-      vty->collab_tform, strlen (vty->collab_tform),
-      &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font (style),
-#else
-      style->font,
-#endif
-      gg->plot_GC,
-      5, 5 + ascent + descent,
-      vty->collab_tform);
-  }
-#ifdef BARCHART_IMPLEMENTED
-  else if (dtype == barchart) {
 
-    barchart_splot_add_plot_labels (sp, drawable, gg);
+  } 
+     /* And allow the display to take up the slack if we don't want to have a special splot class
+        for the display type but still need to do something special. */
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    void (*f)(displayd *, splotd *, GdkDrawable*, datad *, ggobid*);
+    f =  GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->add_plot_labels;
+    if(f)
+      f(display, sp, drawable, d, gg);
   }
-#endif
 
 }
 
@@ -1423,10 +1394,12 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     }
   }
   
-#ifdef BARCHART_IMPLEMENTED
-  if (display->displaytype == barchart)
-    barchart_add_bar_cues (GTK_GGOBI_BARCHART_SPLOT(sp), drawable, gg);
-#endif
+  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+    void (*f)(splotd *, GdkDrawable*, ggobid*);
+    f =  GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->add_markup_cues;
+    if(f)
+      f(sp, drawable, gg);
+  }
    
   splot_add_plot_labels (sp, drawable, gg);  /*-- axis labels --*/
 
@@ -1446,16 +1419,13 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     } else if (cpanel->viewmode == SCALE) {
       scaling_visual_cues_draw (sp, drawable, gg);
 
-#ifdef BARCHART_IMPLEMENTED
-      if (displaytype == barchart) {
-        void barchart_scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg);
-
-        barchart_scaling_visual_cues_draw (sp, drawable, gg);
+      if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+        void (*f)(splotd *, GdkDrawable*, ggobid*);
+	f =  GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->add_scaling_cues;
+	if(f)
+   	  f(sp, drawable, gg);
       }
-#endif
     }
-
-
   }
 
   if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {

@@ -13,6 +13,8 @@
 #include "plugin.h"
 #include "externs.h"
 
+#include "write_state.h"
+
 #if XML_USE_CHILDS
 #define XML_DOC_ROOT(doc) (doc)->root
 #else
@@ -21,9 +23,7 @@
 
 xmlNodePtr add_xml_display(displayd *dpy, xmlDocPtr doc);
 void add_xml_scatterplot_variables(xmlNodePtr node, GList *plots, displayd *dpy);
-void add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy);
 void add_xml_scatmat_variables(xmlNodePtr node, GList *plot, displayd *dpy);
-const char *addVariable(xmlNodePtr node, int which, datad *d);
 void add_xml_parcoords_variables(xmlNodePtr node, GList *plots, displayd *dpy);
 
 
@@ -173,7 +173,15 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
 
 
   plots = dpy->splots;
-  switch(dpy->displaytype) {
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
+    GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
+    if(klass->xml_describe) {
+      klass->xml_describe(node, plots, dpy);
+    } else {
+      g_printerr("No method for generating XML description of %s display type\n", klass->titleLabel); 
+    }
+  } else {
+   switch(dpy->displaytype) {
     case scatterplot:
       add_xml_scatterplot_variables(node, plots, dpy);
     break;
@@ -183,16 +191,10 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
     case parcoords:
       add_xml_parcoords_variables(node, plots, dpy);
     break;
-    case tsplot:
-      add_xml_tsplot_variables(node, plots, dpy);
-    break;
-#ifdef BARCHART_IMPLEMENTED
-    case barchart:
-      printf ("add xml for barchart still missing\n"); 
-    break;
-#endif
     case unknown_display_type:
+    default:
     break;
+  }
   }
 
  return(node);
@@ -208,26 +210,12 @@ add_xml_parcoords_variables(xmlNodePtr node, GList *plots, displayd *dpy)
   splotd *plot;
   while(plots) {
     plot = (splotd *) plots->data;
-    addVariable(node, plot->p1dvar, dpy->d);
+    XML_addVariable(node, plot->p1dvar, dpy->d);
     plots = plots->next;
   }
 }
 
 
-/*
-  Write out the variables in a time series plot
-  to the current node in the XML tree.
- */
-void
-add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
-{
-  splotd *plot;
-  while(plots) {
-    plot = (splotd *)plots->data;
-    addVariable(node, plot->p1dvar, dpy->d);
-    plots = plots->next;
-  }
-}
 
 /*
   Write out the variables in a scatter plot matrix
@@ -244,7 +232,7 @@ add_xml_scatmat_variables(xmlNodePtr node, GList *plots, displayd *dpy)
 
   for(i = 0; i < n1 ; i+=n) {
       plot = (splotd *) g_list_nth_data(plots, i);
-      addVariable(node, plot->xyvars.x, dpy->d);
+      XML_addVariable(node, plot->xyvars.x, dpy->d);
   }
 }
 
@@ -256,8 +244,8 @@ void
 add_xml_scatterplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
 {
   splotd *plot = (splotd *)plots->data;
-  addVariable(node, plot->xyvars.x, dpy->d);
-  addVariable(node, plot->xyvars.y, dpy->d);
+  XML_addVariable(node, plot->xyvars.x, dpy->d);
+  XML_addVariable(node, plot->xyvars.y, dpy->d);
 }
 
 
@@ -268,7 +256,7 @@ add_xml_scatterplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
  */
 
 const char *
-addVariable(xmlNodePtr node, gint j, datad *d)
+XML_addVariable(xmlNodePtr node, gint j, datad *d)
 {
   extern vartabled * vartable_element_get (gint, datad *);
   const char *name;
@@ -289,7 +277,13 @@ const char *
 getDisplayTypeName(displayd *dpy)
 {
   const gchar *val;
-
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
+    /* Perhaps compute the name of the type and use that. 
+     */
+    GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
+    /* val = klass->titleLabel; */
+    val = gtk_type_name(GTK_OBJECT_TYPE(GTK_OBJECT(dpy)));
+  } else {
   switch(dpy->displaytype) {
     case scatterplot:
       val = "scatterplot";
@@ -300,12 +294,10 @@ getDisplayTypeName(displayd *dpy)
     case parcoords:
       val = "parcoords";
     break;
-    case tsplot:
-      val = "tsplot";
-    break;
     default:
       val = "";
     break;
+  }
   }
 
     return(val);

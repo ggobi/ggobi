@@ -22,9 +22,12 @@
 #include "vars.h"
 #include "externs.h"
 
+
+#if 0
 #define VARSEL_X 0
 #define VARSEL_Y 1
 #define VARSEL_LABEL 2
+#endif
 static gchar *varpanel_names[] = {"xtoggle", "ytoggle", "label"};
 
 /*-------------------------------------------------------------------------*/
@@ -115,18 +118,24 @@ varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, datad *d)
 
 void
 varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
-  gint alt_mod, gint ctrl_mod, gint shift_mod, datad *d, ggobid *gg)
+	gint alt_mod, gint ctrl_mod, gint shift_mod, datad *d, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   gboolean redraw = false;
   gint jvar_prev = -1;
 
-  if (display == NULL || !GTK_IS_GGOBI_WINDOW_DISPLAY(display) || !GTK_IS_WIDGET (GTK_GGOBI_WINDOW_DISPLAY(display)->window)) {
+  if (display == NULL || !GTK_IS_GGOBI_WINDOW_DISPLAY(display) || 
+            !GTK_IS_WIDGET (GTK_GGOBI_WINDOW_DISPLAY(display)->window)) 
+  {
     g_printerr ("Bug?  I see no active display\n");
     return ;
   }
-  
-  switch (display->displaytype) {
+
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+     redraw = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->variable_select(display, sp, jvar, btn, cpanel, gg);
+  } else {
+
+   switch (display->displaytype) {
 
     case parcoords:
       redraw = parcoords_varsel (cpanel, sp, jvar, &jvar_prev, gg);
@@ -134,10 +143,6 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 
     case scatmat:
       redraw = scatmat_varsel_simple (cpanel, sp, jvar, &jvar_prev, gg);
-    break;
-
-    case tsplot:
-      redraw = tsplot_varsel (cpanel, sp, btn, jvar, &jvar_prev, gg);
     break;
 
     case scatterplot:
@@ -171,35 +176,21 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
         case MOVEPTS:
         case SCATMAT:
         case PCPLOT:
-        case TSPLOT:
-#ifdef BARCHART_IMPLEMENTED
-        case BARCHART:
-#endif
         case NMODES:
+        default:
         break;
     }
     break;
 
-#ifdef BARCHART_IMPLEMENTED
-    case barchart:
-      redraw = p1d_varsel (sp, jvar, &jvar_prev, btn);
-      if (redraw) {
-        displayd *display = (displayd *) sp->displayptr;
-        datad *d = display->d;
-
-        barchart_clean_init (GTK_GGOBI_BARCHART_SPLOT(sp));
-        barchart_recalc_counts (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
-      }
-    break;
-#endif
-
     case unknown_display_type:
+    default:
     break;
+  }
   }
 
     /* Change the source object for this event to something more meaningful! */
-  gtk_signal_emit(GTK_OBJECT(gg->main_window),
-    GGobiSignals[VARIABLE_SELECTION_SIGNAL], jvar, display->d, sp, gg);
+  gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[VARIABLE_SELECTION_SIGNAL], 
+		   jvar, display->d, sp, gg);
 
   /*-- overkill for scatmat: could redraw one row, one column --*/
   /*-- overkill for parcoords: need to redraw at most 3 plots --*/
@@ -260,7 +251,8 @@ varpanel_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
 
 /*-- here's where we'd reset what's selected according to the current mode --*/
 void
-varpanel_refresh (displayd *display, ggobid *gg) {
+varpanel_refresh (displayd *display, ggobid *gg) 
+{
   gint j;
   splotd *sp = gg->current_splot;
   cpaneld *cpanel = &display->cpanel;
@@ -269,9 +261,13 @@ varpanel_refresh (displayd *display, ggobid *gg) {
 
   if (sp != NULL && d != NULL) {
 
-    switch (display->displaytype) {
+    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+      GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->varpanel_refresh(display, sp, d);
+    } else {
 
-      case parcoords:
+     switch (display->displaytype) {
+
+       case parcoords:
         for (j=0; j<d->ncols; j++) {
           varpanel_toggle_set_active (VARSEL_X, j, false, d);
           varpanel_toggle_set_active (VARSEL_Y, j, false, d);
@@ -300,23 +296,6 @@ varpanel_refresh (displayd *display, ggobid *gg) {
         }
       break;
 
-      case tsplot:
-        for (j=0; j<d->ncols; j++) {
-          varpanel_toggle_set_active (VARSEL_X, j, false, d);
-          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-          varpanel_widget_set_visible (VARSEL_Y, j, true, d);
-        }
-
-        l = display->splots;
-        while (l) {
-          j = ((splotd *) l->data)->xyvars.y;
-          varpanel_toggle_set_active (VARSEL_Y, j, true, d);
-          j = ((splotd *) l->data)->xyvars.x;
-          varpanel_toggle_set_active (VARSEL_X, j, true, d);
-          l = l->next;
-        }
-      break;
-
       case scatterplot:
         switch (cpanel->projection) {
           case P1PLOT:
@@ -337,45 +316,19 @@ varpanel_refresh (displayd *display, ggobid *gg) {
             }
           break;
           /*-- to pacify compiler --*/
-          case NULLMODE:
-          case TOUR2D:
-          case TOUR1D:
-          case COTOUR:
-          case ROTATE:
-          case SCALE:
-          case BRUSH:
-          case IDENT:
-          case EDGEED:
-          case MOVEPTS:
-          case SCATMAT:
-          case PCPLOT:
-          case TSPLOT:
-#ifdef BARCHART_IMPLEMENTED
-          case BARCHART:
-#endif
-          case NMODES:
+  	  default:
           break;
       }
       break;
 
-#ifdef BARCHART_IMPLEMENTED
-      case barchart:
-        for (j=0; j<d->ncols; j++) {
-          varpanel_toggle_set_active (VARSEL_X, j, (j == sp->p1dvar), d);
-          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-          varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-        }
-      break;
-#endif
 
       case unknown_display_type:
+      default:
       break;
+
     }
+   }
   }
-/*
-    }
-  }
-*/
 }
 
 /*-- responds to a button_press_event --*/
@@ -605,10 +558,17 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
   for (j=0; j<d->ncols; j++) {
     if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
       break;
+
     wy = varpanel_widget_get_nth (VARSEL_Y, j, d);
     label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
     
-    switch (display->displaytype) {
+    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+       GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+       if(klass->varpanel_tooltips_set)
+	       klass->varpanel_tooltips_set(display, gg, wx, wy, label);
+    } else {
+
+     switch (display->displaytype) {
 
       case parcoords:
         gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
@@ -625,18 +585,6 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
           NULL);
         gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
           "Click to replace/insert/append a variable, or to delete it",
-          NULL);
-      break;
-
-      case tsplot:
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-          "Select to replace the horizontal (time) variable.",
-          NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-          "Select to replace/insert/append/delete a Y variable.",
-          NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-          "Click left to replace the horizontal (time) variable.  Click middle or right to replace/insert/append/delete a Y variable.",
           NULL);
       break;
 
@@ -690,35 +638,15 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
               NULL);
           break;
           /*-- to pacify compiler if we change these to an enum --*/
-          case ROTATE:
-          case SCALE:
-          case BRUSH:
-          case IDENT:
-          case EDGEED:
-          case MOVEPTS:
-          case SCATMAT:
-          case PCPLOT:
-          case TSPLOT:
-#ifdef BARCHART_IMPLEMENTED
-          case BARCHART:
-#endif
+  	  default:
           break;
       }
       break;
 
-#ifdef BARCHART_IMPLEMENTED
-      case barchart:
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-          "Click to replace a variable",
-          NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-          "Click to replace a variable",
-          NULL);
-      break;
-#endif
-
       case unknown_display_type:
+      default:
       break;
     }
+   } 
   }
 }

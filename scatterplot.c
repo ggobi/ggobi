@@ -95,7 +95,8 @@ scatterplot_show_rulers (displayd *display, gint projection)
 }
 
 void
-ruler_ranges_set (gboolean force, displayd *display, splotd *sp, ggobid *gg) {
+ruler_ranges_set (gboolean force, displayd *display, splotd *sp, ggobid *gg) 
+{
   /*
    * Run 0 and sp->max through the reverse pipeline to find out
    * what their values should be in terms of the data.  Set the
@@ -224,7 +225,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
    * add the other menus manually
   */
   scatterplot_display_menus_make (display, gg->app.sp_accel_group,
-   (GtkSignalFunc) display_options_cb, gg);
+				  (GtkSignalFunc) display_options_cb, gg);
   gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
 
 
@@ -318,7 +319,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
 
   gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
 
-  /*-- hide any extraneous rulers --*/
+   /*-- hide any extraneous rulers --*/
   scatterplot_show_rulers (display, projection);
   ruler_ranges_set (true, display, sp, gg);
 

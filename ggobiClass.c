@@ -4,6 +4,8 @@
 #include "externs.h"
 
 #include "tsdisplay.h"
+#include "tsPlot.h"
+
 #include "barchartDisplay.h"
 
 extern gint num_ggobis, totalNumGGobis;
@@ -339,8 +341,63 @@ gtk_ggobi_splot_get_type (void)
   return data_type;
 }
 
+static void
+extendedSPlotClassInit(GtkGGobiExtendedSPlotClass *klass)
+{
+  klass->tree_label = NULL;
+}
+
+GtkType
+gtk_ggobi_extended_splot_get_type (void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiExtendedSPlot",
+	sizeof (extendedSPlotd),
+	sizeof (GtkGGobiExtendedSPlotClass),
+	(GtkClassInitFunc) extendedSPlotClassInit, 
+	(GtkObjectInitFunc) NULL,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_splot_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
 
 /********************************************/
+
+static void
+extendedDisplayInit(extendedDisplayd *dpy)
+{
+}
+
+static GtkWidget *
+getExtendedDisplayCPanelWidget(displayd *dpy, gint viewmode, gchar **modeName, ggobid *gg)
+{
+  *modeName = "Unknown mode!";
+  return(GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget);
+}
+
+static void
+extendedDisplayClassInit(  GtkGGobiExtendedDisplayClass *klass)
+{
+   klass->viewmode_control_box = getExtendedDisplayCPanelWidget;
+   klass->options_menu_p = true;
+   klass->allow_reorientation = true;
+   klass->binning_ok = true;
+
+    /* DFS noticed that if this is false, no display is drawn. */
+   klass->loop_over_points = true;
+}
 
 
 GtkType
@@ -355,8 +412,8 @@ gtk_ggobi_extended_display_get_type (void)
 	"GtkGGobiExtendedDisplay",
 	sizeof (extendedDisplayd),
 	sizeof (GtkGGobiExtendedDisplayClass),
-	(GtkClassInitFunc) NULL, 
-	(GtkObjectInitFunc) NULL,
+	(GtkClassInitFunc) extendedDisplayClassInit, 
+	(GtkObjectInitFunc) extendedDisplayInit,
 	/* reserved_1 */ NULL,
         /* reserved_2 */ NULL,
         (GtkClassInitFunc) NULL,
@@ -371,7 +428,41 @@ gtk_ggobi_extended_display_get_type (void)
 static void 
 timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass)
 {
-    klass->parent_class.treeLabel = "Time Series";
+/*XX    klass->parent_class.tree_label = tsplot_tree_label; */
+
+    klass->parent_class.treeLabel =  klass->parent_class.titleLabel = "Time Series";
+    klass->parent_class.create = timeSeriesDisplayCreate;
+    klass->parent_class.variable_select = tsplot_varsel;
+    klass->parent_class.variable_plotted_p = tsplotIsVarPlotted;
+    klass->parent_class.cpanel_set = tsplotCPanelSet;
+    klass->parent_class.display_unset = NULL;
+    klass->parent_class.display_set = tsplotDisplaySet;
+    klass->parent_class.varpanel_refresh = tsplotVarpanelRefresh;
+
+    klass->parent_class.handles_action = tsplotHandlesAction;
+
+    klass->parent_class.xml_describe = add_xml_tsplot_variables;
+
+    klass->parent_class.varpanel_tooltips_set = tsplotVarpanelTooltipsSet;
+    klass->parent_class.plotted_vars_get = tsplotPlottedColsGet;
+
+
+    klass->parent_class.viewmode_control_box = tsplotCPanelWidget;
+    klass->parent_class.menus_make = tsplotMenusMake;
+
+    klass->parent_class.event_handlers_toggle = tsplotEventHandlersToggle;
+
+    klass->parent_class.splot_key_event_handler = tsplotSPlotKeyEventHandler;
+
+
+    klass->parent_class.add_plot_labels = NULL; 
+}
+
+
+static void
+timeSeriesDisplayInit(timeSeriesDisplayd *dpy)
+{
+   dpy->extendedDpy.titleLabel = "times series";
 }
 
 GtkType
@@ -387,7 +478,7 @@ gtk_ggobi_time_series_display_get_type (void)
 	sizeof (timeSeriesDisplayd),
 	sizeof (GtkGGobiTimeSeriesDisplayClass),
 	(GtkClassInitFunc) timeSeriesClassInit,
-	(GtkObjectInitFunc) NULL,
+	(GtkObjectInitFunc) timeSeriesDisplayInit,
 	/* reserved_1 */ NULL,
         /* reserved_2 */ NULL,
         (GtkClassInitFunc) NULL,
@@ -402,10 +493,48 @@ gtk_ggobi_time_series_display_get_type (void)
 
 /***********************************************************************/
 
+#ifdef BARCHART_IMPLEMENTED 
+
 static void 
 barchartDisplayClassInit(GtkGGobiBarChartDisplayClass *klass)
 {
-    klass->parent_class.treeLabel = "Barchart";
+    klass->parent_class.treeLabel = klass->parent_class.titleLabel = "Barchart";
+    klass->parent_class.create = barchart_new;
+    klass->parent_class.variable_select = barchartVarSel;
+    klass->parent_class.variable_plotted_p = barchartVarIsPlotted;
+    klass->parent_class.cpanel_set = barchartCPanelSet;
+    klass->parent_class.display_unset = NULL;
+    klass->parent_class.display_set = barchartDisplaySet;
+
+    klass->parent_class.build_symbol_vectors = barchart_build_symbol_vectors;
+
+    klass->parent_class.ruler_ranges_set = ruler_ranges_set;
+
+    klass->parent_class.varpanel_refresh = barchartVarpanelRefresh;
+
+    klass->parent_class.handles_action = barchartHandlesAction;
+
+    klass->parent_class.xml_describe = NULL;
+
+    klass->parent_class.varpanel_tooltips_set = barchartVarpanelTooltipsSet;
+
+    klass->parent_class.plotted_vars_get = barchartPlottedColsGet;
+
+    klass->parent_class.menus_make = barchartMenusMake;
+
+    klass->parent_class.viewmode_control_box = barchartCPanelWidget;
+
+    klass->parent_class.allow_reorientation = false;
+
+    klass->parent_class.binning_ok = false;
+    klass->parent_class.event_handlers_toggle = barchartEventHandlersToggle;
+    klass->parent_class.splot_key_event_handler = barchartSPlotKeyEventHandler;
+}
+
+static void
+barchartDisplayInit(barchartDisplayd *dpy)
+{
+   dpy->extendedDpy.titleLabel = "barchart";
 }
 
 GtkType
@@ -421,7 +550,7 @@ gtk_ggobi_barchart_display_get_type (void)
 	sizeof (barchartDisplayd),
 	sizeof (GtkGGobiBarChartDisplayClass),
 	(GtkClassInitFunc) barchartDisplayClassInit,
-	(GtkObjectInitFunc) NULL,
+	(GtkObjectInitFunc) barchartDisplayInit,
 	/* reserved_1 */ NULL,
         /* reserved_2 */ NULL,
         (GtkClassInitFunc) NULL,
@@ -439,7 +568,21 @@ static void
 barchartSPlotClassInit(GtkGGobiBarChartSPlotClass *klass)
 {
       /* barcharts need more attention than redrawing the brush */
-    klass->splotClass.redraw = FULL;
+    klass->extendedSPlotClass.splot.redraw = FULL;
+    klass->extendedSPlotClass.tree_label = barchart_tree_label;
+
+    klass->extendedSPlotClass.identify_notify = barchart_identify_bars;
+    klass->extendedSPlotClass.add_markup_cues =  barchart_add_bar_cues;
+    klass->extendedSPlotClass.add_scaling_cues = barchart_scaling_visual_cues_draw;
+    klass->extendedSPlotClass.add_plot_labels = barchart_splot_add_plot_labels;
+    klass->extendedSPlotClass.redraw = barchart_redraw;
+
+    klass->extendedSPlotClass.world_to_plane = barchart_recalc_dimensions;
+    klass->extendedSPlotClass.plane_to_screen = barchartPlaneToScreen;
+
+    klass->extendedSPlotClass.active_paint_points = barchart_active_paint_points;
+
+    GTK_OBJECT_CLASS(klass)->destroy = barchartDestroy;
 }
 
 static void
@@ -471,7 +614,87 @@ gtk_ggobi_barchart_splot_get_type (void)
         (GtkClassInitFunc) NULL,
       };
 
-      data_type = gtk_type_unique (gtk_ggobi_splot_get_type (), &data_info);
+      data_type = gtk_type_unique (gtk_ggobi_extended_splot_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
+#endif /* BARCHART_IMPLEMENTED */
+
+
+#if 0
+allocCPanels(GTK_GGOBI_EXTENDED_DISPLAY(dpy));
+void
+allocCPanels(extendedDisplayd *dpy)
+{
+   GtkGGobiExtendedDisplayClass *klass;
+   klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
+
+   if(klass->numControlPanels > 0)
+      dpy->cpanel = (cpaneld **) g_malloc(sizeof(cpaneld *) * klass->numControlPanels);
+}
+
+#endif
+
+
+
+/**************************************************************************/
+
+
+static void 
+timeSeriesSPlotClassInit(GtkGGobiBarChartSPlotClass *klass)
+{
+#if 0
+      /* barcharts need more attention than redrawing the brush */
+    klass->extendedSPlotClass.splot.redraw = FULL;
+
+    klass->extendedSPlotClass.identify_notify = barchart_identify_bars;
+    klass->extendedSPlotClass.add_markup_cues =  barchart_add_bar_cues;
+    klass->extendedSPlotClass.add_scaling_cues = barchart_scaling_visual_cues_draw;
+    klass->extendedSPlotClass.add_plot_labels = barchart_splot_add_plot_labels;
+    klass->extendedSPlotClass.redraw = barchart_redraw;
+
+    klass->extendedSPlotClass.active_paint_points = barchart_active_paint_points;
+#endif
+    klass->extendedSPlotClass.tree_label = tsTreeLabel;
+
+    klass->extendedSPlotClass.within_draw_to_binned = tsWithinDrawBinned;
+    klass->extendedSPlotClass.within_draw_to_unbinned = tsShowWhiskers;
+
+    klass->extendedSPlotClass.draw_edge_p = tsDrawEdge_p;
+    klass->extendedSPlotClass.draw_case_p = tsDrawCase_p;
+
+    klass->extendedSPlotClass.add_plot_labels = tsAddPlotLabels;
+
+    klass->extendedSPlotClass.sub_plane_to_screen = tsWithinPlaneToScreen;
+    klass->extendedSPlotClass.alloc_whiskers = tsAllocWhiskers;
+
+    klass->extendedSPlotClass.world_to_plane = tsWorldToPlane;
+    GTK_OBJECT_CLASS(klass)->destroy = tsDestroy;
+}
+
+
+GtkType 
+gtk_ggobi_time_series_splot_get_type(void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiTimeSeriesSPlot",
+	sizeof (timeSeriesSPlotd),
+	sizeof (GtkGGobiTimeSeriesSPlotClass),
+	(GtkClassInitFunc) timeSeriesSPlotClassInit,
+	(GtkObjectInitFunc) NULL,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_extended_splot_get_type (), &data_info);
     }
 
   return data_type;

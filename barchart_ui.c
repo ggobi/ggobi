@@ -28,19 +28,21 @@ static void display_mode_cb (GtkWidget *w, gpointer cbd)
 /*                   Control panel section                            */
 /*--------------------------------------------------------------------*/
 
-void
-cpanel_barchart_make (ggobid *gg) {
+GtkWidget *
+cpanel_barchart_make (ggobid *gg) 
+{
   GtkWidget *vb, *lbl, *opt;
- 
-  gg->control_panel[BARCHART] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[BARCHART]), 5);
+  GtkWidget *panel;
+
+  panel = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel), 5);
 
 
 /*
  * option menu: selection mode
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[BARCHART]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel), vb, false, false, 0);
 
   lbl = gtk_label_new ("Display mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -56,7 +58,9 @@ cpanel_barchart_make (ggobid *gg) {
     sizeof (display_mode_lbl) / sizeof (gchar *),
     (GtkSignalFunc) display_mode_cb, gg);
 
-  gtk_widget_show_all (gg->control_panel[BARCHART]);
+  gtk_widget_show_all (panel);
+
+  return(panel);
 }
 
 /*--------------------------------------------------------------------*/
@@ -71,33 +75,38 @@ cpanel_barchart_make (ggobid *gg) {
   At present, this is always false.
   See scatmat_mode_menu_make and scatterplot_mode_menu_make.
  */
-void
+GtkWidget *
 barchart_mode_menu_make (GtkAccelGroup *accel_group, 
 			 GtkSignalFunc func, 
  			 ggobid *gg, 
-			 gboolean useIds) {
+			 gboolean useIds) 
+{
+  GtkWidget *menu;
+  /* menu used to be in gg->barchart.mode_menu. But that was never used
+     except for a way to return the value from here. */
+  menu = gtk_menu_new ();
 
-  gg->barchart.mode_menu = gtk_menu_new ();
-
-  CreateMenuItem (gg->barchart.mode_menu, "Barchart",
-    "^h", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (BARCHART) : gg, gg);
+  CreateMenuItem (menu, "Barchart",
+		  "^h", "", NULL, accel_group, func,
+		  useIds ? GINT_TO_POINTER (EXTENDED_DISPLAY_MODE) : gg, gg);
 
   /* Add a separator */
-  CreateMenuItem (gg->barchart.mode_menu, NULL,
+  CreateMenuItem (menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuItem (gg->barchart.mode_menu, "Scale",
-    "^s", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (SCALE) : gg, gg);
-  CreateMenuItem (gg->barchart.mode_menu, "Brush",
-    "^b", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
-  CreateMenuItem (gg->barchart.mode_menu, "Identify",
-    "^i", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
+  CreateMenuItem (menu, "Scale",
+		  "^s", "", NULL, accel_group, func,
+		  useIds ? GINT_TO_POINTER (SCALE) : gg, gg);
+  CreateMenuItem (menu, "Brush",
+		  "^b", "", NULL, accel_group, func,
+		  useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
+  CreateMenuItem (menu, "Identify",
+		  "^i", "", NULL, accel_group, func,
+		  useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
 
-  gtk_widget_show (gg->barchart.mode_menu);
+  gtk_widget_show (menu);
+
+  return(menu);
 }
 
 /*--------------------------------------------------------------------*/
@@ -111,11 +120,11 @@ barchart_mode_menu_make (GtkAccelGroup *accel_group,
 /*-- there already exists barchart_cpanel_init --*/
 
 void
-cpanel_barchart_set (cpaneld *cpanel, ggobid *gg)
+cpanel_barchart_set (cpaneld *cpanel, GtkWidget *panel, ggobid *gg)
 {
   GtkWidget *w;
 
-  w = widget_find_by_name (gg->control_panel[BARCHART],
+  w = widget_find_by_name (panel,
                            "BARCHART:displ_mode_option_menu");
 
   gtk_option_menu_set_history (GTK_OPTION_MENU(w),

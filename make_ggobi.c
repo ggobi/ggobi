@@ -399,7 +399,7 @@ start_ggobi(ggobid *gg, gboolean init_data, gboolean createPlot)
   gg->prev_viewmode = gg->projection = gg->prev_projection =
     gg->viewmode;
         /*-- initialize the mode menus for the new mode --*/
-  viewmode_submenus_update (NULLMODE, gg);
+  viewmode_submenus_update (NULLMODE, (displayd *) NULL, gg);
 }
 
 

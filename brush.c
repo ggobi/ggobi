@@ -202,20 +202,21 @@ binning_permitted (displayd *display, ggobid *gg)
   cpaneld *cpanel = &display->cpanel;
 
   if (gg->linkby_cv)
-    permitted = false;
-#ifdef BARCHART_IMPLEMENTED
-  else if (type == barchart)
-    permitted = false;
-#endif
+    return(false);
+
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    return(GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->binning_ok);
+  }
+
   /*-- if we're adding lines to ASHes --*/
-  else if (type == scatterplot &&
+  if (type == scatterplot &&
            projection_get(gg) == P1PLOT &&
            cpanel->p1d.type == ASH &&
            cpanel->p1d.ASH_add_lines_p)
   {
       permitted = false;
   /*-- if we're drawing whiskers --*/
-  } else if ((type == parcoords || type == tsplot) &&
+  } else if ((type == parcoords) &&
              display->options.whiskers_show_p)
   {
       permitted = false;
@@ -512,7 +513,7 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 /*                      Color brushing                                  */
 /*----------------------------------------------------------------------*/
 
-static gboolean
+gboolean
 update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   datad *d, ggobid *gg)
 {
@@ -593,25 +594,7 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   return (doit);
 }
 
-#ifdef BARCHART_IMPLEMENTED
-/*----------------------------------------------------------------------*/
-/*      local helper function for barcharts,                            */ 
-/*      called by build_symbol_vectors                                  */
-/*----------------------------------------------------------------------*/
 
-gboolean barchart_build_symbol_vectors (datad *d, ggobid *gg) {
-  gboolean changed = FALSE;
-  gint j,m;
-
-  for (j=0; j<d->nrows_in_plot; j++) {
-    m = d->rows_in_plot[j];
-    changed = update_color_vectors (m, changed,
-              d->pts_under_brush.els, d, gg);
-  }
-
-  return changed;
-}
-#endif
 
 
 /*----------------------------------------------------------------------*/
@@ -628,13 +611,20 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
 
-#ifdef BARCHART_IMPLEMENTED
+  /* These two are needed for the extended display.
+     Should the method be on the extended splot or the display (as it is now).
+     The choice is somewhat arbitrary since the method for the barchart doesn't
+     seem to do much with the display or plot. It is just used to check if we
+     have a barchart. */
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
-  if (display->displaytype == barchart) {
-    changed = barchart_build_symbol_vectors (d, gg);
+
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    gboolean (*f)(datad *, ggobid *);
+    f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->build_symbol_vectors; 
+    if(f)
+      changed = f(d, gg);
   }
-#endif
 
   brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
@@ -701,25 +691,26 @@ active_paint_points (datad *d, ggobid *gg)
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
+  gint (*f)(splotd *sp, datad *) = NULL;
 
-#ifdef BARCHART_IMPLEMENTED
-  if (display->displaytype == barchart) {
-    d->npts_under_brush = barchart_active_paint_points (GTK_GGOBI_BARCHART_SPLOT(sp), d);
+  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+    f = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->active_paint_points;
+    if(f)
+       d->npts_under_brush = f(sp, d);
+  }
 
-  } else {
-#endif
-
-  /* Zero out pts_under_brush[] before looping */
-  d->npts_under_brush = 0;
-  for (j=0; j<d->nrows_in_plot; j++)
-    d->pts_under_brush.els[d->rows_in_plot[j]] = 0;
+  if(!f) {
+    /* Zero out pts_under_brush[] before looping */
+   d->npts_under_brush = 0;
+   for (j=0; j<d->nrows_in_plot; j++)
+     d->pts_under_brush.els[d->rows_in_plot[j]] = 0;
  
-  /*
-   * d->brush.binarray[][] only represents the
-   * cases in rows_in_plot[] so there's no need to test for that.
-  */
+   /*
+    * d->brush.binarray[][] only represents the
+    * cases in rows_in_plot[] so there's no need to test for that.
+   */
 
-  for (ih=d->brush.bin0.x; ih<=d->brush.bin1.x; ih++) {
+   for (ih=d->brush.bin0.x; ih<=d->brush.bin1.x; ih++) {
     for (iv=d->brush.bin0.y; iv<=d->brush.bin1.y; iv++) {
       for (j=0; j<d->brush.binarray[ih][iv].nels; j++) {
         pt = d->rows_in_plot[d->brush.binarray[ih][iv].els[j]];
@@ -742,10 +733,7 @@ active_paint_points (datad *d, ggobid *gg)
       }
     }
   }
-
-#ifdef BARCHART_IMPLEMENTED
   } 
-#endif
 
   changed = false;
 

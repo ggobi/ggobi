@@ -75,38 +75,6 @@ parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg) {
   cpanel_identify_init (cpanel, gg);
 }
 
-void
-tsplot_cpanel_init (cpaneld* cpanel, ggobid *gg) {
-  cpanel->viewmode = TSPLOT;
-  cpanel->projection = XYPLOT;  /*-- does it need a projection? --*/
-
-  /*-- 1d plots --*/
-  cpanel->p1d.type = DOTPLOT;
-  cpanel_p1d_init (cpanel, gg);
-
-  cpanel->tsplot_selection_mode = VAR_REPLACE;  /*-- only this is used --*/
-  cpanel->tsplot_arrangement = ARRANGE_COL;
-
-  /*-- available modes --*/
-  cpanel_brush_init (cpanel, gg);
-  cpanel_identify_init (cpanel, gg);
-}
-
-#ifdef BARCHART_IMPLEMENTED
-void
-barchart_cpanel_init (cpaneld* cpanel, ggobid *gg) {
-  cpanel->viewmode = BARCHART;
-  cpanel->projection = P1PLOT;  /*-- does it need a projection? --*/
-  cpanel->barchart_display_mode = 0;  /*dfs-barchart*/
-
-  /*-- 1d plots --*/
-  cpanel_p1d_init (cpanel, gg);
-
-  /*-- available modes --*/
-  cpanel_brush_init (cpanel, gg);
-  cpanel_identify_init (cpanel, gg);
-}
-#endif
 
 void
 cpanel_set (displayd *display, ggobid *gg)
@@ -115,7 +83,10 @@ cpanel_set (displayd *display, ggobid *gg)
   gboolean displaytype_known = true;
   datad *d = display->d;
 
-  switch (display->displaytype) {
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+     displaytype_known = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->cpanel_set(display, cpanel, gg);
+  } else {
+   switch (display->displaytype) {
     case scatterplot:
       cpanel_p1d_set (cpanel, gg);
       cpanel_xyplot_set (cpanel, gg);
@@ -144,22 +115,10 @@ cpanel_set (displayd *display, ggobid *gg)
       cpanel_brush_set (cpanel, gg);
       cpanel_identify_set (cpanel, gg);
     break;
-    case tsplot:
-      cpanel_tsplot_set (cpanel, gg);
-      cpanel_brush_set (cpanel, gg);
-      cpanel_identify_set (cpanel, gg);
-    break;
-#ifdef BARCHART_IMPLEMENTED
-    case barchart:
-      cpanel_barchart_set (cpanel, gg);
-      cpanel_brush_set (cpanel, gg);
-      cpanel_identify_set (cpanel, gg);
-    break;
-#endif
-
     default:
       displaytype_known = false;
     return;
+   }
   }
 
   if (cpanel->viewmode < COTOUR) cpanel->projection = cpanel->viewmode;

@@ -456,7 +456,7 @@ void       vectors_realloc (vector_s *, gint);
 void       vectors_realloc_zero (vector_s *, gint);
 void       viewmode_set (PipelineMode, ggobid *);
 void       viewmode_set_cb (GtkWidget  *, gint);
-void       viewmode_submenus_update (PipelineMode prev_mode, ggobid *);
+void       viewmode_submenus_update (PipelineMode prev_mode, displayd *, ggobid *);
 void       widget_initialize (GtkWidget *w, gboolean initd);
 void       world_to_raw (gint, splotd *, datad *, ggobid *);
 void       writeall_window_open (ggobid *);
@@ -562,14 +562,16 @@ RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
 
 /*tsplot functions*/
 void      cpanel_tsplot_init (cpaneld *, ggobid *);
-void      cpanel_tsplot_make (ggobid *);
-void      cpanel_tsplot_set (cpaneld *, ggobid *);
+GtkWidget* cpanel_tsplot_make (ggobid *);
+void      cpanel_tsplot_set (cpaneld *, GtkWidget *, ggobid *);
 void      tsplot_cpanel_init (cpaneld*, ggobid *);
 void      tsplot_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 displayd* tsplot_new (gboolean, gint, gint *, datad *, ggobid *);
 void      tsplot_reset_arrangement (displayd *, gint, ggobid *);
-gboolean  tsplot_varsel (cpaneld *, splotd *, gint, gint, gint *, ggobid *);
+gboolean  tsplot_varsel (displayd *display, splotd *sp, gint jvar, gint button, cpaneld *cpanel,  ggobid *gg);
 void      tsplot_whiskers_make (splotd *, displayd *, ggobid *);
+
+void tsplot_menus_make (ggobid *gg);
 
 /* The new way of handling window closures, so that we don't just exit. */
 gboolean  ggobi_close (ggobid *gg, GdkEvent *ev, GtkObject *w);
@@ -580,24 +582,30 @@ void      subset_init (datad *d, ggobid *gg);
 
 #ifdef BARCHART_IMPLEMENTED
 #include "barchartDisplay.h"
-gboolean barchart_active_paint_points (barchartSPlotd *sp, datad *d); 
-void barchart_add_bar_cues (barchartSPlotd *sp, GdkDrawable *drawable, ggobid *gg);
+
+void barchart_scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg);
+gboolean barchart_active_paint_points (splotd *sp, datad *d); 
+void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg);
 void barchart_clean_init (barchartSPlotd *sp);
 void barchart_cpanel_init (cpaneld *, ggobid *);
 void barchart_event_handlers_toggle (splotd *, gboolean state);
 void barchart_free_structure (barchartSPlotd *sp);
-gboolean barchart_identify_bars (icoords mousepos, barchartSPlotd *sp, datad *d, ggobid *gg);
+gboolean barchart_identify_bars (icoords mousepos, splotd *sp, datad *d, ggobid *gg);
 void barchart_init_vectors(barchartSPlotd *sp);
-void barchart_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds);
+GtkWidget *barchart_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds);
 displayd *barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
 void barchart_recalc_counts (barchartSPlotd *sp, datad *d, ggobid *gg);
-void barchart_recalc_dimensions (barchartSPlotd *sp, datad *d, ggobid *gg);
+void barchart_recalc_dimensions (splotd *sp, datad *d, ggobid *gg);
 void barchart_recalc_group_dimensions (barchartSPlotd *sp, ggobid *gg);
-void barchart_redraw (barchartSPlotd *sp, datad *d, ggobid *gg);
+gboolean barchart_redraw (splotd *sp, datad *d, ggobid *gg, gboolean binned);
 void barchart_splot_add_plot_labels (splotd *, GdkDrawable *, ggobid *);
-void cpanel_barchart_make (ggobid *gg);
-void cpanel_barchart_set (cpaneld *cpanel, ggobid *gg);
+GtkWidget* cpanel_barchart_make (ggobid *gg);
+void cpanel_barchart_set (cpaneld *cpanel, GtkWidget *panel, ggobid *gg);
 #endif
+
+
+gboolean update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
+			       datad *d, ggobid *gg);
 
 #ifdef WIN32
 void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
@@ -615,6 +623,15 @@ gint parse_command_line (gint *argc, gchar **av);
 #include "GGobiAPI.h"
 
 #define CHECK_GG(a) ValidateGGobiRef(a, true)
+
+/* Made externs for access from display class methods. */
+void varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, datad *d);
+GtkWidget *varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, datad *d);
+
+
+
+
+gboolean array_contains (gint* arr, gint n, gint el);
 
 #endif
 

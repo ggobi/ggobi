@@ -336,33 +336,8 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
         }
       break;
 
-      case tsplot:
-        for (l = display->splots; l; l = l->next) {
-          sp = (splotd *) l->data;
-
-          for (j=0; j<ncols; j++) {
-            if (sp->xyvars.x == cols[j]) {
-              jplotted = sp->xyvars.x;
-              return jplotted;
-            }
-            if (sp->xyvars.y == cols[j]) {
-              jplotted = sp->xyvars.y;
-              return jplotted;
-            }
-          }
-        }
-      break;
-#ifdef BARCHART_IMPLEMENTED
-      case barchart:
-        for (j=0; j<ncols; j++) {
-          if (sp->p1dvar == cols[j]) {
-            jplotted = sp->p1dvar;
-            return jplotted;
-          }
-        }
-      break;
-#endif
       case unknown_display_type:
+      default:
       break;
     }
   }

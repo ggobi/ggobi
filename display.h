@@ -193,8 +193,57 @@ typedef struct
 {
     GtkGGobiWindowDisplayClass parent_class;
 
-    gchar const * treeLabel;
+    gboolean binning_ok; /* see binning_permitted in brush.c */
+    gboolean allow_reorientation; /* see p1d_varsel for changing vertical/horizontal orientation */
+    gboolean options_menu_p; /* whether this supports an option menu in the control panel. Default is yes! */
+
+
+    gboolean loop_over_points; 	/* See splot_draw_to_pixmap0_unbinned. */
+
+    gchar const *  treeLabel ;
     gchar * const (*tree_label)(displayd *dpy);
+
+    gchar const *  titleLabel;
+    const gchar * const (*title_label)(displayd *dpy);
+
+    displayd *(*create)(gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
+
+    gboolean (*variable_select)(displayd *dpy, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg);
+
+    gint  (*variable_plotted_p)(displayd *dpy, gint *cols, gint ncols, datad *d);
+
+    gboolean (*cpanel_set)(displayd *dpy, cpaneld *cp, ggobid *gg);
+
+    void (*display_unset)(displayd *dpy, GtkWidget *);
+    void (*display_set)(displayd *dpy, ggobid *gg);
+
+    gboolean (*build_symbol_vectors)(datad *, ggobid *);
+
+    void (*ruler_ranges_set)(gboolean, displayd *, splotd *, ggobid *);
+
+    void (*varpanel_refresh)(displayd *dpy, splotd *sp, datad *d);
+
+    gboolean (*handles_action)(displayd *dpy, PipelineMode mode);
+
+	/* Probably should arrange for displayd to come first and no need to pass the splots. */
+    void (*xml_describe)(xmlNodePtr node, GList *splots, displayd *dpy);
+
+    void (*varpanel_tooltips_set)(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *label);
+
+    gint (*plotted_vars_get)(displayd *display, gint *cols, datad *d, ggobid *gg);
+
+    GtkWidget *(*viewmode_control_box)(displayd *, gint viewmode, gchar **modeName, ggobid *gg);
+
+    GtkWidget *(*menus_make)(displayd *dpy, PipelineMode viewMode, ggobid *gg);
+
+    gboolean (*event_handlers_toggle)(displayd *dpy, splotd *sp, gboolean state, gint viewMode);
+
+    gint (*splot_key_event_handler)(displayd *dpy, splotd *sp, gint keval);
+
+    void (*add_plot_labels)(displayd *dpy, splotd *sp, GdkDrawable *, datad *, ggobid *);
+
+
+/* For splots */
 
 } GtkGGobiExtendedDisplayClass;
 
@@ -202,11 +251,16 @@ typedef struct
 typedef struct {
 
    windowDisplayd dpy;
+
+   gchar * const titleLabel;
+
+   GtkWidget *cpanelWidget;
    
 } extendedDisplayd;
 
 void display_set_values(displayd *display, enum displaytyped type, datad *d, ggobid *gg);
 
-gchar * const gtk_display_tree_label(displayd *dpy);
-
+ /* For the extended cases. */
+const gchar * const gtk_display_tree_label(displayd *dpy);
+const gchar * const gtk_display_title_label(displayd *dpy);
 #endif

@@ -169,13 +169,14 @@ p1d_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
   gboolean redraw = true;
   displayd *display = (displayd *) sp->displayptr;
   gint orientation = display->p1d_orientation;
+  gboolean allow = true;
 
-#ifdef BARCHART_IMPLEMENTED
-  if (display->displaytype != barchart)
-#endif
-  /*-- if button == -1, don't change orientation. That protects
-       changes made during cycling --*/
-  if (button > 0) 
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+     allow = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->allow_reorientation;
+  }
+
+     /*-- if button == -1, don't change orientation. That protects changes made during cycling --*/
+  if (allow && button > 0) 
     display->p1d_orientation = (button == 1) ? HORIZONTAL : VERTICAL;
 
   redraw = (orientation != display->p1d_orientation) || (jvar != sp->p1dvar);

@@ -702,22 +702,8 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
               gg->selvarfg_GC, r, r, r+x, r-y);
 
           }*/
-        case NULLMODE:
-        case P1PLOT:
-        case XYPLOT:
-        case ROTATE:
-        case SCALE:
-        case BRUSH:
-        case IDENT:
-        case EDGEED:
-        case MOVEPTS:
-        case SCATMAT:
-        case PCPLOT:
-        case TSPLOT:
-#ifdef BARCHART_IMPLEMENTED
-        case BARCHART:
-#endif
-        case NMODES:
+
+        default:
         break;
       }
       break;

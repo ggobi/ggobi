@@ -70,19 +70,22 @@ static void varscale_cb (GtkWidget *w, gpointer cbd)
 /*                   Control panel section                            */
 /*--------------------------------------------------------------------*/
 
-void
-cpanel_tsplot_make (ggobid *gg) {
+GtkWidget *
+cpanel_tsplot_make (ggobid *gg) 
+{
   GtkWidget *vb, *lbl, *opt;
-  
-  gg->control_panel[TSPLOT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[TSPLOT]), 5);
+  GtkWidget *cpanel;
+
+  cpanel = gtk_vbox_new (false, VBOX_SPACING);
+
+  gtk_container_set_border_width (GTK_CONTAINER (cpanel), 5);
 
 #ifdef TS_EXTENSIONS_IMPLEMENTED
 /*
  * arrangement of plots, row or column
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TSPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (cpanel), vb, false, false, 0);
 
   lbl = gtk_label_new ("Layout:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -91,8 +94,8 @@ cpanel_tsplot_make (ggobid *gg) {
   opt = gtk_option_menu_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Arrange the time series as single plot or several plots",
-    NULL);
+			"Arrange the time series as single plot or several plots",
+			NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, arrangement_lbl,
                         sizeof (arrangement_lbl) / sizeof (gchar *),
@@ -103,7 +106,7 @@ cpanel_tsplot_make (ggobid *gg) {
  * option menu: selection mode
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TSPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (cpanel), vb, false, false, 0);
 
   lbl = gtk_label_new ("Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -125,7 +128,7 @@ cpanel_tsplot_make (ggobid *gg) {
 
 #ifdef TS_EXTENSIONS_IMPLEMENTED
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TSPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (cpanel), vb, false, false, 0);
 
   lbl = gtk_label_new ("Scales:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -142,7 +145,9 @@ cpanel_tsplot_make (ggobid *gg) {
 #endif
 
 
-  gtk_widget_show_all (gg->control_panel[TSPLOT]);
+  gtk_widget_show_all (cpanel);
+
+  return(cpanel);
 }
 
 
@@ -159,13 +164,13 @@ cpanel_tsplot_make (ggobid *gg) {
   See scatmat_mode_menu_make and scatterplot_mode_menu_make.
  */
 void
-tsplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) {
-
+tsplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) 
+{
   gg->tsplot.mode_menu = gtk_menu_new ();
 
   CreateMenuItem (gg->tsplot.mode_menu, "Time Series",
     "^v", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (TSPLOT) : gg, gg);
+    useIds ? GINT_TO_POINTER (EXTENDED_DISPLAY_MODE) : gg, gg);
 
   /* Add a separator */
   CreateMenuItem (gg->tsplot.mode_menu, NULL,
@@ -192,11 +197,11 @@ tsplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *g
 /*-- there already exists tsplot_cpanel_init --*/
 
 void
-cpanel_tsplot_set (cpaneld *cpanel, ggobid *gg)
+cpanel_tsplot_set (cpaneld *cpanel, GtkWidget *panelWidget, ggobid *gg)
 {
   GtkWidget *w;
 
-  w = widget_find_by_name (gg->control_panel[TSPLOT],
+  w = widget_find_by_name (panelWidget,
                            "TSPLOT:sel_mode_option_menu");
 
   gtk_option_menu_set_history (GTK_OPTION_MENU(w),

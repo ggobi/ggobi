@@ -24,9 +24,14 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 /* The rest of the menus will be appended once the menubar is created */
 
+
+/**
+ The menu that appears on the display window itself, not the control panel.
+*/
 static void
 tsplot_display_menus_make (displayd *display, 
-  GtkAccelGroup *accel_group, GtkSignalFunc func, GtkWidget *mbar, ggobid *gg)
+			   GtkAccelGroup *accel_group, GtkSignalFunc func, 
+			   GtkWidget *mbar, ggobid *gg)
 {
   GtkWidget *options_menu, *submenu, *item;
 
@@ -36,21 +41,22 @@ tsplot_display_menus_make (displayd *display,
   submenu = submenu_make ("_Options", 'D', accel_group);
   /*-- add a tooltip --*/
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), submenu,
-    "Options menu for this display", NULL);
+			"Options menu for this display", NULL);
 
   options_menu = gtk_menu_new ();
 
   item = CreateMenuCheck (options_menu, "Show points",
-    func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
+			  func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
   item = CreateMenuCheck (options_menu, "Show line segments",
-    func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
+			  func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
   /* Add a separator */
+/* unused
+
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
-/* unused
   item = CreateMenuCheck (options_menu, "Double buffer",
     func, GINT_TO_POINTER (DOPT_BUFFER), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
@@ -64,7 +70,8 @@ tsplot_display_menus_make (displayd *display,
 
 
 void
-tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
+tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) 
+{
   GList *l;
   GtkWidget *frame, *w;
   splotd *sp;
@@ -133,10 +140,8 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
   gint nplots;
   displayd *display;
 
-/*XX  display = display_alloc_init (tsplot, missing_p, d, gg); */
   display = gtk_type_new(GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY);
-  display_set_values(display, tsplot, d, gg);
-
+  display_set_values(display, extended_display_type, d, gg);
 
   if (nvars == 0) {
     nplots = MIN ((d->ncols-1), sessionOptions->info->numTimePlotVars);
@@ -196,8 +201,9 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
 
   display->splots = NULL;
 
-  for (i=1; i<nplots; i++) {
-    sp = splot_new (display, 2.5*WIDTH, HEIGHT, gg);
+  for (i=1; i < nplots; i++) {
+    sp = gtk_time_series_splot_new(display, 2.5*WIDTH, HEIGHT, gg);
+/*XX    sp = splot_new (display, 2.5*WIDTH, HEIGHT, gg); */
     sp->xyvars.y = vars[i];
     sp->xyvars.x = 0;
 
@@ -237,8 +243,8 @@ tsplot_var_selected (gint jvar, displayd *display)
 }
 
 gboolean
-tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
-  gint jvar, gint *jvar_prev, ggobid *gg)
+tsplot_varsel (displayd *display, splotd *sp, gint jvar, gint button,
+	        cpaneld *cpanel,  ggobid *gg)
 {
   gboolean redraw = true;
   gint nplots = g_list_length (gg->current_display->splots);
@@ -248,7 +254,7 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
   splotd *s, *sp_new;
   GtkWidget *box, *w;
   gfloat ratio = 1.0;
-  displayd *display=gg->current_display;
+
 
   /* The index of gg.current_splot */
   gint sp_indx = g_list_index (gg->current_display->splots, sp);
@@ -344,7 +350,9 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
     else if (cpanel->tsplot_selection_mode != VAR_DELETE) {
 
       if (cpanel->tsplot_selection_mode == VAR_REPLACE) {
+#if NOT_USED_ANYMORE
         *jvar_prev = sp->xyvars.y;
+#endif
         sp->xyvars.y = jvar;
         redraw = true;
 
@@ -414,7 +422,8 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
 /*--------------------------------------------------------------------*/
 
 static void
-tsplot_rewhisker (splotd *sp, ggobid *gg) {
+tsplot_rewhisker (splotd *sp, ggobid *gg) 
+{
   gint i, k, n;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;

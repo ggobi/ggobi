@@ -494,56 +494,16 @@ pcplot_menus_make (ggobid *gg)
 
 
 /*--------------------------------------------------------------------*/
-/*                   Time series: Options menu                        */
-/*--------------------------------------------------------------------*/
-
-void
-tsplot_menus_make (ggobid *gg)
-{
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-}
-
-#ifdef BARCHART_IMPLEMENTED
-/*--------------------------------------------------------------------*/
-/*                      Barchart: Options menu                        */
-/*--------------------------------------------------------------------*/
-
-void
-barchart_menus_make (ggobid *gg)
-{
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-}
-
-#endif
-/*--------------------------------------------------------------------*/
 /*               Routines to manage the mode menus                    */
 /*--------------------------------------------------------------------*/
 
 gboolean
-mode_has_options_menu (gint mode)
+mode_has_options_menu (gint mode, displayd *prev_display, ggobid *gg)
 {
+  if(prev_display && GTK_IS_GGOBI_EXTENDED_DISPLAY(prev_display)) {
+   return(GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(prev_display)->klass)->options_menu_p);
+  }
+
   /*-- every mode has an options menu --*/
   return (mode == P1PLOT || mode == XYPLOT || mode == SCALE  ||
           mode == BRUSH  || mode == TOUR1D || mode == TOUR2D ||
@@ -552,10 +512,7 @@ mode_has_options_menu (gint mode)
           mode == EDGEED ||
 #endif
           mode == MOVEPTS ||
-#ifdef BARCHART_IMPLEMENTED
-          mode == BARCHART ||
-#endif
-          mode == SCATMAT || mode == PCPLOT || mode == TSPLOT);
+          mode == SCATMAT || mode == PCPLOT  || mode == EXTENDED_DISPLAY_MODE);
 }
 
 gboolean
@@ -581,16 +538,16 @@ viewmode_submenus_initialize (PipelineMode mode, ggobid *gg)
 }
 
 void
-viewmode_submenus_update (PipelineMode prev_mode, ggobid *gg)
+viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display, ggobid *gg)
 {
   PipelineMode mode = viewmode_get (gg);
 
   /*-- remove any previous submenus --*/
   /* if the menu should be there and it really is there ... */
-  if (mode_has_options_menu (prev_mode) && gg->menus.options_item) {
+  if (mode_has_options_menu (prev_mode, prev_display, gg) && gg->menus.options_item) {
     gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.options_item));
     /*-- destroy menu items if called for --*/
-    if (!mode_has_options_menu (mode)) {
+    if (!mode_has_options_menu (mode, gg->current_display, gg)) {
       if (gg->menus.options_item != NULL) {
         gtk_widget_destroy (gg->menus.options_item);
         gg->menus.options_item = NULL;
@@ -598,11 +555,11 @@ viewmode_submenus_update (PipelineMode prev_mode, ggobid *gg)
     }
   } else {
     /*-- create and insert menu items if called for --*/
-    if (mode_has_options_menu (mode)) {
+    if (mode_has_options_menu (mode, gg->current_display, gg)) {
       gg->menus.options_item = submenu_make ("_Options", 'O',
-        gg->main_accel_group);
+					     gg->main_accel_group);
       submenu_insert (gg->menus.options_item,
-        gg->main_menubar, 4);
+		      gg->main_menubar, 4);
     }
   }
 
@@ -649,18 +606,9 @@ viewmode_submenus_update (PipelineMode prev_mode, ggobid *gg)
     case PCPLOT:
       pcplot_menus_make (gg);
     break;
-    case TSPLOT:
-      tsplot_menus_make (gg);
-    break;
     case SCATMAT:
       scatmat_menus_make (gg);
     break;
-#ifdef BARCHART_IMPLEMENTED
-    case BARCHART:
-      barchart_menus_make (gg);
-    break;
-#endif
-
     case P1PLOT:
       p1dplot_menus_make (gg);
     break;
@@ -709,6 +657,17 @@ viewmode_submenus_update (PipelineMode prev_mode, ggobid *gg)
     case EDGEED:
     case NULLMODE:
     case NMODES:  /*-- why is this part of the enum? --*/
+
+    default:
+    case EXTENDED_DISPLAY_MODE:
+    {
+      displayd *dpy = gg->current_display;
+      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
+        GtkGGobiExtendedDisplayClass *klass;
+        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
+        klass->menus_make(dpy, mode, gg);
+      }
+    }
     break;
   }
 }

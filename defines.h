@@ -40,13 +40,9 @@
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};
 
-enum displaytyped {scatterplot, scatmat, parcoords, tsplot, 
-#ifdef BARCHART_IMPLEMENTED
-		   barchart,
-#endif
+enum displaytyped {scatterplot, scatmat, parcoords, 
+		   extended_display_type,
                    unknown_display_type};
-
-
 
 
 extern const gchar* const ViewTypes[3];
@@ -70,20 +66,12 @@ extern const gint ViewTypeIndeces[3];
 
 /* modes */
 
-#ifndef BARCHART_IMPLEMENTED
-typedef enum {NULLMODE = -1, 
-               P1PLOT, XYPLOT, ROTATE, TOUR1D, TOUR2D, COTOUR,
-               SCALE, BRUSH, IDENT, EDGEED, MOVEPTS, 
-               SCATMAT, PCPLOT, TSPLOT,
-               NMODES} PipelineMode;
-#endif
-#ifdef BARCHART_IMPLEMENTED
 typedef enum {NULLMODE = -1,
                P1PLOT, XYPLOT, ROTATE, TOUR1D, TOUR2D, COTOUR,
                SCALE, BRUSH, IDENT, EDGEED, MOVEPTS,
-               SCATMAT, PCPLOT, TSPLOT, BARCHART,
+               SCATMAT, PCPLOT,
+ 	       EXTENDED_DISPLAY_MODE,
                NMODES} PipelineMode;
-#endif
 
 #if 0
 

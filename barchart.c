@@ -69,8 +69,15 @@ barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
     return (NULL);
 
   if (sp == NULL) {
+     /* Use GTK_TYPE_GGOBI_BARCHART_DISPLAY, or the regular extended display
+        and set the titleLabel immediately afterward. If more goes into barchart,
+        we will do the former. And that's what we do.
+        The alternative is.
+         display = gtk_type_new(GTK_TYPE_GGOBI_EXTENDED_DISPLAY);
+         GTK_GGOBI_EXTENDED_DISPLAY(display)->titleLabel = "BarChart";
+      */
     display = gtk_type_new(GTK_TYPE_GGOBI_BARCHART_DISPLAY);
-    display_set_values(display, barchart, d, gg);
+    display_set_values(display, extended_display_type, d, gg);
   } else {
     display = (displayd*) sp->displayptr;
     display->d = d;
@@ -514,12 +521,12 @@ void barchart_init_categorical (barchartSPlotd *sp, datad *d)
 }
 
 
-void 
-barchart_redraw(barchartSPlotd *sp, datad *d, ggobid *gg) 
+gboolean
+barchart_redraw(splotd *rawsp, datad *d, ggobid *gg, gboolean binned) 
 {
   gint i, j;
   colorschemed *scheme = gg->activeColorScheme;
-  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
 
   barchart_recalc_group_counts (sp, d, gg);
 
@@ -575,7 +582,7 @@ barchart_redraw(barchartSPlotd *sp, datad *d, ggobid *gg)
     }
   }
 
-
+  return(false);
 }
 
 void 
@@ -770,11 +777,11 @@ barchart_recalc_counts(barchartSPlotd *sp, datad *d, ggobid *gg)
   }
 
 
-  barchart_recalc_dimensions (sp, d, gg);
+  barchart_recalc_dimensions (GTK_GGOBI_SPLOT(sp), d, gg);
 }
 
 void 
-barchart_recalc_dimensions (barchartSPlotd *sp, datad *d, ggobid *gg) 
+barchart_recalc_dimensions (splotd *rawsp, datad *d, ggobid *gg) 
 {
   gint i, maxbincount = 0, maxbin = -1;
   gfloat precis = PRECISION1;
@@ -787,7 +794,7 @@ barchart_recalc_dimensions (barchartSPlotd *sp, datad *d, ggobid *gg)
   gfloat rdiff, ftmp;
 
   GdkRectangle *rect;
-  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
 
   scale_y = rawsp->scale.y;
 
@@ -914,9 +921,9 @@ if (!sp->bar->is_spine) {
 }
 
 gboolean 
-barchart_active_paint_points (barchartSPlotd *sp, datad *d) 
+barchart_active_paint_points (splotd *rawsp, datad *d) 
 {
-  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
   brush_coords *brush_pos = &rawsp->brush_pos;
   gint i;
   GdkRectangle brush_rect;
@@ -1049,11 +1056,12 @@ CurrentGGobi = NULL;
 }
 
 void
-barchart_scaling_visual_cues_draw (barchartSPlotd *sp, GdkDrawable *drawable, ggobid *gg) 
+barchart_scaling_visual_cues_draw (splotd *rawsp, GdkDrawable *drawable, ggobid *gg) 
 {
   vartabled *vtx;
   displayd *display = gg->current_display;
   datad *d = display->d;
+  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
 
   vtx = vartable_element_get (GTK_GGOBI_SPLOT(sp)->p1dvar, d);
 
@@ -1149,13 +1157,13 @@ gboolean pt_in_rect (icoords pt, GdkRectangle rect) {
 }
 
 gboolean 
-barchart_identify_bars (icoords mousepos, barchartSPlotd *sp, datad *d, ggobid *gg) 
+barchart_identify_bars (icoords mousepos, splotd *rawsp, datad *d, ggobid *gg) 
 {
 /* returns 0 if nothing has changed from the last time */
 /*         1 if different bars are hit */
   gint i, nbins;
   gboolean stop;
-
+  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
   nbins = sp->bar->nbins;
 
   /* check, which bars are hit */
@@ -1191,9 +1199,9 @@ barchart_identify_bars (icoords mousepos, barchartSPlotd *sp, datad *d, ggobid *
 }
 
 void 
-barchart_add_bar_cues (barchartSPlotd *sp, GdkDrawable *drawable, ggobid *gg) 
+barchart_add_bar_cues (splotd *rawsp, GdkDrawable *drawable, ggobid *gg) 
 {
-  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
   GtkStyle *style = gtk_widget_get_style (rawsp->da);
   gint i, nbins;
   gchar string[100];
@@ -1288,5 +1296,22 @@ gtk_barchart_splot_new(displayd *dpy, gint width, gint height, ggobid *gg)
   return(sp);
 }
 
+/**
+ Called when we create the barchart.
+*/
+void
+barchart_cpanel_init (cpaneld* cpanel, ggobid *gg) 
+{
+  cpanel->viewmode = EXTENDED_DISPLAY_MODE;
+  cpanel->projection = P1PLOT;  /*-- does it need a projection? --*/
+  cpanel->barchart_display_mode = 0;  /*dfs-barchart*/
+
+  /*-- 1d plots --*/
+  cpanel_p1d_init (cpanel, gg);
+
+  /*-- available modes --*/
+  cpanel_brush_init (cpanel, gg);
+  cpanel_identify_init (cpanel, gg);
+}
 
 #endif

@@ -367,6 +367,14 @@ display_alloc_init (enum displaytyped type, gboolean missing_p, datad *d, ggobid
   return (display);
 }
 
+/* 
+  Create an instance of one of the builtin in display types.
+  For the Gtk-based extended display types, see
+  extended_display_open_cb() in display_ui.c and ensure that
+  changes made here are propogated to there.
+  (In the long run, it would be nice to have all of the display
+   types as real Gtk classes and have only one mechanism.)
+ */
 displayd *
 display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
 {
@@ -391,18 +399,17 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
   splot_set_current (gg->current_splot, off, gg);
 
   switch (displaytype) {
-
-    case 0:
+    case scatterplot:
       display = scatterplot_new (missing_p, NULL, d, gg);
       break;
 
-    case 1:
+    case scatmat:
       display = scatmat_new (missing_p,
         nselected_vars, selected_vars, nselected_vars, selected_vars,
         d, gg);
       break;
 
-    case 2:
+    case parcoords:
       /*
        * testing a method to allow variables to be specified
        * before plotting; this is redundant with the variable
@@ -414,16 +421,6 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
       display = parcoords_new (false, nselected_vars, selected_vars, d, gg);
       break;
 
-    case 3:
-      display = tsplot_new (false, nselected_vars, selected_vars, d, gg);
-      break;
-
-
-#ifdef BARCHART_IMPLEMENTED
-    case barchart:
-      display = barchart_new (missing_p, NULL, d, gg);
-      break;
-#endif
     default:
       break;
   }
@@ -441,6 +438,7 @@ display_add (displayd *display, ggobid *gg)
 {
   splotd *prev_splot = gg->current_splot;
   PipelineMode prev_viewmode = viewmode_get (gg);
+  displayd *oldDisplay = gg->current_display;
 
   if (GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
     GGobi_widget_set(GTK_GGOBI_WINDOW_DISPLAY(display)->window, gg, true);
@@ -469,7 +467,7 @@ display_add (displayd *display, ggobid *gg)
 
   /*-- if starting from the API, or changing mode, update the mode menus --*/
   if (prev_viewmode != gg->current_display->cpanel.viewmode) {
-    viewmode_submenus_update (prev_viewmode, gg);
+    viewmode_submenus_update (prev_viewmode, oldDisplay, gg);
   }
 
   /*-- Make sure the border for the previous plot is turned off --*/
@@ -623,6 +621,10 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   gtk_accel_group_unlock (gg->main_accel_group);
 
+    /* Cleanup the old display first. Reset its title to show it is no longer active.
+       Clean up the control panel of the elements provided by this old display,
+       in order to get ready for the elements provided by the new display. */
+
   if (gg->firsttime == false && gg->current_display &&
       GTK_IS_GGOBI_WINDOW_DISPLAY(gg->current_display))
   {
@@ -632,30 +634,35 @@ display_set_current (displayd *new_display, ggobid *gg)
       g_free (title); 
     }
 
+       /* Now cleanup the different control panel menus associated with this display.
+          Specifically, this gets rid of the ViewMode menu.
+        */
+    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display)) {
+       /* Allow the extended display to override the submenu_destroy call.
+          If it doesn't provide a method, then call submenu_destroy. */
+      void (*f)(displayd *dpy, GtkWidget *) =
+	      GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(gg->current_display)->klass)->display_unset;
+      if(f)
+        f(gg->current_display, gg->viewmode_item);
+      else
+        submenu_destroy (gg->viewmode_item); /* default if no method provided. */
+    } else {
     switch (gg->current_display->displaytype) {
       case scatterplot:
-        submenu_destroy (gg->viewmode_item);
-      break;
       case scatmat:
-        submenu_destroy (gg->viewmode_item);
-      break;
       case parcoords:
         submenu_destroy (gg->viewmode_item);
       break;
-      case tsplot:
-        submenu_destroy (gg->viewmode_item);
-      break;
-#ifdef BARCHART_IMPLEMENTED
-      case barchart:
-        submenu_destroy (gg->viewmode_item);
-      break;
-#endif
       case unknown_display_type:
-/**/    return;
+       return;
+      default:
       break;
+    }
     }
   }
 
+
+  /* Now do the setup for the new display.  */
   if (GTK_IS_GGOBI_WINDOW_DISPLAY(new_display)) {
     title = computeTitle (true, new_display, gg);
     if (title) {
@@ -663,12 +670,20 @@ display_set_current (displayd *new_display, ggobid *gg)
       g_free (title); 
     }
 
-    switch (new_display->displaytype) {
+    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(new_display)) {
+       /* Allow the extended display to override the submenu_destroy call.
+          If it doesn't provide a method, then call submenu_destroy. */
+      void (*f)(displayd *dpy, ggobid *gg) =
+	      GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(new_display)->klass)->display_set;
+      if(f)
+        f(new_display, gg);
+    } else {
+      switch (new_display->displaytype) {
       case scatterplot:
         scatterplot_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) viewmode_set_cb, gg, true);
+				    (GtkSignalFunc) viewmode_set_cb, gg, true);
         gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-          gg->main_accel_group);
+					  gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
                                    gg->app.scatterplot_mode_menu); 
         submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
@@ -694,30 +709,9 @@ display_set_current (displayd *new_display, ggobid *gg)
         submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
       break;
 
-      case tsplot:
-        tsplot_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) viewmode_set_cb, gg, true);
-        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-                                   gg->tsplot.mode_menu); 
-        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
-      break;
-
-#ifdef BARCHART_IMPLEMENTED
-      case barchart:
-        barchart_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) viewmode_set_cb, gg, true);
-        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-                                   gg->barchart.mode_menu);
-        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
-      break;
-#endif
-
       default:
       break;
+    }
     }
   }
 
@@ -749,45 +743,24 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
 {
   gint n;
   gchar *title = NULL, *description;
-  const char *tmp = NULL;
+  const char *tmp = NULL, *stars;
 
-  switch (display->displaytype) {
-    case scatterplot:
-      if (current_p)
-        tmp = "*** scatterplot display ***";
-      else
-        tmp = "scatterplot display ";
-    break;
-    case scatmat:
-      if (current_p)
-        tmp = "*** scatterplot matrix ***";
-      else
-        tmp = "scatterplot matrix ";
-    break;
-    case parcoords:
-      if (current_p)
-        tmp = "*** parallel coordinates display *** " ;
-      else 
-        tmp = "parallel coordinates display " ;
-    break;
-    case tsplot:
-      if (current_p)
-        tmp = "*** time series display *** " ;
-      else 
-        tmp = "time series display display " ;
-    break;
-
-#ifdef BARCHART_IMPLEMENTED
-    case barchart:
-      if (current_p)
-        tmp = "*** barchart display *** " ;
-      else
-        tmp = "barchart display";
-    break;
-#endif
-
-    default:
-    break;
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    tmp = gtk_display_title_label(display);
+  } else {
+	  switch (display->displaytype) {
+	  case scatterplot:
+		  tmp = "scatterplot display ";
+		  break;
+	  case scatmat:
+		  tmp = "scatterplot matrix ";
+		  break;
+	  case parcoords:
+		  tmp = "parallel coordinates display " ;
+		  break;
+	  default:
+		  break;
+	  }
   }
 
   if (display->d->name != NULL) {
@@ -796,10 +769,11 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
     description = GGOBI (getDescription)(gg);
   }
 
-  n = strlen (tmp) + strlen (description) + 4;
+  stars = current_p ? "***" : "";
+  n = strlen (tmp) + strlen (description) + 5 + (current_p ? strlen(stars)*2 : 0);
   title = (gchar *) g_malloc(sizeof(gchar) * n);
   memset (title, '\0', n);
-  sprintf (title, "%s: %s", description, tmp);
+  sprintf (title, "%s: %s %s %s", description, stars, tmp, stars);
   g_free (description);
 
   return (title);
@@ -826,7 +800,8 @@ displays_plot (splotd *splot, RedrawStyle type, ggobid *gg) {
 
 /*-- reproject and replot all splots in display --*/
 void
-display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg) {
+display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg) 
+{
   GList *splist = display->splots;
   splotd *sp;
   cpaneld *cpanel;
@@ -855,10 +830,13 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg) {
     if (display->displaytype == scatterplot)
       ruler_ranges_set (false, display, sp, gg);
 
-#ifdef BARCHART_IMPLEMENTED
-    if (display->displaytype == barchart)
-      ruler_ranges_set (true, display, sp, gg);
-#endif
+    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+      void (*f)(gboolean, displayd *, splotd *, ggobid *);
+      f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->ruler_ranges_set;
+      if(f)
+        f(true, display, sp, gg);
+    }
+
 
     splot_redraw (sp, type, gg);
     splist = splist->next;
@@ -911,14 +889,19 @@ isEmbeddedDisplay (displayd *dpy)
  * support which view modes
 */
 gboolean
-display_type_handles_action (displayd *display, PipelineMode viewmode) {
+display_type_handles_action (displayd *display, PipelineMode viewmode) 
+{
   gint dtype = display->displaytype;
   gboolean handles = false;
   PipelineMode v = viewmode;
 
-  if (dtype == scatterplot) { 
-    /*-- handles all view modes, but watch out for display types --*/
-    if (v != SCATMAT && v != PCPLOT && v != TSPLOT)
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+
+    handles = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->handles_action(display, v);
+
+  } else  if (dtype == scatterplot) { 
+       /*-- handles all view modes, but watch out for display types --*/
+    if (v != SCATMAT && v != PCPLOT)
       handles = true;
   } else if (dtype == scatmat) {
     if (v == SCALE || v == BRUSH || v == IDENT || v == MOVEPTS || v == SCATMAT)
@@ -926,16 +909,7 @@ display_type_handles_action (displayd *display, PipelineMode viewmode) {
   } else if (dtype == parcoords) {
     if (v == BRUSH || v == IDENT || v == PCPLOT)
       handles = true;
-  } else if (dtype == tsplot) {
-    if (v == BRUSH || v == IDENT || v == TSPLOT)
-      handles = true;
   }
-#ifdef BARCHART_IMPLEMENTED
-   else if (dtype == barchart) {
-    if (v == SCALE || v == BRUSH || v == IDENT || v == BARCHART)
-      handles = true;
-   }
-#endif
 
   return handles;
 }

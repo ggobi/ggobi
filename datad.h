@@ -25,7 +25,7 @@ struct _ggobid;
 
 #include "fileio.h"
 
-typedef struct _datad datad;
+typedef struct _datad datad; 
 
 #define GTK_TYPE_GGOBI_DATA	 (gtk_ggobi_data_get_type ())
 #define GTK_GGOBI_DATA(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_DATA, datad))

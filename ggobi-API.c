@@ -398,7 +398,7 @@ GGOBI(newTimeSeries)(gint *yvars, gint numVars, datad *d, ggobid *gg)
 { 
   displayd *display = NULL; 
  
-  display = display_alloc_init (tsplot, false, d, gg); 
+/*XX  display = display_alloc_init (extended_display_type, false, d, gg);  */
   display = tsplot_new (false, numVars, yvars, d, gg); 
   display_add (display, gg); 
  

@@ -38,6 +38,12 @@ makes maintaining such additions across different releases easier for
 the developer and also simplifies testing, etc. within the central
 GGobi development.
 
+Also, when changes are made to the GGobi source, modifications to the
+language bindings (e.g. Rggobi, etc.) are also needed.  This
+abstraction so that there are generic methods for the new classes
+should greatly simplify this and remove the need to manually
+synchronize the code.
+
 There is a difference but close connection between the concept of a
 display and a plot in GGobi.  A display can be thought of as a
 container for multiple related plots.  An example is the scatterplot
@@ -90,6 +96,201 @@ The fact that we have to access the fields from the inherited class
 indirectly via the \Cfield{parent_class} field in the class structure
 is one of the several frustrating aspects of the C-based class
 mechanism.
+
+
+\section{Registering a Display type}
+
+The built-in but extended display types are registered at the
+beggining of the process in \Croutine{GGOBI(main)}.  This is done by
+passing routines that load/initialize/register the \Ctype{GtkType} and
+return that value. From that, we store the class in a list.
+
+We can handle people giving us the names of these routines,
+i.e. via an R command, or via the initialization file
+mechanism. Plugins should compute the \Ctype{GtkType}
+directly and register this.
+
+
+We iterate over these extended types when constructing the Display
+menus for a GGobi instance. For these extended display types, we
+construct the menus by using the value of the title label in the
+extended class as the name of the display type.  We use a different
+callback to create the display type, specifically
+\Croutine{extended_display_open_cb}.  This uses the \Cmethod{create}
+routine in the extended display class to create the new top-level
+display.  That \Cmethod{create} method can do whatever it likes
+to get its job done, including selecting the variables to display, etc.
+
+
+
+
+
+Implement the \Cmethod{cpanel_make} method to create the control panel
+for that display type in a \CStruct{ggobid}.  Put it in a hash table
+indexed by the class or type. Or simply store it in the class itself.
+The class initialization should create this object.
+
+
+\section{Creating the Display}
+
+
+\section{Selecting variables}
+
+Is this a property of the display or the splot? The code seems to pass
+the splot. But this might be a convenience rather than a formal
+intent.  Indeed, it is a feature of the display.  The barchart is
+rather special in that it (currently) only has one splot.
+
+Variable selection can be customized by setting different signal
+handlers in the control panel.  We of course allow such different
+behavior to by-pass \Croutine{varsel_cb}. However, if one wants to use
+the built-in mechanisms, then one need only provide a method for that
+extended display to switch the variables.
+
+
+\section{Examples of New Displays/Plots}
+\subsection{Conditional Plot}
+
+\subsection{Margin Plot}
+
+\subsection{Hexagonal Bin Plot}
+
+\subsection{Multi-Dataset Plot}
+Putting multiple variables  a single, e.g., scatterplot.
+
+
+\section{Control Panel}
+
+The control panel is set for a display via a call to
+\Croutine{cpanel_set} called form \Croutine{display_set_current}.  An
+extended display can look at its value for the \Cstruct{cpaneld} in
+its own scope (i.e. inside its \Cstruct{extendedDisplayd} structure).
+If that is \Cnull, it then builds it and stores it for future use
+(presumably, although it can elect to discard it when the display is
+no longer the active one). (Events could be used here!)
+
+There is the issue that display type may have more than one control
+panel, each one associated with a different view mode for that
+display.  For example, the time series plot supports 4 different types
+of views: default, brush, scale \& identify.  For this, it maintains 3
+different control panels.  So we maintain an array of these panels.
+This array can be initialized in the class initialization if that
+simplifies things. Alternatively it can be done on demand.
+
+We can simplify this allocation if we want by having a field in the
+class that specifies the number of modes to use.  If this is set to $>
+0$, we could allocate that many!  If the number of panels is not known
+until run time, the class should set this to 0 or lower, thus allowing
+it to determine the value dynamically. 
+
+ This is partially implemented but needs to get the order of the
+initialization of the class, and inherited types for an instance
+correct. The copy of the class info for the, e.g., time series has not
+been put into the object and so the values are set to $0$.
+
+
+
+Who sets the \literal{display->cpanel} field before
+\Croutine{cpanel_set} is called?  the \Croutine{*_cpanel_init}
+routines do!
+
+
+Actually, we only need the widget.  And for time series, all we really
+need is the option menu.  So we could actually store that directly
+when we create it.
+
+In \Croutine{viewmode_set}, we set the appropriate control panel box
+as the active one for the \Cfield{viewmode_frame}.  At this point, if
+we have an extended view mode, then we can ask the current display
+
+
+Extended displays should handle key events themselves by registering
+signal handlers when the plots are created.  See the Ctrl-v for time
+series displays.
+
+Supportin multiple new modes within an extended display requires that
+display setting the viewmode in the control panel
+(\literal{cpanel->viewmode}) to any value that it understands and then
+decode this in the \Croutine{viewomode_control_box} method.
+
+Added the \Cfield{current_control_panel}.
+
+
+
+Have to allow the extended display types to store information from
+the preferences/initialization file.
+
+
+The time series plots seem to rely heavily on knowing where they are
+in the display.  As a result, we can use methods for the display.
+Alternatively, we can create a sub-class for the extended splot type
+and access the display from the particular splot via the
+\Cfield{displayptr} field.
+
+
+
+
+
+
+\section{Serialization}
+
+We can call methods to serialize a display.  When deserializing them,
+they should have written the type of the object so that we can reload
+the Gtk type and get the class and then call the deserialize
+mechanism.
+
+
+\section{Options}
+To set the title for a display, the \Croutine{computeTitle}
+looks at the display and tries to figure out
+what the correct name is.
+There are several ways in the current code to specify this.
+\begin{description}
+\item[display class]
+one can create a new class that extends (or is derived from)
+\GtkClass{GtkGGobiExtendedDisplay}.
+Then in the class initialization routine, set the value of
+the \Cfield{titleLabel} field in the
+inherited \CStruct{extendedDisplayd} field.
+To use this, of course, one must create an instance of
+the class when creating the display.
+
+Let's look at barchart as an example.  We can specify a value of
+\CVariable{GTK_TYPE_GGOBI_BARCHART_DISPLAY} in the call to
+\Croutine{gtk_type_new}. This creates an instance of
+\CStruct{barchartDisplay} and the initialization in \file{ggobiClass}
+sets \Cfield{titleLabel} to \literal{barchart}.
+
+
+\item[Explicitly set the \Cfield{titleLabel} field in an extended
+  display]
+Rather than defining a new class solely for this purpose, 
+one can arrange to create a regular
+\GtkClass{GtkGGobiExtendedDisplay} object
+and then fill in its \Cfield{titleLabel}
+explicitly after it is created.
+\begin{verbatim}
+    display = gtk_type_new(GTK_TYPE_GGOBI_EXTENDED_DISPLAY);
+    GTK_GGOBI_EXTENDED_DISPLAY(display)->titleLabel = "BarChart";
+\end{verbatim}
+
+\item[Enumerations]
+We can use enumerations for the built-in display types.
+\end{description}
+
+Which approach we use depends on how many other methods, 
+if any, we need for that class. If there are many, then
+defining the value within a new class is appropriate.
+Otherwise, setting the \Cfield{titleLabel} works well. 
+
+
+Note that the \Croutine{computeTitle} now automatically handles adding
+identifiers to mark the display as being current and is no longer the
+responsibility of the display type to do this.
+
+
+
+
 
 
 \section{Functionality}

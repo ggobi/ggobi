@@ -77,10 +77,12 @@ typedef struct {
  gint parcoords_arrangement;  /* arrange plots in a row or a column */
 
  /*-- time series --*/
+/*XX*/
  gint tsplot_selection_mode;
  gint tsplot_arrangement;  /* arrange plots in a row or column*/
 
  /*-- barchart --*/
+/*XX*/
  gint barchart_display_mode;
 
 

@@ -110,7 +110,7 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
 /*-- this will be called by a key_press_cb for each scatterplot mode --*/
 gboolean
 splot_event_handled (GtkWidget *w, GdkEventKey *event,
-  cpaneld *cpanel, splotd *sp, ggobid *gg)
+		     cpaneld *cpanel, splotd *sp, ggobid *gg)
 {
   static guint32 etime = (guint32) 0;
   gboolean common_event = true;
@@ -129,9 +129,17 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
 */
   if (event->time == etime) return false;  /*-- already processed --*/
 
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    GtkGGobiExtendedDisplayClass *klass;
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    if(klass->splot_key_event_handler) 
+         action = klass->splot_key_event_handler(display, sp, event->keyval);
+  }
+  if(action < 0) {
+
   switch (event->keyval) {
-  case GDK_0:
-  case GDK_1:
+   case GDK_0:
+   case GDK_1:
   case GDK_2:
   case GDK_3:
   case GDK_4:
@@ -156,21 +164,12 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
   case GDK_L:
     action = PCPLOT;
   break;
-  case GDK_v:
-  case GDK_V:
-    action = TSPLOT;
-  break;
+
   case GDK_a:
   case GDK_A:
     action = SCATMAT;
   break;
 
-#ifdef BARCHART_IMPLEMENTED
-  case GDK_h:
-  case GDK_H:
-    action = BARCHART;
-  break;
-#endif
 /* */
 
   case GDK_d:
@@ -219,6 +218,7 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
     /* g_printerr ("splot key_press: %d\n", event->keyval); */
     common_event = false;
   }
+  }
 
   if (action >= 0 &&
       display_type_handles_action (display, (PipelineMode) action))
@@ -232,9 +232,17 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
 
 
 void
-sp_event_handlers_toggle (splotd *sp, gboolean state) {
+sp_event_handlers_toggle (splotd *sp, gboolean state) 
+{
   displayd *display = (displayd *) sp->displayptr;
   gint m = display->cpanel.viewmode;
+
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    GtkGGobiExtendedDisplayClass *klass;
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    if(klass->event_handlers_toggle && klass->event_handlers_toggle(display, sp, state, m) == false)
+      return;
+  }
 
   switch (m) {
     case P1PLOT:
@@ -251,12 +259,9 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
     break;
 #endif
 
-#ifdef BARCHART_IMPLEMENTED
-    case BARCHART:
-
-      barchart_event_handlers_toggle (sp, state);
+    case SCALE:
+      scale_event_handlers_toggle (sp, state);
     break;
-#endif
 
     case TOUR1D:
       tour1d_event_handlers_toggle (sp, state);
@@ -268,17 +273,6 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
 
     case COTOUR:
       ctour_event_handlers_toggle (sp, state);
-    break;
-
-    case SCALE:
-#ifdef BARCHART_IMPLEMENTED
-      if (display->displaytype == barchart) {
-        void barchart_scale_event_handlers_toggle (splotd *, gboolean);
-
-        barchart_scale_event_handlers_toggle (sp, state);
-      } else   
-#endif
-        scale_event_handlers_toggle (sp, state);
     break;
 
     case BRUSH:
@@ -311,9 +305,6 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
       p1d_event_handlers_toggle (sp, state);
     break;
 
-    case TSPLOT:
-      xyplot_event_handlers_toggle (sp, state);  /*-- ?? --*/
-    break;
 
     default:
       break;
@@ -380,7 +371,7 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
     gg->current_splot = sp->displayptr->current_splot = sp;
     splot_set_current (sp, on, gg);
 
-    viewmode_submenus_update (prev_viewmode, gg);
+    viewmode_submenus_update (prev_viewmode, display_prev, gg);
 
     /*
      * if the previous splot is in transient brushing mode, a FULL
@@ -431,7 +422,8 @@ splot_add_rows (gint nrows, splotd *sp)
 }
 
 void
-splot_edges_realloc (splotd *sp, datad *e, ggobid *gg) {
+splot_edges_realloc (splotd *sp, datad *e, ggobid *gg) 
+{
   sp->edges = (GdkSegment *) g_realloc ((gpointer) sp->edges,
     e->edge.n * sizeof (GdkSegment));
   sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
@@ -439,7 +431,8 @@ splot_edges_realloc (splotd *sp, datad *e, ggobid *gg) {
 }
 
 void
-splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
+splot_alloc (splotd *sp, displayd *display, ggobid *gg) 
+{
   datad *d = display->d;
   gint nr = d->nrows;
 
@@ -448,20 +441,34 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
   vectorf_init_null (&sp->p1d.spread_data);
   vectorf_alloc (&sp->p1d.spread_data, nr);
 
-  switch (display->displaytype) {
-    case scatterplot:
-    case scatmat:
-    break;
-    case parcoords:
-      sp->whiskers = (GdkSegment *) g_malloc (2 * nr * sizeof (GdkSegment));
-    break;
-    case tsplot:
-      sp->whiskers = (GdkSegment *) g_malloc ((nr-1) * sizeof (GdkSegment));
-    break;
-    default:
-    break;
+  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+    GtkGGobiExtendedSPlotClass *klass;
+    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+    if(klass->alloc_whiskers)
+      sp->whiskers = klass->alloc_whiskers(sp, nr, d);
+  }
+#if 0
+/*XX*/
+  else if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    GtkGGobiExtendedDisplayClass *klass;
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    sp->whiskers = klass->alloc_whiskers(display, sp, nr, d);
+  }
+#endif
+ else {
+    switch (display->displaytype) {
+      case scatterplot:
+      case scatmat:
+       break;
+      case parcoords:
+        sp->whiskers = (GdkSegment *) g_malloc (2 * nr * sizeof (GdkSegment));
+       break;
+      default:
+      break;
+    }
   }
 }
+
 void
 splot_free (splotd *sp, displayd *display, ggobid *gg) 
 {
@@ -472,7 +479,10 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
   g_free ((gpointer) sp->screen);
   vectorf_free (&sp->p1d.spread_data);
 
-  switch (display->displaytype) {
+  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+     gtk_object_destroy(GTK_OBJECT(sp));
+  } else {
+   switch (display->displaytype) {
     case scatterplot:
       if (sp->edges != NULL) g_free ((gpointer) sp->edges);
       if (sp->arrowheads != NULL) g_free ((gpointer) sp->arrowheads);
@@ -484,25 +494,12 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
     case parcoords:
       g_free ((gpointer) sp->whiskers);
     break;
-    case tsplot:
-      g_free ((gpointer) sp->whiskers);
-    break;
-#ifdef BARCHART_IMPLEMENTED
-    case barchart:
-    {
-      barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
-      barchart_free_structure (bsp);
-      g_free ((gpointer) bsp->bar->index_to_rank);
-      g_free ((gpointer) bsp->bar);
-    }
-    break;
-#endif
     default:
     break;
-  }
+   }
 
-  gtk_widget_destroy (sp->da);
-  g_free ((gpointer) sp);
+   gtk_widget_destroy (GTK_WIDGET(sp));
+  }
 }
 
 void
@@ -626,7 +623,11 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
  * beyond d->ncols.
 */
 
-  switch (display->displaytype) {
+  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+      GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->world_to_plane(sp, d, gg);
+  } else {
+
+   switch (display->displaytype) {
 
     case scatterplot:
       switch (cpanel->projection) {
@@ -650,20 +651,7 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
           tourcorr_projdata(sp, d->world.vals, d, gg);
         break;
 
-        case NULLMODE:
-        case ROTATE:
-        case SCALE:
-        case BRUSH:
-        case IDENT:
-        case EDGEED:
-        case MOVEPTS:
-        case SCATMAT:
-        case PCPLOT:
-        case TSPLOT:
-#ifdef BARCHART_IMPLEMENTED
-        case BARCHART:
-#endif
-        case NMODES:
+        default:
         break;
       }
       
@@ -680,25 +668,16 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
       p1d_reproject (sp, d->world.vals, d, gg);
     break;
 
-    case tsplot:
-      xy_reproject (sp, d->world.vals, d, gg);
-    break;
-
-#ifdef BARCHART_IMPLEMENTED
-    case barchart:
-      barchart_recalc_dimensions (GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
-    break;
-#endif
-
     default:
     break;
+   }
   }
 }
 
 
 void
 splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
-  ggobid *gg)
+		       ggobid *gg)
 /*
  * Use the data in projection coordinates and rescale it to the
  * dimensions of the current plotting window, writing it into screen.
@@ -708,17 +687,16 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   gfloat scale_x, scale_y;
   datad *d = display->d;
   glong ltmp;
+  GtkGGobiExtendedSPlotClass *klass = NULL;
 
-
-#ifdef BARCHART_IMPLEMENTED
-  if  (display->displaytype == barchart) {
-    barchartSPlotd *bsp =  GTK_GGOBI_BARCHART_SPLOT(sp);
-    barchart_recalc_dimensions (bsp, d, gg);
-    barchart_recalc_group_dimensions (bsp,gg);
-
-    return;
+  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+       klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+    
+       if(klass->plane_to_screen) {
+        klass->plane_to_screen(sp, d, gg);
+	return;
+       }
   }
-#endif
 
   scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
   scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
@@ -750,23 +728,22 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
     sp->screen[i].y += (sp->max.y / 2);
   }
 
-  switch (display->displaytype) {
+  if(klass) {
+    klass->sub_plane_to_screen(sp, display, d, gg);
+  } else {
+   switch (display->displaytype) {
     case parcoords:
       sp_whiskers_make (sp, display, gg);
-    break;
-    case tsplot:
-      tsplot_whiskers_make (sp, display, gg);
     break;
     case scatterplot:
       ash_baseline_set (&sp->p1d.ash_baseline, sp);
       ash_baseline_set (&sp->tour1d.ash_baseline, sp);
     break;
     case scatmat:
-#ifdef BARCHART_IMPLEMENTED
-    case barchart:
-#endif
     case unknown_display_type:
+    default:
     break;
+   }
   }
 }
 

@@ -103,7 +103,8 @@ typedef struct _GtkGGobiClass
   @brief This is the top-level structure representing a 
   ggobi instance.
  */
-struct _ggobid {
+struct _ggobid 
+{
 
   GtkObject object;
 
@@ -122,6 +123,7 @@ struct _ggobid {
             /*-- first is default: cases, nodes; second might be edges --*/
 
  /* main_ui */
+ GtkWidget *current_control_panel;
  GtkWidget *control_panel[NMODES];
  GtkWidget *main_window, *main_menubar;
  GtkItemFactory *main_menu_factory;
@@ -251,19 +253,14 @@ struct _ggobid {
 
 /*---------------------time series------------------------------------*/  
 
+/*XX */
  struct _TSPLOT {
    GtkAccelGroup *accel_group;
    GtkWidget *arrangement_box;
    GtkWidget *mode_menu;
  } tsplot;
 
-/*----------------------- barchart------------------------------------*/
 
- struct _BARCHART {
-   GtkAccelGroup *accel_group;
-   GtkWidget *arrangement_box;
-   GtkWidget *mode_menu;
- } barchart;
 
 /*------------------------ brushing ----------------------------------*/
 
@@ -544,6 +541,10 @@ void showHelp();
 void globals_init (ggobid *gg);
 
 void gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject *object,  GtkSignalFunc func, gpointer func_data, GtkArg *args);
+
+
+extern GSList *ExtendedDisplayTypes;
+typedef GtkType (*GtkTypeLoad)(void);
 
 #endif
 

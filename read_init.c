@@ -458,8 +458,8 @@ getDisplayType(const xmlChar *type)
     val = scatmat;
   else if(strcmp((char *)type, "parcoords") == 0)
     val = parcoords;
-  else if(strcmp((char *)type,"tsplot") == 0)
-    val = tsplot;
+  else
+    val = extended_display_type;
 
   return(val);
 }
@@ -954,8 +954,13 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
       dpy = GGOBI(newScatmat)(vars, vars, desc->numVars,
                               desc->numVars, data, gg);
     break;
-    case tsplot:
+    case extended_display_type:
+#if 0
+/*XX  for time series. */
       dpy = GGOBI(newTimeSeries)(vars, desc->numVars, data, gg);
+#endif
+      g_printerr("Handle the extended display types soon");
+      dpy = NULL;
     break;
     case unknown_display_type:
     default:

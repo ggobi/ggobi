@@ -34,9 +34,9 @@
  */
 GtkWidget *
 CreateMenuItem (GtkWidget *menu,
-  gchar *szName, gchar *szAccel, gchar *szTip,
-  GtkWidget *win_main, GtkAccelGroup *accel_group,
-  GtkSignalFunc func, gpointer data, ggobid *gg)
+		gchar *szName, gchar *szAccel, gchar *szTip,
+		GtkWidget *win_main, GtkAccelGroup *accel_group,
+		GtkSignalFunc func, gpointer data, ggobid *gg)
 {
   GtkWidget *menuitem;
 

@@ -17,6 +17,8 @@ typedef enum {ascii_data, binary_data, Sprocess_data, xml_data, mysql_data, url_
 
 typedef enum {NONE, EXPOSE, QUICK, BINNED, FULL, FULL_1PIXMAP} RedrawStyle;
 
+/* see varpanel_ui.c and especially varpanel_names. */
+enum {VARSEL_X, VARSEL_Y, VARSEL_LABEL}; 
 
 /* For use in the sticky_point_added and sticky_point_removed events. */
 typedef enum {STICKY, UNSTICKY} PointIdentifyState;
@@ -258,6 +260,7 @@ typedef struct
 
  gint *index_to_rank;
 } barchartd;
+
 
 #define TYPES_H
 

@@ -16,6 +16,8 @@
 #include "plugin.h"
 #endif
 
+void buildExtendedDisplayMenu(ggobid *gg, int nd, datad *d0);
+
 void
 display_set_position (windowDisplayd *display, ggobid *gg)
 {
@@ -183,82 +185,11 @@ display_menu_build (ggobid *gg)
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
     } 
 
-    if (nd == 1) {
-      item = CreateMenuItem (gg->display_menu, "New time series plot",
-        NULL, NULL, gg->main_menubar, gg->main_accel_group,
-        GTK_SIGNAL_FUNC (display_open_cb), (gpointer) d0, gg);
-      gtk_object_set_data (GTK_OBJECT (item),
-        "displaytype", GINT_TO_POINTER (tsplot));
-      gtk_object_set_data (GTK_OBJECT (item),
-        "missing_p", GINT_TO_POINTER (0));
+ 
 
-    } else {  /*-- prepare the menu for multiple data matrices --*/
-
-      submenu = gtk_menu_new ();
-      anchor = CreateMenuItem (gg->display_menu,
-        "New time series plot",
-        NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
-
-      for (k=0; k<nd; k++) { 
-        datad *d = (datad*) g_slist_nth_data (gg->d, k);
-
-        /*-- add an item for each datad with variables --*/
-        if (g_slist_length (d->vartable) > 0) {
-          lbl = datasetName (d, gg);
-          item = CreateMenuItem (submenu, lbl,
-            NULL, NULL, gg->display_menu, gg->main_accel_group,
-            GTK_SIGNAL_FUNC (display_open_cb),
-            g_slist_nth_data (gg->d, k), gg);
-          gtk_object_set_data (GTK_OBJECT (item),
-            "displaytype", GINT_TO_POINTER (tsplot));
-          gtk_object_set_data (GTK_OBJECT (item),
-            "missing_p", GINT_TO_POINTER (0));
-          g_free (lbl);
-        }
-      }
-
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
-    } 
-
-
-#ifdef BARCHART_IMPLEMENTED
-    if (nd == 1) {
-      item = CreateMenuItem (gg->display_menu, "New barchart",
-        NULL, NULL, gg->main_menubar, gg->main_accel_group,
-        GTK_SIGNAL_FUNC (display_open_cb), (gpointer) d0, gg);
-      gtk_object_set_data (GTK_OBJECT (item),
-        "displaytype", GINT_TO_POINTER (barchart));
-      gtk_object_set_data (GTK_OBJECT (item),
-        "missing_p", GINT_TO_POINTER (0));
-
-    } else {  /*-- prepare the menu for multiple data matrices --*/
-
-      submenu = gtk_menu_new ();
-      anchor = CreateMenuItem (gg->display_menu,
-        "New barchart",
-        NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
-
-      for (k=0; k<nd; k++) {
-        datad *d = (datad*) g_slist_nth_data (gg->d, k);
-
-        /*-- add an item for each datad with variables --*/
-        if (g_slist_length (d->vartable) > 0) {
-          lbl = datasetName (d, gg);
-          item = CreateMenuItem (submenu, lbl,
-            NULL, NULL, gg->display_menu, gg->main_accel_group,
-            GTK_SIGNAL_FUNC (display_open_cb),
-            g_slist_nth_data (gg->d, k), gg);
-          gtk_object_set_data (GTK_OBJECT (item),
-            "displaytype", GINT_TO_POINTER (barchart));
-          gtk_object_set_data (GTK_OBJECT (item),
-            "missing_p", GINT_TO_POINTER (0));
-          g_free (lbl);
-        }
-      }
-
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
+    if(g_slist_length(ExtendedDisplayTypes)) {
+       buildExtendedDisplayMenu(gg, nd, d0);
     }
-#endif
   }
 
 #ifdef SUPPORT_PLUGINS  
@@ -282,4 +213,89 @@ display_menu_init (ggobid *gg)
   gtk_widget_show (gg->display_menu_item);
 
   submenu_insert (gg->display_menu_item, gg->main_menubar, 1);
+}
+
+
+typedef struct {
+  GtkGGobiExtendedDisplayClass *klass;
+  datad *d;
+} ExtendedDisplayCreateData;
+
+static void
+extended_display_open_cb (GtkWidget *w, ExtendedDisplayCreateData *data)
+{
+  ggobid *gg = data->d->gg;
+  displayd *dpy;
+
+  if(data->d->nrows == 0)
+	return;
+
+  if(!data->klass->create) {
+       /* How to get the name of the class from the class! GTK_OBJECT_CLASS(gtk_type_name(data->klass)->type) */
+     g_printerr("Real problems! An extended display (%s) without a create routine!\n",  "?");
+  }
+
+  splot_set_current (gg->current_splot, off, gg);   
+  dpy = data->klass->create(false, NULL, data->d, gg);
+  display_add(dpy, gg);
+  varpanel_refresh(dpy, gg);
+}
+
+void
+buildExtendedDisplayMenu(ggobid *gg, int nd, datad *d0)
+{
+	gchar label[200], *lbl;
+	GtkGGobiExtendedDisplayClass *klass;
+	GSList *el = ExtendedDisplayTypes;
+	const gchar * desc;
+	GtkWidget *item, *submenu, *anchor;
+	int k;
+	ExtendedDisplayCreateData *cbdata;
+
+	while(el) {
+	    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS((GtkObjectClass *) el->data);
+	    desc = klass->titleLabel;
+	    sprintf(label, "New %s", desc);
+
+	    if(nd == 1) {
+   	        cbdata = (ExtendedDisplayCreateData *) g_malloc(sizeof(ExtendedDisplayCreateData));
+		cbdata->d = d0;
+		cbdata->klass = klass;
+
+		item = CreateMenuItem (gg->display_menu, label,
+				       NULL, NULL, gg->main_menubar, gg->main_accel_group,
+				       GTK_SIGNAL_FUNC (extended_display_open_cb), (gpointer) cbdata, gg);
+		gtk_object_set_data (GTK_OBJECT (item),
+				     "missing_p", GINT_TO_POINTER (0));
+	    } else {
+		submenu = gtk_menu_new ();
+		anchor = CreateMenuItem (gg->display_menu, label,
+					 NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
+
+		for (k=0; k < nd; k++) { 
+		    datad *d = (datad*) g_slist_nth_data (gg->d, k);
+
+		/*-- add an item for each datad with variables --*/
+		    if (g_slist_length (d->vartable) > 0) {
+			lbl = datasetName (d, gg);
+			cbdata = (ExtendedDisplayCreateData *) g_malloc(sizeof(ExtendedDisplayCreateData*));
+			cbdata->d = d;
+			cbdata->klass = klass;
+			item = CreateMenuItem (submenu, lbl,
+					       NULL, NULL, gg->display_menu, gg->main_accel_group,
+					       GTK_SIGNAL_FUNC (extended_display_open_cb),
+					       cbdata, gg);
+
+			gtk_object_set_data (GTK_OBJECT (item),
+					     "displaytype", (gpointer) klass);
+			gtk_object_set_data (GTK_OBJECT (item),
+					     "missing_p", GINT_TO_POINTER (0));
+			g_free (lbl);
+		    }
+		}
+		gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
+	    }
+
+	    el = el->next;
+	}
 }

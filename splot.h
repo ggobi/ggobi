@@ -116,5 +116,65 @@ typedef struct
 
 } splotd;
 
+
+#define GTK_TYPE_GGOBI_EXTENDED_SPLOT           (gtk_ggobi_extended_splot_get_type())
+#define GTK_GGOBI_EXTENDED_SPLOT(obj)	        (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_EXTENDED_SPLOT, extendedSPlotd))
+#define GTK_GGOBI_EXTENDED_SPLOT_CLASS(klass)	(GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_EXTENDED_SPLOT, GtkGGobiExtendedSPlotClass))
+#define GTK_IS_GGOBI_EXTENDED_SPLOT(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_EXTENDED_SPLOT))
+#define GTK_IS_GGOBI_EXTENDED_SPLOT_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_EXTENDED_SPLOT))
+
+GtkType gtk_ggobi_extended_splot_get_type(void);
+
+#include "datad.h"
+
+typedef struct 
+{
+
+   GtkGGobiSPlotClass splot;
+
+   gchar *(*tree_label)(splotd *sp, datad *d, ggobid *gg);
+ 
+   gboolean (*identify_notify)(icoords, splotd *, datad *, ggobid *);
+
+   void (*add_plot_labels)(splotd *, GdkDrawable *, ggobid *gg);
+   void (*add_markup_cues)(splotd *, GdkDrawable *, ggobid *);
+   void (*add_scaling_cues)(splotd *, GdkDrawable *, ggobid *);
+
+   gboolean (*redraw)(splotd *, datad *, ggobid *, gboolean binned);
+
+   void (*world_to_plane)(splotd *, datad *, ggobid *);
+
+	/** Convenience to be called within the standard loop */
+   void (*sub_plane_to_screen)(splotd *sp, displayd *dpy, datad *d, ggobid *gg);
+        /** Allows the class to take over the entire plane_to_screen.
+            Handling each row can be done using a method for sub_plane_to_screen. */
+   void (*plane_to_screen)(splotd *, datad *, ggobid *);
+
+   gint (*active_paint_points)(splotd *, datad *);
+
+
+   GdkSegment *(*alloc_whiskers)(splotd *sp, gint nrows, datad *d);
+
+	/** called from splot_plot_edge */
+   gboolean (*draw_edge_p)(splotd *sp, gint m, datad *d, datad *e, ggobid *gg);
+	/** called from splot_plot_case. Should probably be the same as draw_edge_p but
+            doesn't take the edge argument! Could drop the first datad in splot_plot_edge
+            and just hand it the one dataset. */
+   gboolean (*draw_case_p)(splotd *sp, gint m, datad *d, ggobid *gg);
+
+   void (*within_draw_to_binned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
+   void (*within_draw_to_unbinned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
+
+} GtkGGobiExtendedSPlotClass;
+
+typedef struct 
+{
+
+   splotd splot; 
+
+} extendedSPlotd;
+
+
+
 void splot_init(splotd *sp, displayd *display, gint width, gint height, struct _ggobid *gg);
 #endif

@@ -225,10 +225,10 @@ gtk_signal_connect (GTK_OBJECT(tree), "select_child",
    Need to find out how to get the title from a GtkWindow.
    For now, use a string associated with the displaytype.
  */
-gchar *
+gchar * 
 display_tree_label(displayd *display)
 {
- gchar *val, *tmp;
+ gchar * val, *tmp;
 
  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display))
     val = gtk_display_tree_label(display);
@@ -268,9 +268,13 @@ display_tree_label(displayd *display)
 gchar *
 splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,  datad *d, ggobid *gg)
 {
-  gchar *buf;
+  gchar *buf = "";
   gint n;
   vartabled *vt, *vtx, *vty;
+
+  if(GTK_IS_GGOBI_EXTENDED_SPLOT(splot)) {
+      return(GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(splot)->klass)->tree_label(splot, d, gg));
+  }
 
   switch (type) {
     case scatterplot:
@@ -326,20 +330,6 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,  datad *d, ggo
       buf = (gchar*) g_malloc(n * sizeof (gchar*));
       sprintf(buf, "%s", vt->collab);
     break;
-    case tsplot:
-      vty = vartable_element_get (splot->xyvars.y, d);
-      n = strlen (vty->collab);
-      buf = (gchar*) g_malloc(n* sizeof (gchar*));
-      sprintf(buf, "%s", vty->collab);
-    break;
-#ifdef BARCHART_IMPLEMENTED
-    case barchart:
-      vt = vartable_element_get (splot->p1dvar, d);
-      n = strlen (vt->collab);
-      buf = (gchar*) g_malloc(n* sizeof (gchar*));
-      sprintf(buf, "%s", vt->collab);
-    break; 
-#endif
     case unknown_display_type:
     break;
     default:

@@ -123,9 +123,14 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   gint k;
 
-  switch (display->displaytype) {
-    case scatterplot:
-      switch (mode) {
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+       GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+       ncols = klass->plotted_vars_get(display, cols, d, gg);
+  } else {
+
+    switch (display->displaytype) {
+     case scatterplot:
+       switch (mode) {
         case P1PLOT:
           cols[ncols++] = sp->p1dvar;
         break;
@@ -147,21 +152,7 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
           for (k=0; k<display->tcorr2.nactive; k++)
             cols[ncols++] = display->tcorr2.active_vars.els[k];
         break;
-
-        case NULLMODE:
-        case ROTATE:
-        case SCALE:
-        case BRUSH:
-        case IDENT:
-        case EDGEED:
-        case MOVEPTS:
-        case SCATMAT:
-        case PCPLOT:
-        case TSPLOT:
-#ifdef BARCHART_IMPLEMENTED
-            case BARCHART:
-#endif
-        case NMODES:
+        default:
         break;
       }
     break;
@@ -194,25 +185,12 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
       }
     }
     break;
-    case tsplot:
-    {
-      GList *l;
-      splotd *s;
-      for (l=display->splots; l; l=l->next) {
-        s = (splotd *) l->data;
-        if (!array_contains (cols, ncols, s->xyvars.y))
-          cols[ncols++] = s->xyvars.y;
-      }
-    }
-    break;
-#ifdef BARCHART_IMPLEMENTED
-    case barchart:
-      cols[ncols++] = sp->p1dvar;
-    break;
-#endif
+
 
     case unknown_display_type:
+    default:
     break;
+   }
   }
 
   return ncols;
