@@ -181,5 +181,16 @@ don't terminate if no GGobi windows are open
 </quickHelp>
 </arg>
 
+<arg name="restore" type="both">
+<description>
+specifies the name of a file/URL containing 
+a description of a previous GGobi session 
+which will be used to attempt to recreate that session.
+</description>
+<quickHelp>
+restore a previously saved GGobi session.
+</quickHelp>
+</arg>
+
 </arguments>
 

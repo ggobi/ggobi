@@ -189,6 +189,8 @@ parse_command_line (gint *argc, gchar **av)
     } else if(strcmp(av[1], "-restore") == 0) {
       sessionOptions->restoreFile = g_strdup(av[2]);
       (*argc)--; av++;
+    } else if((ptr = getOptValue("restore", av[1]))) {
+      sessionOptions->restoreFile = ptr;
     }
   }
 
@@ -481,8 +483,11 @@ processRestoreFile(const gchar * const fileName, ggobid *gg)
     GGobiDisplayDescription *dpyDesc;
     dpyDesc = (GGobiDisplayDescription *) el->data;
     dpy = createDisplayFromDescription(gg, dpyDesc);    
+    /*XX free dpyDesc here and remove from list. */
     el = el->next;
   }
+
+  xmlFreeDoc(doc);
 
   return(true);
 }

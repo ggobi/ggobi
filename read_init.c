@@ -388,6 +388,7 @@ getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc)
   GGobiDisplayDescription *dpy;
   gint n = 0;
   desc->displays = NULL;
+
   while(el) {
     if(el->type != XML_TEXT_NODE && strcmp((char *)el->name, "display") == 0) {
       dpy = getDisplayDescription(el) ;
@@ -412,6 +413,9 @@ getDisplayDescription(xmlNodePtr node)
   xmlChar *tmp;
 
   dpy = (GGobiDisplayDescription*) g_malloc(sizeof(GGobiDisplayDescription));
+  memset(dpy, '\0', sizeof(GGobiDisplayDescription));
+  dpy->canRecreate = true;
+
   tmp = xmlGetProp(node, (xmlChar *) "type");
   dpy->typeName = g_strdup(tmp);
   tmp = xmlGetProp(node, (xmlChar *) "data");
