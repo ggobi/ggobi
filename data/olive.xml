@@ -6,16 +6,36 @@
 <description>
 </description>
 <variables count="10">
-<variable>Region</variable>
-<variable>Area</variable>
-<variable>palmitic</variable>
-<variable>palmitoleic</variable>
-<variable>stearic</variable>
-<variable>oleic</variable>
-<variable>linoleic</variable>
-<variable>linolenic</variable>
-<variable>arachidic</variable>
-<variable>eicosenoic</variable>
+
+  <categoricalvariable name="Region">
+    <levels count="3">
+      <level value="1"> 1 </level>
+      <level value="2"> 2 </level>
+      <level value="3"> 3 </level>
+    </levels>
+  </categoricalvariable>
+  <categoricalvariable name="Area">
+    <levels count="9">
+      <level value="1"> North-Apulia </level>
+      <level value="2"> Calabria </level>
+      <level value="3"> South-Apulia </level>
+      <level value="4"> Sicily </level>
+      <level value="5"> Inland-Sardinia </level>
+      <level value="6"> Coast-Sardinia </level>
+      <level value="7"> East-Liguria </level>
+      <level value="8"> West-Liguria </level>
+      <level value="9"> Umbria </level>
+    </levels>
+  </categoricalvariable>
+
+<realvariable name="palmitic" />
+<realvariable name="palmitoleic" />
+<realvariable name="stearic" />
+<realvariable name="oleic" />
+<realvariable name="linoleic" />
+<realvariable name="linolenic" />
+<realvariable name="arachidic" />
+<realvariable name="eicosenoic" />
 </variables>
 <records
  count="572" glyph="fc 2" color="1">
