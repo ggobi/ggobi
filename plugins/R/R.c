@@ -17,6 +17,9 @@ gboolean initR(GGobiPluginInfo *pluginfo);
 SEXP Rg_evalCmd(const char *cmd);
 
 
+SEXP mapHashTable(GHashTable *table);
+USER_OBJECT_ argsToCharacter(GSList *args);
+
 typedef struct {
    const char *sourceFile;
    const char *constructor;
@@ -157,6 +160,7 @@ R_ggobiPluginInstRef(PluginInstance *inst)
 {
     return(R_createRef(inst, "ggobiPluginInstance"));
 }
+
 USER_OBJECT_
 R_ggobiRef(ggobid *gg)
 {
@@ -174,12 +178,18 @@ RCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 
     fprintf(stderr, "Creating R plugin %s\n", data->constructor);fflush(stderr);
     if(data->constructor) {
-	USER_OBJECT_ e;
+	USER_OBJECT_ e, tmp;
         /* Construct a call of the form constructor(gg, inst) */
-        PROTECT(e = allocVector(LANGSXP, 3));
+        PROTECT(e = allocVector(LANGSXP, 5));
 	SETCAR(e, Rf_install((char *) data->constructor));
-        SETCAR(CDR(e), R_ggobiRef(gg));    
-        SETCAR(CDR(CDR(e)), R_ggobiPluginInstRef(inst));    
+        tmp = CDR(e);
+        SETCAR(tmp, R_ggobiRef(gg));    
+	tmp = CDR(tmp);
+        SETCAR(tmp, R_ggobiPluginInstRef(inst));    
+	tmp = CDR(tmp);
+        SETCAR(tmp, mapHashTable(plugin->details->namedArgs));
+	tmp = CDR(tmp);
+        SETCAR(tmp, argsToCharacter(plugin->details->args));
 
 	obj = tryEval(e, &wasError);
 
@@ -227,6 +237,9 @@ RUpdateDisplayMenu(ggobid *gg, PluginInstance *inst)
 {
     USER_OBJECT_ obj, e;
     RRunTimeData *d = (RRunTimeData *) inst->data;
+
+    if(d == NULL)
+	return(false);
 
     obj = d->pluginObject;
     if(Rf_length(obj) < 2 || !isFunction(VECTOR_ELT(obj, 1)))
@@ -338,14 +351,21 @@ R_GetInputDescription(const char * const fileName, const char * const modeName,
 
     RPluginData *data = (RPluginData *) info->data;
 
-    PROTECT(e = allocVector(LANGSXP, 3));
+    PROTECT(e = allocVector(LANGSXP, 5));
     SETCAR(e, Rf_install(data->constructor));
     SETCAR(CDR(e), tmp = NEW_CHARACTER(1));
     if(fileName)
 	SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(fileName));
     SETCAR(CDR(CDR(e)), tmp = NEW_CHARACTER(1));
-    if(fileName)
+    if(tmp)
 	SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(fileName));
+
+    if(info->details->namedArgs) {
+        SETCAR(CDR(CDR(CDR(e))), mapHashTable(info->details->namedArgs));
+    } else
+        SETCAR(CDR(CDR(CDR(e))), R_NilValue);
+
+   SETCAR(CDR(CDR(CDR(CDR(e)))), argsToCharacter(info->details->args));
 
     obj = tryEval(e, &wasError);
     if(!wasError) {
@@ -404,4 +424,87 @@ R_processPlugin(xmlNodePtr node, GGobiPluginInfo *plugin, GGobiPluginType type,
     setLanguagePluginInfo(details, "R", info);
 
     return(true);
+}
+
+
+
+typedef struct {
+    USER_OBJECT_ els;
+    USER_OBJECT_ names;
+    int  current;
+    int max;
+} R_HashTableConverter;
+
+static gboolean
+collectHashElement(gpointer key, gpointer value, R_HashTableConverter *data)
+{
+    SET_STRING_ELT(data->names, data->current, COPY_TO_USER_STRING((char *)key));  
+    SET_STRING_ELT(data->els, data->current, COPY_TO_USER_STRING((char *)value));  
+    data->current++;
+
+    return(true);
+}
+
+SEXP
+mapHashTable(GHashTable *table)
+{
+    R_HashTableConverter data;
+
+    if(table == NULL)
+	return(R_NilValue); 
+
+    data.max = g_hash_table_size(table);
+    if(data.max < 1)
+	return(R_NilValue);
+
+    data.current = 0;
+    PROTECT(data.els = NEW_CHARACTER(data.max));
+    PROTECT(data.names = NEW_CHARACTER(data.max));
+
+    g_hash_table_foreach(table,  (GHFunc) collectHashElement, (gpointer) &data);
+
+    SET_NAMES(data.els, data.names);
+    UNPROTECT(2);
+    return(data.els);
+}
+
+
+USER_OBJECT_
+RGGobi_getHelpMenu(USER_OBJECT_ sgg)
+{
+ ggobid *gg = (ggobid *) R_ExternalPtrAddr(sgg);
+ GtkItemFactory *factory;
+ GtkWidget *help_menu = NULL;
+
+ if(!gg) {
+     PROBLEM "Invalid ggobid object"
+     ERROR;
+ }
+
+  factory = gtk_item_factory_from_path ("<main>");
+  help_menu = gtk_item_factory_get_widget (factory, "<main>/Help");   
+
+  return(R_createRef(help_menu, "GtkObject"));
+}
+
+USER_OBJECT_
+argsToCharacter(GSList *args)
+{
+    USER_OBJECT_ ans;
+    int i, n;
+    GSList *tmp;
+
+    if(args == NULL)
+	return(NULL_USER_OBJECT);
+
+    n = g_slist_length(args);
+    PROTECT(ans = NEW_CHARACTER(n));
+    tmp = args;
+    for(i = 0; i < n ; i++) {
+	if(tmp->data)
+	    SET_STRING_ELT(ans, i, COPY_TO_USER_STRING((char *)tmp->data));
+	tmp = tmp->next;
+    }
+
+    return(ans);
 }

@@ -32,3 +32,10 @@
 
 
 
+<plugin name="Rhelp" language="R">
+ <description>Help facility using gtkhtml and R</description>
+ <author>Duncan Temple Lang</author>
+ <dll>
+  <init onLoad="plugins/R/R/help.R" onCreate="createRHelpPluginInstance" />
+ </dll>
+</plugin>
