@@ -14,7 +14,6 @@ void       close_glayout_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_glayout_window(ggobid *gg, PluginInstance *inst);
 void       show_glayout_window (GtkWidget *widget, PluginInstance *inst);
 
-
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
@@ -134,7 +133,7 @@ glayout_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
 }
 
 static const gchar *const neato_model_lbl[] = {
-  "Shortest path", "Circuit resistance"};
+  "Shortest path", "Circuit resistance", "Subset"};
 GtkWidget *
 create_glayout_window(ggobid *gg, PluginInstance *inst)
 {

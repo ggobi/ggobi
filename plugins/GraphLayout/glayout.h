@@ -32,7 +32,9 @@ typedef struct {
   noded *nodes;
 } radiald;
 
-typedef enum {neato_shortest_path, neato_circuit_resistance} NeatoModel;
+typedef enum {
+  neato_shortest_path, neato_circuit_resistance, neato_subset
+} NeatoModel;
 
 typedef struct {
 
