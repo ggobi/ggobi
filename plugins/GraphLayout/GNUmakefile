@@ -22,13 +22,12 @@ else
 endif
 
 GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
-#GGOBI_LIB=
+GGOBI_LIB=
 
 ifdef GRAPHVIZ
 CFLAGS+=-Wno-unknown-pragmas
 CFLAGS+= -DGRAPHVIZ=1 $(GVINC:%=-I%)
 LDFLAGS+=-L$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan -lgd -lcdt -ltcldot
-LDFLAGS+=$(GVIZ_EXTLIB_LIB)
 endif
 
 HEADERS=glayout defines
