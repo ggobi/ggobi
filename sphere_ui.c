@@ -127,25 +127,11 @@ sphere_npcs_set_cb (GtkAdjustment *adj, ggobid *gg)
 }
 
 static void
-vars_stdized_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
+vars_stdized_cb (GtkToggleButton *btn, ggobid *gg)
 {
-  gboolean stdized = false;
   datad *d = datad_get_from_window (gg->sphere_ui.window);
-  vartabled *vt;
 
-  if (d != NULL && d->sphere.vars.nels > 0) {
-    gint k;
-    stdized = true;
-    for (k=0; k<d->sphere.vars.nels; k++) {
-      vt = vartable_element_get (d->sphere.vars.els[k], d);
-      if (vt->tform2 != STANDARDIZE) {
-        stdized = false;
-        break;
-      }
-    }
-  }
-
-  gtk_entry_set_text (GTK_ENTRY (w), (stdized) ? "yes" : "no");
+  d->sphere.vars_stdized = btn->active;
 }
 
 void
@@ -423,21 +409,23 @@ sphere_panel_open (ggobid *gg)
     hbox = gtk_hbox_new (false, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
 
-    gtk_box_pack_start (GTK_BOX (hbox),
+    btn = gtk_check_button_new_with_label ("Use correlation matrix");
+    gtk_widget_set_name (btn, "SPHERE:std_button");
+    /*    gtk_box_pack_start (GTK_BOX (hbox),
       gtk_label_new ("Variables standardized?"),
       false, false, 0);
     gg->sphere_ui.stdized_entry = gtk_entry_new ();
-    gtk_entry_set_editable (GTK_ENTRY (gg->sphere_ui.stdized_entry), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.stdized_entry,
+    gtk_entry_set_editable (GTK_ENTRY (gg->sphere_ui.stdized_entry), false);*/
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Have all the selected variables been standardized?  (To standardize, use Variable transformation, Stage 2, then update the scree plot)",
       NULL);
-    gtk_box_pack_start (GTK_BOX (hbox), gg->sphere_ui.stdized_entry,
-      false, false, 0);
-    gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.stdized_entry), "-");
-    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.stdized_entry),
-                        "expose_event",
+    /*    gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.stdized_entry), "-");*/
+    gtk_signal_connect (GTK_OBJECT (btn),
+                        "toggled",
                         (GtkSignalFunc) vars_stdized_cb,
                         (gpointer) gg);
+    gtk_box_pack_start (GTK_BOX (hbox), btn,
+      true, true, 1);
 
     /*-- element 2 of vbox: scree plot --*/
     frame = gtk_frame_new ("Scree plot");

@@ -191,6 +191,9 @@ struct _datad {
    array_f eigenvec;
    array_f vc;
    vector_f tform_mean;
+   vector_f tform_stddev;
+
+   gboolean vars_stdized;
  } sphere;
 
 /*----------------- segments in scatterplots -----------------------------*/

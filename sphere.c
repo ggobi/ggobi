@@ -24,6 +24,7 @@ sphere_init (datad *d) {
   arrayf_init_null (&d->sphere.vc);
 
   vectorf_init_null (&d->sphere.tform_mean);
+  vectorf_init_null (&d->sphere.tform_stddev);
 }
 
 void
@@ -37,6 +38,7 @@ sphere_free (datad *d) {
   arrayf_free (&d->sphere.vc, 0, 0);
 
   vectorf_free (&d->sphere.tform_mean);
+  vectorf_free (&d->sphere.tform_stddev);
 }
 
 void
@@ -53,6 +55,7 @@ sphere_malloc (gint nc, datad *d, ggobid *gg)
     arrayf_alloc_zero (&d->sphere.vc, nc, nc);
 
     vectorf_alloc_zero (&d->sphere.tform_mean, nc);
+    vectorf_alloc_zero (&d->sphere.tform_stddev, nc);
   }
 }
 
@@ -276,7 +279,7 @@ spherevars_set (ggobid *gg) {
     d->sphere.vars.els[j] = vars[j];
 
   /*-- update the "vars stdized?" text entry --*/
-  vars_stdized_send_event (d, gg);
+  /*  vars_stdized_send_event (d, gg);*/
 
   /*-- reset the spinner so that its max is the number of sphered vars --*/
   sphere_npcs_range_set (nvars, gg);
@@ -339,6 +342,7 @@ sphere_varcovar_set (datad *d, ggobid *gg)
   gfloat tmpf = 0.;
   gint n = d->nrows_in_plot;
   gfloat *tform_mean = d->sphere.tform_mean.els;
+  gfloat *tform_stddev = d->sphere.tform_stddev.els;
 
   for (k=0; k<d->sphere.vars.nels; k++) {
     var = d->sphere.vars.els[k];
@@ -368,7 +372,15 @@ sphere_varcovar_set (datad *d, ggobid *gg)
       }
       tmpf /= ((gfloat)(n - 1));
       d->sphere.vc.vals[j][k] = tmpf;
+      if (j == k) tform_stddev[k] = (gfloat) sqrt((gdouble) tmpf);
     }
+  }
+
+  if (d->sphere.vars_stdized) {
+    for (k=0; k<d->sphere.vc.ncols; k++) 
+      for (j=0; j<d->sphere.vc.ncols; j++) 
+        d->sphere.vc.vals[j][k] = d->sphere.vc.vals[j][k] / 
+          (tform_stddev[j]*tform_stddev[k]);
   }
 }
 
@@ -474,6 +486,7 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
   gfloat *b = (gfloat *) g_malloc (svars->nels * sizeof (gfloat));
 
   gfloat *tform_mean = d->sphere.tform_mean.els;
+  gfloat *tform_stddev = d->sphere.tform_stddev.els;
   gfloat **eigenvec = d->sphere.eigenvec.vals;
   gfloat *eigenval = d->sphere.eigenval.els;
 
@@ -483,8 +496,13 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
     for (j=0; j<pcvars->nels; j++) {
       tmpf = 0.;
       for (k=0; k<svars->nels; k++) {
-        tmpf = tmpf + eigenvec[k][j] *
-          (d->tform.vals[i][svars->els[k]] - tform_mean[svars->els[k]]);
+        if (d->sphere.vars_stdized)
+          tmpf = tmpf + eigenvec[k][j] *
+            (d->tform.vals[i][svars->els[k]] - tform_mean[svars->els[k]]) /
+            tform_stddev[svars->els[k]];
+        else
+          tmpf = tmpf + eigenvec[k][j] *
+            (d->tform.vals[i][svars->els[k]] - tform_mean[svars->els[k]]);
       }
       b[j] = tmpf / eigenval[j]; 
     }
