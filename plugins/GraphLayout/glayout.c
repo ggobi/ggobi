@@ -414,7 +414,7 @@ visible_set (glong *visible, datad *d)
   gint nvisible = 0;
 
   for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     if (!d->hidden.els[i]) {
       visible[nvisible++] = i;
     }

@@ -233,7 +233,7 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
   btn = gtk_button_new_with_label ("Hide");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Recursively hide leaf nodes", NULL);
+    "Recursively hide leaf nodes and edges", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (ga_leaf_hide_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
@@ -330,7 +330,7 @@ visible_set (glong *visible, datad *d)
   gint nvisible = 0;
 
   for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     if (!d->hidden.els[i]) {
       visible[nvisible++] = i;
     }

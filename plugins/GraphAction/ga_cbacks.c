@@ -32,7 +32,7 @@ count_visible_edges (PluginInstance *inst)
 */
   /*--   --*/
   for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     for (k=0; k<ga->inEdges[i].nels; k++) {
       edgeid = ga->inEdges[i].els[k];
       a = d->rowid.idv.els[endpoints[edgeid].a];
@@ -132,7 +132,7 @@ ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst)
     changing = false;
     nvisible = 0;
     for (m=0; m<d->nrows_in_plot; m++) {
-      i = d->rows_in_plot[m];
+      i = d->rows_in_plot.els[m];
       if (ga->nInEdgesVisible.els[i] + ga->nOutEdgesVisible.els[i] == 1) {
         /*-- leaf node; hide the node and the edge;  decrease a counter --*/
         if (ga->nInEdgesVisible.els[i] == 1) {
@@ -230,6 +230,10 @@ show_neighbors (gint nodeid, gint edgeid, gint depth,
   }
 }
 
+/*
+ * Find the neighbors of node 'index' and show them; hide
+ * all others.
+*/
 void show_neighbors_sticky_cb (ggobid *gg, gint index, gint state,
   datad *d, void *data)
 {
@@ -250,42 +254,18 @@ void show_neighbors_sticky_cb (ggobid *gg, gint index, gint state,
  * becoming sticky or unsticky.
 */
 
-
-  /*
-   * Find the neighbors of node 'index' and show them; hide
-   * all others.
-  */
   ga_all_hide (d, e, inst);
 
   for (k=0; k<ga->inEdges[index].nels; k++) {
     edgeid = ga->inEdges[index].els[k];
     show_neighbors (index, edgeid, ga->neighborhood_depth, d, e, inst);
-
-/*
-    edgeid = ga->inEdges[index].els[k];
-    a = d->rowid.idv.els[endpoints[edgeid].a];
-    b = d->rowid.idv.els[endpoints[edgeid].b];
-
-    e->hidden_now.els[edgeid] = e->hidden.els[edgeid] = false;
-    d->hidden_now.els[a] = d->hidden.els[a] = false;
-    d->hidden_now.els[b] = d->hidden.els[b] = false;
-*/
-
   }
   for (k=0; k<ga->outEdges[index].nels; k++) {
     edgeid = ga->outEdges[index].els[k];
     show_neighbors (index, edgeid, ga->neighborhood_depth, d, e, inst);
-/*
-    a = d->rowid.idv.els[endpoints[edgeid].a];
-    b = d->rowid.idv.els[endpoints[edgeid].b];
-
-    e->hidden_now.els[edgeid] = e->hidden.els[edgeid] = false;
-    d->hidden_now.els[a] = d->hidden.els[a] = false;
-    d->hidden_now.els[b] = d->hidden.els[b] = false;
-*/
   }
 
-  /*-- now do the linking --*/
+  /*-- <now> do the linking --*/
   if (!gg->linkby_cv && nd > 1) {
     for (i=0; i<d->nrows; i++)
       symbol_link_by_id (true, i, d, gg);

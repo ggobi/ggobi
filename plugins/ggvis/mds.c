@@ -608,7 +608,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
   for (i=0; i<ggv->pos.nrows; i++) 
     ggv->point_status.els[i] = EXCLUDED;
   for (i=0; i<dpos->nrows_in_plot; i++) { 
-    n = dpos->rows_in_plot[i]; 
+    n = dpos->rows_in_plot.els[i]; 
     if(!dpos->hidden_now.els[n])
       ggv->point_status.els[n] = INCLUDED;
   }
