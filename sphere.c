@@ -63,7 +63,6 @@ sphere_malloc (gint nc, datad *d, ggobid *gg)
 void
 variable_set_label (datad *d, gint j, gchar *lbl) 
 {
-  extern void vartable_collab_set_by_var (gint j, datad *d);
   extern void varcircle_label_set (gint jvar, datad *d);
 
   d->vartable[j].collab = g_strdup (lbl);

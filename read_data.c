@@ -142,6 +142,9 @@ collabels_process_word (gchar *word, gint field, gint nvar, datad *d)
 {
   gfloat var;
 
+  /*-- remove leading and trailing whitespace --*/
+  g_strstrip (word);
+
   switch (field) {
     case 0:
       d->vartable[nvar].lim_specified_p = false;
@@ -193,7 +196,7 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
     found = false;
 
   if( found && ( fp = fopen(fileName, "r") ) == NULL ) {
-    g_free(fileName);
+    g_free (fileName);
     found = false;
   }
 
@@ -204,13 +207,15 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
   */
   if (found) {
     gint ch, len = 0, field = 0;
-    gboolean whitespace = false;
+    gboolean fieldsep = false;
     nvar = 0;
 
     while ((ch = fgetc (fp)) != EOF) {
 
-      if (ch == ' ' || ch == '	') {  /*-- blank or tab --*/
-        whitespace = true;
+      /*-- blank or tab --*/
+      /*if (ch == ' ' || ch == '	') {*/
+      if (ch == '|') {
+        fieldsep = true;
 
       } else if (ch == '\n') {
         /*-- process preceding string --*/
@@ -221,11 +226,11 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
         nvar++;
         if (nvar >= d->ncols)
           break;
-        whitespace = false;
+        fieldsep = false;
       } else {  /*-- process the next character --*/
 
-        /*-- if following some number of blanks or tabs, process string --*/
-        if (whitespace && len > 0) {
+        /*-- if following a field separator, process string --*/
+        if (fieldsep && len > 0) {
           /*-- process string --*/
           str[len] = '\0';
           collabels_process_word (str, field, nvar, d);
@@ -242,7 +247,7 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
           len++;
           if (len > INITSTRSIZE)
             break;
-          whitespace = false;
+          fieldsep = false;
         }
       }
     }

@@ -14,6 +14,8 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void vartable_collab_set_by_var (gint, datad *);
+void collab_tform_update (gint j, datad *d, ggobid *gg);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 ggobid * ggobi_get (gint);
 GtkWidget * widget_find_by_name (GtkWidget *, gchar *);

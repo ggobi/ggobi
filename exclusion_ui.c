@@ -9,13 +9,6 @@
     it without violating AT&T's intellectual property rights.
 */
 
-/*
- * I'm constructing one table for each datad.  The thing that's
- * still missing is some kind of labelling or separation to 
- * distinguish datad's from one another.  This also doesn't use
- * scrolling, and that could become a problem.
-*/
-
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
@@ -162,7 +155,7 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
   g_free (str);
 }
 
-static void destroyit (ggobid *gg) {
+static void destroyit (gboolean kill, ggobid *gg) {
   gint n;
   GSList *l;
   datad *d;
@@ -173,12 +166,19 @@ static void destroyit (ggobid *gg) {
       cluster_free (n, d, gg);
   }
 
-  gtk_widget_destroy (gg->exclusion_ui.window);
-  gg->exclusion_ui.window = NULL;
+  if (kill) {
+    gtk_widget_destroy (gg->exclusion_ui.window);
+    gg->exclusion_ui.window = NULL;
+  } else {
+    /*-- the window should have just one child.  Find it and kill it --*/
+    GList* gl = gtk_container_children (GTK_CONTAINER(gg->exclusion_ui.window));
+    GtkWidget *child = (GtkWidget *) gl->data;
+    gtk_widget_destroy (child);
+  }
 }
 
 void
-reset_cluster_table (datad *d, ggobid *gg) {
+update_cluster_table (datad *d, ggobid *gg) {
   gint k, table_rows;
 
   /*-- destroy all the widgets that were in the table --*/
@@ -196,19 +196,19 @@ reset_cluster_table (datad *d, ggobid *gg) {
     exclusion_cluster_add (k, d, gg);
 }
 
-/*-- to reset it, just start fresh --*/
-static void reset_cb (GtkWidget *w, ggobid *gg) {
+/*-- to update it, just start fresh --*/
+static void update_cb (GtkWidget *w, ggobid *gg) {
   exclusion_window_open (gg);
 }
 
 /*-- called when closed from the close button --*/
 static void close_cb (GtkWidget *w, ggobid *gg) {
-  destroyit (gg);
+  destroyit (true, gg);
 }
 
 /*-- called when closed from the window manager --*/
 static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
-  destroyit (gg);
+  destroyit (true, gg);
 }
 
 void
@@ -221,14 +221,18 @@ exclusion_window_open (ggobid *gg) {
 
   /*-- if it isn't NULL, then destroy it and start afresh --*/
   if (gg->exclusion_ui.window != NULL) {
-    destroyit (gg);
+    destroyit (false, gg);  /*-- don't kill the whole thing --*/
   }
 
-  gg->exclusion_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_signal_connect (GTK_OBJECT (gg->exclusion_ui.window), "delete_event",
-                      GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
-  gtk_window_set_title (GTK_WINDOW (gg->exclusion_ui.window),
-    "ggobi hide/exclude window");
+  if (gg->exclusion_ui.window == NULL ||
+      !GTK_WIDGET_REALIZED (gg->exclusion_ui.window))
+  {
+    gg->exclusion_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_signal_connect (GTK_OBJECT (gg->exclusion_ui.window), "delete_event",
+                        GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
+    gtk_window_set_title (GTK_WINDOW (gg->exclusion_ui.window),
+      "ggobi hide/exclude window");
+  }
 
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
@@ -290,10 +294,10 @@ exclusion_window_open (ggobid *gg) {
   hbox = gtk_hbox_new (false, 2);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
 
-  /*-- Reset button --*/
-  btn = gtk_button_new_with_label ("Reset");
+  /*-- Update button --*/
+  btn = gtk_button_new_with_label ("Update");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (reset_cb), (gpointer) gg);
+                      GTK_SIGNAL_FUNC (update_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);
 
   /*-- Close button --*/

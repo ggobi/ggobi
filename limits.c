@@ -76,8 +76,8 @@ static void
 limits_raw_set_by_var (gint j, datad *d) {
   gint i, m;
 
-  d->vartable[j].lim_raw.min = d->raw.vals[0][j];
-  d->vartable[j].lim_raw.max = d->raw.vals[0][j];
+  d->vartable[j].lim_raw.min = d->raw.vals[d->rows_in_plot[0]][j];
+  d->vartable[j].lim_raw.max = d->raw.vals[d->rows_in_plot[0]][j];
 
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];
@@ -107,8 +107,8 @@ limits_tform_set_by_var (gint j, datad *d)
   gfloat sum = 0.0;
   gfloat *x = (gfloat *) g_malloc (d->nrows * sizeof (gfloat));
 
-  d->vartable[j].lim_tform.min = d->tform.vals[0][j];
-  d->vartable[j].lim_tform.max = d->tform.vals[0][j];
+  d->vartable[j].lim_tform.min = d->tform.vals[d->rows_in_plot[0]][j];
+  d->vartable[j].lim_tform.max = d->tform.vals[d->rows_in_plot[0]][j];
 
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];

@@ -295,11 +295,6 @@ scatmat_add_plot (gint xvar, gint yvar, gint col, gint row,
   return sp_new;
 }
 
-/*
- * if jvar is selected (ie, in scatmat_cols (and scatmat_rows)),
- * then delete it.  Otherwise replace/insert/append it.
- * Assume symmetry, but verify.
-*/
 gboolean
 scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
   gint *jvar_prev, ggobid *gg)
@@ -328,8 +323,9 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
  * If jvar is selected, delete a row and a column.  Delete the
  * variable that's selected; we have no interest in the current splot.
 */
-  if (scatmat_var_selected (jvar, display) &&
-      cpanel->scatmat_selection_mode == VAR_DELETE)
+  /*-- VAR_DELETE --*/
+  if (cpanel->scatmat_selection_mode == VAR_DELETE &&
+      scatmat_var_selected (jvar, display))
   {
     /* if jvar is one of the plotted variables, its row and column */
     gint jvar_rc = g_list_index (display->scatmat_cols, GINT_TO_POINTER (jvar));
@@ -404,6 +400,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
  * Otherwise, replace, insert or append a row <and> a column --
  * depending on the value of scatmat_selection_mode.
 */
+  /*-- VAR_REPLACE or VAR_INSERT or VAR_APPEND  --*/
   else if (!scatmat_var_selected (jvar, display)) {
 
     /* the row and column of gg.current_splot */
@@ -461,6 +458,9 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
     } else {  /* VAR_INSERT or VAR_APPEND */
       gint newvar;
       gint row = -1, col = -1;
+
+      /*-- prepare to reset the current plot --*/
+      sp_event_handlers_toggle (sp, off);
 
       /*
        * First adjust the table, inserting or appending a row
@@ -529,6 +529,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
                         scatmat_nvars, scatmat_nvars);
 
       gg->current_splot = sp_new;
+      sp_event_handlers_toggle (sp_new, on);
       redraw = true;
     }
   }
