@@ -160,7 +160,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
   gtk_box_pack_start (GTK_BOX (main_vbox), notebook, false, false, 2);
 
-/*-- Distance controls --*/
+/*-- "Definition of D" controls --*/
 
   hbox = gtk_hbox_new (false, 1);
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
@@ -168,7 +168,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   vbox = gtk_vbox_new (false, 1);
   gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 2);
 
-  /*-- Use edge distances or an edge variable --*/
+  /*-- Option menu: Use edge distances or an edge variable --*/
   opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), opt,
     "To define the distance matrix D, use unweighted edges (typical for graphs) or the edge variable selected at right (typical for MDS data and weighted graphs)",
@@ -182,18 +182,28 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Fill in a missing D[i,j] using a shortest path algorithm when a path exists from i to j; by default, D[i,j] is treated as missing.",
     NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+    GTK_SIGNAL_FUNC (ggv_complete_distances_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
   /*-- include only edge sets.  --*/
   varnotebook = create_variable_notebook (hbox,
     GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
     (GtkSignalFunc) NULL, inst->gg);
-  gtk_object_set_data (GTK_OBJECT (window),
-    "notebook", varnotebook);
 
-/*
- * Add an apply button
-*/
+  /*
+   * create this button after the varnotebook, because it's
+   *   necessary to get hold of the notebook in the button callback
+  */
+  btn = gtk_button_new_with_label ("Compute D");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "Compute the new target distance matrix D.",
+    NULL);
+  gtk_object_set_data (GTK_OBJECT(btn), "notebook", varnotebook);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (ggv_compute_Dtarget_cb), inst);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
+
 
   label = gtk_label_new ("Definition of D");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);

@@ -10,10 +10,8 @@
 
 void
 ggvis_init (ggvisd *ggv) {
-  arrayd_init_null (&ggv->dist_orig);
-  arrayd_init_null (&ggv->dist);
-  arrayd_init_null (&ggv->pos_orig);
-  arrayd_init_null (&ggv->pos);
+  arrayg_init_null (&ggv->Dtarget);
+  arrayg_init_null (&ggv->pos);
 
   ggv->stressplot_pix = NULL;
   ggv->histogram_pix = NULL;
@@ -38,5 +36,8 @@ ggvis_init (ggvisd *ggv) {
 
   ggv->metric_nonmetric = metric;
   ggv->KruskalShepard_classic = KruskalShepard;
+
+  ggv->Dtarget_source = LinkDist;
+  ggv->complete_Dtarget = false;
 }
 

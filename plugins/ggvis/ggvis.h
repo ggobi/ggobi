@@ -14,13 +14,12 @@
 typedef enum {deflt, within, between, anchorscales, anchorfixed} MDSGroupInd;
 typedef enum {metric, nonmetric} MDSMetricInd;
 typedef enum {KruskalShepard, classic} MDSKSInd;
+typedef enum {LinkDist, VarValues} MDSDtargetSource;
 
 typedef struct {
 
-  array_d dist_orig;
-  array_d dist;
-  array_d pos_orig;
-  array_d pos;
+  array_g Dtarget;
+  array_g pos;
 
   GdkPixmap *stressplot_pix;
   GdkPixmap *histogram_pix;
@@ -47,6 +46,8 @@ typedef struct {
 /* callbacks written */
   MDSMetricInd metric_nonmetric;
   MDSKSInd KruskalShepard_classic;
+  MDSDtargetSource Dtarget_source;
+  gboolean complete_Dtarget;
 
 } ggvisd;
 
@@ -55,9 +56,13 @@ typedef struct {
 /*                          functions                                   */
 /*----------------------------------------------------------------------*/
 
-void ggv_dsource_cb (GtkWidget *w, PluginInstance *inst);
 void ggvis_init (ggvisd *);
 ggvisd* ggvisFromInst (PluginInstance *inst);
+
+void ggv_dsource_cb (GtkWidget *w, gpointer cbd);
+void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst);
+void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst);
+
 gint ggv_stressplot_configure_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
 gint ggv_stressplot_expose_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
 gint ggv_histogram_configure_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
