@@ -560,6 +560,8 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   sp->release_id = 0;
   sp->motion_id = 0;
 
+  gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[SPLOT_NEW_SIGNAL], sp, gg);
+
   return sp;
 }
 

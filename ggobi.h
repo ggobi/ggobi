@@ -482,5 +482,7 @@ void process_initialization_files();
 
 extern GGobiOptions *sessionOptions;
 
+enum {DATA_NEW_SIGNAL, SPLOT_NEW_SIGNAL, BRUSH_MOTION_SIGNAL,  MAX_GGOBI_SIGNALS};
+extern guint GGobiSignals[MAX_GGOBI_SIGNALS];
 #endif
 

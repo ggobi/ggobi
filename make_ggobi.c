@@ -29,6 +29,8 @@
 #include "read_mysql.h"
 #endif
 
+guint GGobiSignals[MAX_GGOBI_SIGNALS];
+
 gboolean read_input(InputDescription *desc, ggobid *gg);
 
 /*-- initialize variables which don't depend on the size of the data --*/
@@ -58,6 +60,21 @@ void globals_init (ggobid *gg) {
         GTK_TYPE_POINTER);
   }
 #endif
+  if (gtk_signal_lookup ("brush_motion", GTK_TYPE_WIDGET) == 0) {
+      GGobiSignals[BRUSH_MOTION_SIGNAL] = 
+       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
+					"brush_motion", GTK_RUN_LAST|GTK_RUN_ACTION,
+                                        gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 3,
+                                        GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+  }
+
+  if (gtk_signal_lookup ("splot_new", GTK_TYPE_WIDGET) == 0) {
+      GGobiSignals[SPLOT_NEW_SIGNAL] = 
+       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
+					"splot_new", GTK_RUN_LAST|GTK_RUN_ACTION,
+                                        gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 2,
+                                        GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+  }
   if (gtk_signal_lookup ("variable_added", GTK_TYPE_WIDGET) == 0) {
     gg->signal_variable_added =
       gtk_object_class_user_signal_new (gtk_type_class (GTK_TYPE_WIDGET),

@@ -227,11 +227,25 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
   /*-- get the mouse position and find out which buttons are pressed --*/
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
 
-  if (button1_p || button2_p)
+  if (button1_p || button2_p) {
     brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, sp, gg);
 
+     /* Like this to be emitted from the display. */
+#if TEST_BRUSH_MOTION_CB 
+    fprintf(stderr, "emiting brush motion signal (w) %p (gg) %p (sp) %p (event) %p\n", w, gg, sp, event);fflush(stderr);
+#endif
+    gtk_signal_emit(GTK_OBJECT(w), GGobiSignals[BRUSH_MOTION_SIGNAL], gg, sp, event);
+  }
   return true;
 }
+
+#if TEST_BRUSH_MOTION_CB 
+void
+test_brush_motion_cb(char *userData, ggobid *gg, splotd *sp, GdkEventMotion *ev)
+{
+    fprintf(stderr, "brush motion callback (gg) %p (sp) %p (ev) %p, (userData) %s\n", gg, sp, ev, userData);fflush(stderr);
+}
+#endif
 
 /*-- response to the mouse click event --*/
 static gint
