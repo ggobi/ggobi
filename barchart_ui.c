@@ -8,9 +8,11 @@
 
 static gchar *display_mode_lbl[] = {"Barchart", "Spineplot"};
 
+static gboolean barchart_scale (gboolean button1_p, gboolean button2_p, splotd *sp);
 
 void barchart_set_initials (splotd *sp, datad *d);
 void barchart_allocate_structure (splotd *sp, datad *d);
+extern void barchart_set_breakpoints (gfloat width, splotd *sp, datad *d );
 
 static void display_mode_cb (GtkWidget *w, gpointer cbd)
 {
@@ -77,9 +79,9 @@ cpanel_barchart_make (ggobid *gg)
  */
 GtkWidget *
 barchart_mode_menu_make (GtkAccelGroup *accel_group, 
-			 GtkSignalFunc func, 
- 			 ggobid *gg, 
-			 gboolean useIds) 
+             GtkSignalFunc func, 
+              ggobid *gg, 
+             gboolean useIds) 
 {
   GtkWidget *menu;
   /* menu used to be in gg->barchart.mode_menu. But that was never used
@@ -87,22 +89,22 @@ barchart_mode_menu_make (GtkAccelGroup *accel_group,
   menu = gtk_menu_new ();
 
   CreateMenuItem (menu, "Barchart",
-		  "^h", "", NULL, accel_group, func,
-		  useIds ? GINT_TO_POINTER (EXTENDED_DISPLAY_MODE) : gg, gg);
+          "^h", "", NULL, accel_group, func,
+          useIds ? GINT_TO_POINTER (EXTENDED_DISPLAY_MODE) : gg, gg);
 
   /* Add a separator */
   CreateMenuItem (menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
   CreateMenuItem (menu, "Scale",
-		  "^s", "", NULL, accel_group, func,
-		  useIds ? GINT_TO_POINTER (SCALE) : gg, gg);
+          "^s", "", NULL, accel_group, func,
+          useIds ? GINT_TO_POINTER (SCALE) : gg, gg);
   CreateMenuItem (menu, "Brush",
-		  "^b", "", NULL, accel_group, func,
-		  useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
+          "^b", "", NULL, accel_group, func,
+          useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
   CreateMenuItem (menu, "Identify",
-		  "^i", "", NULL, accel_group, func,
-		  useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
+          "^i", "", NULL, accel_group, func,
+          useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
 
   gtk_widget_show (menu);
 
@@ -202,7 +204,15 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, &state);
 
   gdk_pointer_ungrab (event->time);
-  disconnect_motion_signal (sp);
+
+  /*
+   * When the mouse comes up, return to the default cursor.  If it's
+   * actually still inside one of the triangular regions, it will
+   * be restored to the special cursor as soon as the mouse moves.
+   * If we want to be really precise, we can check the regions here, too.
+  */
+  splot_cursor_set ((gint)NULL, sp);
+  sp->cursor = NULL;
 
   return retval;
 }
@@ -227,26 +237,29 @@ mouse_motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
     region = gdk_region_polygon (bsp->bar->anchor_rgn, 3, GDK_WINDING_RULE);
     if (gdk_region_point_in (region, sp->mousepos.x,sp->mousepos.y)) {
       splot_cursor_set (GDK_SPIDER, sp);
- 
-     cursor_set = TRUE;
+      cursor_set = TRUE;
     }
     gdk_region_destroy(region);
 
     region = gdk_region_polygon (bsp->bar->offset_rgn, 3, GDK_WINDING_RULE);
     if (gdk_region_point_in (region, sp->mousepos.x, sp->mousepos.y)) {
       splot_cursor_set (GDK_UMBRELLA, sp);
-
       cursor_set = TRUE;
     }
-/*
-    if ((!cursor_set) && (sp->jcursor)) {
+    gdk_region_destroy(region);
+
+    /* If all buttons are up and we're outside the triangular regions,
+       restore the cursor to the default.
+    */
+    if (!button1_p && !button2_p && !cursor_set && sp->jcursor) {
       splot_cursor_set ((gint)NULL, sp);
       sp->cursor = NULL;
     }
-*/
-    gdk_region_destroy(region);
   }
 
+  if (button1_p || button2_p) {
+    barchart_scale (button1_p, button2_p, sp);
+  }
 
   sp->mousepos_o.x = sp->mousepos.x;
   sp->mousepos_o.y = sp->mousepos.y;
@@ -254,39 +267,30 @@ mouse_motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   return true;
 }
 
-
-static gint
-motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
+gboolean
+barchart_scale (gboolean button1_p, gboolean button2_p, splotd *sp)
 {
-  gboolean button1_p, button2_p;
+  displayd *display = sp->displayptr;
   ggobid *gg = GGobiFromSPlot(sp);
-  displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
-
-  /*-- get the mouse position and find out which buttons are pressed --*/
-  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
-
-  /*-- if neither button is pressed, we shouldn't have gotten the event --*/
-  if (!button1_p && !button2_p)
-    return false;
+  datad *d = display->d;
 
   /*-- I'm not sure this could ever happen --*/
   if (sp->mousepos.x == sp->mousepos_o.x && sp->mousepos.y == sp->mousepos_o.y)
     return false;
 
-  if (bsp->bar->is_histogram) {
+  if (bsp->bar->is_histogram &&
+      (bsp->bar->anchor_drag || bsp->bar->width_drag))
+  {
+    gint dy = sp->mousepos.y - sp->mousepos_o.y;
+    fcoords pts1, pts2;
+
     if (bsp->bar->anchor_drag) {
-      gint dy;
       gfloat scale_y;
-      cpaneld *cpanel = &display->cpanel;
       icoords scr;
-      fcoords pts1, pts2;
  
-      dy = sp->mousepos.y - sp->mousepos_o.y;
       if (dy != 0) {
-        displayd *display = (displayd *) sp->displayptr;
-        datad *d = display->d;
         gboolean set_anchor = TRUE; 
         gfloat offset_old = bsp->bar->offset;
         gint pmid_old = sp->pmid.y;
@@ -320,21 +324,9 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
           bsp->bar->offset = offset_old;
         }
       }
-
-      sp->mousepos_o.x = sp->mousepos.x;
-      sp->mousepos_o.y = sp->mousepos.y;
-
-/**/  return true; 
-    }
-    if (bsp->bar->width_drag) {
-      gint dy;
-      cpaneld *cpanel = &display->cpanel;
-      fcoords pts1, pts2;
+    } else { /* if (bsp->bar->width_drag) */
      
-      dy = sp->mousepos.y - sp->mousepos_o.y;
       if (dy != 0) {
-        displayd *display = (displayd *) sp->displayptr;
-        datad *d = display->d;
         gfloat width, oldwidth;
 
         splot_screen_to_tform (cpanel, sp, &sp->mousepos_o, &pts1, gg);
@@ -343,7 +335,6 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
         oldwidth = bsp->bar->breaks[1] - bsp->bar->breaks[0];
         width = oldwidth -(pts1.y - pts2.y);
         if (width > 0.) {
-          extern void barchart_set_breakpoints (gfloat width, splotd *sp, datad *d );
           gboolean set_breaks = TRUE; 
           gint pix_width = bsp->bar->bins[0].rect.y - bsp->bar->bins[1].rect.y; 
           if (width > oldwidth)  {
@@ -359,39 +350,30 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
           }
         }
       }
-      sp->mousepos_o.x = sp->mousepos.x;
-      sp->mousepos_o.y = sp->mousepos.y;
-
-/**/  return true;
     }
+  } else {   /*-- we're not dragging the bars, only scaling --*/
 
-  } 
+    switch (cpanel->scale_style) {
 
+      case DRAG:
+        if (button1_p) {
+          pan_by_drag (sp, gg);
+        } else if (button2_p) {
+          zoom_by_drag (sp, gg);
+        }
 
-  switch (cpanel->scale_style) {
-
-    case DRAG:
-      if (button1_p) {
-        pan_by_drag (sp, gg);
-      } else if (button2_p) {
-        zoom_by_drag (sp, gg);
-      }
-
-      /*-- redisplay this plot --*/
-      splot_plane_to_screen (display, &display->cpanel, sp, gg);
-      ruler_ranges_set (false, gg->current_display, sp, gg);
-      splot_redraw (sp, FULL, gg);
+        /*-- redisplay this plot --*/
+        splot_plane_to_screen (display, &display->cpanel, sp, gg);
+        ruler_ranges_set (false, gg->current_display, sp, gg);
+        splot_redraw (sp, FULL, gg);
       break;
 
-    case CLICK:
-      splot_redraw (sp, QUICK, gg);
+      case CLICK:
+        splot_redraw (sp, QUICK, gg);
       break;
 
-  }  /*-- end switch (scale_style) --*/
-
-  sp->mousepos_o.x = sp->mousepos.x;
-  sp->mousepos_o.y = sp->mousepos.y;
-
+    }  /*-- end switch (scale_style) --*/
+  }
   return true;
 }
 
@@ -431,11 +413,6 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos_o.x = sp->mousepos.x;
   sp->mousepos_o.y = sp->mousepos.y;
 
-  disconnect_motion_signal (sp);
-  sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                      "motion_notify_event",
-                                      (GtkSignalFunc) motion_notify_cb,
-                                      (gpointer) sp);
   return retval;
 }
 
@@ -447,10 +424,11 @@ barchart_event_handlers_toggle (splotd *sp, gboolean state) {
       return;
 
   if (state == on) {
-      sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-					     "key_press_event",
-					     (GtkSignalFunc) key_press_cb,
-					     (gpointer) sp);
+    GtkObject *winobj = GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+    sp->key_press_id = gtk_signal_connect (winobj,
+      "key_press_event",
+      (GtkSignalFunc) key_press_cb,
+      (gpointer) sp);
 
   } else {
     disconnect_key_press_signal (sp);
@@ -464,23 +442,24 @@ barchart_scale_event_handlers_toggle (splotd *sp, gboolean state)
   displayd *display = (displayd *) sp->displayptr;
 
   if (state == on) {
-      if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-	  sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-						 "key_press_event",
-						 (GtkSignalFunc) key_press_cb,
-						 (gpointer) sp);
+    GtkObject *winobj = GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+    if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+      sp->key_press_id = gtk_signal_connect (winobj,
+                         "key_press_event",
+                         (GtkSignalFunc) key_press_cb,
+                         (gpointer) sp);
       sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-					 "button_press_event",
-					 (GtkSignalFunc) button_press_cb,
-					 (gpointer) sp);
+                     "button_press_event",
+                     (GtkSignalFunc) button_press_cb,
+                     (gpointer) sp);
       sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-					   "button_release_event",
-					   (GtkSignalFunc) button_release_cb,
-					   (gpointer) sp);
+                       "button_release_event",
+                       (GtkSignalFunc) button_release_cb,
+                       (gpointer) sp);
       sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-					  "motion_notify_event",
-					  (GtkSignalFunc) mouse_motion_notify_cb,
-					  (gpointer) sp);
+                      "motion_notify_event",
+                      (GtkSignalFunc) mouse_motion_notify_cb,
+                      (gpointer) sp);
   } else {
     disconnect_key_press_signal (sp);
     disconnect_button_press_signal (sp);

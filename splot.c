@@ -1050,7 +1050,8 @@ splot_cursor_set (gint jcursor, splotd *sp)
   GdkWindow *window = sp->da->window;
 
   if (jcursor == (gint) NULL) {
-    gdk_cursor_destroy (sp->cursor);
+    if (sp->cursor != NULL)
+      gdk_cursor_destroy (sp->cursor);
     sp->jcursor = (gint) NULL;
     gdk_window_set_cursor (window, NULL);
   } else {
