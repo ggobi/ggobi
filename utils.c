@@ -14,7 +14,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+
+#ifndef NO_VALUES_H
 #include <values.h>
+#endif
 
 #include <gtk/gtk.h>
 #include "vars.h"

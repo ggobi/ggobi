@@ -1,0 +1,21 @@
+This contains some notes on compiling ggobi on a Mac OS X machine
+directly from the CVS repository. (For compiling from the distribution,
+see separate instructions.)
+After installing OS X, download fink from 
+  http://fink.sourceforge.net
+
+Follow the instructions for installing fink.
+
+Create the local.config file, using
+  make local.config
+Then, edit this and add the line
+CFLAGS+= -I/sw/include
+
+To avoid the malloc.h used in some of the tour files, 
+create an empty file named malloc.h
+  touch malloc.h
+
+The inclusion of values.h in utils.c causes problems also. 
+We can conditionally include this with the pre-processor
+symbol
+  -DNO_VALUES_H
