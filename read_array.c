@@ -420,7 +420,7 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
     }  else {
       if ( (fp = fopen(desc->fileName, "r")) != NULL) {
         gchar *sep = g_strdup_printf ("%c", G_DIR_SEPARATOR);
-        gchar *name;
+        gchar *name = NULL;
         gchar **words = g_strsplit ((const gchar *) gg->input->baseName,
           (const gchar *) sep, 0);
         gchar **p;
@@ -434,7 +434,7 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
         read_ascii (fp, d, gg);
         /*-- set the name to the filename with all the directory
              information stripped out --*/
-        d->name = strlen(name) > 0 ?
+        d->name = (name != NULL && strlen(name)) > 0 ?
           g_strdup (name) : g_strdup(gg->input->baseName);
 
         g_strfreev (words);
