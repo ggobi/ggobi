@@ -83,6 +83,7 @@
 30750   7/31  removed static variables from transform.c; added utility
 30784   7/31  embedded exclusion window inside a notebook widget
 30808   8/2   a little polishing in the transformation code
+30818   8/2   more polishing and debugging of sphering
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

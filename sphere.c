@@ -64,7 +64,7 @@ void pca_diagnostics_set (datad *d, ggobid *gg) {
   gfloat ftmp1=0.0, ftmp2=0.0;
   gfloat firstpc = d->sphere.eigenval[0];
   gfloat lastpc = d->sphere.eigenval[d->sphere.npcs-1];
-     
+
   for (j=0; j<d->sphere.npcs; j++)
     ftmp1 += d->sphere.eigenval[j];
   for (j=0; j<d->sphere.nvars; j++)
@@ -140,6 +140,15 @@ eigenval_clear (datad *d, ggobid *gg)
     d->sphere.eigenval[j] = 0.;
 }
 
+void
+eigenvec_clear (datad *d, ggobid *gg)
+{
+  gint j, k;
+  for (j=0; j<d->ncols; j++)
+    for (k=0; k<d->ncols; k++)
+      d->sphere.eigenvec[j][k] = 0.0;
+}
+
 /*
  * this routine overwrites the var-cov matrix of the old active variables
  * with the new active variables. then this matrix is put through
@@ -167,11 +176,12 @@ sphere_varcovar_set (datad *d, ggobid *gg)
 {
   gint i, j, k, var;
   gfloat tmpf = 0.;
-  gint n = d->nrows;
+  gint n = d->nrows_in_plot;
 
   for (k=0; k<d->sphere.nvars; k++) {
     var = d->sphere.vars[k];
 
+    tmpf = 0.;
     for (i=0; i<n; i++)
       tmpf += d->tform1.vals[d->rows_in_plot[i]][var];
     d->sphere.tform1_mean[var] = tmpf / ((gfloat)n);
@@ -184,8 +194,7 @@ sphere_varcovar_set (datad *d, ggobid *gg)
         (d->tform1.vals[d->rows_in_plot[j]][i] - d->sphere.tform1_mean[i]);
       }
       tmpf /= ((gfloat)(n - 1));
-      d->sphere.vc[var][i] = tmpf;
-      d->sphere.vc[i][var] = tmpf;
+      d->sphere.vc[var][i] = d->sphere.vc[i][var] = tmpf;
     }
   }
 }
@@ -237,7 +246,6 @@ gboolean sphere_svd (datad *d, ggobid *gg)
     b[j] = (gfloat *) g_malloc0 (d->sphere.nvars * sizeof (gfloat));
 
   if (!vc_equals_I) {
-    gint j;
     eigenval_clear (d, gg);  /*-- zero out the vector of eigenvalues --*/
     dsvd (d->sphere.eigenvec, d->sphere.nvars, d->sphere.nvars,
           d->sphere.eigenval, b);
@@ -248,7 +256,7 @@ gboolean sphere_svd (datad *d, ggobid *gg)
 
   /*-- obtain ranks to use in sorting eigenvals and eigenvec --*/
   for (i=0; i<d->sphere.nvars; i++) {
-    pairs[i].f = (gfloat) d->sphere.eigenval[i];  /*-- dfs --*/
+    pairs[i].f = (gfloat) d->sphere.eigenval[i];
     pairs[i].indx = i;
   }
   qsort ((gchar *) pairs, d->sphere.nvars, sizeof (paird), pcompare);
@@ -258,15 +266,15 @@ gboolean sphere_svd (datad *d, ggobid *gg)
     k = (d->sphere.nvars - i) - 1;  /*-- to reverse the order --*/
     rank = pairs[i].indx;
     e[k] = d->sphere.eigenval[rank];
-    for (j=0; j<d->sphere.nvars; j++) {
-      b[k][j] = d->sphere.eigenvec[rank][j];
-    }
+    for (j=0; j<d->sphere.nvars; j++)
+      b[j][k] = d->sphere.eigenvec[j][rank];
   }
+
   /*-- copy the sorted eigenvalues and eigenvectors back --*/
   for (i=0; i<d->sphere.nvars; i++) {
     d->sphere.eigenval[i] = e[i];
     for (j=0; j<d->sphere.nvars; j++)
-      d->sphere.eigenvec[i][j] = b[i][j];
+      d->sphere.eigenvec[j][i] = b[j][i];
   }
 
   /*-- free temporary variables --*/
@@ -321,6 +329,8 @@ pca_calc (datad *d, ggobid *gg) {
   if (d->sphere.vars == NULL) {
     sphere_malloc (d, gg);
   }
+
+  eigenvec_clear (d, gg);
 
   spherevars_set (d, gg);
 /*
