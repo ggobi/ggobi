@@ -36,9 +36,9 @@ OBJS=$(SRC:%=%.o)
 ifdef WIN32
 $(PKG).dll: $(OBJS) $(PKG).def
 	$(CC) -mwindows -s -shared -o $@ $(PKG).def $(OBJS) $(GGOBI_LIB) $(LIBS) $(XML_LIBS)
-else
-$(PKG).so: $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%) $(LDFLAGS)
+#else
+#$(PKG).so: $(OBJS)
+#	$(CC) -shared -o $@ $(OBJS) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%) $(LDFLAGS)
 endif
 
 local.config:  configure

@@ -12,7 +12,7 @@ ifdef ADMIN
  include Install/GNUmakefile.admin
 endif
 
-include local.config
+-include local.config
 
 ifdef LOCAL_BUILD
 
@@ -42,8 +42,8 @@ ifndef OBJS
  OBJS=$(patsubst %.c,%.o, $(SRC))
 endif
 
-ifndef SO_LD_FLAGS
- SO_LD_FLAGS=-shared
+ifndef SHLIB_LDFLAGS
+ SHLIB_LDFLAGS=-shared
 endif
 
 GTK_LIBS=$(shell $(GTK_CONFIG) --libs)
@@ -54,7 +54,7 @@ GTK_CFLAGS=$(shell $(GTK_CONFIG) --cflags)
 	$(CC) -c $(PIC_CFLAG) $(PLUGIN_CFLAGS) $(CFLAGS) $(GTK_CFLAGS) $(GGOBI_CFLAGS) $<
 
 %.so: $(OBJS)
-	$(CC) $(SO_LD_FLAGS) $(PLUGIN_LD_FLAGS) $(OBJS) -o $@ $(PLUGIN_LIBS) $(GGOBI_LIB) $(GTK_LIBS)
+	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) $(OBJS) -o $@ $(PLUGIN_LIBS) $(GGOBI_LIB) $(GTK_LIBS)
 
 objects: 
 	@echo "$(OBJS)"

@@ -78,12 +78,20 @@ if test "$prefix" = "NONE" ; then
  prefix=/usr/local
 fi
 
+if test "${prefix}" = "`pwd`" ; then
+ enable_local=yes
+fi
+
+
+echo "Enable local ${enable_local}, ${prefix}  `pwd`"
+
 if test -n "${enable_local}" &&  test "${enable_local}" != "no" ; then
  echo "Installing into build directory."
  INSTALL_DIR="`pwd`"
  GGOBI_INSTALL_HOME="${INSTALL_DIR}"
  LOCAL_INSTALL="yes"
  INSTALL_SRC_CFLAGS="-I${INSTALL_DIR}/include"
+ (cd include ; ln -s . ggobi)
 else
  INSTALL_DIR=$prefix
  INSTALL_SRC_CFLAGS="-I${INSTALL_DIR}/include/ggobi"
@@ -183,9 +191,10 @@ LO_DIR=.
 c_rules_frag=.CRulesFrag
 SHLIB_EXT="so"
 
-if test `uname` = "Darwin" ; then
+if test "`uname`" = "Darwin" ; then
  echo "Darwin operating system detected."
  PIC_CFLAG=-fno-common
+ SHLIB_LDFLAGS=-bundle
  OTHER_CFLAGS="${OTHER_CFLAGS} -DDarwin"
 # SHLIB_LDFLAGS="-dylib -flat_namespace -undefined suppress"
  SHLIB_EXT="dylib"
@@ -676,7 +685,7 @@ dnl
 dnl AC_CONFIG_SUBDIRS($PLUGIN_DIRS)
 dnl might do the same thing. 
 
-INSTALLABLE_PLUGINS=""
+ INSTALLABLE_PLUGINS=""
  for p in ${PLUGIN_DIRS} ; do 
    echo
 
@@ -733,6 +742,7 @@ echo " XML:                    version ${XML_VERSION}"
 echo " Gtk:                    version ${GTK_VERSION}"
 echo " Plugins:               ${PLUGIN_DIRS}"
 echo " Rggobi:                 ${WILL_BUILD_RGGOBI-no}" 
+echo  "Installation directory: $GGOBI_INSTALL_HOME"
 echo ""
 echo "*******************************"
 
