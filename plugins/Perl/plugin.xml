@@ -47,22 +47,17 @@
 </inputPlugin>
 
 
-<!--
-<plugin name="Rfile" language="R" type="mutable">
- <description>Test of the R plugin mechanism.</description>
+<inputPlugin name="PerlInputTest" language="Perl" interactive="true">
+  <description>Test of the Perl input plugin mechanism</description>
+  <modeName>perl</modeName>
   <author>Duncan Temple Lang</author>
+  <options>
+   <named>
+    <numRows>5</numRows>
+   </named>
+  </options>
   <dll>
-   <init onCreate="fileSelectPlugin" onLoad="plugins/R/R/fileSelection.R" />
+   <init onLoad="randomPlugin" read="PullRandom"/>
   </dll>
-</plugin>
+</inputPlugin>
 
-
-
-<plugin name="Rhelp" language="R">
- <description>Help facility using gtkhtml and R</description>
- <author>Duncan Temple Lang</author>
- <dll>
-  <init onLoad="plugins/R/R/help.R" onCreate="createRHelpPluginInstance" />
- </dll>
-</plugin>
--->
