@@ -74,7 +74,9 @@ LGPL_SRC=$(GTK_EXTRA_SRC) mt19937ar.c cokus.c
 createDist: Install/configure $(DOC_FILES) $(DATA_FILES) CmdArgHelp.c
 	if test -d $(TMP_INSTALL_DIR) ; then rm -fr $(TMP_INSTALL_DIR) ; fi
 	mkdir -p $(TMP_INSTALL_DIR)
+ifndef NO_XGOBI_GROUP
 	chgrp xgobi $(TMP_INSTALL_DIR) ; chmod g+ws $(TMP_INSTALL_DIR) ;
+endif
 	for d in $(DIRS) ; do \
 	   mkdir -p $(TMP_INSTALL_DIR)/$$d ; \
 	done
