@@ -181,8 +181,6 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   datad *d = display->d;
   gboolean draw_case;
   gint dtype = display->displaytype;
-  cpaneld *cpanel = &display->cpanel;
-  gint proj = cpanel->projection;
 
   /*
    * since parcoords and tsplot each have their own weird way
@@ -267,9 +265,14 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     }  /* deal with mono later */
   }
 
+/*
+moving this to the end of the routine that adds markup
+  cpaneld *cpanel = &display->cpanel;
+  gint proj = cpanel->projection;
   if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
     splot_draw_tour_axes(sp, sp->pixmap0, gg);
   }
+*/
   return;
 }
 
@@ -1053,6 +1056,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   datad *d = display->d;
   cpaneld *cpanel = &display->cpanel;
   gint displaytype = display->displaytype;
+  gint proj = cpanel->projection;
 
 /*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
   if (display->options.edges_undirected_show_p ||
@@ -1077,14 +1081,16 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   if (g_list_length (display->splots) == 1  /*-- scatterplot --*/
       || sp == display->current_splot)  /*-- ... in a multi-plot display --*/
   {
-/*dfs here*/
-  /*if (sp == gg->current_splot || display->displaytype == scatterplot) {*/
     if (cpanel->viewmode == BRUSH) {
       brush_draw_brush (sp, drawable, d, gg);
       brush_draw_label (sp, drawable, d, gg);
     } else if (cpanel->viewmode == SCALE) {
       scaling_visual_cues_draw (sp, drawable, gg);
     }
+  }
+
+  if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
+    splot_draw_tour_axes(sp, drawable, gg);
   }
 }
 
