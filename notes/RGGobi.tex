@@ -2,6 +2,7 @@
 \input{WebMacros}
 \input{CMacros}
 \usepackage{fullpage}
+\usepackage{times}
 \usepackage{pstricks}
 \input{pst-beta}
 
@@ -332,12 +333,13 @@ index of the display within the specified ggobi instance as the
 argument \SArg{display}.  This is the value returned from an earlier
 call to \SFunction{plotLayout}.
 \begin{verbatim}
- dpy <- plotLayout(, mfrow=c(3,2))
- plotLayout(plot1, plotb, plotc, cells= t(gtkCells(3,2)[c(1,4,5),]),
-                            display = dpy)
+ dpy <- plotLayout(mfrow=c(3,2))
  plotLayout(plot1, plotb, plotc, cells= t(gtkCells(3,2)[c(1,4,5),]),
                             display = dpy)
 \end{verbatim}
+One thing to note about creating an empty display is that it
+will become the active display and all variables in
+the control panel will become unselected.
 
 
 
@@ -574,9 +576,9 @@ integer returned by \SFunction{getDefaultGGobi} and \SFunction{ggobi})
 works in a manner consistent with R.
 \begin{verbatim}
  g <- ggobi(mtcars)
- g[1:10,]
- g[1:10, c("mpg","cyl")]
- g[1:10, 1:2]
+ g[1][1:10,]
+ g[[1]][1:10, c("mpg","cyl")]
+ g[[1]][1:10, 1:2]
 \end{verbatim}
 For large datasets and situations where one wants to extract
 relatively few columns, it might be more efficient to use the
@@ -584,10 +586,9 @@ relatively few columns, it might be more efficient to use the
 This avoids copying the entire dataset into an R structure,
 and works only on the specified variables.
 
-Similarly, we have defined ggobi specific
-versions of \SFunction{dim}, \SFunction{ncol},
-\SFunction{nrow}, \SFunction{dimnames},
-\SFunction{names}.
+Similarly, we have defined methods for the functions \SFunction{dim},
+\SFunction{ncol}, \SFunction{nrow}, \SFunction{dimnames},
+\SFunction{names} which act on ggobi dataset instances.
 
 
 \subsection{getColors}

@@ -18,8 +18,8 @@
        e.g. 
     <color max="100"><red>35</red><green>50</green><blue>25</blue></color>
     <color max="65535"><red>0</red><green>0</green><blue>65535</blue></color>
+    <color max="1"><red>0</red><green>0</green><blue>1</blue></color>
   -->
-  <color max="1"><red>0</red><green>0</green><blue>1</blue></color>
   </background>
   <foreground>
     <color max="1"><red>1</red><green>0</green><blue>0</blue></color>
