@@ -88,7 +88,12 @@ fileset_read (gchar *ldata_in, ggobid *gg)
 
     case ascii:
     {
-      datad *d = datad_new (gg);
+      datad *d; /* datad_new (gg);*/
+#ifdef USE_CLASSES
+      d  = new datad(gg);
+#else
+      d = datad_new(NULL, gg);
+#endif
       array_read (d, gg);
       d->nrows_in_plot = d->nrows;    /*-- for now --*/
       d->nrgroups = 0;                /*-- for now --*/
