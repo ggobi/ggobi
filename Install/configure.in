@@ -109,6 +109,8 @@ if test -n "${with_xml}" && test "${with_xml}" != "no" ; then
    dnl If the file libxml.tar.gz exists in this directory
    dnl assume it is a libxml distribution that we will install
    dnl locally
+   dnl Can override the use of libxml.tar.gz  by setting XML_CONFIG
+   dnl environment variable.
  if test -f libxml.tar.gz && test -z "${XML_CONFIG}" ; then
    echo "Building ggobi-specific version of libxml"
    (gunzip -c libxml.tar.gz | tar xf -)
@@ -180,15 +182,22 @@ dnl  fi
     # the top-level libxml distribution directory.
 
    if test -e "${with_xml}/tree.h" ; then
+    if test ! -e "${with_xml}/entities.c" ; then
      with_xml=`cd ${with_xml}/.. ; pwd`
+    else
+      XML_INC_DIRS="${with_xml}"
+    fi
    fi
 
+   if test -d "${with_xml}/include" ; then
     XML_INC_DIRS="${with_xml}/include"
-    if test "${XML_VERSION}" != "1" ; then
+   fi
+
+   if test "${XML_VERSION}" != "1" ; then
       XML_LINK_LIB="-lxml${XML_VERSION}"
-    else
+   else
       XML_LINK_LIB="-lxml"
-    fi
+   fi
     XML_LIB_DIRS="-L${with_xml}/.libs ${XML_LINK_LIB} -lz"
       dnl Have to get a version that can be used in LD_LIBRARY_PATH,
       dnl i.e. with the spaces replaced by :
@@ -240,6 +249,9 @@ dnl -DDIR_SEPARATOR=\"'/'\""
   fi
 
   if test "${XML_VERSION}" = "1" ; then
+
+   TMP_CFLAGS=$CFLAGS 
+   CFLAGS="$CFLAGS $XML_CFLAG_DEFINES $XML_INC_DIRS"
    echo "Need to check if old-style struct fields in effect (i.e. childs or children)."
    AC_TRY_COMPILE([
    #include <libxml/parser.h>
@@ -247,6 +259,8 @@ dnl -DDIR_SEPARATOR=\"'/'\""
       xmlNodePtr node;
       node->childs == NULL;
    ],[XML_CFLAG_DEFINES="${XML_CFLAG_DEFINES} -DXML_USE_CHILDS=1"; echo "Need to use childs!"],[echo "New style libxml!"])
+
+   CFLAGS=$TMP_CFLAGS
   fi
 fi
 
