@@ -140,10 +140,14 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   gchar **rownames, **colnames;
   glong *visible, *rowids;
   displayd *dspnew;
+  gboolean edges_displayed;
 
-  if (d == NULL || e == NULL) {
-    quick_message ("Please specify an edge set", false);
-    return;
+  if (e == NULL) {
+    gboolean edges_present = edgeset_add (dsp);
+    if (!edges_present) {
+      quick_message ("Please specify an edge set", false);
+      return;
+    } else e = dsp->e;
   }
   if (!d->sampled.els[0] || d->hidden.els[0]) {
     g_printerr ("Trouble: you've eliminated the center node.\n");
@@ -287,7 +291,16 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 */
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
   setDisplayEdge (dspnew, e);
-  display_copy_edge_options (dsp, dspnew);
+  edges_displayed = display_copy_edge_options (dsp, dspnew);
+  if (!edges_displayed) {
+    GtkWidget *item;
+    dspnew->options.edges_undirected_show_p = true;
+    item = widget_find_by_name (dspnew->edge_menu,
+            "DISPLAY MENU: show directed edges");
+    if (item)
+      gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
+        dspnew->options.edges_directed_show_p);
+  }
 
 
   g_free (values);

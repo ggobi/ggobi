@@ -56,6 +56,14 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   gchar **rownames, **colnames;
   glong *visible, *rowids;
   displayd *dspnew;
+  gboolean edges_displayed;
+
+  if (e == NULL) {
+    if (!edgeset_add (dsp)) {
+      quick_message ("Please specify an edge set", false);
+      return;
+    } else e = dsp->e;
+  }
 
   if (strcmp (gtk_widget_get_name (button), "neato") == 0)
     layout_type = NEATO_LAYOUT;
@@ -219,8 +227,16 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 */
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
   setDisplayEdge (dspnew, e);
-  display_copy_edge_options (dsp, dspnew);
-
+  edges_displayed = display_copy_edge_options (dsp, dspnew);
+  if (!edges_displayed) {
+    GtkWidget *item;
+    dspnew->options.edges_undirected_show_p = true;
+    item = widget_find_by_name (dspnew->edge_menu,
+            "DISPLAY MENU: show directed edges");
+    if (item)
+      gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
+        dspnew->options.edges_directed_show_p);
+  }
 
 /*
     name = g_strdup_printf ("x");
