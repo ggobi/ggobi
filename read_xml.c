@@ -971,11 +971,20 @@ allocVariables (const xmlChar **attrs, XMLParserData *data)
 
   d->ncols = strToInteger(tmp);
 
-  arrayf_alloc (&d->raw, d->nrows, d->ncols);
-  hidden_alloc (d);
+
+  /* The following is unlikely to happen as we have not got the count
+     of the number of rows at this stage. But we leave it here just
+     in case there are datasets for which the input gives the count
+     in the top-level tag.*/
+  if(d->nrows > 0 && d->ncols > 0) {
+      arrayf_alloc (&d->raw, d->nrows, d->ncols);
+      hidden_alloc (d);
+  }
+
 
   vartable_alloc (d);
   vartable_init (d);
+
 
   return (true);
 }
