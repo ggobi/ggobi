@@ -1190,7 +1190,7 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
   } else
     stmp = g_strdup (tmp);
 
-    g_array_insert_val (d->rowlab, data->current_record, stmp);
+  g_array_insert_val (d->rowlab, data->current_record, stmp);
 
 
   setColor(attrs, data, i);

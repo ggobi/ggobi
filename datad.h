@@ -52,11 +52,12 @@ class datad {
  struct _ggobid *gg;  /*-- a pointer to the parent --*/
 
  gint nrows;
- GArray *rowlab;
-/*
- *GArray *rowid_name;  <- use a hash table
- *vector_i rowid;
-*/
+ GArray *rowlab;  /*-- allocates memory in chunks --*/
+
+ /*-- row ids to support generalized linking --*/
+/*gchar *rowid_names;*/    /*-- all names, from 1:n; don't need to keep --*/
+/*GArray *rnames_uniq;*/   /*-- names after sorting and uniq-ing --*/
+/*vector_i rowid;*/        /*-- indices into rowid_names_uniq --*/
 
  gint ncols;
  vartabled *vartable;
@@ -120,8 +121,6 @@ class datad {
  gint nlgroups;
  gint *lgroup_ids;
  rgroupd *lgroups;  /* id, nels, *els */
-
-
 
  /*------------------------ jittering --------------------------------*/
 
@@ -235,9 +234,6 @@ class datad {
 typedef struct _datad datad;
 gint alloc_edgeIDs(datad *d);
 #endif
-
-
-
 
 
 extern datad *datad_new (datad *, struct _ggobid *);

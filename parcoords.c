@@ -54,14 +54,16 @@ parcoords_display_menus_make (displayd *display,
   CreateMenuCheck (display, options_menu, "Show missings",
     func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
 */
-  CreateMenuCheck (display, options_menu, "Show axes",
-    func, GINT_TO_POINTER (DOPT_AXES), on, gg);
 
   /* Add a separator */
+/*
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
+*/
 
+/*
   CreateMenuCheck (display, options_menu, "Double buffer",
     func, GINT_TO_POINTER (DOPT_BUFFER), on, gg);
+*/
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
   submenu_append (submenu, mbar);

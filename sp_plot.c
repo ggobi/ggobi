@@ -40,79 +40,76 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
    * Loop once through d->color_now[], collecting the colors currently
    * in use into the colors_used[] vector.
   */
-  if (display->options.points_show_p) {
-
-    if (!binned) {
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        if (d->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
-          new_color = false;
-        } else {
-          new_color = true;
-          for (k=0; k<*ncolors_used; k++) {
-            if (colors_used[k] == d->color_now.els[m]) {
-              new_color = false;
-              break;
-            }
+  if (!binned) {
+    for (i=0; i<d->nrows_in_plot; i++) {
+      m = d->rows_in_plot[i];
+      if (d->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
+        new_color = false;
+      } else {
+        new_color = true;
+        for (k=0; k<*ncolors_used; k++) {
+          if (colors_used[k] == d->color_now.els[m]) {
+            new_color = false;
+            break;
           }
         }
-        if (new_color) {
-          colors_used[*ncolors_used] = d->color_now.els[m];
-          (*ncolors_used)++;
-        }
       }
-    } else {  /* used by plot_bins */
-      gint ih, iv, j;
-      icoords *bin0 = &gg->plot.bin0;
-      icoords *bin1 = &gg->plot.bin1;
-      /*
-       * This has already been called in draw_to_pixmap0_binned, and
-       * it shouldn't be called twice, because it is keeping track of
-       * previous values.
-      */
-      /*get_extended_brush_corners (&bin0, &bin1);*/
+      if (new_color) {
+        colors_used[*ncolors_used] = d->color_now.els[m];
+        (*ncolors_used)++;
+      }
+    }
+  } else {  /* used by plot_bins */
+    gint ih, iv, j;
+    icoords *bin0 = &gg->plot.bin0;
+    icoords *bin1 = &gg->plot.bin1;
+    /*
+     * This has already been called in draw_to_pixmap0_binned, and
+     * it shouldn't be called twice, because it is keeping track of
+     * previous values.
+    */
+    /*get_extended_brush_corners (&bin0, &bin1);*/
 
-      for (ih= bin0->x; ih<= bin1->x; ih++) {
-        for (iv=bin0->y; iv<=bin1->y; iv++) {
-          for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
-            j = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
-            if (d->hidden_now.els[j]) {  /*-- if it's hidden, we don't care --*/
-              new_color = false;
-            } else {
-              new_color = true;
-              for (k=0; k<*ncolors_used; k++) {
-                if (colors_used[k] == d->color_now.els[j]) {
-                  new_color = false;
-                  break;
-                }
+    for (ih= bin0->x; ih<= bin1->x; ih++) {
+      for (iv=bin0->y; iv<=bin1->y; iv++) {
+        for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
+          j = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
+          if (d->hidden_now.els[j]) {  /*-- if it's hidden, we don't care --*/
+            new_color = false;
+          } else {
+            new_color = true;
+            for (k=0; k<*ncolors_used; k++) {
+              if (colors_used[k] == d->color_now.els[j]) {
+                new_color = false;
+                break;
               }
             }
-            if (new_color) {
-              colors_used[*ncolors_used] = d->color_now.els[j];
-              (*ncolors_used)++;
-            }
+          }
+          if (new_color) {
+            colors_used[*ncolors_used] = d->color_now.els[j];
+            (*ncolors_used)++;
           }
         }
       }
     }
-    /*
-     * Make sure that the current brushing color is
-     * last in the list, so that it is drawn on top of
-     * the pile of points.
-    */
-    for (k=0; k<(*ncolors_used-1); k++) {
-      if (colors_used[k] == gg->color_id) {
-        colors_used[k] = colors_used[*ncolors_used-1];
-        colors_used[*ncolors_used-1] = gg->color_id;
-        break;
-      }
+  }
+  /*
+   * Make sure that the current brushing color is
+   * last in the list, so that it is drawn on top of
+   * the pile of points.
+  */
+  for (k=0; k<(*ncolors_used-1); k++) {
+    if (colors_used[k] == gg->color_id) {
+      colors_used[k] = colors_used[*ncolors_used-1];
+      colors_used[*ncolors_used-1] = gg->color_id;
+      break;
     }
+  }
 
-    /* insurance -- eg if using mono drawing on a color screen */
-    if (*ncolors_used == 0) {
-      *ncolors_used = 1;
-      colors_used[0] = d->color_now.els[0];
-    }
+  /* insurance -- eg if using mono drawing on a color screen */
+  if (*ncolors_used == 0) {
+    *ncolors_used = 1;
+    colors_used[0] = d->color_now.els[0];
   }
 }
 
@@ -177,6 +174,16 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   datad *d = display->d;
   gboolean draw_case;
 #endif
+  /*
+   * since parcoords and tsplot each have their own weird way
+   * of drawing line segments, it's necessary to get the point
+   * colors before drawing those lines even if we're not drawing
+   * points.
+  */
+  gboolean loop_over_points =
+    display->options.points_show_p ||
+    display->displaytype == parcoords ||
+    display->displaytype == tsplot;
 
   if (gg->plot_GC == NULL)
     init_plot_GC (sp->pixmap0, gg);
@@ -188,7 +195,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
                       da->allocation.width,
                       da->allocation.height);
 
-  if (!gg->mono_p) {
+  if (!gg->mono_p && loop_over_points) {
     splot_point_colors_used_get (sp, &ncolors_used, colors_used, false, gg);
 
     /*
@@ -214,9 +221,10 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 
           /*-- parallel coordinate plot whiskers --*/
           if (display->displaytype == parcoords ||
-	      display->displaytype == tsplot) {
+              display->displaytype == tsplot)
+          {
             if (display->options.edges_show_p) {
-	      if (display->displaytype == parcoords){
+              if (display->displaytype == parcoords) {
                 n = 2*m;
                 gdk_draw_line (sp->pixmap0, gg->plot_GC,
                   sp->whiskers[n].x1, sp->whiskers[n].y1,
@@ -225,15 +233,14 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
                 gdk_draw_line (sp->pixmap0, gg->plot_GC,
                   sp->whiskers[n].x1, sp->whiskers[n].y1,
                   sp->whiskers[n].x2, sp->whiskers[n].y2);
-  	      }
-	      else{
-		gdk_draw_line (sp->pixmap0, gg->plot_GC,
-			       sp->whiskers[m].x1, sp->whiskers[m].y1,
-			       sp->whiskers[m].x2, sp->whiskers[m].y2);
-	      }
+              }
+              else {
+                gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                  sp->whiskers[m].x1, sp->whiskers[m].y1,
+                  sp->whiskers[m].x2, sp->whiskers[m].y2);
+              }
             }
           }
-
         }
       }
 #endif
@@ -343,12 +350,11 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
                       sp->whiskers[n].x1, sp->whiskers[n].y1,
                       sp->whiskers[n].x2, sp->whiskers[n].y2);
                   }
-                }
-		else if(display->displaytype == tsplot){
-		   gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                } else if(display->displaytype == tsplot) {
+                  gdk_draw_line (sp->pixmap0, gg->plot_GC,
                     sp->whiskers[m].x1, sp->whiskers[m].y1,
                     sp->whiskers[m].x2, sp->whiskers[m].y2);
-		}
+                }
               }
             }
           }
@@ -443,17 +449,6 @@ splot_add_plot_labels (splotd *sp, ggobid *gg) {
     gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
       5, 5 + ascent + descent,
       d->vartable[ sp->xyvars.y ].collab_tform);
-
-/*
-    gdk_text_extents (style->font,
-      d->vartable[ sp->xyvars.y ].collab_tform,
-      strlen (d->vartable[ sp->xyvars.y ].collab_tform),
-      &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
-      5,
-      sp->max.y - 5,
-      d->vartable[ sp->xyvars.y ].collab_tform);
-*/
   }
 
 }
@@ -678,9 +673,9 @@ edges_draw (splotd *sp, ggobid *gg)
               */
               sp->arrowheads[nl].x1 =
                 (gint) (.2*sp->screen[from].x + .8*sp->screen[to].x);
-			  sp->arrowheads[nl].y1 =
+              sp->arrowheads[nl].y1 =
                 (gint) (.2*sp->screen[from].y + .8*sp->screen[to].y);
-			  sp->arrowheads[nl].x2 = sp->screen[to].x;
+              sp->arrowheads[nl].x2 = sp->screen[to].x;
               sp->arrowheads[nl].y2 = sp->screen[to].y;
             }
             nl++;

@@ -105,8 +105,6 @@ void scale_clickoptions_set (gint click_opt, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   cpanel->scale_click_opt = click_opt;
-  g_printerr ("in interaction_style_cb: %s\n",
-    (cpanel->scale_click_opt == PAN) ? "PAN" : "ZOOM");
 
   splot_redraw (gg->current_splot, QUICK, gg);
 }
@@ -125,7 +123,6 @@ static void panoptions_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   gint pan_opt = GPOINTER_TO_INT (cbd);
-  g_printerr ("cbd: %s\n", panoptions_lbl[pan_opt]);
 
   panoptions_set (pan_opt, gg);
 }
@@ -144,8 +141,6 @@ static void zoomoptions_cb (GtkWidget *w, gpointer cbd)
   ggobid *gg = GGobiFromWidget(w, true);
   gint zoom_opt = GPOINTER_TO_INT (cbd);
   zoomoptions_set (zoom_opt, gg);
-
-  g_printerr ("cbd: %s\n", zoomoptions_lbl[zoom_opt]);
 }
 
 /*--------------------------------------------------------------------*/
@@ -177,11 +172,11 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
           }
           break;
         case ZOOM:
-          if (event->keyval == GDK_i || event->keyval == GDK_I) {
+          if (event->keyval == GDK_greater) {
             zoom_step (sp, cpanel->scale_zoom_opt, ZOOM_IN,
               &gg->scale.click_rect, gg);
             redraw = true;
-          } else if (event->keyval == GDK_o || event->keyval == GDK_O) {
+          } else if (event->keyval == GDK_less) {
             zoom_step (sp, cpanel->scale_zoom_opt, ZOOM_OUT,
               &gg->scale.click_rect, gg);
             redraw = true;

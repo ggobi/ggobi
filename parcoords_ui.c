@@ -58,6 +58,7 @@ static void selection_mode_cb (GtkWidget *w, gpointer cbd)
   cpanel->parcoords_selection_mode = GPOINTER_TO_INT (cbd);
 }
 
+/*
 static gchar *showcases_lbl[] = {"All", "Labelled"};
 static void showcases_cb (GtkWidget *w, gpointer cbd)
 {
@@ -71,6 +72,7 @@ static void varscale_cb (GtkWidget *w, gpointer cbd)
   gint indx = GPOINTER_TO_INT (cbd);
   g_printerr ("cbd: %s\n", varscale_lbl[indx]);
 }
+*/
 
 /*--------------------------------------------------------------------*/
 /*                   Control panel section                            */
@@ -170,6 +172,7 @@ cpanel_parcoords_make (ggobid *gg) {
 /*
  * show cases: label and option menu
 */
+/*
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
 
@@ -185,10 +188,12 @@ cpanel_parcoords_make (ggobid *gg) {
   populate_option_menu (opt, showcases_lbl,
                         sizeof (showcases_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) showcases_cb, gg);
+*/
 
 /*
  * Variable scales
 */
+/*
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
 
@@ -205,6 +210,7 @@ cpanel_parcoords_make (ggobid *gg) {
   populate_option_menu (opt, varscale_lbl,
                         sizeof (varscale_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) varscale_cb, gg);
+*/
 
   gtk_widget_show_all (gg->control_panel[PCPLOT]);
 }
