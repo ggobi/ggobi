@@ -133,7 +133,7 @@ p1d_event_handlers_toggle (splotd *sp, gboolean state) {
 
 void
 cpanel_p1dplot_make (ggobid *gg) {
-  GtkWidget *frame, *tgl, *btn, *vbox, *vb, *opt;
+  GtkWidget *frame, *framevb, *tgl, *btn, *vbox, *vb, *opt;
   GtkWidget *sbar;
   GtkObject *adj;
   
@@ -151,6 +151,16 @@ cpanel_p1dplot_make (ggobid *gg) {
                         sizeof (type_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) type_cb, gg);
 
+  /*-- frame around ASH parameters --*/
+  frame = gtk_frame_new ("ASH parameters");
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), frame,
+    false, false, 3);
+
+  framevb = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (framevb), 4);
+  gtk_container_add (GTK_CONTAINER (frame), framevb);
+
   /*-- ASH line segments --*/
   btn = gtk_check_button_new_with_label ("ASH: add lines");
   gtk_widget_set_name (btn, "P1PLOT:ASH_add_lines");
@@ -161,13 +171,12 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), false);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
     GTK_SIGNAL_FUNC (ASH_add_lines_cb), (gpointer) gg);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), btn,
+  gtk_box_pack_start (GTK_BOX (framevb), btn,
     false, false, 0);
 
   /*-- ASH smoothness --*/
   vbox = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), vbox,
-    false, false, 0);
+  gtk_box_pack_start (GTK_BOX (framevb), vbox, false, false, 0);
 
   gtk_box_pack_start (GTK_BOX (vbox), gtk_label_new ("ASH smoothness:"),
     false, false, 0);
@@ -186,6 +195,8 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
   gtk_box_pack_start (GTK_BOX (vbox), sbar, false, false, 1);
+
+
 
 /*
  * Cycling controls

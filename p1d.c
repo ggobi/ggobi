@@ -75,32 +75,33 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
 
   switch (cpanel->p1d.type) {
     case TEXTURE:
-      sp->p1d_lim.min = FORGETITAXIS_MIN ;
-      sp->p1d_lim.max = FORGETITAXIS_MAX ;
+      sp->p1d.lim.min = FORGETITAXIS_MIN ;
+      sp->p1d.lim.max = FORGETITAXIS_MAX ;
 
-      textur (yy, sp->p1d_data.els, d->nrows_in_plot, option, del, stages, gg);
+      textur (yy, sp->p1d.spread_data.els, d->nrows_in_plot,
+        option, del, stages, gg);
     break;
 
     case ASH:
       do_ash1d (yy, d->nrows_in_plot,
                cpanel->p1d.nbins, cpanel->p1d.nASHes,
-               sp->p1d_data.els, &min, &max, &mean);
+               sp->p1d.spread_data.els, &min, &max, &mean);
       /*
        * Instead of using the returned minimum, set the minimum to 0.
        * This scales the plot so that the baseline (also set to 0) is
        * within the range, the connecting lines look terrific, and the
        * plot makes more sense.
       */
-      sp->p1d_lim.min = 0.0; 
-      sp->p1d_lim.max = max;
-      sp->p1d_mean = mean;
+      sp->p1d.lim.min = 0.0; 
+      sp->p1d.lim.max = max;
+      sp->p1d.mean = mean;
     break;   
 
     case DOTPLOT:
-      sp->p1d_lim.min = FORGETITAXIS_MIN ;
-      sp->p1d_lim.max = FORGETITAXIS_MAX ;
+      sp->p1d.lim.min = FORGETITAXIS_MIN ;
+      sp->p1d.lim.max = FORGETITAXIS_MAX ;
       for (i=0; i<d->nrows_in_plot; i++)
-        sp->p1d_data.els[i] = 50;  /*-- halfway between _MIN and _MAX --*/
+        sp->p1d.spread_data.els[i] = 50; /*-- halfway between _MIN and _MAX --*/
     break;   
   }
 }
@@ -140,7 +141,7 @@ p1d_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
   p1d_spread_var (display, yy, sp, d, gg);
 
   /* Then project it */
-  rdiff = sp->p1d_lim.max - sp->p1d_lim.min;
+  rdiff = sp->p1d.lim.max - sp->p1d.lim.min;
   for (i=0; i<d->nrows_in_plot; i++) {
     m = d->rows_in_plot[i];
 
@@ -148,7 +149,7 @@ p1d_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
      * Use p1d_data[i] not [m] because p1d_data[] is populated
      * only up to d->nrows_in_plot
     */
-    ftmp = -1.0 + 2.0*(sp->p1d_data.els[i] - sp->p1d_lim.min)/rdiff;
+    ftmp = -1.0 + 2.0*(sp->p1d.spread_data.els[i] - sp->p1d.lim.min)/rdiff;
 
     if (display->p1d_orientation == VERTICAL) {
       sp->planar[m].x = (glong) (precis * ftmp);
@@ -191,15 +192,15 @@ p1d_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
 /*---------------------------------------------------------------------*/
 
 void
-p1d_ash_baseline_set (splotd *sp)
+ash_baseline_set (icoords *baseline, splotd *sp)
 {
   gfloat ftmp, precis = (gfloat) PRECISION1;
   glong pl, ltmp;
   gint iscr;
 
 /*
-  ftmp = -1 + 2.0 * (0 - sp->p1d_lim.min)/
-                    (sp->p1d_lim.max - sp->p1d_lim.min);
+  ftmp = -1 + 2.0 * (0 - sp->p1d.lim.min)/
+                    (sp->p1d.lim.max - sp->p1d.lim.min);
 */
   ftmp = -1 /* and the rest of the usual expression is 0 now */;
   pl = (glong) (precis * ftmp);
@@ -209,14 +210,14 @@ p1d_ash_baseline_set (splotd *sp)
   iscr = (gint) ((ltmp * sp->iscale.y) >> EXP1);
   iscr += (sp->max.y / 2);
 
-  sp->ash_baseline.y = iscr;
+  baseline->y = iscr;
             
 /*-- VERTICAL --*/
   ltmp = pl - sp->pmid.x;
   iscr = (gint) ((ltmp * sp->iscale.x) >> EXP1);
   iscr += (sp->max.x / 2);
 
-  sp->ash_baseline.x = iscr;
+  baseline->x = iscr;
 }
 
 /*--------------------------------------------------------------------*/

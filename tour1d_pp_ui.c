@@ -126,7 +126,7 @@ void t1d_pp_func_cb (GtkWidget *w, gpointer cbd)
   extern void t1d_clear_ppda(ggobid *);
   gchar *label = g_strdup("PP index: (0.000) 0.0000 (0.000)");
 
-  cpanel->t1d_pp_indx = indx;
+  cpanel->t1d.pp_indx = indx;
   dsp->t1d.get_new_target = true;
 
   dsp->t1d.ppval = 0.00;

@@ -208,6 +208,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   gint dtype = display->displaytype;
   colorschemed *scheme = gg->activeColorScheme;
   gushort maxcolorid;
+  icoords *baseline;
 #ifndef WIN32
   cpaneld *cpanel = &display->cpanel;
   gint proj = cpanel->projection;
@@ -288,23 +289,23 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
           }
 
           if (dtype == scatterplot) {
-            if (
-/*
-   before I can draw the TOUR1D lines, I need to find where 0
-   falls in screen coordinates
-*/
-                /*proj == TOUR1D ||*/ (proj == P1PLOT &&
-                cpanel->p1d.type == ASH &&
-                cpanel->p1d.ASH_add_lines_p))
+            /*-- add ash baseline to p1d or tour1d --*/
+            if ((proj == TOUR1D && cpanel->t1d.ASH_add_lines_p) ||
+                (proj == P1PLOT &&
+                 cpanel->p1d.type == ASH &&
+                 cpanel->p1d.ASH_add_lines_p))
             {
+              baseline = (proj == TOUR1D) ? &sp->tour1d.ash_baseline :
+                                            &sp->p1d.ash_baseline;
+
               if (display->p1d_orientation == HORIZONTAL)
                 gdk_draw_line (sp->pixmap0, gg->plot_GC,
                   sp->screen[m].x, sp->screen[m].y,
-                  sp->screen[m].x, sp->ash_baseline.y);
+                  sp->screen[m].x, baseline->y);
               else
                 gdk_draw_line (sp->pixmap0, gg->plot_GC,
                   sp->screen[m].x, sp->screen[m].y,
-                  sp->ash_baseline.x, sp->screen[m].y);
+                  baseline->x, sp->screen[m].y);
             }
 /* */
 

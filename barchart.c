@@ -466,8 +466,8 @@ void barchart_allocate_structure (splotd *sp, datad *d) {
   } else nbins = sp->bar->new_nbins;
   sp->bar->new_nbins =-1;
 
-  sp->p1d_lim.min = vtx->lim_raw.min;
-  sp->p1d_lim.max = vtx->lim_raw.max;
+  sp->p1d.lim.min = vtx->lim_raw.min;
+  sp->p1d.lim.max = vtx->lim_raw.max;
 
   if (sp->bar->nbins && nbins == sp->bar->nbins) return; /* nothing else to be done */ 
 
@@ -629,7 +629,7 @@ void barchart_set_breakpoints (gfloat width, splotd *sp, datad *d ) {
   gfloat rdiff; 
   gint i, nbins;
 
-  rdiff = sp->p1d_lim.max - sp->p1d_lim.min;
+  rdiff = sp->p1d.lim.max - sp->p1d.lim.min;
   nbins = (gint) (rdiff/width + 1);
 
 
@@ -637,7 +637,7 @@ void barchart_set_breakpoints (gfloat width, splotd *sp, datad *d ) {
   barchart_allocate_structure (sp, d);
 
   for (i=0; i <= sp->bar->nbins; i++) {
-    sp->bar->breaks[i] = sp->p1d_lim.min + width*i;
+    sp->bar->breaks[i] = sp->p1d.lim.min + width*i;
   }
 
 }
@@ -649,12 +649,12 @@ void barchart_set_initials (splotd *sp, datad *d) {
   if (vtx->categorical_p) {
   } else {
     gint i;
-    gfloat rdiff = sp->p1d_lim.max - sp->p1d_lim.min;
+    gfloat rdiff = sp->p1d.lim.max - sp->p1d.lim.min;
 
     for (i=0; i < sp->bar->nbins; i++) {
-      sp->bar->breaks[i] = sp->p1d_lim.min + rdiff/sp->bar->nbins*i; 
+      sp->bar->breaks[i] = sp->p1d.lim.min + rdiff/sp->bar->nbins*i; 
     }
-    sp->bar->breaks[sp->bar->nbins] = sp->p1d_lim.max;
+    sp->bar->breaks[sp->bar->nbins] = sp->p1d.lim.max;
 
   }
 }
@@ -779,7 +779,7 @@ void barchart_recalc_dimensions (splotd *sp, datad *d, ggobid *gg) {
   */
   vtx = vartable_element_get (sp->p1dvar, d);
 
-  rdiff = sp->p1d_lim.max - sp->p1d_lim.min;
+  rdiff = sp->p1d.lim.max - sp->p1d.lim.min;
   index = 0;
   for (i=0; i < sp->bar->nbins; i++) {
     if (sp->bar->bins[i].count> maxbincount) {

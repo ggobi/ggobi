@@ -239,7 +239,7 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
   }
 
   dsp->t1d.dist_az = 0.0;
-  dsp->t1d.delta = cpanel->t1d_step*M_PI_2/10.0;
+  dsp->t1d.delta = cpanel->t1d.step*M_PI_2/10.0;
   dsp->t1d.tang = 0.0;
   dsp->t1d.nsteps = 1; 
   dsp->t1d.stepcntr = 1;
@@ -270,17 +270,17 @@ void tour1d_speed_set(gint slidepos, ggobid *gg) {
   cpaneld *cpanel = &dsp->cpanel;
   extern void speed_set (gint, gfloat *, gfloat *, gint *, gint *);
 
-  cpanel->t1d_slidepos = slidepos;
-  speed_set(slidepos, &cpanel->t1d_step, &dsp->t1d.delta, 
+  cpanel->t1d.slidepos = slidepos;
+  speed_set(slidepos, &cpanel->t1d.step, &dsp->t1d.delta, 
     &dsp->t1d.nsteps, &dsp->t1d.stepcntr);
 }
 
 void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
-  cpanel->t1d_paused = state;
+  cpanel->t1d.paused = state;
 
-  tour1d_func (!cpanel->t1d_paused, gg->current_display, gg);
+  tour1d_func (!cpanel->t1d.paused, gg->current_display, gg);
 
-  if (cpanel->t1d_paused) {
+  if (cpanel->t1d.paused) {
     /*-- whenever motion stops, we need a FULL redraw --*/
     display_tailpipe (gg->current_display, FULL, gg);
   }
@@ -397,28 +397,22 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg)
     }
   }
   do_ash1d (yy, d->nrows_in_plot,
-            cpanel->t1d_nbins, cpanel->t1d_nASHes,
-            sp->p1d_data.els, &min, &max, &mean);
-  if (sp->tour1d.firsttime) {
-    sp->tour1d.keepmin = min;
+            cpanel->t1d.nbins, cpanel->t1d.nASHes,
+            sp->p1d.spread_data.els, &min, &max, &mean);
 /*
-   before I can draw the TOUR1D lines, I need to find where 0
-   falls in screen coordinates  -- dfs
+  if (sp->tour1d.firsttime) {
+    sp->tour1d.keepmin = 0.0;    let this be zero for consistency
+    sp->tour1d.keepmax = max;    ... and this isn't currently used
+    sp->tour1d.firsttime = false;   ... so this isn't needed
+  }
 */
-    /*sp->tour1d.keepmin = 0.0;*/
-    sp->tour1d.keepmax = max;
-    sp->tour1d.firsttime = false;
-  }
-  else {
-    if (min < sp->tour1d.keepmin) sp->tour1d.keepmin = min;
-    if (max > sp->tour1d.keepmax) sp->tour1d.keepmax = max;
-  }
 
   max = 2*mean;  /* try letting the max for scaling depend on the mean */
-  if (cpanel->t1d_vert) {
+  if (cpanel->t1d.vert) {
     for (i=0; i<d->nrows_in_plot; i++) {
       sp->planar[i].x = (glong) (precis*(-1.0+2.0*
-        (sp->p1d_data.els[i]-sp->tour1d.keepmin)/(max-sp->tour1d.keepmin)));
+        sp->p1d.spread_data.els[i]/max));
+        /*(sp->p1d_data.els[i]-min)/(max-min)));*/
       sp->planar[i].y = yy[i];
     }
   }
@@ -426,7 +420,8 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg)
     for (i=0; i<d->nrows_in_plot; i++) {
       sp->planar[i].x = yy[i];
       sp->planar[i].y = (glong) (precis*(-1.0+2.0*
-        (sp->p1d_data.els[i]-sp->tour1d.keepmin)/(max-sp->tour1d.keepmin)));
+        sp->p1d.spread_data.els[i]/max));
+        /*(sp->p1d_data.els[i]-min)/(max-min)));*/
     }
   }
 
@@ -468,7 +463,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
     /* plot pp indx */
     if (dsp->t1d_ppda != NULL) {
 
-      revert_random = t1d_switch_index(cpanel->t1d_pp_indx, 
+      revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
         0, gg);
       count++;
       if (count == 10) {
@@ -517,7 +512,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
       }
       else if (dsp->t1d.target_selection_method == 1) {
         /* pp guided tour  */
-        revert_random = t1d_switch_index(cpanel->t1d_pp_indx, 
+        revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
           dsp->t1d.target_selection_method, gg);
 
         if (!revert_random) {
@@ -535,7 +530,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
               dsp->t1d_pp_op.proj_best.vals[j][0] = 
                 dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[j]];
               /*              dsp->t1d.ppval = -999.0;*/
-            revert_random = t1d_switch_index(cpanel->t1d_pp_indx, 
+            revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
               dsp->t1d.target_selection_method, gg);
           }
           t1d_ppdraw(dsp->t1d.ppval, gg);
@@ -558,7 +553,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
         dsp->t1d.Gz, dsp->t1d.G, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
 		      dsp->t1d.Vz,
         dsp->t1d.tau, dsp->t1d.tinc, &dsp->t1d.nsteps, &dsp->t1d.stepcntr, 
-        &dsp->t1d.dist_az, &dsp->t1d.tang, cpanel->t1d_step);
+        &dsp->t1d.dist_az, &dsp->t1d.tang, cpanel->t1d.step);
       dsp->t1d.get_new_target = false;
     }
   }
@@ -580,7 +575,7 @@ tour1d_idle_func (displayd *dsp)
 {
   ggobid *gg = GGobiFromDisplay (dsp);
   cpaneld *cpanel = &dsp->cpanel;
-  gboolean doit = !cpanel->t1d_paused;
+  gboolean doit = !cpanel->t1d.paused;
 
   if (doit) {
     tour1d_run (dsp, gg);
@@ -659,7 +654,7 @@ void tour1d_scramble(ggobid *gg)
 
 void tour1d_vert(cpaneld *cpanel, gboolean state)
 {
-  cpanel->t1d_vert = state;
+  cpanel->t1d.vert = state;
 }
 
 /* Variable manipulation */
@@ -679,7 +674,7 @@ tour1d_manip_init(gint p1, gint p2, splotd *sp)
   dsp->t1d_phi = 0.;
 
   /* gets mouse position */
-  if (cpanel->t1d_vert) 
+  if (cpanel->t1d.vert) 
     dsp->t1d_pos = dsp->t1d_pos_old = p2;
   else
     dsp->t1d_pos = dsp->t1d_pos_old = p1;
@@ -688,7 +683,7 @@ tour1d_manip_init(gint p1, gint p2, splotd *sp)
   dsp->t1d_manipvar_inc = false;
 
   /* need to turn off tour */
-  if (!cpanel->t1d_paused)
+  if (!cpanel->t1d.paused)
     tour1d_func(T1DOFF, gg->current_display, gg);
 
   /* check if manip var is one of existing vars */
@@ -750,7 +745,7 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
     if (actual_nxvars > 0)
     {
-      if (cpanel->t1d_vert)
+      if (cpanel->t1d.vert)
       {
         distx = 0.;
         disty = dsp->tc2_pos_old - dsp->tc2_pos;
@@ -793,7 +788,7 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     arrayd_copy(&dsp->t1d.F, &dsp->t1d.Fa);
     /*    copy_mat(dsp->t1d.Fa.vals, dsp->t1d.F.vals, d->ncols, 1);*/
     dsp->t1d.get_new_target = true;
-    if (!cpanel->t1d_paused)
+    if (!cpanel->t1d.paused)
       tour1d_func(T1DON, gg->current_display, gg);
   }
 }
@@ -814,7 +809,7 @@ tour1d_manip_end(splotd *sp)
   dsp->t1d.get_new_target = true;
 
   /* need to turn on tour? */
-  if (!cpanel->t1d_paused) {
+  if (!cpanel->t1d.paused) {
     tour1d_pause(cpanel, T1DOFF, gg);
 
     /*-- whenever motion stops, we need a FULL redraw --*/

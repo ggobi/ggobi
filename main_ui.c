@@ -290,7 +290,7 @@ procs_activate (gboolean state, displayd *display, ggobid *gg)
         tour2d_func (state, display, gg);
     break;
     case TOUR1D:
-      if (!display->cpanel.t1d_paused)
+      if (!display->cpanel.t1d.paused)
         tour1d_func (state, display, gg);
     break;
     case COTOUR:

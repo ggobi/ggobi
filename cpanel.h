@@ -98,14 +98,17 @@ typedef struct {
  gint t2d_pp_indx;
  gfloat t2d_slidepos;
 
- /*-- 1d tour --*/
- gboolean t1d_paused;
- gfloat t1d_step; 
- gint t1d_nbins, t1d_nASHes;
- gboolean t1d_vert;
- gint t1d_pp_indx;
- gfloat t1d_slidepos;
- gfloat t1d_ASH_smooth;
+ struct _Tour1DCpanel {
+   /*-- 1d tour --*/
+   gboolean paused;
+   gfloat step; 
+   gint nbins, nASHes;
+   gboolean vert;
+   gint pp_indx;
+   gfloat slidepos;
+   gfloat ASH_smooth;
+   gfloat ASH_add_lines_p;
+ } t1d;
 
  /*-- corr tour --*/
  gboolean tcorr1_paused;

@@ -63,20 +63,23 @@ typedef struct {
  * plot1d  (used in parcoords as well as scatterplot)
 */
  gint p1dvar;
- vector_f p1d_data; /* the spreading data */
- lims p1d_lim;      /* limits of the spreading data */
- gfloat p1d_mean;
- /*-- line segments in ASHes --*/
- icoords ash_baseline;  /*-- for drawing segments from point to baseline --*/
+ struct _p1d {
+   vector_f spread_data; /* the spreading data */
+   lims lim;      /* limits of the spreading data */
+   gfloat mean;
+   /*-- line segments in ASHes --*/
+   icoords ash_baseline;  /*-- for drawing segments from point to baseline --*/
+ } p1d;
  
 
 /*
  * tour1d (variables used to record the state of the 1D tour for this plot)
  */
  struct _tour1d {
-   gint keepmin;
-   gint keepmax; /* Is this ever used */
-   gboolean firsttime;
+   /*gint keepmin;
+   gint keepmax;*/ /* Is this ever used */
+   /*gboolean firsttime;*/
+   icoords ash_baseline;  /*-- for drawing segments from point to baseline --*/
  } tour1d;
 
 /*
@@ -95,6 +98,23 @@ typedef struct {
  * barcharts and histograms
 */
  barchartd *bar;
+
+#ifdef WIN32
+#endif
+/*
+ * for Windows drawing -- this or GArrays?  
+ * Do I really need to keep doing this?
+ struct _win32 {
+   struct {GdkPoint *data; gint n;} points;
+   struct {rectd *data; gint n;} orects;
+   struct {rectd *data; gint n;} frects;
+   struct {arcd *data; gint n;} oarcs;
+   struct {arcd *data; gint n;} farcs;
+   struct {GdkSegment *data; gint n;} segs;
+   struct {GdkSegment *data; gint n;} whisker_segs;
+   struct {GdkSegment *data; gint n;} ash_segs;
+ } win32;
+*/
 
 } splotd;
 
