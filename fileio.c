@@ -60,10 +60,10 @@ fileset_generate(const char *fileName, DataMode guess)
 #ifndef G_OS_WIN32
   struct stat buf;
 #else
-  int ft=0;
+  gint ft=0;
 #endif
-  int i, j;
-  int numGroups;
+  gint i, j;
+  gint numGroups;
   GSList *groups;
 
   if(FileTypeGroups == NULL)
@@ -175,22 +175,22 @@ fileset_generate(const char *fileName, DataMode guess)
 }
 
 gchar *
-completeFileDesc(const char *fileName, InputDescription *desc)
+completeFileDesc(const gchar *fileName, InputDescription *desc)
 {
-  int n;
-  char *tmp = strrchr(fileName, '.');
+  gint n;
+  gchar *tmp = strrchr(fileName, '.');
 
   ExtensionList *group = getInputDescriptionGroup(desc->mode);
  
   if(group) {
-    int i;
-    const char *ext;
+    gint i;
+    const gchar *ext;
     n = strlen(fileName);
     for(i = 0;i<group->len; i++) {
       ext = group->extensions[i];
-      if(endsWith(fileName, ext)) {
-        int nbytes = strlen(fileName)-strlen(ext);
-        desc->baseName = (char *)g_malloc(sizeof(char) * nbytes);
+      if (endsWith(fileName, ext)) {
+        gint nbytes = strlen(fileName)-strlen(ext);
+        desc->baseName = (gchar *)g_malloc(sizeof(gchar) * nbytes);
         g_snprintf(desc->baseName, nbytes, "%s", fileName);
         desc->givenExtension = g_strdup(ext);
         break;

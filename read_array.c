@@ -408,6 +408,7 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
     /*
      * Try fname.bin before fname, to see whether there is a binary
      * data file available.  If there is, call read_binary ().
+     * ... except that there's no support for reading binary data now.
     */
     if(desc->mode == binary_data) {
       if ((fp = fopen (desc->fileName, "rb")) != NULL) {
@@ -423,8 +424,8 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
           (const gchar *) sep, 0);
         gchar **p;
 
-        if(!words)
-	    return(false);
+        if (!words)
+/**/      return (false);
 
         for (p=words; *p; p++) {
           if (**p) {

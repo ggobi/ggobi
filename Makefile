@@ -229,7 +229,7 @@ local.config:
 
 ifdef USE_XML
 xmlConvert: xmlConvert.o libggobi.so
-	$(CC) -g -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS:%=-L%) -L. -lggobi $(DL_RESOLVE_PATH)
+	$(CC) -g -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS:%=-L%) -L. -lggobi $(DL_RESOLVE_PATH) -lgtk
 
 make_ggobi.o: read_xml.h
 endif

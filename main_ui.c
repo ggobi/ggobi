@@ -606,7 +606,7 @@ make_ui (ggobid *gg) {
                             &gg->main_menubar, (gpointer) gg);
 
 #if USE_XML
-  if(sessionOptions->info->numInputs > 0) {
+  if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
    GtkWidget *w;
       w = gtk_item_factory_get_widget(gg->main_menu_factory, "/File");
       addPreviousFilesMenu(w, sessionOptions->info, gg);

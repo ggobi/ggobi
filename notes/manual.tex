@@ -65,11 +65,11 @@ Duncan Temple Lang, Lucent Bell Labs
 
 The ggobi software is a data visualization system with state-of-the-art
 interactive and dynamic methods for the manipulation of views of
-data.  It represents a big step in the evolution of XGobi, with
-multiple plotting windows, more flexible color management, XML file
+data.  It represents a significant improvement on its precedessor, XGobi,
+with multiple plotting windows, more flexible color management, XML file
 handling, and better portability to Windows.
 
-The most significant change is that ggobi can be embedded in other
+The most significant change may be that ggobi can be embedded in other
 software and controlled using an API (application programming
 interface).  This design has been developed and tested in partnership
 with R.  When ggobi is used with R, the result is a full marriage
@@ -94,7 +94,7 @@ be examined.
 This paper gives an overview of the layout and functionality of ggobi,
 interactive graphical software for exploratory data analysis.  Readers
 who are familiar with xgobi will find much that is familiar in ggobi's
-design, and might want to skip directly to section \ref{slbl:xgobi}
+design, and might want to read section \ref{slbl:xgobi} first,
 where key differences between the two programs are described.
 
 You will find that you can use ggobi for simple tasks with virtually
@@ -108,14 +108,13 @@ success is obtained by users who have gained experience with the
 system and combine it with creativity and data analytic
 sophistication.
 
-We begin with a tutorial, and move on to describe ggobi's layout
-and functionality in detail.
+We begin with a tutorial, and move on to describe ggobi in detail.
 
 \section{Tutorial}
 
 Several sample data files are included with the ggobi distribution,
 in a directory called {\bf data,} and there you will find the file
-{\bf pigs.xml}, on a dataset on pig production in the United Kingdom,
+{\bf pigs.xml}, a dataset on pig production in the United Kingdom,
 taken from {\em Data} by Andrews and Herzberg.  Start ggobi for the 
 pig production data by typing:
 
@@ -126,25 +125,14 @@ ggobi pigs
 Two windows will appear, the ggobi control panel and a scatterplot,
 as shown in figure~1.
 
-\vbox{
-\vspace{.4in}
-\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
-
-\vspace{.15in} \centerline{ \parbox{6in}
-{Figure~1: Layout of a ggobi session.  The plotting window contains a
-scatterplot of the pig production data.
-}}
-\vspace{.4in}
-}
-
-The control panel has a panel of ViewMode controls on the left and a
-variable selection region on the right.  You can see that the
-scatterplot contains a 2-dimensional projection of the data, a plot
-of YEAR vs TIME.  Move the mouse to one of the variable labels in the
-variable selection region, and leave it in place until the tooltip
-appears, explaining how to select new variables for the plot.   Begin
-to get a feeling for the data by looking at several of the 2d plots:
-profit vs herdsz, herdsz vs time.
+The control panel has a panel of controls on the left, labeled {\bf
+XYPlot}, and a variable selection region on the right.  You can see
+that the scatterplot contains a 2-dimensional projection of the data,
+a plot of YEAR vs TIME.  Move the mouse to one of the variable labels
+in the variable selection region, and leave it in place until the
+tooltip appears, explaining how to select new variables for the
+plot.   Begin to get a feeling for the data by looking at several of
+the 2d plots:  PROFIT vs HERDSZ, HERDSZ vs TIME.
 
 Some of the variables are not self-explanatory, and here's
 what they mean:
@@ -174,16 +162,35 @@ Display, ViewMode and Tools menus.
 Using the Display menu, open another scatterplot display. Notice that
 the new window has a narrow white band drawn around the outside of
 the plotting area:  that means that the new window is now the
-``current display'' and its plot is the ``current plot.''  Click in
+``current display'' and its plot is the ``current plot.''  Click in the
 plotting region of the other scatterplot to make it the current plot,
-and now notice what happens in the variable selection region of the
-control panel when you do that:  it should always show which
-variables are plotted in the current plot.
+and notice what happens in the variable selection region of the
+control panel when you alternate between the two:  it should always show
+the variables that are plotted in the current plot.
+
+\vbox{
+\vspace{.4in}
+\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
+\vspace{.15in} \centerline{ \parbox{6in}
+{Figure~1: Layout of a ggobi session.  The plotting window contains a
+scatterplot of the PROFIT vs GILTS, from the pig production data.
+}}
+\vspace{.4in}
+}
 
 Now set up a plot of GILTS vs HERDSZ in the first scatterplot, and
 PROFIT vs HERDSZ in the second, and make that the current plot.
-Using the ViewMode menu, choose {\bf Brush.}   The pink rectangle
-that appears in the window is the ``paintbrush,'' and dragging it
+Using the ViewMode menu, choose {\bf Brush.}  
+Look at the buttons and menus inside the leftmost portion of the
+ggobi control panel.  Notice that they're contained by a frame
+labelled {\bf Brush,} which is the ViewMode of the current plot.  This
+frame contains most of the brushing controls, which are described in
+the section \ref{slbl:Brush}.  A few of the brushing controls,
+though, are in the main menubar: in the Reset menu and at the bottom
+of the Options menu.
+
+The pink rectangle
+that appears in the current plot is the ``paintbrush,'' and dragging it
 over points changes their color.  Use the left button to drag it and
 the middle or right button to resize it.  Make it almost as wide as
 the window and about a quarter as tall, and paint first the
@@ -192,28 +199,20 @@ keep an eye on the of GILTS vs HERDSZ, and notice where the painted
 points fall in that scatterplot.  Using two linked 2d plots is one
 way to explore the relationship among three variables.
 
-Look at the buttons and menus inside the leftmost portion of the
-ggobi control panel.  Notice that they're contained by a frame
-labelled ``Brush,'' which is the ViewMode of the current plot.  This
-frame contains most of the brushing controls, which are described in
-the section \ref{slbl:Brush}.  A few of the brushing controls,
-though, are in the main menubar: in the Reset menu and at the bottom
-of the Options menu.
-
 Next use the Tools menu to open the {\bf Variable manipulation tool},
-a very frequently-used part of the ggobi interface.  It contains a
+a central part of the ggobi graphical user interface.  It contains a
 table with a few basic statistics for each variable, and the buttons
 below the table allow you to set variable limits, add new variables,
 and a few other things.  Try clicking the mouse in the table -- 
-you can select row of the table at a time, or use the control and
-shift keys as modifiers to select more than one variable.  Hold the
+you can select one row of the table at a time, or use the control and
+shift keys as modifiers to select more than one.  Hold the
 control key down while clicking to select variables that are not
 contiguous in the table; use the shift key if you want to select
-a contiguous range of variables. 
+a contiguous range of variables.
 
 You select variables in this fashion when you want to use one of
 the tools to operate on them.  For example, select just the GILTS
-variable, and then click on 'Clone' at the bottom of the tool.
+variable, and then click on {\bf Clone} at the bottom of the tool.
 You have just added a duplicate of the GILTS variable to the dataset,
 and you'll see it at the bottom of the table in this tool, and in
 the variable selection region of the ggobi control panel, too.
@@ -228,11 +227,11 @@ tool.}
 
 \subsection{The major functions}
 
-Across the top of the control panel in Figure 1 stretches a row of
-buttons for selecting major GGobi functions from pull-down menus.
-Buttons such as {\bf File}, {\bf Display,} {\bf ViewMode}, {\bf
-Tools}, {\bf Options} and {\bf DisplayTree} organize functions in
-menus.
+Across the top of the control panel, as seen in in Figure 1,
+stretches a row of buttons for selecting major ggobi functions from
+pull-down menus.  Buttons such as {\bf File}, {\bf Display,} {\bf
+ViewMode}, {\bf Tools}, {\bf Options} and {\bf DisplayTree} organize
+functions in menus.
 
 As expected, the {\bf File} button opens a menu for selecting
 input/output functions as well as exiting.
@@ -241,15 +240,15 @@ The {\bf Display} button opens a manu for opening a new plotting
 window.  The display types are
 \begin{itemize}
 \itemsep 0em
-\item Scatterplot,
-\item Scatterplot matrix, 
-\item Parallel coordinates plot,
-\item Time series plots.
+\item scatterplot,
+\item scatterplot matrix, 
+\item parallel coordinates plot, and
+\item time series plots.
 \end{itemize}
 
 If the data has missing values, a scatterplot or scatterplot matrix
 of the ``missingness'' information can be opened.  Each display type
-is discussed in section ~\label{DisplayTypes}.
+is discussed in section ~\ref{DisplayTypes}.
 
 The {\bf ViewMode} menu contains links to ggobi's
 inventory of interactive graphics operations: 
@@ -263,14 +262,13 @@ inventory of interactive graphics operations:
 \item Scale: axis scaling,
 \item Brush: setting point glyphs and point and edge colors,
 \item Identify: labelling points
-\item Move Points: direct manipulation of point position.
+\item Move Points: direct manipulation of point positions.
 \end{itemize}
 
-Each of these operations defines the mouse operations for directly
-manipulating the view.  Examples are dragging the mouse to control
-point cloud rotations, or to highlight points.  These operations also
-determine the content of the control panel on the left of the
-window.  Exactly one mode is selected at all times.  The view modes
+When you choose a new view mode, the controls at the left of
+the main window will change correspondingly:  each mode has its
+own parameters, and its own rules for responding to mouse actions
+in the plotting windows.  The view modes
 are discussed in section~\ref{slbl:ViewModes}.
 
 The {\bf Tools} menu gives access to 
@@ -335,9 +333,9 @@ control panel should update so that its panels correspond to the
 current display type and ViewMode.
 
 \subsubsection{Display types}
+\label{DisplayTypes}
 
 Each display type is briefly described here. 
-
 As mentioned earlier, there are presently four main display types:
 
 The {\bf scatterplot} display is a window containing a single

@@ -129,7 +129,7 @@ read_input(InputDescription *desc, ggobid *gg)
     break;
 
     case binary_data:
-      g_printerr("No support for MySQL\n");
+      g_printerr("No support yet for binary data\n");
     break;
 
     case Sprocess_data:
