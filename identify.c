@@ -14,6 +14,10 @@
 #include "vars.h"
 #include "externs.h"
 
+void sticky_id_link_by_id (gint, gint, datad *, ggobid *);
+
+
+
 gint
 find_nearest_point (icoords *lcursor_pos, splotd *splot, datad *d, ggobid *gg)
 {
@@ -61,7 +65,6 @@ sticky_id_toggle (datad *d, ggobid *gg)
   gint i = 0;
   gboolean i_in_list = false;
   gpointer ptr = NULL;
-  void sticky_id_link_by_id (gint, gint, datad *, ggobid *);
 
   if (d->nearest_point != -1) {
 
