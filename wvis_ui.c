@@ -133,10 +133,16 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
 {
   gint i, k, m;
   gfloat val;
-  vartabled *vt = vartable_element_get (jvar, d);
-  gfloat min = vt->lim_tform.min;
-  gfloat max = vt->lim_tform.max;
+  vartabled *vt;
+  gfloat min, max;
   gint ncolors;
+
+  if (jvar == -1)
+    return;
+
+  vt = vartable_element_get (jvar, d);
+  min = vt->lim_tform.min;
+  max = vt->lim_tform.max;
 
   if (gg->wvis.color_table == NULL) {
     ncolors = gg->ncolors;
@@ -334,21 +340,45 @@ bin_boundaries_set (gint selected_var, datad *d, ggobid *gg)
     /*
      * determine the boundaries that will result in equal-sized
      * groups (as well as the data permits)
+     *
+     * This seems to do the right thing except in one case:  the
+     * variable is categorical with the number of categories less
+     * than the number of groups, and the categories are not of
+     * equal size.  It does something legal, but not ideal, since
+     * the number of groups it identifies may be too small.
     */
+    /*-- initialize the boundaries --*/
+    for (k=0; k<ngroups; k++)
+      gg->wvis.pct[k] = 1.0;
     i = 0;
     for (k=0; k<ngroups; k++) {
       m = 0;
       while (m < groupsize || i == 0 || pairs[i].f == pairs[i-1].f) {
         m++;
         i++;
+        if (i == d->nrows_in_plot-1) 
+          break;
       }
-      midpt = pairs[i].f + (pairs[i+1].f - pairs[i].f) / 2;
+      midpt = (i == d->nrows_in_plot - 1) ?
+        max : pairs[i].f + (pairs[i+1].f - pairs[i].f) / 2 ;
       gg->wvis.pct[k] = (midpt - min) / range;
+      if (i == d->nrows_in_plot-1) 
+        break;
     }
-    gg->wvis.pct[ngroups-1] = 1.0;
 
     g_free (pairs);
   }
+}
+
+static void binning_method_cb (GtkWidget *w, gpointer cbd)
+{
+  gboolean rval = false;
+  ggobid *gg = GGobiFromWidget (w, true);
+  gg->wvis.binning_method = GPOINTER_TO_INT (cbd);
+
+  gg->wvis.npct = 0;  /*-- force bin_boundaries_set to be called --*/
+  gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
+    (gpointer) gg, (gpointer) &rval);
 }
 
 static void
@@ -394,6 +424,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     gg->wvis.n = (gint *) g_realloc (gg->wvis.n,
                                      gg->wvis.npct * sizeof (gint));
     bin_boundaries_set (selected_var, d, gg);
+    bin_counts_reset (selected_var, d, gg);
   }
 
   /*-- clear the pixmap --*/
@@ -554,6 +585,7 @@ selection_made_cb (GtkWidget *clist, gint row, gint column,
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   GtkWidget *btn;
 
+  bin_boundaries_set (row, d, gg);  /*-- in case the method changed --*/
   bin_counts_reset (row, d, gg);
   gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
     (gpointer) gg, (gpointer) &rval);
@@ -731,6 +763,9 @@ wvis_window_open (ggobid *gg) {
     "--- QUALITATIVE ---"};
   gint n, ncolorscaletype_lbl = 4;
 #endif
+  static gchar *const binning_method_lbl[] = {
+    "Constant bin width",
+    "Constant bin count"};
 
   if (gg->d == NULL || g_slist_length (gg->d) == 0)
     return;
@@ -750,6 +785,17 @@ wvis_window_open (ggobid *gg) {
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox, GTK_SELECTION_SINGLE,
       (GtkSignalFunc) selection_made_cb, gg);
+
+    /*-- Insert an option menu for choosing the method of binning --*/
+    opt = gtk_option_menu_new ();
+    gtk_widget_set_name (opt, "WVIS:binning_method");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+      "Select a binning method", NULL);
+    gtk_box_pack_start (GTK_BOX (vbox), opt,
+      false, false, 0);
+    populate_option_menu (opt, (gchar**) binning_method_lbl,
+                          sizeof (binning_method_lbl) / sizeof (gchar *),
+                          (GtkSignalFunc) binning_method_cb, gg);
 
 #ifdef USE_XML
   /*
