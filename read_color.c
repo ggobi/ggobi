@@ -53,7 +53,7 @@ read_colorscheme(char *fileName, GList **list)
 
   node = XML_CHILDREN(node); 
   while(node) {
-    if(node->type != XML_TEXT_NODE) {
+    if(node->type != XML_TEXT_NODE && node->type != XML_COMMENT_NODE) {
       scheme = process_colorscheme(node, doc);
       if(list)
         *list = g_list_append(*list, scheme);
