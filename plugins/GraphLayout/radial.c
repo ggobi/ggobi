@@ -81,6 +81,9 @@ hasPathToCenter (noded *n, noded *referringnode, datad *d, datad *e,
   glayoutd *gl = glayoutFromInst (inst);
   noded *centerNode = gl->radial->centerNode;
   GList *l, *connectedEdges = list_subset_uniq (n->connectedEdges);
+  endpointsd *endpoints;
+
+  endpoints = resolveEdgePoints(e, d);
 
   for (l = connectedEdges; l; l = l->next) {
     k = GPOINTER_TO_INT (l->data);
@@ -88,9 +91,11 @@ hasPathToCenter (noded *n, noded *referringnode, datad *d, datad *e,
     /*-- if edge[k] is included and visible ... --*/
     if (e->sampled.els[k] && !e->hidden.els[k]) {
 
-      n1 = &gl->radial->nodes[ d->rowid.idv.els[e->edge.endpoints[k].a] ];
+      /*n1 = &gl->radial->nodes[ d->rowid.idv.els[e->edge.endpoints[k].a] ];*/
+      n1 = &gl->radial->nodes[endpoints[k].a];
       if (n1->i == n->i)
-        n1 = &gl->radial->nodes[ d->rowid.idv.els[e->edge.endpoints[k].b] ];
+        /*n1 = &gl->radial->nodes[d->rowid.idv.els[e->edge.endpoints[k].b]];*/
+        n1 = &gl->radial->nodes[endpoints[k].b];
 
       if (referringnode != NULL && n1->i == referringnode->i)
         continue;  /*-- skip over this node; we've already tested it --*/
@@ -138,8 +143,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   InputDescription *desc = NULL;
   datad *dnew;
   gdouble *values;
-  gchar **rownames, **colnames;
-  glong *rowids;
+  gchar **rownames, **colnames, **rowids;
   displayd *dspnew;
   gboolean edges_displayed;
   gboolean redisplay_all = false;  /* if points are hidden in this function */
@@ -260,10 +264,17 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 
   nc = 8;
 
+/*
   rowids = (glong *) g_malloc (nvisible * sizeof(glong));
   for (m=0; m<nvisible; m++) {
     i = visible[m];
     rowids[m] = (glong) d->rowid.id.els[i];
+  }
+*/
+  rowids = (gchar **) g_malloc (nvisible * sizeof(gchar *));
+  for (m=0; m<nvisible; m++) {
+    i = visible[m];
+    rowids[m] = g_strdup (d->rowIds[i]);
   }
 
   values = (gdouble *) g_malloc (nvisible * nc * sizeof(gdouble));
@@ -304,7 +315,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   dnew->nickname = g_strdup ("rad");
 
   GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
-    gg, rowids, desc);
+    gg, rowids, false, desc);
 
   /*-- copy the color and glyph vectors from d to dnew --*/
   for (i=0; i<nvisible; i++) {
@@ -342,7 +353,11 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   g_free (values);
   g_free (rownames);
   g_free (colnames);
+/*
+  for (m=0; m<nvisible; m++)
+    g_free (rowids[m]);
   g_free (rowids);
+*/
   g_free (visible);
 
 /*-- add the new variables to this datad --*/
@@ -494,8 +509,14 @@ void radial_highlight_sticky_edges (ggobid *gg, gint index, gint state,
       e->glyph.els[k].size = e->glyph_now.els[k].size = gg->glyph_id.size;
       e->glyph.els[k].type = e->glyph_now.els[k].type = gg->glyph_id.type;
     } else {
+/*
       gint a = d->rowid.idv.els[e->edge.endpoints[k].a];
       gint b = d->rowid.idv.els[e->edge.endpoints[k].b];
+*/
+      gint a, b;
+      endpointsd *endpoints;
+      endpoints = resolveEdgePoints(e, d);
+      edge_endpoints_get (k, &a, &b, d, endpoints, e);
 
       if ((a == index &&
            g_slist_index (d->sticky_ids, GINT_TO_POINTER(b)) != -1) ||
@@ -540,10 +561,12 @@ initRadialLayout (glong *visible, gint nvisible, ggobid *gg,
   gint i;
   noded *na, *nb;
   gint nedges = e->edge.n;
-  endpointsd *endpoints = e->edge.endpoints;
   gint a, b;
   gint nnodessq = nvisible * nvisible;
   glong *nodeindices = g_malloc (d->nrows * sizeof (glong *));
+  endpointsd *endpoints;
+
+  endpoints = resolveEdgePoints(e, d);
 
   /* used for finding edge endpoints */
   for (i=0; i<d->nrows; i++) 
@@ -590,8 +613,12 @@ initRadialLayout (glong *visible, gint nvisible, ggobid *gg,
   /*-- loop over the edges --*/
   for (i = 0; i <e->edge.n; i++) {
     if (e->sampled.els[i] && !e->hidden.els[i]) {
+/*
       a = d->rowid.idv.els[endpoints[i].a];
       b = d->rowid.idv.els[endpoints[i].b];
+*/
+      edge_endpoints_get (i, &a, &b, d, endpoints, e);
+
       if (a != -1 && b != -1 &&
           nodeindices[a] != -1 && nodeindices[b] != -1)
       {

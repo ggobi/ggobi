@@ -17,7 +17,11 @@ count_visible_edges (PluginInstance *inst)
   gint m, i, k, a, b, edgeid;
   endpointsd *endpoints;
 
-  endpoints = e->edge.endpoints;
+  endpoints = resolveEdgePoints(e, d);
+  if (endpoints == NULL) {
+    g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
+/**/return;
+  }
 
   if (ga->nInEdgesVisible.nels != ga->nnodes) {
     vectori_realloc (&ga->nInEdgesVisible, ga->nnodes);
@@ -35,7 +39,8 @@ count_visible_edges (PluginInstance *inst)
     i = d->rows_in_plot.els[m];
     for (k=0; k<ga->inEdges[i].nels; k++) {
       edgeid = ga->inEdges[i].els[k];
-      a = d->rowid.idv.els[endpoints[edgeid].a];
+      /*a = d->rowid.idv.els[endpoints[edgeid].a];*/
+      a = endpoints[edgeid].a;
       /*-- no need for b, because i = b --*/
       if (e->sampled.els[edgeid] && !e->hidden_now.els[edgeid] &&
           !d->hidden_now.els[a] && !d->hidden_now.els[i])
@@ -45,7 +50,8 @@ count_visible_edges (PluginInstance *inst)
     }
     for (k=0; k<ga->outEdges[i].nels; k++) {
       edgeid = ga->outEdges[i].els[k];
-      b = d->rowid.idv.els[endpoints[edgeid].b];
+      /*b = d->rowid.idv.els[endpoints[edgeid].b];*/
+      b = endpoints[edgeid].b;
       /*-- no need for a, because i = a --*/
       if (e->sampled.els[edgeid] && !e->hidden_now.els[edgeid] &&
           !d->hidden_now.els[b] && !d->hidden_now.els[i])
@@ -70,13 +76,20 @@ hide_inEdge (gint i, PluginInstance *inst)
   graphactd *ga = graphactFromInst (inst);
   datad *d = ga->d;
   datad *e = ga->e;
-  endpointsd *endpoints = e->edge.endpoints;
   ggobid *gg = inst->gg;
   gint nd = g_slist_length (gg->d);
+  endpointsd *endpoints;
+
+  endpoints = resolveEdgePoints(e, d);
+  if (endpoints == NULL) {
+    g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
+/**/return;
+  }
 
   for (k=0; k<ga->inEdges[i].nels; k++) {
     edgeid = ga->inEdges[i].els[k];
-    a = d->rowid.idv.els[endpoints[edgeid].a];
+    /*a = d->rowid.idv.els[endpoints[edgeid].a];*/
+    a = endpoints[edgeid].a;
     /*-- no need for b, because i = b --*/
 
     e->hidden_now.els[edgeid] = e->hidden.els[edgeid] = true;
@@ -96,13 +109,20 @@ hide_outEdge (gint i, PluginInstance *inst)
   graphactd *ga = graphactFromInst (inst);
   datad *d = ga->d;
   datad *e = ga->e;
-  endpointsd *endpoints = e->edge.endpoints;
   ggobid *gg = inst->gg;
   gint nd = g_slist_length (gg->d);
+  endpointsd *endpoints;
+
+  endpoints = resolveEdgePoints(e, d);
+  if (endpoints == NULL) {
+    g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
+/**/return;
+  }
 
   for (k=0; k<ga->outEdges[i].nels; k++) {
     edgeid = ga->outEdges[i].els[k];
-    b = d->rowid.idv.els[endpoints[edgeid].b];
+    /*b = d->rowid.idv.els[endpoints[edgeid].b];*/
+    b = endpoints[edgeid].b;
 
     e->hidden_now.els[edgeid] = e->hidden.els[edgeid] = true;
     d->hidden_now.els[i] = d->hidden.els[i] = true;
@@ -207,8 +227,14 @@ show_neighbors (gint nodeid, gint edgeid, gint depth,
 {
   gint a, b, neighbor, k, eid;
   graphactd *ga = (graphactd *) inst->data;
+  endpointsd *endpoints;
+  endpoints = resolveEdgePoints(e, d);
+  if (endpoints == NULL) {
+    g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
+/**/return;
+  }
 
-  edge_endpoints_get (edgeid, &a, &b, d, e->edge.endpoints);
+  edge_endpoints_get (edgeid, &a, &b, d, endpoints, e);
 
   e->hidden_now.els[edgeid] = e->hidden.els[edgeid] = false;
   d->hidden_now.els[a] = d->hidden.els[a] = false;
@@ -241,10 +267,15 @@ void show_neighbors_sticky_cb (ggobid *gg, gint index, gint state,
   graphactd *ga = (graphactd *) inst->data;
   datad *e = ga->e;
   gint k, edgeid;
-  endpointsd *endpoints;
   gint nd = g_slist_length (gg->d);
   gint i;
-  endpoints = e->edge.endpoints;
+  endpointsd *endpoints;
+
+  endpoints = resolveEdgePoints(e, d);
+  if (endpoints == NULL) {
+    g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
+/**/return;
+  }
 
   if (index == -1)
     return;

@@ -181,7 +181,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
-    if (d->rowid.idv.nels != 0) {  /*-- node sets --*/
+    if (d->rowIds != NULL) {  /*-- node sets --*/
       row[0] = g_strdup (d->name);
       gtk_clist_append (GTK_CLIST (clist), row);
       g_free (row[0]);
@@ -300,9 +300,11 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
     "Fix one of the axes during plot cycling or let them both float", NULL);
 */
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
+#ifdef GRAPHVIZ
   populate_option_menu (opt, (gchar**) neato_model_lbl,
     sizeof (neato_model_lbl) / sizeof (gchar *),
     (GtkSignalFunc) neato_model_cb, "PluginInst", inst);
+#endif
 
   /*-- neato scale --*/
   vb = gtk_vbox_new (false, 0);
@@ -349,8 +351,10 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Have neato use edge length in determining node positions, and use the selected variable as a source of lengths",
     NULL);
+#ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
     GTK_SIGNAL_FUNC (neato_use_edge_length_cb), inst);
+#endif
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
   /*-- include only edge sets.  --*/

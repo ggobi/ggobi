@@ -37,7 +37,6 @@ init_edge_vectors (gboolean reinit, PluginInstance *inst)
   gint a, b, i, k, n;
   endpointsd *endpoints;
 
-
   if (reinit && ga->nnodes > 0) {
     for (i=0; i<ga->nnodes; i++) {
       vectori_free (&ga->inEdges[i]);
@@ -65,22 +64,27 @@ init_edge_vectors (gboolean reinit, PluginInstance *inst)
   }
 
 /*
-for (i=0; i<ga->nnodes; i++)
-g_printerr ("id %d %d idv %d %d\n",
-d->rowid.id.els[i], d->rowid.id.els[i],
-d->rowid.idv.els[i], d->rowid.idv.els[i]);
+*for (i=0; i<ga->nnodes; i++)
+*g_printerr ("id %d %d idv %d %d\n",
+*d->rowid.id.els[i], d->rowid.id.els[i],
+*d->rowid.idv.els[i], d->rowid.idv.els[i]);
 */
 
-  endpoints = e->edge.endpoints;
+  endpoints = resolveEdgePoints(e, d);
+  if (endpoints == NULL) {
+    g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
+/**/return;
+  }
   for (i=0; i<ga->nedges; i++) {
 /*
-g_printerr ("endpoints %d %d idv %d %d\n",
-endpoints[i].a, endpoints[i].b,
-d->rowid.idv.els[endpoints[i].a], d->rowid.idv.els[endpoints[i].b]);
+*g_printerr ("endpoints %d %d idv %d %d\n",
+*endpoints[i].a, endpoints[i].b,
+*d->rowid.idv.els[endpoints[i].a], d->rowid.idv.els[endpoints[i].b]);
 */
 
-    a = d->rowid.idv.els[endpoints[i].a];
-    b = d->rowid.idv.els[endpoints[i].b];
+    /*a = d->rowid.idv.els[endpoints[i].a];*/
+    /*b = d->rowid.idv.els[endpoints[i].b];*/
+    edge_endpoints_get (i, &a, &b, d, endpoints, e);
 
     /*-- could use a,b to populate inNodeList, outNodeList --*/
     inEdgeList[b] = g_list_append (inEdgeList[b], GINT_TO_POINTER (i));

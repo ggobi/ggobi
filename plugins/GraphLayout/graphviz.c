@@ -40,13 +40,16 @@ test_edge_length (Agraph_t *graph, glayoutd *gl, ggobid *gg)
   Agnode_t *head, *tail;
   Agedge_t *edge;
   gchar *name;
+  endpointsd *endpoints = resolveEdgePoints(e, d);
 
   for (i=0; i<e->edge.n; i++) {
-    a = d->rowid.idv.els[e->edge.endpoints[i].a];
+    edge_endpoints_get (i, &a, &b, d, endpoints, e);
+
+    /*a = d->rowid.idv.els[e->edge.endpoints[i].a];*/
     name = (gchar *) g_array_index (d->rowlab, gchar *, a);
     tail = agfindnode (graph, name);
 
-    b = d->rowid.idv.els[e->edge.endpoints[i].b];
+    /*b = d->rowid.idv.els[e->edge.endpoints[i].b];*/
     name = (gchar *) g_array_index (d->rowlab, gchar *, b);
     head = agfindnode (graph, name);
 
@@ -190,11 +193,12 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   InputDescription *desc = NULL;
   datad *dnew;
   gdouble *values;
-  gchar **rownames, **colnames;
-  glong *visible, *rowids;
+  gchar **rownames, **colnames, **rowids;
+  glong *visible;
   displayd *dspnew;
   gboolean edges_displayed;
   gint dim, weightvar = -1, nedges;
+  endpointsd *endpoints = resolveEdgePoints(e, d);
 
   if (e == NULL) {
     g_printerr ("Trouble:  no edge set is specified\n");
@@ -229,11 +233,13 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   for (i=0; i<e->edge.n; i++) {
 
 /* still need a test for edge visibility */
-    a = d->rowid.idv.els[e->edge.endpoints[i].a];
+    edge_endpoints_get (i, &a, &b, d, endpoints, e);
+
+    /*a = d->rowid.idv.els[e->edge.endpoints[i].a];*/
     name = (gchar *) g_array_index (d->rowlab, gchar *, a);
     tail = agfindnode (graph, name);
 
-    b = d->rowid.idv.els[e->edge.endpoints[i].b];
+    /*b = d->rowid.idv.els[e->edge.endpoints[i].b];*/
     name = (gchar *) g_array_index (d->rowlab, gchar *, b);
     head = agfindnode (graph, name);
 
@@ -346,10 +352,17 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
   nc = dim;
 
+/*
   rowids = (glong *) g_malloc (nvisible * sizeof(glong));
   for (m=0; m<nvisible; m++) {
     i = visible[m];
     rowids[m] = (glong) d->rowid.id.els[i];
+  }
+*/
+  rowids = (gchar **) g_malloc (nvisible * sizeof(gchar *));
+  for (m=0; m<nvisible; m++) {
+    i = visible[m];
+    rowids[m] = g_strdup (d->rowIds[i]);
   }
 
   values = (gdouble *) g_malloc (nvisible * nc * sizeof(gdouble));
@@ -383,7 +396,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
      (gl->neato_model == neato_circuit_resistance) ? 'c' : 's');
 
   GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
-    gg, rowids, desc);
+    gg, rowids, false, desc);
 
   /*-- copy the color and glyph vectors from d to dnew --*/
   for (i=0; i<nvisible; i++) {
@@ -416,8 +429,11 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 */
   }
 
-  for (i=0; i<nvisible; i++)
+  for (i=0; i<nvisible; i++) {
     g_free (pos[i]);
+    /*g_free (rowids[i]);*/
+  }
+  /*g_free (rowids);*/
   g_free (pos);
   g_free (visible);
   agclose (graph);
