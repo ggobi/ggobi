@@ -231,7 +231,6 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     if (dtype == scatterplot || dtype == scatmat)
       edges_draw (sp, sp->pixmap0, gg);
   }
-g_printerr ("(unbinned) proj = %d\n", proj);
   if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
     splot_draw_tour_axes(sp, sp->pixmap0, gg);
   }
@@ -262,7 +261,6 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   gushort current_color;
   gint ncolors_used;
   gushort colors_used[NCOLORS+2];
-g_printerr ("(binned) proj = %d\n", proj);
 
   if (gg->plot_GC == NULL)
     init_plot_GC (sp->pixmap0, gg);
