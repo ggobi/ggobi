@@ -1,8 +1,8 @@
+include local.config
+
 ifdef ADMIN
  include Install/GNUmakefile.admin
 endif
-
-include local.config
 
 ggobi:
 
