@@ -423,6 +423,9 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
           (const gchar *) sep, 0);
         gchar **p;
 
+        if(!words)
+	    return(false);
+
         for (p=words; *p; p++) {
           if (**p) {
             name = p[0];

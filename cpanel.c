@@ -101,6 +101,8 @@ cpanel_set (displayd *display, ggobid *gg) {
     case tsplot:
       cpanel_brush_set (cpanel, gg);
       break;
+    default:
+	return;
   }
 
   mode_set (cpanel->mode, gg);

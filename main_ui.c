@@ -19,6 +19,7 @@
 #include "externs.h"
 #include "display_tree.h"
 
+#include "write_state.h"
 
 const char *const GGOBI(OpModeNames)[] = {
   "1D Plot",
@@ -41,6 +42,10 @@ const char *const GGOBI(OpModeNames)[] = {
 static const char *const *mode_name = GGOBI(OpModeNames);
 
 void addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg);
+
+void store_session(ggobid *gg, gint action, GtkWidget *w);
+void show_plugin_list(void *gg, gint action, GtkWidget *w);
+void create_new_ggobi(ggobid *gg, gint action, GtkWidget *w);
 
 void
 make_control_panels (ggobid *gg) {
@@ -579,6 +584,10 @@ static GtkItemFactoryEntry menu_items[] = {
        NULL,    
        (GtkItemFactoryCallback) filename_get_r,  
        0 },
+  { "/File/New",
+       NULL,    
+       (GtkItemFactoryCallback) create_new_ggobi,  
+       0 },
   { "/File/Save ...",   
        NULL,    
        (GtkItemFactoryCallback) writeall_window_open,    
@@ -600,6 +609,13 @@ static GtkItemFactoryEntry menu_items[] = {
        "<ctrl>Q",   
        (GtkItemFactoryCallback) quit_ggobi, 
        0 },
+
+  { "/File/Store",   
+       NULL,   
+       (GtkItemFactoryCallback) store_session, 
+       0 },
+
+
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
 
@@ -663,13 +679,13 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) show_display_tree,
        2},
 
-
   { "/_Help",                NULL, NULL, 0, "<LastBranch>" },
   { "/Help/About GGobi",
        NULL,
        (GtkItemFactoryCallback) splash_show,
        0 },
   { "/Help/About help ...",  NULL, NULL, 0, NULL },
+  { "/Help/About plugins ...",  NULL, (GtkItemFactoryCallback) show_plugin_list, NULL },
 };
 
 
@@ -781,15 +797,16 @@ addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
 {
   int i;
   GtkWidget *el;
-  
+  InputDescription *input;
   if(info) {
     for(i = 0 ; i < info->numInputs ; i++) {
-     if(info->inputs[i].fileName) {
-       el = gtk_menu_item_new_with_label(info->inputs[i].fileName);
+     input = &(info->descriptions[i].input);
+     if(input->fileName) {
+       el = gtk_menu_item_new_with_label(input->fileName);
        gtk_signal_connect(GTK_OBJECT(el), "activate", GTK_SIGNAL_FUNC(load_previous_file),
-                            info->inputs + i);
+                            info->descriptions + i);
        GGobi_widget_set(el, gg, true);
-       gtk_menu_insert(GTK_MENU(parent), el, 2 + i + 1);
+       gtk_menu_insert(GTK_MENU(parent), el, 3 + i + 1);
      }
    }
   }
@@ -801,15 +818,21 @@ void
 load_previous_file(GtkWidget *w, gpointer cbd)
 {
   InputDescription *desc;
+  GGobiDescription *gdesc;
   ggobid *gg;
 
    gg = GGobiFromWidget(w, false);
-   desc = (InputDescription*) cbd;
+   gdesc = (GGobiDescription*) cbd;
+   desc =  &(gdesc->input);
+
+   fprintf(stderr, "Number of displays %d\n", g_list_length(gdesc->displays));
 
    if(g_slist_length(gg->d) > 0)
       create_ggobi(desc);
-   else
+   else {
       read_input(desc, gg);
+      start_ggobi(gg, true);
+   }
 }
 
 /*
@@ -837,3 +860,21 @@ create_ggobi(InputDescription *desc)
   return(gg);
 }
 
+
+void
+show_plugin_list(void *garbage, gint action, GtkWidget *w)
+{
+  showPluginInfo(sessionOptions->info->plugins);
+}
+
+void
+store_session(ggobid *gg, gint action, GtkWidget *w)
+{
+  write_ggobi_as_xml(gg, "duncan");
+}
+
+void
+create_new_ggobi(ggobid *gg, gint action, GtkWidget *w)
+{
+    create_ggobi(NULL);
+}

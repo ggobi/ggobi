@@ -10,8 +10,8 @@
 */
 
 
-#ifndef DEFINES_H
-#define DEFINES_H
+#ifndef GGOBI_DEFINES_H
+#define GGOBI_DEFINES_H
 
 #include <gtk/gtk.h> /* Needed for ViewTypes. Can be moved. */
 
@@ -52,7 +52,8 @@ enum redrawStyle {NONE, EXPOSE, QUICK, BINNED, FULL};
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};
 
-enum displaytyped {scatterplot, scatmat, parcoords, tsplot};
+enum displaytyped {scatterplot, scatmat, parcoords, tsplot, unknown_display_type};
+
 extern const gchar* const ViewTypes[3];
 extern const gint ViewTypeIndeces[3];
 

@@ -241,6 +241,7 @@ ggobi_alloc()
   tmp->brush.updateAlways_p = true;
 
   tmp->printOptions = NULL;
+  tmp->pluginInstances = NULL;
 
   totalNumGGobis++;
 

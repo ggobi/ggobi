@@ -90,7 +90,9 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c splash.c cpanel.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937-1.c cokus.c \
  fileio.c \
- print.c
+ print.c \
+ plugin.c
+
 
 
 OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o splash.o cpanel.o \
@@ -125,12 +127,13 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o splash.o cpanel.o \
  eispack.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  fileio.o \
- print.o  
+ print.o  \
+ plugin.o
 
 
 ifdef USE_XML
- XML_SRC= read_xml.c write_xml.c  read_init.c
- XML_OB= read_xml.o write_xml.o read_init.o
+ XML_SRC= read_xml.c write_xml.c  read_init.c write_state.c
+ XML_OB= read_xml.o write_xml.o read_init.o write_state.o
 
  CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=$(USE_XML) $(XML_FLAGS)
 
@@ -159,8 +162,8 @@ endif
 
 OB+=mt19937-1.o cokus.o  
 
-ggobi: $(OB)
-	$(LD) $(OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
+ggobi: $(OB) $(EXTRA_OB)
+	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS)  $(EXTRA_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
 
 
 pure: ggobi.o $(OB)
@@ -262,8 +265,10 @@ datad.o read_xml.o: datad.c datad.h
 ../bin/ggobi: ggobi
 	cp ggobi $@
 
-# DO NOT DELETE
+
 print.o: print.c print.h
 
 %.d: %.c
 	$(CC) -M $(CFLAGS) -I. `gtk-config --cflags` $< > $@
+
+# DO NOT DELETE

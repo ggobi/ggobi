@@ -196,7 +196,12 @@ completeFileDesc(const char *fileName, InputDescription *desc)
         break;
       }
     }
+    if(i == group->len) {
+      return(NULL);
+    }
   }
+
+
 #if 0
   if(tmp) {
     desc->givenExtension = g_strdup(tmp+1);

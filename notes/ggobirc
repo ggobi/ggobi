@@ -2,19 +2,61 @@
 <!DOCTYPE ggobirc>
 <ggobirc>
 
+<preferences>
+  <browser>
+    <executable>netscape</executable>
+    <args><arg>-remote</arg></args>
+    <arg>openURL(<filename/>)</arg>
+  </browser>
+</preferences>
+
 <previousFiles count="4">
-<file name="/home2/FlowData/AltProjects/ggobi/data/flea.xml" mode="xml" />
-<file name="/home2/FlowData/AltProjects/ggobi/data/flea.dat" mode="ascii" />
-<url name="http://www.ggobi.org/data/flea.xml" mode="xml" />
-<database>
- <host>
+
+ <file id="1" name="/home2/FlowData/AltProjects/ggobi/data/flea.xml" mode="xml" />
+
+ <file id="2" name="/home2/FlowData/AltProjects/ggobi/data/flea.dat" mode="ascii" />
+
+ <url  id="3" name="http://www.ggobi.org/data/flea.xml" mode="xml" />
+
+ <database id="4">
+  <host>
    <name>tuolomne</name>
- </host>
- <login>duncan</login>
- <query>select * from flea;</query>
-</database>
+  </host>
+  <login>duncan</login>
+  <query>select * from flea;</query>
+ </database>
+
 </previousFiles>
 
+<ggobis>
+<ggobi id="1">
+<!-- This instance corresponds to the first location/input source in -->
+     the previousFiles tag above.
+     It has two displays
+  -->
+ <display type="parcoords" data="1">
+   <variable name="tars1" />
+   <variable name="tars2" />
+   <variable name="head" />
+ </display>
+ <display type="scatmatrix" data="1">
+   <variable name="tars1" />
+   <variable name="tars2" />
+   <variable name="aede1" />
+ </display>
+</ggobi>
+</ggobis>
+
+
+<plugins>
+ <plugin name="Data Viewer" load="immediate"><!-- load may be on demand. -->
+   <description>Displays datasets in data grid.</description>
+   <author>Duncan Temple Lang</author>
+   <dll name="plugins/DataViewer/DataViewer.so">
+     <init onCreate="addToMenu" />
+   </dll>
+ </plugin>
+</plugins>
 </ggobirc>
 
 

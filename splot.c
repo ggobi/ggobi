@@ -400,6 +400,8 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
     case tsplot:
       sp->whiskers = (GdkSegment *) g_malloc ((nr-1) * sizeof (GdkSegment));
     break;
+    default:
+	break;
   }
 }
 void
@@ -430,6 +432,8 @@ splot_free (splotd *sp, displayd *display, ggobid *gg) {
     case tsplot:
       g_free ((gpointer) sp->whiskers);
       break;
+    default:
+	break;
   }
 
   gtk_widget_destroy (sp->da);
@@ -605,6 +609,8 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
       xy_reproject (sp,
         (display->missing_p) ? d->missing_world.vals : d->world.vals,
         d, gg);
+      break;
+    default:
       break;
   }
 }

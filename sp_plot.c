@@ -123,6 +123,8 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
 
       case scatterplot:
         break;
+      default:
+	break;
     }
   }
   return draw_case;

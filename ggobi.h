@@ -362,6 +362,8 @@ struct _ggobid {
 
 
  PrintOptions *printOptions;
+ GList *pluginInstances;
+
 }; /*  ggobid; */
 
 #ifdef USE_XML

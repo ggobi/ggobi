@@ -23,6 +23,8 @@
 #include "read_xml.h"
 #endif
 
+#include "plugin.h"
+
 #ifdef USE_MYSQL
 #include "read_mysql.h"
 #endif
@@ -101,6 +103,9 @@ gboolean
 read_input(InputDescription *desc, ggobid *gg)
 {
   gboolean ok = false;
+  if(desc == NULL)
+      return(ok);
+
   switch (desc->mode) {
     case xml_data:
     case url_data:
@@ -185,7 +190,7 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
 {
   gboolean init_data = false;
 
-  /*-- some initializations --*/
+     /*-- some initializations --*/
   gg->displays = NULL;
   
   globals_init (gg); /*-- variables that don't depend on the data --*/
@@ -204,6 +209,7 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
 #endif
   }
 
+  registerPlugins(gg, sessionOptions->info->plugins);
   start_ggobi(gg, init_data);
 
 

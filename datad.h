@@ -34,11 +34,7 @@ struct _ggobid;
 
   See the methods at the bottom of the class definition.
  */
-#ifndef USE_CLASSES
 struct _datad {
-#else
-class datad {
-#endif
 
   /* All the variables are left public since this the way they were in the
      C structure. Adding accessor routines and using those would be "good",

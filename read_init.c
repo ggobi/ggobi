@@ -20,10 +20,21 @@ extern int xmlDoValidityCheckingDefaultValue;
 
 #include <string.h>
 
+#include "plugin.h"
+
 int getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
 xmlNode *getXMLElement(const xmlDocPtr doc, const char *tagName);
 DataMode getPreviousInput(xmlNode *node, InputDescription *input);
 DataMode getInputType(xmlNode *node);
+
+void getPlugins(xmlDocPtr doc, GGobiInitInfo *info);
+GGobiPluginInfo *processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
+
+
+int getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info);
+int getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
+GGobiDisplayDescription* getDisplayDescription(xmlNodePtr node);
+enum displaytyped getDisplayType(const CHAR *type);
 
 
 GGobiInitInfo *
@@ -41,10 +52,12 @@ read_init_file(const char *filename)
   info = g_malloc(sizeof(GGobiInitInfo));
 
   info->numInputs = 0;
-  info->inputs = NULL;
+  info->descriptions = NULL;
   info->filename = g_strdup(filename);
 
   getPreviousFiles(doc, info);
+  getPreviousGGobiDisplays(doc, info);
+  getPlugins(doc, info);
 
   return(info);
 }
@@ -80,13 +93,14 @@ getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
         el = el->next;
     }
 
-    info->inputs = g_malloc(n*sizeof(InputDescription));
+    info->descriptions = g_malloc(n*sizeof(GGobiDescription));
     info->numInputs = n;
 
     el = node->children;
     for(i = 0; el ; el = el->next) {
 	if(el->type != XML_TEXT_NODE) {
-	  getPreviousInput(el, info->inputs + i);
+	   
+	  getPreviousInput(el, &(info->descriptions[i].input));
           i++;
 	}
     }
@@ -158,3 +172,194 @@ getInputType(xmlNode *node)
     return(val);
 }
 
+/*****************************************************************/
+
+int
+getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info)
+{
+  xmlNode *node, *el;
+  GGobiDescription *desc;
+  int i;
+   node = getXMLElement(doc, "ggobis"); 
+   el = node->children;
+   i = 0;
+   while(el) {
+     if(el->type != XML_TEXT_NODE && strcmp(el->name,"ggobi") == 0) {
+ 	   /* Need to match these with the input source ids. */
+         desc = info->descriptions + i;
+	 getPreviousDisplays(el, desc);
+         i++;
+     }
+     el = el->next;
+   }
+
+   return(g_list_length(desc->displays));
+}
+
+int
+getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc)
+{
+  xmlNodePtr el = node->children;
+  GGobiDisplayDescription *dpy;
+  int n = 0;
+  desc->displays = NULL;
+  while(el) {
+      if(el->type != XML_TEXT_NODE && strcmp(el->name, "display") == 0) {
+        dpy = getDisplayDescription(el) ;
+        if(dpy) {
+          desc->displays = g_list_append(desc->displays, dpy);
+          n++;
+	}    
+      }
+
+    el = el->next;
+  }
+
+  return(n);
+}
+
+GGobiDisplayDescription*
+getDisplayDescription(xmlNodePtr node)
+{
+ GGobiDisplayDescription *dpy;
+ xmlNodePtr el;
+ int i;
+
+ dpy = (GGobiDisplayDescription*) g_malloc(sizeof(GGobiDisplayDescription*));
+ dpy->type = getDisplayType(xmlGetProp(node, "type"));
+ dpy->numVars = 0;
+ 
+ if(dpy->type == unknown_display_type) {
+  return(dpy);
+ }
+
+ el = node->children;
+ while(el) {
+     if(el->type != XML_TEXT_NODE && strcmp(el->name, "variable") == 0) 
+	 dpy->numVars++;
+     el = el->next;
+ }
+
+ dpy->varNames = (gchar **) g_malloc(dpy->numVars*sizeof(gchar*));
+ for(i = 0, el = node->children; i < dpy->numVars; el = el->next) {
+   if(el->type != XML_TEXT_NODE && strcmp(el->name, "variable") == 0) 
+     dpy->varNames[i++] = g_strdup(xmlGetProp(el, "name"));
+ }
+
+
+ return(dpy);
+}
+
+enum displaytyped
+getDisplayType(const CHAR *type)
+{
+    enum displaytyped val = unknown_display_type;
+       if(strcmp(type, "scatterplot") == 0) 
+	   val = scatterplot;
+       else if(strcmp(type, "scatmat") == 0)
+	   val = scatmat;
+       else if(strcmp(type, "parcoords") == 0)
+	   val = parcoords;
+       else if(strcmp(type,"tsplot") == 0)
+	   val = tsplot;
+   return(val);
+}
+
+
+/*****************************************************************/
+
+/*
+ Handle the plugins section, looping over each <plugin>
+ tag and passing it processPlugin().
+*/
+
+void
+getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
+{
+   xmlNode *node, *el;
+   GGobiPluginInfo *plugin;
+
+    node = getXMLElement(doc, "plugins");
+
+    info->plugins = NULL;
+  
+    el = node->children;
+    while(el) {
+        if(el->type != XML_TEXT_NODE && strcmp(el->name, "plugin") == 0) {
+          plugin = processPlugin(el, info, doc);
+          if(plugin)
+	     info->plugins = g_list_append(info->plugins, plugin);
+	}
+        el = el->next;
+    }
+}
+
+/*
+  This handles the details of a <plugin> tag,
+  reading the description, author, etc.
+ */
+GGobiPluginInfo *
+processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
+{
+  xmlNodePtr el;
+  gboolean load;
+  const CHAR *tmp;
+  GGobiPluginInfo *plugin;
+  xmlChar * val;
+
+    plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
+
+    tmp = xmlGetProp(node, "name");
+    if(tmp) {
+      plugin->name = g_strdup((char *) tmp);
+    }
+
+    tmp = xmlGetProp(node, "load");
+    if(tmp) {
+      load = strcmp((char*)tmp, "immediate") == 0;
+    }
+
+    el = node->children;
+    while(el) {
+      if(el->type != XML_TEXT_NODE) {
+	  if(strcmp(el->name, "author") == 0) {
+              val = xmlNodeListGetString(doc, el->children, 1);
+	      plugin->author = g_strdup((char*) val);
+	  } else if(strcmp(el->name, "description") == 0) {
+              val = xmlNodeListGetString(doc, el->children, 1);
+	      plugin->description = g_strdup((char*) val);
+	  } else if(strcmp(el->name, "dll") == 0) {
+	      plugin->dllName = g_strdup((char*) xmlGetProp(el, "name"));
+	      if(el->children) {
+		  xmlNodePtr c = el->children;
+                  while(c) {
+                      if(el->type != XML_TEXT_NODE && strcmp(c->name, "init") == 0) {
+                          plugin->onLoad = g_strdup((char *) xmlGetProp(c, "onLoad"));
+                          plugin->onCreate = g_strdup((char *) xmlGetProp(c, "onCreate"));
+			  break;
+		      }
+		      c = c->next;
+		  }
+	      }
+	  }
+      }
+
+      el = el->next;
+    }
+
+    if(load) {
+      plugin->library = load_plugin_library(plugin);
+      if(plugin->onLoad) {
+	OnLoad f = (OnLoad) getPluginSymbol(plugin->onLoad, plugin);
+        if(f) {
+           f(0, plugin);
+	} else {
+           char buf[1000];
+             dynload->getError(buf, plugin);
+             fprintf(stderr, "error on loading plugin library %s: %s", plugin->dllName, buf);fflush(stderr);
+	}
+      }
+    }
+
+   return(plugin);
+}

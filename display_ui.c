@@ -65,11 +65,15 @@ display_menu_build (ggobid *gg)
 {
   GtkWidget *item;
   gint nd = g_slist_length (gg->d);
-  datad *d0 = (datad *) gg->d->data;
+  datad *d0;
   gint k;
   GtkWidget *submenu, *anchor;
   gchar *lbl;
 
+  if(gg == NULL || gg->d == NULL)
+      return;
+
+  d0 = (datad *) gg->d->data;
   if (gg->display_menu != NULL)
     gtk_widget_destroy (gg->display_menu);
 

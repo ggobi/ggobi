@@ -541,7 +541,8 @@ display_set_current (displayd *new_display, ggobid *gg)
                                    gg->tsplot.mode_menu); 
         submenu_insert (gg->mode_item, gg->main_menubar, 2);
         break;
-
+      default:
+        break;
     }
   }
 
@@ -595,6 +596,8 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
          tmp = "time series display display " ;
       break;
 
+    default:
+        break;
   }
 
   if (display->d->name != NULL) {

@@ -1,0 +1,12 @@
+Added an item `New' to the File menu
+
+Added an item  `About plugins' to the Help menu
+
+Added the ability to read an initialization file
+   -init, GGOBIRC, ~/.ggobirc
+
+Added the plugin mechanism, registered in the initialization file.
+
+
+Added a plugin for viewing data
+  (See the Data menu beside the Help assuming the plugin is found.)
