@@ -679,11 +679,21 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
       dsp->t2d_mvar_3dbasis.vals[j][j] = 1.;
     }
 
+    norm(dsp->t2d_manbasis.vals[0],d->ncols); /* this is just in case */
+    norm(dsp->t2d_manbasis.vals[1],d->ncols); /* it seems to work ok */
+    norm(dsp->t2d_manbasis.vals[2],d->ncols); /* without normalizing here */
+
+    /* Check if column 3 (2) of manbasis is effectively equal to 
+       column 1 (0) or 2(1). If they are then we'll have to randomly
+       generate a new column 3. If not then we orthonormalize column 3
+       on the other two. */
     if ((inner_prod(dsp->t2d_manbasis.vals[0],dsp->t2d_manbasis.vals[2],
        d->ncols)>1.0-tol) || (inner_prod(dsp->t2d_manbasis.vals[1],
        dsp->t2d_manbasis.vals[2],d->ncols)>1.0-tol))
       ftmp = 0.0;
     else {
+      gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[1],
+		   d->ncols); /* this might not be necessary */
       gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
         d->ncols);
       gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
@@ -764,7 +774,6 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
         {
           distx = dsp->t2d_pos1 - dsp->t2d_pos1_old;
           disty = dsp->t2d_pos2_old - dsp->t2d_pos2;
-          /* seems to go in the wrong direction - 90deg? */
         }
         else if (cpanel->t2d.manip_mode == MANIP_VERT) 
         {
@@ -797,7 +806,19 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
         dtmp1 = (gdouble) (distx*distx+disty*disty);
         len_motion = (gfloat) sqrt(dtmp1);
 
-        if (len_motion != 0)
+        if (len_motion < tol) /* just in case, maybe not necessary */
+        {
+          dsp->t2d_Rmat2.vals[0][0] = 1.0;
+          dsp->t2d_Rmat2.vals[0][1] = 0.0;
+          dsp->t2d_Rmat2.vals[0][2] = 0.0;
+          dsp->t2d_Rmat2.vals[1][0] = 0.0;
+          dsp->t2d_Rmat2.vals[1][1] = 1.0;
+          dsp->t2d_Rmat2.vals[1][2] = 0.0;
+          dsp->t2d_Rmat2.vals[2][0] = 0.0;
+          dsp->t2d_Rmat2.vals[2][1] = 0.0;
+          dsp->t2d_Rmat2.vals[2][2] = 1.0;
+        }
+        else
         {
           phi = len_motion / denom;
      
@@ -862,6 +883,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
         dsp->t2d_Rmat2.vals[2][2] = 1.;
       }
 
+      /* Set up the rotation matrix in the 3D manip space */
       for (i=0; i<3; i++) 
         for (j=0; j<3; j++)
         {
@@ -872,8 +894,10 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
           dsp->t2d_Rmat1.vals[i][j] = dtmp1;
         }
       arrayd_copy(&dsp->t2d_Rmat1, &dsp->t2d_mvar_3dbasis);
-      /*      copy_mat(dsp->t2d_mvar_3dbasis.vals, dsp->t2d_Rmat1.vals, 3, 3);*/
-  
+
+      norm(dsp->t2d_mvar_3dbasis.vals[0],3); /* just in case */
+      norm(dsp->t2d_mvar_3dbasis.vals[1],3); /* seems to work ok without */
+      norm(dsp->t2d_mvar_3dbasis.vals[2],3); /* this */
       gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
         dsp->t2d_mvar_3dbasis.vals[1], 3);
       gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
@@ -881,6 +905,8 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
       gram_schmidt(dsp->t2d_mvar_3dbasis.vals[1], 
         dsp->t2d_mvar_3dbasis.vals[2], 3);
 
+      /* Generate the projection of the data corresponding to 
+         the 3D rotation in the manip space. */
       for (j=0; j<d->ncols; j++)
       {
         dsp->t2d.F.vals[0][j] = 
@@ -892,9 +918,12 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
           dsp->t2d_manbasis.vals[1][j]*dsp->t2d_mvar_3dbasis.vals[1][1] +
           dsp->t2d_manbasis.vals[2][j]*dsp->t2d_mvar_3dbasis.vals[1][2];
       }
+      norm(dsp->t2d.F.vals[0], d->ncols);
+      norm(dsp->t2d.F.vals[1], d->ncols);
+      gram_schmidt(dsp->t2d.F.vals[0], dsp->t2d.F.vals[1], d->ncols);
     }
+
     display_tailpipe (dsp, FULL, gg);
-    /*    display_tailpipe (dsp, FULL_1PIXMAP, gg);*/
     varcircles_refresh (d, gg);
   }
 }
@@ -909,7 +938,6 @@ tour2d_manip_end(splotd *sp)
   disconnect_motion_signal (sp);
 
   arrayd_copy(&dsp->t2d.F, &dsp->t2d.Fa);
-  /*  copy_mat(dsp->t2d.Fa.vals, dsp->t2d.F.vals, d->ncols, 2);*/
   dsp->t2d.get_new_target = true;
 
   /* need to turn on tour? */
