@@ -698,7 +698,7 @@ void cluster_window_open(ggobid * gg)
   btn = gtk_button_new_with_label("Close");
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
     GTK_SIGNAL_FUNC(close_btn_cb), (gpointer) gg);
-  gtk_box_pack_start(GTK_BOX(vbox), btn, true, true, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), btn, false, false, 0);
 
   gtk_widget_show_all(gg->cluster_ui.window);
 
