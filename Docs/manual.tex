@@ -293,11 +293,13 @@ geographic region 1, and then {\bf Rescale} the plot.
 \label{fig5}
 \end{figure}
 
-Now switch into {\bf 2D Tour} using the {\bf ViewMode} menu. The
-variable checkboxes change to variable circles. Click on the circles
-for the variables palmitoleic through arachidic to toggle these variables
-into the tour, and click on Region and Area to toggle these variables out.
-Then click {\bf Reinit}.  The tour should now include 7 variables.
+Now switch into {\bf 2D Tour} using the {\bf ViewMode} menu. A column of
+variable circles is added to the right of the variable toggles, one for
+each selected variable.  Click on the toggle widgets for the variables
+palmitoleic through arachidic to make these variables available for
+touring, and toggle Region and Area out of the tour.  Then click {\bf
+Reinit}.  The tour should now include 7 variables, with one variable
+circle for each.
 
 The scrollbar at the top of the tour controls is used to adjust the
 speed of the tour.  Drag it to the right to speed up the rotation.
@@ -312,11 +314,13 @@ separation by manually changing the coefficients of the variables in
 the projection.  Click on the {\bf Manip} (purple) button below the
 variable selection region of the console, and then click on linoleic
 acid (a purple circle will be seen now in the variable circle for
-linoleic acid).  Select {\bf Oblique} in the {\bf Manual
+linoleic acid).  {\bf Oblique} is already selected in the {\bf Manual
 manipulation} menu.  Now in the plot window, hold down any mouse
 button while you drag the cursor. The coefficient corresponding to
 linoleic acid will increase and decrease following the mouse,
-inducing a rotation of the scattercloud.  Similarly rotate oleic acid
+inducing a rotation of the scattercloud.  If the axes are still
+showing in the scatterplot window, the axis in magenta corresponds
+to the variable you're manipulating.  Similarly rotate oleic acid
 and arachidic acid in and out of the plot, with the aim of finding a
 projection where the two regions are maximally separated (for
 example, Figure \ref{fig6}).  There are 5 choices of manipulation
@@ -398,6 +402,7 @@ and to the interaction type:
 \item 1DPlot: 1-D dotplots and average shifted histograms,
 \item XYPlot: 2-D scatterplots,
 \item 1D Tour: 1-D tour,
+\item Rotation: 2-D tour constrained to the use of 3 variables,
 \item 2D Tour: 2-D tour,
 \item 2x1D Tour: a correlation tour; that is, independent 1-D tours on
       horizontal and vertical axes,
@@ -501,10 +506,13 @@ change the plot orientation as you make a variable selection.)
 % column of checkboxes: clicking left on one of these selects a
 % variable to be plotted horizontally, clicking middle or right selects
 % a vertical variable. 
-The tour modes all use a set of labeled
-circles for variable selection, and they provide some feedback about
-current projection.  The variable selection behavior for the tour
-modes will be described in the section for each mode.
+The tour modes, including rotation, all use toggle buttons to select
+a subset of variables to be available for touring, and a column of
+variable circles, one for each variable in the subset.  The variable
+circles can be used to further refine the selection of variables that are
+actively touring, and they provide some feedback about current projection.
+The variable selection behavior for the tour modes will be described in
+the section for each mode.
 
 The {\bf scatterplot matrix} is a window containing a symmetric matrix
 of scatterplots for the chosen variables.  The plots along the diagonal
@@ -896,6 +904,16 @@ off. Variable fading means a variable smoothly fades out when it is
 de-selected. The alternative is to zero the variable out of view
 immediately, which creates a discontinuity in the tour motion, but is
 desirable for some situations.
+
+\subsection{Rotation: 2D Tour with Three Variables}
+\label{slbl:Rotation}
+
+The rotation mode is essentially a 2D tour that is restricted to use
+three variables.  Its graphical user interface is a subset of the 2D
+tour interface, with the exception that the three axes are individually
+represented by toggle buttons labelled {\bf X}, {\bf Y} and {\bf Z},
+principally so that it's possible to unambiguously specify the variable
+to be replaced when selecting a new one.
 
 \subsection{2x1D Tour}
 \label{slbl:2x1DTour}
@@ -1786,10 +1804,6 @@ the {\bf Options} menu.
 \section{Known problems}
 
 \begin{itemize}
-\item The checkboxes aren't sufficiently informative -- in
-  some projections, they really ought to indicate whether a variable is
-  plotted vertically or horizontally.  We need a new widget, a richer
-  kind of checkbox.
 \item The combination of linking by variable and edge brushing
   doesn't work yet.  [Or does it?]
 \end{itemize}
@@ -1799,9 +1813,8 @@ the {\bf Options} menu.
 Soon:
 
 \begin{itemize}
-\item A two-button toggle widget for variable selection
 \item Categorical data displays
-\item Graph layout  (currently being implemented as a plugin)
+\item Graph layout  (implemented as a plugin)
 \end{itemize}
 
 Longer term:
