@@ -35,9 +35,8 @@ static gchar *stage1_lbl[] = {"No transformation",
 static void
 stage1_cb (GtkWidget *w, gpointer cbd)
 {
- ggobid *gg;
+  ggobid *gg = GGobiFromWidget (w, true);
   gint indx = GPOINTER_TO_INT (cbd);
-  gg = GGobiFromWidget(w, true);
   transform (1, indx, gg->tform.boxcox_adj->value, gg);
 }
 
@@ -67,10 +66,24 @@ static void stage2_cb (GtkWidget *w, gpointer cbd)
   }
 }
 
-
-static void tform_reset_cb (GtkButton *button)
+static void tform_reset_cb (GtkWidget *w, ggobid *gg)
 {
-  g_printerr ("Remove all transformations\n");
+  gint j;
+
+  for (j=0; j<gg->ncols; j++) {
+    transform0_values_set (NO_TFORM0, j, gg);
+    transform1_values_set (NO_TFORM1, 1.0, j, gg);
+    transform2_values_set (NO_TFORM2, j, gg);
+
+    transform1_apply (NO_TFORM1, 1.0, j, gg);
+    transform2_apply (NO_TFORM2, j, gg);
+
+    transform_opt_menus_set_history (j, gg);
+  }
+
+  vardata_lim_update (gg);
+  tform_to_world (gg);
+  displays_tailpipe (REDISPLAY_PRESENT, gg);
 }
 
 static GtkWidget *window = NULL;
@@ -190,7 +203,7 @@ transform_window_open (ggobid *gg)
       "Set all transformation stages to 'no transformation' for the selected variables",
       NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (tform_reset_cb), NULL);
+                        GTK_SIGNAL_FUNC (tform_reset_cb), gg);
 
     gtk_widget_show_all (window);
   }
@@ -198,11 +211,6 @@ transform_window_open (ggobid *gg)
   gdk_window_raise (window->window);
 }
 
-/*
- * I'm a bit bewildered about this at the moment, but I guess its
- * purpose might be to handle the case where the transformation is
- * executed through the api
-*/
 void
 transform_opt_menus_set_history (gint j, ggobid *gg)
 {

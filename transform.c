@@ -154,7 +154,7 @@ transform_values_init (gint j, ggobid *gg)
   gg->vardata[j].inv_domain_adj = no_change;
 }
 
-static void
+void
 transform0_values_set (gint tform_type, gint jcol, ggobid *gg)
 {
   tform0 = tform_type;
@@ -197,7 +197,7 @@ transform0_values_set (gint tform_type, gint jcol, ggobid *gg)
   gg->vardata[jcol].inv_domain_adj = inv_domain_adj;
 }
 
-static void
+void
 transform1_values_set (gint tform_type, gfloat expt, gint jcol, ggobid *gg) {
   tform1 = tform_type;
   boxcoxparam = expt;
@@ -237,7 +237,8 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol, ggobid *gg)
     case STANDARDIZE1:    /* (x-mean)/sigma */
       {
         gfloat mean, stddev;
-        gdouble *x = (gdouble *) g_malloc (gg->nrows_in_plot * sizeof (gdouble));
+        gdouble *x;
+        x = (gdouble *) g_malloc (gg->nrows_in_plot * sizeof (gdouble));
         for (i=0; i<gg->nrows_in_plot; i++) {
           m = gg->rows_in_plot[i];
           x[i] = (*domain_adj) (gg->raw.data[m][jcol]);
@@ -283,6 +284,7 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol, ggobid *gg)
       else {  /*-- if the exponent is outisde (-.001, .001) --*/
 
         for (i=0; i<gg->nrows_in_plot; i++) {
+
           m = gg->rows_in_plot[i];
           dtmp = pow ((gdouble) (*domain_adj)(gg->raw.data[m][jcol]),
                       expt);
@@ -294,17 +296,19 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol, ggobid *gg)
 #else
           if (!finite (dtmp)) {
 #endif
-            g_printerr ("%f %f %f\n",
+            g_printerr ("%f %f %f (breaking, i=%d)\n",
               gg->raw.data[m][jcol],
               (*domain_adj)(gg->raw.data[m][jcol]),
-              dtmp);
+              dtmp, i);
             quick_message (domain_error_message, false);
             tform_ok = false;
             break;
+          } else {
+            gg->tform1.data[m][jcol] = (gfloat) dtmp;
           }
-          gg->tform1.data[m][jcol] = (gfloat) dtmp;
         }
       }
+
       break;
 
     case ABSVALUE:
@@ -498,7 +502,7 @@ transform2_values_set (gint tform_type, gint jcol, ggobid *gg)
   gg->vardata[jcol].tform2 = tform_type;
 }
 
-static gboolean 
+gboolean 
 transform2_apply (gint tform_type, gint jcol, ggobid *gg)
 {
   gint i, m;
@@ -524,7 +528,8 @@ transform2_apply (gint tform_type, gint jcol, ggobid *gg)
     case STANDARDIZE2:    /* (x-mean)/sigma */
       {
         gfloat mean, stddev;
-        gdouble *x = (gdouble *) g_malloc (gg->nrows_in_plot * sizeof (gdouble));
+        gdouble *x;
+        x = (gdouble *) g_malloc (gg->nrows_in_plot * sizeof (gdouble));
         for (i=0; i<gg->nrows_in_plot; i++) {
           m = gg->rows_in_plot[i];
           x[i] = (gdouble) gg->tform2.data[i][jcol];
@@ -709,7 +714,6 @@ transform (gint stage, gint tform_type, gfloat param, ggobid *gg)
   gint *selected_cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
   gint *cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
   gboolean doit;
-/*  displayd *display = (displayd *) current_splot->displayptr;*/
 
   nselected_cols = selected_cols_get (selected_cols, false, gg);
   if (nselected_cols == 0)

@@ -307,15 +307,19 @@ extern void zoom_by_drag (splotd *, ggobid *gg);
 extern void zoom_step (splotd *, gint, gint, rectd *, ggobid* gg);
 extern void writeall_window_open (ggobid *);
 extern void rowlabels_free (ggobid *);
+extern void transform0_values_set (gint, gint, ggobid *);
+extern void transform1_values_set (gint, gfloat, gint, ggobid *);
+extern gboolean transform1_apply (gint, gfloat, gint, ggobid *);
+extern void transform2_values_set (gint, gint, ggobid *);
+extern gboolean transform2_apply (gint, gint, ggobid *);
+
 
 ggobid * ggobi_get (gint);
 displayd * display_alloc_init (enum displaytyped type, gboolean missing_p, ggobid *gg);
 
-/* The new way of handling window closures, so that we don't
-   just exit.
- */
+/* The new way of handling window closures, so that we don't just exit. */
 void ggobi_close (GtkObject *w, ggobid *gg);
-int ggobi_remove_by_index (ggobid *gg, int which);
+int ggobi_remove_by_index (ggobid *gg, gint which);
 int ggobi_remove (ggobid *gg);
 
 extern void variable_clone (gint, const gchar *, gboolean, ggobid *);

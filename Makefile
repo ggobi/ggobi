@@ -36,7 +36,7 @@ SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
  movepts_ui.c \
  parcoords_ui.c parcoords.c \
  scatmat_ui.c scatmat.c \
- varpanel_ui.c vartable_ui.c vardata.c \
+ varpanel_ui.c vartable_ui.c vardata.c vdialog_ui.c \
  transform_ui.c transform.c sphere_ui.c sphere.c svd.c \
  subset_ui.c subset.c jitter_ui.c jitter.c smooth_ui.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
@@ -63,7 +63,7 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  movepts_ui.o \
  parcoords_ui.o parcoords.o \
  scatmat_ui.o scatmat.o \
- varpanel_ui.o vartable_ui.o vardata.o \
+ varpanel_ui.o vartable_ui.o vardata.o vdialog_ui.o \
  transform_ui.o transform.o sphere_ui.o sphere.o svd.o \
  subset_ui.o subset.o jitter_ui.o jitter.o smooth_ui.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \

@@ -25,6 +25,8 @@ various stuff not yet implemented:
 
   exclusion:  rebuilding the table on the fly
 
+For making slides, work out how to switch the background to white
+
 keep working on array and vector management
 
 color:  allow additional colormaps -- .cmap file

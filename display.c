@@ -8,6 +8,7 @@
 
 #include "display_tree.h"
 
+extern void vardialog_open (ggobid *gg, gchar *title);
 
 DisplayOptions DefaultDisplayOptions = {
                                          true,  /* points_show_p */
@@ -158,6 +159,14 @@ display_create (guint action, ggobid *gg)
       break;
 
     case 2:
+      /*
+       * testing a method to allow variables to be specified
+       * before plotting; this is redundant with the variable
+       * statistics panel, though, and also the ability to
+       * reorder variables would be awfully useful.
+      */
+      /* vardialog_open (gg, "Select variables for plotting"); */
+
       display = parcoords_new (false, NULL, 0, gg);
       break;
 
