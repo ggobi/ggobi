@@ -631,13 +631,16 @@ void endXMLElement(void *user_data, const xmlChar *name)
     case DATASET:
     {
       datad *d = getCurrentXMLData(data);
-      setEdgePartners(data);
-      releaseCurrentDataInfo(data);
+
       if (data->current_record < d->nrows) {
-        g_printerr ("There are fewer records than declared for '%s'; exiting.\n",
-          d->name);
+        g_printerr ("There are fewer records than declared for '%s': %d < %d.\n",
+          d->name, data->current_record, d->nrows);
+	releaseCurrentDataInfo(data);
         (*FatalError)(101);
       }
+
+      setEdgePartners(data);
+      releaseCurrentDataInfo(data);
     }
     break;
 
