@@ -34,10 +34,6 @@ typedef struct {
 
 #ifdef GRAPHVIZ
 #include <render.h>
-typedef struct {
-  Agraph_t *graph;
-  datad *d;
-} graphvizd;
 #endif
 
 typedef struct {
@@ -48,10 +44,6 @@ typedef struct {
   array_d pos;
 
   radiald *radial;  /*-- data required for radial layout --*/
-
-#ifdef GRAPHVIZ
-  graphvizd *graphviz;  /*-- data required for dot and neato layouts --*/
-#endif
 
 } glayoutd;
 

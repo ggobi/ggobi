@@ -28,42 +28,18 @@ char *Info[] = {
     DATE                  /* Build Date */
 };
 
-static void
-initGraphviz (ggobid *gg, glayoutd *gl, datad *d, datad *e, gint kind)
-{
-  if (gl->graphviz != NULL) {
-    Agraph_t *graph = gl->graphviz->graph;
-/*
-    if (graph->u.drawing->engine == DOT)
-      dot_cleanup (graph);
-    else if (graph->u.drawing->engine == NEATO)
-      neato_cleanup (graph);
-*/
-    agclose (graph);
-
-  } else {
-
-    gl->graphviz = (graphvizd *) g_malloc (sizeof (graphvizd));
-    aginit();
-  }
-
-
-  /*-- create new empty graph --*/
-  gl->graphviz->graph = agopen("graph", kind);
-
-  gl->graphviz->d = d;
-}
 
 void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   glayoutd *gl = glayoutFromInst (inst);
+  displayd *dsp = gg->current_display;
   datad *d = gg->current_display->d;
   datad *e = gg->current_display->e;
   Agnode_t *node, *head, *tail;
   gchar *name;
   gint kind = AGRAPH;
-  gint i, j, m;
+  gint i, j;
   gint a, b;
   gboolean init;
 #ifdef DEBUG
@@ -72,14 +48,22 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   Agraph_t *graph;
   gdouble *x, *y;
   gint layout_type = DOT_LAYOUT;
+/*-- to add the new datad --*/
+  gint m, nvisible, nc;
+  InputDescription *desc = NULL;
+  datad *dnew;
+  gdouble *values;
+  gchar **rownames, **colnames;
+  glong *visible, *rowids;
+  displayd *dspnew;
 
   if (strcmp (gtk_widget_get_name (button), "neato") == 0)
     layout_type = NEATO_LAYOUT;
 
-  init = (gl->graphviz == NULL || d->nrows != gl->graphviz->d->nrows);
-  initGraphviz (gg, gl, d, e, kind);
+  aginit();
 
-  graph = gl->graphviz->graph;
+  /*-- create a new empty graph --*/
+  graph = agopen("graph", kind);
 
   /*-- create new nodes, add to graph --*/
   for (i=0; i<d->nrows_in_plot; i++) {
@@ -123,6 +107,8 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
         y[i] = (gdouble) node->u.coord.y;
       }
     }
+    dot_cleanup (graph);
+
   } else {  /* if layout_type == NEATO */
     gint         nG;
     attrsym_t*  sym;
@@ -164,6 +150,12 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
         y[i] = (gdouble) node->u.pos[1];
       }
     }
+#ifdef DEBUG
+    f = fopen ("test.out", "w");
+    agwrite (graph, f);
+    fclose(f);
+#endif
+    neato_cleanup (graph);
   }
 
 
@@ -176,42 +168,73 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   }
 */
 
+/*
+ * create a new datad with the new variables.  include only
+ * those nodes that are visible.  these needs some more testing ...
+ * and this code could be more efficient -- writing to one set
+ * of arrays, then copying to a matrix is probably unnecessary.
+*/
 
-  if (init) {
+  nc = 2;
+
+  visible = (glong *) g_malloc (d->nrows_in_plot * sizeof (glong));
+  nvisible = 0;
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot[m];
+    if (!d->hidden.els[i]) {
+      visible[nvisible++] = i;
+    }
+  }
+
+  rowids = (glong *) g_malloc (nvisible * sizeof(glong));
+  for (m=0; m<nvisible; m++) {
+    i = visible[m];
+    rowids[m] = (glong) d->rowid.id.els[i];
+  }
+
+  values = (gdouble *) g_malloc (nvisible * nc * sizeof(gdouble));
+  rownames = (gchar **) g_malloc (nvisible * sizeof(gchar *));
+  for (m=0; m<nvisible; m++) {
+    i = visible[m];
+    values[m + 0*nvisible] = (gdouble) x[i];
+    values[m + 1*nvisible] = (gdouble) y[i];
+
+    rownames[m] = (gchar *) g_array_index (d->rowlab, gchar *, i);
+  }
+
+  colnames = (gchar **) g_malloc (nc * sizeof(gchar *));
+  colnames[0] = "x";
+  colnames[1] = "y";
+
+  dnew = datad_create (nvisible, nc, gg);
+  dnew->name = (layout_type == DOT_LAYOUT) ?
+    g_strdup ("dot") : g_strdup ("neato");
+
+  GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
+    gg, rowids, desc);
+
+/*
+ * open a new scatterplot with the new data, and display edges
+ * as they're displayed in the current datad.
+*/
+  dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
+  setDisplayEdge (dspnew, e);
+  display_copy_edge_options (dsp, dspnew);
+
+
+/*
     name = g_strdup_printf ("x");
     newvar_add_with_values (x, d->nrows, name, d, gg);
     g_free (name);
-    g_free (x);
 
     name = g_strdup_printf ("y");
     newvar_add_with_values (y, d->nrows, name, d, gg);
     g_free (name);
-    g_free (y);
-  } else {
-    j = GGOBI(getVariableIndex)("x", d, gg);
-    for (i=0; i<d->nrows; i++)
-      d->raw.vals[i][j] = d->tform.vals[i][j] = x[i];
-    limits_set_by_var (j, true, true, d, gg);
-    g_free (x);
-
-    j = GGOBI(getVariableIndex)("y", d, gg);
-    for (i=0; i<d->nrows; i++)
-      d->raw.vals[i][j] = d->tform.vals[i][j] = y[i];
-    limits_set_by_var (j, true, true, d, gg);
-    g_free (y);
-
-    tform_to_world (d, gg);
-    displays_tailpipe (FULL, gg);
-  }
+*/
 
   g_free (x);
   g_free (y);
-
-#ifdef DEBUG
-  f = fopen ("test.out", "w");
-  agwrite (graph, f);
-  fclose(f);
-#endif
+  agclose (graph);
 }
 
 #endif

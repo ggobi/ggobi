@@ -119,6 +119,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   glayoutd *gl = glayoutFromInst (inst);
+  displayd *dsp = gg->current_display;
   datad *d = gg->current_display->d;
   datad *e = gg->current_display->e;
   gboolean init;
@@ -138,6 +139,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   gdouble *values;
   gchar **rownames, **colnames;
   glong *visible, *rowids;
+  displayd *dspnew;
 
   if (d == NULL || e == NULL) {
     quick_message ("Please specify an edge set", false);
@@ -225,13 +227,11 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 
 /*
  * create a new datad with the new variables.  include only
- * those nodes that are visible (not yet implemented).
+ * those nodes that are visible.  these needs some more testing ...
+ * and this code could be more efficient -- writing to one set
+ * of arrays, then copying to a matrix is probably unnecessary.
 */
 
-/*
- * This should not necessarily be of size d->nrows -- if some points
- * have been erased, for instance, ...
-*/
   nc = 8;
 
   visible = (glong *) g_malloc (d->nrows_in_plot * sizeof (glong));
@@ -242,7 +242,6 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
       visible[nvisible++] = i;
     }
   }
-g_printerr ("nvisible = %d\n", nvisible);
 
   rowids = (glong *) g_malloc (nvisible * sizeof(glong));
   for (m=0; m<nvisible; m++) {
@@ -281,6 +280,15 @@ g_printerr ("nvisible = %d\n", nvisible);
 
   GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
     gg, rowids, desc);
+
+/*
+ * open a new scatterplot with the new data, and display edges
+ * as they're displayed in the current datad.
+*/
+  dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
+  setDisplayEdge (dspnew, e);
+  display_copy_edge_options (dsp, dspnew);
+
 
   g_free (values);
   g_free (rownames);

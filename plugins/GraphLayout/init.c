@@ -16,7 +16,4 @@ glayout_init (glayoutd *gl) {
   arrayd_init_null (&gl->pos);
 
   gl->radial = NULL;
-#ifdef GRAPHVIZ
-  gl->graphviz = NULL;
-#endif
 }
