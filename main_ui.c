@@ -155,6 +155,19 @@ varpanel_shows_checkboxes (datad *d)
   return GTK_WIDGET_REALIZED (d->vcbox_ui.swin);
 }
 
+/*  This will be the way to hide/show the second child of the hpane.
+    gtk_widget_ref (circles);
+    gtk_container_remove (GTK_CONTAINER (hpaned), circles);
+    gtk_paned_set_handle_size (GTK_PANED(hpaned), 0);
+    gtk_paned_set_gutter_size (GTK_PANED(hpaned), 0);                       
+  } else {
+    gtk_paned_add2 (GTK_PANED(hpaned), circles);
+    gtk_paned_set_handle_size (GTK_PANED(hpaned), 10);
+    gtk_paned_set_gutter_size (GTK_PANED(hpaned), 15);                       
+    gtk_widget_unref (circles);
+  }
+*/
+
 void
 varpanel_reinit (ggobid *gg)
 {
