@@ -977,12 +977,24 @@ vartable_limits_set_by_var (gint j, datad *d)
 
   if (d->vartable_clist != NULL) {
     vt = vartable_element_get (j, d);
+
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
       CLIST_DATA_MIN,
       g_strdup_printf ("%8.3f", vt->lim_tform.min));
+
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
       CLIST_DATA_MAX,
       g_strdup_printf ("%8.3f", vt->lim_tform.max));
+
+    if (vt->lim_specified_p) {
+      gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+        CLIST_USER_MIN,
+        g_strdup_printf ("%8.3f", vt->lim_specified.min));
+
+      gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+        CLIST_USER_MAX,
+        g_strdup_printf ("%8.3f", vt->lim_specified.max));
+    }
   }
 }
 void

@@ -759,7 +759,7 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
  if(tmp && tmp1) {
      double mn, mx;
      mn = asNumber(tmp);
-     mx = asNumber(tmp);
+     mx = asNumber(tmp1);
      el->lim_specified.min = mn < mx ? mn : mx;
      el->lim_specified.max = mn > mx ? mn : mx;
      /* ? */
@@ -767,7 +767,9 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
      el->lim_specified_tform.max = el->lim_specified.max;
 
      if(mn > mx) {
-	 fprintf(stderr, "Minimum is greater than maximum for variable %s\n", el->collab);fflush(stderr);
+       fprintf(stderr,
+         "Minimum is greater than maximum for variable %s\n", el->collab);
+       fflush(stderr);
      }
      el->lim_specified_p = true;
  }
