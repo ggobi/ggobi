@@ -22,7 +22,7 @@ ifdef GGOBI_CONFIG
 else
  GGOBI_INCLUDE_DIR=-I../..
  GGOBI_LIB=-L../.. -lggobi
- CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags ${GGOBI_MAKEFILE} ) $(GGOBI_INCLUDE_DIR)
+ CFLAGS+=$(shell cd $(GGOBI_HOME) ; $(MAKE) cflags ${GGOBI_MAKEFILE} ) $(GGOBI_INCLUDE_DIR)
 endif
 
 HEADERS=ggvis
