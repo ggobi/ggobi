@@ -351,8 +351,6 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr1.dist_az = 0.0;
   dsp->tcorr1.delta = cpanel->tcorr1.step*M_PI_2/10.0;
   dsp->tcorr1.tang = 0.0;
-  dsp->tcorr1.nsteps = 1; 
-  dsp->tcorr1.stepcntr = 1;
 
   dsp->tcorr1.idled = 0;
   dsp->tcorr1.get_new_target = true;
@@ -361,8 +359,6 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr2.dist_az = 0.0;
   dsp->tcorr2.delta = 0.0; /*cpanel->tcorr2.step*M_PI_2/10.0;*/
   dsp->tcorr2.tang = 0.0;
-  dsp->tcorr2.nsteps = 1; 
-  dsp->tcorr2.stepcntr = 1;
 
   dsp->tcorr2.idled = 0;
   dsp->tcorr2.get_new_target = true;
@@ -390,11 +386,9 @@ void tourcorr_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
-  speed_set(slidepos, &cpanel->tcorr1.step, &dsp->tcorr1.delta,  
-    &dsp->tcorr1.nsteps, &dsp->tcorr1.stepcntr);
+  speed_set(slidepos, &cpanel->tcorr1.step, &dsp->tcorr1.delta);
 
-  speed_set(slidepos, &cpanel->tcorr2.step, &dsp->tcorr2.delta,  
-    &dsp->tcorr2.nsteps, &dsp->tcorr2.stepcntr);
+  speed_set(slidepos, &cpanel->tcorr2.step, &dsp->tcorr2.delta);
 
   cpanel->tcorr.slidepos = slidepos;
 }
@@ -591,16 +585,15 @@ void
 tourcorr_run(displayd *dsp, ggobid *gg)
 {
   datad *d = dsp->d;
-  cpaneld *cpanel = &dsp->cpanel;
+  /*  cpaneld *cpanel = &dsp->cpanel;*/
   gint i, nv;
   gint pathprob = 0;
 
   if (!dsp->tcorr1.get_new_target && 
-      !reached_target(dsp->tcorr1.nsteps, dsp->tcorr1.stepcntr, 
-        dsp->tcorr1.tang, dsp->tcorr1.dist_az, 0, 0, 0)) {
+      !reached_target(dsp->tcorr1.tang, dsp->tcorr1.dist_az, 0, 0, 0)) {
 
-    increment_tour(dsp->tcorr1.tinc, dsp->tcorr1.tau, &dsp->tcorr1.nsteps, 
-      &dsp->tcorr1.stepcntr, dsp->tcorr1.dist_az, dsp->tcorr1.delta, 
+    increment_tour(dsp->tcorr1.tinc, dsp->tcorr1.tau, 
+      dsp->tcorr1.dist_az, dsp->tcorr1.delta, 
       &dsp->tcorr1.tang, (gint) 1);
 
     tour_reproject(dsp->tcorr1.tinc, dsp->tcorr1.G, dsp->tcorr1.Ga, 
@@ -632,19 +625,30 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         d->ncols, (gint) 1, 
         dsp->tcorr1.Ga, dsp->tcorr1.Gz, dsp->tcorr1.G, dsp->tcorr1.lambda, 
         dsp->tcorr1.tv, dsp->tcorr1.Va, dsp->tcorr1.Vz,
-        dsp->tcorr1.tau, dsp->tcorr1.tinc, &dsp->tcorr1.nsteps, 
-        &dsp->tcorr1.stepcntr, 
-        &dsp->tcorr1.dist_az, &dsp->tcorr1.tang, 
-        cpanel->tcorr1.step);
-      dsp->tcorr1.get_new_target = false;
+        dsp->tcorr1.tau, dsp->tcorr1.tinc, 
+        &dsp->tcorr1.dist_az, &dsp->tcorr1.tang);
+      if (pathprob == 0) 
+        dsp->tcorr1.get_new_target = false;
+      else if (pathprob == 1) { /* problems with Fa so need to force a jump */
+        tourcorr_scramble(gg);
+        pathprob = path(dsp->tcorr1.Fa, dsp->tcorr1.Fz, dsp->tcorr1.F, 
+          d->ncols, (gint) 1, 
+          dsp->tcorr1.Ga, dsp->tcorr1.Gz, dsp->tcorr1.G, dsp->tcorr1.lambda, 
+          dsp->tcorr1.tv, dsp->tcorr1.Va, dsp->tcorr1.Vz,
+          dsp->tcorr1.tau, dsp->tcorr1.tinc, 
+          &dsp->tcorr1.dist_az, &dsp->tcorr1.tang);
+      }
+      else if (pathprob == 2 || pathprob == 3) { /* problems with Fz,
+				    so will force a new choice of Fz */
+        dsp->tcorr1.get_new_target = true;
+      }
     }
   }
 
   if (!dsp->tcorr2.get_new_target && 
-      !reached_target(dsp->tcorr2.nsteps, dsp->tcorr2.stepcntr, 
-        dsp->tcorr2.tang, dsp->tcorr2.dist_az, 0, 0, 0)) {
-    increment_tour(dsp->tcorr2.tinc, dsp->tcorr2.tau, &dsp->tcorr2.nsteps, 
-      &dsp->tcorr2.stepcntr, dsp->tcorr2.dist_az, dsp->tcorr2.delta, 
+      !reached_target(dsp->tcorr2.tang, dsp->tcorr2.dist_az, 0, 0, 0)) {
+    increment_tour(dsp->tcorr2.tinc, dsp->tcorr2.tau, 
+      dsp->tcorr2.dist_az, dsp->tcorr2.delta, 
       &dsp->tcorr2.tang, (gint) 1);
 
     tour_reproject(dsp->tcorr2.tinc, dsp->tcorr2.G, dsp->tcorr2.Ga, 
@@ -668,16 +672,29 @@ tourcorr_run(displayd *dsp, ggobid *gg)
                                            active/used variables is > 1 */
       dsp->tcorr2.get_new_target = true;
     else {
-      gt_basis(dsp->tcorr2.Fz, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, d->ncols, 
-        (gint) 1);
-      path(dsp->tcorr2.Fa, dsp->tcorr2.Fz, dsp->tcorr2.F, d->ncols, (gint) 1, 
+      gt_basis(dsp->tcorr2.Fz, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
+        d->ncols, (gint) 1);
+      pathprob = path(dsp->tcorr2.Fa, dsp->tcorr2.Fz, dsp->tcorr2.F, 
+        d->ncols, (gint) 1, 
         dsp->tcorr2.Ga, dsp->tcorr2.Gz, dsp->tcorr2.G, dsp->tcorr2.lambda, 
-        dsp->tcorr2.tv, dsp->tcorr2.Va,
-	   dsp->tcorr2.Vz,
-        dsp->tcorr2.tau, dsp->tcorr2.tinc, &dsp->tcorr2.nsteps, 
-        &dsp->tcorr2.stepcntr, &dsp->tcorr2.dist_az, 
-        &dsp->tcorr2.tang, cpanel->tcorr2.step);
-      dsp->tcorr2.get_new_target = false;
+        dsp->tcorr2.tv, dsp->tcorr2.Va, dsp->tcorr2.Vz,
+        dsp->tcorr2.tau, dsp->tcorr2.tinc, &dsp->tcorr2.dist_az, 
+        &dsp->tcorr2.tang);
+      if (pathprob == 0) 
+        dsp->tcorr2.get_new_target = false;
+      else if (pathprob == 1) { /* problems with Fa so need to force a jump */
+        tourcorr_scramble(gg);
+        pathprob = path(dsp->tcorr2.Fa, dsp->tcorr2.Fz, dsp->tcorr2.F, 
+          d->ncols, (gint) 1, 
+          dsp->tcorr2.Ga, dsp->tcorr2.Gz, dsp->tcorr2.G, dsp->tcorr2.lambda, 
+          dsp->tcorr2.tv, dsp->tcorr2.Va, dsp->tcorr2.Vz,
+          dsp->tcorr2.tau, dsp->tcorr2.tinc, 
+          &dsp->tcorr2.dist_az, &dsp->tcorr2.tang);
+      }
+      else if (pathprob == 2 || pathprob == 3) { /* problems with Fz,
+				    so will force a new choice of Fz */
+        dsp->tcorr2.get_new_target = true;
+      }
     }
   }
   
@@ -750,11 +767,6 @@ void tourcorr_reinit(ggobid *gg)
 
   dsp->tcorr2.get_new_target = true;
 
-  dsp->tcorr1.nsteps = 0;
-  dsp->tcorr2.nsteps = 0;
-  dsp->tcorr1.stepcntr = 0;
-  dsp->tcorr2.stepcntr = 0;
-
   display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
@@ -787,11 +799,6 @@ void tourcorr_scramble(ggobid *gg)
     d->ncols, (gint) 1);
   arrayd_copy(&dsp->tcorr2.Fa, &dsp->tcorr2.F);
   /*  copy_mat(dsp->tcorr2.F.vals, dsp->tcorr2.Fa.vals, d->ncols, 1);*/
-
-  dsp->tcorr1.nsteps = 1; 
-  dsp->tcorr1.stepcntr = 1;
-  dsp->tcorr2.nsteps = 1; 
-  dsp->tcorr2.stepcntr = 1;
 
   dsp->tcorr1.get_new_target = true;
   dsp->tcorr2.get_new_target = true;

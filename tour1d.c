@@ -254,8 +254,6 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
   dsp->t1d.dist_az = 0.0;
   dsp->t1d.delta = cpanel->t1d.step*M_PI_2/10.0;
   dsp->t1d.tang = 0.0;
-  dsp->t1d.nsteps = 1; 
-  dsp->t1d.stepcntr = 1;
 
   dsp->t1d.idled = 0;
   dsp->t1d.get_new_target = true;
@@ -283,8 +281,7 @@ void tour1d_speed_set(gint slidepos, ggobid *gg) {
   cpaneld *cpanel = &dsp->cpanel;
 
   cpanel->t1d.slidepos = slidepos;
-  speed_set(slidepos, &cpanel->t1d.step, &dsp->t1d.delta, 
-    &dsp->t1d.nsteps, &dsp->t1d.stepcntr);
+  speed_set(slidepos, &cpanel->t1d.step, &dsp->t1d.delta);
 }
 
 void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
@@ -468,18 +465,17 @@ tour1d_run(displayd *dsp, ggobid *gg)
   gint i, j, nv;
 
   if (!dsp->t1d.get_new_target && 
-      !reached_target(dsp->t1d.nsteps, dsp->t1d.stepcntr, dsp->t1d.tang,
-        dsp->t1d.dist_az, 
+      !reached_target(dsp->t1d.tang, dsp->t1d.dist_az, 
         dsp->t1d.target_selection_method,&dsp->t1d.ppval, &dsp->t1d.oppval)) {
-    increment_tour(dsp->t1d.tinc, dsp->t1d.tau, &dsp->t1d.nsteps, 
-      &dsp->t1d.stepcntr, dsp->t1d.dist_az, dsp->t1d.delta, &dsp->t1d.tang, 
-      (gint) 1);
+    increment_tour(dsp->t1d.tinc, dsp->t1d.tau, dsp->t1d.dist_az, 
+      dsp->t1d.delta, &dsp->t1d.tang, (gint) 1);
     tour_reproject(dsp->t1d.tinc, dsp->t1d.G, dsp->t1d.Ga, dsp->t1d.Gz,
       dsp->t1d.F, dsp->t1d.Va, d->ncols, (gint) 1);
 
     /* plot pp indx */
     if (dsp->t1d_ppda != NULL) {
 
+      dsp->t1d.oppval = dsp->t1d.ppval;
       revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
         0, gg);
       /*      count++;
@@ -495,7 +491,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
       if (dsp->t1d.target_selection_method == 1)
       {
         dsp->t1d_pp_op.index_best = dsp->t1d.ppval;
-        dsp->t1d.oppval = dsp->t1d.ppval;
+	/*        dsp->t1d.oppval = dsp->t1d.ppval;*/
         for (j=0; j<dsp->t1d.nactive; j++) 
           dsp->t1d_pp_op.proj_best.vals[0][j] = 
             dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]];
@@ -504,7 +500,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
     else 
     {
       if (dsp->t1d.target_selection_method == 1)
-        t1d_ppdraw(dsp->t1d.ppval, gg);
+	/*        t1d_ppdraw(dsp->t1d.ppval, gg)*/;
       else
       {
         do_last_increment(dsp->t1d.tinc, dsp->t1d.tau, 
@@ -535,6 +531,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
           dsp->t1d.Fz.vals[0][i] = 0.0;
         dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[0]]=1.0;
 
+        dsp->t1d.oppval = -999.0;
         revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
           dsp->t1d.target_selection_method, gg);
 
@@ -562,7 +559,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
             revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
               dsp->t1d.target_selection_method, gg);
           }
-          t1d_ppdraw(dsp->t1d.ppval, gg);
+          /*t1d_ppdraw(dsp->t1d.ppval, gg);*/
 	  /*          count = 0;*/
 #ifndef WIN32
           sleep(2);
@@ -578,11 +575,10 @@ tour1d_run(displayd *dsp, ggobid *gg)
         
       }
       pathprob = path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
-        (gint) 1, dsp->t1d.Ga,
-        dsp->t1d.Gz, dsp->t1d.G, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
-		      dsp->t1d.Vz,
-        dsp->t1d.tau, dsp->t1d.tinc, &dsp->t1d.nsteps, &dsp->t1d.stepcntr, 
-        &dsp->t1d.dist_az, &dsp->t1d.tang, cpanel->t1d.step);
+        (gint) 1, dsp->t1d.Ga, dsp->t1d.Gz, dsp->t1d.G, 
+        dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
+	dsp->t1d.Vz, dsp->t1d.tau, dsp->t1d.tinc, 
+        &dsp->t1d.dist_az, &dsp->t1d.tang);
       if (pathprob == 0) 
         dsp->t1d.get_new_target = false;
       else if (pathprob == 1) { /* problems with Fa so need to force a jump */
@@ -590,9 +586,8 @@ tour1d_run(displayd *dsp, ggobid *gg)
         pathprob = path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
           (gint) 1, dsp->t1d.Ga,
           dsp->t1d.Gz, dsp->t1d.G, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
-          dsp->t1d.Vz,
-          dsp->t1d.tau, dsp->t1d.tinc, &dsp->t1d.nsteps, &dsp->t1d.stepcntr, 
-          &dsp->t1d.dist_az, &dsp->t1d.tang, cpanel->t1d.step);
+          dsp->t1d.Vz,  dsp->t1d.tau, dsp->t1d.tinc, 
+          &dsp->t1d.dist_az, &dsp->t1d.tang);
       }
       else if (pathprob == 2 || pathprob == 3) { /* problems with Fz,
 				    so will force a new choice of Fz */
@@ -687,9 +682,6 @@ void tour1d_scramble(ggobid *gg)
     d->ncols, (gint) 1);
   arrayd_copy(&dsp->t1d.Fa, &dsp->t1d.F);
   /*  copy_mat(dsp->t1d.F.vals, dsp->t1d.Fa.vals, d->ncols, 1);*/
-
-  dsp->t1d.nsteps = 1; 
-  dsp->t1d.stepcntr = 1;
 
   dsp->t1d.get_new_target = true;
 

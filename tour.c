@@ -263,10 +263,10 @@ eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau,
  * datadim = num vars
  * projdim = proj dim
  */
-gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, array_d Ga,
-  array_d Gz, array_d G, vector_f lambda, array_d tv, array_d Va, array_d Vz,
-  vector_f tau, vector_f tinc, gint *ns, gint *stcn, gfloat *pdist_az, 
-  gfloat *ptang, gfloat step) 
+gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, 
+  array_d Ga, array_d Gz, array_d G, vector_f lambda, array_d tv, 
+  array_d Va, array_d Vz, vector_f tau, vector_f tinc, gfloat *pdist_az, 
+  gfloat *ptang) 
 {
   gint i, j, k;
   gdouble tol = 0.01;
@@ -279,8 +279,6 @@ gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, array_d
 
   gfloat dist_az = *pdist_az;
   gfloat tang = *ptang;
-  gint nsteps = *ns;
-  gint stepcntr = *stcn;
 
   zero_tau(tau, projdim);
   zero_tinc(tinc, projdim);
@@ -506,9 +504,6 @@ g_printerr ("\n");*/
 
     *pdist_az = dist_az;
     *ptang = tang;
-    *ns = nsteps;
-    *stcn = stepcntr;
-
   }
 
   /*  printf("dist_az %f \n",dist_az);*/
@@ -566,14 +561,13 @@ void tour_reproject(vector_f tinc, array_d G, array_d Ga, array_d Gz,
 
 /* this routine increments the interpolation */
 void
-increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn, 
+increment_tour(vector_f tinc, vector_f tau, 
   gfloat dist_az, gfloat delta, gfloat *ptang, gint projdim)
 {
   int i;
   gboolean attheend = false;
   gfloat tang = *ptang;
-  gint nsteps = *ns;
-  gint stepcntr = *stcn;
+
   /*  time_t bt;
   struct tm *nowtm;
   struct timeval tv; 
@@ -593,13 +587,10 @@ increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn,
   }
 
   *ptang = tang;
-  *ns = nsteps;
-  *stcn = stepcntr;
 }
 
 gboolean
-reached_target(gint nsteps, gint stepcntr, gfloat tang, gfloat dist_az, 
-  gint basmeth, 
+reached_target(gfloat tang, gfloat dist_az, gint basmeth, 
   gfloat *indxval, gfloat *oindxval) 
 {
   gboolean arewethereyet = false;
@@ -609,13 +600,13 @@ reached_target(gint nsteps, gint stepcntr, gfloat tang, gfloat dist_az,
       arewethereyet = true;
   }
   else if (basmeth == 1) {
-    if (*indxval < *oindxval)
+    if (*indxval <= *oindxval)
     {
       arewethereyet = true;
-      *indxval = *oindxval;
+      /*      *indxval = *oindxval;*/
     }
-    else
-      *oindxval = *indxval;
+    /*    else
+     *oindxval = *indxval;*/
   }
 
   return(arewethereyet);
@@ -657,13 +648,10 @@ do_last_increment(vector_f tinc, vector_f tau, gfloat dist_az, gint projdim)
 
 }
 
-void speed_set (gint slidepos, gfloat *st, gfloat *dlt,  
-  gint *ns, gint *stcn) {
-
+void speed_set (gint slidepos, gfloat *st, gfloat *dlt) 
+{
   gfloat step = *st;
   gfloat delta = *dlt;
-  gint nsteps = *ns;
-  gint stepcntr = *stcn;
 
   if (slidepos < 5)
   {
@@ -687,8 +675,6 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt,
 
   *st = step;
   *dlt = delta;
-  *ns = nsteps;
-  *stcn = stepcntr;
 }
 
 void

@@ -115,7 +115,6 @@ typedef struct {
   gint target_selection_method;
   gint idled;
   gboolean get_new_target;
-  gint nsteps, stepcntr;
   gint index; /* this is for counting planes passed */
   gfloat ppval, oppval; /* for projection pursuit */
 } tour;
