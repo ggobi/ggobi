@@ -62,8 +62,13 @@ vectord_realloc (vector_d *vecp, gint nels)
   if (nels > 0) {
     if (vecp->els == NULL || vecp->nels == 0)
       vecp->els = (gdouble *) g_malloc (nels * sizeof (gdouble));
-    else 
+    else {
+      gint i, nels_prev = vecp->nels;
       vecp->els = (gdouble *) g_realloc (vecp->els, nels * sizeof (gdouble));
+      /*-- initialize newly allocated slots to 0 --*/
+      for (i=nels_prev; i<nels; i++)
+        vecp->els[i] = 0.0;
+    }
   } else {
     if (vecp->els != NULL)
       g_free (vecp->els);
@@ -172,8 +177,13 @@ vectorf_realloc (vector_f *vecp, gint nels)
   if (nels > 0) {
     if (vecp->els == NULL || vecp->nels == 0)
       vecp->els = (gfloat *) g_malloc (nels * sizeof (gfloat));
-    else 
+    else {
+      gint i, nels_prev = vecp->nels;
       vecp->els = (gfloat *) g_realloc (vecp->els, nels * sizeof (gfloat));
+      /*-- initialize newly allocated slots to 0 --*/
+      for (i=nels_prev; i<nels; i++)
+        vecp->els[i] = 0.0;
+    }
   } else {
     if (vecp->els != NULL)
       g_free (vecp->els);
@@ -295,8 +305,13 @@ vectori_realloc (vector_i *vecp, gint nels)
   if (nels > 0) {
     if (vecp->els == NULL || vecp->nels == 0)
       vecp->els = (gint *) g_malloc (nels * sizeof (gint));
-    else 
+    else {
+      gint i, nels_prev = vecp->nels;
       vecp->els = (gint *) g_realloc (vecp->els, nels * sizeof (gint));
+      /*-- initialize newly allocated slots to 0 --*/
+      for (i=nels_prev; i<nels; i++)
+        vecp->els[i] = 0;
+    }
   } else {
     if (vecp->els != NULL)
       g_free (vecp->els);
@@ -388,9 +403,14 @@ vectorb_realloc (vector_b *vecp, gint nels)
   if (nels > 0) {
     if (vecp->els == NULL || vecp->nels == 0)
       vecp->els = (gboolean *) g_malloc (nels * sizeof (gboolean));
-    else 
+    else {
+      gint i, nels_prev = vecp->nels;
       vecp->els = (gboolean *)
         g_realloc (vecp->els, nels * sizeof (gboolean));
+      /*-- initialize newly allocated slots to false --*/
+      for (i=nels_prev; i<nels; i++)
+        vecp->els[i] = false;
+    }
   } else {
     if (vecp->els != NULL)
       g_free (vecp->els);
@@ -493,8 +513,13 @@ vectors_realloc (vector_s *vecp, gint nels)
   if (nels > 0) {
     if (vecp->els == NULL || vecp->nels == 0)
       vecp->els = (gshort *) g_malloc (nels * sizeof (gshort));
-    else 
+    else {
+      gint i, nels_prev = vecp->nels;
       vecp->els = (gshort *) g_realloc (vecp->els, nels * sizeof (gshort));
+      /*-- initialize newly allocated slots to 0 --*/
+      for (i=nels_prev; i<nels; i++)
+        vecp->els[i] = 0;
+    }
   } else {
     if (vecp->els != NULL)
       g_free (vecp->els);
@@ -575,8 +600,15 @@ vectorg_realloc (vector_g *vecp, gint nels)
   if (nels > 0) {
     if (vecp->els == NULL || vecp->nels == 0)
       vecp->els = (glyphd *) g_malloc (nels * sizeof (glyphd));
-    else 
+    else {
+      gint i, nels_prev = vecp->nels;
       vecp->els = (glyphd *) g_realloc (vecp->els, nels * sizeof (glyphd));
+      /*-- initialize newly allocated slots to 0 --*/
+      for (i=nels_prev; i<nels; i++) {
+        vecp->els[i].type = 0;
+        vecp->els[i].size = 0;
+      }
+    }
   } else {
     if (vecp->els != NULL)
       g_free (vecp->els);
