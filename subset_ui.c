@@ -466,7 +466,8 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
                           GTK_SIGNAL_FUNC (close_btn_cb), (ggobid *) gg);
       gtk_box_pack_start (GTK_BOX (close_hbox), btn, true, false, 0);
 
-      /*subset_display_update (d, gg);*/ /*-- should not be needed --*/
+      /*-- initialize display --*/
+      subset_display_update (gg->d->data, gg);
 
       if (g_slist_length (gg->d) > 1)
         gtk_widget_show_all (swin);
