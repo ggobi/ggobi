@@ -238,11 +238,7 @@ void barchart_clean_init(barchartSPlotd * sp)
   sp->bar->offset = 0;
   GTK_GGOBI_SPLOT(sp)->pmid.y = 0;
 
-  if (sp->bar->index_to_rank) {
-    g_free((gpointer) sp->bar->index_to_rank);
-  }
-  sp->bar->index_to_rank =
-    (gint *) g_malloc(d->nrows_in_plot * sizeof(gint));
+  vectori_realloc (&sp->bar->index_to_rank, d->nrows_in_plot);
   barchart_init_categorical(sp, d);
 }
 
@@ -251,6 +247,8 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 {
   gint i, j, m, bin;
   vartabled *vtx = vartable_element_get(GTK_GGOBI_SPLOT(sp)->p1dvar, d);
+
+  g_assert (sp->bar->index_to_rank.nels == d->nrows_in_plot);
 
   for (i = 0; i < sp->bar->nbins; i++)
     for (j = 0; j < sp->bar->ncolors; j++)
@@ -283,7 +281,7 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
     bin = GTK_GGOBI_SPLOT(sp)->planar[m].x;
 /* dfs */
     if (vtx->vartype == categorical)
-      bin = sp->bar->index_to_rank[i];
+      bin = sp->bar->index_to_rank.els[i];
 /* --- */
     if ((bin >= 0) && (bin < sp->bar->nbins)) {
       sp->bar->cbins[bin][d->color_now.els[m]].count++;
@@ -467,6 +465,7 @@ void barchart_init_vectors(barchartSPlotd * sp)
     sp->bar->col_low_bin = NULL;
     sp->bar->bar_hit = NULL;
     sp->bar->old_bar_hit = NULL;
+    vectori_init_null (&sp->bar->index_to_rank);
   }
 }
 
@@ -863,6 +862,8 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
   splotd *rawsp = GTK_GGOBI_SPLOT(sp);
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
 
+  g_assert (sp->bar->index_to_rank.nels == d->nrows_in_plot);
+
   if (!vtx->vartype == categorical)
     rawsp->scale.y = SCALE_DEFAULT;
   for (i = 0; i < sp->bar->nbins; i++) {
@@ -882,7 +883,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
           && MISSING_P(m, rawsp->p1dvar))
         continue;
 
-      bin = sp->bar->index_to_rank[i];
+      bin = sp->bar->index_to_rank.els[i];
       if ((bin >= 0) && (bin < sp->bar->nbins)) {
         sp->bar->bins[bin].count++;
         if (d->hidden_now.els[m])
@@ -898,7 +899,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
   } else {  /* all vartypes but categorical */
     gint index, m, rank = 0;
 
-    index = sp->bar->index_to_rank[rank];
+    index = sp->bar->index_to_rank.els[rank];
     m = d->rows_in_plot.els[index];
     yy = d->tform.vals[m][rawsp->p1dvar];
 
@@ -907,7 +908,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
     {
       rawsp->planar[m].x = -1;
       rank++;
-      index = sp->bar->index_to_rank[rank];
+      index = sp->bar->index_to_rank.els[rank];
       m = d->rows_in_plot.els[index];
       yy = d->tform.vals[m][rawsp->p1dvar];
     }
@@ -924,7 +925,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
       /*-- count the hiddens among the elements in low_bin --*/
       sp->bar->low_bin->nhidden = 0;
       for (k=0; k<rank; k++) {
-        index = sp->bar->index_to_rank[k];
+        index = sp->bar->index_to_rank.els[k];
         m = d->rows_in_plot.els[index];
         if (d->hidden_now.els[m])
           sp->bar->low_bin->nhidden++;
@@ -933,7 +934,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 
     bin = 0;
     while (rank < d->nrows_in_plot) {
-      index = sp->bar->index_to_rank[rank];
+      index = sp->bar->index_to_rank.els[rank];
       m = d->rows_in_plot.els[index];
 
       yy = d->tform.vals[m][rawsp->p1dvar];
@@ -1297,7 +1298,7 @@ barchart_sort_index(gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
     mindist = 0;
 
     for (i = 0; i < ny; i++) {
-      sp->bar->index_to_rank[i] = indx[i];
+      sp->bar->index_to_rank.els[i] = indx[i];
     }
 
   } else {  /* vartype = categorical */
@@ -1336,7 +1337,7 @@ barchart_sort_index(gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
       }
 
       /* This takes me from index to bin -- dfs */
-      sp->bar->index_to_rank[indx[i]] = rank;
+      sp->bar->index_to_rank.els[indx[i]] = rank;
     }
 
 /* --- */
@@ -1355,7 +1356,7 @@ barchart_sort_index(gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
           sp->bar->bins[rank].index = indx[i];
         }
       }
-      sp->bar->index_to_rank[indx[i]] = rank;
+      sp->bar->index_to_rank.els[indx[i]] = rank;
     }
 #endif
 
