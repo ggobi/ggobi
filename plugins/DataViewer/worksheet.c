@@ -29,7 +29,7 @@ void cell_changed(GtkSheet *sheet, gint row, gint column, datad *data);
 void brush_change(GtkWidget *w, ggobid *gg, splotd *sp, GdkEventMotion *ev, GtkSheet *sheet);
 void move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet);
 void monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkSheet *sheet);
-void identify_cell(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet);
+void identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkSheet *sheet);
 void color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col);
 
 void connect_to_existing_displays(ggobid *gg, GtkSheet *sheet);
@@ -509,13 +509,13 @@ cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
   and selecting that row.
  */
 void
-identify_cell(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet)
+identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkSheet *sheet)
 {
-    if(ev->id < 0)
+    if(id < 0)
 	return;
 
-    gtk_sheet_moveto(sheet, ev->id, 2, 0.5, 0.5);
-    gtk_sheet_select_row(sheet, ev->id);
+    gtk_sheet_moveto(sheet, id, 2, 0.5, 0.5);
+    gtk_sheet_select_row(sheet, id);
 }
 
 

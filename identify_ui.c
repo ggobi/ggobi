@@ -153,7 +153,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       /* This will become an event on the datad when we move to
          Gtk objects (soon now!) */
       gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL],
-		      sp, &ev, gg); 
+		      sp, k, d); 
     }
     d->nearest_point_prev = k;
   }

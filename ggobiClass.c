@@ -92,11 +92,11 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
         gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
                                          "identify_point",
                                          GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_POINTER_POINTER,
+                                         gtk_marshal_NONE__POINTER_INT_POINTER,
                                          GTK_TYPE_NONE, 3,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER);
+                                         GTK_TYPE_GGOBI_SPLOT,
+                                         GTK_TYPE_INT,
+                                         GTK_TYPE_GGOBI_DATA);
   }
 
   /* This should be for a ggobi datad rather than a widget. Make that a
