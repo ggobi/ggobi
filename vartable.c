@@ -217,50 +217,74 @@ vartable_stats_set (datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
+vartable_row_assemble (gint j, gchar **row, datad *d, ggobid *gg)
+{
+  gint nrows = GTK_CLIST (d->vartable_clist)->rows;
+
+  if (j == -1) {
+    row[CLIST_VARNO] = g_strdup_printf ("%d", nrows);
+    row[CLIST_VARNAME] = g_strdup ("");
+    row[CLIST_TFORM] = g_strdup ("");
+    row[CLIST_USER_MIN] = g_strdup_printf ("%8.3f", 0.0);
+    row[CLIST_USER_MAX] = g_strdup_printf ("%8.3f", 0.0);
+    row[CLIST_DATA_MIN] = g_strdup_printf ("%8.3f", 0.0);
+    row[CLIST_DATA_MAX] = g_strdup_printf ("%8.3f", 0.0);
+    row[CLIST_MEAN] = g_strdup_printf ("%8.3f", 0.0);
+    row[CLIST_MEDIAN] = g_strdup_printf ("%8.3f", 0.0);
+    row[CLIST_NMISSING] = g_strdup_printf ("%d", 0);
+  } else {
+    row[CLIST_VARNO] = g_strdup_printf ("%d", nrows);
+    row[CLIST_VARNAME] = g_strdup (d->vartable[j].collab);
+    row[CLIST_TFORM] = g_strdup ("");
+    if (d->vartable[j].lim_specified_p) {
+      row[CLIST_USER_MIN] = g_strdup_printf ("%8.3f",
+        d->vartable[j].lim_specified_tform.min);
+      row[CLIST_USER_MAX] = g_strdup_printf ("%8.3f",
+        d->vartable[j].lim_specified_tform.max);
+    } else {
+      row[CLIST_USER_MIN] = g_strdup ("");
+      row[CLIST_USER_MAX] = g_strdup ("");
+    }
+    row[CLIST_DATA_MIN] = g_strdup_printf ("%8.3f",
+      d->vartable[j].lim_tform.min);
+    row[CLIST_DATA_MAX] = g_strdup_printf ("%8.3f",
+      d->vartable[j].lim_tform.max);
+    row[CLIST_MEAN] = g_strdup_printf ("%8.3f", d->vartable[j].mean);
+    row[CLIST_MEDIAN] = g_strdup_printf ("%8.3f", d->vartable[j].median);
+    row[CLIST_NMISSING] = g_strdup_printf ("%d", d->vartable[j].nmissing);
+  }
+}
+
+void
 vartable_row_append (gint j, datad *d, ggobid *gg)
 {
   if (d->vartable_clist != NULL) {
     gint k;
     gchar **row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
-    gint nrows = GTK_CLIST (d->vartable_clist)->rows;
 
-    if (j == -1) {
-      row[CLIST_VARNO] = g_strdup_printf ("%d", nrows);
-      row[CLIST_VARNAME] = g_strdup ("");
-      row[CLIST_TFORM] = g_strdup ("");
-      row[CLIST_USER_MIN] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_USER_MAX] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_DATA_MIN] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_DATA_MAX] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_MEAN] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_MEDIAN] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_NMISSING] = g_strdup_printf ("%d", 0);
-    } else {
-      row[CLIST_VARNO] = g_strdup_printf ("%d", nrows);
-      row[CLIST_VARNAME] = g_strdup (d->vartable[j].collab);
-      row[CLIST_TFORM] = g_strdup ("");
-      if (d->vartable[j].lim_specified_p) {
-        row[CLIST_USER_MIN] = g_strdup_printf ("%8.3f",
-          d->vartable[j].lim_specified.min);
-        row[CLIST_USER_MAX] = g_strdup_printf ("%8.3f",
-          d->vartable[j].lim_specified.max);
-      } else {
-        row[CLIST_USER_MIN] = g_strdup ("");
-        row[CLIST_USER_MAX] = g_strdup ("");
-      }
-      row[CLIST_DATA_MIN] = g_strdup_printf ("%8.3f",
-        d->vartable[j].lim_raw.min);
-      row[CLIST_DATA_MAX] = g_strdup_printf ("%8.3f",
-        d->vartable[j].lim_raw.max);
-      row[CLIST_MEAN] = g_strdup_printf ("%8.3f", d->vartable[j].mean);
-      row[CLIST_MEDIAN] = g_strdup_printf ("%8.3f", d->vartable[j].median);
-      row[CLIST_NMISSING] = g_strdup_printf ("%d", d->vartable[j].nmissing);
-    }
-
+    vartable_row_assemble (j, row, d, gg);
     gtk_clist_append ((GtkCList *) d->vartable_clist, row);
 
     for (k=0; k<NCOLS_CLIST; k++)
       g_free ((gpointer) row[k]);
+    g_free ((gpointer) row);
+  }
+}
+
+void
+vartable_row_update (gint j, datad *d, ggobid *gg)
+{
+  if (d->vartable_clist != NULL) {
+    gint k;
+    gchar **row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
+
+    vartable_row_assemble (j, row, d, gg);
+    gtk_clist_append ((GtkCList *) d->vartable_clist, row);
+
+    for (k=0; k<NCOLS_CLIST; k++) {
+      gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j, k, row[k]);
+      g_free ((gpointer) row[k]);
+    }
     g_free ((gpointer) row);
   }
 }

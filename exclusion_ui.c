@@ -91,7 +91,7 @@ exclude_cluster_cb (GtkToggleButton *btn, gpointer cbd)
   rows_in_plot_set (d, gg);
 
   /*-- should be exactly what happens in subset_apply --*/
-  vartable_lim_update (d, gg);
+  vartable_lim_update (d, gg);  /*-- if rescaling, right? --*/
   tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_ALL, gg);
 /*  assign_points_to_bins ();*/

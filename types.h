@@ -81,7 +81,7 @@ typedef struct {
  gchar *collab, *collab_tform;
  gint nmissing;
 
- /*-- reference variable:  jref=-1 except for cloned variables --*/
+ /*-- reference variable:  jref=-1 except for cloned or sphered variables --*/
  gint jref;
 
  /*-- unadjusted, unaffected by imputation --*/
@@ -98,7 +98,7 @@ typedef struct {
  lims lim_specified;
  lims lim_specified_tform;
 
- lims lim;      /*-- limits in use: lim_specified or lim_tform --*/
+ lims lim;      /*-- limits in use: lim_specified_tform or lim_tform --*/
 
  /*-- transformations --*/
  gint tform0;
@@ -112,6 +112,7 @@ typedef struct {
  /*-- jittering --*/
  gfloat jitter_factor;
 
+ /*-- in variable table --*/
  gboolean selected;
 
 } vartabled;

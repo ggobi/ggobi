@@ -101,91 +101,9 @@ pipeline_arrays_add_column (gint jvar, datad *d, ggobid *gg)
 }
 */
 
-
-/*-------------------------------------------------------------------------*/
-/*               mucking about with the variable limits                    */
-/*-------------------------------------------------------------------------*/
-
-void
-min_max (gfloat **vals, gint jvar, gfloat *min, gfloat *max,
-  datad *d, ggobid *gg)
-/*
- * Find the minimum and maximum values of variable jvar
- * using min-max scaling.
-*/
-{
-  int i, k;
-/*
- * Choose an initial value for *min and *max
-*/
-  *min = *max = vals[d->rows_in_plot[0]][jvar];
-
-  for (i=0; i<d->nrows_in_plot; i++) {
-    k = d->rows_in_plot[i];
-    if (vals[k][jvar] < *min)
-      *min = vals[k][jvar];
-    else if (vals[k][jvar] > *max)
-      *max = vals[k][jvar];
-  }
-}
-
-void
-limits_adjust (gfloat *min, gfloat *max)
-/*
- * This test could be cleverer.  It could test the ratios
- * lim[i].min/rdiff and lim[i].max/rdiff for overflow or
- * rdiff/lim[i].min and rdiff/lim[i].max for underflow.
- * It should probably do it inside a while loop, too.
- * See Advanced C, p 187.  Set up gfloation point exception
- * handler which alters the values of lim[i].min and lim[i].max
- * until no exceptions occur.
-*/
-{
-  if (*max - *min == 0) {
-    if (*min == 0.0) {
-      *min = -1.0;
-      *max = 1.0;
-    } else {
-      *min = .9 * *min;
-      *max = 1.1 * *max;
-    }
-  }
-
-  /* This is needed to account for the case that max == min < 0 */
-  if (*max < *min) {
-    gfloat ftmp = *max;
-    *max = *min;
-    *min = ftmp;
-  }
-}
-
-void
-vartable_lim_update (datad *d, ggobid *gg)
-{
-  gint j;
-  gfloat min, max;
-
-  for (j=0; j<d->ncols; j++) {
-
-    if (d->vartable[j].lim_specified_p) {
-      min = d->vartable[j].lim_specified_tform.min;
-      max = d->vartable[j].lim_specified_tform.max;
-    } else {
-      min = d->vartable[j].lim_tform.min;
-      max = d->vartable[j].lim_tform.max;
-    }
-
-    limits_adjust (&min, &max);
-
-    d->vartable[j].lim.min = min;
-    d->vartable[j].lim.max = max;
-  }
-}
-
 /*-------------------------------------------------------------------------*/
 /*                       pipeline                                          */
 /*-------------------------------------------------------------------------*/
-
 
 gint
 icompare (gint *x1, gint *x2)

@@ -494,6 +494,5 @@ vartable_tform_set (gint varno, datad *d, ggobid *gg) {
 
   if (d->vartable_clist != NULL)
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), varno,
-      2, d->vartable[varno].collab_tform);
+      CLIST_TFORM, d->vartable[varno].collab_tform);
 }
-
