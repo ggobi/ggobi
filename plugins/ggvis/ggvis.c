@@ -10,6 +10,7 @@
 #include "ggvis.h"
 
 
+ggvisd *   GGVisFromInst (PluginInstance *inst);
 void       close_ggvis_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_ggvis_window(ggobid *gg, PluginInstance *inst);
 void       show_ggvis_window(PluginInstance *inst, GtkWidget *widget);
@@ -68,9 +69,156 @@ show_ggvis_window(PluginInstance *inst, GtkWidget *widget)
   }
 }
 
-static void test_cb (GtkButton *button, ggobid* gg)
+ggvisd *
+GGVisFromInst (PluginInstance *inst)
 {
-g_printerr ("perform a graph layout!\n");
+  GtkWidget *window = (GtkWidget *) inst->data;
+  ggvisd *ggv = (ggvisd *) gtk_object_get_data (GTK_OBJECT(window), "ggvisd");
+  return ggv;
+}
+
+void
+scale_array_max (array_d *dist, gint nr, gint nc)
+{
+  /*extern gdouble delta;*/  /* in mds.c */
+  gdouble max;
+  gint i, j;
+  gdouble **d = dist->vals;
+
+  if (dist->nrows < nr || dist->ncols < nc)
+    g_printerr ("This array is smaller than nr or nc\n");
+  else {
+
+    max = 0.0;
+    for (j=0; j<nc; j++) {
+      for (i=0; i<nr; i++) {
+        if (d[i][j] != DBL_MAX) {
+          if (d[i][j] > max) max = d[i][j];
+          if (d[i][j] < 0.0) 
+            g_printerr ("Negative value %e in dist array at i=%d, j=%d\n",
+              d[i][j], i, j);
+        }
+      }
+    }
+
+    if (max < 1E-10) 
+      printf("Range of dist array too small: max=%e\n", max);
+
+    for (j=0; j<nc; j++) {
+      for (i=0; i<nr; i++) {
+        if(d[i][j] != DBL_MAX)
+          d[i][j] /= max;
+      }
+    }
+  }
+}
+
+static void
+set_dist_matrix_from_edges (datad *d, datad *e, ggobid *gg, ggvisd *ggv)
+{
+  gint nNodes = d->nrows;
+  gint nedges = e->edge.n;
+  endpointsd *endpoints = e->edge.endpoints;
+
+  gint i, j;
+  gdouble infinity = (gdouble) (2*nNodes);
+  gboolean changing;
+  gint end1, end2, end3;
+  gdouble d12;  /* weight */
+  
+  gdouble **dv = ggv->dist.vals;
+
+  if (nNodes < 1 || nedges < 1)
+    return;
+
+  /* Ok, we have a nice distance matrix, let's fill it in with infinity. */
+  for (i = 0; i < nNodes; i++) {
+    for (j = 0; j < nNodes; j++)
+      ggv->dist.vals[i][j] = infinity;
+    ggv->dist.vals[i][i] = 0.0;
+  }
+
+  /* As long as we find a shorter path using the edges, keep going. */
+  changing = true;
+  while (changing) {
+    changing = false;
+    for (i = 0; i < nedges; i++) {
+      end1 = endpoints[i].a;
+      end2 = endpoints[i].b;
+      /*-- we don't have edge weights yet --*/
+      d12 = 1.0;
+      for (end3 = 0; end3 < nNodes; end3++) {
+        /* So we have a direct link from end1 to end2.  Can this be */
+        /* used to shortcut a path from end1 to end3 or end2 to end3? */
+        if (dv[end1][end3] > d12 + dv[end2][end3]) {
+          dv[end3][end1] = dv[end1][end3] = d12 + dv[end2][end3];
+          changing = true;
+        }
+        if (dv[end2][end3] > d12 + dv[end1][end3]) {
+          dv[end3][end2] = dv[end2][end3] = d12 + dv[end1][end3];
+          changing = true;
+        }
+      }    /* end3 */
+    }    /* end1 and end2 */
+  }    /* while changing. */
+
+  scale_array_max (&ggv->dist, nNodes, nNodes);
+}
+
+
+static void test_cb (GtkButton *button, PluginInstance *inst)
+{
+  ggobid *gg = inst->gg;
+  ggvisd *ggv = GGVisFromInst (inst);
+  gint i, m, nNodes, nEdges;
+
+  datad *d = gg->current_display->d;
+  datad *e = gg->current_display->e;
+  if (d == NULL || e == NULL)
+    return;
+
+  nNodes = d->nrows;
+  nEdges = e->edge.n;
+
+  if (nEdges <= 0)
+    return;
+
+  /*-- allocate distance matrix, nNodes x nNodes --*/
+  if (ggv->dist.vals == NULL || ggv->dist.nrows != nNodes)
+    arrayd_alloc (&ggv->dist, nNodes, nNodes);
+
+  /*-- populate distance matrix with link distances --*/
+  set_dist_matrix_from_edges (d, e, gg, ggv);
+
+g_printerr ("distance matrix allocated, populated and scaled\n");
+
+  /*-- allocate position matrix, nNodes x nvariables --*/
+  if (ggv->pos.vals == NULL || ggv->pos.nrows != nNodes)
+    arrayd_alloc (&ggv->pos, nNodes, d->ncols);
+  
+  cmds (&ggv->dist, &ggv->pos);
+g_printerr ("through cmds\n");
+
+/*-- add a couple of rounds of spring therapy --*/
+  spring_once (3, d, e, &ggv->dist, &ggv->pos);
+g_printerr ("through spring_once (ten times)\n");
+
+/*-- add three variables and put in the new values --*/
+  {
+    gint k;
+    gdouble *x = g_malloc0 (d->nrows * sizeof (gdouble));
+    gchar *name;
+
+    for (k=0; k<3; k++) {
+      for (i=0; i<d->nrows; i++) {
+        x[i] = ggv->pos.vals[i][k];
+      }
+      name = g_strdup_printf ("Pos%d", k);
+      newvar_add_with_values (x, d->nrows, name, d, gg);
+      g_free (name);
+    }
+    g_free (x);
+  }
 }
 
 GtkWidget *
@@ -90,7 +238,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
 
   btn = gtk_button_new_with_label ("test");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (test_cb), gg);
+                      GTK_SIGNAL_FUNC (test_cb), inst);
   gtk_box_pack_start (GTK_BOX (main_vbox), btn, false, false, 3);
 
   gtk_widget_show_all (window);
