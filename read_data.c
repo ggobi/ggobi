@@ -623,53 +623,53 @@ missing_values_read (InputDescription *desc, gboolean init, datad *d,
     return(false);
   }
 
-    if (init || d->nmissing == 0)
-      arrays_alloc (&d->missing, d->nrows, d->ncols);
+  if (init || d->nmissing == 0)
+    arrays_alloc (&d->missing, d->nrows, d->ncols);
 
-    for (j=0; j<d->ncols; j++) {
-      vt = vartable_element_get (j, d);
-      vt->nmissing = 0;
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    vt->nmissing = 0;
+  }
+
+  j = 0;
+  i = 0;
+  while ((ok = fscanf (fp, "%d", &itmp)) != EOF) {
+    row = i;
+    col = j;
+    j++;
+    if (j==d->ncols) { j=0; i++; }
+    if (i==d->nrows && j>0) ok = false;
+
+    if (!ok) {
+      g_print ("Problem reading %s", fileName);
+      g_print (" at row %d, column %d.\n", i, j);
+      g_print ("Make sure dimensions of %s and %s match\n",
+                desc->fileName, fileName);
+      fclose (fp);
+
+      g_free(fileName);
+      return(false);
     }
 
-    j = 0;
-    i = 0;
-    while ((ok = fscanf (fp, "%d", &itmp)) != EOF) {
-      row = i;
-      col = j;
-      j++;
-      if (j==d->ncols) { j=0; i++; }
-      if (i==d->nrows && j>0) ok = false;
-
-      if (!ok) {
-        g_print ("Problem reading %s", fileName);
-        g_print (" at row %d, column %d.\n", i, j);
-        g_print ("Make sure dimensions of %s and %s match\n",
-                  desc->fileName, fileName);
-        fclose (fp);
-
-        g_free(fileName);
-        return(false);
-      }
-
-      d->missing.vals[row][col] = itmp;
-      if (itmp != 0) {
-        nmissing++;
-        vt = vartable_element_get (col, d);
-        vt->nmissing++;
-      }
+    d->missing.vals[row][col] = itmp;
+    if (itmp != 0) {
+      nmissing++;
+      vt = vartable_element_get (col, d);
+      vt->nmissing++;
     }
+  }
 
-    if (d->nmissing != 0 && d->nmissing != nmissing) {
-      g_print ("I found %d missing values in your data file\n", d->nmissing);
-      g_print (" but %d missing values in your .missing file.", nmissing);
-      g_print ("I'll use the .missing results.\n");
-    }
-    d->nmissing = nmissing;
+  if (d->nmissing != 0 && d->nmissing != nmissing) {
+    g_print ("I found %d missing values in your data file\n", d->nmissing);
+    g_print (" but %d missing values in your .missing file.", nmissing);
+    g_print ("I'll use the .missing results.\n");
+  }
+  d->nmissing = nmissing;
 
-    fclose (fp);
-    addInputSuffix(desc, suffixes[whichSuffix]);
- 
-    g_free(fileName);
+  fclose (fp);
+  addInputSuffix(desc, suffixes[whichSuffix]);
+
+  g_free(fileName);
 
  return(true);
 }
