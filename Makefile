@@ -182,6 +182,7 @@ libggobi.so: $(OB)
 
 
 ggobi-API.o ggobi.o: config.h
+
 config.h: developerConfigure
 	./developerConfigure
 
