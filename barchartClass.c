@@ -20,7 +20,7 @@ static void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg);
 void barchart_clean_init(barchartSPlotd * sp);
 void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg);
 
-static gboolean barchart_build_symbol_vectors(datad * d, ggobid * gg);
+static gboolean barchart_build_symbol_vectors(cpaneld *, datad *, ggobid *);
 static void barchartVarpanelRefresh(displayd * display, splotd * sp,
                                     datad * d);
 static gboolean barchartHandlesAction(displayd * dpy, PipelineMode mode);
@@ -170,7 +170,7 @@ void barchartWorldToPlane (splotd *sp, datad *d, ggobid *gg)
 /*      called by build_symbol_vectors                                  */
 /*----------------------------------------------------------------------*/
 
-gboolean barchart_build_symbol_vectors(datad * d, ggobid * gg)
+gboolean barchart_build_symbol_vectors (cpaneld *cpanel, datad * d, ggobid * gg)
 {
   gboolean changed = FALSE;
   gint j, m;
@@ -178,10 +178,35 @@ gboolean barchart_build_symbol_vectors(datad * d, ggobid * gg)
 
   for (j = 0; j < d->nrows_in_plot; j++) {
     m = d->rows_in_plot.els[j];
-    changed = update_color_vectors(m, changed,
-                                   d->pts_under_brush.els, d, gg);
-    changed = update_glyph_vectors (j, changed,
-                                    d->pts_under_brush.els, d, gg);
+
+    switch (cpanel->br_point_targets) {
+      case br_candg:  /*-- color and glyph --*/
+        changed = update_color_vectors(m, changed,
+          d->pts_under_brush.els, d, gg);
+        changed = update_glyph_vectors (m, changed,
+          d->pts_under_brush.els, d, gg);
+      break;
+      case br_color:
+        changed = update_color_vectors(m, changed,
+          d->pts_under_brush.els, d, gg);
+      break;
+      case br_glyph:  /*-- glyph type and size --*/
+        changed = update_glyph_vectors (m, changed,
+          d->pts_under_brush.els, d, gg);
+      break;
+      case br_hide:
+        changed = update_hidden_vectors (m, changed,
+          d->pts_under_brush.els, d, gg);
+      break;
+      case br_select:
+        changed = update_selected_vectors (m, changed,
+          d->pts_under_brush.els, d, gg);
+      break;
+      case br_off:
+        ;
+      break;
+    }
+
     /*-- link by id --*/
     if (!gg->linkby_cv && nd > 1) symbol_link_by_id (false, j, d, gg);
     /*-- --*/
