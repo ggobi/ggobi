@@ -165,6 +165,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   limits_set_by_var (jvar, true, true, d, gg);
 
   vt->collab = vt->collab_tform = g_strdup (vname);
+  vt->nickname = g_strndup (vname, 2);
   /*-- --*/
 
   addvar_propagate (d_ncols_prev, 1, d, gg);
