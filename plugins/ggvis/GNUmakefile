@@ -19,8 +19,8 @@ else
  GGOBI_LIB=-L../.. -lggobi
 endif
 
-GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
-#GGOBI_LIB=
+#GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
+GGOBI_LIB=
 
 CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
 
@@ -29,12 +29,9 @@ ARCH=linux.i386
 GVINC=-I$(GVIZ)/include -I$(GVIZ_SRC) -I$(GVIZ_SRC)/dotneato/common
 GVLIB=-L$(GVIZ)/build/$(ARCH)/lib
 
-EXTLIB_INC=-I/usr/include/freetype2
-EXTLIB_LIB=-ljpeg -lpng -lfreetype -lz
-
 CFLAGS+= -DGRAPHVIZ=1 $(GVINC)
-LDFLAGS+=$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan -lgd -lcdt $(EXTLIB_LIB)
-LDFLAGS+=$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan $(GVIZ)/build/$(ARCH)/lib/libgd.a -lcdt $(EXTLIB_LIB)
+LDFLAGS+=$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan -lgd -lcdt $(GVIZ_EXTLIB_LIB)
+LDFLAGS+=$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan $(GVIZ)/build/$(ARCH)/lib/libgd.a -lcdt $(GVIZ_EXTLIB_LIB)
 endif
 
 ifdef BINARY_IO_IMPLEMENTED
