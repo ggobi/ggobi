@@ -583,6 +583,7 @@ setEdgePartners (XMLParserData *parserData)
   datad *e = getCurrentXMLData(parserData);
   SortableEndpoints *ep;
   gint i, k, n;
+  gboolean dups = false;
 
   if (e->edge.n <= 0)
     return;
@@ -591,18 +592,44 @@ setEdgePartners (XMLParserData *parserData)
   ep = (SortableEndpoints *)
     g_malloc (n * sizeof (SortableEndpoints));
 
-  /*-- I'm assuming that we have no edges from i to i --*/
+  /*-- Assume that we have no edges from i to i --*/
+
+  /*
+   *  Before setting partners, check for duplicate edges.  If we find
+   *  one, bail out -- we don't handle them correctly, and we don't
+   * want them around.
+  */
+
   for (i=0, k=0; i<e->edge.n; i++) {
     ep[k].a = g_strdup ((gchar *) e->edge.sym_endpoints[i].a);
     ep[k].b = g_strdup ((gchar *) e->edge.sym_endpoints[i].b);
     ep[k].jcase = i;
     k++;
+  }
+  qsort ((gchar *) ep, e->edge.n, sizeof (SortableEndpoints), edgecompare);
+
+  for (i=1; i<e->edge.n; i++) {
+    k = i-1;
+    if (strcmp(ep[i].a, ep[k].a) == 0 && strcmp(ep[i].b, ep[k].b) == 0) {
+      g_printerr ("Error: found duplicate edge from %s to %s\n",
+		  (gchar *) e->edge.sym_endpoints[ ep[i].jcase ].a,
+		  (gchar *) e->edge.sym_endpoints[ ep[i].jcase ].b);
+      dups = true;
+    }
+  }
+  if (dups) 
+    /* */ (*FatalError)(1);
+
+
+  /*-- If there are no dups, add the reverse of each edge and re-sort --*/
+  for (i=0, k=e->edge.n; i<e->edge.n; i++) {
     ep[k].a = g_strdup ((gchar *) e->edge.sym_endpoints[i].b);
     ep[k].b = g_strdup ((gchar *) e->edge.sym_endpoints[i].a);
     ep[k].jcase = i;
     k++;
   }
   qsort ((gchar *) ep, n, sizeof (SortableEndpoints), edgecompare);
+
 
   for (i=1; i<n; i++) {
     k = i-1;
