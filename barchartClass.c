@@ -292,6 +292,7 @@ void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
   klass->parent_class.treeLabel = klass->parent_class.titleLabel =
       "Barchart";
   klass->parent_class.create = barchart_new;
+  klass->parent_class.createWithVars = barchart_new_with_vars;
   klass->parent_class.variable_select = barchartVarSel;
   klass->parent_class.variable_plotted_p = barchartVarIsPlotted;
   klass->parent_class.cpanel_set = barchartCPanelSet;

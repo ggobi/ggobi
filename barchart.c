@@ -61,8 +61,25 @@ static const GtkItemFactoryEntry menu_items[] = {
    "<Item>"},
 };
 
-displayd *barchart_new(gboolean missing_p, splotd * sp, datad * d,
-                       ggobid * gg)
+
+displayd *createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d, ggobid * gg);
+
+displayd *
+barchart_new(gboolean missing_p, splotd * sp, datad * d, ggobid * gg)
+{
+  return(createBarchart(missing_p, sp, -1, d, gg));
+}
+
+displayd *
+barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, datad * d, ggobid * gg)
+{
+ return(createBarchart(missing_p, NULL, vars ? vars[0] : 0, d, gg));
+}
+
+
+
+displayd *
+createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d, ggobid * gg)
 {
   GtkWidget *table, *vbox;
   displayd *display;
@@ -70,7 +87,7 @@ displayd *barchart_new(gboolean missing_p, splotd * sp, datad * d,
   if (d == NULL || d->ncols < 1)
     return (NULL);
 
-  if (sp == NULL) {
+  if (sp == NULL || sp->displayptr == NULL) {
     /* Use GTK_TYPE_GGOBI_BARCHART_DISPLAY, or the regular extended display
        and set the titleLabel immediately afterward. If more goes into barchart,
        we will do the former. And that's what we do.

@@ -697,6 +697,8 @@ GtkWidget* cpanel_barchart_make (ggobid *gg);
 void cpanel_barchart_set (cpaneld *cpanel, GtkWidget *panel, ggobid *gg);
 
 void barchart_scale_event_handlers_toggle(splotd *sp, gboolean state);
+
+displayd *barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, datad * d, ggobid * gg);
 #endif
 
 
