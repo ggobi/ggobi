@@ -55,13 +55,13 @@ ExcelDataDescription(const char * const fileName, const char * const modeName,
  
   if(!fileName || !fileName[0]) {
     fprintf(stderr, "No file name specified for the ExcelReader plugin to read.\n"); fflush(stderr);
-    return(NULL);
+    //    return(NULL);
   }
 
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
   memset(desc, '\0', sizeof(InputDescription));
 
-  desc->fileName = g_strdup(fileName);
+  desc->fileName = g_strdup(fileName ? fileName : "");
 
   desc->mode = unknown_data;
   desc->desc_read_input = readData;
@@ -102,9 +102,15 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
     Error("Can't get Excel's class ID");
   }
 
-  hr = CoCreateInstance(classID, NULL, CLSCTX_SERVER, IID_IDispatch, (void **) &iface);
+  if(fileName && fileName[0])
+    hr = CoCreateInstance(classID, NULL, CLSCTX_SERVER, IID_IDispatch, (void **) &iface);
+  else {
+    fprintf(stderr, "Connecting to existing Excel application instance\n");fflush(stderr);
+    hr = GetActiveObject(classID, NULL, (IUnknown **)&iface);
+  }
 
   if(FAILED(hr)) {
+    COMError(hr);
     Error("Can't create Excel instance");
   }
 
@@ -124,9 +130,10 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   V_VT(v) = VT_BSTR;
   V_BSTR(v) = AsBstr(fileName);   // XXX doesn't work V_BSTR(&v) = L"D:\\duncan\\quakes.csv";
 
+
   s = call(books, L"Open", v, 1);
 
-  /*  Testing the release.
+#if 0
   if(s) {
     s->Release();
   }
@@ -135,7 +142,7 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   iface->Release();
   releaseVariants(vars, sizeof(vars)/sizeof(vars[0]));
   return;
-  */
+#endif
 
   getProperty(s, L"ActiveSheet", v = &vars[2]);
     sheet = V_DISPATCH(v);  
@@ -147,6 +154,9 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   d->name = g_strdup(fileName);
 
   releaseVariants(vars, sizeof(vars)/sizeof(vars[0]));
+
+  call(s, L"Close", NULL, 0);
+  fprintf(stderr, "Closed() the sheet\n"); fflush(stderr);
 
   cells->Release();
   sheet->Release();
@@ -211,8 +221,11 @@ call(IDispatch *iface, BSTR name, VARIANT *args, int numArgs)
     COMError(hr);
  }
 
- IDispatch *ans = V_DISPATCH(&v);
- ans->AddRef();
+ IDispatch *ans = NULL;
+ if(V_VT(&v) == VT_DISPATCH) {
+   ans = V_DISPATCH(&v);
+   ans->AddRef();
+ }
  VariantClear(&v);
 
  return(ans);
@@ -269,7 +282,17 @@ createDataset(VARIANT *var, ggobid *gg)
     for(ctr = 0, i = dim[0][0] + 1; i <= dim[0][1]; i++, ctr++) {
       indices[0] =i;
       SafeArrayGetElement(arr, indices, &value);
-      d->raw.vals[ctr][col] = asReal(&value);
+      if(V_VT(&value) == VT_VOID) {
+	/* This doesn't work. Instead we get a value of 0.00, not VT_VOID */
+	fprintf(stderr, "Missing value %d, %d\n", ctr+1, col+1);fflush(stderr);
+	d->raw.vals[ctr][col] = -1.0;
+      } else
+         d->raw.vals[ctr][col] = asReal(&value);
+
+      if(ctr == 7 && col == 1) {
+	fprintf(stderr, "(8,1): %d  %lf\n", V_VT(&value), d->raw.vals[ctr][col]); fflush(stderr);
+      }
+
       VariantClear(&value);
     }
 

@@ -18,9 +18,16 @@
   files directly without having to request that the user export it in
   comma-separted format (CSV).  Indeed, the data need never exist in a
   file, but instead we could instruct the plugin to use an existing
-  Excel instance and read its data. If the data came to be in Excel
+  Excel instance and read its data<footnote><para/>The code attempts to do this
+  but unfortunately fails. If no file name is specified on the GGobi command line,
+  but this plugin is called (e.g. with --datamode=excel),
+  then we try to get the currently active instance of the Excel application.
+  However, we get an error message of the form
+  <quote>The object exporter specified was not found.</quote>
+  </foonote>. If the data came to be in Excel
   from a database query, or some other input mechanism such as from a
   URL, there need be no local file.
+ 
 
 <para/>
 The mechanism for reading the data is as follows.
@@ -102,25 +109,24 @@ plugin to ggobi, an R DCOM server, or via Rggobi.
    </documentation>
 
 <bugs>
- Among the missing features are:
+
+Among the missing features are:
 <itemizedList>
 <listitem>
-only handles numbers, not dates, strings, etc.
+only handles numbers; not dates, strings, etc.
+</listitem>
+<lisitem>
+doesn't handle missing values.
+We would have to ask for the formula for a given cell
+rather than assuming that the VARIANT will come across as 
+VT_VOID.
 </listitem>
 <listitem>
 does not handle categorical variables at all.
 </listitem>
 <listitem>
-currently only reads the "active"
-worksheet, and not any others.
+currently only reads the "active" worksheet, and not any others.
 </listem>
-<lisitem>
-doesn't handle missing values.
-</listitem>
-<lisittem>
-doesn't release the Excel server which keeps
-running in the background.
-</lisitem>
 <listitem>
 no support for edges
 </listitem>
