@@ -368,8 +368,11 @@ varpanel_refresh (ggobid *gg) {
 
 #ifdef BARCHART_IMPLEMENTED
           case barchart:
-            for (j=0; j<d->ncols; j++)
+            for (j=0; j<d->ncols; j++) {
               varpanel_toggle_set_active (VARSEL_X, j, (j == sp->p1dvar), d);
+              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+            }
           break;
 #endif
 
@@ -641,10 +644,10 @@ varpanel_tooltips_set (ggobid *gg)
             "Select to replace the horizontal (time) variable.",
             NULL);
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-            "Select to replace/insert/append/delete another variable.",
+            "Select to replace/insert/append/delete a Y variable.",
             NULL);
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-            "Click left to replace the horizontal (time) variable.  Click middle to replace/insert/append/delete another variable.",
+            "Click left to replace the horizontal (time) variable.  Click middle or right to replace/insert/append/delete a Y variable.",
             NULL);
         break;
 
