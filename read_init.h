@@ -46,6 +46,11 @@ typedef struct _GGobiInitInfo {
     gboolean createInitialScatterPlot;
     gboolean allowCloseLastDisplay;
     gboolean quitWithNoGGobi;
+    gint     numScatMatrixVars;
+    gint     numParCoordsVars;
+    gint     numTimePlotVars;
+
+    gchar   *sessionFile;
 } GGobiInitInfo;
 
 GGobiInitInfo *read_init_file(const char *filename, GGobiInitInfo *info);

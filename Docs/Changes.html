@@ -18,11 +18,15 @@ often forget.
        initialization file.
       <br>
      &lt;autoplot&gt;, &lt;allowNoDisplays&gt;,
-      and &lt;quitOnLastGGobi&gt;
+      &lt;quitOnLastGGobi&gt;
      Each has a <b>on</b> attribute
       that can be a logical value
       (TRUE, true, True, T, 1 or
        FALSE, False, false, F, 0)
+      Also, &lt;numDefaultPlotVars&gt;
+      sets the default number of variables to display
+      in the different plots.
+
       <dl>
         <dt>&lt;autoplot on="true|false"&gt;
         <dd> controls whether the initial scatterplot is
@@ -35,8 +39,12 @@ often forget.
 	     main GGobi window for that instance.
 	 <dt> &lt;quitOnLastGGobi&gt;
 	 <dd> controls whether closing the last remaining
-	     GGobi instance main window terminates the
-	     GGobi session.
+	     GGobi instance main window terminates the GGobi session.
+	 <dt> &lt;numDefaultPlotVars&gt;
+	 <dd>
+          The attributes are <b>scatmat</b>, <b>parcoords</b>.
+	  The value for each gives the default number of variables to
+          display in the display. If this is negative, all variables are used.
       </dl> 
       
   <dd>
@@ -86,6 +94,11 @@ often forget.
 	<dd>
       </dl>
 
+  <dt> Storing the session queries the user for
+      the name of the file to which the
+      session information should saved.
+  <dd>
+      
   <dt> Thanks to John Plummer for detailed bug reports.
   <dd>
 </dl>
@@ -145,6 +158,6 @@ often forget.
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Thu Dec  6 20:09:16 EST 2001
+Last modified: Thu Dec  6 23:44:26 EST 2001
 <!-- hhmts end -->
 </body> </html>

@@ -115,7 +115,10 @@ scatmat_new (gboolean missing_p,
      ! Need to check rows and cols are allocated. !
    */
   if (numRows == 0 || numCols == 0) {
-    scatmat_nrows = scatmat_ncols = MIN (d->ncols, MAXNVARS);
+    scatmat_nrows = scatmat_ncols = MIN (d->ncols, sessionOptions->info->numScatMatrixVars);
+    if(scatmat_nrows < 0) {
+	scatmat_nrows = scatmat_ncols = d->ncols;
+    }
     for (j=0; j<scatmat_nrows; j++)
       rows[j] = cols[j] = j;
   } else { 

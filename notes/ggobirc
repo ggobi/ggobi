@@ -13,6 +13,8 @@
   <allowNoDisplays on="true" />
   <quitOnLastGGobi on="true" />
 
+  <numDefaultPlotVars scatmat="-1" parcoords="-1"/> <!-- -1 means all variables. -->
+
   <colorschemes file="/home/duncan/Projects/ggobi/notes/colorschemes.xml" />
   <background>
   <!-- values are scaled by dividing by max and then mapped to the

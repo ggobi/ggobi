@@ -46,6 +46,13 @@ ggobid **all_ggobis;
 gint num_ggobis;
 gint totalNumGGobis;
 
+   /* Needs to be connected to MAXNVARS in scatmat.c
+      and MAXNPCPLOTS in  parcoords.c
+    */
+#define MAXNVARS 4 
+#define MAXNPCPLOTS 5
+#define MAXNTSPLOTS 6 
+
 
 const gchar * const ViewTypes[] =
   {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
@@ -412,12 +419,17 @@ initSessionOptions()
   sessionOptions->showControlPanel = true;
   sessionOptions->verbose = GGOBI_CHATTY;
 
-#ifdef USE_XML
+
   sessionOptions->info = (GGobiInitInfo*) g_malloc(sizeof(GGobiInitInfo));
   memset(sessionOptions->info, '\0', sizeof(GGobiInitInfo));
   sessionOptions->info->glyph.size = sessionOptions->info->glyph.type = -1;
   sessionOptions->info->createInitialScatterPlot = true;
   sessionOptions->info->allowCloseLastDisplay = false;
+  sessionOptions->info->quitWithNoGGobi = true;
+  sessionOptions->info->numScatMatrixVars = MAXNVARS;
+  sessionOptions->info->numParCoordsVars = MAXNPCPLOTS;
+  sessionOptions->info->numTimePlotVars = MAXNTSPLOTS;
+#ifdef USE_XML
 #endif
 }
 

@@ -141,7 +141,9 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars,
 
   display = display_alloc_init (tsplot, missing_p, d, gg);
   if (nvars == 0) {
-    nplots = MIN ((d->ncols-1), MAXNTSPLOTS);
+    nplots = MIN ((d->ncols-1), sessionOptions->info->numTimePlotVars);
+    if(nplots < 0)
+	nplots = d->ncols;
     for (i=1; i<nplots; i++)
       vars[i] = i;
   } else {

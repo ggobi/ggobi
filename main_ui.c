@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include <stdlib.h>
 #ifdef USE_STRINGS_H
 #include <strings.h>
 #endif
@@ -842,11 +843,45 @@ show_plugin_list(void *garbage, gint action, GtkWidget *w)
 
 
 #ifdef USE_XML
+
+void
+store_session_in_file(GtkWidget *btn, GtkWidget *selector)
+{
+ gchar *fileName;
+ ggobid *gg;
+ fileName = gtk_file_selection_get_filename(GTK_FILE_SELECTION(selector));
+ if(fileName && fileName[0]) {
+     gg = gtk_object_get_data(GTK_OBJECT(selector), "ggobi");
+     write_ggobi_as_xml(gg, fileName);
+     gtk_widget_destroy(selector);
+ } else {
+     quick_message("Pick a file", true);
+ }
+}
+
 void
 store_session(ggobid *gg, gint action, GtkWidget *w)
 {
-  write_ggobi_as_xml(gg, "duncan");
+  GtkWidget *dlg;
+  if(!sessionOptions->info->sessionFile) {
+      char buf[1000];
+      sprintf(buf,"%s%c%s", getenv("HOME"), G_DIR_SEPARATOR, ".ggobi-session");
+      dlg = gtk_file_selection_new("Save ggobi session");
+      gtk_object_set_data(GTK_OBJECT(dlg), "ggobi", (gpointer) gg);
+      gtk_file_selection_set_filename(GTK_FILE_SELECTION(dlg), buf);
+      gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->ok_button),
+			  "clicked", GTK_SIGNAL_FUNC (store_session_in_file), dlg);
+
+      gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->cancel_button),
+                                 "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
+				 (gpointer) dlg);
+
+      gtk_widget_show(dlg);
+  } else {
+     write_ggobi_as_xml(gg, sessionOptions->info->sessionFile);
+  }
 }
+
 #endif
 
 

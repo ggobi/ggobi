@@ -195,6 +195,25 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
 
   info->quitWithNoGGobi = getLogicalPreference(node, "quitOnLastGGobi", info->allowCloseLastDisplay);
 
+  el = getXMLElement(node, "numDefaultPlotVars");
+  if(el) {
+      gchar *tmp;
+      tmp = xmlGetProp(el, "scatmat");
+      if(tmp) {
+	  info->numScatMatrixVars = asNumber(tmp);
+      }
+
+      tmp = xmlGetProp(el, "parcoords");
+      if(tmp) {
+	  info->numParCoordsVars = asNumber(tmp);
+      }
+
+      tmp = xmlGetProp(el, "timeplot");
+      if(tmp) {
+	  info->numTimePlotVars = asNumber(tmp);
+      }
+  }
+
   return(0);
 }
 

@@ -152,7 +152,10 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
 
   display = display_alloc_init (parcoords, missing_p, d, gg);
   if (nvars == 0) {
-    nplots = MIN (d->ncols, MAXNPCPLOTS);
+    nplots = MIN (d->ncols, sessionOptions->info->numParCoordsVars);
+    if(nplots < 0) {
+	nplots = d->ncols;
+    }
     for (i=0; i<nplots; i++)
       vars[i] = i;
   } else {
