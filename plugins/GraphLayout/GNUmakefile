@@ -4,6 +4,14 @@ ifndef GGOBI_HOME
  GGOBI_HOME=../..
 endif
 
+ifndef GTK_CONFIG
+ GTK_CONFIG=gtk-config
+endif
+
+ifndef DOTNEATO_CONFIG
+ DOTNEATO_CONFIG=dotneato-config
+endif
+
 ifdef ADMIN
  include Install/GNUmakefile.admin
 endif
@@ -21,13 +29,10 @@ else
  CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
 endif
 
-GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
-GGOBI_LIB=
-
 ifdef GRAPHVIZ
-CFLAGS+=-Wno-unknown-pragmas
-CFLAGS+= -DGRAPHVIZ=1 $(GVINC:%=-I%)
-LDFLAGS+=-L$(GVLIB) -ldotneato -lgraph
+ CFLAGS+=-Wno-unknown-pragmas
+ CFLAGS+=-DGRAPHVIZ=1 $(shell $(DOTNEATO_CONFIG) --cflags)
+ LDFLAGS+=$(shell $(DOTNEATO_CONFIG) --libs)
 endif
 
 HEADERS=glayout defines
