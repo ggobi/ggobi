@@ -20,7 +20,7 @@ else
 endif
 
 GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
-GGOBI_LIB=
+#GGOBI_LIB=
 
 CFLAGS+=-g $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags) $(XML_INC_DIRS:%=-I%)
 
@@ -75,9 +75,6 @@ local.config:  configure
 
 configure: configure.in
 	autoconf
-
-clean:
-	-rm -f $(OBJS)
 
 distclean: clean
 	-rm -f $(PKG).so local.config

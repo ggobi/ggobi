@@ -40,9 +40,6 @@ local.config:  configure
 configure: configure.in
 	autoconf
 
-clean:
-	-rm -f $(OBJS)
-
 distclean: clean
 	-rm -f $(PKG).so local.config
 	-rm -f configure config.status config.cache config.log
