@@ -16,6 +16,115 @@
 #include "externs.h"
 
 /*-------------------------------------------------------------------------*/
+/*                       double array management                           */
+/*-------------------------------------------------------------------------*/
+
+void
+arrayd_init_null (array_d *arrp)
+{
+  arrp->nrows = arrp->ncols = 0;
+  arrp->vals = (gdouble **) NULL;
+}
+
+void
+arrayd_free (array_d *arrp, gint nr, gint nc)
+{
+  gint i;
+
+  /*-- if nr != 0, free only the last nrows-nr rows --*/
+
+  for (i=nr; i<arrp->nrows; i++)
+    if (arrp->vals[i] != NULL)
+      g_free (arrp->vals[i]);
+
+  if (nr == 0) {
+    if (arrp->vals != NULL)
+      g_free (arrp->vals);
+    arrp->vals = (gdouble **) NULL;
+    arrp->nrows = arrp->ncols = 0;
+  } else {
+    arrp->nrows = nr;
+    arrp->ncols = nc;
+  }
+}
+
+/* Zero an array of doubles. */
+void
+arrayd_zero (array_d *arrp)
+{
+  int i, j;
+  for (i=0; i<arrp->nrows; i++) {
+    for (j=0; j<arrp->ncols; j++) {
+      arrp->vals[i][j] = 0.0;
+    }
+  }
+}
+
+/* allocate an array of doubles */
+void
+arrayd_alloc (array_d *arrp, gint nr, gint nc)
+{
+  gint i;
+
+  if ((arrp->nrows != 0)||(arrp->ncols != 0))
+    arrayd_free (arrp, 0, 0);
+
+  arrp->vals = (gdouble **) g_malloc (nr * sizeof (gdouble *));
+  for (i = 0; i < nr; i++)
+    arrp->vals[i] = (gdouble *) g_malloc (nc * sizeof (gdouble));
+  arrp->nrows = nr;
+  arrp->ncols = nc;
+}
+
+/* allocate an array of doubles populated with 0 */
+void
+arrayd_alloc_zero (array_d *arrp, gint nr, gint nc)
+{
+  gint i;
+
+  if ((arrp->nrows != 0)||(arrp->ncols != 0)) {
+    arrayd_free (arrp, 0, 0);
+  }
+
+  arrp->vals = (gdouble **) g_malloc (nr * sizeof (gdouble *));
+  for (i = 0; i < nr; i++)
+    arrp->vals[i] = (gdouble *) g_malloc0 (nc * sizeof (gdouble));
+  arrp->nrows = nr;
+  arrp->ncols = nc;
+}
+
+/* increase the number of rows in an array of doubles */
+void
+arrayd_add_rows (array_d *arrp, gint nr)
+{
+  gint i;
+
+  if (nr > arrp->nrows) {
+
+    arrp->vals = (gdouble **) g_realloc (arrp->vals, nr * sizeof (gdouble *));
+    for (i = arrp->nrows; i < nr; i++)
+      arrp->vals[i] = (gdouble *) g_malloc0 (arrp->ncols * sizeof (gdouble));
+
+    arrp->nrows = nr;
+  }
+}
+
+void
+arrayd_copy (array_d *arrp_from, array_d *arrp_to)
+{
+  gint i, j;
+
+  if (arrp_from->ncols == arrp_to->ncols &&
+      arrp_from->nrows == arrp_to->nrows)
+  {
+    for (i=0; i<arrp_from->nrows; i++)
+      for (j=0; j<arrp_from->ncols; j++)
+        arrp_to->vals[i][j] = arrp_from->vals[i][j];
+  }
+}
+
+
+/*-------------------------------------------------------------------------*/
 /*                     floating point array management                     */
 /*-------------------------------------------------------------------------*/
 
