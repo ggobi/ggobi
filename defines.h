@@ -38,7 +38,7 @@
 #define NDISPLAYTYPES 3
 
 extern const gchar* const ViewTypes[NDISPLAYTYPES];
-extern const gint ViewTypeIndeces[NDISPLAYTYPES];
+extern const gint ViewTypeIndices[NDISPLAYTYPES];
 
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};

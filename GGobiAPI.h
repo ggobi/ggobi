@@ -417,7 +417,7 @@ extern gint GGobi_getCaseGlyphType(gint id, datad *dataset, ggobid *gg);
 /**
  Get the glyph size attribute for a collection of observations.
 
- @param which an array of the indeces of the observations of interest.
+ @param which an array of the indices of the observations of interest.
  @param n the length of the array `which', and the length of the array that is returned.
  @param dataset the dataset within the GGobi instance in which to find the observation.
  @param gg the GGobi instance in which to find the dataset.
@@ -498,7 +498,7 @@ extern void GGobi_setCaseColor(gint pt, gint colorIndex, datad *dataset, ggobid 
 /**
  Set the color (for each plot) for a collection of observations
  to the same value.
- @param pt an array of indeces of the records/observations whose color attribute are to be set.
+ @param pt an array of indices of the records/observations whose color attribute are to be set.
  @param n the number of elements in the `pts' array.
  @param colorIndex the index of the color in the current colormap to which
   the observations color is to be set.
