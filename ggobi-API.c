@@ -1398,19 +1398,20 @@ GGOBI(getVersionNumbers)()
 
 
 datad *
-GGOBI(data_get)(int which, const ggobid * const gg)
+GGOBI(data_get)(gint which, const ggobid * const gg)
 {
-   datad *data;
+  datad *data = NULL;
 
-     data = g_slist_nth_data(gg->d, which);
+  if (gg->d != NULL)
+    data = g_slist_nth_data(gg->d, which);
 
-     return(data);
+  return(data);
 }
 
 datad *
 GGOBI(data_get_by_name)(const gchar * const name, const ggobid * const gg)
 {
-  int which;
+  gint which;
   datad *data = NULL;
 
   which = GGOBI(datasetIndex)(name, gg);

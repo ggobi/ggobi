@@ -108,6 +108,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
       info->colorSchemeFile = g_strdup(tmp);
   }
 
+  info->bgColor = NULL;  /*-- this needs to be initialized --*/
   el = getXMLElement(node, "background");
   if(el) {
     el = getXMLElement(el, "color");
