@@ -536,7 +536,7 @@ void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
 
 void tour1d_reinit(ggobid *gg)
 {
-  int i, j, m;
+  gint i, j;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
 

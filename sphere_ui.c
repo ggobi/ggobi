@@ -94,6 +94,7 @@ deleteit (ggobid *gg) {
   gg->sphere_ui.scree_pixmap = NULL;
   gg->sphere_ui.condnum_entry = NULL;
   gg->sphere_ui.variance_entry = NULL;
+  gg->sphere_ui.stdized_entry = NULL;
   gg->sphere_ui.apply_btn = NULL;
   gg->sphere_ui.npcs_adj = (GtkObject *) NULL;
 }
@@ -128,9 +129,11 @@ void
 vars_stdized_send_event (datad *d, ggobid *gg)
 {
   if (gg->sphere_ui.stdized_entry != NULL &&
+      GTK_IS_WIDGET (gg->sphere_ui.stdized_entry) &&
       GTK_WIDGET_VISIBLE (gg->sphere_ui.stdized_entry))
   {
     gboolean rval = false;
+
     gtk_signal_emit_by_name (GTK_OBJECT (gg->sphere_ui.stdized_entry),
       "expose_event", (gpointer) d, (gpointer) &rval);
   }

@@ -32,7 +32,7 @@ wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
   GtkWidget *opt, *vbox, *hbox, *hb, *menu, *menuitem;
   GtkWidget *swin, *clist, *btn, *entry;
   gint nd = g_slist_length (gg->d);
-  gint j, k;
+  gint j;
   GSList *l;
   datad *d;
   gchar *row[1];

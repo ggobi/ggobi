@@ -85,7 +85,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   gint alt_mod, gint ctrl_mod, gint shift_mod, datad *d, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
-  gboolean redraw;
+  gboolean redraw = false;
   gint jvar_prev = -1;
 
   if (display == NULL || !GTK_IS_WIDGET (display->window)) {
@@ -272,10 +272,6 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
     gint button = bevent->button;
     gboolean alt_mod, shift_mod, ctrl_mod;
     gint j, jvar;
-
-    /*-- respond only to button 1 and button 2 --*/
-    if (button != 1 && button != 2)
-      return false;
 
     jvar = -1;
     for (j=0; j<d->ncols; j++) {

@@ -1,5 +1,9 @@
 \documentclass[11pt]{article}
 \usepackage{fullpage}
+\bibliographystyle{plain}
+%\bibliographystyle{asa}
+%\bibliographystyle{harvard}
+%\bibliographystyle{apalike}
 
 
 % Issues:
@@ -540,6 +544,24 @@ top of the ViewMode menu.
 
 \subsection{1D plots}
 
+The 1D plots can be displayed in two ways:  as a textured dot plot
+or an average shifted histogram.
+
+The textured dot plot uses a method (and code) created by Tukey and Tukey
+\cite{TukeyTukey90TM}.  The method spreads the data laterally by
+amounts that are partly constrained and partly random, resulting in a
+fairly smooth spreading of the points and minimizing artifacts of the
+plotting method, such as stripes, clusters, or gaps.
+
+The average shifted histogram is due to Scott \cite{Scott92},
+and the code is also his.  In this method, several histograms are
+calculated using the same binwidth but different origins, and the
+averaged results are plotted.  The smoothing parameter essentially
+controls the binwidth.
+
+The 1D plot will be arranged horizontally if you select a variable
+with a left click, and vertically if you use a middle or right click.
+
 \subsection{XY plots}
 
 \subsection{1D Tour}
@@ -779,10 +801,15 @@ You can think of stage 0 as a domain adjustment stage:  if a variable
 has negative values, for instance, many transformation functions
 can't be applied to it, so you may need to add an increment to each
 value.  The transformations in the next two stages don't have such
-neat definitions.  Stage 1 transformations include the Box-Cox
-transformation, and you can either type the Box-Cox parameter into
+neat definitions. 
+
+Stage 1 transformations include the Box-Cox family of linear
+transformations \( T(X)~=~(X ^ \lambda - 1) / \lambda\) \cite{BoxCox64},
+and you can either type the Box-Cox parameter into
 the text box and hit return, or use the spin button to gradually
-increase or decrease the parameter.  Many of the stage 2
+increase or decrease the parameter. 
+
+Many of the stage 2
 transformations are not linear; they include sorting and ranking.
 
 \subsection{Sphering}
@@ -825,13 +852,14 @@ Not implemented.
 \subsection{Jittering}
 
 Select {\em Variable jittering ...} to open a panel that allows
-random noise to be added to selected variables.
+random noise to be added to selected variables.  This ameliorates
+overplotting in scatterplots of data with many ties.
 
 First specify the variables you wish to jitter.  By default, the
 variables plotted in the current display will be affected; if you
 wish to select others, use the {\bf Variable manipulation tool.}
 
-Choose between uniform and random jitter, and then set the degree of
+Choose between uniform and normal random jitter, and then set the degree of
 jitter using the slider.  To rejitter without changing the degree of
 jitter, simply click on the {\bf Jitter} button.
 
@@ -906,7 +934,7 @@ type of imputation you'd like to use.
   done using only cases brushed with the same color and glyph.
 \\{\bf Fixed value}: Specify any value to use instead of the default.
 \\{\bf Percentage below minimum}: Specify a value that is $x$ percent
-  above the minimum value.  For example, if the variable ranges from
+  below the minimum value.  For example, if the variable ranges from
  $40$ to $80$, specifying 10 will assign the missings the value $40 - (10\%
  * 40) = 36$.
 \\{\bf Percentage above minimum}: Specify a value that is $x$ percent
@@ -1135,6 +1163,10 @@ The on-line help system used in xgobi has been replaced with
 seconds brings up a phrase describing the function of that widget.
 If the tooltips annoy you, you can turn then off using a
 checkbox on the {\bf Options} menu.
+
+\newpage
+\bibliography{xgobi}
+%\addcontentsline{toc}{section}{References}
 
 \end {document}
 

@@ -7,6 +7,7 @@ ggobi:
 include local.config
 
 CC = gcc
+#CC = cc
 
 # This defaults to $(CC) and is reset to CXX by any optional 
 # segment that needs to use C++, e.g  USE_MYSQL 
@@ -14,7 +15,7 @@ LD=$(CXX)
 LD=$(CC)
 
 CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
-#CFLAGS= -g2 -ansi -DHAVE_CONFIG_H  # when using Irix cc
+#CFLAGS= -g -ansi -DHAVE_CONFIG_H  # when using Irix cc
 CXXFLAGS=$(CFLAGS)
 
 ifdef TEST_KEYS

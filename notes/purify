@@ -20,7 +20,13 @@ export CC=/usr/bin/cc
 ./configure --prefix=/usr/dfs/cc
 make install
 
-Ste; 3: ggobi
+Step 3: ggobi
+
+export CC=/usr/bin/cc
+export GLIB_CONFIG=/usr/dfs/cc/bin/glib-config
+LD_LIBRARY_PATH=/usr/dfs/cc/lib:$LD_LIBRARY_PATH
+LD_LIBRARYN32_PATH=/usr/dfs/cc/lib:$LD_LIBRARYN32_PATH
+PATH=/usr/dfs/cc/bin:$PATH
 
 use the above settings and add this:
 

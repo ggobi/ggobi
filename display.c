@@ -266,6 +266,11 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   display->e = NULL;
   display->embeddedIn = NULL;
 
+  display->t1d_manip_var = -1;
+  display->t2d_manip_var = -1;
+  display->tc1_manip_var = -1;
+  display->tc2_manip_var = -1;
+
   return (display);
 }
 

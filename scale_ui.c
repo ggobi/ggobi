@@ -449,7 +449,7 @@ cpanel_scale_make (ggobid *gg) {
   pan_option_menu = gtk_option_menu_new ();
   gtk_widget_set_name (pan_option_menu, "SCALE:pan_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), pan_option_menu,
-    "Specify any constraints on the panning direction.  Drag the arrow to set the angle and distance, then hit the spacebar to pan.",
+    "Specify constraints on click-style panning.",
     NULL);
   gtk_box_pack_end (GTK_BOX (vb), pan_option_menu, false, false, 0);
   populate_option_menu (pan_option_menu, panoptions_lbl,
@@ -467,7 +467,7 @@ cpanel_scale_make (ggobid *gg) {
   zoom_option_menu = gtk_option_menu_new ();
   gtk_widget_set_name (zoom_option_menu, "SCALE:zoom_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), zoom_option_menu,
-    "Specify any constraints on the zoom.  Drag the box to set the distance, then hit 'i' to zoom in, 'o' to zoom out.",
+    "Specify constraints on click-style zooming.",
     NULL);
   gtk_box_pack_end (GTK_BOX (vb), zoom_option_menu, false, false, 0);
   populate_option_menu (zoom_option_menu, zoomoptions_lbl,

@@ -9,6 +9,14 @@ determine what is the relationship between these.
 Check the fileselection dialog for read (filesel_ok) to ensure that
 the correct data mode is passed.  Take it out of ggobi.
 
+From John Plummer: 
+  It would be nice if the file finder remembered the
+    directory where the last file retrieved was stored.
+  Reset->'show all points' doesn't override the clusters tool.  
+    What to do?
+  Let any variable be the label used in identification
+  Add a close button or menu item to each tool.
+
 
 Bugs: 
 

@@ -113,12 +113,16 @@ arrayf_add_rows (array_f *arrp, gint nr)
 void
 arrayf_add_cols (array_f *arrp, gint nc)
 {
-  gint i;
+  gint i, j;
 
   if (nc > arrp->ncols) {
-    for (i=0; i<arrp->nrows; i++)
+    for (i=0; i<arrp->nrows; i++) {
       arrp->vals[i] = (gfloat *) g_realloc (arrp->vals[i],
                                             nc * sizeof (gfloat));
+      /*-- initialize the new values to 0 --*/
+      for (j=arrp->ncols; j<nc; j++)
+        arrp->vals[i][j] = 0;
+    }
     arrp->ncols = nc;
   }
 }

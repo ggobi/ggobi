@@ -285,7 +285,7 @@ tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 
 void
 tour2d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
-  int i, j, m;
+  gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
 
   for (m=0; m<d->nrows_in_plot; m++)

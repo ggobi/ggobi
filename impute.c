@@ -160,6 +160,9 @@ impute_random (datad *d, ggobid *gg)
   gint i, j, k, n, m, npresent, *presv, nmissing, *missv;
   gint *selected_cols, nselected_cols;
 
+  if (d->nmissing == 0)
+/**/return;
+
   presv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
   missv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
 

@@ -149,10 +149,12 @@ brush_reset(ggobid *gg, gint action)
       break;
 
     case RESET_UNHIDE_EDGES:  /*-- un-hide all edges --*/
-      for (k=0; k<e->edge.n; k++) {
-        e->hidden_now.els[k] = e->hidden.els[k] = false;
+      if (e != NULL) {
+        for (k=0; k<e->edge.n; k++) {
+          e->hidden_now.els[k] = e->hidden.els[k] = false;
+        }
+        displays_plot (NULL, FULL, gg);
       }
-      displays_plot (NULL, FULL, gg);
       break;
 
     case RESET_EDGES:  /*-- reset edge colors -- to what? --*/
