@@ -254,6 +254,10 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   /*-- get the mouse position and find out which buttons are pressed --*/
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
 
+  /*-- if neither button is pressed, we shouldn't have gotten the event --*/
+  if (!button1_p && !button2_p)
+    return false;
+
   /*-- I'm not sure this could ever happen --*/
   if (sp->mousepos.x == sp->mousepos_o.x && sp->mousepos.y == sp->mousepos_o.y)
     return false;

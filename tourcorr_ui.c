@@ -354,6 +354,11 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   gboolean button1_p, button2_p;
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
+
+  /*-- if neither button is pressed, we shouldn't have gotten the event --*/
+  if (!button1_p && !button2_p)
+    return false;
+
   tourcorr_manip(sp->mousepos.x, sp->mousepos.y, sp, gg);
 
   return true;
