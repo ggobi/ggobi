@@ -43,8 +43,8 @@ extern gdouble erf (gdouble);  /*-- not defined on all unixes --*/
 #endif
 /* */
 
-static gchar *domain_error_message = "Data outside the domain of function.";
-static gchar *ldomain_error_message = "Limits outside the domain of function.";
+static const gchar * const domain_error_message = "Data outside the domain of function.";
+static const gchar * const ldomain_error_message = "Limits outside the domain of function.";
 
 #ifdef __cplusplus
 extern "C" {

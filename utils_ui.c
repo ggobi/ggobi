@@ -137,7 +137,7 @@ GtkWidget *CreateMenuCheck (GtkWidget *menu,
  * (Taken from the gtk documentation)
 */
 
-void quick_message (gchar *message, gboolean modal) {
+void quick_message (const gchar * const message, gboolean modal) {
 
   GtkWidget *dialog, *label, *okay_button;
     

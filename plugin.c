@@ -11,21 +11,21 @@ void ggobi_dlerror(char *buf, GGobiPluginDetails *plugin);
 int ggobi_dlclose(HINSTANCE handle);
 DLFUNC ggobi_dlsym(HINSTANCE handle, const char *name);
 
-static Dynload winDynload = { 
+static const Dynload winDynload = { 
                         ggobi_dlopen, 
                         ggobi_dlclose, 
                         ggobi_dlsym,  /* warning because we use const char * */
                         ggobi_dlerror};
-Dynload *dynload = &winDynload;
+const Dynload *dynload = &winDynload;
 
 #else
 
 #include <dlfcn.h>
-static Dynload unixDynload = { ggobi_dlopen, 
-                        dlclose, 
-                        dlsym,  /* warning because we use const char * */
-                        ggobi_dlerror};
-Dynload *dynload = &unixDynload;
+static const Dynload unixDynload = { ggobi_dlopen, 
+				     dlclose, 
+				     dlsym,  /* warning because we use const char * */
+				     ggobi_dlerror};
+const Dynload *dynload = &unixDynload;
 
 #endif
 
@@ -239,7 +239,7 @@ showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
    /* Number of entries here should be the same as in set_column_width below and 
       as the number of elements in addPlugin().
     */
- static const gchar *titles[] = {"Name", "Description", "Author", "Location", "Loaded", "Active"};
+ static const gchar * const titles[] = {"Name", "Description", "Author", "Location", "Loaded", "Active"};
 
   win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   main_vbox=gtk_vbox_new(FALSE,1);

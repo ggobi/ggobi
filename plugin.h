@@ -95,8 +95,6 @@ typedef struct {
 
 
 
-
-
 typedef gboolean (*OnLoad)(gboolean initializing, GGobiPluginInfo *plugin);
 typedef gboolean (*OnCreate)(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst);
 typedef gboolean (*OnClose)(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst);
@@ -116,7 +114,7 @@ typedef struct {
 
 
 
-extern Dynload *dynload;
+extern const Dynload *dynload;
 
 HINSTANCE load_plugin_library(GGobiPluginDetails *plugin);
 

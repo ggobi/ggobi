@@ -237,7 +237,7 @@ void       pipeline_init (datad *, ggobid *);
 gint       plotted_cols_get (gint *, datad *, ggobid *);
 void       populate_option_menu (GtkWidget *, gchar **, gint, GtkSignalFunc, ggobid *);
 void       position_popup_menu (GtkMenu *menu, gint *px, gint *py, gpointer);
-void       quick_message (gchar *, gboolean);
+void       quick_message (const gchar * const, gboolean);
 void       quit_ggobi(ggobid *gg, gint action, GtkWidget *w);
 void       range_unset (ggobid *gg);
 void       raw_to_tform_copy (void);
