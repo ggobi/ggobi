@@ -25,10 +25,6 @@
 static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp);
 static void ruler_down_cb (GtkWidget *w, GdkEventButton *event, splotd *sp);
 
-/*-- move these into displayd.h, probably, next to scatterplot stuff?  --*/
-static gfloat drag_start_x = 0;
-static gfloat drag_start_y = 0;
-
 void
 scatterplot_show_hrule (displayd *display, gboolean show) 
 {
@@ -306,9 +302,9 @@ static void ruler_down_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   displayd *display = (displayd *) sp->displayptr;
   if (w == display->hrule)
-    drag_start_x = event->x;
+    display->drag_start.x = event->x;
   else
-    drag_start_y = event->y;
+    display->drag_start.y = event->y;
 }
 
 static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
@@ -327,18 +323,18 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
     if (direction == HORIZONTAL) {
       gfloat scale_x;
-      gint dx = (gint) (event->x - drag_start_x);
+      gint dx = (gint) (event->x - display->drag_start.x);
       /*-- exactly as in pan_by_drag --*/
       scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
       scale_x /= 2;
       sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
       sp->pmid.x -= ((dx * PRECISION1) / sp->iscale.x);
       /* */
-      drag_start_x = event->x;
+      display->drag_start.x = event->x;
       redraw = true;
     } else {
       gfloat scale_y;
-      gint dy = -1 * (gint) (event->y - drag_start_y);
+      gint dy = -1 * (gint) (event->y - display->drag_start.y);
 
       /*-- exactly as in pan_by_drag --*/
       scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
@@ -347,7 +343,7 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       sp->pmid.y -= ((dy * PRECISION1) / sp->iscale.y);
       /* */
 
-      drag_start_y = event->y;
+      display->drag_start.y = event->y;
       redraw = true;
     }
 
@@ -365,12 +361,12 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       scale_x = (cpanel->projection == TOUR2D) ? &sp->tour_scale.x :
                                                  &sp->scale.x;
       if (ABS(event->x - mid.x) >= npix) {
-        scalefac.x = 
-          (gfloat) (event->x - mid.x) / (gfloat) (drag_start_x - mid.x);
+        scalefac.x = (gfloat) (event->x - mid.x) /
+                     (gfloat) (display->drag_start.x - mid.x);
         if (*scale_x * scalefac.x >= SCALE_MIN)
           *scale_x = *scale_x * scalefac.x;
 
-        drag_start_x = event->x;
+        display->drag_start.x = event->x;
         redraw = true;
       }
 
@@ -384,12 +380,12 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       scale_y = (cpanel->projection == TOUR2D) ? &sp->tour_scale.y :
                                                  &sp->scale.y;
       if (ABS(event->y - mid.y) >= npix) {
-        scalefac.y = 
-          (gfloat) (event->y - mid.y) / (gfloat) (drag_start_y - mid.y);
+        scalefac.y = (gfloat) (event->y - mid.y) /
+                     (gfloat) (display->drag_start.y - mid.y);
         if (*scale_y * scalefac.y >= SCALE_MIN)
           *scale_y = *scale_y * scalefac.y;
 
-        drag_start_y = event->y;
+        display->drag_start.y = event->y;
         redraw = true;
       }
     }

@@ -316,6 +316,9 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   display->e = NULL;
   display->embeddedIn = NULL;
 
+  /*-- for dragging in the rulers --*/
+  display->drag_start.x = display->drag_start.y = 0;
+
   display->t1d_manip_var = -1;
   display->t2d_manip_var = -1;
   display->tc1_manip_var = -1;

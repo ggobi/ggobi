@@ -55,6 +55,7 @@ struct _displayd {
 /*
  * For an individual scatterplot
 */
+  fcoords drag_start;
 
 
 /*
