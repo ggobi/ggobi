@@ -18,12 +18,16 @@ CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H $(EXTRA_CFLAGS)
 #CFLAGS= -g -w -DHAVE_CONFIG_H # when using Irix cc, suppress warnings
 CXXFLAGS=$(CFLAGS)
 
+ifndef GTK_CONFIG
+ GTK_CONFIG=gtk-config
+endif
+
 ifndef GTK_CFLAGS
- GTK_CFLAGS=`gtk-config --cflags`
+ GTK_CFLAGS=`$(GTK_CONFIG) --cflags`
 endif
 
 ifndef GTK_LIBS
- GTK_LIBS=`gtk-config --libs`
+ GTK_LIBS=`$(GTK_CONFIG) --libs`
 endif
 
 ifdef TEST_KEYS
