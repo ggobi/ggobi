@@ -371,6 +371,9 @@ varcircles_populate (datad *d, ggobid *gg)
 
   /* -- a drawing area to place next to the manip button as a color key --*/
   da = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+  gtk_widget_set_double_buffered(da, false);
+#endif
   gtk_drawing_area_size (GTK_DRAWING_AREA (da), 8, 8);
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da,
@@ -393,6 +396,9 @@ varcircles_populate (datad *d, ggobid *gg)
 #ifdef FREEZE_IMPLEMENTED
   /* -- a drawing area to place next to the freeze button as a color key --*/
   da = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+  gtk_widget_set_double_buffered(da, false);
+#endif
   gtk_drawing_area_size (GTK_DRAWING_AREA (da), 8, 8);
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da,
@@ -521,6 +527,9 @@ varcircle_create (gint j, datad *d, ggobid *gg)
 
   /*-- a drawing area to contain the variable circle --*/
   da = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+  gtk_widget_set_double_buffered(da, false);
+#endif
   d->vcirc_ui.da = g_slist_append (d->vcirc_ui.da, da);
   gtk_drawing_area_size (GTK_DRAWING_AREA (da),
                          VAR_CIRCLE_DIAM+2, VAR_CIRCLE_DIAM+2);

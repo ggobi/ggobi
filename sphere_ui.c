@@ -439,6 +439,9 @@ sphere_panel_open (ggobid *gg)
     gtk_container_add (GTK_CONTAINER (frame), vb);
  
     gg->sphere_ui.scree_da = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+    gtk_widget_set_double_buffered(gg->sphere_ui.scree_da, false);
+#endif
     gtk_drawing_area_size (GTK_DRAWING_AREA (gg->sphere_ui.scree_da),
       SCREE_WIDTH, SCREE_HEIGHT);
     gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.scree_da,

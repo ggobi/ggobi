@@ -755,6 +755,9 @@ make_symbol_window (ggobid *gg) {
  * display of glyph types and sizes
 */
     gg->color_ui.symbol_display = gtk_drawing_area_new (); 
+#if GTK_MAJOR_VERSION == 2
+    gtk_widget_set_double_buffered(gg->color_ui.symbol_display, false);
+#endif
 
     /*-- after this, margin is only used in determining y position --*/
     /*-- 2*(NGLYPHSIZES+1) is the size of the largest glyph --*/
@@ -793,6 +796,9 @@ make_symbol_window (ggobid *gg) {
  * the display of line types and widths
 */
     gg->color_ui.line_display = gtk_drawing_area_new (); 
+#if GTK_MAJOR_VERSION == 2
+    gtk_widget_set_double_buffered(gg->color_ui.line_display, false);
+#endif
 
     width = NEDGETYPES*gg->color_ui.spacing +     /*-- lines --*/
             (NEDGETYPES+1)*gg->color_ui.spacing;  /*-- space between --*/
@@ -834,6 +840,9 @@ make_symbol_window (ggobid *gg) {
     k = 0;
     for (i=0, j=0; i<MAXNCOLORS; i++) {
       gg->color_ui.fg_da[k] = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+    gtk_widget_set_double_buffered(gg->color_ui.fg_da[k], false);
+#endif
       gtk_object_set_data (GTK_OBJECT (gg->color_ui.fg_da[k]),
                            "index",
                            GINT_TO_POINTER (k));
@@ -878,6 +887,9 @@ make_symbol_window (ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (ebox), bg_table);
 
     gg->color_ui.bg_da = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+    gtk_widget_set_double_buffered(gg->color_ui.bg_da, false);
+#endif
     gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.bg_da),
       PSIZE, PSIZE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
@@ -910,6 +922,9 @@ make_symbol_window (ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (ebox), accent_table);
 
     gg->color_ui.accent_da = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+    gtk_widget_set_double_buffered(gg->color_ui.accent_da, false);
+#endif
     gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.accent_da),
       PSIZE, PSIZE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),

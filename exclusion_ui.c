@@ -354,6 +354,9 @@ void cluster_add(gint k, datad * d, ggobid * gg)
                                         /*-- use margin = 5 --*/
 
   d->clusvui[k].da = gtk_drawing_area_new();
+#if GTK_MAJOR_VERSION == 2
+  gtk_widget_set_double_buffered(d->clusvui[j].da, false);
+#endif
   gtk_drawing_area_size(GTK_DRAWING_AREA(d->clusvui[k].da),
                         dawidth, dawidth);
 

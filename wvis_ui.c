@@ -996,6 +996,9 @@ wvis_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
 */
     gg->wvis.da = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+    gtk_widget_set_double_buffered(gg->wvis.da, false);
+#endif
     gtk_drawing_area_size (GTK_DRAWING_AREA (gg->wvis.da), 400, 200);
     gtk_object_set_data (GTK_OBJECT (gg->wvis.da), "notebook", notebook);
     gtk_box_pack_start (GTK_BOX (vb), gg->wvis.da, false, false, 0);

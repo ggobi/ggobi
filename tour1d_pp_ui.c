@@ -478,6 +478,9 @@ tour1dpp_window_open (ggobid *gg) {
                         frame, true, true, 1);
 
     dsp->t1d_ppda = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+    gtk_widget_set_double_buffered(dsp->t1d_ppda, false);
+#endif
     gtk_drawing_area_size (GTK_DRAWING_AREA (dsp->t1d_ppda), WIDTH, HEIGHT);
     gtk_signal_connect (GTK_OBJECT (dsp->t1d_ppda),
                         "configure_event",

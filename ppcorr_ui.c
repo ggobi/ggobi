@@ -124,6 +124,9 @@ ctourpp_window_open (ggobid *gg)
                         frame, true, true, 1);
 
     da = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+    gtk_widget_set_double_buffered(da, false);
+#endif
     gtk_drawing_area_size (GTK_DRAWING_AREA (da), WIDTH, HEIGHT);
     gtk_container_add (GTK_CONTAINER (frame), da);
   }
