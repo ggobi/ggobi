@@ -333,6 +333,11 @@ varcircleDraw(displayd *display, gint jvar, GdkPixmap *da_pix, ggobid *gg)
       }
     break;
 
+
+
+
+
+
     /*      } 
       else {
 
@@ -1171,8 +1176,10 @@ worldToPlane(splotd *sp, datad *d, ggobid *gg)
 static gboolean
 drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
 {
+  displayd *display = sp->displayptr;
   gboolean draw_case = true;
   gint proj = projection_get (gg);
+  gint j;
 
   switch (proj) {
     case P1PLOT:
@@ -1186,23 +1193,45 @@ drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
         draw_case = false;
     break;
     case TOUR1D:
-      if (d->missing.vals[m][sp->displayptr->t1d.active_vars.els[m]])
-        draw_case = false;
+      for (j=0; j<display->t1d.nactive; j++) {
+        if (d->missing.vals[m][display->t1d.active_vars.els[j]]) {
+          draw_case = false;
+          break;
+        }
+      }
     break;
     case TOUR2D3:
-      if (d->missing.vals[m][sp->displayptr->t2d3.active_vars.els[m]])
-        draw_case = false;
+      for (j=0; j<display->t2d3.nactive; j++) {
+        if (d->missing.vals[m][display->t2d3.active_vars.els[j]]) {
+          draw_case = false;
+          break;
+        }
+      }
     break;
     case TOUR2D:
-      if (d->missing.vals[m][sp->displayptr->t2d.active_vars.els[m]])
-        draw_case = false;
+      for (j=0; j<display->t2d.nactive; j++) {
+        if (d->missing.vals[m][display->t2d.active_vars.els[j]]) {
+          draw_case = false;
+          break;
+        }
+      }
     break;
 
     case COTOUR:
-      if (d->missing.vals[m][sp->displayptr->tcorr1.active_vars.els[m]])
-        draw_case = false;
-      else if (d->missing.vals[m][sp->displayptr->tcorr2.active_vars.els[m]])
-        draw_case = false;
+      for (j=0; j<display->tcorr1.nactive; j++) {
+        if (d->missing.vals[m][display->tcorr1.active_vars.els[j]]) {
+          draw_case = false;
+          break;
+        }
+      }
+      if (draw_case) {
+        for (j=0; j<display->tcorr2.nactive; j++) {
+          if (d->missing.vals[m][display->tcorr2.active_vars.els[j]]) {
+            draw_case = false;
+            break;
+          }
+	}
+      }
     break;
   }
 
