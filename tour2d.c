@@ -145,7 +145,6 @@ tour2d_idle_func (ggobid *gg)
   return (doit);
 }
 
-/*static gint idled = 0;  *-- could be at display level --*/
 void tour2d_func (gboolean state, ggobid *gg)
 {
   displayd *dsp = gg->current_display; 

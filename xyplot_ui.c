@@ -17,7 +17,6 @@
 #include "vars.h"
 #include "externs.h"
 
-
 static const gchar *const fix_axis_lbl[] = {"No fixed axes", "Fix X", "Fix Y"};
 static void fix_axis_cb (GtkWidget *w, gpointer cbd)
 {

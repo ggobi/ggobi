@@ -91,6 +91,9 @@ make_control_panels (ggobid *gg) {
 void
 main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w) 
 {
+  GSList *l;
+  datad *d;
+
   if (gg->mode_frame == NULL)  /* so it isn't executed on startup */
     return;
   else
@@ -128,10 +131,18 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
             }
           }
         }
-
       }
-      break;
+    break;
 
+    case 3:
+      gg->varpanel_ui.layoutByRow = !gg->varpanel_ui.layoutByRow;
+      for (l = gg->d; l; l = l->next) {
+        d = (datad *) l->data;
+        varcircles_layout_reset (d, gg);
+      }
+    break;
+
+/*
     case 3:
       g_printerr ("toggle gridlines\n");
       break;
@@ -147,6 +158,7 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
     case 7:
       g_printerr ("toggle plotting directed lines\n");
       break;
+*/
   }
 }
 
@@ -553,6 +565,16 @@ static GtkItemFactoryEntry menu_items[] = {
        "<ctrl>p",   
        (GtkItemFactoryCallback) main_display_options_cb,
        1,
+       "<CheckItem>" },
+  { "/Display/Show _axes",  
+       "<ctrl>a",   
+       (GtkItemFactoryCallback) main_display_options_cb,
+       2,
+       "<CheckItem>" },
+  { "/Display/Lay out variable circles by _row",  
+       "<ctrl>r",   
+       (GtkItemFactoryCallback) main_display_options_cb,
+       3,
        "<CheckItem>" },
   { "/Display/sep",  
        NULL,    

@@ -139,7 +139,7 @@ class datad {
    /*-- widgets for the richest modes: variable circles --*/
    GtkWidget *table;    /*-- replaces the vbox for circles --*/
    gint tnrows, tncols; /*-- table dimensions --*/
-   GtkWidget **da, **label;
+   GtkWidget **vb, **da, **label;
    GdkPixmap **da_pix;  /*-- backing pixmaps --*/
 
    /*-- don't know if I need this, but it may be useful --*/

@@ -328,6 +328,7 @@ struct _ggobid {
    GtkWidget *notebook;
    /*GtkAccelGroup *varpanel_accel_group;*/
    GtkTooltips *tips;
+   gboolean layoutByRow;
  } varpanel_ui;
 
 

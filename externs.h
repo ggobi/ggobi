@@ -13,6 +13,8 @@ extern datad *datad_new(datad *d, ggobid *gg);
 extern "C" {
 #endif
 
+extern void varcircles_layout_reset (datad *, ggobid *);
+extern void varsel (cpaneld *, splotd *, gint jvar, gint btn, gint alt_mod, gint ctrl_mod, gint shift_mod, datad *, ggobid *);
 extern void display_set_position (displayd *d, ggobid *gg);
 extern void rotation_menus_make (ggobid *);
 extern void scale_menus_make (ggobid *);
