@@ -159,6 +159,15 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
     sp_event_handlers_toggle (sp, state);
     mode_activate (sp, cpanel->mode, state, gg);
     mode_submenus_activate (sp, cpanel->mode, state, gg);
+
+    if (state == on) {
+      /*
+       * this is now the only place vartable_refresh is called in
+       * changing the current display and splot; we'll see if it's
+       * adequate
+      */
+      vartable_refresh (gg->current_display->d, gg);
+    }
   }
 }
 
@@ -168,7 +177,7 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
   splotd *sp_prev = gg->current_splot;
   if (sp != sp_prev) {
 
-   if(sp_prev != NULL) {
+   if (sp_prev != NULL) {
     splot_set_current (sp_prev, off, gg);
 
     if (gg->current_display != display)

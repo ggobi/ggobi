@@ -435,7 +435,9 @@ display_set_current (displayd *new_display, ggobid *gg)
   gg->current_display = new_display;
   cpanel_set (gg->current_display, gg);
 
+/*
   vartable_refresh (gg->current_display->d, gg);
+*/
 
   gtk_accel_group_lock (gg->main_accel_group);
   gg->firsttime = false;
