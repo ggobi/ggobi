@@ -1,0 +1,82 @@
+PKG_NAME=ggobi
+
+USE_XML=1
+USE_MYSQL=1
+
+createDist:
+
+TMP_INSTALL_DIR=/tmp/Install/ggobi
+
+
+PDFLATEX=pdflatex
+TAR=tar
+
+DIRS=\
+   src include lib bin Docs data
+
+
+DATA_SRC_FILES=\
+   flea.col flea.colors flea.dat flea.doc flea.glyphs flea.row \
+   flea.xml \
+   ratcns.xml \
+   sat.xml \
+   stdColorMap.xml
+
+DATA_FILES=$(DATA_SRC_FILES:%=data/%)
+
+
+DOC_TEX_FILES=\
+    DBMS Embedded RGGobi XML \
+
+DOC_FILES=$(DOC_TEX_FILES:%=notes/%.pdf) notes/ggobi.css
+
+C_SRC_FILES=$(SRC) $(XML_SRC) 
+
+C_HEADER_FILES=\
+  GGobiAPI cpanel datad defines display display_tree \
+  externs ggobi noop-checkbutton read_mysql read_xml  \
+  splot types vars varseldata write_xml writedata 
+
+Install/configure: Install/configure.in
+	(cd Install ; autoconf)
+
+createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
+	if test -d $(TMP_INSTALL_DIR) ; then rm -fr $(TMP_INSTALL_DIR) ; fi
+	for d in $(DIRS) ; do \
+	   mkdir -p $(TMP_INSTALL_DIR)/$$d ; \
+	done
+	cp LICENSING/ATT_minterms LICENSING/ATT_source_code_agreement_1.1 $(TMP_INSTALL_DIR)
+	cp Install/GNUmakefile.all $(TMP_INSTALL_DIR)/GNUmakefile
+	cp Install/configure.in Install/configure Install/GNUmakefile.in Makefile.win32 $(TMP_INSTALL_DIR)/src
+	cp $(DOC_FILES) $(TMP_INSTALL_DIR)/Docs
+	cp $(DATA_FILES) $(TMP_INSTALL_DIR)/data
+	cp $(C_SRC_FILES) $(TMP_INSTALL_DIR)/src
+	cp $(C_HEADER_FILES:%=%.h) $(TMP_INSTALL_DIR)/include
+
+
+
+
+%.pdf: %.tex
+	(cd $(@D) ; TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $(<F))
+
+
+
+GTK_EXTRA_SRC= gtkextruler.c   gtkexthruler.c   gtkextvruler.c 
+LGPL_HEADERS= $(GTK_EXTRA_SRC:%.c=%.h)
+LGPL_SRC=$(GTK_EXTRA_SRC) mt19937-1.c
+
+CUR_DIR=$(shell pwd)
+
+tmp:
+	@echo "$(CUR_DIR)"
+
+lgpl lgpl.tar.gz:
+	if test ! -d $(TMP_INSTALL_DIR) ; then mkdir -p $(TMP_INSTALL_DIR) ; fi
+	cp $(LGPL_SRC) $(TMP_INSTALL_DIR)/src
+	cp $(LGPL_HEADERS) $(TMP_INSTALL_DIR)/include
+	(cd $(TMP_INSTALL_DIR)/.. ; $(TAR) zcvf $(CUR_DIR)/lgpl.tar.gz $(LGPL_SRC:%=$(PKG_NAME)/src/%) $(LGPL_HEADERS:%=$(PKG_NAME)/include/%))
+
+
+
+tar $(PKG_NAME).tar.gz: createDist
+	(cd $(TMP_INSTALL_DIR)/.. ; $(TAR) zcvf $(CUR_DIR)/$(PKG_NAME).tar.gz $(PKG_NAME))
