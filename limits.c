@@ -220,7 +220,7 @@ limits_tform_set_by_var (gint j, datad *d, ggobid *gg)
 }
 
 /*-- this version of the limits never includes missings --*/
-static void
+void
 limits_display_set_by_var (gint j, datad *d, ggobid *gg)
 {
   gint i, m, np = 0;

@@ -1144,11 +1144,61 @@ GGOBI(getColorName)(gint cid, ggobid *gg, gboolean inDefault)
 }
 
 
+/*-- this is really addRealVariable --*/
 gint
-GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update, 
-  datad *d, ggobid *gg)
+GGOBI(addVariable)(gdouble *vals, gint num, gchar *name,
+  gboolean update, datad *d, ggobid *gg)
 {
   gint i;
+
+  if (d->ncols < 1) {
+    gchar ** rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
+    for (i = 0; i < num; i++) {
+      rnames[i] = (gchar *) g_malloc (sizeof (gchar)*7);
+      rnames[i] = g_strdup_printf ("%d", i+1);
+/*    sprintf(rnames[i],"%d",i+1);*/
+    }
+    /* May want the final false here to be true as it causes the 
+       creation of a plot. Probably not, but just mention it here
+       so we don't forget.
+     */
+    GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg, NULL, false, d->input);
+    for (i = 0; i < num; i++)
+      g_free (rnames[i]);
+    g_free (rnames);
+  } else {
+    if (num > d->nrows) {
+      num = d->nrows;
+      /* Add a warning here. */
+    }
+    newvar_add_with_values (vals, num, name,
+      real, 0, NULL, NULL, NULL,
+      d, gg);
+  }
+
+  if (update)
+    gdk_flush();
+
+  return (d->ncols - 1);  /*-- incremented by clone_vars --*/
+}
+
+/*
+It's hard to get the sequence right of adding a variable, updating its
+data, updating the variable table structure, setting the variable's type,
+emitting an event saying that a variable has been added, and updating the
+GUI.   ....  This works for now, but the code is not pretty.  We're making
+only very limted use of the event we emit.    dfs  2/7
+*/
+gint
+GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
+  gchar **levels, gint *values, gint *counts, gint numLevels,
+  gboolean update, datad *d, ggobid *gg)
+{
+  gint i;
+/*
+  int ans;
+  ans = GGOBI(addVariable)(vals, num, name, false, d, gg);
+*/
 
   if (d->ncols < 1) {
     gchar ** rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
@@ -1170,47 +1220,15 @@ GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update,
       num =  d->nrows;
       /* Add a warning here. */
     }
-    newvar_add_with_values (vals, num, name, d, gg);
+    newvar_add_with_values (vals, num, name,
+      categorical, numLevels, levels, values, counts,
+      d, gg);
   }
 
-  if (update)
-    gdk_flush();
-
-  return (d->ncols - 1);  /*-- incremented by clone_vars --*/
-}
-
-gint
-GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name, gchar **levels, gint *values, gint *counts, gint numLevels,
-			      gboolean update, datad *d, ggobid *gg)
-{
-  int ans;
-  vartabled *vt;
-  ans = GGOBI(addVariable)(vals, num, name, false, d, gg);
-  vt = vartable_element_get(ans, d);
-  if(vt) {
-     int i;
-     vt->vartype = categorical;
-     vt->nlevels = numLevels;
-     vt->level_names = (gchar **) g_malloc(sizeof(gchar*) * numLevels);
-     vt->level_values = (gint *) g_malloc(sizeof(gint) * numLevels);
-     vt->level_counts = (gint *) g_malloc(sizeof(gint) * numLevels);
-     for(i = 0 ; i < numLevels; i++) {
-        vt->level_names[i] = g_strdup(levels[i]);
-	if(counts)
- 	    vt->level_counts[i] = counts[i];
-	if(values)
-   	    vt->level_values[i] = values[i];
-     }
-     if(!counts) {
-        for(i = 0; i < num ; i++) {
-    	   vt->level_counts[i] = i;
-	}
-     }
-  }
   if(update)
     gdk_flush();
 
-  return(ans);
+  return(d->ncols-1);
 }
 
 

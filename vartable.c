@@ -274,6 +274,33 @@ void vartable_init (datad *d)
     vartable_element_new (d);
 }
 
+void
+vartable_element_categorical_init (vartabled *vt,
+  gint nlevels, gchar **level_names, gint *level_values, gint *level_counts)
+{
+  gint i;
+  if(vt) {
+    vt->vartype = categorical;
+    vt->nlevels = nlevels;
+    vt->level_names = (gchar **) g_malloc(sizeof(gchar*) * nlevels);
+    vt->level_values = (gint *) g_malloc(sizeof(gint) * nlevels);
+    vt->level_counts = (gint *) g_malloc(sizeof(gint) * nlevels);
+    for(i = 0 ; i < nlevels; i++) {
+      vt->level_names[i] = g_strdup(level_names[i]);
+      if (level_counts)
+        vt->level_counts[i] = level_counts[i];
+      if (level_values)
+   	    vt->level_values[i] = level_values[i];
+   }
+   if (!level_counts) {
+      for(i = 0; i < nlevels; i++) {
+        vt->level_counts[i] = i;
+        vt->level_values[i] = i;
+      }
+    }
+  }
+}
+
 /*-------------------------------------------------------------------------*/
 /*                 finding the statistics for the table                    */
 /*-------------------------------------------------------------------------*/

@@ -393,7 +393,7 @@ static void
 vartable_subwindow_init (datad *d, ggobid *gg)
 {
   gint j, k;
-  GtkWidget *scrolled_window, *ebox, *wlbl;
+  GtkWidget *scrolled_window, *wlbl;
   gchar *lbl;
   gchar *titles[NCOLS_CLIST_REAL] = {
     "varno",          /*-- varno will be an invisible column --*/
@@ -457,13 +457,20 @@ vartable_subwindow_init (datad *d, ggobid *gg)
                                       k, true);
 
   gtk_container_add (GTK_CONTAINER (scrolled_window), d->vartable_clist[real]);
+  wlbl = gtk_label_new("real");
+/*
+This works for showing tooltips in the tabs, but unfortunately it
+interferes with the normal operation of the widget -- I can't switch
+pages any more!
+  GtkWidget *ebox;
   ebox = gtk_event_box_new ();
-  wlbl = (gtk_label_new("real"));
   gtk_container_add (GTK_CONTAINER (ebox), wlbl);
   gtk_widget_show(wlbl);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
     "Table of statistics for real, integer and counter variables", NULL);
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, ebox);
+*/
+  gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, wlbl);
 
 
   gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
@@ -498,13 +505,16 @@ vartable_subwindow_init (datad *d, ggobid *gg)
 
   gtk_container_add (GTK_CONTAINER (scrolled_window),
     d->vartable_clist[categorical]);
+  wlbl = gtk_label_new("categorical");
+/*
   ebox = gtk_event_box_new ();
-  wlbl = (gtk_label_new("categorical"));
   gtk_container_add (GTK_CONTAINER (ebox), wlbl);
   gtk_widget_show(wlbl);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
     "Table of statistics for categorical variables", NULL);
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, ebox);
+*/
+  gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, wlbl);
 
   /*-- 3 = COLUMN_INSET --*/
   gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
@@ -512,8 +522,6 @@ vartable_subwindow_init (datad *d, ggobid *gg)
     GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
     150);
   gtk_widget_show (scrolled_window);
-
-
 
   /*-- populate the tables --*/
   for (j=0 ; j<d->ncols ; j++) {

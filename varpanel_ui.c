@@ -378,6 +378,23 @@ varpanel_widgets_add (gint nc, datad *d, ggobid *gg)
 }
 
 /*-------------------------------------------------------------------------*/
+/*                  handle the addition of new variables                   */
+/*-------------------------------------------------------------------------*/
+
+void 
+varpanel_addvar_cb (ggobid *gg, vartabled *vt, gint which,
+  datad *d, void *p)
+{
+  /*-- variable toggle buttons and circles --*/
+  varpanel_widgets_add (d->ncols, d, gg);
+  varcircles_add (d->ncols, d, gg);
+
+  /*-- make sure the right toggle widgets and circles are showing --*/
+  varpanel_refresh (gg->current_display, gg);
+  varcircles_visibility_set (gg->current_display, gg);
+}
+
+/*-------------------------------------------------------------------------*/
 /*                  initialize and populate the var panel                  */
 /*-------------------------------------------------------------------------*/
 
@@ -399,6 +416,10 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
 
   gtk_box_pack_start (GTK_BOX (parent), gg->varpanel_ui.notebook,
     true, true, 2);
+
+  /*-- prepare to respond to variable_added events --*/
+  gtk_signal_connect (GTK_OBJECT (gg), "variable_added",
+    GTK_SIGNAL_FUNC (varpanel_addvar_cb), NULL);
 
   gtk_widget_show (gg->varpanel_ui.notebook);
 }

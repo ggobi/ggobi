@@ -48,13 +48,27 @@ addvar_pipeline_realloc (datad *d, ggobid *gg)
   missing_arrays_add_cols (d, gg);
 }
 
-static void
-addvar_propagate (gint ncols_prev, gint ncols, datad *d, ggobid *gg)
+/* XXX this routine just should not exist.  The appropriate elements
+   should be responding to the variable_added routine.  But that could
+   be messy, too, because they have to respond in a particular order ..
+   Oh man ...
+
+  gtk_signal_connect (GTK_OBJECT (gg),
+                      "variable_added", 
+                      GTK_SIGNAL_FUNC (variable_notebook_varchange_cb),
+                      GTK_OBJECT (notebook));
+
+void 
+variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
+  datad *data, void *notebook)
+*/
+void
+addvar_propagate (gint ncols_prev, gint ncols_added, datad *d, ggobid *gg)
 {
   gint j, k, jvar;
   vartabled *vt;
 
-  for (j=0; j<ncols; j++) {
+  for (j=0; j<ncols_added; j++) {
     jvar = ncols_prev + j;  /*-- its new index --*/
 
     /*-- update the clist widget (the visible table) --*/
@@ -67,20 +81,9 @@ addvar_propagate (gint ncols_prev, gint ncols, datad *d, ggobid *gg)
         vartable_row_append (jvar, d, gg);
 
     vartable_cells_set_by_var (jvar, d);  /*-- then populate --*/
-
-    /*-- run the data through the head of the pipeline --*/
-    tform_to_world_by_var (jvar, d, gg);
   }
 
-  /*-- variable toggle buttons and circles --*/
-  varpanel_widgets_add (d->ncols, d, gg);
-  varcircles_add (d->ncols, d, gg);
-
-  /*-- make sure the right toggle widgets and circles are showing --*/
-  varpanel_refresh (gg->current_display, gg);
-  varcircles_visibility_set (gg->current_display, gg);
-
-  /*-- in case some datad now have variables and it didn't before --*/
+  /*-- in case some datad now has variables and it didn't before --*/
   display_menu_build (gg);
 }
 
@@ -123,6 +126,9 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
        level names could be color and glyph names if we had them --*/
   /*-- --*/
 
+  /*-- run the data through the head of the pipeline --*/
+  tform_to_world_by_var (jvar, d, gg);
+
   addvar_propagate (d_ncols_prev, 1, d, gg);
 
   /*-- emit variable_added signal --*/
@@ -137,6 +143,9 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
 */
 void
 newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
+  vartyped type,
+    /*-- if categorical, we need ... --*/
+    gint nlevels, gchar **level_names, gint *level_values, gint *level_counts,
   datad *d, ggobid *gg)
 {
   gint i;
@@ -147,22 +156,30 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   if (nvals != d->nrows)
     return;
 
-  addvar_vartable_expand (1, d, gg);  /*-- add one variable --*/
+  vartable_element_new (d);
+  vt = vartable_element_get (jvar, d);
+  if (type == categorical)
+    vartable_element_categorical_init (vt, nlevels, level_names,
+      level_values, level_counts);
+  transform_values_init (jvar, d, gg);
 
   d->ncols += 1;
   addvar_pipeline_realloc (d, gg);
 
-  vt = vartable_element_get (jvar, d);
-
   for (i=0; i<d->nrows; i++) {
-      if(GGobiMissingValue && GGobiMissingValue(vals[i]))
-         setMissingValue(i, jvar, d, vt);
-      else
-	  d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
+    if(GGobiMissingValue && GGobiMissingValue(vals[i]))
+      setMissingValue(i, jvar, d, vt);
+    else
+      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
   }
   
   /*-- update the vartable struct --*/
   limits_set_by_var (jvar, true, true, d, gg);
+  limits_display_set_by_var (jvar, d, gg);
+g_printerr ("jvar %d tform min %f display min %f\n",
+jvar, vt->lim_tform.min, vt->lim_display.min);
+  /*-- run the data through the head of the pipeline --*/
+  tform_to_world_by_var (jvar, d, gg);
 
   vt->collab = vt->collab_tform = g_strdup (vname);
   vt->nickname = g_strndup (vname, 2);
@@ -170,9 +187,12 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
 
   addvar_propagate (d_ncols_prev, 1, d, gg);
 
+/* XXX be careful:  this could be emitted before the variable type
+       is set.
+*/
   /*-- emit variable_added signal --*/
   gtk_signal_emit (GTK_OBJECT (gg),
-                   GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, d->ncols -1, d); 
+    GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, d->ncols -1, d); 
 }
 
 void
