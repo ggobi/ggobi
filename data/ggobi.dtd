@@ -89,6 +89,7 @@
 
 <!ATTLIST variable
     name          NMTOKEN #IMPLIED
+    nickname      NMTOKEN #IMPLIED
     transformName NMTOKEN #IMPLIED
     missingValue  CDATA   #IMPLIED
     group         CDATA   #IMPLIED
@@ -99,6 +100,7 @@
 
 <!ATTLIST realvariable
     name          CDATA   #IMPLIED
+    nickname      NMTOKEN #IMPLIED
     transformName CDATA   #IMPLIED
     missingValue  CDATA   #IMPLIED
     group         CDATA   #IMPLIED
@@ -111,6 +113,7 @@
 
 <!ATTLIST categoricalvariable
     name          NMTOKEN #IMPLIED
+    nickname      NMTOKEN #IMPLIED
     transformName NMTOKEN #IMPLIED
     missingValue  CDATA   #IMPLIED
     group         CDATA   #IMPLIED
