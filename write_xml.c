@@ -142,7 +142,8 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
 
   if (vt->categorical_p) {
     gint k;
-    fprintf(f, "  <categoricalvariable name=\"%s\">\n", vt->collab);
+    fprintf(f, "  <categoricalvariable name=\"%s\">\n",
+      (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
     fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
     for (k=0; k<vt->nlevels; k++) {
       fprintf(f, "      <level value=\"%d\"> %s </level>\n",
@@ -152,7 +153,8 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
     fprintf(f, "    </levels>\n");
     fprintf(f, "  </categoricalvariable>");
   } else {
-    fprintf(f, "  <realvariable name=\"%s\" />", vt->collab);
+    fprintf(f, "  <realvariable name=\"%s\" />",
+      (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
   }
 
   return(true);
@@ -198,6 +200,7 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  gint i, m, n;
 
+
 /*
  * if saving visible records only, find out how many there are
 */
@@ -231,6 +234,7 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
    fprintf(f, " color=\"%s\"", xmlWriteInfo->defaultColorName);
  }
  fprintf(f, ">\n");
+
 
  if (gg->save.row_ind == ALLROWS) {
    for (i = 0; i < d->nrows; i++) {
@@ -341,19 +345,23 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
 
   if (gg->save.column_ind == ALLCOLS) {
     for(j = 0; j < d->ncols; j++) {
-      writeFloat (f, d->raw.vals[i][j]);
+      /*writeFloat (f, d->raw.vals[i][j]);*/
+      writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
+                                                     d->raw.vals[i][j]);
       if (j < d->ncols-1 )
         fprintf(f, " ");
      }
-   } else if (gg->save.column_ind == SELECTEDCOLS) {
-     /*-- work out which columns to save --*/
-     gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-     gint ncols = selected_cols_get (cols, d, gg);
-     for(j = 0; j < ncols; j++) {
-       writeFloat (f, d->raw.vals[i][cols[j]]);
-       if (j < ncols-1 )
-         fprintf(f, " ");
-      }
+  } else if (gg->save.column_ind == SELECTEDCOLS) {
+    /*-- work out which columns to save --*/
+    gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+    gint ncols = selected_cols_get (cols, d, gg);
+    for(j = 0; j < ncols; j++) {
+      /*writeFloat (f, d->raw.vals[i][cols[j]]);*/
+      writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
+                                                     d->raw.vals[i][cols[j]]);
+      if (j < ncols-1 )
+        fprintf(f, " ");
+     }
      g_free (cols);
    }
 

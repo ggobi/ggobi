@@ -131,6 +131,8 @@ writeall_window_open (ggobid *gg) {
       sizeof (format_lbl) / sizeof (gchar *), (GtkSignalFunc) format_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       XMLDATA);
+    /*-- initialize variable to correspond to option menu --*/
+    gg->save.format = XMLDATA;
 
     gtk_table_attach (GTK_TABLE (table),
       gtk_label_new ("Format:"),
@@ -148,6 +150,8 @@ writeall_window_open (ggobid *gg) {
       sizeof (stage_lbl) / sizeof (gchar *), (GtkSignalFunc) stage_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       TFORMDATA);
+    /*-- initialize variable to correspond to option menu --*/
+    gg->save.stage = TFORMDATA;
 
     gtk_table_attach (GTK_TABLE (table),
       gtk_label_new ("Stage:"),
@@ -185,6 +189,8 @@ writeall_window_open (ggobid *gg) {
       (GtkSignalFunc) rowind_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       ALLROWS);
+    /*-- initialize variable to correspond to option menu --*/
+    gg->save.row_ind = ALLROWS;
 
     gtk_table_attach (GTK_TABLE (table),
       gtk_label_new ("Cases:"),
@@ -202,6 +208,8 @@ writeall_window_open (ggobid *gg) {
       sizeof (columndata_lbl) / sizeof (gchar *), (GtkSignalFunc) columnind_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       ALLCOLS);
+    /*-- initialize variable to correspond to option menu --*/
+    gg->save.column_ind = ALLCOLS;
 
     gtk_table_attach (GTK_TABLE (table),
       gtk_label_new ("Variables:"),
@@ -216,9 +224,12 @@ writeall_window_open (ggobid *gg) {
       "Specify how to write out missing data",
       NULL);
     populate_option_menu (opt, missing_lbl,
-      sizeof (missing_lbl) / sizeof (gchar *), (GtkSignalFunc) missingind_set_cb, gg);
+      sizeof (missing_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) missingind_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       MISSINGSNA);
+    /*-- initialize variable to correspond to option menu --*/
+    gg->save.missing_ind = MISSINGSNA;
 
     gtk_table_attach (GTK_TABLE (table),
       gtk_label_new ("Format for missings:"),
@@ -236,6 +247,8 @@ writeall_window_open (ggobid *gg) {
       sizeof (edges_lbl) / sizeof (gchar *), (GtkSignalFunc) edgesp_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       false);
+    /*-- initialize variable to correspond to option menu --*/
+    gg->save.edges_p = false;
 
     gtk_table_attach (GTK_TABLE (table),
       gtk_label_new ("Edges?:"),
