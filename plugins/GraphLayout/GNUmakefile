@@ -21,35 +21,14 @@ else
  CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
 endif
 
-#GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
-GGOBI_LIB=
-
+GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
+#GGOBI_LIB=
 
 ifdef GRAPHVIZ
-GVINC=-I$(GVIZ_INC) -I$(GVIZ_SRC) -I$(GVIZ_SRC)/dotneato/common
-GVLIB=$(GVIZ_LIB)
-
 CFLAGS+=-Wno-unknown-pragmas
-CFLAGS+= -DGRAPHVIZ=1 $(GVINC)
-LDFLAGS+=-L$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan
-LDFLAGS+=$(GVLIB)/libgd.a
-LDFLAGS+=-L$(GVLIB) -lcdt $(GVIZ_EXTLIB_LIB)
-endif
-
-ifdef BINARY_IO_IMPLEMENTED
-  CFLAGS+= -DBINARY_IO_IMPLEMENTED=1
-endif
-ifdef INFERENCE_IMPLEMENTED
-  CFLAGS+= -DINFERENCE_IMPLEMENTED=1
-endif
-ifdef SMOOTH_IMPLEMENTED
-  CFLAGS+= -DSMOOTH_IMPLEMENTED=1
-endif
-ifdef TS_EXTENSIONS_IMPLEMENTED
-  CFLAGS+= -DTS_EXTENSIONS_IMPLEMENTED=1
-endif
-ifdef BARCHART_IMPLEMENTED
-  CFLAGS+= -DBARCHART_IMPLEMENTED
+CFLAGS+= -DGRAPHVIZ=1 -I$(GVINC)
+LDFLAGS+=-L$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan -lgd -lcdt
+LDFLAGS+=$(GVIZ_EXTLIB_LIB)
 endif
 
 HEADERS=glayout defines

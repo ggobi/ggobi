@@ -4,24 +4,20 @@ concentric circles, with the first node in the list appearing at the
 center.
 
 In order to use two more layout methods, pick up the graphviz package
-from www.graphviz.org.  I use the official AT&T release, but I hear
-the anonymous cvs release should also be fine.
+from www.graphviz.org/pub/graphviz.  I just (September 9, 2002) tested
+the build process using graphviz-current.tar.gz, and it's working well.
 
 When you build it, instead of using configure and gmake, follow the
-instructions in graphviz/INSTALL.old, which does a better job of
-building the libraries we need.
+instructions in graphviz/INSTALL.old, which does a better job of building
+and installing the libraries and include files we need.
 
-Even so, graphviz was not designed with this usage in mind, and until
-the graphviz authors catch up to us, the include files and libraries
-you need may end up in a few different directories.  Here's a portion
-of a local.config file that works on linux:
+Here are the lines I use in my local.config file under linux:
 
 GRAPHVIZ = 1
 GVIZ_ARCH=linux.i386
 GVIZ=/usr/local/lib/graphviz
-GVIZ_INC=$(GVIZ)/include
-GVIZ_LIB=$(GVIZ)/build/$(GVIZ_ARCH)/lib
-GVIZ_SRC=/usr/local/src/graphviz-1.8.5
+GVINC=$(GVIZ)/include
+GVLIB=$(GVIZ)/lib
 
 GVIZ_EXTLIB_INC=-I/usr/include/freetype2
 GVIZ_EXTLIB_LIB=-ljpeg -lpng -lfreetype -lz

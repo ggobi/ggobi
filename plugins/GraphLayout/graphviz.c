@@ -13,9 +13,11 @@
 #include <gvconfig.h>
 #include <render.h>
 #include <graph.h>
-#include <dotneato/dotgen/dotprocs.h>
-#include <dotneato/neatogen/neatoprocs.h>
-#include <dotneato/neatogen/adjust.h>
+#include <dotprocs.h>
+#include <neatoprocs.h>
+/*
+#include <adjust.h>
+*/
 
 #define DOT_LAYOUT   0
 #define NEATO_LAYOUT 1
@@ -23,7 +25,7 @@
 #define DATE    "June 2002"
 #define VERSION "huh?"
 char *Info[] = {
-    "glayout",              /* Program */
+    "glayout",            /* Program */
     VERSION,              /* Version */
     DATE                  /* Build Date */
 };
