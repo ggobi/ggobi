@@ -74,7 +74,9 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES) CmdArgHelp.c
 	for d in $(DIRS) ; do \
 	   mkdir -p $(TMP_INSTALL_DIR)/$$d ; \
 	done
+ifndef NO_XGOBI_GROUP
 	chgrp -R xgobi $(TMP_INSTALL_DIR)
+endif
 	chmod -R g+w $(TMP_INSTALL_DIR)
 	cp $(LICENSES:%=LICENSING/%) Install/INSTALL Install/README Install/INSTALL-xml.html $(TMP_INSTALL_DIR)
 	cp Install/configure.in Install/configure  Install/Makeconf.in Install/GNUmakefile.in $(TMP_INSTALL_DIR)
