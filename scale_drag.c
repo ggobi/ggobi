@@ -46,7 +46,7 @@ pan_by_drag (splotd *sp, ggobid *gg)
 }
 
 /*
- * scale_style == DRAG and button 2 is pressed; we are zooming. 
+ * scale_style == DRAG and button 2 (or 3) is pressed; we are zooming. 
  * The mouse has moved to sp->mousepos from sp->mousepos_o and the center
  * of the figure is at sp->mid.  Change sp->scale by the
  * appropriate amounts.
