@@ -179,26 +179,29 @@ p1d_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
 /*---------------------------------------------------------------------*/
 
 void
-p1d_build_segments (splotd *sp, ggobid *gg)
+p1d_ash_baseline_set (splotd *sp)
 {
-}
+  gfloat ftmp, precis = (gfloat) PRECISION1;
+  glong pl, ltmp;
+  gint iscr;
 
-/*
- * If drawing an ASH in a scatterplot or scatterplot display,
- * then it may become possible to add line segments ...
-*/
-void
-add_p1d_segs (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
-  displayd *display = sp->displayptr;
-  datad *d = display->d;
+  ftmp = -1 + 2.0 * (0 - sp->p1d_lim.min)/
+                    (sp->p1d_lim.max - sp->p1d_lim.min);
+  pl = (glong) (precis * ftmp);
 
-  if (sp->p1d_segs == NULL) {
-    sp->p1d_segs = g_array_new (FALSE, FALSE, sizeof (GdkSegment));
-    p1d_build_segments (sp, gg);
-  } else if (sp->p1d_segs->len != d->nrows_in_plot) {
-    g_array_free (sp->p1d_segs, false);  /*-- no need to free each segment? --*/
-    sp->p1d_segs = g_array_new (FALSE, FALSE, sizeof (GdkSegment));
-    p1d_build_segments (sp, gg);
-  }
+
+/*-- HORIZONTAL --*/
+  ltmp = pl - sp->pmid.y;
+  iscr = (gint) ((ltmp * sp->iscale.y) >> EXP1);
+  iscr += (sp->max.y / 2);
+
+  sp->ash_baseline.y = iscr;
+            
+/*-- VERTICAL --*/
+  ltmp = pl - sp->pmid.x;
+  iscr = (gint) ((ltmp * sp->iscale.x) >> EXP1);
+  iscr += (sp->max.x / 2);
+
+  sp->ash_baseline.x = iscr;
 
 }

@@ -30,6 +30,7 @@ typedef struct {
  struct _P1DCpanel {
    gint type;
    gint nbins, nASHes;
+   gboolean ASH_add_lines_p;
  } p1d;
 
  /*-- xy plotting --*/

@@ -19,21 +19,28 @@
  * way to achieve adequate speed in Windows.
 */
 
+/*  Just to see if it compiles, at least ...
+#define WIN32 1
+*/
 #ifdef WIN32
 
 static void build_circle (icoords *, gint, arcd *, gint, gshort);
 static void build_plus (icoords *, gint, GdkSegment *, gint, gshort);
 static void build_rect (icoords *, gint, rectd *, gint, gshort);
 static void build_x (icoords *, gint, GdkSegment *, gint, gshort);
+static void build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp);
+static void build_ash_segs (gint, gint *nsegs, splotd *sp);
 
 /*
- * I think I could eliminate a lot of copies if I made these
- * vectors of pointers and just assigned addresses.
+ * ... just noticed these:  should they become part of the splotd
+ * instead of sitting her as statics?  I think so.
+ * 
 */
 static gint maxn = 0;
 static GdkPoint   *points;
 static GdkSegment *segs;
 static GdkSegment *whisker_segs;
+static GdkSegment *ash_segs;
 static rectd      *open_rects;
 static rectd      *filled_rects;
 static arcd       *open_arcs;
@@ -46,6 +53,7 @@ drawing_arrays_alloc (datad *d, ggobid *gg) {
     points = (GdkPoint *) g_malloc (maxn * sizeof (GdkPoint));
     segs = (GdkSegment *) g_malloc (2 * maxn * sizeof (GdkSegment));
     whisker_segs = (GdkSegment *) g_malloc (2 * maxn * sizeof (GdkSegment));
+    ash_segs = (GdkSegment *) g_malloc (maxn * sizeof (GdkSegment));
     open_rects = (rectd *) g_malloc (maxn * sizeof (rectd));
     filled_rects = (rectd *) g_malloc (maxn * sizeof (rectd));
     open_arcs = (arcd *) g_malloc (maxn * sizeof (arcd));
@@ -56,6 +64,7 @@ drawing_arrays_alloc (datad *d, ggobid *gg) {
     segs = (GdkSegment *) g_realloc (segs, 2 * maxn * sizeof (GdkSegment));
     whisker_segs = (GdkSegment *)
       g_realloc (whisker_segs, 2 * maxn * sizeof (GdkSegment));
+    ash_segs = (GdkSegment *) g_realloc (ash_segs, maxn * sizeof (GdkSegment));
     open_rects = (rectd *) g_realloc (open_rects, maxn * sizeof (rectd));
     filled_rects = (rectd *) g_realloc (filled_rects, maxn * sizeof (rectd));
     open_arcs = (arcd *) g_realloc (open_arcs, maxn * sizeof (arcd));
@@ -68,6 +77,7 @@ drawing_arrays_free (){
   g_free ((gpointer) points);
   g_free ((gpointer) segs);
   g_free ((gpointer) whisker_segs);
+  g_free ((gpointer) ash_segs);
   g_free ((gpointer) open_rects);
   g_free ((gpointer) filled_rects);
   g_free ((gpointer) open_arcs);
@@ -201,7 +211,8 @@ build_glyph (glyphd *gl, icoords *xypos, gint jpos,
       build_point (xypos, jpos, pointv, *np);
       (*np)++;
     break;
-    UNKNOWN_GLYPH:
+    case UNKNOWN_GLYPH:
+    break;
     default:
       g_printerr ("build_glyph: impossible glyph type %d\n", type);
   }
@@ -232,6 +243,26 @@ build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp) {
     whisker_segs[*nwhisker_segs].y2 = sp->whiskers[j].y2; 
     *nwhisker_segs += 1; 
   }
+}
+
+void
+build_ash_segs (gint i, gint *nsegs, splotd *sp)
+{
+  displayd *display = (displayd *) sp->displayptr;
+
+  if (display->p1d_orientation == HORIZONTAL) {
+    ash_segs[*nsegs].x1 = sp->screen[i].x;
+    ash_segs[*nsegs].y1 = sp->screen[i].y;
+    ash_segs[*nsegs].x2 = sp->screen[i].x;
+    ash_segs[*nsegs].y2 = sp->ash_baseline.y;
+  } else {
+    ash_segs[*nsegs].x1 = sp->screen[i].x;
+    ash_segs[*nsegs].y1 = sp->screen[i].y;
+    ash_segs[*nsegs].x2 = sp->ash_baseline.x;
+    ash_segs[*nsegs].y2 = sp->screen[i].y;
+  }
+
+  *nsegs += 1;
 }
 
 void
@@ -267,10 +298,12 @@ void
 win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
   gint i, m;
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;
   gint nwhisker_segs = 0;
+  gint nash_segs = 0;
   gboolean draw_case;
   gint dtype = display->displaytype;
 
@@ -294,13 +327,19 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
             display->options.whiskers_show_p)
         {
           build_whisker_segs (m, &nwhisker_segs, sp);
+        } else if (dtype == scatterplot &&
+                   projection_get(gg) == P1PLOT &&
+                   cpanel->p1d.type == ASH &&
+                   cpanel->p1d.ASH_add_lines_p) {
+          build_ash_segs (m, &nash_segs, sp);
         }
-
       }
     }
   }
   if (nwhisker_segs)
     gdk_draw_segments (sp->pixmap0, gg->plot_GC, whisker_segs, nwhisker_segs);
+  if (nash_segs)
+    gdk_draw_segments (sp->pixmap0, gg->plot_GC, ash_segs, nash_segs);
   draw_glyphs (sp->pixmap0,
     points, npt,           segs, nseg,
     open_rects, nr_open,   filled_rects, nr_filled,

@@ -210,6 +210,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   gint dtype = display->displaytype;
   colorschemed *scheme = gg->activeColorScheme;
   gushort maxcolorid;
+  cpaneld *cpanel = &display->cpanel;
+  gint proj = cpanel->projection;
 
   /*
    * since parcoords and tsplot each have their own weird way
@@ -284,9 +286,24 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
             draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen, m, gg);
           }
 
+          if (dtype == scatterplot) {
+            if (proj == P1PLOT &&
+                cpanel->p1d.type == ASH &&
+                cpanel->p1d.ASH_add_lines_p)
+            {
+              if (display->p1d_orientation == HORIZONTAL)
+                gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                  sp->screen[m].x, sp->screen[m].y,
+                  sp->screen[m].x, sp->ash_baseline.y);
+              else
+                gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                  sp->screen[m].x, sp->screen[m].y,
+                  sp->ash_baseline.x, sp->screen[m].y);
+            }
+/* */
+
           /*-- whiskers: parallel coordinate and time series plots --*/
-          if (dtype == parcoords || dtype == tsplot)
-          {
+          } else if (dtype == parcoords || dtype == tsplot) {
             if (display->options.whiskers_show_p) {
               if (dtype == parcoords) {
                 n = 2*m;

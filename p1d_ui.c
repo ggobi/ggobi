@@ -28,6 +28,13 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   display_tailpipe (gg->current_display, FULL, gg);
 }
 
+static void ASH_add_lines_cb (GtkToggleButton *button, ggobid *gg)
+{
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  cpanel->p1d.ASH_add_lines_p = button->active;
+  splot_redraw (gg->current_splot, FULL, gg);
+}
+
 static void ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg) 
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -108,9 +115,21 @@ cpanel_p1dplot_make (ggobid *gg) {
   populate_option_menu (opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) type_cb, gg);
-/*
- * ASH smoothness
-*/
+
+  /*-- ASH line segments --*/
+  btn = gtk_check_button_new_with_label ("ASH: add lines");
+  gtk_widget_set_name (btn, "P1PLOT:ASH_add_lines");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "When displaying ASHes, add lines connecting each point to the baseline.",
+    NULL);
+  /*-- cpanel may not be available, so initialize this to false --*/
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), false);
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+    GTK_SIGNAL_FUNC (ASH_add_lines_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), btn,
+    false, false, 0);
+
+  /*-- ASH smoothness --*/
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), vb,
     false, false, 0);
@@ -183,6 +202,7 @@ void
 cpanel_p1d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->p1d.nASHes = 20;
   cpanel->p1d.nbins = 200;
+  cpanel->p1d.ASH_add_lines_p = false;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/
@@ -200,6 +220,11 @@ cpanel_p1d_set (cpaneld *cpanel, ggobid* gg)
   /*-- Texturing or ASH --*/
   w = widget_find_by_name (pnl, "P1PLOT:type_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->p1d.type);
+
+  /*-- ASH smoothness parameter --*/
+  w = widget_find_by_name (pnl, "P1PLOT:ASH_add_lines");
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (w),
+    cpanel->p1d.ASH_add_lines_p);
 
   /*-- ASH smoothness parameter --*/
   w = widget_find_by_name (pnl, "P1PLOT:ASH_smooth");

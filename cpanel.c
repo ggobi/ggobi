@@ -100,7 +100,6 @@ barchart_cpanel_init (cpaneld* cpanel, ggobid *gg) {
   cpanel->barchart_display_mode = 0;  /*dfs-barchart*/
 
   /*-- 1d plots --*/
-/*  cpanel->p1d.type = AREAPLOT; */
   cpanel_p1d_init (cpanel, gg);
 
   /*-- available modes --*/
