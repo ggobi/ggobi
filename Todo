@@ -86,6 +86,12 @@ routines:
 
 -----------------------------------------------------------------
 
+Adding records:
+  Duncan suggested a method for managing (in particular)
+  row-wise arrays and vectors so that reallocating them
+  would become much less error-prone.
+
+
 Check the fileselection dialog for read (filesel_ok) to ensure that
 the correct data mode is passed.  Take it out of ggobi.
 
