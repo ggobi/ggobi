@@ -141,9 +141,27 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
         case SCATMAT:
         case PCPLOT:
         case TSPLOT:
+#ifdef BARCHART_IMPLEMENTED
+        case BARCHART:
+#endif
         case NMODES:
         break;
     }
+    break;
+
+#ifdef BARCHART_IMPLEMENTED
+    case barchart:
+      redraw = p1d_varsel (sp, jvar, &jvar_prev, btn);
+      if (redraw) {
+        displayd *display = (displayd *) sp->displayptr;
+        datad *d = display->d;
+
+        barchart_clean_init (sp);
+        barchart_recalc_counts (sp,d,gg);
+      }
+    break;
+#endif
+
     case unknown_display_type:
     break;
   }
@@ -300,9 +318,21 @@ varpanel_refresh (ggobid *gg) {
               case SCATMAT:
               case PCPLOT:
               case TSPLOT:
+#ifdef BARCHART_IMPLEMENTED
+              case BARCHART:
+#endif
               case NMODES:
               break;
           }
+          break;
+
+#ifdef BARCHART_IMPLEMENTED
+          case barchart:
+            for (j=0; j<d->ncols; j++)
+              varpanel_checkbutton_set_active (j, (j == sp->p1dvar), d);
+          break;
+#endif
+
           case unknown_display_type:
           break;
         }
@@ -604,8 +634,23 @@ varpanel_tooltips_set (ggobid *gg)
             case SCATMAT:
             case PCPLOT:
             case TSPLOT:
+#ifdef BARCHART_IMPLEMENTED
+            case BARCHART:
+#endif
             break;
         }
+        break;
+
+#ifdef BARCHART_IMPLEMENTED
+        case barchart:
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+                checkbox_get_nth (j, d),
+                "Click to replace a variable",
+                NULL);
+
+        break;
+#endif
+
         case unknown_display_type:
         break;
       }

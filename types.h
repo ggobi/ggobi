@@ -197,6 +197,55 @@ typedef struct {
 
 extern DisplayOptions DefaultDisplayOptions;
 
+#ifdef BARCHART_IMPLEMENTED
+/* bin struct for bins in Barcharts, histograms, ... */
+typedef struct
+{
+  glong count;
+  gint index;
+  lcoords planar;
+  GdkRectangle rect;
+} bind;
+/* end bind */
+
+/* structure for a barchart, in splotd only a pointer to this structure is made to save memory */
+typedef struct
+{
+
+ gboolean is_histogram;  /* true if variable not categorical */
+ gboolean is_spine;      /* false by default */
+ gint nbins;
+ gint new_nbins;
+
+ gint ncolors;
+ gint maxbincounts;
+ bind  *bins;
+ bind  **cbins;
+ gfloat *breaks;
+
+ GdkPoint anchor_rgn[4];
+ GdkPoint offset_rgn[4];
+ gboolean anchor_drag;
+ gboolean width_drag;
+ gfloat offset;
+
+/* whenever points in histograms "overflow" to the left or right of the first or last bin, they need a place to stay */
+ gboolean high_pts_missing;
+ gboolean low_pts_missing;
+ bind *high_bin;
+ bind *low_bin;
+ bind *col_high_bin;
+ bind *col_low_bin;
+
+/* identify bars */
+ gboolean *bar_hit;
+ gboolean *old_bar_hit;
+ gboolean same_hits;
+
+ gint *index_to_rank;
+} barchartd;
+
+#endif
 
 
 #define TYPES_H

@@ -166,6 +166,13 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
   case GDK_A:
     action = SCATMAT;
   break;
+
+#ifdef BARCHART_IMPLEMENTED
+  case GDK_h:
+  case GDK_H:
+    action = BARCHART;
+  break;
+#endif
 /* */
 
   case GDK_d:
@@ -231,6 +238,9 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
   gint m = display->cpanel.viewmode;
 
+#ifdef BARCHART_IMPLEMENTED
+  extern void barchart_event_handlers_toggle (splotd *, gboolean state);
+#endif
   switch (m) {
     case P1PLOT:
       p1d_event_handlers_toggle (sp, state);
@@ -243,6 +253,13 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
 #ifdef ROTATION_IMPLEMENTED
     case ROTATE:
       rotation_event_handlers_toggle (sp, state);
+    break;
+#endif
+
+#ifdef BARCHART_IMPLEMENTED
+    case BARCHART:
+
+      barchart_event_handlers_toggle (sp, state);
     break;
 #endif
 
@@ -259,7 +276,14 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
     break;
 
     case SCALE:
-      scale_event_handlers_toggle (sp, state);
+#ifdef BARCHART_IMPLEMENTED
+      if (display->displaytype == barchart) {
+        void barchart_scale_event_handlers_toggle (splotd *, gboolean);
+
+        barchart_scale_event_handlers_toggle (sp, state);
+      } else   
+#endif
+        scale_event_handlers_toggle (sp, state);
     break;
 
     case BRUSH:
@@ -467,6 +491,13 @@ splot_free (splotd *sp, displayd *display, ggobid *gg) {
     case tsplot:
       g_free ((gpointer) sp->whiskers);
     break;
+#ifdef BARCHART_IMPLEMENTED
+    case barchart:
+      barchart_free_structure (sp);
+      g_free ((gpointer) sp->bar->index_to_rank);
+      g_free ((gpointer) sp->bar);
+    break;
+#endif
     default:
     break;
   }
@@ -500,6 +531,13 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   sp->pixmap1 = NULL;
   sp->redraw_style = FULL;
   sp->tour1d.firsttime = true; /* Ensure that the 1D tour should be initialized. */
+
+#ifdef BARCHART_IMPLEMENTED
+/* initialize barchart data */
+  if (display->displaytype == barchart) {
+    sp->bar = NULL;
+  }
+#endif
 
   brush_pos_init (sp);
   
@@ -637,6 +675,9 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
         case SCATMAT:
         case PCPLOT:
         case TSPLOT:
+#ifdef BARCHART_IMPLEMENTED
+        case BARCHART:
+#endif
         case NMODES:
         break;
       }
@@ -665,6 +706,13 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
         (display->missing_p) ? d->missing_world.vals : d->world.vals,
         d, gg);
     break;
+
+#ifdef BARCHART_IMPLEMENTED
+    case barchart:
+      barchart_recalc_dimensions (sp,d,gg);
+    break;
+#endif
+
     default:
     break;
   }
@@ -683,6 +731,16 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   gfloat scale_x, scale_y;
   datad *d = display->d;
   long ltmp;
+
+
+#ifdef BARCHART_IMPLEMENTED
+  if  (display->displaytype == barchart) {
+    barchart_recalc_dimensions (sp, d, gg);
+    barchart_recalc_group_dimensions (sp,gg);
+
+/**/    return;
+  }
+#endif
 
   scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
   scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;

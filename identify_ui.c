@@ -104,6 +104,16 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
 
+#ifdef BARCHART_IMPLEMENTED
+  if (gg->current_display->displaytype == barchart) {
+    gboolean changed = barchart_identify_bars (sp->mousepos, sp, d, gg);
+
+    if (changed) {
+        displays_plot (NULL, QUICK, gg);
+    }
+  } else {
+#endif
+
   k = find_nearest_point (&sp->mousepos, sp, d, gg);
   d->nearest_point = k;
 
@@ -123,11 +133,13 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 	GGobiPointMoveEvent ev;
         ev.d = d;
 	ev.id = k;
-        gtk_signal_emit(GTK_OBJECT(w), GGobiSignals[IDENTIFY_POINT_SIGNAL], sp, &ev, gg);
+        gtk_signal_emit(GTK_OBJECT(w), GGobiSignals[IDENTIFY_POINT_SIGNAL], sp, &ev, gg); 
     }
     d->nearest_point_prev = k;
   }
-
+#ifdef BARCHART_IMPLEMENTED
+}
+#endif
   return true;  /* no need to propagate the event */
 }
 

@@ -98,6 +98,8 @@ ruler_ranges_set (gboolean force, displayd *display, splotd *sp, ggobid *gg) {
   if (display->hrule == NULL)
     return;
 
+  tfmin.x = tfmin.y = tfmax.x = tfmax.y = 0.0;
+
   scr.x = scr.y = 0;
   splot_screen_to_tform (cpanel, sp, &scr, &tfmin, gg);
 

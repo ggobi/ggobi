@@ -519,6 +519,29 @@ tsplot_menus_make (ggobid *gg)
     gg->menus.options_menu);
 }
 
+#ifdef BARCHART_IMPLEMENTED
+/*--------------------------------------------------------------------*/
+/*                      Barchart: Options menu                        */
+/*--------------------------------------------------------------------*/
+
+void
+barchart_menus_make (ggobid *gg)
+{
+  gg->menus.options_menu = gtk_menu_new ();
+
+  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
+    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    GTK_TOOLTIPS (gg->tips)->enabled, gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
+    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
+    gg->menus.options_menu);
+}
+
+#endif
 /*--------------------------------------------------------------------*/
 /*               Routines to manage the mode menus                    */
 /*--------------------------------------------------------------------*/
@@ -534,6 +557,9 @@ mode_has_options_menu (gint mode)
           mode == EDGEED ||
 #endif
           mode == MOVEPTS ||
+#ifdef BARCHART_IMPLEMENTED
+          mode == BARCHART ||
+#endif
           mode == SCATMAT || mode == PCPLOT || mode == TSPLOT);
 }
 
@@ -634,6 +660,11 @@ viewmode_submenus_update (PipelineMode prev_mode, ggobid *gg)
     case SCATMAT:
       scatmat_menus_make (gg);
     break;
+#ifdef BARCHART_IMPLEMENTED
+    case BARCHART:
+      barchart_menus_make (gg);
+    break;
+#endif
 
     case P1PLOT:
       p1dplot_menus_make (gg);

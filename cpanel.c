@@ -92,6 +92,23 @@ tsplot_cpanel_init (cpaneld* cpanel, ggobid *gg) {
   cpanel_identify_init (cpanel, gg);
 }
 
+#ifdef BARCHART_IMPLEMENTED
+void
+barchart_cpanel_init (cpaneld* cpanel, ggobid *gg) {
+  cpanel->viewmode = BARCHART;
+  cpanel->projection = P1PLOT;  /*-- does it need a projection? --*/
+  cpanel->barchart_display_mode = 0;  /*dfs-barchart*/
+
+  /*-- 1d plots --*/
+/*  cpanel->p1d.type = AREAPLOT; */
+  cpanel_p1d_init (cpanel, gg);
+
+  /*-- available modes --*/
+  cpanel_brush_init (cpanel, gg);
+  cpanel_identify_init (cpanel, gg);
+}
+#endif
+
 void
 cpanel_set (displayd *display, ggobid *gg) {
   cpaneld *cpanel = &display->cpanel;
@@ -132,6 +149,13 @@ cpanel_set (displayd *display, ggobid *gg) {
       cpanel_brush_set (cpanel, gg);
       cpanel_identify_set (cpanel, gg);
     break;
+#ifdef BARCHART_IMPLEMENTED
+    case barchart:
+      cpanel_barchart_set (cpanel, gg);
+      cpanel_brush_set (cpanel, gg);
+      cpanel_identify_set (cpanel, gg);
+    break;
+#endif
 
     default:
       displaytype_known = false;

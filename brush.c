@@ -202,7 +202,10 @@ binning_permitted (displayd *display, ggobid *gg)
 
   if (gg->linkby_cv)
     permitted = false;
-
+#ifdef BARCHART_IMPLEMENTED
+  else if (type == barchart)
+    permitted = false;
+#endif
   /*-- if we're drawing whiskers --*/
   else if ((type == parcoords || type == tsplot) &&
              display->options.whiskers_show_p)
@@ -571,6 +574,27 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   return (doit);
 }
 
+#ifdef BARCHART_IMPLEMENTED
+/*----------------------------------------------------------------------*/
+/*      local helper function for barcharts,                            */ 
+/*      called by build_symbol_vectors                                  */
+/*----------------------------------------------------------------------*/
+
+gboolean barchart_build_symbol_vectors (datad *d, ggobid *gg) {
+  gboolean changed = FALSE;
+  gint j,m;
+
+  for (j=0; j<d->nrows_in_plot; j++) {
+    m = d->rows_in_plot[j];
+    changed = update_color_vectors (m, changed,
+              d->pts_under_brush.els, d, gg);
+  }
+
+  return changed;
+}
+#endif
+
+
 /*----------------------------------------------------------------------*/
 /*         Handle all symbols in one loop through a bin                 */
 /*----------------------------------------------------------------------*/
@@ -585,6 +609,14 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
   extern void symbol_link_by_id (gint k, datad *source_d, ggobid *gg);
+
+#ifdef BARCHART_IMPLEMENTED
+  splotd *sp = gg->current_splot;
+  displayd *display = (displayd *) sp->displayptr;
+  if (display->displaytype == barchart) {
+    changed = barchart_build_symbol_vectors (d, gg);
+  }
+#endif
 
   brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
@@ -651,6 +683,15 @@ active_paint_points (datad *d, ggobid *gg)
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
 
+#ifdef BARCHART_IMPLEMENTED
+  displayd *display = (displayd *) sp->displayptr;
+  if (display->displaytype == barchart) {
+    extern gboolean barchart_active_paint_points (splotd *sp, datad *d); 
+    d->npts_under_brush = barchart_active_paint_points (sp, d);
+
+  } else {
+#endif
+
   /* Zero out pts_under_brush[] before looping */
   d->npts_under_brush = 0;
   for (j=0; j<d->nrows_in_plot; j++)
@@ -673,6 +714,10 @@ active_paint_points (datad *d, ggobid *gg)
       }
     }
   }
+
+#ifdef BARCHART_IMPLEMENTED
+  } 
+#endif
 
   changed = false;
 

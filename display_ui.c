@@ -220,6 +220,46 @@ display_menu_build (ggobid *gg)
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
     } 
 
+
+#ifdef BARCHART_IMPLEMENTED
+    if (nd == 1) {
+      item = CreateMenuItem (gg->display_menu, "New barchart",
+        NULL, NULL, gg->main_menubar, gg->main_accel_group,
+        GTK_SIGNAL_FUNC (display_open_cb), (gpointer) d0, gg);
+      gtk_object_set_data (GTK_OBJECT (item),
+        "displaytype", GINT_TO_POINTER (barchart));
+      gtk_object_set_data (GTK_OBJECT (item),
+        "missing_p", GINT_TO_POINTER (0));
+
+    } else {  /*-- prepare the menu for multiple data matrices --*/
+
+      submenu = gtk_menu_new ();
+      anchor = CreateMenuItem (gg->display_menu,
+        "New barchart",
+        NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
+
+      for (k=0; k<nd; k++) {
+        datad *d = (datad*) g_slist_nth_data (gg->d, k);
+
+        /*-- add an item for each datad with variables --*/
+        if (g_slist_length (d->vartable) > 0) {
+          lbl = datasetName (d, gg);
+          item = CreateMenuItem (submenu, lbl,
+            NULL, NULL, gg->display_menu, gg->main_accel_group,
+            GTK_SIGNAL_FUNC (display_open_cb),
+            g_slist_nth_data (gg->d, k), gg);
+          gtk_object_set_data (GTK_OBJECT (item),
+            "displaytype", GINT_TO_POINTER (barchart));
+          gtk_object_set_data (GTK_OBJECT (item),
+            "missing_p", GINT_TO_POINTER (0));
+          g_free (lbl);
+        }
+      }
+
+      gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
+    }
+#endif
+
     /*-- add a separator --*/
     CreateMenuItem (gg->display_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 

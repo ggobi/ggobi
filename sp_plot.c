@@ -194,6 +194,15 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   gboolean loop_over_points =
     display->options.points_show_p || dtype == parcoords || dtype == tsplot;
 
+#ifdef BARCHART_IMPLEMENTED
+/*  dfs-barchart
+ * Leaving this line in place prevents me from getting a display!
+  if (dtype == barchart) {
+    loop_over_points = false;
+  }
+*/
+#endif
+
   if (gg->plot_GC == NULL) {
     init_plot_GC (sp->pixmap0, gg);
   }
@@ -231,6 +240,12 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 #ifdef WIN32
       win32_draw_to_pixmap_unbinned (current_color, sp, gg);
 #else
+#ifdef BARCHART_IMPLEMENTED
+      if (dtype == barchart) {
+        barchart_redraw (sp, d, gg);
+      }
+      else {
+#endif
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
         draw_case = splot_plot_case (m, d, sp, display, gg);
@@ -264,6 +279,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
           }
         }
       }
+#ifdef BARCHART_IMPLEMENTED
+      }
+#endif
+
+
 #endif
     }  /* deal with mono later */
   }
@@ -303,6 +323,19 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 
   if (gg->plot_GC == NULL)
     init_plot_GC (sp->pixmap0, gg);
+
+#ifdef BARCHART_IMPLEMENTED
+  {
+    displayd *display = (displayd *) sp->displayptr;
+    datad *d = display->d;
+    gint dtype = display->displaytype;
+
+    if (dtype == barchart) {
+      barchart_redraw (sp, d, gg);
+      return;
+    }
+  }
+#endif
 
 /*
  * Instead of clearing and redrawing the entire pixmap0, only
@@ -420,6 +453,9 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
                       cpanel->projection == P1PLOT ||
                       cpanel->projection == PCPLOT ||
                       cpanel->projection == TSPLOT ||
+#ifdef BARCHART_IMPLEMENTED
+                      cpanel->projection == BARCHART ||
+#endif
                       cpanel->projection == SCATMAT);
   if (!proceed)
     return;
@@ -495,6 +531,13 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
       5, 5 + ascent + descent,
       vty->collab_tform);
   }
+#ifdef BARCHART_IMPLEMENTED
+  else if (dtype == barchart) {
+    extern void barchart_splot_add_plot_labels (splotd *, GdkDrawable *, ggobid *);
+
+    barchart_splot_add_plot_labels (sp, drawable, gg);
+  }
+#endif
 
 }
 
@@ -734,6 +777,7 @@ splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
        nearest point                    in moving points
        source, maybe dest and edge      in edge editing
   */
+
   if (mode == IDENT && d->nearest_point != -1)
     splot_add_identify_cues (sp, drawable, d->nearest_point, true, gg);
   else if (mode == MOVEPTS)
@@ -1073,7 +1117,12 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
         splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);
     }
   }
-     
+  
+#ifdef BARCHART_IMPLEMENTED
+  if (display->displaytype == barchart)
+    barchart_add_bar_cues (sp, drawable, gg);
+#endif
+   
   splot_add_plot_labels (sp, drawable, gg);  /*-- axis labels --*/
 
   /*-- identify, move points, edge editing --*/
@@ -1091,7 +1140,17 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       brush_draw_label (sp, drawable, d, gg);
     } else if (cpanel->viewmode == SCALE) {
       scaling_visual_cues_draw (sp, drawable, gg);
+
+#ifdef BARCHART_IMPLEMENTED
+      if (displaytype == barchart) {
+        void barchart_scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg);
+
+        barchart_scaling_visual_cues_draw (sp, drawable, gg);
+      }
+#endif
     }
+
+
   }
 
   if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {

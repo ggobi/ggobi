@@ -184,6 +184,11 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
     case tsplot:
       add_xml_tsplot_variables(node, plots, dpy);
     break;
+#ifdef BARCHART_IMPLEMENTED
+    case barchart:
+      printf ("add xml for barchart still missing\n"); 
+    break;
+#endif
     case unknown_display_type:
     break;
   }

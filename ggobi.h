@@ -248,6 +248,16 @@ struct _ggobid {
    GtkWidget *mode_menu;
  } tsplot;
 
+#ifdef BARCHART_IMPLEMENTED
+/*----------------------- barchart------------------------------------*/
+
+ struct _BARCHART {
+   GtkAccelGroup *accel_group;
+   GtkWidget *arrangement_box;
+   GtkWidget *mode_menu;
+ } barchart;
+#endif
+
 /*------------------------ brushing ----------------------------------*/
 
  glyphd glyph_id, glyph_0;

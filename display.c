@@ -381,6 +381,12 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
       display = tsplot_new (false, nselected_vars, selected_vars, d, gg);
       break;
 
+
+#ifdef BARCHART_IMPLEMENTED
+    case barchart:
+      display = barchart_new (missing_p, NULL, d, gg);
+      break;
+#endif
     default:
       break;
   }
@@ -605,6 +611,11 @@ display_set_current (displayd *new_display, ggobid *gg)
       case tsplot:
         submenu_destroy (gg->viewmode_item);
       break;
+#ifdef BARCHART_IMPLEMENTED
+      case barchart:
+        submenu_destroy (gg->viewmode_item);
+      break;
+#endif
       case unknown_display_type:
 /**/    return;
       break;
@@ -658,6 +669,19 @@ display_set_current (displayd *new_display, ggobid *gg)
                                    gg->tsplot.mode_menu); 
         submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
       break;
+
+#ifdef BARCHART_IMPLEMENTED
+      case barchart:
+        barchart_mode_menu_make (gg->main_accel_group,
+          (GtkSignalFunc) viewmode_set_cb, gg, true);
+        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
+          gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
+                                   gg->barchart.mode_menu);
+        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
+      break;
+#endif
+
       default:
       break;
     }
@@ -722,6 +746,15 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
       else 
         tmp = "time series display display " ;
     break;
+
+#ifdef BARCHART_IMPLEMENTED
+    case barchart:
+      if (current_p)
+        tmp = "*** barchart display *** " ;
+      else
+        tmp = "barchart display";
+    break;
+#endif
 
     default:
     break;
@@ -792,6 +825,11 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg) {
 
     if (display->displaytype == scatterplot)
       ruler_ranges_set (false, display, sp, gg);
+
+#ifdef BARCHART_IMPLEMENTED
+    if (display->displaytype == barchart)
+      ruler_ranges_set (true, display, sp, gg);
+#endif
 
     splot_redraw (sp, type, gg);
     splist = splist->next;
@@ -869,6 +907,12 @@ display_type_handles_action (displayd *display, PipelineMode viewmode) {
     if (v == BRUSH || v == IDENT || v == TSPLOT)
       handles = true;
   }
+#ifdef BARCHART_IMPLEMENTED
+   else if (dtype == barchart) {
+    if (v == SCALE || v == BRUSH || v == IDENT || v == BARCHART)
+      handles = true;
+   }
+#endif
 
   return handles;
 }

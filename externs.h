@@ -66,6 +66,23 @@ void arrays_free (array_s *, gint, gint);
 void arrays_init_null (array_s *);
 void arrays_zero (array_s *);
 void assign_points_to_bins (datad *, ggobid *);
+#ifdef BARCHART_IMPLEMENTED
+void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg);
+void barchart_clean_init (splotd *sp);
+void barchart_cpanel_init (cpaneld *, ggobid *);
+void barchart_free_structure (splotd *sp);
+gboolean barchart_identify_bars (icoords mousepos, splotd *sp, datad *d, ggobid *gg);
+void barchart_init_vectors(splotd *sp);
+void barchart_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds);
+displayd *barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
+void barchart_recalc_group_dimensions (splotd *sp, ggobid *gg);
+void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg);
+void barchart_recalc_dimensions (splotd *sp, datad *d, ggobid *gg);
+void barchart_redraw (splotd *sp, datad *d, ggobid *gg);
+
+void cpanel_barchart_set (cpaneld *cpanel, ggobid *gg);
+void cpanel_barchart_make (ggobid *gg);
+#endif
 void br_color_ids_alloc (datad *, ggobid *);
 void br_color_ids_init (datad *, ggobid *);
 void br_edge_color_alloc (ggobid *);
@@ -291,6 +308,7 @@ displayd* scatmat_new (gboolean, gint, gint *, gint, gint *, datad *, ggobid *);
 gboolean scatmat_varsel (cpaneld *, splotd *, gint, gint *, gint, gboolean, ggobid *);
 gboolean scatmat_varsel_simple (cpaneld *, splotd *, gint, gint *, ggobid *);
 void scatterplot_cpanel_init (cpaneld *, PipelineMode, ggobid *);
+void scatterplot_display_edge_menu_update (displayd *, GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg);
 void scatterplot_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 displayd* scatterplot_new (gboolean, splotd *sp, datad *d, ggobid *);
 void scatterplot_show_hrule (displayd *, gboolean show);

@@ -158,6 +158,9 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
         case SCATMAT:
         case PCPLOT:
         case TSPLOT:
+#ifdef BARCHART_IMPLEMENTED
+            case BARCHART:
+#endif
         case NMODES:
         break;
       }
@@ -202,6 +205,12 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
       }
     }
     break;
+#ifdef BARCHART_IMPLEMENTED
+    case barchart:
+      cols[ncols++] = sp->p1dvar;
+    break;
+#endif
+
     case unknown_display_type:
     break;
   }

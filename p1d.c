@@ -165,9 +165,14 @@ p1d_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
   displayd *display = (displayd *) sp->displayptr;
   gint orientation = display->p1d_orientation;
 
+#ifdef BARCHART_IMPLEMENTED
+  if (display->displaytype != barchart)
+#endif
   display->p1d_orientation = (button == 1) ? HORIZONTAL : VERTICAL;
 
   redraw = (orientation != display->p1d_orientation) || (jvar != sp->p1dvar);
+
+
 
   *jvar_prev = sp->p1dvar;
   sp->p1dvar = jvar;

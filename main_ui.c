@@ -33,6 +33,26 @@
 #include "testEvents.h"
 #endif
 
+#ifdef BARCHART_IMPLEMENTED
+const char *const GGOBI(OpModeNames)[] = {
+  "1D Plot",
+  "XYPlot",
+  "Rotation",
+  "1D Tour",
+  "2D Tour",
+  "Correlation Tour",
+  "Scale",
+  "Brush",
+  "Identify",
+  "Edit Edges",
+  "Move Points",
+
+  "Scatmat",
+  "Parcoords",
+  "TSplot",
+  "Barchart",
+};
+#else
 const char *const GGOBI(OpModeNames)[] = {
   "1D Plot",
   "XYPlot",
@@ -50,6 +70,7 @@ const char *const GGOBI(OpModeNames)[] = {
   "Parcoords",
   "TSplot",
 };
+#endif
 
 static const char *const *viewmode_name = GGOBI(OpModeNames);
 
@@ -82,6 +103,9 @@ make_control_panels (ggobid *gg) {
   cpanel_parcoords_make (gg);
   cpanel_scatmat_make (gg);
   cpanel_tsplot_make (gg);
+#ifdef BARCHART_IMPLEMENTED
+  cpanel_barchart_make (gg);
+#endif
 }
 
 void
@@ -213,6 +237,8 @@ viewmode_set (PipelineMode m, ggobid *gg)
     }
 
     if (gg->viewmode != NULLMODE) {
+      gint nmodes = sizeof(GGOBI(OpModeNames))/sizeof(GGOBI(OpModeNames)[0]);
+      g_assert (gg->viewmode < nmodes);  /* if a new mode has been partially added ... */
       gtk_frame_set_label (GTK_FRAME (gg->viewmode_frame),
         viewmode_name[gg->viewmode]);
       gtk_container_add (GTK_CONTAINER (gg->viewmode_frame),
@@ -647,10 +673,10 @@ make_ui (ggobid *gg) {
 
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
 
-  gtk_signal_connect_object(GTK_OBJECT (window), "delete_event",
-                      GTK_SIGNAL_FUNC (ggobi_close), (gpointer) gg);
-  gtk_signal_connect_object(GTK_OBJECT (window), "destroy_event",
-                      GTK_SIGNAL_FUNC (ggobi_close), (gpointer) gg);
+  gtk_signal_connect(GTK_OBJECT (window), "delete_event",
+                      GTK_SIGNAL_FUNC (ggobi_close), gg);	
+  gtk_signal_connect(GTK_OBJECT (window), "destroy_event",
+                      GTK_SIGNAL_FUNC (ggobi_close), gg); 
 
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 

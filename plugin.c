@@ -398,7 +398,7 @@ runInteractiveInputPlugin(ggobid *gg)
   }
 #endif
 
-  return(plugin);
+  return((GGobiInputPluginInfo *)plugin); /* Heike: cast necessary */
 }
 
 

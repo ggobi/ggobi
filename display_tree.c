@@ -246,6 +246,11 @@ display_tree_label(displayd *display)
     case tsplot:
       val = "Time Series";
     break;
+#ifdef BARCHART_IMPLEMENTED
+    case barchart: 
+      val = "Barchart";
+    break;
+#endif
     case unknown_display_type:
       val = (gchar *) NULL;
     break;
@@ -333,6 +338,14 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
       buf = (gchar*) g_malloc(n* sizeof (gchar*));
       sprintf(buf, "%s", vty->collab);
     break;
+#ifdef BARCHYART_IMPLEMENTED
+    case barchart:
+      vt = vartable_element_get (splot->p1dvar, d);
+      n = strlen (vt->collab);
+      buf = (gchar*) g_malloc(n* sizeof (gchar*));
+      sprintf(buf, "%s", vt->collab);
+    break; 
+#endif
     case unknown_display_type:
     break;
   }

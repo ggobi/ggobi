@@ -323,6 +323,16 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
           }
         }
       break;
+#ifdef BARCHART_IMPLEMENTED
+      case barchart:
+        for (j=0; j<ncols; j++) {
+          if (sp->p1dvar == cols[j]) {
+            jplotted = sp->p1dvar;
+            return jplotted;
+          }
+        }
+      break;
+#endif
       case unknown_display_type:
       break;
     }

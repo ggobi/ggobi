@@ -694,6 +694,9 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
         case SCATMAT:
         case PCPLOT:
         case TSPLOT:
+#ifdef BARCHART_IMPLEMENTED
+        case BARCHART:
+#endif
         case NMODES:
         break;
       }
