@@ -116,7 +116,8 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
       (*argc)--; av++;
     } else if(strcmp(av[1],"-colorschemes") == 0) {
 #ifdef USE_XML
-      read_colorscheme(av[2], &(sessionOptions->colorSchemes));       
+      sessionOptions->info->colorSchemeFile = av[2];
+      /* read_colorscheme(av[2], &(sessionOptions->colorSchemes)); */
 #else
       fprintf(stderr, "-colorschemes not supported without XML\n");
       fflush(stderr);
@@ -346,6 +347,9 @@ initSessionOptions()
 {
   sessionOptions = &sessionoptions;
   sessionOptions->data_mode = unknown_data;
+
+  sessionOptions->info = (GGobiInitInfo*) g_malloc(sizeof(GGobiInitInfo));
+  memset(sessionOptions->info, '\0', sizeof(GGobiInitInfo));
 }
 
 
@@ -561,8 +565,8 @@ process_initialization_files()
   }
      
   if(fileName) {
-    info = read_init_file(fileName);
-    sessionOptions->info = info;
+    info = read_init_file(fileName, sessionOptions->info);
+    /* sessionOptions->info = info; */
   }
 }
 #endif

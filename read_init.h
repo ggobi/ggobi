@@ -41,7 +41,7 @@ typedef struct _GGobiInitInfo {
     GdkColor *bgColor;
 } GGobiInitInfo;
 
-GGobiInitInfo *read_init_file(const char *filename);
+GGobiInitInfo *read_init_file(const char *filename, GGobiInitInfo *info);
 #ifdef USE_XML
 xmlNode *getXMLDocElement(const xmlDocPtr doc, const char *tagName);
 xmlNode *getXMLElement(const xmlNodePtr doc, const char *tagName);

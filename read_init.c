@@ -42,19 +42,20 @@ gint getPreferences(const xmlDocPtr doc, GGobiInitInfo *info);
 #include "colorscheme.h"
 
 GGobiInitInfo *
-read_init_file(const char *filename)
+read_init_file(const char *filename, GGobiInitInfo *info)
 {
   xmlDocPtr  doc;
-  GGobiInitInfo *info;
+  char *fileName;
   int oldValiditySetting = xmlDoValidityCheckingDefaultValue;
 
   xmlSubstituteEntitiesDefault(1);   
   xmlDoValidityCheckingDefaultValue = false;
-  filename = g_strdup(filename);
-  doc = xmlParseFile(filename); 
+  fileName = g_strdup(filename);
+  doc = xmlParseFile(fileName); 
   if(doc == NULL)
-/**/return((GGobiInitInfo *) NULL);
-  info = g_malloc(sizeof(GGobiInitInfo));
+      return(info);
+  if(info == NULL)
+      info = (GGobiInitInfo *) g_malloc(sizeof(GGobiInitInfo));
 
   info->numInputs = 0;
   info->descriptions = NULL;
@@ -68,7 +69,13 @@ read_init_file(const char *filename)
 #endif
 
   xmlDoValidityCheckingDefaultValue = oldValiditySetting;
+  /* Causes a crash when started with -init notes/ggobirc,
+     but not if there is a -colorschemes filename
+     g_free(fileName); 
+   */
 
+  /* Should release the doc object also. */
+  xmlFreeDoc(doc);
   return(info);
 }
 
@@ -101,11 +108,15 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   /*gint n, i;*/
   node = getXMLDocElement(doc, "preferences");
 
-  el = getXMLElement(node, "colorschemes");
-  if(el) {
+    /* Don't read this setting if the user has specified a value in
+       the command line argument. */
+  if(info->colorSchemeFile == NULL) {
+    el = getXMLElement(node, "colorschemes");
+    if(el) {
       char *tmp;
       tmp = xmlGetProp(el, "file");
       info->colorSchemeFile = g_strdup(tmp);
+    }
   }
 
   info->bgColor = NULL;  /*-- this needs to be initialized --*/

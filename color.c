@@ -129,7 +129,7 @@ color_table_init (ggobid *gg) {
 
 void
 init_plot_GC (GdkWindow *w, ggobid *gg) {
-  GdkColor white, black, *bblack, *wwhite;
+  GdkColor white, black, *bblack;
 
   gdk_color_white (gdk_colormap_get_system (), &white);
 
