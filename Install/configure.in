@@ -113,9 +113,10 @@ AC_ARG_WITH(Perl,  --with-Perl      Install the Perlggobi module)
 
 AC_ARG_WITH(gtk2,  --with-gtk2      Configure using gtk+2 rather than gtk+-1.2)
 
+
 if test -n "${with_gtk2}" && test "${with_gtk2}" != "no" ; then
 
-echo "Looking for gtk2"
+ echo "Looking for gtk2"
  AC_PATH_PROG(PKG_CONFIG, pkg-config,, $PATH)
  if test -z "${PKG_CONFIG}" ; then
    echo "Cannot find pkg-config"
@@ -124,7 +125,7 @@ echo "Looking for gtk2"
   GTK_CFLAGS="\$(shell \${PKG_CONFIG} --cflags gtk+-2.0) -DGTK_2_0=1 -DGTK_ENABLE_BROKEN"
   GTK_LIBS="\$(shell \${PKG_CONFIG} --libs gtk+-2.0)"
 
-  GTK_CONFIG_CFLAGS='"`${PKG_CONFIG} --cflags gtk+-2.0` -DGTK_2_0=1 -DGTK_ENABLE_BROKEN"'
+  GTK_CONFIG_CFLAGS='`${PKG_CONFIG} --cflags gtk+-2.0` -DGTK_2_0=1 -DGTK_ENABLE_BROKEN'
   GTK_CONFIG_LIBS='`${PKG_CONFIG} --libs gtk+-2.0`'
   AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal, , $PATH)
   GTK_2="yes"
@@ -134,7 +135,7 @@ AC_SUBST(GTK_2)
 AC_SUBST(GLIB_GENMARSHAL)
 
 if test -z "${PKG_CONFIG}" ; then
- AC_PATH_PROG(GTK_CONFIG, gtk-config, "<missing>", $PATH)
+  AC_PATH_PROG(GTK_CONFIG, gtk-config, "<missing>", $PATH)
  if test -z "${GTK_CONFIG}" || test "${GTK_CONFIG}" = "<missing>" ; then
    echo "Cannot find gtk-config"
    exit 1
@@ -143,8 +144,8 @@ if test -z "${PKG_CONFIG}" ; then
  GTK_CFLAGS="\$(shell \${GTK_CONFIG} --cflags)"
  GTK_LIBS="\$(shell \${GTK_CONFIG} --libs)"
 
- GTK_CONFIG_CFLAGS="`${GTK_CONFIG} --cflags`"
- GTK_CONFIG_LIBS="`${GTK_CONFIG} --libs`"
+ GTK_CONFIG_CFLAGS='`${GTK_CONFIG} --cflags`'
+ GTK_CONFIG_LIBS='`${GTK_CONFIG} --libs`'
 fi
 
 AC_SUBST(GTK_CONFIG_CFLAGS)
@@ -164,6 +165,9 @@ if test -z "${INSTALL}" ; then
 fi
 
 AC_SUBST(INSTALL)
+
+AC_PATH_PROG(GTK_CONFIG, gtk-config, "<missing>", $PATH)
+ AC_PATH_PROG(PKG_CONFIG, pkg-config,, $PATH)
 
 
 DEFAULT_LIB_DIRS="/usr/lib /usr/local/lib /opt/lib"
@@ -722,6 +726,7 @@ echo "GGobi"
 echo " Version:                $GGOBI_VERSION_STRING"
 echo " Installation directory: $INSTALL_DIR"
 echo " XML:                    version ${XML_VERSION}"
+echo " Gtk:                    version "
 echo " Plugins:               ${PLUGIN_DIRS}"
 echo " Rggobi:                 ${WILL_BUILD_RGGOBI-no}" 
 echo ""
