@@ -32,3 +32,4 @@ Brushing:
 Use a notebook for the advanced tour panel
 
 Rename gtour_ui.c to tour2d_ui.c
+Rename display_reproject to display_tailpipe

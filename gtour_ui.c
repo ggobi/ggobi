@@ -217,15 +217,17 @@ static void section_cb (GtkToggleButton *button)
 static void epsilon_cb (GtkAdjustment *adj, gpointer cbd) {
   g_printerr ("epsilon %f\n", adj->value);
 }
+/*
 static void
 hide_cb (GtkWidget *w ) {
   gtk_widget_hide (w);
 }
+*/
 
 static void
 open_gtouradv_popup () {
-  GtkWidget *vbox, *box, *btn, *opt, *tgl, *frame, *entry;
-  GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar;
+  GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
+  GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;
   GtkObject *adj;
 
   if (window == NULL) {
@@ -235,12 +237,16 @@ open_gtouradv_popup () {
     
     gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
+    /* Create a new notebook, place the position of the tabs */
+    notebook = gtk_notebook_new ();
+    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
+    gtk_container_add (GTK_CONTAINER (window), notebook);
+
+/*-- vbox to be placed in the notebook page --*/
     vbox = gtk_vbox_new (false, 2);
-    gtk_container_add (GTK_CONTAINER (window), vbox);
-    
-/*
- * Local scan toggle
-*/
+    gtk_container_set_border_width (GTK_CONTAINER (vbox), 4);
+
+    /*-- local scan toggle --*/
     tgl = gtk_check_button_new_with_label ("Local scan");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), tgl,
       "Perform the tour within a small local region", NULL);
@@ -249,9 +255,7 @@ open_gtouradv_popup () {
     gtk_box_pack_start (GTK_BOX (vbox),
                         tgl, false, false, 1);
 
-/*
- * Box to hold 'step' toggle and 'go' button
-*/
+    /*-- Box to hold 'step' toggle and 'go' button --*/
     box = gtk_hbox_new (true, 2);
 
     tgl = gtk_check_button_new_with_label ("Step");
@@ -272,9 +276,10 @@ open_gtouradv_popup () {
 
     gtk_box_pack_start (GTK_BOX (vbox), box, false, false, 1);
 
-/*
- * path length option menu inside frame
-*/
+    lbl = gtk_label_new ("General");
+    gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, lbl);
+
+    /*-- path length option menu inside frame --*/
     hb = gtk_hbox_new (false, 0);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
 
@@ -289,13 +294,11 @@ open_gtouradv_popup () {
                           sizeof (pathlen_lbl) / sizeof (gchar *),
                           pathlen_cb);
 
-/*
- * interpolation option menu inside hbox
-*/
+    /*-- interpolation option menu inside hbox --*/
     hb = gtk_hbox_new (false, 0);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
 
-    lbl = gtk_label_new ("Interpolation:");
+    lbl = gtk_label_new ("Interpolation: ");
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
     opt = gtk_option_menu_new ();
@@ -305,20 +308,14 @@ open_gtouradv_popup () {
     populate_option_menu (opt, interp_lbl,
                           sizeof (interp_lbl) / sizeof (gchar *),
                           interp_cb);
-/*
- * tour history functions
-*/
-    frame = gtk_frame_new ("History");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-    gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 0);
 
+/*-- tour history functions: vbox to be placed in the notebook page --*/
     vb = gtk_vbox_new (true, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vb), 4);
-    gtk_container_add (GTK_CONTAINER (frame), vb);
+    lbl = gtk_label_new ("History");
+    gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vb, lbl);
 
-    /*
-     * Store bases toggle
-    */
+    /*-- Store bases toggle --*/
     tgl = gtk_check_button_new_with_label ("Store bases");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), tgl,
       "Store basis vectors", NULL);
@@ -326,9 +323,7 @@ open_gtouradv_popup () {
                         GTK_SIGNAL_FUNC (storebases_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (vb), tgl, false, false, 0);
 
-    /*
-     * Number of bases stored; a label and a text entry
-    */
+    /*-- Number of bases stored; a label and a text entry --*/
     hb = gtk_hbox_new (false, 0);
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
@@ -342,13 +337,11 @@ open_gtouradv_popup () {
                           -1);
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
-    /*
-     * Number of bases stored; a label and a text entry
-    */
+    /*-- Number of bases stored; a label and a text entry --*/
     hb = gtk_hbox_new (false, 0);
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
-    lbl = gtk_label_new ("Current base pair:");
+    lbl = gtk_label_new ("Current base pair: ");
     gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
@@ -363,9 +356,7 @@ open_gtouradv_popup () {
                           -1);
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
-    /*
-     * Return to basis x
-    */
+    /*-- Return to basis x --*/
     hb = gtk_hbox_new (false, 0);
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
@@ -378,9 +369,7 @@ open_gtouradv_popup () {
                           -1);
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
-    /*
-     * Display basis as bitmap
-    */
+    /*-- Display basis as bitmap --*/
     hb = gtk_hbox_new (false, 0);
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
@@ -397,17 +386,11 @@ open_gtouradv_popup () {
                           -1);
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
-
-/* 
- * Section tour: frame with rangewidget
-*/
-    frame = gtk_frame_new ("Cross-section tour");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-    gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 0);
-
-    box = gtk_vbox_new (false, 1);
-    gtk_container_add (GTK_CONTAINER (frame), box);
+/*-- section tour widgets: vbox to be placed in the notebook page --*/
+    box = gtk_vbox_new (false, 0);
     gtk_container_set_border_width (GTK_CONTAINER (box), 4);
+    lbl = gtk_label_new ("Section");
+    gtk_notebook_append_page (GTK_NOTEBOOK (notebook), box, lbl);
 
     tgl = gtk_check_button_new_with_label ("Section");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), tgl,
@@ -417,9 +400,7 @@ open_gtouradv_popup () {
                         GTK_SIGNAL_FUNC (section_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (box), tgl, false, false, 1);
 
-  /*
-   * vbox for label and rangewidget
-  */
+    /*-- vbox for label and rangewidget --*/
     vb = gtk_vbox_new (true, 0);
     gtk_box_pack_start (GTK_BOX (box), vb, false, false, 1);
 
@@ -439,15 +420,6 @@ open_gtouradv_popup () {
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
     gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
     gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 0);
-
-/*
- * Close button
-*/
-    btn = gtk_button_new_with_label ("Close");
-    gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
-                   GTK_SIGNAL_FUNC (hide_cb), (gpointer) window);
-    gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);
-
   }
 
   gtk_widget_show_all (window);

@@ -23,14 +23,14 @@ scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func) {
   CreateMenuItem (scatterplot_mode_menu, "PROJECTION MODES:",
     "", "", NULL, NULL, NULL, NULL);
 
-  CreateMenuItem (scatterplot_mode_menu, "1DPlot",
+  CreateMenuItem (scatterplot_mode_menu, "1D Plot",
     "^d", "", NULL, accel_group, func, GINT_TO_POINTER (P1PLOT));
   CreateMenuItem (scatterplot_mode_menu, "XYPlot",
     "^x", "", NULL, accel_group, func, GINT_TO_POINTER (XYPLOT));
   CreateMenuItem (scatterplot_mode_menu, "Rotation",
     "^r", "", NULL, accel_group, func, GINT_TO_POINTER (ROTATE));
-  CreateMenuItem (scatterplot_mode_menu, "Grand Tour",
-    "^g", "", NULL, accel_group, func, GINT_TO_POINTER (TOUR2D));
+  CreateMenuItem (scatterplot_mode_menu, "2D Tour",
+    "^t", "", NULL, accel_group, func, GINT_TO_POINTER (TOUR2D));
   CreateMenuItem (scatterplot_mode_menu, "Correlation Tour",
     "^c", "", NULL, accel_group, func, GINT_TO_POINTER (COTOUR));
 

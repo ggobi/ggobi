@@ -17,10 +17,10 @@ GtkAccelGroup *main_accel_group;
 
 static GtkWidget *mode_frame;
 static char *mode_name[] = {
-  "1DPlot",
+  "1D Plot",
   "XYPlot",
   "Rotation",
-  "Grand Tour",
+  "2D Tour",
   "Correlation Tour",
   "Scale",
   "Brush",

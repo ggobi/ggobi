@@ -43,16 +43,19 @@ static void rescalep_cb (GtkToggleButton *button)
 
 static void
 subset_cb (GtkWidget *w) {
-  gint subset_type = gtk_notebook_get_current_page (GTK_NOTEBOOK (ss_notebook));
+  gint subset_type;
   gint sample_size;
   gchar *sample_str, *rowlab;
   gint ss_bstart, ss_bsize;
   gint ss_estart, ss_estep;
   gboolean redraw;
 
+  subset_type = gtk_notebook_get_current_page (GTK_NOTEBOOK (ss_notebook));
+
   switch (subset_type) {
     case SS_RANDOM:
-      sample_str = gtk_editable_get_chars (GTK_EDITABLE (ss_random_entry), 0,-1);
+      sample_str = gtk_editable_get_chars (GTK_EDITABLE (ss_random_entry),
+                                           0, -1);
       sample_size = atoi (sample_str);
       redraw = subset_random (sample_size);
       break;

@@ -160,7 +160,7 @@ cpanel_ctour_make () {
 */
   btn = gtk_button_new_with_label ("Projection pursuit ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
-    "Open panel for grand tour projection pursuit", NULL);
+    "Open panel for correlation tour projection pursuit", NULL);
   gtk_box_pack_start (GTK_BOX (control_panel[COTOUR]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
@@ -171,7 +171,7 @@ cpanel_ctour_make () {
 */
   btn = gtk_button_new_with_label ("Advanced features ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
-    "Open panel for additional grand tour features", NULL);
+    "Open panel for additional correlation tour features", NULL);
   gtk_box_pack_start (GTK_BOX (control_panel[COTOUR]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
