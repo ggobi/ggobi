@@ -714,7 +714,7 @@ fi
 
 dnl Doing this here seems to generate all of the files again.
 dnl Want to just write out this one.
-AC_OUTPUT(Plugins)
+AC_OUTPUT(PluginList)
 
 dnl Ensure the resulting ggobi scripts executable.
 chmod +x bin/ggobi

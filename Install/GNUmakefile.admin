@@ -92,7 +92,7 @@ ifndef NO_XGOBI_GROUP
 endif
 	chmod -R g+w $(TMP_INSTALL_DIR)
 	cp $(LICENSES:%=LICENSING/%) Install/INSTALL Install/README Install/INSTALL-xml.html $(TMP_INSTALL_DIR)
-	cp Install/Plugins.in Install/configure.in Install/configure  Install/Makeconf.in Install/GNUmakefile.in $(TMP_INSTALL_DIR)
+	cp Install/PluginList.in Install/configure.in Install/configure  Install/Makeconf.in Install/GNUmakefile.in $(TMP_INSTALL_DIR)
 	cp Install/GNUmakefile_src.in $(TMP_INSTALL_DIR)/src/GNUmakefile.in
 	cp Install/config.h.in $(TMP_INSTALL_DIR)/src/
 	cp Install/setLD.bsh.in Install/setLD.csh.in Install/ggobi-config.in $(TMP_INSTALL_DIR)/bin

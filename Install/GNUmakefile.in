@@ -36,7 +36,7 @@ lib/libggobi.@SHLIB_EXT@ lib: $(GTK_EXT)
 bin/xmlConvert:
 	$(MAKE) -C src ../bin/xmlConvert
 
-include Plugins
+include PluginList
 
 
 HEADER_FILES=$(wildcard include/*.h) 
