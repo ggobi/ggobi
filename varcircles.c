@@ -97,12 +97,22 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
       GTK_SCROLLED_WINDOW (d->vcirc_ui.swin));
     vport_width = adj->page_size;
 
-    vb_width = vb->allocation.width;
-    if (vb_width < 5) vb_width = VAR_CIRCLE_DIAM;
-
-    tncols = MIN (vport_width / vb_width, ncols);
-    tnrows = ncols / tncols;
-    if (tnrows * tncols < ncols) tnrows++;
+    /*
+     * if the varcircles have never been exposed, can't use page_size,
+     * so just keep adding rows
+    */
+    if (vport_width == 0) {
+      while (ncols > d->vcirc_ui.tncols * d->vcirc_ui.tnrows)
+        d->vcirc_ui.tnrows++;
+    } else {  /*-- fill the available space as best we can --*/
+      vb_width = vb->allocation.width;
+      if (vb_width < 5) vb_width = VAR_CIRCLE_DIAM;
+      tncols = MIN (vport_width / vb_width, ncols);
+      tnrows = ncols / tncols;
+      if (tnrows * tncols < ncols) tnrows++;
+      d->vcirc_ui.tncols = tncols;
+      d->vcirc_ui.tnrows = tnrows;
+    }
 
   } else {
     gint vport_height, vb_height;
@@ -111,15 +121,20 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
       GTK_SCROLLED_WINDOW (d->vcirc_ui.swin));
     vport_height = adj->page_size;
 
-    vb_height = vb->allocation.height;
-    if (vb_height < 5) vb_height = VAR_CIRCLE_DIAM;  /*-- a bit low ... --*/
+    if (vport_height == 0) {
+      while (ncols > d->vcirc_ui.tncols * d->vcirc_ui.tnrows)
+        d->vcirc_ui.tncols++;
+    } else {
+      vb_height = vb->allocation.height;
+      if (vb_height < 5) vb_height = VAR_CIRCLE_DIAM;  /*-- a bit low ... --*/
 
-    tnrows = MIN (vport_height / vb_height, ncols);
-    tncols = ncols / tnrows;
-    if (tnrows * tnrows < ncols) tncols++;
+      tnrows = MIN (vport_height / vb_height, ncols);
+      tncols = ncols / tnrows;
+      if (tnrows * tnrows < ncols) tncols++;
+      d->vcirc_ui.tncols = tncols;
+      d->vcirc_ui.tnrows = tnrows;
+    }
   }
-  d->vcirc_ui.tncols = tncols;
-  d->vcirc_ui.tnrows = tnrows;
 
   for (j=0; j<ncols; j++) {
     /*-- if they're in the container, ref and remove them --*/
@@ -180,7 +195,7 @@ varcircles_cursor_set_default (datad *d)
 {
   GdkWindow *window = GTK_WIDGET (d->varpanel_ui.ebox)->window;
   gdk_cursor_destroy (d->vcirc_ui.cursor);
-  d->vcirc_ui.jcursor = NULL;
+  d->vcirc_ui.jcursor = (gint) NULL;
   gdk_window_set_cursor (window, NULL);
 }
 
@@ -192,7 +207,7 @@ manip_select_cb (GtkWidget *w, GdkEvent *event, datad *d)
 
   d->vcirc_ui.cursor = gdk_cursor_new (GDK_HAND2);
   gdk_window_set_cursor (window, d->vcirc_ui.cursor);
-  d->vcirc_ui.jcursor = GDK_HAND2;
+  d->vcirc_ui.jcursor = (gint )GDK_HAND2;
   
   return true;
 }
@@ -257,8 +272,8 @@ varcircles_populate (datad *d, ggobid *gg)
   GtkWidget *da;
 
   varcircles_layout_init (d, gg);
-  d->vcirc_ui.jcursor = NULL;  /*-- start with the default cursor --*/
-  d->vcirc_ui.cursor = NULL;
+  d->vcirc_ui.jcursor = (gint) NULL;  /*-- start with the default cursor --*/
+  d->vcirc_ui.cursor = (gint) NULL;
 
   d->vcirc_ui.vbox = gtk_vbox_new (false, 0);
 
