@@ -170,6 +170,9 @@ getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
   gint n, i;
   node = getXMLDocElement(doc, "previousFiles");
 
+  if(node == NULL)
+      return(0);
+
   n = 0;
   el = XML_CHILDREN(node);
   while(el) {
