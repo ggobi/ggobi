@@ -432,21 +432,6 @@ varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
 /*                  initialize and populate the var panel                  */
 /*-------------------------------------------------------------------------*/
 
-/*-- respond to the addition of a new datad --*/
-#ifdef DATAD_ADDED_SIGNAL_IMPLEMENTED
-static void datad_added_cb (GtkObject *obj, datad *d, ggobid *gg,
-  GtkWidget *notebook)
-{
-/*
-  g_printerr ("varpanel_ui.notebook responds to datad_added signal\n");
-   I wanted to be able to move the calls to varpanel_checkboxes_populate()
-   and varcircles_populate() from datad_init() to here, but then the
-   sequence of functions gets messsed up and things break.  So it won't
-   be that simple.
-*/
-}
-#endif
-
 /*
  * build the notebook to contain an ebox which will be switched
  * between checkboxes and circles
@@ -463,16 +448,8 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.notebook), "switch-page",
     GTK_SIGNAL_FUNC (varpanel_switch_page_cb), gg);
 
-/*-- listen for datad_added events on main_window --*/
-#ifdef DATAD_ADDED_SIGNAL_IMPLEMENTED
-  gtk_signal_connect_object (GTK_OBJECT (gg->main_window),
-    "datad_added", GTK_SIGNAL_FUNC (datad_added_cb),
-     GTK_OBJECT (gg->varpanel_ui.notebook));
-#endif
-
   gtk_box_pack_start (GTK_BOX (parent), gg->varpanel_ui.notebook,
     true, true, 2);
-
 
   gtk_widget_show (gg->varpanel_ui.notebook);
 }
