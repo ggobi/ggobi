@@ -130,7 +130,7 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display)
 void
 display_new (ggobid *gg, guint action, GtkWidget *widget)
 {
- display_create (action, gg);
+  display_create (action, gg);
 }
 
 displayd *
@@ -222,8 +222,8 @@ void
 display_free (displayd* display, gboolean force, ggobid *gg) {
   GList *l;
   splotd *sp = NULL;
-  extern int num_ggobis;
-  int count;
+  extern gint num_ggobis;
+  gint count;
 /*
  * If the current splot belongs to this display, turn off its
  * event handlers before freeing all the splots belonging to this
@@ -243,7 +243,8 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
 
     g_list_remove (gg->displays, display);
 
-    if (display == gg->current_display && (g_list_length (gg->displays) > 1)) {
+    /*-- list length only has to be >=0 because a display was just removed --*/
+    if (display == gg->current_display && (g_list_length (gg->displays) > 0)) {
       display_set_current (g_list_nth_data (gg->displays, 0), gg);
       gg->current_splot = (splotd *)
         g_list_nth_data (gg->current_display->splots, 0);
@@ -271,7 +272,7 @@ void
 display_free_all (ggobid *gg) {
   GList *dlist;
   displayd *display;
-  int count = g_list_length(gg->displays);
+  gint count = g_list_length (gg->displays);
 
   /* Have to count down rather than rely on dlist being non-null.
      This is because when we remove the last entry, we get garbage

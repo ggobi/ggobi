@@ -28,6 +28,11 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   gboolean redraw;
   gint jvar_prev = -1;
 
+  if (display == NULL || !GTK_IS_WIDGET (display->window)) {
+    g_printerr ("Bug?  I see no active display\n");
+    return ;
+  }
+  
   switch (display->displaytype) {
 
     case parcoords:
