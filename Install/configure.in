@@ -1,0 +1,131 @@
+dnl This is the configuration script for ggobi
+dnl to be used when installing it. (It is not 
+dnl necessarily used by in development versions.)
+
+dnl This tries to find the optional elements
+dnl of ggobi such as
+dnl  XML 
+dnl  MySQL, Postgres, etc.
+dnl      Properties library from Omega.
+
+dnl This also determines where the gtk-config
+dnl executable is.
+
+
+AC_INIT(ggobi.c)
+ 
+
+ dnl Check for gtk-config.
+ dnl We are not going anywhere without that.
+
+AC_PATH_PROG(GTK_CONFIG, gtk-config, "<missing>", $PATH)
+
+if test "${GTK_CONFIG}" = "<missing>" ; then
+ echo "Cannot find gtk-config"
+ exit 1
+fi
+
+
+DEFAULT_LIB_DIRS="/usr/lib /usr/local/lib /opt/lib"
+DEFAULT_INC_DIRS="/usr/include /usr/local/include /usr/local/src/include"
+
+AC_ARG_WITH(xml,Enable reading and writing of XML datasets., USE_XML=1)
+AC_ARG_WITH(mysql,Enable reading data from MySQL databases., USE_MYSQL=1)
+
+if test -n "${USE_XML}" ; then
+
+ dnl echo "with_xml: ${with_xml}"
+
+ if test -d ${with_xml} ; then
+  XML_INC_DIRS=$with_xml
+  XML_LIB_DIRS=$with_xml
+ fi
+
+   dnl Now find libxml-1.8.7
+  
+ if test -z "${XML_INC_DIRS}" ; then
+
+   ORIG_CPPFLAGS=$CPPFLAGS
+   for f in ${DEFAULT_INC_DIRS} ; do 
+     for ext in / /xml ; do
+
+       if test -f $f$ext/mysql.h ; then
+         MYSQL_INC_DIRS=$f$ext 
+       fi
+dnl      CPPFLAGS="${ORIG_CPPFLAGS} -I$f$ext"
+dnl      AC_CHECK_HEADER(parserInternals.h, XML_INC_DIRS=$f$ext)
+
+      if test -n "${XML_INC_DIRS}" ; then
+        echo "Found XML include file(s): $XML_INC_DIRS"
+        break
+      fi
+
+     done
+   done
+
+ fi
+
+fi
+
+
+
+if test -n "${USE_MYSQL}" ; then
+
+ echo "with_mysql: ${with_mysql}"
+
+ if test -d ${with_mysql} ; then
+  MYSQL_INC_DIRS=$with_mysql
+  MYSQL_LIB_DIRS=$with_mysql
+ fi
+
+   dnl Now find libmysqlclient
+  
+ if test -z "${MYSQL_INC_DIRS}" ; then
+
+   ORIG_CPPFLAGS=$CPPFLAGS
+   for f in ${DEFAULT_INC_DIRS} ; do 
+     for ext in "/" "/mysql" ; do
+
+      CPPFLAGS="${ORIG_CPPFLAGS} -I$f$ext"
+echo "Checking $f$ext"
+       if test -f $f$ext/mysql.h ; then
+         MYSQL_INC_DIRS=$f$ext 
+       fi
+dnl      AC_CHECK_HEADER(mysql.h, MYSQL_INC_DIRS=$f$ext)
+
+      if test -n "${MYSQL_INC_DIRS}" ; then
+        echo "Found MYSQL include file(s): $MYSQL_INC_DIRS"
+        break
+      fi
+
+     done
+   done
+
+ fi
+
+
+
+ if test -z "${MYSQL_LIB_DIRS}" ; then
+
+   ORIG_LIBS=$LIBS
+   LIBS="$LIBS -L/usr/lib"
+   AC_CHECK_LIB(xml,xmlCreateFileParserCtxt)
+   if test -z "${HAVE_LIBxml}" ; then
+    echo "Cannot find libxml"
+    exit 1;
+   else
+     echo "Using libxml from ${LIBS}"
+   fi
+
+  fi
+
+fi
+
+
+AC_SUBST(XML_INC_DIRS)
+AC_SUBST(XML_LIB_DIRS)
+
+AC_SUBST(MYSQL_INC_DIRS)
+AC_SUBST(MYSQL_LIB_DIRS)
+
+AC_OUTPUT(GNUmakefile)

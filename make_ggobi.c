@@ -27,7 +27,6 @@
 #include "read_mysql.h"
 #endif
 
-
 /*-- initialize variables which don't depend on the size of the data --*/
 void globals_init (ggobid *gg) {
   gg->glyph_id.type = gg->glyph_0.type = FILLED_CIRCLE;
@@ -198,3 +197,5 @@ make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
     gtk_main ();
   }
 }
+
+
