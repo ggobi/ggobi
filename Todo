@@ -1,5 +1,26 @@
+PP indices as plugins and R functions.
+
+Allow speed up and slow down of tour via accelerator keys.
+  < and >
+
+Initialization of tour speed.
+ Done.
+
+
+
 Installation:
+
+  If prefix=`pwd`
+     Create the include/ggobi 
+     Set the default for GGOBI_HOME correctly in ggobi
+
+     Problem with getting pwd on command line and in shell script to get same
+     string for the same directory. pwd -L on 
+
   End up rebuilding Rggobi when make and then make install
+
+  Get the configuration failures for plugins.
+  
 
 
 General:
