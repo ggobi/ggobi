@@ -16,7 +16,9 @@
 #include "vars.h"
 #include "externs.h"
 
-static void destroyit(gboolean kill, ggobid * gg)
+static gint exclusion_notebook_adddata_cb(ggobid *, datad *, void* notebook);
+
+static void destroyit (gboolean kill, ggobid * gg)
 {
   gint n, nrows;
   GSList *l;
@@ -476,11 +478,14 @@ void cluster_table_update(datad * d, ggobid * gg)
   }
 }
 
-static void 
-exclusion_notebook_adddata_cb(ggobid *gg, datad * d, void* notebook)
+static gint
+exclusion_notebook_adddata_cb (ggobid *gg, datad * d, void* notebook)
 {
   /*cluster_table_update(d, gg);*/
+g_printerr ("adddata_cb called for %s\n", d->name);
+
   cluster_window_open (gg);
+  return true;  /* risky -- will this prevent other guys from getting it?  --*/
 }
 
 CHECK_EVENT_SIGNATURE(exclusion_notebook_adddata_cb, datad_added_f)
@@ -494,6 +499,7 @@ void cluster_window_open(ggobid * gg)
   gint k;
   GSList *l;
   datad *d;
+  gboolean new = false;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length(gg->d) == 0)
@@ -505,12 +511,14 @@ void cluster_window_open(ggobid * gg)
   }
 
   if (gg->cluster_ui.window == NULL ||
-      !GTK_WIDGET_REALIZED(gg->cluster_ui.window)) {
+      !GTK_WIDGET_REALIZED(gg->cluster_ui.window))
+  {
     gg->cluster_ui.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_signal_connect(GTK_OBJECT(gg->cluster_ui.window), "delete_event",
       GTK_SIGNAL_FUNC(close_wmgr_cb), (gpointer) gg);
     gtk_window_set_title(GTK_WINDOW(gg->cluster_ui.window),
       "color & glyph groups");
+    new = true;
   }
 
   vbox = gtk_vbox_new(false, 5);
@@ -623,12 +631,13 @@ void cluster_window_open(ggobid * gg)
   }
 
   /*-- listen for datad_added events on main_window --*/
-/*
-  gtk_signal_connect(GTK_OBJECT(gg),
-    "datad_added",
-    GTK_SIGNAL_FUNC(exclusion_notebook_adddata_cb),
-    GTK_OBJECT(gg->cluster_ui.notebook));
-*/
+  /*-- Be careful to add this signal handler only once! --*/
+  if (new) {
+    gtk_signal_connect(GTK_OBJECT(gg),
+      "datad_added",
+      GTK_SIGNAL_FUNC(exclusion_notebook_adddata_cb),
+      NULL);
+  }
 
   /*-- give the window an initial height --*/
   gtk_widget_set_usize(GTK_WIDGET(scrolled_window), -1, 150);
