@@ -797,6 +797,7 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
   const gchar *tmp = strtok((gchar*) line, " \t\n");
   datad *d = getCurrentXMLData(data);
   vartabled *vt = NULL;
+
   while (tmp && (tmp < (gchar *) (line + len))) {
 
     /* If reading past the last column or row, stop */
@@ -825,9 +826,10 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
       value = asNumber (tmp);
       d->raw.vals[data->current_record][data->current_element] = value;
     }
-        /* If the dataset is using one of the variables as the row labels,
-           the resolve the name.
-         */
+
+    /* If the dataset is using one of the variables as the row labels,
+       then resolve the name.
+     */
     if(data->recordLabelsVariable == data->current_element) {
       gchar *tmp1;
       /* If this is a categorical, lookup the level id. */
@@ -852,6 +854,7 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
       }
       g_array_insert_val(d->rowlab, data->current_record, tmp1);
     }
+
     data->current_element++;
     tmp = strtok (NULL, " \t\n");
   }
