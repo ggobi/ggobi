@@ -3,9 +3,20 @@
  */
 #include "read_init.h"
 
+#if USE_XML == 1
+extern int xmlDoValidityCheckingDefaultValue;
+#endif
+
+
+#ifdef USE_GNOME_XML
+#include <gnome-xml/parser.h>
+#include <gnome-xml/tree.h>
+#include <gnome-xml/parserInternals.h> /* for xmlDoValidityChecking */
+#else
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/parserInternals.h> /* for xmlDoValidityChecking */
+#endif
 
 #include <string.h>
 

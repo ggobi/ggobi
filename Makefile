@@ -132,15 +132,18 @@ ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c  read_init.c
  XML_OB= read_xml.o write_xml.o read_init.o
 
- CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=1 
+ CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=$(USE_XML) $(XML_FLAGS)
+
  SRC+=$(XML_SRC)
  OB+= $(XML_OB)
 
 ifdef DL_RESOLVE_FLAG
  DL_RESOLVE_PATH+=$(XML_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %)
 endif
-
- XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml$(USE_XML) -lz 
+ifeq ($(USE_XML),2)
+ XML_LIB_NO=2
+endif
+ XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml$(XML_LIB_NO) -lz 
 
 main_ui.o: write_xml.h
 read_xml.o: read_xml.h
