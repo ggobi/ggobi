@@ -88,7 +88,6 @@ e:
           entry = child->widget;
           lbl = gtk_editable_get_chars (GTK_EDITABLE(entry), 0, -1);
           raw[child->left_attach] = (greal) atof (lbl);
-g_printerr ("raw[%d] = %f\n", child->left_attach, raw[child->left_attach]); 
         }
       }
     
@@ -99,7 +98,6 @@ g_printerr ("raw[%d] = %f\n", child->left_attach, raw[child->left_attach]);
 
   gg->edgeedit.a = -1;
   gtk_widget_destroy (dialog);
-  g_printerr ("add the record\n");
 }
 
 static void

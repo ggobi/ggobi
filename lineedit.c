@@ -18,13 +18,11 @@
 
 /*--------------------------------------------------------------------*/
 
-/* XXX I can't add an edge to a newly added point.  Figure out why not. */
-
 gboolean record_add (gint a, gint b, gchar *lbl, gchar *id, greal *raw,
   datad * d, datad * e, ggobid *gg)
 {
   gchar *s1, *s2;
-  gint j;
+  gint i, j;
   GList *l, *sl;
   splotd *sp;
   displayd *dsp;
@@ -36,6 +34,19 @@ gboolean record_add (gint a, gint b, gchar *lbl, gchar *id, greal *raw,
     dtarget = e;
     edge_record_p = true;
     g_assert (e->edge.n == e->nrows);
+  }
+
+  /*-- Make sure the id is unique --*/
+  if (dtarget->idTable && id) {
+    gchar *stmp = g_strdup ((id)?id:g_strdup_printf ("%d", dtarget->nrows));
+    for (i=0; i<dtarget->nrows; i++) {
+      if (strcmp(stmp, dtarget->rowIds[i]) == 0) {
+        g_printerr ("Please supply an id that isn't already used\n");
+        g_free (stmp);
+        return false;
+      }
+    }
+    g_free (stmp);
   }
 
   /*-- Here's what the datad needs --*/

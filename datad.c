@@ -213,12 +213,19 @@ datad_record_id_add (gchar *id, datad *d)
   gint i, *index;
 
   d->rowIds = (gchar **) g_realloc (d->rowIds, sizeof(gchar *) * d->nrows);
+  i = d->nrows - 1;
 
   index = (guint *) g_malloc(sizeof(guint));
   *index = i;
   g_hash_table_insert (d->idTable, id, index);
-  d->rowIds[d->nrows-1] = id;
-  g_free (index);
+  d->rowIds[i] = id;
+
+/*
+ * I don't really understand why I can't free this
+ * when it's freed in datad_record_ids_set, but purify is
+ * quite clear on this point.  -- dfs
+*/
+  /*g_free (index);*/
 }
 
 /*

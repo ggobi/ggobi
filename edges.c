@@ -59,8 +59,7 @@ gboolean edge_add (gint a, gint b, gchar *lbl, gchar *id, datad * d, datad * e,
   displayd *dsp;
 
 /*-- while the code is evolving ... --*/
-g_printerr ("lbl %s\n", lbl);
-g_printerr ("id %s\n", id);
+g_printerr ("lbl %s id %s\n", lbl, id);
 
   g_assert (e->edge.n == e->nrows);
 
