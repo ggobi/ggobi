@@ -459,34 +459,37 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
   gint dim = (gint) adj->value;
   gint i, j;
   gchar *vname;
-  datad *d = ggv->dpos;
-  gdouble *dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gdouble));
   gboolean running = ggv->running_p;
+  datad *d = ggv->dpos;
+  gdouble *dtmp;
 
-  if (ggv->running_p) mds_func (false, inst);
+  if (ggv->dpos) {
+
+    if (ggv->running_p) mds_func (false, inst);
   
-  if (dim > ggv->dim) {  /*-- add variables as needed --*/
-    gdouble min, range;
-    vartabled *vt;
+    if (dim > ggv->dim) {  /*-- add variables as needed --*/
 
-    arrayd_add_cols (&ggv->pos, dim);
-    vectord_realloc (&ggv->pos_mean, dim);
+      arrayd_add_cols (&ggv->pos, dim);
+      vectord_realloc (&ggv->pos_mean, dim);
 
-    dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gdouble));
-    for (i=0; i<d->nrows; i++)
-      dtmp[i] = 2 * (randvalue() - .5);  /* on [-1, 1] */
-    for (j=ggv->dim; j<dim; j++) {
-      vname = g_strdup_printf ("Pos%d", j+1);
-      newvar_add_with_values (dtmp, d->nrows, vname, d, gg);
-      g_free (vname);
+      dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gdouble));
+      for (i=0; i<d->nrows; i++)
+        dtmp[i] = 2 * (randvalue() - .5);  /* on [-1, 1] */
+      for (j=ggv->dim; j<dim; j++) {
+        vname = g_strdup_printf ("Pos%d", j+1);
+        newvar_add_with_values (dtmp, d->nrows, vname, d, gg);
+        g_free (vname);
+      }
+      g_free (dtmp);
+
     }
-    g_free (dtmp);
-
   }
 
   ggv->dim = dim;
 
-  if (running) mds_func (true, inst);
+  if (ggv->dpos) {
+    if (running) mds_func (true, inst);
+  }
 }
 
 void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst)
