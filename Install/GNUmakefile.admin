@@ -121,6 +121,8 @@ $(XML_TAR_FILE) xmlTar: createDist
 	(cd $(TMP_INSTALL_DIR)/.. ; $(TAR) zcvf $(CUR_DIR)/$(XML_TAR_FILE) $(PKG_NAME))
 
 
+Docs/%:
+	$(MAKE) -C Docs $(@F)
 
 %.pdf: %.tex
 	(cd $(@D) ; TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $(<F))
