@@ -18,6 +18,11 @@
 
 <!ELEMENT edges ( edge )*>
 <!ELEMENT edge EMPTY>
+<!ELEMENT edgevariables ( edgevariable )*>
+<!ELEMENT edgevariable ( #PCDATA )>
+<!ELEMENT edgerecords ( edgerecord )*>
+<!ELEMENT edgerecord  ( #PCDATA )>
+<!ENTITY % lineTypes " solid | dot | dash ">
 
 <!ELEMENT ggobidata (description, (colormap)?, variables, records, (edges)*)>
 
@@ -69,6 +74,25 @@
    color       CDATA  #IMPLIED
    width       CDATA  #IMPLIED
 >
+
+
+<!ATTLIST edgerecords
+   count CDATA  #REQUIRED
+>
+
+<!ATTLIST edgevariable
+    name          NMTOKEN #IMPLIED
+    missingValue  CDATA   #IMPLIED
+>
+
+<!ATTLIST edgerecord
+   label     NMTOKEN                   #REQUIRED
+   id        NMTOKEN                   #IMPLIED
+   color     CDATA                     #IMPLIED
+   lineWidth ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
+   group     CDATA                     #IMPLIED 
+>   
+
 
 <!ATTLIST ggobidata
    numRecords   CDATA #REQUIRED 

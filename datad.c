@@ -8,6 +8,7 @@
 datad *
 datad_new (ggobid *gg) {
   datad *d = (datad *) g_malloc (sizeof (datad));
+  memset(d, 0, sizeof(datad));
 
   d->std_type = 0;
 

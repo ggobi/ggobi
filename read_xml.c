@@ -177,6 +177,8 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->current_edgerecord = 0;
   data->current_edgeelement = 0;
 
+  data->current_data = NULL;
+
   data->current_color = 0;
   data->reading_colormap_file_p = false;
   data->state = UNKNOWN;
@@ -411,7 +413,7 @@ gboolean
 setDatasetInfo (const CHAR **attrs, XMLParserData *data)
 {
   const char *tmp = getAttribute(attrs, "numRecords");
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
 
   if (tmp == NULL) {
     g_printerr ("No numRecords attribute\n");
@@ -474,7 +476,7 @@ newRecord(const CHAR **attrs, XMLParserData *data)
 {
   const gchar *tmp;
   gint i = data->current_record;
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
 
   data->current_element = 0;
 
@@ -508,7 +510,7 @@ setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
 {
   const char *tmp;
   ggobid *gg = data->gg;
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
 
   tmp = getAttribute(attrs, "hidden");
   if(tmp) {
@@ -552,7 +554,7 @@ setColor(const CHAR **attrs, XMLParserData *data, int i)
 {
   const gchar *tmp;
   gint value = data->defaults.color;
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
 
   tmp = getAttribute(attrs, "color");
   if(tmp) {
@@ -577,7 +579,7 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
 {
   const gchar *tmp;
   gint value;
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
 
   value = data->defaults.glyphSize;
   tmp = getAttribute(attrs, "glyphSize");
@@ -668,7 +670,7 @@ setRecordValues (XMLParserData *data, const CHAR *line, gint len)
 {
   gdouble value;
   const gchar *tmp = strtok((gchar*) line, " \t\n");
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
 
   while (tmp) {
     value = asNumber (tmp);
@@ -702,7 +704,7 @@ newVariable(const CHAR **attrs, XMLParserData *data)
 {
   gint groupId = data->current_variable;
   const gchar *tmp;
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
 
   tmp = getAttribute(attrs, "transformName");
   if (tmp) {
@@ -742,7 +744,7 @@ gboolean
 allocVariables (const CHAR **attrs, XMLParserData *data)
 {
   const gchar *tmp = getAttribute (attrs, "count");
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
 
   if(tmp == NULL) {
     g_printerr ("No count for variables attribute\n");
@@ -775,7 +777,7 @@ setVariableName(XMLParserData *data, const CHAR *name, gint len)
 {
   gchar *tmp = (gchar *) g_malloc (sizeof(gchar) * (len+1));
   gint j = data->current_variable;
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
 
   tmp[len] = '\0';
   memcpy (tmp, name, len);
@@ -814,7 +816,7 @@ gboolean
 allocEdges (const CHAR **attrs, XMLParserData *data)
 {
   const char *tmp = getAttribute (attrs, "count");
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
 
   if (tmp) {
     gint value = asInteger (tmp);
@@ -1058,7 +1060,7 @@ setEdgeVariableName (XMLParserData *data, const CHAR *name, gint len)
 gint
 rowId (const gchar *tmp, XMLParserData *data)
 {
-  datad *d = data->gg->current_display->d;
+  datad *d = getCurrentXMLData(data);
   gint value = atoi(tmp) - 1;
 
   if (value < 0) {
@@ -1363,4 +1365,16 @@ asciiParseColorMap(const gchar *fileName, int size, XMLParserData *data)
 {
 
  return(false);
+}
+
+
+datad *
+getCurrentXMLData(XMLParserData* parserData)
+{
+  datad *data = parserData->current_data;
+  if(data == NULL) {
+    data = datad_new(parserData->gg);
+    parserData->current_data = data;
+  }
+  return(data);
 }

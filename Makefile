@@ -14,8 +14,6 @@ CFLAGS= -g -ansi -Wall -fpic
 SHARED_LD_FLAGS= -shared
 LDFLAGS=
 
-#DEPENDS_FLAG=-MM
-
 SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  utils.c utils_ui.c utils_gdk.c array.c vector.c mt19937-1.c \
  read_array.c read_data.c io.c writedata_ui.c writedata.c \
@@ -130,9 +128,13 @@ clean:
 	$(CC) -c $(CFLAGS) -I. `gtk-config --cflags` $*.c
 
 
-# depends: $(SRC)
-# 	$(CC) $(DEPENDS_FLAG) $(CFLAGS) -I. `gtk-config --cflags` $(SRC) > $@	
+ifdef DEPENDS_FLAG
+depends: $(SRC)
+	$(CC) $(DEPENDS_FLAG) $(CFLAGS) -I. `gtk-config --cflags` $(SRC) > $@	
 
+include depends
+
+endif
 
 # Emacs's tags for navigating through the source.
 etags:
@@ -155,6 +157,8 @@ local.config:
 ifdef USE_XML
 xmlConvert: xmlConvert.o libGGobi.so
 	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS) -L. -lGGobi 
+
+make_ggobi.o: read_xml.h
 endif
 
 
@@ -171,5 +175,4 @@ sqldep:
 make_ggobi.o: read_mysql.h
 endif
 
-# include .depends
 # DO NOT DELETE

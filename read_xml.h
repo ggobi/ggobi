@@ -56,6 +56,9 @@ typedef struct _XMLUserData {
   /* The ggobi instance that is being initialized. */
   ggobid *gg;
 
+  /* The current data object to which new records are added. */
+  datad *current_data;
+
   /* Flag indicating whether we should convert
      char arrays into null-terminated strings
      before passing them to the sub-handlers
@@ -150,6 +153,8 @@ gchar *getFileDirectory(const gchar *filename);
 int asInteger(const gchar *tmp);
 double asNumber(const char *sval);
 gboolean asLogical(const gchar *sval);
+
+datad *getCurrentXMLData(XMLParserData* parserData);
 
 #ifdef __cplusplus
 }
