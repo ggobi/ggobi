@@ -148,70 +148,15 @@ static GtkItemFactoryEntry menu_items[] = {
     "<Item>" },
 };
 
-static void
-scatterplot_display_menus_make (displayd *display,
-                                GtkAccelGroup *accel_group,
-                                GtkSignalFunc func,
-                                GtkWidget *mbar, ggobid *gg)
-{
-  GtkWidget *options_menu;
-  GtkWidget *submenu;
-#ifdef UNLINKING_IMPLEMENTED
-  GtkWidget *link_menu;
-#endif
-
-/*
- * Options menu
-*/
-  submenu = submenu_make ("_Options", 'O', accel_group);
-  options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (display, options_menu, "Show points",
-    func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
-  CreateMenuCheck (display, options_menu, "Show lines (undirected)",
-    func, GINT_TO_POINTER (DOPT_SEGS_U), off, gg);
-  CreateMenuCheck (display, options_menu, "Show arrowheads (for directed lines)",
-    func, GINT_TO_POINTER (DOPT_SEGS_D), off, gg);
-/*
-  CreateMenuCheck (display, options_menu, "Show missings",
-    func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
-*/
-
-  /* Add a separator */
-  CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
-
-  CreateMenuCheck (display, options_menu, "Show axes (3D+ modes)",
-    func, GINT_TO_POINTER (DOPT_AXES), on, gg);
-  CreateMenuCheck (display, options_menu, "Center axes (3D+ modes)",
-    func, GINT_TO_POINTER (DOPT_AXES_C), on, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
-  submenu_append (submenu, mbar);
-
-  gtk_widget_show (submenu);
-
-/*
- * Link menu
-*/
-#ifdef UNLINKING_IMPLEMENTED
-  submenu = submenu_make ("_Link", 'L', accel_group);
-  link_menu = gtk_menu_new ();
-
-  CreateMenuCheck (display, link_menu, "Link to other plots",
-    func, GINT_TO_POINTER (DOPT_LINK), on, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), link_menu);
-  submenu_append (submenu, mbar);
-  gtk_widget_show (submenu);
-#endif
-}
-
 
 displayd *
 scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   GtkWidget *table, *vbox;
   GtkWidget *mbar;
   displayd *display;
+  extern void scatterplot_display_menus_make (displayd *display,
+    GtkAccelGroup *accel_group, GtkSignalFunc func, GtkWidget *mbar,
+    ggobid *gg);
 
   if (d == NULL || d->ncols < 2)
     return (NULL);

@@ -45,7 +45,9 @@ make_control_panels (ggobid *gg) {
 
   cpanel_p1dplot_make (gg);
   cpanel_xyplot_make (gg);
+#ifdef ROTATION_IMPLEMENTED
   cpanel_rotation_make (gg);
+#endif
   cpanel_tour1d_make (gg);
   cpanel_tour2d_make (gg);
   cpanel_ctour_make (gg);
@@ -53,7 +55,9 @@ make_control_panels (ggobid *gg) {
   cpanel_brush_make (gg);
   cpanel_scale_make (gg);
   cpanel_identify_make (gg);
+#ifdef EDIT_EDGES_IMPLEMENTED
   cpanel_edgeedit_make (gg);
+#endif
   cpanel_movepts_make (gg);
 
   cpanel_parcoords_make (gg);
@@ -61,213 +65,191 @@ make_control_panels (ggobid *gg) {
   cpanel_tsplot_make (gg);
 }
 
-
 void
-main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w) 
+tooltips_show_cb (GtkCheckMenuItem *w, guint action) 
 {
-  GSList *l;
-  datad *d;
-
-  if (gg->mode_frame == NULL)  /* so it isn't executed on startup */
-    return;
-
-  switch (action) {
-
-    case 0:
-      if (w->active) gtk_tooltips_enable (gg->tips);
-      else gtk_tooltips_disable (gg->tips);
-      break;
-
-    case 1:
-      if (w->active)
-        gtk_widget_show (gg->mode_frame);
-      else
-        gtk_widget_hide (gg->mode_frame);
-      break;
-
-    case 2:
-      if (gg->current_display != NULL) {
-        displayd *display = gg->current_display;
-
-        if (display->displaytype == scatterplot) {
-          if (display->hrule != NULL &&
-              display->cpanel.projection == XYPLOT)
-          {
-            if (w->active) {
-              gtk_widget_show (display->hrule);
-              gtk_widget_show (display->vrule);
-            }
-            else {
-              gtk_widget_hide (display->hrule);
-              gtk_widget_hide (display->vrule);
-            }
-          }
-        }
-      }
-    break;
-
-    case 3:
-      gg->varpanel_ui.layoutByRow = !gg->varpanel_ui.layoutByRow;
-      for (l = gg->d; l; l = l->next) {
-        d = (datad *) l->data;
-        varcircles_layout_reset (d->ncols, d, gg);
-      }
-    break;
-
-/*
-    case 4:
-      g_printerr ("toggle centering axes\n");
-      break;
-    case 5:
-      g_printerr ("toggle plotting points\n");
-      break;
-    case 6:
-      g_printerr ("toggle plotting edges\n");
-      break;
-    case 7:
-      g_printerr ("toggle plotting directed edges\n");
-      break;
-*/
-  }
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+  if (w->active)
+    gtk_tooltips_enable (gg->tips);
+  else
+    gtk_tooltips_disable (gg->tips);
 }
 
+void
+cpanel_show_cb (GtkCheckMenuItem *w, guint action) 
+{
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+  if (w->active)
+    gtk_widget_show (gg->mode_frame);
+  else
+    gtk_widget_hide (gg->mode_frame);
+}
+
+/* this should be done per display
+void
+axes_show_cb (GtkCheckMenuItem *w, guint action) 
+{
+  ggobid *gg = GGobiFromWidget (GTK_WIDGET(w), true);
+
+  if (gg->current_display != NULL) {
+    displayd *display = gg->current_display;
+
+    if (display->displaytype == scatterplot) {
+      if (display->hrule != NULL && display->cpanel.projection == XYPLOT) {
+        if (w->active) {
+          gtk_widget_show (display->hrule);
+          gtk_widget_show (display->vrule);
+        }
+        else {
+          gtk_widget_hide (display->hrule);
+          gtk_widget_hide (display->vrule);
+        }
+      }
+    }
+  }
+}
+*/
 
 void
 mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
 {
+  extern void pcplot_menus_make (ggobid *);
+  extern void scatmat_menus_make (ggobid *);
+  extern void tsplot_menus_make (ggobid *);
+  extern void xyplot_menus_make (ggobid *);
+  extern void p1dplot_menus_make (ggobid *);
+#ifdef EDIT_EDGES_IMPLEMENTED
+  extern void edgeedit_menus_make (ggobid *);
+#endif
+  extern void movepts_menus_make (ggobid *);
+  extern void brush_menus_make (ggobid *);
+  extern void identify_menus_make (ggobid *);
+  extern void scale_menus_make (ggobid *);
+  extern void tour1d_menus_make (ggobid *);
+  extern void tour2d_menus_make (ggobid *);
+  extern void tourcorr_menus_make (ggobid *);
+
   if (state == off) {
 
     switch (m) {
       case PCPLOT:
-      case P1PLOT:
+        submenu_destroy (gg->menus.options_item);
+      break;
       case TSPLOT:
-      case XYPLOT:
-      case EDGEED:
-      case MOVEPTS:
+        submenu_destroy (gg->menus.options_item);
+      break;
+      case SCATMAT:
+        submenu_destroy (gg->menus.options_item);
       break;
 
-      case ROTATE:
-        submenu_destroy (gg->mode_menu.io_item);
+      case P1PLOT:
+        submenu_destroy (gg->menus.options_item);
       break;
+      case XYPLOT:
+        submenu_destroy (gg->menus.options_item);
+      break;
+      case EDGEED:
+        submenu_destroy (gg->menus.options_item);
+      break;
+      case MOVEPTS:
+        submenu_destroy (gg->menus.options_item);
+      break;
+
+#ifdef ROTATION_IMPLEMENTED
+      case ROTATE:
+      break;
+#endif
 
       case TOUR1D:
-        submenu_destroy (gg->mode_menu.io_item);
+        submenu_destroy (gg->menus.io_item);
+        submenu_destroy (gg->menus.options_item);
       break;
 
       case TOUR2D:
-        submenu_destroy (gg->mode_menu.io_item);
+        submenu_destroy (gg->menus.io_item);
+        submenu_destroy (gg->menus.options_item);
       break;
 
       case COTOUR:
-        submenu_destroy (gg->mode_menu.io_item);
+        submenu_destroy (gg->menus.io_item);
+        submenu_destroy (gg->menus.options_item);
       break;
 
       case SCALE:
-        submenu_destroy (gg->mode_menu.reset_item);
+        submenu_destroy (gg->menus.reset_item);
+        submenu_destroy (gg->menus.options_item);
       break;
 
       case BRUSH:
-        submenu_destroy (gg->mode_menu.reset_item);
-#ifdef BRUSHING_OPTIONS_IMPLEMENTED
-        submenu_destroy (gg->mode_menu.link_item);
-#endif
+        submenu_destroy (gg->menus.reset_item);
+        submenu_destroy (gg->menus.options_item);
       break;
 
       case IDENT:
-#ifdef UNLINKING_IMPLEMENTED
-        submenu_destroy (gg->mode_menu.link_item);
-#endif
+        submenu_destroy (gg->menus.options_item);
       break;
+
+#ifdef EDIT_EDGES_IMPLEMENTED
+      case EDGEED:
+        submenu_destroy (gg->menus.options_item);
+      break;
+#endif
     }
   } else if (state == on) {
 
     switch (m) {
       case PCPLOT:
-      case P1PLOT:
-      case XYPLOT:
+        pcplot_menus_make (gg);
+      break;
       case TSPLOT:
+        tsplot_menus_make (gg);
+      break;
+      case SCATMAT:
+        scatmat_menus_make (gg);
+      break;
+
+      case P1PLOT:
+        p1dplot_menus_make (gg);
+      break;
+      case XYPLOT:
+        xyplot_menus_make (gg);
+      break;
+#ifdef EDIT_EDGES_IMPLEMENTED
       case EDGEED:
+        edgeedit_menus_make (gg);
+      break;
+#endif
       case MOVEPTS:
+        movepts_menus_make (gg);
       break;
 
+#ifdef ROTATION_IMPLEMENTED
       case ROTATE:
-        rotation_menus_make (gg);
-
-        gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
-          gg->app.rotation_io_menu); 
-          submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
       break;
+#endif
 
       case TOUR1D:
         tour1d_menus_make (gg);
-
-        gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
-          gg->tour1d.io_menu); 
-          submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
       break;
 
       case TOUR2D:
         tour2d_menus_make (gg);
-
-        gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
-          gg->tour2d.io_menu); 
-          submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
       break;
 
       case COTOUR:
         tourcorr_menus_make (gg);
-
-        gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
-          gg->tourcorr.io_menu); 
-          submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
       break;
 
       case SCALE :
         scale_menus_make (gg);
-
-        gg->mode_menu.reset_item = submenu_make ("_Reset", 'R',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.reset_item),
-          gg->scale.scale_reset_menu); 
-          submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
       break;
 
       case BRUSH :
         brush_menus_make (gg);
-
-        gg->mode_menu.reset_item = submenu_make ("_Reset", 'R',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.reset_item),
-          gg->brush.reset_menu);
-          submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
-
-#ifdef BRUSHING_OPTIONS_IMPLEMENTED
-        gg->mode_menu.link_item = submenu_make ("_Link", 'L',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
-          gg->brush.link_menu); 
-          submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
-#endif
       break;
 
       case IDENT:
         identify_menus_make (gg);
-
-#ifdef UNLINKING_IMPLEMENTED
-        gg->mode_menu.link_item = submenu_make ("_Link", 'L',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
-          gg->identify.link_menu); 
-          submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
-#endif
       break;
     }
   }
@@ -612,53 +594,6 @@ static GtkItemFactoryEntry menu_items[] = {
        0,
        NULL },
 
-/*
- * this code in display.c actually corresponds to the "Window" menu,
- * not this one, which is really just display options.
-*/
-  { "/_Options", NULL, NULL, 0, "<Branch>" },
-  { "/Options/Show tooltips",  
-       "<ctrl>t",   
-       (GtkItemFactoryCallback) main_display_options_cb,
-       0,
-       "<CheckItem>" },
-  { "/Options/Show control _panel",  
-       "<ctrl>p",   
-       (GtkItemFactoryCallback) main_display_options_cb,
-       1,
-       "<CheckItem>" },
-  { "/Options/Show _axes",  
-       "<ctrl>a",   
-       (GtkItemFactoryCallback) main_display_options_cb,
-       2,
-       "<CheckItem>" },
-  { "/Options/Lay out variable circles by _row",  
-       "<ctrl>r",   
-       (GtkItemFactoryCallback) main_display_options_cb,
-       3,
-       "<CheckItem>" },
-
-#ifdef BRUSHING_OPTIONS_IMPLEMENTED
-  { "/Options/sep",  
-       NULL,    
-       NULL,         
-       0,
-       "<Separator>" },
-
-  { "/Options/Brushing", NULL, NULL, 0, "<Branch>" },
-  { "/Options/Brushing/Brush jumps to cursor",  
-       NULL ,       
-       (GtkItemFactoryCallback) brush_options_cb,
-       0,
-       "<CheckItem>" },
-  { "/Options/Brushing/Update linked brushing continuously",  
-       NULL ,      
-       (GtkItemFactoryCallback) brush_options_cb,
-       1,
-       "<CheckItem>" },
-#endif
-
-
   {"/Dis_playTree", NULL, NULL, 0, "<Branch>"},
   { "/DisplayTree/Displays",    
        NULL, 
@@ -690,9 +625,6 @@ void
 make_ui (ggobid *gg) {
   GtkWidget *window;
   GtkWidget *hbox, *vbox;
-  GList *items, *subitems;
-  GtkWidget *item, *submenu;
-  gchar *name;
 
   gg->tips = gtk_tooltips_new ();
 
@@ -728,46 +660,6 @@ make_ui (ggobid *gg) {
 
   gtk_accel_group_lock (gg->main_accel_group);
 
-/*
- * Step through the option menu, setting the values of toggle items
- * as appropriate.
-*/
-  items = gtk_container_children (GTK_CONTAINER (gg->main_menubar));
-  while (items) {
-    item = (GtkWidget *) items->data;
-    gtk_label_get (GTK_LABEL (GTK_MENU_ITEM (item)->item.bin.child ), &name);
-    if (strcmp (name, "Options") == 0) {
-      submenu = GTK_MENU_ITEM (item)->submenu;
-      subitems = gtk_container_children (GTK_CONTAINER (submenu));
-      while (subitems) {
-        item = (GtkWidget*) subitems->data;
-
-        if (GTK_IS_CHECK_MENU_ITEM (item)) {
-          gtk_label_get (GTK_LABEL (GTK_MENU_ITEM (item)->item.bin.child),
-            &name);
-          if (g_strcasecmp (name, "show tooltips") == 0)
-            GTK_CHECK_MENU_ITEM (item)->active = true;
-          else if (g_strcasecmp (name, "show control panel") == 0)
-            GTK_CHECK_MENU_ITEM (item)->active = true;
-          else if (g_strcasecmp (name, "show axes") == 0)
-            GTK_CHECK_MENU_ITEM (item)->active = true;
-          else if (g_strcasecmp (name, "lay out variable circles by row") == 0)
-            GTK_CHECK_MENU_ITEM (item)->active = true;
-  
-        } else {
-          /* If there are to be submenus, I have to dig them out as well. */
-        }
-        subitems = subitems->next;
-      }
-      g_list_free (subitems);
-      break;  /* Finished with options menu */
-    }
-
-    items = items->next;
-  }
-  g_list_free (items);
-/* */
-
   hbox = gtk_hbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, true, true, 0);
 
@@ -789,6 +681,11 @@ make_ui (ggobid *gg) {
   varpanel_make (hbox, gg);
 
   gtk_widget_show_all (hbox);
+
+{
+  extern void xyplot_menus_make (ggobid *);
+  xyplot_menus_make (gg);
+}
 
   gtk_widget_show_all (window);
 }

@@ -42,6 +42,8 @@
 
 #define NDISPLAYTYPES 3
 
+#define OPTIONS_MENU_POS 4
+
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};
 

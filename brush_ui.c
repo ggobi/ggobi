@@ -20,6 +20,12 @@
 #include "vars.h"
 #include "externs.h"
 
+static void brush_update_set_cb (GtkCheckMenuItem *w, guint action) 
+{
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+  gg->brush.updateAlways_p = !gg->brush.updateAlways_p;
+}
+
 static void brush_on_cb (GtkToggleButton *button, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -158,22 +164,11 @@ brush_reset(ggobid *gg, gint action)
   }
 }
 
-/* Actions from the Link menu in the main menubar */
-#ifdef BRUSHING_OPTIONS_IMPLEMENTED
-static void
-brush_link_cb (GtkCheckMenuItem *w, gpointer cbd)
-{
-  gchar *lbl = (gchar *) cbd;
-  g_printerr ("state: %d, cbd: %s\n", w->active, lbl);
-}
-#endif
-
 /* Options from the Options menu in the main menubar */
 void
 brush_options_cb (gpointer data, guint action, GtkCheckMenuItem *w)
 {
 /*
- * action 0 : Brush jumps to cursor
  * action 1 : Update linked brushing continuously
 */
   g_printerr ("action: %d, state: %d\n", action,  w->active);
@@ -282,12 +277,16 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
     cluster_table_update (d, gg);
   }
 
+  /*-- if we're only doing linked brushing on mouse up, do it now --*/
+  if (!gg->brush.updateAlways_p)
+    displays_plot (sp, FULL, gg);
+
   return retval;
 }
 
 
 /*--------------------------------------------------------------------*/
-/*                   Resetting the main menubar                       */
+/*      Handling keyboard and mouse events in the plot window         */
 /*--------------------------------------------------------------------*/
 
 void
@@ -323,6 +322,9 @@ brush_event_handlers_toggle (splotd *sp, gboolean state) {
   }
 }
 
+/*--------------------------------------------------------------------*/
+/*                   Resetting the main menubar                       */
+/*--------------------------------------------------------------------*/
 
 void
 brush_menus_make (ggobid *gg) {
@@ -331,14 +333,14 @@ brush_menus_make (ggobid *gg) {
 /*
  * Reset menu
 */
-  gg->brush.reset_menu = gtk_menu_new ();
+  gg->menus.reset_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Show all points");
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (0));
-  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
 /*
   item = gtk_menu_item_new_with_label ("Reset point colors");
@@ -346,14 +348,14 @@ brush_menus_make (ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (1));
-  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset glyphs");
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (2));
-  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 */
 
   item = gtk_menu_item_new_with_label ("Show all edges");
@@ -361,7 +363,7 @@ brush_menus_make (ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (3));
-  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
 /*
   item = gtk_menu_item_new_with_label ("Reset edgecolors");
@@ -369,7 +371,7 @@ brush_menus_make (ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER(4));
-  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 */
 
   item = gtk_menu_item_new_with_label ("Reset brush size");
@@ -377,35 +379,43 @@ brush_menus_make (ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (5));
-  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
-  gtk_widget_show_all (gg->brush.reset_menu);
+  gtk_widget_show_all (gg->menus.reset_menu);
+
+
+  gg->menus.reset_item = submenu_make ("_Reset", 'R',
+    gg->main_accel_group);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.reset_item),
+    gg->menus.reset_menu);
+  submenu_insert (gg->menus.reset_item, gg->main_menubar, -1);
 
 /*
- * Link menu
+ * Options menu
 */
-/* 
- * it may turn out that we don't want many of these options since
- * we'll use xml to define the rules for linking behavior.
-*/
-#ifdef BRUSHING_OPTIONS_IMPLEMENTED
-  gg->brush.link_menu = gtk_menu_new ();
+  gg->menus.options_item = submenu_make ("_Options", 'O',
+    gg->main_accel_group);
+  gg->menus.options_menu = gtk_menu_new ();
 
-  item = gtk_check_menu_item_new_with_label ("Link color brushing");
-  gtk_signal_connect (GTK_OBJECT (item), "toggled",
-                      GTK_SIGNAL_FUNC (brush_link_cb),
-                      (gpointer) "color");
-  gtk_menu_append (GTK_MENU (gg->brush.link_menu), item);
-  gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
-  item = gtk_check_menu_item_new_with_label ("Link glyph brushing");
-  gtk_signal_connect (GTK_OBJECT (item), "toggled",
-                      GTK_SIGNAL_FUNC (brush_link_cb),
-                      (gpointer) "glyph");
-  gtk_menu_append (GTK_MENU (gg->brush.link_menu), item);
-  gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
+  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
+    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    GTK_TOOLTIPS (gg->tips)->enabled, gg);
 
-  gtk_widget_show_all (gg->brush.link_menu);
-#endif
+  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
+    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+
+  /* Add a separator before the mode-specific items */
+  CreateMenuItem (gg->menus.options_menu, NULL,
+    "", "", NULL, NULL, NULL, NULL, NULL);
+
+  CreateMenuCheck (gg->menus.options_menu, "Update brushing continuously",
+    GTK_SIGNAL_FUNC (brush_update_set_cb), NULL,
+    gg->brush.updateAlways_p, gg);
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
+    gg->menus.options_menu);
+  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 void

@@ -103,8 +103,7 @@ GtkWidget *CreateMenuItem (GtkWidget *menu,
  *
  * returns new menuitem
  */
-GtkWidget *CreateMenuCheck (displayd *display,
-                            GtkWidget *menu,
+GtkWidget *CreateMenuCheck (GtkWidget *menu,
                             gchar *szName,
                             GtkSignalFunc func,
                             gpointer data,
@@ -119,9 +118,6 @@ GtkWidget *CreateMenuCheck (displayd *display,
     gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (menuitem), true);
 
     GGobi_widget_set(GTK_WIDGET(menuitem), gg, true);
-
-    /* --- Attach the display pointer --- */
-    gtk_object_set_data (GTK_OBJECT (menuitem), "display", (gpointer) display);
 
     /* --- set its state --- */
     gtk_check_menu_item_set_state (GTK_CHECK_MENU_ITEM (menuitem), state);

@@ -25,7 +25,9 @@ scatterplot_cpanel_init (cpaneld *cpanel, gint initial_mode, ggobid *gg) {
   cpanel->p1d_type = TEXTURE;
   cpanel_p1d_init (cpanel, gg);
 
+#ifdef ROTATION_IMPLEMENTED
   cpanel_rotation_init (cpanel, gg);
+#endif
   cpanel_brush_init (cpanel, gg);
   cpanel_scale_init (cpanel, gg);
   cpanel_t2d_init (cpanel, gg);  /*-- tour_init, or tour2d_init? --*/
@@ -84,7 +86,9 @@ cpanel_set (displayd *display, ggobid *gg) {
   switch (display->displaytype) {
     case scatterplot:
       cpanel_p1d_set (cpanel, gg);
+#ifdef ROTATION_IMPLEMENTED
       cpanel_rotation_set (cpanel, gg);
+#endif
       cpanel_brush_set (cpanel, gg);
       break;
     case scatmat:

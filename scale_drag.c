@@ -39,7 +39,37 @@ zoom_by_drag (splotd *sp, ggobid *gg)
   gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;
   gint npix = 10;  /*-- number of pixels from the crosshair required --*/
 
+  icoords mid;
+  fcoords scalefac;
+
+  mid.x = sp->max.x / 2;
+  mid.y = sp->max.y / 2;
+  scalefac.x = scalefac.y = 1.0;
+
+  if (ABS(sp->mousepos.x - mid.x) < npix)
+    return;
+
+  /*-- making the behavior identical to click zooming --*/
+  scalefac.x = 
+    (gfloat) (sp->mousepos.x - mid.x) / (gfloat) (sp->mousepos_o.x - mid.x);
+  scalefac.y =
+    (gfloat) (sp->mousepos.y - mid.y) / (gfloat) (sp->mousepos_o.y - mid.y);
+
+  /*-- Now they're both wrong in exactly the same way. --*/
+  if (*scale_x * scalefac.x >= SCALE_MIN) {
+    sp->ishift.x = mid.x +
+      (gint) (scalefac.x * (gfloat) (sp->ishift.x - mid.x));
+    *scale_x = *scale_x * scalefac.x;
+  }
+  if (*scale_y * scalefac.y >= SCALE_MIN) {
+    sp->ishift.y = mid.y +
+      (gint) (scalefac.y * (gfloat) (sp->ishift.y - mid.y));
+    *scale_y = *scale_y * scalefac.y;
+  }
+
+
   /*-- Scale the scaler if far enough from center --*/
+/*
   if (sp->mousepos_o.x - sp->ishift.x > npix ||
       sp->ishift.x - sp->mousepos_o.x > npix)
   {
@@ -54,8 +84,12 @@ zoom_by_drag (splotd *sp, ggobid *gg)
                  (gfloat) (sp->mousepos_o.y - sp->ishift.y));
   }
 
-  /* Restore if too small. */
+  * Restore if too small. *
   *scale_x = MAX (SCALE_MIN, *scale_x);
   *scale_y = MAX (SCALE_MIN, *scale_y);
+*/
+
+
+
 }
 

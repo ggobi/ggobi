@@ -119,6 +119,7 @@
 45808   4/30  Di checked in a LOT of tour code
 45654   5/2   preparation for changes: edges/linking/categorical variables
 45127   5/3   ditto
+45302   5/4   made options menu mode-specific; added brushing option
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

@@ -218,17 +218,14 @@ struct _ggobid {
 /*---------------------- touring -------------------------------------*/
 
  struct _Tour2d {
-   GtkWidget *io_menu;
    gint idled; 
  } tour2d;
 
  struct _Tour1d {
-   GtkWidget *io_menu;
    gint idled; 
  } tour1d;
 
  struct _TourCorr {
-   GtkWidget *io_menu;
    gint idled; 
  } tourcorr;
 
@@ -253,12 +250,11 @@ struct _ggobid {
  glyphv glyph_id, glyph_0;
 
  struct _Brush_UI {
-   GtkWidget *reset_menu;
-   GtkWidget *link_menu;
    GtkWidget *mode_opt;
    GtkWidget *cg_opt;
    GtkWidget *scope_opt;
    GtkWidget *brush_on_btn;
+   gboolean updateAlways_p;
 
    gboolean firsttime;
  } brush;
@@ -277,30 +273,22 @@ struct _ggobid {
 /*---------------------- identification ------------------------------*/
 
  struct _Identify {
-/*
-   GSList *sticky_ids;
-*/
-   GtkWidget *link_menu;
  } identify;
 
 /*--------------------- submenu management ---------------------------*/
 
  struct _Mode_SubMenu {
+   GtkWidget *options_item;
+   GtkWidget *options_menu;
+
    GtkWidget *reset_item;
-   GtkWidget *link_item;
+   GtkWidget *reset_menu;
+
    GtkWidget *io_item;
- 
-   gboolean firsttime_reset;
-   gboolean firsttime_link;
-   gboolean firsttime_io;
-  
- } mode_menu;
+   GtkWidget *io_menu;
+ } menus;
 
 /*-------------------- transformation --------------------------------*/
-
-/*
- gint std_type;
-*/
 
  struct _Transformation {
    GtkWidget *window;
@@ -342,7 +330,6 @@ struct _ggobid {
 /*-------------------- scaling ---------------------------------------*/
 
  struct _Scale {
-   GtkWidget *scale_reset_menu;
    /*-- widgets whose sensitivity needs to be turned on and off --*/
    GtkWidget *pan_opt, *zoom_opt, *pan_radio, *zoom_radio;
    rectd click_rect;
@@ -365,9 +352,6 @@ struct _ggobid {
    gboolean cluster_p;
    enum directiond direction;
    lcoords eps;
-/*
-   GSList *history;
-*/
  } movepts;
 
 
@@ -375,8 +359,6 @@ struct _ggobid {
 
  struct _Varpanel_ui {
    GtkWidget *notebook;
-   /*GtkAccelGroup *varpanel_accel_group;*/
-   GtkTooltips *tips;
    gboolean layoutByRow;
  } varpanel_ui;
 

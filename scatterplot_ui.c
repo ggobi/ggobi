@@ -17,10 +17,9 @@
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-
 void
-scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
- ggobid *gg, gboolean useIds)
+scatterplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
+  ggobid *gg, gboolean useIds)
 {
 
 /*
@@ -76,5 +75,55 @@ scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
     useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg);
 
   gtk_widget_show (gg->app.scatterplot_mode_menu);
+}
+
+/*--------------------------------------------------------------------*/
+/*                   Setting the display menubar                      */
+/*--------------------------------------------------------------------*/
+
+void
+scatterplot_display_menus_make (displayd *display,
+                                GtkAccelGroup *accel_group,
+                                GtkSignalFunc func,
+                                GtkWidget *mbar, ggobid *gg)
+{
+  GtkWidget *options_menu, *submenu, *item;
+
+/*
+ * Options menu
+*/
+  submenu = submenu_make ("_Options", 'O', accel_group);
+  options_menu = gtk_menu_new ();
+
+  item = CreateMenuCheck (options_menu, "Show points",
+    func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  item = CreateMenuCheck (options_menu, "Show lines (undirected)",
+    func, GINT_TO_POINTER (DOPT_SEGS_U), off, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  item = CreateMenuCheck (options_menu,
+    "Show arrowheads (for directed lines)",
+    func, GINT_TO_POINTER (DOPT_SEGS_D), off, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+/*
+  item = CreateMenuCheck (options_menu, "Show missings",
+    func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+*/
+
+  /* Add a separator */
+  CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
+
+  item = CreateMenuCheck (options_menu, "Show axes",
+    func, GINT_TO_POINTER (DOPT_AXES), on, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  item = CreateMenuCheck (options_menu, "Center axes (3D+ modes)",
+    func, GINT_TO_POINTER (DOPT_AXES_C), on, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
+  submenu_append (submenu, mbar);
+
+  gtk_widget_show (submenu);
 }
 

@@ -225,9 +225,11 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
       xyplot_event_handlers_toggle (sp, state);
     break;
 
+#ifdef ROTATION_IMPLEMENTED
     case ROTATE:
       rotation_event_handlers_toggle (sp, state);
     break;
+#endif
 
     case TOUR1D:
       tour1d_event_handlers_toggle (sp, state);

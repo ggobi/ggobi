@@ -34,11 +34,7 @@ static void
 parcoords_display_menus_make (displayd *display, 
   GtkAccelGroup *accel_group, GtkSignalFunc func, GtkWidget *mbar, ggobid *gg)
 {
-  GtkWidget *options_menu;
-#ifdef UNLINKING_IMPLEMENTED
-  GtkWidget *link_menu;
-#endif
-  GtkWidget *submenu;
+  GtkWidget *options_menu, *submenu, *item;
 
 /*
  * Options menu
@@ -46,13 +42,16 @@ parcoords_display_menus_make (displayd *display,
   submenu = submenu_make ("_Options", 'O', accel_group);
   options_menu = gtk_menu_new ();
 
-  CreateMenuCheck (display, options_menu, "Show points",
+  item = CreateMenuCheck (options_menu, "Show points",
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
-  CreateMenuCheck (display, options_menu, "Show lines",
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  item = CreateMenuCheck (options_menu, "Show lines",
     func, GINT_TO_POINTER (DOPT_SEGS), on, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 /*
-  CreateMenuCheck (display, options_menu, "Show missings",
+  CreateMenuCheck (options_menu, "Show missings",
     func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 */
 
   /* Add a separator */
@@ -61,29 +60,15 @@ parcoords_display_menus_make (displayd *display,
 */
 
 /*
-  CreateMenuCheck (display, options_menu, "Double buffer",
+  item = CreateMenuCheck (options_menu, "Double buffer",
     func, GINT_TO_POINTER (DOPT_BUFFER), on, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 */
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
   submenu_append (submenu, mbar);
 
   gtk_widget_show (submenu);
-
-/*
- * Link menu
-*/
-#ifdef UNLINKING_IMPLEMENTED
-  submenu = submenu_make ("_Link", 'L', accel_group);
-  link_menu = gtk_menu_new ();
-
-  CreateMenuCheck (display, link_menu, "Link to other plots",
-    func, GINT_TO_POINTER (DOPT_LINK), on, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), link_menu);
-  submenu_append (submenu, mbar);
-  gtk_widget_show (submenu);
-#endif
 }
 
 

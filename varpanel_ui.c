@@ -333,8 +333,6 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gg->varpanel_ui.layoutByRow = true;  /*-- for the circles --*/
   gg->selvarfg_GC = NULL;
 
-  gg->varpanel_ui.tips = gtk_tooltips_new ();
-  
   gg->varpanel_ui.notebook = gtk_notebook_new ();
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
     GTK_POS_TOP);
@@ -443,21 +441,21 @@ varpanel_tooltips_set (ggobid *gg)
       switch (display->displaytype) {
 
         case parcoords:
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
             checkbox_get_nth (j, d),
             "Click to replace/insert/append a variable, or to delete it",
             NULL);
         break;
 
         case scatmat:
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
             checkbox_get_nth (j, d),
             "Click to replace/insert/append a variable, or to delete it",
             NULL);
         break;
 
         case tsplot:
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
             checkbox_get_nth (j, d),  
             "Click left to replace the horizontal (time) variable.  Click middle to replace/insert/append other variable, or to delete it.",
             NULL);
@@ -466,31 +464,31 @@ varpanel_tooltips_set (ggobid *gg)
         case scatterplot:
           switch (projection) {
             case P1PLOT:
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
                 checkbox_get_nth (j, d),
                 "Click left to plot horizontally, middle to plot vertically",
                 NULL);
             break;
             case XYPLOT:
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
                 checkbox_get_nth (j, d),
                 "Click left to select the horizontal variable, middle for vertical",
                 NULL);
             break;
             case TOUR2D:
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
                 checkbox_get_nth (j, d),
                 "Click to select a variable to be available for touring",
                 NULL);
             break;
             case TOUR1D:
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
                 checkbox_get_nth (j, d),
                 "Click to select a variable to be available for touring",
                 NULL);
             break;
             case COTOUR:
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
                 checkbox_get_nth (j, d),
                 "Click to select a variable to be available for touring",
                 NULL);

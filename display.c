@@ -142,9 +142,28 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
         display_plot (display, FULL, gg);
       }
       break;
+
     case DOPT_AXES:
       display->options.axes_show_p = w->active;
+
+      if (display->cpanel.projection == XYPLOT) {
+
+        if (display->displaytype == scatterplot) {
+          if (display->hrule != NULL)
+          {
+            if (w->active) {
+              gtk_widget_show (display->hrule);
+              gtk_widget_show (display->vrule);
+            }
+            else {
+              gtk_widget_hide (display->hrule);
+              gtk_widget_hide (display->vrule);
+            }
+          }
+        }
+      }
       break;
+
     case DOPT_AXES_C:
       display->options.axes_center_p = w->active;
       break;
@@ -212,6 +231,7 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
 
   display->ggobi = gg;
   display->d = d;
+  display->e = NULL;
   display->embeddedIn = NULL;
 
   return (display);
@@ -459,7 +479,7 @@ display_set_current (displayd *new_display, ggobid *gg)
 
     switch (new_display->displaytype) {
       case scatterplot:
-        scatterplot_main_menus_make (gg->main_accel_group,
+        scatterplot_mode_menu_make (gg->main_accel_group,
                                      (GtkSignalFunc) mode_set_cb, gg, true);
         gg->mode_item = submenu_make ("_ViewMode", 'V', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
@@ -468,7 +488,7 @@ display_set_current (displayd *new_display, ggobid *gg)
         break;
 
       case scatmat:
-        scatmat_main_menus_make (gg->main_accel_group,
+        scatmat_mode_menu_make (gg->main_accel_group,
           (GtkSignalFunc) mode_set_cb, gg, true);
         gg->mode_item = submenu_make ("_ViewMode", 'V', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
@@ -477,7 +497,7 @@ display_set_current (displayd *new_display, ggobid *gg)
         break;
 
       case parcoords:
-        parcoords_main_menus_make (gg->main_accel_group,
+        parcoords_mode_menu_make (gg->main_accel_group,
                                    (GtkSignalFunc) mode_set_cb, gg, true);
         gg->mode_item = submenu_make ("_ViewMode", 'V', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
@@ -486,7 +506,7 @@ display_set_current (displayd *new_display, ggobid *gg)
         break;
 
       case tsplot:
-        tsplot_main_menus_make (gg->main_accel_group,
+        tsplot_mode_menu_make (gg->main_accel_group,
                                    (GtkSignalFunc) mode_set_cb, gg, true);
         gg->mode_item = submenu_make ("_ViewMode", 'V', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),

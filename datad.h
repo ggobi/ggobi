@@ -199,10 +199,6 @@ class datad {
 
    gint *nxed_by_brush;
    vector_b xed_by_brush;
-/*  -- not necessary!  uses the same color vectors as the points --
- * vector_s color, color_now, color_prev;
- * vector_b hidden, hidden_now, hidden_prev;
-*/
  } edge;
 
 /*------------------------------------------------------------------------*/

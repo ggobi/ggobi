@@ -154,6 +154,27 @@ brush_set_pos (gint x, gint y, splotd *sp) {
   brush_pos->y2 = y ;
 }
 
+static gboolean
+binning_permitted (displayd *display)
+{
+  datad *d = display->d;
+  datad *e = display->e;
+  gboolean permitted = true;
+
+  if (d->nrgroups > 0)
+    permitted = false;
+  else {  /*-- if we're drawing edges --*/
+    if (e != NULL && e->edge.n > 0) {
+      if (display->options.edges_undirected_show_p ||
+          display->options.edges_directed_show_p ||
+          display->options.edges_show_p)
+      {
+        permitted = false;
+      }
+    }
+  }
+  return permitted;
+}
 
 void
 brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
@@ -161,7 +182,6 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
 {
   gboolean changed = false;
   displayd *display = sp->displayptr;
-  datad *d = display->d;
   brush_coords *brush_pos = &sp->brush_pos;
 
   if (button1_p) {
@@ -194,19 +214,17 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
 
   if (cpanel->brush_on_p) {
     changed = brush_once (false, sp, gg);
-    if (display->options.edges_undirected_show_p ||
-        display->options.edges_directed_show_p ||
-        display->options.edges_show_p ||
-        d->nrgroups > 0)      /*-- a full redraw is required --*/
-    {
+    if (!binning_permitted (display)) {
       splot_redraw (sp, FULL, gg);
-      displays_plot (sp, FULL, gg);
+      if (gg->brush.updateAlways_p)
+        displays_plot (sp, FULL, gg);
 
     } else {  /*-- if we can get away with binning --*/
 
       if (changed) {
         splot_redraw (sp, BINNED, gg);
-        displays_plot (sp, FULL, gg);
+        if (gg->brush.updateAlways_p)
+          displays_plot (sp, FULL, gg);
       } else {  /*-- just redraw the brush --*/
         splot_redraw (sp, QUICK, gg);  
       }

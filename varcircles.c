@@ -71,7 +71,8 @@ varcircles_layout_init (datad *d, ggobid *gg) {
 }
 
 void
-varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
+varcircles_layout_reset (gint ncols, datad *d, ggobid *gg)
+{
   gint j;
   GtkWidget *vb;
   gint tnrows, tncols;
@@ -186,6 +187,22 @@ varcircle_label_set (gint j, datad *d)
 
   gtk_label_set_text (GTK_LABEL (GTK_BIN(w)->child), d->vartable[j].collab);
 }
+
+/*-- called from the Options mennu --*/
+void
+varcircles_layout_cb (GtkCheckMenuItem *w, guint action) 
+{
+  GSList *l;
+  datad *d;
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+
+  gg->varpanel_ui.layoutByRow = !gg->varpanel_ui.layoutByRow;
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    varcircles_layout_reset (d->ncols, d, gg);
+  }
+}
+
 
 /*
  * Return to the default cursor

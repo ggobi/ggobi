@@ -17,6 +17,8 @@
 #include "vars.h"
 #include "externs.h"
 
+#ifdef ROTATION_IMPLEMENTED
+
 static GtkWidget *ro_paused_btn, *ro_type_opt, *ro_axis_opt;
 
 static void rotation_speed_cb (GtkAdjustment *adj, gpointer cbd) {
@@ -78,10 +80,12 @@ static void axis_cb (GtkWidget *w, gpointer cbd)
 /*                        I/O events                                  */
 /*--------------------------------------------------------------------*/
 
+/*
 static void rotation_io_cb (GtkWidget *w, gpointer *cbd) {
   gchar *lbl = (gchar *) cbd;
   g_printerr ("cbd: %s\n", lbl);
 }
+*/
 
 /*--------------------------------------------------------------------*/
 /*          Handling mouse events in the plot window                  */
@@ -146,36 +150,8 @@ rotation_event_handlers_toggle (splotd *sp, gboolean state)
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-
-
 void
 rotation_menus_make (ggobid *gg) {
-  GtkWidget *item;
-
-/*
- * I/O menu
-*/
-  gg->app.rotation_io_menu = gtk_menu_new ();
-
-  item = gtk_menu_item_new_with_label ("Save coefficients");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (rotation_io_cb),
-                      (gpointer) "write_coeffs");
-  gtk_menu_append (GTK_MENU (gg->app.rotation_io_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Save projection");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (rotation_io_cb),
-                      (gpointer) "write_projection");
-  gtk_menu_append (GTK_MENU (gg->app.rotation_io_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Read projection");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (rotation_io_cb),
-                      (gpointer) "read_projection");
-  gtk_menu_append (GTK_MENU (gg->app.rotation_io_menu), item);
-
-  gtk_widget_show_all (gg->app.rotation_io_menu);
 }
 
 /*--------------------------------------------------------------------*/
@@ -289,4 +265,4 @@ cpanel_rotation_set (cpaneld *cpanel, ggobid *gg) {
 
   GTK_TOGGLE_BUTTON (ro_paused_btn)->active = cpanel->ro_paused_p;
 }
-
+#endif

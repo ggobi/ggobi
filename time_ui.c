@@ -155,10 +155,10 @@ cpanel_tsplot_make (ggobid *gg) {
   The useIds indicates whether the callback data should be integers
   identifying the menu item or the global gg.
   At present, this is always false.
-  See scatmat_main_menus_make and scatterplot_main_menus_make.
+  See scatmat_mode_menu_make and scatterplot_mode_menu_make.
  */
 void
-tsplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) {
+tsplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) {
 
 /*
  * I/O menu
@@ -181,6 +181,28 @@ tsplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *
     useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
 
   gtk_widget_show (gg->tsplot.mode_menu);
+}
+
+void
+tsplot_menus_make (ggobid *gg) {
+/*
+ * Options menu
+*/
+  gg->menus.options_item = submenu_make ("_Options", 'O',
+    gg->main_accel_group);
+  gg->menus.options_menu = gtk_menu_new ();
+
+  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
+    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    GTK_TOOLTIPS (gg->tips)->enabled, gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
+    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
+    gg->menus.options_menu);
+  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/

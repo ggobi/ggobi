@@ -371,21 +371,47 @@ scale_menus_make (ggobid *gg) {
 /*
  * Reset menu
 */
-  gg->scale.scale_reset_menu = gtk_menu_new ();
+  gg->menus.reset_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Reset pan");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (pan_reset_cb),
                       (gpointer) gg);
-  gtk_menu_append (GTK_MENU (gg->scale.scale_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset zoom");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (zoom_reset_cb),
                       (gpointer) gg);
-  gtk_menu_append (GTK_MENU (gg->scale.scale_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
-  gtk_widget_show_all (gg->scale.scale_reset_menu);
+  gtk_widget_show_all (gg->menus.reset_menu);
+
+  gg->menus.reset_item = submenu_make ("_Reset", 'R',
+    gg->main_accel_group);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.reset_item),
+    gg->menus.reset_menu); 
+  submenu_insert (gg->menus.reset_item, gg->main_menubar, -1);
+
+/*
+ * Options menu
+*/
+
+  gg->menus.options_item = submenu_make ("_Options", 'O',
+    gg->main_accel_group);
+  gg->menus.options_menu = gtk_menu_new ();
+
+  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
+    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    GTK_TOOLTIPS (gg->tips)->enabled, gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
+    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
+    gg->menus.options_menu);
+  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/
@@ -586,12 +612,22 @@ scaling_visual_cues_draw (splotd *sp, ggobid *gg) {
   switch (cpanel->scale_style) {
 
     case DRAG:
+      /*-- draw horizontal line --*/
+      gdk_draw_line (sp->pixmap1, gg->plot_GC,  
+        0, sp->da->allocation.height/2,  
+        sp->da->allocation.width, sp->da->allocation.height/2);
+      /*-- draw vertical line --*/
+      gdk_draw_line (sp->pixmap1, gg->plot_GC,
+        sp->da->allocation.width/2, 0,
+        sp->da->allocation.width/2, sp->da->allocation.height);
+/*
       gdk_draw_line (sp->pixmap1, gg->plot_GC,
         0, sp->ishift.y,
         sp->da->allocation.width, sp->ishift.y);
       gdk_draw_line (sp->pixmap1, gg->plot_GC,
         sp->ishift.x, 0,
         sp->ishift.x, sp->da->allocation.height);
+*/
       break;
 
     case CLICK:

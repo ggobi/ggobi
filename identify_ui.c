@@ -43,14 +43,6 @@ id_all_sticky_cb (GtkWidget *w, ggobid *gg)
   }
   displays_plot (NULL, QUICK, gg);
 }
-#ifdef UNLINKING_IMPLEMENTED
-static void
-identify_link_cb (GtkCheckMenuItem *w, gpointer cbd)
-{
-  gchar *lbl = (gchar *) cbd;
-  g_printerr("state: %d, cbd: %s\n", w->active, lbl);
-}
-#endif
 
 /*--------------------------------------------------------------------*/
 /*      Handling keyboard and mouse events in the plot window         */
@@ -228,26 +220,26 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
 /*                   Resetting the main menubar                         */
 /*----------------------------------------------------------------------*/
 
-
 void
 identify_menus_make (ggobid *gg) {
-
 /*
- * Link menu
+ * Options menu
 */
-#ifdef UNLINKING_IMPLEMENTED
-  GtkWidget *item;
+  gg->menus.options_item = submenu_make ("_Options", 'O',
+    gg->main_accel_group);
+  gg->menus.options_menu = gtk_menu_new ();
 
-  gg->identify.link_menu = gtk_menu_new ();
+  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
+    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    GTK_TOOLTIPS (gg->tips)->enabled, gg);
 
-  item = gtk_check_menu_item_new_with_label("Link identification");
-  gtk_signal_connect (GTK_OBJECT (item), "toggled",
-                      GTK_SIGNAL_FUNC (identify_link_cb),
-                      (gpointer) NULL);
-  gtk_menu_append (GTK_MENU (gg->identify.link_menu), item);
-  gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
-  gtk_widget_show(item);
-#endif
+  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
+    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
+    gg->menus.options_menu);
+  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 void
@@ -283,4 +275,5 @@ cpanel_identify_make(ggobid *gg) {
 
   gtk_widget_show_all (gg->control_panel[IDENT]);
 }
+
 

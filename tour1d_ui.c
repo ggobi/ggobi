@@ -581,35 +581,71 @@ tour1d_event_handlers_toggle (splotd *sp, gboolean state) {
 /*----------------------------------------------------------------------*/
 
 
-
 void
 tour1d_menus_make (ggobid *gg) {
   GtkWidget *item;
+  extern void varcircles_layout_cb (GtkCheckMenuItem *w, guint action);
 
 /*
  * I/O menu
 */
-  gg->tour1d.io_menu = gtk_menu_new ();
+  gg->menus.io_item = submenu_make ("_I/O", 'I',
+    gg->main_accel_group);
+  gg->menus.io_menu = gtk_menu_new ();
 
+/*-- these could use CreateMenuItem --*/
   item = gtk_menu_item_new_with_label ("Save coefficients");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (tour1d_io_cb),
                       (gpointer) "write_coeffs");
-  gtk_menu_append (GTK_MENU (gg->tour1d.io_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Save history");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (tour1d_io_cb),
                       (gpointer) "write_history");
-  gtk_menu_append (GTK_MENU (gg->tour1d.io_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Read history");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (tour1d_io_cb),
                       (gpointer) "read_history");
-  gtk_menu_append (GTK_MENU (gg->tour1d.io_menu), item);
+  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
+/*-- --*/
 
-  gtk_widget_show_all (gg->tour1d.io_menu);
+  gtk_widget_show_all (gg->menus.io_menu);
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
+    gg->menus.io_menu); 
+  submenu_insert (gg->menus.io_item, gg->main_menubar, -1);
+
+/*
+ * Options menu
+*/
+  gg->menus.options_item = submenu_make ("_Options", 'O',
+    gg->main_accel_group);
+  gg->menus.options_menu = gtk_menu_new ();
+
+  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
+    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    GTK_TOOLTIPS (gg->tips)->enabled, gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
+    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+
+  /* Add a separator before the mode-specific items */
+  CreateMenuItem (gg->menus.options_menu, NULL,
+    "", "", NULL, NULL, NULL, NULL, gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Lay out variable circles by row",
+    GTK_SIGNAL_FUNC (varcircles_layout_cb), NULL,
+    gg->varpanel_ui.layoutByRow, gg);
+
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
+    gg->menus.options_menu);
+  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*----------------------------------------------------------------------*/
