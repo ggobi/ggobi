@@ -1,3 +1,12 @@
+Added --home as an argument for ggobi and ggobi-config to compute
+the location of the "installed" GGobi files.
+
+GGobi home directory displayed on the spash screen
+
+Configuration now supports --enable-local.
+
+
+
 Getting the names of the data modes (getDataModeNames) now computes
 these from the plugins by querying them dynamically. The caller should
 free the resulting array of strings, but not the strings themselves.

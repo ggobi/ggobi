@@ -193,6 +193,18 @@ restore a previously saved GGobi session.
 </quickHelp>
 </arg>
 
+
+<arg name="restore" novalue="true" type="gnu">
+<description>
+displays the location of the installed
+GGobi files such as the data/, lib/ directories.
+</description>
+<quickHelp>
+display GGobi home directory
+</quickHelp>
+</arg>
+
+
 <arg name="plugin" type="gnu" multiple="true">
 <description>
 specify the name of a file giving information
