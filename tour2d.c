@@ -14,6 +14,10 @@
 #include <strings.h>
 #endif
 
+#ifdef WIN32 
+#include <windows.h>
+#endif
+
 #include <math.h>
 #include <unistd.h>
 
@@ -458,7 +462,11 @@ tour2d_run(displayd *dsp, ggobid *gg)
           }
           t2d_ppdraw(dsp->t2d.ppval, gg);
           count = 0;
+#ifndef WIN32
           sleep(2);
+#else
+          Sleep(2);
+#endif
         }
         else
         {
