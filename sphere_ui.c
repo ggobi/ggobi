@@ -205,6 +205,7 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
   }
 }
 
+/*
 static void
 scree_restore_cb (GtkWidget *w, ggobid *gg)
 { 
@@ -218,17 +219,15 @@ scree_restore_cb (GtkWidget *w, ggobid *gg)
       sphere_malloc (ncols, d, gg);
     }
   
-    vectori_copy (&d->sphere.vars_sphered, &d->sphere.vars);  /* from, to */
-
-    /*-- update the "vars stdized?" text entry --*/
+    vectori_copy (&d->sphere.vars_sphered, &d->sphere.vars);
     vars_stdized_send_event (d, gg);
-
     scree_plot_make (gg);
 
   }  else {
     g_printerr ("sorry, there are no sphered variables to use\n");
   }
 }
+*/
 
 /*
  * update the scree plot when the number or identify of the selected
@@ -572,6 +571,8 @@ sphere_panel_open (ggobid *gg)
       gg->sphere_ui.clist);
     /*-- --*/
 
+/*
+ * Di and I decided there's no good reason to have this button.
     gg->sphere_ui.restore_btn = gtk_button_new_with_label ("Restore scree plot");
     GGobi_widget_set (gg->sphere_ui.restore_btn, gg, true);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.restore_btn,
@@ -581,6 +582,7 @@ sphere_panel_open (ggobid *gg)
                         GTK_SIGNAL_FUNC (scree_restore_cb), gg);
     gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.restore_btn,
       false, false, 0);
+*/
 
     /*-- close button --*/
     gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),

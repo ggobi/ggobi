@@ -68,7 +68,7 @@ Duncan Temple Lang, Lucent Bell Labs
 
 \begin{abstract}
 
-The ggobi software is a data visualization system with state-of-the-art
+The GGobi software is a data visualization system with state-of-the-art
 interactive and dynamic methods for the manipulation of views of
 data.  It represents a significant improvement on its precedessor, XGobi,
 with multiple plotting windows, more flexible color management, XML file
@@ -96,16 +96,16 @@ be examined.
 
 \section{Introduction}
 
-This paper gives an overview of the layout and functionality of ggobi,
+This paper gives an overview of the layout and functionality of GGobi,
 interactive graphical software for exploratory data analysis.  Readers
-who are familiar with xgobi will find much that is familiar in ggobi's
+who are familiar with xgobi will find much that is familiar in GGobi's
 design, and might want to read section \ref{slbl:xgobi} first, where
 key differences between the two programs are described. There are
 several papers that describe parts of the functionality existing in
 both packages
 \cite{BCS95,SCB97,SB98,BAHM88,CBC93,CBCH95,CB95,BCAH95c}.
 
-You will find that you can use ggobi for simple tasks with virtually
+You will find that you can use GGobi for simple tasks with virtually
 no instruction.  All that a user needs is some cursory knowledge of
 the developments in interactive statistical graphics of the last 15
 years, as well as a willingness to experiment with the sample data
@@ -116,18 +116,18 @@ The greatest success is obtained by users who have gained experience
 with the system and combine it with creativity and data analytic
 sophistication.
 
-We begin with a tutorial, and move on to describe ggobi in detail.
+We begin with a tutorial, and move on to describe GGobi in detail.
 
 \section{Tutorial}
 
-Several sample data files are included with the ggobi distribution, in
+Several sample data files are included with the GGobi distribution, in
 a directory called {\bf data,} and there you will find the file {\bf
 olive.xml}, a dataset on olive oil samples from Italy \cite{FALT83}.
 This data set takes advantage of an XML input/output format, a feature
-in ggobi that wasn't available in xgobi. It requires that ggobi has
-been compiled with XML support. If ggobi has been compiled without XML
+in GGobi that wasn't available in XGobi. It requires that GGobi has
+been compiled with XML support. If Ggobi has been compiled without XML
 support, the set of files olive.dat, olive.col, olive.row, similar to
-the xgobi data file input, can be used. The olive oil data consists of
+the XGobi data file input, can be used. The olive oil data consists of
 the percentage composition of 8 fatty acids (palmitic, palmitoleic,
 stearic, oleic, linoleic, linolenic, arachidic, eicosenoic) found in
 the lipid fraction of 572 Italian olive oils. There are 9 collection
@@ -135,13 +135,13 @@ areas, 4 from southern Italy (North and South Apulia, Calabria,
 Sicily), two from Sardinia (Inland and Coastal) and 3 from northern
 Italy (Umbria, East and West Liguria).
 
-Start ggobi for the olive oils data by typing:
+Start GGobi for the olive oils data by typing:
 
 \begin{quote}
 ggobi olive
 \end{quote}
 
-Two windows will appear, the ggobi control panel and a scatterplot,
+Two windows will appear, the GGobi control panel and a scatterplot,
 as shown in Figure~\ref{fig1}.
 
 The control panel has a panel of controls on the left, labeled {\bf
@@ -234,7 +234,7 @@ colors.
 %\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
 \hbox{\pdfimage width 3in {olive-brush1.jpg}\pdfimage width 3in {olive-brush2.jpg}}
 %\vspace{.15in} \centerline{ \parbox{6in}
-\caption{Brushing in a ggobi session. Brushing Region 1 shows that it
+\caption{Brushing in a GGobi session. Brushing Region 1 shows that it
 corresponds to a cohesive cluster in the variables linoleic and 
 eicosenoic acid.
 }%}
@@ -245,25 +245,16 @@ Now change to {\bf Persistent} brushing and paint the 3 Regions
 different colors. You may also want to use different symbols to
 represent the different Areas. 
 
-Next use the Tools menu to open the {\bf Variable manipulation} tool,
-a central part of the ggobi graphical user interface (Figure
-\ref{fig4}).  It contains a table with a few basic statistics for each
-variable, and the buttons below the table allow you to set variable
-limits, add new variables, and a few other things.  Try clicking the
-mouse in the table -- you can select one row of the table at a time,
-or use the control and shift keys as modifiers to select more than
-one.  Hold the control key down while clicking to select variables
-that are not contiguous in the table; use the shift key if you want to
-select a contiguous range of variables. Select all of the fatty acid
-variables. Now open up the {\bf Variable transformation} tool, and
-choose {\bf Standardize} in the stage 2 transformation panel to
-standardize all the variables to have mean 0 and variance 1. The
-transformation tool has numerous transformation operations to perform
-on variables as appropriate. Stage 0 is a domain adjustment operation
-to adjust variables values into an acceptable range as needed for some
-stage 1 transformations. Stage 2 transformations allow for
-post-processing of stage 1 transformations, so that the variables can
-be logged and then standardized, for example.
+Next open up the {\bf Variable transformation} tool, select all of
+the fatty acid variables, and choose {\bf Standardize} in the stage 2
+transformation panel to standardize all the variables to have mean 0
+and variance 1. The transformation tool has numerous transformation
+operations to perform on variables as appropriate. Stage 0 is a
+domain adjustment operation to adjust variables values into an
+acceptable range as needed for some stage 1 transformations. Stage 2
+transformations allow for post-processing of stage 1 transformations,
+so that the variables can be logged and then standardized, for
+example.
 
 \begin{figure}[htp]
 %\vspace{-0.5in}
@@ -271,14 +262,14 @@ be logged and then standardized, for example.
 \pdfimage width 6in {olive-var.jpg}
 %\vspace{.15in} \centerline{ \parbox{6in}
 \caption{Variable manipulation panel contains basic summary 
-statistics of variables. It also is central to variable subset selection
-for other modes.
+statistics of variables. It is also used for variable subset selection
+for launching multi-plot displays.
 }%}
 \label{fig4}
 \end{figure}
 
-Now look at the plot of linoleic vs eicosenoic. Open up the {\bf Case
-clusters ...} panel, and use the Hide/Show chack boxes to toggle
+Now look at the plot of linoleic vs eicosenoic. Open up the {\bf Color
+\& glyph groups ...} panel, and use the Hide/Show chack boxes to toggle
 groups of points on and off (Figure \ref{fig5}). Finally, use these
 controls hide to the cases from geographic region 1, and then {\bf
 Recale} the plot.
@@ -321,28 +312,42 @@ olive oils.}
 \label{fig6}
 \end{figure}
 
+Next use the Tools menu to open the {\bf Variable manipulation} tool,
+(Figure \ref{fig4}).  It contains a table with a few basic statistics
+for each variable, and the buttons below the table allow you to set
+variable limits, add new variables, and a few other things.  Try
+clicking the mouse in the table -- you can select one row of the
+table at a time, or use the control and shift keys as modifiers to
+select more than one.  Hold the control key down while clicking to
+select variables that are not contiguous in the table; use the shift
+key if you want to select a contiguous range of variables. Select all
+of the fatty acid variables.
+
 Now open up a {\bf New parallel coordinates display} using the {\bf
-Display} menu. Using the {\bf Selection Mode:} menu on the control
-panel select {\bf Delete} mode to remove Region and Area from the
-parallel coordinates plot. Then switch to {\bf Append} mode and add
-the remaining acid variables. Now select the first plot in the
-parallel coordinates display by clicking on it, and using the {\bf
-ViewMode} menu switch to {\bf Brush} mode. Choose a new color (say
-yellow) and large closed glyph, and transiently paint the case with a
-very low value on palmitic (Figure \ref{fig7}). This case also has a
-very high value for oleic acid, and low value for linolenic acid.
+Display} menu.
+%Using the {\bf Selection Mode:} menu on the control
+%panel select {\bf Delete} mode to remove Region and Area from the
+%parallel coordinates plot. Then switch to {\bf Append} mode and add
+%the remaining acid variables.
+Now select the first plot in the parallel coordinates display by
+clicking on it, and using the {\bf ViewMode} menu switch to {\bf
+Brush} mode. Choose a new color (say yellow) and large closed glyph,
+and transiently paint the case with a very low value on palmitic
+(Figure \ref{fig7}). This case also has a very high value for oleic
+acid, and low value for linolenic acid.
 
 \begin{figure}[htp]
 \hbox{\pdfimage width 6in {olive-par.jpg}}
-\caption{Brushing in a parallel coordinates display reveals and outlier in 
+\caption{Brushing in a parallel coordinates display reveals an outlier in 
 palmitic, oleic and linolenic acids.}
 \label{fig7}
 \end{figure}
 
-Using the {\bf Case clusters} panel from the {\bf Brush} controls
-click on the show check box to bring the Region 1 cases back into the
-plot. Now using the {\bf File} menu output the data, saving the colors
-and glyphs that have been created during this session.
+Using the {\bf Color \& glyph groups} panel from the {\bf Brush}
+controls, click on the appropriate `S' button to bring the Region 1
+cases back into the plot. Now using the {\bf File} menu, output the
+data, saving the colors and glyphs that have been created during this
+session.
 
 This has been a brief introduction to the use of ggobi. The following
 section contains more detailed information on the functionality.
@@ -380,20 +385,21 @@ inventory of interactive graphics operations:
 \itemsep 0em
 \item 1DPlot: 1-D dotplots and average shifted histograms,
 \item XYPlot: 2-D scatterplots,
-\item 1DTour: 1-D tour,
-\item 2DTour: 2-D tour,
-\item 2x1DTour: correlation tour, which is independent 1-D tours on horizontal and vertical axes, 
+\item 1D Tour: 1-D tour,
+\item 2D Tour: 2-D tour,
+\item 2x1D Tour: a correlation tour; that is, independent 1-D tours on
+      horizontal and vertical axes,
 \item Scale: axis scaling,
 \item Brush: setting point glyphs and point and edge colors,
 \item Identify: labelling points
 \item Move Points: direct manipulation of point positions.
 \end{itemize}
 
-When you choose a new view mode, the controls at the left of
-the main window will change correspondingly:  each mode has its
-own parameters, and its own rules for responding to mouse actions
-in the plotting windows.  The view modes
-are discussed in section~\ref{slbl:ViewModes}.
+When you choose a new view mode, the controls at the left of the main
+window will change correspondingly:  each mode has its own
+parameters, and its own rules for responding to mouse actions in the
+plotting windows.  The view modes are discussed in
+section~\ref{slbl:ViewModes}.
 
 The {\bf Tools} menu gives access to 
 \begin{itemize}
@@ -402,6 +408,8 @@ The {\bf Tools} menu gives access to
 \item a variable transformation pipeline,
 \item an variable sphering panel,
 \item jittering controls,
+\item a panel for automatically brushing by mapping a selected
+      variable to the color scale,
 \item a panel for hiding groups of cases,
 \item subsetting functions for systematic and random subsampling, 
 \item a tool for managing missing values.
@@ -438,11 +446,10 @@ several plots.
 
 Since there are multiple displays, some of which contain multiple
 plots, the question arises:  Which plot in which display window
-corresponds to the control panel?  If you select the {\bf Brush} mode,
-how can you tell which plot is going to respond to
-brushing?
+corresponds to the control panel?  If you select the {\bf Scale} mode,
+how can you tell which plot is going to respond?
 
-There is in ggobi a notion of the ``current display'' and the
+There is in GGobi a notion of the ``current display'' and the
 ``current plot.''  (We need both because some displays, like the
 scatterplot matrix, contain multiple plots.) The current plot is the
 one which is outlined with a thick white border; the current display
@@ -486,8 +493,8 @@ symmetric, and that constraint affects its variable selection behavior.
   one of the checkboxes in the variable selection region.
 \item Insert (Append):  First select one of the plots along the
   diagonal to tell ggobi uniquely where to insert (append) the new
-  variable, then click on one of the variable checkboxes.  (For now,
-  ggobi will not add a variable that's already plotted.)
+  variable, then click on one of the variable checkboxes.  (GGobi will
+  not add a variable that's already plotted.)
 \item Delete:  No plot selection is required; just click on the
   variable you want to delete.
 \end{itemize}
@@ -497,11 +504,11 @@ coordinates plot, which can be arranged horizontally or vertically.
 (To understand this plot if you are encountering it for the first
 time, imagine deconstructing a high-dimensional scatterplot and
 arranging its axes in parallel instead of orthogonally.  To represent
-case $i$, think of drawing a dot on axis $j$ at that point's value for
-variable $j$, and then connecting the dots into one set of connected
-line segments \cite{In85,We90}.)  The line segments are drawn by
-default, but you can turn them off using the {\bf Options} menu on the
-display menubar.
+case $i$, think of drawing a dot on each axis,  with the point on
+axis $j$ being the value of $x[i][j]$, and then connecting the dots
+into one set of connected line segments \cite{In85,We90}.)  The line
+segments are drawn by default, but you can turn them off using the
+{\bf Options} menu on the display menubar.
 
 By default, the plots are simple dotplots, but they can also be drawn
 using one of the other two methods for 1D plots:  as a textured dot
@@ -513,8 +520,9 @@ The variable selection behavior works as follows:
 \item Replace:  First select one of the plots, then click on one
   of the variable checkboxes to replace its plotted variable.
 \item Insert (Append):  First select one of the plots, then click on
-  one of the variable checkboxes to insert (append) a new plot.  (For
-  now, ggobi will not add a variable that's already plotted.)
+  one of the variable checkboxes to insert (append) a new plot before
+  (after) the current plot.  (GGobi will not add a variable that's
+  already plotted.)
 \item Delete:  No plot selection is required; just click on the
   variable whose plot you want to delete.
 \end{itemize}
@@ -535,11 +543,12 @@ and the behavior of the checkboxes depends on the state of the
   variable you want.  (For now, ggobi won't let you use a variable
   that's already plotted.)
 \item Insert (Append):  Select a plot in the display, and then click
-  middle or right on a variable checkbox.  (This applies to
-  verticallly plotted variable only.)
+  middle or right on a variable checkbox to add a new plot before
+  (after) the current plot.  (This applies to vertically plotted
+  variables only.)
 \item Delete: No plot selection is required; just click middle or
   right on the variable checkbox for the variable you want to
-  delete.  (This applies to verticallly plotted variable only.)
+  delete.  (This applies to vertically plotted variables only.)
 \end{itemize}
 
 \subsubsection{Missing values displays}
@@ -561,8 +570,8 @@ the association between missing values and the variables.
 \subsection {ASCII}
 \label{slbl:ASCII}
 
-The basics of the ascii data format used in xgobi are still supported, with
-some changes.
+The basics of the ascii data format used in xgobi are still
+supported, with some changes.
 
 The only essential file is the one containing the data itself.  Each
 line in the file contains one row of the input data matrix, and lines
@@ -595,6 +604,15 @@ using the ordering just presented, and the size is between 1 and 8
 $8 \times (type-1) + size$.
 \end{itemize}
 
+Circles, which may be the most visually appealing glyph, take much
+longer to draw under Microsoft Windows.  Consequently, our sample
+data files usually use a small filled rectangle as the default
+glyph.
+
+Colors must be integers from 0 to the number of colors in
+the colormap - 1.  (Currently, only one colormap is used, and it
+contains 10 colors.)
+
 \subsection {XML}
 \label{slbl:XML}
 
@@ -614,7 +632,8 @@ specification, such as
 
 It is possible to interface ggobi with a mysql database. Details of
 this are described in the document {\em GGobi and Database Management
-Systems}, available through the web site.
+Systems}, available through the web site.  [This may not work at
+present.]
 
 \section{Integration of ggobi with other software systems}
 \label{slbl:Integration}
@@ -635,16 +654,18 @@ well:  they set the projection method for the display, and the meaning
 of actions in the variable selection panel always conforms to the current
 projection method.
 
-As an example, start ggobi with some data, and watch what happens
-in the main ggobi window and a a single scatterplot display.   When ggobi
-starts, it's in {\bf XYPlot} mode by default, so the scatterplot window shows
-a 2-dimensional projection of the data.  If you select {\bf Scale} or
-{\bf Brush} (or any choice in the bottom half of the menu), the control
-panel at the left of the main window changes, reflecting the different
-interactions available to you in each mode.  However, the projection in
-the window doesn't change.  If you click on the checkboxes in the
-variable selection panel at the right of the main ggobi window, you
-replace one of the plotted variables.
+As an example, start ggobi with some data, and watch what happens in
+the main GGobi window and a a single scatterplot display.   When
+GGobi starts, it's in {\bf XYPlot} mode by default, so the
+scatterplot window shows a 2-dimensional projection of the data.  If
+you select {\bf Scale} or {\bf Brush} (or any choice in the bottom
+half of the menu), the control panel at the left of the main window
+changes, reflecting the different interactions available to you in
+each mode.  However, the projection in the window doesn't change.
+(There may be cues added to the plot to tell you the view mode of the
+plot.) If you click on the checkboxes in the variable selection panel
+at the right of the GGobi console, you replace one of the plotted
+variables.
 
 Now select {\em 2D Tour} in the ViewMode menu.  {\em Everything}
 changes at once, because you've effectively selected both a new mode and
@@ -672,11 +693,11 @@ top of the ViewMode menu.
 
 \subsection{1D plots}
 
-The 1D plots can be displayed in two ways:  as a textured dot plot
+The 1D plot can be displayed in two ways:  as a textured dot plot
 or an average shifted histogram.
 
-The textured dot plot uses a method (and code) created by Tukey and Tukey
-\cite{TukeyTukey90}.  The method spreads the data laterally by
+The textured dot plot uses a method (and code) described in
+\cite{TukeyTukey90}.  This method spreads the data laterally by
 amounts that are partly constrained and partly random, resulting in a
 fairly smooth spreading of the points and minimizing artifacts of the
 plotting method, such as stripes, clusters, or gaps.
@@ -797,8 +818,9 @@ The two styles of interaction, {\bf Drag} and {\bf Click}, are quite
 different.  Drag-style scaling is a perfect example of a direct
 manipulation interface, in which the points follow cursor motion in a
 very simple way.  However, if you're looking at a lot of data, the
-points may sometimes lay behind the cursor motion, making the degree
-of panning or zooming hard to control.
+points may sometimes lag behind the cursor motion, making the degree
+of panning or zooming hard to control.  There's also no way to
+hold the aspect ratio fixed with drag-style scaling.
 
 Click-style scaling may take you a few minutes to get used to, but
 you'll find that it gives you very precise control and is especially
@@ -811,7 +833,7 @@ described in terms of a camera:  you're operating a camera and
 looking at a projection of the data in the viewfinder.  When you use
 the left button, the camera is panning freely around, following the
 mouse exactly.  When you use the middle or right button, you're
-zooming the camera in and out.
+zooming the camera in and out -- and the aspect ratio changes, too.
 
 \subsubsection{Click}
 
@@ -838,7 +860,7 @@ yield small movements.
 To reset the plot, use the menu marked Reset in the main menubar:
 it has two entries, allowing pan and zoom to be reset separately.
 
-\subsubsection{Pan and zoom options}
+\subsubsection{Click: pan and zoom options}
 
 By the default, the panning and zooming of the plot is unconstrained,
 moving or rescaling vertically and horizontally with each action.
@@ -870,45 +892,44 @@ This is useful if you are plotting a very large number of points,
 and you want to position the brush before painting, because you
 can move it much more quickly across the plot.  
 
-\subsubsection{Points and edges}
+\subsubsection{Point and edge brushing}
 %
-If {\bf Points} is selected, the brush is drawn as a rectangle.  As
-the brush is moved across the points, any points contained by the
-brush are redrawn using the currently selected glyph and color.  If
-{\bf Edges} is selected, the brush is drawn as a crosshair, and as
-the brush is moved in the window, any edges (line segments)
-intersecting either the vertical or horizontal ``hair'' are redrawn
-in the chosen color.  (There is no edge brushing implementation for
-edge types yet.) If both {\bf Points} and {\bf Edges} are selected,
-the brush is drawn as a crosshair inside a rectangle, and both point
-and edge brushing are performed.
+If {\bf Point brushing} is in any state but `Off,' the brush has a
+rectangular outline.  As the brush is moved across the points, any
+points contained by the brush are affected.  You may be changing the
+color, glyph shape, glyph size, or the visible state of the point,
+depending on the menu setting.
 
-\subsubsection{Color and glyph}
-%
-Use the {\bf Color and glyph} menu to choose whether to brush
-with color, glyph, or both, or whether to hide the points you
-paint.
+Similarly, if {\bf Edge brushing} is in any state but `Off,' the
+brush includes a crosshair, and as the brush is moved in the window,
+any edges (line segments) intersecting either the vertical or
+horizontal ``hair'' are affected.  You may be changing the color,
+line type, line thickness, or visible state of the edge.
+
+If both {\bf Point brushing} and {\bf Edge brushing} are on, the
+brush is drawn as a crosshair inside a rectangle, and both point and
+edge brushing are performed.
 
 \subsubsection{Brushing modes:  persistent, transient}
 %
 These are two brushing modes.
 \medskip
 \noindent
-\\{\bf Persistent}:  When you brush a point, it retains its new color or glyph
-  when the brush has moved away.
-\\{\bf Transient}:  As the brush moves off a point, it returns to the color and
-  glyph it had before the brush covered it.
+\\{\bf Persistent}:  When you brush a point or edge, it retains its new
+  characteristics when the brush has moved away.
+\\{\bf Transient}:  As the brush moves off a point or edge, it returns
+  to the characteristics it had before it was brushed.
 
 \subsubsection{Undo}
 %
-Clicking on the {\bf Undo} button restores the glyph and color and
-visibility of all points painted between the last mouse-down and
+Clicking on the {\bf Undo} button restores the characteristics
+of all points and edges painted between the last mouse-down and
 mouse-up.
 
 \subsubsection{Options menu}
 %
 When the brushing mode is active, the Options menu in the main
-menu bar contains this item:
+menu bar includes this item:
 \medskip
 \noindent
 \\{\bf Update brushing continuously}: Update linked
@@ -929,6 +950,14 @@ menu bar contains these items:
  {\bf Reset brush size} \> Reset the brush to its default size and position. \\
 \end{tabbing}
 %
+
+\subsubsection{Brush by variable ...}
+
+See the description in section \ref{BrushByVariable}.
+
+\subsubsection{Color \& glyph groups ...}
+
+See the description in section \ref{ColorAndGlyphGroups}.
 
 \subsection{Identification}
 \label{slbl:Identify}
@@ -955,11 +984,6 @@ cursor.  It is also possible to restore all labels to unsticky status
 by clicking on the {\bf Remove labels} button.  You can also see all
 the labels at once by clicking on {\bf Make all sticky}.
 
-\subsection{Edge editing}
-
-Not implemented.
-
-
 \newpage
 \section{Tools}
 \label{Tools}
@@ -972,7 +996,7 @@ This powerful tool is opened by selecting the first entry on the
 \begin{itemize}
 \itemsep 0em
 \item the display of variable statistics,
-\item variable selection for other tools,
+\item variable subset selection for launching multi-plot displays,
 \item setting variable ranges,
 \item cloning variables, and
 \item adding other new variables.
@@ -983,10 +1007,10 @@ the current variable transformation (if any); the minimum, maximum,
 mean, and median of the raw data; the number of missing values per variable.
 
 You can also use it to select variables -- not for plotting, but to
-be operated on by other tools.  Variables are selected by highlighting
-rows, and the control and shift keys are modifiers that allow multiple
-rows to be highlighted.  The variable transformation tool, among
-others, will operate on the variables selected in this way.
+specify subsets when launching a parallel coordinates or scatterplot
+matrix display.  Variables are selected by highlighting rows, and the
+control and shift keys are modifiers that allow multiple rows to be
+highlighted.
 
 These selected variables will also respond to operations contained
 within this panel:  you can reset the variable ranges that are used
@@ -1006,9 +1030,7 @@ a set of integers reflecting the groups currently defined by brushing.
 \label{slbl:VarTransform}
 
 The first step in variable transformation is to specify the variables
-you want to transform.  By default, the variables plotted in the
-current display will be affected; if you wish to select others, use
-the {\bf Variable manipulation tool.}
+you want to transform.
 
 There are three stages in the transformation pipeline, with a
 transformation function in each stage operating on the output of the
@@ -1060,43 +1082,52 @@ sphering} to create new variables and add them ggobi's variable selection
 panels.  The names of the selected variables will be added to the
 ``sphered variables'' to help you remember which variables you sphered.
 
-Restore scree plot can be used to refresh the plot when a new subset
-of variables is chosen.
-
-\subsection{Inference}
-
-Not implemented.
-
 \subsection{Jittering}
 
 Select {\em Variable jittering ...} to open a panel that allows
 random noise to be added to selected variables.  This ameliorates
 overplotting in scatterplots of data with many ties.
 
-First specify the variables you wish to jitter.  By default, the
-variables plotted in the current display will be affected; if you
-wish to select others, use the {\bf Variable manipulation tool.}
+First specify the variables you wish to jitter.
 
 Choose between uniform and normal random jitter, and then set the degree of
 jitter using the slider.  To rejitter without changing the degree of
 jitter, simply click on the {\bf Jitter} button.
 
-\subsection{Case clusters}
+\subsection{Brush by variable}
+\label{slbl:BrushByVariable}
 
-The case clusters tool displays a table.  Each unique
-symbol in the data (combination of color and clyph) occupies
-a row, and for each row there are three buttons:  {\bf H}
-hides all points drawn in the chosen symbol, {\bf S} shows
-them all, and {\bf C} hides what's shown and shows what's
-hidden.  The three remaining columns report the number of
-cases hidden, the number shown, and the sum.
+The ``Brush by variable'' tool is used to automatically color points
+using the color scale.  To use it, first select a variable.  This
+adds two sets of numbers to the display:  along the bottom of the
+display, at the center of each stripe of color, is shown the number
+of points that will be drawn with this color once ``Apply'' is
+pressed.  Along the top of the display, at the boundaries between
+stripes of color, appears the value of the chosen variable that 
+defines the boundary.
 
-The {\bf Update} button at the bottom of the window will reset
-the contents of the table in case it isn't responding to changes
-in the displays.  The {\bf Rescale} button will cause the views
-to be redrawn as if any hidden points are no longer in the data:
-that is, the points that are shown will be scaled to fill the
-viewing area of the plot.
+To adjust the boundaries, grab one of the sliders, and notice that
+both the values and the counts adjust as you move it.
+
+[We plan to support multiple color scales of different sizes,
+and then this tool will become increasingly useful.]
+
+\subsection{Color \& glyph groups}
+\label{slbl:ColorAndGlyphGroups}
+
+The `Color \& glyph groups' tool displays a table.  Each unique
+symbol in the data (combination of color and clyph) occupies a row,
+and for each row there are three buttons:  {\bf H} hides all points
+drawn in the chosen symbol, {\bf S} shows them all, and {\bf C} hides
+what's shown and shows what's hidden.  The three remaining columns
+report the number of cases hidden, the number shown, and the sum.
+
+The {\bf Update} button at the bottom of the window will reset the
+contents of the table in case it isn't responding to changes in the
+displays.  The {\bf Rescale} button will cause the views to be
+redrawn as if any hidden points are no longer in the data:  that is,
+the points that are shown will be scaled to fill the viewing area of
+the plot.
 
 See \ref{NewVariable} to read how you can add a new variable to the
 existing data which serves as an indicator for these ``clusters.''
@@ -1107,7 +1138,7 @@ Select {\em Case subsetting and sampling ...} to open a panel
 that allows subsets to be specified in one of five ways.
 
 {\bf Random sample without replacement}:  Specify the number of
-cases to be in the sample.
+     cases to be in the sample.
 \\{\bf Consecutive block}:  Specify the first and last row of the block.
 \\{\bf Every nth case}:  Specify the interval and the first row.
 \\{\bf Sticky labels}:  All cases with a ``sticky'' label will
@@ -1190,7 +1221,8 @@ have been defined in the XML file (or through the API).
 then all datasets with a variable of the same name are affected, and
 all cases which have the same level of that variable are linked.
 (The labels for the levels aren't used in that determination, just
-the numerical representation of the level.)
+the numerical representation of the level.)  [This has not yet been
+implemented as of \date.]
 
 2.  If you are not using a categorical variable for linking, then
 cases are linked by {\bf id}: if two cases share the same {\bf id},
@@ -1204,7 +1236,7 @@ This is described in more detail in the XML documentation.
 *** Debby, I'm not sure what you want to say here???
 
 \newpage
-\section{Differences from xgobi}
+\section{Differences from XGobi}
 \label{slbl:xgobi}
 
 In this section, we summarize the key differences between ggobi
@@ -1250,8 +1282,12 @@ on the File menu or using R.  (The R~-~ggobi interface will be
 introduced below, and it's more fully described in section
 \ref{slbl:Integration}.)
 
-The rules and the interface for linking across data sets have not yet
-been defined.  [now they have!]
+The rules for linking in XGobi had evolved into a rather complicated
+hodge-podge with special handling of ``row groups,'' the
+``nlinkable'' notion to exclude points from linking, and linking
+points to line segments (edges).  This has been replaced with a single set
+of rules that can be specified in the xml file.  See section 
+\ref{LinkingRules} for details.
 
 With multiple displays, too, we no longer have to launch a new
 process to open missing value plots -- the plots of 1's and 0's
@@ -1269,10 +1305,11 @@ introduce the changes in data format.  The xgobi format, in which a
 set of files with a common base name is used, is still supported,
 though some file formats have changed ({\em .colors}), and some are no
 longer supported ({\em .bin}, {\em .vgroups}, {\em .lines}).  (See
-section \ref{slbl:DataFormat} for more detail.) The non-supported
-features have mostly been changed to more sophisticated approaches,
-for example, the simple from-to line structure has been replaced with
-a fully linkable, brushable edges format.
+section \ref{slbl:DataFormat} for more detail.) The functions served
+by the discarded file types are usually served now in a different
+way:  for example, XGobi uses the {\em .vgroups} file to force
+a group of variables to use the same axis ranges.  In GGobi, that's
+accomplished by setting limits in the Variable manipulation tool.
 
 The new format, in which all the data lives in one file, is written
 in XML.  XML (Extensible Markup Language) is a widely used language
@@ -1289,25 +1326,25 @@ in the ascii data format, but they can be specified in XML -- and
 they can have associated data values.
 
 A few XML data files are included in the sample ggobi data, and
-the details of their format is described in ??.
+the details of their format is described in (reference)
 
 Another innovation in data access is the ability to read data
 directly from a MySQL database, as described in section \ref{slbl:MySQL}.
 
 \subsection{Integration}
 
-Many xgobi users are also users of the SPlus or R statistics
+Many XGobi users are also users of the SPlus or R statistics
 software, and have used the S function which launches an xgobi
 process viewing S data.  Once that launch occurred, the resulting
-process was utterly independent of its parent.  The xgobi authors
+process was utterly independent of its parent.  The XGobi authors
 did some experiments in the early 90s to achieve a more intimate
 connection, but made little headway.  (reference)
 
 With ggobi, that problem has been solved, and it's now possible
-to have real-time integration between ggobi and a variety of
+to have real-time integration between GGobi and a variety of
 other software environments.  An example of this integration is
-the embedding of ggobi into R (or S), with the addition of a set of
-R (or S) functions that manipulate ggobi data and displays,
+the embedding of GGobi into R (or S), with the addition of a set of
+R (or S) functions that manipulate GGobi data and displays,
 resetting data values, projection, and the appearance of the plot.
 
 For more details, see section \ref{slbl:Integration}, or read
@@ -1330,11 +1367,8 @@ horizontally and the middle (or right) button to plot vertically.
 \subsection {The variable manipulation tool}
 
 The table in the {\bf Variable manipulation tool} can also be used to
-select variables -- not for plotting, but to be operated on by other
-tools.  Several of the tools, such as variable transformation and
-jittering, will operate on the plotted variables in the current
-display by default.  However, if any rows in this table are
-highlighted, then all selected variables will be affected.
+select variables -- not for specifying variable subsets when launching
+a parallel coordinates or scatterplot matrix display.
 
 This table can also be used to specify limits for variables or groups
 of variables, and so we have dispensed with the {\em .vgroups}
@@ -1348,48 +1382,63 @@ For more detail on this table, see section \ref{slbl:VarManip}.
 \subsection{Changes in ViewModes and Tools}
 
 {\bf Brush} may be the {\bf ViewMode} that has changed the most,
-because ggobi has a much richer notion of color selection than
-xgobi.  Open the {\bf Choose Symbol} panel, and then double-click on
-any element of the color palette to bring up a color selection widget
-with access to the full color map.  Notice that you can change the
-background color as well as any of the foreground colors.
+because GGobi has a much richer notion of color selection than
+XGobi.  Open the {\bf Choose color \& glyph} panel, and then
+double-click on any element of the color palette to bring up a color
+selection widget with access to the full color map.  Notice that you
+can change the background color as well as any of the foreground
+colors, and notice that changing the glyph also changes the line
+type to be used in edge brushing.
 
 {\bf Scale} has also changed.  The direct manipulation shifting and
 scaling methods work as they did in xgobi, but we've added  what we
 call ``Click-style interaction'' for more precise control.  See section
 \ref{slbl:Scaling}.
 
-The tour methods in ggobi are still evolving: many things are not yet
+The tour methods in GGobi are still evolving: many things are not yet
 implemented, but new things are beginning to appear.  In the {\bf
-1DTour}, a projection of several variables is viewed an an average
+1DTour}, a projection of several variables is viewed as an average
 shifted histogram, as described in section \ref{slbl:1DTour}.
 
 The redesign of the tour methods is reflected in the {\bf Sphering}
 tool, which also appears in the most recent versions of xgobi.
 Instead of automatically sphering variables in projection pursuit,
-ggobi allows you the choice:  you can use the {\bf Sphering} tool to
-decide which variables to sphere.  Since this method makes use of
-variable cloning, it creates new variables, allowing you to look at
-plots of principal components against the original data.
+GGobi requires you to specify which variables to sphere.  Since this
+method makes use of variable cloning, it creates new variables,
+allowing you to look at plots of principal components against the
+original data.
 
 See section \ref{slbl:Sphering} for details.
-
-\subsection{Linking}
-
-The rules for linking in xgobi had evolved into a rather complicated
-hodge-podge with special handling of ``row groups,'' the
-``nlinkable'' notion to exclude points from linking, and linking
-points to line segments (edges).  This has been replaced with a single set
-of rules that can be specified in the xml file.  See section 
-\ref{LinkingRules} for details.
 
 \subsection{On-line help}
 
 The on-line help system used in xgobi has been replaced with
 ``tooltips,'' so leaving the mouse over a widget for a couple of
 seconds brings up a phrase describing the function of that widget.
-If the tooltips annoy you, you can turn then off using a
-checkbox on the {\bf Options} menu.
+If the tooltips annoy you, you can turn then off using a checkbox on
+the {\bf Options} menu.
+
+\section{Future work}
+
+Soon:
+
+\begin{itemize}
+\item A two-button toggle widget for variable selection
+\item Reading a set of color scales
+\item Categorical data
+  \begin{itemize}
+  \item For linking
+  \item Categorical data displays
+  \end{itemize}
+\item Graph layout
+\end{itemize}
+
+Longer term:
+
+\begin{itemize}
+\item Edge editing (maybe)
+\item Maps
+\end{itemize}
 
 \section*{Web Links}
 
