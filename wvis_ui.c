@@ -45,6 +45,9 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
 void
 wvis_init (ggobid  *gg)
 {
+  GdkColormap *cmap = gdk_colormap_get_system ();
+  gboolean writeable = false, best_match = true, success;
+
   gg->wvis.window = NULL;
   gg->wvis.npct = 0;
   gg->wvis.n = NULL;
@@ -53,6 +56,19 @@ wvis_init (ggobid  *gg)
   gg->wvis.mousepos.x = -1;
   gg->wvis.mousepos.y = -1;
   gg->wvis.pix = NULL;
+
+  gg->wvis.gray1.red = gg->wvis.gray1.blue = gg->wvis.gray1.green =
+    (guint16) (.3*65535.0);
+  success = gdk_colormap_alloc_color (cmap, &gg->wvis.gray1, writeable,
+    best_match);
+  gg->wvis.gray2.red = gg->wvis.gray2.blue = gg->wvis.gray2.green =
+    (guint16) (.5*65535.0);
+  success = gdk_colormap_alloc_color (cmap, &gg->wvis.gray2, writeable,
+    best_match);
+  gg->wvis.gray3.red = gg->wvis.gray3.blue = gg->wvis.gray3.green =
+    (guint16) (.7*65535.0);
+  success = gdk_colormap_alloc_color (cmap, &gg->wvis.gray3, writeable,
+    best_match);
 }
 
 
@@ -180,9 +196,6 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gint x0, x1;
   gint x = xmargin;
   gint y = ymargin;
-  GdkColormap *cmap = gdk_colormap_get_system ();
-  GdkColor gray1, gray2, gray3;
-  gboolean writeable = false, best_match = true, success;
   GdkPoint *points;
 /*
  * get the current d and the selected variable 
@@ -210,13 +223,6 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     }
   }
 
-  gray1.red = gray1.blue = gray1.green = (guint16) (.3*65535.0);
-  gray2.red = gray2.blue = gray2.green = (guint16) (.5*65535.0);
-  gray3.red = gray3.blue = gray3.green = (guint16) (.7*65535.0);
-  success = gdk_colormap_alloc_color(cmap, &gray1, writeable, best_match);
-  success = gdk_colormap_alloc_color(cmap, &gray2, writeable, best_match);
-  success = gdk_colormap_alloc_color(cmap, &gray3, writeable, best_match);
-
   /*-- clear the pixmap --*/
   gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
   gdk_draw_rectangle (pix, gg->plot_GC, TRUE,
@@ -236,7 +242,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   /*-- draw the horizontal lines --*/
   x0 = xmargin; y = ymargin + 10;
   x1 = xmargin + (w->allocation.width - 2*xmargin) - 1;
-  gdk_gc_set_foreground (gg->plot_GC, &gray2);
+  gdk_gc_set_foreground (gg->plot_GC, &gg->wvis.gray2);
   for (k=0; k<gg->ncolors-1; k++) {
     gdk_draw_line (pix, gg->plot_GC, x0, y, x1, y);
     y += hgt;
@@ -244,7 +250,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
   /*-- draw rectangles, 20 x 10 for the moment --*/
   y = ymargin + 10;
-  gdk_gc_set_foreground (gg->plot_GC, &gray2);
+  gdk_gc_set_foreground (gg->plot_GC, &gg->wvis.gray2);
   for (k=0; k<gg->ncolors-1; k++) {
     x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
     gdk_draw_rectangle (pix, gg->plot_GC,
@@ -256,7 +262,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   /*-- draw the dark shadows --*/
   y = ymargin + 10;
   points = (GdkPoint *) g_malloc (7 * sizeof (GdkPoint));
-  gdk_gc_set_foreground (gg->plot_GC, &gray1);
+  gdk_gc_set_foreground (gg->plot_GC, &gg->wvis.gray1);
   for (k=0; k<gg->ncolors-1; k++) {
     x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
 
@@ -286,7 +292,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   /*-- draw the light shadows --*/
   y = ymargin + 10;
   points = (GdkPoint *) g_malloc (7 * sizeof (GdkPoint));
-  gdk_gc_set_foreground (gg->plot_GC, &gray3);
+  gdk_gc_set_foreground (gg->plot_GC, &gg->wvis.gray3);
   for (k=0; k<gg->ncolors-1; k++) {
     x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
 
@@ -312,11 +318,6 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
     y += hgt;
   }
-/*
-  gdk_color_free (&gray1);
-  gdk_color_free (&gray2);
-  gdk_color_free (&gray3);
-*/
 
   /*-- add the variable limits in the top margin --*/
   if (d && selected_var != -1) {

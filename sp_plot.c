@@ -1035,58 +1035,6 @@ splot_draw_to_pixmap1 (splotd *sp, ggobid *gg)
   }
 }
 
-/*
- * add the points and edges in the currently selected glyph and color;
- * unbinned
-*/
-static void
-splot_draw_current_symbols (splotd *sp, ggobid *gg)
-{
-  gint i, m, n;
-  displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
-  gboolean draw_case;
-  gint dtype = display->displaytype;
-
-  gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[gg->color_id]);
-
-  for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
-    draw_case = splot_plot_case (m, d, sp, display, gg);
-
-    /*-- only test color, because it only works for color brushing --*/
-    if (draw_case && d->color_now.els[m] == gg->color_id) {
-      if (display->options.points_show_p)
-#ifdef WIN32
-        win32_draw_to_pixmap_unbinned (gg->color_id, sp, gg);
-#else
-        draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen, m, gg);
-#endif
-
-      /*-- whiskers: parallel coordinate and time series plots --*/
-      if (dtype == parcoords || dtype == tsplot) {
-        if (display->options.whiskers_show_p) {
-          if (dtype == parcoords) {
-            n = 2*m;
-            gdk_draw_line (sp->pixmap0, gg->plot_GC,
-              sp->whiskers[n].x1, sp->whiskers[n].y1,
-              sp->whiskers[n].x2, sp->whiskers[n].y2);
-            n++;
-            gdk_draw_line (sp->pixmap0, gg->plot_GC,
-              sp->whiskers[n].x1, sp->whiskers[n].y1,
-              sp->whiskers[n].x2, sp->whiskers[n].y2);
-          } else { /*-- if time series plot --*/
-            if (m < d->nrows_in_plot-1)  /*-- there are n-1 whiskers --*/
-              gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                sp->whiskers[m].x1, sp->whiskers[m].y1,
-                sp->whiskers[m].x2, sp->whiskers[m].y2);
-          }
-        }
-      }
-    }
-  }
-}
-
 
 void
 splot_pixmap1_to_window (splotd *sp, ggobid *gg) {
@@ -1126,20 +1074,6 @@ splot_redraw (splotd *sp, enum redrawStyle redraw_style, ggobid *gg) {
       splot_pixmap0_to_pixmap1 (sp, false, gg);  /* false = not binned */
       splot_draw_to_pixmap1 (sp, gg);
     break;
-
-/*
-    case COLOR_BRUSHING:
-      splot_pixmap0_to_pixmap1 (sp, false, gg);
-      splot_draw_current_symbols (sp, gg);
-      splot_draw_to_pixmap1 (sp, gg);
-    break;
-
-    case COLOR_BRUSHING_BINNED:
-      splot_pixmap0_to_pixmap1 (sp, true, gg);    true = binned
-      splot_draw_current_symbols (sp, true, gg);
-      splot_draw_to_pixmap1 (sp, gg);
-    break;
-*/
 
     case BINNED:
       splot_draw_to_pixmap0_binned (sp, gg);

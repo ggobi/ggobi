@@ -321,6 +321,7 @@ struct _ggobid {
    GtkWidget *window;
    GtkWidget *da;
    GdkPixmap *pix;
+   GdkColor gray1, gray2, gray3;
 
    gfloat *pct;
    gint npct;
