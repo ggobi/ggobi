@@ -393,7 +393,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
         strlen (d->vartable[ sp->xyvars.x ].collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (drawable, style->font, gg->plot_GC,
-        sp->max.x - width - 5,
+        sp->max.x/2 - width/2,
         sp->max.y - 5,
         d->vartable[ sp->xyvars.x ].collab_tform);
 
@@ -426,7 +426,8 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
       strlen (d->vartable[ sp->p1dvar ].collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
     gdk_draw_string (drawable, style->font, gg->plot_GC,
-      5,
+      /*5,*/
+      sp->max.x/2 - width/2,
       sp->max.y - 5,
       d->vartable[ sp->p1dvar ].collab_tform);
 
@@ -1065,7 +1066,8 @@ splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
 /*------------------------------------------------------------------------*/
 /*                   draw tour axes                                       */
 /*------------------------------------------------------------------------*/
-static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
+static void
+splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   gint j, ix, iy;
   displayd *dsp = (displayd *) sp->displayptr;
