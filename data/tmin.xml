@@ -19,7 +19,7 @@
    <levels count="3">
      <level value="0">biz</level>
      <level value="1">res</level>
-     <level value="102">unknown</level>
+     <level value="2">unknown</level>
    </levels>
  </categoricalvariable>
 </variables>
