@@ -100,22 +100,23 @@ const gchar * const xmlDataTagNames[] = {
 void
 ggobi_XML_warning_handler(void *data, const gchar *msg, ...)
 {
-    xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
-    fprintf(stderr, "Warning from XML parsing [%d, %d]: %s", p->input->line, p->input->col, msg);
+  xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
+  fprintf(stderr, "Warning from XML parsing [%d, %d]: %s", p->input->line, p->input->col, msg);
 /*
-    fprintf(stderr, msg, ...); 
+  fprintf(stderr, msg, ...); 
 */
-    fflush(stderr);  
+  fflush(stderr);  
 }
 void
 ggobi_XML_error_handler(void *data, const gchar *msg, ...)
 {
-    xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
-    fprintf(stderr, "Error in XML parsing [line %d, column %d]: %s", p->input->line, p->input->col, msg);
+  xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
+  fprintf(stderr, "Error in XML parsing [line %d, column %d]: %s",
+    p->input->line, p->input->col, msg);
 /*
-    fprintf(stderr, msg, ...); 
+  fprintf(stderr, msg, ...); 
 */
-    fflush(stderr);
+  fflush(stderr);
 }
 
 
@@ -135,18 +136,18 @@ ggobi_XML_error_handler(void *data, const gchar *msg, ...)
 gboolean
 data_xml_read (InputDescription *desc, ggobid *gg)
 {
- xmlSAXHandlerPtr xmlParserHandler;
- xmlParserCtxtPtr ctx = (xmlParserCtxtPtr) g_malloc(sizeof(xmlParserCtxtPtr));
- XMLParserData data;
- gboolean ok = false;  
- gchar *name = g_strdup(desc->fileName); /* find_xml_file(desc->fileName, NULL, gg); */
+  xmlSAXHandlerPtr xmlParserHandler;
+  xmlParserCtxtPtr ctx = (xmlParserCtxtPtr) g_malloc(sizeof(xmlParserCtxtPtr));
+  XMLParserData data;
+  gboolean ok = false;  
+  gchar *name = g_strdup(desc->fileName); /* find_xml_file(desc->fileName, NULL, gg); */
 
   if (name == NULL)
     return (false);
 
   if (strcmp(name, desc->fileName) != 0) {
     g_printerr("Different input file name and resolved file name. Please report.\n");
- }
+  }
 
   xmlParserHandler = (xmlSAXHandlerPtr) g_malloc(sizeof(xmlSAXHandler));
   /* Make certain this is initialized so that we don't have any references
@@ -165,9 +166,9 @@ data_xml_read (InputDescription *desc, ggobid *gg)
 
   ctx = xmlCreateFileParserCtxt(name);
   if(ctx == NULL) {
-   xml_warning("File error:", name, "Can't open file ", &data);
-   g_free (name);
-   return(false);
+    xml_warning("File error:", name, "Can't open file ", &data);
+    g_free (name);
+    return(false);
   }
 
   ctx->validate = 1;
@@ -233,54 +234,54 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
 void 
 startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 {
- XMLParserData *data = (XMLParserData*)user_data;
- enum xmlDataState type = tagType(name, false);
+  XMLParserData *data = (XMLParserData*)user_data;
+  enum xmlDataState type = tagType(name, false);
 
- data->state = type;
+  data->state = type;
 
- switch (type) {
-   case VARIABLES:
-     allocVariables (attrs, data);
-   break;
-   case VARIABLE:
-   case REAL_VARIABLE:
-   case CATEGORICAL_VARIABLE:
-     newVariable (attrs, data, name);
-   break;
+  switch (type) {
+    case VARIABLES:
+      allocVariables (attrs, data);
+    break;
+    case VARIABLE:
+    case REAL_VARIABLE:
+    case CATEGORICAL_VARIABLE:
+      newVariable (attrs, data, name);
+    break;
 
-   case CATEGORICAL_LEVELS:
-     categoricalLevels(attrs, data);
-   break;
-   case CATEGORICAL_LEVEL:
-     setLevelIndex(attrs, data);
-   break;
+    case CATEGORICAL_LEVELS:
+      categoricalLevels(attrs, data);
+    break;
+    case CATEGORICAL_LEVEL:
+      setLevelIndex(attrs, data);
+    break;
 
-   case RECORDS: /* Used to be DATASET */
-     setDatasetInfo(attrs, data);
-   break;
-   case TOP:
-     setGeneralInfo(attrs, data);
-   break;
-   case RECORD:
-     newRecord(attrs, data);
-   break;
-   case COLORMAP:
-     setColorMap(attrs, data);
-   break;
-   case COLOR:
-     setColormapEntry(attrs, data);
-   break;
-   case DESCRIPTION:
-     /* description text pending */
-   break;
-   case DATASET:
-     setDataset(attrs, data);
-   break;
+    case RECORDS: /* Used to be DATASET */
+      setDatasetInfo(attrs, data);
+    break;
+    case TOP:
+      setGeneralInfo(attrs, data);
+    break;
+    case RECORD:
+      newRecord(attrs, data);
+    break;
+    case COLORMAP:
+      setColorMap(attrs, data);
+    break;
+    case COLOR:
+      setColormapEntry(attrs, data);
+    break;
+    case DESCRIPTION:
+      /* description text pending */
+    break;
+    case DATASET:
+      setDataset(attrs, data);
+    break;
    
-   default:
-       fprintf(stderr, "Unrecognized XML state\n"); fflush(stderr);    
-   break;
- }
+    default:
+      fprintf(stderr, "Unrecognized XML state\n"); fflush(stderr);    
+    break;
+  }
 }
 
 gint
@@ -354,35 +355,35 @@ addLevel(XMLParserData *data, const gchar *c, gint len)
 
 void endXMLElement(void *user_data, const xmlChar *name)
 {
- XMLParserData *data = (XMLParserData*)user_data;
- enum xmlDataState type = tagType(name, true);
+  XMLParserData *data = (XMLParserData*)user_data;
+  enum xmlDataState type = tagType(name, true);
 
- switch(type) {
-   case RECORD:
-     data->current_record++;
-   break;
-   case VARIABLE:
-   case REAL_VARIABLE:
-   case CATEGORICAL_VARIABLE:
-     data->current_variable++;
-   break;
-   case COLOR:
-     data->current_color++;
-   break;
-   case COLORMAP:
+  switch(type) {
+    case RECORD:
+      data->current_record++;
+    break;
+    case VARIABLE:
+    case REAL_VARIABLE:
+    case CATEGORICAL_VARIABLE:
+      data->current_variable++;
+    break;
+    case COLOR:
+      data->current_color++;
+    break;
+    case COLORMAP:
        /* Only set this if we are reading from the main file 
           and not a secondary colormap file.
         */
-     if(data->reading_colormap_file_p == false)
-       GGOBI(registerColorMap)(data->gg);
-   break;
-   case CATEGORICAL_LEVELS:
-   break;
-   case CATEGORICAL_LEVEL:
-   break;
-   default:
-     data = NULL; /* just any code so we can stop.*/
-   break;
+      if(data->reading_colormap_file_p == false)
+        GGOBI(registerColorMap)(data->gg);
+    break;
+    case CATEGORICAL_LEVELS:
+    break;
+    case CATEGORICAL_LEVEL:
+    break;
+    default:
+      data = NULL; /* just any code so we can stop.*/
+    break;
   }
 }
 
@@ -390,14 +391,14 @@ void endXMLElement(void *user_data, const xmlChar *name)
 XmlTagType
 tagType(const xmlChar *name, gboolean endTag)
 {
- gint n = sizeof(xmlDataTagNames)/sizeof(xmlDataTagNames)[0] - 1; 
- gint i;
- const gchar *tmp = (const gchar *)name;
- /*
+  gint n = sizeof(xmlDataTagNames)/sizeof(xmlDataTagNames)[0] - 1; 
+  gint i;
+  const gchar *tmp = (const gchar *)name;
+  /*
   if(endTag) {
-   tmp++;
+    tmp++;
   }
- */
+  */
 
   for(i = 0; i < n; i++) {
     if(strcmp(tmp, xmlDataTagNames[i]) == 0) {
@@ -405,7 +406,7 @@ tagType(const xmlChar *name, gboolean endTag)
     }
   }
 
- return(UNKNOWN);
+  return(UNKNOWN);
 }
 
 
@@ -446,58 +447,57 @@ tagType(const xmlChar *name, gboolean endTag)
 void 
 Characters(void *user_data, const xmlChar *ch, gint len)
 {
- gchar *tmp = NULL;
- gint dlen = len;
- const xmlChar *c;
- XMLParserData *data = (XMLParserData*)user_data;
+  gchar *tmp = NULL;
+  gint dlen = len;
+  const xmlChar *c;
+  XMLParserData *data = (XMLParserData*)user_data;
 
- c = (const xmlChar *) skipWhiteSpace(ch, &dlen);
- if(dlen < 1 || c[0] == '\n')
-  return;
+  c = (const xmlChar *) skipWhiteSpace(ch, &dlen);
+  if(dlen < 1 || c[0] == '\n')
+    return;
 
- if(data->terminateStrings_p) {
-  tmp = (gchar *) g_malloc(sizeof(gchar)*(dlen+1));
+  if(data->terminateStrings_p) {
+    tmp = (gchar *) g_malloc(sizeof(gchar)*(dlen+1));
 
-  memcpy(tmp, c, dlen);
-  memset(tmp+dlen, '\0', 1);
+    memcpy(tmp, c, dlen);
+    memset(tmp+dlen, '\0', 1);
 
-  c = (const xmlChar *) tmp;
- }
+    c = (const xmlChar *) tmp;
+  }
 
- switch(data->state) {
-   case RECORD:
-     setRecordValues (data, c, dlen);
-   break;
-   case VARIABLE:
-   case CATEGORICAL_VARIABLE:
-   case REAL_VARIABLE:
-     setVariableName (data, c, dlen);
-   break;
-   case COLOR:
-     setColorValue (data, c, dlen);
-     break;
-   case CATEGORICAL_LEVEL:
-     addLevel(data, (const gchar *) c, dlen);
-   break;
-   default:
-   break;
+  switch(data->state) {
+    case RECORD:
+      setRecordValues (data, c, dlen);
+    break;
+    case VARIABLE:
+    case CATEGORICAL_VARIABLE:
+    case REAL_VARIABLE:
+      setVariableName (data, c, dlen);
+    break;
+    case COLOR:
+      setColorValue (data, c, dlen);
+    break;
+    case CATEGORICAL_LEVEL:
+      addLevel(data, (const gchar *) c, dlen);
+    break;
+    default:
+    break;
+  }
 
- }
-
- if(data->terminateStrings_p) {
-  g_free(tmp);
- }
+  if(data->terminateStrings_p) {
+    g_free(tmp);
+  }
 }
 
 const xmlChar *
 skipWhiteSpace(const xmlChar *ch, gint *len)
 {
- const xmlChar *tmp = ch;
+  const xmlChar *tmp = ch;
   while(*len >= 0) {
-   if(*len == 0 || (tmp[0] != ' ' && tmp[0] != '\t' && tmp[0] != '\n'))
-    break;
-   tmp++;
-   (*len)--;
+    if(*len == 0 || (tmp[0] != ' ' && tmp[0] != '\t' && tmp[0] != '\n'))
+      break;
+    tmp++;
+    (*len)--;
   }
 
   return(tmp);
@@ -566,8 +566,7 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
 gboolean
 setDefaultDatasetValues(const xmlChar **attrs, XMLParserData *data)
 {
-
- const gchar * tmp = getAttribute(attrs, "missingValue");
+  const gchar * tmp = getAttribute(attrs, "missingValue");
   if(tmp != NULL) {
     data->NA_identifier = g_strdup(tmp);
   }
@@ -575,31 +574,31 @@ setDefaultDatasetValues(const xmlChar **attrs, XMLParserData *data)
   setGlyph (attrs, data, -1);  
   setColor (attrs, data, -1);
   setHidden (attrs, data, -1);
- return(true);
+  return(true);
 }
 
 gint
 strToInteger(const gchar *tmp)
 {
- gint value;
+  gint value;
 
   value = atoi(tmp);
 
- return(value);
+  return(value);
 }
 
 
 const gchar *
 getAttribute(const xmlChar **attrs, gchar *name)
 {
- const xmlChar **tmp = attrs;
- while(tmp && tmp[0]) {
-  if(strcmp(name, (const gchar *)tmp[0]) == 0)
+  const xmlChar **tmp = attrs;
+  while(tmp && tmp[0]) {
+    if(strcmp(name, (const gchar *)tmp[0]) == 0)
       return((const gchar *)tmp[1]);
-   tmp += 2;
- }
+    tmp += 2;
+  }
 
- return(NULL);
+  return(NULL);
 }
 
 gboolean 
@@ -609,7 +608,7 @@ newRecord(const xmlChar **attrs, XMLParserData *data)
 
   d->readXMLRecord(attrs, data);
 
- return(true);
+  return(true);
 }
 
 gboolean
@@ -628,21 +627,21 @@ setHidden(const xmlChar **attrs, XMLParserData *data, gint i)
       d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = hidden;
   }
 
- return(tmp != NULL);
+  return(tmp != NULL);
 }
 
 gboolean
 asLogical(const gchar *sval)
 {
- guint i;
- gboolean val = false;
- const gchar *const trues[] = {"T","true", "True","1"};
+  guint i;
+  gboolean val = false;
+  const gchar *const trues[] = {"T","true", "True","1"};
   for(i = 0; i < sizeof(trues)/sizeof(trues[0]); i++) {
     if(strcmp(sval, trues[i]) == 0)
       return(true);
   }
 
- return(val);
+  return(val);
 }
 
 gboolean
@@ -667,7 +666,7 @@ setColor(const xmlChar **attrs, XMLParserData *data, gint i)
      d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] = value;
   }
 
- return (value != -1);
+  return (value != -1);
 }
 
 gboolean
@@ -681,7 +680,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
   value = data->defaults.glyphSize;
   tmp = getAttribute(attrs, "glyphSize");
   if (tmp) {
-   value = strToInteger(tmp);
+    value = strToInteger(tmp);
   }
 
   if (value < 0 || value >= NGLYPHSIZES) {
@@ -689,12 +688,11 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
       xml_warning ("glyphSize", tmp, "Out of range", data);
   } else {
      if (i < 0) {
-      data->defaults.glyphSize = value;
-    } else
-      d->glyph.els[i].size = d->glyph_now.els[i].size 
+       data->defaults.glyphSize = value;
+     } else
+       d->glyph.els[i].size = d->glyph_now.els[i].size 
              = d->glyph_prev.els[i].size = value;
   }
-
 
   /*-- glyphType  0:6 --*/
   value = data->defaults.glyphType;
@@ -714,7 +712,6 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
            d->glyph_prev.els[i].type = value;
   }
 
-
   tmp = getAttribute(attrs, "glyph");
   if(tmp != NULL) {
     const gchar *next;
@@ -724,21 +721,21 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
     j = 0;
     while(next) {
       if(j == 0) {
-         value = mapGlyphName(next);
-          if(i < 0)
-            data->defaults.glyphType = value;
-          else
-            d->glyph.els[i].type = d->glyph_now.els[i].type =
+        value = mapGlyphName(next);
+        if(i < 0)
+          data->defaults.glyphType = value;
+        else
+          d->glyph.els[i].type = d->glyph_now.els[i].type =
               d->glyph_prev.els[i].type = value;       
       } else {
         value = atoi(next);
         if(i < 0) { 
           if(data->defaults.glyphSize < 0) 
-	    data->defaults.glyphSize = value;
+	        data->defaults.glyphSize = value;
         } else
           d->glyph.els[i].size = d->glyph_now.els[i].size =
             d->glyph_prev.els[i].size = value;     
-      }
+     }
      j++;
      next = strtok(NULL, " ");
     }
@@ -770,8 +767,14 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
   const gchar *tmp = strtok((gchar*) line, " \t\n");
   datad *d = getCurrentXMLData(data);
   vartabled *vt = NULL;
-
   while (tmp) {
+
+    /* If reading past the last column or row, stop */
+    if (data->current_record >= d->raw.nrows ||
+        data->current_element >= d->raw.ncols)
+    {
+      break;
+    }
 
     vt = vartable_element_get (data->current_element, d);
 
@@ -793,26 +796,28 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
            the resolve the name.
          */
     if(data->recordLabelsVariable == data->current_element) {
-	char *tmp1;
-         /* If this is a categorical, lookup the level id. */
-        char buf[100];
-	if(d->missing.vals && d->missing.vals[data->current_record][data->current_element]) {
-	    sprintf(buf, "%s", "NA");
-	    tmp1 = g_strdup(buf);
-	}
-	else {
-	    if(vt && vt->categorical_p) {
-                 /* To be correct, we need to match the level_values and find the
-                    corresponding entry. */
-                tmp1 = GGobi_getLevelName(vt, value);
-                if(tmp1)
-		    tmp1 = g_strdup(tmp1);
-	    } else {
-		sprintf(buf, "%f", value);
-		tmp1 = g_strdup(buf);
-	    }
-	}
-	g_array_insert_val(d->rowlab, data->current_record, tmp1);
+      gchar *tmp1;
+      /* If this is a categorical, lookup the level id. */
+      gchar buf[100];
+      if(d->missing.vals &&
+         d->missing.vals[data->current_record][data->current_element])
+      {
+        sprintf(buf, "%s", "NA");
+        tmp1 = g_strdup(buf);
+      }
+      else {
+        if(vt && vt->categorical_p) {
+          /* To be correct, we need to match the level_values and find the
+             corresponding entry. */
+          tmp1 = (gchar *) GGobi_getLevelName(vt, value);
+          if(tmp1)
+            tmp1 = g_strdup(tmp1);
+        } else {
+          sprintf(buf, "%f", value);
+          tmp1 = g_strdup(buf);
+        }
+      }
+      g_array_insert_val(d->rowlab, data->current_record, tmp1);
     }
     data->current_element++;
     tmp = strtok (NULL, " \t\n");
@@ -855,42 +860,42 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
     el->collab_tform = g_strdup(tmp);
   }
 
- tmp = getAttribute(attrs, "name");
- if(tmp != NULL) {
-   el->collab = g_strdup(tmp);
-   if (data->variable_transform_name_as_attribute == false)
+  tmp = getAttribute(attrs, "name");
+  if(tmp != NULL) {
+    el->collab = g_strdup(tmp);
+    if (data->variable_transform_name_as_attribute == false)
       el->collab_tform = g_strdup(tmp);
- }
+  }
 
- tmp = getAttribute(attrs, "recordLabel");
- if (tmp != NULL) {
-     data->recordLabelsVariable = data->current_variable;
- }
+  tmp = getAttribute(attrs, "recordLabel");
+  if (tmp != NULL) {
+    data->recordLabelsVariable = data->current_variable;
+  }
 
- tmp = getAttribute(attrs, "min");
- tmp1 = getAttribute(attrs, "max");
- if(tmp && tmp1) {
-     gdouble mn, mx;
-     mn = asNumber(tmp);
-     mx = asNumber(tmp1);
-     el->lim_specified.min = mn < mx ? mn : mx;
-     el->lim_specified.max = mn > mx ? mn : mx;
-     /* ? */
-     el->lim_specified_tform.min = el->lim_specified.min;
-     el->lim_specified_tform.max = el->lim_specified.max;
+  tmp = getAttribute(attrs, "min");
+  tmp1 = getAttribute(attrs, "max");
+  if(tmp && tmp1) {
+    gdouble mn, mx;
+    mn = asNumber(tmp);
+    mx = asNumber(tmp1);
+    el->lim_specified.min = mn < mx ? mn : mx;
+    el->lim_specified.max = mn > mx ? mn : mx;
+    /* ? */
+    el->lim_specified_tform.min = el->lim_specified.min;
+    el->lim_specified_tform.max = el->lim_specified.max;
 
-     if(mn > mx) {
-       fprintf(stderr,
-         "Minimum is greater than maximum for variable %s\n", el->collab);
-       fflush(stderr);
-     }
-     el->lim_specified_p = true;
- }
+    if(mn > mx) {
+      fprintf(stderr,
+        "Minimum is greater than maximum for variable %s\n", el->collab);
+      fflush(stderr);
+    }
+    el->lim_specified_p = true;
+  }
 
 
- if (strcmp((const char *)tagName, "categoricalvariable") == 0) {
-     el->categorical_p = true;
- }
+  if (strcmp((const char *)tagName, "categoricalvariable") == 0) {
+    el->categorical_p = true;
+  }
 
   return (true);
 }
@@ -993,7 +998,6 @@ rowId (const gchar *tmp, XMLParserData *data)
 
 
 
-
 /*
  Prints the attributes.
  For debugging.
@@ -1016,8 +1020,7 @@ showAttributes (const xmlChar **attrs)
 gchar *
 getFileDirectory(const gchar *filename)
 {
-
- gchar *tmp;
+  gchar *tmp;
   tmp =  strrchr(filename, G_DIR_SEPARATOR);
   if(tmp) {
     gint n = tmp - filename + 2;
@@ -1027,7 +1030,7 @@ getFileDirectory(const gchar *filename)
   } else
    tmp = g_strdup("./");
  
- return(tmp);
+  return(tmp);
 }
 
 /*
@@ -1092,116 +1095,118 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
 gboolean
 setColorMap(const xmlChar **attrs, XMLParserData *data)
 {
- const gchar *tmp, *file; 
- gint size = 0;
- tmp = getAttribute(attrs, "size");
- file = getAttribute(attrs, "file");
+  const gchar *tmp, *file; 
+  gint size = 0;
+  tmp = getAttribute(attrs, "size");
+  file = getAttribute(attrs, "file");
 
- if(tmp)
-   size = strToInteger(tmp);
- else {
-  if(file == NULL)
-   return(false);
- }
+  if(tmp)
+    size = strToInteger(tmp);
+  else {
+   if(file == NULL)
+     return(false);
+  }
 
- if(file) {
-   const gchar *type = getAttribute(attrs, "type");
-   if(type != NULL) {
-     if(strcmp("xml", type) == 0)
+  if(file) {
+    const gchar *type = getAttribute(attrs, "type");
+    if(type != NULL) {
+      if(strcmp("xml", type) == 0)
+        xmlParseColorMap(file, size, data);
+      else
+        asciiParseColorMap(file, size, data);
+    } else {
        xmlParseColorMap(file, size, data);
-     else
-       asciiParseColorMap(file, size, data);
-   } else {
-       xmlParseColorMap(file, size, data);
-   }
- }
+    }
+  }
 
  /*
   * This appends the colors, but I don't want to allow more than
   * MAXNCOLORS colors no matter what the user asks for, so I'll be
   * ignoring some of the colors in the set.  -- dfs
  */
- if(size > 0 || file) {
-  ggobid *gg = data->gg;
-  if(file) {
-    gg->ncolors += size;
-    gg->ncolors = MIN (gg->ncolors, MAXNCOLORS);
-    gg->color_table = (GdkColor *)
-      g_realloc (gg->color_table, gg->ncolors * sizeof (GdkColor));
-    gg->colorNames = (gchar **)
-      g_realloc (gg->colorNames, gg->ncolors * sizeof (gchar *));
-    memset(gg->colorNames + (gg->ncolors-size), '\0', size*sizeof(gchar *));
-  } else {
-    gg->ncolors = size;
-    gg->ncolors = MIN (gg->ncolors, MAXNCOLORS);
-    gg->color_table = (GdkColor *) g_malloc (size * sizeof (GdkColor));
-    gg->colorNames = (gchar **) g_malloc (size * sizeof (gchar *));
-    memset(gg->colorNames, '\0', size * sizeof (gchar *));
+  if(size > 0 || file) {
+    ggobid *gg = data->gg;
+    if(file) {
+      gg->ncolors += size;
+      gg->ncolors = MIN (gg->ncolors, MAXNCOLORS);
+      gg->color_table = (GdkColor *)
+        g_realloc (gg->color_table, gg->ncolors * sizeof (GdkColor));
+      gg->colorNames = (gchar **)
+        g_realloc (gg->colorNames, gg->ncolors * sizeof (gchar *));
+      memset(gg->colorNames + (gg->ncolors-size), '\0', size*sizeof(gchar *));
+    } else {
+      gg->ncolors = size;
+      gg->ncolors = MIN (gg->ncolors, MAXNCOLORS);
+      gg->color_table = (GdkColor *) g_malloc (size * sizeof (GdkColor));
+      gg->colorNames = (gchar **) g_malloc (size * sizeof (gchar *));
+      memset(gg->colorNames, '\0', size * sizeof (gchar *));
+    }
   }
- }
 
-
- return(true);
+  return(true);
 }
 
 gboolean
 setColormapEntry(const xmlChar **attrs, XMLParserData *data)
 {
- const gchar * const names[] = {"r", "g", "b"};
- gdouble vals[3] = {-1., -1. , -1.};
- const gchar *tmp;
- gboolean ok = true;
- gint which = data->current_color, i;
- GdkColor *color;
- GdkColormap *cmap = gdk_colormap_get_system ();
+  const gchar * const names[] = {"r", "g", "b"};
+  gdouble vals[3] = {-1., -1. , -1.};
+  const gchar *tmp;
+  gboolean ok = true;
+  gint which = data->current_color, i;
+  GdkColor *color;
+  GdkColormap *cmap = gdk_colormap_get_system ();
 
- tmp = getAttribute(attrs, "id");
+  tmp = getAttribute(attrs, "id");
 
- if(tmp) {
-   if(strcmp("bg",tmp) == 0) {
-     which = -1;
-     color = &data->gg->bg_color;
-   }
-   else  if(strcmp("fg",tmp) == 0) {
-     which = -1;
-     color = &data->gg->bg_color;
-   }
-   else {
+  if(tmp) {
+    if(strcmp("bg",tmp) == 0) {
+      which = -1;
+      color = &data->gg->bg_color;
+    }
+    else  if(strcmp("fg",tmp) == 0) {
+      which = -1;
+      color = &data->gg->bg_color;
+    }
+    else {
        /* Note that we set the current color to this index.
           Thus we can skip values, etc.
         */
-     which = data->current_color = strToInteger(tmp) - 1;
-     color = data->gg->color_table + which;
-   }
- } else {
-     color = data->gg->color_table + data->current_color;
- }
-
- for(i = 0; i < 3; i++) {
-  const gchar *tmp1 = getAttribute(attrs, (gchar *) names[i]);
-  if(tmp1) {
-   vals[i] = asNumber(tmp1);
+      which = data->current_color = strToInteger(tmp) - 1;
+      color = data->gg->color_table + which;
+    }
   } else {
-    ok = false;
-    break;
+    color = data->gg->color_table + data->current_color;
   }
- }
 
- if(which > -1 && which < data->gg->ncolors && (tmp = getAttribute(attrs, "name") ) ) {
+  for(i = 0; i < 3; i++) {
+    const gchar *tmp1 = getAttribute(attrs, (gchar *) names[i]);
+    if(tmp1) {
+      vals[i] = asNumber(tmp1);
+    } else {
+      ok = false;
+      break;
+    }
+  }
+
+  if(which > -1 &&
+     which < data->gg->ncolors &&
+     (tmp = getAttribute(attrs, "name") ) )
+  {
     data->gg->colorNames[which] = g_strdup(tmp);
- }
+  }
 
- if(ok) {
-   setColorValues(color, vals);
+  if(ok) {
+    setColorValues(color, vals);
 
    /* If this is a foreground or background setting, then get the color.
       Otherwise, wait until we have finished the entire 
     */
-  if(which < 0)
-    gdk_colormap_alloc_color(cmap, color, false, true);
- }
+   if(which < 0)
+     gdk_colormap_alloc_color(cmap, color, false, true);
+  }
 
- return(ok);
+  return(ok);
 }
 
 /*
@@ -1211,31 +1216,30 @@ gboolean
 setColorValue(XMLParserData *data, const xmlChar *line, gint len)
 {
 
- gdouble values[3] = {-1, -1, -1};
- gint which = 0;
- const gchar *tmp = strtok((gchar*) line, " \t\n");
+  gdouble values[3] = {-1, -1, -1};
+  gint which = 0;
+  const gchar *tmp = strtok((gchar*) line, " \t\n");
 
- GdkColor *color = data->gg->color_table + data->current_color;
+  GdkColor *color = data->gg->color_table + data->current_color;
  
- while(tmp) {
-  values[which++] = asNumber(tmp);
-  tmp = strtok(NULL, " \t\n");
- }
+  while(tmp) {
+    values[which++] = asNumber(tmp);
+    tmp = strtok(NULL, " \t\n");
+  }
 
- if(which == 3)
-  setColorValues(color, values);
+  if(which == 3)
+    setColorValues(color, values);
 
- return(true); 
+  return(true); 
 }
-
 
 
 void
 setColorValues(GdkColor *color, gdouble *vals)
 {
-   color->red = (guint16) (vals[0]*65535.0);
-   color->green = (guint16) (vals[1]*65535.0);
-   color->blue = (guint16) (vals[2]*65535.0);
+  color->red = (guint16) (vals[0]*65535.0);
+  color->green = (guint16) (vals[1]*65535.0);
+  color->blue = (guint16) (vals[2]*65535.0);
 }
 
 
@@ -1246,37 +1250,36 @@ setColorValues(GdkColor *color, gdouble *vals)
 gboolean
 xmlParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
 {
+  xmlParserCtxtPtr ctx;
+  gchar *tmp, *tmp1;
 
- xmlParserCtxtPtr ctx;
- gchar *tmp, *tmp1;
+  tmp = g_strdup(data->input->dirName);   /* getFileDirectory(data->input->filename); */
+  tmp1 = find_xml_file(fileName, tmp, data->gg);
 
- tmp = g_strdup(data->input->dirName);   /* getFileDirectory(data->input->filename); */
- tmp1 = find_xml_file(fileName, tmp, data->gg);
+  if(tmp1) {
+    ctx  = xmlCreateFileParserCtxt(tmp1);
 
- if(tmp1) {
-   ctx  = xmlCreateFileParserCtxt(tmp1);
+    if(ctx == NULL)
+      return(false);
 
-   if(ctx == NULL)
-     return(false);
+    ctx->userData = data;
+    ctx->sax = data->handlers;
+    data->reading_colormap_file_p = true;
 
-   ctx->userData = data;
-   ctx->sax = data->handlers;
-   data->reading_colormap_file_p = true;
+    xmlParseDocument(ctx);
 
-   xmlParseDocument(ctx);
+    ctx->sax = NULL;
+    xmlFreeParserCtxt(ctx);
 
-   ctx->sax = NULL;
-   xmlFreeParserCtxt(ctx);
+    data->reading_colormap_file_p = false;
 
-   data->reading_colormap_file_p = false;
+    addInputFile(data->input, tmp1);
+    g_free(tmp1);
+  }
 
-   addInputFile(data->input, tmp1);
-   g_free(tmp1);
- }
+  g_free(tmp);
 
- g_free(tmp);
-
- return(size == data->gg->ncolors);
+  return(size == data->gg->ncolors);
 }
 
 
@@ -1290,7 +1293,7 @@ xmlParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
 gboolean
 asciiParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
 {
- return(false);
+  return(false);
 }
 
 
@@ -1344,12 +1347,12 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
 
   tmp = getAttribute(attrs, "label");
   if(!tmp) {
-      if(data->recordLabelsVariable > -1) {
-	  /* Wait until we have read the specific values! */
+    if(data->recordLabelsVariable > -1) {
+      /* Wait until we have read the specific values! */
       } else {
-	  /* Length is to hold the current record number as a string. */
-	  stmp = g_malloc(sizeof(gchar) * 10);
-	  g_snprintf(stmp, 9, "%d", i);
+      /* Length is to hold the current record number as a string. */
+      stmp = g_malloc(sizeof(gchar) * 10);
+      g_snprintf(stmp, 9, "%d", i);
       }
   } else
     stmp = g_strdup (tmp);
