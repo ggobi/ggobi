@@ -29,7 +29,7 @@ AC_ARG_ENABLE(embed, [--enable-embed          Build the ggobi library for embedd
 AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
 
 
-AC_ARG_WITH(prefix, [--with-prefix          Specify where the files are to be installed (default /usr/local/).],INSTALL_DIR=${with_prefix},INSTALL_DIR="/usr/local")
+dnl AC_ARG_WITH(prefix, [--with-prefix          Specify where the files are to be installed (default /usr/local/).],INSTALL_DIR=${with_prefix},INSTALL_DIR="/usr/local")
 
 AC_ARG_WITH(xml, --with-xml          Enable reading and writing of XML datasets.,,with_xml="yes")
 LIBXML_VERSION="2.4.1"
@@ -429,6 +429,12 @@ AC_SUBST_FILE(fileselect_xml)
 AC_SUBST_FILE(testInput_xml)
 AC_SUBST_FILE(testPlugin_xml)
 
+if test "$prefix" = "NONE" ; then
+ INSTALL_DIR=$ac_default_prefix
+else
+ INSTALL_DIR=$prefix
+fi
+AC_SUBST(INSTALL_DIR)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
@@ -442,6 +448,10 @@ if test -n "${PLUGIN_DIRS}" ; then
  echo "Enabling plugins"
  export GGOBI_ROOT
 
+dnl 
+dnl AC_CONFIG_SUBDIRS($PLUGIN_DIRS)
+dnl might do the same thing. 
+
  for p in ${PLUGIN_DIRS} ; do 
    echo
    echo "Configuring plugin $p"
@@ -452,3 +462,5 @@ if test -n "${PLUGIN_DIRS}" ; then
    echo
  done 
 fi
+
+echo "Installation directory: $INSTALL_DIR, $prefix"
