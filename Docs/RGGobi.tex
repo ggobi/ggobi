@@ -1,5 +1,6 @@
 \documentclass{article}
 \input{WebMacros}
+\input{SMacros}
 \input{CMacros}
 \usepackage{fullpage}
 \usepackage{times}
@@ -599,7 +600,7 @@ dataframe as the names of the records in the GGobi data need not be
 unique.  (This restriction for dataframes has been made optional in R
 recently (version 1.4.0) so we migh create a dataframe default soon.)
 
-In the same way that we have overloaded the \SFunction{[] operator, we
+In the same way that we have overloaded the \SFunction{[} operator, we
   have defined methods for the functions \SFunction{dim},
   \SFunction{ncol}, \SFunction{nrow}, \SFunction{dimnames},
   \SFunction{names} which act on ggobi dataset instances.
