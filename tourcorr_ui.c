@@ -29,7 +29,7 @@ cpanel_tcorr_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->tcorr2.paused = false;
   cpanel->tcorr2.step = TOURSTEP0;
   cpanel->tcorr.slidepos = 10.;
-  cpanel->tcorr.manip_mode = CMANIP_OFF;
+  cpanel->tcorr.manip_mode = CMANIP_COMB;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/

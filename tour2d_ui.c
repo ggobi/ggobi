@@ -34,7 +34,7 @@ cpanel_t2d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t2d.slidepos = 10.;/* If this is changed, it needs to be 
      changed in th cpanel_tour2d_make routine also. */
 
-  cpanel->t2d.manip_mode = MANIP_OFF;
+  cpanel->t2d.manip_mode = MANIP_OBLIQUE;
 
   cpanel->t2d.pp_indx = 0;
 }
