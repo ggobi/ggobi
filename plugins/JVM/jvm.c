@@ -108,7 +108,8 @@ gboolean initJVM(GGobiPluginInfo *info)
     res = JNI_CreateJavaVM(&jvm, (void**) &std_env, (void*) vm_args);
 
     if(res < 0 || std_env == NULL) {
-	fprintf(stderr, "Can't create JVM\n");
+	fprintf(stderr, "Can't create JVM? %s\n",
+                          std_env ? "Is it already running" : "Check your library path, etc.");
         return(JNI_FALSE);
     }
 

@@ -625,6 +625,30 @@ getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc)
 gboolean
 loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin)
 {
+    /* If it has already been loaded, just return. */
+    if(plugin->loaded) {
+	return(true);
+    }
+
+       /* Load any plugins on which this one dependens. Make certain they 
+          are fully loaded and initialized. Potential for inter-dependencies
+          that would make this an infinite loop. Hope the user doesn't get this
+          wrong as there are no checks at present.
+        */
+    if(plugin->depends) {
+        GSList *el = plugin->depends;
+	while(el) {
+            char *tmp = (char*) el->data;
+            GGobiPluginInfo *info;
+            info = getLanguagePlugin(sessionOptions->info->plugins, tmp);
+            if(sessionOptions->verbose == GGOBI_VERBOSE) {
+		fprintf(stderr, "Loading dependent plugin %s\n", tmp);fflush(stderr);
+	    }
+            loadPluginLibrary(info->details, info);
+	    el = el->next;
+	}
+    }
+
     plugin->library = load_plugin_library(plugin);
     plugin->loaded = (plugin->library != NULL);
 
