@@ -35,7 +35,7 @@ cpanel_tcorr_init (cpaneld *cpanel, ggobid *gg) {
 
 /*-- scatterplot only; need a different routine for parcoords --*/
 void
-cpanel_tourcorr_set (cpaneld *cpanel, ggobid* gg)
+cpanel_tourcorr_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 /*
  * To handle the case where there are multiple scatterplots
  * which may have different tour options and parameters selected

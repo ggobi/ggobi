@@ -45,7 +45,7 @@ cpanel_t2d_init (cpaneld *cpanel, ggobid *gg) {
 }
 
 void
-cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
+cpanel_tour2d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 /*
  * To handle the case where there are multiple scatterplots
  * which may have different tour options and parameters selected

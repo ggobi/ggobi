@@ -194,7 +194,7 @@ cpanel_xyplot_init (cpaneld *cpanel, ggobid *gg)
 }
 
 void
-cpanel_xyplot_set (cpaneld *cpanel, ggobid* gg)
+cpanel_xyplot_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 /*
  * To handle the case where there are multiple scatterplots
  * which may have different xyplot cycling options and parameters selected

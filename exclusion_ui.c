@@ -255,7 +255,7 @@ cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   gboolean rval = false;
   gint nclusters = symbol_table_populate(d);
   gboolean proceed = true;
-  gint targets = cpanel->br_point_targets;
+  gint targets = cpanel->br.point_targets;
   gint nd = g_slist_length(gg->d);
 
   g_assert (d->clusterid.nels == d->nrows);

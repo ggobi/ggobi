@@ -277,7 +277,7 @@ parcoords_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 /*-- there already exists parcoords_cpanel_init --*/
 
 void
-cpanel_parcoords_set (cpaneld *cpanel, GtkWidget *panel, ggobid *gg)
+cpanel_parcoords_set (displayd *display, cpaneld *cpanel, GtkWidget *panel, ggobid *gg)
 {
   GtkWidget *w;
 

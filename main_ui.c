@@ -494,7 +494,7 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
 
       procs_activate (on, display, gg);
       if (gg->viewmode != BRUSH && prev_viewmode == BRUSH) {
-        if (cpanel->br_mode == BR_TRANSIENT) {
+        if (cpanel->br.mode == BR_TRANSIENT) {
           reinit_transient_p = true;
           reinit_transient_brushing (display, gg);
         }

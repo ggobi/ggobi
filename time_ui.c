@@ -197,7 +197,7 @@ tsplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *g
 /*-- there already exists tsplot_cpanel_init --*/
 
 void
-cpanel_tsplot_set (cpaneld *cpanel, GtkWidget *panelWidget, ggobid *gg)
+cpanel_tsplot_set (displayd *display, cpaneld *cpanel, GtkWidget *panelWidget, ggobid *gg)
 {
   GtkWidget *w;
 

@@ -315,8 +315,9 @@ variable_notebook_subwindow_add (datad *d, GtkSignalFunc func,
           gtk_object_get_data(GTK_OBJECT(notebook), "SELECTION");
 
 #ifdef GTK_2_0
-/* It appears (simple test) that the default mode is GTK_SELECTION_NONE. And then
-   calling gtk_clist_set_selection_mode will cause the default: case to assert a failure.
+/* It appears (simple test) that the default mode is GTK_SELECTION_NONE. 
+   And then calling gtk_clist_set_selection_mode will cause the
+   default: case to assert a failure.
    In Gtk 1.2, the default value is GTK_SELECTION_SINGLE (on my machines). */
   if(mode == GTK_SELECTION_NONE)
      mode = GTK_SELECTION_SINGLE;
@@ -627,3 +628,4 @@ GGobi_addToolsMenuItem (gchar *lbl, ggobid *gg)
 
   return (entry);
 }
+

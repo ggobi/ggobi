@@ -64,10 +64,12 @@ typedef struct {
 
 
  /*-- brushing --*/
- gboolean brush_on_p;
- gint br_mode;
- gint br_linkby;
- BrushTargetType br_point_targets, br_edge_targets;
+  struct _BrushCpanel {
+   gboolean brush_on_p;
+   gint mode;
+   gint linkby_page, linkby_row;
+   BrushTargetType point_targets, edge_targets;
+  } br;
 
  /*-- scaling --*/
  gint scale_style;       /* DRAG or CLICK */

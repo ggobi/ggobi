@@ -56,11 +56,11 @@ tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
     GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =  cpanel_tsplot_make(gg);
   }
 /* Can actually be more efficient here by storing the option menu used
-   in tsplot_set
-   and avoid looking it up each time. Store it in the displayd object. */
-  cpanel_tsplot_set (cpanel, w, gg);
-  cpanel_brush_set (cpanel, gg);
-  cpanel_identify_set (cpanel, gg);
+   in tsplot_set and avoid looking it up each time. Store it in the
+   displayd object. */
+  cpanel_tsplot_set (dpy, cpanel, w, gg);
+  cpanel_brush_set (dpy, cpanel, gg);
+  cpanel_identify_set (dpy, cpanel, gg);
 
   return(true);
 }

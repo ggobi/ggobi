@@ -48,7 +48,7 @@ ASH_add_lines_cb (GtkToggleButton *button, ggobid *gg)
 
 /*-- scatterplot only; need a different routine for parcoords --*/
 void
-cpanel_tour1d_set (cpaneld *cpanel, ggobid* gg)
+cpanel_tour1d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 /*
  * To handle the case where there are multiple scatterplots
  * which may have different tour options and parameters selected

@@ -10,9 +10,9 @@
 static gboolean
 cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 {
-  cpanel_scatmat_set (cpanel, gg);
-  cpanel_brush_set (cpanel, gg);
-  cpanel_identify_set (cpanel, gg);
+  cpanel_scatmat_set (dpy, cpanel, gg);
+  cpanel_brush_set (dpy, cpanel, gg);
+  cpanel_identify_set (dpy, cpanel, gg);
   return(true);
 }
 

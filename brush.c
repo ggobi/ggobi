@@ -92,11 +92,11 @@ brush_once (gboolean force, splotd *sp, ggobid *gg)
 /*
  * Now paint.
 */
-  if (cpanel->br_point_targets) {
+  if (cpanel->br.point_targets) {
     changed = active_paint_points (sp, d, gg);
   }
 
-  if (cpanel->br_edge_targets) {
+  if (cpanel->br.edge_targets) {
     if (e != NULL)
       changed = active_paint_edges (sp, e, gg);
   }
@@ -156,8 +156,8 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
   datad *d = dsp->d;
   datad *e = dsp->e;
   cpaneld *cpanel = &dsp->cpanel;
-  gboolean point_painting_p = (cpanel->br_point_targets != br_off);
-  gboolean edge_painting_p = (cpanel->br_edge_targets != br_off);
+  gboolean point_painting_p = (cpanel->br.point_targets != br_off);
+  gboolean edge_painting_p = (cpanel->br.edge_targets != br_off);
 
   g_assert (d->color.nels == d->nrows);
 
@@ -242,7 +242,7 @@ brush_once_and_redraw (gboolean binningp, splotd *sp, displayd *display,
   cpaneld *cpanel = &display->cpanel;
   gboolean changed = false;
 
-  if (cpanel->brush_on_p) {
+  if (cpanel->br.brush_on_p) {
     changed = brush_once (!binningp, sp, gg);
 
     if (binningp && binning_permitted (display, gg)) {
@@ -338,7 +338,7 @@ brush_boundaries_set (cpaneld *cpanel,
   icoords *bin0 = &d->brush.bin0;
   icoords *bin1 = &d->brush.bin1;
 
-  if (cpanel->br_mode == BR_TRANSIENT) {
+  if (cpanel->br.mode == BR_TRANSIENT) {
     imin->x = MIN (bin0->x, obin0->x);
     imin->y = MIN (bin0->y, obin0->y);
     imax->x = MAX (bin1->x, obin1->x);
@@ -389,8 +389,8 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
 */
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  gboolean point_painting_p = (cpanel->br_point_targets != br_off);
-  gboolean edge_painting_p = (cpanel->br_edge_targets != br_off);
+  gboolean point_painting_p = (cpanel->br.point_targets != br_off);
+  gboolean edge_painting_p = (cpanel->br.edge_targets != br_off);
   colorschemed *scheme = gg->activeColorScheme;
 
   brush_coords *brush_pos = &sp->brush_pos;
@@ -422,7 +422,7 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
     /*
      * highlight brush: but only in the current display
     */
-    if (cpanel->brush_on_p && display == gg->current_display) {
+    if (cpanel->br.brush_on_p && display == gg->current_display) {
       gdk_draw_rectangle (drawable, gg->plot_GC, false,
         x1-1, y1-1, (x2>x1)?(x2-x1+2):(x1-x2+2), (y2>y1)?(y2-y1+2):(y1-y2+2)); 
 
@@ -438,7 +438,7 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
     gdk_draw_line (drawable, gg->plot_GC,
       x1, y1 + (y2 - y1)/2, x2, y1 + (y2 - y1)/2 );
 
-    if (cpanel->brush_on_p) {
+    if (cpanel->br.brush_on_p) {
       gdk_draw_line (drawable, gg->plot_GC,
         x1 + (x2 - x1)/2 + 1, y1, x1 + (x2 - x1)/2 + 1, y2 );
       gdk_draw_line (drawable, gg->plot_GC,
@@ -478,7 +478,7 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 
   if (doit) {
     if (hit_by_brush[i]) {
-      switch (cpanel->br_mode) {
+      switch (cpanel->br.mode) {
 
         case BR_PERSISTENT:
           d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
@@ -514,7 +514,7 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   if (!changed) {
     if (hit_by_brush[i])
       /*-- if persistent, compare against color instead of color_now --*/
-      doit = (cpanel->br_mode == BR_TRANSIENT) ?
+      doit = (cpanel->br.mode == BR_TRANSIENT) ?
                (d->color_now.els[i] != gg->color_id) :
                (d->color.els[i] != gg->color_id);
     else
@@ -527,7 +527,7 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   */
   if (doit) {
     if (hit_by_brush[i]) {
-      switch (cpanel->br_mode) {
+      switch (cpanel->br.mode) {
         case BR_PERSISTENT:
           d->color.els[i] = d->color_now.els[i] = gg->color_id;
         break;
@@ -570,7 +570,7 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 
   if (doit) {
     if (hit_by_brush[i]) {
-      switch (cpanel->br_mode) {
+      switch (cpanel->br.mode) {
         case BR_PERSISTENT:
           d->hidden.els[i] = d->hidden_now.els[i] = true;
         break;
@@ -615,7 +615,7 @@ update_selected_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 
   if (doit) {
     if (hit_by_brush[i]) {
-      switch (cpanel->br_mode) {
+      switch (cpanel->br.mode) {
         case BR_PERSISTENT:
           d->hidden.els[i] = d->hidden_now.els[i] = false;
         break;
@@ -624,7 +624,7 @@ update_selected_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
         break;
       }
     } else {
-      switch (cpanel->br_mode) {
+      switch (cpanel->br.mode) {
         case BR_PERSISTENT:
           d->hidden_now.els[i] = d->hidden.els[i];
         break;
@@ -683,7 +683,7 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
           */
           j = d->rows_in_plot.els[ k = d->brush.binarray[ih][iv].els[m] ] ;
 
-          switch (cpanel->br_point_targets) {
+          switch (cpanel->br.point_targets) {
             case br_candg:  /*-- color and glyph --*/
               changed = update_color_vectors (j, changed,
                 d->pts_under_brush.els, d, gg);
@@ -777,8 +777,8 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
            * cases; otherwise it's ok (I think).
           */
           if (d->hidden_now.els[pt] &&
-            (cpanel->br_point_targets != br_hide 
-	     /* && cpanel->br_point_targets != br_select */))
+            (cpanel->br.point_targets != br_hide 
+	     /* && cpanel->br.point_targets != br_select */))
           {
               continue;
           }
@@ -795,7 +795,7 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
 
   changed = false;
 
-  if (cpanel->brush_on_p) {
+  if (cpanel->br.brush_on_p) {
     if (gg->linkby_cv) {
       /*-- link by categorical variable --*/
       changed = build_symbol_vectors_by_var (cpanel, d, gg);
@@ -876,7 +876,7 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
 */
   for (i=0; i < e->edge.n ; i++) {
 
-    switch (cpanel->br_edge_targets) {
+    switch (cpanel->br.edge_targets) {
       case br_candg:  /*-- color and glyph --*/
         changed = update_color_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
@@ -937,7 +937,7 @@ active_paint_edges (splotd *sp, datad *e, ggobid *gg)
   }
 
   changed = false;
-  if (cpanel->brush_on_p) {
+  if (cpanel->br.brush_on_p) {
     if (gg->linkby_cv) {
       /*-- link by categorical variable --*/
       /*changed = build_symbol_vectors_by_var (cpanel, e, gg);*/

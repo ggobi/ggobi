@@ -621,7 +621,7 @@ cpanel_scale_init (cpaneld *cpanel, ggobid *gg) {
 }
 
 void
-cpanel_scale_set (cpaneld *cpanel, ggobid *gg) {
+cpanel_scale_set (displayd *display, cpaneld *cpanel, ggobid *gg) {
   GtkWidget *w;
 
   /*-- set the Drag or Click radio buttons --*/

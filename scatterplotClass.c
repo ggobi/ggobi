@@ -200,13 +200,13 @@ variableSelect(GtkWidget *w, displayd *display, splotd *sp, gint jvar, gint togg
   switch (cpanel->projection) {
     case P1PLOT:
       redraw = p1d_varsel (sp, jvar, &jvar_prev, toggle, mouse);
-      if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
+      if (viewmode_get (gg) == BRUSH && cpanel->br.mode == BR_TRANSIENT)
         reinit_transient_brushing (display, gg);
     break;
     case XYPLOT:
       redraw = xyplot_varsel (sp, jvar, &jvar_prev, toggle, mouse);
       if (redraw)
-        if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
+        if (viewmode_get (gg) == BRUSH && cpanel->br.mode == BR_TRANSIENT)
           reinit_transient_brushing (display, gg);
     break;
     case TOUR1D:
@@ -842,20 +842,20 @@ cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
       }
 #endif
 
-      cpanel_p1d_set (cpanel, gg);
-      cpanel_xyplot_set (cpanel, gg);
-      cpanel_tour1d_set (cpanel, gg);
+      cpanel_p1d_set (dpy, cpanel, gg);
+      cpanel_xyplot_set (dpy, cpanel, gg);
+      cpanel_tour1d_set (dpy, cpanel, gg);
       if (dpy->d->ncols >= MIN_NVARS_FOR_TOUR2D3)
-        cpanel_tour2d3_set (cpanel, gg);
+        cpanel_tour2d3_set (dpy, cpanel, gg);
       if (dpy->d->ncols >= MIN_NVARS_FOR_TOUR2D)
-        cpanel_tour2d_set (cpanel, gg);
+        cpanel_tour2d_set (dpy, cpanel, gg);
       if (dpy->d->ncols >= MIN_NVARS_FOR_COTOUR)
-        cpanel_tourcorr_set (cpanel, gg);
+        cpanel_tourcorr_set (dpy, cpanel, gg);
 
-      cpanel_brush_set (cpanel, gg);
-      cpanel_scale_set (cpanel, gg);
-      cpanel_edgeedit_set (cpanel, gg);
-      cpanel_identify_set (cpanel, gg);
+      cpanel_brush_set (dpy, cpanel, gg);
+      cpanel_scale_set (dpy, cpanel, gg);
+      cpanel_edgeedit_set (dpy, cpanel, gg);
+      cpanel_identify_set (dpy, cpanel, gg);
 
       return(true);
 }

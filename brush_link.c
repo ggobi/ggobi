@@ -59,7 +59,7 @@ symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
     changed = true;
     if (d->sampled.els[i] && !d->excluded.els[i]) {
 
-      if (persistentp || cpanel->br_mode == BR_PERSISTENT) {
+      if (persistentp || cpanel->br.mode == BR_PERSISTENT) {
 
         /*
          * make it link for everything, no matter
@@ -80,7 +80,7 @@ symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
         /*-- should we handle this here?  --*/
         d->excluded.els[i] = sd->excluded.els[k];
 
-      } else if (cpanel->br_mode == BR_TRANSIENT) {
+      } else if (cpanel->br.mode == BR_TRANSIENT) {
 
         if (!d->hidden_now.els[i]) {
           d->color_now.els[i] = sd->color_now.els[k];
@@ -142,52 +142,6 @@ exclude_link_by_id (gint k, datad * sd, ggobid * gg)
 /*   Linking within and between datad's using a categorical variable    */
 /*----------------------------------------------------------------------*/
 
-void linking_method_set(displayd * display, datad * d, ggobid * gg)
-{
-  cpaneld *cpanel = &display->cpanel;
-  gg->linkby_cv = false;
-
-  if (cpanel->br_linkby == BR_LINKBYVAR) {
-
-    vartabled *vt;
-/*
-    gint *vars = (gint *) g_malloc(d->ncols * sizeof(gint));
-    gint nvars = selected_cols_get(vars, d, gg);
-*/
-/*
-    GtkWidget *notebook = widget_find_by_name (gg->control_panel[BRUSH],
-      "notebook");
-*/
-    gint jvar;
-    GtkWidget *clist;
-    clist = get_clist_from_object (GTK_OBJECT (gg->control_panel[BRUSH]));
-    if (clist) {
-      jvar = get_one_selection_from_clist (clist, d);
-      if (jvar >= 0) {
-        vt = vartable_element_get(jvar, d);
-        if (vt->vartype == categorical) {
-          gg->linkby_cv = true;
-          if (d->linkvar_vt == NULL || d->linkvar_vt != vt) {
-            d->linkvar_vt = vt;
-          }
-        }
-      }
-    }
-    if (!gg->linkby_cv) {
-      GtkWidget *option_menu = widget_find_by_name (gg->control_panel[BRUSH],
-        "BRUSH:linkby_option_menu");
-      gchar *message =
-        g_strdup_printf
-          ("You have specified linking by categorical variable, but \n no categorical variable is selected for the current dataset. \nResetting to 'Link by ID.'\n");
-      quick_message(message, false);
-      gdk_flush();
-      g_free(message);
-      gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), BR_LINKBYID);
-      cpanel->br_linkby = BR_LINKBYID;
-    }
-  }
-}
-
 void
 brush_link_by_var(gint jlinkby, vector_b * levelv,
                   cpaneld * cpanel, datad * d, ggobid * gg)
@@ -203,8 +157,8 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
     level_value = (gint) d->raw.vals[i][jlinkby];
 
     if (levelv->els[level_value]) {  /*-- if it's to acquire the new symbol --*/
-      if (cpanel->br_mode == BR_PERSISTENT) {
-        switch (cpanel->br_point_targets) {
+      if (cpanel->br.mode == BR_PERSISTENT) {
+        switch (cpanel->br.point_targets) {
           case br_candg:   /*-- color and glyph, type and size --*/
             d->color.els[i] = d->color_now.els[i] = gg->color_id;
             d->glyph.els[i].size = d->glyph_now.els[i].size =
@@ -233,8 +187,8 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
           break;
         }
 
-      } else if (cpanel->br_mode == BR_TRANSIENT) {
-        switch (cpanel->br_point_targets) {
+      } else if (cpanel->br.mode == BR_TRANSIENT) {
+        switch (cpanel->br.point_targets) {
           case br_candg:
             d->color_now.els[i] = gg->color_id;
             d->glyph_now.els[i].size = gg->glyph_id.size;
@@ -258,12 +212,11 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
           default:
           break;
         }
-
       }
 
     } else {  /*-- if it's to revert to the previous symbol --*/
       /*-- should only matter if transient, right? --*/
-      switch (cpanel->br_point_targets) {
+      switch (cpanel->br.point_targets) {
         case br_candg:
           d->color_now.els[i] = d->color.els[i];
           d->glyph_now.els[i].size = d->glyph.els[i].size;
@@ -356,4 +309,217 @@ build_symbol_vectors_by_var(cpaneld * cpanel, datad * d, ggobid * gg)
 
   changed = true;
   return (changed);
+}
+
+
+/*********************************************************************/
+/*          Create a variable notebook for brush linking rule        */
+/*********************************************************************/
+
+void linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *);
+
+void
+linking_method_set_cb (GtkWidget *cl, gint row, gint column,
+  GdkEventButton *event, ggobid *gg)
+{
+  datad *d = gtk_object_get_data (GTK_OBJECT(cl), "datad");
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;  
+  /* cpanel has to come from display; is there another way to
+     get the display? Or can I get the cpanel from the swin? */
+  /* think about why this is specified in cpanel, gg, and d -- seems
+     confusing */
+  GtkWidget *notebook;
+
+  notebook = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(cl), "notebook");
+
+  
+  cpanel->br.linkby_row = row;
+  cpanel->br.linkby_page = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
+
+  if (row <= 0) {
+    /*cpanel->br_linkby = BR_LINKBYID;*/
+    gg->linkby_cv = false;
+    return;  /* link by case id; done */
+  } else {
+    gpointer ptr = gtk_clist_get_row_data (GTK_CLIST(cl), row);
+    gint jvar = GPOINTER_TO_INT(ptr);
+    vartabled *vt;
+
+    /*cpanel->br_linkby = BR_LINKBYVAR;*/
+    gg->linkby_cv = true;
+    if (d->linkvar_vt == NULL || d->linkvar_vt != vt) {
+      vt = vartable_element_get(jvar, d);
+      d->linkvar_vt = vt;
+    }
+  }
+}
+
+void 
+linkby_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
+  datad *data, void *notebook)
+{
+  GtkWidget *swin, *clist;
+
+  /*-- add one or more variables to this datad --*/
+  datad *d = (datad *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
+  gint kd = g_slist_index (gg->d, d);
+
+  /*-- get the clist associated with this data; clear and rebuild --*/
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (GTK_WIDGET(notebook)), kd);
+  if (swin) {
+    gint j, k;
+    gchar *row[1];
+    vartabled *vt;
+    clist = GTK_BIN (swin)->child;
+
+    gtk_clist_freeze (GTK_CLIST(clist));
+    gtk_clist_clear (GTK_CLIST (clist));
+
+    /* Insert this string */
+    row[0] = g_strdup_printf ("Link by case id");
+    gtk_clist_append (GTK_CLIST (clist), row);
+
+    k = 1;
+    for (j=0; j<d->ncols; j++) {
+      vt = vartable_element_get (j, d);
+      if (vt && vt->vartype == categorical) {
+        row[0] = g_strdup_printf ("Link by %s", vt->collab);
+        gtk_clist_append (GTK_CLIST (clist), row);
+        gtk_clist_set_row_data(GTK_CLIST(clist), k, GINT_TO_POINTER(j));
+        g_free (row[0]);
+        k++;
+      }
+    }
+    gtk_clist_thaw (GTK_CLIST(clist));
+  }
+}
+
+void 
+linkby_notebook_list_changed_cb(ggobid *gg, datad *d, void *notebook)
+{
+  linkby_notebook_varchange_cb(gg, NULL, -1, d, notebook);
+}
+
+CHECK_EVENT_SIGNATURE(linkby_notebook_adddata_cb, datad_added_f)
+CHECK_EVENT_SIGNATURE(linkby_notebook_varchange_cb, variable_added_f)
+CHECK_EVENT_SIGNATURE(linkby_notebook_list_changed_cb, variable_list_changed_f)
+
+static void
+linkby_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook, GtkSignalFunc func)
+{
+  if (g_slist_length (d->vartable)) {
+    linkby_notebook_subwindow_add (d, notebook, gg);
+  }
+
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_OBJECT(notebook)),
+                              g_slist_length (gg->d) > 1);
+}
+
+void
+linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
+{
+  GtkWidget *swin, *clist;
+  gint j, k;
+  gchar *row[1];
+  vartabled *vt;
+
+  GtkSelectionMode mode = GTK_SELECTION_SINGLE;
+
+  if (d->ncols == 0)
+    return;
+
+  /* Create a scrolled window to pack the CList widget into */
+  swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+  gtk_object_set_data(GTK_OBJECT(swin), "datad", d);  /*setdata*/
+/*
+ * name or nickname?  Which one we'd prefer to use depends on the
+ * size of the space we're working in -- maybe this will become an
+ * argument.
+*/
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), swin,
+    (d->nickname != NULL) ?
+      gtk_label_new (d->nickname) : gtk_label_new (d->name)); 
+
+  /* add the CList */
+  clist = gtk_clist_new (1);
+  gtk_clist_set_selection_mode (GTK_CLIST (clist), mode);
+  gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
+  gtk_object_set_data (GTK_OBJECT (clist), "notebook", notebook);
+  gtk_signal_connect (GTK_OBJECT (clist), "select_row", 
+    GTK_SIGNAL_FUNC (linking_method_set_cb), gg);
+
+  /* Insert this string */
+  row[0] = g_strdup_printf ("Link by case id");
+  gtk_clist_append (GTK_CLIST (clist), row);
+
+  k = 1;
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    if (vt && vt->vartype == categorical) {
+      row[0] = g_strdup_printf ("Link by %s", vt->collab);
+      gtk_clist_append (GTK_CLIST (clist), row);
+      gtk_clist_set_row_data(GTK_CLIST(clist), k, GINT_TO_POINTER(j));
+      g_free (row[0]);
+    }
+  }
+
+  /*-- suggested by Gordon Deane; causes no change under linux --*/
+  gtk_clist_set_column_width(GTK_CLIST(clist), 0,
+    gtk_clist_optimal_column_width (GTK_CLIST(clist), 0));
+  /*--                           --*/
+
+  gtk_container_add (GTK_CONTAINER (swin), clist);
+  gtk_widget_show_all (swin);
+}
+
+GtkWidget *
+create_linkby_notebook (GtkWidget *box, ggobid *gg)
+{
+  GtkWidget *notebook;
+  gint nd = g_slist_length (gg->d);
+  GSList *l;
+  datad *d;
+
+  GtkSelectionMode mode = GTK_SELECTION_SINGLE;
+  vartyped vtype = categorical;
+  datatyped dtype = all_datatypes;
+
+  /* Create a notebook, set the position of the tabs */
+  notebook = gtk_notebook_new ();
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
+  gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
+  gtk_object_set_data (GTK_OBJECT(notebook), "SELECTION", (gpointer) mode);
+  gtk_object_set_data (GTK_OBJECT(notebook), "vartype", (gpointer) vtype);
+  gtk_object_set_data (GTK_OBJECT(notebook), "datatype", (gpointer) dtype);
+
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (g_slist_length (d->vartable)) {
+      linkby_notebook_subwindow_add (d, notebook, gg);
+    }
+  }
+
+  /*-- listen for variable_added and _list_changed events on main_window --*/
+  /*--   ... list_changed would be enough --*/
+  gtk_signal_connect (GTK_OBJECT (gg),
+		      "variable_added", 
+		      GTK_SIGNAL_FUNC (linkby_notebook_varchange_cb),
+		      GTK_OBJECT (notebook));
+  gtk_signal_connect (GTK_OBJECT (gg),
+		      "variable_list_changed", 
+		      GTK_SIGNAL_FUNC (linkby_notebook_varchange_cb),
+		      GTK_OBJECT (notebook));
+
+  /*-- listen for datad_added events on main_window --*/
+  gtk_signal_connect (GTK_OBJECT (gg),
+		      "datad_added", 
+		      GTK_SIGNAL_FUNC (linkby_notebook_adddata_cb),
+		      GTK_OBJECT (notebook));
+
+  return notebook;
 }

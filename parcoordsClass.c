@@ -15,8 +15,8 @@ splot1DVariablesGet(splotd *sp, gint *cols, datad *d)
 static gboolean
 parcoordsBinningPermitted(displayd *dpy)
 {
-  cpaneld *cpanel = &dpy->cpanel;
   /*
+  cpaneld *cpanel = &dpy->cpanel;
   if (cpanel->br_point_targets == br_select)
      return(false);
   */
@@ -33,9 +33,9 @@ cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
       cpanel_parcoords_make(gg);
   }
 
-  cpanel_parcoords_set (cpanel, w, gg);
-  cpanel_brush_set (cpanel, gg);
-  cpanel_identify_set (cpanel, gg);
+  cpanel_parcoords_set (dpy, cpanel, w, gg);
+  cpanel_brush_set (dpy, cpanel, gg);
+  cpanel_identify_set (dpy, cpanel, gg);
 
   return(true);/* XX */
 }

@@ -117,7 +117,7 @@ GtkWidget *barchart_mode_menu_make(GtkAccelGroup * accel_group,
 
 /*-- there already exists barchart_cpanel_init --*/
 
-void cpanel_barchart_set(cpaneld * cpanel, GtkWidget * panel, ggobid * gg)
+void cpanel_barchart_set(displayd *display, cpaneld * cpanel, GtkWidget * panel, ggobid * gg)
 {
   GtkWidget *w;
 

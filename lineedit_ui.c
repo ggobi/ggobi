@@ -523,7 +523,7 @@ cpanel_edgeedit_init (cpaneld *cpanel, ggobid *gg)
 }
 
 void
-cpanel_edgeedit_set (cpaneld *cpanel, ggobid *gg) {
+cpanel_edgeedit_set (displayd *display, cpaneld *cpanel, ggobid *gg) {
   GtkWidget *w;
 
   /*-- set the Drag or Click radio buttons --*/

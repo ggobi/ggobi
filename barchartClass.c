@@ -114,9 +114,9 @@ gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel, ggobid * gg)
     GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =
         cpanel_barchart_make(gg);
   }
-  cpanel_barchart_set(cpanel, w, gg);
-  cpanel_brush_set(cpanel, gg);
-  cpanel_identify_set(cpanel, gg);
+  cpanel_barchart_set(dpy, cpanel, w, gg);
+  cpanel_brush_set(dpy, cpanel, gg);
+  cpanel_identify_set(dpy, cpanel, gg);
 
   return (true);
 }
@@ -203,7 +203,7 @@ gboolean barchart_build_symbol_vectors (cpaneld *cpanel, datad * d, ggobid * gg)
   for (j = 0; j < d->nrows_in_plot; j++) {
     m = d->rows_in_plot.els[j];
 
-    switch (cpanel->br_point_targets) {
+    switch (cpanel->br.point_targets) {
       case br_candg:  /*-- color and glyph --*/
         changed = update_color_vectors(m, changed,
           d->pts_under_brush.els, d, gg);

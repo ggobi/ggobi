@@ -123,7 +123,7 @@ scatmat_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 /*-- there already exists scatmat_cpanel_init --*/
 
 void
-cpanel_scatmat_set (cpaneld *cpanel, ggobid *gg)
+cpanel_scatmat_set (displayd *display, cpaneld *cpanel, ggobid *gg)
 {
   GtkWidget *w;
 

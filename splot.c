@@ -382,7 +382,7 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
     */
     if (prev_viewmode == NULLMODE || cpanel == NULL)
       displays_plot (NULL, FULL, gg);
-    if (prev_viewmode == BRUSH && cpanel->br_mode == BR_TRANSIENT)
+    if (prev_viewmode == BRUSH && cpanel->br.mode == BR_TRANSIENT)
       displays_plot (NULL, FULL, gg);
     else if (prev_viewmode == IDENT)
       displays_plot (NULL, QUICK, gg);
