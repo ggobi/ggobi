@@ -828,9 +828,9 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
              * of each color and type in a group.
             */
             nl = 0;
-            doit = true;
 
             for (j=0; j<e->edge.n; j++) {
+              doit = true;
               if (e->hidden_now.els[j]) {
                 doit = false;
               } else if (endpoints[j].a >= nels || endpoints[j].b >= nels) {
