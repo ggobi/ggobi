@@ -28,7 +28,6 @@ void edges_alloc(gint nsegs, datad * d)
   d->edge.endpoints = (endpointsd *)
       g_realloc(d->edge.endpoints, nsegs * sizeof(endpointsd));
 
-  /*-- wrong: this is in d while the other is in e --*/
   vectorb_alloc(&d->edge.xed_by_brush, nsegs);
 }
 
