@@ -174,6 +174,21 @@ include_all_cb (GtkWidget *w, ggobid *gg) {
   }
 }
 
+static void subset_clist_datad_added_cb (GtkObject *obj, datad *d,
+  ggobid *gg, GtkWidget *clist)
+{
+  gchar *row[1];
+  GtkWidget *swin = (GtkWidget *)
+    gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
+
+  subset_init (d, gg);
+  row[0] = g_strdup (d->name);
+  gtk_clist_append (GTK_CLIST (clist), row);
+  g_free (row[0]);
+
+  gtk_widget_show_all (swin);
+}
+
 /*------------------------------------------------------------------*/
 
 void
@@ -183,6 +198,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
   GtkWidget *vbox, *frame, *hb, *vb, *button_hbox, *close_hbox;
   GtkWidget *label, *btn;
   datad *d;
+  gchar *clist_titles[1] = {"datasets"};
 
   GtkWidget *swin, *clist;
   gchar *row[1];
@@ -215,11 +231,15 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
         GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-      clist = gtk_clist_new (1);
+      clist = gtk_clist_new_with_titles (1, clist_titles);
       gtk_clist_set_selection_mode (GTK_CLIST (clist),
         GTK_SELECTION_SINGLE);
-      gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-                         subset_datad_set_cb, gg);
+      gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
+      gtk_signal_connect (GTK_OBJECT (clist),
+        "select_row", subset_datad_set_cb, gg);
+      gtk_signal_connect (GTK_OBJECT (gg->main_window),
+        "datad_added", subset_clist_datad_added_cb,
+        GTK_OBJECT (clist));
       /*-- --*/
 
       for (l = gg->d; l; l = l->next) {
@@ -439,18 +459,17 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
                           GTK_SIGNAL_FUNC (close_btn_cb), (ggobid *) gg);
       gtk_box_pack_start (GTK_BOX (close_hbox), btn, true, false, 0);
 
+      /*subset_display_update (d, gg);*/ /*-- should not be needed --*/
+
+      if (g_slist_length (gg->d) > 1)
+        gtk_widget_show_all (swin);
+      gtk_widget_show (vbox);
+      gtk_widget_show_all (button_hbox);
+      gtk_widget_show_all (close_hbox);
+      gtk_widget_show_all (gg->subset_ui.notebook);
     }  /*-- if window == NULL --*/
 
-    subset_display_update (d, gg);
-
-    if (g_slist_length (gg->d) > 1) 
-      gtk_widget_show_all (swin);
-    gtk_widget_show (vbox);
-    gtk_widget_show_all (button_hbox);
-    gtk_widget_show_all (close_hbox);
-    gtk_widget_show_all (gg->subset_ui.notebook);
     gtk_widget_show (gg->subset_ui.window);
+    gdk_window_raise (gg->subset_ui.window->window);
   }
-
-  gdk_window_raise (gg->subset_ui.window->window);
 }
