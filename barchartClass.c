@@ -181,6 +181,8 @@ gboolean barchart_build_symbol_vectors(datad * d, ggobid * gg)
     m = d->rows_in_plot[j];
     changed = update_color_vectors(m, changed,
                                    d->pts_under_brush.els, d, gg);
+    changed = update_glyph_vectors (j, changed,
+                                    d->pts_under_brush.els, d, gg);
   }
 
   return changed;
