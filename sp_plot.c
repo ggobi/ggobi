@@ -434,7 +434,7 @@ splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 /*-- add the label to a case (with or without underlining) --*/
 static void
-splot_add_record_label (gboolean nearest, gint k, splotd *sp,
+splot_add_point_label (gboolean nearest, gint k, splotd *sp,
   GdkDrawable *drawable, ggobid *gg)
 {
   displayd *dsp = sp->displayptr;
@@ -516,7 +516,7 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
   }
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  splot_add_record_label (nearest, k, sp, drawable, gg);
+  splot_add_point_label (nearest, k, sp, drawable, gg);
 }
 
 void
@@ -533,7 +533,7 @@ splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
 
   /*-- only add the label if the mouse is up --*/
   if (!gg->buttondown) {
-    splot_add_record_label (nearest, k, sp, drawable, gg);
+    splot_add_point_label (nearest, k, sp, drawable, gg);
   }
 }
 
@@ -571,6 +571,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   GSList *l;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
+  datad *e = display->e;
   PipelineMode mode = viewmode_get (gg);
   cpaneld *cpanel = &display->cpanel;
 
@@ -586,10 +587,10 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
         d->nearest_point != -1)
     {
       splot_add_identify_cues (sp, drawable, d->nearest_point, true, gg);
-    } else if (cpanel->identify_target_type == identify_edges &&
-               d->nearest_edge != -1)
+    } else if (cpanel->identify_target_type == identify_edges && e &&
+               e->nearest_point != -1)
     {
-      splot_add_identify_edge_cues (sp, drawable, d->nearest_edge, true, gg);
+      splot_add_identify_edge_cues (sp, drawable, e->nearest_point, true, gg);
     }
   }
   else if (mode == MOVEPTS)
@@ -823,6 +824,87 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 }
 
+void
+splot_add_edge_highlight_cue (splotd *sp, GdkDrawable *drawable, gint k,
+  gboolean nearest, ggobid *gg)
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  datad *e = dsp->e;
+  gint a, b;
+  colorschemed *scheme = gg->activeColorScheme;
+  gboolean draw_edge = (dsp->options.edges_undirected_show_p ||
+                        dsp->options.edges_directed_show_p);
+
+  draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, e->edge.endpoints);
+
+/*
+ * How to distinguish between sticky and nearest edges?
+*/
+  /*-- draw a thickened line --*/
+  if (draw_edge) {
+    gdk_gc_set_line_attributes (gg->plot_GC,
+      3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+    gdk_gc_set_foreground (gg->plot_GC,
+      &scheme->rgb[ e->color_now.els[k] ]);
+
+    gdk_draw_line (drawable, gg->plot_GC,
+      sp->screen[a].x, sp->screen[a].y,
+      sp->screen[b].x, sp->screen[b].y);
+
+    gdk_gc_set_line_attributes (gg->plot_GC,
+      0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+  }
+}
+
+void
+splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
+  gboolean nearest, ggobid *gg)
+{
+  gchar *lbl;
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  datad *e = dsp->e;
+  gint lbearing, rbearing, width, ascent, descent;
+  GtkStyle *style = gtk_widget_get_style (sp->da);
+  gint xp, yp;
+  gint a, b;
+
+  gboolean draw_edge = (dsp->options.edges_undirected_show_p ||
+                        dsp->options.edges_directed_show_p);
+  draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, e->edge.endpoints);
+
+/*
+ * Do we distinguish between nearest and sticky edge labels?
+*/
+  if (draw_edge) {
+
+    if (nearest) {
+      /*-- add the label last so it will be in front of other markings --*/
+      lbl = (gchar *) g_array_index (e->rowlab, gchar *, k);
+      splot_text_extents (lbl, style, 
+        &lbearing, &rbearing, &width, &ascent, &descent);
+
+      if (sp->screen[a].x > sp->screen[b].x) {gint itmp=b; b=a; a=itmp;}
+      xp = (sp->screen[b].x - sp->screen[a].x)/2 + sp->screen[a].x;
+      if (sp->screen[a].y > sp->screen[b].y) {gint itmp=b; b=a; a=itmp;}
+      yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y;
+
+      /*-- underline the nearest point label?  --*/
+      splot_draw_string (lbl, xp, yp, style, drawable, gg);
+    }
+
+    /*-- display the label in the top center of the window as well --*/
+    if (nearest) {
+      splot_draw_string (lbl,
+        (sp->max.x - width)/2,
+        ascent + descent + 5,  /*-- the border is of width 3 --*/
+        style, drawable, gg);
+    }
+  }
+}
+
 /*
  * I may want to break this up so it looks like add_identify_cues
 
@@ -830,20 +912,23 @@ need two new routines:
   splot_add_edge_highlight_cue
   splot_add_edge_label
 */
+
 void
 splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
   gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
   datad *e = dsp->e;
-  gint lbearing, rbearing, width, ascent, descent;
-  GtkStyle *style = gtk_widget_get_style (sp->da);
+  gboolean useDefault = false;
+/*
+  datad *d = dsp->d;
+  gboolean draw_edge;
   gchar *lbl;
   gint xp, yp;
-  gboolean draw_edge;
   colorschemed *scheme = gg->activeColorScheme;
-  gboolean useDefault = false;
+  gint lbearing, rbearing, width, ascent, descent;
+  GtkStyle *style = gtk_widget_get_style (sp->da);
+*/
 
   if (k >= e->edge.n) return;
 
@@ -862,54 +947,8 @@ splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
   }
 
   if (useDefault) {
-
-    draw_edge = (dsp->options.edges_undirected_show_p ||
-                 dsp->options.edges_directed_show_p);
-
-    /*-- draw a thickened line, and add a label if nearest==true --*/
-    if (draw_edge) {
-      gint a, b;
-      draw_edge = edge_endpoints_get (k, &a, &b, d, e->edge.endpoints);
-
-      gdk_gc_set_line_attributes (gg->plot_GC,
-        3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-      gdk_gc_set_foreground (gg->plot_GC,
-        &scheme->rgb[ e->color_now.els[k] ]);
-
-      gdk_draw_line (drawable, gg->plot_GC,
-        sp->screen[a].x, sp->screen[a].y,
-        sp->screen[b].x, sp->screen[b].y);
-
-      gdk_gc_set_line_attributes (gg->plot_GC,
-        0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-
-      if (nearest) {
-        /*-- add the label last so it will be in front of other markings --*/
-        lbl = (gchar *) g_array_index (e->rowlab, gchar *, k);
-        splot_text_extents (lbl, style, 
-          &lbearing, &rbearing, &width, &ascent, &descent);
-
-        if (sp->screen[a].x > sp->screen[b].x) {gint itmp=b; b=a; a=itmp;}
-        xp = (sp->screen[b].x - sp->screen[a].x)/2 + sp->screen[a].x;
-        if (sp->screen[a].y > sp->screen[b].y) {gint itmp=b; b=a; a=itmp;}
-        yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y;
-
-        /*-- underline the nearest point label?  --*/
-        splot_draw_string (lbl, xp, yp, style, drawable, gg);
-
-        if (nearest)
-          gdk_draw_line (drawable, gg->plot_GC, xp, yp+1, xp+width, yp+1);
-
-        /*-- display the label in the top center of the window as well --*/
-        if (nearest) {
-          splot_draw_string (lbl,
-            (sp->max.x - width)/2,
-            ascent + descent + 5,  /*-- the border is of width 3 --*/
-            style, drawable, gg);
-        }
-      }
-    }
+    splot_add_edge_highlight_cue (sp, drawable, k, nearest, gg);
+    splot_add_edge_label (sp, drawable, k, nearest, gg);
   }
 }
 
@@ -963,32 +1002,45 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
 static void
 splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
-  displayd *display = (displayd *) sp->displayptr;
-  datad *e = display->e;
-  datad *d = display->d;
-  cpaneld *cpanel = &display->cpanel;
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *e = dsp->e;
+  datad *d = dsp->d;
+  cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->projection;
+  GtkGGobiExtendedSPlotClass *splotKlass;
 
-/*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
-  if (e) {
-    if (display->options.edges_undirected_show_p ||
-        display->options.edges_arrowheads_show_p ||
-        display->options.edges_directed_show_p)
-    {
-      if ((GTK_IS_GGOBI_EXTENDED_DISPLAY(display)  
-        && GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->show_edges_p))
-      {
-        if (e->nearest_point != -1)
-          /*splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);*/
-          splot_add_identify_edge_cues (sp, drawable, e->nearest_point,
-            true, gg);
-      }
+  /*
+   * if identification is going on in a plot of points that 
+   * correspond to edges in this plot, add markup for the edge
+   * corresponding to the nearest point in the other plot.
+   * ( What about stickies? )
+  */
+  /*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
+  if (sp != gg->current_splot && e && e->edge.n) {
+    gboolean draw_edge;
+    GtkGGobiExtendedDisplayClass *displayKlass = NULL;
+
+    if (GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp)) {
+      displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dsp)->klass);
+      draw_edge = displayKlass->show_edges_p;
+    } else {
+      draw_edge = dsp->options.edges_undirected_show_p ||
+        dsp->options.edges_arrowheads_show_p ||
+        dsp->options.edges_directed_show_p;
+    }
+
+    if (draw_edge && e->nearest_point != -1) {
+      splot_add_edge_highlight_cue (sp, drawable, e->nearest_point,
+        true, gg);
+      splot_add_edge_label (sp, drawable, e->nearest_point,
+        true, gg);
     }
   }
   
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     void (*f)(splotd *, GdkDrawable*, ggobid*);
-    f =  GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->add_markup_cues;
+    splotKlass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+    f = splotKlass->add_markup_cues;
     if(f)
       f(sp, drawable, gg);
   }
@@ -1002,8 +1054,8 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     splot_draw_border (sp, drawable, gg);
 
   /*-- draw these cues whether this is the current display or not --*/
-  if (g_list_length (display->splots) == 1  /*-- scatterplot --*/
-      || sp == display->current_splot)  /*-- ... in a multi-plot display --*/
+  if (g_list_length (dsp->splots) == 1  /*-- scatterplot --*/
+      || sp == dsp->current_splot)  /*-- ... in a multi-plot display --*/
   {
     if (cpanel->viewmode == BRUSH) {
       brush_draw_brush (sp, drawable, d, gg);
@@ -1011,9 +1063,10 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     } else if (cpanel->viewmode == SCALE) {
       scaling_visual_cues_draw (sp, drawable, gg);
 
-      if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+      if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
         void (*f)(splotd *, GdkDrawable*, ggobid*);
-        f =  GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->add_scaling_cues;
+        splotKlass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+        f = splotKlass->add_scaling_cues;
         if(f)
           f(sp, drawable, gg);
       }

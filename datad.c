@@ -61,8 +61,6 @@ datad_new(datad *d, ggobid *gg)
 
   jitter_vars_init (d, gg);
 
-  d->nearest_point_prev = d->nearest_edge_prev = -1;
-
 #ifdef TESTING_ROWS_IN_PLOT_CB
   /*-- listen for rows_in_plot_changed events --*/
   gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",

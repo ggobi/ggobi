@@ -165,11 +165,14 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       }
     }
   } else {
-    k = find_nearest_edge (sp, gg->current_display, gg);
-    d->nearest_edge = k;
-    if (d->nearest_edge != d->nearest_edge_prev) {
-      displays_plot (NULL, QUICK, gg);
-      d->nearest_edge_prev = k;
+    datad *e = gg->current_display->e;
+    if (e && e->edge.n) {
+      k = find_nearest_edge (sp, gg->current_display, gg);
+      e->nearest_point = k;
+      if (e->nearest_point != e->nearest_point_prev) {
+        displays_plot (NULL, QUICK, gg);
+        e->nearest_point_prev = k;
+      }
     }
   }
 
@@ -185,8 +188,13 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 */
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = sp->displayptr;
-  datad *d = display->d;
-  sticky_id_toggle (d, gg);
+  cpaneld *cpanel = &display->cpanel;
+
+  if (cpanel->identify_target_type == identify_points)
+    sticky_id_toggle (display->d, gg);
+  else 
+    if (display->e && display->e->edge.n)
+      sticky_id_toggle (display->e, gg);
 
   return true;
 }
