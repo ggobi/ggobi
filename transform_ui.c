@@ -33,9 +33,15 @@ static void stage0_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget(w, true);
-  datad *d = gg->current_display->d;
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->tform_ui.window));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
 
-  transform (0, indx, -99., d, gg);
+  if (nvars) {
+    transform (0, indx, -99., vars, nvars, d, gg);
+    g_free (vars);
+  }
 }
 
 static gchar *stage1_lbl[] = {"No transformation",
@@ -50,9 +56,15 @@ stage1_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   gint indx = GPOINTER_TO_INT (cbd);
-  datad *d = gg->current_display->d;
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->tform_ui.window));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
 
-  transform (1, indx, gg->tform_ui.boxcox_adj->value, d, gg);
+  if (nvars) {
+    transform (1, indx, gg->tform_ui.boxcox_adj->value, vars, nvars, d, gg);
+    g_free (vars);
+  }
 }
 
 /*
@@ -60,8 +72,14 @@ stage1_cb (GtkWidget *w, gpointer cbd)
 */
 void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
 {
-  datad *d = gg->current_display->d;
-  transform (1, BOXCOX, adj->value, d, gg);
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->tform_ui.window));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+  if (nvars) {
+    transform (1, BOXCOX, adj->value, vars, nvars, d, gg);
+    g_free (vars);
+  }
 }
 
 gfloat
@@ -106,16 +124,23 @@ static gchar *stage2_lbl[] = {"No transformation",
 static void stage2_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
-  datad *d = gg->current_display->d;
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->tform_ui.window));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
   gint indx = GPOINTER_TO_INT (cbd);
 
-  transform (2, indx, -99, d, gg);
+  if (nvars) {
+    transform (2, indx, -99, vars, nvars, d, gg);
+    g_free (vars);
+  }
 }
 
 static void tform_reset_cb (GtkWidget *w, ggobid *gg)
 {
   gint j;
-  datad *d = gg->current_display->d;
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->tform_ui.window));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
 
   for (j=0; j<d->ncols; j++) {
     transform0_values_set (NO_TFORM0, j, d, gg);
@@ -139,18 +164,14 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
 void
 transform_window_open (ggobid *gg) 
 {
+  GtkWidget *vbox, *frame, *notebook, *hb, *vb, *btn;
   GtkWidget *stage0_option_menu, *stage1_option_menu, *stage2_option_menu;
-  GtkWidget *entry_a, *entry_b;
-  GtkWidget *lbl, *hbox;
-  GtkWidget *vbox, *frame, *hb, *vb, *btn;
+  GtkWidget *lbl, *entry_a, *entry_b;
   GtkWidget *spinner;
-  datad *d;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
     return;
-
-  d = gg->current_display->d;
 
   if (gg->tform_ui.window == NULL) {
     GtkStyle *style;
@@ -167,17 +188,14 @@ transform_window_open (ggobid *gg)
                         (gpointer) gg);
 
 /*
- * Divide the window:  functions on the left, labels on the right
-*/
-    hbox = gtk_hbox_new (false, 1);
-    gtk_container_border_width (GTK_CONTAINER (hbox), 1);
-    gtk_container_add (GTK_CONTAINER (gg->tform_ui.window), hbox);
-
-/*
  * Transformations
 */
     vbox = gtk_vbox_new (false, 2);
-    gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 1);
+    gtk_container_add (GTK_CONTAINER (gg->tform_ui.window), vbox);
+
+    /* Create a notebook, set the position of the tabs */
+    notebook = create_variable_notebook (vbox, GTK_SELECTION_EXTENDED,
+      (GtkSignalFunc) NULL, gg);
 
     /*
      * Stage 0: Domain adjustment
@@ -309,6 +327,9 @@ transform_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 1);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (close_btn_cb), gg);
+
+    gtk_object_set_data (GTK_OBJECT (gg->tform_ui.window),
+      "notebook", notebook);
   } 
 
   gtk_widget_show_all (gg->tform_ui.window);

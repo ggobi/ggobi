@@ -22,7 +22,7 @@ jitter_vars_init (datad *d, ggobid *gg) {
 static void
 jitter_cb (GtkButton *w, ggobid *gg)
 {
-  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(w));
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars = get_selections_from_clist (d->ncols, vars, clist);
@@ -38,7 +38,7 @@ jitter_cb (GtkButton *w, ggobid *gg)
 */
 static void
 degree_cb (GtkAdjustment *adj, ggobid *gg) {
-  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(adj));
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars = get_selections_from_clist (d->ncols, vars, clist);
@@ -122,7 +122,6 @@ jitter_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
       adj = gtk_adjustment_new (0.0, 0.0, 0.7, 0.01, .01, 0.0);
-      gtk_object_set_data (GTK_OBJECT (adj), "notebook", notebook);
       gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                           GTK_SIGNAL_FUNC (degree_cb), (gpointer) gg);
 
@@ -139,7 +138,6 @@ jitter_window_open (ggobid *gg) {
       btn = gtk_button_new_with_label ("Jitter");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
         "Rejitter the data", NULL);
-      gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
       gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                          GTK_SIGNAL_FUNC (jitter_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
@@ -148,7 +146,6 @@ jitter_window_open (ggobid *gg) {
       opt = gtk_option_menu_new ();
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
         "The jittering is either distributed uniform or normal", NULL);
-      gtk_object_set_data (GTK_OBJECT (opt), "notebook", notebook);
       gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
       populate_option_menu (opt, type_lbl,
                             sizeof (type_lbl) / sizeof (gchar *),

@@ -369,7 +369,7 @@ void transform1_values_set (gint, gfloat, gint, datad *, ggobid *);
 gboolean transform2_apply (gint, datad *, ggobid *);
 void transform2_opt_menu_set_value (gint j, datad *d, ggobid *gg);
 void transform2_values_set (gint, gint, datad *, ggobid *);
-void transform (gint, gint, gfloat, datad *, ggobid *);
+void transform (gint, gint, gfloat, gint *, gint, datad *, ggobid *);
 void transform_values_init (gint j, datad *, ggobid *);
 void transform_variable (gint, gint, gfloat, gint, datad *, ggobid *);
 void transform_window_open (ggobid *);

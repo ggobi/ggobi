@@ -804,26 +804,20 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
 }
 
 void
-transform (gint stage, gint tform_type, gfloat param, datad *d, ggobid *gg) 
+transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
+  datad *d, ggobid *gg) 
 {
   gint k;
-  gint ncols;
-  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
 
-  ncols = selected_cols_get (cols, d, gg);
-  if (ncols == 0)
-    ncols = plotted_cols_get (cols, d, gg);
-
-  for (k=0; k<ncols; k++)
-    transform_variable (stage, tform_type, param, cols[k], d, gg);
+  for (k=0; k<nvars; k++)
+    transform_variable (stage, tform_type, param, vars[k], d, gg);
 
   limits_set (false, true, d, gg);  
-  for (k=0; k<ncols; k++) {
-    vartable_limits_set_by_var (cols[k], d);
-    vartable_stats_set_by_var (cols[k], d);
-    tform_to_world_by_var (cols[k], d, gg);
+  for (k=0; k<nvars; k++) {
+    vartable_limits_set_by_var (vars[k], d);
+    vartable_stats_set_by_var (vars[k], d);
+    tform_to_world_by_var (vars[k], d, gg);
   }
-  g_free ((gpointer) cols);
 
 
   /*
