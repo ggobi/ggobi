@@ -34,6 +34,7 @@ typedef struct _GGobiInitInfo {
 #endif
 
     GList *plugins;  /* list of known available plugins */
+    GList *inputPlugins;  /* list of the input reading plugins */
 
     char *filename; /* the name of the file from which this information was read. */
 

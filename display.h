@@ -19,7 +19,6 @@
 #include "ggobi.h"
 
 struct _ggobid; 
-typedef struct _ggobid ggobid;
 
 struct _displayd {
 

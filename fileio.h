@@ -5,7 +5,16 @@
 extern "C" {
 #endif
 
+typedef struct _GGobiInputPluginInfo GGobiInputPluginInfo;
+typedef struct _ggobid ggobid;
 typedef struct _InputDescription InputDescription;
+
+typedef gboolean (*InputReader)(InputDescription *desc, ggobid *gg);
+typedef gboolean (*InputProbe)(const char * const input);
+
+typedef InputDescription* (*InputGetDescription)(const char * const fileName, const char * const input, ggobid *gg, GGobiInputPluginInfo*);
+
+
 struct _InputDescription {
  gchar *fileName;       /* the name of the file to read, fully expanded */
  gchar *baseName;       /* With the extension removed. */
@@ -21,7 +30,7 @@ struct _InputDescription {
  GSList *extensions;     /* a collection of file extension names and modes. */
 
  void *userData;
- gboolean (*read_input)(InputDescription *desc, struct _ggobid *gg);
+ InputReader read_input;
 };
 
 typedef struct {
@@ -57,7 +66,7 @@ gchar *computeExtension(const gchar *fileName);
 gchar *completeFileDesc(const gchar *fileName, InputDescription *desc);
 
 
-InputDescription* fileset_generate(const gchar *fileName, DataMode guess);
+InputDescription* fileset_generate(const gchar *fileName, DataMode guess, ggobid *gg);
 
 
 gchar *findAssociatedFile(InputDescription *desc, const gchar * const *suffixes, gint numSuffixes, gint *which, gboolean isError);

@@ -142,14 +142,14 @@ fileset_read (const gchar *ldata_in, ggobid *gg)
   InputDescription *desc;
   gboolean ok = true;
 
-  desc = fileset_generate(ldata_in, sessionOptions->data_mode);
+  desc = fileset_generate(ldata_in, sessionOptions->data_mode, gg);
 
   if(desc == NULL) {
     g_printerr("Cannot locate the file %s\n", ldata_in); 
     return(false);
   }
 
-  if(desc->mode == unknown_data) {
+  if(desc->mode == unknown_data && desc->read_input == NULL) {
     g_printerr ("Cannot determine the format of the data in file %s\n",
       desc->fileName); 
     return(false);

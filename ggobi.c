@@ -16,6 +16,8 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
+#include "ggobi.h"
+
 #include "vars.h"
 #include "externs.h"
 
@@ -137,6 +139,10 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
       g_printerr ("-colorschemes not supported without XML\n"); fflush(stderr);
 #endif
       (*argc)--; av++;
+    }
+    else if(strcmp(av[1], "-datamode") == 0) {
+	sessionOptions->data_type = g_strdup(av[2]);
+	(*argc)--; av++;
     }
   }
 

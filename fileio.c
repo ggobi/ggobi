@@ -22,6 +22,10 @@
 static char *XMLSuffixes[] = {"xml", "xml.gz","xmlz"};
 #endif
 
+#ifdef SUPPORT_PLUGINS
+#include "plugin.h" 
+#endif
+
 char *ASCIISuffixes[]  = {"dat"};
 char *BinarySuffixes[] = {"bin"};
 
@@ -88,7 +92,7 @@ initFileTypeGroups(void)
 ----------------------------------------------------------------------*/
 
 InputDescription*
-fileset_generate(const gchar *fileName, DataMode guess)
+fileset_generate(const gchar *fileName, DataMode guess, ggobid *gg)
 {
   InputDescription *desc = (InputDescription *)
     calloc(1, sizeof(InputDescription));
@@ -105,6 +109,30 @@ fileset_generate(const gchar *fileName, DataMode guess)
     initFileTypeGroups();
 
   groups = FileTypeGroups;
+
+#ifdef SUPPORT_PLUGINS
+  if(guess == unknown_data && sessionOptions->data_type) {
+      GList *els = sessionOptions->info->inputPlugins;
+      if(els) {
+          int i, n;
+          n = g_list_length(els);
+	  for(i = 0; i < n; i++) {
+	      GGobiInputPluginInfo *plugin;
+	      plugin = g_list_nth_data(els, i);
+              if(plugin->modeName && strcmp(plugin->modeName, sessionOptions->data_type) == 0) {
+                  InputGetDescription f = (InputGetDescription) getPluginSymbol(plugin->getDescription, &plugin->details);
+                  InputDescription *desc;
+                  if(f) {
+		      desc = f(fileName, sessionOptions->data_type, gg, plugin);
+		      if(desc)
+			  return(desc);
+		  }
+	      }
+	  }
+      }
+  }
+#endif
+
 
 #ifndef WIN32
   if(stat(fileName, &buf) != 0) {

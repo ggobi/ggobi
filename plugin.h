@@ -16,17 +16,43 @@ typedef struct {
     char *dllName;
     HINSTANCE library;
 
-    char *onLoad; 
-    char *onCreate; 
-    char *onClose; 
-    char *onUnload; 
-    char *onUpdateDisplay; 
-
     char *description;
     char *author;
 
     gboolean loaded;
+
+    char *onLoad; 
+    char *onUnload; 
+
+} GGobiPluginDetails;
+
+typedef struct {
+
+    GGobiPluginDetails details;
+
+    char *onCreate; 
+    char *onClose; 
+
+    char *onUpdateDisplay; 
+
 } GGobiPluginInfo;
+
+
+/*
+  The two plugin types should share the common information.
+ */
+struct   _GGobiInputPluginInfo {
+    GGobiPluginDetails details;
+
+    char *modeName;
+    char *read_symbol_name;
+    char *probe_symbol_name;
+    char *getDescription;
+
+    InputReader read_input;
+    InputProbe  probe;
+};
+
 
 typedef struct {
   GGobiPluginInfo *info;
@@ -46,10 +72,10 @@ typedef gboolean (*OnUpdateDisplayMenu)(ggobid *gg, PluginInstance *inst);
 
 typedef struct {
 
-  HINSTANCE (*open)(const char *name, GGobiPluginInfo *info);
+  HINSTANCE (*open)(const char *name, GGobiPluginDetails *info);
   int   (*close)(HINSTANCE);
   DLFUNC  (*resolve)(HINSTANCE handle, const char *name);
-  void  (*getError)(char *buf, GGobiPluginInfo *info);
+  void  (*getError)(char *buf, GGobiPluginDetails *info);
 
 } Dynload;
 
@@ -57,9 +83,9 @@ typedef struct {
 
 extern Dynload *dynload;
 
-HINSTANCE load_plugin_library(GGobiPluginInfo *plugin);
+HINSTANCE load_plugin_library(GGobiPluginDetails *plugin);
 
-DLFUNC getPluginSymbol(const char *name, GGobiPluginInfo *plugin);
+DLFUNC getPluginSymbol(const char *name, GGobiPluginDetails *plugin);
 
 gboolean registerPlugins(ggobid *gg, GList *plugins);
 gboolean pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins);

@@ -155,7 +155,7 @@ read_xml.o: read_xml.h
 endif
 
 ifdef USE_MYSQL
- CFLAGS+= $(MYSQL_INCLUDE_DIRS:%=-I%) -DUSE_MYSQL=1 -Wall -I$(PROPERTIES_INCLUDE_DIR) 
+ CFLAGS+= $(MYSQL_INCLUDE_DIRS:%=-I%) -DUSE_MYSQL=1 -Wall $(PROPERTIES_INCLUDE_DIR:%=-I%) 
  MYSQL_LIBS=-lProps -lmysqlclient $(MYSQL_LIB_DIRS:%=-L%) $(MYSQL_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %) $(PROPERTIES_LIB_DIR:%=$(DL_RESOLVE_FLAG) %) $(PROPERTIES_LIB_DIR:%=-L%)
  SRC+=read_mysql.c
  OB+=read_mysql.o
@@ -163,6 +163,11 @@ ifdef USE_MYSQL
 endif
 
 OB+=mt19937-1.o cokus.o  
+
+ifdef USE_DBMS
+ SRC+= dbms.c dbms_ui.c
+ OB+= dbms.o dbms_ui.o
+endif
 
 ggobi: $(OB) $(EXTRA_OB)
 	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS)  $(EXTRA_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
@@ -236,6 +241,15 @@ xmlConvert: xmlConvert.o libggobi.so
 	$(CC) -g -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS:%=-L%) -L. -lggobi $(DL_RESOLVE_PATH) -lgtk
 
 make_ggobi.o: read_xml.h
+endif
+
+dbms_ui.o: dbms_ui.c dbms_ui.h dbms.h
+dbms.c: dbms.h  ggobi.h
+
+
+ifdef USE_PROPERTIES
+dbms_ui.o: dbms_ui.c dbms_ui.h
+	$(CXX) `gtk-config --cflags` $(CFLAGS) -c $<
 endif
 
 

@@ -143,14 +143,13 @@ GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
 
     status =  mysql_query(conn, query);
 
-       /* Call mysql_use_result() to get the entries row at a time. */
-    if( (res = mysql_store_result(conn)) == NULL ) {
+    if(status ||  (res = mysql_store_result(conn)) == NULL ) {
       GGOBI(mysql_warning)("Error from query", conn, gg);
       return(NULL);
     }
 
   d = datad_new(NULL, gg);
-  d->input = fileset_generate(query, mysql_data);  
+  d->input = fileset_generate(query, mysql_data, gg);  
   if(d->input) {
     d->input->baseName = g_strdup(query);
   }
@@ -223,6 +222,8 @@ GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg)
   and columns), we call this to setup up the space to store the data,
   etc.
   This should go elsewhere also.
+
+  Can now use datad_create();
  */
 void
 GGOBI(setDimensions)(gint nrow, gint ncol, datad *d, ggobid *gg)

@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-HINSTANCE ggobi_dlopen(const char *name, GGobiPluginInfo *plugin);
-void ggobi_dlerror(char *buf, GGobiPluginInfo *plugin);
+HINSTANCE ggobi_dlopen(const char *name, GGobiPluginDetails *plugin);
+void ggobi_dlerror(char *buf, GGobiPluginDetails *plugin);
 
 #ifdef WIN32
 
@@ -35,7 +35,7 @@ Dynload *dynload = &unixDynload;
 #include <unistd.h> 
 #include <sys/stat.h> 
 
-#define DLL_EXTENSION ".dll"
+#define DLL_EXTENSION ".so"
 
 #else
 
@@ -45,7 +45,7 @@ Dynload *dynload = &unixDynload;
 # endif
 # include <io.h> 
 
-#define DLL_EXTENSION ".so"
+#define DLL_EXTENSION ".dll"
 
 #endif 
 
@@ -56,7 +56,7 @@ canRead(const char * const fileName)
   gboolean val = false;
 #ifndef WIN32
   struct stat buf;
-  val = (stat(fileName, &buf) != 0);
+  val = (stat(fileName, &buf) == 0);
 #else
   gint ft=0;
   val = (access(fileName, ft) != 0);
@@ -66,7 +66,7 @@ canRead(const char * const fileName)
 }
 
 HINSTANCE 
-load_plugin_library(GGobiPluginInfo *plugin)
+load_plugin_library(GGobiPluginDetails *plugin)
 {
   HINSTANCE handle;
   char *fileName;
@@ -85,7 +85,7 @@ load_plugin_library(GGobiPluginInfo *plugin)
     return(NULL);
   }
 
-   handle = dynload->open(plugin->dllName, plugin);
+   handle = dynload->open(fileName, plugin);
    if(!handle) {
     char buf[1000];
       dynload->getError(buf, plugin);
@@ -98,8 +98,11 @@ load_plugin_library(GGobiPluginInfo *plugin)
 }
 
 DLFUNC 
-getPluginSymbol(const char *name, GGobiPluginInfo *plugin)
+getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
 {
+  if(plugin->library == NULL) {
+     plugin->library = load_plugin_library(plugin);   
+  }
   return(dynload->resolve(plugin->library, name));
 }
 
@@ -117,7 +120,7 @@ registerPlugins(ggobid *gg, GList *plugins)
     plugin = (GGobiPluginInfo *) el->data;
     ok = true;
     if(plugin->onCreate) {
-      f = (OnCreate) getPluginSymbol(plugin->onCreate, plugin);
+      f = (OnCreate) getPluginSymbol(plugin->onCreate, &plugin->details);
       if(f) {
 	  inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
           inst->data = NULL;
@@ -155,7 +158,7 @@ pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins)
     plugin = (PluginInstance *) el->data;
     if(plugin->info->onUpdateDisplay) {
       f = (OnUpdateDisplayMenu) getPluginSymbol(plugin->info->onUpdateDisplay,
-                                                plugin->info);
+                                                &plugin->info->details);
       if(f) {
         ok = f(gg, plugin);
       }
@@ -278,11 +281,11 @@ void
 addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg)
 {
   gchar **els = (gchar **) g_malloc(6*sizeof(gchar*));
-  els[0] = info->name;
-  els[1] = info->description;
-  els[2] = info->author;
-  els[3] = info->dllName;
-  els[4] = info->loaded ? "yes" : "no";
+  els[0] = info->details.name;
+  els[1] = info->details.description;
+  els[2] = info->details.author;
+  els[3] = info->details.dllName;
+  els[4] = info->details.loaded ? "yes" : "no";
   
   els[5] = isPluginActive(info, gg) ? "yes" : "no";
 
@@ -303,7 +306,7 @@ closePlugins(ggobid *gg)
   while(el) { 
     plugin = (PluginInstance *) el->data;
     if(plugin->info->onClose) {
-      DLFUNC f =  getPluginSymbol(plugin->info->onClose, plugin->info);
+      DLFUNC f =  getPluginSymbol(plugin->info->onClose, &plugin->info->details);
       f(gg, plugin, el);
     }
     tmp = el;
@@ -321,13 +324,13 @@ closePlugins(ggobid *gg)
 #ifdef WIN32
 
 HINSTANCE
-ggobi_dlopen(const char *name, GGobiPluginInfo *plugin)
+ggobi_dlopen(const char *name, GGobiPluginDetails *plugin)
 {
   return(LoadLibrary(name));
 }
 
 void
-ggobi_dlerror(char *buf, GGobiPluginInfo *plugin)
+ggobi_dlerror(char *buf, GGobiPluginDetails *plugin)
 {
     LPVOID lpMsgBuf;
 	FormatMessage( 
@@ -364,13 +367,13 @@ ggobi_dlsym(HINSTANCE handle, const char *name)
 #else
 
 HINSTANCE
-ggobi_dlopen(const char *name, GGobiPluginInfo *plugin)
+ggobi_dlopen(const char *name, GGobiPluginDetails *plugin)
 {
   return(dlopen(name, RTLD_LOCAL | RTLD_NOW ));
 }
 
 void
-ggobi_dlerror(char *buf, GGobiPluginInfo *plugin)
+ggobi_dlerror(char *buf, GGobiPluginDetails *plugin)
 {
   sprintf(buf, dlerror());
 }

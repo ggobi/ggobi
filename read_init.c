@@ -21,7 +21,10 @@ extern int xmlDoValidityCheckingDefaultValue;
 
 #include <string.h>
 
+#ifdef SUPPORT_PLUGINS
 #include "plugin.h"
+#endif
+
 #include "GGobiAPI.h"
 
 #include "externs.h"
@@ -30,8 +33,17 @@ gint getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
 DataMode getPreviousInput(xmlNode *node, InputDescription *input);
 DataMode getInputType(xmlNode *node);
 
+#ifdef SUPPORT_PLUGINS
 void getPlugins(xmlDocPtr doc, GGobiInitInfo *info);
 GGobiPluginInfo *processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
+GGobiInputPluginInfo *processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
+void getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc);
+
+
+void getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr doc);
+gboolean getPluginDetails(xmlNodePtr node, GGobiPluginDetails *plugin, xmlDocPtr doc);
+gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin);
+#endif
 
 
 gint getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info);
@@ -403,10 +415,16 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
 
   el = XML_CHILDREN(node);
   while(el) {
-    if(el->type != XML_TEXT_NODE && strcmp(el->name, "plugin") == 0) {
-      plugin = processPlugin(el, info, doc);
-      if(plugin)
-        info->plugins = g_list_append(info->plugins, plugin);
+    if(el->type != XML_TEXT_NODE) {
+	if(strcmp(el->name, "plugin") == 0) {
+	    plugin = processPlugin(el, info, doc);
+	    if(plugin)
+		info->plugins = g_list_append(info->plugins, plugin);
+	} else 	if(strcmp(el->name, "inputPlugin") == 0) {
+	    GGobiInputPluginInfo *inputPlugin = processInputPlugin(el, info, doc);
+	    if(inputPlugin)
+		info->inputPlugins = g_list_append(info->inputPlugins, inputPlugin);
+	}
     }
     el = el->next;
   }
@@ -422,18 +440,69 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
 GGobiPluginInfo *
 processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 {
-  xmlNodePtr el;
   gboolean load;
-  const xmlChar *tmp;
   GGobiPluginInfo *plugin;
-  xmlChar * val;
 
   plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
   memset(plugin, '\0', sizeof(GGobiPluginInfo));
-  plugin->onLoad = NULL;
-  plugin->onCreate = NULL;
-  plugin->onClose = NULL;
-  plugin->onUnload = NULL;
+
+  load = getPluginDetails(node, &plugin->details, doc);
+
+  getPluginSymbols(node, plugin, doc);
+
+  if(load) {
+    loadPluginLibrary(&plugin->details, plugin);
+  }
+
+  return(plugin);
+}
+
+void
+getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc)
+{
+    xmlNodePtr c;
+    const xmlChar *tmp;
+
+    c = getXMLElement(node,"dll");
+    if(!c)
+	return;
+    c = getXMLElement(c, "init");
+    if(!c)
+        return;
+
+    GET_PROP_VALUE(onCreate, "onCreate");
+    GET_PROP_VALUE(onClose, "onClose");
+    GET_PROP_VALUE(onUpdateDisplay, "onUpdateDisplayMenu");
+}
+
+
+gboolean
+loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin)
+{
+    plugin->library = load_plugin_library(plugin);
+    plugin->loaded = (plugin->library != NULL);
+
+    if(plugin->loaded && plugin->onLoad) {
+      OnLoad f = (OnLoad) getPluginSymbol(plugin->onLoad, plugin);
+      if(f) {
+        f(0, realPlugin);
+      } else {
+        gchar buf[1000];
+        dynload->getError(buf, plugin);
+        fprintf(stderr, "error on loading plugin library %s: %s\n",
+                plugin->dllName, buf);fflush(stderr);
+      }
+    }
+    return(false);
+}
+
+gboolean 
+getPluginDetails(xmlNodePtr node, GGobiPluginDetails *plugin, xmlDocPtr doc)
+{
+  gboolean load = false;
+  const xmlChar *tmp;
+  xmlChar * val;
+  xmlNodePtr el;
 
   tmp = xmlGetProp(node, "name");
   if(tmp) {
@@ -461,10 +530,7 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
           while(c) {
             if(el->type != XML_TEXT_NODE && strcmp(c->name, "init") == 0) {
                GET_PROP_VALUE(onLoad, "onLoad");
-               GET_PROP_VALUE(onCreate, "onCreate");
-               GET_PROP_VALUE(onClose, "onClose");
                GET_PROP_VALUE(onUnload, "onUnload");
-               GET_PROP_VALUE(onUpdateDisplay, "onUpdateDisplayMenu");
                break;
             }
             c = c->next;
@@ -476,24 +542,50 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
     el = el->next;
  }
 
-  if(load) {
-    plugin->library = load_plugin_library(plugin);
-    plugin->loaded = (plugin->library != NULL);
+ return(load);
+}
 
-    if(plugin->loaded && plugin->onLoad) {
-      OnLoad f = (OnLoad) getPluginSymbol(plugin->onLoad, plugin);
-      if(f) {
-        f(0, plugin);
-      } else {
-        gchar buf[1000];
-        dynload->getError(buf, plugin);
-        fprintf(stderr, "error on loading plugin library %s: %s\n",
-                plugin->dllName, buf);fflush(stderr);
-      }
-    }
+GGobiInputPluginInfo *
+processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
+{
+  GGobiInputPluginInfo *plugin;
+  gboolean load;
+  plugin = (GGobiInputPluginInfo *) g_malloc(sizeof(GGobiInputPluginInfo));
+  memset(plugin, '\0', sizeof(GGobiInputPluginInfo)); 
+
+  load = getPluginDetails(node, &plugin->details, doc);
+
+  getInputPluginValues(node, plugin, doc);
+
+  if(load) {
+    loadPluginLibrary(&plugin->details, (GGobiPluginInfo*) plugin);
   }
 
   return(plugin);
+}
+
+void
+getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr doc)
+{
+    xmlNodePtr c, ptr;
+    const xmlChar *tmp;
+
+    c = getXMLElement(node,"dll");
+    if(!c)
+	return;
+    ptr = c;
+    c = getXMLElement(c, "modeName");
+    if(c) {
+      xmlChar *val = xmlNodeListGetString(doc, XML_CHILDREN(c), 1);      
+      plugin->modeName = val;
+    }
+    c = getXMLElement(ptr, "init");
+    if(!c)
+        return;
+
+    GET_PROP_VALUE(read_symbol_name, "read");
+    GET_PROP_VALUE(probe_symbol_name, "probe");
+    GET_PROP_VALUE(getDescription, "description");
 }
 
 #endif /* end of SUPPORT_PLUGINS */

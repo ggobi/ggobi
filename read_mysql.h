@@ -33,7 +33,7 @@ typedef struct {
   
 } MySQLLoginInfo;
 
-/* Must correspond the fieldNames in read_mysql.c */
+/* Must correspond to the fieldNames in read_mysql.c */
 typedef enum {HOST,USER, PASSWORD, DATABASE, PORT, SOCKET, FLAGS, MISS, 
               DATA_QUERY, SEGMENTS_QUERY, APPEARANCE_QUERY, COLOR_QUERY} 
            MySQLInfoElement;

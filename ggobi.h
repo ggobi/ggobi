@@ -11,6 +11,8 @@
 #ifndef GGOBI_H
 #define GGOBI_H
 
+struct _ggobid;
+
 #include "defines.h"
 #include "types.h"
 #include "brushing.h"
@@ -28,7 +30,7 @@
  This one is used for responding to identifying points.
  */
 typedef void (*IdentifyProc)(void *user_data, gint id, splotd *sp,
-  GtkWidget *w, ggobid *gg);
+                               GtkWidget *w, ggobid *gg);
 
 typedef struct {
   IdentifyProc handler;
@@ -66,8 +68,6 @@ typedef struct {
   ProgrammingLanguage language;
 } KeyEventHandler;
 
-
-struct _ggobid;
 
 typedef struct /*-- ggobi --*/ {
 
@@ -418,6 +418,8 @@ typedef struct {
        The default format for the data being read.
      */
   DataMode data_mode;
+
+  gchar *data_type;
 
   /**
     @ingroup SessionOptions
