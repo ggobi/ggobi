@@ -1,0 +1,7 @@
+<plugin name="DescribeDisplay" load="immediate"><!-- load may be on demand. -->
+   <description>Write out a description of the current display in XML.</description>
+   <author>Deborah Swayne</author>
+   <dll name="plugins/DescribeDisplay/DescribeDisplay">
+    <init onCreate="addToToolsMenu" onClose="closeWindow" />
+  </dll>
+</plugin>
