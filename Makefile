@@ -106,7 +106,7 @@ SRC=array.c ash1d.c \
  scatmat.c scatmat_ui.c scatmatClass.c \
  scatterplot.c scatterplot_ui.c scatterplotClass.c \
  smooth_ui.c sphere.c sphere_ui.c splash.c \
- splot.c sp_plot.c subset.c subset_ui.c svd.c \
+ splot.c sp_plot.c sp_plot_axes.c sp_plot_edges.c subset.c subset_ui.c svd.c \
  texture.c timeplot.c time_ui.c tsdisplay.c tsPlot.c \
  tour1d.c tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour_pp.c\
  tour2d.c tour2d_ui.c tour2d_pp.c tour2d_pp_ui.c \
