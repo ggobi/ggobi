@@ -6,43 +6,62 @@
 <body>
 <h1>GGobi Installation</h1>
 
+This document gives some information about installing GGobi.  There is
+information for compiling on Linux and some for Windows.  On Windows,
+the self-installing executable simplifies matters by providing
+a pre-compiled distribution.
+
+
 <h2> Downloads </h2>
 
-<p> Binaries and source code can be downloaded from <e
-href="http://www.ggobi.org"> http://www.ggobi.org </a>
-
-<pre>
---GGobi--
-  Windows binary
-  tar'd gzip'd source code (for linux)
-
---Rggobi--
-  Rggobi.tar.gz  file containing the necessary pieces to build the
-                 link between R and ggobi
-</pre>
+Start by downloading the relevant distribution.
 
 <p>
-There are also instructions on how to download code from the cvs
-archive, using anonymous cvs.
 
-<h2> Ways to build GGobi under linux or unix </h2>
+Binaries and source code can be downloaded from <a
+href="http://www.ggobi.org">http://www.ggobi.org</a>
+
+<dl>
+  <dt>
+  <li> <b>GGobi</b>
+  <dd>
+      <ul>
+	<li> <a href="">Windows binary</a>
+	<li> <a href="">tar'd gzip'd source code (for linux)</a>      
+      </ul>       
+  <dt>
+  <li> <b>Rggobi</b>
+  <dd>
+      <ul>
+	<li> <a href="">Rggobi.tar.gz</a>  file containing the necessary pieces to build the
+                 link between R and GGobi	    
+      </ul>
+</dl>
+
 
 <p>
-There are various ways to use ggobi and hence different features that
-one can enable when compiling ggobi.
+
+There are also instructions on how to download code from the
+rsync server.
+
+<h2> Ways to build GGobi under Linux or UNIX </h2>
+
+<p>
+There are various ways to use GGobi and hence different features that
+one can enable when compiling GGobi.
 
 <UL>
 <LI> stand-alone,
 <LI> stand-alone with XML support,
-<LI> stand-alone and embeddable ggobi library,
-      (this implies an embeddable ggobi library is created.)
-<LI> stand-alone and embeddable ggobi library with XML support,
+<LI> stand-alone and embeddable GGobi library,
+      (this implies an embeddable GGobi library is created.)
+<LI> stand-alone and embeddable GGobi library with XML support,
 <LI> R interface
-     (allowing ggobi to be controlled from R)
+     (allowing GGobi to be controlled from R)
 <LI> Python interface
-      (allowing ggobi to be controlled from Python)   
+      (allowing GGobi to be controlled from Python)   
 <LI> Perl   interface
-      (allowing ggobi to be controlled from Perl)
+      (allowing GGobi to be controlled from Perl)
 </UL>
 
 <p> There is also optional support for reading data directly from a MySQL
@@ -69,7 +88,7 @@ Download the tar.gz version of the code, unpack it. The type:
 make
 </pre>
 
-Then to run ggobi type:
+Then to run GGobi type:
 
 <pre>
 bin/ggobi <datafilename> 
@@ -99,14 +118,14 @@ building libxml2, and the x's in libxml2-x.x.x are replaced by by the
 version of libxml2 you downloaded and unpacked. You can use
 xml2-config to check the location of the libxml2 installation. 
 
-<h3> Stand-alone and embeddable ggobi library </h3>
+<h3> Stand-alone and embeddable GGobi library </h3>
 
 <pre>
 ./configure --enable-embed
 make 
 </pre>
 
-<h3> Stand-alone and embeddable ggobi library with XML support </h3>
+<h3> Stand-alone and embeddable GGobi library with XML support </h3>
 
 <p> If the libxml2 library is installed on your system (not common!) then
 type:
@@ -135,13 +154,13 @@ xml2-config to check the location of the libxml2 installation.
 Install R after downloading and following instructions from
 <a href="http://www.R-project.org"> http://www.R-project.org </a>
 
-<p> From the ggobi web site, download Rggobi_x.x-x.tar.gz. 
+<p> From the GGobi web site, download Rggobi_x.x-x.tar.gz. 
 
 <p> Set various system parameters:
 
 <pre>
 % setenv R_HOME /usr/lib/R (where R got installed)
-% setenv GGOBI_ROOT $HOME/ggobi   (or wherever ggobi lives)
+% setenv GGOBI_ROOT $HOME/ggobi   (or wherever GGobi lives)
 % setenv R_LIBS /usr/lib/R/library 
 </pre>
 
@@ -159,7 +178,7 @@ Become superuser:
 % su
 </pre>
 
-<p> Set a symbolic link to the ggobi library and the gtkext library in the
+<p> Set a symbolic link to the GGobi library and the gtkext library in the
 /usr/lib directory (the one above where R resides):
 
 <pre>
@@ -196,7 +215,7 @@ Become superuser:
 <p> Some Linux systems have a version of libxml installed by default in
 /usr/lib or /usr/local/lib and headers in
 /usr/local/include/gnome-xml.  In some cases, these are older
-versions of libxml and will not work with ggobi. While it would be
+versions of libxml and will not work with GGobi. While it would be
 simpler to install libxml2 on your system and replace the existing
 one, that approach may break other applications.
 
@@ -213,7 +232,7 @@ to follow these steps:
              parser.h and tree.h reside;
           b) a .libs/ directory in which libxml2.so resides.
              Note the name of this top-level directory. 
-<LI> configure the ggobi distribution using the --with-xml flag as
+<LI> configure the GGobi distribution using the --with-xml flag as
 <PRE>
        cd ggobi
        ./configure --with-xml=/top-level/directory/of/libxml2
@@ -222,8 +241,8 @@ to follow these steps:
 </PRE>
 </OL>
 
-<p> This should be sufficient to _compile_ ggobi with the correct include
-and library files. However, when one runs ggobi, it will not
+<p> This should be sufficient to _compile_ GGobi with the correct include
+and library files. However, when one runs GGobi, it will not
 necessarily find that newer library, but instead may use the system
 default one in /usr/lib or wherever.  The ggobi script in bin/ however
 takes care of this by setting the LD_LIBRARY_PATH appropriately to
@@ -236,7 +255,7 @@ instructions)
 can download this from <a
 href="ftp://xmlsoft.org/">
 ftp.gnome.org/pub/GNOME/stable/sources/libxml2 </a> or use the version
-that comes with the ggobi distribution. Untar it,
+that comes with the GGobi distribution. Untar it,
 change directory to the top level of that source tree and give the two
 commands
 
@@ -289,7 +308,7 @@ and select PATH, and add the winggobi/bin directory to the path.
 <pre>
 Using the Mingw32 compiler
 
->The following notes include the set-up I used to compile ggobi on windows.
+>The following notes include the set-up I used to compile GGobi on windows.
 I have successfully compiled it on win98 and winnt. I am sure there is
 an easier way but everything I have used in the process is GPL or LGPL
 so I assume there are no licensing issues.
@@ -361,10 +380,13 @@ makefile to reflect your system) and make. Email me when nothing works
 at kohnicho@comp.nus.edu.sg
 </pre>
 
+
 <hr>
+<address><a href="http://www.public.iastate.edu/~dicook">Di Cook</a>
+<a href=mailto:dicook@iastate.edu>&lt;dicook@iastate.edu&gt;</a></address>
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Sat Jan 18 15:32:46 UTC 2003
+Last modified: Thu Oct 30 20:18:25 EST 2003
 <!-- hhmts end -->
 </body> </html>

@@ -1,7 +1,6 @@
 Fix the DisplayOptions and set_display_options to allow
 an MVC approach so that we can support programmatic setting.
 
-
 Add warning messages to XML parser.
   E.g. reading incomplete or excess elements.
 
