@@ -204,11 +204,14 @@ varpanel_reinit (ggobid *gg)
   }
 }
 
-/*
- * Set the mode for the current display
-*/
 void 
-mode_set (gint m, ggobid *gg) {
+mode_set (gint m, ggobid *gg)
+{
+/*
+ * This could be called ui_mode_set or main_window_mode_set,
+ * because it just sets up the mode_frame and the variable
+ * selection panel.
+*/
   displayd *display = gg->current_display;
 
   gg->mode = m;

@@ -17,6 +17,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void mode_set (gint, ggobid *);
 displayd *createDisplayFromDescription (ggobid *, GGobiDisplayDescription *desc);
 gint strToInteger (const gchar *tmp);
 gboolean edgeset_add (displayd *);
@@ -210,7 +211,6 @@ void missing_world_alloc (datad *, ggobid *);
 void missing_world_free (datad *d, ggobid *);
 enum redrawStyle mode_activate (splotd *, gint, gboolean, ggobid *);
 gint mode_get (ggobid *);
-void mode_set (gint, ggobid *);
 void mode_set_cb (GtkWidget  *, gint);
 /*void mode_submenus_activate (splotd *, gint, gboolean, ggobid *);*/
 void mode_submenus_update (gint prev_mode, gint mode, ggobid *);

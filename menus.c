@@ -1,4 +1,5 @@
 /*-- menus.c: where the modes change entries in the main menubar --*/
+/*--          covers Options, Reset, and I/O menus for all modes --*/
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
@@ -501,10 +502,10 @@ tsplot_menus_make (ggobid *gg)
 /*               Routines to manage the mode menus                    */
 /*--------------------------------------------------------------------*/
 
-/*-- every mode has an options meny --*/
 gboolean
 mode_has_options_menu (gint mode)
 {
+  /*-- every mode has an options menu --*/
   return (mode == P1PLOT || mode == XYPLOT || mode == SCALE  ||
           mode == BRUSH  || mode == TOUR1D || mode == TOUR2D ||
           mode == COTOUR || mode == IDENT  || mode == MOVEPTS ||

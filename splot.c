@@ -101,7 +101,6 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
 {
   static guint32 etime = (guint32) 0;
   gboolean common_event = true;
-  extern gint GGOBI(full_mode_set)(gint action, ggobid *gg);
   gint action = -1;
   displayd *display = (displayd *) sp->displayptr;
   extern gboolean display_type_handles_action (displayd *, gint viewmode);
