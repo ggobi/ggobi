@@ -15,8 +15,8 @@
 #define DOT_LAYOUT   0
 #define NEATO_LAYOUT 1
 
-#define DATE    "June 2002"
-#define VERSION "huh?"
+#define DATE    "May 2004"
+#define VERSION "1.12"
 char *Info[] = {
     "glayout",            /* Program */
     VERSION,              /* Version */
@@ -180,6 +180,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   Agraph_t *graph;
   gdouble **pos;
   gint layout_type = DOT_LAYOUT;
+  static GVC_t *gvc; /* temporary, for graphviz-1.12 */
 /*-- to add the new datad --*/
   gint m, nvisible, nc;
   InputDescription *desc = NULL;
@@ -209,9 +210,12 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   }
 
   aginit();
+  if (gvc == NULL)
+     gvc = gvNEWcontext(Info, "");  /*  temporary, for graphviz-1.12 */
 
   /*-- create a new empty graph --*/
   graph = agopen("graph", kind);
+  gvBindContext(gvc, graph);
 
   /*-- create new nodes, add to graph --*/
   for (i=0; i<nvisible; i++) {
@@ -285,8 +289,8 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
     graph_init(graph);
 
-	graph->u.ndim = gl->neato_dim;
-	Ndim = graph->u.ndim = MIN(graph->u.ndim,MAXDIM);
+    graph->u.ndim = gl->neato_dim;
+    Ndim = graph->u.ndim = MIN(graph->u.ndim,MAXDIM);
 
     graph->u.drawing->engine = NEATO;
     neato_init_node_edge(graph);

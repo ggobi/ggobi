@@ -4,18 +4,18 @@ concentric circles, with the first node in the list appearing at the
 center.
 
 In order to use two more layout methods, pick up the graphviz package
-from www.graphviz.org/pub/graphviz.  I just (January 16, 2003) tested
-the build process using graphviz-current.tar.gz, and it's working well.
+from graphviz.org.  Currently (May 11, 2004), you must use Version
+1.12 which can be obtained here:
+   http://www.research.att.com/sw/tools/graphviz/download.html
 
-The older instructions in this file instructed you to read the
-instructions in INSTALL.old, but the default process is now working
-very nicely, so you can now follow the instructions in INSTALL:  that
-is, just use configure and gmake.
+Other instructions to build and use the graphviz methods in this
+plugin:
 
-Here are the lines I use in my local.config file under linux:
+GRAPHVIZ must be defined in your local.config file, ie
+   GRAPHVIZ = 1
+The build process depends on dotneato-config being in your PATH, and
+the directory indicated by `dotneao-config --libs` must be in your
+LD_LIBRARY_PATH in order to use the layout methods.
 
-GRAPHVIZ = 1
-GVINC=/usr/local/include/graphviz
-GVLIB=/usr/local/lib/graphviz
 
-You can see how those are used in the GNUmakefile.
+
