@@ -74,7 +74,6 @@ const gchar *const DataModeNames[num_data_modes] =
   {"ASCII", "binary", "R/S data", "XML", "MySQL", "URL", "Unknown"};
 
 
-void initSessionOptions();
 
 gchar *
 getOptValue(const gchar * const name, const gchar * const value)
@@ -416,9 +415,7 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 {
   GdkVisual *vis;
   ggobid *gg;
-  initSessionOptions();
-  sessionOptions->cmdArgs = argv;
-  sessionOptions->numArgs = argc;
+  initSessionOptions(argc, argv);
 
   ggobiInit(&argc, &argv);
 
@@ -508,14 +505,74 @@ processRestoreFile(const gchar * const fileName, ggobid *gg)
 }
 
 
+#ifdef WIN32
+gchar *
+getGGobHomeFromRegistry()
+{
+  HRESULT hr;
+  gchar *tmp;
+  char *key;
+  BYTE buf;
+  DWORD bufSize;
+
+  key = "SOFTWARE\\GGobi";
+
+  hr = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_ALL_ACCESS, &lkey);
+  if(hr != ERROR_SUCCESS)
+     return(NULL);
+
+  RegQueryValyeEx(lkey, name, NULL, NULL, NULL, &bufSize);
+  buf = (BYTE) g_malloc(bufSize * sizeof(BYTE));
+
+  RegQueryValyeEx(lkey, name, NULL, &type, buf, &bufSize);
+  RegCloseKey(lkey);
+
+  if(type == REG_SZ) {
+     tmp = (gchar*) buf;
+  }
+
+  return(tmp);
+}
+#endif
+
+static gchar *
+computeGGobiHome(char *str)
+{
+  gchar *dir, *dirPtr, *tmp;
+
+#ifdef WIN32
+  tmp = getGGobiHomeFromRegistry(); 
+  if(tmp) 
+     return(tmp);
+#endif
+
+  dir = str;
+  dirPtr = strrchr(dir, G_DIR_SEPARATOR);
+
+  if(!dirPtr) {
+     return(g_strdup(""));
+  }
+
+  tmp = (char *) g_malloc( ((dirPtr - dir) + 1)*sizeof(char));
+  strncpy(tmp, dir, dirPtr-dir + 1);
+  tmp[(dirPtr - dir) + 1] = '\0';
+
+  return(tmp);
+}
+
 void
-initSessionOptions()
+initSessionOptions(int argc, char **argv)
 {
   sessionOptions = &sessionoptions;
   sessionOptions->data_mode = unknown_data;
 
   sessionOptions->showControlPanel = true;
   sessionOptions->verbose = GGOBI_CHATTY;
+
+  sessionOptions->cmdArgs = argv;
+  sessionOptions->numArgs = argc;
+
+  sessionOptions->ggobiHome = computeGGobiHome(argv[0]);
 
 
   sessionOptions->info = (GGobiInitInfo*) g_malloc(sizeof(GGobiInitInfo));
@@ -745,14 +802,7 @@ process_initialization_files()
       }
 
       if(!fileName) {
-        gchar *v;
-        tmp = g_strdup(sessionOptions->cmdArgs[0]);
-        v = strrchr(tmp, DIR_SEPARATOR);
-        if(v) {
-          v[1] = '\0';
-        } else
-          tmp[0] = '\0';
-        sprintf(buf, "%sggobirc",tmp);
+        sprintf(buf, "%sggobirc",sessionOptions->ggobiHome);
         fileName = buf;
         g_free(tmp);
       }

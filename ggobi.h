@@ -505,6 +505,10 @@ typedef struct {
 
   GSList *pluginFiles;
 
+    /** Directory in which the GGobi files are located.
+      */
+  gchar *ggobiHome;
+
 } GGobiOptions;
 
 

@@ -291,7 +291,7 @@ void       impute_random (datad *, gint nvars, gint *vars, ggobid *);
 void       impute_window_open (ggobid *);
 gint       include_hiddens (gboolean include, datad *d, ggobid *gg);
 void       increment_tour(vector_f, vector_f, gfloat, gfloat, gfloat *, gint);
-void       initSessionOptions(void);
+void       initSessionOptions(int argc, char **argv);
 void       init_plot_GC (GdkWindow *, ggobid *);
 void       init_var_GCs (GtkWidget *, ggobid *);
 gdouble    inner_prod (gdouble *, gdouble *, gint);

@@ -89,15 +89,9 @@ installed_file_name(char *name)
 {
   char *tmp;
   char *dirPtr, *dir;
-  dir = sessionOptions->cmdArgs[0];
-  dirPtr = strrchr(dir, G_DIR_SEPARATOR);
 
-  tmp = (char *) g_malloc( ((dirPtr - dir) + strlen(name)+ 3)*sizeof(char));
-  strncpy(tmp, dir, dirPtr-dir + 1);
-  tmp[(dirPtr - dir) + 1] = '\0';
-
-  strcpy(tmp + (dirPtr - dir) + 1, name);
-  tmp[(dirPtr - dir) + strlen(name)+2] = '\0';  
+  tmp = (char *) g_malloc( (strlen(sessionOptions->ggobiHome)  + strlen(name)+ 3)*sizeof(char));
+  sprintf(tmp, "%s%s", sessionOptions->ggobiHome, name);
 
   return(tmp);
 }
