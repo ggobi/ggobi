@@ -355,10 +355,21 @@ brush_draw_label (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg)
 
   if (d->npts_under_brush > 0) {
     gchar *str = g_strdup_printf ("%d", d->npts_under_brush);
-    gdk_text_extents (style->font, 
+    gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
       str, strlen (str),
       &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (drawable, style->font, gg->plot_GC,
+    gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
+      gg->plot_GC,
       sp->max.x - width - 5,
       ascent + descent + 5,
       str);
