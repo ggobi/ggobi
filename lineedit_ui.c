@@ -398,7 +398,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
         /* Add it to the display */
         /*setDisplayEdge (display, e);*/  /* doesn't work, actually */
         display->e = e;
-        display->options.edges_directed_show_p = true;
+        display->options.edges_undirected_show_p = true;
       }
 
       if (which_button == 1)

@@ -156,8 +156,10 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
      * If this is the first edge in the edge set, do something to
      * make it show up in the display menu.
      */
-    if (e->nrows == 1)
+    if (e->nrows == 1) {
+      void GGOBI(edge_menus_update)(ggobid *gg);
       GGOBI(edge_menus_update)(gg);
+    }
 
   } else {
     GSList *l;

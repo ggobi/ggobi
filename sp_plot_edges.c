@@ -287,10 +287,10 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
                   break;
                 }
               }
-              if (k_prev == -1 || k_prev != i || n_prev == -1 || n_prev != n) {
+	      if (k_prev == -1 || k_prev != i || n_prev == -1 || n_prev != n) {
                 gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
                   (gint) ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
-              }
+	      }
 
               gdk_draw_segments (drawable, gg->plot_GC, sp->edges, nl);
             }
@@ -302,9 +302,17 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
               gdk_gc_set_line_attributes (gg->plot_GC,
                 0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
             }
-
-            k_prev = k; n_prev = n; p_prev = p;
           }
+
+          /* 
+           * I thought this should be one bracket earlier, but I'm
+           * having some kind of intermittent problem with brushing
+           * edges after I have added them using the GUI.  This may
+           * fix the problem, which may have been a result of my
+           * skipping over the current points --- though I don't see
+           * why.  dfs 5/2004
+          */
+          k_prev = k; n_prev = n; p_prev = p;
         }
       }
     }

@@ -129,9 +129,15 @@ br_color_ids_add (datad *d, ggobid *gg)
 void
 br_hidden_alloc (datad *d)
 {
+  gint i, nprev = d->hidden.nels;
+
   vectorb_realloc (&d->hidden, d->nrows);
   vectorb_realloc (&d->hidden_now, d->nrows);
   vectorb_realloc (&d->hidden_prev, d->nrows);
+
+  /* initialize to not hidden*/
+  for (i=nprev; i<d->nrows; i++)
+    d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = 0;
 }
 
 void
