@@ -35,7 +35,6 @@
 const char *const GGOBI(OpModeNames)[] = {
   "1D Plot",
   "XYPlot",
-  "Rotation",
   "1D Tour",
   "Rotation",
   "2D Tour",
@@ -50,7 +49,9 @@ const char *const GGOBI(OpModeNames)[] = {
   "Parcoords",
 #ifdef EXTENDED_MODES
   "TSplot",
+#ifdef BARCHART_IMPLEMENTED
   "Barchart"
+#endif
 #endif
 };
 
