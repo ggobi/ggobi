@@ -19,7 +19,7 @@ and Ch. heikertingeri, and 6 measurements on each.
     6 = the aedeagus width from the side in microns.
 </description>
 <variables count="6">
-  <variable name="tars1" min="50" max="500" />
+  <variable name="tars1" />
   <variable name="tars2" />
   <variable name="head"  />
   <variable name="aede1" />
