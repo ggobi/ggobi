@@ -19,8 +19,9 @@
 
   viewmode_set needs a special handler. 
 
-  motion_notify_cb in movepts_ui.c works only for scatterplot and scatterplot matrices
-   Perhaps just don't register the event handler for other types.
+  motion_notify_cb in movepts_ui.c works only for scatterplot and
+  scatterplot matrices
+  Perhaps just don't register the event handler for other types.
   Same with button_press_cb
 
   world_to_raw needs methods.
@@ -1077,24 +1078,25 @@ withinDrawToUnbinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
   cpaneld *cpanel = &display->cpanel;
   gint proj = cpanel->projection;
   icoords *baseline;
-            /*-- add ash baseline to p1d or tour1d --*/
-            if ((proj == TOUR1D && cpanel->t1d.ASH_add_lines_p) ||
-                (proj == P1PLOT &&
-                 cpanel->p1d.type == ASH &&
-                 cpanel->p1d.ASH_add_lines_p))
-            {
-              baseline = (proj == TOUR1D) ? &sp->tour1d.ash_baseline :
-                                            &sp->p1d.ash_baseline;
 
-              if (display->p1d_orientation == HORIZONTAL)
-  	            gdk_draw_line (drawable, gc,
-				   sp->screen[m].x, sp->screen[m].y,
-				   sp->screen[m].x, baseline->y);
-              else
- 	            gdk_draw_line (drawable, gc,
-				   sp->screen[m].x, sp->screen[m].y,
-				   baseline->x, sp->screen[m].y);
-            }
+  /*-- add ash baseline to p1d or tour1d --*/
+  if ((proj == TOUR1D && cpanel->t1d.ASH_add_lines_p) ||
+      (proj == P1PLOT &&
+       cpanel->p1d.type == ASH &&
+       cpanel->p1d.ASH_add_lines_p))
+  {
+    baseline = (proj == TOUR1D) ? &sp->tour1d.ash_baseline :
+                                  &sp->p1d.ash_baseline;
+
+    if (display->p1d_orientation == HORIZONTAL)
+      gdk_draw_line (drawable, gc,
+  	   sp->screen[m].x, sp->screen[m].y,
+  	   sp->screen[m].x, baseline->y);
+    else
+      gdk_draw_line (drawable, gc,
+  	   sp->screen[m].x, sp->screen[m].y,
+  	   baseline->x, sp->screen[m].y);
+  }
 }
 
 void
