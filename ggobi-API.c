@@ -133,7 +133,7 @@ GGOBI(destroyCurrentDisplay)(ggobid *gg)
 /*-- need two of these now, one to replace and one to append --*/
 void
 GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
-  gint nr, gint nc, datad *d, ggobid *gg)
+  gint nr, gint nc, datad *d, gboolean cleanup, ggobid *gg)
 {
   gint i, j;
   gchar *lbl;
@@ -180,11 +180,13 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   }
 
   /* Now recompute and display the top plot. */
-  if (datad_init (d, gg, false) != NULL) {
+  if (datad_init (d, gg, cleanup) != NULL) {
       /* Have to patch up the displays list since we removed
          every entry and that makes for meaningless entries.
        */
      gg->displays->next = NULL;
+
+     display_menu_build (gg);
   }
 }
 
@@ -234,6 +236,8 @@ GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg)
 void
 GGOBI(data_release)(datad *d, ggobid *gg)
 {
+  if(d == NULL)
+    return;
  if (d->rowlab) {
     rowlabels_free (d, gg);
     d->rowlab = NULL;
@@ -983,7 +987,11 @@ GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update,
       rnames[i] = (gchar *) g_malloc (sizeof (gchar)*7);
       sprintf(rnames[i],"%d",i+1);
     }
-    GGOBI(setData)(vals, rnames, &name, num, 1, d, gg);
+    /* May want the final false here to be true as it causes the 
+       creation of a plot. Probably not, but just mention it here
+       so we don't forget.
+     */
+    GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg);
   } else {
     if (num > d->nrows) {
       num =  d->nrows;

@@ -38,7 +38,7 @@ extern const gchar * const GGOBI(getDataModeDescription)(DataMode mode);
  * of doubles, arranged by column. Hence the double* for now.
  * A double array (double **) would be useful also.
 */
-extern void GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames, gint nr, gint nc, datad *d, ggobid *gg);
+extern void GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames, gint nr, gint nc, datad *d, gboolean initPlot, ggobid *gg);
 
 
 /* Whether to get the transformed names or the regular ones. */
