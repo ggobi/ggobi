@@ -35,6 +35,107 @@ void connect_to_existing_displays(ggobid *gg, GtkSheet *sheet);
 static GdkColor red = {-1, 65535, 0, 0};
 static GdkColor black;
 
+/* dfs, working on adding a search facility */
+static void
+row_find_by_label (GtkWidget *w, GtkWidget *notebook)
+{
+  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  GtkWidget *entry;
+  gchar *vname;
+
+  GtkWidget *swin, *sheet;
+
+  entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "find_entry");
+  if (entry == NULL || !GTK_IS_ENTRY(entry)) {
+    g_printerr ("found the wrong widget; bail out\n");
+    return;
+  }
+  vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
+
+  g_printerr ("search for %s (search under construction)\n", vname);
+
+  /*-- now get the current sheet --*/
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), 
+    gtk_notebook_get_current_page (GTK_NOTEBOOK(notebook)));
+  if (swin) sheet = GTK_BIN(swin)->child;
+  
+  /*-- look for vname in the row labels --*/
+  if (sheet) {
+    gint i, k;
+    gchar *str, *s;
+    size_t l1 = (size_t) strlen(vname);
+    gboolean gotit = false;
+
+    for (i=0; i<GTK_SHEET(sheet)->maxrow; i++) {
+      str = GTK_SHEET(sheet)->row[i].button.label;
+      s = str;
+      while (strlen(s) >= l1) {
+        if (strncasecmp(s, vname, l1) == 0) {
+          gtk_sheet_moveto(GTK_SHEET(sheet), i, 2, 0.5, 0.5);
+          gtk_sheet_select_row(GTK_SHEET(sheet), i);
+          gotit = true; break;
+        }
+        s++;
+      }
+      if (gotit) break;
+    }
+  }
+
+  g_free(vname);
+}
+static void
+dialog_close (GtkWidget *w) 
+{
+  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  gtk_widget_destroy (dialog);
+}
+static void
+open_find_dialog (GtkWidget *window)
+{
+  GtkWidget *dialog, *hb, *entry;
+  GtkWidget *okay_btn, *cancel_btn;
+  GtkWidget *notebook = (GtkWidget *)
+    gtk_object_get_data (GTK_OBJECT (window), "notebook");
+
+  dialog = gtk_dialog_new ();
+  gtk_window_set_title (GTK_WINDOW (dialog), "Find row by label");
+
+  /*-- label and entry --*/
+  hb = gtk_hbox_new (false, 2);
+  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Enter search string: "),
+    true, true, 2);
+  entry = gtk_entry_new();
+  gtk_widget_set_name (entry, "find_entry");
+
+  gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
+
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), hb,
+    false, false, 2);
+
+  /*-- ok button --*/
+  okay_btn = gtk_button_new_with_label ("Okay");
+  gtk_signal_connect (GTK_OBJECT (okay_btn), "clicked",
+    GTK_SIGNAL_FUNC (row_find_by_label), notebook);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
+    okay_btn);
+
+  /*-- cancel button --*/
+  cancel_btn = gtk_button_new_with_label ("Close");
+  gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
+    GTK_SIGNAL_FUNC (dialog_close), NULL);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
+    cancel_btn);
+
+  gtk_widget_show_all (dialog);
+}
+static GtkItemFactoryEntry menu_items[] = {
+  { "/_Edit",            NULL,     NULL,             0, "<Branch>" },
+  { "/Edit/Find ...",
+       NULL,    
+       (GtkItemFactoryCallback) open_find_dialog,  
+       0 },
+};
+/* */
 
 /**
  Called when the plugin instance is created for a new ggobi instance.
@@ -107,6 +208,7 @@ GtkWidget *
 create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook;
+  GtkWidget *menubar;
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -121,6 +223,12 @@ create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
   gtk_container_set_border_width(GTK_CONTAINER(main_vbox),0); 
   gtk_container_add(GTK_CONTAINER(window), main_vbox);
 
+/* */
+  get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
+    gtk_accel_group_new(), window,
+    &menubar, (gpointer) window);
+  gtk_box_pack_start (GTK_BOX (main_vbox), menubar, false, false, 0);
+/* */
 
   notebook=gtk_notebook_new();
   gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_BOTTOM);
@@ -129,8 +237,8 @@ create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
 
   add_ggobi_sheets(gg, notebook);
 
-  gtk_widget_show(main_vbox);
-  gtk_widget_show(window);
+  gtk_object_set_data (GTK_OBJECT (window), "notebook", notebook);
+  gtk_widget_show_all(window);
 
   return(window);
 }
@@ -161,6 +269,22 @@ add_ggobi_sheets(ggobid *gg, GtkWidget *notebook)
   }
 }
 
+
+void
+select_row_cb (GtkSheet *sheet, gint row, datad *d)
+{
+  ggobid *gg = (ggobid *) d->gg;
+
+  if (viewmode_get(gg) != IDENT)
+    viewmode_set (IDENT, gg);
+
+  d->nearest_point = row;
+  /*-- the label could be made sticky -- double click? keystroke? --*/
+  /*sticky_id_toggle (d, gg);*/
+
+  displays_tailpipe (QUICK, gg);
+}
+
 /**
  Create a scrolled window containing a worksheet in which the 
  contents of the data set are displayed. 
@@ -185,6 +309,8 @@ create_ggobi_sheet(datad *data, ggobid *gg)
 
   gtk_signal_connect(GTK_OBJECT(sheet), "changed", cell_changed, data);
   gtk_signal_connect(GTK_OBJECT(gg->main_window), "splot_new", monitor_new_plot, sheet);
+
+  gtk_signal_connect (GTK_OBJECT(sheet), "select_row", select_row_cb, data);
 
   connect_to_existing_displays(gg, GTK_SHEET(sheet));
 
@@ -334,15 +460,17 @@ cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
     if(row < 0)
 	return;
     val = gtk_sheet_cell_get_text(sheet, row, column);
-    value = strtod(val, &tmp);
-    if(val == tmp) {
-	fprintf(stderr, "Error in strtod: %d\n", errno);fflush(stderr);
-	return;
-    }
+    if (val) {
+      value = strtod(val, &tmp);
+      if(val == tmp) {
+        fprintf(stderr, "Error in strtod: %d\n", errno);fflush(stderr);
+        return;
+      }
 
 #if 1
-    update_cell(row, column, value, data);
+      update_cell(row, column, value, data);
 #endif
+  }
 }
 
 
