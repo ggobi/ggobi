@@ -17,7 +17,7 @@ typedef struct {
                            verified, which is not possible
                            e.g. when reading a zipped xml file, 
                          */
-  GSList *extensions;    /* */
+ GSList *extensions;     /* */
 } InputDescription;
 
 typedef struct {
@@ -32,31 +32,33 @@ typedef struct {
                                   bin
                          */
 
-  int len;     /* Number of elements in the extensions array. */
+  gint len;     /* Number of elements in the extensions array. */
 } ExtensionList;
 
 
-
+gboolean isURL(const gchar *fileName);
+gboolean check_file_exists(const gchar *fileName);
 GSList *initFileTypeGroups(void);
-DataMode verifyDataMode(const char *fileName, DataMode mode, InputDescription *desc);
-DataMode guessDataMode(const char *fileName, InputDescription *desc);
-gboolean isXMLFile(const char *fileName, InputDescription *desc);
-gboolean isASCIIFile(const char *fileName);
-gchar *computeExtension(const char *fileName);
-
-gchar *completeFileDesc(const char *fileName, InputDescription *desc);
-
+DataMode verifyDataMode(const gchar *fileName, DataMode mode, InputDescription *desc);
+DataMode guessDataMode(const gchar *fileName, InputDescription *desc);
+gboolean isXMLFile(const gchar *fileName, InputDescription *desc);
+gboolean isASCIIFile(const gchar *fileName);
+gboolean endsWith(const gchar *str, const gchar *what);
 ExtensionList *getInputDescriptionGroup(DataMode mode);
 
-gboolean check_file_exists(const char *fileName);
+/*
+gchar *computeExtension(const gchar *fileName);
+*/
 
-gboolean endsWith(const char *str, const char *what);
-InputDescription* fileset_generate(const char *fileName, DataMode guess);
+gchar *completeFileDesc(const gchar *fileName, InputDescription *desc);
 
 
-gchar *findAssociatedFile(InputDescription *desc, const gchar * const *suffixes, int numSuffixes, gint *which, gboolean isError);
-int addInputSuffix(InputDescription *desc, const gchar *suffix);
-int addInputFile(InputDescription *desc, const gchar *file);
+InputDescription* fileset_generate(const gchar *fileName, DataMode guess);
+
+
+gchar *findAssociatedFile(InputDescription *desc, const gchar * const *suffixes, gint numSuffixes, gint *which, gboolean isError);
+gint addInputSuffix(InputDescription *desc, const gchar *suffix);
+gint addInputFile(InputDescription *desc, const gchar *file);
 
 #ifdef __cplusplus
 }

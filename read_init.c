@@ -25,7 +25,7 @@ extern int xmlDoValidityCheckingDefaultValue;
 
 #include "externs.h"
 
-int getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
+gint getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
 xmlNode *getXMLElement(const xmlDocPtr doc, const char *tagName);
 DataMode getPreviousInput(xmlNode *node, InputDescription *input);
 DataMode getInputType(xmlNode *node);
@@ -34,8 +34,8 @@ void getPlugins(xmlDocPtr doc, GGobiInitInfo *info);
 GGobiPluginInfo *processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
 
 
-int getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info);
-int getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
+gint getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info);
+gint getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
 GGobiDisplayDescription* getDisplayDescription(xmlNodePtr node);
 enum displaytyped getDisplayType(const CHAR *type);
 
@@ -81,11 +81,11 @@ getXMLElement(const xmlDocPtr doc, const char *tagName)
   return(node);
 }
 
-int
+gint
 getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
 {
   xmlNode *node, *el;
-  int n, i;
+  gint n, i;
   node = getXMLElement(doc, "previousFiles");
 
   n = 0;
@@ -114,7 +114,7 @@ getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
 DataMode
 getPreviousInput(xmlNode *node, InputDescription *input)
 {
-   const char *tmp;
+   const gchar *tmp;
    DataMode mode = getInputType(node);
    input->mode = mode;
    if((tmp = xmlGetProp(node, "name"))) {
@@ -126,18 +126,18 @@ getPreviousInput(xmlNode *node, InputDescription *input)
         completeFileDesc(input->fileName, input);
    */
    if(input->fileName) {
-     char *ptr, *tmp1, *tmp2;
-     int i;
+     gchar *ptr, *tmp1, *tmp2;
+     gint i;
      tmp1 = strrchr(input->fileName, G_DIR_SEPARATOR);
      tmp2 = strrchr(tmp1, '.');
      if(tmp2)
        input->givenExtension = g_strdup(tmp2+1);
-     input->baseName = g_malloc((tmp2 - tmp1 +1)*sizeof(char));
+     input->baseName = g_malloc((tmp2 - tmp1 +1)*sizeof(gchar));
      for(i = 0, ptr = tmp1 + 1 ; ptr < tmp2; ptr++, i++) {   
        input->baseName[i] = *ptr;
      }
      input->baseName[i] = '\0';
-     input->dirName = g_malloc((tmp1 - input->fileName +1)*sizeof(char));
+     input->dirName = g_malloc((tmp1 - input->fileName +1)*sizeof(gchar));
      for(i=0, ptr = input->fileName; ptr < tmp1; ptr++, i++) {   
        input->dirName[i] = *ptr;
      }
@@ -177,12 +177,12 @@ getInputType(xmlNode *node)
 
 /*****************************************************************/
 
-int
+gint
 getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info)
 {
   xmlNode *node, *el;
   GGobiDescription *desc;
-  int i;
+  gint i;
   node = getXMLElement(doc, "ggobis"); 
   el = node->children;
   i = 0;
@@ -199,12 +199,12 @@ getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info)
   return(g_list_length(desc->displays));
 }
 
-int
+gint
 getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc)
 {
   xmlNodePtr el = node->children;
   GGobiDisplayDescription *dpy;
-  int n = 0;
+  gint n = 0;
   desc->displays = NULL;
   while(el) {
     if(el->type != XML_TEXT_NODE && strcmp(el->name, "display") == 0) {
@@ -226,7 +226,7 @@ getDisplayDescription(xmlNodePtr node)
 {
   GGobiDisplayDescription *dpy;
   xmlNodePtr el;
-  int i;
+  gint i;
   CHAR *tmp;
 
   dpy = (GGobiDisplayDescription*) g_malloc(sizeof(GGobiDisplayDescription*));
@@ -381,7 +381,7 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
       if(f) {
         f(0, plugin);
       } else {
-        char buf[1000];
+        gchar buf[1000];
         dynload->getError(buf, plugin);
         fprintf(stderr, "error on loading plugin library %s: %s",
           plugin->dllName, buf);fflush(stderr);
@@ -392,7 +392,7 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   return(plugin);
 }
 
-int resolveVariableName(const char *name, datad *d);
+gint resolveVariableName(const gchar *name, datad *d);
 
 displayd *
 createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc) 
@@ -429,7 +429,7 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
   return(dpy);
 }
 
-int
+gint
 resolveVariableName(const char *name, datad *d)
 { 
   gint i;

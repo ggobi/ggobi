@@ -29,6 +29,37 @@ const gchar * const GlyphNames[] = {
         };
 
 
+
+gchar *
+findAssociatedFile(InputDescription *desc, const gchar * const *extensions, int numExtensions, gint *which, gboolean isError)
+{
+  gint i;
+  gchar buf[100];
+
+  if (desc->fileName == NULL ||
+      desc->fileName[0] == '\0' ||
+      strcmp (desc->fileName, "stdin") == 0)
+  {
+    return(NULL);
+  }  
+
+  for(i = 0; i < numExtensions; i++) {
+    if(extensions[i] && extensions[i][0])
+      sprintf(buf, "%s.%s", desc->baseName, extensions[i]);
+    else
+      sprintf(buf, "%s", desc->baseName);
+
+    if(check_file_exists(buf)) {
+      if(which)
+        *which = i;
+      return(g_strdup(buf));
+    }
+  }
+
+  return(NULL);
+}
+
+
 /*------------------------------------------------------------------------*/
 /*                          row labels                                    */
 /*------------------------------------------------------------------------*/
@@ -282,153 +313,10 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
 }
 
 /*------------------------------------------------------------------------*/
-/*                       row groups                                       */
+/*                 point glyphs and colors                                */
 /*------------------------------------------------------------------------*/
 
-void
-rgroups_free (datad *d, ggobid *gg) {
-  gint i, j;
-
-  for (i=0; i<d->nrgroups; i++)
-    for (j=0; j<d->rgroups[i].nels; j++)
-      g_free ((gpointer) d->rgroups[i].els);
-
-  g_free ((gpointer) d->rgroups);
-  g_free ((gpointer) d->rgroup_ids);
-}
-
-gboolean
-rgroups_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
-/*
- * Read in the grouping numbers for joint scaling of variables
-*/
-{
-  gchar *suffixes[] = {"rgroups"};
-  gint itmp, i, k;
-  gboolean found = false;
-  gboolean found_rg;
-  FILE *fp;
-  gint *nels;
-  gint nr;
-
-  if (d->nrgroups > 0) rgroups_free (d, gg);
-
-  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
-    if ((fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
-      found = true;
-  
-  if (!found) {
-    d->nrgroups = 0;
-  } else {
-  
-    /*
-     * If this isn't the first time we've read files, then
-     * see if the rgroups structures should be freed.
-    */
-    if (!init)
-      if (d->nrgroups > 0)
-        rgroups_free (d, gg);
-  
-    /* rgroup_ids starts by containing the values in the file */
-    d->rgroup_ids = (gint *) g_malloc (d->nrows * sizeof (gint));
-    nels = (gint *) g_malloc (d->nrows * sizeof (gint));
-     
-    i = 0;
-    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < d->nrows))
-      d->rgroup_ids[i++] = itmp;
-  
-    /* check the number of group ids read -- should be nrows */
-    if (init && i < d->nrows) {
-      g_printerr (
-        "Number of rows and number of row group types do not match.\n");
-      g_printerr ("Creating extra generic groups.\n");
-
-      for (k=i; k<d->nrows; k++)
-        d->rgroup_ids[k] = k;
-    }
-  
-    /*
-     * Initialize the global variables: nrows row groups,
-     * nrows/10 elements in each group
-    */
-
-    d->rgroups = (groupd *) g_malloc (d->nrows * sizeof (groupd));
-    for (i=0; i<d->nrows; i++) {
-      nels[i] = d->nrows/10;
-      d->rgroups[i].els = (gint *) g_malloc (nels[i] * sizeof (gint));
-      d->rgroups[i].nels = 0;
-    }
-    d->nrgroups = 0;
-  
-    /*
-     * On this sweep, find out how many groups there are and how
-     * many elements are in each group
-    */
-    nr = d->nrows;
-
-    for (i=0; i<nr; i++) {
-      found_rg = false;
-      for (k=0; k<d->nrgroups; k++) {
-  
-        /* if we've found this id before ... */
-        if (d->rgroup_ids[i] == d->rgroups[k].id) {
-  
-          /* Reallocate els[k] if necessary */
-          if (d->rgroups[k].nels == nels[k]) {
-            nels[k] *= 2;
-            d->rgroups[k].els = (gint *)
-              g_realloc ((gpointer) d->rgroups[k].els,
-                (nels[k] * sizeof (gint)));
-          }
-  
-          /* Add the element, increment the element counter */
-          d->rgroups[k].els[ d->rgroups[k].nels ] = i;
-          d->rgroups[k].nels++;
-  
-          /*
-           * Now the value in rgroup_ids has to change so that
-           * it can point to the correct member in the array of
-           * rgroups structures
-          */
-          d->rgroup_ids[i] = k;
-  
-          found_rg = true;
-          break;
-        }
-      }
-  
-      /* If it's a new group id, add it */
-      if (!found_rg) {
-        d->rgroups[d->nrgroups].id = d->rgroup_ids[i]; /* from file */
-        d->rgroups[d->nrgroups].nels = 1;
-        d->rgroups[d->nrgroups].els[0] = i;
-        d->rgroup_ids[i] = d->nrgroups;  /* rgroup_ids reset to index */
-        d->nrgroups++;
-      }
-    }
-    d->nrgroups_in_plot = d->nrgroups;
-  
-    /* Reallocate everything now that we know how many there are */
-    d->rgroups = (groupd *) g_realloc ((gpointer) d->rgroups,
-      (gulong) (d->nrgroups * sizeof (groupd)));
-  
-    /* Now reallocate the arrays within each rgroups structure */
-    for (k=0; k<d->nrgroups; k++) {
-      d->rgroups[k].els = (gint *)
-        g_realloc ((gpointer) d->rgroups[k].els,
-                    d->rgroups[k].nels * sizeof (gint));
-    }
-  
-    g_free ((gpointer) nels);
-  }
-
-  if (d->nrgroups != 0)
-    g_printerr ("d.nrgroups=%d\n", d->nrgroups);
-
-  return (found);
-}
-
-void
+static void
 readGlyphErr (void) {
   g_printerr ("The .glyphs file must contain either one number per line,\n");
   g_printerr ("with the number between 1 and %d; using defaults,\n",
@@ -438,10 +326,6 @@ readGlyphErr (void) {
 /*  g_printerr ("+, x, or, fr, oc, fc, .  and the number between 1 and %d.\n",*/
     NGLYPHSIZES);
 }
-
-/*------------------------------------------------------------------------*/
-/*                 point glyphs and colors                                */
-/*------------------------------------------------------------------------*/
 
 gboolean
 point_glyphs_read (InputDescription *desc, gboolean reinit,

@@ -48,12 +48,47 @@ ExtensionList binaryFileTypes = {
 
 GSList *FileTypeGroups = NULL;
 
+/*--------------------------------------------------------------------*/
+/*               Initialization                                       */
+/*--------------------------------------------------------------------*/
 
-gboolean isURL(const gchar *fileName);
+GSList *
+initFileTypeGroups(void)
+{
+  FileTypeGroups = g_slist_alloc();
 
+#ifdef USE_XML
+  xmlFileTypes.extensions = XMLSuffixes;
+  xmlFileTypes.len = 3;
+#endif
+
+  asciiFileTypes.extensions = ASCIISuffixes;
+  asciiFileTypes.len = 1;
+
+
+  binaryFileTypes.extensions = BinarySuffixes;
+  binaryFileTypes.len = 1;
+
+#ifdef USE_XML
+  FileTypeGroups->data = (void *)&xmlFileTypes;
+  g_slist_append(FileTypeGroups, &asciiFileTypes);
+#else
+  FileTypeGroups->data = (void *)&asciiFileTypes;
+#endif
+
+  g_slist_append(FileTypeGroups, &binaryFileTypes);
+
+  return(FileTypeGroups);
+}
+
+/*----------------------------------------------------------------------
+  Initialize and populate in an InputDescription:  work out the
+    mode of the data, the fully expanded name of the file, the
+    base name, the name of its directory, ...
+----------------------------------------------------------------------*/
 
 InputDescription*
-fileset_generate(const char *fileName, DataMode guess)
+fileset_generate(const gchar *fileName, DataMode guess)
 {
   InputDescription *desc = (InputDescription *)
     calloc(1, sizeof(InputDescription));
@@ -91,7 +126,7 @@ fileset_generate(const char *fileName, DataMode guess)
     numGroups = g_slist_length(groups);
     if(guess == unknown_data) {
       for(i = 0; i < numGroups ; i++) {
-        char buf[1000];
+        gchar buf[1000];
         ExtensionList *group;
         group = (ExtensionList *) g_slist_nth_data(groups, i);
         for(j = 0; j < group->len; j++) {
@@ -122,7 +157,7 @@ fileset_generate(const char *fileName, DataMode guess)
           continue;
 
         for(j = 0; j < group->len; j++) {
-          char buf[1000];
+          gchar buf[1000];
           if(endsWith(fileName, group->extensions[j])) {
             g_printerr("%s does not exist!\n", fileName);
             return(NULL);
@@ -174,6 +209,25 @@ fileset_generate(const char *fileName, DataMode guess)
   return(desc);
 }
 
+gint
+addInputSuffix(InputDescription *desc, const gchar *suffix)
+{
+  if(desc->extensions) {
+    g_slist_append(desc->extensions, g_strdup(suffix));
+  } else {
+    desc->extensions = g_slist_alloc();
+    desc->extensions->data = g_strdup(suffix);
+  }
+
+  return(g_slist_length(desc->extensions));
+}
+
+gint 
+addInputFile(InputDescription *desc, const gchar *file) 
+{
+  return(addInputSuffix(desc, file));  
+}
+
 gchar *
 completeFileDesc(const gchar *fileName, InputDescription *desc)
 {
@@ -201,7 +255,6 @@ completeFileDesc(const gchar *fileName, InputDescription *desc)
     }
   }
 
-
 #if 0
   if(tmp) {
     desc->givenExtension = g_strdup(tmp+1);
@@ -226,8 +279,77 @@ completeFileDesc(const gchar *fileName, InputDescription *desc)
   return(tmp);
 }
 
+ExtensionList *
+getInputDescriptionGroup(DataMode mode)
+{
+  GSList *groups = FileTypeGroups;
+  ExtensionList *el;
+  while(groups) {
+    el = (ExtensionList *) groups->data;
+    if(el == NULL)
+      return(NULL);
+
+    if(el->mode == mode)
+      return(el);
+
+    groups = groups->next;
+  }
+
+  return(NULL);
+}
+
+void
+showInputDescription(InputDescription *desc, ggobid *gg)
+{
+  FILE *out = stderr;
+  gint i;
+  fprintf(out, "Input File Information:\n");
+  fprintf(out, "\tFile name: %s  (extension: %s)\n",
+    desc->fileName, desc->givenExtension);
+  fprintf(out, "\tDirectory: %s\n", desc->dirName);
+  fprintf(out, "\tFormat: %s (%d), verified: %s\n",
+    GGOBI(getDataModeDescription)(desc->mode), desc->mode, 
+                                               desc->canVerify ? "yes" : "no");
+
+  if(desc->extensions) {
+    fprintf(out, "Auxillary files\n");
+    for(i= 0; i < g_slist_length(desc->extensions) ; i++) {
+      fprintf(out, "  %d) %s\n",
+        i, (gchar *) g_slist_nth_data(desc->extensions, i));
+    }
+  }
+  fflush(out);
+}
+
+/*--------------------------------------------------------------------*/
+/*          Determining the mode of the data                          */
+/*--------------------------------------------------------------------*/
+
+gboolean
+isURL(const gchar *fileName)
+{
+  return((strncmp(fileName, "http:", 5) == 0 ||
+          strncmp(fileName, "ftp:", 4) == 0));
+}
+
+gboolean
+isASCIIFile(const gchar *fileName)
+{
+  FILE * f;
+  gdouble val;
+  f = fopen(fileName,"r");
+  if(f == NULL)
+    return(false);
+
+  if(fscanf(f, "%lf", &val) == 0) {
+    return(false);
+  } 
+
+  return(true);
+}
+
 DataMode
-verifyDataMode(const char *fileName, DataMode mode, InputDescription *desc)
+verifyDataMode(const gchar *fileName, DataMode mode, InputDescription *desc)
 {
   switch (mode) {
 #ifdef USE_XML
@@ -248,8 +370,46 @@ verifyDataMode(const char *fileName, DataMode mode, InputDescription *desc)
   return(mode);
 }
 
+#ifdef USE_XML
+gboolean
+isXMLFile(const gchar *fileName, InputDescription *desc)
+{
+  FILE * f;
+  gint c;
+
+  gchar *tmp = strrchr(fileName, '.');
+  if(tmp && (strcmp(tmp, ".xmlz") == 0 || strcmp(tmp, ".gz") == 0 )) {
+    desc->canVerify = false;
+    return(true);
+  }
+
+
+  f = fopen(fileName,"r");
+  if(f == NULL)
+    return(false);
+
+  desc->canVerify = true;
+  while((c = getc(f)) != EOF) {
+    if(c == ' ' || c == '\t' || c== '\n')
+      continue;
+    if(c == '<') {
+      gchar buf[10];
+      fgets(buf, 5, f);
+      fclose(f);
+      if(strcmp(buf,"?xml") == 0) {
+        return(true);
+      } else
+        return(false);
+    }
+  }
+
+  return(false);
+}
+#endif
+
+
 DataMode
-guessDataMode(const char *fileName, InputDescription *desc)
+guessDataMode(const gchar *fileName, InputDescription *desc)
 {
   FILE * f;
 
@@ -268,205 +428,30 @@ guessDataMode(const char *fileName, InputDescription *desc)
   return(unknown_data);
 }
 
-#ifdef USE_XML
-gboolean
-isXMLFile(const char *fileName, InputDescription *desc)
-{
-  FILE * f;
-  gint c;
-
-  char *tmp = strrchr(fileName, '.');
-  if(tmp && (strcmp(tmp, ".xmlz") == 0 || strcmp(tmp, ".gz") == 0 )) {
-    desc->canVerify = false;
-    return(true);
-  }
-
-
-  f = fopen(fileName,"r");
-  if(f == NULL)
-    return(false);
-
-  desc->canVerify = true;
-  while((c = getc(f)) != EOF) {
-    if(c == ' ' || c == '\t' || c== '\n')
-      continue;
-    if(c == '<') {
-      char buf[10];
-      fgets(buf, 5, f);
-      fclose(f);
-      if(strcmp(buf,"?xml") == 0) {
-        return(true);
-      } else
-        return(false);
-    }
-  }
-
-  return(false);
-}
-#endif
+/*--------------------------------------------------------------------*/
+/*                 Utility functions                                  */
+/*--------------------------------------------------------------------*/
 
 gboolean
-isASCIIFile(const char *fileName)
+endsWith(const gchar *str, const gchar *what)
 {
-  FILE * f;
-  double val;
-  f = fopen(fileName,"r");
-  if(f == NULL)
-    return(false);
-
-  if(fscanf(f, "%lf", &val) == 0) {
-    return(false);
-  } 
-
-  return(true);
+  return(strcmp(str+ strlen(str) - strlen(what), what) == 0);  
 }
+
 
 #ifdef WIN32
 gboolean
-check_file_exists(const char *fileName)
+check_file_exists(const gchar *fileName)
 {
   gint i=0;
   return (access(fileName, i) == 0);
 }
 #else
 gboolean
-check_file_exists(const char *fileName)
+check_file_exists(const gchar *fileName)
 {
   struct stat buf;
   return (stat(fileName, &buf) == 0);
 }
 #endif
 
-GSList *
-initFileTypeGroups(void)
-{
-  FileTypeGroups = g_slist_alloc();
-
-#ifdef USE_XML
-  xmlFileTypes.extensions = XMLSuffixes;
-  xmlFileTypes.len = 3;
-#endif
-
-  asciiFileTypes.extensions = ASCIISuffixes;
-  asciiFileTypes.len = 1;
-
-
-  binaryFileTypes.extensions = BinarySuffixes;
-  binaryFileTypes.len = 1;
-
-#ifdef USE_XML
-  FileTypeGroups->data = (void *)&xmlFileTypes;
-  g_slist_append(FileTypeGroups, &asciiFileTypes);
-#else
-  FileTypeGroups->data = (void *)&asciiFileTypes;
-#endif
-
-  g_slist_append(FileTypeGroups, &binaryFileTypes);
-
-  return(FileTypeGroups);
-}
-
-
-ExtensionList *
-getInputDescriptionGroup(DataMode mode)
-{
-  GSList *groups = FileTypeGroups;
-  ExtensionList *el;
-  while(groups) {
-    el = (ExtensionList *) groups->data;
-    if(el == NULL)
-      return(NULL);
-
-    if(el->mode == mode)
-      return(el);
-
-    groups = groups->next;
-  }
-
-  return(NULL);
-}
-
-
-gboolean
-endsWith(const char *str, const char *what)
-{
-  return(strcmp(str+ strlen(str) - strlen(what), what) == 0);  
-}
-
-
-void
-showInputDescription(InputDescription *desc, ggobid *gg)
-{
-  FILE *out = stderr;
-  int i;
-  fprintf(out, "Input File Information:\n");
-  fprintf(out, "\tFile name: %s  (extension: %s)\n",
-    desc->fileName, desc->givenExtension);
-  fprintf(out, "\tDirectory: %s\n", desc->dirName);
-  fprintf(out, "\tFormat: %s (%d), verified: %s\n",
-    GGOBI(getDataModeDescription)(desc->mode), desc->mode, 
-                                               desc->canVerify ? "yes" : "no");
-
-  if(desc->extensions) {
-    fprintf(out, "Auxillary files\n");
-    for(i= 0; i < g_slist_length(desc->extensions) ; i++) {
-      fprintf(out, "  %d) %s\n",
-        i, (gchar *) g_slist_nth_data(desc->extensions, i));
-    }
-  }
-  fflush(out);
-}
-
-
-gchar *
-findAssociatedFile(InputDescription *desc, const gchar * const *extensions, int numExtensions, gint *which, gboolean isError)
-{
-  int i;
-  char buf[100];
-
-  if(desc->fileName == NULL || desc->fileName[0] == '\0' || strcmp (desc->fileName, "stdin") == 0) {
-    return(NULL);
-  }  
-
-  for(i = 0; i < numExtensions; i++) {
-    if(extensions[i] && extensions[i][0])
-      sprintf(buf, "%s.%s", desc->baseName, extensions[i]);
-    else
-      sprintf(buf, "%s", desc->baseName);
-
-    if(check_file_exists(buf)) {
-      if(which)
-        *which = i;
-      return(g_strdup(buf));
-    }
-  }
-
-  return(NULL);
-}
-
-
-int
-addInputSuffix(InputDescription *desc, const gchar *suffix)
-{
-  if(desc->extensions) {
-    g_slist_append(desc->extensions, g_strdup(suffix));
-  } else {
-    desc->extensions = g_slist_alloc();
-    desc->extensions->data = g_strdup(suffix);
-  }
-
-  return(g_slist_length(desc->extensions));
-}
-
-int 
-addInputFile(InputDescription *desc, const gchar *file) 
-{
-  return(addInputSuffix(desc, file));  
-}
-
-
-gboolean
-isURL(const gchar *fileName)
-{
- return((strncmp(fileName, "http:", 5) == 0 || strncmp(fileName, "ftp:", 4) == 0));
-}

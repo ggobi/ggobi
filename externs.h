@@ -229,7 +229,6 @@ void movepts_history_delete_last (datad *, ggobid *);
 gdouble myrint (gdouble x);
 void newvar_add (gint vtype, gchar *vname, datad *, ggobid *);
 void newvar_add_with_values (gdouble *, gint, gchar *, datad *, ggobid *);
-FILE* open_ggobi_file_r (gchar *, gint, gchar **, gboolean);
 gint option_menu_index (GtkOptionMenu *);
 void p1d_event_handlers_toggle (splotd *, gboolean);
 void p1d_reproject (splotd *, glong **, datad *, ggobid *);
@@ -276,6 +275,7 @@ gboolean rowlabels_read (InputDescription *desc, gboolean, datad *, ggobid *);
 void rows_in_plot_set (datad *d, ggobid *);
 void ruler_ranges_set (gboolean force, displayd *, splotd *, ggobid *);
 void scale_event_handlers_toggle (splotd *, gboolean);
+void scale_set_default_values (GtkScale *scale);
 void scaling_visual_cues_draw (splotd *, GdkDrawable *, ggobid *);
 void scatmat_cpanel_init (cpaneld *, ggobid *);
 void scatmat_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
@@ -448,7 +448,6 @@ void xyplot_event_handlers_toggle (splotd *, gboolean);
 gboolean xyplot_varsel (splotd *, gint, gint *, gint);
 void zoom_by_drag (splotd *, ggobid *);
 void zoom_step (splotd *, gint, gint, rectd *, ggobid*);
-void scale_set_default_values (GtkScale *scale);
 
 /*tsplot functions*/
 extern void cpanel_tsplot_init (cpaneld *, ggobid *);

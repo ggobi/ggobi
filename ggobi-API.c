@@ -56,9 +56,9 @@ GGOBI(getFileName) (ggobid *gg)
 const gchar *
 GGOBI(setFileName) (const gchar *fileName, DataMode data_mode, ggobid *gg)
 {
- const gchar *old = g_strdup(GGOBI(getFileName)(gg));
- fileset_read_init(fileName, data_mode, gg);
- return(old);
+  const gchar *old = g_strdup(GGOBI(getFileName)(gg));
+  fileset_read_init(fileName, data_mode, gg);
+  return(old);
 }
 
 
@@ -80,17 +80,17 @@ GGOBI(setDataMode) (DataMode newMode, ggobid *gg)
 const gchar * const 
 GGOBI(getDataModeDescription)(DataMode mode)
 {
- extern const gchar * const DataModeNames[];
- return(DataModeNames[mode]);
+  extern const gchar * const DataModeNames[];
+  return(DataModeNames[mode]);
 }
 
 const gchar *const *
 GGOBI(getDataModeNames)(int *n)
 {
- extern const gchar * const DataModeNames[];
- if(n)
-  *n = num_data_modes;
- return(DataModeNames);
+  extern const gchar * const DataModeNames[];
+  if(n)
+    *n = num_data_modes;
+  return(DataModeNames);
 }
 
 
@@ -116,7 +116,6 @@ void
 GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed,
   datad *d, ggobid *gg)
 {
-
   if (!transformed)
     g_free (d->vartable[jvar].collab);
   g_free (d->vartable[jvar].collab_tform);
@@ -129,7 +128,7 @@ GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed,
     d->vartable[jvar].collab_tform = g_strdup(name);
     gtk_object_set (GTK_OBJECT(checkbox_get_nth (jvar, d)),
       "label", name, NULL);
-   }
+  }
 }
 
 
@@ -160,7 +159,8 @@ GGOBI(destroyCurrentDisplay)(ggobid *gg)
 /*-- need two of these now, one to replace and one to append --*/
 void
 GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
-  gint nr, gint nc, datad *d, gboolean cleanup, ggobid *gg, InputDescription *desc)
+  gint nr, gint nc, datad *d, gboolean cleanup, ggobid *gg,
+  InputDescription *desc)
 {
   gint i, j;
   gchar *lbl;
@@ -199,17 +199,17 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   hidden_alloc (d);
 
   for (j = 0; j < nc ; j++) {
-   d->vartable[j].collab = g_strdup(colnames[j]);
-   d->vartable[j].collab_tform = g_strdup(colnames[j]);
-   for (i = 0; i < nr ; i++) {
-     if (j == 0) {
-       lbl = g_strdup (rownames[i]);
-       g_array_append_val (d->rowlab, lbl);
-       g_free (lbl);
-     }
+    d->vartable[j].collab = g_strdup(colnames[j]);
+    d->vartable[j].collab_tform = g_strdup(colnames[j]);
+    for (i = 0; i < nr ; i++) {
+      if (j == 0) {
+        lbl = g_strdup (rownames[i]);
+        g_array_append_val (d->rowlab, lbl);
+        g_free (lbl);
+      }
 
-     d->raw.vals[i][j] = values[i + j*nr];
-   }
+      d->raw.vals[i][j] = values[i + j*nr];
+    }
   }
 
 
@@ -218,9 +218,9 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
       /* Have to patch up the displays list since we removed
          every entry and that makes for meaningless entries.
        */
-     gg->displays->next = NULL;
+    gg->displays->next = NULL;
 
-     display_menu_build (gg);
+    display_menu_build (gg);
   }
 }
 
@@ -230,40 +230,40 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
 void
 GGOBI(displays_release)(ggobid *gg)
 {
- GList *dlist;
- displayd *display;
+  GList *dlist;
+  displayd *display;
 
- /* We have to be careful here as we are removing all the elements
-    of the singly-linked list. When we remove the last one,
-    the ->next value of the dlist becomes non-NULL. Hence
-    we are getting garbage. Accordingly, we count down from the total
-    number to remove using num and when this is 0, we exit.
-    This should leave the slist allocated, but empty.
+  /* We have to be careful here as we are removing all the elements
+     of the singly-linked list. When we remove the last one,
+     the ->next value of the dlist becomes non-NULL. Hence
+     we are getting garbage. Accordingly, we count down from the total
+     number to remove using num and when this is 0, we exit.
+     This should leave the slist allocated, but empty.
 
-    We have to patch the list up afterwards.
+     We have to patch the list up afterwards.
   */
- int num = g_list_length(gg->displays);
+  gint num = g_list_length(gg->displays);
 
- for(dlist = gg->displays; dlist != NULL; dlist = dlist->next, num--) {
-  if(num == 0)
-   break;
-  display = (displayd *) dlist->data;
-  /*  display_release(display, gg); */
-  display_free(display, true, gg);
- }
+  for(dlist = gg->displays; dlist != NULL; dlist = dlist->next, num--) {
+    if(num == 0)
+      break;
+    display = (displayd *) dlist->data;
+    /*  display_release(display, gg); */
+    display_free(display, true, gg);
+  }
 }
 
 void
 GGOBI(display_release)(displayd *display, ggobid *gg)
 {
-   display_free(display, true, gg);
+  display_free(display, true, gg);
 }
 
 
 void
 GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg)
 {
- splot_free(sp, display, gg);
+  splot_free(sp, display, gg);
 }
 
 /* Not in the API for the moment. A "protected" routine. */
@@ -272,7 +272,7 @@ GGOBI(data_release)(datad *d, ggobid *gg)
 {
   if(d == NULL)
     return;
- if (d->rowlab) {
+  if (d->rowlab) {
     rowlabels_free (d, gg);
     d->rowlab = NULL;
   }
@@ -283,7 +283,7 @@ GGOBI(data_release)(datad *d, ggobid *gg)
 void
 GGOBI(vartable_free)(datad *d, ggobid *gg)
 {
- int i;
+  gint i;
 
   for(i = 0; i < d->ncols ; i++) {
     GGOBI(vardatum_free)(d->vartable+i, gg);
@@ -295,18 +295,18 @@ GGOBI(vartable_free)(datad *d, ggobid *gg)
 void 
 GGOBI(vardatum_free)(vartabled *var, ggobid *gg)
 {
- if (var->collab)
-  g_free (var->collab);
- if (var->collab_tform)
-  g_free (var->collab_tform);
+  if (var->collab)
+    g_free (var->collab);
+  if (var->collab_tform)
+    g_free (var->collab_tform);
 }
 
 
 const gchar * const*
 GGOBI(getViewTypes)(int *n)
 {
- *n = NDISPLAYTYPES;
- return (ViewTypes);
+  *n = NDISPLAYTYPES;
+  return (ViewTypes);
 }
 
 const gint *
@@ -321,19 +321,19 @@ GGOBI(getViewTypeIndices)(gint *n)
 displayd *
 GGOBI(newScatterplot) (gint ix, gint iy, datad *d, ggobid *gg)
 {
- displayd *display = NULL;
- splotd* sp;
+  displayd *display = NULL;
+  splotd* sp;
 
- display = display_alloc_init (scatterplot, false, d, gg);
- sp = splot_new (display, 400, 400, gg);
+  display = display_alloc_init (scatterplot, false, d, gg);
+  sp = splot_new (display, 400, 400, gg);
 
- sp->xyvars.x = ix;
- sp->xyvars.y = iy;
+  sp->xyvars.x = ix;
+  sp->xyvars.y = iy;
 
- display = scatterplot_new (false, sp, d, gg);
- display_add (display, gg);
+  display = scatterplot_new (false, sp, d, gg);
+  display_add (display, gg);
 
- return (display);
+  return (display);
 }
 
 displayd *
@@ -363,46 +363,46 @@ GGOBI(newParCoords)(gint *vars, gint numVars, datad *d, ggobid *gg)
 displayd * 
 GGOBI(newTimeSeries)(gint *yvars, gint numVars, datad *d, ggobid *gg) 
 { 
- displayd *display = NULL; 
+  displayd *display = NULL; 
  
- display = display_alloc_init (tsplot, false, d, gg); 
- display = tsplot_new (false, numVars, yvars, d, gg); 
- display_add (display, gg); 
+  display = display_alloc_init (tsplot, false, d, gg); 
+  display = tsplot_new (false, numVars, yvars, d, gg); 
+  display_add (display, gg); 
  
- return (display);
+  return (display);
 } 
 
 displayd* 
 GGOBI(createPlot)(int type, char **varnames)
 {
- displayd *display = NULL;
- /*
-   display_new(type);
- */
- return(display);
+  displayd *display = NULL;
+  /*
+    display_new(type);
+  */
+  return(display);
 }
 
 
 const gchar* 
 GGOBI(getCurrentDisplayType)(ggobid *gg)
 {
- return(GGOBI(getViewTypeName)(gg->current_display->displaytype));
+  return(GGOBI(getViewTypeName)(gg->current_display->displaytype));
 }
 
 const gchar *
 GGOBI(getViewTypeName)(enum displaytyped type)
 {
- gint n, i;
- const gint *types = GGOBI(getViewTypeIndices)(&n);
- const gchar * const *names = GGOBI(getViewTypes)(&n);
+  gint n, i;
+  const gint *types = GGOBI(getViewTypeIndices)(&n);
+  const gchar * const *names = GGOBI(getViewTypes)(&n);
 
- for (i = 0; i < n; i++) {
-   if (types[i] == type) {
-    return (names[i]);
-   }
- }
+  for (i = 0; i < n; i++) {
+    if (types[i] == type) {
+      return (names[i]);
+    }
+  }
 
- return (NULL);
+  return (NULL);
 }
 
 

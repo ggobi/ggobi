@@ -557,7 +557,9 @@ static GtkItemFactoryEntry menu_items[] = {
        NULL,
        (GtkItemFactoryCallback) splash_show,
        0 },
+/*
   { "/Help/About help ...",  NULL, NULL, 0, NULL },
+*/
 
 #ifdef SUPPORT_PLUGINS
   { "/Help/About plugins ...",
@@ -712,17 +714,17 @@ load_previous_file(GtkWidget *w, gpointer cbd)
   GGobiDescription *gdesc;
   ggobid *gg;
 
-   gg = GGobiFromWidget(w, false);
-   gdesc = (GGobiDescription*) cbd;
-   desc =  &(gdesc->input);
+  gg = GGobiFromWidget(w, false);
+  gdesc = (GGobiDescription*) cbd;
+  desc =  &(gdesc->input);
 
-   if(g_slist_length(gg->d) > 0)
-      create_ggobi(desc);
-   else {
-      read_input(desc, gg);
-       /* Need to avoid the initial scatterplot. */
-      start_ggobi(gg, true, gdesc->displays == NULL);
-   }
+  if(g_slist_length(gg->d) > 0)
+    create_ggobi(desc);
+  else {
+    read_input(desc, gg);
+    /* Need to avoid the initial scatterplot. */
+    start_ggobi(gg, true, gdesc->displays == NULL);
+  }
 
 
   if (gdesc->displays) {
@@ -796,5 +798,5 @@ store_session(ggobid *gg, gint action, GtkWidget *w)
 void
 create_new_ggobi(ggobid *gg, gint action, GtkWidget *w)
 {
-    create_ggobi(NULL);
+  create_ggobi(NULL);
 }

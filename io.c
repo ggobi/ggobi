@@ -1,4 +1,5 @@
-/* io.c -- routines that are used in both reading and writing */
+/*-- io.c -- routines that support the file io user interface --*/
+/*--         (should be called fileio_ui.c)                   --*/
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
@@ -44,12 +45,12 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
       if (fileset_read_init (fname, unknown_data, gg)) 
         /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
-      break;
+    break;
     case EXTEND_FILESET:  /*-- not yet enabled --*/
-      break;
+    break;
     case WRITE_FILESET:
       switch (gg->save.format) {
-        case XMLDATA:
+      case XMLDATA:
 #ifdef USE_XML
          {
            XmlWriteInfo info;
@@ -66,7 +67,7 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
           g_free (filename);
 	 }
 #endif
-          break;
+        break;
         case ASCIIDATA:
         {
           datad *d = NULL;
@@ -94,12 +95,12 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 
 
           g_free (filename);
-          break;
+        break;
         }
         case BINARYDATA:  /*-- not yet implemented --*/
-          break;
+        break;
         case MYSQL_DATA:  /*-- never will be implemented --*/
-          break;
+        break;
       }
       break;
   }
@@ -123,7 +124,7 @@ filename_get_configure (GtkWidget *fs, guint type, ggobid *gg) {
                              (GtkObject*) fs);
 
   gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION(fs)->cancel_button),
-                             "clicked", (GtkSignalFunc) GTK_SIGNAL_FUNC (gtk_widget_destroy),
+                             "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
                              (GtkObject*) fs);
 }
 
@@ -140,74 +141,6 @@ filename_get_r (ggobid *gg, guint action, GtkWidget *w)
   filename_get_configure (fs, READ_FILESET, gg);
 
   gtk_widget_show (fs);
-}
-
-/*
- * Open a file for reading
-*/
-FILE *open_file_r (gchar *f, gchar *suffix)
-{
-  FILE *fp = NULL;
-  gchar *fname;
-
-  fname = g_strdup_printf ("%s%s", f, suffix);
-
-#ifndef WIN32
-  if (access (fname, R_OK) == 0)
-#endif
-    fp = fopen (fname, "r");
-
-  if (fp != NULL) {
-    /*
-     * Make sure it isn't an empty file -- get a single character
-    */
-    gint ch;
-    ch = getc (fp);
-    if (ch == EOF) {
-      g_printerr ("%s is an empty file!\n", fname);
-      fclose (fp);
-      fp = NULL;
-    } else ungetc (ch, fp);
-  }
-
-  g_free (fname);
-  return fp;
-}
-
-FILE *open_ggobi_file_r (gchar *fname, gint nsuffixes, gchar **suffixes,
-  gboolean optional)
-{
-  FILE *fp = NULL;
-  gint n;
-
-  if (nsuffixes == 0)
-    fp = open_file_r (fname, "");
-
-  else {
-    for (n=0; n<nsuffixes; n++) {
-      if ((fp = open_file_r (fname, suffixes[n])) != NULL)
-        break;
-    }
-  }
-
-  if (fp == NULL && !optional) {
-    GString *gstr = g_string_new ("Unable to open ");
-    if (nsuffixes > 0) {
-      for (n=0; n<nsuffixes; n++) {
-        if (n < nsuffixes-1)
-          g_string_sprintfa (gstr, " %s%s or", fname, suffixes[n]);
-        else
-          g_string_sprintfa (gstr, " %s%s", fname, suffixes[n]);
-      }
-
-    } else 
-      g_string_sprintfa (gstr, "%s", fname);
-
-    g_printerr ("%s\n", gstr->str);
-    g_string_free (gstr, true);
-  }
-
-  return fp;
 }
 
 /*--------------------------------------------------------------------------*/

@@ -54,13 +54,13 @@ void modes_init (datad *d, ggobid* gg) {
 gboolean
 fileset_read_init (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
 {
-  int howMany;
+  gint howMany;
   gboolean ans;
   howMany = g_slist_length(gg->d);
   ans = fileset_read (ldata_in, data_mode, gg);
   if (ans) {
     datad *d;
-    int n, i;
+    gint n, i;
     /* Loop over the newly added datad elements
        and update them.
      */
@@ -113,21 +113,21 @@ read_input(InputDescription *desc, ggobid *gg)
     case xml_data:
     case url_data:
 #ifdef USE_XML
-     ok = data_xml_read (desc, gg);
+      ok = data_xml_read (desc, gg);
 #else
-    g_printerr("No support for reading XML\n");
+      g_printerr("No support for reading XML\n");
 #endif
     break;
 
     case mysql_data:
 #ifdef USE_MYSQL
-    {
+      {
       extern MySQLLoginInfo DefaultMySQLInfo;
       getDefaultValuesFromFile(ldata_in);
       ok = read_mysql_data(&DefaultMySQLInfo, FALSE, gg);
-    }
+      }
 #else
-    g_printerr("No support for reading MySQL\n");
+      g_printerr("No support for reading MySQL\n");
 #endif
     break;
 
@@ -141,9 +141,9 @@ read_input(InputDescription *desc, ggobid *gg)
     case ascii_data:
       ok = read_ascii_data(desc, gg);
     break;
-   default:
-     g_printerr("Unknown data type in fileset_read\n");
-     break;
+    default:
+      g_printerr("Unknown data type in fileset_read\n");
+    break;
   }
 
   if(ok && sessionOptions->verbose) {
@@ -195,7 +195,7 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
   gboolean init_data = false;
   extern void wvis_init (ggobid *gg);
 
-     /*-- some initializations --*/
+  /*-- some initializations --*/
   gg->displays = NULL;
   
   globals_init (gg); /*-- variables that don't depend on the data --*/
