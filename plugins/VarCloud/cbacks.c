@@ -28,19 +28,27 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   static gchar *clab[] = {"D_ij", "diff_ij", "i", "j"};
   InputDescription *desc = NULL;
   gdouble *values;
-  datad *dsrc = vcl->dsrc, *e, *dnew;
+  datad *d = vcl->dsrc, *e, *dnew;
+  gint var1 = vcl->var1, var2 = vcl->var2;
   gdouble xci, xcj, yci, ycj;
   gchar *lbl;
 
-  if (dsrc->nrows <= 1)
+  /*
+     If vcl->var1 == vcl->var2, this is a one-variable variogram cloud
+     plot.  Otherwise, it's a cross-variogram cloud plot. ... Or
+     perhaps we'll end up redesigning the interface to be more
+     specific -- separate buttons might be nice.
+  */
+
+  if (d->nrows <= 1)
     return;
 
-  /* lower triangle only */
-  npairs = dsrc->nrows_in_plot*(dsrc->nrows_in_plot-1)/2;  
+  /* upper and lower triangle -- but skip the diagonal for now */
+  npairs = d->nrows_in_plot*(d->nrows_in_plot-1);  
  
   /* Step 1: if necessary, add record ids to the original datad */
   /*    Keep it simple: use row numbers */
-  datad_record_ids_set(dsrc, NULL, false);
+  datad_record_ids_set(d, NULL, false);
 
   /* Step 2: if necessary, add an edge set for the complete graph.
       Call it 'allpairs'; it has no variables for now.
@@ -55,11 +63,13 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   rowlabels_alloc(e);
 
   k = 0;
-  for (i=0; i<dsrc->nrows_in_plot-1; i++)
-    for (j=i+1; j<dsrc->nrows_in_plot; j++) {
+  for (i=0; i<d->nrows_in_plot; i++)
+    for (j=0; j<d->nrows_in_plot; j++) {
+      if (i == j) 
+        continue;
       lbl = g_strdup_printf ("%d,%d", 
-        dsrc->rows_in_plot.els[i], 
-        dsrc->rows_in_plot.els[j]);
+        d->rows_in_plot.els[i], 
+        d->rows_in_plot.els[j]);
       recordids[k++] = lbl;
       g_array_append_val(e->rowlab, lbl);
     }
@@ -72,12 +82,14 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
      g_malloc(sizeof(SymbolicEndpoints) * e->edge.n);
 
   k = 0;
-  for (i=0; i<dsrc->nrows_in_plot-1; i++) {
-    for (j=i+1; j<dsrc->nrows_in_plot; j++) {
-      ii = dsrc->rows_in_plot.els[i];
-      jj = dsrc->rows_in_plot.els[j];
-      e->edge.sym_endpoints[k].a = dsrc->rowIds[ii];
-      e->edge.sym_endpoints[k].b = dsrc->rowIds[jj];
+  for (i=0; i<d->nrows_in_plot; i++) {
+    for (j=0; j<d->nrows_in_plot; j++) {
+      if (i == j)
+        continue;
+      ii = d->rows_in_plot.els[i];
+      jj = d->rows_in_plot.els[j];
+      e->edge.sym_endpoints[k].a = d->rowIds[ii];
+      e->edge.sym_endpoints[k].b = d->rowIds[jj];
       e->edge.sym_endpoints[k].jpartner = -1;
       k++;
     }
@@ -105,28 +117,31 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
     colnames[j] = g_strdup (clab[j]);
 
   n = 0;
-  for (i = 0; i<dsrc->nrows_in_plot-1; i++) {
-    for (j = i+1; j<dsrc->nrows_in_plot; j++) {
+  for (i = 0; i<d->nrows_in_plot; i++) {
+    for (j = 0; j<d->nrows_in_plot; j++) {
+      if (i == j)
+        continue;
       if (n == npairs) {
         g_printerr ("too many distances: n %d nr %d\n", n, npairs);
         break;
       }
+
       /* Verify that each of these indices points to something real */
-      ii = dsrc->rows_in_plot.els[i];
-      jj = dsrc->rows_in_plot.els[j];
-      xci = dsrc->tform.vals[ii][vcl->xcoord];
-      yci = dsrc->tform.vals[ii][vcl->ycoord];
-      xcj = dsrc->tform.vals[jj][vcl->xcoord];
-      ycj = dsrc->tform.vals[jj][vcl->ycoord];
+      ii = d->rows_in_plot.els[i];
+      jj = d->rows_in_plot.els[j];
+      xci = d->tform.vals[ii][vcl->xcoord];
+      yci = d->tform.vals[ii][vcl->ycoord];
+      xcj = d->tform.vals[jj][vcl->xcoord];
+      ycj = d->tform.vals[jj][vcl->ycoord];
       values[n + 0*npairs] = sqrt((xci-xcj)*(xci-xcj) + (yci-ycj)*(yci-ycj));
-      values[n + 1*npairs] = sqrt(fabs((gdouble)(dsrc->tform.vals[ii][vcl->var1] - 
-						 dsrc->tform.vals[jj][vcl->var1])));
+      values[n + 1*npairs] = sqrt(fabs((gdouble)(d->tform.vals[ii][var1] - 
+						 d->tform.vals[jj][var2])));
       values[n + 2*npairs] = (gdouble) ii;
       values[n + 3*npairs] = (gdouble) jj;
 
       rownames[n] = g_strdup_printf ("%s,%s",
-        (gchar *) g_array_index (dsrc->rowlab, gchar *, ii),
-        (gchar *) g_array_index (dsrc->rowlab, gchar *, jj));
+        (gchar *) g_array_index (d->rowlab, gchar *, ii),
+        (gchar *) g_array_index (d->rowlab, gchar *, jj));
 
       n++;
     }
