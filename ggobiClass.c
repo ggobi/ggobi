@@ -561,8 +561,6 @@ GtkType gtk_ggobi_time_series_display_get_type(void)
 
 /***********************************************************************/
 
-#ifdef BARCHART_IMPLEMENTED
-
 static void barchartDisplayInit(barchartDisplayd * dpy)
 {
    dpy->extendedDpy.titleLabel = NULL;
@@ -638,8 +636,6 @@ GtkType gtk_ggobi_barchart_splot_get_type(void)
 
   return data_type;
 }
-
-#endif                          /* BARCHART_IMPLEMENTED */
 
 
 #if 0

@@ -1,5 +1,3 @@
-#ifdef BARCHART_IMPLEMENTED
-
 #include "ggobi.h"
 #include "barchartDisplay.h"
 
@@ -371,5 +369,3 @@ void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass * klass)
 
   klass->extendedSPlotClass.plotted_vars_get = splot1DVariablesGet;
 }
-
-#endif                          /* BARCHART_IMPLEMENTED */

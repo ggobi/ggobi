@@ -6,6 +6,8 @@
 #include "defines.h"
 #endif
 
+#include "barchartDisplay.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -636,8 +638,6 @@ gint      ggobi_remove (ggobid *);
 void      subset_init (datad *d, ggobid *gg);
 
 
-#ifdef BARCHART_IMPLEMENTED
-#include "barchartDisplay.h"
 
 void barchart_scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg);
 gboolean barchart_active_paint_points (splotd *sp, datad *d); 
@@ -706,6 +706,3 @@ void ggobiInit(int *argc, char **argv[]);
 
 GGobiPluginInfo *readPluginFile(const char * const fileName, GGobiInitInfo *info);
 gboolean registerPlugin(ggobid *gg, GGobiPluginInfo *plugin);
-
-#endif
-

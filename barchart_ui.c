@@ -1,5 +1,4 @@
 /* barchart_ui.c */
-#ifdef BARCHART_IMPLEMENTED
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
@@ -422,6 +421,7 @@ void barchart_event_handlers_toggle(splotd * sp, gboolean state)
 {
   displayd *display = (displayd *) sp->displayptr;
 
+
   if (!GTK_IS_GGOBI_WINDOW_DISPLAY(display))
     return;
 
@@ -469,5 +469,3 @@ void barchart_scale_event_handlers_toggle(splotd * sp, gboolean state)
     disconnect_button_release_signal(sp);
   }
 }
-
-#endif

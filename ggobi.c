@@ -57,10 +57,8 @@ const GtkTypeLoad typeLoaders[] = {
                                	   gtk_ggobi_scatterplot_display_get_type,
                                	   gtk_ggobi_scatmat_display_get_type,
                                	   gtk_ggobi_par_coords_display_get_type,
-				   gtk_ggobi_time_series_display_get_type,
-#ifdef BARCHART_IMPLEMENTED
+                                   gtk_ggobi_time_series_display_get_type,
                                    gtk_ggobi_barchart_display_get_type
-#endif
                                   };
 
 const gchar * const ViewTypes[] =

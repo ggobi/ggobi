@@ -9,8 +9,6 @@
     it without violating AT&T's intellectual property rights.
 */
 
-#ifdef BARCHART_IMPLEMENTED
-
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -1654,5 +1652,3 @@ void barchart_cpanel_init(cpaneld * cpanel, ggobid * gg)
   cpanel_brush_init(cpanel, gg);
   cpanel_identify_init(cpanel, gg);
 }
-
-#endif
