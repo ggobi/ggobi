@@ -57,20 +57,15 @@ extern const gint ViewTypeIndeces[3];
 #define DOPT_EDGES_A   2
 #define DOPT_EDGES_D   3
 #define DOPT_WHISKERS  4
-#define DOPT_MISSINGS  5
-#define DOPT_GRIDLINES 6
-#define DOPT_AXES      7
-#define DOPT_AXESLAB   8
+#define DOPT_GRIDLINES 5
+#define DOPT_AXES      6
+#define DOPT_AXESLAB   7
 /* unused
+#define DOPT_MISSINGS  5
 #define DOPT_AXES_C    9
 #define DOPT_BUFFER   10
 #define DOPT_LINK     11
 */
-
-/*-- redisplay options --*/
-#define REDISPLAY_ALL     0
-#define REDISPLAY_MISSING 1
-#define REDISPLAY_PRESENT 2
 
 /* modes */
 

@@ -68,9 +68,7 @@ struct _datad {
 
  gint nmissing;
  array_s missing;  /*-- array of shorts --*/
- array_l missing_jitter, missing_world;
- gfloat missing_jitter_factor;
- lims missing_lim;  /*-- usually 0,1, but potentially wider --*/
+ gboolean missings_show_p;  /*-- show/hide per datad, not per display --*/
 
  /*---------------- deleting the hidden points; subsetting ----------*/
 

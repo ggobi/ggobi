@@ -138,8 +138,6 @@ struct _ggobid {
  gboolean lims_use_visible;
 
 
-/*----------------------- missing values ---------------------------*/
-
 /*--------------- clusters: hiding, excluding ----------------------*/
 
  struct _ClusterUI {

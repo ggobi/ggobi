@@ -42,9 +42,6 @@ struct _displayd {
  GtkWidget *edge_item, *edge_menu;
  /*-- --*/
 
-/* Missing values */
- gboolean missing_p;  /* false by default */
-
 /*
  * Actually, this might need to be a pair of vectors
  * or linked lists, corresponding to the number of plots in
