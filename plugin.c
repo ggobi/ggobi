@@ -367,7 +367,7 @@ closePlugins(ggobid *gg)
   gg->pluginInstances = NULL;
 }
 
-GGobiInputPluginInfo *
+GGobiPluginInfo *
 runInteractiveInputPlugin(ggobid *gg)
 {
   GGobiPluginInfo* plugin = NULL;
@@ -398,7 +398,7 @@ runInteractiveInputPlugin(ggobid *gg)
   }
 #endif
 
-  return((GGobiInputPluginInfo *)plugin); /* Heike: cast necessary */
+  return(plugin); 
 }
 
 

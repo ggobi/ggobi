@@ -130,7 +130,7 @@ gboolean GGOBI_removePluginInstance(PluginInstance *inst, ggobid *gg);
 
 void closePlugins(ggobid *gg);
 
-GGobiInputPluginInfo *runInteractiveInputPlugin(ggobid *gg);
+GGobiPluginInfo *runInteractiveInputPlugin(ggobid *gg);
 GtkWidget *showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg);
 
 gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin);
