@@ -6,6 +6,9 @@ ifndef GGOBI_HOME
  GGOBI_HOME=../..
 endif
 
+ifndef SHLIB_LDFLAGS
+ SHLIB_LDFLAGS=-shared
+endif
 
 -include local.config
 -include $(GGOBI_HOME)/local.config
@@ -13,7 +16,6 @@ endif
 ifdef ADMIN
  include Install/GNUmakefile.admin
 endif
-
 
 ifdef GGOBI_CONFIG
  GGOBI_INCLUDE_DIR=$(shell $(GGOBI_CONFIG) --cflags)
@@ -44,7 +46,7 @@ SRC=worksheet
 OBJS=$(SRC:%=%.o)
 
 $(PKG).so: $(OBJS)
-	$(CC) -shared $(OBJS) -o $@ $(GGOBI_LIB)  $(EXTRA_LIBS)  $(shell $(GTK_CONFIG) --libs)
+	$(CC) $(SHLIB_LDFLAGS) $(OBJS) -o $@ $(GGOBI_LIB)  $(EXTRA_LIBS)  $(shell $(GTK_CONFIG) --libs)
 
 clean:
 	rm -f *.o 
