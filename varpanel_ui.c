@@ -125,6 +125,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
           tourcorr_varsel (jvar, btn, d, gg);
         break;
         /*-- to pacify compiler if we change these to an enum --*/
+        case NULLMODE:
         case ROTATE:
         case SCALE:
         case BRUSH:
@@ -134,6 +135,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
         case SCATMAT:
         case PCPLOT:
         case TSPLOT:
+        case NMODES:
         break;
     }
     case unknown_display_type:
@@ -232,7 +234,8 @@ varpanel_refresh (ggobid *gg) {
                   varpanel_checkbutton_set_active (j,
                     (j == sp->xyvars.x || j == sp->xyvars.y), d);
               break;
-              /*-- to pacify compiler if we change these to an enum --*/
+              /*-- to pacify compiler --*/
+              case NULLMODE:
               case TOUR2D:
               case TOUR1D:
               case COTOUR:
@@ -245,6 +248,7 @@ varpanel_refresh (ggobid *gg) {
               case SCATMAT:
               case PCPLOT:
               case TSPLOT:
+              case NMODES:
               break;
           }
           case unknown_display_type:

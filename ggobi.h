@@ -72,7 +72,7 @@ typedef struct /*-- ggobi --*/ {
 
  struct _ggobid *thisGG;
 
- /*-- ViewMode menus --*/
+ /*-- PipelineMode menus --*/
  GtkWidget *scatmat_mode_menu;
  GtkWidget *scatterplot_mode_menu;
 
@@ -100,7 +100,7 @@ struct _ggobid {
  GtkItemFactory *main_menu_factory;
  GtkWidget *display_menu_item, *display_menu;  /*-- menu labelled 'Window' --*/
  GtkAccelGroup *main_accel_group;
- GtkWidget *mode_frame, *mode_item;
+ GtkWidget *pipeline_mode_frame, *pipeline_mode_item;
  GtkTooltips *tips;
  gboolean firsttime;  
 
@@ -118,7 +118,7 @@ struct _ggobid {
 
 /*----------------------- pipeline ---------------------------------*/
 
- PipelineMode mode, prev_mode;
+ PipelineMode pipeline_mode, prev_pipeline_mode;
  PipelineMode projection, prev_projection;
 
  struct _VarTableUI {

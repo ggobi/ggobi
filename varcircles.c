@@ -678,6 +678,20 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
               gg->selvarfg_GC, r, r, r+x, r-y);
 
 	      }*/
+        case NULLMODE:
+        case P1PLOT:
+        case XYPLOT:
+        case ROTATE:
+        case SCALE:
+        case BRUSH:
+        case IDENT:
+        case EDGEED:
+        case MOVEPTS:
+        case SCATMAT:
+        case PCPLOT:
+        case TSPLOT:
+        case NMODES:
+        break;
       }
       break;
 

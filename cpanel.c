@@ -15,8 +15,10 @@
 #include "externs.h"
 
 void
-scatterplot_cpanel_init (cpaneld *cpanel, gint initial_mode, ggobid *gg) {
-  cpanel->mode = initial_mode;
+scatterplot_cpanel_init (cpaneld *cpanel, PipelineMode initial_mode,
+  ggobid *gg)
+{
+  cpanel->pipeline_mode = initial_mode;
 
   /*-- scatterplot only, so far --*/
   cpanel->projection = initial_mode;
@@ -42,7 +44,7 @@ scatterplot_cpanel_init (cpaneld *cpanel, gint initial_mode, ggobid *gg) {
 
 void
 scatmat_cpanel_init (cpaneld* cpanel, ggobid *gg) {
-  cpanel->mode = SCATMAT;
+  cpanel->pipeline_mode = SCATMAT;
   cpanel->projection = XYPLOT;  /*-- does it need a projection? --*/
 
   cpanel->parcoords_selection_mode = VAR_REPLACE;
@@ -58,7 +60,7 @@ scatmat_cpanel_init (cpaneld* cpanel, ggobid *gg) {
 
 void
 parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg) {
-  cpanel->mode = PCPLOT;
+  cpanel->pipeline_mode = PCPLOT;
   cpanel->projection = P1PLOT;  /*-- does it need a projection? --*/
 
   /*-- 1d plots --*/
@@ -75,7 +77,7 @@ parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg) {
 
 void
 tsplot_cpanel_init (cpaneld* cpanel, ggobid *gg) {
-  cpanel->mode = TSPLOT;
+  cpanel->pipeline_mode = TSPLOT;
   cpanel->projection = XYPLOT;  /*-- does it need a projection? --*/
 
   /*-- 1d plots --*/
@@ -127,5 +129,5 @@ cpanel_set (displayd *display, ggobid *gg) {
 	  return;
   }
 
-  mode_set (cpanel->mode, gg);
+  pipeline_mode_set (cpanel->pipeline_mode, gg);
 }

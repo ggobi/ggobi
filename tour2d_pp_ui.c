@@ -27,8 +27,10 @@ static GtkWidget *mbar;
 static GtkAccelGroup *pp_accel_group;
 
 /* terms in expansion, bandwidth */
+/*
 static GtkWidget *param_vb, *param_lbl, *param_scale;
 static GtkAdjustment *param_adj;
+*/
 
 static void
 hide_cb (GtkWidget *w) {
@@ -173,13 +175,15 @@ t2d_ppda_configure_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
 static gint
 t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 {
+  displayd *dsp = gg->current_display;
+/*
   gint margin=10;
   gint j;
   gint xpos, ypos, xstrt, ystrt;
   gchar *tickmk;
-  displayd *dsp = gg->current_display;
   GtkStyle *style = gtk_widget_get_style (dsp->t2d_ppda);
   datad *d = gg->current_display->d;
+*/
   gint wid = w->allocation.width, hgt = w->allocation.height;
   static gboolean init = true;
   extern void t2d_clear_ppda(ggobid *);
@@ -239,8 +243,9 @@ static GtkItemFactoryEntry menu_items[] = {
 
 void
 tour2dpp_window_open (ggobid *gg) {
-  GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *entry;
-  GtkWidget *da, *label, *hb, *opt, *btn;
+  /*GtkWidget **btn, *label, *da, *entry;*/
+  GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl;
+  GtkWidget *hb, *opt;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
   gint i, j;

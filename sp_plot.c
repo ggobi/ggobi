@@ -671,7 +671,7 @@ splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   GSList *l;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
-  gint mode = mode_get (gg);
+  PipelineMode mode = pipeline_mode_get (gg);
 
   /*
      these are the cues added to
@@ -1002,7 +1002,7 @@ splot_draw_to_pixmap1 (splotd *sp, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   datad *e = display->e;
   datad *d = display->d;
-  gint mode = mode_get (gg);
+  PipelineMode mode = pipeline_mode_get (gg);
   gint displaytype = display->displaytype;
 
 /*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
@@ -1025,14 +1025,11 @@ splot_draw_to_pixmap1 (splotd *sp, ggobid *gg)
   if (sp == gg->current_splot) {
     splot_draw_border (sp, sp->pixmap1, gg);
 
-    switch (mode) {
-      case BRUSH:
-        brush_draw_brush (sp, sp->pixmap1, d, gg);
-        brush_draw_label (sp, sp->pixmap1, d, gg);
-      break;
-      case SCALE:
-        scaling_visual_cues_draw (sp, sp->pixmap1, gg);
-      break;
+    if (mode == BRUSH) {
+      brush_draw_brush (sp, sp->pixmap1, d, gg);
+      brush_draw_label (sp, sp->pixmap1, d, gg);
+    } else if (mode == SCALE) {
+      scaling_visual_cues_draw (sp, sp->pixmap1, gg);
     }
 
     splot_draw_tour_axes(sp, sp->pixmap1, gg);

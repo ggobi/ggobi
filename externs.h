@@ -17,6 +17,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 displayd * display_alloc_init (enum displaytyped, gboolean, datad *, ggobid *);
 ggobid * ggobi_get (gint);
@@ -216,11 +217,11 @@ void missing_to_world (datad *, ggobid *);
 gboolean missing_values_read (InputDescription *desc, gboolean, datad *, ggobid *);
 void missing_world_alloc (datad *, ggobid *);
 void missing_world_free (datad *d, ggobid *);
-RedrawStyle mode_activate (splotd *, gint, gboolean, ggobid *);
-PipelineMode mode_get (ggobid *);
-void mode_set (PipelineMode, ggobid *);
-void mode_set_cb (GtkWidget  *, gint);
-void mode_submenus_update (PipelineMode prev_mode, PipelineMode mode, ggobid *);
+RedrawStyle pipeline_mode_activate (splotd *, PipelineMode, gboolean, ggobid *);
+PipelineMode pipeline_mode_get (ggobid *);
+void pipeline_mode_set (PipelineMode, ggobid *);
+void pipeline_mode_set_cb (GtkWidget  *, gint);
+void pipeline_mode_submenus_update (PipelineMode prev_mode, ggobid *);
 gboolean mouseinwindow (splotd *);
 void mousepos_get_motion (GtkWidget *, GdkEventMotion *, gboolean *, gboolean *, splotd *);
 void mousepos_get_pressed (GtkWidget *, GdkEventButton *, gboolean *, gboolean *, splotd *);
@@ -282,7 +283,7 @@ void scatmat_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolea
 displayd* scatmat_new (gboolean, gint, gint *, gint, gint *, datad *, ggobid *);
 gboolean scatmat_varsel (cpaneld *, splotd *, gint, gint *, gint, gboolean, ggobid *);
 gboolean scatmat_varsel_simple (cpaneld *, splotd *, gint, gint *, ggobid *);
-void scatterplot_cpanel_init (cpaneld *, gint, ggobid *);
+void scatterplot_cpanel_init (cpaneld *, PipelineMode, ggobid *);
 void scatterplot_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 displayd* scatterplot_new (gboolean, splotd *sp, datad *d, ggobid *);
 void scatterplot_show_hrule (displayd *, gboolean show);

@@ -35,7 +35,7 @@ p1dplot_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -56,7 +56,7 @@ xyplot_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -107,7 +107,7 @@ tour1d_menus_make (ggobid *gg) {
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
@@ -168,7 +168,7 @@ tour2d_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
@@ -228,7 +228,7 @@ tourcorr_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
@@ -281,7 +281,7 @@ scale_menus_make (ggobid *gg) {
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -361,7 +361,7 @@ brush_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
@@ -390,7 +390,7 @@ identify_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -411,7 +411,7 @@ movepts_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -433,7 +433,7 @@ edgeedit_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -455,7 +455,7 @@ scatmat_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -476,7 +476,7 @@ pcplot_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -498,7 +498,7 @@ tsplot_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->pipeline_mode_frame), gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -537,7 +537,7 @@ mode_has_io_menu (gint mode)
 
 /*-- make the menu items once, and then show/hide them as necessary --*/
 void
-mode_submenus_initialize (PipelineMode mode, ggobid *gg)
+pipeline_mode_submenus_initialize (PipelineMode mode, ggobid *gg)
 {
   gg->menus.options_item = NULL;
   gg->menus.reset_item = NULL;
@@ -545,8 +545,10 @@ mode_submenus_initialize (PipelineMode mode, ggobid *gg)
 }
 
 void
-mode_submenus_update (PipelineMode prev_mode, PipelineMode mode, ggobid *gg)
+pipeline_mode_submenus_update (PipelineMode prev_mode, ggobid *gg)
 {
+  PipelineMode mode = pipeline_mode_get (gg);
+
   /*-- remove any previous submenus --*/
   if (mode_has_options_menu (prev_mode)) {
     gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.options_item));
@@ -660,7 +662,10 @@ mode_submenus_update (PipelineMode prev_mode, PipelineMode mode, ggobid *gg)
       identify_menus_make (gg);
     break;
 
+    case ROTATE:
+    case EDGEED:
     case NULLMODE:
+    case NMODES:  /*-- why is this part of the enum? --*/
     break;
   }
 }

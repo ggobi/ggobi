@@ -67,7 +67,7 @@ selected_cols_get (gint *cols, datad *d, ggobid *gg)
 gint
 plotted_cols_get (gint *cols, datad *d, ggobid *gg) 
 {
-  gint mode = mode_get (gg);
+  PipelineMode mode = pipeline_mode_get (gg);
   gint ncols = 0;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
@@ -96,6 +96,19 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
             cols[ncols++] = display->tcorr1.vars.els[k];
           for (k=0; k<display->tcorr2.nvars; k++)
             cols[ncols++] = display->tcorr2.vars.els[k];
+        break;
+
+        case NULLMODE:
+        case ROTATE:
+        case SCALE:
+        case BRUSH:
+        case IDENT:
+        case EDGEED:
+        case MOVEPTS:
+        case SCATMAT:
+        case PCPLOT:
+        case TSPLOT:
+        case NMODES:
         break;
       }
     break;

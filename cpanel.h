@@ -23,7 +23,7 @@
 
 typedef struct {
 
- PipelineMode mode, prev_mode;
+ PipelineMode pipeline_mode, prev_pipeline_mode;
  PipelineMode projection;
 
  /*-- 1d plotting --*/

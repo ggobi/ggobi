@@ -228,8 +228,8 @@ ggobi_alloc()
   tmp->brush.firsttime = true;
 
   /*-- initialize to NULLMODE and check for ncols later --*/
-  tmp->mode = NULLMODE;
-  tmp->prev_mode = NULLMODE;
+  tmp->pipeline_mode = NULLMODE;
+  tmp->prev_pipeline_mode = NULLMODE;
   tmp->projection = NULLMODE;
   tmp->prev_projection = NULLMODE;
   /*-- --*/

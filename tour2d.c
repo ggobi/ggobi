@@ -15,6 +15,7 @@
 #endif
 
 #include <math.h>
+#include <unistd.h>
 
 #include "vars.h"
 #include "externs.h"

@@ -207,7 +207,7 @@ gfloat variance_explained (gfloat *ew, gint d, gint p)
 void eigenvalues (gfloat *cov, gint p, gfloat *ew, 
                   gint matz, gfloat *ev, gfloat *fv1, gfloat *fv2)
 { gfloat lp, lq;
-  gint ierr;
+  /*gint ierr;*/ /* eispack */
   if (p==2)
   { lp = 0.5*(*(cov+0) + *(cov+3));
     lq = *(cov+0)* *(cov+3) - *(cov+1)* *(cov+2);
@@ -340,7 +340,8 @@ gint free_discriminant_p (discriminant_param *dp)
 
 gint discriminant (array_f *pdata, void *param, gfloat *val)
 { discriminant_param *dp = (discriminant_param *) param;
-  gint i, j, k, lda, n, info, inert[3], job;
+  gint i, j, k, lda, n, job;
+  /*gint info, inert[3];*/  /*eispack*/
   gfloat detw[2], detwb[2];
 
   /* Compute means */
@@ -675,7 +676,7 @@ void t1d_ppdraw_all(gint wid, gint hgt, gfloat indx_min, gfloat indx_max,
   gint margin, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
-  gint xpos, ypos, xstrt, ystrt;
+  /*gint xpos, ypos, xstrt, ystrt;*/
   GdkPoint pptrace[100];
   gint i;
 
@@ -774,7 +775,7 @@ gfloat t1d_calc_indx (array_f data, array_f proj,
 { 
   gfloat indexval;
   array_f pdata;
-  int i, j, m, k;
+  gint i, j, m;
 
   arrayf_init_null (&pdata);
   arrayf_alloc_zero (&pdata, nrows, 1);

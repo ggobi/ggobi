@@ -330,7 +330,7 @@ void t2d_ppdraw_all(gint wid, gint hgt, gfloat indx_min, gfloat indx_max,
   gint margin, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
-  gint xpos, ypos, xstrt, ystrt;
+  /*gint xpos, ypos, xstrt, ystrt;*/
   GdkPoint pptrace[100];
   gint i;
 

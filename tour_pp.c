@@ -275,9 +275,11 @@ gint optimize0 (optimize0_param *op,
 void
 pp_deriv_optimization()
 {
+/*
   int i, j;
   float tmpf1, tmpf2;
   float eps = 0.5;
+*/
 
   /* calc index first */
 
