@@ -243,8 +243,6 @@ cpanel_identify_make(ggobid *gg) {
   /*-- provide a variable list so that any variable can be the label --*/
   notebook = create_variable_notebook (gg->control_panel[IDENT],
     GTK_SELECTION_EXTENDED, all_vartypes, (GtkSignalFunc) NULL, gg);
-    /*-- this comes out with single selection; think about it --*/
-    /*-- can make it a property of the notebook itself, actually --*/
   gtk_object_set_data (GTK_OBJECT (gg->control_panel[IDENT]),
     "notebook", notebook);
 
@@ -252,8 +250,7 @@ cpanel_identify_make(ggobid *gg) {
   opt = gtk_option_menu_new ();
   gtk_widget_set_name (opt, "IDENTIFY:display_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    /*"Display either case label or coordinates of nearest point", NULL);*/
-    "Display a label constructed using variables selected in the list above",
+    "How to construct the label to be displayed: the record label, record number, a label constructed using variables selected in the list above, or the record id",
     NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
                       opt, false, false, 0);
