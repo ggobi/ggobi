@@ -569,7 +569,7 @@ void
 GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, ggobid *gg)
 {
   gg->hidden[pt] = gg->hidden_now[pt] = hidden_p;
-  displays_plot (NULL, gg);
+  /*-- don't replot --*/
 }
 
 void 

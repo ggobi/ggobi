@@ -48,17 +48,19 @@ zoom_step (splotd *sp, gint zoom_opt, gint in_or_out, rectd *rect, ggobid* gg)
       break;
   }
 
-
+/*-- Make sure that the scale doesn't get too small --*/
 /*
  * Reset ishift in response to changes in scale -- in click-style
  * zooming, we are scaling out of the center of the window, 
  * {mid.x/2, mid.y/2}, not out of the center of the data.
 */
-  sp->ishift.x = mid.x + (gint) (scalefac_x * (gfloat) (sp->ishift.x - mid.x));
-  sp->ishift.y = mid.y + (gint) (scalefac_y * (gfloat) (sp->ishift.y - mid.y));
-
-
-  *scale_x = *scale_x * scalefac_x;
-  *scale_y = *scale_y * scalefac_y;
+  if (*scale_x * scalefac_x >= SCALE_MIN) {
+    sp->ishift.x = mid.x + (gint) (scalefac_x * (gfloat) (sp->ishift.x - mid.x));
+    *scale_x = *scale_x * scalefac_x;
+  }
+  if (*scale_y * scalefac_y >= SCALE_MIN) {
+    sp->ishift.y = mid.y + (gint) (scalefac_y * (gfloat) (sp->ishift.y - mid.y));
+    *scale_y = *scale_y * scalefac_y;
+  }
 }
 
