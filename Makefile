@@ -141,7 +141,10 @@ ifdef DL_RESOLVE_FLAG
  DL_RESOLVE_PATH+=$(XML_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %)
 endif
 XML_LIB_NO=2
-XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml$(XML_LIB_NO) -lz 
+
+ifndef XML_LIBS
+ XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml$(XML_LIB_NO) -lz 
+endif
 
 main_ui.o: write_xml.h
 read_xml.o: read_xml.h
