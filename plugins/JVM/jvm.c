@@ -87,6 +87,10 @@ gboolean initJVM(GGobiPluginInfo *info)
   if(!classpath) 
     classpath = "plugins/JVM";
 
+  if(sessionOptions->verbose == GGOBI_VERBOSE) {
+      fprintf(stderr, "Java classpath: %s\n", classpath);fflush(stderr);
+  }
+
   /* Prepare the arguments used to initialize the JVM. Note we only get one chance. */
     vm_args = (JavaVMInitArgs *) &vm2_args;
     vm_args->version = JNI_VERSION_1_2;
@@ -112,6 +116,8 @@ gboolean initJVM(GGobiPluginInfo *info)
                           std_env ? "Is it already running" : "Check your library path, etc.");
         return(JNI_FALSE);
     }
+
+    //    runPlugin("GGobiCallbackTest", std_env);
 
     status = JNI_TRUE;
     return(status);
@@ -302,15 +308,23 @@ getDims(int *nrow, int *ncol, JavaRunTimeData *rt, JNIEnv *env)
 gboolean
 JavaLoadPlugin(gboolean initializing, GGobiPluginInfo *plugin)
 {
-    jboolean ans = JNI_TRUE;
+    gboolean ans = true;
     jmethodID mid;
     jclass klass;
     JNIEnv *env = std_env;
 
     klass = JVMENV FindClass(env, ((JavaInputPluginData*)plugin->data)->className);
+    if(klass == NULL) {
+	fprintf(stderr, "Cannot find Java class %s\n", ((JavaInputPluginData*)plugin->data)->className);fflush(stderr);
+        return(false);
+    }
     mid = JVMENV GetStaticMethodID(env, klass, "onLoad", "()Z");
     if(mid)
-	ans = JVMENV CallStaticBooleanMethod(env, klass, mid);
+	ans = (gboolean) JVMENV CallStaticBooleanMethod(env, klass, mid);
+    else {
+        if(JVMENV ExceptionOccurred(env))
+	    JVMENV ExceptionClear(env);
+    }
 
     return(ans);
 }
@@ -318,15 +332,19 @@ JavaLoadPlugin(gboolean initializing, GGobiPluginInfo *plugin)
 gboolean
 JavaUnloadPlugin(gboolean initializing, GGobiPluginInfo *plugin)
 {
-    jboolean ans = JNI_TRUE;
+    gboolean ans = true;
     jmethodID mid;
     jclass klass;
     JNIEnv *env = std_env;
 
     klass = JVMENV FindClass(env, ((JavaInputPluginData*)plugin->data)->className);
+    if(klass == NULL) {
+	fprintf(stderr, "Cannot find Java class %s\n", ((JavaInputPluginData*)plugin->data)->className);fflush(stderr);
+        return(false);
+    }
     mid = JVMENV GetStaticMethodID(env, klass, "onUnload", "()Z");
     if(mid)
-	ans = JVMENV CallStaticBooleanMethod(env, klass, mid);
+	ans = (gboolean) JVMENV CallStaticBooleanMethod(env, klass, mid);
 
     return(ans);
 }
@@ -349,6 +367,12 @@ JavaCreatePlugin(ggobid *gg, GGobiPluginInfo *info, PluginInstance *inst)
 
     klass = JVMENV FindClass(env, data->className);
 
+    if(JVMENV ExceptionOccurred(env)) {
+	JVMENV ExceptionDescribe(env);
+	JVMENV ExceptionClear(env);
+        return(JNI_FALSE);
+    }
+
      /*  See if this class has a constructor that takes a single argument
          of class ggobi.ggobi.  If so, use that. Otherwise, use the default
          constructor (i.e. no arguments) and the call onCreate (?).
@@ -365,7 +389,13 @@ JavaCreatePlugin(ggobid *gg, GGobiPluginInfo *info, PluginInstance *inst)
 	jgg = JVMENV NewObject(env, tmpClass, ggId, (jdouble) (long) gg);    
 	obj = JVMENV NewObject(env, klass, cid, jgg);
     } else {
+        JVMENV ExceptionClear(env);
 	cid = JVMENV GetMethodID(env, klass, "<init>","()V");
+        if(cid == NULL) {
+	    fprintf(stderr, "Error constructing instance of %s. No default constructor(?)\n", data->className);
+	    JVMENV ExceptionClear(env);
+            return(JNI_FALSE);
+	}
 	obj = JVMENV NewObject(env, klass, cid);
     }
 
@@ -376,10 +406,9 @@ JavaCreatePlugin(ggobid *gg, GGobiPluginInfo *info, PluginInstance *inst)
 	tmp->obj = obj;
 
         tmp->mids[GGobi_CLOSE] = JVMENV GetMethodID(env, klass, "onClose", "()Z");
+        JVMENV ExceptionClear(env);
         tmp->mids[GGobi_UPDATE_DISPLAY] = JVMENV GetMethodID(env, klass, "onUpdateDisplay", "()Z");
-        if(tmp->mids[GGobi_UPDATE_DISPLAY]) {
-            /* Register for events of updating the display menu. */           
-	}
+        JVMENV ExceptionClear(env);
     } else {
         data->runTime = NULL;
 	g_free(data->runTime);
