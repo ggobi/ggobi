@@ -26,7 +26,7 @@
 </records>
 </data>
 
-<edges name="connections" count="6">
+<edges name="connections" count="6" data="toplogy">
 <edge source="node 1" destination="BS A"/>
 <edge source="node 2" destination="BS A"/>
 
@@ -38,8 +38,12 @@
 <edge source="node 6" destination="BS D" />
 </edges>
 
-<edges name="base station links" count="3">
- <edge />
+
+
+<edges name="base station links" count="3" data="toplogy">
+ <edge source="BS A" destination="BS B"/>
+ <edge source="BS B" destination="BS C"/>
+ <edge source="BS C" destination="BS A"/>
 </edges>
 
 </ggobidata>
