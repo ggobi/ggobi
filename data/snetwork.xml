@@ -7,8 +7,8 @@
 An artificial social network of 140 people.
 </description>
 <variables count="2">
-<variable>A</variable>
-<variable>B</variable>
+ <realvariable name="A" />
+ <realvariable name="B" />
 </variables>
 <records count="140" glyph="fr 1" color="0">
 <record id="0" label="Abraham" >
@@ -437,8 +437,8 @@ An artificial social network of 140 people.
 <description>
 </description>
 <variables count="2">
-<variable>n interactions</variable>
-<variable>center triangle</variable>
+ <realvariable name="n interactions" />
+ <realvariable name="center triangle" />
 </variables>
 <records
  count="205" glyph="fr 1" color="0">

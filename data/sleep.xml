@@ -48,16 +48,16 @@ rjohnson@carleton.edu
 </description>
 
 <variables count="10">
-<variable>BodyWgt</variable>
-<variable>BrainWgt</variable>
-<variable>NonD</variable>
-<variable>Dream</variable>
-<variable>Sleep</variable>
-<variable>Span</variable>
-<variable>Gest</variable>
-<variable>Pred</variable>
-<variable>Exp</variable>
-<variable>Danger</variable>
+ <realvariable name="BodyWgt"/>
+ <realvariable name="BrainWgt"/>
+ <realvariable name="NonD"/>
+ <realvariable name="Dream"/>
+ <realvariable name="Sleep"/>
+ <realvariable name="Span"/>
+ <realvariable name="Gest"/>
+ <realvariable name="Pred"/>
+ <realvariable name="Exp"/>
+ <realvariable name="Danger"/>
 </variables>
 <records
  count="62" glyph="fr 0" color="0" missingValue="na">

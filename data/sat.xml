@@ -38,16 +38,16 @@ the school year 1988-1989. The variables in order are:
 </description>
 
 <variables count="10">
- <variable>STATE</variable>
- <variable>SAT</variable>
- <variable>EXPEND</variable>
- <variable>PERPUPIL</variable>
- <variable>ENROLL</variable>
- <variable>TEACHERS</variable>
- <variable>RATIO</variable>
- <variable>SALARY</variable>
- <variable>ATTEND</variable>
- <variable>COMPUTER</variable>
+ <realvariable name="STATE"/>
+ <realvariable name="SAT"/>
+ <realvariable name="EXPEND"/>
+ <realvariable name="PERPUPIL"/>
+ <realvariable name="ENROLL"/>
+ <realvariable name="TEACHERS"/>
+ <realvariable name="RATIO"/>
+ <realvariable name="SALARY"/>
+ <realvariable name="ATTEND"/>
+ <realvariable name="COMPUTER"/>
 </variables>
 <records count="51" color="4">
 <record label="Alabama">

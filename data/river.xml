@@ -11,9 +11,9 @@ of Willamette River in Oregon.  I don't know anymore the particular
 years.
 </description>
 <variables count="3">
-<variable>Time</variable>
-<variable>Flow</variable>
-<variable>Lag1</variable>
+ <realvariable name="Time"/>
+ <realvariable name="Flow"/>
+ <realvariable name="Lag1"/>
 </variables>
 <records
  count="128" glyph="fr 1" color="5">

@@ -62,17 +62,17 @@ Reference (available on the web at pnas.org):
   January 1998
 </description>
 <variables count="11">
-<variable>E11</variable>
-<variable>E13</variable>
-<variable>E15</variable>
-<variable>E18</variable>
-<variable>E21</variable>
-<variable>P0</variable>
-<variable>P7</variable>
-<variable>P14</variable>
-<variable>A</variable>
-<variable>Class1</variable>
-<variable>Class2</variable>
+ <realvariable name="E11"/>
+ <realvariable name="E13"/>
+ <realvariable name="E15"/>
+ <realvariable name="E18"/>
+ <realvariable name="E21"/>
+ <realvariable name="P0"/>
+ <realvariable name="P7"/>
+ <realvariable name="P14"/>
+ <realvariable name="A"/>
+ <realvariable name="Class1"/>
+ <realvariable name="Class2"/>
 </variables>
 <records count="112" glyph="fr 1">
 <record label="keratin" >
