@@ -30,6 +30,14 @@ char *Info[] = {
     DATE                  /* Build Date */
 };
 
+void neato_model_cb (GtkWidget *w, gpointer cbd)
+{
+  PluginInstance *inst = (PluginInstance *) gtk_object_get_data (GTK_OBJECT (w),
+    "PluginInst");
+  glayoutd *gl = glayoutFromInst (inst);
+  gl->neato_model = GPOINTER_TO_INT (cbd);
+}
+
 void neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   glayoutd *gl = glayoutFromInst (inst);
@@ -160,10 +168,15 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       initial_positions(graph, nG);
     }
     else {
+/*
       char *p;
       p = agget(graph,"model");
-      if (p && (streq(p,"circuit"))) circuit_model(graph,nG);
-      else shortest_path(graph, nG);
+      if (p && (streq(p,"circuit"))) {
+*/
+      if (gl->neato_model == neato_circuit_resistance) {
+         circuit_model(graph,nG);
+         g_printerr ("using circuit model\n");
+      } else shortest_path(graph, nG);
       initial_positions(graph, nG);
       diffeq_model(graph, nG);
       solve_model(graph, nG);
@@ -177,6 +190,9 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       node = agfindnode (graph, name);
       for (k=0; k<gl->neato_dim; k++)
         pos[i][k] = (gdouble) node->u.pos[k];
+      /*-- may want to set u.width, u.height to very small values --*/
+      /*-- I see no effect, though ... dfs --*/
+      node->u.width = node->u.height = .001;
     }
 #ifdef DEBUG
     f = fopen ("test.out", "w");
@@ -186,8 +202,6 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     neato_cleanup (graph);
   }
 
-
-  /*-- may want to set u.width, u.height to very small values --*/
 /*
   for (i=0; i<d->nrows_in_plot; i++) {
     m = d->rows_in_plot[i];
@@ -235,7 +249,9 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
   dnew = datad_create (nvisible, nc, gg);
   dnew->name = (layout_type == DOT_LAYOUT) ?
-    g_strdup ("dot") : g_strdup_printf ("neato %dd", gl->neato_dim);
+    g_strdup ("dot") :
+    g_strdup_printf ("neato %dd%c", gl->neato_dim,
+     (gl->neato_model == neato_circuit_resistance) ? 'c' : 's');
 
   GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
     gg, rowids, desc);

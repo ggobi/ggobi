@@ -155,11 +155,13 @@ glayout_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
   gtk_widget_show_all (swin);
 }
 
+static const gchar *const neato_model_lbl[] = {
+  "Shortest path", "Circuit resistance"};
 GtkWidget *
 create_glayout_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
-  GtkWidget *hb, *entry, *hscale;
+  GtkWidget *hb, *entry, *hscale, *vb, *opt;
   GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
   gchar *clist_titles[2] = {"node sets", "edge sets"};
@@ -259,7 +261,9 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   label = gtk_label_new ("Specify datasets");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
 
-  /*-- radial tab --*/
+/*
+ * radial tab
+*/
   frame = gtk_frame_new ("Radial layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
@@ -303,41 +307,39 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
                             frame, label);
   /*-- --*/
 
-  /*-- graphviz tab: dot and neato --*/
-  frame = gtk_frame_new ("Graphviz layouts");
+/* 
+ * neato tab
+*/
+  frame = gtk_frame_new ("Neato layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
-  btn = gtk_button_new_with_label ("dot");
-  gtk_widget_set_name (btn, "dot");
-#ifdef GRAPHVIZ
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
-#else
-  gtk_widget_set_sensitive (btn, false);
-#endif
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+/*
+Add an option:  Model either 'circuit resistance' or 'shortest path'
+*/
+  vb = gtk_vbox_new (false, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
 
-
-  hbox = gtk_hbox_new (true, 10);
-  gtk_container_set_border_width (GTK_CONTAINER (hbox), 2);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, true, true, 3);
-
-  btn = gtk_button_new_with_label ("neato");
-  gtk_widget_set_name (btn, "neato");
-#ifdef GRAPHVIZ
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
-#else
-  gtk_widget_set_sensitive (btn, false);
-#endif
-  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 3);
-
+  label = gtk_label_new ("Model:");
+  gtk_misc_set_alignment (GTK_MISC (label), 0, 1);
+  gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
+  opt = gtk_option_menu_new ();
+/*
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+    "Fix one of the axes during plot cycling or let them both float", NULL);
+*/
+  gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
+  populate_option_menu (opt, (gchar**) neato_model_lbl,
+    sizeof (neato_model_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) neato_model_cb, "PluginInst", inst);
 
   /*-- neato scale --*/
+  hbox = gtk_hbox_new (false, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 3);
+
   adj = gtk_adjustment_new ((gfloat)gl->neato_dim, 2.0, 11.0, 1.0, 1.0, 1.0);
 #ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
@@ -353,12 +355,50 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 
   gtk_scale_set_digits (GTK_SCALE(hscale), 0);
   gtk_box_pack_start (GTK_BOX (hbox), hscale, false, false, 3);
+
+  label = gtk_label_new ("Dimension");
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
+  gtk_box_pack_start (GTK_BOX (hbox), label, false, false, 3);
   /*-- --*/
 
+  btn = gtk_button_new_with_label ("apply");
+  gtk_widget_set_name (btn, "neato");
+#ifdef GRAPHVIZ
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+#else
+  gtk_widget_set_sensitive (btn, false);
+#endif
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
-  label = gtk_label_new ("Graphviz");
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-                            frame, label);
+
+  label = gtk_label_new ("Neato");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
+
+
+/*
+ * Dot tab
+*/
+  frame = gtk_frame_new ("Dot layout");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+
+  vbox = gtk_vbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
+  gtk_container_add (GTK_CONTAINER(frame), vbox);
+
+  btn = gtk_button_new_with_label ("apply");
+  gtk_widget_set_name (btn, "dot");
+#ifdef GRAPHVIZ
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+#else
+  gtk_widget_set_sensitive (btn, false);
+#endif
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+
+  label = gtk_label_new ("Dot");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
+
 
   gtk_widget_show_all (window);
 

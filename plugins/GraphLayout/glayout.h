@@ -36,6 +36,8 @@ typedef struct {
 #include <render.h>
 #endif
 
+typedef enum {neato_shortest_path, neato_circuit_resistance} NeatoModel;
+
 typedef struct {
 
   datad *dsrc, *e;
@@ -48,6 +50,7 @@ typedef struct {
   radiald *radial;  /*-- data required for radial layout --*/
 
   gint neato_dim;
+  NeatoModel neato_model;
 
 } glayoutd;
 
@@ -71,6 +74,7 @@ void spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos);
 
 #ifdef GRAPHVIZ
 void neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst);
+void neato_model_cb (GtkWidget *w, gpointer cbd);
 void dot_neato_layout_cb (GtkWidget *, PluginInstance *inst);
 #endif
 

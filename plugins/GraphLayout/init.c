@@ -20,4 +20,5 @@ glayout_init (glayoutd *gl) {
   gl->radial = NULL;
 
   gl->neato_dim = 2;
+  gl->neato_model = neato_shortest_path;
 }
