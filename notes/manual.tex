@@ -61,8 +61,8 @@ Dianne Cook, Iowa State University \\
 Andreas Buja, AT\&T Labs -- Research \\
 Duncan Temple Lang, Lucent Bell Labs
 }
-%\date{January 2001}
-\date{August 2001}
+
+\date{September 2001}
 
 \maketitle
 
@@ -141,10 +141,10 @@ Start GGobi for the olive oils data by typing:
 ggobi olive
 \end{quote}
 
-Two windows will appear, the GGobi control panel and a scatterplot,
-as shown in Figure~\ref{fig1}.
+Two windows will appear, the GGobi console (control panel),
+and a scatterplot, as shown in Figure~\ref{fig1}.
 
-The control panel has a panel of controls on the left, labeled {\bf
+The console has a panel of controls on the left, labeled {\bf
 XYPlot}, and a variable selection region on the right.  You can see
 that the scatterplot contains a 2-dimensional projection of the data,
 a plot of Area vs Region.  Move the mouse to one of the variable labels
@@ -163,7 +163,7 @@ scatterplot of the Area vs Region, from the olive oils data.
 \label{fig1}
 \end{figure}
 
-Next, get acquainted with the main menubar for the control panel by
+Next, get acquainted with the main menubar for the console by
 exploring each of its menus.  Pay particular attention to the
 Display, ViewMode and Tools menus.
 
@@ -183,39 +183,44 @@ the plotting area:  that means that the new window is now the
 ``current display'' and its plot is the ``current plot.''  Click in the
 plotting region of the other scatterplot to make it the current plot,
 and notice what happens in the variable selection region of the
-control panel when you alternate between the two:  it should always show
+console when you alternate between the two:  it should always show
 the variables that are plotted in the current plot.
 
 Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
 and Area vs Region in the second, and make that the current plot.
 Using the ViewMode menu, choose {\bf Identify}. Look at the buttons
-inside the leftmost portion of the ggobi control panel. Notice that
+inside the leftmost portion of the ggobi console. Notice that
 they're contained by a frame labelled {\bf Identify,} which is the
-ViewMode of the current plot.  This frame contains most of the row
+view mode of the current plot.  This frame contains most of the row
 labeling controls, which are described in the section
 \ref{slbl:Identify}. Move the cursor around the plot window with mouse
 movement, and observe the labels of the point closest to the cursor is
-written. The labels for this data set were set as the geographic area
+written. The labels for this data set show the geographic area
 where the sample was taken.
 
 Using the ViewMode menu, choose {\bf Brush.}  Look at the buttons and
-menus inside the leftmost portion of the ggobi control panel.  Notice
+menus inside the leftmost portion of the ggobi console.  Notice
 that they're contained by a frame labelled {\bf Brush,} which is the
-ViewMode of the current plot.  This frame contains most of the
+view mode of the current plot.  This frame contains most of the
 brushing controls, which are described in the section
 \ref{slbl:Brush}.  A few of the brushing controls, though, are in the
 main menubar: in the Reset menu and at the bottom of the Options menu.
 
 The rectangle that appears in the current plot is the ``paintbrush,''
 and dragging it over points changes their color. Change the color of
-the brush by opening up the {\bf Choose symbol} panel (Figure
-\ref{fig2}). Now change the size of the brush.  Use the left button to
-drag it and the middle or right button to resize it.  Make it almost
-as tall as the window but very thin, and paint the first region, then
-the second and third regions.  While you do that, keep an eye on the
-plot of linoleic vs eicosenoic, and notice where the painted points
-fall in that scatterplot (Figure \ref{fig3}).  Using two linked 2d
-plots is one way to explore the relationship among three variables.
+the brush by opening up the {\bf Choose color \& glyph} panel (Figure
+\ref{fig2}). Now change the size of the brush, holding down the
+middle or right button and dragging the mouse.  Make it almost as
+tall as the window but very thin, and then hold down the left button
+and drag the mouse to  paint the first region, then the second and
+third regions.  Since you're brushing in the {\bf Transient} style,
+the points resume their original color when the paintbrush no longer
+surrounds them.
+
+While you brush, keep an eye on the plot of linoleic vs eicosenoic,
+and notice where the painted points fall in that scatterplot (Figure
+\ref{fig3}).  Using two linked 2d plots is one way to explore the
+relationship among three variables.
 
 \begin{figure}[htp]
 \vspace{-0.5in}
@@ -243,36 +248,43 @@ eicosenoic acid.
 
 Now change to {\bf Persistent} brushing and paint the 3 Regions
 different colors. You may also want to use different symbols to
-represent the different Areas. 
+represent the different Areas, as you'll see shortly in Figure 5.
 
 Next open up the {\bf Variable transformation} tool, select all of
-the fatty acid variables, and choose {\bf Standardize} in the stage 2
-transformation panel to standardize all the variables to have mean 0
-and variance 1. The transformation tool has numerous transformation
-operations to perform on variables as appropriate. Stage 0 is a
-domain adjustment operation to adjust variables values into an
-acceptable range as needed for some stage 1 transformations. Stage 2
-transformations allow for post-processing of stage 1 transformations,
-so that the variables can be logged and then standardized, for
-example.
+the fatty acid variables -- hold the control button down and select
+them one at a time, or select the first one, then hold down the shift
+button down while you select the last one.  Once they're all
+highlighted, choose {\bf Standardize} in the stage 2 transformation
+panel to standardize all the variables to have mean 0 and variance
+1.  This tool has numerous transformations, which can be applied in
+sequence.  Stage 0 transformations are used to adjust variables'
+values so that they're within the range of some stage 1
+transformations. Stage 2 transformations allow for post-processing of
+stage 1 transformations, so that the variables can be logged and then
+standardized, for example.
+
+But that was just an instructive detour; click ``Reset all'' to
+to turn off standardization and any other transformations you've
+explored.
 
 \begin{figure}[htp]
 %\vspace{-0.5in}
 %\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
 \pdfimage width 6in {olive-var.jpg}
 %\vspace{.15in} \centerline{ \parbox{6in}
-\caption{Variable manipulation panel contains basic summary 
-statistics of variables. It is also used for variable subset selection
-for launching multi-plot displays.
+\caption{The variable manipulation panel contains basic summary 
+statistics of variables. It can also be used for adding new variables
+and for variable subset selection before launching multi-plot
+displays.
 }%}
 \label{fig4}
 \end{figure}
 
-Now look at the plot of linoleic vs eicosenoic. Open up the {\bf Color
-\& glyph groups ...} panel, and use the Hide/Show chack boxes to toggle
-groups of points on and off (Figure \ref{fig5}). Finally, use these
-controls hide to the cases from geographic region 1, and then {\bf
-Recale} the plot.
+Now look at the plot of linoleic vs eicosenoic. Open up the {\bf
+Color \& glyph groups ...} tool, and use the Hide and Show buttons to
+make groups of points invisible and then visible again (Figure
+\ref{fig5}). Finally, use these controls hide to the cases from
+geographic region 1, and then {\bf Rescale} the plot.
 
 \begin{figure}[htp]
 \hbox{\pdfimage width 3in {olive-brush3.jpg}\pdfimage width 3.5in {olive-brush4.jpg}}
@@ -282,28 +294,33 @@ Recale} the plot.
 
 Now switch into {\bf 2D Tour} using the {\bf ViewMode} menu. The
 variable checkboxes change to variable circles. Click on the circles
-for Region and Area to toggle these variables out of the tour. And
-then click {\bf Reinit}. Also remove eicosenoic acid from the tour,
-using similar mouse action. The scrollbar at the top of the tour
-controls allows the speed of the tour to be adjusted. Drag it to the
-right to speed up the rotation.  The circle in the bottom of the plot
-window displays the axes for the tour. These can be toggled off the
-plot by selecting the {\bf Options} menu on the plot window. Pause the
-tour when you see a separation of the green and purple points, that
-is, regions 2 and 3 (for example, Figure \ref{fig6}). Now you are
-going to use manual tour controls to sharpen up the separation by
-manually changing the coefficients of the variables in the
-projection. On the main control window click on the {\bf Manip}
-(purple) button, below the plot, and then click on linoleic acid (a
-purple circle will be seen now in the variable circle for linoleic
-acid). Now in the plot window click and drag the cursor. The
-coefficent corresponding to linoleic acid will increase and decrease
-inducing a rotation of the scattercloud. Similarly rotate oleic acid
-and arachidic acid in and out of the plot, with the aim to find a
-projection where the two regions are better separated (for example,
-Figure \ref{fig6}).  There are 5 choices of manipulation mode
-(unconstrained oblique, vertical, horizontal, radial and angular) to
-explore.
+for the variables palmitoleic through arachidic to toggle these variables
+into the tour, and click on Region and Area to toggle these variables out.
+Then click {\bf Reinit}.  The tour should now include 7 variables.
+
+The scrollbar at the top of the tour controls is used to adjust the
+speed of the tour.  Drag it to the right to speed up the rotation.
+The circle at the bottom left of the plot window displays the axes
+for the tour. These can be removed by toggling the ``Show axes''
+button on the plot window's {\bf Options} menu.  Pause the tour when
+you see a separation of the two regions (as seen in Figure
+\ref{fig6}).
+
+Now you are going to use manual tour controls to sharpen up the
+separation by manually changing the coefficients of the variables in
+the projection.  Click on the {\bf Manip} (purple) button below the
+variable selection region of the console, and then click on linoleic
+acid (a purple circle will be seen now in the variable circle for
+linoleic acid).  Select {\bf Oblique} in the {\bf Manual
+manipulation} menu.  Now in the plot window, hold down any mouse
+button while you drag the cursor. The coefficent corresponding to
+linoleic acid will increase and decrease following the mouse,
+inducing a rotation of the scattercloud.  Similarly rotate oleic acid
+and arachidic acid in and out of the plot, with the aim of finding a
+projection where the two regions are maximally separated (for
+example, Figure \ref{fig6}).  There are 5 choices of manipulation
+mode (unconstrained oblique, vertical, horizontal, radial and
+angular) to explore.
 
 \begin{figure}[htp]
 \hbox{\pdfimage width 3in {olive-tour1.jpg}\pdfimage width 3in {olive-tour2.jpg}}
@@ -318,19 +335,15 @@ for each variable, and the buttons below the table allow you to set
 variable limits, add new variables, and a few other things.  Try
 clicking the mouse in the table -- you can select one row of the
 table at a time, or use the control and shift keys as modifiers to
-select more than one.  Hold the control key down while clicking to
-select variables that are not contiguous in the table; use the shift
-key if you want to select a contiguous range of variables. Select all
-of the fatty acid variables.
+select more than one.  Select all the fatty acid variables.
 
-Now open up a {\bf New parallel coordinates display} using the {\bf
-Display} menu.
+Now open a parallel coordinates display using the {\bf Display} menu.
 %Using the {\bf Selection Mode:} menu on the control
 %panel select {\bf Delete} mode to remove Region and Area from the
 %parallel coordinates plot. Then switch to {\bf Append} mode and add
 %the remaining acid variables.
-Now select the first plot in the parallel coordinates display by
-clicking on it, and using the {\bf ViewMode} menu switch to {\bf
+Select the first plot in the parallel coordinates display by
+clicking on it, and use the {\bf ViewMode} menu to switch to {\bf
 Brush} mode. Choose a new color (say yellow) and large closed glyph,
 and transiently paint the case with a very low value on palmitic
 (Figure \ref{fig7}). This case also has a very high value for oleic
@@ -343,13 +356,13 @@ palmitic, oleic and linolenic acids.}
 \label{fig7}
 \end{figure}
 
-Using the {\bf Color \& glyph groups} panel from the {\bf Brush}
+Using the {\bf Color \& glyph groups} tool from the {\bf Brush}
 controls, click on the appropriate `S' button to bring the Region 1
-cases back into the plot. Now using the {\bf File} menu, output the
-data, saving the colors and glyphs that have been created during this
+cases back into the plot.  Using the {\bf File} menu, save the data,
+preserving the colors and glyphs that have been assigned during this
 session.
 
-This has been a brief introduction to the use of ggobi. The following
+This has been a brief introduction to the use of GGobi. The following
 section contains more detailed information on the functionality.
 
 \section{Layout and functionality}
@@ -357,16 +370,15 @@ section contains more detailed information on the functionality.
 \subsection{The major functions}
 
 Across the top of the control panel, as seen in in Figure \ref{fig1},
-stretches a row of buttons for selecting major ggobi functions from
-pull-down menus.  Buttons such as {\bf File}, {\bf Display,} {\bf
-ViewMode}, {\bf Tools}, {\bf Options} and {\bf DisplayTree} organize
-functions in menus.
+stretches a row of menu buttons:  {\bf File}, {\bf Display,} {\bf
+ViewMode}, {\bf Tools}, {\bf Options} and {\bf DisplayTree} are
+always visible; others appear as appropriate.
 
-As expected, the {\bf File} button opens a menu for selecting
-input/output functions as well as exiting.
+As expected, the {\bf File} menu contains items for selecting
+input/output functions and for exiting.
 
-The {\bf Display} button opens a manu for opening a new plotting
-window.  The display types are
+The {\bf Display} menu allows a new plotting window to be opened. 
+The display types include
 \begin{itemize}
 \itemsep 0em
 \item scatterplot,
@@ -379,8 +391,8 @@ If the data has missing values, a scatterplot or scatterplot matrix
 of the ``missingness'' information can be opened.  Each display type
 is discussed in section ~\ref{DisplayTypes}.
 
-The {\bf ViewMode} menu contains links to ggobi's
-inventory of interactive graphics operations: 
+The {\bf ViewMode} menu contains items to set the projection 
+and to the interaction type:
 \begin{itemize}
 \itemsep 0em
 \item 1DPlot: 1-D dotplots and average shifted histograms,
@@ -390,7 +402,7 @@ inventory of interactive graphics operations:
 \item 2x1D Tour: a correlation tour; that is, independent 1-D tours on
       horizontal and vertical axes,
 \item Scale: axis scaling,
-\item Brush: setting point glyphs and point and edge colors,
+\item Brush: setting point glyphs, edge types, and point and edge colors,
 \item Identify: labelling points
 \item Move Points: direct manipulation of point positions.
 \end{itemize}
@@ -420,17 +432,17 @@ Each tool is discussed in section ~\ref{Tools}.
 There are a couple of distinctions between view modes and tools.  The
 view mode functions determine the mouse interactions in the display
 windows, while none of the Tools does.  Furthermore, view mode
-functions populate the control panel in the main ggobi window, while
-tools create their own permanent control panels or views of the data
-in separate windows, as shown in Figure~\ref{fig4}.  For example,
-the {\bf variable manipulation tool} is a window containing a table of
-data each variable and several buttons, and the {\bf variable
-transformation tool} is also a separate window.
+functions populate the control panel in the ggobi console, while
+tools open their own windows, as shown in Figure~\ref{fig4}.  For
+example, the {\bf variable manipulation tool} is a window containing
+a table with one row of data for each variable and several buttons,
+and the {\bf variable transformation tool} is also a separate window,
+with a list of variable names and a set of transformation menus.
 
-The {\bf Options} menu allows users to set some options for the
-main control window:  whether tooltips are displayed, for instance,
-and whether the control panel is shown.  In some view modes, it contains
-additional options that are specific to that mode.
+The {\bf Options} menu allows users to set some options for the main
+control window:  whether tooltips are displayed and whether the
+control panel is shown.  In some view modes, it contains additional
+options that are specific to that mode.
 
 Other menus are present only during certain modes:  you will
 sometimes find an {\bf I/O} menu or a {\bf Reset} menu.
@@ -446,7 +458,7 @@ several plots.
 
 Since there are multiple displays, some of which contain multiple
 plots, the question arises:  Which plot in which display window
-corresponds to the control panel?  If you select the {\bf Scale} mode,
+corresponds to the console?  If you select the {\bf Scale} mode,
 how can you tell which plot is going to respond?
 
 There is in GGobi a notion of the ``current display'' and the
@@ -460,8 +472,8 @@ or middle) in the plot you wish to address.  To understand the
 effects of this selection, open a few displays and set them in
 different ViewModes, then click on different plots and see what
 happens.  The white border should follow your actions, and the
-control panel should update so that its panels correspond to the
-current display type and ViewMode.
+console should update so that its panels correspond to the
+current display type and view mode.
 
 \subsubsection{Display types}
 \label{DisplayTypes}
@@ -488,7 +500,7 @@ are ASHes (Average Shifted Histograms).  The matrix is required to be
 symmetric, and that constraint affects its variable selection behavior.
 
 \begin{itemize}
-\item Replace:  First select one of the plots along the diagonal
+\item Replace:  First select one of the ASH plots along the diagonal
   to tell ggobi uniquely which variable to replace, then click on
   one of the checkboxes in the variable selection region.
 \item Insert:  First select one of the plots along the
@@ -514,7 +526,7 @@ segments are drawn by default, but you can turn them off using the
 {\bf Options} menu on the display menubar.
 
 By default, the plots are simple dotplots, but they can also be drawn
-using one of the other two methods for 1D plots:  as a textured dot
+using one of the two methods for 1D plots:  as a textured dot
 strip or an ASH.
 
 The variable selection behavior works as follows:
@@ -579,8 +591,8 @@ the association between missing values and the variables.
 \subsection {ASCII}
 \label{slbl:ASCII}
 
-The basics of the ascii data format used in xgobi are still
-supported, with some changes.
+The ascii data format used in XGobi are still
+supported, with some changes and some exclusions.
 
 The only essential file is the one containing the data itself.  Each
 line in the file contains one row of the input data matrix, and lines
@@ -613,9 +625,9 @@ using the ordering just presented, and the size is between 1 and 8
 $8 \times (type-1) + size$.
 \end{itemize}
 
-Circles, which may be the most visually appealing glyph, take much
-longer to draw under Microsoft Windows.  Consequently, our sample
-data files usually use a small filled rectangle as the default
+Filled circles may be the most visually appealing glyph, but take
+much longer to draw under Microsoft Windows.  Consequently, our
+sample data files usually use a small filled rectangle as the default
 glyph.
 
 Colors must be integers from 0 to the number of colors in
@@ -630,10 +642,12 @@ available from the web site.  The XML format allows more detailed
 specification, such as
 
 \begin{itemize}
-\item multiple datasets within a single process,
-\item rules for linking between datasets,
-\item edges: line segments connecting pairs of points, and
-\item the colormap to be used in brushing.
+\item multiple datasets within a single XML file, all available within
+      a single GGobi process,
+\item rules for linking between datasets, and
+\item edges: line segments connecting pairs of points.
+% Let's leave this out for now ...
+% \item the colormap to be used in brushing.
 \end{itemize}
 
 \subsection {Database access}
@@ -657,13 +671,13 @@ document {\em Using the R-GGobi Link} available through the web site.
 
 Selecting any mode on the {\bf ViewMode} menu changes the interactions
 available for the display and plot that are current, and pops the
-corresponding control panel into the left portion of the main control
+corresponding control panel into the left portion of the console
 window.  The modes in the top half of the menu do something more as
 well:  they set the projection method for the display, and the meaning
 of actions in the variable selection panel always conforms to the current
 projection method.
 
-As an example, start ggobi with some data, and watch what happens in
+As an example, start GGobi with some data, and watch what happens in
 the main GGobi window and a a single scatterplot display.   When
 GGobi starts, it's in {\bf XYPlot} mode by default, so the
 scatterplot window shows a 2-dimensional projection of the data.  If
@@ -681,8 +695,8 @@ changes at once, because you've effectively selected both a new mode and
 a new projection type at the same time.
 \begin{itemize}
 \itemsep 0em
-\item The control panel changes, because a new set of interactions
-      just became available.
+\item The panel at the left of the console changes, because a
+      new set of interactions just became available.
 \item The variable selection panel changes, because the variable
       selection behavior for high-dimensional projection types is
       quite different than that for low-dimensional projection types.
@@ -695,7 +709,7 @@ If you now select one of the modes in the bottom half of the ViewMode
 menu, you'll see again that the variable selection panel doesn't
 change, and the plot in the scatterplot doesn't change -- except
 that it stops moving.  The only thing that changes with every
-selection is the control panel at the left of the main window.
+selection is the panel at the left of the console.
 
 Now we'll describe each view mode in more detail, starting at the
 top of the ViewMode menu. 
@@ -705,13 +719,13 @@ top of the ViewMode menu.
 The 1D plot can be displayed in two ways:  as a textured dot plot
 or an average shifted histogram.
 
-The textured dot plot uses a method (and code) described in
+The textured dot plot uses a method described in
 \cite{TukeyTukey90}.  This method spreads the data laterally by
 amounts that are partly constrained and partly random, resulting in a
 fairly smooth spreading of the points and minimizing artifacts of the
 plotting method, such as stripes, clusters, or gaps.
 
-The average shifted histogram is due to Scott \cite{Scott92},
+The average shifted histogram is due to Scott (\cite{Scott92}),
 and the code is also his.  In this method, several histograms are
 calculated using the same binwidth but different origins, and the
 averaged results are plotted.  The smoothing parameter essentially
@@ -725,9 +739,10 @@ with a left click, and vertically if you use a middle or right click.
 The XY plots are the rudimentary 2 variable scatterplot (or
 draughtsman plot) displays. Two variables are chosen, one to be
 plotted horizontally and the other vertically. Controls allow for
-variables to be cycled and out of the plot, generating an animation
+variables to be cycled in and out of the plot, generating an animation
 through all pairwise plots.
 
+% dfs here %
 \subsection{1D Tour}
 \label{slbl:1DTour}
 
