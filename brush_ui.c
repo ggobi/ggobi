@@ -60,8 +60,7 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
 
 
 static gchar *point_targets_lbl[] =
-{ "Off", "Color and glyph", "Color only", "Glyph only",
-  "Glyph size only", "Hide", "Select"
+{ "Off", "Color and glyph", "Color only", "Glyph only", "Hide", "Select"
 };
 static void
 brush_point_targets_cb (GtkWidget * w, gpointer cbd)
@@ -80,8 +79,7 @@ brush_point_targets_cb (GtkWidget * w, gpointer cbd)
 }
 
 static gchar *edge_targets_lbl[] =
-{ "Off", "Color and line", "Color only", "Line only",
-  "Line width only", "Hide", "Select"
+{ "Off", "Color and line", "Color only", "Line only", "Hide", "Select"
 };
 static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
 {

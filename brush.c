@@ -458,19 +458,12 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 /* setting the value of changed */
   if (!changed) {
     if (hit_by_brush[i]) {
-
-      doit = (d->glyph_now.els[i].size != gg->glyph_id.size);
-
-      /*-- ... and if not ignoring type --*/
-      if (!doit && cpanel->br_point_targets != br_gsize) 
-        doit = doit || (d->glyph_now.els[i].type != gg->glyph_id.type);
+      doit = (d->glyph_now.els[i].size != gg->glyph_id.size ||
+              d->glyph_now.els[i].type != gg->glyph_id.type);
 
     } else {
-
-      doit = (d->glyph_now.els[i].size != d->glyph.els[i].size);
-      /*-- ... if not ignoring type --*/
-      if (cpanel->br_point_targets != br_gsize) 
-        doit = doit || (d->glyph_now.els[i].type != d->glyph.els[i].type);
+      doit = (d->glyph_now.els[i].size != d->glyph.els[i].size ||
+              d->glyph_now.els[i].type != d->glyph.els[i].type);
     }
   }
 /* */
@@ -481,23 +474,17 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 
         case BR_PERSISTENT:
           d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
-          /*-- ... if not ignoring type --*/
-          if (cpanel->br_point_targets != br_gsize) 
-            d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
+          d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
         break;
 
         case BR_TRANSIENT:
           d->glyph_now.els[i].size = gg->glyph_id.size;
-          /*-- ... if not ignoring type --*/
-          if (cpanel->br_point_targets != br_gsize) 
-            d->glyph_now.els[i].type = gg->glyph_id.type;
+          d->glyph_now.els[i].type = gg->glyph_id.type;
         break;
       }
     } else {
       d->glyph_now.els[i].size = d->glyph.els[i].size;
-      /*-- ... if not ignoring type --*/
-      if (cpanel->br_point_targets != br_gsize) 
-        d->glyph_now.els[i].type = d->glyph.els[i].type;
+      d->glyph_now.els[i].type = d->glyph.els[i].type;
     }
   }
 
@@ -683,7 +670,6 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
               d->pts_under_brush.els, d, gg);
           break;
           case br_glyph:  /*-- glyph type and size --*/
-          case br_gsize:  /*-- glyph size only --*/
             changed = update_glyph_vectors (j, changed,
               d->pts_under_brush.els, d, gg);
           break;
@@ -868,7 +854,6 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
           e->edge.xed_by_brush.els, e, gg);
       break;
       case br_glyph:  /*-- line width and line type --*/
-      case br_gsize:  /*-- line width only --*/
         changed = update_glyph_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;

@@ -176,10 +176,6 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
             d->glyph.els[i].type = d->glyph_now.els[i].type =
               gg->glyph_id.type;
           break;
-          case br_gsize:   /*-- glyph size only --*/
-            d->glyph.els[i].size = d->glyph_now.els[i].size =
-              gg->glyph_id.size;
-          break;
           case br_hide:   /*-- hidden --*/
             d->hidden.els[i] = d->hidden_now.els[i] = true;
           break;
@@ -203,9 +199,6 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
           case br_glyph:   /*-- glyph type and size --*/
             d->glyph_now.els[i].size = gg->glyph_id.size;
             d->glyph_now.els[i].type = gg->glyph_id.type;
-          break;
-          case br_gsize:   /*-- glyph size only --*/
-            d->glyph_now.els[i].size = gg->glyph_id.size;
           break;
           case br_hide:   /*-- hidden --*/
             d->hidden_now.els[i] = true;
@@ -233,9 +226,6 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
         case br_glyph:   /*-- glyph type and size --*/
           d->glyph_now.els[i].size = d->glyph.els[i].size;
           d->glyph_now.els[i].type = d->glyph.els[i].type;
-        break;
-        case br_gsize:   /*-- glyph size only --*/
-          d->glyph_now.els[i].size = d->glyph.els[i].size;
         break;
         case br_hide:   /*-- hidden --*/
           d->hidden_now.els[i] = d->hidden.els[i];
