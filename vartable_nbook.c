@@ -327,6 +327,7 @@ vartable_row_assemble (gint jvar, vartyped type, gchar **row,
   switch (type) {
     case counter:
     case integer:
+    case uniform:
     case real:
       row[REAL_CLIST_VARNO] = g_strdup_printf ("%d", jvar);
       row[REAL_CLIST_VARNAME] = g_strdup ("");
@@ -506,9 +507,10 @@ vartable_subwindow_init (datad *d, ggobid *gg)
     vt = vartable_element_get (j, d);
 
     vartable_row_append (j, d, gg);    /*-- append a generic row --*/
-    if (vt->vartype == categorical)
+    if (vt->vartype == categorical) {
       for (k=0; k<vt->nlevels; k++)
         vartable_row_append (j, d, gg);
+    }
 
     vartable_cells_set_by_var (j, d);  /*-- then opulate --*/
   }
@@ -643,6 +645,7 @@ vartable_collab_set_by_var (gint j, datad *d)
       break;
       case integer:
       case counter:
+      case uniform:
       case real:
         if (d->vartable_clist[real] != NULL) {
           gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]), rownum,
@@ -689,6 +692,7 @@ vartable_limits_set_by_var (gint j, datad *d)
     switch (vt->vartype) {
       case integer:
       case counter:
+      case uniform:
       case real:
         if (d->vartable_clist[real] != NULL) {
 
@@ -780,6 +784,7 @@ vartable_stats_set_by_var (gint j, datad *d) {
 
       case integer:
       case counter:
+      case uniform:
       case real:
         type = real;
         if (d->vartable_clist[real] != NULL) {

@@ -34,7 +34,7 @@ enum {CAT_CLIST_VARNO, CAT_CLIST_VARNAME, CAT_CLIST_NLEVELS,
 #define ADDVAR_ROWNOS   0
 #define ADDVAR_BGROUP   1
 
-typedef enum {real, categorical, integer, counter, all_vartypes} vartyped;
+typedef enum {real, categorical, integer, counter, uniform, all_vartypes} vartyped;
 
 /*
  * a vartabled object is not a table, but rather an entry in
