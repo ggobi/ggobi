@@ -1,14 +1,14 @@
 Bugs: 
 
   the axes aren't being initialized properly for cloned variables.
-  still having problems with variable selection in scatterplot matrices
+  when reading from the file menu, the variable labels aren't read
 
 Find out how to handle threads
 Find out how to use signals
 
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
-  couple that with a thumbnail that sits just below the scaling controls
+  couple that with a thumbnail view that sits just below the scaling controls
 
 Imputation of missing values
 
@@ -60,3 +60,12 @@ I/O
 ! selected_variables_get isn't always right -- maybe it gets messed
 !   up after the clear?  (so maybe it's fixed)
 
+! still having problems with variable selection in scatterplot matrices
+!   put a check in splot_redraw
+
+! Brushing:  add brush-jumps-to-cursor
+
+! parcoords: when switching between row and col layout, plot orientation
+!   and whiskers aren't being reset correctly
+!      added the needed lines to sp_rewhisker; added display_tailpipe
+!      to the rearrangement callback.

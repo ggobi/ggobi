@@ -14,8 +14,6 @@ static GtkWidget *cg_opt;
 static GtkWidget *scope_opt;
 static GtkWidget *brush_on_btn;
 
-extern brush_coords brush_pos;  /* from brush.c */
-
 static void brush_on_cb (GtkToggleButton *button)
 {
   cpaneld *cpanel = &current_display->cpanel;
@@ -102,18 +100,22 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   cpaneld *cpanel;
   gboolean retval = true;
+  gboolean button1_p, button2_p;
 
   current_splot = sp;
   current_display = (displayd *) sp->displayptr;
   cpanel = &current_display->cpanel;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  mousepos_get (w, event, &button1_p, &button2_p);
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                      "motion_notify_event",
                                      (GtkSignalFunc) motion_notify_cb,
                                      (gpointer) cpanel);
+
+  brush_set_pos (event->x, event->y);
+
+  brush_motion (&mousepos, button1_p, button2_p, cpanel);
 
   return retval;
 }

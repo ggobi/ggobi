@@ -20,6 +20,23 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 
 static void
+scatmat_rows_print (displayd *display) {
+  GList *l;
+  g_printerr ("rows: ");
+  for (l=display->scatmat_rows; l != NULL; l=l->next)
+    g_printerr ("%d ", GPOINTER_TO_INT (l->data));
+  g_printerr ("\n");
+}
+static void
+scatmat_cols_print (displayd *display) {
+  GList *l;
+  g_printerr ("cols: ");
+  for (l=display->scatmat_cols; l != NULL; l=l->next)
+    g_printerr ("%d ", GPOINTER_TO_INT (l->data));
+  g_printerr ("\n");
+}
+
+static void
 scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
   GtkSignalFunc func, GtkWidget *mbar)
 {
@@ -350,9 +367,11 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
       if (button == 1) {
         display->scatmat_cols = g_list_replace_nth (display->scatmat_cols,
           GINT_TO_POINTER (jvar), spcol);
+        scatmat_cols_print (display);
       } else {
         display->scatmat_rows = g_list_replace_nth (display->scatmat_rows,
           GINT_TO_POINTER (jvar), sprow);
+        scatmat_rows_print (display);
       }
 
     } else {  /* VAR_INSERT or VAR_APPEND */
@@ -408,6 +427,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
         display->scatmat_cols = g_list_insert (display->scatmat_cols,
                                                GINT_TO_POINTER (jvar),
                                                col);
+        scatmat_cols_print (display);
         for (k=0; k<scatmat_nrows; k++) {
           sp_new = splot_new (display, width, height);
 
@@ -435,6 +455,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
         display->scatmat_rows = g_list_insert (display->scatmat_rows,
                                                GINT_TO_POINTER (jvar),
                                                row);
+        scatmat_rows_print (display);
         for (k=0; k<scatmat_nrows; k++) {
           sp_new = splot_new (display, width, height);
 

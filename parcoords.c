@@ -83,12 +83,10 @@ parcoords_reset_arrangement (displayd *display, gint arrangement) {
   if (display->cpanel.parcoords_arrangement == arrangement)
     return;
 
-  l = display->splots;
-  while (l) {
+  for (l=display->splots; l; l=l->next) {
     w = ((splotd *) l->data)->da;
     gtk_widget_ref (w);
     gtk_container_remove (GTK_CONTAINER (arrangement_box), w);
-    l = l->next ;
   }
 
   frame = arrangement_box->parent;
@@ -105,6 +103,7 @@ parcoords_reset_arrangement (displayd *display, gint arrangement) {
 
   height = (arrangement == ARRANGE_ROW) ? HEIGHT : WIDTH;
   width = (arrangement == ARRANGE_ROW) ? WIDTH : HEIGHT;
+/*
   l = display->splots;
   while (l) {
     sp = (splotd *) l->data;
@@ -112,8 +111,16 @@ parcoords_reset_arrangement (displayd *display, gint arrangement) {
     gtk_box_pack_start (GTK_BOX (arrangement_box), sp->da, true, true, 0);
     l = l->next ;
   }
+*/
+  for (l=display->splots; l; l=l->next) {
+    sp = (splotd *) l->data;
+    gtk_widget_set_usize (sp->da, width, height);
+    gtk_box_pack_start (GTK_BOX (arrangement_box), sp->da, true, true, 0);
+  }
 
   gtk_widget_show_all (arrangement_box);
+
+  display_tailpipe (display);
 
   varpanel_refresh ();
 }
@@ -362,6 +369,7 @@ static void
 sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
   gint i, k, m;
   displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = (cpaneld *) &display->cpanel;
   gboolean draw_whisker;
 
   for (k=0; k<xg.nrows_in_plot; k++) {
@@ -382,17 +390,33 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
     else
       draw_whisker = true;
 
-    /* --- left whisker --- */
-    if (draw_whisker) {
-      sp->whiskers[m].x1 = 0;
-      sp->whiskers[m].y1 = (sp_prev->screen[i].y + sp->screen[i].y) / 2;
-      sp->whiskers[m].x2 = sp->screen[i].x;
-      sp->whiskers[m].y2 = sp->screen[i].y;
-    } else {
-      sp->whiskers[m].x1 = sp->screen[i].x;
-      sp->whiskers[m].y1 = sp->screen[i].y;
-      sp->whiskers[m].x2 = sp->screen[i].x;
-      sp->whiskers[m].y2 = sp->screen[i].y;
+    /* --- left (or top) whisker  --- */
+    if (cpanel->parcoords_arrangement == ARRANGE_ROW) {
+
+      if (draw_whisker) {
+        sp->whiskers[m].x1 = 0;
+        sp->whiskers[m].y1 = (sp_prev->screen[i].y + sp->screen[i].y) / 2;
+        sp->whiskers[m].x2 = sp->screen[i].x;
+        sp->whiskers[m].y2 = sp->screen[i].y;
+      } else {
+        sp->whiskers[m].x1 = sp->screen[i].x;
+        sp->whiskers[m].y1 = sp->screen[i].y;
+        sp->whiskers[m].x2 = sp->screen[i].x;
+        sp->whiskers[m].y2 = sp->screen[i].y;
+      }
+
+    } else {  /* ARRANGE_COLUMN */
+      if (draw_whisker) {
+        sp->whiskers[m].x1 = (sp_prev->screen[i].x + sp->screen[i].x) / 2;
+        sp->whiskers[m].y1 = 0;
+        sp->whiskers[m].x2 = sp->screen[i].x;
+        sp->whiskers[m].y2 = sp->screen[i].y;
+      } else {
+        sp->whiskers[m].x1 = sp->screen[i].x;
+        sp->whiskers[m].y1 = sp->screen[i].y;
+        sp->whiskers[m].x2 = sp->screen[i].x;
+        sp->whiskers[m].y2 = sp->screen[i].y;
+      }
     }
 
     m++;
@@ -409,17 +433,32 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
     else
       draw_whisker = true;
 
-    /* --- right whisker --- */
-    if (draw_whisker) {
-      sp->whiskers[m].x1 = sp->screen[i].x;
-      sp->whiskers[m].y1 = sp->screen[i].y;
-      sp->whiskers[m].x2 = sp->max.x;
-      sp->whiskers[m].y2 = (sp->screen[i].y + sp_next->screen[i].y) / 2;
-    } else {
-      sp->whiskers[m].x1 = sp->screen[i].x;
-      sp->whiskers[m].y1 = sp->screen[i].y;
-      sp->whiskers[m].x2 = sp->screen[i].x;
-      sp->whiskers[m].y2 = sp->screen[i].y;
+    /* --- right (or bottom) whisker --- */
+    if (cpanel->parcoords_arrangement == ARRANGE_ROW) {
+
+      if (draw_whisker) {
+        sp->whiskers[m].x1 = sp->screen[i].x;
+        sp->whiskers[m].y1 = sp->screen[i].y;
+        sp->whiskers[m].x2 = sp->max.x;
+        sp->whiskers[m].y2 = (sp->screen[i].y + sp_next->screen[i].y) / 2;
+      } else {
+        sp->whiskers[m].x1 = sp->screen[i].x;
+        sp->whiskers[m].y1 = sp->screen[i].y;
+        sp->whiskers[m].x2 = sp->screen[i].x;
+        sp->whiskers[m].y2 = sp->screen[i].y;
+      }
+    } else {  /* ARRANGE_COLUMN */
+      if (draw_whisker) {
+        sp->whiskers[m].x1 = sp->screen[i].x;
+        sp->whiskers[m].y1 = sp->screen[i].y;
+        sp->whiskers[m].x2 = (sp->screen[i].x + sp_next->screen[i].x) / 2;
+        sp->whiskers[m].y2 = sp->max.y;
+      } else {
+        sp->whiskers[m].x1 = sp->screen[i].x;
+        sp->whiskers[m].y1 = sp->screen[i].y;
+        sp->whiskers[m].x2 = sp->screen[i].x;
+        sp->whiskers[m].y2 = sp->screen[i].y;
+      }
     }
   }
 }

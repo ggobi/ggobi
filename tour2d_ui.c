@@ -1,7 +1,6 @@
 /* tour2d_ui.c */
 
 #include <strings.h>
-#include <pthread.h>
 #include <gtk/gtk.h>
 
 #include "vars.h"

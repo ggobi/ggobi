@@ -89,6 +89,19 @@ reinit_transient_brushing ()
   (void) brush_once (false);
 }
 
+void
+brush_set_pos (gint x, gint y) {
+  gint xdist = brush_pos.x2 - brush_pos.x1 ;
+  gint ydist = brush_pos.y2 - brush_pos.y1 ;
+  /*
+   * (x2,y2) is the corner that's moving.
+  */
+  brush_pos.x1 = x - xdist ;
+  brush_pos.x2 = x ;
+  brush_pos.y1 = y - ydist ;
+  brush_pos.y2 = y ;
+}
+
 
 void
 brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
@@ -98,23 +111,10 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   splotd *sp = current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
-  if (button1_p) {
-    gint xdist = brush_pos.x2 - brush_pos.x1 ;
-    gint ydist = brush_pos.y2 - brush_pos.y1 ;
-    /*
-     * (x2,y2) is the corner that's moving.
-    */
-    brush_pos.x1 = mouse->x - xdist ;
-    brush_pos.x2 = mouse->x ;
-    brush_pos.y1 = mouse->y - ydist ;
-    brush_pos.y2 = mouse->y ;
-  }
+  if (button1_p)
+    brush_set_pos (mouse->x, mouse->y);
 
   else if (button2_p) {
-    /*
-     * Reshape brush.  Keep x1 < x2 and y1 < y2 so that the
-     * painting code can be simple.
-    */
     brush_pos.x2 = mouse->x ;
     brush_pos.y2 = mouse->y ;
   }

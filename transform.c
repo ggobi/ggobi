@@ -6,6 +6,12 @@
 #include "vars.h"
 #include "externs.h"
 
+#ifdef G_OS_WIN32
+#include <float.h>
+extern gint _finite (gdouble);
+#endif
+
+
 #define SIGNUM(x) (((x)<0.0)?(-1.0):(((x)>0.0)?(1.0):(0.0)))
 
 /* */

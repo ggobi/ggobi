@@ -590,6 +590,12 @@ splot_pixmap1_to_window (splotd *sp) {
 
 void
 splot_redraw (splotd *sp, gint redraw_style) {
+
+  /*-- sometimes the first draw happens before configure is called --*/
+  if (sp->da == NULL || sp->pixmap0 == NULL) {
+    return;
+  }
+
   switch (redraw_style) {
     case FULL:
       splot_draw_to_pixmap0_unbinned (sp);

@@ -568,7 +568,7 @@ determine_endbasis_and_path(displayd *dsp, cpaneld *cpanel)
 }
 
 void
-increment_tour(displayd *dsp)
+increment_tour (displayd *dsp)
 {
   display_tailpipe (dsp);
 
@@ -576,7 +576,7 @@ increment_tour(displayd *dsp)
 }
 
 gint
-check_tour(displayd *dsp, cpaneld *cpanel)
+check_tour (displayd *dsp, cpaneld *cpanel)
 {
   gint return_val = 1;
 
@@ -584,9 +584,9 @@ check_tour(displayd *dsp, cpaneld *cpanel)
   dsp->tinc[1] += (dsp->delta * dsp->tau[1]);
 
   if ((dsp->tinc[0] > cpanel->tour_path_len*dsp->tau[0]) || 
-    (dsp->tinc[1] > cpanel->tour_path_len*dsp->tau[1]) ||
-    ((dsp->tinc[0] == cpanel->tour_path_len*dsp->tau[0]) && 
-    (dsp->tinc[1] == cpanel->tour_path_len*dsp->tau[1])))
+      (dsp->tinc[1] > cpanel->tour_path_len*dsp->tau[1]) ||
+      ((dsp->tinc[0] == cpanel->tour_path_len*dsp->tau[0]) && 
+       (dsp->tinc[1] == cpanel->tour_path_len*dsp->tau[1])))
       return_val = 0;
 
   return (return_val);
@@ -601,8 +601,8 @@ run_tour (displayd *dsp)
  * This controls the tour, effectively. It checks if we are at the end of 
  * the current path, if not then increments the tour a step.
 */
-  if (check_tour(dsp, cpanel)) {
-    increment_tour(dsp);
+  if (check_tour (dsp, cpanel)) {
+    increment_tour (dsp);
   }
 /*
  * Calculation of new path for various different modes.
@@ -611,8 +611,8 @@ run_tour (displayd *dsp)
 /*
  * Do a final projection into the ending plane if just finished a tour
 */
-      do_last_increment(dsp, cpanel);
-      determine_endbasis_and_path(dsp, cpanel);
+      do_last_increment (dsp, cpanel);
+      determine_endbasis_and_path (dsp, cpanel);
   }
 }
 

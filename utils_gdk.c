@@ -86,34 +86,50 @@ draw_glyph (GdkDrawable *drawable, glyphv *gl, icoords *xypos, gint jpos)
   }
 }
 
+/*-- mousepos is a global variable --*/
 void
-mousepos_get (GtkWidget *w, GdkEventMotion *event,
+mousepos_get (GtkWidget *w, GdkEvent *event,
               gboolean *btn1_down_p, gboolean *btn2_down_p)
 {
+  GdkModifierType state;
+
   *btn1_down_p = false;
   *btn2_down_p = false;
 
-  if (event->is_hint) {  /*-- that is, if using motion hints --*/
+  /*-- that is, if using motion hints --*/
+  if (event->type == GDK_MOTION_NOTIFY) { 
+    GdkEventMotion *mevent = (GdkEventMotion *) event;
+    if (mevent->is_hint) {
 
-    GdkModifierType state;
-    /*-- mousepos is global --*/
-    gdk_window_get_pointer (w->window, &mousepos.x, &mousepos.y, &state);
-    if ((state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
-      *btn1_down_p = true;
-    else if ((state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
-      *btn2_down_p = true;
-    else if ((state & GDK_BUTTON3_MASK) == GDK_BUTTON3_MASK)
-      *btn2_down_p = true;
+      gdk_window_get_pointer (w->window, &mousepos.x, &mousepos.y, &state);
+      if ((state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
+        *btn1_down_p = true;
+      else if ((state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
+        *btn2_down_p = true;
+      else if ((state & GDK_BUTTON3_MASK) == GDK_BUTTON3_MASK)
+        *btn2_down_p = true;
 
-  } else {
-    /*-- mousepos is global --*/
-    mousepos.x = event->x;
-    mousepos.y = event->y;
-    if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
+    } else {
+
+      mousepos.x = mevent->x;
+      mousepos.y = mevent->y;
+      if ((mevent->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
+        *btn1_down_p = true;
+      else if ((mevent->state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
+        *btn2_down_p = true;
+      else if ((mevent->state & GDK_BUTTON3_MASK) == GDK_BUTTON3_MASK)
+        *btn2_down_p = true;
+    }
+
+  } else if (event->type == GDK_BUTTON_PRESS) {
+    GdkEventButton *bevent = (GdkEventButton *) event;
+    mousepos.x = bevent->x;
+    mousepos.y = bevent->y;
+    if ((bevent->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
       *btn1_down_p = true;
-    else if ((event->state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
+    else if ((bevent->state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
       *btn2_down_p = true;
-    else if ((event->state & GDK_BUTTON3_MASK) == GDK_BUTTON3_MASK)
+    else if ((bevent->state & GDK_BUTTON3_MASK) == GDK_BUTTON3_MASK)
       *btn2_down_p = true;
   }
 }
