@@ -6,9 +6,9 @@
 <description>
 </description>
 <variables count="3">
-  <variable>v1</variable>
-  <variable>v2</variable>
-  <variable>v3</variable>
+  <variable name="v1" />
+  <variable name="v2" />
+  <variable name="v3" />
 </variables>
 <records count="60" color="2" glyph="plus 0">
 <record id="1"> -0.108022 2.389616 -2.593673 </record>

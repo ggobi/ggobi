@@ -75,20 +75,20 @@ costs, income growth, job growth.
 </description>
 
 <variables count="14">
-<variable>Climate</variable>
-<variable>HousingCost</variable>
-<variable>HlthCare</variable>
-<variable>Crime</variable>
-<variable>Transp</variable>
-<variable>Educ</variable>
-<variable>Arts</variable>
-<variable>Recreat</variable>
-<variable>Econ</variable>
-<variable>CaseNum</variable>
-<variable>Long</variable>
-<variable>Lat</variable>
-<variable>Pop</variable>
-<variable>StNum</variable>
+ <realvariable name="Climate"/>
+ <realvariable name="HousingCost"/>
+ <realvariable name="HlthCare"/>
+ <realvariable name="Crime"/>
+ <realvariable name="Transp"/>
+ <realvariable name="Educ"/>
+ <realvariable name="Arts"/>
+ <realvariable name="Recreat"/>
+ <realvariable name="Econ"/>
+ <realvariable name="CaseNum"/>
+ <realvariable name="Long"/>
+ <realvariable name="Lat"/>
+ <realvariable name="Pop"/>
+ <realvariable name="StNum"/>
 </variables>
 <records
  count="329" glyph="fr 1" color="5">
