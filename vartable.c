@@ -51,10 +51,6 @@ selected_cols_get (gint *cols, datad *d, ggobid *gg)
 /*
  * When there aren't any columns in the variable statistics table,
  * this is how we find out which columns are selected for plotting.
- * 
- * I was selecting them in the variable table, and then clearing
- * the table afterwards, but I don't like that -- it triggers callbacks
- * in a mysterious way.
 */
 gint
 plotted_cols_get (gint *cols, datad *d, ggobid *gg) 
@@ -80,11 +76,36 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
             cols[ncols++] = display->tour_vars[k];
         break;
       }
-      break;
+    break;
     case scatmat:
-      break;
+    {
+      GList *l;
+      splotd *s;
+      for (l=display->splots; l; l=l->next) {
+        s = (splotd *) l->data;
+        if (s->p1dvar == -1) {
+          if (!array_contains (cols, sp->xyvars.x))
+            cols[ncols++] = sp->xyvars.x;
+          if (!array_contains (cols, sp->xyvars.y))
+            cols[ncols++] = sp->xyvars.y;
+        } else {
+          if (!array_contains (cols, sp->p1dvar))
+            cols[ncols++] = sp->p1dvar;
+        }
+      }
+    }
+    break;
     case parcoords:
-      break;
+    {
+      GList *l;
+      splotd *s;
+      for (l=display->splots; l; l=l->next) {
+        s = (splotd *) l->data;
+        if (!array_contains (cols, sp->p1dvar))
+          cols[ncols++] = sp->p1dvar;
+      }
+    }
+    break;
   }
 
   return ncols;

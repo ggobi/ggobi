@@ -1,0 +1,32 @@
+Assuming we had a display class, what methods should it have?
+
+Drawing:
+
+All splots in all displays plot points in the same way (so far);
+most splots should to be able to add edges between points.
+
+When an splot draws itself, it often checks the display type:
+  when it decides whether to draw case i
+  when it decides what plot labels to add
+  whether to add other objects: if parcoords, add whiskers
+  when it decides whether to draw a line differently:
+     if parcoords, mark the current point by drawing its
+     line with double thickness
+
+When an splot manages its data, it checks the display type:
+  it allocates different arrays for different display types
+     parcoords: allocates, builds, frees whiskers
+  projects the data differently 
+  
+Main UI:
+  different viewmodes are available for different display types
+  different display options are available for different display types
+ 
+Variable gui:
+  circles: this looks like a displaytype dependency, but it's really
+    just a viewmode dependency, I think
+  checkboxes: each display has its own variable selection rules
+
+Variable table:
+  finding out which variables are active works differently in
+    each display type

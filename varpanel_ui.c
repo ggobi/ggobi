@@ -413,7 +413,6 @@ varpanel_tooltips_set (ggobid *gg)
         case parcoords:
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
             checkbox_get_nth (j, d),
-/*            d->varpanel_ui.checkbox.vals[j],*/
             "Click to replace/insert/append a variable, or to delete it",
             NULL);
         break;
@@ -421,7 +420,6 @@ varpanel_tooltips_set (ggobid *gg)
         case scatmat:
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
             checkbox_get_nth (j, d),
-/*            d->varpanel_ui.checkbox.vals[j],*/
             "Click to replace/insert/append a variable, or to delete it",
             NULL);
         break;
@@ -431,21 +429,18 @@ varpanel_tooltips_set (ggobid *gg)
             case P1PLOT:
               gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
                 checkbox_get_nth (j, d),
-/*                d->varpanel_ui.checkbox.vals[j],*/
                 "Click left to plot horizontally, middle to plot vertically",
                 NULL);
             break;
             case XYPLOT:
               gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
                 checkbox_get_nth (j, d),
-/*                d->varpanel_ui.checkbox.vals[j],*/
                 "Click left to select the horizontal variable, middle for vertical",
                 NULL);
             break;
             case TOUR2D:
               gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
                 checkbox_get_nth (j, d),
-/*                d->varpanel_ui.checkbox.vals[j],*/
                 "Click to select a variable to be available for touring",
                 NULL);
             break;
