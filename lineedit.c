@@ -40,7 +40,7 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
     dtarget = e;
   }
 
-  /*-- Make sure the id is unique --*/
+  /*-- Make sure the id is unique -- usually only if adding points --*/
   if (dtarget->idTable && id) {
     gchar *stmp;
     if (id && strlen(id) > 0) stmp = g_strdup (id);
