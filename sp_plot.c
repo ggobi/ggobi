@@ -647,6 +647,7 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   gint mode = mode_get (gg);
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
+  datad *d = gg->current_display->d;
 
   if (!binned) {
     gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
@@ -687,8 +688,8 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
 
     switch (mode) {
       case BRUSH:
-        brush_draw_brush (sp, gg);
-        brush_draw_label (sp, gg);
+        brush_draw_brush (sp, d, gg);
+        brush_draw_label (sp, d, gg);
         break;
       case SCALE:
         scaling_visual_cues_draw (sp, gg);

@@ -59,7 +59,7 @@ get_extended_brush_corners (icoords *bin0, icoords *bin1, datad *d, ggobid *gg)
 {
   static brush_coords obrush;
   static gboolean initd = false;
-  brush_coords *brush_pos = &gg->brush.brush_pos;
+  brush_coords *brush_pos = &d->brush_pos;
   gint x1 = MIN (brush_pos->x1, brush_pos->x2);
   gint y1 = MIN (brush_pos->y1, brush_pos->y2);
   gint x2 = MAX (brush_pos->x1, brush_pos->x2);

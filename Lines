@@ -84,6 +84,7 @@
 30784   7/31  embedded exclusion window inside a notebook widget
 30808   8/2   a little polishing in the transformation code
 30818   8/2   more polishing and debugging of sphering
+31051   8/3   folded in Duncan's work to read multiple datad's in xml!
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

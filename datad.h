@@ -95,7 +95,7 @@ class datad {
 
 /*------------------------ brushing ----------------------------------*/
 
- 
+ brush_coords brush_pos;  
  gint npts_under_brush;
  gboolean *pts_under_brush;
  gshort *color_ids, *color_now, *color_prev;  /* 0:ncolors-1 */

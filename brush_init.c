@@ -171,10 +171,10 @@ br_line_color_init (ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-brush_pos_init (ggobid *gg)
+brush_pos_init (datad *d)
 {
-  gg->brush.brush_pos.x1 = gg->brush.brush_pos.y1 = 20;
-  gg->brush.brush_pos.x2 = gg->brush.brush_pos.y2 = 40;
+  d->brush_pos.x1 = d->brush_pos.y1 = 20;
+  d->brush_pos.x2 = d->brush_pos.y2 = 40;
 }
 
 /*----------------------------------------------------------------------*/
@@ -250,33 +250,25 @@ brush_free (datad *d, ggobid *gg)
 void
 brush_init (datad *d, ggobid *gg)
 {
-  
-
   gg->glyph_id.type = gg->glyph_0.type = FILLED_CIRCLE;
   gg->glyph_id.size = gg->glyph_0.size = 3;
   gg->color_id = gg->color_0 = 0;
 
-  if (gg->brush.firsttime) {
-    brush_pos_init (gg);
+  brush_pos_init (d);
 
-    /*
-     * Used in binning the plot window
-    */
-    d->brush.nbins = BRUSH_NBINS;
+  /*
+   * Used in binning the plot window
+  */
+  d->brush.nbins = BRUSH_NBINS;
 
-    /*
-     * These are initialized so that the first merge_brushbins()
-     * call will behave reasonably.
-    */
-    d->brush.bin0.x = d->brush.bin1.x = BRUSH_NBINS;
-    d->brush.bin0.y = d->brush.bin1.y = BRUSH_NBINS;
+  /*
+   * These are initialized so that the first merge_brushbins()
+   * call will behave reasonably.
+  */
+  d->brush.bin0.x = d->brush.bin1.x = BRUSH_NBINS;
+  d->brush.bin0.y = d->brush.bin1.y = BRUSH_NBINS;
 
-    brush_alloc (d, gg);
-
-    gg->brush.firsttime = false;
-
-  } else {
-  }
+  brush_alloc (d, gg);
 }
 
 void

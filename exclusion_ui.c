@@ -198,7 +198,7 @@ void
 exclusion_window_open (ggobid *gg) {
   GtkWidget *scrolled_window;
   GtkWidget *vbox, *ebox, *btn, *hbox;
-  gint k, n;
+  gint k, n=0;
   GSList *l;
   datad *d;
   gchar *label;

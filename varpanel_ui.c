@@ -330,14 +330,17 @@ popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   displayd *display = gg->current_display;
-  datad *d = display->d;
   cpaneld *cpanel;
   gint jvar = GPOINTER_TO_INT (cbd);
   GtkWidget *p1d_menu, *xyplot_menu;
   GtkWidget *rotation_menu, *tour_menu;
   GtkWidget *parcoords_menu, *scatmat_menu;
+  /*-- w  is the variable label --*/
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (w), "datad");
 
   if (display == NULL)
+    return false;
+  if (display->d != d)  /*-- only select for the current plot --*/
     return false;
 
   cpanel = &display->cpanel;
@@ -400,6 +403,7 @@ popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd)
 }
 
 /*-------------------------------------------------------------------------*/
+/*                   variable cloning                                      */
 /*-------------------------------------------------------------------------*/
 
 void
@@ -409,7 +413,6 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   gint nc = d->ncols + 1;
   gint i, j, k = 0;
   
-
   /*-- set a view of the data values before building the new circle --*/
   vartable_row_append (d->ncols-1, d, gg);
   vartable_realloc (nc, d, gg);
@@ -488,6 +491,7 @@ updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
   return (true);
 }
 
+/*-------------------------------------------------------------------------*/
 
 static gint
 varsel_cb (GtkWidget *w, GdkEvent *event, gpointer cbd)
@@ -636,8 +640,9 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
   /*
    * copy the pixmap to the window
   */
-  gdk_draw_pixmap (d->varpanel_ui.da[jvar]->window, gg->unselvarfg_GC, vpixmap, 0, 0, 0, 0,
-    VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
+  gdk_draw_pixmap (d->varpanel_ui.da[jvar]->window, gg->unselvarfg_GC,
+                   vpixmap, 0, 0, 0, 0,
+                   VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
 }
 
 gboolean
@@ -645,8 +650,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   gint k = GPOINTER_TO_INT (cbd);
-  displayd *display = gg->current_display;
-  datad *d = display->d;
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (w), "datad");
 
   /* are there two gg assignments here? */
   /*gg = ggobi_get (0);*/
@@ -709,6 +713,7 @@ varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
     "button_press_event",
     GTK_SIGNAL_FUNC (popup_varmenu), GINT_TO_POINTER (k));
 
+  gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.label[k]), "datad", d);
   GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.label[k]), gg, true);
 
   /*
@@ -731,6 +736,7 @@ varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
   gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.da[k]), "button_press_event",
     GTK_SIGNAL_FUNC (varsel_cb), GINT_TO_POINTER (k));
 
+  gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.da[k]), "datad", d);
   GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.da[k]), gg, true);
 
   gtk_widget_show (d->varpanel_ui.da[k]);
@@ -768,11 +774,15 @@ varpanel_clear (ggobid *gg) {
 void vartable_populate (datad *d, ggobid *gg)
 {
   gint i, j, k;
-
+  GtkWidget *frame = gtk_frame_new (NULL);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  gtk_box_pack_start (GTK_BOX (gg->varpanel_ui.varpanel),
+                      frame, true, true, 2);
+  gtk_widget_show (frame);
+  
   d->varpanel_ui.table = gtk_table_new (d->varpanel_ui.vnrows,
                                         d->varpanel_ui.vncols, true);
-  gtk_box_pack_start (GTK_BOX (gg->varpanel_ui.varpanel),
-                      d->varpanel_ui.table, true, true, 2);
+  gtk_container_add (GTK_CONTAINER (frame), d->varpanel_ui.table);
 
   /*-- da and label are freed in varpanel_clear --*/
 

@@ -144,15 +144,27 @@ vartable_row_append (gint j, datad *d, ggobid *gg)
     gchar **row;
     row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
 
-    row[0] = g_strdup_printf ("%d", j);
-    row[1] = g_strdup (d->vartable[j].collab);
-    row[2] = g_strdup_printf ("%d", d->vartable[j].groupid);
-    row[3] = g_strdup ("");
-    row[4] = g_strdup_printf ("%8.3f", d->vartable[j].lim_raw.min);
-    row[5] = g_strdup_printf ("%8.3f", d->vartable[j].lim_raw.max);
-    row[6] = g_strdup_printf ("%8.3f", d->vartable[j].mean);
-    row[7] = g_strdup_printf ("%8.3f", d->vartable[j].median);
-    row[8] = g_strdup_printf ("%d", d->vartable[j].nmissing);
+    if (j == -1) {
+      row[0] = g_strdup_printf ("%d", 0);
+      row[1] = g_strdup ("");
+      row[2] = g_strdup_printf ("%d", 0);
+      row[3] = g_strdup ("");
+      row[4] = g_strdup_printf ("%8.3f", 0.0);
+      row[5] = g_strdup_printf ("%8.3f", 0.0);
+      row[6] = g_strdup_printf ("%8.3f", 0.0);
+      row[7] = g_strdup_printf ("%8.3f", 0.0);
+      row[8] = g_strdup_printf ("%d", 0);
+    } else {
+      row[0] = g_strdup_printf ("%d", j);
+      row[1] = g_strdup (d->vartable[j].collab);
+      row[2] = g_strdup_printf ("%d", d->vartable[j].groupid);
+      row[3] = g_strdup ("");
+      row[4] = g_strdup_printf ("%8.3f", d->vartable[j].lim_raw.min);
+      row[5] = g_strdup_printf ("%8.3f", d->vartable[j].lim_raw.max);
+      row[6] = g_strdup_printf ("%8.3f", d->vartable[j].mean);
+      row[7] = g_strdup_printf ("%8.3f", d->vartable[j].median);
+      row[8] = g_strdup_printf ("%d", d->vartable[j].nmissing);
+    }
 
     gtk_clist_append ((GtkCList *) d->vartable_clist, row);
 

@@ -101,7 +101,7 @@ brush_reset_cb (GtkWidget *w, gpointer cbd)
       break;
 
     case 5:  /*-- reset brush size --*/
-      brush_pos_init (gg);
+      brush_pos_init (d);
       splot_redraw (gg->current_splot, QUICK, gg);
       break;
   }
@@ -136,12 +136,14 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromWidget (w, true);
   splotd *sp = gg->current_splot;
+  displayd *display = gg->current_display;
+  datad *d = display->d;
 
   /*-- get the mouse position and find out which buttons are pressed --*/
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
 
   if (button1_p || button2_p)
-    brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, gg);
+    brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, d, gg);
 
   return true;
 }
@@ -174,9 +176,9 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   GGobi_widget_set(sp->da, gg, true);
 
-  brush_set_pos ((gint) event->x, (gint) event->y, gg);
+  brush_set_pos ((gint) event->x, (gint) event->y, d, gg);
 
-  brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, gg);
+  brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, d, gg);
 
   return retval;
 }

@@ -11,6 +11,14 @@ API code needed:
   sticky labels
   imputation of missing values
 
+datad work:
+output:
+*  the 'create file set' panel needs thought:  specify
+    datad to save if xml is not selected?
+Brushing: 
+*  when moving between datad's, the colors shown in the exclude window
+    get confused
+
 various stuff not yet implemented:
   1d, xy cycling  .... or run as a demo in R for now?
   some window closings  (display tree, ...)
@@ -21,6 +29,9 @@ display_tree doesn't update itself when splots change
 
 when brushing or identifying in parcoords, use leave/enter events to
   change the current_splot.
+
+consider sphering data into new variables instead of overwriting
+the existing values -- that will test cloning!
 
 keep working on array and vector management
 
@@ -145,3 +156,8 @@ Food for thought:
 ! check for note in transform.c : static variables eliminated
 
 ! add notebook controls to the exclusion window
+
+! Variable panel:
+!  add a divider between the sections; using etched frames 
+!  it doesn't refresh correctly.
+!  the menus pop up in the wrong place

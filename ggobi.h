@@ -200,7 +200,6 @@ struct _ggobid {
    GtkWidget *cg_opt;
    GtkWidget *scope_opt;
    GtkWidget *brush_on_btn;
-   brush_coords brush_pos ;  
 
    gboolean firsttime;
  } brush;

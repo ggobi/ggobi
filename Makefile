@@ -131,7 +131,7 @@ clean:
 	rm -f *.o ggobi libGGobi.so
 
 .c.o:
-	$(CC) -c $(CFLAGS) -I. `gtk-config --cflags` $*.c
+	$(CC) -c -I. `gtk-config --cflags` $(CFLAGS) $*.c
 
 # A version that compiles all C code (except for mt19937-1.c) as 
 # C++.

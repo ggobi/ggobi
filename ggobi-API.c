@@ -837,15 +837,15 @@ GGOBI(setIdentifyHandler)(IdentifyProc proc,  void *data, ggobid *gg)
 void
 GGOBI(getBrushSize)(gint *w, gint *h, datad *d, ggobid *gg)
 {
-  *w = ABS(gg->brush.brush_pos.x1 - gg->brush.brush_pos.x2);
-  *h = ABS(gg->brush.brush_pos.y1 - gg->brush.brush_pos.y2);
+  *w = ABS(d->brush_pos.x1 - d->brush_pos.x2);
+  *h = ABS(d->brush_pos.y1 - d->brush_pos.y2);
 }
 
 void
 GGOBI(getBrushLocation)(gint *x, gint *y, datad *d, ggobid *gg)
 {
-  *x = MIN(gg->brush.brush_pos.x1, gg->brush.brush_pos.x2);
-  *y = MIN(gg->brush.brush_pos.y1, gg->brush.brush_pos.y2);
+  *x = MIN(d->brush_pos.x1, d->brush_pos.x2);
+  *y = MIN(d->brush_pos.y1, d->brush_pos.y2);
 }
 
 void
@@ -862,11 +862,11 @@ redraw (datad *d, ggobid *gg)
 
 void GGOBI(setBrushSize)(int w, int h, datad *d, ggobid *gg)
 {
-  gg->brush.brush_pos.x1 = MIN(gg->brush.brush_pos.x1, gg->brush.brush_pos.x2);
-  gg->brush.brush_pos.y1 = MIN(gg->brush.brush_pos.y1, gg->brush.brush_pos.y2);
+  d->brush_pos.x1 = MIN(d->brush_pos.x1, d->brush_pos.x2);
+  d->brush_pos.y1 = MIN(d->brush_pos.y1, d->brush_pos.y2);
 
-  gg->brush.brush_pos.x2 =  gg->brush.brush_pos.x1 + w;
-  gg->brush.brush_pos.y2 =  gg->brush.brush_pos.y1 + h;
+  d->brush_pos.x2 =  d->brush_pos.x1 + w;
+  d->brush_pos.y2 =  d->brush_pos.y1 + h;
 
   brush_once (true, d, gg);
   redraw (d, gg);
@@ -879,11 +879,11 @@ void GGOBI(setBrushLocation)(gint x, gint y, datad *d, ggobid *gg)
  gint wd, ht;
  GGOBI(getBrushSize)(&wd, &ht, d, gg);
  
- gg->brush.brush_pos.x1 = x;
- gg->brush.brush_pos.y1 = y;
+ d->brush_pos.x1 = x;
+ d->brush_pos.y1 = y;
 
- gg->brush.brush_pos.x2 = x + wd;
- gg->brush.brush_pos.y2 = y + ht;
+ d->brush_pos.x2 = x + wd;
+ d->brush_pos.y2 = y + ht;
 
  /*
  GGOBI(setBrushSize)(wd, ht, gg);

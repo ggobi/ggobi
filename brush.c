@@ -9,7 +9,7 @@
 
 /* */
 gboolean active_paint_points (datad *d, ggobid *gg);
-gboolean active_paint_lines (ggobid *gg);
+gboolean active_paint_lines (datad *d, ggobid *gg);
 /* */
 
   /* corner (x1, y1); corner where the cursor goes (x2,y2) */
@@ -29,7 +29,7 @@ brush_once (gboolean force, datad *d, ggobid *gg)
  * bin0 is the bin which contains of the upper left corner of the
  * brush; bin1 is the one containing of the lower right corner.
 */
-  brush_coords *brush_pos = &gg->brush.brush_pos;
+  brush_coords *brush_pos = &d->brush_pos;
   gint ulx = MIN (brush_pos->x1, brush_pos->x2);
   gint uly = MIN (brush_pos->y1, brush_pos->y2);
   gint lrx = MAX (brush_pos->x1, brush_pos->x2);
@@ -60,7 +60,7 @@ brush_once (gboolean force, datad *d, ggobid *gg)
   }
 
   if (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL) {
-    changed = active_paint_lines (gg);
+    changed = active_paint_lines (d, gg);
   }
 
   return (changed);
@@ -133,8 +133,8 @@ reinit_transient_brushing (datad *d, ggobid *gg)
 }
 
 void
-brush_set_pos (gint x, gint y, ggobid *gg) {
-  brush_coords *brush_pos = &gg->brush.brush_pos;
+brush_set_pos (gint x, gint y, datad *d, ggobid *gg) {
+  brush_coords *brush_pos = &d->brush_pos;
   gint xdist = brush_pos->x2 - brush_pos->x1 ;
   gint ydist = brush_pos->y2 - brush_pos->y1 ;
   /*
@@ -149,13 +149,12 @@ brush_set_pos (gint x, gint y, ggobid *gg) {
 
 void
 brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
-  cpaneld *cpanel, ggobid *gg)
+  cpaneld *cpanel, datad *d, ggobid *gg)
 {
   gboolean changed = false;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
-  brush_coords *brush_pos = &gg->brush.brush_pos;
-  datad *d = display->d;
+  brush_coords *brush_pos = &d->brush_pos;
 
   if (button1_p) {
     if (display->displaytype == parcoords) {
@@ -176,7 +175,7 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
 */
     }
 
-    brush_set_pos (mouse->x, mouse->y, gg);
+    brush_set_pos (mouse->x, mouse->y, d, gg);
   }
 
   else if (button2_p) {
@@ -218,7 +217,8 @@ under_brush (gint k, ggobid *gg)
 */
 {
   splotd *sp = gg->current_splot;
-  brush_coords *brush_pos = &gg->brush.brush_pos;
+  datad *d = gg->current_display->d;
+  brush_coords *brush_pos = &d->brush_pos;
   gint pt;
   gint x1 = MIN (brush_pos->x1, brush_pos->x2);
   gint x2 = MAX (brush_pos->x1, brush_pos->x2);
@@ -258,11 +258,9 @@ brush_boundaries_set (cpaneld *cpanel,
 }
 
 void
-brush_draw_label (splotd *sp, ggobid *gg) {
+brush_draw_label (splotd *sp, datad *d, ggobid *gg) {
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
-  displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
 
   if (d->npts_under_brush > 0) {
     gchar *str = g_strdup_printf ("%d", d->npts_under_brush);
@@ -278,7 +276,7 @@ brush_draw_label (splotd *sp, ggobid *gg) {
 }
 
 void
-brush_draw_brush (splotd *sp, ggobid *gg) {
+brush_draw_brush (splotd *sp, datad *d, ggobid *gg) {
 /*
  * Use brush_pos to draw the brush.
 */
@@ -288,7 +286,7 @@ brush_draw_brush (splotd *sp, ggobid *gg) {
   gboolean line_painting_p =
      (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL);
 
-  brush_coords *brush_pos = &gg->brush.brush_pos;
+  brush_coords *brush_pos = &d->brush_pos;
   gint x1 = MIN (brush_pos->x1, brush_pos->x2);
   gint x2 = MAX (brush_pos->x1, brush_pos->x2);
   gint y1 = MIN (brush_pos->y1, brush_pos->y2);
@@ -704,17 +702,17 @@ line_brush_undo (splotd *sp, ggobid *gg) {
 }
 
 gboolean
-xed_by_brush (gint k, ggobid *gg)
+xed_by_brush (gint k, datad *d, ggobid *gg)
 /*
  * Determine whether line k intersects the brush
 */
 {
   splotd *sp = gg->current_splot;
   gboolean intersect;
-  glong x1 = gg->brush.brush_pos.x1;
-  glong y1 = gg->brush.brush_pos.y1;
-  glong x2 = gg->brush.brush_pos.x2;
-  glong y2 = gg->brush.brush_pos.y2;
+  glong x1 = d->brush_pos.x1;
+  glong y1 = d->brush_pos.y1;
+  glong x2 = d->brush_pos.x2;
+  glong y2 = d->brush_pos.y2;
 
   glong ax = sp->screen[gg->edge_endpoints[k].a - 1].x;
   glong ay = sp->screen[gg->edge_endpoints[k].a - 1].y;
@@ -859,7 +857,7 @@ build_line_hidden_vectors (ggobid *gg)
 }
 
 gboolean
-active_paint_lines (ggobid *gg)
+active_paint_lines (datad *d, ggobid *gg)
 {
   gint k;
   gboolean changed;
@@ -872,7 +870,7 @@ active_paint_lines (ggobid *gg)
  
   for (k=0; k<gg->nedges; k++) {
 
-    if (xed_by_brush (k, gg)) {
+    if (xed_by_brush (k, d, gg)) {
 
       gg->line.nxed_by_brush++ ;
       gg->line.xed_by_brush.vals[k] = true;
