@@ -67,6 +67,23 @@ canRead(const char * const fileName)
   return(val);
 }
 
+gboolean
+GGobi_checkPlugin(GGobiPluginDetails *plugin)
+{
+ gboolean (*f)(void);
+ gboolean ok = true;
+ f = (gboolean (*)(void)) getPluginSymbol("checkGGobiStructSizes", plugin);
+ if(f) {
+   if(!(ok = f())) 
+     g_printerr("Problems with plugin %s. Incosistent view of ggobi's data structures.\n", plugin->name);
+   else if(sessionOptions->verbose == GGOBI_VERBOSE)
+     g_printerr("plugin %s appears consistent with ggobi structures.\n", plugin->name);   
+ } else if(sessionOptions->verbose == GGOBI_VERBOSE)
+     g_printerr("plugin %s has no validation mechanism\n", plugin->name);   
+
+ return(ok);
+}
+
 HINSTANCE 
 load_plugin_library(GGobiPluginDetails *plugin)
 {
@@ -119,6 +136,7 @@ load_plugin_library(GGobiPluginDetails *plugin)
      g_free(fileName);
    return(handle);
 }
+
 
 DLFUNC 
 getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
@@ -251,7 +269,6 @@ showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
   gtk_container_set_border_width(GTK_CONTAINER(main_vbox),0); 
   gtk_container_add(GTK_CONTAINER(win), main_vbox);
   gtk_widget_show(main_vbox);
-
 
   list = gtk_clist_new_with_titles(sizeof(titles)/sizeof(titles[0]), (gchar **) titles);
 
@@ -397,7 +414,10 @@ runInteractiveInputPlugin(ggobid *gg)
          strcmp(sessionOptions->data_type, plugin->info.i->modeName) == 0)
       {
         InputGetDescription f;
-        loadPluginLibrary(plugin->details, plugin);
+        if(!loadPluginLibrary(plugin->details, plugin)) {
+  	   g_printerr("Failed to load plugin %s\n", plugin->details->name);
+   	   continue;
+	}
         f = (InputGetDescription) getPluginSymbol(plugin->info.i->getDescription,
                                                   plugin->details);
         if(f) {

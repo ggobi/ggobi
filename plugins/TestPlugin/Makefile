@@ -22,15 +22,14 @@ ifdef GGOBI_CONFIG
  GGOBI_INCLUDE_DIR=$(shell $(GGOBI_CONFIG) --cflags)
  GGOBI_LIB=$(shell $(GGOBI_CONFIG) --libs)
 else
- GGOBI_INCLUDE_DIR=-I../..
- GGOBI_LIB=-L../.. -lggobi
+ GGOBI_INCLUDE_DIR=-I$(GGOBI_HOME)
+ GGOBI_LIB=-L$(GGOBI_HOME) -lggobi
 endif
 
-CFLAGS+= $(shell $(GTK_CONFIG) --cflags)
+GGOBI_CFLAGS= $(shell cd $(GGOBI_HOME) ; make cflags)
 ifdef  EXTRA_INCLUDE_DIR
  CFLAGS+=$(EXTRA_INCLUDE_DIR:%=-I%)
 endif
-
 
 GTK_LIBS=$(shell $(GTK_CONFIG) --libs)
 
@@ -38,7 +37,7 @@ TestPlugin.so: $(OBJS)
 	$(CC) -shared $(OBJS) -o $@ $(EXTRA_LIBS) $(GGOBI_LIB) $(GTK_LIBS)
 
 testplugin.o: testplugin.c
-	$(CC) -g $(GGOBI_INCLUDE_DIR) $(CFLAGS) -o $@ -c $<
+	$(CC) -g $(GGOBI_INCLUDE_DIR) $(CFLAGS) $(GGOBI_CFLAGS) -o $@ -c $<
 
 clean:
 	rm -f *.o *.so

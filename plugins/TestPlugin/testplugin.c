@@ -3,6 +3,8 @@
 #include <gtk/gtk.h>
 #include "plugin.h"
 
+#include "GGStructSizes.c"
+
 gboolean
 init(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {

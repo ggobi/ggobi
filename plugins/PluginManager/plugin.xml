@@ -2,6 +2,6 @@
    <description>Load plugins from a file.</description>
    <author>Duncan Temple Lang</author>
    <dll name="plugins/PluginManager/PluginManager.so">
-    <init onCreate="addToMenu" />
+    <init onCreate="addToMenu" onLoad="onLoadPluginManager" />
   </dll>
 </plugin>

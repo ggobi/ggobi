@@ -2,6 +2,19 @@
 #include "plugin.h"
 #include "externs.h"
 
+#include "GGStructSizes.c"
+
+gboolean
+onLoadPluginManager(gboolean init, GGobiPluginInfo *plugin)
+{
+  gboolean ok;
+  ok = checkGGobiStructSizes();
+  if(!ok) {
+     g_printerr("Plugin %s (in %s) needs to be recompiled\n", plugin->details->name, plugin->details->dllName);
+  }
+
+  return(ok);
+}
 
 void
 loadPluginFromFile(GtkWidget *btn, ggobid *gg)

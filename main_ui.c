@@ -59,7 +59,7 @@ static const char *const *viewmode_name = GGOBI(OpModeNames);
 void addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg);
 
 void store_session(ggobid *gg, gint action, GtkWidget *w);
-void show_plugin_list(void *gg, gint action, GtkWidget *w);
+void show_plugin_list(ggobid *gg, gint action, GtkWidget *w);
 void create_new_ggobi(ggobid *gg, gint action, GtkWidget *w);
 
 void
@@ -868,11 +868,11 @@ create_ggobi(InputDescription *desc)
 
 #ifdef SUPPORT_PLUGINS
 void
-show_plugin_list(void *garbage, gint action, GtkWidget *w)
+show_plugin_list(ggobid *gg, gint action, GtkWidget *w)
 {
-  if(sessionOptions->info && sessionOptions->info)
+  if(sessionOptions->info && sessionOptions->info->plugins)
     showPluginInfo(sessionOptions->info->plugins,
-      sessionOptions->info->inputPlugins, (ggobid*) garbage);
+      sessionOptions->info->inputPlugins, (ggobid*) gg);
 }
 #endif
 

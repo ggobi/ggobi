@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 
+#include "GGStructSizes.c"
+
 gboolean generate_data(InputDescription *desc, ggobid *gg, GGobiPluginInfo *info);
 
 InputDescription *

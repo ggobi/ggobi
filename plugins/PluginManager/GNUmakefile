@@ -37,3 +37,4 @@ $(PKG).so: $(OBJS)
 	$(CC) -shared $(OBJS) -o $@ $(GGOBI_LIB)  $(EXTRA_LIBS)  
 
 
+pluginViewer.o: $(GGOBI_HOME)/GGStructSizes.c

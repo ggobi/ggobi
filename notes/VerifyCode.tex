@@ -2,6 +2,32 @@
 
 \begin{document}
 
+
+\section{}
+
+From the \file{pluginViewer.c}
+file in \dir{pluginManager}, we have
+\begin{verbatim}
+gboolean
+onLoadPluginManager(gboolean init, GGobiPluginInfo *plugin)
+{
+  gboolean ok;
+  ok = checkGGobiStructSizes();
+  if(!ok) {
+     g_printerr("Plugin %s (in %s) needs to be recompiled\n", plugin->details->name, plugin->details->dllName);
+  }
+
+  return(ok);
+}
+\end{verbatim}
+
+In R, we have an S function that calls the relevant C interfaces to
+the struct information from the \Spackage{Rggobi} package and the
+\SharedLibrary{libggobi} and then compares their contents in the S
+language for simplicity.  This function is called automatically when
+the library is loaded.
+
+
 \section{Event Callbacks}
 If one compiles with \CppMacro{CHECK_EVENT_SIGNATURES} defined as a
 pre-processor symbol (set \MakeVariable{DEFINES} in

@@ -18,6 +18,7 @@
 
 #include <stdlib.h> /* for getenv */
 
+#include "GGStructSizes.c"
 
 
 /**
@@ -123,7 +124,7 @@ gboolean initJVM(GGobiPluginInfo *info)
         return(JNI_FALSE);
     }
 
-    //    runPlugin("GGobiCallbackTest", std_env);
+    /*    runPlugin("GGobiCallbackTest", std_env); */
 
     status = JNI_TRUE;
     return(status);

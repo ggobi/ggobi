@@ -32,7 +32,7 @@ DataMode getInputType(xmlNode *node);
 
 gboolean getLogicalPreference(xmlNodePtr node, const char *elName, gboolean defaultValue);
 
-void getPlugins(xmlDocPtr doc, GGobiInitInfo *info);
+int getPlugins(xmlDocPtr doc, GGobiInitInfo *info);
 GGobiPluginInfo *processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
 GGobiPluginInfo *processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
 void getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc, gboolean isLanguage);
@@ -82,6 +82,7 @@ read_init_file(const gchar *filename, GGobiInitInfo *info)
   getPreviousFiles(doc, info);
   getPreviousGGobiDisplays(doc, info);
 #if SUPPORT_PLUGINS
+  info->plugins = NULL;
   getPlugins(doc, info);
 #endif
 
@@ -479,34 +480,38 @@ getLanguagePlugin(GList *plugins, const char* name)
 }
 
 
-void
+int
 getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
 {
   xmlNode *node, *el;
   GGobiPluginInfo *plugin;
+  int count = 0;
 
   node = getXMLDocElement(doc, "plugins");
-
-  info->plugins = NULL;
-
   if(node == NULL)  
-      return;
+      return(-1);
 
   el = XML_CHILDREN(node);
   while(el) {
    if(el->type != XML_TEXT_NODE) {
      if(strcmp((char *)el->name, "plugin") == 0) {
        plugin = processPlugin(el, info, doc);
-       if(plugin)
+       if(plugin) {
          info->plugins = g_list_append(info->plugins, plugin);
+	 count++;
+       }
      } else if(strcmp((char *)el->name, "inputPlugin") == 0) {
        GGobiPluginInfo *inputPlugin = processInputPlugin(el, info, doc);
-       if(inputPlugin)
+       if(inputPlugin) {
            info->inputPlugins = g_list_append(info->inputPlugins, inputPlugin);
+	   count++;
+       }
      }
    }
    el = el->next;
   }
+
+  return(count);
 }
 
 /*
@@ -696,8 +701,8 @@ gboolean
 loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin)
 {
   /* If it has already been loaded, just return. */
-  if(plugin->loaded) {
-    return(true);
+  if(plugin->loaded != DL_UNLOADED) {
+    return(plugin->loaded == DL_FAILED ? false : true);
   }
 
    /* Load any plugins on which this one depends. Make certain they 
@@ -714,15 +719,16 @@ loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin)
       if(sessionOptions->verbose == GGOBI_VERBOSE) {
         fprintf(stderr, "Loading dependent plugin %s\n", tmp);fflush(stderr);
       }
-      loadPluginLibrary(info->details, info);
+      if(!loadPluginLibrary(info->details, info))
+         return(false);
       el = el->next;
     }
   }
 
   plugin->library = load_plugin_library(plugin);
-  plugin->loaded = (plugin->library != NULL);
+  plugin->loaded = plugin->library != NULL ? DL_LOADED : DL_FAILED;
 
-  if(plugin->loaded && plugin->onLoad) {
+  if(plugin->loaded == DL_LOADED && GGobi_checkPlugin(plugin) && plugin->onLoad) {
     OnLoad f = (OnLoad) getPluginSymbol(plugin->onLoad, plugin);
     if(f) {
       f(0, realPlugin);
@@ -833,12 +839,11 @@ getPluginLanguage(xmlNodePtr node, GGobiPluginInfo *plugin,
     ProcessPluginInfo f;
 
     if(langPlugin == NULL) {
-      fprintf(stderr, "No language plugin %s\n", (char *) tmp); fflush(stderr);
+      fprintf(stderr, "No language plugin for `%s'\n", (char *) tmp); fflush(stderr);
       return(false);
     }
     d = (GGobiLanguagePluginData *) langPlugin->data;
-    loadPluginLibrary(langPlugin->details, langPlugin);
-    if(d) {
+    if(loadPluginLibrary(langPlugin->details, langPlugin) && d) {
       f = (ProcessPluginInfo) getPluginSymbol(d->processPluginName,
                                               langPlugin->details);
       if(f) {
@@ -846,7 +851,7 @@ getPluginLanguage(xmlNodePtr node, GGobiPluginInfo *plugin,
       }
     }
     if(done == false)
-      fprintf(stderr, "Problem processing language plugin processor.");
+      g_printerr("Problem processing language plugin processor.\n");
   } else
   done = true;
 
@@ -875,7 +880,17 @@ processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   getPluginOptions(node, plugin->details, doc);
   plugin->details->depends = getPluginDependencies(node, plugin->details, doc);
 
-  getPluginLanguage(node, plugin, INPUT_PLUGIN, info);
+  if(!getPluginLanguage(node, plugin, INPUT_PLUGIN, info)) {
+#if 0
+     g_free(plugin->details);
+     g_free(plugin->info.i);
+     g_free(plugin);
+     return(NULL);
+#else
+     return(plugin);
+#endif
+  }
+   
 
   if(load) {
     loadPluginLibrary(plugin->details, (GGobiPluginInfo*) plugin);
@@ -1016,9 +1031,12 @@ readPluginFile(const char * const fileName, GGobiInitInfo *info)
       return(NULL);
   }
 
-  node = getXMLDocElement(doc, "plugin");
-  plugin = processPlugin(node, sessionOptions->info, doc);
-
+  if(getPlugins(doc, sessionOptions->info) == -1) {
+    if((node = getXMLDocElement(doc, "plugin")))
+      plugin = processPlugin(node, sessionOptions->info, doc);
+    else if((node = getXMLDocElement(doc, "inputPlugin")))
+      plugin = processInputPlugin(node, sessionOptions->info, doc);
+  }
   if(plugin && info)
      info->plugins = g_list_append(info->plugins, plugin);
   else

@@ -8,6 +8,8 @@
 #include "plugin.h"
 #include "ggvis.h"
 
+#include "GGStructSizes.c"
+
 void       close_ggvis_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_ggvis_window(ggobid *gg, PluginInstance *inst);
 void       show_ggvis_window (GtkWidget *widget, PluginInstance *inst);

@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "GGStructSizes.c"
+
 
 gboolean postgres_read(InputDescription *desc, ggobid *gg, GGobiPluginInfo *);
 int read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);

@@ -14,6 +14,8 @@
 
 #include "parcoordsClass.h"
 
+#include "GGStructSizes.c"
+
 void       add_ggobi_sheets(ggobid *gg, GtkWidget *notebook);
 void       close_worksheet_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);

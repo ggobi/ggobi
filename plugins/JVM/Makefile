@@ -31,8 +31,8 @@ ifdef GGOBI_CONFIG
  GGOBI_INCLUDE_DIR=$(shell $(GGOBI_CONFIG) --cflags)
  GGOBI_LIB=$(shell $(GGOBI_CONFIG) --libs)
 else
- GGOBI_INCLUDE_DIR=-I../..
- GGOBI_LIB=-L../.. -lggobi
+ GGOBI_INCLUDE_DIR=-I$(GGOBI_HOME)
+ GGOBI_LIB=-L$(GGOBI_HOME) -lggobi
 endif
 
 GTK_CONFIG=gtk-config
@@ -42,7 +42,8 @@ ifeq (${DEBUG},yes)
  DEBUG="-DJAVA_DEBUG=1"
 endif
 
-CFLAGS+=-g $(JNI_INCLUDES:%=-I%) $(GNOME_SUPPORT_INCLUDE_DIR:%=-I%) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags) $(DEBUG)
+GGOBI_CFLAGS=$(shell cd $(GGOBI_HOME) ; make cflags)
+CFLAGS+=-g $(GGOBI_CFLAGS) $(JNI_INCLUDES:%=-I%)  $(DEBUG) $(GGOBI_INCLUDE_DIR)
 
 
 SRC+=jvm

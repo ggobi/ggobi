@@ -11,6 +11,8 @@ typedef void * HINSTANCE;
 
 typedef enum {GENERAL_PLUGIN, INPUT_PLUGIN} GGobiPluginType;
 
+typedef enum {DL_UNLOADED = 0, DL_LOADED, DL_FAILED} PluginLoadStatus;
+
 typedef void (*DLFUNC)();
 
 typedef struct {
@@ -21,7 +23,7 @@ typedef struct {
     char *description;
     char *author;
 
-    gboolean loaded;
+    PluginLoadStatus loaded;
 
     char *onLoad; 
     char *onUnload; 
@@ -132,7 +134,7 @@ GGobiPluginInfo *runInteractiveInputPlugin(ggobid *gg);
 GtkWidget *showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg);
 
 gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin);
-
+gboolean GGobi_checkPlugin(GGobiPluginDetails *plugin);
 gboolean setLanguagePluginInfo(GGobiPluginDetails *details, const char *language, GGobiInitInfo *info);
 
 #endif

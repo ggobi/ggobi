@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "GGStructSizes.c"
+
 gboolean mysql_read(InputDescription *desc, ggobid *gg, GGobiPluginInfo *);
 int read_mysql_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
 
