@@ -112,7 +112,7 @@ plot_tree_display(ggobid *gg)
 */
   gtk_signal_connect (GTK_OBJECT(gg->main_window),
     "select_variable",
-    update_display_tree_plots_by_variable,
+    (GtkSignalFunc) update_display_tree_plots_by_variable,
     (gpointer) &gg->display_tree);
 
  } else {
