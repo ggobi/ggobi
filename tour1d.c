@@ -234,6 +234,7 @@ void tour1d_speed_set(gint slidepos, ggobid *gg) {
   cpaneld *cpanel = &dsp->cpanel;
   extern void speed_set (gint, gfloat *, gfloat *, gfloat, gint *, gint *);
 
+  cpanel->t1d_slidepos = slidepos;
   speed_set(slidepos, &cpanel->t1d_step, &dsp->t1d.delta,  dsp->t1d.dv,
     &dsp->t1d.nsteps, &dsp->t1d.stepcntr);
 }

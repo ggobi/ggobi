@@ -86,6 +86,7 @@ typedef struct {
  gint t2d_ls_dir;
  gfloat t2d_path_len;
  gint t2d_pp_indx;
+ gfloat t2d_slidepos;
 
  /*-- 1d tour --*/
  gboolean t1d_paused;
@@ -93,12 +94,15 @@ typedef struct {
  gint t1d_nbins, t1d_nASHes;
  gboolean t1d_vert;
  gint t1d_pp_indx;
+ gfloat t1d_slidepos;
+ gfloat t1d_ASH_smooth;
 
  /*-- corr tour --*/
  gboolean tcorr1_paused;
  gfloat tcorr1_step; 
  gboolean tcorr2_paused;
  gfloat tcorr2_step; 
+ gfloat tc_slidepos;
 
 /* tour variables are in display.h */
 

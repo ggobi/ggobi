@@ -28,6 +28,7 @@ cpanel_tcorr_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->tcorr1_step = TOURSTEP0;
   cpanel->tcorr2_paused = false;
   cpanel->tcorr2_step = TOURSTEP0;
+  cpanel->tc_slidepos = 10.;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/
@@ -38,9 +39,25 @@ cpanel_tourcorr_set (cpaneld *cpanel, ggobid* gg)
  * which may have different tour options and parameters selected
 */
 {
+  GtkWidget *w, *btn;
+  GtkWidget *pnl = gg->control_panel[COTOUR];
+  displayd *dsp = gg->current_display;
+  GtkAdjustment *adj;
+
   /*-- speed --*/
+  w = widget_find_by_name (pnl, "COTOUR:speed_bar");
+  adj = gtk_range_get_adjustment (GTK_RANGE (w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
+    cpanel->tc_slidepos);
+
   /*-- paused --*/
+  btn = widget_find_by_name (pnl, "COTOUR:pause_button");
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->tcorr1_paused);
+
   /*-- manual manip --*/
+  w = widget_find_by_name (pnl, "COTOUR:manip");
+  gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->tc_manip_mode);
+
   /*-- PC axes --*/
   /*-- backtracking --*/
   /*-- local scan --*/
@@ -141,6 +158,7 @@ cpanel_ctour_make (ggobid *gg) {
                       GTK_SIGNAL_FUNC (speedcorr_set_cb), (gpointer) gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_widget_set_name (sbar, "COTOUR:speed_bar");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust speed of tour motion", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
@@ -183,6 +201,7 @@ cpanel_ctour_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   manip_opt = gtk_option_menu_new ();
+  gtk_widget_set_name (manip_opt, "COTOUR:manip");
   gtk_container_set_border_width (GTK_CONTAINER (manip_opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), manip_opt,
     "Set the manual manipulation method", NULL);

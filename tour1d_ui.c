@@ -31,6 +31,8 @@ cpanel_t1d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t1d_vert = false;
 
   cpanel->t1d_pp_indx = 0;
+  cpanel->t1d_slidepos = 10.;
+  cpanel->t1d_ASH_smooth = 0.19;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/
@@ -41,8 +43,26 @@ cpanel_tour1d_set (cpaneld *cpanel, ggobid* gg)
  * which may have different tour options and parameters selected
 */
 {
+  GtkWidget *w, *btn;
+  GtkWidget *pnl = gg->control_panel[TOUR1D];
+  GtkAdjustment *adj;
+
   /*-- speed --*/
+  w = widget_find_by_name (pnl, "TOUR1D:speed_bar");
+  adj = gtk_range_get_adjustment (GTK_RANGE (w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
+    cpanel->t1d_slidepos);
+
   /*-- paused --*/
+  btn = widget_find_by_name (pnl, "TOUR1D:pause_button");
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->t1d_paused);
+
+  /* ASH smoothnewss */
+  w = widget_find_by_name (pnl, "TOUR1D:ASH_smooth");
+  adj = gtk_range_get_adjustment (GTK_RANGE (w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
+    cpanel->t1d_ASH_smooth);
+
   /*-- manual manip --*/
   /*-- PC axes --*/
   /*-- backtracking --*/
@@ -77,6 +97,7 @@ static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg)
 
   /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
   cpanel->t1d_nASHes = (gint) ((gfloat) cpanel->t1d_nbins * (adj->value / 2.0));
+  cpanel->t1d_ASH_smooth = adj->value;
 
   display_tailpipe (gg->current_display, FULL, gg);
 }
@@ -119,6 +140,7 @@ cpanel_tour1d_make (ggobid *gg) {
                       GTK_SIGNAL_FUNC (speed1d_set_cb), (gpointer) gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_widget_set_name (sbar, "TOUR1D:speed_bar");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust speed of tour motion", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
@@ -164,6 +186,7 @@ cpanel_tour1d_make (ggobid *gg) {
                       GTK_SIGNAL_FUNC (t1d_ash_sm_cb), gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.smoothness_adj));
+  gtk_widget_set_name (sbar, "TOUR1D:ASH_smooth");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust ASH smoothness", NULL);
   gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);

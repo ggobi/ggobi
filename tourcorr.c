@@ -348,6 +348,8 @@ void tourcorr_speed_set(gint slidepos, ggobid *gg) {
 
   speed_set(slidepos, &cpanel->tcorr2_step, &dsp->tcorr2.delta,  
     dsp->tcorr2.dv, &dsp->tcorr2.nsteps, &dsp->tcorr2.stepcntr);
+
+  cpanel->tc_slidepos = slidepos;
 }
 
 void tourcorr_pause (cpaneld *cpanel, gboolean state, ggobid *gg)

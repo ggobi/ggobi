@@ -247,6 +247,7 @@ void tour2d_speed_set(gint slidepos, ggobid *gg) {
   cpaneld *cpanel = &dsp->cpanel;
   extern void speed_set (gint, gfloat *, gfloat *, gfloat, gint *, gint *);
 
+  cpanel->t2d_slidepos = slidepos;
   speed_set(slidepos, &cpanel->t2d_step, &dsp->t2d.delta,  dsp->t2d.dv,
     &dsp->t2d.nsteps, &dsp->t2d.stepcntr);
 }

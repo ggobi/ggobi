@@ -31,6 +31,8 @@ cpanel_t2d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t2d_step = TOURSTEP0;
   cpanel->t2d_ls_dir = TOUR_LS_IN;
   cpanel->t2d_path_len = 1.;
+  cpanel->t2d_slidepos = 10.;/* If this is changed, it needs to be 
+     changed in th cpanel_tour2d_make routine also. */
 }
 
 void
@@ -48,14 +50,13 @@ cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
   /*-- speed --*/
   w = widget_find_by_name (pnl, "TOUR2D:speed_bar");
   adj = gtk_range_get_adjustment (GTK_RANGE (w));
-/*
   gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
-    -1 * (gfloat) cpanel->xyplot.cycle_delay);
-*/
+    cpanel->t2d_slidepos);
 
   /*-- paused --*/
   btn = widget_find_by_name (pnl, "TOUR2D:pause_button");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->t2d_paused);
+
   /*-- manual manip --*/
   w = widget_find_by_name (pnl, "TOUR2D:manip");
   gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->t2d_manip_mode);
@@ -143,7 +144,6 @@ cpanel_tour2d_make (ggobid *gg) {
                       GTK_SIGNAL_FUNC (speed2d_set_cb), (gpointer) gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-
   gtk_widget_set_name (sbar, "TOUR2D:speed_bar");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust speed of tour motion", NULL);
