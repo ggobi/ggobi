@@ -57,10 +57,9 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
         gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
                                          "datad_added",
                                          GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_POINTER,
-                                         GTK_TYPE_NONE, 2,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER);
+                                         gtk_marshal_NONE__POINTER,
+                                         GTK_TYPE_NONE, 1,
+                                         GTK_TYPE_GGOBI_DATA);
   }
 
   if (gtk_signal_lookup("brush_motion", GTK_TYPE_GGOBI) == 0) {
@@ -70,9 +69,9 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
                                          GTK_RUN_LAST | GTK_RUN_ACTION,
                                          gtk_marshal_NONE__POINTER_POINTER_POINTER,
                                          GTK_TYPE_NONE, 3,
+                                         GTK_TYPE_GGOBI_SPLOT,
                                          GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER);
+                                         GTK_TYPE_GGOBI_DATA);
   }
 
   if (gtk_signal_lookup("move_point", GTK_TYPE_GGOBI) == 0) {
@@ -80,11 +79,11 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
         gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
                                          "move_point",
                                          GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_POINTER_POINTER,
+                                         gtk_marshal_NONE__POINTER_INT_POINTER,
                                          GTK_TYPE_NONE, 3,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER);
+                                         GTK_TYPE_GGOBI_SPLOT,
+                                         GTK_TYPE_INT,
+                                         GTK_TYPE_GGOBI_DATA);
   }
 
   if (gtk_signal_lookup("identify_point", GTK_TYPE_GGOBI) == 0) {
@@ -106,11 +105,11 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
         gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
                                          "select_variable",
                                          GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__INT_POINTER_POINTER_POINTER,
-                                         GTK_TYPE_NONE, 4, GTK_TYPE_INT,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER);
+                                         gtk_marshal_NONE__POINTER_INT_POINTER,
+                                         GTK_TYPE_NONE, 3, 
+                                         GTK_TYPE_GGOBI_DATA,
+					 GTK_TYPE_INT,
+                                         GTK_TYPE_GGOBI_SPLOT);
   }
 
   if (gtk_signal_lookup("splot_new", GTK_TYPE_GGOBI) == 0) {
@@ -118,10 +117,9 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
         gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
                                          "splot_new",
                                          GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_POINTER,
-                                         GTK_TYPE_NONE, 2,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER);
+                                         gtk_marshal_NONE__POINTER,
+                                         GTK_TYPE_NONE, 1,
+                                         GTK_TYPE_GGOBI_SPLOT);
   }
 
   if (gtk_signal_lookup("variable_added", GTK_TYPE_GGOBI) == 0) {
@@ -327,6 +325,30 @@ GtkType gtk_ggobi_window_display_get_type(void)
   }
 
   return data_type;
+}
+
+
+GtkType 
+gtk_ggobi_embedded_display_get_type(void)
+{
+   static GtkType data_type = 0;
+
+   if(!data_type) {
+      static const GtkTypeInfo data_info = {
+        "GtkGGobiEmbeddedDisplay",
+        sizeof(struct _embeddedDisplayd),
+        sizeof(GtkGGobiEmbeddedDisplayClass),
+        (GtkClassInitFunc) NULL,
+        (GtkObjectInitFunc) NULL,
+        /* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique(gtk_ggobi_display_get_type(), &data_info);
+   }
+
+   return(data_type);
 }
 
 

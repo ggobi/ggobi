@@ -146,6 +146,30 @@ struct _displayd {
 };  /* displayd; */
 
 
+
+
+#define GTK_TYPE_GGOBI_EMBEDDED_DISPLAY	 (gtk_ggobi_embedded_display_get_type ())
+#define GTK_GGOBI_EMBEDDED_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_EMBEDDED_DISPLAY, displayd))
+#define GTK_GGOBI_EMBEDDED_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_EMBEDDED_DISPLAY, GtkGGobiEmbeddedDisplayClass))
+#define GTK_IS_GGOBI_EMBEDDED_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_EMBEDDED_DISPLAY))
+#define GTK_IS_GGOBI_EMBEDDED_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_EMBEDDED_DISPLAY))
+
+GtkType gtk_ggobi_embedded_display_get_type();
+
+typedef struct _GtkGGobiEmbeddedDisplayClass
+{
+    GtkGGobiDisplayClass parent_class;
+
+} GtkGGobiEmbeddedDisplayClass;
+
+typedef struct _embeddedDisplayd {
+   displayd display;
+} embeddedDisplayd;
+
+
+
+
+
 #define GTK_TYPE_GGOBI_WINDOW_DISPLAY	 (gtk_ggobi_window_display_get_type ())
 #define GTK_GGOBI_WINDOW_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_WINDOW_DISPLAY, windowDisplayd))
 #define GTK_GGOBI_WINDOW_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_WINDOW_DISPLAY, GtkGGobiWindowDisplayClass))
