@@ -50,6 +50,16 @@ show_glayout_window (GtkWidget *widget, PluginInstance *inst)
     gtk_object_set_data (GTK_OBJECT (window), "glayoutd", gl);
     inst->data = window;  /*-- or this could be the glayout structure --*/
 
+/*-- Can't do this here until I have an agnostic highlight function --*/
+/*
+void highlight_edges_cb (GtkButton *button, PluginInstance *inst);
+  gtk_signal_connect (GTK_OBJECT(inst->gg),
+    "sticky_point_added", highlight_sticky_edges, inst);
+  gtk_signal_connect (GTK_OBJECT(inst->gg),
+    "sticky_point_removed", highlight_sticky_edges, inst);
+*/
+
+
   } else {
     gtk_widget_show_now ((GtkWidget*) inst->data);
   }
@@ -357,4 +367,20 @@ void closeWindow(ggobid *gg, PluginInstance *inst)
       GTK_SIGNAL_FUNC (close_glayout_window), inst);
     gtk_widget_destroy((GtkWidget*) inst->data);
   }
+}
+
+gint
+visible_set (glong *visible, datad *d)
+{
+  gint i, m;
+  gint nvisible = 0;
+
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot[m];
+    if (!d->hidden.els[i]) {
+      visible[nvisible++] = i;
+    }
+  }
+
+  return nvisible;
 }

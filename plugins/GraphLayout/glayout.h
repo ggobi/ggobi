@@ -28,6 +28,7 @@ typedef struct {
   noded *centerNode;
   gint nStepsToLeaf;
   gint nStepsToCenter;
+  gint nnodes;
   noded *nodes;
   datad *d;
 } radiald;
@@ -52,16 +53,11 @@ typedef struct {
 /*                          functions                                   */
 /*----------------------------------------------------------------------*/
 
-void glayout_init (glayoutd *);
-void setParentNodes (glayoutd *gl, datad *d);
-void setNChildren (glayoutd *gl, datad *d);
-gint setSubtreeSize (noded *, glayoutd *, datad *);
-void setSubtreeSpans (glayoutd *, datad *);
-void setNodePositions (glayoutd *, datad *);
 void radial_cb (GtkButton *button, PluginInstance *inst);
-void highlight_edges_cb (GtkButton *button, PluginInstance *inst);
+void glayout_init (glayoutd *);
 glayoutd* glayoutFromInst (PluginInstance *inst);
 void highlight_sticky_edges (ggobid *, gint, gint , datad *d, void *inst);
+gint visible_set (glong *visible, datad *d);
 
 #ifdef CMDS
 gint cmds (array_d *D, array_d *X);

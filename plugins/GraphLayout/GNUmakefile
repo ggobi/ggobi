@@ -23,6 +23,7 @@ endif
 GGOBI_LIB=
 
 CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
+CFLAGS+=-Wno-unknown-pragmas
 
 ifdef GRAPHVIZ
 GVINC=-I$(GVIZ_INC) -I$(GVIZ_SRC) -I$(GVIZ_SRC)/dotneato/common
