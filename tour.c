@@ -621,12 +621,11 @@ tour_do_step (displayd *dsp) {
   run_tour (dsp);
 }
 
-void *
-tour_thread (void *args)
+/*
+void * tour_thread (void *args)
 {
   displayd *dsp = current_display;
   cpaneld *cpanel = &dsp->cpanel;
-g_printerr ("(tour_thread)\n");
 
   while (true) {
     if (mode_get () == TOUR2D && !cpanel->is_tour_paused) {
@@ -638,6 +637,7 @@ g_printerr ("(tour_thread)\n");
 
   return (NULL);
 }
+*/
 
 static int tour_idle = 0;
 gint

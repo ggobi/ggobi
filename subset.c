@@ -16,63 +16,51 @@ Todo:
 /*         utilities used within this file                          */
 /*------------------------------------------------------------------*/
 
-static void
+static gboolean
 add_to_subset (gint i) {
+  gint j, el;
+  gboolean added = false;
 
   if (xg.nrgroups > 0) {
-    gint j, el;
-    xg.rgroups[i].excluded = false;
-    for (j=0; j<xg.rgroups[i].nels; j++) {
-      el = xg.rgroups[i].els[j];
-      xg.erased[el] = xg.excluded[el] = false;
-      xg.rows_in_plot[xg.nrows_in_plot++] = el;
+    if (xg.rgroups[i].included) {
+      added = true;
+      xg.rgroups[i].in_subset = true;
+      for (j=0; j<xg.rgroups[i].nels; j++) {
+        el = xg.rgroups[i].els[j];
+        xg.in_subset[el] = true;
+      }
     }
 
   } else {
-    xg.erased[i] = xg.excluded[i] = false;
-    xg.rows_in_plot[xg.nrows_in_plot++] = i;
+    if (xg.included[i] == true) {
+      added = true;
+      xg.in_subset[i] = true;
+    }
   }
+
+  return added;
 }
 
-/*-- effectively remove everything from the current subset --*/
+/*-- remove everything from the subset before constructing a new one --*/
 static void
 subset_clear () {
   gint i, rgid;
-  gint top = (xg.nrgroups > 0) ? xg.nrgroups : xg.nlinkable;
 
-  xg.nrows_in_plot = 0;
+  for (i=0; i<xg.nlinkable; i++)
+    xg.in_subset[i] = false;
 
-  for (i=0; i<top; i++) {
-    if (xg.nrgroups > 0) {
-      rgid = xg.rgroup_ids[i];
-      xg.rgroups[rgid].hidden = true;
-    } else
-      xg.erased[i] = true;
+  for (i=0; i<xg.nrgroups; i++) {
+    rgid = xg.rgroup_ids[i];
+    xg.rgroups[rgid].in_subset = false;
   }
 }
 
 /*------------------------------------------------------------------*/
 
-/*
- * Much of this is code that will have to be executed whenever
- * rows_in_plot changes, but that's only happening in subsetting for now
-*/
 void
 subset_apply (gboolean rescale_p) {
-  gint i;
 
-  /*-- add all the unlinkable guys to the sample --*/
-  for (i=xg.nlinkable; i<xg.nrows; i++)
-    xg.rows_in_plot[xg.nrows_in_plot++] = i;
-
-  /* 
-   * Make sure the value of nlinkable_in_plot corresponds to
-   * nrows_in_plot 
-  xg.nlinkable_in_plot = 0;
-  for (i=0; i<xg.nlinkable; i++)
-    if (!xg.excluded[i])
-      xg.nlinkable_in_plot++;
-  */
+  rows_in_plot_set ();
 
   if (rescale_p)
     vardata_lim_update ();  /*-- ?? --*/
@@ -98,16 +86,12 @@ void
 subset_include_all () {
   gint i, rgid;
 
-  xg.nrows_in_plot = xg.nlinkable;
-
-  for (i=0; i<xg.nlinkable; i++) {
-    xg.erased[i] = xg.excluded[i] = false;
-    xg.rows_in_plot[i] = i;
-  }
+  for (i=0; i<xg.nlinkable; i++)
+    xg.in_subset[i] = true;
 
   if (xg.nrgroups > 0) {
     rgid = xg.rgroup_ids[i];
-    xg.rgroups[rgid].hidden = xg.rgroups[rgid].excluded = false;
+    xg.rgroups[rgid].in_subset = true;
   }
 }
 
@@ -129,9 +113,9 @@ subset_random (gint n) {
     for (t=0, m=0; t<top && m<n; t++)
     {
       rrand = (gfloat) randvalue();
-      if ( ((top - t) * rrand) < (n - m) ) {
-        add_to_subset (t);
-        m++;
+      if (((top - t) * rrand) < (n - m)) {
+        if (add_to_subset (t))
+          m++;
       }
     }
 
@@ -158,8 +142,9 @@ subset_block (gint bstart, gint bsize)
   {
     subset_clear ();
 
-    for (i=bstart; i<b_end; i++)
-      add_to_subset (i);
+    for (i=bstart; i<b_end; i++) {
+      add_to_subset (i);  /*-- only added included rows --*/
+    }
 
     doneit = true;
   }
@@ -180,8 +165,13 @@ subset_everyn (gint estart, gint estep)
   {
     subset_clear ();
 
-    for (i=estart; i<top; i+=estep)
-      add_to_subset (i);
+    i = estart;
+    while (i < top) {
+      if (add_to_subset (i))
+        i += estep;
+      else
+        i++;
+    }
 
     doneit = true;
 

@@ -410,7 +410,7 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 
   switch (action) {
     case 0:  /*-- input: read a new set of files --*/
-      if (fileset_read_init(fname)) 
+      if (fileset_read_init (fname)) 
         ;
       break;
     case 1:  /*-- output: extend the current file set --*/

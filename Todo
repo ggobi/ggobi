@@ -1,10 +1,10 @@
 Bugs: 
 
   the axes aren't being initialized properly for cloned variables.
-  when reading from the file menu, the variable labels aren't read
+  reading from stdin in stopped working
 
 Find out how to handle threads
-Find out how to use signals
+Find out how to use signals  (for keeping track of rows_in_plot?)
 
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
@@ -69,3 +69,7 @@ I/O
 !   and whiskers aren't being reset correctly
 !      added the needed lines to sp_rewhisker; added display_tailpipe
 !      to the rearrangement callback.
+
+! when reading from the file menu, the variable labels aren't read
+!    I was using filename (with suffix) instead of fname (without)
+!    Do I need to keep filename for anything?

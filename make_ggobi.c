@@ -3,15 +3,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <pthread.h>
+/*#include <pthread.h>*/
 
 #include <gtk/gtk.h>
 
 #include "vars.h"
 #include "externs.h"
 
-pthread_t tour2d_tid;
-extern void * tour_thread ();
+/*pthread_t tour2d_tid;*/
+/*extern void * tour_thread ();*/
 
 
 /*-- initialize variables which don't depend on the size of the data --*/
@@ -61,25 +61,25 @@ gboolean
 fileset_read (gchar *data_in)
 {
   xg.filename = g_strdup (data_in);
-  strip_suffixes ();
+  strip_suffixes ();  /*-- produces xg.fname, the root name --*/
 
   array_read ();
   xg.nrows_in_plot = xg.nrows;  /*-- for now --*/
   xg.nlinkable = xg.nrows;      /*-- for now --*/
   xg.nrgroups = 0;              /*-- for now --*/
 
-  missing_values_read (xg.filename, true);
+  missing_values_read (xg.fname, true);
 
-  collabels_read (xg.filename, true);
-  rowlabels_read (xg.filename, true);
-  vgroups_read (xg.filename, true);
+  collabels_read (xg.fname, true);
+  rowlabels_read (xg.fname, true);
+  vgroups_read (xg.fname, true);
 
-  point_glyphs_read (xg.filename, true);
-  point_colors_read (xg.filename, true);
-  erase_read (xg.filename, true);
+  point_glyphs_read (xg.fname, true);
+  point_colors_read (xg.fname, true);
+  erase_read (xg.fname, true);
 
-  segments_read (xg.filename, true);
-  line_colors_read (xg.filename, true);
+  segments_read (xg.fname, true);
+  line_colors_read (xg.fname, true);
 
   return true;  /* need to check return codes of reading routines */
 }
@@ -91,8 +91,10 @@ pipeline_init ()
 
   /*-- a handful of allocations and initializations --*/
   pipeline_arrays_alloc ();
-  for (i=0; i<xg.nrows; i++)
+  for (i=0; i<xg.nrows; i++) {
     xg.rows_in_plot[i] = i;
+    xg.in_subset[i] = true;
+  }
 
   /*-- some initializations --*/
   modes_init ();

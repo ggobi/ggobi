@@ -163,13 +163,14 @@ brush_alloc ()
 
   xg.br_nbins = BRUSH_NBINS;
 
-  xg.excluded = (gboolean *) g_realloc (xg.excluded,
-                                        nr * sizeof (gboolean));
+  xg.included = (gboolean *) g_realloc (xg.included, nr * sizeof (gboolean));
   xg.under_new_brush = (gboolean *) g_realloc (xg.under_new_brush,
                                                nr * sizeof (gboolean));
 
-  for (i=0; i<nr; i++) 
-    xg.excluded[i] = xg.under_new_brush[i] = 0;
+  for (i=0; i<nr; i++) {
+    xg.included[i] = true;
+    xg.under_new_brush[i] = false;
+  }
 
   /*
    * color_ids and glyph_ids and their kin were allocated when

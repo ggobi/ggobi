@@ -26,6 +26,7 @@ pipeline_arrays_free ()
   arrayl_free (&xg.jitter, 0, 0);
 
   g_free ((gpointer) xg.rows_in_plot);
+  g_free ((gpointer) xg.in_subset);
 }
 
 void
@@ -45,6 +46,7 @@ pipeline_arrays_alloc ()
   arrayl_alloc_zero (&xg.jitter, nr, nc);
 
   xg.rows_in_plot = (gint *) g_malloc (nr * sizeof (gint));
+  xg.in_subset = (gboolean *) g_malloc (nr * sizeof (gboolean));
 }
 
 void
@@ -383,7 +385,35 @@ tform_to_world ()
       xg.world.data[m][j] += xg.jitter.data[m][j];
     }
   }
+}
 
+/*-------------------------------------------------------------------------*/
+/*               keeping rows_in_plot up to date                           */
+/*-------------------------------------------------------------------------*/
 
+/*
+ * Combine the values in two arrays:
+ *   included[] (which come from the hide/exclude panel)
+ *   in_subset[] (which come from the subset panel)
+ * to determine which cases should be plotted.
+*/
+
+void
+rows_in_plot_set (void) {
+  gint i;
+
+  xg.nrows_in_plot = 0;
+  xg.nlinkable_in_plot = 0;
+
+  for (i=0; i<xg.nrows; i++) {
+    if (i < xg.nlinkable) {
+      if (xg.included[i] && xg.in_subset[i]) {
+        xg.rows_in_plot[xg.nrows_in_plot++] = i;
+        xg.nlinkable_in_plot++;
+      }
+    } else {  /*-- include all points past xg.nlinkable --*/
+      xg.rows_in_plot[xg.nrows_in_plot++] = i;
+    }
+  }
 }
 

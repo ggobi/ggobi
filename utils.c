@@ -4,17 +4,18 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <math.h>
 
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
 
 #if defined (_WIN32)
+extern gdouble floor (gdouble);    
+extern gdouble ceil (gdouble);     
+extern gdouble fabs (gdouble);
 #include <sys/stat.h> 
-#elif defined (USE_RANDOM)
-#include <math.h>
 #else
-#include <math.h>
 /* on linux, this sometimes insists on being spelled out */
 extern void srand48 (glong);
 extern double drand48 (void);
@@ -228,7 +229,7 @@ FILE *open_xgobi_file_r (gchar *fname, gint nsuffixes, gchar **suffixes,
 
   else {
     for (n=0; n<nsuffixes; n++) {
-      if ( (fp = open_file_r (fname, suffixes[n])) != NULL)
+      if ((fp = open_file_r (fname, suffixes[n])) != NULL)
         break;
     }
   }

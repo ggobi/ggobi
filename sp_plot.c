@@ -477,12 +477,12 @@ segments_draw (splotd *sp)
         if (!plot_imputed_values && plotted_var_missing(from, to, xg))
           doit = false;
 */
-        /* If either from or to is excluded, move on */
+        /* If either from or to is not included, move on */
 /*
         else if (xg->ncols == xg->ncols_used) {
-          if (xg->clusv[(int)GROUPID(from)].excluded)
+          if (!xg->clusv[(int)GROUPID(from)].included)
             doit = False;
-          else if (xg->clusv[(int)GROUPID(to)].excluded)
+          else if (!xg->clusv[(int)GROUPID(to)].included)
             doit = False;
         }
 */

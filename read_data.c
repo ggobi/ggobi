@@ -129,7 +129,7 @@ collabels_read (gchar *data_in, gboolean init)
   if (data_in != NULL && data_in != "" && strcmp (data_in,"stdin") != 0)
     if ((fp=open_xgobi_file_r (data_in, 4, suffixes, true)) != NULL)
       found = true;
-  
+
   /*
    * Read in variable labels or initiate them to generic if no label
    * file exists
@@ -306,13 +306,13 @@ rgroups_read (gchar *data_in, gboolean init)
      * nrows/10 elements in each group
     */
 
-    xg.rgroups = (rg_struct *) g_malloc (xg.nrows * sizeof (rg_struct));
+    xg.rgroups = (rgroupd *) g_malloc (xg.nrows * sizeof (rgroupd));
     for (i=0; i<xg.nrows; i++) {
       nels[i] = xg.nrows/10;
       xg.rgroups[i].els = (glong *)
         g_malloc ((guint) nels[i] * sizeof (glong));
       xg.rgroups[i].nels = 0;
-      xg.rgroups[i].excluded = false;
+      xg.rgroups[i].included = true;
     }
     xg.nrgroups = 0;
   
@@ -368,8 +368,8 @@ rgroups_read (gchar *data_in, gboolean init)
     xg.nrgroups_in_plot = xg.nrgroups;
   
     /* Reallocate everything now that we know how many there are */
-    xg.rgroups = (rg_struct *) g_realloc ((gpointer) xg.rgroups,
-      (gulong) (xg.nrgroups * sizeof (rg_struct)));
+    xg.rgroups = (rgroupd *) g_realloc ((gpointer) xg.rgroups,
+      (gulong) (xg.nrgroups * sizeof (rgroupd)));
   
     /* Now reallocate the arrays within each rgroups structure */
     for (k=0; k<xg.nrgroups; k++) {
@@ -759,7 +759,7 @@ nlinkable_read (gchar *data_in, gboolean init)
     gint i;
     xg.nlinkable_in_plot = 0;
     for (i=0; i<xg.nlinkable; i++)
-      if (!xg.excluded[i])
+      if (xg.included[i])
         xg.nlinkable_in_plot++;
   }
 

@@ -95,7 +95,7 @@ typedef struct {
   gulong color;
   gint glyphtype_prev, glyphsize_prev;
   gulong color_prev;
-  gboolean hidden, excluded;
+  gboolean erased, included;
 } cluster;
 
 /* glyph vectors */
@@ -116,8 +116,8 @@ typedef struct {
   glong id;
   gulong *els;
   glong nels;
-  gboolean excluded;  /* will use this for linked brushing */
-  gboolean hidden;  /* may not use this, but add it just in case */
-} rg_struct;
+  gboolean included;   /* for linked brushing */
+  gboolean in_subset;  /* for subsetting */
+} rgroupd;
 
 #define XGOBI_TYPES_H

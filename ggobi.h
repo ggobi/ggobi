@@ -48,19 +48,20 @@ typedef struct {
  gboolean delete_erased_pts;
  gint *rows_in_plot;
  gint nrows_in_plot;
+ gboolean *in_subset;
 
 
 /* Row grouping */
  glong nrgroups, nrgroups_in_plot;
  glong *rgroup_ids;
- rg_struct *rgroups;
+ rgroupd *rgroups;
 
 
- /* Deleting the erased points -- this notion will change to hidden/excluded */
+ /* Hiding/excluding the erased points */
  cluster *clusv;
  int nclust;
  gboolean *erased;
- gboolean *excluded; /* it's too slow to get this from rows_in_plot */
+ gboolean *included; /* it's too slow to get this from rows_in_plot */
 
  gulong *senddata;
  gint nlinkable, nlinkable_in_plot;  /* used in sizing senddata */;
@@ -68,7 +69,7 @@ typedef struct {
 /* Line grouping */
  glong nlgroups;
  glong *lgroup_ids;
- rg_struct *lgroups;  /* id, nels, *els */
+ rgroupd *lgroups;  /* id, nels, *els */
 
 /* standardization options */
  gint std_type;  /* Can be 0, 1 or 2 */
