@@ -605,7 +605,7 @@ display_set_current (displayd *new_display, ggobid *gg)
   gg->firsttime = false;
 }
 
-/*
+/**
    Creates a title string for a display window.
 
    Caller must free the return value.

@@ -5,8 +5,9 @@
 <preferences>
   <browser>
     <executable>netscape</executable>
-    <args><arg>-remote</arg></args>
-    <arg>openURL(<filename/>)</arg>
+    <args><arg>-remote</arg>
+     <arg>openURL(<filename/>)</arg>
+    </args>
   </browser>
 </preferences>
 
