@@ -79,7 +79,7 @@ xyplot_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
 }
 
 void
-xy_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
+xy_reproject (splotd *sp, greal **world_data, datad *d, ggobid *gg)
 {
 /*
  * Project the data down from the ncols_used-dimensional world_data[]
@@ -92,8 +92,8 @@ xy_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
   for (i=0; i<d->nrows; i++) {
     m = d->rows_in_plot[i];
 
-    sp->planar[m].x = world_data[m][jx];  /*-- regular or missings --*/
-    sp->planar[m].y = world_data[m][jy];
+    sp->planar[m].x = (glong) world_data[m][jx];  /*-- regular or missings --*/
+    sp->planar[m].y = (glong) world_data[m][jy];
   }
 }
 

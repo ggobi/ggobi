@@ -110,7 +110,7 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
 /*-- this will be called by a key_press_cb for each scatterplot mode --*/
 gboolean
 splot_event_handled (GtkWidget *w, GdkEventKey *event,
-		     cpaneld *cpanel, splotd *sp, ggobid *gg)
+  cpaneld *cpanel, splotd *sp, ggobid *gg)
 {
   static guint32 etime = (guint32) 0;
   gboolean common_event = true;
@@ -597,7 +597,7 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 
 void
 splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
-		       ggobid *gg)
+  ggobid *gg)
 /*
  * Use the data in projection coordinates and rescale it to the
  * dimensions of the current plotting window, writing it into screen.
@@ -610,12 +610,12 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   GtkGGobiExtendedSPlotClass *klass = NULL;
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-       klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
     
-       if(klass->plane_to_screen) {
+     if(klass->plane_to_screen) {
         klass->plane_to_screen(sp, d, gg);
-	return;
-       }
+        return;
+     }
   }
 
   scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
@@ -817,14 +817,14 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
   switch (cpanel->projection) {
     case P1PLOT:
       if (display->p1d_orientation == VERTICAL)
-        d->world.vals[ipt][sp->p1dvar] = sp->planar[ipt].y;
+        d->world.vals[ipt][sp->p1dvar] = (greal) sp->planar[ipt].y;
       else
-        d->world.vals[ipt][sp->p1dvar] = sp->planar[ipt].x;
+        d->world.vals[ipt][sp->p1dvar] = (greal) sp->planar[ipt].x;
     break;
 
     case XYPLOT:
-      d->world.vals[ipt][sp->xyvars.x] = sp->planar[ipt].x;
-      d->world.vals[ipt][sp->xyvars.y] = sp->planar[ipt].y;
+      d->world.vals[ipt][sp->xyvars.x] = (greal) sp->planar[ipt].x;
+      d->world.vals[ipt][sp->xyvars.y] = (greal) sp->planar[ipt].y;
     break;
 
     case TOUR1D:
@@ -833,7 +833,7 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
       /*if (!gg->is_pp) {*/
         for (j=0; j<display->t1d.nactive; j++) {
           var = display->t1d.active_vars.els[j];
-          d->world.vals[ipt][var] += 
+          d->world.vals[ipt][var] += (greal)
            ((gfloat)gg->movepts.eps.x * display->t1d.F.vals[0][var]);
         }
       /*}*/
@@ -846,7 +846,7 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
       /*if (!gg->is_pp) {*/
         for (j=0; j<display->t2d.nactive; j++) {
           var = display->t2d.active_vars.els[j];
-          d->world.vals[ipt][var] += 
+          d->world.vals[ipt][var] += (greal)
            ((gfloat)gg->movepts.eps.x * display->t2d.F.vals[0][var] +
             (gfloat)gg->movepts.eps.y * display->t2d.F.vals[1][var]);
         }
@@ -860,12 +860,12 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
       /*if (!gg->is_pp) {*/
         for (j=0; j<display->tcorr1.nactive; j++) {
           var = display->tcorr1.active_vars.els[j];
-          d->world.vals[ipt][var] += 
+          d->world.vals[ipt][var] += (greal)
            ((gfloat)gg->movepts.eps.x * display->tcorr1.F.vals[0][var]);
         }
         for (j=0; j<display->tcorr2.nactive; j++) {
           var = display->tcorr2.active_vars.els[j];
-          d->world.vals[ipt][var] += 
+          d->world.vals[ipt][var] += (greal)
            ((gfloat)gg->movepts.eps.y * display->tcorr2.F.vals[0][var]);
         }
       /*}*/

@@ -284,7 +284,7 @@ tour2dvar_set (gint jvar, ggobid *gg)
         gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
           d->ncols, (gint) 2);
         arrayd_copy(&dsp->t2d.Fa, &dsp->t2d.F);
-	/*        copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
+/*        copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
       }
     }
   }
@@ -347,7 +347,7 @@ tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 }
 
 void
-tour2d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
+tour2d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
 
@@ -421,7 +421,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
       if (count == 10) {
       count = 0;*/
         t2d_ppdraw(dsp->t2d.ppval, gg);
-	/*      }*/
+/*      }*/
     }
   }
   else { /* do final clean-up and get new target */
@@ -429,7 +429,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
       if (dsp->t2d.target_selection_method == 1)
       {
         dsp->t2d_pp_op.index_best = dsp->t2d.ppval;
-	/*        dsp->t2d.oppval = dsp->t2d.ppval;*/
+/*        dsp->t2d.oppval = dsp->t2d.ppval;*/
         for (i=0; i<2; i++)
           for (j=0; j<dsp->t2d.nactive; j++)
             dsp->t2d_pp_op.proj_best.vals[i][j] = 
@@ -439,7 +439,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
     else 
     {
       if (dsp->t2d.target_selection_method == 1)
-	/*        t2d_ppdraw(dsp->t2d.ppval, gg)*/;
+/*        t2d_ppdraw(dsp->t2d.ppval, gg)*/;
       else
       {
         if (dsp->t2d.tau.els[0] > 0.0 || dsp->t2d.tau.els[1] > 0.0) {
@@ -447,7 +447,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
             dsp->t2d.dist_az, (gint) 2);
           tour_reproject(dsp->t2d.tinc, dsp->t2d.G, dsp->t2d.Ga, dsp->t2d.Gz,
             dsp->t2d.F, dsp->t2d.Va, d->ncols, (gint) 2);
-	}
+      }
       }
     }
     nv = 0;
@@ -464,9 +464,10 @@ tour2d_run(displayd *dsp, ggobid *gg)
           fabs(dsp->t2d.F.vals[1][i]) < eps)
           dsp->t2d.F.vals[0][i] = dsp->t2d.F.vals[1][i] = 0.0;
         if (fabs(dsp->t2d.F.vals[0][i]) > eps || 
-          fabs(dsp->t2d.F.vals[1][i]) > eps) {
+          fabs(dsp->t2d.F.vals[1][i]) > eps)
+        {
           nv++;
-	}
+        }
       }
     }
     arrayd_copy(&dsp->t2d.F, &dsp->t2d.Fa);
@@ -497,7 +498,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
               to a random projection */
           if (!checkequiv(dsp->t2d.Fa.vals, dsp->t2d.Fz.vals, d->ncols, 2)) 
           {
-	    /*            printf("Using random projection\n");*/
+    /*            printf("Using random projection\n");*/
             gt_basis(dsp->t2d.Fz, dsp->t2d.nactive, dsp->t2d.active_vars, 
               d->ncols, (gint) 2);
             for (i=0; i<2; i++)
@@ -507,8 +508,8 @@ tour2d_run(displayd *dsp, ggobid *gg)
             revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
               dsp->t2d.target_selection_method, gg);
           }
-	  /*          t2d_ppdraw(dsp->t2d.ppval, gg);*/
-	  /*          count = 0;*/
+  /*          t2d_ppdraw(dsp->t2d.ppval, gg);*/
+  /*          count = 0;*/
 #ifndef WIN32
           sleep(2);
 #else
@@ -538,7 +539,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
           &dsp->t2d.dist_az, &dsp->t2d.tang);
       }
       else if (pathprob == 2 || pathprob == 3) { /* problems with Fz,
-				    so will force a new choice of Fz */
+                                    so will force a new choice of Fz */
         dsp->t2d.get_new_target = true;
       }
     }
@@ -704,14 +705,14 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
 
     dsp->t2d_no_dir_flag = false;
     if (cpanel->t2d.manip_mode == MANIP_RADIAL)
-      { /* check if variable is currently visible in plot */
+    { /* check if variable is currently visible in plot */
       if ((dsp->t2d.F.vals[0][dsp->t2d_manip_var]*
         dsp->t2d.F.vals[0][dsp->t2d_manip_var] +
         dsp->t2d.F.vals[1][dsp->t2d_manip_var]*
         dsp->t2d.F.vals[1][dsp->t2d_manip_var]) < tol)
         dsp->t2d_no_dir_flag = true; /* no */
       else
-	{ /* yes: set radial manip direction to be current direction
+      { /* yes: set radial manip direction to be current direction
              of contribution */
         dsp->t2d_rx = (gfloat) dsp->t2d.F.vals[0][dsp->t2d_manip_var];
         dsp->t2d_ry = (gfloat) dsp->t2d.F.vals[1][dsp->t2d_manip_var];

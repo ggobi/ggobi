@@ -285,7 +285,7 @@ tour1dvar_set (gint jvar, ggobid *gg)
         gt_basis(dsp->t1d.Fa, dsp->t1d.nactive, dsp->t1d.active_vars, 
           d->ncols, (gint) 1);
         arrayd_copy(&dsp->t1d.Fa, &dsp->t1d.F);
-	/*        copy_mat(dsp->t1d.F.vals, dsp->t1d.Fa.vals, d->ncols, 1);*/
+/*      copy_mat(dsp->t1d.F.vals, dsp->t1d.Fa.vals, d->ncols, 1);*/
       }
     }
   }
@@ -354,7 +354,7 @@ tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 }
 
 void
-tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg)
+tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
 {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
@@ -376,7 +376,7 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg)
     for (j=0; j<d->ncols; j++)
     {
       /*yy[i] += (gint)(dsp->t1d.F.vals[0][j]*world_data[i][j]);*/
-      yy[i] += (dsp->t1d.F.vals[0][j]*world_data[i][j]);
+      yy[i] += (gfloat)(dsp->t1d.F.vals[0][j]*world_data[i][j]);
     }
   }
 
@@ -441,7 +441,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
       if (count == 10) {
       count = 0;*/
         t1d_ppdraw(dsp->t1d.ppval, gg);
-	/*      }*/
+/*      }*/
     }
 
   }
@@ -450,7 +450,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
       if (dsp->t1d.target_selection_method == 1)
       {
         dsp->t1d_pp_op.index_best = dsp->t1d.ppval;
-	/*        dsp->t1d.oppval = dsp->t1d.ppval;*/
+/*      dsp->t1d.oppval = dsp->t1d.ppval;*/
         for (j=0; j<dsp->t1d.nactive; j++) 
           dsp->t1d_pp_op.proj_best.vals[0][j] = 
             dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]];
@@ -459,7 +459,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
     else 
     {
       if (dsp->t1d.target_selection_method == 1)
-	/*        t1d_ppdraw(dsp->t1d.ppval, gg)*/;
+/*      t1d_ppdraw(dsp->t1d.ppval, gg)*/;
       else
       {
         do_last_increment(dsp->t1d.tinc, dsp->t1d.tau, 
@@ -503,12 +503,12 @@ tour1d_run(displayd *dsp, ggobid *gg)
 #endif
               dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[i]] = 
                 dsp->t1d_pp_op.proj_best.vals[0][i];
-	  }
+          }
 
           /* if the best projection is the same as the previous one, switch 
               to a random projection */
           if (!checkequiv(dsp->t1d.Fa.vals, dsp->t1d.Fz.vals, d->ncols, 1)) {
-	    /*            g_printerr ("Using random projection\n");*/
+    /*            g_printerr ("Using random projection\n");*/
             gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
               d->ncols, (gint) 1);
             for (j=0; j<dsp->t1d.nactive; j++)
@@ -519,7 +519,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
               dsp->t1d.target_selection_method, gg);
           }
           /*t1d_ppdraw(dsp->t1d.ppval, gg);*/
-	  /*          count = 0;*/
+  /*          count = 0;*/
 #ifndef WIN32
           sleep(2);
 #else
@@ -536,7 +536,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
       pathprob = path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
         (gint) 1, dsp->t1d.Ga, dsp->t1d.Gz, dsp->t1d.G, 
         dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
-	dsp->t1d.Vz, dsp->t1d.tau, dsp->t1d.tinc, 
+        dsp->t1d.Vz, dsp->t1d.tau, dsp->t1d.tinc, 
         &dsp->t1d.dist_az, &dsp->t1d.tang);
       if (pathprob == 0) 
         dsp->t1d.get_new_target = false;
@@ -549,7 +549,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
           &dsp->t1d.dist_az, &dsp->t1d.tang);
       }
       else if (pathprob == 2 || pathprob == 3) { /* problems with Fz,
-				    so will force a new choice of Fz */
+                                      so will force a new choice of Fz */
         dsp->t1d.get_new_target = true;
       }
     }

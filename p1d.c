@@ -107,7 +107,7 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
 }
 
 void
-p1d_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
+p1d_reproject (splotd *sp, greal **world_data, datad *d, ggobid *gg)
 {
 /*
  * Project the y variable down from the ncols-dimensional world_data[]
@@ -153,9 +153,9 @@ p1d_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
 
     if (display->p1d_orientation == VERTICAL) {
       sp->planar[m].x = (glong) (precis * ftmp);
-      sp->planar[m].y = world_data[m][jvar];
+      sp->planar[m].y = (glong) world_data[m][jvar];
     } else {
-      sp->planar[m].x = world_data[m][jvar];
+      sp->planar[m].x = (glong) world_data[m][jvar];
       sp->planar[m].y = (glong) (precis * ftmp);
     }
   }

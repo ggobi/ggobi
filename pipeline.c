@@ -29,8 +29,8 @@ pipeline_arrays_free (datad *d, ggobid *gg)
 {
   arrayf_free (&d->tform, 0, 0);
 
-  arrayl_free (&d->world, 0, 0);
-  arrayl_free (&d->jitdata, 0, 0);
+  arrayg_free (&d->world, 0, 0);
+  arrayg_free (&d->jitdata, 0, 0);
 
   /*-- should these be freed here as well? --*/
   vectori_free (&d->clusterid);
@@ -54,8 +54,8 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
 
   arrayf_alloc (&d->tform, nr, nc);
 
-  arrayl_alloc (&d->world, nr, nc);
-  arrayl_alloc_zero (&d->jitdata, nr, nc);
+  arrayg_alloc (&d->world, nr, nc);
+  arrayg_alloc_zero (&d->jitdata, nr, nc);
 
   d->rows_in_plot = (gint *) g_malloc (nr * sizeof (gint));
   vectorb_alloc (&d->sampled, nr);
@@ -73,8 +73,8 @@ pipeline_arrays_add_rows (gint nrows, datad *d)
 
   arrayf_add_rows (&d->tform, nrows);
 
-  arrayl_add_rows (&d->world, nrows);
-  arrayl_add_rows (&d->jitdata, nrows);
+  arrayg_add_rows (&d->world, nrows);
+  arrayg_add_rows (&d->jitdata, nrows);
 
   /*-- alloc and initialize rows_in_plot and sampled --*/
   d->rows_in_plot = (gint *) g_realloc (d->rows_in_plot,
@@ -97,11 +97,11 @@ pipeline_arrays_check_dimensions (datad *d)
   if (d->tform.ncols < d->ncols)
     arrayf_add_cols (&d->tform, d->ncols);
   if (d->world.ncols < d->ncols)
-    arrayl_add_cols (&d->world, d->ncols);
+    arrayg_add_cols (&d->world, d->ncols);
 
   if (d->jitdata.ncols < d->ncols) {
     gint i, j, nc = d->jitdata.ncols;
-    arrayl_add_cols (&d->jitdata, d->ncols);
+    arrayg_add_cols (&d->jitdata, d->ncols);
     for (j=nc; j<d->ncols; j++) {
       for (i=0; i<d->nrows; i++)
         d->jitdata.vals[i][j] = 0;
@@ -228,7 +228,7 @@ void
 tform_to_world_by_var (gint j, datad *d, ggobid *gg)
 {
   gint i, m;
-  gfloat max, min, range, ftmp;
+  greal max, min, range, ftmp;
   gfloat precis = PRECISION1;
   vartabled *vt = vartable_element_get (j, d);
 
@@ -239,14 +239,14 @@ tform_to_world_by_var (gint j, datad *d, ggobid *gg)
  * scaling, but we do want for display, so some more thought
  * is needed, or maybe another set of limits.
 */
-  max = vt->lim.max;
-  min = vt->lim.min;
+  max = (greal) vt->lim.max;
+  min = (greal) vt->lim.min;
   range = max - min;
 
   for (i=0; i<d->nrows_in_plot; i++) {
     m = d->rows_in_plot[i];
-    ftmp = -1.0 + 2.0*(d->tform.vals[m][j] - min) / range;
-    d->world.vals[m][j] = (glong) (precis * ftmp);
+    ftmp = -1.0 + 2.0*((greal)d->tform.vals[m][j] - min) / range;
+    d->world.vals[m][j] = (greal) (precis * ftmp);
 
     /* Add in the jitter values */
     d->world.vals[m][j] += d->jitdata.vals[m][j];
@@ -257,8 +257,7 @@ void
 tform_to_world (datad *d, ggobid *gg)
 {
 /*
- * Take tform.vals[][], one column at a time, and generate
- * world_data[]
+ * Take tform.vals[][], one column at a time, and generate world[]
 */
   gint j;
 
@@ -306,7 +305,7 @@ world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg)
 
   rdiff = vt->lim.max - vt->lim.min;
 
-  ftmp = (d->world.vals[pt][j] - d->jitdata.vals[pt][j]) / precis;
+  ftmp = (gfloat) (d->world.vals[pt][j] - d->jitdata.vals[pt][j]) / precis;
   x = (ftmp + 1.0) * .5 * rdiff;
   x += vt->lim.min;
 

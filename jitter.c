@@ -73,8 +73,8 @@ jitter_randval (gint type)
 void
 rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
   gint i, j, k, m;
-  gfloat frand, fworld, fjit;
-  gfloat precis = (gfloat) PRECISION1;
+  greal frand, fworld, fjit;
+  greal precis = (gfloat) PRECISION1;
   vartabled *vt;
 
   for (j=0; j<nselected_cols; j++) {
@@ -85,20 +85,20 @@ rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
       m = d->rows_in_plot[i];
       /*-- jitter_one_value (m, k); --*/
 
-      frand = jitter_randval (d->jitter.type) * precis;
+      frand = (greal) jitter_randval (d->jitter.type) * precis;
 
       /*
        * The world.vals used here is already jittered:
        * subtract out the previous jittered value ...
       */
       if (d->jitter.convex) {
-        fworld = (gfloat) (d->world.vals[m][k] - d->jitdata.vals[m][k]);
-        fjit = vt->jitter_factor * (frand - fworld);
+        fworld = d->world.vals[m][k] - d->jitdata.vals[m][k];
+        fjit = (greal) vt->jitter_factor * (frand - fworld);
       }
       else
         fjit = vt->jitter_factor * frand;
 
-      d->jitdata.vals[m][k] = (glong) fjit;
+      d->jitdata.vals[m][k] = fjit;
     }
   }
   tform_to_world (d, gg);

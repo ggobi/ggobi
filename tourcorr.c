@@ -490,7 +490,7 @@ tourcorr_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 }
 
 void
-tourcorr_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
+tourcorr_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
 
@@ -501,8 +501,8 @@ tourcorr_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      sp->planar[i].x += (gint)(dsp->tcorr1.F.vals[0][j]*world_data[i][j]);
-      sp->planar[i].y += (gint)(dsp->tcorr2.F.vals[0][j]*world_data[i][j]);
+      sp->planar[i].x += (glong)(dsp->tcorr1.F.vals[0][j]*world_data[i][j]);
+      sp->planar[i].y += (glong)(dsp->tcorr2.F.vals[0][j]*world_data[i][j]);
     }
   }
 }
