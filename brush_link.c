@@ -51,6 +51,23 @@ symbol_link_by_id (gint k, datad *sd, ggobid *gg)  /*-- sd = source_d --*/
 
             /*-- if persistent, handle all target types --*/
             case BR_PERSISTENT:
+
+              /*
+               * make it link for everything, no matter
+               * what kind of brushing is turned on, because
+               * otherwise, connections between points and edges
+               * gets messed up.
+              */
+
+              if (!d->hidden_now.els[i]) {
+                d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
+                d->glyph.els[i].size = d->glyph_now.els[i].size =
+                  sd->glyph.els[k].size;
+                d->glyph.els[i].type = d->glyph_now.els[i].type =
+                  sd->glyph.els[k].type;
+              }
+              d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
+/*
               switch (cpanel->br_point_targets) {
                 case BR_CANDG:
                   if (!d->hidden_now.els[i]) {
@@ -86,10 +103,18 @@ symbol_link_by_id (gint k, datad *sd, ggobid *gg)  /*-- sd = source_d --*/
                   ;
                 break;
               }
+*/
             break;
 
             /*-- if transient, handle all target types --*/
             case BR_TRANSIENT:
+              if (!d->hidden_now.els[i]) {
+                d->color_now.els[i] = sd->color_now.els[k];
+                d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
+                d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
+              }
+              d->hidden_now.els[i] = sd->hidden_now.els[k];
+/*
               switch (cpanel->br_point_targets) {
                 case BR_CANDG:
                   if (!d->hidden_now.els[i]) {
@@ -120,6 +145,7 @@ symbol_link_by_id (gint k, datad *sd, ggobid *gg)  /*-- sd = source_d --*/
                   ;
                 break;
               }
+*/
 
             break;
           }
@@ -262,6 +288,11 @@ brush_link_by_var (gint jlinkby, vector_b *levelv,
   }
 }
 
+/*
+ * We're working too hard here, looping whether there's any
+ * change or not.  Maybe there's an easy way to set the value
+ * of changed by keeping track of pts_under_brush_prev?
+*/
 gboolean
 build_symbol_vectors_by_var (cpaneld *cpanel, datad *d, ggobid *gg)
 {

@@ -657,14 +657,6 @@ active_paint_points (datad *d, ggobid *gg)
 
   changed = false;
 
-  /*---------------------------------------------------------------------*/
-
-/*
- * We're working too hard here, looping whether there's any
- * change or not.  Maybe there's an easy way to set the value
- * of changed by keeping track of pts_under_brush_prev?
-*/
-
   if (cpanel->brush_on_p) {
     if (gg->linkby_cv) {
       /*-- link by categorical variable --*/
@@ -734,48 +726,52 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
   return (intersect == 1);
 }
 
-
+/*-- link by id? --*/
 static gboolean
-build_edge_color_vectors (datad *e, ggobid *gg)
+build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
 {
   gint i;
   gboolean changed = false;
+  gint nd = g_slist_length (gg->d);
+  extern void symbol_link_by_id (gint k, datad *source_d, ggobid *gg);
 
+/*
+ * I'm not doing any checking here to verify that the edges
+ * are displayed.
+*/
   for (i=0; i<e->edge.n; i++) {
-    changed = update_color_vectors (i, changed,
-      e->edge.xed_by_brush.els, e, gg);
+
+    switch (cpanel->br_edge_targets) {
+      case BR_CANDG:  /*-- color and glyph --*/
+        changed = update_color_vectors (i, changed,
+          e->edge.xed_by_brush.els, e, gg);
+        changed = update_glyph_vectors (i, changed,
+          e->edge.xed_by_brush.els, e, gg);
+      break;
+      case BR_COLOR:  /*-- color --*/
+        changed = update_color_vectors (i, changed,
+          e->edge.xed_by_brush.els, e, gg);
+      break;
+      case BR_GLYPH:  /*-- line width and line type --*/
+      case BR_GSIZE:  /*-- line width only --*/
+        changed = update_glyph_vectors (i, changed,
+          e->edge.xed_by_brush.els, e, gg);
+      break;
+      case BR_HIDE:  /*-- hidden --*/
+        changed = update_hidden_vectors (i, changed,
+          e->edge.xed_by_brush.els, e, gg);
+      break;
+      case BR_OFF:
+        ;
+      break;
+    }
+
+    /*-- link by id --*/
+    if (!gg->linkby_cv && nd > 1) symbol_link_by_id (i, e, gg);
+    /*-- --*/
   }
 
   return (changed);
-}
-
-static gboolean
-build_edge_type_vectors (datad *e, ggobid *gg)
-{
-  gint i;
-  gboolean changed = false;
-
-  /*-- make no special accommodation for groups until I know I need it --*/
-  for (i=0; i<e->edge.n; i++) {
-    changed = update_glyph_vectors (i, changed,
-      e->edge.xed_by_brush.els, e, gg);
-  }
-
-  return (changed);
-}
-
-static gboolean
-build_edge_hidden_vectors (datad *e, ggobid *gg)
-{
-  gint k;
-  gboolean changed = false;
-
-  for (k=0; k<e->edge.n; k++) {
-    changed = update_hidden_vectors (k, changed,
-      e->edge.xed_by_brush.els, e, gg);
-  }
-
-  return changed;
 }
 
 static gboolean
@@ -797,29 +793,15 @@ active_paint_edges (displayd *display, ggobid *gg)
       e->edge.xed_by_brush.els[k] = true;
     }
   }
-  changed = false;
 
+  changed = false;
   if (cpanel->brush_on_p) {
-    switch (cpanel->br_edge_targets) {
-      case BR_CANDG:  /*-- color and glyph --*/
-        if (build_edge_type_vectors (e, gg)) changed = true;
-        if (build_edge_color_vectors (e, gg)) changed = true;
-      break;
-      case BR_COLOR:  /*-- color --*/
-        if (build_edge_color_vectors (e, gg)) changed = true;
-      break;
-      case BR_HIDE:  /*-- hidden --*/
-        if (build_edge_hidden_vectors (e, gg)) changed = true;
-      break;
-      case BR_GLYPH:  /*-- line width and line type --*/
-        if (build_edge_type_vectors (e, gg)) changed = true;
-      break;
-      case BR_GSIZE:  /*-- line width only --*/
-        if (build_edge_type_vectors (e, gg)) changed = true;
-      break;
-      case BR_OFF:
-        ;
-      break;
+    if (gg->linkby_cv) {
+      /*-- link by categorical variable --*/
+      /*changed = build_edge_symbol_vectors_by_var (cpanel, d, gg);*/
+    } else {
+      /*-- link by id?  not yet --*/
+      changed = build_edge_symbol_vectors (cpanel, e, gg);
     }
   }
 
