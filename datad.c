@@ -24,9 +24,8 @@ datad_new(datad *d, ggobid *gg)
   if (d == NULL)
     d = (datad *) g_malloc (sizeof (datad));
 
-  d->gg = gg;
-
   memset(d, 0, sizeof(datad));
+  d->gg = gg;
 
   /*-- initialize arrays to NULL --*/
   arrayf_init_null (&d->raw);
@@ -122,7 +121,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
   d->nearest_point = -1;
 
-  if (cleanup) {
+  if (cleanup || g_list_length(gg->displays) == 0) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
     gg->viewmode = NULLMODE;
 
