@@ -1,0 +1,7 @@
+<plugin name="Plugin Manager" load="immediate">
+   <description>Load plugins from a file.</description>
+   <author>Duncan Temple Lang</author>
+   <dll name="plugins/PluginViewer/PluginManager.so">
+    <init onCreate="addToMenu" />
+  </dll>
+</plugin>

@@ -192,5 +192,15 @@ restore a previously saved GGobi session.
 </quickHelp>
 </arg>
 
+<arg name="plugin" type="gnu" multiple="true">
+<description>
+specify the name of a file giving information
+in XML for a single plugin.
+</description>
+<quickHelp>
+name of XML file for single plugin
+</quickHelp>
+</arg>
+
 </arguments>
 

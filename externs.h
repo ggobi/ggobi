@@ -759,5 +759,8 @@ gboolean array_contains (gint* arr, gint n, gint el);
 
 void ggobiInit(int *argc, char **argv[]);
 
+GGobiPluginInfo *readPluginFile(const char * const fileName, GGobiInitInfo *info);
+gboolean registerPlugin(ggobid *gg, GGobiPluginInfo *plugin);
+
 #endif
 

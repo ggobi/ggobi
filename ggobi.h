@@ -492,6 +492,9 @@ typedef struct {
   gchar *activeColorScheme;
 
   gchar *restoreFile;
+
+  GSList *pluginFiles;
+
 } GGobiOptions;
 
 

@@ -107,6 +107,8 @@ getXMLDocElement(const xmlDocPtr doc, const char *tagName)
 xmlNode *
 getXMLElement(xmlNodePtr node, const char *tagName)
 {
+  if(strcmp(node->name, tagName) == 0)
+    return(node);
   node = XML_CHILDREN(node);
   while(node) {
     if(strcmp((const char *) node->name, tagName) == 0) {
@@ -497,13 +499,13 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
        plugin = processPlugin(el, info, doc);
        if(plugin)
          info->plugins = g_list_append(info->plugins, plugin);
-       } else if(strcmp((char *)el->name, "inputPlugin") == 0) {
-         GGobiPluginInfo *inputPlugin = processInputPlugin(el, info, doc);
-         if(inputPlugin)
+     } else if(strcmp((char *)el->name, "inputPlugin") == 0) {
+       GGobiPluginInfo *inputPlugin = processInputPlugin(el, info, doc);
+       if(inputPlugin)
            info->inputPlugins = g_list_append(info->inputPlugins, inputPlugin);
-       }
      }
-    el = el->next;
+   }
+   el = el->next;
   }
 }
 
@@ -1001,3 +1003,27 @@ resolveVariableName(const gchar *name, datad *d)
   return(-1);
 }
 
+GGobiPluginInfo *
+readPluginFile(const char * const fileName, GGobiInitInfo *info)
+{
+  xmlDocPtr doc;
+  xmlNodePtr node;
+  GGobiPluginInfo *plugin;
+
+  doc = xmlParseFile(fileName); 
+  if(doc == NULL) {
+     fprintf(stderr, "Couldn't parse the xml file %s\n", fileName);
+      return(NULL);
+  }
+
+  node = getXMLDocElement(doc, "plugin");
+  plugin = processPlugin(node, sessionOptions->info, doc);
+
+  if(plugin && info)
+     info->plugins = g_list_append(info->plugins, plugin);
+  else
+     fprintf(stderr, "Couldn't load the plugin file %s\n", fileName);
+
+
+  return(plugin);
+}

@@ -191,6 +191,8 @@ parse_command_line (gint *argc, gchar **av)
       (*argc)--; av++;
     } else if((ptr = getOptValue("restore", av[1]))) {
       sessionOptions->restoreFile = ptr;
+    } else if((ptr = getOptValue("plugin", av[1]))) {
+      sessionOptions->pluginFiles = g_slist_append(sessionOptions->pluginFiles, g_strdup(ptr));
     }
   }
 
@@ -759,6 +761,13 @@ process_initialization_files()
   if(fileName && fileName[0] && canRead(fileName)) {
     info = read_init_file(fileName, sessionOptions->info);
     /* sessionOptions->info = info; */
+  }
+  if(sessionOptions->pluginFiles) {
+    GSList *el = sessionOptions->pluginFiles;
+    while(el) {
+       readPluginFile((char *) el->data, sessionOptions->info);
+       el = el->next;
+    }
   }
 }
 

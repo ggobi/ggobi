@@ -528,7 +528,7 @@ GGobi_addToolsMenuItem (gchar *lbl, ggobid *gg)
   GtkWidget *entry = NULL, *tools_menu = NULL;
   GtkItemFactory *factory;
 
-  factory = gtk_item_factory_from_path ("<main>");
+  factory = gg->main_menu_factory; /*   gtk_item_factory_from_path ("<main>"); */
   tools_menu = gtk_item_factory_get_widget (factory, "<main>/Tools");
 
   if (tools_menu != NULL) {

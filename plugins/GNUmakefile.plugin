@@ -49,12 +49,20 @@ GTK_CFLAGS=$(shell $(GTK_CONFIG) --cflags)
 objects: 
 	@echo "$(OBJS)"
 
+distclean: clean
+	rm config.cache config.log $(PKG).so
+
 clean:
 	rm -f *.o *.so
 
+ifndef ADMIN
 local.config: local.config.in configure
+	if test -r local.config ; then cp local.config local.config.bak ; fi
 	./configure
+endif
 
+configure: configure.in
+	autoconf
 
 show:
 	@echo $(OBJS)

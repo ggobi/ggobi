@@ -18,8 +18,6 @@
 #include <string.h> /* for memset() declaration */
 
 
-
-
 datad *
 datad_new(datad *d, ggobid *gg)
 { 

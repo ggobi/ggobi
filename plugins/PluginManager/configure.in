@@ -1,0 +1,4 @@
+AC_INIT(pluginViewer.c)
+
+AC_OUTPUT(local.config)
+

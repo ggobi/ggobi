@@ -130,23 +130,15 @@ getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
 }
 
 
-gboolean 
-registerPlugins(ggobid *gg, GList *plugins)
+gboolean
+registerPlugin(ggobid *gg, GGobiPluginInfo *plugin)
 {
-  GList *el = plugins;
-  OnCreate f;
-  GGobiPluginInfo *plugin;
-  PluginInstance *inst;
   gboolean ok = true;
+  OnCreate f;
+  PluginInstance *inst;
 
-  while(el) {
-    plugin = (GGobiPluginInfo *) el->data;
-    if(plugin->type != GENERAL_PLUGIN) {
-      el = el->next;
-      continue;
-    }
-
-    ok = true;
+  if(plugin->type != GENERAL_PLUGIN) 
+     return(false);
 
     if(!plugin->details->loaded) {
       loadPluginLibrary(plugin->details, plugin);
@@ -173,6 +165,19 @@ registerPlugins(ggobid *gg, GList *plugins)
       inst->active = true;
       GGOBI_addPluginInstance(inst, gg);
     }
+    return(ok);
+}
+
+gboolean 
+registerPlugins(ggobid *gg, GList *plugins)
+{
+  GList *el = plugins;
+  gboolean ok = false;
+  GGobiPluginInfo *plugin;
+
+  while(el) {
+    plugin = (GGobiPluginInfo *) el->data;
+    ok = ok || registerPlugin(gg, plugin);
     el = el->next;
   }
 
