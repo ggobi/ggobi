@@ -1024,24 +1024,17 @@ readPluginFile(const char * const fileName, GGobiInitInfo *info)
   xmlDocPtr doc;
   xmlNodePtr node;
   GGobiPluginInfo *plugin = NULL;
+  int n;
 
   doc = xmlParseFile(fileName); 
   if(doc == NULL) {
-     fprintf(stderr, "Couldn't parse the xml file %s\n", fileName);
-      return(NULL);
+     fprintf(stderr, "Couldn't parse the xml file `%s'\n", fileName);
+     return(NULL);
   }
 
-  if(getPlugins(doc, sessionOptions->info) == -1) {
-    if((node = getXMLDocElement(doc, "plugin")))
-      plugin = processPlugin(node, sessionOptions->info, doc);
-    else if((node = getXMLDocElement(doc, "inputPlugin")))
-      plugin = processInputPlugin(node, sessionOptions->info, doc);
-  }
-  if(plugin && info)
-     info->plugins = g_list_append(info->plugins, plugin);
-  else
-     fprintf(stderr, "Couldn't load the plugin file %s\n", fileName);
+  n = getPlugins(doc, sessionOptions->info);
 
+  xmlFreeDoc(doc); 
 
   return(plugin);
 }
