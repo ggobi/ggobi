@@ -11,8 +11,8 @@ Two datasets, m <-> n linking using record id's
   <variable>died</variable>
 </variables>
 <records  count="2">
-<record label="Experimental" id="exp">  8 7  </record>
-<record label="Control"      id="ctl"> 11 8  </record>
+<record label="Experimental" category="exp">  8 7  </record>
+<record label="Control"      category="ctl"> 11 8  </record>
 </records>
 </data>
 
@@ -23,11 +23,11 @@ Two datasets, m <-> n linking using record id's
   <variable>died</variable>
 </variables>
 <records count="5">
-<record id="exp"> 42 1  1 </record>
-<record id="ctl">  7 1  1 </record>
-<record id="ctl"> 17 0 na </record>
-<record id="exp"> 12 0  0 </record>
-<record id="exp"> 11 3  2 </record>
+<record category="exp"> 42 1  1 </record>
+<record category="ctl">  7 1  1 </record>
+<record category="ctl"> 17 0 na </record>
+<record category="exp"> 12 0  0 </record>
+<record category="exp"> 11 3  2 </record>
 </records>
 </data>
 </ggobidata>
