@@ -892,7 +892,8 @@ asNumber(const char *sval)
    from the specified attributes.
    This includes its name, transformation name, etc.
 
-   Called in response to a <variable>, <realvariable> or <categoricalvariable> tag.
+   Called in response to a <variable>, <realvariable> or
+   <categoricalvariable> tag.
  */
 
 gboolean
@@ -910,14 +911,15 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
   }
 
   tmp = getAttribute(attrs, "name");
-  if(tmp != NULL) {
-    el->collab = g_strdup(tmp);
-    if (data->variable_transform_name_as_attribute == false)
-      el->collab_tform = g_strdup(tmp);
-  }
+  /*-- invent a variable name here if the user didn't supply one  */
+  if (tmp == NULL)
+    tmp = g_strdup_printf ("Var %d", data->current_variable);
+  el->collab = g_strdup(tmp);
+  if (data->variable_transform_name_as_attribute == false)
+    el->collab_tform = g_strdup(tmp);
 
   tmp = getAttribute(attrs, "nickname");
-  if(tmp != NULL) {
+  if (tmp != NULL) {
     el->nickname = g_strdup(tmp);
     /*-- no nickname_tform; defeats the purpose of having a 2-letter name --*/
     /*-- if word is shorter than 2 characters, g_strndup pads with nulls --*/
