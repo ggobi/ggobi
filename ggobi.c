@@ -1,3 +1,13 @@
+/*-- ggobi.c --*/
+/*
+    This software may only be used by you under license from AT&T Corp.
+    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
+    AT&T's Internet website having the URL:
+    <http://www.research.att.com/areas/stat/ggobi/license.html>
+    If you received this software without first entering into a license
+    with AT&T, you have an infringing copy of this software and cannot use
+    it without violating AT&T's intellectual property rights.
+*/
 #define GGOBIINTERN
 
 #include <math.h>
@@ -10,7 +20,7 @@
 #include "externs.h"
 
 ggobid **all_ggobis;
-int num_ggobis;
+gint num_ggobis;
 
 static gchar *version_date = "July 1, 2000";
 

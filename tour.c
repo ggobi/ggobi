@@ -8,7 +8,7 @@
 #include "externs.h"
 
 void
-alloc_tour(displayd *dsp, ggobid *gg)
+alloc_tour (displayd *dsp, ggobid *gg)
 {
   datad *d = dsp->d;
   gint nc = d->ncols;

@@ -1,3 +1,5 @@
+/*-- read_mysql.c --*/
+
 #include "properties.h"
 #include "read_mysql.h"
 #include <stdlib.h>

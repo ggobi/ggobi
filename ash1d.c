@@ -1,3 +1,7 @@
+/*
+ * Copyright 1986 David W. Scott
+*/
+
 #include <math.h>
 #include <limits.h>
 #include <float.h>
@@ -5,7 +9,6 @@
 #include <stdio.h>
 
 #include <glib.h>
-
 
 #define true 1
 #define false 0
@@ -36,7 +39,6 @@ do_ash1d (gfloat *vals, gint nvals, gint nbins, gint n_ashes,
 }
 #endif
 /* */
-
 
 gint
 do_ash1d (gfloat *vals, gint nvals, gint nbins, gint n_ashes,

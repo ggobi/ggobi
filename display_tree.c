@@ -1,3 +1,4 @@
+/*-- display_tree.c --*/
 #include <stdlib.h>
 
 #include "ggobi.h"
