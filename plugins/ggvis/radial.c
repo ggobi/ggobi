@@ -143,11 +143,13 @@ void setNChildren (ggvisd *ggv, datad *d)
     }
   }
 
-  /*-- debug --*/
+/*-- debug --*/
+/*
   for (i=0; i<d->nrows_in_plot; i++) {
     n = &ggv->radial->nodes[i];
     g_printerr ("node %d children %d\n", n->i, n->nChildren);
   }
+*/
 }
 
 /*
@@ -190,7 +192,7 @@ setSubtreeSize (noded *n, ggvisd *ggv, datad *d) {
     else
       n->subtreeSize += setSubtreeSize (nchild, ggv, d);
   }
-  g_printerr ("node %d subtreeSize %d\n", n->i, n->subtreeSize);
+  /*g_printerr ("node %d subtreeSize %d\n", n->i, n->subtreeSize);*/
   return (n->subtreeSize);
 }
 

@@ -181,14 +181,29 @@ static void radial_cb (GtkButton *button, PluginInstance *inst)
 
   setNodePositions (ggv, d);
 
-{
-gint i;
-noded *n;
-for (i=0; i<d->nrows; i++) {
-  g_printerr ("%f %f\n",
-    ggv->radial->nodes[i].pos.x, ggv->radial->nodes[i].pos.y);
-}
-}
+/*-- add two variables and put in the new values --*/
+  {
+    gint i, k;
+    gdouble *x = g_malloc0 (d->nrows * sizeof (gdouble));
+    gdouble *y = g_malloc0 (d->nrows * sizeof (gdouble));
+    gchar *name;
+
+    for (i=0; i<d->nrows; i++) {
+      x[i] = ggv->radial->nodes[i].pos.x;
+      y[i] = ggv->radial->nodes[i].pos.y;
+    }
+
+    name = g_strdup_printf ("x");
+    newvar_add_with_values (x, d->nrows, name, d, gg);
+    g_free (name);
+    g_free (x);
+    name = g_strdup_printf ("y");
+    newvar_add_with_values (y, d->nrows, name, d, gg);
+    g_free (name);
+    g_free (y);
+  }
+
+
 }
 
 static void cmds_cb (GtkButton *button, PluginInstance *inst)
