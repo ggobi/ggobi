@@ -56,14 +56,12 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
 /*
     gdk_colormap_free_colors (gdk_colormap_get_system(),
       gg->wvis.color_table, gg->wvis.ncolors);
-*/
-    g_free (gg->wvis.color_table);
-/*
     gdk_colormap_free_colors (gdk_colormap_get_system(),
                               &gg->wvis.bg_color, 1);
     gdk_colormap_free_colors (gdk_colormap_get_system(),
                               &gg->wvis.accent_color, 1);
 */
+    g_free (gg->wvis.color_table);
     gg->wvis.color_table = NULL;
     gg->wvis.scheme = NULL;
   }
@@ -506,6 +504,7 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint selected_var = get_one_selection_from_clist (clist);
   vartabled *vt;
+  extern void symbol_window_redraw (ggobid *);
 
   if (d && selected_var != -1) {
     gint i, m, k;
@@ -519,13 +518,15 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
      * is now redundant.
     */
     if (gg->wvis.color_table) {  /* ie, wvis.color_table != gg->color_table */
+/*
       gdk_colormap_free_colors (gdk_colormap_get_system(),
         gg->color_table, gg->ncolors);
-      g_free (gg->color_table);
       gdk_colormap_free_colors (gdk_colormap_get_system(),
                                 &gg->bg_color, 1);
       gdk_colormap_free_colors (gdk_colormap_get_system(),
                                 &gg->accent_color, 1);
+*/
+      g_free (gg->color_table);
 
       if (gg->wvis.scheme) {
         colorschemed *scheme = gg->wvis.scheme;
@@ -542,13 +543,15 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
           &gg->bg_color, &gg->accent_color);
       }
 
+/*
       gdk_colormap_free_colors (gdk_colormap_get_system(),
         gg->wvis.color_table, gg->wvis.ncolors);
-      g_free (gg->wvis.color_table);
       gdk_colormap_free_colors (gdk_colormap_get_system(),
                                 &gg->wvis.bg_color, 1);
       gdk_colormap_free_colors (gdk_colormap_get_system(),
                                 &gg->wvis.accent_color, 1);
+*/
+      g_free (gg->wvis.color_table);
       gg->wvis.color_table = NULL;
       gg->wvis.scheme = NULL;
       gg->wvis.ncolors = 0;
@@ -576,10 +579,8 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
     gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
       (gpointer) gg, (gpointer) &rval);
 
-    {
-    extern void symbol_window_redraw (ggobid *);
     symbol_window_redraw (gg);
-    }
+    cluster_table_update (d, gg);
   }
 }
 

@@ -424,7 +424,9 @@ color_expose_fg (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 {
   gint k = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w), "index"));
 
-  redraw_fg (w, k, gg);
+  if (k <= gg->ncolors)
+    redraw_fg (w, k, gg);
+
   return FALSE;
 }
 
@@ -663,8 +665,29 @@ symbol_window_redraw (ggobid *gg)
  * Send expose events where necessary; show the appropriate
  * number of fg_da widgets.
 */
+  gint k;
+  splotd *sp = gg->current_splot;
+  gint rval = false;
 
+  if (gg->color_ui.symbol_display) {
 
+    gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
+      "expose_event",
+      (gpointer) sp, (gpointer) &rval);
+    gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.line_display),
+      "expose_event",
+      (gpointer) sp, (gpointer) &rval);
+    redraw_bg (gg->color_ui.bg_da, gg);
+    redraw_accent (gg->color_ui.accent_da, gg);
+
+    for (k=0; k<gg->ncolors; k++) {
+      gtk_widget_show (gg->color_ui.fg_da[k]);
+      redraw_fg (gg->color_ui.fg_da[k], k, gg);
+    }
+    for (k=gg->ncolors; k<MAXNCOLORS; k++) {
+      gtk_widget_hide (gg->color_ui.fg_da[k]);
+    }
+  }
 }
 
 /*------------------------------------------------------------------------*/
@@ -783,9 +806,11 @@ make_symbol_window (ggobid *gg) {
     ebox = gtk_event_box_new ();
     gtk_container_add (GTK_CONTAINER (fg_frame), ebox);
 
+/*
     ncolors = MIN(gg->ncolors, MAXNCOLORS);
-
-    fg_table = gtk_table_new (1, ncolors, true);
+*/
+    /*-- create MAXNCOLORS drawing areas, showing gg->ncolors of them --*/
+    fg_table = gtk_table_new (1, MAXNCOLORS, true);
     gtk_container_add (GTK_CONTAINER (ebox), fg_table);
 
     k = 0;
@@ -904,4 +929,7 @@ make_symbol_window (ggobid *gg) {
   }
 
   gtk_widget_show_all (gg->color_ui.symbol_window);
+
+  for (k=gg->ncolors; k<MAXNCOLORS; k++)
+    gtk_widget_hide (gg->color_ui.fg_da[k]);
 }
