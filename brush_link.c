@@ -298,7 +298,7 @@ build_symbol_vectors_by_var (cpaneld *cpanel, datad *d, ggobid *gg)
 {
   gint i, m, level_value, level_value_max;
   vector_b levelv;
-  gint jlinkby = g_slist_index (d->vartable, d->linkvar_vt);
+  gint jlinkby;
   /*-- for other datad's --*/
   GSList *l;
   GList *lv;
@@ -306,6 +306,10 @@ build_symbol_vectors_by_var (cpaneld *cpanel, datad *d, ggobid *gg)
   vartabled *vtt;
   gboolean changed = false;
 
+  if (d->linkvar_vt == NULL)
+    return false;
+
+  jlinkby = g_slist_index (d->vartable, d->linkvar_vt);
 /*
  * I may not want to allocate and free this guy every time the
  * brush moves.
