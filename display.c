@@ -394,9 +394,13 @@ display_free (displayd* display, gboolean force, ggobid *gg)
     if(display->t2d.idled) {
       tour2d_func(false, display, gg);
     }
+    if (display->t2d_window)  /* XXX more to free or destroy here? */
+      gtk_widget_destroy (display->t2d_window);
     if(display->t1d.idled) {
       tour1d_func(false, display, gg);
     }
+    if (display->t1d_window)  /* XXX more to free or destroy here? */
+      gtk_widget_destroy (display->t1d_window);
     if(display->tcorr1.idled) {
       tourcorr_func(false, display, gg);
     }
