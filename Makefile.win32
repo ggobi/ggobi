@@ -1,5 +1,7 @@
 EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 
+NEW_DEFS=1
+
 ZIP=zip
 AR=ar rc
 CC=gcc
@@ -24,7 +26,7 @@ DEFINES=-DGGOBI_MAIN -DHAVE_CONFIG_H=1
 
 CFLAGS= $(DEBUG) -ansi -Wall  -mno-cygwin -mpentium \
          -fnative-struct -mwindows   $(INCLUDES:%=-I%) \
-         -DWIN32=1 
+         -DWIN32=1 -DHAVE_CONFIG_H=1
 
 
 SRC=array.c ash1d.c \
@@ -99,6 +101,7 @@ EXP=lib$(IMPBASE).exp
 
 DEF=$(DLL:.dll=.def)
 
+
 ifndef LIB_DIRS
  LIB_DIRS=$(GDK_LIB_DIR) $(GTK_LIB_DIR) $(GLIB_LIB_DIR)
 endif
@@ -116,6 +119,10 @@ endif
 
 dll: $(DLL)
 lib: $(LIB)
+
+
+cflags:
+	@echo "${CFLAGS}"
 
 ifndef CC_DRIVER
  CC_DRIVER=$(shell cygpath -w $(dirname $(CC)))\\$(basename $(CC))
@@ -141,8 +148,18 @@ main_ui.lo: main_ui.c
 $(LIB): main_ui.lo $(OB) 
 	$(AR) $@ $^
 
+ifdef NEW_DEFS
+$(DEF): $(OB)
+	@echo EXPORTS > $@
+	@nm $(OB) > tmp
+	@sed -n '/^........ [T] _/s/^........ [T] _/ /p' tmp >> $@
+	@cat exported-vars >> $@
+	@rm tmp
+
+else
 $(DEF): $(OB)
 	$(DLLTOOL) --kill-at --export-all -D $(DLL) --output-def $@ $^
+endif
 
 $(IMP): $(DEF)
 	$(DLLTOOL) -d $< -l $@ -D $(DLL)
