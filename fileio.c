@@ -48,7 +48,7 @@ ExtensionList binaryFileTypes = {
 };
 
 ExtensionList excelFileTypes = {
-  excel_data,
+  csv_data,
   NULL,
   0
   };
@@ -92,7 +92,8 @@ GSList *initFileTypeGroups(void)
     base name, the name of its directory, ...
 ----------------------------------------------------------------------*/
 
-InputDescription *fileset_generate(const gchar * fileName, DataMode guess,
+InputDescription *
+fileset_generate(const gchar * fileName, DataMode guess,
                                    ggobid * gg)
 {
   InputDescription *desc = (InputDescription *)
@@ -122,8 +123,8 @@ InputDescription *fileset_generate(const gchar * fileName, DataMode guess,
         GGobiInputPluginInfo *info;
         plugin = g_list_nth_data(els, i);
         info = plugin->info.i;
-        if (info->modeName &&
-            strcmp(info->modeName, sessionOptions->data_type) == 0) {
+        if (1 || (info->modeName &&
+            strcmp(info->modeName, sessionOptions->data_type) == 0)) {
           InputGetDescription f;
           f = (InputGetDescription) getPluginSymbol(info->getDescription,
                                                     plugin->details);
@@ -467,7 +468,8 @@ gboolean isXMLFile(const gchar * fileName, InputDescription * desc)
 }
 
 
-gboolean isExcelFile(const gchar * fileName)
+gboolean 
+isExcelFile(const gchar * fileName)
 {
   char tmp[20];
   char extention[20];
@@ -515,7 +517,7 @@ DataMode guessDataMode(const gchar * fileName, InputDescription * desc)
     return (ascii_data);
 
   if (isExcelFile(fileName))
-      return (excel_data);
+      return (csv_data);
 
   return (unknown_data);
 }

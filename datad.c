@@ -196,7 +196,13 @@ datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate)
   d->idTable = g_hash_table_new(g_str_hash, g_str_equal);
   d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
   for(i = 0; i < d->nrows; i++) {
-     tmp = duplicate ? g_strdup(ids[i]) : ids[i];
+     if(ids)
+       tmp = duplicate ? g_strdup(ids[i]) : ids[i];
+     else {
+       char buf[10];
+       sprintf(buf, "%d", i+1);
+       tmp = g_strdup(buf);
+     }
      index = (guint *) g_malloc(sizeof(guint));
      *index = i;
      g_hash_table_insert(d->idTable, tmp, index);

@@ -64,14 +64,17 @@ gboolean setup_category(datad* d, gint* text_table, Tree* text_category)
       InorderTravel_setup_category(&text_category[i],text_category[i].Root,vt);
 
       /* Debugging, dfs */
+#ifdef DEBUG_READ_CSV
       if (vt->nlevels > 0) {
-      g_printerr ("nlevels: %d\n", vt->nlevels);
-      {
-        gint k;
-        for (k=0; k<vt->nlevels; k++)
-          g_printerr ("level_name: %s\n", vt->level_names[k]);
+	g_printerr ("nlevels: %d\n", vt->nlevels);
+	{
+	  gint k;
+	  for (k=0; k<vt->nlevels; k++)
+	    g_printerr ("level_name: %s\n", vt->level_names[k]);
+	}
       }
-      }
+#endif
+
 
 
       for(j=0;j<d->nrows;j++)
@@ -407,7 +410,9 @@ void whatisfiletype(FILE* fp, gint* ncols, gint* nrows)
      row labels are provided, so I can detect errors in the file
      structure */
   if (fgetc(fp) == DELIMITER) {
+#ifdef DEBUG_READ_CSV
     g_printerr ("first character is a delimiter\n");
+#endif
     g_is_row = true;
     g_is_column = true;
   } else {
@@ -442,7 +447,10 @@ void whatisfiletype(FILE* fp, gint* ncols, gint* nrows)
       inx++;
     }
   }
+#ifdef DEBUG_READ_CSV
   g_printerr ("column labels? %d ncols = %d\n", g_is_column, *ncols);
+#endif
+
   rewind(fp);
 
   inx = 0;
@@ -541,7 +549,8 @@ gboolean name_set(FILE* fp, InputDescription *desc, datad* d, ggobid* gg)
   return (true);
 }
 
-gboolean read_excel_data(InputDescription *desc, ggobid *gg)
+gboolean 
+read_csv_data(InputDescription *desc, ggobid *gg)
 {
   FILE *fp;
   datad *d;
@@ -567,7 +576,9 @@ gboolean read_excel_data(InputDescription *desc, ggobid *gg)
     /* Determine file type, g_is_row, g_is_col
      * Calculate ncols, nrows */
     whatisfiletype(fp, &ncols, &nrows);
+#ifdef DEBUG_READ_CSV
     g_printerr ("whatis.. returns %d %d\n", ncols, nrows);
+#endif
     if(g_is_column)
       d->nrows = nrows;
     else
@@ -578,7 +589,9 @@ gboolean read_excel_data(InputDescription *desc, ggobid *gg)
     else
     */
       d->ncols = ncols;
+#ifdef DEBUG_READ_CSV
     g_printerr ("we conclude: %d %d\n", d->ncols, d->nrows);
+#endif
 
     /* Initialize vartable */
     vartable_alloc(d);

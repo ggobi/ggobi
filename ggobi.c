@@ -119,6 +119,8 @@ parse_command_line (gint *argc, gchar **av)
     }
     else if (strcmp (av[1], "-s") == 0)
       sessionOptions->data_mode = Sprocess_data;
+    else if (strcmp (av[1], "-csv") == 0)
+      sessionOptions->data_mode = csv_data;
     else if (strcmp (av[1], "-ascii") == 0) {
       sessionOptions->data_mode = ascii_data;
     }

@@ -118,7 +118,8 @@ gboolean fileset_read_init(const gchar * ldata_in, ggobid * gg)
 }
 
 
-gboolean fileset_read(const gchar * ldata_in, ggobid * gg)
+gboolean 
+fileset_read(const gchar * ldata_in, ggobid * gg)
 {
   InputDescription *desc;
   gboolean ok = true;
@@ -178,8 +179,8 @@ gboolean read_input(InputDescription * desc, ggobid * gg)
     ok = read_ascii_data(desc, gg);
     break;
 
-  case excel_data:
-    ok = read_excel_data(desc, gg);
+  case csv_data:
+    ok = read_csv_data(desc, gg);
     break;
 
   default:

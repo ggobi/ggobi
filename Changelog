@@ -1,4 +1,11 @@
+Read Excel files directly via --datamode=excel and
+ExcelReader plugin on Windows.
 
+Support for reading CSV files.
+
+
+	
+	
 
 Added an item `New' to the File menu
 
