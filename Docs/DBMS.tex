@@ -7,7 +7,7 @@
 \def\URL#1{\texttt{#1}}
 
 \title{GGobi and Database Management Systems from GGobi\\ 
-Reading data from MySQL
+Reading data from MySQL \& Postgres
 }
 \author{
 Duncan Temple Lang, Lucent Bell Labs
@@ -109,10 +109,11 @@ be attempted with no password.
 
 
 
-In the case that the \flag{-mysql} is specified with no filename a
-dialog window is displayed that allows one to interactively specify
-any and all of the details about the database and the data that one
-wants.  The fields are described in table \ref{tab:mysqlLogin}
+In the case that the \flag{-mysql} is specified with no filename, a
+dialog window (see \ref{fig:dbmsGUI}) is displayed that allows one to
+interactively specify any and all of the details about the database
+and the data that one wants.  The fields are described in table
+\ref{tab:mysqlLogin}
 
 \begin{table}[htbp]
   \begin{center}
@@ -152,7 +153,6 @@ The result should be a table with $2$ columns
 and the entries should identify 
 the observations by index (starting at $1$).
  \\
-
 Color query & this is an SQL query that returns a table of RGB values.
 A fourth column, if present, should contain the names by which color
 values can be referenced.
@@ -164,6 +164,13 @@ values can be referenced.
 The non-data queries are not implemented yet.  It would be useful to
 integrate the data sources so that appearance was specified locally,
 but the actual data values were queried via SQL.
-
+\begin{figure}[htbp]
+  \begin{center}
+    \leavevmode
+    \pdfimage{Figures/dbmsGUI.jpg}
+    \caption{DBMS Input GUI}
+    \label{fig:dbmsGUI}
+  \end{center}
+\end{figure}
 
 \end{document}
