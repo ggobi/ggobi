@@ -264,4 +264,13 @@ extern const gint ViewTypeIndeces[3];
 #define MISSING_P(i,j) (d->missing.vals[i][j] != 0)
 
 
+typedef enum {
+  C,
+  R,
+  SPLUS,
+  PERL,
+  PYTHON
+  } ProgrammingLanguage;
+
+
 #endif /* End of conditional definition. */
