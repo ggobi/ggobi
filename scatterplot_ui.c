@@ -160,7 +160,7 @@ scatterplot_display_edge_menu_update (displayd *display,
                       NULL, NULL, NULL, NULL, gg);
     }
 
-      /*
+    /*
      * The edge options are handled like other display options,
      * and their callback function is display_options_cb.
      * I may want to change that, but leave it for now.

@@ -289,3 +289,9 @@ position_popup_menu (GtkMenu *menu, gint *px, gint *py, gpointer data)
   *py += h;
 }
 
+void scale_set_default_values (GtkScale *scale)
+{
+  gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_CONTINUOUS);
+  gtk_scale_set_draw_value (scale, false);
+}
+

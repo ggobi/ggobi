@@ -448,6 +448,7 @@ void xyplot_event_handlers_toggle (splotd *, gboolean);
 gboolean xyplot_varsel (splotd *, gint, gint *, gint);
 void zoom_by_drag (splotd *, ggobid *);
 void zoom_step (splotd *, gint, gint, rectd *, ggobid*);
+void scale_set_default_values (GtkScale *scale);
 
 /*tsplot functions*/
 extern void cpanel_tsplot_init (cpaneld *, ggobid *);

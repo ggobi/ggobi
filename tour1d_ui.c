@@ -46,13 +46,6 @@ static void speed1d_set_cb (GtkAdjustment *adj, ggobid *gg) {
   tour1d_speed_set ((gint)adj->value, gg);
 }
 
-/*-- not a callback, but an initialization routine for the scrollbar --*/
-static void scale_set_default_values (GtkScale *scale )
-{
-  gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_CONTINUOUS);
-  gtk_scale_set_draw_value (scale, false);
-}
-
 static void tour1d_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
   extern void tour1d_pause(cpaneld *, gboolean, ggobid *);

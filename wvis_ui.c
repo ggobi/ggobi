@@ -15,6 +15,7 @@
 #include "vars.h"
 #include "externs.h"
 
+static GtkWidget *da;
 
 static void
 delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data)
@@ -22,16 +23,60 @@ delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data)
   gtk_widget_hide (w);
 }
 
-static void
-nclasses_set_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
+static gint
+da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 {
+  return true;
+}
+
+/*
+
+In practice, these will have to be drawn at locations that
+can change.
+
+*/
+
+static void
+da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
+{
+  gint xmargin = 20;
+  gint ymargin = 20;
+  gint wid = (w->allocation.width - 2*xmargin)/gg->ncolors;
+  gint height = w->allocation.height - 2*ymargin;
+  gint hgt = height / (gg->ncolors - 1);
+  gint k;
+  gint x = xmargin;
+  gint y = ymargin;
+
+  for (k=0; k<gg->ncolors; k++) {
+    gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[k]);
+    gdk_draw_rectangle (w->window, gg->plot_GC,
+                        TRUE, x, ymargin, wid, height);
+    x += wid;
+  }
+
+  /*-- draw rectangles, 20 x 10 for the moment --*/
+  gdk_gc_set_line_attributes (gg->plot_GC,
+    0, GDK_LINE_ON_OFF_DASH, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+  x = xmargin + wid; y = ymargin + 10;
+  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
+  for (k=1; k<gg->ncolors; k++) {
+    gdk_draw_line (w->window, gg->plot_GC,
+      xmargin, y, w->allocation.width - xmargin, y);
+    gdk_draw_rectangle (w->window, gg->plot_GC,
+                        TRUE, x-10, y-5, 20, 10);
+    x += wid;
+    y += hgt;
+  }
+  gdk_gc_set_line_attributes (gg->plot_GC,
+    0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 }
 
 static const gchar *const nclasses_lbl[] = {"5", "6", "7"};
 void
 wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
   GtkWidget *opt, *vbox, *hbox, *hb, *menu, *menuitem;
-  GtkWidget *swin, *clist, *btn, *entry;
+  GtkWidget *swin, *clist, *btn, *vb;
   gint nd = g_slist_length (gg->d);
   gint j;
   GSList *l;
@@ -103,82 +148,10 @@ wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
     gtk_container_add (GTK_CONTAINER (swin), clist);
 
 
-    hb = gtk_hbox_new (false, 0);
-    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
-
-    /*-- button: delete selected variables --*/
-    btn = gtk_button_new_with_label ("Remove selected");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Update the list, removing the selected variables", NULL);
-    gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 1);
-/*
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (remove_selected_cb), gg);
-*/
-
-    /*-- button: retain only the selected variables --*/
-    btn = gtk_button_new_with_label ("Retain selected");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Update the list, retaining only the selected variables", NULL);
-    gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 1);
-/*
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (retain_selected_cb), gg);
-*/
-
-    /*-- min, center, max --*/
-    hb = gtk_hbox_new (false, 0);
-
-    gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Min:"),
-      false, false, 2);
-    entry = gtk_entry_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-      "Minimum value", NULL);
-    gtk_box_pack_start (GTK_BOX (hb), entry,
-      true, true, 2);
-
-    gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Center:"),
-      false, false, 2);
-    entry = gtk_entry_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-      "Center value.  If this is filled in, the scale will be double-ended",
-      NULL);
-    gtk_box_pack_start (GTK_BOX (hb), entry,
-      true, true, 2);
-
-    gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Max:"),
-      false, false, 2);
-    entry = gtk_entry_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-      "Maximum value", NULL);
-    gtk_box_pack_start (GTK_BOX (hb), entry,
-      true, true, 2);
-
-    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
-
-    /*-- number of classes; single- or double-headed --*/
-    hbox = gtk_hbox_new (false, 0);
-    gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
-    hb = gtk_hbox_new (false, 0);
-    gtk_box_pack_start (GTK_BOX (hbox), hb, true, false, 1);
-
-    /*-- n classes option menu --*/
-    gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("N classes:"),
-      false, false, 2);
-    opt = gtk_option_menu_new ();
-    gtk_widget_set_name (opt, "WEIGHTEDVIS:nclasses_option_menu");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "Choose the number of classes.",
-      NULL);
-    populate_option_menu (opt, (gchar**) nclasses_lbl,
-                          sizeof (nclasses_lbl) / sizeof (gchar *),
-                          (GtkSignalFunc) nclasses_set_cb, gg);
-    gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);
-
     btn = gtk_button_new_with_label ("Update scale");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Update the scale of symbols", NULL);
-    gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
 /*
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (scale_update_cb), gg);
@@ -186,6 +159,20 @@ wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
     /*-- colors, symbols --*/
     /*-- now we get fancy:  draw the scale, with glyphs and colors --*/
+    vb = gtk_vbox_new (false, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), vb, true, true, 0);
+    da = gtk_drawing_area_new ();
+    gtk_drawing_area_size (GTK_DRAWING_AREA (da), 400, 200);
+    gtk_box_pack_start (GTK_BOX (vb), da, true, true, 0);
+
+    gtk_signal_connect (GTK_OBJECT (da),
+                        "configure_event",
+                        (GtkSignalFunc) da_configure_cb,
+                        (gpointer) gg);
+    gtk_signal_connect (GTK_OBJECT (da),
+                        "expose_event",
+                        (GtkSignalFunc) da_expose_cb,
+                        (gpointer) gg);
 
     gtk_widget_show_all (gg->wvis_ui.window);
   }

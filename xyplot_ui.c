@@ -52,12 +52,6 @@ static void cycle_cb (GtkToggleButton *button, ggobid *gg)
   xyplot_cycle_activate (cpanel->xyplot.cycle_p, cpanel, gg);
 }
 
-static void scale_set_default_values (GtkScale *scale)
-{
-  gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_CONTINUOUS);
-  gtk_scale_set_draw_value (scale, false);
-}
-
 static void cycle_speed_cb (GtkAdjustment *adj, ggobid *gg) {
   extern GtkFunction xycycle_func (ggobid *gg);
   displayd *display = gg->current_display;

@@ -54,12 +54,6 @@ static void speedcorr_set_cb (GtkAdjustment *adj, ggobid *gg) {
   tourcorr_speed_set ((gint)adj->value, gg);
 }
 
-static void scale_set_default_values (GtkScale *scale )
-{
-  gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_CONTINUOUS);
-  gtk_scale_set_draw_value (scale, false);
-}
-
 static void tourcorr_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
   extern void tourcorr_pause(cpaneld *, gboolean, ggobid *);
