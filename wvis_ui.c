@@ -893,7 +893,7 @@ wvis_window_open (ggobid *gg) {
 
     gg->wvis.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->wvis.window),
-      "color by variable");
+      "color schemes");
     gtk_signal_connect (GTK_OBJECT (gg->wvis.window),
       "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), gg);
 
@@ -954,7 +954,7 @@ wvis_window_open (ggobid *gg) {
     btn = gtk_button_new_with_label ("Apply color scheme to brushing colors");
     gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Make this the current color scheme for brushing in ggobi, preserving current groups.  If the number of groups is less than the number of colors currently in use, this won't work.",
+      "Make this the current color scheme for brushing in ggobi, preserving current color groups.  If the number of colors in the new scheme is less than the number of colors currently in use, this won't work.",
       NULL);
     gtk_box_pack_start (GTK_BOX (vbs), btn, false, false, 0);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
@@ -962,6 +962,7 @@ wvis_window_open (ggobid *gg) {
     gtk_widget_set_name (btn, "WVIS:setcolorscheme");
 #endif
   /**/
+
 
     /*-- colors, symbols --*/
     /*-- now we get fancy:  draw the scale, with glyphs and colors --*/
@@ -1012,7 +1013,7 @@ wvis_window_open (ggobid *gg) {
     opt = gtk_option_menu_new ();
     gtk_widget_set_name (opt, "WVIS:update_method");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "How to update the displays in response to movements of the sliders (only works after color scheme has been applied by variable",
+      "How to update the displays in response to movements of the sliders (works after a color scheme has been applied by variable)",
       NULL);
     gtk_box_pack_start (GTK_BOX (hb), opt, true, true, 0);
     populate_option_menu (opt, (gchar**) update_method_lbl,

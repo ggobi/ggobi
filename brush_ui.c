@@ -527,8 +527,8 @@ g_printerr ("new cvar: %s\n", dd->name);
                         (GtkSignalFunc) brush_linkvar_cb, gg);
 */
 
-/*-- button for opening 'color by variable' panel --*/
-  btn = gtk_button_new_with_label ("Color by variable ...");
+/*-- button for opening 'color schemes' panel --*/
+  btn = gtk_button_new_with_label ("Color schemes ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open tools panel for automatic brushing by variable",
     NULL);
