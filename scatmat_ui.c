@@ -67,6 +67,7 @@ cpanel_scatmat_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_option_menu_new ();
+  gtk_widget_set_name (opt, "SCATMAT:sel_mode_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Selecting an unselected variable either replaces the variable in the current plot, inserts a new plot before the current plot, or appends a new plot after it",
     NULL);
@@ -113,4 +114,22 @@ scatmat_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
     useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg);
 
   gtk_widget_show (gg->app.scatmat_mode_menu);
+}
+
+/*--------------------------------------------------------------------*/
+/*                      Control panel updating                        */
+/*--------------------------------------------------------------------*/
+
+/*-- there already exists scatmat_cpanel_init --*/
+
+void
+cpanel_scatmat_set (cpaneld *cpanel, ggobid *gg)
+{
+  GtkWidget *w;
+
+  w = widget_find_by_name (gg->control_panel[SCATMAT],
+                           "SCATMAT:sel_mode_option_menu");
+
+  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+                               cpanel->scatmat_selection_mode);
 }

@@ -98,6 +98,7 @@ cpanel_parcoords_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_option_menu_new ();
+  gtk_widget_set_name (opt, "PCPLOT:sel_mode_option_menu");
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "When opening a new parallel coordinates display, arrange the 1d plots in a row or a column",
@@ -263,3 +264,21 @@ parcoords_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 /*--------------------------------------------------------------------*/
 /*                   End of main menubar section                      */  
 /*--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------*/
+/*                      Control panel updating                        */
+/*--------------------------------------------------------------------*/
+
+/*-- there already exists parcoords_cpanel_init --*/
+
+void
+cpanel_parcoords_set (cpaneld *cpanel, ggobid *gg)
+{
+  GtkWidget *w;
+
+  w = widget_find_by_name (gg->control_panel[PCPLOT],
+                           "PCPLOT:sel_mode_option_menu");
+
+  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+                               cpanel->parcoords_selection_mode);
+}

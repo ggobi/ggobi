@@ -110,6 +110,7 @@ cpanel_tsplot_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_option_menu_new ();
+  gtk_widget_set_name (opt, "TSPLOT:sel_mode_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Selecting a variable either replaces the variable in the current plot (swapping if appropriate), inserts a new plot before the current plot, or appends a new plot after it",
     NULL);
@@ -183,3 +184,21 @@ tsplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *g
 /*--------------------------------------------------------------------*/
 /*                   End of main menubar section                      */  
 /*--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------*/
+/*                      Control panel updating                        */
+/*--------------------------------------------------------------------*/
+
+/*-- there already exists tsplot_cpanel_init --*/
+
+void
+cpanel_tsplot_set (cpaneld *cpanel, ggobid *gg)
+{
+  GtkWidget *w;
+
+  w = widget_find_by_name (gg->control_panel[TSPLOT],
+                           "TSPLOT:sel_mode_option_menu");
+
+  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+                               cpanel->tsplot_selection_mode);
+}

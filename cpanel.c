@@ -51,7 +51,9 @@ scatmat_cpanel_init (cpaneld* cpanel, ggobid *gg) {
   cpanel->p1d.type = ASH;
   cpanel_p1d_init (cpanel, gg);
 
+  /*-- available modes --*/
   cpanel_brush_init (cpanel, gg);
+  cpanel_identify_init (cpanel, gg);
 }
 
 void
@@ -66,7 +68,9 @@ parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg) {
   cpanel->parcoords_selection_mode = VAR_REPLACE;
   cpanel->parcoords_arrangement = ARRANGE_ROW;
 
+  /*-- available modes --*/
   cpanel_brush_init (cpanel, gg);
+  cpanel_identify_init (cpanel, gg);
 }
 
 void
@@ -78,10 +82,12 @@ tsplot_cpanel_init (cpaneld* cpanel, ggobid *gg) {
   cpanel->p1d.type = DOTPLOT;
   cpanel_p1d_init (cpanel, gg);
 
-  cpanel->tsplot_selection_mode = VAR_REPLACE;
+  cpanel->tsplot_selection_mode = VAR_REPLACE;  /*-- only this is used --*/
   cpanel->tsplot_arrangement = ARRANGE_COL;
 
+  /*-- available modes --*/
   cpanel_brush_init (cpanel, gg);
+  cpanel_identify_init (cpanel, gg);
 }
 
 void
@@ -103,14 +109,19 @@ cpanel_set (displayd *display, ggobid *gg) {
       cpanel_identify_set (cpanel, gg);
     break;
     case scatmat:
+      cpanel_scatmat_set (cpanel, gg);
       cpanel_brush_set (cpanel, gg);
+      cpanel_identify_set (cpanel, gg);
     break;
     case parcoords:
-      /*cpanel_p1d_set (cpanel);  write cpanel_parcoords_set (cpanel) */
+      cpanel_parcoords_set (cpanel, gg);
       cpanel_brush_set (cpanel, gg);
+      cpanel_identify_set (cpanel, gg);
     break;
     case tsplot:
+      cpanel_tsplot_set (cpanel, gg);
       cpanel_brush_set (cpanel, gg);
+      cpanel_identify_set (cpanel, gg);
     break;
     default:
 	  return;

@@ -579,7 +579,7 @@ scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 }
 
 /*--------------------------------------------------------------------*/
-/*                      Control panel section                         */
+/*                      Control panel updating                        */
 /*--------------------------------------------------------------------*/
 
 void

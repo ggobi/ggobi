@@ -121,6 +121,7 @@
 45127   5/3   ditto
 45302   5/4   made options menu mode-specific; added brushing option
 41569   5/4   the result of excluding some files that aren't in use
+44795   6/8   edge editing code, cpanel updating, bug fixing, ...
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.
