@@ -403,9 +403,11 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg)
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      yy[i] += (gint)(dsp->t1d.F.vals[0][j]*world_data[i][j]);
+      /*yy[i] += (gint)(dsp->t1d.F.vals[0][j]*world_data[i][j]);*/
+      yy[i] += (dsp->t1d.F.vals[0][j]*world_data[i][j]);
     }
   }
+
   do_ash1d (yy, d->nrows_in_plot,
             cpanel->t1d.nbins, cpanel->t1d.nASHes,
             sp->p1d.spread_data.els, &min, &max, &mean);
