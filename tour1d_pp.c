@@ -720,9 +720,9 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
 
   if (indx_min == indx_max) indx_min *= 0.9999;
 
-  sprintf(label,"PP index: (%3.1f) %5.3f (%3.1f)",
+  sprintf((const gchar *) label,"PP index: (%3.1f) %5.3f (%3.1f)",
     indx_min, ppindx_mat[ppindx_count], indx_max);
-  gtk_label_set_text(dsp->t1d_pplabel,label);
+  gtk_label_set_text((const gchar *) dsp->t1d_pplabel,label);
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
   if (ppindx_count == 0) 

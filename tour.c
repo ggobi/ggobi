@@ -579,7 +579,7 @@ reached_target(gint nsteps, gint stepcntr, gint basmeth,
 
   if (nsteps == 0 || stepcntr == nsteps)
     arewethereyet = true;
-  if (basmeth == 1)
+  if (basmeth == 1) {
     if (*indxval < *oindxval)
     {
       arewethereyet = true;
@@ -587,6 +587,7 @@ reached_target(gint nsteps, gint stepcntr, gint basmeth,
     }
     else
       *oindxval = *indxval;
+  }
 
   return(arewethereyet);
 }

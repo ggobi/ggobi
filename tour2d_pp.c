@@ -360,7 +360,7 @@ void t2d_ppdraw(gfloat pp_indx_val, ggobid *gg)
     hgt = dsp->t2d_ppda->allocation.height;
   gint j;
   static gboolean init = true;
-  const gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
+  gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
 
   if (init) {
     t2d_clear_ppda(gg);

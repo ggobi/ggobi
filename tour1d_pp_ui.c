@@ -128,14 +128,14 @@ void t1d_pp_func_cb (GtkWidget *w, gpointer cbd)
   displayd *dsp = gg->current_display;
   gint indx = GPOINTER_TO_INT (cbd);
   extern void t1d_clear_ppda(ggobid *);
-  const gchar *label = g_strdup("PP index: (0.000) 0.0000 (0.000)");
+  gchar *label = g_strdup("PP index: (0.000) 0.0000 (0.000)");
 
   cpanel->t1d_pp_indx = indx;
   dsp->t1d.get_new_target = true;
 
   dsp->t1d.ppval = 0.00;
   dsp->t1d_pp_op.index_best = -100.0;
-  sprintf(label,"PP index: (%3.1f) %5.3f (%3.1f) ",0.0,dsp->t1d.ppval,0.0);
+  sprintf(label, "PP index: (%3.1f) %5.3f (%3.1f) ",0.0,dsp->t1d.ppval,0.0);
   gtk_label_set_text(dsp->t1d_pplabel,label);
 
   t1d_clear_ppda(gg);
@@ -344,7 +344,7 @@ tour1dpp_window_open (ggobid *gg) {
 
     opt = gtk_option_menu_new ();
     gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-    gtk_misc_set_alignment (opt, 0, 0.5);
+    gtk_misc_set_alignment (GTK_MISC (opt), 0, 0.5);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Set the projection pursuit index", NULL);
     gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);

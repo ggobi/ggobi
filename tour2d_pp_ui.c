@@ -122,7 +122,7 @@ void t2d_pp_func_cb (GtkWidget *w, gpointer cbd)
   displayd *dsp = gg->current_display;
   gint indx = GPOINTER_TO_INT (cbd);
   extern void t2d_clear_ppda(ggobid *);
-  const gchar *label = g_strdup("PP index: (0.000) 0.0000 (0.000)");
+  gchar *label = g_strdup("PP index: (0.000) 0.0000 (0.000)");
 
   cpanel->t2d_pp_indx = indx;
   dsp->t2d.get_new_target = true;
@@ -253,7 +253,7 @@ tour2dpp_window_open (ggobid *gg) {
   for (j=0; j<dsp->t2d.nvars; j++) 
   {
     for (i=0; i<d->sphere.pcvars.nels; i++) 
-      if (dsp->t2d.vars.els[j] == d->sphere.pcvars.els)
+      if (dsp->t2d.vars.els[j] == d->sphere.pcvars.els[i])
         break;
     if ((i == d->sphere.pcvars.nels-1) && 
        (dsp->t2d.vars.els[j] != d->sphere.pcvars.els[i]))
@@ -366,7 +366,7 @@ tour2dpp_window_open (ggobid *gg) {
 
       opt = gtk_option_menu_new ();
       gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-      gtk_misc_set_alignment (opt, 0, 0.5);
+      gtk_misc_set_alignment (GTK_MISC (opt), 0, 0.5);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
         "Set the projection pursuit index", NULL);
       gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
