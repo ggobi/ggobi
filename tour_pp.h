@@ -1,3 +1,7 @@
+#ifndef TOUR_PP_H
+#define TOUR_PP_H
+
+
 /* tour_pp.h */
 /* Copyright (C) 2001 Dianne Cook and Sigbert Klinke
 
@@ -20,9 +24,6 @@ The authors can be contacted at the following email addresses:
 */
 
 
-typedef gint (*Tour_PPIndex_f)(array_f *pd, void *params, gfloat *val);
-
-
 gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
 gint free_optimize0_p (optimize0_param *op);
 gboolean iszero (array_f *data);
@@ -33,7 +34,7 @@ gfloat normalrandom(void);
 void normal_fill (array_f *data, gfloat delta, array_f *base);
 void orthonormal (array_f *proj);
 gint optimize0 (optimize0_param *op,
-                gint (*index) (array_f*, void*, gfloat*),
+                Tour_PPIndex_f fun,
                 void *param);
 
 /* Utility routines */
@@ -42,13 +43,15 @@ gdouble tour_pp_solve(gdouble *a, gdouble *b, gint n, gint *Pivot);
 void inverse(gdouble *a, gint n);
 
 /* Arbitrary dimensional indices */
-gint holes_raw(array_f *pdata, void *param, gfloat *val);
-gint central_mass_raw(array_f *pdata, void *param, gfloat *val);
+gint holes_raw(array_f *pdata, void *param, gfloat *val, gpointer unused);
+gint central_mass_raw(array_f *pdata, void *param, gfloat *val, gpointer unused);
 void zero (gdouble *ptr, gint length);
 void zero_int (gint *mem, gint size);
-gint compute_groups (vector_i group, vector_i ngroup, gint *groups, 
-  gint nrows, gfloat *gdata);
-gint discriminant (array_f *pdata, void *param, gfloat *val);
-gint cartgini (array_f *pdata, void *param, gfloat *val);
-gint cartentropy (array_f *pdata, void *param, gfloat *val);
+gint compute_groups (vector_i group, vector_i ngroup, gint *groups,  gint nrows, gfloat *gdata);
+gint discriminant (array_f *pdata, void *param, gfloat *val, gpointer unused);
+gint cartgini (array_f *pdata, void *param, gfloat *val, gpointer unused);
+gint cartentropy (array_f *pdata, void *param, gfloat *val, gpointer unused);
 
+
+
+#endif 

@@ -738,7 +738,7 @@ gfloat t1d_calc_indx (array_f pd,
 { 
   gfloat indexval;
 
-  index (&pd, param, &indexval);
+  index (&pd, param, &indexval, NULL);
 
   return(indexval);
 }

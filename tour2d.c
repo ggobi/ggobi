@@ -622,8 +622,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
       /*    if (dsp->t2d_ppda != NULL) {*/
 
       dsp->t2d.oppval = dsp->t2d.ppval;
-      revert_random = t2d_switch_index(cpanel->t2d.pp_indx,
-        0, dsp, gg);
+      revert_random = t2d_switch_index(cpanel->t2d, 0, dsp, gg);
       t2d_ppdraw(dsp->t2d.ppval, dsp, gg);
     }
   }
@@ -695,7 +694,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
         dsp->t2d.oppval = -1.0;
         t2d_ppdraw_think(dsp, gg);
 /*XX*/  gdk_flush ();
-        revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
+        revert_random = t2d_switch_index(cpanel->t2d, 
           dsp->t2d.target_selection_method, dsp, gg);
 
         if (!revert_random) {
@@ -725,7 +724,7 @@ g_printerr ("\n");
               for (j=0; j<dsp->t2d.nactive; j++)
                 dsp->t2d_pp_op.proj_best.vals[i][j] = 
                   dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[j]];
-            revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
+            revert_random = t2d_switch_index(cpanel->t2d, 
               dsp->t2d.target_selection_method, dsp, gg);
 	      }*/
   /*          t2d_ppdraw(dsp->t2d.ppval, dsp, gg);*/
@@ -1313,7 +1312,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
       /*    if (dsp->t2d_ppda != NULL) {*/
 
       dsp->t2d.oppval = dsp->t2d.ppval;
-      pp_problem = t2d_switch_index(cpanel->t2d.pp_indx, 
+      pp_problem = t2d_switch_index(cpanel->t2d, 
         0, dsp, gg);
       t2d_ppdraw(dsp->t2d.ppval, dsp, gg);
     }

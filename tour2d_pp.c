@@ -38,11 +38,9 @@ The authors can be contacted at the following email addresses:
 #include "tour2d_pp.h"
 #include "tour_pp.h"
 
-#define HOLES 0
-#define CENTRAL_MASS 1
-#define LDA 2
-#define CGINI 3
-#define CENTROPY 4
+
+typedef enum {HOLES, CENTRAL_MASS, LDA, CGINI, CENTROPY}  StandardPPIndexTypes;
+
 
 #define EXPMINUS1 0.3678794411714423
 #define ONEMINUSEXPMINUS1 0.63212056
@@ -638,12 +636,17 @@ gfloat t2d_calc_indx (array_f pd,
 { 
   gfloat indexval;
 
-  index (&pd, param, &indexval);
+  index (&pd, param, &indexval, NULL);
 
   return(indexval);
 }
 
-gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
+/* 
+ We could call this with the tour t2d object rather than the index type
+ since we no longer need the indxtype 
+*/
+gboolean
+t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
   ggobid *gg)
 {
   datad *d = dsp->d;
@@ -679,7 +682,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
 
   gdata  = g_malloc (nrows*sizeof(gfloat));
   if (d->clusterid.els==NULL) printf ("No cluster information found\n");
-  for (i=0; i<nrows; i++)
+  for (i = 0 ; i < nrows; i++)
   { 
     if (d->clusterid.els!=NULL)
       gdata[i] = d->clusterid.els[d->rows_in_plot.els[i]];
@@ -687,6 +690,17 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       gdata[i] = 0;
   }
 
+  if(controls.ppindex.index_f) {
+      if(controls.ppindex.checkGroups == false || 
+           !compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, &dsp->t2d_pp_param.numgroups, nrows, gdata)) 
+      { 
+	  controls.ppindex.index_f(&dsp->t2d_pp_op.pdata, &dsp->t2d_pp_param,  &dsp->t2d.ppval, controls.ppindex.userData);
+	  if(basismeth == 1) 
+	      kout = optimize0 (&dsp->t2d_pp_op, controls.ppindex.index_f, &dsp->t2d_pp_param);
+      }
+  }
+
+#if 0
   switch (indxtype)
   { 
     case HOLES: 
@@ -700,8 +714,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
 				      central_mass_raw, &dsp->t2d_pp_param);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t2d_pp_op, central_mass_raw, 
-          &dsp->t2d_pp_param);
+        kout = optimize0 (&dsp->t2d_pp_op, central_mass_raw, &dsp->t2d_pp_param);
     break;
     case LDA: 
       if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
@@ -734,18 +747,16 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       break;
     break;
     default: 
+/* Shouldn't we free gdata. */
       return(true);
     break;
   }
+#endif
+
   g_free (gdata);
   return(false);
 }
 
-#undef HOLES
-#undef CENTRAL_MASS
-#undef LDA
-#undef CGINI      
-#undef CENTROPY   
 
 #undef ONEMINUSEXPMINUS1
 #undef EXPMINUS1

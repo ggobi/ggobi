@@ -155,6 +155,15 @@ typedef struct {
   gfloat val;
 } celld;
 
+typedef gint (*Tour_PPIndex_f)(array_f *pd, void *params, gfloat *val, gpointer userData);
+
+typedef struct {
+    gchar *ppIndexName;   /* a string that can be used in the GUI to describe this PP index. */
+    Tour_PPIndex_f index_f; /* The C routine that calculates the PP index value.*/
+    gboolean checkGroups; /* Whether we have to call compute_groups and calculate the index only if this returns false(). */
+    gpointer userData;    /* arbitrary data object that is passed in the call to index_f to parameterize it. */
+} TourPPIndex;
+
 /*-- tour elements --*/
 typedef struct {
   gint datadim, projdim;
@@ -182,6 +191,7 @@ typedef struct {
   gboolean get_new_target;
   gint index; /* this is for counting planes passed */
   gfloat ppval, oppval; /* for projection pursuit */
+
 } tour;
 
 typedef struct {

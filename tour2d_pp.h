@@ -30,6 +30,5 @@ gint holes( array_f *pdata,void *param, gfloat *val);
 gint holes_raw1(array_f *pdata,void *param, gfloat *val);
 gint holes_raw2(array_f *pdata,void *param, gfloat *val);
 
-gfloat t2d_calc_indx(array_f, gint (*index) (array_f*, void*, gfloat*),
-                void *param);
-gboolean t2d_switch_index(gint, gint, displayd *, ggobid *);
+gfloat t2d_calc_indx(array_f, Tour_PPIndex_f fun,  void *param);
+gboolean t2d_switch_index(Tour2DCPanel, gint, displayd *, ggobid *);

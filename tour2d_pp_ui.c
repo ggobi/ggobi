@@ -16,9 +16,6 @@
 #define WIDTH   200
 #define HEIGHT  100
 
-#define HOLES           0
-#define CENTRAL_MASS    1
-#define LDA             2
 
 /* terms in expansion, bandwidth */
 /*
@@ -27,7 +24,9 @@ static GtkAdjustment *param_adj;
 */
 
 /*-- called when closed from the close menu item --*/
-static void close_menuitem_cb (displayd *dsp, gint action, GtkWidget *w) {
+static void
+close_menuitem_cb (displayd *dsp, gint action, GtkWidget *w) 
+{
   gtk_widget_hide (dsp->t2d_window);
   t2d_optimz(0, &dsp->t2d.get_new_target, 
     &dsp->t2d.target_selection_method, dsp);
@@ -37,9 +36,12 @@ static void close_menuitem_cb (displayd *dsp, gint action, GtkWidget *w) {
                                just gets hidden, so shouldn't
                                free the arrays. */
 }
+
+
 /*-- called when destroyed from the window manager --*/
 static void
-close_wmgr_cb (GtkWidget *w, GdkEventButton *event, displayd *dsp) {
+close_wmgr_cb (GtkWidget *w, GdkEventButton *event, displayd *dsp) 
+{
   gtk_widget_hide (dsp->t2d_window);
   t2d_optimz(0, &dsp->t2d.get_new_target, 
     &dsp->t2d.target_selection_method, dsp);
@@ -58,10 +60,9 @@ hide_cb (GtkWidget *w) {
 */
 
 static void
-options_cb(displayd *dsp, guint action, GtkCheckMenuItem *w) {
-  
+options_cb(displayd *dsp, guint action, GtkCheckMenuItem *w) 
+{
   switch (action) {
-
     case 0:
       if (w->active)
         gtk_widget_show (dsp->t2d_control_frame);
@@ -116,14 +117,14 @@ replot_freq_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
   }*/
 
 static void
-t2d_optimz_cb (GtkToggleButton  *w, displayd *dsp) {
+t2d_optimz_cb (GtkToggleButton  *w, displayd *dsp) 
+{
   if (dsp == NULL) {
     g_printerr ("No display corresponds to these projection pursuit controls; close this panel.\n");
     return;
   }
 
-  t2d_optimz(w->active, &dsp->t2d.get_new_target, 
-    &dsp->t2d.target_selection_method, dsp);
+  t2d_optimz(w->active, &dsp->t2d.get_new_target, &dsp->t2d.target_selection_method, dsp);
 }
 
 static void t2d_pptemp_set_cb (GtkAdjustment *adj, displayd *dsp) {
@@ -144,7 +145,18 @@ sphere_cb (GtkWidget  *w, ggobid *gg) {
 }
 */
 
-gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","LDA","Gini-C","Entropy-C"};
+#include "tour_pp.h"
+
+static gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","LDA","Gini-C","Entropy-C"};
+
+TourPPIndex StandardPPIndices[] = {
+    {"Holes", &holes_raw, false, NULL},
+    {"Central Mass", &central_mass_raw, false, NULL},
+    {"LDA", &discriminant, true, NULL},
+    {"Gini-C", &cartgini, true, NULL},
+    {"Entropy-C", &cartentropy, true, NULL},
+};
+
 
 void t2d_pp_func_cb (GtkWidget *w, gpointer cbd)
 {
@@ -162,17 +174,19 @@ void t2d_pp_func_cb (GtkWidget *w, gpointer cbd)
 
   cpanel = &dsp->cpanel;
   cpanel->t2d.pp_indx = indx;
+  cpanel->t2d.ppindex = StandardPPIndices[indx];
   dsp->t2d.get_new_target = true;
 
   dsp->t2d.ppval = 0.0;
   dsp->t2d.oppval = -1.0;
   dsp->t2d_pp_op.index_best = 0.0;
-  sprintf(label,"PP index: (%3.1f) %5.3f (%3.1f) ",0.0,dsp->t2d.ppval,0.0);
+  sprintf(label,"PP index: (%3.1f) %5.3f (%3.1f) ", 0.0, dsp->t2d.ppval, 0.0);
   gtk_label_set_text(GTK_LABEL(dsp->t2d_pplabel),label);
 
   t2d_clear_ppda(dsp, gg);
 
-  /*  if (indx == SUBD || LDA || CART_GINI || CART_ENTROPY || CART_VAR || PCA)
+  /*
+  if (indx == SUBD || LDA || CART_GINI || CART_ENTROPY || CART_VAR || PCA)
     gtk_widget_hide (param_vb);
   else {
   gtk_widget_show (param_vb);
@@ -558,6 +572,4 @@ tour2dpp_window_open (ggobid *gg) {
   }
 }
 
-#undef HOLES
-#undef CENTRAL_MASS
-#undef LDA
+

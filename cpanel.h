@@ -15,6 +15,22 @@
 #include <gtk/gtk.h>
 #include "defines.h"  /*-- and defines includes cpanel.h?  weird --*/
 
+
+typedef struct _Tour2DCPanel {
+   gboolean paused;
+   gboolean local_scan;
+   gboolean stepping;
+   gboolean backtracking;
+   gfloat step; 
+   gint ls_dir;
+   gfloat path_len;
+   gint pp_indx;
+   gfloat slidepos;
+   gint manip_mode;
+
+   TourPPIndex ppindex;
+} Tour2DCPanel;
+
 /*
  * This is at the display, or window, level.  Every display type
  * has one.  It captures the state of the control panel -- but
@@ -85,18 +101,7 @@ typedef struct {
  gint scatmat_selection_mode;
 
  /*-- 2d touring control pane --*/
- struct _Tour2DCPanel {
-   gboolean paused;
-   gboolean local_scan;
-   gboolean stepping;
-   gboolean backtracking;
-   gfloat step; 
-   gint ls_dir;
-   gfloat path_len;
-   gint pp_indx;
-   gfloat slidepos;
-   gint manip_mode;
- } t2d;
+ Tour2DCPanel t2d;
 
  /*-- rotation control pane --*/
  struct _Tour2D3CPanel {

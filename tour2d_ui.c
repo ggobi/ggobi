@@ -19,6 +19,9 @@
 #include "externs.h"
 #include "tour.h"
 
+extern TourPPIndex StandardPPIndices[];
+
+
 /* This function initializes the tour variables - it should only be
    called more than once, when a new tour is started since a new
    subset of variable might be used, or when there is new data. */
@@ -37,7 +40,8 @@ cpanel_t2d_init (cpaneld *cpanel, ggobid *gg) {
 
   cpanel->t2d.manip_mode = MANIP_OBLIQUE;
 
-  cpanel->t2d.pp_indx = 0;
+  cpanel->t2d.pp_indx = 0; /* Corresponds to the HOLES */
+  cpanel->t2d.ppindex = StandardPPIndices[0];
 }
 
 void

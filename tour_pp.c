@@ -222,7 +222,7 @@ void orthonormal (array_f *proj)
 }
 
 gint optimize0 (optimize0_param *op,
-                gint (*index) (array_f*, void*, gfloat*),
+                Tour_PPIndex_f index,
                 void *param)
 { 
   gfloat index_work = 0.0;
@@ -276,7 +276,7 @@ g_printerr ("\n");*/
     }*/
   /* do index calculation, functions return -1 if a problem, which
      is then passed back through optimize0 to tour1d_run */
-  if (index (&op->pdata, param, &op->index_best)) return(-1);
+  if (index (&op->pdata, param, &op->index_best, NULL)) return(-1);
   /*g_printerr ("index_work %f index_best %f \n",index_work, op->index_best);*/
 /*  if (index (&op->pdata, param, &index_work)) return(-1);*/
 
@@ -305,7 +305,7 @@ g_printerr ("\n");*/
       }
 
       /* Calculate pp index for current projection */       
-      if (index (&op->pdata, param, &index_work)) return(-1);
+      if (index (&op->pdata, param, &index_work, NULL)) return(-1);
 
       /*g_printerr ("index_work %f temp %f \n",index_work, op->temp);
 g_printerr ("proj_work: ");
@@ -591,7 +591,7 @@ Transformation : -
 Purpose        : Looks for the projection with no data in center.
 *********************************************************************/
 
-gint holes_raw(array_f *pdata, void *param, gfloat *val)
+gint holes_raw(array_f *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n, k,j;
@@ -668,7 +668,7 @@ Transformation : -
 Purpose        : Looks for the projection with lots of data in center.
 *********************************************************************/
 
-gint central_mass_raw(array_f *pdata, void *param, gfloat *val)
+gint central_mass_raw(array_f *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n,k,j;
@@ -793,7 +793,7 @@ gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups,
   return ((*numgroups==1) || (*numgroups==nrows));
 }
 
-gint discriminant (array_f *pdata, void *param, gfloat *val)
+gint discriminant (array_f *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, j, k, l;
@@ -1026,7 +1026,7 @@ void countngroup(int *group, int *ngroup, int n)
 
 }
 
-gint cartgini (array_f *pdata, void *param, gfloat *val)
+gint cartgini (array_f *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right, l;
@@ -1087,7 +1087,7 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
   return(0);
 }
 
-gint cartentropy (array_f *pdata, void *param, gfloat *val)
+gint cartentropy (array_f *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right,l;

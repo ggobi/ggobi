@@ -22,5 +22,5 @@ The authors can be contacted at the following email addresses:
 void center (array_f *);
 gint pca (array_f *, void *, gfloat *);
 
-gfloat t1d_calc_indx(array_f, gint (*index) (array_f*, void*, gfloat*), void *param);
+gfloat t1d_calc_indx(array_f, Tour_PPIndex_f fun, void *param);
 gboolean t1d_switch_index(gint, gint, displayd *, ggobid *);

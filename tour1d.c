@@ -47,6 +47,9 @@ extern gdouble erf (gdouble);  /*-- not defined on all unixes --*/
 #define T1DON true
 #define T1DOFF false
 
+static void tour1d_speed_set_display(gfloat slidepos, displayd *dsp); 
+
+
 #ifdef TESTING_TOUR_STEP
 void tour1d_step_cb(displayd *dsp, tour td, gint projdim, ggobid *gg,
   void *display)
@@ -260,6 +263,8 @@ display_tour1d_init (displayd *dsp, ggobid *gg)
 
   dsp->t1d_pp_op.temp_start = 1.0;
   dsp->t1d_pp_op.cooling = 0.99;
+
+  tour1d_speed_set_display(sessionOptions->defaultTour1dSpeed, dsp);
 }
 
 /*-- called from the Options menu --*/
@@ -308,13 +313,19 @@ tour1d_all_vars_cb (GtkCheckMenuItem *w, guint action)
   }
 }
 
-void tour1d_speed_set(gfloat slidepos, ggobid *gg) {
-  displayd *dsp = gg->current_display; 
+static void 
+tour1d_speed_set_display(gfloat slidepos, displayd *dsp) 
+{
   cpaneld *cpanel = &dsp->cpanel;
 
   cpanel->t1d.slidepos = slidepos;
   speed_set(slidepos, &cpanel->t1d.step, &dsp->t1d.delta);
 
+}
+
+void tour1d_speed_set(gfloat slidepos, ggobid *gg) 
+{
+    tour1d_speed_set_display(slidepos, gg->current_display); 
 }
 
 #ifdef TESTING_TOUR_STEP
