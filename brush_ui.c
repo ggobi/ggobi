@@ -459,8 +459,8 @@ void cpanel_brush_make(ggobid * gg)
   option_menu = gtk_option_menu_new();
   gtk_widget_set_name(option_menu, "BRUSH:point_targets_option_menu");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), option_menu,
-                       "Brushing points: what characteristics, if any, should respond?",
-                       NULL);
+    "Brushing points: what characteristics, if any, should respond?",
+    NULL);
   gtk_box_pack_start(GTK_BOX(vb), option_menu, false, false, 0);
   populate_option_menu(option_menu, point_targets_lbl,
     sizeof(point_targets_lbl) / sizeof(gchar *),
