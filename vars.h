@@ -8,6 +8,10 @@
     with AT&T, you have an infringing copy of this software and cannot use
     it without violating AT&T's intellectual property rights.
 */
+
+#ifndef GGOBI_VARS_H
+#define GGOBI_VARS_H
+
 #ifdef GGOBIINTERN
 #define GGOBI_
 #else
@@ -19,4 +23,6 @@
 #include "datad.h"
 #include "ggobi.h"
 #include "display.h"
+
+#endif
 
