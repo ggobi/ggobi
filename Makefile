@@ -33,7 +33,7 @@ SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
  scale_ui.c scale_drag.c scale_click.c scale_api.c \
  identify_ui.c identify.c \
  lineedit_ui.c lineedit.c \
- movepts_ui.c \
+ movepts_ui.c movepts.c \
  parcoords_ui.c parcoords.c \
  scatmat_ui.c scatmat.c \
  varpanel_ui.c vartable_ui.c vardata.c \
@@ -62,7 +62,7 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  scale_ui.o scale_drag.o scale_click.o scale_api.o \
  identify_ui.o identify.o \
  lineedit_ui.o lineedit.o \
- movepts_ui.o \
+ movepts_ui.o movepts.o \
  parcoords_ui.o parcoords.o \
  scatmat_ui.o scatmat.o \
  varpanel_ui.o vartable_ui.o vardata.o \

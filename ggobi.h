@@ -27,7 +27,6 @@ typedef struct {
  struct _ggobid *thisGG;
 
  /*-- used in identification, line editing, and point motion --*/
- icoords cursor_pos;
  gint nearest_point, nearest_point_prev; 
 
  GtkWidget *scatmat_mode_menu;
@@ -91,8 +90,6 @@ struct _ggobid {
 
  array_f raw, tform1, tform2;
  array_l world, jitdata;
-
-/*----------------------- pipeline ---------------------------------*/
 
  struct _Vartable {
    GtkWidget *window;
@@ -341,6 +338,16 @@ struct _ggobid {
    /*-- the entry widgets from which to get values to impute --*/
    GtkWidget *entry_above, *entry_below, *entry_val;
  } impute;
+
+/*---------------------- moving points ---------------------------------*/
+
+ struct _MovePts {
+   gboolean cluster_p;
+   enum directiond direction;
+   lcoords eps;
+   GSList *history;  /*-- a list of elements of type celld --*/
+ } movepts;
+
 
 /*----------------------------------------------------------------------*/
 /*                    variable selection panel                          */

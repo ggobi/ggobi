@@ -407,7 +407,8 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 
 
 void
-splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp, ggobid *gg)
+splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
+  ggobid *gg)
 /*
  * Use the data in projection coordinates and rescale it to the
  * dimensions of the current plotting window, writing it into screen.
@@ -477,7 +478,6 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   planar.x = (scr->x - sp->ishift.x) * PRECISION1 / sp->iscale.x ;
   planar.y = (scr->y - sp->ishift.y) * PRECISION1 / sp->iscale.y ;
 
-
 /*
  * plane to world
 */
@@ -541,8 +541,12 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
     default:
       break;
   }
-
 }
+
+/*
+ * The remainder of the reverse pipeline routines operate on
+ * the ggobi data structures.
+*/
 
 void
 splot_screen_to_plane (splotd *sp, gint pt, lcoords *eps,
@@ -566,8 +570,10 @@ splot_screen_to_plane (splotd *sp, gint pt, lcoords *eps,
 }
 
 void
-splot_plane_to_world (cpaneld *cpanel, splotd *sp, gint ipt, lcoords *eps, ggobid *gg) 
+splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg) 
 { 
+  displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
 
   switch (cpanel->projection) {
     case XYPLOT:
@@ -580,13 +586,14 @@ splot_plane_to_world (cpaneld *cpanel, splotd *sp, gint ipt, lcoords *eps, ggobi
   }
 }
 
-
 void
-splot_reverse_pipeline (cpaneld *cpanel, splotd *sp, gint ipt,
+splot_reverse_pipeline (splotd *sp, gint ipt, lcoords *eps,
                         gboolean horiz, gboolean vert, ggobid *gg)
 {
-  lcoords eps;
+  splot_screen_to_plane (sp, ipt, eps, horiz, vert);
+  splot_plane_to_world (sp, ipt, gg);
 
-  splot_screen_to_plane (sp, ipt, &eps, horiz, vert);
-  splot_plane_to_world (cpanel, sp, ipt, &eps, gg);
+  /*-- for bivariate plots only --*/
+  /*-- in pipeline.c since it applies to the front of the pipeline --*/
+  world_to_raw (ipt, sp, gg);
 }

@@ -7,6 +7,12 @@
 extern "C" {
 #endif
 
+extern void splot_reverse_pipeline (splotd *, gint, lcoords *, gboolean, gboolean, ggobid *);
+extern void move_pt_history_add (gint id, splotd *sp, ggobid *gg);
+extern void world_to_raw (gint pt, splotd *sp, ggobid *gg);
+extern void splot_plane_to_world (splotd *, gint, ggobid *);
+extern void move_pt_history_delete_last (ggobid *);
+extern void move_pt (gint id, gint x, gint y, splotd *sp, ggobid *gg);
 extern GtkWidget* CreateMenuCheck (displayd *, GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 extern GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *gg) ;
 extern ggobid* GGobiFromDisplay (displayd *display);
@@ -240,7 +246,6 @@ extern splotd* splot_new (displayd *, gint, gint, ggobid *gg);
 extern void splot_pixmap0_to_pixmap1 (splotd *, gboolean, ggobid *gg);
 extern void splot_pixmap1_to_window (splotd *, ggobid *gg);
 extern void splot_plane_to_screen (displayd *, cpaneld *, splotd *, ggobid *gg);
-extern void splot_plane_to_screen (displayd *, cpaneld *, splotd *, ggobid *gg);
 extern void splot_redraw (splotd *sp, gint, ggobid *gg);
 extern void splot_screen_to_tform (cpaneld *, splotd *, icoords *, fcoords *, ggobid *gg);
 extern void splot_set_current (splotd *, gboolean, ggobid *gg);
@@ -314,6 +319,7 @@ extern void xy_reproject (splotd *, glong **, ggobid *gg);
 extern gboolean xyplot_varsel (splotd *, gint, gint *, gint);
 extern void zoom_by_drag (splotd *, ggobid *gg);
 extern void zoom_step (splotd *, gint, gint, rectd *, ggobid* gg);
+extern gboolean mouseinwindow (splotd *sp, ggobid *gg);
 
 
 ggobid * ggobi_get (gint);

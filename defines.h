@@ -30,6 +30,8 @@
 
 #define NDISPLAYTYPES 3
 
+/*-- used in movepts --*/
+enum directiond {both, vertical, horizontal};
 
 enum displaytyped {scatterplot, scatmat, parcoords};
 extern const gchar* const ViewTypes[3];

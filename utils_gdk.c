@@ -115,7 +115,8 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
   /*-- that is, if using motion hints --*/
   if (event->is_hint) {
 
-    gdk_window_get_pointer (w->window, &gg->mousepos.x, &gg->mousepos.y, &state);
+    gdk_window_get_pointer (w->window, &gg->mousepos.x, &gg->mousepos.y,
+      &state);
     if ((state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
       *btn1_down_p = true;
     else if ((state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
@@ -133,5 +134,12 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
       *btn2_down_p = true;
     else if ((event->state & GDK_BUTTON3_MASK) == GDK_BUTTON3_MASK)
       *btn2_down_p = true;
+  }
 }
+
+gboolean
+mouseinwindow (splotd *sp, ggobid *gg) {
+  return ( 0 < gg->mousepos.x && gg->mousepos.x < sp->max.x &&
+           0 < gg->mousepos.y && gg->mousepos.y < sp->max.y) ;
+
 }

@@ -232,9 +232,9 @@ display_create (guint action, ggobid *gg)
       break;
   }
 
- display_add (display, gg);
+  display_add (display, gg);
 
- return(display);
+  return (display);
 }
 
 gint

@@ -147,6 +147,11 @@ typedef struct {
 } rgroupd;
 
 
+/*-- used to keep track of history in moving points --*/
+typedef struct {
+  gint i, j;
+  gfloat val;
+} celld;
 
 /*
  * display options
@@ -168,6 +173,8 @@ typedef struct {
 } DisplayOptions;
 
 extern DisplayOptions DefaultDisplayOptions;
+
+
 
 #define TYPES_H
 

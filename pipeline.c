@@ -410,3 +410,51 @@ rows_in_plot_set (ggobid *gg) {
   }
 }
 
+/*-------------------------------------------------------------------------*/
+/*                     reverse pipeline                                    */
+/*-------------------------------------------------------------------------*/
+
+void
+world_to_raw_by_var (gint pt, gint var, displayd *display, ggobid *gg)
+{
+  gfloat precis = PRECISION1;
+  gfloat ftmp, max, min, rdiff;
+  gfloat x;
+
+  if (display->missing_p) {
+    max = gg->missing_lim.max;
+    min = gg->missing_lim.min;
+  } else {
+    max = gg->vardata[var].lim.max;
+    min = gg->vardata[var].lim.min;
+  }
+  rdiff = max - min;
+
+  ftmp = gg->world.data[pt][var] / precis;
+  x = (ftmp + 1.0) * .5 * rdiff;
+  x += min;
+
+  gg->raw.data[pt][var] =
+    gg->tform1.data[pt][var] =
+    gg->tform2.data[pt][var] = x;
+}
+
+  /*
+   * allow the reverse pipeline only for
+   *   scatterplots in xyplot mode
+   *   the splotd members of a scatmat that are xyplots.
+  */
+void
+world_to_raw (gint pt, splotd *sp, ggobid *gg)
+{
+  displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
+
+  if ((display->displaytype == scatterplot && cpanel->projection == XYPLOT) ||
+      (display->displaytype == scatmat && sp->p1dvar == -1))
+  {
+    world_to_raw_by_var (pt, sp->xyvars.x, display, gg);
+    world_to_raw_by_var (pt, sp->xyvars.y, display, gg);
+  }
+}
+

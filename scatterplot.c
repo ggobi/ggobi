@@ -69,7 +69,7 @@ ruler_ranges_set (displayd *display, splotd *sp, ggobid *gg) {
   fcoords tfmin, tfmax;
   cpaneld *cpanel = &display->cpanel;
 
-  if(display->hrule == NULL)
+  if (display->hrule == NULL)
     return;
 
   scr.x = scr.y = 0;

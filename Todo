@@ -13,9 +13,10 @@ API code needed:
 
 various stuff not yet implemented: 
   1d, xy cycling  .... or leave it as a demo in R for now?
-  some window closings
+  some window closings  (display tree, ...)
   row groups
   moving points
+  the sphering transformation as it has been updated in xgobi
 
 brush_pos should be per-display.  when brushing or identifying in
   parcoords, use leave/enter events to change the current_splot.

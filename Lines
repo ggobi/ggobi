@@ -66,6 +66,7 @@
 29041   6/20  added sticky labels to identification
 29477   6/21  added simple imputation of missing values
 29475   6/23  using var stat panel to specify vars for scatmat, parcoords
+29791   6/27  point motion (including undo) 
 
 note: There are about 40.8K lines in xgobi,
 subtracting the rpc, xgvis and tour code.

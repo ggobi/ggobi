@@ -74,9 +74,10 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 */
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+/*-- use mousepos_get_motion for this --*/
   gdk_window_get_pointer (w->window,
-    &gg->app.cursor_pos.x, &gg->app.cursor_pos.y, NULL);
-  k = find_nearest_point (&gg->app.cursor_pos, sp, gg);
+    &gg->mousepos.x, &gg->mousepos.y, NULL);
+  k = find_nearest_point (&gg->mousepos, sp, gg);
   gg->app.nearest_point = k;
 
   if (k != gg->app.nearest_point_prev) {
