@@ -38,6 +38,8 @@ gdouble tour_pp_solve(gdouble *a, gdouble *b, gint n, gint *Pivot);
 void inverse(gdouble *a, gint n);
 
 /* Arbitrary dimensional indices */
+gint holes_raw(array_f *pdata, void *param, gfloat *val);
+gint central_mass_raw(array_f *pdata, void *param, gfloat *val);
 void zero (gdouble *ptr, gint length);
 void zero_int (gint *mem, gint size);
 gint compute_groups (gint *group, gint *ngroup, gint *groups, gint nrows, 

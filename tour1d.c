@@ -427,6 +427,12 @@ tour1d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     dsp->t1d.active_vars_p.els[jvar] = true;
   }
 
+  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+    free_optimize0_p(&dsp->t1d_pp_op);
+    alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
+      1);
+    t1d_pp_reinit(dsp, gg);
+  }  
   dsp->t1d.get_new_target = true;
 
   if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
@@ -689,7 +695,7 @@ g_printerr ("\n");*/
           }*/
 	  /*          t1d_ppdraw(dsp->t1d.ppval, dsp, gg);*/
   /*          count = 0;*/
-         ggobi_sleep(2);
+          ggobi_sleep(0);
         }
         else /* Use random target */
         {

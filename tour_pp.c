@@ -261,8 +261,8 @@ for (i=0; i<proj->ncols; i++) g_printerr ("%f ", proj->vals[0][i]);
 g_printerr ("\n");
 for (i=0; i<proj->ncols; i++) g_printerr ("%f ", proj->vals[1][i]);
 g_printerr ("\n");*/
-  /* calculate projected data */
-  for (i=0; i<op->data.nrows; i++)
+  /* calculate projected data */ /* this is generated outside this function */
+  /*  for (i=0; i<op->data.nrows; i++)
   { 
     for (j=0; j<proj->nrows; j++)
     { 
@@ -270,7 +270,7 @@ g_printerr ("\n");*/
       for (m=0; m<op->data.ncols; m++)
         op->pdata.vals[i][j] += op->data.vals[i][m]*proj->vals[j][m];
     }
-  }
+    }*/
   /* do index calculation, functions return -1 if a problem, which
      is then passed back through optimize0 to tour1d_run */
   if (index (&op->pdata, param, &op->index_best)) return(-1);
@@ -534,6 +534,111 @@ gdouble ludcmp(gdouble *a,gint n,gint *Pivot)
 
 /********************************************************************
 
+Index          : Holes
+Transformation : -
+Purpose        : Looks for the projection with no data in center.
+*********************************************************************/
+
+gint holes_raw(array_f *pdata, void *param, gfloat *val)
+{ 
+   int i, p, n,k,j;
+   double *m,tmp,x1,x2;
+   double *cov;
+   double det,acoefs;
+   p = pdata->ncols; n = pdata->nrows;
+   cov = (double *) malloc(p*p*sizeof(double));
+   m = (double *) malloc(p*sizeof(double));
+   zero(cov,p*p); zero(m,p);
+   for(i=0; i<n; i++)
+   { for(j=0; j<p; j++)
+     m[j] += pdata->vals[i][j]/(double)n;}
+
+  for (i=0; i<n; i++) 
+  { for (j=0; j<p; j++) 
+    { for(k=0; k<=j; k++) 
+      { cov[k*p+j] +=((pdata->vals[i][j])-(m[j]))* 
+                     ((pdata->vals[i][k])-(m[k]))/(double)(n-1); 
+        cov[j*p+k] = cov[k*p+j]; 
+      } 
+    } 
+  }
+
+  inverse(cov,p);
+  acoefs=0.0;
+
+  for(i=0; i<n; i++)
+  { tmp = 0;  
+    for (j=0; j<p; j++) 
+    {   x1 = pdata->vals[i][j]-m[j];
+         for(k=0; k<p; k++)
+        {  x2 = pdata->vals[i][k]-m[k]; 
+           tmp+= x1*x2*cov[j*p+k];
+        }
+    } 
+    acoefs +=exp(-tmp/(double)2);
+  }
+   *val = (1.-acoefs/(double)n)/(double) (1-exp(-p/(double)2));
+ 
+   free(m);
+   free(cov);
+   return(0);
+}
+
+/********************************************************************
+
+Index          : Central Mass
+Transformation : -
+Purpose        : Looks for the projection with lots of data in center.
+*********************************************************************/
+
+gint central_mass_raw(array_f *pdata, void *param, gfloat *val)
+{ 
+
+   int i, p, n,k,j;
+   double *m,tmp,x1,x2;
+   double *cov;
+   double det,acoefs;
+   p = pdata->ncols; n = pdata->nrows;
+   cov = (double *) malloc(p*p*sizeof(double));
+   m = (double *) malloc(p*sizeof(double));
+   zero(cov,p*p); zero(m,p);
+   for(i=0; i<n; i++)
+   { for(j=0; j<p; j++)
+     m[j] += pdata->vals[i][j]/(double)n;}
+
+  for (i=0; i<n; i++) 
+  { for (j=0; j<p; j++) 
+    { for(k=0; k<=j; k++) 
+      { cov[k*p+j] +=((pdata->vals[i][j])-(m[j]))* 
+                     ((pdata->vals[i][k])-(m[k]))/(double)(n-1); 
+        cov[j*p+k] = cov[k*p+j]; 
+      } 
+    } 
+  }
+
+  inverse(cov,p);
+  acoefs=0.0;
+
+  for(i=0; i<n; i++)
+  { tmp = 0;  
+    for (j=0; j<p; j++)
+
+    {   x1 = pdata->vals[i][j]-m[j];
+         for(k=0; k<p; k++)
+        {  x2 = pdata->vals[i][k]-m[k]; 
+           tmp+= x1*x2*cov[j*p+k];
+        }
+    } 
+    acoefs +=exp(-tmp/(double)2);
+  }
+  *val = (acoefs/n-exp(-p/(double)2))/(double) (1-exp(-p/(double)2));
+   free(m);
+   free(cov);
+   return(0);
+}
+
+/********************************************************************
+
 Index          : Discriminant
 Transformation : -
 Purpose        : Looks for the best projection to discriminate
@@ -634,7 +739,7 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   n = pdata->nrows;
   p = pdata->ncols;
 
-  Pv = (int *) malloc(n*sizeof(int));
+  Pv = (int *) malloc(p*sizeof(int));
 
   /* Compute means */
   zero (dp->mean, dp->groups*p);
@@ -654,7 +759,8 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   { 
     for (i=0; i<dp->groups; i++)
     { 
-      dp->mean[k*p+i] /= (gdouble) dp->ngroup[i];
+      /*      dp->mean[k*p+i] /= (gdouble) dp->ngroup[i];*/
+      dp->mean[k+p*i] /= (gdouble) dp->ngroup[i];
     /*     sprintf (msg, "mean[%i,%i]=%f", i, k, dp->mean[k*n+i]); print(); */
     }
     dp->ovmean[k] /= (gdouble) n;
@@ -693,7 +799,7 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
     {
       for (i=0; i< dp->groups; i++)	
         dp->cov[p*j+k] += (dp->mean[i*p+j]-dp->ovmean[j])*
-          (dp->mean[i*p+k]-dp->ovmean[k])/(gdouble)(dp->ngroup[i]);
+          (dp->mean[i*p+k]-dp->ovmean[k])*(gdouble)(dp->ngroup[i]);
     }
   }
 
@@ -848,11 +954,13 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
 /* Sort pdata by group */ 
   right = pdata->nrows-1;
   left = 0;
-  sort_group(pdata,dp->group,left,right);
+  zero_int(dp->index,n);
+  for (i=0; i<n; i++)
+    dp->index[i] = dp->group[i];
+  sort_group(pdata,dp->index,left,right);
 
 /* data relocation and make index */ 
   zero(dp->x,n);
-  zero_int(dp->index,n);
 
 /* Calculate Gini index in each coordinate 
              and find minimum              */
@@ -883,7 +991,7 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
       for (k=0; k<g; k++) {
         prob = ((gdouble) dp->nright[k])/((gdouble)(i+1));
         dev -= prob*prob*((gdouble)(i+1)/(gdouble)n);
-        prob = ((gdouble) (dp->ngroup[k]-dp->nright[k]))/((gdouble)(n-i+1));
+        prob = ((gdouble) (dp->ngroup[k]-dp->nright[k]))/((gdouble)(n-i-1));
         dev -= prob*prob*((gdouble)(n-i-1)/(gdouble)n);
       }
       if (dev<index) index = dev;
@@ -938,11 +1046,13 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val)
 /* Sort pdata by group */ 
   right = pdata->nrows-1;
   left = 0;
-  sort_group(pdata,dp->group,left,right);
+  zero_int(dp->index,n);
+  for (i=0; i<n; i++)
+    dp->index[i] = dp->group[i];
+  sort_group(pdata,dp->index,left,right);
 
 /* data relocation and make index */ 
   zero(dp->x,n);
-  zero_int(dp->index,n);
 
 /* Calculate index in each coordinate and find minimum  */
   for(l=0; l<p; l++)
@@ -971,7 +1081,7 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val)
         prob = ((double) dp->nright[k])/((double)(i+1));
         if (prob > 0)
           dev -= prob*log(prob)*((gdouble)(i+1)/(gdouble)n);
-        prob = ((double) (dp->ngroup[k]-dp->nright[k]))/((double)(n-i+1));
+        prob = ((double) (dp->ngroup[k]-dp->nright[k]))/((double)(n-i-1));
         if (prob > 0)
           dev -= prob*log(prob)*((gdouble)(n-i-1)/(gdouble)n);
       }

@@ -160,40 +160,47 @@ gint holes_raw1(array_f *pdata, void *param, gfloat *val)
    holes_param *hp = (holes_param *) param;
 */
    gint i, p=pdata->ncols, n=pdata->nrows;
-   gfloat m1, m2,x1,x2,temp;
+   gfloat m1, m2, x1, x2, temp;
    gdouble *cov;
    gfloat det,acoefs;
 
    cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
-   for(i=0; i<(p*p); i++) cov[i] = 0;
-   m1=0; m2=0;
-   for(i=0; i<n; i++)
-   { m1 += pdata->vals[i][0];
+   for(i=0; i<(p*p); i++) 
+     cov[i] = 0;
+   m1=0; 
+   m2=0;
+   for (i=0; i<n; i++) { 
+     m1 += pdata->vals[i][0];
      m2 += pdata->vals[i][1];
    }      
    m1 /= n;
    m2 /= n;
 
-   for(i=0; i<n; i++)
-     {  cov[0] += (pdata->vals[i][0]-m1)*(pdata->vals[i][0]-m1)/(n-1);
-        cov[1] += (pdata->vals[i][0]-m1)*(pdata->vals[i][1]-m2)/(n-1);
-        cov[3] += (pdata->vals[i][1]-m2)*(pdata->vals[i][1]-m2)/(n-1);
-     }
+   for (i=0; i<n; i++) {  
+     cov[0] += (pdata->vals[i][0]-m1)*(pdata->vals[i][0]-m1)/(n-1);
+     cov[1] += (pdata->vals[i][0]-m1)*(pdata->vals[i][1]-m2)/(n-1);
+     cov[3] += (pdata->vals[i][1]-m2)*(pdata->vals[i][1]-m2)/(n-1);
+   }
 
-   cov[2]= cov[1];
+   cov[2] = cov[1];
    det = cov[0]*cov[3]-cov[1]*cov[1];
+   cov[0] /= det;
+   cov[1] /= det;
+   cov[2] /= det;
+   cov[3] /= det;
    acoefs=0.;
 
-   for(i=0; i<n; i++)
-     {  x1 = pdata->vals[i][0]-m1; 
-        x2=pdata->vals[i][1]-m2;
-        temp= (cov[3]*x1*x1-2*cov[1]*x1*x2+cov[0]*x2*x2)/det;
-        acoefs +=exp(-temp/2);
+   for(i=0; i<n; i++) {  
+     x1 = pdata->vals[i][0]-m1; 
+     x2 = pdata->vals[i][1]-m2;
+     /*     temp = (cov[3]*x1*x1-2*cov[1]*x1*x2+cov[0]*x2*x2)/det;*/
+     temp = (cov[3]*x1*x1-2*cov[1]*x1*x2+cov[0]*x2*x2);
+     acoefs += exp(-temp/2);
    }
 
    *val = (1.-acoefs/n)/(gfloat) ONEMINUSEXPMINUS1;
 
-   free(cov);
+   g_free(cov);
    return(0);
 }
 
@@ -227,7 +234,7 @@ gint holes_raw2( array_f *pdata, void *param, gfloat *val)
    for(i=0; i<n; i++)
      {  x1 = pdata->vals[i][0]-m1; 
         x2=pdata->vals[i][1]-m2;
-        temp= cov[0]*x1*x1-(cov[1]+cov[2])*x1*x2+cov[3]*x2*x2;
+        temp= cov[0]*x1*x1+(cov[1]+cov[2])*x1*x2+cov[3]*x2*x2;
         acoefs +=exp(-temp/2);
    }
 
@@ -424,7 +431,7 @@ void t2d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
         dsp->t2d_pp_op.proj_best.vals[i][j] = 
           dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
     /*    dsp->t2d.ppval = dsp->t2d_indx_min;*/
-    dsp->t2d_pp_op.index_best = 0.0;
+    dsp->t2d_pp_op.index_best = dsp->t2d.ppval;
     bas_meth = 1;
   }
   else
@@ -588,7 +595,8 @@ void t2d_pp_reinit(displayd *dsp, ggobid *gg)
 
   for (i=0; i<dsp->t2d_pp_op.proj_best.nrows; i++)
     for (j=0; j<dsp->t2d_pp_op.proj_best.ncols; j++)
-      dsp->t2d_pp_op.proj_best.vals[i][j] = 0.;
+      dsp->t2d_pp_op.proj_best.vals[i][j] = 
+      dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
   dsp->t2d.ppval = 0.0;
   dsp->t2d.oppval = -1.0;
   dsp->t2d_pp_op.index_best = 0.0;
@@ -670,19 +678,21 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   gint i, j, k;
   /* gint pdim = 2; */
 
-  gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
-    reset_pp, gg);
+  /*  gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
+      reset_pp, gg);*/
 
   if (d->nrows_in_plot == 1)  /* can't do pp on no data! */
     return(false);
 
+  /* Copy data into pp opt'n data */
   for (i=0; i<d->nrows_in_plot; i++)
     for (j=0; j<dsp->t2d.nactive; j++)
       dsp->t2d_pp_op.data.vals[i][j] = 
         d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[j]];
 
+  /* Copy current projection into opt'n projection */
   for (i=0; i<2; i++)
-    for (j=0; j<dsp->t2d.nactive; j++)
+    for (j=0; j<dsp->t2d.nactive; j++) 
       dsp->t2d_pp_op.proj_best.vals[i][j] = 
         dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
 
@@ -690,11 +700,13 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
     for (i=0; i<d->nrows_in_plot; i++) {
       dsp->t2d_pp_op.pdata.vals[i][k] = 
           (d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[0]]*
-          dsp->t2d.F.vals[k][dsp->t2d.active_vars.els[0]]);
+          dsp->t2d_pp_op.proj_best.vals[k][0]);
+	   /*          dsp->t2d.F.vals[k][dsp->t2d.active_vars.els[0]]);*/
       for (j=1; j<dsp->t2d.nactive; j++)
         dsp->t2d_pp_op.pdata.vals[i][k] += 
           (d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[j]]*
-          dsp->t2d.F.vals[k][dsp->t2d.active_vars.els[j]]);
+          dsp->t2d_pp_op.proj_best.vals[k][j]);
+	   /*          dsp->t2d.F.vals[k][dsp->t2d.active_vars.els[j]]);*/
     }
 
   gdata  = g_malloc (nrows*sizeof(gfloat));
@@ -707,6 +719,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       gdata[i] = 0;
   }
 
+/*  dsp->t2d_pp_op.index_best = -1.0;  set best val to be current val */
   switch (indxtype)
   { 
     case HOLES: 
@@ -714,9 +727,10 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       /*      dsp->t2d.ppval = t2d_calc_indx (d->tform, 
 	      dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, holes_raw1, &hp);*/
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata, 
-        holes_raw1, &hp);
-      if (basismeth == 1)
-        kout = optimize0 (&dsp->t2d_pp_op, holes_raw1, &hp);
+        holes_raw, &hp);
+      if (basismeth == 1) {
+        kout = optimize0 (&dsp->t2d_pp_op, holes_raw, &hp);
+      }
       free_holes_p(&hp);
     break;
     case CENTRAL_MASS: 
@@ -724,9 +738,9 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       /*      dsp->t2d.ppval = t2d_calc_indx (d->tform, 
 	      dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, central_mass_raw1, &hp);*/
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-        central_mass_raw1, &hp);
+        central_mass_raw, &hp);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t2d_pp_op, central_mass, &hp);
+        kout = optimize0 (&dsp->t2d_pp_op, central_mass_raw, &hp);
       free_holes_p(&hp);
     break;
     case LDA: 

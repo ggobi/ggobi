@@ -281,6 +281,9 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_signal_connect (GTK_OBJECT (dsp->t1d_window), "delete_event",
                         GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) dsp);
     /*gtk_window_set_policy (GTK_WINDOW (dsp->t1d_window), true, true, false);*/
+    gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
+      reset_pp, gg);
+
     gtk_container_set_border_width (GTK_CONTAINER (dsp->t1d_window), 10);
 
 /*
@@ -364,7 +367,7 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vb), gtk_label_new ("Cooling:"),
       false, false, 0);
 
-    adj = gtk_adjustment_new (0.90, 0.5, 1.0, 0.05, 0.05, 0.0);
+    adj = gtk_adjustment_new (0.99, 0.5, 1.0, 0.05, 0.05, 0.0);
     gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (t1d_ppcool_set_cb), dsp);
 

@@ -453,6 +453,7 @@ tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
       2);
     t2d_pp_reinit(dsp, gg);
   }
+
 }
 
 static void
@@ -581,6 +582,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
   gint pathprob = 0;
   extern void t2d_ppdraw_think(displayd *,ggobid *);
 
+  /* Need to see why ppval goes down even though optimize is on. */
   /* Controls interpolation steps */
   if (!dsp->t2d.get_new_target && 
       !reached_target(dsp->t2d.tang, dsp->t2d.dist_az,
@@ -682,7 +684,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
                 dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[j]] = 
                   dsp->t2d_pp_op.proj_best.vals[i][j];
 	    }
-            dsp->t2d_pp_op.index_best = 0.0;
+	  /*            dsp->t2d_pp_op.index_best = 0.0;*/
 	    /*g_printerr ("tour_run:index_best %f temp %f \n", dsp->t2d_pp_op.index_best, dsp->t2d_pp_op.temp);
 g_printerr ("proj: ");
 for (i=0; i<dsp->t2d_pp_op.proj_best.ncols; i++) g_printerr ("%f ", dsp->t2d_pp_op.proj_best.vals[0][i]);
@@ -703,8 +705,7 @@ g_printerr ("\n");
 	      }*/
   /*          t2d_ppdraw(dsp->t2d.ppval, dsp, gg);*/
   /*          count = 0;*/
-
-          ggobi_sleep(2);  
+          ggobi_sleep(0);  
         }
         else
         {

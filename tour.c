@@ -646,8 +646,9 @@ reached_target(gfloat tang, gfloat dist_az, gint basmeth,
     {
       arewethereyet = true;
     }
-    /*    else
-     *oindxval = *indxval;*//* this gets re-set in the run function */
+    /*    if (tang >= dist_az)
+      arewethereyet = true;
+    */
   }
 
   return(arewethereyet);

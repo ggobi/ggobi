@@ -765,8 +765,8 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   gfloat *gdata;
   gint i, j;
 
-  gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
-    reset_pp, gg);
+  /*  gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
+      reset_pp, gg);*/
 
   if (d->nrows_in_plot == 1)  /* can't do pp on no data! */
     return(false);
@@ -804,15 +804,15 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   { 
     case HOLES: 
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        holes1d_raw1, NULL);
+        holes_raw, NULL);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, holes1d_raw1, &hp);
+        kout = optimize0 (&dsp->t1d_pp_op, holes_raw, &hp);
       break;
     case CENTRAL_MASS: 
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        central_mass1d_raw1, NULL);
+        central_mass_raw, NULL);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, central_mass1d_raw1, &hp);
+        kout = optimize0 (&dsp->t1d_pp_op, central_mass_raw, &hp);
       break;
     case PCA: 
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
