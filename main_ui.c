@@ -8,14 +8,6 @@
 #include "display_tree.h"
 
 
-/* Key for storing a reference to a ggobid instance
-   in a widget so that we can retrieve it within
-   a callback.
-*/
-const gchar * const GGobiGTKey = "GGobi";
-
-
-
 const char *const GGOBI(ModeNames)[] = {
   "1D Plot",
   "XYPlot",
@@ -419,11 +411,12 @@ void
 filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 {
   ggobid *gg;
+  extern const gchar* const key_get (void);
 
   gchar *fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
   guint action = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (fs),
                  "action"));
-  gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), GGobiGTKey);
+  gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), key_get());
 
   switch (action) {
     case 0:  /*-- input: read a new set of files --*/
@@ -441,12 +434,16 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
   }
 }
 
+
 void
 filename_get (ggobid *gg, guint action, GtkWidget *w) 
 {
+  extern const gchar* const key_get (void);
+
   GtkWidget *fs = gtk_file_selection_new ("read ggobi data");
   gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs));
-  gtk_object_set_data (GTK_OBJECT (fs), GGobiGTKey, gg);
+/*  gtk_object_set_data (GTK_OBJECT (fs), GGobiGTKey, gg);*/
+  gtk_object_set_data (GTK_OBJECT (fs), key_get(), gg);
   gtk_object_set_data (GTK_OBJECT (fs), "action", GINT_TO_POINTER (action));
 
   gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION (fs)->ok_button),
@@ -654,88 +651,6 @@ make_ui (ggobid *gg) {
                       (gpointer) gg);
 
   gtk_widget_show_all (window);
-}
-
-
-
-/*
-  Computes the ggobid pointer associated with the specified
-  widget. It does so by looking in the window associated with the widget
-  and then looking for an entry in the window's association table.
-  This assumes that the ggobid reference was stored in the window 
-  when it was created.
- */
-ggobid*
-GGobiFromWidget(GtkWidget *w, gboolean useWindow)
-{
-  /*
- GdkWindow *win = gtk_widget_get_parent_window(w);
- return(GGobiFromWindow(win));
-  */
- ggobid *gg = NULL;
-  gg = (ggobid*) gtk_object_get_data(GTK_OBJECT(w), GGobiGTKey);
- ValidateGGobiRef(gg, true);
- return(gg);
-}
-
-ggobid* GGobiFromWindow(GdkWindow *win)
-{
- ggobid *gg = NULL;
-  gg = (ggobid*) gtk_object_get_data(GTK_OBJECT(win), GGobiGTKey);
- ValidateGGobiRef(gg, true);
- return(gg);
-}
-
-ggobid* 
-GGobiFromSPlot(splotd *sp)
-{
- return(sp->displayptr->ggobi);
-}
-
-ggobid* 
-GGobiFromDisplay(displayd *display)
-{
- return(display->ggobi);
-}
-
-
-void
-GGobi_widget_set (GtkWidget *w, ggobid *gg, gboolean asIs)
-{
-  GtkObject *obj;
-  if (asIs)
-    obj = GTK_OBJECT (w);
-  else 
-    obj = GTK_OBJECT (gtk_widget_get_parent_window (w));
-
-  gtk_object_set_data (obj, GGobiGTKey, gg);
-}
-
-
-ggobid *
-ggobi_get(int which)
-{
- extern ggobid** all_ggobis;
- return(all_ggobis[which]);
-}
-
-ggobid*
-ValidateGGobiRef(ggobid *gg, gboolean fatal)
-{ 
- extern ggobid** all_ggobis;
- extern int num_ggobis;
-  int i;
-  for(i = 0; i < num_ggobis ; i++) {
-   if(all_ggobis[i] == gg)
-    return(gg);
-  }
-
-  fprintf(stderr, "Incorrect reference to ggobid.");
-
- if(fatal)
-  exit(10);
-
- return(NULL);
 }
 
 

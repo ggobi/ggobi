@@ -10,7 +10,7 @@
 #include "externs.h"
 #include "display.h"
 
- extern const gchar *GlyphNames[];
+extern const gchar *GlyphNames[];
 
 void warning(const char *msg);
 
@@ -248,14 +248,15 @@ const gchar * const*
 GGOBI(getViewTypes)(int *n)
 {
  *n = NDISPLAYTYPES;
- return(ViewTypes);
+ return (ViewTypes);
 }
 
 const gint *
-GGOBI(getViewTypeIndeces)(int *n)
+GGOBI(getViewTypeIndices)(gint *n)
 {
- *n = NDISPLAYTYPES;
- return(ViewTypeIndeces);
+  extern gint ViewTypeIndices[];
+  *n = NDISPLAYTYPES;
+  return (ViewTypeIndices);
 }
 
 
@@ -350,7 +351,7 @@ const gchar *
 GGOBI(getViewTypeName)(enum displaytyped type)
 {
  int n, i;
- const gint *types = GGOBI(getViewTypeIndeces)(&n);
+ const gint *types = GGOBI(getViewTypeIndices)(&n);
  const gchar * const *names = GGOBI(getViewTypes)(&n);
 
  for(i = 0; i < n; i++) {

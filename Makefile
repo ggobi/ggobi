@@ -77,7 +77,6 @@ ifdef USE_XML
  XML_LIBS=-lxml -lz
 endif
 
-USE_MYSQL=1
 ifdef USE_MYSQL
  MYSQL_DIST=/usr/local/src/mysql-3.23.16-alpha/
  MYSQL_INCLUDE_DIRS=$(MYSQL_DIST)/include

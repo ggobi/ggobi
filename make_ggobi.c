@@ -13,7 +13,7 @@
 #include "read_xml.h"
 #endif
 
-#ifdef USE_XML
+#ifdef USE_MYSQL
 #include "read_mysql.h"
 #endif
 
@@ -102,7 +102,7 @@ fileset_read (gchar *ldata_in, ggobid *gg)
      break;
    case mysql:
 #ifdef USE_MYSQL
-     ok = read_mysql_data(NULL, gg);
+     ok = read_mysql_data (NULL, gg);
 #endif
     break;
    case binary:
@@ -182,9 +182,11 @@ make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
       dataset_init(gg, true);
     }
   } else {
+#ifdef USE_MYSQL
     if(gg->data_mode == mysql) {
       GGOBI(get_mysql_login_info)(gg);
     }
+#endif
   }
 
   if (processEvents) {

@@ -12,13 +12,13 @@
 ggobid **all_ggobis;
 int num_ggobis;
 
-static gchar *version_date = "January 5, 2000";
+static gchar *version_date = "June 1, 2000";
 
 const gchar * const ViewTypes[] =
   {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
-const gint ViewTypeIndeces[] = { scatterplot, scatmat, parcoords};           
-
-const gchar *const ModeNames[] = {"ASCII", "R/S data", "binary", "XML", "MySQL"};
+const gint ViewTypeIndices[] = {scatterplot, scatmat, parcoords};           
+const gchar *const ModeNames[] =
+  {"ASCII", "R/S data", "binary", "XML", "MySQL"};
 
 gint
 parse_command_line (gint *argc, gchar **av, ggobid *gg)
@@ -224,7 +224,8 @@ ggobi_alloc()
   all_ggobis = g_realloc (all_ggobis, sizeof(ggobid*)*(num_ggobis+1));
   all_ggobis[num_ggobis] = tmp;
   num_ggobis++;
- return(tmp);
+
+  return (tmp);
 }
 
   /* Available so that we can call this from R
@@ -272,3 +273,96 @@ ggobi_close(GtkObject *w, ggobid *gg)
 {
   GGOBI(close)(gg, false);
 }
+
+
+/* Key for storing a reference to a ggobid instance
+   in a widget so that we can retrieve it within
+   a callback.
+*/
+const gchar * const GGobiGTKey = "GGobi";
+
+const gchar* const key_get (void) {
+  return GGobiGTKey;
+}
+
+/*
+  Computes the ggobid pointer associated with the specified
+  widget. It does so by looking in the window associated with the widget
+  and then looking for an entry in the window's association table.
+  This assumes that the ggobid reference was stored in the window 
+  when it was created.
+ */
+ggobid*
+GGobiFromWidget (GtkWidget *w, gboolean useWindow)
+{
+  /*
+   GdkWindow *win = gtk_widget_get_parent_window(w);
+   return(GGobiFromWindow(win));
+  */
+  ggobid *gg = NULL;
+  gg = (ggobid*) gtk_object_get_data (GTK_OBJECT(w), GGobiGTKey);
+  ValidateGGobiRef (gg, true);
+
+  return (gg);
+}
+
+ggobid* GGobiFromWindow (GdkWindow *win)
+{
+  ggobid *gg = NULL;
+  gg = (ggobid*) gtk_object_get_data(GTK_OBJECT(win), GGobiGTKey);
+  ValidateGGobiRef (gg, true);
+
+  return(gg);
+}
+
+ggobid* 
+GGobiFromSPlot(splotd *sp)
+{
+ return(sp->displayptr->ggobi);
+}
+
+ggobid* 
+GGobiFromDisplay(displayd *display)
+{
+  return(display->ggobi);
+}
+
+void
+GGobi_widget_set (GtkWidget *w, ggobid *gg, gboolean asIs)
+{
+  GtkObject *obj;
+  if (asIs)
+    obj = GTK_OBJECT (w);
+  else 
+    obj = GTK_OBJECT (gtk_widget_get_parent_window (w));
+
+  gtk_object_set_data (obj, GGobiGTKey, gg);
+}
+
+
+ggobid *
+ggobi_get (gint which)
+{
+ extern ggobid** all_ggobis;
+ return (all_ggobis[which]);
+}
+
+ggobid*
+ValidateGGobiRef(ggobid *gg, gboolean fatal)
+{ 
+ extern ggobid** all_ggobis;
+ extern int num_ggobis;
+  int i;
+  for(i = 0; i < num_ggobis ; i++) {
+   if(all_ggobis[i] == gg)
+    return(gg);
+  }
+
+  fprintf(stderr, "Incorrect reference to ggobid.");
+
+ if (fatal)
+  exit(10);
+
+ return(NULL);
+}
+

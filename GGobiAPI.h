@@ -75,7 +75,7 @@ extern const gchar *GGOBI(getCurrentDisplayType)();
 /*
    Sets the value of the argument to the number of
    view types.
-   See  ViewTypes[] and ViewTypeIndeces[] in defines.h
+   See  ViewTypes[] and ViewTypeIndices[] in defines.h
  */
 extern const gchar * const *GGOBI(getViewTypes) (int *n);
 /*
@@ -84,9 +84,9 @@ extern const gchar * const *GGOBI(getViewTypes) (int *n);
   The value of the argument is set to the length of the
   array.
   See getViewTypes.
-      ViewTypes[] and ViewTypeIndeces[] in defines.h
+      ViewTypes[] and ViewTypeIndices[] in defines.h
  */
-extern const gint  *GGOBI(getViewTypeIndeces)(int *n);
+extern const gint  *GGOBI(getViewTypeIndices)(int *n);
 
 
 /*
