@@ -34,26 +34,54 @@ Dynload *dynload = &unixDynload;
 #ifndef WIN32 
 #include <unistd.h> 
 #include <sys/stat.h> 
+
+#define DLL_EXTENSION ".dll"
+
 #else
+
 #include <glib.h> 
 # ifdef __STRICT_ANSI__ 
 # undef   __STRICT_ANSI__ 
 # endif
 # include <io.h> 
+
+#define DLL_EXTENSION ".so"
+
 #endif 
+
+
+gboolean
+canRead(const char * const fileName)
+{
+  gboolean val;
+#ifndef WIN32
+  struct stat buf;
+  val = (stat(fileName, &buf) != 0)
+#else
+  gint ft=0;
+  val = (access(fileName, ft) != 0);
+#endif
+
+  return(val);
+}
 
 HINSTANCE 
 load_plugin_library(GGobiPluginInfo *plugin)
 {
   HINSTANCE handle;
-#ifndef WIN32
-  struct stat buf;
-  if(stat(plugin->dllName, &buf) != 0) {
-#else
-  gint ft=0;
-  if(access(plugin->dllName, ft) != 0) {
-#endif
+  char *fileName;
+  fileName = plugin->dllName;
+  if(canRead(fileName) == false) {
+    fileName = (char *) g_malloc((strlen(fileName)+ strlen(DLL_EXTENSION) + 1)*sizeof(char));
+    strcpy(fileName, plugin->dllName);
+    strcpy(fileName+strlen(plugin->dllName), DLL_EXTENSION);
+    fileName[strlen(plugin->dllName) + strlen(DLL_EXTENSION)] = '\0';
+  }
+
+  if(canRead(fileName) == false) {
     fprintf(stderr, "can't locate plugin library %s:\n", plugin->dllName);fflush(stderr);      
+    if(fileName != plugin->dllName)
+      g_free(fileName);
     return(NULL);
   }
 
@@ -64,6 +92,8 @@ load_plugin_library(GGobiPluginInfo *plugin)
       fprintf(stderr, "error on loading plugin library %s: %s\n", plugin->dllName, buf);fflush(stderr);
    }
 
+   if(fileName != plugin->dllName)
+      g_free(fileName);
    return(handle);
 }
 
