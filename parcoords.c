@@ -138,6 +138,9 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
   splotd *sp;
   gint nplots;
   displayd *display;
+  gint arrangement = ARRANGE_ROW;  /*-- default initial orientation --*/
+  gint width, screenwidth;
+  gint height, screenheight;
 
   display = display_alloc_init (parcoords, missing_p, d, gg);
   if (nvars == 0) {
@@ -189,13 +192,31 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
 
   display->splots = NULL;
 
+  /*-- make sure the initial plot doesn't spill outside the screen --*/
+  /*-- this should know about the display borders, but it doesn't --*/
+  /*-- at the moment, the arrangement is forced to be ARRANGE_ROW --*/
+  width = WIDTH;
+  height = HEIGHT;
+  if (arrangement == ARRANGE_ROW) {
+    screenwidth = gdk_screen_width();
+    while (nplots * width > screenwidth) {
+      width -= 10;
+    }
+  } else {
+    screenheight = gdk_screen_height();
+    while (nplots * height > screenheight) {
+      height -= 10;
+    }
+  }
+  /*-- --*/
+
   for (i=0; i<nplots; i++) {
-    sp = splot_new (display, WIDTH, HEIGHT, gg);
+    sp = splot_new (display, width, height, gg);
     sp->p1dvar = vars[i]; 
 
 /*
     if (sub_plots == NULL) {
-      sp = splot_new (display, WIDTH, HEIGHT, gg);
+      sp = splot_new (display, width, height, gg);
       sp->p1dvar = i; 
     } else
        sp = sub_plots[i];
