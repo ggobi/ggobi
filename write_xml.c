@@ -142,8 +142,9 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
 
   if (vt->categorical_p) {
     gint k;
-    fprintf(f, "  <categoricalvariable name=\"%s\">\n",
+    fprintf(f, "  <categoricalvariable name=\"%s\"",
       (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
+    fprintf(f, " nickname=\"%s\">\n", vt->nickname);
     fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
     for (k=0; k<vt->nlevels; k++) {
       fprintf(f, "      <level value=\"%d\"> %s </level>\n",
@@ -153,8 +154,9 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
     fprintf(f, "    </levels>\n");
     fprintf(f, "  </categoricalvariable>");
   } else {
-    fprintf(f, "  <realvariable name=\"%s\"/>",
+    fprintf(f, "  <realvariable name=\"%s\"",
       (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
+    fprintf(f, " nickname=\"%s\" />", vt->nickname);
   }
 
   return(true);
