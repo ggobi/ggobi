@@ -479,9 +479,7 @@ static gboolean nclusters_changed(ggobid * gg)
 
 void cluster_table_update (datad * d, ggobid * gg)
 {
-  if (gg->cluster_ui.window == NULL) {
-    ;
-  } else {
+  if (gg->cluster_ui.window != NULL) {
     if (nclusters_changed(gg)) {   /*-- for any of the datad's --*/
       cluster_window_open(gg);
     } else {

@@ -158,18 +158,21 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
  * and there's probably a way to do it better.
 */
   clist = get_clist_from_object (GTK_OBJECT (w));
-  if(clist == NULL) {
+  if(clist != NULL) {
       d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
       selected_var = get_one_selection_from_clist (clist, d);
   } else {
       d = (datad *) g_slist_nth_data(gg->d, 0);
       selected_var = 0;
   }
+
   if (d && selected_var != -1) {
       gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
         (gpointer) gg, (gpointer) &rval);
+
+      bin_counts_reset (selected_var, d, gg);
   }
-  bin_counts_reset (selected_var, d, gg);
+
   gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
     (gpointer) gg, (gpointer) &rval);
 }
@@ -274,11 +277,16 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
   gfloat val;
 
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_one_selection_from_clist (clist, d);
+  datad *d = NULL;
+  gint selected_var = -1;
 
   icoords *mousepos = &gg->wvis.mousepos;
   gint color = gg->wvis.nearest_color;
+
+  if(clist) {
+    d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+    selected_var = get_one_selection_from_clist (clist, d);
+  }
 
   gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
 
@@ -360,8 +368,13 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_one_selection_from_clist (clist, d);
+  datad *d = NULL; 
+  gint selected_var = -1;
+
+  if(clist) {
+      d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+      selected_var = get_one_selection_from_clist (clist, d);
+  }
 
   if (gg->wvis.motion_notify_id) {
     gtk_signal_disconnect (GTK_OBJECT (w), gg->wvis.motion_notify_id);
@@ -495,11 +508,16 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     gg->wvis.scheme : gg->activeColorScheme;
 
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_one_selection_from_clist (clist, d);
+  datad *d = NULL;
+  gint selected_var = -1;
 
   GtkWidget *da = gg->wvis.da;
   GdkPixmap *pix = gg->wvis.pix;
+
+  if(clist) {
+   d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+   selected_var = get_one_selection_from_clist (clist, d);
+  }
 
   if (gg->wvis.GC == NULL)
     gg->wvis.GC = gdk_gc_new (w->window);
@@ -740,8 +758,11 @@ gboolean colors_remap (colorschemed *scheme, gboolean force, ggobid *gg)
 static void scale_set_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  datad *d = NULL;
   gboolean rval = false;
+
+  if(clist)
+    d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
 
   /*
    * If we've been using gg->wvis.scheme, set gg->activeColorScheme
@@ -847,8 +868,10 @@ wvis_window_open (ggobid *gg)
     "Update on mouse release",
     "Update continuously"};
 
+#if 0
   if (gg->d == NULL || g_slist_length (gg->d) == 0)
     return;
+#endif
 
   if (gg->wvis.window == NULL) {
 
