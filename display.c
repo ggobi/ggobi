@@ -97,11 +97,11 @@ display_print_cb (displayd *display, guint action, GtkWidget *w) {
  */
 void
 display_close_cb (displayd *display, guint action, GtkWidget *w) {
-  display_free (display);
+  display_free (display, false);
 }
 void
 display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display) {
-  display_free (display);
+  display_free (display, false);
 }
 
 /*----------------------------------------------------------------------*/
@@ -179,7 +179,7 @@ display_new (gpointer cbd, guint action, GtkWidget *widget)
  * current_display and current_splot if necessary.
 */ 
 void
-display_free (displayd* display) {
+display_free (displayd* display, gboolean force) {
   GList *l;
   splotd *sp = NULL;
 
@@ -193,7 +193,7 @@ display_free (displayd* display) {
      sp_event_handlers_toggle (xg.current_splot, off);
   }
 
-  if (g_list_length (xg.displays) > 1) {
+  if (force || g_list_length (xg.displays) > 1) {
 
     /* If the display tree is active, remove the corresponding
        entry.
@@ -202,7 +202,7 @@ display_free (displayd* display) {
 
     g_list_remove (xg.displays, display);
 
-    if (display == xg.current_display) {
+    if (display == xg.current_display && (g_list_length (xg.displays) > 1)) {
       display_set_current (g_list_nth_data (xg.displays, 0));
       xg.current_splot = (splotd *)
         g_list_nth_data (xg.current_display->splots, 0);
@@ -232,7 +232,7 @@ display_free_all () {
 
   for (dlist = xg.displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
-    display_free (display);
+    display_free (display, false); /* Perhaps this should be true to get the final one.*/
   }
 }
 
@@ -241,6 +241,9 @@ display_set_current (displayd *new_display) {
 
   static GtkWidget *mode_item = NULL;
   static gboolean firsttime = true;
+
+  if(new_display == NULL)
+   return;
 
   gtk_accel_group_unlock (main_accel_group);
 

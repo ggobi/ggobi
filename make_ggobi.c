@@ -42,20 +42,30 @@ fileset_read_init (gchar *ldata_in)
 {
   gboolean ans = fileset_read (ldata_in);
   if (ans) {
+    dataset_init(&xg);
+  }
+
+ return (ans);
+} 
+
+void
+dataset_init(xgobid *xg)
+{
     displayd *display;
 
     pipeline_init ();
 
+
     /*-- initialize the first display --*/
     display = scatterplot_new (false);
-    xg.displays = g_list_append (xg.displays, (gpointer) display);
+    /* Need to make certain this is the only one there.
+       See
+     */
+    xg->displays = g_list_append (xg->displays, (gpointer) display);
     display_set_current (display);
-    xg.current_splot = (splotd *)
-      g_list_nth_data (xg.current_display->splots, 0);
- }
-
- return (ans);
-} 
+    xg->current_splot = (splotd *)
+      g_list_nth_data (xg->current_display->splots, 0);
+}
 
 
 gboolean

@@ -175,6 +175,7 @@ gint XGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
 
 
 /*  g_thread_init (NULL);*/
+
   gtk_init (&argc, &argv);
 
   vis = gdk_visual_get_system ();

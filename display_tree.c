@@ -117,8 +117,7 @@ gtk_signal_connect (GTK_OBJECT(item), "select",
 
 
 /*
-  Called when the 
-  
+  Called when the display tree window is closed.
  */
 void
 display_tree_delete_cb(GtkWidget *w, GdkEvent *event, GtkWidget *display) 

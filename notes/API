@@ -7,8 +7,12 @@ Also, the GGobiAPI.h has prototypes for some of these.
 /*
  * data, but also row and column labels, lines, colors, blahblah
  * how to do that from R?  Easier once we have xml i/o.
+
+ * R and S would really like to provide a single vector/array
+ * of doubles, arranged by column. Hence the double* for now.
+ * A double array (double **) would be useful also.
 */
-void setData ()
+void setData (double *values, gchar *rownames, gchar *colnames);
 
 /* Whether to get the transformed names or the regular ones. */
 ! gchar **getVariableNames (bool transformed)

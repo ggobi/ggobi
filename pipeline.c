@@ -126,6 +126,8 @@ vardata_lim_raw_gp_set ()
     for (j=0; j<xg.ncols; j++) {
       if (xg.vardata[j].groupid == k)
         cols[ncols++] = j;
+      else
+        cols[j] = j;
     }
 
     min_max (xg.raw.data, cols, ncols, &min, &max);

@@ -1,3 +1,4 @@
+
 This describes the basic setup for embedding GGobi/XGobi in another
 application.  It relates specifically to R and S, but should be of
 some value for other applications.
@@ -152,6 +153,34 @@ Example for smoothing,identify, etc.
 The function that is registered can be a closure
 with its own ``local'' state.
 
+
+Consider identifying points on a plot.  We can arrange to have an R
+function be invoked when a new point is encountered or a point
+selected by explicitly click on the canvas.
+We can make this behave like the locator() function
+in R and S in that it gathers up the collection of 
+$(x, y)$ pairs for all the clicks
+and returns this.
+
+Since this is event driven, rather than a blocking call as with
+locator(), we can arrange to to this with an ``object'' with its own
+state.
+\begin{verbatim}
+ function () {
+   vals <- list(x=numeric(0), y= numeric(0))
+
+   click <- function(x, y) {
+    
+     vals$x <<- c(vals$x, x)
+     vals$y <<- c(vals$y, y)
+   }
+
+   return(click)
+ }
+\end{verbatim}
+
+
+
 Closures for mutable state and local variables.
 
 
@@ -176,6 +205,15 @@ There are still a lot of statics to be dealt with.
 We need to remove the macros from ggobi.h as we go to
 make things simpler. Just need to find the time.
 
+
+
+\section{Resetting the data}
+
+Change vardata_init to set the group identifier to 0.
+
+
+Need to change dataset_init to make certain that there is only
+one display in the list when this is finished..
 
 
 \section{API Routines}

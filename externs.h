@@ -70,7 +70,7 @@ extern void cpanel_xyplot_make (void);
 extern void ctour_event_handlers_toggle (splotd *, gboolean);
 extern void display_close_cb (displayd *d, guint, GtkWidget *);
 extern void display_delete_cb (GtkWidget *, GdkEvent *, displayd *);
-extern void display_free (displayd *);
+extern void display_free (displayd *, gboolean force);
 extern void display_free_all (void);
 extern void display_new (gpointer cbd, guint action, GtkWidget *widget);
 extern void display_options_cb (GtkCheckMenuItem *w, guint action);
@@ -235,3 +235,5 @@ extern void xy_reproject (splotd *, glong **);
 extern gboolean xyplot_varsel (splotd *, gint, gint *, gint);
 extern void zoom_by_drag (splotd *);
 extern void zoom_step (splotd *, gint, gint, rectd *);
+
+void dataset_init(xgobid *xg);
