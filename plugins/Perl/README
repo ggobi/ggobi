@@ -1,0 +1,21 @@
+This is a language plugin for GGobi which embeds the Perl interpreter
+inside GGobi and allows developers to create others plugins written in
+Perl for GGobi.  The motivation is that this will be useful for
+creating specialized input plugins for reading data from different
+formats since Perl is exceedingly good at this.
+
+Additionally, since there exist Perl bindings for Gtk, one can create
+regular UI plugins for GGobi in a higher-level language than C, and
+not necessarily have to use R.
+
+When we migrate the GGobi data structures to being regular Gtk objects
+(reasonably soon now), then we will be able to have easy access from
+Perl to Gtk events, data structures, etc.  Given this, a Perl plugin
+will be able to readily interact extensively with GGobi.
+
+As of now, we need a few more hooks and Perl bindings for GGobi to
+make this interface work well. These will emerge gradually, or perhaps
+we may use SWIG or Slcc to generate them.  Having this plugin
+mechanism will hopefully encourage others to push to have the
+bindings, or maybe even add them themselves.
+

@@ -1,0 +1,7 @@
+Put ggobi/plugins/Perl and  ggobi/plugins/Perl/GGobi in your 
+PERLLIB path
+
+i.e. 
+ setenv PERLLIB /home/duncan/Projects/ggobi/ggobi/plugins/Perl:/home/duncan/Projects/ggobi/ggobi/plugins/Perl/GGobi
+
+Will sort this out later!

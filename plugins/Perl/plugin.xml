@@ -1,0 +1,45 @@
+<plugin name="Perl" providesLanguage="Perl">
+   <description>Loads the Perl interpreter engine for use by other plugins</description>
+   <author>Duncan Temple Lang</author>
+   <options>
+    <args>
+     <arg>ggobi.pl</arg>
+    </args>
+   </options>
+   <dll name="/home/duncan/Projects/ggobi/ggobi/plugins/Perl/PerlPlugin.so">
+    <init onLoad="Perl_onLoad" processPlugin="Perl_processPlugin" />
+  </dll>
+</plugin>
+
+<plugin name="Perltest" language="Perl">
+ <description>Test of the Perl plugin mechanism.</description>
+  <author>Duncan Temple Lang</author>
+  <dll>
+     <!-- 
+     The onLoad is the name of a module that is loaded via a call to 
+     require. onCreate is the name of the Perl class for which to call new()
+     with the different arguments.  -->
+    <init onLoad="testPlugin" onCreate="GGobi::TestPlugin" />
+  </dll>
+</plugin>
+
+
+<!--
+<plugin name="Rfile" language="R" type="mutable">
+ <description>Test of the R plugin mechanism.</description>
+  <author>Duncan Temple Lang</author>
+  <dll>
+   <init onCreate="fileSelectPlugin" onLoad="plugins/R/R/fileSelection.R" />
+  </dll>
+</plugin>
+
+
+
+<plugin name="Rhelp" language="R">
+ <description>Help facility using gtkhtml and R</description>
+ <author>Duncan Temple Lang</author>
+ <dll>
+  <init onLoad="plugins/R/R/help.R" onCreate="createRHelpPluginInstance" />
+ </dll>
+</plugin>
+-->
