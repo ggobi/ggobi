@@ -87,7 +87,6 @@ alloc_tour2d3 (displayd *dsp, ggobid *gg)
 
   vectorf_alloc(&dsp->t2d3.lambda, nc);
   vectorf_alloc_zero(&dsp->t2d3.tau, nc);
-  vectorf_alloc_zero(&dsp->t2d3.tau, nc);
   vectorf_alloc(&dsp->t2d3.tinc, nc);
 
   /* manipulation variables */
@@ -208,11 +207,11 @@ display_tour2d3_init (displayd *dsp, ggobid *gg) {
   }
 
   /* declare starting base as first 2 chosen variables */
-  for (i=0; i<2; i++)
-    for (j=0; j<nc; j++)
-      dsp->t2d3.Fa.vals[i][j] = dsp->t2d3.Fz.vals[i][j] = 
-        dsp->t2d3.F.vals[i][j] = dsp->t2d3.Ga.vals[i][j] = 
-        dsp->t2d3.Gz.vals[i][j] = 0.0;
+  arrayd_zero (&dsp->t2d3.Fa);
+  arrayd_zero (&dsp->t2d3.Fz);
+  arrayd_zero (&dsp->t2d3.F);
+  arrayd_zero (&dsp->t2d3.Ga);
+  arrayd_zero (&dsp->t2d3.Gz);
 
   for (i=0; i<2; i++) {
     dsp->t2d3.Fz.vals[i][dsp->t2d3.active_vars.els[i]] =
@@ -231,6 +230,8 @@ display_tour2d3_init (displayd *dsp, ggobid *gg) {
 
   /* manip */
   dsp->t2d3_manip_var = 0;
+
+  dsp->t2d.target_selection_method = 0;
 }
 
 void tour2d3_speed_set(gint slidepos, ggobid *gg) {
@@ -254,13 +255,15 @@ void tour2d3_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
 
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
 gboolean
-tour2d3_subset_var_set (gint jvar, gint button, datad *d,
+tour2d3_subset_var_set (gint jvar, gint *jprev, gint button, datad *d,
   displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->t2d3.subset_vars_p.els[jvar];
   gint j, k;
   gboolean changed = false;
   gint xyz;
+
+  *jprev = dsp->t2d3.subset_vars.els[button];
 
   /*-- require exactly 3 variables in the subset --*/
   if (in_subset) {               /*-- handle a swap --*/
@@ -285,6 +288,7 @@ tour2d3_subset_var_set (gint jvar, gint button, datad *d,
 /**/    return false;
       break;
     }
+
     dsp->t2d3.subset_vars.els[xyz] = dsp->t2d3.subset_vars.els[button];
     dsp->t2d3.subset_vars.els[button] = jvar;
     changed = true;
@@ -377,24 +381,28 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean changed = true;
+  gint jprev;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
     /* add/remove jvar to/from the subset of variables that <may> be active */
 
-    changed = tour2d3_subset_var_set(jvar, button, d, dsp, gg);
+    changed = tour2d3_subset_var_set(jvar, &jprev, button, d, dsp, gg);
     if (changed) {
+      tour2d3_func(T2D3OFF, gg->current_display, gg);
       varcircles_visibility_set (dsp, gg);
 
       /*-- now add/remove the variable to/from the active set, too --*/
-      tour2d3_active_var_set (jvar, d, dsp, gg);
+      tour2d3_active_var_set (jprev, d, dsp, gg);  /*-- remove --*/
+      tour2d3_active_var_set (jvar, d, dsp, gg);   /*-- add --*/
     }
   } else if (GTK_IS_BUTTON(w)) {  /*-- it's the label --*/
 
     /*-- 'button' is the mouse button; translate it to one of the toggles --*/
-    changed = tour2d3_subset_var_set(jvar, button-1, d, dsp, gg);
+    changed = tour2d3_subset_var_set(jvar, &jprev, button-1, d, dsp, gg);
     if (changed) {
       varcircles_visibility_set (dsp, gg);
-      tour2d3_active_var_set (jvar, d, dsp, gg);
+      tour2d3_active_var_set (jprev, d, dsp, gg);  /*-- remove --*/
+      tour2d3_active_var_set (jvar, d, dsp, gg);   /*-- add --*/
     }
 
   } else if (GTK_IS_DRAWING_AREA(w)) {
@@ -462,11 +470,11 @@ void tour2d3_scramble(ggobid *gg)
   datad *d = dsp->d;
   gint nc = d->ncols;
 
-  for (i=0; i<2; i++)
-    for (j=0; j<nc; j++)
-      dsp->t2d3.Fa.vals[i][j] = dsp->t2d3.Fz.vals[i][j] = 
-        dsp->t2d3.F.vals[i][j] = dsp->t2d3.Ga.vals[i][j] = 
-        dsp->t2d3.Gz.vals[i][j] = 0.0;
+  arrayd_zero (&dsp->t2d3.Fa);
+  arrayd_zero (&dsp->t2d3.Fz);
+  arrayd_zero (&dsp->t2d3.F);
+  arrayd_zero (&dsp->t2d3.Ga);
+  arrayd_zero (&dsp->t2d3.Gz);
 
   gt_basis(dsp->t2d3.Fa, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
     d->ncols, (gint) 2);
@@ -614,11 +622,11 @@ void tour2d3_reinit(ggobid *gg)
   gint nc = d->ncols;
   splotd *sp = gg->current_splot;
 
-  for (i=0; i<2; i++)
-    for (j=0; j<nc; j++)
-      dsp->t2d3.Fa.vals[i][j] = dsp->t2d3.Fz.vals[i][j] = 
-        dsp->t2d3.F.vals[i][j] = dsp->t2d3.Ga.vals[i][j] = 
-        dsp->t2d3.Gz.vals[i][j] = 0.0;
+  arrayd_zero (&dsp->t2d3.Fa);
+  arrayd_zero (&dsp->t2d3.Fz);
+  arrayd_zero (&dsp->t2d3.F);
+  arrayd_zero (&dsp->t2d3.Ga);
+  arrayd_zero (&dsp->t2d3.Gz);
 
   for (i=0; i<2; i++) {
     dsp->t2d3.Fz.vals[i][dsp->t2d3.active_vars.els[i]] =
@@ -628,8 +636,6 @@ void tour2d3_reinit(ggobid *gg)
       dsp->t2d3.Gz.vals[i][dsp->t2d3.active_vars.els[i]] = 1.0;
   }
 
-  dsp->t2d3.tau.els[0] = 0.0;
-  dsp->t2d3.tau.els[1] = 0.0;
   dsp->t2d3.get_new_target = true;
   sp->tour2d3.initmax = true;
 
