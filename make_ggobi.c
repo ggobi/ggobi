@@ -82,17 +82,6 @@ fileset_read (gchar *ldata_in, ggobid *gg)
   rowlabels_read (gg->fname, true, gg);
   vgroups_read (gg->fname, true, gg);
 
-
-  array_read (gg);
-  gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
-  gg->nrgroups = 0;              /*-- for now --*/
-
-  missing_values_read (gg->fname, true, gg);
-
-  collabels_read (gg->fname, true, gg);
-  rowlabels_read (gg->fname, true, gg);
-  vgroups_read (gg->fname, true, gg);
-
   point_glyphs_read (gg->fname, true, gg);
   point_colors_read (gg->fname, true, gg);
   hidden_read (gg->fname, true, gg);
