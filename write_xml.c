@@ -12,8 +12,10 @@ write_xml (const gchar *filename,  ggobid *gg)
 {
   FILE *f;
   gboolean ok = false;
-  datad *d;
-  GSList *tmp = gg->d;
+/*
+ *datad *d;
+ *GSList *tmp = gg->d;
+*/
   f = fopen (filename,"w");
   if (f == NULL) {
    return (false);

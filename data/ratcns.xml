@@ -75,340 +75,340 @@ Reference (available on the web at pnas.org):
 <variable>Class2</variable>
 </variables>
 <records count="112">
-<record label="keratin" color="0" glyph="fc 3">
+<record label="keratin" >
 1.000 0.200 0.310 0.240 0.400 0.270 0.190 0.050 0.000 1.000 1.000
 </record>
-<record label="cellubrevin" color="0" glyph="fc 3">
+<record label="cellubrevin" >
 1.000 0.770 0.210 0.370 0.400 0.440 0.680 0.690 0.470 1.000 1.000
 </record>
-<record label="nestin" color="0" glyph="fc 3">
+<record label="nestin" >
 0.490 0.630 1.000 0.540 0.290 0.220 0.100 0.100 0.080 1.000 1.000
 </record>
-<record label="MAP2" color="0" glyph="fc 3">
+<record label="MAP2" >
 0.020 0.270 0.820 0.870 0.880 0.790 0.760 0.840 1.000 1.000 1.000
 </record>
-<record label="GAP43" color="0" glyph="fc 3">
+<record label="GAP43" >
 0.360 0.620 0.700 0.810 0.970 0.960 0.780 0.780 1.000 1.000 1.000
 </record>
-<record label="L1" color="0" glyph="fc 3">
+<record label="L1" >
 0.060 0.170 0.530 0.960 1.000 0.900 0.510 0.420 0.400 1.000 1.000
 </record>
-<record label="NFL" color="0" glyph="fc 3">
+<record label="NFL" >
 0.030 0.370 0.450 0.660 0.660 0.900 1.000 0.530 0.300 1.000 1.000
 </record>
-<record label="NFM" color="0" glyph="fc 3">
+<record label="NFM" >
 0.020 0.120 0.190 0.150 0.160 0.250 0.240 0.490 1.000 1.000 1.000
 </record>
-<record label="NFH" color="0" glyph="fc 3">
+<record label="NFH" >
 0.040 0.030 0.130 0.280 0.380 0.410 0.470 1.000 0.950 1.000 1.000
 </record>
-<record label="synaptophysin" color="0" glyph="fc 3">
+<record label="synaptophysin" >
 0.080 0.260 0.660 0.620 0.820 0.840 1.000 0.920 0.740 1.000 1.000
 </record>
-<record label="neno" color="0" glyph="fc 3">
+<record label="neno" >
 0.150 0.380 0.760 0.780 1.000 0.830 0.880 0.850 0.810 1.000 1.000
 </record>
-<record label="S100beta" color="0" glyph="fc 3">
+<record label="S100beta" >
 0.020 0.000 0.220 0.570 0.650 0.590 0.630 1.000 0.950 1.000 1.000
 </record>
-<record label="GFAP" color="0" glyph="fc 3">
+<record label="GFAP" >
 0.000 0.000 0.000 0.030 0.310 0.430 1.000 0.860 0.750 1.000 1.000
 </record>
-<record label="MOG" color="0" glyph="fc 3">
+<record label="MOG" >
 0.000 0.000 0.000 0.000 0.000 0.180 0.700 1.000 0.870 1.000 1.000
 </record>
-<record label="GAD65" color="0" glyph="fc 3">
+<record label="GAD65" >
 0.090 0.290 0.670 1.000 0.840 0.730 0.700 0.610 0.620 1.000 2.000
 </record>
-<record label="pre-GAD67" color="0" glyph="fc 3">
+<record label="pre-GAD67" >
 0.050 0.120 0.810 0.990 1.000 0.960 0.810 0.690 0.680 1.000 2.000
 </record>
-<record label="GAD67" color="0" glyph="fc 3">
+<record label="GAD67" >
 0.080 0.080 0.300 0.780 1.000 0.890 0.730 0.640 0.580 1.000 2.000
 </record>
-<record label="G67I80/86" color="0" glyph="fc 3">
+<record label="G67I80/86" >
 0.320 0.590 1.000 0.800 0.570 0.430 0.280 0.240 0.130 1.000 2.000
 </record>
-<record label="G67I86" color="0" glyph="fc 3">
+<record label="G67I86" >
 0.090 0.260 0.840 1.000 0.530 0.260 0.070 0.030 0.000 1.000 2.000
 </record>
-<record label="GAT1" color="0" glyph="fc 3">
+<record label="GAT1" >
 0.150 0.190 1.000 0.680 0.840 0.830 0.860 0.810 0.820 1.000 2.000
 </record>
-<record label="ChAT" color="0" glyph="fc 3">
+<record label="ChAT" >
 0.000 0.010 0.250 0.230 0.460 0.420 0.560 0.710 1.000 1.000 2.000
 </record>
-<record label="ACHE" color="0" glyph="fc 3">
+<record label="ACHE" >
 0.040 0.100 0.390 0.650 0.780 0.830 1.000 0.920 0.940 1.000 2.000
 </record>
-<record label="ODC" color="0" glyph="fc 3">
+<record label="ODC" >
 0.920 1.000 0.900 0.800 0.780 0.780 0.700 0.660 0.560 1.000 2.000
 </record>
-<record label="TH" color="0" glyph="fc 3">
+<record label="TH" >
 0.520 1.000 0.820 0.660 0.530 0.570 0.190 0.230 0.000 1.000 2.000
 </record>
-<record label="NOS" color="0" glyph="fc 3">
+<record label="NOS" >
 0.050 0.150 0.730 0.680 0.930 1.000 0.860 0.700 0.480 1.000 2.000
 </record>
-<record label="GRa1" color="0" glyph="fc 3">
+<record label="GRa1" >
 0.300 0.410 0.530 0.640 0.680 0.780 0.850 0.970 1.000 2.000 3.000
 </record>
-<record label="GRa2" color="0" glyph="fc 3">
+<record label="GRa2" >
 0.010 0.050 0.590 0.800 0.800 0.880 0.790 0.930 1.000 2.000 3.000
 </record>
-<record label="GRa3" color="0" glyph="fc 3">
+<record label="GRa3" >
 0.170 0.160 0.900 1.000 0.920 0.790 0.640 0.840 0.730 2.000 3.000
 </record>
-<record label="GRa4" color="0" glyph="fc 3">
+<record label="GRa4" >
 0.010 0.190 0.530 0.810 1.000 0.930 0.670 0.530 0.220 2.000 3.000
 </record>
-<record label="GRa5" color="0" glyph="fc 3">
+<record label="GRa5" >
 0.060 0.060 0.540 0.940 0.980 0.940 0.830 1.000 0.870 2.000 3.000
 </record>
-<record label="GRb1" color="0" glyph="fc 3">
+<record label="GRb1" >
 0.000 0.000 0.330 0.580 0.570 0.530 0.540 1.000 0.510 2.000 3.000
 </record>
-<record label="GRb2" color="0" glyph="fc 3">
+<record label="GRb2" >
 0.000 0.000 0.000 1.000 0.580 0.660 0.660 0.270 0.170 2.000 3.000
 </record>
-<record label="GRb3" color="0" glyph="fc 3">
+<record label="GRb3" >
 0.270 0.360 0.740 0.740 0.810 0.790 0.690 1.000 0.570 2.000 3.000
 </record>
-<record label="GRg1" color="0" glyph="fc 3">
+<record label="GRg1" >
 0.010 0.030 0.230 0.500 0.480 0.580 0.550 0.970 1.000 2.000 3.000
 </record>
-<record label="GRg2" color="0" glyph="fc 3">
+<record label="GRg2" >
 0.000 0.320 0.730 0.830 0.810 0.630 0.540 0.650 1.000 2.000 3.000
 </record>
-<record label="GRg3" color="0" glyph="fc 3">
+<record label="GRg3" >
 0.130 0.180 0.540 0.850 1.000 0.920 0.690 0.730 0.610 2.000 3.000
 </record>
-<record label="mGluR1" color="0" glyph="fc 3">
+<record label="mGluR1" >
 0.000 0.000 0.000 0.200 0.210 0.250 0.180 0.450 1.000 2.000 4.000
 </record>
-<record label="mGluR2" color="0" glyph="fc 3">
+<record label="mGluR2" >
 0.000 0.420 0.360 0.860 0.830 1.000 0.750 0.110 0.250 2.000 4.000
 </record>
-<record label="mGluR3" color="0" glyph="fc 3">
+<record label="mGluR3" >
 0.020 0.070 0.400 0.790 0.900 0.780 0.660 0.920 1.000 2.000 4.000
 </record>
-<record label="mGluR4" color="0" glyph="fc 3">
+<record label="mGluR4" >
 0.000 0.000 0.140 0.290 0.900 1.000 0.710 0.380 0.520 2.000 4.000
 </record>
-<record label="mGluR5" color="0" glyph="fc 3">
+<record label="mGluR5" >
 0.000 0.000 0.160 1.000 0.800 0.760 0.730 0.500 0.610 2.000 4.000
 </record>
-<record label="mGluR6" color="0" glyph="fc 3">
+<record label="mGluR6" >
 0.000 0.140 0.640 0.680 0.910 1.000 0.480 0.090 0.180 2.000 4.000
 </record>
-<record label="mGluR7" color="0" glyph="fc 3">
+<record label="mGluR7" >
 0.000 0.120 0.310 0.870 0.920 0.870 0.640 1.000 0.760 2.000 4.000
 </record>
-<record label="mGluR8" color="0" glyph="fc 3">
+<record label="mGluR8" >
 0.200 0.000 1.000 0.870 0.970 0.830 0.500 0.500 0.330 2.000 4.000
 </record>
-<record label="NMDA1" color="0" glyph="fc 3">
+<record label="NMDA1" >
 0.000 0.000 0.190 1.000 0.840 0.880 0.870 0.430 0.500 2.000 4.000
 </record>
-<record label="NMDA2A" color="0" glyph="fc 3">
+<record label="NMDA2A" >
 0.000 0.000 0.000 0.000 0.000 0.060 0.140 0.380 1.000 2.000 4.000
 </record>
-<record label="NMDA2B" color="0" glyph="fc 3">
+<record label="NMDA2B" >
 0.070 0.000 0.490 0.730 0.710 0.680 0.490 0.810 1.000 2.000 4.000
 </record>
-<record label="NMDA2C" color="0" glyph="fc 3">
+<record label="NMDA2C" >
 0.000 0.000 0.000 0.380 0.680 1.000 0.590 0.210 0.340 2.000 4.000
 </record>
-<record label="NMDA2D" color="0" glyph="fc 3">
+<record label="NMDA2D" >
 0.670 0.620 0.330 0.760 0.990 1.000 0.500 0.320 0.220 2.000 4.000
 </record>
-<record label="nAChRa2" color="0" glyph="fc 3">
+<record label="nAChRa2" >
 0.000 0.000 0.000 0.380 0.880 1.000 0.810 0.690 0.500 2.000 5.000
 </record>
-<record label="nAChRa3" color="0" glyph="fc 3">
+<record label="nAChRa3" >
 0.010 0.150 0.940 0.600 0.880 1.000 0.590 0.470 0.250 2.000 5.000
 </record>
-<record label="nAChRa4" color="0" glyph="fc 3">
+<record label="nAChRa4" >
 0.140 0.690 1.000 0.690 0.890 0.850 0.680 0.610 0.140 2.000 5.000
 </record>
-<record label="nAChRa5" color="0" glyph="fc 3">
+<record label="nAChRa5" >
 0.230 0.830 1.000 0.860 0.880 0.790 0.620 0.350 0.350 2.000 5.000
 </record>
-<record label="nAChRa6" color="0" glyph="fc 3">
+<record label="nAChRa6" >
 0.940 1.000 0.190 0.500 0.310 0.690 0.690 0.000 0.000 2.000 5.000
 </record>
-<record label="nAChRa7" color="0" glyph="fc 3">
+<record label="nAChRa7" >
 0.470 0.110 0.120 0.890 1.000 0.940 0.740 0.910 0.500 2.000 5.000
 </record>
-<record label="nAChRd" color="0" glyph="fc 3">
+<record label="nAChRd" >
 0.380 1.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 2.000 5.000
 </record>
-<record label="nAChRe" color="0" glyph="fc 3">
+<record label="nAChRe" >
 0.000 0.000 1.000 0.270 0.000 0.040 0.000 0.000 0.150 2.000 5.000
 </record>
-<record label="mAChR2" color="0" glyph="fc 3">
+<record label="mAChR2" >
 0.040 0.030 0.260 0.690 0.780 0.800 0.970 1.000 0.530 2.000 5.000
 </record>
-<record label="mAChR3" color="0" glyph="fc 3">
+<record label="mAChR3" >
 0.110 0.180 0.290 0.500 1.000 0.980 0.370 0.390 0.110 2.000 5.000
 </record>
-<record label="mAChR4" color="0" glyph="fc 3">
+<record label="mAChR4" >
 0.290 0.200 0.090 0.200 0.460 0.490 0.640 1.000 0.590 2.000 5.000
 </record>
-<record label="5HT1b" color="0" glyph="fc 3">
+<record label="5HT1b" >
 0.150 0.340 0.560 0.760 1.000 0.990 0.700 0.630 0.300 2.000 6.000
 </record>
-<record label="5HT1c" color="0" glyph="fc 3">
+<record label="5HT1c" >
 0.000 0.000 0.110 0.580 0.730 0.810 1.000 0.920 0.820 2.000 6.000
 </record>
-<record label="5HT2" color="0" glyph="fc 3">
+<record label="5HT2" >
 0.150 0.100 0.430 0.810 1.000 0.830 0.790 0.640 0.540 2.000 6.000
 </record>
-<record label="5HT3" color="0" glyph="fc 3">
+<record label="5HT3" >
 0.140 0.140 0.520 0.760 0.760 1.000 0.720 0.170 0.030 2.000 6.000
 </record>
-<record label="NGF" color="0" glyph="fc 3">
+<record label="NGF" >
 0.300 0.590 0.140 0.200 0.180 0.240 0.170 0.350 1.000 3.000 7.000
 </record>
-<record label="NT3" color="0" glyph="fc 3">
+<record label="NT3" >
 0.630 1.000 0.750 0.360 0.480 0.330 0.000 0.050 0.360 3.000 7.000
 </record>
-<record label="BDNF" color="0" glyph="fc 3">
+<record label="BDNF" >
 0.660 1.000 0.640 0.950 1.000 0.840 0.590 0.550 0.440 3.000 7.000
 </record>
-<record label="CNTF" color="0" glyph="fc 3">
+<record label="CNTF" >
 0.640 0.660 0.270 0.260 0.400 0.760 0.870 0.900 1.000 3.000 7.000
 </record>
-<record label="trk" color="0" glyph="fc 3">
+<record label="trk" >
 0.000 0.300 1.000 0.190 0.070 0.090 0.070 0.040 0.000 3.000 7.000
 </record>
-<record label="trkB" color="0" glyph="fc 3">
+<record label="trkB" >
 0.060 0.090 1.000 0.410 0.520 0.540 0.570 0.500 0.590 3.000 7.000
 </record>
-<record label="trkC" color="0" glyph="fc 3">
+<record label="trkC" >
 0.150 0.420 1.000 0.700 0.820 0.970 0.750 0.980 0.980 3.000 7.000
 </record>
-<record label="CNTFR" color="0" glyph="fc 3">
+<record label="CNTFR" >
 0.850 0.960 0.960 0.890 1.000 0.910 0.810 0.840 0.950 3.000 7.000
 </record>
-<record label="MK2" color="0" glyph="fc 3">
+<record label="MK2" >
 0.680 1.000 0.790 0.550 0.430 0.500 0.590 0.470 0.270 3.000 8.000
 </record>
-<record label="PTN" color="0" glyph="fc 3">
+<record label="PTN" >
 0.800 0.900 1.000 0.760 0.750 0.700 0.820 0.900 0.630 3.000 8.000
 </record>
-<record label="GDNF" color="0" glyph="fc 3">
+<record label="GDNF" >
 1.000 0.880 0.200 0.270 0.540 0.540 0.390 0.240 0.120 3.000 8.000
 </record>
-<record label="EGF" color="0" glyph="fc 3">
+<record label="EGF" >
 0.390 0.500 0.200 0.370 0.580 0.900 0.970 0.190 1.000 3.000 8.000
 </record>
-<record label="bFGF" color="0" glyph="fc 3">
+<record label="bFGF" >
 0.010 0.080 0.100 0.310 0.550 0.680 0.740 0.740 1.000 3.000 8.000
 </record>
-<record label="aFGF" color="0" glyph="fc 3">
+<record label="aFGF" >
 0.010 0.040 0.160 0.210 0.480 0.420 0.690 0.640 1.000 3.000 8.000
 </record>
-<record label="PDGFa" color="0" glyph="fc 3">
+<record label="PDGFa" >
 0.870 0.710 0.680 0.830 0.870 0.750 0.770 1.000 1.000 3.000 8.000
 </record>
-<record label="PDGFb" color="0" glyph="fc 3">
+<record label="PDGFb" >
 0.550 1.000 0.550 0.500 0.090 0.000 0.000 0.000 0.000 3.000 8.000
 </record>
-<record label="EGFR" color="0" glyph="fc 3">
+<record label="EGFR" >
 0.270 0.480 0.330 0.500 1.000 0.780 0.910 0.760 0.260 3.000 8.000
 </record>
-<record label="FGFR" color="0" glyph="fc 3">
+<record label="FGFR" >
 1.000 0.920 0.610 0.750 0.880 0.860 0.760 0.840 0.890 3.000 8.000
 </record>
-<record label="PDGFR" color="0" glyph="fc 3">
+<record label="PDGFR" >
 0.820 1.000 0.980 0.320 0.320 0.320 0.320 0.280 0.500 3.000 8.000
 </record>
-<record label="TGFR" color="0" glyph="fc 3">
+<record label="TGFR" >
 0.600 0.820 1.000 0.720 0.570 0.560 0.680 0.820 0.820 3.000 8.000
 </record>
-<record label="Ins1" color="0" glyph="fc 3">
+<record label="Ins1" >
 1.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 3.000 9.000
 </record>
-<record label="Ins2" color="0" glyph="fc 3">
+<record label="Ins2" >
 1.000 0.850 0.710 0.710 0.730 0.650 0.640 0.470 0.980 3.000 9.000
 </record>
-<record label="IGF.I" color="0" glyph="fc 3">
+<record label="IGF.I" >
 0.770 0.980 0.910 0.850 1.000 0.970 0.790 0.780 0.810 3.000 9.000
 </record>
-<record label="IGF.II" color="0" glyph="fc 3">
+<record label="IGF.II" >
 0.900 1.000 0.840 0.780 0.540 0.570 0.430 0.400 0.190 3.000 9.000
 </record>
-<record label="InsR" color="0" glyph="fc 3">
+<record label="InsR" >
 0.670 0.660 0.980 0.950 1.000 0.960 0.790 0.320 0.370 3.000 9.000
 </record>
-<record label="IGFR1" color="0" glyph="fc 3">
+<record label="IGFR1" >
 0.770 0.630 1.000 0.620 0.520 0.610 0.380 0.560 0.590 3.000 9.000
 </record>
-<record label="IGFR2" color="0" glyph="fc 3">
+<record label="IGFR2" >
 1.000 0.690 0.860 0.730 0.560 0.510 0.420 0.310 0.280 3.000 9.000
 </record>
-<record label="CRAF" color="0" glyph="fc 3">
+<record label="CRAF" >
 0.880 0.860 0.900 0.940 1.000 0.990 0.700 0.350 0.620 4.000 10.000
 </record>
-<record label="IP3R1" color="0" glyph="fc 3">
+<record label="IP3R1" >
 0.870 0.710 0.550 0.580 0.600 0.710 0.700 1.000 0.600 4.000 10.000
 </record>
-<record label="IP3R2" color="0" glyph="fc 3">
+<record label="IP3R2" >
 0.480 0.420 0.650 0.620 0.680 0.620 0.810 0.940 1.000 4.000 10.000
 </record>
-<record label="IP3R3" color="0" glyph="fc 3">
+<record label="IP3R3" >
 0.620 0.720 0.620 0.490 0.870 1.000 0.360 0.280 0.180 4.000 10.000
 </record>
-<record label="cyclin.A" color="0" glyph="fc 3">
+<record label="cyclin.A" >
 1.000 0.910 0.970 0.860 0.950 0.770 0.810 0.640 0.630 4.000 11.000
 </record>
-<record label="cyclin.B" color="0" glyph="fc 3">
+<record label="cyclin.B" >
 0.990 0.990 1.000 0.490 0.520 0.470 0.420 0.230 0.020 4.000 11.000
 </record>
-<record label="H2AZ" color="0" glyph="fc 3">
+<record label="H2AZ" >
 0.870 0.940 0.880 1.000 0.930 0.880 0.810 0.680 0.830 4.000 11.000
 </record>
-<record label="statin" color="0" glyph="fc 3">
+<record label="statin" >
 0.000 0.010 0.560 0.730 0.990 0.990 0.960 0.860 1.000 4.000 11.000
 </record>
-<record label="cjun" color="0" glyph="fc 3">
+<record label="cjun" >
 0.230 0.460 0.490 0.350 0.450 0.400 0.420 0.510 1.000 4.000 12.000
 </record>
-<record label="cfos" color="0" glyph="fc 3">
+<record label="cfos" >
 0.110 0.110 0.200 0.310 0.360 0.590 0.390 0.350 1.000 4.000 12.000
 </record>
-<record label="Brm" color="0" glyph="fc 3">
+<record label="Brm" >
 0.810 1.000 0.610 0.660 0.550 0.500 0.340 0.410 0.270 4.000 12.000
 </record>
-<record label="TCP" color="0" glyph="fc 3">
+<record label="TCP" >
 0.900 0.850 0.860 0.880 0.980 1.000 0.990 0.910 0.720 4.000 12.000
 </record>
-<record label="actin" color="0" glyph="fc 3">
+<record label="actin" >
 0.810 0.720 0.720 0.680 0.850 1.000 0.890 0.850 0.960 4.000 13.000
 </record>
-<record label="SOD" color="0" glyph="fc 3">
+<record label="SOD" >
 0.910 0.570 0.570 0.470 0.600 0.930 0.710 0.660 1.000 4.000 13.000
 </record>
-<record label="CCO1" color="0" glyph="fc 3">
+<record label="CCO1" >
 0.840 0.690 0.750 1.000 0.770 0.730 0.800 0.640 0.770 4.000 13.000
 </record>
-<record label="CCO2" color="0" glyph="fc 3">
+<record label="CCO2" >
 1.000 0.570 0.530 0.760 0.570 0.590 0.750 0.540 0.700 4.000 13.000
 </record>
-<record label="SC1" color="0" glyph="fc 3">
+<record label="SC1" >
 1.000 1.000 0.670 0.720 0.870 0.730 0.640 0.410 0.300 4.000 14.000
 </record>
-<record label="SC2" color="0" glyph="fc 3">
+<record label="SC2" >
 0.510 0.420 0.720 0.750 1.000 0.710 0.740 0.650 0.350 4.000 14.000
 </record>
-<record label="SC6" color="0" glyph="fc 3">
+<record label="SC6" >
 1.000 0.970 0.000 0.000 0.000 0.000 0.000 0.000 0.000 4.000 14.000
 </record>
-<record label="SC7" color="0" glyph="fc 3">
+<record label="SC7" >
 0.340 0.470 1.000 0.860 0.740 0.590 0.310 0.190 0.160 4.000 14.000
 </record>
-<record label="DD63.2" color="0" glyph="fc 3">
+<record label="DD63.2" >
 0.680 0.630 0.700 0.720 0.740 0.680 0.650 0.790 1.000 4.000 14.000
 </record>
 </records>

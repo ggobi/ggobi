@@ -14,6 +14,8 @@ datad *datad_new(datad *d, ggobid *gg);
 #endif
 
 /* sort +1 */
+void display_tour2d_init (displayd *dsp, ggobid *gg);
+void display_tour1d_init (displayd *dsp, ggobid *gg);
 GtkWidget* CreateMenuCheck (displayd *, GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
 ggobid* GGobiFromDisplay (displayd *display);

@@ -247,9 +247,11 @@ brush_free (datad *d, ggobid *gg)
 void
 brush_init (datad *d, ggobid *gg)
 {
+  /*-- duplicated in globals_init -- is this redundant? --*/
   gg->glyph_id.type = gg->glyph_0.type = FILLED_CIRCLE;
   gg->glyph_id.size = gg->glyph_0.size = 3;
-  gg->color_id = gg->color_0 = 0;
+  gg->color_id = 0;
+  gg->color_0 = 4;
 
   brush_pos_init (d);
 

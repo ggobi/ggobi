@@ -31,7 +31,8 @@
 void globals_init (ggobid *gg) {
   gg->glyph_id.type = gg->glyph_0.type = FILLED_CIRCLE;
   gg->glyph_id.size = gg->glyph_0.size = 3;
-  gg->color_id = gg->color_0 = 0;
+  gg->color_id = 0;
+  gg->color_0 = 4;
 
   vectors_init (&gg->line.color);
   vectors_init (&gg->line.color_now);
@@ -127,6 +128,9 @@ g_printerr ("reading ascii\n");
       line_colors_read (gg->fname, true, d, gg);
     }
     break;
+
+    case unknown_data:
+      break;
   }
 
   return ok;  /* need to check return codes of reading routines */
