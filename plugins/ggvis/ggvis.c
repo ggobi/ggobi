@@ -88,17 +88,15 @@ static const gchar *const dsource_lbl[] = {
 };
 static const gchar *const metric_lbl[] = {"Metric MDS", "Nonmetric MDS"};
 static const gchar *const kruskal_lbl[] = {"Kruskal", "Classic"};
-/*
-static const gchar *const groups_lbl[] = {
-  "Within groups",
-  "Between groups",
-  "Anchors scale",
-  "Anchors fixed"};
-*/
 static const gchar *const groups_lbl[] = {
   "Use all distances",
   "Use distances within groups",
   "Use distances between groups",
+};
+static const gchar *const anchor_lbl[] = {
+  "No anchor",
+  "Scaled",
+  "Fixed",
 };
 static const gchar *const constrained_lbl[] = {
   "No variables frozen",
@@ -199,11 +197,11 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   GtkWidget *window, *main_vbox, *vbox_params;
   GtkWidget *notebook, *varnotebook, *opt, *metric_opt;
   GtkWidget *label, *frame, *btn, *vbox, *hbox, *vb, *hscale, *table, *hb;
-  GtkWidget *radio1, *radio2, *radio3;
-  /* GtkWidget *radio4; */
+  GtkWidget *radio, *radio1, *radio2;
+  /* GtkWidget *radio3, *radio4; */
   GSList *group;
   GtkObject *adj, *Dtarget_adj, *isotonic_mix_adj;
-  gint top;
+  gint i, top;
   GtkAccelGroup *ggv_accel_group;
   GtkWidget *menubar;
   GtkTooltips *tips;
@@ -311,7 +309,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_add (GTK_CONTAINER (swin), clist);
   gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
 
-  label = gtk_label_new ("Specify datasets");
+  label = gtk_label_new ("Datasets");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
 
 /*-- TaskDef controls --*/
@@ -422,13 +420,13 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
   gtk_container_add (GTK_CONTAINER(frame), vb);
 
-  radio1 = gtk_radio_button_new_with_label (NULL, "MDS");
+  radio1 = gtk_radio_button_new_with_label (NULL, "Dissimilarity analysis");
   gtk_widget_set_name (GTK_WIDGET(radio1), "MDS");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), radio1,
     "Perform multidimensional scaling (MDS) for the purpose of dissimilarity analysis; dissimilarities (distances) are provided as an edge variable.",
     NULL);
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
-  radio2 = gtk_radio_button_new_with_label (group, "Graph Layout");
+  radio2 = gtk_radio_button_new_with_label (group, "Graph layout");
   gtk_widget_set_name (GTK_WIDGET(radio2), "GRAPH_LAYOUT");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), radio2,
     "Perform multidimensional scaling (MDS) for the purpose of laying out a graph.",
@@ -851,15 +849,32 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 2);
   */
 
-  radio1 = gtk_radio_button_new_with_label (NULL, groups_lbl[0]);
-  GTK_TOGGLE_BUTTON (radio1)->active = TRUE;
-  gtk_box_pack_start (GTK_BOX (vbox), radio1, TRUE, TRUE, 0);
+  for (i=0; i<3; i++) {
+    if (i == 0) {
+      radio = gtk_radio_button_new_with_label (NULL, groups_lbl[i]);
+      GTK_TOGGLE_BUTTON (radio)->active = TRUE;
+    } else {
+      group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio));
+      radio = gtk_radio_button_new_with_label (group, groups_lbl[i]);
+    }
+    gtk_object_set_data (GTK_OBJECT(radio), "PluginInst", inst);
+    gtk_signal_connect (GTK_OBJECT (radio), "toggled",
+      GTK_SIGNAL_FUNC (ggv_groups_cb), GINT_TO_POINTER(i));
+    gtk_box_pack_start (GTK_BOX (vbox), radio, TRUE, TRUE, 0);
+  }
 
-  group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
+  /*
   radio2 = gtk_radio_button_new_with_label (group, groups_lbl[1]);
+  gtk_object_set_data (GTK_OBJECT(radio2), "PluginInst", inst);   
+  gtk_signal_connect (GTK_OBJECT (radio2), "toggled",
+    GTK_SIGNAL_FUNC (ggv_groups_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), radio2, TRUE, TRUE, 0);
   radio3 = gtk_radio_button_new_with_label (group, groups_lbl[2]);
+  gtk_object_set_data (GTK_OBJECT(radio3), "PluginInst", inst);   
+  gtk_signal_connect (GTK_OBJECT (radio3), "toggled",
+    GTK_SIGNAL_FUNC (ggv_groups_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), radio3, TRUE, TRUE, 0);
+  */
 
   label = gtk_label_new ("Groups");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
@@ -875,15 +890,40 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   vbox = gtk_vbox_new (false, 2);
   gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 0);
 
-  radio1 = gtk_radio_button_new_with_label (NULL, "No anchor");
+  for (i=0; i<3; i++) {
+    if (i == 0) {
+      radio = gtk_radio_button_new_with_label (NULL, anchor_lbl[i]);
+      GTK_TOGGLE_BUTTON (radio)->active = TRUE;
+    } else {
+      group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio));
+      radio = gtk_radio_button_new_with_label (group, anchor_lbl[i]);
+    }
+    gtk_object_set_data (GTK_OBJECT(radio), "PluginInst", inst);
+    gtk_signal_connect (GTK_OBJECT (radio), "toggled",
+      GTK_SIGNAL_FUNC (ggv_anchor_cb), GINT_TO_POINTER(i));
+    gtk_box_pack_start (GTK_BOX (vbox), radio, TRUE, TRUE, 0);
+  }
+
+  /*
+  radio1 = gtk_radio_button_new_with_label (NULL, anchor_lbl[0]);
+  gtk_object_set_data (GTK_OBJECT(radio1), "PluginInst", inst);   
   GTK_TOGGLE_BUTTON (radio1)->active = TRUE;
+  gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
+    GTK_SIGNAL_FUNC (ggv_anchor_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), radio1, TRUE, TRUE, 0);
 
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
-  radio2 = gtk_radio_button_new_with_label (group, "Scaled");
+  radio2 = gtk_radio_button_new_with_label (group, anchor_lbl[1]);
+  gtk_object_set_data (GTK_OBJECT(radio2), "PluginInst", inst);   
+  gtk_signal_connect (GTK_OBJECT (radio2), "toggled",
+    GTK_SIGNAL_FUNC (ggv_anchor_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), radio2, TRUE, TRUE, 0);
-  radio3 = gtk_radio_button_new_with_label (group, "Fixed");
+  radio3 = gtk_radio_button_new_with_label (group, anchor_lbl[2]);
+  gtk_object_set_data (GTK_OBJECT(radio3), "PluginInst", inst);   
+  gtk_signal_connect (GTK_OBJECT (radio3), "toggled",
+    GTK_SIGNAL_FUNC (ggv_anchor_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), radio3, TRUE, TRUE, 0);
+  */
 
   label = gtk_label_new ("Anchor");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);

@@ -39,8 +39,8 @@ extern void Myqsort(void* bot, int nmemb, int size, CompareFunc compar);
 #define IS_EXCLUDED(i) (ggv->point_status.els[(i)] == EXCLUDED)
 #define IS_ANCHOR(i) (ggv->point_status.els[(i)] == ANCHOR)
 
-#define ANCHOR_SCALE (ggv->group_p && ggv->group_ind == anchorscales)
-#define ANCHOR_FIXED (ggv->group_p && ggv->group_ind == anchorfixed)
+#define ANCHOR_SCALE (ggv->anchor_ind == scaled)
+#define ANCHOR_FIXED (ggv->anchor_ind == fixed)
 
 gdouble delta = 1E-10;
 /* these belong in ggv */
@@ -270,15 +270,15 @@ update_stress (ggvisd *ggv, ggobid *gg)
       }
     }
 
-    /* calculate stress and draw it */
-    if (stress_dd * stress_xx > delta*delta) {
-      stress = pow( 1.0 - stress_dx * stress_dx / stress_xx / stress_dd, 0.5);
-      add_stress_value (stress, ggv);
-      draw_stress (ggv, gg);
-    } else {
-      g_printerr ("didn't draw stress: stress_dx = %5.5g   stress_dd = %5.5g   stress_xx = %5.5g\n",
-        stress_dx, stress_dd, stress_xx);
-    }
+  /* calculate stress and draw it */
+  if (stress_dd * stress_xx > delta*delta) {
+    stress = pow( 1.0 - stress_dx * stress_dx / stress_xx / stress_dd, 0.5);
+    add_stress_value (stress, ggv);
+    draw_stress (ggv, gg);
+  } else {
+    g_printerr ("didn't draw stress: stress_dx = %5.5g   stress_dd = %5.5g   stress_xx = %5.5g\n",
+      stress_dx, stress_dd, stress_xx);
+  }
 } /* end update_stress() */
 
 
@@ -623,8 +623,8 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
     }
 */
   /* anchors of either kind */  
-  if (ggv->group_p && ggv->anchor_group.nels > 0 &&
-      (ggv->group_ind == anchorfixed || ggv->group_ind == anchorscales))
+  if (ggv->anchor_group.nels > 0 &&
+      (ggv->anchor_ind == fixed || ggv->anchor_ind == scaled))
   {
     for (i=0; i<ggv->pos.nrows; i++) {
       if (!IS_EXCLUDED(i) &&
@@ -685,11 +685,9 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
       if (ggv->weights.nels != 0 && ggv->weights.els[IJ] == 0.) continue;
 
       /* using groups */
-      if (ggv->group_p && ggv->group_ind == within &&
-          !SAMEGLYPH(dpos,i,j))
+      if (ggv->group_ind == within && !SAMEGLYPH(dpos,i,j))
         continue;
-      if (ggv->group_p && ggv->group_ind == between &&
-          SAMEGLYPH(dpos,i,j))
+      if (ggv->group_ind == between && SAMEGLYPH(dpos,i,j))
         continue;
 
       /*

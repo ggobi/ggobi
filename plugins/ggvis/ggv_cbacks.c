@@ -230,15 +230,6 @@ void ggv_task_cb (GtkToggleButton *button, PluginInstance *inst)
       ggv->mds_task = DissimAnalysis;
     } else {
       ggv->mds_task = GraphLayout;
-      /* Set Dtarget_source and complete_Dtarget based on the widgets */
-      /*
-      w = widget_find_by_name (window, "MDS_WEIGHTS");
-      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), 
-        ggv->Dtarget_source == VarValues);
-      w = widget_find_by_name (window, "MDS_COMPLETE");
-      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), 
-        ggv->complete_Dtarget);
-      */
     }
 
     w = widget_find_by_name (window, "MDS_WEIGHTS");
@@ -427,8 +418,10 @@ mds_open_display (PluginInstance *inst)
   }
   
   window = (GtkWidget *) inst->data;
+  /*
   w = widget_find_by_name (window, "RunMDS");
   gtk_widget_set_sensitive (w, true);
+  */
   w = widget_find_by_name (window, "Step");
   gtk_widget_set_sensitive (w, true);
 }
@@ -787,19 +780,35 @@ void ggv_kruskal_cb (GtkWidget *w, gpointer cbd)
 }
 
 
+/*
 void ggv_brush_groupsp_cb (GtkToggleButton *w, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggv->group_p = w->active;
-}
-void ggv_brush_groups_opt_cb (GtkWidget *w, gpointer cbd)
+  }*/
+void ggv_groups_cb (GtkToggleButton *button,  gpointer cbd)
 {
-  PluginInstance *inst = (PluginInstance *)
-    gtk_object_get_data (GTK_OBJECT(w), "PluginInst");
-  ggvisd *ggv = ggvisFromInst (inst);
+  /* no_anchor, scaled, fixed */
+  if (button->active) {
+    PluginInstance *inst = (PluginInstance *)
+      gtk_object_get_data (GTK_OBJECT(button), "PluginInst");
+    ggvisd *ggv = ggvisFromInst (inst);
 
-  /* within, between, anchorscales, anchorfixed */
-  ggv->group_ind = GPOINTER_TO_INT (cbd);
+    ggv->group_ind = GPOINTER_TO_INT (cbd);
+    g_printerr ("group_ind = %d\n", ggv->group_ind);
+  }
+}
+void ggv_anchor_cb (GtkToggleButton *button, gpointer cbd)
+{
+  /* all_distances, within, between */
+  if (button->active) {
+    PluginInstance *inst = (PluginInstance *)
+      gtk_object_get_data (GTK_OBJECT(button), "PluginInst");
+    ggvisd *ggv = ggvisFromInst (inst);
+
+    ggv->anchor_ind = GPOINTER_TO_INT (cbd);
+    g_printerr ("anchor_ind = %d\n", ggv->anchor_ind);
+  }
 }
 
 void

@@ -27,7 +27,9 @@
 
 typedef int (*CompareFunc)(const void *, const void *);
 
-typedef enum {within, between, anchorscales, anchorfixed} MDSGroupInd;
+/*typedef enum {within, between, anchorscales, anchorfixed} MDSGroupInd;*/
+typedef enum {all_distances, within, between} MDSGroupInd;
+typedef enum {no_anchor, scaled, fixed} MDSAnchorInd;
 typedef enum {metric, nonmetric} MDSMetricInd;
 typedef enum {KruskalShepard, classic} MDSKSInd;
 typedef enum {LinkDist, VarValues} MDSDtargetSource;
@@ -113,8 +115,9 @@ typedef struct {
   GtkCList *clist_dist;
   gboolean complete_Dtarget;
 
-  gboolean group_p;
+  /*gboolean group_p;*/
   MDSGroupInd group_ind;
+  MDSAnchorInd anchor_ind;
   vector_b anchor_group;
 
   /*-- for Shepard plot --*/
@@ -139,8 +142,8 @@ void update_ggobi (ggvisd *ggv, ggobid *gg);
 /*void ggv_dsource_cb (GtkWidget *w, gpointer cbd);*/
 void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst);
 void ggv_edge_weights_cb (GtkToggleButton *button, PluginInstance *inst);
-void ggv_brush_groupsp_cb (GtkToggleButton *button, PluginInstance *inst);
-void ggv_brush_groups_opt_cb (GtkWidget *w, gpointer cbd);
+void ggv_groups_cb (GtkToggleButton *button, gpointer cbd);
+void ggv_anchor_cb (GtkToggleButton *button, gpointer cbd);
 void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst);
 
 gint ggv_stressplot_configure_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
@@ -159,7 +162,6 @@ void ggv_Dtarget_histogram_update (ggvisd *, ggobid *);
 void ggv_metric_cb (GtkWidget *w, gpointer cbd);
 void ggv_metric (GtkWidget *w, gint param);
 void ggv_kruskal_cb (GtkWidget *w, gpointer cbd);
-void ggv_groups_cb (GtkWidget *w, PluginInstance *inst);
 void ggv_constrained_cb (GtkWidget *w, gpointer cbd);
 void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_perturb_adj_cb (GtkAdjustment *adj, PluginInstance *inst);
