@@ -366,8 +366,8 @@ ggobi_alloc(ggobid *tmp)
     tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,
       sessionOptions->activeColorScheme);
   else {
-    /*-- use "Spectrum 7" by default, if it's present --*/
-    sessionOptions->activeColorScheme = "Spectrum 7";
+    /*-- use "Set1 9" by default, if it's present --*/
+    sessionOptions->activeColorScheme = "Set1 9";
     tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,
       sessionOptions->activeColorScheme);
     if (!tmp->activeColorScheme)

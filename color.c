@@ -93,6 +93,7 @@ void colorscheme_init(colorschemed * scheme)
 colorschemed *default_scheme_init()
 {
   gint i, k;
+#ifdef SPECTRUM7
   static gfloat data[7][3] = {
     {0.890, 0.196, 0.122},
     {1.000, 0.549, 0.000},
@@ -114,6 +115,33 @@ colorschemed *default_scheme_init()
   scheme->type = spectral;
   scheme->system = rgb;
   scheme->n = 7;
+  scheme->rgb = NULL;
+  scheme->criticalvalue = 0;  /*-- unused --*/
+#endif
+
+  static gfloat data[9][3] = {
+    {0.8941, 0.1020, 0.1098},
+    {0.2157, 0.4941, 0.7216},
+    {0.3020, 0.6863, 0.2902},
+    {0.5961, 0.3059, 0.6392},
+    {1.0000, 0.4980, 0.0000},
+    {1.0000, 1.0000, 0.2000},
+    {0.6510, 0.3373, 0.1569},
+    {0.9686, 0.5059, 0.7490},
+    {0.4980, 0.4980, 0.4980},
+  };
+  static gchar *colorNames[9] = {
+    "A", "B", "C", "D", "E", "F", "G", "H", "I"
+  };
+  static gfloat bg[] = { 0.000, 0.000, 0.000 };
+  static gfloat accent[] = { 1.000, 1.000, 1.000 };
+  colorschemed *scheme = (colorschemed *) g_malloc(sizeof(colorschemed));
+
+  scheme->name = g_strdup("Set1 9");
+  scheme->description = g_strdup("From Cindy Brewer, one of the schemes in the ColorBrewer software");
+  scheme->type = qualitative;
+  scheme->system = rgb;
+  scheme->n = 9;
   scheme->rgb = NULL;
   scheme->criticalvalue = 0;  /*-- unused --*/
 
