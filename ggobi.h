@@ -214,6 +214,11 @@ struct _ggobid {
     gfloat *jitfacv;
   } jitter;
 
+  struct _Save {
+    gint format, stage, row_ind, column_ind, missing_ind;
+    gboolean jitter_p, lines_p;
+  } save;
+
  /*
   * identification
  */

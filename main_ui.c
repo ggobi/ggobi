@@ -415,7 +415,6 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
 
 /*-- these will be moved to another file eventually, I'm sure --*/
 
-
 void
 filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 {
@@ -472,7 +471,7 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/File/Save (extend file set) ...",   
                          NULL,     filename_get,     1 },
   { "/File/Save (new file set) ...",   
-                         NULL,     filename_get,     2 },
+                         NULL,     writeall_window_open,     2 },
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Print",       NULL,     NULL,          0 },

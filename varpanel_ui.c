@@ -604,16 +604,17 @@ varcircle_add (gint i, gint j, gint k, ggobid *gg)
   gtk_container_border_width (GTK_CONTAINER (vb), 1);
   gtk_widget_show (vb);
 
-  gg->varpanel_ui.varlabel[k] = gtk_button_new_with_label (gg->vardata[k].collab);
+  gg->varpanel_ui.varlabel[k] =
+    gtk_button_new_with_label (gg->vardata[k].collab);
 
   gtk_widget_show (gg->varpanel_ui.varlabel[k]);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
     gg->varpanel_ui.varlabel[k], "Click left to select", NULL);
   gtk_container_add (GTK_CONTAINER (vb), gg->varpanel_ui.varlabel[k]);
 
-  gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.varlabel[k]), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.varlabel[k]),
+    "button_press_event",
     GTK_SIGNAL_FUNC (popup_varmenu), GINT_TO_POINTER (k));
-
 
   GGobi_widget_set(GTK_WIDGET(gg->varpanel_ui.varlabel[k]), gg, true);
   /*
@@ -680,16 +681,20 @@ make_varpanel (GtkWidget *parent, ggobid *gg) {
 
   /* create a new scrolled window. */
   gg->varpanel_ui.scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
-                                  GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-  gtk_box_pack_start (GTK_BOX (parent), gg->varpanel_ui.scrolled_window, true, true, 2);
+  gtk_scrolled_window_set_policy (
+    GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
+    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+  gtk_box_pack_start (GTK_BOX (parent),
+    gg->varpanel_ui.scrolled_window, true, true, 2);
   gtk_widget_show (gg->varpanel_ui.scrolled_window);
 
-  gg->varpanel_ui.varpanel = gtk_table_new (gg->varpanel_ui.vnrows, gg->varpanel_ui.vncols, true);
+  gg->varpanel_ui.varpanel = gtk_table_new (gg->varpanel_ui.vnrows,
+    gg->varpanel_ui.vncols, true);
 
   /* pack the table into the scrolled window */
   gtk_scrolled_window_add_with_viewport (
-    GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window), gg->varpanel_ui.varpanel);
+    GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
+    gg->varpanel_ui.varpanel);
   gtk_widget_show (gg->varpanel_ui.varpanel);
 
   varpanel_layout_init (gg);
@@ -723,7 +728,8 @@ varpanel_size_init (gint cpanel_height, ggobid* gg)
   GtkTable *t = GTK_TABLE (gg->varpanel_ui.varpanel);
   GtkTableRowCol c, r;
   gint width = 0, height = 0;
-  GtkWidget *vport = GTK_WIDGET ((GTK_BIN (gg->varpanel_ui.scrolled_window))->child);
+  GtkWidget *vport = GTK_WIDGET
+    ((GTK_BIN (gg->varpanel_ui.scrolled_window))->child);
 
   /*-- Find the width of the first few columns --*/
   for (i=0; i<MIN (t->ncols, 3); i++) {

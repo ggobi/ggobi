@@ -290,6 +290,7 @@ extern void xy_reproject (splotd *, glong **, ggobid *gg);
 extern gboolean xyplot_varsel (splotd *, gint, gint *, gint);
 extern void zoom_by_drag (splotd *, ggobid *gg);
 extern void zoom_step (splotd *, gint, gint, rectd *, ggobid* gg);
+extern void writeall_window_open (ggobid *);
 
 ggobid * ggobi_get (gint);
 displayd * display_alloc_init (enum displaytyped type, gboolean missing_p, ggobid *gg);
@@ -297,12 +298,12 @@ displayd * display_alloc_init (enum displaytyped type, gboolean missing_p, ggobi
 /* The new way of handling window closures, so that we don't
    just exit.
  */
-void ggobi_close(GtkObject *w, ggobid *gg);
-int ggobi_remove_by_index(ggobid *gg, int which);
-int ggobi_remove(ggobid *gg);
+void ggobi_close (GtkObject *w, ggobid *gg);
+int ggobi_remove_by_index (ggobid *gg, int which);
+int ggobi_remove (ggobid *gg);
 
-extern void variable_clone (gint jvar, const gchar *name, gboolean update, ggobid *gg);
-extern gboolean updateAddedColumn(int nc, int jvar, ggobid *gg);
+extern void variable_clone (gint, const gchar *, gboolean, ggobid *);
+extern gboolean updateAddedColumn (gint nc, gint jvar, ggobid *gg);
 
 #include "GGobiAPI.h"
 
