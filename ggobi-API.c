@@ -948,10 +948,58 @@ GGOBI(setBrushColor)(int cid, ggobid *gg)
   return(old);
 }
 
+
+
 int
-GGOBI(addVariable)(double *vals, char *name, ggobid *gg)
+GGOBI(addVariable)(double *vals, char *name, gboolean update, ggobid *gg)
 {
-  return(-1);
+
+ int which;
+   variable_clone(0, name, true, gg);
+   which = gg->ncols-1;
+   GGOBI(setVariableValues)(which, vals, gg->nrows, update, gg);
+
+   if(update)
+    gdk_flush();
+
+  return(gg->ncols - 1);
+}
+
+/*
+  The idea of the update argument is that we can defer recomputing
+  the statistics for all the variables and then the transformations.
+  This is useful when we know we will be adding more variables before
+  redisplaying.
+  For example,
+    for(i = 0; i < n; i++)
+      GGOBI(setVariableValues)(i, values[i], gg->nrows, i == n-1, gg);
+  causes the update to be done only for the last variable.
+ */
+gboolean
+GGOBI(setVariableValues)(int whichVar, double *vals, int num, gboolean update, ggobid *gg)
+{
+  int i;
+  for(i = 0; i < num; i++) {
+    gg->raw.data[i][whichVar] = gg->tform1.data[i][whichVar]  =
+             gg->tform2.data[i][whichVar] = vals[i];
+  }
+
+
+  if(update) {
+    GGOBI(update_data)(gg);
+  }
+
+
+  return(true);    
+}
+
+void
+GGOBI(update_data)(ggobid *gg)
+{
+   vardata_stats_set(gg);
+   vardata_lim_raw_gp_set (gg);
+   vardata_lim_update (gg);
+   tform_to_world(gg);
 }
 
 int

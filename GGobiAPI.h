@@ -213,5 +213,11 @@ extern int GGOBI(setBrushColor)(int cid, ggobid *gg);
 extern gboolean GGOBI(setBrushGlyph)(int type, int size, ggobid *gg);
 extern int GGOBI(getVariableIndex)(const gchar *name, ggobid *gg);
 extern int GGOBI(removeVariableByIndex)(int which, ggobid *gg);
+
+extern gboolean GGOBI(setVariableValues)(int whichVar, double *vals, int num, gboolean update, ggobid *gg);
+
+extern int GGOBI(addVariable)(double *vals, char *name, gboolean update, ggobid *gg);
+
+extern void GGOBI(update_data)(ggobid *gg);
 #endif /* End of conditional inclusion of entire file.*/
 

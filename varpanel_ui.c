@@ -339,16 +339,18 @@ popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd)
 /*-------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------*/
 
-static void
-variable_clone (gint jvar, ggobid *gg) {
+void
+variable_clone (gint jvar, const gchar *newName, gboolean update, ggobid *gg) 
+{
   gint nc = gg->ncols + 1;
   gint i, j, k = 0;
+  
 
-  /*-- set a vew of the data values before building the new circle --*/
+  /*-- set a view of the data values before building the new circle --*/
   vartable_row_append (gg->ncols-1, gg);
   vardata_realloc (nc, gg);
-  gg->vardata[nc-1].collab = g_strdup (gg->vardata[jvar].collab);
-  gg->vardata[nc-1].collab_tform = g_strdup (gg->vardata[jvar].collab);
+  gg->vardata[nc-1].collab = g_strdup (newName && newName[0] ? newName : gg->vardata[jvar].collab);
+  gg->vardata[nc-1].collab_tform = g_strdup (newName && newName[0] ? newName : gg->vardata[jvar].collab);
 
   /*
    * Follow the algorithm by which the table has been populated
@@ -381,10 +383,22 @@ variable_clone (gint jvar, ggobid *gg) {
   gg->vardata[nc-1].groupid = gg->vardata[nc-1].groupid_ori =
     gg->vardata[gg->ncols-1].groupid + 1; 
 
-  gg->vardata[nc-1].nmissing = gg->vardata[jvar].nmissing;
-
   gg->vardata[nc-1].jitter_factor = gg->vardata[jvar].jitter_factor;
 
+  gg->vardata[nc-1].nmissing = gg->vardata[jvar].nmissing;
+
+  if(update) {
+    updateAddedColumn(nc, jvar, gg);
+  }
+
+  gtk_widget_show_all (gg->varpanel_ui.varpanel);
+}
+
+
+gboolean
+updateAddedColumn(int nc, int jvar, ggobid *gg)
+{
+ if(jvar > -1) {
   gg->vardata[nc-1].mean = gg->vardata[jvar].mean;
   gg->vardata[nc-1].median = gg->vardata[jvar].median;
   gg->vardata[nc-1].lim.min =
@@ -395,6 +409,7 @@ variable_clone (gint jvar, ggobid *gg) {
     gg->vardata[nc-1].lim_raw.max = gg->vardata[nc-1].lim_raw_gp.max =
     gg->vardata[nc-1].lim_tform.max = gg->vardata[nc-1].lim_tform_gp.max =
     gg->vardata[jvar].lim_raw.max;
+ } 
 
   transform_values_init (nc-1, gg);
 
@@ -404,7 +419,7 @@ variable_clone (gint jvar, ggobid *gg) {
   gg->ncols++;
   tform_to_world (gg); /*-- need this only for the new variable --*/
 
-  gtk_widget_show_all (gg->varpanel_ui.varpanel);
+  return(true);
 }
 
 
@@ -428,7 +443,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, gpointer cbd)
 /* */
 
     if (ctrl_mod) {
-      variable_clone (jvar, gg);
+      variable_clone (jvar, NULL, true, gg);
       return (false);
     }
     

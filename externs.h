@@ -299,8 +299,13 @@ void ggobi_close(GtkObject *w, ggobid *gg);
 int ggobi_remove_by_index(ggobid *gg, int which);
 int ggobi_remove(ggobid *gg);
 
+extern void variable_clone (gint jvar, const gchar *name, gboolean update, ggobid *gg);
+extern gboolean updateAddedColumn(int nc, int jvar, ggobid *gg);
+
 #include "GGobiAPI.h"
 
 #define CHECK_GG(a) ValidateGGobiRef(a, true)
 
 #endif
+
+

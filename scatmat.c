@@ -8,7 +8,7 @@
 
 #define WIDTH 200
 #define HEIGHT 200
-#define MAXNVARS 3   /* only used to set up the initial matrix */
+#define MAXNVARS 9   /* only used to set up the initial matrix */
 
 static GtkAccelGroup *scatmat_accel_group;
 
