@@ -92,6 +92,7 @@ ifdef USE_XML
  XML_OB= read_xml.o write_xml.o
 
  CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=1
+ SRC+=$(XML_SRC)
  OB+= $(XML_OB)
 
 ifdef DL_RESOLVE_FLAG

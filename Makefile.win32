@@ -4,8 +4,12 @@ EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 include local.config
 
 CC=/gcc-2.95.2/bin/gcc 
+
+  # if building from the CVS repository
+  # change this to .
+LOCAL_INCLUDES=../include
 CFLAGS= -g -ggdb -O -ansi -Wall  -mno-cygwin -mpentium \
-         -fnative-struct -mwindows  
+         -fnative-struct -mwindows   $(INCLUDES:%=-I%)
 AR=ar rc
 
 DLLTOOL=dlltool
@@ -101,8 +105,6 @@ DEF=$(DLL:.dll=.def)
 
 LLIBS=-lgdk-1.3 -lgtk-1.3 -lglib-1.3 
 
-dllinit.o: dllinit.c
-
 ggobi: $(OB)
 	$(CC)  $(LIBS) $(OB) -o ggobi $(XML_LIB_DIRS) $(XML_LIBS) -lm \
         -lgdk-1.3 -lgtk-1.3 \
@@ -129,7 +131,7 @@ main_ui.lo: main_ui.c
 	$(CC) -DAS_GGOBI_LIBRARY $(CFLAGS) $(INC) -o $@ -c $<
 
 
-$(LIB): main_ui.lo $(OB) dllinit.o
+$(LIB): main_ui.lo $(OB) 
 	$(AR) $@ $^
 
 $(DEF): $(OB)
@@ -177,8 +179,8 @@ local.config:
 	@echo "# DM=1" >> $@
 
 #ifdef USE_XML
-#xmlConvert: xmlConvert.o libGGobi.so
-#	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS) -L. -lGGobi 
+#xmlConvert: xmlConvert.o libggobi.so
+#	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS) -L. -lggobi 
 #endif
 
 # include .depends
