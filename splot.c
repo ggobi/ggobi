@@ -454,7 +454,8 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp, ggobid *g
  * without have any impact on the pipeline data structures.
 */
 void
-splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr, fcoords *tfd, ggobid *gg)
+splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
+  fcoords *tfd, ggobid *gg)
 {
   lcoords planar, world;
   gfloat precis = PRECISION1;
@@ -584,4 +585,3 @@ splot_reverse_pipeline (cpaneld *cpanel, splotd *sp, gint ipt,
   splot_screen_to_plane (sp, ipt, &eps, horiz, vert);
   splot_plane_to_world (cpanel, sp, ipt, &eps, gg);
 }
-

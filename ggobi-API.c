@@ -548,7 +548,7 @@ GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx, ggobid *gg)
 gint 
 GGOBI(getCaseColor) (gint pt, ggobid *gg)
 {
-  return(gg->color_now[pt]);
+  return (gg->color_now[pt]);
 }
 
 gint *

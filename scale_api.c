@@ -4,6 +4,15 @@
 #include "vars.h"
 #include "externs.h"
 
+/*
+   I didn't do these right, I don't think, because pan takes
+   incremental steps, while zoom resets the scale value in an
+   absolute way.  Maybe the way I did the zooming is the way one
+   would like.  If that's so, it could be renamed splot_zoom_set
+   and left as it is.  splot_pan could be renamed splot_pan_set
+   and reworked.
+*/
+
 void
 splot_pan (splotd *sp, gint xstep, gint ystep, ggobid *gg)
 {

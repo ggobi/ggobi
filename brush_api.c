@@ -2,9 +2,9 @@
 #include "vars.h"
 #include "externs.h"
 
-
+/*-- move brush and paint --*/
 void
-GGOBI(moveBrush) (gint ulx, gint uly, ggobid *gg)  /*-- move brush and paint --*/
+GGOBI(moveBrush) (gint ulx, gint uly, ggobid *gg) 
 {
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
@@ -17,8 +17,9 @@ GGOBI(moveBrush) (gint ulx, gint uly, ggobid *gg)  /*-- move brush and paint --*
   brush_motion (&pos, true, false, cpanel, gg);
 }
 
+/*-- resize brush without painting --*/
 void
-GGOBI(sizeBrush) (gint width, gint height, ggobid *gg)  /*-- resize brush without painting --*/
+GGOBI(sizeBrush) (gint width, gint height, ggobid *gg) 
 {
   splotd *sp = gg->current_splot;
   brush_coords *brush_pos = &gg->brush.brush_pos;
