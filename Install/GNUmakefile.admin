@@ -46,7 +46,7 @@ C_HEADER_FILES=\
   GGobiAPI brushing cpanel datad defines display display_tree \
   externs ggobi noop-checkbutton read_mysql read_xml  \
   splot types vars varseldata write_xml writedata vartable gtkext fileio \
-  print
+  print tour1d_pp f2c eispack
 
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)

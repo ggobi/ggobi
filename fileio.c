@@ -3,13 +3,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifndef G_OS_WIN32
-#include <unistd.h>
-#include <sys/stat.h>
+#ifndef G_OS_WIN32 
+#include <unistd.h> 
+#include <sys/stat.h> 
 #else
-#include <glib.h>
-#include <io.h>
-#endif
+#include <glib.h> 
+# ifdef __STRICT_ANSI__ 
+# undef   __STRICT_ANSI__ 
+# endif
+# include <io.h> 
+#endif 
 
 #include <string.h>
 
