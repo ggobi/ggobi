@@ -204,7 +204,7 @@ void GGOBI(setBrushLocation)(gint x, gint y, datad *, ggobid *gg);
 
 extern splotd *GGOBI(getSPlot)(gint which, displayd *display);
 
-extern const gchar * const* GGOBI(getModeNames)();
+extern const gchar * const* GGOBI(getModeNames)(int *);
 extern gint GGOBI(getModeId)(const gchar *name);
 extern gint GGOBI(setMode)(const gchar *name, ggobid *gg);
 extern const gchar *GGOBI(getModeName)(gint which);
@@ -230,6 +230,9 @@ extern void GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid 
 #ifdef __cplusplus
 }
 #endif
+
+
+gchar *datasetName(datad *d, int which);
 
 #endif /* End of conditional inclusion of entire file.*/
 
