@@ -143,8 +143,8 @@ extern const gint ViewTypeIndeces[3];
 #define M_PI_2  1.57079632679489661923
 
 #define CMANIP_COMB 0
-#define CMANIP_HOR 1
-#define CMANIP_VERT 2
+#define CMANIP_VERT 1
+#define CMANIP_HOR 2
 #define CMANIP_EQUAL 3
 
 /*-- projection pursuit indices --*/

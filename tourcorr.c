@@ -683,7 +683,8 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   dsp->tc2_manipvar_inc = false;
 
   /* need to turn off tour */
-  tourcorr_pause(cpanel, CTON, gg);
+  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
+    tourcorr_pause(cpanel, CTON, gg);
 
   /* check if manip var is one of existing vars */
   /* n1vars, n2vars is the number of variables, excluding the
@@ -733,7 +734,6 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   if (dontdoit) {
     if (sp->motion_id)
       gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
-    tourcorr_pause(cpanel, CTOFF, gg);
   }
 }
 
@@ -855,7 +855,7 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     copy_mat(dsp->tcorr2.u0.vals, dsp->tcorr2.u.vals, d->ncols, 1);
     dsp->tcorr1.get_new_target = true;
     dsp->tcorr2.get_new_target = true;
-    if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
+    if (cpanel->tcorr1_paused || cpanel->tcorr2_paused)
       tourcorr_pause(cpanel, CTOFF, gg);
   }
 }
@@ -878,7 +878,7 @@ tourcorr_manip_end(splotd *sp)
   dsp->tcorr2.get_new_target = true;
 
   /* need to turn on tour? */
-  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
+  if (cpanel->tcorr1_paused || cpanel->tcorr2_paused)
     tourcorr_pause(cpanel, CTOFF, gg);
 
 }
