@@ -94,7 +94,7 @@ static void ctouradv_cb (GtkWidget *w, gpointer dummy) {
   #endif
 }
 
-static gchar *manip_lbl[] = {"Vertical", "Horizontal", "Comb",
+static gchar *manip_lbl[] = {"Comb", "Vertical", "Horizontal", 
                              "EqualComb"};
 static void manip_cb (GtkWidget *w, gpointer cbd)
 {
@@ -102,7 +102,6 @@ static void manip_cb (GtkWidget *w, gpointer cbd)
   displayd *dsp = gg->current_display;
 
   dsp->tc_manip_mode = GPOINTER_TO_INT (cbd);
-  /*  g_printerr ("cbd: %s\n", manip_lbl[indx]);*/
 }
 static gchar *pathlen_lbl[] = {"1/10", "1/5", "1/4", "1/3", "1/2", "1",
                                "2", "10", "Infinite"};
@@ -315,13 +314,10 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   ggobid *gg = GGobiFromSPlot(sp);
   extern void tourcorr_manip(gint, gint, splotd *, ggobid *);
-  /*  extern void tourcorr_manip(gint, gint, splotd *);*/
 
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
-  /*  printf("%d %d \n",sp->mousepos.x,sp->mousepos.y);*/
   tourcorr_manip(sp->mousepos.x, sp->mousepos.y, sp, gg);
-  /*  tourcorr_manip(sp->mousepos.x, sp->mousepos.y, sp);*/
 
   return true;
 }
