@@ -398,6 +398,13 @@ varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
 /*                  initialize and populate the var panel                  */
 /*-------------------------------------------------------------------------*/
 
+/*-- respond to the addition of a new datad --*/
+#ifdef DATAD_NEW_SIGNAL_IMPLEMENTED
+static void datad_new_cb (GtkWidget *w, ggobid *gg)
+{
+  g_printerr ("varpanel_ui.notebook responds to datad_new signal\n");
+}
+#endif
 
 /*
  * build the notebook to contain an ebox which will be switched
@@ -414,6 +421,12 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
     GTK_POS_TOP);
   gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.notebook), "switch-page",
     GTK_SIGNAL_FUNC (varpanel_switch_page_cb), gg);
+#ifdef DATAD_NEW_SIGNAL_IMPLEMENTED
+/*-- listen for datad_new events on main_window --*/
+  gtk_signal_connect_object (GTK_OBJECT (gg->main_window),
+    "datad_new", GTK_SIGNAL_FUNC (datad_new_cb),
+     GTK_OBJECT (gg->varpanel_ui.notebook));
+#endif
   gtk_box_pack_start (GTK_BOX (parent), gg->varpanel_ui.notebook,
     true, true, 2);
 

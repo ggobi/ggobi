@@ -52,6 +52,7 @@ datad_new(datad *d, ggobid *gg)
   jitter_vars_init (d, gg);
 
   gg->d = g_slist_append (gg->d, d);
+
   return (d);
 }
 
@@ -111,6 +112,17 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   }
 
   varpanel_refresh (gg);
+
+#ifdef DATAD_NEW_SIGNAL_IMPLEMENTED
+  /*g_printerr ("emitting datad_new signal\n");*/
+  gtk_signal_emit (GTK_OBJECT (gg->main_window), gg->signal_datad_new, gg); 
+  /*{
+    gboolean rval = false;
+    g_printerr ("emitting datad_new signal by name\n");
+    gtk_signal_emit_by_name (GTK_OBJECT (gg->main_window), "datad_new", 
+      gg, &rval);
+  }*/
+#endif
 
   return (display);
 }

@@ -91,6 +91,10 @@ struct _ggobid {
  splotd *current_splot;
  gint buttondown; /*-- can be 0, 1, 2, or 3; could be useful in drawing --*/
 
+#ifdef DATAD_NEW_SIGNAL_IMPLEMENTED
+ guint signal_datad_new;
+#endif
+
  GGobiApp app;
 
 

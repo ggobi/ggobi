@@ -45,6 +45,19 @@ void globals_init (ggobid *gg) {
   gg->buttondown = 0;  /*-- no button is pressed --*/
 
   gg->d = NULL;
+
+#ifdef DATAD_NEW_SIGNAL_IMPLEMENTED
+  /*-- If this signal has not been initialized yet, do it now --*/
+  if (gtk_signal_lookup ("datad_new", GTK_TYPE_WIDGET) == 0) {
+    gg->signal_datad_new =
+      gtk_object_class_user_signal_new (gtk_type_class (GTK_TYPE_WIDGET),
+        "datad_new",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER,
+        GTK_TYPE_NONE, 1,
+        GTK_TYPE_POINTER);
+  }
+#endif
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/
@@ -204,9 +217,11 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
   
   globals_init (gg); /*-- variables that don't depend on the data --*/
   color_table_init (gg);
+#ifdef USE_XML
   if(sessionOptions->info && sessionOptions->info->bgColor) {
       gg->bg_color = *(sessionOptions->info->bgColor);
   }
+#endif
   wvis_init (gg);
   make_ui (gg);
 
