@@ -55,7 +55,7 @@ cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
 
   /*-- paused --*/
   btn = widget_find_by_name (pnl, "TOUR2D:pause_button");
-  GTK_TOGGLE_BUTTON (btn)->active = cpanel->t2d_paused;
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->t2d_paused);
   /*-- manual manip --*/
   w = widget_find_by_name (pnl, "TOUR2D:manip");
   gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->t2d_manip_mode);

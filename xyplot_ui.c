@@ -190,8 +190,7 @@ cpanel_xyplot_set (cpaneld *cpanel, ggobid* gg)
   GtkWidget *w;
 
   /*-- Cycling on or off --*/
-  w = widget_find_by_name (gg->control_panel[XYPLOT], 
-                           "XYPLOT:cycle_toggle");
+  w = widget_find_by_name (gg->control_panel[XYPLOT], "XYPLOT:cycle_toggle");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), cpanel->xyplot.cycle_p);
 
   /*-- Cycling speed --*/
@@ -199,7 +198,6 @@ cpanel_xyplot_set (cpaneld *cpanel, ggobid* gg)
     -1 * (gfloat) cpanel->xyplot.cycle_delay);
 
   /*-- Cycling axis --*/
-  w = widget_find_by_name (gg->control_panel[XYPLOT],
-                           "XYPLOT:cycle_axis");
+  w = widget_find_by_name (gg->control_panel[XYPLOT], "XYPLOT:cycle_axis");
   gtk_option_menu_set_history (GTK_OPTION_MENU(w), cpanel->xyplot.cycle_axis);
 }
