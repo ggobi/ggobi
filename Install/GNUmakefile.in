@@ -61,7 +61,7 @@ ifeq (${LOCAL_INSTALL},)
 	$(INSTALL) bin/ggobi-config $(bindir)
 	$(INSTALL) bin/ggobi $(bindir)
 	if ! test -d $(includedir) ; then $(INSTALL) -d $(includedir) ; fi
-	$(INSTALL) $(INSTALL_FLAGS) $(HEADER_FILES) $(includedir)
+	$(INSTALL) $(INSTALL_FLAGS) $(HEADER_FILES) include/GGStructSizes.c $(includedir)
 	$(INSTALL) -d $(ggobi_install_home)/plugins
 	$(MAKE) installPlugins
 
@@ -86,7 +86,14 @@ ggobirc: Plugins
 	echo "</ggobirc>" >> $@
 
 Rggobi: @EMBED_LIB@
-	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)
+	if test -d Rggobi ; then \
+		@R_BIN@ INSTALL -c @R_PKG_DIR@ $@  \
+	else \
+		@echo "No Rggobi directory here. Untar the Rggobi distribution first!"
+	fi
+
+
+#	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)
 
 Python: @EMBED_LIB@
 	@if test -d Python ; then \

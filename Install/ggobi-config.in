@@ -10,6 +10,7 @@
 # --version
 
 TOP=@INSTALL_DIR@
+GGOBI_ROOT=@GGOBI_INSTALL_HOME@
 VERSION="@MAJOR_VERSION@.@MINOR_VERSION@-@PATCH_LEVEL@"
 
 GTK_CFLAGS=`@GTK_CONFIG@ --cflags`
@@ -21,7 +22,7 @@ XML_LIB_DIRS_PATH="@XML_LIB_DIRS_PATH@"
 
 CFLAGS="@INSTALL_SRC_CFLAGS@ ${GTK_CFLAGS} @XML_INC_DIRS@ @XML_CFLAG_DEFINES@ @DEFS@ @OTHER_CFLAGS@"
 
-LIBS="@INSTALL_SRC_LIBS@"
+LIBS="@INSTALL_SRC_LIBS@ -lggobi"
 
 
 usage="
@@ -35,6 +36,8 @@ Options:
   --xml-libs
   --xml-path
   --ld-library-path   
+  --home
+  --install-dir
 "
 
 
@@ -68,6 +71,9 @@ case $1 in
    --help|-h)
        echo "$usage"
        exit 0;;
+   --home)
+       echo "$GGOBI_ROOT"
+       shift ;;
    --home)
        echo "$TOP"
        shift ;;

@@ -142,7 +142,7 @@ GTK_EXT_LD=-lgtkext
 
 OBJ=$(SRC:%.c=%.o)
 
-CFLAGS= @SRC_DEBUG@ -I../include -I../gtkext/include $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ @DEFS@
+CFLAGS= @SRC_DEBUG@ -I$(TOP)/include -I$(TOP)/gtkext/include $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ @DEFS@
 
 LIBS=-L$(TOP)/lib $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS) @LIBS@
 
@@ -158,9 +158,14 @@ libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
 libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ:%.o=%.lo)
 	libtool -dynamic -o $@ $(OBJ:%.o=%.lo) `echo "$(LIBS)"|sed 's/-bexpall//'`
 
-../bin/xmlConvert xmlConvert: xmlConvert.o libggobi.@SHLIB_EXT@
+$(TOP)/bin/xmlConvert xmlConvert: xmlConvert.o libggobi.@SHLIB_EXT@
 	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS) 
 
+cflags:
+	@echo "$(CFLAGS)"
+
+libs:
+	@echo "$(LIBS)"
 
 clean:
 	for f in $(OBJ) $(OBJ:%.o=%.lo) ; do \
@@ -168,7 +173,7 @@ clean:
 	done
 
 TAGS:
-	etags $(SRC) $(find ../include -name '*.h')
+	etags $(SRC) $(find $(TOP)/include -name '*.h')
 
 
 marshal.h: marshal.list

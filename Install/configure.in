@@ -75,8 +75,10 @@ if test -n "${enable_local}" &&  test "${enable_local}" != "no" ; then
  INSTALL_DIR="`pwd`"
  GGOBI_INSTALL_HOME="${INSTALL_DIR}"
  LOCAL_INSTALL="yes"
+ INSTALL_SRC_CFLAGS="-I${INSTALL_DIR}/include"
 else
  INSTALL_DIR=$prefix
+ INSTALL_SRC_CFLAGS="-I${INSTALL_DIR}/include/ggobi"
  GGOBI_INSTALL_HOME="${INSTALL_DIR}/ggobi/"
 fi
 	
@@ -509,7 +511,7 @@ AC_SUBST(SRC_DEBUG)
 
 
 SRC_CFLAGS="-I${TOP}/include -I${TOP}/gtkext/include"
-INSTALL_SRC_CFLAGS="-I${INSTALL_DIR}/include"
+# INSTALL_SRC_CFLAGS="-I${INSTALL_DIR}/include"
 
 if test -n "${EMBED}" ; then
    SRC_LIBS="-L${TOP}/lib -lggobi"
