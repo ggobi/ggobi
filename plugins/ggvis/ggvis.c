@@ -193,6 +193,11 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
     (GtkSignalFunc) NULL, inst->gg);
 
+
+  /*-- Report on D --*/
+  hb = gtk_hbox_new (false, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
+
   /*
    * create this button after the varnotebook, because it's
    *   necessary to get hold of the notebook in the button callback
@@ -204,13 +209,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_object_set_data (GTK_OBJECT(btn), "notebook", varnotebook);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (ggv_compute_Dtarget_cb), inst);
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
-
-  /*-- Report on D --*/
-  hb = gtk_hbox_new (false, 1);
-  gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
-  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Dimension of D"),
-    false, false, 2);
+  gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 2);
 
   entry = gtk_entry_new ();
   gtk_object_set_data (GTK_OBJECT(window), "DTARGET_ENTRY", entry);
@@ -415,7 +414,8 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  adj = gtk_adjustment_new (1.0, 0.0, 6.0, 0.1, 1.0, 1.0);
+  adj = gtk_adjustment_new (1.0, 0.0, 7.0, 0.02, 0.01, 1.0);
+  gtk_object_set_data (GTK_OBJECT(adj), "label", label);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_Dtarget_power_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
@@ -435,7 +435,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  adj = gtk_adjustment_new (0.0, -4.0, 4.0, 0.1, 1.0, 1.0);
+  adj = gtk_adjustment_new (0.0, -4.0, 5.0, 0.02, 0.01, 1.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_weight_power_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
@@ -478,7 +478,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  adj = gtk_adjustment_new (1.0, 0.0, 6.0, 0.1, 1.0, 1.0);
+  adj = gtk_adjustment_new (1.0, 0.0, 7.0, 0.02, 0.01, 1.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_dist_power_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
@@ -498,7 +498,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  adj = gtk_adjustment_new (2.0, 1.0, 6.0, 0.1, 1.0, 1.0);
+  adj = gtk_adjustment_new (2.0, 1.0, 7.0, 0.02, 0.01, 1.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_lnorm_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
@@ -552,7 +552,11 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL),
     2, 2);
 
-  adj = gtk_adjustment_new (1.0, 0.0, 1.0, 0.2, 0.2, 0.10);
+  adj = gtk_adjustment_new (ggv->mds_rand_select_val, 0.0, 1.0, .01, .01, 1.00);
+/*
+  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
+    GTK_SIGNAL_FUNC (ggv_lnorm_cb), inst);
+*/
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
@@ -572,12 +576,20 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   /*-- perturbation slider and button --*/
   top++;
   btn = gtk_button_new_with_label ("Reperturb");
+/*
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (ggv_reperturb_cb), inst);
+*/
   gtk_table_attach (GTK_TABLE (table), btn, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  adj = gtk_adjustment_new (0.0, 0.0, 1.0, 0.2, 0.2, 0.10);
+  adj = gtk_adjustment_new (ggv->mds_perturb_val, 0.0, 1.0, 0.2, 0.2, 1.00);
+/*
+  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
+    GTK_SIGNAL_FUNC (ggv_perturb_adj_cb), inst);
+*/
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));

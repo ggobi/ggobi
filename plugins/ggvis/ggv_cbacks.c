@@ -32,7 +32,7 @@ void
 ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
 {
   gint i, j;
-  gint nc = 3;   /*-- default:  3d --*/
+  gint nc = ggv->mds_dims;   /*-- default:  3d --*/
   glong *rowids;
   gchar **rownames, **colnames;
   gdouble *values;
@@ -52,7 +52,8 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
     arrayd_alloc (&ggv->pos, dsrc->nrows, nc);
     for (i=0; i<dsrc->nrows; i++) {
       for (j=0; j<nc; j++) {
-        ggv->pos.vals[i][j] = values[i + j*dsrc->nrows] = randvalue();
+        ggv->pos.vals[i][j] = values[i + j*dsrc->nrows] =
+          (randvalue() - .5) * 2.0;
       }
     }
   } else if (ggv->pos.ncols < nc) {
@@ -60,7 +61,8 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
     arrayd_add_cols (&ggv->pos, nc);
     for (i=0; i<dsrc->nrows; i++) {
       for (j=nc_prev; j<nc; j++) {
-        ggv->pos.vals[i][j] = values[i + j*dsrc->nrows] = randvalue();
+        ggv->pos.vals[i][j] = values[i + j*dsrc->nrows] =
+          (randvalue() - .5) * 2.0;
       }
     }
   }
@@ -143,7 +145,7 @@ ggv_center_scale_pos_all (ggvisd *ggv)
 
   /* center & scale */
   for (i=0; i<ggv->pos.nrows; i++)
-    for (j=0; j<ggv->mds_dims; j++)
+    for (j=0; j<ggv->pos.ncols; j++)
       ggv->pos.vals[i][j] = (ggv->pos.vals[i][j] - ggv->pos_mean.els[j])/
                             ggv->pos_scl;
 
@@ -151,6 +153,20 @@ ggv_center_scale_pos_all (ggvisd *ggv)
   ggv->pos_scl = 1.;
 }
 
+void
+printminmax (gchar *cmt, ggvisd *ggv)
+{
+  gint i, j;
+  gfloat min, max;
+  max = min = ggv->pos.vals[0][0];
+  for (i=0; i<ggv->pos.nrows; i++) {
+    for (j=0; j<ggv->pos.ncols; j++) {
+      min = MIN (ggv->pos.vals[i][j], min);
+      max = MAX (ggv->pos.vals[i][j], max);
+    }
+  }
+  g_printerr("%s min %f max %f\n", cmt, min, max);
+}
 
 void
 ggv_pos_init (ggvisd *ggv)
@@ -369,9 +385,26 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
     return;
   }
   if (!ggv->dpos) {
+    gint j;
+    vartabled *vt;
     /*-- initialize, allocate and populate dpos --*/
     ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, ggv, gg);
     ggv_pos_init (ggv);
+    /*-- update limits here? could force them to be -1, 1  --*/
+    /*limits_set (true, true, ggv->dpos, gg);*/
+
+    /*
+     * The initial data is on [-1, 1]; force the limits to be on [-2,2].
+     * Rationale:  since the average distance from the mean is 1, we want
+     * to guarantee that we have space for 2*1, ie, [mean-1, mean+1]
+    */
+    for (j=0; j<ggv->dpos->ncols; j++) {
+      vt = vartable_element_get (j, ggv->dpos);
+      vt->lim_tform.min = vt->lim_raw.min = vt->lim_display.min =
+        vt->lim.min = -2.0;
+      vt->lim_tform.max = vt->lim_raw.max = vt->lim_display.max =
+        vt->lim.max = 2.0;
+    }
   }
 
   mds_func (state, inst);
@@ -452,7 +485,7 @@ void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_Dtarget_power = adj->value;
+  GtkWidget *label = gtk_object_get_data (GTK_OBJECT (adj), "label");
 
   if (!ggv->dpos) {
     /*-- initialize, allocate and populate dpos --*/
@@ -460,27 +493,16 @@ void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst)
     ggv_pos_init (ggv);
   }
 
-/*
-  if (metric_nonmetric == METRIC) {
-    mds_power = floor(6. * slidepos * 1.04 * 10.) / 10. ;
-    if(mds_power > 6.) mds_power = 6.;
-    if(KruskalShepard_classic == KRUSKALSHEPARD) {
-      sprintf(str, "Data Power (D^p): %3.1f ",  mds_power);
-    } else {
-      sprintf(str, "Data Power (D^2p): %3.1f ",  mds_power);
-    }
-    XtSetArg(args[0], XtNstring, str);
-    XtSetValues(mds_power_label, args, 1);
-    XawScrollbarSetThumb(mds_power_sbar, mds_power/1.04/6.0, -1.);
+  if (ggv->metric_nonmetric == metric) {
+    ggv->mds_Dtarget_power = adj->value;
+    gtk_label_set_text (GTK_LABEL(label), "Data power (D^p)");
   } else {
-    mds_isotonic_mix = floor(slidepos * 1.04 * 100.)/100. ;
-    if(mds_isotonic_mix > 1.0) mds_isotonic_mix = 1.0;
-    sprintf(str, "Isotonic(D): %d%% ", (int) (mds_isotonic_mix*100));
-    XtSetArg(args[0], XtNstring, str);
-    XtSetValues(mds_power_label, args, 1);
-    XawScrollbarSetThumb(mds_power_sbar, mds_isotonic_mix/1.04, -1.);
+    ggv->mds_isotonic_mix = adj->value / 6.0;
+/*XXX*/
+/* Use a different adjustment later.  And change the label when
+the combo box is activated, not here. */
+    gtk_label_set_text (GTK_LABEL(label), "Isotonic(D) 6*fraction");
   }
-*/
 
   mds_once (false, ggv, gg);
   ggv_Dtarget_histogram_update (ggv, gg);
@@ -523,6 +545,35 @@ void ggv_groups_cb (GtkWidget *w, PluginInstance *inst)
 {
 }
 
+void ggv_perturb_adj_cb (GtkAdjustment *adj, PluginInstance *inst)
+{
+  ggvisd *ggv = ggvisFromInst (inst);
+  ggv->mds_stepsize = adj->value;
+
+  ggv->mds_perturb_val = adj->value;
+
+  /* run mds_once */
+}
+
+void ggv_reperturb_cb (GtkToggleButton *btn, PluginInstance *inst)
+{
+  ggvisd *ggv = ggvisFromInst (inst);
+/*
+  int i, k;
+
+  for (i = 0; i < pos_orig.nrows; i++)
+    for (k = mds_freeze_var; k < mds_dims; k++) {
+      pos.data[i][k] = (1.0-mds_perturb_val)*pos.data[i][k] + (mds_perturb_val)*drandval(NORMAL);
+    }
+
+  center_scale_pos();
+
+  update_plot(&xgobi);
+  plot_once(&xgobi);
+
+  reinit_stress();
+*/
+}
 
 void ggv_constrained_cb (GtkWidget *w, PluginInstance *inst)
 {

@@ -81,7 +81,9 @@ get_center (ggvisd *ggv)
   n = 0;
 
   for (i=0; i<ggv->pos.nrows; i++) {
-    if (ggv->point_status.els[i] != EXCLUDED) {
+    if (ggv->point_status.els[i] != EXCLUDED &&
+        ggv->point_status.els[i] != DRAGGED)
+    {
       for(k=0; k<ggv->mds_dims; k++) 
         ggv->pos_mean.els[k] += ggv->pos.vals[i][k];
       n++;
@@ -101,44 +103,18 @@ get_center_scale (ggvisd *ggv)
   ggv->pos_scl = 0.;
 
   for(i=0; i<ggv->pos.nrows; i++) {
-    if (ggv->point_status.els[i] != EXCLUDED) {
+    if (ggv->point_status.els[i] != EXCLUDED &&
+        ggv->point_status.els[i] != DRAGGED)
+    {
       for (k=0; k<ggv->mds_dims; k++) 
         ggv->pos_scl += ((ggv->pos.vals[i][k] - ggv->pos_mean.els[k]) *
                          (ggv->pos.vals[i][k] - ggv->pos_mean.els[k]));
       n++;
     }
   }
-  ggv->pos_scl = sqrt(ggv->pos_scl/(gdouble)n/ggv->mds_dims);
+  ggv->pos_scl = sqrt(ggv->pos_scl/(gdouble)n/(gdouble)ggv->mds_dims);
 }
 
-void
-center_pos (ggvisd *ggv) 
-{
-  gint i, k;
-
-  get_center (ggv);
-
-  for (i=0; i<ggv->pos.nrows; i++)
-    if (ggv->point_status.els[i] != EXCLUDED)
-      for (k=0; k<ggv->mds_dims; k++)
-        ggv->pos.vals[i][k] -= ggv->pos_mean.els[k];
-}
-
-/* restore configuration to old scale */
-void
-scale_pos (ggvisd *ggv) 
-{
-  gint i, k;
-  gdouble **pos = ggv->pos.vals;
-
-  get_center_scale (ggv);
-
-  for (i=0; i<ggv->pos.nrows; i++)
-    if (ggv->point_status.els[i] != EXCLUDED)
-      for (k=0; k<ggv->mds_dims; k++)
-        pos[i][k] = (pos[i][k] - ggv->pos_mean.els[k]) / ggv->pos_scl +
-          ggv->pos_mean.els[k];
-}
 
 void
 ggv_center_scale_pos (ggvisd *ggv) 
@@ -148,10 +124,14 @@ ggv_center_scale_pos (ggvisd *ggv)
 
   get_center_scale (ggv);
 
-  for (i=0; i<ggv->pos.nrows; i++)
-    if (ggv->point_status.els[i] != EXCLUDED)
+  for (i=0; i<ggv->pos.nrows; i++) {
+    if (ggv->point_status.els[i] != EXCLUDED &&
+        ggv->point_status.els[i] != DRAGGED)
+    {
       for (k=0; k<ggv->mds_dims; k++)
         pos[i][k] = (pos[i][k] - ggv->pos_mean.els[k])/ggv->pos_scl;
+    }
+  }
 }
 
 /* end centering and sizing routines */
@@ -535,10 +515,12 @@ update_ggobi (ggvisd *ggv, ggobid *gg)
 {
   gint i, j;
 
-  for (i=0; i<ggv->pos.nrows; i++)
-    for (j=0; j<ggv->pos.ncols; j++)
+  for (i=0; i<ggv->pos.nrows; i++) {
+    for (j=0; j<ggv->pos.ncols; j++) {
       ggv->dpos->tform.vals[i][j] =
         ggv->dpos->raw.vals[i][j] = ggv->pos.vals[i][j];
+    }
+  }
 
   tform_to_world (ggv->dpos, gg);
   displays_tailpipe (FULL, gg);
@@ -652,21 +634,22 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
   }
 */
   /* dragged by mouse */
-/*
-  if (xg->is_point_moving && moving_point != -1) {
-    if(move_type==0) {
-      point_status[moving_point] = DRAGGED;
-    } else if(move_type==1) {
-      for (i=0; i<ggv->pos.nrows; i++)
-        if (point_status[i] != EXCLUDED && SAMEGLYPH(d,i,moving_point)) 
-          point_status[i] = DRAGGED;
-    } else if(move_type==2) {
-      for (i=0; i<ggv->pos.nrows; i++)
-        if (point_status[i] != EXCLUDED)
-          point_status[i] = DRAGGED;
+  if (viewmode_get (gg) == MOVEPTS &&
+      gg->buttondown &&
+      dpos->nearest_point != -1)
+  {
+    if (gg->movepts.cluster_p) {
+      for (i=0; i<ggv->pos.nrows; i++) {
+        if (ggv->point_status.els[i] != EXCLUDED &&
+            SAMEGLYPH(dpos,i,dpos->nearest_point)) 
+        {
+          ggv->point_status.els[i] = DRAGGED;
+        }
+      }
+    } else {
+      ggv->point_status.els[dpos->nearest_point] = DRAGGED;
     }
   }
-*/
 
   /* allocate position and compute means */
   get_center (ggv);
@@ -898,11 +881,6 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
     for (i=0; i<ggv->pos.nrows; i++) {
       if (ggv->point_status.els[i] != DRAGGED) {
         for (k = ggv->mds_freeze_var; k<ggv->mds_dims; k++) {
-/*
-g_printerr ("i %d k %d prev %f gfactor %f gradient %f new %f\n",
-i, k, ggv->pos.vals[i][k], gfactor,  ggv->gradient.vals[i][k],
-ggv->pos.vals[i][k] + (gfactor * ggv->gradient.vals[i][k]));
-*/
           ggv->pos.vals[i][k] += (gfactor * ggv->gradient.vals[i][k]);
         }
       } else {
@@ -914,7 +892,7 @@ ggv->pos.vals[i][k] + (gfactor * ggv->gradient.vals[i][k]));
     /* experiment: normalize point cloud after using simplified gradient */
     ggv_center_scale_pos (ggv);
 
-  } /*   if (doit && num_active_dist > 0) { */
+  } /* close:  if (doit && num_active_dist > 0)  */
 
   /* update Shepard labels */
   if (ggv->num_active_dist != num_active_dist_prev) {

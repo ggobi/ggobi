@@ -50,7 +50,7 @@ ggvis_init (ggvisd *ggv)
   ggv->mds_dist_power_over_lnorm = 0.5;
   ggv->mds_lnorm_over_dist_power = 2.0;
   ggv->mds_within_between = 1.0;
-  ggv->mds_rand_select_val = 1.0;
+  ggv->mds_rand_select_val = 1.0;  /* selection probability */
   ggv->mds_rand_select_new = false;
   ggv->mds_perturb_val = 1.0;
   ggv->mds_threshold_high = 0.0;
