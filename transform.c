@@ -219,10 +219,10 @@ transform1_values_set (gint tform1, gfloat expt, gint jcol,
 gboolean 
 transform1_apply (gint jcol, datad *d, ggobid *gg)
 {
-  gint i, m;
+  gint i, m, n;
   gfloat min, max, diff;
-  gfloat fmedian, ref;
-  gboolean allequal, tform_ok = true;
+  gfloat ref;
+  gboolean tform_ok = true;
   gdouble dtmp;
   lims slim, slim_tform;  /*-- specified limits --*/
 
@@ -252,39 +252,7 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
       }
     break;
 
-    case STANDARDIZE1:    /* (x-mean)/sigma */
-    {
-      gfloat mean, stddev;
-      gdouble *x;
-      x = (gdouble *) g_malloc (d->nrows_in_plot * sizeof (gdouble));
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        x[i] = (*domain_adj) (d->raw.vals[m][jcol], incr);
-      }
-
-      mean_stddev (x, &mean, &stddev, jcol, d, gg);
-
-      if (stddev == 0) {
-        quick_message (domain_error_message, false);
-      } else {
-        for (i=0; i<d->nrows_in_plot; i++) {
-          m = d->rows_in_plot[i];
-          d->tform.vals[m][jcol] = ((gfloat) x[i] - mean) / stddev;
-        }
-      }
-      g_free ((gpointer) x);
-
-      /*-- apply the same transformation to the specified limits --*/
-      if (d->vartable[jcol].lim_specified_p) {
-        slim_tform.min = ((*domain_adj)(slim.min, incr) - mean) / stddev;
-        slim_tform.max = ((*domain_adj)(slim.max, incr) - mean) / stddev;
-      }
-
-    }
-    break;
-
     case BOXCOX:  /* Box-Cox power transform family */
-
       if (fabs (boxcoxparam-0) < .001) {       /* Natural log */
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot[i];
@@ -365,7 +333,7 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
           slim_tform.min = (gfloat) (dtmp - 1.0) / boxcoxparam;
           dtmp = pow ((gdouble) (*domain_adj)(slim.max, incr), boxcoxparam);
 #ifdef _WIN32
-          if (!_finite (dtmp)) {
+          if (!_finite (dtmp)) /*[*/
 #else
           if (!finite (dtmp)) {
 #endif
@@ -373,63 +341,6 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
             tform_ok = false;
           }
           slim_tform.max = (gfloat) (dtmp - 1.0) / boxcoxparam;
-        }
-      }
-
-    break;
-
-    case ABSVALUE:
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        d->tform.vals[m][jcol] = (d->raw.vals[m][jcol] + incr < 0) ?
-          fabs ((gdouble)(*domain_adj)(d->raw.vals[m][jcol], incr)) :
-          (*domain_adj)(d->raw.vals[m][jcol], incr);
-      }
-
-      /*-- apply the same transformation to the specified limits --*/
-      if (d->vartable[jcol].lim_specified_p) {
-        slim_tform.min = (slim.min + incr < 0) ?
-          fabs ((gdouble)(*domain_adj)(slim.min, incr)) :
-          (*domain_adj)(slim.min, incr);
-        slim_tform.max = (slim.max + incr < 0) ?
-          fabs ((gdouble)(*domain_adj)(slim.max, incr)) :
-          (*domain_adj)(slim.max, incr);
-      }
-    break;
-
-    case INVERSE:    /* 1/x */
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        if ((*domain_adj)(d->raw.vals[m][jcol], incr) == 0) {
-          quick_message (domain_error_message, false);
-          tform_ok = false;
-          break;
-        }
-      }
-      /*-- apply the same domain test to the specified limits --*/
-      if (d->vartable[jcol].lim_specified_p) {
-        if (((*domain_adj)(slim_tform.min, incr) == 0) ||
-            ((*domain_adj)(slim_tform.max, incr) == 0))
-        {
-          quick_message (ldomain_error_message, false);
-          tform_ok = false;
-        }
-      }
-
-      if (tform_ok) {
-        for (i=0; i<d->nrows_in_plot; i++) {
-          m = d->rows_in_plot[i];
-          d->tform.vals[m][jcol] = (gfloat)
-            pow ((gdouble) (*domain_adj)(d->raw.vals[m][jcol], incr),
-              (gdouble) (-1.0));
-        }
-
-        /*-- apply the same transformation to the specified limits --*/
-        if (d->vartable[jcol].lim_specified_p) {
-          slim_tform.min = (gfloat)
-            pow ((gdouble) (*domain_adj)(slim.min, incr), (gdouble) (-1.0));
-          slim_tform.max = (gfloat)
-            pow ((gdouble) (*domain_adj)(slim.max, incr), (gdouble) (-1.0));
         }
       }
     break;
@@ -469,15 +380,59 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
       }
     break;
 
-    case SCALE01:    /* Map onto [0,1] */
-      /* First find min and max; they get updated after transformations */
-
-      min = max = (*domain_adj)(d->raw.vals[0][jcol], incr);
-      for (i=0; i<d->nrows_in_plot; i++) {
+    case INVERSE:    /* 1/x: require all data to be of the same sign */
+      for (i=0; i<d->nrows_in_plot-1; i++) {
         m = d->rows_in_plot[i];
-        ref = (*domain_adj)(d->raw.vals[m][jcol], incr);
-        if (ref < min) min = ref;
-        if (ref > max) max = ref;
+        n = d->rows_in_plot[i+1];
+        if (SIGNUM((*domain_adj)(d->raw.vals[m][jcol], incr)) !=
+            SIGNUM((*domain_adj)(d->raw.vals[n][jcol], incr)))
+        {
+          quick_message (domain_error_message, false);
+          tform_ok = false;
+          break;
+        }
+      }
+      /*-- apply the same domain test to the specified limits --*/
+      if (d->vartable[jcol].lim_specified_p) {
+        if (SIGNUM((*domain_adj)(slim_tform.min, incr)) !=
+            SIGNUM((*domain_adj)(slim_tform.max, incr)))
+        {
+          quick_message (ldomain_error_message, false);
+          tform_ok = false;
+        }
+      }
+
+      if (tform_ok) {
+        for (i=0; i<d->nrows_in_plot; i++) {
+          m = d->rows_in_plot[i];
+          d->tform.vals[m][jcol] = (gfloat)
+            pow ((gdouble) (*domain_adj)(d->raw.vals[m][jcol], incr),
+              (gdouble) (-1.0));
+        }
+
+        /*-- apply the same transformation to the specified limits --*/
+        if (d->vartable[jcol].lim_specified_p) {
+          slim_tform.min = (gfloat)
+            pow ((gdouble) (*domain_adj)(slim.min, incr), (gdouble) (-1.0));
+          slim_tform.max = (gfloat)
+            pow ((gdouble) (*domain_adj)(slim.max, incr), (gdouble) (-1.0));
+        }
+      }
+    break;
+
+    case SCALE01_1:    /* Map onto [0,1] */
+      /*-- Either use user-defined limits, or data min and max --*/
+      if (d->vartable[jcol].lim_specified_p) {
+        min = slim_tform.min;
+        max = slim_tform.max;
+      } else {
+        min = max = (*domain_adj)(d->raw.vals[0][jcol], incr);
+        for (i=0; i<d->nrows_in_plot; i++) {
+          m = d->rows_in_plot[i];
+          ref = (*domain_adj)(d->raw.vals[m][jcol], incr);
+          if (ref < min) min = ref;
+          if (ref > max) max = ref;
+        }
       }
 
       limits_adjust (&min, &max);
@@ -488,135 +443,9 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         d->tform.vals[m][jcol] =
           ((*domain_adj)(d->raw.vals[m][jcol], incr) - min)/diff;
       }
-
-      /*-- apply the same transformation to the specified limits --*/
-      if (d->vartable[jcol].lim_specified_p) {
-        slim_tform.min = ((*domain_adj)(slim.min, incr) - min) / diff;
-        slim_tform.max = ((*domain_adj)(slim.max, incr) - min) / diff;
-      }
     break;
 
-
-    case DISCRETE2:    /* x>median */
-      /* refuse to discretize if all values are the same */
-      allequal = true;
-      ref = d->raw.vals[0][jcol];
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        if (d->raw.vals[m][jcol] != ref) {
-          allequal = false;
-          break;
-        }
-      }
-
-      if (allequal) {
-        quick_message (domain_error_message, false);
-        tform_ok = false;
-        break;
-      }
-
-      /* First find median */
-
-      fmedian = median (d->raw.vals, jcol, d, gg);
-      fmedian = (*domain_adj)(fmedian, incr);
-
-      /* Then find the true min and max */
-      min = max = (*domain_adj)(d->raw.vals[0][jcol], incr);
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        ref = (*domain_adj)(d->raw.vals[m][jcol], incr);
-        if (ref < min) min = ref;
-        if (ref > max) max = ref;
-      }
-
-      /* This prevents the collapse of the data in a special case */
-      if (max == fmedian)
-        fmedian = (min + max)/2.0;
-
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        d->tform.vals[m][jcol] =
-          ((*domain_adj)(d->raw.vals[m][jcol], incr) > fmedian) ? 1.0 : 0.0;
-      }
-
-      /*-- apply the same transformation to the specified limits --*/
-      if (d->vartable[jcol].lim_specified_p) {
-        slim_tform.min = 0.0;
-        slim_tform.max = 1.0;
-      }
-    break;
-
-    case RANK:
-    case NORMSCORE:  /*-- normscore = qnorm applied to rank --*/
-    {
-      paird *pairs = (paird *)
-        g_malloc (d->nrows_in_plot * sizeof (paird));
-    
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        pairs[m].f = d->raw.vals[m][jcol];
-        pairs[m].indx = m;
-      }
-      qsort ((gchar *) pairs, d->nrows_in_plot, sizeof (paird), pcompare);
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        d->tform.vals[pairs[m].indx][jcol] =
-          (tform1 == RANK) ?
-            (gfloat) m :
-            qnorm ((gfloat) (m+1) / (gfloat) (d->nrows_in_plot+1));
-      }
-
-      /*-- apply the same transformation to the specified limits --*/
-      /*-- how? --*/
-
-      g_free ((gpointer) pairs);
-    }
-      break;
-
-    case ZSCORE:
-    {
-      gdouble *zscore_data;
-      gdouble zmean=0, zvar=0;
-
-      /* Allocate array for z scores */
-      zscore_data = (gdouble *) g_malloc (d->nrows_in_plot * sizeof (gdouble));
-
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        dtmp = (gdouble) (*domain_adj)(d->raw.vals[m][jcol], incr);
-        zscore_data[m] = dtmp;
-        zmean += dtmp;
-        zvar += (dtmp * dtmp);
-      }
-      zmean /= (gdouble) d->nrows_in_plot;
-      zvar = sqrt (zvar / (gdouble) d->nrows_in_plot - zmean*zmean);
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        zscore_data[m] = (zscore_data[m] - zmean) / zvar;
-      }
-
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        if (zscore_data[m] > 0)
-          zscore_data[m] =
-            erf (zscore_data[m]/sqrt (2.)) / 2.8284271+0.5;
-        else if (zscore_data[m]<0)
-          zscore_data[m] = 0.5 - erf (fabs
-            (zscore_data[m])/sqrt (2.))/2.8284271;
-        else 
-          zscore_data[m] = 0.5;
-      }
-        
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        d->tform.vals[m][jcol] = (gfloat) zscore_data[m]; 
-      }
-
-      /*-- apply the same transformation to the specified limits --*/
-      /*-- how? --*/
-
-      g_free ((gpointer) zscore_data);
-    }
+    default:
     break;
   }
 
@@ -644,18 +473,12 @@ transform2_apply (gint jcol, datad *d, ggobid *gg)
   gboolean tform_ok = true;
   gint tform2 = option_menu_index (GTK_OPTION_MENU (gg->tform_ui.stage2_opt));
 
-  lims slim, slim_tform;  /*-- specified limits --*/
-  if (d->vartable[jcol].lim_specified_p) {
-    slim.min = d->vartable[jcol].lim_specified_tform.min;
-    slim.max = d->vartable[jcol].lim_specified_tform.max;
-  }
-
   switch (tform2)
   {
     case NO_TFORM2:  /* Restore the values from transformation, stage 2 */
-      break;
+    break;
 
-    case STANDARDIZE2:    /* (x-mean)/sigma */
+    case STANDARDIZE:    /* (x-mean)/sigma */
     {
       gfloat mean, stddev;
       gdouble *x;
@@ -669,29 +492,162 @@ transform2_apply (gint jcol, datad *d, ggobid *gg)
       if (stddev == 0) {
         quick_message (domain_error_message, false);
       } else {
-
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot[i];
           d->tform.vals[m][jcol] = (x[i] - mean)/stddev;
         }
+      }
+    }
+    break;
 
-        /*-- apply the same transformation to the specified limits --*/
-        if (d->vartable[jcol].lim_specified_p) {
-          slim_tform.min = (slim.min - mean) / stddev;
-          slim_tform.max = (slim.max - mean) / stddev;
+    case SORT:
+    case RANK:
+    case NORMSCORE:  /*-- normscore = qnorm applied to rank --*/
+    {
+      paird *pairs = (paird *)
+        g_malloc (d->nrows_in_plot * sizeof (paird));
+    
+      for (i=0; i<d->nrows_in_plot; i++) {
+        m = d->rows_in_plot[i];
+        pairs[i].f = d->tform.vals[m][jcol];
+        pairs[i].indx = m;
+      }
+      qsort ((gchar *) pairs, d->nrows_in_plot, sizeof (paird), pcompare);
+
+      if (tform2 == SORT) {
+        for (i=0; i<d->nrows_in_plot; i++) {
+          m = pairs[i].indx;
+          d->tform.vals[m][jcol] = pairs[i].f;
         }
+      } else if (tform2 == RANK) {
+        for (i=0; i<d->nrows_in_plot; i++) {
+          m = pairs[i].indx;
+          d->tform.vals[m][jcol] = i;
+        }
+      } else if (tform2 == NORMSCORE) {
+        for (i=0; i<d->nrows_in_plot; i++) {
+          m = pairs[i].indx;
+          d->tform.vals[m][jcol] = 
+            qnorm ((gfloat) (i+1) / (gfloat) (d->nrows_in_plot+1));
+        }
+      }
+      g_free ((gpointer) pairs);
+    }
+    break;
 
+    case ZSCORE:
+    {
+      gdouble *zscore_data;
+      gdouble zmean=0, zvar=0;
+      gdouble dtmp;
+
+      /* Allocate array for z scores */
+      zscore_data = (gdouble *) g_malloc (d->nrows_in_plot * sizeof (gdouble));
+
+      for (i=0; i<d->nrows_in_plot; i++) {
+        m = d->rows_in_plot[i];
+        dtmp = (gdouble) d->tform.vals[m][jcol];
+        zscore_data[i] = dtmp;
+        zmean += dtmp;
+        zvar += (dtmp * dtmp);
+      }
+      zmean /= (gdouble) d->nrows_in_plot;
+      zvar = sqrt (zvar / (gdouble) d->nrows_in_plot - zmean*zmean);
+      for (i=0; i<d->nrows_in_plot; i++) {
+        zscore_data[i] = (zscore_data[i] - zmean) / zvar;
+      }
+
+      for (i=0; i<d->nrows_in_plot; i++) {
+        if (zscore_data[i] > 0)
+          zscore_data[i] =
+            erf (zscore_data[i]/sqrt (2.)) / 2.8284271+0.5;
+        else if (zscore_data[i]<0)
+          zscore_data[i] = 0.5 - erf (fabs
+            (zscore_data[i])/sqrt (2.))/2.8284271;
+        else 
+          zscore_data[i] = 0.5;
+      }
+        
+      for (i=0; i<d->nrows_in_plot; i++) {
+        m = d->rows_in_plot[i];
+        d->tform.vals[m][jcol] = (gfloat) zscore_data[i]; 
+      }
+
+      g_free ((gpointer) zscore_data);
+    }
+    break;
+
+    case DISCRETE2:    /* x>median */
+    {
+      gfloat ref, fmedian, min, max;
+
+      /* refuse to discretize if all values are the same */
+      gboolean allequal = true;
+      ref = d->tform.vals[0][jcol];
+      for (i=0; i<d->nrows_in_plot; i++) {
+        m = d->rows_in_plot[i];
+        if (d->tform.vals[m][jcol] != ref) {
+          allequal = false;
+          break;
+        }
+      }
+
+      if (allequal) {
+        quick_message (domain_error_message, false);
+        tform_ok = false;
+        break;
+      }
+
+      /* First find median */
+
+      fmedian = median (d->tform.vals, jcol, d, gg);
+
+      /* Then find the true min and max */
+      min = max = d->tform.vals[0][jcol];
+      for (i=0; i<d->nrows_in_plot; i++) {
+        m = d->rows_in_plot[i];
+        ref = d->tform.vals[m][jcol];
+        if (ref < min) min = ref;
+        if (ref > max) max = ref;
+      }
+
+      /* This prevents the collapse of the data in a special case */
+      if (max == fmedian)
+        fmedian = (min + max)/2.0;
+
+      for (i=0; i<d->nrows_in_plot; i++) {
+        m = d->rows_in_plot[i];
+        d->tform.vals[m][jcol] =
+          (d->tform.vals[m][jcol] > fmedian) ? 1.0 : 0.0;
+      }
+    }
+    break;
+
+    case SCALE01_2:    /* Map onto [0,1] */
+    {
+      /* First find min and max; they get updated after transformations */
+      gfloat min, max, ref, diff;
+
+      min = max = d->tform.vals[0][jcol];
+      for (i=0; i<d->nrows_in_plot; i++) {
+        m = d->rows_in_plot[i];
+        ref = d->tform.vals[m][jcol];
+        if (ref < min) min = ref;
+        if (ref > max) max = ref;
+      }
+
+      limits_adjust (&min, &max);
+      diff = max - min;
+
+      for (i=0; i<d->nrows_in_plot; i++) {
+        m = d->rows_in_plot[i];
+        d->tform.vals[m][jcol] = (d->tform.vals[m][jcol] - min)/diff;
       }
     }
     break;
 
     default:
       fprintf (stderr, "Unhandled switch-case in transform2_apply\n");
-  }
-
-  if (tform_ok && d->vartable[jcol].lim_specified_p) {
-    d->vartable[jcol].lim_specified_tform.min = slim_tform.min;
-    d->vartable[jcol].lim_specified_tform.max = slim_tform.max;
   }
 
   return tform_ok;
@@ -722,35 +678,17 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
     case NO_TFORM1:
       lbl1 = g_strdup (lbl0);
       break;
-    case STANDARDIZE1:
-      lbl1 = g_strdup_printf ("(%s-m)/s", lbl0);
-      break;
     case BOXCOX:
       lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, d->vartable[j].param);
-      break;
-    case ABSVALUE:
-      lbl1 = g_strdup_printf ("Abs(%s)", lbl0);
-      break;
-    case INVERSE:
-      lbl1 = g_strdup_printf ("1/%s", lbl0);
       break;
     case LOG10:
       lbl1 = g_strdup_printf ("log10(%s)", lbl0);
       break;
-    case SCALE01:
+    case INVERSE:
+      lbl1 = g_strdup_printf ("1/%s", lbl0);
+      break;
+    case SCALE01_1:
       lbl1 = g_strdup_printf ("%s [0,1]", lbl0);
-      break;
-    case DISCRETE2:
-      lbl1 = g_strdup_printf ("%s:0,1", lbl0);
-      break;
-    case RANK:
-      lbl1 = g_strdup_printf ("rank(%s)", lbl0);
-      break;
-    case NORMSCORE:
-      lbl1 = g_strdup_printf ("normsc(%s)", lbl0);
-      break;
-    case ZSCORE:
-      lbl1 = g_strdup_printf ("zsc(%s)", lbl0);
       break;
   }
 
@@ -758,8 +696,26 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
     case NO_TFORM2:
       d->vartable[j].collab_tform = g_strdup (lbl1);
       break;
-    case STANDARDIZE2:
+    case STANDARDIZE:
       d->vartable[j].collab_tform = g_strdup_printf ("(%s-m)/s", lbl1);
+      break;
+    case SORT:
+      d->vartable[j].collab_tform = g_strdup_printf ("sort(%s)", lbl1);
+      break;
+    case RANK:
+      d->vartable[j].collab_tform = g_strdup_printf ("rank(%s)", lbl1);
+      break;
+    case NORMSCORE:
+      d->vartable[j].collab_tform = g_strdup_printf ("normsc(%s)", lbl1);
+      break;
+    case ZSCORE:
+      d->vartable[j].collab_tform = g_strdup_printf ("zsc(%s)", lbl1);
+      break;
+    case DISCRETE2:
+      d->vartable[j].collab_tform = g_strdup_printf ("%s:0,1", lbl1);
+      break;
+    case SCALE01_2:
+      d->vartable[j].collab_tform = g_strdup_printf ("%s [0,1]", lbl1);
       break;
   }
 

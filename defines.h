@@ -200,22 +200,22 @@ extern const gint ViewTypeIndeces[3];
 #define RAISE_MIN_TO_1  2
 #define NEGATE          3
 
-#define N1TFORMS 11
+#define N1TFORMS 5
 #define NO_TFORM1    0
-#define STANDARDIZE1 1
-#define BOXCOX       2
-#define ABSVALUE     3
-#define INVERSE      4
-#define LOG10        5
-#define SCALE01      6
-#define DISCRETE2    7
-#define RANK         8
-#define NORMSCORE    9
-#define ZSCORE      10
+#define BOXCOX       1
+#define LOG10        2
+#define INVERSE      3
+#define SCALE01_1    4
 
-#define N2TFORMS 2
+#define N2TFORMS     8
 #define NO_TFORM2    0
-#define STANDARDIZE2 1
+#define STANDARDIZE  1
+#define SORT         2
+#define RANK         3
+#define NORMSCORE    4
+#define ZSCORE       5
+#define DISCRETE2    6
+#define SCALE01_2    7
 
 
 /*

@@ -32,16 +32,10 @@ static void stage0_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *stage1_lbl[] = {"No transformation",
-                              "Standardize",
                               "Box-Cox",
-                              "Absolute value",
-                              "Inverse",
                               "Log base 10",
+                              "Inverse",
                               "Scale to [0,1]",
-                              "Discretize: 2 levels",
-                              "Rank",
-                              "Normal score",
-                              "Z-score"
                               };
 static void
 stage1_cb (GtkWidget *w, gpointer cbd)
@@ -62,7 +56,15 @@ void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
   transform (1, BOXCOX, adj->value, d, gg);
 }
 
-static gchar *stage2_lbl[] = {"No transformation", "Standardize"};
+static gchar *stage2_lbl[] = {"No transformation",
+                              "Standardize",
+                              "Sort",
+                              "Rank",
+                              "Normal score",
+                              "Z-score"
+                              "Discretize: 2 levels",
+                              "Scale to [0,1]",
+                              };
 static void stage2_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
@@ -160,7 +162,7 @@ transform_window_open (ggobid *gg)
 
     gg->tform_ui.stage1_opt = gtk_option_menu_new ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->tform_ui.stage1_opt,
-      "Stage 1: Power transformations et al",
+      "Stage 1: Data-independent transformations, preserving user-defined limits",
       NULL);
     populate_option_menu (gg->tform_ui.stage1_opt, stage1_lbl,
                           sizeof (stage1_lbl) / sizeof (gchar *),
@@ -197,7 +199,8 @@ transform_window_open (ggobid *gg)
     gg->tform_ui.stage2_opt = gtk_option_menu_new ();
     gtk_container_set_border_width (GTK_CONTAINER (gg->tform_ui.stage2_opt), 4);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->tform_ui.stage2_opt,
-      "Stage 2: Standardization", NULL);
+      "Stage 2: Data-dependent transformations, ignoring user-defined limits",
+      NULL);
     populate_option_menu (gg->tform_ui.stage2_opt, stage2_lbl,
                           sizeof (stage2_lbl) / sizeof (gchar *),
                           (GtkSignalFunc) stage2_cb, gg);
