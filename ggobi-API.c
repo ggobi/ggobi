@@ -568,8 +568,6 @@ void
 GGOBI(setCaseColor)(gint pt, gint colorIndex, datad *d, ggobid *gg)
 {
 if (pt < 5)
-g_printerr ("pt= %d, color=%d\n",
-pt, colorIndex);
   d->color_ids.els[pt] = d->color_now.els[pt] = colorIndex;
 }
 
@@ -1030,7 +1028,6 @@ gint
 GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update, 
   datad *d, ggobid *gg)
 {
-g_printerr ("entering addVariable\n");
   if (d->ncols < 1) {
     gint i;
     gchar ** rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
