@@ -33,11 +33,6 @@ export GTK_CONFIG=/usr/dfs/cc/bin/gtk-config
 
 Makefile:
   CC=cc
+  CFLAGS
 local.config
-  undef XML
-
-I had to turn xml off, because that inserts /usr/common/include and
-/usr/common/lib into the search path when I'm trying to get them out
-(because that's where xml lives, but it's also where glib and gtk
-live).
-
+  use XML libraries compiled with cc
