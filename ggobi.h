@@ -331,16 +331,9 @@ struct _ggobid {
 
 /*-------------------- subsetting ------------------------------------*/
 
- /*-- all the widgets here except the window should be removed
-      from this file and retrieved by name instead.  --*/
   struct _SubsetUI {
     GtkWidget *window;
     GtkWidget *notebook;
-   /*-- entry widgets from which to get values for sample, rowlab --*/
-    GtkWidget *random_entry, *nrows_entry, *rowlab_entry;
-   /*-- spinners --*/
-    GtkWidget *bstart, *bsize;
-    GtkWidget *estart, *estep;
   } subset_ui;
 
 /*---------------- brushing by weights -------------------------------*/

@@ -417,6 +417,7 @@ gboolean   subset_block (gint, gint, datad *, ggobid *);
 gboolean   subset_everyn (gint, gint, datad *, ggobid *);
 void       subset_include_all (datad *, ggobid *);
 gboolean   subset_random (gint, datad *, ggobid *);
+gboolean   subset_range (greal min, greal max, gint j, datad *d, ggobid *gg);
 gboolean   subset_rowlab (gchar *, datad *, ggobid *);
 gboolean   subset_sticky (datad *, ggobid *);
 void       subset_window_open (ggobid *, guint, GtkWidget *);

@@ -21,6 +21,7 @@ subset_init (datad *d, ggobid *gg)
   gfloat fnr = (gfloat) d->nrows;
 
   d->subset.random_n = d->nrows;
+  d->subset.jvar = -1;
 
   d->subset.bstart_adj = (GtkAdjustment *)
     gtk_adjustment_new (1.0, 1.0, (fnr-2.0), 1.0, 5.0, 0.0);
@@ -131,6 +132,29 @@ subset_block (gint bstart, gint bsize, datad *d, ggobid *gg)
     for (i=bstart, k=1; i<d->nrows && k<=bsize; i++, k++) {
       add_to_subset (i, d, gg);
       subsetsize++;
+    }
+  }
+
+  if (subsetsize == 0)
+    quick_message ("The limits aren't correctly specified.", false);
+ 
+  return (subsetsize > 0);
+}
+
+gboolean
+subset_range (greal min, greal max, gint j, datad *d, ggobid *gg)
+{
+  gint i;
+  gboolean subsetsize = 0;
+
+  if (min <max) {
+    subset_clear (d, gg);
+
+    for (i=0; i<d->nrows; i++) {
+      if (d->tform.vals[i][j] >= min && d->tform.vals[i][j] <= max) {
+        add_to_subset (i, d, gg);
+        subsetsize++;
+      }
     }
   }
 
