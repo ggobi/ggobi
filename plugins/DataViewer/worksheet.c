@@ -390,6 +390,12 @@ add_ggobi_data(datad *data, GtkWidget *w)
   GtkSheet *sheet;
   const gfloat **raw;
   vartabled *vt;
+  /*-- for working out the width of the longest row label --*/
+  gchar *str;
+  GtkStyle *style = gtk_widget_get_style (w);
+  gint lbearing, rbearing, width, ascent, descent;
+  gint maxwidth = 0;
+
   sheet = GTK_SHEET(w);
   for(i = 0; i < data->ncols; i++) {
     char *name;
@@ -401,8 +407,22 @@ add_ggobi_data(datad *data, GtkWidget *w)
 
   raw = GGOBI(getRawData)(data, data->gg);
   for(i = 0; i < data->nrows; i++) {
-    gtk_sheet_row_button_add_label(sheet, i,
-      (gchar *) g_array_index(data->rowlab, gchar*, i));
+    str = (gchar *) g_array_index(data->rowlab, gchar*, i);
+    gtk_sheet_row_button_justify (sheet, i, GTK_JUSTIFY_LEFT);
+
+    gtk_sheet_row_button_add_label(sheet, i, str);
+
+    /* keep track of the width of the longest label */
+    gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
+      str, strlen (str),
+      &lbearing, &rbearing, &width, &ascent, &descent);
+    maxwidth = MAX (width, maxwidth);
+    /* */
 
     for(j = 0; j < data->ncols; j++) {
       char buf[10];
@@ -410,6 +430,11 @@ add_ggobi_data(datad *data, GtkWidget *w)
       gtk_sheet_set_cell(sheet, i, j, GTK_JUSTIFY_RIGHT, buf);
     }
   }
+
+  /*-- Does this apply to the row titles?  Alas, no.  --*/
+/* GTK_SHEET_SET_FLAGS(sheet, GTK_SHEET_AUTORESIZE); */
+
+  gtk_sheet_set_row_titles_width (sheet, maxwidth);
 }
 
 /**
