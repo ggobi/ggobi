@@ -34,6 +34,9 @@ read_colorscheme(gchar *fileName, GList **list)
   xmlNodePtr node;
   colorschemed *scheme;
 
+  if(!canRead(fileName))
+      return(NULL);
+
 /*  xmlSubstituteEntitiesDefault(1);    */
   doc = xmlParseFile(fileName); 
   if(doc == NULL)
