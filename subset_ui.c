@@ -35,6 +35,15 @@ subset_cb (GtkWidget *w, ggobid *gg)
   gboolean redraw;
   datad *d = gg->current_display->d;
 
+  /* 
+   * if datad has changed, refuse to do anything until the
+   * user has closed and reopened subset_ui.window.
+  */
+  if (gg->subset_ui.d != d) {
+    g_printerr ("Close and reopen this window, please\n");
+    return;
+  }
+
   subset_type = 
     gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->subset_ui.notebook));
 
@@ -74,6 +83,14 @@ subset_cb (GtkWidget *w, ggobid *gg)
 static void
 include_all_cb (GtkWidget *w, ggobid *gg) {
   datad *d = gg->current_display->d;
+  /* 
+   * if datad has changed, refuse to do anything until the
+   * user has closed and reopened subset_ui.window.
+  */
+  if (gg->subset_ui.d != d) {
+    g_printerr ("Close and reopen this window, please\n");
+    return;
+  }
 
   if (d != NULL) {
     subset_include_all (d, gg);
@@ -123,6 +140,8 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
   if (d == NULL)  /*-- if used before we have data --*/
     return;
   else {
+
+    gg->subset_ui.d = d;
 
     /*
      * if this particular datad object hasn't been the active one

@@ -56,7 +56,7 @@ filesel_ok (GtkWidget *w, datad *d, GtkFileSelection *fs)
           else
             filename = g_strdup (fname);
           g_printerr ("filename=%s\n", filename);
-          ggobi_file_set_create (filename, gg);
+          ggobi_file_set_create (filename, d, gg);
           g_free (filename);
           break;
         case BINARYDATA:  /*-- not implemented --*/

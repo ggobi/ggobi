@@ -252,6 +252,9 @@ struct _ggobid {
    GtkWidget *bstart, *bsize;
    GtkWidget *bstart_incr, *bsize_incr;
    GtkWidget *estart, *estep;
+
+   /*-- a pointer to be compared with current_display->d --*/
+   datad *d;
  } subset_ui;
 
 /*-------------------- scaling ---------------------------------------*/

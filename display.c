@@ -365,14 +365,14 @@ display_set_current (displayd *new_display, ggobid *gg)
       case scatterplot:
         gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
           (gg->current_display->missing_p) ? "scatterplot display (missings)" :
-                                            "scatterplot display"); 
+                                             "scatterplot display"); 
         submenu_destroy (gg->mode_item);
         break;
 
       case scatmat:
         gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
           (gg->current_display->missing_p) ? "scatterplot matrix (missings)" :
-                                         "scatterplot matrix"); 
+                                             "scatterplot matrix"); 
         submenu_destroy (gg->mode_item);
         break;
 
