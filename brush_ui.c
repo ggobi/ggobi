@@ -408,6 +408,7 @@ void cpanel_brush_make(ggobid * gg)
   GtkWidget *btn;
   GtkWidget *option_menu;
   GtkWidget *vb, *lbl;
+  GtkWidget *frame, *framevb, *notebook;
 
   gg->control_panel[BRUSH] = gtk_vbox_new(false, VBOX_SPACING);
   gtk_container_set_border_width(GTK_CONTAINER(gg->control_panel[BRUSH]),
@@ -505,14 +506,29 @@ void cpanel_brush_make(ggobid * gg)
   gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
                      btn, false, false, 1);
 
-  /*-- option menu:  link by id, link by variable --*/
+  frame = gtk_frame_new ("Linking rule");
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]), frame,
+    false, false, 3);
+
+  framevb = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (framevb), 4);
+  gtk_container_add (GTK_CONTAINER (frame), framevb);
+
+  /*-- provide a variable list so that any variable can be the label --*/
+  notebook = create_variable_notebook (framevb,
+    GTK_SELECTION_SINGLE, categorical_only, (GtkSignalFunc) NULL, gg);
+  gtk_object_set_data (GTK_OBJECT (gg->control_panel[BRUSH]),
+    "notebook", notebook);
   option_menu = gtk_option_menu_new();
   gtk_widget_set_name(option_menu, "BRUSH:linkby_option_menu");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), option_menu,
-                       "Link by id (specified in XML), or link using the categorical variable selected in the variable manipulation tool",
-                       NULL);
-  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
+    "Link by id (specified in XML or through the API), or link using the categorical variable selected above",
+    NULL);
+  gtk_box_pack_start(GTK_BOX(framevb),
                      option_menu, false, false, 0);
+
+  /*-- option menu:  link by id, link by variable --*/
   populate_option_menu(option_menu, linkby_lbl,
                        sizeof(linkby_lbl) / sizeof(gchar *),
                        (GtkSignalFunc) brush_linkby_cb, gg);
