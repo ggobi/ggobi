@@ -139,67 +139,10 @@ for (i=0; i<ga->nnodes; i++) {
 }
 */
 
-  count_visible_edges (inst);
-  
   for (i=0; i<ga->nnodes; i++) {
     g_list_free (inEdgeList[i]);
     g_list_free (outEdgeList[i]);
   }
   g_free (inEdgeList);
   g_free (outEdgeList);
-}
-
-void
-count_visible_edges (PluginInstance *inst)
-{
-  graphactd *ga = (graphactd *) inst->data;
-  datad *d = ga->d;
-  datad *e = ga->e;
-  gint m, i, k, a, b, edgeid;
-  endpointsd *endpoints;
-
-  endpoints = e->edge.endpoints;
-
-  if (ga->nInEdgesVisible.nels != ga->nnodes) {
-    vectori_realloc (&ga->nInEdgesVisible, ga->nnodes);
-    vectori_realloc (&ga->nOutEdgesVisible, ga->nnodes);
-  }
-  vectori_zero (&ga->nInEdgesVisible);
-  vectori_zero (&ga->nOutEdgesVisible);
-
-/*
- * I don't really need to distinguish between inEdges and outEdges
- * for anything I'm going to do for a while, but why not?
-*/
-  /*--   --*/
-  for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
-    for (k=0; k<ga->inEdges[i].nels; k++) {
-      edgeid = ga->inEdges[i].els[k];
-      a = d->rowid.idv.els[endpoints[edgeid].a];
-      /*-- no need for b, because i = b --*/
-      if (e->sampled.els[edgeid] && !e->hidden_now.els[edgeid] &&
-          !d->hidden_now.els[a] && !d->hidden_now.els[i])
-      {
-        ga->nInEdgesVisible.els[i]++;
-      }
-    }
-    for (k=0; k<ga->outEdges[i].nels; k++) {
-      edgeid = ga->outEdges[i].els[k];
-      b = d->rowid.idv.els[endpoints[edgeid].b];
-      /*-- no need for a, because i = a --*/
-      if (e->sampled.els[edgeid] && !e->hidden_now.els[edgeid] &&
-          !d->hidden_now.els[b] && !d->hidden_now.els[i])
-      {
-        ga->nOutEdgesVisible.els[i]++;
-      }
-    }
-  }
-  
-/*
-for (i=0; i<ga->nnodes; i++)
-  g_printerr ("%d %d\n",
-    ga->nInEdgesVisible.els[i],
-    ga->nOutEdgesVisible.els[i]);
-*/
 }
