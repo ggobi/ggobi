@@ -4,12 +4,12 @@ ifndef GGOBI_HOME
  GGOBI_HOME=../..
 endif
 
-GTKEXTRA_INCLUDES=../../../gtk+extra-0.99.13/gtkextra
-GTKEXTRA_LIB_DIR=/home2/FlowData/AltProjects/gtk+extra-0.99.13/gtkextra/.libs
+
 EXTRA_LIBS=$(GTKEXTRA_LIB_DIR:%=-L%) $(GTKEXTRA_LIB_DIR:%=-Xlinker --rpath -Xlinker %) -lgtkextra
 
 OBJS=worksheet.o
 
+include local.config
 -include $(GGOBI_HOME)/local.config
 
 DataViewer.so: $(OBJS)
