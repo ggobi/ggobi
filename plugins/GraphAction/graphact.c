@@ -232,10 +232,14 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   hbox = gtk_hbox_new (true, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
   btn = gtk_button_new_with_label ("Hide");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "Recursively hide leaf nodes", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (ga_leaf_hide_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
   btn = gtk_button_new_with_label ("Show");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "Show all nodes and edges", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
@@ -255,18 +259,27 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
  checkbox:  Neighborhood finder on or off
  button: restore all nodes and edges
  option menu taking the values {1,2} for the radius of the path to be reported
- button: label all nodes and edges?
+ possibilities:
+   button: sticky label everything showing
+   button: remove all sticky labels
+   color:  draw the rest of the graph in a ghost color, just a
+     few shades lighter/darker than the background color.  That
+     would necessitate the use of a custom colorscheme.
 */
 
   hbox = gtk_hbox_new (true, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
   btn = gtk_check_button_new_with_label ("Show neighbors");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "To display only a node and its neighbors, turn this on, select 'Identify' in ggobi, and double-click to make a label 'sticky.'", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
     GTK_SIGNAL_FUNC (show_neighbors_toggle_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
   btn = gtk_button_new_with_label ("Show all");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "Show all nodes and edges", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
@@ -278,6 +291,8 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   gtk_misc_set_alignment (GTK_MISC (label), 0, 1);
   gtk_box_pack_start (GTK_BOX (hbox), label, false, false, 0);
   opt = gtk_option_menu_new ();
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), opt,
+    "Select the size of the selected node's neighborhood to show; ie, the number of steps from the node.", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), opt, false, false, 0);
   populate_option_menu (opt, (gchar**) neighborhood_depth_lbl,
     sizeof (neighborhood_depth_lbl) / sizeof (gchar *),
