@@ -35,13 +35,14 @@ addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 void
 show_glayout_window (GtkWidget *widget, PluginInstance *inst)
 {
+  GtkWidget *window;
+
   if (g_slist_length(inst->gg->d) < 1) {
     g_printerr ("No datasets to show\n");
     return;
   }
 
   if (inst->data == NULL) {
-    GtkWidget *window;
     glayoutd *gl = (glayoutd *) g_malloc (sizeof (glayoutd));
 
     glayout_init (gl);
@@ -50,18 +51,8 @@ show_glayout_window (GtkWidget *widget, PluginInstance *inst)
     window = create_glayout_window (inst->gg, inst);
     gtk_object_set_data (GTK_OBJECT (window), "glayoutd", gl);
 
-#ifdef HIGHLIGHTSTICKY
-/*-- Can't do this here until I have an agnostic highlight function --*/
-void highlight_edges_cb (GtkButton *button, PluginInstance *inst);
-  gtk_signal_connect (GTK_OBJECT(inst->gg),
-    "sticky_point_added", highlight_sticky_edges, inst);
-  gtk_signal_connect (GTK_OBJECT(inst->gg),
-    "sticky_point_removed", highlight_sticky_edges, inst);
-#endif
-
-
   } else {
-    gtk_widget_show_now ((GtkWidget*) inst->data);
+    gtk_widget_show_now ((GtkWidget*) window);
   }
 }
 
