@@ -232,6 +232,7 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   /*-- delete columns from pipeline arrays --*/
   arrayf_delete_cols (&d->raw, ncols, cols);
   arrayf_delete_cols (&d->tform, ncols, cols);
+  tour_realloc_down (ncols, cols, d, gg);
   if (d->nmissing)
     arrays_delete_cols (&d->missing, ncols, cols);
 
@@ -470,6 +471,8 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   /*-- pipeline --*/
   arrayf_add_cols (&d->raw, d->ncols);
   arrayf_add_cols (&d->tform, d->ncols);
+
+  tour_realloc_up (d->ncols, d, gg);
 
   for (k=0; k<ncols; k++) {
     n = cols[k];              /*-- variable being cloned --*/

@@ -103,42 +103,58 @@ alloc_tour (displayd *dsp, ggobid *gg)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-tour_realloc_down (gint nc, gint *cols, displayd *dsp, ggobid *gg)
+tour_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
 {
-  arrayf_delete_cols (&dsp->u0, nc, cols);
-  arrayf_delete_cols (&dsp->u1, nc, cols);
-  arrayf_delete_cols (&dsp->u, nc, cols);
-  arrayf_delete_cols (&dsp->uold, nc, cols);
-  arrayf_delete_cols (&dsp->v0, nc, cols);
-  arrayf_delete_cols (&dsp->v1, nc, cols);
-  arrayf_delete_cols (&dsp->v, nc, cols);
-  arrayf_delete_cols (&dsp->uvevec, nc, cols);
-  arrayf_delete_cols (&dsp->tv, nc, cols);
+  displayd *dsp;
+  GList *l;
+  for (l=gg->displays; l; l=l->next) {
+    dsp = (displayd *) l->data;
+    if (dsp->d == d) {
+g_printerr ("tour_realloc_down\n");
+      arrayf_delete_cols (&dsp->u0, nc, cols);
+      arrayf_delete_cols (&dsp->u1, nc, cols);
+      arrayf_delete_cols (&dsp->u, nc, cols);
+      arrayf_delete_cols (&dsp->uold, nc, cols);
+      arrayf_delete_cols (&dsp->v0, nc, cols);
+      arrayf_delete_cols (&dsp->v1, nc, cols);
+      arrayf_delete_cols (&dsp->v, nc, cols);
+      arrayf_delete_cols (&dsp->uvevec, nc, cols);
+      arrayf_delete_cols (&dsp->tv, nc, cols);
 
-  vectori_delete_els (&dsp->tour_vars, nc, cols);
-  vectorf_delete_els (&dsp->lambda, nc, cols);
-  vectorf_delete_els (&dsp->tau, nc, cols);
-  vectorf_delete_els (&dsp->tinc, nc, cols);
+      vectori_delete_els (&dsp->tour_vars, nc, cols);
+      vectorf_delete_els (&dsp->lambda, nc, cols);
+      vectorf_delete_els (&dsp->tau, nc, cols);
+      vectorf_delete_els (&dsp->tinc, nc, cols);
+    }
+  }
 }
 
 /*-- append columns for a total of nc columns --*/
 void
-tour_realloc_up (gint nc, displayd *dsp, ggobid *gg)
+tour_realloc_up (gint nc, datad *d, ggobid *gg)
 {
-  arrayf_add_cols (&dsp->u0, nc);
-  arrayf_add_cols (&dsp->u1, nc);
-  arrayf_add_cols (&dsp->u, nc);
-  arrayf_add_cols (&dsp->uold, nc);
-  arrayf_add_cols (&dsp->v0, nc);
-  arrayf_add_cols (&dsp->v1, nc);
-  arrayf_add_cols (&dsp->v, nc);
-  arrayf_add_cols (&dsp->uvevec, nc);
-  arrayf_add_cols (&dsp->tv, nc);
+  displayd *dsp;
+  GList *l;
+  for (l=gg->displays; l; l=l->next) {
+    dsp = (displayd *) l->data;
+    if (dsp->d == d) {
+g_printerr ("tour_realloc_up\n");
+      arrayf_add_cols (&dsp->u0, nc);
+      arrayf_add_cols (&dsp->u1, nc);
+      arrayf_add_cols (&dsp->u, nc);
+      arrayf_add_cols (&dsp->uold, nc);
+      arrayf_add_cols (&dsp->v0, nc);
+      arrayf_add_cols (&dsp->v1, nc);
+      arrayf_add_cols (&dsp->v, nc);
+      arrayf_add_cols (&dsp->uvevec, nc);
+      arrayf_add_cols (&dsp->tv, nc);
 
-  vectori_realloc (&dsp->tour_vars, nc);
-  vectorf_realloc (&dsp->lambda, nc);
-  vectorf_realloc (&dsp->tau, nc);
-  vectorf_realloc (&dsp->tinc, nc);
+      vectori_realloc (&dsp->tour_vars, nc);
+      vectorf_realloc (&dsp->lambda, nc);
+      vectorf_realloc (&dsp->tau, nc);
+      vectorf_realloc (&dsp->tinc, nc);
+    }
+  }
 }
 
 void

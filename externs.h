@@ -320,6 +320,8 @@ void tour2d_projdata (splotd *, glong **, datad *, ggobid *);
 void tour2d_projdata (splotd *, glong **, datad *, ggobid *);
 void tour2dpp_window_open (ggobid *);
 void tour_do_step (displayd *, ggobid *);
+void tour_realloc_up (gint nc, datad *d, ggobid *gg);
+void tour_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg);
 void transform (gint, gint, gfloat, datad *, ggobid *);
 void transform0_opt_menu_set_value (gint j, datad *d, ggobid *gg);
 void transform0_values_set (gint, gint, datad *, ggobid *);
