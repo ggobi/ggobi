@@ -10,6 +10,7 @@
 */
 
 #include <gtk/gtk.h>
+#include <math.h>
 #include "vars.h"
 #include "externs.h"
 
@@ -52,7 +53,7 @@ zoom_by_drag (splotd *sp, ggobid *gg)
   gint projection = projection_get (gg);
   gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
   gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;
-  gint npix = 10;  /*-- number of pixels from the crosshair required --*/
+  gint npix = 5;  /*-- number of pixels from the crosshair required --*/
 
   icoords mid;
   fcoords scalefac;
@@ -61,20 +62,29 @@ zoom_by_drag (splotd *sp, ggobid *gg)
   mid.y = sp->max.y / 2;
   scalefac.x = scalefac.y = 1.0;
 
-  if (ABS(sp->mousepos.x - mid.x) < npix)
-    return;
+  if (ABS(sp->mousepos.x - mid.x) >= npix) {
+    /*-- making the behavior identical to click zooming --*/
+    scalefac.x = 
+      (gfloat) (sp->mousepos.x - mid.x) / (gfloat) (sp->mousepos_o.x - mid.x);
 
-  /*-- making the behavior identical to click zooming --*/
-  scalefac.x = 
-    (gfloat) (sp->mousepos.x - mid.x) / (gfloat) (sp->mousepos_o.x - mid.x);
-  scalefac.y =
-    (gfloat) (sp->mousepos.y - mid.y) / (gfloat) (sp->mousepos_o.y - mid.y);
+/*
+ * Trying to make it behave better around mid.x, but it doesn't 
+ * seem to help much.
+    scalefac.x = (gfloat) sqrt((gdouble)scalefac.x);
+*/
 
-  if (*scale_x * scalefac.x >= SCALE_MIN) {
-    *scale_x = *scale_x * scalefac.x;
+    if (*scale_x * scalefac.x >= SCALE_MIN) {
+      *scale_x = *scale_x * scalefac.x;
+    }
   }
-  if (*scale_y * scalefac.y >= SCALE_MIN) {
-    *scale_y = *scale_y * scalefac.y;
+
+  if (ABS(sp->mousepos.y - mid.y) >= npix) {
+    /*-- making the behavior identical to click zooming --*/
+    scalefac.y =
+      (gfloat) (sp->mousepos.y - mid.y) / (gfloat) (sp->mousepos_o.y - mid.y);
+    if (*scale_y * scalefac.y >= SCALE_MIN) {
+      *scale_y = *scale_y * scalefac.y;
+    }
   }
 
 }
