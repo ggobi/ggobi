@@ -21,12 +21,12 @@ else
  CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
 endif
 
-GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
-#GGOBI_LIB=
+#GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
+GGOBI_LIB=
 
 
-HEADERS=ggvis
-SRC=ggvis
+HEADERS=ggvis defines
+SRC=ggvis init stressplot histogram
 OBJS=$(SRC:%=%.o)
 
 $(PKG).so: $(OBJS)

@@ -11,7 +11,7 @@
 #include "GGStructSizes.c"
 
 void       close_ggvis_window(GtkWidget *w, PluginInstance *inst);
-GtkWidget *create_ggvis_window(ggobid *gg, PluginInstance *inst);
+void       create_ggvis_window(ggvisd *ggv, PluginInstance *inst);
 void       show_ggvis_window (GtkWidget *widget, PluginInstance *inst);
 
 
@@ -67,16 +67,6 @@ static GtkItemFactoryEntry menu_items[] = {
   };
 
 
-void
-ggvis_init (ggvisd *ggv) {
-/*
-  arrayd_init_null (&ggv->dist_orig);
-  arrayd_init_null (&ggv->dist);
-  arrayd_init_null (&ggv->pos_orig);
-  arrayd_init_null (&ggv->pos);
-*/
-}
-
 static const gchar *const metric_lbl[] = {"Metric MDS", "Nonmetric MDS"};
 static void metric_cb (GtkWidget *w, gpointer cbd)
 {
@@ -111,17 +101,13 @@ show_ggvis_window (GtkWidget *widget, PluginInstance *inst)
   }
 
   if (inst->data == NULL) {
-    GtkWidget *window;
-    ggvisd *gl = (ggvisd *) g_malloc (sizeof (ggvisd));
+    ggvisd *ggv = (ggvisd *) g_malloc (sizeof (ggvisd));
 
-    ggvis_init (gl);
-
-    window = create_ggvis_window (inst->gg, inst);
-    gtk_object_set_data (GTK_OBJECT (window), "ggvisd", gl);
-    inst->data = window;  /*-- or this could be the ggvis structure --*/
+    ggvis_init (ggv);
+    create_ggvis_window (ggv, inst);
 
   } else {
-    gtk_widget_show_now ((GtkWidget*) inst->data);
+    gtk_widget_show_now ((GtkWidget*) inst->data);  /* ie, window */
   }
 }
 
@@ -129,8 +115,12 @@ ggvisd *
 ggvisFromInst (PluginInstance *inst)
 {
   GtkWidget *window = (GtkWidget *) inst->data;
-  ggvisd *gl = (ggvisd *) gtk_object_get_data (GTK_OBJECT(window), "ggvisd");
-  return gl;
+  ggvisd *ggv = NULL;
+
+  if (window)
+    ggv = (ggvisd *) gtk_object_get_data (GTK_OBJECT(window), "ggvisd");
+
+  return ggv;
 }
 
 void ggvis_scale_set_default_values (GtkScale *scale)
@@ -141,8 +131,8 @@ void ggvis_scale_set_default_values (GtkScale *scale)
   gtk_scale_set_draw_value (scale, TRUE);
 }
 
-GtkWidget *
-create_ggvis_window(ggobid *gg, PluginInstance *inst)
+void
+create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *run_vbox;
   GtkWidget *notebook, *opt;
@@ -151,10 +141,13 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   gint top;
   GtkAccelGroup *ggv_accel_group;
   GtkWidget *menubar;
+  GtkWidget *da;
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gtk_object_set_data (GTK_OBJECT (window), "ggvisd", ggv);
+  inst->data = window;  /*-- or this could be the ggvis structure --*/
 
   gtk_window_set_title(GTK_WINDOW(window), "ggvis");
   gtk_signal_connect (GTK_OBJECT (window), "destroy",
@@ -210,6 +203,15 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
   gtk_box_pack_start (GTK_BOX (hbox), frame, false, false, 2);
 
+  da = gtk_drawing_area_new ();
+  gtk_drawing_area_size (GTK_DRAWING_AREA (da),
+    STRESSPLOT_WIDTH, STRESSPLOT_HEIGHT);
+  gtk_signal_connect (GTK_OBJECT (da), "expose_event",
+    GTK_SIGNAL_FUNC(stressplot_expose_cb), inst);
+  gtk_signal_connect (GTK_OBJECT (da), "configure_event",
+    GTK_SIGNAL_FUNC(stressplot_configure_cb), inst);
+  gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
+  gtk_container_add (GTK_CONTAINER(frame), da);
 
 /*-- notebook --*/
 
@@ -217,18 +219,17 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
   gtk_box_pack_start (GTK_BOX (main_vbox), notebook, false, false, 2);
 
-  /*-- network tab: cmds --*/
+
+/*-- MDS parameters tab --*/
+  hbox = gtk_hbox_new (false, 1);  /* 2 children, each a frame */
+
   frame = gtk_frame_new ("MDS Parameters");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 6);
+  gtk_box_pack_start (GTK_BOX (hbox), frame, false, false, 5);
 
-/*-- MDS parameters --*/
-
-  hbox = gtk_hbox_new (false, 1);  /* 2 children: table, drawing area */
-  gtk_container_add (GTK_CONTAINER(frame), hbox);
-
-  /*-- MDS Dimension, Data Power, Dist Power, Minkowski, Weight power --*/
+  /*-- MDS Dimension, Data power, Dist power, Minkowski, Weight power --*/
   table = gtk_table_new (2, 5, false);
-  gtk_box_pack_start (GTK_BOX (hbox), table, false, false, 5);
+  gtk_container_add (GTK_CONTAINER(frame), table);
 
   top = 0;
 
@@ -254,7 +255,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
 
   /*-- Data power --*/
   top++;
-  label = gtk_label_new ("Data Power (D^p)");
+  label = gtk_label_new ("Data power (D^p)");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
@@ -272,7 +273,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
 
   /*-- Dist power --*/
   top++;
-  label = gtk_label_new ("Dist Power (d^q)");
+  label = gtk_label_new ("Dist power (d^q)");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
@@ -309,6 +310,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   /*-- Weight power --*/
   top++;
   label = gtk_label_new ("Weight power (w=D^r)");
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
@@ -328,7 +330,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   opt = gtk_option_menu_new ();
   populate_option_menu (opt, (gchar**) metric_lbl,
     sizeof (metric_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) metric_cb, "GGobi", gg);
+    (GtkSignalFunc) metric_cb, "PluginInst", inst);
   gtk_table_attach (GTK_TABLE (table), opt, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
@@ -338,17 +340,30 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   opt = gtk_option_menu_new ();
   populate_option_menu (opt, (gchar**) kruskal_lbl,
     sizeof (kruskal_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) kruskal_cb, "GGobi", gg);
+    (GtkSignalFunc) kruskal_cb, "PluginInst", inst);
   gtk_table_attach (GTK_TABLE (table), opt, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  label = gtk_label_new ("Parameters");
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-                            frame, label);
+  frame = gtk_frame_new ("Distribution of transformed D");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 6);
+  gtk_box_pack_start (GTK_BOX (hbox), frame, false, false, 5);
 
-  /*-- Groups --*/
+  da = gtk_drawing_area_new ();
+  gtk_drawing_area_size (GTK_DRAWING_AREA (da),
+    HISTOGRAM_WIDTH, HISTOGRAM_HEIGHT);
+  gtk_signal_connect (GTK_OBJECT (da), "expose_event",
+    GTK_SIGNAL_FUNC(histogram_expose_cb), inst);
+  gtk_signal_connect (GTK_OBJECT (da), "configure_event",
+    GTK_SIGNAL_FUNC(histogram_configure_cb), inst);
+  gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
+  gtk_container_add (GTK_CONTAINER(frame), da);
+
+  label = gtk_label_new ("Parameters");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
+
+  /*-- Groups tab --*/
   frame = gtk_frame_new ("Groups");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
@@ -361,7 +376,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   opt = gtk_option_menu_new ();
   populate_option_menu (opt, (gchar**) groups_lbl,
     sizeof (groups_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) groups_cb, "GGobi", gg);
+    (GtkSignalFunc) groups_cb, "PluginInst", inst);
   gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
 
   label = gtk_label_new ("Groups");
@@ -443,7 +458,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   opt = gtk_option_menu_new ();
   populate_option_menu (opt, (gchar**) constrained_lbl,
     sizeof (constrained_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) constrained_cb, "GGobi", gg);
+    (GtkSignalFunc) constrained_cb, "PluginInst", inst);
   gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
 
   label = gtk_label_new ("Constrained MDS");
@@ -451,8 +466,6 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
                             frame, label);
 
   gtk_widget_show_all (window);
-
-  return(window);
 }
 
 
