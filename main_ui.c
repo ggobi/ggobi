@@ -40,11 +40,11 @@ const char *const GGOBI(OpModeNames)[] = {
 
 static const char *const *mode_name = GGOBI(OpModeNames);
 
-/* w is the toplevel window */
+/* w is gg->mode_frame */
 static gint
 size_allocate_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
 {
-  static gint height = 0;
+  static gint height = 0;  /*-- this should be moved in ggobi.h, probably --*/
 
   gint frame_height_req, frame_height, cpanel_height_req, hdiff;
 
@@ -339,9 +339,29 @@ projection_get (ggobid* gg) {
  * panel should display checkboxes or circles
 */
 gboolean
-varpanel_uses_circles (gint mode)
+varpanel_highd (gint mode)
 {
   return (mode == TOUR1D || mode == TOUR2D || mode == COTOUR);
+}
+gboolean
+varpanel_permits_circles_or_checkboxes (gint mode)
+{
+  return (mode > COTOUR);
+}
+/*
+ * Use the widget state to figure out which is currently displayed.
+*/
+gboolean
+varpanel_shows_circles (ggobid *gg)
+{
+  datad *d = gg->current_display->d;
+  return GTK_WIDGET_MAPPED (d->vcirc_ui.vbox);
+}
+gboolean
+varpanel_shows_checkboxes (ggobid *gg)
+{
+  datad *d = gg->current_display->d;
+  return GTK_WIDGET_MAPPED (d->vcbox_ui.swin);
 }
 
 static void
@@ -350,9 +370,13 @@ varpanel_reinit (ggobid *gg)
   GSList *l;
   datad *d;
 
-  if (varpanel_uses_circles(gg->mode) &&
-     !varpanel_uses_circles(gg->prev_mode))
+  if (varpanel_permits_circles_or_checkboxes (gg->mode))
   {
+    ;  /*-- no change required either way --*/
+  }
+
+  else if (varpanel_highd(gg->mode) && varpanel_shows_checkboxes (gg))
+  {  /*-- remove checkboxes and add circles --*/
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
       /*
@@ -372,8 +396,7 @@ varpanel_reinit (ggobid *gg)
       if (GTK_OBJECT (d->vcirc_ui.vbox)->ref_count > 1)
         gtk_widget_unref (d->vcirc_ui.vbox);
     }
-  } else if (!varpanel_uses_circles(gg->mode) &&
-              varpanel_uses_circles(gg->prev_mode))
+  } else if (!varpanel_highd(gg->mode) && varpanel_shows_circles (gg))
   {  /*-- remove circles and add checkboxes --*/
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
@@ -819,15 +842,10 @@ make_ui (ggobid *gg) {
 
   gtk_widget_show_all (hbox);
 
-/*-- adjust the size of the main window before it's displayed --*/
-/*-- never mind; it wasn't working anyway --*/
-/*
-  gtk_widget_realize (window); 
-  gtk_signal_connect (GTK_OBJECT (window),
-                      "size_allocate",
-                      (GtkSignalFunc) size_allocate_cb,
-                      (gpointer) gg);
-*/
+  /*
+   * to keep the mode_frame from shrinking when a smaller control
+   *   panel is used
+  */
   gtk_signal_connect (GTK_OBJECT (gg->mode_frame),
                       "size_allocate",
                       (GtkSignalFunc) size_allocate_cb,
