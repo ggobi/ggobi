@@ -270,15 +270,14 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
     bin = GTK_GGOBI_SPLOT(sp)->planar[m].x;
 /* dfs */
     if (vtx->vartype == categorical)
-      bin = sp->bar->index_to_rank[m];
+      bin = sp->bar->index_to_rank[i];
 /* --- */
     if ((bin >= 0) && (bin < sp->bar->nbins)) {
       sp->bar->cbins[bin][d->color_now.els[m]].count++;
     }
     if (bin == -1) {
       sp->bar->col_low_bin[d->color_now.els[m]].count++;
-    }
-    if (bin == sp->bar->nbins) {
+    } else if (bin == sp->bar->nbins) {
       sp->bar->col_high_bin[d->color_now.els[m]].count++;
     }
   }
@@ -863,14 +862,17 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
     gint index, rank = 0;
 
     index = sp->bar->index_to_rank[rank];
-    yy = d->tform.vals[index][rawsp->p1dvar];
+    /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs */
+    yy = d->tform.vals[ d->rows_in_plot[index] ][rawsp->p1dvar];
 
     while ((yy < sp->bar->breaks[0] + sp->bar->offset) &&
            (rank < d->nrows_in_plot - 1)) {
-      rawsp->planar[index].x = -1;
+      /*rawsp->planar[index].x = -1;*/ /* maybe not, dfs */
+      rawsp->planar[ d->rows_in_plot[index] ].x = -1;
       rank++;
       index = sp->bar->index_to_rank[rank];
-      yy = d->tform.vals[index][rawsp->p1dvar];
+      /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs */
+      yy = d->tform.vals[ d->rows_in_plot[index] ][rawsp->p1dvar];
     }
     if (rank > 0) {
       sp->bar->low_pts_missing = TRUE;
@@ -884,7 +886,8 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
     bin = 0;
     while (rank < d->nrows_in_plot) {
       index = sp->bar->index_to_rank[rank];
-      yy = d->tform.vals[index][rawsp->p1dvar];
+      /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs*/
+      yy = d->tform.vals[ d->rows_in_plot[index] ][rawsp->p1dvar];
       while ((bin < sp->bar->nbins) &&
              (sp->bar->breaks[bin + 1] + sp->bar->offset < yy)) {
         bin++;
@@ -912,7 +915,8 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
       } else {
         sp->bar->bins[bin].count++;
       }
-      rawsp->planar[index].x = bin;
+      /*rawsp->planar[index].x = bin;*/ /* maybe not, dfs */
+      rawsp->planar[ d->rows_in_plot[index] ].x = bin;
       rank++;
     }
   }
@@ -1172,11 +1176,11 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
     d->pts_under_brush.els[m] = hits[indx];
     if (hits[indx])
       d->npts_under_brush++;
-/*
+#ifdef PREV
       d->pts_under_brush.els[m] = hits[(gint)rawsp->planar[m].x + 1];
       if (hits[(gint)rawsp->planar[m].x + 1])
         d->npts_under_brush++;
-*/
+#endif
   }
 
   g_free((gpointer) hits);
@@ -1247,6 +1251,7 @@ barchart_sort_index(gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
        Later, when labelling, if a value doesn't match one of the
        level_values, label it 'missing'
     */
+/* assumption:  there exist at least two bins */
     mindist = sp->bar->bins[1].value - sp->bar->bins[0].value;
     for (i = 1; i < sp->bar->nbins; i++)
       mindist = MIN (mindist,
