@@ -20,3 +20,7 @@ ExcelReader.dll: $(OBJS)
 
 read: read.o error.o
 	$(CXX) -o $@ read.o error.o $(GGOBI_LIBS) $(LIBS) $(LIBS)
+
+OMEGA_XSL_DIR=d:/duncan/Projects/org/omegahat/Docs/XSL
+plugin.html: plugin.xml
+	xsltproc -o $@  $(OMEGA_XSL_DIR)/Rstyle.xsl $<

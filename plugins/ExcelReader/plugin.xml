@@ -24,7 +24,7 @@
   then we try to get the currently active instance of the Excel application.
   However, we get an error message of the form
   <quote>The object exporter specified was not found.</quote>
-  </foonote>. If the data came to be in Excel
+  </footnote>. If the data came to be in Excel
   from a database query, or some other input mechanism such as from a
   URL, there need be no local file.
  
@@ -110,33 +110,36 @@ plugin to ggobi, an R DCOM server, or via Rggobi.
 
 <bugs>
 
+Empty cells are transferred to us as the value 0.00 rather than
+missing/void. As a result, we don't handle missing values.
+We would have to ask for the formula for a given cell
+rather than assuming that the VARIANT will come across as 
+VT_VOID. However, this involves more communication with the 
+Excel server and more code!
+
+<para/>
+
 Among the missing features are:
 <itemizedList>
 <listitem>
 only handles numbers; not dates, strings, etc.
-</listitem>
-<lisitem>
-doesn't handle missing values.
-We would have to ask for the formula for a given cell
-rather than assuming that the VARIANT will come across as 
-VT_VOID.
 </listitem>
 <listitem>
 does not handle categorical variables at all.
 </listitem>
 <listitem>
 currently only reads the "active" worksheet, and not any others.
-</listem>
+</listitem>
 <listitem>
 no support for edges
 </listitem>
 <listitem>
 no support for additional command line arguments
 such as
- <itemizedlist>
+ <itemizedList>
  <listitem> --headers=true to specify whether the first row gives the variable
   names,
-  </listitem>
+ </listitem>
  <listitem>
    --visible=true to make the Excel interface visible to the user
  </listitem>
@@ -144,7 +147,7 @@ such as
  --rows="20..30", --columns="1,2,4,6",
 to do on-the-fly subsetting.
  </listitem>
- </itemizedlist>
+ </itemizedList>
  If one wants to do this, use a different
 interface such as R, Python or Perl to  program these operations for DCOM.
 </listitem>
