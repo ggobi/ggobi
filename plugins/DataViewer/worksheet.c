@@ -10,6 +10,7 @@
 #include "gtkextra/gtksheet.h"
 
 #include <stdlib.h>
+#include <strings.h>
 #include "errno.h"
 
 #include "parcoordsClass.h"
@@ -441,7 +442,7 @@ add_ggobi_data(datad *data, GtkWidget *w)
       if(data->nmissing && data->missing.vals[i][j])
            sprintf(buf, "<NA>");
       else {
-         if(vt->categorical_p) 
+         if(vt->vartype == categorical) 
           sprintf(buf,"%s", vt->level_names[(int) raw[i][j]]);
          else 
           sprintf(buf, "%.3g", raw[i][j]);
@@ -499,7 +500,6 @@ void
 cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
 {
     char *val, *tmp;
-    ggobid *gg;
     float value;
     if(row < 0)
 	return;
