@@ -229,6 +229,17 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 /* --------------------------------------------------------------- */
 
 void
+splot_add_rows (gint nrows, splotd *sp)
+{
+  vectorf_realloc (&sp->p1d_data, nrows);
+
+  sp->planar = (lcoords *) g_realloc (sp->planar,
+    nrows * sizeof (lcoords));
+  sp->screen = (icoords *) g_realloc (sp->screen,
+    nrows * sizeof (icoords));
+}
+
+void
 splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
   datad *d = display->d;
   gint nr = d->nrows;
@@ -236,7 +247,8 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
-  sp->p1d_data = (gfloat *) g_malloc (nr * sizeof (gfloat));
+  vectorf_init (&sp->p1d_data);
+  vectorf_alloc (&sp->p1d_data, nr);
 
 /*
   sp->points = (GdkPoint *) g_malloc (nr * sizeof (GdkPoint));
@@ -277,7 +289,7 @@ splot_free (splotd *sp, displayd *display, ggobid *gg) {
 
   g_free ((gpointer) sp->planar);
   g_free ((gpointer) sp->screen);
-  g_free ((gpointer) sp->p1d_data);
+  vectorf_free (&sp->p1d_data);
 
   switch (display->displaytype) {
     case scatterplot:

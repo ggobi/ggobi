@@ -57,7 +57,8 @@ typedef struct {
  * plot1d  (used in parcoords as well as scatterplot)
 */
  gint p1dvar;
- gfloat *p1d_data;  /* the spreading data */
+ vector_f p1d_data; /* the spreading data */
+ /*gfloat *p1d_data;*/ 
  lims p1d_lim;      /* limits of the spreading data */
  gfloat p1d_mean;
 

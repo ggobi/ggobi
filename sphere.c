@@ -98,15 +98,15 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
     return;
 
   /*-- the null case: sphering for the first time --*/
-  if (d->sphere.pcvars.vals == NULL || d->sphere.pcvars.nels == 0) {
+  if (d->sphere.pcvars.els == NULL || d->sphere.pcvars.nels == 0) {
     vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
     vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
 
     vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
-    clone_vars (d->sphere.vars.vals, d->sphere.npcs, d, gg);
+    clone_vars (d->sphere.vars.els, d->sphere.npcs, d, gg);
 
     for (j=ncols_prev, k=0; j<d->ncols; j++) {
-      d->sphere.pcvars.vals[k++] = j;
+      d->sphere.pcvars.els[k++] = j;
     }
 
 /*
@@ -125,17 +125,17 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
     /*-- add just the additional required variables? --*/
 
     /*-- try deleting them all and starting fresh? --*/
-    delete_vars (d->sphere.pcvars.vals, d->sphere.pcvars.nels, d, gg);
+    delete_vars (d->sphere.pcvars.els, d->sphere.pcvars.nels, d, gg);
     ncols_prev = d->ncols;
 
     vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
     vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
 
     vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
-    clone_vars (d->sphere.vars.vals, d->sphere.npcs, d, gg);
+    clone_vars (d->sphere.vars.els, d->sphere.npcs, d, gg);
 
     for (j=ncols_prev, k=0; j<d->ncols; j++) {
-      d->sphere.pcvars.vals[k++] = j;
+      d->sphere.pcvars.els[k++] = j;
     }
 
   /*-- if the number has decreased --*/
@@ -144,7 +144,7 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
     gint ncols = d->sphere.pcvars.nels - d->sphere.npcs;
     gint *cols = (gint *) g_malloc (ncols * sizeof (gint));
     for (j=d->sphere.pcvars.nels-1, k=ncols-1; j>=d->sphere.npcs; j--)
-      cols[k--] = d->sphere.pcvars.vals[j];
+      cols[k--] = d->sphere.pcvars.els[j];
     delete_vars (cols, ncols, d, gg);
 
     /*-- then behave as above, when the lengths were the same --*/
@@ -156,7 +156,7 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
   }
 
   for (k=0; k<d->sphere.pcvars.nels; k++) {
-    j = d->sphere.pcvars.vals[k];
+    j = d->sphere.pcvars.els[k];
     lbl = g_strdup_printf ("PC%d", (k+1));
     variable_set_label (d, j, lbl);
     g_free (lbl);
@@ -167,7 +167,7 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
   /*-- add the new labels to the clist --*/
   gtk_clist_freeze (clist);
   for (j=0; j<d->sphere.vars_sphered.nels; j++) {
-    row[0] = g_strdup (d->vartable[d->sphere.vars_sphered.vals[j]].collab);
+    row[0] = g_strdup (d->vartable[d->sphere.vars_sphered.els[j]].collab);
     gtk_clist_append (clist, row);
     g_free (row[0]);
   }
@@ -191,13 +191,13 @@ void pca_diagnostics_set (datad *d, ggobid *gg) {
   g_assert (d->sphere.npcs > 0);
   g_assert (d->sphere.eigenval.nels >= d->sphere.npcs);
 
-  firstpc = d->sphere.eigenval.vals[0];
-  lastpc = d->sphere.eigenval.vals[d->sphere.npcs-1];
+  firstpc = d->sphere.eigenval.els[0];
+  lastpc = d->sphere.eigenval.els[d->sphere.npcs-1];
 
   for (j=0; j<d->sphere.npcs; j++)
-    ftmp1 += d->sphere.eigenval.vals[j];
+    ftmp1 += d->sphere.eigenval.els[j];
   for (j=0; j<d->sphere.vars.nels; j++)
-    ftmp2 += d->sphere.eigenval.vals[j];
+    ftmp2 += d->sphere.eigenval.els[j];
 
   if (ftmp2 != 0)
     sphere_variance_set (ftmp1/ftmp2, d, gg);
@@ -251,12 +251,12 @@ spherevars_set (datad *d, ggobid *gg) {
   if (ncols == 0)
     ncols = plotted_cols_get (cols, d, gg);
 
-  if (d->sphere.vars.vals == NULL || d->sphere.vars.nels != ncols) {
+  if (d->sphere.vars.els == NULL || d->sphere.vars.nels != ncols) {
     sphere_malloc (ncols, d, gg);
   }
 
   for (j=0; j<ncols; j++)
-    d->sphere.vars.vals[j] = cols[j];
+    d->sphere.vars.els[j] = cols[j];
 
   /*-- update the "vars stdized?" text entry --*/
   vars_stdized_send_event (d, gg);
@@ -271,11 +271,11 @@ spherevars_set (datad *d, ggobid *gg) {
 /*    eigenvector and eigenvalues routines                                 */
 /*-------------------------------------------------------------------------*/
 
-void eigenvals_get (gfloat *vals, datad *d)
+void eigenvals_get (gfloat *els, datad *d)
 {
   gint j;
   for (j=0; j<d->sphere.vars.nels; j++)
-    vals[j] = d->sphere.eigenval.vals[j];
+    els[j] = d->sphere.eigenval.els[j];
 }
 
 void
@@ -320,10 +320,10 @@ sphere_varcovar_set (datad *d, ggobid *gg)
   gint i, j, k, m, var;
   gfloat tmpf = 0.;
   gint n = d->nrows_in_plot;
-  gfloat *tform_mean = d->sphere.tform_mean.vals;
+  gfloat *tform_mean = d->sphere.tform_mean.els;
 
   for (k=0; k<d->sphere.vars.nels; k++) {
-    var = d->sphere.vars.vals[k];
+    var = d->sphere.vars.els[k];
 
     g_assert (var < d->ncols);
     g_assert (k < d->sphere.tform_mean.nels);
@@ -391,7 +391,7 @@ gboolean sphere_svd (datad *d, ggobid *gg)
   gint i, j, k, rank;
   gint nels = d->sphere.vars.nels;
   gfloat **eigenvec = d->sphere.eigenvec.vals;
-  gfloat *eigenval = d->sphere.eigenval.vals;
+  gfloat *eigenval = d->sphere.eigenval.els;
 
   gboolean vc_equals_I = vc_identity_p (eigenvec, nels);
   paird *pairs = (paird *) g_malloc (nels * sizeof (paird));
@@ -404,7 +404,7 @@ gboolean sphere_svd (datad *d, ggobid *gg)
 
   if (!vc_equals_I) {
     eigenval_zero (d);  /*-- zero out the vector of eigenvalues --*/
-    dsvd (eigenvec, nels, nels, d->sphere.eigenval.vals, b);
+    dsvd (eigenvec, nels, nels, d->sphere.eigenval.els, b);
     for (j=0; j<nels; j++) {
       eigenval[j] = (gfloat) sqrt ((gdouble) eigenval[j]);
     }
@@ -451,9 +451,9 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
   gfloat tmpf;
   gfloat *b = (gfloat *) g_malloc (svars->nels * sizeof (gfloat));
 
-  gfloat *tform_mean = d->sphere.tform_mean.vals;
+  gfloat *tform_mean = d->sphere.tform_mean.els;
   gfloat **eigenvec = d->sphere.eigenvec.vals;
-  gfloat *eigenval = d->sphere.eigenval.vals;
+  gfloat *eigenval = d->sphere.eigenval.els;
 
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];
@@ -462,12 +462,12 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
       tmpf = 0.;
       for (k=0; k<svars->nels; k++) {
         tmpf = tmpf + eigenvec[k][j] *
-          (d->tform.vals[i][svars->vals[k]] - tform_mean[svars->vals[k]]);
+          (d->tform.vals[i][svars->els[k]] - tform_mean[svars->els[k]]);
       }
       b[j] = tmpf / eigenval[j]; 
     }
     for (j=0; j<pcvars->nels; j++)
-      d->tform.vals[i][pcvars->vals[j]] = b[j];
+      d->tform.vals[i][pcvars->els[j]] = b[j];
   }
 
   g_free (b);

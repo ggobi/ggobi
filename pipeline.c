@@ -33,7 +33,7 @@ pipeline_arrays_free (datad *d, ggobid *gg)
   arrayl_free (&d->jitdata, 0, 0);
 
   g_free ((gpointer) d->rows_in_plot);
-  g_free ((gpointer) d->sampled);
+  vectorb_free (&d->sampled);
 }
 
 void
@@ -52,7 +52,34 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
   arrayl_alloc_zero (&d->jitdata, nr, nc);
 
   d->rows_in_plot = (gint *) g_malloc (nr * sizeof (gint));
-  d->sampled = (gboolean *) g_malloc (nr * sizeof (gboolean));
+  vectorb_alloc (&d->sampled, nr);
+}
+
+void
+pipeline_arrays_add_rows (gint nrows, datad *d)
+/*
+ * Dynamically add rows -- assume d->nrows has already been increased.
+*/
+{
+  gint n = d->tform.nrows;
+  gint i, k;
+
+  arrayf_add_rows (&d->tform, nrows);
+
+  arrayl_add_rows (&d->world, nrows);
+  arrayl_add_rows (&d->jitdata, nrows);
+
+  d->rows_in_plot = (gint *) g_realloc (d->rows_in_plot,
+    nrows * sizeof (gint));
+
+  vectorb_realloc (&d->sampled, nrows);
+
+  k = d->nrows_in_plot;
+  for (i=n; i<d->nrows; i++, k++) {
+    d->rows_in_plot[k] = i;
+    d->sampled.els[i] = true;
+  }
+  d->nrows_in_plot = k;
 }
 
 /*-- reallocate tour arrays as needed here? --*/
@@ -248,7 +275,7 @@ rows_in_plot_set (datad *d, ggobid *gg) {
   d->nrows_in_plot = 0;
 
   for (i=0; i<d->nrows; i++) {
-    if (d->included[i] && d->sampled[i]) {
+    if (d->included.els[i] && d->sampled.els[i]) {
       d->rows_in_plot[d->nrows_in_plot++] = i;
     }
   }

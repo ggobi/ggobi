@@ -425,7 +425,7 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
             gg->selvarfg_GC, r, r, r+x, r-y);
 
           for (k=0; k<display->ntour_vars; k++) {
-            if (display->tour_vars.vals[k] == jvar) {
+            if (display->tour_vars.els[k] == jvar) {
               chosen = true;
               break;
             }
@@ -438,7 +438,7 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
             gg->selvarfg_GC, r, r, r+x, r-y);
 
           for (k=0; k<display->ntour_vars; k++) {
-            if (display->tour_vars.vals[k] == jvar) {
+            if (display->tour_vars.els[k] == jvar) {
               chosen = true;
               break;
             }

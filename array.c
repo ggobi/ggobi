@@ -103,7 +103,7 @@ arrayf_add_rows (array_f *arrp, gint nr)
 
     arrp->vals = (gfloat **) g_realloc (arrp->vals, nr * sizeof (gfloat *));
     for (i = arrp->nrows; i < nr; i++)
-      arrp->vals[i] = (gfloat *) g_malloc (arrp->ncols * sizeof (gfloat));
+      arrp->vals[i] = (gfloat *) g_malloc0 (arrp->ncols * sizeof (gfloat));
 
     arrp->nrows = nr;
   }
@@ -256,7 +256,7 @@ arrays_add_rows (array_s *arrp, gint nr)
 
     arrp->vals = (gshort **) g_realloc (arrp->vals, nr * sizeof (gshort *));
     for (i = arrp->nrows; i < nr; i++)
-      arrp->vals[i] = (gshort *) g_malloc (arrp->ncols * sizeof (gshort));
+      arrp->vals[i] = (gshort *) g_malloc0 (arrp->ncols * sizeof (gshort));
 
     arrp->nrows = nr;
   }
@@ -392,7 +392,7 @@ arrayl_add_rows (array_l *arrp, gint nr)
 
     arrp->vals = (glong **) g_realloc (arrp->vals, nr * sizeof (glong *));
     for (i = arrp->nrows; i < nr; i++)
-      arrp->vals[i] = (glong *) g_malloc (arrp->ncols * sizeof (glong));
+      arrp->vals[i] = (glong *) g_malloc0 (arrp->ncols * sizeof (glong));
 
     arrp->nrows = nr;
   }

@@ -576,7 +576,7 @@ point_colors_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
           break;
         }
 
-        d->color_ids[i] = d->color_now[i] = d->color_prev[i] = id;
+        d->color_ids.els[i] = d->color_now.els[i] = d->color_prev.els[i] = id;
 
         i++;  /* increment the array index */
         k++;  /* increment the file's row counter */
@@ -631,8 +631,8 @@ line_colors_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
             break;
           }
 
-          gg->line.color.vals[i] = gg->line.color_now.vals[i] =
-            gg->line.color_prev.vals[i] = id;
+          gg->line.color.els[i] = gg->line.color_now.els[i] =
+            gg->line.color_prev.els[i] = id;
           i++;
         }
         fclose(fp);
@@ -762,7 +762,7 @@ hidden_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
   if (found) {
     i = 0;
     while ((fscanf (fp, "%d", &itmp) != EOF) && (i < d->nrows)) {
-      d->hidden[i] = d->hidden_now[i] = d->hidden_prev[i] =
+      d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] =
         (gboolean) itmp;
       i++;
     }

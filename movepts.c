@@ -114,7 +114,7 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
 
   if (gg->movepts.cluster_p) {
     if (d->nclusters > 1) {
-      gint cur_clust = d->clusterids.vals[id];
+      gint cur_clust = d->clusterids.els[id];
 
       /*
        * Move all points which belong to the same cluster
@@ -125,8 +125,8 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
         if (k == id)
           ;
         else {
-          if (d->clusterids.vals[k] == cur_clust) {
-            if (!d->hidden_now[k]) {   /* ignore erased values altogether */
+          if (d->clusterids.els[k] == cur_clust) {
+            if (!d->hidden_now.els[k]) { /* ignore erased values altogether */
               if (horiz)
                 sp->planar[k].x += gg->movepts.eps.x;
               if (vert)

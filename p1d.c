@@ -50,13 +50,13 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
       sp->p1d_lim.min = FORGETITAXIS_MIN ;
       sp->p1d_lim.max = FORGETITAXIS_MAX ;
 
-      textur (yy, sp->p1d_data, d->nrows_in_plot, option, del, stages, gg);
+      textur (yy, sp->p1d_data.els, d->nrows_in_plot, option, del, stages, gg);
       break;
 
     case ASH:
       do_ash1d (yy, d->nrows_in_plot,
                cpanel->nbins, cpanel->nASHes,
-               sp->p1d_data, &min, &max, &mean);
+               sp->p1d_data.els, &min, &max, &mean);
       sp->p1d_lim.min = min;
       sp->p1d_lim.max = max;
       sp->p1d_mean = mean;
@@ -66,7 +66,7 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
       sp->p1d_lim.min = FORGETITAXIS_MIN ;
       sp->p1d_lim.max = FORGETITAXIS_MAX ;
       for (i=0; i<d->nrows_in_plot; i++)
-        sp->p1d_data[i] = 50;  /*-- halfway between _MIN and _MAX --*/
+        sp->p1d_data.els[i] = 50;  /*-- halfway between _MIN and _MAX --*/
       break;   
   }
 }
@@ -110,7 +110,7 @@ p1d_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
      * Use p1d_data[i] not [m] because p1d_data[] is populated
      * only up to d->nrows_in_plot
     */
-    ftmp = -1.0 + 2.0*(sp->p1d_data[i] - sp->p1d_lim.min)/rdiff;
+    ftmp = -1.0 + 2.0*(sp->p1d_data.els[i] - sp->p1d_lim.min)/rdiff;
 
     if (display->p1d_orientation == VERTICAL) {
       sp->planar[m].x = (glong) (precis * ftmp);

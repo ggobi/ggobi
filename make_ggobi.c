@@ -80,6 +80,7 @@ fileset_read (gchar *ldata_in, ggobid *gg)
   switch (gg->data_mode) {
     case xml_data:
 #ifdef USE_XML
+g_printerr ("reading xml\n");
       ok = data_xml_read (gg->fname, gg);
 #endif
     break;
@@ -103,6 +104,7 @@ fileset_read (gchar *ldata_in, ggobid *gg)
     case ascii_data:
     {
       datad *d; /* datad_new (gg);*/
+g_printerr ("reading ascii\n");
 #ifdef USE_CLASSES
       d  = new datad (gg);
 #else
@@ -138,7 +140,7 @@ pipeline_init (datad *d, ggobid *gg)
   pipeline_arrays_alloc (d, gg);
   for (i=0; i<d->nrows; i++) {
     d->rows_in_plot[i] = i;
-    d->sampled[i] = true;
+    d->sampled.els[i] = true;
   }
 
   /*-- some initializations --*/

@@ -63,9 +63,9 @@ br_glyph_ids_init (datad *d, ggobid *gg)
 void
 br_color_ids_free (datad *d, ggobid *gg)
 {
-  g_free (d->color_ids);
-  g_free (d->color_now);
-  g_free (d->color_prev);
+  vectors_free (&d->color_ids);
+  vectors_free (&d->color_now);
+  vectors_free (&d->color_prev);
 }
 
 void
@@ -73,14 +73,21 @@ br_color_ids_alloc (datad *d, ggobid *gg)
 {
   gint i;
 
+  vectors_realloc (&d->color_ids, d->nrows);
+  vectors_realloc (&d->color_now, d->nrows);
+  vectors_realloc (&d->color_prev, d->nrows);
+
+/*
   d->color_ids = (gshort *)  g_realloc (d->color_ids,
                                         d->nrows * sizeof (gshort));
   d->color_now = (gshort *)  g_realloc (d->color_now,
                                         d->nrows * sizeof (gshort));
   d->color_prev = (gshort *) g_realloc (d->color_prev,
                                         d->nrows * sizeof (gshort));
+*/
   for (i=0; i<d->nrows; i++)
-    d->color_ids[i] = d->color_now[i] = d->color_prev[i] = gg->color_0;
+    d->color_ids.els[i] = d->color_now.els[i] = d->color_prev.els[i] =
+      gg->color_0;
 }
 
 void
@@ -90,7 +97,8 @@ br_color_ids_init (datad *d, ggobid *gg)
 
   gg->color_id = gg->color_0;
   for (i=0; i<d->nrows; i++)
-    d->color_ids[i] = d->color_now[i] = d->color_prev[i] = gg->color_0;
+    d->color_ids.els[i] = d->color_now.els[i] = d->color_prev.els[i] =
+      gg->color_0;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -100,6 +108,10 @@ br_color_ids_init (datad *d, ggobid *gg)
 void
 hidden_alloc (datad *d, ggobid *gg)
 {
+  vectorb_realloc (&d->hidden, d->nrows);
+  vectorb_realloc (&d->hidden_now, d->nrows);
+  vectorb_realloc (&d->hidden_prev, d->nrows);
+/*
   if (d->hidden != NULL) g_free (d->hidden);
   if (d->hidden_now != NULL) g_free (d->hidden_now);
   if (d->hidden_prev != NULL) g_free (d->hidden_prev);
@@ -107,10 +119,11 @@ hidden_alloc (datad *d, ggobid *gg)
   d->hidden = (gboolean *) g_malloc (d->nrows * sizeof (gboolean));
   d->hidden_now = (gboolean *) g_malloc (d->nrows * sizeof (gboolean));
   d->hidden_prev = (gboolean *) g_malloc (d->nrows * sizeof (gboolean));
+*/
  
-  memset (d->hidden, '\0', sizeof (gboolean)*d->nrows);
-  memset (d->hidden_now, '\0', sizeof (gboolean)*d->nrows);
-  memset (d->hidden_prev, '\0', sizeof (gboolean)*d->nrows);
+  memset (d->hidden.els, '\0', sizeof (gboolean)*d->nrows);
+  memset (d->hidden_now.els, '\0', sizeof (gboolean)*d->nrows);
+  memset (d->hidden_prev.els, '\0', sizeof (gboolean)*d->nrows);
 }
 
 void
@@ -119,7 +132,7 @@ hidden_init (datad *d, ggobid *gg)
   gint i;
 
   for (i=0; i<d->nrows; i++)
-    d->hidden[i] = d->hidden_now[i] = d->hidden_prev[i] = false;
+    d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = false;
 }
 
 
@@ -157,21 +170,14 @@ void
 br_line_color_init (ggobid *gg)
 {
   gint j;
-  gshort *color, *color_now, *color_prev;
-  gboolean *hidden, *hidden_now, *hidden_prev;
 
   br_line_vectors_check_size (gg->nedges, gg);
 
-  color = gg->line.color.vals;
-  color_now = gg->line.color_now.vals;
-  color_prev = gg->line.color_prev.vals;
-  hidden = gg->line.hidden.vals;
-  hidden_now = gg->line.hidden_now.vals;
-  hidden_prev = gg->line.hidden_prev.vals;
-
   for (j=0; j<gg->nedges; j++) {
-    color[j] = color_now[j] = color_prev[j] = gg->color_0;
-    hidden[j] = hidden_now[j] = hidden_prev[j] = false;
+    gg->line.color.els[j] = gg->line.color_now.els[j] =
+      gg->line.color_prev.els[j] = gg->color_0;
+    gg->line.hidden.els[j] = gg->line.hidden_now.els[j] =
+      gg->line.hidden_prev.els[j] = false;
   }
 }
 
@@ -202,13 +208,17 @@ brush_alloc (datad *d, ggobid *gg)
 
   d->brush.nbins = BRUSH_NBINS;
 
+  vectorb_realloc (&d->included, nr);
+  vectorb_realloc (&d->pts_under_brush, nr);
+/*
   d->included = (gboolean *) g_realloc (d->included, nr * sizeof (gboolean));
   d->pts_under_brush = (gboolean *) g_realloc (d->pts_under_brush,
                                                nr * sizeof (gboolean));
+*/
 
   for (i=0; i<nr; i++) {
-    d->included[i] = true;
-    d->pts_under_brush[i] = false;
+    d->included.els[i] = true;
+    d->pts_under_brush.els[i] = false;
   }
 
   /*
@@ -246,7 +256,7 @@ brush_free (datad *d, ggobid *gg)
   br_glyph_ids_free (d, gg);
   br_color_ids_free (d, gg);
 
-  g_free ((gpointer) d->pts_under_brush);
+  vectorb_free (&d->pts_under_brush);
 
   for (k=0; k<d->brush.nbins; k++) {
     for (j=0; j<d->brush.nbins; j++)
@@ -277,6 +287,8 @@ brush_init (datad *d, ggobid *gg)
   d->brush.bin0.x = d->brush.bin1.x = BRUSH_NBINS;
   d->brush.bin0.y = d->brush.bin1.y = BRUSH_NBINS;
 
+  vectorb_init (&d->included);
+  vectorb_init (&d->pts_under_brush);
   brush_alloc (d, gg);
 }
 

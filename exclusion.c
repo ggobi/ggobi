@@ -43,21 +43,21 @@ clusters_set (datad *d, ggobid *gg) {
   /*
    * Find all glyphs and colors used among the cases in the current sample
   */
-  colors_used[0] = d->color_ids[0];
+  colors_used[0] = d->color_ids.els[0];
   ncolors_used = 1;
 
   if (!gg->mono_p) {
     for (i=0; i<d->nrows; i++) {
-      if (d->sampled[i]) {  /*-- if in current sample (subset) --*/
+      if (d->sampled.els[i]) {  /*-- if in current sample (subset) --*/
         new_color = true;
         for (k=0; k<ncolors_used; k++) {
-          if (colors_used[k] == d->color_ids[i]) {
+          if (colors_used[k] == d->color_ids.els[i]) {
             new_color = false;
             break;
           }
         }
         if (new_color) {
-          colors_used[ncolors_used] = d->color_ids[i];
+          colors_used[ncolors_used] = d->color_ids.els[i];
           ncolors_used++;
         }
       }
@@ -68,7 +68,7 @@ clusters_set (datad *d, ggobid *gg) {
   glyphs_used[0].size = d->glyph_ids[0].size;
   nglyphs_used = 1;
   for (i=0; i<d->nrows; i++) {
-    if (d->sampled[i]) {  /*-- if in current sample (subset) --*/
+    if (d->sampled.els[i]) {  /*-- if in current sample (subset) --*/
       new_glyph = true;
       for (k=0; k<nglyphs_used; k++) {
         if (glyphs_used[k].type == d->glyph_ids[i].type &&
@@ -108,11 +108,11 @@ clusters_set (datad *d, ggobid *gg) {
         */
         if (d->glyph_ids[i].type == glyphs_used[k].type &&
             d->glyph_ids[i].size == glyphs_used[k].size &&
-            d->color_ids[i] == colors_used[n])
+            d->color_ids.els[i] == colors_used[n])
         {
           new_cluster = true;
-          hidden = d->hidden[i];
-          included = d->included[i];
+          hidden = d->hidden.els[i];
+          included = d->included.els[i];
           /*
            * make sure it's not already a member of clusv[]
           */
@@ -145,12 +145,12 @@ clusters_set (datad *d, ggobid *gg) {
   */
   for (n=0; n<nclust; n++) {
     for (i=0; i<d->nrows; i++) {
-      if (d->sampled[i]) {
+      if (d->sampled.els[i]) {
         if (d->glyph_ids[i].type == d->clusv[n].glyphtype &&
             d->glyph_ids[i].size == d->clusv[n].glyphsize &&
-            d->color_ids[i] == d->clusv[n].color)
+            d->color_ids.els[i] == d->clusv[n].color)
         {
-          d->clusterids.vals[i] = n;
+          d->clusterids.els[i] = n;
         }
       }
     }
@@ -165,11 +165,11 @@ clusters_set (datad *d, ggobid *gg) {
   */
   if (nclust > 1) {
     for (i=0; i<d->nrows; i++) {
-      if (d->sampled[i]) {
-        k = d->clusterids.vals[i];
+      if (d->sampled.els[i]) {
+        k = d->clusterids.els[i];
 
-        d->hidden[i] = d->clusv[k].hidden;
-        d->included[i] = d->clusv[k].included;
+        d->hidden.els[i] = d->clusv[k].hidden;
+        d->included.els[i] = d->clusv[k].included;
         d->clusv[k].n++;
       }
     }

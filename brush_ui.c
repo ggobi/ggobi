@@ -99,7 +99,7 @@ brush_reset_cb (GtkWidget *w, gpointer cbd)
     case 0:  /*-- un-hide all points --*/
       for (m=0; m<d->nrows_in_plot; m++) {
         i = d->rows_in_plot[m];
-        d->hidden[i] = d->hidden_now[i] = false;
+        d->hidden.els[i] = d->hidden_now.els[i] = false;
       }
       displays_plot (NULL, FULL, gg);
       break;
@@ -110,7 +110,7 @@ brush_reset_cb (GtkWidget *w, gpointer cbd)
 
     case 3:  /*-- un-hide all lines --*/
       for (k=0; k<gg->nedges; k++) {
-        gg->line.hidden_now.vals[k] = gg->line.hidden.vals[k] = false;
+        gg->line.hidden_now.els[k] = gg->line.hidden.els[k] = false;
       }
       displays_plot (NULL, FULL, gg);
       break;

@@ -361,6 +361,7 @@ void vartable_row_append (gint, datad *, ggobid *);
 void vartable_select_var (gint, gboolean, datad *, ggobid *);
 void vartable_stats_set (datad *);
 void vartable_stats_set_by_var (gint j, datad *);
+void vectorb_alloc (vector_b *, gint);
 void vectorb_copy (vector_b *, vector_b *);
 void vectorb_free (vector_b *);
 void vectorb_init (vector_b *);

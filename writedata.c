@@ -48,7 +48,7 @@ set_rowv (gint *rowv, gchar *rootname, datad *d, ggobid *gg)
 
       for (i=0, j=0; i<d->nrows_in_plot; i++) {
         k = d->rows_in_plot[i];
-        if (!d->hidden_now[k])
+        if (!d->hidden_now.els[k])
           rowv[j++] = k;
       }
       nrows = j;
@@ -273,7 +273,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
   skipit = true;
   /*-- if no color differs from the default color, don't save colors --*/
   for (i=0; i<nr; i++) {
-    if (d->color_now[rowv[i]] != 0) {
+    if (d->color_now.els[rowv[i]] != 0) {
       skipit = false;
       break;
     }
@@ -310,7 +310,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
     skipit = true;
     /*-- if nothing is erased, skip it --*/
     for (i=0; i<nr; i++) {
-      if (d->hidden[rowv[i]] == 1) {
+      if (d->hidden.els[rowv[i]] == 1) {
         skipit = false;
         break;
       }
@@ -330,7 +330,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
     /*-- decide whether to save line colors --*/
     skipit = true;
     for (k=0; k<gg->nedges; k++) {
-      if (gg->line.color_now.vals[k] != 0) {
+      if (gg->line.color_now.els[k] != 0) {
         skipit = false;
         break;
       }
@@ -520,7 +520,7 @@ brush_save_colors (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
   else
   {
     for (i=0; i<nr; i++)
-      fprintf (fp, "%d\n", d->color_now[rowv[i]]);
+      fprintf (fp, "%d\n", d->color_now.els[rowv[i]]);
 
     if (fclose (fp) == EOF)
       fprintf(stderr, "error in writing color vector\n");
@@ -606,7 +606,7 @@ brush_save_erase (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
   }
 
   for (i=0; i<nr; i++)
-    fprintf(fp, "%ld\n", (glong) d->hidden[rowv[i]]);
+    fprintf(fp, "%ld\n", (glong) d->hidden.els[rowv[i]]);
 
   fclose(fp);
   return true;
@@ -650,7 +650,7 @@ linedata_get (endpointsd *tlinks, gshort *tcolors,
     if (start_a != -1 && start_b != -1) {  /* Both ends included */
       tlinks[nl].a = start_a + 1;
       tlinks[nl].b = start_b + 1;
-      tcolors[nl] = gg->line.color_now.vals[k];
+      tcolors[nl] = gg->line.color_now.els[k];
       nl++;
     }
   }
@@ -673,7 +673,7 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
       nl = gg->nedges;
       tlinks = gg->edge_endpoints;
       if (!gg->mono_p)
-        linecolors = gg->line.color_now.vals;
+        linecolors = gg->line.color_now.els;
 
     } else {
       /*

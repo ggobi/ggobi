@@ -141,7 +141,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
         m = d->rows_in_plot[i];
         draw_case = splot_plot_case (m, d, sp, display, gg);
 
-        if (draw_case && d->color_now[m] == current_color) {
+        if (draw_case && d->color_now.els[m] == current_color) {
           if (display->options.points_show_p) {
             fprintf (f, "<circle style=\"fill: %s; stroke: %s\"", cx, cx);
             /*-- write out sp->screen values --*/
@@ -175,15 +175,15 @@ splot_write_svg (splotd *sp, ggobid *gg)
       nl = 0;
 
       for (j=0; j<gg->nedges; j++) {
-        if (gg->line.hidden_now.vals[j]) {
+        if (gg->line.hidden_now.els[j]) {
           doit = false;
         } else {
           from = gg->edge_endpoints[j].a - 1;
           to = gg->edge_endpoints[j].b - 1;
-          doit = (!d->hidden_now[from] && !d->hidden_now[to]);
+          doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
         }
         if (doit) {
-          if (gg->line.color_now.vals[j] == current_color) {
+          if (gg->line.color_now.els[j] == current_color) {
             fprintf (f,
               "<path style=\"stroke: %s\" d=\"M %d %d L %d %d z\"/>\n",
               cx,

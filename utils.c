@@ -242,7 +242,7 @@ widget_initialized (GtkWidget *w) {
   gboolean initd = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w),
     "initialized"));
 
-  return (initd != NULL && initd == true) ? true : false;
+  return (initd != (gboolean) NULL && initd == true) ? true : false;
 }
 void
 widget_initialize (GtkWidget *w, gboolean initd) {

@@ -53,6 +53,15 @@ missing_arrays_add_cols (gint jvar, datad *d, ggobid *gg)
   }
 }
 
+void
+missing_arrays_add_rows (gint nrows, datad *d)
+{
+  if (d->nmissing > 0) {
+    arrays_add_rows (&d->missing, nrows);
+    arrayl_add_rows (&d->missing_jitter, nrows);
+    arrayl_add_rows (&d->missing_world, nrows);
+  }
+}
 
 /*------------------------------------------------------------------*/
 /*      Scaling and jittering missing value plots                   */

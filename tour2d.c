@@ -21,44 +21,44 @@ set_tour2dvar(ggobid *gg, gint jvar)
   extern void init_basis(displayd *, ggobid *);
 
   for (j=0; j<dsp->ntour_vars; j++)
-    if (jvar == dsp->tour_vars.vals[j])
+    if (jvar == dsp->tour_vars.els[j])
       selected = true;
 
   /* deselect var if ntour_vars > 2 */
   if (selected) {
     if (dsp->ntour_vars > 2) {
       for (j=0; j<dsp->ntour_vars; j++) {
-        if (jvar == dsp->tour_vars.vals[j]) 
+        if (jvar == dsp->tour_vars.els[j]) 
           break;
       }
       if (j<dsp->ntour_vars-1) {
         for (k=j; k<dsp->ntour_vars-1; k++){
-          dsp->tour_vars.vals[k] = dsp->tour_vars.vals[k+1];
+          dsp->tour_vars.els[k] = dsp->tour_vars.els[k+1];
 	}
       }
       dsp->ntour_vars--;
     }
   }
   else { /* not selected, so add the variable */
-    if (jvar > dsp->tour_vars.vals[dsp->ntour_vars-1]) {
-      dsp->tour_vars.vals[dsp->ntour_vars] = jvar;
+    if (jvar > dsp->tour_vars.els[dsp->ntour_vars-1]) {
+      dsp->tour_vars.els[dsp->ntour_vars] = jvar;
     }
-    else if (jvar < dsp->tour_vars.vals[0]) {
+    else if (jvar < dsp->tour_vars.els[0]) {
       for (j=dsp->ntour_vars; j>0; j--) {
-          dsp->tour_vars.vals[j] = dsp->tour_vars.vals[j-1];
+          dsp->tour_vars.els[j] = dsp->tour_vars.els[j-1];
       }
-      dsp->tour_vars.vals[0] = jvar;
+      dsp->tour_vars.els[0] = jvar;
     }
     else {
       for (j=0; j<dsp->ntour_vars-1; j++) {
-        if (jvar > dsp->tour_vars.vals[j] && jvar < dsp->tour_vars.vals[j+1]) {
+        if (jvar > dsp->tour_vars.els[j] && jvar < dsp->tour_vars.els[j+1]) {
           jtmp = j+1;
           break;
 	}
       }
       for (j=dsp->ntour_vars-1;j>=jtmp; j--) 
-          dsp->tour_vars.vals[j+1] = dsp->tour_vars.vals[j];
-      dsp->tour_vars.vals[jtmp] = jvar;
+          dsp->tour_vars.els[j+1] = dsp->tour_vars.els[j];
+      dsp->tour_vars.els[jtmp] = jvar;
     }
     dsp->ntour_vars++;
   }

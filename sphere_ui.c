@@ -111,7 +111,7 @@ vars_stdized_cb (GtkWidget *w, GdkEvent *event, datad *d)
   gint el, k;
 
   for (k=0; k<d->sphere.vars.nels; k++) {
-    el = d->sphere.vars.vals[k];
+    el = d->sphere.vars.els[k];
     if (d->vartable[el].tform2 != STANDARDIZE) {
       stdized = false;
       break;
@@ -145,8 +145,8 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
  * executed when the apply button is pressed
 */
   datad *d = gg->current_display->d;
-  gfloat firstpc = d->sphere.eigenval.vals[0];
-  gfloat lastpc = d->sphere.eigenval.vals[d->sphere.npcs-1];
+  gfloat firstpc = d->sphere.eigenval.els[0];
+  gfloat lastpc = d->sphere.eigenval.els[d->sphere.npcs-1];
 
   /* 
    * if datad has changed, refuse to do anything until the
@@ -196,7 +196,7 @@ scree_restore_cb (GtkWidget *w, datad *d)
     ggobid *gg = GGobiFromWidget (w, true);
     gint ncols = d->sphere.vars_sphered.nels;
 
-    if (d->sphere.vars.vals == NULL || d->sphere.vars.nels != ncols) {
+    if (d->sphere.vars.els == NULL || d->sphere.vars.nels != ncols) {
       sphere_malloc (ncols, d, gg);
     }
   

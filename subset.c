@@ -36,14 +36,14 @@ add_to_subset (gint i, datad *d, ggobid *gg) {
       d->rgroups[i].sampled = true;
       for (j=0; j<d->rgroups[i].nels; j++) {
         el = d->rgroups[i].els[j];
-        d->sampled[el] = true;
+        d->sampled.els[el] = true;
       }
     }
 
   } else {
-    if (d->included[i] == true) {
+    if (d->included.els[i] == true) {
       added = true;
-      d->sampled[i] = true;
+      d->sampled.els[i] = true;
     }
   }
 
@@ -56,7 +56,7 @@ subset_clear (datad *d, ggobid *gg) {
   gint i, rgid;
 
   for (i=0; i<d->nrows; i++)
-    d->sampled[i] = false;
+    d->sampled.els[i] = false;
 
   for (i=0; i<d->nrgroups; i++) {
     rgid = d->rgroup_ids[i];
@@ -100,7 +100,7 @@ subset_include_all (datad *d, ggobid *gg) {
   gint i, rgid;
 
   for (i=0; i<d->nrows; i++)
-    d->sampled[i] = true;
+    d->sampled.els[i] = true;
 
   if (d->nrgroups > 0) {
     rgid = d->rgroup_ids[i];

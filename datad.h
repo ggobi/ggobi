@@ -70,7 +70,7 @@ class datad {
 
  gint *rows_in_plot;
  gint nrows_in_plot;
- gboolean *sampled;
+ vector_b sampled;
 
  struct _Subset {
    gint random_n;
@@ -83,7 +83,8 @@ class datad {
  /*--------------- clusters: hiding, excluding ----------------------*/
 
  GtkWidget *exclusion_table;
- gboolean *included;
+/* gboolean *included;*/
+ vector_b included;
  
  gint nclusters;
  clusterd *clusv;
@@ -108,10 +109,16 @@ class datad {
 
  brush_coords brush_pos;  
  gint npts_under_brush;
+/*
  gboolean *pts_under_brush;
- gshort *color_ids, *color_now, *color_prev;  /* 0:ncolors-1 */
- glyphv *glyph_ids, *glyph_now, *glyph_prev;
+ gshort *color_ids, *color_now, *color_prev;
  gboolean *hidden, *hidden_now, *hidden_prev;
+*/
+ vector_b pts_under_brush;
+ vector_s color_ids, color_now, color_prev;  /* 0:ncolors-1 */
+ vector_b hidden, hidden_now, hidden_prev;
+ glyphv *glyph_ids, *glyph_now, *glyph_prev;
+
  struct _BrushBins {
    gint nbins;
    bin_struct **binarray;

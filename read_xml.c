@@ -525,10 +525,10 @@ setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
      }     
     } else
      if(type == ROW)
-       d->hidden[i] = d->hidden_now[i] = d->hidden_prev[i] = hidden;
+       d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = hidden;
      else {
-       gg->line.hidden.vals[i] = gg->line.hidden_now.vals[i] =
-         gg->line.hidden_prev.vals[i] = hidden;
+       gg->line.hidden.els[i] = gg->line.hidden_now.els[i] =
+         gg->line.hidden_prev.els[i] = hidden;
      }
   }
 
@@ -568,7 +568,7 @@ setColor(const CHAR **attrs, XMLParserData *data, int i)
     if(i < 0)
      data->defaults.color = value;
     else 
-     d->color_ids[i] = d->color_now[i] = d->color_prev[i] = value;    
+     d->color_ids.els[i] = d->color_now.els[i] = d->color_prev.els[i] = value;
   }
 
  return (value != -1);

@@ -132,7 +132,7 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i)
        && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) {  
      fprintf(f, " label=\"%s\"", gstr);
   }
-  fprintf(f, " color=\"%d\"", d->color_ids[i]);
+  fprintf(f, " color=\"%d\"", d->color_ids.els[i]);
 /*
   fprintf(f, " glyphSize=\"%d\"", d->glyph_ids[i].size);
   fprintf(f, " glyphType=\"%d\"", d->glyph_ids[i].type);

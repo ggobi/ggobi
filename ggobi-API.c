@@ -536,7 +536,7 @@ GGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size,
 void 
 GGOBI(setCaseColor)(gint pt, gint colorIndex, datad *d, ggobid *gg)
 {
-  d->color_ids[pt] = d->color_now[pt] = colorIndex;
+  d->color_ids.els[pt] = d->color_now.els[pt] = colorIndex;
 }
 
 void 
@@ -552,7 +552,7 @@ GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx,
 gint 
 GGOBI(getCaseColor) (gint pt, datad *d, ggobid *gg)
 {
-  return (d->color_now[pt]);
+  return (d->color_now.els[pt]);
 }
 
 gint *
@@ -574,7 +574,7 @@ GGOBI(getCaseColors)(gint *pts, gint howMany, datad *d, ggobid *gg)
 void 
 GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, datad *d, ggobid *gg)
 {
-  d->hidden[pt] = d->hidden_now[pt] = hidden_p;
+  d->hidden.els[pt] = d->hidden_now.els[pt] = hidden_p;
   /*-- don't replot --*/
 }
 
@@ -590,7 +590,7 @@ GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, datad *d, ggob
 gboolean
 GGOBI(getCaseHidden) (gint pt, datad *d, ggobid *gg)
 {
-  return (d->hidden_now[pt]);
+  return (d->hidden_now.els[pt]);
 }
 
 gboolean *

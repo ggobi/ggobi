@@ -221,9 +221,9 @@ zero_tau (displayd *dsp, ggobid *gg) {
   datad *d = dsp->d;
 
   for (k=0; k<d->ncols; k++) {
-    dsp->lambda.vals[k]  = 0.0;
-    dsp->tau.vals[k]  = 0.0;
-    dsp->tinc.vals[k] = 0.0;
+    dsp->lambda.els[k]  = 0.0;
+    dsp->tau.els[k]  = 0.0;
+    dsp->tinc.els[k] = 0.0;
   }
 }
 
@@ -233,7 +233,7 @@ zero_tinc(displayd *dsp, ggobid *gg) {
   gint k;
 
   for (k=0; k<d->ncols; k++) {
-    dsp->tinc.vals[k] = 0.0;
+    dsp->tinc.els[k] = 0.0;
   }
 }
 
@@ -264,10 +264,10 @@ display_tour_init (displayd *dsp, ggobid *gg) {
     /* Initialize starting subset of active variables */
   dsp->ntour_vars = nc;
   for (j=0; j<nc; j++)
-    dsp->tour_vars.vals[j] = j;
-  /*  dsp->tour_vars.vals[0] = 0;
-  dsp->tour_vars.vals[1] = 1;
-  dsp->tour_vars.vals[2] = 2;*/
+    dsp->tour_vars.els[j] = j;
+  /*  dsp->tour_vars.els[0] = 0;
+  dsp->tour_vars.els[1] = 1;
+  dsp->tour_vars.els[2] = 2;*/
 
   /* declare starting base as first p chosen variables */
   for (i=0; i<nc; i++)
@@ -278,11 +278,11 @@ display_tour_init (displayd *dsp, ggobid *gg) {
 
   for (i=0; i<nc; i++)
   {
-    dsp->u1.vals[i][dsp->tour_vars.vals[i]] =
-      dsp->u0.vals[i][dsp->tour_vars.vals[i]] = 
-      dsp->u.vals[i][dsp->tour_vars.vals[i]] =
-      dsp->v0.vals[i][dsp->tour_vars.vals[i]] = 
-      dsp->v1.vals[i][dsp->tour_vars.vals[i]] = 1.0;
+    dsp->u1.vals[i][dsp->tour_vars.els[i]] =
+      dsp->u0.vals[i][dsp->tour_vars.els[i]] = 
+      dsp->u.vals[i][dsp->tour_vars.els[i]] =
+      dsp->v0.vals[i][dsp->tour_vars.els[i]] = 
+      dsp->v1.vals[i][dsp->tour_vars.els[i]] = 1.0;
   }
 
   /*  dsp->ts[0] = 0;
@@ -489,9 +489,9 @@ eigen_clear (displayd *dsp)
       dsp->v0.vals[j][k] = 0.;
       dsp->v1.vals[j][k] = 0.;
     }
-    dsp->lambda.vals[j] = 0.;
-    dsp->tau.vals[j] = 0.;
-    dsp->tinc.vals[j] = 0.;
+    dsp->lambda.els[j] = 0.;
+    dsp->tau.els[j] = 0.;
+    dsp->tinc.els[j] = 0.;
   }
 
 }
@@ -544,7 +544,7 @@ void path(displayd *dsp, gint nd) {
     if (!matmult_utv(dsp->u0.vals, dsp->u1.vals, nc, nd, nc, nd, dsp->tv.vals))
       printf("#cols != #rows in the two matrices");
       
-      dsvd(dsp->tv.vals, nd, nd, dsp->lambda.vals, dsp->v1.vals);
+      dsvd(dsp->tv.vals, nd, nd, dsp->lambda.els, dsp->v1.vals);
 
       copy_mat(dsp->v0.vals, dsp->tv.vals, nd, nd);
 
@@ -554,23 +554,23 @@ void path(displayd *dsp, gint nd) {
       if (nd > 2) {
         /*-- obtain ranks to use in sorting eigenvals and eigenvec --*/
         for (i=0; i<nd; i++) {
-          pairs[i].f = (gfloat) dsp->lambda.vals[i];
+          pairs[i].f = (gfloat) dsp->lambda.els[i];
           pairs[i].indx = i;
         }
-        qsort ((gchar *) pairs, (size_t) dsp->lambda.vals, sizeof (paird), pcompare);
+        qsort ((gchar *) pairs, (size_t) dsp->lambda.els, sizeof (paird), pcompare);
 
        /*-- sort the eigenvalues and eigenvectors into temporary arrays --*/
        for (i=0; i<nd; i++) {
          k = (nd - i) - 1;  /*-- to reverse the order --*/
          rank = pairs[i].indx;
-         e[k] = dsp->lambda.vals[rank];
+         e[k] = dsp->lambda.els[rank];
          for (j=0; j<nd; j++)
            dsp->tv.vals[j][k] = dsp->v0.vals[j][rank];
        }
 
        /*-- copy the sorted eigenvalues and eigenvectors back --*/
        for (i=0; i<nd; i++) {
-         dsp->lambda.vals[i] = e[i];
+         dsp->lambda.els[i] = e[i];
          for (j=0; j<nd; j++)
            dsp->v0.vals[j][i] = dsp->tv.vals[j][i];
        }
@@ -588,10 +588,10 @@ void path(displayd *dsp, gint nd) {
        }
      }
      else if (nd == 2) {
-       if (dsp->lambda.vals[1] > dsp->lambda.vals[0]) {
-         e[0] = dsp->lambda.vals[1];
-         dsp->lambda.vals[1] = dsp->lambda.vals[0];
-         dsp->lambda.vals[0] = e[0];
+       if (dsp->lambda.els[1] > dsp->lambda.els[0]) {
+         e[0] = dsp->lambda.els[1];
+         dsp->lambda.els[1] = dsp->lambda.els[0];
+         dsp->lambda.els[0] = e[0];
          for (j=0; j<nd; j++) {
            dsp->tv.vals[j][1] = dsp->v0.vals[j][0];
            dsp->v0.vals[j][0] = dsp->v0.vals[j][1];
@@ -619,15 +619,15 @@ void path(displayd *dsp, gint nd) {
        equivalent to setting the lambda's to be 1.0 at this stage.*/
       dI = 0;
       for (i=0; i<nd; i++) {
-	if (dsp->lambda.vals[i] > 1.0-tol) {
-	  dI++;
-	  dsp->lambda.vals[i] = 1.0;
-	}
+        if (dsp->lambda.els[i] > 1.0-tol) {
+          dI++;
+          dsp->lambda.els[i] = 1.0;
+        }
       }
     
       /*  Compute principal angles */
       for (i=0; i<nd; i++)
-	dsp->tau.vals[i] = (gfloat) acos((gdouble) dsp->lambda.vals[i]);
+        dsp->tau.els[i] = (gfloat) acos((gdouble) dsp->lambda.els[i]);
       
       /*  Calculate principal directions */
       if (nd > dI) {
@@ -644,16 +644,16 @@ void path(displayd *dsp, gint nd) {
       else {
         copy_mat(dsp->v0.vals, dsp->u0.vals, nc, nd);
         copy_mat(dsp->v1.vals, dsp->u0.vals, nc, nd);
-	for (i=0; i<nd; i++)
-	  dsp->tau.vals[i] = 0.0;
+        for (i=0; i<nd; i++)
+          dsp->tau.els[i] = 0.0;
       }
 
       /* Construct current basis*/
       for (i=0; i<nd; i++)
-	dsp->tinc.vals[i]=0.0;
+        dsp->tinc.els[i]=0.0;
       for (i=0; i<nd; i++) {
-	ptinc[0][i] = (gfloat) cos((gdouble) dsp->tinc.vals[i]);
-	ptinc[1][i] = (gfloat) sin((gdouble) dsp->tinc.vals[i]);
+        ptinc[0][i] = (gfloat) cos((gdouble) dsp->tinc.els[i]);
+        ptinc[1][i] = (gfloat) sin((gdouble) dsp->tinc.els[i]);
       }
 
       for (i=0; i<nd; i++) {
@@ -678,7 +678,7 @@ void path(displayd *dsp, gint nd) {
       /* Calculate Euclidean norm of principal angles.*/
       dsp->dv = 0.0;
       for (i=0; i<nd; i++)
-	dsp->dv += (dsp->tau.vals[i]*dsp->tau.vals[i]);
+        dsp->dv += (dsp->tau.els[i]*dsp->tau.els[i]);
       dsp->dv = (gfloat)sqrt((gdouble)dsp->dv);
 
       /* Reset increment counters.*/
@@ -691,7 +691,7 @@ void path(displayd *dsp, gint nd) {
     }
     else {
       for (i=0; i<nd; i++)
-	dsp->tau.vals[i] = 0.0;
+        dsp->tau.els[i] = 0.0;
       copy_mat(dsp->v0.vals, dsp->u0.vals, nc, nd);
       copy_mat(dsp->v1.vals, dsp->u0.vals, nc, nd);
       dsp->tour_nsteps = 0;
@@ -719,8 +719,8 @@ void tour_reproject(displayd *dsp, gint nd)
     ptinc[i] = (gfloat *) g_malloc (nd * sizeof (gfloat));
 
   for (i=0; i<nd; i++) {
-    ptinc[0][i] = (gfloat) cos((gdouble) dsp->tinc.vals[i]);
-    ptinc[1][i] = (gfloat) sin((gdouble) dsp->tinc.vals[i]);
+    ptinc[0][i] = (gfloat) cos((gdouble) dsp->tinc.els[i]);
+    ptinc[1][i] = (gfloat) sin((gdouble) dsp->tinc.els[i]);
   }
 
   for (i=0; i<nd; i++) {
@@ -766,7 +766,7 @@ increment_tour(displayd *dsp, gint nd)
   printf("\n");*/
 
   for (i=0; i<nd; i++) 
-    if (dsp->tinc.vals[i] > dsp->tau.vals[i]) {
+    if (dsp->tinc.els[i] > dsp->tau.els[i]) {
       attheend = true;
       dsp->tour_nsteps = dsp->tour_stepcntr;
     }
@@ -774,11 +774,11 @@ increment_tour(displayd *dsp, gint nd)
   if (attheend || dsp->tour_nsteps == 0 || 
       dsp->tour_nsteps == dsp->tour_stepcntr) {
     for (i=0; i<nd; i++)
-      dsp->tinc.vals[i] = dsp->tau.vals[i];
+      dsp->tinc.els[i] = dsp->tau.els[i];
   }
   else {
     for (i=0; i<nd; i++)
-      dsp->tinc.vals[i] += dsp->delta*dsp->tau.vals[i]/dsp->dv;
+      dsp->tinc.els[i] += dsp->delta*dsp->tau.els[i]/dsp->dv;
   }
 }
 
@@ -798,7 +798,7 @@ do_last_increment(displayd *dsp, gint nd)
   int j;
 
   for (j=0; j<nd; j++)
-    dsp->tinc.vals[j] = dsp->tau.vals[j];
+    dsp->tinc.els[j] = dsp->tau.els[j];
 
 }
 
@@ -882,15 +882,15 @@ gt_basis (displayd *dsp, ggobid *gg, gint nd)
           check = 1;
           if (nd == 1) {
             if (2*j <= dsp->ntour_vars) {
-              dsp->u1.vals[0][dsp->tour_vars.vals[2*j]] = (gfloat) frnorm[0];
+              dsp->u1.vals[0][dsp->tour_vars.els[2*j]] = (gfloat) frnorm[0];
               if (2*j+1 < dsp->ntour_vars) 
-                dsp->u1.vals[0][dsp->tour_vars.vals[2*j+1]] = (gfloat) frnorm[1];
+                dsp->u1.vals[0][dsp->tour_vars.els[2*j+1]] = (gfloat) frnorm[1];
 	    }
 	  }
           else if (nd == 2) {
             if (j <= dsp->ntour_vars) {
-              dsp->u1.vals[0][dsp->tour_vars.vals[j]] = (gfloat) frnorm[0];
-              dsp->u1.vals[1][dsp->tour_vars.vals[j]] = (gfloat) frnorm[1];
+              dsp->u1.vals[0][dsp->tour_vars.els[j]] = (gfloat) frnorm[0];
+              dsp->u1.vals[1][dsp->tour_vars.els[j]] = (gfloat) frnorm[1];
 	    }
 	  }
       }
@@ -909,6 +909,6 @@ gt_basis (displayd *dsp, ggobid *gg, gint nd)
   else
   {
     for (k=0; k<nd; k++) 
-      dsp->u1.vals[k][dsp->tour_vars.vals[k]] = 1.;
+      dsp->u1.vals[k][dsp->tour_vars.els[k]] = 1.;
   }
 }

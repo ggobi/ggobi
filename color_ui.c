@@ -333,7 +333,7 @@ set_color_fg ( GtkWidget *w, GdkEventButton *event , ggobid *gg)
   datad *d = display->d;
 
   for (i=0; i<d->nrows; i++)
-    d->color_prev[i] = d->color_ids[i];
+    d->color_prev.els[i] = d->color_ids.els[i];
   gg->color_id = k;
 
   if (event->type==GDK_2BUTTON_PRESS || event->type==GDK_3BUTTON_PRESS) {

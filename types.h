@@ -55,19 +55,19 @@ typedef struct {
 
 /*-- vectors --*/
 typedef struct {
-  gfloat *vals;
+  gfloat *els;
   guint nels;
 } vector_f;
 typedef struct {
-  gint *vals;
+  gint *els;
   guint nels;
 } vector_i;
 typedef struct {
-  gshort *vals;
+  gshort *els;
   guint nels;
 } vector_s;
 typedef struct {
-  gboolean *vals;
+  gboolean *els;
   guint nels;
 } vector_b;
 

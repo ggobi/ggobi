@@ -44,19 +44,19 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
     if (!binned) {
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
-        if (d->hidden_now[m]) {  /*-- if it's hidden, we don't care --*/
+        if (d->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
           new_color = false;
         } else {
           new_color = true;
           for (k=0; k<*ncolors_used; k++) {
-            if (colors_used[k] == d->color_now[m]) {
+            if (colors_used[k] == d->color_now.els[m]) {
               new_color = false;
               break;
             }
           }
         }
         if (new_color) {
-          colors_used[*ncolors_used] = d->color_now[m];
+          colors_used[*ncolors_used] = d->color_now.els[m];
           (*ncolors_used)++;
         }
       }
@@ -75,19 +75,19 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
         for (iv=bin0->y; iv<=bin1->y; iv++) {
           for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
             j = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
-            if (d->hidden_now[j]) {  /*-- if it's hidden, we don't care --*/
+            if (d->hidden_now.els[j]) {  /*-- if it's hidden, we don't care --*/
               new_color = false;
             } else {
               new_color = true;
               for (k=0; k<*ncolors_used; k++) {
-                if (colors_used[k] == d->color_now[j]) {
+                if (colors_used[k] == d->color_now.els[j]) {
                   new_color = false;
                   break;
                 }
               }
             }
             if (new_color) {
-              colors_used[*ncolors_used] = d->color_now[j];
+              colors_used[*ncolors_used] = d->color_now.els[j];
               (*ncolors_used)++;
             }
           }
@@ -110,7 +110,7 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
     /* insurance -- eg if using mono drawing on a color screen */
     if (*ncolors_used == 0) {
       *ncolors_used = 1;
-      colors_used[0] = d->color_now[0];
+      colors_used[0] = d->color_now.els[0];
     }
   }
 }
@@ -122,7 +122,7 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
 
   /*-- determine whether case m should be plotted --*/
   draw_case = true;
-  if (d->hidden_now[m])
+  if (d->hidden_now.els[m])
     draw_case = false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
@@ -201,7 +201,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
         m = d->rows_in_plot[i];
         draw_case = splot_plot_case (m, d, sp, display, gg);
 
-        if (draw_case && d->color_now[m] == current_color) {
+        if (draw_case && d->color_now.els[m] == current_color) {
           if (display->options.points_show_p)
             draw_glyph (sp->pixmap0, &d->glyph_now[m], sp->screen, m, gg);
 
@@ -310,7 +310,9 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
           for (iv=bin0->y; iv<=bin1->y; iv++) {
             for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
               i = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
-              if (!d->hidden_now[i] && d->color_now[i] == current_color) {
+              if (!d->hidden_now.els[i] &&
+                   d->color_now.els[i] == current_color)
+              {
                 draw_glyph (sp->pixmap0, &d->glyph_now[i], sp->screen, i, gg);
 
                 /* parallel coordinate plot whiskers */
@@ -422,7 +424,7 @@ splot_add_point_label (splotd *sp, gint k, gboolean nearest, ggobid *gg) {
         gdk_gc_set_line_attributes (gg->plot_GC,
           3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
         gdk_gc_set_foreground (gg->plot_GC,
-          &gg->default_color_table[d->color_now[k]]);
+          &gg->default_color_table[d->color_now.els[k]]);
 
         n = 2*k;
         gdk_draw_line (sp->pixmap1, gg->plot_GC,
@@ -537,25 +539,25 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
    * currently in use into the line_colors_used[] vector.
   */
   *ncolors_used = 1;
-  colors_used[0] = gg->line.color_now.vals[0];
+  colors_used[0] = gg->line.color_now.els[0];
 
   if (display->options.edges_directed_show_p ||
       display->options.edges_undirected_show_p)
   {
     for (i=0; i<gg->nedges; i++) {
-      if (gg->line.hidden_now.vals[i])
+      if (gg->line.hidden_now.els[i])
         new_color = false;
       else {
         new_color = true;
         for (k=0; k<*ncolors_used; k++) {
-          if (colors_used[k] == gg->line.color_now.vals[i]) {
+          if (colors_used[k] == gg->line.color_now.els[i]) {
             new_color = false;
             break;
           }
         }
       }
       if (new_color) {
-        colors_used[*ncolors_used] = gg->line.color_now.vals[i];
+        colors_used[*ncolors_used] = gg->line.color_now.els[i];
         (*ncolors_used)++;
       }
     }
@@ -587,12 +589,12 @@ edges_draw (splotd *sp, ggobid *gg)
       nl = 0;
 
       for (j=0; j<gg->nedges; j++) {
-        if (gg->line.hidden_now.vals[j]) {
+        if (gg->line.hidden_now.els[j]) {
           doit = false;
         } else {
           from = gg->edge_endpoints[j].a - 1;
           to = gg->edge_endpoints[j].b - 1;
-          doit = (!d->hidden_now[from] && !d->hidden_now[to]);
+          doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
 
         /* If not plotting imputed values, and one is missing, skip it */
 /*
@@ -611,7 +613,7 @@ edges_draw (splotd *sp, ggobid *gg)
         }
 
         if (doit) {
-          if (gg->line.color_now.vals[j] == current_color) {
+          if (gg->line.color_now.els[j] == current_color) {
             sp->edges[nl].x1 = sp->screen[from].x;
             sp->edges[nl].y1 = sp->screen[from].y;
             sp->edges[nl].x2 = sp->screen[to].x;
