@@ -69,8 +69,6 @@
 #include "GGobiAPI.h"
 
 
-gint checkLevelValue(vartabled *vt, double value);
-
 void setColorScheme(const xmlChar **attrs, XMLParserData *data);
 
 void startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs);
@@ -1072,6 +1070,7 @@ setRecordValue(const char *tmp, datad *d, XMLParserData *data)
     if(vt->vartype == categorical) {
       if(data->autoLevels && data->autoLevels[data->current_element]) {
         value = getAutoLevelIndex(tmp, data, vt);
+        vt->level_counts[(gint)value]++;
       } else {
         gint level = checkLevelValue(vt, value);
         if (level == -1) {
