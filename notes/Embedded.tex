@@ -171,6 +171,10 @@ the symbols that are static variables
  nm -A *.o | grep ' [a-tA-Z] ' | grep -v ' [UTtb] ' | grep -v '.*\.[0-9]*$'
 \end{verbatim}
 
+There are still a lot of statics to be dealt with.
+
+We need to remove the macros from ggobi.h as we go to
+make things simpler. Just need to find the time.
 
 
 
