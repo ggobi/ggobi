@@ -537,6 +537,64 @@ resolveAllEdgeIds(XMLParserData *parserData)
 
 }
 
+/*-- used to find ranks --*/
+gint
+edgesumcompare (const void *val1, const void *val2)
+{
+  const endpointsd *etmp1 = (const endpointsd *) val1;
+  const endpointsd *etmp2 = (const endpointsd *) val2;
+
+  if (etmp1->a + etmp1->b < etmp2->a + etmp2->b)
+    return (-1);
+  if (etmp1->a + etmp1->b == etmp2->a + etmp2->b)
+    return (0);
+  return (1);
+}
+
+void 
+setEdgePartners (XMLParserData *parserData)
+{
+  datad *d = getCurrentXMLData(parserData);
+  gint i, k, sum;
+
+  if (d->edge.n) {
+    /*-- sort the edges in the order of source + destination --*/
+    endpointsd *etmp = g_malloc (d->edge.n * sizeof(endpointsd));
+    for (i=0; i<d->edge.n; i++) {
+      etmp[i].a = d->edge.endpoints[i].a;
+      etmp[i].b = d->edge.endpoints[i].b;
+      etmp[i].jpartner = i;
+    }
+    qsort ((gchar *) etmp, d->edge.n, sizeof (endpointsd), edgesumcompare);
+/*g_printerr ("sorted\n");*/
+
+    sum = 0;
+    for (i=0; i<d->edge.n-1; i++) {
+      if (etmp[i].a + etmp[i].b != sum) {
+        sum = etmp[i].a + etmp[i].b;
+        k = i+1;
+        while (k < d->edge.n) {
+          if (etmp[k].a + etmp[k].b != sum)
+            break;
+          if (etmp[k].b == etmp[i].a && etmp[k].a == etmp[i].b) {
+            d->edge.endpoints[etmp[i].jpartner].jpartner = etmp[k].jpartner;
+            d->edge.endpoints[etmp[k].jpartner].jpartner = etmp[i].jpartner;
+/*
+g_printerr ("partners: a,b,j %d %d %d  a,b,j %d %d %d\n",
+d->edge.endpoints[i].a, d->edge.endpoints[i].b, d->edge.endpoints[i].jpartner,
+d->edge.endpoints[k].a, d->edge.endpoints[k].b, d->edge.endpoints[k].jpartner);
+*/
+          }
+          k++;
+        }
+      }
+    }
+
+/*g_printerr ("assigned jpartners\n");*/
+    g_free (etmp);
+  }
+}
+
 void endXMLElement(void *user_data, const xmlChar *name)
 {
   XMLParserData *data = (XMLParserData*)user_data;
@@ -546,11 +604,13 @@ void endXMLElement(void *user_data, const xmlChar *name)
     case EDGES:
       resolveEdgeIds(data);
     case DATASET:
+      setEdgePartners(data);
       releaseCurrentDataInfo(data);
     break;
+
     case EDGE:
       data->current_record++;
-      break;
+    break;
     case RECORD:
       setRecordValues(data, data->recordString, data->recordStringLength);
       data->current_record++;
@@ -1298,12 +1358,16 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
       /* Mark this as being a variable for which we must compute the levels. */
     if( (tmp = getAttribute(attrs, "levels")) && strcmp(tmp, "auto") == 0) {
       if(data->autoLevels == NULL) {
-         data->autoLevels = (GHashTable **) g_malloc(sizeof(GHashTable*) * data->current_data->ncols);
-         memset(data->autoLevels, '\0', sizeof(gboolean) * data->current_data->ncols);
+         data->autoLevels = (GHashTable **)
+           g_malloc(sizeof(GHashTable*) * data->current_data->ncols);
+         memset(data->autoLevels, '\0',
+           sizeof(gboolean) * data->current_data->ncols);
       }
-       /* glib-2.0 provides a g_hash_table_new_full with which we can specify the `free' routine
-          for elements. This should simplify (slightly) releaseCurrentDataInfo(). */
-      data->autoLevels[data->current_variable] = g_hash_table_new(g_str_hash, g_str_equal);
+       /* glib-2.0 provides a g_hash_table_new_full with which we can
+          specify the `free' routine for elements. This should simplify
+          (slightly) releaseCurrentDataInfo(). */
+      data->autoLevels[data->current_variable] = g_hash_table_new(g_str_hash,
+        g_str_equal);
     }
   } else if (strcmp((const char *)tagName, "integervariable") == 0) {
     el->vartype = integer;
@@ -1801,7 +1865,6 @@ getCurrentXMLData(XMLParserData* parserData)
 void
 setEdge(gint start, gint end, gint i, datad *d)
 {
-    gint k;
     /*-- if encountering the first edge, allocate endpoints array --*/
     if (d->edge.n == 0) 
       edges_alloc (d->nrows, d);
@@ -1809,12 +1872,16 @@ setEdge(gint start, gint end, gint i, datad *d)
     d->edge.endpoints[i].a = start;
     d->edge.endpoints[i].b = end;
     d->edge.endpoints[i].jpartner = -1;  /*-- default value --*/
+/* Replacing this code with a single sweep in setEdgePartners */
+/*
+    gint k;
     for (k=0; k<i; k++) {
       if (d->edge.endpoints[k].a == end && d->edge.endpoints[k].b == start) {
         d->edge.endpoints[i].jpartner = k;
         d->edge.endpoints[k].jpartner = i;
       }
     }
+*/
 }
 
 gboolean
