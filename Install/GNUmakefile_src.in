@@ -25,9 +25,11 @@ SRC=\
     display_ui.c \
     exclusion.c \
     exclusion_ui.c \
+	extendedDisplay.c \
     fileio.c \
     ggobi-API.c \
     ggobi.c \
+    ggobiClass.c \
     identify.c \
     identify_ui.c \
     impute.c \
@@ -76,6 +78,8 @@ SRC=\
     texture.c \
     timeplot.c \
     time_ui.c \
+	tsdisplay.c \
+	tsPlot.c \
     tour.c \
     tour_pp.c \
     tour1d.c \

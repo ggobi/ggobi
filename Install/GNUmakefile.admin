@@ -34,8 +34,6 @@ DATA_SRC_FILES=\
    laser.col laser.dat laser.doc laser.xml \
    ggobi.dtd
 
-# Note that COI which provides an example of an XML file containing
-# 2 data sets is not included. Can we ship it?
 
 DATA_FILES=$(DATA_SRC_FILES:%=data/%)  notes/colorschemes.xml
 
@@ -51,11 +49,13 @@ DOC_FILES=$(DOC_TEX_FILES:%=Docs/%.$(DOC_EXTENSION)) Docs/ggobi.css Docs/Embeddi
 C_SRC_FILES=$(SRC) $(XML_SRC) xmlConvert.c 
 
 C_HEADER_FILES=\
-  GGobiAPI brushing cpanel datad defines display display_tree \
-  externs ggobi noop-toggle read_xml  \
-  splot types vars varseldata write_xml writedata vartable gtkext fileio \
-  print tour1d_pp tour2d_pp tour_pp splash read_init write_state \
-  plugin colorscheme \
+  GGobiAPI barchartDisplay brushing colorscheme cpanel datad defines \
+  display display_tree \
+  externs fileio ggobi ggobiClass noop-toggle plugin read_xml  \
+  splot types vars varseldata write_xml writedata gtkext \
+  tour1d_pp tour2d_pp tour_pp splash read_init \
+  tsdisplay tsPlot vartable write_state \
+  print \
   dbms dbms_ui
 
 Install/configure: Install/configure.in
