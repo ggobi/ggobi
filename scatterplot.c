@@ -324,7 +324,10 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   gtk_widget_show (table);
 
   /*-- position the display toward the lower left of the main window --*/
+/*-- Turning this off; never places the window correctly anyway - dfs --*/
+/*
   display_set_position (display, gg);
+*/
 
   gtk_widget_show_all (display->window);
   

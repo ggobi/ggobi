@@ -6,6 +6,7 @@
   that is desired.
   (More likely to be correct than writing a Perl script!)
  */
+#include <string.h>
 
 
 XmlWriteInfo *updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info);

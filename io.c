@@ -9,6 +9,7 @@
     it without violating AT&T's intellectual property rights.
 */
 
+#include <string.h>
 #ifdef USE_STRINGS_H
 #include <strings.h>
 #endif

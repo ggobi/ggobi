@@ -148,10 +148,6 @@ pipeline_init (datad *d, ggobid *gg)
   /*-- run the first half of the pipeline --*/
   arrayf_copy (&d->raw, &d->tform);
 
-/*
-  vartable_stats_set (d, gg);
-  vartable_lim_update (d, gg);
-*/
   limits_set (true, true, d);  
   vartable_limits_set (d);  /*-- does this do something here?  --*/
   vartable_stats_set (d);  /*-- does this do something here?  --*/

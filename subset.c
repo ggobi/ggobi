@@ -17,6 +17,8 @@ Todo:
  probably a bit more work will be needed when tour is added
 */
 
+#include <string.h>
+
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"

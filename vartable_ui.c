@@ -10,6 +10,7 @@
 */
 /* interface code for the variable statistics table */
 
+#include <string.h>
 #include <stdlib.h>
 
 #include <gtk/gtk.h>

@@ -1,5 +1,7 @@
 /* sphere_ui.c */
 
+#include <string.h>
+
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"

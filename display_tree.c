@@ -1,5 +1,6 @@
 /*-- display_tree.c --*/
 #include <stdlib.h>
+#include <string.h>
 
 #include "ggobi.h"
 /* #include "display_tree.h" */

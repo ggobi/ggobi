@@ -449,7 +449,6 @@ void
 tourcorr_run(displayd *dsp, ggobid *gg)
 {
   datad *d = dsp->d;
-  gint i;
   extern gboolean reached_target(gint, gint);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);

@@ -9,6 +9,7 @@
     it without violating AT&T's intellectual property rights.
 */
 #include <math.h>
+#include <string.h>
 #include <stdlib.h>
 #include <gtk/gtk.h>
 

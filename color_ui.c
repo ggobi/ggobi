@@ -201,7 +201,8 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
   gdk_color.blue = (guint16)(color[2]*65535.0);
 
   /* Allocate color */
-  gdk_colormap_alloc_color (cmap, &gdk_color, false, true);
+/*  gdk_colormap_alloc_color (cmap, &gdk_color, false, true);*/
+  gdk_color_alloc (cmap, &gdk_color);
 
   if (gg->color_ui.current_da == gg->color_ui.bg_da) {
     gg->bg_color = gdk_color;

@@ -34,6 +34,7 @@
 */
 
 
+#include <string.h>  /*-- dfs, linux gcc is complaining --*/
 #include <math.h>
 #include <gtk/gtksignal.h>
 #include "gtkextruler.h"
@@ -90,7 +91,8 @@ gtk_ext_ruler_get_type (void)
     return ruler_type;
 }
 
-static gint gtk_ext_ruler_enter_notify(GtkWidget *widget,GdkEventCrossing *event)
+static gint
+gtk_ext_ruler_enter_notify (GtkWidget *widget,GdkEventCrossing *event)
 {
     GtkExtRuler *ruler;
     g_return_val_if_fail(GTK_IS_EXT_RULER(widget),0);
