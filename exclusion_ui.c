@@ -216,7 +216,6 @@ static gint comp_cluster_cb(GtkToggleButton * btn, gpointer cbd)
   return false;
 }
 
-/*-- could add a callback to the symbol some day --*/
 static gint
 cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 {
@@ -230,6 +229,7 @@ cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   gint nclusters = symbol_table_populate(d);
   gboolean proceed = true;
   gint targets = cpanel->br_point_targets;
+  gint nd = g_slist_length(gg->d);
 /*
   gint nclusters_after;
   nclusters_after = symbol_table_populate (d);
@@ -301,8 +301,8 @@ cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 */
   if (!proceed) {
     quick_message
-        ("You're about to reset the color and/or glyph for this cluster\nin such a way as to merge it with another cluster.  I bet\nthat's not what you intend, so I won't let you do it.\n",
-         false);
+      ("You're about to reset the color and/or glyph for this cluster\nin such a way as to merge it with another cluster.  I bet\nthat's not what you intend, so I won't let you do it.\n",
+       false);
     return true;
   }
 
@@ -329,6 +329,10 @@ cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
         /*-- this will be done multiple times, but who cares? --*/
         d->clusv[n].glyphsize = gg->glyph_id.size;
       }
+
+      /*-- link so that displays of linked datad's will be brushed as well --*/
+      if (nd > 1 && !gg->linkby_cv)
+        symbol_link_by_id (true, i, d, gg);
     }
   }
 
