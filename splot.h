@@ -45,7 +45,8 @@ typedef struct {
  */
  fcoords scale, tour_scale;
  lcoords iscale;
- icoords ishift;
+ /*icoords ishift;*/  /*-- shift in screen coords --*/
+ lcoords pmid;	  /*-- center of the screen in planar coords --*/
 
 /*
  * button and key event information

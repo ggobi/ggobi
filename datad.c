@@ -43,20 +43,20 @@ datad_new(datad *d, ggobid *gg)
   memset(d, 0, sizeof(datad));
 
   /*-- initialize arrays to NULL --*/
-  arrayf_null (&d->raw);
-  arrayf_null (&d->tform);
-  arrayl_null (&d->world);
-  arrayl_null (&d->jitdata);
+  arrayf_init_null (&d->raw);
+  arrayf_init_null (&d->tform);
+  arrayl_init_null (&d->world);
+  arrayl_init_null (&d->jitdata);
 
-  arrays_null (&d->missing);
-  arrayl_null (&d->missing_world);
-  arrayl_null (&d->missing_jitter);
+  arrays_init_null (&d->missing);
+  arrayl_init_null (&d->missing_world);
+  arrayl_init_null (&d->missing_jitter);
 
-  vectori_null (&d->clusterid);
+  vectori_init_null (&d->clusterid);
 
   /*-- brushing and linking --*/
-  rowids_null (d);
-  vectorb_null (&d->edge.xed_by_brush);
+  rowids_init_null (d);
+  vectorb_init_null (&d->edge.xed_by_brush);
 
   sphere_init (d);
 

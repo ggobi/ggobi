@@ -38,8 +38,7 @@ scale_pan_reset (ggobid *gg) {
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
-  sp->ishift.x = sp->max.x/2;
-  sp->ishift.y = sp->max.y/2;
+  sp->pmid.x = sp->pmid.y = 0;
 
   splot_plane_to_screen (display, &display->cpanel, sp, gg);
   ruler_ranges_set (gg->current_display, sp, gg);
@@ -620,14 +619,6 @@ scaling_visual_cues_draw (splotd *sp, ggobid *gg) {
       gdk_draw_line (sp->pixmap1, gg->plot_GC,
         sp->da->allocation.width/2, 0,
         sp->da->allocation.width/2, sp->da->allocation.height);
-/*
-      gdk_draw_line (sp->pixmap1, gg->plot_GC,
-        0, sp->ishift.y,
-        sp->da->allocation.width, sp->ishift.y);
-      gdk_draw_line (sp->pixmap1, gg->plot_GC,
-        sp->ishift.x, 0,
-        sp->ishift.x, sp->da->allocation.height);
-*/
       break;
 
     case CLICK:

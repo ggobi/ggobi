@@ -17,37 +17,37 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
   gint nc = d->ncols;
 
   /* first index is the projection dimensions, second dimension is ncols */
-  arrayf_null(&dsp->t2d.u0);
+  arrayf_init_null(&dsp->t2d.u0);
   arrayf_alloc(&dsp->t2d.u0, 2, nc);
 
-  arrayf_null(&dsp->t2d.u1);
+  arrayf_init_null(&dsp->t2d.u1);
   arrayf_alloc(&dsp->t2d.u1, 2, nc);
 
-  arrayf_null(&dsp->t2d.u);
+  arrayf_init_null(&dsp->t2d.u);
   arrayf_alloc(&dsp->t2d.u, 2, nc);
 
-  arrayf_null(&dsp->t2d.v0);
+  arrayf_init_null(&dsp->t2d.v0);
   arrayf_alloc(&dsp->t2d.v0, 2, nc);
 
-  arrayf_null(&dsp->t2d.v1);
+  arrayf_init_null(&dsp->t2d.v1);
   arrayf_alloc(&dsp->t2d.v1, 2, nc);
 
-  arrayf_null(&dsp->t2d.v);
+  arrayf_init_null(&dsp->t2d.v);
   arrayf_alloc(&dsp->t2d.v, 2, nc);
 
-  arrayf_null(&dsp->t2d.uvevec);
+  arrayf_init_null(&dsp->t2d.uvevec);
   arrayf_alloc(&dsp->t2d.uvevec, 2, nc);
 
-  arrayf_null(&dsp->t2d.tv);
+  arrayf_init_null(&dsp->t2d.tv);
   arrayf_alloc(&dsp->t2d.tv, 2, nc);
 
-  vectori_null(&dsp->t2d.vars);
+  vectori_init_null(&dsp->t2d.vars);
   vectori_alloc(&dsp->t2d.vars, nc);
-  vectorf_null(&dsp->t2d.lambda);
+  vectorf_init_null(&dsp->t2d.lambda);
   vectorf_alloc(&dsp->t2d.lambda, nc);
-  vectorf_null(&dsp->t2d.tau);
+  vectorf_init_null(&dsp->t2d.tau);
   vectorf_alloc(&dsp->t2d.tau, nc);
-  vectorf_null(&dsp->t2d.tinc);
+  vectorf_init_null(&dsp->t2d.tinc);
   vectorf_alloc(&dsp->t2d.tinc, nc);
 
 }

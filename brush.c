@@ -19,10 +19,12 @@
 
 /* */
 static gboolean active_paint_points (datad *d, ggobid *gg);
-static gboolean active_paint_edges (datad *d, datad *e, ggobid *gg);
+static gboolean active_paint_edges (displayd *display, ggobid *gg);
 /* */
 
-  /* corner (x1, y1); corner where the cursor goes (x2,y2) */
+/*----------------------------------------------------------------------*/
+/*             Glyph utility: called in read_data                       */
+/*----------------------------------------------------------------------*/
 
 void
 find_glyph_type_and_size (gint gid, glyphv *glyph)
@@ -31,6 +33,49 @@ find_glyph_type_and_size (gint gid, glyphv *glyph)
   glyph->size = ( (gid-1) % (gint) NGLYPHSIZES ) + 1 ;
 }
 
+/*----------------------------------------------------------------------*/
+/*                     Linking to other datad's                         */
+/*----------------------------------------------------------------------*/
+
+void
+color_link_by_id (gint source_i, datad *source_d, ggobid *gg)
+{
+  datad *d;
+  GSList *l;
+  gint i, id;
+  gint k = source_i;
+  /*-- this is the cpanel for the display being brushed --*/
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  if (source_d->rowid.id.nels > 0) {
+    id = source_d->rowid.id.els[k];
+
+    for (l = gg->d; l; l = l->next) {
+      d = (datad *) l->data;
+      if (d != source_d) {
+        if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
+          /*-- i is the row number, irrespective of rows_in_plot --*/
+          i = d->rowid.idv.els[id]; 
+          if (!d->hidden_now.els[id]) {
+            switch (cpanel->br_mode) {
+              case BR_PERSISTENT:
+                d->color.els[i] = d->color_now.els[i] = source_d->color.els[k];
+                break;
+              case BR_TRANSIENT:
+                d->color_now.els[i] = source_d->color.els[k];
+                break;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/*----------------------------------------------------------------------*/
+
+/*-- called by brush_motion, and when the brushing mode is turned on/off --*/
 gboolean
 brush_once (gboolean force, splotd *sp, ggobid *gg)
 {
@@ -75,7 +120,7 @@ brush_once (gboolean force, splotd *sp, ggobid *gg)
 
   if (cpanel->br_scope == BR_EDGES || cpanel->br_scope == BR_PANDE) {
     if (e != NULL)
-      changed = active_paint_edges (d, e, gg);
+      changed = active_paint_edges (display, gg);
   }
 
   return (changed);
@@ -737,24 +782,24 @@ active_paint_points (datad *d, ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 
-gboolean
-xed_by_brush (gint k, datad *e, ggobid *gg)
+static gboolean
+xed_by_brush (gint k, displayd *display, ggobid *gg)
 /*
  * Determine whether edge k intersects the brush
 */
 {
+  datad *d = display->d;
+  datad *e = display->e;
   splotd *sp = gg->current_splot;
   gboolean intersect;
   glong x1 = sp->brush_pos.x1;
   glong y1 = sp->brush_pos.y1;
   glong x2 = sp->brush_pos.x2;
   glong y2 = sp->brush_pos.y2;
-  endpointsd *endpoints = e->edge.endpoints;
 
-  glong ax = sp->screen[endpoints[k].a].x;
-  glong ay = sp->screen[endpoints[k].a].y;
-  glong bx = sp->screen[endpoints[k].b].x;
-  glong by = sp->screen[endpoints[k].b].y;
+  endpointsd *endpoints = e->edge.endpoints;
+  glong a = d->rowid.idv.els[endpoints[k].a];
+  glong b = d->rowid.idv.els[endpoints[k].b];
 
   glong x, y;
   extern gint lines_intersect (glong, glong, glong, glong, 
@@ -762,11 +807,15 @@ xed_by_brush (gint k, datad *e, ggobid *gg)
 
   /*-- test for intersection with the vertical edge --*/
   intersect = lines_intersect (x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2,
-     ax, ay, bx, by, &x, &y);
+    sp->screen[a].x, sp->screen[a].y,
+    sp->screen[b].x, sp->screen[b].y,
+    &x, &y);
 
   if (!intersect)
     intersect = lines_intersect (x1, y1 + (y2 - y1)/2, x2, y1 + (y2 - y1)/2,
-      ax, ay, bx, by, &x, &y);
+      sp->screen[a].x, sp->screen[a].y,
+      sp->screen[b].x, sp->screen[b].y,
+      &x, &y);
 
   return (intersect);
 }
@@ -838,8 +887,9 @@ build_edge_hidden_vectors (datad *e, ggobid *gg)
 }
 
 static gboolean
-active_paint_edges (datad *d, datad *e, ggobid *gg)
+active_paint_edges (displayd *display, ggobid *gg)
 {
+  datad *e = display->e;
   gint k;
   gboolean changed;
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -851,7 +901,7 @@ active_paint_edges (datad *d, datad *e, ggobid *gg)
  
   for (k=0; k<e->edge.n; k++) {
 
-    if (xed_by_brush (k, e, gg)) {
+    if (xed_by_brush (k, display, gg)) {
 
       e->edge.nxed_by_brush++ ;
       e->edge.xed_by_brush.els[k] = true;

@@ -30,7 +30,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   displayd *display = (displayd *) sp->displayptr; 
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
-  gfloat ftmp;
+/*  gfloat ftmp;*/
   gg = sp->displayptr->ggobi;
 
   /*
@@ -61,12 +61,6 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
     w->allocation.width, w->allocation.height, -1);
   sp->pixmap1 = gdk_pixmap_new (w->window,
     w->allocation.width, w->allocation.height, -1);
-
-  /*-- rescale ishift --*/
-  ftmp = (gfloat) w->allocation.width / (gfloat) sp->max.x;
-  sp->ishift.x = (gint) (ftmp * (gfloat) sp->ishift.x);
-  ftmp = (gfloat) w->allocation.height / (gfloat) sp->max.y;
-  sp->ishift.y = (gint) (ftmp * (gfloat) sp->ishift.y);
 
   sp->max.x = w->allocation.width;
   sp->max.y = w->allocation.height;
@@ -384,7 +378,7 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
-  vectorf_null (&sp->p1d_data);
+  vectorf_init_null (&sp->p1d_data);
   vectorf_alloc (&sp->p1d_data, nr);
 
   switch (display->displaytype) {
@@ -435,8 +429,8 @@ splot_dimension_set (splotd* sp, gint width, gint height)
 {
   sp->max.x = width;
   sp->max.y = height;
-  sp->ishift.x = sp->max.x / 2;
-  sp->ishift.y = sp->max.y / 2;
+
+  sp->pmid.x = sp->pmid.y = 0;
 
   if (sp->da != NULL && width != -1 && height != -1)
     gtk_drawing_area_size (GTK_DRAWING_AREA (sp->da), width, height);
@@ -614,6 +608,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   gint i, k;
   gfloat scale_x, scale_y;
   datad *d = display->d;
+  long ltmp;
 
   scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
   scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
@@ -635,12 +630,14 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
     i = d->rows_in_plot[k];
 
     /*-- scale from world to plot window --*/
-    sp->screen[i].x = (gint) ((sp->planar[i].x * sp->iscale.x) >> EXP1);
-    sp->screen[i].y = (gint) ((sp->planar[i].y * sp->iscale.y) >> EXP1);
+    ltmp = sp->planar[i].x - sp->pmid.x;
+    sp->screen[i].x = (gint) ((ltmp * sp->iscale.x) >> EXP1);
+    ltmp = sp->planar[i].y - sp->pmid.y;
+    sp->screen[i].y = (gint) ((ltmp * sp->iscale.y) >> EXP1);
 
     /*-- shift into middle of plot window --*/
-    sp->screen[i].x += sp->ishift.x;
-    sp->screen[i].y += sp->ishift.y;
+    sp->screen[i].x += (sp->max.x / 2);
+    sp->screen[i].y += (sp->max.y / 2);
   }
 
   if (display->displaytype == parcoords) {
@@ -671,6 +668,7 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   gfloat ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
+  gfloat scale_x, scale_y;
 
   g_return_if_fail (cpanel->projection == XYPLOT ||
                     cpanel->projection == P1PLOT ||
@@ -678,11 +676,21 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
                     cpanel->projection == TOUR2D ||
                     cpanel->projection == COTOUR);
 
+
+  scale_x = sp->scale.x;
+  scale_y = sp->scale.y;
+  scale_x /= 2;
+  sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
+  scale_y /= 2;
+  sp->iscale.y = (glong) (-1 * (gfloat) sp->max.y * scale_y);
+
 /*
  * screen to plane 
 */
-  planar.x = (scr->x - sp->ishift.x) * PRECISION1 / sp->iscale.x ;
-  planar.y = (scr->y - sp->ishift.y) * PRECISION1 / sp->iscale.y ;
+  planar.x = (scr->x - sp->max.x/2) * PRECISION1 / sp->iscale.x ;
+  planar.x += sp->pmid.x;
+  planar.y = (scr->y - sp->max.y/2) * PRECISION1 / sp->iscale.y ;
+  planar.y += sp->pmid.y;
 
 /*
  * plane to world
@@ -771,16 +779,18 @@ splot_screen_to_plane (splotd *sp, gint pt, lcoords *eps,
   icoords prev_planar;
 
   if (horiz) {
-    sp->screen[pt].x -= sp->ishift.x;
     prev_planar.x = sp->planar[pt].x;
+    sp->screen[pt].x -= sp->max.x/2;
     sp->planar[pt].x = sp->screen[pt].x * PRECISION1 / sp->iscale.x ;
+    sp->planar[pt].x += sp->pmid.x;
     eps->x = sp->planar[pt].x - prev_planar.x;
   }
 
   if (vert) {
-    sp->screen[pt].y -= sp->ishift.y;
     prev_planar.y = sp->planar[pt].y;
+    sp->screen[pt].y -= sp->max.y/2;
     sp->planar[pt].y = sp->screen[pt].y * PRECISION1 / sp->iscale.y ;
+    sp->planar[pt].y += sp->pmid.y;
     eps->y = sp->planar[pt].y - prev_planar.y;
   }
 }

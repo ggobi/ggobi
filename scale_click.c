@@ -16,11 +16,26 @@
 void
 pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 {
-  if (pan_opt == P_OBLIQUE || pan_opt == P_HORIZ)  /* pan horizontally */
-    sp->ishift.x += (sp->mousepos.x - sp->max.x/2);
+  gint dx, dy;
+  gfloat scale_x, scale_y;
+  cpaneld *cpanel = &gg->current_display->cpanel;
 
-  if (pan_opt == P_OBLIQUE || pan_opt == P_VERT)  /* pan vertically */
-    sp->ishift.y += (sp->mousepos.y - sp->max.y/2);
+  if (pan_opt == P_OBLIQUE || pan_opt == P_HORIZ) {
+    dx = sp->mousepos.x - sp->max.x/2;
+    scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
+    scale_x /= 2;
+    sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
+    sp->pmid.x -= ((dx * PRECISION1) / sp->iscale.x);
+  }
+
+
+  if (pan_opt == P_OBLIQUE || pan_opt == P_VERT) {
+    dy = sp->mousepos.y - sp->max.y/2;
+    scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
+    scale_y /= 2;
+    sp->iscale.y = (glong) ((gfloat) sp->max.y * scale_y);
+    sp->pmid.y += ((dy * PRECISION1) / sp->iscale.y);
+  }
 }
 
 void
@@ -58,19 +73,10 @@ zoom_step (splotd *sp, gint zoom_opt, gint in_or_out, rectd *rect, ggobid* gg)
   }
 
 /*-- Make sure that the scale doesn't get too small --*/
-/*
- * Reset ishift in response to changes in scale -- in click-style
- * zooming, we are scaling out of the center of the window, 
- * {mid.x/2, mid.y/2}, not out of the center of the data.
-*/
   if (*scale_x * scalefac_x >= SCALE_MIN) {
-    sp->ishift.x = mid.x +
-      (gint) (scalefac_x * (gfloat) (sp->ishift.x - mid.x));
     *scale_x = *scale_x * scalefac_x;
   }
   if (*scale_y * scalefac_y >= SCALE_MIN) {
-    sp->ishift.y = mid.y +
-      (gint) (scalefac_y * (gfloat) (sp->ishift.y - mid.y));
     *scale_y = *scale_y * scalefac_y;
   }
 }

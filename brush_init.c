@@ -244,7 +244,7 @@ brush_init (datad *d, ggobid *gg)
   d->brush.bin0.x = d->brush.bin1.x = BRUSH_NBINS;
   d->brush.bin0.y = d->brush.bin1.y = BRUSH_NBINS;
 
-  vectorb_null (&d->pts_under_brush);
+  vectorb_init_null (&d->pts_under_brush);
   brush_alloc (d, gg);
 }
 

@@ -120,6 +120,7 @@
 45654   5/2   preparation for changes: edges/linking/categorical variables
 45127   5/3   ditto
 45302   5/4   made options menu mode-specific; added brushing option
+41569   5/4   the result of excluding some files that aren't in use
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

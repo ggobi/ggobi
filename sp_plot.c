@@ -537,7 +537,7 @@ void
 edges_draw (splotd *sp, ggobid *gg)
 {
   gint j, k;
-  gint from, to;
+  gint a, b;
   gushort current_color;
   gushort colors_used[NCOLORS+2];
   gint ncolors_used = 0;
@@ -545,6 +545,7 @@ edges_draw (splotd *sp, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   datad *e = display->e;
+  endpointsd *endpoints;
 
   if (e == (datad *) NULL || e->edge.n == 0) {
 /**/return;
@@ -561,6 +562,7 @@ edges_draw (splotd *sp, ggobid *gg)
      * Now loop through colors_used[], plotting the glyphs of each
      * color in a group.
     */
+    endpoints = e->edge.endpoints;
     for (k=0; k<ncolors_used; k++) {
       gint nl = 0;
       current_color = colors_used[k];
@@ -569,9 +571,10 @@ edges_draw (splotd *sp, ggobid *gg)
         if (e->hidden_now.els[j]) {
           doit = false;
         } else {
-          from = e->edge.endpoints[j].a;
-          to = e->edge.endpoints[j].b;
-          doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
+          a = d->rowid.idv.els[endpoints[j].a];
+          b = d->rowid.idv.els[endpoints[j].b];
+
+          doit = (!d->hidden_now.els[a] && !d->hidden_now.els[b]);
 
         /* If not plotting imputed values, and one is missing, skip it */
 /*
@@ -584,10 +587,10 @@ edges_draw (splotd *sp, ggobid *gg)
           if (e->color_now.els[j] == current_color) {
 
             if (display->options.edges_undirected_show_p) {
-              sp->edges[nl].x1 = sp->screen[from].x;
-              sp->edges[nl].y1 = sp->screen[from].y;
-              sp->edges[nl].x2 = sp->screen[to].x;
-              sp->edges[nl].y2 = sp->screen[to].y;
+              sp->edges[nl].x1 = sp->screen[a].x;
+              sp->edges[nl].y1 = sp->screen[a].y;
+              sp->edges[nl].x2 = sp->screen[b].x;
+              sp->edges[nl].y2 = sp->screen[b].y;
             }
 
             if (display->options.edges_directed_show_p) {
@@ -595,11 +598,11 @@ edges_draw (splotd *sp, ggobid *gg)
                * Add thick piece of the lines to suggest a directional arrow
               */
               sp->arrowheads[nl].x1 =
-                (gint) (.2*sp->screen[from].x + .8*sp->screen[to].x);
+                (gint) (.2*sp->screen[a].x + .8*sp->screen[b].x);
               sp->arrowheads[nl].y1 =
-                (gint) (.2*sp->screen[from].y + .8*sp->screen[to].y);
-              sp->arrowheads[nl].x2 = sp->screen[to].x;
-              sp->arrowheads[nl].y2 = sp->screen[to].y;
+                (gint) (.2*sp->screen[a].y + .8*sp->screen[b].y);
+              sp->arrowheads[nl].x2 = sp->screen[b].x;
+              sp->arrowheads[nl].y2 = sp->screen[b].y;
             }
             nl++;
           }  /*-- end if ... == current_color --*/

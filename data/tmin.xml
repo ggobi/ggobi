@@ -3,48 +3,46 @@
 <!-- partial conversion to new format: handling of ids and edges -->
 <!-- no use of realvariable or categoricalvariable -->
 <!-- no use of variable name attribute -->
-<!-- points and edges attributes ignored; unnecessary? -->
 
-<data name="Customers" points="T" edges="F">
+<data name="Customers">
 <description>
 
 </description>
 <variables count="3">
-  <variable> avgusage </variable>
-  <variable> fraudp </variable>
-  <variable> bizres </variable>
+ <variable> avgusage </variable>
+ <variable> fraudp </variable>
+ <variable> bizres </variable>
 </variables>
 <records  count="5">
-<record id="0">  8 0 0  </record>
-<record id="1">  4 2 1  </record>
-<record id="2">  8 1 1  </record>
-<record id="3"> 17 2 0  </record>
-<record id="4"> 11 0 1  </record>
+ <record id="0">  8 0 0  </record>
+ <record id="1">  4 2 1  </record>
+ <record id="2">  8 1 1  </record>
+ <record id="3"> 17 2 0  </record>
+ <record id="5"> 11 0 1  </record>
 </records>
 
 </data>
 
-<!-- -------------------------------------------------------- -->
-
-<data name="Calls" points="T" edges="T">
+<data name="Calls">
 <description>
 
 </description>
 <variables count="4">
-  <variable> nseconds </variable>
-  <variable> timeofday </variable>
-  <variable> type </variable>
-  <variable> fraudp </variable>
+ <variable> nseconds </variable>
+ <variable> timeofday </variable>
+ <variable> type </variable>
+ <variable> fraudp </variable>
 </variables>
 
 <records count="6">
-<record source="0" destination="2"> 42 4870  1 0 </record>
-<record source="2" destination="3"> 42 4880  1 2 </record>
-<record source="0" destination="3">  7 4890  1 1 </record>
-<record source="3" destination="4"> 17 4900 na 2 </record>
-<record source="1" destination="4"> 12 5000  0 0 </record>
-<record source="1" destination="0"> 18 5100  1 2 </record>
+ <record source="0" destination="2"> 42 4870  1 0 </record>
+ <record source="2" destination="3"> 42 4880  1 2 </record>
+ <record source="0" destination="3">  7 4890  1 1 </record>
+ <record source="3" destination="5"> 17 4900 na 2 </record>
+ <record source="1" destination="5"> 12 5000  0 0 </record>
+ <record source="1" destination="0"> 18 5100  1 2 </record>
 </records>
 </data>
+  
 </ggobidata>
 

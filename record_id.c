@@ -18,10 +18,10 @@
 /*                   Memory allocation, initialization                */
 /*--------------------------------------------------------------------*/
 
-void rowids_null (datad *d)
+void rowids_init_null (datad *d)
 {
-  vectori_null (&d->rowid.id);
-  vectori_null (&d->rowid.idv);
+  vectori_init_null (&d->rowid.id);
+  vectori_init_null (&d->rowid.idv);
 }
 
 void rowids_free (datad *d)

@@ -21,8 +21,23 @@
 void
 pan_by_drag (splotd *sp, ggobid *gg)
 {
-  sp->ishift.x += (sp->mousepos.x - sp->mousepos_o.x);
-  sp->ishift.y += (sp->mousepos.y - sp->mousepos_o.y);
+  gint dx, dy;
+  gfloat scale_x, scale_y;
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  dx = sp->mousepos.x - sp->mousepos_o.x;
+  dy = sp->mousepos.y - sp->mousepos_o.y;
+
+  scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
+  scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
+
+  scale_x /= 2;
+  sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
+  scale_y /= 2;
+  sp->iscale.y = (glong) (-1 * (gfloat) sp->max.y * scale_y);
+
+  sp->pmid.x -= ((dx * PRECISION1) / sp->iscale.x);
+  sp->pmid.y -= ((dy * PRECISION1) / sp->iscale.y);
 }
 
 /*
@@ -55,41 +70,12 @@ zoom_by_drag (splotd *sp, ggobid *gg)
   scalefac.y =
     (gfloat) (sp->mousepos.y - mid.y) / (gfloat) (sp->mousepos_o.y - mid.y);
 
-  /*-- Now they're both wrong in exactly the same way. --*/
   if (*scale_x * scalefac.x >= SCALE_MIN) {
-    sp->ishift.x = mid.x +
-      (gint) (scalefac.x * (gfloat) (sp->ishift.x - mid.x));
     *scale_x = *scale_x * scalefac.x;
   }
   if (*scale_y * scalefac.y >= SCALE_MIN) {
-    sp->ishift.y = mid.y +
-      (gint) (scalefac.y * (gfloat) (sp->ishift.y - mid.y));
     *scale_y = *scale_y * scalefac.y;
   }
-
-
-  /*-- Scale the scaler if far enough from center --*/
-/*
-  if (sp->mousepos_o.x - sp->ishift.x > npix ||
-      sp->ishift.x - sp->mousepos_o.x > npix)
-  {
-    *scale_x *= ((gfloat) (sp->mousepos.x - sp->ishift.x) /
-                 (gfloat) (sp->mousepos_o.x - sp->ishift.x));
-  }
-
-  if (sp->mousepos_o.y - sp->ishift.y > npix ||
-      sp->ishift.y - sp->mousepos_o.y > npix)
-  {
-    *scale_y *= ((gfloat) (sp->mousepos.y - sp->ishift.y) /
-                 (gfloat) (sp->mousepos_o.y - sp->ishift.y));
-  }
-
-  * Restore if too small. *
-  *scale_x = MAX (SCALE_MIN, *scale_x);
-  *scale_y = MAX (SCALE_MIN, *scale_y);
-*/
-
-
 
 }
 

@@ -19,7 +19,7 @@
 /*-------------------------------------------------------------------------*/
 
 void
-vectorf_null (vector_f *vecp)
+vectorf_init_null (vector_f *vecp)
 {
   vecp->nels = 0;
   vecp->els = (gfloat *) NULL;
@@ -129,7 +129,7 @@ vectorf_copy (vector_f *vecp_from, vector_f *vecp_to)
 /*-------------------------------------------------------------------------*/
 
 void
-vectori_null (vector_i *vecp)
+vectori_init_null (vector_i *vecp)
 {
   vecp->nels = 0;
   vecp->els = (gint *) NULL;
@@ -238,7 +238,7 @@ vectori_copy (vector_i *vecp_from, vector_i *vecp_to)
 /*                   gboolean vector management                            */
 /*-------------------------------------------------------------------------*/
 
-void vectorb_null (vector_b *vecp)
+void vectorb_init_null (vector_b *vecp)
 {
   vecp->nels = 0;
   vecp->els = (gboolean *) NULL;
@@ -319,7 +319,7 @@ vectorb_copy (vector_b *vecp_from, vector_b *vecp_to)
 /*                     gshort vector management                            */
 /*-------------------------------------------------------------------------*/
 
-void vectors_null (vector_s *vecp)
+void vectors_init_null (vector_s *vecp)
 {
   vecp->nels = 0;
   vecp->els = (gshort *) NULL;

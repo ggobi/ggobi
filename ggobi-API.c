@@ -654,6 +654,7 @@ GGOBI(getCaseHiddens)(gint *pts, gint howMany, datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 
+/*-- this isn't going to work any more -- dfs --*/
 gboolean 
 GGOBI(isConnectedEdge)(gint a, gint b, datad *d, ggobid *gg)
 {

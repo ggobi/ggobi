@@ -16,14 +16,14 @@ extern void sphere_variance_set (gfloat x, datad *, ggobid*);
 
 void
 sphere_init (datad *d) {
-  vectori_null (&d->sphere.vars);
-  vectori_null (&d->sphere.pcvars);
-  vectorf_null (&d->sphere.eigenval);
+  vectori_init_null (&d->sphere.vars);
+  vectori_init_null (&d->sphere.pcvars);
+  vectorf_init_null (&d->sphere.eigenval);
 
-  arrayf_null (&d->sphere.eigenvec);
-  arrayf_null (&d->sphere.vc);
+  arrayf_init_null (&d->sphere.eigenvec);
+  arrayf_init_null (&d->sphere.vc);
 
-  vectorf_null (&d->sphere.tform_mean);
+  vectorf_init_null (&d->sphere.tform_mean);
 }
 
 void

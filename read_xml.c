@@ -82,15 +82,6 @@ const gchar * const xmlDataTagNames[] = {
                                           "variable",
                                           "data",
 
-/*
-                                          "edges",
-                                          "edge",
-                                          "edgerecord",
-                                          "edgerecords",
-                                          "edgevariables",
-                                          "edgevariable",
-*/
-
                                           "colormap",
                                           "color",
                                           ""
@@ -119,7 +110,7 @@ data_xml_read (InputDescription *desc, ggobid *gg)
  XMLParserData data;
  gboolean ok = false;  
  gchar *name = g_strdup(desc->fileName); /* find_xml_file(desc->fileName, NULL, gg); */
-  
+
   if(name == NULL)
     return(false);
 
@@ -156,7 +147,6 @@ data_xml_read (InputDescription *desc, ggobid *gg)
 
   g_free(xmlParserHandler);
 
-
   {
     GSList *l;
     datad *d;
@@ -177,14 +167,6 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->current_record = 0;
   data->current_variable = 0;
   data->current_element = 0;
-
-/* dfs -- no such thing as an edge record now
-  data->current_edge = 0;
-  data->current_edgevariable = 0;
-  data->current_edgerecord = 0;
-  data->current_edgeelement = 0;
-*/
-
   data->current_data = NULL;
 
   data->current_color = 0;
@@ -198,10 +180,6 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->defaults.glyphType = -1;
   data->defaults.glyphSize = -1;
   data->defaults.edgeWidth = -1;  /*-- this has no home in ggobi yet --*/
-/*
-  data->defaults.edgeColor = -1;
-  data->defaults.edgeHidden = false;
-*/
   data->defaults.hidden = false;
 }
 
@@ -260,17 +238,6 @@ endXMLElement(void *user_data, const CHAR *name)
    case VARIABLE:
      data->current_variable++;
      break;
-
-/*
-   case CONNECTION:
-     data->current_edge++;
-     break;
-   case EDGERECORD:
-     break;
-   case EDGEVARIABLE:
-     break;
-*/
-
    case COLOR:
      data->current_color++;
      break;
@@ -1110,23 +1077,11 @@ setDataset(const CHAR **attrs, XMLParserData *parserData)
   gchar *name;
   const gchar *tmp;
 
-
 #ifdef USE_CLASSES
-  // tmp = getAttribute(attrs, (char*) "nodeData");*/
-  //if(tmp) {
-    // data = new EdgeDatad(1);
-    // data = new edgeDatad(parserData->gg);
-  //} else 
-    data = new datad(parserData->gg);
+  data = new datad(parserData->gg);
 #else
   data = datad_new(NULL, parserData->gg);
-  /*if(tmp) {*/
-  /*  data->readXMLRecord = readXMLEdgeRecord;*/
-  /*  data->edgeData = true;*/
-  /*} else {*/
-    data->readXMLRecord = readXMLRecord;
-    /*data->edgeData = false;*/
-  /*}*/
+  data->readXMLRecord = readXMLRecord;
 #endif
 
 
@@ -1194,7 +1149,7 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
      data->rowIds = (gchar **) g_malloc(d->nrows * sizeof(gchar *));
      memset(data->rowIds, '\0', d->nrows);
     }
-    if (d->rowid.id.els == NULL) {
+    if (d->rowid.id.nels == 0) {
       rowids_alloc (d);
     }
 
@@ -1246,48 +1201,6 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
 
   return(true);
 }
-
-/*
-gboolean
-readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data)
-{
-  const gchar *tmp;
-  gint index = data->current_record;
-  datad *d = getCurrentXMLData(data);
-  gint start, end;
-
-  gboolean ans = readXMLRecord(attrs, data);
-
-  tmp = getAttribute(attrs, "source");   
-  if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
-    char buf[512]; 
-    sprintf(buf,"No source attribute for record %d in edge data %s\n",
-      index, d->name);
-    g_printerr (buf);
-    exit(103);
-  }
-  start = asInteger(tmp);
-
-  tmp = getAttribute(attrs, "destination");   
-  if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
-    char buf[512]; 
-    sprintf(buf,"No destination attribute for record %d in edge data %s\n",
-      index, d->name);
-    g_printerr (buf);
-    exit(103);
-  }
-  end = asInteger(tmp);
-
-  if (d->edge.n == 0)
-    edges_alloc (d->nrows, d);
-
-  d->edge.endpoints[index].a = start;
-  d->edge.endpoints[index].b = end;
-
-  return(ans);
-}
-*/
-
 
 #else /* So using classes */
 gboolean
