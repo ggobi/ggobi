@@ -60,8 +60,16 @@ GGobi - Interface from Perl to native GGobi code
 
 =head1 SEE ALSO
 
-perl(1).
-GGobi - http://www.ggobi.org
-GGobi Plugins - http://www.ggobi.org/plugins.pdf
+=over 4
 
+=item *
+    perl(1).
+
+=item *
+     GGobi - http://www.ggobi.org
+
+=item *
+     GGobi Plugins - http://www.ggobi.org/plugins.pdf
+
+=back
 =cut

@@ -1,10 +1,13 @@
 use GGobi::plugin;
 
 {
+
 =head1 DESCRIPTION
- This is a simple test of the Perl plugin mechanism for GGobi.
- This implements a very basic plugin that does not really do much.
- It just proves that the Perl language plugin is working.
+
+This is a simple test of the Perl plugin mechanism for GGobi.  This
+implements a very basic plugin that does not really do much.  It just
+proves that the Perl language plugin is working.
+
 =cut
   package GGobi::TestPlugin;
 
@@ -42,3 +45,25 @@ use GGobi::plugin;
 # print "Loaded testPlugin.pm\n";
 
 1;
+
+
+=head1 AUTHOR
+
+ Duncan Temple Lang duncan@research.bell-labs.com
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+    perl(1).
+
+=item *
+     GGobi - http://www.ggobi.org
+
+=item *
+     GGobi Plugins - http://www.ggobi.org/plugins.pdf
+
+=back
+=cut
+
