@@ -233,11 +233,15 @@ parcoords_menu_build (gint jvar, ggobid *gg)
 
   menu = gtk_menu_new ();
   CreateMenuItem (menu, "Select Y      M,R",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->parcoords_menu.vdata0, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel,
+    gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu),
+    (gpointer) &gg->parcoords_menu.vdata0, gg);
   CreateMenuItem (menu, "Delete Y <alt>M,R",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->parcoords_menu.vdata1, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel,
+    gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu),
+    (gpointer) &gg->parcoords_menu.vdata1, gg);
 
   return menu;
 }
@@ -247,29 +251,47 @@ scatmat_menu_build (gint jvar, ggobid *gg)
 {
   GtkWidget *menu;
 
-  gg->scatmat_menu.vdata0.sp = gg->scatmat_menu.vdata1.sp = gg->scatmat_menu.vdata2.sp = gg->scatmat_menu.vdata3.sp = gg->current_splot;
-  gg->scatmat_menu.vdata0.jvar = gg->scatmat_menu.vdata1.jvar = gg->scatmat_menu.vdata2.jvar = gg->scatmat_menu.vdata3.jvar = jvar;
+  gg->scatmat_menu.vdata0.sp =
+    gg->scatmat_menu.vdata1.sp =
+    gg->scatmat_menu.vdata2.sp =
+    gg->scatmat_menu.vdata3.sp =
+    gg->current_splot;
+  gg->scatmat_menu.vdata0.jvar =
+    gg->scatmat_menu.vdata1.jvar =
+    gg->scatmat_menu.vdata2.jvar =
+    gg->scatmat_menu.vdata3.jvar = jvar;
   gg->scatmat_menu.vdata0.alt_mod = gg->scatmat_menu.vdata1.alt_mod = false;
   gg->scatmat_menu.vdata2.alt_mod = gg->scatmat_menu.vdata3.alt_mod = 3;
 
   gg->scatmat_menu.vdata0.btn = gg->scatmat_menu.vdata2.btn = 1;
   gg->scatmat_menu.vdata1.btn = gg->scatmat_menu.vdata3.btn = 2;
 
-  gg->scatmat_menu.vdata3.gg = gg->scatmat_menu.vdata2.gg = gg->scatmat_menu.vdata1.gg = gg->scatmat_menu.vdata0.gg = gg;
+  gg->scatmat_menu.vdata3.gg =
+    gg->scatmat_menu.vdata2.gg =
+    gg->scatmat_menu.vdata1.gg =
+    gg->scatmat_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
   CreateMenuItem (menu, "Select row  L",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->scatmat_menu.vdata0, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel,
+    gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu),
+    (gpointer) &gg->scatmat_menu.vdata0, gg);
   CreateMenuItem (menu, "Select col  M,R",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->scatmat_menu.vdata1, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel,
+    gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu),
+    (gpointer) &gg->scatmat_menu.vdata1, gg);
   CreateMenuItem (menu, "Delete row  <alt>L",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->scatmat_menu.vdata2, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel,
+    gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC
+    (varsel_from_menu), (gpointer) &gg->scatmat_menu.vdata2, gg);
   CreateMenuItem (menu, "Delete col  <alt>M,R",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->scatmat_menu.vdata3, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel,
+    gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu),
+    (gpointer) &gg->scatmat_menu.vdata3, gg);
 
   return menu;
 }
@@ -354,8 +376,10 @@ variable_clone (gint jvar, const gchar *newName, gboolean update, ggobid *gg)
   /*-- set a view of the data values before building the new circle --*/
   vartable_row_append (gg->ncols-1, gg);
   vardata_realloc (nc, gg);
-  gg->vardata[nc-1].collab = g_strdup (newName && newName[0] ? newName : gg->vardata[jvar].collab);
-  gg->vardata[nc-1].collab_tform = g_strdup (newName && newName[0] ? newName : gg->vardata[jvar].collab);
+  gg->vardata[nc-1].collab =
+    g_strdup (newName && newName[0] ? newName : gg->vardata[jvar].collab);
+  gg->vardata[nc-1].collab_tform =
+    g_strdup (newName && newName[0] ? newName : gg->vardata[jvar].collab);
 
   /*
    * Follow the algorithm by which the table has been populated
@@ -638,7 +662,7 @@ varcircle_add (gint i, gint j, gint k, ggobid *gg)
   gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.da[k]), "button_press_event",
     GTK_SIGNAL_FUNC (varsel_cb), GINT_TO_POINTER (k));
 
-  GGobi_widget_set(GTK_WIDGET(gg->varpanel_ui.da[k]), gg, true);
+  GGobi_widget_set (GTK_WIDGET (gg->varpanel_ui.da[k]), gg, true);
 
   gtk_widget_show (gg->varpanel_ui.da[k]);
   gtk_container_add (GTK_CONTAINER (vb), gg->varpanel_ui.da[k]);
@@ -646,21 +670,31 @@ varcircle_add (gint i, gint j, gint k, ggobid *gg)
     GTK_FILL, GTK_FILL, 0, 0);
 }
 
+void
+varpanel_clear (ggobid *gg) {
+  gint j;
+
+  for (j=0; j<gg->varpanel_ui.nvars; j++) {
+    gtk_widget_destroy (gg->varpanel_ui.da[j]);
+    gtk_widget_destroy (gg->varpanel_ui.varlabel[j]);
+  }
+
+  /*-- free when they've been alloc'ed before --*/
+  g_free (gg->varpanel_ui.da);
+  g_free (gg->varpanel_ui.varlabel);
+}
+
 /*-- create a grid of buttons in the table --*/
 void varpanel_populate (ggobid *gg)
 {
   gint i, j, k;
 
-  /*-- realloc in case they've been alloc'ed before --*/
+  /*-- previous allocated da and varlabel are freed in varpanel_clear --*/
 
-  if (gg->varpanel_ui.da == NULL) {
-    gg->varpanel_ui.da = (GtkWidget **) g_malloc (gg->ncols * sizeof (GtkWidget *));
-    gg->varpanel_ui.varlabel = (GtkWidget **) g_malloc (gg->ncols * sizeof (GtkWidget *));
-  } else {
-    gg->varpanel_ui.da = (GtkWidget **) g_realloc (gg->varpanel_ui.da, gg->ncols * sizeof (GtkWidget *));
-    gg->varpanel_ui.varlabel = (GtkWidget **) g_realloc (gg->varpanel_ui.varlabel,
-                                         gg->ncols * sizeof (GtkWidget *));
-  }
+  gg->varpanel_ui.da = (GtkWidget **)
+    g_malloc (gg->ncols * sizeof (GtkWidget *));
+  gg->varpanel_ui.varlabel = (GtkWidget **)
+    g_malloc (gg->ncols * sizeof (GtkWidget *));
 
   k = 0;
   for (i=0; i<gg->varpanel_ui.vnrows; i++) {

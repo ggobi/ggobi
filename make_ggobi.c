@@ -56,35 +56,35 @@ fileset_read_init (gchar *ldata_in, ggobid *gg)
 {
   gboolean ans = fileset_read (ldata_in, gg);
   if (ans) {
-    dataset_init(gg, true);
+    dataset_init (gg, true);
   }
 
- return (ans);
+  return (ans);
 } 
 
 displayd *
-dataset_init(ggobid *gg, gboolean cleanup)
+dataset_init (ggobid *gg, gboolean cleanup)
 {
-    displayd *display = NULL;
+  displayd *display = NULL;
 
-    pipeline_init (gg);
+  pipeline_init (gg);
 
-    if(cleanup)
-      display_free_all (gg);  /*-- destroy any existing displays --*/
+  if (cleanup)
+    display_free_all (gg);  /*-- destroy any existing displays --*/
 
-    if(gg->ncols > 1) {
-       /*-- initialize the first display --*/
-      display = scatterplot_new (false, NULL, gg);
-       /* Need to make certain this is the only one there.
-          See
-        */
-      gg->displays = g_list_append (gg->displays, (gpointer) display);
-      display_set_current (display, gg);
-      gg->current_splot = (splotd *)
-      g_list_nth_data (gg->current_display->splots, 0);
-    }
+  if (gg->ncols > 1) {
+     /*-- initialize the first display --*/
+    display = scatterplot_new (false, NULL, gg);
+     /* Need to make certain this is the only one there.
+        See
+      */
+    gg->displays = g_list_append (gg->displays, (gpointer) display);
+    display_set_current (display, gg);
+    gg->current_splot = (splotd *)
+    g_list_nth_data (gg->current_display->splots, 0);
+  }
 
-    return(display);
+  return (display);
 }
 
 gboolean
@@ -93,6 +93,9 @@ fileset_read (gchar *ldata_in, ggobid *gg)
   gboolean ok = true;
   gg->filename = g_strdup (ldata_in);
   strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
+
+  /*-- the varpanel has to know how many circles and labels to destroy --*/
+  gg->varpanel_ui.nvars = gg->ncols;
 
   switch (gg->data_mode) {
    case xml:
@@ -105,14 +108,14 @@ fileset_read (gchar *ldata_in, ggobid *gg)
      ok = read_mysql_data (NULL, gg);
 #endif
     break;
+
    case binary:
      break;
-   case Sprocess:
-     break;
+
    case ascii:
      array_read (gg);
      gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
-     gg->nrgroups = 0;              /*-- for now --*/
+     gg->nrgroups = 0;               /*-- for now --*/
       
      missing_values_read (gg->fname, true, gg);
       
@@ -147,6 +150,7 @@ pipeline_init (ggobid *gg)
   /*-- some initializations --*/
   modes_init (gg);
   varpanel_layout_init (gg);
+  varpanel_clear (gg);
   varpanel_populate (gg);
 
   /*-- run the first half of the pipeline --*/
@@ -178,11 +182,11 @@ make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
 
   if (ldata_in != NULL) {
     if (fileset_read (ldata_in, gg)) {
-      dataset_init(gg, true);
+      dataset_init (gg, true);
     }
   } else {
 #ifdef USE_MYSQL
-    if(gg->data_mode == mysql) {
+    if (gg->data_mode == mysql) {
       GGOBI(get_mysql_login_info)(gg);
     }
 #endif

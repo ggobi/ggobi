@@ -8,7 +8,7 @@
 
 #include "varseldata.h"
 
-typedef enum {ascii, Sprocess, binary, xml, mysql} DataMode;
+typedef enum {ascii, binary, xml, mysql} DataMode;
 typedef enum {read_all, read_block, draw_sample} FileReadType;
 
 struct _ggobid;
@@ -295,6 +295,7 @@ struct _ggobid {
     GtkAccelGroup *varpanel_accel_group;
     
     gint vnrows, vncols;
+    gint nvars;
   } varpanel_ui;
 
   struct _Transformation {

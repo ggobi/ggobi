@@ -236,9 +236,7 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
 
   if (num_ggobis > 1 || force || g_list_length (gg->displays) > 1) {
 
-    /* If the display tree is active, remove the corresponding
-       entry.
-     */
+    /*-- If the display tree is active, remove the corresponding entry. --*/
     tree_display_entry_remove(display, gg->app.display_tree.tree, gg); 
 
     g_list_remove (gg->displays, display);
@@ -275,17 +273,19 @@ display_free_all (ggobid *gg) {
   gint count = g_list_length (gg->displays);
 
   /* Have to count down rather than rely on dlist being non-null.
-     This is because when we remove the last entry, we get garbage
+     This is because when we remove the last entry, we get garbage,
      not a null value.
    */
-  for (dlist = gg->displays; count > 0 && dlist ; dlist = dlist->next, count--) {
+  for (dlist = gg->displays; count > 0 && dlist; dlist = dlist->next, count--)
+  {
     /*    display = (displayd *) dlist->data; */
-    display = (displayd*) g_list_nth_data(gg->displays,count-1);
-     /* Perhaps this force should be true to get the final one.
+    display = (displayd*) g_list_nth_data (gg->displays,count-1);
+     /* If the second argument 'force' is true, it eliminates the
+        final display.
         It will work now if there is more than one ggobi instance
         running.
       */
-    display_free (display, false, gg); 
+    display_free (display, true, gg); 
   }
 }
 

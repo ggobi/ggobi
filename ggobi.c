@@ -31,13 +31,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 */
   for ( ; *argc>1 && av[1][0]=='-'; (*argc)--,av++) {
 
-    /*
-     * -s:  ggobi initiated from inside S
-    */
-    if (strcmp (av[1], "-s") == 0)
-      gg->data_mode = Sprocess;
-
-    else if (strcmp (av[1], "-x") == 0)
+    if (strcmp (av[1], "-x") == 0)
       gg->data_mode = xml;
     else if (strcmp (av[1], "-mysql") == 0)
       gg->data_mode = mysql;

@@ -3,11 +3,16 @@ COPYRIGHT STATUS
 The following files are covered by the GNU General Public License.
 See the file GPL.
 
-gtkexthruler.c
-gtkexthruler.h
-gtkextruler.c
-gtkextruler.h
-gtkextvruler.c
-gtkextvruler.h
+ gtkexthruler.c
+ gtkexthruler.h
+ gtkextruler.c
+ gtkextruler.h
+ gtkextvruler.c
+ gtkextvruler.h
+
+The following files come from the Graphics Gems series
+
+ xlines.c
+  
 
 The files in the RS subdirectory  ...
