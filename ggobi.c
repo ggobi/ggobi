@@ -357,9 +357,6 @@ ggobi_alloc()
   tmp->printOptions = NULL;
   tmp->pluginInstances = NULL;
 
-/*
-#ifdef USE_XML
-*/
   tmp->colorSchemes = sessionOptions->colorSchemes;
   if (sessionOptions->activeColorScheme)
     tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,
@@ -373,9 +370,8 @@ ggobi_alloc()
       tmp->activeColorScheme = (colorschemed *)
         g_list_nth_data(tmp->colorSchemes, 0);
   }
-/*
-#endif
-*/
+  colorscheme_init (tmp->activeColorScheme);
+  
 
   totalNumGGobis++;
 
