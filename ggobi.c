@@ -223,6 +223,8 @@ gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   GdkVisual *vis;
   ggobid *gg;
   initOptions();
+  Options->cmdArgs = argv;
+  Options->numArgs = argc;
 
   gtk_init (&argc, &argv);
 

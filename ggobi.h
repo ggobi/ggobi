@@ -352,6 +352,9 @@ typedef struct {
   DataMode data_mode;
 
   gchar *data_in;
+
+  char **cmdArgs;
+  int numArgs;
 } GGobiOptions;
 
 extern GGobiOptions *Options;

@@ -246,6 +246,9 @@ ggobid * GGOBI(ggobi_get)(gint);
 gint GGOBI(ncols)(datad *d);
 gint GGOBI(nrecords)(datad *dg);
 
+
+const gchar *const * GGOBI(getDataModeNames)(int *n);
+
 #ifdef __cplusplus
 }
 #endif

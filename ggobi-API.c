@@ -81,6 +81,16 @@ GGOBI(getDataModeDescription)(DataMode mode)
  return(DataModeNames[mode]);
 }
 
+const gchar *const *
+GGOBI(getDataModeNames)(int *n)
+{
+ extern const gchar * const DataModeNames[];
+ if(n)
+  *n = num_data_modes;
+ return(DataModeNames);
+}
+
+
 gchar **
 GGOBI(getVariableNames)(gint transformed, datad *d, ggobid *gg)
 {
@@ -159,6 +169,12 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   GGOBI(displays_release)(gg);
   GGOBI(data_release)(d, gg);
 
+  d->input = desc;
+  if(d->name == NULL)
+    d->name = g_strdup(desc->fileName);
+  if(gg->input == NULL)
+    gg->input = desc;
+
   d->ncols = nc;
   d->nrows = nr;
 
@@ -197,7 +213,6 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
    }
   }
 
-  d->input = desc;
 
   /* Now recompute and display the top plot. */
   if (datad_init (d, gg, cleanup) != NULL) {
