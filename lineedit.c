@@ -353,18 +353,19 @@ find_nearest_edge (splotd *sp, displayd *display, ggobid *gg)
 /*--------------------------------------------------------------------*/
 /* Reverse pipeline code for populating the table of variable values  */
 /*--------------------------------------------------------------------*/
-
 /*
- * if I want to use this in movepts, it needs three more inputs
- *        gboolean horiz, gboolean vert       (both true here)
- *        gint i: the point index             (-1 here?)
- * and one more return value
- *        gcoords *eps                         (meaningful for i != -1)
+ * I want these routines to work for point motion (movepts.c) and
+ * for line editing (lineedit.c).  They require different arguments.
+ * And they all need to be moved now, too, maybe some to splot.c or
+ * maybe all to pipeline.c.  ... and what about the class-based
+ * methodology?  Hmm.
 */
 
 void
-pt_screen_to_plane (icoords *screen, gcoords *planar, splotd *sp)
+pt_screen_to_plane (icoords *screen, gint id, gboolean horiz, gboolean vert,
+  gcoords *eps, gcoords *planar, splotd *sp)
 {
+  gcoords prev_planar;
   gfloat scale_x, scale_y;
   greal precis = (greal) PRECISION1;
 
@@ -375,17 +376,32 @@ pt_screen_to_plane (icoords *screen, gcoords *planar, splotd *sp)
   scale_y /= 2;
   sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
 
-  screen->x -= sp->max.x/2;
-  planar->x = (greal) screen->x * precis / sp->iscale.x ;
-  planar->x += (greal) sp->pmid.x;
+  if (id >= 0) {  /* when moving points */
+    prev_planar.x = sp->planar[id].x;
+    prev_planar.y = sp->planar[id].y;
+  }
 
-  screen->y -= sp->max.y/2;
-  planar->y = (greal) screen->y * precis / sp->iscale.y ;
-  planar->y += (greal) sp->pmid.y;
+  if (horiz) {  /* relevant distinction for moving points */
+    screen->x -= sp->max.x/2;
+
+    planar->x = (greal) screen->x * precis / sp->iscale.x ;
+    planar->x += (greal) sp->pmid.x;
+  }
+
+  if (vert) {  /* relevant distinction for moving points */
+    screen->y -= sp->max.y/2;
+    planar->y = (greal) screen->y * precis / sp->iscale.y ;
+    planar->y += (greal) sp->pmid.y;
+  }
+
+  if (id >= 0) {  /* when moving points */
+    if (horiz) eps->x = planar->x - prev_planar.x;
+    if (vert)  eps->y = planar->y - prev_planar.y;
+  }
 }
 
 void
-pt_plane_to_world (splotd *sp, gcoords *planar, greal *world) 
+pt_plane_to_world (splotd *sp, gcoords *planar, gcoords *eps, greal *world) 
 { 
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -406,7 +422,7 @@ pt_plane_to_world (splotd *sp, gcoords *planar, greal *world)
     /*if (!gg->is_pp) {*/
       for (j=0; j<display->t1d.nactive; j++) {
         var = display->t1d.active_vars.els[j];
-        world[var] += (planar->x * (greal) display->t1d.F.vals[0][var]);
+        world[var] += (eps->x * (greal) display->t1d.F.vals[0][var]);
       }
     /*}*/
     break;
@@ -414,8 +430,8 @@ pt_plane_to_world (splotd *sp, gcoords *planar, greal *world)
       for (j=0; j<display->t2d3.nactive; j++) {
         var = display->t2d3.active_vars.els[j];
         world[var] += 
-         (planar->x * (greal) display->t2d3.F.vals[0][var] +
-          planar->y * (greal) display->t2d3.F.vals[1][var]);
+         (eps->x * (greal) display->t2d3.F.vals[0][var] +
+          eps->y * (greal) display->t2d3.F.vals[1][var]);
       }
 	break;
     case TOUR2D:
@@ -423,8 +439,8 @@ pt_plane_to_world (splotd *sp, gcoords *planar, greal *world)
         for (j=0; j<display->t2d.nactive; j++) {
           var = display->t2d.active_vars.els[j];
           world[var] += 
-           (planar->x * (greal) display->t2d.F.vals[0][var] +
-            planar->y * (greal) display->t2d.F.vals[1][var]);
+           (eps->x * (greal) display->t2d.F.vals[0][var] +
+            eps->y * (greal) display->t2d.F.vals[1][var]);
         }
     /*}*/
     break;
@@ -432,11 +448,11 @@ pt_plane_to_world (splotd *sp, gcoords *planar, greal *world)
     /*if (!gg->is_pp) {*/
       for (j=0; j<display->tcorr1.nactive; j++) {
         var = display->tcorr1.active_vars.els[j];
-        world[var] += (planar->x * (greal) display->tcorr1.F.vals[0][var]);
+        world[var] += (eps->x * (greal) display->tcorr1.F.vals[0][var]);
       }
       for (j=0; j<display->tcorr2.nactive; j++) {
         var = display->tcorr2.active_vars.els[j];
-        world[var] += (planar->y * (greal) display->tcorr2.F.vals[0][var]);
+        world[var] += (eps->y * (greal) display->tcorr2.F.vals[0][var]);
       }
     /*}*/
     break;
@@ -463,15 +479,15 @@ pt_world_to_raw_by_var (gint j, greal *world, greal *raw, datad *d)
 }
 
 void
-pt_screen_to_raw (icoords *screen, greal *raw,
-  datad *d, splotd *sp, ggobid *gg)
+pt_screen_to_raw (icoords *screen, gint id, gboolean horiz, gboolean vert,
+  greal *raw, gcoords *eps, datad *d, splotd *sp, ggobid *gg)
 {
   gint j;
   gcoords planar;
   greal *world = (greal *) g_malloc0 (d->ncols * sizeof(greal));
 
-  pt_screen_to_plane (screen, &planar, sp);
-  pt_plane_to_world (sp, &planar, world); 
+  pt_screen_to_plane (screen, id, horiz, vert, eps, &planar, sp);
+  pt_plane_to_world (sp, &planar, &planar, world); 
 
   for (j=0; j<d->ncols; j++)
     pt_world_to_raw_by_var (j, world, raw, d);
@@ -484,12 +500,14 @@ fetch_default_record_values (gchar **vals, datad *dtarget, displayd *display,
   ggobid *gg)
 {
   gint j;
+  gcoords eps;
 
   if (dtarget == display->d) {
     /*-- use the screen position --*/
     greal *raw = (greal *) g_malloc (dtarget->ncols * sizeof (greal));
-    pt_screen_to_raw (&gg->current_splot->mousepos, raw,
-      dtarget, gg->current_splot, gg);
+    pt_screen_to_raw (&gg->current_splot->mousepos,
+      -1, true, true, /* no id, both horiz and vert are true */
+      raw, &eps, dtarget, gg->current_splot, gg);
     for (j=0; j<dtarget->ncols; j++)
       vals[j] = g_strdup_printf ("%g", raw[j]);
     g_free (raw);

@@ -96,6 +96,68 @@ movepts_history_delete_last (datad *d, ggobid *gg)
 
 /*------------------------------------------------------------------------*/
 
+void
+movept_screen_to_raw (splotd *sp, gint ipt, gcoords *eps,
+                      gboolean horiz, gboolean vert, ggobid *gg)
+{
+  gint j;
+  gcoords planar;
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
+  greal *world = (greal *) g_malloc0 (d->ncols * sizeof(greal));
+  icoords pos;
+  greal *raw = (greal *) g_malloc (d->ncols * sizeof (greal));
+
+  pos.x = sp->screen[ipt].x;
+  pos.y = sp->screen[ipt].y;
+  for (j=0; j<d->ncols; j++)
+    world[j] = d->world.vals[ipt][j];
+
+  pt_screen_to_plane (&pos, ipt, horiz, vert, eps, &planar, sp);
+  pt_plane_to_world (sp, &planar, eps, world); 
+
+  for (j=0; j<d->ncols; j++)
+    pt_world_to_raw_by_var (j, world, raw, d);
+
+  for (j=0; j<d->ncols; j++) {
+    d->raw.vals[ipt][j] = d->tform.vals[ipt][j] = raw[j];
+    d->world.vals[ipt][j] = world[j];
+  }
+  sp->planar[ipt].x = planar.x;
+  sp->planar[ipt].y = planar.y;
+
+  g_free (raw);
+  g_free (world);
+}
+
+void
+movept_plane_to_raw (splotd *sp, gint ipt, gcoords *eps, datad *d, ggobid *gg)
+{
+  gint j;
+  gcoords planar;
+  greal *world = (greal *) g_malloc0 (d->ncols * sizeof(greal));
+  greal *raw = (greal *) g_malloc (d->ncols * sizeof (greal));
+
+  planar.x = sp->planar[ipt].x;
+  planar.y = sp->planar[ipt].y;
+  for (j=0; j<d->ncols; j++)
+    world[j] = d->world.vals[ipt][j];
+
+  pt_plane_to_world (sp, &planar, eps, world); 
+
+  for (j=0; j<d->ncols; j++)
+    pt_world_to_raw_by_var (j, world, raw, d);
+
+  for (j=0; j<d->ncols; j++) {
+    d->raw.vals[ipt][j] = d->tform.vals[ipt][j] = raw[j];
+    d->world.vals[ipt][j] = world[j];
+  }
+
+  g_free (raw);
+  g_free (world);
+}
+
+/*------------------------------------------------------------------------*/
 
 void
 move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
@@ -114,7 +176,7 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
     sp->screen[id].y = y;
 
   /* run the pipeline backwards for case 'id' */
-  splot_reverse_pipeline (sp, id, &gg->movepts.eps, horiz, vert, gg);
+  movept_screen_to_raw (sp, id, &gg->movepts.eps, horiz, vert, gg);
 
   /* Let this work even if all points are the same glyph and color */
   if (gg->movepts.cluster_p) {
@@ -137,8 +199,7 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
               sp->planar[k].y += gg->movepts.eps.y;
 
             /*-- run only the latter portion of the reverse pipeline --*/
-            splot_plane_to_world (sp, k, gg);
-            world_to_raw (k, sp, d, gg);
+            movept_plane_to_raw (sp, k, &gg->movepts.eps, d, gg);
           }
         }
       }

@@ -19,7 +19,26 @@ RedrawStyle p1d_activate (gint, displayd *, ggobid *);
 RedrawStyle viewmode_activate (splotd *, PipelineMode, gboolean, ggobid *);
 RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
 
+/* reverse pipeline */
+void pt_screen_to_plane (icoords *screen, gint id, gboolean horiz, gboolean vert, gcoords *eps, gcoords *planar, splotd *sp);
+void pt_plane_to_world (splotd *sp, gcoords *planar, gcoords *eps, greal *world);
+void pt_world_to_raw_by_var (gint j, greal *world, greal *raw, datad *d);
+
+/*-- this is the one that's used for axes and by the barchart --*/
+void splot_screen_to_tform (cpaneld *, splotd *, icoords *, fcoords *, ggobid *);
+/*-- these aren't used, but the classes think they are .. or are they? --*/
+/*
+void world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg);
+void world_to_raw (gint, splotd *, datad *, ggobid *);
+*/
+
+/* no longer used
+void splot_plane_to_world (splotd *, gint, ggobid *);
+void splot_reverse_pipeline (splotd *, gint, gcoords *, gboolean, gboolean, ggobid *);
+*/
+
 /* sort -t":" -k1.12 */
+gboolean   array_contains (gint* arr, gint n, gint el);
 void       edgeedit_init (ggobid * gg);
 GtkWidget* CreateMenuCheck (GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
@@ -417,12 +436,9 @@ splotd*    splot_new (displayd *, gint, gint, ggobid *);
 void       splot_pixmap0_to_pixmap1 (splotd *, gboolean, ggobid *);
 void       splot_pixmap1_to_window (splotd *, ggobid *);
 void       splot_plane_to_screen (displayd *, cpaneld *, splotd *, ggobid *);
-void       splot_plane_to_world (splotd *, gint, ggobid *);
 gboolean   splot_plot_case (gint m, datad *, splotd *, displayd *, ggobid *);
 void       splot_points_realloc (gint, splotd *, datad *);
 void       splot_redraw (splotd *sp, RedrawStyle, ggobid *);
-void       splot_reverse_pipeline (splotd *, gint, gcoords *, gboolean, gboolean, ggobid *);
-void       splot_screen_to_tform (cpaneld *, splotd *, icoords *, fcoords *, ggobid *);
 void       splot_set_current (splotd *, gboolean, ggobid *);
 void       splot_set_plot_center (splotd *);
 void       splot_text_extents (gchar *text, GtkStyle *style, gint *lbearing, gint *rbearing, gint *width, gint *ascent, gint *descent);
@@ -647,7 +663,6 @@ void       viewmode_submenus_update (PipelineMode prev_mode, displayd *, ggobid 
 GtkWidget* widget_find_by_name (GtkWidget *, gchar *);
 void       widget_initialize (GtkWidget *w, gboolean initd);
 gboolean   widget_initialized (GtkWidget *w);
-void       world_to_raw (gint, splotd *, datad *, ggobid *);
 void       writeall_window_open (ggobid *);
 void       wvis_init (ggobid *gg);
 void       wvis_window_open (ggobid *gg);
@@ -702,7 +717,6 @@ void cpanel_barchart_set (cpaneld *cpanel, GtkWidget *panel, ggobid *gg);
 void barchart_scale_event_handlers_toggle(splotd *sp, gboolean state);
 
 displayd *barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, datad * d, ggobid * gg);
-#endif
 
 
 #ifdef WIN32
@@ -723,16 +737,10 @@ void win32_drawing_arrays_free (splotd *sp);
 void varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, datad *d);
 GtkWidget *varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, datad *d);
 
-
 void display_plot (displayd *display, RedrawStyle type, ggobid *gg);
 
-gboolean array_contains (gint* arr, gint n, gint el);
-
-void world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg);
 void scatterXYAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc);
 void scatter1DAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc);
-
-
 
 gboolean processRestoreFile(const gchar * const fileName, ggobid *gg);
 
@@ -753,4 +761,6 @@ gboolean registerPlugin(ggobid *gg, GGobiPluginInfo *plugin);
 /* needed by transform.c */
 extern double erf(double x);
 extern double erfc(double x);
+#endif
+
 #endif
