@@ -19,10 +19,12 @@
 
 
 void
-scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) {
+scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
+ ggobid *gg, gboolean useIds)
+{
 
 /*
- * I/O menu
+ * ViewMode menu
 */
   gg->app.scatterplot_mode_menu = gtk_menu_new ();
 
