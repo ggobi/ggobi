@@ -134,7 +134,7 @@
   </dll>
  </inputPlugin>
 
- <inputPlugin name="testInput">
+ <inputPlugin name="testInput" interactive="true">
   <description>Generates random data via an input plugin</description>
    <author>Duncan Temple Lang</author>
    <modeName>testInput</modeName>
