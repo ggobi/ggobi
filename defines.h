@@ -93,7 +93,8 @@ typedef enum {NULLMODE = -1,
 #define SCATMAT 11
 #define PCPLOT  12
 #define TSPLOT  13
-#endif
+
+#endif /* Plot mode defines */
 /* */
 
 #define TEXTURE 0

@@ -328,6 +328,12 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   if(DefaultPrintHandler.callback == NULL)
     setStandardPrintHandlers();
 
+#ifdef USE_XML
+  if(sessionOptions->info->colorSchemeFile) {
+      read_colorscheme(sessionOptions->info->colorSchemeFile, &sessionOptions->colorSchemes);
+  }
+#endif
+
   make_ggobi (sessionOptions, processEvents, gg);
 
   /* g_free (sessionOptions->data_in); */
