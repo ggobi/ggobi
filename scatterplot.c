@@ -154,8 +154,11 @@ scatterplot_display_menus_make (displayd *display,
                                 GtkSignalFunc func,
                                 GtkWidget *mbar, ggobid *gg)
 {
-  GtkWidget *options_menu, *link_menu;
+  GtkWidget *options_menu;
   GtkWidget *submenu;
+#ifdef UNLINKING_IMPLEMENTED
+  GtkWidget *link_menu;
+#endif
 
 /*
  * Options menu
@@ -167,7 +170,7 @@ scatterplot_display_menus_make (displayd *display,
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   CreateMenuCheck (display, options_menu, "Show lines (undirected)",
     func, GINT_TO_POINTER (DOPT_SEGS_U), off, gg);
-  CreateMenuCheck (display, options_menu, "Show lines (directed)",
+  CreateMenuCheck (display, options_menu, "Show arrowheads (for directed lines)",
     func, GINT_TO_POINTER (DOPT_SEGS_D), off, gg);
 /*
   CreateMenuCheck (display, options_menu, "Show missings",
@@ -192,6 +195,7 @@ scatterplot_display_menus_make (displayd *display,
 /*
  * Link menu
 */
+#ifdef UNLINKING_IMPLEMENTED
   submenu = submenu_make ("_Link", 'L', accel_group);
   link_menu = gtk_menu_new ();
 
@@ -201,6 +205,7 @@ scatterplot_display_menus_make (displayd *display,
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), link_menu);
   submenu_append (submenu, mbar);
   gtk_widget_show (submenu);
+#endif
 }
 
 

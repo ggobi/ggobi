@@ -43,12 +43,14 @@ id_all_sticky_cb (GtkWidget *w, ggobid *gg)
   }
   displays_plot (NULL, QUICK, gg);
 }
+#ifdef UNLINKING_IMPLEMENTED
 static void
 identify_link_cb (GtkCheckMenuItem *w, gpointer cbd)
 {
   gchar *lbl = (gchar *) cbd;
   g_printerr("state: %d, cbd: %s\n", w->active, lbl);
 }
+#endif
 
 /*--------------------------------------------------------------------*/
 /*      Handling keyboard and mouse events in the plot window         */
@@ -221,11 +223,13 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
 
 void
 identify_menus_make (ggobid *gg) {
-  GtkWidget *item;
 
 /*
  * Link menu
 */
+#ifdef UNLINKING_IMPLEMENTED
+  GtkWidget *item;
+
   gg->identify.link_menu = gtk_menu_new ();
 
   item = gtk_check_menu_item_new_with_label("Link identification");
@@ -235,6 +239,7 @@ identify_menus_make (ggobid *gg) {
   gtk_menu_append (GTK_MENU (gg->identify.link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
   gtk_widget_show(item);
+#endif
 }
 
 void

@@ -142,12 +142,14 @@ brush_reset(ggobid *gg, gint action)
 }
 
 /* Actions from the Link menu in the main menubar */
+#ifdef BRUSHING_OPTIONS_IMPLEMENTED
 static void
 brush_link_cb (GtkCheckMenuItem *w, gpointer cbd)
 {
   gchar *lbl = (gchar *) cbd;
   g_printerr ("state: %d, cbd: %s\n", w->active, lbl);
 }
+#endif
 
 /* Options from the Options menu in the main menubar */
 void
@@ -344,6 +346,11 @@ brush_menus_make (ggobid *gg) {
 /*
  * Link menu
 */
+/* 
+ * it may turn out that we don't want many of these options since
+ * we'll use xml to define the rules for linking behavior.
+*/
+#ifdef BRUSHING_OPTIONS_IMPLEMENTED
   gg->brush.link_menu = gtk_menu_new ();
 
   item = gtk_check_menu_item_new_with_label ("Link points <-> points");
@@ -381,6 +388,7 @@ brush_menus_make (ggobid *gg) {
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   gtk_widget_show_all (gg->brush.link_menu);
+#endif
 }
 
 void

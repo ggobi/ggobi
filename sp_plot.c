@@ -657,10 +657,13 @@ edges_draw (splotd *sp, ggobid *gg)
 
         if (doit) {
           if (d->line.color_now.els[j] == current_color) {
-            sp->edges[nl].x1 = sp->screen[from].x;
-            sp->edges[nl].y1 = sp->screen[from].y;
-            sp->edges[nl].x2 = sp->screen[to].x;
-            sp->edges[nl].y2 = sp->screen[to].y;
+
+            if (display->options.edges_undirected_show_p) {
+              sp->edges[nl].x1 = sp->screen[from].x;
+              sp->edges[nl].y1 = sp->screen[from].y;
+              sp->edges[nl].x2 = sp->screen[to].x;
+              sp->edges[nl].y2 = sp->screen[to].y;
+            }
 
             if (display->options.edges_directed_show_p) {
               /*
@@ -681,10 +684,15 @@ edges_draw (splotd *sp, ggobid *gg)
         gdk_gc_set_foreground (gg->plot_GC,
           &gg->default_color_table[current_color]);
 
-      gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->edges, nl);
+      if (display->options.edges_undirected_show_p)
+        gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->edges, nl);
 
       if (display->options.edges_directed_show_p) {
+        gdk_gc_set_line_attributes (gg->plot_GC,
+          3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
         gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->arrowheads, nl);
+        gdk_gc_set_line_attributes (gg->plot_GC,
+          0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
       }
     }
   }

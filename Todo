@@ -35,7 +35,7 @@ In progress, needing design discussions:
 various stuff not yet implemented:
   Options on options menu
   show/hide missings button
-  some window closings  (display tree, ...)
+  some window closings  (display tree ok; check others)
   "row groups" are only partially implemented
   1d, xy cycling  .... or run as a demo in R for now? (disabled for now)
 

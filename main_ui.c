@@ -226,11 +226,15 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
 
       case BRUSH:
         submenu_destroy (gg->mode_menu.reset_item);
+#ifdef BRUSHING_OPTIONS_IMPLEMENTED
         submenu_destroy (gg->mode_menu.link_item);
+#endif
       break;
 
       case IDENT:
+#ifdef UNLINKING_IMPLEMENTED
         submenu_destroy (gg->mode_menu.link_item);
+#endif
       break;
     }
   } else if (state == on) {
@@ -303,21 +307,25 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
           gg->brush.reset_menu);
           submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
 
+#ifdef BRUSHING_OPTIONS_IMPLEMENTED
         gg->mode_menu.link_item = submenu_make ("_Link", 'L',
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
           gg->brush.link_menu); 
           submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
+#endif
       break;
 
       case IDENT:
         identify_menus_make (gg);
 
+#ifdef UNLINKING_IMPLEMENTED
         gg->mode_menu.link_item = submenu_make ("_Link", 'L',
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
           gg->identify.link_menu); 
           submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
+#endif
       break;
     }
   }
