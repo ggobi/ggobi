@@ -73,15 +73,11 @@ also TAR_FILE, RGGOBI_TAR_FILE to the locations of the tar.gz files.)
 Preparing a Release
 ===================
 
-ssh franz.stat.wisc.edu
+It's best to do this on some machine that has pdflatex and xml2.
+(I'm using my laptop running linux.  -- dfs)
 
-alias R=/usr/bin/R
-export R_HOME=`R RHOME`
-export CVSROOT=/home/xgobi/CVSRoot
-export OMEGA_HOME=~omega/org/omegahat
-export TEXINPUTS=$TEXINPUTS:$OMEGA_HOME
-
-0. Make sure all three directories are up to date.
+0. Make sure all relevant directories are up to date.  Plugins?
+   Python and perl modules?
 
   cd ggobi
   cvs update -d -P
@@ -94,27 +90,37 @@ export TEXINPUTS=$TEXINPUTS:$OMEGA_HOME
      cd ggobi
      make ADMIN=1 DOC_TEX_FILES=
      cd /tmp/ggobi/Install/ggobi
+     # no arguments should be required here, but point to libxml2 if
+     # you have to
+     ./configure
      ./configure  --with-xml=/usr/lib/libxml2
-         or, if that isn't working properly,
-     ./configure  --with-xml
      make
 
-2. Build the tar file, from the ggobi directory, not the test directory.
+2. Build the tar files
 
-  make ADMIN=1 DOC_TEX_FILES= tar
+  # First, edit VersionInfo -- otherwise permission problems
+  #   may prevent you from overwriting the existing version on franz.
+  #   You may want a higher version number in any case.
+  # Also, comment out in Install/GNUmakefile.admin any packages
+  #  that you just can't figure out how to build.
+
+  make ADMIN=1 tar
+
+  # Point to the libxml source from xmlsoft.org
+  make ADMIN=1 LIBXML_TAR_FILE=/usr/dfs/src/libxml2-2.4.16.tar.gz xmlTar
 
 3. cd Web, make install
 
-(You may need to set GGOBI_SRC to the location of the src code, and
-hence the notes directory which contains pieces for the web site. And
-also TAR_FILE, RGGOBI_TAR_FILE to the locations of the tar.gz files.
+   make configure
+   make Download.html   # this may take care of 'make configure'
+   #  Do not try to execute 'make index.html' ; it always fails,
+   #  and the creation of index.html is a side effect of making
+   #  Download.html
 
-Also with the CVSROOT variable set to
-   franz.stat.wisc.edu:/home/xgobi/CVSRoot
-and CVS_RSH set to
-   ssh
-)
-
+   # These are the arguments that worked for me -- dfs
+   make TAR_FILE=/usr/dfs/ggobi/ggobi/ggobi_0.97-0.tar.gz \
+    XML_TAR_FILE=/usr/dfs/ggobi/ggobi/ggobi-xml_0.97-0.tar.gz \
+    RGGOBI_TAR_FILE=/usr/dfs/ggobi/Rggobi_0.4-1.tar.gz
 
 R-GGobi Installation from cvs
 =============================
