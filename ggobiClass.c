@@ -327,7 +327,6 @@ static void
 splotDestroy(GtkObject *obj)
 {
     GtkObjectClass *klass;
-#if 0
     splotd *sp = GTK_GGOBI_SPLOT(obj);
      /* Can't we just do this in the extended display class, or even the displayd class itself. */
     if(sp->whiskers) {
@@ -344,7 +343,7 @@ splotDestroy(GtkObject *obj)
     }
 
     sp->da = NULL;
-#endif
+
 
     klass = GTK_OBJECT_CLASS(gtk_type_class(GTK_TYPE_DRAWING_AREA));
     if(klass->destroy)
