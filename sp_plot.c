@@ -49,24 +49,19 @@ splot_check_colors (gushort maxcolorid, gint *ncolors_used,
 
 
 gboolean
-splot_plot_case (gint m, gboolean ignore_hidden, datad *d,
+splot_plot_case (gint m, datad *d,
   splotd *sp, displayd *display, ggobid *gg)
 {
-  gboolean draw_case;
+  gboolean draw_case = true;
 
   /*-- determine whether case m should be plotted --*/
   /*-- usually checking sampled is redundant because we're looping
        over rows_in_plot, but maybe we're not always --*/
-  draw_case = true;
-
-  if (!d->sampled.els[m]) {
-    draw_case = false;
-
-  } else if (ignore_hidden && d->hidden_now.els[m]) {
+  if (d->excluded.els[m] || !d->sampled.els[m])
     draw_case = false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  } else if (d->nmissing > 0 && !d->missings_show_p) {
+  else if (d->nmissing > 0 && !d->missings_show_p) {
     if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
       GtkGGobiExtendedSPlotClass *klass;
       klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
@@ -171,9 +166,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot.els[i];
-        if (d->hidden_now.els[m] &&
-            splot_plot_case (m, false, d, sp, display, gg))
-        {
+        if (d->hidden_now.els[m] && splot_plot_case (m, d, sp, display, gg)) {
           draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
             m, gg);
           if (klass && klass->within_draw_to_unbinned)
@@ -212,7 +205,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
           for (i=0; i<d->nrows_in_plot; i++) {
             m = d->rows_in_plot.els[i];
             if (d->color_now.els[m] == current_color &&
-              splot_plot_case (m, true, d, sp, display, gg))
+              !d->hidden_now.els[m] &&
+              splot_plot_case (m, d, sp, display, gg))
             {
               draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
                 m, gg);
@@ -339,9 +333,9 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
           for (m=0; m<d->brush.binarray[ih][iv].nels ; m++) {
             i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
 
-            /* if hidden && plottable (excluding hiddens) */
+            /* if hidden && plottable */
             if (d->hidden_now.els[i] &&
-                splot_plot_case (i, false, d, sp, display, gg))
+                splot_plot_case (i, d, sp, display, gg))
             {
               draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
                 sp->screen, i, gg);
@@ -379,8 +373,9 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             for (m=0; m<d->brush.binarray[ih][iv].nels ; m++) {
               i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
 
-              if (d->color_now.els[i] == current_color &&
-                  splot_plot_case (i, true, d, sp, display, gg))
+              if (!d->hidden_now.els[i] &&
+                  d->color_now.els[i] == current_color &&
+                  splot_plot_case (i, d, sp, display, gg))
               {
                 draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
                   sp->screen, i, gg);

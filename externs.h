@@ -12,7 +12,6 @@
 extern "C" {
 #endif
 
-
 RedrawStyle brush_activate (gboolean, displayd *, ggobid *);
 RedrawStyle identify_activate (gint, displayd *, ggobid *);
 RedrawStyle p1d_activate (gint, displayd *, ggobid *);
@@ -232,6 +231,7 @@ gboolean   edges_read (InputDescription *desc, gboolean, datad *, ggobid *);
 gboolean   edgeset_add (displayd *);
 void       edgeset_add_cb (GtkWidget *w, datad *e);
 void       eigenvals_get (gfloat *, datad *);
+gboolean   exclude_link_by_id (gint k, datad *source_d, ggobid *gg);
 gint       fcompare (const void *x1, const void *x2);
 void       filename_get_r (ggobid *, guint, GtkWidget *);
 void       filename_get_w (GtkWidget *, ggobid *);
@@ -344,9 +344,6 @@ void       rejitter (gint *, gint, datad *, ggobid *);
 void       reset_pp(datad *, gint, gint, ggobid *, void *);
 void       rnorm2 (gdouble *, gdouble *);
 void       rotation_event_handlers_toggle (splotd *, gboolean);
-void       rowids_alloc (datad *);
-void       rowids_init_null (datad *d);
-void       rowidv_init (datad *d);
 void       rowlabels_alloc (datad *d, ggobid *) ;
 void       rowlabels_free (datad *d, ggobid *);
 gboolean   rowlabels_read (InputDescription *desc, gboolean, datad *, ggobid *);
@@ -411,7 +408,7 @@ void       splot_pixmap0_to_pixmap1 (splotd *, gboolean, ggobid *);
 void       splot_pixmap1_to_window (splotd *, ggobid *);
 void       splot_plane_to_screen (displayd *, cpaneld *, splotd *, ggobid *);
 void       splot_plane_to_world (splotd *, gint, ggobid *);
-gboolean   splot_plot_case (gint m, gboolean, datad *, splotd *, displayd *, ggobid *);
+gboolean   splot_plot_case (gint m, datad *, splotd *, displayd *, ggobid *);
 void       splot_redraw (splotd *sp, RedrawStyle, ggobid *);
 void       splot_reverse_pipeline (splotd *, gint, gcoords *, gboolean, gboolean, ggobid *);
 void       splot_screen_to_tform (cpaneld *, splotd *, icoords *, fcoords *, ggobid *);
@@ -438,7 +435,7 @@ gboolean   subset_range (greal min, greal max, gint j, datad *d, ggobid *gg);
 gboolean   subset_rowlab (gchar *, datad *, ggobid *);
 gboolean   subset_sticky (datad *, ggobid *);
 void       subset_window_open (ggobid *, guint, GtkWidget *);
-void       symbol_link_by_id (gboolean persistentp, gint k, datad *source_d, ggobid *gg);
+gboolean   symbol_link_by_id (gboolean persistentp, gint k, datad *source_d, ggobid *gg);
 gint       symbol_table_populate (datad *d);
 void       symbol_window_redraw (ggobid *);
 void       t1d_clear_ppda (displayd *, ggobid *);

@@ -23,7 +23,7 @@
 /*------------------------------------------------------------------------*/
 
 gboolean
-splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
+splot_plot_edge (gint m, datad *d, datad *e,
   splotd *sp, displayd *display, ggobid *gg)
 {
   gint a, b;
@@ -34,23 +34,21 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
   draw_edge = edge_endpoints_get (m, &a, &b, d, endpoints, e);
 
   if(!draw_edge)
-    return(false);
+    return (false);
 
   /*-- determine whether edge m should be plotted --*/
   /*-- usually checking sampled is redundant because we're looping
        over rows_in_plot, but maybe we're not always --*/
 
-  if (!e->sampled.els[m])
+  if (e->excluded.els[m] || !e->sampled.els[m])
     draw_edge = false;
-  else if (ignore_hidden) {
-    if (e->hidden_now.els[m])
-      draw_edge = false;
-    else if (!splot_plot_case (a, ignore_hidden, d, sp, display, gg) ||
-             !splot_plot_case (b, ignore_hidden, d, sp, display, gg))
+
+  else if (!splot_plot_case (a, d, sp, display, gg) ||
+    !splot_plot_case (b, d, sp, display, gg))
       draw_edge = false;
   
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  } else if (e->nmissing > 0 && !e->missings_show_p) {
+  else if (e->nmissing > 0 && !e->missings_show_p) {
     if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
       GtkGGobiExtendedSPlotClass *klass;
       klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
@@ -178,15 +176,12 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
 
             for (j=0; j<e->edge.n; j++) {
 
-              if (draw_hidden) {
-                if (!splot_plot_edge (j, false, d, e, sp, display, gg)) {
+              if (draw_hidden && !splot_hidden_edge (j, d, e, sp, display, gg))
                   continue;
-                }
-              } else {
-                if (!splot_plot_edge (j, true, d, e, sp, display, gg)) {
+              if (!draw_hidden && splot_hidden_edge (j, d, e, sp, display, gg))
                   continue;
-                }
-              }
+              if (!splot_plot_edge (j, d, e, sp, display, gg))
+                continue;
 
               edge_endpoints_get (j, &a, &b, d, endpoints, e);
 
@@ -403,7 +398,6 @@ splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
 
   if (k >= e->edge.n) return;
 
-  /*-- not yet using rowid.idv  -- huh? --*/
   if (e->hidden_now.els[k]) return;
 
   if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
