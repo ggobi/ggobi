@@ -25,6 +25,7 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
   gchar *val_str;
   gboolean ok = true;
   vartabled *vt;
+  GtkWidget *w;
 
   if (d->missing.nrows == 0) {
     quick_message ("There are no missings.\n", false);
@@ -36,12 +37,13 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
 
   if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
 
-    if (impute_type == IMP_ABOVE)
-      val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->impute.entry_above),
-        0, -1);
-    else if (impute_type == IMP_BELOW)
-      val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->impute.entry_below),
-        0, -1);
+    if (impute_type == IMP_ABOVE) {
+      w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_above");
+      val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
+    }  else if (impute_type == IMP_BELOW) {
+      w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_below");
+      val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
+    }
 
     if (strlen (val_str) == 0) {
       gchar *message = g_strdup_printf (
@@ -88,9 +90,8 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
     }
   }
   else if (impute_type == IMP_FIXED) {
-
-    val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->impute.entry_val),
-      0, -1);
+    w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_val");
+    val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
     if (strlen (val_str) == 0) {
       quick_message (
         "You've selected 'Specify' but haven't specified a value.\n",
@@ -114,6 +115,34 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
   }
 
   return ok;
+}
+
+gboolean
+impute_mean_or_median (gint type, gint nvars, gint *vars, 
+   datad *d, ggobid *gg)
+{
+  gint i, j, k, m;
+  vartabled *vt;
+  gboolean redraw = false;
+
+  if (d->nmissing == 0)
+/**/return false;
+
+  for (m=0; m<nvars; m++) {
+    j = vars[m];
+    vt = vartable_element_get (j, d);
+    for (i=0; i<d->nrows_in_plot; i++) {
+      k = d->rows_in_plot.els[i];
+      if (!d->hidden_now.els[k]) {   /* ignore erased values altogether */
+        if (d->missing.vals[k][j]) {
+          d->raw.vals[k][j] = d->tform.vals[k][j] = (type == IMP_MEAN) ?
+            vt->mean : vt->median;
+          redraw = true;
+        }
+      }
+    }
+  }
+  return redraw;
 }
 
 static void

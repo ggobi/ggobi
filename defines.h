@@ -238,12 +238,6 @@ enum {ID_RECORD_LABEL, ID_RECORD_NO, ID_VAR_LABELS, ID_RECORD_ID};
 #define Z_VERT    2
 #define Z_OBLIQUE 3
 
-/*-- imputation --*/
-#define IMP_RANDOM 0
-#define IMP_FIXED  1
-#define IMP_BELOW  2
-#define IMP_ABOVE  3
-
 /*-- color by variable --*/
 #define WVIS_EQUAL_WIDTH_BINS 0
 #define WVIS_EQUAL_COUNT_BINS 1

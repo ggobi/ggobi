@@ -390,9 +390,11 @@ struct _ggobid {
     gboolean bgroup_p;
     gint whichvars;
     GtkWidget *window;
-    GtkWidget *notebook;  /*- notebook of imputation types --*/
-   /*-- the entry widgets from which to get values to impute --*/
+    ImputeType type;
+    /*
+    GtkWidget *notebook;
     GtkWidget *entry_above, *entry_below, *entry_val;
+    */
   } impute;
 
 /*-------------------- moving points ---------------------------------*/
@@ -547,6 +549,7 @@ extern GGobiOptions *sessionOptions;
      for ggobi.c
      IMHO that should be the correct behavior for all platforms, but ... */
 #if !defined Darwin || defined GGOBI_C
+  /*#if defined GGOBI_C*/ /* use this line only when using cc, not gcc */
 EXTERN GGobiOptions *sessionOptions;
 #endif
 

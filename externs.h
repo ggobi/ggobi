@@ -288,6 +288,7 @@ void       identify_event_handlers_toggle (splotd *, gboolean);
 gchar *    identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *);
 void       identify_link_by_id (gint k, datad *source_d, ggobid *gg);
 gboolean   impute_fixed (gint, gint nvars, gint *vars, datad *, ggobid *);
+gboolean   impute_mean_or_median (gint, gint, gint *, datad *, ggobid *);
 void       impute_random (datad *, gint nvars, gint *vars, ggobid *);
 void       impute_window_open (ggobid *);
 gint       include_hiddens (gboolean include, datad *d, ggobid *gg);
