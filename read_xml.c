@@ -1185,7 +1185,11 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
           for elements. This should simplify (slightly) releaseCurrentDataInfo(). */
       data->autoLevels[data->current_variable] = g_hash_table_new(g_str_hash, g_str_equal);
     }
-  }
+  } else if (strcmp((const char *)tagName, "integervariable") == 0) {
+    el->vartype = integer;
+  } else if (strcmp((const char *)tagName, "countervariable") == 0) {
+    el->vartype = counter;
+  } /* real by default */
 
   return (true);
 }
