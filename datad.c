@@ -114,7 +114,6 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
  * corresponding to different datad's.  This is a way to figure
  * out which datad we should be operating on in that case.
 */
-/*-- better way to do this, maybe: nclusters_changed in exclusion_ui.c --*/
 datad *
 datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
   if (g_slist_length (gg->d) == 1) {

@@ -19,7 +19,6 @@
 static gint xmargin = 20;
 static gint ymargin = 20;
 
-/*------------- static utilities ------------------------------------------*/
 static GtkWidget *
 get_clist_from_widget (GtkWidget *w)
 {
@@ -32,8 +31,8 @@ get_clist_from_widget (GtkWidget *w)
 
   return clist;
 }
-static gint
-get_selection_from_clist (GtkWidget *clist)
+static gint  /*-- assumes GTK_SELECTION_SINGLE --*/
+get_one_selection_from_clist (GtkWidget *clist)
 {
   GList *selection = GTK_CLIST (clist)->selection;
   gint selected_var = -1;
@@ -116,7 +115,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
 
   GtkWidget *clist = get_clist_from_widget (w);
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_selection_from_clist (clist);
+  gint selected_var = get_one_selection_from_clist (clist);
 
   icoords *mousepos = &gg->wvis.mousepos;
   gint nearest_color = gg->wvis.nearest_color;
@@ -224,7 +223,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
   GtkWidget *clist = get_clist_from_widget (w);
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_selection_from_clist (clist);
+  gint selected_var = get_one_selection_from_clist (clist);
 
   GtkWidget *da = gg->wvis.da;
   GdkPixmap *pix = gg->wvis.pix;
@@ -433,7 +432,7 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *clist = get_clist_from_widget (w);
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_selection_from_clist (clist);
+  gint selected_var = get_one_selection_from_clist (clist);
 
   if (d && selected_var != -1) {
     gint i, m, k;
@@ -481,36 +480,8 @@ wvis_window_open (ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (gg->wvis.window), vbox);
 
     /* Create a notebook, set the position of the tabs */
-    notebook = gtk_notebook_new ();
-    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
-    gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
-    gtk_box_pack_start (GTK_BOX (vbox), notebook, true, true, 2);
-
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-
-      /* Create a scrolled window to pack the CList widget into */
-      swin = gtk_scrolled_window_new (NULL, NULL);
-      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
-        GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-      gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-                                swin, gtk_label_new (d->name));
-      gtk_widget_show (swin);
-
-      /* add the CList */
-      clist = gtk_clist_new (1);
-      gtk_clist_set_selection_mode (GTK_CLIST (clist), GTK_SELECTION_SINGLE);
-      gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
-      gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-                         GTK_SIGNAL_FUNC (selection_made_cb),
-                         gg);
-
-      for (j=0; j<d->ncols; j++) {
-        row[0] = g_strdup_printf (d->vartable[j].collab_tform);
-        gtk_clist_append (GTK_CLIST (clist), row);
-      }
-      gtk_container_add (GTK_CONTAINER (swin), clist);
-    }
+    notebook = create_variable_notebook (vbox, GTK_SELECTION_SINGLE,
+      (GtkSignalFunc) selection_made_cb, gg);
 
     /*-- colors, symbols --*/
     /*-- now we get fancy:  draw the scale, with glyphs and colors --*/

@@ -117,9 +117,6 @@ rejitter (datad *d, ggobid *gg) {
 }
 
 
-/*
- * This needs a plotted_cols_get
-*/
 void
 jitter_value_set (gfloat value, datad *d, ggobid *gg) {
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));

@@ -378,6 +378,10 @@ varcircles_populate (datad *d, ggobid *gg)
     true, true, 2);
   gtk_signal_connect (GTK_OBJECT (d->vcirc_ui.freeze_btn),
     "button_press_event", GTK_SIGNAL_FUNC (freeze_select_cb), d);
+/*
+ * not yet sensitive
+*/
+  gtk_widget_set_sensitive (d->vcirc_ui.freeze_btn, false);
 
   gtk_widget_show_all (d->vcirc_ui.vbox);
 }
@@ -489,6 +493,7 @@ varcircle_create (gint k, datad *d, ggobid *gg)
   gtk_container_border_width (GTK_CONTAINER (vb), 1);
 
   lbl = gtk_label_new (d->vartable[k].collab);
+  gtk_misc_set_alignment (GTK_MISC (lbl), 0, .5);  /*- x: left, y: middle --*/
   d->vcirc_ui.label = g_slist_append (d->vcirc_ui.label, lbl);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
     lbl, "Click left on the circle to select or deselect", NULL);
@@ -509,7 +514,7 @@ varcircle_create (gint k, datad *d, ggobid *gg)
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), da,
     "Click left to select or deselect", NULL);
-    /*"Click to select; see menu", NULL);*/
+
   gtk_signal_connect (GTK_OBJECT (da), "expose_event",
     GTK_SIGNAL_FUNC (da_expose_cb), GINT_TO_POINTER (k));
   gtk_signal_connect (GTK_OBJECT (da), "button_press_event",

@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+GtkWidget * create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, GtkSignalFunc func, ggobid *);
 gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 displayd * display_alloc_init (enum displaytyped, gboolean, datad *, ggobid *);

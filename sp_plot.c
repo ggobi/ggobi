@@ -231,6 +231,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     if (dtype == scatterplot || dtype == scatmat)
       edges_draw (sp, sp->pixmap0, gg);
   }
+g_printerr ("(unbinned) proj = %d\n", proj);
   if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
     splot_draw_tour_axes(sp, sp->pixmap0, gg);
   }
@@ -247,16 +248,21 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 #endif
   gint k;
   displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
   icoords *bin0 = &gg->plot.bin0;
   icoords *bin1 = &gg->plot.bin1;
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
+/*
   gint proj = projection_get (gg);
+*/
+  gint proj = cpanel->projection;
 
   gushort current_color;
   gint ncolors_used;
   gushort colors_used[NCOLORS+2];
+g_printerr ("(binned) proj = %d\n", proj);
 
   if (gg->plot_GC == NULL)
     init_plot_GC (sp->pixmap0, gg);
