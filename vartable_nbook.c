@@ -350,6 +350,10 @@ vartable_row_assemble (gint jvar, vartyped type, gchar **row,
       row[CAT_CLIST_DATA_MAX] = g_strdup ("");
       row[CAT_CLIST_NMISSING] = g_strdup ("");
     break;
+    case all_vartypes:
+      g_printerr ("(vartable_row_assemble) %d: illegal variable type %d\n",
+        jvar, all_vartypes);
+    break;
   }
 }
 
@@ -643,7 +647,9 @@ vartable_collab_set_by_var (gint j, datad *d)
             REAL_CLIST_VARNAME, vt->collab);
         }
       break;
-
+      case all_vartypes:
+        g_printerr ("(vartable_collab_set_by_var) illegal variable type %d\n", all_vartypes);
+      break;
     }
   }
 }
@@ -736,6 +742,10 @@ vartable_limits_set_by_var (gint j, datad *d)
           }
         }
       break;
+      case all_vartypes:
+        g_printerr ("(vartable_limits_set_by_var) %d: illegal variable type %d\n",
+          j, all_vartypes);
+      break;
     }
   }
 }
@@ -753,11 +763,11 @@ void
 vartable_stats_set_by_var (gint j, datad *d) {
   vartabled *vt = vartable_element_get (j, d);
   gchar *stmp;
+  vartyped type;
 
   if (vt) {
-    vartyped type = vt->vartype;
-    gint rownum = vartable_rownum_from_varno (j, type, d);
-    switch (type) {
+    gint rownum = vartable_rownum_from_varno (j, vt->vartype, d);
+    switch (vt->vartype) {
       case categorical:
         if (d->vartable_clist[categorical] != NULL) {
           stmp = g_strdup_printf ("%d", vt->nmissing);
@@ -791,9 +801,15 @@ vartable_stats_set_by_var (gint j, datad *d) {
             rownum, REAL_CLIST_NMISSING, stmp);
           g_free (stmp);
         }
+      break;
+      case all_vartypes:
+        g_printerr ("(vartable_stats_set_by_var) %d: illegal variable type %d\n",
+          j, vt->vartype);
+      break;
     }
   }
 }
+
 void
 vartable_stats_set (datad *d) {
   gint j;

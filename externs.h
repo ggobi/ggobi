@@ -20,7 +20,7 @@ RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
 /* sort -t":" -k1.12 */
 void       vartable_copy_var (gint jfrom, gint jto, datad *d);
 gboolean   array_contains (gint* arr, gint n, gint el);
-void       vartable_element_new (datad *d);
+vartabled* vartable_element_new (datad *d);
 void       transform_values_copy (gint jfrom, gint jto, datad *d);
 GtkCList*  vartable_clist_get (ggobid *gg);
 GtkWidget* CreateMenuCheck (GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
