@@ -30,6 +30,7 @@ DisplayOptions DefaultDisplayOptions = {
                                          true,  /* whiskers_show_p*/
                                          true,  /* axes_show_p */
                                          false, /* axes_label_p */
+                                         true, /* axes_values_p */
 /* unused
                                          true,  * missings_show_p  * 
                                          true,  * axes_center_p *
@@ -213,6 +214,17 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 	klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
 	if(klass->set_show_axes_label_option)
    	   klass->set_show_axes_label_option(display, w->active);
+      }      
+    break;
+
+    case DOPT_AXESVALS:
+      display->options.axes_values_p = w->active;
+
+      if(GTK_IS_GGOBI_EXTENDED_DISPLAY_CLASS(display)) {
+        GtkGGobiExtendedDisplayClass *klass;
+	klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+	if(klass->set_show_axes_values_option)
+   	   klass->set_show_axes_values_option(display, w->active);
       }      
     break;
 

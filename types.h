@@ -237,6 +237,7 @@ typedef struct {
 
  gboolean axes_show_p;                /* scatterplot, scatmat, parcoords */
  gboolean axes_label_p;               /* scatterplot */
+ gboolean axes_values_p;              /* scatterplot */
 /* unused
  gboolean missings_show_p;            * scatterplot, scatmat, parcoords *
  gboolean axes_center_p;              * scatterplot *

@@ -285,6 +285,7 @@ typedef struct
 
     void (*set_show_axes_option)(displayd *, gboolean);
     void (*set_show_axes_label_option)(displayd *, gboolean);
+    void (*set_show_axes_values_option)(displayd *, gboolean);
 
 } GtkGGobiExtendedDisplayClass;
 

@@ -759,7 +759,6 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
       ;
 #endif
   
-
   dsp->t2d_manipvar_inc = false;
   dsp->t2d_pos1 = dsp->t2d_pos1_old = p1;
   dsp->t2d_pos2 = dsp->t2d_pos2_old = p2;

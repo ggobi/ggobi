@@ -53,6 +53,7 @@ enum directiond {both, vertical, horizontal};
 #define DOPT_GRIDLINES 5
 #define DOPT_AXES      6
 #define DOPT_AXESLAB   7
+#define DOPT_AXESVALS  8
 /* unused
 #define DOPT_MISSINGS  5
 #define DOPT_AXES_C    9

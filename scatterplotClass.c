@@ -41,7 +41,14 @@ display_data_added_cb should only be called for scatterplot guys.
 static void
 setShowAxesLabelOption(displayd *display, gboolean active)
 {
-  if(display->cpanel.projection == COTOUR)
+  if(display->cpanel.projection == TOUR2D)
+     display_plot (display, FULL, display->ggobi);  
+}
+
+static void
+setShowAxesValuesOption(displayd *display, gboolean active)
+{
+  if(display->cpanel.projection == TOUR2D)
      display_plot (display, FULL, display->ggobi);  
 }
 
@@ -1234,6 +1241,7 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
 
   klass->parent_class.set_show_axes_option = setShowAxesOption;
   klass->parent_class.set_show_axes_label_option = setShowAxesLabelOption;
+  klass->parent_class.set_show_axes_values_option = setShowAxesValuesOption;
 
   klass->parent_class.world_to_raw = worldToRaw;
 

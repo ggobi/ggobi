@@ -727,6 +727,118 @@ tourcorr_active_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   dsp->tcorr2.get_new_target = true;
 }
 
+void 
+tourcorr_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+{
+  gboolean in_subsethor = dsp->tcorr1.subset_vars_p.els[jvar];
+  gboolean in_subsetver = dsp->tcorr2.subset_vars_p.els[jvar];
+  gboolean activehor = dsp->tcorr1.active_vars_p.els[jvar];
+  gboolean activever = dsp->tcorr2.active_vars_p.els[jvar];
+  gint j, k;
+
+  /* Taking care of horzontal variables first */ 
+  if (in_subsethor & activehor & (dsp->tcorr1.nactive>1)) {
+    /* remove variable */
+    for (j=0; j<dsp->tcorr1.nactive; j++) {
+      if (jvar == dsp->tcorr1.active_vars.els[j]) 
+        break;
+    }
+    if (j<dsp->tcorr1.nactive-1) {
+      for (k=j; k<dsp->tcorr1.nactive-1; k++){
+        dsp->tcorr1.active_vars.els[k] = dsp->tcorr1.active_vars.els[k+1];
+      }
+    }
+    dsp->tcorr1.nactive--;
+    if (!gg->tourcorr.fade_vars) /* set current position without sel var */
+    {
+      gt_basis(dsp->tcorr1.Fa, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
+        d->ncols, (gint) 1);
+      arrayd_copy(&dsp->tcorr1.Fa, &dsp->tcorr1.F);
+    }
+    dsp->tcorr1.active_vars_p.els[jvar] = false;
+  }
+  else if (in_subsethor & !activehor) {
+    /* add variable */
+    if (jvar > dsp->tcorr1.active_vars.els[dsp->tcorr1.nactive-1]) {
+      dsp->tcorr1.active_vars.els[dsp->tcorr1.nactive] = jvar;
+    }
+    else if (jvar < dsp->tcorr1.active_vars.els[0]) {
+      for (j=dsp->tcorr1.nactive; j>0; j--) {
+          dsp->tcorr1.active_vars.els[j] = dsp->tcorr1.active_vars.els[j-1];
+      }
+      dsp->tcorr1.active_vars.els[0] = jvar;
+    }
+    else {
+      gint jtmp = dsp->tcorr1.nactive;
+      for (j=0; j<dsp->tcorr1.nactive-1; j++) {
+        if (jvar > dsp->tcorr1.active_vars.els[j] && jvar < 
+          dsp->tcorr1.active_vars.els[j+1]) {
+          jtmp = j+1;
+          break;
+        }
+      }
+      for (j=dsp->tcorr1.nactive-1;j>=jtmp; j--) 
+          dsp->tcorr1.active_vars.els[j+1] = dsp->tcorr1.active_vars.els[j];
+      dsp->tcorr1.active_vars.els[jtmp] = jvar;
+    }
+    dsp->tcorr1.nactive++;
+    dsp->tcorr1.active_vars_p.els[jvar] = true;
+  }
+
+  /* Now vertical variables */
+  if (in_subsetver & activever & (dsp->tcorr2.nactive>1)) {
+    /* remove variable */
+    for (j=0; j<dsp->tcorr2.nactive; j++) {
+      if (jvar == dsp->tcorr2.active_vars.els[j]) 
+        break;
+    }
+    if (j<dsp->tcorr2.nactive-1) {
+      for (k=j; k<dsp->tcorr2.nactive-1; k++) {
+        dsp->tcorr2.active_vars.els[k] = dsp->tcorr2.active_vars.els[k+1];
+      }
+    }
+    dsp->tcorr2.nactive--;
+
+    if (!gg->tourcorr.fade_vars) /* set current position without sel var */
+    {
+      gt_basis(dsp->tcorr2.Fa, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
+        d->ncols, (gint) 1);
+      arrayd_copy(&dsp->tcorr2.Fa, &dsp->tcorr2.F);
+    }
+    dsp->tcorr2.active_vars_p.els[jvar] = false;
+  }
+  else if (in_subsetver & !activever) {
+    /* add variable */
+    if (jvar > dsp->tcorr2.active_vars.els[dsp->tcorr2.nactive-1]) {
+      dsp->tcorr2.active_vars.els[dsp->tcorr2.nactive] = jvar;
+    }
+    else if (jvar < dsp->tcorr2.active_vars.els[0]) {
+      for (j=dsp->tcorr2.nactive; j>0; j--) {
+          dsp->tcorr2.active_vars.els[j] = dsp->tcorr2.active_vars.els[j-1];
+      }
+      dsp->tcorr2.active_vars.els[0] = jvar;
+    }
+    else {
+      gint jtmp = dsp->tcorr2.nactive;
+      for (j=0; j<dsp->tcorr2.nactive-1; j++) {
+        if (jvar > dsp->tcorr2.active_vars.els[j] && jvar < 
+          dsp->tcorr2.active_vars.els[j+1]) {
+          jtmp = j+1;
+          break;
+        }
+      }
+      for (j=dsp->tcorr2.nactive-1;j>=jtmp; j--) 
+          dsp->tcorr2.active_vars.els[j+1] = dsp->tcorr2.active_vars.els[j];
+      dsp->tcorr2.active_vars.els[jtmp] = jvar;
+    }
+    dsp->tcorr2.nactive++;
+    dsp->tcorr2.active_vars_p.els[jvar] = true;
+  }
+
+  dsp->tcorr1.get_new_target = true;
+  dsp->tcorr2.get_new_target = true;
+}
+
 void
 tourcorr_manip_var_set (gint j, gint btn, ggobid *gg)
 {
@@ -759,12 +871,13 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
       d->vcirc_ui.jcursor = (gint) NULL;
     }
     else {
-      if (button == 1) { 
+      tourcorr_active_var_set (jvar, d, dsp, gg);
+      /*      if (button == 1) { 
         tourcorr_active_horvar_set (jvar, d, dsp, gg);
       }
       else if (button == 2 || button == 3) {
         tourcorr_active_vervar_set (jvar, d, dsp, gg);
-      }
+	}*/
     }
   }
   sp->tourcorr.initmax = true;
