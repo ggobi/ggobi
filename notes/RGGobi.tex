@@ -48,6 +48,15 @@ later command.
 \end{verbatim}
 
 
+The opposite of creating a ggobi instance is closing its displays and
+removing it from the session.  This is done via
+\SFunction{ggobi.close}.  As usual, the particular instance to operate
+on is identified by the \SArg{.gobi} argument and defaults to the
+default instance.
+
+\note{I have seen this crash, but can't yet see why.}
+
+
 At any point, the dataset can be augmented or reduced by
 adding or removing variables.
 \begin{verbatim}
@@ -99,10 +108,8 @@ of this map or table is an RGB color value.
 \end{verbatim}
 
 One can set the color map with the function
-\SFunction{ggobi.setColorMap}.
-To change, for example, the second row
-to the values $.8, .2. 3$,
-we can use the following steps
+\SFunction{ggobi.setColorMap}.  To change, for example, the second row
+to the values $.8, .2. 3$, we can use the following steps
 \begin{verbatim}
  mp <- ggobi.getColorMap()
  mp[2,] <- c(.8,.2,.3)
@@ -111,18 +118,114 @@ we can use the following steps
 
 
 
+\section{Brushing}
+One can determine which observations are contained within the current
+brushing region with the function
+\SFunction{ggobi.getSelectedIndices}.  This returns a vector
+containing the (unordered) indices of the observations in the dataset
+that have been selected.  
+(For efficiency purposes, the labels of the observations
+are not returned with the vector. This can be easily changed.)
+
+The function \SFunction{ggobi.isObservationSelected} returns a logical
+vector with as many elements as there are observations in the dataset.
+Each element indicates whether the observation is within the current
+brushing region.
+
+
+
+
+\section{Programmatically Configuring a View} 
+One can (will be able to) set the brush location and size directly via
+a function call.  Additionally, one can control the glyph type, size
+and color for the points under the brush.
+
 
 \section{Callbacks}
-Associating R function calls with events in GGobi is a valuable way to
-allow customization of the existing interactivity provided by GGobi.
-Consider an example where we have a scatterplot of two variables X and
-Y.  As we identify individual points in the scatterplot, we might want
-to perform examine the result of fitting the regression of Y on X with
-that point omitted.  GGobi does not currently provide such a facility.
-However, it is trivial in R.  By allowing one to register an R
-function to be called when a particular event (the identification)
-occurs. Allows us to easily do this.
 
+Associating R function calls with events in GGobi
+is a valuable way to allow customization of the existing interactivity
+provided by GGobi.  Consider an example where we have a scatterplot of
+two variables X and Y.  As we identify individual points in the
+scatterplot, we might want to examine the result of fitting the
+regression of Y on X with that point omitted.  GGobi does not
+currently provide such a facility.  However, it is trivial in R.  By
+allowing one to register an R function to be called when a particular
+event (the identification) occurs, we can easily arrange to update
+other plots.  Given the available primitives with which we can control
+ggobi or other graphics devices, we can
+
+
+
+Clustering or model selection might serve as other examples.  The
+basic idea is that we would have some data that represents the fits
+for different models.  The data frame is made up of, say, 2 columns -
+Model identifier (an integer) and the fit statistic (e.g. Cp, etc.).
+As we identify or brush over one or more points, we want to link with
+a plot in another ggobi using the indeces of the other model.  For
+example, we might want to show the residuals resulting from that fit.
+This is non-trivial in GGobi since the data does not correspond to the
+model it employs which is a rectangular array of data.  (Again, an
+object oriented approach would be convenient, but still difficult.)
+Thus, we need two ggobi instances, with different but related data.
+Additionally, we need a mechanism to specify linking between plots and
+displays within and between ggobi instances.
+
+Covering all such cases is not feasible in GGobi both from a
+programming perspective and additionally as an issue of complexity in
+the user interface.  Instead, a programmatic mechanism for ``linking''
+or associating/connecting displays and or plots within displays both
+between and within ggobi instances is necessary.  Furthermore, while
+many of the common linking actions can be performed efficiently in
+GGobi itself, allowing arbitrary R functions to be invoked for these
+connection events is important to allow new styles of linking to be
+explored and implemented easily.
+
+
+The basic functions for performing these types of actions
+is \SFunction{ggobi.setIdentifyHandler}.
+\begin{verbatim}
+ggobi.setIdentifyHandler(function(i) {print(i)})
+\end{verbatim}
+More arguments should be supplied to this function. 
+
+We may also want to make this plot specific, thus allowing the data to
+be stored in the function rather than having to be determined at
+evaluation time. For example, suppose we want to know what variables
+are being identified and in what ggobi.  We can create a closure with
+that information in the environment.
+\begin{verbatim}
+ handlerTemplate <- function(x,y, ggobi) {
+   handler <- function(which) {
+     cat("Observation",which,"in", ggobi,"\n")    
+   }
+
+   return(handler);
+ }
+\end{verbatim}
+Of course, we can do this for the ggobi instance
+as it stands now.
+
+
+To remove the handler
+\begin{verbatim}
+ggobi.setIdentifyHandler(NULL)
+\end{verbatim}
+
+See IdentifyProc in ggobi.h and add the appropriate set and get for
+the ggobid specific instance.  Already arrange to do callback.
+
+We can make this slightly more flexible and efficient.  The
+\SFunction{ggobi.setIdentifyHandler} can specify how many arguments
+the function wants to receive.  This can be stored with the function
+reference in the \Escape{user_data} field of the ggobi handler
+structure. Then, when we go to invoke the function, we can determine
+how many arguments to pass.  This allows some functions to avoid the
+overhead of creating unecessary arguments that will never be used.  It
+would be ideal if there was an easy way for the R function to access
+the ``environment'' of the C-level calling routine (as is possible in
+Omegahat due to the seamless access between the interpreted and native
+language).
 
 
 
