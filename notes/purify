@@ -36,3 +36,7 @@ Makefile:
   CFLAGS
 local.config
   use XML libraries compiled with cc
+
+plugin directories
+  GTK_CONFIG=/usr/dfs/cc/bin/gtk-config
+
