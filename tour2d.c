@@ -265,8 +265,33 @@ void
 tour2d_all_vars_cb (GtkCheckMenuItem *w, guint action) 
 {
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+  displayd *dsp = gg->current_display; 
+  datad *d = dsp->d;
+  gint j;
 
   gg->tour2d.all_vars = !gg->tour2d.all_vars;
+
+  if (gg->tour2d.all_vars)
+  {
+    for (j=0; j<d->ncols; j++) {
+      dsp->t2d.subset_vars.els[j] = j;
+      dsp->t2d.active_vars.els[j] = j;
+      dsp->t2d.subset_vars_p.els[j] = true;
+      dsp->t2d.active_vars_p.els[j] = true;
+    }
+    dsp->t2d.nsubset = d->ncols;
+    dsp->t2d.nactive = d->ncols;
+    dsp->t2d.get_new_target = true;
+    zero_tau(dsp->t2d.tau, 2);
+    varcircles_visibility_set (dsp, gg);
+
+    if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+      free_optimize0_p(&dsp->t2d_pp_op);
+      alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
+        2);
+      t2d_pp_reinit(gg);
+    }  
+  }
 }
 
 void tour2d_speed_set(gfloat slidepos, ggobid *gg) {

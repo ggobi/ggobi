@@ -271,9 +271,13 @@ tour1d_all_vars_cb (GtkCheckMenuItem *w, guint action)
   if (gg->tour1d.all_vars)
   {
     for (j=0; j<d->ncols; j++) {
-      dsp->t1d.subset_vars.els[j] = dsp->t1d.active_vars.els[j] = j;
-      dsp->t1d.subset_vars_p.els[j] = dsp->t1d.active_vars_p.els[j] = true;
+      dsp->t1d.subset_vars.els[j] = j;
+      dsp->t1d.active_vars.els[j] = j;
+      dsp->t1d.subset_vars_p.els[j] = true;
+      dsp->t1d.active_vars_p.els[j] = true;
     }
+    dsp->t1d.nsubset = d->ncols;
+    dsp->t1d.nactive = d->ncols;
     dsp->t1d.get_new_target = true;
     zero_tau(dsp->t1d.tau, 1);
     varcircles_visibility_set (dsp, gg);
