@@ -169,14 +169,14 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       }
 #endif
 
-      ev.d = d;
-      ev.id = k;
-      /* This will become an event on the datad when we move to
-         Gtk objects (soon now!) */
-      gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL],
-        sp, k, d); 
-
       if (k != d->nearest_point_prev) {
+        ev.d = d;
+        ev.id = k;
+        /* This will become an event on the datad when we move to
+           Gtk objects (soon now!) */
+        gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL],
+          sp, k, d); 
+
         displays_plot (NULL, QUICK, gg);
         d->nearest_point_prev = k;
       }
@@ -187,6 +187,12 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       k = find_nearest_edge (sp, gg->current_display, gg);
       e->nearest_point = k;
       if (e->nearest_point != e->nearest_point_prev) {
+        ev.d = e;
+        ev.id = k;
+        /*-- perhaps this should be an IDENTIFY_EDGE_SIGNAL ... --*/
+        gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL],
+          sp, k, e); 
+
         displays_plot (NULL, QUICK, gg);
         e->nearest_point_prev = k;
       }
