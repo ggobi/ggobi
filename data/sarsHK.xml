@@ -1,0 +1,590 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
+<ggobidata count="2">
+
+<data name="Country" nickname="Cntry">
+<description>
+A graph of the first 249 SARS infections in Hong Kong.  The
+data is taken from the New York Times on April 1.
+</description>
+
+<variables count="2">
+  <categoricalvariable name="Infected in">
+    <levels count="9">
+      <level value="1"> China </level>
+      <level value="2"> Hong Kong </level>
+      <level value="3"> VietNam </level>
+      <level value="4"> Singapore </level>
+      <level value="5"> Canada </level>
+      <level value="6"> United States </level>
+      <level value="7"> Ireland </level>
+      <level value="8"> Germany </level>
+      <level value="9"> Thailand </level>
+    </levels>
+  </categoricalvariable>
+  <categoricalvariable name="Traveled to">
+    <levels count="9">
+      <level value="1"> China </level>
+      <level value="2"> Hong Kong </level>
+      <level value="3"> VietNam </level>
+      <level value="4"> Singapore </level>
+      <level value="5"> Canada </level>
+      <level value="6"> United States </level>
+      <level value="7"> Ireland </level>
+      <level value="8"> Germany </level>
+      <level value="9"> Thailand </level>
+    </levels>
+  </categoricalvariable>
+</variables>
+<records count="249">
+<!-- A Chinese medical professor who had been treating SARS patients -->
+<!-- in Guangong province goes to Hong Kong for a wedding -->
+<record id="1"> <int>1</int><int>2</int></record>
+
+<!-- He stays in the Hotel Metropole, and 12 other guests become infected, -->
+<!-- as well as two of his relatives and 4 medical personnel.  He dies -->
+<record id="2"> <int>2</int><int>2</int></record>
+<record id="3"> <int>2</int><int>2</int></record>
+<record id="4"> <int>2</int><int>2</int></record>
+<record id="5"> <int>2</int><int>2</int></record>
+<record id="6"> <int>2</int><int>2</int></record>
+<record id="7"> <int>2</int><int>2</int></record>
+<record id="8"> <int>2</int><int>2</int></record>
+<record id="9"> <int>2</int><int>2</int></record>
+<record id="10"> <int>2</int><int>3</int></record>
+<record id="11"> <int>2</int><int>4</int></record>
+<record id="12"> <int>2</int><int>4</int></record>
+<record id="13"> <int>2</int><int>4</int></record>
+<record id="14"> <int>2</int><int>7</int></record>
+<record id="15"> <int>2</int><int>5</int></record>
+<record id="16"> <int>2</int><int>5</int></record>
+<record id="17"> <int>2</int><int>6</int></record>
+<record id="18"> <int>2</int><int>6</int></record>
+<record id="19"> <int>2</int><int>6</int></record>
+
+<!-- A guest infects 99 medical personnel -->
+<record id="20"> <int>2</int><int>2</int></record>
+<record id="21"> <int>2</int><int>2</int></record>
+<record id="22"> <int>2</int><int>2</int></record>
+<record id="23"> <int>2</int><int>2</int></record>
+<record id="24"> <int>2</int><int>2</int></record>
+<record id="25"> <int>2</int><int>2</int></record>
+<record id="26"> <int>2</int><int>2</int></record>
+<record id="27"> <int>2</int><int>2</int></record>
+<record id="28"> <int>2</int><int>2</int></record>
+<record id="29"> <int>2</int><int>2</int></record>
+<record id="30"> <int>2</int><int>2</int></record>
+<record id="31"> <int>2</int><int>2</int></record>
+<record id="32"> <int>2</int><int>2</int></record>
+<record id="33"> <int>2</int><int>2</int></record>
+<record id="34"> <int>2</int><int>2</int></record>
+<record id="35"> <int>2</int><int>2</int></record>
+<record id="36"> <int>2</int><int>2</int></record>
+<record id="37"> <int>2</int><int>2</int></record>
+<record id="38"> <int>2</int><int>2</int></record>
+<record id="39"> <int>2</int><int>2</int></record>
+<record id="40"> <int>2</int><int>2</int></record>
+<record id="41"> <int>2</int><int>2</int></record>
+<record id="42"> <int>2</int><int>2</int></record>
+<record id="43"> <int>2</int><int>2</int></record>
+<record id="44"> <int>2</int><int>2</int></record>
+<record id="45"> <int>2</int><int>2</int></record>
+<record id="46"> <int>2</int><int>2</int></record>
+<record id="47"> <int>2</int><int>2</int></record>
+<record id="48"> <int>2</int><int>2</int></record>
+<record id="49"> <int>2</int><int>2</int></record>
+<record id="50"> <int>2</int><int>2</int></record>
+<record id="51"> <int>2</int><int>2</int></record>
+<record id="52"> <int>2</int><int>2</int></record>
+<record id="53"> <int>2</int><int>2</int></record>
+<record id="54"> <int>2</int><int>2</int></record>
+<record id="55"> <int>2</int><int>2</int></record>
+<record id="56"> <int>2</int><int>2</int></record>
+<record id="57"> <int>2</int><int>2</int></record>
+<record id="58"> <int>2</int><int>2</int></record>
+<record id="59"> <int>2</int><int>2</int></record>
+<record id="60"> <int>2</int><int>2</int></record>
+<record id="61"> <int>2</int><int>2</int></record>
+<record id="62"> <int>2</int><int>2</int></record>
+<record id="63"> <int>2</int><int>2</int></record>
+<record id="64"> <int>2</int><int>2</int></record>
+<record id="65"> <int>2</int><int>2</int></record>
+<record id="66"> <int>2</int><int>2</int></record>
+<record id="67"> <int>2</int><int>2</int></record>
+<record id="68"> <int>2</int><int>2</int></record>
+<record id="69"> <int>2</int><int>2</int></record>
+<record id="70"> <int>2</int><int>2</int></record>
+<record id="71"> <int>2</int><int>2</int></record>
+<record id="72"> <int>2</int><int>2</int></record>
+<record id="73"> <int>2</int><int>2</int></record>
+<record id="74"> <int>2</int><int>2</int></record>
+<record id="75"> <int>2</int><int>2</int></record>
+<record id="76"> <int>2</int><int>2</int></record>
+<record id="77"> <int>2</int><int>2</int></record>
+<record id="78"> <int>2</int><int>2</int></record>
+<record id="79"> <int>2</int><int>2</int></record>
+<record id="80"> <int>2</int><int>2</int></record>
+<record id="81"> <int>2</int><int>2</int></record>
+<record id="82"> <int>2</int><int>2</int></record>
+<record id="83"> <int>2</int><int>2</int></record>
+<record id="84"> <int>2</int><int>2</int></record>
+<record id="85"> <int>2</int><int>2</int></record>
+<record id="86"> <int>2</int><int>2</int></record>
+<record id="87"> <int>2</int><int>2</int></record>
+<record id="88"> <int>2</int><int>2</int></record>
+<record id="89"> <int>2</int><int>2</int></record>
+<record id="90"> <int>2</int><int>2</int></record>
+<record id="91"> <int>2</int><int>2</int></record>
+<record id="92"> <int>2</int><int>2</int></record>
+<record id="93"> <int>2</int><int>2</int></record>
+<record id="94"> <int>2</int><int>2</int></record>
+<record id="95"> <int>2</int><int>2</int></record>
+<record id="96"> <int>2</int><int>2</int></record>
+<record id="97"> <int>2</int><int>2</int></record>
+<record id="98"> <int>2</int><int>2</int></record>
+<record id="99"> <int>2</int><int>2</int></record>
+<record id="100"> <int>2</int><int>2</int></record>
+<record id="101"> <int>2</int><int>2</int></record>
+<record id="102"> <int>2</int><int>2</int></record>
+<record id="103"> <int>2</int><int>2</int></record>
+<record id="104"> <int>2</int><int>2</int></record>
+<record id="105"> <int>2</int><int>2</int></record>
+<record id="106"> <int>2</int><int>2</int></record>
+<record id="107"> <int>2</int><int>2</int></record>
+<record id="108"> <int>2</int><int>2</int></record>
+<record id="109"> <int>2</int><int>2</int></record>
+<record id="110"> <int>2</int><int>2</int></record>
+<record id="111"> <int>2</int><int>2</int></record>
+<record id="112"> <int>2</int><int>2</int></record>
+<record id="113"> <int>2</int><int>2</int></record>
+<record id="114"> <int>2</int><int>2</int></record>
+<record id="115"> <int>2</int><int>2</int></record>
+<record id="116"> <int>2</int><int>2</int></record>
+<record id="117"> <int>2</int><int>2</int></record>
+<record id="118"> <int>2</int><int>2</int></record>
+
+<!-- A guest infects 3 medical personnel -->
+<record id="119"> <int>2</int><int>2</int></record>
+<record id="120"> <int>2</int><int>2</int></record>
+<record id="121"> <int>2</int><int>2</int></record>
+
+<!-- One of two hotel guests from Canada infects 4 in her family; -->
+<!-- she and one member of her family die. -->
+<record id="122"> <int>5</int><int>5</int></record>
+<record id="123"> <int>5</int><int>5</int></record>
+<record id="124"> <int>5</int><int>5</int></record>
+<record id="125"> <int>5</int><int>5</int></record>
+
+<!-- Those four infect 12 others; one dies. -->
+<record id="126"> <int>5</int><int>5</int></record>
+<record id="127"> <int>5</int><int>5</int></record>
+<record id="128"> <int>5</int><int>5</int></record>
+<record id="129"> <int>5</int><int>5</int></record>
+<record id="130"> <int>5</int><int>5</int></record>
+<record id="131"> <int>5</int><int>5</int></record>
+<record id="132"> <int>5</int><int>5</int></record>
+<record id="133"> <int>5</int><int>5</int></record>
+<record id="134"> <int>5</int><int>5</int></record>
+<record id="135"> <int>5</int><int>5</int></record>
+<record id="136"> <int>5</int><int>5</int></record>
+<record id="137"> <int>5</int><int>5</int></record>
+
+<!-- Three guests from Singapore return home, and infect 34 -->
+<!-- health care workers and 37 others. -->
+<record id="138"> <int>4</int><int>4</int></record>
+<record id="139"> <int>4</int><int>4</int></record>
+<record id="140"> <int>4</int><int>4</int></record>
+<record id="141"> <int>4</int><int>4</int></record>
+<record id="142"> <int>4</int><int>4</int></record>
+<record id="143"> <int>4</int><int>4</int></record>
+<record id="144"> <int>4</int><int>4</int></record>
+<record id="145"> <int>4</int><int>4</int></record>
+<record id="146"> <int>4</int><int>4</int></record>
+<record id="147"> <int>4</int><int>4</int></record>
+<record id="148"> <int>4</int><int>4</int></record>
+<record id="149"> <int>4</int><int>4</int></record>
+<record id="150"> <int>4</int><int>4</int></record>
+<record id="151"> <int>4</int><int>4</int></record>
+<record id="152"> <int>4</int><int>4</int></record>
+<record id="153"> <int>4</int><int>4</int></record>
+<record id="154"> <int>4</int><int>4</int></record>
+<record id="155"> <int>4</int><int>4</int></record>
+<record id="156"> <int>4</int><int>4</int></record>
+<record id="157"> <int>4</int><int>4</int></record>
+<record id="158"> <int>4</int><int>4</int></record>
+<record id="159"> <int>4</int><int>4</int></record>
+<record id="160"> <int>4</int><int>4</int></record>
+<record id="161"> <int>4</int><int>4</int></record>
+<record id="162"> <int>4</int><int>4</int></record>
+<record id="163"> <int>4</int><int>4</int></record>
+<record id="164"> <int>4</int><int>4</int></record>
+<record id="165"> <int>4</int><int>4</int></record>
+<record id="166"> <int>4</int><int>4</int></record>
+<record id="167"> <int>4</int><int>4</int></record>
+<record id="168"> <int>4</int><int>4</int></record>
+<record id="169"> <int>4</int><int>4</int></record>
+<record id="170"> <int>4</int><int>4</int></record>
+<record id="171"> <int>4</int><int>4</int></record>
+<record id="172"> <int>4</int><int>4</int></record>
+<record id="173"> <int>4</int><int>4</int></record>
+<record id="174"> <int>4</int><int>4</int></record>
+<record id="175"> <int>4</int><int>4</int></record>
+<record id="176"> <int>4</int><int>4</int></record>
+<record id="177"> <int>4</int><int>4</int></record>
+<record id="178"> <int>4</int><int>4</int></record>
+<record id="179"> <int>4</int><int>4</int></record>
+<record id="180"> <int>4</int><int>4</int></record>
+<record id="181"> <int>4</int><int>4</int></record>
+<record id="182"> <int>4</int><int>4</int></record>
+<record id="183"> <int>4</int><int>4</int></record>
+<record id="184"> <int>4</int><int>4</int></record>
+<record id="185"> <int>4</int><int>4</int></record>
+<record id="186"> <int>4</int><int>4</int></record>
+<record id="187"> <int>4</int><int>4</int></record>
+<record id="188"> <int>4</int><int>4</int></record>
+<record id="189"> <int>4</int><int>4</int></record>
+<record id="190"> <int>4</int><int>4</int></record>
+<record id="191"> <int>4</int><int>4</int></record>
+<record id="192"> <int>4</int><int>4</int></record>
+<record id="193"> <int>4</int><int>4</int></record>
+<record id="194"> <int>4</int><int>4</int></record>
+<record id="195"> <int>4</int><int>4</int></record>
+<record id="196"> <int>4</int><int>4</int></record>
+<record id="197"> <int>4</int><int>4</int></record>
+<record id="198"> <int>4</int><int>4</int></record>
+<record id="199"> <int>4</int><int>4</int></record>
+<record id="200"> <int>4</int><int>4</int></record>
+<record id="201"> <int>4</int><int>4</int></record>
+<record id="202"> <int>4</int><int>4</int></record>
+<record id="203"> <int>4</int><int>4</int></record>
+<record id="204"> <int>4</int><int>4</int></record>
+<record id="205"> <int>4</int><int>4</int></record>
+<record id="206"> <int>4</int><int>4</int></record>
+<record id="207"> <int>4</int><int>4</int></record>
+<record id="208"> <int>4</int><int>4</int></record>
+
+<!-- A physician in Singapore travels to New York City for a conference -->
+<!-- He infects two of his family members.  They leave New York for -->
+<!-- Singapore, but are detained and hospitalized in Germany. -->
+<record id="249"> <int>4</int><int>6</int></record>
+<record id="209"> <int>6</int><int>8</int></record>
+<record id="210"> <int>6</int><int>8</int></record>
+
+<!-- A guest travels to Hanoi; 37 medical personnel are infected. -->
+<!-- Four die. -->
+<record id="211"> <int>3</int><int>3</int></record>
+<record id="212"> <int>3</int><int>3</int></record>
+<record id="213"> <int>3</int><int>3</int></record>
+<record id="214"> <int>3</int><int>3</int></record>
+<record id="215"> <int>3</int><int>3</int></record>
+<record id="216"> <int>3</int><int>3</int></record>
+<record id="217"> <int>3</int><int>3</int></record>
+<record id="218"> <int>3</int><int>3</int></record>
+<record id="219"> <int>3</int><int>3</int></record>
+<record id="220"> <int>3</int><int>3</int></record>
+<record id="221"> <int>3</int><int>3</int></record>
+<record id="222"> <int>3</int><int>3</int></record>
+<record id="223"> <int>3</int><int>3</int></record>
+<record id="224"> <int>3</int><int>3</int></record>
+<record id="225"> <int>3</int><int>3</int></record>
+<record id="226"> <int>3</int><int>3</int></record>
+<record id="227"> <int>3</int><int>3</int></record>
+<record id="228"> <int>3</int><int>3</int></record>
+<record id="229"> <int>3</int><int>3</int></record>
+<record id="230"> <int>3</int><int>3</int></record>
+<record id="231"> <int>3</int><int>3</int></record>
+<record id="232"> <int>3</int><int>3</int></record>
+<record id="233"> <int>3</int><int>3</int></record>
+<record id="234"> <int>3</int><int>3</int></record>
+<record id="235"> <int>3</int><int>3</int></record>
+<record id="236"> <int>3</int><int>3</int></record>
+<record id="237"> <int>3</int><int>3</int></record>
+<record id="238"> <int>3</int><int>3</int></record>
+<record id="239"> <int>3</int><int>3</int></record>
+<record id="240"> <int>3</int><int>3</int></record>
+<record id="241"> <int>3</int><int>3</int></record>
+<record id="242"> <int>3</int><int>3</int></record>
+<record id="243"> <int>3</int><int>3</int></record>
+<record id="244"> <int>3</int><int>3</int></record>
+<record id="245"> <int>3</int><int>3</int></record>
+<record id="246"> <int>3</int><int>3</int></record>
+<record id="247"> <int>3</int><int>3</int></record>
+
+<!-- A WHO doctor travels from VietNam to Bangkok, becomes ill there, -->
+<!-- and dies. -->
+<record id="248"> <int>3</int><int>9</int></record>
+
+</records>
+</data>
+
+<data name="edges">
+<variables count="0"/>
+<records count="248">
+<record source="1" destination="2"></record>
+<record source="1" destination="3"></record>
+<record source="1" destination="4"></record>
+<record source="1" destination="5"></record>
+<record source="1" destination="6"></record>
+<record source="1" destination="7"></record>
+<record source="1" destination="8"></record>
+<record source="1" destination="9"></record>
+<record source="1" destination="10"></record>
+<record source="1" destination="11"></record>
+<record source="1" destination="12"></record>
+<record source="1" destination="13"></record>
+<record source="1" destination="14"></record>
+<record source="1" destination="15"></record>
+<record source="1" destination="16"></record>
+<record source="1" destination="17"></record>
+<record source="1" destination="18"></record>
+<record source="1" destination="19"></record>
+
+<record source="2" destination="20"> </record>
+<record source="2" destination="21"> </record>
+<record source="2" destination="22"> </record>
+<record source="2" destination="23"> </record>
+<record source="2" destination="24"> </record>
+<record source="2" destination="25"> </record>
+<record source="2" destination="26"> </record>
+<record source="2" destination="27"> </record>
+<record source="2" destination="28"> </record>
+<record source="2" destination="29"> </record>
+<record source="2" destination="30"> </record>
+<record source="2" destination="31"> </record>
+<record source="2" destination="32"> </record>
+<record source="2" destination="33"> </record>
+<record source="2" destination="34"> </record>
+<record source="2" destination="35"> </record>
+<record source="2" destination="36"> </record>
+<record source="2" destination="37"> </record>
+<record source="2" destination="38"> </record>
+<record source="2" destination="39"> </record>
+<record source="2" destination="40"> </record>
+<record source="2" destination="41"> </record>
+<record source="2" destination="42"> </record>
+<record source="2" destination="43"> </record>
+<record source="2" destination="44"> </record>
+<record source="2" destination="45"> </record>
+<record source="2" destination="46"> </record>
+<record source="2" destination="47"> </record>
+<record source="2" destination="48"> </record>
+<record source="2" destination="49"> </record>
+<record source="2" destination="50"> </record>
+<record source="2" destination="51"> </record>
+<record source="2" destination="52"> </record>
+<record source="2" destination="53"> </record>
+<record source="2" destination="54"> </record>
+<record source="2" destination="55"> </record>
+<record source="2" destination="56"> </record>
+<record source="2" destination="57"> </record>
+<record source="2" destination="58"> </record>
+<record source="2" destination="59"> </record>
+<record source="2" destination="60"> </record>
+<record source="2" destination="61"> </record>
+<record source="2" destination="62"> </record>
+<record source="2" destination="63"> </record>
+<record source="2" destination="64"> </record>
+<record source="2" destination="65"> </record>
+<record source="2" destination="66"> </record>
+<record source="2" destination="67"> </record>
+<record source="2" destination="68"> </record>
+<record source="2" destination="69"> </record>
+<record source="2" destination="70"> </record>
+<record source="2" destination="71"> </record>
+<record source="2" destination="72"> </record>
+<record source="2" destination="73"> </record>
+<record source="2" destination="74"> </record>
+<record source="2" destination="75"> </record>
+<record source="2" destination="76"> </record>
+<record source="2" destination="77"> </record>
+<record source="2" destination="78"> </record>
+<record source="2" destination="79"> </record>
+<record source="2" destination="80"> </record>
+<record source="2" destination="81"> </record>
+<record source="2" destination="82"> </record>
+<record source="2" destination="83"> </record>
+<record source="2" destination="84"> </record>
+<record source="2" destination="85"> </record>
+<record source="2" destination="86"> </record>
+<record source="2" destination="87"> </record>
+<record source="2" destination="88"> </record>
+<record source="2" destination="89"> </record>
+<record source="2" destination="90"> </record>
+<record source="2" destination="91"> </record>
+<record source="2" destination="92"> </record>
+<record source="2" destination="93"> </record>
+<record source="2" destination="94"> </record>
+<record source="2" destination="95"> </record>
+<record source="2" destination="96"> </record>
+<record source="2" destination="97"> </record>
+<record source="2" destination="98"> </record>
+<record source="2" destination="99"> </record>
+<record source="2" destination="100"> </record>
+<record source="2" destination="101"> </record>
+<record source="2" destination="102"> </record>
+<record source="2" destination="103"> </record>
+<record source="2" destination="104"> </record>
+<record source="2" destination="105"> </record>
+<record source="2" destination="106"> </record>
+<record source="2" destination="107"> </record>
+<record source="2" destination="108"> </record>
+<record source="2" destination="109"> </record>
+<record source="2" destination="110"> </record>
+<record source="2" destination="111"> </record>
+<record source="2" destination="112"> </record>
+<record source="2" destination="113"> </record>
+<record source="2" destination="114"> </record>
+<record source="2" destination="115"> </record>
+<record source="2" destination="116"> </record>
+<record source="2" destination="117"> </record>
+<record source="2" destination="118"> </record>
+
+<record source="3" destination="119"> </record>
+<record source="3" destination="120"> </record>
+<record source="3" destination="121"> </record>
+
+<record source="16" destination="122"> </record>
+<record source="16" destination="123"> </record>
+<record source="16" destination="124"> </record>
+<record source="16" destination="125"> </record>
+
+<record source="122" destination="126"> </record>
+<record source="122" destination="127"> </record>
+<record source="122" destination="128"> </record>
+<record source="122" destination="129"> </record>
+<record source="122" destination="130"> </record>
+<record source="122" destination="131"> </record>
+<record source="122" destination="132"> </record>
+<record source="122" destination="133"> </record>
+<record source="122" destination="134"> </record>
+<record source="122" destination="135"> </record>
+<record source="122" destination="136"> </record>
+<record source="122" destination="137"> </record>
+<!-- could add edges from 123, 124, 125 to this dozen, too -->
+
+<!-- In Singapore, 3 hotel guests infect 34 health-care workers and 37 more -->
+<record source="11" destination="138"> </record>
+<record source="11" destination="139"> </record>
+<record source="11" destination="140"> </record>
+<record source="11" destination="141"> </record>
+<record source="11" destination="142"> </record>
+<record source="11" destination="143"> </record>
+<record source="11" destination="144"> </record>
+<record source="11" destination="145"> </record>
+<record source="11" destination="146"> </record>
+<record source="11" destination="147"> </record>
+<record source="11" destination="148"> </record>
+<record source="11" destination="149"> </record>
+<record source="11" destination="150"> </record>
+<record source="11" destination="151"> </record>
+<record source="11" destination="152"> </record>
+<record source="11" destination="153"> </record>
+<record source="11" destination="154"> </record>
+<record source="11" destination="155"> </record>
+<record source="11" destination="156"> </record>
+<record source="11" destination="157"> </record>
+<record source="11" destination="158"> </record>
+<record source="11" destination="159"> </record>
+<record source="11" destination="160"> </record>
+<record source="11" destination="161"> </record>
+<record source="11" destination="162"> </record>
+<record source="11" destination="163"> </record>
+<record source="11" destination="164"> </record>
+<record source="11" destination="165"> </record>
+<record source="11" destination="166"> </record>
+<record source="11" destination="167"> </record>
+<record source="11" destination="168"> </record>
+<record source="11" destination="169"> </record>
+<record source="11" destination="170"> </record>
+<record source="11" destination="171"> </record>
+<record source="11" destination="172"> </record>
+<record source="11" destination="173"> </record>
+<record source="11" destination="174"> </record>
+<record source="11" destination="175"> </record>
+<record source="11" destination="176"> </record>
+<record source="11" destination="177"> </record>
+<record source="11" destination="178"> </record>
+<record source="11" destination="179"> </record>
+<record source="11" destination="180"> </record>
+<record source="11" destination="181"> </record>
+<record source="11" destination="182"> </record>
+<record source="11" destination="183"> </record>
+<record source="11" destination="184"> </record>
+<record source="11" destination="185"> </record>
+<record source="11" destination="186"> </record>
+<record source="11" destination="187"> </record>
+<record source="11" destination="188"> </record>
+<record source="11" destination="189"> </record>
+<record source="11" destination="190"> </record>
+<record source="11" destination="191"> </record>
+<record source="11" destination="192"> </record>
+<record source="11" destination="193"> </record>
+<record source="11" destination="194"> </record>
+<record source="11" destination="195"> </record>
+<record source="11" destination="196"> </record>
+<record source="11" destination="197"> </record>
+<record source="11" destination="198"> </record>
+<record source="11" destination="199"> </record>
+<record source="11" destination="200"> </record>
+<record source="11" destination="201"> </record>
+<record source="11" destination="202"> </record>
+<record source="11" destination="203"> </record>
+<record source="11" destination="204"> </record>
+<record source="11" destination="205"> </record>
+<record source="11" destination="206"> </record>
+<record source="11" destination="207"> </record>
+<record source="11" destination="208"> </record>
+<!-- could also add edges from 12 and 13 to the above group -->
+
+<!-- A physician from Singapore infects his family members, either in -->
+<!-- New York or on the plane to Germany -->
+<record source="11" destination="249"> </record>
+<record source="249" destination="209"> </record>
+<record source="249" destination="210"> </record>
+
+<!-- 37 medical personnel in Hanoi are infected by a guest -->
+<record source="10" destination="211"> </record>
+<record source="10" destination="212"> </record>
+<record source="10" destination="213"> </record>
+<record source="10" destination="214"> </record>
+<record source="10" destination="215"> </record>
+<record source="10" destination="216"> </record>
+<record source="10" destination="217"> </record>
+<record source="10" destination="218"> </record>
+<record source="10" destination="219"> </record>
+<record source="10" destination="220"> </record>
+<record source="10" destination="221"> </record>
+<record source="10" destination="222"> </record>
+<record source="10" destination="223"> </record>
+<record source="10" destination="224"> </record>
+<record source="10" destination="225"> </record>
+<record source="10" destination="226"> </record>
+<record source="10" destination="227"> </record>
+<record source="10" destination="228"> </record>
+<record source="10" destination="229"> </record>
+<record source="10" destination="230"> </record>
+<record source="10" destination="231"> </record>
+<record source="10" destination="232"> </record>
+<record source="10" destination="233"> </record>
+<record source="10" destination="234"> </record>
+<record source="10" destination="235"> </record>
+<record source="10" destination="236"> </record>
+<record source="10" destination="237"> </record>
+<record source="10" destination="238"> </record>
+<record source="10" destination="239"> </record>
+<record source="10" destination="240"> </record>
+<record source="10" destination="241"> </record>
+<record source="10" destination="242"> </record>
+<record source="10" destination="243"> </record>
+<record source="10" destination="244"> </record>
+<record source="10" destination="245"> </record>
+<record source="10" destination="246"> </record>
+<record source="10" destination="247"> </record>
+
+<!-- Someone in VietNam infects a WHO doctor, who dies in Bangkok. -->
+<record source="247" destination="248"> </record>
+
+</records>
+</data>
+</ggobidata>
