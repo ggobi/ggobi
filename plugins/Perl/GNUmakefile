@@ -20,8 +20,15 @@ endif
 
 CFLAGS+= -g -Wall $(PERL_CFLAGS) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags)
 
-SRC=Plugin
+SRC=Plugin XSInit
 OBJS=$(SRC:%=%.o)
 
-PerlPlugin.so: $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) $(shell $(GTK_CONFIG) --libs) $(PERL_LDFLAGS)
+GGOBI_XS_SO=$(shell pwd)/blib/arch/auto/GGobi/GGobi.so
+
+PerlPlugin.so:
+
+$(GGOBI_XS_SO): GGobi.xs
+	$(MAKE) -f Makefile.perl
+
+PerlPlugin.so: $(OBJS) $(GGOBI_XS_SO)
+	$(CC) -shared -o $@ $(OBJS) $(GGOBI_XS_SO) $(shell $(GTK_CONFIG) --libs) $(PERL_LDFLAGS)

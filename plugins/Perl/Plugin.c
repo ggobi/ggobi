@@ -1,7 +1,6 @@
 #include <EXTERN.h>
 #include <perl.h>
 
-
 #ifdef MIN
 #undef MIN
 #endif
@@ -36,7 +35,7 @@ typedef struct {
 } PerlPluginInstData;
 
 
-void xs_init _((void));
+extern void xs_init(void);
 
 /**
  This gets called when the Perl language plugin is loaded.
@@ -55,7 +54,7 @@ Perl_onLoad(gboolean initializing, GGobiPluginInfo *plugin)
  void (*lxs_init)(void);
  PerlInterpreter  *interpreter;
 
- lxs_init = NULL; // xs_init;
+ lxs_init = xs_init;
 
    argc = 3;
    argv = (char **) g_malloc(sizeof(char *) * argc);
@@ -129,10 +128,12 @@ PerlDestroyPlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
     PerlPluginInstData *instData;
     instData = (PerlPluginInstData *) inst->data;
 
+#if PERL_PLUGIN_DEBUG
     fprintf(stderr, "Reference counts: gg = %ld, plugin = %ld, obj = %ld\n",
                     SvREFCNT(instData->ggobiRef),
                     SvREFCNT(instData->pluginInstanceRef),
                     SvREFCNT(instData->perlObj));
+#endif
 
     SvREFCNT_dec(instData->ggobiRef);    
     SvREFCNT_dec(instData->pluginInstanceRef);    
@@ -147,7 +148,30 @@ gboolean
 PerlUpdateDisplayMenu(ggobid *gg, PluginInstance *inst)
 {
     gboolean status = true;
-    fprintf(stderr, "update display menu\n");
+    PerlPluginInstData *data = inst->data;
+
+    if(data->perlObj) {
+	int n;
+	dSP;
+	ENTER ;
+	SAVETMPS;
+	PUSHMARK(SP);   
+
+	XPUSHs(data->perlObj);
+	PUTBACK;
+	n = call_method("updateDisplayMenu", G_KEEPERR | G_EVAL | G_SCALAR);
+
+	SPAGAIN;
+	if(SvTRUE(ERRSV)) {
+          status = false;
+	} else
+          status = POPi;
+     
+        PUTBACK;
+	FREETMPS;
+	LEAVE;
+    }
+
     return(status);
 }
 
@@ -212,8 +236,9 @@ SV *
 createPerlReferenceObject(gpointer ptr, const char *className)
 {
     SV *ref = NULL;
-    float f = (float) ((long)ptr);
+    unsigned long f = (unsigned long)ptr;
     int n ;
+
     dSP;
 
     ENTER ;
@@ -224,7 +249,7 @@ createPerlReferenceObject(gpointer ptr, const char *className)
          and the actual address of the C-level object that we are 
          exporting as a reference. */
     XPUSHs(sv_2mortal(newSVpv(className, 0)));
-    XPUSHs(sv_2mortal(newSVnv(f)));
+    XPUSHs(sv_2mortal(newSVuv(f)));
 
     PUTBACK;
 
