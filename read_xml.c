@@ -353,7 +353,7 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     break;
 
     case REAL:   
-    case INT:   
+    case INTEGER:   
     case STRING:   
     case NA:  
       if(data->recordString) { 
@@ -644,7 +644,7 @@ void endXMLElement(void *user_data, const xmlChar *name)
       data->current_element++; 
     break;
     case REAL:
-    case INT:
+    case INTEGER:
       setRecordValues(data, data->recordString, data->recordStringLength);
     break;
     case STRING:
@@ -774,7 +774,7 @@ Characters(void *user_data, const xmlChar *ch, gint len)
     case RECORD:
     case REAL:
     case STRING:
-    case INT:
+    case INTEGER:
     case UNKNOWN:
         /* Now we call
             setRecordValues (data, c, dlen); 
