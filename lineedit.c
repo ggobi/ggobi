@@ -168,6 +168,7 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
  * This will be handled with signals, where each splotd listens
  * for (maybe) point_added or edge_added events.
 */
+/* could put some code in splot_record_add  */
   if (mode == ADDING_EDGES) {
     for (l=gg->displays; l; l=l->next) {
       dsp = (displayd *) l->data;
@@ -352,6 +353,14 @@ find_nearest_edge (splotd *sp, displayd *display, ggobid *gg)
 /*--------------------------------------------------------------------*/
 /* Reverse pipeline code for populating the table of variable values  */
 /*--------------------------------------------------------------------*/
+
+/*
+ * if I want to use this in movepts, it needs three more inputs
+ *        gboolean horiz, gboolean vert       (both true here)
+ *        gint i: the point index             (-1 here?)
+ * and one more return value
+ *        gcoords *eps                         (meaningful for i != -1)
+*/
 
 void
 pt_screen_to_plane (icoords *screen, gcoords *planar, splotd *sp)

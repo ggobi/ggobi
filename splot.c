@@ -810,19 +810,7 @@ splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
   gcoords prev_planar;
   greal precis = (greal) PRECISION1;
 
-/*
- * All this code shouldn't be necessary, because (eg) if we're
- * in tour and using tour_scale, we should already know that.
- * Look through the movepts code and see if I'm inappropriately
- * resetting iscale somewhere.
-*/
   gfloat scale_x, scale_y;
-/*
-  displayd *display = (displayd *) sp->displayptr;
-  cpaneld *cpanel = &display->cpanel;
-  scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
-  scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
-*/
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
   scale_x /= 2;
@@ -944,7 +932,6 @@ splot_reverse_pipeline (splotd *sp, gint ipt, gcoords *eps,
   splot_screen_to_plane (sp, ipt, eps, horiz, vert);
   splot_plane_to_world (sp, ipt, gg);
 
-  /*-- for bivariate plots only --*/
   /*-- in pipeline.c since it applies to the front of the pipeline --*/
   world_to_raw (ipt, sp, d, gg);
 }
