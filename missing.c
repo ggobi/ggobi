@@ -140,8 +140,7 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
 
     rowlabels_alloc (dnew, gg);
     for (i=0; i<d->nrows; i++) {
-      g_array_insert_val (dnew->rowlab, i,
-        (gchar *) g_array_index (d->rowlab, gchar *, i));
+      g_array_append_val (dnew->rowlab, g_array_index (d->rowlab, gchar *, i));
     }
 
     datad_init (dnew, gg, false);
