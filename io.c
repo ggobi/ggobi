@@ -190,7 +190,6 @@ filename_mode_selection_cb(GtkList *l, GtkWidget *el, GtkWidget *data)
     gint *i = gtk_object_get_data(GTK_OBJECT(data), ".selectedElement");
     if(i) {
       *i = gtk_list_child_position(l, el);
-      fprintf(stderr, "Selected element %d\n", *i);fflush(stderr);
     }
 }
 
