@@ -40,19 +40,19 @@ redraw_fg (GtkWidget *w, gint k) {
 }
 
 static void
-find_selection_circle_pos (gint *sizes, icoords *pos) {
+find_selection_circle_pos (icoords *pos) {
   gint i;
   glyphv g;
 
   if (xg.glyph_id.type == POINT_GLYPH) {
-    pos->y = margin + (3*sizes[0])/2;
+    pos->y = margin + 3/2;
     pos->x = spacing/2;
 
   } else {
 
     pos->y = 0;
     for (i=0; i<NGLYPHSIZES; i++) {
-      g.size = sizes[i];
+      g.size = i;
       pos->y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
       pos->x = spacing + spacing/2;
 
@@ -86,7 +86,6 @@ find_selection_circle_pos (gint *sizes, icoords *pos) {
 extern void draw_glyph (GdkDrawable *, glyphv *, icoords *, gint);
 static void
 redraw_symbol_display (GtkWidget *w) {
-  static gint sizes[] = {TINY, SMALL, MEDIUM, LARGE, JUMBO};
   gint i;
   glyphv g;
   icoords pos;
@@ -104,13 +103,13 @@ redraw_symbol_display (GtkWidget *w) {
   /*
    * The factor of three is dictated by the sizing of circles
   */
-  pos.y = margin + (3*sizes[0])/2;
+  pos.y = margin + 3/2;
   pos.x = spacing/2;
   gdk_draw_point (w->window, plot_GC, pos.x, pos.y);
 
   pos.y = 0;
   for (i=0; i<NGLYPHSIZES; i++) {
-    g.size = sizes[i];
+    g.size = i;
     pos.y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
     pos.x = spacing + spacing/2;
 
@@ -140,8 +139,9 @@ redraw_symbol_display (GtkWidget *w) {
   
   if (!mono_p) {
     icoords p;
-    gint radius = (3*JUMBO)/2 + margin/2;
-    find_selection_circle_pos (sizes, &p);
+    /*-- NGLYPHSIZES is the size of the largest glyph --*/
+    gint radius = (3*NGLYPHSIZES)/2 + margin/2;
+    find_selection_circle_pos (&p);
 
     gdk_gc_set_foreground (plot_GC, &xg.accent_color);
     gdk_gc_set_line_attributes (plot_GC,
@@ -376,7 +376,6 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event) {
 /*
  * Reset glyph_id to the nearest glyph.
 */
-  static gint sizes[] = {TINY, SMALL, MEDIUM, LARGE, JUMBO};
   glyphv g;
   gint i, dsq, nearest_dsq, type, size, rval = false;
   icoords pos, ev;
@@ -390,7 +389,7 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event) {
   ev.x = (gint) event->x;
   ev.y = (gint) event->y;
 
-  pos.y = margin + (3*sizes[0])/2;
+  pos.y = margin + 3/2;
   pos.x = spacing/2;
   g.type = POINT_GLYPH;
   g.size = 1;
@@ -399,7 +398,7 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event) {
 
   pos.y = 0;
   for (i=0; i<NGLYPHSIZES; i++) {
-    g.size = sizes[i];
+    g.size = i;
     pos.y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
     pos.x = spacing + spacing/2;
 
@@ -502,11 +501,15 @@ make_symbol_window () {
     symbol_display = gtk_drawing_area_new (); 
 
     /*
-     * margin pixels between glyphs, and three at each border
+     * margin pixels between glyphs and at the edges
     */
-    width = NGLYPHTYPES*JUMBO + margin*(NGLYPHTYPES+1);
+    /*-- 2*(NGLYPHSIZES+1) is the size of the largest glyph --*/
+    width = NGLYPHTYPES*2*(NGLYPHSIZES+1) + margin*(NGLYPHTYPES+1);
 
-    height = 3 * (TINY + SMALL + MEDIUM + LARGE + JUMBO) + 6*margin;
+    height = margin;
+    for (i=0; i<NGLYPHSIZES; i++)
+      height += (margin + 2*(i+2));
+    height += margin;
 
     gtk_drawing_area_size (GTK_DRAWING_AREA (symbol_display), width, height);
     gtk_box_pack_start (GTK_BOX (vbox), symbol_display, false, false, 0);

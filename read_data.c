@@ -380,9 +380,11 @@ rgroups_read (gchar *data_in, gboolean init)
 void
 readGlyphErr (void) {
   g_printerr ("The .glyphs file must contain either one number per line,\n");
-  g_printerr ("with the number between 1 and %d; using defaults,\n", NGLYPHS);
+  g_printerr ("with the number between 1 and %d; using defaults,\n",
+    NGLYPHS);
   g_printerr ("or a string and a number, with the string being one of\n");
-  g_printerr ("+, x, or, ft, oc, fc, .  and the number between 1 and 5.\n");
+  g_printerr ("+, x, or, fr, oc, fc, .  and the number between 1 and %d.\n",
+    NGLYPHSIZES);
 }
 
 /*------------------------------------------------------------------------*/

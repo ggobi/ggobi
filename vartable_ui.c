@@ -44,8 +44,13 @@ vartable_select_var (gint jvar, gboolean selected)
 void
 vartable_unselect_all () 
 {
+  gint j;
+
   if (clist != NULL)
     gtk_clist_unselect_all (GTK_CLIST (clist));
+
+  for (j=0; j<xg.ncols; j++)
+    xg.vardata[j].selected = false;
 }
 
 void

@@ -98,23 +98,6 @@ build_plus (icoords *pos, gint nrow, GdkSegment *segv, gint nplus, gshort size)
 {
   gshort x = (gshort) pos[nrow].x;
 
-  switch (size)
-  {
-    case TINY:
-    case SMALL:
-      break;
-    case MEDIUM:
-    case LARGE:
-      size++ ;
-      break;
-    case JUMBO:
-      size = size + 2 ;
-      break;
-    default:
-      g_printerr ("error in build_plus; impossible size %d\n", size);
-      size = (gshort) MEDIUM + 1 ;
-      break;
-  }
   segv[nplus].x1 = x - size;
   segv[nplus].x2 = x + size;
   segv[nplus].y1 = segv[nplus].y2 = (gshort) pos[nrow].y;
@@ -143,22 +126,17 @@ build_x (icoords *pos, gint nrow, GdkSegment *segv, gint nx, gshort size)
 void
 build_circle (icoords *pos, gint nrow, arcd *circv, gint ncirc, gshort size)
 {
-  size = size * 3;
-
-  circv[ncirc].x = (gushort) (pos[nrow].x - size/2);
-  circv[ncirc].y = (gushort) (pos[nrow].y - size/2);
-  circv[ncirc].width = size;
-  circv[ncirc].height = size;
+  circv[ncirc].x = (gushort) (pos[nrow].x - size);
+  circv[ncirc].y = (gushort) (pos[nrow].y - size);
+  circv[ncirc].width = circv[ncirc].height = 2*size;
 }
 
 void
 build_rect (icoords *pos, gint nrow, rectd * rectv, gint nrect, gshort size)
 {
-  size = size * 3 - 1;
-
-  rectv[nrect].x = (gushort) (pos[nrow].x - (size/2 + 1));
-  rectv[nrect].y = (gushort) (pos[nrow].y - (size/2 + 1));
-  rectv[nrect].width = rectv[nrect].height = size;
+  rectv[nrect].x = (gushort) (pos[nrow].x - size);
+  rectv[nrect].y = (gushort) (pos[nrow].y - size);
+  rectv[nrect].width = rectv[nrect].height = 2*size;
 }
 
 void

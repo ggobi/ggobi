@@ -8,9 +8,13 @@
 
 static void open_gtouradv_popup (void);
 
-static void speed_cb (GtkAdjustment *adj, gpointer cbd) {
-  g_printerr ("%d\n", ((gint) adj->value));
+void speed_set (gint speed) {
+  g_printerr ("speed=%d\n", speed);
 }
+static void speed_set_cb (GtkAdjustment *adj, gpointer cbd) {
+  speed_set ((gint)adj->value);
+}
+/*-- not a callback, but an initialization routine for the scrollbar --*/
 static void scale_set_default_values (GtkScale *scale )
 {
   gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_CONTINUOUS);
@@ -64,7 +68,7 @@ cpanel_gtour_make () {
    * (upper - page_size). */
   adj = gtk_adjustment_new (1.0, 0.0, 100.0, 1.0, 1.0, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (speed_cb), NULL);
+                      GTK_SIGNAL_FUNC (speed_set_cb), NULL);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), sbar,

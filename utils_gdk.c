@@ -13,15 +13,22 @@ NewColor (glong red, glong green, glong blue) {
   return (c);
 }
 
+/*
+ * The plotted glyph is actually 2*size + 1 on a side, so the
+ * size progression is  5, 7, 9, 11, 13, ...     That's
+ * because it seems necessary to have glyphs that have odd
+ * sizes in order to make sure the point is at the center of
+ * the glyph.  That may be overly fastidious for large glyphs,
+ * but it's neceessary for the small ones.
+*/
 void
 draw_glyph (GdkDrawable *drawable, glyphv *gl, icoords *xypos, gint jpos)
 {
-  gushort size;
+  gushort size = gl->size + 1;
 
   switch (gl->type) {
 
     case PLUS_GLYPH:
-      size = gl->size + 2 ;
       gdk_draw_line (drawable, plot_GC,
         xypos[jpos].x - size, xypos[jpos].y,
         xypos[jpos].x + size, xypos[jpos].y);
@@ -30,7 +37,6 @@ draw_glyph (GdkDrawable *drawable, glyphv *gl, icoords *xypos, gint jpos)
         xypos[jpos].x, xypos[jpos].y + size);
       break;
     case X_GLYPH:
-      size = gl->size;
       gdk_draw_line (drawable, plot_GC,
         xypos[jpos].x - size, xypos[jpos].y - size,
         xypos[jpos].x + size, xypos[jpos].y + size);
@@ -39,31 +45,30 @@ draw_glyph (GdkDrawable *drawable, glyphv *gl, icoords *xypos, gint jpos)
         xypos[jpos].x - size, xypos[jpos].y + size);
       break;
     case OPEN_RECTANGLE:
-      size = 2*size;
       gdk_draw_rectangle (drawable, plot_GC, false,
-        xypos[jpos].x - size/2 + 1, xypos[jpos].y - size/2 + 1,
-        size, size);
+        xypos[jpos].x - size, xypos[jpos].y - size,
+        2*size, 2*size);
       break;
     case FILLED_RECTANGLE:
-      size = size+2;
+      gdk_draw_rectangle (drawable, plot_GC, false,
+        xypos[jpos].x - size, xypos[jpos].y - size,
+        2*size, 2*size);
       gdk_draw_rectangle (drawable, plot_GC, true,
-        xypos[jpos].x - size/2 + 1, xypos[jpos].y - size/2 + 1,
-        size, size);
+        xypos[jpos].x - size, xypos[jpos].y - size,
+        2*size, 2*size);
       break;
     case OPEN_CIRCLE:
-      size = gl->size * 3;
       gdk_draw_arc (drawable, plot_GC, false,
-        xypos[jpos].x - size/2, xypos[jpos].y - size/2,
-        size, size, 0, (gshort) 23040);
+        xypos[jpos].x - size, xypos[jpos].y - size,
+        2*size, 2*size, 0, (gshort) 23040);
       break;
     case FILLED_CIRCLE:
-      size = gl->size * 3;
       gdk_draw_arc (drawable, plot_GC, false,
-        xypos[jpos].x - size/2, xypos[jpos].y - size/2,
-        size, size, 0, (gshort) 23040);
+        xypos[jpos].x - size, xypos[jpos].y - size,
+        2*size, 2*size, 0, (gshort) 23040);
       gdk_draw_arc (drawable, plot_GC, true,
-        xypos[jpos].x - size/2, xypos[jpos].y - size/2,
-        size, size, 0, (gshort) 23040);
+        xypos[jpos].x - size, xypos[jpos].y - size,
+        2*size, 2*size, 0, (gshort) 23040);
       break;
     case POINT_GLYPH:
       gdk_draw_point (drawable, plot_GC, xypos[jpos].x, xypos[jpos].y);

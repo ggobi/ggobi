@@ -1,18 +1,34 @@
-The parallel coordinates plot is drawing (not because it
-receives an expose event, either) before it is configured --
-that's why the lines aren't appearing
+Bug: 
 
-Jittering doesn't know whether it's supposed to adjust
-the column jitter value or the missing values jittering
-factor.
+the axes aren't being initialized properly for cloned variables.
 
-I've added an array to the missing values pipeline, but not
-yet changed how missing_world_data is computed.
+still having problems with variable selection in scatterplot matrices
 
-Try to add the missings work without being too kludgey.
+sphering labels aren't being reset
 
-The missing program doesn't pay attention to the .missing
-file unless the file has an na in it.
+selected_variables_get isn't always right -- maybe it gets messed
+  up after the clear?  (so maybe it's fixed)
 
-Noted in xgobi:  ashes are not being recomputed after a
-transformation
+Find out how to handle threads!  and to generate signals, too.
+
+Scaling:
+  take advantage of the cleverness of the axes:  l to shift, m/r to scale
+  couple that with a thumbnail that sits just below the scaling controls
+
+Brushing:
+  for dealing with weighted data, handle the case where the users
+  either 
+    (1) supply input data with a wider range of sizes, or
+    (2) set the glyph sizes from outside (eg, R) to a wider
+        range of sizes
+
+  further, add to the list of
+    color and glyph
+    color only
+    glyph only
+    glyph size only
+
+
+Use a notebook for the advanced tour panel
+
+

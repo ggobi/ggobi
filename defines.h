@@ -61,7 +61,7 @@ enum displaytyped {scatterplot, scatmat, parcoords};
 #define DOTPLOT 2
 
 #define NGLYPHTYPES 7
-#define NGLYPHSIZES 5
+#define NGLYPHSIZES 8
 #define NGLYPHS ((NGLYPHTYPES-1)*NGLYPHSIZES + 1)
 
 #define PLUS_GLYPH       1
@@ -71,12 +71,6 @@ enum displaytyped {scatterplot, scatmat, parcoords};
 #define OPEN_CIRCLE      5
 #define FILLED_CIRCLE    6
 #define POINT_GLYPH      7
-
-#define TINY   1
-#define SMALL  2
-#define MEDIUM 3
-#define LARGE  4
-#define JUMBO  5
 
 #define FORWARD  1
 #define BACKWARD -1
