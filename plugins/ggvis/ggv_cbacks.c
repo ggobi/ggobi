@@ -284,7 +284,6 @@ trans_dist_init_defaults (ggvisd *ggv)
 void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggobid *gg = inst->gg;
   GtkWidget *clist;
   gint selected_var = -1;
   datad *dsrc;
@@ -697,6 +696,13 @@ ggv_selection_prob_btn_cb (GtkWidget *btn, PluginInstance *inst)
   update_ggobi (ggv, gg);
 }
 
-void ggv_constrained_cb (GtkWidget *w, PluginInstance *inst)
+void ggv_constrained_cb (GtkWidget *w, gpointer cbd)
 {
+  PluginInstance *inst = (PluginInstance *)
+     gtk_object_get_data (GTK_OBJECT (w), "PluginInst");
+  ggvisd *ggv = ggvisFromInst (inst);
+  /*-- 0: no variables frozen        --*/
+  /*-- 1: first variable frozen      --*/
+  /*-- 2: first two variables frozen --*/
+  ggv->mds_freeze_var = GPOINTER_TO_INT (cbd);
 }

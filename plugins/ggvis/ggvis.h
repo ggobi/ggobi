@@ -140,7 +140,7 @@ void ggv_Dtarget_histogram_update (ggvisd *, ggobid *);
 void ggv_metric_cb (GtkWidget *w, gpointer cbd);
 void ggv_kruskal_cb (GtkWidget *w, gpointer cbd);
 void ggv_groups_cb (GtkWidget *w, PluginInstance *inst);
-void ggv_constrained_cb (GtkWidget *w, PluginInstance *inst);
+void ggv_constrained_cb (GtkWidget *w, gpointer cbd);
 void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_perturb_adj_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_perturb_btn_cb (GtkWidget *w, PluginInstance *inst);
