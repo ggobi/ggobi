@@ -258,6 +258,7 @@ vartable_alloc (datad *d)
 void
 vartable_copy_var (gint jfrom, gint jto, datad *d)
 {
+  gint k;
   vartabled *vt_from = vartable_element_get (jfrom, d);
   vartabled *vt_to = vartable_element_get (jto, d);
 
@@ -271,6 +272,14 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
 
   vt_to->categorical_p = vt_from->categorical_p;
   vt_to->nlevels = vt_from->nlevels;
+  vt_to->level_values = NULL;
+  vt_to->level_names = g_array_new (false, false, sizeof (gchar *));
+  for (k=0; k<vt_to->nlevels; k++) {
+    vt_to->level_values = g_list_append (vt_to->level_values,
+      g_list_nth_data (vt_from->level_values, k));
+    g_array_append_val (vt_to->level_names, 
+      g_array_index (vt_from->level_names, gchar *, k));
+  }
 
   vt_to->mean = vt_from->mean;
   vt_to->median = vt_from->median;
