@@ -6,10 +6,12 @@ XML_INC_DIRS=@XML_INC_DIRS@
 XML_LIB_DIRS=@XML_LIB_DIRS@
 
 
-
 SRC=\
     array.c \
     ash1d.c \
+    barchartClass.c \
+    barchart.c \
+    barchart_ui.c \
     brush.c \
     brush_api.c \
     brush_bins.c \
