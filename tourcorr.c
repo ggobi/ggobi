@@ -858,7 +858,17 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
   splotd *sp = gg->current_splot;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
+    /*-- w is either one of the x or y toggle buttons --*/
+    gboolean isx = (w == varpanel_widget_get_nth (VARSEL_X, jvar, d));
+
     /* add/remove jvar to/from the subset of variables that <may> be active */
+    if (isx) 
+      changed = tourcorr_subset_horvar_set (jvar, d, dsp, gg);
+    else
+      changed = tourcorr_subset_vervar_set (jvar, d, dsp, gg);
+
+  } else if (GTK_IS_BUTTON(w)) {
+    /*-- w is the label --*/
     if (button == 1) 
       changed = tourcorr_subset_horvar_set (jvar, d, dsp, gg);
     else

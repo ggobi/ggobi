@@ -377,7 +377,7 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
   displayd *dsp = gg->current_display;
   gboolean changed = true;
 
-  if (GTK_IS_TOGGLE_BUTTON(w)) {
+  if (GTK_IS_TOGGLE_BUTTON(w) || GTK_IS_BUTTON(w)) {
     /*
      * add/remove jvar to/from the subset of variables that <may> be active
     */

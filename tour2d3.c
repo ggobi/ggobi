@@ -379,15 +379,21 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
   gboolean changed = true;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
-    /*
-     * add/remove jvar to/from the subset of variables that <may> be active
-    */
+    /* add/remove jvar to/from the subset of variables that <may> be active */
 
     changed = tour2d3_subset_var_set(jvar, button, d, dsp, gg);
     if (changed) {
       varcircles_visibility_set (dsp, gg);
 
       /*-- now add/remove the variable to/from the active set, too --*/
+      tour2d3_active_var_set (jvar, d, dsp, gg);
+    }
+  } else if (GTK_IS_BUTTON(w)) {  /*-- it's the label --*/
+
+    /*-- 'button' is the mouse button; translate it to one of the toggles --*/
+    changed = tour2d3_subset_var_set(jvar, button-1, d, dsp, gg);
+    if (changed) {
+      varcircles_visibility_set (dsp, gg);
       tour2d3_active_var_set (jvar, d, dsp, gg);
     }
 

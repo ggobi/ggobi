@@ -385,7 +385,7 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
   splotd *sp = gg->current_splot;
   gboolean redraw = true;
 
-  if (GTK_IS_TOGGLE_BUTTON(w)) {
+  if (GTK_IS_TOGGLE_BUTTON(w) || GTK_IS_BUTTON(w)) {  /* toggle or 'label' */
     /*
      * add/remove jvar to/from the subset of variables that <may> be active
     */
@@ -452,7 +452,6 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      /*yy[i] += (gint)(dsp->t1d.F.vals[0][j]*world_data[i][j]);*/
       yy[i] += (gfloat)(dsp->t1d.F.vals[0][j]*world_data[i][j]);
     }
   }
