@@ -1,7 +1,4 @@
-/* exclusion.c */
-/*
- * This is no longer appropriately named: think of it as cluster.c
-*/
+/* exclusion.c -- for manipulating clusters */
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
@@ -74,10 +71,8 @@ clusters_set (datad *d, ggobid *gg) {
    * make sure new clusters are not excluded, without changing the
    * status of pre-existing clusters.
   */
-  for (i=d->nclusters; i<nclusters; i++) {
+  for (i=d->nclusters; i<nclusters; i++)
     d->clusv[i].hidden_p = false;
-    d->clusv[i].excluded_p = false;
-  }
 
   /*
    * populate the clusv structures using the information in the
@@ -106,7 +101,7 @@ clusters_set (datad *d, ggobid *gg) {
   */
   vectori_alloc_zero (&d->clusterid, d->nrows);
 
-  if (nclusters != d->nrows) {
+  if (nclusters > 0 && nclusters != 1) {
     for (i=0; i<d->nrows; i++) {
       for (n=0; n<nclusters; n++) {
         if (d->sampled.els[i]) {
