@@ -368,29 +368,31 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
+    if (g_slist_length (d->vartable)) {
 
-    /* Create a scrolled window to pack the CList widget into */
-    swin = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
-      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-                              swin, gtk_label_new (d->name));
-    gtk_widget_show (swin);
+      /* Create a scrolled window to pack the CList widget into */
+      swin = gtk_scrolled_window_new (NULL, NULL);
+      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
+        GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+      gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+                                swin, gtk_label_new (d->name));
+      gtk_widget_show (swin);
 
-    /* add the CList */
-    clist = gtk_clist_new (1);
-    gtk_clist_set_selection_mode (GTK_CLIST (clist), mode);
-    gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
-    gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-                       GTK_SIGNAL_FUNC (func),
-                       gg);
+      /* add the CList */
+      clist = gtk_clist_new (1);
+      gtk_clist_set_selection_mode (GTK_CLIST (clist), mode);
+      gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
+      gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+                         GTK_SIGNAL_FUNC (func),
+                         gg);
 
-    for (j=0; j<d->ncols; j++) {
-      vt = vartable_element_get (j, d);
-      row[0] = g_strdup_printf (vt->collab_tform);
-      gtk_clist_append (GTK_CLIST (clist), row);
+      for (j=0; j<d->ncols; j++) {
+        vt = vartable_element_get (j, d);
+        row[0] = g_strdup_printf (vt->collab_tform);
+        gtk_clist_append (GTK_CLIST (clist), row);
+      }
+      gtk_container_add (GTK_CONTAINER (swin), clist);
     }
-    gtk_container_add (GTK_CONTAINER (swin), clist);
   }
 
   return notebook;
