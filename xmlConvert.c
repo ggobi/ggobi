@@ -22,7 +22,8 @@ main (gint argc, gchar *argv[])
   gtk_init (&argc, &argv);
   gg = ggobi_alloc ();
 
-  parse_command_line(&argc, argv, gg);
+  /*parse_command_line(&argc, argv, gg);*/
+  parse_command_line(&argc, argv);
 
   fileName = argv[1];
 
