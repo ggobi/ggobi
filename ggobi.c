@@ -152,7 +152,7 @@ ggobi_remove_by_index (ggobid *gg, gint which)
      down by one in the array to compact it.
    */
   if(which < num_ggobis -1) {
-    memcpy(all_ggobis + which, all_ggobis + which + 1, num_ggobis-which);
+     memcpy(all_ggobis + which, all_ggobis + which + 1, sizeof(ggobid*)*(num_ggobis-which-1));
   }
   /* Now patch up the array so that it has the correct number of elements. */
   num_ggobis--;
@@ -367,7 +367,7 @@ ValidateGGobiRef(ggobid *gg, gboolean fatal)
     return(gg);
   }
 
-  fprintf(stderr, "Incorrect reference to ggobid.");
+  g_printerr(stderr, "Incorrect reference to ggobid.\n");
 
  if (fatal)
   exit(10);
