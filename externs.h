@@ -297,7 +297,7 @@ displayd*  parcoords_new (gboolean, gint, gint *, datad *, ggobid *);
 void       parcoords_reset_arrangement (displayd *, gint, ggobid *);
 gboolean   parcoords_varsel (cpaneld *, splotd *, gint, gint *, ggobid *);
 gint       parse_command_line (gint *argc, gchar **av);
-gint       path (array_d, array_d, array_d, gint, gint, array_d, array_d, array_d, vector_f, array_d, array_d, array_d, vector_f, vector_f, gfloat *, gfloat *);
+gint       tour_path (array_d, array_d, array_d, gint, gint, array_d, array_d, array_d, vector_f, array_d, array_d, array_d, vector_f, vector_f, gfloat *, gfloat *);
 gboolean   pca_calc (datad *, ggobid *);
 void       pca_diagnostics_set (datad *d, ggobid *);
 gint       pcompare (const void *, const void *);

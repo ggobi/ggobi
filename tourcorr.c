@@ -967,7 +967,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
       gt_basis(dsp->tcorr1.Fz, dsp->tcorr1.nactive, 
         dsp->tcorr1.active_vars, d->ncols, 
         (gint) 1);
-      pathprob = path(dsp->tcorr1.Fa, dsp->tcorr1.Fz, dsp->tcorr1.F, 
+      pathprob = tour_path(dsp->tcorr1.Fa, dsp->tcorr1.Fz, dsp->tcorr1.F, 
         d->ncols, (gint) 1, 
         dsp->tcorr1.Ga, dsp->tcorr1.Gz, dsp->tcorr1.G, dsp->tcorr1.lambda, 
         dsp->tcorr1.tv, dsp->tcorr1.Va, dsp->tcorr1.Vz,
@@ -977,7 +977,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         dsp->tcorr1.get_new_target = false;
       else if (pathprob == 1) { /* problems with Fa so need to force a jump */
         tourcorr_scramble(gg);
-        pathprob = path(dsp->tcorr1.Fa, dsp->tcorr1.Fz, dsp->tcorr1.F, 
+        pathprob = tour_path(dsp->tcorr1.Fa, dsp->tcorr1.Fz, dsp->tcorr1.F, 
           d->ncols, (gint) 1, 
           dsp->tcorr1.Ga, dsp->tcorr1.Gz, dsp->tcorr1.G, dsp->tcorr1.lambda, 
           dsp->tcorr1.tv, dsp->tcorr1.Va, dsp->tcorr1.Vz,
@@ -1020,7 +1020,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
     else {
       gt_basis(dsp->tcorr2.Fz, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
         d->ncols, (gint) 1);
-      pathprob = path(dsp->tcorr2.Fa, dsp->tcorr2.Fz, dsp->tcorr2.F, 
+      pathprob = tour_path(dsp->tcorr2.Fa, dsp->tcorr2.Fz, dsp->tcorr2.F, 
         d->ncols, (gint) 1, 
         dsp->tcorr2.Ga, dsp->tcorr2.Gz, dsp->tcorr2.G, dsp->tcorr2.lambda, 
         dsp->tcorr2.tv, dsp->tcorr2.Va, dsp->tcorr2.Vz,
@@ -1030,7 +1030,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         dsp->tcorr2.get_new_target = false;
       else if (pathprob == 1) { /* problems with Fa so need to force a jump */
         tourcorr_scramble(gg);
-        pathprob = path(dsp->tcorr2.Fa, dsp->tcorr2.Fz, dsp->tcorr2.F, 
+        pathprob = tour_path(dsp->tcorr2.Fa, dsp->tcorr2.Fz, dsp->tcorr2.F, 
           d->ncols, (gint) 1, 
           dsp->tcorr2.Ga, dsp->tcorr2.Gz, dsp->tcorr2.G, dsp->tcorr2.lambda, 
           dsp->tcorr2.tv, dsp->tcorr2.Va, dsp->tcorr2.Vz,

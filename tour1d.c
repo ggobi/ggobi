@@ -635,7 +635,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
         }
         
       }
-      pathprob = path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
+      pathprob = tour_path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
         (gint) 1, dsp->t1d.Ga, dsp->t1d.Gz, dsp->t1d.G, 
         dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
         dsp->t1d.Vz, dsp->t1d.tau, dsp->t1d.tinc, 
@@ -644,7 +644,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
         dsp->t1d.get_new_target = false;
       else if (pathprob == 1) { /* problems with Fa so need to force a jump */
         tour1d_scramble(gg);
-        pathprob = path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
+        pathprob = tour_path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
           (gint) 1, dsp->t1d.Ga,
           dsp->t1d.Gz, dsp->t1d.G, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
           dsp->t1d.Vz,  dsp->t1d.tau, dsp->t1d.tinc, 

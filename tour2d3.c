@@ -532,7 +532,7 @@ tour2d3_run(displayd *dsp, ggobid *gg)
       gt_basis(dsp->t2d3.Fz, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
         d->ncols, (gint) 2);
 
-      pathprob = path(dsp->t2d3.Fa, dsp->t2d3.Fz, dsp->t2d3.F, d->ncols, 
+      pathprob = tour_path(dsp->t2d3.Fa, dsp->t2d3.Fz, dsp->t2d3.F, d->ncols, 
         (gint) 2, dsp->t2d3.Ga,
         dsp->t2d3.Gz, dsp->t2d3.G, dsp->t2d3.lambda, dsp->t2d3.tv, dsp->t2d3.Va,
         dsp->t2d3.Vz, dsp->t2d3.tau, dsp->t2d3.tinc, 
@@ -541,7 +541,7 @@ tour2d3_run(displayd *dsp, ggobid *gg)
         dsp->t2d3.get_new_target = false;
       else if (pathprob == 1) { /* problems with Fa so need to force a jump */
         tour2d3_scramble(gg);
-        pathprob = path(dsp->t2d3.Fa, dsp->t2d3.Fz, dsp->t2d3.F, d->ncols, 
+        pathprob = tour_path(dsp->t2d3.Fa, dsp->t2d3.Fz, dsp->t2d3.F, d->ncols, 
           (gint) 2, dsp->t2d3.Ga,
           dsp->t2d3.Gz, dsp->t2d3.G, dsp->t2d3.lambda, dsp->t2d3.tv,
           dsp->t2d3.Va,

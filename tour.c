@@ -267,7 +267,7 @@ eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau,
  * datadim = num vars
  * projdim = proj dim
  */
-gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, 
+gint tour_path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, 
   array_d Ga, array_d Gz, array_d G, vector_f lambda, array_d tv, 
   array_d Va, array_d Vz, vector_f tau, vector_f tinc, gfloat *pdist_az, 
   gfloat *ptang) 
