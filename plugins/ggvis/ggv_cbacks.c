@@ -186,6 +186,31 @@ void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst)
 }
 
 /*
+ * Required so that the histogram is properly drawn before mds_once
+ * has executed.
+*/
+static void
+trans_dist_init_defaults (ggvisd *ggv)
+{
+  gint i, j, IJ;;
+
+  vectord_realloc (&ggv->trans_dist, ggv->ndistances);
+  for (i=0; i<ggv->Dtarget.nrows; i++) {
+    for (j=0; j<ggv->Dtarget.nrows; j++) {
+      IJ = i*ggv->Dtarget.ncols+j;
+      if (ggv->KruskalShepard_classic == KruskalShepard) {
+        ggv->trans_dist.els[IJ]  = ggv->Dtarget.vals[i][j];
+      } else { /* CLASSIC */
+        ggv->trans_dist.els[IJ]  = -ggv->Dtarget.vals[i][j]*
+                                    ggv->Dtarget.vals[i][j];
+      }
+    }
+  }
+
+}
+
+
+/*
  * This code should actually be moved out of the callback
  * and stashed someplace else.
 */
@@ -327,6 +352,8 @@ large size of it isn't important.
   lbl = g_strdup_printf ("%d x %d", ggv->Dtarget.nrows, ggv->Dtarget.ncols);
   gtk_entry_set_text (GTK_ENTRY (entry), lbl);
   g_free (lbl);
+
+  trans_dist_init_defaults (ggv);
 }
 
 /*-- --*/

@@ -4,11 +4,12 @@
 #include "GGobiAPI.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "plugin.h"
 #include "ggvis.h"
 
-#define STR_VMARGIN 10
+#define STR_VMARGIN  5
 #define STR_HMARGIN 10
 
 static gint histogram_plotheight_get (ggvisd *ggv);
@@ -52,6 +53,9 @@ g_printerr ("(histogram_configure)\n");
   D->pix = gdk_pixmap_new (w->window,
     w->allocation.width, w->allocation.height, -1);
   histogram_pixmap_clear (ggv, gg);
+
+  if (ggv->Dtarget.nrows == 0 || ggv->Dtarget.ncols == 0)
+    return retval;  /*-- too early to figure out the histogram bins --*/
 
   histogram_bins_reset (ggv);
   if (D->nbins > 0) {
@@ -220,8 +224,8 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
     D->bars[D->nbins-1].x+D->bars[D->nbins-1].width,
       ymax);
 
-  /*-- Once just to get the string width --*/
-  str = g_strdup_printf ("%s", ".99");
+
+  str = g_strdup_printf ("%2.2f", trans_dist_max);
   gdk_text_extents (
 #if GTK_MAJOR_VERSION == 2
     gtk_style_get_font (style),
@@ -230,8 +234,6 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
 #endif
     str, strlen (str),
     &lbearing, &rbearing, &strwidth, &ascent, &descent);
-
-  str = g_strdup_printf ("%2.2f", trans_dist_max);
   gdk_draw_string (D->pix,
 #if GTK_MAJOR_VERSION == 2
       gtk_style_get_font (style),
@@ -239,7 +241,9 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
       style->font,
 #endif
     gg->plot_GC,
-    da->allocation.width - STR_HMARGIN - strwidth, ascent + descent, str);
+    da->allocation.width - STR_HMARGIN - strwidth,
+    ascent + descent + STR_VMARGIN,
+    str);
   g_free (str);
 
   str = g_strdup_printf ("%2.2f", trans_dist_min);
@@ -258,7 +262,9 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
       style->font,
 #endif
     gg->plot_GC,
-    (gint) STR_HMARGIN/2, ascent + descent, str);
+    (gint) STR_HMARGIN/2,
+    ascent + descent + STR_VMARGIN,
+    str);
   g_free (str);
 
   draw_grip_control (ggv, gg);
@@ -391,7 +397,7 @@ static void
 histogram_bins_reset (ggvisd *ggv)
 {
   dissimd *D = ggv->dissim;
-  gint i, k;
+  gint i, j, k;
   gdouble fac, t_d, t_delta;
   GtkWidget *da = D->da;
   gint xmin = HISTOGRAM_HMARGIN;
@@ -407,24 +413,55 @@ g_printerr ("(histogram_bins_reset) pwidth = %d nbins %d\n", pwidth, D->nbins);
 
   /* map trans_dist[i] to [0,1] and sort into bins */
   trans_dist_min = DBL_MAX; trans_dist_max = DBL_MIN;
-  for(i=0; i<ggv->Dtarget.nrows*ggv->Dtarget.ncols; i++) {
-    t_d = ggv->trans_dist.els[i];
-    if (t_d != DBL_MAX) {
-      if (t_d > trans_dist_max) trans_dist_max = t_d;
-      if (t_d < trans_dist_min) trans_dist_min = t_d;
+
+/*
+ * Probably I can initialize trans_dist before mds_once is run
+*/
+g_printerr ("trans_dist initialized? nels %d\n",
+ggv->trans_dist.nels);
+  if (ggv->trans_dist.nels > 0) {
+    for (i=0; i<ggv->Dtarget.nrows*ggv->Dtarget.ncols; i++) {
+      t_d = ggv->trans_dist.els[i];
+      if (t_d != DBL_MAX) {
+        if (t_d > trans_dist_max) trans_dist_max = t_d;
+        if (t_d < trans_dist_min) trans_dist_min = t_d;
+      }
     }
-  }
+  } else if (ggv->Dtarget.nrows > 0 && ggv->Dtarget.ncols > 0) {
+    for (i=0; i<ggv->Dtarget.nrows; i++) {
+      for (j=0; j<ggv->Dtarget.ncols; j++) {
+        t_d = ggv->Dtarget.vals[i][j];
+        if (t_d != DBL_MAX) {
+          if (t_d > trans_dist_max) {
+            trans_dist_max = t_d;
+g_printerr ("changing max: %f\n", trans_dist_max);
+          }
+          if (t_d < trans_dist_min) {
+            trans_dist_min = t_d;
+g_printerr ("changing min: %f\n", trans_dist_min);
+          }
+        }
+      }
+    }
+  } else return;
+
+g_printerr ("min %f max %f\n", trans_dist_min, trans_dist_max);
+
   /* in case trans_dist is constant and t_delta would be zero */
   t_delta = MAX(trans_dist_max-trans_dist_min, 1E-100);
   /* so rounding off results is strictly < thr_nbins */
   fac = (double)D->nbins * 0.999999;  
 g_printerr ("nbins %d bin allocation %d\n", D->nbins, D->bins.nels);
+
+  D->nbins = MIN (D->nbins, D->bins.nels);
   for (i=0; i<D->nbins; i++)
     D->bins.els[i] = 0;
+
   for (i=0; i < ggv->Dtarget.nrows*ggv->Dtarget.ncols; i++) {
     t_d = ggv->trans_dist.els[i];
     if (t_d != DBL_MAX) {
       k = (gint) ((ggv->trans_dist.els[i]-trans_dist_min)/t_delta * fac);
+      if (k >= D->bins.nels) g_printerr ("k too large: %d\n", k);
       D->bins.els[k]++;
     }
   }
