@@ -35,9 +35,11 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
   if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
 
     if (impute_type == IMP_ABOVE)
-      val_str = gtk_entry_get_text (GTK_ENTRY (gg->impute.entry_above));
+      val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->impute.entry_above),
+        0, -1);
     else if (impute_type == IMP_BELOW)
-      val_str = gtk_entry_get_text (GTK_ENTRY (gg->impute.entry_below));
+      val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->impute.entry_below),
+        0, -1);
 
     if (strlen (val_str) == 0) {
       gchar *message = g_strdup_printf (
@@ -49,6 +51,7 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
     }
 
     val = (gfloat) atof (val_str);
+    g_free (val_str);
     if (val < 0 || val > 100) {
       gchar *message = g_strdup_printf (
         "You specified %f%%; please specify a percentage between 0 and 100.\n",
@@ -91,7 +94,8 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
   }
   else if (impute_type == IMP_FIXED) {
 
-    val_str = gtk_entry_get_text (GTK_ENTRY (gg->impute.entry_val));
+    val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->impute.entry_val),
+      0, -1);
     if (strlen (val_str) == 0) {
       quick_message (
         "You've selected 'Specify' but haven't specified a value.\n",
@@ -101,6 +105,7 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
     }
     else {
       impval = (gfloat) atof (val_str);
+      g_free (val_str);
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
         for (k=0; k<nselected_cols; k++) {

@@ -66,9 +66,11 @@ scale_get_a (ggobid *gg) {
   gchar *val_str;
   gfloat val = 0;  /*-- default value --*/
 
-  val_str = gtk_entry_get_text (GTK_ENTRY (gg->tform_ui.entry_a));
-  if (val_str != NULL && strlen (val_str) > 0)
+  val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->tform_ui.entry_a), 0, -1);
+  if (val_str != NULL && strlen (val_str) > 0) {
     val = (gfloat) atof (val_str);
+    g_free (val_str);
+  }
 
   return val;
 }
@@ -77,9 +79,11 @@ scale_get_b (ggobid *gg) {
   gchar *val_str;
   gfloat val = 1;  /*-- default value --*/
 
-  val_str = gtk_entry_get_text (GTK_ENTRY (gg->tform_ui.entry_b));
-  if (val_str != NULL && strlen (val_str) > 0)
+  val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->tform_ui.entry_b), 0, -1);
+  if (val_str != NULL && strlen (val_str) > 0) {
     val = (gfloat) atof (val_str);
+    g_free (val_str);
+  }
 
   return val;
 }

@@ -512,20 +512,30 @@ void
 GGOBI(getMySQLGUIInfo)(GtkButton *button, MySQLGUIInput *guiInput)
 {
  ggobid *gg = guiInput->gg;
- int i;
- char *val;
+ gint i;
+ gchar *val = NULL;
  MySQLLoginInfo* info = initMySQLLoginInfo(NULL);
 
  for(i = 0; i < guiInput->numInputs; i++) {
    if(guiInput->textInput[i] == NULL)
      continue;
-   val = gtk_entry_get_text(GTK_ENTRY(guiInput->textInput[i]));
+
+   if (val)
+     g_free (val);
+/* val_str = gtk_entry_get_text(GTK_ENTRY(guiInput->textInput[i]));*/
+/* deprecated, replaced by the following */
+   val = gtk_editable_get_chars(GTK_EDITABLE(guiInput->textInput[i]), 0, -1);
+
    if(val)
-     val = g_strdup(val);
+     /*val = g_strdup(val);*/ 
+     /* Is this necessary with gtk_editable_get_chars? I bet not.  dfs */
+     ;
    else
      continue;
 
    setMySQLLoginElement((MySQLInfoElement) i, val, info);
+   g_free (val);
+   val = NULL;
  }
 
   /* Only cancel if we read something. Otherwise,

@@ -17,6 +17,7 @@ PRINTING_IMPLEMENTED=0
 
 include local.config
 
+#CC = cc
 CC = gcc
 
 # This defaults to $(CC) and is reset to CXX by any optional 

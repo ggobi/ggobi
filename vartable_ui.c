@@ -92,15 +92,19 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   gboolean min_p = false, max_p = false;
 
   /*-- minimum --*/
-  val_str = gtk_entry_get_text (GTK_ENTRY (gg->vartable_ui.umin));
+  val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->vartable_ui.umin),
+    0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
     min_val = (gfloat) atof (val_str);
+    g_free (val_str);
     min_p = true;
   }
 
   /*-- maximum --*/
-  val_str = gtk_entry_get_text (GTK_ENTRY (gg->vartable_ui.umax));
+  val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->vartable_ui.umax),
+    0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
+    g_free (val_str);
     max_val = (gfloat) atof (val_str);
     max_p = true;
   }
