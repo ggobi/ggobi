@@ -56,6 +56,8 @@ GTK_CFLAGS=$(shell $(GTK_CONFIG) --cflags)
 %.so: $(OBJS)
 	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) $(OBJS) -o $@ $(PLUGIN_LIBS) $(GGOBI_LIB) $(GTK_LIBS)
 
+$(PKG).so:
+
 objects: 
 	@echo "$(OBJS)"
 
