@@ -66,6 +66,8 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
 	for d in $(DIRS) ; do \
 	   mkdir -p $(TMP_INSTALL_DIR)/$$d ; \
 	done
+	chgrp -R xgobi $(TMP_INSTALL_DIR)
+	chmod -R g+w $(TMP_INSTALL_DIR)
 	cp $(LICENSES:%=LICENSING/%) Install/INSTALL Install/README $(TMP_INSTALL_DIR)
 	cp Install/configure.in Install/configure  Install/Makeconf.in Install/GNUmakefile.in $(TMP_INSTALL_DIR)
 	cp Install/GNUmakefile_src.in $(TMP_INSTALL_DIR)/src/GNUmakefile.in
