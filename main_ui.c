@@ -604,7 +604,7 @@ static GtkItemFactoryEntry menu_items[] = {
        NULL },
 #endif
 
-  { "/Tools/Impute missing values ...", 
+  { "/Tools/Missing values ...", 
        NULL,        
        (GtkItemFactoryCallback) impute_window_open,   
        0,

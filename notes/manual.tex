@@ -1,6 +1,15 @@
 \documentclass[11pt]{article}
 \usepackage{fullpage}
 
+% Issues:
+%  I haven't worked out a consistent notation:  when to display
+%  a button's contents in bf, when to use em, etc.
+
+%  We need a better terminology to distinguish between the two
+%  types of variable selection.  Can I call one widget the
+%  variable selection panel, and the other the variable chooser?
+%  Can you think of something better?
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % If it turns out that I can use pdflatex, I can use jpeg graphics
@@ -198,15 +207,6 @@ reading and writing data pertaining to that mode.
 \subsection{Graphical displays}
 \label{slbl:GraphicalDisplays}
 
-As mentioned earlier, the main display types are
-\begin{itemize}
-\itemsep 0em
-\item scatterplot,
-\item scatterplot matrix,
-\item parallel coordinates plot, and
-\item time series plots.
-\end{itemize}
-
 \subsubsection{Current display, current plot}
 
 Since there are multiple displays, some of which contain multiple
@@ -229,12 +229,48 @@ happens.  The white border should follow your actions, and the
 control panel should update so that its panels correspond to the
 current display type and ViewMode.
 
-\subsubsection{Missing data displays}
+\subsubsection{Display types}
+
+Each display type is briefly described here.  A full description of the
+view modes and variable selection behavior for each display will be
+given in section \ref{slbl:ViewModes}.
+
+As mentioned earlier, there are presently four main display types:
+
+The {\bf scatterplot} display is a window containing a single scatterplot.
+By default, it includes axes; they can be turned off using the Options
+menu in the main control window.  It has the largest number of view
+modes of any display.
+
+The {\bf scatterplot matrix} is a window containing a symmetric matrix
+of scatterplots for the chosen variables.  The plots along the diagonal
+are ASHes (Average Shifted Histograms).
+
+The {\bf parallel coordinates} display contains a single parallel
+coordinates plot, which can be arranged horizontally or vertically.
+(To understand this plot if you are encountering it for the first time, 
+imagine deconstructing a high-dimensional scatterplot and arranging
+its axes in parallel instead of orthogonally.  To represent case $i$,
+think of drawing a dot on axis $j$ at that point's value for variable
+$j$, and then connecting the dots into one set of connected line segments.
+For a more detailed explanation, see [].)
+
+The {\bf time series plots:}
+
+[I can't quite figure this out.]
+
+\subsubsection{Missing values displays}
 % \ref{slbl:MissingData}
 
-
-\subsection{Selecting variables for plotting}
-\subsection{Control panels}
+When your data includes missing values, two additional display types
+are available.  The missing values scatterplot and scatterplot matrix
+display not the data itself but the ``missingness'' for each point, namely
+a jittered scatterplot of indicator variables encoding the presence or
+absence of values for each variable.  Examining a number of views in one
+of these displays allows us to explore the joint distribution of missing
+values across variables.  Since these displays are linked to all others,
+brushing the missings in a missing values display allows us to explore
+the association between missing values and the variables.
 
 \section{Data format}
 \label{slbl:DataFormat}
@@ -246,14 +282,62 @@ current display type and ViewMode.
 \section{Integration of ggobi with other software systems}
 \label{slbl:Integration}
 
-\section{View modes}
+\section{View modes: projection and interaction}
 \label{slbl:ViewModes}
 
-\subsection{1D plots}
-\subsection{XY plots}
-\subsection{Tours}
-\label{slbl:1DTour}
+Selecting any mode on the {\bf ViewMode} menu changes the interactions
+available for the display and plot that are current, and pops the
+corresponding control panel into the left portion of the main control
+window.  The modes in the top half of the menu do something more as
+well:  they set the projection method for the display, and the meaning
+of actions in the variable selection panel always conforms to the current
+projection method.
 
+As an example, start ggobi with some data, and watch what happens
+in the main ggobi window and a a single scatterplot display.   When ggobi
+starts, it's in XYPlot mode by default, so the scatterplot window shows
+a 2-dimensional projection of the data.  If you select {\em Scale} or
+{\em Brush} (or any choice in the bottom half of the menu), the control
+panel at the left of the main window changes, reflecting the different
+interactions available to you in each mode.  However, the projection in
+the window doesn't change.  If you click on the checkboxes in the
+variable selection panel at the right of the main ggobi window, you
+replace one of the plotted variables.
+
+Now select {\em 2D Tour} in the ViewMode menu.  {\em Everything}
+changes at once, because you've effective selected both a new mode and
+a new projection type at the same time.
+\begin{itemize}
+\itemsep 0em
+\item The control panel changes, because a new set of interactions
+      just became available.
+\item The variable selection panel changes, because the variable
+      selection behavior for high-dimensional projection types is
+      quite different than that for low-dimensional projection types.
+\item The plot in the scatterplot display changes, because it's
+      now showing a projection of 3 variables instead of 2.  Furthermore,
+      it's moving, because a grand tour process is running.
+\end{itemize}
+
+If you now select one of the modes in the bottom half of the ViewMode
+menu, you'll see again that the variable selection panel doesn't
+change, and the plot in the scatterplot doesn't change -- except
+that it stops moving.  The only thing that changes with every
+selection is the control panel at the left of the main window.
+
+Now we'll describe each view mode in more detail, starting at the
+top of the ViewMode menu. 
+
+\subsection{1D plots}
+
+\subsection{XY plots}
+
+\subsection{1D Tour}
+\label{slbl:1DTour}
+\subsection{2D Tour}
+\label{slbl:2DTour}
+\subsection{2x1D Tour}
+\label{slbl:2x1DTour}
 
 \subsection{Scaling of axes}
 \label{slbl:Scaling}
@@ -417,8 +501,9 @@ This important table is opened by selecting the first entry on the
 \itemsep 0em
 \item the display of variable statistics,
 \item variable selection for other tools,
-\item setting variable ranges, and
-\item cloning variables.
+\item setting variable ranges,
+\item cloning variables, and
+\item adding other new variables.
 \end{itemize}
 
 Its first purpose is to display a few statistics for each variable:
@@ -439,6 +524,11 @@ useful for a data set where several of the variables have the same units.
 The selected variables can also be cloned, and the new variables
 you create will be added to the table as well as the main control panel.
 
+There's another way to add new variables, and that relies on the {\em New
+...} button, which brings up a small panel.  Use that panel to specify
+the variable's name and to set its values:  either the row numbers or
+a set of integers reflecting the groups currently defined by brushing.
+
 \subsection{Jittering}
 
 Select {\em Variable jittering ...} to open a panel that allows
@@ -453,9 +543,68 @@ Choose between uniform and random jitter, and then set the degree of
 jitter using the slider.  To rejitter without changing the degree of
 jitter, simply click on the {\bf Jitter} button.
 
-\subsection{Imputation controls for missing data}
-\subsection{Sphere}
-\label{slbl:Sphere}
+\subsection{Controls for missing data}
+
+By default, missing values are assigned the value $0$, but you
+may sometimes find that to be an inconvenient choice.  Use the
+{\em Missing values} panel to assign alternative numbers.
+
+By default, all missings in all variables will be affected
+together, but you can choose to assign values only for selected
+variables using the menu at the top of the panel.
+
+Below the menu, a notebook widget allows you to specify the
+type of imputation you'd like to use.
+
+{\bf Random imputation}: Sample from the present values for each variable
+  to populate the missing values.  If you have done some brushing to
+  partition the cases, you can specify that you want the sampling to be
+  done using only cases brushed with the same color and glyph.
+\\{\bf Fixed value}: Specify any value to use instead of the default.
+\\{\bf Percentage below minimum}: Specify a value that is $x$ percent
+  above the minimum value.  For example, if the variable ranges from
+ $40$ to $80$, specifying 10 will assign the missings the value $40 - (10\%
+ * 40) = 36$.
+\\{\bf Percentage above minimum}: Specify a value that is $x$ percent
+above the maximum.
+
+If you want all plots to rescale immediately when you assign new
+values, turn on {\em Rescale} toggle.  Finally, click on the {\em Impute}
+button to perform the imputation or assignment of values.
+
+\subsection{Sphering}
+\label{slbl:Sphering}
+
+The {\em Sphering} panel starts by displaying a scree plot for the
+currently selected variables (see section \ref{slbl:VarStats}).  If the
+scree plot doesn't reflect the variables you want to sphere, then open
+the Variable statistics panel, select the variables of interest, and
+click on {\em Update scree plot}.
+
+It's advisable to standardize the variables first, so a label at the top
+of the panel reminds you if they aren't.  In that case, open the {\em
+Variable transformation} tool and standardize the selected variables,
+then click {\em Update scree plot.}
+
+Now you're ready to sphere the selected variables.  Working your way down
+the panel, use your visual interpretation of the scree plot together
+with the information in the labelled section ``Prepare to sphere'' to
+decide how many principal components you want to create.  By default,
+all the selected variables will be sphered, but you decide that the first
+few principal components account for a sufficiently high proportion of
+the variance.  In that case, you can use the spin button to the right
+of the label ``Set number of PCs'' to decrease the number of principal
+components you're going to generate.  The variance and condition number
+are displayed to help you make that choice.
+
+Once you're satisfied with the selected variables and the number of
+principal components, proceed to the last step.  Click on {\em Apply
+sphering} to create new variables and add them ggobi's variable selection
+panels.  The names of the selected variables will be added to the
+``sphered variables'' to help you remember which variables you sphered.
+
+[And I forget what 'Restore scree plot' is for -- dfs]
+
 \subsection{Subsetting}
 
 Select {\em Case subsetting and sampling ...} to open a panel
@@ -657,15 +806,15 @@ beginning to appear.  In the {\bf 1DTour}, a projection of several
 variables is viewed an an average shifted histogram, as described
 in section \ref{slbl:1DTour}.
 
-The redesign of the tour methods is reflected in the {\bf Sphere}
+The redesign of the tour methods is reflected in the {\bf Sphering}
 tool, which also appears in the most recent versions of xgobi.
 Instead of automatically sphering variables in projection pursuit,
-ggobi allows you the choice:  you can use the {\bf Sphere} tool to
+ggobi allows you the choice:  you can use the {\bf Sphering} tool to
 decide which variables to sphere.  Since this method makes use of
 variable cloning, it creates new variables, allowing you to look at
 plots of principal components against the original data.
 
-See section \ref{slbl:Sphere} for details and pictures.
+See section \ref{slbl:Sphering} for details and pictures.
 
 \subsection{On-line help}
 

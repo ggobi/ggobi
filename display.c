@@ -312,7 +312,7 @@ display_add (displayd *display, ggobid *gg)
   /*
    * Make sure the border for the previous plot is turned off
   */
-  if(prev_splot != NULL) {
+  if (prev_splot != NULL) {
     prev_splot->redraw_style = QUICK;
     gtk_widget_queue_draw (prev_splot->da);
   }

@@ -210,7 +210,7 @@ display_menu_build (ggobid *gg)
     CreateMenuItem (gg->display_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
     /*-- add a title --*/
-    CreateMenuItem (gg->display_menu, "MISSING VALUES PLOTS",
+    CreateMenuItem (gg->display_menu, "MISSING VALUES DISPLAYS",
       "", "", NULL, NULL, NULL, NULL, gg);
 
     if (nd == 1) {

@@ -88,7 +88,7 @@ impute_window_open (ggobid *gg) {
     
     gg->impute.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->impute.window),
-      "impute data");
+      "assign values");
     gtk_signal_connect (GTK_OBJECT (gg->impute.window),
       "delete_event", GTK_SIGNAL_FUNC (delete_cb), NULL);
   
@@ -202,6 +202,8 @@ impute_window_open (ggobid *gg) {
                         "clicked",
                         GTK_SIGNAL_FUNC (impute_cb),
                         (gpointer) gg);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
+      "Impute or assign values to missings", NULL);
     gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
 
     button = gtk_check_button_new_with_label ("Rescale");
