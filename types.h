@@ -33,8 +33,6 @@ typedef enum {STICKY, UNSTICKY} PointIdentifyState;
 
 typedef enum {DOT_GLYPH=0, PLUS, X, OC, OR, FC, FR, UNKNOWN_GLYPH} GlyphType;
 
-typedef enum {all_vartypes, real_only, categorical_only} vartyped;
-
 typedef struct {
   GlyphType type;
   gint size;
