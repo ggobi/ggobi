@@ -292,7 +292,10 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
   node = getXMLElement(doc, "plugins");
 
   info->plugins = NULL;
-  
+
+  if(node == NULL)  
+      return;
+
   el = node->children;
   while(el) {
     if(el->type != XML_TEXT_NODE && strcmp(el->name, "plugin") == 0) {

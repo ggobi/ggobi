@@ -34,7 +34,7 @@
      the previousFiles tag above.
      It has two displays
   -->
-
+cvs
  <display type="parcoords" data="1">
    <variable name="tars1" />
    <variable name="tars2" />
@@ -50,6 +50,7 @@
 </ggobis>
 
 
+
 <plugins>
  <plugin name="Data Viewer" load="immediate"><!-- load may be on demand. -->
    <description>Displays datasets in data grid.</description>
@@ -59,6 +60,7 @@
    </dll>
  </plugin>
 </plugins>
+
 </ggobirc>
 
 
