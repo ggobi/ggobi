@@ -165,7 +165,7 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
     }
   }
   if (edge_painting_p && e != NULL) {
-    for (k=0; k<e->edge.n; k++) {
+    for (k=0; k < e->edge.n; k++) {
       e->color_now.els[k] = e->color.els[k];
       e->glyph_now.els[k].type = e->glyph.els[k].type;
       e->glyph_now.els[k].size = e->glyph.els[k].size;
@@ -843,7 +843,7 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
  * I'm not doing any checking here to verify that the edges
  * are displayed.
 */
-  for (i=0; i<e->edge.n; i++) {
+  for (i=0; i < e->edge.n ; i++) {
 
     switch (cpanel->br_edge_targets) {
       case br_candg:  /*-- color and glyph --*/

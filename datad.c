@@ -291,10 +291,13 @@ datasetName (datad *d, ggobid *gg)
   return (lbl);
 }
 
-gboolean datad_has_edges (datad *d) {
+gboolean datad_has_edges (datad *d) 
+{
   return (d->edge.n > 0);
 }
-gboolean datad_has_variables (datad *d) {
+
+gboolean datad_has_variables (datad *d) 
+{
   return (d->ncols > 0);
 }
 
