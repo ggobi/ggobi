@@ -123,11 +123,20 @@ scatterplot_event_handled (GtkWidget *w, GdkEventKey *event,
   if (event->time == etime) return false;  /*-- already processed --*/
 
   switch (event->keyval) {
+  case GDK_0:
   case GDK_1:
-    g_printerr ("you pressed the 1 key\n");
-  break;
   case GDK_2:
-    g_printerr ("you pressed the 2 key\n");
+  case GDK_3:
+  case GDK_4:
+  case GDK_5:
+  case GDK_6:
+  case GDK_7:
+  case GDK_8:
+  case GDK_9:
+    if(gg->NumberedKeyEventHandler != NULL && gg->NumberedKeyEventHandler->handlerRoutine) {
+      (gg->NumberedKeyEventHandler->handlerRoutine)(event->keyval, w, event, cpanel, sp, gg, 
+                                                     gg->NumberedKeyEventHandler->userData);
+    }
   break;
 
   case GDK_d:
@@ -167,7 +176,7 @@ scatterplot_event_handled (GtkWidget *w, GdkEventKey *event,
     action = MOVEPTS;
   break;
   default:
-    g_printerr ("splot key_press: %d\n", event->keyval);
+    /* g_printerr ("splot key_press: %d\n", event->keyval); */
     common_event = false;
   }
 

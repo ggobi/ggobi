@@ -256,13 +256,20 @@ gint GGOBI(nrecords)(datad *dg);
 
 const gchar *const * GGOBI(getDataModeNames)(int *n);
 
+gchar *datasetName(datad *d, int which);
+gint  *createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gboolean useWindow);
+
+  /*
+   Routines for registering and un-registering handlers for numbered key presses.
+   */
+KeyEventHandler *GGOBI(registerNumberedKeyEventHandler)(KeyEventHandlerFunc routine, void *userData, char *description, ReleaseData *data, ggobid *gg, ProgrammingLanguage lang);
+KeyEventHandler *GGOBI(removeNumberedKeyEventHandler)(ggobid *gg);
 #ifdef __cplusplus
 }
 #endif
 
 
-gchar *datasetName(datad *d, int which);
-gint  *createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gboolean useWindow);
+
 
 #endif /* End of conditional inclusion of entire file.*/
 

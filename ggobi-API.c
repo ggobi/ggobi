@@ -1307,3 +1307,41 @@ GGOBI(nrecords)(datad *data)
 {
  return(data->nrows);
 }
+
+
+/*
+ This is the routine one uses to register a handler for key press events
+ for the numbered keys, i.e. 0, 1, ..., 9
+ One can specify null values for each of these to remove the handler and have
+ these events discarded.
+
+ See notes/NumberedKeys.*, splot.c and ggobi.h also for more details 
+ */
+KeyEventHandler *
+GGOBI(registerNumberedKeyEventHandler)(KeyEventHandlerFunc routine, void *userData, char *description, ReleaseData *relaseData, ggobid *gg, ProgrammingLanguage lang)
+{
+  KeyEventHandler *old = gg->NumberedKeyEventHandler;
+  KeyEventHandler *newValue;
+  if(routine == NULL)
+    newValue = NULL;
+  else {
+    newValue = g_malloc(1 * sizeof(KeyEventHandler));
+    newValue->handlerRoutine = routine;
+    newValue->userData = userData;
+    newValue->description = g_strdup(description);
+    newValue->language = lang;
+    newValue->ReleaseData = releaseData;
+  }
+
+  gg->NumberedKeyEventHandler = newValue;
+
+  return(old);
+}
+
+KeyEventHandler *
+GGOBI(removeNumberedKeyEventHandler)(ggobid *gg)
+{
+ return(GGOBI(registerNumberedKeyEventHandler(NULL, NULL, NULL, NULL, gg, C)));
+}
+
+

@@ -27,10 +27,42 @@
  */
 typedef void (*IdentifyProc)(void *user_data, gint id, splotd *sp,
   GtkWidget *w, ggobid *gg);
+
 typedef struct {
   IdentifyProc handler;
   void *user_data;
 } IdentifyHandler;
+
+
+/*
+ This is a typedef that is used for registering a routine for handling
+ presses of the numbered keys 0, 1, ..., 9.
+ It gets the events from the regular event handler and also the key identifier.
+ See scatterplot_event_handled() in splot.c.
+ The idea is that people can register routines in a programming language interface
+ to ggobi such as Rggobi, or the Perl or Python interfaces, and provide customized
+ callbacks/handlers for the numbered keys. 
+ Note that if you register a handler for any of these keys, you have to handle
+ them all (i.e. 0, ..., 9).  You can discard the ones you are not interested in.
+ In the future, we may set it up so that one can refuse to handle an event
+ and return false and have the scatterplot_event_handled() then process it
+ in the default way. Also, one can register an intermediate handler which 
+ looks up a table for key-specific handlers for each the 0, .., 9 keys.
+ Then one could register that function with the general ggobi mechanism
+ and provide an interface
+ */
+typedef gboolean (*KeyEventHandlerFunc)(guint keyval, GtkWidget *w, GdkEventKey *event,  cpaneld *cpanel, splotd *sp, ggobid *gg, void *userData);
+
+typedef void (*ReleaseData)(void *userData);
+  /* This is the variable that stores the registered handler */
+typedef struct {
+  KeyEventHandlerFunc handlerRoutine;
+  void *userData;
+  char *description;
+  ReleaseData *release;
+  ProgrammingLanguage language;
+} KeyEventHandler;
+
 
 struct _ggobid;
 
@@ -336,6 +368,8 @@ struct _ggobid {
    gboolean layoutByRow;
  } varpanel_ui;
 
+
+ KeyEventHandler *NumberedKeyEventHandler;
 
 }; /*  ggobid; */
 

@@ -119,7 +119,8 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 
 gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents);
 
-int main (gint argc, gchar *argv[])
+int 
+main(gint argc, gchar *argv[])
 { 
  GGOBI(main)(argc, argv, true);
  return (0);
@@ -179,6 +180,27 @@ ggobi_remove_by_index (ggobid *gg, gint which)
   return (which);
 }
 
+/*
+ The code within the TEST_KEYS sections performs a test of handling key presses on 
+ the numbered keys. It registers a function
+ */
+#ifdef TEST_KEYS
+gboolean
+DummyKeyTest(guint keyval, GtkWidget *w, GdkEventKey *event,  cpaneld *cpanel, splotd *sp, ggobid *gg, void *userData)
+{
+ static int count = 0;
+  fprintf(stderr, "Key press event (count = %d): key = %d, data = %s\n", 
+                     count, (int)keyval, (char *)userData);
+  fflush(stderr);
+
+  if(++count == 4) {
+    count = 0;
+    GGOBI(removeNumberedKeyEventHandler)(gg);
+  }
+ return(true);
+}
+#endif
+
 ggobid*
 ggobi_alloc()
 {
@@ -212,7 +234,10 @@ ggobi_alloc()
     g_realloc (all_ggobis, sizeof(ggobid*)*(num_ggobis+1));
   all_ggobis[num_ggobis] = tmp;
   num_ggobis++;
-  
+
+#ifdef TEST_KEYS
+  GGOBI(registerNumberedKeyEventHandler)(DummyKeyTest, g_strdup("A string for the key handler"),"Test handler", NULL, tmp, C);
+#endif
 
   return (tmp);
 }
@@ -220,7 +245,8 @@ ggobi_alloc()
   /* Available so that we can call this from R
      without any confusion between which main().
    */
-gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
+gint 
+GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 {
   extern void make_ggobi (GGobiOptions *, gboolean, ggobid *);
   GdkVisual *vis;
