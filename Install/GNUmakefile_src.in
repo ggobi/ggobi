@@ -5,8 +5,6 @@ include $(TOP)/Makeconf
 XML_INC_DIRS=@XML_INC_DIRS@
 XML_LIB_DIRS=@XML_LIB_DIRS@
 
-MYSQL_INC_DIRS=@MYSQL_INC_DIRS@
-MYSQL_LIB_DIRS=@MYSQL_LIB_DIRS@
 
 
 SRC=\
@@ -112,7 +110,7 @@ SRC=\
     xyplot_ui.c \
     print.c \
     dbms.c dbms_ui.c \
-    @XML_SRC@ @MYSQL_SRC@
+    @XML_SRC@
 
 #    mt19937-1.c \
 #    cokus.c \
@@ -123,13 +121,10 @@ ifdef USE_XML
 # -lxml2
 endif
 
-ifdef USE_MYSQL
- MYSQL_INC_DIRS=$(@MYSQL_INC_DIRS@:%=-I%)
-endif
 
 OBJ=$(SRC:%.c=%.o)
 
-CFLAGS= @SRC_DEBUG@ -I../include -I../gtkext/include $(shell $(GTK_CONFIG) --cflags ) $(XML_INC_DIRS) $(MYSQL_INC_DIRS) @XML_CFLAG_DEFINES@ @DEFS@
+CFLAGS= @SRC_DEBUG@ -I../include -I../gtkext/include $(shell $(GTK_CONFIG) --cflags ) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ @DEFS@
 
 LIBS=-L$(TOP)/lib -lgtkext $(XML_LIBS) $(shell $(GTK_CONFIG) --libs)
 

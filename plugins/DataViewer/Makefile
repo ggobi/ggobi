@@ -14,6 +14,15 @@ ifdef ADMIN
 endif
 
 
+ifdef GGOBI_CONFIG
+ GGOBI_INCLUDE_DIR=$(shell $(GGOBI_CONFIG) --cflags)
+ GGOBI_LIB=$(shell $(GGOBI_CONFIG) --libs)
+else
+ GGOBI_INCLUDE_DIR=-I../..
+ GGOBI_LIB=-L../.. -lggobi
+endif
+
+
 ifdef GTK_EXTRA_CONFIG
  GTKEXTRA_INCLUDES=$(shell $(GTK_EXTRA_CONFIG) --cflags)
  EXTRA_LIBS=$(shell $(GTK_EXTRA_CONFIG) --libs)
@@ -21,9 +30,8 @@ else
  EXTRA_LIBS=$(GTKEXTRA_LIB_DIR:%=-L%) $(GTKEXTRA_LIB_DIR:%=-Xlinker -rpath -Xlinker %) -lgtkextra 
 endif
 
-CFLAGS+=-g $(GTKEXTRA_INCLUDES) $(GNOME_SUPPORT_INCLUDE_DIR:%=-I%) -I$(GGOBI_HOME) $(shell $(GTK_CONFIG) --cflags)
+CFLAGS+=-g $(GTKEXTRA_INCLUDES) $(GNOME_SUPPORT_INCLUDE_DIR:%=-I%) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags)
 
-GGOBI_LIB=-L$(GGOBI_HOME) -lggobi
 
 SRC=worksheet
 OBJS=$(SRC:%=%.o)

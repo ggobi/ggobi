@@ -14,10 +14,13 @@ TAR=tar
 
 DIRS=\
    src include lib bin Docs data gtkext/src gtkext/include examples \
-   plugins
+   plugins share
 
 
 PLUGIN_DIRS=MySQL Postgres DataViewer FileSelector TestInput TestPlugin 
+
+SHARE_FILES=Install/ggobirc.in
+
 
 DATA_SRC_FILES=\
    flea.col flea.colors flea.dat flea.doc flea.glyphs flea.row \
@@ -86,6 +89,7 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
 	cp $(LGPL_SRC) $(TMP_INSTALL_DIR)/gtkext/src
 	cp $(LGPL_HEADERS) $(TMP_INSTALL_DIR)/gtkext/include
 	cp Install/GNUmakefile_gtkext.in $(TMP_INSTALL_DIR)/gtkext/src/GNUmakefile.in
+	cp $(SHARE_FILES) $(TMP_INSTALL_DIR)/share
 	$(MAKE) ADMIN=1 copyPlugins
 
 

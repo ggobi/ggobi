@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobirc>
+<ggobirc>
+
+<preferences>
+  <browser>
+    <executable>netscape</executable>
+    <args><arg>-remote</arg>
+     <arg>openURL(<filename/>)</arg>
+    </args>
+  </browser>
+
+  <colorschemes file="/home/duncan/Projects/ggobi/notes/colorschemes.xml" />
+  <background>
+  <!-- values are scaled by dividing by max and then mapped to the
+       range [0,65535], so one can use values between 0 and max for
+       the individual components.
+       e.g. 
+    <color max="100"><red>35</red><green>50</green><blue>25</blue></color>
+    <color max="65535"><red>0</red><green>0</green><blue>65535</blue></color>
+    <color max="1"><red>0</red><green>0</green><blue>1</blue></color>
+  -->
+  </background>
+  <foreground>
+    <color max="1"><red>1</red><green>0</green><blue>0</blue></color>
+  </foreground>
+  <glyph type="x" size="2" />
+</preferences>
+
+<previousFiles count="0">
+</previousFiles>
+
+<ggobis>
+</ggobis>
+
+<plugins>
+
+@mysql_xml@
+
+@postgres_xml@
+
+@dataviewer_xml@
+
+@fileselect_xml@
+
+@testInput_xml@
+
+@testPlugin_xml@
+
+</plugins>
+</ggobirc>
+
+

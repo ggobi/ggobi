@@ -19,10 +19,10 @@ all: lib/libgtkext.so bin/ggobi.bin @EMBED@ $(UTILS) @PACKAGES@ Plugins
 lib/libgtkext.so:
 	$(MAKE) -C gtkext/src install
 
-ggobi bin/ggobi.bin: lib/libgtkext.so @MYSQL_DEPENDS@
+ggobi bin/ggobi.bin: lib/libgtkext.so 
 	$(MAKE) -C src ../bin/ggobi.bin
 
-lib/libggobi.so lib: lib/libgtkext.so @MYSQL_DEPENDS@
+lib/libggobi.so lib: lib/libgtkext.so 
 	$(MAKE) -C src ../lib/libggobi.so
 
 
@@ -36,9 +36,10 @@ Rggobi: lib/libggobi.so
 	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)
 
 
-Plugins: 
+Plugins:  @EMBED_LIB@
 	if test -n "${PLUGIN_DIRS}" ; then \
 	  for f in $(PLUGIN_DIRS) ; do \
+	    echo "Building plugin $$f" ; \
 	    $(MAKE) -C plugins/$$f GGOBI_CONFIG=$(CUR_DIR)/bin/ggobi-config ; \
 	  done \
 	fi 

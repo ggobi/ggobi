@@ -42,7 +42,7 @@ AC_ARG_WITH(postgres, --with-postgres          Enable plugin reading data from P
 AC_ARG_WITH(dataviewer, --with-dataviewer          Enable plugin for viewig data in a datagrid., 
               DATAVIEWER_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DataViewer"; ENABLE_PLUGINS=1)
 AC_ARG_WITH(fileselector,--with-fileselector          Enable GtkExtra file selector plugin, 
-              FILESELECTOR_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} FileSelector" ; ENABLE_PLUGINS=1)
+              FILESELECTOR_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} FileSelect" ; ENABLE_PLUGINS=1)
 
 
 AC_ARG_WITH(R,--with-R          Install the Rggobi package)
@@ -302,6 +302,7 @@ MV=mv
 
 if test "${enable_embed}" = "yes" ; then
    EMBED="lib/libggobi.so"
+   EMBED_LIB="lib/libggobi.so"
 fi
 
 
@@ -314,6 +315,8 @@ GGOBI_ROOT=`pwd`
 AC_SUBST(GGOBI_ROOT)
 
 AC_SUBST(EMBED)
+AC_SUBST(EMBED_LIB)
+
 AC_SUBST(MV)
 
 AC_SUBST(TOP)
@@ -364,8 +367,13 @@ if test -n "${enable_debug}" && test "${enable_debug}" != "no" ;  then
 fi
 AC_SUBST(SRC_DEBUG)
 
+
 SRC_CFLAGS="-I${TOP}/include"
-SRC_LIBS="-L${TOP}/lib -lggobi"
+
+if test -n "${EMBED}" ; then
+   SRC_LIBS="-L${TOP}/lib -lggobi"
+fi
+
 AC_SUBST(SRC_CFLAGS)
 AC_SUBST(SRC_LIBS)
 
@@ -380,7 +388,7 @@ AC_SUBST(GGOBI_RELEASE_DATE)
 
 
 if test -n "${PLUGIN_DIRS}" ; then
- PLUGIN_DIRS="${PLUGIN_DIRS} TestPlugin"
+ PLUGIN_DIRS="${PLUGIN_DIRS} TestPlugin TestInput"
 fi
 AC_SUBST(PLUGIN_DIRS)
 
@@ -393,9 +401,38 @@ AC_DEFINE_UNQUOTED(PATCH_LEVEL, $PATCH_LEVEL)
 
 AC_CONFIG_HEADER(src/config.h)
 
+if test -n "$MYSQL_PLUGIN" ; then 
+ mysql_xml=plugins/MySQL/plugin.xml
+fi
+
+if test -n "$POSTGRES_PLUGIN" ; then 
+ postgres_xml=plugins/Postgres/plugin.xml
+fi
+
+if test -n "$DATAVIEWER_PLUGIN" ; then 
+ dataviewer_xml=plugins/DataViewer/plugin.xml
+fi
+
+if test -n "$FILESELECTOR_PLUGIN" ; then 
+ fileselect_xml=plugins/FileSelect/plugin.xml
+fi
+
+if test -n "${PLUGIN_DIRS}" ; then
+ testInput_xml=plugins/TestInput/plugin.xml
+ testPlugin_xml=plugins/TestPlugin/plugin.xml
+fi
+
+AC_SUBST_FILE(mysql_xml)
+AC_SUBST_FILE(postgres_xml)
+AC_SUBST_FILE(dataviewer_xml)
+AC_SUBST_FILE(fileselect_xml)
+AC_SUBST_FILE(testInput_xml)
+AC_SUBST_FILE(testPlugin_xml)
+
+
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate)
+AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate share/ggobirc)
 
 dnl Ensure the resulting ggobi scripts executable.
 chmod +x bin/ggobi
@@ -415,5 +452,3 @@ if test -n "${PLUGIN_DIRS}" ; then
    echo
  done 
 fi
-
-

@@ -30,7 +30,8 @@ DEFAULT_LIB_DIRS="/usr/lib /usr/local/lib /opt/lib"
 DEFAULT_INC_DIRS="/usr/include /usr/local/include /usr/local/src/include"
 
 AC_ARG_WITH(xml,Enable reading and writing of XML datasets., USE_XML=1)
-AC_ARG_WITH(mysql,Enable reading data from MySQL databases., USE_MYSQL=1)
+dnl Not used anymore.
+dnl    AC_ARG_WITH(mysql,Enable reading data from MySQL databases., USE_MYSQL=1)
 
 
 
@@ -73,70 +74,10 @@ dnl      AC_CHECK_HEADER(parserInternals.h, XML_INC_DIRS=$f$ext)
 fi
 
 
-
-if test -n "${USE_MYSQL}" ; then
-
- echo "with_mysql: ${with_mysql}"
-
- MYSQL_SRC=read_mysql.c
-
- if test -d ${with_mysql} ; then
-  MYSQL_INC_DIRS=$with_mysql
-  MYSQL_LIB_DIRS=$with_mysql
- fi
-
-   dnl Now find libmysqlclient
-  
- if test -z "${MYSQL_INC_DIRS}" ; then
-
-   ORIG_CPPFLAGS=$CPPFLAGS
-   for f in ${DEFAULT_INC_DIRS} ; do 
-     for ext in "/" "/mysql" ; do
-
-      CPPFLAGS="${ORIG_CPPFLAGS} -I$f$ext"
-echo "Checking $f$ext"
-       if test -f $f$ext/mysql.h ; then
-         MYSQL_INC_DIRS=$f$ext 
-       fi
-dnl      AC_CHECK_HEADER(mysql.h, MYSQL_INC_DIRS=$f$ext)
-
-      if test -n "${MYSQL_INC_DIRS}" ; then
-        echo "Found MYSQL include file(s): $MYSQL_INC_DIRS"
-        break
-      fi
-
-     done
-   done
-
- fi
-
-
-
- if test -z "${MYSQL_LIB_DIRS}" ; then
-
-   ORIG_LIBS=$LIBS
-   LIBS="$LIBS -L/usr/lib"
-   AC_CHECK_LIB(xml,xmlCreateFileParserCtxt)
-   if test -z "${HAVE_LIBxml}" ; then
-    echo "Cannot find libxml"
-    exit 1;
-   else
-     echo "Using libxml from ${LIBS}"
-   fi
-
-  fi
-
-fi
-
-
 AC_SUBST(XML_SRC)
-AC_SUBST(MYSQL_SRC)
 
 AC_SUBST(XML_INC_DIRS)
 AC_SUBST(XML_LIB_DIRS)
-
-AC_SUBST(MYSQL_INC_DIRS)
-AC_SUBST(MYSQL_LIB_DIRS)
 
 AC_CONFIG_HEADER(config.h)
 
