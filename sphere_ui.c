@@ -74,8 +74,8 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
  * executed when the apply button is pressed
 */
   datad *d = gg->current_display->d;
-  gfloat firstpc = d->sphere.eigenval[0];
-  gfloat lastpc = d->sphere.eigenval[d->sphere.npcs-1];
+  gfloat firstpc = d->sphere.eigenval.vals[0];
+  gfloat lastpc = d->sphere.eigenval.vals[d->sphere.npcs-1];
 
   /* 
    * if datad has changed, refuse to do anything until the
@@ -86,20 +86,26 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
     return;
   }
 
-  if (d->sphere.npcs > 0 && d->sphere.npcs <= d->sphere.nvars)
+  if (d->sphere.npcs > 0 && d->sphere.npcs <= d->sphere.vars.nels)
   {
     if (lastpc == 0.0 || firstpc/lastpc > 10000.0) {
       quick_message ("Need to choose fewer PCs. Var-cov close to singular.",
         false);
     }
     else {
-      spherize_data (d->sphere.npcs, d->sphere.nvars, d->sphere.vars, d, gg);
+      /*-- set up the variables into which sphered data will be written --*/
+      extern void spherize_set_pcvars (datad *, ggobid *);
+      spherize_set_pcvars (d, gg);
+
+      /*
+       * sphere the variables in d->sphere.vars
+       * into the variables in d->sphere.pcvars
+      */
+      spherize_data (&d->sphere.vars, &d->sphere.pcvars, d, gg);
       sphere_varcovar_set (d, gg);
 /*    pc_axes_sensitive_set (true);*/
 
-
       /*-- these three lines replicated from transform.c --*/
-      /*vartable_lim_update (d, gg);*/
       limits_set (false, true, d);
       vartable_limits_set (d);
       vartable_stats_set (d);
@@ -159,13 +165,11 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 
   gint *sphvars = (gint *) g_malloc (d->ncols * sizeof (gint));
   gfloat *evals = (gfloat *) g_malloc (d->ncols * sizeof (gfloat));
+  gint nels;
 
   CHECK_GG (gg);
 
   eigenvals_get (evals, d, gg);
-
-for (j=0; j<d->sphere.nvars; j++)
-g_printerr ("(expose) sphvar %d eval %f\n", d->sphere.vars[j], evals[j]);
 
   /* clear the pixmap */
   gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
@@ -178,8 +182,9 @@ g_printerr ("(expose) sphvar %d eval %f\n", d->sphere.vars[j], evals[j]);
   gdk_draw_line (gg->sphere_ui.scree_pixmap, gg->plot_GC, 10, 90, 190, 90);
   gdk_draw_line (gg->sphere_ui.scree_pixmap, gg->plot_GC, 10, 90, 10, 10);
 
-  for (j=0; j<d->sphere.nvars; j++) {
-    xpos = (gint) (180./(gfloat)(d->sphere.nvars-1)*j+10);
+  nels = d->sphere.vars.nels;
+  for (j=0; j<nels; j++) {
+    xpos = (gint) (180./(gfloat)(nels-1)*j+10);
     ypos = (gint) (90. - evals[j]/evals[0]*80.);
 
     tickmk = g_strdup_printf ("%d", j+1);
@@ -304,7 +309,7 @@ sphere_panel_open (ggobid *gg)
 
     /* Spinner: number of principal components */
     /*-- the parameters of the adjustment should be reset each time --*/
-    gg->sphere_ui.npcs_adj = gtk_adjustment_new ((gfloat) d->sphere.nvars,
+    gg->sphere_ui.npcs_adj = gtk_adjustment_new ((gfloat) d->sphere.vars.nels,
        1.0, (gfloat) d->ncols, 1.0, 5.0, 0.0);
 
     gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.npcs_adj),
