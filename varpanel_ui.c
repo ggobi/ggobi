@@ -43,6 +43,9 @@ varpanel_widget_get_nth (gint jbutton, gint jvar, datad *d)
 {
   GtkWidget *box, *child;
   box = (GtkWidget *) varpanel_container_get_nth (jvar, d);
+  if(!box)
+    return(NULL);
+
   child = (GtkWidget *) gtk_object_get_data (GTK_OBJECT (box),
     varpanel_names[jbutton]);
   return child;
@@ -53,8 +56,15 @@ varpanel_label_set (gint j, datad *d)
   GtkWidget *label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
   vartabled *vt = vartable_element_get (j, d);
   /*-- the label is actually a button; this is the label --*/
-  GtkWidget *labelw = GTK_BIN(label)->child;
+  GtkWidget *labelw;
 
+  if(!label || !GTK_IS_BIN(label))
+    return;
+
+  labelw = GTK_BIN(label)->child;
+
+  if(!labelw)
+    return;
   /*-- make sure it stays left-aligned --*/
   gtk_misc_set_alignment (GTK_MISC(labelw), 0, .5);
   gtk_label_set_text (GTK_LABEL(labelw), vt->collab_tform);

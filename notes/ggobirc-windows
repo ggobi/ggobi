@@ -21,7 +21,7 @@
    <description>input plugin for reading data from Excel using COM</description>
    <author>Duncan Temple Lang</author>
    <modeName>excel</modeName>
-   <dll name="plugins/ExcelReader/ExcelReader">
+   <dll name="plugins/ExcelReader">
     <init description="ExcelDataDescription" onLoad="onLoad"/>
    </dll>
    <usage>
