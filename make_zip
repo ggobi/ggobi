@@ -1,0 +1,10 @@
+#!/bin/sh
+
+rm -f /usr/dfs/tmp/ggobi/*
+cp *.c *.h Makefile /usr/dfs/tmp/ggobi
+cd /usr/dfs/tmp
+
+zip ggobi.zip ggobi ggobi/*
+
+mv ggobi.zip /usr/dfs/xgobi/gtk
+cd -

@@ -1,0 +1,17 @@
+
+# case 2:  the splot is reset because the current splot is deleted
+
+{
+  before deleting the splot, remove its event handlers
+
+  current_splot = new splot
+  turn on the appropriate event handlers for current_splot
+  add the border to the current_splot
+}
+
+mode doesn't change, display doesn't change
+
+   sp_event_handlers_toggle (sp, off);
+   splot_free (jvar_sp, current_display);
+   sp_event_handlers_toggle (sp, on);
+

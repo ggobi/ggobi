@@ -1,0 +1,15 @@
+reset the current display because a new display is launched
+{
+  reset the window title for the previous display
+  if (the new displaytype != the previous displaytype)
+    destroy the mode submenu that corresponded to the previous display
+
+  reset the window title for the current display
+  if (the new displaytype != the previous displaytype)
+    create and insert the new mode menu
+
+  update the control panel and the main menubar
+
+  splot_reset, case 3
+}
+

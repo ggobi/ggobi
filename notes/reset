@@ -1,0 +1,97 @@
+Resetting the splot:
+
+# case 1:  the splot is reset with a button click
+
+splot_set_current_cb
+{
+  turn off the event handlers for the current_splot
+  redraw the current splot without a border
+
+  if (current_display != display)
+    reset the current display, case 1
+
+  current_splot = new splot
+  turn on the event handlers for current_splot
+  add the border to the current_splot
+}
+
+
+# case 2:  the splot is reset because the current splot is deleted
+
+{
+  before deleting the splot, remove its event handlers
+
+  current_splot = new splot
+  turn on the appropriate event handlers for current_splot
+  add the border to the current_splot
+}
+
+# case 3:  the splot is reset because a new display is launched
+
+  turn off the event handlers for the current_splot
+  redraw the current splot without a border
+
+  current_splot = new splot
+  [turn on the event handlers for current_splot; none in launch state]
+  add the border to the current_splot
+
+# case 4:  the splot is reset because a display is closed,
+           causing a new display to become current
+
+  current_splot = new splot
+  turn on the event handlers for current_splot
+  add the border to the current_splot
+
+_____
+_____
+
+Resetting the display:
+
+reset the current display because a new splot was selected
+{
+  reset the window title for the previous display
+  if (the new displaytype != the previous displaytype)
+    destroy the mode submenu that corresponded to the previous display
+
+  reset the window title for the currentew display
+  if (the new displaytype != the previous displaytype)
+    create and insert the new mode menu
+
+  update the control panel and the main menubar
+}
+
+reset the current display because a new display is launched
+{
+  reset the window title for the previous display
+  if (the new displaytype != the previous displaytype)
+    destroy the mode submenu that corresponded to the previous display
+
+  reset the window title for the current display
+  if (the new displaytype != the previous displaytype)
+    create and insert the new mode menu
+
+  update the control panel and the main menubar
+
+  splot_reset, case 3
+}
+
+reset the current display because the current display is closed
+{
+  reset the window title for the current display
+  if (the new displaytype != the previous displaytype)
+    create and insert the new mode menu
+
+  update the control panel and the main menubar
+
+  splot_reset, case 4
+}
+
+____
+____
+
+Resetting the mode:
+
+reset the mode because a new mode was selected from the menu
+reset the mode because the display changed
+  display_new
+  display_set_current

@@ -1,0 +1,95 @@
+... misc stuff from the GTK faq
+5.16 How do I set the size of a widget/window? How do I prevent
+the user resizing my window?
+
+   The gtk_widget_set_uposition() function is used to set the
+   position of any widget.
+
+   The gtk_widget_set_usize() function is used to set the size of
+   a widget. In order to use all the features that are provided
+   by this function when it acts on a window, you may want to use
+   the gtk_window_set_policy function. The definition of these
+   functions is:
+
+     void        gtk_widget_set_usize (GtkWidget *widget,
+                                       gint width,
+                                       gint height);
+
+     void        gtk_window_set_policy (GtkWindow *window,
+                                        gint allow_shrink,
+                                        gint allow_grow,
+                                        gint auto_shrink);
+
+   Auto_shrink will automatically shrink the window when the
+   requested size of the child widgets goes below the current
+   size of the window. Allow_shrink will give the user the
+   authorisation to make the window smaller that it should
+   normally be. Allow_grow will give the user will have the
+   ability to make the window bigger. The default values for
+   these parameters are:
+
+             allow_shrink = FALSE
+             allow_grow   = TRUE
+             auto_shrink  = FALSE
+
+Label alignment:
+
+What you probably want is to set the alignment of the label, ie
+right align it, center it or left align it. If you want to do
+this, you should use:
+
+     void gtk_misc_set_alignment     (GtkMisc *misc,
+                                     gfloat xalign,
+                                     gfloat yalign);
+
+6.8 How do I set the background color of a GtkLabel widget?
+
+     The Gtklabel widget is one of a few GTK+ widgets that don't
+     create their own window to render themselves into. Instead,
+     they draw themselves directly onto their parents window.
+
+     This means that in order to set the background color for a
+     GtkLabel widget, you need to change the background color of
+     its parent, i.e. the object that you pack it into.
+
+6.9 How do I set the color and font of a GtkLabel using a Resource File? 
+
+The widget name path constructed for a Label consists of the
+widget names of its object hierarchy as well, e.g.
+
+window (name: humphrey)
+  hbox
+    label (name: mylabel)
+
+The widget path your pattern needs to match would be: humphrey.GtkHBox.mylabel 
+
+The resource file may look something like: 
+
+style "title"
+{
+      fg[NORMAL] = {1.0, 0.0, 0.0}
+      font = "-adobe-helvetica-bold-r-normal--*-140-*-*-*-*-*-*"
+}
+widget "*mylabel" style "title"
+
+In your program, you would also need to give a name to the Label
+widget, which can be done using:
+
+  label = gtk_label_new("Some Label Text");
+  gtk_widget_set_name(label, "mylabel");
+  gtk_widget_show(label);
+
+6.10 How do I configure Tooltips in a Resource File? 
+
+The tooltip's window is named "gtk-tooltips", GtkTooltips in
+itself is not a GtkWidget (though a GtkObject) and as such is not
+attempted to match any widget styles.
+
+So, you resource file should look something like: 
+
+ 
+style "postie"
+{
+      bg[NORMAL] = {1.0, 1.0, 0.0}
+}
+widget "gtk-tooltips*" style "postie"

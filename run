@@ -1,0 +1,4 @@
+#!/bin/sh
+PATH=/usr/common/gtk-1.2.6/bin:$PATH \
+LD_LIBRARYN32_PATH=.:/usr/lib32:/usr/common/libn32:/usr/common/gtk-1.2.6/lib \
+/usr/dfs/xgobi/gtk/ggobi

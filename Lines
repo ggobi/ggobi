@@ -1,0 +1,60 @@
+  600   1/13/2000
+ 6000   2/4
+ 8000   2/8
+ 8900   2/11
+10000   2/15
+11948   3/10
+12020   3/12   finalizing the parallel coordinates plot layout & selection
+12240   3/13   scatterplot matrix, first pass
+12604   3/14   scatterplot matrix, nearly finished with selection
+12734   3/15   scatterplot matrix, finishing selection
+13079   3/17   reworked splot_new, display_new; basic id works, no linking
+13218   3/20   linked identification works; drawing uses 2 pixmaps
+14359   3/22   point brushing, no linking, no plot_bins yet
+14525   3/24   linked point brushing and binning
+14870   3/24   beginning of lines code; cleaned up display menus
+15276   3/27   more lines code; about ready to draw in scatterplot/scatmat
+15312   3/27   basic line drawing; initial color isn't right
+15079   3/28   simplification of drawing code!
+15177   3/28   parallel coordinates lines are working -- even linked brushing!
+15295   3/28   variable cloning!
+15323   3/30   variable table, can select rows, sort by a col; cloning ok
+16001   4/3    slowly reconstructing transformation; getting close
+17599   4/4    basic transformation; no labels; mygtkruler files (1480 lines)
+18147   4/5    restored batch drawing code for win32; updated gtkruler files
+18271   4/7    eliminated inv_transform; adding jittering, RANK, NORMSCORE
+18391   4/7    working on the handling of missings; dumping core at present
+18405   4/8    cleaned up win32 drawing; more on missings; float sort in table
+18668   4/9    scaling a la xgobi works; so does click to pan
+18713   4/9    scaling visual aids nearly finished
+18723   4/11   scaling is finished, even the axes
+18852   4/12   using jitter by jitter for 1d missings plots
+19041   4/17   missing/jittering/vartable interactions improving; queue_draw
+19139   4/17   reads .missing; improved layout geometry for varpanel/table
+18742   4/18   some cleanup and debugging
+18669   4/18   can't use queue_draw; too slow
+18750   4/20   some cleanup of groups in transformation; parcoords whiskers
+18602   4/20   created externs.h
+18543   4/20   simplified transformations: always 1 variable at a time
+18610   4/20   handling "show missings" for scatmat/parcoords displays
+18731   4/20   making the variable menus work
+18790   4/21   using queue_draw in configure_cb, forcing it elsewhere
+19089   4/21   the basics of subsetting 
+19255   4/24   the basics of the sphering ui
+
+target:  about 40.8K lines?  That's the number of lines in
+xgobi, subtracting the rpc, xgvis and tour code.
+
+scaling:    900
+rotation:  1700
+lines:     1300
+transform: 1400
+subset:     800
+smoothing: 1600
+jittering:  400
+exclusion:  900
+missing:   1300
+saving:    2300
+moving pts: 400
+
+total:    13,000

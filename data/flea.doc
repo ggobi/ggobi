@@ -1,0 +1,13 @@
+This data is from a paper by A. A. Lubischew, "On the Use of
+Discriminant Functions in Taxonomy", Biometrics, Dec 1962, pp.455-477.
+
+There are three species of flea-beetles: Ch. concinna, Ch. heptapotamica,
+and Ch. heikertingeri, and 6 measurements on each.
+    1 =  width of the first joint of the first tarsus in microns 
+        (the sum of measurements for both tarsi).
+    2 = the same for the second joint.
+    3 = the maximal width of the head between the external edges of the
+        eyes in 0.01 mm.
+    4 = the maximal width of the aedeagus in the fore-part in microns.
+    5 = the front angle of the aedeagus ( 1 unit = 7.5 degrees).
+    6 = the aedeagus width from the side in microns.

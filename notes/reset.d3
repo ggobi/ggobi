@@ -1,0 +1,11 @@
+
+reset the current display because the current display is closed
+{
+  reset the window title for the current display
+  if (the new displaytype != the previous displaytype)
+    create and insert the new mode menu
+
+  update the control panel and the main menubar
+
+  splot_reset, case 4
+}

@@ -1,0 +1,22 @@
+This is going to have to live in scatterplot.c?
+ 
+/*
+ * Since shift_wrld depends on scale (through xg->is) and scale depends
+ * on shift (through xg->cntr), then when scaling is going on, the
+ * value of shift_wrld has to change, so that the values of is and
+ * cntr can remain unchanged.
+*/
+void
+sp_tune_shift(gfloat prev_scale_x, gfloat prev_scale_y)
+{
+  extern scatterplot splot;
+
+  gfloat scale_x, scale_y
+
+  scale_x = (splot.projection == TOUR) ? splot.tour_scale.x : splot.scale.x;
+  scale_y = (splot.projection == TOUR) ? splot.tour_scale.y : splot.scale.y;
+
+  splot.shift_wrld.x = (int) (splot.shift_wrld.x * prev_scale_x / scale_x);
+  splot.shift_wrld.y = (int) (splot.shift_wrld.y * prev_scale_y / scale_y);
+}
+

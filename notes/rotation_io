@@ -1,0 +1,60 @@
+I just picked an example to work through, to remind myself how
+these files work.  I used the flea beetle data (flea.dat) and
+wrote out a coefficients matrix and a rotation matrix for a
+particular view.  Following the instructions in the help windows
+(opened by clicking with the right button on the corresponding
+buttons), I used S to transform the arrays like this:
+
+> coeffs
+          [,1]     [,2]
+[1,]  0.002943 0.006521
+[2,] -0.023378 0.004230
+[3,] -0.013987 0.040024
+[4,]  0.000000 0.000000
+[5,]  0.000000 0.000000
+[6,]  0.000000 0.000000
+
+> romax
+          [,1]     [,2]      [,3]
+[1,]  0.353183 0.782530  0.512746
+[2,] -0.209804 0.600355 -0.771722
+[3,] -0.911725 0.164983  0.376213
+
+Then I read in the flea data to test out my understanding of these
+matrices.
+
+  flea <- matrix(scan("data/flea.dat"), byrow=T, ncol=6)
+
+Now I can plot, inside S,  (flea %*% coeffs), and recover the
+projection on the xgobi screen.
+
+So if coeffs is really a rotation matrix, what's the rotation
+matrix?  As far as I can tell, it's writing out a matrix whose
+sole purpose is to be read back in.  I can't at the moment figure
+out what else you would want to do with it.
+
+This is pretty poorly documented, I must admit.  We'll think
+about how to make the distinction between these clearer.
+
+******************************************************************
+
+Here's what I save for coefficients:
+
+-0.005543 0.006141
+-0.015337 -0.015956
+0.029804 0.017592
+0.000000 0.000000
+0.000000 0.000000
+0.000000 0.000000
+
+Here's what I save in order to restart rotation smoothly; it's
+not the same, and it's a lot more, than I save for coefficients.
+
+-0.665112 0.447064 -0.598131
+0.736979 0.263878 -0.622278
+-0.120364 -0.854694 -0.504986
+-0.665112 0.447064 -0.598131
+0.736979 0.263878 -0.622278
+-0.120364 -0.854694 -0.504986
+0.010000
+-0.707107 0.707107 0.000000

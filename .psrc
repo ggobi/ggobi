@@ -1,0 +1,5 @@
+insure++.compiler gcc
+insure++.runtime.report_file insra
+insra.visual xterm -e vim +%l %f
+insra.follow_messages on
+insra.sourcepath /usr/dfs/xgobi/gtk
