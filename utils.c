@@ -167,7 +167,7 @@ glyphNames (gchar **names) {
     {"plus", "x", "openrectangle",  "filledrectangle", "opencircle",
     "filledcircle", "point"};
   for (i=0; i < sizeof(gnames)/sizeof(gnames[0]); i++) 
-       names[i] = gnames[i];
+    names[i] = gnames[i];
   return (7);
 }
 

@@ -155,9 +155,9 @@ static void closeit (ggobid *gg) {
   for (n=0; n<d->nclusters; n++)
     cluster_free (n, d, gg);
 
-  gtk_widget_destroy (gg->exclusion_window);
+  gtk_widget_destroy (gg->exclusion_ui.window);
 
-  gg->exclusion_window = NULL;
+  gg->exclusion_ui.window = NULL;
 }
 
 void
@@ -196,35 +196,63 @@ static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
 
 void
 exclusion_window_open (ggobid *gg) {
-
+  GtkWidget *scrolled_window;
   GtkWidget *vbox, *ebox, *btn, *hbox;
-  gint k;
+  gint k, n;
   GSList *l;
   datad *d;
+  gchar *label;
+  GtkWidget *labelw;
 
   /*-- if it isn't NULL, then destroy it and start afresh --*/
-  if (gg->exclusion_window != NULL) {
+  if (gg->exclusion_ui.window != NULL) {
     closeit (gg);
   }
 
-  gg->exclusion_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_signal_connect (GTK_OBJECT (gg->exclusion_window), "delete_event",
+  gg->exclusion_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_signal_connect (GTK_OBJECT (gg->exclusion_ui.window), "delete_event",
                       GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
-  gtk_window_set_title (GTK_WINDOW (gg->exclusion_window),
+  gtk_window_set_title (GTK_WINDOW (gg->exclusion_ui.window),
     "ggobi hide/exclude window");
 
-  vbox = gtk_vbox_new (false, 2);
-  gtk_container_add (GTK_CONTAINER (gg->exclusion_window), vbox);
+  vbox = gtk_vbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
+  gtk_container_add (GTK_CONTAINER (gg->exclusion_ui.window), vbox);
 
   ebox = gtk_event_box_new ();
-  gtk_box_pack_start (GTK_BOX (vbox), ebox, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), ebox, true, true, 2);
+
+  /* Create a notebook, set the position of the tabs */
+  gg->exclusion_ui.notebook = gtk_notebook_new ();
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->exclusion_ui.notebook),
+    GTK_POS_TOP);
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->exclusion_ui.notebook),
+    g_slist_length (gg->d) > 1);
+  gtk_container_add (GTK_CONTAINER (ebox), gg->exclusion_ui.notebook);
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     clusters_set (d, gg);
 
+    /* Create a scrolled window to hold the table */
+    scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+    /*-- use datad->name once it's been defined --*/
+    labelw = NULL;
+    if (g_slist_length (gg->d) > 1) {
+      label = g_strdup_printf ("data %d\n", n++);
+      labelw = gtk_label_new (label);
+      g_free (label);
+    }
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->exclusion_ui.notebook),
+                              scrolled_window, labelw);
+    gtk_widget_show (scrolled_window);
+
     d->exclusion_table = gtk_table_new (d->nclusters+1, 4, false);
-    gtk_container_add (GTK_CONTAINER (ebox), d->exclusion_table);
+    gtk_scrolled_window_add_with_viewport (
+      GTK_SCROLLED_WINDOW (scrolled_window), d->exclusion_table);
 
     /*-- add the row of titles --*/
 
@@ -245,12 +273,16 @@ exclusion_window_open (ggobid *gg) {
     /*-- add the cluster rows, one by one --*/
     for (k=0; k<d->nclusters; k++)
       exclusion_cluster_add (k, d, gg);
-
-    hbox = gtk_hbox_new (false, 2);
-    gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
   }
 
-  /*-- Close button --*/
+  /*-- give the window an initial height --*/
+  gtk_widget_set_usize (GTK_WIDGET (scrolled_window), -1, 150);
+
+  /*-- horizontal box to hold a few buttons --*/
+  hbox = gtk_hbox_new (false, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
+
+  /*-- Reset button --*/
   btn = gtk_button_new_with_label ("Reset");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (reset_cb), (gpointer) gg);
@@ -262,6 +294,6 @@ exclusion_window_open (ggobid *gg) {
                  GTK_SIGNAL_FUNC (close_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);
 
-  gtk_widget_show_all (gg->exclusion_window);
-  gdk_window_raise (gg->exclusion_window->window);
+  gtk_widget_show_all (gg->exclusion_ui.window);
+  gdk_window_raise (gg->exclusion_ui.window->window);
 }

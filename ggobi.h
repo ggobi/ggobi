@@ -84,7 +84,10 @@ struct _ggobid {
 
 /*--------------- clusters: hiding, excluding ----------------------*/
 
- GtkWidget *exclusion_window;
+ struct _ExclusionUI {
+   GtkWidget *window;
+   GtkWidget *notebook;
+ } exclusion_ui;
  
 /*----------------------- row grouping -----------------------------*/
 

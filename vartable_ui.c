@@ -210,7 +210,7 @@ vartable_open (ggobid *gg)
       /* Create a scrolled window to pack the CList widget into */
       scrolled_window = gtk_scrolled_window_new (NULL, NULL);
       gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-        GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+        GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
       /*-- use datad->name once it's been defined --*/
       labelw = NULL;

@@ -80,6 +80,8 @@
 30694   7/25  did some more polishing of sphering; fixed Windows menu bug
 30716   7/28  embedded vartables inside a notebook widget
 30740   7/28  added write_svg.c
+30750   7/31  removed static variables from transform.c; added utility
+30784   7/31  embedded exclusion window inside a notebook widget
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

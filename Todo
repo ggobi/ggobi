@@ -11,14 +11,15 @@ API code needed:
   sticky labels
   imputation of missing values
 
-various stuff not yet implemented: 
-  1d, xy cycling  .... or leave it as a demo in R for now?
+various stuff not yet implemented:
+  1d, xy cycling  .... or run as a demo in R for now?
   some window closings  (display tree, ...)
   row groups are only partially implemented; line groups
     will wait until we know what we want to do about lines.
 
+display_tree doesn't update itself when splots change
+
 datad
-  check for note in transform.c
   add notebook controls to the exclusion window
 
 when brushing or identifying in parcoords, use leave/enter events to
@@ -43,6 +44,8 @@ old-style I/O -- the biggest part is now in place.  extend
   current file set by one or more files.  (wait until the
   dtd has been redesigned to handle multiple datad objects)
 
+In progress:  writing out plots as .svg files
+
 Graphs
   Edges with data: a separate region of the variable selection panel
   Let other line functionality wait until graphs are designed:
@@ -51,12 +54,6 @@ Graphs
     line editing
 
 Food for thought:
-  * Now using the variable statistics panel for variable selection for
-     initiating parcoords and scatmat plots
-     transformation, imputation, jittering, saving
-    We surely need a more obvious variable selection dialog -- see
-    vardialog_ui.c
-
   * Categorical data?  Better labelling, at least?
 
   * maps; data as polygons -- for summer 2001?
@@ -146,3 +143,4 @@ Food for thought:
 !    changed; done
 ! sphering: redesigned the tool window
 
+! check for note in transform.c : static variables eliminated

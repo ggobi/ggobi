@@ -683,7 +683,6 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gtk_scrolled_window_add_with_viewport (
     GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
     gg->varpanel_ui.varpanel);
-/*  gtk_widget_show (gg->varpanel_ui.varpanel);*/
 
   gtk_widget_show_all (gg->varpanel_ui.scrolled_window);
 }
