@@ -28,10 +28,11 @@ CFLAGS+= -g -Wall -I$(R_HOME)/include $(GGOBI_INCLUDE_DIR)  $(shell $(GTK_CONFIG
 Rplugin.so: $(OBJS)
 	$(CC) -shared -o $@ $^ $(R_LIBS) $(GGOBI_LIB)  $(shell $(GTK_CONFIG) --libs) 
 
+ifndef ADMIN
 local.config: local.config.in configure
 	./configure
 
 
 configure: configure.in
 	autoconf
-
+endif

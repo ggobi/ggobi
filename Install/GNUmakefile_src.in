@@ -25,7 +25,7 @@ SRC=\
     display_ui.c \
     exclusion.c \
     exclusion_ui.c \
-	extendedDisplay.c \
+    extendedDisplay.c \
     fileio.c \
     ggobi-API.c \
     ggobi.c \
@@ -115,7 +115,9 @@ SRC=\
     print.c \
     dbms.c dbms_ui.c \
     @XML_SRC@ \
-    help.c
+    help.c \
+    parcoordsClass.c scatmatClass.c scatterplotClass.c \
+    tour2d3.c tour2d3_ui.c
 
 #    mt19937-1.c \
 #    cokus.c \

@@ -414,7 +414,7 @@ fi
 AC_SUBST(SRC_DEBUG)
 
 
-SRC_CFLAGS="-I${TOP}/include"
+SRC_CFLAGS="-I${TOP}/include -I${TOP}/gtkext/include"
 
 if test -n "${EMBED}" ; then
    SRC_LIBS="-L${TOP}/lib -lggobi"
