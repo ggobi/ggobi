@@ -107,11 +107,12 @@ typedef struct {
   gint num_active_dist;
   gint prev_nonmetric_active_dist;
 
-/* callbacks written */
   MDSMetricInd metric_nonmetric;
   MDSKSInd KruskalShepard_classic;
   MDSTask mds_task;  /* DissimAnalysis or GraphLayout */
   MDSDtargetSource Dtarget_source;
+  gint weight_var;  /* index of the variable which is the source of
+		       the distance matrix or vector of weights */
   GtkCList *clist_dist;
   gboolean complete_Dtarget;
 
