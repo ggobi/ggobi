@@ -22,18 +22,21 @@
 <!ELEMENT ggobidata (description, (colormap)?, variables, records, (segments)*)
 
 <!ELEMENT color ( #PCDATA) >
+<!-- id is a number or either of "fg" and "bg" -->
 <!ATTLIST color  
-       id CDATA #IMPLIED
-       r  CDATA #IMPLIED
-       g  CDATA #IMPLIED
-       b  CDATA #IMPLIED
+       id CDATA     #IMPLIED
+       r  CDATA     #IMPLIED
+       g  CDATA     #IMPLIED
+       b  CDATA     #IMPLIED
+       range CDATA  #IMPLIED
 >
       
 <!ELEMENT colormap (color)+ >
 <!ATTLIST colormap
+      size  CDATA  #REQUIRED
       range CDATA  #IMPLIED
-      file CDATA   #IMPLIED
-      type CDATA   (xml | table)
+      file  CDATA   #IMPLIED
+      type  CDATA   (xml | table)
 >
          
 

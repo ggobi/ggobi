@@ -109,6 +109,23 @@ attribute in the \texttt{ggobidata} tag.  This greatly simplifies
 experimenting with different parameter values.
 
 
+In contrast with the multiple input files for each dataset used by
+xgobi, the XML approach reduces the number of files to $1$. This means
+that it is easier to distribute inputs to others. There is no need to
+send multiple files individually, or to combine them into an archive,
+etc.
+
+An advantage of XML over a simpler but omre specialized format is that
+people are somewhat familiar with the basic rules of HTML, and hence
+XML. Additionally, it is easy to define new DTDs to represent
+different inputs such as property or resource files, descriptions of
+plots (see \dir{SVG/}), layout specifications for multiple plots,
+graph descriptions, etc.  This can leverage much of the same parsing
+setup and importantly provides a uniform and increasingly familiar
+interface for the user for specifying files.
+
+
+
 
 \section{The File Format}
 The format of the file is described by the 
@@ -143,11 +160,96 @@ The remainder of the dataset is specified as sub-elements or sub-tags
 within this \texttt{ggobidata} element.  Thus, there must be a
 termination of this \texttt{ggobidata} at the end of the file.
 
-The first of the sub-elements is a description of the datasets.  This
+
+
+\subsection{Colormap}
+The user can specify rows of a color table in RGB format.  (Perhaps
+different formats such HSV, etc. can be supported directly by GTK
+also.)  The idea is that colors for records, etc.  are specified as
+row identifiers for this table.  The colormap section allows the user
+to specify the values for these rows.  In this way, the data and color
+references can remain fixed and one need only change the contents of
+the colormap to which the correspond.
+
+It is often convenient to use the same colormap for several
+datasets. Rather than encoding the data in each input file, the XML
+input file can be told to read color data from an external file.  This
+is specified via the \XMLAttribute{file} and \XMLAttribute{type} The
+value of the \XMLAttribute{file} attribute identifies a URL or
+file. If not an absolute file name or URI, then this is located
+relative to the location of the document being currently read.
+That is, suppose we are running in the top-level distribution
+directory of ggobi and run with the input file \file{data/flea.xml}.
+Then, a reference to 
+\begin{verbatim}
+ <colormap file="stdColorMap.xml">
+\end{verbatim}
+is found as \file{data/stdColorMap.xml}.
+Similalry, if a colormap file named \file{map.xml} is located
+in the directory \dir{color} parallel to \dir{data},
+then
+\begin{verbatim}
+ <colormap file="../color/map.xml">
+\end{verbatim}
+would find it for the same input file \file{data/flea.xml}.
+
+When an external colormap file is used in conjunction with local
+values, there are two size specifications.  One is in the colormap of
+the external file and the other is local. Both refer to the number of
+local entries, i.e. entries under their control.  By default, these
+are accumulated so that the size of the table is the sum of the two
+sizes.  This can lead to oversized tables.
+
+
+
+
+
+
+External color map files can be formatted using XML (see
+\file{data/stdColorMap.xml}) or as a simple rectangular array.  In the
+latter case, each row should contain 3 values separated by white
+space.
+
+
+To differentiate between the two formats, the \XMLAttribute{type} is
+used when specifying an external color map file to read.  This can be
+either \texttt{xml} or \texttt{ascii}.  (See \file{ggobi.dtd})
+
+
+Each entry can have an identifier attribute.  This is usually an
+integer identifying the index by which one can reference this color in
+records and other files.  The alternative values for the identifier
+attribute are ``fg'' or ``bg''.
+
+The identifier is really only used to override other values read from
+a file.  This is due to the fact that subsequent entries without
+identifiers occupy the next entry  in the color table.
+In other words, the input
+\begin{verbatim}
+<color id="4" r=".5" g=".5" b="0" />
+<color>0 0 1</color>
+\end{verbatim}
+sets the $5$ entry (in position $4$) to blue ($0 0 1$) since the
+previous set entry was indexed explicitly as $4$.
+
+
+The attribute \XMLRange{range} value can be specified for the entire
+colormap or on a per-entry basis.  If this is present, it is
+interpreted as a numeric value and each value in the entry (or all
+entries if specified for the entire colormap) is divided by that
+amount.  This allows one to easily use different scales such as 0 to 1
+or 0 to 100, etc. This is designed to assist when the software
+creating the file does not facilitate such rescaling.
+
+
+\section{Description}
+
+The second of the sub-elements is a description of the datasets.  This
 includes the source, any references, etc.  This is currently
 free-format.  A convenient attribute is \texttt{source} which
 indicates where it can be found.
 
+\subsection{Variables}
 The next element of the file 
 lists the variables.
 \begin{verbatim}
@@ -164,7 +266,8 @@ The name of the transformed variable can be specified via the
 attribute \texttt{transformedName}.
 
 The group attribute allows variables to be joined for the same purpose
-as ifentified by the .vgroups file in the old format.
+as ifentified by the .vgroups file in the old format.  Variables
+within the same group are scaled ``jointly''.
 
 Additionally, instructions as to how to create the variable can be
 specified as a programming command via the Programming Instruction
@@ -175,17 +278,64 @@ specified as a programming command via the Programming Instruction
 </variable>
 \end{verbatim}
 
+\subsection{Records}
 The next section of the file is the data itself.  The individual
 \texttt{record} tags are contained within the \texttt{records}
 element.  The body or content of each \texttt{record} is a simply
-ASCII listing of the values. Each value is separated
-by white space (space character, tabs or new lines).
+ASCII listing of the values. Each value is separated by white space
+(space character, tabs or new lines).
+
+
+A record can be considered ``hidden''.  This is set via a logical
+value for the attribute \texttt{hidden}.
+
+
+Each record can be given an \XMLAttribute{id} attribute value.  This
+is different from a label in that it is not used by the ggobid
+instance when displaying plots.  Instead, it is used only when reading
+the line segment information that connects different points.  (See
+below). The \XMLAttribute{id} is a symbolic name or tag used to
+uniquely identify a record.  These are mainted by the parser and can
+be used as alternatives to row numbers when specifying the source and
+destination records in a line segment.
+
+
+\subsection{Segments}
+Connections between points can be specified via the \XMLTag{segments}
+tag.  Like records, the individual \XMLTag{segment} entries are
+contained within a \XMLTag{segments} entry.  Also, the latter must
+specify the \XMLAttribute{size} attribute to identify how many entries
+to expect.
+
+Each line segment can have characteristics such as line color, width,
+whether it is hidden or not, etc.  Default values for these
+characteristics can be set via the attributes of the \XMLTag{segments}
+tag.
+
+Each individual segment must have a \XMLAttribute{source} and
+\XMLAttribute{destination} attribute.  The value for each of these is
+a record identifier.  This can be simply the row number (starting at
+1).  Alternatively, as explained above, this can be the value of an
+\XMLAttribute{id} assigned to a \XMLAttribute{record} tag earlier in
+the input.
+
+The different appearance characteristics of the line
+are specified via
+the attributes
+\XMLAttribute{width}, 
+\XMLAttribute{color},
+\XMLAttribute{type}
+and
+\XMLAttribute{hidden}
+
+
+
+
 
 
 \section{Using XML Files}
-To use data that is contained in an XML file, 
-invoke ggobi with the command line flag
-\texttt{-x}.
+To use data that is contained in an XML file, invoke ggobi with the
+command line flag \texttt{-x}.
 
 In the future, ggobi could be smart enough to include the detection of
 the XML format.

@@ -78,6 +78,8 @@ const gchar * const xmlDataTagNames[] = {
                                           "data",
                                           "segments",
                                           "segment",
+                                          "colormap",
+                                          "color",
                                           ""
                                          };
 
@@ -102,14 +104,14 @@ data_xml_read(const gchar *filename, ggobid *gg)
  xmlParserCtxtPtr ctx = (xmlParserCtxtPtr) g_malloc(sizeof(xmlParserCtxtPtr));
  XMLParserData data;
  gboolean ok = false;  
- gchar *name = find_xml_file(filename, gg);
+ gchar *name = find_xml_file(filename, NULL, gg);
  
   if(name == NULL)
     return(false);
 
   gg->filename = name;
 
-  initParserData(&data, gg);
+
 
   xmlParserHandler = (xmlSAXHandlerPtr) g_malloc(sizeof(xmlSAXHandler));
   /* Make certain this is initialized so that we don't have any references
@@ -120,6 +122,10 @@ data_xml_read(const gchar *filename, ggobid *gg)
   xmlParserHandler->startElement = startXMLElement;
   xmlParserHandler->endElement = endXMLElement;
   xmlParserHandler->characters = characters;
+
+
+  initParserData(&data, xmlParserHandler, gg);
+
 
   ctx = xmlCreateFileParserCtxt(name);
   if(ctx == NULL) {
@@ -158,23 +164,27 @@ data_xml_read(const gchar *filename, ggobid *gg)
 }
 
 void
-initParserData(XMLParserData *data, ggobid *gg)
+initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
 {
   data->gg=gg;
   data->current_record = 0;
   data->current_variable = 0;
   data->current_element = 0;
   data->current_segment = 0;
+  data->current_color = 0;
+  data->reading_colormap_file_p = false;
   data->state = UNKNOWN;
-  data->terminateStrings = true;
+  data->terminateStrings_p = true;
   data->NA_identifier = NULL;
   data->rowIds = NULL;
-
+  data->handlers = handler;
   data->defaults.color = -1;
   data->defaults.glyphType = -1;
   data->defaults.glyphSize = -1;
   data->defaults.lineWidth = -1;
   data->defaults.lineColor = -1;
+  data->defaults.lineHidden = false;
+  data->defaults.hidden = false;
 }
 
 void 
@@ -204,6 +214,12 @@ startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
    case CONNECTION:
      addConnection(attrs, data);
     break;
+   case COLORMAP:
+     setColorMap(attrs, data);
+    break;
+   case COLOR:
+     setColormapEntry(attrs, data);
+    break;
    default:
      break;
  }
@@ -226,6 +242,15 @@ endXMLElement(void *user_data, const CHAR *name)
    case CONNECTION:
      data->current_segment++;
      break;
+   case COLOR:
+     data->current_color++;
+     break;
+   case COLORMAP:
+       /* Only set this if we are reading from the main file 
+          and not a secondary colormap file.
+        */
+     if(data->reading_colormap_file_p == false)
+       registerColorMap(data->gg);
    default:
      break;
  }
@@ -300,7 +325,7 @@ characters(void *user_data, const CHAR *ch, int len)
  if(dlen < 1 || c[0] == '\n')
   return;
 
- if(data->terminateStrings) {
+ if(data->terminateStrings_p) {
   tmp = g_malloc(sizeof(char)*(dlen+1));
 
   memcpy(tmp, c, dlen);
@@ -317,12 +342,14 @@ characters(void *user_data, const CHAR *ch, int len)
    case VARIABLE:
      setVariableName(data, c, dlen);
    break;
+   case COLOR:
+     setColorValue(data, c, dlen);
    default:
      break;
 
  }
 
- if(data->terminateStrings) {
+ if(data->terminateStrings_p) {
   g_free(tmp);
  }
 }
@@ -371,6 +398,7 @@ setDatasetInfo(const CHAR **attrs, XMLParserData *data)
 
  setGlyph(attrs, data, -1);  
  setColor(attrs, data, -1);
+ setHidden(attrs, data, -1, ROW);
  /*
  setLineColor(attrs, data, -1);
  setLineWidth(attrs, data, -1);  
@@ -417,6 +445,7 @@ newRecord(const CHAR **attrs, XMLParserData *data)
 
   setColor(attrs, data, i);
   setGlyph(attrs, data, i);
+  setHidden(attrs, data, i, LINE);
  
   tmp = getAttribute(attrs, "id");
   if(tmp) {
@@ -428,7 +457,48 @@ newRecord(const CHAR **attrs, XMLParserData *data)
     data->rowIds[i] = g_strdup(tmp);
   }
 
+
  return(true);
+}
+
+gboolean
+setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
+{
+ const char *tmp;
+  tmp = getAttribute(attrs, "hidden");
+  if(tmp) {
+    gboolean hidden = asLogical(tmp);
+
+
+    if(i < 0) {
+     if(type == RECORD)
+       data->defaults.hidden = hidden;
+     else {
+       data->defaults.lineHidden = hidden;
+     }     
+    } else
+     if(type == RECORD)
+       data->gg->hidden[i] = data->gg->hidden_now[i] = data->gg->hidden_now[i] = hidden;
+     else {
+       data->gg->line_hidden[i] = data->gg->line_hidden_now[i] = data->gg->line_hidden_now[i] = hidden;
+     }
+  }
+
+ return(tmp != NULL);
+}
+
+gboolean
+asLogical(const gchar *sval)
+{
+ int i;
+ gboolean val = false;
+ const gchar *const trues[] = {"T","true", "True","1"};
+  for(i = 0; i < sizeof(trues)/sizeof(trues[0]); i++) {
+    if(strcmp(sval, trues[i]) == 0)
+      return(true);
+  }
+
+ return(val);
 }
 
 gboolean
@@ -535,12 +605,18 @@ xml_warning(const char *attribute, const char *value, const char *msg, XMLParser
 }
 
 
+/*
+  Read the values for this record from
+  free-formatted text. The entries are white-space
+  delimited. They should not have quotes or anything
+  that needs to be escape.
+ */
+
 gboolean
 setRecordValues(XMLParserData *data, const CHAR *line, int len)
 {
-
- const char *tmp = strtok((char*) line, " \t\n");
  double value;
+ const char *tmp = strtok((char*) line, " \t\n");
 
  while(tmp) {
   value = asNumber(tmp);
@@ -552,11 +628,23 @@ setRecordValues(XMLParserData *data, const CHAR *line, int len)
  return(true);
 }
 
+/*
+  Convert the specified string to a numeric value.
+ */
 double
 asNumber(const char *sval)
 {
   return(atof(sval));
 }
+
+
+/*
+   Read the declaration of a variable, gathering its information
+   from the specified attributes.
+   This includes its name, transformation name, etc.
+
+    Called in response to a <variable> tag.
+ */
 
 gboolean
 newVariable(const CHAR **attrs, XMLParserData *data)
@@ -590,6 +678,14 @@ newVariable(const CHAR **attrs, XMLParserData *data)
 }
 
 
+/*
+   Reads the number of variables in the dataset from the attributes
+   and allocates space for them in the ggobid structure.
+   At this point, we have the number of records and variables
+   and can initialize the data areas of the ggobid structure.
+
+    Called in response to a <variables> tag. (Note the plural.)
+ */
 gboolean 
 allocVariables(const CHAR **attrs, XMLParserData *data)
 {
@@ -613,6 +709,14 @@ allocVariables(const CHAR **attrs, XMLParserData *data)
 }
 
 
+/*
+  Reads the text in name and assigns it as the name of the
+  variable currently being read within the 
+  <variable> tag. The index for the variable is stored in 
+  data->current_variable.
+
+   Called when parsing free-formatted text within a <variable> tag.
+ */
 gboolean
 setVariableName(XMLParserData *data, const CHAR *name, int len)
 {
@@ -646,6 +750,13 @@ setVariableName(XMLParserData *data, const CHAR *name, int len)
 }
 
 
+/*
+  The segments tag should be told the number of segments 
+  being specified. This is read and the number of segments
+  in the ggobid structure is set to this.
+
+  Called for <segments> tag.
+ */
 gboolean
 allocSegments(const CHAR **attrs, XMLParserData *data)
 {
@@ -662,6 +773,10 @@ allocSegments(const CHAR **attrs, XMLParserData *data)
 }
 
 
+/*
+  Reads the specification of a segment.
+  Called for <segment> tag.
+ */
 gboolean
 addConnection(const CHAR **attrs, XMLParserData *data)
 {
@@ -739,20 +854,59 @@ showAttributes(const CHAR **attrs)
  }
 }
 
+/* Finds the directory associated with the specified file.
+   Strips away the basename by looking for the last 
+   directory separator.
+ */
+gchar *
+getFileDirectory(const gchar *filename)
+{
+
+ char *tmp;
+  tmp =  strrchr(filename, DIR_SEPARATOR);
+  if(tmp) {
+    int n = tmp - filename + 2;
+    tmp = g_malloc(n*sizeof(char));
+    memcpy(tmp, filename, n);
+    tmp[n-1] = '\0';
+  } else
+   tmp = g_strdup("./");
+ 
+ return(tmp);
+}
+
+/*
+  Checks for files with different extensions.
+
+  The directory is needed so that we can resolve
+  files relative to the location of the original 
+  file from which it was referenced,
+   e.g. colormap file reference from flea.xml
+   should be relative to that one.
+ */
 
 gchar *
-find_xml_file(const gchar *filename, ggobid *gg)
+find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
 {
   int i;
   gchar* name = NULL;
   FILE *f;
-
-  const gchar *suffixes[] = {".xml", ".xml.gz", ".xmlz"};
+  int dirlen = 0;
+  const gchar *suffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
   int nsuffixes = sizeof(suffixes)/sizeof(suffixes[0]);
 
+  if(dir)
+    dirlen = strlen(dir);
+
+    /* If filename starts with a /, so it is an absolute name,
+       then ignore the directory argument.
+     */
+  if(filename[0] == DIR_SEPARATOR)
+    dirlen = 0;
+
   for(i = 0; i < nsuffixes;i++) {
-    name = g_malloc(sizeof(char)*(strlen(filename)+strlen(suffixes[i]) + 2));
-    sprintf(name,"%s%s", filename,suffixes[i]);
+    name = g_malloc(sizeof(char)*(dirlen + strlen(filename)+strlen(suffixes[i]) + 2));
+    sprintf(name,"%s%s%s", dirlen ? dir : "", filename,suffixes[i]);
     if((f = fopen(name,"r")) != NULL) {
       fclose(f);
       break;
@@ -772,4 +926,215 @@ find_xml_file(const gchar *filename, ggobid *gg)
   }
 
  return(name);
+}
+
+/*
+
+  This is reentrant.  
+  First we check the size attribute. Then we check the
+  for the specification of an external file.
+ */
+gboolean
+setColorMap(const CHAR **attrs, XMLParserData *data)
+{
+ const gchar *tmp, *file; 
+ int size = 0;
+ tmp = getAttribute(attrs, "size");
+ file = getAttribute(attrs, "file");
+
+ if(tmp)
+   size = asInteger(tmp);
+ else {
+  if(file == NULL)
+   return(false);
+ }
+
+ if(file) {
+   const gchar *type = getAttribute(attrs, "type");
+   if(type != NULL) {
+     if(strcmp("xml", type) == 0)
+       xmlParseColorMap(file, size, data);
+     else
+       asciiParseColorMap(file, size, data);
+   } else {
+       xmlParseColorMap(file, size, data);
+   }
+ }
+
+ if(size > 0 || file) {
+  if(file) {
+    data->gg->ncolors +=  size;
+    data->gg->default_color_table = (GdkColor *) g_realloc (data->gg->default_color_table , data->gg->ncolors * sizeof (GdkColor));
+  } else {
+    data->gg->ncolors = size;
+    data->gg->default_color_table = (GdkColor *) g_malloc (size * sizeof (GdkColor));
+  }
+ }
+
+
+ return(true);
+}
+
+gboolean
+setColormapEntry(const CHAR **attrs, XMLParserData *data)
+{
+ const gchar * const names[] = {"r", "g", "b"};
+ double vals[3] = {-1., -1. , -1.};
+ const gchar *tmp;
+ gboolean ok = true;
+ int which = data->current_color, i;
+
+ GdkColor *color;
+ GdkColormap *cmap = gdk_colormap_get_system ();
+
+
+ tmp = getAttribute(attrs, "id");
+
+ if(tmp) {
+   if(strcmp("bg",tmp) == 0) {
+     which = -1;
+     color = &data->gg->bg_color;
+   }
+   else  if(strcmp("fg",tmp) == 0) {
+     which = -1;
+     color = &data->gg->bg_color;
+   }
+   else {
+       /* Note that we set the current color to this index.
+          Thus we can skip values, etc.
+        */
+     which = data->current_color = asInteger(tmp) - 1;
+     color = data->gg->default_color_table + which;
+   }
+ } else {
+     color = data->gg->default_color_table + data->current_color;
+ }
+
+ for(i = 0; i < 3; i++) {
+  const gchar *tmp1 = getAttribute(attrs, (char *) names[i]);
+  if(tmp1) {
+   vals[i] = asNumber(tmp1);
+  } else {
+    ok = false;
+    break;
+  }
+ }
+
+ if(ok) {
+   setColorValues(color, vals);
+
+   /* If this is a foreground or background setting, then get the color.
+      Otherwise, wait until we have finished the entire 
+    */
+  if(which < 0)
+    gdk_colormap_alloc_color(cmap, color, false, true);
+ }
+
+ return(ok);
+}
+
+/*
+  An RGB value in simple text form.
+ */
+gboolean
+setColorValue(XMLParserData *data, const CHAR *line, int len)
+{
+
+ double values[3] = {-1, -1, -1};
+ int which = 0;
+ const char *tmp = strtok((char*) line, " \t\n");
+
+ GdkColor *color = data->gg->default_color_table + data->current_color;
+ 
+ while(tmp) {
+  values[which++] = asNumber(tmp);
+  tmp = strtok(NULL, " \t\n");
+ }
+
+ if(which == 3)
+  setColorValues(color, values);
+
+ return(true); 
+}
+
+
+gboolean
+registerColorMap(ggobid *gg)
+{
+ GdkColormap *cmap;
+ gboolean *success;
+
+ cmap = gdk_colormap_get_system ();
+   success = (gboolean *) g_malloc(sizeof(gboolean) * gg->ncolors);
+   gdk_colormap_alloc_colors (cmap, gg->default_color_table, gg->ncolors,
+         false, true, success);
+
+  g_free(success);
+
+ return(true);
+}
+
+
+void
+setColorValues(GdkColor *color, double *vals)
+{
+   color->red = (guint16) (vals[0]*65535.0);
+   color->green = (guint16) (vals[1]*65535.0);
+   color->blue = (guint16) (vals[2]*65535.0);
+}
+
+
+/*
+ The colormap file will have its own size.
+ */
+
+gboolean
+xmlParseColorMap(const gchar *fileName, int size, XMLParserData *data)
+{
+
+ xmlParserCtxtPtr ctx;
+   
+ char *tmp, *tmp1;
+
+ tmp = getFileDirectory(data->gg->filename);
+ tmp1 = find_xml_file(fileName, tmp, data->gg);
+
+ if(tmp1) {
+  ctx  = xmlCreateFileParserCtxt(tmp1);
+
+  if(ctx == NULL)
+   return(false);
+
+  ctx->userData = data;
+  ctx->sax = data->handlers;
+  data->reading_colormap_file_p = true;
+
+  xmlParseDocument(ctx);
+
+  ctx->sax = NULL;
+  xmlFreeParserCtxt(ctx);
+
+  data->reading_colormap_file_p = false;
+
+  g_free(tmp1);
+ }
+
+  g_free(tmp);
+
+ return(size == data->gg->ncolors);
+}
+
+
+/*
+  Reads color map entries from an ASCII file as a rectangular array
+  of size, at most, size by 3 rows.
+
+  Doesn't do anything at the moment.
+ */
+
+gboolean
+asciiParseColorMap(const gchar *fileName, int size, XMLParserData *data)
+{
+
+ return(false);
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
-<ggobidata numRecords="74" color="2" glyph=". 1" missingValue="NA">
+<ggobidata numRecords="74" color="2" glyph="+ 3" missingValue="NA">
 <description source="ftp://...">
 This data is from a paper by A. A. Lubischew, "On the Use of
 Discriminant Functions in Taxonomy", Biometrics, Dec 1962, pp.455-477.
@@ -17,9 +17,11 @@ and Ch. heikertingeri, and 6 measurements on each.
     5 = the front angle of the aedeagus ( 1 unit = 7.5 degrees).
     6 = the aedeagus width from the side in microns.
 </description>
-<colormap file="defaultColormap" type="xml">
-<color>.5 .5 0 </color>
-<color id="2" r=".5" g=".5" b="0" />
+<colormap  file="stdColorMap.xml" type="xml" size="4">
+<color>1 0  0 </color>
+<color>0 1 0 </color>
+<color>0 0 1</color>
+<color id="4" r=".5" g=".5" b="0" />
 </colormap>
 <variables count="6">
   <variable>tars1</variable>

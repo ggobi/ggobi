@@ -1,8 +1,62 @@
 \documentclass{article}
 \input{WebMacros}
 \usepackage{fullpage}
+\usepackage{pstricks}
+\input{pst-beta}
 
+\title{Using the R-GGobi Link}
+\author{Andreas Buja \\
+Di Cook \\
+Deborah Swayne \\
+Duncan Temple Lang}
 \begin{document}
+\begin{abstract}
+  In this document, we describe some of the features of the R-GGobi
+  link. We illustrate some of the common uses and the different
+  functions to both query and modify the state of the GGobi.  This
+  serves as a form of a tutorial.
+\end{abstract}
+
+\maketitle{}
+
+
+\section{Getting Started}
+The first thing to do is create a ggobi instance.
+Each instance is associated with a particular dataset.
+There are two ways to create this.
+One specifies the name of the file to read
+and the other takes a data frame or matrix in R.
+The first takes a string, such as
+\begin{verbatim}
+ > ggobi("../data/flea")
+\end{verbatim}
+The second form passes the data frame as the first argument.
+\begin{verbatim}
+ > data(mtcars)
+ > ggobi(mtcars)
+\end{verbatim}
+Both of these create ggobi in the same manner as the stand-alone
+application via the command line.  One can pass a vector of strings as
+arguments which are processed as command line arguments.  When
+specifying the name of a file, one can specify whether this is XML,
+ASCII or binary.
+
+We can create a ggobi instance with no data and set the data in a
+later command.
+\begin{verbatim}
+ > ggobi()
+\end{verbatim}
+
+
+At any point, the dataset can be augmented or reduced by
+adding or removing variables.
+\begin{verbatim}
+ ggobi.addVariable()
+ ggobi.removeVariable()
+\end{verbatim}
+
+\section{}
+
 
 
 \section{API Routines}
