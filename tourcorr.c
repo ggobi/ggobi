@@ -22,6 +22,9 @@
 #define CTON true
 #define CTOFF false
 
+void tourcorr_active_horvar_set (gint jvar, datad *, displayd *, ggobid *);
+void tourcorr_active_vervar_set (gint jvar, datad *, displayd *, ggobid *);
+
 void
 display_tourcorr_init_null (displayd *dsp, ggobid *gg)
 {
@@ -291,11 +294,13 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
     dsp->tcorr2.subset_vars_p.els[j] = dsp->tcorr2.active_vars_p.els[j] = true;
   }
 
+
   /*-- horizontal --*/
   dsp->tcorr1.nsubset = dsp->tcorr1.nactive = nhoriz;
   for (j=0; j<nhoriz; j++) {
     dsp->tcorr1.subset_vars.els[j] = dsp->tcorr1.active_vars.els[j] = j+nvert;
-    dsp->tcorr1.subset_vars_p.els[j+nvert] = dsp->tcorr1.active_vars_p.els[j+nvert] = true;
+    dsp->tcorr1.subset_vars_p.els[j+nvert] =
+      dsp->tcorr1.active_vars_p.els[j+nvert] = true;
   }
 
 /*
@@ -322,27 +327,26 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   }
 */
 
-  /* declare starting vertical base as first variable */
+  /* declare starting horizontal base as first horizontal variable */
   for (i=0; i<1; i++)
     for (j=0; j<nc; j++)
       dsp->tcorr1.Fa.vals[i][j] = dsp->tcorr1.Fz.vals[i][j] = 
         dsp->tcorr1.F.vals[i][j] = 
         dsp->tcorr1.Ga.vals[i][j] = dsp->tcorr1.Gz.vals[i][j] = 0.0;
-
   dsp->tcorr1.F.vals[0][dsp->tcorr1.active_vars.els[0]] = 1.0;
 
+  /* declare starting vertical base as first vertical variable */
   for (i=0; i<1; i++)
     for (j=0; j<nc; j++)
       dsp->tcorr2.Fa.vals[i][j] = dsp->tcorr2.Fz.vals[i][j] = 
         dsp->tcorr2.F.vals[i][j] = 
         dsp->tcorr2.Ga.vals[i][j] = dsp->tcorr2.Gz.vals[i][j] = 0.0;
-
   dsp->tcorr2.F.vals[0][dsp->tcorr2.active_vars.els[0]] = 1.0;
 
+  /* horizontal */
   dsp->tcorr1.dist_az = 0.0;
   dsp->tcorr1.delta = cpanel->tcorr1.step*M_PI_2/10.0;
   dsp->tcorr1.tang = 0.0;
-
   dsp->tcorr1.idled = 0;
   dsp->tcorr1.get_new_target = true;
 
@@ -350,7 +354,6 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr2.dist_az = 0.0;
   dsp->tcorr2.delta = 0.0; /*cpanel->tcorr2.step*M_PI_2/10.0;*/
   dsp->tcorr2.tang = 0.0;
-
   dsp->tcorr2.idled = 0;
   dsp->tcorr2.get_new_target = true;
 
@@ -404,36 +407,78 @@ tourcorr_subset_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   gboolean in_subset = dsp->tcorr1.subset_vars_p.els[jvar];
   gint j, k;
   gboolean changed = false;
+  gboolean fade = gg->tourcorr.fade_vars;
 
-/*
- * vardesign
- * For the moment, don't allow this if jvar is in the vertical subset
-*/
-  if (dsp->tcorr2.subset_vars_p.els[jvar])
-    return false;
+  gg->tourcorr.fade_vars = false;
 
-  if (in_subset) {
-    /*-- allow the change if there are more than 3 cotour variables,
-         and if there's more than 1 horizontal variables --*/
-    if (dsp->tcorr1.nsubset + dsp->tcorr2.nsubset > MIN_NVARS_FOR_COTOUR &&
-        dsp->tcorr1.nsubset > 1)
-    {
-      dsp->tcorr1.subset_vars_p.els[jvar] = false;
-      dsp->tcorr1.nsubset -= 1;
-      changed = true;
-    }
-  } else {
+  /*
+   * if it's in the vertical subset, and there are at least two
+   * variables in that subset, then remove jvar from the vertical
+   * subset before adding it to the horizontal one
+  */
+  if (dsp->tcorr2.subset_vars_p.els[jvar] && dsp->tcorr2.nsubset > 1) {
+
+  /*-- removing from tcorr2 --*/
+    dsp->tcorr2.subset_vars_p.els[jvar] = false;
+    dsp->tcorr2.nsubset -= 1;
+
+    /*-- reset the horizontal subset_vars based on subset_vars_p --*/
+    for (j=0, k=0; j<d->ncols; j++)
+      if (dsp->tcorr2.subset_vars_p.els[j])
+        dsp->tcorr2.subset_vars.els[k++] = j;
+
+    /*-- jump jvar out of the vertical active set --*/
+    tourcorr_active_vervar_set (jvar, d, dsp, gg);
+
+  /*-- adding to tcorr1 --*/
+ 
+    /*-- add jvar to the horizontal subset --*/
     dsp->tcorr1.subset_vars_p.els[jvar] = true;
     dsp->tcorr1.nsubset += 1;
-    changed = true;
-  }
 
-  /*-- reset subset_vars based on subset_vars_p --*/
-  if (changed)
+    /*-- jump jvar into the horizontal active set --*/
+    tourcorr_active_horvar_set (jvar, d, dsp, gg);
+
+    changed = true;
+
+    /*-- reset subset_vars based on subset_vars_p --*/
     for (j=0, k=0; j<d->ncols; j++)
       if (dsp->tcorr1.subset_vars_p.els[j])
         dsp->tcorr1.subset_vars.els[k++] = j;
 
+    varcircles_visibility_set (dsp, gg);
+
+  } else {  /*-- simple adding or removing, no swaps --*/
+
+    if (in_subset) {
+      /*-- allow the change if there are more than 3 cotour variables,
+           and if there's more than 1 horizontal variables --*/
+      if (dsp->tcorr1.nsubset + dsp->tcorr2.nsubset > MIN_NVARS_FOR_COTOUR &&
+          dsp->tcorr1.nsubset > 1)
+      {
+        dsp->tcorr1.subset_vars_p.els[jvar] = false;
+        dsp->tcorr1.nsubset -= 1;
+        changed = true;
+      }
+    } else {
+      dsp->tcorr1.subset_vars_p.els[jvar] = true;
+      dsp->tcorr1.nsubset += 1;
+      changed = true;
+    }
+
+    if (changed) {
+      /*-- reset subset_vars based on subset_vars_p --*/
+      for (j=0, k=0; j<d->ncols; j++)
+        if (dsp->tcorr1.subset_vars_p.els[j])
+          dsp->tcorr1.subset_vars.els[k++] = j;
+
+      varcircles_visibility_set (dsp, gg);
+      /*-- add/remove jvar to/from the horizontal active set --*/
+      tourcorr_active_horvar_set (jvar, d, dsp, gg);
+    }
+  }
+
+  gg->tourcorr.fade_vars = fade;
   return changed;
 }
 
@@ -494,7 +539,6 @@ tourcorr_active_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   }
 
   dsp->tcorr1.get_new_target = true;
-
 }
 
 gboolean
@@ -503,11 +547,92 @@ tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
   gint j, k;
   gboolean changed = false;
+  gboolean fade = gg->tourcorr.fade_vars;
 
-/*
- * vardesign
- * For the moment, don't allow this if jvar is in the other subset
-*/
+  gg->tourcorr.fade_vars = false;
+
+  /*
+   * if it's in the horiz subset, and there are at least two
+   * variables in that subset, then remove jvar from the horiz
+   * subset before adding it to the vertical one
+  */
+  if (dsp->tcorr1.subset_vars_p.els[jvar] && dsp->tcorr1.nsubset > 1) {
+
+  /*-- removing from tcorr1 --*/
+    dsp->tcorr1.subset_vars_p.els[jvar] = false;
+    dsp->tcorr1.nsubset -= 1;
+
+    /*-- reset the vertical subset_vars based on subset_vars_p --*/
+    for (j=0, k=0; j<d->ncols; j++)
+      if (dsp->tcorr1.subset_vars_p.els[j])
+        dsp->tcorr1.subset_vars.els[k++] = j;
+
+    /*-- jump jvar out of the horizontal active set --*/
+    tourcorr_active_horvar_set (jvar, d, dsp, gg);
+
+  /*-- adding to tcorr2 --*/
+ 
+    /*-- add jvar to the vertical subset --*/
+    dsp->tcorr2.subset_vars_p.els[jvar] = true;
+    dsp->tcorr2.nsubset += 1;
+
+    /*-- jump jvar into the vertical active set --*/
+    tourcorr_active_vervar_set (jvar, d, dsp, gg);
+
+    changed = true;
+
+    /*-- reset subset_vars based on subset_vars_p --*/
+    for (j=0, k=0; j<d->ncols; j++)
+      if (dsp->tcorr2.subset_vars_p.els[j])
+        dsp->tcorr2.subset_vars.els[k++] = j;
+
+    varcircles_visibility_set (dsp, gg);
+
+  } else {  /*-- simple adding or removing, no swaps --*/
+
+    if (in_subset) {
+      /*-- allow the change if there are more than 3 cotour variables,
+           and if there's more than 1 vertical variables --*/
+      if (dsp->tcorr2.nsubset + dsp->tcorr1.nsubset > MIN_NVARS_FOR_COTOUR &&
+          dsp->tcorr2.nsubset > 1)
+      {
+        dsp->tcorr2.subset_vars_p.els[jvar] = false;
+        dsp->tcorr2.nsubset -= 1;
+        changed = true;
+      }
+    } else {
+      dsp->tcorr2.subset_vars_p.els[jvar] = true;
+      dsp->tcorr2.nsubset += 1;
+      changed = true;
+    }
+
+    if (changed) {
+      /*-- reset subset_vars based on subset_vars_p --*/
+      for (j=0, k=0; j<d->ncols; j++)
+        if (dsp->tcorr2.subset_vars_p.els[j])
+          dsp->tcorr2.subset_vars.els[k++] = j;
+
+      varcircles_visibility_set (dsp, gg);
+      /*-- add/remove jvar to/from the horizontal active set --*/
+      tourcorr_active_vervar_set (jvar, d, dsp, gg);
+    }
+  }
+
+  gg->tourcorr.fade_vars = fade;
+  return changed;
+}
+
+#ifdef OVER
+gboolean
+tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+{
+  gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
+  gint j, k;
+  gboolean changed = false;
+  gboolean fade = gg->tourcorr.fade_vars;
+
+  gg->tourcorr.fade_vars = false;
+
   if (dsp->tcorr1.subset_vars_p.els[jvar])
     return false;
 
@@ -526,13 +651,20 @@ tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   }
 
   /*-- reset subset_vars based on subset_vars_p --*/
-  if (changed)
+  if (changed) {
     for (j=0, k=0; j<d->ncols; j++)
       if (dsp->tcorr2.subset_vars_p.els[j])
         dsp->tcorr2.subset_vars.els[k++] = j;
 
+    varcircles_visibility_set (dsp, gg);
+    /*-- add/remove jvar to/from the vertical active set --*/
+    tourcorr_active_vervar_set (jvar, d, dsp, gg);
+  }
+
+  gg->tourcorr.fade_vars = fade;
   return changed;
 }
+#endif
 
 void 
 tourcorr_active_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
@@ -614,32 +746,11 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
   splotd *sp = gg->current_splot;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
-    /*
-     * add/remove jvar to/from the subset of variables that <may> be active
-    */
-    gboolean fade = gg->tourcorr.fade_vars;
-
-    if (button == 1) { 
+    /* add/remove jvar to/from the subset of variables that <may> be active */
+    if (button == 1) 
       changed = tourcorr_subset_horvar_set (jvar, d, dsp, gg);
-      if (changed) {
-        varcircles_visibility_set (dsp, gg);
-
-        /*-- now add/remove the variable to/from the active set, too --*/
-        gg->tourcorr.fade_vars = false;
-        tourcorr_active_horvar_set (jvar, d, dsp, gg);
-        gg->tourcorr.fade_vars = fade;
-      }
-    } else {
+    else
       changed = tourcorr_subset_vervar_set (jvar, d, dsp, gg);
-      if (changed) {
-        varcircles_visibility_set (dsp, gg);
-
-        /*-- now add/remove the variable to/from the active set, too --*/
-        gg->tourcorr.fade_vars = false;
-        tourcorr_active_vervar_set (jvar, d, dsp, gg);
-        gg->tourcorr.fade_vars = fade;
-      }
-    }
 
   } else if (GTK_IS_DRAWING_AREA(w)) {
 
@@ -672,9 +783,9 @@ tourcorr_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
     sp->tourcorr.initmax = false;
   }
 
-  tmpf = precis/sp->tour2d.maxscreen;
-  maxx = sp->tour2d.maxscreen;
-  maxy = sp->tour2d.maxscreen;
+  tmpf = precis/sp->tourcorr.maxscreen;
+  maxx = sp->tourcorr.maxscreen;
+  maxy = sp->tourcorr.maxscreen;
   for (m=0; m<d->nrows_in_plot; m++)
   {
     i = d->rows_in_plot[m];
