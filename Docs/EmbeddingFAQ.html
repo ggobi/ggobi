@@ -62,7 +62,18 @@
       compiling
       my own application with GGobi embedded?
   <dd>
-      The best way to do this is by using pkg-config
+      There are two  ways to do this: pkg-config and ggobi-config.
+      The preferred way is to use the general pkg-config tool.
+      This reuses a well-documented and established application
+      that is familiar to many.
+      It has a rich feature set relative to what we want,
+      allowing standard flags and application-specific variables
+      to be queried.
+      If pkg-config is not installed on your machine, a home-grown
+      version "equivalent" is available in the form of the
+      ggobi-config script.  This will gradually be phased out
+      or left to decay as pkg-config is a nicer way of doing this.
+      
 
 </dl>
 
@@ -72,6 +83,6 @@
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Tue Nov 23 16:37:47 PST 2004
+Last modified: Tue Nov 23 16:51:50 PST 2004
 <!-- hhmts end -->
 </body> </html>
