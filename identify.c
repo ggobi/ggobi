@@ -80,14 +80,20 @@ sticky_id_toggle (datad *d, ggobid *gg)
     if (i_in_list) {
       d->sticky_ids = g_slist_remove (d->sticky_ids, ptr);
       sticky_id_link_by_id (STICKY_REMOVE, d->nearest_point, d, gg);
-       /* This will become an event on the datad when we move to Gtk objects (soon now!) */
-      gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], i, (int) UNSTICKY, d);
+       /* This will become an event on the datad when we move to
+          Gtk objects (soon now!) */
+      gtk_signal_emit(GTK_OBJECT(gg->main_window),
+        GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], d->nearest_point,
+        (gint) UNSTICKY, d);
     } else {
       ptr = GINT_TO_POINTER (d->nearest_point);
       d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
       sticky_id_link_by_id (STICKY_ADD, d->nearest_point, d, gg);
-       /* This will become an event on the datad when we move to Gtk objects (soon now!) */
-      gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[STICKY_POINT_ADDED_SIGNAL], i, (int) STICKY, d);
+       /* This will become an event on the datad when we move to
+          Gtk objects (soon now!) */
+      gtk_signal_emit(GTK_OBJECT(gg->main_window),
+        GGobiSignals[STICKY_POINT_ADDED_SIGNAL], d->nearest_point,
+        (gint) STICKY, d);
     }
   }
 }
