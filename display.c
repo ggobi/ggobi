@@ -529,7 +529,13 @@ void
 display_free_all (ggobid *gg) {
   GList *dlist;
   displayd *display;
-  gint count = g_list_length (gg->displays);
+  gint count;
+
+  if(gg->displays == NULL)
+      return;
+
+
+  count = g_list_length (gg->displays);
 
   /* Have to count down rather than rely on dlist being non-null.
      This is because when we remove the last entry, we get garbage,
