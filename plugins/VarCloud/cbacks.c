@@ -119,8 +119,8 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
       xcj = dsrc->tform.vals[jj][vcl->xcoord];
       ycj = dsrc->tform.vals[jj][vcl->ycoord];
       values[n + 0*npairs] = sqrt((xci-xcj)*(xci-xcj) + (yci-ycj)*(yci-ycj));
-      values[n + 1*npairs] = sqrt(abs(dsrc->tform.vals[ii][vcl->var1] - 
-                                      dsrc->tform.vals[jj][vcl->var1]));
+      values[n + 1*npairs] = sqrt(fabs((gdouble)(dsrc->tform.vals[ii][vcl->var1] - 
+						 dsrc->tform.vals[jj][vcl->var1])));
       values[n + 2*npairs] = (gdouble) ii;
       values[n + 3*npairs] = (gdouble) jj;
 
