@@ -349,7 +349,7 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
 
   btn = gtk_check_button_new_with_label ("Use edge length");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Have neato use edge length in determining node positions, and use the selected variable as a source of lengths",
+    "Have neato use edge length in determining node positions, and use the selected variable as a source of lengths.  Edge lengths must be >= 1.0.",
     NULL);
 #ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
