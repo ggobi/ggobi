@@ -5,7 +5,7 @@
 #include "tsdisplay.h"
 
 void timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass);
-void timeSeriesSPlotClassInit(GtkGGobiBarChartSPlotClass *klass);
+void timeSeriesSPlotClassInit(GtkGGobiTimeSeriesSPlotClass *klass);
 splotd *gtk_time_series_splot_new(displayd *dpy, gint width, gint height, ggobid *gg);
 
 #endif

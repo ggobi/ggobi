@@ -119,20 +119,20 @@ tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 void
 tsWithinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 {
-	gdk_draw_line (drawable, gc,
-		       sp->whiskers[m].x1, sp->whiskers[m].y1,
-		       sp->whiskers[m].x2, sp->whiskers[m].y2);
+  gdk_draw_line (drawable, gc,
+    sp->whiskers[m].x1, sp->whiskers[m].y1,
+    sp->whiskers[m].x2, sp->whiskers[m].y2);
 }
 
 
 void
 tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 {
-   displayd *dpy = sp->displayptr;
-   if (dpy->options.whiskers_show_p && m < dpy->d->nrows_in_plot-1)  /*-- there are n-1 whiskers --*/
-      gdk_draw_line (drawable, gc,
-		     sp->whiskers[m].x1, sp->whiskers[m].y1,
-		     sp->whiskers[m].x2, sp->whiskers[m].y2);
+  displayd *dpy = sp->displayptr;
+  if (dpy->options.whiskers_show_p && m < dpy->d->nrows_in_plot-1)  /*-- there are n-1 whiskers --*/
+     gdk_draw_line (drawable, gc,
+       sp->whiskers[m].x1, sp->whiskers[m].y1,
+       sp->whiskers[m].x2, sp->whiskers[m].y2);
 }
 
 
@@ -159,7 +159,7 @@ tsTreeLabel(splotd *sp, datad *d, ggobid *gg)
 
 
 void 
-timeSeriesSPlotClassInit(GtkGGobiBarChartSPlotClass *klass)
+timeSeriesSPlotClassInit(GtkGGobiTimeSeriesSPlotClass *klass)
 {
     klass->extendedSPlotClass.splot.redraw = QUICK;
     klass->extendedSPlotClass.tree_label = tsTreeLabel;
