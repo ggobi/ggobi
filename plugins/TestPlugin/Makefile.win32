@@ -8,8 +8,12 @@ OBJS=testplugin.o
 
 include $(GGOBI_HOME)/local.config
 
+GGOBI_LIBS=-L${GGOBI_HOME} -lggobi
+
 TestPlugin.dll: $(OBJS)
-	$(CC) -shared $(OBJS) -o $@
+	$(CC) -shared -s -mwindows -o $@ TestPlugin.def $(OBJS) ${GGOBI_LIBS} ${LIBS} ${XML_LIBS}
 
 testplugin.o: testplugin.c
 	$(CC) -g  -I$(GGOBI_HOME) -I$(GTK_DIR) -I$(GLIB_DIR) -I$(GTK_DIR)/gdk $(CFLAGS) -o $@ -c $<
+
+include $(GGOBI_HOME)/Makefile.win32
