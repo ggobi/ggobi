@@ -680,9 +680,9 @@ active_paint_points (datad *d, ggobid *gg)
   gboolean changed;
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
+  displayd *display = (displayd *) sp->displayptr;
 
 #ifdef BARCHART_IMPLEMENTED
-  displayd *display = (displayd *) sp->displayptr;
   if (display->displaytype == barchart) {
     d->npts_under_brush = barchart_active_paint_points (sp, d);
 
