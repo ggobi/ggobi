@@ -199,7 +199,7 @@ extern void parcoords_cpanel_init (cpaneld*, ggobid *);
 extern void parcoords_main_menus_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 extern displayd* parcoords_new (gboolean, gint, gint *, datad *, ggobid *);
 extern void parcoords_reset_arrangement (displayd *, gint, ggobid *);
-extern gboolean parcoords_varsel (cpaneld *, splotd *, gint, gint *, gboolean, ggobid *);
+extern gboolean parcoords_varsel (cpaneld *, splotd *, gint, gint *, ggobid *);
 extern gboolean pca_calc (datad *, ggobid *);
 extern void pca_diagnostics_set (datad *d, ggobid *);
 extern gint pcompare (const void *, const void *);

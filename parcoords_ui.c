@@ -110,7 +110,7 @@ cpanel_parcoords_make (ggobid *gg) {
 
   opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Selecting a variable either replaces the variable in the current plot (swapping if appropriate), inserts a new plot before the current plot, or appends a new plot after it",
+    "Selecting an unselected variable either replaces the variable in the current plot, inserts a new plot before the current plot, or appends a new plot after it",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, selection_mode_lbl,

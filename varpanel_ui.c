@@ -63,7 +63,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   switch (display->displaytype) {
 
     case parcoords:
-      redraw = parcoords_varsel (cpanel, sp, jvar, &jvar_prev, alt_mod, gg);
+      redraw = parcoords_varsel (cpanel, sp, jvar, &jvar_prev, gg);
     break;
 
     case scatmat:
