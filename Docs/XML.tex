@@ -10,6 +10,7 @@
 
 % dfs, just trying to build the pdf file
 \def\file#1{\Escape{#1}}
+\usepackage{comment}
 
 \usepackage{fullpage}
 \usepackage{hyperref}
@@ -202,9 +203,16 @@ types of relationships among their elements:
 The remainder of the dataset is specified as sub-elements or sub-tags
 within this \texttt{data} element.
 
-\subsection{Colormap}
+\subsection{Color schemes}
 
-[The use of colormaps is in the process of being redesigned.]
+Included in the source code is a file called colorschemes.xml,
+which contains (as of this writing) 265 distinct color schemes.
+
+
+
+
+\begin{comment}
+\subsection{Colormap}
 
 The user can specify rows of a color table in RGB format.  (Perhaps
 different formats such HSV, etc. can be supported directly by GTK
@@ -227,7 +235,7 @@ Then, a reference to
 \begin{verbatim}
  <colormap file="stdColorMap.xml">
 \end{verbatim}
-is found as \file{data/stdColorMap.xml}.  Similalry, if a colormap
+is found as \file{data/stdColorMap.xml}.  Similarly, if a colormap
 file named \file{map.xml} is located in the directory \dir{color}
 parallel to \dir{data}, then
 \begin{verbatim}
@@ -279,6 +287,7 @@ entries if specified for the entire colormap) is divided by that
 amount.  This allows one to easily use different scales such as 0 to 1
 or 0 to 100, etc. This is designed to assist when the software
 creating the file does not facilitate such rescaling.
+\end{comment}
 
 \subsection{Description}
 
@@ -318,7 +327,9 @@ specified simply:
 % 
 For categorical variables, it's also necessary to list their
 levels and specify the mapping between data value and level, because
-the data values in the \texttt{record} tag are numbers.
+the data values in the \texttt{record} tag are numbers.  (These
+levels can also serve as a basis for linking records during brushing
+as described in \ref{LinkingRecords}.)
 \begin{verbatim}
 <categoricalvariable>
   <name> fraudp </name>
@@ -419,6 +430,13 @@ usage data for a set of customers, while dataset B contains
 demographic data for a subset of those customers.  Those datasets
 will be linked for brushing and identification if they have the
 same value for \XMLAttribute{id}.
+
+The levels of a categorical variable can also be used as the
+basis for linking records during brushing.  If {\em Link by
+variable} is selected, and a categorical variable is highlighted
+in the {\bf Variable manipulation} tool, then brushing one
+observation causes all observations in all displays with the
+same level for that variable to be brushed as well.
 
 \subsubsection{Edges}
 \label{Edges}
