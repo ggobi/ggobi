@@ -507,5 +507,12 @@ enum {DATAD_ADDED_SIGNAL, VARIABLE_ADDED_SIGNAL,
   Indexed by the enum above.
  */
 extern guint GGobiSignals[MAX_GGOBI_SIGNALS];
+
+
+/**
+  Should be in edges.h, if there were one.
+ */
+datad *setDisplayEdge(displayd *dpy, datad *e);
+
 #endif
 
