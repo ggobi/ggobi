@@ -4,14 +4,14 @@
 #include "plugin.h"
 
 gboolean
-init(gboolean initializing, GGobiPluginInfo *plugin, PluginInstance *inst)
+init(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
     fprintf(stderr, "initializing test plugin instance\n");fflush(stderr);
     return(true);
 }
 
 gboolean
-close(gboolean quitting, GGobiPluginInfo *plugin, PluginInstance *inst)
+close(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
     fprintf(stderr, "closing the test plugin instance\n");fflush(stderr);
     return(true);
