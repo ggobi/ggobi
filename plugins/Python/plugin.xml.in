@@ -1,4 +1,4 @@
-<plugin name="JVM" load="immediate">
+<plugin name="JVM" load="immediate" providesLanguage="python">
    <description>Loads the Python Interpreter for use by other plugins</description>
    <author>Duncan Temple Lang</author>
    <options>
@@ -7,6 +7,8 @@
     </named>
    </options>
    <dll name="@PWD@/Python.so">
-    <init onLoad="loadPython" />
+    <init onLoad="loadPython" processPlugin="Python_processPlugin" />
   </dll>
 </plugin>
+
+

@@ -3,6 +3,13 @@
 
 #include <Python.h>
 
+typedef struct{
+	char *className;
+	char *moduleName;
+	PyObject *inst;
+} PythonInputPluginData;
+
+
 
 
 gboolean CheckPythonError();
@@ -44,6 +51,54 @@ initPython(GGobiPluginInfo *info)
    return(true);
 }
 
+
+gboolean
+Py_onClose(ggobid *gg, GGobiPluginInfo *info, PluginInstance *inst)
+{
+  return(CallPluginMethod("onClose", gg, inst));
+}
+
+gboolean
+Py_onUpdateDisplay(ggobid *gg, PluginInstance *inst)
+{
+  return(CallPluginMethod("onUpdateDisplay", gg, inst));
+}
+
+gboolean
+CallPluginMethod(const char *name, ggobid *gg, PluginInstance *inst)
+{
+  PyObject *pinst;
+  PyObject *pmethod, *pargs, *value;
+  gboolean status = true;
+
+#ifdef PY_GGOBI_DEBUG
+  g_printerr("Calling plugin method %s\n", name);
+#endif
+
+  pinst =  (PyObject *) (inst->data);
+  pmethod = PyObject_GetAttrString(pinst, (char *) name);
+  if(CheckPythonError()) 
+    return(false);
+
+  pargs = NULL;
+  value = PyEval_CallObject(pmethod, pargs);
+
+  if(CheckPythonError()) 
+    return(false);
+
+  if(PyInt_Check(value))
+    status = PyInt_AsLong(value);
+  else {
+    g_printerr("Return value from method %s was not an integer", name);
+    status = false;
+  }
+
+  Py_DECREF(value);
+
+  return(status);
+}
+
+
 gboolean
 CheckPythonError()
 {
@@ -73,8 +128,78 @@ CheckPythonError()
 
       }
 	g_printerr(buf);
+	g_printerr("\n");
 	return(true);
   }
       return(false);
 }
 
+
+gboolean 
+PythonCreatePlugin(ggobid *gg, GGobiPluginInfo *info, PluginInstance *inst)
+{
+   PyObject *module, *obj, *d, *klass;
+   PythonInputPluginData *data = (PythonInputPluginData *) info->data;
+
+#ifdef PY_GGOBI_DEBUG
+   g_printerr("Creating plugin %s\n", data->className);
+#endif
+
+   module = PyImport_ImportModule(data->moduleName ? data->moduleName : "__main__");
+   if(CheckPythonError()) 
+	   return(false);
+
+   d = PyModule_GetDict(module);
+   klass = PyMapping_GetItemString(d, data->className);
+   PyClass_Check(klass);
+   obj = PyInstance_New(klass, NULL, NULL);
+   if(CheckPythonError())
+     return(false);
+
+   Py_INCREF(obj);
+   inst->data = obj;
+
+   return(true);
+}
+
+gboolean
+Python_processPlugin(xmlNodePtr node, GGobiPluginInfo *plugin, GGobiPluginType type, 
+                      GGobiPluginInfo *langPlugin, GGobiInitInfo *info)
+{
+
+      const xmlChar *tmp;
+      PythonInputPluginData *data;
+      GGobiPluginDetails *details;
+
+
+      data = (PythonInputPluginData *)g_malloc(sizeof(PythonInputPluginData));
+      memset(data, '\0', sizeof(PythonInputPluginData));
+      plugin->data = data;
+      details = plugin->details;
+
+      tmp = xmlGetProp(node, "class");
+      data->className = g_strdup(tmp); 
+      tmp = xmlGetProp(node, "module");
+      data->moduleName = g_strdup(tmp); 
+
+#ifdef PY_GGOBI_DEBUG
+      g_printerr("In Python_processPlugin %s\n", data->className);
+#endif
+
+      if(type == INPUT_PLUGIN) {
+        plugin->info.i->getDescription = g_strdup("PythonGetInputDescription");
+
+      } else {
+        plugin->info.g->onCreate = g_strdup("PythonCreatePlugin");
+        plugin->info.g->onClose = g_strdup("Py_onClose");
+        plugin->info.g->onUpdateDisplay = g_strdup("Py_onUpdateDisplay"); 
+      }
+
+      setLanguagePluginInfo(details, "Python", info);
+/*
+      details->onLoad = g_strdup("PythonLoadPlugin");
+      details->onUnload = g_strdup("PythonUnloadPlugin");
+*/
+
+      return(true);
+}

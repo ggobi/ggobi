@@ -1,0 +1,11 @@
+To test this plugin, you can use the following command
+
+   ../../ggobi --plugin=tests/plugin.xml-test ../../data/flea.xml
+
+from within this directory.
+
+To implement a plugin (not an input plugin yet), one can either extend
+the GGobiPythonPlugin class in the python/GGobiPlugin.py file or
+simply implement a new class with methods identical in signature to
+those in that class.
+

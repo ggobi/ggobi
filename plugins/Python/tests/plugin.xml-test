@@ -1,0 +1,26 @@
+<plugins>
+<plugin name="Python" load="immediate" providesLanguage="Python">
+   <description>Loads the Python Interpreter for use by other plugins</description>
+   <author>Duncan Temple Lang</author>
+   <options>
+    <named>
+      <pythonpath>.:./python:./tests</pythonpath>
+    </named>
+   </options>
+   <dll name="./Python.so">
+    <init onLoad="loadPython" processPlugin="Python_processPlugin"/>
+  </dll>
+</plugin>
+
+<plugin name="testPython" language="Python" class="GGobiPythonPlugin" module="GGobiPlugin">
+ <description>My test of python meta-plugin</description>
+ <author>DTL</author>
+ <dll class="GGobiPythonPlugin" module="GGobiPlugin"/>
+</plugin>
+
+
+<plugin name="samplePlugin" language="Python" class="SamplePlugin" module="samplePlugin">
+ <description>My test of python meta-plugin</description>
+ <author>DTL</author>
+</plugin>
+</plugins>
