@@ -118,6 +118,9 @@ fileset_generate(const gchar * fileName,
   GSList *groups;
   gboolean isUnknownMode;
 
+  if (FileTypeGroups == NULL)
+    initFileTypeGroups();
+
 #ifdef SUPPORT_PLUGINS
   if(plugin) {
 	  InputDescription *desc;
@@ -126,9 +129,6 @@ fileset_generate(const gchar * fileName,
             return(desc);
   }
 #endif
-
-  if (FileTypeGroups == NULL)
-    initFileTypeGroups();
 
   groups = FileTypeGroups;
 
@@ -450,25 +450,6 @@ verifyDataMode(const gchar * fileName, DataMode mode,
                InputDescription * desc)
 {
   switch (mode) {
-#if 0
-  case xml_data:
-  case url_data:
-    if (!isXMLFile(fileName, desc))
-      mode = unknown_data;
-    break;
-#endif
-#if 0
-  case ascii_data:
-    if (!isASCIIFile(fileName))
-      mode = unknown_data;
-    break;
-#endif
-#if 0
-  case csv_data:
-    if (!isCSVFile(fileName))
-      mode = unknown_data;
-    break;
-#endif
   default:
     mode = guessDataMode(fileName, desc);
   }
