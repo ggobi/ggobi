@@ -85,7 +85,13 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
       do_ash1d (yy, d->nrows_in_plot,
                cpanel->p1d.nbins, cpanel->p1d.nASHes,
                sp->p1d_data.els, &min, &max, &mean);
-      sp->p1d_lim.min = min;
+      /*
+       * Instead of using the returned minimum, set the minimum to 0.
+       * This scales the plot so that the baseline (also set to 0) is
+       * within the range, the connecting lines look terrific, and the
+       * plot makes more sense.
+      */
+      sp->p1d_lim.min = 0.0; 
       sp->p1d_lim.max = max;
       sp->p1d_mean = mean;
       break;   
