@@ -42,7 +42,7 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 
   pos.y = margin + 3/2;
   pos.x = spacing/2;
-  g.type = POINT_GLYPH;
+  g.type = DOT;
   g.size = 1;
   nearest_dsq = dsq = sqdist (pos.x, pos.y, ev.x, ev.y);
   type = g.type; size = g.size;
@@ -53,37 +53,37 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
     pos.y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
     pos.x = spacing + spacing/2;
 
-    g.type = PLUS_GLYPH;
+    g.type = PLUS;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
     pos.x += spacing;
-    g.type = X_GLYPH;
+    g.type = X;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
     pos.x += spacing;
-    g.type = OPEN_CIRCLE;
+    g.type = OC;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
     pos.x += spacing;
-    g.type = OPEN_RECTANGLE;
+    g.type = OR;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
     pos.x += spacing;
-    g.type = FILLED_CIRCLE;
+    g.type = FC;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
     pos.x += spacing;
-    g.type = FILLED_RECTANGLE;
+    g.type = FR;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
@@ -106,7 +106,7 @@ find_symbol_selection_circle_pos (icoords *pos, ggobid *gg) {
   gint spacing = gg->color_ui.spacing;
   gint margin = gg->color_ui.margin;
 
-  if (gg->glyph_id.type == POINT_GLYPH) {
+  if (gg->glyph_id.type == DOT) {
     pos->y = margin + 3/2;
     pos->x = spacing/2;
 
@@ -118,27 +118,27 @@ find_symbol_selection_circle_pos (icoords *pos, ggobid *gg) {
       pos->y += (margin + ((i==0) ? (3*g.size)/2 : 3*g.size ));
       pos->x = spacing + spacing/2;
 
-      if (gg->glyph_id.type == PLUS_GLYPH && gg->glyph_id.size == g.size)
+      if (gg->glyph_id.type == PLUS && gg->glyph_id.size == g.size)
         break;
 
       pos->x += spacing;
-      if (gg->glyph_id.type == X_GLYPH && gg->glyph_id.size == g.size)
+      if (gg->glyph_id.type == X && gg->glyph_id.size == g.size)
         break;
 
       pos->x += spacing;
-      if (gg->glyph_id.type == OPEN_CIRCLE && gg->glyph_id.size == g.size)
+      if (gg->glyph_id.type == OC && gg->glyph_id.size == g.size)
         break;
 
       pos->x += spacing;
-      if (gg->glyph_id.type == OPEN_RECTANGLE && gg->glyph_id.size == g.size)
+      if (gg->glyph_id.type == OR && gg->glyph_id.size == g.size)
         break;
 
       pos->x += spacing;
-      if (gg->glyph_id.type == FILLED_CIRCLE && gg->glyph_id.size == g.size)
+      if (gg->glyph_id.type == FC && gg->glyph_id.size == g.size)
         break;
 
       pos->x += spacing;
-      if (gg->glyph_id.type == FILLED_RECTANGLE && gg->glyph_id.size == g.size)
+      if (gg->glyph_id.type == FR && gg->glyph_id.size == g.size)
         break;
     }
   }
@@ -178,27 +178,27 @@ redraw_symbol_display (GtkWidget *w, ggobid *gg) {
     pos.y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
     pos.x = spacing + spacing/2;
 
-    g.type = PLUS_GLYPH;
+    g.type = PLUS;
     draw_glyph (w->window, &g, &pos, 0, gg);
 
     pos.x += spacing;
-    g.type = X_GLYPH;
+    g.type = X;
     draw_glyph (w->window, &g, &pos, 0, gg);
 
     pos.x += spacing;
-    g.type = OPEN_CIRCLE;
+    g.type = OC;
     draw_glyph (w->window, &g, &pos, 0, gg);
 
     pos.x += spacing;
-    g.type = OPEN_RECTANGLE;
+    g.type = OR;
     draw_glyph (w->window, &g, &pos, 0, gg);
 
     pos.x += spacing;
-    g.type = FILLED_CIRCLE;
+    g.type = FC;
     draw_glyph (w->window, &g, &pos, 0, gg);
 
     pos.x += spacing;
-    g.type = FILLED_RECTANGLE;
+    g.type = FR;
     draw_glyph (w->window, &g, &pos, 0, gg);
   }
   
@@ -242,7 +242,7 @@ find_line_selection_pos (icoords *pos, ggobid *gg) {
   gint spacing = gg->color_ui.spacing;
   gint margin = gg->color_ui.margin;
 
-  if (gg->glyph_id.type == POINT_GLYPH) {
+  if (gg->glyph_id.type == DOT) {
     pos->x = spacing + spacing/2;
     pos->y = margin;
   } else {
@@ -252,21 +252,21 @@ find_line_selection_pos (icoords *pos, ggobid *gg) {
       pos->y += (margin + ((i==0) ? (3*g.size)/2 : 3*g.size ));
       pos->x = spacing + spacing/2;
 
-      if (gg->glyph_id.type == PLUS_GLYPH && gg->glyph_id.size == g.size)
+      if (gg->glyph_id.type == PLUS && gg->glyph_id.size == g.size)
         break;
-      if (gg->glyph_id.type == X_GLYPH && gg->glyph_id.size == g.size)
-        break;
-
-      pos->x += (2*spacing);
-      if (gg->glyph_id.type == OPEN_CIRCLE && gg->glyph_id.size == g.size)
-        break;
-      if (gg->glyph_id.type == OPEN_RECTANGLE && gg->glyph_id.size == g.size)
+      if (gg->glyph_id.type == X && gg->glyph_id.size == g.size)
         break;
 
       pos->x += (2*spacing);
-      if (gg->glyph_id.type == FILLED_CIRCLE && gg->glyph_id.size == g.size)
+      if (gg->glyph_id.type == OC && gg->glyph_id.size == g.size)
         break;
-      if (gg->glyph_id.type == FILLED_RECTANGLE && gg->glyph_id.size == g.size)
+      if (gg->glyph_id.type == OR && gg->glyph_id.size == g.size)
+        break;
+
+      pos->x += (2*spacing);
+      if (gg->glyph_id.type == FC && gg->glyph_id.size == g.size)
+        break;
+      if (gg->glyph_id.type == FR && gg->glyph_id.size == g.size)
         break;
     }
   }

@@ -875,7 +875,8 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   endpointsd *endpoints;
   gboolean edges_show_p, arrowheads_show_p;
   gint nels = d->rowid.idv.nels;
-  gint lwidth, ltype, gtype;
+  gint lwidth, ltype;
+  GlyphType gtype;
 
   if (e == (datad *) NULL || e->edge.n == 0) {
 /**/return;
@@ -911,9 +912,9 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       m = e->rows_in_plot[i];
       if (!e->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
         gtype = e->glyph_now.els[m].type;
-        if (gtype == FILLED_CIRCLE || gtype == FILLED_RECTANGLE)
+        if (gtype == FC || gtype == FR)
           ltype = SOLID;
-        else if (gtype == OPEN_CIRCLE || gtype == OPEN_RECTANGLE)
+        else if (gtype == OC || gtype == OR)
           ltype = WIDE_DASH;
         else ltype = NARROW_DASH;
 
@@ -968,9 +969,9 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
               if (doit) {
 
                 gtype = e->glyph_now.els[j].type;
-                if (gtype == FILLED_CIRCLE || gtype == FILLED_RECTANGLE)
+                if (gtype == FC || gtype == FR)
                   ltype = SOLID;
-                else if (gtype == OPEN_CIRCLE || gtype == OPEN_RECTANGLE)
+                else if (gtype == OC || gtype == OR)
                   ltype = WIDE_DASH;
                 else ltype = NARROW_DASH;
 
