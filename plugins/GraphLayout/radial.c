@@ -294,10 +294,21 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   colnames[7] = "nSiblings";
 
   dnew = datad_create (nvisible, nc, gg);
-  dnew->name = g_strdup ("radial layout");
+  dnew->name = g_strdup ("radial");
 
   GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
     gg, rowids, desc);
+
+  /*-- copy the color and glyph vectors from d to dnew --*/
+  for (i=0; i<nvisible; i++) {
+    m = visible[i];
+    dnew->color.els[m] = dnew->color_now.els[m] = dnew->color_prev.els[m] =
+      d->color.els[m];
+    dnew->glyph.els[m].type = dnew->glyph_now.els[m].type =
+      dnew->glyph_prev.els[m].type = d->glyph.els[m].type;
+    dnew->glyph.els[m].size = dnew->glyph_now.els[m].size =
+      dnew->glyph_prev.els[m].size = d->glyph.els[m].size;
+  }
 
 /*
  * open a new scatterplot with the new data, and display edges
@@ -307,6 +318,8 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   setDisplayEdge (dspnew, e);
   edges_displayed = display_copy_edge_options (dsp, dspnew);
   if (!edges_displayed) {
+    GGOBI(setShowLines)(dspnew, true);
+/*
     GtkWidget *item;
     dspnew->options.edges_undirected_show_p = true;
     item = widget_find_by_name (dspnew->edge_menu,
@@ -314,6 +327,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
     if (item)
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
         dspnew->options.edges_directed_show_p);
+*/
   }
 
   displays_tailpipe (FULL, gg);
