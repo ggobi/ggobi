@@ -90,13 +90,13 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
 
 /*
  * open a new scatterplot with the new data, and display edges
- * as they're displayed in the current datad.
+ * as they're displayed in the current datad ... or not
 */
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
-  setDisplayEdge (dspnew, e);
+/* setDisplayEdge (dspnew, e); */
   edges_displayed = display_copy_edge_options (dsp, dspnew);
   if (!edges_displayed) {
-    GGOBI(setShowLines)(dspnew, true);
+    /*GGOBI(setShowLines)(dspnew, true);*/
 /*
     GtkWidget *item;
     dspnew->options.edges_undirected_show_p = true;
@@ -209,6 +209,7 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
   displayd *dsp = gg->current_display;
   GtkWidget *window, *entry;
   gchar *lbl;
+  gdouble dtmp;
 
   /*
    * this is awkward -- it allows dsrc to be initialized once
@@ -243,6 +244,8 @@ large size of it isn't important.
       quick_message ("I can't identify a set of edges", false);
       return;
     }
+    /*-- this is the edgeset for distance computations, not
+         necessarily the edgeset to be displayed (eg, morsecode) --*/
     ggv->e = gtk_object_get_data (GTK_OBJECT(clist), "datad");
     if (!ggv->e) {
       quick_message ("I can't identify a set of edges", false);
@@ -268,10 +271,6 @@ large size of it isn't important.
     for (i = 0; i < e->edge.n; i++) {
       end1 = dsrc->rowid.idv.els[endpoints[i].a];
       end2 = dsrc->rowid.idv.els[endpoints[i].b];
-/*
-      end1 = edges_arrp->data[i][0]-1;
-      end2 = edges_arrp->data[i][1]-1;
-*/
       Dvals[end1][end2] = (ggv->Dtarget_source == VarValues) ?
         e->tform.vals[i][selected_var] : 1.0;
     }
@@ -283,10 +282,6 @@ large size of it isn't important.
       for (i = 0; i < e->edge.n; i++) {
         end1 = dsrc->rowid.idv.els[endpoints[i].a];
         end2 = dsrc->rowid.idv.els[endpoints[i].b];
-/*
-        end1 = edges_arrp->data[i][0]-1;
-        end2 = edges_arrp->data[i][1]-1;
-*/
         d12 = (ggv->Dtarget_source == VarValues) ?
           e->tform.vals[i][selected_var] : 1.0;
 
@@ -307,30 +302,23 @@ large size of it isn't important.
   }
   ggv->ndistances = ggv->Dtarget.nrows * ggv->Dtarget.ncols;
 
-{
-  int i, j;
-  FILE *fp;
-  fp = fopen("foo", "w");
-
-  for (i = 0; i < ggv->Dtarget.nrows; i++) {
-    for (j = 0; j < ggv->Dtarget.ncols; j++) {
-      fprintf(fp, "%f ", ggv->Dtarget.vals[i][j]);
-    }
-    fprintf(fp, "\n");
-  }
-  fflush(fp);
-}
-
-
-  ggv->mds_threshold_low = ggv->mds_threshold_high = ggv->Dtarget.vals[0][0];
+  ggv->Dtarget_max = DBL_MIN;  ggv->Dtarget_min = DBL_MAX;
   for (i=0; i<ggv->Dtarget.nrows; i++) {
     for (j=0; j<ggv->Dtarget.ncols; j++) {
-      ggv->mds_threshold_low = MIN (ggv->mds_threshold_low,
-                                    ggv->Dtarget.vals[i][j]);
-      ggv->mds_threshold_high = MAX (ggv->mds_threshold_high,
-                                    ggv->Dtarget.vals[i][j]);
+      dtmp = ggv->Dtarget.vals[i][j]; 
+      if (dtmp < 0) {
+        g_printerr ("negative dissimilarity: i=%d j=%d diss=%3.6f -> NA\n",
+          i, j, dtmp);
+        dtmp = ggv->Dtarget.vals[i][j] = DBL_MAX;
+      }
+      if(dtmp != DBL_MAX) {
+        if (dtmp > ggv->Dtarget_max) ggv->Dtarget_max = dtmp;
+        if (dtmp < ggv->Dtarget_min) ggv->Dtarget_min = dtmp;
+      }
     }
   }
+  ggv->mds_threshold_low =  ggv->Dtarget_min;
+  ggv->mds_threshold_high = ggv->Dtarget_max;
 
   /*-- update the entry to let people know Dtarget has been computed --*/
   window = (GtkWidget *) inst->data;
@@ -413,15 +401,57 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
 }
 void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
+  ggobid *gg = inst->gg;
   ggvisd *ggv = ggvisFromInst (inst);
   ggv->mds_dist_power = adj->value;
  g_printerr ("mds_dist_power = %f\n", ggv->mds_dist_power);
+/*
+  mds_distpow = floor(6. * slidepos * 1.04 * 10.) / 10. ;
+printf ("setting mds_distpow to %f\n", mds_distpow);
+  if(mds_distpow > 6.) mds_distpow = 6.;
+  sprintf(str, "%s: %3.1f ", "Dist Power (d^q)", mds_distpow);
+  XtSetArg(args[0], XtNstring, str);
+  XtSetValues(mds_distpow_label, args, 1);
+  XawScrollbarSetThumb(mds_distpow_sbar, mds_distpow/1.04/6., -1.);
+
+  mds_lnorm_over_distpow = mds_lnorm/mds_distpow;
+  mds_distpow_over_lnorm = mds_distpow/mds_lnorm;
+*/
+
+  mds_once (false, ggv, gg);
+  ggv_Dtarget_histogram_update (ggv, gg);
 }
 void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
+  ggobid *gg = inst->gg;
   ggvisd *ggv = ggvisFromInst (inst);
   ggv->mds_Dtarget_power = adj->value;
  g_printerr ("mds_Dtarget_power = %f\n", ggv->mds_Dtarget_power);
+
+/*
+  if (metric_nonmetric == METRIC) {
+    mds_power = floor(6. * slidepos * 1.04 * 10.) / 10. ;
+    if(mds_power > 6.) mds_power = 6.;
+    if(KruskalShepard_classic == KRUSKALSHEPARD) {
+      sprintf(str, "Data Power (D^p): %3.1f ",  mds_power);
+    } else {
+      sprintf(str, "Data Power (D^2p): %3.1f ",  mds_power);
+    }
+    XtSetArg(args[0], XtNstring, str);
+    XtSetValues(mds_power_label, args, 1);
+    XawScrollbarSetThumb(mds_power_sbar, mds_power/1.04/6.0, -1.);
+  } else {
+    mds_isotonic_mix = floor(slidepos * 1.04 * 100.)/100. ;
+    if(mds_isotonic_mix > 1.0) mds_isotonic_mix = 1.0;
+    sprintf(str, "Isotonic(D): %d%% ", (int) (mds_isotonic_mix*100));
+    XtSetArg(args[0], XtNstring, str);
+    XtSetValues(mds_power_label, args, 1);
+    XawScrollbarSetThumb(mds_power_sbar, mds_isotonic_mix/1.04, -1.);
+  }
+*/
+
+  mds_once (false, ggv, gg);
+  ggv_Dtarget_histogram_update (ggv, gg);
 }
 void ggv_lnorm_cb (GtkAdjustment *adj, PluginInstance *inst)
 {

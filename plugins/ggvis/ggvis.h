@@ -9,9 +9,13 @@
 #define NSTRESSVALUES    1000
 #define STRESSPLOT_MARGIN  10
 
-#define HISTOGRAM_WIDTH  250
-#define HISTOGRAM_HEIGHT 100
-#define HISTOGRAM_MARGIN  10
+#define HISTOGRAM_WIDTH     250
+#define HISTOGRAM_HEIGHT    100
+#define HISTOGRAM_VMARGIN     5
+#define HISTOGRAM_HMARGIN    15
+#define HISTOGRAM_GRIP_SPACE 20
+#define HISTOGRAM_GRIP_SIZE  10  /* should be even number */
+#define HISTOGRAM_BWIDTH      5
 
 typedef int (*CompareFunc)(const void *, const void *);
 
@@ -24,6 +28,19 @@ typedef enum {LinkDist, VarValues} MDSDtargetSource;
 #define INCLUDED 1
 #define ANCHOR   2
 #define DRAGGED  4 
+
+typedef struct {
+  GtkWidget *da;
+  GdkPixmap *pix;
+  gdouble low, high;
+  gint lgrip_pos, rgrip_pos;
+  GdkRectangle lgrip, rgrip;
+  gint lgrip_down, rgrip_down;
+  GdkRectangle *bars;
+  vector_b bars_included;
+  vector_i bins;
+  gint nbins;
+} dissimd;
 
 typedef struct {
 
@@ -42,8 +59,7 @@ typedef struct {
   vector_d stressvalues;  /*-- allocated to hold NSTRESSVALUES values --*/
   gint nstressvalues;     /*-- the number of stress values */
 
-  GtkWidget *histogram_da;
-  GdkPixmap *histogram_pix;
+  dissimd *dissim;
 
   gint mds_dims;
   gdouble mds_stepsize;
@@ -73,7 +89,7 @@ typedef struct {
   array_d gradient;
   vector_d bl_w;
   gdouble pos_scl;
-  gdouble dist_max;
+  gdouble Dtarget_max, Dtarget_min;
   vector_d rand_sel;
   gint mds_freeze_var;
   gint ndistances;
@@ -108,8 +124,15 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst);
 
 gint ggv_stressplot_configure_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
 gint ggv_stressplot_expose_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
+
 gint ggv_histogram_configure_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
 gint ggv_histogram_expose_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
+void ggv_histogram_init (ggvisd *ggv, ggobid *gg);
+gint ggv_histogram_motion_cb (GtkWidget *w, GdkEventMotion *xmotion, PluginInstance *inst);
+void ggv_histogram_button_press_cb (GtkWidget *w, GdkEventButton *evnt, PluginInstance *inst);
+void ggv_histogram_button_release_cb (GtkWidget *w, GdkEventButton *evnt, PluginInstance *inst);
+void ggv_Dtarget_histogram_update (ggvisd *, ggobid *);
+
 void ggv_metric_cb (GtkWidget *w, gpointer cbd);
 void ggv_kruskal_cb (GtkWidget *w, gpointer cbd);
 void ggv_groups_cb (GtkWidget *w, PluginInstance *inst);

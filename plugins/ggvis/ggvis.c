@@ -91,6 +91,8 @@ show_ggvis_window (GtkWidget *widget, PluginInstance *inst)
     ggvisd *ggv = (ggvisd *) g_malloc (sizeof (ggvisd));
 
     ggvis_init (ggv);
+    ggv_histogram_init (ggv, inst->gg);
+
     create_ggvis_window (ggv, inst);
 
   } else {
@@ -378,15 +380,25 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
   gtk_container_add (GTK_CONTAINER(frame), vb);
 
-  ggv->histogram_da = gtk_drawing_area_new ();
-  gtk_drawing_area_size (GTK_DRAWING_AREA (ggv->histogram_da),
+  ggv->dissim->da = gtk_drawing_area_new ();
+  gtk_drawing_area_size (GTK_DRAWING_AREA (ggv->dissim->da),
     HISTOGRAM_WIDTH, HISTOGRAM_HEIGHT);
-  gtk_signal_connect (GTK_OBJECT (ggv->histogram_da), "expose_event",
+  gtk_widget_set_events (ggv->dissim->da, GDK_EXPOSURE_MASK
+             | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
+             | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
+  gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "expose_event",
     GTK_SIGNAL_FUNC(ggv_histogram_expose_cb), inst);
-  gtk_signal_connect (GTK_OBJECT (ggv->histogram_da), "configure_event",
+  gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "configure_event",
     GTK_SIGNAL_FUNC(ggv_histogram_configure_cb), inst);
-  gtk_widget_set_events (ggv->histogram_da, GDK_EXPOSURE_MASK);
-  gtk_box_pack_start (GTK_BOX (vb), ggv->histogram_da, true, true, 2);
+  gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "motion_notify_event",
+    GTK_SIGNAL_FUNC(ggv_histogram_motion_cb), inst);
+  gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "button_press_event",
+    GTK_SIGNAL_FUNC(ggv_histogram_button_press_cb), inst);
+  gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "button_release_event",
+    GTK_SIGNAL_FUNC(ggv_histogram_button_release_cb), inst);
+
+  gtk_widget_set_events (ggv->dissim->da, GDK_EXPOSURE_MASK);
+  gtk_box_pack_start (GTK_BOX (vb), ggv->dissim->da, true, true, 2);
 
 
   /*-- Data power, weight power --*/

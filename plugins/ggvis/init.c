@@ -27,7 +27,15 @@ ggvis_init (ggvisd *ggv)
   vectord_init_null (&ggv->stressvalues);
   vectord_alloc (&ggv->stressvalues, NSTRESSVALUES);
 
-  ggv->histogram_pix = NULL;
+  ggv->dissim = (dissimd *) g_malloc (sizeof (dissimd));
+  ggv->dissim->pix = NULL;
+  ggv->dissim->low = 0.;
+  ggv->dissim->high = 1.;
+  ggv->dissim->lgrip_pos = -1;
+  ggv->dissim->lgrip_pos = -1;
+  ggv->dissim->bars = NULL;
+  vectorb_init_null (&ggv->dissim->bars_included);
+  vectori_init_null (&ggv->dissim->bins);
 
   ggv->mds_dims = 3;
 
@@ -71,7 +79,8 @@ ggvis_init (ggvisd *ggv)
   ggv->pos_scl = 0.0;
   ggv->mds_rand_select_val = 1.0;
   ggv->mds_freeze_var = 0;
-  ggv->dist_max = 0.0;
+  ggv->Dtarget_max = DBL_MAX;
+  ggv->Dtarget_min = DBL_MIN;
   ggv->prev_nonmetric_active_dist = 0;
   /* */
 }

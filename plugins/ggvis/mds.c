@@ -26,7 +26,6 @@ extern void draw_stress (ggvisd *ggv, ggobid *gg);
 /*extern void update_shepard_labels (gint);*/
 extern void Myqsort(void* bot, int nmemb, int size, CompareFunc compar);
    /* in ggv_qsort.c */
-extern void update_histogram (ggvisd *);
 
 
 #define SAMEGLYPH(d,i,j) \
@@ -320,17 +319,17 @@ power_transform (ggvisd *ggv)
       for (i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
         if (tmp != DBL_MAX)
-          ggv->trans_dist.els[i] = tmp*tmp/ggv->dist_max;
+          ggv->trans_dist.els[i] = tmp*tmp/ggv->Dtarget_max;
       }
     } else { 
       for (i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
         if (tmp != DBL_MAX)
-          ggv->trans_dist.els[i] = -tmp*tmp/ggv->dist_max;
+          ggv->trans_dist.els[i] = -tmp*tmp/ggv->Dtarget_max;
       }
     }
   } else {
-    fac = pow (ggv->dist_max, ggv->mds_Dtarget_power-1);
+    fac = pow (ggv->Dtarget_max, ggv->mds_Dtarget_power-1);
     if (ggv->KruskalShepard_classic == KruskalShepard) { 
       for(i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
@@ -367,7 +366,7 @@ gint realCompare(const void* aPtr, const void* bPtr)
 }
 /* nonmetric transform with isotonic regression of config_dist on dist */
 void
-isotonic_transform (ggvisd *ggv)
+isotonic_transform (ggvisd *ggv, ggobid *gg)
 {
   gint i, j, ii, ij, k;
   gdouble tmp_dist, tmp_distsum, tmp_weightsum, this_weight,
@@ -522,11 +521,12 @@ isotonic_transform (ggvisd *ggv)
                 pow(ggv->Dtarget.vals[i][j], 2*ggv->mds_Dtarget_power);
             }
           }
-        } /* end if(trans_dist[ij] != DBL_MAX) { */
-      } /* end for (j = 0; j < dist.ncols; j++) { */
+        } /* end if(trans_dist[ij] != DBL_MAX) */
+      } /* end for (j = 0; j < dist.ncols; j++) */
   } /* end if(mds_isotonic_mix != 1.0) */
 
-  update_histogram (ggv);  /*-- update histogram of transformed D --*/
+  /*-- update histogram of transformed D --*/
+  ggv_Dtarget_histogram_update (ggv, gg);
 
 } /* end isotonic_transform() */
 
@@ -763,7 +763,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
     if (ggv->metric_nonmetric == metric)
       power_transform (ggv);
     else
-      isotonic_transform (ggv);
+      isotonic_transform (ggv, gg);
     /*-- stress (always lags behind gradient by one step) --*/
     update_stress (ggv, gg);
   }
