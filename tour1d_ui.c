@@ -96,9 +96,6 @@ void
 cpanel_tour1d_make (ggobid *gg) {
   GtkWidget *box, *btn, *sbar, *vb;
   GtkObject *adj;
-/*
-  GtkWidget *lbl, *tgl, *manip_opt;
-*/
   
   gg->control_panel[TOUR1D] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[TOUR1D]), 5);

@@ -56,9 +56,7 @@ fileset_read_init (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
   howMany = g_slist_length(gg->d);
   ans = fileset_read (ldata_in, data_mode, gg);
   if (ans) {
-    GSList *l;
     datad *d;
-    gboolean firstd = true;
     int n, i;
     /* Loop over the newly added datad elements
        and update them.

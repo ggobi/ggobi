@@ -25,15 +25,11 @@ const char *const GGOBI(OpModeNames)[] = {
   "Rotation",
   "1D Tour",
   "2D Tour",
-#ifdef CORRELATION_TOUR_IMPLEMENTED
   "Correlation Tour",
-#endif
   "Scale",
   "Brush",
   "Identify",
-#ifdef EDIT_LINES_IMPLEMENTED
   "Edit Lines",
-#endif
   "Move Points",
 
   "Scatmat",
