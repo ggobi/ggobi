@@ -799,7 +799,8 @@ void
 show_plugin_list(void *garbage, gint action, GtkWidget *w)
 {
   extern GtkWidget * showPluginInfo (GList *plugins);
-  showPluginInfo(sessionOptions->info->plugins);
+  if(sessionOptions->info && sessionOptions->info)
+    showPluginInfo(sessionOptions->info->plugins);
 }
 #endif
 

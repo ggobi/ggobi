@@ -227,7 +227,7 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
   gboolean redraw = true;
   gint nplots = g_list_length (gg->current_display->splots);
   gint k, width, height;
-  gint jvar_indx, new_indx;
+  gint jvar_indx=-1, new_indx;
   GList *l;
   splotd *s, *sp_new;
   GtkWidget *box, *w;

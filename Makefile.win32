@@ -50,8 +50,7 @@ SRC= ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
 \
  read_color.c read_init.c \
  wvis_ui.c write_state.c \
-
-# plugin.c
+ plugin.c
 
 # pp_ui.c
 
@@ -95,8 +94,7 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  cokus.o \
  read_color.o read_init.o \
  wvis_ui.o write_state.o  \
-
-# plugin.o 
+ plugin.o 
 
 # eispack.o
 # pp_ui.o
@@ -107,8 +105,7 @@ ifdef USE_XML
  OB+= $(XML_OB)
 
    # User must specify XML_INC_DIRS
-#-DSUPPORT_PLUGINS=1 
- CFLAGS+=  -DUSE_XML=2 -DSUPPORT_INIT_FILES=1 $(XML_INC_DIRS:%=-I%)
+ CFLAGS+=  -DUSE_XML=2 -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1 $(XML_INC_DIRS:%=-I%)
    # User must specify XML_LIB_DIRS
 # -lzlib (original) or -lz
  XML_LIBS= $(XML_LIB_DIRS:%=-L%) -lxml2 -liconv -lz -lwsock32

@@ -3,11 +3,11 @@
 
 [Setup]
 AppName=ggobi
-AppVerName=ggobi_0.9
+AppVerName=ggobi_0.9-4
 AppPublisher=ggobi
 AppPublisherURL=http://www.ggobi.org
 AppSupportURL=http://www.ggobi.org
-AppUpdatesURL=http://www.ggobi.org
+AppUpdatesURL=http://www.ggobi.org/Download
 DefaultDirName={pf}\ggobi
 DefaultGroupName=ggobi
 AllowNoIcons=yes
@@ -33,7 +33,7 @@ Name: "{group}\ggobi on the Web"; Filename: "{app}\ggobi.url"
 Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe"; MinVersion: 4,4; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\ggobi.exe"; Parameters: "flea.dat"; Description: "Launch ggobi"; Flags: nowait postinstall skipifsilent runminimized
+Filename: "{app}\ggobi.exe"; Parameters: "flea.xml"; Description: "Launch ggobi"; Flags: nowait postinstall skipifsilent runminimized
 
 [UninstallDelete]
 Type: files; Name: "{app}\ggobi.url"

@@ -3,8 +3,10 @@
 
 #include "ggobi.h"
 
-#ifndef Win32
+#ifndef WIN32
 typedef void * HINSTANCE;
+#else
+#include <windows.h>
 #endif
 
 typedef void (*DLFUNC)();

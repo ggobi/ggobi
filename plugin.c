@@ -1,19 +1,34 @@
 #include "plugin.h"
-#ifndef WIN32
-#include <dlfcn.h>
-#endif
 
 #include <stdio.h>
 
 HINSTANCE ggobi_dlopen(const char *name, GGobiPluginInfo *plugin);
 void ggobi_dlerror(char *buf, GGobiPluginInfo *plugin);
 
+#ifdef WIN32
+
+#include <string.h>
+
+int ggobi_dlclose(HINSTANCE handle);
+DLFUNC ggobi_dlsym(HINSTANCE handle, const char *name);
+
+static Dynload winDynload = { 
+                        ggobi_dlopen, 
+                        ggobi_dlclose, 
+                        ggobi_dlsym,  /* warning because we use const char * */
+                        ggobi_dlerror};
+Dynload *dynload = &winDynload;
+
+#else
+
+#include <dlfcn.h>
 static Dynload unixDynload = { ggobi_dlopen, 
                         dlclose, 
                         dlsym,  /* warning because we use const char * */
                         ggobi_dlerror};
 Dynload *dynload = &unixDynload;
 
+#endif
 
 
 HINSTANCE 
@@ -110,8 +125,8 @@ showPluginInfo(GList *plugins)
   gtk_clist_set_column_width(GTK_CLIST(list), 2, 150); 
   gtk_clist_set_column_width(GTK_CLIST(list), 3, 225); 
 
-
-  addPlugins(plugins, list);
+  if(plugins)
+    addPlugins(plugins, list);
   gtk_box_pack_start(GTK_BOX(main_vbox), list, TRUE, TRUE, 0);
   gtk_widget_show(list);
   gtk_widget_show(win);
@@ -169,7 +184,50 @@ closePlugins(ggobid *gg)
 
 /***************************************************************************/
 
+#ifdef WIN32
 
+HINSTANCE
+ggobi_dlopen(const char *name, GGobiPluginInfo *plugin)
+{
+  return(LoadLibrary(name));
+}
+
+void
+ggobi_dlerror(char *buf, GGobiPluginInfo *plugin)
+{
+    LPVOID lpMsgBuf;
+	FormatMessage( 
+	    FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+	    FORMAT_MESSAGE_FROM_SYSTEM | 
+	    FORMAT_MESSAGE_IGNORE_INSERTS,
+	    NULL,
+	    GetLastError(),
+	    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+	    (LPTSTR) &lpMsgBuf,
+	    0,
+	    NULL 
+	    );
+	strcpy(buf, "Failure in LoadLibrary:  ");
+	strcat(buf, lpMsgBuf);
+	LocalFree(lpMsgBuf);
+}
+
+int
+ggobi_dlclose(HINSTANCE handle)
+{
+  FreeLibrary(handle);
+  return(0);
+}
+
+
+DLFUNC
+ggobi_dlsym(HINSTANCE handle, const char *name)
+{
+  return((DLFUNC) GetProcAddress(handle, name));
+}
+
+
+#else
 
 HINSTANCE
 ggobi_dlopen(const char *name, GGobiPluginInfo *plugin)
@@ -182,3 +240,5 @@ ggobi_dlerror(char *buf, GGobiPluginInfo *plugin)
 {
   sprintf(buf, dlerror());
 }
+
+#endif
