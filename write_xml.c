@@ -98,12 +98,27 @@ write_xml_description (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 gboolean
 write_xml_variables (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
-  gint i;
-  fprintf(f,"<variables count=\"%d\">\n", d->ncols); 
+  gint j;
 
-  for(i = 0; i < d->ncols; i++) {
-    write_xml_variable (f, d, gg, i, xmlWriteInfo);
-    fprintf(f,"\n");
+
+  if (gg->save.column_ind == ALLCOLS) {
+    fprintf(f,"<variables count=\"%d\">\n", d->ncols); 
+    for(j = 0; j < d->ncols; j++) {
+      write_xml_variable (f, d, gg, j, xmlWriteInfo);
+      fprintf(f,"\n");
+    }
+  } else if (gg->save.column_ind == SELECTEDCOLS) {
+    /*-- work out which columns to save --*/
+    gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+    gint ncols = selected_cols_get (cols, d, gg);
+
+    fprintf(f,"<variables count=\"%d\">\n", ncols); 
+    for(j = 0; j < ncols; j++) {
+      write_xml_variable (f, d, gg, cols[j], xmlWriteInfo);
+      fprintf(f,"\n");
+    }
+
+    g_free (cols);
   }
 
   fprintf(f,"</variables>\n"); 
@@ -296,15 +311,28 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
     }
 
     fprintf (f, " glyph=\"%s %d\"", gtypestr, d->glyph.els[i].size);
- }
-
- fprintf(f, ">\n");
-
-  for(j = 0; j < d->ncols; j++) {
-     writeFloat (f, d->raw.vals[i][j]);
-     if (j < d->ncols-1 )
-       fprintf(f, " ");
   }
+
+  fprintf(f, ">\n");
+
+  if (gg->save.column_ind == ALLCOLS) {
+    for(j = 0; j < d->ncols; j++) {
+      writeFloat (f, d->raw.vals[i][j]);
+      if (j < d->ncols-1 )
+        fprintf(f, " ");
+     }
+   } else if (gg->save.column_ind == SELECTEDCOLS) {
+     /*-- work out which columns to save --*/
+     gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+     gint ncols = selected_cols_get (cols, d, gg);
+     for(j = 0; j < ncols; j++) {
+       writeFloat (f, d->raw.vals[i][cols[j]]);
+       if (j < ncols-1 )
+         fprintf(f, " ");
+      }
+     g_free (cols);
+   }
+
   fprintf(f, "\n</record>");
 
  return (true);
