@@ -139,7 +139,7 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
         else {
 
           /*-- if we get here, d has one case with the indicated id --*/
-          if (!d->hidden_now.els[i] && d->sampled.els[i]) {
+          if (i < d->nrows && !d->hidden_now.els[i] && d->sampled.els[i]) {
             inrange = true;
             if (i != d->nearest_point) {
               d->nearest_point_prev = d->nearest_point;
