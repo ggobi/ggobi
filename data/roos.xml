@@ -5,7 +5,7 @@
 <data name="roos">
 <description>
 data on kangaroos in australia, which comes from the
-andrews and herzberg "data" book.
+Andrews and Herzberg Data book.
 
 the problem is that there are 3 historical skulls (housed in
 different museums in europe) whose species identification got lost
@@ -18,27 +18,27 @@ kangaroos transported to europe in the late 1800s fed on a bread and
 beer diet!
 </description>
 <variables count="21">
-  <realvariable name="ANIMAL" />
-  <realvariable name="SEX" />
-  <realvariable name="SPECIES" />
-  <realvariable name="BASILAR" />
-  <realvariable name="OCCIPITONASAL" />
-  <realvariable name="PALATILAR" />
-  <realvariable name="PALATEWIDTH" />
-  <realvariable name="NASALLENGTH" />
-  <realvariable name="NASALWIDTH" />
-  <realvariable name="SQUAMOSAL" />
-  <realvariable name="INTERLAC" />
-  <realvariable name="ZYGOMATIC" />
-  <realvariable name="POSTORBITAL" />
-  <realvariable name="ROSTRAL" />
-  <realvariable name="SOPD" />
-  <realvariable name="CREST" />
-  <realvariable name="INCFOR" />
-  <realvariable name="MANDLENGTH" />
-  <realvariable name="MANDWIDTH" />
-  <realvariable name="MANDDEPTH" />
-  <realvariable name="RAMUS" />
+  <realvariable name="ANIMAL"/>
+  <realvariable name="SEX"/>
+  <realvariable name="SPECIES"/>
+  <realvariable name="BASILAR"/>
+  <realvariable name="OCCIPITONASAL"/>
+  <realvariable name="PALATILAR"/>
+  <realvariable name="PALATEWIDTH"/>
+  <realvariable name="NASALLENGTH"/>
+  <realvariable name="NASALWIDTH"/>
+  <realvariable name="SQUAMOSAL"/>
+  <realvariable name="INTERLAC"/>
+  <realvariable name="ZYGOMATIC"/>
+  <realvariable name="POSTORBITAL"/>
+  <realvariable name="ROSTRAL"/>
+  <realvariable name="SOPD"/>
+  <realvariable name="CREST"/>
+  <realvariable name="INCFOR"/>
+  <realvariable name="MANDLENGTH"/>
+  <realvariable name="MANDWIDTH"/>
+  <realvariable name="MANDDEPTH"/>
+  <realvariable name="RAMUS"/>
 </variables>
 <records
  count="151" glyph="fr 1" color="0" missingValue="na">
