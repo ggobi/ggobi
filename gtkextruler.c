@@ -386,6 +386,8 @@ gtk_ext_ruler_calc_scale (GtkExtRuler *ruler, gchar direction)
     gfloat wsubdiv;
     gint ndiv;
 
+    /*-- dfs: subdiv is never assigned a value, but its value is used --*/
+
     /*g_return_if_fail (ruler != NULL);*/
     /*g_return_if_fail (GTK_IS_MYHRULER (ruler));*/
 
