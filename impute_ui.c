@@ -113,7 +113,7 @@ impute_window_open (ggobid *gg)
     tgl = gtk_check_button_new_with_label ("Show missing values");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(tgl), on);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-      "Draw the missing values when plotting",
+      "Draw the missing values when plotting displays; if there are multiple datasets, this applies only to the current dataset",
       NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
       GTK_SIGNAL_FUNC (show_missings_cb), (gpointer) gg);
