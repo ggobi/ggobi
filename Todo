@@ -1,3 +1,10 @@
+Have the read_xml process colorschemes (should be there already)
+and set the activeColorScheme of the ggobid to the appropriate one.
+
+
+Add warning messages to XML parser.
+  E.g. reading incomplete or excess elements.
+
 Plugins
   showPluginInfo should color the input plugins differently.
 

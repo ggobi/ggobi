@@ -337,9 +337,10 @@ ggobi_alloc()
   if(sessionOptions->activeColorScheme)
       tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,
         sessionOptions->activeColorScheme);
-  else
+  else {
       tmp->activeColorScheme = (colorschemed *)
-        g_list_nth_data(tmp->colorSchemes, 0);
+	                         g_list_nth_data(tmp->colorSchemes, 0);
+  }
 #endif
 
   totalNumGGobis++;
@@ -375,13 +376,8 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 
   vis = gdk_visual_get_system ();
 
-  gg = ggobi_alloc();
-
-  gg->mono_p = (vis->depth == 1 ||
-               vis->type == GDK_VISUAL_STATIC_GRAY ||
-               vis->type == GDK_VISUAL_GRAYSCALE);
-
   parse_command_line (&argc, argv, gg);
+
 
 #ifdef SUPPORT_INIT_FILES
   process_initialization_files();
@@ -397,10 +393,24 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
     setStandardPrintHandlers();
 
 #ifdef USE_XML
-  if(sessionOptions->info->colorSchemeFile) {
+  if(sessionOptions->info->colorSchemeFile && sessionOptions->colorSchemes == NULL) {
       read_colorscheme(sessionOptions->info->colorSchemeFile, &sessionOptions->colorSchemes);
   }
 #endif
+
+  if(sessionOptions->colorSchemes == NULL) {
+      /* Debby, create the default color scheme from the built-in data 
+         and append. */
+      colorschemed *scheme = NULL;
+      sessionOptions->colorSchemes = g_list_append(sessionOptions->colorSchemes, scheme);
+  }
+  
+
+  gg = ggobi_alloc();
+
+  gg->mono_p = (vis->depth == 1 ||
+               vis->type == GDK_VISUAL_STATIC_GRAY ||
+               vis->type == GDK_VISUAL_GRAYSCALE);
 
   make_ggobi (sessionOptions, processEvents, gg);
 
