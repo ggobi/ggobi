@@ -218,6 +218,12 @@ subset_rowlab (gchar *rowlab, datad *d, ggobid *gg)
   /*gint top = (d->nrgroups > 0) ? d->nrgroups : d->nrows;*/
   gint top = d->nrows;
 
+  /*-- remove all sticky labels --*/
+  GtkWidget *w = widget_find_by_name (gg->control_panel[IDENT],
+    "IDENTIFY:remove_sticky_labels");
+  gtk_signal_emit_by_name (GTK_OBJECT (w), "clicked", gg);
+  /*-- --*/
+
   subset_clear (d, gg);
 
   for (i=0; i<top; i++) {
