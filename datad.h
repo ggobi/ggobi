@@ -88,7 +88,7 @@ struct _datad {
 
   gint ncols;
   GSList *vartable;
-  GtkWidget *vartable_clist;
+  GtkWidget *vartable_clist[all_vartypes];
 
   array_f raw, tform;
   array_g world, jitdata;

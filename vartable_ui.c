@@ -19,8 +19,6 @@
 
 #include "vartable.h"
 
-extern GtkCList * vartable_clist_get (ggobid *gg);
-
 static void close_btn_cb (GtkWidget *w, ggobid *gg)
 {
   gtk_widget_hide (gg->vartable_ui.window);
@@ -128,9 +126,9 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       vt->lim_specified.min = vt->lim_specified_tform.min = min_val;
       vt->lim_specified.max = vt->lim_specified_tform.max = max_val;
 
-      gtk_clist_set_text (clist, j, CLIST_USER_MIN,
+      gtk_clist_set_text (clist, j, REAL_CLIST_USER_MIN,
         g_strdup_printf("%8.3f", min_val));
-      gtk_clist_set_text (clist, j, CLIST_USER_MAX,
+      gtk_clist_set_text (clist, j, REAL_CLIST_USER_MAX,
         g_strdup_printf("%8.3f", max_val));
 
       vt->lim_specified_p = min_p && max_p;
@@ -337,8 +335,8 @@ void range_unset (ggobid *gg)
     vt = vartable_element_get (j, d);
     vt->lim_specified_p = false;
     /*-- then null out the two entries in the table --*/
-    gtk_clist_set_text (clist, j, CLIST_USER_MIN, g_strdup(""));
-    gtk_clist_set_text (clist, j, CLIST_USER_MAX, g_strdup(""));
+    gtk_clist_set_text (clist, j, REAL_CLIST_USER_MIN, g_strdup(""));
+    gtk_clist_set_text (clist, j, REAL_CLIST_USER_MAX, g_strdup(""));
   }
   g_free ((gchar *) cols);
 
@@ -392,10 +390,12 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
   }
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 0) {
+#ifndef MULTIPLE_CLISTS
     GtkNotebook *nb;
     gint indx;
     GtkWidget *swin;
     GtkAdjustment *adj;
+#endif
     newvar_add (vtype, vname, d, gg);
 
 #ifndef MULTIPLE_CLISTS
@@ -453,6 +453,7 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
   gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Variable name: "),
     true, true, 2);
   entry = gtk_entry_new();
+  gtk_entry_set_text (GTK_ENTRY (entry), "foo");
   gtk_widget_set_name (entry, "newvar_entry");
 
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);

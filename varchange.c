@@ -19,10 +19,6 @@
 
 #include "vartable.h"
 
-void vartable_copy_var (gint jfrom, gint jto, datad *d);
-gboolean array_contains (gint* arr, gint n, gint el);
-void vartable_element_new (datad *d);
-void transform_values_copy (gint jfrom, gint jto, datad *d);
 
 static void
 addvar_vartable_expand (gint ncols, datad *d, ggobid *gg)
@@ -55,13 +51,21 @@ addvar_pipeline_realloc (datad *d, ggobid *gg)
 static void
 addvar_propagate (gint ncols_prev, gint ncols, datad *d, ggobid *gg)
 {
-  gint k, jvar;
+  gint j, k, jvar;
+  vartabled *vt;
 
-  for (k=0; k<ncols; k++) {
-    jvar = ncols_prev + k;  /*-- its new index --*/
+  for (j=0; j<ncols; j++) {
+    jvar = ncols_prev + j;  /*-- its new index --*/
 
     /*-- update the clist widget (the visible table) --*/
-    vartable_row_append (d, gg);          /*-- append empty --*/
+    vartable_row_append (jvar, d, gg);          /*-- append empty --*/
+
+    /*-- add rows for the levels for categorical variables --*/
+    vt = vartable_element_get (jvar, d);
+    if (vt->vartype == categorical)
+      for (k=0; k<vt->nlevels; k++)
+        vartable_row_append (jvar, d, gg);
+
     vartable_cells_set_by_var (jvar, d);  /*-- then populate --*/
 
     /*-- run the data through the head of the pipeline --*/
@@ -110,6 +114,10 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
   /*-- update the vartable struct --*/
   limits_set_by_var (jvar, true, true, d, gg);
   vt->collab = vt->collab_tform = g_strdup (vname);
+  if (vtype == ADDVAR_ROWNOS)
+    vt->vartype = counter;
+  /*-- the other should be categorical, eventually, and the
+       level names could be color and glyph names if we had them --*/
   /*-- --*/
 
   addvar_propagate (d_ncols_prev, 1, d, gg);
@@ -291,18 +299,18 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   }
 
   /*-- delete rows from clist; no copying is called for --*/
-  if (d->vartable_clist != NULL) {
-    l = g_list_last (GTK_CLIST (d->vartable_clist)->row_list);
+  if (d->vartable_clist[real] != NULL) {
+    l = g_list_last (GTK_CLIST (d->vartable_clist[real])->row_list);
     while (l) {
       row = GTK_CLIST_ROW (l);
       /*-- grab the text in the invisible cell of the row to get the index --*/
-      varstr = GTK_CELL_TEXT(row->cell[CLIST_VARNO])->text;
+      varstr = GTK_CELL_TEXT(row->cell[REAL_CLIST_VARNO])->text;
       if (varstr != NULL && strlen (varstr) > 0) {
         irow = atoi (varstr);
         if (!array_contains (keepers, nkeepers, irow)) {
-          gtk_clist_freeze (GTK_CLIST (d->vartable_clist));
-          gtk_clist_remove (GTK_CLIST (d->vartable_clist), irow);
-          gtk_clist_thaw (GTK_CLIST (d->vartable_clist));
+          gtk_clist_freeze (GTK_CLIST (d->vartable_clist[real]));
+          gtk_clist_remove (GTK_CLIST (d->vartable_clist[real]), irow);
+          gtk_clist_thaw (GTK_CLIST (d->vartable_clist[real]));
         }
       }
       l = l->prev;
