@@ -612,7 +612,7 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
   gint diamond_dim = DIAMOND_DIM;
-  gchar *lbl;
+  gchar *lbl = NULL;
 
   if (k < 0 || k >= d->nrows) return;
 
@@ -629,16 +629,33 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
   /*-- add the label last so it will be in front of other markings --*/
   if (cpanel->identify_display_type == ID_CASE_LABEL)
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
+  /*-- if categorical, use level name ... --*/
   else if (cpanel->identify_display_type == ID_VAR_LABELS) {
+    vartabled *vt;
     GtkWidget *clist =
       get_clist_from_object (GTK_OBJECT (gg->control_panel[IDENT]));
     gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
     gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+    gint lval;
+
     for (j=0; j<nvars; j++) {
-      if (j == 0)
-        lbl = g_strdup_printf ("%g", d->tform.vals[k][vars[j]]);
-      else
-        lbl = g_strdup_printf ("%s, %g", lbl, d->tform.vals[k][vars[j]]);
+      vt = vartable_element_get (vars[j], d);
+
+      if (vt->categorical_p) {
+        lval = (gint) d->tform.vals[k][vars[j]] - 1;
+       }
+
+      if (j == 0) {
+        lbl = (vt->categorical_p) ?
+          g_strdup_printf ("%s",
+            (gchar *) g_array_index (vt->level_names, gchar *, lval)) :
+          g_strdup_printf ("%g", d->tform.vals[k][vars[j]]);
+      } else {
+        lbl = (vt->categorical_p) ?
+          g_strdup_printf ("%s, %s", lbl,
+            (gchar *) g_array_index (vt->level_names, gchar *, lval)) :
+          g_strdup_printf ("%s, %g", lbl, d->tform.vals[k][vars[j]]);
+      }
     }
   } else {
     switch (proj) {
@@ -692,29 +709,40 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
       break;
     }
   }
-  gdk_text_extents (style->font, lbl, strlen (lbl),
-    &lbearing, &rbearing, &width, &ascent, &descent);
 
-  /*-- underline the nearest point label?  --*/
-  if (sp->screen[k].x <= sp->max.x/2) {
-    gdk_draw_string (drawable, style->font, gg->plot_GC,
-      sp->screen[k].x+diamond_dim,
-      sp->screen[k].y-diamond_dim,
-      lbl);
-    if (nearest)
-      gdk_draw_line (drawable, gg->plot_GC,
-        sp->screen[k].x+diamond_dim, sp->screen[k].y-diamond_dim+1,
-        sp->screen[k].x+diamond_dim+width, sp->screen[k].y-diamond_dim+1);
+  /*
+   * if displaying 'variable labels' and no variable is selected,
+   * lbl can still be NULL here.
+  */
+  if (lbl) {
+    gdk_text_extents (style->font, lbl, strlen (lbl),
+      &lbearing, &rbearing, &width, &ascent, &descent);
+
+    /*-- underline the nearest point label?  --*/
+    if (sp->screen[k].x <= sp->max.x/2) {
+      gdk_draw_string (drawable, style->font, gg->plot_GC,
+        sp->screen[k].x+diamond_dim,
+        sp->screen[k].y-diamond_dim,
+        lbl);
+      if (nearest)
+        gdk_draw_line (drawable, gg->plot_GC,
+          sp->screen[k].x+diamond_dim,
+          sp->screen[k].y-diamond_dim+1,
+          sp->screen[k].x+diamond_dim+width,
+          sp->screen[k].y-diamond_dim+1);
       
-  } else {
-    gdk_draw_string (drawable, style->font, gg->plot_GC,
-      sp->screen[k].x - width - diamond_dim,
-      sp->screen[k].y - diamond_dim,
-      lbl);
-    if (nearest)
-      gdk_draw_line (drawable, gg->plot_GC,
-        sp->screen[k].x - width - diamond_dim, sp->screen[k].y - diamond_dim+1,
-        sp->screen[k].x - diamond_dim, sp->screen[k].y - diamond_dim+1);
+    } else {
+      gdk_draw_string (drawable, style->font, gg->plot_GC,
+        sp->screen[k].x - width - diamond_dim,
+        sp->screen[k].y - diamond_dim,
+        lbl);
+      if (nearest)
+        gdk_draw_line (drawable, gg->plot_GC,
+          sp->screen[k].x - width - diamond_dim,
+          sp->screen[k].y - diamond_dim+1,
+          sp->screen[k].x - diamond_dim,
+          sp->screen[k].y - diamond_dim+1);
+    }
   }
 
 }
