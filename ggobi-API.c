@@ -1180,3 +1180,47 @@ GGOBI(getDescription)(ggobid *gg)
 {
   return(g_strdup(gg->filename));
 }
+
+/*
+  Finds the index of the dataset named `name'
+  in the specified ggobid object.
+ */
+int 
+GGOBI(datasetIndex)(const char *name,  ggobid *gg)
+{
+  datad *d;
+  int ctr = 0;
+  GSList *tmp = gg->d;
+
+  while(tmp) {
+    d =(datad *) tmp->data;
+    if(strcmp(name, d->name) == 0)
+      return(ctr);
+    ctr++;
+    tmp = tmp->next;
+  }
+
+  return(-1);
+}
+
+/*
+  Returns the names of the different datasets
+  maintained in the specified ggobid object.
+ */
+gchar **
+GGOBI(getDatasetNames)(int *n, ggobid *gg)
+{
+  int i;
+  datad *d;
+  gchar **names;
+  GSList *tmp = gg->d;
+  *n = g_slist_length(gg->d);
+  names = (gchar **) g_malloc(sizeof(gchar *) * (*n));
+  for(i = 0; i < *n ; i++) {
+    d =(datad *) tmp->data;
+    names[i] = g_strdup(d->name);
+    tmp = tmp->next;
+  }
+
+  return(names);
+}
