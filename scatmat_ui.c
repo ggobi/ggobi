@@ -32,16 +32,16 @@ static void selection_mode_cb (GtkWidget *w, gpointer cbd)
   switch (indx) {
     case 0:
       cpanel->scatmat_selection_mode = VAR_REPLACE;
-      break;
+    break;
     case 1:
       cpanel->scatmat_selection_mode = VAR_INSERT;
-      break;
+    break;
     case 2:
       cpanel->scatmat_selection_mode = VAR_APPEND;
-      break;
+    break;
     case 3:
       cpanel->scatmat_selection_mode = VAR_DELETE;
-      break;
+    break;
   }
 }
 

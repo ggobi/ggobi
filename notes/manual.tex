@@ -1,14 +1,10 @@
 \documentclass[11pt]{article}
 \usepackage{fullpage}
 
+
 % Issues:
 %  I haven't worked out a consistent notation:  when to display
 %  a button's contents in bf, when to use em, etc.
-
-%  We need a better terminology to distinguish between the two
-%  types of variable selection.  Can I call one widget the
-%  variable selection panel, and the other the variable chooser?
-%  Can you think of something better?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -24,11 +20,17 @@
   
 \ifpdf
   \pdfoutput=1
-  \usepackage[pdftex]{graphicx}  % uncomment if using graphicx
-  %  \usepackage[pdftex]{hyperref}  % uncomment if using hyperref
+  %\usepackage[pdftex]{graphicx}  % uncomment if using graphicx
+  \usepackage[pdftex]{hyperref}  % uncomment if using hyperref
 \else
-  \usepackage{graphicx}  % uncomment if using graphicx
-  %  \usepackage{hyperref}  % uncomment if using hyperref
+  %\usepackage{graphicx}  % uncomment if using graphicx
+  \usepackage[colorlinks=true,
+    linkcolor=webgreen,
+    filecolor=webbrown,
+    citecolor=webgreen]{hyperref} % uncomment if using hyperref
+  \definecolor{webgreen}{rgb}{0,.5,0}
+  \definecolor{webbrown}{rgb}{.6,0,0}
+  % dvips -z
 \fi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -58,7 +60,6 @@ Duncan Temple Lang, Lucent Bell Labs
 \date{January 2001}
 
 \maketitle
-
 
 \begin{abstract}
 
@@ -94,7 +95,7 @@ This paper gives an overview of the layout and functionality of ggobi,
 interactive graphical software for exploratory data analysis.  Readers
 who are familiar with xgobi will find much that is familiar in ggobi's
 design, and might want to skip directly to section \ref{slbl:xgobi}
-where key differences between the two tools are described.
+where key differences between the two programs are described.
 
 You will find that you can use ggobi for simple tasks with virtually
 no instruction.  All that a user needs is some cursory knowledge of
@@ -107,37 +108,34 @@ success is obtained by users who have gained experience with the
 system and combine it with creativity and data analytic
 sophistication.
 
-We first describe the specifics of GGobi's layout and functionalities.
-Figure~1 shows a GGobi window, made using a version that was
-available in early 2001.
-
-\vbox{
-\vspace{.4in}
-%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
-\centerline{[Figure 1 here]}
-
-\vspace{.15in} \centerline{ \parbox{6in}
-{Figure~1: Layout of a ggobi session.  The display window contains a
-simple scatterplot.  Brushing has been used, and three different
-symbols are in use.
-}}
-\vspace{.4in}
-}
+We begin with a tutorial, and move on to describe ggobi's layout
+and functionality in detail.
 
 \section{Tutorial}
 
 Several sample data files are included with the ggobi distribution,
 in a directory called {\bf data,} and there you will find the file
 {\bf pigs.xml}, on a dataset on pig production in the United Kingdom,
-taken from Data by Andrews and Herzberg.  Start ggobi for the 
-pigs data by typing:
+taken from {\em Data} by Andrews and Herzberg.  Start ggobi for the 
+pig production data by typing:
 
 \begin{quote}
 ggobi pigs
 \end{quote}
 
 Two windows will appear, the ggobi control panel and a scatterplot,
-as shown in Figure \ref{}.
+as shown in figure~1.
+
+\vbox{
+\vspace{.4in}
+\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
+
+\vspace{.15in} \centerline{ \parbox{6in}
+{Figure~1: Layout of a ggobi session.  The plotting window contains a
+scatterplot of the pig production data.
+}}
+\vspace{.4in}
+}
 
 The control panel has a panel of ViewMode controls on the left and a
 variable selection region on the right.  You can see that the
@@ -230,15 +228,16 @@ tool.}
 
 \subsection{The major functions}
 
-Across the top of the control panel in Figure 1 stretch a row of buttons for
-selecting major GGobi functions from pull-down menus.  Buttons
-such as ``File'', ``Display,'' ``ViewMode'', ``Tools'', ``Options'' and
-``DisplayTree'' organize functions in menus.  
+Across the top of the control panel in Figure 1 stretches a row of
+buttons for selecting major GGobi functions from pull-down menus.
+Buttons such as {\bf File}, {\bf Display,} {\bf ViewMode}, {\bf
+Tools}, {\bf Options} and {\bf DisplayTree} organize functions in
+menus.
 
-As expected, the ``File'' button opens a menu for selecting
+As expected, the {\bf File} button opens a menu for selecting
 input/output functions as well as exiting.
 
-The ``Display'' button opens a manu for opening a new plotting
+The {\bf Display} button opens a manu for opening a new plotting
 window.  The display types are
 \begin{itemize}
 \itemsep 0em
@@ -249,31 +248,32 @@ window.  The display types are
 \end{itemize}
 
 If the data has missing values, a scatterplot or scatterplot matrix
-of the ``missingness'' information can be opened.
+of the ``missingness'' information can be opened.  Each display type
+is discussed in section ~\label{DisplayTypes}.
 
-The ``ViewMode'' button opens a menu for selecting from ggobi's
+The {\bf ViewMode} menu contains links to ggobi's
 inventory of interactive graphics operations: 
 \begin{itemize}
 \itemsep 0em
-\item 1-D dotplots and average shifted histograms,
-\item 2-D XY-plots, 
-\item 1-D and 2-D tours, random or guided,
-\item axis scaling,
-\item brushing, 
-\item identification, 
-\item point motion.  
+\item 1DPlot: 1-D dotplots and average shifted histograms,
+\item XYPlot: 2-D scatterplots,
+\item 1DTour: random 1-Dimensional tour,
+\item 2DTour: random 2-Dimensional tour,
+\item 2x1DTour: correlation tour, random and guided,
+\item Scale: axis scaling,
+\item Brush: setting point glyphs and point and edge colors,
+\item Identify: labelling points
+\item Move Points: direct manipulation of point position.
 \end{itemize}
 
-The unifying feature of these operations is that they take over the
-display area and dictate the mouse operations for directly
-manipulating the view.  Examples are mouse sweeps to control 3-D
-rotations, or moves of the brush when brushing.  These operations
-also determine the content of the control panel on the left of the
-window (see below).  Exactly one mode is selected at all times.
-``ViewModes'' will be discussed in greater detail in
-section~\ref{slbl:ViewModes}.
+Each of these operations defines the mouse operations for directly
+manipulating the view.  Examples are dragging the mouse to control
+point cloud rotations, or to highlight points.  These operations also
+determine the content of the control panel on the left of the
+window.  Exactly one mode is selected at all times.  The view modes
+are discussed in section~\ref{slbl:ViewModes}.
 
-The ``Tools'' button gives access to 
+The {\bf Tools} menu gives access to 
 \begin{itemize}
 \itemsep 0em
 \item a variable manipulation table,
@@ -282,29 +282,32 @@ The ``Tools'' button gives access to
 \item jittering controls,
 \item a panel for hiding groups of cases,
 \item subsetting functions for systematic and random subsampling, 
-\item assignment of a value to missings.
-
+\item a tool for managing missing values.
 \end{itemize}
-The division between ``ViewMode'' functions and ``Tools'' is somewhat
-arbitrary.  The ``ViewMode'' functions determine the mouse
-interactions in the display windows, while none of the ``Tools''
-does.  Furthermore, ``ViewMode'' functions populate the left hand
-control panel in the main ggobi window, while ``Tools'' create their
-own permanent control panels or views of the data in separate
-windows, as shown in figure~2.  For example, the variable
-manipulation ``Tool'' opens a table of data each variable, and the
-transformation ``Tool'' generates a transformation control window.
 
-The ``Options'' button allows users to set some options for the
+Each tool is discussed in section ~\ref{Tools}.
+
+There are a couple of distinctions between view modes and tools
+The view mode functions determine the mouse interactions in the
+display windows, while none of the Tools does.  Furthermore,
+view mode functions populate the control panel in the main ggobi
+window, while tools create their own permanent control panels
+or views of the data in separate windows, as shown in figure~?.  For
+example, the {\bf variable manipulation tool} is a window containing
+a table of data each variable and several buttons, and the {\bf
+variable transformation tool} is also a separate window.
+
+The {\bf Options} menu allows users to set some options for the
 main control window:  whether tooltips are displayed, for instance,
-and whether the control panel is shown.
+and whether the control panel is shown.  In some view modes, it contains
+additional options that are specific to that mode.
 
-The ``DisplayTree'' menu allows users to open a tree listing
+Other menus are present only during certain modes:  you will
+sometimes find an {\bf I/O} menu or a {\bf Reset} menu.
+
+The {\bf DisplayTree} menu allows users to open a tree listing
 all the currently open display windows, each of which may contain
 several plots.
-
-In some ViewModes, an ``I/O'' menu appears, with options for
-reading and writing data pertaining to that mode.
 
 \subsection{Graphical displays}
 \label{slbl:GraphicalDisplays}
@@ -313,8 +316,8 @@ reading and writing data pertaining to that mode.
 
 Since there are multiple displays, some of which contain multiple
 plots, the question arises:  Which plot in which display window
-corresponds to the control panel?  If you select the {\bf Brush} {\bf
-ViewMode}, how can you tell which plot is going to respond to
+corresponds to the control panel?  If you select the {\bf Brush} mode,
+how can you tell which plot is going to respond to
 brushing?
 
 There is in ggobi a notion of the ``current display'' and the
@@ -333,20 +336,39 @@ current display type and ViewMode.
 
 \subsubsection{Display types}
 
-Each display type is briefly described here.  A full description of the
-view modes and variable selection behavior for each display will be
-given in section \ref{slbl:ViewModes}.
+Each display type is briefly described here. 
 
 As mentioned earlier, there are presently four main display types:
 
-The {\bf scatterplot} display is a window containing a single scatterplot.
-By default, it includes axes; they can be turned off using the Options
-menu in the main control window.  It has the largest number of view
-modes of any display.
+The {\bf scatterplot} display is a window containing a single
+scatterplot.  By default, it includes axes; they can be turned off
+using the Options menu in the main control window.  It has the
+largest number of view modes of any display, and each of the
+projection modes has its own rules for variable selection.  The
+variable selection interface for the 1DPlot and XYPlot modes is a
+column of checkboxes: clicking left on one of these selects a
+variable to be plotted horizontally, clicking middle or right selects
+a vertical variable.  The tour modes all use a set of labelled
+circles for variable selection, and they provide some feedback about
+current projection.  The variable selection behavior for the tour
+modes will be described in the section for each mode.
 
 The {\bf scatterplot matrix} is a window containing a symmetric matrix
 of scatterplots for the chosen variables.  The plots along the diagonal
-are ASHes (Average Shifted Histograms).
+are ASHes (Average Shifted Histograms).  The matrix is required to be
+symmetric, and that constraint affects its variable selection behavior.
+
+\begin{itemize}
+\item Replace:  First select one of the plots along the diagonal
+  to tell ggobi uniquely which variable to replace, then click on
+  one of the checkboxes in the variable selection region.
+\item Insert (Append):  First select one of the plots along the
+  diagonal to tell ggobi uniquely where to insert (append) the new
+  variable, then click on one of the variable checkboxes.  (For now,
+  ggobi will not add a variable that's already plotted.)
+\item Delete:  No plot selection is required; just click on the
+  variable you want to delete.
+\end{itemize}
 
 The {\bf parallel coordinates} display contains a single parallel
 coordinates plot, which can be arranged horizontally or vertically.
@@ -355,14 +377,43 @@ imagine deconstructing a high-dimensional scatterplot and arranging
 its axes in parallel instead of orthogonally.  To represent case $i$,
 think of drawing a dot on axis $j$ at that point's value for variable
 $j$, and then connecting the dots into one set of connected line segments.
-For a more detailed explanation, see [].)
+For a more detailed explanation, see [].)  The line segments are drawn
+by default, but you can turn them off using the {\bf Options} menu
+on the display menubar.
 
-The {\bf time series plots:}
+By default, the plots are simple dotplots, but they can also be drawn
+using one of the other two methods for 1D plots:  as a textured dot
+strip or an ASH.
 
-[I can't quite figure this out.]
+The variable selection behavior works as follows:
+
+\begin{itemize}
+\item Replace:  First select one of the plots, then click on one
+  of the variable checkboxes to replace its plotted variable.
+\item Insert (Append):  First select one of the plots, then click on
+  one of the variable checkboxes to insert (append) a new plot.  (For
+  now, ggobi will not add a variable that's already plotted.)
+\item Delete:  No plot selection is required; just click on the
+  variable whose plot you want to delete.
+\end{itemize}
+
+The {\bf time series display} contains a row or column of 2-variable
+plots with a common axis, usually a time variable.  By default, the
+points are connected with line segments.  
+
+The time series display uses the checkbox variable selection interface,
+and the behavior of the checkboxes depends on the state of the
+{\bf Selection mode} option menu in the control panel.
+
+\begin{itemize}
+\item Replace: 
+\item Insert
+\item Append
+\item Delete
+\end{itemize}
 
 \subsubsection{Missing values displays}
-% \ref{slbl:MissingData}
+\label{slbl:MissingData}
 
 When your data includes missing values, two additional display types
 are available.  The missing values scatterplot and scatterplot matrix
@@ -376,8 +427,59 @@ the association between missing values and the variables.
 
 \section{Data format}
 \label{slbl:DataFormat}
+
+\subsection {ASCII}
+\label{slbl:ASCII}
+
+The basics of the ascii data format used in xgobi are still supported, with
+some changes.
+
+The only essential file is the one containing the data itself.  Each
+line in the file contains one row of the input data matrix, and lines
+must be separated by carriage returns.  Columns, or variables, can be
+separated by any number of tabs or spaces.  The file can have the
+suffix {\em .dat}, but no suffix is required, so it is named either
+{\bf filename.dat} or just {\em filename}.
+
+You can supply variable and case labels in associated files.
+Variable (column) labels can be in a file named {\bf datafile.col}
+(or {\bf datafile.column}, {\bf datafile.collab}, or {\bf
+datafile.var}).  Case (row) labels can be supplied in a file named
+{\bf datafile.row} (or {\bf data\-file.row\-lab} or {\bf
+data\-file.case}).  There should be one label per line, and the label
+can include blanks.  If variable or case labels are not supplied,
+default labels using column or row numbers are used.
+
+The files {\bf datafile.glyphs} and {\bf datafile.colors} can be
+used to set the plotting characters and colors to be used in
+drawing each point.  Glyphs can be specified in two ways:
+
+\begin{itemize}
+\item with a string for glyph type and a number for glyph size, where
+the string is one of ``plus'', ``x'', ``or'' (open rectangle), ``fr''
+(filled rectangle), ``oc'' (open circle), ``fc'' (filled circle),
+``.'' (a one-pixel point), and the number is between 1 and 8, or
+\item with one number per line, where the number is between one and
+49.  Here's how to generate that number: the type is between 1 and 7,
+using the ordering just presented, and the size is between 1 and 8
+(though it must be 1 for the single-pixel glyph).  The number is then
+$8 \times (type-1) + size$.
+\end{itemize}
+
 \subsection {XML}
 \label{slbl:XML}
+
+The XML format is described in {\em Using XML Input Formats},
+which you should find where you found this manual.  The XML format
+allows more detailed specification, such as
+
+\begin{itemize}
+\item multiple datasets within a single process,
+\item rules for linking between datasets,
+\item edges: line segments connecting pairs of points, and
+\item the colormap to be used in brushing.
+\end{itemize}
+
 \subsection {Database access}
 \label{slbl:MySQL}
 
@@ -397,9 +499,9 @@ projection method.
 
 As an example, start ggobi with some data, and watch what happens
 in the main ggobi window and a a single scatterplot display.   When ggobi
-starts, it's in XYPlot mode by default, so the scatterplot window shows
-a 2-dimensional projection of the data.  If you select {\em Scale} or
-{\em Brush} (or any choice in the bottom half of the menu), the control
+starts, it's in {\bf XYPlot} mode by default, so the scatterplot window shows
+a 2-dimensional projection of the data.  If you select {\bf Scale} or
+{\bf Brush} (or any choice in the bottom half of the menu), the control
 panel at the left of the main window changes, reflecting the different
 interactions available to you in each mode.  However, the projection in
 the window doesn't change.  If you click on the checkboxes in the
@@ -407,7 +509,7 @@ variable selection panel at the right of the main ggobi window, you
 replace one of the plotted variables.
 
 Now select {\em 2D Tour} in the ViewMode menu.  {\em Everything}
-changes at once, because you've effective selected both a new mode and
+changes at once, because you've effectively selected both a new mode and
 a new projection type at the same time.
 \begin{itemize}
 \itemsep 0em
@@ -560,7 +662,7 @@ menu bar contains these items:
 \end{tabbing}
 %
 
-\subsection{Linked identification of points}
+\subsection{Identification}
 
 This mode is used to display labels near points in the plotting
 window.  The labels are taken from the file of row or case labels
@@ -586,14 +688,11 @@ labels at once by clicking on {\bf Make all sticky}.
 
 \subsection{Line editing}
 
-\section {Display types}
-\subsection{Scatterplot}
-\subsection{Scatterplot matrix}
-\subsection{Parallel coordinate plot}
-\subsection{Time series plots}
 
 \newpage
 \section{Tools}
+\label{Tools}
+
 \subsection{Variable manipulation tool}
 \label{slbl:VarManip}
 
@@ -740,6 +839,8 @@ a good chance it's not just an artifact of visualization.
 
 \section{Implementation}
 
+
+\newpage
 \section{Differences from xgobi}
 \label{slbl:xgobi}
 

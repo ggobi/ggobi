@@ -330,7 +330,7 @@ updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info)
   info->defaultGlyphSizeName = str = g_malloc(5 * sizeof(char));
   sprintf(str, "%d", info->defaultGlyphSize);
 
-  str = GGOBI(getGlyphTypeName)(info->defaultGlyphType);  
+  str = (gchar *) GGOBI(getGlyphTypeName)(info->defaultGlyphType);  
   info->defaultGlyphTypeName = g_strdup(str);
 
   return(info);

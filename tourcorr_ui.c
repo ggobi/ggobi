@@ -434,7 +434,7 @@ tourcorr_menus_make (ggobid *gg) {
     gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
     gg->menus.io_menu); 
-  submenu_insert (gg->menus.io_item, gg->main_menubar, -1);
+  submenu_insert (gg->menus.io_item, gg->main_menubar, 4);
 
 /*
  * Options menu

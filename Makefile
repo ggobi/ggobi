@@ -4,7 +4,7 @@ endif
 
 ggobi:
 
-EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
+#EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 
 include local.config
 

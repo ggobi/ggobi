@@ -544,7 +544,7 @@ point_glyphs_read (InputDescription *desc, gboolean reinit,
         }
 
         glyph.size = gsize;
-        if (gsize < 1 || gsize > 5) {
+        if (gsize < 1 || gsize > 8) {
           use_defaults = true;
           readGlyphErr ();
         }

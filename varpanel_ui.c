@@ -460,7 +460,7 @@ varpanel_tooltips_set (ggobid *gg)
         case tsplot:
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
             checkbox_get_nth (j, d),  
-            "Click left to replace the horizontal (time) variable.  Click middle to replace/insert/append other variable, or to delete it.",
+            "Click left to replace the horizontal (time) variable.  Click middle to replace/insert/append another variable, or to delete it.",
             NULL);
         break;
 

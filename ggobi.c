@@ -272,7 +272,6 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
                vis->type == GDK_VISUAL_STATIC_GRAY ||
                vis->type == GDK_VISUAL_GRAYSCALE);
 
-
   parse_command_line (&argc, argv, gg);
 
   if(sessionOptions->verbose)

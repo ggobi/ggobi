@@ -201,7 +201,6 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
   gdk_color.blue = (guint16)(color[2]*65535.0);
 
   /* Allocate color */
-/*  gdk_colormap_alloc_color (cmap, &gdk_color, false, true);*/
   gdk_color_alloc (cmap, &gdk_color);
 
   if (gg->color_ui.current_da == gg->color_ui.bg_da) {
@@ -268,13 +267,12 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
     /*
      * Connect to the "color_changed" signal, set the client-data
      * to the colorsel widget
-    */
     gtk_signal_connect (GTK_OBJECT (colorsel), "color_changed",
       (GtkSignalFunc) color_changed_cb, gg);
+    */
 
     /*
      * Connect up the buttons
-    */
     ok_button = colordlg->ok_button;
     cancel_button = colordlg->cancel_button;
     help_button = colordlg->help_button;
@@ -282,6 +280,7 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
                         (GtkSignalFunc) dlg_close_cb, gg);
     gtk_signal_connect (GTK_OBJECT (cancel_button), "clicked",
                         (GtkSignalFunc) dlg_close_cb, gg);
+    */
 
   } else {
 
@@ -314,32 +313,6 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
   }
 
   /* Show the dialog */
-/*
- * This is failing on my X terminal at the moment.  I can
- * realize this widget, but I can't show it.  -- dfs
-*/
-  gtk_widget_realize (gg->color_ui.colorseldlg);
-/*
-{
-  GdkVisual *visual;
-
-  visual = gdk_visual_get_system ();
-  g_printerr ("system: type=%d depth=%d\n", visual->type, visual->depth);
-
-  visual = gdk_visual_get_best ();
-  g_printerr ("best: type=%d depth=%d\n", visual->type, visual->depth);
-
-  visual = gtk_widget_get_visual (gg->color_ui.colorseldlg);
-  g_printerr ("dialog: type=%d depth=%d\n", visual->type, visual->depth);
-
-  visual = gtk_widget_get_visual (gg->control_panel[0]);
-  g_printerr ("control_panel: type=%d depth=%d\n", visual->type, visual->depth);
-
-  visual = gdk_rgb_get_visual ();
-  g_printerr ("rgb: type=%d depth=%d\n", visual->type, visual->depth);
-}
-*/
-
   gtk_widget_show (gg->color_ui.colorseldlg);
 
   return handled;
@@ -379,7 +352,6 @@ set_color_fg ( GtkWidget *w, GdkEventButton *event , ggobid *gg)
 static gint
 set_color_id (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
-
   /*
    * So that the same routines can be used to handle both the foreground
    * and background color swatches, keep track of which drawing area
@@ -556,9 +528,7 @@ make_symbol_window (ggobid *gg) {
     */
     gg->color_ui.symbol_display = gtk_drawing_area_new (); 
 
-    /*
-     * margin pixels between glyphs and at the edges
-    */
+    /*-- margin pixels between glyphs and at the edges --*/
     /*-- 2*(NGLYPHSIZES+1) is the size of the largest glyph --*/
     width = NGLYPHTYPES*2*(NGLYPHSIZES+1) + gg->color_ui.margin*(NGLYPHTYPES+1);
 
@@ -630,10 +600,7 @@ make_symbol_window (ggobid *gg) {
       }
     }
 
-/*
- * Background color
-*/
-
+    /*-- Background color --*/
     bg_frame = gtk_frame_new ("Background color");
     gtk_box_pack_start (GTK_BOX (vbox), bg_frame, false, false, 0);
 
@@ -661,9 +628,7 @@ make_symbol_window (ggobid *gg) {
     gtk_table_attach (GTK_TABLE (bg_table), gg->color_ui.bg_da, 0, 1, 0, 1,
       GTK_FILL, GTK_FILL, 10, 10);
 
-/*
- * Accent color
-*/
+    /*-- Accent color --*/
     accent_frame = gtk_frame_new ("Accent color");
     gtk_box_pack_start (GTK_BOX (vbox), accent_frame, false, false, 0);
 
@@ -694,10 +659,7 @@ make_symbol_window (ggobid *gg) {
       gg->color_ui.accent_da, 0, 1, 0, 1,
       GTK_FILL, GTK_FILL, 10, 10);
 
-/*
- * Close button
-*/
-
+    /*-- Close button --*/
     btn = gtk_button_new_with_label ("Close");
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
     gtk_signal_connect (GTK_OBJECT (btn),
