@@ -70,20 +70,27 @@ make_ggobi.c
 
 -----------------------------------------------------------------
 
+> The RGGobi code has support for referencing colors by name.  It would
+> be nice to get this back soon using colorschemes rather than removing
+> or turning off the code in the meantime.
+
+Is this working now?
+
+-----------------------------------------------------------------
+
 Adding data:  check for inconsistencies and redundancies in these
 routines:
   ggobi-API.c (setData)
   datad.c  (datad_create, datad_init)
   missing.c (missings_datad_cb)
 
+-----------------------------------------------------------------
+
 Check the fileselection dialog for read (filesel_ok) to ensure that
 the correct data mode is passed.  Take it out of ggobi.
 
 Allow a variable transformation to be pre-specifed in
   the xml file.
-
-Allow a 2-character nickname to be specified in the xml file
-  along with the full variable name.
 
 Missings:
   We might want to support various levels of missingness: left
@@ -345,3 +352,5 @@ Food for thought:
 ! Have read_xml process colorschemes (should be there already)
 ! and set the activeColorScheme of the ggobid to the appropriate one.
 
+! Allow a 2-character nickname to be specified in the xml file
+!   along with the full variable name.
