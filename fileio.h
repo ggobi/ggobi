@@ -17,7 +17,9 @@ typedef struct {
                            verified, which is not possible
                            e.g. when reading a zipped xml file, 
                          */
- GSList *extensions;     /* */
+ GSList *extensions;     /* a collection of file extension names and modes. */
+
+ void *userData;
 } InputDescription;
 
 typedef struct {

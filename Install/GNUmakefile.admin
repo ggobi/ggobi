@@ -13,7 +13,7 @@ PDFLATEX=pdflatex
 TAR=tar
 
 DIRS=\
-   src include lib bin Docs data gtkext/src gtkext/include
+   src include lib bin Docs data gtkext/src gtkext/include examples
 
 
 DATA_SRC_FILES=\
@@ -76,6 +76,7 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
 	cp Makefile.win32 $(TMP_INSTALL_DIR)/src
 	if test -n "${DOC_FILES}" ; then cp $(DOC_FILES) $(TMP_INSTALL_DIR)/Docs ; fi
 	cp $(DATA_FILES) $(TMP_INSTALL_DIR)/data
+	cp notes/ggobirc $(TMP_INSTALL_DIR)/examples
 	cp $(C_SRC_FILES) $(TMP_INSTALL_DIR)/src
 	cp $(C_HEADER_FILES:%=%.h) $(TMP_INSTALL_DIR)/include
 	cp $(LGPL_SRC) $(TMP_INSTALL_DIR)/gtkext/src

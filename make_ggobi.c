@@ -64,7 +64,23 @@ void globals_init (ggobid *gg) {
       GGobiSignals[BRUSH_MOTION_SIGNAL] = 
        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
 					"brush_motion", GTK_RUN_LAST|GTK_RUN_ACTION,
-                                        gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 3,
+                                        gtk_marshal_NONE__POINTER_POINTER_POINTER, GTK_TYPE_NONE, 3,
+                                        GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+  }
+
+  if (gtk_signal_lookup ("move_point", GTK_TYPE_WIDGET) == 0) {
+      GGobiSignals[POINT_MOVE_SIGNAL] = 
+       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
+					"move_point", GTK_RUN_LAST|GTK_RUN_ACTION,
+                                        gtk_marshal_NONE__POINTER_POINTER_POINTER, GTK_TYPE_NONE, 3,
+                                        GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+  }
+
+  if (gtk_signal_lookup ("identify_point", GTK_TYPE_WIDGET) == 0) {
+      GGobiSignals[IDENTIFY_POINT_SIGNAL] = 
+       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
+					"identify_point", GTK_RUN_LAST|GTK_RUN_ACTION,
+                                        gtk_marshal_NONE__POINTER_POINTER_POINTER, GTK_TYPE_NONE, 3,
                                         GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
 
@@ -72,9 +88,11 @@ void globals_init (ggobid *gg) {
       GGobiSignals[SPLOT_NEW_SIGNAL] = 
        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
 					"splot_new", GTK_RUN_LAST|GTK_RUN_ACTION,
-                                        gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 2,
+                                        gtk_marshal_NONE__POINTER_POINTER, GTK_TYPE_NONE, 2,
                                         GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
+
+
   if (gtk_signal_lookup ("variable_added", GTK_TYPE_WIDGET) == 0) {
     gg->signal_variable_added =
       gtk_object_class_user_signal_new (gtk_type_class (GTK_TYPE_WIDGET),
