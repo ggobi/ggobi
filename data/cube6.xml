@@ -1,0 +1,798 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi2.dtd">
+
+<ggobidata count="2">
+
+<data name="/usr/dfs/xgobi/data_xgobi/cube6 1">
+<description>
+</description>
+<variables count="6">
+  <realvariable name="D1" />
+  <realvariable name="D2" />
+  <realvariable name="D3"  />
+  <realvariable name="D4" />
+  <realvariable name="D5" />
+  <realvariable name="D6" />
+</variables>
+<records count="64">
+<record id="1">
+0 0 0 0 0 0
+</record>
+<record id="2">
+0 0 0 0 0 1
+</record>
+<record id="3">
+0 0 0 0 1 0
+</record>
+<record id="4">
+0 0 0 0 1 1
+</record>
+<record id="5">
+0 0 0 1 0 0
+</record>
+<record id="6">
+0 0 0 1 0 1
+</record>
+<record id="7">
+0 0 0 1 1 0
+</record>
+<record id="8">
+0 0 0 1 1 1
+</record>
+<record id="9">
+0 0 1 0 0 0
+</record>
+<record id="10">
+0 0 1 0 0 1
+</record>
+<record id="11">
+0 0 1 0 1 0
+</record>
+<record id="12">
+0 0 1 0 1 1
+</record>
+<record id="13">
+0 0 1 1 0 0
+</record>
+<record id="14">
+0 0 1 1 0 1
+</record>
+<record id="15">
+0 0 1 1 1 0
+</record>
+<record id="16">
+0 0 1 1 1 1
+</record>
+<record id="17">
+0 1 0 0 0 0
+</record>
+<record id="18">
+0 1 0 0 0 1
+</record>
+<record id="19">
+0 1 0 0 1 0
+</record>
+<record id="20">
+0 1 0 0 1 1
+</record>
+<record id="21">
+0 1 0 1 0 0
+</record>
+<record id="22">
+0 1 0 1 0 1
+</record>
+<record id="23">
+0 1 0 1 1 0
+</record>
+<record id="24">
+0 1 0 1 1 1
+</record>
+<record id="25">
+0 1 1 0 0 0
+</record>
+<record id="26">
+0 1 1 0 0 1
+</record>
+<record id="27">
+0 1 1 0 1 0
+</record>
+<record id="28">
+0 1 1 0 1 1
+</record>
+<record id="29">
+0 1 1 1 0 0
+</record>
+<record id="30">
+0 1 1 1 0 1
+</record>
+<record id="31">
+0 1 1 1 1 0
+</record>
+<record id="32">
+0 1 1 1 1 1
+</record>
+<record id="33">
+1 0 0 0 0 0
+</record>
+<record id="34">
+1 0 0 0 0 1
+</record>
+<record id="35">
+1 0 0 0 1 0
+</record>
+<record id="36">
+1 0 0 0 1 1
+</record>
+<record id="37">
+1 0 0 1 0 0
+</record>
+<record id="38">
+1 0 0 1 0 1
+</record>
+<record id="39">
+1 0 0 1 1 0
+</record>
+<record id="40">
+1 0 0 1 1 1
+</record>
+<record id="41">
+1 0 1 0 0 0
+</record>
+<record id="42">
+1 0 1 0 0 1
+</record>
+<record id="43">
+1 0 1 0 1 0
+</record>
+<record id="44">
+1 0 1 0 1 1
+</record>
+<record id="45">
+1 0 1 1 0 0
+</record>
+<record id="46">
+1 0 1 1 0 1
+</record>
+<record id="47">
+1 0 1 1 1 0
+</record>
+<record id="48">
+1 0 1 1 1 1
+</record>
+<record id="49">
+1 1 0 0 0 0
+</record>
+<record id="50">
+1 1 0 0 0 1
+</record>
+<record id="51">
+1 1 0 0 1 0
+</record>
+<record id="52">
+1 1 0 0 1 1
+</record>
+<record id="53">
+1 1 0 1 0 0
+</record>
+<record id="54">
+1 1 0 1 0 1
+</record>
+<record id="55">
+1 1 0 1 1 0
+</record>
+<record id="56">
+1 1 0 1 1 1
+</record>
+<record id="57">
+1 1 1 0 0 0
+</record>
+<record id="58">
+1 1 1 0 0 1
+</record>
+<record id="59">
+1 1 1 0 1 0
+</record>
+<record id="60">
+1 1 1 0 1 1
+</record>
+<record id="61">
+1 1 1 1 0 0
+</record>
+<record id="62">
+1 1 1 1 0 1
+</record>
+<record id="63">
+1 1 1 1 1 0
+</record>
+<record id="64">
+1 1 1 1 1 1
+</record>
+</records>
+
+</data>
+
+<data name="/usr/dfs/xgobi/data_xgobi/cube6 2">
+<description>
+</description>
+<variables count="0">
+</variables>
+<records count="192">
+<record source="1" destination="2">
+
+</record>
+<record source="1" destination="3">
+
+</record>
+<record source="1" destination="5">
+
+</record>
+<record source="1" destination="9">
+
+</record>
+<record source="1" destination="17">
+
+</record>
+<record source="1" destination="33">
+
+</record>
+<record source="2" destination="4">
+
+</record>
+<record source="2" destination="6">
+
+</record>
+<record source="2" destination="10">
+
+</record>
+<record source="2" destination="18">
+
+</record>
+<record source="2" destination="34">
+
+</record>
+<record source="3" destination="4">
+
+</record>
+<record source="3" destination="7">
+
+</record>
+<record source="3" destination="11">
+
+</record>
+<record source="3" destination="19">
+
+</record>
+<record source="3" destination="35">
+
+</record>
+<record source="4" destination="8">
+
+</record>
+<record source="4" destination="12">
+
+</record>
+<record source="4" destination="20">
+
+</record>
+<record source="4" destination="36">
+
+</record>
+<record source="5" destination="6">
+
+</record>
+<record source="5" destination="7">
+
+</record>
+<record source="5" destination="13">
+
+</record>
+<record source="5" destination="21">
+
+</record>
+<record source="5" destination="37">
+
+</record>
+<record source="6" destination="8">
+
+</record>
+<record source="6" destination="14">
+
+</record>
+<record source="6" destination="22">
+
+</record>
+<record source="6" destination="38">
+
+</record>
+<record source="7" destination="8">
+
+</record>
+<record source="7" destination="15">
+
+</record>
+<record source="7" destination="23">
+
+</record>
+<record source="7" destination="39">
+
+</record>
+<record source="8" destination="16">
+
+</record>
+<record source="8" destination="24">
+
+</record>
+<record source="8" destination="40">
+
+</record>
+<record source="9" destination="10">
+
+</record>
+<record source="9" destination="11">
+
+</record>
+<record source="9" destination="13">
+
+</record>
+<record source="9" destination="25">
+
+</record>
+<record source="9" destination="41">
+
+</record>
+<record source="10" destination="12">
+
+</record>
+<record source="10" destination="14">
+
+</record>
+<record source="10" destination="26">
+
+</record>
+<record source="10" destination="42">
+
+</record>
+<record source="11" destination="12">
+
+</record>
+<record source="11" destination="15">
+
+</record>
+<record source="11" destination="27">
+
+</record>
+<record source="11" destination="43">
+
+</record>
+<record source="12" destination="16">
+
+</record>
+<record source="12" destination="28">
+
+</record>
+<record source="12" destination="44">
+
+</record>
+<record source="13" destination="14">
+
+</record>
+<record source="13" destination="15">
+
+</record>
+<record source="13" destination="29">
+
+</record>
+<record source="13" destination="45">
+
+</record>
+<record source="14" destination="16">
+
+</record>
+<record source="14" destination="30">
+
+</record>
+<record source="14" destination="46">
+
+</record>
+<record source="15" destination="16">
+
+</record>
+<record source="15" destination="31">
+
+</record>
+<record source="15" destination="47">
+
+</record>
+<record source="16" destination="32">
+
+</record>
+<record source="16" destination="48">
+
+</record>
+<record source="17" destination="18">
+
+</record>
+<record source="17" destination="19">
+
+</record>
+<record source="17" destination="21">
+
+</record>
+<record source="17" destination="25">
+
+</record>
+<record source="17" destination="49">
+
+</record>
+<record source="18" destination="20">
+
+</record>
+<record source="18" destination="22">
+
+</record>
+<record source="18" destination="26">
+
+</record>
+<record source="18" destination="50">
+
+</record>
+<record source="19" destination="20">
+
+</record>
+<record source="19" destination="23">
+
+</record>
+<record source="19" destination="27">
+
+</record>
+<record source="19" destination="51">
+
+</record>
+<record source="20" destination="24">
+
+</record>
+<record source="20" destination="28">
+
+</record>
+<record source="20" destination="52">
+
+</record>
+<record source="21" destination="22">
+
+</record>
+<record source="21" destination="23">
+
+</record>
+<record source="21" destination="29">
+
+</record>
+<record source="21" destination="53">
+
+</record>
+<record source="22" destination="24">
+
+</record>
+<record source="22" destination="30">
+
+</record>
+<record source="22" destination="54">
+
+</record>
+<record source="23" destination="24">
+
+</record>
+<record source="23" destination="31">
+
+</record>
+<record source="23" destination="55">
+
+</record>
+<record source="24" destination="32">
+
+</record>
+<record source="24" destination="56">
+
+</record>
+<record source="25" destination="26">
+
+</record>
+<record source="25" destination="27">
+
+</record>
+<record source="25" destination="29">
+
+</record>
+<record source="25" destination="57">
+
+</record>
+<record source="26" destination="28">
+
+</record>
+<record source="26" destination="30">
+
+</record>
+<record source="26" destination="58">
+
+</record>
+<record source="27" destination="28">
+
+</record>
+<record source="27" destination="31">
+
+</record>
+<record source="27" destination="59">
+
+</record>
+<record source="28" destination="32">
+
+</record>
+<record source="28" destination="60">
+
+</record>
+<record source="29" destination="30">
+
+</record>
+<record source="29" destination="31">
+
+</record>
+<record source="29" destination="61">
+
+</record>
+<record source="30" destination="32">
+
+</record>
+<record source="30" destination="62">
+
+</record>
+<record source="31" destination="32">
+
+</record>
+<record source="31" destination="63">
+
+</record>
+<record source="32" destination="64">
+
+</record>
+<record source="33" destination="34">
+
+</record>
+<record source="33" destination="35">
+
+</record>
+<record source="33" destination="37">
+
+</record>
+<record source="33" destination="41">
+
+</record>
+<record source="33" destination="49">
+
+</record>
+<record source="34" destination="36">
+
+</record>
+<record source="34" destination="38">
+
+</record>
+<record source="34" destination="42">
+
+</record>
+<record source="34" destination="50">
+
+</record>
+<record source="35" destination="36">
+
+</record>
+<record source="35" destination="39">
+
+</record>
+<record source="35" destination="43">
+
+</record>
+<record source="35" destination="51">
+
+</record>
+<record source="36" destination="40">
+
+</record>
+<record source="36" destination="44">
+
+</record>
+<record source="36" destination="52">
+
+</record>
+<record source="37" destination="38">
+
+</record>
+<record source="37" destination="39">
+
+</record>
+<record source="37" destination="45">
+
+</record>
+<record source="37" destination="53">
+
+</record>
+<record source="38" destination="40">
+
+</record>
+<record source="38" destination="46">
+
+</record>
+<record source="38" destination="54">
+
+</record>
+<record source="39" destination="40">
+
+</record>
+<record source="39" destination="47">
+
+</record>
+<record source="39" destination="55">
+
+</record>
+<record source="40" destination="48">
+
+</record>
+<record source="40" destination="56">
+
+</record>
+<record source="41" destination="42">
+
+</record>
+<record source="41" destination="43">
+
+</record>
+<record source="41" destination="45">
+
+</record>
+<record source="41" destination="57">
+
+</record>
+<record source="42" destination="44">
+
+</record>
+<record source="42" destination="46">
+
+</record>
+<record source="42" destination="58">
+
+</record>
+<record source="43" destination="44">
+
+</record>
+<record source="43" destination="47">
+
+</record>
+<record source="43" destination="59">
+
+</record>
+<record source="44" destination="48">
+
+</record>
+<record source="44" destination="60">
+
+</record>
+<record source="45" destination="46">
+
+</record>
+<record source="45" destination="47">
+
+</record>
+<record source="45" destination="61">
+
+</record>
+<record source="46" destination="48">
+
+</record>
+<record source="46" destination="62">
+
+</record>
+<record source="47" destination="48">
+
+</record>
+<record source="47" destination="63">
+
+</record>
+<record source="48" destination="64">
+
+</record>
+<record source="49" destination="50">
+
+</record>
+<record source="49" destination="51">
+
+</record>
+<record source="49" destination="53">
+
+</record>
+<record source="49" destination="57">
+
+</record>
+<record source="50" destination="52">
+
+</record>
+<record source="50" destination="54">
+
+</record>
+<record source="50" destination="58">
+
+</record>
+<record source="51" destination="52">
+
+</record>
+<record source="51" destination="55">
+
+</record>
+<record source="51" destination="59">
+
+</record>
+<record source="52" destination="56">
+
+</record>
+<record source="52" destination="60">
+
+</record>
+<record source="53" destination="54">
+
+</record>
+<record source="53" destination="55">
+
+</record>
+<record source="53" destination="61">
+
+</record>
+<record source="54" destination="56">
+
+</record>
+<record source="54" destination="62">
+
+</record>
+<record source="55" destination="56">
+
+</record>
+<record source="55" destination="63">
+
+</record>
+<record source="56" destination="64">
+
+</record>
+<record source="57" destination="58">
+
+</record>
+<record source="57" destination="59">
+
+</record>
+<record source="57" destination="61">
+
+</record>
+<record source="58" destination="60">
+
+</record>
+<record source="58" destination="62">
+
+</record>
+<record source="59" destination="60">
+
+</record>
+<record source="59" destination="63">
+
+</record>
+<record source="60" destination="64">
+
+</record>
+<record source="61" destination="62">
+
+</record>
+<record source="61" destination="63">
+
+</record>
+<record source="62" destination="64">
+
+</record>
+<record source="63" destination="64">
+
+</record>
+</records>
+</data>
+</ggobidata>
