@@ -492,3 +492,4 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
 
 #undef WIDTH
 #undef HEIGHT
+#undef MAXNVARS

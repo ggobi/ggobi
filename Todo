@@ -10,6 +10,8 @@ Bugs:
  and all the points will have gravitated towards the 0,0 
  (upper left) corner.
 
+ adding and removing plots in scatmat continues to be problematic
+
 various stuff not yet implemented: 
   1d, xy cycling
   window closings
@@ -20,7 +22,7 @@ various stuff not yet implemented:
 
   exclusion:  rebuilding the table on the fly
 
-array and vector management
+keep working on array and vector management
 
 color:  allow additional colormaps -- .cmap file
   (DTL: This is supported in the XML.)

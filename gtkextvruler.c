@@ -27,6 +27,12 @@
 
 /* Modified by Gustavo Carneiro ee96090@fe.up.pt */
 
+/*
+ * Modified my Deborah Swayne, dfs@research.att.com, to
+ * use myrint rather than rint, since it seemed that I couldn't
+ * rely on rint being present in all environments.
+*/
+
 
 #include <math.h>
 #include <stdio.h>

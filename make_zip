@@ -1,19 +1,9 @@
 #!/bin/sh
 
-rm -f /usr/dfs/tmp/ggobi/*
-cp *.c *.h Makefile /usr/dfs/tmp/ggobi
-
-mkdir /usr/dfs/tmp/ggobi/RS
-cd RS
-cp *.c *.h *.S GNUmakefile README /usr/dfs/tmp/ggobi/RS
-
-mkdir /usr/dfs/tmp/ggobi/RS/Src
-cd Src
-cp *.S /usr/dfs/tmp/ggobi/RS/Src
-
-cd /usr/dfs/tmp
-
-zip ggobi.zip ggobi ggobi/* ggobi/RS ggobi/RS/* ggobi/RS/Src ggobi/RS/Src/*
-
-mv ggobi.zip /usr/dfs/xgobi/gtk
 cd /usr/dfs/xgobi/gtk
+gmake clean
+cd RS
+gmake clean
+
+cd /usr/dfs/xgobi
+zip -r ggobi.zip ggobi
