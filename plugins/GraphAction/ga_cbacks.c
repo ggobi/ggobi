@@ -92,8 +92,10 @@ hide_inEdge (gint i, PluginInstance *inst)
     e->hidden_now.els[edgeid] = e->hidden.els[edgeid] = true;
     d->hidden_now.els[i] = d->hidden.els[i] = true;
 
-    if (!gg->linkby_cv && nd > 1)
+    if (!gg->linkby_cv && nd > 1) {
       symbol_link_by_id (true, i, d, gg);
+      symbol_link_by_id (true, edgeid, e, gg);
+    }
 
     ga->nInEdgesVisible.els[i] = 0;   
     ga->nOutEdgesVisible.els[a]--;
@@ -227,7 +229,6 @@ ga_orphans_hide_cb (GtkWidget *btn, PluginInstance *inst)
     }
   }
   displays_tailpipe (FULL, gg);
-
 }
 
 void
@@ -241,13 +242,15 @@ ga_nodes_show_cb (GtkWidget *btn, PluginInstance *inst)
   gint nd = g_slist_length (gg->d);
 
   for (i=0; i<d->nrows; i++) {
-    d->hidden_now.els[i] = d->hidden.els[i] = false;
+    d->hidden_now.els[i] = d->hidden.els[i] = d->hidden_prev.els[i] = false;
     if (!gg->linkby_cv && nd > 1)
-      symbol_link_by_id (false, i, d, gg);
+      symbol_link_by_id (true, i, d, gg);
   }
-  for (i=0; i<e->nrows; i++)
-    e->hidden_now.els[i] = e->hidden.els[i] = false;
-    /*-- probably need to link here as well --*/
+  for (i=0; i<e->nrows; i++) {
+    e->hidden_now.els[i] = e->hidden.els[i] = e->hidden_prev.els[i] = false;
+    if (!gg->linkby_cv && nd > 1)
+      symbol_link_by_id (true, i, e, gg);
+  }
 
   displays_tailpipe (FULL, gg);
 }
