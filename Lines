@@ -90,7 +90,8 @@
 31391   8/22  replaced variable circles with checkboxes; collapsed tform{12}
 31416   8/28  context-sensitive tooltips for variable circles
 31455   9/4   added placement of scatter windows
-32495   9/15  replaced vgroups with vminmax; Di has done work on the tour
+32495   9/15  replaced vgroups with vminmax
+32547   9/18  Di has done work on the tour
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.
