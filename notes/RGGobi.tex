@@ -143,9 +143,7 @@ One can determine which observations are contained within the current
 brushing region with the function
 \SFunction{getSelectedIndices.ggobi}.  This returns a vector
 containing the (unordered) indices of the observations in the dataset
-that have been selected.  
-(For efficiency purposes, the labels of the observations
-are not returned with the vector. This can be easily changed.)
+that have been selected, together with their labels.
 
 The function \SFunction{isObservationSelected.ggobi} returns a logical
 vector with as many elements as there are observations in the dataset.
@@ -167,17 +165,16 @@ different groups of observations.
  views <- list(c(20,20, 100,100), c(400,300), c(300,150,40,40))
  setMode.ggobi("Brush")
  for(i in views) {
-   setBrush.ggobi(i)
+   setBrushLocation.ggobi(i)
    print(getSelectedIndices.ggobi())
    prompt()
  }
 \end{verbatim}
 
-
 \section{Creating New Windows and Plots}
 See \file{RSCreatePlot.c} for some details.
 
-The graphical user interface for ggobi allows one to create new
+The graphical user interface for GGobi allows one to create new
 windows and groups or collections of plots.  These collections are
 defined by the menu or button that is used to generate them and offers
 little in the way of allowing the user to specify what the type or
@@ -404,8 +401,6 @@ event (the identification) occurs, we can easily arrange to update
 other plots.  Given the available primitives with which we can control
 ggobi or other graphics devices, we can
 
-
-
 Clustering or model selection might serve as other examples.  The
 basic idea is that we would have some data that represents the fits
 for different models.  The data frame is made up of, say, 2 columns -
@@ -552,6 +547,8 @@ This allows us to send repeated commands easily to a ggobi instance.
 Additionally, commands intended for another can be directed without
 setting that instance to the default.
 
+[What is intended here?]
+
 By default, this is 
 This identifies 
 
@@ -633,7 +630,7 @@ to be $0$-based, corresponding to the C routines.
 \subsection{getRowNames.ggobi}
 Returns the observation labels for the specified ggobi instance.
 
-See also \SFunction{ggobi.setRowNames}.
+See also \SFunction{setRowNames.ggobi}.
 
 \subsection{getSmootherFunction.ggobi}
 \subsection{setSmootherFunction.ggobi}
@@ -656,8 +653,6 @@ smoothing and returns the predicted value something like:
    predict(loess(y ~ x, data.frame(x=x, y = y), span = w))
  }
 \end{verbatim}
-
-
 
 
 \subsection{ggobi}
@@ -706,8 +701,6 @@ are used to create new plots.  These are logical values that govern
 the appearance of these plots.  This function returns a named vector
 of those values currently in existence.
 
-
-
 \subsection{getDisplays.ggobi}
 Returns a list describing each display (or window) of plots within the
 specified ggobi instance.  Each element in the list identifies a
@@ -718,7 +711,6 @@ the type of plot. Generally it contains a list of the variables within
 that plot.  This is an integer vector giving the indeces of the
 variables. The names of the elements in this vector are the names of
 the variables. 
-
 
 What about subsets in effect when the display was created, etc.  This
 doesn't really apply as the plots are updated when the set of hidden
@@ -767,9 +759,8 @@ counting scheme and must be decremented by $1$ for
 use in a \SFunction{.Call}.
 
 \subsection{getVariableNames.ggobi}
-Returns  a character vector 
-containing the names of the variables
-in the specified ggobi.
+Returns  a character vector containing the names of the variables in
+the specified ggobi.
 
 \subsection{getViewTypes.ggobi}
 The Ggobi system supports several different plot types. This function
@@ -799,7 +790,6 @@ The variable
 
 
 
-
 \subsection{setData.ggobi}
 Specify a data frame or the name of a file
 
@@ -818,14 +808,9 @@ These control issues such as
 \begin{itemize}
 \item whether lines are drawn, 
 \item lines are directed or undirected
-\item missing values are displayed,
-\item grid lines are drawn on the plot(s),
-\item axes are shown and/or centered,
-\item double buffering is used,
-\item the plot(s) are linked to others.
+\item missing values are displayed (not implemented)  
+\item axes are shown.
 \end{itemize}
-
-
 
 \subsection{setRowNames.ggobi}
 This sets the observation identifiers for the 
@@ -835,8 +820,6 @@ plots.
 
 The return value is a vector of the previous labels for the
 specified rows/observations.
-
-
 
 
 

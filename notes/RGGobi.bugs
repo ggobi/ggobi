@@ -1,0 +1,189 @@
+If I execute
+   ggobi ("external xml file")    
+I get the console and a scatterplot window.
+     
+If I execute
+   data(mtcars)
+   ggobi(mtcars)
+I get the console but no scatterplot window. 
+
+The combination
+  ggobi()
+  setData.ggobi()
+results in behavior like the second case.
+
+-----
+
+setMode.ggobi() appears to need a gdk_flush() -- at least
+I hope that's all it needs.  The mode doesn't update until
+I move the cursor across a ggobi window.
+
+-----
+
+When a tour is active, the R command line doesn't respond.
+Is this a known limitation of the synchronizing of the
+event loops?
+
+-----
+
+This example doesn't work:  setBrushLocation.ggobi() needs
+two arguments.
+
+ views <- list(c(20,20, 100,100), c(400,300), c(300,150,40,40))
+ setMode.ggobi("Brush")
+ for(i in views) { 
+   setBrushLocation.ggobi(i)  
+   print(getSelectedIndices.ggobi())
+   prompt()
+ }
+ 
+This may be more an issue of inaccurate documentation
+than a problem with the code.
+
+-----
+
+The plotLayout examples work, for the most part, and they're
+unbelievably cute.
+
+However, this command fails:
+ 
+> dpy <- plotLayout(, mfrow=c(3,2))
+Error in plotLayout(, mfrow = c(3, 2)) : Argument is missing, with no default
+
+-----
+
+The function raisePlot.ggobi, mentioned in the documentation,
+doesn't exist.  Nor does the function iconify.ggobi.
+
+-----
+
+In section 9 on the API routines, there's an example
+of using more than one ggobi instance, and it works almost perfectly.
+
+This combination works well:
+
+> setDefaultGGobi(1)
+> getVariableNames.ggobi()
+
+but this returns NULL:
+ 
+> getVariableNames.ggobi(.gobi=1)
+ 
+ 
+And a question about the documentation.  I don't see any
+difference between launching ggobi the way it's done in the example:
+ 
+> ggobi(args="../data/tes") 
+> ggobi(args="../data/flea")
+     
+and just calling it normally:
+ 
+> ggobi("../data/tes") 
+> ggobi("../data/flea")
+ 
+Is there a purpose for the usage in the documentation?
+
+-----
+
+In section 9.1, getData, this usage fails:
+
+> g <- ggobi(mtcars)
+> g[1:10,]
+Error in as.list(X) : Argument is missing, with no default
+
+-----
+
+getVariable.ggobi, mentioned in the manual, does not exist.
+
+What does this mean?
+
+  Similarly, we have defined ggobi specific versions of
+  \SFunction{dim}, \SFunction{ncol}, \SFunction{nrow},
+  \SFunction{dimnames}, \SFunction{names}.
+
+-----
+
+initialize a ggobi instance with 
+  data(mtcars)
+  ggobi(mtcars)
+then launch a scatterplot, and choose identify.  The row
+labels look like this, as can be seen in getRowNames.ggobi():
+
+  vscrollbar
+  as.data.frame(data)
+  hscrollbar
+  ...
+
+-----
+
+setRowNames.ggobi() works perfectly, but it has a
+very strange return value, consisting of one of the previous
+row names repeated once for each row.
+
+-----
+
+getFileName.ggobi() does not exist.
+
+-----
+
+getLineSegments.ggobi() returns an error:
+Error in .Call(.ggobi.symbol(name), ..., .gobi) : 
+        .Call function name not in load table
+
+-----
+
+parcoords.ggobi(), called with no arguments, seems to
+open a parallel coordinates plot with one variable, but then
+kills R and ggobi and dumps core.
+
+parcoords.ggobi(getVariableNames.ggobi())  works fine.
+
+-----
+
+I was running a ggobi on the flea beetle data, and I executed this:
+
+data(mtcars)
+setData.ggobi(mtcars)
+
+It closed the scatterplot, added a second tab to the variable
+selection panel with an unhelpful label, then killed R and dumped core.
+
+-----
+
+Similarly, I was running a ggobi on the flea beetle data, and I
+executed this:
+
+data(mtcars)
+setDataFrame.ggobi(mtcars)
+
+It closed the scatterplot, added a second tab to the variable
+selection panel with the correct label (mtcars), but when I tried to
+open a scatterplot of mtcars data, it killed R and dumped core.
+
+setDataFile.ggobi("/usr/dfs/ggobi/ggobi/data/pigs"), on the other
+hand, worked like a breeze.
+
+----
+
+The R display options are out of sync with what's actually
+implemented in ggobi (this is unfortunately a moving target).  The
+following should be removed from the R code -- these are not likely
+ever to be implemented:
+
+\item grid lines are drawn on the plot(s),
+\item double buffering is used,
+\item axes are centered,
+\item the plot(s) are linked to others.
+
+This is likely to be implemented pretty soon, but it isn't now:
+
+\item missing values are displayed,
+
+----
+
+These functions return null, though brushing is active:
+
+getBrushSize.ggobi()
+getBrushLocation.ggobi()
+
+----
