@@ -143,6 +143,7 @@ default_scheme_init ()
   return scheme;
 }
 
+/*
 static const gfloat default_rgb[MAXNCOLORS][3] = {
   {0.73, 0.33, 0.83},
   {0.51, 0.44, 1.00},
@@ -155,8 +156,9 @@ static const gfloat default_rgb[MAXNCOLORS][3] = {
   {1.00, 0.27, 0.00},
   {1.00, 0.08, 0.58}
 };
-static const gfloat bg_rgb  []    = {0, 0, 0};  /* -> bg_color */
-static const gfloat accent_rgb [] = {1, 1, 1};  /* -> fg_color */
+static const gfloat bg_rgb  []    = {0, 0, 0};  * -> bg_color *
+static const gfloat accent_rgb [] = {1, 1, 1};  * -> fg_color *
+*/
 
 /* API */
 static guint m[MAXNCOLORS][3];
