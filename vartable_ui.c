@@ -16,18 +16,7 @@
 #include "vars.h"
 #include "externs.h"
 
-#define NCOLS_CLIST 10
-
-#define CLIST_VARNO     0
-#define CLIST_VARNAME   1
-#define CLIST_TFORM     2
-#define CLIST_USER_MIN  3
-#define CLIST_USER_MAX  4
-#define CLIST_DATA_MIN  5
-#define CLIST_DATA_MAX  6
-#define CLIST_MEAN      7
-#define CLIST_MEDIAN    8
-#define CLIST_NMISSING  9
+#include "vartable.h"
 
 static void delete_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
 {
@@ -297,55 +286,6 @@ void sortbycolumn_cb (GtkWidget *cl, gint column, ggobid *gg)
 }
 
 void
-vartable_row_append (gint j, datad *d, ggobid *gg)
-{
-  if (d->vartable_clist != NULL) {
-    gint k;
-    gchar **row;
-    row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
-
-    if (j == -1) {
-      row[CLIST_VARNO] = g_strdup_printf ("%d", 0);
-      row[CLIST_VARNAME] = g_strdup ("");
-      row[CLIST_TFORM] = g_strdup ("");
-      row[CLIST_USER_MIN] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_USER_MAX] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_DATA_MIN] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_DATA_MAX] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_MEAN] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_MEDIAN] = g_strdup_printf ("%8.3f", 0.0);
-      row[CLIST_NMISSING] = g_strdup_printf ("%d", 0);
-    } else {
-      row[CLIST_VARNO] = g_strdup_printf ("%d", j);
-      row[CLIST_VARNAME] = g_strdup (d->vartable[j].collab);
-      row[CLIST_TFORM] = g_strdup ("");
-      if (d->vartable[j].lim_specified_p) {
-        row[CLIST_USER_MIN] = g_strdup_printf ("%8.3f",
-          d->vartable[j].lim_specified.min);
-        row[CLIST_USER_MAX] = g_strdup_printf ("%8.3f",
-          d->vartable[j].lim_specified.max);
-      } else {
-        row[CLIST_USER_MIN] = g_strdup ("");
-        row[CLIST_USER_MAX] = g_strdup ("");
-      }
-      row[CLIST_DATA_MIN] = g_strdup_printf ("%8.3f",
-        d->vartable[j].lim_raw.min);
-      row[CLIST_DATA_MAX] = g_strdup_printf ("%8.3f",
-        d->vartable[j].lim_raw.max);
-      row[CLIST_MEAN] = g_strdup_printf ("%8.3f", d->vartable[j].mean);
-      row[CLIST_MEDIAN] = g_strdup_printf ("%8.3f", d->vartable[j].median);
-      row[CLIST_NMISSING] = g_strdup_printf ("%d", d->vartable[j].nmissing);
-    }
-
-    gtk_clist_append ((GtkCList *) d->vartable_clist, row);
-
-    for (k=0; k<NCOLS_CLIST; k++)
-      g_free ((gpointer) row[k]);
-    g_free ((gpointer) row);
-  }
-}
-
-void
 vartable_open (ggobid *gg)
 {                                  
   gint j, k;
@@ -507,3 +447,4 @@ vartable_tform_set (gint varno, datad *d, ggobid *gg) {
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), varno,
       2, d->vartable[varno].collab_tform);
 }
+

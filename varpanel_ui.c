@@ -21,7 +21,6 @@
 #include "vars.h"
 #include "externs.h"
 
-static void varpanel_checkbox_add (gint j, datad *d, ggobid *gg);
 
 /*-------------------------------------------------------------------------*/
 /*                     Variable selection                                  */
@@ -94,82 +93,6 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   if (redraw) {
     display_tailpipe (display, gg);
   }
-}
-
-/*-------------------------------------------------------------------------*/
-/*                   variable cloning                                      */
-/*-------------------------------------------------------------------------*/
-
-void
-variable_clone (gint jvar, const gchar *newName, gboolean update,
-  datad *d, ggobid *gg) 
-{
-  gint nc = d->ncols + 1;
-  
-/*-- vartable_ui --*/
-  /*-- set a view of the data values before adding the new label --*/
-  vartable_row_append (d->ncols-1, d, gg);
-
-/*-- vartable --*/
-  vartable_realloc (nc, d, gg);
-  d->vartable[nc-1].collab =
-    g_strdup ((newName && newName[0]) ? newName : d->vartable[jvar].collab);
-  d->vartable[nc-1].collab_tform =
-    g_strdup ((newName && newName[0]) ? newName : d->vartable[jvar].collab);
-
-/*-- varpanel_ui  --*/
-  d->varpanel_ui.checkbox = (GtkWidget **)
-    g_realloc (d->varpanel_ui.checkbox, nc * sizeof (GtkWidget *));
-  varpanel_checkbox_add (nc-1, d, gg);
-
-/*-- vartable --*/
-  /*-- now the rest of the variables --*/
-  d->vartable[nc-1].jitter_factor = d->vartable[jvar].jitter_factor;
-  d->vartable[nc-1].nmissing = d->vartable[jvar].nmissing;
-
-  if (update) {
-    updateAddedColumn (nc, jvar, d, gg);
-  }
-
-  gtk_widget_show_all (gg->varpanel_ui.notebook);
-}
-
-gboolean
-updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
-{
-  gint i;
-
-/*-- vartable --*/
-  if (jvar > -1) {
-    d->vartable[nc-1].mean = d->vartable[jvar].mean;
-    d->vartable[nc-1].median = d->vartable[jvar].median;
-    d->vartable[nc-1].lim.min =
-      d->vartable[nc-1].lim_raw.min = d->vartable[nc-1].lim_tform.min = 
-      d->vartable[jvar].lim_raw.min;
-    d->vartable[nc-1].lim.max =
-      d->vartable[nc-1].lim_raw.max = d->vartable[nc-1].lim_tform.max = 
-      d->vartable[jvar].lim_raw.max;
-  } 
-
-  transform_values_init (nc-1, d, gg);
-/*-- --*/
-
-/*-- pipeline --*/
-/*
-  pipeline_arrays_add_column (jvar, d, gg);
-*/
-
-  arrayf_add_cols (&d->raw, nc);  /*-- adding exactly one column --*/
-  arrayf_add_cols (&d->tform, nc);
-  for (i=0; i<d->nrows; i++)
-    d->raw.vals[i][nc-1] = d->tform.vals[i][nc-1] = d->raw.vals[i][jvar];
-
-  missing_arrays_add_column (jvar, d, gg);
-
-  d->ncols++;
-  tform_to_world (d, gg); /*-- need this only for the new variable --*/
-
-  return (true);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -281,10 +204,12 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
     ctrl_mod = ((bevent->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK);
 /* */
 
+/*
     if (ctrl_mod) {
       variable_clone (jvar, NULL, true, d, gg);
       return (true);
     }
+*/
     
     /*-- general variable selection --*/
     varsel (cpanel, sp, jvar, button, alt_mod, ctrl_mod, shift_mod, d, gg);
@@ -293,6 +218,36 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
   }
 
   return false;
+}
+
+/*-------------------------------------------------------------------------*/
+/*                  adding and deleting variables                          */
+/*-------------------------------------------------------------------------*/
+
+void
+varpanel_checkbox_add (gint j, datad *d, ggobid *gg) 
+{
+  d->varpanel_ui.checkbox[j] =
+    gtk_noop_check_button_new_with_label (d->vartable[j].collab);
+  GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.checkbox[j]), gg, true);
+
+  gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.checkbox[j]),
+    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+
+  gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
+    d->varpanel_ui.checkbox[j], false, false, 0);
+  gtk_widget_show (d->varpanel_ui.checkbox[j]);
+}
+
+/*-- delete nc checkboxes, starting at jcol --*/
+void
+varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
+  gint j;
+
+  if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every checkbox --*/
+    for (j=jcol; j<jcol+nc; j++)
+      gtk_widget_destroy (d->varpanel_ui.checkbox[j]);
+  }
 }
 
 /*-------------------------------------------------------------------------*/
@@ -321,31 +276,6 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gtk_widget_show (gg->varpanel_ui.notebook);
 }
 
-static void
-varpanel_checkbox_add (gint j, datad *d, ggobid *gg) 
-{
-  d->varpanel_ui.checkbox[j] =
-    gtk_noop_check_button_new_with_label (d->vartable[j].collab);
-  GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.checkbox[j]), gg, true);
-
-  gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.checkbox[j]),
-    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
-
-  gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
-    d->varpanel_ui.checkbox[j], false, false, 0);
-  gtk_widget_show (d->varpanel_ui.checkbox[j]);
-}
-
-/*-- delete nc checkboxes, starting at jcol --*/
-void
-varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
-  gint j;
-
-  if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every checkbox --*/
-    for (j=jcol; j<jcol+nc; j++)
-      gtk_widget_destroy (d->varpanel_ui.checkbox[j]);
-  }
-}
 
 /*-- should rename varpanel_checkboxes_populate --*/
 /*-- for each datad, a scrolled window, vbox, and column of check buttons --*/
