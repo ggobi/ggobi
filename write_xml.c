@@ -153,7 +153,7 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
     fprintf(f, "    </levels>\n");
     fprintf(f, "  </categoricalvariable>");
   } else {
-    fprintf(f, "  <realvariable name=\"%s\" />",
+    fprintf(f, "  <realvariable name=\"%s\"/>",
       (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
   }
 
@@ -221,8 +221,8 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
    }
  }
 
- fprintf(f, "<records\n");
- fprintf(f, " count=\"%d\"", n);
+ fprintf(f, "<records ");
+ fprintf(f, "count=\"%d\"", n);
  if(xmlWriteInfo->useDefault) {
 /*
    fprintf(f, " glyphSize=\"%s\"", xmlWriteInfo->defaultGlyphSizeName);
