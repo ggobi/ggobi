@@ -83,13 +83,14 @@ display_menu_build (ggobid *gg)
         "missing_p", GINT_TO_POINTER (0));
 
     } else {  /*-- prepare the cascading menu for multiple data matrices --*/
+      datad *d;
 
       submenu = gtk_menu_new ();
       anchor = CreateMenuItem (gg->display_menu, "New scatterplot",
         NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
 
-      for (k=0; k<nd; k++) { 
-        datad *d = (datad*) g_slist_nth_data (gg->d, k);
+      k = 0;
+      while ((d = (datad*) g_slist_nth_data (gg->d, k++)) != NULL) {
 
         /*-- add an item for each datad with variables --*/
         if (g_slist_length (d->vartable) > 0) {
