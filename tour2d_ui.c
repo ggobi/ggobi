@@ -33,7 +33,6 @@ cpanel_t2d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t2d_path_len = 1.;
 }
 
-/*-- scatterplot only; need a different routine for parcoords --*/
 void
 cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
 /*
@@ -42,20 +41,25 @@ cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
 */
 {
   GtkWidget *w, *btn;
-  GtkObject *adj;
   GtkWidget *pnl = gg->control_panel[TOUR2D];
   displayd *dsp = gg->current_display;
+  GtkAdjustment *adj;
 
   /*-- speed --*/
-  /*  adj = widget_find_by_name (pnl, "TOUR2D:speed_bar");
+  w = widget_find_by_name (pnl, "TOUR2D:speed_bar");
+  adj = gtk_range_get_adjustment (GTK_RANGE (w));
+/*
   gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
-  -1 * (gfloat) cpanel->xyplot.cycle_delay);*/
+    -1 * (gfloat) cpanel->xyplot.cycle_delay);
+*/
+
   /*-- paused --*/
   btn = widget_find_by_name (pnl, "TOUR2D:pause_button");
   GTK_TOGGLE_BUTTON (btn)->active = cpanel->t2d_paused;
   /*-- manual manip --*/
   w = widget_find_by_name (pnl, "TOUR2D:manip");
   gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->t2d_manip_mode);
+
   /*-- PC axes --*/
   /*-- backtracking --*/
   /*-- local scan --*/
@@ -134,10 +138,13 @@ cpanel_tour2d_make (ggobid *gg) {
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
   adj = gtk_adjustment_new (10.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (speed2d_set_cb), (gpointer) gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+
+  gtk_widget_set_name (sbar, "TOUR2D:speed_bar");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust speed of tour motion", NULL);
   scale_set_default_values (GTK_SCALE (sbar));

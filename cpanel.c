@@ -95,6 +95,9 @@ tsplot_cpanel_init (cpaneld* cpanel, ggobid *gg) {
 void
 cpanel_set (displayd *display, ggobid *gg) {
   cpaneld *cpanel = &display->cpanel;
+  extern void cpanel_tour1d_set (cpaneld *, ggobid *);
+  extern void cpanel_tour2d_set (cpaneld *, ggobid *);
+  extern void cpanel_tourcorr_set (cpaneld *, ggobid *);
 
   switch (display->displaytype) {
     case scatterplot:
@@ -105,6 +108,9 @@ cpanel_set (displayd *display, ggobid *gg) {
 #endif
       cpanel_brush_set (cpanel, gg);
       cpanel_scale_set (cpanel, gg);
+      cpanel_tour1d_set (cpanel, gg);
+      cpanel_tour2d_set (cpanel, gg);
+      cpanel_tourcorr_set (cpanel, gg);
 #ifdef EDIT_EDGES_IMPLEMENTED
       cpanel_edgeedit_set (cpanel, gg);
 #endif
