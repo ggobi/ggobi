@@ -19,8 +19,30 @@ XML_LIB_DIRS_PATH="@XML_LIB_DIRS_PATH@"
 
 LIBS="@SRC_LIBS@"
 
+
+
 GTK_CFLAGS=`@GTK_CONFIG@ --cflags`
 GTK_LIBS=`@GTK_CONFIG@ --libs`
+
+usage="
+Usage: ggobi-config [option]
+
+Options:
+  --cflags
+  --libs
+  --xml-support
+  --xml
+  --xml-libs
+  --xml-path
+  --ld-library-path   
+"
+
+
+if test $# -lt 1 ; then
+ echo "$usage"
+ exit 0
+fi
+
 
 case $1 in
    "--v")
@@ -40,6 +62,12 @@ case $1 in
    "--xml-path")
          echo "${XML_LIB_DIRS_PATH}"
          shift ;;
+   --ld-library-path)
+         echo "@TOP@/lib"
+         shift ;;
+   --help|-h)
+       echo "$usage"
+       exit 0;;
    "*") echo "Unrecognized argument $1"
           shift ;;
 esac

@@ -125,8 +125,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       displays_add_point_labels (sp, k, gg);
 
     if (gg->identify_handler.handler) {
-      (gg->identify_handler.handler)(gg->identify_handler.user_data,
-        k, sp, w, gg);
+      (gg->identify_handler.handler)(gg->identify_handler.user_data, k, sp, w, gg);
     }
 
     d->nearest_point_prev = k;
