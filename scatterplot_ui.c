@@ -51,9 +51,11 @@ scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggo
   CreateMenuItem (gg->app.scatterplot_mode_menu, "2D Tour",
     "^t", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (TOUR2D) : gg, gg);
+#ifdef CORRELATION_TOUR_IMPLEMENTED
   CreateMenuItem (gg->app.scatterplot_mode_menu, "Correlation Tour",
     "^c", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (COTOUR) : gg, gg);
+#endif
 
   /* Add a separator */
   CreateMenuItem (gg->app.scatterplot_mode_menu, NULL,
@@ -70,9 +72,11 @@ scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggo
   CreateMenuItem (gg->app.scatterplot_mode_menu, "Identify",
     "^i", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
+#ifdef EDIT_LINES_IMPLEMENTED
   CreateMenuItem (gg->app.scatterplot_mode_menu, "Edit Lines",
     "^l", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (LINEED) : gg, gg);
+#endif
   CreateMenuItem (gg->app.scatterplot_mode_menu, "Move Points",
     "^m", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg);

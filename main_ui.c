@@ -25,11 +25,15 @@ const char *const GGOBI(OpModeNames)[] = {
   "Rotation",
   "1D Tour",
   "2D Tour",
+#ifdef CORRELATION_TOUR_IMPLEMENTED
   "Correlation Tour",
+#endif
   "Scale",
   "Brush",
   "Identify",
+#ifdef EDIT_LINES_IMPLEMENTED
   "Edit Lines",
+#endif
   "Move Points",
 
   "Scatmat",
@@ -434,11 +438,11 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
         break;
 
       case TOUR1D:
-	/*        tour1d_func (off, gg);*/
+	    tour1d_func (off, gg);
         break;
 
       case TOUR2D:
-	/*        tour2d_func (off, gg);*/
+	    tour2d_func (off, gg);
         break;
 
       case SCALE:
@@ -522,16 +526,19 @@ static GtkItemFactoryEntry menu_items[] = {
  *     filename_get,    
  *     1 },
 */
-  { "/File/Save (new file set) ...",   
+  { "/File/Save ...",   
        NULL,    
        (GtkItemFactoryCallback) writeall_window_open,    
        2 },
 
+#ifdef PRINTING_IMPLEMENTED
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Print",
        NULL,    
        (GtkItemFactoryCallback) display_write_svg,         
        0 },
+#endif
+
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Quit",   
        "<ctrl>Q",   
@@ -578,11 +585,13 @@ static GtkItemFactoryEntry menu_items[] = {
        0,
        NULL },
   { "/Tools/sep",     NULL, NULL, 0, "<Separator>" },
+#ifdef SMOOTH_IMPLEMENTED
   { "/Tools/Smooth ...", 
        NULL,        
        (GtkItemFactoryCallback) smooth_window_open,   
        0,
        NULL },
+#endif
 
   { "/Tools/Impute missing values ...", 
        NULL,        
@@ -615,6 +624,8 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) main_display_options_cb,
        3,
        "<CheckItem>" },
+
+#ifdef BRUSHING_OPTIONS_IMPLEMENTED
   { "/Options/sep",  
        NULL,    
        NULL,         
@@ -632,6 +643,7 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) brush_options_cb,
        1,
        "<CheckItem>" },
+#endif
 
 
   {"/Dis_playTree", NULL, NULL, 0, "<Branch>"},
@@ -721,7 +733,11 @@ make_ui (ggobid *gg) {
             &name);
           if (g_strcasecmp (name, "show tooltips") == 0)
             GTK_CHECK_MENU_ITEM (item)->active = true;
-          else if (g_strcasecmp (name, "show mode panel") == 0)
+          else if (g_strcasecmp (name, "show control panel") == 0)
+            GTK_CHECK_MENU_ITEM (item)->active = true;
+          else if (g_strcasecmp (name, "show axes") == 0)
+            GTK_CHECK_MENU_ITEM (item)->active = true;
+          else if (g_strcasecmp (name, "lay out variable circles by row") == 0)
             GTK_CHECK_MENU_ITEM (item)->active = true;
   
         } else {

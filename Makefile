@@ -9,8 +9,13 @@ EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 # used to comment out sections of code for incompletely
 # implemented or buggy functionality
 TOUR1D_IMPLEMENTED=0
+CORRELATION_TOUR_IMPLEMENTED=0
 BINARY_IO_IMPLEMENTED=0
 INFERENCE_IMPLEMENTED=0
+SMOOTH_IMPLEMENTED=0
+BRUSHING_OPTIONS_IMPLEMENTED=0
+EDIT_LINES_IMPLEMENTED=0
+PRINTING_IMPLEMENTED=0
 
 include local.config
 

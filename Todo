@@ -1,11 +1,6 @@
 Fix the names and ids in the color map specification. Need to
 determine what is the relationship between these.
 
-
-When we add a dataset after loading the first one (i.e. in a separate
-action) the first tab of the notebook does not have the correct labe
-(it appears as Page 1).
-
 Check the fileselection dialog for read (filesel_ok) to ensure that
 the correct data mode is passed.  Take it out of ggobi.
 
@@ -19,7 +14,8 @@ Bugs:
 
   is adding and removing plots in scatmat still problematic?
 
-  reading in new data works surprisingly -- adding rather than replacing
+Reading in new data
+  add an option:  add a new datad or replace an existing one
 
 In progress, needing design discussions:
   Should variable limits be disabled for transformed variables?
@@ -27,10 +23,13 @@ In progress, needing design discussions:
 
 various stuff not yet implemented:
   Options on options menu
-  show/hide missings button 
+  show/hide missings button
   some window closings  (display tree, ...)
   "row groups" are only partially implemented
   1d, xy cycling  .... or run as a demo in R for now? (disabled for now)
+
+Moving points
+  add point labels as in xgobi
 
 Graphs
   Edges with data: a separate region of the variable selection panel
@@ -200,3 +199,7 @@ Food for thought:
 
 ! sphere data into new variables instead of overwriting
 !   the existing values -- that will test cloning!
+
+! When we add a dataset after loading the first one (i.e. in a separate
+! action) the first tab of the notebook does not have the correct labe
+! (it appears as Page 1).
