@@ -31,10 +31,31 @@ Dynload *dynload = &unixDynload;
 #endif
 
 
+#ifndef WIN32 
+#include <unistd.h> 
+#include <sys/stat.h> 
+#else
+#include <glib.h> 
+# ifdef __STRICT_ANSI__ 
+# undef   __STRICT_ANSI__ 
+# endif
+# include <io.h> 
+#endif 
+
 HINSTANCE 
 load_plugin_library(GGobiPluginInfo *plugin)
 {
   HINSTANCE handle;
+#ifndef WIN32
+  struct stat buf;
+  if(stat(plugin->dllName, &buf) != 0) {
+#else
+  gint ft=0;
+  if(access(plugin->dllName, ft) != 0) {
+#endif
+    fprintf(stderr, "can't locate plugin library %s:\n", plugin->dllName);fflush(stderr);      
+    return(NULL);
+  }
 
    handle = dynload->open(plugin->dllName, plugin);
    if(!handle) {
@@ -71,6 +92,7 @@ registerPlugins(ggobid *gg, GList *plugins)
 	  inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
           inst->data = NULL;
           inst->info = plugin;
+          inst->active = true;
 	  ok = f(gg, plugin, inst);
 	  if(ok) {
 	      GGOBI_addPluginInstance(inst, gg);
@@ -81,6 +103,8 @@ registerPlugins(ggobid *gg, GList *plugins)
 	  inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
           inst->data = NULL;
           inst->info = plugin;
+          inst->gg = gg;
+          inst->active = true;
           GGOBI_addPluginInstance(inst, gg);
     }
     el = el->next;
@@ -95,7 +119,6 @@ pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins)
   GList *el = plugins;
   OnUpdateDisplayMenu f;
   PluginInstance *plugin;
-  PluginInstance *inst;
   gboolean ok = true;
 
   while(el) {
