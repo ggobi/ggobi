@@ -104,7 +104,9 @@ glayout_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
 
   swin = (GtkWidget *) gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
   clname = gtk_widget_get_name (GTK_WIDGET(clist));
+#ifdef GGOBI_DEBUG
   g_printerr ("clname = %s\n", clname);
+#endif
 
   /*
    * This doesn't look right: a new datad can be only one of a
@@ -117,7 +119,9 @@ glayout_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
   }
   if (strcmp (clname, "edgeset") == 0) {
     if (d->edge.n > 0) {
+#ifdef GGOBI_DEBUG
       g_printerr ("... with %d edges\n", d->edge.n);
+#endif
       row[0] = g_strdup (d->name);
       gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
       g_free (row[0]);
