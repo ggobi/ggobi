@@ -112,7 +112,7 @@ extern const gint ViewTypeIndeces[3];
 #define BR_COLOR 1
 #define BR_GLYPH 2  /*-- glyph type and size --*/
 #define BR_GSIZE 3  /*-- glyph size only --*/
-#define BR_ERASE 4
+#define BR_HIDE  4
 /* for binning the screen */
 #define BRUSH_NBINS  20
 #define BRUSH_MARGIN 10

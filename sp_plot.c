@@ -149,7 +149,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp)
         draw_case = true;
 
         /*-- determine whether case m should be plotted --*/
-        if (xg.erased_now[m])
+        if (xg.hidden_now[m])
           draw_case = false;
         /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
         else if (!display->missings_show_p && xg.nmissing > 0) {
@@ -276,7 +276,7 @@ splot_draw_to_pixmap0_binned (splotd *sp)
           for (iv=bin0.y; iv<=bin1.y; iv++) {
             for (m=0; m<xg.br_binarray[ih][iv].nels; m++) {
               i = xg.rows_in_plot[xg.br_binarray[ih][iv].els[m]];
-              if (!xg.erased_now[i] && xg.color_now[i] == current_color) {
+              if (!xg.hidden_now[i] && xg.color_now[i] == current_color) {
                 draw_glyph (sp->pixmap0, &xg.glyph_now[i], sp->screen, i);
 
                 /* parallel coordinate plot whiskers */
@@ -488,8 +488,8 @@ segments_draw (splotd *sp)
             doit = False;
         }
 */
-        /* If either from or to is erased, move on */
-        if (doit && (xg.erased_now[from] || xg.erased_now[to]))
+        /* If either from or to is hidden, move on */
+        if (doit && (xg.hidden_now[from] || xg.hidden_now[to]))
           doit = false;
 
         if (doit) {

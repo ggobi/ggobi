@@ -6,7 +6,7 @@
 #include "vars.h"
 #include "externs.h"
 
-static void open_tour2dadv_popup (void);
+static void tour2dadv_window_open (void);
 
 void speed_set (gint speed) {
   g_printerr ("speed=%d\n", speed);
@@ -14,6 +14,7 @@ void speed_set (gint speed) {
 static void speed_set_cb (GtkAdjustment *adj, gpointer cbd) {
   speed_set ((gint)adj->value);
 }
+
 /*-- not a callback, but an initialization routine for the scrollbar --*/
 static void scale_set_default_values (GtkScale *scale )
 {
@@ -44,11 +45,11 @@ static void pcaxes_cb (GtkToggleButton *button)
 
 static void tour2dpp_cb (GtkWidget *w) {
   g_printerr ("open projection pursuit panel\n");
-  open_tour2dpp_popup ();
+  tour2dpp_window_open ();
 }
 static void tour2dadv_cb (GtkWidget *w) {
   g_printerr ("open advanced tour features panel\n");
-  open_tour2dadv_popup ();
+  tour2dadv_window_open ();
 }
 
 static gchar *manip_lbl[] = {"Oblique", "Vert", "Horiz", "Radial",
@@ -238,7 +239,7 @@ static void hide_cb (GtkWidget *w ) {
   gtk_widget_hide (w);
 }
 
-static void open_tour2dadv_popup () {
+static void tour2dadv_window_open () {
   GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
   GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;
   GtkObject *adj;

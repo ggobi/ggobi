@@ -33,7 +33,7 @@ static void brush_scope_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *cg_lbl[] =
-  {"Color and glyph", "Color only", "Glyph only", "Glyph size only", "Erase"};
+  {"Color and glyph", "Color only", "Glyph only", "Glyph size only", "Hide"};
 static void brush_cg_cb (GtkWidget *w, gpointer cbd)
 {
   cpaneld *cpanel = &xg.current_display->cpanel;
@@ -285,7 +285,7 @@ cpanel_brush_make () {
 */
   cg_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), cg_opt,
-    "Brush with color and glyph, color, glyph, glyph size; or erase", NULL);
+    "Brush with color and glyph, color, glyph, glyph size; or hide", NULL);
   gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
                       cg_opt, false, false, 0);
   populate_option_menu (cg_opt, cg_lbl,

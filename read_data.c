@@ -774,18 +774,18 @@ nlinkable_read (gchar *ldata_in, gboolean init)
 /*------------------------------------------------------------------------*/
 
 gboolean
-erase_read (gchar *ldata_in, gboolean reinit)
+hidden_read (gchar *ldata_in, gboolean reinit)
 /*
- * Read in the erase vector
+ * Read in the hidden vector
 */
 {
-  gchar *suffixes[] = {".erase"};
+  gchar *suffixes[] = {".hide"};
   gint itmp, i;
   gboolean found = false;
   FILE *fp;
 
   if (reinit)
-    erase_alloc ();
+    hidden_alloc ();
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
     if ((fp=open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
@@ -796,18 +796,18 @@ erase_read (gchar *ldata_in, gboolean reinit)
     i = 0;
     while ((fscanf (fp, "%d", &itmp) != EOF) && (i < xg.nrows)) {
       if (xg.file_read_type == read_all || k == xg.file_rows_sampled[i]) {
-        xg.erased[i] = xg.erased_now[i] = xg.erased_prev[i] = (gboolean) itmp;
+        xg.hidden[i] = xg.hidden_now[i] = xg.hidden_prev[i] = (gboolean) itmp;
         i++;
       }
       k++;
     }
   
     if (i < xg.nrows)
-      g_printerr ("Problem in reading erase file; not enough rows\n");
+      g_printerr ("Problem in reading hide file; not enough rows\n");
 
   } else {
     if (reinit)
-      erase_init ();
+      hidden_init ();
   }
 
   return (found);

@@ -24,17 +24,17 @@ add_to_subset (gint i) {
   if (xg.nrgroups > 0) {
     if (xg.rgroups[i].included) {
       added = true;
-      xg.rgroups[i].in_subset = true;
+      xg.rgroups[i].sampled = true;
       for (j=0; j<xg.rgroups[i].nels; j++) {
         el = xg.rgroups[i].els[j];
-        xg.in_subset[el] = true;
+        xg.sampled[el] = true;
       }
     }
 
   } else {
     if (xg.included[i] == true) {
       added = true;
-      xg.in_subset[i] = true;
+      xg.sampled[i] = true;
     }
   }
 
@@ -47,11 +47,11 @@ subset_clear () {
   gint i, rgid;
 
   for (i=0; i<xg.nlinkable; i++)
-    xg.in_subset[i] = false;
+    xg.sampled[i] = false;
 
   for (i=0; i<xg.nrgroups; i++) {
     rgid = xg.rgroup_ids[i];
-    xg.rgroups[rgid].in_subset = false;
+    xg.rgroups[rgid].sampled = false;
   }
 }
 
@@ -87,11 +87,11 @@ subset_include_all () {
   gint i, rgid;
 
   for (i=0; i<xg.nlinkable; i++)
-    xg.in_subset[i] = true;
+    xg.sampled[i] = true;
 
   if (xg.nrgroups > 0) {
     rgid = xg.rgroup_ids[i];
-    xg.rgroups[rgid].in_subset = true;
+    xg.rgroups[rgid].sampled = true;
   }
 }
 

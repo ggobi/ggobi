@@ -83,7 +83,6 @@ find_selection_circle_pos (icoords *pos) {
 }
 
 
-extern void draw_glyph (GdkDrawable *, glyphv *, icoords *, gint);
 static void
 redraw_symbol_display (GtkWidget *w) {
   gint i;
@@ -102,6 +101,7 @@ redraw_symbol_display (GtkWidget *w) {
 
   /*
    * The factor of three is dictated by the sizing of circles
+   *  ... this should no longer be true; it should be 2*width + 1
   */
   pos.y = margin + 3/2;
   pos.x = spacing/2;

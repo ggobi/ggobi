@@ -72,7 +72,7 @@ static void reset_tform_cb (GtkButton *button)
 
 static GtkWidget *window = NULL;
 void
-open_transform_popup () {
+transform_window_open () {
 
   GtkWidget *lbl, *hbox;
   GtkWidget *vbox, *frame, *hb, *vb, *btn;

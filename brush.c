@@ -72,7 +72,7 @@ brush_prev_vectors_update (void) {
   for (m=0; m<xg.nrows_in_plot; m++) {
     i = xg.rows_in_plot[m];
     xg.color_prev[i] = xg.color_ids[i];
-    xg.erased_prev[i] = xg.erased[i];
+    xg.hidden_prev[i] = xg.hidden[i];
     xg.glyph_prev[i].size = xg.glyph_ids[i].size;
     xg.glyph_prev[i].type = xg.glyph_ids[i].type;
   }
@@ -84,7 +84,7 @@ brush_undo (splotd *sp) {
   for (m=0; m<xg.nrows_in_plot; m++) {
     i = xg.rows_in_plot[m];
     xg.color_ids[i] = xg.color_now[i] = xg.color_prev[i];
-    xg.erased[i] = xg.erased_now[i] = xg.erased_prev[i];
+    xg.hidden[i] = xg.hidden_now[i] = xg.hidden_prev[i];
     xg.glyph_ids[i].type = xg.glyph_now[i].type = xg.glyph_prev[i].type;
     xg.glyph_ids[i].size = xg.glyph_now[i].size = xg.glyph_prev[i].size;
   }
@@ -110,7 +110,7 @@ reinit_transient_brushing (void)
     xg.color_now[i] = xg.color_ids[i] ;
     xg.glyph_now[i].type = xg.glyph_ids[i].type;
     xg.glyph_now[i].size = xg.glyph_ids[i].size;
-    xg.erased_now[i] = xg.erased[i];
+    xg.hidden_now[i] = xg.hidden[i];
   }
   (void) brush_once (false);
 }
@@ -479,11 +479,11 @@ build_color_vectors (void)
 }
 
 /*----------------------------------------------------------------------*/
-/*                      Erase brushing                                  */
+/*                      Hide brushing                                   */
 /*----------------------------------------------------------------------*/
 
 static gboolean
-update_erase_arrays (gint i, gboolean changed) {
+update_hidden_arrays (gint i, gboolean changed) {
   cpaneld *cpanel = &xg.current_display->cpanel;
   gboolean doit = true;
 
@@ -493,9 +493,9 @@ update_erase_arrays (gint i, gboolean changed) {
   */
   if (!changed) {
     if (xg.under_new_brush[i])
-      doit = (xg.erased_now[i] != true);
+      doit = (xg.hidden_now[i] != true);
     else
-      doit = (xg.erased_now[i] != xg.erased[i]);
+      doit = (xg.hidden_now[i] != xg.hidden[i]);
   }
 /* */
 
@@ -507,20 +507,20 @@ update_erase_arrays (gint i, gboolean changed) {
     if (xg.under_new_brush[i]) {
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
-          xg.erased[i] = xg.erased_now[i] = true;
+          xg.hidden[i] = xg.hidden_now[i] = true;
           break;
         case BR_TRANSIENT:
-          xg.erased_now[i] = true;
+          xg.hidden_now[i] = true;
           break;
       }
-    } else xg.erased_now[i] = xg.erased[i];
+    } else xg.hidden_now[i] = xg.hidden[i];
   }
 
   return (doit);
 }
 
 static gboolean
-build_erase_vectors (void)
+build_hidden_vectors (void)
 {
   gint ih, iv, m, j, k, gp, n, p;
   static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
@@ -542,16 +542,16 @@ build_erase_vectors (void)
         if (j < xg.nlinkable) {
 
           if (xg.nrgroups > 0) {
-            /*-- update the erase arrays for every member of the row group --*/
+            /*-- update the hidden arrays for every member of the row group --*/
             gp = xg.rgroup_ids[k];
             for (n=0; n<xg.rgroups[gp].nels; n++) {
               p = xg.rgroups[gp].els[n];
-              changed = update_erase_arrays (p, changed);
+              changed = update_hidden_arrays (p, changed);
             }
           /* */
 
           } else {  /* update the arrays for this point only */
-            changed = update_erase_arrays (j, changed);
+            changed = update_hidden_arrays (j, changed);
           }
         }
       }
@@ -590,7 +590,7 @@ active_paint_points (void)
         pt = xg.rows_in_plot[xg.br_binarray[ih][iv].els[j]];
 
         if (pt < xg.nlinkable) {
-/*          if (!xg.erased[pt] && under_brush (pt)) {*/
+/*          if (!xg.hidden[pt] && under_brush (pt)) {*/
           if (under_brush (pt)) {
 
             npts_under_brush++ ;
@@ -601,7 +601,7 @@ active_paint_points (void)
               gp = xg.rgroup_ids[pt];
               if (gp < xg.nrgroups) {  /* exclude points without an rgroup */
                 for (k=0; k<xg.rgroups[gp].nels; k++) {
-/*                  if (!xg.erased[ xg.rgroups[gp].els[k] ])*/
+/*                  if (!xg.hidden[ xg.rgroups[gp].els[k] ])*/
                     xg.under_new_brush[xg.rgroups[gp].els[k]] = 1;
                 }
               }
@@ -631,8 +631,8 @@ active_paint_points (void)
       case BR_GSIZE:  /*-- glyph size only --*/
         if (build_glyph_vectors ()) changed = true;
         break;
-      case BR_ERASE:  /*-- erase --*/
-        if (build_erase_vectors ()) changed = true;
+      case BR_HIDE:  /*-- hidden --*/
+        if (build_hidden_vectors ()) changed = true;
         break;
     }
   }

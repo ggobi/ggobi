@@ -43,7 +43,7 @@ hide_cb (GtkWidget *w ) {
 }
 
 void
-open_smooth_popup () {
+smooth_window_open (void) {
 
   GtkWidget *tgl, *lbl;
   GtkWidget *vbox, *vb;

@@ -29,7 +29,7 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 
 void
-open_ctourpp_popup () {
+ctourpp_window_open (void) {
   GtkWidget *hbox, *vbox, *vbc, *frame, *tgl, *entry;
   GtkWidget *da, *label, *hb;
 

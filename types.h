@@ -94,13 +94,12 @@ typedef struct {
 
 /* cluster; to be used in Group Exclusion tool */
 typedef struct {
-  gchar name[32];
+  glong n;  /*-- Can I know the number of elements in this cluster? --*/
   gint glyphtype, glyphsize;
-  gulong color;
-  gint glyphtype_prev, glyphsize_prev;
-  gulong color_prev;
-  gboolean erased, included;
-} cluster;
+  gshort color;
+  gboolean hidden, included;
+  GtkWidget *da, *hide_tgl, *exclude_tgl;
+} clusterd;
 
 /* glyph vectors */
 typedef struct {
@@ -121,7 +120,7 @@ typedef struct {
   gulong *els;
   glong nels;
   gboolean included;   /* for linked brushing */
-  gboolean in_subset;  /* for subsetting */
+  gboolean sampled;  /* for subsetting */
 } rgroupd;
 
 #define TYPES_H

@@ -53,7 +53,7 @@ vgroups_cb (GtkToggleButton *button)
 }
 
 void
-jitter_popup_open () {
+jitter_window_open (void) {
 
   GtkWidget *btn, *tgl, *lbl;
   GtkWidget *vbox, *vb;

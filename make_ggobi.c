@@ -87,7 +87,7 @@ fileset_read (gchar *ldata_in)
 
   point_glyphs_read (xg.fname, true);
   point_colors_read (xg.fname, true);
-  erase_read (xg.fname, true);
+  hidden_read (xg.fname, true);
 
   segments_read (xg.fname, true);
   line_colors_read (xg.fname, true);
@@ -104,7 +104,7 @@ pipeline_init ()
   pipeline_arrays_alloc ();
   for (i=0; i<xg.nrows; i++) {
     xg.rows_in_plot[i] = i;
-    xg.in_subset[i] = true;
+    xg.sampled[i] = true;
   }
 
   /*-- some initializations --*/

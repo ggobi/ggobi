@@ -116,7 +116,7 @@ void set_block_incr_cb (GtkAdjustment *adj, GtkSpinButton *spin )
 /*------------------------------------------------------------------*/
 
 void
-open_subset_popup () {
+subset_window_open (void) {
 
   GtkWidget *button, *t;
   GtkWidget *vbox, *frame, *hb, *vb;

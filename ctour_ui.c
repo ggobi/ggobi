@@ -6,7 +6,7 @@
 #include "vars.h"
 #include "externs.h"
 
-static void open_ctouradv_popup (void);
+static void ctouradv_window_open (void);
 
 static void speed_cb (GtkAdjustment *adj, gpointer cbd) {
   g_printerr ("%d\n", ((gint) adj->value));
@@ -34,11 +34,11 @@ hide_cb (GtkWidget *w ) {
 
 static void ctourpp_cb (GtkWidget *w) {
   g_printerr ("open projection pursuit panel\n");
-  open_ctourpp_popup ();
+  ctourpp_window_open ();
 }
 static void ctouradv_cb (GtkWidget *w) {
   g_printerr ("open advanced correlation tour features panel\n");
-  open_ctouradv_popup ();
+  ctouradv_window_open ();
 }
 
 static gchar *manip_lbl[] = {"Vertical", "Horizontal", "Comb",
@@ -193,7 +193,7 @@ The following are considered advanced features for now:
 static GtkWidget *window = NULL;
 
 static void
-open_ctouradv_popup () {
+ctouradv_window_open (void) {
   GtkWidget *vbox, *btn, *frame;
 
   if (window == NULL) {

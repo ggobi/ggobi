@@ -111,12 +111,11 @@ typedef struct _xgobid {
  lims missing_lim;  /*-- usually 0,1, but potentially wider --*/
 /* */
 
- /* Deleting the erased points; subsetting */
- gboolean delete_erased_pts;
+ /* Deleting the hidden points; subsetting */
+ gboolean delete_hidden_pts;
  gint *rows_in_plot;
  gint nrows_in_plot;
- gboolean *in_subset;
-
+ gboolean *sampled;
 
  /* Row grouping */
 
@@ -124,9 +123,9 @@ typedef struct _xgobid {
  glong *rgroup_ids;
  rgroupd *rgroups;
 
- /* Hiding/excluding the erased points */
- cluster *clusv;
- int nclust;
+ /* Hiding/excluding the hidden points */
+ clusterd *clusv;
+ gint nclust;
  gboolean *included;
 
 
@@ -163,7 +162,7 @@ typedef struct _xgobid {
  gushort *color_ids, *color_now, *color_prev;  /* 0:ncolors-1 */
  glyphv glyph_id, glyph_0;
  glyphv *glyph_ids, *glyph_now, *glyph_prev;
- gboolean *erased, *erased_now, *erased_prev;
+ gboolean *hidden, *hidden_now, *hidden_prev;
  /* line brushing */
  gushort *xed_by_new_brush;
  gushort *line_color_ids, *line_color_now, *line_color_prev;  /* 0:ncolors-1 */

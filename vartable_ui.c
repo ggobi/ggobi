@@ -140,7 +140,7 @@ vartable_row_append (gint j)
 
 
 void
-vartable_create ()
+vartable_open ()
 {                                  
   gint j, k;
   GtkWidget *vbox;

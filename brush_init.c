@@ -87,23 +87,23 @@ br_color_ids_init ()
 /*-------------------------------------------------------------------------*/
 
 void
-erase_alloc (void)
+hidden_alloc (void)
 {
-  if (xg.erased != NULL) g_free (xg.erased);
-  if (xg.erased_now != NULL) g_free (xg.erased_now);
-  if (xg.erased_prev != NULL) g_free (xg.erased_prev);
+  if (xg.hidden != NULL) g_free (xg.hidden);
+  if (xg.hidden_now != NULL) g_free (xg.hidden_now);
+  if (xg.hidden_prev != NULL) g_free (xg.hidden_prev);
 
-  xg.erased = (gboolean *) g_malloc (xg.nrows * sizeof (gboolean));
-  xg.erased_now = (gboolean *) g_malloc (xg.nrows * sizeof (gboolean));
-  xg.erased_prev = (gboolean *) g_malloc (xg.nrows * sizeof (gboolean));
+  xg.hidden = (gboolean *) g_malloc (xg.nrows * sizeof (gboolean));
+  xg.hidden_now = (gboolean *) g_malloc (xg.nrows * sizeof (gboolean));
+  xg.hidden_prev = (gboolean *) g_malloc (xg.nrows * sizeof (gboolean));
 }
 void
-erase_init (void)
+hidden_init (void)
 {
   gint i;
 
   for (i=0; i<xg.nrows; i++)
-    xg.erased[i] = xg.erased_now[i] = xg.erased_prev[i] = false;
+    xg.hidden[i] = xg.hidden_now[i] = xg.hidden_prev[i] = false;
 }
 
 
