@@ -19,6 +19,7 @@ enum xmlDataState {
   COLORSCHEME,
   BRUSHSTYLE,
   REAL, INT, NA,
+  QUICK_HELP,
 /* HELP, DESCRIPTION */
   UNKNOWN
 };

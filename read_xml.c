@@ -105,6 +105,7 @@ const gchar * const xmlDataTagNames[] = {
   "real",
   "int",
   "na",
+  "quickHelp",
   ""
   };
 
@@ -307,6 +308,8 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
       if(data->recordString)
         setRecordValues(data, data->recordString, data->recordStringLength);
     break;
+    case QUICK_HELP:
+      break;
     default:
       fprintf(stderr, "Unrecognized XML state %s\n", name); fflush(stderr);    
     break;
