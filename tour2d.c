@@ -369,6 +369,7 @@ void
 tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
     /*
@@ -383,7 +384,6 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
     gg->tour2d.fade_vars = false;
     tour2d_active_var_set (jvar, d, dsp, gg);
     gg->tour2d.fade_vars = fade;
-
 
   } else if (GTK_IS_DRAWING_AREA(w)) {
     
@@ -405,12 +405,20 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
       }
     }
   }
+  sp->tour1d.initmax = true;
 }
 
 void
 tour2d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
+  greal precis = (greal) PRECISION1;
+  greal tmpf;
+
+  if (sp->tour2d.initmax) {
+    sp->tour2d.maxscreenx = 1.0;
+    sp->tour2d.maxscreeny = 1.0;
+  }
 
   for (m=0; m<d->nrows_in_plot; m++)
   {
@@ -422,7 +430,23 @@ tour2d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
       sp->planar[i].x += (greal)(dsp->t2d.F.vals[0][j]*world_data[i][j]);
       sp->planar[i].y += (greal)(dsp->t2d.F.vals[1][j]*world_data[i][j]);
     }
+    if (fabs(sp->planar[i].x) > sp->tour2d.maxscreenx)
+      sp->tour2d.maxscreenx = fabs(sp->planar[i].x);
+    if (fabs(sp->planar[i].y) > sp->tour2d.maxscreeny)
+      sp->tour2d.maxscreeny = fabs(sp->planar[i].y);
   }
+
+  if ((sp->tour2d.maxscreenx > precis) || (sp->tour2d.maxscreeny > precis)) {
+    tmpf = (sp->tour2d.maxscreenx > sp->tour2d.maxscreeny) ?
+      sp->tour2d.maxscreenx : sp->tour2d.maxscreeny;
+    tmpf = precis/tmpf;
+    for (m=0; m<d->nrows_in_plot; m++) {
+      i = d->rows_in_plot[m];
+      sp->planar[i].x *= tmpf;
+      sp->planar[i].y *= tmpf;
+    }
+  }
+
 }
 
 void tour2d_scramble(ggobid *gg)
@@ -654,6 +678,7 @@ void tour2d_reinit(ggobid *gg)
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
   gint nc = d->ncols;
+  splotd *sp = gg->current_splot;
 
   for (i=0; i<2; i++)
     for (j=0; j<nc; j++)
@@ -679,6 +704,8 @@ void tour2d_reinit(ggobid *gg)
     }*/
 
   dsp->t2d.get_new_target = true;
+
+  sp->tour2d.initmax = true;
 
   display_tailpipe (dsp, FULL, gg);
 

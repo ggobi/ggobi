@@ -451,26 +451,50 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
             sp->p1d.spread_data.els, &min, &max, &mean);
 
   if (sp->tour1d.initmax) {
-    sp->tour1d.keepmin = 0.0;    /* let this be zero for consistency */
-    sp->tour1d.keepmax = max;    
+    sp->tour1d.mincnt = 0.0;    /* let this be zero for consistency */
+    sp->tour1d.maxcnt = max;    
     sp->tour1d.initmax = false;  
+    sp->tour1d.minscreenx = yy[0];
+    sp->tour1d.maxscreenx = yy[0];
   }
   else
-    if (max > sp->tour1d.keepmax) sp->tour1d.keepmax = max;
+    if (max > sp->tour1d.maxcnt) sp->tour1d.maxcnt = max;
 
   /*max = 2*mean;  * try letting the max for scaling depend on the mean */
-  max = sp->tour1d.keepmax;
+  max = sp->tour1d.maxcnt;
   if (cpanel->t1d.vert) {
+    for (i=0; i<d->nrows_in_plot; i++) {
+      if (yy[i] < sp->tour1d.minscreenx) {
+         sp->tour1d.minscreenx = yy[i];
+      }
+      else if (yy[i] > sp->tour1d.maxscreenx) {
+         sp->tour1d.maxscreenx = yy[i];
+      }
+    }
     for (i=0; i<d->nrows_in_plot; i++) {
       sp->planar[i].x = (greal) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[i]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
-      sp->planar[i].y = yy[i];
+      /*      sp->planar[i].y = yy[i];*/
+      sp->planar[i].y = (greal) (precis*(-1.0+2.0*
+        ((yy[i]-sp->tour1d.minscreenx)/
+        (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));
     }
   }
   else {
     for (i=0; i<d->nrows_in_plot; i++) {
-      sp->planar[i].x = yy[i];
+      if (yy[i] < sp->tour1d.minscreenx) {
+         sp->tour1d.minscreenx = yy[i];
+      }
+      else if (yy[i] > sp->tour1d.maxscreenx) {
+         sp->tour1d.maxscreenx = yy[i];
+      }
+    }
+    for (i=0; i<d->nrows_in_plot; i++) {
+      sp->planar[i].x = (greal) (precis*(-1.0+2.0*
+        ((yy[i]-sp->tour1d.minscreenx)/
+        (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));
+      /*      sp->planar[i].x = yy[i];*/
       sp->planar[i].y = (greal) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[i]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/

@@ -96,11 +96,22 @@ typedef struct
  * tour1d (variables used to record the state of the 1D tour for this plot)
  */
  struct _tour1d {
-   gfloat keepmin;
-   gfloat keepmax; /* Is this ever used */
+   gfloat mincnt;
+   gfloat maxcnt;
+   gfloat minscreenx;
+   gfloat maxscreenx;
    gboolean initmax;
    icoords ash_baseline;  /*-- for drawing segments from point to baseline --*/
  } tour1d;
+
+/*
+ * tour1d (variables used to record the state of the 1D tour for this plot)
+ */
+ struct _tour2d {
+   greal maxscreenx;
+   greal maxscreeny;
+   gboolean initmax;
+ } tour2d;
 
 /*
  * xyplot
