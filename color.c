@@ -315,3 +315,65 @@ void init_var_GCs(GtkWidget * w, ggobid * gg)
 
   g_free(style);
 }
+
+gushort  /*-- returns the maximum color id --*/
+datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
+  datad *d, ggobid *gg) 
+{
+  gboolean new_color;
+  gint i, k, m, n;
+  gushort colorid, maxcolorid = 0;
+
+  if (d == NULL || d->nrows == 0)
+/**/return -1;
+          
+  n = 0;  /*-- *ncolors_used --*/
+
+  /*
+   * Loop once through d->color[], collecting the colors currently
+   * in use into the colors_used[] vector.
+  */
+  for (i=0; i<d->nrows_in_plot; i++) {
+    m = d->rows_in_plot[i];
+    if (d->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
+      new_color = false;
+    } else {
+      new_color = true;
+      for (k=0; k<n; k++) {
+        if (colors_used[k] == d->color_now.els[m]) {
+          new_color = false;
+          break;
+        }
+      }
+    }
+    if (new_color) {
+      colorid = d->color_now.els[m];
+      colors_used[n] = colorid;
+      maxcolorid = MAX(colorid, maxcolorid);
+      (n)++;
+    }
+  }
+
+  /*
+   * Make sure that the current brushing color is
+   * last in the list, so that it is drawn on top of
+   * the pile of points.
+  */
+  for (k=0; k<(n-1); k++) {
+    if (colors_used[k] == gg->color_id) {
+      colors_used[k] = colors_used[n-1];
+      colors_used[n-1] = gg->color_id;
+      break;
+    }
+  }
+
+  /* insurance -- eg if using mono drawing on a color screen */
+  if (n == 0) {
+    n = 1;
+    colors_used[0] = d->color_now.els[0];
+  }
+
+  *ncolors_used = n;
+  return (maxcolorid);
+}
+
