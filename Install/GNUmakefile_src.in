@@ -187,5 +187,6 @@ marshal.o: marshal.h
 
 ifneq ($(GTK_2),)
  make_ggobi.o: marshal.h GtkSignalDef.c
+ ggobiClass.o: marshal.h
 endif
 
