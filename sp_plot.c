@@ -922,6 +922,11 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     }
 
 
+/*
+ * It would be nice to draw the edges using the current color and
+ * glyph last, but it's not obvious how to set that up in this scheme.
+ * Should I skip them on the way through and then draw them at the end?
+*/
     for (k=0; k<NGLYPHSIZES; k++) {
       for (n=0; n<NEDGETYPES; n++) {
         for (p=0; p<ncolors; p++) {
@@ -1332,13 +1337,12 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
               gdk_text_extents (style->font, 
                 lbl, 3,
                 &lbearing, &rbearing, &width, &ascent, &descent);
-	    }
-            else {
+	        } else {
               varlab = g_strdup_printf("%d",j+1);
               gdk_text_extents (style->font, 
                 varlab, strlen (varlab),
                 &lbearing, &rbearing, &width, &ascent, &descent);
-	    }
+	        }
             textheight = ascent+descent;
             ix = ix - axindent - dawidth/8;
             iy = iy - (daheight - daheight/8 - axindent);
@@ -1355,14 +1359,17 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
               iy -= (textheight/2);
             else
               iy += (textheight);
-            if (dsp->options.axes_label_p) 
+            if (dsp->options.axes_label_p) {
               gdk_draw_string (drawable, style->font, gg->plot_GC,
                 ix, iy,
                 lbl);
-            else 
+              /* note: don't free lbl */
+            } else {
               gdk_draw_string (drawable, style->font, gg->plot_GC,
                 ix, iy,
                 varlab);
+              g_free (varlab);
+            }
           }
         }
         gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID, 
@@ -1370,6 +1377,9 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
       break;
       case COTOUR:
+        if (d->ncols < 4)
+          break;
+
         /*-- use string height to place the labels --*/
         gdk_text_extents (style->font, "yA", strlen("yA"),
           &lbearing, &rbearing, &width, &ascent, &descent);
