@@ -175,7 +175,86 @@ ga_nodes_show_cb (GtkWidget *btn, PluginInstance *inst)
   }
   for (i=0; i<e->nrows; i++)
     e->hidden_now.els[i] = e->hidden.els[i] = false;
-    /*-- probably need to link here as well in a while --*/
+    /*-- probably need to link here as well --*/
 
   displays_tailpipe (FULL, gg);
 }
+
+/*---------------------------------------------------------------------*/
+/*                    Neighbors routines                               */
+/*---------------------------------------------------------------------*/
+
+void ga_all_hide (PluginInstance *inst)
+{
+  graphactd *ga = graphactFromInst (inst);
+  datad *d = ga->d;
+  datad *e = ga->e;
+  gint i;
+
+  /*-- no linking at this stage --*/
+  for (i=0; i<d->nrows; i++)
+    d->hidden_now.els[i] = d->hidden.els[i] = true;
+  for (i=0; i<e->nrows; i++)
+    e->hidden_now.els[i] = e->hidden.els[i] = true;
+}
+
+void show_neighbors (ggobid *gg, gint index, gint state,
+  datad *d, void *data)
+{
+  PluginInstance *inst = (PluginInstance *)data;
+  graphactd *ga = (graphactd *) inst->data;
+  datad *e = ga->e;
+  gint k, a, b, edgeid;
+  endpointsd *endpoints;
+
+  endpoints = e->edge.endpoints;
+
+  if (state == STICKY) {
+    /*
+     * Find the neighbors of node 'index' and show them; hide
+     * all others.
+    */
+    ga_all_hide (inst);
+
+    for (k=0; k<ga->inEdges[index].nels; k++) {
+      edgeid = ga->inEdges[index].els[k];
+      a = d->rowid.idv.els[endpoints[edgeid].a];
+      b = d->rowid.idv.els[endpoints[edgeid].b];
+
+      e->hidden_now.els[edgeid] = e->hidden.els[edgeid] = false;
+      d->hidden_now.els[a] = d->hidden.els[a] = false;
+      d->hidden_now.els[b] = d->hidden.els[b] = false;
+    }
+    for (k=0; k<ga->outEdges[index].nels; k++) {
+      edgeid = ga->outEdges[index].els[k];
+      a = d->rowid.idv.els[endpoints[edgeid].a];
+      b = d->rowid.idv.els[endpoints[edgeid].b];
+
+      e->hidden_now.els[edgeid] = e->hidden.els[edgeid] = false;
+      d->hidden_now.els[a] = d->hidden.els[a] = false;
+      d->hidden_now.els[b] = d->hidden.els[b] = false;
+    }
+    displays_tailpipe (FULL, gg);
+  }
+}
+
+void
+show_neighbors_cb (GtkToggleButton *button, PluginInstance *inst)
+{
+  graphactd *ga = (graphactd *) inst->data;
+
+  if (ga->neighbors_find_p) {
+    gtk_signal_disconnect_by_func(GTK_OBJECT(inst->gg),
+      GTK_SIGNAL_FUNC (show_neighbors), inst);
+    ga->neighbors_find_p = false;
+  } else {
+    gtk_signal_connect (GTK_OBJECT(inst->gg),
+      "sticky_point_added", show_neighbors, inst);
+/*
+    gtk_signal_connect (GTK_OBJECT(gg),
+      "sticky_point_removed", show_all, inst);
+*/
+    ga->neighbors_find_p = true;
+  }
+}
+

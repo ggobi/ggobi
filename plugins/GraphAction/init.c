@@ -20,6 +20,10 @@ graphact_init (graphactd *ga) {
 
   vectori_init_null (&ga->nOutEdgesVisible);
   vectori_init_null (&ga->nInEdgesVisible);
+
+  /*-- finding neighborhoods --*/
+  ga->neighbors_find_p = false;
+  ga->nbor_radius = 1;
 }
 
 void

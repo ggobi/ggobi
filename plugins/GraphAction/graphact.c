@@ -163,7 +163,7 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
 /*-- "Specify datasets" list widgets --*/
 /*-- this is exactly the same code that appears in ggvis.c --*/
 
-  hbox = gtk_hbox_new (true, 10);
+  hbox = gtk_hbox_new (false, 10);
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
 
 /*
@@ -255,18 +255,34 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
 
 
   /*-- --*/
-  frame = gtk_frame_new ("PathsFinder");
+  frame = gtk_frame_new ("Find neighbors");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 1);
 
+  vbox = gtk_vbox_new (false, 1);
+  gtk_container_add (GTK_CONTAINER(frame), vbox);
+
+  hbox = gtk_hbox_new (true, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
+
+  btn = gtk_check_button_new_with_label ("Show neighbors");
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+    GTK_SIGNAL_FUNC (show_neighbors_cb), inst);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+
+  btn = gtk_button_new_with_label ("Show all");
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+
 /*
- checkbox:  PathsFinder on or off
+ checkbox:  Neighborhood finder on or off
  button: restore all nodes and edges
  slider taking the values {1,2} or {2,4} for the radius or diameter
     of the path to be reported
  button: label all nodes and edges
 */
 
-  label = gtk_label_new ("Paths");
+  label = gtk_label_new ("Neighbors");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
   /*-- --*/
 
