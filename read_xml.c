@@ -604,8 +604,16 @@ void endXMLElement(void *user_data, const xmlChar *name)
     case EDGES:
       resolveEdgeIds(data);
     case DATASET:
+    {
+      datad *d = getCurrentXMLData(data);
       setEdgePartners(data);
       releaseCurrentDataInfo(data);
+      if (data->current_record < d->nrows) {
+        g_printerr ("There are fewer records than declared for '%s'; exiting.\n",
+          d->name);
+        exit(101);
+      }
+    }
     break;
 
     case EDGE:
@@ -1892,6 +1900,12 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   gchar *stmp;
   gint i = data->current_record;
   gint start, end;
+
+  if (i == d->nrows) {
+    g_printerr ("There are more records than declared for '%s'; exiting.\n",
+      d->name);
+    exit(101);
+  }
 
   data->current_element = 0;
 
