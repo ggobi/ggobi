@@ -97,7 +97,6 @@ fileset_read (gchar *ldata_in, ggobid *gg)
       array_read (d, gg);
       d->nrows_in_plot = d->nrows;    /*-- for now --*/
       d->nrgroups = 0;                /*-- for now --*/
-       
       missing_values_read (gg->fname, true, d, gg);
       
       collabels_read (gg->fname, true, d, gg);

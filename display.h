@@ -19,6 +19,9 @@ struct _displayd {
  GtkWidget *window;
  cpaneld cpanel;
  enum displaytyped displaytype;
+
+ struct _displayd *embeddedIn;
+
  GList *splots;  /* doubly linked list of splots */
 
  datad *d;  /*-- pointer to a particular gg->d[] --*/
@@ -71,6 +74,9 @@ struct _displayd {
   struct _ggobid *ggobi;
 
 };  /* displayd; */
+
+
+gboolean isEmbeddedDisplay(displayd *dpy);
 
 
 #endif
