@@ -17,7 +17,7 @@ TestPlugin.so: $(OBJS)
 	$(CC) -shared $(OBJS) -o $@ $(EXTRA_LIBS) `gtk-config --libs`
 
 testplugin.o: testplugin.c
-	$(CC) -g $(GTKEXTRA_INCLUDES:%=-I%) -I$(GGOBI_HOME) $(CFLAGS) `gtk-config --cflags` -o $@ -c $<
+	$(CC) -g -I$(GGOBI_HOME) $(CFLAGS) -o $@ -c $<
 
 clean:
 	rm -f *.o *.so

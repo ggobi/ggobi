@@ -135,7 +135,7 @@ lib: $(LIB)
 $(DLL): $(LIB) $(DEF) $(IMP)  
 	$(DLLWRAP) -DBUILDING_DLL=1 --output-def $(DEF) --driver-name $(CC) \
 	--dllname $@\
-	--output-lib $@ $(LIB) $(LIBS) $(LLIBS) $(XML_LIB_DIRS)\
+	--output-lib $@ $(LIB) $(LIBS) $(LLIBS) \
 	$(XML_LIBS) $(LDFLAGS) -mwindows -mno-cygwin
 
 #$(DLL): $(LIB) $(DEF) 

@@ -26,20 +26,31 @@ Source: "C:\cygwin\home\duncan\Projects\ggobi\data\*.*"; DestDir: "{app}\data"; 
 Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\*.html"; DestDir: "{app}\Docs"; CopyMode: alwaysoverwrite
 Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\ggobi.ico"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 
+Source: "C:\cygwin\home\duncan\Projects\ggobi\*.h"; DestDir: "{app}\include"; CopyMode: alwaysoverwrite
+
+Source: "C:\cygwin\home\duncan\Projects\ggobi\libggobi.a"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\libggobi.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\libggobi.def"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
+
 
 [INI]
 Filename: "{app}\ggobi.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.ggobi.org"
 
 [Icons]
-Name: "{group}\ggobi"; Filename: "{app}\ggobi.exe"; IconFilename: "{app}\ggobi.ico"
-Name: "{group}\ggobi on the Web"; Filename: "{app}\ggobi.url"
-Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe"; IconFilename: "{app}\ggobi.ico"; MinVersion: 4,4; Tasks: desktopicon
-;Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe"; IconFilename: "C:\WINDOWS\WINUPD.ICO"; MinVersion: 4,4; Tasks: desktopicon
+Name: "{group}\GGobi"; Filename: "{app}\ggobi.exe"; IconFilename: "C:\WINDOWS\WINUPD.ICO" ; WorkingDir: "{app}" ; Flags: runminimized
+
+Name: "{group}\GGobi on the Web"; Filename: "{app}\ggobi.url"
+;Name: "{userdesktop}\GGobi"; Filename: "{app}\ggobi.exe"; IconFilename: "C:\cygwin\home\duncan\Projects\ggobi\notes\ggobi.ico";  Tasks: desktopicon
+
+; IconFilename: "C:\WINDOWS\WINUPD.ICO";
+Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe";  MinVersion: 4,4; Tasks: desktopicon; WorkingDir: "{app}\data"; Comment: "GGobi Interactive, Dynamic Visualization Software"; Flags: runminimized ; IconFilename: "C:\WINDOWS\A.ICO"
 
 [Run]
 ; Must put the "" around the data file since otherwise app may get broken into
 ; multiple words such as c:\Program Files\data\flea.xml, counting as two arguments!
-Filename: "{app}\ggobi.exe"; Parameters: """{app}\data\flea.xml"""; Description: "Launch ggobi"; Flags: nowait postinstall skipifsilent runminimized
+Filename: "{app}\ggobi.exe"; Parameters: """{app}\data\flea.xml"""; Description: "Launch ggobi"; Flags: runminimized
+
+; nowait postinstall skipifsilent
 
 [UninstallDelete]
 Type: files; Name: "{app}\ggobi.url"

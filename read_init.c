@@ -111,13 +111,14 @@ getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
 
   el = XML_CHILDREN(node);
   for(i = 0; el ; el = el->next) {
+
+/* */
+    if(el->type != XML_TEXT_NODE) {
 /*
  * dfs; trying to get past my compiler
 */
     /*memset((void*) info->descriptions+i, '\0', sizeof(GGobiDescription));*/
-    memset(info->descriptions+i, '\0', sizeof(GGobiDescription)); 
-/* */
-    if(el->type != XML_TEXT_NODE) {
+      memset(info->descriptions+i, '\0', sizeof(GGobiDescription)); 
       getPreviousInput(el, &(info->descriptions[i].input));
       i++;
     }
@@ -142,22 +143,28 @@ getPreviousInput(xmlNode *node, InputDescription *input)
         completeFileDesc(input->fileName, input);
    */
    if(input->fileName) {
-     gchar *ptr, *tmp1, *tmp2;
+     gchar *ptr, *tmp1, *tmp2 = NULL;
      gint i;
      tmp1 = strrchr(input->fileName, G_DIR_SEPARATOR);
-     tmp2 = strrchr(tmp1, '.');
-     if(tmp2)
-       input->givenExtension = g_strdup(tmp2+1);
-     input->baseName = g_malloc((tmp2 - tmp1 +1)*sizeof(gchar));
-     for(i = 0, ptr = tmp1 + 1 ; ptr < tmp2; ptr++, i++) {   
-       input->baseName[i] = *ptr;
+     if(tmp1) {
+       tmp2 = strrchr(tmp1, '.');
+       if(tmp2)
+         input->givenExtension = g_strdup(tmp2+1);
+       input->baseName = g_malloc((tmp2 - tmp1 +1)*sizeof(gchar));
+       for(i = 0, ptr = tmp1 + 1 ; ptr < tmp2; ptr++, i++) {   
+         input->baseName[i] = *ptr;
+       }
+       input->baseName[i] = '\0';
+       input->dirName = g_malloc((tmp1 - input->fileName +1)*sizeof(gchar));
+       for(i=0, ptr = input->fileName; ptr < tmp1; ptr++, i++) {   
+         input->dirName[i] = *ptr;
+       }
+       input->dirName[i] = '\0';
+     } else {
+       input->fileName = NULL;
+       input->dirName = NULL;
+       input->baseName = NULL;
      }
-     input->baseName[i] = '\0';
-     input->dirName = g_malloc((tmp1 - input->fileName +1)*sizeof(gchar));
-     for(i=0, ptr = input->fileName; ptr < tmp1; ptr++, i++) {   
-       input->dirName[i] = *ptr;
-     }
-     input->dirName[i] = '\0';
    }
 
    input->canVerify = 0;

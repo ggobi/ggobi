@@ -735,9 +735,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
     }
   }
 
-  if(i < 0) {
-    fprintf(stderr, "default glyph size %d\n",value);fflush(stderr);
-  }
+
   return (value != -1);
 }
 

@@ -64,7 +64,7 @@ cvs
  <plugin name="test plugin" load="immediate">
    <description>Test of the plugin mechanism.</description>
      <author>Duncan Temple Lang</author>
-     <dll name="plugins/TestPlugin/TestPlugin.so">
+     <dll name="plugins/TestPlugin/TestPlugin.dll">
       <init onCreate="init" onClose="close" onLoad="load" onUnload="unload" />
      </dll>
  </plugin>

@@ -1,0 +1,15 @@
+TestPlugin.dll:
+
+ifndef GGOBI_HOME
+ GGOBI_HOME=../..
+endif
+
+OBJS=testplugin.o
+
+include $(GGOBI_HOME)/local.config
+
+TestPlugin.dll: $(OBJS)
+	$(CC) -shared $(OBJS) -o $@
+
+testplugin.o: testplugin.c
+	$(CC) -g  -I$(GGOBI_HOME) -I$(GTK_DIR) -I$(GLIB_DIR) -I$(GTK_DIR)/gdk $(CFLAGS) -o $@ -c $<
