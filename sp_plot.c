@@ -199,9 +199,6 @@ void
 splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 {
   gint k;
-#ifndef WIN32
-  gint i, m, n;
-#endif
   gushort current_color;
   gint ncolors_used;
   gushort colors_used[MAXNCOLORS+2];
@@ -211,8 +208,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   gint dtype = display->displaytype;
   colorschemed *scheme = gg->activeColorScheme;
   gushort maxcolorid;
+#ifndef WIN32
   cpaneld *cpanel = &display->cpanel;
   gint proj = cpanel->projection;
+  gint i, m, n;
+#endif
 
   /*
    * since parcoords and tsplot each have their own weird way
@@ -1047,7 +1047,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
                    * directional arrow.  How thick should it be
                    * compared to the current line thickness?
                   */
-                  if (endpoints[j].jpartner == -1) {
+                  if (endpoints[j].jpartner == -1) { /* not bidirectional */
                     sp->arrowheads[nl].x1 =
                       (gint) (.2*sp->screen[a].x + .8*sp->screen[b].x);
                     sp->arrowheads[nl].y1 =
