@@ -23,7 +23,7 @@ ifndef GTK_CFLAGS
 endif
 
 ifndef GTK_LIBS
- GTK_LIBS=`gtk-config --cflags --libs`
+ GTK_LIBS=`gtk-config --libs`
 endif
 
 ifdef TEST_KEYS
@@ -257,8 +257,13 @@ datad.o read_xml.o: datad.c datad.h
 ../bin/ggobi: ggobi
 	cp ggobi $@
 
+PWD=$(shell pwd)
+
 cflags:
-	@echo "$(CFLAGS) $(GTK_CFLAGS)"
+	@echo "-I$(PWD) $(CFLAGS) $(GTK_CFLAGS)"
+
+libs:
+	@echo "-L$(PWD) -lggobi $(GTK_LIBS)"
 
 print.o: print.c print.h
 
