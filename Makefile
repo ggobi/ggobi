@@ -307,5 +307,7 @@ endif
 apiDoc: Install/apiDocConfig
 	$(DOXYGEN) Install/apiDocConfig
 
+testEvents.o: GGobiEvents.h
+
 # DO NOT DELETE
 

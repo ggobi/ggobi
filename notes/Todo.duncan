@@ -1,3 +1,6 @@
+When compiling Rggobi, ensure that the versions of Gtk are the same.
+
+
 Vertical ruler under Gtk+-2.4 does not display correctly - ticks are not there.
  Is this a scale calculation problem? The thumb is at the top and doesn't
  seem to move with the mouse.

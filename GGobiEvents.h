@@ -30,8 +30,14 @@ typedef void (*ggev_sticky_point_removed_f)(ggobid *, gint, gint, datad *, void*
 typedef void (*ggev_clusters_changed_f)(ggobid *, datad *, void *);
 
 #ifdef CHECK_EVENT_SIGNATURES
-#define CHECK_EVENT_SIGNATURE(x,y)  static ggev_##y __check ## x ## y __attribute__ ((unused)) = & x;
-#define CHECK_R_EVENT_SIGNATURE(x,y)  static ggev_r_##y __check ## x ## y __attribute__ ((unused)) = & x;
+#ifdef __GNUC__
+#define UNUSED_ATTR  __attribute__ ((unused))
+#else
+#define UNUSED_ATTR
+#endif
+
+#define CHECK_EVENT_SIGNATURE(x,y)  static ggev_##y __check ## x ## y UNUSED_ATTR = & x;
+#define CHECK_R_EVENT_SIGNATURE(x,y)  static ggev_r_##y __check ## x ## y UNUSED_ATTR = & x;
 #else
 #define CHECK_EVENT_SIGNATURE(x,y) 
 #endif
