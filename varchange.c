@@ -332,6 +332,14 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 {
   gint j, jfrom, jto;
   gint *keepers, nkeepers;
+  GList *l;
+  GtkCListRow *row;
+  gchar *varstr;
+  gint irow;
+
+  /*-- don't allow all variables to be deleted --*/
+  if (ncols >= d->ncols)
+/**/return false;
 
   /*
    * If one of the variables to be deleted is currently plotted,
@@ -367,25 +375,20 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   vartable_realloc (nkeepers, d);
 
   /*-- delete rows from clist; no copying is called for --*/
-  {
-    GList *l = g_list_last (GTK_CLIST (d->vartable_clist)->row_list);
-    GtkCListRow *row;
-    gchar *varstr;
-    gint irow;
-    while (l) {
-      row = GTK_CLIST_ROW (l);
-      /*-- grab the text in the invisible cell of the row to get the index --*/
-      varstr = GTK_CELL_TEXT(row->cell[CLIST_VARNO])->text;
-      if (varstr != NULL && strlen (varstr) > 0) {
-        irow = atoi (varstr);
-        if (!array_contains (keepers, nkeepers, irow)) {
-          gtk_clist_freeze (GTK_CLIST (d->vartable_clist));
-          gtk_clist_remove (GTK_CLIST (d->vartable_clist), irow);
-          gtk_clist_thaw (GTK_CLIST (d->vartable_clist));
-        }
+  l = g_list_last (GTK_CLIST (d->vartable_clist)->row_list);
+  while (l) {
+    row = GTK_CLIST_ROW (l);
+    /*-- grab the text in the invisible cell of the row to get the index --*/
+    varstr = GTK_CELL_TEXT(row->cell[CLIST_VARNO])->text;
+    if (varstr != NULL && strlen (varstr) > 0) {
+      irow = atoi (varstr);
+      if (!array_contains (keepers, nkeepers, irow)) {
+        gtk_clist_freeze (GTK_CLIST (d->vartable_clist));
+        gtk_clist_remove (GTK_CLIST (d->vartable_clist), irow);
+        gtk_clist_thaw (GTK_CLIST (d->vartable_clist));
       }
-      l = l->prev;
     }
+    l = l->prev;
   }
 
   /*-- delete columns from pipeline arrays --*/
@@ -415,10 +418,11 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
   d->ncols -= ncols;
 
-  /*-- run the pipeline  --*/
-  tform_to_world (d, gg);  /*-- I think not  --*/
-
+  /*-- run the first part of the pipeline  --*/
+  tform_to_world (d, gg);
+/*
   displays_tailpipe (REDISPLAY_ALL, gg);
+*/
 
   return true;
 }

@@ -118,8 +118,13 @@ tourcorr_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
       vectorf_delete_els (&dsp->tcorr1.tau, nc, cols);
       vectorf_delete_els (&dsp->tcorr1.tinc, nc, cols);
 
+/*-- why 2? --*/
+/*
       arrayf_delete_cols (&dsp->tc1_manbasis, (gint) 2, cols);
       arrayf_delete_cols (&dsp->tc2_manbasis, (gint) 2, cols);
+*/
+      arrayf_delete_cols (&dsp->tc1_manbasis, (gint) nc, cols);
+      arrayf_delete_cols (&dsp->tc2_manbasis, (gint) nc, cols);
 
       arrayf_delete_cols (&dsp->tcorr2.u0, nc, cols);
       arrayf_delete_cols (&dsp->tcorr2.u1, nc, cols);

@@ -248,10 +248,11 @@ brush_init (datad *d, ggobid *gg)
   brush_alloc (d, gg);
 }
 
-void
+enum redrawStyle
 brush_activate (gboolean state, displayd *display, ggobid *gg)
 {
   datad *d = display->d;
+  enum redrawStyle redraw_style = NONE;
 
   if (state)
     assign_points_to_bins (d, gg);
@@ -262,5 +263,8 @@ brush_activate (gboolean state, displayd *display, ggobid *gg)
      * brushed points to their previous color
     */
     reinit_transient_brushing (display, gg);
+    redraw_style = FULL;
   }
+
+  return redraw_style;
 }

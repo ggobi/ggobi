@@ -12,6 +12,7 @@
 #define SPLOT_H
 
 #include "defines.h"
+
 typedef struct _displayd displayd;
 
 typedef struct {
@@ -21,7 +22,7 @@ typedef struct {
  GtkWidget *da;                 /* drawing_area */
  GdkPixmap *pixmap0, *pixmap1;  /* 2-stage drawing */
 
- gint redraw_style;
+ enum redrawStyle redraw_style;
 
  /* Drawing area dimensions */
  icoords max;

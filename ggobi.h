@@ -87,7 +87,7 @@ struct _ggobid {
  DisplayTree display_tree;
  GList *displays;
  displayd *current_display;
- splotd *current_splot; 
+ splotd *current_splot;
 
  GGobiApp app;
 
@@ -96,7 +96,7 @@ struct _ggobid {
  /* main_ui */
  GtkWidget *control_panel[NMODES];
  GtkWidget *main_window, *main_menubar;
-  GtkItemFactory *main_menu_factory;
+ GtkItemFactory *main_menu_factory;
  GtkWidget *display_menu_item, *display_menu;  /*-- menu labelled 'Window' --*/
  GtkAccelGroup *main_accel_group;
  GtkWidget *mode_frame, *mode_item;

@@ -880,8 +880,6 @@ vartable_open (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (delete_vars_cb), gg);
-  /*-- until the details are worked out, make this insensitive --*/
-  gtk_widget_set_sensitive (btn, false);
 
   gtk_box_pack_start (GTK_BOX (hbox), hb, true, false, 1);
   /*-- --*/

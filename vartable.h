@@ -28,7 +28,12 @@
 #define ADDVAR_ROWNOS   0
 #define ADDVAR_BGROUP   1
 
-/* column-wise data that will appear in the variable table */
+/*
+ * a vartabled object is not a table, but rather an entry in
+ * a table:  it's all the data for a single variable, and it
+ * is used to populate a row in the variable manipulation table.
+*/
+
 typedef struct {
  gchar *collab, *collab_tform;
  gint nmissing;

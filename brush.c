@@ -168,10 +168,6 @@ brush_set_pos (gint x, gint y, splotd *sp) {
   brush->y2 = y ;
 }
 
-/*
- * This is not doing the right thing in a parallel
- * coordinates plot
-*/
 static gboolean
 binning_permitted (displayd *display)
 {
@@ -403,16 +399,20 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
  * type yet.
 */
 static gboolean
-update_glyph_vectors (gint i, gboolean changed, datad *d, ggobid *gg) {
+update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
+  datad *d, ggobid *gg)
+{
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
 
 /* setting the value of changed */
   if (!changed) {
-    if (d->pts_under_brush.els[i]) {
+    if (hit_by_brush[i]) {
 
       doit = (d->glyph_now[i].size != gg->glyph_id.size);
-      if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
+
+      /*-- ... and if not ignoring type --*/
+      if (!doit && cpanel->br_target != BR_GSIZE) 
         doit = doit || (d->glyph_now[i].type != gg->glyph_id.type);
 
     } else {
@@ -425,20 +425,20 @@ update_glyph_vectors (gint i, gboolean changed, datad *d, ggobid *gg) {
 /* */
 
   if (doit) {
-    if (d->pts_under_brush.els[i]) {
+    if (hit_by_brush[i]) {
       switch (cpanel->br_mode) {
 
         case BR_PERSISTENT:
           d->glyph[i].size = d->glyph_now[i].size = gg->glyph_id.size;
           if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
             d->glyph[i].type = d->glyph_now[i].type = gg->glyph_id.type;
-          break;
+        break;
 
         case BR_TRANSIENT:
           d->glyph_now[i].size = gg->glyph_id.size;
           if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
             d->glyph_now[i].type = gg->glyph_id.type;
-          break;
+        break;
       }
     } else {
       d->glyph_now[i].size = d->glyph[i].size;
@@ -447,7 +447,7 @@ update_glyph_vectors (gint i, gboolean changed, datad *d, ggobid *gg) {
     }
   }
 
-  return (changed);
+  return (doit);
 }
 
 
@@ -473,18 +473,19 @@ build_glyph_vectors (datad *d, ggobid *gg)
         */
         j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
 
-
         /* update the glyph vectors for every member of the row group */
         if (d->nrgroups > 0) {
           gp = d->rgroup_ids[k];
           for (n=0; n<d->rgroups[gp].nels; n++) {
             p = d->rgroups[gp].els[n];
-            changed = update_glyph_vectors (p, changed, d, gg);
+            changed = update_glyph_vectors (p, changed,
+              d->pts_under_brush.els, d, gg);
           }
         /* */
 
         } else {  /* update the vectors for this point only */
-          changed = update_glyph_vectors (j, changed, d, gg);
+          changed = update_glyph_vectors (j, changed,
+            d->pts_under_brush.els, d, gg);
 
           /*-- link by id --*/
           if (nd > 1) glyph_link_by_id (j, d, gg);
@@ -742,19 +743,19 @@ active_paint_points (datad *d, ggobid *gg)
       case BR_CANDG:  /*-- color and glyph --*/
         if (build_color_vectors (d, gg)) changed = true;
         if (build_glyph_vectors (d, gg)) changed = true;
-        break;
+      break;
       case BR_COLOR:
         if (build_color_vectors (d, gg)) changed = true;
-        break;
+      break;
       case BR_GLYPH:  /*-- glyph type and size --*/
         if (build_glyph_vectors (d, gg)) changed = true;
-        break;
+      break;
       case BR_GSIZE:  /*-- glyph size only --*/
         if (build_glyph_vectors (d, gg)) changed = true;
-        break;
+      break;
       case BR_HIDE:  /*-- hidden --*/
         if (build_hidden_vectors (d, gg)) changed = true;
-        break;
+      break;
     }
   }
 

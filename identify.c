@@ -40,6 +40,20 @@ find_nearest_point (icoords *lcursor_pos, splotd *splot, datad *d, ggobid *gg)
   return (npoint);
 }
 
+/*-- still having trouble getting identify turned off properly --*/
+enum redrawStyle
+identify_activate (gint state, displayd *display, ggobid *gg)
+{
+  enum redrawStyle redraw_style = NONE;
+
+  if (state == off) {
+    datad *d = display->d;
+    if (d->nearest_point != -1) redraw_style = QUICK;
+    d->nearest_point = -1;
+  }
+
+  return redraw_style;
+}
 
 void
 sticky_id_toggle (datad *d, ggobid *gg)

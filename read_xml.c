@@ -152,7 +152,8 @@ data_xml_read (InputDescription *desc, ggobid *gg)
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
       /* ok &= (d->ncols > 0 && d->nrows > 0); */
-      ok &= (d->nrows > 0);   /*-- try allowing no columns --*/
+      /*-- a simple edge set has no variables --*/
+      ok &= (d->nrows > 0);
     }
   }
       

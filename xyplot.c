@@ -12,6 +12,31 @@
 #include "vars.h"
 #include "externs.h"
 
+enum redrawStyle
+xyplot_activate (gint state, displayd *display, ggobid *gg)
+{
+  GList *slist;
+  splotd *sp;
+  datad *d = display->d;
+  gboolean reset = false;
+
+  for (slist = display->splots; slist; slist = slist->next) {
+    sp = (splotd *) slist->data;
+    if (sp->xyvars.x >= d->ncols) {
+      reset = true;
+      sp->xyvars.x = (sp->xyvars.y == 0) ? 1 : 0;
+    }
+    if (sp->xyvars.y >= d->ncols) {
+      reset = true;
+      sp->xyvars.y = (sp->xyvars.x == 0) ? 1 : 0;
+    }
+  }
+  if (reset)
+    varpanel_refresh (gg);
+
+  return NONE;
+}   
+
 gboolean
 xyplot_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
 {

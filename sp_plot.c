@@ -793,7 +793,7 @@ splot_pixmap1_to_window (splotd *sp, ggobid *gg) {
 /*------------------------------------------------------------------------*/
 
 void
-splot_redraw (splotd *sp, gint redraw_style, ggobid *gg) {
+splot_redraw (splotd *sp, enum redrawStyle redraw_style, ggobid *gg) {
 
   /*-- sometimes the first draw happens before configure is called --*/
   if (sp->da == NULL || sp->pixmap0 == NULL) {
@@ -813,18 +813,23 @@ splot_redraw (splotd *sp, gint redraw_style, ggobid *gg) {
       splot_pixmap0_to_pixmap1 (sp, true, gg);  /* true = binned */
     break;
     case EXPOSE:
-      break;
+    break;
+
+    case NONE:
+    break;
   }
 
-  splot_pixmap1_to_window (sp, gg);
+  if (redraw_style != NONE) {
+    splot_pixmap1_to_window (sp, gg);
 
-  /*
-   * Somehow the very first window is initially drawn without a border. 
-   * I ought to be able to fix that more nicely some day, but in the
-   * meantime, what's an extra rectangle?
-  */
-  if (sp == gg->current_splot) 
-    splot_draw_border (sp, sp->da->window, gg);
+    /*
+     * Somehow the very first window is initially drawn without a border. 
+     * I ought to be able to fix that more nicely some day, but in the
+     * meantime, what's an extra rectangle?
+    */
+    if (sp == gg->current_splot) 
+      splot_draw_border (sp, sp->da->window, gg);
+  }
 
   sp->redraw_style = EXPOSE;
 }

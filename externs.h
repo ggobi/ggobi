@@ -2,6 +2,9 @@
 #define GGOBI_S_H
 
 #include <stdio.h>
+#ifndef DEFINES_H
+#include "defines.h"
+#endif
 
 #ifdef USE_CLASSES
 datad *datad_new (ggobid *);
@@ -62,7 +65,7 @@ void br_edge_color_init (datad *d, ggobid *);
 gboolean br_edge_vectors_check_size (gint, datad *, ggobid *);
 void br_glyph_ids_alloc (datad *);
 void br_glyph_ids_init (datad *, ggobid *);
-void brush_activate (gboolean, displayd *, ggobid *);
+enum redrawStyle brush_activate (gboolean, displayd *, ggobid *);
 void brush_draw_brush (splotd *, GdkDrawable *, datad *, ggobid *);
 void brush_draw_label (splotd *, GdkDrawable *, datad *, ggobid *);
 void brush_event_handlers_toggle (splotd *, gboolean);
@@ -201,7 +204,7 @@ void missing_to_world (datad *, ggobid *);
 gboolean missing_values_read (InputDescription *desc, gboolean, datad *, ggobid *);
 void missing_world_alloc (datad *, ggobid *);
 void missing_world_free (datad *d, ggobid *);
-void mode_activate (splotd *, gint, gboolean, ggobid *);
+enum redrawStyle mode_activate (splotd *, gint, gboolean, ggobid *);
 gint mode_get (ggobid *);
 void mode_set (gint, ggobid *);
 void mode_set_cb (GtkWidget  *, gint);
@@ -299,7 +302,7 @@ void splot_pixmap1_to_window (splotd *, ggobid *);
 void splot_plane_to_screen (displayd *, cpaneld *, splotd *, ggobid *);
 void splot_plane_to_world (splotd *, gint, ggobid *);
 gboolean splot_plot_case (gint m, datad *, splotd *, displayd *, ggobid *);
-void splot_redraw (splotd *sp, gint, ggobid *);
+void splot_redraw (splotd *sp, enum redrawStyle, ggobid *);
 void splot_reverse_pipeline (splotd *, gint, lcoords *, gboolean, gboolean, ggobid *);
 void splot_screen_to_tform (cpaneld *, splotd *, icoords *, fcoords *, ggobid *);
 void splot_set_current (splotd *, gboolean, ggobid *);

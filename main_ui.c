@@ -424,27 +424,41 @@ procs_activate (gboolean state, displayd *display, ggobid *gg)
   }
 }
 
-void
+enum redrawStyle
 mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
   displayd *display = (displayd *) sp->displayptr;
+  gint redraw_style = NONE;
 
   if (state == off) {
     switch (m) {
       case BRUSH:
-        brush_activate (state, display, gg);
+        redraw_style = brush_activate (state, display, gg);
+      break;
+      case IDENT:
+      {
+        extern enum redrawStyle identify_activate (gint, displayd *, ggobid *);
+        redraw_style = identify_activate (state, display, gg);
+      }
       break;
       default:
       break;
     }
   } else if (state == on) {
     switch (m) {
-/*
       case P1PLOT:
-        p1plot_activate (state, display, gg);
+      {
+        extern enum redrawStyle p1d_activate (gint, displayd *, ggobid *);
+        p1d_activate (state, display, gg);
+      }
       break;
       case XYPLOT:
+      {
+        extern enum redrawStyle xyplot_activate (gint, displayd *, ggobid *);
         xyplot_activate (state, display, gg);
+      }
       break;
+/*
+are these needed?  maybe Di's already handling this.
       case TOUR1D:
         tour1d_activate (state, display, gg);
       break;
@@ -456,7 +470,7 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
       break;
 */
       case BRUSH:
-        brush_activate (state, display, gg);
+        redraw_style = brush_activate (state, display, gg);
       break;
       case SCALE:
       {
@@ -468,6 +482,7 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
       break;
     }
   }
+  return redraw_style;
 }
 
 void
@@ -524,10 +539,11 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
     displayd *display = gg->current_display;
+    enum redrawStyle redraw_style = NONE;
 
     if (projection_ok (action, display)) {
       sp_event_handlers_toggle (sp, off);
-      mode_activate (sp, gg->mode, off, gg);
+      redraw_style = mode_activate (sp, gg->mode, off, gg);
       mode_submenus_activate (sp, gg->mode, off, gg);
       procs_activate (off, display, gg);
 
@@ -539,7 +555,12 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
       mode_submenus_activate (sp, gg->mode, on, gg);
       procs_activate (on, display, gg);
 
+      /*-- redraw as needed for transient brushing and identify --*/
       display_tailpipe (display, gg);
+      if (redraw_style != NONE) {
+        displays_plot (sp, redraw_style, gg);
+      }
+
 /**/  return (action);
     }
   }

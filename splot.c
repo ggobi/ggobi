@@ -297,14 +297,11 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
     /*
      * this is now the only place varpanel_refresh is called in
      * changing the current display and splot; we'll see if it's
-     * adequate
+     * adequate -- and it's probably overkill sometimes, too.
     */
     if (state == on) {
       varpanel_refresh (gg);
     }
-
-    /*-- only required after leaving an splot in transient brushing --*/
-    displays_plot (NULL, FULL, gg);
   }
 }
 
@@ -312,6 +309,11 @@ void
 GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
 {
   splotd *sp_prev = gg->current_splot;
+  /*-- display and cpanel for outgoing current_splot --*/
+  displayd *display_prev = (displayd *) sp_prev->displayptr;
+  cpaneld *cpanel = &display_prev->cpanel;
+  gint prev_mode = gg->mode;
+
   if (sp != sp_prev) {
 
    if (sp_prev != NULL) {
@@ -322,20 +324,27 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
     }
 
     gg->current_splot = sp;
-
-    /* add border to current_splot */
-    sp->redraw_style = QUICK;
-    gtk_widget_queue_draw (sp->da);
-
     splot_set_current (sp, on, gg);
 
-    /* remove border from the previous splot */
-    if (sp_prev != NULL) {
-      sp_prev->redraw_style = QUICK;
-      gtk_widget_queue_draw (sp_prev->da);
+    /*
+     * if the previous splot is in transient brushing mode, a FULL
+     * redraw is required.
+     *
+     * if the previous splot is in identify, a QUICK redraw is required
+     *
+     * otherwise, just redraw the borders of the two affected splots
+    */
+    if (prev_mode == BRUSH && cpanel->br_mode == BR_TRANSIENT)
+      displays_plot (NULL, FULL, gg);
+    else if (prev_mode == IDENT)
+      displays_plot (NULL, QUICK, gg);
+    else {
+      /* remove border from the previous splot */
+      if (sp_prev != NULL) splot_redraw (sp_prev, QUICK, gg);
+      /* add border to current_splot */
+      splot_redraw (sp, QUICK, gg);
     }
   }
-
 }
 
 static gint

@@ -32,6 +32,24 @@
 #define FORGETITAXIS_MIN -100.
 #define FORGETITAXIS_MAX 200.
 
+enum redrawStyle
+p1d_activate (gint state, displayd *display, ggobid *gg)
+{
+  GList *slist;
+  splotd *sp;
+  datad *d = display->d;
+
+  for (slist = display->splots; slist; slist = slist->next) {
+    sp = (splotd *) slist->data;
+    if (sp->p1dvar >= d->ncols)
+      sp->p1dvar = 0;
+  }
+  varpanel_refresh (gg);
+
+  return NONE;
+}   
+
+
 void
 p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
   ggobid *gg)
