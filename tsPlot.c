@@ -6,7 +6,6 @@
 
 
 static void tsWorldToPlane(splotd *sp, datad *d, ggobid *gg);
-static void tsDestroy(splotd *sp);
 static void tsWithinPlaneToScreen(splotd *sp, displayd *display, datad *d, ggobid *gg);
 static gboolean tsDrawEdge_p(splotd *sp, gint m, datad *d, datad *e, ggobid *gg);
 static gboolean tsDrawCase_p(splotd *sp, gint m, datad *d, ggobid *gg);
