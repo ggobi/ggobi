@@ -313,9 +313,9 @@ power_transform (ggvisd *ggv)
   gdouble tmp, fac;
   gint i;
 
-  if (ggv->mds_dist_power == 1.) { 
+  if (ggv->mds_Dtarget_power == 1.) { 
     return; 
-  } else if (ggv->mds_dist_power == 2.) {
+  } else if (ggv->mds_Dtarget_power == 2.) {
     if (ggv->KruskalShepard_classic == KruskalShepard) { 
       for (i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
@@ -330,18 +330,18 @@ power_transform (ggvisd *ggv)
       }
     }
   } else {
-    fac = pow (ggv->dist_max, ggv->mds_dist_power-1);
+    fac = pow (ggv->dist_max, ggv->mds_Dtarget_power-1);
     if (ggv->KruskalShepard_classic == KruskalShepard) { 
       for(i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
         if (tmp != DBL_MAX)
-          ggv->trans_dist.els[i] = pow(tmp, ggv->mds_dist_power)/fac;
+          ggv->trans_dist.els[i] = pow(tmp, ggv->mds_Dtarget_power)/fac;
       }
     } else { 
       for(i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
         if(tmp != DBL_MAX)
-          ggv->trans_dist.els[i] = -pow(-tmp, ggv->mds_dist_power)/fac;
+          ggv->trans_dist.els[i] = -pow(-tmp, ggv->mds_Dtarget_power)/fac;
       }
     }
   }
@@ -498,7 +498,7 @@ isotonic_transform (ggvisd *ggv)
       for (j = 0; j < ggv->Dtarget.ncols; j++) {
         ij = IJ;
         if (ggv->trans_dist.els[ij] != DBL_MAX) {
-          if (ggv->mds_dist_power == 1.0) {
+          if (ggv->mds_Dtarget_power == 1.0) {
             if (ggv->KruskalShepard_classic == KruskalShepard) {
               ggv->trans_dist.els[ij] =
                 ggv->mds_isotonic_mix * ggv->trans_dist.els[ij] + 
@@ -509,17 +509,17 @@ isotonic_transform (ggvisd *ggv)
                 (1 - ggv->mds_isotonic_mix) *
                 ggv->Dtarget.vals[i][j]*ggv->Dtarget.vals[i][j];
             }
-          } else { /* mds_dist_power != 1.0 */
+          } else { /* mds_Dtarget_power != 1.0 */
             if (ggv->KruskalShepard_classic == KruskalShepard) {
               ggv->trans_dist.els[ij] =
                 ggv->mds_isotonic_mix * ggv->trans_dist.els[ij] + 
                 (1 - ggv->mds_isotonic_mix) *
-                pow(ggv->Dtarget.vals[i][j], ggv->mds_dist_power);
+                pow(ggv->Dtarget.vals[i][j], ggv->mds_Dtarget_power);
             } else {
               ggv->trans_dist.els[ij] =
                 ggv->mds_isotonic_mix * ggv->trans_dist.els[ij] - 
                 (1 - ggv->mds_isotonic_mix) *
-                pow(ggv->Dtarget.vals[i][j], 2*ggv->mds_dist_power);
+                pow(ggv->Dtarget.vals[i][j], 2*ggv->mds_Dtarget_power);
             }
           }
         } /* end if(trans_dist[ij] != DBL_MAX) { */
@@ -813,6 +813,8 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
                   ggv->mds_lnorm-1.0);
             }
           } else { /* Euclidean Minkowski/Lebesgue metric */
+            /* Note the simplification of the code for the special
+             * cases when mds_distpow takes on an integer value.  */
             if (ggv->mds_dist_power == 1)
               step_mag = weight * resid / dist_config;
             else if(ggv->mds_dist_power == 2)
