@@ -128,9 +128,12 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
  * as they're displayed in the current datad ... or not
 */
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
+  
 /* setDisplayEdge (dspnew, e); */
+/*
   if (dsp)
     edges_displayed = display_copy_edge_options (dsp, dspnew);
+*/
   if (!edges_displayed) {
     /*GGOBI(setShowLines)(dspnew, true);*/
 /*
@@ -325,6 +328,7 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
          necessarily the edgeset to be displayed (eg, morsecode) --*/
 /* can override the setting of the second clist in the preceding tab */
     ggv->e = gtk_object_get_data (GTK_OBJECT(clist), "datad");
+g_printerr ("e name = %s\n", ggv->e->name);
     if (ggv->e == NULL) {
 g_printerr ("e is null\n");
       quick_message ("I can't identify a set of edges", false);
