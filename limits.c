@@ -106,7 +106,7 @@ limits_raw_set_by_var (gint j, datad *d, ggobid *gg) {
         }
       }
     } else {
-      for (i=1; i<d->nrows; i++) {
+      for (i=0; i<d->nrows; i++) {
         if (!MISSING_P(i,j)) {
           min = d->raw.vals[i][j];
           max = d->raw.vals[i][j];
@@ -180,7 +180,7 @@ limits_tform_set_by_var (gint j, datad *d, ggobid *gg)
         }
       }
     } else {
-      for (i=1; i<d->nrows; i++) {
+      for (i=0; i<d->nrows; i++) {
         if (!MISSING_P(i,j)) {
           min = d->tform.vals[i][j];
           max = d->tform.vals[i][j];
