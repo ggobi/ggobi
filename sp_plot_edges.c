@@ -425,21 +425,16 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
   cpaneld *cpanel = &display->cpanel;
 
   if (cpanel->ee_adding_p) {
+
     if (k != -1)
       splot_add_diamond_cue (k, sp, drawable, gg);
+    if (gg->edgeedit.a != -1)
+      splot_add_diamond_cue (gg->edgeedit.a, sp, drawable, gg);
 
-    /*-- when the button is up, we're choosing the starting point --*/
-
-    if (gg->buttondown) {   /*-- button is down: choosing end point --*/
-      if (k != -1 && k != gg->edgeedit.a) {
-        gdk_draw_line (drawable, gg->plot_GC,
-          sp->screen[ gg->edgeedit.a ].x, sp->screen[ gg->edgeedit.a ].y,
-          sp->screen[ k ].x, sp->screen[ k ].y);
-      } else {
-        gdk_draw_line (drawable, gg->plot_GC,
-          sp->screen[ gg->edgeedit.a ].x, sp->screen[ gg->edgeedit.a ].y,
-          sp->mousepos.x, sp->mousepos.y);
-      }
+    if (gg->buttondown && gg->edgeedit.a != -1 && k != -1 && k != gg->edgeedit.a) {
+      gdk_draw_line (drawable, gg->plot_GC,
+        sp->screen[ gg->edgeedit.a ].x, sp->screen[ gg->edgeedit.a ].y,
+        sp->screen[ k ].x, sp->screen[ k ].y);
     }
   } else if (cpanel->ee_deleting_p) {
   }
