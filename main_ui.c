@@ -30,7 +30,7 @@ const char *const GGOBI(OpModeNames)[] = {
   "Scale",
   "Brush",
   "Identify",
-  "Edit Lines",
+  "Edit Edges",
   "Move Points",
 
   "Scatmat",
@@ -53,7 +53,7 @@ make_control_panels (ggobid *gg) {
   cpanel_brush_make (gg);
   cpanel_scale_make (gg);
   cpanel_identify_make (gg);
-  cpanel_lineedit_make (gg);
+  cpanel_edgeedit_make (gg);
   cpanel_movepts_make (gg);
 
   cpanel_parcoords_make (gg);
@@ -122,10 +122,10 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
       g_printerr ("toggle plotting points\n");
       break;
     case 6:
-      g_printerr ("toggle plotting lines\n");
+      g_printerr ("toggle plotting edges\n");
       break;
     case 7:
-      g_printerr ("toggle plotting directed lines\n");
+      g_printerr ("toggle plotting directed edges\n");
       break;
 */
   }
@@ -142,7 +142,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case P1PLOT:
       case TSPLOT:
       case XYPLOT:
-      case LINEED:
+      case EDGEED:
       case MOVEPTS:
       break;
 
@@ -186,7 +186,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case P1PLOT:
       case XYPLOT:
       case TSPLOT:
-      case LINEED:
+      case EDGEED:
       case MOVEPTS:
       break;
 

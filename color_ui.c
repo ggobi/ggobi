@@ -362,7 +362,7 @@ set_color_fg ( GtkWidget *w, GdkEventButton *event , ggobid *gg)
   datad *d = display->d;
 
   for (i=0; i<d->nrows; i++)
-    d->color_prev.els[i] = d->color_ids.els[i];
+    d->color_prev.els[i] = d->color.els[i];
   gg->color_id = k;
 
   if (event->type==GDK_2BUTTON_PRESS || event->type==GDK_3BUTTON_PRESS) {
@@ -422,8 +422,8 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   gint margin = gg->color_ui.margin;
 
   for (i=0; i<d->nrows; i++) { 
-    d->glyph_prev[i].type = d->glyph_ids[i].type;
-    d->glyph_prev[i].size = d->glyph_ids[i].size;
+    d->glyph_prev[i].type = d->glyph[i].type;
+    d->glyph_prev[i].size = d->glyph[i].size;
   }
 
   ev.x = (gint) event->x;

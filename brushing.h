@@ -37,8 +37,8 @@
 */
 /* br_scope */
 #define BR_POINTS 0
-#define BR_LINES  1
-#define BR_PANDL  2  /* points and lines */
+#define BR_EDGES  1
+#define BR_PANDE  2  /* points and edges */
 /* br_mode */
 #define BR_PERSISTENT 0
 #define BR_TRANSIENT  1
@@ -57,7 +57,7 @@
 typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT,UNKNOWN_GLYPH} GlyphType;
 
 typedef enum { RESET_UNHIDE_POINTS, RESET_POINT_COLORS, RESET_GLYPHS, 
-               RESET_UNHIDE_LINES, RESET_LINES, RESET_INIT_BRUSH} BrushReset;
+               RESET_UNHIDE_EDGES, RESET_EDGES, RESET_INIT_BRUSH} BrushReset;
 
 typedef struct {
     gint x1, y1, x2, y2;
@@ -106,6 +106,6 @@ typedef struct {
 typedef struct {
   gint id, nels, *els;
   gboolean sampled;   /* for subsetting */
-} rgroupd;
+} groupd;
 
 #endif

@@ -253,8 +253,8 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
       identify_event_handlers_toggle (sp, state);
       break;
 
-    case LINEED:
-      lineedit_event_handlers_toggle (sp, state);
+    case EDGEED:
+      edgeedit_event_handlers_toggle (sp, state);
     break;
 
     case MOVEPTS:
@@ -367,7 +367,7 @@ void
 splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
   datad *d = display->d;
   gint nr = d->nrows;
-  gint nl = d->nedges;
+  gint nl = d->edge.n;
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
@@ -395,9 +395,9 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
 void
 splot_edges_realloc (splotd *sp, datad *d, ggobid *gg) {
   sp->edges = (GdkSegment *) g_realloc ((gpointer) sp->edges,
-    d->nedges * sizeof (GdkSegment));
+    d->edge.n * sizeof (GdkSegment));
   sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
-    d->nedges * sizeof (GdkSegment));
+    d->edge.n * sizeof (GdkSegment));
 }
 
 void

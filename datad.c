@@ -58,13 +58,13 @@ datad_new(datad *d, ggobid *gg)
   vectori_init (&d->rowid.id);
 
   /*-- edges --*/
-  vectors_init (&d->line.color);
-  vectors_init (&d->line.color_now);
-  vectors_init (&d->line.color_prev);
-  vectorb_init (&d->line.hidden);
-  vectorb_init (&d->line.hidden_now);
-  vectorb_init (&d->line.hidden_prev);
-  vectorb_init (&d->line.xed_by_brush);
+  vectors_init (&d->edge.color);
+  vectors_init (&d->edge.color_now);
+  vectors_init (&d->edge.color_prev);
+  vectorb_init (&d->edge.hidden);
+  vectorb_init (&d->edge.hidden_now);
+  vectorb_init (&d->edge.hidden_prev);
+  vectorb_init (&d->edge.xed_by_brush);
 
   sphere_init (d);
 
@@ -105,12 +105,6 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   /*-- ids for edges with specified sources and destinations --*/
   if (d->edgeData) {
     /*edge_ids_init (d, gg);*/
-  }
-
-  /*-- if no edges were supplied, initialize with defaults --*/
-  if (d->nedges == 0) {
-    edges_create_defaults (d, gg);
-    br_line_color_init (d, gg);
   }
   /*-- --*/
 

@@ -174,16 +174,16 @@ splot_write_svg (splotd *sp, ggobid *gg)
       cx = hexcolor (&gg->default_color_table[current_color]);
       nl = 0;
 
-      for (j=0; j<d->nedges; j++) {
-        if (d->line.hidden_now.els[j]) {
+      for (j=0; j<d->edge.n; j++) {
+        if (d->edge.hidden_now.els[j]) {
           doit = false;
         } else {
-          from = d->edge_endpoints[j].a - 1;
-          to = d->edge_endpoints[j].b - 1;
+          from = d->edge.endpoints[j].a - 1;
+          to = d->edge.endpoints[j].b - 1;
           doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
         }
         if (doit) {
-          if (d->line.color_now.els[j] == current_color) {
+          if (d->edge.color_now.els[j] == current_color) {
             fprintf (f,
               "<path style=\"stroke: %s\" d=\"M %d %d L %d %d z\"/>\n",
               cx,

@@ -32,10 +32,10 @@ static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)
   datad *d = gg->current_display->d;
   splotd *sp = gg->current_splot;
 
-  if (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDL)
+  if (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDE)
     point_brush_undo (sp, d, gg);
-  if (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL)
-    line_brush_undo (sp, d, gg);
+  if (cpanel->br_scope == BR_EDGES || cpanel->br_scope == BR_PANDE)
+    edge_brush_undo (sp, d, gg);
 
   /*-- when rows_in_plot changes ... --*/
   rows_in_plot_set (d, gg);
@@ -58,7 +58,7 @@ brush_scope_set (gint br_scope, datad *d, ggobid *gg) {
   splot_redraw (sp, QUICK, gg);  
 }
 
-static gchar *scope_lbl[] = {"Points", "Lines", "Points and lines"};
+static gchar *scope_lbl[] = {"Points", "Edges", "Points and edges"};
 static void brush_scope_set_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
@@ -138,14 +138,14 @@ brush_reset(ggobid *gg, gint action)
     case RESET_GLYPHS:  /*-- reset point glyphs -- to what? --*/
       break;
 
-    case RESET_UNHIDE_LINES:  /*-- un-hide all lines --*/
-      for (k=0; k<d->nedges; k++) {
-        d->line.hidden_now.els[k] = d->line.hidden.els[k] = false;
+    case RESET_UNHIDE_EDGES:  /*-- un-hide all edges --*/
+      for (k=0; k<d->edge.n; k++) {
+        d->edge.hidden_now.els[k] = d->edge.hidden.els[k] = false;
       }
       displays_plot (NULL, FULL, gg);
       break;
 
-    case RESET_LINES:  /*-- reset line colors -- to what? --*/
+    case RESET_EDGES:  /*-- reset edge colors -- to what? --*/
       break;
 
     case RESET_INIT_BRUSH:  /*-- reset brush size --*/
@@ -231,7 +231,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   d = gg->current_display->d;
 
   point_brush_prev_vectors_update (d, gg);
-  line_brush_prev_vectors_update (d, gg);
+  edge_brush_prev_vectors_update (d, gg);
 
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
@@ -353,7 +353,7 @@ brush_menus_make (ggobid *gg) {
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 */
 
-  item = gtk_menu_item_new_with_label ("Show all lines");
+  item = gtk_menu_item_new_with_label ("Show all edges");
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
@@ -361,7 +361,7 @@ brush_menus_make (ggobid *gg) {
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
 /*
-  item = gtk_menu_item_new_with_label ("Reset linecolors");
+  item = gtk_menu_item_new_with_label ("Reset edgecolors");
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
@@ -387,27 +387,6 @@ brush_menus_make (ggobid *gg) {
 */
 #ifdef BRUSHING_OPTIONS_IMPLEMENTED
   gg->brush.link_menu = gtk_menu_new ();
-
-  item = gtk_check_menu_item_new_with_label ("Link points <-> points");
-  gtk_signal_connect (GTK_OBJECT (item), "toggled",
-                      GTK_SIGNAL_FUNC (brush_link_cb),
-                      (gpointer) "p2p");
-  gtk_menu_append (GTK_MENU (gg->brush.link_menu), item);
-  gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
-
-  item = gtk_check_menu_item_new_with_label ("Link lines <-> lines");
-  gtk_signal_connect (GTK_OBJECT (item), "toggled",
-                      GTK_SIGNAL_FUNC (brush_link_cb),
-                      (gpointer) "l2l");
-  gtk_menu_append (GTK_MENU (gg->brush.link_menu), item);
-  gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
-
-  item = gtk_check_menu_item_new_with_label ("Link points <-> lines");
-  gtk_signal_connect (GTK_OBJECT (item), "toggled",
-                      GTK_SIGNAL_FUNC (brush_link_cb),
-                      (gpointer) "p2l");
-  gtk_menu_append (GTK_MENU (gg->brush.link_menu), item);
-  gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   item = gtk_check_menu_item_new_with_label ("Link color brushing");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
@@ -446,7 +425,7 @@ cpanel_brush_make (ggobid *gg) {
 */
   gg->brush.scope_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->brush.scope_opt,
-    "Brush points only, lines only, or both points and lines", NULL);
+    "Brush points only, edges only, or both points and edges", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
                       gg->brush.scope_opt, false, false, 0);
   populate_option_menu (gg->brush.scope_opt, scope_lbl,

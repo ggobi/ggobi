@@ -79,7 +79,7 @@ extern const gint ViewTypeIndeces[3];
 #define SCALE    6
 #define BRUSH    7
 #define IDENT    8
-#define LINEED   9
+#define EDGEED   9
 #define MOVEPTS  10
 
 #define SCATMAT 11

@@ -193,9 +193,9 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->defaults.color = -1;
   data->defaults.glyphType = -1;
   data->defaults.glyphSize = -1;
-  data->defaults.lineWidth = -1;
-  data->defaults.lineColor = -1;
-  data->defaults.lineHidden = false;
+  data->defaults.edgeWidth = -1;
+  data->defaults.edgeColor = -1;
+  data->defaults.edgeHidden = false;
   data->defaults.hidden = false;
 }
 
@@ -529,14 +529,14 @@ setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
      if (type == ROW)
        data->defaults.hidden = hidden;
      else {
-       data->defaults.lineHidden = hidden;
+       data->defaults.edgeHidden = hidden;
      }     
     } else
      if(type == ROW)
        d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = hidden;
      else {
-       d->line.hidden.els[i] = d->line.hidden_now.els[i] =
-         d->line.hidden_prev.els[i] = hidden;
+       d->edge.hidden.els[i] = d->edge.hidden_now.els[i] =
+         d->edge.hidden_prev.els[i] = hidden;
      }
   }
 
@@ -576,7 +576,7 @@ setColor(const CHAR **attrs, XMLParserData *data, int i)
     if(i < 0)
      data->defaults.color = value;
     else 
-     d->color_ids.els[i] = d->color_now.els[i] = d->color_prev.els[i] = value;
+     d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] = value;
   }
 
  return (value != -1);
@@ -602,7 +602,7 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
    if (i < 0)
      data->defaults.glyphSize = value;
    else
-     d->glyph_ids[i].size = d->glyph_now[i].size 
+     d->glyph[i].size = d->glyph_now[i].size 
              = d->glyph_prev[i].size = value;
   }
 
@@ -620,7 +620,7 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
     if(i < 0)
       data->defaults.glyphSize = value;
     else
-     d->glyph_ids[i].type = d->glyph_now[i].type = 
+     d->glyph[i].type = d->glyph_now[i].type = 
            d->glyph_prev[i].type = value;
   }
 
@@ -638,14 +638,14 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
           if(i < 0)
             data->defaults.glyphType = value;
           else
-            d->glyph_ids[i].type = d->glyph_now[i].type =
+            d->glyph[i].type = d->glyph_now[i].type =
               d->glyph_prev[i].type = value;       
       } else {
         value = atoi(next);
         if(i < 0)
           data->defaults.glyphSize = value;
         else
-          d->glyph_ids[i].size = d->glyph_now[i].size =
+          d->glyph[i].size = d->glyph_now[i].size =
             d->glyph_prev[i].size = value;     
       }
      j++;
@@ -1202,7 +1202,7 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
 
   setColor(attrs, data, i);
   setGlyph(attrs, data, i);
-  setHidden(attrs, data, i, LINE);
+  setHidden(attrs, data, i, EDGE);
  
   tmp = getAttribute(attrs, "id");
   if(tmp) {
@@ -1212,13 +1212,11 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
     }
 
     data->rowIds[i] = g_strdup(tmp);
-    g_array_insert_val (d->rowid.name, data->current_record, stmp);
+
+    d->rowid.id.els[i] = asInteger (tmp);
   } else {
 
-    /* dfs */
-    /*-- I have to force a rowid if I'm going to use a GArray --*/
-    stmp = g_strdup_printf ("%d", i);
-    g_array_insert_val (d->rowid.name, data->current_record, stmp);
+    d->rowid.id.els[i] = i;
 
   }
 
@@ -1255,11 +1253,11 @@ readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data)
   end = asInteger(tmp);
 
   if (start > end) {
-    d->edge_endpoints[index].a = end;
-    d->edge_endpoints[index].b = start;
+    d->edge.endpoints[index].a = end;
+    d->edge.endpoints[index].b = start;
   } else {
-    d->edge_endpoints[index].a = start;
-    d->edge_endpoints[index].b = end;
+    d->edge.endpoints[index].a = start;
+    d->edge.endpoints[index].b = end;
   }
 
 /*
@@ -1300,7 +1298,7 @@ datad::readXMLRecord(const CHAR **attrs, XMLParserData *data)
 
   setColor(attrs, data, i);
   setGlyph(attrs, data, i);
-  setHidden(attrs, data, i, LINE);
+  setHidden(attrs, data, i, EDGE);
  
   tmp = getAttribute(attrs, "id");
   if(tmp) {

@@ -331,8 +331,8 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
 
     /*-- decide whether to save line colors --*/
     skipit = true;
-    for (k=0; k<d->nedges; k++) {
-      if (d->line.color_now.els[k] != 0) {
+    for (k=0; k<d->edge.n; k++) {
+      if (d->edge.color_now.els[k] != 0) {
         skipit = false;
         break;
       }
@@ -560,7 +560,7 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
   } else {
 
     for (i=0; i<nr; i++) {
-      switch (d->glyph_ids[i].type) {
+      switch (d->glyph[i].type) {
         case PLUS_GLYPH:
 /*          gstr = "+";*/
           gstr = "plus";
@@ -585,7 +585,7 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
           break;
       }
 
-      fprintf (fp, "%s %d\n", gstr, d->glyph_ids[i].size);
+      fprintf (fp, "%s %d\n", gstr, d->glyph[i].size);
     }
     if (fclose (fp) == EOF)
       fprintf (stderr, "error in writing glyphs vector\n");
@@ -636,10 +636,10 @@ linedata_get (endpointsd *tlinks, gshort *tcolors,
   gint i, k;
   gint a, b, start_a, start_b;
 
-  for (k=0; k<d->nedges; k++) {
+  for (k=0; k<d->edge.n; k++) {
     start_a = start_b = -1;
-    a = d->edge_endpoints[k].a - 1;
-    b = d->edge_endpoints[k].b - 1;
+    a = d->edge.endpoints[k].a - 1;
+    b = d->edge.endpoints[k].b - 1;
     for (i=0; i<nr; i++) {
       if (rowv[i] == a) {
         start_a = i;
@@ -657,7 +657,7 @@ linedata_get (endpointsd *tlinks, gshort *tcolors,
     if (start_a != -1 && start_b != -1) {  /* Both ends included */
       tlinks[nl].a = start_a + 1;
       tlinks[nl].b = start_b + 1;
-      tcolors[nl] = d->line.color_now.els[k];
+      tcolors[nl] = d->edge.color_now.els[k];
       nl++;
     }
   }
@@ -672,15 +672,15 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
   gint k, nl;
   FILE *fp;
   endpointsd *tlinks;
-  gshort *linecolors;
+  gshort *edgecolors;
 
   if (lines_p || colors_p) {
 
     if (nr == d->nrows) {
-      nl = d->nedges;
-      tlinks = d->edge_endpoints;
+      nl = d->edge.n;
+      tlinks = d->edge.endpoints;
       if (!gg->mono_p)
-        linecolors = d->line.color_now.els;
+        edgecolors = d->edge.color_now.els;
 
     } else {
       /*
@@ -688,10 +688,10 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
        * Determine the number of links to be saved -- may as
        * well build a temporary links structure to use, actually.
       */
-      tlinks = (endpointsd *) g_malloc (d->nedges * sizeof (endpointsd));
+      tlinks = (endpointsd *) g_malloc (d->edge.n * sizeof (endpointsd));
       if (!gg->mono_p)
-        linecolors = (gshort *) g_malloc (d->nedges * sizeof (gshort));
-      nl = linedata_get (tlinks, linecolors, rowv, nr, d, gg);
+        edgecolors = (gshort *) g_malloc (d->edge.n * sizeof (gshort));
+      nl = linedata_get (tlinks, edgecolors, rowv, nr, d, gg);
     }
   }
 
@@ -710,7 +710,7 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
       if (nr != d->nrows) {
         g_free (tlinks);
         if (!gg->mono_p)
-          g_free (linecolors);
+          g_free (edgecolors);
       }
       return false;
 
@@ -730,28 +730,28 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
   /*-- save the line colors --*/
   if (colors_p && !gg->mono_p) {
 
-    fname = g_strdup_printf ("%s.linecolors", rootname);
+    fname = g_strdup_printf ("%s.edgecolors", rootname);
     fp = fopen (fname, "w");
     g_free (fname);
 
     if (fp == NULL) {
       gchar *message = g_strdup_printf (
-        "The file '%s.linecolors' can not be opened for writing\n", rootname);
+        "The file '%s.edgecolors' can not be opened for writing\n", rootname);
       quick_message (message, false);
       g_free (message);
       if (nr != d->nrows) {
         g_free (tlinks);
-        g_free (linecolors);
+        g_free (edgecolors);
       }
       return false;
 
     } else {
 
       for (k=0; k<nl; k++)
-        fprintf (fp, "%d\n", linecolors[k]);
+        fprintf (fp, "%d\n", edgecolors[k]);
   
       if (nr != d->nrows)
-        g_free ((gchar *) linecolors);
+        g_free ((gchar *) edgecolors);
       fclose (fp);
     }
   }

@@ -559,9 +559,9 @@ void
 GGOBI(setCaseGlyph)(gint index, gint type, gint size, datad *d, ggobid *gg)
 {
   if (size > -1)
-    d->glyph_ids[index].size = d->glyph_now[index].size = size;
+    d->glyph[index].size = d->glyph_now[index].size = size;
   if (type > -1)
-    d->glyph_ids[index].type = d->glyph_now[index].type = type;
+    d->glyph[index].type = d->glyph_now[index].type = type;
 }
 
 void 
@@ -580,7 +580,7 @@ GGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size,
 void 
 GGOBI(setCaseColor)(gint pt, gint colorIndex, datad *d, ggobid *gg)
 {
-  d->color_ids.els[pt] = d->color_now.els[pt] = colorIndex;
+  d->color.els[pt] = d->color_now.els[pt] = colorIndex;
 }
 
 void 
@@ -589,7 +589,7 @@ GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorIndex,
 {
   gint i;
   for (i = 0; i < howMany ; i++)
-    d->color_ids.els[pts[i]] = d->color_now.els[pts[i]] = colorIndex;
+    d->color.els[pts[i]] = d->color_now.els[pts[i]] = colorIndex;
 }
 
 
@@ -665,12 +665,12 @@ GGOBI(isConnectedEdge)(gint a, gint b, datad *d, ggobid *gg)
      b = tmp;
   }
 
-  for(i = 0; i < d->nedges ; i++) {
+  for(i = 0; i < d->edge.n ; i++) {
     
-    if(d->edge_endpoints[i].a == a && d->edge_endpoints[i].b == b)
+    if(d->edge.endpoints[i].a == a && d->edge.endpoints[i].b == b)
        return(true);
 
-    if(d->edge_endpoints[i].a > a) {
+    if(d->edge.endpoints[i].a > a) {
       return(false);
     } 
   }
@@ -680,7 +680,7 @@ GGOBI(isConnectedEdge)(gint a, gint b, datad *d, ggobid *gg)
 
 /*
   The additional argument update allows one to pre-allocate
-  an entire block for edge_endpoints and then write into
+  an entire block for edge.endpoints and then write into
   it, rather than reallocate the vector for each new edge.
   
   To do this, the value of update should be false.
@@ -690,10 +690,10 @@ GGOBI(setObservationEdge)(gint x, gint y, datad *d, ggobid *gg, gboolean update)
 {
   if (GGOBI(isConnectedEdge)(x, y, d, gg) == false) {
     if (update)
-      edges_alloc (d->nedges+1, d);
-    d->edge_endpoints[d->nedges].a = x;
-    d->edge_endpoints[d->nedges].b = y;
-    d->nedges++;
+      edges_alloc (d->edge.n+1, d);
+    d->edge.endpoints[d->edge.n].a = x;
+    d->edge.endpoints[d->edge.n].b = y;
+    d->edge.n++;
   }
 }
 

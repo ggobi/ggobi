@@ -361,7 +361,7 @@ rgroups_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
      * nrows/10 elements in each group
     */
 
-    d->rgroups = (rgroupd *) g_malloc (d->nrows * sizeof (rgroupd));
+    d->rgroups = (groupd *) g_malloc (d->nrows * sizeof (groupd));
     for (i=0; i<d->nrows; i++) {
       nels[i] = d->nrows/10;
       d->rgroups[i].els = (gint *) g_malloc (nels[i] * sizeof (gint));
@@ -418,8 +418,8 @@ rgroups_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
     d->nrgroups_in_plot = d->nrgroups;
   
     /* Reallocate everything now that we know how many there are */
-    d->rgroups = (rgroupd *) g_realloc ((gpointer) d->rgroups,
-      (gulong) (d->nrgroups * sizeof (rgroupd)));
+    d->rgroups = (groupd *) g_realloc ((gpointer) d->rgroups,
+      (gulong) (d->nrgroups * sizeof (groupd)));
   
     /* Now reallocate the arrays within each rgroups structure */
     for (k=0; k<d->nrgroups; k++) {
@@ -554,9 +554,9 @@ point_glyphs_read (InputDescription *desc, gboolean reinit,
         break;
       }
 
-      d->glyph_ids[i].type = d->glyph_now[i].type =
+      d->glyph[i].type = d->glyph_now[i].type =
         d->glyph_prev[i].type = glyph.type;
-      d->glyph_ids[i].size = d->glyph_now[i].size =
+      d->glyph[i].size = d->glyph_now[i].size =
         d->glyph_prev[i].size = glyph.size;
 
       i++;  /* increment the array index */
@@ -643,7 +643,7 @@ point_colors_read (InputDescription *desc, gboolean reinit,
           break;
         }
 
-        d->color_ids.els[i] = d->color_now.els[i] = d->color_prev.els[i] = id;
+        d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] = id;
 
         i++;  /* increment the array index */
         k++;  /* increment the file's row counter */
@@ -668,7 +668,7 @@ point_colors_read (InputDescription *desc, gboolean reinit,
 /*------------------------------------------------------------------------*/
 
 gboolean
-line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
+edge_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
 {
   gint i, id, retval;
   gboolean ok = true;
@@ -679,7 +679,7 @@ line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
   int whichSuffix;
 
   if (reinit) {
-    br_line_vectors_check_size (d->nedges, d, gg);
+    br_edge_vectors_check_size (d->edge.n, d, gg);
   }
 
   if (!gg->mono_p) {
@@ -704,7 +704,7 @@ line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
         */
 
         i = 0;
-        while (i < d->nedges) {
+        while (i < d->edge.n) {
           retval = fscanf (fp, "%d", &id);
           if (retval <= 0 || id < 0 || id >= NCOLORS) {
             ok = false;
@@ -712,8 +712,8 @@ line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
             break;
           }
 
-          d->line.color.els[i] =
-            d->line.color_now.els[i] = d->line.color_prev.els[i] = id;
+          d->edge.color.els[i] =
+            d->edge.color_now.els[i] = d->edge.color_prev.els[i] = id;
           i++;
         }
         fclose(fp);
@@ -726,7 +726,7 @@ line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
   }
 
   if (!ok)
-    br_line_color_init (d, gg);
+    br_edge_color_init (d, gg);
 
   return (ok);
 }
@@ -768,7 +768,7 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
   if ((fp = fopen (fileName, "r")) != NULL) {
     gint a, b;
 
-    d->nedges = 0;
+    d->edge.n = 0;
     /*
      * Allocate space for <bsize> connecting lines.
     */
@@ -794,14 +794,14 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
          * Sort lines data such that a <= b
         */
         if (a <= b) {
-          d->edge_endpoints[d->nedges].a = a;
-          d->edge_endpoints[d->nedges].b = b;
+          d->edge.endpoints[d->edge.n].a = a;
+          d->edge.endpoints[d->edge.n].b = b;
         } else {
-          d->edge_endpoints[d->nedges].a = b;
-          d->edge_endpoints[d->nedges].b = a;
+          d->edge.endpoints[d->edge.n].a = b;
+          d->edge.endpoints[d->edge.n].b = a;
         }
 
-        (d->nedges)++;
+        (d->edge.n)++;
         jlinks++;
         if (jlinks == bsize) {
           /*

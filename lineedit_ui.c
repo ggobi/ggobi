@@ -1,4 +1,4 @@
-/* lineedit_ui.c */
+/* edgeedit_ui.c */
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
@@ -26,13 +26,13 @@ static void addordelete_cb (GtkToggleButton *button)
 {
   g_printerr("active %d\n", button->active);
 }
-static void show_lines_cb (GtkToggleButton *button)
+static void show_edges_cb (GtkToggleButton *button)
 {
   g_printerr("active %d\n", button->active);
 }
-static void remove_lines_cb (GtkToggleButton *button)
+static void remove_edges_cb (GtkToggleButton *button)
 {
-  g_printerr("move all lines\n");
+  g_printerr("move all edges\n");
 }
 static void include_missings_cb (GtkToggleButton *button)
 {
@@ -83,7 +83,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 }
 
 void
-lineedit_event_handlers_toggle (splotd *sp, gboolean state) {
+edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
   if (state == on) {
     sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                        "button_press_event",
@@ -106,26 +106,26 @@ lineedit_event_handlers_toggle (splotd *sp, gboolean state) {
 }
 
 void
-cpanel_lineedit_make (ggobid *gg) {
+cpanel_edgeedit_make (ggobid *gg) {
   GtkWidget *btn;
   GtkWidget *hb, *radio1, *radio2;
   GSList *group;
   
-  gg->control_panel[LINEED] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[LINEED]), 5);
+  gg->control_panel[EDGEED] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[EDGEED]), 5);
 
 /*
  * Radio group in a box: add/delete buttons
 */
   hb = gtk_hbox_new (true, 1);
   gtk_container_set_border_width (GTK_CONTAINER (hb), 3);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[LINEED]), hb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]), hb, false, false, 0);
 
   radio1 = gtk_radio_button_new_with_label (NULL, "Add");
   GTK_TOGGLE_BUTTON (radio1)->active = true;
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
-    "Add new line segments using the mouse", NULL);
+    "Add new edges using the mouse", NULL);
   gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
                       GTK_SIGNAL_FUNC (addordelete_cb), NULL);
   gtk_box_pack_start (GTK_BOX (hb), radio1, false, false, 0);
@@ -134,41 +134,41 @@ cpanel_lineedit_make (ggobid *gg) {
 
   radio2 = gtk_radio_button_new_with_label (group, "Delete");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
-    "Delete line segments using the mouse", NULL);
+    "Delete edges using the mouse", NULL);
   gtk_box_pack_start (GTK_BOX (hb), radio2, false, false, 0);
 
 /*
- * Show lines toggle
+ * Show edges toggle
 */
-  btn = gtk_check_button_new_with_label ("Show lines");
+  btn = gtk_check_button_new_with_label ("Show edges");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Show connected lines", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[LINEED]),
+    "Show connected edges", NULL);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-                      GTK_SIGNAL_FUNC (show_lines_cb), NULL);
+                      GTK_SIGNAL_FUNC (show_edges_cb), NULL);
 
 /*
- * Remove lines button
+ * Remove edges button
 */
-  btn = gtk_button_new_with_label ("Remove all lines");
+  btn = gtk_button_new_with_label ("Remove all edges");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Remove all lines", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[LINEED]),
+    "Remove all edges", NULL);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (remove_lines_cb), NULL);
+                      GTK_SIGNAL_FUNC (remove_edges_cb), NULL);
 /*
  * Including missings togle
 */
   btn = gtk_check_button_new_with_label ("Include missings");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Include missing values", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[LINEED]),
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
                       GTK_SIGNAL_FUNC (include_missings_cb), NULL);
 
-  gtk_widget_show_all (gg->control_panel[LINEED]);
+  gtk_widget_show_all (gg->control_panel[EDGEED]);
 }
 

@@ -162,16 +162,16 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
      fprintf(f, " label=\"%s\"", gstr);
   }
 
- if(!xmlWriteInfo->useDefault || xmlWriteInfo->defaultColor != d->color_ids.els[i]) {
-  fprintf(f, " color=\"%d\"", d->color_ids.els[i]);
+ if(!xmlWriteInfo->useDefault || xmlWriteInfo->defaultColor != d->color.els[i]) {
+  fprintf(f, " color=\"%d\"", d->color.els[i]);
  }
 
 /*
-  fprintf(f, " glyphSize=\"%d\"", d->glyph_ids[i].size);
-  fprintf(f, " glyphType=\"%d\"", d->glyph_ids[i].type);
+  fprintf(f, " glyphSize=\"%d\"", d->glyph[i].size);
+  fprintf(f, " glyphType=\"%d\"", d->glyph[i].type);
 */
- if(!xmlWriteInfo->useDefault || (xmlWriteInfo->defaultGlyphType != d->glyph_ids[i].type)) {
-  switch (d->glyph_ids[i].type) {
+ if(!xmlWriteInfo->useDefault || (xmlWriteInfo->defaultGlyphType != d->glyph[i].type)) {
+  switch (d->glyph[i].type) {
     case PLUS_GLYPH:
       gstr = "plus";
       break;
@@ -198,8 +198,8 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
   fprintf(f, " glyphType=\"%s\"", gstr);
  }
 
- if(!xmlWriteInfo->useDefault || (xmlWriteInfo->defaultGlyphSize != d->glyph_ids[i].size)) {
-  fprintf(f, " glyphSize=\"%d\"", d->glyph_ids[i].size);
+ if(!xmlWriteInfo->useDefault || (xmlWriteInfo->defaultGlyphSize != d->glyph[i].size)) {
+  fprintf(f, " glyphSize=\"%d\"", d->glyph[i].size);
  }
 
 
@@ -219,11 +219,11 @@ gboolean
 write_xml_edges (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  gint i;
- if (d->nedges < 1)
+ if (d->edge.n < 1)
   return(true);
 
- fprintf(f, "<edges count=%d>\n", d->nedges);
- for(i = 0; i < d->nedges; i++) {
+ fprintf(f, "<edges count=%d>\n", d->edge.n);
+ for(i = 0; i < d->edge.n; i++) {
   write_xml_edge(f, d, gg, i, xmlWriteInfo);
   fprintf(f, "\n");
  }
@@ -236,8 +236,8 @@ gboolean
 write_xml_edge(FILE *f, datad *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f, "<edge ");
- fprintf(f, "source=\"%d\" destination=\"%d\"", d->edge_endpoints[i].a
-                                              , d->edge_endpoints[i].b);
+ fprintf(f, "source=\"%d\" destination=\"%d\"", d->edge.endpoints[i].a
+                                              , d->edge.endpoints[i].b);
  fprintf(f, " />");
 
  return(true);
@@ -291,9 +291,9 @@ updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info)
 
   n = GGOBI(nrecords)(d);
   for(i = 0 ; i < n ; i++) {
-    colorCounts[d->color_ids.els[i]]++;
-    glyphSizeCounts[d->glyph_ids[i].size]++;
-    glyphTypeCounts[d->glyph_ids[i].type]++;
+    colorCounts[d->color.els[i]]++;
+    glyphSizeCounts[d->glyph[i].size]++;
+    glyphTypeCounts[d->glyph[i].type]++;
   }
 
   count = -1;

@@ -25,32 +25,17 @@
 void
 edges_alloc (gint nsegs, datad *d)
 {
-  d->edge_endpoints = (endpointsd *)
-    g_realloc (d->edge_endpoints, nsegs * sizeof (endpointsd));
+  d->edge.endpoints = (endpointsd *)
+    g_realloc (d->edge.endpoints, nsegs * sizeof (endpointsd));
 }
 
 void
 edges_free (datad *d, ggobid *gg)
 {
-  g_free ((gpointer) d->edge_endpoints);
+  g_free ((gpointer) d->edge.endpoints);
 }
 
 /* --------------------------------------------------------------- */
 /*               End of dynamic allocation section                 */
 /* --------------------------------------------------------------- */
 
-void
-edges_create_defaults (datad *d, ggobid *gg)
-{
-  gint i;
-
-  d->nedges = d->nrows - 1;
-  d->edge_endpoints = (endpointsd *)
-    g_realloc ((gpointer) d->edge_endpoints,
-    d->nedges * sizeof (endpointsd));
-
-  for (i=0; i<d->nedges; i++) {
-    d->edge_endpoints[i].a = i+1;
-    d->edge_endpoints[i].b = i+2;
-  }
-}

@@ -43,9 +43,9 @@ symbol_table_populate (datad *d)
 
   /*-- loop over all data --*/
   for (i=0; i<d->nrows; i++) {
-    j = d->glyph_ids[i].type;
-    k = d->glyph_ids[i].size;
-    m = d->color_ids.els[i];
+    j = d->glyph[i].type;
+    k = d->glyph[i].size;
+    m = d->color.els[i];
     if (d->symbol_table[j][k][m].n == 0) nclusters++;
     d->symbol_table[j][k][m].n++;
     if (d->hidden.els[i])
@@ -98,9 +98,9 @@ clusters_set (datad *d, ggobid *gg) {
     for (i=0; i<d->nrows; i++) {
       for (n=0; n<nclusters; n++) {
         if (d->sampled.els[i]) {
-          if (d->glyph_ids[i].type == d->clusv[n].glyphtype &&
-              d->glyph_ids[i].size == d->clusv[n].glyphsize &&
-              d->color_ids.els[i] == d->clusv[n].color)
+          if (d->glyph[i].type == d->clusv[n].glyphtype &&
+              d->glyph[i].size == d->clusv[n].glyphsize &&
+              d->color.els[i] == d->clusv[n].color)
           {
             d->clusterid.els[i] = n;
             break;

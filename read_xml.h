@@ -6,7 +6,7 @@
 /*#include <libxml/parser.h>*/
 #include <parser.h>
 
-enum HiddenType {ROW, LINE};
+enum HiddenType {ROW, EDGE};
 enum xmlDataState { 
   TOP = 0, 
   DATASET,
@@ -22,9 +22,9 @@ typedef struct {
   int color;
   int glyphType;
   int glyphSize;
-  int lineColor;
-  int lineWidth;
-  int lineHidden;
+  int edgeColor;
+  int edgeWidth;
+  int edgeHidden;
   int hidden;
 
 } DataOptions;

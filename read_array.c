@@ -372,11 +372,8 @@ read_ascii_data(InputDescription *desc, ggobid *gg)
   point_colors_read (desc, true, d, gg);
   hidden_read (desc, true, d, gg);
     
-  /*-- if reading lines failed for any reason, construct default edges --*/
-  if (edges_read (desc, true, d, gg) == false || d->nedges == 0) {
-    edges_create_defaults (d, gg);
-  }
-  line_colors_read (desc, true, d, gg);
+  if (d->edge.n > 0)
+    edge_colors_read (desc, true, d, gg);
 
   return (true);
 }

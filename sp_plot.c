@@ -582,25 +582,25 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
    * currently in use into the line_colors_used[] vector.
   */
   *ncolors_used = 1;
-  colors_used[0] = d->line.color_now.els[0];
+  colors_used[0] = d->edge.color_now.els[0];
 
   if (display->options.edges_directed_show_p ||
       display->options.edges_undirected_show_p)
   {
-    for (i=0; i<d->nedges; i++) {
-      if (d->line.hidden_now.els[i])
+    for (i=0; i<d->edge.n; i++) {
+      if (d->edge.hidden_now.els[i])
         new_color = false;
       else {
         new_color = true;
         for (k=0; k<*ncolors_used; k++) {
-          if (colors_used[k] == d->line.color_now.els[i]) {
+          if (colors_used[k] == d->edge.color_now.els[i]) {
             new_color = false;
             break;
           }
         }
       }
       if (new_color) {
-        colors_used[*ncolors_used] = d->line.color_now.els[i];
+        colors_used[*ncolors_used] = d->edge.color_now.els[i];
         (*ncolors_used)++;
       }
     }
@@ -620,6 +620,10 @@ edges_draw (splotd *sp, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
 
+  if (d->edge.n == 0) {
+/**/return;
+  }
+
   if (!gg->mono_p) {
     splot_line_colors_used_get (sp, &ncolors_used, colors_used, d, gg);
 
@@ -631,12 +635,12 @@ edges_draw (splotd *sp, ggobid *gg)
       current_color = colors_used[k];
       nl = 0;
 
-      for (j=0; j<d->nedges; j++) {
-        if (d->line.hidden_now.els[j]) {
+      for (j=0; j<d->edge.n; j++) {
+        if (d->edge.hidden_now.els[j]) {
           doit = false;
         } else {
-          from = d->edge_endpoints[j].a - 1;
-          to = d->edge_endpoints[j].b - 1;
+          from = d->edge.endpoints[j].a - 1;
+          to = d->edge.endpoints[j].b - 1;
           doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
 
         /* If not plotting imputed values, and one is missing, skip it */
@@ -647,7 +651,7 @@ edges_draw (splotd *sp, ggobid *gg)
         }
 
         if (doit) {
-          if (d->line.color_now.els[j] == current_color) {
+          if (d->edge.color_now.els[j] == current_color) {
 
             if (display->options.edges_undirected_show_p) {
               sp->edges[nl].x1 = sp->screen[from].x;

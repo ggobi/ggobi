@@ -58,8 +58,6 @@ class datad {
 
  /*-- row ids to support generalized linking --*/
  struct _RowID {
-   GArray *name;      /*-- all names, from 1:n; don't need to keep --*/
-   GArray *uniq;      /*-- names after sorting and uniq-ing --*/
    vector_i id;       /*-- indices into rowid_names_uniq --*/
  } rowid;
  /*-- --*/
@@ -106,28 +104,14 @@ class datad {
  vector_i clusterid;
 
  /*----------------------- row grouping -----------------------------*/
+ /*
+  * these are the point groups, constructed from a categorical
+  * variable when it's selected to use for linked and grouped brushing.
+ */
 
  gint nrgroups, nrgroups_in_plot;
  gint *rgroup_ids;
- rgroupd *rgroups;
-
-/*----------------- segments in scatterplots -----------------------------*/
-
- gint nedges;
- endpointsd *edge_endpoints;
-
- /*-- line brushing --*/
- struct _LineData {
-   gint *nxed_by_brush;
-   vector_b xed_by_brush;
-   vector_s color, color_now, color_prev;
-   vector_b hidden, hidden_now, hidden_prev;
- } line;
-
- /*-- line groups --*/
- gint nlgroups;
- gint *lgroup_ids;
- rgroupd *lgroups;  /* id, nels, *els */
+ groupd *rgroups;
 
  /*------------------------ jittering --------------------------------*/
 
@@ -143,9 +127,9 @@ class datad {
  brush_coords brush_pos;  
  gint npts_under_brush;
  vector_b pts_under_brush;
- vector_s color_ids, color_now, color_prev;  /* 0:ncolors-1 */
+ vector_s color, color_now, color_prev;  /* 0:ncolors-1 */
  vector_b hidden, hidden_now, hidden_prev;
- glyphv *glyph_ids, *glyph_now, *glyph_prev;
+ glyphv *glyph, *glyph_now, *glyph_prev;
 
  struct _BrushBins {
    gint nbins;
@@ -204,6 +188,25 @@ class datad {
    vector_f tform_mean;
  } sphere;
 
+/*----------------- segments in scatterplots -----------------------------*/
+
+ /*-- edges --*/
+ struct _EdgeData {
+   gint n;
+   endpointsd *endpoints;
+
+   gint *nxed_by_brush;
+   vector_b xed_by_brush;
+   vector_s color, color_now, color_prev;
+   vector_b hidden, hidden_now, hidden_prev;
+
+   gint ngroups;
+   gint *group_ids;
+   groupd *groups;  /* id, nels, *els */
+
+ } edge;
+
+/*------------------------------------------------------------------------*/
 
 #ifdef USE_CLASSES
  public:
@@ -230,12 +233,6 @@ class datad {
 #endif 
 
    gboolean edgeData;
-   struct _SourceID {
-     vector_i id;
-   } sourceid;
-   struct _DestinationID {
-     vector_i id;
-   } destid;
 
    struct _datad *nodeData; 
 
@@ -254,9 +251,7 @@ extern datad *datad_new (datad *, struct _ggobid *);
 class EdgeDatad : public datad 
 {
  public:
-  EdgeDatad() : datad() { sourceid.name = NULL; 
-                          destid.name = NULL;
-                        }
+  EdgeDatad() : datad() { }
 
   EdgeDatad(struct _ggobid *gg) : datad(gg) { 
   }
@@ -269,13 +264,7 @@ class EdgeDatad : public datad
 #endif
 
  protected:
-   /*-- dfs -- I bet this isn't right --*/
-   struct _SourceID {
-     vector_i id;
-   } sourceid;
-   struct _DestinationID {
-     vector_i id;
-   } destid;
+
 /*
   int *sourceID;
   int *destinationID;
