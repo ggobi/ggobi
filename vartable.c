@@ -36,8 +36,14 @@ void vartable_init (datad *d, ggobid *gg)
   for (j=0; j<d->ncols; j++) {
     d->vartable[j].selected = false;
     d->vartable[j].nmissing = 0;
+
+    d->vartable[j].jref = -1;  /*-- not cloned --*/
+
     d->vartable[j].mean = 0.0;
     d->vartable[j].median = 0.0;
+
+    d->vartable[j].lim_specified_p = false;  /*-- no user-specified limits --*/
+
     d->vartable[j].lim_raw.min = 0.0;
     d->vartable[j].lim_raw.max = 0.0;
     d->vartable[j].lim_tform.min = 0.0;

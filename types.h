@@ -73,8 +73,18 @@ typedef struct {
  gchar *collab, *collab_tform;
  gint nmissing;
 
- /*-- unadjusted, unaffected by vgroups or imputation --*/
+ /*-- reference variable:  jref=-1 except for cloned variables --*/
+ gint jref;
+
+ /*-- unadjusted, unaffected by imputation --*/
  gfloat mean, median;
+
+ /*
+  * If the user has supplied limits, lim_specified_p = true
+  * and the limits are stored in lim_specified.{min,max}
+ */
+ gboolean lim_specified_p;
+ lims lim_specified;
 
  /*
   * lim contains the limits in use: the first use use min/max scaling
@@ -98,8 +108,6 @@ typedef struct {
 
  /*-- jittering --*/
  gfloat jitter_factor;
-
- /*-- and doubtless more, as we go along --*/
 
 } vartabled;
 
