@@ -1280,9 +1280,9 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 	        } else {
               varlab = g_strdup_printf ("%d",j+1);
 	        }
-            if (j == dsp->t2d_manip_var) 
-              varlab = g_strdup_printf ("%5.4f",
-                dsp->t2d.F.vals[0][dsp->t2d_manip_var]);
+	    /*            if (j == dsp->t2d_manip_var) 
+              varlab = g_strdup_printf ("%4.3f",
+	      dsp->t2d.F.vals[0][dsp->t2d_manip_var]);*/
 
             gdk_text_extents (
 #if GTK_MAJOR_VERSION == 2
