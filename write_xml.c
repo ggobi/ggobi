@@ -88,7 +88,7 @@ gboolean
 write_xml_description (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"<description>\n");
-
+/*XXX*/
 
  fprintf(f,"</description>\n");
 
