@@ -330,7 +330,7 @@ variable_notebook_subwindow_add (datad *d,
 
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get (j, d);
-    row[0] = g_strdup_printf (vt->collab_tform);
+    row[0] = g_strdup (vt->collab_tform);
     gtk_clist_append (GTK_CLIST (clist), row);
     g_free (row[0]);
   }
