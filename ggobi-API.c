@@ -507,8 +507,10 @@ GGOBI(getCaseGlyphSize)(gint id, ggobid *gg)
 void 
 GGOBI(setCaseGlyph)(gint index, gint type, gint size, ggobid *gg)
 {
-  gg->glyph_ids[index].size = size;
-  gg->glyph_ids[index].type = type;
+  if(size > -1)
+   gg->glyph_ids[index].size = size;
+  if(type > -1)
+   gg->glyph_ids[index].type = type;
 }
 
 void 
@@ -681,4 +683,40 @@ GGOBI(getNumGGobis)()
 {
  extern int num_ggobis;
  return(num_ggobis);
+}
+
+
+gboolean
+GGOBI(setColorMap)(double *vals, int nr, ggobid *gg)
+{
+ int i;
+
+ gg->default_color_table = (GdkColor*) g_realloc(gg->default_color_table, sizeof(GdkColor) * nr);
+ gg->ncolors = nr;
+
+ for(i = 0; i < nr; i++) {
+   gg->default_color_table[i].red = vals[i];
+   gg->default_color_table[i].green = vals[i + nr];
+   gg->default_color_table[i].blue = vals[i + 2*nr];
+ }
+
+ return(GGOBI(registerColorMap)(gg));
+}
+
+
+
+gboolean
+GGOBI(registerColorMap)(ggobid *gg)
+{
+ GdkColormap *cmap;
+ gboolean *success;
+
+ cmap = gdk_colormap_get_system ();
+   success = (gboolean *) g_malloc(sizeof(gboolean) * gg->ncolors);
+   gdk_colormap_alloc_colors (cmap, gg->default_color_table, gg->ncolors,
+         false, true, success);
+
+  g_free(success);
+
+ return(true);
 }

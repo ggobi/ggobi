@@ -176,5 +176,8 @@ extern void GGOBI(sizeBrush) (gint width, gint height);
 
 extern int GGOBI(getNumGGobis)();
 
+gboolean GGOBI(setColorMap)(double *vals, int nr, ggobid *gg);
+gboolean GGOBI(registerColorMap)(ggobid *gg);
+
 #endif /* End of conditional inclusion of entire file.*/
 

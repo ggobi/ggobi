@@ -58,13 +58,78 @@ adding or removing variables.
 \section{}
 
 
+\section{System Values}
+The representation of points or observations within a plot is
+controlled by its glyph.  Each observation has its own glyph
+setting. This controls the type  and size of glyph.
+(In the near future, these may be indepdently settable across
+sub-plots.)
+The possible values for the glyph type and size
+are fixed for a ggobi session.
+They can be queried via the functions
+\SFunction{ggobi.getGlyphTypes}
+and 
+\SFunction{ggobi.getGlyphSizes}
+
+\begin{verbatim}
+> ggobi.getGlyphTypes()
+ +  x or fr oc fc  . 
+ 1  2  3  4  5  6  7 
+> ggobi.getGlyphSizes()
+[1] 0 1 2 3 4 5 6 7 8
+\end{verbatim}
+
+Each ggobi instance has its own color map.  The color of each
+observation is specified as a row index into this colormap.  Each row
+of this map or table is an RGB color value.
+
+\begin{verbatim}
+> ggobi.getColorMap()
+         Red        Green      Blue
+1  1.0000000 0.0008697642 0.0000000
+2  1.0000000 0.2699931334 0.0000000
+3  1.0000000 0.5499961852 0.0000000
+4  1.0000000 0.8399938964 0.0000000
+5  1.0000000 1.0000000000 0.0000000
+6  0.0000000 0.7499961852 1.0000000
+7  0.5099870 0.4399938964 1.0000000
+8  0.6000000 0.8000000000 0.2000000
+9  0.0000000 0.9799954223 0.6000000
+10 0.7299916 0.3299916075 0.8299992
+\end{verbatim}
+
+One can set the color map with the function
+\SFunction{ggobi.setColorMap}.
+To change, for example, the second row
+to the values $.8, .2. 3$,
+we can use the following steps
+\begin{verbatim}
+ mp <- ggobi.getColorMap()
+ mp[2,] <- c(.8,.2,.3)
+ ggobi.setColorMap(mp)
+\end{verbatim}
+
+
+
+
+\section{Callbacks}
+Associating R function calls with events in GGobi is a valuable way to
+allow customization of the existing interactivity provided by GGobi.
+Consider an example where we have a scatterplot of two variables X and
+Y.  As we identify individual points in the scatterplot, we might want
+to perform examine the result of fitting the regression of Y on X with
+that point omitted.  GGobi does not currently provide such a facility.
+However, it is trivial in R.  By allowing one to register an R
+function to be called when a particular event (the identification)
+occurs. Allows us to easily do this.
+
+
+
 
 \section{API Routines}
-In this section  we describe the different
-R/S functions that one can invoke to query
-and modify the state of the GGobi session.
-There are some common concepts shared between
-most of these functions.
+In this section we describe the different R/S functions that one can
+invoke to query and modify the state of the GGobi session.  There are
+some common concepts shared between most of these functions.
 
 Firstly, there are some global variables that are properties of the
 entire ggobi system.  These are things such as the color table, the
@@ -76,10 +141,9 @@ instance within the single session.  (Note that this is different from
 xgobi in which only one dataset could be introduced into the a
 process.)
 
-Within each ggobi instance, one can have multiple 
-windows, also known as displays.
-Each display has one or more plots within it.
-The plots can be a
+Within each ggobi instance, one can have multiple windows, also known
+as displays.  Each display has one or more plots within it.  The plots
+can be a
 \begin{itemize}
 \item $1$ variable plot
 such as ASH plots,

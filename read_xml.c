@@ -250,7 +250,7 @@ endXMLElement(void *user_data, const CHAR *name)
           and not a secondary colormap file.
         */
      if(data->reading_colormap_file_p == false)
-       registerColorMap(data->gg);
+       GGOBI(registerColorMap)(data->gg);
    default:
      break;
  }
@@ -1058,21 +1058,6 @@ setColorValue(XMLParserData *data, const CHAR *line, int len)
 }
 
 
-gboolean
-registerColorMap(ggobid *gg)
-{
- GdkColormap *cmap;
- gboolean *success;
-
- cmap = gdk_colormap_get_system ();
-   success = (gboolean *) g_malloc(sizeof(gboolean) * gg->ncolors);
-   gdk_colormap_alloc_colors (cmap, gg->default_color_table, gg->ncolors,
-         false, true, success);
-
-  g_free(success);
-
- return(true);
-}
 
 
 void

@@ -113,6 +113,8 @@ tags:
 local.config:
 	@echo "# Whether to enable support for reading XML data" > $@
 	@echo "# USE_XML=1" >> $@
+	@echo "# XML_INC_DIRS=" >> $@
+	@echo "# XML_LIB_DIRS=" >> $@
 	@echo "# Location of dmalloc" >> $@
 	@echo "# DM=1" >> $@
 
