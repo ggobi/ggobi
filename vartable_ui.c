@@ -75,7 +75,7 @@ selection_made (GtkWidget *cl, gint row, gint column,
   gchar *varno_str;
   gint indx =
     gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->vartable_ui.notebook));
-  datad *d = g_slist_nth_data (gg->d, indx);
+  datad *d = (datad*) g_slist_nth_data (gg->d, indx);
 
   gtk_clist_get_text (GTK_CLIST (d->vartable_clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
@@ -92,7 +92,7 @@ deselection_made (GtkWidget *cl, gint row, gint column,
   gchar *varno_str;
   gint indx =
     gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->vartable_ui.notebook));
-  datad *d = g_slist_nth_data (gg->d, indx);
+  datad *d = (datad*) g_slist_nth_data (gg->d, indx);
 
   gtk_clist_get_text (GTK_CLIST (d->vartable_clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
@@ -123,7 +123,7 @@ void sortbycolumn_cb (GtkWidget *cl, gint column, ggobid *gg)
 {
   gint indx =
     gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->vartable_ui.notebook));
-  datad *d = g_slist_nth_data (gg->d, indx);
+  datad *d = (datad*) g_slist_nth_data (gg->d, indx);
 
   gtk_clist_set_sort_column (GTK_CLIST (d->vartable_clist), column);
   if (column == 1)  /*-- variable name --*/
@@ -203,7 +203,7 @@ vartable_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vbox), gg->vartable_ui.notebook,
       false, false, 2);
 
-    n = 1;
+    n = 0;
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
 
@@ -215,7 +215,7 @@ vartable_open (ggobid *gg)
       /*-- use datad->name once it's been defined --*/
       labelw = NULL;
       if (g_slist_length (gg->d) > 1) {
-        label = g_strdup_printf ("data %d\n", n++);
+        label = datasetName(d, n++);
         labelw = gtk_label_new (label);
         g_free (label);
       }
