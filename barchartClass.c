@@ -138,7 +138,7 @@ static void barchartDestroy(GtkObject *obj)
   barchartSPlotd * sp;
   sp = GTK_GGOBI_BARCHART_SPLOT(obj);
   barchart_free_structure(sp);
-  g_free((gpointer) sp->bar->index_to_rank);
+  vectori_free (&sp->bar->index_to_rank);
   g_free((gpointer) sp->bar);
 
   {

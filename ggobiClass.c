@@ -616,7 +616,7 @@ gtk_ggobi_barchart_display_get_type (void)
 static void barchartSPlotInit(barchartSPlotd * sp)
 {
   sp->bar = (barchartd *) g_malloc(1 * sizeof(barchartd));
-  sp->bar->index_to_rank = NULL;
+  vectori_init_null (&sp->bar->index_to_rank);
   sp->bar->is_spine = FALSE;
 
   barchart_init_vectors(sp);
