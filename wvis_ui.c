@@ -885,7 +885,7 @@ wvis_window_open (ggobid *gg)
     gtk_signal_connect (GTK_OBJECT (gg->wvis.window),
       "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), gg);
 
-#if 1 /* Testing */
+#if 0 /* Testing */
     gtk_signal_connect (GTK_OBJECT (gg->main_window),
                         "delete_event",
                         GTK_SIGNAL_FUNC (close_wvis_window_cb),
