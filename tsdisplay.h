@@ -64,7 +64,7 @@ void tsplotDisplaySet(displayd *dpy, ggobid *gg);
 void tsplotVarpanelRefresh(displayd *display, splotd *sp, datad *d);
 gboolean tsplotHandlesAction(displayd *dpy, PipelineMode mode);
 void add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy);
-void tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *label);
+void tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label);
 gint tsplotPlottedColsGet(displayd *display, gint *cols, datad *d, ggobid *gg);
 
 GtkWidget *tsplotMenusMake(displayd *dpy, PipelineMode viewMode, ggobid *gg);
