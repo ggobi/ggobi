@@ -6,15 +6,6 @@ ggobi:
 
 EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 
-# used to comment out sections of code for incompletely
-# implemented or buggy functionality
-BINARY_IO_IMPLEMENTED=0
-INFERENCE_IMPLEMENTED=0
-SMOOTH_IMPLEMENTED=0
-BRUSHING_OPTIONS_IMPLEMENTED=0
-EDIT_LINES_IMPLEMENTED=0
-PRINTING_IMPLEMENTED=0
-
 include local.config
 
 CC = gcc
@@ -30,6 +21,28 @@ CXXFLAGS=$(CFLAGS)
 ifdef TEST_KEYS
  CFLAGS+= -DTEST_KEYS=1
 endif
+
+# used to comment out sections of code for incompletely
+# implemented or buggy functionality
+ifdef BINARY_IO_IMPLEMENTED
+  CFLAGS+= -DBINARY_IO_IMPLEMENTED=1
+endif
+ifdef INFERENCE_IMPLEMENTED
+  CFLAGS+= -DINFERENCE_IMPLEMENTED=1
+endif
+ifdef SMOOTH_IMPLEMENTED
+  CFLAGS+= -DSMOOTH_IMPLEMENTED=1
+endif
+ifdef BRUSHING_OPTIONS_IMPLEMENTED
+  CFLAGS+= -DBRUSHING_OPTIONS_IMPLEMENTED=1
+endif
+ifdef EDIT_LINES_IMPLEMENTED
+  CFLAGS+= -DEDIT_LINES_IMPLEMENTED=1
+endif
+ifdef PRINTING_IMPLEMENTED
+  CFLAGS+= -DPRINTING_IMPLEMENTED=1
+endif
+
 
 SHLIB_LDFLAGS= -shared
 SHARED_LD_FLAGS= -shared
