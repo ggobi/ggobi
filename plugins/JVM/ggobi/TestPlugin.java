@@ -16,37 +16,37 @@ public class TestPlugin
 {
     ggobi gg;
     public TestPlugin() {
-	System.err.println("In TestPlugin constructor\n");
+	System.err.println("In TestPlugin constructor");
     }
 
     public TestPlugin(ggobi inst) {
 	this();
-	System.err.println("In TestPlugin constructor with ggobi instance\n");
+	System.err.println("In TestPlugin constructor with ggobi instance");
         gg = inst;
     }
 
     public boolean onCreate() {
-	System.err.println("In TestPlugin onCreate()\n");
+	System.err.println("In TestPlugin onCreate()");
 	return(true);
     }
 
     public boolean onClose() {
-	System.err.println("In TestPlugin onClose()\n");
+	System.err.println("In TestPlugin onClose()");
 	return(true);
     }
 
     public boolean onUpdateDisplay() {
-	System.err.println("In TestPlugin onUpdateDisplay()\n");
+	System.err.println("In TestPlugin onUpdateDisplay()");
 	return(true);
     }
 
     static public boolean onUnload() {
- 	System.err.println("In TestPlugin onUnload()\n");
+ 	System.err.println("In TestPlugin onUnload()");
         return(true);
     }
 
     static public boolean onLoad() {
- 	System.err.println("In TestPlugin onLoad()\n");
+ 	System.err.println("In TestPlugin onLoad()");
         return(true);
     }
 }
