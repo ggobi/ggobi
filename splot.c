@@ -140,8 +140,8 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
  * I'm not happy about these, since a display type is not a mode.
  * Maybe I'll think of a better way some day.
 */
-  case GDK_p:
-  case GDK_P:
+  case GDK_l:
+  case GDK_L:
     action = PCPLOT;
   break;
   case GDK_v:

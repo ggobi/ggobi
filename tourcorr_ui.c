@@ -9,6 +9,7 @@
     it without violating AT&T's intellectual property rights.
 */
 
+#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #ifdef USE_STRINGS_H		    
 #include <strings.h>
@@ -139,6 +140,7 @@ cpanel_ctour_make (ggobid *gg) {
   box = gtk_hbox_new (true, 2);
 
   btn = gtk_check_button_new_with_label ("Pause");
+  gtk_widget_set_name (btn, "COTOUR:pause_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Stop tour motion temporarily", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
@@ -297,6 +299,16 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
     return true;
 
   /*-- insert mode-specific key presses (if any) here --*/
+  if (event->keyval == GDK_w || event->keyval == GDK_W) {
+    /*-- turn pause on and off --*/
+    GtkWidget *pause_button = NULL;
+    pause_button = widget_find_by_name (gg->control_panel[COTOUR],
+      "COTOUR:pause_button");
+
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
+      !cpanel->tcorr1_paused || !cpanel->tcorr2_paused);
+  }
+
 
   return true;
 }
