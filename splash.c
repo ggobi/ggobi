@@ -15,6 +15,8 @@
 
 #include "splash.h"
 
+#include "config.h"
+
 void
 splash_destroy (GtkWidget *w, GdkEventButton *event, GdkPixmap *pix)
 {
@@ -27,11 +29,12 @@ splash_destroy (GtkWidget *w, GdkEventButton *event, GdkPixmap *pix)
 void
 splash_show (ggobid *gg, guint action, GtkWidget *w)
 {
+  char *versionInfo;
   GdkPixmap *splash_pix;
-  GtkWidget *splashw;
+  GtkWidget *splashw, *label;
   GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   GtkWidget *ebox = gtk_event_box_new ();
-  GtkWidget *hbox = gtk_hbox_new (false, 0);
+  GtkWidget *hbox = gtk_vbox_new (false, 0);
 
   splash_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL,
     gtk_widget_get_colormap (w),
@@ -41,6 +44,15 @@ splash_show (ggobid *gg, guint action, GtkWidget *w)
   gtk_container_add (GTK_CONTAINER (window), ebox);
   gtk_container_add (GTK_CONTAINER (ebox), hbox);
   gtk_box_pack_start (GTK_BOX (hbox), splashw, FALSE, FALSE, 0);
+
+  versionInfo = (char *) g_malloc(sizeof(gchar)*(strlen("Version ") + 
+                                                 strlen(GGOBI_VERSION_STRING) + 
+                                                 2 +
+                                                 strlen(GGOBI_RELEASE_DATE) + 1));
+  sprintf(versionInfo,"%s %s, %s", "Version", GGOBI_VERSION_STRING, GGOBI_RELEASE_DATE);
+  label = gtk_label_new(versionInfo);
+  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+  g_free(versionInfo);
 
   gtk_object_set_data (GTK_OBJECT (ebox), "window", (gpointer) window);
 
