@@ -25,12 +25,20 @@ static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)
   brush_undo (gg->current_splot, gg);
 }
 
+void
+brush_scope_set (gint br_scope, ggobid *gg) {
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  splotd *sp = gg->current_splot;
+
+  cpanel->br_scope = br_scope;
+  splot_redraw (sp, QUICK, gg);  
+}
+
 static gchar *scope_lbl[] = {"Points", "Lines", "Points and lines"};
-static void brush_scope_cb (GtkWidget *w, gpointer cbd)
+static void brush_scope_set_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->br_scope = GPOINTER_TO_INT (cbd);
+  brush_scope_set (GPOINTER_TO_INT (cbd), gg);
 }
 
 static gchar *cg_lbl[] =
@@ -286,7 +294,7 @@ cpanel_brush_make (ggobid *gg) {
                       scope_opt, false, false, 0);
   populate_option_menu (scope_opt, scope_lbl,
                         sizeof (scope_lbl) / sizeof (gchar *),
-                        brush_scope_cb, gg);
+                        brush_scope_set_cb, gg);
   /* points only */
   gtk_option_menu_set_history (GTK_OPTION_MENU (scope_opt), 0); 
   

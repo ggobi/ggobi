@@ -5,10 +5,11 @@ Bugs:
   scatterplot matrix:  ASH is vertical instead of horizontal
                        replacement mode isn't working
                        maybe its cpanel isn't initialized correctly?
-
+  the brush isn't redrawing when a new color is selected
+  reset zoom doesn't work; reset pan is fine
+  closing the 'choose symbol' window dumps core
 
 Scaling:
-  reset zoom doesn't work; reset pan is fine
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
   couple that with a thumbnail view that sits just below the scaling controls
 

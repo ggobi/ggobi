@@ -666,22 +666,35 @@ line_brush_undo (splotd *sp, ggobid *gg) {
   splot_redraw (sp, FULL, gg);
 }
 
-gint
+gboolean
 xed_by_brush (gint k, ggobid *gg)
 /*
  * Determine whether line k intersects the brush
 */
 {
   splotd *sp = gg->current_splot;
-  gint pt;
-  gint x1 = MIN (gg->app.brush_pos.x1, gg->app.brush_pos.x2);
-  gint x2 = MAX (gg->app.brush_pos.x1, gg->app.brush_pos.x2);
-  gint y1 = MIN (gg->app.brush_pos.y1, gg->app.brush_pos.y2);
-  gint y2 = MAX (gg->app.brush_pos.y1, gg->app.brush_pos.y2);
+  gboolean intersect;
+  glong x1 = gg->app.brush_pos.x1;
+  glong y1 = gg->app.brush_pos.y1;
+  glong x2 = gg->app.brush_pos.x2;
+  glong y2 = gg->app.brush_pos.y2;
 
-  pt = (sp->screen[k].x <= x2 && sp->screen[k].y <= y2 &&
-        sp->screen[k].x >= x1 && sp->screen[k].y >= y1) ? 1 : 0;
-  return (pt);
+  glong ax = sp->screen[gg->segment_endpoints[k].a - 1].x;
+  glong ay = sp->screen[gg->segment_endpoints[k].a - 1].y;
+  glong bx = sp->screen[gg->segment_endpoints[k].b - 1].x;
+  glong by = sp->screen[gg->segment_endpoints[k].b - 1].y;
+
+  glong x, y;
+  extern gint lines_intersect (glong, glong, glong, glong, 
+    glong, glong, glong, glong, glong *, glong *);
+
+  /*-- test for intersection with the vertical line --*/
+  intersect = lines_intersect (x1, y1, x1, y2, ax, ay, bx, by, &x, &y);
+
+  if (!intersect)
+    intersect = lines_intersect (x1, y1, x2, y1, ax, ay, bx, by, &x, &y);
+
+  return (intersect);
 }
 
 static gboolean
