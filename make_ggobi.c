@@ -173,9 +173,9 @@ gboolean read_input(InputDescription * desc, ggobid * gg)
     break;
 
   default:
-     /* Usethe plugin structure. */
+     /* Use the plugin structure. */
     if (desc->desc_read_input) {
-#if 0
+#if 1
       if(!desc->baseName) 
 	completeFileDesc(desc->fileName, desc);
 #endif
