@@ -176,77 +176,79 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
 
     /*
      * because display_tourcorr_init_null has been performed even if
-     * alloc_tourcorr has not, Fa.ncols has been initialized.
+     * alloc_tourcorr has not, Fa.ncols has been initialized, and
+     * dsp->tcorr1.Fa.ncols = 0.
     */
     old_ncols = dsp->tcorr1.Fa.ncols;
 
-    if (old_ncols < MIN_NVARS_FOR_COTOUR && nc >= MIN_NVARS_FOR_COTOUR) {
-      display_tourcorr_init(dsp, gg);
-    }
+    if (nc >= MIN_NVARS_FOR_COTOUR) {
+      if (old_ncols < MIN_NVARS_FOR_COTOUR)
+        display_tourcorr_init(dsp, gg);
 
-    if (dsp->d == d) {
-      arrayd_add_cols (&dsp->tcorr1.Fa, nc);
-      arrayd_add_cols (&dsp->tcorr1.Fz, nc);
-      arrayd_add_cols (&dsp->tcorr1.F, nc);
-      arrayd_add_cols (&dsp->tcorr1.Ga, nc);
-      arrayd_add_cols (&dsp->tcorr1.Gz, nc);
-      arrayd_add_cols (&dsp->tcorr1.G, nc);
-      arrayd_add_cols (&dsp->tcorr1.Va, nc);
-      arrayd_add_cols (&dsp->tcorr1.Vz, nc);
-      arrayd_add_cols (&dsp->tcorr1.tv, nc);
+      if (dsp->d == d) {
+        arrayd_add_cols (&dsp->tcorr1.Fa, nc);
+        arrayd_add_cols (&dsp->tcorr1.Fz, nc);
+        arrayd_add_cols (&dsp->tcorr1.F, nc);
+        arrayd_add_cols (&dsp->tcorr1.Ga, nc);
+        arrayd_add_cols (&dsp->tcorr1.Gz, nc);
+        arrayd_add_cols (&dsp->tcorr1.G, nc);
+        arrayd_add_cols (&dsp->tcorr1.Va, nc);
+        arrayd_add_cols (&dsp->tcorr1.Vz, nc);
+        arrayd_add_cols (&dsp->tcorr1.tv, nc);
 
-      vectori_realloc (&dsp->tcorr1.active_vars, nc);
-      vectorf_realloc (&dsp->tcorr1.lambda, nc);
-      vectorf_realloc (&dsp->tcorr1.tau, nc);
-      vectorf_realloc (&dsp->tcorr1.tinc, nc);
+        vectori_realloc (&dsp->tcorr1.active_vars, nc);
+        vectorf_realloc (&dsp->tcorr1.lambda, nc);
+        vectorf_realloc (&dsp->tcorr1.tau, nc);
+        vectorf_realloc (&dsp->tcorr1.tinc, nc);
 
-      arrayd_add_cols (&dsp->tc1_manbasis, (gint) nc);
-      arrayd_add_cols (&dsp->tc2_manbasis, (gint) nc);
+        arrayd_add_cols (&dsp->tc1_manbasis, (gint) nc);
+        arrayd_add_cols (&dsp->tc2_manbasis, (gint) nc);
 
-      arrayd_add_cols (&dsp->tcorr2.Fa, nc);
-      arrayd_add_cols (&dsp->tcorr2.Fz, nc);
-      arrayd_add_cols (&dsp->tcorr2.F, nc);
-      arrayd_add_cols (&dsp->tcorr2.Ga, nc);
-      arrayd_add_cols (&dsp->tcorr2.Gz, nc);
-      arrayd_add_cols (&dsp->tcorr2.G, nc);
-      arrayd_add_cols (&dsp->tcorr2.Va, nc);
-      arrayd_add_cols (&dsp->tcorr2.Vz, nc);
-      arrayd_add_cols (&dsp->tcorr2.tv, nc);
+        arrayd_add_cols (&dsp->tcorr2.Fa, nc);
+        arrayd_add_cols (&dsp->tcorr2.Fz, nc);
+        arrayd_add_cols (&dsp->tcorr2.F, nc);
+        arrayd_add_cols (&dsp->tcorr2.Ga, nc);
+        arrayd_add_cols (&dsp->tcorr2.Gz, nc);
+        arrayd_add_cols (&dsp->tcorr2.G, nc);
+        arrayd_add_cols (&dsp->tcorr2.Va, nc);
+        arrayd_add_cols (&dsp->tcorr2.Vz, nc);
+        arrayd_add_cols (&dsp->tcorr2.tv, nc);
 
-      vectori_realloc (&dsp->tcorr2.active_vars, nc);
-      vectorf_realloc (&dsp->tcorr2.lambda, nc);
-      vectorf_realloc (&dsp->tcorr2.tau, nc);
-      vectorf_realloc (&dsp->tcorr2.tinc, nc);
+        vectori_realloc (&dsp->tcorr2.active_vars, nc);
+        vectorf_realloc (&dsp->tcorr2.lambda, nc);
+        vectorf_realloc (&dsp->tcorr2.tau, nc);
+        vectorf_realloc (&dsp->tcorr2.tinc, nc);
 
-      /* need to zero extra cols */
-      for (i=old_ncols; i<nc; i++) {
-        dsp->tcorr1.Fa.vals[0][i] = 0.0;
-        dsp->tcorr1.Fz.vals[0][i] = 0.0;
-        dsp->tcorr1.F.vals[0][i] = 0.0;
-        dsp->tcorr1.Ga.vals[0][i] = 0.0;
-        dsp->tcorr1.Gz.vals[0][i] = 0.0;
-        dsp->tcorr1.G.vals[0][i] = 0.0;
-        dsp->tcorr1.Va.vals[0][i] = 0.0;
-        dsp->tcorr1.Vz.vals[0][i] = 0.0;
-        dsp->tcorr1.tv.vals[0][i] = 0.0;
-        dsp->tcorr1.active_vars.els[i] = 0;
-        dsp->tcorr1.lambda.els[i] = 0.0;
-        dsp->tcorr1.tau.els[i] = 0.0;
-        dsp->tcorr1.tinc.els[i] = 0.0;
+        /* need to zero extra cols */
+        for (i=old_ncols; i<nc; i++) {
+          dsp->tcorr1.Fa.vals[0][i] = 0.0;
+          dsp->tcorr1.Fz.vals[0][i] = 0.0;
+          dsp->tcorr1.F.vals[0][i] = 0.0;
+          dsp->tcorr1.Ga.vals[0][i] = 0.0;
+          dsp->tcorr1.Gz.vals[0][i] = 0.0;
+          dsp->tcorr1.G.vals[0][i] = 0.0;
+          dsp->tcorr1.Va.vals[0][i] = 0.0;
+          dsp->tcorr1.Vz.vals[0][i] = 0.0;
+          dsp->tcorr1.tv.vals[0][i] = 0.0;
+          dsp->tcorr1.active_vars.els[i] = 0;
+          dsp->tcorr1.lambda.els[i] = 0.0;
+          dsp->tcorr1.tau.els[i] = 0.0;
+          dsp->tcorr1.tinc.els[i] = 0.0;
 
-        dsp->tcorr2.Fa.vals[0][i] = 0.0;
-        dsp->tcorr2.Fz.vals[0][i] = 0.0;
-        dsp->tcorr2.F.vals[0][i] = 0.0;
-        dsp->tcorr2.Ga.vals[0][i] = 0.0;
-        dsp->tcorr2.Gz.vals[0][i] = 0.0;
-        dsp->tcorr2.G.vals[0][i] = 0.0;
-        dsp->tcorr2.Va.vals[0][i] = 0.0;
-        dsp->tcorr2.Vz.vals[0][i] = 0.0;
-        dsp->tcorr2.tv.vals[0][i] = 0.0;
-        dsp->tcorr2.active_vars.els[i] = 0;
-        dsp->tcorr2.lambda.els[i] = 0.0;
-        dsp->tcorr2.tau.els[i] = 0.0;
-        dsp->tcorr2.tinc.els[i] = 0.0;
+          dsp->tcorr2.Fa.vals[0][i] = 0.0;
+          dsp->tcorr2.Fz.vals[0][i] = 0.0;
+          dsp->tcorr2.F.vals[0][i] = 0.0;
+          dsp->tcorr2.Ga.vals[0][i] = 0.0;
+          dsp->tcorr2.Gz.vals[0][i] = 0.0;
+          dsp->tcorr2.G.vals[0][i] = 0.0;
+          dsp->tcorr2.Va.vals[0][i] = 0.0;
+          dsp->tcorr2.Vz.vals[0][i] = 0.0;
+          dsp->tcorr2.tv.vals[0][i] = 0.0;
+          dsp->tcorr2.active_vars.els[i] = 0;
+          dsp->tcorr2.lambda.els[i] = 0.0;
+          dsp->tcorr2.tau.els[i] = 0.0;
+          dsp->tcorr2.tinc.els[i] = 0.0;
+        }
       }
     }
   }
