@@ -1,0 +1,12 @@
+<plugin name="JVM" load="immediate">
+   <description>Loads the Python Interpreter for use by other plugins</description>
+   <author>Duncan Temple Lang</author>
+   <options>
+    <named>
+      <pythonpath>.:@PWD@</pythonpath>
+    </named>
+   </options>
+   <dll name="@PWD@/Python.so">
+    <init onLoad="loadPython" />
+  </dll>
+</plugin>

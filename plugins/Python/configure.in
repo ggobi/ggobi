@@ -1,0 +1,37 @@
+AC_INIT(Python.c)
+
+PWD=`pwd`
+AC_SUBST(PWD)
+
+
+AC_ARG_WITH(threads, [--with-threads  link against the thread libraries for a thread aware Python],,
+   if test ! `echo "import thread" | ${PYTHON}` ; then 
+     with_threads="yes" 
+     echo "Using threads"
+   fi
+       )
+
+PY_CONFIG_DIR=${OMEGA_HOME}/Python/R/Install
+
+AC_PATH_PROG(PYTHON, python)
+
+PYTHON_VERSION=${PYTHON_VERSION-`${PYTHON} $PY_CONFIG_DIR/version.py`}
+AC_SUBST(PYTHON_VERSION)
+
+if test -z "${PYTHON_INCLUDE_DIR}" ; then
+ PYTHON_INCLUDE_DIR=`$PYTHON  ${PY_CONFIG_DIR}/distutilsInc.py`
+fi
+
+if test -z "${PYTHON_LIB_DIR}" ; then
+ PYTHON_LIB_DIR=`$PYTHON  ${PY_CONFIG_DIR}/distutilsLib.py`
+fi
+
+AC_SUBST(PYTHON_INCLUDE_DIR)
+AC_SUBST(PYTHON_LIB_DIR)
+
+if test -n "${with_threads}" ; then
+   THREAD_LIBS="-lpthread -lutil"
+fi
+AC_SUBST(THREAD_LIBS)
+
+AC_OUTPUT(plugin.xml local.config)
