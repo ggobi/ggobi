@@ -50,7 +50,7 @@ saveDOMToFile(xmlDocPtr doc, const char *fileName)
 	status = xmlSaveFile(fileName, doc);
 	xmlSetDocCompressMode(doc, compressionLevel);
     }
-#if USE_XML==1
+#if USE_XML==2
     else {
 	xmlChar *mem;
 	int size;
