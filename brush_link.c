@@ -17,7 +17,8 @@
 /*                Linking to other datad's by id                        */
 /*----------------------------------------------------------------------*/
 
-void symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
+gboolean
+symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
 {
 /*-- sd = source_d --*/
   datad *d;
@@ -25,6 +26,7 @@ void symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
   gint i, id = -1;
   /*-- this is the cpanel for the display being brushed --*/
   cpaneld *cpanel = &gg->current_display->cpanel;
+  gboolean changed = false;
 
   /*-- k is the row number in source_d --*/
 
@@ -32,65 +34,108 @@ void symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
     gpointer ptr = g_hash_table_lookup(sd->idTable, sd->rowIds[k]);
     if (ptr)
       id = * ((guint *)ptr);
-  } else if (sd->rowid.id.nels > 0) 
-    id = sd->rowid.id.els[k];
+  }
 
   if (id < 0)      /*-- this would indicate a bug --*/
-/**/return;
+/**/return false;
 
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-      if (d == sd)
-        continue;        /*-- skip the originating datad --*/
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (d == sd)
+      continue;        /*-- skip the originating datad --*/
 
-      i = -1;
-      if(sd->rowIds && d->idTable) {
-         gpointer ptr = g_hash_table_lookup(d->idTable, sd->rowIds[id]);
-         if(ptr) {
-           i = * ((guint *)ptr);
-         }        
-      } else  if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
-        /*-- if this id exists, it is in the range of d's ids ... --*/
-
-        /*-- i is the row number, irrespective of rows_in_plot --*/
-        i = d->rowid.idv.els[id];
-      } 
-
-      if (i < 0)      /*-- then no cases in d have this id --*/
-         continue;
-
-        /*-- if we get here, d has one case with the indicated id --*/
-        if (d->sampled.els[i]) {
-
-          if (persistentp || cpanel->br_mode == BR_PERSISTENT) {
-
-            /*
-             * make it link for everything, no matter
-             * what kind of brushing is turned on, because
-             * otherwise, connections between points and edges
-             * gets messed up.
-             */
-
-            if (!d->hidden_now.els[i]) {
-              d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
-              d->glyph.els[i].size = d->glyph_now.els[i].size =
-                sd->glyph.els[k].size;
-              d->glyph.els[i].type = d->glyph_now.els[i].type =
-                sd->glyph.els[k].type;
-            }
-            d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
-
-          } else if (cpanel->br_mode == BR_TRANSIENT) {
-
-            if (!d->hidden_now.els[i]) {
-              d->color_now.els[i] = sd->color_now.els[k];
-              d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
-              d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
-            }
-            d->hidden_now.els[i] = sd->hidden_now.els[k];
-          }
-        }
+    i = -1;
+    if(sd->rowIds && d->idTable) {
+       gpointer ptr = g_hash_table_lookup(d->idTable, sd->rowIds[id]);
+       if(ptr) {
+         i = * ((guint *)ptr);
+       }        
     }
+
+    if (i < 0)      /*-- then no cases in d have this id --*/
+       continue;
+
+    /*-- if we get here, d has one case with the indicated id --*/
+    changed = true;
+    if (d->sampled.els[i] && !d->excluded.els[i]) {
+
+      if (persistentp || cpanel->br_mode == BR_PERSISTENT) {
+
+        /*
+         * make it link for everything, no matter
+         * what kind of brushing is turned on, because
+         * otherwise, connections between points and edges
+         * gets messed up.
+         */
+
+        if (!d->hidden_now.els[i]) {
+          d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
+          d->glyph.els[i].size = d->glyph_now.els[i].size =
+            sd->glyph.els[k].size;
+          d->glyph.els[i].type = d->glyph_now.els[i].type =
+            sd->glyph.els[k].type;
+        }
+        d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
+
+        /*-- should we handle this here?  --*/
+        d->excluded.els[i] = sd->excluded.els[k];
+
+      } else if (cpanel->br_mode == BR_TRANSIENT) {
+
+        if (!d->hidden_now.els[i]) {
+          d->color_now.els[i] = sd->color_now.els[k];
+          d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
+          d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
+        }
+        d->hidden_now.els[i] = sd->hidden_now.els[k];
+      }
+    }
+  }
+  return changed;
+}
+
+gboolean
+exclude_link_by_id (gint k, datad * sd, ggobid * gg)
+{
+/*-- sd = source_d --*/
+  datad *d;
+  GSList *l;
+  gint i, id = -1;
+  gboolean changed = false;
+
+  /*-- k is the row number in source_d --*/
+
+  if (sd->rowIds) {
+    gpointer ptr = g_hash_table_lookup(sd->idTable, sd->rowIds[k]);
+    if (ptr)
+      id = * ((guint *)ptr);
+  }
+
+  if (id < 0)      /*-- this would indicate a bug --*/
+/**/return false;
+
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (d == sd)
+      continue;        /*-- skip the originating datad --*/
+
+    i = -1;
+    if(sd->rowIds && d->idTable) {
+       gpointer ptr = g_hash_table_lookup(d->idTable, sd->rowIds[id]);
+       if(ptr) {
+         i = * ((guint *)ptr);
+       }        
+    }
+
+    if (i < 0)      /*-- then no cases in d have this id --*/
+       continue;
+
+    /*-- if we get here, d has one case with the indicated id --*/
+    changed = true;
+    if (d->sampled.els[i])
+      d->excluded.els[i] = sd->excluded.els[k];
+  }
+  return changed;
 }
 
 /*----------------------------------------------------------------------*/
