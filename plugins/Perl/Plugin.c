@@ -123,18 +123,21 @@ initializePerlPlugin(PerlPluginData *details, ggobid *gg, PluginInstance *inst)
     /* load the Perl module, create the ggobi and plugin instance references
        as Perl objects. */
 
+#if 0
+    require_pv(moduleName);
+#else
     cmd = g_malloc( sizeof(char *) * (strlen(moduleName) + 3 + strlen("require")));
     sprintf(cmd, "require %s;", moduleName);
     (void) eval_pv(cmd, TRUE);
+    g_free(cmd);
+#endif
     if(SvTRUE(ERRSV)) {
 	fprintf(stderr, "Failed to load the perl module %s\n", moduleName);
     }
-    g_free(cmd);
 
        /* create the references */
     instData->ggobiRef = createPerlReferenceObject(gg, "GGobi::GGobiRef");
     instData->pluginInstanceRef = createPerlReferenceObject(inst, "GGobi::PluginInstRef");
-
     return(instData);
 }
 
@@ -143,22 +146,32 @@ createPerlReferenceObject(gpointer ptr, const char *className)
 {
     SV *ref = NULL;
     float f = (float) ((long)ptr);
+    int n ;
     dSP;
+
     ENTER ;
     SAVETMPS;
     PUSHMARK(SP);   
 
+      /* Pop the class name of the object we are trying to create
+         and the actual address of the C-level object that we are 
+         exporting as a reference. */
     XPUSHs(sv_2mortal(newSVpv(className, 0)));
     XPUSHs(sv_2mortal(newSVnv(f)));
 
     PUTBACK;
-    call_method("new", G_SCALAR | G_EVAL | G_KEEPERR);
-    if(SvTRUE(ERRSV)) {
+
+    n = call_method("new", G_SCALAR | G_EVAL | G_KEEPERR);
+    if(SvTRUE(ERRSV) || n < 1) {
 	fprintf(stderr, "Can't create Perl reference object of class %s\n", className);fflush(stderr);
 	return(NULL);
     }
+
     SPAGAIN;
     ref = POPs;
+
+    SvREFCNT_inc(ref);
+
     PUTBACK;
     FREETMPS;
     LEAVE;
@@ -167,7 +180,15 @@ createPerlReferenceObject(gpointer ptr, const char *className)
 }
 
 /**
-
+ This creates an instance of the specified Perl plugin.
+ It does this by call the new() method for the class specified
+ in the onCreate element of the plugin description (in the XML).
+ It passes 5 arguments to that method:
+  1) the class name
+  2) a reference to the C-levle GGobi data structure which the plugin instance serves
+  3) a reference to the C-level which acts as a proxy for the plugin instance
+  4) a hash of the named arguments for the plugin (given in the XML) 
+  5) an array of the unnamed arguments.
  */
 gboolean
 PerlCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
@@ -177,7 +198,7 @@ PerlCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
     gboolean status = false;
     char *className = inst->info->info.g->onCreate;  
 
-    inst->data = initializePerlPlugin(data, gg, inst);
+    inst->data = instData = initializePerlPlugin(data, gg, inst);
 
     if(data->className) {
 	SV *args, *namedArgs;
@@ -198,15 +219,20 @@ PerlCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
            named arguments
            un-named arguments
          */
-        XPUSHs(sv_2mortal(newSVpv(data->className, 0)));
+        XPUSHs((newSVpv(data->className, 0)));
+
         XPUSHs(instData->ggobiRef);
         XPUSHs(instData->pluginInstanceRef);
-	XPUSHs(sv_2mortal(namedArgs));
+
+	XPUSHs(sv_2mortal(namedArgs)); 
 	XPUSHs(sv_2mortal(args));
+
 	PUTBACK;
+
         /* */
         n = call_method("new", G_SCALAR | G_EVAL | G_KEEPERR);
         if(SvTRUE(ERRSV)) {
+	    fprintf(stderr, "Error in creating plugin: %s\n", SvPV(ERRSV, PL_na));fflush(stderr);
 	    return(false);
 	}
 
@@ -214,7 +240,7 @@ PerlCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
         if(n > 0) {
 	    instData->perlObj = POPs;
 	} else
-	    status = true;
+	    status = false;
 
 	PUTBACK;
 	FREETMPS;
@@ -223,6 +249,7 @@ PerlCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 
     return(status);
 }
+
 
 SV *
 Perl_getUnnamedArguments(GSList *args)
@@ -236,8 +263,9 @@ Perl_getUnnamedArguments(GSList *args)
 	return(&sv_undef);
 
     tmp = args;
+
     ans = newAV();
-    av_extend(ans, n);
+    av_extend(ans, n); 
 
     for(i = 0; i < n; i++) {
 	if(tmp->data) {
@@ -247,6 +275,7 @@ Perl_getUnnamedArguments(GSList *args)
 	}
 	tmp = tmp->next;
     }
+    ans = newRV_noinc(ans);
 
     return((SV *) ans);
 }
@@ -254,7 +283,6 @@ Perl_getUnnamedArguments(GSList *args)
 typedef struct {
     SV *table;
 } Perl_HashTableConverter;
-
 
 void
 collectHashElement(gpointer gkey, gpointer gvalue, HV *table)
@@ -281,9 +309,12 @@ Perl_getNamedArguments(GHashTable *table)
 
     g_hash_table_foreach(table, (GHFunc) collectHashElement, (gpointer) ans);
 
+    fprintf(stderr, "Ref count %ld\n", SvREFCNT(ans));
+    ans = newRV_noinc(ans);
+
+
     return((SV *) ans);
 }
-
 
 gboolean
 PerlDestroyPlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
