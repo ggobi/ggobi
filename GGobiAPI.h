@@ -208,5 +208,6 @@ extern const gchar *GGOBI(getModeName)(int which);
 extern int GGOBI(full_mode_set)(int action, ggobid *gg);
 
 extern int GGOBI(setBrushColor)(int cid, ggobid *gg);
+extern gboolean GGOBI(setBrushGlyph)(int type, int size, ggobid *gg);
 #endif /* End of conditional inclusion of entire file.*/
 

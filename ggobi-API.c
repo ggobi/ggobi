@@ -857,6 +857,18 @@ void GGOBI(setBrushLocation)(int x, int y, ggobid *gg)
  redraw(gg);
 }
 
+gboolean
+GGOBI(setBrushGlyph)(int type, int size, ggobid *gg)
+{
+  if(type > -1)
+    gg->glyph_id.type = type;
+  if(size > -1)
+    gg->glyph_id.size = size;
+
+  return(true); /* Should be true iff there is a change. */
+}
+
+
 /*
   Returns the dimensions of the specified
   splot in pixels which can then be used for
