@@ -54,10 +54,8 @@ cpanel_barchart_make (ggobid *gg) {
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, display_mode_lbl,
-                        sizeof (display_mode_lbl) / sizeof (gchar *),
-                        display_mode_cb, gg);
-
-
+    sizeof (display_mode_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) display_mode_cb, gg);
 
   gtk_widget_show_all (gg->control_panel[BARCHART]);
 }
