@@ -459,6 +459,7 @@ tourCorrRealloc(displayd *dsp, gint nc, datad *d)
     }
 }
 
+#ifdef ROTATION_IMPLEMENTED
 static void
 tour2d3Realloc(displayd *dsp, gint nc, datad *d)
 {
@@ -517,6 +518,7 @@ tour2d3Realloc(displayd *dsp, gint nc, datad *d)
     }
   }
 }
+#endif
 
 static void
 tour2dRealloc(displayd *dsp, gint nc, datad *d)
@@ -1436,7 +1438,9 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
   klass->parent_class.move_points_button_cb = scatterplotMovePointsButtonCb;
 
   klass->parent_class.tour1d_realloc = tour1dRealloc;
+#ifdef ROTATION_IMPLEMENTED
   klass->parent_class.tour2d3_realloc = tour2d3Realloc;
+#endif
   klass->parent_class.tour2d_realloc = tour2dRealloc;
   klass->parent_class.tourcorr_realloc = tourCorrRealloc;
 
