@@ -25,8 +25,8 @@ GGOBI_LIB=
 CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
 
 ifdef GRAPHVIZ
-GVINC=-I$(GVIZ)/include -I$(GVIZ_SRC) -I$(GVIZ_SRC)/dotneato/common
-GVLIB=$(GVIZ)/lib
+GVINC=-I$(GVIZ_INC) -I$(GVIZ_SRC) -I$(GVIZ_SRC)/dotneato/common
+GVLIB=$(GVIZ_LIB)
 
 CFLAGS+= -DGRAPHVIZ=1 $(GVINC)
 LDFLAGS+=-L$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan
