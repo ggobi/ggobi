@@ -338,7 +338,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
     m = d->rows_in_plot[i];
 
     if (d->color_now.els[m] == current_color &&
-        splot_plot_case (m, d, sp, display, gg))
+        splot_plot_case (m, true, d, sp, display, gg))
     {
       if (display->options.points_show_p) {
         build_glyph (&d->glyph_now.els[m], sp->screen, m,

@@ -727,10 +727,15 @@ active_paint_points (datad *d, ggobid *gg)
         /*
          * if a case is hidden, or it's missing and we aren't
          * displaying missings, don't count it as being under the brush.
+         * Caution:
+         * If we're doing hide brushing, we can't ignore hidden
+         * cases; otherwise it's ok (I think).
         */
-        if (splot_plot_case (pt, d, sp, display, gg)) {
+        if (splot_plot_case (pt, cpanel->br_point_targets != BR_HIDE,
+          d, sp, display, gg))
+        {
           if (under_brush (pt, sp)) {
-            d->npts_under_brush++ ;    /*-- this is just boolean, really **/
+            d->npts_under_brush++ ;
             d->pts_under_brush.els[pt] = 1;
           }
         }

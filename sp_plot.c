@@ -113,7 +113,8 @@ splot_check_colors (gushort maxcolorid, gint *ncolors_used,
 
 
 gboolean
-splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
+splot_plot_case (gint m, gboolean ignore_hidden, datad *d,
+  splotd *sp, displayd *display, ggobid *gg)
 {
   gboolean draw_case;
 
@@ -121,7 +122,11 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
   /*-- usually checking sampled is redundant because we're looping
        over rows_in_plot, but maybe we're not always --*/
   draw_case = true;
-  if (d->hidden_now.els[m] || !d->sampled.els[m]) {
+
+  if (!d->sampled.els[m]) {
+    draw_case = false;
+
+  } else if (ignore_hidden && d->hidden_now.els[m]) {
     draw_case = false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
@@ -282,7 +287,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
         if (d->color_now.els[m] == current_color &&
-            splot_plot_case (m, d, sp, display, gg))
+            splot_plot_case (m, true, d, sp, display, gg))
         {
           if (display->options.points_show_p) {
             draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen, m, gg);
@@ -445,7 +450,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
             for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
               i = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
               if (d->color_now.els[i] == current_color &&
-                  splot_plot_case (i, d, sp, display, gg))
+                  splot_plot_case (i, true, d, sp, display, gg))
               {
                 draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
                   sp->screen, i, gg);
@@ -1115,8 +1120,8 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
               /*
                * This checks for hidden, sampled <and> missingness
               */
-              doit = splot_plot_case (a, d, sp, display, gg) &&
-                     splot_plot_case (b, d, sp, display, gg);
+              doit = splot_plot_case (a, true, d, sp, display, gg) &&
+                     splot_plot_case (b, true, d, sp, display, gg);
 
               if (!doit)
                 continue;
