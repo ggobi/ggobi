@@ -760,7 +760,6 @@ gboolean registerPlugin(ggobid *gg, GGobiPluginInfo *plugin);
 GGobiOptions *GGOBI_getSessionOptions();
 
 
-void set_display_option(gboolean active, guint action, displayd *display, ggobid *gg);
 
 #ifdef WIN32
 /* needed by transform.c */

@@ -39,6 +39,10 @@ DisplayOptions DefaultDisplayOptions = {
 */
                                        };
 
+
+void set_display_option(gboolean active, guint action, displayd *display, ggobid *gg);
+
+
 /*-- debugging utility --*/
 /*
 static void
@@ -100,7 +104,14 @@ display_plot_allbutone (displayd *display, splotd *splot,
 static void
 display_edges_directed_show (displayd *display, gboolean show)
 {
-  GtkWidget *w = widget_find_by_name (display->edge_menu,
+  GtkWidget *w;
+
+  if(!display->edge_menu) {
+     /* set_display_options doesn't know whether to call this or not. */
+    return;
+  }
+
+  w  = widget_find_by_name (display->edge_menu,
     "DISPLAYMENU:edges_d");
 
   if (!show && display->options.edges_directed_show_p && w) {
@@ -153,6 +164,13 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
   set_display_option(w->active, action, display, gg);
 }
 
+
+/*
+
+We need to allow people to programmatically change a setting and force the update.  The current framework is all based on GUI events and so we don't update the GUI components here as we assume they
+are set appropriately.  A Model View Controller approach is needed.
+
+*/
 void
 set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)
 {
@@ -331,6 +349,56 @@ set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)
       g_printerr ("no variable is associated with %d\n", action);
   }
 }
+
+
+/**
+ This is a start at allowing programmatic specification
+of options. Here, we set them in place (i.e. in
+display->options) and then force them to be applied.
+This does not update the menus.
+*/
+void
+set_display_options(displayd *display, ggobid *gg)
+{
+    int i;
+    gboolean active;
+    DisplayOptions *options = &display->options;
+    for(i = DOPT_POINTS ; i <=  DOPT_WHISKERS; i++) {
+       if (i == DOPT_EDGES_U || i == DOPT_EDGES_D ||  i == DOPT_EDGES_A)
+         if(!display->edge_menu)
+   	   continue;
+
+         switch(i) {
+		 case DOPT_POINTS:
+			 active = options->points_show_p;
+			 break;
+		 case DOPT_AXES:
+			 active = options->axes_show_p;
+			 break;
+		 case DOPT_AXESLAB:
+			 active = options->axes_label_p;
+			 break;
+		 case DOPT_AXESVALS:
+			 active = options->axes_values_p;
+			 break;
+		 case DOPT_EDGES_U:
+			 active = options->edges_undirected_show_p;
+			 break;
+		 case DOPT_EDGES_A:
+			 active = options->edges_arrowheads_show_p;
+			 break;
+		 case DOPT_EDGES_D:
+			 active = options->edges_directed_show_p;
+			 break;
+		 case DOPT_WHISKERS:
+			 active = options->whiskers_show_p;
+			 break;
+	 }
+
+         set_display_option(active, i, display, gg);
+    }
+}
+
 
 void
 display_print_cb (displayd *display, guint action, GtkWidget *w) 
