@@ -73,6 +73,11 @@ typedef struct {
 } SymbolicEndpoints;
 
 
+typedef struct {
+  endpointsd *endpoints;
+  struct _datad *data;
+} DatadEndpoints;
+
 
 /*-- arrays --*/
 /*-- double: some plugins will want these --*/

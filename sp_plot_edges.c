@@ -33,6 +33,9 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
   endpoints = resolveEdgePoints(e, d);
   draw_edge = edge_endpoints_get (m, &a, &b, d, endpoints, e);
 
+  if(!draw_edge)
+    return(false);
+
   /*-- determine whether edge m should be plotted --*/
   /*-- usually checking sampled is redundant because we're looping
        over rows_in_plot, but maybe we're not always --*/

@@ -191,6 +191,8 @@ edge_endpoints_get (gint k, gint *a, gint *b, datad *d, endpointsd *endpoints, d
   gboolean ok;
 
   if(e->edge.old_endpoints) {
+    if(d->rowid.idv.nels == 0)
+        return(false);
     *a = d->rowid.idv.els[endpoints[k].a];
     *b = d->rowid.idv.els[endpoints[k].b];
   } else {
@@ -224,20 +226,23 @@ computeResolvedEdgePoints(datad *e, datad *d)
 
   ans = g_malloc( sizeof(endpointsd) * e->edge.n);
  
-  for(i = 0; i < e->edge.n; i++) {
+  for(i = 0; i < e->edge.n; i++, ctr++) {
     tmp = (guint *) g_hash_table_lookup(tbl, e->edge.sym_endpoints[i].a);
-    if(!tmp) 
-      continue;
+    if(!tmp) {
+     ans[ctr].a = -1;
+     continue;
+    }
 
     ans[ctr].a = *tmp;
 
     tmp = (guint *) g_hash_table_lookup(tbl, e->edge.sym_endpoints[i].b);
-    if(!tmp) 
+    if(!tmp) {
+      ans[ctr].a = -1;
       continue;
+    }
     ans[ctr].b = *tmp;
 
     ans[ctr].jpartner = e->edge.sym_endpoints[i].jpartner;
-    ctr++;
   }
 
   if(ctr == 0) {
@@ -250,10 +255,6 @@ computeResolvedEdgePoints(datad *e, datad *d)
   return(ans);
 }
 
-typedef struct {
-  endpointsd *endpoints;
-  datad *data;
-} DatadEndpoints;
 
 /*
  Find the resolved edgepoints array associated with
