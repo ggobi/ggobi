@@ -432,7 +432,6 @@ void cluster_free(gint k, datad * d, ggobid * gg)
 static void update_cb(GtkWidget * w, ggobid * gg)
 {
   cluster_window_open(gg);
-  /*-- and emit an event --*/
 }
 
 static gboolean nclusters_changed(ggobid * gg)
@@ -616,11 +615,6 @@ void cluster_window_open(ggobid * gg)
     /*-- add the cluster rows, one by one --*/
     for (k = 0; k < d->nclusters; k++)
       cluster_add(k, d, gg);
-
-    /* This will become an event on the datad when we move to
-       Gtk objects (soon now!) */
-    /*-- this doesn't track cluster counts, just cluster identities --*/
-    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[CLUSTERS_CHANGED_SIGNAL], d);
   }
 
   /*-- listen for datad_added events on main_window --*/
@@ -661,5 +655,12 @@ void cluster_window_open(ggobid * gg)
   gtk_box_pack_start(GTK_BOX(hbox), btn, true, true, 0);
 
   gtk_widget_show_all(gg->cluster_ui.window);
+
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    /*-- this doesn't track cluster counts, just cluster identities --*/
+    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[CLUSTERS_CHANGED_SIGNAL], d);
+  }
+
   gdk_window_raise(gg->cluster_ui.window->window);
 }
