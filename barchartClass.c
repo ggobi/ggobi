@@ -174,6 +174,7 @@ gboolean barchart_build_symbol_vectors(datad * d, ggobid * gg)
 {
   gboolean changed = FALSE;
   gint j, m;
+  gint nd = g_slist_length (gg->d);
 
   for (j = 0; j < d->nrows_in_plot; j++) {
     m = d->rows_in_plot.els[j];
@@ -181,6 +182,9 @@ gboolean barchart_build_symbol_vectors(datad * d, ggobid * gg)
                                    d->pts_under_brush.els, d, gg);
     changed = update_glyph_vectors (j, changed,
                                     d->pts_under_brush.els, d, gg);
+    /*-- link by id --*/
+    if (!gg->linkby_cv && nd > 1) symbol_link_by_id (false, j, d, gg);
+    /*-- --*/
   }
 
   return changed;

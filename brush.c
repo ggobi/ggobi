@@ -646,6 +646,7 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   icoords imin, imax;
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
+  gboolean (*f)(datad *, ggobid *);
 
   /* These two are needed for the extended display.
      Should the method be on the extended splot or the display (as it is now).
@@ -656,53 +657,57 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
 
   if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    gboolean (*f)(datad *, ggobid *);
     f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->build_symbol_vectors; 
     if(f)
       changed = f(d, gg);
   }
 
-  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
+/*
+ * None of the following code makes any sense for the barchart...
+*/
+  if (!f) {
+    brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
-  for (ih=imin.x; ih<=imax.x; ih++) {
-    for (iv=imin.y; iv<=imax.y; iv++) {
-      for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
-        /*
-         * j is the row number; k is the index of rows_in_plot.els[]
-        */
+    for (ih=imin.x; ih<=imax.x; ih++) {
+      for (iv=imin.y; iv<=imax.y; iv++) {
+        for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
+          /*
+           * j is the row number; k is the index of rows_in_plot.els[]
+          */
         j = d->rows_in_plot.els[ k = d->brush.binarray[ih][iv].els[m] ] ;
 
-        switch (cpanel->br_point_targets) {
-          case br_candg:  /*-- color and glyph --*/
-            changed = update_color_vectors (j, changed,
-              d->pts_under_brush.els, d, gg);
-            changed = update_glyph_vectors (j, changed,
-              d->pts_under_brush.els, d, gg);
-          break;
-          case br_color:
-            changed = update_color_vectors (j, changed,
-              d->pts_under_brush.els, d, gg);
-          break;
-          case br_glyph:  /*-- glyph type and size --*/
-            changed = update_glyph_vectors (j, changed,
-              d->pts_under_brush.els, d, gg);
-          break;
-          case br_hide:  /*-- hidden --*/
-            changed = update_hidden_vectors (j, changed,
-              d->pts_under_brush.els, d, gg);
-          break;
-          case br_select:
-            changed = update_selected_vectors (j, changed,
-              d->pts_under_brush.els, d, gg);
-          break;
-          case br_off:
-            ;
-          break;
-        }
+          switch (cpanel->br_point_targets) {
+            case br_candg:  /*-- color and glyph --*/
+              changed = update_color_vectors (j, changed,
+                d->pts_under_brush.els, d, gg);
+              changed = update_glyph_vectors (j, changed,
+                d->pts_under_brush.els, d, gg);
+            break;
+            case br_color:
+              changed = update_color_vectors (j, changed,
+                d->pts_under_brush.els, d, gg);
+            break;
+            case br_glyph:  /*-- glyph type and size --*/
+              changed = update_glyph_vectors (j, changed,
+                d->pts_under_brush.els, d, gg);
+            break;
+            case br_hide:  /*-- hidden --*/
+              changed = update_hidden_vectors (j, changed,
+                d->pts_under_brush.els, d, gg);
+            break;
+            case br_select:
+              changed = update_selected_vectors (j, changed,
+                d->pts_under_brush.els, d, gg);
+            break;
+            case br_off:
+              ;
+            break;
+          }
 
-        /*-- link by id --*/
-        if (!gg->linkby_cv && nd > 1) symbol_link_by_id (false, j, d, gg);
-        /*-- --*/
+          /*-- link by id --*/
+          if (!gg->linkby_cv && nd > 1) symbol_link_by_id (false, j, d, gg);
+          /*-- --*/
+        }
       }
     }
   }
