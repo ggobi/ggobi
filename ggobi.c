@@ -256,6 +256,9 @@ ggobi_alloc()
   tmp->tour2d.idled = 0;
   tmp->tour1d.idled = 0;
   tmp->tourcorr.idled = 0;
+  tmp->tour1d.fade_vars = true;
+  tmp->tour2d.fade_vars = true;
+  tmp->tourcorr.fade_vars = true;
   tmp->brush.updateAlways_p = true;
 
   tmp->printOptions = NULL;

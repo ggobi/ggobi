@@ -88,6 +88,13 @@ static void reinit_cb (GtkWidget *w, ggobid *gg) {
 
 }
 
+static void scramble_cb (GtkWidget *w, ggobid *gg) {
+  extern void tour2d_scramble(ggobid *);
+
+  tour2d_scramble(gg);
+
+}
+
 /*static void pcaxes_cb (GtkToggleButton *button)
 {
   g_printerr ("pcaxes: %d\n", button->active);
@@ -153,9 +160,9 @@ cpanel_tour2d_make (ggobid *gg) {
     false, false, 1);
 
 /*
- * Box to hold 'pause' toggle and 'reinit' button
+ * Box to hold 'pause' toggle button
 */
-  box = gtk_hbox_new (true, 2);
+  box = gtk_hbox_new (true, 1);
 
   btn = gtk_check_button_new_with_label ("Pause");
   gtk_widget_set_name (btn, "TOUR2D:pause_button");
@@ -165,15 +172,28 @@ cpanel_tour2d_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (tour2d_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), box, false, false, 1);
+
+/*
+ * Box to hold 'Reinit' toggle and 'Scramble' button
+*/
+  box = gtk_hbox_new (true, 2);
+
   btn = gtk_button_new_with_label ("Reinit");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Reset projection", NULL);
+    "Reset projection to first two active variables", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                      GTK_SIGNAL_FUNC (reinit_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), box, false, false, 1);
+  btn = gtk_button_new_with_label ("Scramble");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Reset projection to random value", NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                     GTK_SIGNAL_FUNC (scramble_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), box, false, false, 1);
 
 /*
  * manipulation option menu and label inside vbox

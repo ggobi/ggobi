@@ -87,6 +87,12 @@ static void tourcorr_reinit_cb (GtkWidget *w, ggobid *gg) {
   tourcorr_reinit(gg);
 }
 
+static void tourcorr_scramble_cb (GtkWidget *w, ggobid *gg) {
+  extern void tourcorr_scramble(ggobid *);
+
+  tourcorr_scramble(gg);
+}
+
 /*
 static void syncaxes_cb (GtkToggleButton *button)
 {
@@ -167,9 +173,9 @@ cpanel_ctour_make (ggobid *gg) {
     false, false, 1);
 
 /*
- * Box to hold 'pause' toggle and 'reinit' button
+ * Box to hold 'pause' toggle button
 */
-  box = gtk_hbox_new (true, 2);
+  box = gtk_hbox_new (true, 1);
 
   btn = gtk_check_button_new_with_label ("Pause");
   gtk_widget_set_name (btn, "COTOUR:pause_button");
@@ -179,11 +185,25 @@ cpanel_ctour_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (tourcorr_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
+    box, false, false, 1);
+/*
+ * Box to hold 'Reinit' toggle and 'Scramble' button
+*/
+  box = gtk_hbox_new (true, 2);
+
   btn = gtk_button_new_with_label ("Reinit");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Reset projection", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                      GTK_SIGNAL_FUNC (tourcorr_reinit_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
+
+  btn = gtk_button_new_with_label ("Scramble");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Reset projection to random value", NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                     GTK_SIGNAL_FUNC (tourcorr_scramble_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),

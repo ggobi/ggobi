@@ -347,6 +347,15 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr_axes = true;
 }
 
+/*-- called from the Options menu --*/
+void
+tourcorr_fade_vars_cb (GtkCheckMenuItem *w, guint action) 
+{
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+
+  gg->tourcorr.fade_vars = !gg->tourcorr.fade_vars;
+}
+
 void tourcorr_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
@@ -381,6 +390,7 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
   gint j, jtmp, k;
   gboolean active=false;
   displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
 
   for (j=0; j<dsp->tcorr1.nvars; j++)
     if (jvar == dsp->tcorr1.vars.els[j])
@@ -399,6 +409,12 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
         }
       }
       dsp->tcorr1.nvars--;
+      if (!gg->tourcorr.fade_vars) /* set current position without sel var */
+      {
+        gt_basis(dsp->tcorr1.u0, dsp->tcorr1.nvars, dsp->tcorr1.vars, 
+          d->ncols, (gint) 1);
+        copy_mat(dsp->tcorr1.u.vals, dsp->tcorr1.u0.vals, d->ncols, 1);
+      }
     }
   }
   else { /* not active, so add the variable */
@@ -436,6 +452,7 @@ tourcorr_vervar_set (gint jvar, ggobid *gg)
   gint j, jtmp, k;
   gboolean active=false;
   displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
 
   for (j=0; j<dsp->tcorr2.nvars; j++)
     if (jvar == dsp->tcorr2.vars.els[j])
@@ -454,6 +471,13 @@ tourcorr_vervar_set (gint jvar, ggobid *gg)
         }
       }
       dsp->tcorr2.nvars--;
+
+      if (!gg->tourcorr.fade_vars) /* set current position without sel var */
+      {
+        gt_basis(dsp->tcorr2.u0, dsp->tcorr2.nvars, dsp->tcorr2.vars, 
+          d->ncols, (gint) 1);
+        copy_mat(dsp->tcorr2.u.vals, dsp->tcorr2.u0.vals, d->ncols, 1);
+      }
     }
   }
   else { /* not active, so add the variable */
@@ -675,51 +699,26 @@ void tourcorr_reinit(ggobid *gg)
   int j, m;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  /*  extern void tour_reproject(vector_f, array_f, array_f, array_f, 
-    array_f, array_f, gint, gint);
-  extern void zero_tinc(vector_f, gint);
-  extern void zero_tau(vector_f, gint);
-  extern void zero_lambda(vector_f, gint);*/
 
   for (j=0; j<d->ncols; j++) {
-    /*    m = dsp->tcorr1.vars.els[j];*/
-    /*    dsp->tcorr1.u0.vals[0][j] = 0.;*/
     dsp->tcorr1.u.vals[0][j] = 0.;
     dsp->tcorr1.u0.vals[0][j] = 0.;
-    /*    dsp->tcorr1.v0.vals[0][j] = 0.;
-    dsp->tcorr1.v1.vals[0][j] = 0.;
-    dsp->tcorr1.u1.vals[0][j] = 0.;*/
   }
   m = dsp->tcorr1.vars.els[0];
-  /*  dsp->tcorr1.u0.vals[0][m] = 1.;*/
   dsp->tcorr1.u.vals[0][m] = 1.;
   dsp->tcorr1.u0.vals[0][m] = 1.;
-  /*  dsp->tcorr1.v0.vals[0][m] = 1.;*/
 
   dsp->tcorr1.get_new_target = true;
 
   for (j=0; j<d->ncols; j++) {
     dsp->tcorr2.u.vals[0][j] = 0.;
     dsp->tcorr2.u0.vals[0][j] = 0.;
-    /*    dsp->tcorr2.v0.vals[0][j] = 0.;
-    dsp->tcorr2.u1.vals[0][j] = 0.;
-    dsp->tcorr2.v1.vals[0][j] = 0.;*/
   }
   m = dsp->tcorr2.vars.els[0];
-  /*  dsp->tcorr2.u0.vals[0][m] = 1.;*/
   dsp->tcorr2.u.vals[0][m] = 1.;
   dsp->tcorr2.u0.vals[0][m] = 1.;
-  /*  dsp->tcorr2.v0.vals[0][m] = 1.;*/
 
   dsp->tcorr2.get_new_target = true;
-
-  /*  zero_tinc(dsp->tcorr1.tinc, 1);
-  zero_tinc(dsp->tcorr2.tinc, 1);
-  zero_tau(dsp->tcorr1.tau, 1);
-  zero_tau(dsp->tcorr2.tau, 1);
-  zero_lambda(dsp->tcorr1.lambda, 1);
-  zero_lambda(dsp->tcorr2.lambda, 1);
-  */
 
   dsp->tcorr1.nsteps = 0;
   dsp->tcorr2.nsteps = 0;
@@ -730,6 +729,45 @@ void tourcorr_reinit(ggobid *gg)
 
   varcircles_refresh (d, gg);
 
+}
+
+void tourcorr_scramble(ggobid *gg)
+{
+  int i, j;
+  displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
+  gint nc = d->ncols;
+  extern void gt_basis(array_f, gint, vector_i, gint, gint);
+
+  for (j=0; j<d->ncols; j++) {
+    dsp->tcorr1.u.vals[0][j] = 0.;
+    dsp->tcorr1.u0.vals[0][j] = 0.;
+  }
+
+  for (j=0; j<d->ncols; j++) {
+    dsp->tcorr2.u.vals[0][j] = 0.;
+    dsp->tcorr2.u0.vals[0][j] = 0.;
+  }
+
+  gt_basis(dsp->tcorr1.u0, dsp->tcorr1.nvars, dsp->tcorr1.vars, 
+    d->ncols, (gint) 1);
+  copy_mat(dsp->tcorr1.u.vals, dsp->tcorr1.u0.vals, d->ncols, 1);
+
+  gt_basis(dsp->tcorr2.u0, dsp->tcorr2.nvars, dsp->tcorr2.vars, 
+    d->ncols, (gint) 1);
+  copy_mat(dsp->tcorr2.u.vals, dsp->tcorr2.u0.vals, d->ncols, 1);
+
+  dsp->tcorr1.nsteps = 1; 
+  dsp->tcorr1.stepcntr = 1;
+  dsp->tcorr2.nsteps = 1; 
+  dsp->tcorr2.stepcntr = 1;
+
+  dsp->tcorr1.get_new_target = true;
+  dsp->tcorr2.get_new_target = true;
+
+  display_tailpipe (dsp, FULL, gg);
+
+  varcircles_refresh (d, gg);
 }
 
 /* Variable manipulation */

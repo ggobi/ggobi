@@ -237,6 +237,15 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
   dsp->t1d_axes = true;
 }
 
+/*-- called from the Options menu --*/
+void
+tour1d_fade_vars_cb (GtkCheckMenuItem *w, guint action) 
+{
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+
+  gg->tour1d.fade_vars = !gg->tour1d.fade_vars;
+}
+
 void tour1d_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
@@ -264,6 +273,7 @@ tour1dvar_set (gint jvar, ggobid *gg)
   gint j, jtmp, k;
   gboolean active=false;
   displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
 
   for (j=0; j<dsp->t1d.nvars; j++)
     if (jvar == dsp->t1d.vars.els[j])
@@ -282,6 +292,13 @@ tour1dvar_set (gint jvar, ggobid *gg)
         }
       }
       dsp->t1d.nvars--;
+
+      if (!gg->tour1d.fade_vars) /* set current position without sel var */
+      {
+        gt_basis(dsp->t1d.u0, dsp->t1d.nvars, dsp->t1d.vars, 
+          d->ncols, (gint) 1);
+        copy_mat(dsp->t1d.u.vals, dsp->t1d.u0.vals, d->ncols, 1);
+      }
     }
   }
   else { /* not active, so add the variable */
@@ -577,6 +594,34 @@ void tour1d_reinit(ggobid *gg)
     dsp->t1d.u0.vals[i][dsp->t1d.vars.els[i]] = 1.;
     dsp->t1d.u.vals[i][dsp->t1d.vars.els[i]] = 1.;
   }
+
+  dsp->t1d.get_new_target = true;
+
+  display_tailpipe (dsp, FULL, gg);
+
+  varcircles_refresh (d, gg);
+}
+
+void tour1d_scramble(ggobid *gg)
+{
+  int i, j;
+  displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
+  gint nc = d->ncols;
+  extern void gt_basis(array_f, gint, vector_i, gint, gint);
+
+  for (i=0; i<1; i++)
+    for (j=0; j<nc; j++)
+      dsp->t1d.u0.vals[i][j] = dsp->t1d.u1.vals[i][j] = 
+        dsp->t1d.u.vals[i][j] = dsp->t1d.v0.vals[i][j] = 
+        dsp->t1d.v1.vals[i][j] = 0.0;
+
+  gt_basis(dsp->t1d.u0, dsp->t1d.nvars, dsp->t1d.vars, 
+    d->ncols, (gint) 1);
+  copy_mat(dsp->t1d.u.vals, dsp->t1d.u0.vals, d->ncols, 1);
+
+  dsp->t1d.nsteps = 1; 
+  dsp->t1d.stepcntr = 1;
 
   dsp->t1d.get_new_target = true;
 

@@ -70,10 +70,11 @@ void
 tour1d_menus_make (ggobid *gg) {
   GtkWidget *item;
   extern void varcircles_layout_cb (GtkCheckMenuItem *w, guint action);
+  extern void tour1d_fade_vars_cb (GtkCheckMenuItem *w, guint action);
   void tour1d_io_cb (GtkWidget *w, gpointer *cbd);
 
   /*-- I/O menu --*/
-  gg->menus.io_menu = gtk_menu_new ();
+  /*  gg->menus.io_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Save coefficients");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
@@ -96,7 +97,7 @@ tour1d_menus_make (ggobid *gg) {
   gtk_widget_show_all (gg->menus.io_menu);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
-    gg->menus.io_menu); 
+  gg->menus.io_menu); *//* di hasn't filled this in yet. */
 
   /*-- Options menu --*/ 
   gg->menus.options_menu = gtk_menu_new ();
@@ -117,6 +118,9 @@ tour1d_menus_make (ggobid *gg) {
     GTK_SIGNAL_FUNC (varcircles_layout_cb), NULL,
     gg->varpanel_ui.layoutByRow, gg);
 
+  CreateMenuCheck (gg->menus.options_menu, "Fade variables on de-selection",
+    GTK_SIGNAL_FUNC (tour1d_fade_vars_cb), NULL,
+    gg->tour1d.fade_vars, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -131,10 +135,11 @@ tour2d_menus_make (ggobid *gg)
 {
   GtkWidget *item;
   extern void varcircles_layout_cb (GtkCheckMenuItem *w, guint action);
+  extern void tour2d_fade_vars_cb (GtkCheckMenuItem *w, guint action);
   void tour2d_io_cb (GtkWidget *w, gpointer *cbd);
 
   /*-- I/O menu --*/
-  gg->menus.io_menu = gtk_menu_new ();
+  /*  gg->menus.io_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Save coefficients");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
@@ -154,10 +159,11 @@ tour2d_menus_make (ggobid *gg)
                       (gpointer) "read_history");
   gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
 
-  gtk_widget_show_all (gg->menus.io_menu);
+  gtk_widget_show_all (gg->menus.io_menu);*//* di hasn't filled in
+//these routines yet */
 
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
-    gg->menus.io_menu); 
+  /*  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
+      gg->menus.io_menu); */
 
   /*-- Options menu --*/
   gg->menus.options_menu = gtk_menu_new ();
@@ -177,6 +183,10 @@ tour2d_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Lay out variable circles by row",
     GTK_SIGNAL_FUNC (varcircles_layout_cb), NULL,
     gg->varpanel_ui.layoutByRow, gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Fade variables on de-selection",
+    GTK_SIGNAL_FUNC (tour2d_fade_vars_cb), NULL,
+    gg->tour2d.fade_vars, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -191,10 +201,11 @@ tourcorr_menus_make (ggobid *gg)
 {
   GtkWidget *item;
   extern void varcircles_layout_cb (GtkCheckMenuItem *w, guint action);
+  extern void tourcorr_fade_vars_cb (GtkCheckMenuItem *w, guint action);
   void tourcorr_io_cb (GtkWidget *w, gpointer *cbd);
 
   /*-- I/O menu --*/
-  gg->menus.io_menu = gtk_menu_new ();
+  /*  gg->menus.io_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Save coefficients");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
@@ -217,7 +228,7 @@ tourcorr_menus_make (ggobid *gg)
   gtk_widget_show_all (gg->menus.io_menu);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
-    gg->menus.io_menu); 
+  gg->menus.io_menu); *//* di hasn't filled this in yet */
 
   /*-- Options menu --*/
   gg->menus.options_menu = gtk_menu_new ();
@@ -237,6 +248,10 @@ tourcorr_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Lay out variable circles by row",
     GTK_SIGNAL_FUNC (varcircles_layout_cb), NULL,
     gg->varpanel_ui.layoutByRow, gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Fade variables on de-selection",
+    GTK_SIGNAL_FUNC (tourcorr_fade_vars_cb), NULL,
+    gg->tourcorr.fade_vars, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -570,24 +585,24 @@ viewmode_submenus_update (PipelineMode prev_mode, ggobid *gg)
   }
 
   /*-- remove any previous submenus --*/
-  if (mode_has_io_menu (prev_mode)) {
+  /*  if (mode_has_io_menu (prev_mode)) {
     gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.io_item));
-    /*-- destroy menu items if called for --*/
+    *-- destroy menu items if called for --*
     if (!mode_has_io_menu (mode)) {
       if (gg->menus.io_item != NULL) {
         gtk_widget_destroy (gg->menus.io_item);
         gg->menus.io_item = NULL;
       }
-    }
+      }
   } else {
-    /*-- create and insert menu items if called for --*/
+    *-- create and insert menu items if called for --*
     if (mode_has_io_menu (mode)) {
       gg->menus.io_item = submenu_make ("_I/O", 'I',
         gg->main_accel_group);
       submenu_insert (gg->menus.io_item,
-        gg->main_menubar, 5);
+      gg->main_menubar, 5);
     }
-  }
+    }*//* di hasn't filled these in yet*/
 
   if (mode_has_reset_menu (prev_mode)) {
     gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.reset_item));

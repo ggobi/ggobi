@@ -291,6 +291,18 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
         redraw_style = identify_activate (state, display, gg);
       }
       break;
+      case TOUR2D:
+      {
+        if (display->t2d_manip_mode != MANIP_OFF)
+          splot_cursor_set ((gint) NULL, sp);
+      }
+      break;
+      case COTOUR:
+      {
+        if (display->tc_manip_mode != MANIP_OFF)
+          splot_cursor_set ((gint) NULL, sp);
+      }
+      break;
       case SCALE:
         /*-- for insurance, because sometimes scaling doesn't quit --*/
         disconnect_motion_signal (sp);
@@ -320,6 +332,18 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       {
         extern void scale_click_init (splotd *sp, ggobid *gg);
         scale_click_init (sp, gg);
+      }
+      break;
+      case TOUR2D:
+      {
+        if (display->t2d_manip_mode != MANIP_OFF)
+          splot_cursor_set (GDK_HAND2, sp);
+      }
+      break;
+      case COTOUR:
+      {
+        if (display->tc_manip_mode != MANIP_OFF)
+          splot_cursor_set (GDK_HAND2, sp);
       }
       break;
       default:

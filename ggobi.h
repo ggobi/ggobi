@@ -212,14 +212,17 @@ struct _ggobid {
 
  struct _Tour2d {
    gint idled;
+   gboolean fade_vars;
  } tour2d;
 
  struct _Tour1d {
    gint idled; 
+   gboolean fade_vars;
  } tour1d;
 
  struct _TourCorr {
    gint idled; 
+   gboolean fade_vars;
  } tourcorr;
 
 /*-------------------- parallel coordinates --------------------------*/

@@ -251,6 +251,15 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   dsp->t2d_axes = true;
 }
 
+/*-- called from the Options menu --*/
+void
+tour2d_fade_vars_cb (GtkCheckMenuItem *w, guint action) 
+{
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+
+  gg->tour2d.fade_vars = !gg->tour2d.fade_vars;
+}
+
 void tour2d_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
@@ -278,6 +287,8 @@ tour2dvar_set (gint jvar, ggobid *gg)
   gint j, jtmp, k;
   gboolean active=false;
   displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
+  extern void gt_basis(array_f, gint, vector_i, gint, gint);
 
   for (j=0; j<dsp->t2d.nvars; j++)
     if (jvar == dsp->t2d.vars.els[j])
@@ -296,6 +307,13 @@ tour2dvar_set (gint jvar, ggobid *gg)
         }
       }
       dsp->t2d.nvars--;
+ 
+      if (!gg->tour2d.fade_vars) /* set current position without sel var */
+      {
+        gt_basis(dsp->t2d.u0, dsp->t2d.nvars, dsp->t2d.vars, 
+          d->ncols, (gint) 2);
+        copy_mat(dsp->t2d.u.vals, dsp->t2d.u0.vals, d->ncols, 2);
+      }
     }
   }
   else { /* not active, so add the variable */
@@ -382,10 +400,12 @@ tour2d_run(displayd *dsp, ggobid *gg)
   extern void t2d_ppdraw(gfloat, ggobid *);
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  gint i, j, nv;
+  gint i, j, k, nv;
   static gint count = 0;
   gboolean revert_random = false;
   static gfloat oindxval = -999.0;
+  gboolean chosen;
+  gfloat eps = .02;
 
 /* dfsdebug */
 {
@@ -454,6 +474,32 @@ for (i=0; i<d->ncols; i++) {
   if (!dsp->t2d.get_new_target && 
        !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, 
          dsp->t2d.target_basis_method, &dsp->t2d.ppval, &oindxval)) {
+
+    /*    for (i=0; i<d->ncols; i++) {
+      chosen = false;
+      for (k=0; k<dsp->t2d.nvars; k++) {
+        if (dsp->t2d.vars.els[k] == i) {
+          chosen = true;
+          break;
+        }
+	}*/
+
+      /*
+       * If the variable has been de-selected, and it's close to
+       * gone, take it all the way out.
+      */
+    /*      if (!chosen) {
+        gfloat eps = .02;
+        if (dsp->t2d.v.vals[0][i] < eps && dsp->t2d.v.vals[1][i] < eps)
+          dsp->t2d.v.vals[0][i] = dsp->t2d.v.vals[1][i] = 0.0;
+        if (dsp->t2d.v0.vals[0][i] < eps && dsp->t2d.v0.vals[1][i] < eps)
+          dsp->t2d.v0.vals[0][i] = dsp->t2d.v0.vals[1][i] = 0.0;
+        if (dsp->t2d.v1.vals[0][i] < eps && dsp->t2d.v1.vals[1][i] < eps)
+          dsp->t2d.v1.vals[0][i] = dsp->t2d.v1.vals[1][i] = 0.0;
+        if (dsp->t2d.u.vals[0][i] < eps && dsp->t2d.u.vals[1][i] < eps)
+          dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
+      }
+      }*/
     increment_tour(dsp->t2d.tinc, dsp->t2d.tau, &dsp->t2d.nsteps, 
       &dsp->t2d.stepcntr, dsp->t2d.dv, dsp->t2d.delta, (gint) 2);
     tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1, 
@@ -638,6 +684,34 @@ void tour2d_reinit(ggobid *gg)
     dsp->t2d.u0.vals[i][dsp->t2d.vars.els[i]] = 1.;
     dsp->t2d.u.vals[i][dsp->t2d.vars.els[i]] = 1.;
     }*/
+  dsp->t2d.nsteps = 1; 
+  dsp->t2d.stepcntr = 1;
+
+  dsp->t2d.get_new_target = true;
+
+  display_tailpipe (dsp, FULL, gg);
+
+  varcircles_refresh (d, gg);
+}
+
+void tour2d_scramble(ggobid *gg)
+{
+  int i, j;
+  displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
+  gint nc = d->ncols;
+  extern void gt_basis(array_f, gint, vector_i, gint, gint);
+
+  for (i=0; i<2; i++)
+    for (j=0; j<nc; j++)
+      dsp->t2d.u0.vals[i][j] = dsp->t2d.u1.vals[i][j] = 
+        dsp->t2d.u.vals[i][j] = dsp->t2d.v0.vals[i][j] = 
+        dsp->t2d.v1.vals[i][j] = 0.0;
+
+  gt_basis(dsp->t2d.u0, dsp->t2d.nvars, dsp->t2d.vars, 
+    d->ncols, (gint) 2);
+  copy_mat(dsp->t2d.u.vals, dsp->t2d.u0.vals, d->ncols, 2);
+
   dsp->t2d.nsteps = 1; 
   dsp->t2d.stepcntr = 1;
 
