@@ -248,14 +248,14 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
     for (i = 0; i < d->nrows; i++) {
       fprintf(f, "<record");
       write_xml_record (f, d, gg, i, xmlWriteInfo);
-      fprintf(f, "\n</record>");
+      fprintf(f, "\n</record>\n");
     }
   } else {  /*-- if displaying visible rows only --*/
     for (i=0; i<d->nrows_in_plot; i++) {
       m = d->rows_in_plot.els[i];
       fprintf(f, "<record");
       write_xml_record (f, d, gg, m, xmlWriteInfo);
-      fprintf(f, "\n</record>");
+      fprintf(f, "\n</record>\n");
     }
   }
 
