@@ -42,6 +42,34 @@ than a problem with the code.
 
 -----
 
+getGlyphTypes doesn't return what the paper says it does,
+and it looks a bit confused about how many glyph types there are.
+     
+> getGlyphTypes.ggobi()
+plus    x   or   fr   oc   fc    .
+   0    1    2    3    4    5    6   81
+     
+----
+
+getSelectedIndices seems to work perfectly, but
+I don't understand this commend in the documentation:
+
+  (For efficiency purposes, the labels of the observations
+  are not returned with the vector. This can be easily changed.)
+
+When I tested the function, I got this result, which seems to me
+to show the labels:    
+
+Concinna Concinna Concinna Concinna Concinna Concinna Concinna Concinna
+       0        1        2        6        7       12       13       14
+Concinna Concinna Heikert. Heikert.
+      15       20       53       68
+
+
+Also, the first index is 0.  Shouldn't those indices be 1-based?
+
+-----
+
 The plotLayout examples work, for the most part, and they're
 unbelievably cute.
 
