@@ -33,11 +33,6 @@ ASH:
   Add an option to connect the points?  This could be done
     either in a single line or as lines down to a baseline.
 
-Brushing
-  Extend the 'color & glyph groups' tool so that it's possible
-  to change the glyph and/or color of an entire group at once,
-  as in xgobi, by clicking on the symbol.
-
 Reading in new data
   add an option:  add a new datad or replace an existing one
 
@@ -48,7 +43,6 @@ Graphs
   line editing  <- depends on the ability to add a record
 
 Bugs:
-  moving jittered points is very weird.
 
 various stuff not yet implemented:
   1d cycling 
@@ -64,9 +58,6 @@ I/O -- the biggest part is now in place.  extend
   user options to write_xml.  Add the ability to extend the
   current file set by one or more files.  (wait until the
   dtd has been redesigned to handle multiple datad objects)
-
-  If all glyphs are the same, there's no need to write 
-    a glyph description in each record
 
 Variable manipulation table
   If a variable is categorical, show the mapping between its
@@ -270,3 +261,13 @@ Food for thought:
 
 ! We don't yet have a show/hide missings button -- at what
 !   level should it operate?  per-datad or per-display?
+
+! Brushing
+!   Extend the 'color & glyph groups' tool so that it's possible
+!   to change the glyph and/or color of an entire group at once,
+!   as in xgobi, by clicking on the symbol.
+
+! If all glyphs are the same, there's no need to write 
+!   a glyph description in each record
+
+! moving jittered points is very weird.
