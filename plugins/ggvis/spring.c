@@ -58,8 +58,9 @@ spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos)
          spring parameters */
 
     for (i = 0; i < nEdges; i++) {
-      a = endpoints[i].a;
-      b = endpoints[i].b;
+
+      a = d->rowid.idv.els[endpoints[i].a];
+      b = d->rowid.idv.els[endpoints[i].b];
 
       /*-- this does the first two dimensions only; test this first --*/
       dx = pos->vals[b][dim0] - pos->vals[a][dim0];

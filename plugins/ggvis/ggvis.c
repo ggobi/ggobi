@@ -129,8 +129,8 @@ set_dist_matrix_from_edges (datad *d, datad *e, ggobid *gg, ggvisd *ggv)
   while (changing) {
     changing = false;
     for (i = 0; i < nedges; i++) {
-      end1 = endpoints[i].a;
-      end2 = endpoints[i].b;
+      end1 = d->rowid.idv.els[endpoints[i].a];
+      end2 = d->rowid.idv.els[endpoints[i].b];
       /*-- we don't have edge weights yet --*/
       d12 = 1.0;
       for (end3 = 0; end3 < nNodes; end3++) {
