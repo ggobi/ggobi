@@ -4,1564 +4,1564 @@
 <ggobidata>
 
 <data>
-<documentation>
+<description>
 This data was taken from the web site
 http://www.the-shipman-inquiry.org.uk, which describes an
 investigation into the convicted murderer Dr. Harold Shipman.
 Shipman had lived in Hyde, England, it's been determined that
 he killed at least 215 of his patients during his 23 years of
 medical practice.
-</documentation>
+</description>
 <variables count="6">
   <countervariable name="id"/>
-  <integervariable name="age"/>
+  <realvariable name="age"/>
   <categoricalvariable name="month">
    <levels count="12">
-    <level value="1" name="Jan"/>
-    <level value="2" name="Feb"/>
-    <level value="3" name="Mar"/>
-    <level value="4" name="Apr"/>
-    <level value="5" name="May"/>
-    <level value="6" name="Jun"/>
-    <level value="7" name="Jul"/>
-    <level value="8" name="Aug"/>
-    <level value="9" name="Sep"/>
-    <level value="10" name="Oct"/>
-    <level value="11" name="Nov"/>
-    <level value="12" name="Dec"/>
+    <level value="1"> Jan </level>
+    <level value="2"> Feb </level>
+    <level value="3"> Mar </level>
+    <level value="4"> Apr </level>
+    <level value="5"> May </level>
+    <level value="6"> Jun </level>
+    <level value="7"> Jul </level>
+    <level value="8"> Aug </level>
+    <level value="9"> Sep </level>
+    <level value="10"> Oct </level>
+    <level value="11"> Nov </level>
+    <level value="12"> Dec </level>
    </levels>
   </categoricalvariable>
   <integervariable name="year"/>
   <categoricalvariable name="place" levels="auto"/>
   <categoricalvariable name="cause" levels="auto"/>
 </variables>
-
 <records count="508">
+
 <record label="Ruth Highley">
- <real>72</real><int>5</int><real>1974</real><string>Own home</string><string>Natural death</string>
+ <real>72</real><int>5</int><int>1974</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Edith Annie Bill">
- <real>67</real><int>6</int><real>1974</real><string>Own home</string><string>Natural death</string>
+ <real>67</real><int>6</int><int>1974</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Colin Whitham">
- <real>26</real><int>7</int><real>1974</real><string>Own home</string><string>Natural death</string>
+ <real>26</real><int>7</int><int>1974</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Stanley Uttley">
- <real>58</real><int>8</int><real>1974</real><string>Surgery</string><string>Natural death</string>
+ <real>58</real><int>8</int><int>1974</int><string>Surgery</string><string>Natural death</string>
 </record>
 <record label="Hena Cheetham">
- <real>77</real><int>10</int><real>1974</real><string>Ambulance</string><string>Natural death</string>
+ <real>77</real><int>10</int><int>1974</int><string>Ambulance</string><string>Natural death</string>
 </record>
 <record label="Harold Edward Jackman">
- <real>78</real><int>11</int><real>1974</real><string>Hospital</string><string>Natural death</string>
+ <real>78</real><int>11</int><int>1974</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="Sean Stuart Callaghan">
- <real>18</real><int>12</int><real>1974</real><string>Hospital</string><string>Natural death</string>
+ <real>18</real><int>12</int><int>1974</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="Moira Kelly">
- <real>26</real><int>12</int><real>1974</real><string>Hospital</string><string>Natural death</string>
+ <real>26</real><int>12</int><int>1974</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="Sarah Ann Thomas">
- <real>86</real><int>12</int><real>1974</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>86</real><int>12</int><int>1974</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Lily Crossley">
- <real>73</real><int>1</int><real>1975</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>73</real><int>1</int><int>1975</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Robert Henry Lingard">
- <real>62</real><int>1</int><real>1975</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>62</real><int>1</int><int>1975</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Elizabeth Pearce">
- <real>84</real><int>1</int><real>1975</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>84</real><int>1</int><int>1975</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Edward Walker">
- <real>70</real><int>1</int><real>1975</real><string>Residential home</string><string>Insufficient evidence for decision</string>
+ <real>70</real><int>1</int><int>1975</int><string>Residential home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Jane Isabella Rowland">
- <real>80</real><int>2</int><real>1975</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>80</real><int>2</int><int>1975</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Alice Brown">
- <real>72</real><int>3</int><real>1975</real><string>Own home</string><string>Natural death</string>
+ <real>72</real><int>3</int><int>1975</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Jack Wills">
- <real>65</real><int>3</int><real>1975</real><string>Own home</string><string>Natural death</string>
+ <real>65</real><int>3</int><int>1975</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Eva Lyons">
- <real>70</real><int>3</int><real>1975</real><string>Own home</string><string>Unlawful killing</string>
+ <real>70</real><int>3</int><int>1975</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Edith Roberts">
- <real>67</real><int>3</int><real>1975</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>67</real><int>3</int><int>1975</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Wilbert Mitchell">
- <real>87</real><int>4</int><real>1975</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>87</real><int>4</int><int>1975</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Joe Ainscow Stansfield">
- <real>77</real><int>4</int><real>1975</real><string>Own home</string><string>Natural death</string>
+ <real>77</real><int>4</int><int>1975</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Winifred Isabel Smith">
- <real>67</real><int>4</int><real>1975</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>67</real><int>4</int><int>1975</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Jane Ellen Lord">
- <real>86</real><int>4</int><real>1975</real><string>Own home</string><string>Natural death</string>
+ <real>86</real><int>4</int><int>1975</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Michael Connors">
- <real>64</real><int>4</int><real>1975</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>64</real><int>4</int><int>1975</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Phyllis Oxley">
- <real>59</real><int>5</int><real>1975</real><string>Own home</string><string>Natural death</string>
+ <real>59</real><int>5</int><int>1975</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Lilian Shaw">
- <real>54</real><int>7</int><real>1975</real><string>Own home</string><string>Natural death</string>
+ <real>54</real><int>7</int><int>1975</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Leah Pickering">
- <real>86</real><int>8</int><real>1975</real><string>Own home</string><string>Natural death</string>
+ <real>86</real><int>8</int><int>1975</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Albert Redvers Williams">
- <real>75</real><int>8</int><real>1975</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>75</real><int>8</int><int>1975</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="William Earnshaw">
- <real>88</real><int>8</int><real>1975</real><string>Daughter's home</string><string>Natural death</string>
+ <real>88</real><int>8</int><int>1975</int><string>Daughter's home</string><string>Natural death</string>
 </record>
 <record label="Mary Ann Tempest">
- <real>70</real><int>9</int><real>1975</real><string>Own home</string><string>Natural death</string>
+ <real>70</real><int>9</int><int>1975</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Margaret Wilmore">
- <real>38</real><int>9</int><real>1975</real><string>Own home</string><string>Natural death</string>
+ <real>38</real><int>9</int><int>1975</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Josephine May Carroll">
- <real>81</real><int>10</int><real>1977</real><string>Residential home</string><string>Natural death</string>
+ <real>81</real><int>10</int><int>1977</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Eveline Robinson">
- <real>77</real><int>11</int><real>1977</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>77</real><int>11</int><int>1977</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Wilfred Chadwick">
- <real>81</real><int>12</int><real>1977</real><string>Own home</string><string>Natural death</string>
+ <real>81</real><int>12</int><int>1977</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Eric Wardle">
- <real>60</real><int>1</int><real>1978</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>60</real><int>1</int><int>1978</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="William Henry Brown">
- <real>74</real><int>2</int><real>1978</real><string>Residential home</string><string>Natural death</string>
+ <real>74</real><int>2</int><int>1978</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Lily Shore">
- <real>87</real><int>2</int><real>1978</real><string>Residential home</string><string>Natural death</string>
+ <real>87</real><int>2</int><int>1978</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Alice Dixon">
- <real>88</real><int>2</int><real>1978</real><string>Residential home</string><string>Natural death</string>
+ <real>88</real><int>2</int><int>1978</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="James Ashworth">
- <real>81</real><int>6</int><real>1978</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>81</real><int>6</int><int>1978</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Esther Lowe">
- <real>73</real><int>7</int><real>1978</real><string>Residential home</string><string>Natural death</string>
+ <real>73</real><int>7</int><int>1978</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Reginald Potts">
- <real>83</real><int>7</int><real>1978</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>83</real><int>7</int><int>1978</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Clifford Gess">
- <real>65</real><int>8</int><real>1978</real><string>Friend's home</string><string>Natural death</string>
+ <real>65</real><int>8</int><int>1978</int><string>Friend's home</string><string>Natural death</string>
 </record>
 <record label="Sarah Hannah Marsland">
- <real>86</real><int>8</int><real>1978</real><string>Own home</string><string>Unlawful killing</string>
+ <real>86</real><int>8</int><int>1978</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ellen Ashton">
- <real>81</real><int>8</int><real>1978</real><string>Residential home</string><string>Natural death</string>
+ <real>81</real><int>8</int><int>1978</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Mary Ellen Jordan">
- <real>73</real><int>8</int><real>1978</real><string>Own home</string><string>Unlawful killing</string>
+ <real>73</real><int>8</int><int>1978</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Hervey Nuttall">
- <real>74</real><int>9</int><real>1978</real><string>Own home</string><string>Natural death</string>
+ <real>74</real><int>9</int><int>1978</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Thomas Alfred Longmate">
- <real>69</real><int>9</int><real>1978</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>69</real><int>9</int><int>1978</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Christina Harrison">
- <real>96</real><int>9</int><real>1978</real><string>Residential home</string><string>Natural death</string>
+ <real>96</real><int>9</int><int>1978</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Emily Williams">
- <real>75</real><int>9</int><real>1978</real><string>Daughter's home</string><string>Suspicion of unlawful killing</string>
+ <real>75</real><int>9</int><int>1978</int><string>Daughter's home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Winifred Amy Tuffin">
- <real>86</real><int>11</int><real>1978</real><string>Residential home</string><string>Natural death</string>
+ <real>86</real><int>11</int><int>1978</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Ada Heywood">
- <real>78</real><int>11</int><real>1978</real><string>Own home</string><string>Natural death</string>
+ <real>78</real><int>11</int><int>1978</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Mary Jane Hett">
- <real>77</real><int>11</int><real>1978</real><string>Own home</string><string>Natural death</string>
+ <real>77</real><int>11</int><int>1978</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Elsie Royles">
- <real>70</real><int>11</int><real>1978</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>70</real><int>11</int><int>1978</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Ruth Strickland">
- <real>84</real><int>12</int><real>1978</real><string>Residential home</string><string>Natural death</string>
+ <real>84</real><int>12</int><int>1978</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Robert Hickson">
- <real>76</real><int>12</int><real>1978</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>76</real><int>12</int><int>1978</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Harold Bramwell">
- <real>73</real><int>12</int><real>1978</real><string>Own home</string><string>Unlawful killing</string>
+ <real>73</real><int>12</int><int>1978</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ellen Kelly">
- <real>82</real><int>12</int><real>1978</real><string>Residential home</string><string>Natural death</string>
+ <real>82</real><int>12</int><int>1978</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Esther Hannah Roberts">
- <real>89</real><int>12</int><real>1978</real><string>Own home</string><string>Natural death</string>
+ <real>89</real><int>12</int><int>1978</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Annie Campbell">
- <real>88</real><int>12</int><real>1978</real><string>Own home</string><string>Unlawful killing</string>
+ <real>88</real><int>12</int><int>1978</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Albert Slater">
- <real>79</real><int>1</int><real>1979</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>79</real><int>1</int><int>1979</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Annie Wilkinson">
- <real>81</real><int>1</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>81</real><int>1</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Harriet Harris">
- <real>77</real><int>1</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>77</real><int>1</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Ernest Shawcross">
- <real>74</real><int>3</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>74</real><int>3</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Agnes Edge">
- <real>87</real><int>3</int><real>1979</real><string>Residential home</string><string>Natural death</string>
+ <real>87</real><int>3</int><int>1979</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Stanley Riley">
- <real>77</real><int>4</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>77</real><int>4</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Mary Alice Garratt">
- <real>86</real><int>5</int><real>1979</real><string>Residential home</string><string>Natural death</string>
+ <real>86</real><int>5</int><int>1979</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Sydney Walton">
- <real>57</real><int>5</int><real>1979</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>57</real><int>5</int><int>1979</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Richard Johnson">
- <real>89</real><int>5</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>89</real><int>5</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Gertrude McLoughlin">
- <real>83</real><int>5</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>83</real><int>5</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="William Hill Wareing">
- <real>61</real><int>5</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>61</real><int>5</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Florence Leach">
- <real>92</real><int>5</int><real>1979</real><string>Residential home</string><string>Natural death</string>
+ <real>92</real><int>5</int><int>1979</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Arthur Floyd">
- <real>97</real><int>7</int><real>1979</real><string>Residential home</string><string>Natural death</string>
+ <real>97</real><int>7</int><int>1979</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Lavinia Wharmby">
- <real>88</real><int>7</int><real>1979</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>88</real><int>7</int><int>1979</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Elsie King">
- <real>84</real><int>7</int><real>1979</real><string>Residential home</string><string>Natural death</string>
+ <real>84</real><int>7</int><int>1979</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Sarah Adkinson">
- <real>76</real><int>8</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>76</real><int>8</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Fanny Dawson">
- <real>68</real><int>8</int><real>1979</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>68</real><int>8</int><int>1979</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Hannah Helena Mottram">
- <real>69</real><int>8</int><real>1979</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>69</real><int>8</int><int>1979</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Maud Matley">
- <real>88</real><int>8</int><real>1979</real><string>Residential home</string><string>Natural death</string>
+ <real>88</real><int>8</int><int>1979</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Alice Maude Gorton">
- <real>76</real><int>8</int><real>1979</real><string>Own home</string><string>Unlawful killing</string>
+ <real>76</real><int>8</int><int>1979</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Frederick Vickers">
- <real>66</real><int>8</int><real>1979</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>66</real><int>8</int><int>1979</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Edith Graham">
- <real>72</real><int>8</int><real>1979</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>72</real><int>8</int><int>1979</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Leonora Hamblett">
- <real>78</real><int>8</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>78</real><int>8</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Dora Elizabeth Smith">
- <real>83</real><int>8</int><real>1979</real><string>Residential home</string><string>Natural death</string>
+ <real>83</real><int>8</int><int>1979</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Mary Kingsley">
- <real>91</real><int>9</int><real>1979</real><string>Residential home</string><string>Natural death</string>
+ <real>91</real><int>9</int><int>1979</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Ada Marjorie Preston">
- <real>68</real><int>10</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>68</real><int>10</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Leah Johnston">
- <real>80</real><int>11</int><real>1979</real><string>Residential home</string><string>Suspicion of unlawful killing</string>
+ <real>80</real><int>11</int><int>1979</int><string>Residential home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Jack Leslie Shelmerdine">
- <real>77</real><int>11</int><real>1979</real><string>Hospital</string><string>Unlawful killing</string>
+ <real>77</real><int>11</int><int>1979</int><string>Hospital</string><string>Unlawful killing</string>
 </record>
 <record label="Norman Adshead">
- <real>84</real><int>12</int><real>1979</real><string>Residential home</string><string>Natural death</string>
+ <real>84</real><int>12</int><int>1979</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Alice Chappell">
- <real>85</real><int>12</int><real>1979</real><string>Own home</string><string>Natural death</string>
+ <real>85</real><int>12</int><int>1979</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Bethel Anne Evans">
- <real>92</real><int>1</int><real>1980</real><string>Residential home</string><string>Suspicion of unlawful killing</string>
+ <real>92</real><int>1</int><int>1980</int><string>Residential home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Charles Henry Wood">
- <real>83</real><int>2</int><real>1980</real><string>Own home</string><string>Natural death</string>
+ <real>83</real><int>2</int><int>1980</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Edgar Dobb">
- <real>79</real><int>2</int><real>1980</real><string>Own home</string><string>Natural death</string>
+ <real>79</real><int>2</int><int>1980</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Frederick Coomber">
- <real>81</real><int>2</int><real>1980</real><string>Residential home</string><string>Insufficient evidence for decision</string>
+ <real>81</real><int>2</int><int>1980</int><string>Residential home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Norman John Bell">
- <real>72</real><int>2</int><real>1980</real><string>Own home</string><string>Natural death</string>
+ <real>72</real><int>2</int><int>1980</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Fanny Wood">
- <real>89</real><int>3</int><real>1980</real><string>Residential home</string><string>Natural death</string>
+ <real>89</real><int>3</int><int>1980</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Miriam Davies">
- <real>66</real><int>3</int><real>1980</real><string>Own home</string><string>Natural death</string>
+ <real>66</real><int>3</int><int>1980</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Miriam Rose Emily Mycock">
- <real>91</real><int>4</int><real>1980</real><string>Residential home</string><string>Insufficient evidence for decision</string>
+ <real>91</real><int>4</int><int>1980</int><string>Residential home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Nellie Gee">
- <real>79</real><int>4</int><real>1980</real><string>Own home</string><string>Natural death</string>
+ <real>79</real><int>4</int><int>1980</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Clara Ethel Aveyard">
- <real>90</real><int>4</int><real>1980</real><string>Residential home</string><string>Natural death</string>
+ <real>90</real><int>4</int><int>1980</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Hannah Cartwright">
- <real>83</real><int>5</int><real>1980</real><string>Residential home</string><string>Natural death</string>
+ <real>83</real><int>5</int><int>1980</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Mary Ann Mansfield">
- <real>84</real><int>6</int><real>1980</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>84</real><int>6</int><int>1980</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Sarah Hawkins">
- <real>77</real><int>7</int><real>1980</real><string>Residential home</string><string>Natural death</string>
+ <real>77</real><int>7</int><int>1980</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Robert Swann">
- <real>92</real><int>9</int><real>1980</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>92</real><int>9</int><int>1980</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Sarah Tideswell">
- <real>85</real><int>10</int><real>1980</real><string>Residential home</string><string>Natural death</string>
+ <real>85</real><int>10</int><int>1980</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Hannah Everall">
- <real>78</real><int>11</int><real>1980</real><string>Own home</string><string>Natural death</string>
+ <real>78</real><int>11</int><int>1980</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Bertha Bagshaw">
- <real>88</real><int>11</int><real>1980</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>88</real><int>11</int><int>1980</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Lily Acton">
- <real>91</real><int>12</int><real>1980</real><string>Own home</string><string>Natural death</string>
+ <real>91</real><int>12</int><int>1980</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Leonard Shaw">
- <real>85</real><int>1</int><real>1981</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>85</real><int>1</int><int>1981</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Caroline Veronica Hammond">
- <real>70</real><int>1</int><real>1981</real><string>Own home</string><string>Natural death</string>
+ <real>70</real><int>1</int><int>1981</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Samuel Oldham">
- <real>69</real><int>3</int><real>1981</real><string>Own home</string><string>Natural death</string>
+ <real>69</real><int>3</int><int>1981</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Mary Elizabeth Firman">
- <real>87</real><int>3</int><real>1981</real><string>Residential home</string><string>Natural death</string>
+ <real>87</real><int>3</int><int>1981</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="May Slater">
- <real>84</real><int>4</int><real>1981</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>4</int><int>1981</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Emmeline Swindells">
- <real>86</real><int>4</int><real>1981</real><string>Residential home</string><string>Natural death</string>
+ <real>86</real><int>4</int><int>1981</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="William James McLaren">
- <real>86</real><int>4</int><real>1981</real><string>Residential home</string><string>Natural death</string>
+ <real>86</real><int>4</int><int>1981</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Cyril Mitchell">
- <real>60</real><int>5</int><real>1981</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>60</real><int>5</int><int>1981</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Albert Arrandale">
- <real>77</real><int>5</int><real>1981</real><string>Own home</string><string>Natural death</string>
+ <real>77</real><int>5</int><int>1981</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Alice Bolland">
- <real>80</real><int>5</int><real>1981</real><string>Residential home</string><string>Natural death</string>
+ <real>80</real><int>5</int><int>1981</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Frances Bennett">
- <real>82</real><int>5</int><real>1981</real><string>Residential home</string><string>Natural death</string>
+ <real>82</real><int>5</int><int>1981</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Rosetta Pedley">
- <real>67</real><int>6</int><real>1981</real><string>Own home</string><string>Natural death</string>
+ <real>67</real><int>6</int><int>1981</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Violet Mary Whittaker">
- <real>59</real><int>6</int><real>1981</real><string>Own home</string><string>Natural death</string>
+ <real>59</real><int>6</int><int>1981</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Florence Taylor">
- <real>93</real><int>6</int><real>1981</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>93</real><int>6</int><int>1981</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Florence Sidebotham">
- <real>83</real><int>6</int><real>1981</real><string>Residential home</string><string>Insufficient evidence for decision</string>
+ <real>83</real><int>6</int><int>1981</int><string>Residential home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Ellen Frances Wharam">
- <real>91</real><int>7</int><real>1981</real><string>Residential home</string><string>Insufficient evidence for decision</string>
+ <real>91</real><int>7</int><int>1981</int><string>Residential home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Elsie Lewis">
- <real>88</real><int>7</int><real>1981</real><string>Residential home</string><string>Natural death</string>
+ <real>88</real><int>7</int><int>1981</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Ethel Doris Holgate">
- <real>91</real><int>7</int><real>1981</real><string>Residential home</string><string>Natural death</string>
+ <real>91</real><int>7</int><int>1981</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Alline Devolle Holland">
- <real>84</real><int>8</int><real>1981</real><string>Residential home</string><string>Insufficient evidence for decision</string>
+ <real>84</real><int>8</int><int>1981</int><string>Residential home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Emma Smith">
- <real>85</real><int>8</int><real>1981</real><string>Own home</string><string>Natural death</string>
+ <real>85</real><int>8</int><int>1981</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Elizabeth Ashworth">
- <real>81</real><int>8</int><real>1981</real><string>Own home</string><string>Unlawful killing</string>
+ <real>81</real><int>8</int><int>1981</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ann Coulthard">
- <real>75</real><int>9</int><real>1981</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>75</real><int>9</int><int>1981</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="William Givens">
- <real>77</real><int>9</int><real>1981</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>77</real><int>9</int><int>1981</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Elsie Scott">
- <real>86</real><int>10</int><real>1981</real><string>Residential home</string><string>Suspicion of unlawful killing</string>
+ <real>86</real><int>10</int><int>1981</int><string>Residential home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Mark Wimpeney">
- <real>86</real><int>10</int><real>1981</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>86</real><int>10</int><int>1981</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Mary Elizabeth Bowers">
- <real>86</real><int>11</int><real>1981</real><string>Residential home</string><string>Natural death</string>
+ <real>86</real><int>11</int><int>1981</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Samuel Harrison">
- <real>87</real><int>1</int><real>1982</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>87</real><int>1</int><int>1982</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Alice Squirrell">
- <real>81</real><int>1</int><real>1982</real><string>Residential home</string><string>Natural death</string>
+ <real>81</real><int>1</int><int>1982</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Florence Slater">
- <real>88</real><int>2</int><real>1982</real><string>Own home</string><string>Natural death</string>
+ <real>88</real><int>2</int><int>1982</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="William Henry Leech">
- <real>84</real><int>2</int><real>1982</real><string>Own home</string><string>Natural death</string>
+ <real>84</real><int>2</int><int>1982</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Alice Holt">
- <real>75</real><int>2</int><real>1982</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>75</real><int>2</int><int>1982</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="William Baxter">
- <real>70</real><int>3</int><real>1982</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>70</real><int>3</int><int>1982</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Edith Leech">
- <real>83</real><int>3</int><real>1982</real><string>Residential home</string><string>Insufficient evidence for decision</string>
+ <real>83</real><int>3</int><int>1982</int><string>Residential home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Fred Davies">
- <real>76</real><int>3</int><real>1982</real><string>Own home</string><string>Natural death</string>
+ <real>76</real><int>3</int><int>1982</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="George Charnock">
- <real>81</real><int>3</int><real>1982</real><string>Own home</string><string>Natural death</string>
+ <real>81</real><int>3</int><int>1982</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Louisa Stocks">
- <real>80</real><int>3</int><real>1982</real><string>Residential home</string><string>Suspicion of unlawful killing</string>
+ <real>80</real><int>3</int><int>1982</int><string>Residential home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Annie Rowbottom">
- <real>91</real><int>5</int><real>1982</real><string>Residential home</string><string>Natural death</string>
+ <real>91</real><int>5</int><int>1982</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Annie Parkes">
- <real>94</real><int>6</int><real>1982</real><string>Residential home</string><string>Natural death</string>
+ <real>94</real><int>6</int><int>1982</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Wilfred Leigh">
- <real>74</real><int>6</int><real>1982</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>74</real><int>6</int><int>1982</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Emma Hirst">
- <real>86</real><int>7</int><real>1982</real><string>Residential home</string><string>Natural death</string>
+ <real>86</real><int>7</int><int>1982</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Norah Johnson">
- <real>76</real><int>7</int><real>1982</real><string>Own home</string><string>Natural death</string>
+ <real>76</real><int>7</int><int>1982</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Alice Smith">
- <real>74</real><int>8</int><real>1982</real><string>Own home</string><string>Natural death</string>
+ <real>74</real><int>8</int><int>1982</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Ivy Elizabeth Challinor">
- <real>83</real><int>9</int><real>1982</real><string>Residential home</string><string>Natural death</string>
+ <real>83</real><int>9</int><int>1982</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="May Vizor">
- <real>57</real><int>12</int><real>1982</real><string>Own home</string><string>Natural death</string>
+ <real>57</real><int>12</int><int>1982</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Percy Ward">
- <real>90</real><int>1</int><real>1983</real><string>Own home</string><string>Unlawful killing</string>
+ <real>90</real><int>1</int><int>1983</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Frances Clayton">
- <real>87</real><int>1</int><real>1983</real><string>Residential home</string><string>Natural death</string>
+ <real>87</real><int>1</int><int>1983</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Hannah Moss">
- <real>82</real><int>3</int><real>1983</real><string>Residential home</string><string>Natural death</string>
+ <real>82</real><int>3</int><int>1983</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Margaret Metcalfe">
- <real>84</real><int>5</int><real>1983</real><string>Residential home</string><string>Natural death</string>
+ <real>84</real><int>5</int><int>1983</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Mary Alice Brown">
- <real>85</real><int>5</int><real>1983</real><string>Residential home</string><string>Natural death</string>
+ <real>85</real><int>5</int><int>1983</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Charles MacConnell">
- <real>72</real><int>5</int><real>1983</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>72</real><int>5</int><int>1983</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Moira Ashton Fox">
- <real>77</real><int>6</int><real>1983</real><string>Own home</string><string>Unlawful killing</string>
+ <real>77</real><int>6</int><int>1983</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Violet Nicholls">
- <real>83</real><int>7</int><real>1983</real><string>Residential home</string><string>Natural death</string>
+ <real>83</real><int>7</int><int>1983</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="George Winston">
- <real>80</real><int>7</int><real>1983</real><string>Own home</string><string>Natural death</string>
+ <real>80</real><int>7</int><int>1983</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Ethel Buckley">
- <real>89</real><int>9</int><real>1983</real><string>Residential home</string><string>Natural death</string>
+ <real>89</real><int>9</int><int>1983</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Olive Winston">
- <real>93</real><int>10</int><real>1983</real><string>Residential home</string><string>Natural death</string>
+ <real>93</real><int>10</int><int>1983</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Mary Taylor">
- <real>78</real><int>11</int><real>1983</real><string>Own home</string><string>Natural death</string>
+ <real>78</real><int>11</int><int>1983</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Dorothy Tucker">
- <real>51</real><int>1</int><real>1984</real><string>Own home</string><string>Unlawful killing</string>
+ <real>51</real><int>1</int><int>1984</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Miriam Bradshaw">
- <real>88</real><int>1</int><real>1984</real><string>Residential home</string><string>Insufficient evidence for decision</string>
+ <real>88</real><int>1</int><int>1984</int><string>Residential home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Gladys Heapey">
- <real>69</real><int>1</int><real>1984</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>69</real><int>1</int><int>1984</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Norah Cheetham">
- <real>83</real><int>1</int><real>1984</real><string>Own home</string><string>Natural death</string>
+ <real>83</real><int>1</int><int>1984</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Gladys Roberts">
- <real>78</real><int>2</int><real>1984</real><string>Own home</string><string>Unlawful killing</string>
+ <real>78</real><int>2</int><int>1984</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Doris Bridge">
- <real>83</real><int>3</int><real>1984</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>83</real><int>3</int><int>1984</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Annie Wood">
- <real>82</real><int>3</int><real>1984</real><string>Residential home</string><string>Insufficient evidence for decision</string>
+ <real>82</real><int>3</int><int>1984</int><string>Residential home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Christopher Denham">
- <real>97</real><int>3</int><real>1984</real><string>Residential home</string><string>Natural death</string>
+ <real>97</real><int>3</int><int>1984</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Walter Mansfield">
- <real>83</real><int>3</int><real>1984</real><string>Daughter's home</string><string>Suspicion of unlawful killing</string>
+ <real>83</real><int>3</int><int>1984</int><string>Daughter's home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Joseph Bardsley">
- <real>83</real><int>4</int><real>1984</real><string>Own home</string><string>Unlawful killing</string>
+ <real>83</real><int>4</int><int>1984</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Jessie Irene Wagstaff">
- <real>70</real><int>4</int><real>1984</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>70</real><int>4</int><int>1984</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Winifred Arrowsmith">
- <real>70</real><int>4</int><real>1984</real><string>Own home</string><string>Unlawful killing</string>
+ <real>70</real><int>4</int><int>1984</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Thomas Condon">
- <real>73</real><int>5</int><real>1984</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>73</real><int>5</int><int>1984</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Annie Grimshaw">
- <real>88</real><int>5</int><real>1984</real><string>Residential home</string><string>Natural death</string>
+ <real>88</real><int>5</int><int>1984</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Caroline Mary Taylor">
- <real>84</real><int>5</int><real>1984</real><string>Residential home</string><string>Natural death</string>
+ <real>84</real><int>5</int><int>1984</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Mary Ivy Birchall">
- <real>63</real><int>6</int><real>1984</real><string>Own home</string><string>Natural death</string>
+ <real>63</real><int>6</int><int>1984</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="May Warren">
- <real>72</real><int>7</int><real>1984</real><string>Own home</string><string>Natural death</string>
+ <real>72</real><int>7</int><int>1984</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Laura Victoria Parkin">
- <real>81</real><int>8</int><real>1984</real><string>Residential home</string><string>Natural death</string>
+ <real>81</real><int>8</int><int>1984</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Mary Elizabeth Haslam">
- <real>77</real><int>8</int><real>1984</real><string>Own home</string><string>Natural death</string>
+ <real>77</real><int>8</int><int>1984</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Donald Anthony Grundy">
- <real>75</real><int>9</int><real>1984</real><string>Own home</string><string>Natural death</string>
+ <real>75</real><int>9</int><int>1984</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Mary Winterbottom">
- <real>76</real><int>9</int><real>1984</real><string>Own home</string><string>Unlawful killing</string>
+ <real>76</real><int>9</int><int>1984</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Lily Nichols">
- <real>80</real><int>9</int><real>1984</real><string>Residential home</string><string>Natural death</string>
+ <real>80</real><int>9</int><int>1984</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Beatrice Lowe">
- <real>88</real><int>10</int><real>1984</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>88</real><int>10</int><int>1984</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Oscar Meredith">
- <real>78</real><int>11</int><real>1984</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>78</real><int>11</int><int>1984</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="William Hague">
- <real>89</real><int>11</int><real>1984</real><string>Residential home</string><string>Natural death</string>
+ <real>89</real><int>11</int><int>1984</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Charles Harris">
- <real>70</real><int>11</int><real>1984</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>70</real><int>11</int><int>1984</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Ada Ashworth">
- <real>87</real><int>11</int><real>1984</real><string>Own home</string><string>Unlawful killing</string>
+ <real>87</real><int>11</int><int>1984</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Joseph Vincent Everall">
- <real>80</real><int>12</int><real>1984</real><string>Own home</string><string>Unlawful killing</string>
+ <real>80</real><int>12</int><int>1984</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Edith Wibberley">
- <real>76</real><int>12</int><real>1984</real><string>Own home</string><string>Unlawful killing</string>
+ <real>76</real><int>12</int><int>1984</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Eileen Theresa Cox">
- <real>72</real><int>12</int><real>1984</real><string>Own home</string><string>Unlawful killing</string>
+ <real>72</real><int>12</int><int>1984</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="John Howcroft">
- <real>77</real><int>1</int><real>1985</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>77</real><int>1</int><int>1985</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Edwin Foulkes">
- <real>88</real><int>1</int><real>1985</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>88</real><int>1</int><int>1985</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Peter Lewis">
- <real>41</real><int>1</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>41</real><int>1</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Edna Shawcross">
- <real>66</real><int>1</int><real>1985</real><string>Own home</string><string>Natural death</string>
+ <real>66</real><int>1</int><int>1985</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Frederick Dentith">
- <real>60</real><int>1</int><real>1985</real><string>Friend's home</string><string>Natural death</string>
+ <real>60</real><int>1</int><int>1985</int><string>Friend's home</string><string>Natural death</string>
 </record>
 <record label="May Brookes">
- <real>74</real><int>2</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>74</real><int>2</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Christina McCulloch Mackie">
- <real>83</real><int>2</int><real>1985</real><string>Residential home</string><string>Natural death</string>
+ <real>83</real><int>2</int><int>1985</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Jesse Hampson">
- <real>92</real><int>2</int><real>1985</real><string>Own home</string><string>Natural death</string>
+ <real>92</real><int>2</int><int>1985</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Ellen Higson">
- <real>84</real><int>2</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>2</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Albert Brierley">
- <real>91</real><int>2</int><real>1985</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>91</real><int>2</int><int>1985</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Margaret Ann Conway">
- <real>69</real><int>2</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>69</real><int>2</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Kathleen McDonald">
- <real>73</real><int>2</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>73</real><int>2</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Olive Lees">
- <real>81</real><int>3</int><real>1985</real><string>Residential home</string><string>Natural death</string>
+ <real>81</real><int>3</int><int>1985</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Violet Hadfield">
- <real>74</real><int>5</int><real>1985</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>74</real><int>5</int><int>1985</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Thomas Moult">
- <real>70</real><int>6</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>70</real><int>6</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mildred Robinson">
- <real>84</real><int>6</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>6</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Hannah Jones">
- <real>84</real><int>7</int><real>1985</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>84</real><int>7</int><int>1985</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Frances Elizabeth Turner">
- <real>85</real><int>8</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>85</real><int>8</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mary Ogden">
- <real>58</real><int>10</int><real>1985</real><string>Own home</string><string>Natural death</string>
+ <real>58</real><int>10</int><int>1985</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Tom Redfern">
- <real>76</real><int>10</int><real>1985</real><string>Own home</string><string>Natural death</string>
+ <real>76</real><int>10</int><int>1985</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Selina Mackenzie">
- <real>77</real><int>12</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>77</real><int>12</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Vera Bramwell">
- <real>79</real><int>12</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>79</real><int>12</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Edith Goddard">
- <real>82</real><int>12</int><real>1985</real><string>Residential home</string><string>Natural death</string>
+ <real>82</real><int>12</int><int>1985</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Fred Kellett">
- <real>79</real><int>12</int><real>1985</real><string>Own home</string><string>Unlawful killing</string>
+ <real>79</real><int>12</int><int>1985</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Jane Bridge">
- <real>80</real><int>1</int><real>1986</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>80</real><int>1</int><int>1986</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Deborah Middleton">
- <real>81</real><int>1</int><real>1986</real><string>Own home</string><string>Unlawful killing</string>
+ <real>81</real><int>1</int><int>1986</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Vara Penney">
- <real>86</real><int>1</int><real>1986</real><string>Own home</string><string>Natural death</string>
+ <real>86</real><int>1</int><int>1986</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="May Hurd">
- <real>78</real><int>4</int><real>1986</real><string>Residential home</string><string>Natural death</string>
+ <real>78</real><int>4</int><int>1986</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Dorothy Fletcher">
- <real>74</real><int>4</int><real>1986</real><string>Residential home</string><string>Unlawful killing</string>
+ <real>74</real><int>4</int><int>1986</int><string>Residential home</string><string>Unlawful killing</string>
 </record>
 <record label="Charles Geoffrey Brassington">
- <real>69</real><int>5</int><real>1986</real><string>Own home</string><string>Natural death</string>
+ <real>69</real><int>5</int><int>1986</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Jozef Iwanina">
- <real>63</real><int>5</int><real>1986</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>63</real><int>5</int><int>1986</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Neville Shaw">
- <real>57</real><int>5</int><real>1986</real><string>Hospital</string><string>Natural death</string>
+ <real>57</real><int>5</int><int>1986</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="Thomas Fowden">
- <real>81</real><int>6</int><real>1986</real><string>Own home</string><string>Unlawful killing</string>
+ <real>81</real><int>6</int><int>1986</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mona Ashton White">
- <real>63</real><int>9</int><real>1986</real><string>Own home</string><string>Unlawful killing</string>
+ <real>63</real><int>9</int><int>1986</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mary Tomlin">
- <real>73</real><int>10</int><real>1986</real><string>Own home</string><string>Unlawful killing</string>
+ <real>73</real><int>10</int><int>1986</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Beatrice Toft">
- <real>59</real><int>11</int><real>1986</real><string>Own home</string><string>Unlawful killing</string>
+ <real>59</real><int>11</int><int>1986</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Annie Watkins">
- <real>81</real><int>11</int><real>1986</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>81</real><int>11</int><int>1986</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Lily Broadbent">
- <real>75</real><int>12</int><real>1986</real><string>Own home</string><string>Unlawful killing</string>
+ <real>75</real><int>12</int><int>1986</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="James Wood">
- <real>82</real><int>12</int><real>1986</real><string>Own home</string><string>Unlawful killing</string>
+ <real>82</real><int>12</int><int>1986</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="George Eric Higginbottom">
- <real>66</real><int>3</int><real>1987</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>66</real><int>3</int><int>1987</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Alice Hilda Connaughton">
- <real>77</real><int>3</int><real>1987</real><string>Residential home</string><string>Suspicion of unlawful killing</string>
+ <real>77</real><int>3</int><int>1987</int><string>Residential home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Hilda Hulme">
- <real>78</real><int>3</int><real>1987</real><string>Residential home</string><string>Natural death</string>
+ <real>78</real><int>3</int><int>1987</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Frank Halliday">
- <real>76</real><int>3</int><real>1987</real><string>Own home</string><string>Unlawful killing</string>
+ <real>76</real><int>3</int><int>1987</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Albert Cheetham">
- <real>85</real><int>4</int><real>1987</real><string>Own home</string><string>Unlawful killing</string>
+ <real>85</real><int>4</int><int>1987</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Robert Edward Jones">
- <real>81</real><int>4</int><real>1987</real><string>Own home</string><string>Natural death</string>
+ <real>81</real><int>4</int><int>1987</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Violet Garlick">
- <real>86</real><int>4</int><real>1987</real><string>Residential home</string><string>Natural death</string>
+ <real>86</real><int>4</int><int>1987</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Alice Thomas">
- <real>83</real><int>4</int><real>1987</real><string>Own home</string><string>Unlawful killing</string>
+ <real>83</real><int>4</int><int>1987</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ethel Dolan">
- <real>82</real><int>4</int><real>1987</real><string>Residential home</string><string>Natural death</string>
+ <real>82</real><int>4</int><int>1987</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Kenneth Harry Simpson">
- <real>61</real><int>4</int><real>1987</real><string>Own home</string><string>Natural death</string>
+ <real>61</real><int>4</int><int>1987</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Jane Frances Rostron">
- <real>78</real><int>5</int><real>1987</real><string>Own home</string><string>Unlawful killing</string>
+ <real>78</real><int>5</int><int>1987</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mary Gaunt">
- <real>76</real><int>7</int><real>1987</real><string>Daughter's home</string><string>Insufficient evidence for decision</string>
+ <real>76</real><int>7</int><int>1987</int><string>Daughter's home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Nancy Anne Brassington">
- <real>71</real><int>9</int><real>1987</real><string>Own home</string><string>Unlawful killing</string>
+ <real>71</real><int>9</int><int>1987</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Susan Eveline Shaw">
- <real>81</real><int>9</int><real>1987</real><string>Residential home</string><string>Natural death</string>
+ <real>81</real><int>9</int><int>1987</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Margaret Townsend">
- <real>80</real><int>12</int><real>1987</real><string>Own home</string><string>Unlawful killing</string>
+ <real>80</real><int>12</int><int>1987</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Nellie Bardsley">
- <real>69</real><int>12</int><real>1987</real><string>Own home</string><string>Unlawful killing</string>
+ <real>69</real><int>12</int><int>1987</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elizabeth Ann Rogers">
- <real>74</real><int>12</int><real>1987</real><string>Own home</string><string>Unlawful killing</string>
+ <real>74</real><int>12</int><int>1987</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elizabeth Fletcher">
- <real>90</real><int>1</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>90</real><int>1</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Alice Mary Jones">
- <real>83</real><int>1</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>83</real><int>1</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Constance Anne Couldwell">
- <real>88</real><int>2</int><real>1988</real><string>Residential home</string><string>Insufficient evidence for decision</string>
+ <real>88</real><int>2</int><int>1988</int><string>Residential home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Dorothea Hill Renwick">
- <real>90</real><int>2</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>90</real><int>2</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ann Cooper">
- <real>93</real><int>2</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>93</real><int>2</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Jane Jones">
- <real>83</real><int>2</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>83</real><int>2</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Lavinia Robinson">
- <real>84</real><int>2</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>2</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Kate Elizabeth Stafford">
- <real>93</real><int>2</int><real>1988</real><string>Residential home</string><string>Natural death</string>
+ <real>93</real><int>2</int><int>1988</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Rose Ann Adshead">
- <real>80</real><int>9</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>80</real><int>9</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Alice Rawling">
- <real>100</real><int>10</int><real>1988</real><string>Residential home</string><string>Natural death</string>
+ <real>100</real><int>10</int><int>1988</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Alice Prestwich">
- <real>69</real><int>10</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>69</real><int>10</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Harry Waller">
- <real>69</real><int>10</int><real>1988</real><string>Own home</string><string>Natural death</string>
+ <real>69</real><int>10</int><int>1988</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Amy Chidlow">
- <real>85</real><int>11</int><real>1988</real><string>Residential home</string><string>Natural death</string>
+ <real>85</real><int>11</int><int>1988</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Walter Tingle">
- <real>85</real><int>11</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>85</real><int>11</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ellen Hennefer">
- <real>91</real><int>12</int><real>1988</real><string>Residential home</string><string>Natural death</string>
+ <real>91</real><int>12</int><int>1988</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Harry Stafford">
- <real>87</real><int>12</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>87</real><int>12</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ethel Bennett">
- <real>80</real><int>12</int><real>1988</real><string>Own home</string><string>Unlawful killing</string>
+ <real>80</real><int>12</int><int>1988</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Wilfred Chappell">
- <real>80</real><int>1</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>80</real><int>1</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mary Emma Hamer">
- <real>81</real><int>3</int><real>1989</real><string>Shipman's surgery</string><string>Unlawful killing</string>
+ <real>81</real><int>3</int><int>1989</int><string>Shipman's surgery</string><string>Unlawful killing</string>
 </record>
 <record label="Margaret Smith">
- <real>90</real><int>3</int><real>1989</real><string>Residential home</string><string>Natural death</string>
+ <real>90</real><int>3</int><int>1989</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Beatrice Helen Clee">
- <real>78</real><int>5</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>78</real><int>5</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Edith Pitman">
- <real>86</real><int>5</int><real>1989</real><string>Residential home</string><string>Natural death</string>
+ <real>86</real><int>5</int><int>1989</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Josephine Hall">
- <real>69</real><int>6</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>69</real><int>6</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Hilda Fitton">
- <real>75</real><int>7</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>75</real><int>7</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Marion Carradice">
- <real>80</real><int>8</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>80</real><int>8</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elsie Harrop">
- <real>82</real><int>9</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>82</real><int>9</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elizabeth Mary Burke">
- <real>82</real><int>9</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>82</real><int>9</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Sarah Jane Williamson">
- <real>82</real><int>10</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>82</real><int>10</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="John Charlton">
- <real>81</real><int>10</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>81</real><int>10</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="George Edgar Vizor">
- <real>67</real><int>10</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>67</real><int>10</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Joseph Frank Wilcockson">
- <real>85</real><int>11</int><real>1989</real><string>Own home</string><string>Unlawful killing</string>
+ <real>85</real><int>11</int><int>1989</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Samuel Mellor">
- <real>73</real><int>11</int><real>1989</real><string>Own home</string><string>Natural death</string>
+ <real>73</real><int>11</int><int>1989</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Annie Elizabeth Golds">
- <real>83</real><int>5</int><real>1990</real><string>Own home</string><string>Natural death</string>
+ <real>83</real><int>5</int><int>1990</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Genevieve Challoner">
- <real>69</real><int>7</int><real>1990</real><string>Own home</string><string>Natural death</string>
+ <real>69</real><int>7</int><int>1990</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Dorothy Rowarth">
- <real>56</real><int>9</int><real>1990</real><string>Own home</string><string>Unlawful killing</string>
+ <real>56</real><int>9</int><int>1990</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Clara Hackney">
- <real>84</real><int>9</int><real>1990</real><string>Own home</string><string>Natural death</string>
+ <real>84</real><int>9</int><int>1990</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Marion Harrison">
- <real>68</real><int>10</int><real>1990</real><string>Residential home</string><string>Natural death</string>
+ <real>68</real><int>10</int><int>1990</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Winifred Mary Walker">
- <real>75</real><int>11</int><real>1990</real><string>Residential home</string><string>Natural death</string>
+ <real>75</real><int>11</int><int>1990</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Mary Rose Dudley">
- <real>69</real><int>12</int><real>1990</real><string>Own home</string><string>Unlawful killing</string>
+ <real>69</real><int>12</int><int>1990</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ronald Jameson">
- <real>48</real><int>2</int><real>1991</real><string>Own home</string><string>Natural death</string>
+ <real>48</real><int>2</int><int>1991</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Ellen Walker">
- <real>88</real><int>3</int><real>1991</real><string>Residential home</string><string>Natural death</string>
+ <real>88</real><int>3</int><int>1991</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Alfred Cheetham">
- <real>73</real><int>3</int><real>1991</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>73</real><int>3</int><int>1991</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="Mary Middleton">
- <real>81</real><int>5</int><real>1991</real><string>Own home</string><string>Natural death</string>
+ <real>81</real><int>5</int><int>1991</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Barry Higgins">
- <real>58</real><int>5</int><real>1991</real><string>Own home</string><string>Natural death</string>
+ <real>58</real><int>5</int><int>1991</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Phyllis Farrell">
- <real>79</real><int>8</int><real>1991</real><string>Own home</string><string>Natural death</string>
+ <real>79</real><int>8</int><int>1991</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Ethel May Proud">
- <real>94</real><int>8</int><real>1991</real><string>Own home</string><string>Natural death</string>
+ <real>94</real><int>8</int><int>1991</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Margaret Ousey">
- <real>33</real><int>10</int><real>1991</real><string>Own home</string><string>Natural death</string>
+ <real>33</real><int>10</int><int>1991</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Nora Grundy">
- <real>77</real><int>10</int><real>1991</real><string>Residential home</string><string>Natural death</string>
+ <real>77</real><int>10</int><int>1991</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Elsie Clayton">
- <real>82</real><int>10</int><real>1991</real><string>Residential home</string><string>Natural death</string>
+ <real>82</real><int>10</int><int>1991</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Alice Richardson">
- <real>82</real><int>10</int><real>1991</real><string>Own home</string><string>Natural death</string>
+ <real>82</real><int>10</int><int>1991</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Joseph Andrew">
- <real>84</real><int>11</int><real>1991</real><string>Nursing home</string><string>Natural death</string>
+ <real>84</real><int>11</int><int>1991</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Annie Alexandra Powers">
- <real>89</real><int>1</int><real>1992</real><string>Residential home</string><string>Suspicion of unlawful killing</string>
+ <real>89</real><int>1</int><int>1992</int><string>Residential home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Joseph Drummond">
- <real>85</real><int>4</int><real>1992</real><string>Own home</string><string>Natural death</string>
+ <real>85</real><int>4</int><int>1992</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Muriel Elsie Wilson">
- <real>87</real><int>7</int><real>1992</real><string>Residential home</string><string>Natural death</string>
+ <real>87</real><int>7</int><int>1992</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Alice Drinkwater">
- <real>79</real><int>7</int><real>1992</real><string>Residential home</string><string>Natural death</string>
+ <real>79</real><int>7</int><int>1992</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Monica Rene Sparkes">
- <real>72</real><int>10</int><real>1992</real><string>Own home</string><string>Unlawful killing</string>
+ <real>72</real><int>10</int><int>1992</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Hannah Frith">
- <real>79</real><int>11</int><real>1992</real><string>Own home</string><string>Natural death</string>
+ <real>79</real><int>11</int><int>1992</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Thomas O'Sullivan">
- <real>67</real><int>12</int><real>1992</real><string>Own home</string><string>Natural death</string>
+ <real>67</real><int>12</int><int>1992</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Harriet Stopford">
- <real>80</real><int>12</int><real>1992</real><string>Residential home</string><string>Natural death</string>
+ <real>80</real><int>12</int><int>1992</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Edith Whittle">
- <real>84</real><int>2</int><real>1993</real><string>Residential home</string><string>Natural death</string>
+ <real>84</real><int>2</int><int>1993</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Harold Freeman">
- <real>83</real><int>2</int><real>1993</real><string>Residential home</string><string>Suspicion of unlawful killing</string>
+ <real>83</real><int>2</int><int>1993</int><string>Residential home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Hilda Mary Couzens">
- <real>92</real><int>2</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>92</real><int>2</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Olive Heginbotham">
- <real>86</real><int>2</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>86</real><int>2</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Winifred Freeman">
- <real>75</real><int>3</int><real>1993</real><string>Residential home</string><string>Natural death</string>
+ <real>75</real><int>3</int><int>1993</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Amy Whitehead">
- <real>82</real><int>3</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>82</real><int>3</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mary Emma Andrew">
- <real>86</real><int>4</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>86</real><int>4</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Lydia Edith Butcher">
- <real>94</real><int>4</int><real>1993</real><string>Residential home</string><string>Natural death</string>
+ <real>94</real><int>4</int><int>1993</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Sarah Ashworth">
- <real>74</real><int>4</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>74</real><int>4</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Fanny Nichols">
- <real>84</real><int>4</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>4</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Marjorie Parker">
- <real>74</real><int>4</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>74</real><int>4</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Edna Mary Taylor">
- <real>90</real><int>4</int><real>1993</real><string>Residential home</string><string>Natural death</string>
+ <real>90</real><int>4</int><int>1993</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Nellie Mullen">
- <real>77</real><int>5</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>77</real><int>5</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Edna May Llewellyn">
- <real>68</real><int>5</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>68</real><int>5</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Rebecca Gray">
- <real>84</real><int>5</int><real>1993</real><string>Own home</string><string>Natural death</string>
+ <real>84</real><int>5</int><int>1993</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Emily Morgan">
- <real>84</real><int>5</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>5</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Violet May Bird">
- <real>60</real><int>5</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>60</real><int>5</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Jose Kathleen Diana Richards">
- <real>74</real><int>7</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>74</real><int>7</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="George Lawton Wagstaff">
- <real>77</real><int>7</int><real>1993</real><string>Own home</string><string>Natural death</string>
+ <real>77</real><int>7</int><int>1993</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Edith Calverley">
- <real>77</real><int>8</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>77</real><int>8</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ernest Colin Ralphs">
- <real>69</real><int>9</int><real>1993</real><string>Own home</string><string>Natural death</string>
+ <real>69</real><int>9</int><int>1993</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="James Edward Barnes">
- <real>65</real><int>10</int><real>1993</real><string>Nursing home</string><string>Natural death</string>
+ <real>65</real><int>10</int><int>1993</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Margaret Sankey">
- <real>90</real><int>11</int><real>1993</real><string>Residential home</string><string>Natural death</string>
+ <real>90</real><int>11</int><int>1993</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Joseph Leigh">
- <real>78</real><int>12</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>78</real><int>12</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Eileen Robinson">
- <real>54</real><int>12</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>54</real><int>12</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="David Jones">
- <real>73</real><int>12</int><real>1993</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>73</real><int>12</int><int>1993</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Marion Platt">
- <real>78</real><int>12</int><real>1993</real><string>Residential home</string><string>Natural death</string>
+ <real>78</real><int>12</int><int>1993</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Charles Edward Brocklehurst">
- <real>90</real><int>12</int><real>1993</real><string>Own home</string><string>Unlawful killing</string>
+ <real>90</real><int>12</int><int>1993</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Joan Milray Harding">
- <real>82</real><int>1</int><real>1994</real><string>Shipman's surgery</string><string>Unlawful killing</string>
+ <real>82</real><int>1</int><int>1994</int><string>Shipman's surgery</string><string>Unlawful killing</string>
 </record>
 <record label="Christine Hancock">
- <real>53</real><int>1</int><real>1994</real><string>Own home</string><string>Unlawful killing</string>
+ <real>53</real><int>1</int><int>1994</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elsie Platt">
- <real>73</real><int>2</int><real>1994</real><string>Own home</string><string>Unlawful killing</string>
+ <real>73</real><int>2</int><int>1994</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mary Alice Smith">
- <real>84</real><int>5</int><real>1994</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>5</int><int>1994</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ronnie Devenport">
- <real>57</real><int>5</int><real>1994</real><string>Own home</string><string>Unlawful killing</string>
+ <real>57</real><int>5</int><int>1994</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Cicely Sharples">
- <real>87</real><int>6</int><real>1994</real><string>Own home</string><string>Unlawful killing</string>
+ <real>87</real><int>6</int><int>1994</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Alice Christine Kitchen">
- <real>70</real><int>6</int><real>1994</real><string>Own home</string><string>Unlawful killing</string>
+ <real>70</real><int>6</int><int>1994</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Maria Thornton">
- <real>78</real><int>7</int><real>1994</real><string>Own home</string><string>Unlawful killing</string>
+ <real>78</real><int>7</int><int>1994</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Eric Davies">
- <real>72</real><int>9</int><real>1994</real><string>Nursing home</string><string>Natural death</string>
+ <real>72</real><int>9</int><int>1994</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Audrey Reade">
- <real>58</real><int>10</int><real>1994</real><string>Hospital</string><string>Natural death</string>
+ <real>58</real><int>10</int><int>1994</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="John Hilton">
- <real>64</real><int>11</int><real>1994</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>64</real><int>11</int><int>1994</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Florence Heywood">
- <real>91</real><int>11</int><real>1994</real><string>Nursing home</string><string>Suspicion of unlawful killing</string>
+ <real>91</real><int>11</int><int>1994</int><string>Nursing home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Henrietta Walker">
- <real>87</real><int>11</int><real>1994</real><string>Own home</string><string>Unlawful killing</string>
+ <real>87</real><int>11</int><int>1994</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elizabeth Ellen Mellor">
- <real>75</real><int>11</int><real>1994</real><string>Own home</string><string>Unlawful killing</string>
+ <real>75</real><int>11</int><int>1994</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Beatrice Jeffries">
- <real>81</real><int>12</int><real>1994</real><string>Nursing home</string><string>Natural death</string>
+ <real>81</real><int>12</int><int>1994</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Janet Hallsworth">
- <real>90</real><int>12</int><real>1994</real><string>Residential home</string><string>Natural death</string>
+ <real>90</real><int>12</int><int>1994</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="John Bennett Molesdale">
- <real>81</real><int>12</int><real>1994</real><string>Own home</string><string>Unlawful killing</string>
+ <real>81</real><int>12</int><int>1994</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Sarah Ann Hill">
- <real>74</real><int>1</int><real>1995</real><string>Daughter's home</string><string>Natural death</string>
+ <real>74</real><int>1</int><int>1995</int><string>Daughter's home</string><string>Natural death</string>
 </record>
 <record label="Alice Kennedy">
- <real>88</real><int>1</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>88</real><int>1</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Lily Brookes">
- <real>80</real><int>1</int><real>1995</real><string>Nursing home</string><string>Natural death</string>
+ <real>80</real><int>1</int><int>1995</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Sydney Hoskins Copeland">
- <real>80</real><int>1</int><real>1995</real><string>Own home</string><string>Natural death</string>
+ <real>80</real><int>1</int><int>1995</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Lucy Virgin">
- <real>70</real><int>3</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>70</real><int>3</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Joseph Shaw">
- <real>88</real><int>3</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>88</real><int>3</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Maria West">
- <real>81</real><int>3</int><real>1995</real><string>Own home</string><string>Conviction</string>
+ <real>81</real><int>3</int><int>1995</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Netta Ashcroft">
- <real>71</real><int>3</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>71</real><int>3</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Lily Bardsley">
- <real>88</real><int>3</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>88</real><int>3</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Marie Antoinette Fernley">
- <real>53</real><int>3</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>53</real><int>3</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ida Cains">
- <real>84</real><int>3</int><real>1995</real><string>Own home</string><string>Insufficient evidence for decision</string>
+ <real>84</real><int>3</int><int>1995</int><string>Own home</string><string>Insufficient evidence for decision</string>
 </record>
 <record label="John Crompton">
- <real>82</real><int>3</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>82</real><int>3</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Frank Crompton">
- <real>86</real><int>3</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>86</real><int>3</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Vera Brocklehurst">
- <real>70</real><int>3</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>70</real><int>3</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Angela Philomena Tierney">
- <real>71</real><int>4</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>71</real><int>4</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Edith Scott">
- <real>85</real><int>4</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>85</real><int>4</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Clara Hackney">
- <real>84</real><int>4</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>4</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Renate Eldtraude Overton">
- <real>47</real><int>4</int><real>1995</real><string>Hospital</string><string>Unlawful killing</string>
+ <real>47</real><int>4</int><int>1995</int><string>Hospital</string><string>Unlawful killing</string>
 </record>
 <record label="Maud Wilkinson">
- <real>82</real><int>5</int><real>1995</real><string>Residential home</string><string>Natural death</string>
+ <real>82</real><int>5</int><int>1995</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Kate Maud Sellors">
- <real>75</real><int>5</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>75</real><int>5</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Arthur Bent">
- <real>90</real><int>5</int><real>1995</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>90</real><int>5</int><int>1995</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Clifford Barnes Heapey">
- <real>85</real><int>6</int><real>1995</real><string>Nursing home</string><string>Unlawful killing</string>
+ <real>85</real><int>6</int><int>1995</int><string>Nursing home</string><string>Unlawful killing</string>
 </record>
 <record label="James Clough">
- <real>71</real><int>6</int><real>1995</real><string>Own home</string><string>Natural death</string>
+ <real>71</real><int>6</int><int>1995</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Bertha Moss">
- <real>68</real><int>6</int><real>1995</real><string>Shipman's surgery</string><string>Unlawful killing</string>
+ <real>68</real><int>6</int><int>1995</int><string>Shipman's surgery</string><string>Unlawful killing</string>
 </record>
 <record label="Brenda Ashworth">
- <real>63</real><int>6</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>63</real><int>6</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ernest Rudol">
- <real>82</real><int>6</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>82</real><int>6</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Alice Carrington">
- <real>75</real><int>7</int><real>1995</real><string>Hospital</string><string>Natural death</string>
+ <real>75</real><int>7</int><int>1995</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="Ada Matley Hilton">
- <real>88</real><int>7</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>88</real><int>7</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Irene Aitken">
- <real>65</real><int>7</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>65</real><int>7</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ivy Jones">
- <real>64</real><int>8</int><real>1995</real><string>Hospital</string><string>Natural death</string>
+ <real>64</real><int>8</int><int>1995</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="John France">
- <real>84</real><int>8</int><real>1995</real><string>Nursing home</string><string>Natural death</string>
+ <real>84</real><int>8</int><int>1995</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Arthur Henderson Stopford">
- <real>82</real><int>8</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>82</real><int>8</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Geoffrey Bogle">
- <real>72</real><int>9</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>72</real><int>9</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Dora Elizabeth Ashton">
- <real>87</real><int>9</int><real>1995</real><string>Shipman's surgery</string><string>Unlawful killing</string>
+ <real>87</real><int>9</int><int>1995</int><string>Shipman's surgery</string><string>Unlawful killing</string>
 </record>
 <record label="Muriel Margaret Ward">
- <real>87</real><int>10</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>87</real><int>10</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Kathleen May Wass">
- <real>87</real><int>11</int><real>1995</real><string>Residential home</string><string>Natural death</string>
+ <real>87</real><int>11</int><int>1995</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Edith Brock">
- <real>74</real><int>11</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>74</real><int>11</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Charles Henry Barlow">
- <real>88</real><int>11</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>88</real><int>11</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Konrad Peter Ovcar-Robinson">
- <real>43</real><int>11</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>43</real><int>11</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elizabeth Teresa Sigley">
- <real>67</real><int>12</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>67</real><int>12</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Kenneth Wharmby Woodhead">
- <real>75</real><int>12</int><real>1995</real><string>Own home</string><string>Unlawful killing</string>
+ <real>75</real><int>12</int><int>1995</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Kathleen May Boardman">
- <real>72</real><int>12</int><real>1995</real><string>Own home</string><string>Natural death</string>
+ <real>72</real><int>12</int><int>1995</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Hilda Mary Hibbert">
- <real>81</real><int>1</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>81</real><int>1</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Erla Copeland">
- <real>79</real><int>1</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>79</real><int>1</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Peter Higginbottom">
- <real>42</real><int>1</int><real>1996</real><string>Hospital</string><string>Natural death</string>
+ <real>42</real><int>1</int><int>1996</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="Nora Needham">
- <real>76</real><int>1</int><real>1996</real><string>Own home</string><string>Natural death</string>
+ <real>76</real><int>1</int><int>1996</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Edward Buckland">
- <real>84</real><int>2</int><real>1996</real><string>Residential home</string><string>Natural death</string>
+ <real>84</real><int>2</int><int>1996</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="George Henry Mottram">
- <real>91</real><int>2</int><real>1996</real><string>Residential home</string><string>Natural death</string>
+ <real>91</real><int>2</int><int>1996</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Jane Elizabeth Shelmerdine">
- <real>80</real><int>2</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>80</real><int>2</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="John Sheard Greenhalgh">
- <real>88</real><int>2</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>88</real><int>2</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Minnie Doris Irene Galpin">
- <real>71</real><int>3</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>71</real><int>3</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Joseph Beech">
- <real>80</real><int>4</int><real>1996</real><string>Own home</string><string>Natural death</string>
+ <real>80</real><int>4</int><int>1996</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Marjorie Hope Waller">
- <real>79</real><int>4</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>79</real><int>4</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Minnie Ward">
- <real>104</real><int>4</int><real>1996</real><string>Residential home</string><string>Natural death</string>
+ <real>104</real><int>4</int><int>1996</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Frances Potts">
- <real>85</real><int>4</int><real>1996</real><string>Residential home</string><string>Natural death</string>
+ <real>85</real><int>4</int><int>1996</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="John Stone">
- <real>77</real><int>4</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>77</real><int>4</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elsie Godfrey">
- <real>85</real><int>5</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>85</real><int>5</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Edith Brady">
- <real>72</real><int>5</int><real>1996</real><string>Shipman's surgery</string><string>Unlawful killing</string>
+ <real>72</real><int>5</int><int>1996</int><string>Shipman's surgery</string><string>Unlawful killing</string>
 </record>
 <record label="Fanny Clarke">
- <real>82</real><int>5</int><real>1996</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>82</real><int>5</int><int>1996</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Valerie Cuthbert">
- <real>54</real><int>5</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>54</real><int>5</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Lilian Cullen">
- <real>77</real><int>5</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>77</real><int>5</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Renee Lacey">
- <real>63</real><int>6</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>63</real><int>6</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="John Baddeley">
- <real>80</real><int>6</int><real>1996</real><string>Own home</string><string>Natural death</string>
+ <real>80</real><int>6</int><int>1996</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Leah Fogg">
- <real>82</real><int>6</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>82</real><int>6</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Gladys Saunders">
- <real>82</real><int>6</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>82</real><int>6</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Nellie Bennett">
- <real>86</real><int>6</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>86</real><int>6</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Margaret Mary Vickers">
- <real>81</real><int>6</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>81</real><int>6</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Tom Balfour Russell">
- <real>77</real><int>7</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>77</real><int>7</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Irene Turner">
- <real>67</real><int>7</int><real>1996</real><string>Own home</string><string>Conviction</string>
+ <real>67</real><int>7</int><int>1996</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Carrie Leigh">
- <real>81</real><int>7</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>81</real><int>7</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Marion Elizabeth Higham">
- <real>84</real><int>7</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>7</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Pamela Grace Mottram">
- <real>57</real><int>7</int><real>1996</real><string>Own home</string><string>Natural death</string>
+ <real>57</real><int>7</int><int>1996</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Elsie Hannible">
- <real>85</real><int>7</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>85</real><int>7</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elsie Barker">
- <real>84</real><int>7</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>7</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Sidney Arthur Smith">
- <real>76</real><int>8</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>76</real><int>8</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Dorothy Mary Andrew">
- <real>85</real><int>9</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>85</real><int>9</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Anne Lilian Ralphs">
- <real>75</real><int>9</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>75</real><int>9</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Millicent Garside">
- <real>76</real><int>10</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>76</real><int>10</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Grace Sumner">
- <real>60</real><int>11</int><real>1996</real><string>Hospital</string><string>Natural death</string>
+ <real>60</real><int>11</int><int>1996</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="Agnes Oldham">
- <real>95</real><int>11</int><real>1996</real><string>Residential home</string><string>Natural death</string>
+ <real>95</real><int>11</int><int>1996</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Irene Heathcote">
- <real>76</real><int>11</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>76</real><int>11</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Samuel Mills">
- <real>89</real><int>11</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>89</real><int>11</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Marion Gaskell">
- <real>77</real><int>11</int><real>1996</real><string>Hospital</string><string>Natural death</string>
+ <real>77</real><int>11</int><int>1996</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="Thomas Cheetham">
- <real>78</real><int>12</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>78</real><int>12</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Maureen Whittaker">
- <real>62</real><int>12</int><real>1996</real><string>Nursing home</string><string>Natural death</string>
+ <real>62</real><int>12</int><int>1996</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Kenneth Ernest Smith">
- <real>73</real><int>12</int><real>1996</real><string>Own home</string><string>Unlawful killing</string>
+ <real>73</real><int>12</int><int>1996</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Eileen Daphne Crompton">
- <real>75</real><int>1</int><real>1997</real><string>Residential home</string><string>Unlawful killing</string>
+ <real>75</real><int>1</int><int>1997</int><string>Residential home</string><string>Unlawful killing</string>
 </record>
 <record label="David Alan Harrison">
- <real>47</real><int>1</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>47</real><int>1</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elsie Lorna Dean">
- <real>69</real><int>1</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>69</real><int>1</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Albert Edward Saunders">
- <real>81</real><int>1</int><real>1997</real><string>Nursing home</string><string>Natural death</string>
+ <real>81</real><int>1</int><int>1997</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Mary Louisa Boardman">
- <real>95</real><int>1</int><real>1997</real><string>Residential home</string><string>Natural death</string>
+ <real>95</real><int>1</int><int>1997</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Irene Brooder">
- <real>76</real><int>1</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>76</real><int>1</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Charlotte Bennison">
- <real>89</real><int>1</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>89</real><int>1</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Charles Henry Killan">
- <real>90</real><int>2</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>90</real><int>2</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Betty Royston">
- <real>70</real><int>2</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>70</real><int>2</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Joyce Woodhead">
- <real>74</real><int>2</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>74</real><int>2</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Lizzie Adams">
- <real>77</real><int>2</int><real>1997</real><string>Own home</string><string>Conviction</string>
+ <real>77</real><int>2</int><int>1997</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Squire Barber">
- <real>69</real><int>3</int><real>1997</real><string>Nursing home</string><string>Natural death</string>
+ <real>69</real><int>3</int><int>1997</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Rose Garlick">
- <real>76</real><int>3</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>76</real><int>3</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="May Lowe">
- <real>84</real><int>3</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>3</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Hilda Fish">
- <real>97</real><int>3</int><real>1997</real><string>Residential home</string><string>Natural death</string>
+ <real>97</real><int>3</int><int>1997</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Elaine Dutton">
- <real>73</real><int>4</int><real>1997</real><string>Nursing home</string><string>Natural death</string>
+ <real>73</real><int>4</int><int>1997</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Mary Coutts">
- <real>80</real><int>4</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>80</real><int>4</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mary Tuff">
- <real>76</real><int>4</int><real>1997</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>76</real><int>4</int><int>1997</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Elsie Cheetham">
- <real>76</real><int>4</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>76</real><int>4</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Jean Lilley">
- <real>58</real><int>4</int><real>1997</real><string>Own home</string><string>Conviction</string>
+ <real>58</real><int>4</int><int>1997</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Lena Norah Slater">
- <real>68</real><int>5</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>68</real><int>5</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ethel May Kellett">
- <real>74</real><int>5</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>74</real><int>5</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Doris Earls">
- <real>79</real><int>5</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>79</real><int>5</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Bessie Delaney">
- <real>87</real><int>5</int><real>1997</real><string>Residential home</string><string>Natural death</string>
+ <real>87</real><int>5</int><int>1997</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Ivy Lomas">
- <real>63</real><int>5</int><real>1997</real><string>Shipman's surgery</string><string>Conviction</string>
+ <real>63</real><int>5</int><int>1997</int><string>Shipman's surgery</string><string>Conviction</string>
 </record>
 <record label="Vera Whittingslow">
- <real>69</real><int>6</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>69</real><int>6</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Maureen Lamonnier Jackson">
- <real>51</real><int>7</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>51</real><int>7</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Muriel Grimshaw">
- <real>76</real><int>7</int><real>1997</real><string>Own home</string><string>Conviction</string>
+ <real>76</real><int>7</int><int>1997</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="John Louden Livesey">
- <real>69</real><int>7</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>69</real><int>7</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Lily Newby Taylor">
- <real>86</real><int>7</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>86</real><int>7</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Dorothy Doretta Hopkins">
- <real>72</real><int>8</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>72</real><int>8</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Harry Lomas">
- <real>82</real><int>8</int><real>1997</real><string>Nursing home</string><string>Natural death</string>
+ <real>82</real><int>8</int><int>1997</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Kenneth Pickup">
- <real>77</real><int>8</int><real>1997</real><string>Country park footpath</string><string>Natural death</string>
+ <real>77</real><int>8</int><int>1997</int><string>Country park footpath</string><string>Natural death</string>
 </record>
 <record label="Nancy Jackson">
- <real>81</real><int>9</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>81</real><int>9</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mavis Mary Pickup">
- <real>79</real><int>9</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>79</real><int>9</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Bessie Swann">
- <real>79</real><int>9</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>79</real><int>9</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Enid Otter">
- <real>77</real><int>9</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>77</real><int>9</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Florence Lewis">
- <real>79</real><int>11</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>79</real><int>11</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Bertha Parr">
- <real>77</real><int>11</int><real>1997</real><string>Own home</string><string>Suspicion of unlawful killing</string>
+ <real>77</real><int>11</int><int>1997</int><string>Own home</string><string>Suspicion of Unlawful killing</string>
 </record>
 <record label="Mary Walls">
- <real>78</real><int>11</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>78</real><int>11</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Elizabeth Mary Baddeley">
- <real>83</real><int>11</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>83</real><int>11</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Marie Quinn">
- <real>67</real><int>11</int><real>1997</real><string>Own home</string><string>Conviction</string>
+ <real>67</real><int>11</int><int>1997</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Elizabeth Battersby">
- <real>70</real><int>12</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>70</real><int>12</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Laura Kathleen Wagstaff">
- <real>81</real><int>12</int><real>1997</real><string>Own home</string><string>Conviction</string>
+ <real>81</real><int>12</int><int>1997</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Bianka Pomfret">
- <real>49</real><int>12</int><real>1997</real><string>Own home</string><string>Conviction</string>
+ <real>49</real><int>12</int><int>1997</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Alice Black">
- <real>73</real><int>12</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>73</real><int>12</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="James Joseph King">
- <real>83</real><int>12</int><real>1997</real><string>Own home</string><string>Unlawful killing</string>
+ <real>83</real><int>12</int><int>1997</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mabel Shawcross">
- <real>79</real><int>1</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>79</real><int>1</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Norah Nuttall">
- <real>64</real><int>1</int><real>1998</real><string>Own home</string><string>Conviction</string>
+ <real>64</real><int>1</int><int>1998</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Cissie Davies">
- <real>73</real><int>2</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>73</real><int>2</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Muriel Eveline Harrison">
- <real>73</real><int>2</int><real>1998</real><string>Nursing home</string><string>Natural death</string>
+ <real>73</real><int>2</int><int>1998</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Pamela Marguerite Hillier">
- <real>68</real><int>2</int><real>1998</real><string>Own home</string><string>Conviction</string>
+ <real>68</real><int>2</int><int>1998</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Edith Brierley">
- <real>90</real><int>2</int><real>1998</real><string>Nursing home</string><string>Natural death</string>
+ <real>90</real><int>2</int><int>1998</int><string>Nursing home</string><string>Natural death</string>
 </record>
 <record label="Laura Frances Linn">
- <real>83</real><int>2</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>83</real><int>2</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Irene Berry">
- <real>74</real><int>2</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>74</real><int>2</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Maureen Alice Ward">
- <real>57</real><int>2</int><real>1998</real><string>Own home</string><string>Conviction</string>
+ <real>57</real><int>2</int><int>1998</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Winifred Healey">
- <real>82</real><int>2</int><real>1998</real><string>Own home</string><string>Natural death</string>
+ <real>82</real><int>2</int><int>1998</int><string>Own home</string><string>Natural death</string>
 </record>
 <record label="Joan Edwina Dean">
- <real>75</real><int>2</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>75</real><int>2</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Monica Eddleston">
- <real>75</real><int>2</int><real>1998</real><string>Hospital</string><string>Natural death</string>
+ <real>75</real><int>2</int><int>1998</int><string>Hospital</string><string>Natural death</string>
 </record>
 <record label="Harold Eddleston">
- <real>77</real><int>3</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>77</real><int>3</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Margaret Anne Waldron">
- <real>65</real><int>3</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>65</real><int>3</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Irene Chapman">
- <real>74</real><int>3</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>74</real><int>3</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Dorothy Long">
- <real>84</real><int>3</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>84</real><int>3</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Lily Higgins">
- <real>83</real><int>3</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>83</real><int>3</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Ada Warburton">
- <real>77</real><int>3</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>77</real><int>3</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Martha Marley">
- <real>88</real><int>3</int><real>1998</real><string>Own home</string><string>Unlawful killing</string>
+ <real>88</real><int>3</int><int>1998</int><string>Own home</string><string>Unlawful killing</string>
 </record>
 <record label="Mary Keating">
- <real>95</real><int>4</int><real>1998</real><string>Residential home</string><string>Natural death</string>
+ <real>95</real><int>4</int><int>1998</int><string>Residential home</string><string>Natural death</string>
 </record>
 <record label="Winifred Mellor">
- <real>73</real><int>5</int><real>1998</real><string>Own home</string><string>Conviction</string>
+ <real>73</real><int>5</int><int>1998</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Joan May Melia">
- <real>73</real><int>6</int><real>1998</real><string>Own home</string><string>Conviction</string>
+ <real>73</real><int>6</int><int>1998</int><string>Own home</string><string>Conviction</string>
 </record>
 <record label="Kathleen Grundy">
- <real>81</real><int>6</int><real>1998</real><string>Own home</string><string>Conviction</string>
+ <real>81</real><int>6</int><int>1998</int><string>Own home</string><string>Conviction</string>
 </record>
+
 </records>
 </data>
-
 </ggobidata>
