@@ -73,6 +73,9 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
   gfloat min, max, mean;
   cpaneld *cpanel = &display->cpanel;
 
+  if (sp->p1d.spread_data.nels != d->nrows)
+    vectorf_realloc (&sp->p1d.spread_data, d->nrows);
+
   switch (cpanel->p1d.type) {
     case TEXTURE:
       sp->p1d.lim.min = FORGETITAXIS_MIN ;

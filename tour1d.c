@@ -515,11 +515,12 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
 
   if (sp == NULL)
     return;
+  if (sp->p1d.spread_data.nels != d->nrows)
+    vectorf_realloc (&sp->p1d.spread_data, d->nrows);
 
   yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
 
-  for (m=0; m < d->nrows_in_plot; m++)
-  {
+  for (m=0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
     yy[m] = sp->planar[i].x = 0;
     sp->planar[i].y = 0;
