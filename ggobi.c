@@ -440,6 +440,30 @@ ggobi_getIndex(ggobid *gg)
  return(-1);
 }
 
+datad *
+GGobi_get_data(int which, const ggobid * const gg)
+{
+   datad *d;
+   d = g_slist_nth_data(gg->d, which);
+
+   return(d);
+}
+
+datad *
+GGobi_get_data_by_name(const gchar * const name, const ggobid * const gg)
+{
+   datad *d;
+   GSList *l;
+
+   for (l = gg->d; l; l = l->next) {
+     d = (datad *) l->data;
+     if(strcmp(d->name, name) == 0)
+	 return(d);
+   }
+   return(NULL);
+}
+
+
 ggobid*
 ValidateGGobiRef(ggobid *gg, gboolean fatal)
 { 
