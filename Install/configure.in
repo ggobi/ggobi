@@ -118,7 +118,11 @@ if test -n "${with_R}" ; then
     fi
     PACKAGES="Rggobi ${PACKAGES}"
   else
+    echo ""
+    echo "**Error"
     echo "You cannot install the Rggobi interface without first downloading Rggobi.tar.gz"
+    echo "and then un-tarring it"
+    echo ""
   fi
 fi
 
