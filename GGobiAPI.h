@@ -127,6 +127,8 @@ extern void GGobi_setData(gdouble *values, gchar **rownames, gchar **colnames,
   gchar **ids, gboolean duplicate, InputDescription *);
 
 
+extern void GGobi_setDataName(const char * const name, datad *d);
+
 /** 
  @ingroup GGobi
   Whether to get the transformed names or the regular ones. 

@@ -1568,6 +1568,18 @@ GGobi_getLevelName(vartabled *vt, double value)
   return(NULL);
 }
 
+
+void 
+GGobi_setDataName(const char * const name, datad *d)
+{
+   if(d->name)
+      g_free(d->name);
+
+   d->name = g_strdup(name);
+   /* Update the different labels. */
+}
+
+
 /* sets the tour projection matrix, F */
 gboolean
 GGOBI(setTour2DProjectionMatrix)(gdouble *Fvalues, gint ncols, gint ndim, 
@@ -1655,3 +1667,5 @@ GGOBI(edge_menus_update)(ggobid *gg)
   }
 }
 */
+
+
