@@ -586,6 +586,7 @@ ggobid*    GGobiFromWidget (GtkWidget *w, gboolean);
 ggobid*    GGobiFromWindow (GdkWindow *w);
 ggobid*    ValidateGGobiRef (ggobid *gg, gboolean fatal);
 gdouble    calc_norm (gdouble *, gint);
+void       norm (gdouble *, gint);
 gushort    datad_colors_used_get (gint *ncolors_used, gushort *colors_used, datad *, ggobid *); 
 ggobid*    ggobi_alloc (ggobid *tmp);
 ggobid*    ggobi_get (gint);
