@@ -345,7 +345,7 @@ help.o: CmdArgHelp.c
 # as in
 CmdArgHelp.c: share/R/commandArgs.S Docs/commandArgs.xml
 ifdef USE_R_XSL
-	echo 'source("share/R/commandArgs.S") ; cat(createCmdArgHelp(getArgInfo("Docs/commandArgs.xml")), file="$@")' | $(R) --vanilla 
+	echo 'source("share/R/commandArgs.S") ; cat(createCmdArgHelp(getArgInfo("Docs/commandArgs.xml")), "\n", file="$@")' | $(R) --vanilla 
 else
 	 $(XSLT) share/XSL/CmdArgHelp.xsl Docs/commandArgs.xml > $@
 endif
