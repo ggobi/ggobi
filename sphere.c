@@ -204,8 +204,12 @@ void pca_diagnostics_set (datad *d, ggobid *gg) {
 
   if (ftmp2 != 0)
     sphere_variance_set (ftmp1/ftmp2, d, gg);
+  else
+    sphere_variance_set (-999.0, d, gg);
   if (lastpc != 0)
     sphere_condnum_set (firstpc/lastpc, gg);
+  else
+    sphere_condnum_set (-999.0, gg);
 }
 
 void
@@ -320,6 +324,7 @@ eigenvec_set (datad *d, ggobid *gg)
   for (i=0; i<nels; i++)
     for (j=0; j<nels; j++)
       eigenvec[i][j] = vc[i][j];
+
 }
 
 
@@ -350,17 +355,19 @@ sphere_varcovar_set (datad *d, ggobid *gg)
     for (i=0; i<n; i++)
       tmpf += d->tform.vals[d->rows_in_plot[i]][var];
     tform_mean[k] = tmpf / ((gfloat)n);
+  }
 
-    tmpf = 0.;
+  for (k=0; k<d->sphere.vc.ncols; k++) {
     for (j=0; j<d->sphere.vc.ncols; j++) {
+      tmpf = 0.;
       for (m=0; m<n; m++) {
         i = d->rows_in_plot[m];
         tmpf = tmpf +
-          (d->tform.vals[i][var] - tform_mean[k]) *
-          (d->tform.vals[i][j] - tform_mean[j]);
+          (d->tform.vals[i][d->sphere.vars.els[k]] - tform_mean[k]) *
+          (d->tform.vals[i][d->sphere.vars.els[j]] - tform_mean[j]);
       }
       tmpf /= ((gfloat)(n - 1));
-      d->sphere.vc.vals[k][j] = d->sphere.vc.vals[j][k] = tmpf;
+      d->sphere.vc.vals[j][k] = tmpf;
     }
   }
 }
@@ -403,7 +410,8 @@ gboolean sphere_svd (datad *d, ggobid *gg)
 {
   gint i, j, k, rank;
   gint nels = d->sphere.vars.nels;
-  gfloat **eigenvec = d->sphere.eigenvec.vals;
+  /*  gfloat **eigenvec = d->sphere.eigenvec.vals;*/
+  gfloat **eigenvec = d->sphere.vc.vals;
   gfloat *eigenval = d->sphere.eigenval.els;
 
   gboolean vc_equals_I = vc_identity_p (eigenvec, nels);
