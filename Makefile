@@ -24,7 +24,7 @@ CC = gcc
 LD=$(CXX)
 LD=$(CC)
 
-CFLAGS= -g -ansi -Wall -fpic
+CFLAGS= -g -ansi -Wall -fpic -DHAVE_CONFIG_H
 CXXFLAGS=$(CFLAGS)
 
 ifdef TEST_KEYS
@@ -151,6 +151,16 @@ efence: $(OB)
 lib: libggobi.so
 libggobi.so: $(OB)
 	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --libs` $(DL_RESOLVE_PATH)
+
+
+ggobi-API.o ggobi.o: config.h
+config.h: developerConfigure
+	./developerConfigure
+
+developerConfigure: developerConfigure.in
+	autoconf $< > $@
+	chmod +x $@
+
 
 clean: 
 	rm -f *.o ggobi libggobi.so

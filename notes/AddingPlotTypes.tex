@@ -1,0 +1,34 @@
+\documentclass{article}
+
+\begin{document}
+
+This document describes some of the issues related to introducing a
+new plot type for ggobi.  Since we have designed ggobi to be
+extensible in some sense (not in an object-oriented manner) and to be
+embedded in to other systems such as S, Python, Perl, etc.  it is
+important that the plots provide an easy and consistent API so that
+they can share common facilities and simplify the task of developers
+integrating into these other languages.
+
+\begin{description}
+\item[name] 
+\item[description]
+\item[setVariable]
+\item[multiple variables]
+\end{description}
+
+
+Please keep the user interface material in a separate file from the
+internal operations of the plot.  The GUI aspects are essentially the
+view and the control elements of the Model-View-Control
+pattern\cite{DesignPatterns}.
+
+It is important that the internals be exposed via additions to the
+ggobi API. This allows the developers of interfaces to other languages
+easily provide connections for this plot type.
+
+Use enumerations for a list of possible types,
+e.g. the \Cvariable{tsplot_arrangement}.
+
+
+\end{document}
