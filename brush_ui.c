@@ -61,7 +61,8 @@ static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)
 
 
 static gchar *point_targets_lbl[] =
-  {"Off", "Color and glyph", "Color only", "Glyph only", "Glyph size only", "Hide"};
+  {"Off", "Color and glyph", "Color only", "Glyph only",
+   "Glyph size only", "Hide"};
 static void brush_point_targets_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
@@ -71,7 +72,8 @@ static void brush_point_targets_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *edge_targets_lbl[] =
-  {"Off", "Color and line", "Color only", "Line only", "Line width only", "Hide"};
+  {"Off", "Color and line", "Color only", "Line only",
+   "Line width only", "Hide"};
 static void brush_edge_targets_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
@@ -479,31 +481,23 @@ cpanel_brush_init (cpaneld *cpanel, ggobid *gg) {
 
 void
 cpanel_brush_set (cpaneld *cpanel, ggobid *gg) {
-  GtkWidget *btn;
-  GtkWidget *mode_option_menu, *linkby_option_menu;
-  GtkWidget *edge_targets_option_menu, *point_targets_option_menu;
+  GtkWidget *w, *btn;
+  GtkWidget *pnl = gg->control_panel[BRUSH];
 
-  btn = widget_find_by_name (gg->control_panel[BRUSH],
-                             "BRUSH:brush_on_button");
+  btn = widget_find_by_name (pnl, "BRUSH:brush_on_button");
   GTK_TOGGLE_BUTTON (btn)->active = cpanel->brush_on_p;
 
-  mode_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
-    "BRUSH:mode_option_menu");
-  linkby_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
-    "BRUSH:linkby_option_menu");
-  point_targets_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
-    "BRUSH:point_targets_option_menu");
-  edge_targets_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
-    "BRUSH:edge_targets_option_menu");
+  w = widget_find_by_name (pnl, "BRUSH:mode_option_menu");
+  gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->br_mode);
 
-  gtk_option_menu_set_history (GTK_OPTION_MENU (mode_option_menu),
-                               cpanel->br_mode);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (linkby_option_menu),
-                               cpanel->br_linkby);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (point_targets_option_menu),
-                               cpanel->br_point_targets);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (edge_targets_option_menu),
-                               cpanel->br_edge_targets);
+  w = widget_find_by_name (pnl, "BRUSH:linkby_option_menu");
+  gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->br_linkby);
+
+  w = widget_find_by_name (pnl, "BRUSH:point_targets_option_menu");
+  gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->br_point_targets);
+
+  w = widget_find_by_name (pnl, "BRUSH:edge_targets_option_menu");
+  gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->br_edge_targets);
 }
 
 /*--------------------------------------------------------------------*/
