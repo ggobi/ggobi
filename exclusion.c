@@ -74,8 +74,10 @@ clusters_set (datad *d, ggobid *gg) {
    * make sure new clusters are not excluded, without changing the
    * status of pre-existing clusters.
   */
-  for (i=d->nclusters; i<nclusters; i++)
+  for (i=d->nclusters; i<nclusters; i++) {
+    d->clusv[i].hidden_p = false;
     d->clusv[i].excluded_p = false;
+  }
 
   /*
    * populate the clusv structures using the information in the

@@ -70,7 +70,7 @@ typedef struct {
 
 typedef struct {
   glong n, nshown, nhidden;
-  gboolean excluded_p;
+  gboolean hidden_p, excluded_p;
   gint glyphtype, glyphsize;
   gshort color;
 } clusterd;

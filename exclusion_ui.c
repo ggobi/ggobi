@@ -151,8 +151,8 @@ static gint hide_cluster_cb(GtkToggleButton * btn, gpointer cbd)
     }
   }
 
-  /*rows_in_plot_set(d, gg);*/
-  /*assign_points_to_bins(d, gg);*/
+  rows_in_plot_set(d, gg);
+  assign_points_to_bins(d, gg);
   clusters_set(d, gg);
 
   cluster_table_labels_update(d, gg);
@@ -202,6 +202,7 @@ static gint exclude_cluster_cb(GtkToggleButton * btn, gpointer cbd)
 
   tform_to_world(d, gg);
   displays_tailpipe(FULL, gg);
+  displays_plot(NULL, FULL, gg);
 
   return false;
 }
@@ -340,6 +341,8 @@ void cluster_add(gint k, datad * d, ggobid * gg)
 
 
   d->clusvui[k].h_btn = gtk_toggle_button_new_with_label("H");
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(d->clusvui[k].h_btn),
+    d->clusv[k].hidden_p);
   gtk_signal_connect(GTK_OBJECT(d->clusvui[k].h_btn), "toggled",
     GTK_SIGNAL_FUNC(hide_cluster_cb), GINT_TO_POINTER(k));
   GGobi_widget_set(d->clusvui[k].h_btn, gg, true);
@@ -348,30 +351,14 @@ void cluster_add(gint k, datad * d, ggobid * gg)
     1, 2, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
 
   d->clusvui[k].e_btn = gtk_toggle_button_new_with_label("E");
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(d->clusvui[k].e_btn),
+    d->clusv[k].excluded_p);
   gtk_signal_connect(GTK_OBJECT(d->clusvui[k].e_btn), "toggled",
     GTK_SIGNAL_FUNC(exclude_cluster_cb), GINT_TO_POINTER(k));
   GGobi_widget_set(d->clusvui[k].e_btn, gg, true);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
     d->clusvui[k].e_btn,
     2, 3, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
-
-/*
-  d->clusvui[k].s_btn = gtk_button_new_with_label("S");
-  gtk_signal_connect(GTK_OBJECT(d->clusvui[k].s_btn), "clicked",
-                     GTK_SIGNAL_FUNC(show_cluster_cb), GINT_TO_POINTER(k));
-  GGobi_widget_set(d->clusvui[k].s_btn, gg, true);
-  gtk_table_attach(GTK_TABLE(d->cluster_table),
-    d->clusvui[k].s_btn,
-    2, 3, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
-
-  d->clusvui[k].c_btn = gtk_button_new_with_label("C");
-  gtk_signal_connect(GTK_OBJECT(d->clusvui[k].c_btn), "clicked",
-                     GTK_SIGNAL_FUNC(comp_cluster_cb), GINT_TO_POINTER(k));
-  GGobi_widget_set(d->clusvui[k].c_btn, gg, true);
-  gtk_table_attach(GTK_TABLE(d->cluster_table),
-    d->clusvui[k].c_btn,
-    3, 4, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
-*/
 
   str = g_strdup_printf("%ld", d->clusv[k].nhidden);
   d->clusvui[k].nh_lbl = gtk_label_new(str);
@@ -401,10 +388,6 @@ void cluster_free(gint k, datad * d, ggobid * gg)
     gtk_widget_destroy(d->clusvui[k].da);
     gtk_widget_destroy(d->clusvui[k].h_btn);
     gtk_widget_destroy(d->clusvui[k].e_btn);
-/*
-    gtk_widget_destroy(d->clusvui[k].s_btn);
-    gtk_widget_destroy(d->clusvui[k].c_btn);
-*/
     gtk_widget_destroy(d->clusvui[k].nh_lbl);
     gtk_widget_destroy(d->clusvui[k].ns_lbl);
     gtk_widget_destroy(d->clusvui[k].n_lbl);
@@ -414,6 +397,15 @@ void cluster_free(gint k, datad * d, ggobid * gg)
 
 static void update_cb(GtkWidget * w, ggobid * gg)
 {
+  datad *d = datad_get_from_notebook(gg->cluster_ui.notebook, gg);
+
+  rows_in_plot_set(d, gg);
+  assign_points_to_bins(d, gg);
+  clusters_set(d, gg);
+
+  cluster_table_labels_update(d, gg);
+  displays_plot(NULL, FULL, gg);
+
   cluster_window_open(gg);
 }
 
@@ -462,8 +454,6 @@ void cluster_table_update (datad * d, ggobid * gg)
 static gint
 exclusion_notebook_adddata_cb (ggobid *gg, datad * d, void* notebook)
 {
-  /*cluster_table_update(d, gg);*/
-
   cluster_window_open (gg);
   return true;  /* risky -- will this prevent other guys from getting it?  --*/
 }
@@ -560,7 +550,7 @@ void cluster_window_open(ggobid * gg)
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-      "Exclude all cases with the corresponding symbol",
+      "Exclude all hidden cases with the corresponding symbol",
       NULL);
     lbl = gtk_label_new("Exclude");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
@@ -639,7 +629,7 @@ void cluster_window_open(ggobid * gg)
   /*-- Update button --*/
   btn = gtk_button_new_with_label("Update");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-    "This table should stay up to date by itself, but this will reset it in case it doesn't do that.",
+    "Reset plots after brushing so that hidden and excluded status is consistent with this table; reset this table if necessary.",
     NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
     GTK_SIGNAL_FUNC(update_cb), (gpointer) gg);
