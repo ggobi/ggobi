@@ -139,7 +139,6 @@ gboolean
 PrintAsSVG(PrintOptions *options, PrintInfo *info, void *userData)
 {
  extern void display_write_svg (ggobid *gg);
- displayd *dpy = info->dpy;
 
   display_write_svg(info->ggobi);
 
