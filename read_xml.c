@@ -952,9 +952,13 @@ setColorMap(const CHAR **attrs, XMLParserData *data)
   if(file) {
     data->gg->ncolors +=  size;
     data->gg->default_color_table = (GdkColor *) g_realloc (data->gg->default_color_table , data->gg->ncolors * sizeof (GdkColor));
+    data->gg->colorNames = (gchar **) g_realloc (data->gg->colorNames, data->gg->ncolors * sizeof (gchar *));
+    memset(data->gg->colorNames + (data->gg->ncolors-size), '\0', size*sizeof(gchar *));
   } else {
     data->gg->ncolors = size;
     data->gg->default_color_table = (GdkColor *) g_malloc (size * sizeof (GdkColor));
+    data->gg->colorNames = (gchar **) g_malloc (size * sizeof (gchar *));
+    memset(data->gg->colorNames, '\0', size * sizeof (gchar *));
   }
  }
 
@@ -1005,6 +1009,10 @@ setColormapEntry(const CHAR **attrs, XMLParserData *data)
     ok = false;
     break;
   }
+ }
+
+ if(which > -1 && which < data->gg->ncolors && (tmp = getAttribute(attrs, "name") ) ) {
+    data->gg->colorNames[which] = g_strdup(tmp);
  }
 
  if(ok) {
