@@ -3,20 +3,32 @@ Bugs:
   Set the brush to any region  (manually) and then reduce the
    size of the window.  Note that the brush size stays
    fixed and is not scaled and points enter the region but are
-   not "brushed."  dfs -- haven't been able to replicate this.
+   not "brushed."
 
   is adding and removing plots in scatmat still problematic?
 
   reading in new data works surprisingly -- adding rather than replacing
 
-In progress, needing design discussions:
-  should variable limits be disabled for transformed variables?
-  deleting variables: how should plots behave? (disabled for now)
-  line editing -- line drawing -- graphs   
-  Options on options menu
-
 sphere data into new variables instead of overwriting
   the existing values -- that will test cloning!
+
+In progress, needing design discussions:
+  Should variable limits be disabled for transformed variables?
+  Deleting variables: how should plots behave? (disabled for now)
+
+various stuff not yet implemented:
+  Options on options menu
+  show/hide missings button 
+  some window closings  (display tree, ...)
+  "row groups" are only partially implemented
+  1d, xy cycling  .... or run as a demo in R for now? (disabled for now)
+
+Graphs
+  Edges with data: a separate region of the variable selection panel
+  Let other line functionality wait until graphs are designed:
+    line type brushing
+    line editing
+    line groups
 
 API code needed:
   sticky labels
@@ -52,12 +64,6 @@ Tour:
   correlation tour
   history controls
 
-various stuff not yet implemented:
-  1d, xy cycling  .... or run as a demo in R for now?
-  I still want a show/hide missings button somewhere
-  some window closings  (display tree, ...)
-  "row groups" are only partially implemented; line groups
-    will wait until we know what we want to do about lines.
 
 display_tree doesn't update itself when splots change
 
@@ -72,13 +78,6 @@ Scaling:
 
 Smoothing -- to take advantage of the R loess code
   wait until we think about decoration?
-
-Graphs
-  Edges with data: a separate region of the variable selection panel
-  Let other line functionality wait until graphs are designed:
-    line groups
-    line type brushing
-    line editing
 
 Food for thought:
   * Use a set of decoration arrays (points and lines) instead of nlinkable
