@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <gtk/gtk.h>
 #include "vars.h"
@@ -307,15 +308,59 @@ pt_plane_to_world (splotd *sp, gcoords *planar, greal *world)
 { 
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
+  gint j, var;
 
-  if (cpanel->projection == P1PLOT) {
-    if (display->p1d_orientation == VERTICAL)
-      world[0] = planar->y;
-    else
-      world[0] = planar->x;
-  } else {
-    world[0] = planar->x;
-    world[1] = planar->y;
+  switch (cpanel->projection) {
+    case P1PLOT:
+      if (display->p1d_orientation == VERTICAL)
+        world[sp->p1dvar] = planar->y;
+      else
+        world[sp->p1dvar] = planar->x;
+    break;
+    case XYPLOT:
+      world[sp->xyvars.x] = planar->x;
+      world[sp->xyvars.y] = planar->y;
+    break;
+    case TOUR1D:
+    /*if (!gg->is_pp) {*/
+      for (j=0; j<display->t1d.nactive; j++) {
+        var = display->t1d.active_vars.els[j];
+        world[var] += (planar->x * (greal) display->t1d.F.vals[0][var]);
+      }
+    /*}*/
+    break;
+    case TOUR2D3:
+      for (j=0; j<display->t2d3.nactive; j++) {
+        var = display->t2d3.active_vars.els[j];
+        world[var] += 
+         (planar->x * (greal) display->t2d3.F.vals[0][var] +
+          planar->y * (greal) display->t2d3.F.vals[1][var]);
+      }
+	break;
+    case TOUR2D:
+    /*if (!gg->is_pp) {*/
+        for (j=0; j<display->t2d.nactive; j++) {
+          var = display->t2d.active_vars.els[j];
+          world[var] += 
+           (planar->x * (greal) display->t2d.F.vals[0][var] +
+            planar->y * (greal) display->t2d.F.vals[1][var]);
+        }
+    /*}*/
+    break;
+    case COTOUR:
+    /*if (!gg->is_pp) {*/
+      for (j=0; j<display->tcorr1.nactive; j++) {
+        var = display->tcorr1.active_vars.els[j];
+        world[var] += (planar->x * (greal) display->tcorr1.F.vals[0][var]);
+      }
+      for (j=0; j<display->tcorr2.nactive; j++) {
+        var = display->tcorr2.active_vars.els[j];
+        world[var] += (planar->y * (greal) display->tcorr2.F.vals[0][var]);
+      }
+    /*}*/
+    break;
+    default:
+      g_printerr ("reverse pipeline not yet implemented for this projection\n");
   }
 }
 
@@ -356,25 +401,3 @@ pt_screen_to_raw (icoords *screen, greal *raw,
 
   g_free (world);
 }
-
-/*
-
-void
-splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
-  gboolean horiz, gboolean vert)
-{ ...
-
-Just let the current planar value be 0 and then run the same code.
-
-  if (horiz) {
-    sp->screen[pt].x -= sp->max.x/2;
-
-    prev_planar.x = sp->planar[pt].x;
-    sp->planar[pt].x = (greal) sp->screen[pt].x * precis / sp->iscale.x ;
-    sp->planar[pt].x += (greal) sp->pmid.x;
-
-    eps->x = sp->planar[pt].x - prev_planar.x;
-  }
-
-
-*/
