@@ -202,7 +202,7 @@ ga_orphans_hide_cb (GtkWidget *btn, PluginInstance *inst)
       /*-- no need for b, because i = b --*/
       if (e->sampled.els[edgeid] && !e->excluded.els[edgeid] &&
           !e->hidden.els[edgeid] &&
-          !d->excluded.els[a] && !d->excluded.els[i])
+          !d->excluded.els[a] && !d->hidden.els[a] && !d->excluded.els[i])
       {
         included = true;
         break;
@@ -215,7 +215,7 @@ ga_orphans_hide_cb (GtkWidget *btn, PluginInstance *inst)
         /*-- no need for a, because i = a --*/
         if (e->sampled.els[edgeid] && !e->excluded.els[edgeid] &&
             !e->hidden.els[edgeid] &&
-            !d->excluded.els[b] && !d->excluded.els[i])
+            !d->excluded.els[b] && !d->hidden.els[b] && !d->excluded.els[i])
         {
           included = true;
           break;
