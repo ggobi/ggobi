@@ -152,7 +152,7 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
   if (nvars == 0) {
     nplots = MIN (d->ncols, sessionOptions->info->numParCoordsVars);
     if(nplots < 0) {
-	nplots = d->ncols;
+      nplots = d->ncols;
     }
     for (i=0; i<nplots; i++)
       vars[i] = i;
@@ -284,7 +284,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
 
   if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
       gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-			     false, false, false);
+        false, false, false);
 
   splot_get_dimensions (sp, &width, &height);
 
@@ -416,7 +416,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
 
   if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
       gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-			     true, true, false);
+       true, true, false);
 
   return redraw;
 }
