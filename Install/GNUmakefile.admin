@@ -132,5 +132,4 @@ copyPlugins:
 	   $(MAKE) ADMIN=1 -C plugins/$$f createDist INSTALL_DIR=$(TMP_INSTALL_DIR)/plugins ; \
 	done
 	cp plugins/GNUmakefile.plugin $(TMP_INSTALL_DIR)/plugins
-	cp Install/plugin.in $(TMP_INSTALL_DIR)/bin
-	chmod +x  $(TMP_INSTALL_DIR)/bin/plugin.in
+	cp Install/plugin.in $(TMP_INSTALL_DIR)/share/tools
