@@ -79,6 +79,9 @@ addvar_propagate (gint ncols_prev, gint ncols, datad *d, ggobid *gg)
   /*-- make sure the right toggle widgets and circles are showing --*/
   varpanel_refresh (gg->current_display, gg);
   varcircles_visibility_set (gg->current_display, gg);
+
+  /*-- in case some datad now have variables and it didn't before --*/
+  display_menu_build (gg);
 }
 
 

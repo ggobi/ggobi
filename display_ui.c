@@ -41,10 +41,6 @@ display_set_position (windowDisplayd *display, ggobid *gg)
 }
 
 
-
-
-
-
 void
 display_menu_build (ggobid *gg)
 {
@@ -63,7 +59,7 @@ display_menu_build (ggobid *gg)
   if (nd > 0) {
     gg->display_menu = gtk_menu_new ();
 
-    if(g_slist_length(ExtendedDisplayTypes)) {
+    if (g_slist_length(ExtendedDisplayTypes)) {
        buildExtendedDisplayMenu(gg, nd, d0);
     }
   }
@@ -150,7 +146,7 @@ buildExtendedDisplayMenu(ggobid *gg, gint nd, datad *d0)
   gint k;
   ExtendedDisplayCreateData *cbdata;
 
-  while(el) {
+  while (el) {
     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS((GtkObjectClass *) el->data);
     desc = klass->titleLabel;
     sprintf(label, "New %s", desc);
@@ -170,7 +166,8 @@ buildExtendedDisplayMenu(ggobid *gg, gint nd, datad *d0)
       anchor = CreateMenuItem (gg->display_menu, label,
          NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
 
-      for (k=0; k < nd; k++) { 
+      k = 0;
+      for (k=0; k < g_slist_length(gg->d); k++) {
         datad *d = (datad*) g_slist_nth_data (gg->d, k);
 
         /*-- add an item for each datad with variables --*/
