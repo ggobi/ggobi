@@ -1430,7 +1430,7 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
   klass->parent_class.varpanel_tooltips_set = varpanelTooltipsReset;
   klass->parent_class.plotted_vars_get = plottedVarsGet;
 
-  klass->parent_class.titleLabel = "scatterplot display";
+  klass->parent_class.titleLabel = "Scatterplot Display";
   klass->parent_class.treeLabel = "Scatterplot";
   klass->parent_class.ruler_ranges_set = ruler_ranges_set;
   klass->parent_class.xml_describe = add_xml_scatterplot_variables;

@@ -341,7 +341,7 @@ parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass)
 
   klass->parent_class.loop_over_points = true;
 
-  klass->parent_class.titleLabel = "parallel coordinates display";
+  klass->parent_class.titleLabel = "Parallel Coordinates Display";
   klass->parent_class.treeLabel = "Parallel Coordinates";
 
   /* No create method, just createWIthVars. */
