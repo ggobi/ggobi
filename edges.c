@@ -74,7 +74,7 @@ gboolean edge_add(gint a, gint b, datad * d, datad * e)
 
 /**
   This sets the data set as the source of the edge information
-  for all the plots withing the display.
+  for all the plots within the display.
  */
 datad *setDisplayEdge(displayd * dpy, datad * e)
 {
