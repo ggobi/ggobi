@@ -9,6 +9,9 @@
 #include "vars.h"
 #include "externs.h"
 
+extern void sgenrand (gulong);
+extern double genrand (void);
+
 #if defined (_WIN32)
 #include <sys/stat.h> 
 #else
@@ -36,6 +39,8 @@ init_random_seed () {
   srand ((gint) time ((glong *) 0));
 #elif defined (USE_RANDOM)
   srandom ((gint) time ((glong *) 0));
+#elif defined (MERSENNETWISTER)
+  sgenrand ((glong) time ((glong *) 0));
 #else
   srand48 ((glong) time ((glong *) 0));
 #endif
@@ -47,13 +52,15 @@ randvalue (void) {
 
 #if defined (_WIN32)
   gint rval = rand ();
-  drand = ((double) rval / RAND_MAX);
+  drand = ((gdouble) rval / RAND_MAX);
 #elif defined (USE_RANDOM)
   /* random () returns a value on [0, (2**31)-1], or [0, INT_MAX] */
   glong lrand = (glong) random ();
   drand = (gdouble) lrand / (gdouble) INT_MAX;
+#elif defined (MERSENNETWISTER)
+  drand = genrand ();
 #else
-  drand = drand48();    /* rrand on [0.0,1.0] */
+  drand = drand48 ();    /* rrand on [0.0,1.0] */
 #endif
 
   return drand;
@@ -179,7 +186,7 @@ glyphIDfromName (gchar *glyphName) {
 
 gint
 glyphNames (gchar **names) {
-  unsigned int i;
+  guint i;
   static gchar* gnames[] =
     {"plus", "x", "openrectangle",  "filledrectangle", "opencircle",
     "filledcircle", "point"};

@@ -1,6 +1,5 @@
 ggobi:
 
-
 EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 
 include local.config
@@ -18,7 +17,7 @@ LDFLAGS=
 #DEPENDS_FLAG=-MM
 
 SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
- utils.c array.c vector.c \
+ utils.c utils_ui.c utils_gdk.c array.c vector.c mt19937-1.c \
  read_array.c read_data.c io.c writedata_ui.c writedata.c \
  pipeline.c missing.c \
  scatterplot.c scatterplot_ui.c \
@@ -46,8 +45,8 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  ggobi-API.c 
 #vdialog_ui.c \
 
-OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
- utils_ui.o utils.o utils_gdk.o \
+OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
+ utils.o utils_ui.o utils_gdk.o array.o vector.o mt19937-1.o \
  read_array.o read_data.o io.o writedata_ui.o writedata.o \
  pipeline.o missing.o \
  scatterplot.o scatterplot_ui.o \
