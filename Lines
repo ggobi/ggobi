@@ -134,6 +134,7 @@
 2002
 
 58056   1/15  signal handlers, improvements in tour code, ...
+58519   3/6   missings become a new datad; rulers are now responsive, ...
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.
