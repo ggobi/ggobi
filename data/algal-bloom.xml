@@ -3,7 +3,7 @@
 
 <ggobidata count="4">
 
-<data name="Algal Bloom: Experimental Conditions">
+<data name="Algal Bloom: Exp Conditions">
 <description>
 </description>
 <variables count="8">
@@ -54,7 +54,7 @@
 </records>
 </data>
 
-<data name="Algal Bloom: Measurements">
+<data name="Measurements">
 <description>
 </description>
 <variables count="6">
@@ -159,8 +159,8 @@
 </records>
 </data>
 
-<data name="Lines for Experimental Conditions">
-<records count=12>
+<data name="Lines for Exp Cond">
+<records count="12">
  <record source="101" destination="102"> </record>
  <record source="101" destination="103"> </record>
  <record source="101" destination="105"> </record>
@@ -176,7 +176,7 @@
 </records>
 </data>
 
-<data name="Lines for Measurements">
+<data name="Lines for Meas">
 <records count="92">
  <record source="1" destination="9"> </record>
  <record source="1" destination="17"> </record>
