@@ -137,8 +137,16 @@ void barchartDisplaySet(displayd * dpy, ggobid * gg)
 static void barchartDestroy(GtkObject *obj)
 {
   barchartSPlotd * sp;
+  GtkObjectClass *klass;
+
+#ifdef GTK_2_0
+  klass = g_type_class_peek_parent(GTK_GGOBI_EXTENDED_SPLOT_CLASS(obj));
+#else
+  klass = gtk_type_parent_class(GTK_TYPE_GGOBI_EXTENDED_SPLOT);
+#endif
 
   sp = GTK_GGOBI_BARCHART_SPLOT(obj);
+
   if(sp && sp->bar) {
 	  GtkObjectClass *klass;
                 /* Goal here is to get the class object for the parent
@@ -160,6 +168,7 @@ static void barchartDestroy(GtkObject *obj)
 
 	  klass->destroy(GTK_OBJECT(sp)); 
   }
+
 }
 
 
