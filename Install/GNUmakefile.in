@@ -1,6 +1,7 @@
 # This is placed in the top-level directory
 # of the ggobi suite and is a convenience
-# for 
+# for accessing the different sub-parts of the 
+# source base.
 
 TOP=@TOP@
 INSTALL_DIR=@INSTALL_DIR@
@@ -16,7 +17,7 @@ include Makeconf
 
 GTK_EXT=lib/libgtkext.@SHLIB_EXT@
 
-all: $(GTK_EXT) bin/ggobi.bin @EMBED@ $(UTILS) @PACKAGES@ Plugins
+all: $(GTK_EXT) bin/ggobi.bin @EMBED_LIB@ $(UTILS) @PACKAGES@ buildPlugins
 
 .PHONY:	lib Rggobi Pythonggobi Perlggobi
 
@@ -33,18 +34,44 @@ lib/libggobi.@SHLIB_EXT@ lib: $(GTK_EXT)
 bin/xmlConvert:
 	$(MAKE) -C src ../bin/xmlConvert
 
+include Plugins
+
 HEADER_FILES=$(wildcard include/*.h) 
 
-# Should use install command.
-install: bin/ggobi.bin
+install: all bin/ggobi.bin ggobirc
 	if test -n "${EMBED_LIB}" ; then  \
 	  $(INSTALL) $(INSTALL_FLAGS) $(EMBED_LIB) $(libdir) ;\
 	fi
+	-mkdir $(ggobi_install_home)
+	$(INSTALL) -d $(ggobi_install_home)/data
+	$(INSTALL) data/* $(ggobi_install_home)/data
+	$(INSTALL) ggobirc $(ggobi_install_home)/
+	$(INSTALL) -d $(ggobi_install_home)/bin
+	$(INSTALL) bin/setLD.bsh $(ggobi_install_home)/bin
+	$(INSTALL) bin/ggobi.bin $(ggobi_install_home)/bin
+	$(INSTALL) -d $(ggobi_install_home)/lib
+	$(INSTALL) lib/* $(ggobi_install_home)/lib
 	$(INSTALL) bin/ggobi-config $(bindir)
 	$(INSTALL) bin/ggobi $(bindir)
 	if ! test -d $(includedir) ; then $(INSTALL) -d $(includedir) ; fi
 	$(INSTALL) $(INSTALL_FLAGS) $(HEADER_FILES) $(includedir)
+	$(INSTALL) -d $(ggobi_install_home)/plugins
+	$(MAKE) installPlugins
 
+#	for i in $(PLUGIN_DIRS) ; do \
+#	    cd plugins/$$i ; make install ggobi_install_home=$(ggobi_install_home) ; \
+#	done
+
+
+ggobirc: Plugins
+	echo "<ggobirc>" > $@
+	echo "<plugins>" >> $@ 
+	for i in $(PLUGIN_DIRS) ; do \
+	  echo "" >> $@ ; \
+	  cat plugins/$$i/plugin.xml >> $@ ; \
+	done
+	echo "</plugins>" >> $@ 
+	echo "</ggobirc>" >> $@
 
 Rggobi: @EMBED_LIB@
 	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)
@@ -58,20 +85,28 @@ Python: @EMBED_LIB@
 
 GGOBI_HOME=$(shell pwd)
 
-include Plugins
 
 
 ifneq (${PLUGIN_DIRS},)
-Plugins:  @EMBED_LIB@
-	if test -n "${PLUGIN_DIRS}" ; then \
+buildPlugins:  @EMBED_LIB@
 	  for f in $(PLUGIN_DIRS) ; do \
 	    echo "Building plugin $$f" ; \
-	    export GGOBI_HOME ; ./share/tools/plugin $$f ; \
+	    export GGOBI_HOME ; $(GGOBI_HOME)/share/tools/plugin $$f ; \
 	  done \
-	fi 
+
+installPlugins:
+	for f in ${PLUGIN_DIRS} ; do \
+	  export GGOBI_HOME ; $(GGOBI_HOME)/share/tools/plugin --install=$(ggobi_install_home) $$f ; \
+	done
+
 else
-Plugins:
+
+buildPlugins:
 	@echo "No ggobi plugins configured for building"
+
+installPlugins:
+	@echo "No plugins to install"
+
 endif
 
 clean:

@@ -16,6 +16,8 @@ VERBOSE=0
 
 STANDARD_PLUGIN_MAKEFILE="-f ${GGOBI_HOME}/plugins/GNUmakefile.plugin"
 
+INSTALL_DIR=/usr/local/ggobi
+
 while test "$1" != "" ; do
  case "$1" in 
  --objects) TARGET="objects" ; shift ;;
@@ -23,6 +25,8 @@ while test "$1" != "" ; do
  --no-std) STANDARD_PLUGIN_MAKEFILE="" ; shift ;;
  --plugin) PLUGIN=`echo $1 | sed -e s/.*=//g` ; shift ;; 
  --verbose) VERBOSE=1 ; shift;;
+ --install) INSTALL=1 ; shift;;
+ --install=*) INSTALL=1; INSTALL_DIR=`echo $1 | sed -e s/.*=//g` ; shift ;; 
  *)  if test -z "${PLUGIN}" ; then
        PLUGIN=${1-TestPlugin}
      else 
@@ -32,6 +36,15 @@ while test "$1" != "" ; do
      
  esac
 done
+
+if test -n "${INSTALL}" ; then
+ TARGET=install
+else
+if test -z "${TARGET}" ; then
+ TARGET=${PLUGIN}.so
+fi
+
+fi # end of test -n "${INSTALL}"
 
 plugin_dir=$GGOBI_HOME/plugins/$PLUGIN
 
@@ -47,9 +60,7 @@ else
  fi
 fi
 
-if test -z "${TARGET}" ; then
- TARGET=${PLUGIN}.so
-fi
+ARGS="${ARGS} PLUGIN_NAME=${PLUGIN}"
 
 if test "${VERBOSE}" != "0" ; then
   echo "$MAKE ${MAKE_VARS} ${STANDARD_PLUGIN_MAKEFILE} -C $plugin_dir ${TARGET} $ARGS"

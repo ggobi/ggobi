@@ -3,5 +3,16 @@ AC_INIT(glayout.c)
 AC_PATH_PROG(GTK_CONFIG, gtk-config)
 AC_SUBST(GTK_CONFIG)
 
+AC_PATH_PROG(DONEATO_CONFIG, dotneato-config)
+
+GRAPHVIZ=
+if test -n "${DOTNEATO_CONFIG}" ; then
+ GRAPHVIZ="1"
+fi
+
+AC_SUBST(GRAPHVIZ)
+AC_SUBST(DOTNEATO_CONFIG)
+
+
 AC_OUTPUT(local.config)
 

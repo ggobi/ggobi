@@ -24,7 +24,6 @@ fi
 
 PLUGIN_DIRS=""
 
-GGOBI_HOME=`pwd` 
 
 AC_ARG_ENABLE(embed, [--enable-embed          Build the ggobi library for embedding in other applications (e.g. R) (yes)])
 
@@ -450,8 +449,17 @@ AC_SUBST(XML_INC_DIRS)
 AC_SUBST(XML_LIB_DIRS)
 AC_SUBST(XML_LIB_DIRS_PATH)
 
+echo "Prefix: $prefix"
+if test "$prefix" = "NONE" ; then
+ prefix=/usr/local
+fi
+
+GGOBI_HOME=`pwd`/
+GGOBI_INSTALL_HOME=$prefix/ggobi/
+echo "Install home: $GGOBI_INSTALL_HOME"
 
 AC_SUBST(GGOBI_HOME)
+AC_SUBST(GGOBI_INSTALL_HOME)
 
 AC_SUBST(INSTALL_DIR)
 
@@ -525,9 +533,9 @@ echo "Plugin directories: $PLUGIN_DIRS"
 # PLUGIN_DIRS="ImageLib MySQL Postgres DataViewer FileSelect GraphLayout ggvis Perl R JVM"
 fi
 
-if test -n "${PLUGIN_DIRS}" ; then
- PLUGIN_DIRS="${PLUGIN_DIRS} TestPlugin TestInput"
-fi
+dnl if test -n "${PLUGIN_DIRS}" ; then
+dnl    PLUGIN_DIRS="${PLUGIN_DIRS}  TestPlugin TestInput"
+dnl fi
 AC_SUBST(PLUGIN_DIRS)
 
 if test -n "$MYSQL_PLUGIN" ; then 
@@ -566,13 +574,13 @@ else
  ggvis_xml=/dev/null
 fi
 
-if test -n "${PLUGIN_DIRS}" ; then
- testInput_xml=plugins/TestInput/plugin.xml
- testPlugin_xml=plugins/TestPlugin/plugin.xml
-else
- testInput_xml=/dev/null
- testPlugin_xml=/dev/null
-fi
+testInput_xml=/dev/null
+testPlugin_xml=/dev/null
+
+dnl if test -n "${PLUGIN_DIRS}" ; then
+dnl  testInput_xml=plugins/TestInput/plugin.xml
+dnl  testPlugin_xml=plugins/TestPlugin/plugin.xml
+dnl fi
 
 AC_SUBST_FILE(mysql_xml)
 AC_SUBST_FILE(postgres_xml)
@@ -597,11 +605,6 @@ AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.
 
 cp src/config.h include/GGobiConfig.h
 
-dnl Ensure the resulting ggobi scripts executable.
-chmod +x bin/ggobi
-chmod +x bin/ggobi-config
-chmod +x share/tools/plugin
-
 if test -n "${PLUGIN_DIRS}" ; then
  echo "Enabling plugins"
  export GGOBI_ROOT
@@ -610,18 +613,46 @@ dnl
 dnl AC_CONFIG_SUBDIRS($PLUGIN_DIRS)
 dnl might do the same thing. 
 
+INSTALLABLE_PLUGINS=""
  for p in ${PLUGIN_DIRS} ; do 
    echo
    echo "Configuring plugin $p"
+   
    if test -x plugins/$p/configure ; then
-      (cd plugins/$p ; ./configure)
+      cd plugins/$p 
+      ./configure
+      ok=$? 
+      cd ../..
+   else
+      ok="0"
    fi
-   echo "Configured plugin $p"
+   if test "${ok}" = "0" ; then
+     echo "Configured plugin $p"
+     INSTALLABLE_PLUGINS="${INSTALLABLE_PLUGINS} $p"
+   else
+     echo "Failed to configure plugin $p ($ok)"
+   fi
+
    echo
+
  done 
+
+ PLUGIN_DIRS=$INSTALLABLE_PLUGINS
+ echo "Installable plugins: $PLUGIN_DIRS"
+
 fi
 
+
+dnl Doing this here seems to generate all of the files again.
+dnl Want to just write out this one.
 AC_OUTPUT(Plugins)
+
+dnl Ensure the resulting ggobi scripts executable.
+chmod +x bin/ggobi
+chmod +x bin/ggobi-config
+chmod +x share/tools/plugin
+
+
 
 echo "*******************************"
 echo ""
@@ -632,3 +663,4 @@ echo " XML:                    version ${XML_VERSION}"
 echo " Plugins:                ${PLUGIN_DIRS}"
 echo ""
 echo "*******************************"
+

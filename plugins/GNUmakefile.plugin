@@ -51,6 +51,15 @@ GTK_CFLAGS=$(shell $(GTK_CONFIG) --cflags)
 objects: 
 	@echo "$(OBJS)"
 
+
+install:
+	@echo "I would be installing now into $(ggobi_install_home)"
+	if test ! -d $(ggobi_install_home)/plugins ; then mkdir $(ggobi_install_home)/plugins ; fi
+	if test ! -d $(ggobi_install_home)/plugins/${PLUGIN_NAME} ; then mkdir $(ggobi_install_home)/plugins/${PLUGIN_NAME} ; fi
+	cp plugin.xml $(PLUGIN_NAME).$(DLL_EXT) $(ggobi_install_home)/plugins/${PLUGIN_NAME}/
+
+# Docs and support files, e.g. R, Python, Perl files.
+
 distclean: clean
 	rm config.cache config.log $(PKG).so
 
