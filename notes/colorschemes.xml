@@ -202,7 +202,7 @@
   <red>0.8706</red><green>0.9216</green><blue>0.9686</blue>
  </color>
  <color name="F">
-  <red>0.6118</red><green>0.7804</green><blue>0.8706</blue>
+  <red>0.6196</red><green>0.7922</green><blue>0.8824</blue>
  </color>
  <color name="I">
   <red>0.1922</red><green>0.5098</green><blue>0.7412</blue>
@@ -286,7 +286,7 @@
   <red>0.7765</red><green>0.8588</green><blue>0.9373</blue>
  </color>
  <color name="F">
-  <red>0.6118</red><green>0.7804</green><blue>0.8706</blue>
+  <red>0.6196</red><green>0.7922</green><blue>0.8824</blue>
  </color>
  <color name="G">
   <red>0.4196</red><green>0.6824</green><blue>0.8392</blue>
@@ -319,7 +319,7 @@
   <red>0.7765</red><green>0.8588</green><blue>0.9373</blue>
  </color>
  <color name="F">
-  <red>0.6118</red><green>0.7804</green><blue>0.8706</blue>
+  <red>0.6196</red><green>0.7922</green><blue>0.8824</blue>
  </color>
  <color name="G">
   <red>0.4196</red><green>0.6824</green><blue>0.8392</blue>
@@ -358,7 +358,7 @@
   <red>0.7765</red><green>0.8588</green><blue>0.9373</blue>
  </color>
  <color name="F">
-  <red>0.6118</red><green>0.7804</green><blue>0.8706</blue>
+  <red>0.6196</red><green>0.7922</green><blue>0.8824</blue>
  </color>
  <color name="G">
   <red>0.4196</red><green>0.6824</green><blue>0.8392</blue>
@@ -397,7 +397,7 @@
   <red>0.7765</red><green>0.8588</green><blue>0.9373</blue>
  </color>
  <color name="F">
-  <red>0.6118</red><green>0.7804</green><blue>0.8706</blue>
+  <red>0.6196</red><green>0.7922</green><blue>0.8824</blue>
  </color>
  <color name="G">
   <red>0.4196</red><green>0.6824</green><blue>0.8392</blue>
@@ -757,7 +757,7 @@
   <red>0.8980</red><green>0.9608</green><blue>0.9765</blue>
  </color>
  <color name="F">
-  <red>0.6000</red><green>0.8471</green><blue>0.8118</blue>
+  <red>0.6000</red><green>0.8471</green><blue>0.7882</blue>
  </color>
  <color name="I">
   <red>0.1725</red><green>0.6353</green><blue>0.3725</blue>
@@ -838,10 +838,10 @@
   <red>0.9294</red><green>0.9725</green><blue>0.9843</blue>
  </color>
  <color name="D">
-  <red>0.8000</red><green>0.9255</green><blue>0.9255</blue>
+  <red>0.8000</red><green>0.9255</green><blue>0.9020</blue>
  </color>
  <color name="F">
-  <red>0.6000</red><green>0.8471</green><blue>0.8118</blue>
+  <red>0.6000</red><green>0.8471</green><blue>0.7882</blue>
  </color>
  <color name="G">
   <red>0.4000</red><green>0.7608</green><blue>0.6431</blue>
@@ -871,10 +871,10 @@
   <red>0.9294</red><green>0.9725</green><blue>0.9843</blue>
  </color>
  <color name="D">
-  <red>0.8000</red><green>0.9255</green><blue>0.9255</blue>
+  <red>0.8000</red><green>0.9255</green><blue>0.9020</blue>
  </color>
  <color name="F">
-  <red>0.6000</red><green>0.8471</green><blue>0.8118</blue>
+  <red>0.6000</red><green>0.8471</green><blue>0.7882</blue>
  </color>
  <color name="G">
   <red>0.4000</red><green>0.7608</green><blue>0.6431</blue>
@@ -910,10 +910,10 @@
   <red>0.8980</red><green>0.9608</green><blue>0.9765</blue>
  </color>
  <color name="D">
-  <red>0.8000</red><green>0.9255</green><blue>0.9255</blue>
+  <red>0.8000</red><green>0.9255</green><blue>0.9020</blue>
  </color>
  <color name="F">
-  <red>0.6000</red><green>0.8471</green><blue>0.8118</blue>
+  <red>0.6000</red><green>0.8471</green><blue>0.7882</blue>
  </color>
  <color name="G">
   <red>0.4000</red><green>0.7608</green><blue>0.6431</blue>
@@ -949,10 +949,10 @@
   <red>0.8980</red><green>0.9608</green><blue>0.9765</blue>
  </color>
  <color name="D">
-  <red>0.8000</red><green>0.9255</green><blue>0.9255</blue>
+  <red>0.8000</red><green>0.9255</green><blue>0.9020</blue>
  </color>
  <color name="F">
-  <red>0.6000</red><green>0.8471</green><blue>0.8118</blue>
+  <red>0.6000</red><green>0.8471</green><blue>0.7882</blue>
  </color>
  <color name="G">
   <red>0.4000</red><green>0.7608</green><blue>0.6431</blue>
@@ -991,7 +991,7 @@
   <red>0.6196</red><green>0.7373</green><blue>0.8549</blue>
  </color>
  <color name="I">
-  <red>0.5804</red><green>0.4196</green><blue>0.6941</blue>
+  <red>0.5333</red><green>0.3373</green><blue>0.6549</blue>
  </color>
 </foreground>
 <background>
@@ -1015,10 +1015,10 @@
   <red>0.7020</red><green>0.8039</green><blue>0.8902</blue>
  </color>
  <color name="G">
-  <red>0.5529</red><green>0.6275</green><blue>0.7961</blue>
+  <red>0.5490</red><green>0.5882</green><blue>0.7765</blue>
  </color>
  <color name="J">
-  <red>0.5529</red><green>0.2980</green><blue>0.6353</blue>
+  <red>0.5333</red><green>0.2549</green><blue>0.6157</blue>
  </color>
 </foreground>
 <background>
@@ -1042,13 +1042,13 @@
   <red>0.7020</red><green>0.8039</green><blue>0.8902</blue>
  </color>
  <color name="G">
-  <red>0.5529</red><green>0.6275</green><blue>0.7961</blue>
+  <red>0.5490</red><green>0.5882</green><blue>0.7765</blue>
  </color>
  <color name="I">
-  <red>0.5804</red><green>0.4196</green><blue>0.6941</blue>
+  <red>0.5333</red><green>0.3373</green><blue>0.6549</blue>
  </color>
  <color name="K">
-  <red>0.4549</red><green>0.0039</green><blue>0.4431</blue>
+  <red>0.5059</red><green>0.0588</green><blue>0.4863</blue>
  </color>
 </foreground>
 <background>
@@ -1075,13 +1075,13 @@
   <red>0.6196</red><green>0.7373</green><blue>0.8549</blue>
  </color>
  <color name="G">
-  <red>0.5529</red><green>0.6275</green><blue>0.7961</blue>
+  <red>0.5490</red><green>0.5882</green><blue>0.7765</blue>
  </color>
  <color name="I">
-  <red>0.5804</red><green>0.4196</green><blue>0.6941</blue>
+  <red>0.5333</red><green>0.3373</green><blue>0.6549</blue>
  </color>
  <color name="K">
-  <red>0.4549</red><green>0.0039</green><blue>0.4431</blue>
+  <red>0.5059</red><green>0.0588</green><blue>0.4863</blue>
  </color>
 </foreground>
 <background>
@@ -1108,13 +1108,13 @@
   <red>0.6196</red><green>0.7373</green><blue>0.8549</blue>
  </color>
  <color name="G">
-  <red>0.5529</red><green>0.6275</green><blue>0.7961</blue>
+  <red>0.5490</red><green>0.5882</green><blue>0.7765</blue>
  </color>
  <color name="H">
-  <red>0.5686</red><green>0.4824</green><blue>0.7255</blue>
+  <red>0.5490</red><green>0.4196</green><blue>0.6941</blue>
  </color>
  <color name="J">
-  <red>0.5529</red><green>0.2980</green><blue>0.6353</blue>
+  <red>0.5333</red><green>0.2549</green><blue>0.6157</blue>
  </color>
  <color name="L">
   <red>0.4314</red><green>0.0039</green><blue>0.4196</blue>
@@ -1147,13 +1147,13 @@
   <red>0.6196</red><green>0.7373</green><blue>0.8549</blue>
  </color>
  <color name="G">
-  <red>0.5529</red><green>0.6275</green><blue>0.7961</blue>
+  <red>0.5490</red><green>0.5882</green><blue>0.7765</blue>
  </color>
  <color name="H">
-  <red>0.5686</red><green>0.4824</green><blue>0.7255</blue>
+  <red>0.5490</red><green>0.4196</green><blue>0.6941</blue>
  </color>
  <color name="J">
-  <red>0.5529</red><green>0.2980</green><blue>0.6353</blue>
+  <red>0.5333</red><green>0.2549</green><blue>0.6157</blue>
  </color>
  <color name="L">
   <red>0.4314</red><green>0.0039</green><blue>0.4196</blue>
@@ -1186,16 +1186,16 @@
   <red>0.6196</red><green>0.7373</green><blue>0.8549</blue>
  </color>
  <color name="G">
-  <red>0.5529</red><green>0.6275</green><blue>0.7961</blue>
+  <red>0.5490</red><green>0.5882</green><blue>0.7765</blue>
  </color>
  <color name="H">
-  <red>0.5686</red><green>0.4824</green><blue>0.7255</blue>
+  <red>0.5490</red><green>0.4196</green><blue>0.6941</blue>
  </color>
  <color name="J">
-  <red>0.5529</red><green>0.2980</green><blue>0.6353</blue>
+  <red>0.5333</red><green>0.2549</green><blue>0.6157</blue>
  </color>
  <color name="K">
-  <red>0.4549</red><green>0.0039</green><blue>0.4431</blue>
+  <red>0.5059</red><green>0.0588</green><blue>0.4863</blue>
  </color>
  <color name="M">
   <red>0.3020</red><green>0.0000</green><blue>0.2941</blue>
@@ -1249,7 +1249,7 @@
   <red>0.4588</red><green>0.4392</green><blue>0.7020</blue>
  </color>
  <color name="D">
-  <red>0.7725</red><green>0.0039</green><blue>0.4235</blue>
+  <red>0.9059</red><green>0.1608</green><blue>0.5412</blue>
  </color>
 </foreground>
 <background>
@@ -1276,7 +1276,7 @@
   <red>0.4588</red><green>0.4392</green><blue>0.7020</blue>
  </color>
  <color name="D">
-  <red>0.7725</red><green>0.0039</green><blue>0.4235</blue>
+  <red>0.9059</red><green>0.1608</green><blue>0.5412</blue>
  </color>
  <color name="E">
   <red>0.4000</red><green>0.6510</green><blue>0.1176</blue>
@@ -1306,7 +1306,7 @@
   <red>0.4588</red><green>0.4392</green><blue>0.7020</blue>
  </color>
  <color name="D">
-  <red>0.7725</red><green>0.0039</green><blue>0.4235</blue>
+  <red>0.9059</red><green>0.1608</green><blue>0.5412</blue>
  </color>
  <color name="E">
   <red>0.4000</red><green>0.6510</green><blue>0.1176</blue>
@@ -1339,7 +1339,7 @@
   <red>0.4588</red><green>0.4392</green><blue>0.7020</blue>
  </color>
  <color name="D">
-  <red>0.7725</red><green>0.0039</green><blue>0.4235</blue>
+  <red>0.9059</red><green>0.1608</green><blue>0.5412</blue>
  </color>
  <color name="E">
   <red>0.4000</red><green>0.6510</green><blue>0.1176</blue>
@@ -1375,7 +1375,7 @@
   <red>0.4588</red><green>0.4392</green><blue>0.7020</blue>
  </color>
  <color name="D">
-  <red>0.7725</red><green>0.0039</green><blue>0.4235</blue>
+  <red>0.9059</red><green>0.1608</green><blue>0.5412</blue>
  </color>
  <color name="E">
   <red>0.4000</red><green>0.6510</green><blue>0.1176</blue>
@@ -1438,7 +1438,7 @@
   <red>0.4824</red><green>0.8000</green><blue>0.7686</blue>
  </color>
  <color name="J">
-  <red>0.2118</red><green>0.5647</green><blue>0.7529</blue>
+  <red>0.1686</red><green>0.5490</green><blue>0.7451</blue>
  </color>
 </foreground>
 <background>
@@ -1534,7 +1534,7 @@
   <red>0.3059</red><green>0.7020</green><blue>0.8275</blue>
  </color>
  <color name="J">
-  <red>0.2118</red><green>0.5647</green><blue>0.7529</blue>
+  <red>0.1686</red><green>0.5490</green><blue>0.7451</blue>
  </color>
  <color name="L">
   <red>0.0314</red><green>0.3451</green><blue>0.6196</blue>
@@ -1573,7 +1573,7 @@
   <red>0.3059</red><green>0.7020</green><blue>0.8275</blue>
  </color>
  <color name="J">
-  <red>0.2118</red><green>0.5647</green><blue>0.7529</blue>
+  <red>0.1686</red><green>0.5490</green><blue>0.7451</blue>
  </color>
  <color name="L">
   <red>0.0314</red><green>0.3451</green><blue>0.6196</blue>
@@ -1612,7 +1612,7 @@
   <red>0.3059</red><green>0.7020</green><blue>0.8275</blue>
  </color>
  <color name="J">
-  <red>0.2118</red><green>0.5647</green><blue>0.7529</blue>
+  <red>0.1686</red><green>0.5490</green><blue>0.7451</blue>
  </color>
  <color name="K">
   <red>0.0314</red><green>0.4078</green><blue>0.6745</blue>
@@ -1639,7 +1639,7 @@
   <red>0.8980</red><green>0.9608</green><blue>0.8784</blue>
  </color>
  <color name="F">
-  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
+  <red>0.6314</red><green>0.8510</green><blue>0.6078</blue>
  </color>
  <color name="I">
   <red>0.1922</red><green>0.6392</green><blue>0.3294</blue>
@@ -1666,7 +1666,7 @@
   <red>0.7294</red><green>0.8941</green><blue>0.7020</blue>
  </color>
  <color name="G">
-  <red>0.4706</red><green>0.7765</green><blue>0.4745</blue>
+  <red>0.4549</red><green>0.7686</green><blue>0.4627</blue>
  </color>
  <color name="J">
   <red>0.1373</red><green>0.5451</green><blue>0.2706</blue>
@@ -1693,7 +1693,7 @@
   <red>0.7294</red><green>0.8941</green><blue>0.7020</blue>
  </color>
  <color name="G">
-  <red>0.4706</red><green>0.7765</green><blue>0.4745</blue>
+  <red>0.4549</red><green>0.7686</green><blue>0.4627</blue>
  </color>
  <color name="I">
   <red>0.1922</red><green>0.6392</green><blue>0.3294</blue>
@@ -1720,13 +1720,13 @@
   <red>0.9294</red><green>0.9725</green><blue>0.9137</blue>
  </color>
  <color name="D">
-  <red>0.8000</red><green>0.9216</green><blue>0.7725</blue>
+  <red>0.7804</red><green>0.9137</green><blue>0.7529</blue>
  </color>
  <color name="F">
-  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
+  <red>0.6314</red><green>0.8510</green><blue>0.6078</blue>
  </color>
  <color name="G">
-  <red>0.4706</red><green>0.7765</green><blue>0.4745</blue>
+  <red>0.4549</red><green>0.7686</green><blue>0.4627</blue>
  </color>
  <color name="I">
   <red>0.1922</red><green>0.6392</green><blue>0.3294</blue>
@@ -1753,13 +1753,13 @@
   <red>0.9294</red><green>0.9725</green><blue>0.9137</blue>
  </color>
  <color name="D">
-  <red>0.8000</red><green>0.9216</green><blue>0.7725</blue>
+  <red>0.7804</red><green>0.9137</green><blue>0.7529</blue>
  </color>
  <color name="F">
-  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
+  <red>0.6314</red><green>0.8510</green><blue>0.6078</blue>
  </color>
  <color name="G">
-  <red>0.4706</red><green>0.7765</green><blue>0.4745</blue>
+  <red>0.4549</red><green>0.7686</green><blue>0.4627</blue>
  </color>
  <color name="H">
   <red>0.2549</red><green>0.6706</green><blue>0.3647</blue>
@@ -1792,13 +1792,13 @@
   <red>0.8980</red><green>0.9608</green><blue>0.8784</blue>
  </color>
  <color name="D">
-  <red>0.8000</red><green>0.9216</green><blue>0.7725</blue>
+  <red>0.7804</red><green>0.9137</green><blue>0.7529</blue>
  </color>
  <color name="F">
-  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
+  <red>0.6314</red><green>0.8510</green><blue>0.6078</blue>
  </color>
  <color name="G">
-  <red>0.4706</red><green>0.7765</green><blue>0.4745</blue>
+  <red>0.4549</red><green>0.7686</green><blue>0.4627</blue>
  </color>
  <color name="H">
   <red>0.2549</red><green>0.6706</green><blue>0.3647</blue>
@@ -1831,13 +1831,13 @@
   <red>0.8980</red><green>0.9608</green><blue>0.8784</blue>
  </color>
  <color name="D">
-  <red>0.8000</red><green>0.9216</green><blue>0.7725</blue>
+  <red>0.7804</red><green>0.9137</green><blue>0.7529</blue>
  </color>
  <color name="F">
-  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
+  <red>0.6314</red><green>0.8510</green><blue>0.6078</blue>
  </color>
  <color name="G">
-  <red>0.4706</red><green>0.7765</green><blue>0.4745</blue>
+  <red>0.4549</red><green>0.7686</green><blue>0.4627</blue>
  </color>
  <color name="H">
   <red>0.2549</red><green>0.6706</green><blue>0.3647</blue>
@@ -1849,7 +1849,7 @@
   <red>0.0000</red><green>0.4275</green><blue>0.1725</blue>
  </color>
  <color name="M">
-  <red>0.0000</red><green>0.2706</green><blue>0.1608</blue>
+  <red>0.0000</red><green>0.2667</green><blue>0.1059</blue>
  </color>
 </foreground>
 <background>
@@ -1867,13 +1867,13 @@
 </description>
 <foreground>
  <color name="C">
-  <red>0.9490</red><green>0.9490</green><blue>0.9490</blue>
+  <red>0.9412</red><green>0.9412</green><blue>0.9412</blue>
  </color>
  <color name="F">
-  <red>0.7686</red><green>0.7686</green><blue>0.7686</blue>
+  <red>0.7412</red><green>0.7412</green><blue>0.7412</blue>
  </color>
  <color name="I">
-  <red>0.4510</red><green>0.4510</green><blue>0.4510</blue>
+  <red>0.3882</red><green>0.3882</green><blue>0.3882</blue>
  </color>
 </foreground>
 <background>
@@ -1897,10 +1897,10 @@
   <red>0.8000</red><green>0.8000</green><blue>0.8000</blue>
  </color>
  <color name="G">
-  <red>0.6314</red><green>0.6314</green><blue>0.6314</blue>
+  <red>0.5882</red><green>0.5882</green><blue>0.5882</blue>
  </color>
  <color name="J">
-  <red>0.3804</red><green>0.3804</green><blue>0.3804</blue>
+  <red>0.3216</red><green>0.3216</green><blue>0.3216</blue>
  </color>
 </foreground>
 <background>
@@ -1924,13 +1924,13 @@
   <red>0.8000</red><green>0.8000</green><blue>0.8000</blue>
  </color>
  <color name="G">
-  <red>0.6314</red><green>0.6314</green><blue>0.6314</blue>
+  <red>0.5882</red><green>0.5882</green><blue>0.5882</blue>
  </color>
  <color name="I">
-  <red>0.4510</red><green>0.4510</green><blue>0.4510</blue>
+  <red>0.3882</red><green>0.3882</green><blue>0.3882</blue>
  </color>
  <color name="K">
-  <red>0.2510</red><green>0.2510</green><blue>0.2510</blue>
+  <red>0.1451</red><green>0.1451</green><blue>0.1451</blue>
  </color>
 </foreground>
 <background>
@@ -1951,19 +1951,19 @@
   <red>0.9686</red><green>0.9686</green><blue>0.9686</blue>
  </color>
  <color name="D">
-  <red>0.8706</red><green>0.8706</green><blue>0.8706</blue>
+  <red>0.8510</red><green>0.8510</green><blue>0.8510</blue>
  </color>
  <color name="F">
-  <red>0.7686</red><green>0.7686</green><blue>0.7686</blue>
+  <red>0.7412</red><green>0.7412</green><blue>0.7412</blue>
  </color>
  <color name="G">
-  <red>0.6314</red><green>0.6314</green><blue>0.6314</blue>
+  <red>0.5882</red><green>0.5882</green><blue>0.5882</blue>
  </color>
  <color name="I">
-  <red>0.4510</red><green>0.4510</green><blue>0.4510</blue>
+  <red>0.3882</red><green>0.3882</green><blue>0.3882</blue>
  </color>
  <color name="K">
-  <red>0.2510</red><green>0.2510</green><blue>0.2510</blue>
+  <red>0.1451</red><green>0.1451</green><blue>0.1451</blue>
  </color>
 </foreground>
 <background>
@@ -1984,22 +1984,22 @@
   <red>0.9686</red><green>0.9686</green><blue>0.9686</blue>
  </color>
  <color name="D">
-  <red>0.8706</red><green>0.8706</green><blue>0.8706</blue>
+  <red>0.8510</red><green>0.8510</green><blue>0.8510</blue>
  </color>
  <color name="F">
-  <red>0.7686</red><green>0.7686</green><blue>0.7686</blue>
+  <red>0.7412</red><green>0.7412</green><blue>0.7412</blue>
  </color>
  <color name="G">
-  <red>0.6314</red><green>0.6314</green><blue>0.6314</blue>
+  <red>0.5882</red><green>0.5882</green><blue>0.5882</blue>
  </color>
  <color name="H">
-  <red>0.4980</red><green>0.4980</green><blue>0.4980</blue>
+  <red>0.4510</red><green>0.4510</green><blue>0.4510</blue>
  </color>
  <color name="J">
-  <red>0.3804</red><green>0.3804</green><blue>0.3804</blue>
+  <red>0.3216</red><green>0.3216</green><blue>0.3216</blue>
  </color>
  <color name="L">
-  <red>0.2000</red><green>0.2000</green><blue>0.2000</blue>
+  <red>0.1451</red><green>0.1451</green><blue>0.1451</blue>
  </color>
 </foreground>
 <background>
@@ -2020,25 +2020,25 @@
   <red>1.0000</red><green>1.0000</green><blue>1.0000</blue>
  </color>
  <color name="C">
-  <red>0.9490</red><green>0.9490</green><blue>0.9490</blue>
+  <red>0.9412</red><green>0.9412</green><blue>0.9412</blue>
  </color>
  <color name="D">
-  <red>0.8706</red><green>0.8706</green><blue>0.8706</blue>
+  <red>0.8510</red><green>0.8510</green><blue>0.8510</blue>
  </color>
  <color name="F">
-  <red>0.7686</red><green>0.7686</green><blue>0.7686</blue>
+  <red>0.7412</red><green>0.7412</green><blue>0.7412</blue>
  </color>
  <color name="G">
-  <red>0.6314</red><green>0.6314</green><blue>0.6314</blue>
+  <red>0.5882</red><green>0.5882</green><blue>0.5882</blue>
  </color>
  <color name="H">
-  <red>0.4980</red><green>0.4980</green><blue>0.4980</blue>
+  <red>0.4510</red><green>0.4510</green><blue>0.4510</blue>
  </color>
  <color name="J">
-  <red>0.3804</red><green>0.3804</green><blue>0.3804</blue>
+  <red>0.3216</red><green>0.3216</green><blue>0.3216</blue>
  </color>
  <color name="L">
-  <red>0.2000</red><green>0.2000</green><blue>0.2000</blue>
+  <red>0.1451</red><green>0.1451</green><blue>0.1451</blue>
  </color>
 </foreground>
 <background>
@@ -2059,25 +2059,25 @@
   <red>1.0000</red><green>1.0000</green><blue>1.0000</blue>
  </color>
  <color name="C">
-  <red>0.9490</red><green>0.9490</green><blue>0.9490</blue>
+  <red>0.9412</red><green>0.9412</green><blue>0.9412</blue>
  </color>
  <color name="D">
-  <red>0.8706</red><green>0.8706</green><blue>0.8706</blue>
+  <red>0.8510</red><green>0.8510</green><blue>0.8510</blue>
  </color>
  <color name="F">
-  <red>0.7686</red><green>0.7686</green><blue>0.7686</blue>
+  <red>0.7412</red><green>0.7412</green><blue>0.7412</blue>
  </color>
  <color name="G">
-  <red>0.6314</red><green>0.6314</green><blue>0.6314</blue>
+  <red>0.5882</red><green>0.5882</green><blue>0.5882</blue>
  </color>
  <color name="H">
-  <red>0.4980</red><green>0.4980</green><blue>0.4980</blue>
+  <red>0.4510</red><green>0.4510</green><blue>0.4510</blue>
  </color>
  <color name="J">
-  <red>0.3804</red><green>0.3804</green><blue>0.3804</blue>
+  <red>0.3216</red><green>0.3216</green><blue>0.3216</blue>
  </color>
  <color name="K">
-  <red>0.2510</red><green>0.2510</green><blue>0.2510</blue>
+  <red>0.1451</red><green>0.1451</green><blue>0.1451</blue>
  </color>
  <color name="M">
   <red>0.0000</red><green>0.0000</green><blue>0.0000</blue>
@@ -2098,13 +2098,13 @@
 </description>
 <foreground>
  <color name="C">
-  <red>0.9961</red><green>0.9294</green><blue>0.8196</blue>
+  <red>0.9961</red><green>0.9020</green><blue>0.8078</blue>
  </color>
  <color name="F">
-  <red>0.9922</red><green>0.7490</green><blue>0.4353</blue>
+  <red>0.9922</red><green>0.6824</green><blue>0.4196</blue>
  </color>
  <color name="I">
-  <red>0.8784</red><green>0.4275</green><blue>0.0039</blue>
+  <red>0.9020</red><green>0.3333</green><blue>0.0510</blue>
  </color>
 </foreground>
 <background>
@@ -2122,16 +2122,16 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.9961</red><green>0.9490</green><blue>0.8745</blue>
+  <red>0.9961</red><green>0.9294</green><blue>0.8706</blue>
  </color>
  <color name="E">
-  <red>0.9922</red><green>0.8000</green><blue>0.5412</blue>
+  <red>0.9922</red><green>0.7451</green><blue>0.5216</blue>
  </color>
  <color name="G">
-  <red>0.9961</red><green>0.6510</green><blue>0.2510</blue>
+  <red>0.9922</red><green>0.5529</green><blue>0.2353</blue>
  </color>
  <color name="J">
-  <red>0.8000</red><green>0.3647</green><blue>0.0118</blue>
+  <red>0.8510</red><green>0.2784</green><blue>0.0039</blue>
  </color>
 </foreground>
 <background>
@@ -2149,19 +2149,19 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.9961</red><green>0.9490</green><blue>0.8745</blue>
+  <red>0.9961</red><green>0.9294</green><blue>0.8706</blue>
  </color>
  <color name="E">
-  <red>0.9922</red><green>0.8000</green><blue>0.5412</blue>
+  <red>0.9922</red><green>0.7451</green><blue>0.5216</blue>
  </color>
  <color name="G">
-  <red>0.9961</red><green>0.6510</green><blue>0.2510</blue>
+  <red>0.9922</red><green>0.5529</green><blue>0.2353</blue>
  </color>
  <color name="I">
-  <red>0.8784</red><green>0.4275</green><blue>0.0039</blue>
+  <red>0.9020</red><green>0.3333</green><blue>0.0510</blue>
  </color>
  <color name="K">
-  <red>0.6000</red><green>0.2471</green><blue>0.0235</blue>
+  <red>0.6510</red><green>0.2118</green><blue>0.0118</blue>
  </color>
 </foreground>
 <background>
@@ -2179,22 +2179,22 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.9961</red><green>0.9490</green><blue>0.8745</blue>
+  <red>0.9961</red><green>0.9294</green><blue>0.8706</blue>
  </color>
  <color name="D">
-  <red>0.9961</red><green>0.8510</green><blue>0.6471</blue>
+  <red>0.9922</red><green>0.8157</green><blue>0.6353</blue>
  </color>
  <color name="F">
-  <red>0.9922</red><green>0.7490</green><blue>0.4353</blue>
+  <red>0.9922</red><green>0.6824</green><blue>0.4196</blue>
  </color>
  <color name="G">
-  <red>0.9961</red><green>0.6510</green><blue>0.2510</blue>
+  <red>0.9922</red><green>0.5529</green><blue>0.2353</blue>
  </color>
  <color name="I">
-  <red>0.8784</red><green>0.4275</green><blue>0.0039</blue>
+  <red>0.9020</red><green>0.3333</green><blue>0.0510</blue>
  </color>
  <color name="K">
-  <red>0.6000</red><green>0.2471</green><blue>0.0235</blue>
+  <red>0.6510</red><green>0.2118</green><blue>0.0118</blue>
  </color>
 </foreground>
 <background>
@@ -2212,25 +2212,25 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.9961</red><green>0.9490</green><blue>0.8745</blue>
+  <red>0.9961</red><green>0.9294</green><blue>0.8706</blue>
  </color>
  <color name="D">
-  <red>0.9961</red><green>0.8510</green><blue>0.6471</blue>
+  <red>0.9922</red><green>0.8157</green><blue>0.6353</blue>
  </color>
  <color name="F">
-  <red>0.9922</red><green>0.7490</green><blue>0.4353</blue>
+  <red>0.9922</red><green>0.6824</green><blue>0.4196</blue>
  </color>
  <color name="G">
-  <red>0.9961</red><green>0.6510</green><blue>0.2510</blue>
+  <red>0.9922</red><green>0.5529</green><blue>0.2353</blue>
  </color>
  <color name="H">
-  <red>0.9490</red><green>0.4863</green><blue>0.0039</blue>
+  <red>0.9451</red><green>0.4118</green><blue>0.0745</blue>
  </color>
  <color name="J">
-  <red>0.8000</red><green>0.3647</green><blue>0.0118</blue>
+  <red>0.8510</red><green>0.2824</green><blue>0.0039</blue>
  </color>
  <color name="L">
-  <red>0.4980</red><green>0.2314</green><blue>0.0314</blue>
+  <red>0.5490</red><green>0.1765</green><blue>0.0157</blue>
  </color>
 </foreground>
 <background>
@@ -2248,28 +2248,28 @@
 </description>
 <foreground>
  <color name="A">
-  <red>1.0000</red><green>0.9686</green><blue>0.9255</blue>
+  <red>1.0000</red><green>0.9608</green><blue>0.9216</blue>
  </color>
  <color name="C">
-  <red>0.9961</red><green>0.9294</green><blue>0.8196</blue>
+  <red>0.9961</red><green>0.9020</green><blue>0.8078</blue>
  </color>
  <color name="D">
-  <red>0.9961</red><green>0.8510</green><blue>0.6471</blue>
+  <red>0.9922</red><green>0.8157</green><blue>0.6353</blue>
  </color>
  <color name="F">
-  <red>0.9922</red><green>0.7490</green><blue>0.4353</blue>
+  <red>0.9922</red><green>0.6824</green><blue>0.4196</blue>
  </color>
  <color name="G">
-  <red>0.9961</red><green>0.6510</green><blue>0.2510</blue>
+  <red>0.9922</red><green>0.5529</green><blue>0.2353</blue>
  </color>
  <color name="H">
-  <red>0.9490</red><green>0.4863</green><blue>0.0039</blue>
+  <red>0.9451</red><green>0.4118</green><blue>0.0745</blue>
  </color>
  <color name="J">
-  <red>0.8000</red><green>0.3647</green><blue>0.0118</blue>
+  <red>0.8510</red><green>0.2824</green><blue>0.0039</blue>
  </color>
  <color name="L">
-  <red>0.4980</red><green>0.2314</green><blue>0.0314</blue>
+  <red>0.5490</red><green>0.1765</green><blue>0.0157</blue>
  </color>
 </foreground>
 <background>
@@ -2287,31 +2287,31 @@
 </description>
 <foreground>
  <color name="A">
-  <red>1.0000</red><green>0.9686</green><blue>0.9255</blue>
+  <red>1.0000</red><green>0.9608</green><blue>0.9216</blue>
  </color>
  <color name="C">
-  <red>0.9961</red><green>0.9294</green><blue>0.8196</blue>
+  <red>0.9961</red><green>0.9020</green><blue>0.8078</blue>
  </color>
  <color name="D">
-  <red>0.9961</red><green>0.8510</green><blue>0.6471</blue>
+  <red>0.9922</red><green>0.8157</green><blue>0.6353</blue>
  </color>
  <color name="F">
-  <red>0.9922</red><green>0.7490</green><blue>0.4353</blue>
+  <red>0.9922</red><green>0.6824</green><blue>0.4196</blue>
  </color>
  <color name="G">
-  <red>0.9961</red><green>0.6510</green><blue>0.2510</blue>
+  <red>0.9922</red><green>0.5529</green><blue>0.2353</blue>
  </color>
  <color name="H">
-  <red>0.9490</red><green>0.4863</green><blue>0.0039</blue>
+  <red>0.9451</red><green>0.4118</green><blue>0.0745</blue>
  </color>
  <color name="J">
-  <red>0.8000</red><green>0.3647</green><blue>0.0118</blue>
+  <red>0.8510</red><green>0.2824</green><blue>0.0039</blue>
  </color>
  <color name="K">
-  <red>0.6000</red><green>0.2471</green><blue>0.0235</blue>
+  <red>0.6510</red><green>0.2118</green><blue>0.0118</blue>
  </color>
  <color name="M">
-  <red>0.4000</red><green>0.2157</green><blue>0.0392</blue>
+  <red>0.4980</red><green>0.1529</green><blue>0.0157</blue>
  </color>
 </foreground>
 <background>
@@ -2392,7 +2392,7 @@
   <red>0.8902</red><green>0.2902</green><blue>0.2000</blue>
  </color>
  <color name="K">
-  <red>0.6980</red><green>0.0000</green><blue>0.0510</blue>
+  <red>0.7020</red><green>0.0000</green><blue>0.0000</blue>
  </color>
 </foreground>
 <background>
@@ -2425,7 +2425,7 @@
   <red>0.8902</red><green>0.2902</green><blue>0.2000</blue>
  </color>
  <color name="K">
-  <red>0.6980</red><green>0.0000</green><blue>0.0510</blue>
+  <red>0.7020</red><green>0.0000</green><blue>0.0000</blue>
  </color>
 </foreground>
 <background>
@@ -2461,7 +2461,7 @@
   <red>0.8431</red><green>0.1882</green><blue>0.1216</blue>
  </color>
  <color name="L">
-  <red>0.6000</red><green>0.0000</green><blue>0.0510</blue>
+  <red>0.6000</red><green>0.0000</green><blue>0.0000</blue>
  </color>
 </foreground>
 <background>
@@ -2500,7 +2500,7 @@
   <red>0.8431</red><green>0.1882</green><blue>0.1216</blue>
  </color>
  <color name="L">
-  <red>0.6000</red><green>0.0000</green><blue>0.0510</blue>
+  <red>0.6000</red><green>0.0000</green><blue>0.0000</blue>
  </color>
 </foreground>
 <background>
@@ -2539,10 +2539,10 @@
   <red>0.8431</red><green>0.1882</green><blue>0.1216</blue>
  </color>
  <color name="K">
-  <red>0.6980</red><green>0.0000</green><blue>0.0510</blue>
+  <red>0.7020</red><green>0.0000</green><blue>0.0000</blue>
  </color>
  <color name="M">
-  <red>0.4980</red><green>0.0000</green><blue>0.0980</blue>
+  <red>0.4980</red><green>0.0000</green><blue>0.0000</blue>
  </color>
 </foreground>
 <background>
@@ -3148,7 +3148,7 @@
   <red>0.9922</red><green>0.8549</green><blue>0.9255</blue>
  </color>
  <color name="I">
-  <red>0.8510</red><green>0.8510</green><blue>0.8510</blue>
+  <red>0.9490</red><green>0.9490</green><blue>0.9490</blue>
  </color>
 </foreground>
 <background>
@@ -3337,7 +3337,7 @@
   <red>0.9451</red><green>0.8863</green><blue>0.8000</blue>
  </color>
  <color name="H">
-  <red>0.9020</red><green>0.9020</green><blue>0.9020</blue>
+  <red>0.8000</red><green>0.8000</green><blue>0.8000</blue>
  </color>
 </foreground>
 <background>
@@ -3436,7 +3436,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.7725</red><green>0.0039</green><blue>0.4471</blue>
+  <red>0.7725</red><green>0.1059</green><blue>0.4902</blue>
  </color>
  <color name="E">
   <red>0.9137</red><green>0.6392</green><blue>0.7882</blue>
@@ -3469,7 +3469,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.7725</red><green>0.0039</green><blue>0.4471</blue>
+  <red>0.7725</red><green>0.1059</green><blue>0.4902</blue>
  </color>
  <color name="E">
   <red>0.9137</red><green>0.6392</green><blue>0.7882</blue>
@@ -3505,7 +3505,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.7725</red><green>0.0039</green><blue>0.4471</blue>
+  <red>0.7725</red><green>0.1059</green><blue>0.4902</blue>
  </color>
  <color name="D">
   <red>0.8706</red><green>0.4667</green><blue>0.6824</blue>
@@ -3544,7 +3544,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.7725</red><green>0.0039</green><blue>0.4471</blue>
+  <red>0.7725</red><green>0.1059</green><blue>0.4902</blue>
  </color>
  <color name="D">
   <red>0.8706</red><green>0.4667</green><blue>0.6824</blue>
@@ -3589,7 +3589,7 @@
   <red>0.5569</red><green>0.0039</green><blue>0.3216</blue>
  </color>
  <color name="B">
-  <red>0.7725</red><green>0.0039</green><blue>0.4471</blue>
+  <red>0.7725</red><green>0.1059</green><blue>0.4902</blue>
  </color>
  <color name="D">
   <red>0.8706</red><green>0.4667</green><blue>0.6824</blue>
@@ -3634,7 +3634,7 @@
   <red>0.5569</red><green>0.0039</green><blue>0.3216</blue>
  </color>
  <color name="B">
-  <red>0.7725</red><green>0.0039</green><blue>0.4471</blue>
+  <red>0.7725</red><green>0.1059</green><blue>0.4902</blue>
  </color>
  <color name="D">
   <red>0.8706</red><green>0.4667</green><blue>0.6824</blue>
@@ -3672,7 +3672,7 @@
 </annotations>
 </colormap>
 
-<colormap name="PRG 3" ncolors="3"
+<colormap name="PRGn 3" ncolors="3"
            type="diverging" criticalvalue="2" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -3696,7 +3696,7 @@
 </annotations>
 </colormap>
 
-<colormap name="PRG 4" ncolors="4"
+<colormap name="PRGn 4" ncolors="4"
            type="diverging" criticalvalue="2.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -3709,7 +3709,7 @@
   <red>0.7608</red><green>0.6471</green><blue>0.8118</blue>
  </color>
  <color name="J">
-  <red>0.6588</red><green>0.8471</green><blue>0.7176</blue>
+  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
  </color>
  <color name="M">
   <red>0.0000</red><green>0.5333</green><blue>0.2157</blue>
@@ -3723,7 +3723,7 @@
 </annotations>
 </colormap>
 
-<colormap name="PRG 5" ncolors="5"
+<colormap name="PRGn 5" ncolors="5"
            type="diverging" criticalvalue="3" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -3739,7 +3739,7 @@
   <red>0.9686</red><green>0.9686</green><blue>0.9686</blue>
  </color>
  <color name="J">
-  <red>0.6588</red><green>0.8471</green><blue>0.7176</blue>
+  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
  </color>
  <color name="M">
   <red>0.0000</red><green>0.5333</green><blue>0.2157</blue>
@@ -3753,14 +3753,14 @@
 </annotations>
 </colormap>
 
-<colormap name="PRG 6" ncolors="6"
+<colormap name="PRGn 6" ncolors="6"
            type="diverging" criticalvalue="3.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.3882</red><green>0.1059</green><blue>0.4745</blue>
+  <red>0.4627</red><green>0.1647</green><blue>0.5137</blue>
  </color>
  <color name="E">
   <red>0.6863</red><green>0.5529</green><blue>0.7647</blue>
@@ -3786,14 +3786,14 @@
 </annotations>
 </colormap>
 
-<colormap name="PRG 7" ncolors="7"
+<colormap name="PRGn 7" ncolors="7"
            type="diverging" criticalvalue="4" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.3882</red><green>0.1059</green><blue>0.4745</blue>
+  <red>0.4627</red><green>0.1647</green><blue>0.5137</blue>
  </color>
  <color name="E">
   <red>0.6863</red><green>0.5529</green><blue>0.7647</blue>
@@ -3822,14 +3822,14 @@
 </annotations>
 </colormap>
 
-<colormap name="PRG 8" ncolors="8"
+<colormap name="PRGn 8" ncolors="8"
            type="diverging" criticalvalue="4.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.3882</red><green>0.1059</green><blue>0.4745</blue>
+  <red>0.4627</red><green>0.1647</green><blue>0.5137</blue>
  </color>
  <color name="D">
   <red>0.6000</red><green>0.4392</green><blue>0.6706</blue>
@@ -3844,7 +3844,7 @@
   <red>0.8510</red><green>0.9412</green><blue>0.8275</blue>
  </color>
  <color name="J">
-  <red>0.6588</red><green>0.8471</green><blue>0.7176</blue>
+  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
  </color>
  <color name="L">
   <red>0.3529</red><green>0.6824</green><blue>0.3804</blue>
@@ -3861,14 +3861,14 @@
 </annotations>
 </colormap>
 
-<colormap name="PRG 9" ncolors="9"
+<colormap name="PRGn 9" ncolors="9"
            type="diverging" criticalvalue="5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.3882</red><green>0.1059</green><blue>0.4745</blue>
+  <red>0.4627</red><green>0.1647</green><blue>0.5137</blue>
  </color>
  <color name="D">
   <red>0.6000</red><green>0.4392</green><blue>0.6706</blue>
@@ -3886,7 +3886,7 @@
   <red>0.8510</red><green>0.9412</green><blue>0.8275</blue>
  </color>
  <color name="J">
-  <red>0.6588</red><green>0.8471</green><blue>0.7176</blue>
+  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
  </color>
  <color name="L">
   <red>0.3529</red><green>0.6824</green><blue>0.3804</blue>
@@ -3903,7 +3903,7 @@
 </annotations>
 </colormap>
 
-<colormap name="PRG 10" ncolors="10"
+<colormap name="PRGn 10" ncolors="10"
            type="diverging" criticalvalue="5.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -3913,7 +3913,7 @@
   <red>0.2510</red><green>0.0000</green><blue>0.2941</blue>
  </color>
  <color name="B">
-  <red>0.3882</red><green>0.1059</green><blue>0.4745</blue>
+  <red>0.4627</red><green>0.1647</green><blue>0.5137</blue>
  </color>
  <color name="D">
   <red>0.6000</red><green>0.4392</green><blue>0.6706</blue>
@@ -3928,7 +3928,7 @@
   <red>0.8510</red><green>0.9412</green><blue>0.8275</blue>
  </color>
  <color name="J">
-  <red>0.6588</red><green>0.8471</green><blue>0.7176</blue>
+  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
  </color>
  <color name="L">
   <red>0.3529</red><green>0.6824</green><blue>0.3804</blue>
@@ -3948,7 +3948,7 @@
 </annotations>
 </colormap>
 
-<colormap name="PRG 11" ncolors="11"
+<colormap name="PRGn 11" ncolors="11"
            type="diverging" criticalvalue="6" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -3958,7 +3958,7 @@
   <red>0.2510</red><green>0.0000</green><blue>0.2941</blue>
  </color>
  <color name="B">
-  <red>0.3882</red><green>0.1059</green><blue>0.4745</blue>
+  <red>0.4627</red><green>0.1647</green><blue>0.5137</blue>
  </color>
  <color name="D">
   <red>0.6000</red><green>0.4392</green><blue>0.6706</blue>
@@ -3976,7 +3976,7 @@
   <red>0.8510</red><green>0.9412</green><blue>0.8275</blue>
  </color>
  <color name="J">
-  <red>0.6588</red><green>0.8471</green><blue>0.7176</blue>
+  <red>0.6510</red><green>0.8588</green><blue>0.6275</blue>
  </color>
  <color name="L">
   <red>0.3529</red><green>0.6824</green><blue>0.3804</blue>
@@ -4033,7 +4033,7 @@
   <red>0.7412</red><green>0.7882</green><blue>0.8824</blue>
  </color>
  <color name="G">
-  <red>0.4039</red><green>0.6627</green><blue>0.8118</blue>
+  <red>0.4549</red><green>0.6627</green><blue>0.8118</blue>
  </color>
  <color name="J">
   <red>0.0196</red><green>0.4392</green><blue>0.6902</blue>
@@ -4060,7 +4060,7 @@
   <red>0.7412</red><green>0.7882</green><blue>0.8824</blue>
  </color>
  <color name="G">
-  <red>0.4039</red><green>0.6627</green><blue>0.8118</blue>
+  <red>0.4549</red><green>0.6627</green><blue>0.8118</blue>
  </color>
  <color name="I">
   <red>0.1686</red><green>0.5490</green><blue>0.7451</blue>
@@ -4093,7 +4093,7 @@
   <red>0.6510</red><green>0.7412</green><blue>0.8588</blue>
  </color>
  <color name="G">
-  <red>0.4039</red><green>0.6627</green><blue>0.8118</blue>
+  <red>0.4549</red><green>0.6627</green><blue>0.8118</blue>
  </color>
  <color name="I">
   <red>0.1686</red><green>0.5490</green><blue>0.7451</blue>
@@ -4126,7 +4126,7 @@
   <red>0.6510</red><green>0.7412</green><blue>0.8588</blue>
  </color>
  <color name="G">
-  <red>0.4039</red><green>0.6627</green><blue>0.8118</blue>
+  <red>0.4549</red><green>0.6627</green><blue>0.8118</blue>
  </color>
  <color name="H">
   <red>0.2118</red><green>0.5647</green><blue>0.7529</blue>
@@ -4165,7 +4165,7 @@
   <red>0.6510</red><green>0.7412</green><blue>0.8588</blue>
  </color>
  <color name="G">
-  <red>0.4039</red><green>0.6627</green><blue>0.8118</blue>
+  <red>0.4549</red><green>0.6627</green><blue>0.8118</blue>
  </color>
  <color name="H">
   <red>0.2118</red><green>0.5647</green><blue>0.7529</blue>
@@ -4204,7 +4204,7 @@
   <red>0.6510</red><green>0.7412</green><blue>0.8588</blue>
  </color>
  <color name="G">
-  <red>0.4039</red><green>0.6627</green><blue>0.8118</blue>
+  <red>0.4549</red><green>0.6627</green><blue>0.8118</blue>
  </color>
  <color name="H">
   <red>0.2118</red><green>0.5647</green><blue>0.7529</blue>
@@ -4546,7 +4546,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.7020</red><green>0.2588</green><blue>0.0118</blue>
+  <red>0.7020</red><green>0.3451</green><blue>0.0235</blue>
  </color>
  <color name="E">
   <red>0.9451</red><green>0.6392</green><blue>0.2510</blue>
@@ -4561,7 +4561,7 @@
   <red>0.6000</red><green>0.5569</green><blue>0.7647</blue>
  </color>
  <color name="N">
-  <red>0.2863</red><green>0.1137</green><blue>0.5098</blue>
+  <red>0.3294</red><green>0.1529</green><blue>0.5333</blue>
  </color>
 </foreground>
 <background>
@@ -4579,7 +4579,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.7020</red><green>0.2588</green><blue>0.0118</blue>
+  <red>0.7020</red><green>0.3451</green><blue>0.0235</blue>
  </color>
  <color name="E">
   <red>0.9451</red><green>0.6392</green><blue>0.2510</blue>
@@ -4597,7 +4597,7 @@
   <red>0.6000</red><green>0.5569</green><blue>0.7647</blue>
  </color>
  <color name="N">
-  <red>0.2863</red><green>0.1137</green><blue>0.5098</blue>
+  <red>0.3294</red><green>0.1529</green><blue>0.5333</blue>
  </color>
 </foreground>
 <background>
@@ -4615,7 +4615,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.7020</red><green>0.2588</green><blue>0.0118</blue>
+  <red>0.7020</red><green>0.3451</green><blue>0.0235</blue>
  </color>
  <color name="D">
   <red>0.8784</red><green>0.5098</green><blue>0.0784</blue>
@@ -4636,7 +4636,7 @@
   <red>0.5020</red><green>0.4510</green><blue>0.6745</blue>
  </color>
  <color name="N">
-  <red>0.2863</red><green>0.1137</green><blue>0.5098</blue>
+  <red>0.3294</red><green>0.1529</green><blue>0.5333</blue>
  </color>
 </foreground>
 <background>
@@ -4654,7 +4654,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.7020</red><green>0.2588</green><blue>0.0118</blue>
+  <red>0.7020</red><green>0.3451</green><blue>0.0235</blue>
  </color>
  <color name="D">
   <red>0.8784</red><green>0.5098</green><blue>0.0784</blue>
@@ -4678,7 +4678,7 @@
   <red>0.5020</red><green>0.4510</green><blue>0.6745</blue>
  </color>
  <color name="N">
-  <red>0.2863</red><green>0.1137</green><blue>0.5098</blue>
+  <red>0.3294</red><green>0.1529</green><blue>0.5333</blue>
  </color>
 </foreground>
 <background>
@@ -4699,7 +4699,7 @@
   <red>0.4980</red><green>0.2314</green><blue>0.0314</blue>
  </color>
  <color name="B">
-  <red>0.7020</red><green>0.2588</green><blue>0.0118</blue>
+  <red>0.7020</red><green>0.3451</green><blue>0.0235</blue>
  </color>
  <color name="D">
   <red>0.8784</red><green>0.5098</green><blue>0.0784</blue>
@@ -4720,7 +4720,7 @@
   <red>0.5020</red><green>0.4510</green><blue>0.6745</blue>
  </color>
  <color name="N">
-  <red>0.2863</red><green>0.1137</green><blue>0.5098</blue>
+  <red>0.3294</red><green>0.1529</green><blue>0.5333</blue>
  </color>
  <color name="O">
   <red>0.1765</red><green>0.0000</green><blue>0.2941</blue>
@@ -4744,7 +4744,7 @@
   <red>0.4980</red><green>0.2314</green><blue>0.0314</blue>
  </color>
  <color name="B">
-  <red>0.7020</red><green>0.2588</green><blue>0.0118</blue>
+  <red>0.7020</red><green>0.3451</green><blue>0.0235</blue>
  </color>
  <color name="D">
   <red>0.8784</red><green>0.5098</green><blue>0.0784</blue>
@@ -4768,7 +4768,7 @@
   <red>0.5020</red><green>0.4510</green><blue>0.6745</blue>
  </color>
  <color name="N">
-  <red>0.2863</red><green>0.1137</green><blue>0.5098</blue>
+  <red>0.3294</red><green>0.1529</green><blue>0.5333</blue>
  </color>
  <color name="O">
   <red>0.1765</red><green>0.0000</green><blue>0.2941</blue>
@@ -4792,10 +4792,10 @@
   <red>0.9059</red><green>0.8824</green><blue>0.9373</blue>
  </color>
  <color name="F">
-  <red>0.8078</red><green>0.6314</green><blue>0.8078</blue>
+  <red>0.7882</red><green>0.5804</green><blue>0.7804</blue>
  </color>
  <color name="I">
-  <red>0.8863</red><green>0.0039</green><blue>0.4353</blue>
+  <red>0.8667</red><green>0.1098</green><blue>0.4667</blue>
  </color>
 </foreground>
 <background>
@@ -4819,10 +4819,10 @@
   <red>0.8431</red><green>0.7098</green><blue>0.8471</blue>
  </color>
  <color name="G">
-  <red>0.8784</red><green>0.4431</green><blue>0.7137</blue>
+  <red>0.8745</red><green>0.3961</green><blue>0.6902</blue>
  </color>
  <color name="J">
-  <red>0.7804</red><green>0.0039</green><blue>0.3216</blue>
+  <red>0.8078</red><green>0.0706</green><blue>0.3373</blue>
  </color>
 </foreground>
 <background>
@@ -4846,10 +4846,10 @@
   <red>0.8431</red><green>0.7098</green><blue>0.8471</blue>
  </color>
  <color name="G">
-  <red>0.8784</red><green>0.4431</green><blue>0.7137</blue>
+  <red>0.8745</red><green>0.3961</green><blue>0.6902</blue>
  </color>
  <color name="I">
-  <red>0.8863</red><green>0.0039</green><blue>0.4353</blue>
+  <red>0.8667</red><green>0.1098</green><blue>0.4667</blue>
  </color>
  <color name="K">
   <red>0.5961</red><green>0.0000</green><blue>0.2627</blue>
@@ -4873,16 +4873,16 @@
   <red>0.9451</red><green>0.9333</green><blue>0.9647</blue>
  </color>
  <color name="D">
-  <red>0.8510</red><green>0.7725</green><blue>0.8784</blue>
+  <red>0.8314</red><green>0.7255</green><blue>0.8549</blue>
  </color>
  <color name="F">
-  <red>0.8078</red><green>0.6314</green><blue>0.8078</blue>
+  <red>0.7882</red><green>0.5804</green><blue>0.7804</blue>
  </color>
  <color name="G">
-  <red>0.8784</red><green>0.4431</green><blue>0.7137</blue>
+  <red>0.8745</red><green>0.3961</green><blue>0.6902</blue>
  </color>
  <color name="I">
-  <red>0.8863</red><green>0.0039</green><blue>0.4353</blue>
+  <red>0.8667</red><green>0.1098</green><blue>0.4667</blue>
  </color>
  <color name="K">
   <red>0.5961</red><green>0.0000</green><blue>0.2627</blue>
@@ -4906,19 +4906,19 @@
   <red>0.9451</red><green>0.9333</green><blue>0.9647</blue>
  </color>
  <color name="D">
-  <red>0.8510</red><green>0.7725</green><blue>0.8784</blue>
+  <red>0.8314</red><green>0.7255</green><blue>0.8549</blue>
  </color>
  <color name="F">
-  <red>0.8078</red><green>0.6314</green><blue>0.8078</blue>
+  <red>0.7882</red><green>0.5804</green><blue>0.7804</blue>
  </color>
  <color name="G">
-  <red>0.8784</red><green>0.4431</green><blue>0.7137</blue>
+  <red>0.8745</red><green>0.3961</green><blue>0.6902</blue>
  </color>
  <color name="H">
-  <red>0.9059</red><green>0.1137</green><blue>0.5216</blue>
+  <red>0.9059</red><green>0.1608</green><blue>0.5412</blue>
  </color>
  <color name="J">
-  <red>0.7804</red><green>0.0039</green><blue>0.3216</blue>
+  <red>0.8078</red><green>0.0706</green><blue>0.3373</blue>
  </color>
  <color name="L">
   <red>0.5686</red><green>0.0000</green><blue>0.2471</blue>
@@ -4945,19 +4945,19 @@
   <red>0.9059</red><green>0.8824</green><blue>0.9373</blue>
  </color>
  <color name="D">
-  <red>0.8510</red><green>0.7725</green><blue>0.8784</blue>
+  <red>0.8314</red><green>0.7255</green><blue>0.8549</blue>
  </color>
  <color name="F">
-  <red>0.8078</red><green>0.6314</green><blue>0.8078</blue>
+  <red>0.7882</red><green>0.5804</green><blue>0.7804</blue>
  </color>
  <color name="G">
-  <red>0.8784</red><green>0.4431</green><blue>0.7137</blue>
+  <red>0.8745</red><green>0.3961</green><blue>0.6902</blue>
  </color>
  <color name="H">
-  <red>0.9059</red><green>0.1137</green><blue>0.5216</blue>
+  <red>0.9059</red><green>0.1608</green><blue>0.5412</blue>
  </color>
  <color name="J">
-  <red>0.7804</red><green>0.0039</green><blue>0.3216</blue>
+  <red>0.8078</red><green>0.0706</green><blue>0.3373</blue>
  </color>
  <color name="L">
   <red>0.5686</red><green>0.0000</green><blue>0.2471</blue>
@@ -4984,19 +4984,19 @@
   <red>0.9059</red><green>0.8824</green><blue>0.9373</blue>
  </color>
  <color name="D">
-  <red>0.8510</red><green>0.7725</green><blue>0.8784</blue>
+  <red>0.8314</red><green>0.7255</green><blue>0.8549</blue>
  </color>
  <color name="F">
-  <red>0.8078</red><green>0.6314</green><blue>0.8078</blue>
+  <red>0.7882</red><green>0.5804</green><blue>0.7804</blue>
  </color>
  <color name="G">
-  <red>0.8784</red><green>0.4431</green><blue>0.7137</blue>
+  <red>0.8745</red><green>0.3961</green><blue>0.6902</blue>
  </color>
  <color name="H">
-  <red>0.9059</red><green>0.1137</green><blue>0.5216</blue>
+  <red>0.9059</red><green>0.1608</green><blue>0.5412</blue>
  </color>
  <color name="J">
-  <red>0.7804</red><green>0.0039</green><blue>0.3216</blue>
+  <red>0.8078</red><green>0.0706</green><blue>0.3373</blue>
  </color>
  <color name="K">
   <red>0.5961</red><green>0.0000</green><blue>0.2627</blue>
@@ -5050,10 +5050,10 @@
   <red>0.7961</red><green>0.7882</green><blue>0.8863</blue>
  </color>
  <color name="G">
-  <red>0.6471</red><green>0.6314</green><blue>0.8039</blue>
+  <red>0.6196</red><green>0.6039</green><blue>0.7843</blue>
  </color>
  <color name="J">
-  <red>0.4235</red><green>0.3882</green><blue>0.6745</blue>
+  <red>0.4157</red><green>0.3176</green><blue>0.6392</blue>
  </color>
 </foreground>
 <background>
@@ -5077,13 +5077,13 @@
   <red>0.7961</red><green>0.7882</green><blue>0.8863</blue>
  </color>
  <color name="G">
-  <red>0.6471</red><green>0.6314</green><blue>0.8039</blue>
+  <red>0.6196</red><green>0.6039</green><blue>0.7843</blue>
  </color>
  <color name="I">
   <red>0.4588</red><green>0.4196</green><blue>0.6941</blue>
  </color>
  <color name="K">
-  <red>0.3255</red><green>0.2471</green><blue>0.6078</blue>
+  <red>0.3294</red><green>0.1529</green><blue>0.5608</blue>
  </color>
 </foreground>
 <background>
@@ -5110,13 +5110,13 @@
   <red>0.7373</red><green>0.7412</green><blue>0.8627</blue>
  </color>
  <color name="G">
-  <red>0.6471</red><green>0.6314</green><blue>0.8039</blue>
+  <red>0.6196</red><green>0.6039</green><blue>0.7843</blue>
  </color>
  <color name="I">
   <red>0.4588</red><green>0.4196</green><blue>0.6941</blue>
  </color>
  <color name="K">
-  <red>0.3255</red><green>0.2471</green><blue>0.6078</blue>
+  <red>0.3294</red><green>0.1529</green><blue>0.5608</blue>
  </color>
 </foreground>
 <background>
@@ -5143,16 +5143,16 @@
   <red>0.7373</red><green>0.7412</green><blue>0.8627</blue>
  </color>
  <color name="G">
-  <red>0.6471</red><green>0.6314</green><blue>0.8039</blue>
+  <red>0.6196</red><green>0.6039</green><blue>0.7843</blue>
  </color>
  <color name="H">
-  <red>0.5451</red><green>0.5176</green><blue>0.7451</blue>
+  <red>0.5020</red><green>0.4902</green><blue>0.7294</blue>
  </color>
  <color name="J">
-  <red>0.4235</red><green>0.3882</green><blue>0.6745</blue>
+  <red>0.4157</red><green>0.3176</green><blue>0.6392</blue>
  </color>
  <color name="L">
-  <red>0.2471</red><green>0.0510</green><blue>0.5059</blue>
+  <red>0.2902</red><green>0.0784</green><blue>0.5255</blue>
  </color>
 </foreground>
 <background>
@@ -5182,16 +5182,16 @@
   <red>0.7373</red><green>0.7412</green><blue>0.8627</blue>
  </color>
  <color name="G">
-  <red>0.6471</red><green>0.6314</green><blue>0.8039</blue>
+  <red>0.6196</red><green>0.6039</green><blue>0.7843</blue>
  </color>
  <color name="H">
-  <red>0.5451</red><green>0.5176</green><blue>0.7451</blue>
+  <red>0.5020</red><green>0.4902</green><blue>0.7294</blue>
  </color>
  <color name="J">
-  <red>0.4235</red><green>0.3882</green><blue>0.6745</blue>
+  <red>0.4157</red><green>0.3176</green><blue>0.6392</blue>
  </color>
  <color name="L">
-  <red>0.2471</red><green>0.0510</green><blue>0.5059</blue>
+  <red>0.2902</red><green>0.0784</green><blue>0.5255</blue>
  </color>
 </foreground>
 <background>
@@ -5221,16 +5221,16 @@
   <red>0.7373</red><green>0.7412</green><blue>0.8627</blue>
  </color>
  <color name="G">
-  <red>0.6471</red><green>0.6314</green><blue>0.8039</blue>
+  <red>0.6196</red><green>0.6039</green><blue>0.7843</blue>
  </color>
  <color name="H">
-  <red>0.5451</red><green>0.5176</green><blue>0.7451</blue>
+  <red>0.5020</red><green>0.4902</green><blue>0.7294</blue>
  </color>
  <color name="J">
-  <red>0.4235</red><green>0.3882</green><blue>0.6745</blue>
+  <red>0.4157</red><green>0.3176</green><blue>0.6392</blue>
  </color>
  <color name="K">
-  <red>0.3255</red><green>0.2471</green><blue>0.6078</blue>
+  <red>0.3294</red><green>0.1529</green><blue>0.5608</blue>
  </color>
  <color name="M">
   <red>0.2471</red><green>0.0000</green><blue>0.4902</blue>
@@ -5332,7 +5332,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="E">
   <red>0.9373</red><green>0.5412</green><blue>0.3843</blue>
@@ -5347,7 +5347,7 @@
   <red>0.4039</red><green>0.6627</green><blue>0.8118</blue>
  </color>
  <color name="N">
-  <red>0.0392</red><green>0.3137</green><blue>0.6314</blue>
+  <red>0.1294</red><green>0.4000</green><blue>0.6745</blue>
  </color>
 </foreground>
 <background>
@@ -5365,7 +5365,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="E">
   <red>0.9373</red><green>0.5412</green><blue>0.3843</blue>
@@ -5383,7 +5383,7 @@
   <red>0.4039</red><green>0.6627</green><blue>0.8118</blue>
  </color>
  <color name="N">
-  <red>0.0392</red><green>0.3137</green><blue>0.6314</blue>
+  <red>0.1294</red><green>0.4000</green><blue>0.6745</blue>
  </color>
 </foreground>
 <background>
@@ -5401,10 +5401,10 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="D">
-  <red>0.8431</red><green>0.4275</green><blue>0.3137</blue>
+  <red>0.8392</red><green>0.3765</green><blue>0.3020</blue>
  </color>
  <color name="F">
   <red>0.9569</red><green>0.6471</green><blue>0.5098</blue>
@@ -5422,7 +5422,7 @@
   <red>0.2627</red><green>0.5765</green><blue>0.7647</blue>
  </color>
  <color name="N">
-  <red>0.0392</red><green>0.3137</green><blue>0.6314</blue>
+  <red>0.1294</red><green>0.4000</green><blue>0.6745</blue>
  </color>
 </foreground>
 <background>
@@ -5440,10 +5440,10 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="D">
-  <red>0.8431</red><green>0.4275</green><blue>0.3137</blue>
+  <red>0.8392</red><green>0.3765</green><blue>0.3020</blue>
  </color>
  <color name="F">
   <red>0.9569</red><green>0.6471</green><blue>0.5098</blue>
@@ -5464,7 +5464,7 @@
   <red>0.2627</red><green>0.5765</green><blue>0.7647</blue>
  </color>
  <color name="N">
-  <red>0.0392</red><green>0.3137</green><blue>0.6314</blue>
+  <red>0.1294</red><green>0.4000</green><blue>0.6745</blue>
  </color>
 </foreground>
 <background>
@@ -5485,10 +5485,10 @@
   <red>0.4039</red><green>0.0000</green><blue>0.1216</blue>
  </color>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="D">
-  <red>0.8431</red><green>0.4275</green><blue>0.3137</blue>
+  <red>0.8392</red><green>0.3765</green><blue>0.3020</blue>
  </color>
  <color name="F">
   <red>0.9569</red><green>0.6471</green><blue>0.5098</blue>
@@ -5506,7 +5506,7 @@
   <red>0.2627</red><green>0.5765</green><blue>0.7647</blue>
  </color>
  <color name="N">
-  <red>0.0392</red><green>0.3137</green><blue>0.6314</blue>
+  <red>0.1294</red><green>0.4000</green><blue>0.6745</blue>
  </color>
  <color name="O">
   <red>0.0196</red><green>0.1882</green><blue>0.3804</blue>
@@ -5530,10 +5530,10 @@
   <red>0.4039</red><green>0.0000</green><blue>0.1216</blue>
  </color>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="D">
-  <red>0.8431</red><green>0.4275</green><blue>0.3137</blue>
+  <red>0.8392</red><green>0.3765</green><blue>0.3020</blue>
  </color>
  <color name="F">
   <red>0.9569</red><green>0.6471</green><blue>0.5098</blue>
@@ -5554,7 +5554,7 @@
   <red>0.2627</red><green>0.5765</green><blue>0.7647</blue>
  </color>
  <color name="N">
-  <red>0.0392</red><green>0.3137</green><blue>0.6314</blue>
+  <red>0.1294</red><green>0.4000</green><blue>0.6745</blue>
  </color>
  <color name="O">
   <red>0.0196</red><green>0.1882</green><blue>0.3804</blue>
@@ -5656,7 +5656,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="E">
   <red>0.9373</red><green>0.5412</green><blue>0.3843</blue>
@@ -5689,7 +5689,7 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="E">
   <red>0.9373</red><green>0.5412</green><blue>0.3843</blue>
@@ -5725,10 +5725,10 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="D">
-  <red>0.8431</red><green>0.4275</green><blue>0.3137</blue>
+  <red>0.8392</red><green>0.3765</green><blue>0.3020</blue>
  </color>
  <color name="F">
   <red>0.9569</red><green>0.6471</green><blue>0.5098</blue>
@@ -5764,10 +5764,10 @@
 </description>
 <foreground>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="D">
-  <red>0.8431</red><green>0.4275</green><blue>0.3137</blue>
+  <red>0.8392</red><green>0.3765</green><blue>0.3020</blue>
  </color>
  <color name="F">
   <red>0.9569</red><green>0.6471</green><blue>0.5098</blue>
@@ -5809,10 +5809,10 @@
   <red>0.4039</red><green>0.0000</green><blue>0.1216</blue>
  </color>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="D">
-  <red>0.8431</red><green>0.4275</green><blue>0.3137</blue>
+  <red>0.8392</red><green>0.3765</green><blue>0.3020</blue>
  </color>
  <color name="F">
   <red>0.9569</red><green>0.6471</green><blue>0.5098</blue>
@@ -5833,7 +5833,7 @@
   <red>0.3020</red><green>0.3020</green><blue>0.3020</blue>
  </color>
  <color name="O">
-  <red>0.0000</red><green>0.0000</green><blue>0.0000</blue>
+  <red>0.1020</red><green>0.1020</green><blue>0.1020</blue>
  </color>
 </foreground>
 <background>
@@ -5854,10 +5854,10 @@
   <red>0.4039</red><green>0.0000</green><blue>0.1216</blue>
  </color>
  <color name="B">
-  <red>0.6980</red><green>0.0000</green><blue>0.1255</blue>
+  <red>0.6980</red><green>0.0941</green><blue>0.1686</blue>
  </color>
  <color name="D">
-  <red>0.8431</red><green>0.4275</green><blue>0.3137</blue>
+  <red>0.8392</red><green>0.3765</green><blue>0.3020</blue>
  </color>
  <color name="F">
   <red>0.9569</red><green>0.6471</green><blue>0.5098</blue>
@@ -5881,7 +5881,7 @@
   <red>0.3020</red><green>0.3020</green><blue>0.3020</blue>
  </color>
  <color name="O">
-  <red>0.0000</red><green>0.0000</green><blue>0.0000</blue>
+  <red>0.1020</red><green>0.1020</green><blue>0.1020</blue>
  </color>
 </foreground>
 <background>
@@ -5905,7 +5905,7 @@
   <red>0.9804</red><green>0.6235</green><blue>0.7098</blue>
  </color>
  <color name="I">
-  <red>0.7686</red><green>0.0078</green><blue>0.4941</blue>
+  <red>0.7725</red><green>0.1059</green><blue>0.5412</blue>
  </color>
 </foreground>
 <background>
@@ -5959,7 +5959,7 @@
   <red>0.9686</red><green>0.4078</green><blue>0.6314</blue>
  </color>
  <color name="I">
-  <red>0.7686</red><green>0.0078</green><blue>0.4941</blue>
+  <red>0.7725</red><green>0.1059</green><blue>0.5412</blue>
  </color>
  <color name="K">
   <red>0.4784</red><green>0.0039</green><blue>0.4667</blue>
@@ -5992,7 +5992,7 @@
   <red>0.9686</red><green>0.4078</green><blue>0.6314</blue>
  </color>
  <color name="I">
-  <red>0.7686</red><green>0.0078</green><blue>0.4941</blue>
+  <red>0.7725</red><green>0.1059</green><blue>0.5412</blue>
  </color>
  <color name="K">
   <red>0.4784</red><green>0.0039</green><blue>0.4667</blue>
@@ -6133,7 +6133,7 @@
   <red>0.9961</red><green>0.8784</green><blue>0.8235</blue>
  </color>
  <color name="F">
-  <red>0.9843</red><green>0.6039</green><blue>0.4784</blue>
+  <red>0.9882</red><green>0.5725</green><blue>0.4471</blue>
  </color>
  <color name="I">
   <red>0.8706</red><green>0.1765</green><blue>0.1490</blue>
@@ -6160,7 +6160,7 @@
   <red>0.9882</red><green>0.6824</green><blue>0.5686</blue>
  </color>
  <color name="G">
-  <red>0.9843</red><green>0.4549</green><blue>0.3255</blue>
+  <red>0.9843</red><green>0.4157</green><blue>0.2902</blue>
  </color>
  <color name="J">
   <red>0.7961</red><green>0.0941</green><blue>0.1137</blue>
@@ -6187,13 +6187,13 @@
   <red>0.9882</red><green>0.6824</green><blue>0.5686</blue>
  </color>
  <color name="G">
-  <red>0.9843</red><green>0.4549</green><blue>0.3255</blue>
+  <red>0.9843</red><green>0.4157</green><blue>0.2902</blue>
  </color>
  <color name="I">
   <red>0.8706</red><green>0.1765</green><blue>0.1490</blue>
  </color>
  <color name="K">
-  <red>0.6000</red><green>0.0549</green><blue>0.0824</blue>
+  <red>0.6471</red><green>0.0588</green><blue>0.0824</blue>
  </color>
 </foreground>
 <background>
@@ -6214,19 +6214,19 @@
   <red>0.9961</red><green>0.8980</green><blue>0.8510</blue>
  </color>
  <color name="D">
-  <red>0.9882</red><green>0.7529</green><blue>0.6549</blue>
+  <red>0.9882</red><green>0.7333</green><blue>0.6314</blue>
  </color>
  <color name="F">
-  <red>0.9843</red><green>0.6039</green><blue>0.4784</blue>
+  <red>0.9882</red><green>0.5725</green><blue>0.4471</blue>
  </color>
  <color name="G">
-  <red>0.9843</red><green>0.4549</green><blue>0.3255</blue>
+  <red>0.9843</red><green>0.4157</green><blue>0.2902</blue>
  </color>
  <color name="I">
   <red>0.8706</red><green>0.1765</green><blue>0.1490</blue>
  </color>
  <color name="K">
-  <red>0.6000</red><green>0.0549</green><blue>0.0824</blue>
+  <red>0.6471</red><green>0.0588</green><blue>0.0824</blue>
  </color>
 </foreground>
 <background>
@@ -6247,16 +6247,16 @@
   <red>0.9961</red><green>0.8980</green><blue>0.8510</blue>
  </color>
  <color name="D">
-  <red>0.9882</red><green>0.7529</green><blue>0.6549</blue>
+  <red>0.9882</red><green>0.7333</green><blue>0.6314</blue>
  </color>
  <color name="F">
-  <red>0.9843</red><green>0.6039</green><blue>0.4784</blue>
+  <red>0.9882</red><green>0.5725</green><blue>0.4471</blue>
  </color>
  <color name="G">
-  <red>0.9843</red><green>0.4549</green><blue>0.3255</blue>
+  <red>0.9843</red><green>0.4157</green><blue>0.2902</blue>
  </color>
  <color name="H">
-  <red>0.9373</red><green>0.2784</green><blue>0.2078</blue>
+  <red>0.9373</red><green>0.2314</green><blue>0.1725</blue>
  </color>
  <color name="J">
   <red>0.7961</red><green>0.0941</green><blue>0.1137</blue>
@@ -6286,16 +6286,16 @@
   <red>0.9961</red><green>0.8784</green><blue>0.8235</blue>
  </color>
  <color name="D">
-  <red>0.9882</red><green>0.7529</green><blue>0.6549</blue>
+  <red>0.9882</red><green>0.7333</green><blue>0.6314</blue>
  </color>
  <color name="F">
-  <red>0.9843</red><green>0.6039</green><blue>0.4784</blue>
+  <red>0.9882</red><green>0.5725</green><blue>0.4471</blue>
  </color>
  <color name="G">
-  <red>0.9843</red><green>0.4549</green><blue>0.3255</blue>
+  <red>0.9843</red><green>0.4157</green><blue>0.2902</blue>
  </color>
  <color name="H">
-  <red>0.9373</red><green>0.2784</green><blue>0.2078</blue>
+  <red>0.9373</red><green>0.2314</green><blue>0.1725</blue>
  </color>
  <color name="J">
   <red>0.7961</red><green>0.0941</green><blue>0.1137</blue>
@@ -6325,22 +6325,22 @@
   <red>0.9961</red><green>0.8784</green><blue>0.8235</blue>
  </color>
  <color name="D">
-  <red>0.9882</red><green>0.7529</green><blue>0.6549</blue>
+  <red>0.9882</red><green>0.7333</green><blue>0.6314</blue>
  </color>
  <color name="F">
-  <red>0.9843</red><green>0.6039</green><blue>0.4784</blue>
+  <red>0.9882</red><green>0.5725</green><blue>0.4471</blue>
  </color>
  <color name="G">
-  <red>0.9843</red><green>0.4549</green><blue>0.3255</blue>
+  <red>0.9843</red><green>0.4157</green><blue>0.2902</blue>
  </color>
  <color name="H">
-  <red>0.9373</red><green>0.2784</green><blue>0.2078</blue>
+  <red>0.9373</red><green>0.2314</green><blue>0.1725</blue>
  </color>
  <color name="J">
   <red>0.7961</red><green>0.0941</green><blue>0.1137</blue>
  </color>
  <color name="K">
-  <red>0.6000</red><green>0.0549</green><blue>0.0824</blue>
+  <red>0.6471</red><green>0.0588</green><blue>0.0824</blue>
  </color>
  <color name="M">
   <red>0.4039</red><green>0.0000</green><blue>0.0510</blue>
@@ -6354,7 +6354,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYB 3" ncolors="3"
+<colormap name="RdYlBu 3" ncolors="3"
            type="diverging" criticalvalue="2" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6378,7 +6378,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYB 4" ncolors="4"
+<colormap name="RdYlBu 4" ncolors="4"
            type="diverging" criticalvalue="2.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6405,7 +6405,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYB 5" ncolors="5"
+<colormap name="RdYlBu 5" ncolors="5"
            type="diverging" criticalvalue="3" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6435,14 +6435,14 @@
 </annotations>
 </colormap>
 
-<colormap name="RYB 6" ncolors="6"
+<colormap name="RdYlBu 6" ncolors="6"
            type="diverging" criticalvalue="3.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8431</red><green>0.1882</green><blue>0.1529</blue>
  </color>
  <color name="E">
   <red>0.9882</red><green>0.5529</green><blue>0.3490</blue>
@@ -6468,14 +6468,14 @@
 </annotations>
 </colormap>
 
-<colormap name="RYB 7" ncolors="7"
+<colormap name="RdYlBu 7" ncolors="7"
            type="diverging" criticalvalue="4" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8431</red><green>0.1882</green><blue>0.1529</blue>
  </color>
  <color name="E">
   <red>0.9882</red><green>0.5529</green><blue>0.3490</blue>
@@ -6504,14 +6504,14 @@
 </annotations>
 </colormap>
 
-<colormap name="RYB 8" ncolors="8"
+<colormap name="RdYlBu 8" ncolors="8"
            type="diverging" criticalvalue="4.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8431</red><green>0.1882</green><blue>0.1529</blue>
  </color>
  <color name="D">
   <red>0.9569</red><green>0.4275</green><blue>0.2627</blue>
@@ -6543,14 +6543,14 @@
 </annotations>
 </colormap>
 
-<colormap name="RYB 9" ncolors="9"
+<colormap name="RdYlBu 9" ncolors="9"
            type="diverging" criticalvalue="5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8431</red><green>0.1882</green><blue>0.1529</blue>
  </color>
  <color name="D">
   <red>0.9569</red><green>0.4275</green><blue>0.2627</blue>
@@ -6585,17 +6585,17 @@
 </annotations>
 </colormap>
 
-<colormap name="RYB 10" ncolors="10"
+<colormap name="RdYlBu 10" ncolors="10"
            type="diverging" criticalvalue="5.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="A">
-  <red>0.6784</red><green>0.0000</green><blue>0.1922</blue>
+  <red>0.6471</red><green>0.0000</green><blue>0.1490</blue>
  </color>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8431</red><green>0.1882</green><blue>0.1529</blue>
  </color>
  <color name="D">
   <red>0.9569</red><green>0.4275</green><blue>0.2627</blue>
@@ -6630,17 +6630,17 @@
 </annotations>
 </colormap>
 
-<colormap name="RYB 11" ncolors="11"
+<colormap name="RdYlBu 11" ncolors="11"
            type="diverging" criticalvalue="6" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="A">
-  <red>0.6784</red><green>0.0000</green><blue>0.1922</blue>
+  <red>0.6471</red><green>0.0000</green><blue>0.1490</blue>
  </color>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8431</red><green>0.1882</green><blue>0.1529</blue>
  </color>
  <color name="D">
   <red>0.9569</red><green>0.4275</green><blue>0.2627</blue>
@@ -6678,7 +6678,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYG 3" ncolors="3"
+<colormap name="RdYlGn 3" ncolors="3"
            type="diverging" criticalvalue="2" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6702,7 +6702,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYG 4" ncolors="4"
+<colormap name="RdYlGn 4" ncolors="4"
            type="diverging" criticalvalue="2.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6729,7 +6729,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYG 5" ncolors="5"
+<colormap name="RdYlGn 5" ncolors="5"
            type="diverging" criticalvalue="3" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6759,7 +6759,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYG 6" ncolors="6"
+<colormap name="RdYlGn 6" ncolors="6"
            type="diverging" criticalvalue="3.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6781,7 +6781,7 @@
   <red>0.5686</red><green>0.8118</green><blue>0.3765</blue>
  </color>
  <color name="N">
-  <red>0.0667</red><green>0.5765</green><blue>0.3216</blue>
+  <red>0.1020</red><green>0.5961</green><blue>0.3137</blue>
  </color>
 </foreground>
 <background>
@@ -6792,7 +6792,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYG 7" ncolors="7"
+<colormap name="RdYlGn 7" ncolors="7"
            type="diverging" criticalvalue="4" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6817,7 +6817,7 @@
   <red>0.5686</red><green>0.8118</green><blue>0.3765</blue>
  </color>
  <color name="N">
-  <red>0.0667</red><green>0.5765</green><blue>0.3216</blue>
+  <red>0.1020</red><green>0.5961</green><blue>0.3137</blue>
  </color>
 </foreground>
 <background>
@@ -6828,7 +6828,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYG 8" ncolors="8"
+<colormap name="RdYlGn 8" ncolors="8"
            type="diverging" criticalvalue="4.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6856,7 +6856,7 @@
   <red>0.4000</red><green>0.7412</green><blue>0.3882</blue>
  </color>
  <color name="N">
-  <red>0.0667</red><green>0.5765</green><blue>0.3216</blue>
+  <red>0.1020</red><green>0.5961</green><blue>0.3137</blue>
  </color>
 </foreground>
 <background>
@@ -6867,7 +6867,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYG 9" ncolors="9"
+<colormap name="RdYlGn 9" ncolors="9"
            type="diverging" criticalvalue="5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6898,7 +6898,7 @@
   <red>0.4000</red><green>0.7412</green><blue>0.3882</blue>
  </color>
  <color name="N">
-  <red>0.0667</red><green>0.5765</green><blue>0.3216</blue>
+  <red>0.1020</red><green>0.5961</green><blue>0.3137</blue>
  </color>
 </foreground>
 <background>
@@ -6909,7 +6909,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYG 10" ncolors="10"
+<colormap name="RdYlGn 10" ncolors="10"
            type="diverging" criticalvalue="5.5" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6940,7 +6940,7 @@
   <red>0.4000</red><green>0.7412</green><blue>0.3882</blue>
  </color>
  <color name="N">
-  <red>0.0667</red><green>0.5765</green><blue>0.3216</blue>
+  <red>0.1020</red><green>0.5961</green><blue>0.3137</blue>
  </color>
  <color name="O">
   <red>0.0000</red><green>0.4078</green><blue>0.2157</blue>
@@ -6954,7 +6954,7 @@
 </annotations>
 </colormap>
 
-<colormap name="RYG 11" ncolors="11"
+<colormap name="RdYlGn 11" ncolors="11"
            type="diverging" criticalvalue="6" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
@@ -6988,7 +6988,7 @@
   <red>0.4000</red><green>0.7412</green><blue>0.3882</blue>
  </color>
  <color name="N">
-  <red>0.0667</red><green>0.5765</green><blue>0.3216</blue>
+  <red>0.1020</red><green>0.5961</green><blue>0.3137</blue>
  </color>
  <color name="O">
   <red>0.0000</red><green>0.4078</green><blue>0.2157</blue>
@@ -7194,36 +7194,36 @@
 <colormap name="Set1 9" ncolors="9"
            type="qualitative" system="rgb">
 <description>
- From Cindy Brewer; one of the schemes in the ColorBrewer software.
+ From Cindy Brewer; one of the schemes in the ColorBrewer software
  (The sequence of colors has been modified to improve its default
  behavior in ggobi.)
 </description>
 <foreground>
- <color name="Yellow">
+ <color name="F">
   <red>1.0000</red><green>1.0000</green><blue>0.2000</blue>
  </color>
- <color name="Orange">
+ <color name="A">
   <red>0.8941</red><green>0.1020</green><blue>0.1098</blue>
  </color>
- <color name="Blue">
+ <color name="B">
   <red>0.2157</red><green>0.4941</green><blue>0.7216</blue>
  </color>
- <color name="Green">
+ <color name="C">
   <red>0.3020</red><green>0.6863</green><blue>0.2902</blue>
  </color>
- <color name="Orange">
+ <color name="E">
   <red>1.0000</red><green>0.4980</green><blue>0.0000</blue>
  </color>
- <color name="Brown">
+ <color name="G">
   <red>0.6510</red><green>0.3373</green><blue>0.1569</blue>
  </color>
- <color name="Pink">
+ <color name="H">
   <red>0.9686</red><green>0.5059</green><blue>0.7490</blue>
  </color>
- <color name="Gray">
-  <red>0.4980</red><green>0.4980</green><blue>0.4980</blue>
+ <color name="I">
+  <red>0.6000</red><green>0.6000</green><blue>0.6000</blue>
  </color>
- <color name="Purple">
+ <color name="D">
   <red>0.5961</red><green>0.3059</green><blue>0.6392</blue>
  </color>
 </foreground>
@@ -7644,7 +7644,7 @@
   <red>0.9882</red><green>0.8039</green><blue>0.8980</blue>
  </color>
  <color name="I">
-  <red>0.7020</red><green>0.7020</green><blue>0.7020</blue>
+  <red>0.8510</red><green>0.8510</green><blue>0.8510</blue>
  </color>
 </foreground>
 <background>
@@ -7686,7 +7686,7 @@
   <red>0.9882</red><green>0.8039</green><blue>0.8980</blue>
  </color>
  <color name="I">
-  <red>0.7020</red><green>0.7020</green><blue>0.7020</blue>
+  <red>0.8510</red><green>0.8510</green><blue>0.8510</blue>
  </color>
  <color name="J">
   <red>0.7373</red><green>0.5020</green><blue>0.7412</blue>
@@ -7731,7 +7731,7 @@
   <red>0.9882</red><green>0.8039</green><blue>0.8980</blue>
  </color>
  <color name="I">
-  <red>0.7020</red><green>0.7020</green><blue>0.7020</blue>
+  <red>0.8510</red><green>0.8510</green><blue>0.8510</blue>
  </color>
  <color name="J">
   <red>0.7373</red><green>0.5020</green><blue>0.7412</blue>
@@ -7779,7 +7779,7 @@
   <red>0.9882</red><green>0.8039</green><blue>0.8980</blue>
  </color>
  <color name="I">
-  <red>0.7020</red><green>0.7020</green><blue>0.7020</blue>
+  <red>0.8510</red><green>0.8510</green><blue>0.8510</blue>
  </color>
  <color name="J">
   <red>0.7373</red><green>0.5020</green><blue>0.7412</blue>
@@ -7799,8 +7799,8 @@
 </annotations>
 </colormap>
 
-<colormap name="spectral 3" ncolors="3"
-          type="spectral" criticalvalue="2" system="rgb">
+<colormap name="Spectral 3" ncolors="3"
+           type="spectral" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
@@ -7823,8 +7823,8 @@
 </annotations>
 </colormap>
 
-<colormap name="spectral 4" ncolors="4"
-          type="spectral" criticalvalue="2.5" system="rgb">
+<colormap name="Spectral 4" ncolors="4"
+           type="spectral" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
@@ -7850,8 +7850,8 @@
 </annotations>
 </colormap>
 
-<colormap name="spectral 5" ncolors="5"
-          type="spectral" criticalvalue="3" system="rgb">
+<colormap name="Spectral 5" ncolors="5"
+           type="spectral" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
@@ -7880,14 +7880,14 @@
 </annotations>
 </colormap>
 
-<colormap name="spectral 6" ncolors="6"
-          type="spectral" criticalvalue="3.5" system="rgb">
+<colormap name="Spectral 6" ncolors="6"
+           type="spectral" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8353</red><green>0.2431</green><blue>0.3098</blue>
  </color>
  <color name="E">
   <red>0.9882</red><green>0.5529</green><blue>0.3490</blue>
@@ -7902,7 +7902,7 @@
   <red>0.6000</red><green>0.8353</green><blue>0.5804</blue>
  </color>
  <color name="N">
-  <red>0.1686</red><green>0.5137</green><blue>0.7294</blue>
+  <red>0.1961</red><green>0.5333</green><blue>0.7412</blue>
  </color>
 </foreground>
 <background>
@@ -7913,14 +7913,14 @@
 </annotations>
 </colormap>
 
-<colormap name="spectral 7" ncolors="7"
-          type="spectral" criticalvalue="4" system="rgb">
+<colormap name="Spectral 7" ncolors="7"
+           type="spectral" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8353</red><green>0.2431</green><blue>0.3098</blue>
  </color>
  <color name="E">
   <red>0.9882</red><green>0.5529</green><blue>0.3490</blue>
@@ -7938,7 +7938,7 @@
   <red>0.6000</red><green>0.8353</green><blue>0.5804</blue>
  </color>
  <color name="N">
-  <red>0.1686</red><green>0.5137</green><blue>0.7294</blue>
+  <red>0.1961</red><green>0.5333</green><blue>0.7412</blue>
  </color>
 </foreground>
 <background>
@@ -7949,14 +7949,14 @@
 </annotations>
 </colormap>
 
-<colormap name="spectral 8" ncolors="8"
-          type="spectral" criticalvalue="4.5" system="rgb">
+<colormap name="Spectral 8" ncolors="8"
+           type="spectral" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8353</red><green>0.2431</green><blue>0.3098</blue>
  </color>
  <color name="D">
   <red>0.9569</red><green>0.4275</green><blue>0.2627</blue>
@@ -7977,7 +7977,7 @@
   <red>0.4000</red><green>0.7608</green><blue>0.6471</blue>
  </color>
  <color name="N">
-  <red>0.1686</red><green>0.5137</green><blue>0.7294</blue>
+  <red>0.1961</red><green>0.5333</green><blue>0.7412</blue>
  </color>
 </foreground>
 <background>
@@ -7988,14 +7988,14 @@
 </annotations>
 </colormap>
 
-<colormap name="spectral 9" ncolors="9"
-          type="spectral" criticalvalue="5" system="rgb">
+<colormap name="Spectral 9" ncolors="9"
+           type="spectral" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
 <foreground>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8353</red><green>0.2431</green><blue>0.3098</blue>
  </color>
  <color name="D">
   <red>0.9569</red><green>0.4275</green><blue>0.2627</blue>
@@ -8019,7 +8019,7 @@
   <red>0.4000</red><green>0.7608</green><blue>0.6471</blue>
  </color>
  <color name="N">
-  <red>0.1686</red><green>0.5137</green><blue>0.7294</blue>
+  <red>0.1961</red><green>0.5333</green><blue>0.7412</blue>
  </color>
 </foreground>
 <background>
@@ -8030,8 +8030,8 @@
 </annotations>
 </colormap>
 
-<colormap name="spectral 10" ncolors="10"
-          type="spectral" criticalvalue="5.5" system="rgb">
+<colormap name="Spectral 10" ncolors="10"
+           type="spectral" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
@@ -8040,7 +8040,7 @@
   <red>0.6196</red><green>0.0039</green><blue>0.2588</blue>
  </color>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8353</red><green>0.2431</green><blue>0.3098</blue>
  </color>
  <color name="D">
   <red>0.9569</red><green>0.4275</green><blue>0.2627</blue>
@@ -8061,7 +8061,7 @@
   <red>0.4000</red><green>0.7608</green><blue>0.6471</blue>
  </color>
  <color name="N">
-  <red>0.1686</red><green>0.5137</green><blue>0.7294</blue>
+  <red>0.1961</red><green>0.5333</green><blue>0.7412</blue>
  </color>
  <color name="O">
   <red>0.3686</red><green>0.3098</green><blue>0.6353</blue>
@@ -8075,8 +8075,8 @@
 </annotations>
 </colormap>
 
-<colormap name="spectral 11" ncolors="11"
-          type="spectral" criticalvalue="6" system="rgb">
+<colormap name="Spectral 11" ncolors="11"
+           type="spectral" system="rgb">
 <description>
  From Cindy Brewer; one of the schemes in the ColorBrewer software
 </description>
@@ -8085,7 +8085,7 @@
   <red>0.6196</red><green>0.0039</green><blue>0.2588</blue>
  </color>
  <color name="B">
-  <red>0.8431</red><green>0.2392</green><blue>0.1608</blue>
+  <red>0.8353</red><green>0.2431</green><blue>0.3098</blue>
  </color>
  <color name="D">
   <red>0.9569</red><green>0.4275</green><blue>0.2627</blue>
@@ -8109,7 +8109,7 @@
   <red>0.4000</red><green>0.7608</green><blue>0.6471</blue>
  </color>
  <color name="N">
-  <red>0.1686</red><green>0.5137</green><blue>0.7294</blue>
+  <red>0.1961</red><green>0.5333</green><blue>0.7412</blue>
  </color>
  <color name="O">
   <red>0.3686</red><green>0.3098</green><blue>0.6353</blue>
@@ -8163,7 +8163,7 @@
   <red>0.4706</red><green>0.7765</green><blue>0.4745</blue>
  </color>
  <color name="J">
-  <red>0.1373</red><green>0.5451</green><blue>0.2706</blue>
+  <red>0.1373</red><green>0.5176</green><blue>0.2627</blue>
  </color>
 </foreground>
 <background>
@@ -8193,7 +8193,7 @@
   <red>0.1922</red><green>0.6392</green><blue>0.3294</blue>
  </color>
  <color name="K">
-  <red>0.0000</red><green>0.4275</green><blue>0.1725</blue>
+  <red>0.0000</red><green>0.4078</green><blue>0.2157</blue>
  </color>
 </foreground>
 <background>
@@ -8226,7 +8226,7 @@
   <red>0.1922</red><green>0.6392</green><blue>0.3294</blue>
  </color>
  <color name="K">
-  <red>0.0000</red><green>0.4275</green><blue>0.1725</blue>
+  <red>0.0000</red><green>0.4078</green><blue>0.2157</blue>
  </color>
 </foreground>
 <background>
@@ -8259,7 +8259,7 @@
   <red>0.2549</red><green>0.6706</green><blue>0.3647</blue>
  </color>
  <color name="J">
-  <red>0.1373</red><green>0.5451</green><blue>0.2706</blue>
+  <red>0.1373</red><green>0.5176</green><blue>0.2627</blue>
  </color>
  <color name="L">
   <red>0.0000</red><green>0.3529</green><blue>0.1961</blue>
@@ -8298,7 +8298,7 @@
   <red>0.2549</red><green>0.6706</green><blue>0.3647</blue>
  </color>
  <color name="J">
-  <red>0.1373</red><green>0.5451</green><blue>0.2706</blue>
+  <red>0.1373</red><green>0.5176</green><blue>0.2627</blue>
  </color>
  <color name="L">
   <red>0.0000</red><green>0.3529</green><blue>0.1961</blue>
@@ -8337,10 +8337,10 @@
   <red>0.2549</red><green>0.6706</green><blue>0.3647</blue>
  </color>
  <color name="J">
-  <red>0.1373</red><green>0.5451</green><blue>0.2706</blue>
+  <red>0.1373</red><green>0.5176</green><blue>0.2627</blue>
  </color>
  <color name="K">
-  <red>0.0000</red><green>0.4275</green><blue>0.1725</blue>
+  <red>0.0000</red><green>0.4078</green><blue>0.2157</blue>
  </color>
  <color name="M">
   <red>0.0000</red><green>0.2706</green><blue>0.1608</blue>
@@ -8394,7 +8394,7 @@
   <red>0.2549</red><green>0.7137</green><blue>0.7686</blue>
  </color>
  <color name="J">
-  <red>0.2196</red><green>0.4235</green><blue>0.6902</blue>
+  <red>0.1333</red><green>0.3686</green><blue>0.6588</blue>
  </color>
 </foreground>
 <background>
@@ -8490,7 +8490,7 @@
   <red>0.1137</red><green>0.5686</green><blue>0.7529</blue>
  </color>
  <color name="J">
-  <red>0.2196</red><green>0.4235</green><blue>0.6902</blue>
+  <red>0.1333</red><green>0.3686</green><blue>0.6588</blue>
  </color>
  <color name="L">
   <red>0.0471</red><green>0.1725</green><blue>0.5176</blue>
@@ -8529,7 +8529,7 @@
   <red>0.1137</red><green>0.5686</green><blue>0.7529</blue>
  </color>
  <color name="J">
-  <red>0.2196</red><green>0.4235</green><blue>0.6902</blue>
+  <red>0.1333</red><green>0.3686</green><blue>0.6588</blue>
  </color>
  <color name="L">
   <red>0.0471</red><green>0.1725</green><blue>0.5176</blue>
@@ -8568,7 +8568,7 @@
   <red>0.1137</red><green>0.5686</green><blue>0.7529</blue>
  </color>
  <color name="J">
-  <red>0.2196</red><green>0.4235</green><blue>0.6902</blue>
+  <red>0.1333</red><green>0.3686</green><blue>0.6588</blue>
  </color>
  <color name="K">
   <red>0.1451</red><green>0.2039</green><blue>0.5804</blue>
@@ -8625,7 +8625,7 @@
   <red>0.9961</red><green>0.6000</green><blue>0.1608</blue>
  </color>
  <color name="J">
-  <red>0.8000</red><green>0.3176</green><blue>0.0078</blue>
+  <red>0.8000</red><green>0.2980</green><blue>0.0078</blue>
  </color>
 </foreground>
 <background>
@@ -8721,10 +8721,10 @@
   <red>0.9255</red><green>0.4392</green><blue>0.0784</blue>
  </color>
  <color name="J">
-  <red>0.8000</red><green>0.3176</green><blue>0.0078</blue>
+  <red>0.8000</red><green>0.2980</green><blue>0.0078</blue>
  </color>
  <color name="L">
-  <red>0.5490</red><green>0.2000</green><blue>0.0196</blue>
+  <red>0.5490</red><green>0.1765</green><blue>0.0157</blue>
  </color>
 </foreground>
 <background>
@@ -8760,10 +8760,10 @@
   <red>0.9255</red><green>0.4392</green><blue>0.0784</blue>
  </color>
  <color name="J">
-  <red>0.8000</red><green>0.3176</green><blue>0.0078</blue>
+  <red>0.8000</red><green>0.2980</green><blue>0.0078</blue>
  </color>
  <color name="L">
-  <red>0.5490</red><green>0.2000</green><blue>0.0196</blue>
+  <red>0.5490</red><green>0.1765</green><blue>0.0157</blue>
  </color>
 </foreground>
 <background>
@@ -8799,13 +8799,13 @@
   <red>0.9255</red><green>0.4392</green><blue>0.0784</blue>
  </color>
  <color name="J">
-  <red>0.8000</red><green>0.3176</green><blue>0.0078</blue>
+  <red>0.8000</red><green>0.2980</green><blue>0.0078</blue>
  </color>
  <color name="K">
   <red>0.6000</red><green>0.2039</green><blue>0.0157</blue>
  </color>
  <color name="M">
-  <red>0.4000</red><green>0.1804</green><blue>0.0314</blue>
+  <red>0.4000</red><green>0.1451</green><blue>0.0235</blue>
  </color>
 </foreground>
 <background>
