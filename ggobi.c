@@ -174,6 +174,7 @@ gint XGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
   extern void make_ggobi (gchar *, gboolean);
   GdkVisual *vis;
 
+
 /*  g_thread_init (NULL);*/
   gtk_init (&argc, &argv);
 
