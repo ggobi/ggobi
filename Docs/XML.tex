@@ -208,7 +208,23 @@ within this \texttt{data} element.
 Included in the source code is a file called colorschemes.xml,
 which contains (as of this writing) 265 distinct color schemes.
 
+To specify one that one of these schemes should be the default
+for a particular set of data, specify it inside the ggobidata
+element.
+\begin{verbatim}
+<ggobidata>
+<activeColorScheme name="YlOrRd 9"/>
+...
+</ggobidata>
+\end{verbatim}
 
+In case you have devised your own scheme you'd like to use, 
+specify it as follows:
+
+\begin{verbatim}
+<activeColorScheme file="/full/path/name/mycolorschemes.xml"
+                   name="MyColorScheme 7"/>
+\end{verbatim}
 
 
 \begin{comment}
@@ -431,7 +447,8 @@ character, tabs or new lines).
 A record can be considered ``hidden''.  This is set via a logical
 value for the attribute \texttt{hidden}.
 
-Each record can be given an \XMLAttribute{id} attribute value.  This
+Each record can be given an \XMLAttribute{id} attribute value, which
+can be an arbitrary string.  This
 is different from a label in that it is not used by ggobi instance
 when displaying plots.  Instead, it is used only to uniquely identify
 a record within a dataset, and it has two purposes.
@@ -464,7 +481,7 @@ a second dataset whose records have \XMLAttribute{source}
 and \XMLAttribute{destination} tags, like this:
 
 \begin{verbatim}
-<record source="0" destination="2"> </record>
+<record source="a" destination="b"> </record>
 \end{verbatim}
 % 
 The values used for \XMLAttribute{source} and \XMLAttribute{destination}
