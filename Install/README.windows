@@ -1,3 +1,124 @@
+New Notes written by Aashish Chaudhary June 2004
+------------------------------------------------
+
+Download and Unpack GGobi:
+
+You can go to the web site http://www.ggobi.org/Download, download the
+latest version of the tar.gz file. Unzip it (to tar and then to
+ggobi). You can use Winzip, or if you have cygwin already installed
+the usual gunzip and tar unix commands can be used.
+
+Installing Cygwin:
+
+Cygwin is the program that enables us to use Unix/Linux shell for
+Windows.  You can simply go to the web site, http://www.cygwin.com,
+and click "Install now". Be sure that you get a full developers
+installation. Some of the tools may not be installed by default, eg
+autoconf, but you can come back to this site and install the missed
+pieces at any time.
+
+Get supporting development files from the ggobi web site. These are
+stored in src_zip.zip. Unzip this into a temporary directory.
+
+Installing MingW:
+
+MingW is minimalist GNU for windows. It has several useful utilities
+and libraries which enable us to use Unix/Linux style program.  The
+setup file is MinGW-2.0.0-3.exe, and it should create a directory
+C:/MinGW.
+
+Setup MingW:
+
+To enable using of bin programs in MingW, you need to modify path in
+the profile in Cygwin. Open the profile file under "etc" directory in
+Cygwin, and add path of MingW bin directory.
+
+PATH="/cygdrive/c/mingw/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+Installing Gcc:
+
+Unzip gcc-2.95.2-1-msvcrt.zip and copy the pieces into the MingW
+directory.
+
+Note: gcc-2.95.2.-1-msvcrt.zip consists of four directories, bin,
+i386-mingw32msvc, include, and lib, which already exist in MingW
+directory; therefore, you need to overwrite files in the bin, include,
+and lib directories. There are newer versions of gcc but ggobi cannot
+be compiled with these yet.
+
+Installing libxml2 library:
+
+Unzip the file libxml2-2.6.6.win32.zip into the directory
+C:/GGobiLibs. The directory name GGobiLibs can be changed to whatever
+you want to call it, but the you'll need to use this new name
+everywhere that we use GGobiLibs in these instructions.
+
+Installing libintl library:
+
+Unzip the file libintl-0.10.40-tml-20020904.zip into the directory,
+C:/GGobiLibs.
+
+Installing libiconv library:
+
+Unzip the libiconv-1.8-w32-1.bin.zip into the directory, C:/GGobiLibs.
+
+Installing GTK libraries:
+
+Unzip the files gtk+-dev-1.3.0-20030115.zip, gtk+-1.3.0-20030717.zip,
+into the directory, C:/GGobiLibs.
+
+Installing glib libraries:
+
+Unzip the files glib-dev-2.2.3-20040116.zip, glib-2.2.3-20040116.zip
+into the directory, C:/GGobiLibs.
+
+Installing zlib libraries:
+
+Unzip the file zlib-1.1.4.win32.zip into the directory, C:/GGobiLibs.
+
+Now the C:/GGobiLibs directory structure should look like
+
+C:/GGobiLibs/
+               bin
+               etc
+               include
+               lib
+               libiconv-1.8-w32-1.bin
+               libxml2-2.6.6.win32
+               zlib-1.1.4.win32         
+               man
+               share
+
+Compilation:
+
+Create folder name Install in ggobi/src and copy ggobi/src/config.h.in
+into that folder.
+
+There should be a Makefile.win32 file available in the src
+directory. This is the file that will control the make. It may need to
+be updated for each new release of ggobi. Right now there is a
+Makefile.win32 which matches the latest ggobi-xml.1.0-1-beta.ta.gz.
+
+Copy the local.config file from the src_zip directory into ggobi/src.
+(Change this line to
+DOWNLOAD_DIR=C:\users\aashish\projects\Win32\april09\GGobiLibs to the
+location where you have GGobiLibs folder )
+
+Copy the files developerConfigure.in, s_erf.c, ggobiMain.c, ggobi.def
+from the src_zip directory into ggobi/src.
+
+Copy all the dlls from src_zip/dlls to ggobi/src/.
+
+The final step is to type "make -f Makefile.win32.1.0-1-beta. 
+
+If you have trouble send email to ggobi-help@ggobi.org, complete with
+the error messages you got in the cygwin window. We'll aim to help as
+possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Old Notes
+---------
+
 To build ggobi for Windows, you will need the following.
 
 Install the compiler required to build R, i.e. the

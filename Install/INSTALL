@@ -41,6 +41,8 @@ one can enable when compiling ggobi.
   f) Perl interface
       (allowing ggobi to be controlled from Perl)       
 
+The default build is embeddable ggobi library with with XML support.
+
 There is also optional support for reading data directly from a MySQL
 database. (The configuration for this has not been ironed out yet.)
 
@@ -56,6 +58,7 @@ methods, starting with the simplest. (Note that gmake is really used,
 but make should default to this on linux. You may need to force make
 to be gmake on other unix systems.)
 
+----delete this part-----
 a) Stand-alone
 
 Download the tar.gz version of the code, unpack it. The type:
@@ -113,7 +116,25 @@ building libxml2, and the x's in libxml2-x.x.x are replaced by by the
 version of libxml2 you downloaded and unpacked. You can use
 xml2-config to check the location of the libxml2 installation. 
 
-e) R interface
+----delete to here-----
+
+BUILDING THE DEFAULT: embeddable library with xml support
+
+Download the tar.gz version of the code, unpack it. The type:
+
+./configure
+make
+
+Then to run ggobi type:
+
+bin/ggobi <datafilename> 
+
+(You may see the message "No plugins configured for build" which can
+be ignored.)
+
+BUILDING PLUGINS: ***Need to add something here***
+
+R INTERFACE
 
 Install R after downloading and following instructions from
   http://www.R-project.org

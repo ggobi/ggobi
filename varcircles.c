@@ -739,4 +739,3 @@ varcircles_add (gint nc, datad *d, ggobid *gg)
 
   gtk_widget_show_all (gg->varpanel_ui.notebook);
 }
-

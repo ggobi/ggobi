@@ -5,9 +5,10 @@ NEW_DEFS=1
 ZIP=zip
 AR=ar rc
 CC=gcc
-DLLTOOL=dlltool -k
+DLLTOOL=dlltool
 DLLWRAP=dllwrap
 WIN32=1
+USE_DEVELOPER_CONFIG=1
 
 INNO=C:\\Program\ Files\\Inno\ Setup\\Compil32.exe
 INNO=/cygdrive/c/Inno3/iscc.exe
@@ -168,14 +169,14 @@ ggobi.a: $(OB)
 	ar cr $@ $(OB)
 	ranlib $@
 
-
+COMPUTE_DEFS=1
 ifdef NEW_DEFS
 ifdef COMPUTE_DEFS
 $(DEF): $(OB)
 	echo EXPORTS > $@
 	nm $(OB) > tmp
 	sed -n '/^........ [T] _/s/^........ [T] _/ /p' tmp >> $@
-	cat exported-vars >> $@
+	#cat exported-vars >> $@
 	rm tmp
 else
 $(DEF): ManualGGobi.def
@@ -197,7 +198,7 @@ ifndef INC
 INC= -I. -I/gtk/src/gtk+ -I/gtk/src/gtk+/gdk -I/gtk/src/glib 
 
 GTK_SUB_DIRS=glib glib/module gtk+/gdk/win32 gdk gtk-win/pthreads
-INC=-I. $(GLIB_DIR:%=-I%) $(GTK_DIR:%=-I%) $(GTK_SUB_DIRS:%=-I$(GTK_DIR)/%)
+INC=-I. -I./../include -I./../gtkext/include -I./Install $(GLIB_DIR:%=-I%) $(GTK_DIR:%=-I%) $(GTK_SUB_DIRS:%=-I$(GTK_DIR)/%)
 endif
 
 #LIBS= -L/gtk/src/gtk+/gtk  -L/gtk/src/gtk+/gdk -L/gtk/src/glib
@@ -254,7 +255,8 @@ DATA= flea.dat flea.xml flea.col flea.colors flea.glyphs \
 ifndef OTHER_DLL_LIB
   OTHER_DLL_LIB=/cygwin/home/duncan/libs
 endif
-OTHER_DLL_NAMES= gdk-1.3 glib-1.3 gmodule-1.3 gnu-intl gtk-1.3 iconv-1.3
+#OTHER_DLL_NAMES= gdk-1.3 glib-1.3 gmodule-1.3 gnu-intl gtk-1.3 iconv-1.3
+OTHER_DLL_NAMES= gdk-0 glib-2.0.0 gmodule-2.0.0 intl-1 gtk-0 iconv
 OTHER_DLLS=$(OTHER_DLL_NAMES:%=$(OTHER_DLL_LIB)/%.dll)
 
 
