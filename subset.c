@@ -23,18 +23,6 @@ static gboolean
 add_to_subset (gint i, datad *d, ggobid *gg) {
   gboolean added = false;
 
-/*
-  gint j, el;
-  if (d->nrgroups > 0) {
-    added = true;
-    d->rgroups[i].sampled = true;
-    for (j=0; j<d->rgroups[i].nels; j++) {
-      el = d->rgroups[i].els[j];
-      d->sampled.els[el] = true;
-    }
-  } else {
-*/
-
   added = true;
   d->sampled.els[i] = true;
 
@@ -48,14 +36,6 @@ subset_clear (datad *d, ggobid *gg) {
 
   for (i=0; i<d->nrows; i++)
     d->sampled.els[i] = false;
-
-/*
-  gint rgid;
-  for (i=0; i<d->nrgroups; i++) {
-    rgid = d->rgroup_ids[i];
-    d->rgroups[rgid].sampled = false;
-  }
-*/
 }
 
 /*------------------------------------------------------------------*/
@@ -88,14 +68,6 @@ subset_include_all (datad *d, ggobid *gg) {
 
   for (i=0; i<d->nrows; i++)
     d->sampled.els[i] = true;
-
-/*
-  gint rgid;
-  if (d->nrgroups > 0) {
-    rgid = d->rgroup_ids[i];
-    d->rgroups[rgid].sampled = true;
-  }
-*/
 }
 
 /*
@@ -108,7 +80,6 @@ subset_random (gint n, datad *d, ggobid *gg) {
   gboolean doneit = false;
   gfloat rrand;
 
-  /*gint top = (d->nrgroups > 0) ? d->nrgroups : d->nrows;*/
   gint top = d->nrows;
 
   subset_clear (d, gg);
@@ -134,7 +105,6 @@ subset_block (gint bstart, gint bsize, datad *d, ggobid *gg)
 {
   gint i, b_end;
   gboolean doneit = false;
-  /*gint top = (d->nrgroups > 0) ? d->nrgroups : d->nrows;*/
   gint top = d->nrows;
   top -= 1;
 
@@ -192,7 +162,6 @@ subset_sticky (datad *d, ggobid *gg)
 {
   gint id;
   GSList *l;
-  /*gint top = (d->nrgroups > 0) ? d->nrgroups : d->nrows;*/
   gint top = d->nrows;
 
 
@@ -203,7 +172,6 @@ subset_sticky (datad *d, ggobid *gg)
     for (l = d->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
       if (id < top)
-        /*add_to_subset ((d->nrgroups > 0) ? d->rgroup_ids[id] : id, d, gg);*/
         add_to_subset (id, d, gg);
     }
   }
@@ -215,7 +183,6 @@ gboolean
 subset_rowlab (gchar *rowlab, datad *d, ggobid *gg)
 {
   gint i;
-  /*gint top = (d->nrgroups > 0) ? d->nrgroups : d->nrows;*/
   gint top = d->nrows;
 
   /*-- remove all sticky labels --*/
@@ -228,7 +195,6 @@ subset_rowlab (gchar *rowlab, datad *d, ggobid *gg)
 
   for (i=0; i<top; i++) {
     if (!strcmp ((gchar *) g_array_index (d->rowlab, gchar *, i), rowlab)) {
-      /*add_to_subset ((d->nrgroups > 0) ? d->rgroup_ids[i] : i, d, gg);*/
       add_to_subset (i, d, gg);
     }
   }
