@@ -44,7 +44,7 @@ plot_tree_display(ggobid *gg)
 
  GtkWidget *tree;
  GtkWidget *plot_tree_window;
- int numItems;
+ gint numItems;
 
  /* If this is the first time we have called this, 
     create it from scratch. Otherwise, we have to 
@@ -57,7 +57,9 @@ plot_tree_display(ggobid *gg)
   gtk_window_set_title(GTK_WINDOW(plot_tree_window), "GGobi Displays");
  } else {
 
-  fprintf(stderr, "The display tree is already visible. It should be correct!\n");fflush(stderr);
+  fprintf(stderr,
+    "The display tree is already visible. It should be correct!\n");
+  fflush(stderr);
   return(NULL);
 
   /* 
@@ -97,25 +99,26 @@ plot_tree_display(ggobid *gg)
 
 
 GtkWidget *
-display_add_tree(displayd *display, int entry, GtkWidget *tree, ggobid *gg)
+display_add_tree(displayd *display, gint entry, GtkWidget *tree, ggobid *gg)
 {
   GtkWidget *item, *subTree;
 
-   if(tree == NULL)
+  if(tree == NULL)
     return(NULL);
 
-    item = gtk_tree_item_new_with_label(display_tree_label(display));
-gtk_signal_connect (GTK_OBJECT(item), "select",
-                                 GTK_SIGNAL_FUNC(display_tree_display_child_select), display);
-    gtk_tree_append(GTK_TREE( tree ), item);
-    gtk_widget_show(item);
+  item = gtk_tree_item_new_with_label(display_tree_label(display));
+  gtk_signal_connect (GTK_OBJECT(item), "select",
+                      GTK_SIGNAL_FUNC(display_tree_display_child_select),
+                      display);
+  gtk_tree_append(GTK_TREE( tree ), item);
+  gtk_widget_show(item);
 
 
-    subTree = splot_subtree_create(display, gg);
-    gtk_tree_set_view_mode (GTK_TREE(subTree), GTK_TREE_VIEW_ITEM);
-    gtk_tree_item_set_subtree(GTK_TREE_ITEM( item ), subTree);
+  subTree = splot_subtree_create(display, gg);
+  gtk_tree_set_view_mode (GTK_TREE(subTree), GTK_TREE_VIEW_ITEM);
+  gtk_tree_item_set_subtree(GTK_TREE_ITEM( item ), subTree);
 
- return(item);
+  return(item);
 }
 
 
@@ -299,12 +302,12 @@ show_display_tree (ggobid *gg, GtkWidget *widget)
  Identify the index of the given display and remove
  the corresponding node in the display_tree.
  */
-int
+gint
 tree_display_entry_remove(displayd *display, GtkWidget *tree, ggobid *gg)
 {
  GList *dlist;
  displayd *tmp;
- int which = 0;
+ gint which = 0;
 
   if(tree == NULL)
     return(-1);
@@ -323,8 +326,8 @@ tree_display_entry_remove(displayd *display, GtkWidget *tree, ggobid *gg)
   Remove the specified entry from the top-level of the 
   given tree.
  */
-int  
-tree_display_entry_remove_by_index(int which, GtkWidget *tree)
+gint  
+tree_display_entry_remove_by_index(gint which, GtkWidget *tree)
 {
 fprintf(stderr, "Removing display %d\n", which); fflush(stderr);
   gtk_tree_clear_items(GTK_TREE(tree), which, which+1);
@@ -340,16 +343,25 @@ fprintf(stderr, "Removing display %d\n", which); fflush(stderr);
  This sets that display to be the current or active one.
  */
 void
-display_tree_display_child_select(GtkWidget *item, displayd *display, ggobid *gg)
+display_tree_display_child_select(GtkWidget *item, displayd *display)
 {
+  ggobid *gg = GGobiFromDisplay (display);
 
   if(gg->display_tree.tree == NULL) {
     return;
   }
 
   if(display != NULL) {
+    splotd *sp = gg->current_splot;
+    displayd *spd = (displayd *) sp->displayptr;
     /* Top-level of tree, so set that to be the current display. */
     display_set_current(display, gg);
+
+    /* Make sure the current splot is in the current display */
+    if (spd != display) {
+      sp = (splotd *) g_list_nth_data (display->splots, 0);
+      GGOBI(splot_set_current_full) (display, sp, gg);
+    }
   }  
 }
 
