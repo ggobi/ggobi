@@ -412,23 +412,24 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
             splot_plot_case (j, d, sp, display, gg) &&
             (draw_hidden == d->hidden_now.els[j]))
 */
-      if (splot_plot_case (j, d, sp, display, gg)) {
-        if ((draw_hidden && d->hidden_now.els[j]) ||  /*-- hiddens --*/
-           (d->color_now.els[j] == current_color &&   /*-- unhiddens --*/
-                !draw_hidden && !d->hidden_now.els[j]))
-        {
-          build_glyph (&d->glyph_now.els[j], sp->screen, j,
-            sp->win32.points, &npt,          
-            sp->win32.segs, &nseg,
-            sp->win32.open_rects, &nr_open,  
-            sp->win32.filled_rects, &nr_filled,
-            sp->win32.open_arcs, &nc_open,   
-            sp->win32.filled_arcs, &nc_filled);
-
-          if (GTK_IS_GGOBI_PARCOORDS_DISPLAY(display) ||
-              GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display))
+        if (splot_plot_case (j, d, sp, display, gg)) {
+          if ((draw_hidden && d->hidden_now.els[j]) ||  /*-- hiddens --*/
+             (d->color_now.els[j] == current_color &&   /*-- unhiddens --*/
+                  !draw_hidden && !d->hidden_now.els[j]))
           {
-            build_whisker_segs (j, &nwhisker_segs, sp);
+            build_glyph (&d->glyph_now.els[j], sp->screen, j,
+              sp->win32.points, &npt,          
+              sp->win32.segs, &nseg,
+              sp->win32.open_rects, &nr_open,  
+              sp->win32.filled_rects, &nr_filled,
+              sp->win32.open_arcs, &nc_open,   
+              sp->win32.filled_arcs, &nc_filled);
+
+            if (GTK_IS_GGOBI_PARCOORDS_DISPLAY(display) ||
+                GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display))
+            {
+              build_whisker_segs (j, &nwhisker_segs, sp);
+            }
           }
         }
       }
