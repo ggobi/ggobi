@@ -85,7 +85,7 @@ ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c
  XML_OB= read_xml.o write_xml.o
 
- CFLAGS+= $(XML_INC_DIRS) -DUSE_XML=1
+ CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=1
  OB+= $(XML_OB)
 
  XML_LIBS=-lxml -lz
@@ -95,7 +95,7 @@ read_xml.o: read_xml.h
 endif
 
 ifdef USE_MYSQL
- CFLAGS+= -I$(MYSQL_INCLUDE_DIRS) -DUSE_MYSQL=1 -Wall -I$(PROPERTIES_INCLUDE_DIR)
+ CFLAGS+= $(MYSQL_INCLUDE_DIRS:%=-%I) -DUSE_MYSQL=1 -Wall -I$(PROPERTIES_INCLUDE_DIR)
  MYSQL_LIBS=-lProps -lmysqlclient $(MYSQL_LIB_DIRS:%=-L%) $(MYSQL_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %) $(PROPERTIES_LIB_DIR:%=$(DL_RESOLVE_FLAG) %) $(PROPERTIES_LIB_DIR:%=-L%)
 
  SRC+=read_mysql.c
@@ -116,7 +116,7 @@ pure: ggobi.o $(OB)
 	$(CC) -dS -c $(CFLAGS) -I. `gtk-config --cflags` $*.c
 
 ggobi.sched: $(OB)
-	$(CC) -S $(OB) $(LDFLAGS)  $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --cflags --libs`
+	$(CC) -S $(OB) $(LDFLAGS)  $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --cflags --libs`
 
 mt19937-1.o: mt19937-1.c
 	$(CC) $(CFLAGS) `gtk-config --cflags` -c $<
@@ -160,7 +160,7 @@ local.config:
 
 ifdef USE_XML
 xmlConvert: xmlConvert.o libGGobi.so
-	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS) -L. -lGGobi 
+	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS:%=-L%) -L. -lGGobi 
 
 make_ggobi.o: read_xml.h
 endif
