@@ -281,6 +281,8 @@ tform_to_world (datad *d, ggobid *gg)
 void
 rows_in_plot_set (datad *d, ggobid *gg) {
   gint i;
+  GtkGGobiDataClass *klass;
+  gint nprev = d->nrows_in_plot;
 
   d->nrows_in_plot = 0;
 
@@ -290,6 +292,10 @@ rows_in_plot_set (datad *d, ggobid *gg) {
     }
   }
 
+  klass = GTK_GGOBI_DATA_CLASS(GTK_OBJECT(d)->klass);
+  gtk_signal_emit (GTK_OBJECT(d),
+    klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL], 
+    nprev, -1, gg);  /* the argument shown with -1 has no current use */
 }
 
 /*-------------------------------------------------------------------------*/

@@ -163,6 +163,7 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
 						   GTK_TYPE_NONE, 3, 
 						   GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI_DATA);     /* record index and datad pointer */
   }
+
 }
 
 /****************************/
@@ -170,7 +171,15 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
 
 void gtk_ggobi_data_class_init(GtkGGobiDataClass * klass)
 {
-
+  if (gtk_signal_lookup("rows_in_plot_changed", GTK_TYPE_GGOBI_DATA) == 0) {
+    klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL] = 
+	  gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI_DATA), 
+        "rows_in_plot_changed",
+        GTK_RUN_LAST | GTK_RUN_ACTION, 
+        gtk_marshal_NONE__INT_INT_POINTER, 
+        GTK_TYPE_NONE, 3, 
+        GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI);
+  }
 }
 
 GtkType gtk_ggobi_data_get_type(void)

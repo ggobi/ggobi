@@ -17,6 +17,15 @@
 
 #include <string.h> /* for memset() declaration */
 
+#ifdef TESTING_ROWS_IN_PLOT_CB
+void rows_in_plot_test_cb (datad *d, gint nprev, gint b, ggobid *gg,
+  void *data)
+{
+  g_printerr ("d->nrows_in_plot = %d nprev %d\n", d->nrows_in_plot, nprev);
+}
+#endif
+
+
 
 datad *
 datad_new(datad *d, ggobid *gg)
@@ -49,6 +58,10 @@ datad_new(datad *d, ggobid *gg)
   sphere_init (d);
 
   jitter_vars_init (d, gg);
+
+  /*-- listen for rows_in_plot_changed events --*/
+  gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
+    rows_in_plot_test_cb, gg);
 
   gg->d = g_slist_append (gg->d, d);
 
@@ -108,7 +121,6 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
     varpanel_clear (d, gg);
   }
 
-  /*varpanel_checkboxes_populate (d, gg);*/
   varpanel_populate (d, gg);   /*-- toggles */
   /*-- circles: build but don't show --*/
   varcircles_populate (d, gg);
