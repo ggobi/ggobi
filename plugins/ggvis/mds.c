@@ -623,7 +623,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
     }
 */
   /* anchors of either kind */  
-  if (ggv->anchor_group.nels > 0 &&
+  if (ggv->anchor_group.nels > 0 && ggv->n_anchors > 0 &&
       (ggv->anchor_ind == fixed || ggv->anchor_ind == scaled))
   {
     for (i=0; i<ggv->pos.nrows; i++) {

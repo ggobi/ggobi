@@ -85,11 +85,12 @@ ggvis_init (ggvisd *ggv, ggobid *gg)
     }
   }
 
-  /*ggv->group_p = false;*/
   ggv->group_ind = all_distances;
-  /*ggv->group_ind = within;*/
+
   ggv->anchor_ind = no_anchor;
+  ggv->anchor_table = (GtkWidget *) NULL;
   vectorb_init_null (&ggv->anchor_group);
+  ggv->n_anchors = 0;
 
   /*-- used in mds.c --*/
   vectord_init_null (&ggv->pos_mean);

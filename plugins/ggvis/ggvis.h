@@ -115,10 +115,14 @@ typedef struct {
   GtkCList *clist_dist;
   gboolean complete_Dtarget;
 
-  /*gboolean group_p;*/
   MDSGroupInd group_ind;
+  /* anchors */
   MDSAnchorInd anchor_ind;
   vector_b anchor_group;
+  GtkWidget *anchor_frame, *anchor_table;
+  gint n_anchors;
+
+  GtkTooltips *tips;
 
   /*-- for Shepard plot --*/
   gint shepard_iter;
@@ -178,6 +182,8 @@ greal ggv_randvalue (gint type);
 void update_stress (ggvisd *ggv, ggobid *gg);
 void ggv_compute_Dtarget (gint selected_var, ggvisd *ggv);
 void ggv_init_Dtarget (gint, ggvisd *ggv);
+
+void ggv_anchor_table_build (PluginInstance *inst);
 
 void mds_func (gboolean, PluginInstance *);
 void mds_once (gboolean doit, ggvisd *ggv, ggobid *gg);

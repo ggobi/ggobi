@@ -154,6 +154,7 @@ ggv_datad_set_cb (GtkWidget *cl, gint row, gint column,
   datad *d;
   GSList *l;
   gchar *clname = gtk_widget_get_name (GTK_WIDGET(cl));
+  gint k;
 
   gtk_clist_get_text (GTK_CLIST (cl), row, 0, &dname);
   for (l = gg->d; l; l = l->next) {
@@ -161,6 +162,13 @@ ggv_datad_set_cb (GtkWidget *cl, gint row, gint column,
     if (strcmp (d->name, dname) == 0) {
       if (strcmp (clname, "nodeset") == 0) {
         ggv->dsrc = d;
+
+        /* Once dsrc has been defined, the anchor groups can be
+	   initialized */
+        vectorb_realloc (&ggv->anchor_group, d->nclusters);
+        for (k=0; k<d->nclusters; k++)
+          ggv->anchor_group.els[k] = false;
+
       } else if (strcmp (clname, "edgeset") == 0) {
         ggv->e = d;
       }
@@ -204,7 +212,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gint i, top;
   GtkAccelGroup *ggv_accel_group;
   GtkWidget *menubar;
-  GtkTooltips *tips;
   /*-- for lists of datads --*/
   gchar *clist_titles[2] = {"node sets", "edge sets"};
   datad *d;
@@ -213,7 +220,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gchar *row[1];
   GSList *l;
 
-  tips = gtk_tooltips_new ();
+  ggv->tips = gtk_tooltips_new ();
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (window), "ggvisd", ggv);
@@ -327,13 +334,13 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   radio1 = gtk_radio_button_new_with_label (NULL, "Dissimilarity analysis");
   gtk_widget_set_name (GTK_WIDGET(radio1), "MDS");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), radio1,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), radio1,
     "Perform multidimensional scaling (MDS) for the purpose of dissimilarity analysis; dissimilarities (distances) are provided as an edge variable.",
     NULL);
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
   radio2 = gtk_radio_button_new_with_label (group, "Graph layout");
   gtk_widget_set_name (GTK_WIDGET(radio2), "GRAPH_LAYOUT");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), radio2,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), radio2,
     "Perform multidimensional scaling (MDS) for the purpose of laying out a graph.",
     NULL);
 
@@ -358,7 +365,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   btn = gtk_check_button_new_with_label ("Use edge weights");
   gtk_widget_set_name (GTK_WIDGET(btn), "MDS_WEIGHTS");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), btn,
     "The distance matrix for a graph is the minimum number of edges connecting any pair of nodes.  These distances can be weighted if an edge variable is supplied.",
     NULL);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), false);
@@ -369,7 +376,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   btn = gtk_check_button_new_with_label ("Complete graph distances");
   gtk_widget_set_name (GTK_WIDGET(btn), "MDS_COMPLETE");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), btn,
     "Fill in a missing D[i,j] using a shortest path algorithm when a path exists from i to j; if not checked, D[i,j] is treated as missing.",
     NULL);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
@@ -456,7 +463,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     GTK_SIGNAL_FUNC (ggv_stepsize_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_name (hscale, "stepsize_scale");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), hscale,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), hscale,
     "Stepsize", NULL);
   gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
@@ -717,6 +724,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     if (i == 0) {
       radio = gtk_radio_button_new_with_label (NULL, groups_lbl[i]);
       GTK_TOGGLE_BUTTON (radio)->active = TRUE;
+      gtk_widget_set_name (radio, "GROUPS_OFF");
     } else {
       group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio));
       radio = gtk_radio_button_new_with_label (group, groups_lbl[i]);
@@ -744,6 +752,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   for (i=0; i<3; i++) {
     if (i == 0) {
       radio = gtk_radio_button_new_with_label (NULL, anchor_lbl[i]);
+      gtk_widget_set_name (radio, "ANCHOR_OFF");
       GTK_TOGGLE_BUTTON (radio)->active = TRUE;
     } else {
       group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio));
@@ -755,6 +764,10 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     gtk_box_pack_start (GTK_BOX (vbox), radio, TRUE, TRUE, 0);
   }
 
+  /* Add symbols */
+  ggv->anchor_frame =  gtk_frame_new ("Symbols in use");
+  gtk_box_pack_start (GTK_BOX (hbox), ggv->anchor_frame, TRUE, TRUE, 0);
+  ggv_anchor_table_build (inst);
 
   label = gtk_label_new ("Anchor");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);

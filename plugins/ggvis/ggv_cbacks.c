@@ -30,8 +30,10 @@ ggv_scramble (ggvisd *ggv, ggobid *gg)
 }
 
 void
-ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
+ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, PluginInstance *inst)
 {
+  ggvisd *ggv = ggvisFromInst (inst); 
+  ggobid *gg = inst->gg;
   gint i, j;
   gint nc = ggv->dim;   /*-- default:  3d --*/
   gchar **rownames, **colnames, **rowids;
@@ -127,6 +129,7 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
   display_tailpipe (dspnew, FULL, gg);
 
   ggv->dpos = dnew;
+  clusters_set (ggv->dpos, gg);
 
   g_free(values);
   g_free(colnames);
@@ -398,7 +401,7 @@ mds_open_display (PluginInstance *inst)
     gint j;
     vartabled *vt;
     /*-- initialize, allocate and populate dpos --*/
-    ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, ggv, gg);
+    ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, inst);
     ggv_pos_init (ggv);
     /*-- update limits here? could force them to be -1, 1  --*/
     /*limits_set (true, true, ggv->dpos, gg);*/
@@ -780,25 +783,7 @@ void ggv_kruskal_cb (GtkWidget *w, gpointer cbd)
 }
 
 
-/*
-void ggv_brush_groupsp_cb (GtkToggleButton *w, PluginInstance *inst)
-{
-  ggvisd *ggv = ggvisFromInst (inst);
-  ggv->group_p = w->active;
-  }*/
 void ggv_groups_cb (GtkToggleButton *button,  gpointer cbd)
-{
-  /* no_anchor, scaled, fixed */
-  if (button->active) {
-    PluginInstance *inst = (PluginInstance *)
-      gtk_object_get_data (GTK_OBJECT(button), "PluginInst");
-    ggvisd *ggv = ggvisFromInst (inst);
-
-    ggv->group_ind = GPOINTER_TO_INT (cbd);
-    g_printerr ("group_ind = %d\n", ggv->group_ind);
-  }
-}
-void ggv_anchor_cb (GtkToggleButton *button, gpointer cbd)
 {
   /* all_distances, within, between */
   if (button->active) {
@@ -806,8 +791,36 @@ void ggv_anchor_cb (GtkToggleButton *button, gpointer cbd)
       gtk_object_get_data (GTK_OBJECT(button), "PluginInst");
     ggvisd *ggv = ggvisFromInst (inst);
 
+    ggv->group_ind = GPOINTER_TO_INT (cbd);
+
+    /* If we just turned groups on, make sure anchor is off */
+    if (ggv->group_ind != 0) {
+      if (ggv->anchor_ind != 0) {
+        GtkWidget *window = (GtkWidget *) inst->data;
+        GtkWidget *w = widget_find_by_name (window, "ANCHOR_OFF");
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
+      }
+    }
+  }
+}
+void ggv_anchor_cb (GtkToggleButton *button, gpointer cbd)
+{
+  /* no_anchor, scaled, fixed */
+  if (button->active) {
+    PluginInstance *inst = (PluginInstance *)
+      gtk_object_get_data (GTK_OBJECT(button), "PluginInst");
+    ggvisd *ggv = ggvisFromInst (inst);
+
     ggv->anchor_ind = GPOINTER_TO_INT (cbd);
-    g_printerr ("anchor_ind = %d\n", ggv->anchor_ind);
+
+    /* If we just turned anchor on, make sure groups is off */
+    if (ggv->anchor_ind != 0) {
+      if (ggv->group_ind != 0) {
+        GtkWidget *window = (GtkWidget *) inst->data;
+        GtkWidget *w = widget_find_by_name (window, "GROUPS_OFF");
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
+      }
+    }
   }
 }
 
