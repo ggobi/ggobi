@@ -1,6 +1,8 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+#include <gtk/gtk.h> /* Needed for ViewTypes. Can be moved. */
+
 /* defines.h */
 
 #define XGOBI(a) XGobi_##a
@@ -22,7 +24,12 @@
 #define MSGBUFLEN 512
 
 #define NDISPLAYTYPES 3
+
+
 enum displaytyped {scatterplot, scatmat, parcoords};
+extern const gchar* const ViewTypes[3];
+extern const gint ViewTypeIndeces[3];
+
 /* display options */
 #define DOPT_POINTS    0
 #define DOPT_SEGS_D    1

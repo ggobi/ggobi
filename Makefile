@@ -4,6 +4,8 @@ CC = gcc
 CFLAGS= -g -ansi -Wall -fpic
 SHARED_LD_FLAGS= -shared
 
+DEPENDS_FLAG=-MM
+
 SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c \
  read_array.c read_data.c \
  pipeline.c missing.c \
@@ -78,3 +80,11 @@ clean:
 
 .c.o:
 	$(CC) -c $(CFLAGS) -I. `gtk-config --cflags` $*.c
+
+
+
+depends: $(SRC)
+	$(CC) $(DEPENDS_FLAG) $(CFLAGS) -I. `gtk-config --cflags` $(SRC) > $@	
+
+
+include .depends

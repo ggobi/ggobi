@@ -8,6 +8,9 @@
 #include "types.h"
 #include "vars.h"
 #include "externs.h"
+#include "display.h"
+
+void warning(const char *msg);
 
 void displays_release(xgobid *xg);
 void display_release(displayd *display, xgobid *xg);
@@ -16,7 +19,7 @@ void data_release(xgobid *xg);
 void vardata_free(xgobid *xg);
 void vardatum_free(vardatad *var, xgobid *xg);
 
-gchar *
+const gchar *
 getFileName ()
 {
   return(xg.filename);
@@ -47,19 +50,30 @@ getVariableNames(int transformed)
   return(names);
 }
 
+
 void
-setVariableName(gint jvar, gchar *name)
+setVariableName(gint jvar, gchar *name, gboolean transformed)
 {
- gchar *old = xg.vardata[jvar].collab;
+ gchar *old;
+
+ if(transformed)
+   old = xg.vardata[jvar].collab_tform;
+ else
+   old = xg.vardata[jvar].collab;
 
  if(old)
    g_free(old);
 
- xg.vardata[jvar].collab = g_strdup(name);
+ if(transformed)
+   xg.vardata[jvar].collab_tform = g_strdup(name);
+ else
+   xg.vardata[jvar].collab = g_strdup(name);
 }
 
 
-
+/*
+  Closes the specified display
+ */
 void 
 destroyCurrentDisplay ()
 {
@@ -204,3 +218,294 @@ vardatum_free(vardatad *var, xgobid *xg)
  if(var->collab_tform)
   g_free(var->collab_tform);
 }
+
+
+const gchar * const*
+getViewTypes(int *n)
+{
+ *n = NDISPLAYTYPES;
+ return(ViewTypes);
+}
+
+const gint *
+getViewTypeIndeces(int *n)
+{
+ *n = NDISPLAYTYPES;
+ return(ViewTypeIndeces);
+}
+
+
+displayd *
+newScatterplot (gint ix, gint iy, gchar *viewType)
+{
+ displayd *display = NULL;
+
+return(display);
+}
+
+displayd *
+newScatmat (gint *rows, gint *columns)
+{
+ displayd *display = NULL;
+
+return(display);
+}
+
+displayd *
+newParCoords (gint *vars)
+{
+ displayd *display = NULL;
+
+return(display);
+}
+
+displayd* 
+createPlot(int type, char **varnames)
+{
+ displayd *display = NULL;
+ /*
+
+   display_new(type);
+
+ */
+ return(display);
+}
+
+const gchar * getViewTypeName(enum displaytyped type);
+
+const gchar* 
+getCurrentDisplayType(xgobid *xg)
+{
+ return(getViewTypeName(xg->current_display->displaytype));
+}
+
+const gchar *
+getViewTypeName(enum displaytyped type)
+{
+ int n, i;
+ const gint *types = getViewTypeIndeces(&n);
+ const gchar * const *names = getViewTypes(&n);
+
+ for(i = 0; i < n; i++) {
+   if(types[i] == type) {
+    return(names[i]);
+   }
+ }
+
+ return(NULL);
+}
+
+
+/*
+  Pointer to the raw data managed by GGobi.
+  Don't touch this.
+ */
+const gfloat** 
+getRawData()
+{
+ return((const gfloat**) xg.raw.data);
+}
+
+/*
+  Pointer to the second transformation of the data managed by GGobi.
+  Don't touch this.
+ */
+const gfloat** 
+getTFormData()
+{
+ return((const gfloat **)xg.tform2.data);
+}
+
+
+/*
+  Returns a reference to the labels used to identify
+  the observations.
+  Do not change this as it is not a copy.
+ */
+const gchar **
+getCaseNames()
+{
+ return((const gchar **) xg.rowlab);
+}
+
+/*
+ This does not copy the label, so it is assumed
+ that the caller has already allocated the space
+ using the appropriate GTK memory model.
+ If it is apparent that this is being called from 
+ contexts that use a very different memory model (e.g. S/R),
+ we can change the behaviour to copy this.
+
+ Similarly, this can be modified to return the previous
+ value, but the caller will have to free that pointer.
+ */
+void
+setCaseName(gint index, const gchar *label)
+{
+  gchar *old;
+  if(index < 0 || index >= xg.nrows) {
+    warning("Index is out of range of observations in setCaseName");
+    return; 
+  }
+
+  old = xg.rowlab[index];
+
+  g_free(old);
+  xg.rowlab[index] = (gchar *)label;
+}
+
+
+void
+warning(const char *msg)
+{
+ fprintf(stderr, "%s\n", msg);
+ fflush(stderr);
+}
+
+
+
+gint *
+getGlyphTypes(int *n)
+{
+
+}
+
+
+gchar const*
+getGlyphTypeName(int type)
+{
+ gchar const *ans;
+  ans = "Foo";
+
+ return(ans);
+}
+
+
+gint *
+getCaseGlyphTypes(gint *ids, gint n)
+{
+ int i;
+ gint *ans = (gint *) g_malloc(n * sizeof(int));
+
+ for(i = 0; i < n ; i++)
+   ans[i] = getCaseGlyphType(ids[i]);
+
+ return(ids);
+}
+
+gint 
+getCaseGlyphType(gint id)
+{
+ int index = xg.rows_in_plot[id];
+  return(xg.glyph_ids[index].type);
+}
+
+gint *
+getCaseGlyphSizes(gint *ids, gint n)
+{
+ int i;
+ gint *ans = (gint *) g_malloc(n * sizeof(int));
+
+ for(i = 0; i < n ; i++)
+   ans[i] = getCaseGlyphSize(ids[i]);
+
+ return(ids);
+}
+
+gint 
+getCaseGlyphSize(gint id)
+{
+ int index = xg.rows_in_plot[id];
+
+  return(xg.glyph_ids[index].size);
+}
+
+
+void 
+setCaseGlyph (gint index, gint type, gint size)
+{
+  xg.glyph_ids[index].size = size;
+  xg.glyph_ids[index].type = type;
+}
+
+void 
+setCaseGlyphs (gint *ids, gint n, gint type, gint size)
+{
+ int i;
+ for(i = 0; i < n ; i++)
+   setCaseGlyph(ids[i], type, size);
+}
+
+
+void 
+setCaseColor(gint pt, gint colorIndex)
+{
+ xg.color_ids[pt] = xg.color_now[pt] = colorIndex;
+}
+
+void setCaseColors(gint *pts, gint howMany, gint colorindx)
+{
+ int i;
+ for(i = 0; i < howMany ; i++)
+   setCaseColor(pts[i], colorindx);
+}
+
+
+gint 
+getCaseColor (gint pt)
+{
+  return(xg.color_ids[pt]);
+}
+
+gint *
+getCaseColors (gint *pts, gint howMany)
+{
+ int i;
+ gint *ans = (gint*) g_malloc(howMany * sizeof(int));
+
+ for(i = 0; i < howMany ; i++)
+  ans[i] = getCaseColor(pts[i]);
+
+ return(ans);
+}
+
+
+
+void
+setObservationSegment(gint x, gint y)
+{
+  if(isConnectedSegment(x, y) == false) {
+    segments_alloc(xg.nsegments+1);
+    xg.segment_endpoints[xg.nsegments].a = x;
+    xg.segment_endpoints[xg.nsegments].b = y;
+    xg.nsegments++;
+  }
+}
+
+
+gboolean 
+isConnectedSegment(gint a, gint b)
+{
+  gint tmp, i;
+
+  if(a > b) {
+     tmp = a;
+     a = b;
+     b = tmp;
+  }
+
+  for(i = 0; i < xg.nsegments ; i++) {
+    
+    if(xg.segment_endpoints[i].a == a && xg.segment_endpoints[i].b == b)
+       return(true);
+
+    if(xg.segment_endpoints[i].a > a) {
+      return(false);
+    } 
+  }
+
+ return(false);
+}
+
+
+

@@ -1,32 +1,10 @@
 I have added some implementations in ggobi-API.c
 Also, the GGobiAPI.h has prototypes for some of these.
 
-! gchar *getFileName ()
-! DataMode getDataMode()
-
-/*
- * data, but also row and column labels, lines, colors, blahblah
- * how to do that from R?  Easier once we have xml i/o.
-
- * R and S would really like to provide a single vector/array
- * of doubles, arranged by column. Hence the double* for now.
- * A double array (double **) would be useful also.
-*/
-void setData (double *values, gchar *rownames, gchar *colnames);
-
-/* Whether to get the transformed names or the regular ones. */
-! gchar **getVariableNames (bool transformed)
-/* */
-
-! void setVariableName (gint jvar, gchar *name)
-
-
-gchar *getViewTypes ()
 gint getView ()
 void setView (gchar *)
 
-gchar *getCurrentDisplayType ()
-setCurrentDisplay (gchar *)
+displayd setCurrentDisplay (gchar *)
 
 /*-- brushing --*/
 ! gfloat **getColorTable ()
@@ -35,33 +13,28 @@ setCurrentDisplay (gchar *)
 ! void sizeBrush (gint width, gint height)
 
 /* point colors */
-void setCaseColor (gint pt, gint colorindx)
-void setCaseColors (gint *pts, gint colorindx)
-gint getCaseColor (gint pt)
-gint *getCaseColors (gint *pts)
 
-/* point glyphs */
-void setCaseGlyph (gint pt, gint type, gint size)
-void setCaseGlyphs (gint *pts, gint type, gint size)
-gint getCaseGlyphType (gint pt)
-gint *getCaseGlyphTypes (gint *pts)
-gint getCaseGlyphSize (gint pt)
-gint *getCaseGlyphSizes (gint *pts)
 
-/* data */
-gfloat **getRawData
-gfloat **getTFormData
+
+/* Conections between points (i.e. lines) */
+ ?
+
 
 /* identification */
-gchar **getCaseNames ()
-void setCaseName (gint pt, gchar *lbl)
 
-/* displays */
+
+ /* displays */
+ /*  Stubs added for these, but not implemented yet. */
+
 void newScatterplot (gint ix, gint iy, gchar *viewType)
 void newScatmat (gint *rows, gint *columns)
 void newParCoords (gint *vars)
+/* Create a display (collection of one or more plots) of the specified type
+   (see displaytyped in defines.h)
+   using the identified variables.
+ */
+displayd* createPlot(int type, char **varnames);
 
-! void destroyCurrentDisplay ()
 
 gint *getPlottedVariables ()
 

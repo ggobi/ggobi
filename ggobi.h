@@ -6,9 +6,8 @@
 #include "display.h"
 #include "display_tree.h"
 
-typedef enum {ascii, Sprocess, binary} DataMode;
+typedef enum {ascii, Sprocess, binary, xml} DataMode;
 typedef enum {read_all, read_block, draw_sample} FileReadType;
-
 
 struct _xgobid;
 
@@ -118,7 +117,9 @@ typedef struct _xgobid {
  gint nrows_in_plot;
  gboolean *in_subset;
 
+
  /* Row grouping */
+
  glong nrgroups, nrgroups_in_plot;
  glong *rgroup_ids;
  rgroupd *rgroups;
@@ -127,6 +128,7 @@ typedef struct _xgobid {
  cluster *clusv;
  int nclust;
  gboolean *included;
+
 
 /* Line groups */
  glong nlgroups;

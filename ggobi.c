@@ -11,6 +11,9 @@
 
 static gchar *version_date = "January 5, 2000";
 
+const gchar * const ViewTypes[] = {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
+const gint ViewTypeIndeces[] = { scatterplot, scatmat, parcoords};           
+
 gint
 parse_command_line (gint *argc, gchar **av)
 {
