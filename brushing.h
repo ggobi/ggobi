@@ -18,14 +18,6 @@
 #define NGLYPHSIZES 8  /* 0:7 */
 #define NGLYPHS ((NGLYPHTYPES-1)*NGLYPHSIZES + 1)  /* 1:49 */
 
-#define PLUS_GLYPH       0
-#define X_GLYPH          1
-#define OPEN_RECTANGLE   2
-#define FILLED_RECTANGLE 3
-#define OPEN_CIRCLE      4
-#define FILLED_CIRCLE    5
-#define POINT_GLYPH      6
-
 #define OPEN 0
 #define FILL 1
 
@@ -50,7 +42,7 @@
 #define BR_LINKBYVAR  1
 /* */
 
-typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT, UNKNOWN_GLYPH} GlyphType;
+typedef enum {DOT=0, PLUS, X, OR, FR, OC, FC, UNKNOWN_GLYPH} GlyphType;
 
 /*-- for edge brushing:  all sizes, 3 types for now --*/
 #define NEDGETYPES 3
