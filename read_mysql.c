@@ -526,8 +526,6 @@ GGOBI(getMySQLGUIInfo)(GtkButton *button, MySQLGUIInput *guiInput)
    if(guiInput->textInput[i] == NULL)
      continue;
 
-/* val_str = gtk_entry_get_text(GTK_ENTRY(guiInput->textInput[i]));*/
-/* deprecated, replaced by the following */
    val = gtk_editable_get_chars(GTK_EDITABLE(guiInput->textInput[i]), 0, -1);
 
    if(val)

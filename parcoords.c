@@ -442,7 +442,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
 
     m++;
 
-    /*-- if it's the rightmost plot, don'r draw the right whisker --*/
+    /*-- if it's the rightmost plot, don't draw the right whisker --*/
     if (sp_next == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
