@@ -1009,9 +1009,12 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
                       sp->arrowheads[nl].x2 = sp->screen[b].x;
                       sp->arrowheads[nl].y2 = sp->screen[b].y;
                     } else {  /*-- draw the partner's arrowhead --*/
+/*
+ * Do I need to check whether j is a visible point in e?  -- dfs
+*/
                       gint jp = endpoints[j].jpartner;
-                      gint ja = endpoints[jp].a;
-                      gint jb = endpoints[jp].b;
+                      gint ja = d->rowid.idv.els[endpoints[jp].a];
+                      gint jb = d->rowid.idv.els[endpoints[jp].b];
                       sp->arrowheads[nl].x1 =
                         (gint) (.2*sp->screen[ja].x + .8*sp->screen[jb].x);
                       sp->arrowheads[nl].y1 =
