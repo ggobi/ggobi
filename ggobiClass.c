@@ -151,7 +151,7 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
 					     GTK_RUN_LAST | GTK_RUN_ACTION, 
 					     gtk_marshal_NONE__INT_INT_POINTER,
 					     GTK_TYPE_NONE, 3, 
-					     GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER); /* record index and datad pointer * */
+					     GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI_DATA); /* record index and datad pointer */
   }
 
   if (gtk_signal_lookup("sticky_point_removed", GTK_TYPE_GGOBI) == 0) {
@@ -161,7 +161,7 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
 						   GTK_RUN_LAST | GTK_RUN_ACTION, 
 						   gtk_marshal_NONE__INT_INT_POINTER, 
 						   GTK_TYPE_NONE, 3, 
-						   GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER);     /* record index and datad pointer * */
+						   GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI_DATA);     /* record index and datad pointer */
   }
 }
 

@@ -51,7 +51,7 @@ test_data_add_cb(GtkWidget *w, datad *d,  ggobid *gg, gpointer data)
 
 
 void
-test_sticky_points(GtkWidget *w, gint index, gint state, datad *d, gpointer data)
+test_sticky_points(ggobid *gg, gint index, gint state, datad *d, gpointer data)
 {
     fprintf(stderr, "[Sticky point identification] %d %s in %s\n",
 	    index, state == STICKY ? "sticky" : "unsticky", d->name);

@@ -18,7 +18,7 @@
  */
 
 static void
-update_display_tree_plots_by_variable(DisplayTree *tree, gint whichVar, datad *d, splotd *sp, ggobid *gg, GtkWidget *w)
+update_display_tree_plots_by_variable(DisplayTree *tree, datad *d, gint whichVar, splotd *sp, ggobid *gg)
 {
     displayd *dpy = sp->displayptr;
     int i, n;

@@ -378,7 +378,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         height = (gint) (ratio * (gfloat) height);
       /* */
 
-      sp_new = splot_new (display, width, height, gg);
+      sp_new = gtk_parcoords_splot_new (display, width, height, gg);
       sp_new->p1dvar = jvar; 
 
       if (cpanel->parcoords_selection_mode == VAR_INSERT)
