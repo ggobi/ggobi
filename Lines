@@ -99,6 +99,7 @@
 34759   10/9  deleting variables almost works (scatterplot only)
 34875   10/10 transformation does domain check of user limits
 34875   10/10 reading in new data works now -- if surprisingly
+35277   10/18 working on transformation and sphering
               
 
 note: There are about 40.8K lines in xgobi,

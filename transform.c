@@ -421,6 +421,14 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
     break;
 
     case SCALE_AB:    /* Map onto [a,b] */
+    {
+      gfloat scale_get_a (ggobid *);
+      gfloat scale_get_b (ggobid *);
+      gfloat a = scale_get_a (gg);
+      gfloat b = scale_get_b (gg);
+      gfloat bminusa = b - a;
+      gfloat ftmp;
+
       /*-- Either use user-defined limits, or data min and max --*/
       if (d->vartable[jcol].lim_specified_p) {
         min = slim_tform.min;
@@ -440,9 +448,10 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
 
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
-        d->tform.vals[m][jcol] =
-          ((*domain_adj)(d->raw.vals[m][jcol], incr) - min)/diff;
+        ftmp = ((*domain_adj)(d->raw.vals[m][jcol], incr) - min)/diff;
+        d->tform.vals[m][jcol] = (ftmp * bminusa) + a;
       }
+    }
     break;
 
     default:

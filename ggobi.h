@@ -263,6 +263,7 @@ struct _ggobid {
    GtkWidget *window;
    GtkWidget *stage0_opt, *stage1_opt, *stage2_opt;
    GtkAdjustment *boxcox_adj;
+   GtkWidget *entry_a, *entry_b;
  } tform_ui;
 
  struct _Sphere {

@@ -9,6 +9,8 @@
     it without violating AT&T's intellectual property rights.
 */
 
+#include <stdlib.h>
+
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
@@ -54,6 +56,29 @@ void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
 {
   datad *d = gg->current_display->d;
   transform (1, BOXCOX, adj->value, d, gg);
+}
+
+gfloat
+scale_get_a (ggobid *gg) {
+  gchar *val_str;
+  gfloat val = 0;  /*-- default value --*/
+
+  val_str = gtk_entry_get_text (GTK_ENTRY (gg->tform_ui.entry_a));
+  if (val_str != NULL && strlen (val_str) > 0)
+    val = (gfloat) atof (val_str);
+
+  return val;
+}
+gfloat
+scale_get_b (ggobid *gg) {
+  gchar *val_str;
+  gfloat val = 1;  /*-- default value --*/
+
+  val_str = gtk_entry_get_text (GTK_ENTRY (gg->tform_ui.entry_b));
+  if (val_str != NULL && strlen (val_str) > 0)
+    val = (gfloat) atof (val_str);
+
+  return val;
 }
 
 static gchar *stage2_lbl[] = {"No transformation",
@@ -111,6 +136,8 @@ transform_window_open (ggobid *gg)
     return;
 
   if (gg->tform_ui.window == NULL) {
+    GtkStyle *style;
+    gint lbearing, rbearing, width, ascent, descent;
     
     gg->tform_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->tform_ui.window),
@@ -168,10 +195,11 @@ transform_window_open (ggobid *gg)
                           (GtkSignalFunc) stage1_cb, gg);
     gtk_box_pack_start (GTK_BOX (vb), gg->tform_ui.stage1_opt, true, false, 1);
 
-    hb = gtk_vbox_new (false, 2);  /*-- changed from hbox to vbox --*/
+    /*-- label and spin button for Box-Cox parameter --*/
+    hb = gtk_hbox_new (false, 2);
     gtk_box_pack_start (GTK_BOX (vb), hb, true, false, 2);
     
-    lbl = gtk_label_new ("Box-Cox parameter:");
+    lbl = gtk_label_new ("Box-Cox param:");
     gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
     gg->tform_ui.boxcox_adj = (GtkAdjustment *) gtk_adjustment_new (1.0,
@@ -187,6 +215,33 @@ transform_window_open (ggobid *gg)
     gtk_signal_connect (GTK_OBJECT (gg->tform_ui.boxcox_adj), "value_changed",
 		                GTK_SIGNAL_FUNC (boxcox_cb),
 		                (gpointer) gg);
+
+    /*-- labels and entries for scaling limits --*/
+    style = gtk_widget_get_style (spinner);
+    gdk_text_extents (style->font, 
+      "999999999", strlen ("999999999"),
+      &lbearing, &rbearing, &width, &ascent, &descent);
+
+    hb = gtk_hbox_new (false, 2);
+    gtk_box_pack_start (GTK_BOX (vb), hb, true, false, 2);
+
+    lbl = gtk_label_new ("a:");
+    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
+
+    gg->tform_ui.entry_a = gtk_entry_new ();
+    gtk_entry_set_text (GTK_ENTRY (gg->tform_ui.entry_a), "0");
+    gtk_widget_set_usize (gg->tform_ui.entry_a, width, -1);
+    gtk_box_pack_start (GTK_BOX (hb), gg->tform_ui.entry_a, false, false, 0);
+
+    lbl = gtk_label_new ("b:");
+    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
+
+    gg->tform_ui.entry_b = gtk_entry_new ();
+    gtk_entry_set_text (GTK_ENTRY (gg->tform_ui.entry_b), "1");
+    gtk_widget_set_usize (gg->tform_ui.entry_b, width, -1);
+    gtk_box_pack_start (GTK_BOX (hb), gg->tform_ui.entry_b, false, false, 0);
 
     /*
      * Stage 2: Another standardization step
