@@ -275,6 +275,11 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
 
   gg->status_message_func = gg_write_to_statusbar;
 
+#if 0
+ checkDLL(gg);
+ exit(0);
+#endif
+
   if (processEvents) {
     gtk_main();
   }
