@@ -65,19 +65,28 @@ make
 
 Then to run ggobi type:
 
-ggobi <datafilename> 
+bin/ggobi <datafilename> 
 
 b) Stand-alone with XML support
 
-You need to build the libxml2 library before starting (instructions below).
-Then type:
+If the libxml2 library is installed on your system (not common) then
+type:
+
+./configure --with-xml
+make
+
+However you may need to build the libxml2 library before starting
+(instructions below and in separate file INSTALL-xml.html).  Then
+type:
 
 ./configure --with-xml=$HOME/XML/libxml2-x.x.x
 make
 
-where $HOME/XML is of course replaced by the directory in which
-you're building libxml2, and the x's in libxml2-x.x.x are replaced by
-by the version of libxml2 you downloaded and unpacked.
+where $HOME/XML is of course replaced by the directory in which you're
+building libxml2, and the x's in libxml2-x.x.x are replaced by by the
+version of libxml2 you downloaded and unpacked. You can use
+xml2-config to check the location of the libxml2 installation. 
+
 
 c) Stand-alone and embeddable ggobi library
 
@@ -87,12 +96,26 @@ make
 OR
 ./configure
 make
-make lib
 
 d) Stand-alone and embeddable ggobi library with XML support
 
+If the libxml2 library is installed on your system (not common!) then
+type:
+
+./configure --with-xml --enable-embed
+make 
+
+However you may need to build the libxml2 library (common!) before
+starting (instructions below and in separate file INSTALL-xml.html).
+Then type:
+
 ./configure --with-xml=$HOME/XML/libxml2-x.x.x --enable-embed
-make or gmake
+make
+
+where $HOME/XML is of course replaced by the directory in which you're
+building libxml2, and the x's in libxml2-x.x.x are replaced by by the
+version of libxml2 you downloaded and unpacked. You can use
+xml2-config to check the location of the libxml2 installation. 
 
 e) R interface
 
@@ -114,9 +137,11 @@ Become root:
 
 % su
 
-Set a symbolic link to the ggobi library in the R directory:
+Set a symbolic link to the ggobi library and the gtkext library in the
+/usr/local/lib directory (the one above where R resides):
 
-% ln -s $GGOBI_ROOT/libggobi.so /usr/local/lib/.
+% ln -s $GGOBI_ROOT/lib/libggobi.so /usr/local/lib/.
+% ln -s $GGOBI_ROOT/lib/libgtkext.so /usr/local/lib/.
 
 Install the Rggobi library:
 
@@ -133,7 +158,7 @@ You are now ready to test out the link. Start R:
 
 % R
 > library(Rggobi)
-> ggobi("/home/dicook/ggobi/data/flea.dat") # or ggobi()
+> ggobi()
 > ls(pos=2)      # lists the ggobi functionality available
 
 XML support:
@@ -172,7 +197,7 @@ default one in /usr/lib or wherever.  The ggobi script in bin/ however
 takes care of this by setting the LD_LIBRARY_PATH appropriately to
 refer to the .libs/ directory.
 
-Getting libxml2:
+Getting libxml2: (See INSTALL-xml.html for more complete instructions)
 ==============
 
 You will need to have the libxml2 library, NOT libxml-1.x.x. You can
