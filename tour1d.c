@@ -252,6 +252,7 @@ void tour1d_speed_set(gint slidepos, ggobid *gg) {
 
   cpanel->t1d.slidepos = slidepos;
   speed_set(slidepos, &cpanel->t1d.step, &dsp->t1d.delta);
+
 }
 
 void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {

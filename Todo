@@ -146,6 +146,7 @@ Tour:
 ! 1d tour
 !  correlation tour
   history controls
+  scaling so that it doesn't run off the screen.
 
 Tour (dfs):
   Change the tour control panels.  Let there be a scrolling
