@@ -529,7 +529,7 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) jitter_window_open,   
        0,
        NULL },
-  { "/Tools/Brush by variable ...", 
+  { "/Tools/Color by variable ...", 
        NULL,        
        (GtkItemFactoryCallback) wvis_window_open,   
        0,

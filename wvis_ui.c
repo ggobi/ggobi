@@ -431,7 +431,7 @@ wvis_window_open (ggobid *gg) {
 
     gg->wvis.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->wvis.window),
-      "brush by variable");
+      "color by variable");
     gtk_signal_connect (GTK_OBJECT (gg->wvis.window),
       "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), gg);
 
