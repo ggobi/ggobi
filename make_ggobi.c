@@ -51,10 +51,11 @@ gboolean read_input(InputDescription *desc, ggobid *gg);
 
 /*-- initialize variables which don't depend on the size of the data --*/
 void globals_init (ggobid *gg) {
+
   gg->glyph_id.type = gg->glyph_0.type = FILLED_RECTANGLE;
   gg->glyph_id.size = gg->glyph_0.size = 1;
   gg->color_0 = 0;
-  gg->color_id = 1;
+  gg->color_id = 4;  /*-- how about specifying this in the xml file? --*/
 
   /*-- for linking by categorical variable --*/
   gg->linkby_cv = false;

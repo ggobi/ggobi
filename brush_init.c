@@ -84,7 +84,6 @@ br_color_ids_init (datad *d, ggobid *gg)
 {
   gint i;
 
-  gg->color_id = gg->color_0;
   for (i=0; i<d->nrows; i++)
     d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] =
       gg->color_0;
