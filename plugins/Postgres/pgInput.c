@@ -76,14 +76,14 @@ read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
     datad *d;
     conn = makeConnection(info);    
     if(!conn) {
+	quick_message("You haven't specified a data query!");
 	return(-1);
     }
 
     result = query(info->dataQuery, conn);
     d = processResult(result, gg);
-    if(d) {
+    if(d) 
 	d->name = g_strdup(info->dataQuery);
-    }
     PQclear(result);
     PQfinish(conn);
     

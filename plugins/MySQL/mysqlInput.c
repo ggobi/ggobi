@@ -16,7 +16,7 @@ int read_mysql_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
 void mysql_warning(const char *msg, MYSQL *conn, ggobid *gg);
 MYSQL* makeConnection(DBMSLoginInfo *login, ggobid *gg);
 MYSQL_RES *query(const char * const query, MYSQL *conn, ggobid *gg);
-int processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg);
+datad *processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg);
 
 /**
   This creates and populates an InputDescription object
@@ -77,6 +77,12 @@ read_mysql_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
 {
     MYSQL *conn;
     MYSQL_RES *result;
+    datad *d;
+
+    if(!info->dataQuery || !info->dataQuery[0]) {
+	mysql_warning("You haven't specified a data query!",NULL, gg);
+	return(-1);
+    }
 
     conn = makeConnection(info, gg);    
     if(!conn) {
@@ -84,7 +90,13 @@ read_mysql_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
     }
 
     result = query(info->dataQuery, conn, gg);
-    processResult(result, conn, gg);
+    if(!result) {
+	mysql_close(conn);
+	return(-1);
+    }
+    d = processResult(result, conn, gg);
+    if(d)
+	d->name = g_strdup(info->dataQuery);
     mysql_free_result(result);
     mysql_close(conn);
     
@@ -154,12 +166,12 @@ mysql_warning(const char *msg, MYSQL *conn, ggobid *gg)
 }
 
 
-int
+datad *
 processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg)
 {
   int i, j;
   int nr, nc;
-  datad *d;
+  datad *d = NULL;
 
   nr =  mysql_num_rows(result);
   nc = mysql_num_fields(result);
@@ -195,7 +207,7 @@ processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg)
       }
   }
 
-  return(1);
+  return(d);
 }
 
 #ifdef STANDALONE

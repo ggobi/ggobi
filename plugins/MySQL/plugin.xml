@@ -1,4 +1,4 @@
- <inputPlugin name="mysql">
+ <inputPlugin name="mysql" interactive="true">
   <description>Reads data from a MySQL DBMS</description>
   <author>Duncan Temple Lang</author>
   <modeName>mysql</modeName>
