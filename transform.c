@@ -44,6 +44,7 @@ extern gdouble erf (gdouble);  /*-- defined in math.h, but being ignored --*/
 /* */
 
 static gchar *domain_error_message = "Data outside the domain of function.";
+static gchar *ldomain_error_message = "Limits outside the domain of function.";
 
 #ifdef __cplusplus
 extern "C" {
@@ -296,6 +297,16 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
             break;
           }
         }
+        /*-- apply the same domain test to the specified limits --*/
+        if (d->vartable[jcol].lim_specified_p) {
+          if (((*domain_adj)(slim_tform.min, incr) <= 0) ||
+              ((*domain_adj)(slim_tform.max, incr) <= 0))
+          {
+            quick_message (ldomain_error_message, false);
+            tform_ok = false;
+          }
+        }
+
         if (tform_ok) {  /*-- if all values are in the domain of log --*/
           for (i=0; i<d->nrows_in_plot; i++) {
             m = d->rows_in_plot[i];
@@ -343,8 +354,24 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         /*-- apply the same transformation to the specified limits --*/
         if (d->vartable[jcol].lim_specified_p) {
           dtmp = pow ((gdouble) (*domain_adj)(slim.min, incr), boxcoxparam);
+#ifdef _WIN32
+          if (!_finite (dtmp)) {
+#else
+          if (!finite (dtmp)) {
+#endif
+            quick_message (ldomain_error_message, false);
+            tform_ok = false;
+          }
           slim_tform.min = (gfloat) (dtmp - 1.0) / boxcoxparam;
           dtmp = pow ((gdouble) (*domain_adj)(slim.max, incr), boxcoxparam);
+#ifdef _WIN32
+          if (!_finite (dtmp)) {
+#else
+          if (!finite (dtmp)) {
+#endif
+            quick_message (ldomain_error_message, false);
+            tform_ok = false;
+          }
           slim_tform.max = (gfloat) (dtmp - 1.0) / boxcoxparam;
         }
       }
@@ -379,6 +406,15 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
           break;
         }
       }
+      /*-- apply the same domain test to the specified limits --*/
+      if (d->vartable[jcol].lim_specified_p) {
+        if (((*domain_adj)(slim_tform.min, incr) == 0) ||
+            ((*domain_adj)(slim_tform.max, incr) == 0))
+        {
+          quick_message (ldomain_error_message, false);
+          tform_ok = false;
+        }
+      }
 
       if (tform_ok) {
         for (i=0; i<d->nrows_in_plot; i++) {
@@ -405,6 +441,15 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
           quick_message (domain_error_message, false);
           tform_ok = false;
           break;
+        }
+      }
+      /*-- apply the same domain test to the specified limits --*/
+      if (d->vartable[jcol].lim_specified_p) {
+        if (((*domain_adj)(slim_tform.min, incr) <= 0) ||
+            ((*domain_adj)(slim_tform.max, incr) <= 0))
+        {
+          quick_message (ldomain_error_message, false);
+          tform_ok = false;
         }
       }
       if (tform_ok) {  /*-- if all values are in the domain of log10 --*/

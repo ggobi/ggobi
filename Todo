@@ -11,8 +11,7 @@ Bugs:
 
 In progress, needing design discussions:
   should variable limits be disabled for transformed variables?
-  user limits need to be checked before transforming
-  deleting variables: how should plots behave?
+  deleting variables: how should plots behave? (disabled for now)
     
 
 API code needed:
@@ -184,3 +183,5 @@ Food for thought:
 
 ! figure out context-sensitive tooltips for the variable
 !   selection panel
+
+! user limits need to be checked before transforming
