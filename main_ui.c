@@ -253,9 +253,10 @@ viewmode_set (PipelineMode m, ggobid *gg)
         panel = gg->control_panel[gg->viewmode];
       } else {
         GtkGGobiExtendedDisplayClass *klass;
-        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
-        panel = klass->viewmode_control_box(display, gg->viewmode,
-          &modeName, gg);
+	if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+          klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+          panel = klass->viewmode_control_box(display, gg->viewmode, &modeName, gg);
+	}
       }
 
       gtk_frame_set_label (GTK_FRAME (gg->viewmode_frame), modeName);
@@ -278,7 +279,7 @@ viewmode_set (PipelineMode m, ggobid *gg)
    * type is selected.  (For parcoords and scatmat plots, the
    * value of projection is irrelevant.)
   */
-  if (display) {
+  if (display && GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     GtkGGobiExtendedDisplayClass *klass;
     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
     if(klass->viewmode_set)
