@@ -42,6 +42,30 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
   GtkWidget *dialog = gtk_widget_get_toplevel (w);
   GtkWidget *label_entry, *id_entry;
   gchar *label = NULL, *id = NULL;
+  greal *raw = NULL;
+  datad *dtarget;
+
+  dtarget = (cpanel->ee_mode == ADDING_EDGES)?e:d;
+  if (dtarget->ncols) {
+    GList *list;
+    GtkTableChild *child;
+    GtkWidget *entry;
+    gchar *lbl;
+    GtkWidget *table = widget_find_by_name (GTK_DIALOG(dialog)->vbox,
+      "EE:tablev");
+
+    raw = (greal *) g_malloc (d->ncols * sizeof(greal));
+
+    for (list = GTK_TABLE(table)->children; list; list = list->next) {
+      child = (GtkTableChild *) list->data;
+      if (child->top_attach == 1) {
+        entry = child->widget;
+        lbl = gtk_editable_get_chars (GTK_EDITABLE(entry), 0, -1);
+        raw[child->left_attach] = (greal) atof (lbl);
+      }
+    }
+  }
+
 
   if ((label_entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox,
     "EE:rowlabel")))
@@ -56,49 +80,15 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
   }
 
   if (cpanel->ee_mode == ADDING_EDGES) {
-
     /*-- Add the new edge to e --*/
-/*
-
-d:  We're not making any changes to d when we add an edge.
-
-e:
-  record label
-  if e has rowIds, a rowId
-  if e has variables, variable values -- we don't have a clue what to use
-*/
-
-/*
-    edge_add (gg->edgeedit.a, d->nearest_point, label, id, d, e, gg);
-*/
-    record_add (cpanel->ee_mode, gg->edgeedit.a, d->nearest_point, label, id, NULL, d, e, gg);
+    record_add (cpanel->ee_mode, gg->edgeedit.a, d->nearest_point,
+      label, id, raw, d, e, gg);
 
   } else if (cpanel->ee_mode == ADDING_POINTS) {
-
-    greal *raw = NULL;
-    GList *list;
-    GtkTableChild *child;
-    GtkWidget *entry;
-    gchar *lbl;
-
-    if (d->ncols) {
-      GtkWidget *table = widget_find_by_name (GTK_DIALOG(dialog)->vbox,
-        "EE:tablev");
-      raw = (greal *) g_malloc (d->ncols * sizeof(greal));
-
-      for (list = GTK_TABLE(table)->children; list; list = list->next) {
-        child = (GtkTableChild *) list->data;
-        if (child->top_attach == 1) {
-          entry = child->widget;
-          lbl = gtk_editable_get_chars (GTK_EDITABLE(entry), 0, -1);
-          raw[child->left_attach] = (greal) atof (lbl);
-        }
-      }
-    
-      record_add (cpanel->ee_mode, -1, -1, label, id, raw, d, e, gg);
-      g_free (raw);
-    }
+    record_add (cpanel->ee_mode, -1, -1, label, id, raw, d, e, gg);
   }
+
+  g_free (raw);
 
   gg->edgeedit.a = -1;
   gtk_widget_destroy (dialog);
@@ -197,8 +187,16 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
     extern void pt_screen_to_raw (icoords *screen, greal *raw,
       datad *d, splotd *sp, ggobid *gg);
 
-    pt_screen_to_raw (&gg->current_splot->mousepos, raw,
-      dtarget, gg->current_splot, gg);
+    if (dtarget == d) {
+      /*-- use the screen position --*/
+      pt_screen_to_raw (&gg->current_splot->mousepos, raw,
+        dtarget, gg->current_splot, gg);
+    } else {
+      /*-- use the values for the last edge --*/
+      for (j=0; j<e->ncols; j++) {
+        raw[j] = e->raw.vals[e->nrows-1][j];
+      }
+    }
 
     tablev = gtk_table_new (2, dtarget->ncols, false);
     gtk_widget_set_name (tablev, "EE:tablev");
@@ -367,10 +365,12 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
         g_printerr ("Not yet initializing a new edge set\n");
         return false;
       }
+/*
       if (e->ncols) {
         g_printerr ("Not yet adding edges to datad's with variables\n");
         return false;
       }
+*/
 
       /*-- Open a dialog window to ask for label, rowId, data ... --*/
       add_record_dialog_open (d, e, display, gg);
