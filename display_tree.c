@@ -104,8 +104,16 @@ plot_tree_display(ggobid *gg)
   gtk_window_set_title(GTK_WINDOW(plot_tree_window), "GGobi Displays");
   gtk_widget_set_usize(plot_tree_window, 250, 300);
 
-  gtk_signal_connect_object(GTK_OBJECT(gg->main_window), "select_variable",
-                             update_display_tree_plots_by_variable, (gpointer) &gg->display_tree);
+/*  replacing with gtk_signal_connect  -- dfs
+ *gtk_signal_connect_object(GTK_OBJECT(gg->main_window),
+ *  "select_variable",
+ *  update_display_tree_plots_by_variable,
+ *  (gpointer) &gg->display_tree);
+*/
+  gtk_signal_connect (GTK_OBJECT(gg->main_window),
+    "select_variable",
+    update_display_tree_plots_by_variable,
+    (gpointer) &gg->display_tree);
 
  } else {
 

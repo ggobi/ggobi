@@ -645,10 +645,14 @@ make_ui (ggobid *gg) {
   GGobi_widget_set (window, gg, true);
 
 #ifdef TEST_GGOBI_EVENTS
-  gtk_signal_connect_object(GTK_OBJECT(gg->main_window), "splot_new", test_new_plot_cb, (gpointer) "A new plot");
-  gtk_signal_connect(GTK_OBJECT(gg->main_window), "datad_added", test_data_add_cb, NULL);
-  gtk_signal_connect(GTK_OBJECT(gg->main_window), "sticky_point_added", test_sticky_points, NULL);
-  gtk_signal_connect(GTK_OBJECT(gg->main_window), "sticky_point_removed", test_sticky_points, NULL);
+  gtk_signal_connect (GTK_OBJECT(gg->main_window),
+   "splot_new", test_new_plot_cb, (gpointer) "A new plot");
+  gtk_signal_connect(GTK_OBJECT(gg->main_window),
+   "datad_added", test_data_add_cb, NULL);
+  gtk_signal_connect(GTK_OBJECT(gg->main_window),
+   "sticky_point_added", test_sticky_points, NULL);
+  gtk_signal_connect(GTK_OBJECT(gg->main_window),
+   "sticky_point_removed", test_sticky_points, NULL);
 #endif
 
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
@@ -883,9 +887,14 @@ store_session(ggobid *gg, gint action, GtkWidget *w)
       gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->ok_button),
 			  "clicked", GTK_SIGNAL_FUNC (store_session_in_file), dlg);
 
+/* replacing with gtk_signal_connect -- dfs
       gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->cancel_button),
-                                 "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-				 (gpointer) dlg);
+         "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
+	     (gpointer) dlg);
+*/
+      gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->cancel_button),
+         "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
+	     (gpointer) dlg);
 
       gtk_widget_show(dlg);
   } else {
