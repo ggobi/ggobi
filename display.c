@@ -434,10 +434,10 @@ display_add (displayd *display, ggobid *gg)
   /* don't activate */
   viewmode_set (gg->current_display->cpanel.viewmode, gg); 
 
-
-  /*-- if starting from the API, the first mode menu needs to be shown --*/
-  if (prev_viewmode == NULLMODE)
+  /*-- if starting from the API, or changing mode, update the mode menus --*/
+  if (prev_viewmode != gg->current_display->cpanel.viewmode) {
     viewmode_submenus_update (prev_viewmode, gg);
+  }
 
   /*-- Make sure the border for the previous plot is turned off --*/
   if (prev_splot != NULL) {
