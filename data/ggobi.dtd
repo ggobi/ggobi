@@ -3,7 +3,7 @@
   See data/flea.xml in the distribution for an example.
  -->
 
-<!ENTITY % glyphTypes " plus | x | or | fr | oc | fc | . ">
+<!ENTITY % glyphTypes " plus | x | oc | or | fc | fr | . ">
 <!ENTITY % Boolean    " true | T | TRUE | false | F | FALSE ">
 
 <!ELEMENT description ( #PCDATA )>
