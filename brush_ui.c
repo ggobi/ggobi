@@ -76,6 +76,12 @@ static void open_symbol_window_cb (GtkWidget *w, ggobid *gg)
   make_symbol_window (gg);
 }
 
+static void exclusion_window_cb (GtkToggleButton *button, ggobid *gg)
+{
+  exclusion_window_open (gg);
+}
+
+
 /*
  * Callbacks for menus in the main menubar
 */
@@ -423,6 +429,9 @@ cpanel_brush_make (ggobid *gg) {
                         btn,
                         "Open panel for hiding or excluding brushed groups",
                         NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (exclusion_window_cb),
+                      (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
                       btn, false, false, 1);
 
