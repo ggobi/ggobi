@@ -1272,7 +1272,26 @@ The {\bf Color schemes} tool has two purposes: to select a
 new color scheme, and to automatically color points
 using the current color scheme.
 
-\subsubsection{Choosing a color scheme}
+\subsubsection{Specifying a color scheme on the command line}
+
+If you're using XML, and you have a colorschemes.xml file, then
+you can also specify a color scheme on the command line when you
+start ggobi.  Use the name of the color scheme, which appears in
+the XML file, like this:
+
+\begin{verbatim}
+  ggobi -activeColorScheme "ColorScheme Name"
+\end{verbatim}
+  or   
+\begin{verbatim}
+  ggobi --activeColorScheme="ColorSchemeName"
+\end{verbatim}
+
+Warning: If you mistakenly launch a color scheme which does not have
+as many colors as you're specifying in the XML data file, strange
+things may happen; ggobi doesn't yet know how to respond.
+
+\subsubsection{Choosing a color scheme interactively}
 
 Preview a new color scheme by selecting from the menu.  If you would
 like to apply it, click on the button ``Apply color scheme to brushing
@@ -1314,7 +1333,7 @@ The four types represented are
 \item spectral: Brewer's modifications of the popular spectral scale
       to reduce its drawbacks.  She has made the perceptual steps
       more uniform, and made the scales more friendly for people with
-      color impairments.
+      color vision impairments.
 \end{itemize}
 
 \subsubsection{Applying the color scheme by variable}
@@ -1346,6 +1365,9 @@ mouse, so it is probably more effective to update only on mouse release.
 
 Try it with the olive oil data used in the tutorial, and select the {\it
 Area} variable.  It can be a real time-saver.
+
+It's not clear that this tool knows the best way to handle categorical
+variables yet.
 
 \subsection{Color \& glyph groups}
 \label{slbl:ColorAndGlyphGroups}
