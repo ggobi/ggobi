@@ -313,7 +313,6 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
   /*-- VAR_DELETE --*/
   if (cpanel->scatmat_selection_mode == VAR_DELETE) {
     if (scatmat_var_selected (jvar, display)) {
-      gboolean deleted_p = false;  /*-- have we deleted yet? --*/
       /* if jvar is one of the plotted variables, its row and column */
       gint jvar_rc;
       jvar_rc = g_list_index (display->scatmat_cols, GINT_TO_POINTER (jvar));
@@ -341,11 +340,10 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
           child->bottom_attach--;
         }
 
-        if (Delete && !deleted_p) {
+        if (Delete) {
 
           s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
-          display->splots = g_list_remove (display->splots,
-                                           (gpointer) s);
+          display->splots = g_list_remove (display->splots, (gpointer) s);
           /*
            * add a reference to da here, because it's going to be
            * destroyed in splot_free, and we don't want it destroyed
@@ -357,35 +355,39 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
           if (s == gg->current_splot)
             sp_event_handlers_toggle (s, off);
           splot_free (s, display, gg);
-
-          deleted_p = true;
-
-        } else {
-          gtk_widget_set_usize (da, -1, -1);
-          gtk_widget_set_usize (da, width, height);
         }
-  
-        /*
-         * Delete the list elements for the row&column that are being deleted
-        */
-        display->scatmat_cols = g_list_remove_nth (display->scatmat_cols,
-                                                   jvar_rc);
-        display->scatmat_rows = g_list_remove_nth (display->scatmat_rows,
-                                                   jvar_rc);
-
-        gtk_table_resize (GTK_TABLE (display->table),
-                          g_list_length (display->scatmat_rows),
-                          g_list_length (display->scatmat_cols));
-
-        /*
-         * I'm not sure this is necessary -- am I checking whether the
-         * gg.current_splot was deleted?
-        */
-        gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
-        display->current_splot = gg->current_splot;
-
-        redraw = false;
       }
+
+      /*
+       * Delete the list elements for the row&column that are being deleted
+      */
+      display->scatmat_cols = g_list_remove_nth (display->scatmat_cols,
+                                                 jvar_rc);
+      display->scatmat_rows = g_list_remove_nth (display->scatmat_rows,
+                                                 jvar_rc);
+
+      gtk_table_resize (GTK_TABLE (display->table),
+                        g_list_length (display->scatmat_rows),
+                        g_list_length (display->scatmat_cols));
+
+      /*-- when finished, adjust the sizes of the remaining plots --*/
+      l = (GTK_TABLE (display->table))->children;
+      while (l) {
+        child = (GtkTableChild *) l->data;
+        l = l->next;
+        da = child->widget;
+        gtk_widget_set_usize (da, -1, -1);
+        gtk_widget_set_usize (da, width, height);
+      }
+  
+      /*
+       * I'm not sure this is necessary -- am I checking whether the
+       * gg.current_splot was deleted?
+      */
+      gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
+      display->current_splot = gg->current_splot;
+
+      redraw = false;  /*-- individual plots don't need a redraw --*/
     }
   }
 
