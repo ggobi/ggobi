@@ -15,8 +15,13 @@
 #include "vars.h"
 #include "externs.h"
 
+/*-- called when closed from the close button --*/
+static void close_btn_cb (GtkWidget *w, ggobid *gg) {
+  gtk_widget_hide (gg->impute.window);
+}
+/*-- called when closed from the window manager --*/
 static void
-close_window_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
+close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   gtk_widget_hide (gg->impute.window);
 }
 
@@ -93,7 +98,7 @@ impute_window_open (ggobid *gg) {
     gtk_window_set_title (GTK_WINDOW (gg->impute.window),
       "assign values");
     gtk_signal_connect (GTK_OBJECT (gg->impute.window),
-      "delete_event", GTK_SIGNAL_FUNC (close_window_cb), NULL);
+      "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), NULL);
   
     gtk_container_set_border_width (GTK_CONTAINER (gg->impute.window), 5);
 
@@ -217,7 +222,8 @@ impute_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
 
     /*-- add a close button --*/
-    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(), false, true, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
+      false, true, 2);
     hb = gtk_hbox_new (false, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
@@ -226,7 +232,7 @@ impute_window_open (ggobid *gg) {
       "Close the window", NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 2);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (close_window_cb), gg);
+                        GTK_SIGNAL_FUNC (close_btn_cb), gg);
   }
 
   gtk_widget_show_all (gg->impute.window);

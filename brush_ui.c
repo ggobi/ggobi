@@ -249,9 +249,9 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean retval = true;
   GdkModifierType state;
 
-  gg->buttondown = 0;
-
   gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, &state);
+
+  gg->buttondown = 0;
 
   disconnect_motion_signal (sp);
   gdk_pointer_ungrab (event->time);  /*-- grabbed in mousepos_get_pressed --*/

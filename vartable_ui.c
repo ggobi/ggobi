@@ -19,11 +19,11 @@
 
 #include "vartable.h"
 
-static void delete_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
+static void close_wmgr_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
 {
   gtk_widget_hide (gg->vartable_ui.window);
 }
-static void hide_cb (GtkWidget *w, ggobid *gg)
+static void close_btn_cb (GtkWidget *w, ggobid *gg)
 {
   gtk_widget_hide (gg->vartable_ui.window);
 }
@@ -734,7 +734,7 @@ vartable_open (ggobid *gg)
 
   gg->vartable_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_signal_connect (GTK_OBJECT (gg->vartable_ui.window),
-    "delete_event", GTK_SIGNAL_FUNC (delete_cb), gg);
+    "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), gg);
   gtk_window_set_title (GTK_WINDOW (gg->vartable_ui.window),
     "Variable manipulation");
 
@@ -904,7 +904,7 @@ vartable_open (ggobid *gg)
     "Close the window", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (hide_cb), gg);
+                      GTK_SIGNAL_FUNC (close_btn_cb), gg);
 
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 1);
 

@@ -799,7 +799,7 @@ tour2d_manip_end(splotd *sp)
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   extern void copy_mat(gfloat **, gfloat **, gint, gint);
- 
+
   disconnect_motion_signal (sp);
 
   copy_mat(dsp->t2d.u0.vals, dsp->t2d.u.vals, d->ncols, 2);

@@ -21,10 +21,13 @@
 #define SS_STICKY 3
 #define SS_ROWLAB 4
 
-
+/*-- called when closed from the close button --*/
+static void close_btn_cb (GtkWidget *w, ggobid *gg) {
+  gtk_widget_hide (gg->subset_ui.window);
+}
+/*-- called when closed from the window manager --*/
 static void
-close_window_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
-{
+close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   gtk_widget_hide (gg->subset_ui.window);
 }
 
@@ -196,7 +199,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_window_set_title (GTK_WINDOW (gg->subset_ui.window),
         "subset data");
       gtk_signal_connect (GTK_OBJECT (gg->subset_ui.window),
-        "delete_event", GTK_SIGNAL_FUNC (close_window_cb), NULL);
+        "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), NULL);
   
       gtk_container_set_border_width (GTK_CONTAINER (gg->subset_ui.window), 5);
 
@@ -435,13 +438,14 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
 
       /*-- Close button --*/
-      gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(), false, true, 2);
+      gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
+        false, true, 2);
       hb = gtk_hbox_new (false, 2);
       gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
       btn = gtk_button_new_with_label ("Close");
       gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                          GTK_SIGNAL_FUNC (close_window_cb), (ggobid *) gg);
+                          GTK_SIGNAL_FUNC (close_btn_cb), (ggobid *) gg);
       gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
 
     }  /*-- if window == NULL --*/

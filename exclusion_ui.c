@@ -16,6 +16,38 @@
 #include "vars.h"
 #include "externs.h"
 
+static void destroyit (gboolean kill, ggobid *gg) {
+  gint n, nrows;
+  GSList *l;
+  datad *d;
+
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    nrows = GTK_TABLE (d->cluster_table)->nrows;
+    for (n=0; n<nrows-1; n++)
+      cluster_free (n, d, gg);
+  }
+
+  if (kill) {
+    gtk_widget_destroy (gg->cluster_ui.window);
+    gg->cluster_ui.window = NULL;
+  } else {
+    /*-- the window should have just one child.  Find it and kill it --*/
+    GList* gl = gtk_container_children (GTK_CONTAINER(gg->cluster_ui.window));
+    GtkWidget *child = (GtkWidget *) gl->data;
+    gtk_widget_destroy (child);
+  }
+}
+
+/*-- called when closed from the close button --*/
+static void close_btn_cb (GtkWidget *w, ggobid *gg) {
+  destroyit (true, gg);
+}
+/*-- called when closed from the window manager --*/
+static void close_wmgr_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
+  destroyit (true, gg);
+}
+
 static gint
 cluster_symbol_show (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
 {
@@ -252,41 +284,8 @@ cluster_free (gint k, datad *d, ggobid *gg) {
 }
 
 
-static void destroyit (gboolean kill, ggobid *gg) {
-  gint n, nrows;
-  GSList *l;
-  datad *d;
-
-  for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
-    nrows = GTK_TABLE (d->cluster_table)->nrows;
-    for (n=0; n<nrows-1; n++)
-      cluster_free (n, d, gg);
-  }
-
-  if (kill) {
-    gtk_widget_destroy (gg->cluster_ui.window);
-    gg->cluster_ui.window = NULL;
-  } else {
-    /*-- the window should have just one child.  Find it and kill it --*/
-    GList* gl = gtk_container_children (GTK_CONTAINER(gg->cluster_ui.window));
-    GtkWidget *child = (GtkWidget *) gl->data;
-    gtk_widget_destroy (child);
-  }
-}
-
 static void update_cb (GtkWidget *w, ggobid *gg) {
   cluster_window_open (gg);
-}
-
-/*-- called when closed from the close button --*/
-static void close_cb (GtkWidget *w, ggobid *gg) {
-  destroyit (true, gg);
-}
-
-/*-- called when closed from the window manager --*/
-static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
-  destroyit (true, gg);
 }
 
 static gboolean
@@ -351,7 +350,7 @@ cluster_window_open (ggobid *gg) {
   {
     gg->cluster_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_signal_connect (GTK_OBJECT (gg->cluster_ui.window), "delete_event",
-                        GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
+                        GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) gg);
     gtk_window_set_title (GTK_WINDOW (gg->cluster_ui.window),
       "case clusters");
   }
@@ -482,7 +481,7 @@ cluster_window_open (ggobid *gg) {
   /*-- Close button --*/
   btn = gtk_button_new_with_label ("Close");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                 GTK_SIGNAL_FUNC (close_cb), (gpointer) gg);
+                 GTK_SIGNAL_FUNC (close_btn_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);
 
   gtk_widget_show_all (gg->cluster_ui.window);

@@ -16,9 +16,12 @@
 #include "vars.h"
 #include "externs.h"
 
-/*-- catch the delete (close) event from the window manager --*/
-static void
-close_window_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
+/*-- called when closed from the close button --*/
+static void close_btn_cb (GtkWidget *w, ggobid *gg) {
+  gtk_widget_hide (gg->tform_ui.window);
+}
+/*-- called when closed from the window manager --*/
+static void close_wmgr_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
   gtk_widget_hide (gg->tform_ui.window);
 }
 
@@ -160,7 +163,7 @@ transform_window_open (ggobid *gg)
 
     gtk_signal_connect (GTK_OBJECT (gg->tform_ui.window),
                         "delete_event",
-                        GTK_SIGNAL_FUNC (close_window_cb),
+                        GTK_SIGNAL_FUNC (close_wmgr_cb),
                         (gpointer) gg);
 
 /*
@@ -305,7 +308,7 @@ transform_window_open (ggobid *gg)
       "Close the window", NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 1);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (close_window_cb), gg);
+                        GTK_SIGNAL_FUNC (close_btn_cb), gg);
   } 
 
   gtk_widget_show_all (gg->tform_ui.window);

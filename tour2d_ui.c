@@ -544,13 +544,12 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   extern void tour2d_manip_init(gint, gint, splotd *);
   gboolean button1_p, button2_p;
-  mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
+  mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
                                       (GtkSignalFunc) motion_notify_cb,
                                       (gpointer) sp);
-
   tour2d_manip_init(sp->mousepos.x, sp->mousepos.y, sp);
 
   return true;
