@@ -390,15 +390,10 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
   }
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 0) {
-#ifndef MULTIPLE_CLISTS
-    GtkNotebook *nb;
-    gint indx;
-    GtkWidget *swin;
-    GtkAdjustment *adj;
-#endif
     newvar_add (vtype, vname, d, gg);
 
-#ifndef MULTIPLE_CLISTS
+/* I think we still want to do this ... */
+#ifdef FORMERLY
     /*-- scroll to the bottom to highlight the new variable --*/
     nb = GTK_NOTEBOOK (gg->vartable_ui.notebook);
     indx = gtk_notebook_get_current_page (nb);
