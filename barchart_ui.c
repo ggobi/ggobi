@@ -154,14 +154,14 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
   /*-- insert mode-specific key presses (if any) here --*/
   switch (event->keyval) {
   case GDK_plus:
-    if (!vtx->categorical_p) {
+    if (!vtx->vartype == categorical) {
       bsp->bar->new_nbins = bsp->bar->nbins + 1;
       reallocate = TRUE;
     }
     break;
 
   case GDK_minus:
-    if (!vtx->categorical_p) {
+    if (!vtx->vartype == categorical) {
       if (bsp->bar->nbins > 2) {
         bsp->bar->new_nbins = bsp->bar->nbins - 1;
         reallocate = TRUE;

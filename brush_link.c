@@ -182,7 +182,7 @@ void linking_method_set(displayd * display, datad * d, ggobid * gg)
       jvar = get_one_selection_from_clist (clist, d);
       if (jvar >= 0) {
         vt = vartable_element_get(jvar, d);
-        if (vt->categorical_p) {
+        if (vt->vartype == categorical) {
           gg->linkby_cv = true;
           if (d->linkvar_vt == NULL || d->linkvar_vt != vt) {
             d->linkvar_vt = vt;

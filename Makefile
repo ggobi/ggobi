@@ -15,15 +15,15 @@ LD=$(CXX)
 LD=$(CC)
 
 CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
-#CFLAGS= -g -ansi -DHAVE_CONFIG_H  # when using Irix cc
+#CFLAGS= -g -w -DHAVE_CONFIG_H # when using Irix cc, suppress warnings
 CXXFLAGS=$(CFLAGS)
 
 ifndef GTK_CFLAGS
-GTK_CFLAGS=`gtk-config --cflags`
+ GTK_CFLAGS=`gtk-config --cflags`
 endif
 
 ifndef GTK_LIBS
-GTK_LIBS=`gtk-config --cflags --libs`
+ GTK_LIBS=`gtk-config --cflags --libs`
 endif
 
 ifdef TEST_KEYS
@@ -36,6 +36,9 @@ endif
 
 ifdef TESTING_TOUR_STEP
  CFLAGS+= -DTESTING_TOUR_STEP=1
+endif
+ifdef MULTIPLE_CLISTS
+ CFLAGS+= -DMULTIPLE_CLISTS=1
 endif
 
 ifndef DOXYGEN
@@ -117,7 +120,8 @@ SRC=array.c ash1d.c \
  tour.c tourcorr.c tourcorr_ui.c \
  transform.c transform_ui.c \
  utils.c utils_gdk.c utils_ui.c \
- varchange.c varcircles.c varpanel_ui.c vartable.c vartable_ui.c \
+ varchange.c varcircles.c varpanel_ui.c \
+ vartable.c vartable_nbook.c vartable_ui.c \
  vector.c wvis.c wvis_ui.c win32_draw.c \
  writedata.c writedata_ui.c write_svg.c \
  xlines.c xyplot.c xyplot_ui.c \
@@ -153,7 +157,8 @@ OB=array.o ash1d.o \
  tour.o tourcorr.o tourcorr_ui.o \
  transform.o transform_ui.o \
  utils.o utils_gdk.o utils_ui.o \
- varchange.o varcircles.o varpanel_ui.o vartable.o vartable_ui.o \
+ varchange.o varcircles.o varpanel_ui.o \
+ vartable.o vartable_nbook.o vartable_ui.o \
  vector.o wvis.o wvis_ui.o win32_draw.o \
  writedata.o writedata_ui.o write_svg.o \
  xlines.o xyplot.o xyplot_ui.o \
@@ -205,27 +210,13 @@ endif
 ggobi: $(OB) $(EXTRA_OB)
 	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS)  $(EXTRA_LIBS) ${GTK_LIBS}  $(DL_RESOLVE_PATH)
 
-
 pure: ggobi.o $(OB) $(EXTRA_OB)
-	purify.new -cache-dir=/tmp  -always-use-cache-dir=yes \
-	-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/ggvis \
-	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggvis.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/cmds.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/init.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/radial.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/spring.o \
+	purify.new -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
+	-user-path=/usr/dfs/ggobi/ggobi \
+	$(LD) $(OB) $(EXTRA_OB) \
+	$(LDFLAGS) -o ggobi \
 	/usr/dfs/cc/lib/libxml2.so \
-	$(MYSQL_LIBS) \
-	/usr/dfs/cc/lib/libgtk.so \
-	/usr/dfs/cc/lib/libgdk.so \
-	/usr/dfs/cc/lib/libgmodule.so \
-	/usr/dfs/cc/lib/libglib.so \
-	-lXext -lX11 -lm \
-	$(DL_RESOLVE_PATH)
-
-	#$(XML_LIBS) \
-	#`gtk-config --cflags --libs` \
+	`gtk-config --libs`
 
 %.sched: %.c
 	$(CC) -dS -c $(CFLAGS) -I. $(GTK_CFLAGS) $*.c
@@ -314,7 +305,7 @@ datad.o read_xml.o: datad.c datad.h
 	cp ggobi $@
 
 cflags:
-	@echo "$(CFLAGS) $(GTK_CFLAGS)"
+	@echo "$(CFLAGS) "$(GTK_CFLAGS)"
 
 print.o: print.c print.h
 
@@ -348,8 +339,6 @@ ifdef USE_R_XSL
 else
 	 $(XSLT) share/XSL/CmdArgHelp.xsl Docs/commandArgs.xml > $@
 endif
-
-ggobi.o: GGStructSizes.c ggobi.c
 
 # Where is the output?
 apiDoc: Install/apiDocConfig

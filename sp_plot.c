@@ -538,7 +538,7 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
     for (j=0; j<nvars; j++) {
       vt = vartable_element_get (vars[j], d);
       if (vt == NULL) continue;
-      if (vt->categorical_p) {
+      if (vt->vartype == categorical) {
         /*
          * since the level values can be any arbitrary integers,
          * it's necessary to dig out the level name using the list
@@ -562,13 +562,13 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
       }
 
       if (j == 0) {
-        lbl = (vt->categorical_p) ?
+        lbl = (vt->vartype == categorical) ?
           g_strdup_printf ("%s=%s",
             vt->collab_tform, vt->level_names[lval]) :
           g_strdup_printf ("%s=%g",
             vt->collab_tform, d->tform.vals[k][vars[j]]);
       } else {
-        lbl = (vt->categorical_p) ?
+        lbl = (vt->vartype == categorical) ?
           g_strdup_printf ("%s, %s=%s",
             lbl, vt->collab_tform, vt->level_names[lval]) :
           g_strdup_printf ("%s, %s=%g",

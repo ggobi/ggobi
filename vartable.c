@@ -181,10 +181,10 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
   vt_to->collab = g_strdup (vt_from->collab);
   vt_to->collab_tform = g_strdup (vt_from->collab_tform);
 
-  vt_to->categorical_p = vt_from->categorical_p;
+  vt_to->vartype = vt_from->vartype;
   vt_to->nlevels = vt_from->nlevels;
-  if(vt_from->nlevels && vt_from->categorical_p) {
-      vt_to->level_values = (int*) g_malloc(sizeof(int) * vt_from->nlevels);
+  if(vt_from->nlevels && vt_from->vartype == categorical) {
+      vt_to->level_values = (gint*) g_malloc(sizeof(gint) * vt_from->nlevels);
       vt_to->level_names =  (gchar **) g_malloc(sizeof(gchar *) * vt_from->nlevels);
   } else {
       vt_to->level_values = NULL;
@@ -224,7 +224,7 @@ vartable_element_new (datad *d)
   vt->selected = false;
   vt->nmissing = 0;
 
-  vt->categorical_p = false;  /*-- real-valued by default --*/
+  vt->vartype = real;  /*-- real-valued by default --*/
   vt->nlevels = 0;
 
   vt->jref = -1;  /*-- not cloned --*/

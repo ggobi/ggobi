@@ -289,7 +289,7 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
       setLevelIndex(attrs, data);
     break;
 
-    case RECORDS: /* Used to be DATASET */
+    case RECORDS:
       setDatasetInfo(attrs, data);
     break;
     case TOP:
@@ -318,13 +318,13 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     case INT:   
     case STRING:   
     case NA:  
-        if(data->recordString) { 
-          setRecordValues(data, data->recordString, data->recordStringLength);
-	  if(type != NA && type != STRING)
-            data->current_element++;
-	  resetRecordInfo(data);
-	}
-       break;
+      if(data->recordString) { 
+        setRecordValues(data, data->recordString, data->recordStringLength);
+	    if(type != NA && type != STRING)
+          data->current_element++;
+	    resetRecordInfo(data);
+	  }
+    break;
     case QUICK_HELP:
       break;
     default:
@@ -463,6 +463,8 @@ addLevel(XMLParserData *data, const gchar *c, gint len)
 
 /*XXX check not off by one! If so, probably increment data->current_level. */
   el->level_names[data->current_level] = g_strdup(val);
+
+  g_free (val);
 }
 
 void
@@ -482,7 +484,7 @@ void endXMLElement(void *user_data, const xmlChar *name)
   switch(type) {
     case DATASET:
       releaseCurrentDataInfo(data);
-      break;
+    break;
     case RECORD:
       setRecordValues(data, data->recordString, data->recordStringLength);
       data->current_record++;
@@ -1018,7 +1020,7 @@ setRecordValue(const char *tmp, datad *d, XMLParserData *data)
 
       value = asNumber (tmp);
       
-      if(vt->categorical_p) {
+      if(vt->vartype == categorical) {
         if(data->autoLevels && data->autoLevels[data->current_element]) {
   	    value = getAutoLevelIndex(tmp, data, vt);
 	} else if(checkLevelValue(vt, value) == false) {
@@ -1050,7 +1052,7 @@ setRecordValue(const char *tmp, datad *d, XMLParserData *data)
         tmp1 = g_strdup("NA");
       }
       else {
-        if(vt && vt->categorical_p) {
+        if(vt && vt->vartype == categorical) {
           /* To be correct, we need to match the level_values and find the
              corresponding entry. */
           tmp1 = (gchar *) GGobi_getLevelName(vt, value);
@@ -1062,6 +1064,7 @@ setRecordValue(const char *tmp, datad *d, XMLParserData *data)
         }
       }
       g_array_insert_val(d->rowlab, data->current_record, tmp1);
+      g_free (tmp1);
     }
 
     return(true);
@@ -1170,7 +1173,7 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
 
 
   if (strcmp((const char *)tagName, "categoricalvariable") == 0) {
-    el->categorical_p = true;
+    el->vartype = categorical;
 
       /* Mark this as being a variable for which we must compute the levels. */
     if( (tmp = getAttribute(attrs, "levels")) && strcmp(tmp, "auto") == 0) {
@@ -1267,6 +1270,9 @@ setVariableName(XMLParserData *data, const xmlChar *name, gint len)
   if (strcmp (el->collab_tform, lbl) == 0) {
     el->collab_tform = g_strdup (tmp);
   }
+
+  g_free (lbl);
+  g_free (tmp);
 
   return (true);
 }

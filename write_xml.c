@@ -134,16 +134,8 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
   XmlWriteInfo *xmlWriteInfo)
 {
   vartabled *vt = vartable_element_get (j, d);
-/*
-   fprintf(f, "<variable");
-   fprintf(f," name=\"%s\"", vt->collab);
-   if(strcmp(vt->collab, vt->collab_tform) != 0) {
-     fprintf(f," transformName=\"%s\"", vt->collab_tform);
-   }
-   fprintf(f, " />");
-*/
 
-  if (vt->categorical_p) {
+  if (vt->vartype == categorical) {
     gint k;
     fprintf(f, "  <categoricalvariable name=\"%s\"",
       (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
@@ -151,13 +143,21 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
     fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
     for (k=0; k<vt->nlevels; k++) {
       fprintf(f, "      <level value=\"%d\"> %s </level>\n",
-	      vt->level_values[k],
-              vt->level_names[k]);
+	    vt->level_values[k],
+        vt->level_names[k]);
     }
     fprintf(f, "    </levels>\n");
     fprintf(f, "  </categoricalvariable>");
-  } else {
+  } else if (vt->vartype == real) {
     fprintf(f, "  <realvariable name=\"%s\"",
+      (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
+    fprintf(f, " nickname=\"%s\" />", vt->nickname);
+  } else if (vt->vartype == integer) {
+    fprintf(f, "  <integervariable name=\"%s\"",
+      (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
+    fprintf(f, " nickname=\"%s\" />", vt->nickname);
+  } else if (vt->vartype == counter) {
+    fprintf(f, "  <countervariable name=\"%s\"",
       (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
     fprintf(f, " nickname=\"%s\" />", vt->nickname);
   }

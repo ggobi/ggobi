@@ -131,7 +131,7 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
       vtnew->collab_tform = g_strdup (vtnew->collab);
 
       /*-- categorical variable definitions --*/
-      vtnew->categorical_p = true;
+      vtnew->vartype = categorical;
       vtnew->nlevels = 2;
       vtnew->level_values = (int*) g_malloc(sizeof(int) * 2);
       vtnew->level_names = (char **) g_malloc(sizeof(char *) * 2);

@@ -314,12 +314,12 @@ variable_notebook_subwindow_add (datad *d,
   if (d->ncols == 0)
     return;
 
-  if (vtype == categorical_only) {
+  if (vtype == categorical) {
     /* is there in fact a categorical variable? */
     gboolean categorical_variable_present = false;
     for (j=0; j<g_slist_length (d->vartable); j++) {
       vt = (vartabled *) g_slist_nth_data (d->vartable, j);
-      if (vt->categorical_p) {
+      if (vt->vartype == categorical) {
         categorical_variable_present = true;
         break;
       }
@@ -346,8 +346,9 @@ variable_notebook_subwindow_add (datad *d,
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get (j, d);
     if (vtype == all_vartypes ||
-        (vtype == categorical_only && vt->categorical_p) ||
-        (vtype == real_only && !vt->categorical_p))
+        (vtype == categorical && vt->vartype == categorical) ||
+        (vtype == integer && vt->vartype == integer) ||
+        (vtype == real && vt->vartype == real))
     {
       row[0] = g_strdup (vt->collab_tform);
       gtk_clist_append (GTK_CLIST (clist), row);

@@ -23,6 +23,8 @@ enum {CLIST_VARNO, CLIST_VARNAME, CLIST_TYPE, CLIST_TFORM,
 #define ADDVAR_ROWNOS   0
 #define ADDVAR_BGROUP   1
 
+typedef enum {real, categorical, integer, counter, all_vartypes} vartyped;
+
 /*
  * a vartabled object is not a table, but rather an entry in
  * a table:  it's all the data for a single variable, and it
@@ -37,7 +39,8 @@ typedef struct {
  gint nmissing;
 
  /*-- is this variable categorical? --*/
- gboolean categorical_p;
+ vartyped vartype;
+ /*gboolean categorical_p;*/
  gint nlevels;
  int *level_values;
  gchar **level_names;  /*-- strings --*/

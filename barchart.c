@@ -500,7 +500,7 @@ void barchart_allocate_structure(barchartSPlotd * sp, datad * d)
   vtx = vartable_element_get(rawsp->p1dvar, d);
 
   if (sp->bar->new_nbins < 0) {
-    if (vtx->categorical_p) {
+    if (vtx->vartype == categorical) {
       nbins = vtx->nlevels;
       sp->bar->is_histogram = FALSE;
     } else {
@@ -538,7 +538,7 @@ void barchart_allocate_structure(barchartSPlotd * sp, datad * d)
   }
 
 
-  if (!vtx->categorical_p)
+  if (!vtx->vartype == categorical)
     sp->bar->breaks = (gfloat *) g_malloc((nbins + 1) * sizeof(nbins));
 }
 
@@ -667,7 +667,7 @@ barchart_splot_add_plot_labels(splotd * sp, GdkDrawable * drawable,
                   sp->max.y - 5, vtx->collab_tform);
 
 
-  if (vtx->categorical_p) {
+  if (vtx->vartype == categorical) {
     gint i;
     gchar catname[100];
     barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
@@ -714,7 +714,7 @@ void barchart_set_initials(barchartSPlotd * sp, datad * d)
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
 
 
-  if (vtx->categorical_p) {
+  if (vtx->vartype == categorical) {
   } else {
     gint i;
     gfloat rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
@@ -734,14 +734,14 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
   splotd *rawsp = GTK_GGOBI_SPLOT(sp);
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
 
-  if (!vtx->categorical_p)
+  if (!vtx->vartype == categorical)
     rawsp->scale.y = SCALE_DEFAULT;
   for (i = 0; i < sp->bar->nbins; i++)
     sp->bar->bins[i].count = 0;
 
   sp->bar->high_pts_missing = sp->bar->low_pts_missing = FALSE;
 
-  if (vtx->categorical_p) {
+  if (vtx->vartype == categorical) {
     for (i = 0; i < d->nrows_in_plot; i++) {
       m = d->rows_in_plot[i];
 
@@ -864,7 +864,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
     }
 
     sp->bar->bins[i].planar.x = -1;
-    if (vtx->categorical_p) {
+    if (vtx->vartype == categorical) {
       index = sp->bar->bins[i].index;
       sp->bar->bins[i].planar.y =
           (glong) d->world.vals[index][rawsp->p1dvar];
@@ -939,7 +939,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
 
     minwidth = (gint) (0.9 * minwidth);
     for (i = 0; i < sp->bar->nbins; i++) {
-      if (!vtx->categorical_p)
+      if (!vtx->vartype == categorical)
         sp->bar->bins[i].rect.y -= sp->bar->bins[i].rect.height;
       else {
         sp->bar->bins[i].rect.height = minwidth;
@@ -1147,7 +1147,7 @@ barchart_scaling_visual_cues_draw(splotd * rawsp, GdkDrawable * drawable,
 
   vtx = vartable_element_get(GTK_GGOBI_SPLOT(sp)->p1dvar, d);
 
-  if (!vtx->categorical_p) {
+  if (!vtx->vartype == categorical) {
 /* calculate & draw anchor_rgn */
     gint y = sp->bar->bins[0].rect.y + sp->bar->bins[0].rect.height;
     gint x = sp->bar->bins[0].rect.x;
