@@ -295,7 +295,6 @@ update_stress (ggvisd *ggv, ggobid *gg)
     /* calculate stress and draw it */
     if (stress_dd * stress_xx > delta*delta) {
       stress = pow( 1.0 - stress_dx * stress_dx / stress_xx / stress_dd, 0.5);
-g_printerr ("stress: %3.3f\n", stress);
       add_stress_value (stress, ggv);
       draw_stress (ggv, gg);
     } else {

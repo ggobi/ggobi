@@ -9,31 +9,8 @@
 #include "plugin.h"
 #include "ggvis.h"
 
-
-gint
-ggv_stressplot_configure_cb (GtkWidget *w, GdkEventExpose *event,
-  PluginInstance *inst)
-{
-  ggvisd *ggv = ggvisFromInst (inst);
-  gboolean retval = true;
-
-  if (ggv == NULL)  /*-- too early to configure --*/
-    return retval;
-  if (w->allocation.width < 2 || w->allocation.height < 2)
-    return retval;
-
-  if (ggv->stressplot_pix != NULL)
-    gdk_pixmap_unref (ggv->stressplot_pix);
-  ggv->stressplot_pix = gdk_pixmap_new (w->window,
-    w->allocation.width, w->allocation.height, -1);
-
-  gtk_widget_queue_draw (w);
-
-  return retval;
-}
-
 static void
-stress_pixmap_clear (ggvisd *ggv, ggobid *gg)
+stressplot_pixmap_clear (ggvisd *ggv, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   GtkWidget *da = ggv->stressplot_da;
@@ -45,8 +22,33 @@ stress_pixmap_clear (ggvisd *ggv, ggobid *gg)
                       da->allocation.height);
 }
 
+
+gint
+ggv_stressplot_configure_cb (GtkWidget *w, GdkEventExpose *event,
+  PluginInstance *inst)
+{
+  ggvisd *ggv = ggvisFromInst (inst);
+  ggobid *gg = inst->gg;
+  gboolean retval = true;
+
+  if (ggv == NULL)  /*-- too early to configure --*/
+    return retval;
+  if (w->allocation.width < 2 || w->allocation.height < 2)
+    return retval;
+
+  if (ggv->stressplot_pix != NULL)
+    gdk_pixmap_unref (ggv->stressplot_pix);
+  ggv->stressplot_pix = gdk_pixmap_new (w->window,
+    w->allocation.width, w->allocation.height, -1);
+  stressplot_pixmap_clear (ggv, gg);
+
+  gtk_widget_queue_draw (w);
+
+  return retval;
+}
+
 void
-stress_pixmap_copy (ggvisd *ggv, ggobid *gg)
+stressplot_pixmap_copy (ggvisd *ggv, ggobid *gg)
 {
   GtkWidget *da = ggv->stressplot_da;
 
@@ -74,7 +76,7 @@ ggv_stressplot_expose_cb (GtkWidget *w, GdkEventExpose *event,
     return retval;
 
   /*-- copy the pixmap to the screen --*/
-  stress_pixmap_copy (ggv, gg);
+  stressplot_pixmap_copy (ggv, gg);
 
   return retval;
 }
@@ -140,7 +142,7 @@ draw_stress (ggvisd *ggv, ggobid *gg)
 
   /* stress as a fraction */
 
-  stress_pixmap_clear (ggv, gg);
+  stressplot_pixmap_clear (ggv, gg);
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   gdk_draw_lines (ggv->stressplot_pix, gg->plot_GC, axes, 3);
@@ -164,7 +166,7 @@ draw_stress (ggvisd *ggv, ggobid *gg)
     g_free(str);
   }
 
-  stress_pixmap_copy (ggv, gg);
+  stressplot_pixmap_copy (ggv, gg);
 }
 
 void add_stress_value (gdouble stress, ggvisd *ggv)

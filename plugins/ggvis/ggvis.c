@@ -128,7 +128,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gint top;
   GtkAccelGroup *ggv_accel_group;
   GtkWidget *menubar;
-  GtkWidget *da;
   GtkTooltips *tips;
   GtkWidget *entry;
 
@@ -387,7 +386,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (ggv->histogram_da), "configure_event",
     GTK_SIGNAL_FUNC(ggv_histogram_configure_cb), inst);
   gtk_widget_set_events (ggv->histogram_da, GDK_EXPOSURE_MASK);
-  gtk_box_pack_start (GTK_BOX (vb), da, true, true, 2);
+  gtk_box_pack_start (GTK_BOX (vb), ggv->histogram_da, true, true, 2);
 
 
   /*-- Data power, weight power --*/

@@ -8,11 +8,25 @@
 #include "plugin.h"
 #include "ggvis.h"
 
+static void
+histogram_pixmap_clear (ggvisd *ggv, ggobid *gg)
+{
+  colorschemed *scheme = gg->activeColorScheme;
+  GtkWidget *da = ggv->histogram_da;
+
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
+  gdk_draw_rectangle (ggv->histogram_pix, gg->plot_GC,
+                      TRUE, 0, 0,
+                      da->allocation.width,
+                      da->allocation.height);
+}
+
 gint
 ggv_histogram_configure_cb (GtkWidget *w, GdkEventExpose *event,
   PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
+  ggobid *gg = inst->gg;
   gboolean retval = true;
 
   if (ggv == NULL)  /*-- too early to configure --*/
@@ -25,22 +39,10 @@ ggv_histogram_configure_cb (GtkWidget *w, GdkEventExpose *event,
   ggv->histogram_pix = gdk_pixmap_new (w->window,
     w->allocation.width, w->allocation.height, -1);
 
+  histogram_pixmap_clear (ggv, gg);
   gtk_widget_queue_draw (w);
 
   return retval;
-}
-
-static void
-histogram_pixmap_clear (ggvisd *ggv, ggobid *gg)
-{
-  colorschemed *scheme = gg->activeColorScheme;
-  GtkWidget *da = ggv->histogram_da;
-
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (ggv->histogram_pix, gg->plot_GC,
-                      TRUE, 0, 0,
-                      da->allocation.width,
-                      da->allocation.height);
 }
 
 void
