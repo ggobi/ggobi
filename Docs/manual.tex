@@ -770,8 +770,14 @@ plotting method, such as stripes, clusters, or gaps.
 The ASH is due to Scott (\cite{Scott92}),
 and the code is also his.  In this method, several histograms are
 calculated using the same bin width but different origins, and the
-averaged results are plotted.  The smoothing parameter essentially
-controls the bin width.  Line segments can be added that run between
+averaged results are plotted.  His algorithm has two key parameters: 
+the number of bins, which controls the bin width, and the number of
+histograms to be computed.
+In ggobi, the number of bins is held constant (at 200), while the
+smoothing parameter available on the console controls the number of
+histograms (which ranges from 1 to 50).
+
+Line segments can be added that run between
 the plotted point and the baseline of the ASH.  This is helpful
 when the smoothing parameter is low, because it helps your eye
 make out the the shape of the ASH.
