@@ -126,9 +126,18 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   gint i, nP, nC, nS;
   gdouble *x, *y, *depth, *inDegree, *outDegree;
   gdouble *nParents, *nChildren, *nSiblings;
+/*
   gchar *name;
+*/
   GList *l, *connectedNodes;
   noded *n, *n1;
+/*-- to add the new datad --*/
+  gint m, nvisible, nc;
+  InputDescription *desc = NULL;
+  datad *dnew;
+  gdouble *values;
+  gchar **rownames, **colnames;
+  glong *visible, *rowids;
 
   if (d == NULL || e == NULL) {
     quick_message ("Please specify an edge set", false);
@@ -214,94 +223,157 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
     }
   }
 
-  if (init) {
+/*
+ * create a new datad with the new variables.  include only
+ * those nodes that are visible (not yet implemented).
+*/
+
+/*
+ * This should not necessarily be of size d->nrows -- if some points
+ * have been erased, for instance, ...
+*/
+  nc = 8;
+
+  visible = (glong *) g_malloc (d->nrows_in_plot * sizeof (glong));
+  nvisible = 0;
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot[m];
+    if (!d->hidden.els[i]) {
+      visible[nvisible++] = i;
+    }
+  }
+g_printerr ("nvisible = %d\n", nvisible);
+
+  rowids = (glong *) g_malloc (nvisible * sizeof(glong));
+  for (m=0; m<nvisible; m++) {
+    i = visible[m];
+    rowids[m] = (glong) d->rowid.id.els[i];
+  }
+
+  values = (gdouble *) g_malloc (nvisible * nc * sizeof(gdouble));
+  rownames = (gchar **) g_malloc (nvisible * sizeof(gchar *));
+  for (m=0; m<nvisible; m++) {
+    i = visible[m];
+    values[m + 0*nvisible] = (gdouble) x[i];
+    values[m + 1*nvisible] = (gdouble) y[i];
+    values[m + 2*nvisible] = (gdouble) depth[i];
+    values[m + 3*nvisible] = (gdouble) inDegree[i];
+    values[m + 4*nvisible] = (gdouble) outDegree[i];
+    values[m + 5*nvisible] = (gdouble) nParents[i];
+    values[m + 6*nvisible] = (gdouble) nChildren[i];
+    values[m + 7*nvisible] = (gdouble) nSiblings[i];
+
+    rownames[m] = (gchar *) g_array_index (d->rowlab, gchar *, i);
+  }
+
+  colnames = (gchar **) g_malloc (nc * sizeof(gchar *));
+  colnames[0] = "x";
+  colnames[1] = "y";
+  colnames[2] = "depth";
+  colnames[3] = "in degree";
+  colnames[4] = "out degree";
+  colnames[5] = "nParents";
+  colnames[6] = "nChildren";
+  colnames[7] = "nSiblings";
+
+  dnew = datad_create (nvisible, nc, gg);
+  dnew->name = g_strdup ("radial layout");
+
+  GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
+    gg, rowids, desc);
+
+  g_free (values);
+  g_free (rownames);
+  g_free (colnames);
+  g_free (rowids);
+  g_free (visible);
+
+/*-- add the new variables to this datad --*/
+/*
     name = g_strdup_printf ("x");
     newvar_add_with_values (x, d->nrows, name, d, gg);
     g_free (name);
-    g_free (x);
 
     name = g_strdup_printf ("y");
     newvar_add_with_values (y, d->nrows, name, d, gg);
     g_free (name);
-    g_free (y);
 
     name = g_strdup_printf ("depth");
     newvar_add_with_values (depth, d->nrows, name, d, gg);
     g_free (name);
-    g_free (depth);
 
     name = g_strdup_printf ("in degree");
     newvar_add_with_values (inDegree, d->nrows, name, d, gg);
     g_free (name);
-    g_free (inDegree);
 
     name = g_strdup_printf ("out degree");
     newvar_add_with_values (outDegree, d->nrows, name, d, gg);
     g_free (name);
-    g_free (outDegree);
 
     name = g_strdup_printf ("nparents");
     newvar_add_with_values (nParents, d->nrows, name, d, gg);
     g_free (name);
-    g_free (nParents);
 
     name = g_strdup_printf ("nchildren");
     newvar_add_with_values (nChildren, d->nrows, name, d, gg);
     g_free (name);
-    g_free (nChildren);
 
     name = g_strdup_printf ("nsiblings");
     newvar_add_with_values (nSiblings, d->nrows, name, d, gg);
     g_free (name);
-    g_free (nSiblings);
-  } else {  /*-- overwrite the values of all those variables --*/
-    gint j;
+*/
 
+/*-- overwrite new radial variables --*/
+/*
+    gint j;
     j = GGOBI(getVariableIndex)("x", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = x[i];
     limits_set_by_var (j, true, true, d, gg);
-    g_free (x);
 
     j = GGOBI(getVariableIndex)("y", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = y[i];
     limits_set_by_var (j, true, true, d, gg);
-    g_free (y);
 
     j = GGOBI(getVariableIndex)("in degree", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = inDegree[i];
     limits_set_by_var (j, true, true, d, gg);
-    g_free (inDegree);
 
     j = GGOBI(getVariableIndex)("out degree", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = outDegree[i];
     limits_set_by_var (j, true, true, d, gg);
-    g_free (outDegree);
 
     j = GGOBI(getVariableIndex)("nparents", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = nParents[i];
     limits_set_by_var (j, true, true, d, gg);
-    g_free (nParents);
 
     j = GGOBI(getVariableIndex)("nchildren", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = nChildren[i];
     limits_set_by_var (j, true, true, d, gg);
-    g_free (nChildren);
 
     j = GGOBI(getVariableIndex)("nsiblings", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = nSiblings[i];
     limits_set_by_var (j, true, true, d, gg);
-    g_free (nSiblings);
 
     tform_to_world (d, gg);
     displays_tailpipe (FULL, gg);
   }
+*/
+
+  g_free (x);
+  g_free (y);
+  g_free (depth);
+  g_free (inDegree);
+  g_free (outDegree);
+  g_free (nParents);
+  g_free (nChildren);
+  g_free (nSiblings);
 }
 
 void highlight_sticky_edges (ggobid *gg, gint index, gint state, datad *d,
