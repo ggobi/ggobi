@@ -59,7 +59,7 @@ void br_glyph_ids_alloc (datad *);
 void br_glyph_ids_init (datad *, ggobid *);
 void br_line_color_alloc (ggobid *);
 void br_line_color_init (datad *d, ggobid *);
-void br_line_vectors_check_size (gint, datad *, ggobid *);
+gboolean br_line_vectors_check_size (gint, datad *, ggobid *);
 void brush_activate (gboolean, datad *d, ggobid *);
 void brush_draw_brush (splotd *, datad *d, ggobid *);
 void brush_draw_label (splotd *, datad *d, ggobid *);

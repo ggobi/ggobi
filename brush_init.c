@@ -135,8 +135,16 @@ br_line_vectors_free (datad *d, ggobid *gg)
   vectorb_free (&d->line.xed_by_brush);
 }
 
-void
+gboolean
 br_line_vectors_check_size (gint ns, datad *d, ggobid *gg) {
+  gboolean same =
+    (d->line.color.nels != ns) ||
+    (d->line.color_now.nels != ns) ||
+    (d->line.color_prev.nels != ns) ||
+    (d->line.hidden.nels != ns) ||
+    (d->line.hidden_now.nels != ns) ||
+    (d->line.hidden_prev.nels != ns);
+
   /*-- assume these vectors are always of the same size --*/
   if (d->line.color.nels != ns) {
     vectors_realloc (&d->line.color, ns);
@@ -147,6 +155,8 @@ br_line_vectors_check_size (gint ns, datad *d, ggobid *gg) {
     vectorb_realloc (&d->line.hidden_prev, ns);
     vectorb_realloc (&d->line.xed_by_brush, ns);
   }
+
+  return same;
 }
 
 void

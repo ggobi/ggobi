@@ -251,15 +251,6 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
   vectorf_init (&sp->p1d_data);
   vectorf_alloc (&sp->p1d_data, nr);
 
-/*
-  sp->points = (GdkPoint *) g_malloc (nr * sizeof (GdkPoint));
-  sp->segs = (GdkSegment *) g_malloc (2 * nr * sizeof (GdkSegment));
-  sp->open_rects = (rectd *) g_malloc (nr * sizeof (rectd));
-  sp->filled_rects = (rectd *) g_malloc (nr * sizeof (rectd));
-  sp->open_arcs = (arcd *) g_malloc (nr * sizeof (arcd));
-  sp->filled_arcs = (arcd *) g_malloc (nr * sizeof (arcd));
-*/
-
   switch (display->displaytype) {
     case scatterplot:
       sp->edges = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));

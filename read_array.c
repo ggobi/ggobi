@@ -352,11 +352,11 @@ read_ascii_data(InputDescription *desc, ggobid *gg)
 #else
       d = datad_new (NULL, gg);
 #endif
-      if(array_read (d, desc, gg) == false) {
-  	/* Somewhere, we have to arrange to throw away the datad
-           and get it out of the list.
-         */
-	return(false);
+      if (array_read (d, desc, gg) == false) {
+        /* Somewhere, we have to arrange to throw away the datad
+         * and get it out of the list.
+        */
+        return(false);
       }
 
       d->nrows_in_plot = d->nrows;    /*-- for now --*/
@@ -374,7 +374,7 @@ read_ascii_data(InputDescription *desc, ggobid *gg)
       edges_read (desc, true, d, gg);
       line_colors_read (desc, true, d, gg);
 
-   return(true);
+   return (true);
 }
 
 /*----------------------------------------------------------------------*/

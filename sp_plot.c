@@ -549,8 +549,16 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
   gint i, k;
   displayd *display = (displayd *) sp->displayptr;
 
-  if (d->nedges == 0)
-    return;
+  /*-- in case there were no edges specified in the data, initialize --*/
+  if (d->nedges == 0) {
+    extern void edges_create_defaults (datad *d, ggobid *gg);
+    extern void splot_edges_realloc (splotd *sp, datad *d, ggobid *gg);
+    edges_create_defaults (d, gg);
+    splot_edges_realloc (sp, d, gg);
+    br_line_color_init (d, gg);
+  }
+  /*-- --*/
+
 
   /*
    * Loop once through line_color_now[], collecting the colors
@@ -590,7 +598,7 @@ edges_draw (splotd *sp, ggobid *gg)
   gint nl;
   gushort current_color;
   gushort colors_used[NCOLORS+2];
-  gint ncolors_used;
+  gint ncolors_used = 0;
   gboolean doit;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;

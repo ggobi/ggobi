@@ -40,7 +40,7 @@ edges_free (datad *d, ggobid *gg)
 /* --------------------------------------------------------------- */
 
 void
-edges_create (datad *d, ggobid *gg)
+edges_create_defaults (datad *d, ggobid *gg)
 {
   gint i;
 

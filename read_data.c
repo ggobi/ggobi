@@ -727,21 +727,28 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
   gint jlinks = 0;
   FILE *fp;
   
-  if(desc->fileName == NULL || desc->fileName[0] == '\0' || strcmp (desc->fileName, "stdin") == 0)   
+  /*-- if there's no edges file ... --*/
+  if (desc->fileName == NULL ||
+      desc->fileName[0] == '\0' ||
+      strcmp (desc->fileName, "stdin") == 0)   
+  {
     return(true);
-  else {
+
+  } else {
 
    gchar *fileName;
    int whichSuffix;
    static const gchar * const suffixes[] = {"lines"};
 
-   fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
-   if(fileName == NULL)
-    return(false);
+   fileName = findAssociatedFile (desc, suffixes,
+     sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+   if (fileName == NULL)
+     ok = false;
+     return (false);
 
-   if( ( fp = fopen(fileName, "r") ) == NULL ) {
-     g_free(fileName);
-     return(false);
+   if ( ( fp = fopen(fileName, "r") ) == NULL ) {
+     g_free (fileName);
+     return (false);
    }
 
   if ((fp = fopen (fileName, "r")) != NULL) {
@@ -759,15 +766,14 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
       if (fs == EOF)
         break;
       else if (fs < 0) {
-        ok = false;
         g_printerr ("Error in reading .lines file\n");
-        return(false);
+        return (false);
+        break;
       }
 
       if (a < 1 || b > d->nrows) {
-        ok = false;
         g_printerr ("Entry in .lines file > number of rows or < 1\n");
-        return(false);
+        return (false);
       }
       else {
         /*
@@ -805,7 +811,15 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
     g_free(fileName);
   }
 
- return (ok);
+  /*-- if reading lines failed for any reason, construct default edges --*/
+/*
+  if (!ok) {
+    extern void edges_create_defaults (datad *d, ggobid *gg);
+    edges_create_defaults (d, gg);
+  }
+*/
+
+  return (ok);
 }
 
 
