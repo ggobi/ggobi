@@ -461,7 +461,7 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
 
   /*-- the label is actually a button, with the old behavior --*/
-  label = gtk_button_new_with_label (vt->collab);
+  label = gtk_button_new_with_label (vt->collab_tform);
   gtk_button_set_relief (GTK_BUTTON (label), GTK_RELIEF_NONE);
   GGobi_widget_set (label, gg, true);
   gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_LABEL], label);
