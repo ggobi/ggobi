@@ -31,6 +31,10 @@ add_anchor_toggles (datad *d, PluginInstance *inst)
   GtkArg arg;
   gboolean rval = false;
 
+  /*-- skip datasets without variables --*/
+  if (!datad_has_variables (d))
+    return;
+
   arg.name = "n_columns";
   gtk_widget_get (d->cluster_table, &arg);
   nc = (guint) GTK_VALUE_UINT(arg);
