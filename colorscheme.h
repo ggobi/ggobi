@@ -3,7 +3,8 @@
 
 #include <gdk/gdk.h>
 
-typedef enum {diverging, sequential, spectral, categorical, UNKNOWN_COLOR_TYPE} colorscaletype;
+typedef enum {diverging, sequential, spectral, qualitative,
+  UNKNOWN_COLOR_TYPE} colorscaletype;
 typedef enum {rgb, hsv, cmy, cmyk, UNKNOWN_COLOR_SYSTEM} colorsystem;
 
 typedef struct {

@@ -1,5 +1,4 @@
 #include "ggobi.h"
-#include "colorscheme.h"
 
 #include <string.h>
 
@@ -114,11 +113,11 @@ getColorSchemeType(const xmlChar *type)
   if(strcmp(type, "diverging") == 0)
     return(diverging);
   else if(strcmp(type, "sequential") == 0) 
-    return(diverging);
+    return(sequential);
   else if(strcmp(type, "spectral") == 0) 
     return(spectral);
-  else if(strcmp(type, "categorical") == 0) 
-    return(categorical);
+  else if(strcmp(type, "qualitative") == 0) 
+    return(qualitative);
   else 
     return(UNKNOWN_COLOR_TYPE);
 }

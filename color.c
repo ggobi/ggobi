@@ -18,7 +18,6 @@
 
 #include "vars.h"
 #include "externs.h"
-#include "colorscheme.h"
 
 static const gfloat default_rgb[MAXNCOLORS][3] = {
   {0.73, 0.33, 0.83},

@@ -5,7 +5,7 @@
 
 <!-- Diverging schemes -->
 
-<colormap name="Brown -- Blue Green 7" ncolors="7"
+<colormap name="Brown to Blue Green 7" ncolors="7"
           type="diverging" criticalvalue="4"
           system="rgb" system_min="0" system_max="1">
 <description>
@@ -43,7 +43,7 @@
 </annotations>
 </colormap>
 
-<colormap name="Brick Red -- Blue 7" ncolors="7"
+<colormap name="Brick Red to Blue 7" ncolors="7"
           type="diverging" criticalvalue="4"
           system="rgb" system_min="0" system_max="1">
 <description>
@@ -81,7 +81,7 @@
 </annotations>
 </colormap>
 
-<colormap name="Dark Red -- Dark Green 7" ncolors="7"
+<colormap name="Dark Red to Dark Green 7" ncolors="7"
           type="diverging" criticalvalue="4"
           system="rgb" system_min="0" system_max="1">
 <description>
@@ -119,7 +119,7 @@
 </annotations>
 </colormap>
 
-<colormap name="Dark Blue -- Green 6" ncolors="6"
+<colormap name="Dark Blue to Green 6" ncolors="6"
           type="diverging" criticalvalue="4"
           system="rgb" system_min="0" system_max="1">
 <description>
@@ -154,7 +154,7 @@
 </annotations>
 </colormap>
 
-<colormap name="Green -- Violet 6" ncolors="6"
+<colormap name="Green to Violet 6" ncolors="6"
           type="diverging" criticalvalue="3"
           system="rgb" system_min="0" system_max="1">
 <description>
@@ -189,7 +189,7 @@
 </annotations>
 </colormap>
 
-<colormap name="Brown -- Blue Green 5" ncolors="5"
+<colormap name="Brown to Blue Green 5" ncolors="5"
           type="diverging" criticalvalue="2"
           system="rgb" system_min="0" system_max="1">
 <description>
@@ -221,7 +221,7 @@
 </annotations>
 </colormap>
 
-<colormap name="Pinkish Red -- Olive Green 5" ncolors="5"
+<colormap name="Pinkish Red to Olive Green 5" ncolors="5"
           type="diverging" criticalvalue="2"
           system="rgb" system_min="0" system_max="1">
 <description>
@@ -253,7 +253,7 @@
 </annotations>
 </colormap>
 
-<colormap name="Purplish Blue -- Green 5" ncolors="5"
+<colormap name="Purplish Blue to Green 5" ncolors="5"
           type="diverging" criticalvalue="2"
           system="rgb" system_min="0" system_max="1">
 <description>
@@ -285,7 +285,7 @@
 </annotations>
 </colormap>
 
-<colormap name="Orange -- Blue 5" ncolors="5"
+<colormap name="Orange to Blue 5" ncolors="5"
           type="diverging" criticalvalue="2"
           system="rgb" system_min="0" system_max="1">
 <description>
@@ -317,7 +317,7 @@
 </annotations>
 </colormap>
 
-<colormap name="Green -- Peach 5" ncolors="5"
+<colormap name="Green to Peach 5" ncolors="5"
           type="diverging" criticalvalue="2"
           system="rgb" system_min="0" system_max="1">
 <description>
@@ -349,7 +349,7 @@
 </annotations>
 </colormap>
 
-<colormap name="Red -- Blue 5" ncolors="5"
+<colormap name="Red to Blue 5" ncolors="5"
           type="diverging" criticalvalue="2"
           system="rgb" system_min="0" system_max="1">
 <description>

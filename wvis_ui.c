@@ -105,24 +105,22 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
 }
 
 static void
-colorscheme_add_to_menu (GtkWidget *menu, colorschemed *scheme,
-  gpointer ptr, ggobid *gg)
+colorscheme_add_to_menu (GtkWidget *menu, gchar *lbl, colorschemed *scheme,
+  GtkSignalFunc func, gpointer ptr, ggobid *gg)
 {
   GtkWidget *menuitem;
 
-  if (scheme) {
-    menuitem = gtk_menu_item_new_with_label (scheme->name);
-  } else {
-    menuitem = gtk_menu_item_new_with_label ("Default");
+  menuitem = gtk_menu_item_new_with_label (lbl);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+
+  if (scheme && func) {
+    gtk_object_set_data (GTK_OBJECT (menuitem), "notebook", ptr);
+    GGobi_widget_set (menuitem, gg, true);
+    gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+      func, scheme);
   }
 
-  gtk_object_set_data (GTK_OBJECT (menuitem), "notebook", ptr);
-
-  gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem) ;
-  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-    colorscheme_set_cb, scheme);
-  GGobi_widget_set (menuitem, gg, true);
 }
 
 
@@ -593,6 +591,12 @@ wvis_window_open (ggobid *gg) {
   GtkWidget *frame, *opt, *menu;
   GList *l;
   colorschemed *scheme;
+  static gchar *colorscaletype_lbl[] = {
+    "--- DIVERGING ---",
+    "--- SEQUENTIAL ---",
+    "--- SPECTRAL ---",
+    "--- QUALITATIVE ---"};
+  gint n, ncolorscaletype_lbl = 4;
   /* */
 
   if (gg->wvis.window == NULL) {
@@ -621,19 +625,21 @@ wvis_window_open (ggobid *gg) {
     opt = gtk_option_menu_new ();
     menu = gtk_menu_new ();
 
-    colorscheme_add_to_menu (menu, NULL, notebook, gg);
-    for (l = sessionOptions->colorSchemes; l; l = l->next) {
-      scheme = (colorschemed *) l->data;
-      colorscheme_add_to_menu (menu, scheme, notebook, gg);
-/*
-      menuitem = gtk_menu_item_new_with_label (scheme->name);
-      gtk_menu_append (GTK_MENU (menu), menuitem);
-      gtk_widget_show (menuitem) ;
-      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-        colorscheme_set_cb, scheme);
-      GGobi_widget_set (menuitem, gg, true);
-*/
+    colorscheme_add_to_menu (menu, "Default", NULL,
+      colorscheme_set_cb, notebook, gg);
+
+    for (n=0; n<ncolorscaletype_lbl; n++) {
+      colorscheme_add_to_menu (menu, colorscaletype_lbl[n], NULL,
+        NULL, notebook, gg);
+      for (l = sessionOptions->colorSchemes; l; l = l->next) {
+        scheme = (colorschemed *) l->data;
+        if (scheme->type == n)
+          colorscheme_add_to_menu (menu, scheme->name, scheme,
+            colorscheme_set_cb, notebook, gg);
+      }
     }
+
+
     gtk_option_menu_set_menu (GTK_OPTION_MENU (opt), menu);
 
     gtk_container_set_border_width (GTK_CONTAINER (opt), 4);

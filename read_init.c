@@ -40,7 +40,6 @@ GGobiDisplayDescription* getDisplayDescription(xmlNodePtr node);
 enum displaytyped getDisplayType(const xmlChar *type);
 gint getPreferences(const xmlDocPtr doc, GGobiInitInfo *info);
 
-#include "colorscheme.h"
 
 GGobiInitInfo *
 read_init_file(const char *filename, GGobiInitInfo *info)
