@@ -310,9 +310,6 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
 
   dsp->tcorr2.u.vals[0][dsp->tcorr2.vars.els[0]] = 1.0;
 
-  dsp->tc1_manip_var = dsp->tcorr1.vars.els[0];
-  dsp->tc2_manip_var = dsp->tcorr2.vars.els[0];
-
   dsp->tcorr1.dv = 1.0;
   dsp->tcorr1.delta = cpanel->tcorr1_step*M_PI_2/10.0;
   dsp->tcorr1.nsteps = 1; 
@@ -331,7 +328,9 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr2.get_new_target = true;
 
   /* manip */
-  dsp->tc_manip_mode = CMANIP_COMB;
+  dsp->tc_manip_mode = CMANIP_OFF;
+  dsp->tc1_manip_var = dsp->tcorr1.vars.els[0];
+  dsp->tc2_manip_var = dsp->tcorr2.vars.els[0];
 
   /* pp */
   dsp->tcorr1.target_basis_method = 0;
