@@ -187,11 +187,12 @@ typedef struct {
  gboolean missings_show_p;            /* scatterplot, scatmat, parcoords */
 
  gboolean axes_show_p;                /* scatterplot, scatmat, parcoords */
- gboolean axes_center_p;              /* scatterplot */
-
- gboolean double_buffer_p;            /* parcoords */
-
- gboolean link_p;                     /* scatterplot, scatmat, parcoords */
+ gboolean axes_label_p;               /* scatterplot */
+/* unused
+ gboolean axes_center_p;              * scatterplot *
+ gboolean double_buffer_p;            * parcoords *
+ gboolean link_p;                     * scatterplot, scatmat, parcoords *
+*/
 } DisplayOptions;
 
 extern DisplayOptions DefaultDisplayOptions;

@@ -836,6 +836,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
               doit = true;
               if (e->hidden_now.els[j]) {
                 doit = false;
+              /*-- nels = d->rowid.idv.nels --*/
               } else if (endpoints[j].a >= nels || endpoints[j].b >= nels) {
                 doit = false;
               }
@@ -959,7 +960,7 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
   if (k >= e->edge.n)
     return;
 
-  /*-- not yet using rowid.idv --*/
+  /*-- not yet using rowid.idv  -- huh? --*/
   if (e->hidden_now.els[k])
     return;
 
@@ -1135,6 +1136,11 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gint daheight = sp->da->allocation.height;
   vartabled *vt;
 
+  /*-- for tour axes --*/
+  gchar lbl[3];
+  gint axindent = 20;
+  /*-- --*/
+
   if (!dsp->options.axes_show_p)
     return;
   
@@ -1183,6 +1189,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           GDK_CAP_ROUND, GDK_JOIN_ROUND);
       break;
       case TOUR2D:
+/*
         gdk_draw_arc(drawable,gg->plot_GC,FALSE,
           10, 3*daheight/4 - 10,
           dawidth/4, daheight/4, 0,360*64);
@@ -1226,6 +1233,68 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           }
         }
         gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID, 
+          GDK_CAP_ROUND, GDK_JOIN_ROUND);
+*/
+        /* draws circle */
+        gdk_draw_arc(drawable,gg->plot_GC,FALSE,
+          axindent, 3*daheight/4 - axindent,
+          dawidth/4, daheight/4, 0,360*64); 
+          
+        /* draw the axes and labels */
+        for (j=0; j<d->ncols; j++) {  
+          ix = dawidth/8 + axindent + 
+            (gint) (dsp->t2d.u.vals[0][j]* (gfloat) dawidth/8);
+          iy = daheight - axindent - (daheight/8 +
+            (gint) (dsp->t2d.u.vals[1][j]* (gfloat) daheight/8));
+          gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID,
+            GDK_CAP_ROUND, GDK_JOIN_ROUND);
+          gdk_draw_line(drawable, gg->plot_GC,
+            dawidth/8+axindent, daheight-daheight/8-axindent,
+            ix, iy);
+            
+          if (abs(ix - axindent - dawidth/8) > 5 ||
+              abs(iy + axindent - (daheight- daheight/8)) > 5)
+          {   
+            if (dsp->options.axes_label_p) {
+              vt = vartable_element_get (j, d);
+              g_snprintf(lbl,3,"%s",vt->collab_tform);
+              gdk_text_extents (style->font,
+                lbl, 3,
+                &lbearing, &rbearing, &width, &ascent, &descent);
+            }   
+            else {
+              varlab = g_strdup_printf("%d",j+1);
+              gdk_text_extents (style->font,
+                varlab, strlen (varlab),
+                &lbearing, &rbearing, &width, &ascent, &descent);
+            }   
+            textheight = ascent+descent;
+            ix = ix - axindent - dawidth/8;
+            iy = iy - (daheight - daheight/8 - axindent);
+            dst = sqrt(ix*ix + iy*iy);
+            ix = axindent + dawidth/8 +
+               (gint) ((gfloat) ix / dst * (gfloat) dawidth/8);
+            iy = daheight - axindent -
+               daheight/8 + (gint) ((gfloat) iy / dst * (gfloat) daheight/8);
+            if (ix < dawidth/8+axindent)
+              ix -= width;
+            else 
+              ix += (width/2);
+            if (iy < daheight-daheight/8-axindent)
+              iy -= (textheight/2);
+            else 
+              iy += (textheight);
+            if (dsp->options.axes_label_p)
+              gdk_draw_string (drawable, style->font, gg->plot_GC,
+                ix, iy,
+                lbl);  
+            else
+              gdk_draw_string (drawable, style->font, gg->plot_GC,
+                ix, iy,
+                varlab);
+          }     
+        }       
+        gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID,
           GDK_CAP_ROUND, GDK_JOIN_ROUND);
       break;
       case COTOUR:

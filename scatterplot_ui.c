@@ -234,6 +234,10 @@ scatterplot_display_menus_make (displayd *display,
     func, GINT_TO_POINTER (DOPT_AXES), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
+  item = CreateMenuCheck (options_menu, "Show 2D tour axes as text",
+    func, GINT_TO_POINTER (DOPT_AXESLAB), off, gg);
+  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (topmenu), options_menu);
   submenu_append (topmenu, display->menubar);
   gtk_widget_show (topmenu);

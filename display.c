@@ -30,9 +30,12 @@ DisplayOptions DefaultDisplayOptions = {
                                          true,  /* whiskers_show_p*/
                                          true,  /* missings_show_p  */
                                          true,  /* axes_show_p */
-                                         true,  /* axes_center_p */
-                                         true,  /* double_buffer_p */
-                                         true   /* link_p */
+                                         false, /* axes_label_p */
+/* unused
+                                         true,  * axes_center_p *
+                                         true,  * double_buffer_p *
+                                         true   * link_p *
+*/
                                        };
 
 /*-- debugging utility --*/
@@ -220,17 +223,39 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
           break;
         }
       }
-      break;
+    break;
 
+    case DOPT_AXESLAB:
+      display->options.axes_label_p = w->active;
+      
+      if (display->displaytype == scatterplot) {
+        switch (display->cpanel.projection) {
+          case XYPLOT:
+          break;
+          case P1PLOT:
+          break;
+          case TOUR1D:
+          case TOUR2D:
+          case COTOUR:
+            display_plot (display, FULL, gg);  /* di changed QUICK to FULL */
+          break;
+          default:
+          break;  
+        } 
+      }   
+    break;
+
+/* unused
     case DOPT_AXES_C:
       display->options.axes_center_p = w->active;
-      break;
+    break;
     case DOPT_BUFFER:
       display->options.double_buffer_p = w->active;
-      break;
+    break;
     case DOPT_LINK:
       display->options.link_p = w->active;
-      break;
+    break;
+*/
     default:
       g_printerr ("no variable is associated with %d\n", action);
   }

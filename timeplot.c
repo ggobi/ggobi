@@ -55,9 +55,11 @@ tsplot_display_menus_make (displayd *display,
   /* Add a separator */
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
+/* unused
   item = CreateMenuCheck (options_menu, "Double buffer",
     func, GINT_TO_POINTER (DOPT_BUFFER), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+*/
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
   submenu_append (submenu, mbar);

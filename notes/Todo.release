@@ -1,9 +1,9 @@
 XML format
- a. Read in a set of colormaps  (in progress)
+ a. Read in a set of colormaps  (Done)
     Question: How should a user specify in an xml data file which
-       colormap to use?)
+       colormap to use?   (not yet tested by me -- dfs)  
  b. Read in scaling limits for a variable (Done)
- c. Handle <categoricalvariable> (This is now being read correctly.)
+ c. Handle <categoricalvariable> (Done)
  d. Does 'write_xml' handle all this information?  (Not missings)
 
 manual
