@@ -52,7 +52,7 @@ Plugins:  @EMBED_LIB@
 	if test -n "${PLUGIN_DIRS}" ; then \
 	  for f in $(PLUGIN_DIRS) ; do \
 	    echo "Building plugin $$f" ; \
-	    $(MAKE) -C plugins/$$f GGOBI_CONFIG=$(CUR_DIR)/bin/ggobi-config ; \
+	      ./share/tools/plugin $$f ; \
 	  done \
 	fi 
 else
