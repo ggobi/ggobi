@@ -232,7 +232,7 @@ void barchart_clean_init(barchartSPlotd * sp)
     g_free((gpointer) sp->bar->index_to_rank);
   }
   sp->bar->index_to_rank =
-      (gint *) g_malloc(d->nrows_in_plot * sizeof(gint));
+    (gint *) g_malloc(d->nrows_in_plot * sizeof(gint));
   barchart_init_categorical(sp, d);
 }
 
@@ -265,6 +265,9 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
       continue;
 
     bin = GTK_GGOBI_SPLOT(sp)->planar[m].x;
+#ifdef BARCHART_DFS
+    bin = sp->bar->index_to_rank[m];
+#endif
     if ((bin >= 0) && (bin < sp->bar->nbins)) {
       sp->bar->cbins[bin][d->color_now.els[m]].count++;
     }
@@ -501,7 +504,11 @@ void barchart_allocate_structure(barchartSPlotd * sp, datad * d)
 
   if (sp->bar->new_nbins < 0) {
     if (vtx->vartype == categorical) {
+#ifdef BARCHART_DFS
+      nbins = (vtx->nmissing) ? vtx->nlevels+1 : vtx->nlevels;
+#else
       nbins = vtx->nlevels;
+#endif
       sp->bar->is_histogram = FALSE;
     } else {
       nbins = 10;               /* replace by a more sophisticated rule */
@@ -511,15 +518,21 @@ void barchart_allocate_structure(barchartSPlotd * sp, datad * d)
     nbins = sp->bar->new_nbins;
   sp->bar->new_nbins = -1;
 
-/* This is ignoring variable transformation ... */
   if (vtx->lim_specified_p) {
     rawsp->p1d.lim.min = vtx->lim_specified.min;
     rawsp->p1d.lim.max = vtx->lim_specified.max;
   } else {
-    rawsp->p1d.lim.min = vtx->lim_raw.min;
-    rawsp->p1d.lim.max = vtx->lim_raw.max;
+    rawsp->p1d.lim.min = vtx->lim.min;
+    rawsp->p1d.lim.max = vtx->lim.max;
+#ifdef BARCHART_DFS
+    if (vtx->vartype == categorical) {
+      rawsp->p1d.lim.min = MIN (rawsp->p1d.lim.min,
+                                vtx->level_values[0]);
+      rawsp->p1d.lim.max = MAX (rawsp->p1d.lim.max,
+                                vtx->level_values[vtx->nlevels-1]);
+    }
+#endif
   }
-
 
   if (sp->bar->nbins && nbins == sp->bar->nbins)
     return;                     /* nothing else to be done */
@@ -538,39 +551,41 @@ void barchart_allocate_structure(barchartSPlotd * sp, datad * d)
   sp->bar->old_bar_hit =
       (gboolean *) g_malloc((nbins + 2) * sizeof(gboolean));
 
-
   for (i = 0; i < sp->bar->nbins; i++) {
     sp->bar->cbins[i] =
         (gbind *) g_malloc(sp->bar->ncolors * sizeof(gbind));
   }
 
-
-  if (!vtx->vartype == categorical)
-    sp->bar->breaks = (gfloat *) g_malloc((nbins + 1) * sizeof(nbins));
+  sp->bar->breaks = (gfloat *) g_malloc((nbins + 1) * sizeof(nbins));
 }
 
 void barchart_init_categorical(barchartSPlotd * sp, datad * d)
 {
   splotd *rawsp = GTK_GGOBI_SPLOT(sp);
-  gfloat *yy;
   gint i, jvar = rawsp->p1dvar;
   ggobid *gg = GGobiFromSPlot(rawsp);
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
   gfloat mindist, maxheight;
+  gfloat min, max;
 
+  gfloat *yy;
   yy = (gfloat *) g_malloc(d->nrows_in_plot * sizeof(gfloat));
   for (i = 0; i < d->nrows_in_plot; i++)
     yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];
-
   mindist = barchart_sort_index(yy, d->nrows_in_plot, gg, sp);
   g_free((gpointer) yy);
 
-/* This is ignoring variable transformation ... */
-  if (vtx->lim_specified_p) {
-    maxheight = vtx->lim_specified.max - vtx->lim_specified.min;
-  } else {
-    maxheight = vtx->lim_raw.max - vtx->lim_raw.min;
+  min = vtx->lim_tform.min;
+  max = vtx->lim_tform.max;
+#ifdef BARCHART_DFS
+  if (vtx->vartype == categorical) {
+    min = MIN (min, vtx->level_values[0]);
+    max = MAX (max, vtx->level_values[vtx->nlevels-1]);
   }
+#endif
+
+  maxheight = max - min;
+
   rawsp->scale.y = SCALE_DEFAULT * maxheight / (maxheight + mindist);
 }
 
@@ -660,43 +675,55 @@ barchart_splot_add_plot_labels(splotd * sp, GdkDrawable * drawable,
   vartabled *vtx;
 
   vtx = vartable_element_get(sp->p1dvar, d);
-  gdk_text_extents(
-#if GTK_MAJOR_VERSION == 2
-                    gtk_style_get_font(style),
-#else
-                    style->font,
-#endif
-                    vtx->collab_tform, strlen(vtx->collab_tform),
-                    &lbearing, &rbearing, &width, &ascent, &descent);
-  gdk_draw_string(drawable,
-#if GTK_MAJOR_VERSION == 2
-                  gtk_style_get_font(style),
-#else
-                  style->font,
-#endif
-                  gg->plot_GC, sp->max.x - width - 5,
-                            /*-- right justify --*/
-                  sp->max.y - 5, vtx->collab_tform);
 
+#if GTK_MAJOR_VERSION == 2
+  gdk_text_extents(gtk_style_get_font(style),
+    vtx->collab_tform, strlen(vtx->collab_tform),
+    &lbearing, &rbearing, &width, &ascent, &descent);
+#else
+  gdk_text_extents(style->font,
+     vtx->collab_tform, strlen(vtx->collab_tform),
+     &lbearing, &rbearing, &width, &ascent, &descent);
+#endif
+
+#if GTK_MAJOR_VERSION == 2
+  gdk_draw_string(drawable, gtk_style_get_font(style),
+    gg->plot_GC, sp->max.x - width - 5, /*-- right justify --*/
+    sp->max.y - 5, vtx->collab_tform);
+#else
+  gdk_draw_string(drawable, style->font,
+    gg->plot_GC, sp->max.x - width - 5, /*-- right justify --*/
+    sp->max.y - 5, vtx->collab_tform);
+#endif
 
   if (vtx->vartype == categorical) {
     gint i;
-    gchar catname[100];
+    gchar *catname;
     barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
 
-    for (i = 0; i < vtx->nlevels; i++) {
-      strcpy(catname, vtx->level_names[i]);
-
-      gdk_draw_string(drawable,
-#if GTK_MAJOR_VERSION == 2
-                      gtk_style_get_font(style),
+#ifdef BARCHART_DFS
+    gint level;
+    for (i = 0; i < bsp->bar->nbins; i++) {
+      level = checkLevelValue (vtx, (gdouble) bsp->bar->bins[i].value);
+      catname = g_strdup_printf ("%s",
+        (level == -1) ? "missing" : vtx->level_names[level]);
 #else
-                      style->font,
+    for (i = 0; i < vtx->nlevels; i++) {
+      catname = g_strdup (vtx->level_names[i]);
 #endif
-                      gg->plot_GC,
-                      bsp->bar->bins[i].rect.x + 2,
-                      bsp->bar->bins[i].rect.y +
-                      bsp->bar->bins[i].rect.height / 2 + 2, catname);
+
+#if GTK_MAJOR_VERSION == 2
+      gdk_draw_string(drawable, gtk_style_get_font(style), gg->plot_GC,
+        bsp->bar->bins[i].rect.x + 2,
+        bsp->bar->bins[i].rect.y +
+        bsp->bar->bins[i].rect.height / 2 + 2, catname);
+#else
+      gdk_draw_string(drawable, style->font, gg->plot_GC,
+        bsp->bar->bins[i].rect.x + 2,
+        bsp->bar->bins[i].rect.y +
+        bsp->bar->bins[i].rect.height / 2 + 2, catname);
+#endif
+      g_free (catname);
     }
   }
 }
@@ -708,8 +735,8 @@ void barchart_set_breakpoints(gfloat width, barchartSPlotd * sp, datad * d)
   splotd *rawsp = GTK_GGOBI_SPLOT(sp);
 
   rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
-  nbins = (gint) (rdiff / width + 1);
 
+  nbins = (gint) (rdiff / width + 1);
 
   sp->bar->new_nbins = nbins;
   barchart_allocate_structure(sp, d);
@@ -725,8 +752,50 @@ void barchart_set_initials(barchartSPlotd * sp, datad * d)
   splotd *rawsp = GTK_GGOBI_SPLOT(sp);
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
 
-
   if (vtx->vartype == categorical) {
+#ifdef BARCHART_DFS
+    if (vtx->nlevels > 1) {
+      gint i, level;
+      gfloat missing_val;
+      gboolean add_level = false;
+      if (vtx->nmissing) {
+        for (i=0; i<d->nrows_in_plot; i++) {
+          if (MISSING_P(d->rows_in_plot[i], rawsp->p1dvar)) {
+            missing_val = d->tform.vals[i][rawsp->p1dvar];
+            break;
+          }
+        }
+        /* If the currently "imputed" value for missings is not one
+           of the levels we already have, then we need an extra bin
+           for the missings.
+        */
+        if (checkLevelValue (vtx, missing_val) == -1) {
+          add_level = true;
+          for (i=0, level=0; i<sp->bar->nbins, level<vtx->nlevels; i++) {
+            if (add_level &&
+                (gint) missing_val < vtx->level_values[level])
+            {
+              sp->bar->bins[i].value = (gint) missing_val;
+              add_level = false;
+            } else {
+              sp->bar->bins[i].value = vtx->level_values[level++];
+            }
+          }
+          if (add_level &&
+              (gint) missing_val > vtx->level_values[vtx->nlevels-1])
+            sp->bar->bins[sp->bar->nbins-1].value = missing_val;
+        } else {
+          for (i=0; i<vtx->nlevels; i++)
+            sp->bar->bins[i].value = vtx->level_values[i];
+          sp->bar->nbins -= 1;  /*XXX Reallocate cbins down, or there'll be */
+                                /*  memory leaks */
+        }
+      } else {
+        for (i=0; i<vtx->nlevels; i++)
+          sp->bar->bins[i].value = vtx->level_values[i];
+      }
+    }
+#endif
   } else {
     gint i;
     gfloat rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
@@ -735,7 +804,6 @@ void barchart_set_initials(barchartSPlotd * sp, datad * d)
       sp->bar->breaks[i] = rawsp->p1d.lim.min + rdiff / sp->bar->nbins * i;
     }
     sp->bar->breaks[sp->bar->nbins] = rawsp->p1d.lim.max;
-
   }
 }
 
@@ -754,6 +822,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
   sp->bar->high_pts_missing = sp->bar->low_pts_missing = FALSE;
 
   if (vtx->vartype == categorical) {
+
     for (i = 0; i < d->nrows_in_plot; i++) {
       m = d->rows_in_plot[i];
 
@@ -766,9 +835,13 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
       if ((bin >= 0) && (bin < sp->bar->nbins)) {
         sp->bar->bins[bin].count++;
       }
+#ifdef BARCHART_DFS
+      rawsp->planar[m].x = (greal) sp->bar->bins[bin].value;
+#else
       rawsp->planar[m].x = bin;
+#endif
     }
-  } else {
+  } else {  /* all vartypes but categorical */
     gint index, rank = 0;
 
     index = sp->bar->index_to_rank[rank];
@@ -877,9 +950,19 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
 
     sp->bar->bins[i].planar.x = -1;
     if (vtx->vartype == categorical) {
+#ifdef BARCHART_DFS
+      {
+      gfloat ftmp;
+      ftmp = -1.0 + 2.0*((greal)sp->bar->bins[i].value - rawsp->p1d.lim.min)
+        / rdiff;
+      sp->bar->bins[i].planar.y = (greal) (PRECISION1 * ftmp);
+      }
+#else
       index = sp->bar->bins[i].index;
-      sp->bar->bins[i].planar.y =
+      if (index >= 0)
+        sp->bar->bins[i].planar.y =
           (glong) d->world.vals[index][rawsp->p1dvar];
+#endif
     } else {
       ftmp =
           -1.0 + 2.0 * (sp->bar->breaks[i] - sp->bar->breaks[0]) / rdiff;
@@ -898,10 +981,9 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
 
     minwidth = rawsp->max.y;
     for (i = 0; i < sp->bar->nbins; i++) {
+
       rect = &sp->bar->bins[i].rect;
-      /*ltmp = sp->bar->bins[i].planar.y - rawsp->pmid.y;*/
       gtmp = sp->bar->bins[i].planar.y - rawsp->pmid.y;
-      /*rect->y = (gint) ((ltmp * rawsp->iscale.y) >> EXP1);*/
       rect->y = (gint) (gtmp * rawsp->iscale.y / precis);
 
       rect->x = 10;
@@ -1047,8 +1129,6 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
   else
     hits[0] = FALSE;
 
-
-
   d->npts_under_brush = 0;
 
   {
@@ -1120,14 +1200,55 @@ barchart_sort_index(gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
 /*
  * Bug here:  this is screwy if ny < 4.
 */
-  if (sp->bar->is_histogram) {
+  if (sp->bar->is_histogram) {  /* vartype != categorical */
     mindist = 0;
 
     for (i = 0; i < ny; i++) {
       sp->bar->index_to_rank[i] = indx[i];
     }
-  } else {
+
+  } else {  /* vartype = categorical */
+
+#ifdef BARCHART_DFS
+    /* XXX
+       Later, when labelling, if a value doesn't match one of the
+       level_values, label it 'missing'
+    */
+    mindist = sp->bar->bins[1].value - sp->bar->bins[0].value;
+    for (i = 1; i < sp->bar->nbins; i++)
+      mindist = MIN (mindist,
+                     sp->bar->bins[i].value - sp->bar->bins[i-1].value);
+
     rank = 0;
+    /*-- there are bin values that don't exist in the data --*/
+    while (yy[indx[0]] > sp->bar->bins[rank].value)
+      rank++;
+
+    for (i=0; i<sp->bar->nbins; i++)
+      sp->bar->bins[i].index = -1;
+
+    for (i=0; i<ny; i++) {
+
+      if (i > 0) {
+        if (yy[indx[i]] != yy[indx[i - 1]]) {
+          rank++;
+
+          while (yy[indx[i]] > sp->bar->bins[rank].value) {
+            rank++;
+          }
+
+          sp->bar->bins[rank].index = indx[i]; /* do I care? */
+        }
+      }
+
+      /* This takes me from index to bin -- dfs */
+      sp->bar->index_to_rank[indx[i]] = rank;
+    }
+
+#else
+    rank = 0;
+    for (i=0; i<sp->bar->nbins; i++)
+      sp->bar->bins[i].index = -1;
 
     mindist = yy[indx[ny - 1]] - yy[indx[0]];
     sp->bar->bins[rank].index = indx[0];
@@ -1141,7 +1262,10 @@ barchart_sort_index(gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
       }
       sp->bar->index_to_rank[indx[i]] = rank;
     }
+#endif
+
   }
+
   g_free((gpointer) (gg->p1d.gy));
   g_free((gpointer) (indx));
 
@@ -1352,10 +1476,29 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
         var =
             (vartabled *) g_slist_nth_data(rawsp->displayptr->d->vartable,
                                            rawsp->p1dvar);
+#ifdef BARCHART_DFS
+        {
+        gint level;
+        gint j = i-1;
+        level = checkLevelValue (var, (gdouble) sp->bar->bins[j].value);
+
+        if (level == -1) {
+          sprintf(string, "%ld point%s missing",
+                sp->bar->bins[j].count,
+                sp->bar->bins[j].count == 1 ? "" : "s");
+        } else {
+          levelName = var->level_names[level];
+          sprintf(string, "%ld point%s for level %s",
+                sp->bar->bins[j].count,
+                sp->bar->bins[j].count == 1 ? "" : "s", levelName);
+        }
+        }
+#else
         levelName = var->level_names[i - 1];
         sprintf(string, "%ld point%s for level %s",
                 sp->bar->bins[i - 1].count,
                 sp->bar->bins[i - 1].count == 1 ? "" : "s", levelName);
+#endif
       }
       gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
                          sp->bar->bins[i - 1].rect.x,

@@ -250,6 +250,7 @@ typedef struct
 {
   glong count;
   gint index;
+  gint value;  /* dfs; restricting index to non-categorical variables */
   gcoords planar;
   GdkRectangle rect;
 } gbind;
