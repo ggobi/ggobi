@@ -216,6 +216,24 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
 
 
 
+/* something like this -- dfs -- */
+void
+GGOBI(edge_menus_update)(ggobid *gg)
+{
+  GList *dlist;
+  displayd *display;
+  for (dlist = gg->displays; dlist != NULL; dlist = dlist->next) {
+    display = (displayd *) dlist->data;
+    if (GTK_WIDGET_REALIZED (GTK_GGOBI_WINDOW_DISPLAY(display)->window) &&
+        GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(display))
+    {
+      scatterplot_display_edge_menu_update (GTK_GGOBI_DISPLAY(display),
+        gg->app.sp_accel_group, display_options_cb, gg);
+    }
+  }
+}
+
+
 
 displayd *
 createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg)

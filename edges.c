@@ -162,11 +162,9 @@ datad *setDisplayEdge(displayd * dpy, datad * e)
 
   if(resolveEdgePoints(e, dpy->d)) {
     dpy->e = e;
-     /*XXX  This needs to be more general, working on all displays.
-            Need to emit an event and have the displays respond to it by
-            checking whether the edgeset_add returns true. */
-    scatterplot_display_edge_menu_update(dpy, e->gg->app.sp_accel_group,
-      display_options_cb, e->gg);
+      /* Now update all displays, not just this one. Events could also be used,
+         but this is not too bad. */
+    GGOBI(edge_menus_update)(e->gg);
   }
 
   for (l = dpy->splots; l; l = l->next) {
