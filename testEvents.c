@@ -1,4 +1,7 @@
+
 #include "testEvents.h"
+
+#include <stdio.h>
 
 /*
   Used to test the selection of variable events.
@@ -44,4 +47,13 @@ test_data_add_cb(GtkWidget *w, datad *d,  ggobid *gg, gpointer data)
 {
   g_printerr ("(test_data_add_cb) adding datad\n");
   gtk_signal_connect(GTK_OBJECT(gg->main_window), "select_variable", test_variable_select, "My String");
+}
+
+
+void
+test_sticky_points(GtkWidget *w, gint index, gint state, datad *d, gpointer data)
+{
+    fprintf(stderr, "[Sticky point identification] %d %s in %s\n",
+	    index, state == STICKY ? "sticky" : "unsticky", d->name);
+    fflush(stderr);
 }

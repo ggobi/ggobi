@@ -126,6 +126,26 @@ void globals_init (ggobid *gg) {
         GTK_TYPE_NONE, 2,
         GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
+
+  if (gtk_signal_lookup ("sticky_point_added", GTK_TYPE_WIDGET) == 0) {
+    GGobiSignals[STICKY_POINT_ADDED_SIGNAL] =
+      gtk_object_class_user_signal_new (gtk_type_class (GTK_TYPE_WIDGET),
+        "sticky_point_added",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__INT_INT_POINTER,
+        GTK_TYPE_NONE, 3,
+        GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER);  /* record index and datad pointer **/
+  }
+
+  if (gtk_signal_lookup ("sticky_point_removed", GTK_TYPE_WIDGET) == 0) {
+    GGobiSignals[STICKY_POINT_REMOVED_SIGNAL] =
+      gtk_object_class_user_signal_new (gtk_type_class (GTK_TYPE_WIDGET),
+        "sticky_point_removed",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__INT_INT_POINTER,
+        GTK_TYPE_NONE, 3,
+        GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER);  /* record index and datad pointer **/
+  }
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/

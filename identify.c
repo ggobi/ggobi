@@ -58,7 +58,7 @@ identify_activate (gint state, displayd *display, ggobid *gg)
 void
 sticky_id_toggle (datad *d, ggobid *gg)
 {
-  gint i;
+  gint i = 0;
   gboolean i_in_list = false;
   gpointer ptr = NULL;
   void sticky_id_link_by_id (gint, gint, datad *, ggobid *);
@@ -80,10 +80,14 @@ sticky_id_toggle (datad *d, ggobid *gg)
     if (i_in_list) {
       d->sticky_ids = g_slist_remove (d->sticky_ids, ptr);
       sticky_id_link_by_id (STICKY_REMOVE, d->nearest_point, d, gg);
+       /* This will become an event on the datad when we move to Gtk objects (soon now!) */
+      gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], i, (int) UNSTICKY, d);
     } else {
       ptr = GINT_TO_POINTER (d->nearest_point);
       d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
       sticky_id_link_by_id (STICKY_ADD, d->nearest_point, d, gg);
+       /* This will become an event on the datad when we move to Gtk objects (soon now!) */
+      gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[STICKY_POINT_ADDED_SIGNAL], i, (int) STICKY, d);
     }
   }
 }
