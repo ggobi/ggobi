@@ -57,7 +57,7 @@ const gchar *
 GGOBI(setFileName) (const gchar *fileName, DataMode data_mode, ggobid *gg)
 {
   const gchar *old = g_strdup(GGOBI(getFileName)(gg));
-  fileset_read_init(fileName, data_mode, gg);
+  fileset_read_init(fileName, gg);
   return(old);
 }
 

@@ -52,12 +52,12 @@ void modes_init (datad *d, ggobid* gg) {
 }
 
 gboolean
-fileset_read_init (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
+fileset_read_init (const gchar *ldata_in, ggobid *gg)
 {
   gint howMany;
   gboolean ans;
   howMany = g_slist_length(gg->d);
-  ans = fileset_read (ldata_in, data_mode, gg);
+  ans = fileset_read (ldata_in, gg);
   if (ans) {
     datad *d;
     gint n, i;
@@ -76,11 +76,10 @@ fileset_read_init (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
 
 
 gboolean
-fileset_read (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
+fileset_read (const gchar *ldata_in, ggobid *gg)
 {
   InputDescription *desc;
   gboolean ok = true;
-  /*  gg->filename = g_strdup (ldata_in); */
 
   desc = fileset_generate(ldata_in, sessionOptions->data_mode);
 
@@ -204,14 +203,16 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
   make_ui (gg);
 
   if (options->data_in != NULL) {
-    if (fileset_read (options->data_in, options->data_mode, gg) > 0) {
+    if (fileset_read (options->data_in, gg) > 0) {
       init_data = true;
     }
   } else {
 #ifdef USE_MYSQL
+/*    -- gg->data_mode no longer exists --
     if(gg->data_mode == mysql) {
       GGOBI(get_mysql_login_info)(NULL, gg);
     }
+*/
 #endif
   }
 

@@ -31,7 +31,8 @@ const gchar * const GlyphNames[] = {
 
 
 gchar *
-findAssociatedFile(InputDescription *desc, const gchar * const *extensions, int numExtensions, gint *which, gboolean isError)
+findAssociatedFile(InputDescription *desc, const gchar * const *extensions,
+  gint numExtensions, gint *which, gboolean isError)
 {
   gint i;
   gchar buf[100];
@@ -216,7 +217,7 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
   FILE *fp;
 
   gchar *fileName;
-  int whichSuffix;
+  gint whichSuffix;
 
   gchar str[INITSTRSIZE];
 
@@ -482,7 +483,7 @@ point_colors_read (InputDescription *desc, gboolean reinit,
   gint id;
  
   gchar *fileName;
-  int whichSuffix;
+  gint whichSuffix;
 
 
   if (reinit)
@@ -553,7 +554,7 @@ hidden_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
   gboolean found = true;
   FILE *fp;
   gchar *fileName;
-  int whichSuffix;
+  gint whichSuffix;
 
   if (reinit)
     hidden_alloc (d);

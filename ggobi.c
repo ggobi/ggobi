@@ -86,7 +86,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
  
 #ifdef USE_MYSQL
     else if (strcmp (av[1], "-mysql") == 0) {
-      gg->data_mode = mysql_data;
+      /*gg->data_mode = mysql_data;*/  /*-- no longer exists --*/
     }
 #endif
 
@@ -124,7 +124,6 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
  * Test the values
 */
 
-  /* (gg->data_mode == ascii_data || gg->data_mode == binary_data) */
   if (*argc == 0)
     sessionOptions->data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
   else

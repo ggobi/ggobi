@@ -29,7 +29,7 @@ main (gint argc, gchar *argv[])
   globals_init (gg); /*-- variables that don't depend on the data --*/
   color_table_init (gg);
 
-  fileset_read (fileName, unknown_data, gg);
+  fileset_read (fileName, gg);
 
   memset(&info, '\0', sizeof(XmlWriteInfo));
   info.useDefault = true;

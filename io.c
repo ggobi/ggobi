@@ -42,7 +42,8 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 
   switch (action) {
     case READ_FILESET:
-      if (fileset_read_init (fname, unknown_data, gg)) 
+      /*if (fileset_read_init (fname, unknown_data, gg)) */
+      if (fileset_read_init (fname, gg)) 
         /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
     break;
