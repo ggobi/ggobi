@@ -315,8 +315,8 @@ set_threshold (ggvisd *ggv)
   D->low = MAX(0, (gdouble)(D->lgrip_pos - xmin) / (gdouble) (xmax - xmin) );
   D->high = MIN(1, (gdouble)(D->rgrip_pos - xmin) / (gdouble) (xmax - xmin) );
 
-  ggv->mds_threshold_low  = D->low  * ggv->Dtarget_max;
-  ggv->mds_threshold_high = D->high * ggv->Dtarget_max;
+  ggv->threshold_low  = D->low  * ggv->Dtarget_max;
+  ggv->threshold_high = D->high * ggv->Dtarget_max;
 }
 
 /* ARGSUSED */
