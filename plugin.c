@@ -74,6 +74,12 @@ load_plugin_library(GGobiPluginDetails *plugin)
   HINSTANCE handle;
   char *fileName;
   fileName = plugin->dllName;
+
+  if(!fileName || !fileName[0]) {
+      plugin->loaded = true;  
+      return(NULL);
+  }
+
   if(canRead(fileName) == false) {
     fileName = (char *) g_malloc((strlen(fileName)+ strlen(DLL_EXTENSION) + 1)*sizeof(char));
     strcpy(fileName, plugin->dllName);
@@ -130,8 +136,13 @@ registerPlugins(ggobid *gg, GList *plugins)
   while(el) {
     plugin = (GGobiPluginInfo *) el->data;
     ok = true;
+
+    if(!plugin->details->loaded) {
+	loadPluginLibrary(plugin->details, plugin);
+    }
+
     if(plugin->onCreate) {
-      f = (OnCreate) getPluginSymbol(plugin->onCreate, &plugin->details);
+      f = (OnCreate) getPluginSymbol(plugin->onCreate, plugin->details);
       if(f) {
         inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
         inst->data = NULL;
@@ -169,7 +180,7 @@ pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins)
     plugin = (PluginInstance *) el->data;
     if(plugin->info->onUpdateDisplay) {
       f = (OnUpdateDisplayMenu) getPluginSymbol(plugin->info->onUpdateDisplay,
-                                                &plugin->info->details);
+                                                plugin->info->details);
       if(f) {
         ok = f(gg, plugin);
       }
@@ -305,13 +316,13 @@ addPlugins(GList *plugins, GtkWidget *list, ggobid *gg, GGobiPluginType type)
 void
 addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg)
 {
-    addPluginDetails(&info->details, list, gg, isPluginActive(info, gg));
+    addPluginDetails(info->details, list, gg, isPluginActive(info, gg));
 }
 
 void
 addInputPlugin(GGobiInputPluginInfo *info, GtkWidget *list, ggobid *gg)
 {
-    addPluginDetails(&info->details, list, gg, true);
+    addPluginDetails(info->details, list, gg, true);
 }
 
 void
@@ -343,8 +354,8 @@ closePlugins(ggobid *gg)
   while(el) { 
     plugin = (PluginInstance *) el->data;
     if(plugin->info->onClose) {
-      DLFUNC f =  getPluginSymbol(plugin->info->onClose, &plugin->info->details);
-      f(gg, plugin, el);
+      DLFUNC f =  getPluginSymbol(plugin->info->onClose, plugin->info->details);
+      f(gg, plugin->info, plugin);
     }
     tmp = el;
     el = el->next;
@@ -369,13 +380,13 @@ runInteractiveInputPlugin(ggobid *gg)
       {
         InputGetDescription f;
         f = (InputGetDescription) getPluginSymbol(plugin->getDescription,
-                                                  &plugin->details);
+                                                  plugin->details);
         if(f) {
           InputDescription *desc;
-          desc = f(NULL, NULL, gg, plugin);
-          if(desc && desc->read_input) {
+          desc = f(NULL, sessionOptions->data_type, gg, plugin);
+          if(desc && desc->desc_read_input) {
             gg->input = desc;
-            desc->read_input(desc, gg);
+            desc->desc_read_input(desc, gg, plugin);
             break;
           }
         }

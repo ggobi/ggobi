@@ -26,16 +26,21 @@ typedef struct {
     char *onLoad; 
     char *onUnload; 
 
+    char *language;
+    GList *depends;
+
 } GGobiPluginDetails;
 
 typedef struct {
 
-    GGobiPluginDetails details;
+    GGobiPluginDetails *details;
 
     char *onCreate; 
     char *onClose; 
 
     char *onUpdateDisplay; 
+
+    void *data;
 
 } GGobiPluginInfo;
 
@@ -44,7 +49,7 @@ typedef struct {
   The two plugin types should share the common information.
  */
 struct   _GGobiInputPluginInfo {
-    GGobiPluginDetails details;
+    GGobiPluginDetails *details;
 
     char *modeName;
     char *read_symbol_name;
@@ -53,8 +58,10 @@ struct   _GGobiInputPluginInfo {
 
     gboolean interactive;
 
-    InputReader read_input;
+    InputReader plugin_read_input;
     InputProbe  probe;
+
+    void *data;
 };
 
 
@@ -64,6 +71,13 @@ typedef struct {
   gboolean active;
   void *data;
 } PluginInstance;
+
+typedef struct _JavaRunTimeData JavaRunTimeData;
+
+typedef struct {
+   const char *className;
+   JavaRunTimeData *runTime;
+} JavaInputPluginData;
 
 
 typedef gboolean (*OnLoad)(gboolean initializing, GGobiPluginInfo *plugin);
@@ -101,4 +115,7 @@ void closePlugins(ggobid *gg);
 
 GGobiInputPluginInfo *runInteractiveInputPlugin(ggobid *gg);
 GtkWidget *showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg);
+
+gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin);
+
 #endif

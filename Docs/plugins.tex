@@ -338,6 +338,16 @@ the Gtk+Extra library (\url{http://gtkextra.sourceforge.net}).
 Currently this only works for XML files, but this is easily extended
 to others.
 
+One motivation for input plugins is the ability to handle large
+amounts of data in intelligent and efficient ways.  XML provides us
+with a powerful formatting scheme.  However it is verbose and requires
+extra resources to process. In contrast, a specialized binary format
+can reduce the storage space requirements and be amenable to rapid
+processing that exploit knowledge of the specific structure of the
+format. It is relatively easy to develop a new plugin that can read
+these types of inputs.  (We also need to provide output plugins that
+serialize data in a particular format.)
+
 
 It would be useful to have a plugin for reading 
 \begin{itemize}
@@ -364,6 +374,47 @@ format and mechanism. Gnumeric provides a similar mechanism that we
 will probably mimic.
 
 
+\subsection{Technical Issues about Input Plugins.}
+When GGobi starts, it processes the command line arguments and then the
+initialization file.  It is at this point that we register the
+plugins, and specifically the input plugins.  Next we attempt to load
+the data.  The heart of this from the perspective of identifying the
+plugin is \Croutine{fileset_generate} in \file{make_ggobi.c}.  This is
+responsible for creating an instance of the \CStruct{InputDescription}
+with the appropriate data for reading the data.  The user identifies
+the plugin by providing a value for the \flag{-datamode} argument.
+\Croutine{fileset_generate} reads this value (stored in the session
+options) by looking through the known input formats.
+
+\subsection{Java Input Plugins}
+
+Given Java's support for high-level network access, database
+connectivity, XML parsing, etc., coupled with its relative ease of
+programming and portability, it may be convenient to develop input
+plugins using Java.  This can be done relatively easily given the JVM
+plugin and some support classes provided by GGobi itself.
+
+The basic idea is that a Java input plugin provides basic methods for
+filling a description of the data such as the name of the data source,
+its format/mode, and then to actually read the data.
+
+
+
+We provide a collection of different interfaces which range from the
+minimal methods needed to read data to reading coloschemes, etc.  A
+plugin implements the relevant interfaces and we check whether the
+plugin does in fact implement these. If so, we invoke the relevant
+methods.
+
+
+The simplest thing to do in order to implement a new input plugin is
+to extend the appropriate GGobi input plugin class.
+
+
+
+
+\section{Creating a Plugin}
+
 \subsection{Developing an Input Plugin}
 
 The \dir{Postgres} and \dir{TestInput} directories in the
@@ -378,21 +429,6 @@ displayed and this behaves just like reading data from an XML or ASCII
 file.
 
 
-\subsection{Technical Issues about Input Plugins.}
-When GGobi starts, it processes the command line arguments and then the
-initialization file.  It is at this point that we register the
-plugins, and specifically the input plugins.  Next we attempt to load
-the data.  The heart of this from the perspective of identifying the
-plugin is \Croutine{fileset_generate} in \file{make_ggobi.c}.  This is
-responsible for creating an instance of the \CStruct{InputDescription}
-with the appropriate data for reading the data.  The user identifies
-the plugin by providing a value for the \flag{-datamode} argument.
-\Croutine{fileset_generate} reads this value (stored in the session
-options) by looking through the known input formats.
-
-
-
-\section{Creating a Plugin}
 
 \subsection{Installation}
 
@@ -435,12 +471,37 @@ plugin directory to the definition of the variable
 \MakeVariable{PLUGIN_DIRS} in the \file{Install/GNUmakefile.admin}.
 
 
+\section{Non-\C/\Cplus{} Plugins}
 
+It is often convenient to develop plugins that are implemented not in
+C, but a high-level interpreted language.  An obvious example is
+implementing an input plugin in Java, Python or Plugin.  In such a
+case, we have a well defined \C-level interface and we can invoke the
+corresponding methods in the class of the corresponding language.
+For the case of a regular, top-level plugin, these are
+\begin{itemize}
+\item 
+\end{itemize}
+and for an input plugin
+these are
+\begin{itemize}
+\item 
+\end{itemize}
+
+\subsection{Java}
+The input plugin is expected to fill in an \CStruct{InputDescription}
+instance. We provide a Java class for such a plugin that provides
+methods for specifying the fields in this instance.  This class is
+named \JClass{GGobiInputPlugin}.
+
+
+\begin{comment}
 \section{Issues}
 Configuration
 
 Debugging dynamically loaded code.
 
 The plugin mechanism requires XML.
+\end{comment}
 
 \end{document}

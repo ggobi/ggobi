@@ -149,7 +149,7 @@ fileset_read (const gchar *ldata_in, ggobid *gg)
     return(false);
   }
 
-  if(desc->mode == unknown_data && desc->read_input == NULL) {
+  if(desc->mode == unknown_data && desc->desc_read_input == NULL) {
     g_printerr ("Cannot determine the format of the data in file %s\n",
       desc->fileName); 
     return(false);
@@ -202,8 +202,8 @@ read_input(InputDescription *desc, ggobid *gg)
       ok = read_ascii_data(desc, gg);
     break;
     default:
-	if(desc->read_input) {
-	    ok = desc->read_input(desc, gg);
+	if(desc->desc_read_input) {
+	    ok = desc->desc_read_input(desc, gg, NULL);
 	} else
 	    g_printerr("Unknown data type in read_input\n");
     break;

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-gboolean postgres_read(InputDescription *desc, ggobid *gg);
+gboolean postgres_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *);
 int read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
 
 PGresult *query(const char * const query, PGconn *conn);
@@ -34,7 +34,7 @@ postgres_input_description(const char * const fileName, const char * const modeN
 
   desc->fileName = g_strdup("Postgres table");
   desc->mode = unknown_data;
-  desc->read_input = postgres_read;
+  desc->desc_read_input = postgres_read;
 
   return(desc);
 }
@@ -48,14 +48,14 @@ postgres_input_description(const char * const fileName, const char * const modeN
  input routines in GGobi.
  */
 gboolean 
-postgres_read(InputDescription *desc, ggobid *gg)
+postgres_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
 {
     DBMSLoginInfo *info ;
     info = initDBMSLoginInfo(NULL);
      /* We would read these values from a file. */
 
     info->desc = desc;
-    info->read_input = read_postgres_data;
+    info->dbms_read_input = read_postgres_data;
 
     GGOBI(get_dbms_login_info)(info, gg);
 

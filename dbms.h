@@ -31,7 +31,7 @@ typedef struct _DBMSLoginInfo DBMSLoginInfo;
   char *appearanceQuery;
   char *colorQuery;
   
-  int (*read_input)(DBMSLoginInfo *, gboolean, ggobid *);
+  int (*dbms_read_input)(DBMSLoginInfo *, gboolean, ggobid *);
   InputDescription *desc;
 };
 

@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-gboolean generate_data(InputDescription *desc, ggobid *gg);
+gboolean generate_data(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *info);
 
 InputDescription *
 test_input_description(const char * const fileName, const char * const modeName, 
@@ -15,13 +15,13 @@ test_input_description(const char * const fileName, const char * const modeName,
 
   desc->fileName = g_strdup("Test input plugin data");
   desc->mode = unknown_data;
-  desc->read_input = generate_data;
+  desc->desc_read_input = generate_data;
 
   return(desc);
 }
 
 gboolean 
-generate_data(InputDescription *desc, ggobid *gg)
+generate_data(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
 {
 
   int nr = 10, nc = 3;

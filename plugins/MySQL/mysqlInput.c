@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-gboolean mysql_read(InputDescription *desc, ggobid *gg);
+gboolean mysql_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *);
 int read_mysql_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
 
 
@@ -36,7 +36,7 @@ mysql_input_description(const char * const fileName, const char * const modeName
 
   desc->fileName = g_strdup("MySQL table");
   desc->mode = unknown_data;
-  desc->read_input = mysql_read;
+  desc->desc_read_input = mysql_read;
 
   return(desc);
 }
@@ -50,14 +50,14 @@ mysql_input_description(const char * const fileName, const char * const modeName
  input routines in GGobi.
  */
 gboolean 
-mysql_read(InputDescription *desc, ggobid *gg)
+mysql_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
 {
     DBMSLoginInfo *info ;
     info = initDBMSLoginInfo(NULL);
      /* We would read these values from a file. */
 
     info->desc = desc;
-    info->read_input = read_mysql_data;
+    info->dbms_read_input = read_mysql_data;
 
     GGOBI(get_dbms_login_info)(info, gg);
 

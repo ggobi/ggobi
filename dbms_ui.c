@@ -138,10 +138,10 @@ GGOBI(getDBMSGUIInfo)(GtkButton *button, DBMSGUIInput *guiInput)
   /* Only cancel if we read something. Otherwise,
      leave the display for the user to edit.
    */
- if(info->read_input == NULL)
+ if(info->dbms_read_input == NULL)
      return;
 
-  if (info->read_input(info, TRUE, gg) > 0) {
+  if (info->dbms_read_input(info, TRUE, gg) > 0) {
    GGOBI(cancelDBMSGUI)(button, guiInput);
      /* Can we free the info here. */
   }

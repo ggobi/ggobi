@@ -9,8 +9,8 @@ typedef struct _GGobiInputPluginInfo GGobiInputPluginInfo;
 typedef struct _ggobid ggobid;
 typedef struct _InputDescription InputDescription;
 
-typedef gboolean (*InputReader)(InputDescription *desc, ggobid *gg);
-typedef gboolean (*InputProbe)(const char * const input);
+typedef gboolean (*InputReader)(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *);
+typedef gboolean (*InputProbe)(const char * const input, GGobiInputPluginInfo *);
 
 typedef InputDescription* (*InputGetDescription)(const char * const fileName, const char * const input, ggobid *gg, GGobiInputPluginInfo*);
 
@@ -30,7 +30,7 @@ struct _InputDescription {
  GSList *extensions;     /* a collection of file extension names and modes. */
 
  void *userData;
- InputReader read_input;
+ InputReader desc_read_input;
 };
 
 typedef struct {

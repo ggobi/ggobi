@@ -43,6 +43,8 @@ void getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc);
 void getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr doc);
 gboolean getPluginDetails(xmlNodePtr node, GGobiPluginDetails *plugin, xmlDocPtr doc);
 gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin);
+
+void *getPluginLanguage(xmlNodePtr node, GGobiInputPluginInfo *gplugin,  GGobiPluginType type, GGobiInitInfo *info);
 #endif
 
 
@@ -404,6 +406,23 @@ getDisplayType(const xmlChar *type)
  tag and passing it processPlugin().
 */
 
+
+GGobiPluginInfo*
+getLanguagePlugin(GList *plugins, const char* name)
+{
+    GList *el = plugins;
+
+    while(el) {
+        GGobiPluginInfo *info;
+        info = (GGobiPluginInfo *) el->data;
+        if(strcmp(info->details->name, name) == 0)
+	    return(info);
+	el = el->next;
+    }
+    return(NULL);
+}
+
+
 void
 getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
 {
@@ -449,14 +468,19 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 
   plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
   memset(plugin, '\0', sizeof(GGobiPluginInfo));
+  plugin->details = g_malloc(sizeof(GGobiPluginDetails));
+  memset(plugin->details, '\0', sizeof(GGobiPluginDetails));
 
-  load = getPluginDetails(node, &plugin->details, doc);
+  load = getPluginDetails(node, plugin->details, doc);
 
   getPluginSymbols(node, plugin, doc);
 
   if(load) {
-    loadPluginLibrary(&plugin->details, plugin);
+    loadPluginLibrary(plugin->details, plugin);
   }
+
+     /* Weird casting going on here to avoid a void*. */
+  getPluginLanguage(node, (GGobiInputPluginInfo*) plugin, GENERAL_PLUGIN, info);
 
   return(plugin);
 }
@@ -549,21 +573,79 @@ getPluginDetails(xmlNodePtr node, GGobiPluginDetails *plugin, xmlDocPtr doc)
  return(load);
 }
 
+void *
+getPluginLanguage(xmlNodePtr node,GGobiInputPluginInfo *iplugin, GGobiPluginType type, GGobiInitInfo *info)
+{
+  void *value = NULL;
+  const xmlChar *tmp;
+  tmp = xmlGetProp(node, "language");
+  if(tmp) {
+      GGobiPluginDetails *details;
+      if(strcmp(tmp, "java") == 0) {
+	  JavaInputPluginData *data;
+
+          data = (JavaInputPluginData *)g_malloc(sizeof(JavaInputPluginData));
+          memset(data, '\0',sizeof(JavaInputPluginData));
+
+	  tmp = xmlGetProp(node, "class");
+	  data->className = g_strdup(tmp); 
+          if(type == INPUT_PLUGIN) {
+	      iplugin->data = data;
+	      iplugin->getDescription = g_strdup("JavaGetInputDescription");
+              details = iplugin->details;
+	  } else {
+              GGobiPluginInfo *p = (GGobiPluginInfo *)iplugin;
+	      p->data = data;
+              p->onCreate = g_strdup("JavaCreatePlugin");
+              p->onClose = g_strdup("JavaDestroyPlugin");
+              /* p->onUpdateDisplay = g_strdup("JavaCreatePlugin"); */
+              details = p->details;
+	  }
+          value = data;
+
+
+	  {
+	      GGobiPluginInfo *tmp = getLanguagePlugin(info->plugins, "JVM");
+              if(!tmp) {
+	      } else {
+		  GGobiPluginDetails *jdetails = tmp->details;
+		  details->dllName = g_strdup(jdetails->dllName);
+		  details->library = jdetails->library;
+		  details->loaded = 0; /* jdetails->loaded; */
+
+                  details->onLoad = g_strdup("JavaLoadPlugin");
+                  details->onUnload = g_strdup("JavaUnloadPlugin");
+
+                  details->depends = g_list_append(details->depends, tmp);
+	      }
+	  }
+      }
+  }
+
+  return(value);
+}
+
+
 GGobiInputPluginInfo *
 processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 {
   GGobiInputPluginInfo *plugin;
   gboolean load;
+
   plugin = (GGobiInputPluginInfo *) g_malloc(sizeof(GGobiInputPluginInfo));
   memset(plugin, '\0', sizeof(GGobiInputPluginInfo)); 
+  plugin->details = g_malloc(sizeof(GGobiPluginDetails));
+  memset(plugin->details, '\0', sizeof(GGobiPluginDetails));
 
-  load = getPluginDetails(node, &plugin->details, doc);
+  load = getPluginDetails(node, plugin->details, doc);
 
   getInputPluginValues(node, plugin, doc);
 
   if(load) {
-    loadPluginLibrary(&plugin->details, (GGobiPluginInfo*) plugin);
+    loadPluginLibrary(plugin->details, (GGobiPluginInfo*) plugin);
   }
+
+  getPluginLanguage(node, plugin, INPUT_PLUGIN, info);
 
   return(plugin);
 }
@@ -653,3 +735,4 @@ resolveVariableName(const char *name, datad *d)
 
   return(-1);
 }
+
