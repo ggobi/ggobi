@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
-<ggobidata numRecords="74" color="2" glyph="+ 1" missingValue="NA">
+<ggobidata numRecords="74" color="2" glyph=". 1" missingValue="NA">
 <description source="ftp://...">
 This data is from a paper by A. A. Lubischew, "On the Use of
 Discriminant Functions in Taxonomy", Biometrics, Dec 1962, pp.455-477.

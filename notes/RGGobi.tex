@@ -1,0 +1,207 @@
+\documentclass{article}
+\input{WebMacros}
+\usepackage{fullpage}
+
+\begin{document}
+
+
+\section{API Routines}
+In this section  we describe the different
+R/S functions that one can invoke to query
+and modify the state of the GGobi session.
+There are some common concepts shared between
+most of these functions.
+
+Firstly, there are some global variables that are properties of the
+entire ggobi system.  These are things such as the color table, the
+glyph types and sizes.  These can be considered fixed, but queryable.
+
+Within a ggobi session, one can view different datasets
+simultaneously. Each dataset corresponds to its own ggobi data
+instance within the single session.  (Note that this is different from
+xgobi in which only one dataset could be introduced into the a
+process.)
+
+Within each ggobi instance, one can have multiple 
+windows, also known as displays.
+Each display has one or more plots within it.
+The plots can be a
+\begin{itemize}
+\item $1$ variable plot
+such as ASH plots,
+\item  scatterplot of two variables
+\item scatter matrix of 2 or more variables
+\item parallel coordinates plot of $k$ variables.
+\end{itemize}
+
+This hierarchical setup is displayed in the following
+figure.
+\begin{center}
+\pstree{\Tr{Session}}{%
+ \pstree{\Tr{dataset}}{%
+    \pstree{\Tr{display}}{
+      \Tr{plot}
+      \Tr{$\vdots$}
+      \Tr{plot}
+    }
+ }
+ \Tr{$\ldots$}
+ \pstree{\Tr{dataset}}{%
+    \pstree{\Tr{display}}{
+      \Tr{plot}
+      \Tr{$\vdots$}
+      \Tr{plot}
+    }
+ }
+}  
+\end{center}
+
+When operating with multiple datasets in the ggobi session at any one
+time, it is important to identify to which instance a command should
+be directed.  For example, if we wish to get information on the
+variables within a particular instance of a ggobi instance, we can
+call \SFunction{ggobi.getVariableNames}. However, we must
+specify the ggobi instance in question. All the functions
+that operate on a ggobi instance have an optional argument,
+\SArg{.ggobi}, which is an integer.
+If omitted, this defaults to the currently active
+ggobi instance.
+
+This allows us to send repeated commands easily to a ggobi instance.
+\begin{verbatim}
+> ggobi(args="../data/tes") 
+> ggobi(args="../data/flea") #
+> ggobi.getVariableNames()
+[1] "tars1" "tars2" "head"  "aede1" "aede2" "aede3"
+> setDefaultGGobi(1)
+> ggobi.getVariableNames(.gobi=2)
+\end{verbatim}
+Additionally, commands intended for another can be directed without
+setting that instance to the default.
+
+By default, this is 
+This identifies 
+
+
+have multiple ggobi
+instances in existence at any one time.
+Each ggobi has its own
+
+
+\subsection{getData}
+Since the user can load data in a non-programmatic way, there is an
+opportunity for XGobi to have data that has not been introduced to the
+R/S session.  As a result, we need a mechanism to retrieve the current
+values of the active data set.  This is especially important if we
+allow the data to be edited in any way.
+
+The return value is a matrix of numeric values containing the data
+values.  The names of the rows and columns are the XGobi row labels
+and variable names respectively.
+
+
+
+\subsection{getColors}
+
+
+\subsection{set}
+
+\subsection{getGlyphs}
+
+
+\subsection{getSelectedIndices}
+This needs attention to access the correct
+variable in the xgobi structure.
+
+
+\subsection{getNumGGobis}
+Returns the number of ggobi instances within this session.  Each ggobi
+instance has its own data set. Of course, two instances may have the
+same dataset, but they are independent.  We may allow them to be
+linked in the future.  Again, the ability to specific which displays
+and even plots within them inter- and intra- ggobi instance is most
+useful in a programmatic interface.
+
+\subsection{getDefaultGGobi}
+Return the index of the currently active
+or default ggobi instance.
+This is the ggobi instance which 
+receives the commands by default.
+
+
+\subsection{setDefaultGGobi}
+
+\subsection{getRowNames}
+\subsection{getRowNames}
+\subsection{getSmootherFunction.ggobi}
+\subsection{ggobi}
+\subsection{ggobi.getActivePlot}
+\subsection{ggobi.getCurrentDisplayType}
+\subsection{ggobi.getDescription}
+\subsection{ggobi.getDisplayOptions}
+This returns the current settings of the values that control how new
+plots are displayed.  Each ggobi instance has a set of options which
+are used to create new plots.  These are logical values that govern
+the appearance of these plots.  This function returns a named vector
+of those values currently in existence.
+
+
+
+\subsection{ggobi.getDisplays}
+\subsection{ggobi.getFileName}
+\subsection{ggobi.getGlyphs}
+\subsection{ggobi.getSegments}
+\subsection{ggobi.getVariableIndex}
+\subsection{ggobi.getVariableNames}
+\subsection{ggobi.getViewTypes}
+\subsection{ggobi.parcoords}
+\subsection{ggobi.scatmat}
+\subsection{ggobi.scatterplot}
+\subsection{ggobi.setActivePlot}
+\subsection{ggobi.setData}
+\subsection{ggobi.setDataFile}
+\subsection{ggobi.setDataFrame}
+This sets the dataset for the particular ggobi instance to the
+contents of the dataframe.  Each column in the data frame corresponds
+to an observations. The row names of the data frame are used as the
+observation labels in the ggobi displays.
+
+\subsection{ggobi.setDisplayOptions}
+This controls the characteristics
+of plots that are subsequently
+created within the specified ggobi instance.
+These control issues such as 
+\begin{itemize}
+\item whether lines are drawn, 
+\item lines are directed or undirected
+\item missing values are displayed,
+\item grid lines are drawn on the plot(s),
+\item axes are shown and/or centered,
+\item double buffering is used,
+\item the plot(s) are linked to others.
+\end{itemize}
+
+
+
+\subsection{ggobi.setRowNames}
+This sets the observation identifiers for the 
+specified rows in the ggobi instance dataset.
+These are used in identifying points within 
+plots.
+
+The return value is a vector of the previous labels for the
+specified rows/observations.
+
+\subsection{setSmootherFunction.ggobi}
+
+
+
+
+\subsection{ggobi.symbol}
+This is of little or no interest to the regular user.  It is merely a
+function that takes the name of a C routine and maps it to the name of
+a routine in the GGobi chapter.  It does so by prefixing the name with
+the ``unique'' identifier \Escape{RS_GGOBI} in an effort to avoid
+symbol conflicts with other libraries.
+
+\end{document}

@@ -27,6 +27,12 @@ typedef struct _XMLUserData {
   int current_element;  /* Indexes the values within a record. */
   int current_segment;  /* Current segment being added. */
 
+
+  /* A boolean indicating whether the transformation name of a variable
+     was stored as an attribute.
+   */
+  gboolean variable_transform_name_as_attribute;
+
   ggobid *gg;
 
   gboolean terminateStrings;
