@@ -59,9 +59,11 @@ datad_new(datad *d, ggobid *gg)
 
   jitter_vars_init (d, gg);
 
+#ifdef TESTING_ROWS_IN_PLOT_CB
   /*-- listen for rows_in_plot_changed events --*/
   gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
     rows_in_plot_test_cb, gg);
+#endif
 
   gg->d = g_slist_append (gg->d, d);
 
