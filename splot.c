@@ -518,7 +518,9 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg)
 void
 raise_control_panel(GtkWidget *w, GdkEventKey *ev, ggobid *gg)
 {
-    if(ev->type == GDK_KEY_PRESS && ev->keyval == GDK_w)
+    /* Alt-M for "Main" */
+    if(ev->type == GDK_KEY_PRESS && 
+      (ev->state & GDK_MOD1_MASK) && ev->keyval == GDK_m)
 	gdk_window_raise(gg->main_window->window);
 }
 
