@@ -727,12 +727,17 @@ active_paint_points (datad *d, ggobid *gg)
     datad *dd;
     vartabled *vtt;
 
+/*
+ * I may not want to allocate and free this guy every time the
+ * brush moves.
+*/
     level_value_max = d->linkvar_vt->nlevels;
     for (lv = d->linkvar_vt->level_values; lv; lv = lv->next) {
       level_value = GPOINTER_TO_INT (lv->data);
       if (level_value > level_value_max) level_value_max = level_value;
     }
     
+    vectorb_init_null (&levelv);
     vectorb_alloc (&levelv, level_value_max+1);
     vectorb_zero (&levelv);
 
