@@ -15,6 +15,9 @@ stressplot_pixmap_clear (ggvisd *ggv, ggobid *gg)
   colorschemed *scheme = gg->activeColorScheme;
   GtkWidget *da = ggv->stressplot_da;
 
+  if (gg->plot_GC == NULL)
+    init_plot_GC (ggv->stressplot_pix, gg);
+
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (ggv->stressplot_pix, gg->plot_GC,
                       TRUE, 0, 0,
@@ -51,6 +54,9 @@ void
 stressplot_pixmap_copy (ggvisd *ggv, ggobid *gg)
 {
   GtkWidget *da = ggv->stressplot_da;
+
+  if (gg->plot_GC == NULL)
+    init_plot_GC (ggv->stressplot_pix, gg);
 
   /* copy the pixmap to the screen */
   gdk_draw_pixmap (da->window, gg->plot_GC, ggv->stressplot_pix,
@@ -101,6 +107,9 @@ draw_stress (ggvisd *ggv, ggobid *gg)
   GtkStyle *style = gtk_widget_get_style (da);
   gint lbearing, rbearing, strwidth, ascent, descent;
   colorschemed *scheme = gg->activeColorScheme;
+
+  if (gg->plot_GC == NULL)
+    init_plot_GC (ggv->stressplot_pix, gg);
 
   height = (gfloat)da->allocation.height - 2. * (gfloat)STRESSPLOT_MARGIN;
 

@@ -26,6 +26,9 @@ histogram_pixmap_clear (ggvisd *ggv, ggobid *gg)
   dissimd *D = ggv->dissim;
   GtkWidget *da = D->da;
 
+  if (gg->plot_GC == NULL)
+    init_plot_GC (D->pix, gg);
+
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (D->pix, gg->plot_GC,
                       TRUE, 0, 0,
@@ -72,6 +75,9 @@ histogram_pixmap_copy (ggvisd *ggv, ggobid *gg)
 {
   dissimd *D = ggv->dissim;
   GtkWidget *da = D->da;
+
+  if (gg->plot_GC == NULL)
+    init_plot_GC (D->pix, gg);
 
   /* copy the pixmap to the screen */
   gdk_draw_pixmap (da->window, gg->plot_GC, D->pix,
@@ -144,12 +150,14 @@ draw_grip_control (ggvisd *ggv, ggobid *gg) {
   dissimd *D = ggv->dissim;
   gint xmin = HISTOGRAM_HMARGIN;
   gint xmax = da->allocation.width - HISTOGRAM_HMARGIN;
-
   /* The grip positions are at the center of the grips */
 
   /* Suppose I allow the grips to go a bit into the margins ... */
   gint min_grip_pos = xmin - HISTOGRAM_HMARGIN/2;
   gint max_grip_pos = xmax + HISTOGRAM_HMARGIN/2;
+
+  if (gg->plot_GC == NULL)
+    init_plot_GC (D->pix, gg);
 
   if (D->lgrip_pos == -1 && D->rgrip_pos == -1) {  /* first time */
     D->lgrip_pos = min_grip_pos;
@@ -184,6 +192,9 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
     return;
   if (ggv->trans_dist.nels == 0)
     return;
+
+  if (gg->plot_GC == NULL)
+    init_plot_GC (D->pix, gg);
 
   histogram_pixmap_clear (ggv, gg);
 

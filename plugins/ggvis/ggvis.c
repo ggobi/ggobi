@@ -120,6 +120,53 @@ void ggvis_scale_set_default_values (GtkScale *scale)
   gtk_scale_set_draw_value (scale, TRUE);
 }
 
+static void
+ggv_datad_set_cb (GtkWidget *cl, gint row, gint column,
+  GdkEventButton *event, PluginInstance *inst)
+{
+  ggobid *gg = inst->gg;
+  ggvisd *ggv = ggvisFromInst (inst);
+  gchar *dname;
+  datad *d;
+  GSList *l;
+  gchar *clname = gtk_widget_get_name (GTK_WIDGET(cl));
+
+  gtk_clist_get_text (GTK_CLIST (cl), row, 0, &dname);
+  for (l = gg->d; l; l = l->next) {
+    d = l->data;
+    if (strcmp (d->name, dname) == 0) {
+      if (strcmp (clname, "nodeset") == 0) {
+        ggv->dsrc = d;
+      } else if (strcmp (clname, "edgeset") == 0) {
+        ggv->e = d;
+      }
+      break;
+    }
+  }
+  /* Don't free either string; they're just pointers */
+}
+static void 
+ggv_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
+{
+  gchar *row[1];
+  GtkWidget *swin = (GtkWidget *)
+    gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
+  gchar *clname = gtk_widget_get_name (GTK_WIDGET(clist));
+
+  if (strcmp (clname, "nodeset") == 0 && d->rowid.idv.nels > 0) {
+    row[0] = g_strdup (d->name);
+    gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
+    g_free (row[0]);
+  }
+  if (strcmp (clname, "edgeset") == 0 && d->edge.n > 0) {
+    row[0] = g_strdup (d->name);
+    gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
+    g_free (row[0]);
+  }
+
+  gtk_widget_show_all (swin);
+}
+
 void
 create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 {
@@ -132,6 +179,13 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   GtkWidget *menubar;
   GtkTooltips *tips;
   GtkWidget *entry;
+  /*-- for lists of datads --*/
+  gchar *clist_titles[2] = {"node sets", "edge sets"};
+  datad *d;
+  ggobid *gg = inst->gg;
+  GtkWidget *swin, *clist;
+  gchar *row[1];
+  GSList *l;
 
   tips = gtk_tooltips_new ();
 
@@ -156,11 +210,83 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     &menubar, (gpointer) inst);
   gtk_box_pack_start (GTK_BOX (main_vbox), menubar, false, false, 0);
 
-/*-- notebook for distance matrix, run controls, and starting layout --*/
+/*-- notebook for datads, distance matrix, run controls --*/
 
   notebook = gtk_notebook_new ();
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
   gtk_box_pack_start (GTK_BOX (main_vbox), notebook, false, false, 2);
+
+/*-- "Specify datasets" list widgets --*/
+
+  hbox = gtk_hbox_new (false, 10);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
+
+/*
+ * node sets
+*/
+  /* Create a scrolled window to pack the CList widget into */
+  swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+  clist = gtk_clist_new_with_titles (1, &clist_titles[0]);
+  gtk_widget_set_name (GTK_WIDGET(clist), "nodeset");
+  gtk_clist_set_selection_mode (GTK_CLIST (clist),
+    GTK_SELECTION_SINGLE);
+  gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
+  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+    (GtkSignalFunc) ggv_datad_set_cb, inst);
+  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
+    (GtkSignalFunc) ggv_clist_datad_added_cb, GTK_OBJECT (clist));
+  /*-- --*/
+
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (d->rowid.idv.nels != 0) {  /*-- node sets --*/
+      row[0] = g_strdup (d->name);
+      gtk_clist_append (GTK_CLIST (clist), row);
+      g_free (row[0]);
+    }
+  }
+  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
+  gtk_container_add (GTK_CONTAINER (swin), clist);
+  gtk_box_pack_start (GTK_BOX (hbox), swin, false, false, 2);
+
+/*
+ * edge sets
+*/
+  /* Create a scrolled window to pack the CList widget into */
+  swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+  clist = gtk_clist_new_with_titles (1, &clist_titles[1]);
+  gtk_widget_set_name (GTK_WIDGET(clist), "edgeset");
+  gtk_clist_set_selection_mode (GTK_CLIST (clist),
+    GTK_SELECTION_SINGLE);
+  gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
+  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+    (GtkSignalFunc) ggv_datad_set_cb, inst);
+  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
+    (GtkSignalFunc) ggv_clist_datad_added_cb, GTK_OBJECT (clist));
+  /*-- --*/
+
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (d->edge.n != 0) {  /*-- edge sets --*/
+      row[0] = g_strdup (d->name);
+      gtk_clist_append (GTK_CLIST (clist), row);
+      g_free (row[0]);
+    }
+  }
+  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
+  gtk_container_add (GTK_CONTAINER (swin), clist);
+  gtk_box_pack_start (GTK_BOX (hbox), swin, false, false, 2);
+
+
+
+  label = gtk_label_new ("Specify datasets");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
 
 /*-- "Definition of D" controls --*/
 

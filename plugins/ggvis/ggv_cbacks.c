@@ -114,7 +114,8 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
 */
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
 /* setDisplayEdge (dspnew, e); */
-  edges_displayed = display_copy_edge_options (dsp, dspnew);
+  if (dsp)
+    edges_displayed = display_copy_edge_options (dsp, dspnew);
   if (!edges_displayed) {
     /*GGOBI(setShowLines)(dspnew, true);*/
 /*
@@ -278,18 +279,24 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
   GtkWidget *clist;
   gint selected_var = -1;
   datad *dsrc;
-  displayd *dsp = gg->current_display;
   GtkWidget *window, *entry;
   gchar *lbl;
 
-  /*-- for now, use the d from the current display --*/
-  ggv->dsrc = dsp->d;
-  dsrc = ggv->dsrc;
+  /* This was set in the first clist in the preceding tab */
+  if (ggv->dsrc == NULL || ggv->dsrc->rowid.idv.nels == 0) {
+    g_printerr ("node set not correctly specified\n");
+    return;
+  }
+  if (ggv->e == NULL || ggv->e->edge.n == 0) {
+    g_printerr ("edge set not correctly specified\n");
+    return;
+  }
+
+  dsrc = ggv->dsrc; 
  
   /*-- allocate Dtarget --*/
   arrayd_alloc (&ggv->Dtarget, dsrc->nrows, dsrc->nrows);
 
-  ggv->e = gg->current_display->e;
   if (ggv->Dtarget_source == VarValues) {
     clist = get_clist_from_object (GTK_OBJECT (button));
     if (!clist) {
@@ -298,6 +305,7 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
     }
     /*-- this is the edgeset for distance computations, not
          necessarily the edgeset to be displayed (eg, morsecode) --*/
+/* can override the setting of the second clist in the preceding tab */
     ggv->e = gtk_object_get_data (GTK_OBJECT(clist), "datad");
     if (ggv->e == NULL) {
 g_printerr ("e is null\n");
@@ -311,6 +319,7 @@ g_printerr ("e is null\n");
     }
   }
 
+/*
   if (ggv->e == NULL) {
     if (!edgeset_add (dsp)) {
       quick_message ("Please specify an edge set", false);
@@ -319,6 +328,7 @@ g_printerr ("e is null\n");
       ggv->e = dsp->e;
     }
   }
+*/
 
   if (dsrc->rowid.idv.nels == 0) {
     g_printerr ("Make sure the current display is a plot of the nodes.\n");
