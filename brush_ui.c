@@ -442,8 +442,8 @@ void cpanel_brush_make(ggobid * gg)
                        NULL);
   gtk_box_pack_start(GTK_BOX(vb), option_menu, false, false, 0);
   populate_option_menu(option_menu, point_targets_lbl,
-                       sizeof(point_targets_lbl) / sizeof(gchar *),
-                       (GtkSignalFunc) brush_point_targets_cb, gg);
+    sizeof(point_targets_lbl) / sizeof(gchar *),
+    (GtkSignalFunc) brush_point_targets_cb, "GGobi", gg);
   /*-- initial value: both --*/
   gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 1);
 
@@ -465,8 +465,8 @@ void cpanel_brush_make(ggobid * gg)
                        NULL);
   gtk_box_pack_start(GTK_BOX(vb), option_menu, false, false, 0);
   populate_option_menu(option_menu, edge_targets_lbl,
-                       sizeof(edge_targets_lbl) / sizeof(gchar *),
-                       (GtkSignalFunc) brush_edge_targets_cb, gg);
+    sizeof(edge_targets_lbl) / sizeof(gchar *),
+    (GtkSignalFunc) brush_edge_targets_cb, "GGobi", gg);
   /*-- initial value: off --*/
   gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 0);
 
@@ -481,8 +481,8 @@ void cpanel_brush_make(ggobid * gg)
   gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
                      option_menu, false, false, 0);
   populate_option_menu(option_menu, mode_lbl,
-                       sizeof(mode_lbl) / sizeof(gchar *),
-                       (GtkSignalFunc) brush_mode_cb, gg);
+    sizeof(mode_lbl) / sizeof(gchar *),
+    (GtkSignalFunc) brush_mode_cb, "GGobi", gg);
   /* initialize transient */
   gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 1);
 
@@ -530,8 +530,8 @@ void cpanel_brush_make(ggobid * gg)
 
   /*-- option menu:  link by id, link by variable --*/
   populate_option_menu(option_menu, linkby_lbl,
-                       sizeof(linkby_lbl) / sizeof(gchar *),
-                       (GtkSignalFunc) brush_linkby_cb, gg);
+    sizeof(linkby_lbl) / sizeof(gchar *),
+    (GtkSignalFunc) brush_linkby_cb, "GGobi", gg);
   /*-- initial value: link by id --*/
   gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), BR_LINKBYID);
 
@@ -569,8 +569,8 @@ g_printerr ("new cvar: %s\n", dd->name);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
                       option_menu, false, false, 0);
   populate_option_menu (option_menu, catvars,
-                        sizeof (catvars) / sizeof (gchar *),
-                        (GtkSignalFunc) brush_linkvar_cb, gg);
+    sizeof (catvars) / sizeof (gchar *),
+    (GtkSignalFunc) brush_linkvar_cb, "GGobi", gg);
 */
 
 /*-- button for opening 'color schemes' panel --*/

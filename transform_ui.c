@@ -219,8 +219,8 @@ transform_window_open (ggobid *gg)
       "Stage 0: Adjust the domain of the variables",
       NULL);
     populate_option_menu (stage0_option_menu, stage0_lbl,
-                          sizeof (stage0_lbl) / sizeof (gchar *),
-                          (GtkSignalFunc) stage0_cb, gg);
+      sizeof (stage0_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) stage0_cb, "GGobi", gg);
     gtk_container_add (GTK_CONTAINER (frame), stage0_option_menu);
 
     /*
@@ -240,8 +240,8 @@ transform_window_open (ggobid *gg)
       "Stage 1: Data-independent transformations, preserving user-defined limits",
       NULL);
     populate_option_menu (stage1_option_menu, stage1_lbl,
-                          sizeof (stage1_lbl) / sizeof (gchar *),
-                          (GtkSignalFunc) stage1_cb, gg);
+      sizeof (stage1_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) stage1_cb, "GGobi", gg);
     gtk_box_pack_start (GTK_BOX (vb), stage1_option_menu, true, false, 1);
 
     /*-- label and spin button for Box-Cox parameter --*/
@@ -315,8 +315,8 @@ transform_window_open (ggobid *gg)
       "Stage 2: Data-dependent transformations, ignoring user-defined limits",
       NULL);
     populate_option_menu (stage2_option_menu, stage2_lbl,
-                          sizeof (stage2_lbl) / sizeof (gchar *),
-                          (GtkSignalFunc) stage2_cb, gg);
+      sizeof (stage2_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) stage2_cb, "GGobi", gg);
     gtk_container_add (GTK_CONTAINER (frame), stage2_option_menu);
 
     /*

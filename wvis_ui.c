@@ -956,8 +956,8 @@ wvis_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vb1), opt,
       false, false, 0);
     populate_option_menu (opt, (gchar**) binning_method_lbl,
-                          sizeof (binning_method_lbl) / sizeof (gchar *),
-                          (GtkSignalFunc) binning_method_cb, gg);
+      sizeof (binning_method_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) binning_method_cb, "GGobi", gg);
 
   /*
    * section on choosing new colormap
@@ -1067,8 +1067,8 @@ wvis_window_open (ggobid *gg)
       NULL);
     gtk_box_pack_start (GTK_BOX (hb), opt, true, true, 0);
     populate_option_menu (opt, (gchar**) update_method_lbl,
-                          sizeof (update_method_lbl) / sizeof (gchar *),
-                          (GtkSignalFunc) update_method_cb, gg);
+      sizeof (update_method_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) update_method_cb, "GGobi", gg);
 
     /*-- add a close button --*/
     gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),

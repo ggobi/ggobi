@@ -53,12 +53,12 @@ GtkWidget *cpanel_barchart_make(ggobid * gg)
   opt = gtk_option_menu_new();
   gtk_widget_set_name(opt, "BARCHART:displ_mode_option_menu");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), opt,
-                       "some sensible text about spine plots and barcharts",
-                       NULL);
+    "some sensible text about spine plots and barcharts",
+    NULL);
   gtk_box_pack_start(GTK_BOX(vb), opt, false, false, 0);
   populate_option_menu(opt, display_mode_lbl,
-                       sizeof(display_mode_lbl) / sizeof(gchar *),
-                       (GtkSignalFunc) display_mode_cb, gg);
+    sizeof(display_mode_lbl) / sizeof(gchar *),
+    (GtkSignalFunc) display_mode_cb, "GGobi", gg);
 
   gtk_widget_show_all(panel);
 

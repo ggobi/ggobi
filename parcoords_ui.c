@@ -107,8 +107,8 @@ cpanel_parcoords_make (ggobid *gg)
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, arrangement_lbl,
-                        sizeof (arrangement_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) arrangement_cb, gg);
+    sizeof (arrangement_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) arrangement_cb, "GGobi", gg);
 /*
  * option menu: selection mode
 */
@@ -125,8 +125,8 @@ cpanel_parcoords_make (ggobid *gg)
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, selection_mode_lbl,
-                        sizeof (selection_mode_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) selection_mode_cb, gg);
+    sizeof (selection_mode_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) selection_mode_cb, "GGobi", gg);
 
 /*
  * option menu
@@ -143,8 +143,8 @@ cpanel_parcoords_make (ggobid *gg)
     "Display either textured dot plots or average shifted histograms", NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, type_lbl,
-                        sizeof (type_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) type_cb, gg);
+    sizeof (type_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) type_cb, "GGobi", gg);
   /*-- this should be set to the value of cpanel->p1d_type --*/
   gtk_option_menu_set_history (GTK_OPTION_MENU (opt), DOTPLOT);
 
@@ -190,8 +190,8 @@ cpanel_parcoords_make (ggobid *gg)
     "Show all visible cases, or show only labelled cases", NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, showcases_lbl,
-                        sizeof (showcases_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) showcases_cb, gg);
+    sizeof (showcases_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) showcases_cb, "GGobi", gg);
 */
 
 /*
@@ -212,8 +212,8 @@ cpanel_parcoords_make (ggobid *gg)
      NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, varscale_lbl,
-                        sizeof (varscale_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) varscale_cb, gg);
+    sizeof (varscale_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) varscale_cb, "GGobi", gg);
 */
 
   gtk_widget_show_all (panel);

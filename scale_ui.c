@@ -448,8 +448,8 @@ cpanel_scale_make (ggobid *gg) {
     NULL);
   gtk_box_pack_end (GTK_BOX (vb), pan_option_menu, false, false, 0);
   populate_option_menu (pan_option_menu, panoptions_lbl,
-                        sizeof (panoptions_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) panoptions_cb, gg);
+    sizeof (panoptions_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) panoptions_cb, "GGobi", gg);
 
  /*-- zooming controls --*/
   vb = gtk_vbox_new (false, 0);
@@ -466,8 +466,8 @@ cpanel_scale_make (ggobid *gg) {
     NULL);
   gtk_box_pack_end (GTK_BOX (vb), zoom_option_menu, false, false, 0);
   populate_option_menu (zoom_option_menu, zoomoptions_lbl,
-                        sizeof (zoomoptions_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) zoomoptions_cb, gg);
+    sizeof (zoomoptions_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) zoomoptions_cb, "GGobi", gg);
 
   /*-- start with dragging on by default --*/
   gtk_widget_set_sensitive (pan_radio, false);

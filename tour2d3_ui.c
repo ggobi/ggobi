@@ -187,8 +187,8 @@ cpanel_tour2d3_make (ggobid *gg) {
     "Set the manual manipulation method", NULL);
   gtk_box_pack_end (GTK_BOX (vb), manip_opt, false, false, 0);
   populate_option_menu (manip_opt, manip_lbl,
-                        sizeof (manip_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) manip_cb, gg);
+    sizeof (manip_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) manip_cb, "GGobi", gg);
 
   gtk_widget_show_all (gg->control_panel[TOUR2D3]);
 }

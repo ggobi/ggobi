@@ -96,8 +96,8 @@ smooth_window_open (ggobid *gg) {
       "Set the smoothing function", NULL);
     gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
     populate_option_menu (opt, smoother_lbl,
-                          sizeof (smoother_lbl) / sizeof (gchar *),
-                          (GtkSignalFunc) smoother_cb, gg);
+      sizeof (smoother_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) smoother_cb, "GGobi", gg);
 
 /*
  * vbox for label and rangewidget
@@ -142,11 +142,6 @@ smooth_window_open (ggobid *gg) {
                        GTK_SIGNAL_FUNC (window_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (vbox), tgl,
       false, false, 3);
-
-/*
-    gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
-                   GTK_SIGNAL_FUNC (hide_cb), (gpointer) window);
-*/
 
     gtk_widget_show_all (window);
   }

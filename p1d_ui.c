@@ -149,8 +149,8 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]),
                       opt, false, false, 0);
   populate_option_menu (opt, type_lbl,
-                        sizeof (type_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) type_cb, gg);
+    sizeof (type_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) type_cb, "GGobi", gg);
 
   /*-- frame around ASH parameters --*/
   frame = gtk_frame_new ("ASH parameters");

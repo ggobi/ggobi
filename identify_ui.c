@@ -258,8 +258,8 @@ cpanel_identify_make(ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
                       opt, false, false, 0);
   populate_option_menu (opt, display_lbl,
-                        sizeof (display_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) display_cb, gg);
+    sizeof (display_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) display_cb, "GGobi", gg);
 
  /*-- button for removing all labels --*/
   btn = gtk_button_new_with_label ("Remove labels");

@@ -98,8 +98,8 @@ cpanel_tsplot_make (ggobid *gg)
 			NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, arrangement_lbl,
-                        sizeof (arrangement_lbl) / sizeof (gchar *),
-                        arrangement_cb, gg);
+    sizeof (arrangement_lbl) / sizeof (gchar *),
+    arrangement_cb, "GGobi", gg);
 #endif
 
 /*
@@ -120,7 +120,7 @@ cpanel_tsplot_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, selection_mode_lbl,
     sizeof (selection_mode_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) selection_mode_cb, gg);
+    (GtkSignalFunc) selection_mode_cb, "GGobi", gg);
 
 /*
  * Variable scales
@@ -140,8 +140,8 @@ cpanel_tsplot_make (ggobid *gg)
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, varscale_lbl,
-                        sizeof (varscale_lbl) / sizeof (gchar *),
-                        varscale_cb, gg);
+    sizeof (varscale_lbl) / sizeof (gchar *),
+    varscale_cb, "GGobi", gg);
 #endif
 
 

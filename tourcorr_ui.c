@@ -225,8 +225,8 @@ cpanel_ctour_make (ggobid *gg) {
     "Set the manual manipulation method", NULL);
   gtk_container_add (GTK_CONTAINER (vb), manip_opt);
   populate_option_menu (manip_opt, manip_lbl,
-                        sizeof (manip_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) manip_cb, gg);
+    sizeof (manip_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) manip_cb, "GGobi", gg);
 
 /*
  * path length option menu 
@@ -244,8 +244,8 @@ cpanel_ctour_make (ggobid *gg) {
     "Set the path length", NULL);
   gtk_container_add (GTK_CONTAINER (vb), pathlen_opt);
   populate_option_menu (pathlen_opt, pathlen_lbl,
-                        sizeof (pathlen_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) pathlen_cb, gg);
+    sizeof (pathlen_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) pathlen_cb, "GGobi", gg);
   */
 /*
  * Sync Axes toggle

@@ -146,8 +146,8 @@ cpanel_xyplot_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), opt,
     false, false, 0);
   populate_option_menu (opt, (gchar**) fix_axis_lbl,
-                        sizeof (fix_axis_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) fix_axis_cb, gg);
+    sizeof (fix_axis_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) fix_axis_cb, "GGobi", gg);
   
   /* value, lower, upper, step_increment, page_increment, page_size */
   /* Note that the page_size value only makes a difference for

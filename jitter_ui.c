@@ -123,8 +123,8 @@ jitter_window_open (ggobid *gg) {
         "The jittering is either distributed uniform or normal", NULL);
       gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
       populate_option_menu (opt, type_lbl,
-                            sizeof (type_lbl) / sizeof (gchar *),
-                            (GtkSignalFunc) type_cb, gg);
+        sizeof (type_lbl) / sizeof (gchar *),
+        (GtkSignalFunc) type_cb, "GGobi", gg);
 
       /*-- vbox for label and rangewidget --*/
       vb = gtk_vbox_new (true, 2);

@@ -194,8 +194,8 @@ cpanel_movepts_make (ggobid *gg) {
     "Move freely, or constrain the motion vertically or horizontally",
     NULL);
   populate_option_menu (opt, mdir_lbl,
-                        sizeof (mdir_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) mdir_cb, gg);
+    sizeof (mdir_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) mdir_cb, "GGobi", gg);
   gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);
 
   /*-- Use group toggle --*/
