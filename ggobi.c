@@ -28,7 +28,7 @@ const gchar * const ViewTypes[] =
   {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
 const gint ViewTypeIndices[] = {scatterplot, scatmat, parcoords};           
 const gchar *const ModeNames[] =
-  {"ASCII", "R/S data", "binary", "XML", "MySQL"};
+  {"ASCII", "binary", "R/S data", "XML", "MySQL"};
 
 gint
 parse_command_line (gint *argc, gchar **av, ggobid *gg)
