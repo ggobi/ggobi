@@ -404,12 +404,15 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
     return(-1);
 }
 
-extern void filename_get (ggobid *, guint, GtkWidget *);
+extern void filename_get_r (ggobid *, guint, GtkWidget *);
+
 static GtkItemFactoryEntry menu_items[] = {
-  { "/_File",            NULL,     NULL,          0, "<Branch>" },
-  { "/File/Read ...",    NULL,     filename_get,     0 },
-  { "/File/Save (extend file set) ...",   
-                         NULL,     filename_get,     1 },
+  { "/_File",            NULL,     NULL,             0, "<Branch>" },
+  { "/File/Read ...",    NULL,     filename_get_r,   0 },
+/*
+ *{ "/File/Save (extend file set) ...",   
+ *                       NULL,     filename_get,     1 },
+*/
   { "/File/Save (new file set) ...",   
                          NULL,     writeall_window_open,     2 },
 

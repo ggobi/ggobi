@@ -4,14 +4,12 @@
 #include "vars.h"
 #include "externs.h"
 
+#include "writedata.h"
+
 static GtkWidget *window = NULL;
 
-static gchar *format_lbl[] = {"XML", "File set (binary)", "File set (ascii)", "MySQL"};
-#define XMLDATA    0
-#define ASCIIDATA  1
-#define BINARYDATA 2
-#define MYSQL_DATA 3
-
+static gchar *format_lbl[] =
+  {"XML", "File set (ascii)", "File set (binary)", "MySQL"};
 void format_set (gint fmt, ggobid *gg) { gg->save.format = fmt; }
 static void format_set_cb (GtkWidget *w, gpointer cbd)
 {
@@ -20,8 +18,6 @@ static void format_set_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *stage_lbl[] = {"Raw data", "Transformed data"};
-#define RAWDATA    0
-#define TFORMDATA  1
 void stage_set (gint stage, ggobid *gg) { gg->save.stage = stage; }
 static void stage_set_cb (GtkWidget *w, gpointer cbd)
 {
@@ -30,7 +26,6 @@ static void stage_set_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *jitter_lbl[] = {"Don't add jitter", "Add jitter"};
-gboolean jitter_p;
 void jitterp_set (gboolean jitterp, ggobid *gg) { gg->save.jitter_p = jitterp; }
 static void jitterp_set_cb (GtkWidget *w, gpointer cbd)
 {
@@ -40,11 +35,8 @@ static void jitterp_set_cb (GtkWidget *w, gpointer cbd)
 
 static gchar *rowdata_lbl[] = {"All cases",
                                "Displayed cases",
-                               "Labeled cases"};
-gint row_ind;
-#define ALLROWS       0
-#define DISPLAYEDROWS 1
-#define LABELLEDROWS  2
+                               "Labeled cases"
+                               "Specified cases"};
 void rowind_set (gint ind, ggobid *gg) { gg->save.row_ind = ind; }
 static void rowind_set_cb (GtkWidget *w, gpointer cbd)
 {
@@ -52,10 +44,9 @@ static void rowind_set_cb (GtkWidget *w, gpointer cbd)
   rowind_set (GPOINTER_TO_INT (cbd), gg);
 }
 
-static gchar *columndata_lbl[] = {"All columns", "Plotted columns"};
-gint column_ind;
-#define ALLCOLS      0
-#define PLOTTEDCOLS  1
+static gchar *columndata_lbl[] = {"All variables",
+                                  "Selected variables",
+                                  "Specified variables"};
 void columnind_set (gint ind, ggobid *gg) { gg->save.column_ind = ind; }
 static void columnind_set_cb (GtkWidget *w, gpointer cbd)
 {
@@ -66,9 +57,6 @@ static void columnind_set_cb (GtkWidget *w, gpointer cbd)
 static gchar *missing_lbl[] = {"Missings as 'na'",
                                "Missings as '.'"
                                "Imputed values"};
-#define MISSINGSNA      0
-#define MISSINGSDOT     1
-#define MISSINGSIMPUTED 2
 void missingind_set (gint ind, ggobid *gg) { gg->save.missing_ind = ind; }
 static void missingind_set_cb (GtkWidget *w, gpointer cbd)
 {
@@ -96,9 +84,10 @@ static void delete_cb (GtkWidget *w, GdkEvent *event) {
   window = NULL;
 }
 
+extern void filename_get_w (GtkWidget *, ggobid *);
 void
 writeall_window_open (ggobid *gg) {
-  GtkWidget *table, *opt;
+  GtkWidget *vbox, *table, *opt, *btn;
   gint j;
 
   if (window == NULL) {
@@ -106,12 +95,17 @@ writeall_window_open (ggobid *gg) {
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_signal_connect (GTK_OBJECT (window), "delete_event",
                         GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
-    gtk_window_set_title (GTK_WINDOW (window), "Write data");
+    gtk_window_set_title (GTK_WINDOW (window), "create ggobi file set");
     
     gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
+    vbox = gtk_vbox_new (false, VBOX_SPACING);
+    gtk_container_add (GTK_CONTAINER (window), vbox);
+
     table = gtk_table_new (7, 2, false);
-    gtk_container_add (GTK_CONTAINER (window), table);
+/*    gtk_container_add (GTK_CONTAINER (window), table);*/
+    gtk_box_pack_start (GTK_BOX (vbox), table,
+      false, false, 3);
 
     /*-- Format --*/
     j = 0;
@@ -235,6 +229,13 @@ writeall_window_open (ggobid *gg) {
 /*
 Add a button to open a file selection box; see filename_get in main_ui.c
 */
+    btn = gtk_button_new_with_label ("Save ...");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Open file selection widget", NULL);
+    gtk_box_pack_start (GTK_BOX (vbox), btn,
+                        false, false, 3);
+    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                        GTK_SIGNAL_FUNC (filename_get_w), gg);
 
 
     gtk_widget_show_all (window);

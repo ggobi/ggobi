@@ -172,7 +172,6 @@ struct _ggobid {
  vardatad *vardata;
 
 /* row labels */
-/* gchar **rowlab;*/
  GArray *rowlab;
 
 /* gboolean: does this data contain only one variable? False by default */
@@ -193,11 +192,6 @@ struct _ggobid {
  glyphv glyph_id, glyph_0;
  glyphv *glyph_ids, *glyph_now, *glyph_prev;
  gboolean *hidden, *hidden_now, *hidden_prev;
-
-/*
- gshort *line_color, *line_color_now, *line_color_prev;
- gshort *line_hidden, *line_hidden_now, *line_hidden_prev;
-*/
 
   /* line brushing data; could combine with other line-wise data */
   struct _LineData {

@@ -10,7 +10,7 @@ LDFLAGS=
 #DEPENDS_FLAG=-MM
 
 SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
- read_array.c read_data.c io.c writedata_ui.c \
+ read_array.c read_data.c io.c writedata_ui.c writedata.c \
  pipeline.c missing.c \
  scatterplot.c scatterplot_ui.c \
  splot.c sp_plot.c win32_draw.c \
@@ -37,7 +37,7 @@ SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
 
 OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  utils_ui.o utils.o utils_gdk.o \
- read_array.o read_data.o io.o writedata_ui.o \
+ read_array.o read_data.o io.o writedata_ui.o writedata.o \
  pipeline.o missing.o \
  scatterplot.o scatterplot_ui.o \
  splot.o sp_plot.o win32_draw.o \
