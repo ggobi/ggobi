@@ -515,6 +515,7 @@ void gtk_ext_hruler_drag_motion(GtkWidget *widget,gint event_x)
 	xinc = dx/width*view_w;
 	gtk_ext_ruler_set_range(ruler, ruler->lower - xinc, ruler->upper - xinc);
 	break;
+    case 2: /* Button 2 -> Scale mode */  /* dfs */
     case 3: /* Button 3 -> Scale mode */
     {				
 	gdouble xi,xf,xc,scale;
