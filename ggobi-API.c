@@ -40,7 +40,6 @@ GGOBI(getFileName) (ggobid *gg)
   return(gg->filename);
 }
 
-
 DataMode
 GGOBI(getDataMode) (ggobid *gg)
 {
@@ -306,20 +305,7 @@ GGOBI(newParCoords)(gint *vars, gint numVars, datad *d, ggobid *gg)
 {
   displayd *display = NULL;
 
-/*
- splotd **plots;
- int i;
-  plots = (splotd**) g_malloc(sizeof(splotd*) * numVars);
-  for(i = 0 ; i < numVars; i++) {
-    plots[i] = splot_new (display, 400, 400, gg);
-    plots[i]->p1dvar = vars[i];
-  }
-  display = parcoords_new (false, plots, numVars, gg);
-  g_free(plots);
-*/
-
   display = display_alloc_init (parcoords, false, d, gg);
-
   display = parcoords_new (false, numVars, vars, d, gg);
   display_add (display, gg);
 
@@ -331,9 +317,7 @@ GGOBI(createPlot)(int type, char **varnames)
 {
  displayd *display = NULL;
  /*
-
    display_new(type);
-
  */
  return(display);
 }
@@ -1097,8 +1081,6 @@ GGOBI(setPlotRange)(double *x, double *y, int displayNum, int plotNum, gboolean 
     splot_zoom(sp, *x, *y, gg);
   }
 
-
-
  /*
   fcoords tfmin, tfmax;
   tfmin.x = x[0];
@@ -1128,14 +1110,16 @@ GGOBI(setPlotRange)(double *x, double *y, int displayNum, int plotNum, gboolean 
 
 
 /*
-  This handles the raising and lowering or the iconifying or de-iconifying
-  of one or more windows.
-  If which is negative, the operation applies to all the displays with the ggobid instance.
-  Otherwise, the operation applies just to the display indexed by which.
+  This handles the raising and lowering or the iconifying or
+  de-iconifying of one or more windows.  If which is negative,
+  the operation applies to all the displays with the ggobid
+  instance.  Otherwise, the operation applies just to the
+  display indexed by which.
 
-  The two logical arguments indicate whether to raise/lower or iconify/deiconify.
-  Within these two operation types, the up argument indicates whether to 
-  raise or lower, an iconify or deiconify.
+  The two logical arguments indicate whether to raise/lower
+  or iconify/deiconify.  Within these two operation types, the
+  up argument indicates whether to raise or lower, an iconify
+  or deiconify.
  */
 gboolean
 GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg)

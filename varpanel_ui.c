@@ -888,7 +888,6 @@ varpanel_size_init (gint cpanel_height, ggobid* gg)
 */
 }
 
-
 void
 vartable_refresh (datad *d, ggobid *gg) {
   gint j;
@@ -903,3 +902,24 @@ varlabel_set (gint j, datad *d, ggobid *gg) {
   gtk_label_set_text (GTK_LABEL (GTK_BIN (d->varpanel_ui.label[j])->child),
     d->vartable[j].collab_tform);
 }
+
+/*-------------------------------------------------------------------------*/
+/*                          API                                            */
+/*-------------------------------------------------------------------------*/
+
+void
+GGOBI(selectScatterplotX) (gint jvar, ggobid *gg) 
+{
+  displayd *display = gg->current_display;
+  if (display->displaytype != scatterplot)
+    return;
+  else {
+
+    datad *d = display->d;
+    splotd *sp = (splotd *) display->splots->data;
+    cpaneld *cpanel = &display->cpanel;
+
+    varsel (cpanel, sp, jvar, 1, false, false, false, d, gg);
+  }
+}
+

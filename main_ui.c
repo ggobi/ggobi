@@ -279,7 +279,6 @@ projection_get (ggobid* gg) {
   return gg->projection;
 }
 
-
 /*
  * Set the mode for the current display
 */
@@ -568,6 +567,10 @@ make_ui (ggobid *gg) {
  * and contents, using the default mode for the default display.
 */
   gg->mode_frame = gtk_frame_new (mode_name[gg->mode]);
+  /*-- this may keep the window from shrinking all the time --*/
+  gtk_container_set_resize_mode (GTK_CONTAINER (gg->mode_frame), 
+                                 GTK_RESIZE_IMMEDIATE);
+
   gtk_box_pack_start (GTK_BOX (hbox), gg->mode_frame, false, false, 3);
   gtk_container_set_border_width (GTK_CONTAINER (gg->mode_frame), 3);
   gtk_frame_set_shadow_type (GTK_FRAME (gg->mode_frame), GTK_SHADOW_IN);
