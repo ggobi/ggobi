@@ -82,14 +82,15 @@ load_plugin_library(GGobiPluginDetails *plugin)
   }
 
   if(canRead(fileName) == false) {
-    fprintf(stderr, "can't locate plugin library %s:\n", plugin->dllName);fflush(stderr);      
-    if(fileName != plugin->dllName)
-      g_free(fileName);
+      if(sessionOptions->verbose != GGOBI_SILENT)
+	  fprintf(stderr, "can't locate plugin library %s:\n", plugin->dllName);fflush(stderr);      
+      if(fileName != plugin->dllName)
+	  g_free(fileName);
     return(NULL);
   }
 
    handle = dynload->open(fileName, plugin);
-   if(!handle) {
+   if(!handle && sessionOptions->verbose != GGOBI_SILENT) {
     char buf[1000];
       dynload->getError(buf, plugin);
       fprintf(stderr, "error on loading plugin library %s: %s\n", plugin->dllName, buf);fflush(stderr);

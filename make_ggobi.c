@@ -209,7 +209,7 @@ read_input(InputDescription *desc, ggobid *gg)
     break;
   }
 
-  if(ok && sessionOptions->verbose) {
+  if(ok && sessionOptions->verbose == GGOBI_VERBOSE) {
     showInputDescription(desc, gg);
   }
 

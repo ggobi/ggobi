@@ -398,6 +398,8 @@ struct _ggobid {
 #endif
 
 
+typedef enum { GGOBI_SILENT, GGOBI_CHATTY, GGOBI_VERBOSE} GGobiOutputLevel;
+
 /**
   @defgroup SessionOptions Session Options
   @brief This is used to store store values from the
@@ -411,7 +413,7 @@ typedef struct {
     Controls whether messages explaining what is being done internally
     are displayed.
     */
-  gboolean verbose;
+  GGobiOutputLevel verbose;
 
     /**
        @ingroup SessionOptions

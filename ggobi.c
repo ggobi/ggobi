@@ -111,8 +111,12 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 #endif
    }
 
-   else if(strcmp(av[1], "-verbose") == 0 || strcmp(av[1], "-V") == 0) {
-      sessionOptions->verbose = true;
+   else if(strcmp(av[1], "--verbose") == 0  || strcmp(av[1], "-verbose") == 0  || strcmp(av[1], "-V") == 0) {
+      sessionOptions->verbose = GGOBI_VERBOSE;
+   } 
+
+   else if(strcmp(av[1], "--silent") == 0  || strcmp(av[1], "-silent") == 0)  {
+      sessionOptions->verbose = GGOBI_SILENT;
    } 
  #ifdef USE_MYSQL
     else if (strcmp (av[1], "-mysql") == 0) {
@@ -366,10 +370,10 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   process_initialization_files();
 #endif
 
-  if(sessionOptions->verbose)
+  if(sessionOptions->verbose == GGOBI_VERBOSE)
     g_printerr("progname = %s\n", g_get_prgname());
 
-  if(sessionOptions->verbose)
+  if(sessionOptions->verbose == GGOBI_VERBOSE)
     g_printerr("data_in = %s\n", sessionOptions->data_in);
 
   if(DefaultPrintHandler.callback == NULL)
@@ -395,6 +399,7 @@ initSessionOptions()
   sessionOptions->data_mode = unknown_data;
 
   sessionOptions->showControlPanel = true;
+  sessionOptions->verbose = GGOBI_CHATTY;
 
 #ifdef USE_XML
   sessionOptions->info = (GGobiInitInfo*) g_malloc(sizeof(GGobiInitInfo));

@@ -304,7 +304,7 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
 
   d->nrows = nrows;
 
-  if(sessionOptions->verbose)
+  if(sessionOptions->verbose == GGOBI_VERBOSE)
     g_printerr ("size of data: %d x %d\n", d->nrows, d->ncols);
 
   if (nitems != d->nrows * d->ncols) {
