@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE xgobidata SYSTEM "xgobi.dtd">
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="1">
 
@@ -412,4 +412,5 @@ Reference (available on the web at pnas.org):
 0.680 0.630 0.700 0.720 0.740 0.680 0.650 0.790 1.000 4.000 14.000
 </record>
 </records>
+</data>
 </ggobidata>
