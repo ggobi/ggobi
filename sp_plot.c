@@ -118,8 +118,10 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
   gboolean draw_case;
 
   /*-- determine whether case m should be plotted --*/
+  /*-- usually checking sampled is redundant because we're looping
+       over rows_in_plot, but maybe we're not always --*/
   draw_case = true;
-  if (d->hidden_now.els[m]) {
+  if (d->hidden_now.els[m] || !d->sampled.els[m]) {
     draw_case = false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
@@ -987,90 +989,87 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
             for (j=0; j<e->edge.n; j++) {
 /*
- * I'm checking hidden_now here quite vigorously, but what about
- * sampled?   -- dfs
+ * I'm checking hidden_now and sampled here, but what about missings
+ * among the edge records?  Wouldn't know what variables to use in
+ * splot_plot_case, so leave it alone for now. -- dfs
 */
               doit = true;
-              if (e->hidden_now.els[j]) {
+              if (e->hidden_now.els[j] || !e->sampled.els[j]) {
                 doit = false;
               /*-- nels = d->rowid.idv.nels --*/
               } else if (endpoints[j].a >= nels || endpoints[j].b >= nels) {
                 doit = false;
               }
+              if (!doit)
+                continue;
 
-              if (doit) {
-                a = d->rowid.idv.els[endpoints[j].a];
-                b = d->rowid.idv.els[endpoints[j].b];
-                doit = (!d->hidden_now.els[a] && !d->hidden_now.els[b]);
+              a = d->rowid.idv.els[endpoints[j].a];
+              b = d->rowid.idv.els[endpoints[j].b];
+              /*
+               * This checks for hidden, sampled <and> missingness
+              */
+              doit = splot_plot_case (a, d, sp, display, gg) &&
+                     splot_plot_case (b, d, sp, display, gg);
 
-                /* If not plotting imputed values, and one is
-                 * missing, skip it */
-/*
-          if (!plot_imputed_values && plotted_var_missing(from, to, gg))
-            doit = false;
-*/
-              }
+              if (!doit)
+                continue;
 
-              if (doit) {
+              gtype = e->glyph_now.els[j].type;
+              if (gtype == FC || gtype == FR)
+                ltype = SOLID;
+              else if (gtype == OC || gtype == OR)
+                ltype = WIDE_DASH;
+              else ltype = NARROW_DASH;
 
-                gtype = e->glyph_now.els[j].type;
-                if (gtype == FC || gtype == FR)
-                  ltype = SOLID;
-                else if (gtype == OC || gtype == OR)
-                  ltype = WIDE_DASH;
-                else ltype = NARROW_DASH;
-
-                if (e->color_now.els[j] == p &&
-                    ltype == n &&
-                    e->glyph_now.els[j].size == k)
-                {
-
-                  if (edges_show_p) {
-                    if (endpoints[j].jpartner == -1) {
-                      sp->edges[nl].x1 = sp->screen[a].x;
-                      sp->edges[nl].y1 = sp->screen[a].y;
-                      sp->edges[nl].x2 = sp->screen[b].x;
-                      sp->edges[nl].y2 = sp->screen[b].y;
-                    } else {
-                      sp->edges[nl].x1 = sp->screen[a].x;
-                      sp->edges[nl].y1 = sp->screen[a].y;
-                      sp->edges[nl].x2 = sp->screen[a].x +
-                        (sp->screen[b].x - sp->screen[a].x) / 2;
-                      sp->edges[nl].y2 = sp->screen[a].y +
-                        (sp->screen[b].y - sp->screen[a].y) / 2;
-                    }
+              if (e->color_now.els[j] == p &&
+                  ltype == n &&
+                  e->glyph_now.els[j].size == k)
+              {
+                if (edges_show_p) {
+                  if (endpoints[j].jpartner == -1) {
+                    sp->edges[nl].x1 = sp->screen[a].x;
+                    sp->edges[nl].y1 = sp->screen[a].y;
+                    sp->edges[nl].x2 = sp->screen[b].x;
+                    sp->edges[nl].y2 = sp->screen[b].y;
+                  } else {
+                    sp->edges[nl].x1 = sp->screen[a].x;
+                    sp->edges[nl].y1 = sp->screen[a].y;
+                    sp->edges[nl].x2 = sp->screen[a].x +
+                      (sp->screen[b].x - sp->screen[a].x) / 2;
+                    sp->edges[nl].y2 = sp->screen[a].y +
+                      (sp->screen[b].y - sp->screen[a].y) / 2;
                   }
+                }
 
-                  if (arrowheads_show_p) {
-                    /*
-                     * Add thick piece of the lines to suggest a
-                     * directional arrow.  How thick should it be
-                     * compared to the current line thickness?
-                    */
-                    if (endpoints[j].jpartner == -1) {
-                      sp->arrowheads[nl].x1 =
-                        (gint) (.2*sp->screen[a].x + .8*sp->screen[b].x);
-                      sp->arrowheads[nl].y1 =
-                        (gint) (.2*sp->screen[a].y + .8*sp->screen[b].y);
-                      sp->arrowheads[nl].x2 = sp->screen[b].x;
-                      sp->arrowheads[nl].y2 = sp->screen[b].y;
-                    } else {  /*-- draw the partner's arrowhead --*/
+                if (arrowheads_show_p) {
+                  /*
+                   * Add thick piece of the lines to suggest a
+                   * directional arrow.  How thick should it be
+                   * compared to the current line thickness?
+                  */
+                  if (endpoints[j].jpartner == -1) {
+                    sp->arrowheads[nl].x1 =
+                      (gint) (.2*sp->screen[a].x + .8*sp->screen[b].x);
+                    sp->arrowheads[nl].y1 =
+                      (gint) (.2*sp->screen[a].y + .8*sp->screen[b].y);
+                    sp->arrowheads[nl].x2 = sp->screen[b].x;
+                    sp->arrowheads[nl].y2 = sp->screen[b].y;
+                  } else {  /*-- draw the partner's arrowhead --*/
 /*
  * Do I need to check whether j is a visible point in e?  -- dfs
 */
-                      gint jp = endpoints[j].jpartner;
-                      gint ja = d->rowid.idv.els[endpoints[jp].a];
-                      gint jb = d->rowid.idv.els[endpoints[jp].b];
-                      sp->arrowheads[nl].x1 =
-                        (gint) (.2*sp->screen[ja].x + .8*sp->screen[jb].x);
-                      sp->arrowheads[nl].y1 =
-                        (gint) (.2*sp->screen[ja].y + .8*sp->screen[jb].y);
-                      sp->arrowheads[nl].x2 = sp->screen[jb].x;
-                      sp->arrowheads[nl].y2 = sp->screen[jb].y;
-                    }
+                    gint jp = endpoints[j].jpartner;
+                    gint ja = d->rowid.idv.els[endpoints[jp].a];
+                    gint jb = d->rowid.idv.els[endpoints[jp].b];
+                    sp->arrowheads[nl].x1 =
+                      (gint) (.2*sp->screen[ja].x + .8*sp->screen[jb].x);
+                    sp->arrowheads[nl].y1 =
+                      (gint) (.2*sp->screen[ja].y + .8*sp->screen[jb].y);
+                    sp->arrowheads[nl].x2 = sp->screen[jb].x;
+                    sp->arrowheads[nl].y2 = sp->screen[jb].y;
                   }
-                  nl++;
                 }
+                nl++;
               }
             }  /*-- end of looping through edges --*/
 
