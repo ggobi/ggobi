@@ -221,11 +221,18 @@ record_colors_reset (gint selected_var, datad *d, ggobid *gg)
 {
   gint i, k, m;
   vartabled *vt = vartable_element_get (selected_var, d);
-  gfloat min = vt->lim_tform.min;
-  gfloat max = vt->lim_tform.max;
+  gfloat min;
+  gfloat max;
   gfloat val;
-  colorschemed *scheme = gg->activeColorScheme;
+  colorschemed *scheme;
 
+  if(selected_var < 0)
+      return;
+
+  scheme = gg->activeColorScheme;
+
+  min = vt->lim_tform.min;
+  max = vt->lim_tform.max;
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];
     for (k=0; k<scheme->n; k++) {
