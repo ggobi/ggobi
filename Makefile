@@ -90,23 +90,23 @@ ifdef DL_RESOLVE_FLAG
  DL_RESOLVE_PATH+=$(XML_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %)
 endif
 
- XML_LIBS=-lxml -lz
+ XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml -lz 
 
 main_ui.o: write_xml.h
 read_xml.o: read_xml.h
 endif
 
 ifdef USE_MYSQL
- CFLAGS+= $(MYSQL_INCLUDE_DIRS:%=-%I) -DUSE_MYSQL=1 -Wall -I$(PROPERTIES_INCLUDE_DIR)
+ CFLAGS+= $(MYSQL_INCLUDE_DIRS:%=-I%) -DUSE_MYSQL=1 -Wall -I$(PROPERTIES_INCLUDE_DIR) 
  MYSQL_LIBS=-lProps -lmysqlclient $(MYSQL_LIB_DIRS:%=-L%) $(MYSQL_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %) $(PROPERTIES_LIB_DIR:%=$(DL_RESOLVE_FLAG) %) $(PROPERTIES_LIB_DIR:%=-L%)
-
  SRC+=read_mysql.c
  OB+=read_mysql.o
   LD=$(CXX)
 endif
 
+
 ggobi: $(OB)
-	$(LD) $(OB) $(LDFLAGS) -o ggobi $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
+	$(LD) $(OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
 
 
 pure: ggobi.o $(OB)
