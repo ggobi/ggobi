@@ -117,15 +117,20 @@ parse_command_line (gint *argc, gchar **av)
       showHelp();
       exit(0);
     }
-    else if (strcmp (av[1], "-s") == 0)
+    else if (strcmp (av[1], "-s") == 0) {
       sessionOptions->data_mode = Sprocess_data;
-    else if (strcmp (av[1], "-csv") == 0)
+      sessionOptions->data_type = g_strdup(av[1]+1);
+    }
+    else if (strcmp (av[1], "-csv") == 0) {
       sessionOptions->data_mode = csv_data;
-    else if (strcmp (av[1], "-ascii") == 0) {
+      sessionOptions->data_type = g_strdup(av[1]+1);
+    } else if (strcmp (av[1], "-ascii") == 0) {
       sessionOptions->data_mode = ascii_data;
+      sessionOptions->data_type = g_strdup(av[1]+1);
     }
     else if (strcmp (av[1], "-xml") == 0) {
       sessionOptions->data_mode = xml_data;
+      sessionOptions->data_type = g_strdup(av[1]+1);
     } else if (strcmp (av[1], "-v") == 0 || strcmp (av[1], "--validate") == 0) {
       extern gint xmlDoValidityCheckingDefaultValue;
       xmlDoValidityCheckingDefaultValue = 1;
