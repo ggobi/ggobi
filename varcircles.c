@@ -30,11 +30,6 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
   GList *children = gtk_container_children (GTK_CONTAINER (d->vcirc_ui.table));
   gint n = 0;
 
-/*
-g_printerr ("0: nchildren = %d\n", g_list_length (children));
-g_printerr ("0: nboxes = %d\n", g_slist_length (d->vcirc_ui.vb));
-*/
-
   switch (projection) {
 
     case TOUR2D3:
@@ -100,9 +95,6 @@ g_printerr ("0: nboxes = %d\n", g_slist_length (d->vcirc_ui.vb));
         /* if in the subset but not among the children, pack and unref */
         if (display->t2d.subset_vars_p.els[j]) {
           if (g_list_index (children, box) == -1) {
-/*
-g_printerr ("box %d in subset but not among children; pack and unref\n", j);
-*/
             gtk_box_pack_start (GTK_BOX (d->vcirc_ui.table), box,
                                 false, false, 2);
             gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
@@ -113,25 +105,14 @@ g_printerr ("box %d in subset but not among children; pack and unref\n", j);
             if (G_OBJECT (box)->ref_count > 1)
 #endif
               gtk_widget_unref (box);
-          } else {
-/*
-g_printerr ("box %d in subset AND among children; do nothing\n", j);
-*/
           }
           n++;
 
         /* if not in the subset but among the children, ref and remove */
         } else { 
           if (g_list_index (children, box) >= 0) {
-/*
-g_printerr ("%d is not in subset but IS among children; ref & remove\n", j);
-*/
             gtk_widget_ref (box);
             gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), box);
-          } else {
-/*
-g_printerr ("%d is not in subset and is NOT among children; do nothing\n", j);
-*/
           }
         }
       }
@@ -169,12 +150,6 @@ g_printerr ("%d is not in subset and is NOT among children; do nothing\n", j);
     default:
     break;
   }
-
-/*
-children = gtk_container_children (GTK_CONTAINER (d->vcirc_ui.table));
-g_printerr ("1: nchildren = %d\n", g_list_length (children));
-g_printerr ("1: nboxes = %d\n", g_slist_length (d->vcirc_ui.vb));
-*/
 }
 
 GtkWidget *
