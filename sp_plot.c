@@ -17,8 +17,6 @@
 #include "vars.h"
 #include "externs.h"
 
-static void splot_add_point_label (splotd *, GdkDrawable *, gint, gboolean, ggobid *);
-static void splot_add_point_labels (splotd *, GdkDrawable *, ggobid *);
 static void splot_draw_border (splotd *, GdkDrawable *d, ggobid *);
 static void edges_draw (splotd *, ggobid *gg);
 
@@ -434,7 +432,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 
 /*-- add the nearest_point and sticky labels, plus a diamond for emphasis --*/
 void
-splot_add_point_label (splotd *sp, GdkDrawable *drawable,
+splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
@@ -524,8 +522,7 @@ splot_add_point_label (splotd *sp, GdkDrawable *drawable,
       break;
     }
   }
-  gdk_text_extents (style->font,  
-    lbl, strlen (lbl),
+  gdk_text_extents (style->font, lbl, strlen (lbl),
     &lbearing, &rbearing, &width, &ascent, &descent);
 
   /*-- underline the nearest point label?  --*/
@@ -552,14 +549,25 @@ splot_add_point_label (splotd *sp, GdkDrawable *drawable,
 }
 
 void
-splot_add_point_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
+splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
+  gint k, gboolean nearest, ggobid *gg)
+{
+}
+
+static void
+splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   gint id;
   GSList *l;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
+  gint mode = mode_get (gg);
 
-  if (d->nearest_point != -1)
-    splot_add_point_label (sp, drawable, d->nearest_point, true, gg);
+  if (d->nearest_point != -1) {
+    if (mode == IDENT || mode == MOVEPTS)
+      splot_add_identify_cues (sp, drawable, d->nearest_point, true, gg);
+    else if (mode == EDGEED)
+      splot_add_edgeedit_cues (sp, drawable, d->nearest_point, true, gg);
+  }
 
   if (d->sticky_ids != NULL &&
       g_slist_length (d->sticky_ids) > 0)
@@ -567,7 +575,7 @@ splot_add_point_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
     for (l = d->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
       /*-- false = !nearest --*/
-      splot_add_point_label (sp, drawable, id, false, gg);
+      splot_add_identify_cues (sp, drawable, id, false, gg);
     }
   }
 }
@@ -810,7 +818,9 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   }
      
   splot_add_plot_labels (sp, sp->pixmap1, gg);  /*-- axis labels --*/
-  splot_add_point_labels (sp, sp->pixmap1, gg);
+
+  /*-- identify, move points, edge editing --*/
+  splot_add_point_cues (sp, sp->pixmap1, gg);  
 
   if (sp == gg->current_splot) {
     splot_draw_border (sp, sp->pixmap1, gg);

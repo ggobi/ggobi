@@ -69,7 +69,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 }
 
 void
-displays_add_point_labels (splotd *splot, gint k, ggobid *gg) {
+displays_add_point_cues (splotd *splot, gint k, ggobid *gg) {
   GList *dlist, *slist;
   displayd *display;
   splotd *sp;
@@ -103,7 +103,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
  * sp = gtk_object_get_data (GTK_OBJECT (w), "splotd"));
 */
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+/*  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);*/
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
 
   k = find_nearest_point (&sp->mousepos, sp, d, gg);

@@ -45,7 +45,9 @@ void globals_init (ggobid *gg) {
 
 /*-- initialize variables which DO depend on the size of the data --*/
 void modes_init (datad *d, ggobid* gg) {
+  extern void edgeedit_init (ggobid *gg);
   brush_init (d, gg);
+  edgeedit_init (gg);
 }
 
 gboolean

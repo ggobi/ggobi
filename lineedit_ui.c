@@ -1,4 +1,4 @@
-/* edgeedit_ui.c */
+/* lineedit_ui.c */
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
@@ -22,9 +22,13 @@
 /*          Respond to buttons and menus in the panel                 */
 /*--------------------------------------------------------------------*/
 
-static void addordelete_cb (GtkToggleButton *button)
+static void addordelete_cb (GtkToggleButton *button, ggobid *gg)
 {
-  g_printerr("active %d\n", button->active);
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
+
+  cpanel->ee_adding_p = button->active;
+  cpanel->ee_deleting_p = !button->active;
 }
 static void undo_last_cb (GtkToggleButton *button)
 {
@@ -51,9 +55,39 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 }
 
 static gint
-motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
+motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
-  g_printerr ("(le_motion_notify_cb)\n");
+  displayd *display = sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
+  datad *d = display->d;
+  ggobid *gg = GGobiFromSPlot(sp);
+  gboolean button1_p, button2_p;
+  gint k;
+
+  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
+  k = find_nearest_point (&sp->mousepos, sp, d, gg);
+
+  if (cpanel->ee_adding_p) {
+    if (gg->edgeedit.a == -1) {  /*-- looking for starting point --*/
+
+      d->nearest_point = k;
+      if (k != d->nearest_point_prev) {
+        displays_plot (NULL, QUICK, gg);
+        d->nearest_point_prev = k;
+      }
+
+    } else {  /*-- found starting point; looking for ending point --*/
+
+      if (k != -1 && k != gg->edgeedit.a) {
+        d->nearest_point = k;
+
+        displays_plot (NULL, QUICK, gg);
+        /*-- add a dotted line from gg->edgeedit.a to gg->nearest_point --*/
+
+        d->nearest_point_prev = d->nearest_point;
+      }
+    }
+  }
 
   return true;
 }
@@ -68,10 +102,12 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
 
+/*
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
                                       (GtkSignalFunc) motion_notify_cb,
                                       (gpointer) sp);
+*/
 
   return true;
 }
@@ -162,7 +198,7 @@ cpanel_edgeedit_make (ggobid *gg) {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
     "Add new edges using the mouse", NULL);
   gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
-                      GTK_SIGNAL_FUNC (addordelete_cb), NULL);
+                      GTK_SIGNAL_FUNC (addordelete_cb), gg);
   gtk_box_pack_start (GTK_BOX (hb), radio1, false, false, 0);
 
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));

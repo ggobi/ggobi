@@ -17,7 +17,7 @@
 #include "externs.h"
 
 void
-edgeedit_init (displayd *display, ggobid *gg)
+edgeedit_init (ggobid *gg)
 {
   gg->edgeedit.a = -1;  /*-- index of point where new edge begins --*/
 }

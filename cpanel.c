@@ -24,17 +24,17 @@ scatterplot_cpanel_init (cpaneld *cpanel, gint initial_mode, ggobid *gg) {
   /*-- 1d plots --*/
   cpanel->p1d.type = TEXTURE;
   cpanel_p1d_init (cpanel, gg);
-
   cpanel_xyplot_init (cpanel, gg);
-
 #ifdef ROTATION_IMPLEMENTED
   cpanel_rotation_init (cpanel, gg);
 #endif
-  cpanel_brush_init (cpanel, gg);
-  cpanel_scale_init (cpanel, gg);
   cpanel_t2d_init (cpanel, gg);  /*-- tour_init, or tour2d_init? --*/
   cpanel_t1d_init (cpanel, gg);
   cpanel_tcorr_init (cpanel, gg);
+
+  cpanel_brush_init (cpanel, gg);
+  cpanel_scale_init (cpanel, gg);
+  cpanel_edgeedit_init (cpanel, gg);
 }
 
 void
@@ -94,19 +94,20 @@ cpanel_set (displayd *display, ggobid *gg) {
 #endif
       cpanel_brush_set (cpanel, gg);
       cpanel_scale_set (cpanel, gg);
-      break;
+      cpanel_edgeedit_set (cpanel, gg);
+    break;
     case scatmat:
       cpanel_brush_set (cpanel, gg);
-      break;
+    break;
     case parcoords:
       /*cpanel_p1d_set (cpanel);  write cpanel_parcoords_set (cpanel) */
       cpanel_brush_set (cpanel, gg);
-      break;
+    break;
     case tsplot:
       cpanel_brush_set (cpanel, gg);
-      break;
+    break;
     default:
-	return;
+	  return;
   }
 
   mode_set (cpanel->mode, gg);

@@ -97,6 +97,8 @@ void color_table_init (ggobid *);
 gchar* computeTitle (gboolean, displayd *, ggobid *);
 void copy_mat(gfloat **, gfloat **, gint, gint);
 void cpanel_brush_init (cpaneld *, ggobid *);
+void cpanel_edgeedit_init (cpaneld *, ggobid *);
+void cpanel_edgeedit_set (cpaneld *, ggobid *);
 void cpanel_brush_make (ggobid *);
 void cpanel_brush_set (cpaneld *, ggobid *);
 void cpanel_ctour_make (ggobid *);

@@ -101,8 +101,6 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
   gint i, k;
   gboolean horiz, vert;
 
-  extern void displays_add_point_labels (splotd *splot, gint k, ggobid *gg);
-
   horiz = gg->movepts.direction == horizontal || gg->movepts.direction == both;
   vert = gg->movepts.direction == vert || gg->movepts.direction == both;
 
@@ -147,12 +145,5 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
   /* and now forward again, all the way ... */
   tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_ALL, gg);
-
-/*
- *if (k != -1) {
- *  splot_add_point_label (sp, id, true, gg);
- *  displays_add_point_labels (sp, id, gg);
- *}
-*/
 }
 

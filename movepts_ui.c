@@ -203,6 +203,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   ggobid *gg = GGobiFromSPlot (sp);
+  datad *d = display->d;
 
   gg->current_splot = sp;
 
@@ -215,6 +216,10 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       sp->motion_id = 0;
     }
   }
+
+  d->nearest_point_prev = d->nearest_point;
+  d->nearest_point = -1;
+  displays_tailpipe (REDISPLAY_ALL, gg);
 
   return retval;
 }
