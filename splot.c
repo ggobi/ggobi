@@ -338,7 +338,7 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
      * adequate -- and it's probably overkill sometimes, too.
     */
     if (state == on) {
-      varpanel_refresh (gg);
+      varpanel_refresh (display, gg);
     }
   }
 }

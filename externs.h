@@ -448,10 +448,10 @@ void       variable_notebook_subwindow_add (datad *d, GtkSignalFunc func, GtkWid
 void       variable_notebook_varchange_cb (GtkObject *obj, vartabled *vt, ggobid *gg, GtkWidget *notebook);
 void       varpanel_clear (datad *, ggobid *);
 void       varpanel_make (GtkWidget *, ggobid *);
-void       varpanel_refresh (ggobid *);
+void       varpanel_refresh (displayd *, ggobid *);
 void       varpanel_reinit (ggobid *gg);
 void       varpanel_show_page (displayd*, ggobid*);
-void       varpanel_tooltips_set (ggobid *);
+void       varpanel_tooltips_set (displayd *, ggobid *);
 void       varsel (cpaneld *, splotd *, gint jvar, gint btn, gint alt_mod, gint ctrl_mod, gint shift_mod, datad *, ggobid *);
 void       vars_stdized_send_event (datad *d, ggobid *gg);
 void       vartable_alloc (datad *);

@@ -45,7 +45,7 @@ p1d_activate (gint state, displayd *display, ggobid *gg)
       if (sp->p1dvar >= d->ncols)
         sp->p1dvar = 0;
     }
-    varpanel_refresh (gg);
+    varpanel_refresh (display, gg);
   } else {
     /*
      * Turn cycling off when leaving the mode, but don't worry
@@ -252,7 +252,7 @@ p1dcycle_func (ggobid *gg)
   if (varno != sp->p1dvar) {
     jvar_prev = sp->p1dvar;
     if (p1d_varsel (sp, varno, &jvar_prev, -1)) {
-      varpanel_refresh (gg);
+      varpanel_refresh (display, gg);
       display_tailpipe (display, FULL, gg);
     }
   }

@@ -398,7 +398,7 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
 
   display_add (display, gg);
 
-  varpanel_refresh (gg);
+  varpanel_refresh (display, gg);
 
   g_free (selected_vars);
 
@@ -701,7 +701,7 @@ display_set_current (displayd *new_display, ggobid *gg)
   varpanel_show_page (gg->current_display, gg);
   vartable_show_page (gg->current_display, gg);
 
-  varpanel_tooltips_set (gg);
+  varpanel_tooltips_set (gg->current_display, gg);
 
   gtk_accel_group_lock (gg->main_accel_group);
   gg->firsttime = false;

@@ -274,8 +274,8 @@ viewmode_set (PipelineMode m, ggobid *gg)
 
   gg->prev_viewmode = gg->viewmode;
 
-  varpanel_tooltips_set (gg);
-  varpanel_refresh (gg);
+  varpanel_tooltips_set (display, gg);
+  varpanel_refresh (display, gg);
 }
 
 /*

@@ -260,128 +260,137 @@ varpanel_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
 
 /*-- here's where we'd reset what's selected according to the current mode --*/
 void
-varpanel_refresh (ggobid *gg) {
+varpanel_refresh (displayd *display, ggobid *gg) {
   gint j;
-  displayd *display = gg->current_display;
   splotd *sp = gg->current_splot;
   cpaneld *cpanel = &display->cpanel;
+  GList *l;
+  datad *d = display->d;
+
+/*
   gint nd = g_slist_length (gg->d);
   gint k;
-  GList *l;
-
+  displayd *display = gg->current_display;
   if (nd > 0 && sp != NULL) {
+*/
 
+  if (sp != NULL && d != NULL) {
+
+/*
     for (k=0; k<nd; k++) {
       datad *d = (datad*) g_slist_nth_data (gg->d, k);
       if (display->d != d)
-        ;  /*-- we will only deal with the current datad --*/
+        ;
       else {
+*/
 
-        switch (display->displaytype) {
+    switch (display->displaytype) {
 
-          case parcoords:
-            for (j=0; j<d->ncols; j++) {
-              varpanel_toggle_set_active (VARSEL_X, j, false, d);
-              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-            }
-
-            l = display->splots;
-            while (l) {
-              j = ((splotd *) l->data)->p1dvar;
-              varpanel_toggle_set_active (VARSEL_X, j, true, d);
-              l = l->next;
-            }
-          break;
-
-          case scatmat:
-            for (j=0; j<d->ncols; j++) {
-              varpanel_toggle_set_active (VARSEL_X, j, false, d);
-              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-            }
-            l = display->scatmat_cols;  /*-- assume rows = cols --*/
-            while (l) {
-              j = GPOINTER_TO_INT (l->data);
-              varpanel_toggle_set_active (VARSEL_X, j, true, d);
-              l = l->next;
-            }
-          break;
-
-          case tsplot:
-            for (j=0; j<d->ncols; j++) {
-              varpanel_toggle_set_active (VARSEL_X, j, false, d);
-              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-              varpanel_widget_set_visible (VARSEL_Y, j, true, d);
-            }
-
-            l = display->splots;
-            while (l) {
-              j = ((splotd *) l->data)->xyvars.y;
-              varpanel_toggle_set_active (VARSEL_Y, j, true, d);
-              j = ((splotd *) l->data)->xyvars.x;
-              varpanel_toggle_set_active (VARSEL_X, j, true, d);
-              l = l->next;
-            }
-          break;
-
-          case scatterplot:
-            switch (cpanel->projection) {
-              case P1PLOT:
-                for (j=0; j<d->ncols; j++) {
-                  varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-                  varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-
-                  varpanel_toggle_set_active (VARSEL_X, j, j == sp->p1dvar, d);
-                }
-              break;
-              case XYPLOT:
-                for (j=0; j<d->ncols; j++) {
-                  varpanel_toggle_set_active (VARSEL_X, j, 
-                    (j == sp->xyvars.x), d);
-                  varpanel_widget_set_visible (VARSEL_Y, j, true, d);
-                  varpanel_toggle_set_active (VARSEL_Y, j, 
-                    (j == sp->xyvars.y), d);
-                }
-              break;
-              /*-- to pacify compiler --*/
-              case NULLMODE:
-              case TOUR2D:
-              case TOUR1D:
-              case COTOUR:
-              case ROTATE:
-              case SCALE:
-              case BRUSH:
-              case IDENT:
-              case EDGEED:
-              case MOVEPTS:
-              case SCATMAT:
-              case PCPLOT:
-              case TSPLOT:
-#ifdef BARCHART_IMPLEMENTED
-              case BARCHART:
-#endif
-              case NMODES:
-              break;
-          }
-          break;
-
-#ifdef BARCHART_IMPLEMENTED
-          case barchart:
-            for (j=0; j<d->ncols; j++) {
-              varpanel_toggle_set_active (VARSEL_X, j, (j == sp->p1dvar), d);
-              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-            }
-          break;
-#endif
-
-          case unknown_display_type:
-          break;
+      case parcoords:
+        for (j=0; j<d->ncols; j++) {
+          varpanel_toggle_set_active (VARSEL_X, j, false, d);
+          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+          varpanel_widget_set_visible (VARSEL_Y, j, false, d);
         }
+
+        l = display->splots;
+        while (l) {
+          j = ((splotd *) l->data)->p1dvar;
+          varpanel_toggle_set_active (VARSEL_X, j, true, d);
+          l = l->next;
+        }
+      break;
+
+      case scatmat:
+        for (j=0; j<d->ncols; j++) {
+          varpanel_toggle_set_active (VARSEL_X, j, false, d);
+          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+          varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+        }
+        l = display->scatmat_cols;  /*-- assume rows = cols --*/
+        while (l) {
+          j = GPOINTER_TO_INT (l->data);
+          varpanel_toggle_set_active (VARSEL_X, j, true, d);
+          l = l->next;
+        }
+      break;
+
+      case tsplot:
+        for (j=0; j<d->ncols; j++) {
+          varpanel_toggle_set_active (VARSEL_X, j, false, d);
+          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+          varpanel_widget_set_visible (VARSEL_Y, j, true, d);
+        }
+
+        l = display->splots;
+        while (l) {
+          j = ((splotd *) l->data)->xyvars.y;
+          varpanel_toggle_set_active (VARSEL_Y, j, true, d);
+          j = ((splotd *) l->data)->xyvars.x;
+          varpanel_toggle_set_active (VARSEL_X, j, true, d);
+          l = l->next;
+        }
+      break;
+
+      case scatterplot:
+        switch (cpanel->projection) {
+          case P1PLOT:
+            for (j=0; j<d->ncols; j++) {
+              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+
+              varpanel_toggle_set_active (VARSEL_X, j, j == sp->p1dvar, d);
+            }
+          break;
+          case XYPLOT:
+            for (j=0; j<d->ncols; j++) {
+              varpanel_toggle_set_active (VARSEL_X, j, 
+                (j == sp->xyvars.x), d);
+              varpanel_widget_set_visible (VARSEL_Y, j, true, d);
+              varpanel_toggle_set_active (VARSEL_Y, j, 
+                (j == sp->xyvars.y), d);
+            }
+          break;
+          /*-- to pacify compiler --*/
+          case NULLMODE:
+          case TOUR2D:
+          case TOUR1D:
+          case COTOUR:
+          case ROTATE:
+          case SCALE:
+          case BRUSH:
+          case IDENT:
+          case EDGEED:
+          case MOVEPTS:
+          case SCATMAT:
+          case PCPLOT:
+          case TSPLOT:
+#ifdef BARCHART_IMPLEMENTED
+          case BARCHART:
+#endif
+          case NMODES:
+          break;
       }
+      break;
+
+#ifdef BARCHART_IMPLEMENTED
+      case barchart:
+        for (j=0; j<d->ncols; j++) {
+          varpanel_toggle_set_active (VARSEL_X, j, (j == sp->p1dvar), d);
+          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+          varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+        }
+      break;
+#endif
+
+      case unknown_display_type:
+      break;
     }
   }
+/*
+    }
+  }
+*/
 }
 
 /*-- responds to a button_press_event --*/
@@ -431,7 +440,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 
     /*-- general variable selection --*/
     varsel (cpanel, sp, jvar, button, alt_mod, ctrl_mod, shift_mod, d, gg);
-    varpanel_refresh (gg);
+    varpanel_refresh (display, gg);
     return true;
   }
 
@@ -600,18 +609,21 @@ GGOBI(selectScatterplotX) (gint jvar, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-varpanel_tooltips_set (ggobid *gg) 
+varpanel_tooltips_set (displayd *display, ggobid *gg) 
 {
-  displayd *display = gg->current_display;
   gint projection = projection_get (gg);
-  gint j, k;
-  gint nd = g_slist_length (gg->d);
-  datad *d;
+  gint j;
+  datad *d = display->d;
   GtkWidget *wx, *wy, *label;
 
   /*-- for each datad --*/
+/*
+  gint k;
+  gint nd = g_slist_length (gg->d);
+  displayd *display = gg->current_display;
   for (k=0; k<nd; k++) {
     d = (datad*) g_slist_nth_data (gg->d, k);
+*/
     /*-- for each variable --*/
     for (j=0; j<d->ncols; j++) {
       if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
@@ -732,5 +744,5 @@ varpanel_tooltips_set (ggobid *gg)
         break;
       }
     }
-  }
+  /*}*/
 }

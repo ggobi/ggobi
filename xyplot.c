@@ -34,7 +34,7 @@ xyplot_activate (gint state, displayd *display, ggobid *gg)
       }
     }
     if (reset)
-      varpanel_refresh (gg);
+      varpanel_refresh (display, gg);
   } else {
     /*
      * Turn cycling off when leaving the mode, but don't worry
@@ -134,7 +134,7 @@ cycle_fixedx (splotd *sp, displayd *display, datad *d, ggobid *gg)
   if (varno != sp->xyvars.y) {
     jvar_prev = sp->xyvars.y;
     if (xyplot_varsel (sp, varno, &jvar_prev, 2)) {
-      varpanel_refresh (gg);
+      varpanel_refresh (display, gg);
       display_tailpipe (display, FULL, gg);
     }
   }
@@ -173,7 +173,7 @@ cycle_fixedy (splotd *sp, displayd *display, datad *d, ggobid *gg)
   if (varno != sp->xyvars.x) {
     jvar_prev = sp->xyvars.x;
     if (xyplot_varsel (sp, varno, &jvar_prev, 1))
-      varpanel_refresh (gg);
+      varpanel_refresh (display, gg);
       display_tailpipe (display, FULL, gg);
   }
 }
@@ -241,7 +241,7 @@ cycle_xy (splotd *sp, displayd *display, datad *d, ggobid *gg)
   }
 
   if (redraw) {
-    varpanel_refresh (gg);
+    varpanel_refresh (display, gg);
     display_tailpipe (display, FULL, gg);
   }
 }

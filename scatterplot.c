@@ -157,6 +157,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   GtkWidget *table, *vbox, *w;
   GtkItemFactory *factory;
   displayd *display;
+  PipelineMode projection;
 
   if (d == NULL || d->ncols < 1)
     return (NULL);
@@ -173,9 +174,8 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
     display->options.axes_center_p = true;
    */
 
-  scatterplot_cpanel_init (&display->cpanel,
-    (d->ncols >= 2) ? XYPLOT : P1PLOT, gg);
-
+  projection = (d->ncols >= 2) ? XYPLOT : P1PLOT;
+  scatterplot_cpanel_init (&display->cpanel, projection, gg);
 
   display_window_init (display, 3, gg);  /*-- 3 = width = any small int --*/
 
@@ -286,9 +286,9 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
                     0, 0 );
 
   gtk_widget_show_all (display->window);
-  
+
   /*-- hide any extraneous rulers --*/
-  scatterplot_show_rulers (display, projection_get (gg));
+  scatterplot_show_rulers (display, projection);
   ruler_ranges_set (true, display, sp, gg);
 
   return display;

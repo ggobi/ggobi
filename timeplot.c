@@ -115,7 +115,7 @@ tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
   display_tailpipe (display, FULL, gg);
 
-  varpanel_refresh (gg);
+  varpanel_refresh (display, gg);
 }
 
 
