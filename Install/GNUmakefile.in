@@ -99,13 +99,13 @@ ggobirc: Plugins
 
 Rggobi: @EMBED_LIB@
 	if test -d Rggobi ; then \
-		@R_BIN@ INSTALL -c @R_PKG_DIR@ $@  ; \
+		@R_BIN@ CMD INSTALL -c @R_PKG_DIR@ $@  ; \
 	else \
 		echo "No Rggobi directory here. Untar the Rggobi distribution first!" ; \
 	fi
 
 
-#	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)
+#	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ CMD INSTALL -c @R_PKG_DIR@ $@)
 
 Python: @EMBED_LIB@
 	@if test -d Python ; then \
