@@ -8,6 +8,8 @@
 #include <gtk/gtk.h>
 #include "write_xml.h"
 
+#include <string.h>
+
 gint
 main (gint argc, gchar *argv[])
 {
