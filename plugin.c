@@ -326,17 +326,19 @@ runInteractiveInputPlugin(ggobid *gg)
     for(; l; l = l->next) {
 	plugin =  (GGobiInputPluginInfo*) l->data;
         if(plugin->interactive) {
-            InputGetDescription f;
-            f = (InputGetDescription) getPluginSymbol(plugin->getDescription, &plugin->details);
-            if(f) {
-		InputDescription *desc;
-                desc = f(NULL, NULL, gg, plugin);
-                if(desc && desc->read_input) {
-		    gg->input = desc;
-                    desc->read_input(desc, gg);
-                    break;
+	    if(!sessionOptions->data_type || strcmp(sessionOptions->data_type, plugin->modeName) == 0) {
+		InputGetDescription f;
+		f = (InputGetDescription) getPluginSymbol(plugin->getDescription, &plugin->details);
+		if(f) {
+		    InputDescription *desc;
+		    desc = f(NULL, NULL, gg, plugin);
+		    if(desc && desc->read_input) {
+			gg->input = desc;
+			desc->read_input(desc, gg);
+			break;
+		    }
 		}
-	    }
+	}
 	}
     }
 
