@@ -17,4 +17,4 @@ createDist:: $(DEPS)
 	cp $(HEADERS:%=%.h) $(INSTALL_DIR)/$(DIR_NAME)
 	cp $(SRC:%=%.c) $(INSTALL_DIR)/$(DIR_NAME)
 	if test ! -d $(INSTALL_DIR)/$(DIR_NAME)/Docs ; then mkdir $(INSTALL_DIR)/$(DIR_NAME)/Docs ; fi
-	cp $(DOCS:%=Docs/%) $(INSTALL_DIR)/$(DIR_NAME)/Docs
+	if test -s "$(DOCS)" ; then cp $(DOCS:%=Docs/%) $(INSTALL_DIR)/$(DIR_NAME)/Docs ; fi
