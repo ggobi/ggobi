@@ -217,7 +217,7 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
 
     display->splots = g_list_append (display->splots, (gpointer) sp);
     gtk_box_pack_start (GTK_BOX (gg->tsplot.arrangement_box),
-      sp->da, true, true, 0);
+			sp->da, true, true, 0);
   }
 
   gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
