@@ -30,3 +30,80 @@ Variable gui:
 Variable table:
   finding out which variables are active works differently in
     each display type
+
+-----
+
+In order to add a display as a new plugin, here are some of
+the requirements:
+
+Here are some thoughts about what a display and an splot are going
+to need to handle.  I think this is definitely worth pursuing, but
+it sure isn't trivial.
+
+Does the new display type have to be added to the list of display
+types and also to the list of PipelineModes?  It might, because  
+it has to get onto the viewmode menu as well as onto the display 
+menu.
+
+It needs to be able to respond when a new viewmode is selected,
+whether it's from the API or the menus -- this is because all  
+displays except the scatterplot are also viewmodes.
+  viewmode_set
+  viewmode_activate
+  
+It needs routines for drawing the variable selection panel,
+and for doing variable selection. 
+  varpanel_reinit
+  varpanel_refresh
+  varpanel_tooltips_set
+  varsel
+  
+It needs routines for initializing the control panel variables,
+and for copying them in and out of the control panel widgets,  
+as well as for building the control panel.
+  cpanel_init
+  cpanel_set 
+  cpanel_build
+
+It needs to be able to allocate and create a new display,
+and react when one of its own displays becomes the current
+display.
+  display_create
+  display_alloc_init
+  display_set_current
+  computeTitle
+  
+It needs to specify which 'actions' it can handle, so I
+should reorganize the code in
+  display_type_handles_action
+  
+As we said the other day, we don't really have splot types,
+but we might need them -- we may as well, because one could
+imagine a special display that contained (eg) a map and a  
+scatterplot.  An splot needs
+  splot_alloc 
+  splot_free  
+  a pipeline:  scatterplots use these; barcharts and maps might use
+   something else:
+      splot_world_to_plane
+      splot_plane_to_screen
+      
+Even if it's a scatterplot, it might still need special routines
+for drawing, adding labels, points, lines and other decorations.
+Those often differ strongly from display to display.
+
+Lots of code in sp_plot.c has to be reorganized, because each
+splot also has to have a routine that tells whether each case
+should be plotted 
+  draw_case_p
+  
+And of course, if the splot isn't a scatterplot, it will need its
+own interaction routines -- brushing and identification will
+certainly be different.
+
+Splots may may have their own unique interactions, too, like
+reordering bars in a barchart.  If this interaction needs its own
+widgets and viewmode, it could live on the display's own viewmode
+control panel, but it might also want its own new and unique
+viewmodes.
+
