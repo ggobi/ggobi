@@ -1,3 +1,4 @@
+<plugins>
 <plugin name="R" providesLanguage="R">
    <description>Loads the R engine for use by other plugins</description>
    <author>Duncan Temple Lang</author>
@@ -12,6 +13,7 @@
    <dll name="/home/duncan/Projects/ggobi/ggobi/plugins/R/Rplugin.so">
     <init onLoad="loadR" processPlugin="R_processPlugin" />
   </dll>
+  <documentation href="Rplugin.xml"/>
 </plugin>
 
 <plugin name="Rtest" language="R">
@@ -39,3 +41,4 @@
   <init onLoad="plugins/R/R/help.R" onCreate="createRHelpPluginInstance" />
  </dll>
 </plugin>
+</plugins>

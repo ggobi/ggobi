@@ -1,12 +1,5 @@
 #include "RSCommon.h"
-#include "REval.h"
-
 #include "plugin.h"
-
-#if 0
-#include "read_xml.h"
-#endif
-
 #include "GGobiAPI.h"
 
 
@@ -82,7 +75,7 @@ Rg_evalCmd(const char *cmd)
     SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(cmd));
     SET_TAG(CDR(e), Rf_install("text"));
 
-    val = tryEval(e, &errorOccurred);
+    val = R_tryEval(e, R_GlobalEnv, &errorOccurred);
     if(errorOccurred) {
 	fprintf(stderr, "Cannot parse the command\n");fflush(stderr);
         UNPROTECT(1);
@@ -92,7 +85,7 @@ Rg_evalCmd(const char *cmd)
     SETCAR(e, Rf_install("eval"));
     SETCAR(CDR(e), val);
     SET_TAG(CDR(e), NULL_USER_OBJECT);
-    val = tryEval(e, &errorOccurred);
+    val = R_tryEval(e, R_GlobalEnv, &errorOccurred);
     if(errorOccurred) {
 	fprintf(stderr, "There was a problem\n");fflush(stderr);
 	return(NULL_USER_OBJECT);
@@ -114,7 +107,7 @@ Rsource(const char *name)
      SETCAR(CDR(e), tmp = NEW_CHARACTER(1));
      SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(name));
 
-     val = tryEval(e, &errorOccurred);
+     val = R_tryEval(e, R_GlobalEnv, &errorOccurred);
      if(errorOccurred) {
 	 fprintf(stderr, "Failed to source %s\n", name);fflush(stderr);
      }
@@ -145,7 +138,7 @@ R_createRef(void *ptr, const char *className)
     USER_OBJECT_ val;
     USER_OBJECT_ klass;
 
-    PROTECT(val = R_MakeExternalPtr(ptr, Rf_install((char *) className), NULL));
+    PROTECT(val = R_MakeExternalPtr(ptr, Rf_install((char *) className), R_NilValue));
     PROTECT(klass = NEW_CHARACTER(1));
     SET_STRING_ELT(klass, 0, COPY_TO_USER_STRING(className));
     SET_CLASS(val, klass);
@@ -191,7 +184,7 @@ RCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 	tmp = CDR(tmp);
         SETCAR(tmp, argsToCharacter(plugin->details->args));
 
-	obj = tryEval(e, &wasError);
+	obj = R_tryEval(e, R_GlobalEnv, &wasError);
 
 	if(!wasError && obj && obj != NULL_USER_OBJECT) {
             RRunTimeData *runTime;
@@ -218,7 +211,7 @@ RDestroyPlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 
     PROTECT(e = allocVector(LANGSXP, 1));
     SETCAR(e, VECTOR_ELT(obj, 0));
-    tryEval(e, NULL);
+    R_tryEval(e, R_GlobalEnv, NULL);
     UNPROTECT(1);
     R_ReleaseObject(obj);
     g_free(d);
@@ -247,7 +240,7 @@ RUpdateDisplayMenu(ggobid *gg, PluginInstance *inst)
 
     PROTECT(e = allocVector(LANGSXP, 1));
     SETCAR(e, VECTOR_ELT(obj, 1));
-    tryEval(e, NULL);
+    R_tryEval(e, R_GlobalEnv, NULL);
     UNPROTECT(1);
 
     return(true);
@@ -272,7 +265,7 @@ getDims(int *nrow, int *ncol, USER_OBJECT_ obj)
     int wasError;
     PROTECT(e = allocVector(LANGSXP, 1));
     SETCAR(e, VECTOR_ELT(obj, GET_DIMS));
-    val = tryEval(e, &wasError);
+    val = R_tryEval(e, R_GlobalEnv, &wasError);
     if(!wasError) {
 	*nrow = INTEGER_DATA(val)[0];
 	*ncol = INTEGER_DATA(val)[1];
@@ -288,7 +281,7 @@ getVariableNames(USER_OBJECT_ obj)
     int wasError;
     PROTECT(e = allocVector(LANGSXP, 1));
     SETCAR(e, VECTOR_ELT(obj, GET_VARIABLE_NAMES));
-    val = tryEval(e, &wasError);
+    val = R_tryEval(e, R_GlobalEnv, &wasError);
     UNPROTECT(1);
 
     return(val);
@@ -326,7 +319,7 @@ gboolean init = true;
     for(i = 0 ; i < nrow; i++) {
 	USER_OBJECT_ els;
 	INTEGER_DATA(tmp)[0] = i+1;
-	els = tryEval(e, &wasError);
+	els = R_tryEval(e, R_GlobalEnv, &wasError);
         for(j = 0; j < ncol; j++)
 	    gdata->raw.vals[i][j] = NUMERIC_DATA(els)[j];
     }
@@ -367,7 +360,7 @@ R_GetInputDescription(const char * const fileName, const char * const modeName,
 
    SETCAR(CDR(CDR(CDR(CDR(e)))), argsToCharacter(info->details->args));
 
-    obj = tryEval(e, &wasError);
+    obj = R_tryEval(e, R_GlobalEnv, &wasError);
     if(!wasError) {
 	desc = g_malloc(sizeof(InputDescription));
 	memset(desc, '\0', sizeof(InputDescription));

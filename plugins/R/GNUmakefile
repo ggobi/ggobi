@@ -20,7 +20,8 @@ endif
 
 R_LIBS=-L$(R_HOME)/bin -lR
 
-SRC=R REval
+SRC=R
+# REval
 OBJS=$(SRC:%=%.o)
 
 CFLAGS+= -g -Wall -I$(R_HOME)/include $(GGOBI_INCLUDE_DIR)  $(shell $(GTK_CONFIG) --cflags) -I$(OMEGA_HOME)/include/Corba -D_R_=1 -DUSE_R=1
