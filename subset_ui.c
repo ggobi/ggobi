@@ -51,6 +51,7 @@ datad_get_from_widget (GtkWidget *w, ggobid *gg)
       GList *selection = GTK_CLIST (clist)->selection;
       if (selection) {
         gint kd = (gint) selection->data;
+        /*-- Assume that all datad's are included --*/
         if (kd >= 0) d = (datad *) g_slist_nth_data (gg->d, kd);
       }
     }
@@ -120,6 +121,7 @@ static void
 subset_datad_set_cb (GtkWidget *cl, gint row, gint column,
   GdkEventButton *event, ggobid *gg)
 {
+  /*-- Assume that all datad's are included --*/
   datad *d = g_slist_nth_data (gg->d, row);
   if (d)
     subset_display_update (d, gg);
@@ -296,6 +298,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
         (GtkSignalFunc) subset_clist_datad_added_cb, GTK_OBJECT (clist));
       /*-- --*/
 
+      /*-- All datad's are included. This assumption is used in two places. */
       for (l = gg->d; l; l = l->next) {
         d = (datad *) l->data;
         subset_init (d, gg);
