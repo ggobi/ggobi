@@ -375,7 +375,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
    * have no variables, we don't want creating a datad to trigger
    * the initialization of this plot.   This takes care of it.
   */
-  sessionOptions->info->createInitialScatterPlot = false;
+  GGOBI_getSessionOptions()->info->createInitialScatterPlot = false;
   /*-- --*/
 
   dnew = datad_create (nvisible, nc, gg);
