@@ -286,7 +286,9 @@ typedef struct
     void (*move_points_motion_cb)(displayd *, splotd *, GtkWidget *w, GdkEventMotion *event, ggobid *);
     void (*move_points_button_cb)(displayd *, splotd *, GtkWidget *w, GdkEventButton *event, ggobid *);
 
+/* XXX duncan and dfs: you need to sort this out
     void (*world_to_raw)(displayd *, splotd *, gint, datad *, ggobid *);
+*/
     void (*viewmode_set)(displayd *, ggobid *);
 
     gboolean (*varcircle_draw)(displayd *, gint jvar, GdkPixmap *da_pix, ggobid *gg);

@@ -30,6 +30,7 @@ movePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *
     scatterplotMovePointsButtonCb(display, sp, w, event, gg);
 }
 
+/* XXX duncan and dfs: you need to sort this out
 static void
 worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
 {
@@ -38,6 +39,7 @@ worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
     world_to_raw_by_var (pt, sp->xyvars.y, display, d, gg);
   }
 }
+*/
 
 
 static gint 
@@ -176,7 +178,9 @@ scatmatDisplayClassInit(GtkGGobiScatmatDisplayClass *klass)
 	klass->parent_class.xml_describe = add_xml_scatmat_variables;
 	klass->parent_class.move_points_motion_cb = movePointsMotionCb;
 	klass->parent_class.move_points_button_cb = movePointsButtonCb;
+/* XXX duncan and dfs: you need to sort this out
 	klass->parent_class.world_to_raw = worldToRaw;
+*/
 	klass->parent_class.variable_plotted_p = variablePlottedP;
 	klass->parent_class.variable_select = variableSelect;
 	klass->parent_class.varpanel_refresh = varpanelRefresh;

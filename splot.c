@@ -135,91 +135,89 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
     if(klass->splot_key_event_handler) 
          action = klass->splot_key_event_handler(display, sp, event->keyval);
   }
-  if(action < 0) {
 
-  switch (event->keyval) {
-   case GDK_0:
-   case GDK_1:
-  case GDK_2:
-  case GDK_3:
-  case GDK_4:
-  case GDK_5:
-  case GDK_6:
-  case GDK_7:
-  case GDK_8:
-  case GDK_9:
-    if (gg->NumberedKeyEventHandler != NULL &&
-        gg->NumberedKeyEventHandler->handlerRoutine)
-    {
-      (gg->NumberedKeyEventHandler->handlerRoutine)(event->keyval, w, event,
-         cpanel, sp, gg, gg->NumberedKeyEventHandler->userData);
-    }
-  break;
+  if(action < 0) {
+    switch (event->keyval) {
+    case GDK_0:
+    case GDK_1:
+    case GDK_2:
+    case GDK_3:
+    case GDK_4:
+    case GDK_5:
+    case GDK_6:
+    case GDK_7:
+    case GDK_8:
+    case GDK_9:
+      if (gg->NumberedKeyEventHandler != NULL &&
+          gg->NumberedKeyEventHandler->handlerRoutine)
+      {
+        (gg->NumberedKeyEventHandler->handlerRoutine)(event->keyval, w, event,
+           cpanel, sp, gg, gg->NumberedKeyEventHandler->userData);
+      }
+    break;
 
 /*
  * I'm not happy about these, since a display type is not a mode.
  * Maybe I'll think of a better way some day.
 */
-  case GDK_l:
-  case GDK_L:
-    action = PCPLOT;
-  break;
+    case GDK_l:
+    case GDK_L:
+      action = PCPLOT;
+    break;
 
-  case GDK_a:
-  case GDK_A:
-    action = SCATMAT;
-  break;
-
+    case GDK_a:
+    case GDK_A:
+      action = SCATMAT;
+    break;
 /* */
 
-  case GDK_d:
-  case GDK_D:
-    action = P1PLOT;
-  break;
-  case GDK_x:
-  case GDK_X:
-    action = XYPLOT;
-  break;
-  case GDK_t:
-  case GDK_T:
-    action = TOUR1D;
-  break;
-  case GDK_r:
-  case GDK_R:
-    action = TOUR2D3;
-  break;
-  case GDK_g:
-  case GDK_G:
-    action = TOUR2D;
-  break;
-  case GDK_c:
-  case GDK_C:
-    action = COTOUR;
-  break;
-  case GDK_s:
-  case GDK_S:
-    action = SCALE;
-  break;
-  case GDK_b:
-  case GDK_B:
-    action = BRUSH;
-  break;
-  case GDK_i:
-  case GDK_I:
-    action = IDENT;
-  break;
-  case GDK_e:
-  case GDK_E:
-    action = EDGEED;
-  break;
-  case GDK_m:
-  case GDK_M:
-    action = MOVEPTS;
-  break;
-  default:
-    /* g_printerr ("splot key_press: %d\n", event->keyval); */
-    common_event = false;
-  }
+    case GDK_d:
+    case GDK_D:
+      action = P1PLOT;
+    break;
+    case GDK_x:
+    case GDK_X:
+      action = XYPLOT;
+    break;
+    case GDK_t:
+    case GDK_T:
+      action = TOUR1D;
+    break;
+    case GDK_r:
+    case GDK_R:
+      action = TOUR2D3;
+    break;
+    case GDK_g:
+    case GDK_G:
+      action = TOUR2D;
+    break;
+    case GDK_c:
+    case GDK_C:
+      action = COTOUR;
+    break;
+    case GDK_s:
+    case GDK_S:
+      action = SCALE;
+    break;
+    case GDK_b:
+    case GDK_B:
+      action = BRUSH;
+    break;
+    case GDK_i:
+    case GDK_I:
+      action = IDENT;
+    break;
+    case GDK_e:
+    case GDK_E:
+      action = EDGEED;
+    break;
+    case GDK_m:
+    case GDK_M:
+      action = MOVEPTS;
+    break;
+    default:
+      common_event = false;
+    }
   }
 
   if (action >= 0 &&
@@ -839,9 +837,10 @@ splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
   }
 }
 
+/*
 void
 splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg) 
-{ 
+{
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
@@ -862,13 +861,11 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
     case TOUR1D:
     {
       gint j, var;
-      /*if (!gg->is_pp) {*/
         for (j=0; j<display->t1d.nactive; j++) {
           var = display->t1d.active_vars.els[j];
           d->world.vals[ipt][var] += 
            (gg->movepts.eps.x * (greal) display->t1d.F.vals[0][var]);
         }
-      /*}*/
     }
     break;
 
@@ -887,21 +884,18 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
     case TOUR2D:
     {
       gint j, var;
-      /*if (!gg->is_pp) {*/
         for (j=0; j<display->t2d.nactive; j++) {
           var = display->t2d.active_vars.els[j];
           d->world.vals[ipt][var] += 
            (gg->movepts.eps.x * (greal) display->t2d.F.vals[0][var] +
             gg->movepts.eps.y * (greal) display->t2d.F.vals[1][var]);
         }
-      /*}*/
     }
     break;
 
     case COTOUR:
     {
       gint j, var;
-      /*if (!gg->is_pp) {*/
         for (j=0; j<display->tcorr1.nactive; j++) {
           var = display->tcorr1.active_vars.els[j];
           d->world.vals[ipt][var] += 
@@ -912,7 +906,6 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
           d->world.vals[ipt][var] += 
            (gg->movepts.eps.y * (greal) display->tcorr2.F.vals[0][var]);
         }
-      /*}*/
     }
 
     break;
@@ -921,20 +914,20 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
       g_printerr ("reverse pipeline not yet implemented for this projection\n");
   }
 }
+*/
 
+/*
 void
 splot_reverse_pipeline (splotd *sp, gint ipt, gcoords *eps,
                         gboolean horiz, gboolean vert, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
-
   splot_screen_to_plane (sp, ipt, eps, horiz, vert);
   splot_plane_to_world (sp, ipt, gg);
-
-  /*-- in pipeline.c since it applies to the front of the pipeline --*/
   world_to_raw (ipt, sp, d, gg);
 }
+*/
 
 /* ---------------------------------------------------------------------*/
 /*          Pack up some of short signal routines                       */

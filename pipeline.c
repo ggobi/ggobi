@@ -309,6 +309,7 @@ rows_in_plot_set (datad *d, ggobid *gg) {
 /*                     reverse pipeline                                    */
 /*-------------------------------------------------------------------------*/
 
+/* XXX duncan and dfs: you need to sort this out
 void
 world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg)
 {
@@ -325,12 +326,14 @@ world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg)
 
   d->raw.vals[pt][j] = d->tform.vals[pt][j] = x;
 }
+*/
 
 /*
  * allow the reverse pipeline only for
  *   scatterplots in xyplot mode
  *   the splotd members of a scatmat that are xyplots.
 */
+/* XXX duncan and dfs: you need to sort this out
 void
 world_to_raw (gint pt, splotd *sp, datad *d, ggobid *gg)
 {
@@ -343,4 +346,4 @@ world_to_raw (gint pt, splotd *sp, datad *d, ggobid *gg)
          klass->world_to_raw(display, sp, pt, d, gg);
   } 
 }
-
+*/

@@ -627,6 +627,7 @@ tour1dRealloc(displayd *dsp, gint nc, datad *d)
     }
 }
 
+/* XXX duncan and dfs: you need to sort this out
 void
 worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
 {
@@ -672,6 +673,7 @@ worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
     break;
   }
 }
+*/
 
 
 void
@@ -1421,7 +1423,9 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
   klass->parent_class.set_show_axes_label_option = setShowAxesLabelOption;
   klass->parent_class.set_show_axes_values_option = setShowAxesValuesOption;
 
+/* XXX duncan and dfs: you need to sort this out
   klass->parent_class.world_to_raw = worldToRaw;
+*/
 
   klass->parent_class.select_X = selectXVar;
   klass->parent_class.varcircle_draw = varcircleDraw;
