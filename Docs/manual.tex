@@ -1686,7 +1686,54 @@ in another.
 Two plugins, GraphLayout and ggvis, offer methods for laying out
 graphs.  They are documented elsewhere.
 
-% dfs here %
+\section{Large data}
+
+There exist at least two meanings of ``large'' in data analysis: large
+$N$ (number of cases) and large $P$ (number of variables).  
+
+\subsection{Large $N$}
+
+We won't attempt to define ``large,'' because it depends so much on
+your computing hardware and software, but we do know something about
+the sources of sluggishness, and some effective workarounds.
+
+First of all, there are inefficiencies in the Windows implementation
+of \verb|gdk|, the drawing library underlying the \verb|gtk+| toolkit
+in which GGobi is written.  Windows users should restrict themselves to
+rectangular glyphs or point glyphs to get the best possible performance.
+They certainly should avoid the use of circles.  (We have tried to
+persuade the folks who port \verb|gdk| to Windows to do a better job,
+but we haven't yet managed to convince them it's important.)  Even in
+dialects of UNIX, single-pixel points are drawn faster than other glyphs.
+
+Use subsets when possible, particularly with the rotation and tour
+methods.  Use the Tools->Case subsetting and sampling panel to select
+a sample of the data.
+
+If the touring and rotation methods become too slow, pause the movement
+and use the {\bf Scramble} button to see different views.
+
+Avoid the 1-D plotting methods in scatterplots; they both become slow
+as the data gets very large.  The barchart/histogram display is of course
+much less affected by $N$, and is probably easier to read because it
+isn't affected by overplotting.
+
+There are a few ways to improve brushing performance, most of which
+involve postponing linked updates.  
+\begin{itemize}
+\item In Brush mode, open the Reset menu in the main menubar and turn off
+ ``Update brushing continuously.''  In that case, linked windows will only
+ be redrawn when you lift your finger off the mouse button.  Sometimes you
+ can go even further and perform all your brushing operations with only
+ a single display open, and open the other displays afterwards.
+\item Turn off the brush until you have it shaped and positioned.
+\item Use the API instead of the GUI.  Using the Rggobi package, for
+ example, you can brush a region in a single command if you can describe
+ it in terms of variable values or indices.
+\item Working with edges slows down the drawing routines, so you might
+ remove edges during point brushing (or rotation), and then restore them.
+\end{itemize}
+
 \newpage
 \section{Differences from XGobi}
 \label{slbl:xgobi}
@@ -1880,10 +1927,6 @@ the {\bf Options} menu.
 
 \section{Known problems}
 
-\begin{itemize}
-\item The distributed Windows version is often out of date,
-   with bugs that have long been repaired in the source code.
-\end{itemize}
 
 \section{Future work}
 
