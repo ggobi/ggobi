@@ -752,12 +752,19 @@ GGOBI(getShowLines)()
 }
 
 
-gboolean GGOBI(setShowLines)(gboolean val)
+gboolean GGOBI(setShowLines)(displayd *dsp, gboolean val)
 {
- gboolean old = GGOBI(getShowLines)();
- GGOBI(getDefaultDisplayOptions)()->edges_undirected_show_p = val;
+  GtkWidget *menu_item;
+  gboolean old = GGOBI(getShowLines)();
+  /*GGOBI(getDefaultDisplayOptions)()->edges_undirected_show_p = val;*/
+  dsp->options.edges_undirected_show_p = true;
 
- return(old);
+  menu_item = widget_find_by_name (dsp->edge_menu,
+          "DISPLAY MENU: show directed edges");
+  if (menu_item)
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *) menu_item, val);
+
+  return(old);
 }
 
 DisplayOptions *
