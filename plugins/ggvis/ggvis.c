@@ -184,7 +184,6 @@ ggv_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
   GtkWidget *swin;
   gchar *clname;
 
-  g_printerr ("adding data %d\n", (gint)clist);
   if (clist == NULL)
     return;
 
@@ -879,9 +878,17 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_widget_show_all (window);
 }
 
-
+/*
+ * This one is called if the ggvis window is closed while
+ * ggobi is still running.  It should disconnect signals,
+ * because otherwise there's a problem when another routine
+ * (eg GraphLayout) adds a datad.  (This doesn't happen to be
+ * working, but it should!)
+ */
 void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
 {
+ guint id;
+ 
   if (inst->data) {
     GtkWidget *window = GTK_WIDGET(inst->data);
     ggobid *gg = inst->gg;
@@ -889,40 +896,39 @@ void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
 
     GtkWidget *clist_node = widget_find_by_name (window, "nodeset");
     GtkWidget *clist_edge = widget_find_by_name (window, "edgeset");
+
     /* I'm definitely getting the right clists; I've checked */
+/*
+    if (id) gtk_signal_disconnect (GTK_OBJECT(gg), id);
+    if (id) gtk_signal_disconnect (GTK_OBJECT(gg), id);
+*/
 
     /* Disconnect signals; this isn't working.  Don't know why. */
 
     /*gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
      (GtkSignalFunc) ggv_clist_datad_added_cb,
      GTK_OBJECT (clist));*/
-    gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
-      (GtkSignalFunc) ggv_clist_datad_added_cb,
-      (gpointer) GTK_OBJECT(clist_node));
-
-    gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
-      (GtkSignalFunc) ggv_clist_datad_added_cb,
-      (gpointer) GTK_OBJECT(clist_edge));
+    id = gtk_signal_lookup ("datad_added", GTK_TYPE_GGOBI);
+    if (id && clist_node != NULL && clist_edge != NULL) {
+      gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
+        (GtkSignalFunc) ggv_clist_datad_added_cb,
+        (gpointer) GTK_OBJECT(clist_node));
+      gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
+        (GtkSignalFunc) ggv_clist_datad_added_cb,
+        (gpointer) GTK_OBJECT(clist_edge));
+    }
 
     /*  gtk_signal_connect (GTK_OBJECT(gg),
 	"clusters_changed", clusters_changed_cb, inst); */
-    gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
-      (GtkSignalFunc) clusters_changed_cb,
-      (gpointer) inst);
+    id = gtk_signal_lookup ("clusters_changed", GTK_TYPE_GGOBI);
+    if (id) {
+      gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
+        (GtkSignalFunc) clusters_changed_cb,
+        (gpointer) inst);
+    }
 
     /* The signals don't seem to be disappearing, and
        I can't disconnect a signal by id */
-/*
-  guint id;
-    id = gtk_signal_lookup ("datad_added", GTK_TYPE_GGOBI);
-    g_printerr ("id = %d\n", id);
-    if (id) g_printerr (" name = %s\n", gtk_signal_name(id));
-    if (id) gtk_signal_disconnect (GTK_OBJECT(gg), id);
-    id = gtk_signal_lookup ("clusters_changed", GTK_TYPE_GGOBI);
-    g_printerr ("id = %d\n", id);
-    if (id) g_printerr (" name = %s\n", gtk_signal_name(id));
-    if (id) gtk_signal_disconnect (GTK_OBJECT(gg), id);
-*/
 
     /*
      * This is the window, so it should serve to destroy
@@ -935,19 +941,28 @@ void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
   inst->data = NULL;
 }
 
+/*
+ * This one is called when ggobi shuts down; it doesn't
+ * need to do much of anything, I think.  Should it free
+ * its data, though?  Perhaps.  When I try freeing the pixmaps
+ * at that time, though, I get an error message.  - dfs
+ */
 void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   if (inst->data) {
-    GtkWidget *window = GTK_WIDGET(inst->data);
-    close_ggvis_window (window, inst);
+    inst->data = NULL;
   }
 }
 
 void
 ggv_free (ggvisd *ggv) {
   /* unref the pixmaps */
-  gdk_pixmap_unref (ggv->dissim->pix);
-  gdk_pixmap_unref (ggv->stressplot_pix);
+  /*
+  if (GTK_OBJECT(ggv->dissim->pix)->ref_count > 1)
+    gdk_pixmap_unref (ggv->dissim->pix);
+  if (GTK_OBJECT(ggv->stressplot_pix)->ref_count > 1)
+    gdk_pixmap_unref (ggv->stressplot_pix);
+  */
 
   arrayd_free (&ggv->Dtarget, 0, 0);
   arrayd_free (&ggv->pos, 0, 0);
