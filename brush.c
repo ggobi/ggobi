@@ -597,7 +597,7 @@ update_selected_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
     if (hit_by_brush[i])
       doit = (d->hidden_now.els[i] == true);
     else
-      doit = (d->hidden_now.els[i] == d->hidden.els[i]);
+      doit = (d->hidden_now.els[i] != d->hidden.els[i]);
   }
   /* */
 
@@ -615,9 +615,18 @@ update_selected_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
           d->hidden_now.els[i] = false;
         break;
       }
-    /*} else d->hidden_now.els[i] = d->hidden.els[i];*/
-    } else d->hidden_now.els[i] = true;
+    } else {
+      switch (cpanel->br_mode) {
+        case BR_PERSISTENT:
+          d->hidden_now.els[i] = d->hidden.els[i];
+        break;
+        case BR_TRANSIENT:
+          d->hidden_now.els[i] = true;
+        break;
+      }
+    }
   }
+g_printerr ("hidden_now[%d] = %d\n", i, d->hidden_now.els[i]);
 
   return (doit);
 }

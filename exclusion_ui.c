@@ -370,7 +370,7 @@ void cluster_add(gint k, datad * d, ggobid * gg)
     (GtkAttachOptions) 0, (GtkAttachOptions) 0, 5, 2);
 
 
-  d->clusvui[k].h_btn = gtk_toggle_button_new_with_label("H");
+  d->clusvui[k].h_btn = gtk_toggle_button_new_with_label("Shadow");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(d->clusvui[k].h_btn),
     d->clusv[k].hidden_p);
   gtk_signal_connect(GTK_OBJECT(d->clusvui[k].h_btn), "toggled",
@@ -572,9 +572,9 @@ void cluster_window_open(ggobid * gg)
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-      "Hide all cases with the corresponding symbol",
+      "Shadow brush all cases with the corresponding symbol.",
       NULL);
-    lbl = gtk_label_new("Hide");
+    lbl = gtk_label_new("Shadow");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
       1, 2, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
@@ -612,16 +612,16 @@ void cluster_window_open(ggobid * gg)
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-      "The number of hidden cases out of N with the corresponding symbol.",
+      "The number of cases in shadow out of N with the corresponding symbol.",
       NULL);
-    lbl = gtk_label_new("Hidden");
+    lbl = gtk_label_new("Shadowed");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
       2, 3, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-      "The number of visible cases out of N with the corresponding symbol.",
+      "The number of visible cases (cases not in shadow) out of N with the corresponding symbol.",
       NULL);
     lbl = gtk_label_new("Shown");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
@@ -661,16 +661,16 @@ void cluster_window_open(ggobid * gg)
   gtk_box_pack_start(GTK_BOX(vbox), hbox, false, false, 0);
 
   /*-- Exclude button --*/
-  btn = gtk_button_new_with_label("Exclude hidden");
+  btn = gtk_button_new_with_label("Exclude shadows");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-    "Exclude all hidden points, so that they're not drawn and they're ignored when scaling the view.",
+    "Exclude all points in shadow, so that they're not drawn and they're ignored when scaling the view.",
     NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
     GTK_SIGNAL_FUNC(exclude_hiddens_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(hbox), btn, true, true, 0);
 
   /*-- Include button --*/
-  btn = gtk_button_new_with_label("Include hidden");
+  btn = gtk_button_new_with_label("Include shadows");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Include all previously hidden and excluded points.",
     NULL);
@@ -681,7 +681,7 @@ void cluster_window_open(ggobid * gg)
   /*-- Update button --*/
   btn = gtk_button_new_with_label("Update");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-    "Reset plots after brushing so that hidden and excluded status is consistent with this table; reset this table if necessary.",
+    "Reset plots after brushing so that shadow and excluded status is consistent with this table; reset this table if necessary.",
     NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
     GTK_SIGNAL_FUNC(update_cb), (gpointer) gg);

@@ -60,7 +60,7 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
 
 
 static gchar *point_targets_lbl[] =
-{ "Off", "Color and glyph", "Color only", "Glyph only", "Hide", "Select"
+{ "Off", "Color and glyph", "Color only", "Glyph only", "Shadow", "Select"
 };
 static void
 brush_point_targets_cb (GtkWidget * w, gpointer cbd)
@@ -75,11 +75,30 @@ brush_point_targets_cb (GtkWidget * w, gpointer cbd)
 
   /* binning not permitted here */
   brush_once_and_redraw (false, gg->current_splot, gg->current_display, gg);
-  /*splot_redraw(gg->current_splot, QUICK, gg);*/
+
+
+  /*
+   * select brushing is a special case: hide all points
+   * before starting to move the brush.
+   *
+   * There's still a weird thing that can happen:  enter select
+   * brushing and then leave it; all points remain hidden.  Hmm.
+  */
+  if (cpanel->br_point_targets == br_select) {
+    gint i, m;
+    datad *d = gg->current_display->d;
+    for (i=0; i<d->nrows_in_plot; i++) {
+      m = d->rows_in_plot.els[i];
+      d->hidden_now.els[m] = d->hidden.els[m] = true;
+    }
+    displays_plot (NULL, FULL, gg);
+  }
+  /* */
+
 }
 
 static gchar *edge_targets_lbl[] =
-{ "Off", "Color and line", "Color only", "Line only", "Hide", "Select"
+{ "Off", "Color and line", "Color only", "Line only", "Shadow", "Select"
 };
 static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
 {
@@ -93,7 +112,25 @@ static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
 
   /* binning not permitted here */
   brush_once_and_redraw (false, gg->current_splot, gg->current_display, gg);
-  /*splot_redraw(gg->current_splot, QUICK, gg);*/
+
+  /*
+   * select brushing is a special case: hide all points
+   * before starting to move the brush.
+  */
+  if (cpanel->br_edge_targets == br_select) {
+    gint i, m;
+    datad *e = gg->current_display->e;
+    if (e) {
+      for (i=0; i<e->nrows_in_plot; i++) {
+        m = e->rows_in_plot.els[i];
+        e->hidden_now.els[m] = e->hidden.els[m] = true;
+      }
+      displays_plot (NULL, FULL, gg);
+    }
+  }
+  /* */
+
+
 }
 
 static gchar *mode_lbl[] = { "Persistent", "Transient" };
@@ -105,6 +142,7 @@ static void brush_mode_cb(GtkWidget * w, gpointer cbd)
   gint prev_mode = cpanel->br_mode;
 
   cpanel->br_mode = GPOINTER_TO_INT(cbd);
+
   if (cpanel->br_mode == BR_PERSISTENT && cpanel->br_mode != prev_mode) {
     brush_once(false, sp, gg);
   }
@@ -255,10 +293,11 @@ motion_notify_cb(GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
   if (button1_p || button2_p) {
     brush_motion(&sp->mousepos, button1_p, button2_p, cpanel, sp, gg);
 
-    /*XX
-       Like this to be emitted from the display. Or what about the splotd? 
-       or perhaps both the ggobi and the splotd? or perhaps only on scatterSPlotds
-       And we might store the signal ids in the class itself.
+    /*XXX
+      Like this to be emitted from the display. Or what about the splotd? 
+      or perhaps both the ggobi and the splotd? or perhaps only on
+      scatterSPlotds
+      And we might store the signal ids in the class itself.
      */
 #if TEST_BRUSH_MOTION_CB
     fprintf(stderr,
@@ -267,7 +306,8 @@ motion_notify_cb(GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
     fflush(stderr);
 #endif
 /*XX is this the correct source object? */
-    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[BRUSH_MOTION_SIGNAL], sp, event, sp->displayptr->d);
+    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[BRUSH_MOTION_SIGNAL],
+      sp, event, sp->displayptr->d);
   }
   return true;
 }
@@ -398,21 +438,20 @@ void brush_event_handlers_toggle(splotd * sp, gboolean state)
 
   if (state == on) {
     if (GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-      sp->key_press_id =
-          gtk_signal_connect(GTK_OBJECT
-                             (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-                             "key_press_event",
-                             (GtkSignalFunc) key_press_cb, (gpointer) sp);
+      sp->key_press_id = gtk_signal_connect(GTK_OBJECT
+        (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+        "key_press_event",
+        (GtkSignalFunc) key_press_cb, (gpointer) sp);
 
 
     sp->press_id = gtk_signal_connect(GTK_OBJECT(sp->da),
-                                      "button_press_event",
-                                      (GtkSignalFunc) button_press_cb,
-                                      (gpointer) sp);
+      "button_press_event",
+      (GtkSignalFunc) button_press_cb,
+      (gpointer) sp);
     sp->release_id = gtk_signal_connect(GTK_OBJECT(sp->da),
-                                        "button_release_event",
-                                        (GtkSignalFunc) button_release_cb,
-                                        (gpointer) sp);
+      "button_release_event",
+      (GtkSignalFunc) button_release_cb,
+      (gpointer) sp);
   } else {
     disconnect_key_press_signal(sp);
     disconnect_button_press_signal(sp);
@@ -438,12 +477,11 @@ void cpanel_brush_make(ggobid * gg)
   btn = gtk_check_button_new_with_label("Brush on");
   gtk_widget_set_name(btn, "BRUSH:brush_on_button");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-                       "Make the brush active or inactive.  Drag the left button to brush and the right or middle button  to resize the brush.",
-                       NULL);
+    "Make the brush active or inactive.  Drag the left button to brush and the right or middle button  to resize the brush.",
+    NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "toggled",
-                     GTK_SIGNAL_FUNC(brush_on_cb), (gpointer) gg);
-  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]), btn, false, false,
-                     0);
+    GTK_SIGNAL_FUNC(brush_on_cb), (gpointer) gg);
+  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]), btn, false, false, 0);
 
 /*
  * option menu for specifying whether to brush with color/glyph/both
@@ -482,8 +520,8 @@ void cpanel_brush_make(ggobid * gg)
   option_menu = gtk_option_menu_new();
   gtk_widget_set_name(option_menu, "BRUSH:edge_targets_option_menu");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), option_menu,
-                       "Brushing edges: what characteristics, if any, should respond?",
-                       NULL);
+    "Brushing edges: what characteristics, if any, should respond?",
+    NULL);
   gtk_box_pack_start(GTK_BOX(vb), option_menu, false, false, 0);
   populate_option_menu(option_menu, edge_targets_lbl,
     sizeof(edge_targets_lbl) / sizeof(gchar *),
@@ -498,9 +536,9 @@ void cpanel_brush_make(ggobid * gg)
   option_menu = gtk_option_menu_new();
   gtk_widget_set_name(option_menu, "BRUSH:mode_option_menu");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), option_menu,
-                       "Persistent or transient brushing", NULL);
+    "Persistent or transient brushing", NULL);
   gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
-                     option_menu, false, false, 0);
+    option_menu, false, false, 0);
   populate_option_menu(option_menu, mode_lbl,
     sizeof(mode_lbl) / sizeof(gchar *),
     (GtkSignalFunc) brush_mode_cb, "GGobi", gg);
@@ -510,22 +548,21 @@ void cpanel_brush_make(ggobid * gg)
 
   btn = gtk_button_new_with_label("Undo");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-                       "Undo the most recent brushing changes, from button down to button up",
-                       NULL);
+    "Undo the most recent brushing changes, from button down to button up",
+    NULL);
   gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
-                     btn, false, false, 0);
+    btn, false, false, 0);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-                     GTK_SIGNAL_FUNC(brush_undo_cb), gg);
+    GTK_SIGNAL_FUNC(brush_undo_cb), gg);
 
  /*-- button for opening symbol panel --*/
   btn = gtk_button_new_with_label("Choose color & glyph ...");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-                       "Open panel for choosing color and glyph", NULL);
+    "Open panel for choosing color and glyph", NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-                     GTK_SIGNAL_FUNC(open_symbol_window_cb),
-                     (gpointer) gg);
+    GTK_SIGNAL_FUNC(open_symbol_window_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
-                     btn, false, false, 1);
+    btn, false, false, 1);
 
   frame = gtk_frame_new ("Linking rule");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
@@ -557,63 +594,25 @@ void cpanel_brush_make(ggobid * gg)
   /*-- initial value: link by id --*/
   gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), BR_LINKBYID);
 
-
-  /*-- if linking by variable, specify the variable here --*/
-/* at this point, we haven't read any datad's yet
-{
-  gchar **catvars;
-  GSList *ld, *lv;
-  GSList *names = NULL;
-  datad *dd;
-  vartabled *vt;
-
-g_printerr ("nd: %d\n", g_slist_length(gg->d));
-  for (ld = gg->d; ld; ld = ld->next) {
-    dd = ld->data;
-    for (lv = dd->vartable; lv; lv = lv->next) {
-      vt = lv->data;
-      if (vt->categorical_p) {
-        if (g_slist_index (names, (gpointer) dd->name) == -1) {
-          names = g_slist_append (names, (gpointer) dd->name);
-g_printerr ("new cvar: %s\n", dd->name);
-        }
-      }
-    }
-  }
-}
-*/
-/*
-  option_menu = gtk_option_menu_new ();
-  gtk_widget_set_name (option_menu, "BRUSH:linkvars_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), option_menu,
-    "If linking by variable, choose a categorical variable here",
-    NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      option_menu, false, false, 0);
-  populate_option_menu (option_menu, catvars,
-    sizeof (catvars) / sizeof (gchar *),
-    (GtkSignalFunc) brush_linkvar_cb, "GGobi", gg);
-*/
-
 /*-- button for opening 'color schemes' panel --*/
   btn = gtk_button_new_with_label("Color schemes ...");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-                       "Open tools panel for automatic brushing by variable",
-                       NULL);
+    "Open tools panel for automatic brushing by variable",
+    NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-                     GTK_SIGNAL_FUNC(wvis_window_cb), (gpointer) gg);
+    GTK_SIGNAL_FUNC(wvis_window_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
-                     btn, false, false, 1);
+    btn, false, false, 1);
 
 /*-- button for opening clusters table --*/
   btn = gtk_button_new_with_label("Color & glyph groups ...");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-                       "Open tools panel for hiding or excluding brushed groups",
-                       NULL);
+    "Open tools panel for hiding or excluding brushed groups",
+    NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-                     GTK_SIGNAL_FUNC(cluster_window_cb), (gpointer) gg);
+    GTK_SIGNAL_FUNC(cluster_window_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
-                     btn, false, false, 1);
+    btn, false, false, 1);
 
   gtk_widget_show_all(gg->control_panel[BRUSH]);
 }
