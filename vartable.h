@@ -30,6 +30,8 @@ enum {CLIST_VARNO, CLIST_VARNAME, CLIST_TYPE, CLIST_TFORM,
 */
 
 typedef struct {
+ struct datad *d;  /*-- I want a pointer back to its parent datad --*/
+
  gchar *collab, *collab_tform;
  gint nmissing;
 
