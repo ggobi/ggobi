@@ -290,7 +290,9 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 /*                  initialize and populate the var panel                  */
 /*-------------------------------------------------------------------------*/
 
-/*-- build the scrolled window and vbox; the d-specific parts follow --*/
+/*
+ * build the notebook to contain one scrolled window and vbox for each d
+*/
 void
 varpanel_make (GtkWidget *parent, ggobid *gg) {
 
@@ -301,23 +303,13 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
 */
   gg->varpanel_ui.tips = gtk_tooltips_new ();
   
+  gg->varpanel_ui.notebook = gtk_notebook_new ();
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
+    GTK_POS_TOP);
+  gtk_box_pack_start (GTK_BOX (parent), gg->varpanel_ui.notebook,
+    true, true, 2);
 
-  /*-- create a scrolled window --*/
-  gg->varpanel_ui.scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (
-    GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
-    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-  gtk_box_pack_start (GTK_BOX (parent),
-    gg->varpanel_ui.scrolled_window, true, true, 2);
-  gtk_widget_show (gg->varpanel_ui.scrolled_window);
-
-  /*-- create varpanel, a vbox, and add it to the scrolled window --*/
-  gg->varpanel_ui.varpanel = gtk_vbox_new (false, 10);
-  gtk_scrolled_window_add_with_viewport (
-    GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
-    gg->varpanel_ui.varpanel);
-
-  gtk_widget_show_all (gg->varpanel_ui.scrolled_window);
+  gtk_widget_show (gg->varpanel_ui.notebook);
 }
 
 static void
@@ -335,47 +327,44 @@ varpanel_checkbox_add (gint j, datad *d, ggobid *gg)
   gtk_widget_show (d->varpanel_ui.checkbox[j]);
 }
 
-/*-- create a column of check buttons? --*/
+/*-- for each datad, a scrolled window, vbox, and column of check buttons --*/
 void varpanel_populate (datad *d, ggobid *gg)
 {
   gint j;
-  GtkWidget *ebox;
-  GtkWidget *frame = gtk_frame_new (NULL);
+  GtkWidget *ebox, *scrolled_window;
+  GtkWidget *labelw;
 
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (gg->varpanel_ui.varpanel),
-    frame, false, false, 2);
+  /*-- we don't know the length of gg->d when the notebook is created --*/
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
+    g_slist_length (gg->d) > 1);
 
-  /*-- add an ebox to the frame --*/
+  /*-- create a scrolled window --*/
+  scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+  labelw = (g_slist_length (gg->d) > 1) ? gtk_label_new (d->name) : NULL;
+  gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
+                            scrolled_window, labelw);
+
+
+  /*-- add an ebox to the scrolled window: needed for tooltips? --*/
   ebox = gtk_event_box_new ();
-  gtk_container_add (GTK_CONTAINER (frame), ebox);
+  gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (scrolled_window),
+   ebox);
   
   /*-- add a vbox to the ebox --*/
   d->varpanel_ui.vbox = gtk_vbox_new (false, 0);
   gtk_container_add (GTK_CONTAINER (ebox), d->varpanel_ui.vbox);
 
-  gtk_widget_show_all (frame);
+  gtk_widget_show_all (scrolled_window);
   gdk_flush ();
 
   d->varpanel_ui.checkbox = (GtkWidget **)
     g_malloc (d->ncols * sizeof (GtkWidget *));
 
-  for (j=0; j<d->ncols; j++) {
+  for (j=0; j<d->ncols; j++)
     varpanel_checkbox_add (j, d, gg);
-/*
-    d->varpanel_ui.checkbox[j] =
-      gtk_noop_check_button_new_with_label (d->vartable[j].collab);
-    GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.checkbox[j]), gg, true);
-
-    gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.checkbox[j]),
-      "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
-
-    gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
-      d->varpanel_ui.checkbox[j], true, true, 0);
-    gtk_widget_show (d->varpanel_ui.checkbox[j]);
-*/
-  }
-    
 }
 
 
@@ -423,7 +412,8 @@ varpanel_tooltips_set (ggobid *gg)
     d = (datad*) g_slist_nth_data (gg->d, k);
     /*-- for each variable --*/
     for (j=0; j<d->ncols; j++) {
-      g_return_if_fail (d->varpanel_ui.checkbox != NULL);
+      if (d->varpanel_ui.checkbox == NULL)
+        break;
       
       switch (display->displaytype) {
 

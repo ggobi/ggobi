@@ -657,6 +657,7 @@ make_ui (ggobid *gg) {
 
   /*-- Variable selection panel --*/
   varpanel_make (hbox, gg);
+  /*varcircles_make (hbox, gg);*/
 
   gtk_widget_show_all (hbox);
 
