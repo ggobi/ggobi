@@ -25,12 +25,55 @@ static void
 add_record_dialog_cancel (GtkWidget *w, ggobid *gg) 
 {
   GtkWidget *dialog = gtk_widget_get_toplevel (w);
+
+  gg->edgeedit.a = -1;
   gtk_widget_destroy (dialog);
 }
 
 static void
-add_record_dialog_apply (GtkWidget *w, ggobid *gg) 
+add_record_dialog_apply (GtkWidget *w, displayd *display) 
 {
+  cpaneld *cpanel = &display->cpanel;
+  datad *d = display->d;
+  datad *e = display->e;
+  ggobid *gg = d->gg;
+  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  GtkWidget *label_entry, *id_entry;
+  gchar *label = NULL, *id = NULL;
+
+  if ((label_entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox,
+    "EE:rowlabel")))
+  {
+    label = gtk_editable_get_chars (GTK_EDITABLE (label_entry), 0, -1);
+  }
+
+  if ((id_entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox,
+    "EE:recordid")))
+  {
+    id = gtk_editable_get_chars (GTK_EDITABLE (id_entry), 0, -1);
+  }
+
+  if (cpanel->ee_adding_edges_p) {
+
+    /*-- Add the new edge to e --*/
+/*
+
+d:  We're not making any changes to d when we add an edge.
+
+e:
+  record label
+  if e has rowIds, a rowId
+  if e has variables, variable values -- we don't have a clue what to use
+*/
+
+    edge_add (gg->edgeedit.a, d->nearest_point, label, id, d, e, gg);
+
+  } else if (cpanel->ee_adding_points_p) {
+
+  }
+
+  gg->edgeedit.a = -1;
+  gtk_widget_destroy (dialog);
   g_printerr ("add the record\n");
 }
 
@@ -42,44 +85,99 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   gchar *lbl;
   cpaneld *cpanel = &dsp->cpanel;
   GtkAttachOptions table_opt = GTK_SHRINK|GTK_FILL|GTK_EXPAND;
+  gint row = 0;
+  datad *dtarget;
+
+  if (cpanel->ee_adding_edges_p) dtarget = e;
+  else dtarget = d;
 
   dialog = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW(dialog), "Add a record");
 
-  table = gtk_table_new (2, 3, false);
+  table = gtk_table_new (5, 2, false);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), table);
 
   w = gtk_label_new ("Record number");
   gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
   gtk_table_attach (GTK_TABLE (table),
-    w, 0, 1, 0, 1, /* left right top bottom */
-    table_opt, table_opt, 1, 1);
-  lbl = g_strdup_printf ("%d",
-    (cpanel->ee_adding_edges_p)?e->nrows:d->nrows + 1);
+    w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
+  lbl = g_strdup_printf ("%d", dtarget->nrows + 1);
   w = gtk_label_new (lbl);
   gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
   gtk_table_attach (GTK_TABLE (table),
-    w, 1, 2, 0, 1, table_opt, table_opt, 1, 1);
+    w, 1, 2, row, row+1, table_opt, table_opt, 1, 1);
   g_free (lbl);
+  row++;
+
+  if (cpanel->ee_adding_edges_p) {
+    w = gtk_label_new ("Edge source");
+    gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+    gtk_table_attach (GTK_TABLE (table),
+      w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
+    lbl = (gchar *) g_array_index (d->rowlab, gchar *, gg->edgeedit.a);
+    w = gtk_label_new (lbl);
+    gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
+    gtk_table_attach (GTK_TABLE (table),
+      w, 1, 2, row, row+1, table_opt, table_opt, 1, 1);
+    row++;
+
+    w = gtk_label_new ("Edge destination");
+    gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+    gtk_table_attach (GTK_TABLE (table),
+      w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
+    lbl = (gchar *) g_array_index (d->rowlab, gchar *, d->nearest_point);
+    w = gtk_label_new (lbl);
+    gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
+    gtk_table_attach (GTK_TABLE (table),
+      w, 1, 2, row, row+1, table_opt, table_opt, 1, 1);
+    row++;
+  }
 
   w = gtk_label_new ("Record label");
   gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
   gtk_table_attach (GTK_TABLE (table),
-    w, 0, 1, 1, 2, table_opt, table_opt, 1, 1);
+    w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
   entry = gtk_entry_new ();
   gtk_widget_set_name (entry, "EE:rowlabel");
   gtk_table_attach (GTK_TABLE (table),
-    entry, 1, 2, 1, 2, table_opt, table_opt, 1, 1);
+    entry, 1, 2, row, row+1, table_opt, table_opt, 1, 1);
+  row++;
 
-  w = gtk_label_new ("Record id");
-  gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
-  gtk_table_attach (GTK_TABLE (table),
-    w, 0, 1, 2, 3, table_opt, table_opt, 1, 1);
-  entry = gtk_entry_new ();
-  gtk_widget_set_name (entry, "EE:recordid");
-  gtk_table_attach (GTK_TABLE (table),
-    entry, 1, 2, 2, 3,
-    table_opt, table_opt, 1, 1);
+  if ((cpanel->ee_adding_points_p && d->idTable) ||
+      (cpanel->ee_adding_edges_p && e->idTable))
+  {
+    w = gtk_label_new ("Record id");
+    gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+    gtk_table_attach (GTK_TABLE (table),
+      w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
+    entry = gtk_entry_new ();
+    gtk_widget_set_name (entry, "EE:recordid");
+    gtk_table_attach (GTK_TABLE (table),
+      entry, 1, 2, row, row+1, table_opt, table_opt, 1, 1);
+    row++;
+  }
+
+  /*-- Another table to contain variable name-value pairs --*/
+  if (dtarget->ncols) {
+    gint j;
+    vartabled *vt;
+    GtkWidget *tablev;
+
+    tablev = gtk_table_new (2, dtarget->ncols, false);
+    gtk_widget_set_name (entry, "EE:tablev");
+    gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), tablev);
+
+    for (j=0; j<dtarget->ncols; j++) {
+      vt = vartable_element_get (j, d);
+      w = gtk_label_new (vt->collab);
+      gtk_table_attach (GTK_TABLE (tablev),
+        w, j, j+1, 0, 1, table_opt, table_opt, 1, 1);
+
+      entry = gtk_entry_new ();
+      gtk_table_attach (GTK_TABLE (tablev),
+        entry, j, j+1, 1, 2, table_opt, table_opt, 1, 1);
+    }
+  }
 
   /*-- ok button --*/
   w = gtk_button_new_with_label ("Apply");
@@ -110,6 +208,12 @@ static void add_edges_or_points_cb (GtkToggleButton *button, ggobid *gg)
 
   cpanel->ee_adding_edges_p = button->active;
   cpanel->ee_adding_points_p = !button->active;
+
+  if (cpanel->ee_adding_points_p) {
+    splot_cursor_set (GDK_CROSSHAIR, gg->current_splot);
+  } else {
+    splot_cursor_set ((gint)NULL, gg->current_splot);
+  }
 }
 static void undo_last_cb (GtkToggleButton *button)
 {
@@ -145,22 +249,28 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   gboolean button1_p, button2_p;
   gint k;
 
-  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
-  k = find_nearest_point (&sp->mousepos, sp, d, gg);
-  d->nearest_point = k;
+  if (cpanel->ee_adding_edges_p) {
+    mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
+    k = find_nearest_point (&sp->mousepos, sp, d, gg);
+    d->nearest_point = k;
 
-  if (cpanel->ee_adding_edges_p && k != d->nearest_point_prev) {
-    if (gg->edgeedit.a == -1) {  /*-- looking for starting point --*/
-      if (k != d->nearest_point_prev)
+    if (k != d->nearest_point_prev) {
+
+      if (gg->edgeedit.a == -1) {  /*-- looking for starting point --*/
+        if (k != d->nearest_point_prev)
+          displays_plot (NULL, QUICK, gg);
+      } else {  /*-- found starting point; looking for ending point --*/
+
         displays_plot (NULL, QUICK, gg);
-    } else {  /*-- found starting point; looking for ending point --*/
-
-      displays_plot (NULL, QUICK, gg);
-      /*-- add a dotted line from gg->edgeedit.a to gg->nearest_point --*/
+        /*-- add a dotted line from gg->edgeedit.a to gg->nearest_point --*/
+      }
     }
+    d->nearest_point_prev = d->nearest_point;
+
+  } else if (cpanel->ee_adding_points_p) {
+    ;
   }
 
-  d->nearest_point_prev = d->nearest_point;
   return true;
 }
 
@@ -203,49 +313,39 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
    * If record indices are in use, use them; if not, initialize
    * indices for display->d.
   */
-  if (d->nearest_point >= 0) {
-    g_printerr ("add the edge from %d to %d\n",
-      gg->edgeedit.a, d->nearest_point);
+  if (cpanel->ee_adding_edges_p) {
 
-    if (e == NULL) {
-      /*-- Initialize a new edge set --*/
-      g_printerr ("Not yet initializing a new edge set\n");
-      return false;
+    if (d->nearest_point >= 0 &&
+        gg->edgeedit.a >= 0 &&
+        d->nearest_point != gg->edgeedit.a)
+    {
+      g_printerr ("add the edge from %d to %d\n",
+        gg->edgeedit.a, d->nearest_point);
+
+      if (e == NULL) {
+        /*-- Initialize a new edge set --*/
+        g_printerr ("Not yet initializing a new edge set\n");
+        return false;
+      }
+      if (e->ncols) {
+        g_printerr ("Not yet adding edges to datad's with variables\n");
+        return false;
+      }
+
+      /*-- Open a dialog window to ask for label, rowId, data ... --*/
+      add_record_dialog_open (d, e, display, gg);
     }
 
-    if (e->ncols) {
-      g_printerr ("Not yet adding edges to datad's with variables\n");
-      return false;
-    }
+  } else if (cpanel->ee_adding_points_p) {
 
     if (d->rowIds == NULL) {
       /*-- Add rowids to d --*/
       g_printerr ("Not yet initializing new rowids\n");
       return false;
     }
-
-    /*-- Open a dialog window to ask for label and maybe rowId --*/
-    /*-- just use defaults for the moment --*/
-
-    /*-- Add the new edge to e --*/
-/*
-
-d:  We're not making any changes to d when we add an edge.
-
-e:
-  record label
-  if e has rowIds, a rowId
-  if e has variables, variable values -- we don't have a clue what to use
-*/
-
-/*
-    edge_add (gg->edgeedit.a, d->nearest_point, NULL, NULL, d, e, gg);
-*/
-
+    /*-- Open a dialog window to ask for label, rowId, data ... --*/
     add_record_dialog_open (d, e, display, gg);
-
   }
-  gg->edgeedit.a = -1;
 
   /*-- Release the pointer so the button press can be detected --*/
   gdk_pointer_ungrab (event->time);

@@ -123,8 +123,17 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
     if (dsp->e == e) {
       for (sl = dsp->splots; sl; sl = sl->next) {
         sp = (splotd *) sl->data;
-        if (sp != NULL)
+        if (sp != NULL) {
           splot_edges_realloc (n, sp, e);
+          /*-- this is only necessary if there are variables, I think --*/
+          if (e->ncols && GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+            GtkGGobiExtendedSPlotClass *klass;
+            klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+            if(klass->alloc_whiskers)
+              sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp,
+                e->nrows, e);
+          }
+        }
       }
     }
   }

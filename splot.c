@@ -479,7 +479,6 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg)
 void
 splot_free (splotd *sp, displayd *display, ggobid *gg) 
 {
-
   gtk_widget_hide (sp->da);
 
   g_free ((gpointer) sp->planar);
