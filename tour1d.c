@@ -246,6 +246,7 @@ display_tour1d_init (displayd *dsp, ggobid *gg)
   dsp->t1d.target_selection_method = 0;
   dsp->t1d_ppda = NULL;
   dsp->t1d_axes = true;
+
 }
 
 /*-- called from the Options menu --*/
@@ -301,7 +302,16 @@ void tour1d_speed_set(gfloat slidepos, ggobid *gg) {
 
 }
 
+#ifdef TESTING_TOUR_STEP
+void tour1d_step_cb(displayd *dsp, tour td, gint projdim, ggobid *gg,
+  void *display)
+{
+  g_printerr ("tour_step\n");
+}
+#endif
+
 void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
+  displayd *dsp = gg->current_display;
   cpanel->t1d.paused = state;
 
   tour1d_func (!cpanel->t1d.paused, gg->current_display, gg);
@@ -310,6 +320,12 @@ void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
     /*-- whenever motion stops, we need a FULL redraw --*/
     display_tailpipe (gg->current_display, FULL, gg);
   }
+
+#ifdef TESTING_TOUR_STEP
+  gtk_signal_connect (GTK_OBJECT(dsp), "tour_step",
+    tour1d_step_cb, dsp);
+#endif
+
 }
 
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
@@ -569,8 +585,8 @@ tour1d_run(displayd *dsp, ggobid *gg)
   /*  static gint count = 0;*/
   gboolean revert_random = false;
   gint pathprob = 0;
-
   gint i, j, nv;
+  GtkGGobiDisplayClass *klass;
 
   if (!dsp->t1d.get_new_target && 
       !reached_target(dsp->t1d.tang, dsp->t1d.dist_az, 
@@ -703,10 +719,13 @@ tour1d_run(displayd *dsp, ggobid *gg)
       }
     }
   }
-  /*  tour_reproject(dsp, 2);*/
-  /*  gtk_signal_emit(GTK_OBJECT(gg),
-    GGobiSignals[TOUR_STEP_SIGNAL], dsp->t1d.F,
-    (gint) 1, d);*/
+ /*  tour_reproject(dsp, 2);*/
+#ifdef TESTING_TOUR_STEP
+  klass = GTK_GGOBI_DISPLAY_CLASS(GTK_OBJECT(dsp)->klass);
+  gtk_signal_emit(GTK_OBJECT(dsp),
+    klass->signals[TOUR_STEP_SIGNAL], dsp->t1d,
+    (gint) 1, gg);
+#endif
 
   display_tailpipe (dsp, FULL, gg);
 

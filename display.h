@@ -29,9 +29,13 @@ struct _ggobid;
 
 GtkType gtk_ggobi_display_get_type();
 
+enum { TOUR_STEP_SIGNAL, 
+       MAX_GGOBI_DISPLAY_SIGNALS};
+
 typedef struct _GtkGGobiDisplayClass
 {
-    GtkVBoxClass parent_class;
+  GtkVBoxClass parent_class;
+  guint signals[MAX_GGOBI_DISPLAY_SIGNALS];
 
 } GtkGGobiDisplayClass;
 

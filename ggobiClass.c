@@ -164,15 +164,6 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
 						   GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI_DATA);     /* record index and datad pointer */
   }
 
-  if (gtk_signal_lookup("tour_step", GTK_TYPE_GGOBI) == 0) {
-    GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL] =
-        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
-                                         "tour_step",
-                                         GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER,
-                                         GTK_TYPE_NONE, 1,
-                                         GTK_TYPE_GGOBI_DATA);
-  }
 }
 
 /****************************/
@@ -190,6 +181,7 @@ void gtk_ggobi_data_class_init(GtkGGobiDataClass * klass)
         GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI);
   }
 }
+
 
 GtkType gtk_ggobi_data_get_type(void)
 {
@@ -275,6 +267,17 @@ gtk_ggobi_display_class_init(GtkGGobiDisplayClass * klass)
 #ifdef TEST_DESTROY /* Just here to test the destroy mechanism is working. */
   GTK_OBJECT_CLASS(klass)->destroy = testDisplayDestroy;
 #endif
+
+  if (gtk_signal_lookup("tour_step", GTK_TYPE_GGOBI_DISPLAY) == 0) {
+    GGobiSignals[TOUR_STEP_SIGNAL] =
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI_DISPLAY),
+                                         "tour_step",
+                                         GTK_RUN_LAST | GTK_RUN_ACTION,
+                                         gtk_marshal_NONE__POINTER_INT_POINTER,
+                                         GTK_TYPE_NONE, 3,
+                                         GTK_TYPE_POINTER, GTK_TYPE_INT,
+                                         GTK_TYPE_GGOBI);
+  }
 }
 
 static void 
