@@ -67,8 +67,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
     break;
 
     case scatmat:
-      redraw = scatmat_varsel_simple (cpanel, sp, jvar, &jvar_prev,
-        btn, alt_mod, gg);
+      redraw = scatmat_varsel_simple (cpanel, sp, jvar, &jvar_prev, gg);
     break;
 
     case scatterplot:
@@ -430,14 +429,14 @@ varpanel_tooltips_set (ggobid *gg)
         case parcoords:
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
             d->varpanel_ui.checkbox[j],
-            "Click to add/replace/insert a variable, symmetrically; <alt>click to delete",
+            "Click to replace/insert/append a variable, or to delete it",
             NULL);
         break;
 
         case scatmat:
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
             d->varpanel_ui.checkbox[j],
-            "Click to add/replace/insert a row&column, symmetrically; <alt>click to delete",
+            "Click to replace/insert/append a variable, or to delete it",
             NULL);
         break;
 

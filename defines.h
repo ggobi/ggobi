@@ -185,6 +185,7 @@ extern const gint ViewTypeIndeces[3];
 #define VAR_REPLACE 0
 #define VAR_INSERT  1
 #define VAR_APPEND  2
+#define VAR_DELETE  3
 
 #define ARRANGE_ROW 0
 #define ARRANGE_COL 1
