@@ -55,6 +55,7 @@ SRC=\
     parcoords_ui.c \
     pipeline.c \
     pp_ui.c \
+    ppcorr_ui.c \
     read_array.c \
     read_data.c \
     rotate_ui.c \
@@ -80,6 +81,7 @@ SRC=\
     tour1d_ui.c \
     tour2d.c \
     tour2d_ui.c \
+    tourcorr_ui.c \
     transform.c \
     transform_ui.c \
     utils.c \
