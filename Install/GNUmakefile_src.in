@@ -48,6 +48,7 @@ SRC=\
     movepts.c \
     movepts_ui.c \
     mt19937-1.c \
+    cokus.c \
     noop-checkbutton.c \
     p1d.c \
     p1d_ui.c \

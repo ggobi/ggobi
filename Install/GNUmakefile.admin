@@ -53,7 +53,7 @@ Install/configure: Install/configure.in
 
 GTK_EXTRA_SRC= gtkextruler.c   gtkexthruler.c   gtkextvruler.c 
 LGPL_HEADERS:=$(GTK_EXTRA_SRC:%.c=%.h)
-LGPL_SRC=$(GTK_EXTRA_SRC) mt19937-1.c
+LGPL_SRC=$(GTK_EXTRA_SRC) mt19937-1.c cokus.c
 
 
 createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
