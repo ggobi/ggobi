@@ -130,7 +130,11 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 */
 datad *
 datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
-  GtkNotebook *nb = GTK_NOTEBOOK (notebook);
-  gint indx = gtk_notebook_get_current_page (nb);
-  return ((datad *) g_slist_nth_data (gg->d, indx));
+  if (g_slist_length (gg->d) == 1) {
+    return (datad *) gg->d->data;
+  } else {
+    GtkNotebook *nb = GTK_NOTEBOOK (notebook);
+    gint indx = gtk_notebook_get_current_page (nb);
+    return ((datad *) g_slist_nth_data (gg->d, indx));
+  }
 }

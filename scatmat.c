@@ -54,9 +54,7 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
 {
   GtkWidget *options_menu, *submenu, *item;
 
-/*
- * Options menu
-*/
+  /*-- Options menu --*/
   submenu = submenu_make ("_Options", 'O', accel_group);
   options_menu = gtk_menu_new ();
 

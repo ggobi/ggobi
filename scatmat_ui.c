@@ -57,9 +57,7 @@ cpanel_scatmat_make (ggobid *gg) {
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[SCATMAT]),
                                   5);
 
-/*
- * option menu: selection mode
-*/
+ /*-- option menu: selection mode --*/
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[SCATMAT]),
                       vb, false, false, 0);
@@ -87,18 +85,17 @@ cpanel_scatmat_make (ggobid *gg) {
 
 
 void
-scatmat_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) 
+scatmat_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
+  ggobid *gg, gboolean useIds) 
 {
-/*
- * I/O menu
-*/
+  /*-- I/O menu --*/
   gg->app.scatmat_mode_menu = gtk_menu_new ();
 
   CreateMenuItem (gg->app.scatmat_mode_menu, "Scatterplot Matrix",
     "^a", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (SCATMAT) : gg, gg);
 
-  /* Add a separator */
+  /*-- Add a separator --*/
   CreateMenuItem (gg->app.scatmat_mode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 

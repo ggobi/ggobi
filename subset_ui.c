@@ -31,7 +31,15 @@ delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data)
 static void
 rescale_cb (GtkButton *button, ggobid *gg)
 {
-  datad *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  datad *d = gg->current_data->d;
+  /* 
+   * if datad has changed, refuse to do anything until the
+   * user has closed and reopened subset_ui.window.
+  */
+  if (gg->subset_ui.d != d) {
+    g_printerr ("Close and reopen this window, please\n");
+    return;
+  }
 
   limits_set (true, true, d, gg);
   vartable_limits_set (d);

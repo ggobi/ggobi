@@ -46,7 +46,6 @@ typedef struct {
  */
  fcoords scale, tour_scale;
  lcoords iscale;
- /*icoords ishift;*/  /*-- shift in screen coords --*/
  lcoords pmid;	  /*-- center of the screen in planar coords --*/
 
 /*
@@ -74,18 +73,6 @@ typedef struct {
  * rotation
 */
  struct {gint x, y, z;} spinvars;
-
-/*
- * tour
-*/
-
-/*
- * correlation tour
-*/
-
-/*
- * brushing
-*/
 
 } splotd;
 

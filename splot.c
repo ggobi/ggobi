@@ -424,29 +424,24 @@ splot_free (splotd *sp, displayd *display, ggobid *gg) {
 
   switch (display->displaytype) {
     case scatterplot:
-      if (sp->edges != NULL)
-        g_free ((gpointer) sp->edges);
-      if (sp->arrowheads != NULL)
-        g_free ((gpointer) sp->arrowheads);
-      break;
+      if (sp->edges != NULL) g_free ((gpointer) sp->edges);
+      if (sp->arrowheads != NULL) g_free ((gpointer) sp->arrowheads);
+    break;
     case scatmat:
-      if (sp->edges != NULL)
-        g_free ((gpointer) sp->edges);
-      if (sp->arrowheads != NULL)
-        g_free ((gpointer) sp->arrowheads);
-      break;
+      if (sp->edges != NULL) g_free ((gpointer) sp->edges);
+      if (sp->arrowheads != NULL) g_free ((gpointer) sp->arrowheads);
+    break;
     case parcoords:
       g_free ((gpointer) sp->whiskers);
-      break;
+    break;
     case tsplot:
       g_free ((gpointer) sp->whiskers);
-      break;
+    break;
     default:
 	break;
   }
 
   gtk_widget_destroy (sp->da);
-
   g_free ((gpointer) sp);
 }
 

@@ -255,10 +255,10 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
 
   display->p1d_orientation = VERTICAL;
 
-    /* Copy in the contents of DefaultOptions to create
-       an indepedently modifiable configuration copied from
-       the current template.
-     */
+  /* Copy in the contents of DefaultOptions to create
+     an indepedently modifiable configuration copied from
+     the current template.
+   */
   display->options = DefaultDisplayOptions;
 
   display->ggobi = gg;
@@ -328,7 +328,6 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
 
   varpanel_refresh (gg);
 
-  /*-- don't I need this? --*/
   g_free (selected_vars);
 
   return (display);
