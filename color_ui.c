@@ -594,10 +594,10 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
       redraw_hidden (gg->color_ui.hidden_da, gg);
     } else {
 
-      gg->activeColorScheme->rgb[gg->color_id].blue = gdk_color.pixel;
-      gg->activeColorScheme->rgb[gg->color_id].pixel = gdk_color.red;
-      gg->activeColorScheme->rgb[gg->color_id].red = gdk_color.green;
-      gg->activeColorScheme->rgb[gg->color_id].green = gdk_color.blue;
+      gg->activeColorScheme->rgb[gg->color_id].pixel = gdk_color.pixel;
+      gg->activeColorScheme->rgb[gg->color_id].red = gdk_color.red;
+      gg->activeColorScheme->rgb[gg->color_id].green = gdk_color.green;
+      gg->activeColorScheme->rgb[gg->color_id].blue = gdk_color.blue;
 
       redraw_fg (gg->color_ui.fg_da[gg->color_id], gg->color_id, gg);
     }
