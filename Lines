@@ -97,6 +97,9 @@
               menubar; working on adding and deleting variables
 34614   10/9  cloning is working; bugs in transformation are fixed
 34759   10/9  deleting variables almost works (scatterplot only)
+34875   10/10 transformation does domain check of user limits
+34875   10/10 reading in new data works now -- if surprisingly
+              
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

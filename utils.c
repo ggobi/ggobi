@@ -351,3 +351,20 @@ find_keepers (gint ncols_current, gint nc, gint *cols, gint *keepers)
   return nkeepers;
 }
 
+/*--- set the data_mode depending on the suffix of the filename --*/
+DataMode
+data_mode_set (gchar *filename)
+{
+  gint len = strlen (filename);
+  gchar *suffix = (gchar *) &filename[len-4];
+  DataMode data_mode = ascii_data;
+
+  if (strcmp (suffix, ".dat") == 0)
+    data_mode = ascii_data;
+  else if (strcmp (suffix, ".bin") == 0)
+    data_mode = binary_data;
+  else if (strcmp (suffix, ".xml") == 0)
+    data_mode = xml_data;
+
+  return data_mode;
+}

@@ -22,7 +22,7 @@
 ggobid **all_ggobis;
 gint num_ggobis;
 
-static gchar *version_date = "July 1, 2000";
+static gchar *version_date = "October 10, 2000";
 
 const gchar * const ViewTypes[] =
   {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};

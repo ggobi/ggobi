@@ -69,9 +69,13 @@ fileset_read_init (gchar *ldata_in, ggobid *gg)
 gboolean
 fileset_read (gchar *ldata_in, ggobid *gg)
 {
+  extern DataMode data_mode_set (gchar *);
   gboolean ok = true;
   gg->filename = g_strdup (ldata_in);
   strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
+
+  /*-- determine the data_mode based on the suffix of the input file --*/
+  gg->data_mode = data_mode_set (gg->filename);
 
   switch (gg->data_mode) {
     case xml_data:
@@ -100,9 +104,9 @@ fileset_read (gchar *ldata_in, ggobid *gg)
     {
       datad *d; /* datad_new (gg);*/
 #ifdef USE_CLASSES
-      d  = new datad(gg);
+      d  = new datad (gg);
 #else
-      d = datad_new(NULL, gg);
+      d = datad_new (NULL, gg);
 #endif
       array_read (d, gg);
       d->nrows_in_plot = d->nrows;    /*-- for now --*/

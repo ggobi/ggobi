@@ -308,6 +308,23 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gtk_widget_show (gg->varpanel_ui.notebook);
 }
 
+void
+varpanel_clear (datad *d, ggobid *gg)
+{
+  GList *pages;
+  gint npages;
+  gint k;
+
+  if (gg->varpanel_ui.notebook != NULL &&
+      GTK_WIDGET_REALIZED (gg->varpanel_ui.notebook))
+  {
+    pages = gtk_container_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
+    npages = g_list_length (pages);
+    for (k=0; k<npages; k++)
+      gtk_notebook_remove_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook), k);
+  }
+}
+
 
 /*-- should rename varpanel_checkboxes_populate --*/
 /*-- for each datad, a scrolled window, vbox, and column of check buttons --*/

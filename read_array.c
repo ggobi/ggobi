@@ -43,9 +43,10 @@ strip_suffixes (ggobid *gg)
 */
   gint i, nchars;
   gboolean foundit = false;
-  gint nsuffixes = 2;
+  gint nsuffixes = 3;
   static gchar *suffix[] = {
     ".bin",
+    ".xml",
     ".dat"
   };
 

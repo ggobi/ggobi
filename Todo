@@ -7,7 +7,7 @@ Bugs:
 
   is adding and removing plots in scatmat still problematic?
 
-  reading in new data is broken
+  reading in new data works surprisingly -- adding rather than replacing
 
 In progress, needing design discussions:
   should variable limits be disabled for transformed variables?
