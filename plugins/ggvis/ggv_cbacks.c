@@ -10,6 +10,11 @@
 #include "defines.h"
 #include "ggvis.h"
 
+#if 0
+/* Use getSessionOptions() */
+__declspec(dllimport) GGobiOptions *sessionOptions;
+#endif
+
 static void ggv_center_scale_pos_all (ggvisd *ggv);
 void mds_open_display (PluginInstance *inst);
 
@@ -96,7 +101,9 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
    * have no variables, we don't want creating a datad to trigger
    * the initialization of this plot.   This takes care of it.
   */
-  sessionOptions->info->createInitialScatterPlot = false;
+
+  GGOBI_getSessionOptions()->info->createInitialScatterPlot = false;
+
   /*-- --*/
 
   dnew = datad_create (dsrc->nrows, nc, gg);
@@ -333,7 +340,6 @@ g_printerr ("e is null\n");
 
   ggv_compute_Dtarget (selected_var, ggv);
 
-
   /*-- update the entry to let people know Dtarget has been computed --*/
   window = (GtkWidget *) inst->data;
   entry = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(window),
@@ -342,8 +348,8 @@ g_printerr ("e is null\n");
   gtk_entry_set_text (GTK_ENTRY (entry), lbl);
   g_free (lbl);
 
-  trans_dist_init_defaults (ggv);
 
+  trans_dist_init_defaults (ggv);
   /*-- open display --*/
   mds_open_display (inst);
 }
@@ -361,6 +367,7 @@ mds_open_display (PluginInstance *inst)
     quick_message ("I can't identify a distance matrix", false);
     return;
   }
+
   if (!ggv->dpos) {
     gint j;
     vartabled *vt;
