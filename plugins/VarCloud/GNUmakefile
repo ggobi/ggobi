@@ -27,7 +27,7 @@ else
  CFLAGS+=$(shell cd $(GGOBI_HOME) ; $(MAKE) cflags ${GGOBI_MAKEFILE} ) $(GGOBI_INCLUDE_DIR)
 endif
 
-HEADERS=varcloud.h
+HEADERS=varcloud
 SRC=varcloud init cbacks
 OBJS=$(SRC:%=%.o)
 
