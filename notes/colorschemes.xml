@@ -7194,35 +7194,37 @@
 <colormap name="Set1 9" ncolors="9"
            type="qualitative" system="rgb">
 <description>
- From Cindy Brewer; one of the schemes in the ColorBrewer software
+ From Cindy Brewer; one of the schemes in the ColorBrewer software.
+ (The sequence of colors has been modified to improve its default
+ behavior in ggobi.)
 </description>
 <foreground>
- <color name="A">
-  <red>0.8941</red><green>0.1020</green><blue>0.1098</blue>
- </color>
- <color name="B">
-  <red>0.2157</red><green>0.4941</green><blue>0.7216</blue>
- </color>
- <color name="C">
-  <red>0.3020</red><green>0.6863</green><blue>0.2902</blue>
- </color>
- <color name="D">
-  <red>0.5961</red><green>0.3059</green><blue>0.6392</blue>
- </color>
- <color name="E">
-  <red>1.0000</red><green>0.4980</green><blue>0.0000</blue>
- </color>
- <color name="F">
+ <color name="Yellow">
   <red>1.0000</red><green>1.0000</green><blue>0.2000</blue>
  </color>
- <color name="G">
+ <color name="Orange">
+  <red>0.8941</red><green>0.1020</green><blue>0.1098</blue>
+ </color>
+ <color name="Blue">
+  <red>0.2157</red><green>0.4941</green><blue>0.7216</blue>
+ </color>
+ <color name="Green">
+  <red>0.3020</red><green>0.6863</green><blue>0.2902</blue>
+ </color>
+ <color name="Orange">
+  <red>1.0000</red><green>0.4980</green><blue>0.0000</blue>
+ </color>
+ <color name="Brown">
   <red>0.6510</red><green>0.3373</green><blue>0.1569</blue>
  </color>
- <color name="H">
+ <color name="Pink">
   <red>0.9686</red><green>0.5059</green><blue>0.7490</blue>
  </color>
- <color name="I">
+ <color name="Gray">
   <red>0.4980</red><green>0.4980</green><blue>0.4980</blue>
+ </color>
+ <color name="Purple">
+  <red>0.5961</red><green>0.3059</green><blue>0.6392</blue>
  </color>
 </foreground>
 <background>
