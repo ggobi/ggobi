@@ -570,6 +570,9 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
     } else if (gg->color_ui.current_da == gg->color_ui.accent_da) {
       scheme->rgb_accent = gdk_color;
       redraw_accent (gg->color_ui.accent_da, gg);
+    } else if (gg->color_ui.current_da == gg->color_ui.hidden_da) {
+      scheme->rgb_hidden = gdk_color;
+      redraw_hidden (gg->color_ui.hidden_da, gg);
     } else {
       gg->activeColorScheme->rgb[gg->color_id] = gdk_color;
       redraw_fg (gg->color_ui.fg_da[gg->color_id], gg->color_id, gg);
