@@ -71,7 +71,6 @@ const gchar * const ViewTypes[] =
 };
 const gint ViewTypeIndices[];
 
-
 FatalErrorHandler FatalError = &exit;
 
 static gchar *computeGGobiHome(char *str);
@@ -582,7 +581,12 @@ computeGGobiHome(char *str)
      return(g_strdup(""));
     }
 
+    /*
+    This can't be right, based on the assignment a few characters
+    down.   -- dfs
     tmp = (char *) g_malloc( ((dirPtr - dir) + 1)*sizeof(char));
+    */
+    tmp = (char *) g_malloc( ((dirPtr - dir) + 2)*sizeof(char));
     strncpy(tmp, dir, dirPtr-dir + 1);
     tmp[(dirPtr - dir) + 1] = '\0';
   }
@@ -850,7 +854,7 @@ process_initialization_files()
       if(!fileName) {
         sprintf(buf, "%sggobirc",sessionOptions->ggobiHome);
         fileName = buf;
-        g_free(tmp);
+        /*g_free(tmp);*/ /* purify objects to this */
       }
     }
     if(fileName)
