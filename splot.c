@@ -62,13 +62,27 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   sp->pixmap1 = gdk_pixmap_new (w->window,
     w->allocation.width, w->allocation.height, -1);
 
+  if (cpanel->viewmode == BRUSH) {
+    sp->brush_pos.x1 = (gint) ((gfloat) sp->brush_pos.x1 *
+      (gfloat) (w->allocation.width) / (gfloat) (sp->max.x));
+    sp->brush_pos.x2 = (gint) ((gfloat) sp->brush_pos.x2 *
+      (gfloat) (w->allocation.width) / (gfloat) (sp->max.x));
+
+    sp->brush_pos.y1 = (gint) ((gfloat) sp->brush_pos.y1 *
+      (gfloat) (w->allocation.height)/ (gfloat) (sp->max.y));
+    sp->brush_pos.y2 = (gint) ((gfloat) sp->brush_pos.y2 *
+      (gfloat) (w->allocation.height) / (gfloat) (sp->max.y));
+  }
+
   sp->max.x = w->allocation.width;
   sp->max.y = w->allocation.height;
 
   splot_plane_to_screen (display, cpanel, sp, gg);
 
-  if (viewmode_get (gg) == BRUSH)
+  /*if (viewmode_get (gg) == BRUSH)*/
+  if (cpanel->viewmode == BRUSH) {
     assign_points_to_bins (d, gg);
+  }
 
   sp->redraw_style = FULL;
   gtk_widget_queue_draw (sp->da);
