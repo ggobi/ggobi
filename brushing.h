@@ -70,15 +70,14 @@ typedef struct {
 
 typedef struct {
   glong n, nshown, nhidden;
-  gboolean hidden_p, excluded_p;
+  gboolean hidden_p;
   gint glyphtype, glyphsize;
   gshort color;
 } clusterd;
 typedef struct {
   GtkWidget *da;
   /*-- buttons and labels for hide, show, complement --*/
-/* GtkWidget *h_btn, *s_btn, *c_btn; */
-  GtkWidget *h_btn, *e_btn;  /* hide, exclude */
+  GtkWidget *h_btn;  /* hide */
   GtkWidget *nh_lbl, *ns_lbl, *n_lbl;
 } clusteruid;
 
