@@ -1663,7 +1663,8 @@ releaseCurrentDataInfo(XMLParserData *parserData)
      return;
 
    if(parserData->idTable && parserData->usesStringIds == false) {
-      g_hash_table_foreach(parserData->idTable, freeLevelHashEntry, parserData);
+      g_hash_table_foreach(parserData->idTable,
+        (GHFunc) freeLevelHashEntry, parserData);
       g_hash_table_destroy(parserData->idTable); 
    }
 
@@ -1673,7 +1674,8 @@ releaseCurrentDataInfo(XMLParserData *parserData)
          if(parserData->autoLevels[i]) {
                  /* don't free the keys (so pass NULL as third argument) 
                     since these are used in the level_names array.*/
-          g_hash_table_foreach(parserData->autoLevels[i], freeLevelHashEntry, NULL);
+          g_hash_table_foreach(parserData->autoLevels[i],
+            (GHFunc) freeLevelHashEntry, NULL);
            g_hash_table_destroy(parserData->autoLevels[i]); 
      }
       }
@@ -2031,7 +2033,7 @@ getRowLabsFromTable(GHashTable *tbl, gchar **names)
   if(!names)
      names = (gchar **) g_malloc(sizeof(gchar *) * g_hash_table_size(tbl));
 
-  g_hash_table_foreach(tbl, getLabel, names);
+  g_hash_table_foreach(tbl, (GHFunc) getLabel, names);
 
   return(names);
 }
