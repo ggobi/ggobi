@@ -121,5 +121,19 @@ edgeset_add_cb (GtkWidget *w, datad *e) {
   }
 
   display_plot (display, FULL, gg);  /*- moving edge drawing */
+
+  /*
+   * If no edge options is true, then turn on undirected edges.
+  */
+  if (!display->options.edges_undirected_show_p &&
+      !display->options.edges_directed_show_p &&
+      !display->options.edges_arrowheads_show_p)
+  {
+    GtkWidget *ww = widget_find_by_name (display->edge_menu,
+      "DISPLAY MENU: show undirected edges");
+    if (ww) {
+      gtk_check_menu_item_set_active ((GtkCheckMenuItem *) ww, true);
+    }
+  }
 }
 
