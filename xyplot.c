@@ -39,6 +39,8 @@ xyplot_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
     sp->xyvars.y = jvar;
   }
 
+g_printerr ("x,y = %d,%d\n", sp->xyvars.x, sp->xyvars.y);
+
   return redraw;
 }
 

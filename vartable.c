@@ -263,6 +263,7 @@ void
 clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 {
   gint i, k, n, jvar;
+  gint d_ncols_prev = d->ncols;
 
   vartable_realloc (d->ncols+ncols, d, gg);
   for (k=0; k<ncols; k++) {
@@ -275,13 +276,15 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
     transform_values_init (jvar, d, gg);
   }
 
+  d->ncols += ncols;
+
   /*-- pipeline --*/
-  arrayf_add_cols (&d->raw, d->ncols+ncols);
-  arrayf_add_cols (&d->tform, d->ncols+ncols);
+  arrayf_add_cols (&d->raw, d->ncols);
+  arrayf_add_cols (&d->tform, d->ncols);
 
   for (k=0; k<ncols; k++) {
-    n = cols[k];        /*-- variable being cloned --*/
-    jvar = d->ncols+k;  /*-- its new index --*/
+    n = cols[k];              /*-- variable being cloned --*/
+    jvar = d_ncols_prev + k;  /*-- its new index --*/
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = d->tform.vals[i][n];
 
@@ -291,22 +294,18 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
     vartable_row_append (jvar, d, gg);
   }
   /*-- --*/
-/*
-    missing_arrays_add_column (jvar, d, gg);
-*/
+  /*-- missing_arrays_add_column (jvar, d, gg); */
 
   /*-- variable checkboxes --*/
   for (k=0; k<ncols; k++) {
-    jvar = d->ncols+k;  /*-- its new index --*/
+    jvar = d_ncols_prev + k;  /*-- its new index --*/
     varpanel_checkbox_add (jvar, d, gg);
   }
 
   /*-- variable circles --*/
 /*
-  varcircles_add (d->ncols+ncols, d, gg);
+  varcircles_add (d->ncols, d, gg);
 */
-
-  d->ncols += ncols;
 }
 
 void delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)

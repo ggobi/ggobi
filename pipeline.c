@@ -58,6 +58,9 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
 static void
 pipeline_arrays_check_dimensions (datad *d) {
 
+g_printerr ("inside check_dims: ncols %d world.ncols %d jit.ncols %d\n ",
+d->ncols, d->world.ncols, d->jitdata.ncols);
+
 /*
  * I won't do this check for the raw array, because that
  * has to have been populated before the pipeline can be run.
@@ -69,10 +72,13 @@ pipeline_arrays_check_dimensions (datad *d) {
 
   if (d->jitdata.ncols < d->ncols) {
     gint i, j, nc = d->jitdata.ncols;
+g_printerr ("reallocating jitterdata:\n ");
     arrayl_add_cols (&d->jitdata, d->ncols);
-    for (j=nc; j<d->ncols; j++)
+    for (j=nc; j<d->ncols; j++) {
       for (i=0; i<d->nrows; i++)
         d->jitdata.vals[i][j] = 0;
+      g_printerr ("%ld %ld\n", d->jitdata.vals[0][j] , d->jitdata.vals[d->nrows-1][j]);
+    }
   }
 }
 
@@ -200,6 +206,7 @@ tform_to_world_by_var (gint j, datad *d, ggobid *gg)
 
   pipeline_arrays_check_dimensions (d);  /*-- realloc as necessary --*/
 
+
   max = d->vartable[j].lim.max;
   min = d->vartable[j].lim.min;
   range = max - min;
@@ -212,6 +219,11 @@ tform_to_world_by_var (gint j, datad *d, ggobid *gg)
     /* Add in the jitter values */
     d->world.vals[m][j] += d->jitdata.vals[m][j];
   }
+
+g_printerr ("inside tform_to_world_by_var %f, %f ; %ld, %ld ; %ld, %ld\n",
+d->tform.vals[0][j], d->tform.vals[d->nrows-1][j],
+d->jitdata.vals[0][j], d->jitdata.vals[d->nrows-1][j],
+d->world.vals[0][j], d->world.vals[d->nrows-1][j]);
 }
 
 void

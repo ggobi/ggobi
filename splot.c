@@ -393,6 +393,7 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
+g_printerr ("inside splot_world_to_plane\n");
 
   switch (display->displaytype) {
 
@@ -457,6 +458,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   gfloat scale_x, scale_y;
   datad *d = display->d;
 
+
   scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
   scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
 
@@ -488,6 +490,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   if (display->displaytype == parcoords) {
     sp_whiskers_make (sp, display, gg);
   }
+
 }
 
 /*----------------------------------------------------------------------*/
