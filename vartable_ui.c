@@ -1063,6 +1063,8 @@ vartable_stats_set_by_var (gint j, datad *d) {
       CLIST_MEAN, g_strdup_printf ("%8.3f", vt->mean));
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
       CLIST_MEDIAN, g_strdup_printf ("%8.3f", vt->median));
+    gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+      CLIST_NMISSING, g_strdup_printf ("%d", vt->nmissing));
   }
 }
 void

@@ -602,7 +602,8 @@ hidden_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
 
 
 gboolean
-missing_values_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
+missing_values_read (InputDescription *desc, gboolean init, datad *d,
+  ggobid *gg)
 {
   static const gchar *const suffixes[] = {"missing"};
   gint i, j, ok, itmp, row, col;

@@ -760,10 +760,25 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
   gdouble value;
   const gchar *tmp = strtok((gchar*) line, " \t\n");
   datad *d = getCurrentXMLData(data);
+  vartabled *vt;
 
   while (tmp) {
-    value = asNumber (tmp);
-    d->raw.vals[data->current_record][data->current_element++] = value;
+    if (strcmp (tmp, data->NA_identifier) == 0) {
+      if (d->nmissing == 0) {
+        arrays_alloc (&d->missing, d->nrows, d->ncols);
+        arrays_zero (&d->missing);
+      }
+      d->missing.vals[data->current_record][data->current_element] = 1;
+      vt = vartable_element_get (data->current_element, d);
+      vt->nmissing++;
+      d->raw.vals[data->current_record][data->current_element] = 0;
+      d->nmissing++;
+
+    } else {
+      value = asNumber (tmp);
+      d->raw.vals[data->current_record][data->current_element] = value;
+    }
+    data->current_element++;
     tmp = strtok (NULL, " \t\n");
   }
 

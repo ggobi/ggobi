@@ -26,6 +26,11 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
   gboolean ok = true;
   vartabled *vt;
 
+  if (d->missing.nrows == 0) {
+    quick_message ("There are no missings.\n", false);
+    return false;
+  }
+
   if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
 
     if (impute_type == IMP_ABOVE)
