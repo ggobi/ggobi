@@ -24,8 +24,8 @@
   
 \ifpdf
   \pdfoutput=1
-  %\usepackage[pdftex]{graphicx}  % uncomment if using graphicx
-  \usepackage[pdftex]{hyperref}  % uncomment if using hyperref
+  \usepackage[pdftex]{graphicx}  % uncomment if using graphicx
+  %\usepackage[pdftex]{hyperref}  % uncomment if using hyperref
 \else
   %\usepackage{graphicx}  % uncomment if using graphicx
   \usepackage[colorlinks=true,
@@ -61,7 +61,8 @@ Dianne Cook, Iowa State University \\
 Andreas Buja, AT\&T Labs -- Research \\
 Duncan Temple Lang, Lucent Bell Labs
 }
-\date{January 2001}
+%\date{January 2001}
+\date{}
 
 \maketitle
 
@@ -116,38 +117,48 @@ We begin with a tutorial, and move on to describe ggobi in detail.
 
 \section{Tutorial}
 
-Several sample data files are included with the ggobi distribution,
-in a directory called {\bf data,} and there you will find the file
-{\bf pigs.xml}, a dataset on pig production in the United Kingdom,
-taken from {\em Data} by Andrews and Herzberg.  Start ggobi for the 
-pig production data by typing:
+Several sample data files are included with the ggobi distribution, in
+a directory called {\bf data,} and there you will find the file {\bf
+olive.xml}, a dataset on olive oil samples from Italy \cite{FALT83}.
+(This data set takes advantage of an XML input/output format, a
+feature in ggobi that wasn't available in xgobi. It requires that
+ggobi has been compiled with XML support. If ggobi has been compiled
+without XML support, the set of files olive.dat, olive.col, olive.row,
+similar to the xgobi data file input, can be used.) This data consists
+of the percentage composition of 8 fatty acids (palmitic, palmitoleic,
+stearic, oleic, linoleic, linolenic, arachidic, eicosenoic) found in
+the lipid fraction of 572 Italian olive oils. There are 9 collection
+areas, 4 from southern Italy (North and South Apulia, Calabria,
+Sicily), two from Sardinia (Inland and Coastal) and 3 from northern
+Italy (Umbria, East and West Liguria).
+
+Start ggobi for the olive oils data by typing:
 
 \begin{quote}
-ggobi pigs
+ggobi olive
 \end{quote}
 
 Two windows will appear, the ggobi control panel and a scatterplot,
-as shown in figure~1.
+as shown in Figure~\ref{fig1}.
 
 The control panel has a panel of controls on the left, labeled {\bf
 XYPlot}, and a variable selection region on the right.  You can see
 that the scatterplot contains a 2-dimensional projection of the data,
-a plot of YEAR vs TIME.  Move the mouse to one of the variable labels
+a plot of Area vs Region.  Move the mouse to one of the variable labels
 in the variable selection region, and leave it in place until the
 tooltip appears, explaining how to select new variables for the
 plot.   Begin to get a feeling for the data by looking at several of
-the 2d plots:  PROFIT vs HERDSZ, HERDSZ vs TIME.
+the 2d plots:  Area vs palmitic, Region vs oleic....
 
-Some of the variables are not self-explanatory, and here's
-what they mean:
-
-\begin {itemize}
-\item GILTS: number of sows ``in pig'' (reproducing) for the first time
-\item PROFIT: ratio of price to an index of feed price
-\item S/HERDSZ: ratio of the number of breeding pigs slaughtered to the total
-      breeding herd size
-\item PRODUCTION: number of pigs slaughtered that were reared for meat
-\end {itemize}
+\begin{figure}[h]
+%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
+\hbox{\pdfimage width 3in {olive1.jpg}\pdfimage width 3in {olive2.jpg}}
+%\vspace{.15in} \centerline{ \parbox{6in}
+\caption{Layout of a ggobi session.  The plotting window contains a
+scatterplot of the Area vs Region, from the olive oils data.
+}%}
+\label{fig1}
+\end{figure}
 
 Next, get acquainted with the main menubar for the control panel by
 exploring each of its menus.  Pay particular attention to the
@@ -172,47 +183,90 @@ and notice what happens in the variable selection region of the
 control panel when you alternate between the two:  it should always show
 the variables that are plotted in the current plot.
 
-\vbox{
-\vspace{.4in}
-\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
-\vspace{.15in} \centerline{ \parbox{6in}
-{Figure~1: Layout of a ggobi session.  The plotting window contains a
-scatterplot of the PROFIT vs GILTS, from the pig production data.
-}}
-\vspace{.4in}
-}
+Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
+and Area vs Region in the second, and make that the current plot.
+Using the ViewMode menu, choose {\bf Identify}. Look at the buttons
+inside the leftmost portion of the ggobi control panel. Notice that
+they're contained by a frame labelled {\bf Identify,} which is the
+ViewMode of the current plot.  This frame contains most of the row
+labeling controls, which are described in the section
+\ref{slbl:Identify}. Move the cursor around the plot window with mouse
+movement, and observe the labels of the point closest to the cursor is
+written. The labels for this data set were set as the geographic area
+where the sample was taken.
 
-Now set up a plot of GILTS vs HERDSZ in the first scatterplot, and
-PROFIT vs HERDSZ in the second, and make that the current plot.
-Using the ViewMode menu, choose {\bf Brush.}  
-Look at the buttons and menus inside the leftmost portion of the
-ggobi control panel.  Notice that they're contained by a frame
-labelled {\bf Brush,} which is the ViewMode of the current plot.  This
-frame contains most of the brushing controls, which are described in
-the section \ref{slbl:Brush}.  A few of the brushing controls,
-though, are in the main menubar: in the Reset menu and at the bottom
-of the Options menu.
+Using the ViewMode menu, choose {\bf Brush.}  Look at the buttons and
+menus inside the leftmost portion of the ggobi control panel.  Notice
+that they're contained by a frame labelled {\bf Brush,} which is the
+ViewMode of the current plot.  This frame contains most of the
+brushing controls, which are described in the section
+\ref{slbl:Brush}.  A few of the brushing controls, though, are in the
+main menubar: in the Reset menu and at the bottom of the Options menu.
 
-The pink rectangle
-that appears in the current plot is the ``paintbrush,'' and dragging it
-over points changes their color.  Use the left button to drag it and
-the middle or right button to resize it.  Make it almost as wide as
-the window and about a quarter as tall, and paint first the
-profitable herds, and then the unprofitable ones.  While you do that,
-keep an eye on the of GILTS vs HERDSZ, and notice where the painted
-points fall in that scatterplot.  Using two linked 2d plots is one
-way to explore the relationship among three variables.
+The rectangle that appears in the current plot is the ``paintbrush,''
+and dragging it over points changes their color. Change the color of
+the brush to, say, yellow, by opening up the {\bf Choose symbol} panel
+(Figure \ref{fig2}). Now change the size of the brush.  Use the left
+button to drag it and the middle or right button to resize it.  Make
+it almost as tall as the window but very thin, and paint first the
+region, then the second and third regions.  While you do that, keep an
+eye on the plot of linoleic vs eicosenoic, and notice where the
+painted points fall in that scatterplot (Figure \ref{fig3}.  Using two
+linked 2d plots is one way to explore the relationship among three
+variables.
+
+\begin{figure}[htp]
+\vspace{-0.5in}
+%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
+\pdfimage width 4in {olive-colorchoose.jpg}
+%\vspace{.15in} \centerline{ \parbox{6in}
+\caption{Brush color chooser panel for selecting color and symbol, 
+and line type and thickness to paint with. Also allows setting the 
+plot background color, and a full color wheel for changing the selection
+of 10 colors.
+}%}
+\label{fig2}
+\end{figure}
+
+\begin{figure}[htp]
+%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
+\hbox{\pdfimage width 3in {olive-brush1.jpg}\pdfimage width 3in {olive-brush2.jpg}}
+%\vspace{.15in} \centerline{ \parbox{6in}
+\caption{Brushing in a ggobi session. Brushing Region 1 shows that it
+corresponds to a cohesive cluster in the variables linoleic and 
+eicosenoic acid.
+}%}
+\label{fig3}
+\end{figure}
+
+Now change to {\bf Persistent} brushing and paint the 3 Regions
+different colors. You may also want to use different symbols to
+represent the different Areas. 
+
+Hiding subsets.
 
 Next use the Tools menu to open the {\bf Variable manipulation tool},
-a central part of the ggobi graphical user interface.  It contains a
-table with a few basic statistics for each variable, and the buttons
-below the table allow you to set variable limits, add new variables,
-and a few other things.  Try clicking the mouse in the table -- 
-you can select one row of the table at a time, or use the control and
-shift keys as modifiers to select more than one.  Hold the
-control key down while clicking to select variables that are not
-contiguous in the table; use the shift key if you want to select
-a contiguous range of variables.
+a central part of the ggobi graphical user interface (Figure
+\ref{fig4}).  It contains a table with a few basic statistics for each
+variable, and the buttons below the table allow you to set variable
+limits, add new variables, and a few other things.  Try clicking the
+mouse in the table -- you can select one row of the table at a time,
+or use the control and shift keys as modifiers to select more than
+one.  Hold the control key down while clicking to select variables
+that are not contiguous in the table; use the shift key if you want to
+select a contiguous range of variables.
+
+\begin{figure}[htp]
+\vspace{-0.5in}
+%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
+\pdfimage width 5in {olive-var.jpg}
+%\vspace{.15in} \centerline{ \parbox{6in}
+\caption{Variable manipulation panel contains basic summary 
+statistics of variables. It also is central to variable subset selection
+for other modes.
+}%}
+\label{fig4}
+\end{figure}
 
 You select variables in this fashion when you want to use one of
 the tools to operate on them.  For example, select just the GILTS
@@ -715,6 +769,7 @@ menu bar contains these items:
 %
 
 \subsection{Identification}
+\label{slbl:Identify}
 
 This mode is used to display labels near points in the plotting
 window.  The labels are taken from the file of row or case labels
@@ -1165,7 +1220,7 @@ If the tooltips annoy you, you can turn then off using a
 checkbox on the {\bf Options} menu.
 
 \newpage
-\bibliography{xgobi}
+%\bibliography{xgobi}
 %\addcontentsline{toc}{section}{References}
 
 \end {document}

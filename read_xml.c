@@ -1268,5 +1268,3 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   return(true);
 }
 
-
-

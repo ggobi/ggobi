@@ -226,9 +226,8 @@ getDisplayDescription(xmlNodePtr node)
 {
   GGobiDisplayDescription *dpy;
   xmlNodePtr el;
-  int i;
+  gint i;
   xmlChar *tmp;
-
 
   dpy = (GGobiDisplayDescription*) g_malloc(sizeof(GGobiDisplayDescription*));
   dpy->type = getDisplayType(xmlGetProp(node, "type"));
