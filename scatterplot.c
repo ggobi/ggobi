@@ -72,17 +72,17 @@ scatterplot_show_rulers (displayd *display, gint projection)
   switch (projection) {
     case P1PLOT:
       if (display->p1d_orientation == VERTICAL) {
-        scatterplot_show_vrule (display, true);
+        scatterplot_show_vrule (display, display->options.axes_show_p);
         scatterplot_show_hrule (display, false);
       } else {
         scatterplot_show_vrule (display, false);
-        scatterplot_show_hrule (display, true);
+        scatterplot_show_hrule (display, display->options.axes_show_p);
       }
     break;
 
     case XYPLOT:
-      scatterplot_show_vrule (display, true);
-      scatterplot_show_hrule (display, true);
+      scatterplot_show_vrule (display, display->options.axes_show_p);
+      scatterplot_show_hrule (display, display->options.axes_show_p);
     break;
 
     case TOUR1D:
