@@ -240,7 +240,7 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
 
     if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
       GtkGGobiExtendedDisplayClass *klass;
-      klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+      klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
       jplotted = klass->variable_plotted_p(display, cols, ncols, d);
     }
   }

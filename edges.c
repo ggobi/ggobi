@@ -127,7 +127,7 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
           /*-- this is only necessary if there are variables, I think --*/
           if (e->ncols && GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
             GtkGGobiExtendedSPlotClass *klass;
-            klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+            klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
             if(klass->alloc_whiskers)
               sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp,
                 e->nrows, e);

@@ -123,7 +123,7 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
      GtkGGobiExtendedDisplayClass *klass;
-     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
      ncols = klass->plotted_vars_get(display, cols, d, gg);
   }
 

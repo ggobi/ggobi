@@ -80,7 +80,7 @@ cpanel_set (displayd *display, ggobid *gg)
   gboolean displaytype_known = true;
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-   displaytype_known = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->cpanel_set(display, cpanel, gg);
+   displaytype_known = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->cpanel_set(display, cpanel, gg);
   }
 
   if (cpanel->viewmode < COTOUR) cpanel->projection = cpanel->viewmode;

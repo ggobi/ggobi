@@ -592,6 +592,12 @@ void setMissingValue(int i, int j, datad *d, vartabled *vt);
 
 #include "GGobiEvents.h"
 
+
+#ifndef GTK_2_0
+#define GTK_OBJECT_GET_CLASS(obj)  (GTK_OBJECT(obj))->klass
+#endif
+
+
 #ifdef __cplusplus
 } /* end of extern "C" */
 #endif

@@ -13,6 +13,11 @@
 #include "scatterplotClass.h"
 #include "scatmatClass.h"
 
+#ifdef GTK_2_0
+#undef __gtk_marshal_MARSHAL_H__
+#include "marshal.h"
+#endif
+
 
 extern gint num_ggobis, totalNumGGobis;
 extern ggobid **all_ggobis;
@@ -54,6 +59,7 @@ GtkType gtk_ggobi_get_type(void)
  */
 void gtk_ggobi_class_init(GtkGGobiClass * klass)
 {
+#ifndef GTK_2_0
   if (gtk_signal_lookup("datad_added", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[DATAD_ADDED_SIGNAL] =
       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
@@ -81,7 +87,11 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
         "move_point",
         GTK_RUN_LAST | GTK_RUN_ACTION,
+#ifdef GTK_2_0
+        gtk_marshal_VOID__POINTER_INT_POINTER,
+#else
         gtk_marshal_NONE__POINTER_INT_POINTER,
+#endif
         GTK_TYPE_NONE, 3,
         GTK_TYPE_GGOBI_SPLOT,
         GTK_TYPE_INT,
@@ -93,7 +103,11 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
         "identify_point",
         GTK_RUN_LAST | GTK_RUN_ACTION,
+#ifdef GTK_2_0
+        gtk_marshal_VOID__POINTER_INT_POINTER,
+#else
         gtk_marshal_NONE__POINTER_INT_POINTER,
+#endif
         GTK_TYPE_NONE, 3,
         GTK_TYPE_GGOBI_SPLOT,
         GTK_TYPE_INT,
@@ -175,6 +189,7 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
       GTK_TYPE_NONE, 1, 
       GTK_TYPE_GGOBI_DATA);  /* datad pointer */
   }
+#endif /* GTK_2_0 */
 }
 
 /****************************/
@@ -182,6 +197,7 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
 
 void gtk_ggobi_data_class_init(GtkGGobiDataClass * klass)
 {
+#ifndef GTK_2_0
   if (gtk_signal_lookup("rows_in_plot_changed", GTK_TYPE_GGOBI_DATA) == 0) {
     klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL] = 
     gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI_DATA), 
@@ -191,6 +207,7 @@ void gtk_ggobi_data_class_init(GtkGGobiDataClass * klass)
         GTK_TYPE_NONE, 3, 
         GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI);
   }
+#endif
 }
 
 
@@ -286,6 +303,7 @@ gtk_ggobi_display_class_init(GtkGGobiDisplayClass * klass)
   GTK_OBJECT_CLASS(klass)->destroy = testDisplayDestroy;
 #endif
 
+#ifndef GTK_2_0
   if (gtk_signal_lookup("tour_step", GTK_TYPE_GGOBI_DISPLAY) == 0) {
     GGobiSignals[TOUR_STEP_SIGNAL] =
       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI_DISPLAY),
@@ -296,6 +314,8 @@ gtk_ggobi_display_class_init(GtkGGobiDisplayClass * klass)
                                          GTK_TYPE_POINTER, GTK_TYPE_INT,
                                          GTK_TYPE_GGOBI);
   }
+#endif
+
 }
 
 static void 
@@ -663,7 +683,7 @@ allocCPanels(GTK_GGOBI_EXTENDED_DISPLAY(dpy));
 void allocCPanels(extendedDisplayd * dpy)
 {
   GtkGGobiExtendedDisplayClass *klass;
-  klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
+  klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dpy));
 
   if (klass->numControlPanels > 0)
     dpy->cpanel =

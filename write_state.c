@@ -229,16 +229,18 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
   /* write the width and height information so we can restore these.
      Currently, the query only returns -1! */
 
+#ifndef GTK_2_0
   for(i = 0; i < sizeof(props)/sizeof(props[0]); i++) {
     arg.name = props[i];
     gtk_object_arg_get(GTK_OBJECT(dpy), &arg, NULL);
     sprintf(buf, "%d", arg.d.int_data);
     xmlSetProp(node, props[i], buf);
   }
+#endif
 
   plots = dpy->splots;
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
-    GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
+    GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dpy));
     if(klass->xml_describe) {
       klass->xml_describe(node, plots, dpy);
     } else {

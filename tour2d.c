@@ -163,7 +163,7 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
 
     if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp))
       continue;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dsp)->klass);
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp));
     if(klass->tour2d_realloc)
         klass->tour2d_realloc(dsp, nc, d);
   }

@@ -165,7 +165,7 @@ varpanel_highd (displayd *display)
 
   if(display && GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
      GtkGGobiExtendedDisplayClass *klass;
-     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
      if(klass->varpanel_highd)
        highd = klass->varpanel_highd(display);
   }
@@ -253,7 +253,7 @@ viewmode_set (PipelineMode m, ggobid *gg)
         panel = gg->control_panel[gg->viewmode];
       } else {
         GtkGGobiExtendedDisplayClass *klass;
-        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
         panel = klass->viewmode_control_box(display, gg->viewmode,
           &modeName, gg);
       }
@@ -280,7 +280,7 @@ viewmode_set (PipelineMode m, ggobid *gg)
   */
   if (display) {
     GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
     if(klass->viewmode_set)
        klass->viewmode_set(display, gg);
   }

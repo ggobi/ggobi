@@ -143,7 +143,11 @@ static void barchartDestroy(GtkObject *obj)
 
   {
     GtkObjectClass *klass;
+#ifdef GTK_2_0
+    klass = g_type_class_peek_parent(GTK_TYPE_GGOBI_EXTENDED_SPLOT);
+#else
     klass = gtk_type_parent_class(GTK_TYPE_GGOBI_EXTENDED_SPLOT);
+#endif
     klass->destroy(GTK_OBJECT(sp));
   }
 }

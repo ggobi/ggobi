@@ -63,7 +63,7 @@ splot_plot_case (gint m, datad *d,
   else if (d->nmissing > 0 && !d->missings_show_p) {
     if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
       GtkGGobiExtendedSPlotClass *klass;
-      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
       if(klass->draw_case_p) {
          draw_case = klass->draw_case_p(sp, m, d, gg);
       }
@@ -122,7 +122,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   g_assert (d->hidden.nels == d->nrows);
 
   if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-   displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+   displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
    loop_over_points = display->options.points_show_p &&
                       displayKlass->loop_over_points;
   } else
@@ -151,7 +151,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
       /*
       */
       if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-        klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+        klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
         f = klass->redraw;
         if(f) {
           f(sp, d, gg, false);
@@ -188,7 +188,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
 
         if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-          klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+          klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
           f = klass->redraw;
           if(f) {
             f(sp, d, gg, false);
@@ -304,7 +304,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
     /* Allow the extended plot to take over the entire thing.
        If it wants to take over just a small part, see below.*/
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
     if(klass->redraw) {
       displayd *display = (displayd *) sp->displayptr;
       datad *d = display->d;
@@ -424,7 +424,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     void (*f)(splotd *, GdkDrawable*, ggobid*);
-    f =  GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->add_plot_labels;
+    f =  GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp))->add_plot_labels;
     if(f) {
       f(sp, drawable, gg);
       return;
@@ -435,7 +435,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
         for the display type but still need to do something special. */
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     void (*f)(displayd *, splotd *, GdkDrawable*, datad *, ggobid*);
-    f =  GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->add_plot_labels;
+    f =  GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->add_plot_labels;
     if(f)
       f(display, sp, drawable, d, gg);
   }
@@ -546,7 +546,7 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
   if (nearest) {
     if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
       GtkGGobiExtendedSPlotClass *klass;
-      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
       if (klass->add_identify_cues)
         klass->add_identify_cues(k, sp, drawable, gg);
       else 
@@ -703,7 +703,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     GtkGGobiExtendedDisplayClass *displayKlass = NULL;
 
     if (GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp)) {
-      displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dsp)->klass);
+      displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp));
       draw_edge = displayKlass->supports_edges_p && displayKlass->show_edges_p;
     } else {
       draw_edge = dsp->options.edges_undirected_show_p ||
@@ -721,7 +721,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   
   if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     void (*f)(splotd *, GdkDrawable*, ggobid*);
-    splotKlass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+    splotKlass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
     f = splotKlass->add_markup_cues;
     if(f)
       f(sp, drawable, gg);
@@ -747,7 +747,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
       if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
         void (*f)(splotd *, GdkDrawable*, ggobid*);
-        splotKlass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+        splotKlass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
         f = splotKlass->add_scaling_cues;
         if(f)
           f(sp, drawable, gg);

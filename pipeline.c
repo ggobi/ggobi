@@ -297,7 +297,7 @@ rows_in_plot_set (datad *d, ggobid *gg) {
     if (d->sampled.els[i] && !d->excluded.els[i])
       d->rows_in_plot.els[d->nrows_in_plot++] = i;
 
-  klass = GTK_GGOBI_DATA_CLASS(GTK_OBJECT(d)->klass);
+  klass = GTK_GGOBI_DATA_CLASS(GTK_OBJECT_GET_CLASS(d));
   gtk_signal_emit (GTK_OBJECT(d),
     klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL], 
     nprev, -1, gg);  /* the argument shown with -1 has no current use */

@@ -168,7 +168,7 @@ setRowNames(datad *d, gchar **rownames)
     int i;
     gchar *lbl;
     for (i = 0; i < d->nrows ; i++) {
-        lbl = (rownames != &DefaultRowNames && rownames != NULL && rownames[i] != NULL) ?
+        lbl = (rownames != &DefaultRowNames && rownames != (gchar **) NULL && rownames[i] != (gchar *) NULL) ?
           g_strdup (rownames[i]) : g_strdup_printf ("%d", i+1);
         g_array_append_val (d->rowlab, lbl);
     }
@@ -464,7 +464,7 @@ GGOBI(getViewTypeName)(displayd *dpy)
 /*
  or use gtk_type_name(GTK_OBJECT_TYPE(dpy))
  */
-  val = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass)->treeLabel;
+  val = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dpy))->treeLabel;
 
   return (val);
 }

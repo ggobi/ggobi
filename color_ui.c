@@ -402,7 +402,7 @@ set_color_id (GtkWidget *w, GdkEventButton *event, ggobid *gg)
     set_color_fg (w, event, gg);
 
   splot_redraw (gg->current_splot, 
-                GTK_GGOBI_SPLOT_CLASS(GTK_OBJECT(gg->current_splot)->klass)->redraw,
+                GTK_GGOBI_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(gg->current_splot))->redraw,
                 gg);  /*-- redraw brush --*/
 
   return FALSE;

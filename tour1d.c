@@ -163,7 +163,7 @@ tour1d_realloc_up (gint nc, datad *d, ggobid *gg)
 
     if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp))
       continue;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dsp)->klass);
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp));
     if(klass->tour1d_realloc)
         klass->tour1d_realloc(dsp, nc, d);
   }
@@ -763,7 +763,7 @@ g_printerr ("\n");*/
 #ifdef TESTING_TOUR_STEP
 {
   GtkGGobiDisplayClass *klass;
-  klass = GTK_GGOBI_DISPLAY_CLASS(GTK_OBJECT(dsp)->klass);
+  klass = GTK_GGOBI_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp));
   gtk_signal_emit(GTK_OBJECT(dsp),
     klass->signals[TOUR_STEP_SIGNAL], dsp->t1d,
     (gint) 1, gg);

@@ -53,7 +53,7 @@ splot_plot_edge (gint m, datad *d, datad *e,
   else if (e->nmissing > 0 && !e->missings_show_p) {
     if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
       GtkGGobiExtendedSPlotClass *klass;
-      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
       if (klass->draw_edge_p) {
         draw_edge = klass->draw_edge_p(sp, m, d, e, gg);
       }
@@ -422,7 +422,7 @@ splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
 
   if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     GtkGGobiExtendedSPlotClass *klass;
-    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
     if(klass->add_identify_edge_cues)
       klass->add_identify_edge_cues(k, sp, drawable, nearest, gg);
     else 

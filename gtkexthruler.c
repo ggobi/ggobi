@@ -163,7 +163,7 @@ gtk_ext_hruler_draw_ticks (GtkExtRuler *ruler)
     /*if (!GTK_WIDGET_DRAWABLE (ruler)) 
 	return;*/
 
-    klass = GTK_EXT_RULER_CLASS(GTK_OBJECT(ruler)->klass);
+    klass = GTK_EXT_RULER_CLASS(GTK_OBJECT_GET_CLASS(ruler));
   
     gtk_ext_ruler_calc_scale(ruler,'h');
 

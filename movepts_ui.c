@@ -93,7 +93,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   */
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
      GtkGGobiExtendedDisplayClass *klass;
-     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
      if(klass->move_points_motion_cb)
          klass->move_points_motion_cb(display, sp, w, event, gg);
   }
@@ -118,7 +118,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   */
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
     if(klass->move_points_button_cb) 
         klass->move_points_button_cb(display, sp, w, event, gg);
   } else 

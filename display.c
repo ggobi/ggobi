@@ -281,7 +281,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
         GtkGGobiExtendedDisplayClass *klass;
-        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
         if(klass->set_show_axes_option)
           klass->set_show_axes_option(display, w->active);
       }
@@ -292,7 +292,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
         GtkGGobiExtendedDisplayClass *klass;
-        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
         if(klass->set_show_axes_label_option)
           klass->set_show_axes_label_option(display, w->active);
       }      
@@ -303,7 +303,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
         GtkGGobiExtendedDisplayClass *klass;
-        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
         if(klass->set_show_axes_values_option)
           klass->set_show_axes_values_option(display, w->active);
       }
@@ -626,7 +626,7 @@ display_set_current (displayd *new_display, ggobid *gg)
      /* Allow the extended display to override the submenu_destroy call.
         If it doesn't provide a method, then call submenu_destroy. */
       void (*f)(displayd *dpy, GtkWidget *) =
-        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(gg->current_display)->klass)->display_unset;
+        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(gg->current_display))->display_unset;
       if(f)
         f(gg->current_display, gg->viewmode_item);
       else
@@ -646,7 +646,7 @@ display_set_current (displayd *new_display, ggobid *gg)
        /* Allow the extended display to override the submenu_destroy call.
           If it doesn't provide a method, then call submenu_destroy. */
       void (*f)(displayd *dpy, ggobid *gg) =
-        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(new_display)->klass)->display_set;
+        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(new_display))->display_set;
       if(f)
         f(new_display, gg);
     }
@@ -755,7 +755,7 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg)
 
     if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
       void (*f)(gboolean, displayd *, splotd *, ggobid *);
-      f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->ruler_ranges_set;
+      f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->ruler_ranges_set;
       if(f) {
         f(GTK_WIDGET_VISIBLE (display->hrule) ||
           GTK_WIDGET_VISIBLE (display->vrule),
@@ -818,7 +818,7 @@ display_type_handles_action (displayd *display, PipelineMode viewmode)
   PipelineMode v = viewmode;
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    handles = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->handles_action(display, v);
+    handles = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->handles_action(display, v);
   } 
 
   return handles;

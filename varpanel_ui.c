@@ -130,7 +130,7 @@ varsel (GtkWidget *w, cpaneld *cpanel, splotd *sp, gint jvar,
   }
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-     redraw = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->variable_select(w, display, sp, jvar, toggle, mousebtn, cpanel, gg);
+     redraw = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->variable_select(w, display, sp, jvar, toggle, mousebtn, cpanel, gg);
   }
 
   gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[VARIABLE_SELECTION_SIGNAL], 
@@ -219,7 +219,7 @@ varpanel_refresh (displayd *display, ggobid *gg)
 
     if (sp != NULL && d != NULL) {
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->varpanel_refresh(display, sp, d);
+        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->varpanel_refresh(display, sp, d);
       }
     }
   } else {
@@ -456,7 +456,9 @@ void varpanel_populate (datad *d, ggobid *gg)
 
   /*-- create a paned widget --*/
   d->varpanel_ui.hpane = gtk_hpaned_new ();
+#ifndef GTK_2_0
   gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+#endif
   gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
   /*-- set the handle position all the way to the right --*/
   gtk_paned_set_position (GTK_PANED(d->varpanel_ui.hpane), -1);
@@ -506,7 +508,7 @@ GGOBI(selectScatterplotX) (GtkWidget *w, gint jvar, ggobid *gg)
 
   if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(display))
     return;
-  klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+  klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
   if(klass->select_X)
     klass->select_X(w, display, jvar, gg);
 }
@@ -551,7 +553,7 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
       label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
     
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-         GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+         GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
          if(klass->varpanel_tooltips_set)
            klass->varpanel_tooltips_set(display, gg, wx, wy, wz, label);
       }

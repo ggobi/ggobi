@@ -141,7 +141,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
     gboolean changed;
     gboolean (*f)(icoords, splotd *sp, datad *, ggobid *);
 
-    f = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->identify_notify;
+    f = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp))->identify_notify;
     if(f) {
       changed = f(sp->mousepos, sp, d, gg);
       if (changed) {

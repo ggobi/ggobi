@@ -61,6 +61,9 @@ C_HEADER_FILES=\
   scatmatClass parcoordsClass  \
   GGobiEvents
 
+ifdef GTK_2
+ C_HEADER_FILES+=marshal
+endif
 
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)

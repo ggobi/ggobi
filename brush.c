@@ -215,7 +215,7 @@ binning_permitted (displayd *display, ggobid *gg)
      /* If there is a function to determine this, call it. Otherwise just 
         get the value of binning_ok in the class. */
     GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(GTK_OBJECT(display)));
     if(klass->binningPermitted)
        return(klass->binningPermitted(display));
     return(klass->binning_ok);
@@ -662,7 +662,7 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
 
   if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->build_symbol_vectors; 
+    f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(GTK_OBJECT(display)))->build_symbol_vectors; 
     if(f)
       changed = f(cpanel, d, gg);
   }
@@ -744,7 +744,7 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
   g_assert (d->pts_under_brush.nels == d->nrows);
 
   if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-    f = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->active_paint_points;
+    f = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(GTK_OBJECT(sp)))->active_paint_points;
     if(f)
        d->npts_under_brush = f(sp, d, gg);
   }

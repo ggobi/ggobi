@@ -131,7 +131,7 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
     if(klass->splot_key_event_handler) 
          action = klass->splot_key_event_handler(display, sp, event->keyval);
   }
@@ -239,7 +239,7 @@ sp_event_handlers_toggle (splotd *sp, gboolean state)
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
     if(klass->event_handlers_toggle && klass->event_handlers_toggle(display, sp, state, m) == false) {
       return;
     }
@@ -462,7 +462,7 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg)
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     GtkGGobiExtendedSPlotClass *klass;
-    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
     if(klass->alloc_whiskers)
       sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp, nr, d);
   }
@@ -620,7 +620,7 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 */
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-    GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->world_to_plane(sp,
+    GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp))->world_to_plane(sp,
       d, gg);
   }
 }
@@ -642,7 +642,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   greal precis = (greal) PRECISION1;
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
     
      if(klass->plane_to_screen) {
         klass->plane_to_screen(sp, d, gg);

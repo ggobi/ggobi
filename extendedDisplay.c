@@ -6,7 +6,7 @@ gtk_display_tree_label(displayd *dpy)
 {
   GtkGGobiExtendedDisplayClass *klass;
   gchar * const label = "?";
-  klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
+  klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dpy));
   if(klass->treeLabel)
     return(klass->treeLabel);
   if(klass->tree_label)
@@ -27,7 +27,7 @@ gtk_display_title_label(displayd *dpy)
 		return(edpy->titleLabel);
 	}
 
-	klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
+	klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dpy));
 	if(klass->titleLabel)
 		return(klass->treeLabel);
 	if(klass->title_label)

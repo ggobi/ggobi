@@ -295,7 +295,9 @@ varcircles_show (gboolean show, datad *d, displayd *display, ggobid *gg)
       varcircles_visibility_set (display, gg);
     gtk_paned_pack2 (GTK_PANED (d->varpanel_ui.hpane),
       d->vcirc_ui.ebox, true, true);
+#ifndef GTK_2_0
     gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 10);
+#endif
     gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 15);
 
     /*-- update the reference count for the ebox --*/
@@ -311,7 +313,9 @@ varcircles_show (gboolean show, datad *d, displayd *display, ggobid *gg)
     gtk_widget_ref (d->vcirc_ui.ebox);
     gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.hpane),
                                          d->vcirc_ui.ebox);
+#ifndef GTK_2_0
     gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+#endif
     gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
     /*-- set the handle position all the way to the right --*/
     gtk_paned_set_position (GTK_PANED(d->varpanel_ui.hpane), -1);
@@ -649,7 +653,7 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
   /*-- add the appropriate line --*/
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
     if(klass->varcircle_draw)
       chosen = klass->varcircle_draw(display, jvar, da_pix, gg);
   }

@@ -572,7 +572,7 @@ gboolean
 mode_has_options_menu (gint mode, displayd *prev_display, ggobid *gg)
 {
   if(prev_display && GTK_IS_GGOBI_EXTENDED_DISPLAY(prev_display)) {
-   return(GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(prev_display)->klass)->options_menu_p);
+   return(GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(prev_display))->options_menu_p);
   }
 
   /*-- every mode has an options menu --*/
@@ -731,7 +731,7 @@ viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display,
       displayd *dpy = gg->current_display;
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
         GtkGGobiExtendedDisplayClass *klass;
-        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
+        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dpy));
         klass->menus_make(dpy, mode, gg);
       }
     }

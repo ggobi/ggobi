@@ -212,8 +212,8 @@ gtk_ext_ruler_draw_ticks (GtkExtRuler *ruler)
     g_return_if_fail (ruler != NULL);
     g_return_if_fail (GTK_IS_EXT_RULER (ruler));
 
-    if (GTK_EXT_RULER_CLASS (GTK_OBJECT (ruler)->klass)->draw_ticks)
-	(* GTK_EXT_RULER_CLASS (GTK_OBJECT (ruler)->klass)->draw_ticks) (ruler);
+    if (GTK_EXT_RULER_CLASS (GTK_OBJECT_GET_CLASS(ruler))->draw_ticks)
+	(* GTK_EXT_RULER_CLASS (GTK_OBJECT_GET_CLASS(ruler))->draw_ticks) (ruler);
 }
 
 void
@@ -222,8 +222,8 @@ gtk_ext_ruler_draw_pos (GtkExtRuler *ruler)
     g_return_if_fail (ruler != NULL);
     g_return_if_fail (GTK_IS_EXT_RULER (ruler));
 
-    if (GTK_EXT_RULER_CLASS (GTK_OBJECT (ruler)->klass)->draw_pos)
-	(* GTK_EXT_RULER_CLASS (GTK_OBJECT (ruler)->klass)->draw_pos) (ruler);
+    if (GTK_EXT_RULER_CLASS (GTK_OBJECT_GET_CLASS(ruler))->draw_pos)
+	(* GTK_EXT_RULER_CLASS (GTK_OBJECT_GET_CLASS(ruler))->draw_pos) (ruler);
 }
 
 

@@ -256,7 +256,7 @@ gchar *
 splot_tree_label(splotd *splot, gint ctr, datad *d, ggobid *gg)
 {
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(splot)) {
-      return(GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(splot)->klass)->tree_label(splot, d, gg));
+      return(GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(splot))->tree_label(splot, d, gg));
   }
 
   return (NULL);

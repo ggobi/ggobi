@@ -117,6 +117,10 @@ void    gtk_ext_ruler_calc_scale     (GtkExtRuler          *ruler,
 
 
 
+#ifndef GTK_2_0
+#define GTK_OBJECT_GET_CLASS(obj)  (GTK_OBJECT(obj))->klass
+#endif
+
 
 #ifdef __cplusplus
 }

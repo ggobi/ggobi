@@ -123,6 +123,11 @@ SRC=\
     parcoordsClass.c scatmatClass.c scatterplotClass.c \
     tour2d3.c tour2d3_ui.c
 
+
+ifneq ($(GTK_2),)
+ SRC+= marshal.c
+endif
+
 #    mt19937-1.c \
 #    cokus.c \
 

@@ -206,7 +206,7 @@ gtk_ext_vruler_draw_ticks (GtkExtRuler *ruler)
 	return;*/
 
     widget = GTK_WIDGET (ruler);
-    klass = GTK_EXT_RULER_CLASS(GTK_OBJECT(ruler)->klass);
+    klass = GTK_EXT_RULER_CLASS(GTK_OBJECT_GET_CLASS(ruler));
 
     gc = widget->style->fg_gc[widget->state];
     bg_gc = widget->style->bg_gc[widget->state];
