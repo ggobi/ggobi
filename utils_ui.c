@@ -398,7 +398,10 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   return notebook;
 }
 
-/*-- This is for the benefit of plugins, though it might have other uses --*/
+/*--------------------------------------------------------------------*/
+/* These are for the benefit of plugins, though they might have other */
+/* uses as well                                                       */
+/*--------------------------------------------------------------------*/
 
 GtkWidget *
 GGobi_addDisplayMenuItem(ggobid *gg, const char *label)
@@ -421,4 +424,25 @@ GGobi_addDisplayMenuItem(ggobid *gg, const char *label)
   gtk_menu_append (GTK_MENU (dpy_menu), entry);
 
   return(entry);
+}
+
+GtkWidget *
+GGobi_addToolsMenuItem (const char *label, ggobid *gg)
+{
+  GtkWidget *entry, *tools_menu;
+  GtkItemFactory *factory;
+
+  entry = gtk_menu_item_new_with_label (label);
+  gtk_widget_show (entry);
+
+  factory = gtk_item_factory_from_path ("<main>");
+  tools_menu = gtk_item_factory_get_widget (factory, "<main>/Tools");
+
+
+  /* Add a separator */
+  CreateMenuItem (tools_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
+
+  gtk_menu_append (GTK_MENU (tools_menu), entry);
+
+  return (entry);
 }
