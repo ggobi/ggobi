@@ -457,7 +457,7 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
     "variable_added", GTK_SIGNAL_FUNC (variable_notebook_addvar_cb),
      GTK_OBJECT (notebook));
 
-  /*-- listen for variable_added events on main_window --*/
+  /*-- listen for datad_added events on main_window --*/
   gtk_signal_connect (GTK_OBJECT (gg->main_window),
     "datad_added", GTK_SIGNAL_FUNC (variable_notebook_adddata_cb),
      GTK_OBJECT (notebook));
