@@ -321,9 +321,6 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gg->varpanel_ui.layoutByRow = true;  /*-- for the circles --*/
   gg->selvarfg_GC = NULL;
 
-/*
-  gg->varpanel_ui.varpanel_accel_group = gtk_accel_group_new ();
-*/
   gg->varpanel_ui.tips = gtk_tooltips_new ();
   
   gg->varpanel_ui.notebook = gtk_notebook_new ();

@@ -49,8 +49,9 @@ extern DataMode GGOBI(setDataMode) (DataMode newMode, ggobid *gg);
  * of doubles, arranged by column. Hence the double* for now.
  * A double array (double **) would be useful also.
 */
-extern void GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames, gint nr, gint nc,
-                             datad *d, gboolean initPlot, ggobid *gg, InputDescription *);
+extern void GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
+  gint nr, gint nc, datad *d, gboolean initPlot, ggobid *gg,
+  InputDescription *);
 
 
 /* Whether to get the transformed names or the regular ones. */
@@ -160,7 +161,7 @@ extern gint GGOBI(getCaseColor) (gint pt, datad *, ggobid *gg);
 extern gint * GGOBI(getCaseColors) (gint *pts, gint howMany, datad *, ggobid *gg);
 
 extern void GGOBI(setCaseColor)(gint pt, gint colorIndex, datad *, ggobid *gg);
-extern void GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx, datad *, ggobid *gg);
+extern void GGOBI(setCaseColors)(gint *pts, gint n, gint color, datad *, ggobid *);
 
 /*-- point hidden state --*/
 extern gboolean GGOBI(getCaseHidden) (gint pt, datad *, ggobid *gg);

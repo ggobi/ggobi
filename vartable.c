@@ -520,6 +520,8 @@ vartable_update_cloned_var (gint n, gint jvar, datad *d, ggobid *gg)
 
     d->vartable[jvar].nmissing = d->vartable[n].nmissing;
 
+    d->vartable[jvar].lim_specified_p = false;
+
     return (true);
 
   } else return (false); 

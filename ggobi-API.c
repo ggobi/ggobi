@@ -113,21 +113,17 @@ void
 GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed,
   datad *d, ggobid *gg)
 {
-  gchar *old;
 
-  if (transformed)
-    old = d->vartable[jvar].collab_tform;
-  else
-    old = d->vartable[jvar].collab;
-
-  if (old)
-    g_free (old);
+  if (!transformed)
+    g_free (d->vartable[jvar].collab);
+  g_free (d->vartable[jvar].collab_tform);
 
   if (transformed)
     d->vartable[jvar].collab_tform = g_strdup(name);
   else {
     extern GtkWidget *checkbox_get_nth (gint, datad *);
     d->vartable[jvar].collab = g_strdup(name);
+    d->vartable[jvar].collab_tform = g_strdup(name);
     gtk_object_set (GTK_OBJECT(checkbox_get_nth (jvar, d)),
       "label", name, NULL);
    }
@@ -571,16 +567,19 @@ GGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size,
 void 
 GGOBI(setCaseColor)(gint pt, gint colorIndex, datad *d, ggobid *gg)
 {
+if (pt < 5)
+g_printerr ("pt= %d, color=%d\n",
+pt, colorIndex);
   d->color_ids.els[pt] = d->color_now.els[pt] = colorIndex;
 }
 
 void 
-GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx,
+GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorIndex,
   datad *d, ggobid *gg)
 {
   gint i;
   for (i = 0; i < howMany ; i++)
-   GGOBI(setCaseColor)(pts[i], colorindx, d, gg);
+    d->color_ids.els[pts[i]] = d->color_now.els[pts[i]] = colorIndex;
 }
 
 
@@ -1031,38 +1030,49 @@ gint
 GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update, 
   datad *d, ggobid *gg)
 {
-
+g_printerr ("entering addVariable\n");
   if (d->ncols < 1) {
     gint i;
     gchar ** rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
-    for(i = 0; i < num; i++) {
+    for (i = 0; i < num; i++) {
       rnames[i] = (gchar *) g_malloc (sizeof (gchar)*7);
-      sprintf(rnames[i],"%d",i+1);
+      rnames[i] = g_strdup_printf ("%d", i+1);
+/*    sprintf(rnames[i],"%d",i+1);*/
     }
     /* May want the final false here to be true as it causes the 
        creation of a plot. Probably not, but just mention it here
        so we don't forget.
      */
     GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg, d->input);
+    for (i = 0; i < num; i++)
+      g_free (rnames[i]);
+    g_free (rnames);
   } else {
+    gint which = d->ncols-1;
+    gint *cols = (gint *) g_malloc (sizeof (gint));
+    gint ncols = 1;
     if (num > d->nrows) {
       num =  d->nrows;
       /* Add a warning here. */
     }
 
-    /*
-     * I'm breaking this section for now, reworking cloning -- dfs
-    gint which;
-    variable_clone (0, name, true, d, gg);
-    which = d->ncols-1;
+    /*-- we have to first clone a variable and then
+         overwrite its name and variables.  --*/
+    cols[0] = 0;
+    clone_vars (cols, ncols, d, gg);
+    g_free (cols);
+/*
+ *  variable_clone (0, name, true, d, gg);
+*/
+    which++;
+    GGOBI(setVariableName)(which, name, false, d, gg);
     GGOBI(setVariableValues)(which, vals, num, update, d, gg);
-    */
   }
 
   if (update)
     gdk_flush();
 
-  return (d->ncols - 1);
+  return (d->ncols - 1);  /*-- incremented by clone_vars --*/
 }
 
 /*

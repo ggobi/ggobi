@@ -108,10 +108,10 @@ struct _ggobid {
 /*                      reading in the data                           */
 /*--------------------------------------------------------------------*/
 
-  InputDescription *input;   /* Information about input files for the default
-                                data source, such as the name of the
-                                file, directory, data mode, extension, etc.
-                              */
+ InputDescription *input;   /* Information about input files for the default
+                               data source, such as the name of the
+                               file, directory, data mode, extension, etc.
+                             */
 
 /*----------------------- pipeline ---------------------------------*/
 
