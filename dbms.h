@@ -47,7 +47,7 @@ extern const char * const DBMSFieldNames[NUM_DBMS_FIELDS];
 
 extern DBMSLoginInfo DefaultDBMSInfo;
 
-DBMSLoginInfo * initDBMSLoginInfo(DBMSLoginInfo *login);
+DBMSLoginInfo * initDBMSLoginInfo(DBMSLoginInfo *login, GHashTable *);
 DBMSInfoElement getDBMSLoginElementIndex(const char *name);
 char *getDBMSLoginElement(DBMSInfoElement i, int *isCopy, DBMSLoginInfo *info);
 int setDBMSLoginElement(DBMSInfoElement i, char *val, DBMSLoginInfo *info);

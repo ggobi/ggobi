@@ -4,12 +4,14 @@
 
 DBMSLoginInfo DefaultDBMSInfo;
 
+void updateDBMSLoginInfo(DBMSLoginInfo *login, GHashTable *tbl);
+
 /*
   Optionally allocate and initialize the MySQLLoginInfo
   instance by copying the values from the DefaultDBMSInfo.
  */
 DBMSLoginInfo *
-initDBMSLoginInfo(DBMSLoginInfo *login)
+initDBMSLoginInfo(DBMSLoginInfo *login, GHashTable *tbl)
 {
   if(login == NULL)
     login = (DBMSLoginInfo*) g_malloc(sizeof(DBMSLoginInfo));
@@ -19,9 +21,34 @@ initDBMSLoginInfo(DBMSLoginInfo *login)
 
   *login = DefaultDBMSInfo;
 
+  if(tbl) {
+      updateDBMSLoginInfo(login, tbl);
+  }
+
   return(login);
 }
 
+void
+DBMSLoginInfoTableUpdate(gpointer key, gpointer value, gpointer userData)
+{
+    DBMSLoginInfo *login = (DBMSLoginInfo *)userData;
+    DBMSInfoElement i;
+
+    if(strcmp((char *)key, "DataQuery") == 0) {
+	key = "Data query";
+    }
+
+    i = getDBMSLoginElementIndex((const char *)key);
+    if(i != MISS) {
+	setDBMSLoginElement(i, (char *)value, login);
+    }
+}
+
+void
+updateDBMSLoginInfo(DBMSLoginInfo *login, GHashTable *tbl)
+{
+    g_hash_table_foreach(tbl, DBMSLoginInfoTableUpdate, login);
+}
 
 
 const char * const DBMSFieldNames[] = {

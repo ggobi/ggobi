@@ -3,7 +3,7 @@
    <author>Duncan Temple Lang</author>
    <options>
     <named>
-      <classpath>.:/home/duncan/Projects/org/..</classpath>
+      <classpath>.:plugins/JVM/GGobi.jar:/home/duncan/Projects/org/..</classpath>
     </named>
     <args>
      <arg>-Dggobi=ABC</arg>

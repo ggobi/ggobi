@@ -114,7 +114,7 @@ GGOBI(getDBMSGUIInfo)(GtkButton *button, DBMSGUIInput *guiInput)
  ggobid *gg = guiInput->gg;
  gint i;
  gchar *val = NULL;
- DBMSLoginInfo* info;  /* = initDBMSLoginInfo(NULL); */
+ DBMSLoginInfo* info;  
 
  info = guiInput->info;
 

@@ -47,12 +47,12 @@ gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlug
 void *getPluginLanguage(xmlNodePtr node, GGobiInputPluginInfo *gplugin,  GGobiPluginType type, GGobiInitInfo *info);
 #endif
 
-GHashTable *getPluginNamedOptions(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc);
-GSList *getPluginUnnamedArguments(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc);
-gboolean getPluginOptions(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc);
+GHashTable *getPluginNamedOptions(xmlNodePtr node, GGobiPluginDetails *info, xmlDocPtr doc);
+GSList *getPluginUnnamedArguments(xmlNodePtr node, GGobiPluginDetails *info, xmlDocPtr doc);
+gboolean getPluginOptions(xmlNodePtr node, GGobiPluginDetails *info, xmlDocPtr doc);
 
 
-GSList *getPluginDependencies(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc);
+GSList *getPluginDependencies(xmlNodePtr node, GGobiPluginDetails *info, xmlDocPtr doc);
 
 
 gint getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info);
@@ -485,9 +485,9 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   load = getPluginDetails(node, plugin->details, doc);
 
   getPluginSymbols(node, plugin, doc);
-  getPluginOptions(node, plugin, doc);
+  getPluginOptions(node, plugin->details, doc);
 
-  plugin->details->depends = getPluginDependencies(node, plugin, doc);
+  plugin->details->depends = getPluginDependencies(node, plugin->details, doc);
 
 
      /* Weird casting going on here to avoid a void*. */
@@ -505,15 +505,15 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   These will be interpreted in a plugin-specific manner.
  */
 gboolean
-getPluginOptions(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
+getPluginOptions(xmlNodePtr node, GGobiPluginDetails *details, xmlDocPtr doc)
 {
    xmlNodePtr c;
    c = getXMLElement(node, "options");
    if(!c)
        return(false);
 
-   info->details->args = getPluginUnnamedArguments(c, info, doc);
-   info->details->namedArgs = getPluginNamedOptions(c, info, doc);
+   details->args = getPluginUnnamedArguments(c, details, doc);
+   details->namedArgs = getPluginNamedOptions(c, details, doc);
 
    return(true);
 }
@@ -524,7 +524,7 @@ getPluginOptions(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
   `value's are stored in a simple single-linked list.
  */
 GSList *
-getPluginUnnamedArguments(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
+getPluginUnnamedArguments(xmlNodePtr node, GGobiPluginDetails *details, xmlDocPtr doc)
 {
     GSList *l = NULL;
     xmlNodePtr c, el;
@@ -552,7 +552,7 @@ getPluginUnnamedArguments(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
   Each element is assumed to be a simple text element.
  */
 GHashTable *
-getPluginNamedOptions(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
+getPluginNamedOptions(xmlNodePtr node, GGobiPluginDetails *details, xmlDocPtr doc)
 {
     GHashTable *tbl;
     xmlNodePtr c, el;
@@ -580,7 +580,7 @@ getPluginNamedOptions(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
   are also loaded.
  */
 GSList *
-getPluginDependencies(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
+getPluginDependencies(xmlNodePtr node, GGobiPluginDetails *info, xmlDocPtr doc)
 {
    GSList *list = NULL;
    xmlNodePtr c, el;
@@ -773,11 +773,14 @@ processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 
   getInputPluginValues(node, plugin, doc);
 
+  getPluginOptions(node, plugin->details, doc);
+  plugin->details->depends = getPluginDependencies(node, plugin->details, doc);
+
+  getPluginLanguage(node, plugin, INPUT_PLUGIN, info);
+
   if(load) {
     loadPluginLibrary(plugin->details, (GGobiPluginInfo*) plugin);
   }
-
-  getPluginLanguage(node, plugin, INPUT_PLUGIN, info);
 
   return(plugin);
 }

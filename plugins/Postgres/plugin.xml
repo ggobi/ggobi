@@ -2,6 +2,14 @@
   <description>Reads data from a Postgres DBMS</description>
   <author>Duncan Temple Lang</author>
   <modeName>postgres</modeName>
+   <options>
+     <named>
+       <Host>127.0.0.1</Host>
+       <User>duncan</User>
+       <Database>ggobi</Database>
+       <DataQuery>select * from flea;</DataQuery>
+     </named>
+   </options>
   <dll name="plugins/Postgres/Postgres"> 
        <init description="postgres_input_description" />
   </dll>

@@ -4,9 +4,11 @@
 #include "GGobiAPI.h"
 
 #include "dbms_ui.h"
+#include "plugin.h"
 
 #include <stdlib.h>
 #include <string.h>
+
 
 gboolean postgres_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *);
 int read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
@@ -51,9 +53,9 @@ gboolean
 postgres_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
 {
     DBMSLoginInfo *info ;
-    info = initDBMSLoginInfo(NULL);
-     /* We would read these values from a file. */
+    info = initDBMSLoginInfo(NULL, plugin->details->namedArgs);
 
+       /* We would read these values from a file. */
     info->desc = desc;
     info->dbms_read_input = read_postgres_data;
 

@@ -138,6 +138,14 @@
 <plugin name="JVM" load="immediate">
    <description>Loads the Java Virtual Machine for use by other plugins</description>
    <author>Duncan Temple Lang</author>
+   <options>
+    <named>
+      <classpath>.:plugins/JVM/GGobi.jar:/home/duncan/Projects/org/..</classpath>
+    </named>
+    <args>
+     <arg>-Dggobi=ABC</arg>
+    </args>
+   </options>
    <dll name="plugins/JVM/JVM.so">
     <init onLoad="loadJVM" />
   </dll>
@@ -152,6 +160,9 @@
  <plugin name="javaTest" language="java" class="ggobi/TestPlugin">
   <description>Test for using Java plugins</description>
    <author>Duncan Temple Lang</author>
+   <dependencies>
+     <dependency name="JVM" />
+   </dependencies>
  </plugin>
 
 </plugins>

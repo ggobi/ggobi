@@ -2,8 +2,9 @@
 
 #include "ggobi.h"
 #include "GGobiAPI.h"
-
 #include "dbms_ui.h"
+
+#include "plugin.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -53,7 +54,7 @@ gboolean
 mysql_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
 {
     DBMSLoginInfo *info ;
-    info = initDBMSLoginInfo(NULL);
+    info = initDBMSLoginInfo(NULL, plugin->details->namedArgs);
      /* We would read these values from a file. */
 
     info->desc = desc;
