@@ -41,10 +41,11 @@ postgres_input_description(const char * const fileName, const char * const modeN
 
 /**
  This is the initial entry point for reading data from 
- Postgres. This only does the initial setup, specifically
- getting the inputs from the user for parameterizing
+ Postgres. This only performs the initial setup, specifically
+ requesting the inputs from the user for parameterizing
  the connection and the SQL queries for the different
- data information.
+ data information. It does this by using the DBMS GUI
+ input routines in GGobi.
  */
 gboolean 
 postgres_read(InputDescription *desc, ggobid *gg)
@@ -80,7 +81,9 @@ read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
 
     result = query(info->dataQuery, conn);
     processResult(result, gg);
-
+    PQclear(result);
+    PQfinish(conn);
+    
     start_ggobi(gg, true, init);
  
     return(1);
@@ -148,7 +151,11 @@ processResult(PGresult *result, ggobid *gg)
 	  }
 
 	  tmp  = PQgetvalue(result, i, j);
-	  d->raw.vals[i][j] = f = atof(tmp);
+          if(tmp)
+	      f = atof(tmp);
+	  else
+	      f = 0;
+	  d->raw.vals[i][j] = f;
       }
   }
 

@@ -1,0 +1,7 @@
+AC_INIT(testInput.c)
+
+AC_PATH_PROG(GTK_CONFIG, gtk-config)
+
+AC_SUBST(GTK_CONFIG)
+
+AC_OUTPUT(local.config)

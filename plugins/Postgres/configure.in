@@ -1,0 +1,9 @@
+AC_INIT(pgInput.c)
+
+AC_PATH_PROG(PG_CONFIG, pg_config)
+AC_PATH_PROG(GTK_CONFIG, gtk-config)
+
+AC_SUBST(GTK_CONFIG)
+AC_SUBST(PG_CONFIG)
+
+AC_OUTPUT(local.config)
