@@ -120,9 +120,8 @@ LO_DIR=.
 c_rules_frag=.CRulesFrag
 
 if test "${GCC}" = "yes" ; then
-
  PIC_CFLAG=-fPIC
- SHLIB_LDFLAGS=-shared
+# SHLIB_LDFLAGS=-shared
  LO_DIR=.
 
 
@@ -141,7 +140,7 @@ else
    dnl assume the Solaris cc compiler
  PIC_CFLAG=-KPIC
  OTHER_CFLAGS="-DG_INLINE_FUNC=extern"
- SHLIB_LDFLAGS=-G
+# SHLIB_LDFLAGS=-G
  LO_DIR=.libs
 
 cat << \EOF > ${c_rules_frag}
@@ -152,6 +151,27 @@ cat << \EOF > ${c_rules_frag}
 EOF
 
 fi
+
+
+dnl This will hopefully check whether the -shared flag works
+dnl to create a shared library or whether we should use -G.
+dnl Unchecked on the platforms that want to use -G.
+if test -z "${SHLIB_LDFLAGS}" ; then
+ echo "Checking flag for linking shared libraries"
+ OLD_LDFLAGS="${LDFLAGS}"
+ LDFLAGS="-shared"
+ AC_TRY_LINK(,[int i=0; i++;], SHLIB_LDFLAGS="-shared", [USE_G="no"; echo "-G doesn't work"])
+ if test "${USE_G}" = "no" ; then
+   LDFLAGS="-G"
+   AC_TRY_LINK(,[int i=0; i++;], SHLIB_LDFLAGS="-G",
+        [echo "Cannot determine flag for creating shared libraries. Please specify this via the environment variable SHLIB_LDFLAGS"])
+ fi
+ echo "SHLIB linker flags: ${SHLIB_LDFLAGS}"
+ LDFLAGS="${OLD_LDFLAGS}"
+fi
+
+
+
 
 AC_SUBST(OTHER_CFLAGS)
 AC_SUBST_FILE(c_rules_frag)
