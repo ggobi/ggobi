@@ -383,7 +383,7 @@ g_printerr ("\n");
         for (i=0; i<datadim; i++)
           for (j=0; j<projdim; j++)
             tv.vals[j][i] = 0.0;
-        arrayd_copy(&Va.vals, &tv.vals);
+        arrayd_copy(&Va, &tv);
 
         /* Rotate Fa to get Ga */
         if (!matmult_uv(Fa.vals, tv.vals, datadim, projdim, projdim, 
@@ -399,7 +399,7 @@ g_printerr ("\n");
         for (i=0; i<datadim; i++)
           for (j=0; j<projdim; j++)
             tv.vals[j][i] = 0.0;
-        arrayd_copy(&Vz.vals, &tv.vals);
+        arrayd_copy(&Vz, &tv);
 
         if (!matmult_uv(Fz.vals, tv.vals, datadim, projdim, projdim, 
           projdim, Gz.vals))
@@ -423,8 +423,8 @@ g_printerr ("\n");
 	}
       }
       else { /* Span not ok, cannot do interp path, so reinitialize */
-        arrayd_copy(&Fa.vals, &Ga.vals);
-        arrayd_copy(&Fa.vals, &Gz.vals);
+        arrayd_copy(&Fa, &Ga);
+        arrayd_copy(&Fa, &Gz);
         for (i=0; i<projdim; i++)
           tau.els[i] = 0.0;
       }
@@ -475,11 +475,11 @@ g_printerr ("\n");
       *stcn = stepcntr;
   }
   else {
-    arrayd_copy(&Fa.vals, &F.vals);
-    arrayd_copy(&Fa.vals, &Ga.vals);
-    arrayd_copy(&Fz.vals, &Gz.vals);
-    arrayd_copy(&Fz.vals, &Va.vals);
-    arrayd_copy(&Fa.vals, &G.vals);
+    arrayd_copy(&Fa, &F);
+    arrayd_copy(&Fa, &Ga);
+    arrayd_copy(&Fz, &Gz);
+    arrayd_copy(&Fz, &Va);
+    arrayd_copy(&Fa, &G);
 
     *pdist_az = dist_az;
     *ns = nsteps;

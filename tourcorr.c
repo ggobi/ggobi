@@ -161,6 +161,9 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
   GList *l;
   gint old_ncols, i;
 
+  if (nc < 3)
+    return;
+
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->displaytype != scatterplot)
@@ -292,6 +295,9 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint nc = d->ncols;
+
+  if (nc < 3)
+    return;
 
   alloc_tourcorr(dsp, gg);
  
@@ -425,7 +431,7 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
       {
         gt_basis(dsp->tcorr1.Fa, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
           d->ncols, (gint) 1);
-        arrayd_copy(&dsp->tcorr1.Fa.vals, &dsp->tcorr1.F.vals);
+        arrayd_copy(&dsp->tcorr1.Fa, &dsp->tcorr1.F);
 	/*        copy_mat(dsp->tcorr1.F.vals, dsp->tcorr1.Fa.vals, d->ncols, 1);*/
       }
     }
@@ -490,7 +496,7 @@ tourcorr_vervar_set (gint jvar, ggobid *gg)
       {
         gt_basis(dsp->tcorr2.Fa, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
           d->ncols, (gint) 1);
-        arrayd_copy(&dsp->tcorr2.Fa.vals, &dsp->tcorr2.F.vals);
+        arrayd_copy(&dsp->tcorr2.Fa, &dsp->tcorr2.F);
 	/*        copy_mat(dsp->tcorr2.F.vals, dsp->tcorr2.Fa.vals, d->ncols, 1);*/
       }
     }
@@ -603,7 +609,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         dsp->tcorr1.Gz, dsp->tcorr1.F, dsp->tcorr1.Va, d->ncols, (gint) 1);
       }
     
-    arrayd_copy(&dsp->tcorr1.F.vals, &dsp->tcorr1.Fa.vals);
+    arrayd_copy(&dsp->tcorr1.F, &dsp->tcorr1.Fa);
     /*    copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, d->ncols, 1);*/
     nv = 0;
     for (i=0; i<d->ncols; i++) 
@@ -642,7 +648,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
       tour_reproject(dsp->tcorr2.tinc, dsp->tcorr2.G, dsp->tcorr2.Ga, 
         dsp->tcorr2.Gz, dsp->tcorr2.F, dsp->tcorr2.Va, d->ncols, (gint) 1);
     }
-    arrayd_copy(&dsp->tcorr2.F.vals, &dsp->tcorr2.Fa.vals);
+    arrayd_copy(&dsp->tcorr2.F, &dsp->tcorr2.Fa);
     /*    copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->ncols, 1);*/
     nv = 0;
     for (i=0; i<d->ncols; i++) 
@@ -764,12 +770,12 @@ void tourcorr_scramble(ggobid *gg)
 
   gt_basis(dsp->tcorr1.Fa, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
     d->ncols, (gint) 1);
-  arrayd_copy(&dsp->tcorr1.Fa.vals, &dsp->tcorr1.F.vals);
+  arrayd_copy(&dsp->tcorr1.Fa, &dsp->tcorr1.F);
   /*  copy_mat(dsp->tcorr1.F.vals, dsp->tcorr1.Fa.vals, d->ncols, 1);*/
 
   gt_basis(dsp->tcorr2.Fa, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
     d->ncols, (gint) 1);
-  arrayd_copy(&dsp->tcorr2.Fa.vals, &dsp->tcorr2.F.vals);
+  arrayd_copy(&dsp->tcorr2.Fa, &dsp->tcorr2.F);
   /*  copy_mat(dsp->tcorr2.F.vals, dsp->tcorr2.Fa.vals, d->ncols, 1);*/
 
   dsp->tcorr1.nsteps = 1; 
@@ -979,9 +985,9 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   }
   else {
     disconnect_motion_signal (sp);
-    arrayd_copy(&dsp->tcorr1.F.vals, &dsp->tcorr1.Fa.vals);
+    arrayd_copy(&dsp->tcorr1.F, &dsp->tcorr1.Fa);
     /*    copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, d->ncols, 1);*/
-    arrayd_copy(&dsp->tcorr2.F.vals, &dsp->tcorr2.Fa.vals);
+    arrayd_copy(&dsp->tcorr2.F, &dsp->tcorr2.Fa);
     /*    copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->ncols, 1);*/
     dsp->tcorr1.get_new_target = true;
     dsp->tcorr2.get_new_target = true;
@@ -1001,9 +1007,9 @@ tourcorr_manip_end(splotd *sp)
 
   disconnect_motion_signal (sp);
 
-  arrayd_copy(&dsp->tcorr1.F.vals, &dsp->tcorr1.Fa.vals);
+  arrayd_copy(&dsp->tcorr1.F, &dsp->tcorr1.Fa);
   /*  copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, d->ncols, 1);*/
-  arrayd_copy(&dsp->tcorr2.Fa.vals, &dsp->tcorr2.F.vals);
+  arrayd_copy(&dsp->tcorr2.Fa, &dsp->tcorr2.F);
   /*  copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->ncols, 1);*/
   dsp->tcorr1.get_new_target = true;
   dsp->tcorr2.get_new_target = true;

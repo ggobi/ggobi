@@ -194,7 +194,7 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
   gint nc = d->ncols;
 
   alloc_tour1d(dsp, gg);
- 
+
     /* Initialize starting subset of active variables */
   if (nc < 8) {
     dsp->t1d.nactive = nc;
@@ -304,7 +304,7 @@ tour1dvar_set (gint jvar, ggobid *gg)
       {
         gt_basis(dsp->t1d.Fa, dsp->t1d.nactive, dsp->t1d.active_vars, 
           d->ncols, (gint) 1);
-        arrayd_copy(&dsp->t1d.Fa.vals, &dsp->t1d.F.vals);
+        arrayd_copy(&dsp->t1d.Fa, &dsp->t1d.F);
 	/*        copy_mat(dsp->t1d.F.vals, dsp->t1d.Fa.vals, d->ncols, 1);*/
       }
     }
@@ -481,7 +481,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
           dsp->t1d.F, dsp->t1d.Va, d->ncols, (gint) 1);
       }
     }
-    arrayd_copy(&dsp->t1d.F.vals, &dsp->t1d.Fa.vals);
+    arrayd_copy(&dsp->t1d.F, &dsp->t1d.Fa);
     /*    copy_mat(dsp->t1d.Fa.vals, dsp->t1d.F.vals, d->ncols, 1);*/
     nv = 0;
     for (i=0; i<d->ncols; i++)
@@ -624,7 +624,7 @@ void tour1d_scramble(ggobid *gg)
 
   gt_basis(dsp->t1d.Fa, dsp->t1d.nactive, dsp->t1d.active_vars, 
     d->ncols, (gint) 1);
-  arrayd_copy(&dsp->t1d.Fa.vals, &dsp->t1d.F.vals);
+  arrayd_copy(&dsp->t1d.Fa, &dsp->t1d.F);
   /*  copy_mat(dsp->t1d.F.vals, dsp->t1d.Fa.vals, d->ncols, 1);*/
 
   dsp->t1d.nsteps = 1; 
@@ -770,7 +770,7 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   }
   else {
     disconnect_motion_signal (sp);
-    arrayd_copy(&dsp->t1d.F.vals, &dsp->t1d.Fa.vals);
+    arrayd_copy(&dsp->t1d.F, &dsp->t1d.Fa);
     /*    copy_mat(dsp->t1d.Fa.vals, dsp->t1d.F.vals, d->ncols, 1);*/
     dsp->t1d.get_new_target = true;
     if (!cpanel->t1d_paused)
@@ -789,7 +789,7 @@ tour1d_manip_end(splotd *sp)
 
   disconnect_motion_signal (sp);
 
-  arrayd_copy(&dsp->t1d.F.vals, &dsp->t1d.Fa.vals);
+  arrayd_copy(&dsp->t1d.F, &dsp->t1d.Fa);
   /*  copy_mat(dsp->t1d.Fa.vals, dsp->t1d.F.vals, d->ncols, 1);*/
   dsp->t1d.get_new_target = true;
 
