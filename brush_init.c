@@ -125,8 +125,7 @@ br_line_vectors_free (ggobid *gg)
   vectorb_free (&gg->line.hidden);
   vectorb_free (&gg->line.hidden_now);
   vectorb_free (&gg->line.hidden_prev);
-
-  g_free ((gpointer) gg->line.xed_by_brush);
+  vectorb_free (&gg->line.xed_by_brush);
 }
 
 void
@@ -139,6 +138,7 @@ br_line_vectors_check_size (gint ns, ggobid *gg) {
     vectorb_realloc (&gg->line.hidden, ns);
     vectorb_realloc (&gg->line.hidden_now, ns);
     vectorb_realloc (&gg->line.hidden_prev, ns);
+    vectorb_realloc (&gg->line.xed_by_brush, ns);
   }
 }
 

@@ -688,12 +688,11 @@ xed_by_brush (gint k, ggobid *gg)
 */
 {
   splotd *sp = gg->current_splot;
-  brush_coords *brush_pos = &gg->brush.brush_pos;
   gboolean intersect;
-  glong x1 = brush_pos->x1;
-  glong y1 = brush_pos->y1;
-  glong x2 = brush_pos->x2;
-  glong y2 = brush_pos->y2;
+  glong x1 = gg->brush.brush_pos.x1;
+  glong y1 = gg->brush.brush_pos.y1;
+  glong x2 = gg->brush.brush_pos.x2;
+  glong y2 = gg->brush.brush_pos.y2;
 
   glong ax = sp->screen[gg->segment_endpoints[k].a - 1].x;
   glong ay = sp->screen[gg->segment_endpoints[k].a - 1].y;
@@ -705,10 +704,12 @@ xed_by_brush (gint k, ggobid *gg)
     glong, glong, glong, glong, glong *, glong *);
 
   /*-- test for intersection with the vertical line --*/
-  intersect = lines_intersect (x1, y1, x1, y2, ax, ay, bx, by, &x, &y);
+  intersect = lines_intersect (x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2,
+     ax, ay, bx, by, &x, &y);
 
   if (!intersect)
-    intersect = lines_intersect (x1, y1, x2, y1, ax, ay, bx, by, &x, &y);
+    intersect = lines_intersect (x1, y1 + (y2 - y1)/2, x2, y1 + (y2 - y1)/2,
+      ax, ay, bx, by, &x, &y);
 
   return (intersect);
 }
@@ -720,7 +721,7 @@ update_line_color_vectors (gint k, gboolean changed, ggobid *gg) {
 
 /* setting the value of doit */
   if (!changed) {
-    if (gg->line.xed_by_brush[k])
+    if (gg->line.xed_by_brush.data[k])
       doit = (gg->line.color_now.data[k] != gg->color_id);
     else
       doit = (gg->line.color_now.data[k] != gg->line.color.data[k]);
@@ -731,7 +732,7 @@ update_line_color_vectors (gint k, gboolean changed, ggobid *gg) {
    * If doit is false, it's guaranteed that there will be no change.
   */
   if (doit) {
-    if (gg->line.xed_by_brush[k]) {
+    if (gg->line.xed_by_brush.data[k]) {
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
           gg->line.color.data[k] = gg->line.color_now.data[k] = gg->color_id;
@@ -781,7 +782,7 @@ update_line_hidden_vectors (gint k, gboolean changed, ggobid *gg) {
 
 /* setting the value of doit */
   if (!changed) {
-    if (gg->line.xed_by_brush[k])
+    if (gg->line.xed_by_brush.data[k])
       doit = (gg->line.hidden_now.data[k] != true);
     else
       doit = (gg->line.hidden_now.data[k] != gg->line.hidden.data[k]);
@@ -792,7 +793,7 @@ update_line_hidden_vectors (gint k, gboolean changed, ggobid *gg) {
    * If doit is false, it's guaranteed that there will be no change.
   */
   if (doit) {
-    if (gg->line.xed_by_brush[k]) {
+    if (gg->line.xed_by_brush.data[k]) {
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
           gg->line.hidden.data[k] = gg->line.hidden_now.data[k] = true;
@@ -845,14 +846,14 @@ active_paint_lines (ggobid *gg)
   /* Zero out xed_by_brush[] before looping */
   gg->line.nxed_by_brush = 0;
   for (k=0; k<gg->nsegments; k++)
-    gg->line.xed_by_brush[k] = false;
+    gg->line.xed_by_brush.data[k] = false;
  
   for (k=0; k<gg->nsegments; k++) {
 
     if (xed_by_brush (k, gg)) {
 
       gg->line.nxed_by_brush++ ;
-      gg->line.xed_by_brush[k] = true;
+      gg->line.xed_by_brush.data[k] = true;
 
       /* brush other members of this line group */
       if (gg->nlgroups > 0) {
@@ -861,7 +862,7 @@ active_paint_lines (ggobid *gg)
         gp = gg->lgroup_ids[k];
         if (gp < gg->nlgroups) {
           for (p=0; p<gg->rgroups[gp].nels; p++) {
-              gg->xed_by_brush[gg->lgroups[gp].els[p]] = 1;
+              gg->xed_by_brush.data[gg->lgroups[gp].els[p]] = 1;
           }
         }
 */

@@ -135,7 +135,7 @@ struct _ggobid {
  /*-- line brushing --*/
  struct _LineData {
    gint *nxed_by_brush;
-   gboolean *xed_by_brush;
+   vector_b xed_by_brush;
    vector_s color, color_now, color_prev;
    vector_b hidden, hidden_now, hidden_prev;
  } line;

@@ -43,6 +43,7 @@ void globals_init (ggobid *gg) {
   vectorb_init (&gg->line.hidden);
   vectorb_init (&gg->line.hidden_now);
   vectorb_init (&gg->line.hidden_prev);
+  vectorb_init (&gg->line.xed_by_brush);
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/
