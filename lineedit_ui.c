@@ -63,10 +63,10 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
 
     for (list = GTK_TABLE(table)->children; list; list = list->next) {
       child = (GtkTableChild *) list->data;
-      if (child->top_attach == 1) {
+      if (child->left_attach == 1) {
         entry = child->widget;
         lbl = gtk_editable_get_chars (GTK_EDITABLE(entry), 0, -1);
-        vals[child->left_attach] = g_strdup (lbl);
+        vals[child->top_attach] = g_strdup (lbl);
       }
     }
   }
@@ -111,7 +111,8 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   GtkWidget *entry, *w;
   gchar *lbl;
   cpaneld *cpanel = &dsp->cpanel;
-  GtkAttachOptions table_opt = GTK_SHRINK|GTK_FILL|GTK_EXPAND;
+  /*  GtkAttachOptions table_opt = GTK_SHRINK|GTK_FILL|GTK_EXPAND;*/
+  GtkAttachOptions table_opt = GTK_SHRINK;
   gint row = 0;
   datad *dtarget;
 
@@ -124,7 +125,8 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   gtk_window_set_title (GTK_WINDOW(dialog), "Add a record");
 
   table = gtk_table_new (5, 2, false);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), table);
+  gtk_box_pack_start (GTK_BOX(GTK_DIALOG (dialog)->vbox),
+		      table, false, false, 5);
 
   w = gtk_label_new ("Record number");
   gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
@@ -205,20 +207,21 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
       datad *, displayd *, ggobid *gg);
     fetch_default_record_values (vals, dtarget, dsp, gg);
 
-    tablev = gtk_table_new (2, dtarget->ncols, false);
+    tablev = gtk_table_new (dtarget->ncols, 2, false);
     gtk_widget_set_name (tablev, "EE:tablev");
-    gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), tablev);
+    gtk_box_pack_start (GTK_BOX(GTK_DIALOG (dialog)->vbox),
+		      tablev, false, false, 5);
 
     for (j=0; j<dtarget->ncols; j++) {
       vt = vartable_element_get (j, d);
       w = gtk_label_new (vt->collab);
       gtk_table_attach (GTK_TABLE (tablev),
-        w, j, j+1, 0, 1, table_opt, table_opt, 1, 1);
+        w, 0, 1, j, j+1, table_opt, table_opt, 1, 1);
 
       entry = gtk_entry_new ();
       gtk_entry_set_text (GTK_ENTRY (entry), vals[j]);
       gtk_table_attach (GTK_TABLE (tablev),
-        entry, j, j+1, 1, 2, table_opt, table_opt, 1, 1);
+        entry, 1, 2, j, j+1, table_opt, table_opt, 1, 1);
     }
 
     /* free vals, I think */
@@ -266,10 +269,13 @@ static void add_edges_or_points_cb (GtkToggleButton *button, ggobid *gg)
     splot_cursor_set (GDK_CROSSHAIR, gg->current_splot);
   }
 }
+
+/*
 static void undo_last_cb (GtkToggleButton *button)
 {
   g_printerr("undo last\n");
 }
+*/
 
 /*--------------------------------------------------------------------*/
 /*          Handling and mouse events in the plot window              */
@@ -411,10 +417,15 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   } else if (cpanel->ee_mode == ADDING_POINTS) {
 
     if (d->rowIds == NULL) {
-      /*-- Add rowids to d --*/
-      g_printerr ("Not yet initializing new rowids\n");
+      /*-- Add rowids to d --*/  /* duplicate code -- see edges */
+      gchar **rowids = (gchar **) g_malloc (d->nrows * sizeof(gchar *));
+      for (i=0; i<d->nrows; i++)
+        rowids[i] = g_strdup_printf ("%d", i);
+      datad_record_ids_set (d, rowids, true);
+      for (i=0; i<d->nrows; i++)
+        g_free (rowids[i]);
+      g_free (rowids);
       gdk_pointer_ungrab (event->time);
-      return false;
     }
     if (which_button == 1)
       /*-- Open a dialog window to ask for label, rowId, data ... --*/
@@ -457,7 +468,6 @@ edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
 
 void
 cpanel_edgeedit_make (ggobid *gg) {
-  GtkWidget *btn;
   GtkWidget *hb, *radio1, *radio2;
   GSList *group;
   
@@ -488,7 +498,8 @@ cpanel_edgeedit_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (hb), radio2, false, false, 0);
 
 
- /*-- Undo --*/
+  /*-- Undo --*/
+  /*   not implemented
   btn = gtk_button_new_with_label ("Undo");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Undo last action", NULL);
@@ -496,6 +507,7 @@ cpanel_edgeedit_make (ggobid *gg) {
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (undo_last_cb), NULL);
+  */		      
 
   gtk_widget_show_all (gg->control_panel[EDGEED]);
 }
