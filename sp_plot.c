@@ -741,6 +741,16 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
           sp->screen[k].x - diamond_dim,
           sp->screen[k].y - diamond_dim+1);
     }
+
+    /*-- display the label in the top center of the window as well --*/
+    if (nearest) {
+      gdk_draw_string (drawable, style->font, gg->plot_GC,
+        (sp->max.x - width)/2,
+        ascent + descent + 5,  /*-- the border is of width 3 --*/
+        lbl);
+    }
+
+
   }
 
 }
