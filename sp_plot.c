@@ -215,10 +215,10 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             }
           }
         }
+#endif
       }
     }
 
-#endif
   }
 
   return;
