@@ -134,7 +134,7 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
 gboolean
 write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
- int i;
+ gint i;
  fprintf(f, "<records\n");
  fprintf(f, " count=\"%d\"", d->nrows);
  if(xmlWriteInfo->useDefault) {
@@ -165,6 +165,17 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
   gboolean gsize_p = false, gtype_p = false;
 
   fprintf(f, "<record");
+
+  /*-- ids if present --*/
+  if (d->rowid.id.nels != 0 && d->rowid.idv.nels != 0) {
+    fprintf(f, " id=\"%d\"", d->rowid.idv.els[i]);
+  }
+
+  /*-- edges if present and requested --*/
+  if (gg->save.edges_p && d->edge.n == d->nrows) {
+    fprintf(f, " source=\"%d\"", d->edge.endpoints[i].a);
+    fprintf(f, " destination=\"%d\"", d->edge.endpoints[i].b);
+  }
 
   if(d->rowlab && d->rowlab->data
        && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) {  
@@ -276,7 +287,8 @@ gboolean
 write_dataset_header (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"<data ");
- fprintf(f, "numRecords=\"%d\"", d->nrows);
+/*fprintf(f, "numRecords=\"%d\"", d->nrows);*/
+ fprintf(f, "name=\"%s\"", d->name);
  fprintf(f,">\n");
 
  return(true);
