@@ -1,5 +1,5 @@
 /* tour1d_pp.c */
-/* Copyright (C) 2001, 2002 Dianne Cook and Sigbert Klinke
+/* Copyright (C) 2001, 2002 Dianne Cook and Sigbert Klinke and Eun-Kyung Lee
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -44,8 +44,8 @@ The authors can be contacted at the following email addresses:
 /*-- projection pursuit indices --*/
 #define PCA            0
 #define LDA            1
-#define CART_GINI      2
-#define CART_ENTROPY   3
+#define CGINI          2
+#define CENTROPY       3
 #define CART_VAR       4
 #define SUBD           5
 
@@ -119,15 +119,15 @@ gint alloc_subd_p (subd_param *sp, gint nrows, gint ncols)
   sp->neighbour_step =  1;
 
   /* initialize temporary space */
-  sp->dist  = malloc (nrows*sizeof(gfloat));
-  sp->index = malloc (nrows*sizeof(gint));
-  sp->nmean = malloc (ncols*sizeof(gfloat));
-  sp->mean  = malloc (ncols*sizeof(gfloat));
-  sp->ew    = malloc (ncols*sizeof(gfloat));
-  sp->ev    = malloc (ncols*ncols*sizeof(gfloat));
-  sp->fv1   = malloc (ncols*sizeof(gfloat));
-  sp->fv2   = malloc (ncols*sizeof(gfloat));
-  sp->cov   = malloc (ncols*ncols*sizeof(gfloat));
+  sp->dist  = g_malloc (nrows*sizeof(gfloat));
+  sp->index = g_malloc (nrows*sizeof(gint));
+  sp->nmean = g_malloc (ncols*sizeof(gfloat));
+  sp->mean  = g_malloc (ncols*sizeof(gfloat));
+  sp->ew    = g_malloc (ncols*sizeof(gfloat));
+  sp->ev    = g_malloc (ncols*ncols*sizeof(gfloat));
+  sp->fv1   = g_malloc (ncols*sizeof(gfloat));
+  sp->fv2   = g_malloc (ncols*sizeof(gfloat));
+  sp->cov   = g_malloc (ncols*ncols*sizeof(gfloat));
 
   return 0;
 }
@@ -265,18 +265,17 @@ Purpose        : Looks for the best projection to discriminate
                  between groups.
 *********************************************************************/
 
-gint zero (gdouble *ptr, gint length)
+void zero (gdouble *ptr, gint length)
 { gint i;
   for (i=0; i<length; i++)
     ptr[i] = 0.0;
-  return (0);
 }
 
-void zero_int(int *mem, int size)
+void zero_int(gint *mem, int size)
 {
-  int i;
+  gint i;
   for(i=0; i<size; i++)
-  mem[i] =0;
+  mem[i] = 0;
 }
   
 gint compute_groups (gint *group, gint *ngroup, gint *groups, 
@@ -317,44 +316,44 @@ gint compute_groups (gint *group, gint *ngroup, gint *groups,
 gint alloc_discriminant_p (discriminant_param *dp, /*gfloat *gdata, */
   gint nrows, gint ncols)
 {
-  dp->group    = malloc (nrows*sizeof(gint));
-  dp->ngroup   = malloc (nrows*sizeof(gint));
+  dp->group    = g_malloc (nrows*sizeof(gint));
+  dp->ngroup   = g_malloc (nrows*sizeof(gint));
 
   /*  if (compute_groups (dp->group, dp->ngroup, &dp->groups, nrows, 
       gdata)) return (1);*/
 
   /* initialize temporary space */
-  dp->cov      = malloc (ncols*ncols*sizeof(gfloat));
-  dp->a        = malloc (ncols*ncols*sizeof(gfloat));
-  dp->mean     = malloc (nrows*ncols*sizeof(gfloat));
-  dp->ovmean   = malloc (ncols*sizeof(gfloat));
-  dp->kpvt     = malloc (ncols*sizeof(gint));
-  dp->work     = malloc (nrows*sizeof(gint));
+  dp->cov      = g_malloc (ncols*ncols*sizeof(gfloat));
+  dp->a        = g_malloc (ncols*ncols*sizeof(gfloat));
+  dp->mean     = g_malloc (nrows*ncols*sizeof(gfloat));
+  dp->ovmean   = g_malloc (ncols*sizeof(gfloat));
+  dp->kpvt     = g_malloc (ncols*sizeof(gint));
+  dp->work     = g_malloc (nrows*sizeof(gint));
 
   return 0;
 }
 
 gint free_discriminant_p (discriminant_param *dp)
-{ free(dp->group);
-  free(dp->ngroup);
-  free(dp->cov);
-  free(dp->a);
-  free(dp->mean);
-  free(dp->ovmean);
-  free(dp->kpvt);
-  free(dp->work);
+{ g_free(dp->group);
+  g_free(dp->ngroup);
+  g_free(dp->cov);
+  g_free(dp->a);
+  g_free(dp->mean);
+  g_free(dp->ovmean);
+  g_free(dp->kpvt);
+  g_free(dp->work);
 
   return 0;
 }
 
-/* what does this function do? */
+/* what does this function do? *
 double ludcomp(double *a,int n) 
 { 
   int i,j,k,ier,pivot;
   double *s,det,temp,c;
 
   det=1;
-  s = (double *) malloc(n*sizeof(double));
+  s = (double *) g_malloc(n*sizeof(double));
   for(i=0; i<n; i++) {       
     s[i] = a[i*n+1];
     for (j=1; j<n; j++)
@@ -374,14 +373,14 @@ double ludcomp(double *a,int n)
         }
       }
 
-      /* If all elements of a row(or column) of A are zero, |A| = 0 */
+      * If all elements of a row(or column) of A are zero, |A| = 0 *
       if (c==0) {       
         det=0;
         return(det);
       }
       if (pivot!=k) {
         det*=-1; 
-	/*        printf("Change!!\n");*/
+	*        printf("Change!!\n");*
         for(j=k; j<n; j++) {       
           temp = a[k*n+j]; 
           a[k*n+j]=a[pivot*n+j]; 
@@ -401,20 +400,24 @@ double ludcomp(double *a,int n)
     }
     k = n-1;
     det *= a[(n-1)*n+(n-1)];
-    /*    printf("det in ludecomp = %f\n",det);*/
+    *    printf("det in ludecomp = %f\n",det);*
     ier=0;
     return(det);
 }
-               
+*/
+
 gint discriminant (array_f *pdata, void *param, gfloat *val)
 { 
   discriminant_param *dp = (discriminant_param *) param;
   gint i, j, k;
   gint n, p;
   gdouble det;
+  gint *Pv; /* dummy structure for pivot in ludcmp - not used */
 
   n = pdata->nrows;
   p = pdata->ncols;
+
+  Pv = (int *) malloc(n*sizeof(int));
 
   /* how does group info get into here?  if comes in through 
       allocate_discriminant_p. it would be safe to have it
@@ -455,8 +458,7 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
       { 
         dp->cov[k*p+j] += 
           ((gdouble) pdata->vals[i][j]-dp->mean[j+p*dp->group[i]])*
-          ((gdouble) pdata->vals[i][k]-dp->mean[k+p*dp->group[i]])/
-           ((gdouble) (dp->ngroup[dp->group[i]]));
+          ((gdouble) pdata->vals[i][k]-dp->mean[k+p*dp->group[i]]);
       }
       dp->cov[j*p+k] = dp->cov[k*p+j];
     }
@@ -467,7 +469,7 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   job = 10;*/
 
   memcpy(dp->a,dp->cov,p*p*sizeof(double)); 
-  det= ludcomp(dp->a,p); 
+  det = ludcmp(dp->a, p, Pv); 
   *val = det;
 
   /* Compute W+B */
@@ -478,17 +480,19 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
     {
       for (i=0; i< dp->groups; i++)	
         dp->cov[p*j+k] += (dp->mean[i*p+j]-dp->ovmean[j])*
-          (dp->mean[i*p+k]-dp->ovmean[k])/(gdouble)(dp->groups-1);
+          (dp->mean[i*p+k]-dp->ovmean[k])/(gdouble)(dp->ngroup[i]);
     }
   }
 
   memcpy(dp->a,dp->cov,p*p*sizeof(double)); 
-  det = ludcomp(dp->a,p); 
+  det = ludcmp(dp->a, p, Pv); 
   *val = 1.0-*val/det;
 
   /*  printf ("Index=%f\n", *val);*/
 
 /*  sprintf (msg, "index=%f\n", *val); print(); */
+  free(Pv);
+
   return (0);
 }
 
@@ -590,29 +594,28 @@ void countngroup(int *group, int *ngroup, int n)
 
 }
 
-gint alloc_cartgini_p (cartgini_param *dp, gint nrows, gfloat *gdata)
+gint alloc_cartgini_p (cartgini_param *dp, gint nrows)
 { /* initialize data */
+  gint n = nrows;
 
-  dp->group    = malloc (nrows*sizeof(gint));
-  dp->ngroup   = malloc (nrows*sizeof(gint));
-  if (compute_groups (dp->group, dp->ngroup, &dp->groups, nrows, gdata)) 
-    return (1);
+  dp->group    = g_malloc(n*sizeof(gint));
+  dp->ngroup   = g_malloc(n*sizeof(gint));
 
   /* initialize temporary space */
-  dp->x        = malloc (nrows*sizeof(gfloat));
-  dp->nright   = malloc (nrows*sizeof(gint));
-  dp->index    = malloc (nrows*sizeof(gint));
+  dp->x        = g_malloc(n*sizeof(gdouble));
+  dp->nright   = g_malloc(n*sizeof(gint));
+  dp->index    = g_malloc(n*sizeof(gint));
 
   return 0;
 }
 
 gint free_cartgini_p (cartgini_param *dp)
 { 
-  free (dp->group);
-  free (dp->ngroup);
-  free (dp->x);
-  free (dp->nright);
-  free (dp->index);
+  g_free (dp->group);
+  g_free (dp->ngroup);
+  g_free (dp->x);
+  g_free (dp->nright);
+  g_free (dp->index);
 
   return 0;
 }
@@ -634,30 +637,29 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
   sort_group(pdata,dp->group,left,right);
 
 /* data relocation and make index */ 
-
-  zero((gdouble *) dp->x,n);
+  zero(dp->x,n);
   zero_int(dp->index,n);
 
   for (i=0; i<n; i++) {	
+    /*    dp->x[i] = pdata->vals[i][0];*/
     dp->x[i] = pdata->vals[i][0];
     dp->index[i] = dp->group[i];
   }
 
   left=0;
   right=n-1;
-  sort_data((gdouble *) dp->x, dp->index,left,right) ;
+  sort_data(dp->x, dp->index,left,right) ;
 
  /* Calculate gini index */
-	
   zero_int(dp->nright,g);
   *val = 1;
   for (i=0; i<g; i++) {	
     dp->nright[i] = 0;
-    *val -= (((double)dp->ngroup[i])/((double)n))*
-      (((double)dp->ngroup[i])/((double)n));
+    *val -= (((gdouble)dp->ngroup[i])/((gdouble)n))*
+      (((gdouble)dp->ngroup[i])/((gdouble)n));
   }
   for (i=0; i<n-1; i++)  {
-    (dp->nright[(dp->index[i]-1)])++;
+    (dp->nright[(dp->index[i])])++;
     dev=2;
     for (k=0; k<g; k++) {
       prob = ((double) dp->nright[k])/((double)(i+1));
@@ -667,72 +669,70 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
     }
     if (dev<*val) *val = dev;
   } 
-  *val *= -1;
-
-  /*  *val = 2;
-  for (i=0; i<dp->groups; i++) { 
-    dp->nright[i] = 0;
-    *val -= (dp->ngroup[i]/n)*(dp->ngroup[i]/n);
-  }
-  
-  for (i=0; i<n-1; i++) { 
-    (dp->nright[dp->group[dp->index[i]]])++;
-    dev = 2;
-    for (k=0; k<dp->groups; k++) { 
-      prob = ((gfloat) dp->nright[k])/((gfloat) (i+1));
-      dev -= prob*prob;
-      prob = ((gfloat) (dp->ngroup[k]-dp->nright[k]))/
-        ((gfloat) (n-i-1));
-      dev -= prob*prob;
-    }
-    if (dev<*val) *val = dev;
-  }
-
-  *val *= -1;*/
-  /*  printf ("Index=%f\n", *val);*/
-/*  sprintf (msg, "Index=%f", *val);print();              */
+  /*  *val = (*val)*(gdouble)(g/(g-1));*/
+  *val = (1-*val);
 
   return(0);
 }
 
-gint alloc_cartentropy_p (cartentropy_param *dp, gint nrows, gfloat *gdata)
+gint alloc_cartentropy_p (cartentropy_param *dp, gint nrows)
 { /* initialize data */
-  dp->group    = malloc (nrows*sizeof(gint));
-  dp->ngroup   = malloc (nrows*sizeof(gint));
-  if (compute_groups (dp->group, dp->ngroup, &dp->groups, nrows, gdata)) return (1);
+  gint n = nrows;
+
+  dp->group    = g_malloc (n*sizeof(gint));
+  dp->ngroup   = g_malloc (n*sizeof(gint));
 
   /* initialize temporary space */
-  dp->x        = malloc (nrows*sizeof(gfloat));
-  dp->nright   = malloc (nrows*sizeof(gint));
-  dp->index    = malloc (nrows*sizeof(gint));
+  dp->x        = g_malloc (n*sizeof(gdouble));
+  dp->nright   = g_malloc (n*sizeof(gint));
+  dp->index    = g_malloc (n*sizeof(gint));
 
   return 0;
 }
 
 gint free_cartentropy_p (cartentropy_param *dp)
-{ free (dp->ngroup);
-  free (dp->group);
-  free (dp->x);
-  free (dp->index);
-  free (dp->nright);
+{ g_free (dp->ngroup);
+  g_free (dp->group);
+  g_free (dp->x);
+  g_free (dp->index);
+  g_free (dp->nright);
 
   return 0;
 }
 
 gint cartentropy (array_f *pdata, void *param, gfloat *val)
-{ cartentropy_param *dp = (cartentropy_param *) param;
-  gint i, k;
+{ 
+  cartentropy_param *dp = (cartentropy_param *) param;
+
+  gint i, k, n, p, g = dp->groups, left, right;
   gfloat dev, prob;
- 
-  if (pdata->ncols!=1) return(-1);
-  for (i=0; i<pdata->nrows; i++) 
-  { dp->x[i] = pdata->vals[i][0];
-    dp->index[i] = i;
+
+  n = pdata->nrows;
+  p = pdata->ncols;
+  if (p != 1) 
+    return(-1);
+
+/* Sort pdata by group */ 
+  right = pdata->nrows-1;
+  left = 0;
+  sort_group(pdata,dp->group,left,right);
+
+/* data relocation and make index */ 
+  zero(dp->x,n);
+  zero_int(dp->index,n);
+
+  for (i=0; i<n; i++) {	
+    /*    dp->x[i] = pdata->vals[i][0];*/
+    dp->x[i] = pdata->vals[i][0];
+    dp->index[i] = dp->group[i];
   }
 
-  base = dp->x;
-  qsort (dp->index, pdata->nrows, sizeof(gint), smallest);
- 
+  left=0;
+  right=n-1;
+  sort_data(dp->x, dp->index,left,right) ;
+
+ /* Calculate entropy index */
+  zero_int(dp->nright,g);
   *val = 0;
   for (i=0; i<dp->groups; i++)
   { dp->nright[i] = 0;
@@ -741,19 +741,20 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val)
   }
   
   for (i=0; i<pdata->nrows-1; i++)
-  { (dp->nright[dp->group[dp->index[i]]])++;
+  { (dp->nright[dp->index[i]])++;
     dev = 0;
     for (k=0; k<dp->groups; k++)
-    { prob = ((gfloat) dp->nright[k])/((gfloat) (i+1));
+    { prob = ((gdouble) dp->nright[k])/((gdouble) (i+1));
       if (prob>0) dev += prob*log(prob);
-      prob = ((gfloat) (dp->ngroup[k]-dp->nright[k]))/((gfloat) (pdata->nrows-i-1));
+      prob = ((gdouble) (dp->ngroup[k]-dp->nright[k]))/
+        ((gdouble) (pdata->nrows-i-1));
       if (prob>0) dev += prob*log(prob);
     }
     if (dev<*val) *val = dev;
   }
 
-  *val *= -1;
-/*  sprintf (msg, "Index=%f", *val); print(); */
+  *val = (1-*val);
+
   return(0);
 }
 
@@ -761,22 +762,22 @@ gint alloc_cartvariance_p (cartvariance_param *dp, gint nrows, gfloat *gdata)
 { gint i;
   /* initialize data */
 
-  dp->y = malloc (nrows*sizeof(gfloat));
+  dp->y = g_malloc (nrows*sizeof(gfloat));
 
   for (i=0; i<nrows; i++)
     dp->y[i] = gdata[i];
 
   /* initialize temporary space */
-  dp->x        = malloc (nrows*sizeof(gfloat));
-  dp->index    = malloc (nrows*sizeof(gint));
+  dp->x        = g_malloc (nrows*sizeof(gfloat));
+  dp->index    = g_malloc (nrows*sizeof(gint));
 
   return 0;
 }
 
 gint free_cartvariance_p (cartvariance_param *dp)
-{ free (dp->y);
-  free (dp->x);
-  free (dp->index);
+{ g_free (dp->y);
+  g_free (dp->x);
+  g_free (dp->index);
 
   return 0;
 }
@@ -1024,7 +1025,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
   /*  subd_param sp; */
   discriminant_param dp;
   cartgini_param cgp;
-  /*    cartentropy_param cep;*/
+  cartentropy_param cep;
   cartvariance_param cvp;
   gfloat *gdata;
   gint i, j;
@@ -1092,28 +1093,33 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       }
       free_discriminant_p (&dp);
       break;
-    case CART_GINI: 
-      alloc_cartgini_p (&cgp, nrows, gdata);
+    case CGINI: 
+      alloc_cartgini_p (&cgp, nrows);
       /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
         dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols,
         cartgini, &cgp);*/
-      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
+      if (!compute_groups (cgp.group, cgp.ngroup, &cgp.groups, nrows, 
+			   gdata)) {
+        dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
      /*  d->rows_in_plot, d->nrows, d->ncols,*/
-        cartgini, &cgp);
+          cartgini, &cgp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, cartgini, &cgp);
-      /*      free_cartgini_p (&cgp);*/
+      }
+      /*      free_cartgini_p (&cgp); need to free but this causes a crash!*/
       break;
-      /*    case CART_ENTROPY: 
-      alloc_cartentropy_p (&cep, nrows, gdata);
-      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 
+   case CENTROPY: 
+      alloc_cartentropy_p (&cep, nrows);
+      if (!compute_groups (cep.group, cep.ngroup, &cep.groups, nrows, 
+			   gdata)) {
+        dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata,
         cartentropy, &cep);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &cep);
       free_cartentropy_p (&cep);
+      }
       break;
-    case CART_VAR: 
+      /*    case CART_VAR: 
       alloc_cartvariance_p (&cvp, nrows, gdata);
       dsp->t1d.ppval = t1d_calc_indx (d->tform, 
         dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 
@@ -1141,7 +1147,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
 
 #undef SUBD           
 #undef LDA            
-#undef CART_GINI      
-#undef CART_ENTROPY   
+#undef CGINI      
+#undef CENTROPY   
 #undef CART_VAR       
 #undef PCA            

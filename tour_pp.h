@@ -32,3 +32,8 @@ gint optimize0 (optimize0_param *op,
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param);
 
+/* Utility routines */
+gdouble ludcmp(gdouble *a, gint n, gint *Pivot); 
+gdouble solve(gdouble *a, gdouble *b, gint n, gint *Pivot); 
+void inverse(gdouble *a, gint n);
+

@@ -1,5 +1,5 @@
 /* tour1d_pp.h */
-/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke
+/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke and Eun-Kyung Lee
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,8 @@ void eigenvalues (gfloat *cov, int p, gfloat *ew,
                   gint matz, gfloat *ev, gfloat *fv1, gfloat *fv2);
 gint subd (array_f *pdata, void *param, gfloat *val);
 
-gint zero (gdouble *ptr, gint length);
+void zero (gdouble *ptr, gint length);
+void zero_int (gint *mem, gint size);
 gint compute_groups (gint *group, gint *ngroup, gint *groups, gint nrows, 
   gfloat *gdata);
 gint alloc_discriminant_p (discriminant_param *dp, /* gfloat *gdata, */
@@ -42,11 +43,11 @@ gint alloc_discriminant_p (discriminant_param *dp, /* gfloat *gdata, */
 gint free_discriminant_p (discriminant_param *dp);
 gint discriminant (array_f *pdata, void *param, gfloat *val);
 
-gint alloc_cartgini_p (cartgini_param *dp, gint nrows, gfloat *gdata);
-gint free_cartgini_p (cartgini_param *dp);
+gint alloc_cartgini_p (cartgini_param *cgp, gint nrows);
+gint free_cartgini_p (cartgini_param *cgp);
 gint cartgini (array_f *pdata, void *param, gfloat *val);
 
-gint alloc_cartentropy_p (cartentropy_param *dp, gint nrows, gfloat *gdata);
+gint alloc_cartentropy_p (cartentropy_param *dp, gint nrows);
 gint free_cartentropy_p (cartentropy_param *dp);
 gint cartentropy (array_f *pdata, void *param, gfloat *val);
 

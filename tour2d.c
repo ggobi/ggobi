@@ -568,12 +568,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
       dsp->t2d.oppval = dsp->t2d.ppval;
       revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
         0, gg);
-      /*      count++;
-      if (count == 10) {
-      count = 0;*/
-        t2d_ppdraw(dsp->t2d.ppval, gg);
-/*      }*/
-     
+      t2d_ppdraw(dsp->t2d.ppval, gg);
     }
   }
   else { /* do final clean-up and get new target */
@@ -1006,6 +1001,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   gdouble dtmp1, dtmp2;
   gfloat len_motion;
   gint i,j,k;
+  gboolean pp_problem = false;
 
   /* check if off the plot window */
   if (p1 > sp->max.x || p1 < 0 ||
@@ -1241,6 +1237,15 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
       if (calc_norm(dsp->t2d.F.vals[1], d->ncols)>1.0) 
 	g_printerr("F1 out of bounds\n");
       */
+    }
+
+    /* plot pp indx */
+    if (dsp->t2d_ppda != NULL) {
+
+      dsp->t2d.oppval = dsp->t2d.ppval;
+      pp_problem = t2d_switch_index(cpanel->t2d.pp_indx, 
+        0, gg);
+      t2d_ppdraw(dsp->t2d.ppval, gg);
     }
 
     display_tailpipe (dsp, FULL, gg);

@@ -1,5 +1,5 @@
 /* tour2d_pp.h */
-/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke
+/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke and Eun-Kyung Lee
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,18 @@ The authors can be contacted at the following email addresses:
 */
 void alloc_holes_p (holes_param *hp, gint nrows);
 void free_holes_p (holes_param *hp);
-gint holes (array_f *pdata, void *param, gfloat *val);
+
+gint skewness_raw2(array_f *pdata, void *param, gfloat *val);
+gint skewness_raw1( array_f *pdata, void *param, gfloat *val);
+gint skewness( array_f *pdata, void *param, gfloat *val);
+gint central_mass(array_f *pdata, void *param, gfloat *val);
+gint central_mass_raw1(array_f *pdata, void *param, gfloat *val);
+gint central_mass_raw2(array_f *pdata, void *param, gfloat *val);
+gfloat mean_fn2(gfloat *x1, gfloat *x2, gint n);
+/*void inverse(double *a, int n);*/
+gint holes( array_f *pdata,void *param, gfloat *val);
+gint holes_raw1(array_f *pdata,void *param, gfloat *val);
+gint holes_raw2(array_f *pdata,void *param, gfloat *val);
 
 gfloat t2d_calc_indx(array_f, array_d, gint *, gint, gint,
                 gint (*index) (array_f*, void*, gfloat*),

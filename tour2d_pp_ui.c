@@ -263,7 +263,7 @@ tour2dpp_window_open (ggobid *gg) {
 
   /* check if selected variables are sphered beforeing allowing window
      to popup */
-  if (dsp->t2d.nactive > d->sphere.pcvars.nels)
+  /*  if (dsp->t2d.nactive > d->sphere.pcvars.nels)
     vars_sphered = false;
   for (j=0; j<dsp->t2d.nactive; j++) 
   {
@@ -276,7 +276,7 @@ tour2dpp_window_open (ggobid *gg) {
       vars_sphered = false;
       break;
     }
-  }
+    }*/
 
   if (!vars_sphered) {
 

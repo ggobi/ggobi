@@ -1,5 +1,5 @@
 /* tour_pp.c */
-/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke
+/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke and Eun-Kyung Lee
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -227,9 +227,9 @@ gint optimize0 (optimize0_param *op,
   /*  arrayf_init_null (&pdata);
       arrayf_alloc_zero (&pdata, op->data.nrows, proj->ncols);*/
 
-  op->temp_start     =  1;
+  op->temp_start     =  1; /* make this an interactive parameter */
   op->temp_end       =  0.001;
-  op->cooling        =  0.99;
+  op->cooling        =  0.99; /* make this an interactive parameter */
   /* is equivalent to log(temp_end/temp_start)/log(cooling) projections */
   op->heating        =  1;
   op->restart        =  1;
@@ -394,3 +394,111 @@ pp_deriv_optimization()
     init_basis(xg);
     }*/
 }
+
+/*****************************************************/
+/*               Utility Routines                    */
+/*                                                   */
+/* Reference : An Introduction to Numerical Analysis */
+/*             - Kendall E. Atkinson                 */
+/*             (p 449 - 450)                         */
+/*****************************************************/
+
+void inverse(gdouble *a, gint n)
+{
+  gdouble *b,*inv,d;
+  gint *P,i,j;
+
+  P = (gint *) malloc(n*sizeof(gint));
+  inv = (gdouble *) malloc(n*n*sizeof(gdouble));
+  d = ludcmp(a,n,P);
+ 
+  b = (gdouble *) malloc(n*sizeof(gdouble));
+  for(i=0; i<n; i++)
+  {  
+    for(j=0; j<n; j++)
+    {  
+      if(i == j) b[j] = 1.0; else b[j] = 0.0;
+    }
+    d=solve(a,b,n,P);
+     for(j=0; j<n; j++)
+       inv[j*n+i] = b[j];
+  }
+  memcpy(a,inv,n*n*sizeof(gdouble));
+
+  free(P);
+  free(inv);
+}    
+
+gdouble solve(gdouble *a,gdouble *b,gint n,gint *Pivot) 
+{
+  gint i,j,k;
+  gdouble temp;
+  
+  for(k=0; k<(n-1); k++)
+  {  if(Pivot[k] != k)
+     {  temp = b[Pivot[k]];
+        b[Pivot[k]] = b[k];
+        b[k] = temp;
+     }
+     for(i=(k+1);i<n; i++)
+        b[i] -= a[i*n+k]*b[k];
+  }
+  b[n-1] /= a[n*n-1];
+  for(i=(n-2); i>=0; i--)
+  {  temp=0;
+     for(j=(i+1); j<n; j++)
+       temp += a[i*n+j]*b[j];
+       b[i] = (b[i] -temp)/a[i*n+i];
+  }
+  return(0);
+}
+
+
+gdouble ludcmp(gdouble *a,gint n,gint *Pivot) 
+{ 
+    gint i,j,k,ier;
+    gdouble *s,det,temp,c;
+    det=1;
+    s = (gdouble *) malloc(n*sizeof(gdouble));
+    for(i=0;i<n; i++)
+    {  s[i] = a[i*n+1];
+       for(j=1; j<n; j++)
+          if(s[i] < a[i*n+j]) s[i] = a[i*n+j];
+    }
+    for(k=0;k<n-1; k++)
+    {  for(i=k; i<n; i++)
+       {   temp = fabs(a[i*n+k]/s[i]);
+           if(i==k) { c=temp; Pivot[k]=i;}
+           else if(c <temp) {c = temp; Pivot[k]=i;}
+       }  
+        /* If all elements of a row(or column) of A are zero, |A| = 0 */
+       if(c==0) 
+       {   det=0;
+           return(det);
+       }
+       if(Pivot[k]!=k)
+       {   det*=-1; 
+           for(j=k; j<n; j++)
+           {   temp =a[k*n+j]; 
+               a[k*n+j]=a[Pivot[k]*n+j]; 
+               a[Pivot[k]*n+j]=temp;
+            }       
+           temp = s[k];
+           s[k] = s[Pivot[k]];   
+           s[Pivot[k]]=temp;
+       }
+       for(i=k+1; i<n; i++)
+       {   temp =a[i*n+k]/a[k*n+k];
+           a[i*n+k] = temp;
+           for(j=k+1; j<n; j++)
+              a[i*n+j] -= temp*a[k*n+j];
+       }
+       det *= a[k*n+k];
+    }
+    k = n-1;
+    det *= a[(n-1)*n+(n-1)];
+    ier=0; 
+    free(s);
+    return(det);
+}                               
+  

@@ -180,7 +180,7 @@ typedef struct {
 
   /* temporary space */
   gint *nright, *index;
-  gfloat *x;
+  gdouble *x;
 
 } cartgini_param;
 
@@ -189,7 +189,7 @@ typedef struct {
 
   /* temporary space */
   gint *nright, *index;
-  gfloat *x;
+  gdouble *x;
 
 } cartentropy_param;
 

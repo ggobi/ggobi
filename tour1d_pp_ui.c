@@ -19,8 +19,8 @@
 /*-- projection pursuit indices --*/
 #define PCA            0
 #define LDA            1
-#define CART_GINI      2
-#define CART_ENTROPY   3
+#define CGINI          2
+#define CENTROPY       3
 #define CART_VAR       4
 #define SUBD           5
 
@@ -113,7 +113,7 @@ t1d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
     &dsp->t1d.target_selection_method);
 }
 
-gchar *t1d_pp_func_lbl[] = {"PCA","LDA","CART-Gini"};
+gchar *t1d_pp_func_lbl[] = {"PCA","LDA","Gini-C","Entropy-C"};
 /*,"LDA","CART Gini","CART Entropy", 
                             "CART Variance","SUB-D"
                             };*/
@@ -424,7 +424,7 @@ tour1dpp_window_open (ggobid *gg) {
 
 #undef SUBD           
 #undef LDA            
-#undef CART_GINI      
-#undef CART_ENTROPY   
+#undef CGINI      
+#undef CENTROPY   
 #undef CART_VAR       
 #undef PCA            

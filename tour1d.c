@@ -322,8 +322,8 @@ void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
   }
 
 #ifdef TESTING_TOUR_STEP
-  gtk_signal_connect (GTK_OBJECT(dsp), "tour_step",
-    tour1d_step_cb, dsp);
+  /*  gtk_signal_connect (GTK_OBJECT(dsp), "tour_step",
+      tour1d_step_cb, dsp);*/
 #endif
 
 }
@@ -906,6 +906,7 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   gint actual_nxvars = dsp->t1d.nactive;
   gint j;
   gboolean offscreen = false;
+  gboolean pp_problem = false;
 
   /* check if off the plot window */
   if (p1 > sp->max.x || p1 < 0 ||
@@ -957,6 +958,14 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
          xsinphi * dsp->t1d_manbasis.vals[1][j];
     }
  
+    /* plot pp index */
+    if (dsp->t1d_ppda != NULL) {
+      dsp->t1d.oppval = dsp->t1d.ppval;
+      pp_problem = t1d_switch_index(cpanel->t1d.pp_indx, 
+        0, gg);
+      t1d_ppdraw(dsp->t1d.ppval, gg);
+    }
+
     display_tailpipe (dsp, FULL, gg);
     varcircles_refresh (d, gg);
   }

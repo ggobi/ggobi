@@ -1,5 +1,5 @@
 /* tour2d_pp.c */
-/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke
+/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke and Eun-Kuung Lee
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -43,26 +43,13 @@ The authors can be contacted at the following email addresses:
 #define EXPMINUS1 0.3678794411714423
 #define ONEMINUSEXPMINUS1 0.63212056
 
-/*
-static gfloat
-mean_fn(gfloat *x1, gint n, gint *rows_in_plot)
-{
-  gint i;
-  gfloat tmpf;
-  gfloat mean1;
+/*****************************************************/
+/* Reference : An Introduction to Numerical Analysis */
+/*             - Kendall E. Atkinson                 */
+/*             (p 449 - 450)                         */
+/*****************************************************/
 
-  tmpf = 0.;
-  for (i=0; i<n; i++)
-    tmpf += (x1[rows_in_plot[i]]-x1[0]);
-  mean1 = tmpf / (gfloat)n;
-  mean1 += x1[0];
-
-  return(mean1);
-}
-*/
-
-static gfloat
-mean_fn2(gfloat *x1, gfloat *x2, gint n)
+gfloat mean_fn2(gfloat *x1, gfloat *x2, gint n)
 {
   gint i;
   gfloat tmean, tmpf1;
@@ -86,14 +73,6 @@ mean_fn2(gfloat *x1, gfloat *x2, gint n)
   return(tmean);
 }
 
-/********************************************************************
-
-Index          : Holes
-Transformation : needs sphered variables/principal components
-Purpose        : computes a projection into a normal density fn
-Note           : only works for 2d now, could be generalized
-
-*********************************************************************/
 void
 alloc_holes_p(holes_param *hp, gint nrows)
 {
@@ -109,6 +88,13 @@ free_holes_p(holes_param *hp)
   g_free(hp->h0);
   g_free(hp->h1);
 }
+
+/********************************************************************
+Index          : Holes
+Transformation : needs sphered variables/principal components
+Purpose        : computes a projection into a normal density fn
+Note           : only works for 2d now, could be generalized
+*********************************************************************/
 
 gint holes(array_f *pdata, void *param, gfloat *val)
 {
@@ -129,7 +115,196 @@ gint holes(array_f *pdata, void *param, gfloat *val)
   return(0);
 }
 
-void
+/********************************************************************
+
+Index          : Central Mass
+Transformation : needs sphered variables/principal components
+Purpose        : computes a neg projection into a normal density fn
+Note           : only works for 2d now, could be generalized
+
+*********************************************************************/
+
+gint
+central_mass(array_f *pdata, void *param, gfloat *val)
+{
+  holes_param *hp = (holes_param *) param;
+  gint i, m;
+
+  /* Calculate coefficients */
+  for (i=0; i<pdata->nrows; i++)
+  {
+    m = i;
+    hp->h0[m] = exp(-pdata->vals[m][0]*pdata->vals[m][0]/2.) ;
+    hp->h1[m] = exp(-pdata->vals[m][1]*pdata->vals[m][1]/2.) ;
+  }
+
+  /* Calculate index */
+  hp->acoefs = mean_fn2(hp->h0,hp->h1,pdata->nrows);
+  *val = (hp->acoefs - (gfloat)EXPMINUS1)/(float)ONEMINUSEXPMINUS1 ;
+  return(0);
+}
+
+/***************************************************/
+/*  2D Holes index for raw data                    */
+/*   holes_raw1                                    */
+/*   holes_raw2 : use inverse function             */
+/***************************************************/
+
+gint holes_raw1( array_f *pdata, void *param, gfloat *val)
+{  holes_param *hp = (holes_param *) param;
+   gint i,m,p=pdata->ncols, n=pdata->nrows;
+   gfloat m1, m2,x1,x2,temp;
+   gfloat *cov,det,acoefs;
+
+   cov = (gfloat *) malloc(p*p*sizeof(gfloat));
+   for(i=0; i<(p*p); i++) cov[i] = 0;
+   m1=0; m2=0;
+   for(i=0; i<n; i++)
+   { m1 += pdata->vals[i][0];
+     m2 += pdata->vals[i][1];
+   }      
+   m1 /= n;
+   m2 /= n;
+
+   for(i=0; i<n; i++)
+     {  cov[0] += (pdata->vals[i][0]-m1)*(pdata->vals[i][0]-m1)/(n-1);
+        cov[1] += (pdata->vals[i][0]-m1)*(pdata->vals[i][1]-m2)/(n-1);
+        cov[3] += (pdata->vals[i][1]-m2)*(pdata->vals[i][1]-m2)/(n-1);
+     }
+
+   cov[2]= cov[1];
+   det = cov[0]*cov[3]-cov[1]*cov[1];
+   acoefs=0.;
+
+   for(i=0; i<n; i++)
+     {  x1 = pdata->vals[i][0]-m1; 
+        x2=pdata->vals[i][1]-m2;
+        temp= (cov[3]*x1*x1-2*cov[1]*x1*x2+cov[0]*x2*x2)/det;
+        acoefs +=exp(-temp/2);
+   }
+
+   *val = (1.-acoefs/n)/(gfloat) ONEMINUSEXPMINUS1;
+   free(cov);
+   return(0);
+}
+
+gint holes_raw2( array_f *pdata, void *param, gfloat *val)
+{  holes_param *hp = (holes_param *) param;
+   gint i,m,p=pdata->ncols, n=pdata->nrows;
+   gfloat m1, m2,x1,x2,temp;
+   gfloat *cov,det,acoefs;
+
+   cov = (gdouble *) malloc(p*p*sizeof(gfloat));
+   for(i=0; i<(p*p); i++) cov[i] = 0;
+   m1=0; m2=0;
+   for(i=0; i<n; i++)
+   { m1 += pdata->vals[i][0]/n;
+     m2 += pdata->vals[i][1]/n;
+   }      
+   for(i=0; i<n; i++)
+     {  cov[0] += (pdata->vals[i][0]-m1)*(pdata->vals[i][0]-m1)/(n-1);
+        cov[1] += (pdata->vals[i][0]-m1)*(pdata->vals[i][1]-m2)/(n-1);
+        cov[3] += (pdata->vals[i][1]-m2)*(pdata->vals[i][1]-m2)/(n-1);
+     }
+   cov[2]= cov[1];
+   inverse(cov,p);
+   acoefs=0.;
+
+   for(i=0; i<n; i++)
+     {  x1 = pdata->vals[i][0]-m1; 
+        x2=pdata->vals[i][1]-m2;
+        temp= cov[0]*x1*x1-(cov[1]+cov[2])*x1*x2+cov[3]*x2*x2;
+        acoefs +=exp(-temp/2);
+   }
+
+   *val = (1.-acoefs/n)/(gfloat) ONEMINUSEXPMINUS1;
+   free(cov);
+   return(0);
+}
+
+
+/**********************************************************/
+/*  2D Central Mass index for raw data                    */
+/*   central_mass_raw1                                    */
+/*   central_mass_raw2 : use inverse function             */
+/**********************************************************/
+
+gint central_mass_raw1(array_f *pdata, void *param, gfloat *val)
+{
+
+   holes_param *hp = (holes_param *) param;
+   gint i,m,p=pdata->ncols, n=pdata->nrows;
+   gfloat m1, m2,x1,x2,temp;
+   gfloat *cov,det,acoefs;
+
+   cov = (gfloat *) malloc(p*p*sizeof(gfloat));
+   for(i=0; i<(p*p); i++) cov[i] = 0;
+   m1=0; m2=0;
+   for(i=0; i<n; i++)
+   { m1 += pdata->vals[i][0];
+     m2 += pdata->vals[i][1];
+   }      
+   m1 /= n;
+   m2 /= n;
+
+   for(i=0; i<n; i++)
+     {  cov[0] += (pdata->vals[i][0]-m1)*(pdata->vals[i][0]-m1)/(n-1);
+        cov[1] += (pdata->vals[i][0]-m1)*(pdata->vals[i][1]-m2)/(n-1);
+        cov[3] += (pdata->vals[i][1]-m2)*(pdata->vals[i][1]-m2)/(n-1);
+     }
+
+   cov[2]= cov[1];
+   det = cov[0]*cov[3]-cov[1]*cov[1];
+   acoefs=0.;
+
+   for(i=0; i<n; i++)
+     {  x1 = pdata->vals[i][0]-m1; 
+        x2=pdata->vals[i][1]-m2;
+        temp= (cov[3]*x1*x1-2*cov[1]*x1*x2+cov[0]*x2*x2)/det;
+        acoefs +=exp(-temp/2);
+   }
+
+   *val = (acoefs/n-(gfloat)EXPMINUS1)/(gfloat) ONEMINUSEXPMINUS1;
+   free(cov);
+   return(0);
+
+}
+
+gint central_mass_raw2(array_f *pdata, void *param, gfloat *val)
+{ holes_param *hp = (holes_param *) param;
+   gint i,m,p=pdata->ncols, n=pdata->nrows;
+   gfloat m1, m2,x1,x2,temp;
+   gfloat *cov,det,acoefs;
+
+   cov = (gdouble *) malloc(p*p*sizeof(gfloat));
+   for(i=0; i<(p*p); i++) cov[i] = 0;
+   m1=0; m2=0;
+   for(i=0; i<n; i++)
+   { m1 += pdata->vals[i][0]/n;
+     m2 += pdata->vals[i][1]/n;
+   }      
+   for(i=0; i<n; i++)
+     {  cov[0] += (pdata->vals[i][0]-m1)*(pdata->vals[i][0]-m1)/(n-1);
+        cov[1] += (pdata->vals[i][0]-m1)*(pdata->vals[i][1]-m2)/(n-1);
+        cov[3] += (pdata->vals[i][1]-m2)*(pdata->vals[i][1]-m2)/(n-1);
+     }
+   cov[2]= cov[1];
+   inverse(cov,p);
+   acoefs=0.;
+
+   for(i=0; i<n; i++)
+     {  x1 = pdata->vals[i][0]-m1; 
+        x2=pdata->vals[i][1]-m2;
+        temp= cov[0]*x1*x1-(cov[1]+cov[2])*x1*x2+cov[3]*x2*x2;
+        acoefs +=exp(-temp/2);
+   }
+   *val = (acoefs/n-(gfloat)EXPMINUS1)/(gfloat) ONEMINUSEXPMINUS1;
+   free(cov);
+   return(0);
+
+}
+
+/*void
 holes_deriv(holes_param *hp, gfloat **data, gfloat **pdata)
 {
   gint i, k, m;
@@ -139,7 +314,7 @@ holes_deriv(holes_param *hp, gfloat **data, gfloat **pdata)
     for (k=0; k<hp->ncols; k++)
       hp->derivs[i][k] = 0.;
 
-/* alpha */
+* alpha *
   for (k=0; k<hp->ncols; k++)
   {
     tmpf = 0.;
@@ -155,7 +330,7 @@ holes_deriv(holes_param *hp, gfloat **data, gfloat **pdata)
     hp->derivs[0][k] = tmpf;
   }
 
-/* beta */
+* beta *
   for (k=0; k<hp->ncols; k++)
   {
     tmpf = 0.;
@@ -172,49 +347,8 @@ holes_deriv(holes_param *hp, gfloat **data, gfloat **pdata)
   }
 
 }
+*/
 
-/********************************************************************
-
-Index          : Central Mass
-Transformation : needs sphered variables/principal components
-Purpose        : computes a neg projection into a normal density fn
-Note           : only works for 2d now, could be generalized
-
-*********************************************************************/
-
-void
-alloc_central_mass(holes_param *hp, gint nrows)
-{
-  hp->h0 = (gfloat *) g_malloc((guint) nrows*sizeof(gfloat *));
-  hp->h1 = (gfloat *) g_malloc((guint) nrows*sizeof(gfloat *));
-}
-
-void
-free_central_mass(holes_param *hp)
-{
-  g_free(hp->h0);
-  g_free(hp->h1);
-}
-
-gint
-central_mass(array_f *pdata, void *param, gfloat *val)
-{
-  holes_param *hp = (holes_param *) param;
-  gint i, m;
-
-/* Calculate coefficients */
-  for (i=0; i<pdata->nrows; i++)
-  {
-    m = i;
-    hp->h0[m] = exp(-pdata->vals[m][0]*pdata->vals[m][0]/2.) ;
-    hp->h1[m] = exp(-pdata->vals[m][1]*pdata->vals[m][1]/2.) ;
-  }
-
-/* Calculate index */
-  hp->acoefs = mean_fn2(hp->h0,hp->h1,pdata->nrows);
-  *val = (hp->acoefs - (float)EXPMINUS1)/(float)ONEMINUSEXPMINUS1 ;
-  return(0);
-}
 
 /*void
 central_mass_deriv(float **data, float **proj_data, float *alpha, float *beta,
@@ -498,18 +632,18 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
     case HOLES: 
       alloc_holes_p (&hp, nrows);
       dsp->t2d.ppval = t2d_calc_indx (d->tform, 
-        dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, holes, &hp);
+        dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, holes_raw1, &hp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, holes, &hp);
       free_holes_p(&hp);
     break;
     case CENTRAL_MASS: 
-      alloc_central_mass (&hp, nrows);
+      alloc_holes_p (&hp, nrows);
       dsp->t2d.ppval = t2d_calc_indx (d->tform, 
-        dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, central_mass, &hp);
+        dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, central_mass_raw1, &hp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, central_mass, &hp);
-      free_central_mass(&hp);
+      free_holes_p(&hp);
     break;
     case SKEWNESS: 
       /*      alloc_cartgini_p (&cgp, nrows, gdata);
