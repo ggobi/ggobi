@@ -302,7 +302,7 @@ nclusters_changed (ggobid *gg)
     nrows = 0;
     page = gtk_notebook_get_nth_page (GTK_NOTEBOOK (gg->cluster_ui.notebook),
                                       k);
-    d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+    d = (datad *) gtk_object_get_data (GTK_OBJECT (page), "datad");
     nrows = GTK_TABLE (d->cluster_table)->nrows;
 
     if (nrows != d->nclusters+1) {  /*-- add one for the titles --*/
@@ -320,10 +320,10 @@ cluster_table_update (datad *d, ggobid *gg)
   if (gg->cluster_ui.window == NULL) {
     ;
   } else {
-    if (nclusters_changed (gg)) {
+    if (nclusters_changed (gg)) {  /*-- for any of the datad's --*/
       cluster_window_open (gg);
     } else {
-      cluster_table_labels_update (d, gg);  /*-- d, or all d's? --*/
+      cluster_table_labels_update (d, gg);  /*-- d, or all d's? --*//* do all */
     }
   }
 }
@@ -376,6 +376,7 @@ cluster_window_open (ggobid *gg) {
 
     /* Create a scrolled window to hold the table */
     scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+    gtk_object_set_data (GTK_OBJECT (scrolled_window), "datad", d);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
       GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
