@@ -79,7 +79,6 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 
   splot_plane_to_screen (display, cpanel, sp, gg);
 
-  /*if (viewmode_get (gg) == BRUSH)*/
   if (cpanel->viewmode == BRUSH) {
     assign_points_to_bins (d, gg);
   }
@@ -580,7 +579,6 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
 
 /*  could become splot_p1d_init ();*/
   sp->p1dvar = 0;
-  sp->p1d_segs = NULL;
 
 /*  could become splot_xyplot_init ();*/
   sp->xyvars.x = 0;
@@ -751,13 +749,17 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
     sp->screen[i].y += (sp->max.y / 2);
   }
 
-  if (display->displaytype == parcoords) {
-    sp_whiskers_make (sp, display, gg);
+  switch (display->displaytype) {
+    case parcoords:
+      sp_whiskers_make (sp, display, gg);
+    break;
+    case tsplot:
+      tsplot_whiskers_make (sp, display, gg);
+    break;
+    case scatterplot:
+      p1d_ash_baseline_set (sp);
+    break;
   }
-  else if (display->displaytype == tsplot) {
-    tsplot_whiskers_make (sp, display, gg);
-  }
-
 }
 
 /*----------------------------------------------------------------------*/
