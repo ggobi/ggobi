@@ -734,6 +734,10 @@ controls the binwidth.
 The 1D plot will be arranged horizontally if you select a variable
 with a left click, and vertically if you use a middle or right click.
 
+To activate this view mode from the keyboard, type {\em d} or {\em D}
+with the focus in the plot window, or type Control-{\em d} or
+Control-{\em D} with the focus in the console.
+
 \subsection{XY plots}
 
 The XY plots are the rudimentary 2 variable scatterplot (or
@@ -742,37 +746,50 @@ plotted horizontally and the other vertically. Controls allow for
 variables to be cycled in and out of the plot, generating an animation
 through all pairwise plots.
 
-% dfs here %
+To activate this view mode from the keyboard, type {\em x} or {\em X}
+with the focus in the plot window, or type Control-{\em x} or
+Control-{\em X} with the focus in the console.
+
 \subsection{1D Tour}
 \label{slbl:1DTour}
 
 The 1D tour generates a continuous sequence of 1-D projections of the
 active variable space. The projected data are displayed as an average
-shifted histogram, horizontally or vertically. The scrollbar at the
+shifted histogram (ASH), horizontally or vertically. The scrollbar at the
 top of the controls allows the speed of rotation to be adjusted. The
-pause checkbox stops and starts the tour. Reinit initializes the tour
-to the projection of the first active variable.  Scramble set the view
-to a random projection.
+pause checkbox stops and starts the tour. {\bf Reinit} initializes the tour
+to the projection (the ASH) of the first active variable.  {\bf Scramble} sets
+the view to a random projection.
 
-Variables can be toggled into the tour by clicking on the variable
-circles. The active variable space is the subset of variables
-currently entered into a tour. When a variable is toggled out of the
-tour it fades out gradually, to maintain continuity of the tour.
+Variables can be toggled into and out of the tour by clicking on the
+variable circles. The active variable space is the subset of variables
+currently selected, and their variable circles are drawn with
+a bold outline. When a variable is toggled out of the tour it fades out
+gradually, to maintain continuity of motion.
 
-The variable projection coefficients can be manually manipulated using
-manual controls. To select the variable to manipulate, click on the
-purple {\bf Manip} button and then click on the variable circle. Then
-using mouse motion in the plot window the coefficient for the
-manipulation variable can be altered, constrained by the values of the
-coefficients of other active variables.
+The variable projection coefficients can be manually manipulated
+using manual controls. To select the variable to manipulate, click on
+the purple {\bf Manip} button and then click on the variable circle.
+Horizontal mouse motions in the plot window then alter the coefficient for
+the manipulation variable, constrained by the values of the coefficients
+of other active variables (which may also change).
 
 The variable axes can be toggled on or off using the options menu at
 the top of the plot window.
 
-A rudimentary guided tour is available when the {\bf Projection
-Pursuit} button is selected. It is controlled through a separate
-pop-up projection pursuit window. Currently only the principal
-component index is implemented.
+To activate this view mode from the keyboard, type {\em t} or {\em T}
+with the focus in the plot window, or type Control-{\em t} or
+Control-{\em T} with the focus in the console.
+
+\subsubsection{Projection Pursuit}
+
+A rudimentary guided tour is available when the {\bf Projection Pursuit}
+button is selected. It is controlled through a separate pop-up projection
+pursuit window, which contains a plot of the projection pursuit index.
+When {\bf Optimize} is selected, the tour is guided by the index rather
+than proceeding randomly.  The numbers displayed to the right of the {\bf
+PP index} label are the minimum, current value, and maximum of the index.
+(Currently only the principal component index is implemented.)
 
 The {\bf Options} menu on the main menu bar contains controls for
 laying out variable circles in the variable selection panel in
@@ -789,37 +806,49 @@ The 2D tour generates a continuous sequence of 2-D projections of the
 active variable space. The projected data are displayed as a
 scatterplot. The scrollbar at the top of the controls allows the speed
 of rotation to be adjusted. The pause checkbox stops and starts the
-tour. Reinit initializes the tour to the projection of the first two
-active variables. Scramble set the view to a random projection.
+tour. {\bf Reinit} initializes the tour to the projection of the first two
+active variables. {\bf Scramble} sets the view to a random projection.
 
-Variables can be toggled into the tour by clicking on the variable
-circles. The active variable space is the subset of variables
-currently entered into a tour. When a variable is toggled out of the
-tour it fades out gradually, to maintain continuity of the tour.
+Variables can be toggled into and out of the tour by clicking on the
+variable circles. The active variable space is the subset of variables
+currently entered into a tour, and their variable circles are drawn with
+a bold outline. When a variable is toggled out of the tour it fades out
+gradually, to maintain continuity of motion.
 
 The variable projection coefficients can be manually manipulated using
 manual controls. To select the variable to manipulate, click on the
-purple {\bf Manip} button and then click on the variable circle. Then
-using mouse motion in the plot window the coefficient for the
-manipulation variable can be altered, constrained by the values of the
-coefficients of other active variables. There are 5 manipulation
-modes: oblique is unconstrained manipulation, horizontal and vertical
-constrain manipulation along the axes, radial constrains manipulation
-to the current direction of the variable keeping angle fixed, and
-angular manipulation allows rotating the variable axis in the plane of
-the plot window, keeping the length of the axis fixed.
+purple {\bf Manip} button and then click on the variable circle. 
+Once a manipulation mode has been selected,
+horizontal mouse motions in the plot window alter the coefficient for
+the manipulation variable, constrained by the values of the coefficients
+of other active variables (which may also change).
+
+There are 5 manipulation modes: {\it oblique} allows unconstrained
+manipulation, {\it horizontal} and {\it vertical} constrain manipulation
+along the axes, {\it radial} constrains manipulation to the current
+direction of the variable keeping angle fixed, and {\it angular}
+manipulation allows rotating the variable axis in the plane of the plot
+window, keeping the length of the axis fixed.
 
 The variable axes can be toggled on or off using the options menu at
 the top of the plot window.
 
-A rudimentary guided tour is available from the projection pursuit
-control panel. Currently only the holes and central mass indices are
-implemented. Projection pursuit in the 2D tour requires the variables
-to be sphered ahead of time. So the user needs to first enter the {\bf
-Tools} menu and use the {\bf Sphering...} tool to clone sphered
-counterparts of the currently active variables. Once this is done then
-the {\bf Projection Pursuit} option can be chosen. This pops up a new
-window which provides an interface to guiding the tour.
+To activate this view mode from the keyboard, type {\em g} or {\em G}
+with the focus in the plot window, or type Control-{\em g} or
+Control-{\em G} with the focus in the console.
+
+\subsubsection{Projection Pursuit}
+
+A rudimentary guided tour is available from the projection pursuit control
+panel. Projection pursuit in the 2D tour requires the variables to be
+sphered ahead of time, so the user needs to first enter the {\bf Tools}
+menu and use the {\bf Sphering...} tool to clone sphered counterparts of
+the currently active variables. Once these variables have been selected
+and all others deselected, then the {\bf Projection Pursuit} option can
+be chosen. This pops up a new window which provides an interface for
+guiding the tour.
+(Currently only the holes and central mass indices are implemented. )
+
 
 The {\bf Options} menu on the main menu bar contains controls for
 laying out variable circles in the variable selection panel in
@@ -836,28 +865,31 @@ The 1x1D tour generates 2 independent continuous sequences of 1D
 projections of 2 active variable spaces, plotting the results
 horizontally and vertically generating a scatterplot. The scrollbar at
 the top of the controls allows the speed of rotation to be
-adjusted. The pause checkbox stops and starts the tour. Reinit
+adjusted. The pause checkbox stops and starts the tour. {\bf Reinit}
 initializes the tour to the projection of the first two active
-variables. Scramble set the view to a random projection.
+variables. {\bf Scramble} sets the view to a random projection.
 
 Variables can be toggled into the tour by clicking on the variable
-circles. A click with the left mouse toggles a variable in the
-horizontal direction, and a click with the middle mouse toggles a
-variable in the vertical direction. The active variable space is the
-subset of variables currently entered into a tour. When a variable is
-toggled out of the tour it fades out gradually, to maintain continuity
-of the tour.
+circles. A click with the left mouse toggles a variable in the horizontal
+direction, and a click with the middle mouse toggles a variable in
+the vertical direction. The active variable space is the subset of
+variables currently selected, and their variables circles are drawn with
+a bold outline. When a variable is toggled out of the tour it fades out
+gradually, to maintain continuity of motion.
 
 The variable projection coefficients can be manually manipulated using
-manual controls. To select the variable to manipulate, click on the
-purple {\bf Manip} button and then click on the variable circle. Then
-using mouse motion in the plot window the coefficient for the
-manipulation variable can be altered, constrained by the values of the
-coefficients of other active variables. There are 4 manipulation
-modes: combined is changes both horizontal and vertical manipulation
-variable coefficients, equal combined constrains the horizontal and
-vertical changes to be equal, horizontal and vertical constrain
-manipulation along the axes.
+manual controls. To select the variable to manipulate, click on the purple
+{\bf Manip} button and then click left or right on the variable circle.
+Once a manipulation mode has been selected, mouse motions in the plot
+window alter the coefficients for the manipulation variable or variables,
+constrained by the values of the coefficients of other active variables
+(which may also change).
+
+There are 4 manipulation modes: {\it combined} changes both horizontal
+and vertical manipulation variable coefficients, {\it equal combined}
+constrains the horizontal and vertical changes to be equal, {\it
+horizontal} and {\it vertical} constrain manipulation in the corresponding
+direction.
 
 The {\bf Options} menu on the main menu bar contains controls for
 laying out variable circles in the variable selection panel in
@@ -870,6 +902,11 @@ desirable for some situations.
 The variable axes can be toggled on or off using the options menu at
 the top of the plot window.
 
+To activate this view mode from the keyboard, type {\em c} or {\em C}
+with the focus in the plot window, or type Control-{\em c} or
+Control-{\em C} with the focus in the console.
+
+% dfs here %
 \subsection{Scaling of axes}
 \label{slbl:Scaling}
 
