@@ -993,10 +993,10 @@ GGOBI(getSPlot)(gint which, displayd *display)
 gint
 GGOBI(setMode)(const gchar *name, ggobid *gg)
 {
-  PipelineMode old = pipeline_mode_get(gg);
+  PipelineMode old = viewmode_get(gg);
   PipelineMode newMode =   GGOBI(getModeId)(name);
   if(newMode != NULLMODE)
-    GGOBI(full_pipeline_mode_set)(newMode, gg);
+    GGOBI(full_viewmode_set)(newMode, gg);
 
   return(old);
 }

@@ -126,10 +126,10 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
 {
 /*
  * If a new variable is selected or a variable is transformed
- * during transient brushing, restore all points to the permanent
- * value.  After calling this routine, re-execute brush_once() to
- * brush the points that are now underneath the brush.  For now,
- * don't make the same change for persistent brushing.
+ * during transient brushing, we may want to restore all points to
+ * the permanent value.  After calling this routine, re-execute
+ * brush_once() to brush the points that are now underneath the brush. 
+ * For now, don't make the same change for persistent brushing.
 */
   gint i, m, k;
   datad *d = dsp->d;

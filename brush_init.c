@@ -248,14 +248,5 @@ brush_activate (gboolean state, displayd *display, ggobid *gg)
   if (state)
     assign_points_to_bins (d, gg);
 
-  else {
-    /*
-     * If transient brushing, restore the color of the transiently
-     * brushed points to their previous color
-    */
-    reinit_transient_brushing (display, gg);
-    redraw_style = FULL;
-  }
-
   return redraw_style;
 }

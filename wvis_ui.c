@@ -459,13 +459,8 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 void
 wvis_window_open (ggobid *gg) {
   GtkWidget *vbox, *hb;
-  GtkWidget *notebook, *swin, *clist;
+  GtkWidget *notebook;
   GtkWidget *btn, *vb;
-  gint nd = g_slist_length (gg->d);
-  gint j;
-  GSList *l;
-  datad *d;
-  gchar *row[1];
 
   if (gg->wvis.window == NULL) {
 

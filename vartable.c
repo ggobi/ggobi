@@ -67,7 +67,7 @@ selected_cols_get (gint *cols, datad *d, ggobid *gg)
 gint
 plotted_cols_get (gint *cols, datad *d, ggobid *gg) 
 {
-  PipelineMode mode = pipeline_mode_get (gg);
+  PipelineMode mode = viewmode_get (gg);
   gint ncols = 0;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;

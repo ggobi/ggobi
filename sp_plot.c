@@ -149,7 +149,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   datad *d = display->d;
   gboolean draw_case;
   gint dtype = display->displaytype;
-  gint proj = projection_get (gg);
+  cpaneld *cpanel = &display->cpanel;
+  gint proj = cpanel->projection;
 
   /*
    * since parcoords and tsplot each have their own weird way
@@ -248,15 +249,12 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   gint k;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
+  gint proj = cpanel->projection;
   datad *d = display->d;
   icoords *bin0 = &gg->plot.bin0;
   icoords *bin1 = &gg->plot.bin1;
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
-/*
-  gint proj = projection_get (gg);
-*/
-  gint proj = cpanel->projection;
 
   gushort current_color;
   gint ncolors_used;
@@ -521,6 +519,7 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
 {
   displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
+  gint proj = cpanel->projection;
   datad *d = dsp->d;
   gint j;
   gint lbearing, rbearing, width, ascent, descent;
@@ -534,7 +533,6 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
   if (cpanel->identify_display_type == ID_CASE_LABEL)
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
   else {
-    gint proj = projection_get (gg);
     switch (proj) {
       case P1PLOT:
         lbl = g_strdup_printf ("%g", d->tform.vals[k][sp->p1dvar]);
@@ -684,7 +682,7 @@ splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   GSList *l;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
-  PipelineMode mode = pipeline_mode_get (gg);
+  PipelineMode mode = viewmode_get (gg);
 
   /*
      these are the cues added to
@@ -1015,7 +1013,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   datad *e = display->e;
   datad *d = display->d;
-  PipelineMode mode = pipeline_mode_get (gg);
+  cpaneld *cpanel = &display->cpanel;
   gint displaytype = display->displaytype;
 
 /*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
@@ -1035,15 +1033,15 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   /*-- identify, move points, edge editing --*/
   splot_add_point_cues (sp, drawable, gg);  
 
-  if (sp == gg->current_splot) {
+  if (sp == gg->current_splot)
     splot_draw_border (sp, drawable, gg);
 
-    if (mode == BRUSH) {
-      brush_draw_brush (sp, drawable, d, gg);
-      brush_draw_label (sp, drawable, d, gg);
-    } else if (mode == SCALE) {
-      scaling_visual_cues_draw (sp, drawable, gg);
-    }
+  /*-- draw these cues whether this is the current plot or not --*/
+  if (cpanel->viewmode == BRUSH) {
+    brush_draw_brush (sp, drawable, d, gg);
+    brush_draw_label (sp, drawable, d, gg);
+  } else if (cpanel->viewmode == SCALE) {
+    scaling_visual_cues_draw (sp, drawable, gg);
   }
 }
 
@@ -1070,8 +1068,9 @@ splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
 static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   gint j, ix, iy;
-  gint proj = projection_get (gg);
   displayd *dsp = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &dsp->cpanel;
+  gint proj = cpanel->projection;
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
   datad *d = dsp->d;

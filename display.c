@@ -373,7 +373,7 @@ gint
 display_add (displayd *display, ggobid *gg)
 {
   splotd *prev_splot = gg->current_splot;
-  PipelineMode prev_pipeline_mode = pipeline_mode_get (gg);
+  PipelineMode prev_viewmode = viewmode_get (gg);
 
   if (isEmbeddedDisplay(display) == false) {
     GGobi_widget_set(display->window, gg, true);
@@ -394,12 +394,12 @@ display_add (displayd *display, ggobid *gg)
    * I may need to add handlers later for some unforeseen display.
   */
   /* don't activate */
-  pipeline_mode_set (gg->current_display->cpanel.pipeline_mode, gg); 
+  viewmode_set (gg->current_display->cpanel.viewmode, gg); 
 
 
   /*-- if starting from the API, the first mode menu needs to be shown --*/
-  if (prev_pipeline_mode == NULLMODE)
-    pipeline_mode_submenus_update (prev_pipeline_mode, gg);
+  if (prev_viewmode == NULLMODE)
+    viewmode_submenus_update (prev_viewmode, gg);
 
   /*-- Make sure the border for the previous plot is turned off --*/
   if (prev_splot != NULL) {
@@ -526,16 +526,16 @@ display_set_current (displayd *new_display, ggobid *gg)
 
     switch (gg->current_display->displaytype) {
       case scatterplot:
-        submenu_destroy (gg->pipeline_mode_item);
+        submenu_destroy (gg->viewmode_item);
       break;
       case scatmat:
-        submenu_destroy (gg->pipeline_mode_item);
+        submenu_destroy (gg->viewmode_item);
       break;
       case parcoords:
-        submenu_destroy (gg->pipeline_mode_item);
+        submenu_destroy (gg->viewmode_item);
       break;
       case tsplot:
-        submenu_destroy (gg->pipeline_mode_item);
+        submenu_destroy (gg->viewmode_item);
       break;
       case unknown_display_type:
 /**/    return;
@@ -553,42 +553,42 @@ display_set_current (displayd *new_display, ggobid *gg)
     switch (new_display->displaytype) {
       case scatterplot:
         scatterplot_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) pipeline_mode_set_cb, gg, true);
-        gg->pipeline_mode_item = submenu_make ("_ViewMode", 'V',
+          (GtkSignalFunc) viewmode_set_cb, gg, true);
+        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
           gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->pipeline_mode_item),
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
                                    gg->app.scatterplot_mode_menu); 
-        submenu_insert (gg->pipeline_mode_item, gg->main_menubar, 2);
+        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
       break;
 
       case scatmat:
         scatmat_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) pipeline_mode_set_cb, gg, true);
-        gg->pipeline_mode_item = submenu_make ("_ViewMode", 'V',
+          (GtkSignalFunc) viewmode_set_cb, gg, true);
+        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
           gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->pipeline_mode_item),
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
                                    gg->app.scatmat_mode_menu); 
-        submenu_insert (gg->pipeline_mode_item, gg->main_menubar, 2);
+        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
       break;
 
       case parcoords:
         parcoords_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) pipeline_mode_set_cb, gg, true);
-        gg->pipeline_mode_item = submenu_make ("_ViewMode", 'V',
+          (GtkSignalFunc) viewmode_set_cb, gg, true);
+        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
           gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->pipeline_mode_item),
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
                                    gg->parcoords.mode_menu); 
-        submenu_insert (gg->pipeline_mode_item, gg->main_menubar, 2);
+        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
       break;
 
       case tsplot:
         tsplot_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) pipeline_mode_set_cb, gg, true);
-        gg->pipeline_mode_item = submenu_make ("_ViewMode", 'V',
+          (GtkSignalFunc) viewmode_set_cb, gg, true);
+        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
           gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->pipeline_mode_item),
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
                                    gg->tsplot.mode_menu); 
-        submenu_insert (gg->pipeline_mode_item, gg->main_menubar, 2);
+        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
       break;
       default:
       break;
@@ -706,7 +706,7 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg) {
 /*-- update transient brushing; I will also need to un-brush some points --*/
     if (display == gg->current_display &&
         sp == gg->current_splot &&
-        pipeline_mode_get (gg) == BRUSH)
+        viewmode_get (gg) == BRUSH)
     {
       datad *d = display->d;
       assign_points_to_bins (d, gg);

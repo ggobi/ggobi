@@ -230,7 +230,7 @@ extern const gchar * const* GGOBI(getOpModeNames)(int *);
 extern gint GGOBI(getModeId)(const gchar *name);
 extern gint GGOBI(setMode)(const gchar *name, ggobid *gg);
 extern const gchar *GGOBI(getModeName)(gint which);
-extern int GGOBI(full_pipeline_mode_set)(gint action, ggobid *gg);
+extern int GGOBI(full_viewmode_set)(gint action, ggobid *gg);
 
 extern int GGOBI(setBrushColor)(gint cid, ggobid *gg);
 extern gint GGOBI(getBrushColor)(ggobid *gg);

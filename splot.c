@@ -67,7 +67,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 
   splot_plane_to_screen (display, cpanel, sp, gg);
 
-  if (pipeline_mode_get (gg) == BRUSH)
+  if (viewmode_get (gg) == BRUSH)
     assign_points_to_bins (d, gg);
 
   sp->redraw_style = FULL;
@@ -205,7 +205,7 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
     (PipelineMode) action))
   {
     etime = event->time;
-    GGOBI(full_pipeline_mode_set)((PipelineMode) action, gg);
+    GGOBI(full_viewmode_set)((PipelineMode) action, gg);
   }
 
   return common_event;
@@ -215,7 +215,7 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
 void
 sp_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
-  gint m = display->cpanel.pipeline_mode;
+  gint m = display->cpanel.viewmode;
 
   switch (m) {
     case P1PLOT:
@@ -298,7 +298,7 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
 
     sp_event_handlers_toggle (sp, state);
 
-    pipeline_mode_activate (sp, cpanel->pipeline_mode, state, gg);
+    viewmode_activate (sp, cpanel->viewmode, state, gg);
 
     /*
      * this is now the only place varpanel_refresh is called in
@@ -318,7 +318,7 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
   /*-- display and cpanel for outgoing current_splot --*/
   displayd *display_prev = NULL;
   cpaneld *cpanel = NULL;
-  PipelineMode prev_pipeline_mode = gg->pipeline_mode;
+  PipelineMode prev_viewmode = gg->viewmode;
 
   if (sp != sp_prev) {
     if (sp_prev != NULL) {
@@ -333,7 +333,7 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
     gg->current_splot = sp;
     splot_set_current (sp, on, gg);
 
-    pipeline_mode_submenus_update (prev_pipeline_mode, gg);
+    viewmode_submenus_update (prev_viewmode, gg);
 
     /*
      * if the previous splot is in transient brushing mode, a FULL
@@ -343,11 +343,11 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
      *
      * otherwise, just redraw the borders of the two affected splots
     */
-    if (prev_pipeline_mode == NULLMODE || cpanel == NULL)
+    if (prev_viewmode == NULLMODE || cpanel == NULL)
       displays_plot (NULL, FULL, gg);
-    if (prev_pipeline_mode == BRUSH && cpanel->br_mode == BR_TRANSIENT)
+    if (prev_viewmode == BRUSH && cpanel->br_mode == BR_TRANSIENT)
       displays_plot (NULL, FULL, gg);
-    else if (prev_pipeline_mode == IDENT)
+    else if (prev_viewmode == IDENT)
       displays_plot (NULL, QUICK, gg);
     else {
       /* remove border from the previous splot */

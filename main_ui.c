@@ -39,7 +39,7 @@ const char *const GGOBI(OpModeNames)[] = {
   "TSplot",
 };
 
-static const char *const *pipeline_mode_name = GGOBI(OpModeNames);
+static const char *const *viewmode_name = GGOBI(OpModeNames);
 
 void addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg);
 
@@ -87,15 +87,15 @@ cpanel_show_cb (GtkCheckMenuItem *w, guint action)
 {
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
   if (w->active)
-    gtk_widget_show (gg->pipeline_mode_frame);
+    gtk_widget_show (gg->viewmode_frame);
   else
-    gtk_widget_hide (gg->pipeline_mode_frame);
+    gtk_widget_hide (gg->viewmode_frame);
 }
 
 
 PipelineMode
-pipeline_mode_get (ggobid* gg) {
-  return gg->pipeline_mode;
+viewmode_get (ggobid* gg) {
+  return gg->viewmode;
 }
 PipelineMode
 projection_get (ggobid* gg) {
@@ -138,12 +138,7 @@ varpanel_reinit (ggobid *gg)
   GSList *l;
   datad *d;
 
-  if (varpanel_permits_circles_or_checkboxes (gg->pipeline_mode))
-  {
-    ;  /*-- no change required either way --*/
-  }
-
-  else if (varpanel_highd(gg->pipeline_mode) && varpanel_shows_checkboxes (gg))
+  if (varpanel_highd(gg->projection) && varpanel_shows_checkboxes (gg))
   {  /*-- remove checkboxes and add circles --*/
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
@@ -164,7 +159,7 @@ varpanel_reinit (ggobid *gg)
       if (GTK_OBJECT (d->vcirc_ui.vbox)->ref_count > 1)
         gtk_widget_unref (d->vcirc_ui.vbox);
     }
-  } else if (!varpanel_highd(gg->pipeline_mode) && varpanel_shows_circles (gg))
+  } else if (!varpanel_highd(gg->projection) && varpanel_shows_circles (gg))
   {  /*-- remove circles and add checkboxes --*/
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
@@ -180,7 +175,7 @@ varpanel_reinit (ggobid *gg)
 }
 
 void 
-pipeline_mode_set (PipelineMode m, ggobid *gg)
+viewmode_set (PipelineMode m, ggobid *gg)
 {
 /*
  * This could be called ui_mode_set or main_window_mode_set,
@@ -189,32 +184,27 @@ pipeline_mode_set (PipelineMode m, ggobid *gg)
 */
   displayd *display = gg->current_display;
 
-  gg->pipeline_mode = m;
-  if (gg->pipeline_mode != gg->prev_pipeline_mode) {
+  gg->viewmode = m;
 
-    if (gg->prev_pipeline_mode != NULLMODE) {
+  if (gg->viewmode != gg->prev_viewmode) {
+
+    if (gg->prev_viewmode != NULLMODE) {
       /* Add a reference to the widget so it isn't destroyed */
-      gtk_widget_ref (gg->control_panel[gg->prev_pipeline_mode]);
-      gtk_container_remove (GTK_CONTAINER (gg->pipeline_mode_frame),
-                            gg->control_panel[gg->prev_pipeline_mode]);
+      gtk_widget_ref (gg->control_panel[gg->prev_viewmode]);
+      gtk_container_remove (GTK_CONTAINER (gg->viewmode_frame),
+                            gg->control_panel[gg->prev_viewmode]);
     }
 
-    if (gg->pipeline_mode != NULLMODE) {
-      gtk_frame_set_label (GTK_FRAME (gg->pipeline_mode_frame),
-        pipeline_mode_name[gg->pipeline_mode]);
-      gtk_container_add (GTK_CONTAINER (gg->pipeline_mode_frame),
-        gg->control_panel[gg->pipeline_mode]);
+    if (gg->viewmode != NULLMODE) {
+      gtk_frame_set_label (GTK_FRAME (gg->viewmode_frame),
+        viewmode_name[gg->viewmode]);
+      gtk_container_add (GTK_CONTAINER (gg->viewmode_frame),
+        gg->control_panel[gg->viewmode]);
 
       /*-- avoid increasing the object's ref_count infinitely  --*/
-      if (GTK_OBJECT (gg->control_panel[gg->pipeline_mode])->ref_count > 1)
-        gtk_widget_unref (gg->control_panel[gg->pipeline_mode]);
+      if (GTK_OBJECT (gg->control_panel[gg->viewmode])->ref_count > 1)
+        gtk_widget_unref (gg->control_panel[gg->viewmode]);
     }
-
-    /* 
-     * If moving between modes whose variable selection interface
-     * differs, swap in the correct display.
-     */
-    varpanel_reinit (gg);
   }
 
   /*
@@ -224,8 +214,10 @@ pipeline_mode_set (PipelineMode m, ggobid *gg)
    * value of projection is irrelevant.)
   */
   if (display->displaytype == scatterplot) {
-    if (gg->pipeline_mode <= COTOUR)
-      gg->projection = display->cpanel.projection = gg->pipeline_mode;
+
+    if (gg->viewmode <= COTOUR)
+      display->cpanel.projection = gg->viewmode;
+    gg->projection = display->cpanel.projection;
 
     if (gg->projection != gg->prev_projection) {
       scatterplot_show_rulers (display, gg->projection);
@@ -233,7 +225,15 @@ pipeline_mode_set (PipelineMode m, ggobid *gg)
     }
   }
 
-  gg->prev_pipeline_mode = gg->pipeline_mode;
+  if (gg->viewmode != gg->prev_viewmode) {
+    /* 
+     * If moving between modes whose variable selection interface
+     * differs, swap in the correct display.
+     */
+    varpanel_reinit (gg);
+  }
+
+  gg->prev_viewmode = gg->viewmode;
 
   varpanel_tooltips_set (gg);
   varpanel_refresh (gg);
@@ -245,7 +245,7 @@ pipeline_mode_set (PipelineMode m, ggobid *gg)
 static void
 procs_activate (gboolean state, displayd *display, ggobid *gg)
 {
-  switch (gg->pipeline_mode) {
+  switch (gg->viewmode) {
     case TOUR2D:
       if (!display->cpanel.t2d_paused)
         tour2d_func (state, display, gg);
@@ -264,7 +264,7 @@ procs_activate (gboolean state, displayd *display, ggobid *gg)
 }
 
 RedrawStyle
-pipeline_mode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
+viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   RedrawStyle redraw_style = NONE;
@@ -303,18 +303,6 @@ pipeline_mode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
         xyplot_activate (state, display, gg);
       }
       break;
-/*
-are these needed?  maybe Di's already handling this.
-      case TOUR1D:
-        tour1d_activate (state, display, gg);
-      break;
-      case TOUR2D:
-        tour2d_activate (state, display, gg);
-      break;
-      case COTOUR:
-        tourcorr_activate (state, display, gg);
-      break;
-*/
       case BRUSH:
         redraw_style = brush_activate (state, display, gg);
       break;
@@ -332,10 +320,10 @@ are these needed?  maybe Di's already handling this.
 }
 
 void
-pipeline_mode_set_cb (GtkWidget *widget, gint action)
+viewmode_set_cb (GtkWidget *widget, gint action)
 {
   ggobid *gg = GGobiFromWidget(widget,true);
-  GGOBI(full_pipeline_mode_set)((PipelineMode) action, gg);
+  GGOBI(full_viewmode_set)((PipelineMode) action, gg);
 }
 
 /*
@@ -380,32 +368,45 @@ projection_ok (gint m, displayd *display)
 }
 
 gint
-GGOBI(full_pipeline_mode_set)(gint action, ggobid *gg)
+GGOBI(full_viewmode_set)(gint action, ggobid *gg)
 {
-  PipelineMode prev_pipeline_mode = gg->pipeline_mode;
+/*
+ * Some of the routines called here, like procs_activate
+ * and reinit_transient brushing, are routines that we want
+ * to have executed when a new viewmode
+ * is selected for the current display, but not when the
+ * viewmode changes because a new display becomes current.
+ * Because of that, we don't put them in viewmode_activate.
+*/
+  PipelineMode prev_viewmode = gg->viewmode;
 
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
     displayd *display = gg->current_display;
+    cpaneld *cpanel = &display->cpanel;
     RedrawStyle redraw_style = NONE;
 
     if (projection_ok (action, display)) {
       sp_event_handlers_toggle (sp, off);
-      redraw_style = pipeline_mode_activate (sp, gg->pipeline_mode, off, gg);
+      redraw_style = viewmode_activate (sp, gg->viewmode, off, gg);
       procs_activate (off, display, gg);
 
-      display->cpanel.pipeline_mode = (PipelineMode) action;
-      pipeline_mode_set (display->cpanel.pipeline_mode, gg);
+      display->cpanel.viewmode = (PipelineMode) action;
+      viewmode_set (display->cpanel.viewmode, gg);
 
       sp_event_handlers_toggle (sp, on);
-      pipeline_mode_activate (sp, gg->pipeline_mode, on, gg);
+      viewmode_activate (sp, gg->viewmode, on, gg);
+
       procs_activate (on, display, gg);
+      if (gg->viewmode != BRUSH && prev_viewmode == BRUSH)
+        if (cpanel->br_mode == BR_TRANSIENT)
+          reinit_transient_brushing (display, gg);
 
       /*
        * work out which mode menus (Options, Reset, I/O) need
        * to be present, and add the needed callbacks.
       */
-      pipeline_mode_submenus_update (prev_pipeline_mode, gg);
+      viewmode_submenus_update (prev_viewmode, gg);
 
       /*-- redraw this display --*/
       display_tailpipe (display, FULL, gg);
@@ -615,19 +616,19 @@ make_ui (ggobid *gg) {
  * Create a frame to hold the mode panels, set its label
  * and contents, using the default mode for the default display.
 */
-  gg->pipeline_mode_frame = gtk_frame_new (
-    (gg->pipeline_mode == NULLMODE) ? "" :
-      pipeline_mode_name[gg->pipeline_mode]);
+  gg->viewmode_frame = gtk_frame_new (
+    (gg->viewmode == NULLMODE) ? "" :
+      viewmode_name[gg->viewmode]);
 
-  gtk_box_pack_start (GTK_BOX (hbox), gg->pipeline_mode_frame, false, false, 3);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->pipeline_mode_frame), 3);
-  gtk_frame_set_shadow_type (GTK_FRAME (gg->pipeline_mode_frame),
+  gtk_box_pack_start (GTK_BOX (hbox), gg->viewmode_frame, false, false, 3);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->viewmode_frame), 3);
+  gtk_frame_set_shadow_type (GTK_FRAME (gg->viewmode_frame),
     GTK_SHADOW_IN);
 
   make_control_panels (gg);
-  if (gg->pipeline_mode != NULLMODE)
-    gtk_container_add (GTK_CONTAINER (gg->pipeline_mode_frame),
-                       gg->control_panel[gg->pipeline_mode]);
+  if (gg->viewmode != NULLMODE)
+    gtk_container_add (GTK_CONTAINER (gg->viewmode_frame),
+                       gg->control_panel[gg->viewmode]);
 
   /*-- Variable selection panel --*/
   varpanel_make (hbox, gg);
@@ -635,10 +636,10 @@ make_ui (ggobid *gg) {
   gtk_widget_show_all (hbox);
 
   /*-- at this point, the mode could be NULLMODE, P1PLOT, or XYPLOT --*/
-  /*mode_submenus_activate (NULL, gg->pipeline_mode, on, gg);*/
+  /*mode_submenus_activate (NULL, gg->viewmode, on, gg);*/
   {
-    void pipeline_mode_submenus_initialize (PipelineMode mode, ggobid *gg);
-    pipeline_mode_submenus_initialize (gg->pipeline_mode, gg);
+    void viewmode_submenus_initialize (PipelineMode mode, ggobid *gg);
+    viewmode_submenus_initialize (gg->viewmode, gg);
   }
 
   gtk_widget_show_all (window);
