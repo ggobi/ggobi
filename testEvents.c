@@ -46,7 +46,7 @@ void
 test_data_add_cb(GtkWidget *w, datad *d,  ggobid *gg, gpointer data)
 {
   g_printerr ("(test_data_add_cb) adding datad\n");
-  gtk_signal_connect(GTK_OBJECT(gg->main_window), "select_variable", test_variable_select, "My String");
+  gtk_signal_connect(GTK_OBJECT(gg), "select_variable", test_variable_select, "My String");
 }
 
 

@@ -1158,6 +1158,13 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
   klass->parent_class.tourcorr_realloc = tourCorrRealloc;
 }
 
+static gint
+splotVariablesGet(splotd *sp, gint *cols, datad *d)
+{
+	cols[0] = sp->xyvars.x;
+	cols[1] = sp->xyvars.y;
+	return(2);
+}
 
 void
 scatterSPlotClassInit(GtkGGobiScatterSPlotClass *klass)
@@ -1171,4 +1178,6 @@ scatterSPlotClassInit(GtkGGobiScatterSPlotClass *klass)
    klass->parent_class.add_plot_labels = addPlotLabels;
    klass->parent_class.within_draw_to_unbinned = withinDrawToUnbinned;
    klass->parent_class.add_markup_cues = addMarkupCues;
+
+   klass->parent_class.plotted_vars_get = splotVariablesGet;
 }

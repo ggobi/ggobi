@@ -4,6 +4,14 @@
 #include "write_state.h"
 #include "externs.h"
 
+
+gint
+splot1DVariablesGet(splotd *sp, gint *cols, datad *d)
+{
+	cols[0] = sp->p1dvar;
+	return(1);
+}
+
 static gboolean
 parcoordsBinningPermitted(displayd *dpy)
 {
@@ -363,6 +371,7 @@ parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass)
   klass->parent_class.add_plot_labels = addPlotLabels;
 }
 
+
 void
 parcoordsSPlotClassInit(GtkGGobiParCoordsSPlotClass *klass)
 {
@@ -379,6 +388,8 @@ parcoordsSPlotClassInit(GtkGGobiParCoordsSPlotClass *klass)
 
    klass->parent_class.within_draw_to_binned = withinDrawBinned;
    klass->parent_class.within_draw_to_unbinned = withinDrawUnbinned;
+
+   klass->parent_class.plotted_vars_get = splot1DVariablesGet;
 }
 
 

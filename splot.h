@@ -167,7 +167,7 @@ typedef struct
    void (*within_draw_to_binned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
    void (*within_draw_to_unbinned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
 
-
+   gint (*plotted_vars_get)(splotd *sp, gint *vars, datad *d);
 
 } GtkGGobiExtendedSPlotClass;
 
@@ -181,5 +181,8 @@ typedef struct
 
 
 void splot_init(splotd *sp, displayd *display, gint width, gint height, struct _ggobid *gg);
+
+/* shared by barchart and parcoords. */
+gint splot1DVariablesGet(splotd *sp, gint *cols, datad *d);
 
 #endif

@@ -256,6 +256,21 @@ addPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg)
     }
 }
 
+
+static gint
+splotVariablesGet(splotd *sp, gint *cols, datad *d)
+{
+	if(sp->p1dvar > -1) {
+   	   cols[0] = sp->p1dvar;
+	   return(1);
+	} else {
+    	   cols[0] = sp->xyvars.x;
+     	   cols[1] = sp->xyvars.y;
+   	   return(2);
+	}
+}
+
+
 void
 scatmatSPlotClassInit(GtkGGobiScatmatSPlotClass *klass) 
 {
@@ -264,4 +279,6 @@ scatmatSPlotClassInit(GtkGGobiScatmatSPlotClass *klass)
   klass->parent_class.draw_case_p = drawCaseP;
   klass->parent_class.draw_edge_p = drawEdgeP;
   klass->parent_class.add_plot_labels = addPlotLabels;
+
+  klass->parent_class.plotted_vars_get = splotVariablesGet;
 }

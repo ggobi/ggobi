@@ -415,7 +415,7 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   gtk_init (&argc, &argv);
 
   registerDisplayTypes((GtkTypeLoad *) typeLoaders,
-    sizeof(typeLoaders)/sizeof(typeLoaders)[0]);
+		       sizeof(typeLoaders)/sizeof(typeLoaders)[0]);
 
   vis = gdk_visual_get_system ();
 

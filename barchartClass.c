@@ -16,7 +16,7 @@ static gint barchartVarIsPlotted(displayd * dpy, gint * cols, gint ncols,
 static gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel,
                                   ggobid * gg);
 static void barchartDisplaySet(displayd * dpy, ggobid * gg);
-static void barchartDestroy(barchartSPlotd * sp);
+static void barchartDestroy(GtkObject *);
 static void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg);
 
 static gboolean barchart_build_symbol_vectors(datad * d, ggobid * gg);
@@ -132,18 +132,19 @@ void barchartDisplaySet(displayd * dpy, ggobid * gg)
 }
 
 
-void barchartDestroy(barchartSPlotd * sp)
+static void barchartDestroy(GtkObject *obj)
 {
+  barchartSPlotd * sp;
+  sp = GTK_GGOBI_BARCHART_SPLOT(obj);
   barchart_free_structure(sp);
   g_free((gpointer) sp->bar->index_to_rank);
   g_free((gpointer) sp->bar);
 
   {
     GtkObjectClass *klass;
-    klass = gtk_type_parent_class(GTK_TYPE_GGOBI_BARCHART_SPLOT);
+    klass = gtk_type_parent_class(GTK_TYPE_GGOBI_EXTENDED_SPLOT);
     klass->destroy(GTK_OBJECT(sp));
   }
-/*XX And need to chain */
 }
 
 void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg)
@@ -286,7 +287,6 @@ gint barchartSPlotKeyEventHandler(displayd * dpy, splotd * sp, gint keyval)
 }
 
 
-
 void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
 {
   klass->parent_class.treeLabel = klass->parent_class.titleLabel =
@@ -347,6 +347,8 @@ void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass * klass)
       barchart_active_paint_points;
 
   GTK_OBJECT_CLASS(klass)->destroy = barchartDestroy;
+
+  klass->extendedSPlotClass.plotted_vars_get = splot1DVariablesGet;
 }
 
 #endif                          /* BARCHART_IMPLEMENTED */

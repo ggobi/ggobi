@@ -318,7 +318,7 @@ datad.o read_xml.o: datad.c datad.h
 	cp ggobi $@
 
 cflags:
-	@echo "$(CFLAGS)"
+	@echo "$(CFLAGS) $(GTK_CFLAGS)"
 
 print.o: print.c print.h
 

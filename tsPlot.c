@@ -158,6 +158,14 @@ tsTreeLabel(splotd *sp, datad *d, ggobid *gg)
 }
 
 
+static gint
+splotVariablesGet(splotd *sp, gint *cols, datad *d)
+{
+	cols[0] = sp->xyvars.x;
+	cols[1] = sp->xyvars.y;
+	return(2);
+}
+
 void 
 timeSeriesSPlotClassInit(GtkGGobiTimeSeriesSPlotClass *klass)
 {
@@ -176,7 +184,8 @@ timeSeriesSPlotClassInit(GtkGGobiTimeSeriesSPlotClass *klass)
     klass->extendedSPlotClass.alloc_whiskers = tsAllocWhiskers;
 
     klass->extendedSPlotClass.world_to_plane = tsWorldToPlane;
-    GTK_OBJECT_CLASS(klass)->destroy = tsDestroy;
+
+    klass->extendedSPlotClass.plotted_vars_get = splotVariablesGet;
 }
 
 

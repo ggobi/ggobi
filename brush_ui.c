@@ -240,7 +240,11 @@ motion_notify_cb(GtkWidget * w, GdkEventMotion * event, cpaneld * cpanel)
   if (button1_p || button2_p) {
     brush_motion(&sp->mousepos, button1_p, button2_p, cpanel, sp, gg);
 
-    /* Like this to be emitted from the display. */
+    /*XX
+       Like this to be emitted from the display. Or what about the splotd? 
+       or perhaps both the ggobi and the splotd? or perhaps only on scatterSPlotds
+       And we might store the signal ids in the class itself.
+     */
 #if TEST_BRUSH_MOTION_CB
     fprintf(stderr,
             "emiting brush motion signal (w) %p (gg) %p (sp) %p (event) %p\n",
@@ -248,8 +252,7 @@ motion_notify_cb(GtkWidget * w, GdkEventMotion * event, cpaneld * cpanel)
     fflush(stderr);
 #endif
 /*XX is this the correct source object? */
-    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[BRUSH_MOTION_SIGNAL], gg,
-                    sp, event);
+    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[BRUSH_MOTION_SIGNAL], gg, sp, event);
   }
   return true;
 }
