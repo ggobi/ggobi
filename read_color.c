@@ -36,7 +36,7 @@ read_colorscheme(gchar *fileName, GList **list)
   xmlNodePtr node;
   colorschemed *scheme;
 
-  if(!canRead(fileName))
+  if(!canRead(fileName) && !(strncmp("http", fileName, 4) == 0 || strncmp("ftp", fileName, 3) == 0))
       return(NULL);
 
 /*  xmlSubstituteEntitiesDefault(1);    */

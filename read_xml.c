@@ -314,9 +314,11 @@ setColorScheme(const xmlChar **attrs, XMLParserData *data)
       if(scheme) {
 	  data->gg->activeColorScheme = scheme;
 	  colorscheme_init(scheme);
-      }
+      } else
+	  ggobi_XML_error_handler(data, "Invalid colorscheme name %s. No such scheme.", tmp);
+   } else {
+	  ggobi_XML_error_handler(data, "No colorscheme name specified");
    }
-   
 }
 
 gint
