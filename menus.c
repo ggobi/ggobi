@@ -1,5 +1,6 @@
-/*-- menus.c: where the modes change entries in the main menubar --*/
-/*--          covers Options, Reset, and I/O menus for all modes --*/
+/*-- menus.c: menus in the main menubar that change with the mode: --*/
+/*--          Options, Reset, and I/O menus for all modes --*/
+
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
@@ -13,6 +14,11 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+
+/*
+ * ..._item is the widget you see in the main menubar
+ * ..._menu is the submenu attached to ..._item
+*/
 
 /*--------------------------------------------------------------------*/
 /*                   Plot1D: Options menu                             */

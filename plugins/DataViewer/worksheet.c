@@ -27,8 +27,8 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin)
   PluginInstance *inst = g_malloc(sizeof(PluginInstance));
   GtkWidget *menu, *entry, *data_item;
 
-   inst->data = NULL;
-   inst->info = plugin;
+  inst->data = NULL;
+  inst->info = plugin;
 
   GGOBI_addPluginInstance(inst, gg);
 
@@ -38,8 +38,8 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin)
   gtk_menu_append (GTK_MENU (menu), entry);
 
   gtk_signal_connect_object (GTK_OBJECT(entry), "activate",
-                                   GTK_SIGNAL_FUNC (show_data_edit_window),
-                                   (gpointer) inst);
+                             GTK_SIGNAL_FUNC (show_data_edit_window),
+                             (gpointer) inst);
   gtk_widget_show(entry);
 
 /*
@@ -62,7 +62,7 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin)
   gtk_menu_bar_append (GTK_MENU_BAR (gg->main_menubar), data_item);
 */
   {
-    int n;  
+    gint n;  
     GList *children = gtk_container_children(GTK_CONTAINER(gg->main_menubar));
     n = g_list_length(children);
     gtk_menu_bar_insert(GTK_MENU_BAR (gg->main_menubar), data_item, n-1);

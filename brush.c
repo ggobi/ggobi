@@ -786,23 +786,36 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
   glong a = d->rowid.idv.els[endpoints[k].a];
   glong b = d->rowid.idv.els[endpoints[k].b];
 
-  glong x, y;
   extern gint lines_intersect (glong, glong, glong, glong, 
-    glong, glong, glong, glong, glong *, glong *);
+    glong, glong, glong, glong);
+  extern gboolean isCrossed (gdouble, gdouble, gdouble, gdouble,
+    gdouble, gdouble, gdouble, gdouble);
 
   /*-- test for intersection with the vertical edge --*/
   intersect = lines_intersect (x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2,
     sp->screen[a].x, sp->screen[a].y,
-    sp->screen[b].x, sp->screen[b].y,
-    &x, &y);
+    sp->screen[b].x, sp->screen[b].y);
+/*
+  intersect = isCrossed (x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2,
+    (gdouble) sp->screen[a].x, (gdouble) sp->screen[a].y,
+    (gdouble) sp->screen[b].x, (gdouble) sp->screen[b].y);
+*/
 
-  if (!intersect)
+/*-- I wonder if Lee's method is truly faster --- it requires
+     doubles, which forces me to do a lot of casting.  I should
+     figure out how to test it --*/
+  if (intersect != 1) {
     intersect = lines_intersect (x1, y1 + (y2 - y1)/2, x2, y1 + (y2 - y1)/2,
       sp->screen[a].x, sp->screen[a].y,
-      sp->screen[b].x, sp->screen[b].y,
-      &x, &y);
+      sp->screen[b].x, sp->screen[b].y);
+/*
+    intersect = isCrossed (x1, y1 + (y2 - y1)/2, x2, y1 + (y2 - y1)/2,
+      (gdouble) sp->screen[a].x, (gdouble) sp->screen[a].y,
+      (gdouble) sp->screen[b].x, (gdouble) sp->screen[b].y);
+*/
+  }
 
-  return (intersect);
+  return (intersect == 1);
 }
 
 

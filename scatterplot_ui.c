@@ -79,97 +79,22 @@ scatterplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 /*                   Setting the display menubar                      */
 /*--------------------------------------------------------------------*/
 
+/*
+ * This handles the initialization of the edge menu item and menu,
+ * and it should also be called whenever the number of edge sets
+ * might have changed:  when an edge set is added or removed, and
+ * when a datad is added or removed.
+*/
 void
-popup_edge_menu (GtkWidget *w, displayd *display)
+scatterplot_display_edge_menu_update (displayd *display,
+                                      GtkAccelGroup *accel_group,
+                                      GtkSignalFunc func, ggobid *gg)
 {
-  GTimeVal current_time  = { 0, 0 };
-  ggobid *gg = GGobiFromDisplay (display);
-  GtkWidget *edge_menu, *item;
-  gint k, ne = 0, nd = g_slist_length (gg->d);
-  datad *e, *d = display->d;
-
-  for (k=0; k<nd; k++) { 
-    e = (datad*) g_slist_nth_data (gg->d, k);
-    if (e != d && e->edge.n > 0)
-      ne++;
-  }
-
-  /*-- build the menu --*/
-  edge_menu = gtk_menu_new ();
-
-  /*-- if there's only one edge set, there's no need for this menu --*/
-  if (ne > 1) {  /*-- add cascading menu --*/
-    GtkWidget *submenu, *anchor;
-    gchar *lbl;
-    extern void edgeset_add_cb (GtkWidget *w, datad *e);
-
-    submenu = gtk_menu_new ();
-    anchor = CreateMenuItem (edge_menu, "Select edge set",
-      NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
-
-    for (k=0; k<nd; k++) { 
-      e = (datad *) g_slist_nth_data (gg->d, k);
-      if (e == d)
-        continue;
-      lbl = datasetName (e, k);
-      item = CreateMenuItem (submenu, lbl,
-        NULL, NULL, NULL, gg->main_accel_group,
-        GTK_SIGNAL_FUNC (edgeset_add_cb), e, gg);
-      gtk_object_set_data (GTK_OBJECT (item),
-        "display", GINT_TO_POINTER (display));
-      g_free (lbl);
-    }
-
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
-
-    /* Add a separator */
-    CreateMenuItem (edge_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
-  }
-
-  /*
-   * The edge options are handled like other display options,
-   * and their callback function is display_options_cb.
-   * I may want to change that, but leave it for now.
-  */
-  item = CreateMenuCheck (edge_menu,
-    "Show edges (undirected)",
-    display_options_cb, GINT_TO_POINTER (DOPT_EDGES_U),
-    display->options.edges_undirected_show_p, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-
-  item = CreateMenuCheck (edge_menu,
-    "Show 'arrowheads' (for directed edges)",
-    display_options_cb, GINT_TO_POINTER (DOPT_EDGES_A),
-    display->options.edges_arrowheads_show_p, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-
-  /* Add a separator */
-  CreateMenuItem (edge_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
-
-  item = CreateMenuCheck (edge_menu,
-    "Show directed edges (both edges and 'arrowheads')",
-    display_options_cb, GINT_TO_POINTER (DOPT_EDGES_D),
-    display->options.edges_directed_show_p, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-
-  /*-- pop it up --*/
-  g_get_current_time (&current_time);
-  gtk_menu_popup (GTK_MENU (edge_menu), NULL, NULL,
-    NULL, NULL,
-    1, (guint32) current_time.tv_sec);
-}
-
-void
-scatterplot_display_edge_menu_make (displayd *display,
-                                    GtkAccelGroup *accel_group,
-                                    GtkSignalFunc func,
-                                    GtkWidget *mbar, ggobid *gg)
-{
-  GtkWidget *edge_item;
   datad *d = display->d;  /*-- this dataset --*/
   gint nd = g_slist_length (gg->d);
   datad *e;
   gint k, ne = 0;
+  GtkWidget *item;
 
   /*-- If this datad has ids, find the number of other datad's with edges --*/
   if (d->rowid.idv.nels > 0) {
@@ -178,33 +103,111 @@ scatterplot_display_edge_menu_make (displayd *display,
       if (e != d && e->edge.n > 0)
         ne++;
     }
+  }
 
-    /*-- if ne > 0, add edges menu --*/
+  /*-- remove any existing submenu --*/
+  if (display->edge_item != NULL && display->edge_menu != NULL) {
+    gtk_menu_item_remove_submenu (GTK_MENU_ITEM (display->edge_item));
+    display->edge_menu = NULL;
+    if (ne < 1) {
+      /*-- destroy menu item if there are no edge sets --*/
+      gtk_widget_destroy (display->edge_item);
+      display->edge_item = NULL;
+    }
+  } else {
+    /*-- create the edge menu item if there is at least one edge set --*/
     if (ne > 0) {
-      edge_item = submenu_make ("_Edges", 'E', accel_group);
-      gtk_signal_connect (GTK_OBJECT (edge_item), "activate",
-        GTK_SIGNAL_FUNC (popup_edge_menu), display);
-      submenu_insert (edge_item, mbar, 1);
+      if (display->edge_item == NULL) {
+        display->edge_item = submenu_make ("_Edges", 'E',
+          gg->main_accel_group);
+        submenu_insert (display->edge_item, display->menubar, 1);
+      }
     }
   }
 
+  /*-- then build the new menu if appropriate --*/
+  if (ne) {
+    /*-- build the menu --*/
+    display->edge_menu = gtk_menu_new ();
 
+    /*-- if there's only one edge set, there's no need for this menu --*/
+    if (ne > 1) {  /*-- add cascading menu --*/
+      GtkWidget *submenu, *anchor;
+      gchar *lbl;
+      extern void edgeset_add_cb (GtkWidget *w, datad *e);
+
+      submenu = gtk_menu_new ();
+      anchor = CreateMenuItem (display->edge_menu, "Select edge set",
+        NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
+
+      for (k=0; k<nd; k++) { 
+        e = (datad *) g_slist_nth_data (gg->d, k);
+        if (e == d)
+          continue;
+        lbl = datasetName (e, k);
+        item = CreateMenuItem (submenu, lbl,
+          NULL, NULL, NULL, gg->main_accel_group,
+          GTK_SIGNAL_FUNC (edgeset_add_cb), e, gg);
+        gtk_object_set_data (GTK_OBJECT (item),
+          "display", GINT_TO_POINTER (display));
+        g_free (lbl);
+      }
+
+      gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
+
+      /* Add a separator */
+      CreateMenuItem (display->edge_menu, NULL, "", "",
+                      NULL, NULL, NULL, NULL, gg);
+    }
+
+      /*
+     * The edge options are handled like other display options,
+     * and their callback function is display_options_cb.
+     * I may want to change that, but leave it for now.
+    */
+    item = CreateMenuCheck (display->edge_menu,
+      "Show edges (undirected)",
+      display_options_cb, GINT_TO_POINTER (DOPT_EDGES_U),
+      display->options.edges_undirected_show_p, gg);
+    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+
+    item = CreateMenuCheck (display->edge_menu,
+      "Show 'arrowheads' (for directed edges)",
+      display_options_cb, GINT_TO_POINTER (DOPT_EDGES_A),
+      display->options.edges_arrowheads_show_p, gg);
+    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+
+    /* Add a separator */
+    CreateMenuItem (display->edge_menu, NULL, "", "",
+                    NULL, NULL, NULL, NULL, gg);
+
+    item = CreateMenuCheck (display->edge_menu,
+      "Show directed edges (both edges and 'arrowheads')",
+      display_options_cb, GINT_TO_POINTER (DOPT_EDGES_D),
+      display->options.edges_directed_show_p, gg);
+    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (display->edge_item),
+      display->edge_menu);
+  }
 }
 
 void
 scatterplot_display_menus_make (displayd *display,
                                 GtkAccelGroup *accel_group,
-                                GtkSignalFunc func,
-                                GtkWidget *mbar, ggobid *gg)
+                                GtkSignalFunc func, ggobid *gg)
 {
   GtkWidget *topmenu, *options_menu;
   GtkWidget *item;
 
-  scatterplot_display_edge_menu_make (display, accel_group, func, mbar, gg);
-
+  display->edge_item = NULL;
+  display->edge_menu = NULL;
 /*
- * Options menu
+  scatterplot_display_edge_menu_make (display, accel_group, func, gg);
 */
+  scatterplot_display_edge_menu_update (display, accel_group, func, gg);
+
+  /*-- Options menu --*/
   topmenu = submenu_make ("_Options", 'O', accel_group);
   options_menu = gtk_menu_new ();
 
@@ -217,7 +220,7 @@ scatterplot_display_menus_make (displayd *display,
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 */
 
-  /* Add a separator */
+  /*-- Add a separator --*/
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
   item = CreateMenuCheck (options_menu, "Show axes",
@@ -228,7 +231,7 @@ scatterplot_display_menus_make (displayd *display,
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (topmenu), options_menu);
-  submenu_append (topmenu, mbar);
+  submenu_append (topmenu, display->menubar);
   gtk_widget_show (topmenu);
 }
 

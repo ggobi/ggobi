@@ -6,7 +6,7 @@ endif
 
 # -rpath or --rpath?  My compiler accepts -rpath.
 
-EXTRA_LIBS=$(GTKEXTRA_LIB_DIR:%=-L%) $(GTKEXTRA_LIB_DIR:%=-Xlinker --rpath -Xlinker %) -lgtkextra
+EXTRA_LIBS=$(GTKEXTRA_LIB_DIR:%=-L%) $(GTKEXTRA_LIB_DIR:%=-Xlinker --rpath -Xlinker %) -lgtkextra -L$(GGOBI_HOME) -lggobi
 
 OBJS=worksheet.o
 
@@ -18,3 +18,6 @@ DataViewer.so: $(OBJS)
 
 worksheet.o: worksheet.c
 	$(CC) -g $(GTKEXTRA_INCLUDES:%=-I%) -I$(GGOBI_HOME) $(CFLAGS) `gtk-config --cflags` -o $@ -c $<
+
+clean:
+	rm -f *.o *.so

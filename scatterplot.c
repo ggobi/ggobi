@@ -152,10 +152,9 @@ static GtkItemFactoryEntry menu_items[] = {
 displayd *
 scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   GtkWidget *table, *vbox;
-  GtkWidget *mbar;
   displayd *display;
   extern void scatterplot_display_menus_make (displayd *display,
-    GtkAccelGroup *, GtkSignalFunc, GtkWidget *mbar, ggobid *);
+    GtkAccelGroup *, GtkSignalFunc, ggobid *);
 
   if (d == NULL || d->ncols < 1)
     return (NULL);
@@ -186,15 +185,15 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
 
   gg->app.sp_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 gg->app.sp_accel_group, display->window, &mbar,
+                 gg->app.sp_accel_group, display->window, &display->menubar,
                  (gpointer) display);
   /*
    * After creating the menubar, and populating the file menu,
    * add the other menus manually
   */
   scatterplot_display_menus_make (display, gg->app.sp_accel_group,
-   (GtkSignalFunc) display_options_cb, mbar, gg);
-  gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+   (GtkSignalFunc) display_options_cb, gg);
+  gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
 
 
   /*-- Initialize a single splot --*/

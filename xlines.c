@@ -2,6 +2,9 @@
 
 #include <gtk/gtk.h>
 
+#define true 1
+#define false 0
+
 /* lines_intersect:  AUTHOR: Mukesh Prasad
  *
  *   This function computes whether two line segments,
@@ -56,15 +59,16 @@
 #define SAME_SIGNS( a, b )	\
 		(((glong) ((gulong) a ^ (gulong) b)) >= 0 )
 
+/*-- not interested in the intersection point --*/
 gint
 lines_intersect (
    glong x1, glong y1, glong x2, glong y2, /* First line segment */
-   glong x3, glong y3, glong x4, glong y4, /* Second line segment */
-   glong *x, glong *y)             /* Output value: * point of intersection */
+   glong x3, glong y3, glong x4, glong y4) /* Second line segment */
+   /*glong *x, glong *y)*/     /* Output value: * point of intersection */
 {
     glong a1, a2, b1, b2, c1, c2; /* Coefficients of line eqns. */
     glong r1, r2, r3, r4;         /* 'Sign' values */
-    glong denom, offset, num;     /* Intermediate values */
+    glong denom;                  /* Intermediate values */
 
     /* Compute a1, b1, c1, where line joining points 1 and 2
      * is "a1 x  +  b1 y  +  c1  =  0".
@@ -101,31 +105,65 @@ lines_intersect (
      * not intersect.
      */
 
-    if ( r1 != 0 &&
-         r2 != 0 &&
-         SAME_SIGNS( r1, r2 ))
-        return ( DONT_INTERSECT );
+    if ( r1 != 0 && r2 != 0 && SAME_SIGNS( r1, r2 ))
+      return ( DONT_INTERSECT );
 
     /* Line segments intersect: compute intersection point. */
 
     denom = a1 * b2 - a2 * b1;
     if ( denom == 0 )
-        return ( COLLINEAR );
-    offset = denom < 0 ? - denom / 2 : denom / 2;
+      return ( COLLINEAR );
 
     /* The denom/2 is to get rounding instead of truncating.  It
      * is added or subtracted to the numerator, depending upon the
      * sign of the numerator.
      */
 
+/*
+  glong num, offset;
+    offset = denom < 0 ? - denom / 2 : denom / 2;
     num = b1 * c2 - b2 * c1;
     *x = ( num < 0 ? num - offset : num + offset ) / denom;
-
     num = a2 * c1 - a1 * c2;
     *y = ( num < 0 ? num - offset : num + offset ) / denom;
+*/
 
     return ( DO_INTERSECT );
 } /* lines_intersect */
 
 
 
+gboolean
+isCrossed(double ax, double ay, double bx, double by, 
+          double cx, double cy, double dx, double dy)
+{
+/* Check whether line segment [a,b] crosses segment [c,d]. Fast method
+   due to Amie Wilkinson. */
+
+  double determinant, b1, b2;
+        
+  bx -= ax;
+  by -= ay;
+  cx -= ax;
+  cy -= ay;
+  dx -= ax;
+  dy -= ay;
+        
+  determinant = dx*cy - dy*cx;
+                
+  if (determinant == 0.)
+    return false;
+            
+  b1 = (cy*bx - cx*by)/determinant;
+  if (b1 <= 0.)
+    return false;
+            
+  b2 = (dx*by - dy*bx)/determinant;
+  if (b2 <= 0.)
+    return false;
+        
+  if (b1+b2 <= 1.)
+    return false;
+      
+  return true;
+}    

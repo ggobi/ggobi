@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include <stdlib.h>
 
 #include <gtk/gtk.h>
 #include "vars.h"

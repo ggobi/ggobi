@@ -37,6 +37,11 @@ struct _displayd {
  datad *d;  /*-- pointer to a particular gg->d[] --*/
  datad *e;  /*-- pointer to a particular gg->d[] --*/
 
+ /*-- for scatterplots, where edge menus need to be rebuilt on the fly --*/
+ GtkWidget *menubar;
+ GtkWidget *edge_item, *edge_menu;
+ /*-- --*/
+
 /* Missing values */
  gboolean missing_p;  /* false by default */
 

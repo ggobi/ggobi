@@ -72,9 +72,10 @@ typedef struct /*-- ggobi --*/ {
 
  struct _ggobid *thisGG;
 
+ /*-- ViewMode menus --*/
  GtkWidget *scatmat_mode_menu;
  GtkWidget *scatterplot_mode_menu;
- GtkWidget *rotation_io_menu;
+
  GtkAccelGroup *sp_accel_group;  /*-- sp = scatterplot here --*/
 
 } GGobiApp;
