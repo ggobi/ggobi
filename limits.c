@@ -160,9 +160,7 @@ limits_raw_set (datad *d, ggobid *gg) {
 static void
 limits_tform_set_by_var (gint j, datad *d, ggobid *gg)
 {
-  gint i, m, np = 0;
-  gfloat sum = 0.0;
-  gfloat *x = (gfloat *) g_malloc (d->nrows * sizeof (gfloat));
+  gint i, m;
   vartabled *vt = vartable_element_get (j, d);
   greal min, max;
 
