@@ -210,6 +210,45 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
   return true;
 }
 
+/*
+ * Add a data record, filling in all values with reasonable defaults.
+ * This is executed when the middle or right button is used for edge
+ * editing.
+*/
+void
+record_add_defaults (datad *d, datad *e, displayd *display, ggobid *gg)
+{
+  cpaneld *cpanel = &display->cpanel;
+  datad *dtarget;
+  gchar *lbl;
+  gchar **vals = NULL;
+  gint j;
+
+  dtarget = (cpanel->ee_mode == ADDING_EDGES)?e:d;
+
+  if (dtarget->ncols) {
+    void fetch_default_record_values (gchar **vals, 
+      datad *, displayd *, ggobid *gg);
+    vals = (gchar **) g_malloc (dtarget->ncols * sizeof (gchar *));
+    fetch_default_record_values (vals, dtarget, display, gg);
+  }
+
+  lbl = g_strdup_printf("%d", dtarget->nrows+1); /* record label and id */
+
+  if (cpanel->ee_mode == ADDING_EDGES) {
+    record_add (cpanel->ee_mode, gg->edgeedit.a, d->nearest_point,
+      lbl, lbl, vals, d, e, gg);
+  } else if (cpanel->ee_mode == ADDING_POINTS) {
+    record_add (cpanel->ee_mode, -1, -1, lbl, lbl, vals, d, e, gg);
+  }
+
+  if (dtarget->ncols) {
+    for (j=0; j<dtarget->ncols; j++)
+      g_free (vals[j]);
+    g_free (vals);
+  }
+
+}
 
 /*--------------------------------------------------------------------*/
 
@@ -429,4 +468,24 @@ pt_screen_to_raw (icoords *screen, greal *raw,
     pt_world_to_raw_by_var (j, world, raw, d);
 
   g_free (world);
+}
+
+void
+fetch_default_record_values (gchar **vals, datad *dtarget, displayd *display,
+  ggobid *gg)
+{
+  gint j;
+
+  if (dtarget == display->d) {
+    /*-- use the screen position --*/
+    greal *raw = (greal *) g_malloc (dtarget->ncols * sizeof (greal));
+    pt_screen_to_raw (&gg->current_splot->mousepos, raw,
+      dtarget, gg->current_splot, gg);
+    for (j=0; j<dtarget->ncols; j++)
+      vals[j] = g_strdup_printf ("%g", raw[j]);
+    g_free (raw);
+  } else {  /* for edges, use NA's */
+    for (j=0; j<dtarget->ncols; j++)
+      vals[j] = g_strdup ("NA");
+  }
 }

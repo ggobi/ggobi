@@ -66,7 +66,6 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
       if (child->top_attach == 1) {
         entry = child->widget;
         lbl = gtk_editable_get_chars (GTK_EDITABLE(entry), 0, -1);
-        /*raw[child->left_attach] = (greal) atof (lbl);*/
         vals[child->left_attach] = g_strdup (lbl);
       }
     }
@@ -168,7 +167,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   gtk_table_attach (GTK_TABLE (table),
     w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
   entry = gtk_entry_new ();
-  lbl = g_strdup_printf("%d", d->nrows+1);
+  lbl = g_strdup_printf("%d", dtarget->nrows+1);
   gtk_entry_set_text (GTK_ENTRY(entry), lbl);
   g_free (lbl);
 
@@ -185,7 +184,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
     gtk_table_attach (GTK_TABLE (table),
       w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
     entry = gtk_entry_new ();
-    lbl = g_strdup_printf("%d", d->nrows);
+    lbl = g_strdup_printf("%d", dtarget->nrows);
     gtk_entry_set_text (GTK_ENTRY(entry), lbl);
     g_free (lbl);
     gtk_widget_set_name (entry, "EE:recordid");
@@ -199,21 +198,11 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
     gint j;
     vartabled *vt;
     GtkWidget *tablev;
-    greal *raw = (greal *) g_malloc0 (dtarget->ncols * sizeof(greal));
+    gchar **vals = (gchar **) g_malloc (dtarget->ncols * sizeof (gchar *));
 
-    extern void pt_screen_to_raw (icoords *screen, greal *raw,
-      datad *d, splotd *sp, ggobid *gg);
-
-    if (dtarget == d) {
-      /*-- use the screen position --*/
-      pt_screen_to_raw (&gg->current_splot->mousepos, raw,
-        dtarget, gg->current_splot, gg);
-    } else {
-      /*-- use the values for the last edge ... should use NAs --*/
-      for (j=0; j<e->ncols; j++) {
-        raw[j] = e->raw.vals[e->nrows-1][j];
-      }
-    }
+    extern void fetch_default_record_values (gchar **vals, 
+      datad *, displayd *, ggobid *gg);
+    fetch_default_record_values (vals, dtarget, dsp, gg);
 
     tablev = gtk_table_new (2, dtarget->ncols, false);
     gtk_widget_set_name (tablev, "EE:tablev");
@@ -226,19 +215,21 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
         w, j, j+1, 0, 1, table_opt, table_opt, 1, 1);
 
       entry = gtk_entry_new ();
-      if (cpanel->ee_mode == ADDING_POINTS)
-        lbl = g_strdup_printf ("%g", raw[j]);
-      else
-        lbl = g_strdup ("NA");
-      gtk_entry_set_text (GTK_ENTRY (entry), lbl);
+      gtk_entry_set_text (GTK_ENTRY (entry), vals[j]);
       gtk_table_attach (GTK_TABLE (tablev),
         entry, j, j+1, 1, 2, table_opt, table_opt, 1, 1);
-      g_free (lbl);
     }
+
+    /* free vals, I think */
+    for (j=0; j<dtarget->ncols; j++)
+      g_free (vals[j]);
+    g_free (vals);
   }
 
   /*-- ok button --*/
   w = gtk_button_new_with_label ("Apply");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), w,
+    "Add the point or edge.  To avoid seeing this dialog, use the middle or right button.", NULL);
   gtk_signal_connect (GTK_OBJECT (w), "clicked",
     GTK_SIGNAL_FUNC (add_record_dialog_apply), dsp);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
@@ -248,6 +239,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   gtk_signal_connect (GTK_OBJECT (w), "clicked",
     GTK_SIGNAL_FUNC (add_record_dialog_cancel), gg);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
+
 
   gtk_widget_show_all (dialog);
 }
@@ -358,6 +350,17 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
   datad *e = display->e;
+  gint which_button = 1;
+
+void
+record_add_defaults (datad *d, datad *e, displayd *display, ggobid *gg);
+
+  if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
+    which_button = 1;
+  else if ((event->state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
+    which_button = 2;
+  else if ((event->state & GDK_BUTTON3_MASK) == GDK_BUTTON3_MASK)
+    which_button = 2;
 
   gg->buttondown = 0;
 
@@ -384,8 +387,11 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
         return false;
       }
 
-      /*-- Open a dialog window to ask for label, rowId, data ... --*/
-      add_record_dialog_open (d, e, display, gg);
+      if (which_button == 1)
+        /*-- Open a dialog window to ask for label, rowId, data ... --*/
+        add_record_dialog_open (d, e, display, gg);
+      else
+        record_add_defaults (d, e, display, gg);
     }
 
   } else if (cpanel->ee_mode == ADDING_POINTS) {
@@ -396,8 +402,11 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       gdk_pointer_ungrab (event->time);
       return false;
     }
-    /*-- Open a dialog window to ask for label, rowId, data ... --*/
-    add_record_dialog_open (d, e, display, gg);
+    if (which_button == 1)
+      /*-- Open a dialog window to ask for label, rowId, data ... --*/
+      add_record_dialog_open (d, e, display, gg);
+    else
+      record_add_defaults (d, e, display, gg);
   }
 
   /*-- Release the pointer so the button press can be detected --*/
@@ -451,7 +460,7 @@ cpanel_edgeedit_make (ggobid *gg) {
   GTK_TOGGLE_BUTTON (radio1)->active = true;
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
-    "Add new edges using the mouse", NULL);
+    "Add new edges using the mouse. The left button opens a dialog window; the middle or right button adds an edge using default.", NULL);
   gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
                       GTK_SIGNAL_FUNC (add_edges_or_points_cb), gg);
   gtk_box_pack_start (GTK_BOX (hb), radio1, false, false, 0);
@@ -461,7 +470,7 @@ cpanel_edgeedit_make (ggobid *gg) {
   radio2 = gtk_radio_button_new_with_label (group, "Add points");
   gtk_widget_set_name (radio2, "EDGEEDIT:add_points_radio_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
-    "Add points using the mouse", NULL);
+    "Add points using the mouse.  The left button opens a dialog window; the middle or right button adds a point using defaults.", NULL);
   gtk_box_pack_start (GTK_BOX (hb), radio2, false, false, 0);
 
 
