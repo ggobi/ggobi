@@ -641,12 +641,12 @@ static gboolean colors_remap (colorschemed *scheme, ggobid *gg)
   if (maxcolorindex < scheme->n)
     /* no problem, go right ahead */
     ;
-  else if (ncolors_used >= scheme->n) {
+  else if (ncolors_used > scheme->n) {
     /* fatal: bail out with a warning */
     quick_message ("The number of colors now in use is greater than than\nthe number of colors in the chosen color scheme.", false);
 
     remap_ok = false;   
-  } else if (maxcolorindex >= scheme->n && ncolors_used < scheme->n) {
+  } else if (maxcolorindex >= scheme->n && ncolors_used <= scheme->n) {
     /*-- build the vector that will be used to reset the current indices --*/
     gint *newind = (gint *) g_malloc ((maxcolorindex+1) * sizeof (gint));
     gint n = 0;
