@@ -174,7 +174,7 @@ struct _ggobid {
 /*                         color                                      */
 /*--------------------------------------------------------------------*/
 
-  GdkColor vcirc_freeze_color, vcirc_manip_color;       /* for variable circles */
+  GdkColor vcirc_freeze_color, vcirc_manip_color;   /* for variable circles */
   gshort color_id, color_0;     /* 0:ncolors-1 */
   gboolean mono_p;
 
@@ -384,7 +384,7 @@ struct _ggobid {
   struct _MovePts {
     gboolean cluster_p;
     enum directiond direction;
-    lcoords eps;
+    gcoords eps;
   } movepts;
 
 
