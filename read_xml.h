@@ -21,6 +21,7 @@ enum xmlDataState {
   BRUSHSTYLE,
   REAL, INT, STRING, NA,
   QUICK_HELP,
+  EDGES, EDGE,
 /* HELP, DESCRIPTION */
   UNKNOWN
 };
@@ -136,7 +137,7 @@ extern "C" {
   gboolean setGeneralInfo(const xmlChar ** attrs, XMLParserData * data);
   gboolean allocVariables(const xmlChar ** attrs, XMLParserData * data);
   gboolean newRecord(const xmlChar ** attrs, XMLParserData * data);
-  gboolean setDataset(const xmlChar ** attrs, XMLParserData * parserData);
+  gboolean setDataset(const xmlChar ** attrs, XMLParserData * parserData, enum xmlDataState);
   gboolean setBrushStyle(const xmlChar ** attrs, XMLParserData * parserData);
 
   gboolean setRecordValues(XMLParserData * data, const xmlChar * line,

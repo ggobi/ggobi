@@ -113,6 +113,8 @@ const gchar * const xmlDataTagNames[] = {
   "string",
   "na",
   "quickHelp",
+  "edges", 
+  "edge",
   ""
   };
 
@@ -296,6 +298,7 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     case TOP:
       setGeneralInfo(attrs, data);
     break;
+    case EDGE:
     case RECORD:
       newRecord(attrs, data);
     break;
@@ -311,8 +314,9 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     case DESCRIPTION:
       /* description text pending */
     break;
+    case EDGES:
     case DATASET:
-      setDataset(attrs, data);
+      setDataset(attrs, data, type);
     break;
 
     case REAL:   
@@ -898,12 +902,15 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
      * string here, like "plus" or "fc", value = 0 and the mistake
      * isn't caught later when value is tested.
     */
-    if (tmp[0] < '0' || tmp[0] > '6') {
-      g_printerr ("%s is an illegal value for glyphType; it must be on [0,6]\n",
-        tmp);
-      exit(101);
+    value = mapGlyphName(tmp);
+    if (value == UNKNOWN_GLYPH) {
+     if(tmp[0] < '0' || tmp[0] > '6') {
+       g_printerr ("%s is an illegal value for glyphType; it must be on [0,6]\n", tmp);
+       exit(101);
+     }
+
+     value = strToInteger(tmp);
     }
-    value = strToInteger(tmp);
   }
   if(value < 0 || value >= NGLYPHTYPES) {
     if(tmp)
@@ -1593,6 +1600,8 @@ asciiParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
   return(false);
 }
 
+
+
 /* 
   glib-2.0 defines this as a void routine, i.e. no return value.
   glib-1.2 however expects a return value of type gboolean.
@@ -1633,7 +1642,7 @@ releaseCurrentDataInfo(XMLParserData *parserData)
 
 
 gboolean
-setDataset(const xmlChar **attrs, XMLParserData *parserData) 
+setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState type) 
 {
   datad *data;
   gchar *name;
@@ -1653,6 +1662,10 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData)
 
   data->name = name;
   parserData->current_data = data;
+
+  if(type == EDGES) {
+    setDatasetInfo(attrs, parserData);
+  }
 
  return(true);
 }
@@ -1829,7 +1842,9 @@ setBrushStyle(const xmlChar ** attrs, XMLParserData * data)
       xml_warning ("brushing glyphType", tmp, "Must be on [0,6]\n", data);
       return false;
     }
-    value = strToInteger(tmp);
+    value = mapGlyphName(tmp);
+    if(value == UNKNOWN_GLYPH)
+      value = strToInteger(tmp);
 
     if(value < 0 || value >= NGLYPHTYPES) {
       xml_warning("glyphType", tmp, "Out of range", data);
@@ -1914,6 +1929,27 @@ getAutoLevelIndex(const char * const label, XMLParserData *data, vartabled *el)
   return(index);
 }
 
+/* Routines for walking the hash table and getting all the row labels
+   into an array. */
+
+static void
+getLabel(gpointer key, gpointer val, gchar **labels)
+{
+ if(val) {
+   labels[*(guint *)val] = (gchar *) key;
+ }
+}
+
+gchar **
+getRowLabsFromTable(GHashTable *tbl, gchar **names)
+{
+  if(!names)
+     names = (gchar **) g_malloc(sizeof(gchar *) * g_hash_table_size(tbl));
+
+  g_hash_table_foreach(tbl, getLabel, names);
+
+  return(names);
+}
 
 
 
