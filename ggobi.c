@@ -425,7 +425,7 @@ initSessionOptions()
   sessionOptions->info->glyph.size = sessionOptions->info->glyph.type = -1;
   sessionOptions->info->createInitialScatterPlot = true;
   sessionOptions->info->allowCloseLastDisplay = false;
-  sessionOptions->info->quitWithNoGGobi = true;
+  sessionOptions->info->quitWithNoGGobi = true; 
   sessionOptions->info->numScatMatrixVars = MAXNVARS;
   sessionOptions->info->numParCoordsVars = MAXNPCPLOTS;
   sessionOptions->info->numTimePlotVars = MAXNTSPLOTS;

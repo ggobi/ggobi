@@ -1470,3 +1470,10 @@ getCommandLineArgValue(const char *name)
 
     return(tmp);
 }
+
+
+void
+GGobi_setSessionOptions(GGobiOptions *opts)
+{
+    sessionOptions = opts;
+}
