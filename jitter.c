@@ -62,7 +62,7 @@ jitter_randval (gint type)
 }
 
 void
-rejitter (ggobid *gg) {
+rejitter (datad *d, ggobid *gg) {
   gint *selected_cols, nselected_cols = 0;
   gint i, j, k, m;
   gfloat frand, fworld, fjit;
@@ -73,35 +73,35 @@ rejitter (ggobid *gg) {
  * this depends first on the selected variables and
  * second on vgroups (if jitter_vgroup is True)
 */
-  selected_cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
-  nselected_cols = selected_cols_get (selected_cols, gg->jitter.vgroup, gg);
+  selected_cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  nselected_cols = selected_cols_get (selected_cols, d->jitter.vgroup, d, gg);
   if (nselected_cols == 0)
-    nselected_cols = plotted_cols_get (selected_cols, false, gg);
+    nselected_cols = plotted_cols_get (selected_cols, false, d, gg);
 
   for (j=0; j<nselected_cols; j++) {
     k = selected_cols[j];
 
-    for (i=0; i<gg->nrows_in_plot; i++) {
-      m = gg->rows_in_plot[i];
+    for (i=0; i<d->nrows_in_plot; i++) {
+      m = d->rows_in_plot[i];
       /*-- jitter_one_value (m, k); --*/
 
-      frand = jitter_randval (gg->jitter.type) * precis;
+      frand = jitter_randval (d->jitter.type) * precis;
 
       /*
        * The world.vals used here is already jittered:
        * subtract out the previous jittered value ...
       */
-      if (gg->jitter.convex) {
-        fworld = (gfloat) (gg->world.vals[m][k] - gg->jitdata.vals[m][k]);
-        fjit = gg->vardata[k].jitter_factor * (frand - fworld);
+      if (d->jitter.convex) {
+        fworld = (gfloat) (d->world.vals[m][k] - d->jitdata.vals[m][k]);
+        fjit = d->vardata[k].jitter_factor * (frand - fworld);
       }
       else
-        fjit = gg->vardata[k].jitter_factor * frand;
+        fjit = d->vardata[k].jitter_factor * frand;
 
-      gg->jitdata.vals[m][k] = (glong) fjit;
+      d->jitdata.vals[m][k] = (glong) fjit;
     }
   }
-  tform_to_world (gg);
+  tform_to_world (d, gg);
   /*-- do not redisplay the missing values displays --*/
   displays_tailpipe (REDISPLAY_PRESENT, gg);
 
@@ -118,13 +118,13 @@ rejitter (ggobid *gg) {
  * This needs a plotted_cols_get
 */
 void
-jitter_value_set (gfloat value, ggobid *gg) {
-  gint *cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
-  gint ncols = selected_cols_get (cols, gg->jitter.vgroup, gg);
+jitter_value_set (gfloat value, datad *d, ggobid *gg) {
+  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint ncols = selected_cols_get (cols, d->jitter.vgroup, d, gg);
   gint j;
 
   for (j=0; j<ncols; j++)
-    gg->vardata[cols[j]].jitter_factor = value;
+    d->vardata[cols[j]].jitter_factor = value;
 
   g_free ((gpointer) cols);
 }

@@ -126,7 +126,8 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
 #define MAXNPCPLOTS 5
 displayd *
-parcoords_new (gboolean missing_p, gint nvars, gint *vars, ggobid *gg) 
+parcoords_new (gboolean missing_p, gint nvars, gint *vars,
+  datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   GtkWidget *mbar;
@@ -135,9 +136,9 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars, ggobid *gg)
   gint nplots;
   displayd *display;
 
-  display = display_alloc_init (parcoords, missing_p, gg);
+  display = display_alloc_init (parcoords, missing_p, d, gg);
   if (nvars == 0) {
-    nplots = MIN (gg->ncols, MAXNPCPLOTS);
+    nplots = MIN (d->ncols, MAXNPCPLOTS);
     for (i=0; i<nplots; i++)
       vars[i] = i;
   } else {
@@ -364,10 +365,11 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
   gint i, k, m;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = (cpaneld *) &display->cpanel;
+  datad *d = display->d;
   gboolean draw_whisker;
 
-  for (k=0; k<gg->nrows_in_plot; k++) {
-    i = gg->rows_in_plot[k];
+  for (k=0; k<d->nrows_in_plot; k++) {
+    i = d->rows_in_plot[k];
     m = 2*i;
 
     /*-- if it's the leftmost plot, don'r draw the left whisker --*/
@@ -375,9 +377,9 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     else if (!display->options.missings_show_p &&
-          gg->nmissing > 0 &&
-          (gg->missing.vals[i][sp->p1dvar] ||
-           gg->missing.vals[i][sp_prev->p1dvar]))
+          d->nmissing > 0 &&
+          (d->missing.vals[i][sp->p1dvar] ||
+           d->missing.vals[i][sp_prev->p1dvar]))
     {
       draw_whisker = false;
     }
@@ -419,7 +421,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
     if (sp_next == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    else if (!display->options.missings_show_p && gg->nmissing > 0 &&
+    else if (!display->options.missings_show_p && d->nmissing > 0 &&
             (MISSING_P(i,sp->p1dvar) || MISSING_P(i,sp_next->p1dvar)))
     {
       draw_whisker = false;

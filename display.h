@@ -4,6 +4,7 @@
 #include "defines.h"
 #include "cpanel.h"
 #include "splot.h"
+#include "datad.h"
 
 #include "ggobi.h"
 
@@ -19,6 +20,8 @@ struct _displayd {
  cpaneld cpanel;
  enum displaytyped displaytype;
  GList *splots;  /* doubly linked list of splots */
+
+ datad *d;  /*-- pointer to a particular gg->d[] --*/
 
 /* Missing values */
  gboolean missing_p;  /* false by default */

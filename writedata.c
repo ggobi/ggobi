@@ -11,18 +11,18 @@
 #include "externs.h"
 #include "writedata.h"
 
-gboolean write_binary_data (gchar *, gint *, gint, gint *, gint, ggobid *);
-gboolean write_ascii_data (gchar *, gint *, gint, gint *, gint, ggobid *);
-gboolean save_collabels (gchar *, gint *colv, gint nc, ggobid *gg);
-gboolean save_rowlabels (gchar *, gint *rowv, gint nr, ggobid *gg);
-gboolean brush_save_colors (gchar *, gint *, gint, ggobid *);
-gboolean brush_save_erase (gchar *, gint *, gint, ggobid *);
-gboolean brush_save_glyphs (gchar *, gint *, gint, ggobid *);
-gboolean save_lines (gchar *, gboolean, gboolean, gint *, gint, ggobid *);
+gboolean write_binary_data (gchar *, gint *, gint, gint *, gint, datad *, ggobid *);
+gboolean write_ascii_data (gchar *, gint *, gint, gint *, gint, datad *, ggobid *);
+gboolean save_collabels (gchar *, gint *colv, gint nc, datad *, ggobid *);
+gboolean save_rowlabels (gchar *, gint *rowv, gint nr, datad *, ggobid *);
+gboolean brush_save_colors (gchar *, gint *, gint, datad *, ggobid *);
+gboolean brush_save_erase (gchar *, gint *, gint, datad *, ggobid *);
+gboolean brush_save_glyphs (gchar *, gint *, gint, datad *, ggobid *);
+gboolean save_lines (gchar *, gboolean, gboolean, gint *, gint, datad *d, ggobid *);
 gint linedata_get (endpointsd *, gshort *, gint *, gint, ggobid *);
 
 static gint
-set_rowv (gint *rowv, gchar *rootname, ggobid *gg)
+set_rowv (gint *rowv, gchar *rootname, datad *d, ggobid *gg)
 {
   gint i, j, k;
   gint nrows = 0;
@@ -36,9 +36,9 @@ set_rowv (gint *rowv, gchar *rootname, ggobid *gg)
      * points into rowv, and return their count.
     */
 
-      for (i=0, j=0; i<gg->nrows_in_plot; i++) {
-        k = gg->rows_in_plot[i];
-        if (!gg->hidden_now[k])
+      for (i=0, j=0; i<d->nrows_in_plot; i++) {
+        k = d->rows_in_plot[i];
+        if (!d->hidden_now[k])
           rowv[j++] = k;
       }
       nrows = j;
@@ -49,18 +49,18 @@ set_rowv (gint *rowv, gchar *rootname, ggobid *gg)
        * Otherwise just copy the row numbers representing sticky
        * labels into rowv, and return their count.
       */
-      for (l = gg->identify.sticky_ids; l; l = l->next)
+      for (l = d->sticky_ids; l; l = l->next)
         rowv[i] = GPOINTER_TO_INT (l->data);
-      nrows = g_slist_length (gg->identify.sticky_ids);
+      nrows = g_slist_length (d->sticky_ids);
       break;
 
     case ALLROWS:
     /* 
-     * Finally, let rowv be (0,1,2,,,,gg->nrows)
+     * Finally, let rowv be (0,1,2,,,,d->nrows)
     */
-      for (i=0; i<gg->nrows; i++)
+      for (i=0; i<d->nrows; i++)
         rowv[i] = i;
-      nrows = gg->nrows;
+      nrows = d->nrows;
       break;
 
     default:
@@ -73,7 +73,7 @@ set_rowv (gint *rowv, gchar *rootname, ggobid *gg)
 }
 
 static gint
-set_colv (gint *colv, gchar *rootname, ggobid *gg)
+set_colv (gint *colv, gchar *rootname, datad *d, ggobid *gg)
 {
   gint i;
   gint ncols = 0;
@@ -84,15 +84,15 @@ set_colv (gint *colv, gchar *rootname, ggobid *gg)
       /* 
        * let colv be (0,1,2,,,,gg->ncols)
       */
-      for (i=0; i<gg->ncols; i++)
+      for (i=0; i<d->ncols; i++)
         colv[i] = i;
-      ncols = gg->ncols;
+      ncols = d->ncols;
       break;
 
     case SELECTEDCOLS:
-      ncols = selected_cols_get (colv, false, gg);
+      ncols = selected_cols_get (colv, false, d, gg);
       if (ncols == 0)
-        ncols = plotted_cols_get (colv, false, gg);
+        ncols = plotted_cols_get (colv, false, d, gg);
       break;
     
 
@@ -107,7 +107,7 @@ set_colv (gint *colv, gchar *rootname, ggobid *gg)
 
 gboolean
 write_ascii_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
-  ggobid *gg)
+  datad *d, ggobid *gg)
 {
   gchar fname[164];
   gchar *message;
@@ -124,13 +124,13 @@ write_ascii_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
     g_free (message);
     return false;
   } else {
-    fdatap = (gg->save.stage == RAWDATA) ? gg->raw.vals : gg->tform2.vals;
+    fdatap = (gg->save.stage == RAWDATA) ? d->raw.vals : d->tform2.vals;
 
     for (i=0; i<nr; i++) {
       ir = rowv[i];
       for (j=0; j<nc; j++) {
         jc = colv[j];
-        if (gg->nmissing > 0 && gg->missing.vals[ir][jc]) {
+        if (d->nmissing > 0 && d->missing.vals[ir][jc]) {
           if (gg->save.missing_ind == MISSINGSNA) {
             fprintf (fp, "NA ");
           }  else if (gg->save.missing_ind == MISSINGSDOT) {
@@ -160,7 +160,7 @@ strip_blanks (gchar *str)
 }
 
 gboolean
-ggobi_file_set_create (gchar *rootname, ggobid *gg)
+ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
 {
   gint nr, nc, nvgr;
   gint *rowv, *colv;
@@ -174,7 +174,7 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
    * write out "na"
   */
   if (gg->save.format == BINARYDATA &&
-      gg->nmissing > 0 &&
+      d->nmissing > 0 &&
         (gg->save.missing_ind == MISSINGSNA ||
          gg->save.missing_ind == MISSINGSDOT))
   {
@@ -198,8 +198,8 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
   }
 
 /* Determine the rows to be saved */
-  rowv = (gint *) g_malloc (gg->nrows * sizeof (gint));
-  nr = set_rowv (rowv, rootname, gg);
+  rowv = (gint *) g_malloc (d->nrows * sizeof (gint));
+  nr = set_rowv (rowv, rootname, d, gg);
   if (nr == 0) {
     gchar *message = g_strdup_printf (
       "You have not successfully specified any rows; sorry");
@@ -210,8 +210,8 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
   }
 
 /* Determine the columns to be saved */
-  colv = (gint *) g_malloc (gg->ncols * sizeof (gint));
-  nc = set_colv (colv, rootname, gg);
+  colv = (gint *) g_malloc (d->ncols * sizeof (gint));
+  nc = set_colv (colv, rootname, d, gg);
   if (nc == 0) {
     gchar *message = g_strdup_printf (
       "You have not successfully specified any columns; sorry");
@@ -227,13 +227,13 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
    * 'na' or as currently imputed values
   */
   if (gg->save.format == BINARYDATA) { 
-    if (write_binary_data (rootname, rowv, nr, colv, nc, gg) == 0) {
+    if (write_binary_data (rootname, rowv, nr, colv, nc, d, gg) == 0) {
       g_free ((gchar *) rowv);
       g_free ((gchar *) colv);
       return false;
     }
   } else {
-    if (write_ascii_data (rootname, rowv, nr, colv, nc, gg) == 0) {
+    if (write_ascii_data (rootname, rowv, nr, colv, nc, d, gg) == 0) {
       g_free ((gchar *) rowv);
       g_free ((gchar *) colv);
       return false;
@@ -241,14 +241,14 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
   }
 
 /* Save column labels */
-  if (!save_collabels (rootname, colv, nc, gg)) {
+  if (!save_collabels (rootname, colv, nc, d, gg)) {
     g_free ((gchar *) rowv);
     g_free ((gchar *) colv);
     return false;
   }
 
 /* Save row labels */
-  if (!save_rowlabels (rootname, rowv, nr, gg)) {
+  if (!save_rowlabels (rootname, rowv, nr, d, gg)) {
     g_free ((gchar *) rowv);
     g_free ((gchar *) colv);
     return false;
@@ -258,13 +258,13 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
   skipit = true;
   /*-- if no color differs from the default color, don't save colors --*/
   for (i=0; i<nr; i++) {
-    if (gg->color_now[rowv[i]] != 0) {
+    if (d->color_now[rowv[i]] != 0) {
       skipit = false;
       break;
     }
   }
   if (!skipit) {
-    if (!brush_save_colors (rootname, rowv, nr, gg)) {
+    if (!brush_save_colors (rootname, rowv, nr, d, gg)) {
       g_free ((gchar *) rowv);
       g_free ((gchar *) colv);
       return false;
@@ -275,15 +275,15 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
   skipit = true;
   /*-- if no glyph differs from the default, don't save glyphs --*/
   for (i=0; i<nr; i++) {
-    if (gg->glyph_now[rowv[i]].type != gg->glyph_0.type ||
-        gg->glyph_now[rowv[i]].size != gg->glyph_0.size)
+    if (d->glyph_now[rowv[i]].type != gg->glyph_0.type ||
+        d->glyph_now[rowv[i]].size != gg->glyph_0.size)
     {
       skipit = false;
       break;
     }
   }
   if (!skipit) {
-    if (!brush_save_glyphs (rootname, rowv, nr, gg)) {
+    if (!brush_save_glyphs (rootname, rowv, nr, d, gg)) {
       g_free ((gchar *) rowv);
       g_free ((gchar *) colv);
       return false;
@@ -295,13 +295,13 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
     skipit = true;
     /*-- if nothing is erased, skip it --*/
     for (i=0; i<nr; i++) {
-      if (gg->hidden[rowv[i]] == 1) {
+      if (d->hidden[rowv[i]] == 1) {
         skipit = false;
         break;
       }
     }
     if (!skipit) {
-      if (!brush_save_erase (rootname, rowv, nr, gg)) {
+      if (!brush_save_erase (rootname, rowv, nr, d, gg)) {
         g_free ((gchar *) rowv);
         g_free ((gchar *) colv);
         return false;
@@ -322,7 +322,7 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
     }
 
     fprintf(stderr, ".. saving %s.lines ...\n", rootname);
-    if (!save_lines (rootname, true, !skipit, rowv, nr, gg)) {
+    if (!save_lines (rootname, true, !skipit, rowv, nr, d, gg)) {
       g_free ((gchar *) rowv);
       g_free ((gchar *) colv);
       return false;
@@ -331,8 +331,8 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
 
 
 /* Save vgroups */
-  nvgr = nvgroups (gg);
-  if (nvgr != gg->ncols) {
+  nvgr = nvgroups (d, gg);
+  if (nvgr != d->ncols) {
     fname = g_strdup_printf ("%s.vgroups", rootname);
     fp = fopen (fname, "w");
     g_free (fname);
@@ -347,14 +347,14 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
       return false;
     } else {
       for (j=0; j<nc; j++)
-        fprintf (fp, "%d ", gg->vardata[colv[j]].groupid + 1);
+        fprintf (fp, "%d ", d->vardata[colv[j]].groupid + 1);
       fprintf (fp, "\n");
       fclose (fp);
     }
   }
 
 /* Save rgroups */
-  if (gg->nrgroups > 0) {
+  if (d->nrgroups > 0) {
     sprintf (fname, "%s.rgroups", rootname);
     if ( (fp = fopen (fname, "w")) == NULL) {
       gchar *message = g_strdup_printf (
@@ -366,7 +366,7 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
       return false;
     } else {
       for (j=0; j<nr; j++)
-        fprintf (fp, "%d ", gg->rgroup_ids[rowv[j]] + 1);
+        fprintf (fp, "%d ", d->rgroup_ids[rowv[j]] + 1);
       fprintf (fp, "\n");
       fclose (fp);
     }
@@ -390,7 +390,7 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
 
 gboolean
 write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
-  ggobid *gg)
+  datad *d, ggobid *gg)
 {
   gchar *fname;
   FILE *fp;
@@ -420,7 +420,7 @@ write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
     fwrite ((gchar *) &nr, sizeof (nr), 1, fp);
     fwrite ((gchar *) &nc, sizeof (nc), 1, fp);
 
-    datap = (gg->save.stage == RAWDATA) ? gg->raw.vals : gg->tform2.vals;
+    datap = (gg->save.stage == RAWDATA) ? d->raw.vals : d->tform2.vals;
 
     for (i=0; i<nr; i++) {
       ir = rowv[i];
@@ -430,7 +430,7 @@ write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
           jc = j;
         else
           jc = colv[j];  /* Write the columns as specified */
-        if (gg->nmissing > 0 && gg->missing.vals[i][j])
+        if (d->nmissing > 0 && d->missing.vals[i][j])
           xfoo = FLT_MAX;
         else
           xfoo = datap[ir][jc];
@@ -444,7 +444,7 @@ write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
 }
 
 gboolean
-save_collabels (gchar *rootname, gint *colv, gint nc, ggobid *gg)
+save_collabels (gchar *rootname, gint *colv, gint nc, datad *d, ggobid *gg)
 {
   gint j;
   FILE *fp;
@@ -464,10 +464,10 @@ save_collabels (gchar *rootname, gint *colv, gint nc, ggobid *gg)
   else {
     if (gg->save.stage == RAWDATA) {
       for (j=0; j<nc; j++)
-        fprintf (fp, "%s\n", gg->vardata[colv[j]].collab);
+        fprintf (fp, "%s\n", d->vardata[colv[j]].collab);
     } else {  /*-- TFORMDATA --*/
       for (j=0; j<nc; j++)
-        fprintf (fp, "%s\n", gg->vardata[colv[j]].collab_tform);
+        fprintf (fp, "%s\n", d->vardata[colv[j]].collab_tform);
     }
     fclose (fp);
     return true;
@@ -475,7 +475,7 @@ save_collabels (gchar *rootname, gint *colv, gint nc, ggobid *gg)
 }
 
 gboolean
-save_rowlabels (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
+save_rowlabels (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
 {
   gint i;
   FILE *fp;
@@ -495,14 +495,14 @@ save_rowlabels (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
   else
   {
     for (i=0; i<nr; i++)
-      fprintf (fp, "%s\n",  g_array_index (gg->rowlab, gchar *, rowv[i]));
+      fprintf (fp, "%s\n",  g_array_index (d->rowlab, gchar *, rowv[i]));
     fclose(fp);
     return true;
   }
 }
 
 gboolean
-brush_save_colors (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
+brush_save_colors (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
 {
   gchar *fname;
   gint i;
@@ -526,7 +526,7 @@ brush_save_colors (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
   else
   {
     for (i=0; i<nr; i++)
-      fprintf (fp, "%d\n", gg->color_now[rowv[i]]);
+      fprintf (fp, "%d\n", d->color_now[rowv[i]]);
 
     if (fclose (fp) == EOF)
       fprintf(stderr, "error in writing color vector\n");
@@ -536,7 +536,7 @@ brush_save_colors (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
 }
 
 gboolean
-brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
+brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
 {
   gchar *fname;
   gint i;
@@ -559,7 +559,7 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
   } else {
 
     for (i=0; i<nr; i++) {
-      switch (gg->glyph_ids[i].type) {
+      switch (d->glyph_ids[i].type) {
         case PLUS_GLYPH:
 /*          gstr = "+";*/
           gstr = "plus";
@@ -584,7 +584,7 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
           break;
       }
 
-      fprintf (fp, "%s %d\n", gstr, gg->glyph_ids[i].size);
+      fprintf (fp, "%s %d\n", gstr, d->glyph_ids[i].size);
     }
     if (fclose (fp) == EOF)
       fprintf (stderr, "error in writing glyphs vector\n");
@@ -593,7 +593,7 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
 }
 
 gboolean
-brush_save_erase (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
+brush_save_erase (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
 {
   gchar *fname;
   gint i;
@@ -612,7 +612,7 @@ brush_save_erase (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
   }
 
   for (i=0; i<nr; i++)
-    fprintf(fp, "%ld\n", (glong) gg->hidden[rowv[i]]);
+    fprintf(fp, "%ld\n", (glong) d->hidden[rowv[i]]);
 
   fclose(fp);
   return true;
@@ -665,7 +665,7 @@ linedata_get (endpointsd *tlinks, gshort *tcolors,
 
 gboolean
 save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
-  gint *rowv, gint nr, ggobid *gg)
+  gint *rowv, gint nr, datad *d, ggobid *gg)
 {
   gchar *fname;
   gint k, nl;
@@ -675,7 +675,7 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
 
   if (lines_p || colors_p) {
 
-    if (nr == gg->nrows) {
+    if (nr == d->nrows) {
       nl = gg->nedges;
       tlinks = gg->edge_endpoints;
       if (!gg->mono_p)
@@ -706,7 +706,7 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
         "The file '%s.lines' can not be opened for writing\n", rootname);
       quick_message (message, false);
       g_free (message);
-      if (nr != gg->nrows) {
+      if (nr != d->nrows) {
         g_free (tlinks);
         if (!gg->mono_p)
           g_free (linecolors);
@@ -718,7 +718,7 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
       for (k=0; k<nl; k++)
         fprintf (fp, "%d %d\n", tlinks[k].a, tlinks[k].b);
 
-      if (nr != gg->nrows) {
+      if (nr != d->nrows) {
         g_free ((gchar *) tlinks);
       }
       fclose (fp);
@@ -738,7 +738,7 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
         "The file '%s.linecolors' can not be opened for writing\n", rootname);
       quick_message (message, false);
       g_free (message);
-      if (nr != gg->nrows) {
+      if (nr != d->nrows) {
         g_free (tlinks);
         g_free (linecolors);
       }
@@ -749,7 +749,7 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
       for (k=0; k<nl; k++)
         fprintf (fp, "%d\n", linecolors[k]);
   
-      if (nr != gg->nrows)
+      if (nr != d->nrows)
         g_free ((gchar *) linecolors);
       fclose (fp);
     }
@@ -764,7 +764,7 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
 
 gboolean
 save_missing (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
-  ggobid *gg)
+  datad *d, ggobid *gg)
 {
   gint i;
   gchar *fname;
@@ -800,7 +800,7 @@ save_missing (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
           jc = j;
         else
           jc = colv[j];  /* Write the columns as specified */
-          fprintf (fp, "%d ", gg->missing.vals[m][jc]);
+          fprintf (fp, "%d ", d->missing.vals[m][jc]);
       }
       fprintf (fp, "\n");
     }

@@ -58,36 +58,6 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
     }
 
     /*
-     * -std:  look for one of mmx (default), msd, or mmd
-    */
-    else if (strcmp (av[1], "-std") == 0) {
-      if (strcmp (av[2], "mmx") == 0) {
-        gg->std_type = 0;
-        av++; (*argc)--;
-      }
-      else if (strcmp (av[2], "msd") == 0) {
-        gg->std_type = 1;
-        av++; (*argc)--;
-      }
-      else if (strcmp (av[2], "mmd") == 0) {
-        gg->std_type = 2;
-        av++; (*argc)--;
-      }
-    }
-
-    /*
-     * -subset:  Sample size n; look for an integer.
-    */
-    else if (strcmp (av[1], "-subset") == 0) {
-      gint n = atoi (av[2]);
-      if (n > 1) {
-        gg->nrows_in_plot = n;
-        g_printerr ("Starting ggobi with a sample of size %d\n", n);
-      }
-	  av++; (*argc)--;
-    }
-
-    /*
      * -version:  print version date, return
     */
     else if (strcmp (av[1], "-version") == 0) {
@@ -103,11 +73,6 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 /*
  * Test the values
 */
-
-  if (gg->std_type != 0 && gg->std_type != 1 && gg->std_type != 2) {
-    g_printerr ("std: Standardization type not valid; aborting.\n");
-    exit(0);
-  }
 
   /* (gg->data_mode == ascii || gg->data_mode == binary) */
   if (*argc == 0)
@@ -211,9 +176,7 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
 
   g_print ("progname = %s\n", g_get_prgname());
 
-  gg->std_type = 0;
   gg->data_mode = ascii;
-  gg->nrows_in_plot = -1;
 
   parse_command_line (&argc, argv, gg);
   g_print ("data_in = %s\n", gg->data_in);
@@ -221,7 +184,8 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
   make_ggobi (gg->data_in, processEvents, gg);
 
   g_free (gg->data_in);
- return (num_ggobis);
+
+  return (num_ggobis);
 }
 
 

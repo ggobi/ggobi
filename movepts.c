@@ -5,17 +5,19 @@
 #include "vars.h"
 #include "externs.h"
 
+static gboolean movepts_history_contains (gint, gint, datad *, ggobid *);
+
 /*------------------------------------------------------------------------*/
 /*                       history                                          */
 /*------------------------------------------------------------------------*/
 
 static gboolean
-move_pt_history_contains (gint i, gint j, ggobid *gg) {
+movepts_history_contains (gint i, gint j, datad *d, ggobid *gg) {
 
-  if (g_slist_length (gg->movepts.history) > 0) {
+  if (g_slist_length (d->movepts_history) > 0) {
     GSList *l;
     celld *cell;
-    for (l = gg->movepts.history; l; l = l->next) {
+    for (l = d->movepts_history; l; l = l->next) {
       cell = (celld *) l->data;
       if (cell->i == i && cell->j == j) {
         return true;
@@ -27,7 +29,7 @@ move_pt_history_contains (gint i, gint j, ggobid *gg) {
 }
 
 void
-move_pt_history_add (gint id, splotd *sp, ggobid *gg)
+movepts_history_add (gint id, splotd *sp, datad *d, ggobid *gg)
 {
 /*
  * So that it's possible to do 'undo last', always add two
@@ -41,45 +43,45 @@ move_pt_history_add (gint id, splotd *sp, ggobid *gg)
   cell->i = cell->j = -1;
   if (gg->movepts.direction == horizontal || gg->movepts.direction == both) {
     /*-- the cell is (id, sp->xyvars.x), gg->raw.vals[id][sp->xyvars.x] --*/
-    if (!move_pt_history_contains (id, sp->xyvars.x, gg)) {
+    if (!movepts_history_contains (id, sp->xyvars.x, d, gg)) {
       cell->i = id;
       cell->j = sp->xyvars.x;
-      cell->val = gg->raw.vals[id][sp->xyvars.x];
+      cell->val = d->raw.vals[id][sp->xyvars.x];
     }
   }
-  gg->movepts.history = g_slist_append (gg->movepts.history, cell);
+  d->movepts_history = g_slist_append (d->movepts_history, cell);
 
   cell = (celld *) g_malloc (sizeof (celld));
   cell->i = cell->j = -1;
   if (gg->movepts.direction == vertical || gg->movepts.direction == both) {
     /*-- the cell is (id, sp->xyvars.y), gg->raw.vals[id][sp->xyvars.y] --*/
-    if (!move_pt_history_contains (id, sp->xyvars.y, gg)) {
+    if (!movepts_history_contains (id, sp->xyvars.y, d, gg)) {
       cell->i = id;
       cell->j = sp->xyvars.y;
-      cell->val = gg->raw.vals[id][sp->xyvars.y];
+      cell->val = d->raw.vals[id][sp->xyvars.y];
     }
   }
-  gg->movepts.history = g_slist_append (gg->movepts.history, cell);
+  d->movepts_history = g_slist_append (d->movepts_history, cell);
 }
 
 void
-move_pt_history_delete_last (ggobid *gg)
+move_pt_history_delete_last (datad *d, ggobid *gg)
 {
   gint n;
 
-  if ((n = g_slist_length (gg->movepts.history)) > 0) {
-    celld *cell = (celld *) g_slist_nth_data (gg->movepts.history, n-1);
+  if ((n = g_slist_length (d->movepts_history)) > 0) {
+    celld *cell = (celld *) g_slist_nth_data (d->movepts_history, n-1);
 
     /*-- especially ignore cells with indices == -1 --*/
-    if (cell->i > -1 && cell->i < gg->nrows_in_plot) {
-      if (cell->j > -1 && cell->j < gg->ncols) {
-        gg->raw.vals[cell->i][cell->j] =
-          gg->tform1.vals[cell->i][cell->j] =
-          gg->tform2.vals[cell->i][cell->j] = cell->val;
+    if (cell->i > -1 && cell->i < d->nrows_in_plot) {
+      if (cell->j > -1 && cell->j < d->ncols) {
+        d->raw.vals[cell->i][cell->j] =
+          d->tform1.vals[cell->i][cell->j] =
+          d->tform2.vals[cell->i][cell->j] = cell->val;
       }
     }
 
-    gg->movepts.history = g_slist_remove (gg->movepts.history, cell);
+    d->movepts_history = g_slist_remove (d->movepts_history, cell);
     g_free (cell);
   }
 }
@@ -87,7 +89,7 @@ move_pt_history_delete_last (ggobid *gg)
 /*------------------------------------------------------------------------*/
 
 void
-move_pt (gint id, gint x, gint y, splotd *sp, ggobid *gg) {
+move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
   gint i, k;
   gboolean horiz, vert;
 
@@ -103,20 +105,20 @@ move_pt (gint id, gint x, gint y, splotd *sp, ggobid *gg) {
   splot_reverse_pipeline (sp, id, &gg->movepts.eps, horiz, vert, gg);
 
   if (gg->movepts.cluster_p) {
-    if (gg->nclust > 1) {
-      gint cur_clust = gg->clusterid.vals[id];
+    if (d->nclusters > 1) {
+      gint cur_clust = d->clusterids.vals[id];
 
       /*
        * Move all points which belong to the same cluster
        * as the selected point.
       */
-      for (i=0; i<gg->nrows_in_plot; i++) {
-        k = gg->rows_in_plot[i];
+      for (i=0; i<d->nrows_in_plot; i++) {
+        k = d->rows_in_plot[i];
         if (k == id)
           ;
         else {
-          if (gg->clusterid.vals[k] == cur_clust) {
-            if (!gg->hidden_now[k]) {   /* ignore erased values altogether */
+          if (d->clusterids.vals[k] == cur_clust) {
+            if (!d->hidden_now[k]) {   /* ignore erased values altogether */
               if (horiz)
                 sp->planar[k].x += gg->movepts.eps.x;
               if (vert)
@@ -124,7 +126,7 @@ move_pt (gint id, gint x, gint y, splotd *sp, ggobid *gg) {
 
               /*-- run only the latter portion of the reverse pipeline --*/
               splot_plane_to_world (sp, k, gg);
-              world_to_raw (k, sp, gg);
+              world_to_raw (k, sp, d, gg);
             }
           }
         }
@@ -133,7 +135,7 @@ move_pt (gint id, gint x, gint y, splotd *sp, ggobid *gg) {
   }
 
   /* and now forward again, all the way ... */
-  tform_to_world (gg);
+  tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_ALL, gg);
 }
 

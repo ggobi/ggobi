@@ -20,109 +20,6 @@ typedef struct {
   void *user_data;
 } IdentifyHandler;
 
-typedef struct /*-- datad --*/ {
- gint ncols, nrows;
- vardatad *vardata;
- GArray *rowlab;
-
- gboolean single_column;
-
- array_f raw, tform1, tform2;
- array_l world, jitdata;
-
- /*----------------------- missing values ---------------------------*/
-
- gint nmissing;
- array_s missing;  /*-- array of shorts --*/
- array_l missing_jitter, missing_world;
- gfloat missing_jitter_factor;
- lims missing_lim;  /*-- usually 0,1, but potentially wider --*/
-
- /*---------------- deleting the hidden points; subsetting ----------*/
-
- gint *rows_in_plot;
- gint nrows_in_plot;
- gboolean *sampled;
-
- /*--------------- clusters: hiding, excluding ----------------------*/
- 
- struct _Clusterd {
-   gint nclusters;
-   clusterd *clusv;
-   vector_i clusterid;
-   gboolean *included;
- } cluster;
-
- /*----------------------- row grouping -----------------------------*/
-
- gint nrgroups, nrgroups_in_plot;
- gint *rgroup_ids;
- rgroupd *rgroups;
-
- /*------------------------ jittering --------------------------------*/
-
- struct _Jitterd {
-   gfloat factor;
-   gboolean type;
-   gboolean vgroup;
-   gboolean convex;
-   gfloat *jitfacv;
- } jitter;
-
-/*------------------------ brushing ----------------------------------*/
-
- gint npts_under_brush;
- gboolean *pts_under_brush;
- gshort *color_ids, *color_now, *color_prev;  /* 0:ncolors-1 */
- glyphv glyph_id, glyph_0;
- glyphv *glyph_ids, *glyph_now, *glyph_prev;
- gboolean *hidden, *hidden_now, *hidden_prev;
- bin_struct **binarray;
-
-/*---------------------- identification ------------------------------*/
-
- GSList *sticky_ids;
-
-/*-------------------- moving points ---------------------------------*/
-
- GSList *movepts_history;  /*-- a list of elements of type celld --*/
-
-/*----------------- variable selection panel -------------------------*/
-
- struct _Varpaneld {
-   GtkWidget **da, **label;
-   gint vnrows, vncols, nvars;
- } varpanel;
-
-/*-------------------- transformation --------------------------------*/
-
- gint std_type;  /* Can be 0, 1 or 2 */
-
- struct _Transformation_d {
-   GtkWidget *stage0_opt, *stage1_opt, *stage2_opt;
-   GtkAdjustment *boxcox_adj;
- } tform;
-
- struct _Sphere_d {
-   /* sphering transformation */
-   GtkWidget *window;
-   GtkAdjustment *npcs_adj;
-   GtkWidget *totvar_entry, *condnum_entry;
-   GtkWidget *sphere_apply_btn;
-
-   gint nspherevars;
-   gint *spherevars;
-   gint sphere_npcs;
-
-   gfloat *eigenval;
-   gfloat **eigenvec;
-   gfloat **vc;
-   gfloat *tform1_mean;
- } sphere;
-
-} datad;
-
-
 struct _ggobid;
 
 typedef struct /*-- ggobi --*/ {
@@ -148,8 +45,7 @@ struct _ggobid {
 
  GGobiApp app;
 
- datad d;
- datad edged;
+ GSList *d;  /*-- first is default: cases, nodes; second might be edges --*/
 
  icoords mousepos, mousepos_o;
 
@@ -174,53 +70,64 @@ struct _ggobid {
  gchar *fname;         /* file name without suffix: .dat, .missing */
 
  /* gboolean: does the data contain only one column? False by default */
+/*
  gboolean single_column;
+*/
 
 /*----------------------- pipeline ---------------------------------*/
 
+/*
  gint ncols, nrows;
  vardatad *vardata;
  GArray *rowlab;
+*/
 
  gint mode, prev_mode;
  gint projection, prev_projection;
 
+/*
  array_f raw, tform1, tform2;
  array_l world, jitdata;
+*/
 
- struct _Vartable {
-   GtkWidget *window;
-   GtkWidget *clist;
- } vartable;
+ GtkWidget *vardata_window;
 
 /*----------------------- missing values ---------------------------*/
 
+/*
  gint nmissing;
- array_s missing;  /*-- array of shorts --*/
+ array_s missing;
  array_l missing_jitter, missing_world;
  gfloat missing_jitter_factor;
- lims missing_lim;  /*-- usually 0,1, but potentially wider --*/
+ lims missing_lim;
+*/
 
 /*---------------- deleting the hidden points; subsetting ----------*/
 
+/*
  gint *rows_in_plot;
  gint nrows_in_plot;
  gboolean *sampled;
+*/
 
 /*--------------- clusters: hiding, excluding ----------------------*/
  
+/*
  clusterd *clusv;
  gint nclust;
  vector_i clusterid;
  gboolean *included;
+*/
 
 /*----------------------- row grouping -----------------------------*/
 
+/*
  gint nrgroups, nrgroups_in_plot;
  gint *rgroup_ids;
  rgroupd *rgroups;
+*/
 
-/*---------------- segments; edges ---------------------------------*/
+/*----------------- segments in scatterplots -----------------------------*/
 
  gint nedges;
  endpointsd *edge_endpoints;
@@ -269,6 +176,7 @@ struct _ggobid {
 
 /*--------------------------- jittering --------------------------------*/
 
+/*
  struct _Jitter {
    gfloat factor;
    gboolean type;
@@ -276,6 +184,7 @@ struct _ggobid {
    gboolean convex;
    gfloat *jitfacv;
  } jitter;
+*/
 
 /*------------------------- writing out data ---------------------------*/
 
@@ -321,12 +230,16 @@ struct _ggobid {
 
 /*------------------------ brushing ----------------------------------*/
 
+ glyphv glyph_id, glyph_0;
+
+/*
  gint npts_under_brush;
  gboolean *pts_under_brush;
- gshort *color_ids, *color_now, *color_prev;  /* 0:ncolors-1 */
+ gshort *color_ids, *color_now, *color_prev;
  glyphv glyph_id, glyph_0;
  glyphv *glyph_ids, *glyph_now, *glyph_prev;
  gboolean *hidden, *hidden_now, *hidden_prev;
+*/
 
  struct _Brush_UI {
    GtkWidget *reset_menu;
@@ -338,9 +251,11 @@ struct _ggobid {
    brush_coords brush_pos ;  
 
    /* binning */
+/*
    gint nbins;
    bin_struct **binarray;
    icoords bin0, bin1;
+*/
 
    gboolean firsttime;
  } brush;
@@ -359,7 +274,9 @@ struct _ggobid {
 /*---------------------- identification ------------------------------*/
 
  struct _Identify {
+/*
    GSList *sticky_ids;
+*/
    GtkWidget *link_menu;
  } identify;
 
@@ -378,7 +295,9 @@ struct _ggobid {
 
 /*-------------------- transformation --------------------------------*/
 
- gint std_type;  /* Can be 0, 1 or 2 */
+/*
+ gint std_type;
+*/
 
  struct _Transformation {
    GtkWidget *stage0_opt, *stage1_opt, *stage2_opt;
@@ -386,12 +305,12 @@ struct _ggobid {
  } tform;
 
  struct _Sphere {
-   /* sphering transformation */
    GtkWidget *window;
    GtkAdjustment *npcs_adj;
    GtkWidget *totvar_entry, *condnum_entry;
    GtkWidget *sphere_apply_btn;
 
+/*
    gint nspherevars;
    gint *spherevars;
    gint sphere_npcs;
@@ -400,7 +319,8 @@ struct _ggobid {
    gfloat **eigenvec;
    gfloat **vc;
    gfloat *tform1_mean;
- } sphere;
+*/
+ } sphere_ui;
 
 /*-------------------- subsetting ------------------------------------*/
 
@@ -441,7 +361,9 @@ struct _ggobid {
    gboolean cluster_p;
    enum directiond direction;
    lcoords eps;
-   GSList *history;  /*-- a list of elements of type celld --*/
+/*
+   GSList *history;
+*/
  } movepts;
 
 
@@ -452,8 +374,10 @@ struct _ggobid {
    GtkWidget *scrolled_window;
    GtkAccelGroup *varpanel_accel_group;
    
+/*
    GtkWidget **da, **varlabel;
    gint vnrows, vncols, nvars;
+*/
  } varpanel_ui;
 
 /*----------------- variable selection menus -------------------------*/

@@ -322,6 +322,8 @@ mode_set (gint m, ggobid *gg) {
 
 void
 mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
   extern void tour_func (gboolean, ggobid *);
 
   if (state == off) {
@@ -367,7 +369,7 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
         break;
 
       case BRUSH:
-        brush_activate (state, gg);
+        brush_activate (state, d, gg);
         break;
     }
   }
@@ -526,7 +528,8 @@ make_ui (ggobid *gg) {
 
   gg->main_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 gg->main_accel_group, window, &gg->main_menubar, (gpointer) gg);
+                 gg->main_accel_group, window,
+                 &gg->main_menubar, (gpointer) gg);
 
   gtk_box_pack_start (GTK_BOX (vbox), gg->main_menubar, false, true, 0);
 

@@ -8,7 +8,7 @@
 #include "externs.h"
 
 /* */
-gboolean active_paint_points (ggobid *gg);
+gboolean active_paint_points (datad *d, ggobid *gg);
 gboolean active_paint_lines (ggobid *gg);
 /* */
 
@@ -22,7 +22,7 @@ find_glyph_type_and_size(gint gid, glyphv *glyph)
 }
 
 gboolean
-brush_once (gboolean force, ggobid *gg)
+brush_once (gboolean force, datad *d, ggobid *gg)
 {
 /*
  * Determine which bins the brush is currently sitting in.
@@ -36,27 +36,27 @@ brush_once (gboolean force, ggobid *gg)
   gint lry = MAX (brush_pos->y1, brush_pos->y2);
   gboolean changed = false;
   cpaneld *cpanel = &gg->current_display->cpanel;
-  icoords *bin0 = &gg->brush.bin0;
-  icoords *bin1 = &gg->brush.bin1;
+  icoords *bin0 = &d->brush.bin0;
+  icoords *bin1 = &d->brush.bin1;
 
-  if (!point_in_which_bin (ulx, uly, &bin0->x, &bin0->y, gg)) {
+  if (!point_in_which_bin (ulx, uly, &bin0->x, &bin0->y, d, gg)) {
     bin0->x = MAX (bin0->x, 0);
-    bin0->x = MIN (bin0->x, gg->brush.nbins - 1);
+    bin0->x = MIN (bin0->x, d->brush.nbins - 1);
     bin0->y = MAX (bin0->y, 0);
-    bin0->y = MIN (bin0->y, gg->brush.nbins - 1);
+    bin0->y = MIN (bin0->y, d->brush.nbins - 1);
   }
-  if (!point_in_which_bin (lrx, lry, &bin1->x, &bin1->y, gg)) {
+  if (!point_in_which_bin (lrx, lry, &bin1->x, &bin1->y, d, gg)) {
     bin1->x = MAX (bin1->x, 0);
-    bin1->x = MIN (bin1->x, gg->brush.nbins - 1);
+    bin1->x = MIN (bin1->x, d->brush.nbins - 1);
     bin1->y = MAX (bin1->y, 0);
-    bin1->y = MIN (bin1->y, gg->brush.nbins - 1);
+    bin1->y = MIN (bin1->y, d->brush.nbins - 1);
   }
 
 /*
  * Now paint.
 */
   if (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDL) {
-    changed = active_paint_points (gg);
+    changed = active_paint_points (d, gg);
   }
 
   if (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL) {
@@ -67,32 +67,32 @@ brush_once (gboolean force, ggobid *gg)
 }
 
 void
-point_brush_prev_vectors_update (ggobid *gg) {
+point_brush_prev_vectors_update (datad *d, ggobid *gg) {
   gint m, i;
-  for (m=0; m<gg->nrows_in_plot; m++) {
-    i = gg->rows_in_plot[m];
-    gg->color_prev[i] = gg->color_ids[i];
-    gg->hidden_prev[i] = gg->hidden[i];
-    gg->glyph_prev[i].size = gg->glyph_ids[i].size;
-    gg->glyph_prev[i].type = gg->glyph_ids[i].type;
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot[m];
+    d->color_prev[i] = d->color_ids[i];
+    d->hidden_prev[i] = d->hidden[i];
+    d->glyph_prev[i].size = d->glyph_ids[i].size;
+    d->glyph_prev[i].type = d->glyph_ids[i].type;
   }
 }
 
 void
-point_brush_undo (splotd *sp, ggobid *gg) {
+point_brush_undo (splotd *sp, datad *d, ggobid *gg) {
   gint m, i;
-  for (m=0; m<gg->nrows_in_plot; m++) {
-    i = gg->rows_in_plot[m];
-    gg->color_ids[i] = gg->color_now[i] = gg->color_prev[i];
-    gg->hidden[i] = gg->hidden_now[i] = gg->hidden_prev[i];
-    gg->glyph_ids[i].type = gg->glyph_now[i].type = gg->glyph_prev[i].type;
-    gg->glyph_ids[i].size = gg->glyph_now[i].size = gg->glyph_prev[i].size;
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot[m];
+    d->color_ids[i] = d->color_now[i] = d->color_prev[i];
+    d->hidden[i] = d->hidden_now[i] = d->hidden_prev[i];
+    d->glyph_ids[i].type = d->glyph_now[i].type = d->glyph_prev[i].type;
+    d->glyph_ids[i].size = d->glyph_now[i].size = d->glyph_prev[i].size;
   }
   splot_redraw (sp, FULL, gg);
 }
 
 void
-reinit_transient_brushing (ggobid *gg)
+reinit_transient_brushing (datad *d, ggobid *gg)
 {
 /*
  * If a new variable is selected or a variable is transformed
@@ -110,12 +110,12 @@ reinit_transient_brushing (ggobid *gg)
      (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL);
 
   if (point_painting_p) {
-    for (m=0; m<gg->nrows_in_plot; m++) {
-      i = gg->rows_in_plot[m];
-      gg->color_now[i] = gg->color_ids[i] ;
-      gg->glyph_now[i].type = gg->glyph_ids[i].type;
-      gg->glyph_now[i].size = gg->glyph_ids[i].size;
-      gg->hidden_now[i] = gg->hidden[i];
+    for (m=0; m<d->nrows_in_plot; m++) {
+      i = d->rows_in_plot[m];
+      d->color_now[i] = d->color_ids[i] ;
+      d->glyph_now[i].type = d->glyph_ids[i].type;
+      d->glyph_now[i].size = d->glyph_ids[i].size;
+      d->hidden_now[i] = d->hidden[i];
     }
   }
   if (line_painting_p) {
@@ -129,7 +129,7 @@ reinit_transient_brushing (ggobid *gg)
     }
   }
 
-  (void) brush_once (false, gg);
+  brush_once (false, d, gg);
 }
 
 void
@@ -155,6 +155,7 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
   brush_coords *brush_pos = &gg->brush.brush_pos;
+  datad *d = display->d;
 
   if (button1_p)
     brush_set_pos (mouse->x, mouse->y, gg);
@@ -166,11 +167,11 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
 
 
   if (cpanel->brush_on_p) {
-    changed = brush_once (false, gg);
+    changed = brush_once (false, d, gg);
     if (display->options.edges_undirected_show_p ||
         display->options.edges_directed_show_p ||
         display->options.edges_show_p ||
-        gg->nrgroups > 0)      /*-- a full redraw is required --*/
+        d->nrgroups > 0)      /*-- a full redraw is required --*/
     {
       splot_redraw (sp, FULL, gg);
       displays_plot (sp, FULL, gg);
@@ -218,10 +219,10 @@ under_brush (gint k, ggobid *gg)
 static void
 brush_boundaries_set (cpaneld *cpanel,
   icoords *obin0, icoords *obin1,
-  icoords *imin, icoords *imax, ggobid *gg)
+  icoords *imin, icoords *imax, datad *d, ggobid *gg)
 {
-  icoords *bin0 = &gg->brush.bin0;
-  icoords *bin1 = &gg->brush.bin1;
+  icoords *bin0 = &d->brush.bin0;
+  icoords *bin1 = &d->brush.bin1;
 
   if (cpanel->br_mode == BR_TRANSIENT) {
     imin->x = MIN (bin0->x, obin0->x);
@@ -241,9 +242,11 @@ void
 brush_draw_label (splotd *sp, ggobid *gg) {
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
 
-  if (gg->npts_under_brush > 0) {
-    gchar *str = g_strdup_printf ("%d", gg->npts_under_brush);
+  if (d->npts_under_brush > 0) {
+    gchar *str = g_strdup_printf ("%d", d->npts_under_brush);
     gdk_text_extents (style->font, 
       str, strlen (str),
       &lbearing, &rbearing, &width, &ascent, &descent);
@@ -326,47 +329,47 @@ brush_draw_brush (splotd *sp, ggobid *gg) {
 /*----------------------------------------------------------------------*/
 
 static gboolean
-update_glyph_vectors (gint i, gboolean changed, ggobid *gg) {
+update_glyph_vectors (gint i, gboolean changed, datad *d, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
 
 /* setting the value of changed */
   if (!changed) {
-    if (gg->pts_under_brush[i]) {
+    if (d->pts_under_brush[i]) {
 
-      doit = (gg->glyph_now[i].size != gg->glyph_id.size);
+      doit = (d->glyph_now[i].size != gg->glyph_id.size);
       if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
-        doit = doit || (gg->glyph_now[i].type != gg->glyph_id.type);
+        doit = doit || (d->glyph_now[i].type != gg->glyph_id.type);
 
     } else {
 
-      doit = (gg->glyph_now[i].size != gg->glyph_ids[i].size);
+      doit = (d->glyph_now[i].size != d->glyph_ids[i].size);
       if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
-        doit = doit || (gg->glyph_now[i].type != gg->glyph_ids[i].type);
+        doit = doit || (d->glyph_now[i].type != d->glyph_ids[i].type);
     }
   }
 /* */
 
   if (doit) {
-    if (gg->pts_under_brush[i]) {
+    if (d->pts_under_brush[i]) {
       switch (cpanel->br_mode) {
 
         case BR_PERSISTENT:
-          gg->glyph_ids[i].size = gg->glyph_now[i].size = gg->glyph_id.size;
+          d->glyph_ids[i].size = d->glyph_now[i].size = gg->glyph_id.size;
           if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
-            gg->glyph_ids[i].type = gg->glyph_now[i].type = gg->glyph_id.type;
+            d->glyph_ids[i].type = d->glyph_now[i].type = gg->glyph_id.type;
           break;
 
         case BR_TRANSIENT:
-          gg->glyph_now[i].size = gg->glyph_id.size;
+          d->glyph_now[i].size = gg->glyph_id.size;
           if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
-            gg->glyph_now[i].type = gg->glyph_id.type;
+            d->glyph_now[i].type = gg->glyph_id.type;
           break;
       }
     } else {
-      gg->glyph_now[i].size = gg->glyph_ids[i].size;
+      d->glyph_now[i].size = d->glyph_ids[i].size;
       if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
-        gg->glyph_now[i].type = gg->glyph_ids[i].type;
+        d->glyph_now[i].type = d->glyph_ids[i].type;
     }
   }
 
@@ -375,7 +378,7 @@ update_glyph_vectors (gint i, gboolean changed, ggobid *gg) {
 
 
 static gboolean
-build_glyph_vectors (ggobid *gg)
+build_glyph_vectors (datad *d, ggobid *gg)
 {
   gint ih, iv, m, j, k, gp, n, p;
   static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
@@ -384,37 +387,37 @@ build_glyph_vectors (ggobid *gg)
   gboolean changed = false;
   cpaneld *cpanel = &gg->current_display->cpanel;
 
-  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, gg);
+  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
   for (ih=imin.x; ih<=imax.x; ih++) {
     for (iv=imin.y; iv<=imax.y; iv++) {
-      for (m=0; m<gg->brush.binarray[ih][iv].nels; m++) {
+      for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
         /*
          * j is the row number; k is the index of rows_in_plot[]
         */
-        j = gg->rows_in_plot[ k = gg->brush.binarray[ih][iv].els[m] ] ;
+        j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
 
 
         /* update the glyph vectors for every member of the row group */
-        if (gg->nrgroups > 0) {
-          gp = gg->rgroup_ids[k];
-          for (n=0; n<gg->rgroups[gp].nels; n++) {
-            p = gg->rgroups[gp].els[n];
-            changed = update_glyph_vectors (p, changed, gg);
+        if (d->nrgroups > 0) {
+          gp = d->rgroup_ids[k];
+          for (n=0; n<d->rgroups[gp].nels; n++) {
+            p = d->rgroups[gp].els[n];
+            changed = update_glyph_vectors (p, changed, d, gg);
           }
         /* */
 
         } else {  /* update the vectors for this point only */
-          changed = update_glyph_vectors (j, changed, gg);
+          changed = update_glyph_vectors (j, changed, d, gg);
         }
       }
     }
   }
 
-  obin0.x = gg->brush.bin0.x;
-  obin0.y = gg->brush.bin0.y;
-  obin1.x = gg->brush.bin1.x;
-  obin1.y = gg->brush.bin1.y;
+  obin0.x = d->brush.bin0.x;
+  obin0.y = d->brush.bin0.y;
+  obin1.x = d->brush.bin1.x;
+  obin1.y = d->brush.bin1.y;
 
   return (changed);
 }
@@ -424,16 +427,16 @@ build_glyph_vectors (ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 static gboolean
-update_color_vectors (gint i, gboolean changed, ggobid *gg) {
+update_color_vectors (gint i, gboolean changed, datad *d, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
 
 /* setting the value of doit */
   if (!changed) {
-    if (gg->pts_under_brush[i])
-      doit = (gg->color_now[i] != gg->color_id);
+    if (d->pts_under_brush[i])
+      doit = (d->color_now[i] != gg->color_id);
     else
-      doit = (gg->color_now[i] != gg->color_ids[i]);
+      doit = (d->color_now[i] != d->color_ids[i]);
   }
 /* */
 
@@ -441,23 +444,23 @@ update_color_vectors (gint i, gboolean changed, ggobid *gg) {
    * If doit is false, it's guaranteed that there will be no change.
   */
   if (doit) {
-    if (gg->pts_under_brush[i]) {
+    if (d->pts_under_brush[i]) {
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
-          gg->color_ids[i] = gg->color_now[i] = gg->color_id;
+          d->color_ids[i] = d->color_now[i] = gg->color_id;
           break;
         case BR_TRANSIENT:
-          gg->color_now[i] = gg->color_id;
+          d->color_now[i] = gg->color_id;
           break;
       }
-    } else gg->color_now[i] = gg->color_ids[i];
+    } else d->color_now[i] = d->color_ids[i];
   }
 
   return (doit);
 }
 
 static gboolean
-build_color_vectors (ggobid *gg)
+build_color_vectors (datad *d, ggobid *gg)
 {
   gint ih, iv, m, j, k, gp, n, p;
   static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
@@ -466,12 +469,12 @@ build_color_vectors (ggobid *gg)
   gboolean changed = false;
   cpaneld *cpanel = &gg->current_display->cpanel;
 
-  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, gg);
+  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
   for (ih=imin.x; ih<=imax.x; ih++) {
     for (iv=imin.y; iv<=imax.y; iv++) {
-      for (m=0; m<gg->brush.binarray[ih][iv].nels; m++) {
-        j = gg->rows_in_plot[ k = gg->brush.binarray[ih][iv].els[m] ] ;
+      for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
+        j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
         /*
          * k   raw index, based on nrows
          * j   index based on nrows_in_plot
@@ -479,23 +482,23 @@ build_color_vectors (ggobid *gg)
 
 
         /* update the color vectors for every member of the row group */
-        if (gg->nrgroups > 0) {
-          gp = gg->rgroup_ids[k];
-          for (n=0; n<gg->rgroups[gp].nels; n++) {
-            p = gg->rgroups[gp].els[n];
-            changed = update_color_vectors (p, changed, gg);
+        if (d->nrgroups > 0) {
+          gp = d->rgroup_ids[k];
+          for (n=0; n<d->rgroups[gp].nels; n++) {
+            p = d->rgroups[gp].els[n];
+            changed = update_color_vectors (p, changed, d, gg);
           }
         /* */
 
         } else {  /* update the vectors for this point only */
-          changed = update_color_vectors (j, changed, gg);
+          changed = update_color_vectors (j, changed, d, gg);
         }
       }
     }
-    obin0.x = gg->brush.bin0.x;
-    obin0.y = gg->brush.bin0.y;
-    obin1.x = gg->brush.bin1.x;
-    obin1.y = gg->brush.bin1.y;
+    obin0.x = d->brush.bin0.x;
+    obin0.y = d->brush.bin0.y;
+    obin1.x = d->brush.bin1.x;
+    obin1.y = d->brush.bin1.y;
   }
 
   return (changed);
@@ -506,7 +509,7 @@ build_color_vectors (ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 static gboolean
-update_hidden_vectors (gint i, gboolean changed, ggobid *gg) {
+update_hidden_vectors (gint i, gboolean changed, datad *d, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
 
@@ -515,10 +518,10 @@ update_hidden_vectors (gint i, gboolean changed, ggobid *gg) {
    * order to be able to return that information.
   */
   if (!changed) {
-    if (gg->pts_under_brush[i])
-      doit = (gg->hidden_now[i] != true);
+    if (d->pts_under_brush[i])
+      doit = (d->hidden_now[i] != true);
     else
-      doit = (gg->hidden_now[i] != gg->hidden[i]);
+      doit = (d->hidden_now[i] != d->hidden[i]);
   }
 /* */
 
@@ -527,23 +530,23 @@ update_hidden_vectors (gint i, gboolean changed, ggobid *gg) {
 */
 
   if (doit) {
-    if (gg->pts_under_brush[i]) {
+    if (d->pts_under_brush[i]) {
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
-          gg->hidden[i] = gg->hidden_now[i] = true;
+          d->hidden[i] = d->hidden_now[i] = true;
           break;
         case BR_TRANSIENT:
-          gg->hidden_now[i] = true;
+          d->hidden_now[i] = true;
           break;
       }
-    } else gg->hidden_now[i] = gg->hidden[i];
+    } else d->hidden_now[i] = d->hidden[i];
   }
 
   return (doit);
 }
 
 static gboolean
-build_hidden_vectors (ggobid *gg)
+build_hidden_vectors (datad *d, ggobid *gg)
 {
   gint ih, iv, m, j, k, gp, n, p;
   static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
@@ -552,42 +555,42 @@ build_hidden_vectors (ggobid *gg)
   gboolean changed = false;
   cpaneld *cpanel = &gg->current_display->cpanel;
 
-  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, gg);
+  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
   for (ih=imin.x; ih<=imax.x; ih++) {
     for (iv=imin.y; iv<=imax.y; iv++) {
-      for (m=0; m<gg->brush.binarray[ih][iv].nels; m++) {
-        j = gg->rows_in_plot[ k = gg->brush.binarray[ih][iv].els[m] ] ;
+      for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
+        j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
         /*
          * k   raw index, based on nrows
          * j   index based on nrows_in_plot
         */
 
-        if (gg->nrgroups > 0) {
+        if (d->nrgroups > 0) {
           /*-- update the hidden vectors for every member of the row group --*/
-          gp = gg->rgroup_ids[k];
-          for (n=0; n<gg->rgroups[gp].nels; n++) {
-            p = gg->rgroups[gp].els[n];
-            changed = update_hidden_vectors (p, changed, gg);
+          gp = d->rgroup_ids[k];
+          for (n=0; n<d->rgroups[gp].nels; n++) {
+            p = d->rgroups[gp].els[n];
+            changed = update_hidden_vectors (p, changed, d, gg);
           }
         /* */
 
         } else {  /* update the vectors for this point only */
-          changed = update_hidden_vectors (j, changed, gg);
+          changed = update_hidden_vectors (j, changed, d, gg);
         }
       }
     }
-    obin0.x = gg->brush.bin0.x;
-    obin0.y = gg->brush.bin0.y;
-    obin1.x = gg->brush.bin1.x;
-    obin1.y = gg->brush.bin1.y;
+    obin0.x = d->brush.bin0.x;
+    obin0.y = d->brush.bin0.y;
+    obin1.x = d->brush.bin1.x;
+    obin1.y = d->brush.bin1.y;
   }
 
   return (changed);
 }
 
 gboolean
-active_paint_points (ggobid *gg)
+active_paint_points (datad *d, ggobid *gg)
 {
   gint ih, iv, j, pt, k, gp;
   gboolean changed;
@@ -597,31 +600,31 @@ active_paint_points (ggobid *gg)
 */
 
   /* Zero out pts_under_brush[] before looping */
-  gg->npts_under_brush = 0;
-  for (j=0; j<gg->nrows_in_plot; j++)
-    gg->pts_under_brush[gg->rows_in_plot[j]] = 0;
+  d->npts_under_brush = 0;
+  for (j=0; j<d->nrows_in_plot; j++)
+    d->pts_under_brush[d->rows_in_plot[j]] = 0;
  
   /*
    * brush.binarray[][] only represents the
    * rows in rows_in_plot[] so there's no need to test for that.
   */
 
-  for (ih=gg->brush.bin0.x; ih<=gg->brush.bin1.x; ih++) {
-    for (iv=gg->brush.bin0.y; iv<=gg->brush.bin1.y; iv++) {
-      for (j=0; j<gg->brush.binarray[ih][iv].nels; j++) {
-        pt = gg->rows_in_plot[gg->brush.binarray[ih][iv].els[j]];
+  for (ih=d->brush.bin0.x; ih<=d->brush.bin1.x; ih++) {
+    for (iv=d->brush.bin0.y; iv<=d->brush.bin1.y; iv++) {
+      for (j=0; j<d->brush.binarray[ih][iv].nels; j++) {
+        pt = d->rows_in_plot[d->brush.binarray[ih][iv].els[j]];
 
         if (under_brush (pt, gg)) {
 
-          gg->npts_under_brush++ ;
-          gg->pts_under_brush[pt] = 1;
+          d->npts_under_brush++ ;
+          d->pts_under_brush[pt] = 1;
 
           /* brush other members of this row group */
-          if (gg->nrgroups > 0) {
-            gp = gg->rgroup_ids[pt];
-            if (gp < gg->nrgroups) {  /* exclude points without an rgroup */
-              for (k=0; k<gg->rgroups[gp].nels; k++) {
-                  gg->pts_under_brush[gg->rgroups[gp].els[k]] = 1;
+          if (d->nrgroups > 0) {
+            gp = d->rgroup_ids[pt];
+            if (gp < d->nrgroups) {  /* exclude points without an rgroup */
+              for (k=0; k<d->rgroups[gp].nels; k++) {
+                  d->pts_under_brush[d->rgroups[gp].els[k]] = 1;
               }
             }
           }
@@ -636,20 +639,20 @@ active_paint_points (ggobid *gg)
   if (cpanel->brush_on_p) {
     switch (cpanel->br_target) {
       case BR_CANDG:  /*-- color and glyph --*/
-        if (build_color_vectors (gg)) changed = true;
-        if (build_glyph_vectors (gg)) changed = true;
+        if (build_color_vectors (d, gg)) changed = true;
+        if (build_glyph_vectors (d, gg)) changed = true;
         break;
       case BR_COLOR:
-        if (build_color_vectors (gg)) changed = true;
+        if (build_color_vectors (d, gg)) changed = true;
         break;
       case BR_GLYPH:  /*-- glyph type and size --*/
-        if (build_glyph_vectors (gg)) changed = true;
+        if (build_glyph_vectors (d, gg)) changed = true;
         break;
       case BR_GSIZE:  /*-- glyph size only --*/
-        if (build_glyph_vectors (gg)) changed = true;
+        if (build_glyph_vectors (d, gg)) changed = true;
         break;
       case BR_HIDE:  /*-- hidden --*/
-        if (build_hidden_vectors (gg)) changed = true;
+        if (build_hidden_vectors (d, gg)) changed = true;
         break;
     }
   }

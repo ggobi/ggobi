@@ -17,7 +17,9 @@ static void stage0_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget(w, true);
-  transform (0, indx, -99., gg);
+  datad *d = gg->current_display->d;
+
+  transform (0, indx, -99., d, gg);
 }
 
 static gchar *stage1_lbl[] = {"No transformation",
@@ -37,7 +39,9 @@ stage1_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   gint indx = GPOINTER_TO_INT (cbd);
-  transform (1, indx, gg->tform.boxcox_adj->value, gg);
+  datad *d = gg->current_display->d;
+
+  transform (1, indx, gg->tform.boxcox_adj->value, d, gg);
 }
 
 /*
@@ -45,7 +49,8 @@ stage1_cb (GtkWidget *w, gpointer cbd)
 */
 void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
 {
-  transform (1, BOXCOX, adj->value, gg);
+  datad *d = gg->current_display->d;
+  transform (1, BOXCOX, adj->value, d, gg);
 }
 
 static gchar *stage2_lbl[] = {"No transformation",
@@ -55,34 +60,35 @@ static gchar *stage2_lbl[] = {"No transformation",
                               "Sphere ..."};
 static void stage2_cb (GtkWidget *w, gpointer cbd)
 {
- ggobid *gg;
+  ggobid *gg = GGobiFromWidget(w, true);
+  datad *d = gg->current_display->d;
   gint indx = GPOINTER_TO_INT (cbd);
-  gg = GGobiFromWidget(w, true);
 
   if (indx == SPHERE) {
     sphere_panel_open (gg);
   } else {
-    transform (2, indx, -99, gg);
+    transform (2, indx, -99, d, gg);
   }
 }
 
 static void tform_reset_cb (GtkWidget *w, ggobid *gg)
 {
   gint j;
+  datad *d = gg->current_display->d;
 
-  for (j=0; j<gg->ncols; j++) {
-    transform0_values_set (NO_TFORM0, j, gg);
-    transform1_values_set (NO_TFORM1, 1.0, j, gg);
-    transform2_values_set (NO_TFORM2, j, gg);
+  for (j=0; j<d->ncols; j++) {
+    transform0_values_set (NO_TFORM0, j, d, gg);
+    transform1_values_set (NO_TFORM1, 1.0, j, d, gg);
+    transform2_values_set (NO_TFORM2, j, d, gg);
 
-    transform1_apply (NO_TFORM1, 1.0, j, gg);
-    transform2_apply (NO_TFORM2, j, gg);
+    transform1_apply (NO_TFORM1, 1.0, j, d, gg);
+    transform2_apply (NO_TFORM2, j, d, gg);
 
-    transform_opt_menus_set_history (j, gg);
+    transform_opt_menus_set_history (j, d, gg);
   }
 
-  vardata_lim_update (gg);
-  tform_to_world (gg);
+  vardata_lim_update (d, gg);
+  tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_PRESENT, gg);
 }
 
@@ -94,8 +100,9 @@ transform_window_open (ggobid *gg)
   GtkWidget *lbl, *hbox;
   GtkWidget *vbox, *frame, *hb, *vb, *btn;
   GtkWidget *spinner;
+  datad *d = gg->current_display->d;
 
-  if (gg->nrows == 0)  /*-- if used before we have data --*/
+  if (d == NULL || d->nrows == 0)  /*-- if used before we have data --*/
     return;
 
   if (window == NULL) {
@@ -212,12 +219,12 @@ transform_window_open (ggobid *gg)
 }
 
 void
-transform_opt_menus_set_history (gint j, ggobid *gg)
+transform_opt_menus_set_history (gint j, datad *d, ggobid *gg)
 {
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform.stage0_opt),
-    gg->vardata[j].tform0);
+    d->vardata[j].tform0);
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform.stage1_opt),
-    gg->vardata[j].tform1);
+    d->vardata[j].tform1);
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform.stage2_opt),
-    gg->vardata[j].tform2);
+    d->vardata[j].tform2);
 }

@@ -136,31 +136,34 @@ display_tree_delete_cb(GtkWidget *w, GdkEvent *event, ggobid *gg)
  */
 
 GtkWidget *
-splot_subtree_create(displayd *display, ggobid *gg)
+splot_subtree_create (displayd *display, ggobid *gg)
 {
- GList *slist;
- splotd *sp;
- GtkWidget *tree, *item;
- int ctr = 0;
-
-   tree = gtk_tree_new();
+  GList *slist;
+  splotd *sp;
+  GtkWidget *tree, *item;
+  gint ctr = 0;
+  datad *d = display->d;
+  
+  tree = gtk_tree_new();
 
 /*
 gtk_signal_connect (GTK_OBJECT(tree), "select_child",
                              GTK_SIGNAL_FUNC(display_tree_child_select), display);
 */
       /* Here do the plots within the display. */
-    for(slist = display->splots; slist ; slist = slist->next, ctr++) {
-        sp = slist->data;
-        item = gtk_tree_item_new_with_label(splot_tree_label(sp, ctr, display->displaytype, gg));
-gtk_signal_connect (GTK_OBJECT(item), "select",
-                             GTK_SIGNAL_FUNC(display_tree_splot_child_select), sp);
-        gtk_widget_show(item);
+  for (slist = display->splots; slist ; slist = slist->next, ctr++) {
+    sp = slist->data;
+    item = gtk_tree_item_new_with_label (splot_tree_label (sp,
+      ctr, display->displaytype, d, gg));
 
-        gtk_tree_append(GTK_TREE(tree), item);
-    }
+    gtk_signal_connect (GTK_OBJECT(item), "select",
+                        GTK_SIGNAL_FUNC(display_tree_splot_child_select), sp);
+    gtk_widget_show (item);
 
- return(tree);
+    gtk_tree_append (GTK_TREE (tree), item);
+  }
+
+   return (tree);
 }
 
 /*
@@ -193,26 +196,31 @@ display_tree_label(displayd *display)
   splot, in position `ctr' and an element in the container of 
   type `type'.
  */
-char *
-splot_tree_label(splotd *splot, int ctr, enum displaytyped type, ggobid *gg)
+gchar *
+splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
+  datad *d, ggobid *gg)
 {
- char *buf;
- int n;
- switch(type) {
+  gchar *buf;
+  gint n;
+
+  switch (type) {
     case scatterplot:
     case scatmat:
-      n = strlen(gg->vardata[splot->xyvars.x].collab) + strlen(gg->vardata[splot->xyvars.y].collab) + 5;
-      buf = (char*) malloc(n* sizeof(char*));
-      sprintf(buf, "%s v %s",gg->vardata[splot->xyvars.x].collab, gg->vardata[splot->xyvars.y].collab);
+      n = strlen (d->vardata[splot->xyvars.x].collab) +
+          strlen (d->vardata[splot->xyvars.y].collab) + 5;
+      buf = (gchar*) g_malloc (n * sizeof (gchar*));
+      sprintf (buf, "%s v %s",
+        d->vardata[splot->xyvars.x].collab,
+        d->vardata[splot->xyvars.y].collab);
      break;
     case parcoords:
-      n = strlen(gg->vardata[splot->p1dvar].collab);
-      buf = (char*) malloc(n* sizeof(char*));
-      sprintf(buf,"%s",gg->vardata[splot->p1dvar].collab);
+      n = strlen (d->vardata[splot->p1dvar].collab);
+      buf = (gchar*) g_malloc(n* sizeof (gchar*));
+      sprintf(buf, "%s", d->vardata[splot->p1dvar].collab);
      break;
- }
+  }
 
- return(buf);
+  return (buf);
 }
 
 

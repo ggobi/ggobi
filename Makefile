@@ -17,7 +17,8 @@ LDFLAGS=
 
 #DEPENDS_FLAG=-MM
 
-SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
+SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
+ utils.c array.c vector.c \
  read_array.c read_data.c io.c writedata_ui.c writedata.c \
  pipeline.c missing.c \
  scatterplot.c scatterplot_ui.c \
@@ -45,7 +46,7 @@ SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
  ggobi-API.c 
 #vdialog_ui.c \
 
-OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
+OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  utils_ui.o utils.o utils_gdk.o \
  read_array.o read_data.o io.o writedata_ui.o writedata.o \
  pipeline.o missing.o \

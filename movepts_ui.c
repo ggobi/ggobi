@@ -8,20 +8,29 @@
 
 static void reset_all_cb (GtkButton *button, ggobid *gg)
 {
-  while (g_slist_length (gg->movepts.history) > 0) {
-    move_pt_history_delete_last (gg);
-    move_pt_history_delete_last (gg);
+  GSList *l;
+  datad *d;
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+
+    while (g_slist_length (d->movepts_history) > 0) {
+      movepts_history_delete_last (d, gg);
+      movepts_history_delete_last (d, gg);
+    }
+    tform_to_world (d, gg);
   }
-  tform_to_world (gg);
+
   displays_tailpipe (REDISPLAY_ALL, gg);
 }
 
 static void undo_last_cb (GtkButton *button, ggobid *gg)
 {
+  datad *d = gg->current_display->d;
+
 /*-- remove the last two cells --*/
-  move_pt_history_delete_last (gg);
-  move_pt_history_delete_last (gg);
-  tform_to_world (gg);
+  movepts_history_delete_last (d, gg);
+  movepts_history_delete_last (d, gg);
+  tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_ALL, gg);
 }
 
@@ -44,12 +53,15 @@ static void mdir_cb (GtkWidget *w, gpointer cbd)
 static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
-  ggobid *gg;
+  ggobid *gg = GGobiFromSPlot (sp);
+  displayd *display;
+  datad *d;
   gboolean button1_p, button2_p;
   gboolean inwindow, wasinwindow, pointer_moved;
 
-  gg = GGobiFromSPlot (sp);
   gg->current_splot = sp;
+  display = (displayd *) sp->displayptr;
+  d = display->d;
 
   /*-- try defining wasinwindow before the new mousepos is calculated --*/
   wasinwindow = mouseinwindow (sp, gg);
@@ -78,16 +90,16 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
      * data pipeline in reverse, (then run it forward again?) and
      * draw the plot.
     */
-    if (gg->app.nearest_point != -1) {
-      move_pt (gg->app.nearest_point,
+    if (d->nearest_point != -1) {
+      move_pt (d->nearest_point,
                gg->mousepos.x,
                gg->mousepos.y,
-               sp, gg);
+               sp, d, gg);
     }
   }
 
   if (!inwindow && wasinwindow) {
-    gg->app.nearest_point = -1;
+    d->nearest_point = -1;
     splot_redraw (sp, QUICK, gg);  
   }
 
@@ -101,7 +113,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   ggobid *gg = GGobiFromSPlot (sp);
-
+  datad *d = gg->current_display->d;
+  
   gg->current_display = (displayd *) sp->displayptr;
   gg->current_splot = sp;
 
@@ -119,24 +132,24 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
                                         "motion_notify_event",
                                         (GtkSignalFunc) motion_notify_cb,
                                         (gpointer) sp);
-    gg->app.nearest_point = find_nearest_point (&gg->mousepos, sp, gg);
-    if (gg->app.nearest_point != -1) {
-      move_pt_history_add (gg->app.nearest_point, sp, gg);
+    d->nearest_point = find_nearest_point (&gg->mousepos, sp, d, gg);
+    if (d->nearest_point != -1) {
+      movepts_history_add (d->nearest_point, sp, d, gg);
 
       /*-- add the history information for the cluster here --*/
       if (gg->movepts.cluster_p) {
-        clusters_set (gg);
-        if (gg->nclust > 1) {
-          gint i, k, id = gg->app.nearest_point;
-          gfloat cur_clust = gg->clusterid.vals[id];
-          for (i=0; i<gg->nrows_in_plot; i++) {
-            k = gg->rows_in_plot[i];
+        clusters_set (d, gg);
+        if (d->nclusters > 1) {
+          gint i, k, id = d->nearest_point;
+          gfloat cur_clust = d->clusterids.vals[id];
+          for (i=0; i<d->nrows_in_plot; i++) {
+            k = d->rows_in_plot[i];
             if (k == id)
               ;
             else
-              if (gg->clusterid.vals[k] == cur_clust)
-                if (!gg->hidden_now[k])
-                  move_pt_history_add (k, sp, gg);
+              if (d->clusterids.vals[k] == cur_clust)
+                if (!d->hidden_now[k])
+                  movepts_history_add (k, sp, d, gg);
           }
         }
       }

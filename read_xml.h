@@ -130,7 +130,7 @@ gboolean allocEdges(const CHAR **attrs, XMLParserData *data);
 gboolean addEdge(const CHAR **attrs, XMLParserData *data);
 gint rowId(const gchar *tmp, XMLParserData *data);
 
-gboolean data_xml_read(const gchar *filename, ggobid *gg);
+gboolean data_xml_read (const gchar *filename, ggobid *gg);
 
 gboolean setHidden(const CHAR **attrs, XMLParserData *data, gint i, enum HiddenType);
 

@@ -9,23 +9,25 @@
 static void
 id_remove_labels_cb (GtkWidget *w, ggobid *gg)
 {
-  g_slist_free (gg->identify.sticky_ids);
-  gg->identify.sticky_ids = (GSList *) NULL;
+  datad *d = gg->current_display->d;
+
+  g_slist_free (d->sticky_ids);
+  d->sticky_ids = (GSList *) NULL;
   displays_plot (NULL, QUICK, gg);
 }
 static void
 id_all_sticky_cb (GtkWidget *w, ggobid *gg)
 {
   gint i, m;
+  datad *d = gg->current_display->d;
 
   /*-- clear the list before adding to avoid redundant entries --*/
-  g_slist_free (gg->identify.sticky_ids);
-  gg->identify.sticky_ids = (GSList *) NULL;
+  g_slist_free (d->sticky_ids);
+  d->sticky_ids = (GSList *) NULL;
 
-  for (m=0; m<gg->nrows_in_plot; m++) {
-    i = gg->rows_in_plot[m];
-    gg->identify.sticky_ids = g_slist_append (gg->identify.sticky_ids,
-                                              GINT_TO_POINTER (i));
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot[m];
+    d->sticky_ids = g_slist_append (d->sticky_ids, GINT_TO_POINTER (i));
   }
   displays_plot (NULL, QUICK, gg);
 }
@@ -67,6 +69,7 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gint k;
   ggobid *gg = GGobiFromSPlot(sp);
+  datad *d = gg->current_display->d;
 
 /*
  * w = sp->da
@@ -77,10 +80,10 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 /*-- use mousepos_get_motion for this --*/
   gdk_window_get_pointer (w->window,
     &gg->mousepos.x, &gg->mousepos.y, NULL);
-  k = find_nearest_point (&gg->mousepos, sp, gg);
-  gg->app.nearest_point = k;
+  k = find_nearest_point (&gg->mousepos, sp, d, gg);
+  d->nearest_point = k;
 
-  if (k != gg->app.nearest_point_prev) {
+  if (k != d->nearest_point_prev) {
 
     splot_pixmap0_to_pixmap1 (sp, false, gg);
 
@@ -97,7 +100,7 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
         k, sp, w, gg);
     }
 
-    gg->app.nearest_point_prev = k;
+    d->nearest_point_prev = k;
   }
 
   return true;  /* no need to propagate the event */
@@ -107,21 +110,22 @@ static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
 /*
- * If nearest_point is a member of gg->identify.sticky_ids, remove it; if
+ * If nearest_point is a member of gg->sticky_ids, remove it; if
  * it isn't, add it.
 */
   ggobid *gg = GGobiFromSPlot (sp);
   gint id;
   gboolean id_in_list = false;
   gpointer ptr;
+  datad *d = gg->current_display->d;
 
-  if (gg->app.nearest_point != -1) {
+  if (d->nearest_point != -1) {
 
-    if (g_slist_length (gg->identify.sticky_ids) > 0) {
+    if (g_slist_length (d->sticky_ids) > 0) {
       GSList *l;
-      for (l = gg->identify.sticky_ids; l; l = l->next) {
+      for (l = d->sticky_ids; l; l = l->next) {
         id = GPOINTER_TO_INT (l->data);
-        if (id == gg->app.nearest_point) {
+        if (id == d->nearest_point) {
           id_in_list = true;
           ptr = l->data;
           break;
@@ -129,12 +133,12 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       }
 
       if (id_in_list)
-        gg->identify.sticky_ids = g_slist_remove (gg->identify.sticky_ids, ptr);
+        d->sticky_ids = g_slist_remove (d->sticky_ids, ptr);
     }
 
     if (!id_in_list) {
-      ptr = GINT_TO_POINTER (gg->app.nearest_point);
-      gg->identify.sticky_ids = g_slist_append (gg->identify.sticky_ids, ptr);
+      ptr = GINT_TO_POINTER (d->nearest_point);
+      d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
     }
   }
 

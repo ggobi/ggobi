@@ -68,6 +68,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
   displayd *display = (displayd *)
     gtk_object_get_data (GTK_OBJECT (w), "display");
+  datad *d = display->d;
 
   switch (action) {
     case DOPT_POINTS:
@@ -87,7 +88,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
       display_plot (display, FULL, gg);
       break;
     case DOPT_MISSINGS:  /*-- only in scatmat and parcoords --*/
-      if (!display->missing_p && gg->nmissing > 0) {
+      if (!display->missing_p && d->nmissing > 0) {
         display->options.missings_show_p = w->active;
 
         if (display->displaytype == parcoords) {
@@ -147,7 +148,8 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display)
 /*----------------------------------------------------------------------*/
 
 displayd *
-display_alloc_init (enum displaytyped type, gboolean missing_p, ggobid *gg)
+display_alloc_init (enum displaytyped type, gboolean missing_p,
+  datad *d, ggobid *gg)
 {
   displayd *display = (displayd *) g_malloc (sizeof (displayd));
   display->displaytype = type; 
@@ -162,6 +164,7 @@ display_alloc_init (enum displaytyped type, gboolean missing_p, ggobid *gg)
   display->options = DefaultDisplayOptions;
 
   display->ggobi = gg;
+  display->d = d;
 
   return (display);
 }
@@ -178,12 +181,15 @@ display_create (guint action, ggobid *gg)
   displayd *display;
   gint *selected_vars, nselected_vars = 0;
 
-  if (gg->nrows == 0)  /*-- if used before we have data --*/
+  /*-- by default, use the 0th datad in the list --*/
+  datad *d = (datad *) g_slist_nth_data (gg->d, 0);
+
+  if (d == NULL || d->nrows == 0)  /*-- if used before we have data --*/
     return (NULL);
 
   /*-- find out what variable are selected in the var statistics panel --*/
-  selected_vars = (gint *) g_malloc (gg->ncols * sizeof (gint));
-  nselected_vars = selected_cols_get (selected_vars, false, gg);
+  selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+  nselected_vars = selected_cols_get (selected_vars, false, d, gg);
 
   /*
    * Turn off event handlers, remove submenus, and redraw the
@@ -194,13 +200,13 @@ display_create (guint action, ggobid *gg)
   switch (action) {
 
     case 0:
-      display = scatterplot_new (false, NULL, gg);
+      display = scatterplot_new (false, NULL, d, gg);
       break;
 
     case 1:
       display = scatmat_new (false,
         nselected_vars, selected_vars, nselected_vars, selected_vars,
-        gg);
+        d, gg);
       break;
 
     case 2:
@@ -212,20 +218,20 @@ display_create (guint action, ggobid *gg)
       */
       /* vardialog_open (gg, "Select variables for plotting"); */
 
-      display = parcoords_new (false, nselected_vars, selected_vars, gg);
+      display = parcoords_new (false, nselected_vars, selected_vars, d, gg);
       break;
 
     case 3:  /*-- scatterplot of missing values --*/
-      if (gg->nmissing)
-        display = scatterplot_new (true, NULL, gg);
+      if (d->nmissing)
+        display = scatterplot_new (true, NULL, d, gg);
 
       break;
 
     case 4:  /*-- scatterplot matrix of missing values --*/
-      if (gg->nmissing)
+      if (d->nmissing)
         display = scatmat_new (true,
           nselected_vars, selected_vars, nselected_vars, selected_vars,
-          gg);
+          d, gg);
       break;
 
     default:
@@ -350,7 +356,7 @@ display_set_current (displayd *new_display, ggobid *gg)
 {
   gchar *title;
 
-  if(new_display == NULL)
+  if (new_display == NULL)
    return;
 
   gtk_accel_group_unlock (gg->main_accel_group);
@@ -415,7 +421,7 @@ display_set_current (displayd *new_display, ggobid *gg)
   gg->current_display = new_display;
   cpanel_set (gg->current_display, gg);
 
-  varpanel_refresh (gg);
+  varpanel_refresh (gg->current_display->d, gg);
 
   gtk_accel_group_lock (gg->main_accel_group);
   gg->firsttime = false;

@@ -109,17 +109,21 @@ void set_block_incr_cb (GtkAdjustment *adj, GtkSpinButton *spin )
 
 /*------------------------------------------------------------------*/
 
+/*
+ * note that this uses d->nrows.  What happens if it remains open
+ * and the value of d is reset?
+*/
 void
-subset_window_open (ggobid *gg) {
+subset_window_open (datad *d, ggobid *gg) {
 
   GtkWidget *button, *t;
   GtkWidget *vbox, *frame, *hb, *vb;
   GtkWidget *label;
   GtkWidget *spinner, *start_spinner, *block_spinner;
   GtkAdjustment *adj;
-  gfloat fnr = (gfloat) gg->nrows;
+  gfloat fnr = (gfloat) d->nrows;
 
-  if (gg->nrows == 0)  /*-- if used before we have data --*/
+  if (d->nrows == 0)  /*-- if used before we have data --*/
     return;
 
   if (gg->subset.window == NULL) {
@@ -158,7 +162,7 @@ subset_window_open (ggobid *gg) {
     gg->subset.random_entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (gg->subset.random_entry), 8);
     gtk_entry_set_text (GTK_ENTRY (gg->subset.random_entry),
-      g_strdup_printf ("%d", gg->nrows));
+      g_strdup_printf ("%d", d->nrows));
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset.random_entry,
       "Type in the desired sample size", NULL);
     gtk_box_pack_start (GTK_BOX (hb), gg->subset.random_entry,

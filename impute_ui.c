@@ -27,6 +27,7 @@ static void
 impute_cb (GtkWidget *w, ggobid *gg) {
   gint impute_type;
   gboolean redraw = true;
+  datad *d = gg->current_display->d;
 
   impute_type = 
     gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->impute.notebook));
@@ -44,8 +45,8 @@ impute_cb (GtkWidget *w, ggobid *gg) {
 
   if (redraw) {
     if (gg->impute.rescale_p)
-      vardata_lim_update (gg);
-    tform_to_world (gg);
+      vardata_lim_update (d, gg);
+    tform_to_world (d, gg);
     displays_tailpipe (REDISPLAY_ALL, gg);
   }
 }
@@ -67,8 +68,9 @@ impute_window_open (ggobid *gg) {
   GtkWidget *button, *tgl, *opt;
   GtkWidget *vbox, *frame, *hb;
   GtkWidget *label;
+  datad *d = gg->current_display->d;
 
-  if (gg->nrows == 0)  /*-- if used before we have data --*/
+  if (d->nrows == 0)  /*-- if used before we have data --*/
     return;
 
   if (gg->impute.window == NULL) {

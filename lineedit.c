@@ -14,14 +14,14 @@
 */
 
 void
-edges_alloc (gint nsegs, ggobid *gg)
+edges_alloc (gint nsegs, datad *d, ggobid *gg)
 {
   gg->edge_endpoints = (endpointsd *)
     g_realloc (gg->edge_endpoints, nsegs * sizeof (endpointsd));
 }
 
 void
-edges_free (ggobid *gg)
+edges_free (datad *d, ggobid *gg)
 {
   g_free ((gpointer) gg->edge_endpoints);
 }
@@ -31,11 +31,11 @@ edges_free (ggobid *gg)
 /* --------------------------------------------------------------- */
 
 void
-edges_create (ggobid *gg)
+edges_create (datad *d, ggobid *gg)
 {
   gint i;
 
-  gg->nedges = gg->nrows - 1;
+  gg->nedges = d->nrows - 1;
   gg->edge_endpoints = (endpointsd *)
     g_realloc ((gpointer) gg->edge_endpoints,
     gg->nedges * sizeof (endpointsd));

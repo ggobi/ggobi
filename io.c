@@ -17,7 +17,7 @@
 extern gboolean ggobi_file_set_create (gchar *rootname, ggobid *gg);
 
 void
-filesel_ok (GtkWidget *w, GtkFileSelection *fs)
+filesel_ok (GtkWidget *w, datad *d, GtkFileSelection *fs)
 {
   extern const gchar* const key_get (void);
   ggobid *gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), key_get());
@@ -31,7 +31,7 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
   switch (action) {
     case READ_FILESET:
       /*-- deal with suffixes? --*/
-      if (fileset_read_init (fname, gg)) 
+      if (fileset_read_init (fname, d, gg)) 
         ;
       break;
     case EXTEND_FILESET:  /*-- not yet enabled --*/

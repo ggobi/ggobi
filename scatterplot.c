@@ -170,18 +170,19 @@ scatterplot_display_menus_make (displayd *display,
 
 
 displayd *
-scatterplot_new (gboolean missing_p, splotd *sp, ggobid *gg) {
+scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   GtkWidget *table, *vbox;
   GtkWidget *mbar;
   displayd *display;
 
-  if (gg->ncols < 2)
+  if (d == NULL || d->ncols < 2)
     return (NULL);
 
   if (sp == NULL) {
-    display = display_alloc_init (scatterplot, missing_p, gg);
+    display = display_alloc_init (scatterplot, missing_p, d, gg);
   } else {
-   display = (displayd*) sp->displayptr;
+    display = (displayd*) sp->displayptr;
+    display->d = d;
   }
 
 
@@ -226,7 +227,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, ggobid *gg) {
   /* 
    * Initialize tour
    */
-  if (display->displaytype == scatterplot && gg->ncols > 2) 
+  if (display->displaytype == scatterplot && d->ncols > 2) 
     display_tour_init(display, gg);
 
   table = gtk_table_new (3, 2, false);  /* rows, columns, homogeneous */

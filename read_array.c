@@ -53,8 +53,8 @@ strip_suffixes (ggobid *gg)
     gg->fname = g_strdup (gg->filename);
 }
 
-void
-read_binary (FILE *fp, ggobid *gg)
+static void
+read_binary (FILE *fp, datad *d, ggobid *gg)
 {
   gint i, j, nr, nc;
   gint onesize = sizeof (gfloat);
@@ -62,35 +62,35 @@ read_binary (FILE *fp, ggobid *gg)
 
   fread ((gchar *) &nr, sizeof (gint), 1, fp);
   fread ((gchar *) &nc, sizeof (gint), 1, fp);
-  gg->ncols = nc;
+  d->ncols = nc;
 
   /*
    * As soon as the number of columns is known, allocate vardata.
   */
-  vardata_alloc (gg);
-  vardata_init (gg);
+  vardata_alloc (d, gg);
+  vardata_init (d, gg);
 
-  gg->nrows = nr;
+  d->nrows = nr;
 
-  arrayf_alloc (&gg->raw, gg->nrows, gg->ncols);
+  arrayf_alloc (&d->raw, d->nrows, d->ncols);
 
-  for (i=0; i<gg->nrows; i++) {
-    for (j=0; j<gg->ncols; j++) {
-      out = fread ((gchar *) &gg->raw.vals[i][j], onesize, 1, fp);
+  for (i=0; i<d->nrows; i++) {
+    for (j=0; j<d->ncols; j++) {
+      out = fread ((gchar *) &d->raw.vals[i][j], onesize, 1, fp);
       if (out != 1) {
         g_printerr ("problem in reading the binary data file\n");
         fclose (fp);
         exit (0);
 
-      } else if (gg->raw.vals[i][j] == FLT_MAX) {
-        gg->raw.vals[i][j] = 0.0;
+      } else if (d->raw.vals[i][j] == FLT_MAX) {
+        d->raw.vals[i][j] = 0.0;
 
         /* Allocate the missing values array */
-        if (gg->nmissing == 0)
-          arrays_alloc (&gg->missing, gg->nrows, gg->ncols);
-        gg->missing.vals[i][j] = 1;
-        gg->vardata[j].nmissing++;
-        gg->nmissing++;
+        if (d->nmissing == 0)
+          arrays_alloc (&d->missing, d->nrows, d->ncols);
+        d->missing.vals[i][j] = 1;
+        d->vardata[j].nmissing++;
+        d->nmissing++;
       }
     }
   }
@@ -158,7 +158,7 @@ find_data_start (FILE *fp)
 }
 
 gint
-row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, ggobid *gg) {
+row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, datad *d, ggobid *gg) {
 
   gint j, ch;
   gboolean found_row = true;
@@ -189,7 +189,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, ggobid *gg) {
       } else {
 
         if (g_strcasecmp (word, "na") == 0 || strcmp (word, ".") == 0) {
-          gg->nmissing++;
+          d->nmissing++;
           row1_missing[ncols] = 1;
 
         } else {
@@ -199,7 +199,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, ggobid *gg) {
         ncols++;
         gotone = true;  /*-- suppress the alarm -- the file pointer is ok --*/
 
-        if (gg->ncols >= MAXNCOLS) {
+        if (d->ncols >= MAXNCOLS) {
           g_printerr (
             "This file has more than %d columns.  In order to read\n", MAXNCOLS);
           g_printerr (" it in, increase MAXNCOLS in defines.h and recompile.\n");
@@ -212,8 +212,8 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, ggobid *gg) {
   return ncols;
 }
 
-void
-read_ascii (FILE *fp, ggobid *gg)
+static void
+read_ascii (FILE *fp, datad *d, ggobid *gg)
 {
   gint j, jrows, nrows, jcols, fs;
   gint nitems;
@@ -223,32 +223,32 @@ read_ascii (FILE *fp, ggobid *gg)
   gshort row1_missing[MAXNCOLS];
 
   /*-- Read in the first row of the data and calculate ncols. --*/
-  gg->ncols = row1_read (fp, row1, row1_missing, gg);
+  d->ncols = row1_read (fp, row1, row1_missing, d, gg);
 
   /*-- Once the number of columns is known, allocate vardata. --*/
-  vardata_alloc (gg);
-  vardata_init (gg);
+  vardata_alloc (d, gg);
+  vardata_init (d, gg);
 
 /*
  * allocate the first block.
 */
-  gg->nrows = 0;
-  arrayf_alloc (&gg->raw, BLOCKSIZE, gg->ncols);
-  if (gg->nmissing > 0)
-    arrays_alloc_zero (&gg->missing, BLOCKSIZE, gg->ncols);
+  d->nrows = 0;
+  arrayf_alloc (&d->raw, BLOCKSIZE, d->ncols);
+  if (d->nmissing > 0)
+    arrays_alloc_zero (&d->missing, BLOCKSIZE, d->ncols);
 
   /*-- copy the values in row1 to the main array --*/
-  for (j=0; j<gg->ncols; j++)
-    gg->raw.vals[0][j] = row1[j];
-  if (gg->nmissing > 0) {
-    for (j=0; j<gg->ncols; j++)
-      gg->missing.vals[0][j] = row1_missing[j];
+  for (j=0; j<d->ncols; j++)
+    d->raw.vals[0][j] = row1[j];
+  if (d->nmissing > 0) {
+    for (j=0; j<d->ncols; j++)
+      d->missing.vals[0][j] = row1_missing[j];
   }
 
 
 /*-- Read, reallocating as needed.  Determine nrows for the read_all case. --*/
   nblocks = 1;
-  nitems = gg->ncols;
+  nitems = d->ncols;
   jrows = 1;
   nrows = 1;
   jcols = 0;
@@ -272,26 +272,26 @@ read_ascii (FILE *fp, ggobid *gg)
 
       if (g_strcasecmp (word, "na") == 0 || strcmp (word, ".") == 0) {
 
-        if (gg->nmissing == 0) {
+        if (d->nmissing == 0) {
           /*
            * When the first "na" or "." has been encountered,
            * allocate space to contain the missing values matrix.
            * Initialize all previous values to 0.
           */
-          arrays_alloc (&gg->missing, nblocks*BLOCKSIZE, gg->ncols);
+          arrays_alloc (&d->missing, nblocks*BLOCKSIZE, d->ncols);
         }
 
-        gg->nmissing++;
-        gg->vardata[jcols].nmissing++;
-        gg->missing.vals[nrows][jcols] = 1;
-        gg->raw.vals[nrows][jcols] = 0.0;
+        d->nmissing++;
+        d->vardata[jcols].nmissing++;
+        d->missing.vals[nrows][jcols] = 1;
+        d->raw.vals[nrows][jcols] = 0.0;
       }
       else {  /*-- not missing --*/
-        gg->raw.vals[nrows][jcols] = (gfloat) atof (word);
+        d->raw.vals[nrows][jcols] = (gfloat) atof (word);
       }
 
       jcols++;
-      if (jcols == gg->ncols)  /*-- we just completed a row --*/
+      if (jcols == d->ncols)  /*-- we just completed a row --*/
       {
         jcols = 0;
         nrows++;
@@ -304,9 +304,9 @@ read_ascii (FILE *fp, ggobid *gg)
         if (nblocks%20 == 0)
           g_printerr ("reallocating; n > %d\n", nblocks*BLOCKSIZE);
 
-        arrayf_add_rows (&gg->raw, nblocks*BLOCKSIZE);
-        if (gg->nmissing > 0)
-          arrays_add_rows (&gg->missing, nblocks*BLOCKSIZE);
+        arrayf_add_rows (&d->raw, nblocks*BLOCKSIZE);
+        if (d->nmissing > 0)
+          arrays_add_rows (&d->missing, nblocks*BLOCKSIZE);
       }
     }
   }
@@ -315,14 +315,14 @@ read_ascii (FILE *fp, ggobid *gg)
   if (fclose (fp) == EOF)
     g_printerr ("read_ascii: error in fclose");
 
-  gg->nrows = nrows;
+  d->nrows = nrows;
 
-  g_print ("size of data: %d x %d\n", gg->nrows, gg->ncols);
+  g_print ("size of data: %d x %d\n", d->nrows, d->ncols);
 
-  if (nitems != gg->nrows * gg->ncols) {
+  if (nitems != d->nrows * d->ncols) {
     g_printerr ("read_ascii: nrows*ncols != nitems read\n");
     g_printerr ("(nrows= %d, ncols= %d, nitems read= %d)\n",
-      gg->nrows, gg->ncols, nitems);
+      d->nrows, d->ncols, nitems);
     exit (0);
   } else if (nitems == 0) {
     g_printerr ("No data was read\n");
@@ -333,26 +333,26 @@ read_ascii (FILE *fp, ggobid *gg)
      * One last free and realloc to make these arrays take up exactly
      * the amount of space they need.
     */
-    arrayf_free (&gg->raw, gg->nrows, gg->ncols);
-    if (gg->nmissing)
-      arrays_free (&gg->missing, gg->nrows, gg->ncols);
+    arrayf_free (&d->raw, d->nrows, d->ncols);
+    if (d->nmissing)
+      arrays_free (&d->missing, d->nrows, d->ncols);
   }
 
   /*-- finally handle the 1-column case: insert a column --*/
-  gg->single_column = (gg->ncols == 1);
-  if (gg->single_column) {
+  d->single_column = (d->ncols == 1);
+  if (d->single_column) {
     gint i;
-    arrayf_add_cols (&gg->raw, 2);
-    for (i=0; i<gg->nrows; i++) {
-      gg->raw.vals[i][1] = gg->raw.vals[i][0];
-      gg->raw.vals[i][0] = (gfloat) (i+1);
+    arrayf_add_cols (&d->raw, 2);
+    for (i=0; i<d->nrows; i++) {
+      d->raw.vals[i][1] = d->raw.vals[i][0];
+      d->raw.vals[i][0] = (gfloat) (i+1);
     }
 
-    if (gg->nmissing) {
-      arrays_add_cols (&gg->missing, 2);
-      for (i=0; i<gg->nrows; i++) {
-        gg->missing.vals[i][1] = gg->missing.vals[i][0];
-        gg->missing.vals[i][0] = 0;
+    if (d->nmissing) {
+      arrays_add_cols (&d->missing, 2);
+      for (i=0; i<d->nrows; i++) {
+        d->missing.vals[i][1] = d->missing.vals[i][0];
+        d->missing.vals[i][0] = 0;
       }
     }
   }
@@ -364,7 +364,7 @@ read_ascii (FILE *fp, ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 void
-array_read (ggobid *gg)
+array_read (datad *d, ggobid *gg)
 {
   gchar fname[128];
   FILE *fp;
@@ -385,7 +385,7 @@ array_read (ggobid *gg)
     signal (SIGALRM, stdin_empty);
 #endif
 
-    read_ascii (fp, gg);
+    read_ascii (fp, d, gg);
   }
   else
   {
@@ -397,7 +397,7 @@ array_read (ggobid *gg)
     strcat (fname, ".bin");
 
     if ((fp = fopen (fname, "rb")) != NULL)
-      read_binary (fp, gg);
+      read_binary (fp, d, gg);
 
     /*
      * If not, look for an ASCII file
@@ -405,7 +405,7 @@ array_read (ggobid *gg)
     else {
       static gchar *suffixes[] = {"", ".dat"};
       if ( (fp=open_ggobi_file_r (gg->fname, 2, suffixes, false)) != NULL)
-        read_ascii (fp, gg);
+        read_ascii (fp, d, gg);
       else
         exit (1);
         

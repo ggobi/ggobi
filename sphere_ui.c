@@ -11,20 +11,20 @@
 
 void sphere_enable (gboolean sens, ggobid* gg)
 {
-  gtk_widget_set_sensitive (gg->sphere.sphere_apply_btn, sens);
+  gtk_widget_set_sensitive (gg->sphere_ui.sphere_apply_btn, sens);
 }
 
 void sphere_condnum_set (gfloat x, ggobid* gg)
 {
   gchar *lbl = g_strdup_printf ("%5.1f", x);
-  gtk_entry_set_text (GTK_ENTRY (gg->sphere.condnum_entry), lbl);
+  gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.condnum_entry), lbl);
   g_free (lbl);
 }
 
-void sphere_totvar_set (gfloat x, ggobid* gg)
+void sphere_totvar_set (gfloat x, datad *d, ggobid* gg)
 {
   gchar *lbl = g_strdup_printf ("%.2e", x);
-  gtk_entry_set_text (GTK_ENTRY (gg->sphere.totvar_entry), lbl);
+  gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.totvar_entry), lbl);
   g_free (lbl);
 }
 
@@ -36,7 +36,9 @@ void
 sphere_npcs_set_cb (GtkAdjustment *adj, ggobid *gg) 
 {
   gint n = (gint) adj->value;
-  sphere_npcs_set (n, gg);
+  datad *d = gg->current_display->d;
+
+  sphere_npcs_set (n, d, gg);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -70,15 +72,16 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
   gint xpos, ypos, xstrt, ystrt;
   gchar *tickmk;
   GtkStyle *style = gtk_widget_get_style (scree_da);
+  datad *d = gg->current_display->d;
 
-  gint *sphvars = (gint *) g_malloc (gg->ncols * sizeof (gint));
-  gfloat *evals = (gfloat *) g_malloc (gg->ncols * sizeof (gfloat));
+  gint *sphvars = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gfloat *evals = (gfloat *) g_malloc (d->ncols * sizeof (gfloat));
 
-  gint nsphvars = spherevars_get (sphvars, gg);
+  gint nsphvars = spherevars_get (sphvars, d, gg);
 
-CHECK_GG(gg);
+  CHECK_GG(gg);
 
-  eigenvals_get (evals, gg);
+  eigenvals_get (evals, d, gg);
 
 for (j=0; j<nsphvars; j++)
 g_printerr ("(expose) sphvar %d eval %f\n", sphvars[j], evals[j]);
@@ -125,12 +128,13 @@ g_printerr ("(expose) sphvar %d eval %f\n", sphvars[j], evals[j]);
 */
 void scree_plot_make (ggobid *gg)  /*-- when sphere panel is opened --*/
 {
-g_printerr ("(scree_plot_make)\n");
-  if (pca_calc (gg)) {
+  datad *d = gg->current_display->d;
+
+  if (pca_calc (d, gg)) {
     gboolean rval = false;
     gtk_signal_emit_by_name (GTK_OBJECT (scree_da), "expose_event",
       (gpointer) NULL, (gpointer) &rval);
-    pca_diagnostics_set (gg);
+    pca_diagnostics_set (d, gg);
   } else {
      quick_message ("Variance-covariance is identity already!\n", false);
   }
@@ -140,6 +144,7 @@ g_printerr ("(scree_plot_make)\n");
 /*                     Create and map the sphere panel                     */
 /*-------------------------------------------------------------------------*/
 
+/*-- this should be independent of datad --*/
 void
 sphere_panel_open (ggobid *gg)
 {
@@ -147,19 +152,20 @@ sphere_panel_open (ggobid *gg)
   GtkWidget *vb, *label;
   GtkWidget *hb, *npcs_spinner;
   gint nvars;
+  datad *d = gg->current_display->d;
 
-  spherevars_set (gg);
-  nvars = nspherevars_get (gg);
+  spherevars_set (d, gg);
+  nvars = nspherevars_get (d, gg);
 
-  if (gg->sphere.window == NULL) {
+  if (gg->sphere_ui.window == NULL) {
     
-    gg->sphere.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (gg->sphere.window),
+    gg->sphere_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (gg->sphere_ui.window),
       "sphere variables");
-    gtk_container_set_border_width (GTK_CONTAINER (gg->sphere.window), 10);
+    gtk_container_set_border_width (GTK_CONTAINER (gg->sphere_ui.window), 10);
 
     hbox = gtk_hbox_new (false, 2);
-    gtk_container_add (GTK_CONTAINER (gg->sphere.window), hbox);
+    gtk_container_add (GTK_CONTAINER (gg->sphere_ui.window), hbox);
 
     /* Controls to the left */
     vbox = gtk_vbox_new (false, 5);
@@ -179,13 +185,13 @@ sphere_panel_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vb), hb, true, true, 2);
     
     /*-- the parameters of the adjustment should be reset each time --*/
-    gg->sphere.npcs_adj = (GtkAdjustment *)
-      gtk_adjustment_new ((gfloat) nvars, 1.0, (gfloat) gg->ncols,
+    gg->sphere_ui.npcs_adj = (GtkAdjustment *)
+      gtk_adjustment_new ((gfloat) nvars, 1.0, (gfloat) d->ncols,
                           1.0, 5.0, 0.0);
-    gtk_signal_connect (GTK_OBJECT (gg->sphere.npcs_adj), "value_changed",
+    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.npcs_adj), "value_changed",
 		                GTK_SIGNAL_FUNC (sphere_npcs_set_cb),
 		                gg);
-    npcs_spinner = gtk_spin_button_new (gg->sphere.npcs_adj, 0, 0);
+    npcs_spinner = gtk_spin_button_new (gg->sphere_ui.npcs_adj, 0, 0);
 
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (npcs_spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (npcs_spinner),
@@ -195,14 +201,14 @@ sphere_panel_open (ggobid *gg)
       NULL);
     gtk_box_pack_start (GTK_BOX (hb), npcs_spinner, true, true, 0);
 
-    gg->sphere.sphere_apply_btn = gtk_button_new_with_label ("Apply");
-    gtk_box_pack_start (GTK_BOX (hb), gg->sphere.sphere_apply_btn,
+    gg->sphere_ui.sphere_apply_btn = gtk_button_new_with_label ("Apply");
+    gtk_box_pack_start (GTK_BOX (hb), gg->sphere_ui.sphere_apply_btn,
       false, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-      gg->sphere.sphere_apply_btn,
+      gg->sphere_ui.sphere_apply_btn,
       "Perform principal components transformation for the first n variables",
       NULL);
-    gtk_signal_connect (GTK_OBJECT (gg->sphere.sphere_apply_btn), "clicked",
+    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.sphere_apply_btn), "clicked",
                         GTK_SIGNAL_FUNC (sphere_apply_cb), gg);
 
     /*-- the labels, in a frame --*/
@@ -223,13 +229,13 @@ sphere_panel_open (ggobid *gg)
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
-    gg->sphere.totvar_entry = gtk_entry_new ();
-    gtk_entry_set_editable (GTK_ENTRY (gg->sphere.totvar_entry), false);
-    gtk_entry_set_text (GTK_ENTRY (gg->sphere.totvar_entry), "-");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere.totvar_entry,
+    gg->sphere_ui.totvar_entry = gtk_entry_new ();
+    gtk_entry_set_editable (GTK_ENTRY (gg->sphere_ui.totvar_entry), false);
+    gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.totvar_entry), "-");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.totvar_entry,
       "The percentage of variance accounted for by the selected variables",
       NULL);
-    gtk_box_pack_start (GTK_BOX (vb), gg->sphere.totvar_entry,
+    gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.totvar_entry,
       true, true, 2);
 
     /*-- condition number --*/
@@ -240,13 +246,13 @@ sphere_panel_open (ggobid *gg)
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
-    gg->sphere.condnum_entry = gtk_entry_new ();
-    gtk_entry_set_editable (GTK_ENTRY (gg->sphere.condnum_entry), false);
-    gtk_entry_set_text (GTK_ENTRY (gg->sphere.condnum_entry), "-");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere.condnum_entry,
+    gg->sphere_ui.condnum_entry = gtk_entry_new ();
+    gtk_entry_set_editable (GTK_ENTRY (gg->sphere_ui.condnum_entry), false);
+    gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.condnum_entry), "-");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.condnum_entry,
       "The condition number for the selected variables",
       NULL);
-    gtk_box_pack_start (GTK_BOX (vb), gg->sphere.condnum_entry,
+    gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.condnum_entry,
       true, true, 2);
 
 
@@ -271,7 +277,7 @@ sphere_panel_open (ggobid *gg)
                         (gpointer) gg);
   }
 
-  gtk_widget_show_all (gg->sphere.window);
+  gtk_widget_show_all (gg->sphere_ui.window);
 
   scree_plot_make (gg);
 }

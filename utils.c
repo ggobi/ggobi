@@ -293,22 +293,22 @@ print_attachments (ggobid *gg) {
 }
 
 gint
-get_vgroup_cols (gint k, gint *cols, ggobid *gg) {
+get_vgroup_cols (gint k, gint *cols, datad *d, ggobid *gg) {
 /*
  * Return all columns in the same vgroup as k
 */
   gint j, ncols = 0;
-  gint groupno = gg->vardata[k].groupid;
+  gint groupno = d->vardata[k].groupid;
 
-  for (j=0; j<gg->ncols; j++)
-    if (gg->vardata[j].groupid == groupno)
+  for (j=0; j<d->ncols; j++)
+    if (d->vardata[j].groupid == groupno)
        cols[ncols++] = j;
 
   return ncols;
 }
 
 gint
-selected_cols_get (gint *cols, gboolean add_vgroups, ggobid *gg)
+selected_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg)
 {
 /*
  * Figure out which columns are selected.  If (add_vgroups),
@@ -318,17 +318,17 @@ selected_cols_get (gint *cols, gboolean add_vgroups, ggobid *gg)
   gint groupno;
   gboolean included;
 
-  for (j=0; j<gg->ncols; j++)
-    if (gg->vardata[j].selected)
+  for (j=0; j<d->ncols; j++)
+    if (d->vardata[j].selected)
       cols[ncols++] = j;
 
   if (add_vgroups) {
     /*-- now add their fellow vgroup members --*/
-    for (j=0; j<gg->ncols; j++) {
-      groupno = gg->vardata[j].groupid;
+    for (j=0; j<d->ncols; j++) {
+      groupno = d->vardata[j].groupid;
       /*-- look for j's fellow group members --*/
-      for (k=0; k<gg->ncols; k++) {
-        if (k != j && gg->vardata[k].groupid == groupno) {
+      for (k=0; k<d->ncols; k++) {
+        if (k != j && d->vardata[k].groupid == groupno) {
           /*-- if k is not already in cols, add it */
           included = false;
           for (n=0; n<ncols; n++) {
@@ -351,24 +351,24 @@ selected_cols_get (gint *cols, gboolean add_vgroups, ggobid *gg)
  * this is how we find out which columns are selected for plotting.
 */
 gint
-plotted_cols_get (gint *cols, gboolean add_vgroups, ggobid *gg) 
+plotted_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg) 
 {
   gint mode = mode_get (gg);
   gint j, ncols;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
-  for (j=0; j<gg->ncols; j++) {
+  for (j=0; j<d->ncols; j++) {
     /*-- if j is plotted in the current splot ... --*/
     switch (display->displaytype) {
       case scatterplot:
         switch (mode) {
           case P1PLOT:
-            vartable_select_var (sp->p1dvar, true, gg);
+            vartable_select_var (sp->p1dvar, true, d, gg);
             break;
           case XYPLOT:
-            vartable_select_var (sp->xyvars.x, true, gg);
-            vartable_select_var (sp->xyvars.y, true, gg);
+            vartable_select_var (sp->xyvars.x, true, d, gg);
+            vartable_select_var (sp->xyvars.y, true, d, gg);
             break;
         }
         break;
@@ -379,7 +379,7 @@ plotted_cols_get (gint *cols, gboolean add_vgroups, ggobid *gg)
     }
   }
 
-  ncols = selected_cols_get (cols, add_vgroups, gg);
+  ncols = selected_cols_get (cols, add_vgroups, d, gg);
 
   /*
    * Having highlighted the plotted variables in the variable table
@@ -391,12 +391,12 @@ plotted_cols_get (gint *cols, gboolean add_vgroups, ggobid *gg)
 }
 
 gint
-address_check (ggobid *gg) 
+address_check (datad *d, ggobid *gg) 
 {
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %d nseg %d rowlab %s jitfac %f\n",
-    gg->data_mode, (gint) gg->world.vals[0][0], gg->nedges,
-    g_array_index (gg->rowlab, gchar *, 0), gg->jitter.factor);
+    gg->data_mode, (gint) d->world.vals[0][0], gg->nedges,
+    g_array_index (d->rowlab, gchar *, 0), d->jitter.factor);
 
   return 1;
 }

@@ -8,7 +8,7 @@
  */
 
 gboolean
-write_xml(const gchar *filename, ggobid *gg)
+write_xml(const gchar *filename, datad *d, ggobid *gg)
 {
   FILE *f;
   gboolean ok = false;
@@ -18,19 +18,19 @@ write_xml(const gchar *filename, ggobid *gg)
    return (false);
   }
 
-  ok = write_xml_stream(f, gg, filename);
+  ok = write_xml_stream(f, d, gg, filename);
   fclose(f);
   return ok;
 }
 
 gboolean
-write_xml_stream(FILE *f, ggobid *gg, const gchar *filename)
+write_xml_stream (FILE *f, datad *d, ggobid *gg, const gchar *filename)
 {
-  write_xml_header(f, gg);
-  write_dataset_header(f, gg);
-  write_xml_description(f, gg);
-  write_xml_variables(f, gg);
-  write_xml_records(f, gg);
+  write_xml_header (f, gg);
+  write_dataset_header (f, d, gg);
+  write_xml_description (f, gg);
+  write_xml_variables (f, d, gg);
+  write_xml_records (f, d, gg);
 /*-- skip for now, because there's no need to write the default edges --*/
 /*    write_xml_edges(f, gg);*/
   write_dataset_footer(f, gg);
@@ -39,7 +39,7 @@ write_xml_stream(FILE *f, ggobid *gg, const gchar *filename)
 }
 
 gboolean
-write_xml_header(FILE *f, ggobid *gg)
+write_xml_header (FILE *f, ggobid *gg)
 {
 
  fprintf(f, "<?xml version=\"1.0\"?>");
@@ -53,7 +53,7 @@ write_xml_header(FILE *f, ggobid *gg)
 }
 
 gboolean
-write_xml_description(FILE *f, ggobid *gg)
+write_xml_description (FILE *f, ggobid *gg)
 {
  fprintf(f,"<description>\n");
 
@@ -64,23 +64,23 @@ write_xml_description(FILE *f, ggobid *gg)
 }
 
 gboolean
-write_xml_variables(FILE *f, ggobid *gg)
+write_xml_variables (FILE *f, datad *d, ggobid *gg)
 {
- int i;
- fprintf(f,"<variables count=\"%d\">\n", gg->ncols); 
+  gint i;
+  fprintf(f,"<variables count=\"%d\">\n", d->ncols); 
 
-  for(i = 0; i < gg->ncols; i++) {
-   write_xml_variable(f, gg, i);
-   fprintf(f,"\n");
+  for(i = 0; i < d->ncols; i++) {
+    write_xml_variable (f, d, gg, i);
+    fprintf(f,"\n");
   }
 
- fprintf(f,"</variables>\n"); 
+  fprintf(f,"</variables>\n"); 
 
- return(true);
+  return(true);
 }
 
 gboolean
-write_xml_variable(FILE *f, ggobid *gg, int i)
+write_xml_variable(FILE *f, datad *d, ggobid *gg, gint i)
 {
 /*
    fprintf(f, "<variable");
@@ -92,21 +92,21 @@ write_xml_variable(FILE *f, ggobid *gg, int i)
 */
 
   fprintf(f, "<variable>");
-  fprintf(f,"%s", gg->vardata[i].collab);
+  fprintf(f,"%s", d->vardata[i].collab);
   fprintf(f, "</variable>");
 
   return(true);
 }
 
 gboolean
-write_xml_records(FILE *f, ggobid *gg)
+write_xml_records(FILE *f, datad *d, ggobid *gg)
 {
  int i;
  fprintf(f, "<records\n");
- fprintf(f, " numRecords=\"%d\"", gg->nrows);
+ fprintf(f, " numRecords=\"%d\"", d->nrows);
  fprintf(f, ">\n");
- for(i = 0; i < gg->nrows; i++) {
-  write_xml_record(f, gg, i);
+ for(i = 0; i < d->nrows; i++) {
+  write_xml_record(f, d, gg, i);
   fprintf(f, "\n");
  }
  fprintf(f, "</records>\n");
@@ -115,19 +115,19 @@ write_xml_records(FILE *f, ggobid *gg)
 }
 
 gboolean
-write_xml_record(FILE *f, ggobid *gg, gint i)
+write_xml_record (FILE *f, datad *d, ggobid *gg, gint i)
 {
   gint j;
   gchar *gstr;
   fprintf(f, "<record");
 
-  fprintf(f, " label=\"%s\"", g_array_index (gg->rowlab, gchar *, i));
-  fprintf(f, " color=\"%d\"", gg->color_ids[i]);
+  fprintf(f, " label=\"%s\"", g_array_index (d->rowlab, gchar *, i));
+  fprintf(f, " color=\"%d\"", d->color_ids[i]);
 /*
-  fprintf(f, " glyphSize=\"%d\"", gg->glyph_ids[i].size);
-  fprintf(f, " glyphType=\"%d\"", gg->glyph_ids[i].type);
+  fprintf(f, " glyphSize=\"%d\"", d->glyph_ids[i].size);
+  fprintf(f, " glyphType=\"%d\"", d->glyph_ids[i].type);
 */
-  switch (gg->glyph_ids[i].type) {
+  switch (d->glyph_ids[i].type) {
     case PLUS_GLYPH:
 /*      gstr = "+";*/
       gstr = "plus";
@@ -152,13 +152,13 @@ write_xml_record(FILE *f, ggobid *gg, gint i)
       break;
   }
 
-  fprintf(f, " glyph=\"%s %d\"", gstr, gg->glyph_ids[i].size);
+  fprintf(f, " glyph=\"%s %d\"", gstr, d->glyph_ids[i].size);
 
   fprintf(f, ">\n");
 
-  for(j = 0; j < gg->ncols; j++) {
-     writeFloat (f, gg->raw.vals[i][j]);
-     if (j < gg->ncols-1 )
+  for(j = 0; j < d->ncols; j++) {
+     writeFloat (f, d->raw.vals[i][j]);
+     if (j < d->ncols-1 )
        fprintf(f, " ");
   }
   fprintf(f, "\n</record>");
@@ -167,7 +167,7 @@ write_xml_record(FILE *f, ggobid *gg, gint i)
 }
 
 gboolean
-write_xml_edges(FILE *f, ggobid *gg)
+write_xml_edges (FILE *f, ggobid *gg)
 {
  int i;
  if(gg->nedges < 1)
@@ -201,10 +201,10 @@ writeFloat(FILE *f, double value)
 }
 
 gboolean
-write_dataset_header(FILE *f, ggobid *gg)
+write_dataset_header (FILE *f, datad *d, ggobid *gg)
 {
  fprintf(f,"<ggobidata ");
- fprintf(f, "numRecords=\"%d\"", gg->nrows);
+ fprintf(f, "numRecords=\"%d\"", d->nrows);
  fprintf(f,">\n");
 
  return(true);

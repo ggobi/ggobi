@@ -39,11 +39,11 @@ extern const gchar * const GGOBI(getDataModeDescription)(DataMode mode);
  * of doubles, arranged by column. Hence the double* for now.
  * A double array (double **) would be useful also.
 */
-extern void GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int nc, ggobid *gg);
+extern void GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames, gint nr, gint nc, datad *d, ggobid *gg);
 
 
 /* Whether to get the transformed names or the regular ones. */
-extern gchar **GGOBI(getVariableNames)(gboolean transformed, ggobid *gg);
+extern gchar **GGOBI(getVariableNames)(gboolean transformed, datad *, ggobid *);
 
 
 
@@ -51,7 +51,7 @@ extern gchar **GGOBI(getVariableNames)(gboolean transformed, ggobid *gg);
    Set the name of the jvar'th variable, either the regular
    name or that of the variable's tranformed counterpart.
  */
-extern void GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed, ggobid *gg);
+extern void GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed, datad *, ggobid *gg);
 
 
 extern gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents);
@@ -96,14 +96,14 @@ extern const gint  *GGOBI(getViewTypeIndices)(int *n);
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-extern const gfloat** GGOBI(getRawData)();
+extern const gfloat** GGOBI(getRawData)(datad *, ggobid *);
 
 /*
   Returns a pointer to the (second) transformation of the raw data.
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-extern const gfloat** GGOBI(getTFormData)();
+extern const gfloat** GGOBI(getTFormData)(datad *, ggobid *);
 
 
 /*
@@ -122,40 +122,40 @@ extern void GGOBI(destroyCurrentDisplay)();
   */
 extern const gchar ** GGOBI(getCaseNames)();
 
-extern void GGOBI(setCaseName)(gint pt, const gchar *lbl, ggobid *gg);
+extern void GGOBI(setCaseName)(gint pt, const gchar *lbl, datad *d, ggobid *gg);
 
 
-extern displayd *GGOBI(newScatterplot)(gint ix, gint iy, ggobid *gg);
-extern displayd *GGOBI(newScatmat)(gint *rows, gint *columns, int nr, int nc, ggobid *gg);
-extern displayd *GGOBI(newParCoords)(gint *vars, int num, ggobid *gg);
-extern displayd *createPlot(int type, char **varnames);
+extern displayd *GGOBI(newScatterplot)(gint ix, gint iy, datad *, ggobid *gg);
+extern displayd *GGOBI(newScatmat)(gint *rows, gint *columns, gint nr, gint nc, datad *, ggobid *gg);
+extern displayd *GGOBI(newParCoords)(gint *vars, gint num, datad *, ggobid *gg);
+extern displayd *createPlot(gint type, gchar **varnames);
 
 /*-- point glyph types and sizes --*/
-extern gint *GGOBI(getGlyphTypes)(int *n);
-extern const gchar **const GGOBI(getGlyphTypeNames)(int *n);
+extern gint *GGOBI(getGlyphTypes)(gint *n);
+extern const gchar **const GGOBI(getGlyphTypeNames)(gint *n);
 
-extern gint *GGOBI(getCaseGlyphTypes)(gint *, gint n, ggobid *gg);
-extern gint GGOBI(getCaseGlyphType)(gint id, ggobid *gg);
+extern gint *GGOBI(getCaseGlyphTypes)(gint *, gint n, datad *, ggobid *gg);
+extern gint GGOBI(getCaseGlyphType)(gint id, datad *, ggobid *gg);
 
-extern gint *GGOBI(getCaseGlyphSizes)(gint *, gint n, ggobid *gg);
-extern gint GGOBI(getCaseGlyphSize)(gint id, ggobid *gg);
+extern gint *GGOBI(getCaseGlyphSizes)(gint *, gint n, datad *, ggobid *gg);
+extern gint GGOBI(getCaseGlyphSize)(gint id, datad *, ggobid *gg);
 
-extern void GGOBI(setCaseGlyph) (gint pt, gint type, gint size, ggobid *gg);
-extern void GGOBI(setCaseGlyphs) (gint *pts, gint n, gint type, gint size, ggobid *gg);
+extern void GGOBI(setCaseGlyph) (gint pt, gint type, gint size, datad *d, ggobid *gg);
+extern void GGOBI(setCaseGlyphs) (gint *pts, gint n, gint type, gint size, datad *d, ggobid *gg);
 
 /*-- point colors --*/
-extern gint GGOBI(getCaseColor) (gint pt, ggobid *gg);
-extern gint * GGOBI(getCaseColors) (gint *pts, gint howMany, ggobid *gg);
+extern gint GGOBI(getCaseColor) (gint pt, datad *, ggobid *gg);
+extern gint * GGOBI(getCaseColors) (gint *pts, gint howMany, datad *, ggobid *gg);
 
-extern void GGOBI(setCaseColor)(gint pt, gint colorIndex, ggobid *gg);
-extern void GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx, ggobid *gg);
+extern void GGOBI(setCaseColor)(gint pt, gint colorIndex, datad *, ggobid *gg);
+extern void GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx, datad *, ggobid *gg);
 
 /*-- point hidden state --*/
-extern gboolean GGOBI(getCaseHidden) (gint pt, ggobid *gg);
-extern gboolean * GGOBI(getCaseHiddens) (gint *pts, gint howMany, ggobid *gg);
+extern gboolean GGOBI(getCaseHidden) (gint pt, datad *, ggobid *gg);
+extern gboolean * GGOBI(getCaseHiddens) (gint *pts, gint howMany, datad *, ggobid *gg);
 
-extern void GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, ggobid *gg);
-extern void GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, ggobid *gg);
+extern void GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, datad *, ggobid *gg);
+extern void GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, datad *, ggobid *gg);
 
 extern gboolean  GGOBI(isConnectedSegment)(gint a, gint b, ggobid *gg);
 extern void GGOBI(setObservationSegment)(gint x, gint y, ggobid *gg, gboolean update);
@@ -195,15 +195,15 @@ void GGOBI(setIdentifyHandler)(IdentifyProc proc,  void *data, ggobid *gg);
    For now, pixels
 */
 
-extern void GGOBI(getBrushGlyph)(int *type, int *size, ggobid *gg);
+extern void GGOBI(getBrushGlyph)(gint *type, gint *size, ggobid *gg);
 
-void GGOBI(getBrushSize)(int *w, int *h, ggobid *gg);
-void GGOBI(getBrushLocation)(int *x, int *y, ggobid *gg);
+void GGOBI(getBrushSize)(gint *w, gint *h, datad *, ggobid *gg);
+void GGOBI(getBrushLocation)(gint *x, gint *y, datad *, ggobid *gg);
 
-void GGOBI(setBrushSize)(int w, int h, ggobid *gg);
-void GGOBI(setBrushLocation)(int x, int y, ggobid *gg);
+void GGOBI(setBrushSize)(gint w, gint h, datad *, ggobid *gg);
+void GGOBI(setBrushLocation)(gint x, gint y, datad *, ggobid *gg);
 
-extern splotd *GGOBI(getSPlot)(int which, displayd *display);
+extern splotd *GGOBI(getSPlot)(gint which, displayd *display);
 
 extern const gchar * const* GGOBI(getModeNames)();
 extern gint GGOBI(getModeId)(const gchar *name);
@@ -213,15 +213,15 @@ extern int GGOBI(full_mode_set)(int action, ggobid *gg);
 
 extern int GGOBI(setBrushColor)(int cid, ggobid *gg);
 extern gboolean GGOBI(setBrushGlyph)(int type, int size, ggobid *gg);
-extern int GGOBI(getVariableIndex)(const gchar *name, ggobid *gg);
-extern int GGOBI(removeVariableByIndex)(int which, ggobid *gg);
+extern int GGOBI(getVariableIndex)(const gchar *name, datad *, ggobid *gg);
+extern int GGOBI(removeVariableByIndex)(gint which, datad *, ggobid *gg);
 
-extern gboolean GGOBI(setVariableValues)(int whichVar, double *vals, int num, gboolean update, ggobid *gg);
+extern gboolean GGOBI(setVariableValues)(gint whichVar, gdouble *vals, gint num, gboolean update, datad *d, ggobid *gg);
 
 /* Need len just in case there is no data in the instance*/
-extern int GGOBI(addVariable)(double *vals, int len, char *name, gboolean update, ggobid *gg);
+extern int GGOBI(addVariable)(double *vals, int len, char *name, gboolean update, datad *d, ggobid *gg);
 
-extern void GGOBI(update_data)(ggobid *gg);
+extern void GGOBI(update_data)(datad *, ggobid *gg);
 extern gboolean GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg);
 
 

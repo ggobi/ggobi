@@ -24,19 +24,6 @@ void globals_init (ggobid *gg) {
   gg->glyph_id.size = gg->glyph_0.size = 3;
   gg->color_id = gg->color_0 = 0;
 
-  /*-- initialize arrays to NULL --*/
-  arrayf_init (&gg->raw);
-  arrayf_init (&gg->tform1);
-  arrayf_init (&gg->tform2);
-  arrayl_init (&gg->world);
-  arrayl_init (&gg->jitdata);
-
-  arrays_init (&gg->missing);
-  arrayl_init (&gg->missing_world);
-  arrayl_init (&gg->missing_jitter);
-
-  vectori_init (&gg->clusterid);
-
   vectors_init (&gg->line.color);
   vectors_init (&gg->line.color_now);
   vectors_init (&gg->line.color_prev);
@@ -47,61 +34,61 @@ void globals_init (ggobid *gg) {
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/
-void modes_init (ggobid* gg) {
-  brush_init (gg);
+void modes_init (datad *d, ggobid* gg) {
+  brush_init (d, gg);
 }
 
-
 gboolean
-fileset_read_init (gchar *ldata_in, ggobid *gg)
+fileset_read_init (gchar *ldata_in, datad *d, ggobid *gg)
 {
-  gboolean ans = fileset_read (ldata_in, gg);
+  gboolean ans = fileset_read (ldata_in, d, gg);
   if (ans) {
-    dataset_init (gg, true);
+    dataset_init (d, gg, true);
   }
 
   return (ans);
 } 
 
 displayd *
-dataset_init (ggobid *gg, gboolean cleanup)
+dataset_init (datad *d, ggobid *gg, gboolean cleanup)
 {
   displayd *display = NULL;
 
-  pipeline_init (gg);
+  pipeline_init (d, gg);
 
   if (cleanup)
     display_free_all (gg);  /*-- destroy any existing displays --*/
 
-  if (gg->ncols > 1) {
-     /*-- initialize the first display --*/
-    display = scatterplot_new (false, NULL, gg);
-     /* Need to make certain this is the only one there.
-        See
-      */
-    gg->displays = g_list_append (gg->displays, (gpointer) display);
-    display_set_current (display, gg);
-    gg->current_splot = (splotd *)
+   /*-- initialize the first display --*/
+  display = scatterplot_new (false, NULL, d, gg);
+   /* Need to make certain this is the only one there.
+      See
+    */
+  gg->displays = g_list_append (gg->displays, (gpointer) display);
+  display_set_current (display, gg);
+  gg->current_splot = (splotd *)
     g_list_nth_data (gg->current_display->splots, 0);
-  }
 
   return (display);
 }
 
 gboolean
-fileset_read (gchar *ldata_in, ggobid *gg)
+fileset_read (gchar *ldata_in, datad *d, ggobid *gg)
 {
   gboolean ok = true;
   gg->filename = g_strdup (ldata_in);
   strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
 
-  /*-- the varpanel has to know how many circles and labels to destroy --*/
-  gg->varpanel_ui.nvars = gg->ncols;
+  /*
+   * the varpanel has to know how many circles and labels to destroy
+   * if new data is read in later
+  */
+  d->varpanel_ui.nvars = d->ncols;
 
   switch (gg->data_mode) {
    case xml:
 #ifdef USE_XML
-     ok = data_xml_read (gg->fname, gg);
+     ok = data_xml_read (gg->fname, d, gg);
 #endif
      break;
    case mysql:
@@ -120,22 +107,22 @@ fileset_read (gchar *ldata_in, ggobid *gg)
      break;
 
    case ascii:
-     array_read (gg);
-     gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
-     gg->nrgroups = 0;               /*-- for now --*/
+     array_read (d, gg);
+     d->nrows_in_plot = d->nrows;    /*-- for now --*/
+     d->nrgroups = 0;                /*-- for now --*/
       
-     missing_values_read (gg->fname, true, gg);
+     missing_values_read (gg->fname, true, d, gg);
       
-     collabels_read (gg->fname, true, gg);
-     rowlabels_read (gg->fname, true, gg);
-     vgroups_read (gg->fname, true, gg);
+     collabels_read (gg->fname, true, d, gg);
+     rowlabels_read (gg->fname, true, d, gg);
+     vgroups_read (gg->fname, true, d, gg);
       
-     point_glyphs_read (gg->fname, true, gg);
-     point_colors_read (gg->fname, true, gg);
-     hidden_read (gg->fname, true, gg);
+     point_glyphs_read (gg->fname, true, d, gg);
+     point_colors_read (gg->fname, true, d, gg);
+     hidden_read (gg->fname, true, d, gg);
     
-     edges_read (gg->fname, true, gg);
-     line_colors_read (gg->fname, true, gg);
+     edges_read (gg->fname, true, d, gg);
+     line_colors_read (gg->fname, true, d, gg);
      break;
   }
 
@@ -143,53 +130,58 @@ fileset_read (gchar *ldata_in, ggobid *gg)
 }
 
 void
-pipeline_init (ggobid *gg) 
+pipeline_init (datad *d, ggobid *gg) 
 {
   gint i;
 
   /*-- a handful of allocations and initializations --*/
-  pipeline_arrays_alloc (gg);
-  for (i=0; i<gg->nrows; i++) {
-    gg->rows_in_plot[i] = i;
-    gg->sampled[i] = true;
+  pipeline_arrays_alloc (d, gg);
+  for (i=0; i<d->nrows; i++) {
+    d->rows_in_plot[i] = i;
+    d->sampled[i] = true;
   }
 
   /*-- some initializations --*/
-  modes_init (gg);
-  varpanel_layout_init (gg);
-  varpanel_clear (gg);
-  varpanel_populate (gg);
+  modes_init (d, gg);
+  varpanel_layout_init (d, gg);
+  varpanel_clear (d, gg);
+  varpanel_populate (d, gg);
 
   /*-- run the first half of the pipeline --*/
-  arrayf_copy (&gg->raw, &gg->tform1);
-  arrayf_copy (&gg->tform1, &gg->tform2);
+  arrayf_copy (&d->raw, &d->tform1);
+  arrayf_copy (&d->tform1, &d->tform2);
 
-  vardata_stats_set (gg);
+  vardata_stats_set (d, gg);
 
-  vardata_lim_raw_gp_set (gg);
-  vardata_lim_update (gg);
-  tform_to_world (gg);
+  vardata_lim_raw_gp_set (d, gg);
+  vardata_lim_update (d, gg);
+  tform_to_world (d, gg);
 
-  if (gg->nmissing > 0) {
-    missing_lim_set (gg);
-    missing_world_alloc (gg);
-    missing_to_world (gg);
+  if (d->nmissing > 0) {
+    missing_lim_set (d, gg);
+    missing_world_alloc (d, gg);
+    missing_to_world (d, gg);
   }
 }
 
 void
 make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
+  datad *d = (datad *) g_malloc (sizeof (datad));
+  gg->d = g_slist_append (gg->d, d);
+
   /*-- some initializations --*/
   gg->displays = NULL;
-  gg->nrows = gg->ncols = 0;
+  
+  d->nrows = d->ncols = 0;
 
   globals_init (gg); /*-- variables that don't depend on the data --*/
+  datad_init (d);
   color_table_init (gg);
   make_ui (gg);
 
   if (ldata_in != NULL) {
-    if (fileset_read (ldata_in, gg) > 0) {
-      dataset_init(gg, true);
+    if (fileset_read (ldata_in, d, gg) > 0) {
+      dataset_init (d, gg, true);
 
     }
   } else {

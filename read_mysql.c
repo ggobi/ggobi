@@ -44,7 +44,7 @@ char *getMySQLLoginElement(int i, int *isCopy, MySQLLoginInfo *info);
   empty.
  */
 int
-read_mysql_data(MySQLLoginInfo *login, int init, ggobid *gg)
+read_mysql_data(MySQLLoginInfo *login, gint init, datad *d, ggobid *gg)
 {
   MYSQL *conn;
 
@@ -70,15 +70,15 @@ read_mysql_data(MySQLLoginInfo *login, int init, ggobid *gg)
   }
 
     /* Execute the query specified by the user to get the data. */
-  if(GGOBI(get_mysql_data)(conn, login->dataQuery, gg) < 1) {
+  if(GGOBI(get_mysql_data)(conn, login->dataQuery, d, gg) < 1) {
     return(-1);
   }
 
   /* This should go into its own routine in the core ggobi. */
-  vgroups_sort(gg);
+  vgroups_sort (d, gg);
   { gint j;
-    for (j=0; j<gg->ncols; j++)
-      gg->vardata[j].groupid = gg->vardata[j].groupid_ori;
+    for (j=0; j<d->ncols; j++)
+      d->vardata[j].groupid = d->vardata[j].groupid_ori;
   }
 
   segments_alloc (gg->nsegments, gg);
@@ -91,7 +91,7 @@ read_mysql_data(MySQLLoginInfo *login, int init, ggobid *gg)
 
     /* Now we have to read in the glyph and color data. */
   if (init)
-    dataset_init (gg, true);
+    dataset_init (gg, d, true);
 
   return(1); /* everything was ok*/
 }
@@ -136,7 +136,7 @@ GGOBI(mysql_connect)(MySQLLoginInfo *login, ggobid *gg)
    puts it in the ggobid raw.data array.
  */
 int
-GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
+GGOBI(get_mysql_data)(MYSQL *conn, const char *query, datad *d, ggobid *gg)
 {
   MYSQL_RES *res;
   int status;
@@ -152,10 +152,10 @@ GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
       return(-1);
     }
 
-    gg->filename = g_strdup(query);
-    GGOBI(register_mysql_data)(conn, res, 1, gg);
+  gg->filename = g_strdup(query);
+  GGOBI(register_mysql_data)(conn, res, 1, gg);
 
- return(gg->nrows);
+  return (d->nrows);
 }
 
 /**
@@ -163,7 +163,8 @@ GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
    from its meta-data and then the values for each observation.
  */
 int
-GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched, ggobid *gg)
+GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched,
+  datad *d, ggobid *gg)
 {
   unsigned long i, rownum = 0;
   unsigned long nrows, ncols;
@@ -177,14 +178,14 @@ GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched, ggobid *
 
    for(i = 0; i < ncols; i++) {
     MYSQL_FIELD *field = mysql_fetch_field(res);
-    gg->vardata[i].collab = g_strdup(field->name);
-    gg->vardata[i].collab_tform = g_strdup(field->name);
-    gg->vardata[i].groupid = gg->vardata[i].groupid_ori = i;
+    d->vardata[i].collab = g_strdup(field->name);
+    d->vardata[i].collab_tform = g_strdup(field->name);
+    d->vardata[i].groupid = d->vardata[i].groupid_ori = i;
    }
 
     while((row = mysql_fetch_row(res)) != NULL) { 
       for(i = 0; i < ncols; i++) {
-        gg->raw.data[rownum][i] = atof(row[i]);
+        d->raw.data[rownum][i] = atof(row[i]);
       }
       rownum++;
     }
@@ -222,28 +223,27 @@ GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg)
   This should go elsewhere also.
  */
 void
-GGOBI(setDimensions)(gint nrow, gint ncol, ggobid *gg)
+GGOBI(setDimensions)(gint nrow, gint ncol, datad *d, ggobid *gg)
 {
-  gg->nrows = nrow;
-  gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
-  gg->nrgroups = 0;              /*-- for now --*/
+  d->nrows = nrow;
+  d->nrows_in_plot = d->nrows;  /*-- for now --*/
+  d->nrgroups = 0;              /*-- for now --*/
 
-  rowlabels_alloc (gg);
-  br_glyph_ids_alloc (gg);
-  br_glyph_ids_init (gg);
+  rowlabels_alloc (d, gg);
+  br_glyph_ids_alloc (d, gg);
+  br_glyph_ids_init (d, gg);
 
-  br_color_ids_alloc (gg);
-  br_color_ids_init (gg);
+  br_color_ids_alloc (d, gg);
+  br_color_ids_init (d, gg);
 
 
-  gg->ncols = ncol;
+  d->ncols = ncol;
 
-  arrayf_alloc (&gg->raw, gg->nrows, gg->ncols);
+  arrayf_alloc (&d->raw, d->nrows, d->ncols);
 
-  vardata_alloc (gg);
-  vardata_init (gg);
-
- hidden_alloc(gg);
+  vardata_alloc (d, gg);
+  vardata_init (d, gg);
+  hidden_alloc (d, gg);
 }
 
 /*
@@ -447,10 +447,10 @@ GGOBI(get_mysql_login_info)(MySQLLoginInfo *info, ggobid *gg)
   dialog = gtk_dialog_new();
   gtk_window_set_title(GTK_WINDOW(dialog), "MySQL Login & Query Settings");
 
-   guiInputs->gg = gg;
-   guiInputs->dialog = dialog;
-   guiInputs->textInput = (GtkWidget**) g_malloc(sizeof(GtkWidget*) * n);
-   guiInputs->numInputs = n;
+  guiInputs->gg = gg;
+  guiInputs->dialog = dialog;
+  guiInputs->textInput = (GtkWidget**) g_malloc(sizeof(GtkWidget*) * n);
+  guiInputs->numInputs = n;
 
   table = gtk_table_new(n, 2, 0);
      /* Now run through all the entries of interest and generate  
@@ -494,12 +494,12 @@ GGOBI(get_mysql_login_info)(MySQLLoginInfo *info, ggobid *gg)
 
       /* Now setup the action/signal handlers. */  
   gtk_signal_connect (GTK_OBJECT (cancel_button), "clicked",
-                               GTK_SIGNAL_FUNC (GGOBI(cancelMySQLGUI)), guiInputs);
+                      GTK_SIGNAL_FUNC (GGOBI(cancelMySQLGUI)), guiInputs);
 
   gtk_signal_connect (GTK_OBJECT (okay_button), "clicked",
-                               GTK_SIGNAL_FUNC (GGOBI(getMySQLGUIInfo)), guiInputs);
+                      GTK_SIGNAL_FUNC (GGOBI(getMySQLGUIInfo)), guiInputs);
   gtk_signal_connect (GTK_OBJECT (help_button), "clicked",
-                               GTK_SIGNAL_FUNC (GGOBI(getMySQLGUIHelp)), guiInputs);
+                      GTK_SIGNAL_FUNC (GGOBI(getMySQLGUIHelp)), guiInputs);
 
 
   return(NULL);
@@ -537,7 +537,7 @@ GGOBI(getMySQLGUIInfo)(GtkButton *button, MySQLGUIInput *guiInput)
   /* Only cancel if we read something. Otherwise,
      leave the display for the user to edit.
    */
- if(read_mysql_data(info, TRUE, gg) > 0) {
+  if (read_mysql_data(info, TRUE, d, gg) > 0) {
    GGOBI(cancelMySQLGUI)(button, guiInput);
    /* Can we free the info here. */
  }

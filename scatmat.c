@@ -85,7 +85,7 @@ displayd *
 scatmat_new (gboolean missing_p,
   gint numRows, gint *rows,
   gint numCols, gint *cols,
-  ggobid *gg) 
+  datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   GtkWidget *mbar;
@@ -96,9 +96,9 @@ scatmat_new (gboolean missing_p,
   splotd *sp;
   displayd *display;
 
-  display = display_alloc_init (scatmat, missing_p, gg);
+  display = display_alloc_init (scatmat, missing_p, d, gg);
   if (numRows == 0 || numCols == 0) {
-    scatmat_nrows = scatmat_ncols = MIN (gg->ncols, MAXNVARS);
+    scatmat_nrows = scatmat_ncols = MIN (d->ncols, MAXNVARS);
     for (j=0; j<scatmat_nrows; j++)
       rows[j] = cols[j] = j;
   } else { 

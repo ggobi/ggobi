@@ -18,15 +18,16 @@ static void brush_on_cb (GtkToggleButton *button, ggobid *gg)
 static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
+  datad *d = gg->current_display->d;
 
   if (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDL)
-    point_brush_undo (gg->current_splot, gg);
+    point_brush_undo (gg->current_splot, d, gg);
   if (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL)
     line_brush_undo (gg->current_splot, gg);
 }
 
 void
-brush_scope_set (gint br_scope, ggobid *gg) {
+brush_scope_set (gint br_scope, datad *d, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
 
@@ -38,7 +39,8 @@ static gchar *scope_lbl[] = {"Points", "Lines", "Points and lines"};
 static void brush_scope_set_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
-  brush_scope_set (GPOINTER_TO_INT (cbd), gg);
+  datad *d = gg->current_display->d;
+  brush_scope_set (GPOINTER_TO_INT (cbd), d, gg);
 }
 
 static gchar *cg_lbl[] =
@@ -74,12 +76,13 @@ brush_reset_cb (GtkWidget *w, gpointer cbd)
   ggobid *gg = GGobiFromWidget (w, true);
   gint action = GPOINTER_TO_INT (cbd);
   gint m, i, k;
+  datad *d = gg->current_display->d;
 
   switch (action) {
     case 0:  /*-- un-hide all points --*/
-      for (m=0; m<gg->nrows_in_plot; m++) {
-        i = gg->rows_in_plot[m];
-        gg->hidden[i] = gg->hidden_now[i] = false;
+      for (m=0; m<d->nrows_in_plot; m++) {
+        i = d->rows_in_plot[m];
+        d->hidden[i] = d->hidden_now[i] = false;
       }
       displays_plot (NULL, FULL, gg);
       break;
@@ -150,13 +153,15 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean retval = true;
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromSPlot(sp);
+  datad *d;
 
 
   gg->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
   cpanel = &gg->current_display->cpanel;
+  d = gg->current_display->d;
 
-  point_brush_prev_vectors_update (gg);
+  point_brush_prev_vectors_update (d, gg);
   line_brush_prev_vectors_update (gg);
 
   mousepos_get_pressed (w, event, &button1_p, &button2_p, gg);

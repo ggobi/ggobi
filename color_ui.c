@@ -319,17 +319,19 @@ set_color_fg ( GtkWidget *w, GdkEventButton *event , ggobid *gg)
   gint prev = gg->color_id;
   gint k = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w), "index"));
   splotd *sp = gg->current_splot;
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
 
-  for (i=0; i<gg->nrows; i++)
-    gg->color_prev[i] = gg->color_ids[i];
+  for (i=0; i<d->nrows; i++)
+    d->color_prev[i] = d->color_ids[i];
   gg->color_id = k;
 
   if (event->type==GDK_2BUTTON_PRESS || event->type==GDK_3BUTTON_PRESS) {
     open_colorsel_dialog (w, gg);
   } else {
     gint rval = false;
-    gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display), "expose_event",
-      (gpointer) sp, (gpointer) &rval);
+    gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
+      "expose_event", (gpointer) sp, (gpointer) &rval);
   }
 
   redraw_fg (gg->color_ui.fg_da[prev], prev, gg);
@@ -375,12 +377,14 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   gint i, dsq, nearest_dsq, type, size, rval = false;
   icoords pos, ev;
   splotd *sp = gg->current_splot;
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
   gint spacing = gg->color_ui.spacing;
   gint margin = gg->color_ui.margin;
 
-  for (i=0; i<gg->nrows; i++) { 
-    gg->glyph_prev[i].type = gg->glyph_ids[i].type;
-    gg->glyph_prev[i].size = gg->glyph_ids[i].size;
+  for (i=0; i<d->nrows; i++) { 
+    d->glyph_prev[i].type = d->glyph_ids[i].type;
+    d->glyph_prev[i].size = d->glyph_ids[i].size;
   }
 
   ev.x = (gint) event->x;

@@ -19,6 +19,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = (displayd *) sp->displayptr; 
   cpaneld *cpanel = &display->cpanel;
+  datad *d = display->d;
   gfloat ftmp;
 
   /*
@@ -62,7 +63,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   splot_plane_to_screen (display, cpanel, sp, gg);
 
   if (mode_get (gg) == BRUSH)
-    assign_points_to_bins (gg);
+    assign_points_to_bins (d, gg);
 
   sp->redraw_style = FULL;
   gtk_widget_queue_draw (sp->da);
@@ -75,7 +76,7 @@ static gint
 splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot(sp);
+  ggobid *gg = GGobiFromSPlot (sp);
 
   /*-- sanity checks --*/
   if (sp->pixmap0 == NULL || sp->pixmap1 == NULL)
@@ -202,7 +203,8 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
 void
 splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
-  gint nr = gg->nrows;
+  datad *d = display->d;
+  gint nr = d->nrows;
   gint nl = gg->nedges;
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
@@ -366,6 +368,7 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 */
 {
   displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
 
   switch (display->displaytype) {
 
@@ -373,17 +376,20 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
       switch (cpanel->projection) {
         case P1PLOT:
           p1d_reproject (sp,
-            (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
+            (display->missing_p) ? d->missing_world.vals : d->world.vals,
+            d, gg);
           break;
 
         case XYPLOT:
           xy_reproject (sp,
-            (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
+            (display->missing_p) ? d->missing_world.vals : d->world.vals,
+            d, gg);
           break;
 
         case TOUR2D:
           tour_reproject (sp,
-            (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
+            (display->missing_p) ? d->missing_world.vals : d->world.vals,
+            d, gg);
           break;
       }
       break;
@@ -392,15 +398,18 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 
       if (sp->p1dvar == -1)
         xy_reproject (sp,
-          (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
+          (display->missing_p) ? d->missing_world.vals : d->world.vals,
+          d, gg);
       else
         p1d_reproject (sp,
-          (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
+          (display->missing_p) ? d->missing_world.vals : d->world.vals,
+          d, gg);
       break;
 
     case parcoords:
       p1d_reproject (sp,
-        (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
+        (display->missing_p) ? d->missing_world.vals : d->world.vals,
+        d, gg);
       break;
   }
 }
@@ -416,6 +425,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
 {
   gint i, k;
   gfloat scale_x, scale_y;
+  datad *d = display->d;
 
   scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
   scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
@@ -433,8 +443,8 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   /*
    * Calculate new coordinates.
   */
-  for (k=0; k<gg->nrows_in_plot; k++) {
-    i = gg->rows_in_plot[k];
+  for (k=0; k<d->nrows_in_plot; k++) {
+    i = d->rows_in_plot[k];
 
     /*-- scale from world to plot window --*/
     sp->screen[i].x = (gint) ((sp->planar[i].x * sp->iscale.x) >> EXP1);
@@ -467,6 +477,7 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   gfloat precis = PRECISION1;
   gfloat ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
 
   g_return_if_fail (cpanel->projection == XYPLOT ||
                     cpanel->projection == P1PLOT ||
@@ -485,11 +496,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   switch (cpanel->projection) {
     case P1PLOT:
       if (display->missing_p) {
-        max = gg->missing_lim.max;
-        min = gg->missing_lim.min;
+        max = d->missing_lim.max;
+        min = d->missing_lim.min;
       } else {
-        max = gg->vardata[sp->p1dvar].lim.max;
-        min = gg->vardata[sp->p1dvar].lim.min;
+        max = d->vardata[sp->p1dvar].lim.max;
+        min = d->vardata[sp->p1dvar].lim.min;
       }
       rdiff = max - min;
 
@@ -511,11 +522,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
     case XYPLOT:
       /* x */
       if (display->missing_p) {
-        max = gg->missing_lim.max;
-        min = gg->missing_lim.min;
+        max = d->missing_lim.max;
+        min = d->missing_lim.min;
       } else {
-        max = gg->vardata[sp->xyvars.x].lim.max;
-        min = gg->vardata[sp->xyvars.x].lim.min;
+        max = d->vardata[sp->xyvars.x].lim.max;
+        min = d->vardata[sp->xyvars.x].lim.min;
       }
       rdiff = max - min;
       world.x = planar.x;
@@ -525,11 +536,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
 
       /* y */
       if (display->missing_p) {
-        max = gg->missing_lim.max;
-        min = gg->missing_lim.min;
+        max = d->missing_lim.max;
+        min = d->missing_lim.min;
       } else {
-        max = gg->vardata[sp->xyvars.y].lim.max;
-        min = gg->vardata[sp->xyvars.y].lim.min;
+        max = d->vardata[sp->xyvars.y].lim.max;
+        min = d->vardata[sp->xyvars.y].lim.min;
       }
       rdiff = max - min;
       world.y = planar.y;
@@ -574,11 +585,12 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
 { 
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
+  datad *d = display->d;
 
   switch (cpanel->projection) {
     case XYPLOT:
-      gg->world.vals[ipt][sp->xyvars.x] = sp->planar[ipt].x;
-      gg->world.vals[ipt][sp->xyvars.y] = sp->planar[ipt].y;
+      d->world.vals[ipt][sp->xyvars.x] = sp->planar[ipt].x;
+      d->world.vals[ipt][sp->xyvars.y] = sp->planar[ipt].y;
       break;
 
     default:
@@ -590,10 +602,13 @@ void
 splot_reverse_pipeline (splotd *sp, gint ipt, lcoords *eps,
                         gboolean horiz, gboolean vert, ggobid *gg)
 {
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
+
   splot_screen_to_plane (sp, ipt, eps, horiz, vert);
   splot_plane_to_world (sp, ipt, gg);
 
   /*-- for bivariate plots only --*/
   /*-- in pipeline.c since it applies to the front of the pipeline --*/
-  world_to_raw (ipt, sp, gg);
+  world_to_raw (ipt, sp, d, gg);
 }

@@ -28,9 +28,9 @@ static arcd       *open_arcs;
 static arcd       *filled_arcs;
 
 static void
-drawing_arrays_alloc (ggobid *gg) {
+drawing_arrays_alloc (datad *d, ggobid *gg) {
   if (maxn == 0) {
-    maxn = gg->nrows;
+    maxn = d->nrows;
     points = (GdkPoint *) g_malloc (maxn * sizeof (GdkPoint));
     segs = (GdkSegment *) g_malloc (2 * maxn * sizeof (GdkSegment));
     whisker_segs = (GdkSegment *) g_malloc (2 * maxn * sizeof (GdkSegment));
@@ -39,7 +39,7 @@ drawing_arrays_alloc (ggobid *gg) {
     open_arcs = (arcd *) g_malloc (maxn * sizeof (arcd));
     filled_arcs = (arcd *) g_malloc (maxn * sizeof (arcd));
   } else {
-    maxn = gg->nrows;
+    maxn = d->nrows;
     points = (GdkPoint *) g_realloc (points, maxn * sizeof (GdkPoint));
     segs = (GdkSegment *) g_realloc (segs, 2 * maxn * sizeof (GdkSegment));
     whisker_segs = (GdkSegment *)
@@ -249,26 +249,27 @@ void
 win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
   gint m, j;
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;
   gint nwhisker_segs = 0;
 
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
-  if (maxn != gg->ncols)
-    drawing_arrays_alloc (gg);
+  if (maxn != d->ncols)
+    drawing_arrays_alloc (d, gg);
 
-  for (m=0; m<gg->nrows_in_plot; m++) {
-    j = gg->rows_in_plot[m];
-    if (!gg->hidden_now[j] && gg->color_now[j] == current_color) {
+  for (m=0; m<d->nrows_in_plot; m++) {
+    j = d->rows_in_plot[m];
+    if (!d->hidden_now[j] && d->color_now[j] == current_color) {
       if (display->options.points_show_p) {
-        build_glyph (&gg->glyph_now[j], sp->screen, j,
+        build_glyph (&d->glyph_now[j], sp->screen, j,
           points, &npt,           segs, &nseg,
           open_rects, &nr_open,   filled_rects, &nr_filled,
           open_arcs, &nc_open,    filled_arcs, &nc_filled);
 
         if (display->displaytype == parcoords &&
-            display->options.segments_show_p)
+            display->options.edges_show_p)
         {
           build_whisker_segs (j, sp);
           nwhisker_segs += 2;
@@ -289,6 +290,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
   gint current_color, splotd *sp, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
   gint ih, iv;
   gint m, j;
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;
@@ -297,10 +299,10 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
 
   for (ih=bin0->x; ih<=bin1->x; ih++) {
     for (iv=bin0->y; iv<=bin1->y; iv++) {
-      for (m=0; m<gg->brush.binarray[ih][iv].nels; m++) {
-        j = gg->rows_in_plot[gg->brush.binarray[ih][iv].els[m]];
-        if (!gg->hidden_now[j] && gg->color_now[j] == current_color) {
-          build_glyph (&gg->glyph_now[j], sp->screen, j,
+      for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
+        j = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
+        if (!d->hidden_now[j] && d->color_now[j] == current_color) {
+          build_glyph (&d->glyph_now[j], sp->screen, j,
             points, &npt,           segs, &nseg,
             open_rects, &nr_open,   filled_rects, &nr_filled,
             open_arcs, &nc_open,    filled_arcs, &nc_filled);

@@ -6,6 +6,7 @@
 
 #include "defines.h"
 #include "types.h"
+#include "datad.h"
 #include "ggobi.h"
 #include "display.h"
 #include "gtkexthruler.h"

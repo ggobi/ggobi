@@ -7,16 +7,18 @@
 static GtkWidget *window = NULL;
 
 void
-jitter_vars_init (ggobid *gg) {
-  gg->jitter.type = UNIFORM;
-  gg->jitter.vgroup = true;
-  gg->jitter.convex = true;
+jitter_vars_init (datad *d, ggobid *gg) {
+  d->jitter.type = UNIFORM;
+  d->jitter.vgroup = true;
+  d->jitter.convex = true;
 }
 
 static void
 jitter_cb (GtkButton *button, ggobid *gg)
 {
-  rejitter (gg);
+  datad *d = gg->current_display->d;
+
+  rejitter (d, gg);
 }
 
 /*
@@ -24,12 +26,14 @@ jitter_cb (GtkButton *button, ggobid *gg)
 */
 static void
 degree_cb (GtkAdjustment *adj, ggobid *gg) {
+  datad *d = gg->current_display->d;
+
   if (gg->current_display->missing_p) {
-    missing_jitter_value_set (adj->value, gg);
-    missing_rejitter (gg);
+    missing_jitter_value_set (adj->value, d, gg);
+    missing_rejitter (d, gg);
   } else {
-    jitter_value_set (adj->value, gg);
-    rejitter (gg);
+    jitter_value_set (adj->value, d, gg);
+    rejitter (d, gg);
   }
 }
 
@@ -48,33 +52,36 @@ static gchar *type_lbl[] = {"Uniform", "Normal"};
 static void type_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
-  ggobid *gg;
-   gg = GGobiFromWidget(w, true);
+  ggobid *gg = GGobiFromWidget(w, true);
+  datad *d = gg->current_display->d;
 
-  gg->jitter.type = indx;
-  rejitter (gg);
+  d->jitter.type = indx;
+  rejitter (d, gg);
 }
 
 static void
 vgroups_cb (GtkToggleButton *button, ggobid *gg)
 {
-  gg->jitter.vgroup = button->active;
+  datad *d = gg->current_display->d;
+
+  d->jitter.vgroup = button->active;
 }
 
+/*-- warning: should be independent of datad --*/
 void
-jitter_window_open (ggobid *gg) {
+jitter_window_open (datad *d, ggobid *gg) {
 
   GtkWidget *btn, *tgl, *lbl;
   GtkWidget *vbox, *vb;
   GtkWidget *sbar, *opt;
   GtkObject *adj;
 
-  if (gg->nrows == 0)  /*-- if used before we have data --*/
+  if (d->nrows == 0)  /*-- if used before we have data --*/
     return;
 
   if (window == NULL) {
 
-    jitter_vars_init (gg);
+    jitter_vars_init (d, gg);
     
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_signal_connect (GTK_OBJECT (window), "delete_event",
