@@ -177,6 +177,8 @@ varpanel_show_page (displayd *display, ggobid *gg)
       if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
         if (page != page_new) {
           gtk_notebook_set_page (nb, page_new);
+          if (gg->status_message_func)
+            gg->status_message_func((gchar *)NULL, gg);
           break;
         }
       }
@@ -190,6 +192,17 @@ varpanel_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
   gint page_num, ggobid *gg)
 {
   varpanel_reinit (gg);
+  gdk_flush ();
+
+  /*-- describe the datad being selected in the console statusbar --*/
+  if (gg->status_message_func) {
+    datad *d = (datad *) g_slist_nth_data (gg->d, page_num);
+    if (d) {
+      gchar *msg = g_strdup_printf ("%s:%dx%d\n", d->name, d->nrows, d->ncols);
+      gg->status_message_func(msg, gg);
+      g_free (msg);
+    }
+  }
 }
 
 

@@ -419,6 +419,7 @@ void       splot_text_extents (gchar *text, GtkStyle *style, gint *lbearing, gin
 void       splot_world_to_plane (cpaneld *, splotd *, ggobid *);
 void       splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *) ;
 gint       sqdist (gint, gint, gint, gint);
+void       statusbar_show_cb (GtkCheckMenuItem *w, guint action);
 void       sticky_id_link_by_id (gint, gint, datad *, ggobid *);
 void       sticky_id_toggle (datad *, ggobid *);
 gint       strToInteger (const gchar *tmp);
@@ -633,6 +634,7 @@ GtkWidget* widget_find_by_name (GtkWidget *, gchar *);
 void       widget_initialize (GtkWidget *w, gboolean initd);
 gboolean   widget_initialized (GtkWidget *w);
 void       world_to_raw (gint, splotd *, datad *, ggobid *);
+void       gg_write_to_statusbar (gchar *message, ggobid *gg);
 void       writeall_window_open (ggobid *);
 void       wvis_init (ggobid *gg);
 void       wvis_window_open (ggobid *gg);

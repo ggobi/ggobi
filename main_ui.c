@@ -95,6 +95,45 @@ tooltips_show_cb (GtkCheckMenuItem *w, guint action)
 }
 
 void
+statusbar_show (gboolean show, ggobid *gg)
+{
+  GtkWidget *entry = (GtkWidget *)
+    gtk_object_get_data (GTK_OBJECT(gg->main_window), "MAIN:STATUSBAR");
+  if (show)
+    gtk_widget_show (entry);
+  else
+    gtk_widget_hide (entry);
+  gg->statusbar_p = show;
+}
+void
+statusbar_show_cb (GtkCheckMenuItem *w, guint action) 
+{
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+  statusbar_show (w->active, gg);
+}
+/*
+  gg->status_message_func((gchar *)domain_error_message, gg);
+*/
+void
+gg_write_to_statusbar (gchar *message, ggobid *gg)
+{
+  GtkWidget *entry = (GtkWidget *)
+    gtk_object_get_data (GTK_OBJECT(gg->main_window), "MAIN:STATUSBAR");
+
+  if (message)
+    gtk_entry_set_text (GTK_ENTRY(entry), message);
+  else {
+    /*-- by default, describe the current datad --*/
+    datad *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+    if (d) {
+      gchar *msg = g_strdup_printf ("%s:%dx%d\n", d->name, d->nrows, d->ncols);
+      gtk_entry_set_text (GTK_ENTRY(entry), msg);
+      g_free (msg);
+    }
+  }
+}
+
+void
 cpanel_show_cb (GtkCheckMenuItem *w, guint action) 
 {
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
@@ -643,7 +682,7 @@ void
 make_ui (ggobid *gg) 
 {
   GtkWidget *window;
-  GtkWidget *hbox, *vbox;
+  GtkWidget *hbox, *vbox, *entry;
 
   gg->tips = gtk_tooltips_new ();
 
@@ -728,6 +767,12 @@ make_ui (ggobid *gg)
 
   /*-- Variable selection panel --*/
   varpanel_make (hbox, gg);
+
+  /*-- status bar --*/
+  entry = gtk_entry_new ();
+  gtk_object_set_data (GTK_OBJECT(gg->main_window), "MAIN:STATUSBAR", entry);
+  gtk_box_pack_start (GTK_BOX (vbox), entry, true, true, 0);
+  /*--            --*/
 
   gtk_widget_show_all (hbox);
 

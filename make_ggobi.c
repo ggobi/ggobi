@@ -80,6 +80,8 @@ void globals_init(ggobid * gg)
 
   gg->save.window = NULL;
 
+  gg->statusbar_p = true;
+
 #ifndef GTK_2_0
 #else
 #include "GtkSignalDef.c"
@@ -273,6 +275,8 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
   if (sessionOptions->restoreFile) {
     processRestoreFile(sessionOptions->restoreFile, gg);
   }
+
+  gg->status_message_func = gg_write_to_statusbar;
 
   if (processEvents) {
     gtk_main();
