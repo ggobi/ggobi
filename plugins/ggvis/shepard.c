@@ -88,7 +88,7 @@ create_shepard_data_cb (PluginInstance *inst, guint action, GtkWidget *w)
     dnew->name = g_strdup_printf ("Shepard Plot %d", ggv->shepard_iter);
 
     GGOBI(setData) (values, rownames, colnames, n, nc, dnew,
-      false, gg, /*rowids*/NULL, desc);  /*no rowids to start */
+      false, gg, /*rowids*/NULL, false, desc);  /*no rowids to start */
     dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
     display_tailpipe (dspnew, FULL, gg);
   }

@@ -33,8 +33,7 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
 {
   gint i, j;
   gint nc = ggv->dim;   /*-- default:  3d --*/
-  glong *rowids;
-  gchar **rownames, **colnames;
+  gchar **rownames, **colnames, **rowids;
   gdouble *values;
   datad *dnew;
   InputDescription *desc = NULL;
@@ -43,9 +42,15 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
   vartabled *vt;
   gdouble range;
 
-  rowids = (glong *) g_malloc (dsrc->nrows * sizeof(glong));
+/*
+ *rowids = (glong *) g_malloc (dsrc->nrows * sizeof(glong));
+ *for (i=0; i<dsrc->nrows; i++) {
+ *  rowids[i] = (glong) dsrc->rowid.id.els[i];
+ *}
+*/
+  rowids = (gchar **) g_malloc (dsrc->nrows * sizeof(gchar *));
   for (i=0; i<dsrc->nrows; i++) {
-    rowids[i] = (glong) dsrc->rowid.id.els[i];
+    rowids[i] = g_strdup (dsrc->rowIds[i]);
   }
 
   values = (gdouble *) g_malloc (dsrc->nrows * nc * sizeof(gdouble));
@@ -103,9 +108,10 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
 
   dnew = datad_create (dsrc->nrows, nc, gg);
   dnew->name = g_strdup ("MDS");
+  dnew->nickname = g_strdup ("MDS");
 
   GGOBI(setData) (values, rownames, colnames, dsrc->nrows, nc, dnew,
-    false, gg, rowids, desc);
+    false, gg, rowids, false, desc);
 
   /*-- copy the color and glyph vectors from d to dnew --*/
   for (i=0; i<dsrc->nrows; i++) {
@@ -145,7 +151,11 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
   g_free(values);
   g_free(colnames);
   g_free(rownames);
+/*
+  for (i=0; i<dsrc->nrows; i++)
+    g_free (rowids[i]);
   g_free(rowids);
+*/
 }
 
 static void
@@ -291,7 +301,7 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
   gchar *lbl;
 
   /* This was set in the first clist in the preceding tab */
-  if (ggv->dsrc == NULL || ggv->dsrc->rowid.idv.nels == 0) {
+  if (ggv->dsrc == NULL || ggv->dsrc->rowIds == NULL) {
     g_printerr ("node set not correctly specified\n");
     return;
   }
@@ -338,7 +348,7 @@ g_printerr ("e is null\n");
   }
 */
 
-  if (dsrc->rowid.idv.nels == 0) {
+  if (dsrc->rowIds == NULL) {
     g_printerr ("Make sure the current display is a plot of the nodes.\n");
     g_printerr ("  Currently nodes: %s edges: %s\n", dsrc->name, ggv->e->name);
     return;
@@ -356,63 +366,6 @@ g_printerr ("e is null\n");
 */
 
   ggv_compute_Dtarget (selected_var, ggv);
-
-/*
-  e = ggv->e;
-  Dvals = ggv->Dtarget.vals;
-  endpoints = e->edge.endpoints;
-
-  if (!ggv->complete_Dtarget) {
-    for (i = 0; i < e->edge.n; i++) {
-      end1 = dsrc->rowid.idv.els[endpoints[i].a];
-      end2 = dsrc->rowid.idv.els[endpoints[i].b];
-      Dvals[end1][end2] = (ggv->Dtarget_source == VarValues) ?
-        e->tform.vals[i][selected_var] : 1.0;
-    }
-  } else {
-
-    changing = true;
-    while (changing) {
-      changing = false;
-      for (i = 0; i < e->edge.n; i++) {
-        end1 = dsrc->rowid.idv.els[endpoints[i].a];
-        end2 = dsrc->rowid.idv.els[endpoints[i].b];
-        d12 = (ggv->Dtarget_source == VarValues) ?
-          e->tform.vals[i][selected_var] : 1.0;
-
-        for (end3 = 0; end3 < dsrc->nrows; end3++) {
-          if (Dvals[end1][end3] > d12 + Dvals[end2][end3]) {
-            Dvals[end3][end1] = Dvals[end1][end3] = d12 + Dvals[end2][end3];
-            changing = true;
-          }
-          if (Dvals[end2][end3] > d12 + Dvals[end1][end3]) {
-            Dvals[end3][end2] = Dvals[end2][end3] = d12 + Dvals[end1][end3];
-            changing = true;
-          }
-        }
-      }
-    }
-  }
-  ggv->ndistances = ggv->Dtarget.nrows * ggv->Dtarget.ncols;
-
-  ggv->Dtarget_max = DBL_MIN;  ggv->Dtarget_min = DBL_MAX;
-  for (i=0; i<ggv->Dtarget.nrows; i++) {
-    for (j=0; j<ggv->Dtarget.ncols; j++) {
-      dtmp = ggv->Dtarget.vals[i][j]; 
-      if (dtmp < 0) {
-        g_printerr ("negative dissimilarity: i=%d j=%d diss=%3.6f -> NA\n",
-          i, j, dtmp);
-        dtmp = ggv->Dtarget.vals[i][j] = DBL_MAX;
-      }
-      if(dtmp != DBL_MAX) {
-        if (dtmp > ggv->Dtarget_max) ggv->Dtarget_max = dtmp;
-        if (dtmp < ggv->Dtarget_min) ggv->Dtarget_min = dtmp;
-      }
-    }
-  }
-  ggv->threshold_low =  ggv->Dtarget_min;
-  ggv->threshold_high = ggv->Dtarget_max;
-*/
 
 
   /*-- update the entry to let people know Dtarget has been computed --*/

@@ -57,13 +57,13 @@ ggv_compute_Dtarget (gint selected_var, ggvisd *ggv)
   dsrc = ggv->dsrc;
   e = ggv->e;
   Dvals = ggv->Dtarget.vals;
-  endpoints = e->edge.endpoints;
+  endpoints = resolveEdgePoints(e, dsrc);
 
   /*-- populate --*/
   if (!ggv->complete_Dtarget) {
     for (i = 0; i < e->edge.n; i++) {
-      end1 = dsrc->rowid.idv.els[endpoints[i].a];
-      end2 = dsrc->rowid.idv.els[endpoints[i].b];
+      end1 = endpoints[i].a;
+      end2 = endpoints[i].b;
       Dvals[end1][end2] = (ggv->Dtarget_source == VarValues) ?
         e->tform.vals[i][selected_var] : 1.0;
     }
@@ -74,8 +74,10 @@ ggv_compute_Dtarget (gint selected_var, ggvisd *ggv)
     while (changing) {
       changing = false;
       for (i = 0; i < e->edge.n; i++) {
-        end1 = dsrc->rowid.idv.els[endpoints[i].a];
-        end2 = dsrc->rowid.idv.els[endpoints[i].b];
+        /*end1 = dsrc->rowid.idv.els[endpoints[i].a];*/
+        /*end2 = dsrc->rowid.idv.els[endpoints[i].b];*/
+        end1 = endpoints[i].a;
+        end2 = endpoints[i].b;
         d12 = (ggv->Dtarget_source == VarValues) ?
           e->tform.vals[i][selected_var] : 1.0;
         if (d12 < 0) {
