@@ -120,6 +120,6 @@ edgeset_add_cb (GtkWidget *w, datad *e) {
     splot_edges_realloc (sp, e, gg);
   }
 
-  display_plot (display, FULL, gg);
+  display_plot (display, FULL, gg);  /*- moving edge drawing */
 }
 

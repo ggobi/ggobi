@@ -105,46 +105,66 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
     case DOPT_POINTS:
       display->options.points_show_p = w->active;
       display_plot (display, FULL, gg);
-      break;
+    break;
     case DOPT_EDGES_U:  /*-- undirected: edges only --*/
       if (display->e == NULL)
         edgeset_add (display);
       if (display->e != NULL)
         display->options.edges_undirected_show_p = w->active;
 
-      if (!w->active)
-        display->options.edges_directed_show_p = false;
+      if (!w->active && display->options.edges_directed_show_p) { 
+        GtkWidget *ww = widget_find_by_name (display->edge_menu,
+          "DISPLAY MENU: show directed edges");
+        if (ww) {
+          gtk_check_menu_item_set_active ((GtkCheckMenuItem *) ww, false);
+        }
+      }
 
-      display_plot (display, QUICK, gg);
-      break;
+      display_plot (display, FULL, gg);
+    break;
     case DOPT_EDGES_A:  /*-- arrowheads only --*/
       if (display->e == NULL)
         edgeset_add (display);
       if (display->e != NULL)
         display->options.edges_arrowheads_show_p = w->active;
 
-      if (!w->active)
-        display->options.edges_directed_show_p = false;
+      if (!w->active && display->options.edges_directed_show_p) { 
+        GtkWidget *ww = widget_find_by_name (display->edge_menu,
+          "DISPLAY MENU: show directed edges");
+        if (ww) {
+          gtk_check_menu_item_set_active ((GtkCheckMenuItem *) ww, false);
+        }
+      }
 
-      display_plot (display, QUICK, gg);
-      break;
+      display_plot (display, FULL, gg);
+    break;
     case DOPT_EDGES_D:  /*-- directed: both edges and arrowheads --*/
       if (display->e == NULL)
         edgeset_add (display);
       if (display->e != NULL)
         display->options.edges_directed_show_p = w->active;
 
-      if (!w->active) {
-        display->options.edges_undirected_show_p = false;
-        display->options.edges_arrowheads_show_p = false;
+      if (!w->active && display->options.edges_undirected_show_p) { 
+        GtkWidget *ww = widget_find_by_name (display->edge_menu,
+          "DISPLAY MENU: show undirected edges");
+        if (ww) {
+          gtk_check_menu_item_set_active ((GtkCheckMenuItem *) ww, false);
+        }
+      }
+      if (!w->active && display->options.edges_arrowheads_show_p) { 
+        GtkWidget *ww = widget_find_by_name (display->edge_menu,
+          "DISPLAY MENU: show arrowheads");
+        if (ww) {
+          gtk_check_menu_item_set_active ((GtkCheckMenuItem *) ww, false);
+        }
       }
 
-      display_plot (display, QUICK, gg);
-      break;
+      display_plot (display, FULL, gg);
+    break;
     case DOPT_WHISKERS:
       display->options.whiskers_show_p = w->active;
       display_plot (display, FULL, gg);
-      break;
+    break;
     case DOPT_MISSINGS:  /*-- only in scatmat and parcoords --*/
       if (!display->missing_p && d->nmissing > 0) {
         display->options.missings_show_p = w->active;
@@ -170,7 +190,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 
         display_plot (display, FULL, gg);
       }
-      break;
+    break;
 
     case DOPT_AXES:
       display->options.axes_show_p = w->active;

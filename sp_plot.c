@@ -18,7 +18,8 @@
 #include "externs.h"
 
 static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
-static void edges_draw (splotd *, ggobid *gg);
+static void edges_draw (splotd *, GdkDrawable *, ggobid *gg);
+static void splot_nearest_edge_highlight (splotd *, gint, gboolean nearest, ggobid *);
 
 #ifdef WIN32
 extern void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
@@ -39,7 +40,7 @@ splot_colors_used_get (splotd *sp, gint *ncolors_used,
 /**/return;
           
   /*
-   * Loop once through d->color_now[], collecting the colors currently
+   * Loop once through d->color[], collecting the colors currently
    * in use into the colors_used[] vector.
   */
   for (i=0; i<d->nrows_in_plot; i++) {
@@ -127,6 +128,9 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
   return draw_case;
 }
 
+/*------------------------------------------------------------------------*/
+/*               drawing to pixmap0 when binning can't be used            */
+/*------------------------------------------------------------------------*/
 
 void
 splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
@@ -142,6 +146,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   gboolean draw_case;
+  gint dtype = display->displaytype;
   /*
    * since parcoords and tsplot each have their own weird way
    * of drawing line segments, it's necessary to get the point
@@ -149,9 +154,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
    * points.
   */
   gboolean loop_over_points =
-    display->options.points_show_p ||
-    display->displaytype == parcoords ||
-    display->displaytype == tsplot;
+    display->options.points_show_p || dtype == parcoords || dtype == tsplot;
 
   if (gg->plot_GC == NULL) {
     init_plot_GC (sp->pixmap0, gg);
@@ -174,8 +177,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     */
     for (k=0; k<ncolors_used; k++) {
       current_color = colors_used[k];
-      gdk_gc_set_foreground (gg->plot_GC,
-        &gg->color_table[current_color]);
+      gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[current_color]);
 
 #ifdef WIN32
       win32_draw_to_pixmap_unbinned (current_color, sp, gg);
@@ -189,11 +191,10 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
             draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen, m, gg);
 
           /*-- whiskers: parallel coordinate and time series plots --*/
-          if (display->displaytype == parcoords ||
-              display->displaytype == tsplot)
+          if (dtype == parcoords || dtype == tsplot)
           {
             if (display->options.whiskers_show_p) {
-              if (display->displaytype == parcoords) {
+              if (dtype == parcoords) {
                 n = 2*m;
                 gdk_draw_line (sp->pixmap0, gg->plot_GC,
                   sp->whiskers[n].x1, sp->whiskers[n].y1,
@@ -215,6 +216,16 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
       }
 #endif
     }  /* deal with mono later */
+  }
+
+
+  /*-- shifted in from splot_pixmap0_to_pixmap1 --*/
+  if (display->options.edges_undirected_show_p ||
+      display->options.edges_arrowheads_show_p ||
+      display->options.edges_directed_show_p)
+  {
+    if (dtype == scatterplot || dtype == scatmat)
+      edges_draw (sp, sp->pixmap0, gg);
   }
 
   return;
@@ -292,8 +303,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
       */
       for (k=0; k<ncolors_used; k++) {
         current_color = colors_used[k];
-        gdk_gc_set_foreground (gg->plot_GC,
-          &gg->color_table[current_color]);
+        gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[current_color]);
 
 #ifdef WIN32
         win32_draw_to_pixmap_binned (bin0, bin1, current_color, sp, gg);
@@ -448,8 +458,7 @@ splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
   if (display->options.whiskers_show_p) {
     gdk_gc_set_line_attributes (gg->plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC,
-      &gg->color_table[d->color_now.els[k]]);
+    gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[d->color_now.els[k]]);
 
     n = 2*k;
     gdk_draw_line (drawable, gg->plot_GC,
@@ -693,20 +702,10 @@ splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 /*                   line drawing routines                                */
 /*------------------------------------------------------------------------*/
 
-/*
-  In calling program:
-
-  guint *line_symbols_used[NGLYPHSIZES][NEDGETYPES][NCOLORS];
-
-  The fourth dimension of this array could be allocated:  it
-  could be used to contain the indices of the lines which belong
-  to each group.  Or, we leave it out and just use the table as
-  follows: for every non-zero cell, we have to loop once through
-  e->rows_in_plot[].
-*/
+/*-- the current color and line type need to be drawn last --*/
 
 void
-edges_draw (splotd *sp, ggobid *gg)
+edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   gint i, j, m;
   gint k, n, p;
@@ -867,7 +866,7 @@ edges_draw (splotd *sp, ggobid *gg)
                 gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[p]);
               }
 
-              gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->edges, nl);
+              gdk_draw_segments (drawable, gg->plot_GC, sp->edges, nl);
 
               k_prev = k; n_prev = n; p_prev = p;
             }
@@ -875,7 +874,7 @@ edges_draw (splotd *sp, ggobid *gg)
             if (arrowheads_show_p) {
               gdk_gc_set_line_attributes (gg->plot_GC,
                 3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-              gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->arrowheads, nl);
+              gdk_draw_segments (drawable, gg->plot_GC, sp->arrowheads, nl);
               gdk_gc_set_line_attributes (gg->plot_GC,
                 0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
             }
@@ -917,8 +916,7 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
 
     gdk_gc_set_line_attributes (gg->plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC,
-      &gg->color_table[e->color_now.els[k]]);
+    gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[e->color_now.els[k]]);
 
     gdk_draw_line (sp->pixmap1, gg->plot_GC,
       sp->screen[a].x, sp->screen[a].y,
@@ -979,20 +977,9 @@ splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 void
 splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   GtkWidget *w = sp->da;
-  displayd *display = (displayd *) sp->displayptr;
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
-  datad *e = display->e;
-  datad *d = display->d;
-  gint mode = mode_get (gg);
 
-#if 0
-      if(gg->plot_GC == NULL) {
-	  init_plot_GC(w->window, gg);
-	  fprintf(stderr, "Mmmm\n");
-	  return;
-      }
-#endif
   if (!binned) {
     gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
                      0, 0, 0, 0,
@@ -1005,16 +992,26 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
                       loc0->x, loc0->y,
                       1 + loc1->x - loc0->x, 1 + loc1->y - loc0->y);
   }
+}
 
+static void
+splot_draw_to_pixmap1 (splotd *sp, ggobid *gg)
+{
+  displayd *display = (displayd *) sp->displayptr;
+  datad *e = display->e;
+  datad *d = display->d;
+  gint mode = mode_get (gg);
+  gint displaytype = display->displaytype;
+
+/*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
   if (display->options.edges_undirected_show_p ||
       display->options.edges_arrowheads_show_p ||
       display->options.edges_directed_show_p)
   {
-    if (display->displaytype == scatterplot || display->displaytype == scatmat)
-    {
-        edges_draw (sp, gg);
-        if (e->nearest_point != -1)
-          splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);
+    if (displaytype == scatterplot || displaytype == scatmat) {
+      /* edges_draw (sp, gg); */
+      if (e->nearest_point != -1)
+        splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);
     }
   }
      
@@ -1037,6 +1034,59 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
     }
   }
 }
+
+/*
+ * add the points and edges in the currently selected glyph and color;
+ * unbinned
+*/
+static void
+splot_draw_current_symbols (splotd *sp, ggobid *gg)
+{
+  gint i, m, n;
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
+  gboolean draw_case;
+  gint dtype = display->displaytype;
+
+  gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[gg->color_id]);
+
+  for (i=0; i<d->nrows_in_plot; i++) {
+    m = d->rows_in_plot[i];
+    draw_case = splot_plot_case (m, d, sp, display, gg);
+
+    /*-- only test color, because it only works for color brushing --*/
+    if (draw_case && d->color_now.els[m] == gg->color_id) {
+      if (display->options.points_show_p)
+#ifdef WIN32
+        win32_draw_to_pixmap_unbinned (gg->color_id, sp, gg);
+#else
+        draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen, m, gg);
+#endif
+
+      /*-- whiskers: parallel coordinate and time series plots --*/
+      if (dtype == parcoords || dtype == tsplot) {
+        if (display->options.whiskers_show_p) {
+          if (dtype == parcoords) {
+            n = 2*m;
+            gdk_draw_line (sp->pixmap0, gg->plot_GC,
+              sp->whiskers[n].x1, sp->whiskers[n].y1,
+              sp->whiskers[n].x2, sp->whiskers[n].y2);
+            n++;
+            gdk_draw_line (sp->pixmap0, gg->plot_GC,
+              sp->whiskers[n].x1, sp->whiskers[n].y1,
+              sp->whiskers[n].x2, sp->whiskers[n].y2);
+          } else { /*-- if time series plot --*/
+            if (m < d->nrows_in_plot-1)  /*-- there are n-1 whiskers --*/
+              gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                sp->whiskers[m].x1, sp->whiskers[m].y1,
+                sp->whiskers[m].x2, sp->whiskers[m].y2);
+          }
+        }
+      }
+    }
+  }
+}
+
 
 void
 splot_pixmap1_to_window (splotd *sp, ggobid *gg) {
@@ -1070,14 +1120,33 @@ splot_redraw (splotd *sp, enum redrawStyle redraw_style, ggobid *gg) {
     case FULL:
       splot_draw_to_pixmap0_unbinned (sp, gg);
       splot_pixmap0_to_pixmap1 (sp, false, gg);  /* false = not binned */
+      splot_draw_to_pixmap1 (sp, gg);
     break;
     case QUICK:
       splot_pixmap0_to_pixmap1 (sp, false, gg);  /* false = not binned */
+      splot_draw_to_pixmap1 (sp, gg);
     break;
+
+/*
+    case COLOR_BRUSHING:
+      splot_pixmap0_to_pixmap1 (sp, false, gg);
+      splot_draw_current_symbols (sp, gg);
+      splot_draw_to_pixmap1 (sp, gg);
+    break;
+
+    case COLOR_BRUSHING_BINNED:
+      splot_pixmap0_to_pixmap1 (sp, true, gg);    true = binned
+      splot_draw_current_symbols (sp, true, gg);
+      splot_draw_to_pixmap1 (sp, gg);
+    break;
+*/
+
     case BINNED:
       splot_draw_to_pixmap0_binned (sp, gg);
       splot_pixmap0_to_pixmap1 (sp, true, gg);  /* true = binned */
+      splot_draw_to_pixmap1 (sp, gg);
     break;
+
     case EXPOSE:
     break;
 

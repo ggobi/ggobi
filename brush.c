@@ -242,18 +242,21 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
     brush_pos->y2 = mouse->y ;
   }
 
+/*-- drawing over the top won't work if erasing or glyph brushing --*/
 
   if (cpanel->brush_on_p) {
     changed = brush_once (false, sp, gg);
     if (!binning_permitted (display)) {
-      splot_redraw (sp, FULL, gg);
+
+      splot_redraw (sp, FULL, gg);  
       if (gg->brush.updateAlways_p)
-        displays_plot (sp, FULL, gg);
+        displays_plot (sp, FULL, gg);  
 
     } else {  /*-- if we can get away with binning --*/
 
       if (changed) {
         splot_redraw (sp, BINNED, gg);
+
         if (gg->brush.updateAlways_p)
           displays_plot (sp, FULL, gg);
 
@@ -557,7 +560,8 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 static gboolean
 build_color_vectors (datad *d, ggobid *gg)
 {
-  gint ih, iv, m, j, k, gp, n, p;
+  gint ih, iv, m, j, k;
+  /* gint gp, n, p; */
   static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   icoords imin, imax;
@@ -592,6 +596,8 @@ build_color_vectors (datad *d, ggobid *gg)
         } else {  /* update the vectors for this point only */
           changed = update_color_vectors (j, changed,
             d->pts_under_brush.els, d, gg);
+if (changed)
+g_printerr ("j %d changed %d \n", j, changed);
 
           /*-- link by id --*/
           if (nd > 1) color_link_by_id (j, d, gg);
@@ -841,7 +847,7 @@ build_edge_color_vectors (datad *e, ggobid *gg)
 {
   gint i, k;
   gboolean changed = false;
-  gint n, p, gp;
+  /* gint gp, n, p; */
 
   if (e->nrgroups > 0) {
 

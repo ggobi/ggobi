@@ -169,12 +169,14 @@ scatterplot_display_edge_menu_update (displayd *display,
       "Show edges (undirected)",
       display_options_cb, GINT_TO_POINTER (DOPT_EDGES_U),
       display->options.edges_undirected_show_p, gg);
+    gtk_widget_set_name (item, "DISPLAY MENU: show undirected edges");
     gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
     item = CreateMenuCheck (display->edge_menu,
       "Show 'arrowheads' (for directed edges)",
       display_options_cb, GINT_TO_POINTER (DOPT_EDGES_A),
       display->options.edges_arrowheads_show_p, gg);
+    gtk_widget_set_name (item, "DISPLAY MENU: show arrowheads");
     gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
     /* Add a separator */
@@ -185,6 +187,7 @@ scatterplot_display_edge_menu_update (displayd *display,
       "Show directed edges (both edges and 'arrowheads')",
       display_options_cb, GINT_TO_POINTER (DOPT_EDGES_D),
       display->options.edges_directed_show_p, gg);
+    gtk_widget_set_name (item, "DISPLAY MENU: show directed edges");
     gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (display->edge_item),
