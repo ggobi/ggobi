@@ -279,14 +279,15 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
 
   if (bsp->bar->is_histogram &&
       (bsp->bar->anchor_drag || bsp->bar->width_drag)) {
-    gint dy = sp->mousepos.y - sp->mousepos_o.y;
+    gint idy = sp->mousepos.y - sp->mousepos_o.y;
+    greal dy = (greal) idy;
     fcoords pts1, pts2;
 
     if (bsp->bar->anchor_drag) {
       gfloat scale_y;
       icoords scr;
 
-      if (dy != 0) {
+      if (idy != 0) {
         gboolean set_anchor = TRUE;
         gfloat offset_old = bsp->bar->offset;
         gint pmid_old = sp->pmid.y;
@@ -294,10 +295,10 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
         scr.x = scr.y = 0;
         scale_y = sp->scale.y;
         scale_y /= 2;
-        sp->iscale.y = (glong) ((gfloat) sp->max.y * scale_y);
+        sp->iscale.y = (gfloat) sp->max.y * scale_y;
 
         splot_screen_to_tform(cpanel, sp, &scr, &pts1, gg);
-        sp->pmid.y -= ((dy * PRECISION1) / sp->iscale.y);
+        sp->pmid.y -= (dy * (greal)PRECISION1 / sp->iscale.y);
         splot_screen_to_tform(cpanel, sp, &scr, &pts2, gg);
         bsp->bar->offset += (pts1.y - pts2.y);
 
@@ -326,7 +327,7 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
       }
     } else {                    /* if (bsp->bar->width_drag) */
 
-      if (dy != 0) {
+      if (idy != 0) {
         gfloat width, oldwidth;
 
         splot_screen_to_tform(cpanel, sp, &sp->mousepos_o, &pts1, gg);

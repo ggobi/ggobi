@@ -16,25 +16,28 @@
 void
 pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 {
-  gint dx, dy;
-  gfloat scale_x, scale_y;
+  greal dx, dy;
+  greal scale_x, scale_y;
   cpaneld *cpanel = &gg->current_display->cpanel;
+  greal precis = (greal) PRECISION1;
 
   if (pan_opt == P_OBLIQUE || pan_opt == P_HORIZ) {
-    dx = sp->mousepos.x - sp->max.x/2;
-    scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
+    dx = (greal) (sp->mousepos.x - sp->max.x/2);
+    scale_x = (greal)
+      ((cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x);
     scale_x /= 2;
-    sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
-    sp->pmid.x -= ((dx * PRECISION1) / sp->iscale.x);
+    sp->iscale.x = (greal) sp->max.x * scale_x;
+    sp->pmid.x -= (dx * precis / sp->iscale.x);
   }
 
 
   if (pan_opt == P_OBLIQUE || pan_opt == P_VERT) {
-    dy = sp->mousepos.y - sp->max.y/2;
-    scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
+    dy = (greal) (sp->mousepos.y - sp->max.y/2);
+    scale_y = (greal)
+      ((cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y);
     scale_y /= 2;
-    sp->iscale.y = (glong) ((gfloat) sp->max.y * scale_y);
-    sp->pmid.y += ((dy * PRECISION1) / sp->iscale.y);
+    sp->iscale.y = (greal) sp->max.y * scale_y;
+    sp->pmid.y += (dy * precis / sp->iscale.y);
   }
 }
 

@@ -22,27 +22,30 @@
 void
 pan_by_drag (splotd *sp, ggobid *gg)
 {
-  gint dx, dy;
-  gfloat scale_x, scale_y;
+  greal dx, dy;
+  greal scale_x, scale_y;
   cpaneld *cpanel = &gg->current_display->cpanel;
+  greal precis = (greal) PRECISION1;
 
-  dx = sp->mousepos.x - sp->mousepos_o.x;
-  dy = sp->mousepos.y - sp->mousepos_o.y;
+  dx = (greal) (sp->mousepos.x - sp->mousepos_o.x);
+  dy = (greal) (sp->mousepos.y - sp->mousepos_o.y);
 
-  scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
-  scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
+  scale_x = (greal)
+    ((cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x);
+  scale_y = (greal)
+    ((cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y);
 
 /*
  * This section is a bit puzzling, because I don't know what
  * would change this -- maybe resizing the plot window?
 */
   scale_x /= 2;
-  sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
+  sp->iscale.x = (greal) sp->max.x * scale_x;
   scale_y /= 2;
-  sp->iscale.y = (glong) (-1 * (gfloat) sp->max.y * scale_y);
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
 
-  sp->pmid.x -= ((dx * PRECISION1) / sp->iscale.x);
-  sp->pmid.y -= ((dy * PRECISION1) / sp->iscale.y);
+  sp->pmid.x -= (dx * precis / sp->iscale.x);
+  sp->pmid.y -= (dy * precis / sp->iscale.y);
 }
 
 /*

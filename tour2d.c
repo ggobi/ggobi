@@ -358,8 +358,8 @@ tour2d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      sp->planar[i].x += (gint)(dsp->t2d.F.vals[0][j]*world_data[i][j]);
-      sp->planar[i].y += (gint)(dsp->t2d.F.vals[1][j]*world_data[i][j]);
+      sp->planar[i].x += (greal)(dsp->t2d.F.vals[0][j]*world_data[i][j]);
+      sp->planar[i].y += (greal)(dsp->t2d.F.vals[1][j]*world_data[i][j]);
     }
   }
 }

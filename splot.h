@@ -61,15 +61,15 @@ typedef struct
  */
  GdkSegment *whiskers;
 
- lcoords *planar;
+ gcoords *planar;
  icoords *screen;
 
  /*
   * shift and scale
  */
  fcoords scale, tour_scale;
- lcoords iscale;
- lcoords pmid;	  /*-- center of the screen in planar coords --*/
+ gcoords iscale;
+ gcoords pmid;	  /*-- center of the screen in planar/world coords --*/
 
 /*
  * button and key event information
@@ -159,9 +159,9 @@ typedef struct
 
 	/** called from splot_plot_edge */
    gboolean (*draw_edge_p)(splotd *sp, gint m, datad *d, datad *e, ggobid *gg);
-	/** called from splot_plot_case. Should probably be the same as draw_edge_p but
-            doesn't take the edge argument! Could drop the first datad in splot_plot_edge
-            and just hand it the one dataset. */
+	/** called from splot_plot_case. Should probably be the same as
+        draw_edge_p but doesn't take the edge argument! Could drop the
+        first datad in splot_plot_edge and just hand it the one dataset. */
    gboolean (*draw_case_p)(splotd *sp, gint m, datad *d, ggobid *gg);
 
    void (*within_draw_to_binned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);

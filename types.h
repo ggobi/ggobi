@@ -13,6 +13,14 @@
 
 #include <gtk/gtk.h>
 
+/*
+ * greal is at several steps in the pipeline, in particular
+ * for world, jitdata, and planar, as we eliminate the conversion
+ * to longs.  Defining 'greal' allows us to compare the behavior
+ * of floats and doubles for speed and storage.
+*/
+typedef gfloat greal;
+
 typedef enum {ascii_data, binary_data, Sprocess_data, xml_data, mysql_data, url_data, unknown_data, num_data_modes} DataMode;
 
 typedef enum {NONE, EXPOSE, QUICK, BINNED, FULL, FULL_1PIXMAP} RedrawStyle;
@@ -33,6 +41,9 @@ typedef struct {
   glong x, y;
 } lcoords;
 typedef struct {
+  greal x, y;
+} gcoords;
+typedef struct {
   gint x, y;
 } icoords;
 typedef struct {
@@ -52,7 +63,6 @@ typedef struct {
 } endpointsd;
 
 
-typedef gfloat greal;  /*-- so we can use either floats or doubles --*/
 
 /*-- arrays --*/
 /*-- double: some plugins will want these --*/
@@ -227,7 +237,7 @@ typedef struct
 {
   glong count;
   gint index;
-  lcoords planar;
+  gcoords planar;
   GdkRectangle rect;
 } gbind;
 /* end bind */

@@ -415,8 +415,8 @@ splot_add_rows (gint nrows, splotd *sp)
 {
   vectorf_realloc (&sp->p1d.spread_data, nrows);
 
-  sp->planar = (lcoords *) g_realloc (sp->planar,
-    nrows * sizeof (lcoords));
+  sp->planar = (gcoords *) g_realloc (sp->planar,
+    nrows * sizeof (gcoords));
   sp->screen = (icoords *) g_realloc (sp->screen,
     nrows * sizeof (icoords));
 }
@@ -439,7 +439,7 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg)
     return;
   d = display->d;
   nr = d->nrows;
-  sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
+  sp->planar = (gcoords *) g_malloc (nr * sizeof (gcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
   vectorf_init_null (&sp->p1d.spread_data);
   vectorf_alloc (&sp->p1d.spread_data, nr);
@@ -604,10 +604,11 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
 */
 {
   gint i, k;
-  gfloat scale_x, scale_y;
+  greal scale_x, scale_y;
   datad *d = display->d;
-  glong ltmp;
+  greal gtmp;
   GtkGGobiExtendedSPlotClass *klass = NULL;
+  greal precis = (greal) PRECISION1;
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
@@ -618,8 +619,10 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
      }
   }
 
-  scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
-  scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
+  scale_x = (greal) (cpanel->projection == TOUR2D) ?
+    sp->tour_scale.x : sp->scale.x;
+  scale_y = (greal) (cpanel->projection == TOUR2D) ?
+    sp->tour_scale.y : sp->scale.y;
 
   /*
    * Calculate is, a scale factor.  Scale so as to use the entire
@@ -627,9 +630,9 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
    * scale.y permit.)
   */
   scale_x /= 2;
-  sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
+  sp->iscale.x = (greal) sp->max.x * scale_x;
   scale_y /= 2;
-  sp->iscale.y = (glong) (-1 * (gfloat) sp->max.y * scale_y);
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
 
   /*
    * Calculate new coordinates.
@@ -638,10 +641,10 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
     i = d->rows_in_plot[k];
 
     /*-- scale from world to plot window --*/
-    ltmp = sp->planar[i].x - sp->pmid.x;
-    sp->screen[i].x = (gint) ((ltmp * sp->iscale.x) >> EXP1);
-    ltmp = sp->planar[i].y - sp->pmid.y;
-    sp->screen[i].y = (gint) ((ltmp * sp->iscale.y) >> EXP1);
+    gtmp = sp->planar[i].x - sp->pmid.x;
+    sp->screen[i].x = (gint) (gtmp * sp->iscale.x / precis);
+    gtmp = sp->planar[i].y - sp->pmid.y;
+    sp->screen[i].y = (gint) (gtmp * sp->iscale.y / precis);
 
     /*-- shift into middle of plot window --*/
     sp->screen[i].x += (sp->max.x / 2);
@@ -666,9 +669,9 @@ void
 splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   fcoords *tfd, ggobid *gg)
 {
-  lcoords planar, world;
-  gfloat precis = PRECISION1;
-  gfloat ftmp, max, min, rdiff;
+  gcoords planar, world;
+  greal precis = (greal) PRECISION1;
+  greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   gfloat scale_x, scale_y;
@@ -684,16 +687,16 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
   scale_x /= 2;
-  sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
+  sp->iscale.x = (greal) sp->max.x * scale_x;
   scale_y /= 2;
-  sp->iscale.y = (glong) (-1 * (gfloat) sp->max.y * scale_y);
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
 
 /*
  * screen to plane 
 */
-  planar.x = (scr->x - sp->max.x/2) * PRECISION1 / sp->iscale.x ;
+  planar.x = (scr->x - sp->max.x/2) * precis / sp->iscale.x ;
   planar.x += sp->pmid.x;
-  planar.y = (scr->y - sp->max.y/2) * PRECISION1 / sp->iscale.y ;
+  planar.y = (scr->y - sp->max.y/2) * precis / sp->iscale.y ;
   planar.y += sp->pmid.y;
 
 /*
@@ -765,10 +768,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
 */
 
 void
-splot_screen_to_plane (splotd *sp, gint pt, lcoords *eps,
+splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
   gboolean horiz, gboolean vert)
 {
-  icoords prev_planar;
+  gcoords prev_planar;
+  greal precis = (greal) PRECISION1;
 
 /*
  * All this code shouldn't be necessary, because (eg) if we're
@@ -782,16 +786,16 @@ splot_screen_to_plane (splotd *sp, gint pt, lcoords *eps,
   scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
   scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
   scale_x /= 2;
-  sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
+  sp->iscale.x = (greal) sp->max.x * scale_x;
   scale_y /= 2;
-  sp->iscale.y = (glong) (-1 * (gfloat) sp->max.y * scale_y);
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
 
   if (horiz) {
     sp->screen[pt].x -= sp->max.x/2;
 
     prev_planar.x = sp->planar[pt].x;
-    sp->planar[pt].x = sp->screen[pt].x * PRECISION1 / sp->iscale.x ;
-    sp->planar[pt].x += sp->pmid.x;
+    sp->planar[pt].x = (greal) sp->screen[pt].x * precis / sp->iscale.x ;
+    sp->planar[pt].x += (greal) sp->pmid.x;
 
     eps->x = sp->planar[pt].x - prev_planar.x;
   }
@@ -800,8 +804,8 @@ splot_screen_to_plane (splotd *sp, gint pt, lcoords *eps,
     sp->screen[pt].y -= sp->max.y/2;
 
     prev_planar.y = sp->planar[pt].y;
-    sp->planar[pt].y = sp->screen[pt].y * PRECISION1 / sp->iscale.y ;
-    sp->planar[pt].y += sp->pmid.y;
+    sp->planar[pt].y = (greal) sp->screen[pt].y * precis / sp->iscale.y ;
+    sp->planar[pt].y += (greal) sp->pmid.y;
 
     eps->y = sp->planar[pt].y - prev_planar.y;
   }
@@ -833,8 +837,8 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
       /*if (!gg->is_pp) {*/
         for (j=0; j<display->t1d.nactive; j++) {
           var = display->t1d.active_vars.els[j];
-          d->world.vals[ipt][var] += (greal)
-           ((gfloat)gg->movepts.eps.x * display->t1d.F.vals[0][var]);
+          d->world.vals[ipt][var] += 
+           (gg->movepts.eps.x * (greal) display->t1d.F.vals[0][var]);
         }
       /*}*/
     }
@@ -846,9 +850,9 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
       /*if (!gg->is_pp) {*/
         for (j=0; j<display->t2d.nactive; j++) {
           var = display->t2d.active_vars.els[j];
-          d->world.vals[ipt][var] += (greal)
-           ((gfloat)gg->movepts.eps.x * display->t2d.F.vals[0][var] +
-            (gfloat)gg->movepts.eps.y * display->t2d.F.vals[1][var]);
+          d->world.vals[ipt][var] += 
+           (gg->movepts.eps.x * (greal) display->t2d.F.vals[0][var] +
+            gg->movepts.eps.y * (greal) display->t2d.F.vals[1][var]);
         }
       /*}*/
     }
@@ -860,28 +864,16 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
       /*if (!gg->is_pp) {*/
         for (j=0; j<display->tcorr1.nactive; j++) {
           var = display->tcorr1.active_vars.els[j];
-          d->world.vals[ipt][var] += (greal)
-           ((gfloat)gg->movepts.eps.x * display->tcorr1.F.vals[0][var]);
+          d->world.vals[ipt][var] += 
+           (gg->movepts.eps.x * (greal) display->tcorr1.F.vals[0][var]);
         }
         for (j=0; j<display->tcorr2.nactive; j++) {
           var = display->tcorr2.active_vars.els[j];
-          d->world.vals[ipt][var] += (greal)
-           ((gfloat)gg->movepts.eps.y * display->tcorr2.F.vals[0][var]);
+          d->world.vals[ipt][var] += 
+           (gg->movepts.eps.y * (greal) display->tcorr2.F.vals[0][var]);
         }
       /*}*/
     }
-/* xgobi
-    for (j=0; j<xg->ncorr_xvars; j++) {
-      var = xg->corr_xvars[j];
-      xg->world_data[pt][var] += 
-       ((float)eps->x * xg->cu[0][var] + (float)eps->y * xg->cu[1][var]);
-    }
-    for (j=0; j<xg->ncorr_yvars; j++) {
-      var = xg->corr_yvars[j];
-      xg->world_data[pt][var] += 
-       ((float)eps->x * xg->cu[0][var] + (float)eps->y * xg->cu[1][var]);
-    }
-*/
 
     break;
 
@@ -891,7 +883,7 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
 }
 
 void
-splot_reverse_pipeline (splotd *sp, gint ipt, lcoords *eps,
+splot_reverse_pipeline (splotd *sp, gint ipt, gcoords *eps,
                         gboolean horiz, gboolean vert, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;

@@ -501,8 +501,8 @@ tourcorr_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      sp->planar[i].x += (glong)(dsp->tcorr1.F.vals[0][j]*world_data[i][j]);
-      sp->planar[i].y += (glong)(dsp->tcorr2.F.vals[0][j]*world_data[i][j]);
+      sp->planar[i].x += (greal)(dsp->tcorr1.F.vals[0][j]*world_data[i][j]);
+      sp->planar[i].y += (greal)(dsp->tcorr2.F.vals[0][j]*world_data[i][j]);
     }
   }
 }

@@ -283,7 +283,7 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
    * add the other menus manually
   */
   scatterplot_display_menus_make (display, gg->app.sp_accel_group,
-				  (GtkSignalFunc) display_options_cb, gg);
+    (GtkSignalFunc) display_options_cb, gg);
   gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
 
 
@@ -414,6 +414,7 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   gboolean button1_p, button2_p;
   gint direction = (w == display->hrule) ? HORIZONTAL : VERTICAL;
   gboolean redraw = false;
+  greal precis = (greal) PRECISION1;
 
   /*-- find out if any buttons are pressed --*/
   mousepos_get_motion (w, event,  &button1_p, &button2_p, sp);
@@ -421,25 +422,25 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   if (button1_p) {
 
     if (direction == HORIZONTAL) {
-      gfloat scale_x;
-      gint dx = (gint) (event->x - display->drag_start.x);
+      greal scale_x;
+      greal dx = (greal) (event->x - display->drag_start.x);
       /*-- exactly as in pan_by_drag --*/
       scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
       scale_x /= 2;
-      sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
-      sp->pmid.x -= ((dx * PRECISION1) / sp->iscale.x);
+      sp->iscale.x = (greal) sp->max.x * scale_x;
+      sp->pmid.x -= (dx * precis / sp->iscale.x);
       /* */
       display->drag_start.x = event->x;
       redraw = true;
     } else {
-      gfloat scale_y;
-      gint dy = -1 * (gint) (event->y - display->drag_start.y);
+      greal scale_y;
+      greal dy = -1 * (greal) (event->y - display->drag_start.y);
 
       /*-- exactly as in pan_by_drag --*/
       scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
       scale_y /= 2;
-      sp->iscale.y = (glong) ((gfloat) sp->max.y * scale_y);
-      sp->pmid.y -= ((dy * PRECISION1) / sp->iscale.y);
+      sp->iscale.y = (greal) sp->max.y * scale_y;
+      sp->pmid.y -= (dy * precis / sp->iscale.y);
       /* */
 
       display->drag_start.y = event->y;

@@ -394,7 +394,7 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
   max = 2*mean;  /* try letting the max for scaling depend on the mean */
   if (cpanel->t1d.vert) {
     for (i=0; i<d->nrows_in_plot; i++) {
-      sp->planar[i].x = (glong) (precis*(-1.0+2.0*
+      sp->planar[i].x = (greal) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[i]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
       sp->planar[i].y = yy[i];
@@ -403,7 +403,7 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
   else {
     for (i=0; i<d->nrows_in_plot; i++) {
       sp->planar[i].x = yy[i];
-      sp->planar[i].y = (glong) (precis*(-1.0+2.0*
+      sp->planar[i].y = (greal) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[i]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
     }

@@ -195,27 +195,27 @@ p1d_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
 void
 ash_baseline_set (icoords *baseline, splotd *sp)
 {
-  gfloat ftmp, precis = (gfloat) PRECISION1;
-  glong pl, ltmp;
+  greal ftmp, precis = (greal) PRECISION1;
+  greal pl, gtmp;
   gint iscr;
 
 /*
   ftmp = -1 + 2.0 * (0 - sp->p1d.lim.min)/
                     (sp->p1d.lim.max - sp->p1d.lim.min);
 */
-  ftmp = -1 /* and the rest of the usual expression is 0 now */;
-  pl = (glong) (precis * ftmp);
+  gtmp = -1 /* and the rest of the usual expression is 0 now */;
+  pl = precis * ftmp;
 
 /*-- HORIZONTAL --*/
-  ltmp = pl - sp->pmid.y;
-  iscr = (gint) ((ltmp * sp->iscale.y) >> EXP1);
+  gtmp = pl - sp->pmid.y;
+  iscr = (gint) (gtmp * sp->iscale.y / precis);
   iscr += (sp->max.y / 2);
 
   baseline->y = iscr;
             
 /*-- VERTICAL --*/
-  ltmp = pl - sp->pmid.x;
-  iscr = (gint) ((ltmp * sp->iscale.x) >> EXP1);
+  gtmp = pl - sp->pmid.x;
+  iscr = (gint) (gtmp * sp->iscale.x / precis);
   iscr += (sp->max.x / 2);
 
   baseline->x = iscr;

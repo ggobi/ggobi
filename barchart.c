@@ -836,7 +836,6 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
 {
   gint i, maxbincount = 0, maxbin = -1;
   gfloat precis = PRECISION1;
-  glong ltmp;
   vartabled *vtx;
 
   gfloat scale_y;
@@ -878,15 +877,20 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
   sp->bar->maxbincounts = maxbincount;
 
   if (!sp->bar->is_spine) {
+    greal precis = (greal) PRECISION1;
+    greal gtmp;
+
     scale_y /= 2;
 
-    rawsp->iscale.y = (glong) (-1 * (gfloat) rawsp->max.y * scale_y);
+    rawsp->iscale.y = (greal) (-1 * (gfloat) rawsp->max.y * scale_y);
 
     minwidth = rawsp->max.y;
     for (i = 0; i < sp->bar->nbins; i++) {
       rect = &sp->bar->bins[i].rect;
-      ltmp = sp->bar->bins[i].planar.y - rawsp->pmid.y;
-      rect->y = (gint) ((ltmp * rawsp->iscale.y) >> EXP1);
+      /*ltmp = sp->bar->bins[i].planar.y - rawsp->pmid.y;*/
+      gtmp = sp->bar->bins[i].planar.y - rawsp->pmid.y;
+      /*rect->y = (gint) ((ltmp * rawsp->iscale.y) >> EXP1);*/
+      rect->y = (gint) (gtmp * rawsp->iscale.y / precis);
 
       rect->x = 10;
       rect->y += (rawsp->max.y / 2);
@@ -1045,8 +1049,8 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
           && MISSING_P(m, rawsp->p1dvar))
         continue;
 
-      d->pts_under_brush.els[m] = hits[rawsp->planar[i].x + 1];
-      if (hits[rawsp->planar[i].x + 1])
+      d->pts_under_brush.els[m] = hits[(gint)rawsp->planar[i].x + 1];
+      if (hits[(gint)rawsp->planar[i].x + 1])
         d->npts_under_brush++;
     }
   }
