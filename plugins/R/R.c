@@ -171,6 +171,7 @@ RCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
             inst->data = runTime;
 	} 
     }
+    fprintf(stderr, "Created plugin\n");fflush(stderr);
     return(true);
 }
 
@@ -208,7 +209,7 @@ RUpdateDisplayMenu(ggobid *gg, PluginInstance *inst)
     RRunTimeData *d = (RRunTimeData *) inst->data;
 
     obj = d->pluginObject;
-    if(Rf_length(obj) < 2 || !isFunction(VECTOR_ELT(obj, 2)))
+    if(Rf_length(obj) < 2 || !isFunction(VECTOR_ELT(obj, 1)))
 	return(false);
 
     PROTECT(e = allocVector(LANGSXP, 1));
