@@ -26,7 +26,7 @@ DisplayOptions DefaultDisplayOptions = {
                                          true,  /* points_show_p */
                                          true,  /* axes_show_p */
                                          false, /* axes_label_p */
-                                         false, /* axes_values_p */
+                                         true, /* axes_values_p */
                                          false, /* edges_undirected_show_p */
                                          false, /* edges_arrowheads_show_p */
                                          false, /* edges_directed_show_p */

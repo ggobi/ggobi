@@ -18,7 +18,7 @@
 
 #define HOLES           0
 #define CENTRAL_MASS    1
-#define SKEWNESS        2
+#define LDA             2
 
 /* terms in expansion, bandwidth */
 /*
@@ -31,6 +31,8 @@ static void close_menuitem_cb (ggobid *gg, gint action, GtkWidget *w) {
   /*  free_optimize0_p(&dsp->t2d_pp_op); should this go here? */
   displayd *dsp = gg->current_display;
   gtk_widget_hide (dsp->t2d_window);
+  t2d_optimz(0, &dsp->t2d.get_new_target, 
+    &dsp->t2d.target_selection_method, dsp);
 }
 /*-- called when closed from the window manager --*/
 static void
@@ -131,7 +133,8 @@ sphere_cb (GtkWidget  *w, ggobid *gg) {
 }
 */
 
-gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","Skewness"};
+gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","LDA","Gini-C","Entropy-C"};
+
 void t2d_pp_func_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
@@ -143,9 +146,9 @@ void t2d_pp_func_cb (GtkWidget *w, gpointer cbd)
   cpanel->t2d.pp_indx = indx;
   dsp->t2d.get_new_target = true;
 
-  dsp->t2d.ppval = 0.00;
-  dsp->t2d.oppval = -999.0;
-  dsp->t2d_pp_op.index_best = -100.0;
+  dsp->t2d.ppval = 0.0;
+  dsp->t2d.oppval = -1.0;
+  dsp->t2d_pp_op.index_best = 0.0;
   sprintf(label,"PP index: (%3.1f) %5.3f (%3.1f) ",0.0,dsp->t2d.ppval,0.0);
   gtk_label_set_text(GTK_LABEL(dsp->t2d_pplabel),label);
 
@@ -362,7 +365,7 @@ tour2dpp_window_open (ggobid *gg) {
       false, false, 0);
 
   /*-- value, lower, upper, step --*/
-    adj = gtk_adjustment_new (1.0, 0.5, 1.5, 0.1, 0.1, 0.0);
+    adj = gtk_adjustment_new (1.0, 0.1, 3.0, 0.1, 0.1, 0.0);
     gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (t2d_pptemp_set_cb), gg);
 
@@ -385,7 +388,7 @@ tour2dpp_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vb), gtk_label_new ("Cooling:"),
       false, false, 0);
 
-    adj = gtk_adjustment_new (0.99, 0.80, 1.20, 0.05, 0.05, 0.0);
+    adj = gtk_adjustment_new (0.90, 0.50, 1.0, 0.05, 0.05, 0.0);
     gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (t2d_ppcool_set_cb), gg);
 
@@ -528,4 +531,4 @@ tour2dpp_window_open (ggobid *gg) {
 
 #undef HOLES
 #undef CENTRAL_MASS
-#undef SKEWNESS
+#undef LDA

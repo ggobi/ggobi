@@ -34,23 +34,6 @@ void eigenvalues (gfloat *cov, int p, gfloat *ew,
                   gint matz, gfloat *ev, gfloat *fv1, gfloat *fv2);
 gint subd (array_f *pdata, void *param, gfloat *val);
 
-void zero (gdouble *ptr, gint length);
-void zero_int (gint *mem, gint size);
-gint compute_groups (gint *group, gint *ngroup, gint *groups, gint nrows, 
-  gfloat *gdata);
-gint alloc_discriminant_p (discriminant_param *dp, /* gfloat *gdata, */
-  gint nrows, gint ncols);
-gint free_discriminant_p (discriminant_param *dp);
-gint discriminant (array_f *pdata, void *param, gfloat *val);
-
-gint alloc_cartgini_p (cartgini_param *cgp, gint nrows);
-gint free_cartgini_p (cartgini_param *cgp);
-gint cartgini (array_f *pdata, void *param, gfloat *val);
-
-gint alloc_cartentropy_p (cartentropy_param *dp, gint nrows);
-gint free_cartentropy_p (cartentropy_param *dp);
-gint cartentropy (array_f *pdata, void *param, gfloat *val);
-
 gint alloc_cartvariance_p (cartvariance_param *dp, gint nrows, gfloat *gdata);
 gint free_cartvariance_p (cartvariance_param *dp);
 gint cartvariance (array_f *pdata, void *param, gfloat *val);

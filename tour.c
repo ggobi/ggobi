@@ -629,7 +629,15 @@ reached_target(gfloat tang, gfloat dist_az, gint basmeth,
 {
   gboolean arewethereyet = false;
 
-  if (basmeth == 0) {
+  if (basmeth == 0) { /* Note: I don't need to do something different
+                               if the basis method is different. The pp
+                               optimization provides the best target plane
+                               it can find, so we simply interpolate to it.
+                               We don't need to check index values along 
+                               the way. It does get to this maximum
+                               quickly. BUT Aesthetically it is more pleasing
+                               to do this check so that the index value
+                               never gets smaller during optimize.*/
     if (tang >= dist_az)
       arewethereyet = true;
   }
@@ -637,10 +645,9 @@ reached_target(gfloat tang, gfloat dist_az, gint basmeth,
     if (*indxval <= *oindxval)
     {
       arewethereyet = true;
-      /*      *indxval = *oindxval;*/
     }
     /*    else
-     *oindxval = *indxval;*/
+     *oindxval = *indxval;*//* this gets re-set in the run function */
   }
 
   return(arewethereyet);

@@ -145,7 +145,6 @@ struct _displayd {
  GtkWidget *t1d_mbar, *t2d_mbar;
  GtkAccelGroup *t1d_pp_accel_group, *t2d_pp_accel_group;
  optimize0_param t1d_pp_op, t2d_pp_op;
- gint t2d_pp_indx, t1d_pp_indx;
  gfloat t2d_ppindx_mat[100], t1d_ppindx_mat[100];
  gfloat t2d_indx_min, t2d_indx_max, t1d_indx_min, t1d_indx_max;
  gint t2d_ppindx_count, t1d_ppindx_count;

@@ -416,7 +416,7 @@ void       symbol_link_by_id (gint k, datad *source_d, ggobid *gg);
 gint       symbol_table_populate (datad *d);
 void       symbol_window_redraw (ggobid *);
 void       t1d_clear_ppda (ggobid *);
-void       t1d_optimz (gint, gboolean *, gint *);
+void       t1d_optimz (gint, gboolean *, gint *, displayd *);
 void       t1d_pp_reinit(ggobid *);
 void       t1d_ppdraw(gfloat, ggobid *);
 void       t1d_pptemp_set(gfloat, ggobid *);

@@ -138,6 +138,9 @@ typedef enum {NULLMODE = -1,
 #define CMANIP_HOR 3
 #define CMANIP_EQUAL 4
 
+#define TOUR_RANDOM 0
+#define TOUR_PP 1
+
 /*-- projection pursuit indices --*/
 /*#define NATURAL_HERMITE 0
 #define HERMITE         1

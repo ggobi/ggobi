@@ -28,6 +28,7 @@ The authors can be contacted at the following email addresses:
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 
 #include "vars.h"
 #include "externs.h"
@@ -37,7 +38,9 @@ The authors can be contacted at the following email addresses:
 
 #define HOLES 0
 #define CENTRAL_MASS 1
-#define SKEWNESS 2
+#define LDA 2
+#define CGINI 3
+#define CENTROPY 4
 
 #define EXPMINUS1 0.3678794411714423
 #define ONEMINUSEXPMINUS1 0.63212056
@@ -155,7 +158,7 @@ central_mass(array_f *pdata, void *param, gfloat *val)
 /*   holes_raw2 : use inverse function             */
 /***************************************************/
 
-gint holes_raw1( array_f *pdata, void *param, gfloat *val)
+gint holes_raw1(array_f *pdata, void *param, gfloat *val)
 { 
 /*
    holes_param *hp = (holes_param *) param;
@@ -193,6 +196,7 @@ gint holes_raw1( array_f *pdata, void *param, gfloat *val)
    }
 
    *val = (1.-acoefs/n)/(gfloat) ONEMINUSEXPMINUS1;
+
    free(cov);
    return(0);
 }
@@ -423,7 +427,8 @@ void t2d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
       for (j=0; j<dsp->t2d.nactive; j++)
         dsp->t2d_pp_op.proj_best.vals[i][j] = 
           dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
-    dsp->t2d.ppval = dsp->t2d_indx_min;
+    /*    dsp->t2d.ppval = dsp->t2d_indx_min;*/
+    dsp->t2d_pp_op.index_best = 0.0;
     bas_meth = 1;
   }
   else
@@ -500,6 +505,41 @@ void t2d_ppdraw_all(gint wid, gint hgt, gint margin, ggobid *gg)
 
 }
 
+/* This is writes text to the pp window to in form the
+user that optimize is finding a new maximum */ 
+void t2d_ppdraw_think(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  colorschemed *scheme = gg->activeColorScheme;
+  GtkStyle *style = gtk_widget_get_style (sp->da);
+  gchar *varlab;
+  gint lbearing, rbearing, width, ascent, descent;
+  gint wid = dsp->t2d_ppda->allocation.width, 
+    hgt = dsp->t2d_ppda->allocation.height;
+
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+  varlab = g_strdup_printf("Thinking...");
+  gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+    gtk_style_get_font (style),
+#else
+    style->font,
+#endif
+    varlab, strlen (varlab),
+    &lbearing, &rbearing, &width, &ascent, &descent);
+    gdk_draw_string (dsp->t2d_pp_pixmap,
+#if GTK_MAJOR_VERSION == 2
+    gtk_style_get_font (style),
+#else
+      style->font,
+#endif
+      gg->plot_GC, 10, 10, varlab);
+    g_free (varlab);
+  gdk_draw_pixmap (dsp->t2d_ppda->window, gg->plot_GC, dsp->t2d_pp_pixmap,
+    0, 0, 0, 0, wid, hgt);
+}
+
 /* This is the pp index plot drawing routine */ 
 void t2d_ppdraw(gfloat pp_indx_val, ggobid *gg)
 {
@@ -554,15 +594,21 @@ void t2d_pp_reinit(ggobid *gg)
 {
   gint i, j;
   displayd *dsp = gg->current_display;
+  gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
 
   for (i=0; i<dsp->t2d_pp_op.proj_best.nrows; i++)
     for (j=0; j<dsp->t2d_pp_op.proj_best.ncols; j++)
       dsp->t2d_pp_op.proj_best.vals[i][j] = 0.;
-  dsp->t2d.ppval = -100.0;
-  dsp->t2d.oppval = -999.0;
-  dsp->t2d_pp_op.index_best = -100.0;
+  dsp->t2d.ppval = 0.0;
+  dsp->t2d.oppval = -1.0;
+  dsp->t2d_pp_op.index_best = 0.0;
+  label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
+  dsp->t2d_indx_min, dsp->t2d_ppindx_mat[dsp->t2d_ppindx_count], 
+  dsp->t2d_indx_max);
+  gtk_label_set_text(GTK_LABEL(dsp->t2d_pplabel),label);
 
   t2d_clear_ppda(gg);
+  g_free (label);
 }
 
 /********************************************************************
@@ -587,22 +633,23 @@ projection.
 *********************************************************************/
 
 
-gfloat t2d_calc_indx (array_f data, array_d proj, 
+/*gfloat t2d_calc_indx (array_f data, array_d proj, 
                 gint *rows, gint nrows, 
                 gint ncols,
+                gint (*index) (array_f*, void*, gfloat*),
+                void *param)*/
+gfloat t2d_calc_indx (array_f pd,
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param)
 { 
   gfloat indexval;
-  array_f pdata;
-  gint i, j, m;
   /* gint k; */
 
-  arrayf_init_null (&pdata);
-  arrayf_alloc_zero (&pdata, nrows, 2);
+  /*  arrayf_init_null (&pdata);
+      arrayf_alloc_zero (&pdata, nrows, 2);*/
 
   /* fill projected data array */
-  for (m=0; m<nrows; m++)
+  /*  for (m=0; m<nrows; m++)
   { 
     i = rows[m];
     pdata.vals[i][0] = 0.0;
@@ -612,10 +659,10 @@ gfloat t2d_calc_indx (array_f data, array_d proj,
       pdata.vals[i][0] += data.vals[i][j]*(gfloat)proj.vals[0][j];
       pdata.vals[i][1] += data.vals[i][j]*(gfloat)proj.vals[1][j];
     }
-  }
+    }*/
 
-  index (&pdata, param, &indexval);
-  arrayf_free (&pdata, 0, 0);
+  index (&pd, param, &indexval);
+  /*  arrayf_free (&pdata, 0, 0);*/
 
   return(indexval);
 }
@@ -625,8 +672,12 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
   displayd *dsp = gg->current_display; 
   datad *d = dsp->d;
   holes_param hp;
-  gint kout, nrows = d->nrows_in_plot;
-  gint i, j;
+  discriminant_param dp;
+  cartgini_param cgp;
+  cartentropy_param cep;
+  gint kout, nrows = d->nrows_in_plot, ncols=d->ncols;
+  gfloat *gdata;
+  gint i, j, k;
   /* gint pdim = 2; */
 
   gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
@@ -645,43 +696,96 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       dsp->t2d_pp_op.proj_best.vals[i][j] = 
         dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
 
+  for (k=0; k<2; k++) 
+    for (i=0; i<d->nrows_in_plot; i++) {
+      dsp->t2d_pp_op.pdata.vals[i][k] = 
+          (d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[0]]*
+          dsp->t2d.F.vals[k][dsp->t2d.active_vars.els[0]]);
+      for (j=1; j<dsp->t2d.nactive; j++)
+        dsp->t2d_pp_op.pdata.vals[i][k] += 
+          (d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[j]]*
+          dsp->t2d.F.vals[k][dsp->t2d.active_vars.els[j]]);
+    }
+
+  gdata  = g_malloc (nrows*sizeof(gfloat));
+  if (d->clusterid.els==NULL) printf ("No cluster information found\n");
+  for (i=0; i<nrows; i++)
+  { 
+    if (d->clusterid.els!=NULL)
+      gdata[i] = d->clusterid.els[d->rows_in_plot[i]];
+    else
+      gdata[i] = 0;
+  }
+
   switch (indxtype)
   { 
     case HOLES: 
       alloc_holes_p (&hp, nrows);
-      dsp->t2d.ppval = t2d_calc_indx (d->tform, 
-        dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, holes_raw1, &hp);
+      /*      dsp->t2d.ppval = t2d_calc_indx (d->tform, 
+	      dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, holes_raw1, &hp);*/
+      dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata, 
+        holes_raw1, &hp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, holes, &hp);
       free_holes_p(&hp);
     break;
     case CENTRAL_MASS: 
       alloc_holes_p (&hp, nrows);
-      dsp->t2d.ppval = t2d_calc_indx (d->tform, 
-        dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, central_mass_raw1, &hp);
+      /*      dsp->t2d.ppval = t2d_calc_indx (d->tform, 
+	      dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, central_mass_raw1, &hp);*/
+      dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
+        central_mass_raw1, &hp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, central_mass, &hp);
       free_holes_p(&hp);
     break;
-    case SKEWNESS: 
-      /*      alloc_cartgini_p (&cgp, nrows, gdata);
-      dsp->t2d.ppval = t2d_calc_indx (d->tform, 
-        dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols,
-        cartgini, &cgp);
-      if (basismeth == 1)
-        kout = optimize0 (&dsp->t2d_pp_op, cartgini, &cgp);
-      free_cartgini_p (&cgp);*/
+    case LDA: 
+      alloc_discriminant_p (&dp, nrows, ncols); 
+      if (!compute_groups (dp.group, dp.ngroup, &dp.groups, nrows, 
+			   gdata)) {
+        dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
+          discriminant, &dp);
+        if (basismeth == 1)
+          kout = optimize0 (&dsp->t2d_pp_op, discriminant, &dp);
+      }
+      free_discriminant_p (&dp);
+      break;
+    case CGINI: 
+      alloc_cartgini_p (&cgp, nrows); 
+      if (!compute_groups (cgp.group, cgp.ngroup, &cgp.groups, nrows, 
+			   gdata)) {
+        dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
+          cartgini, &cgp);
+        if (basismeth == 1)
+          kout = optimize0 (&dsp->t2d_pp_op, cartgini, &cgp);
+      }
+      free_cartgini_p (&cgp);
+      break;
+    case CENTROPY: 
+      alloc_cartentropy_p (&cep, nrows);
+      if (!compute_groups (cep.group, cep.ngroup, &cep.groups, nrows, 
+			   gdata)) {
+        dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
+          cartentropy, &cep);
+        if (basismeth == 1)
+          kout = optimize0 (&dsp->t2d_pp_op, cartentropy, &cep);
+      }
+      free_cartentropy_p (&cep);
+      break;
     break;
     default: 
       return(true);
     break;
   }
+  g_free (gdata);
   return(false);
 }
 
 #undef HOLES
 #undef CENTRAL_MASS
-#undef SKEWNESS
+#undef LDA
+#undef CGINI      
+#undef CENTROPY   
 
 #undef ONEMINUSEXPMINUS1
 #undef EXPMINUS1

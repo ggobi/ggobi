@@ -33,7 +33,9 @@ gint holes( array_f *pdata,void *param, gfloat *val);
 gint holes_raw1(array_f *pdata,void *param, gfloat *val);
 gint holes_raw2(array_f *pdata,void *param, gfloat *val);
 
-gfloat t2d_calc_indx(array_f, array_d, gint *, gint, gint,
+/*gfloat t2d_calc_indx(array_f, array_d, gint *, gint, gint,
                 gint (*index) (array_f*, void*, gfloat*),
+                void *param);*/
+gfloat t2d_calc_indx(array_f, gint (*index) (array_f*, void*, gfloat*),
                 void *param);
 gboolean t2d_switch_index(gint, gint, ggobid *);

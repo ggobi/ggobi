@@ -243,7 +243,7 @@ display_tour1d_init (displayd *dsp, ggobid *gg)
   dsp->t1d_manip_var = 0;
 
   /* pp */
-  dsp->t1d.target_selection_method = 0;
+  dsp->t1d.target_selection_method = TOUR_RANDOM;
   dsp->t1d_ppda = NULL;
   dsp->t1d_axes = true;
   dsp->t1d_pp_op.temp_start = 1.0;
@@ -586,11 +586,13 @@ tour1d_run(displayd *dsp, ggobid *gg)
   /*  static gint count = 0;*/
   gboolean revert_random = false;
   gint pathprob = 0;
-  gint i, j, nv;
+  gint i, nv;
 #ifdef TESTING_TOUR_STEP
   GtkGGobiDisplayClass *klass;
 #endif
+  extern void t1d_ppdraw_think(ggobid *);
 
+  /* Controls interpolation steps */
   if (!dsp->t1d.get_new_target && 
       !reached_target(dsp->t1d.tang, dsp->t1d.dist_az, 
         dsp->t1d.target_selection_method,&dsp->t1d.ppval, &dsp->t1d.oppval)) {
@@ -605,30 +607,23 @@ tour1d_run(displayd *dsp, ggobid *gg)
       dsp->t1d.oppval = dsp->t1d.ppval;
       revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
         0, gg);
-      /*      count++;
-      if (count == 10) {
-      count = 0;*/
-        t1d_ppdraw(dsp->t1d.ppval, gg);
-/*      }*/
+      t1d_ppdraw(dsp->t1d.ppval, gg);
     }
 
   }
-  else { /* do final clean-up and get new target */
-    if (dsp->t1d.get_new_target) {
-      if (dsp->t1d.target_selection_method == 1)
+  else { /* we're at the target plane */
+    if (dsp->t1d.get_new_target) { /* store the pp parameters */
+      if (dsp->t1d.target_selection_method == TOUR_PP)
       {
-        dsp->t1d_pp_op.index_best = dsp->t1d.ppval;
-/*      dsp->t1d.oppval = dsp->t1d.ppval;*/
+	/*        dsp->t1d_pp_op.index_best = dsp->t1d.ppval;
         for (j=0; j<dsp->t1d.nactive; j++) 
           dsp->t1d_pp_op.proj_best.vals[0][j] = 
-            dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]];
+	  dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]];*/
       }
     }
     else 
-    {
-      if (dsp->t1d.target_selection_method == 1)
-/*      t1d_ppdraw(dsp->t1d.ppval, gg)*/;
-      else
+    { /* make sure the ending projection is the same as the target */
+      if (dsp->t1d.target_selection_method == TOUR_RANDOM)
       {
         do_last_increment(dsp->t1d.tinc, dsp->t1d.tau, 
           dsp->t1d.dist_az, (gint) 1);
@@ -636,8 +631,8 @@ tour1d_run(displayd *dsp, ggobid *gg)
           dsp->t1d.F, dsp->t1d.Va, d->ncols, (gint) 1);
       }
     }
+    /* now cleanup: store the current basis into the starting basis */
     arrayd_copy(&dsp->t1d.F, &dsp->t1d.Fa);
-    /*    copy_mat(dsp->t1d.Fa.vals, dsp->t1d.F.vals, d->ncols, 1);*/
     nv = 0;
     for (i=0; i<d->ncols; i++)
       if (fabs(dsp->t1d.Fa.vals[0][i]) > 0.01) {
@@ -647,18 +642,20 @@ tour1d_run(displayd *dsp, ggobid *gg)
                                            active/used variables is > 2 */
       dsp->t1d.get_new_target = true;
     else {
-      if (dsp->t1d.target_selection_method == 0) {
+      if (dsp->t1d.target_selection_method == TOUR_RANDOM) {
         gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
           d->ncols, (gint) 1);
       }
-      else if (dsp->t1d.target_selection_method == 1) {
+      else if (dsp->t1d.target_selection_method == TOUR_PP) {
         /* pp guided tour  */
         /* get new target according to the selected pp index */
         for (i=0; i<d->ncols; i++)
           dsp->t1d.Fz.vals[0][i] = 0.0;
         dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[0]]=1.0;
 
-        dsp->t1d.oppval = -999.0;
+        dsp->t1d.oppval = -1.0;
+        t1d_ppdraw_think(gg);
+        gdk_flush ();
         revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
           dsp->t1d.target_selection_method, gg);
 
@@ -672,21 +669,25 @@ tour1d_run(displayd *dsp, ggobid *gg)
               dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[i]] = 
                 dsp->t1d_pp_op.proj_best.vals[0][i];
           }
+          dsp->t1d_pp_op.index_best = 0.0;
+	  /*g_printerr ("tour_run:index_best %f temp %f \n", dsp->t1d_pp_op.index_best, dsp->t1d_pp_op.temp);
+g_printerr ("proj: ");
+for (i=0; i<dsp->t1d_pp_op.proj_best.ncols; i++) g_printerr ("%f ", dsp->t1d_pp_op.proj_best.vals[0][i]);
+g_printerr ("\n");*/
 
           /* if the best projection is the same as the previous one, switch 
               to a random projection */
-          if (!checkequiv(dsp->t1d.Fa.vals, dsp->t1d.Fz.vals, d->ncols, 1)) {
-    /*            g_printerr ("Using random projection\n");*/
+/*          if (!checkequiv(dsp->t1d.Fa.vals, dsp->t1d.Fz.vals, d->ncols, 1)) {
+            g_printerr ("Using random projection\n");
             gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
               d->ncols, (gint) 1);
             for (j=0; j<dsp->t1d.nactive; j++)
               dsp->t1d_pp_op.proj_best.vals[0][j] = 
                 dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[j]];
-              /*              dsp->t1d.ppval = -999.0;*/
             revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
               dsp->t1d.target_selection_method, gg);
-          }
-          /*t1d_ppdraw(dsp->t1d.ppval, gg);*/
+          }*/
+	  /*          t1d_ppdraw(dsp->t1d.ppval, gg);*/
   /*          count = 0;*/
 #ifndef WIN32
           sleep(2);
@@ -696,8 +697,9 @@ tour1d_run(displayd *dsp, ggobid *gg)
         }
         else /* Use random target */
         {
-          gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
+	  /*          gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
             d->ncols, (gint) 1);
+	    g_printerr ("Using random projection 2\n");*/
         }
         
       }

@@ -63,14 +63,12 @@ void t1d_pptemp_set(gfloat slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
 
   dsp->t1d_pp_op.temp_start = slidepos;
-  g_printerr("temp start %f\n",dsp->t1d_pp_op.temp_start);
 }
 
 void t1d_ppcool_set(gfloat slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
 
   dsp->t1d_pp_op.cooling = slidepos;
-  g_printerr("cooling %f\n",dsp->t1d_pp_op.cooling);
 }
 
 void
@@ -350,369 +348,7 @@ gint subd (array_f *pdata, void *param, gfloat *val)
   return (0);
 }
 
-/********************************************************************
-
-Index          : Discriminant
-Transformation : -
-Purpose        : Looks for the best projection to discriminate
-                 between groups.
-*********************************************************************/
-
-void zero (gdouble *ptr, gint length)
-{ 
-  gint i;
-
-  for (i=0; i<length; i++)
-    ptr[i] = 0.0;
-}
-
-void zero_int(gint *mem, int size)
-{
-  gint i;
-  for(i=0; i<size; i++)
-  mem[i] = 0;
-}
-  
-gint compute_groups (gint *group, gint *ngroup, gint *groups, 
-  gint nrows, gfloat *gdata)
-{ 
-  gint i, j, *groupval;
-
-  /* initialize data */
-  groupval = g_malloc (nrows*sizeof(gint));
-
-  *groups = 0;
-  for (i=0; i<nrows; i++)
-  { for (j=0; j<*groups; j++)
-    { if (groupval[j]==gdata[i])
-      { ngroup[j]++;
-        break;
-      }
-    }
-    if (j==*groups )
-    { groupval[j]  = gdata[i];
-      ngroup[j] = 1;
-      (*groups)++;
-    }
-  }
-
-  for (i=0; i<nrows; i++)
-  { for (j=0; j<*groups; j++)
-    { if (groupval[j]==gdata[i])
-        group[i] = j;
-    }
-  }
-
-  g_free(groupval);
-
-  return ((*groups==1) || (*groups==nrows));
-}
-
-gint alloc_discriminant_p (discriminant_param *dp, /*gfloat *gdata, */
-  gint nrows, gint ncols)
-{
-  dp->group    = g_malloc (nrows*sizeof(gint));
-  dp->ngroup   = g_malloc (nrows*sizeof(gint));
-
-  /*  if (compute_groups (dp->group, dp->ngroup, &dp->groups, nrows, 
-      gdata)) return (1);*/
-
-  /* initialize temporary space */
-  dp->cov      = (gdouble *) g_malloc ((ncols+ncols)*sizeof(gdouble));
-  dp->a        = (gdouble *) g_malloc ((ncols+ncols)*sizeof(gdouble));
-  dp->mean     = (gdouble *) g_malloc (nrows*ncols*sizeof(gdouble));
-  dp->ovmean   = (gdouble *) g_malloc (ncols*sizeof(gdouble));
-
-  dp->kpvt     = (gint *) g_malloc (ncols*sizeof(gint));
-  dp->work     = (gfloat *) g_malloc (nrows*sizeof(gfloat));
-
-  return 0;
-}
-
-gint free_discriminant_p (discriminant_param *dp)
-{ g_free(dp->group);
-  g_free(dp->ngroup);
-  g_free(dp->cov);
-  g_free(dp->a);
-  g_free(dp->mean);
-  g_free(dp->ovmean);
-  g_free(dp->kpvt);
-  g_free(dp->work);
-
-  return 0;
-}
-
-/* what does this function do? *
-double ludcomp(double *a,int n) 
-{ 
-  int i,j,k,ier,pivot;
-  double *s,det,temp,c;
-
-  det=1;
-  s = (double *) g_malloc(n*sizeof(double));
-  for(i=0; i<n; i++) {       
-    s[i] = a[i*n+1];
-    for (j=1; j<n; j++)
-    if (s[i] < a[i*n+j]) 
-      s[i] = a[i*n+j];
-  }
-  for(k=0; k<n-1; k++) {       
-    for(i=k; i<n; i++) {       
-      temp = fabs(a[i*n+k]/s[i]);
-      if(i==k) {      
-        c=temp; 
-        pivot=i;
-      }
-      else if (c < temp) {
-        c = temp; 
-        pivot=i;
-        }
-      }
-
-      * If all elements of a row(or column) of A are zero, |A| = 0 *
-      if (c==0) {       
-        det=0;
-        return(det);
-      }
-      if (pivot!=k) {
-        det*=-1; 
-	*        printf("Change!!\n");*
-        for(j=k; j<n; j++) {       
-          temp = a[k*n+j]; 
-          a[k*n+j]=a[pivot*n+j]; 
-          a[pivot*n+j]=temp;
-        }
-        temp = s[k];
-        s[k] = s[pivot];
-        s[pivot]=temp;
-      }
-      for (i=k+1; i<n; i++) {       
-        temp = a[i*n+k]/a[k*n+k];
-        a[i*n+k] = temp;
-        for(j=k+1; j<n; j++)
-          a[i*n+j] -= temp*a[k*n+j];
-      }
-      det *= a[k*n+k];
-    }
-    k = n-1;
-    det *= a[(n-1)*n+(n-1)];
-    *    printf("det in ludecomp = %f\n",det);*
-    ier=0;
-    return(det);
-}
-*/
-
-gint discriminant (array_f *pdata, void *param, gfloat *val)
-{ 
-  discriminant_param *dp = (discriminant_param *) param;
-  gint i, j, k;
-  gint n, p;
-  gdouble det;
-  gint *Pv; /* dummy structure for pivot in ludcmp - not used */
-
-  n = pdata->nrows;
-  p = pdata->ncols;
-
-  Pv = (int *) malloc(n*sizeof(int));
-
-  /* Compute means */
-  zero (dp->mean, dp->groups*p);
-  zero (dp->ovmean, p);
-  zero (dp->cov, p*p);
-
-  for (i=0; i<n; i++)
-  { 
-    for (k=0; k<p; k++)
-    { 
-      dp->mean[k+p*dp->group[i]] += (gdouble) pdata->vals[i][k];  
-      dp->ovmean[k] += (gdouble) pdata->vals[i][k];
-    }
-  }
-
-  for (k=0; k<p; k++)
-  { 
-    for (i=0; i<dp->groups; i++)
-    { 
-      dp->mean[k*p+i] /= (gdouble) dp->ngroup[i];
-    /*     sprintf (msg, "mean[%i,%i]=%f", i, k, dp->mean[k*n+i]); print(); */
-    }
-    dp->ovmean[k] /= (gdouble) n;
-  }
-
-  /* Compute W */
-
-  for (i=0; i<n; i++)
-  { 
-    for (j=0; j<p; j++)
-    { 
-      /*      for (k=0; k<=p; k++)*/
-      for (k=0; k<=j; k++)
-      { 
-        dp->cov[k*p+j] += 
-          ((gdouble) pdata->vals[i][j]-dp->mean[j+p*dp->group[i]])*
-          ((gdouble) pdata->vals[i][k]-dp->mean[k+p*dp->group[i]]);
-      }
-      dp->cov[j*p+k] = dp->cov[k*p+j];
-    }
-  }
-
-  /*  lda = p;
-  n   = p;
-  job = 10;*/
-
-  memcpy(dp->a,dp->cov,p*p*sizeof(double)); 
-  det = ludcmp(dp->a, p, Pv); 
-  *val = det;
-
-  /* Compute W+B */
-
-  for (j=0; j<p; j++) 
-  {	
-    for(k=0; k<p; k++)
-    {
-      for (i=0; i< dp->groups; i++)	
-        dp->cov[p*j+k] += (dp->mean[i*p+j]-dp->ovmean[j])*
-          (dp->mean[i*p+k]-dp->ovmean[k])/(gdouble)(dp->ngroup[i]);
-    }
-  }
-
-  memcpy(dp->a,dp->cov,p*p*sizeof(double)); 
-  det = ludcmp(dp->a, p, Pv); 
-  *val = 1.0-*val/det;
-
-  /*  printf ("Index=%f\n", *val);*/
-
-/*  sprintf (msg, "index=%f\n", *val); print(); */
-  free(Pv);
-
-  return (0);
-}
-
-/********************************************************************
-
-Index          : Gini, Entropy, Variance
-Transformation : -
-Purpose        : Looks for the best split in 1d-projected data.
-
-*********************************************************************/
-
-void swap_group(array_f *pdata, gint *group, int i, int j)
-{
-  int temp1,k; 
-  double temp2;
-
-  temp1 = group[i];
-  group[i] = group[j];
-  group[j] = temp1;
-  for(k=0; k<pdata->ncols; k++)
-  { temp2 = pdata->vals[i][k];   
-        pdata->vals[i][k] = pdata->vals[j][k];
-        pdata->vals[j][k] = temp2;
-  }
-
-}
-
-void sort_group(array_f *pdata, gint *group, int left, int right)
-{
-  int i, last;
-                                
-  if(left >= right) return;
-  swap_group(pdata, group, left, (left+right)/2);
-  last = left;   
-  for(i=left+1; i<=right; i++)
-    if(group[i] < group[left])
-      swap_group(pdata, group, ++last,i);
-  swap_group(pdata, group, left, last);
-  sort_group(pdata, group, left, last-1);
-  sort_group(pdata, group, last+1,right);
-}       
-
-void swap_data(double *x, int *index,int i, int j)
-{
-  int temp1; double temp2;
-  
-  temp1 = index[i];
-  index[i] = index[j];
-  index[j] = temp1;
-  temp2 = x[i];
-  x[i]= x[j];
-  x[j] = temp2;
-}
-
-void sort_data(double *x, int *index,int left, int right)
-{
-  int i, last;
-                                
-  if(left >= right) return;
-  swap_data(x,index,left,(left+right)/2);
-  last = left;   
-  for(i=left+1; i<=right; i++)
-    if(x[i] < x[left])
-      swap_data(x,index,++last,i);
-  swap_data(x,index, left, last);
-  sort_data(x,index, left, last-1);
-  sort_data(x,index,last+1,right);
-}       
-
-void countgroup(int *group, int *gps, int n)
-{
-  int temp,i;
-  int groups = *gps;
-
-  temp = group[0]; 
-  groups=1; 
-
-  for(i=1; i<n; i++) 
-    if (group[i] != temp) 
-      (groups)++; 
-  temp = group[i];
-
-  *gps = groups;
-}
-
-void countngroup(int *group, int *ngroup, int n)
-{
-  int temp,i,j;
-
-  temp= group[0]; 
-  ngroup[0] = 1; 
-  j=0; 
-  for(i=1; i<n; i++) 
-  {	
-    if (group[i] != temp) 
-      temp = group[i]; j++;
-    (ngroup[j]) ++; 
-  } 
-
-}
-
-gint alloc_cartgini_p (cartgini_param *dp, gint nrows)
-{ /* initialize data */
-  gint n = nrows;
-
-  dp->group    = g_malloc(n*sizeof(gint));
-  dp->ngroup   = g_malloc(n*sizeof(gint));
-
-  /* initialize temporary space */
-  dp->x        = g_malloc(n*sizeof(gdouble));
-  dp->nright   = g_malloc(n*sizeof(gint));
-  dp->index    = g_malloc(n*sizeof(gint));
-
-  return 0;
-}
-
-gint free_cartgini_p (cartgini_param *dp)
-{ 
-  g_free (dp->group);
-  g_free (dp->ngroup);
-  g_free (dp->x);
-  g_free (dp->nright);
-  g_free (dp->index);
-
-  return 0;
-}
-
-gint cartgini (array_f *pdata, void *param, gfloat *val)
+/*gint cartgini (array_f *pdata, void *param, gfloat *val)
 { 
   cartgini_param *dp = (cartgini_param *) param;
   gint i, k, n, p, g = dp->groups, left, right;
@@ -723,17 +359,16 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
   if (p != 1) 
     return(-1);
 
-/* Sort pdata by group */ 
+* Sort pdata by group *
   right = pdata->nrows-1;
   left = 0;
   sort_group(pdata,dp->group,left,right);
 
-/* data relocation and make index */ 
+* data relocation and make index *
   zero(dp->x,n);
   zero_int(dp->index,n);
 
   for (i=0; i<n; i++) {	
-    /*    dp->x[i] = pdata->vals[i][0];*/
     dp->x[i] = pdata->vals[i][0];
     dp->index[i] = dp->group[i];
   }
@@ -742,7 +377,7 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
   right=n-1;
   sort_data(dp->x, dp->index,left,right) ;
 
- /* Calculate gini index */
+ * Calculate gini index *
   zero_int(dp->nright,g);
   *val = 1;
   for (i=0; i<g; i++) {	
@@ -761,38 +396,13 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
     }
     if (dev<*val) *val = dev;
   } 
-  /*  *val = (*val)*(gdouble)(g/(g-1));*/
   *val = (1-*val);
 
   return(0);
-}
+}*/
 
-gint alloc_cartentropy_p (cartentropy_param *dp, gint nrows)
-{ /* initialize data */
-  gint n = nrows;
 
-  dp->group    = g_malloc (n*sizeof(gint));
-  dp->ngroup   = g_malloc (n*sizeof(gint));
-
-  /* initialize temporary space */
-  dp->x        = g_malloc (n*sizeof(gdouble));
-  dp->nright   = g_malloc (n*sizeof(gint));
-  dp->index    = g_malloc (n*sizeof(gint));
-
-  return 0;
-}
-
-gint free_cartentropy_p (cartentropy_param *dp)
-{ g_free (dp->ngroup);
-  g_free (dp->group);
-  g_free (dp->x);
-  g_free (dp->index);
-  g_free (dp->nright);
-
-  return 0;
-}
-
-gint cartentropy (array_f *pdata, void *param, gfloat *val)
+/*gint cartentropy (array_f *pdata, void *param, gfloat *val)
 { 
   cartentropy_param *dp = (cartentropy_param *) param;
 
@@ -804,17 +414,16 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val)
   if (p != 1) 
     return(-1);
 
-/* Sort pdata by group */ 
+* Sort pdata by group *
   right = pdata->nrows-1;
   left = 0;
   sort_group(pdata,dp->group,left,right);
 
-/* data relocation and make index */ 
+* data relocation and make index *
   zero(dp->x,n);
   zero_int(dp->index,n);
 
   for (i=0; i<n; i++) {	
-    /*    dp->x[i] = pdata->vals[i][0];*/
     dp->x[i] = pdata->vals[i][0];
     dp->index[i] = dp->group[i];
   }
@@ -823,7 +432,7 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val)
   right=n-1;
   sort_data(dp->x, dp->index,left,right) ;
 
- /* Calculate entropy index */
+* Calculate entropy index *
   zero_int(dp->nright,g);
   *val = 0;
   for (i=0; i<dp->groups; i++)
@@ -849,7 +458,7 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val)
 
   return(0);
 }
-
+*/
 gint alloc_cartvariance_p (cartvariance_param *dp, gint nrows, gfloat *gdata)
 { gint i;
   /* initialize data */
@@ -921,11 +530,18 @@ gint cartvariance (array_f *pdata, void *param, gfloat *val)
 
 
 /* This function interacts with control  buttons in ggobi */
-void t1d_optimz(gint optimz_on, gboolean *nt, gint *bm) {
+void t1d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
   gboolean new_target = *nt;
   gint bas_meth = *bm;
+  gint i, j;
 
   if (optimz_on) {
+    for (i=0; i<1; i++)
+      for (j=0; j<dsp->t1d.nactive; j++)
+        dsp->t1d_pp_op.proj_best.vals[i][j] = 
+          dsp->t1d.F.vals[i][dsp->t1d.active_vars.els[j]];
+    /*    dsp->t1d.ppval = dsp->t1d_indx_min;*/
+    dsp->t1d_pp_op.index_best = 0.0;
     bas_meth = 1;
   }
   else {
@@ -1004,6 +620,41 @@ void t1d_ppdraw_all(gint wid, gint hgt, gint margin, ggobid *gg)
 
 }
 
+/* This is writes text to the pp window to in form the
+user that optimize is finding a new maximum */ 
+void t1d_ppdraw_think(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  colorschemed *scheme = gg->activeColorScheme;
+  GtkStyle *style = gtk_widget_get_style (sp->da);
+  gchar *varlab;
+  gint lbearing, rbearing, width, ascent, descent;
+  gint wid = dsp->t1d_ppda->allocation.width, 
+    hgt = dsp->t1d_ppda->allocation.height;
+
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+  varlab = g_strdup_printf("Thinking...");
+  gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+    gtk_style_get_font (style),
+#else
+    style->font,
+#endif
+    varlab, strlen (varlab),
+    &lbearing, &rbearing, &width, &ascent, &descent);
+    gdk_draw_string (dsp->t1d_pp_pixmap,
+#if GTK_MAJOR_VERSION == 2
+    gtk_style_get_font (style),
+#else
+      style->font,
+#endif
+      gg->plot_GC, 10, 10, varlab);
+    g_free (varlab);
+  gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
+    0, 0, 0, 0, wid, hgt);
+}
+
 /* This is the pp index plot drawing routine */ 
 void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
 {
@@ -1063,15 +714,16 @@ void t1d_pp_reinit(ggobid *gg)
   for (i=0; i<dsp->t1d_pp_op.proj_best.nrows; i++)
     for (j=0; j<dsp->t1d_pp_op.proj_best.ncols; j++)
       dsp->t1d_pp_op.proj_best.vals[i][j] = 0.;
-  dsp->t1d.ppval = -100.0;
-  dsp->t1d.oppval = -999.0;
-  dsp->t1d_pp_op.index_best = -100.0;
+  dsp->t1d.ppval = 0.0;
+  dsp->t1d.oppval = -1.0;
+  dsp->t1d_pp_op.index_best = 0.0;
   label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
   dsp->t1d_indx_min, dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count], 
   dsp->t1d_indx_max);
   gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
 
   t1d_clear_ppda(gg);
+  g_free (label);
 }
 
 /********************************************************************
@@ -1123,8 +775,6 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
   gfloat *gdata;
   gint i, j;
 
-  gdata  = g_malloc (nrows*sizeof(gfloat));
-
   gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
     reset_pp, gg);
 
@@ -1150,6 +800,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
         dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]]);
   }
 
+  gdata  = g_malloc (nrows*sizeof(gfloat));
   if (d->clusterid.els==NULL) printf ("No cluster information found\n");
   for (i=0; i<nrows; i++)
   { 
@@ -1174,10 +825,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
         kout = optimize0 (&dsp->t1d_pp_op, central_mass1d_raw1, &hp);
       break;
     case PCA: 
-      /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-	      dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, pca, NULL);*/
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-      /*        d->rows_in_plot, d->nrows, d->ncols, */
         pca, NULL);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, pca, &cvp);
@@ -1185,9 +833,6 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
     case LDA:
       alloc_discriminant_p (&dp, /* gdata, */
 			    nrows, ncols); /*pdim);*/
-      /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 
-        discriminant, &dp);*/
       if (!compute_groups (dp.group, dp.ngroup, &dp.groups, nrows, 
 			   gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
