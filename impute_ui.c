@@ -245,6 +245,85 @@ impute_window_open (ggobid *gg)
       GTK_SIGNAL_FUNC (rescale_cb), (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
 
+#if 0
+    {
+      GtkWidget *table, *entry, *radio;
+      gint row = 0;
+
+      table = gtk_table_new (6, 2, false);
+      gtk_box_pack_start (GTK_BOX (vb), table, false, false, 2);
+ 
+      /* Random */
+      radio = gtk_radio_button_new_with_label (NULL, "Random");
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(radio), true);
+      gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        1, 1);
+      tgl = gtk_check_button_new_with_label ("Condition on symbol and color"); 
+      gtk_table_attach (GTK_TABLE (table), tgl, 1, 2, row, row+1,
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        1, 1);
+      row++;
+
+      /* Fixed */
+      radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Fixed");
+      gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        1, 1);
+      /* gg->impute.entry_val */ entry = gtk_entry_new();
+      gtk_table_attach (GTK_TABLE (table), entry, 1, 2, row, row+1,
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        1, 1);
+      row++;
+
+      /* Pctage below min */
+      radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Percent below min");
+      gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        1, 1);
+      /* gg->impute.entry_below */ entry = gtk_entry_new();
+      gtk_table_attach (GTK_TABLE (table), entry, 1, 2, row, row+1,
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        1, 1);
+      row++;
+
+      /* Pctage above min */
+      radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Percent above min");
+      gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        1, 1);
+      /* gg->impute.entry_above */ entry = gtk_entry_new();
+      gtk_table_attach (GTK_TABLE (table), entry, 1, 2, row, row+1,
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        1, 1);
+      row++;
+
+      /* Mean */
+      radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Variable mean");
+      gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        1, 1);
+      row++;
+
+      /* Median */
+      radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Variable median");
+      gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                        1, 1);
+      row++;
+    }
+#endif
+
     /*-- add a close button --*/
     hb = gtk_hbox_new (false, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
