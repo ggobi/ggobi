@@ -124,22 +124,24 @@ brush_reset_cb (GtkWidget *w, gpointer cbd)
 void
 brush_reset(ggobid *gg, gint action)
 {
-  gint m, i, k;
+  gint i, k;
   datad *d = gg->current_display->d;
   datad *e = gg->current_display->e;
+  extern void cluster_table_labels_update (datad *d, ggobid *gg);
 
   switch (action) {
     case RESET_UNHIDE_POINTS:  /*-- un-hide all points --*/
-      for (m=0; m<d->nrows_in_plot; m++) {
-        i = d->rows_in_plot[m];
+      for (i=0; i<d->nrows; i++) {
         d->hidden.els[i] = d->hidden_now.els[i] = false;
       }
-      displays_plot (NULL, FULL, gg);
-      break;
 
-    case RESET_POINT_COLORS:  /*-- reset point colors -- to what? --*/
-      break;
-    case RESET_GLYPHS:  /*-- reset point glyphs -- to what? --*/
+      /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
+      clusters_set (d, gg);
+      cluster_table_labels_update (d, gg);
+      rows_in_plot_set (d, gg);
+      tform_to_world (d, gg);
+      displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+      /*-- --*/
       break;
 
     case RESET_UNHIDE_EDGES:  /*-- un-hide all edges --*/
@@ -147,16 +149,24 @@ brush_reset(ggobid *gg, gint action)
         for (k=0; k<e->edge.n; k++) {
           e->hidden_now.els[k] = e->hidden.els[k] = false;
         }
-        displays_plot (NULL, FULL, gg);
+        /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
+        clusters_set (e, gg);
+        cluster_table_labels_update (e, gg);
+        rows_in_plot_set (e, gg);
+        tform_to_world (e, gg);
+        displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+        /*-- --*/
       }
-      break;
-
-    case RESET_EDGES:  /*-- reset edge colors -- to what? --*/
       break;
 
     case RESET_INIT_BRUSH:  /*-- reset brush size --*/
       brush_pos_init (gg->current_splot);
       splot_redraw (gg->current_splot, QUICK, gg);
+      break;
+
+    case RESET_POINT_COLORS:  /*-- reset point colors -- to what? --*/
+    case RESET_GLYPHS:  /*-- reset point glyphs -- to what? --*/
+    case RESET_EDGES:  /*-- reset edge colors -- to what? --*/
       break;
   }
 }

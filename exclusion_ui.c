@@ -76,11 +76,14 @@ cluster_symbol_show (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
   return FALSE;
 }
 
-static void
+void
 cluster_table_labels_update (datad *d, ggobid *gg)
 {
   gint k;
   gchar *str;
+
+  if (gg->cluster_ui.window == NULL)
+    return;
 
   for (k=0; k<d->nclusters; k++) {
     str = g_strdup_printf ("%ld", d->clusv[k].nhidden);
@@ -352,7 +355,7 @@ cluster_window_open (ggobid *gg) {
     gtk_signal_connect (GTK_OBJECT (gg->cluster_ui.window), "delete_event",
                         GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) gg);
     gtk_window_set_title (GTK_WINDOW (gg->cluster_ui.window),
-      "case clusters");
+      "color & glyph groups");
   }
 
   vbox = gtk_vbox_new (false, 5);

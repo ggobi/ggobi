@@ -48,8 +48,9 @@ symbol_table_populate (datad *d)
     m = d->color.els[i];
     if (d->symbol_table[j][k][m].n == 0) nclusters++;
     d->symbol_table[j][k][m].n++;
-    if (d->hidden.els[i])
+    if (d->hidden.els[i]) {
       d->symbol_table[j][k][m].nhidden++;
+    }
     else
       d->symbol_table[j][k][m].nshown++;
   }
@@ -65,7 +66,8 @@ clusters_set (datad *d, ggobid *gg) {
   nclusters = symbol_table_populate (d);
 
   /*-- reallocate the array of cluster structures --*/
-  d->clusv = (clusterd *) g_realloc (d->clusv, nclusters * sizeof (clusterd));
+  d->clusv = (clusterd *)
+    g_realloc (d->clusv, nclusters * sizeof (clusterd));
 
   /*
    * populate the clusv structures using the information in the
