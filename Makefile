@@ -1,3 +1,9 @@
+ggobi:
+
+local.config: developerConfigure
+	./developerConfigure
+	@echo "Created local.config via developerConfigure"
+
 include local.config
 
 ifdef ADMIN
@@ -224,14 +230,6 @@ depends: $(SRC)
 include depends
 
 endif
-
-
-local.config:
-	@echo "# Where to find XML libraries" > $@
-	@echo "# XML_INC_DIRS=" >> $@
-	@echo "# XML_LIB_DIRS=" >> $@
-	@echo "# Location of dmalloc" >> $@
-	@echo "# DM=1" >> $@
 
 
 readXML: read_xml.o read_data.o fileio.o read_color.o read_init.o plugin.o brush_init.o ggobi.o

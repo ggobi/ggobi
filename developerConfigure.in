@@ -17,11 +17,31 @@ if test -e config.h ;  then
  rm config.h
 fi 
 
+
+AC_PATH_PROG(XML_CONFIG, xml2-config)
+
+if test -z "$XML_CONFIG" ; then
+  AC_PATH_PROG(XML_CONFIG, xml-config)
+fi 
+
+
+
+if test -r local.config ; then
+  cp local.config local.config.bak
+  echo "Old version of local.config is in local.config.bak"
+fi
+
+
+AC_OUTPUT(local.config)
+
 if test -e Install/config.h ; then
+  echo "Moving config.h to `pwd`"
   mv Install/config.h .
   if test ! -r GGobiConfig.h ; then
     ln -s config.h GGobiConfig.h
   fi
+else
+  echo "config.h hasn't been created (`pwd`)"
 fi
 
-AC_OUTPUT()
+

@@ -1,0 +1,8 @@
+# Where to find XML libraries
+# XML_INC_DIRS=
+# XML_LIB_DIRS=
+XML_FLAGS=$(shell @XML_CONFIG@ --cflags)
+XML_LIBS=$(shell @XML_CONFIG@ --libs)
+
+# Location of dmalloc
+# DM=1
