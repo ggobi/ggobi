@@ -60,6 +60,7 @@ SRC=\
     ppcorr_ui.c \
     read_array.c \
     read_data.c \
+    record_id.c \
     rotate_ui.c \
     scale_api.c \
     scale_click.c \
