@@ -178,6 +178,16 @@ cycle_fixedy (splotd *sp, displayd *display, datad *d, ggobid *gg)
   }
 }
 
+/*
+ * The question is:  cycle over all y vs x, ie, the entire
+ * off-diagonal scatterplot matrix, or cycle over only one
+ * triangle of the matrix.  It's more efficient just to use
+ * the upper triangle, so let's try to make that work properly.
+ *
+ * y is always > x, unless we're starting from a projection that
+ * was determined by variable selection, not by cycling.  (And
+ * users can select plots during cycling, too.)
+*/
 void
 cycle_xy (splotd *sp, displayd *display, datad *d, ggobid *gg)
 {
@@ -191,37 +201,34 @@ cycle_xy (splotd *sp, displayd *display, datad *d, ggobid *gg)
 
   if (cpanel->xyplot.cycle_dir == 1) {
 
-    if ((jx == d->ncols-1) ||
-        (jx == d->ncols-2 && jy == d->ncols-1) )
-    {
+    /* case 1: x is maxed out. */
+    if ((jx == d->ncols-1) || (jx == d->ncols-2 && jy == d->ncols-1) ) {
       jx = 0;
       jy = jx+1;
-    }
-    else if (jy < jx) {
+    /* 2: this can occur due to variable selection, but not due to cycling */
+    } else if (jy < jx) {
       jy = jx+1;
-    }
-    else if (jy == d->ncols-1) {
+    /* y is maxed out, but not x */
+    } else if (jy == d->ncols-1) {
       jx++;
-      jy = jx+1;
-    }
-    else
-      jy++;
+      jy = 0;
+    } else jy++;
 
   } else {
 
-    if ( jx == 0 || (jx == 1 && jy == 0) ) {
-      jx = d->ncols-1;
-      jy = jx-1;
-    }
-    else if (jy > jx) {
-      jy = jx-1;
-    }
-    else if (jy == 0) {
-      jx--;
-      jy = jx-1;
-    }
-    else
-      jy--;
+    /* case 1: y is at a minimum, or x and y together are at a minimum */
+    if ( jy == jx+1 ) {
+      if (jx == 0) {
+        jx = d->ncols - 2;
+      } else {
+        jx--;
+      }
+      jy = d->ncols - 1;
+    /* 2: this can occur due to variable selection, but not due to cycling */
+    } else if (jy < jx) {
+      jy = d->ncols-1;
+    /* 3: just decrement y */
+    } else jy--;
   }
 
   if (jx != sp->xyvars.x) {
