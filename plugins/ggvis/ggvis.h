@@ -192,5 +192,7 @@ void mds_open_display_cb (GtkWidget *btn, PluginInstance *inst);
 void clusters_changed_cb (ggobid *, datad *, void *);
 void create_shepard_data_cb (PluginInstance *inst, guint action, GtkWidget *w);
 
+void ggv_free (ggvisd *);
+
 #define GGVIS_H
 #endif

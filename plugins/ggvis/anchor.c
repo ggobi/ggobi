@@ -141,6 +141,9 @@ ggv_anchor_table_build (PluginInstance *inst)
   gint nrows = 2, ncols = 7;
   datad *d;
 
+  if (inst->data == NULL)
+    return;
+
   d = ggv->dpos;
   if (ggv->dpos == NULL)
     d = ggv->dsrc;

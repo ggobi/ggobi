@@ -181,9 +181,16 @@ static void
 ggv_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
 {
   gchar *row[1];
-  GtkWidget *swin = (GtkWidget *)
+  GtkWidget *swin;
+  gchar *clname;
+
+  g_printerr ("adding data %d\n", (gint)clist);
+  if (clist == NULL)
+    return;
+
+  swin = (GtkWidget *)
     gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
-  gchar *clname = gtk_widget_get_name (GTK_WIDGET(clist));
+  clname = gtk_widget_get_name (GTK_WIDGET(clist));
 
   if (strcmp (clname, "nodeset") == 0 && d->rowIds != NULL) {
     row[0] = g_strdup (d->name);
@@ -875,18 +882,93 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
 void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
 {
+  if (inst->data) {
+    GtkWidget *window = GTK_WIDGET(inst->data);
+    ggobid *gg = inst->gg;
+    ggvisd *ggv = ggvisFromInst (inst);
+
+    GtkWidget *clist_node = widget_find_by_name (window, "nodeset");
+    GtkWidget *clist_edge = widget_find_by_name (window, "edgeset");
+    /* I'm definitely getting the right clists; I've checked */
+
+    /* Disconnect signals; this isn't working.  Don't know why. */
+
+    /*gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
+     (GtkSignalFunc) ggv_clist_datad_added_cb,
+     GTK_OBJECT (clist));*/
+    gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
+      (GtkSignalFunc) ggv_clist_datad_added_cb,
+      (gpointer) GTK_OBJECT(clist_node));
+
+    gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
+      (GtkSignalFunc) ggv_clist_datad_added_cb,
+      (gpointer) GTK_OBJECT(clist_edge));
+
+    /*  gtk_signal_connect (GTK_OBJECT(gg),
+	"clusters_changed", clusters_changed_cb, inst); */
+    gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
+      (GtkSignalFunc) clusters_changed_cb,
+      (gpointer) inst);
+
+    /* The signals don't seem to be disappearing, and
+       I can't disconnect a signal by id */
+/*
+  guint id;
+    id = gtk_signal_lookup ("datad_added", GTK_TYPE_GGOBI);
+    g_printerr ("id = %d\n", id);
+    if (id) g_printerr (" name = %s\n", gtk_signal_name(id));
+    if (id) gtk_signal_disconnect (GTK_OBJECT(gg), id);
+    id = gtk_signal_lookup ("clusters_changed", GTK_TYPE_GGOBI);
+    g_printerr ("id = %d\n", id);
+    if (id) g_printerr (" name = %s\n", gtk_signal_name(id));
+    if (id) gtk_signal_disconnect (GTK_OBJECT(gg), id);
+*/
+
+    /*
+     * This is the window, so it should serve to destroy
+     * all the child widgets.
+    */
+    gtk_widget_destroy ((GtkWidget *) inst->data);
+
+    ggv_free (ggv);
+  }
   inst->data = NULL;
 }
 
 void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   if (inst->data) {
-    ggvisd *ggv = ggvisFromInst (inst);
-    /*
-    gtk_signal_disconnect_by_func(GTK_OBJECT(inst->data),
-      GTK_SIGNAL_FUNC (close_ggvis_window), inst);
-    */
-    gtk_widget_destroy ((GtkWidget *) inst->data);
+    GtkWidget *window = GTK_WIDGET(inst->data);
+    close_ggvis_window (window, inst);
   }
 }
 
+void
+ggv_free (ggvisd *ggv) {
+  /* unref the pixmaps */
+  gdk_pixmap_unref (ggv->dissim->pix);
+  gdk_pixmap_unref (ggv->stressplot_pix);
+
+  arrayd_free (&ggv->Dtarget, 0, 0);
+  arrayd_free (&ggv->pos, 0, 0);
+
+  vectord_free (&ggv->stressvalues);
+  vectord_free (&ggv->stressvalues);
+
+  g_free (ggv->dissim);
+  vectorb_free (&ggv->dissim->bars_included);
+  vectori_free (&ggv->dissim->bins);
+  vectorb_free (&ggv->anchor_group);
+  vectord_free (&ggv->pos_mean);
+  vectord_free (&ggv->weights);
+  vectord_free (&ggv->rand_sel);
+  vectord_free (&ggv->trans_dist);
+  vectord_free (&ggv->config_dist);
+  vectori_free (&ggv->point_status);
+  vectori_free (&ggv->trans_dist_index);
+  vectori_free (&ggv->bl);
+  vectord_free (&ggv->bl_w);
+  arrayd_free (&ggv->gradient, 0, 0);
+
+  g_free (ggv);
+}
