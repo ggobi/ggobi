@@ -659,29 +659,22 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
       break;
 
     case 1:
-      transform1_values_set (tform_type, param, jcol, d, gg);
-      if (!transform1_apply (jcol, d, gg)) {
-        transform1_values_set (NO_TFORM1, 0., jcol, d, gg);
-        transform1_apply (jcol, d, gg);
-      }
-
-      if (!transform2_apply (jcol, d, gg)) {
-        transform2_values_set (NO_TFORM2, jcol, d, gg);
-      }
-      break;
-
     case 2:
       /*-- run the stage1 transform --*/
+      if (stage == 1)
+        transform1_values_set (tform_type, param, jcol, d, gg);
       if (!transform1_apply (jcol, d, gg)) {
         transform1_values_set (NO_TFORM1, 0., jcol, d, gg);
         transform1_apply (jcol, d, gg);
       }
 
-      transform2_values_set (tform_type, jcol, d, gg);
+      /*-- then run the stage2 transform --*/
+      if (stage == 2)
+        transform2_values_set (tform_type, jcol, d, gg);
       if (!transform2_apply (jcol, d, gg)) {
         transform2_values_set (NO_TFORM2, jcol, d, gg);
       }
-      break;
+    break;
   }
 
   tform_label_update (jcol, d, gg);
