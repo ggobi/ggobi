@@ -39,12 +39,23 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
                  "action"));
   guint len = strlen (fname);
   gchar *filename;
+  gboolean firsttime;
 
   switch (action) {
     case READ_FILESET:
+      firsttime = (g_slist_length (gg->d) == 0);
       if (fileset_read_init (fname, gg)) 
         /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
+
+      /*
+       * If this is the first data read in, we need a call to
+       * full_viewmode_set to initialize the mode and projection,
+       * and to make the Options menu appear.
+      */
+      if (firsttime) {
+        GGOBI(full_viewmode_set) (XYPLOT, gg);
+      }
     break;
     case EXTEND_FILESET:  /*-- not yet enabled --*/
     break;
@@ -138,6 +149,14 @@ filename_get_r (ggobid *gg, guint action, GtkWidget *w)
   GtkWidget *fs = gtk_file_selection_new ("read ggobi data");
   gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs));
 
+  /*
+   * I would like to put in the directory here without the
+   * filename, but I don't know how -- dfs
+  */
+  if (gg->input && gg->input->baseName)
+    gtk_file_selection_set_filename (GTK_FILE_SELECTION (fs),
+                                     gg->input->baseName);
+
   filename_get_configure (fs, READ_FILESET, gg);
 
   gtk_widget_show (fs);
@@ -156,7 +175,16 @@ filename_get_w (GtkWidget *w, ggobid *gg)
     fs = gtk_file_selection_new ("Specify base name for new xml file");
   else
     fs = gtk_file_selection_new ("Specify base name for new file set");
+
   gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs));
+
+  /*
+   * I would like to put in the directory here without the
+   * filename, but I don't know how -- dfs
+  */
+  if (gg->input && gg->input->baseName)
+    gtk_file_selection_set_filename (GTK_FILE_SELECTION (fs),
+                                     gg->input->baseName);
 
   filename_get_configure (fs, WRITE_FILESET, gg);
 
