@@ -15,8 +15,7 @@ years.
  <realvariable name="Flow"/>
  <realvariable name="Lag1"/>
 </variables>
-<records
- count="128" glyph="fr 1" color="5">
+<records count="128" glyph="fr 1" color="4">
 <record id="1" label="1"> 1.000 8.954 8.954
 </record>
 <record id="2" label="2"> 2.000 9.494 8.954
