@@ -180,7 +180,7 @@ cpanel_ctour_make (ggobid *gg) {
 /*
  * path length option menu 
 */
-  vb = gtk_vbox_new (false, 0);
+  /*  vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Path length:");
@@ -195,41 +195,42 @@ cpanel_ctour_make (ggobid *gg) {
   populate_option_menu (pathlen_opt, pathlen_lbl,
                         sizeof (pathlen_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) pathlen_cb, gg);
-
+  */
 /*
  * Sync Axes toggle
 */
-  tgl = gtk_check_button_new_with_label ("Sync axes");
+  /*  tgl = gtk_check_button_new_with_label ("Sync axes");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
     "Synchronize the horizontal and vertical axes", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                       GTK_SIGNAL_FUNC (syncaxes_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
                       tgl, false, false, 1);
-
+  */
 /*
  * projection pursuit button
 */
-  btn = gtk_button_new_with_label ("Projection pursuit ...");
+  /*  btn = gtk_button_new_with_label ("Projection pursuit ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for correlation tour projection pursuit", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (ctourpp_cb), gg);
-
+  */
 /*
  * advanced features button
 */
-  btn = gtk_button_new_with_label ("Advanced features ...");
+  /*  btn = gtk_button_new_with_label ("Advanced features ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for additional correlation tour features", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (ctouradv_cb), NULL);
-
-  gtk_widget_show_all (gg->control_panel[COTOUR]);
+  */
+  gtk_widget_show_all (gg->control_panel[COTOUR]); 
+  
 }
 
 /*----------------------------------------------------------------------*/

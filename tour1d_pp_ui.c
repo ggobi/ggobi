@@ -112,14 +112,6 @@ t1d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
     &dsp->t1d.target_basis_method);
 }
 
-static void
-t1d_writeindx_cb (GtkEntry  *w, ggobid *gg) {
-  /* displayd *dsp = gg->current_display; */
-
-  /* draw index value */
-  /*  gtk_entry_set_text (w, dsp->t1d.ppval);*/
-}
-
 gchar *t1d_pp_func_lbl[] = {"PCA","LDA","CART Gini","CART Entropy", 
                             "CART Variance","SUB-D"
                             };
@@ -258,7 +250,7 @@ tour1dpp_window_open (ggobid *gg) {
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (window), 
-      "projection pursuit");
+      "projection pursuit - 1D");
     gtk_signal_connect (GTK_OBJECT (window), "delete_event",
                         GTK_SIGNAL_FUNC (hide_cb), (gpointer) NULL);
     /*    gtk_window_set_policy (GTK_WINDOW (window), true, true, false);*/

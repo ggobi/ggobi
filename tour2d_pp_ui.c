@@ -274,7 +274,7 @@ tour2dpp_window_open (ggobid *gg) {
 
       window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
       gtk_window_set_title (GTK_WINDOW (window), 
-        "projection pursuit");
+        "projection pursuit - 2D");
       gtk_signal_connect (GTK_OBJECT (window), "delete_event",
                           GTK_SIGNAL_FUNC (hide_cb), (gpointer) NULL);
       /*    gtk_window_set_policy (GTK_WINDOW (window), true, true, false);*/

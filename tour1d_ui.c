@@ -88,9 +88,13 @@ static void tour1d_vert_cb (GtkToggleButton *button, ggobid *gg)
 
 static void tour1dpp_cb (GtkWidget *w, ggobid *gg) 
 {
-  /*  #ifdef TOUR_PP_IMPLEMENTED*/
   tour1dpp_window_open (gg);
-  /*  #endif*/
+}
+
+static void tour1dadv_cb (GtkWidget *w, ggobid *gg) {
+  #ifdef TOUR_ADV_IMPLEMENTED
+  tour1dadv_window_open (gg);
+  #endif
 }
 
 void
@@ -170,6 +174,7 @@ cpanel_tour1d_make (ggobid *gg) {
 /*
  * Box to hold 'vertical' button
 */
+  #ifdef TOUR_ADV_IMPLEMENTED
   box = gtk_hbox_new (true, 1);
 
   btn = gtk_check_button_new_with_label ("Vertical");
@@ -180,6 +185,7 @@ cpanel_tour1d_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]), box, false, false, 1);
+#endif
 
 /*
  * projection pursuit button
@@ -191,6 +197,19 @@ cpanel_tour1d_make (ggobid *gg) {
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (tour1dpp_cb), gg);
+
+/*
+ * advanced features button
+*/
+  #ifdef TOUR_ADV_IMPLEMENTED
+  btn = gtk_button_new_with_label ("Advanced features ...");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Open panel for additional grand tour features", NULL);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]),
+                      btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (tour1dadv_cb), gg);
+  #endif
 
 
   gtk_widget_show_all (gg->control_panel[TOUR1D]);

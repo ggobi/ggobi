@@ -72,17 +72,15 @@ static void reinit_cb (GtkWidget *w, ggobid *gg) {
 
 }
 
-static void pcaxes_cb (GtkToggleButton *button)
+/*static void pcaxes_cb (GtkToggleButton *button)
 {
   g_printerr ("pcaxes: %d\n", button->active);
-}
+}*/
 
 
 static void tour2dpp_cb (GtkWidget *w, ggobid *gg) 
 {
-  /*  #ifdef TOUR_PP_IMPLEMENTED*/
   tour2dpp_window_open (gg);
-  /*  #endif*/
 }
 
 static void tour2dadv_cb (GtkWidget *w, ggobid *gg) {
@@ -197,6 +195,7 @@ cpanel_tour2d_make (ggobid *gg) {
 /*
  * advanced features button
 */
+  #ifdef TOUR_ADV_IMPLEMENTED
   btn = gtk_button_new_with_label ("Advanced features ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for additional grand tour features", NULL);
@@ -204,6 +203,7 @@ cpanel_tour2d_make (ggobid *gg) {
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (tour2dadv_cb), gg);
+  #endif
 
   gtk_widget_show_all (gg->control_panel[TOUR2D]);
 }
