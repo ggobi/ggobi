@@ -36,6 +36,7 @@ distClean: clean
 	rm config.cache config.log $(PKG).so
 
 local.config: configure local.config.in
+	if test -r local.config ; then cp local.config local.config.bak ; fi
 	./configure
 
 configure: configure.in
