@@ -313,7 +313,6 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
  * open a new scatterplot with the new data, and display edges
  * as they're displayed in the current datad.
 */
-g_printerr ("createInitial? %d\n", sessionOptions->info->createInitialScatterPlot);
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
   setDisplayEdge (dspnew, e);
   if (dsp)
@@ -432,7 +431,7 @@ void radial_center_set_cb (ggobid *gg, gint index,
 {
   glayoutd *gl = glayoutFromInst (inst);
 
-  GtkWidget *entry = (GtkWidget *) gtk_object_get_data (inst->data,
+  GtkWidget *entry = (GtkWidget *) gtk_object_get_data (gl->window,
     "CENTERNODE");
 
   if (state == STICKY) {
