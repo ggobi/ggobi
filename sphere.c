@@ -7,10 +7,6 @@
 #include "vars.h"
 #include "externs.h"
 
-/*
-When I go from 2 to 3 variables, I don't get a third variable
-  in the table or the checkbox list.
-*/
 extern void sphere_variance_set (gfloat x, datad *, ggobid*);
 
 
@@ -97,6 +93,7 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   gchar *row[] = {""};
   /*-- --*/
 
+g_printerr ("npcs=%d\n", d->sphere.npcs);
   if (d->sphere.npcs == 0)
     return;
 
@@ -110,39 +107,54 @@ spherize_set_pcvars (datad *d, ggobid *gg)
 
     for (j=ncols_prev, k=0; j<d->ncols; j++) {
       d->sphere.pcvars.vals[k++] = j;
+/*
       lbl = g_strdup_printf ("PC%d", k);
       variable_set_label (d, j, lbl);
       g_free (lbl);
+*/
     }
 
-/*  I can't remember what this case was intended to cover
-  } else if (d->sphere.pcvars.nels == 0) {
-    vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
-    vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);
-
-    vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
-    clone_vars (d->sphere.vars.vals, d->sphere.npcs, d, gg);
-    for (j=ncols_prev, k=0; j<d->ncols; j++, k++) {
-      d->sphere.pcvars.vals[k] = j;
-      lbl = g_strdup_printf ("PC%d", k);
-      variable_set_label (d, j, lbl);
-      g_free (lbl);
-    }
+/*
+ * sphering after the first time
 */
 
-  /*-- sphering after the first time --*/
+  /*-- if the number hasn't changed --*/
   } else if (d->sphere.pcvars.nels == d->sphere.npcs) {
-    /*-- no need for any reallocation or relabelling, very neat --*/
+
+    if (d->sphere.vars_sphered.nels != d->sphere.vars.nels)
+      vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
     vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
 
+  /*-- if the number has grown --*/
   } else if (d->sphere.pcvars.nels < d->sphere.npcs) {
     /*-- add just the additional required variables? --*/
-    /*-- or delete them all and then add fresh? --*/
 
+    /*-- try deleting them all and starting fresh? --*/
+    extern void delete_vars (gint *, gint, datad *, ggobid *);
+    delete_vars (d->sphere.pcvars.vals, d->sphere.pcvars.nels, d, gg);
+    ncols_prev = d->ncols;
+
+    vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
+    vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
+
+    vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
+    clone_vars (d->sphere.vars.vals, d->sphere.npcs, d, gg);
+
+    for (j=ncols_prev, k=0; j<d->ncols; j++) {
+      d->sphere.pcvars.vals[k++] = j;
+    }
+
+  /*-- if the number has decreased --*/
   } else if (d->sphere.pcvars.nels > d->sphere.npcs) {
     /*-- delete variables --*/
   }
 
+  for (k=0; k<d->sphere.pcvars.nels; k++) {
+    j = d->sphere.pcvars.vals[k];
+    lbl = g_strdup_printf ("PC%d", (k+1));
+    variable_set_label (d, j, lbl);
+    g_free (lbl);
+  }
 
   /*-- clear the clist --*/
   gtk_clist_clear (clist);
@@ -225,6 +237,7 @@ npcs_get (datad *d, ggobid *gg)
 void
 spherevars_set (datad *d, ggobid *gg) {
   extern void vars_stdized_send_event (datad *d, ggobid *gg);
+  extern void sphere_npcs_range_set (gint n, ggobid *gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint j, ncols;
 
@@ -241,6 +254,9 @@ spherevars_set (datad *d, ggobid *gg) {
 
   /*-- update the "vars stdized?" text entry --*/
   vars_stdized_send_event (d, gg);
+
+  /*-- reset the spinner so that its max is the number of sphered vars --*/
+  sphere_npcs_range_set (ncols, gg);
 
   g_free (cols);
 }

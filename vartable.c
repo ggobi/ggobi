@@ -137,6 +137,9 @@ vartable_free_var (gint j, datad *d)
     g_free (d->vartable[j].collab);
   if (d->vartable[j].collab_tform != NULL)
     g_free (d->vartable[j].collab_tform);
+
+  d->vartable[j].collab = NULL;
+  d->vartable[j].collab_tform = NULL;
 }
 
 static void
@@ -146,7 +149,8 @@ vartable_free (datad *d)
   for (j=0; j<d->ncols; j++) {
     vartable_free_var (j, d);
   }
-  g_free ((gpointer) d->vartable);
+  g_free (d->vartable);
+  d->vartable = NULL;
 }
 
 void
@@ -170,6 +174,9 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
 {
   void transform_values_copy (gint jfrom, gint jto, datad *d);
 
+  g_assert (d->vartable[jfrom].collab != NULL);
+  g_assert (d->vartable[jfrom].collab_tform != NULL);
+
   d->vartable[jto].jref = d->vartable[jfrom].jref;
 
   d->vartable[jto].collab = g_strdup (d->vartable[jfrom].collab);
@@ -185,8 +192,6 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
     d->vartable[jto].lim_tform.max = d->vartable[jfrom].lim_tform.max;
 
   transform_values_copy (jfrom, jto, d);
-
-  vartable_free_var (jfrom, d);
 }
 
 
@@ -210,21 +215,35 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   for (j=0; j<nkeepers; j++) {
     jto = j;
     jfrom = keepers[j];
-    vartable_free_var (jto, d);  /*-- free collab and collab_tform --*/
-    vartable_copy_var (jto, jfrom, d);
+    if (jto != jfrom) {
+      vartable_free_var (jto, d);  /*-- free collab and collab_tform --*/
+      vartable_copy_var (jfrom, jto, d);
+    }
   }
+
+  /*-- having copied the keepers, free the last ncols elements --*/
   for (j=nkeepers; j<d->ncols; j++)
     vartable_free_var (j, d);
   vartable_realloc (nkeepers, d);
 
   /*-- delete rows from clist; no copying is called for --*/
   {
-    GList *l = g_list_last (GTK_CLIST (d->vartable_clist)->selection);
+    GList *l = g_list_last (GTK_CLIST (d->vartable_clist)->row_list);
+    GtkCListRow *row;
+    gchar *varstr;
     gint irow;
     while (l) {
-      irow = GPOINTER_TO_INT (l->data);
-      if (!array_contains (keepers, nkeepers, irow))
-        gtk_clist_remove (GTK_CLIST (d->vartable_clist), irow);
+      row = GTK_CLIST_ROW (l);
+      /*-- grab the text in the invisible cell of the row to get the index --*/
+      varstr = GTK_CELL_TEXT(row->cell[CLIST_VARNO])->text;
+      if (varstr != NULL && strlen (varstr) > 0) {
+        irow = atoi (varstr);
+        if (!array_contains (keepers, nkeepers, irow)) {
+          gtk_clist_freeze (GTK_CLIST (d->vartable_clist));
+          gtk_clist_remove (GTK_CLIST (d->vartable_clist), irow);
+          gtk_clist_thaw (GTK_CLIST (d->vartable_clist));
+        }
+      }
       l = l->prev;
     }
   }

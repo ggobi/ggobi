@@ -37,6 +37,16 @@ void sphere_variance_set (gfloat x, datad *d, ggobid* gg)
   }
 }
 
+/*-- reset the spinner max and value --*/
+void sphere_npcs_range_set (gint n, ggobid *gg)
+{
+  if (gg->sphere_ui.npcs_adj != NULL) {
+    GTK_ADJUSTMENT(gg->sphere_ui.npcs_adj)->upper = (gfloat) n;
+    gtk_adjustment_set_value (GTK_ADJUSTMENT(gg->sphere_ui.npcs_adj),
+      (gfloat) n);
+  }
+}
+
 /*-------------------------------------------------------------------------*/
 /*                          callbacks                                      */
 /*-------------------------------------------------------------------------*/
@@ -429,7 +439,7 @@ sphere_panel_open (ggobid *gg)
     /* Spinner: number of principal components */
     /*-- the parameters of the adjustment should be reset each time --*/
     gg->sphere_ui.npcs_adj = gtk_adjustment_new ((gfloat) d->sphere.vars.nels,
-       1.0, (gfloat) d->ncols, 1.0, 5.0, 0.0);
+       1.0, (gfloat) d->sphere.vars.nels, 1.0, 5.0, 0.0);
 
     gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.npcs_adj),
                         "value_changed",

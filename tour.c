@@ -110,7 +110,6 @@ tour_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->d == d) {
-g_printerr ("tour_realloc_down\n");
       arrayf_delete_cols (&dsp->u0, nc, cols);
       arrayf_delete_cols (&dsp->u1, nc, cols);
       arrayf_delete_cols (&dsp->u, nc, cols);
@@ -138,7 +137,6 @@ tour_realloc_up (gint nc, datad *d, ggobid *gg)
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->d == d) {
-g_printerr ("tour_realloc_up\n");
       arrayf_add_cols (&dsp->u0, nc);
       arrayf_add_cols (&dsp->u1, nc);
       arrayf_add_cols (&dsp->u, nc);
