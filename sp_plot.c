@@ -9,8 +9,8 @@
 
 void segments_draw (splotd *, ggobid *gg);
 #ifdef _WIN32
-extern void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *);
-extern void win32_draw_to_pixmap_unbinned (gint, splotd *);
+extern void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
+extern void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
 #endif
 
 
@@ -144,7 +144,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
         &gg->default_color_table[current_color]);
 
 #ifdef _WIN32
-      win32_draw_to_pixmap_unbinned (current_color, sp);
+      win32_draw_to_pixmap_unbinned (current_color, sp, gg);
 #else
       for (i=0; i<gg->nrows_in_plot; i++) {
         m = gg->rows_in_plot[i];
@@ -282,7 +282,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
           &gg->default_color_table[current_color]);
 
 #ifdef _WIN32
-        win32_draw_to_pixmap_binned (bin0, bin1, current_color, sp);
+        win32_draw_to_pixmap_binned (bin0, bin1, current_color, sp, gg);
 #else
         for (ih=bin0->x; ih<=bin1->x; ih++) {
           for (iv=bin0->y; iv<=bin1->y; iv++) {

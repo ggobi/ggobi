@@ -12,6 +12,7 @@ extern void build_circle (icoords *, gint, arcd *, gint, gshort);
 extern void build_plus (icoords *, gint, GdkSegment *, gint, gshort);
 extern void build_rect (icoords *, gint, rectd *, gint, gshort);
 extern void build_x (icoords *, gint, GdkSegment *, gint, gshort);
+extern void init_plot_GC (GdkWindow *, ggobid *gg);
 
 /*
  * I think I could eliminate a lot of copies if I made these
@@ -27,9 +28,9 @@ static arcd       *open_arcs;
 static arcd       *filled_arcs;
 
 static void
-drawing_arrays_alloc () {
+drawing_arrays_alloc (ggobid *gg) {
   if (maxn == 0) {
-    maxn = gg.nrows;
+    maxn = gg->nrows;
     points = (GdkPoint *) g_malloc (maxn * sizeof (GdkPoint));
     segs = (GdkSegment *) g_malloc (2 * maxn * sizeof (GdkSegment));
     whisker_segs = (GdkSegment *) g_malloc (2 * maxn * sizeof (GdkSegment));
@@ -38,7 +39,7 @@ drawing_arrays_alloc () {
     open_arcs = (arcd *) g_malloc (maxn * sizeof (arcd));
     filled_arcs = (arcd *) g_malloc (maxn * sizeof (arcd));
   } else {
-    maxn = gg.nrows;
+    maxn = gg->nrows;
     points = (GdkPoint *) g_realloc (points, maxn * sizeof (GdkPoint));
     segs = (GdkSegment *) g_realloc (segs, 2 * maxn * sizeof (GdkSegment));
     whisker_segs = (GdkSegment *)
@@ -70,11 +71,11 @@ win32_draw_arcs (GdkDrawable *drawable,
 {
   gint i;
   for (i=0; i<narcs; i++) {
-    gdk_draw_arc (drawable, gg.plot_GC, false,
+    gdk_draw_arc (drawable, gc, false,
       arcs[i].x, arcs[i].y,
       arcs[i].width, arcs[i].height, 0, (gshort) 23040);
     if (filled)
-      gdk_draw_arc (drawable, gg.plot_GC, filled,
+      gdk_draw_arc (drawable, gc, filled,
         arcs[i].x, arcs[i].y,
         arcs[i].width, arcs[i].height, 0, (gshort) 23040);
   }
@@ -222,29 +223,30 @@ draw_glyphs (GdkDrawable *drawable,
   rectd *open_rects,   gint nr_open,
   rectd *filled_rects, gint nr_filled,
   arcd *open_arcs,     gint nc_open,
-  arcd *filled_arcs,   gint nc_filled)
+  arcd *filled_arcs,   gint nc_filled,
+  ggobid *gg)
 {
-  if (gg.plot_GC == NULL)
-    init_plot_GC (drawable);
+  if (gg->plot_GC == NULL)
+    init_plot_GC (drawable, gg);
 
   if (np)
-    gdk_draw_points (drawable, gg.plot_GC, points, np);
+    gdk_draw_points (drawable, gg->plot_GC, points, np);
   if (ns)
-    gdk_draw_segments (drawable, gg.plot_GC, segs, ns);
+    gdk_draw_segments (drawable, gg->plot_GC, segs, ns);
 
   if (nr_open)
-    win32_draw_rectangles (drawable, gg.plot_GC, OPEN, open_rects, nr_open);
+    win32_draw_rectangles (drawable, gg->plot_GC, OPEN, open_rects, nr_open);
   if (nr_filled)
-    win32_draw_rectangles (drawable, gg.plot_GC, FILL, filled_rects, nr_filled);
+    win32_draw_rectangles (drawable, gg->plot_GC, FILL, filled_rects, nr_filled);
 
   if (nc_open)
-    win32_draw_arcs (drawable, gg.plot_GC, OPEN, open_arcs, nc_open);
+    win32_draw_arcs (drawable, gg->plot_GC, OPEN, open_arcs, nc_open);
   if (nc_filled)
-    win32_draw_arcs (drawable, gg.plot_GC, FILL, filled_arcs, nc_filled);
+    win32_draw_arcs (drawable, gg->plot_GC, FILL, filled_arcs, nc_filled);
 }
 
 void
-win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp)
+win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   gint m, j;
@@ -253,34 +255,38 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp)
 
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
-  if (maxn != gg.ncols)
-    drawing_arrays_alloc ();
+  if (maxn != gg->ncols)
+    drawing_arrays_alloc (gg);
 
-  for (m=0; m<gg.nrows_in_plot; m++) {
-    j = gg.rows_in_plot[m];
-    if (!gg.hidden_now[j] && gg.color_now[j] == current_color) {
-      if (display->points_show_p)
-        build_glyph (&gg.glyph_now[j], sp->screen, j,
+  for (m=0; m<gg->nrows_in_plot; m++) {
+    j = gg->rows_in_plot[m];
+    if (!gg->hidden_now[j] && gg->color_now[j] == current_color) {
+      if (display->options.points_show_p) {
+        build_glyph (&gg->glyph_now[j], sp->screen, j,
           points, &npt,           segs, &nseg,
           open_rects, &nr_open,   filled_rects, &nr_filled,
           open_arcs, &nc_open,    filled_arcs, &nc_filled);
 
-      if (display->displaytype == parcoords & display->segments_show_p) {
-        build_whisker_segs (j, sp);
-        nwhisker_segs += 2;
+        if (display->displaytype == parcoords &&
+            display->options.segments_show_p)
+        {
+          build_whisker_segs (j, sp);
+          nwhisker_segs += 2;
+        }
       }
     }
   }
-  gdk_draw_segments (sp->pixmap0, gg.plot_GC, whisker_segs, nwhisker_segs);
+  gdk_draw_segments (sp->pixmap0, gg->plot_GC, whisker_segs, nwhisker_segs);
   draw_glyphs (sp->pixmap0,
     points, npt,           segs, nseg,
     open_rects, nr_open,   filled_rects, nr_filled,
-    open_arcs, nc_open,    filled_arcs, nc_filled);
+    open_arcs, nc_open,    filled_arcs, nc_filled,
+    gg);
 }
 
 void
 win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
-  gint current_color, splotd *sp)
+  gint current_color, splotd *sp, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   gint ih, iv;
@@ -291,10 +297,10 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
 
   for (ih=bin0->x; ih<=bin1->x; ih++) {
     for (iv=bin0->y; iv<=bin1->y; iv++) {
-      for (m=0; m<gg.br_binarray[ih][iv].nels; m++) {
-        j = gg.rows_in_plot[gg.br_binarray[ih][iv].els[m]];
-        if (!gg.hidden_now[j] && gg.color_now[j] == current_color) {
-          build_glyph (&gg.glyph_now[j], sp->screen, j,
+      for (m=0; m<gg->brush.binarray[ih][iv].nels; m++) {
+        j = gg->rows_in_plot[gg->brush.binarray[ih][iv].els[m]];
+        if (!gg->hidden_now[j] && gg->color_now[j] == current_color) {
+          build_glyph (&gg->glyph_now[j], sp->screen, j,
             points, &npt,           segs, &nseg,
             open_rects, &nr_open,   filled_rects, &nr_filled,
             open_arcs, &nc_open,    filled_arcs, &nc_filled);
@@ -307,10 +313,11 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
       }
     }
   }
-  gdk_draw_segments (sp->pixmap0, gg.plot_GC, whisker_segs, nwhisker_segs);
+  gdk_draw_segments (sp->pixmap0, gg->plot_GC, whisker_segs, nwhisker_segs);
   draw_glyphs (sp->pixmap0,
     points, npt,           segs, nseg,
     open_rects, nr_open,   filled_rects, nr_filled,
-    open_arcs, nc_open,    filled_arcs, nc_filled);
+    open_arcs, nc_open,    filled_arcs, nc_filled,
+    gg);
 }
 #endif
