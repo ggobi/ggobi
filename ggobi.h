@@ -50,6 +50,7 @@ struct _ggobid {
  /* main_ui */
  GtkWidget *control_panel[NMODES];
  GtkWidget *main_window, *main_menubar;
+ GtkWidget *display_menu_item, *display_menu;  /*-- menu labelled 'Window' --*/
  GtkAccelGroup *main_accel_group;
  GtkWidget *mode_frame, *mode_item;
  GtkTooltips *tips;
@@ -79,6 +80,8 @@ struct _ggobid {
 /*---------------- deleting the hidden points; subsetting ----------*/
 
 /*--------------- clusters: hiding, excluding ----------------------*/
+
+ GtkWidget *exclusion_window;
  
 /*----------------------- row grouping -----------------------------*/
 

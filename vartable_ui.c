@@ -66,13 +66,13 @@ selection_made (GtkWidget *cl, gint row, gint column,
   gchar *varno_str;
   datad *d = gg->current_display->d;
 
-g_printerr ("calilng selection_made\n");
   gtk_clist_get_text (GTK_CLIST (d->vardata_clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
   d->vardata[varno].selected = true;
 
   return;
 }
+
 void
 deselection_made (GtkWidget *cl, gint row, gint column,
   GdkEventButton *event, ggobid *gg)
@@ -147,12 +147,11 @@ vartable_row_append (gint j, datad *d, ggobid *gg)
   }
 }
 
-
 void
 vartable_open (ggobid *gg)
 {                                  
   gint j, k;
-  GtkWidget *vbox, *vb;
+  GtkWidget *vbox;
   GtkWidget *scrolled_window;
   gchar *titles[NCOLS_CLIST] =
     {"varno", "Variable",          /*-- varno will be an invisible column --*/
@@ -176,27 +175,15 @@ vartable_open (ggobid *gg)
     gtk_container_add (GTK_CONTAINER (gg->vardata_window), vbox);
     gtk_widget_show (vbox);
 
-/*
- * Tried embedding a vbox in the scrolled window, but I might
- * instead need multiple scrolled windows, one for each d.
-*/
-
-    /* Create a scrolled window to pack the CList widget into */
-    scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-      GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-    gtk_box_pack_start (GTK_BOX (vbox), scrolled_window, TRUE, TRUE, 0);
-    gtk_widget_show (scrolled_window);
-
-/*
-    vb = gtk_vbox_new (false, 5);
-    gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
-    gtk_container_add (GTK_CONTAINER (scrolled_window), vb);
-    gtk_widget_show (vb);
-*/
-
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
+
+      /* Create a scrolled window to pack the CList widget into */
+      scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+        GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+      gtk_box_pack_start (GTK_BOX (vbox), scrolled_window, TRUE, TRUE, 0);
+      gtk_widget_show (scrolled_window);
 
       d->vardata_clist = gtk_clist_new_with_titles (NCOLS_CLIST, titles);
       gtk_clist_set_selection_mode (GTK_CLIST (d->vardata_clist),
@@ -259,7 +246,6 @@ vartable_open (ggobid *gg)
 
   gdk_window_raise (gg->vardata_window->window);
 }
-
 
 
 void

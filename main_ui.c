@@ -236,7 +236,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
         gg->mode_menu.reset_item = submenu_make ("_Reset", 'R',
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.reset_item),
-          gg->brush.reset_menu); 
+          gg->brush.reset_menu);
         if (gg->mode_menu.firsttime_reset) {
           submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_reset = false;
@@ -496,10 +496,9 @@ static GtkItemFactoryEntry menu_items[] = {
 void
 quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
 {
- gtk_main_quit();
+  gtk_main_quit();
 }
 
-extern void display_menu_init (ggobid *);
 void 
 make_ui (ggobid *gg) {
   GtkWidget *window;

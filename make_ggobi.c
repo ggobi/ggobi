@@ -181,6 +181,9 @@ make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
       datad_init (d, gg, firstd);
       firstd = false;
     }
+
+    /*-- destroy and rebuild the menu every time data is read in --*/
+    display_menu_build (gg);
   }
 
   if (processEvents) {

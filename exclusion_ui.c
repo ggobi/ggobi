@@ -1,11 +1,15 @@
 /*-- exclusion_ui.c  --*/
 
+/*
+ * I'm constructing one table for each datad.  The thing that's
+ * still missing is some kind of labelling or separation to 
+ * distinguish datad's from one another.  This also doesn't use
+ * scrolling, and that could become a problem.
+*/
+
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
-
-static GtkWidget *exclusion_window = NULL;
-static GtkWidget *exclusion_table;
 
 static gint
 exclusion_symbol_show (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
@@ -113,7 +117,7 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (d->clusv[k].da), "button_press_event",
     GTK_SIGNAL_FUNC (exclusion_symbol_cb), GINT_TO_POINTER (k));
   GGobi_widget_set (d->clusv[k].da, gg, true);
-  gtk_table_attach (GTK_TABLE (exclusion_table),
+  gtk_table_attach (GTK_TABLE (d->exclusion_table),
     d->clusv[k].da,
     0, 1, k+1, k+2, 0, 0, 5, 2);  /*-- don't fill --*/
 
@@ -122,7 +126,7 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (d->clusv[k].hide_tgl), "toggled",
     GTK_SIGNAL_FUNC (hide_cluster_cb), GINT_TO_POINTER (k));
   GGobi_widget_set (d->clusv[k].hide_tgl, gg, true);
-  gtk_table_attach (GTK_TABLE (exclusion_table),
+  gtk_table_attach (GTK_TABLE (d->exclusion_table),
     d->clusv[k].hide_tgl,
     1, 2, k+1, k+2, GTK_FILL, GTK_FILL, 5, 2);
 
@@ -131,13 +135,13 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (d->clusv[k].exclude_tgl), "toggled",
     GTK_SIGNAL_FUNC (exclude_cluster_cb), GINT_TO_POINTER (k));
   GGobi_widget_set (d->clusv[k].exclude_tgl, gg, true);
-  gtk_table_attach (GTK_TABLE (exclusion_table),
+  gtk_table_attach (GTK_TABLE (d->exclusion_table),
     d->clusv[k].exclude_tgl,
     2, 3, k+1, k+2, GTK_FILL, GTK_FILL, 5, 2);
 
   str = g_strdup_printf ("%ld", d->clusv[k].n);
   d->clusv[k].lbl = gtk_label_new (str);
-  gtk_table_attach (GTK_TABLE (exclusion_table),
+  gtk_table_attach (GTK_TABLE (d->exclusion_table),
     d->clusv[k].lbl,
     3, 4, k+1, k+2, GTK_FILL, GTK_FILL, 5, 2);
   g_free (str);
@@ -151,9 +155,33 @@ static void closeit (ggobid *gg) {
   for (n=0; n<d->nclusters; n++)
     cluster_free (n, d, gg);
 
-  gtk_widget_destroy (exclusion_window);
+  gtk_widget_destroy (gg->exclusion_window);
 
-  exclusion_window = NULL;
+  gg->exclusion_window = NULL;
+}
+
+void
+reset_cluster_table (datad *d, ggobid *gg) {
+  gint k, table_rows;
+
+  /*-- destroy all the widgets that were in the table --*/
+  table_rows = GTK_TABLE (d->exclusion_table)->nrows;
+  for (k=0; k<table_rows-1; k++)
+    cluster_free (k, d, gg);
+
+  clusters_set (d, gg);
+
+  gtk_table_resize (GTK_TABLE (d->exclusion_table), 1, 4);
+  gtk_table_resize (GTK_TABLE (d->exclusion_table), d->nclusters+1, 4);
+
+  /*-- add the cluster rows, one by one --*/
+  for (k=0; k<d->nclusters; k++)
+    exclusion_cluster_add (k, d, gg);
+}
+
+/*-- to reset it, just start fresh --*/
+static void reset_cb (GtkWidget *w, ggobid *gg) {
+  exclusion_window_open (gg);
 }
 
 /*-- called when closed from the close button --*/
@@ -169,67 +197,71 @@ static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
 void
 exclusion_window_open (ggobid *gg) {
 
-  GtkWidget *vbox, *ebox, *btn;
+  GtkWidget *vbox, *ebox, *btn, *hbox;
   gint k;
-  datad *d = gg->current_display->d;
+  GSList *l;
+  datad *d;
 
-  if (exclusion_window == NULL) {
+  /*-- if it isn't NULL, then destroy it and start afresh --*/
+  if (gg->exclusion_window != NULL) {
+    closeit (gg);
+  }
 
+  gg->exclusion_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_signal_connect (GTK_OBJECT (gg->exclusion_window), "delete_event",
+                      GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
+  gtk_window_set_title (GTK_WINDOW (gg->exclusion_window),
+    "ggobi hide/exclude window");
+
+  vbox = gtk_vbox_new (false, 2);
+  gtk_container_add (GTK_CONTAINER (gg->exclusion_window), vbox);
+
+  ebox = gtk_event_box_new ();
+  gtk_box_pack_start (GTK_BOX (vbox), ebox, false, false, 0);
+
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
     clusters_set (d, gg);
 
-    exclusion_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_signal_connect (GTK_OBJECT (exclusion_window), "delete_event",
-                        GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
-    gtk_window_set_title (GTK_WINDOW (exclusion_window),
-      "ggobi hide/exclude window");
-
-    vbox = gtk_vbox_new (false, 2);
-    gtk_container_add (GTK_CONTAINER (exclusion_window), vbox);
-
-    ebox = gtk_event_box_new ();
-    gtk_box_pack_start (GTK_BOX (vbox), ebox, false, false, 0);
-
-    exclusion_table = gtk_table_new (d->nclusters+1, 4, false);
-    gtk_container_add (GTK_CONTAINER (ebox), exclusion_table);
+    d->exclusion_table = gtk_table_new (d->nclusters+1, 4, false);
+    gtk_container_add (GTK_CONTAINER (ebox), d->exclusion_table);
 
     /*-- add the row of titles --*/
 
-    gtk_table_attach (GTK_TABLE (exclusion_table), gtk_label_new ("Symbol"),
+    gtk_table_attach (GTK_TABLE (d->exclusion_table),
+      gtk_label_new ("Symbol"),
       0, 1, 0, 1,  /*-- left, right, top, bottom --*/
       GTK_FILL, GTK_FILL, 5, 2);
-    gtk_table_attach (GTK_TABLE (exclusion_table), gtk_label_new ("Hidden"),
+    gtk_table_attach (GTK_TABLE (d->exclusion_table),
+      gtk_label_new ("Hidden"),
       1, 2, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
-    gtk_table_attach (GTK_TABLE (exclusion_table), gtk_label_new ("Excluded"),
+    gtk_table_attach (GTK_TABLE (d->exclusion_table),
+      gtk_label_new ("Excluded"),
       2, 3, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
-    gtk_table_attach (GTK_TABLE (exclusion_table), gtk_label_new ("N elements"),
+    gtk_table_attach (GTK_TABLE (d->exclusion_table),
+      gtk_label_new ("N elements"),
       3, 4, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     /*-- add the cluster rows, one by one --*/
     for (k=0; k<d->nclusters; k++)
       exclusion_cluster_add (k, d, gg);
 
-    /*-- Close button --*/
-    btn = gtk_button_new_with_label ("Close");
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                   GTK_SIGNAL_FUNC (close_cb), (gpointer) gg);
-    gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
-
-/*
-    *-- destroy all the widgets that were in the table --*
-    gint table_rows = GTK_TABLE (exclusion_table)->nrows;
-
-    for (k=0; k<table_rows-1; k++)
-      cluster_free (k, gg);
-
-    gtk_table_resize (GTK_TABLE (exclusion_table), 1, 4);
-    gtk_table_resize (GTK_TABLE (exclusion_table), gg->nclust+1, 4);
-
-    *-- add the cluster rows, one by one --*
-    for (k=0; k<gg->nclust; k++)
-      exclusion_cluster_add (k, d, gg);
-*/
-    gtk_widget_show_all (exclusion_window);
+    hbox = gtk_hbox_new (false, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
   }
 
-  gdk_window_raise (exclusion_window->window);
+  /*-- Close button --*/
+  btn = gtk_button_new_with_label ("Reset");
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (reset_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);
+
+  /*-- Close button --*/
+  btn = gtk_button_new_with_label ("Close");
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                 GTK_SIGNAL_FUNC (close_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);
+
+  gtk_widget_show_all (gg->exclusion_window);
+  gdk_window_raise (gg->exclusion_window->window);
 }

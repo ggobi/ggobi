@@ -22,7 +22,7 @@
  * returns new menuitem
  */
 GtkWidget *CreateMenuItem (GtkWidget *menu,
-  char *szName, char *szAccel, char *szTip,
+  gchar *szName, gchar *szAccel, gchar *szTip,
   GtkWidget *win_main, GtkAccelGroup *accel_group,
   GtkSignalFunc func, gpointer data, ggobid *gg)
 {

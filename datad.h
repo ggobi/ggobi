@@ -39,6 +39,7 @@ typedef struct /*-- datad --*/ {
 
  /*--------------- clusters: hiding, excluding ----------------------*/
 
+ GtkWidget *exclusion_table;
  gboolean *included;
  
  gint nclusters;

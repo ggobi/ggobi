@@ -317,12 +317,9 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
                       (GtkSignalFunc) splot_set_current_cb,
                       (gpointer) sp);
 
-  gtk_widget_set_events (sp->da,
-               GDK_EXPOSURE_MASK
-             | GDK_BUTTON_PRESS_MASK
-             | GDK_BUTTON_RELEASE_MASK
-             | GDK_POINTER_MOTION_MASK
-             | GDK_POINTER_MOTION_HINT_MASK);
+  gtk_widget_set_events (sp->da, GDK_EXPOSURE_MASK
+             | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
+             | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
 
 /*

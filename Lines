@@ -73,6 +73,8 @@
 30147   7/11  more on multiple pipelines; ggobi works again, in simple case
 30292   7/11  added random number generator
 30506   7/13  build the "Windows" menu on the fly, for multiple data objects
+30544   7/17  subset, jitter, vartable should work for multiple d's.
+30617   7/18  improved behavior of "Windows" menu
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

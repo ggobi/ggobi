@@ -157,8 +157,27 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   brush_coords *brush_pos = &gg->brush.brush_pos;
   datad *d = display->d;
 
-  if (button1_p)
+  if (button1_p) {
+    if (display->displaytype == parcoords) {
+/*
+      if (mouse->x > sp->da->allocation.width || mouse->x < 0) {
+        gint indx = g_list_index (display->splots, sp);
+        gint nplots = g_list_length (display->splots);
+        if (mouse->x > sp->da->allocation.width) {
+          if (indx != nplots-1) {
+            g_printerr ("slid off to the right\n");
+          }
+        } else if (mouse->x < 0) {
+          if (indx > 0) {
+            g_printerr ("slid off to the left\n");
+          }
+        }
+      }
+*/
+    }
+
     brush_set_pos (mouse->x, mouse->y, gg);
+  }
 
   else if (button2_p) {
     brush_pos->x2 = mouse->x ;

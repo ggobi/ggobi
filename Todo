@@ -21,7 +21,8 @@ various stuff not yet implemented:
 when brushing or identifying in parcoords, use leave/enter events to
   change the current_splot.
 
-exclusion:  rebuilding the table on the fly
+Window menu:  build it more permanently, and then rebuild it
+  whenever the number (or contents) of the d's has changed.
 
 keep working on array and vector management
 
@@ -131,4 +132,7 @@ Food for thought:
 ! sticky labels -- just draw them without the underline and the diamond
 
 ! brush_pos should be per-display.  -- in fact made it per-splot
+
+! exclusion:  rebuilding the table on the fly -- just destroy and
+!   rebuild, as we did in xgobi
 
