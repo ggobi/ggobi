@@ -3,11 +3,11 @@
 
 #include <stdlib.h>
 
-gboolean generate_data(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *info);
+gboolean generate_data(InputDescription *desc, ggobid *gg, GGobiPluginInfo *info);
 
 InputDescription *
 test_input_description(const char * const fileName, const char * const modeName, 
-                             ggobid *gg, GGobiInputPluginInfo *info)
+                             ggobid *gg, GGobiPluginInfo *info)
 {
   InputDescription *desc;
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
@@ -21,7 +21,7 @@ test_input_description(const char * const fileName, const char * const modeName,
 }
 
 gboolean 
-generate_data(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
+generate_data(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 {
 
   int nr = 10, nc = 3;
@@ -35,7 +35,7 @@ generate_data(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
 	  if(i == 0) {
 	      vartabled *vt;
 	      tmp = g_strdup("abc");
-	      sprintf(tmp, "%c", 'A' + i);
+	      sprintf(tmp, "%c", 'A' + j);
 #if 1
 	      GGOBI(setVariableName)(j, g_strdup(tmp), false, d, gg);
 #else
@@ -47,7 +47,7 @@ generate_data(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
 	  d->raw.vals[i][j] = 100.*((float)rand()/(float)RAND_MAX);
       }
   }
-//  start_ggobi(gg, true, true);
+  start_ggobi(gg, true, true);
 
   return(true);
 }
