@@ -259,33 +259,6 @@ display_menu_build (ggobid *gg)
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
     }
 #endif
-
-    /*-- add a separator --*/
-    CreateMenuItem (gg->display_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
-
-    /*-- add a title --*/
-    CreateMenuItem (gg->display_menu, "MISSING VALUES DISPLAYS",
-      "", "", NULL, NULL, NULL, NULL, gg);
-
-    if (nd == 1) {
-      item = CreateMenuItem (gg->display_menu, "New scatterplot",
-        NULL, NULL, gg->main_menubar, gg->main_accel_group,
-        GTK_SIGNAL_FUNC (display_open_cb), (gpointer) d0, gg);
-      gtk_object_set_data (GTK_OBJECT (item),
-        "displaytype", GINT_TO_POINTER (scatterplot));
-      gtk_object_set_data (GTK_OBJECT (item),
-        "missing_p", GINT_TO_POINTER (1));
-    } 
-
-    if (nd == 1) {
-      item = CreateMenuItem (gg->display_menu, "New scatterplot matrix",
-        NULL, NULL, gg->main_menubar, gg->main_accel_group,
-        GTK_SIGNAL_FUNC (display_open_cb), (gpointer) d0, gg);
-      gtk_object_set_data (GTK_OBJECT (item),
-        "displaytype", GINT_TO_POINTER (scatmat));
-      gtk_object_set_data (GTK_OBJECT (item),
-        "missing_p", GINT_TO_POINTER (1));
-    } 
   }
 
 #ifdef SUPPORT_PLUGINS  
@@ -310,6 +283,3 @@ display_menu_init (ggobid *gg)
 
   submenu_insert (gg->display_menu_item, gg->main_menubar, 1);
 }
-
-
-
