@@ -101,6 +101,7 @@ void       brush_update_set_cb (GtkCheckMenuItem *w, guint action);
 gboolean   build_symbol_vectors_by_var (cpaneld *, datad *, ggobid *);
 gdouble    calc_norm (gdouble *, gint);
 gboolean   checkequiv(gdouble **u0, gdouble **u1, gint nc, gint nd);
+gint       checkLevelValue(vartabled *vt, gdouble value);
 void       clone_vars (gint *cols, gint ncols, datad *, ggobid *);
 void       cluster_free (gint, datad *, ggobid *);
 void       cluster_table_labels_update (datad *d, ggobid *gg);
