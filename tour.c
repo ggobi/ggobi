@@ -626,7 +626,7 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dv,
 
   }
 
-    printf("slidepos: %d; nsteps: %d; stepcntr: %d; delta: %f; dv: %f\n",slidepos,nsteps,stepcntr, delta,dv);
+  /*    printf("slidepos: %d; nsteps: %d; stepcntr: %d; delta: %f; dv: %f\n",slidepos,nsteps,stepcntr, delta,dv);*/
 
   *st = step;
   *dlt = delta;
