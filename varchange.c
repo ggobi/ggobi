@@ -111,7 +111,7 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
   addvar_propagate (d_ncols_prev, 1, d, gg);
 
   /*-- emit variable_added signal --*/
-  gtk_signal_emit (GTK_OBJECT (gg->main_window),
+  gtk_signal_emit (GTK_OBJECT (gg),
                    GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, gg); 
 }
 
@@ -149,7 +149,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   addvar_propagate (d_ncols_prev, 1, d, gg);
 
   /*-- emit variable_added signal --*/
-  gtk_signal_emit (GTK_OBJECT (gg->main_window),
+  gtk_signal_emit (GTK_OBJECT (gg),
                    GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, gg); 
 }
 
@@ -192,7 +192,7 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
     vt = vartable_element_get (n, d);
 
     /*-- emit variable_added signal --*/
-    gtk_signal_emit (GTK_OBJECT (gg->main_window),
+    gtk_signal_emit (GTK_OBJECT (gg),
                      GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, gg); 
   }
 
@@ -332,7 +332,7 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   /*-- emit a single variable_list_changed signal when finished --*/
   /*-- doesn't need to give a variable index any more, really --*/
   vt = vartable_element_get (cols[d->ncols-1], d);
-  gtk_signal_emit (GTK_OBJECT (gg->main_window),
+  gtk_signal_emit (GTK_OBJECT (gg),
                    GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], vt, gg); 
 
   /*-- run the first part of the pipeline  --*/

@@ -34,9 +34,8 @@ id_remove_labels_cb (GtkWidget *w, ggobid *gg)
 
   /* This will become an event on the datad when we move to
      Gtk objects (soon now!) */
-  gtk_signal_emit(GTK_OBJECT(gg->main_window),
-    GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], -1,
-    (gint) UNSTICKY, d);
+  gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], 
+		  -1, (gint) UNSTICKY, d);
 
   displays_plot (NULL, QUICK, gg);
 }
@@ -58,9 +57,9 @@ id_all_sticky_cb (GtkWidget *w, ggobid *gg)
 
   /* This will become an event on the datad when we move to
      Gtk objects (soon now!) */
-  gtk_signal_emit(GTK_OBJECT(gg->main_window),
-    GGobiSignals[STICKY_POINT_ADDED_SIGNAL], -1,
-    (gint) STICKY, d);
+  gtk_signal_emit(GTK_OBJECT(gg),
+		  GGobiSignals[STICKY_POINT_ADDED_SIGNAL], -1,
+		  (gint) STICKY, d);
   displays_plot (NULL, QUICK, gg);
 }
 
@@ -153,8 +152,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       ev.id = k;
       /* This will become an event on the datad when we move to
          Gtk objects (soon now!) */
-      gtk_signal_emit(GTK_OBJECT(w), GGobiSignals[IDENTIFY_POINT_SIGNAL],
-        sp, &ev, gg); 
+      gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL],
+		      sp, &ev, gg); 
     }
     d->nearest_point_prev = k;
   }

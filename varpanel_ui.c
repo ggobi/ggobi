@@ -134,8 +134,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
      redraw = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->variable_select(display, sp, jvar, btn, cpanel, gg);
   }
 
-    /* Change the source object for this event to something more meaningful! */
-  gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[VARIABLE_SELECTION_SIGNAL], 
+  gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[VARIABLE_SELECTION_SIGNAL], 
 		   jvar, display->d, sp, gg);
 
   /*-- overkill for scatmat: could redraw one row, one column --*/

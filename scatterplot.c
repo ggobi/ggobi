@@ -387,7 +387,7 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
   scatterplot_show_rulers (display, projection);
   ruler_ranges_set (true, display, sp, gg);
 
-  gtk_signal_connect (GTK_OBJECT (gg->main_window), "datad_added",
+  gtk_signal_connect (GTK_OBJECT(gg), "datad_added",
 		        (GtkSignalFunc) display_datad_added_cb, display);
 
   return display;

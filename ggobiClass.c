@@ -135,12 +135,35 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
                                          GTK_TYPE_POINTER);
   }
 
+  if (gtk_signal_lookup("variable_list_changed", GTK_TYPE_GGOBI) == 0) {
+    GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL] =
+        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
+                                         "variable_list_changed",
+                                         GTK_RUN_LAST | GTK_RUN_ACTION,
+                                         gtk_marshal_NONE__POINTER_POINTER,
+                                         GTK_TYPE_NONE, 2,
+                                         GTK_TYPE_POINTER,
+                                         GTK_TYPE_POINTER);
+  }
+
   if (gtk_signal_lookup("sticky_point_added", GTK_TYPE_GGOBI) == 0) {
-    GGobiSignals[STICKY_POINT_ADDED_SIGNAL] = gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), "sticky_point_added", GTK_RUN_LAST | GTK_RUN_ACTION, gtk_marshal_NONE__INT_INT_POINTER, GTK_TYPE_NONE, 3, GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER); /* record index and datad pointer * */
+    GGobiSignals[STICKY_POINT_ADDED_SIGNAL] = 
+	    gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), 
+					     "sticky_point_added", 
+					     GTK_RUN_LAST | GTK_RUN_ACTION, 
+					     gtk_marshal_NONE__INT_INT_POINTER,
+					     GTK_TYPE_NONE, 3, 
+					     GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER); /* record index and datad pointer * */
   }
 
   if (gtk_signal_lookup("sticky_point_removed", GTK_TYPE_GGOBI) == 0) {
-    GGobiSignals[STICKY_POINT_REMOVED_SIGNAL] = gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), "sticky_point_removed", GTK_RUN_LAST | GTK_RUN_ACTION, gtk_marshal_NONE__INT_INT_POINTER, GTK_TYPE_NONE, 3, GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER);     /* record index and datad pointer * */
+	  GGobiSignals[STICKY_POINT_REMOVED_SIGNAL] = 
+		  gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), 
+						   "sticky_point_removed", 
+						   GTK_RUN_LAST | GTK_RUN_ACTION, 
+						   gtk_marshal_NONE__INT_INT_POINTER, 
+						   GTK_TYPE_NONE, 3, 
+						   GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER);     /* record index and datad pointer * */
   }
 }
 
