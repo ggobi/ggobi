@@ -230,7 +230,9 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   br_hidden_alloc (d);
   br_hidden_init(d);
 
-  for (j = 0; j < nc ; j++) {
+  if(d->vartable) {
+      /* the person who created the datad is taking care of populating it.*/
+   for (j = 0; j < nc ; j++) {
     vt = vartable_element_get (j, d);
     vt->collab = (colnames != NULL && colnames[j] != NULL) ?
       g_strdup(colnames[j]) : g_strdup_printf("V%d", j+1);
@@ -249,6 +251,15 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
          setMissingValue(i, j, d, vt);
       else
          d->raw.vals[i][j] = values[i + j*nr];
+    }
+   }
+  } 
+
+  if(rownames && d->rowlab->len == 0) {
+    for (i = 0; i < nr ; i++) {
+        lbl = (rownames != NULL && rownames[i] != NULL) ?
+          g_strdup (rownames[i]) : g_strdup_printf ("%d", i+1);
+        g_array_append_val (d->rowlab, lbl);
     }
   }
 
@@ -1200,22 +1211,31 @@ GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
   ans = GGOBI(addVariable)(vals, num, name, false, d, gg);
 */
 
+
   if (d->ncols < 1) {
-    gchar ** rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
-    for (i = 0; i < num; i++) {
-      rnames[i] = (gchar *) g_malloc (sizeof (gchar)*7);
-      rnames[i] = g_strdup_printf ("%d", i+1);
-/*    sprintf(rnames[i],"%d",i+1);*/
+    gchar ** rnames = NULL;
+    if(!d->rowlab || d->rowlab->len == 0) {
+      rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
+      for (i = 0; i < num; i++) 
+        rnames[i] = g_strdup_printf ("%d", i+1);
     }
+
     /* May want the final false here to be true as it causes the 
        creation of a plot. Probably not, but just mention it here
        so we don't forget.
      */
-    GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg, NULL, false, d->input);
-    for (i = 0; i < num; i++)
-      g_free (rnames[i]);
-    g_free (rnames);
-  } else {
+    GGOBI(setData)(NULL, rnames, &name, num, d->ncols, d, false, gg, NULL, false, d->input); 
+    datad_init(d, gg, false);
+
+    if(rnames) {
+      for (i = 0; i < num; i++)
+         g_free (rnames[i]);
+      g_free (rnames);
+    }
+
+  }
+
+  /* else*/ {
     if (num > d->nrows) {
       num =  d->nrows;
       /* Add a warning here. */

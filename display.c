@@ -662,7 +662,7 @@ display_set_current (displayd *new_display, ggobid *gg)
    * the variable manipulation table.
   */
   varpanel_show_page (gg->current_display, gg);
-  vartable_show_page (gg->current_display, gg);
+  vartable_show_page (gg->current_display->d, gg);
 
   varpanel_tooltips_set (gg->current_display, gg);
 

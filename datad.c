@@ -156,7 +156,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
     gg->viewmode = NULLMODE;
 
     /*-- initialize the first display --*/
-    if(sessionOptions->info->createInitialScatterPlot) {
+    if(sessionOptions->info->createInitialScatterPlot && d->ncols > 0) {
 /*XXX allow this to be specified as a gtk type name on the command
       line, initialization file, etc.  and invoke the corresponding
       create() method. */
@@ -209,7 +209,8 @@ datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate)
 void
 datad_record_id_add (gchar *id, datad *d)
 {
-  gint i, *index;
+  gint i;
+  guint *index;
 
   d->rowIds = (gchar **) g_realloc (d->rowIds, sizeof(gchar *) * d->nrows);
   i = d->nrows - 1;

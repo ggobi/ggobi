@@ -198,7 +198,7 @@ varpanel_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
   if (gg->status_message_func) {
     datad *d = (datad *) g_slist_nth_data (gg->d, page_num);
     if (d) {
-      gchar *msg = g_strdup_printf ("%s: %d x %d\n",
+      gchar *msg = g_strdup_printf ("%s: %d x %d",
         d->name, d->nrows, d->ncols);
       gg->status_message_func(msg, gg);
       g_free (msg);

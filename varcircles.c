@@ -23,12 +23,19 @@ static void varcircle_pack (GtkWidget *, datad *);
 void
 varcircles_visibility_set (displayd *display, ggobid *gg)
 {
-  gint projection = (gint) projection_get (gg);
+  gint projection;
   gint j;
   GtkWidget *box;
-  datad *d = display->d;
-  GList *children = gtk_container_children (GTK_CONTAINER (d->vcirc_ui.table));
+  datad *d;
+  GList *children;
   gint n = 0;
+
+  if(!display)
+      return;
+
+  projection = (gint) projection_get (gg);
+  d = display->d;
+  children = gtk_container_children (GTK_CONTAINER (d->vcirc_ui.table));
 
   switch (projection) {
 

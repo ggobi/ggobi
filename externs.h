@@ -613,7 +613,7 @@ void       vartable_limits_set_by_var (gint j, datad *d);
 void       vartable_open (ggobid *);
 void       vartable_realloc (gint, datad *);
 void       vartable_row_append (gint j, datad *, ggobid *);
-void       vartable_show_page (displayd*, ggobid*);
+void       vartable_show_page (datad*, ggobid*);
 void       vartable_stats_set (datad *);
 void       vartable_stats_set_by_var (gint j, datad *);
 void       vectorb_alloc (vector_b *, gint);

@@ -104,16 +104,16 @@ vartable_clist_get (ggobid *gg) {
 }
 
 void
-vartable_show_page (displayd *display, ggobid *gg)
+vartable_show_page (datad *d, ggobid *gg)
 {
   GtkNotebook *nb;
   gint page, page_new;
-  datad *d = display->d;
   GList *l, *children;
   GtkWidget *child, *tab_label;
 
-  if (display == NULL || gg == NULL || gg->vartable_ui.notebook == NULL)
+  if (gg == NULL || gg->vartable_ui.notebook == NULL)
     return;
+
 
   nb = GTK_NOTEBOOK (gg->vartable_ui.notebook);
   page = gtk_notebook_get_current_page (nb);
@@ -623,7 +623,8 @@ vartable_open (ggobid *gg)
   gtk_widget_show_all (gg->vartable_ui.window);
 
   /*-- set it to the page corresponding to the current display --*/
-  vartable_show_page (gg->current_display, gg);
+  d = (gg->current_display ? gg->current_display->d : (datad *)gg->d->data);
+  vartable_show_page (d, gg);
 }
 
 /*-------------------------------------------------------------------------*/
