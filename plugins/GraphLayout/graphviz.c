@@ -228,6 +228,8 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   nedges = 0;
   /*-- create new edges, add to graph --*/
   for (i=0; i<e->edge.n; i++) {
+    if (e->excluded.els[i])
+      continue;
 
 /* still need a test for edge visibility */
     edge_endpoints_get (i, &a, &b, d, endpoints, e);
