@@ -90,8 +90,8 @@ typedef struct {
  /*-- transformations --*/
  gint tform0;
  gfloat domain_incr;  /*-- stage 0 --*/
- gfloat (*domain_adj) (gfloat x);
- gfloat (*inv_domain_adj) (gfloat x);
+ gfloat (*domain_adj) (gfloat x, gfloat incr);
+ gfloat (*inv_domain_adj) (gfloat x, gfloat incr);
  gint tform1;
  gfloat param;
  gint tform2;

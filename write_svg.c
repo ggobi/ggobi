@@ -96,6 +96,8 @@ splot_write_svg (splotd *sp, ggobid *gg)
 <path style="stroke: #000000" d="M 60 360 L 60 350 z"/>
 <path style="stroke: #000000" d="M 60 350 L 340 350 z"/>
 <path style="stroke: #000000" d="M 340 350 L 340 360 z"/>
+<text x="50" y="375" > 122 </text>
+<text x="330" y="375" > 242 </text>
 */
 
   /*-- y axis --*/
@@ -106,6 +108,8 @@ splot_write_svg (splotd *sp, ggobid *gg)
 <path style="stroke: #000000" d="M 40 60 L 50 60 z"/>
 <path style="stroke: #000000" d="M 50 60 L 50 340 z"/>
 <path style="stroke: #000000" d="M 50 340 L 40 340 z"/>
+<text x="15" y="65" > 107 </text>
+<text x="15" y="345" > 146 </text>
 */
 
   if (!gg->mono_p) {

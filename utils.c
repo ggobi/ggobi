@@ -233,6 +233,49 @@ g_list_replace_nth (GList *list, gpointer item, gint indx) {
 }
 
 /*-----------------------------------------------------------------------*/
+/*  a routine gtk should have for finding out which option is selected   */
+/*-----------------------------------------------------------------------*/
+
+/**
+ * option_menu_index:
+ * @optionmenu: a gtkoptionmenu
+ * 
+ * Tries to find out (in an ugly way) the selected
+ * item in @optionmenu
+ * 
+ * Return value: the selected index
+ **/
+gint
+option_menu_index (GtkOptionMenu *optionmenu)
+{
+  GtkMenu *menu;
+  GtkMenuItem *selected;
+  GList *iterator;
+  gint index = -1;
+  gint i = 0;
+
+  g_return_val_if_fail (optionmenu != NULL, -1);
+
+  menu = (GtkMenu *) gtk_option_menu_get_menu (optionmenu);
+  iterator = GTK_MENU_SHELL (menu)->children;
+  selected = (GtkMenuItem *) gtk_menu_get_active (menu);
+
+  while (iterator) {
+
+    if (iterator->data == selected) {
+      index = i;
+      break;
+    }
+
+    iterator = iterator->next;
+    i++;
+  }
+
+  return index;
+}
+
+
+/*-----------------------------------------------------------------------*/
 /*                            Debugging                                  */
 /*-----------------------------------------------------------------------*/
 

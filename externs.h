@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+extern gint option_menu_index (GtkOptionMenu *);
 extern gboolean splot_plot_case (gint m, datad *, splotd *, displayd *, ggobid *);
 extern void splot_point_colors_used_get (splotd *, gint *ncolors_used, gushort *colors_used, gboolean binned, ggobid *); 
 extern displayd * datad_init (datad *, ggobid *, gboolean);
@@ -292,9 +293,9 @@ extern void tour_func (gboolean, ggobid *);
 extern void tour_reproject (splotd *, glong **, datad *, ggobid *);
 extern void transform (gint, gint, gfloat, datad *, ggobid *);
 extern void transform0_values_set (gint, gint, datad *, ggobid *);
-extern gboolean transform1_apply (gint, gfloat, gint, datad *, ggobid *);
+extern gboolean transform1_apply (gint, datad *, ggobid *);
 extern void transform1_values_set (gint, gfloat, gint, datad *, ggobid *);
-extern gboolean transform2_apply (gint, gint, datad *, ggobid *);
+extern gboolean transform2_apply (gint, datad *, ggobid *);
 extern void transform2_values_set (gint, gint, datad *, ggobid *);
 extern void transform_opt_menus_set_history (gint, datad *, ggobid *);
 extern void transform_values_init (gint j, datad *, ggobid *);

@@ -19,7 +19,7 @@ various stuff not yet implemented:
 
 datad
   check for note in transform.c
-
+  add notebook controls to the exclusion window
 
 when brushing or identifying in parcoords, use leave/enter events to
   change the current_splot.

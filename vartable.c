@@ -10,7 +10,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern gfloat no_change (gfloat);
+extern gfloat no_change (gfloat, gfloat);
 #ifdef __cplusplus
 }
 #endif

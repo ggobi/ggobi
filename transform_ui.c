@@ -81,8 +81,8 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
     transform1_values_set (NO_TFORM1, 1.0, j, d, gg);
     transform2_values_set (NO_TFORM2, j, d, gg);
 
-    transform1_apply (NO_TFORM1, 1.0, j, d, gg);
-    transform2_apply (NO_TFORM2, j, d, gg);
+    transform1_apply (j, d, gg);
+    transform2_apply (j, d, gg);
 
     transform_opt_menus_set_history (j, d, gg);
   }
