@@ -1,7 +1,6 @@
 Have the read_xml process colorschemes (should be there already)
 and set the activeColorScheme of the ggobid to the appropriate one.
 
-
 Add warning messages to XML parser.
   E.g. reading incomplete or excess elements.
 
@@ -24,6 +23,9 @@ determine what is the relationship between these.
 
 Check the fileselection dialog for read (filesel_ok) to ensure that
 the correct data mode is passed.  Take it out of ggobi.
+
+Allow a variable transformation to be pre-specifed in
+  the xml file.
 
 Missings:
   It should be possible in xml to acknowledge various
