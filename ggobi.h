@@ -370,7 +370,7 @@ struct _ggobid {
  PrintOptions *printOptions;
  GList *pluginInstances;
 
- GList *colorschemes;
+ GList *colorSchemes;
  colorschemed *activeColorScheme;
 }; /*  ggobid; */
 
@@ -392,6 +392,7 @@ typedef struct {
   gchar *initializationFile;
 
   GList *colorSchemes;
+  gchar *activeColorScheme;
 #endif
 } GGobiOptions;
 

@@ -218,3 +218,19 @@ getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col)
 
     return(numElements);
 }
+
+
+colorschemed *
+findColorSchemeByName(GList *schemes, const gchar *name)
+{
+  colorschemed *s;
+  int i, n;
+
+  n = g_list_length(schemes);
+  for(i = 0; i < n; i++) {
+   s = (colorschemed *)g_list_nth_data(schemes, i);
+   if(strcmp(name, s->name) == 0)
+       return(s);
+  }
+  return(NULL);
+}

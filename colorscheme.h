@@ -28,5 +28,6 @@ typedef struct {
 } colorschemed;
 
 colorschemed *read_colorscheme(char *fileName, GList **);
+colorschemed *findColorSchemeByName(GList *schemes, const gchar *name);
 
 #endif

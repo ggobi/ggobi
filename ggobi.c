@@ -117,9 +117,16 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
         (*argc)--; av++;
     } else if(strcmp(av[1],"-colorschemes") == 0) {
 #ifdef USE_XML
-
 	read_colorscheme(av[2], &(sessionOptions->colorSchemes));       
-	fprintf(stderr, "# color schemes %d\n", g_list_length(sessionOptions->colorSchemes));
+#else
+        fprintf(stderr, "-colorschemes not supported without XML\n");fflush(stderr);
+#endif
+        (*argc)--; av++;
+
+    }
+ else if(strcmp(av[1],"-activeColorScheme") == 0) {
+#ifdef USE_XML
+        sessionOptions->activeColorScheme = g_strdup(av[2]);
 #else
         fprintf(stderr, "-colorschemes not supported without XML\n");fflush(stderr);
 #endif
@@ -253,6 +260,13 @@ ggobi_alloc()
 
   tmp->printOptions = NULL;
   tmp->pluginInstances = NULL;
+
+  tmp->colorSchemes = sessionOptions->colorSchemes;
+
+  if(sessionOptions->activeColorScheme)
+      tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes, sessionOptions->activeColorScheme);
+  else
+      tmp->activeColorScheme = (colorschemed *) g_list_nth_data(tmp->colorSchemes, 0);
 
   totalNumGGobis++;
 

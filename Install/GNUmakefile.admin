@@ -30,7 +30,7 @@ DATA_SRC_FILES=\
 # Note that COI which provides an example of an XML file containing
 # 2 data sets is not included. Can we ship it?
 
-DATA_FILES=$(DATA_SRC_FILES:%=data/%)  
+DATA_FILES=$(DATA_SRC_FILES:%=data/%)  notes/colorschemes.xml
 
 LICENSES= LGPL.txt license.html license.txt minterms.html minterms.txt
 
@@ -48,7 +48,7 @@ C_HEADER_FILES=\
   externs ggobi noop-checkbutton read_mysql read_xml  \
   splot types vars varseldata write_xml writedata vartable gtkext fileio \
   print tour1d_pp tour2d_pp tour_pp splash read_init write_state \
-  plugin
+  plugin colorscheme
 
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)
