@@ -193,11 +193,11 @@ subset_sticky (ggobid *gg)
   gint top = (gg->nrgroups > 0) ? gg->nrgroups : gg->nrows;
 
 
-  if (g_slist_length (gg->sticky_ids) > 0) {
+  if (g_slist_length (gg->identify.sticky_ids) > 0) {
 
     subset_clear (gg);
 
-    for (l = gg->sticky_ids; l; l = l->next) {
+    for (l = gg->identify.sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
       if (id < top)
         add_to_subset ((gg->nrgroups > 0) ? gg->rgroup_ids[id] : id, gg);

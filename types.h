@@ -4,7 +4,8 @@
 #include <gtk/gtk.h>
 /* types.h */
 
-
+typedef enum {ascii, binary, Sprocess, xml, mysql} DataMode;
+typedef enum {read_all, read_block, draw_sample} FileReadType;
 typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT,UNKNOWN_GLYPH} GlyphType;
 
 typedef struct {
@@ -26,17 +27,18 @@ typedef struct {
     gint x1, y1, x2, y2;
 } brush_coords;
 
-/* for gg.raw_data, tform1, tform2 */
+/*-- arrays --*/
+/*-- floating point: for gg.raw_data, tform1, tform2 --*/
 typedef struct {
   gfloat **data;
   gint nrows, ncols;
 } array_f;
-/* for gg.missing */
+/*-- short: for gg.missing --*/
 typedef struct {
   gshort **data;
   gint nrows, ncols;
 } array_s;
-/* for gg.missing */
+/*-- long: for gg.world, jitdata --*/
 typedef struct {
   glong **data;
   gint nrows, ncols;
@@ -86,17 +88,17 @@ typedef struct {
 
  gboolean selected;  /*-- temporary?  I'll use this for transformation --*/
 
-  /*-- transformations --*/
-  gint tform0;
-  gfloat domain_incr;  /*-- stage 0 --*/
-  gfloat (*domain_adj) (gfloat x);
-  gfloat (*inv_domain_adj) (gfloat x);
-  gint tform1;
-  gfloat param;
-  gint tform2;
+ /*-- transformations --*/
+ gint tform0;
+ gfloat domain_incr;  /*-- stage 0 --*/
+ gfloat (*domain_adj) (gfloat x);
+ gfloat (*inv_domain_adj) (gfloat x);
+ gint tform1;
+ gfloat param;
+ gint tform2;
 
-  /*-- jittering --*/
-  gfloat jitter_factor;
+ /*-- jittering --*/
+ gfloat jitter_factor;
 
  /*-- and doubtless more, as we go along --*/
 
@@ -140,10 +142,9 @@ typedef struct {
   glong id;
   gulong *els;
   glong nels;
-  gboolean included;   /* for linked brushing */
-  gboolean sampled;  /* for subsetting */
+  gboolean included;  /* for linked brushing */
+  gboolean sampled;   /* for subsetting */
 } rgroupd;
-
 
 
 
@@ -168,8 +169,6 @@ typedef struct {
 
 extern DisplayOptions DefaultDisplayOptions;
 
-
 #define TYPES_H
-
 
 #endif

@@ -50,7 +50,7 @@ plot_tree_display(ggobid *gg)
     the entire contents of the tree and start rebuilding
     with the current model.
   */
- if(gg->app.display_tree.tree == NULL) {
+ if(gg->display_tree.tree == NULL) {
   plot_tree_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(plot_tree_window), "GGobi Displays");
  } else {
@@ -86,9 +86,9 @@ plot_tree_display(ggobid *gg)
   gtk_signal_connect (GTK_OBJECT (plot_tree_window), "delete_event",
                       GTK_SIGNAL_FUNC (display_tree_delete_cb), gg);
 
- gg->app.display_tree.tree = tree;
- gg->app.display_tree.numItems = numItems;
- gg->app.display_tree.window = plot_tree_window;
+ gg->display_tree.tree = tree;
+ gg->display_tree.numItems = numItems;
+ gg->display_tree.window = plot_tree_window;
 
  return(GTK_TREE( tree ));
 }
@@ -123,8 +123,8 @@ gtk_signal_connect (GTK_OBJECT(item), "select",
 void
 display_tree_delete_cb(GtkWidget *w, GdkEvent *event, ggobid *gg) 
 {
- gg->app.display_tree.tree = NULL;
- gg->app.display_tree.numItems = -1;
+ gg->display_tree.tree = NULL;
+ gg->display_tree.numItems = -1;
 }
 
 
@@ -275,7 +275,7 @@ void
 display_tree_display_child_select(GtkWidget *item, displayd *display, ggobid *gg)
 {
 
-  if(gg->app.display_tree.tree == NULL) {
+  if(gg->display_tree.tree == NULL) {
     return;
   }
 
@@ -296,7 +296,7 @@ display_tree_splot_child_select(GtkWidget *item, splotd *plot)
 {
   ggobid *gg = GGobiFromSPlot(plot);
 
-  if( &(plot->displayptr->ggobi->app.display_tree) == NULL) {
+  if( &(plot->displayptr->ggobi->display_tree) == NULL) {
     return;
   }
 

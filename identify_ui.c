@@ -9,8 +9,8 @@
 static void
 id_remove_labels_cb (GtkWidget *w, ggobid *gg)
 {
-  g_slist_free (gg->sticky_ids);
-  gg->sticky_ids = (GSList *) NULL;
+  g_slist_free (gg->identify.sticky_ids);
+  gg->identify.sticky_ids = (GSList *) NULL;
   displays_plot (NULL, QUICK, gg);
 }
 static void
@@ -19,12 +19,13 @@ id_all_sticky_cb (GtkWidget *w, ggobid *gg)
   gint i, m;
 
   /*-- clear the list before adding to avoid redundant entries --*/
-  g_slist_free (gg->sticky_ids);
-  gg->sticky_ids = (GSList *) NULL;
+  g_slist_free (gg->identify.sticky_ids);
+  gg->identify.sticky_ids = (GSList *) NULL;
 
   for (m=0; m<gg->nrows_in_plot; m++) {
     i = gg->rows_in_plot[m];
-    gg->sticky_ids = g_slist_append (gg->sticky_ids, GINT_TO_POINTER (i));
+    gg->identify.sticky_ids = g_slist_append (gg->identify.sticky_ids,
+                                              GINT_TO_POINTER (i));
   }
   displays_plot (NULL, QUICK, gg);
 }
@@ -105,7 +106,7 @@ static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
 /*
- * If nearest_point is a member of gg->sticky_ids, remove it; if
+ * If nearest_point is a member of gg->identify.sticky_ids, remove it; if
  * it isn't, add it.
 */
   ggobid *gg = GGobiFromSPlot (sp);
@@ -115,9 +116,9 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   if (gg->app.nearest_point != -1) {
 
-    if (g_slist_length (gg->sticky_ids) > 0) {
+    if (g_slist_length (gg->identify.sticky_ids) > 0) {
       GSList *l;
-      for (l = gg->sticky_ids; l; l = l->next) {
+      for (l = gg->identify.sticky_ids; l; l = l->next) {
         id = GPOINTER_TO_INT (l->data);
         if (id == gg->app.nearest_point) {
           id_in_list = true;
@@ -127,12 +128,12 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       }
 
       if (id_in_list)
-        gg->sticky_ids = g_slist_remove (gg->sticky_ids, ptr);
+        gg->identify.sticky_ids = g_slist_remove (gg->identify.sticky_ids, ptr);
     }
 
     if (!id_in_list) {
       ptr = GINT_TO_POINTER (gg->app.nearest_point);
-      gg->sticky_ids = g_slist_append (gg->sticky_ids, ptr);
+      gg->identify.sticky_ids = g_slist_append (gg->identify.sticky_ids, ptr);
     }
   }
 
@@ -182,13 +183,13 @@ identify_menus_make (ggobid *gg) {
 /*
  * Link menu
 */
-  gg->app.identify_link_menu = gtk_menu_new ();
+  gg->identify.link_menu = gtk_menu_new ();
 
   item = gtk_check_menu_item_new_with_label("Link identification");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (identify_link_cb),
                       (gpointer) NULL);
-  gtk_menu_append (GTK_MENU (gg->app.identify_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg->identify.link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
   gtk_widget_show(item);
 }

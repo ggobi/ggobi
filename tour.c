@@ -640,8 +640,6 @@ void * tour_thread (void *args)
 */
 
 
-static gint tour_idled = 0;  /*-- could be at display level --*/
-
 gint
 tour_idle_func (ggobid *gg)
 {
@@ -657,15 +655,16 @@ tour_idle_func (ggobid *gg)
   return (doit);
 }
 
+static gint idled = 0;  /*-- could be at display level --*/
 void tour_func (gboolean state, ggobid *gg)
 {
   if (state) {
-    tour_idled = gtk_idle_add_priority (G_PRIORITY_LOW,
-                                       (GtkFunction) tour_idle_func, gg);
-    gg->tour_idled = 1;
+    idled = gtk_idle_add_priority (G_PRIORITY_LOW,
+                                   (GtkFunction) tour_idle_func, gg);
+    gg->tour2d.idled = 1;
   } else {
-    gtk_idle_remove (tour_idled);
-    gg->tour_idled = 0;
+    gtk_idle_remove (idled);
+    gg->tour2d.idled = 0;
   }
 
 /*

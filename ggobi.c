@@ -212,10 +212,11 @@ ggobi_alloc()
 {
  ggobid *tmp;
 
-  tmp = g_malloc (sizeof(ggobid));
+  tmp = g_malloc (sizeof (ggobid));
 
-  memset(tmp, '\0', sizeof(ggobid));
-  tmp->app.direction = FORWARD;
+  memset (tmp, '\0', sizeof (ggobid));
+  tmp->xyplot.direction = FORWARD;
+  tmp->xyplot.cycle_p = false;
   tmp->firsttime = true;
   tmp->brush.firsttime = true;
   tmp->mode = XYPLOT;
@@ -227,7 +228,7 @@ ggobi_alloc()
       tmp->mode_menu.firsttime_io =  true;
 
   tmp->color_ui.margin = 10;
-  tmp->tour_idled = 0;
+  tmp->tour2d.idled = 0;
 
   all_ggobis = g_realloc (all_ggobis, sizeof(ggobid*)*(num_ggobis+1));
   all_ggobis[num_ggobis] = tmp;

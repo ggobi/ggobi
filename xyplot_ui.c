@@ -18,7 +18,7 @@ static void fix_axis_cb (GtkWidget *w, gpointer cbd)
 
 static void cycle_cb (GtkToggleButton *button, ggobid *gg)
 {
-  gg->app.cycle_p = button->active;
+  gg->xyplot.cycle_p = button->active;
 }
 static void scale_set_default_values (GtkScale *scale )
 {
@@ -32,7 +32,7 @@ static void cycle_speed_cb (GtkAdjustment *adj, gpointer cbd) {
 
 static void chdir_cb (GtkButton *button, ggobid* gg)
 {
-  gg->app.direction = -1 * gg->app.direction;
+  gg->xyplot.direction = -1 * gg->xyplot.direction;
 }
 
 void

@@ -219,7 +219,7 @@ display_add (displayd *display, ggobid *gg)
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
     /* If the tree of displays is active, add this to it. */
-  display_add_tree(display, -1, gg->app.display_tree.tree, gg);
+  display_add_tree(display, -1, gg->display_tree.tree, gg);
 
   gg->current_splot = (splotd *)
     g_list_nth_data (gg->current_display->splots, 0);
@@ -264,7 +264,7 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
   if (num_ggobis > 1 || force || g_list_length (gg->displays) > 1) {
 
     /*-- If the display tree is active, remove the corresponding entry. --*/
-    tree_display_entry_remove(display, gg->app.display_tree.tree, gg); 
+    tree_display_entry_remove(display, gg->display_tree.tree, gg); 
 
     g_list_remove (gg->displays, display);
 
@@ -378,7 +378,7 @@ display_set_current (displayd *new_display, ggobid *gg)
       parcoords_main_menus_make (gg->main_accel_group, mode_set_cb, gg, true);
       gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
-                                 gg->app.parcoords_mode_menu); 
+                                 gg->parcoords.mode_menu); 
       submenu_insert (gg->mode_item, gg->main_menubar, 2);
       break;
   }

@@ -210,7 +210,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
         gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
-          gg->app.tour2d_io_menu); 
+          gg->tour2d.io_menu); 
         if (gg->mode_menu.firsttime_io) {
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_io = false;
@@ -259,7 +259,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
         gg->mode_menu.link_item = submenu_make ("_Link", 'L',
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
-          gg->app.identify_link_menu); 
+          gg->identify.link_menu); 
         if (gg->mode_menu.firsttime_link) {
           submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_link = false;
@@ -505,7 +505,7 @@ make_ui (ggobid *gg) {
   gg->tips = gtk_tooltips_new ();
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gg->app.main_window = window;
+  gg->main_window = window;
   GGobi_widget_set (window, gg, true);
 
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);

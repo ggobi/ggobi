@@ -8,7 +8,7 @@ typedef struct {
 
  displayd *displayptr;  /* a pointer to the enclosing display */
 
- GtkWidget *da;      /* drawing_area */
+ GtkWidget *da;                 /* drawing_area */
  GdkPixmap *pixmap0, *pixmap1;  /* 2-stage drawing */
 
  gint redraw_style;

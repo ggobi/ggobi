@@ -825,13 +825,13 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
   gg->close_pending = true;
   display_free_all(gg);
 
-  if(closeWindow && gg->app.main_window)
-    gtk_widget_destroy(gg->app.main_window);
+  if (closeWindow && gg->main_window)
+    gtk_widget_destroy(gg->main_window);
 
-  if(gg->app.display_tree.window)
-    gtk_widget_destroy(gg->app.display_tree.window);
-  if(gg->app.vardata_window)
-    gtk_widget_destroy(gg->app.vardata_window);
+  if (gg->display_tree.window)
+    gtk_widget_destroy (gg->display_tree.window);
+  if (gg->vartable.window)
+    gtk_widget_destroy (gg->vartable.window);
 
   gg->close_pending = false;
   /* Now fix up the list of ggobi's */

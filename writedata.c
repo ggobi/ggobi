@@ -49,9 +49,9 @@ set_rowv (gint *rowv, gchar *rootname, ggobid *gg)
        * Otherwise just copy the row numbers representing sticky
        * labels into rowv, and return their count.
       */
-      for (l = gg->sticky_ids; l; l = l->next)
+      for (l = gg->identify.sticky_ids; l; l = l->next)
         rowv[i] = GPOINTER_TO_INT (l->data);
-      nrows = g_slist_length (gg->sticky_ids);
+      nrows = g_slist_length (gg->identify.sticky_ids);
       break;
 
     case ALLROWS:

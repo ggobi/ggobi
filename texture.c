@@ -41,9 +41,9 @@ ggobid *gg = CurrentGGobi;
   gint *x1 = (gint *) arg1;
   gint *x2 = (gint *) arg2;
 
-  if (gg->app.gy[*x1] < gg->app.gy[*x2])
+  if (gg->p1d.gy[*x1] < gg->p1d.gy[*x2])
     val = -1;
-  else if (gg->app.gy[*x1] > gg->app.gy[*x2])
+  else if (gg->p1d.gy[*x1] > gg->p1d.gy[*x2])
     val = 1;
 
   return (val);
@@ -189,13 +189,13 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages,
  * gy is needed solely for the psort routine:  psort is used by
  * qsort to put an index vector in the order that yy will assume.
 */
-   gg->app.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
+   gg->p1d.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
   xx = (gfloat *) g_malloc (ny * sizeof (gfloat));
 
   for (i=0; i<ny; i++)
   {
     indx[i] = i;
-    gg->app.gy[i] = yy[i];
+    gg->p1d.gy[i] = yy[i];
   }
 
 CurrentGGobi = gg;
@@ -237,7 +237,7 @@ CurrentGGobi = NULL;
 
   if (stages<=1) {
     g_free ((gpointer) indx);
-    g_free ((gpointer) gg->app.gy);
+    g_free ((gpointer) gg->p1d.gy);
     g_free ((gpointer) xx);
     return;
   }
@@ -336,7 +336,7 @@ CurrentGGobi = NULL;
     shft[i] = xx[i];
 
   g_free ((gpointer) indx);
-  g_free ((gpointer) gg->app.gy);
+  g_free ((gpointer) gg->p1d.gy);
   g_free ((gpointer) xx);
 
   return;

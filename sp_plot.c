@@ -462,8 +462,10 @@ splot_add_sticky_labels (splotd *sp, ggobid *gg) {
   gint id;
   GSList *l;
 
-  if (gg->sticky_ids != NULL && g_slist_length (gg->sticky_ids) > 0) {
-    for (l = gg->sticky_ids; l; l = l->next) {
+  if (gg->identify.sticky_ids != NULL &&
+      g_slist_length (gg->identify.sticky_ids) > 0)
+  {
+    for (l = gg->identify.sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
       splot_add_point_label (sp, id, false, gg);  /*-- false = !nearest --*/
     }
