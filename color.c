@@ -129,13 +129,20 @@ color_table_init (ggobid *gg) {
 
 void
 init_plot_GC (GdkWindow *w, ggobid *gg) {
-  GdkColor white, black;
+  GdkColor white, black, *bblack, *wwhite;
+
   gdk_color_white (gdk_colormap_get_system (), &white);
-  gdk_color_black (gdk_colormap_get_system (), &black);
+
+  if(!sessionOptions->info || !sessionOptions->info->bgColor) {
+      gdk_color_black (gdk_colormap_get_system (), &black);
+      bblack = &black;
+  } else {
+      bblack = sessionOptions->info->bgColor;
+  }
 
   gg->plot_GC = gdk_gc_new (w);
   gdk_gc_set_foreground (gg->plot_GC, &white);
-  gdk_gc_set_background (gg->plot_GC, &black);
+  gdk_gc_set_background (gg->plot_GC, bblack);
   /* line_width, GdkLineStyle, GdkCapStyle, GdkJoinStyle */
   gdk_gc_set_line_attributes (gg->plot_GC,
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
@@ -145,11 +152,16 @@ void
 init_var_GCs (GtkWidget *w, ggobid *gg) {
   GdkWindow *window = w->window;
   GtkStyle *style = gtk_style_copy (gtk_widget_get_style (w));
-  GdkColor white, black, bg;
+  GdkColor white, black, bg,  *bblack;
 
   gdk_color_white (gdk_colormap_get_system (), &white);
   gdk_color_black (gdk_colormap_get_system (), &black);
 
+  if(!sessionOptions->info->bgColor) {
+      gdk_color_black (gdk_colormap_get_system (), &black);
+      bblack = &black;
+  } else
+      bblack = sessionOptions->info->bgColor;
 /*
  * the unselected variable GCs: thin lines
 */
@@ -160,7 +172,7 @@ init_var_GCs (GtkWidget *w, ggobid *gg) {
   gg->unselvarfg_GC = gdk_gc_new (window);
   gdk_gc_set_line_attributes (gg->unselvarfg_GC,
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (gg->unselvarfg_GC, &black);
+  gdk_gc_set_foreground (gg->unselvarfg_GC, bblack);
 
 
 /*

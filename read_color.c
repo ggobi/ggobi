@@ -198,6 +198,14 @@ getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col)
   xmlNodePtr tmp;
   int i = 0, numElements = 3; /* RGB only at present. */
   float *vals;
+  float max = 65535;
+
+  char *tmpVal;
+  tmpVal = xmlGetProp(node, "max");
+  if(tmpVal) {
+     max /= asNumber(tmpVal);
+  }
+
   tmp = XML_CHILDREN(node);
 
   vals = (float *) g_malloc(3 * sizeof(float));
@@ -205,7 +213,7 @@ getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col)
     xmlChar *val;
     if(tmp->type != XML_TEXT_NODE) {
       val = xmlNodeListGetString(doc, XML_CHILDREN(tmp), 1);
-      vals[i] = asNumber(val);
+      vals[i] = asNumber(val) * max;
       i++;
     }
     tmp = tmp->next;
@@ -216,6 +224,9 @@ getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col)
   col->red = vals[0];
   col->green = vals[1];
   col->blue = vals[2];
+
+  gdk_colormap_alloc_color(gdk_colormap_get_system (), col, true, true);
+
 
   return(numElements);
 }
