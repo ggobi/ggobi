@@ -64,18 +64,26 @@ findAssociatedFile(InputDescription *desc, const gchar * const *extensions,
 /*                          row labels                                    */
 /*------------------------------------------------------------------------*/
 
-void rowlabels_free (datad *d, ggobid *gg)
+void rowlabels_free (datad *d)
 {
-  g_array_free (d->rowlab, true);  /* unsure about the 2nd arg */
+  g_array_free (d->rowlab, true);
 }
 
 
 void
-rowlabels_alloc (datad *d, ggobid *gg) 
+rowlabels_alloc (datad *d) 
 {
-  if (d->rowlab != NULL) rowlabels_free (d, gg);
-
+  if (d->rowlab != NULL) rowlabels_free (d);
   d->rowlab = g_array_new (false, false, sizeof (gchar *));
+}
+
+void
+rowlabels_add (gchar **labels, gint nnewlabels, datad *d) 
+{
+  d->rowlab = g_array_append_vals (d->rowlab, (gconstpointer) labels,
+    nnewlabels);
+
+  g_assert (d->rowlab->len == d->nrows);
 }
 
 gboolean
@@ -95,7 +103,7 @@ rowlabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
   gchar *fileName;
 
   if (init)
-    rowlabels_alloc (d, gg);
+    rowlabels_alloc (d);
 
   fileName = findAssociatedFile (desc, suffixes,
     sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
@@ -559,7 +567,7 @@ hidden_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
   gint whichSuffix;
 
   if (reinit)
-    hidden_alloc (d);
+    br_hidden_alloc (d);
 
   fileName = findAssociatedFile(desc, suffixes,
     sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
@@ -586,7 +594,7 @@ hidden_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
        addInputSuffix(desc, suffixes[whichSuffix]);
   } else {
     if (reinit)
-      hidden_init (d);
+      br_hidden_init (d);
   }
 
   if(fileName) 

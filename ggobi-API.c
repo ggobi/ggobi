@@ -216,7 +216,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
     datad_record_ids_set(d, ids, duplicate);
   }
 
-  rowlabels_alloc (d, gg);
+  rowlabels_alloc (d);
 
   vartable_alloc (d);
   vartable_init (d);
@@ -227,8 +227,8 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   br_color_ids_alloc (d, gg);
   br_color_ids_init (d, gg);
 
-  hidden_alloc (d);
-  hidden_init(d);
+  br_hidden_alloc (d);
+  br_hidden_init(d);
 
   for (j = 0; j < nc ; j++) {
     vt = vartable_element_get (j, d);
@@ -318,7 +318,7 @@ GGOBI(data_release)(datad *d, ggobid *gg)
   if(d == NULL)
     return;
   if (d->rowlab) {
-    rowlabels_free (d, gg);
+    rowlabels_free (d);
     d->rowlab = NULL;
   }
 
@@ -1185,7 +1185,7 @@ GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name, gchar **leve
      }
      if(!counts) {
         for(i = 0; i < num ; i++) {
-    	   vt->level_counts[i];
+    	   vt->level_counts[i] = i;
 	}
      }
   }
@@ -1573,7 +1573,7 @@ void
 GGobi_setDataName(const char * const name, datad *d)
 {
    if(d->name)
-      g_free(d->name);
+      g_free((gchar *) d->name);
 
    d->name = g_strdup(name);
    /* Update the different labels. */

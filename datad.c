@@ -93,7 +93,7 @@ datad_create(gint nr, gint nc, ggobid *gg)
 
   arrayf_alloc(&d->raw, nr, nc);
 
-  rowlabels_alloc (d, gg);
+  rowlabels_alloc (d);
 
   vartable_alloc (d);
   vartable_init (d);
@@ -104,8 +104,8 @@ datad_create(gint nr, gint nc, ggobid *gg)
   br_color_ids_alloc (d, gg);
   br_color_ids_init (d, gg);
 
-  hidden_alloc (d);
-  hidden_init (d);
+  br_hidden_alloc (d);
+  br_hidden_init (d);
 
   return(d);
 }
@@ -198,6 +198,30 @@ datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate)
      *index = i;
      g_hash_table_insert(d->idTable, tmp, index);
      d->rowIds[i] = tmp;     
+
+     g_free (index);
+     if (duplicate)
+       g_free (tmp);
+  }
+}
+
+/* Add some number of record ids */
+void
+datad_record_ids_add (gchar **ids, gint nprev, datad *d)
+{
+  gint i, *index;
+  gchar *tmp;
+
+  d->rowIds = (gchar **) g_realloc (d->rowIds, sizeof(gchar *) * d->nrows);
+  for (i=nprev; i<d->nrows; i++) {
+    tmp = g_strdup(ids[i]);
+    index = (guint *) g_malloc(sizeof(guint));
+    *index = i;
+    g_hash_table_insert (d->idTable, tmp, index);
+    d->rowIds[i] = tmp;
+
+    g_free (index);
+    g_free (tmp);
   }
 }
 

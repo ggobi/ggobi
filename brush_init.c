@@ -55,6 +55,25 @@ br_glyph_ids_init (datad *d, ggobid *gg)
   }
 }
 
+/*-- reallocates and initializes to the current glyph type and size --*/
+void
+br_glyph_ids_add (datad *d, ggobid *gg)
+{
+  gint i, nprev = d->glyph.nels;
+
+  vectorg_alloc (&d->glyph, d->nrows);
+  vectorg_alloc (&d->glyph_now, d->nrows);
+  vectorg_alloc (&d->glyph_prev, d->nrows);
+
+  for (i=nprev; i<d->nrows; i++) {
+    d->glyph.els[i].type = d->glyph_now.els[i].type =
+      d->glyph_prev.els[i].type = gg->glyph_id.type;
+    d->glyph.els[i].size = d->glyph_now.els[i].size =
+      d->glyph_prev.els[i].size = gg->glyph_id.size;
+  }
+}
+
+
 /*-------------------------------------------------------------------------*/
 /*                       color                                             */
 /*-------------------------------------------------------------------------*/
@@ -73,12 +92,6 @@ br_color_ids_alloc (datad *d, ggobid *gg)
   vectors_realloc (&d->color, d->nrows);
   vectors_realloc (&d->color_now, d->nrows);
   vectors_realloc (&d->color_prev, d->nrows);
-/*  allocation and initialization should be separate
-  gint i;
-  for (i=0; i<d->nrows; i++)
-    d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] =
-      gg->color_0;
-*/
 }
 
 void
@@ -93,12 +106,28 @@ br_color_ids_init (datad *d, ggobid *gg)
       gg->color_0;
 }
 
+/*-- reallocate and initialize colors --*/
+void
+br_color_ids_add (datad *d, ggobid *gg)
+{
+  gint i, nprev = d->color.nels;
+
+  vectors_realloc (&d->color, d->nrows);
+  vectors_realloc (&d->color_now, d->nrows);
+  vectors_realloc (&d->color_prev, d->nrows);
+
+  /* initialize */
+  for (i=nprev; i<d->nrows; i++)
+    d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] =
+      gg->color_id;
+}
+
 /*-------------------------------------------------------------------------*/
 /*                             erasing                                     */
 /*-------------------------------------------------------------------------*/
 
 void
-hidden_alloc (datad *d)
+br_hidden_alloc (datad *d)
 {
   vectorb_realloc (&d->hidden, d->nrows);
   vectorb_realloc (&d->hidden_now, d->nrows);
@@ -106,7 +135,7 @@ hidden_alloc (datad *d)
 }
 
 void
-hidden_init (datad *d)
+br_hidden_init (datad *d)
 {
   gint i;
 

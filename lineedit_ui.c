@@ -131,11 +131,18 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
     if (e == NULL) {
       /*-- Initialize a new edge set --*/
       g_printerr ("Not yet initializing a new edge set\n");
+      return false;
+    }
+
+    if (e->ncols) {
+      g_printerr ("Not yet adding edges to datad's with variables\n");
+      return false;
     }
 
     if (d->rowIds == NULL) {
       /*-- Add rowids to d --*/
       g_printerr ("Not yet initializing new rowids\n");
+      return false;
     }
 
 

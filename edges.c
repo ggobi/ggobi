@@ -108,7 +108,7 @@ datad *setDisplayEdge(displayd * dpy, datad * e)
   for (l = dpy->splots; l; l = l->next) {
     splotd *sp;
     sp = (splotd *) l->data;
-    splot_edges_realloc(sp, e, e->gg);
+    splot_edges_realloc (-1, sp, e);
   }
   return (old);
 }

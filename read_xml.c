@@ -850,7 +850,7 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
   d->nrows = strToInteger(tmp);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
-  rowlabels_alloc (d, data->gg);
+  rowlabels_alloc (d);
   br_glyph_ids_alloc (d);
   br_glyph_ids_init (d, data->gg);
 
@@ -863,8 +863,8 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
 
   if (tmp) {
     arrayf_alloc (&d->raw, d->nrows, d->ncols);
-    hidden_alloc (d);
-    hidden_init (d);
+    br_hidden_alloc (d);
+    br_hidden_init (d);
   }
 
   data->current_variable = 0;
@@ -1420,7 +1420,7 @@ allocVariables (const xmlChar **attrs, XMLParserData *data)
      in the top-level tag.*/
   if(d->nrows > 0 && d->ncols > 0) {
     arrayf_alloc (&d->raw, d->nrows, d->ncols);
-      hidden_alloc (d);
+      br_hidden_alloc (d);
   }
 
 

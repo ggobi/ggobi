@@ -414,23 +414,44 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 /* --------------------------------------------------------------- */
 
 void
-splot_add_rows (gint nrows, splotd *sp)
+splot_points_realloc (gint nrows_prev, splotd *sp, datad *d)
 {
-  vectorf_realloc (&sp->p1d.spread_data, nrows);
+  gint i;
+
+  vectorf_realloc (&sp->p1d.spread_data, d->nrows);
 
   sp->planar = (gcoords *) g_realloc (sp->planar,
-    nrows * sizeof (gcoords));
+    d->nrows * sizeof (gcoords));
   sp->screen = (icoords *) g_realloc (sp->screen,
-    nrows * sizeof (icoords));
+    d->nrows * sizeof (icoords));
+
+  for (i=nrows_prev; i<d->nrows; i++) {
+    sp->planar[i].x = sp->planar[i].y = 0.0;
+    sp->screen[i].x = sp->screen[i].y = 0;
+  }
 }
 
 void
-splot_edges_realloc (splotd *sp, datad *e, ggobid *gg) 
+splot_edges_realloc (gint nedges_prev, splotd *sp, datad *e) 
 {
+  gint i;
+
+  if (nedges_prev == -1) {
+    if (sp->edges) g_free (sp->edges);
+    if (sp->arrowheads) g_free (sp->arrowheads);
+    nedges_prev = 0;
+  }
+
   sp->edges = (GdkSegment *) g_realloc ((gpointer) sp->edges,
     e->edge.n * sizeof (GdkSegment));
   sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
     e->edge.n * sizeof (GdkSegment));
+
+  /*-- these aren't useful values, but they're finite --*/
+  for (i=nedges_prev; i<e->edge.n; i++) {
+    sp->edges[i].x1 = sp->edges[i].x2 = 0;
+    sp->arrowheads[i].x1 = sp->arrowheads[i].x2 = 0;
+  }
 }
 
 void

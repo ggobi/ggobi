@@ -244,7 +244,7 @@ GGOBI(setDimensions)(gint nrow, gint ncol, datad *d, ggobid *gg)
 
   vartable_alloc (d);
   vartable_init (d);
-  hidden_alloc (d);
+  br_hidden_alloc (d);
 }
 
 /*
