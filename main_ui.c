@@ -274,10 +274,6 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   RedrawStyle redraw_style = NONE;
 
-  /*-- for insurance, because sometimes scaling doesn't quit --*/
-  disconnect_motion_signal (sp);
-  /*-- --*/
-
   if (state == off) {
     switch (m) {
       case XYPLOT:
@@ -294,6 +290,11 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
         extern RedrawStyle identify_activate (gint, displayd *, ggobid *);
         redraw_style = identify_activate (state, display, gg);
       }
+      break;
+      case SCALE:
+        /*-- for insurance, because sometimes scaling doesn't quit --*/
+        disconnect_motion_signal (sp);
+        /*-- --*/
       break;
       default:
       break;
