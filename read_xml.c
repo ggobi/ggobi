@@ -62,6 +62,8 @@
 #include "ggobi.h"
 #include "externs.h"
 
+#include "GGobiAPI.h"
+
 
 void startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs);
 void endXMLElement(void *user_data, const CHAR *name);

@@ -241,7 +241,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
 
         reset_item = submenu_make ("_Reset", 'R', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (reset_item),
-                                   gg->brush.brush_reset_menu); 
+                                   gg->brush.reset_menu); 
         if (firsttime_reset) {
           submenu_insert (reset_item, gg->main_menubar, -1);
           firsttime_reset = false;
@@ -249,7 +249,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
 
         link_item = submenu_make ("_Link", 'L', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (link_item),
-                                   gg->brush.brush_link_menu); 
+                                   gg->brush.link_menu); 
         if (firsttime_link) {
           submenu_insert (link_item, gg->main_menubar, -1);
           firsttime_link = false;
