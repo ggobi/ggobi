@@ -117,6 +117,7 @@ cpanel_set (displayd *display, ggobid *gg)
   extern void cpanel_tour2d_set (cpaneld *, ggobid *);
   extern void cpanel_tourcorr_set (cpaneld *, ggobid *);
   gboolean displaytype_known = true;
+  datad *d = display->d;
 
   switch (display->displaytype) {
     case scatterplot:
@@ -128,8 +129,10 @@ cpanel_set (displayd *display, ggobid *gg)
       cpanel_brush_set (cpanel, gg);
       cpanel_scale_set (cpanel, gg);
       cpanel_tour1d_set (cpanel, gg);
-      cpanel_tour2d_set (cpanel, gg);
-      cpanel_tourcorr_set (cpanel, gg);
+      if (d->ncols >= 2)
+        cpanel_tour2d_set (cpanel, gg);
+      if (d->ncols >= 4)
+        cpanel_tourcorr_set (cpanel, gg);
 #ifdef EDIT_EDGES_IMPLEMENTED
       cpanel_edgeedit_set (cpanel, gg);
 #endif
