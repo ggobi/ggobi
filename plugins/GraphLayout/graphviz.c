@@ -4,6 +4,7 @@
 #include "GGobiAPI.h"
 
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 
 #include "plugin.h"
@@ -163,7 +164,6 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   glayoutd *gl = glayoutFromInst (inst);
-  displayd *dsp = gg->current_display;
   datad *d = gl->dsrc;
   datad *e = gl->e;
   Agnode_t *node, *head, *tail;
@@ -189,7 +189,6 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   gchar **rownames, **colnames, **rowids;
   glong *visible;
   displayd *dspnew;
-  gboolean edges_displayed;
   gint dim, weightvar = -1, nedges;
   endpointsd *endpoints = resolveEdgePoints(e, d);
 
