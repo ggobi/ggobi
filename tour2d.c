@@ -658,7 +658,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
 
         dsp->t2d.oppval = -1.0;
         t2d_ppdraw_think(gg);
-        gdk_flush ();
+/*XX*/  gdk_flush ();
         revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
           dsp->t2d.target_selection_method, gg);
 
@@ -694,11 +694,8 @@ g_printerr ("\n");
 	      }*/
   /*          t2d_ppdraw(dsp->t2d.ppval, gg);*/
   /*          count = 0;*/
-#ifndef WIN32
-          sleep(2);
-#else
-          Sleep(2);
-#endif
+
+          ggobi_sleep(2);  
         }
         else
         {
@@ -745,10 +742,9 @@ tour2d_idle_func (displayd *dsp)
   ggobid *gg = GGobiFromDisplay (dsp);
   cpaneld *cpanel = &dsp->cpanel;
   gboolean doit = !cpanel->t2d.paused;
-
   if (doit) {
     tour2d_run (dsp, gg);
-    gdk_flush ();
+    gdk_flush (); 
   }
 
   return (doit);

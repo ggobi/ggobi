@@ -689,11 +689,7 @@ g_printerr ("\n");*/
           }*/
 	  /*          t1d_ppdraw(dsp->t1d.ppval, gg);*/
   /*          count = 0;*/
-#ifndef WIN32
-          sleep(2);
-#else
-          Sleep(2);
-#endif
+         ggobi_sleep(2);
         }
         else /* Use random target */
         {
