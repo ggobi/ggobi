@@ -375,6 +375,9 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       case BRUSH:
         redraw_style = brush_activate (state, display, gg);
       break;
+      case IDENT:
+        redraw_style = identify_activate (state, display, gg);
+      break;
       case SCALE:
         scale_click_init (sp, gg);
       break;

@@ -49,9 +49,10 @@ RedrawStyle
 identify_activate (gint state, displayd *display, ggobid *gg)
 {
   RedrawStyle redraw_style = NONE;
+  datad *d = display->d;
 
-  if (state == off) {
-    datad *d = display->d;
+/* At the moment, do the same thing whether identify is turning on or off */
+  if (state == on || state == off) {
     if (d->nearest_point != -1) redraw_style = QUICK;
     d->nearest_point = -1;
   }
