@@ -45,11 +45,12 @@ parcoords_display_menus_make (displayd *display,
   item = CreateMenuCheck (options_menu, "Show line segments",
     func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-/*
-  CreateMenuCheck (options_menu, "Show missings",
-    func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-*/
+  if (!display->missing_p) {
+    item = CreateMenuCheck (options_menu, "Show missings",
+      func, GINT_TO_POINTER (DOPT_MISSINGS),
+      display->options.missings_show_p, gg);
+    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  }
 
   /* Add a separator */
 /*

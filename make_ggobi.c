@@ -177,13 +177,13 @@ pipeline_init (datad *d, ggobid *gg)
   vartable_limits_set (d);  /*-- does this do something here?  --*/
   vartable_stats_set (d);  /*-- does this do something here?  --*/
 
-  tform_to_world (d, gg);
-
   if (d->nmissing > 0) {
     missing_lim_set (d, gg);
     missing_world_alloc (d, gg);
     missing_to_world (d, gg);
   }
+
+  tform_to_world (d, gg);
 }
 
 /*

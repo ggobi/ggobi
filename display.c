@@ -168,7 +168,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
       display->options.whiskers_show_p = w->active;
       display_plot (display, FULL, gg);
     break;
-    case DOPT_MISSINGS:  /*-- only in scatmat and parcoords --*/
+    case DOPT_MISSINGS:  /*-- in scatterplot, scatmat, parcoords, tsplot --*/
       if (!display->missing_p && d->nmissing > 0) {
         display->options.missings_show_p = w->active;
 
@@ -179,9 +179,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
             sp = (splotd *) splist->data;
             sp_whiskers_make (sp, display, gg);
           }
-        }
-
-        if (display->displaytype == tsplot) {
+        } else if (display->displaytype == tsplot) {
           extern void tsplot_whiskers_make (splotd *, displayd *, ggobid *);
           GList *splist;
           splotd *sp;

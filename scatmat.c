@@ -72,13 +72,13 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
     func, GINT_TO_POINTER (DOPT_EDGES_D), off, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 */
-/*
+
   if (!display->missing_p) {
     item = CreateMenuCheck (options_menu, "Show missings",
-      func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
+      func, GINT_TO_POINTER (DOPT_MISSINGS),
+      display->options.missings_show_p, gg);
     gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
   }
-*/
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
   submenu_append (submenu, mbar);
   gtk_widget_show (submenu);

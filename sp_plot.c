@@ -91,8 +91,9 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
 
   /*-- determine whether case m should be plotted --*/
   draw_case = true;
-  if (d->hidden_now.els[m])
+  if (d->hidden_now.els[m]) {
     draw_case = false;
+  }
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
   else if (!display->options.missings_show_p && d->nmissing > 0) {
@@ -100,7 +101,7 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
       case parcoords:
         if (d->missing.vals[m][sp->p1dvar])
           draw_case = false;
-        break;
+      break;
 
       case scatmat:
         if (sp->p1dvar != -1) {
@@ -113,18 +114,49 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
             draw_case = false;
           }
         }
-        break;
+      break;
 
       case tsplot:
         if (d->missing.vals[m][sp->xyvars.y]|| 
             d->missing.vals[m][sp->xyvars.x])
           draw_case = false;
-        break;
+      break;
 
       case scatterplot:
-        break;
+      {
+        gint proj = projection_get (gg);
+        switch (proj) {
+          case P1PLOT:
+            if (d->missing.vals[m][sp->p1dvar])
+              draw_case = false;
+          break;
+          case XYPLOT:
+            if (d->missing.vals[m][sp->xyvars.x])
+              draw_case = false;
+            else if (d->missing.vals[m][sp->xyvars.y])
+              draw_case = false;
+          break;
+          case TOUR1D:
+            if (d->missing.vals[m][display->t1d.vars.els[m]])
+              draw_case = false;
+          break;
+
+          case TOUR2D:
+            if (d->missing.vals[m][display->t2d.vars.els[m]])
+              draw_case = false;
+          break;
+
+          case COTOUR:
+            if (d->missing.vals[m][display->tcorr1.vars.els[m]])
+              draw_case = false;
+            else if (d->missing.vals[m][display->tcorr2.vars.els[m]])
+              draw_case = false;
+          break;
+        }
+      }
+      break;
       default:
-        break;
+      break;
     }
   }
   return draw_case;
@@ -192,8 +224,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
         draw_case = splot_plot_case (m, d, sp, display, gg);
 
         if (draw_case && d->color_now.els[m] == current_color) {
-          if (display->options.points_show_p)
+          if (display->options.points_show_p) {
             draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen, m, gg);
+          }
 
           /*-- whiskers: parallel coordinate and time series plots --*/
           if (dtype == parcoords || dtype == tsplot)

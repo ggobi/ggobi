@@ -235,7 +235,9 @@ tform_to_world_by_var (gint j, datad *d, ggobid *gg)
   pipeline_arrays_check_dimensions (d);  /*-- realloc as necessary --*/
 
   max = vt->lim.max;
+  if (vt->nmissing) max = MAX(max,d->missing_lim.max);
   min = vt->lim.min;
+  if (vt->nmissing) min = MIN(min,d->missing_lim.min);
   range = max - min;
 
   for (i=0; i<d->nrows_in_plot; i++) {

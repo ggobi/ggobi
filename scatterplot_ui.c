@@ -205,9 +205,6 @@ scatterplot_display_menus_make (displayd *display,
 
   display->edge_item = NULL;
   display->edge_menu = NULL;
-/*
-  scatterplot_display_edge_menu_make (display, accel_group, func, gg);
-*/
   scatterplot_display_edge_menu_update (display, accel_group, func, gg);
 
   /*-- Options menu --*/
@@ -217,11 +214,13 @@ scatterplot_display_menus_make (displayd *display,
   item = CreateMenuCheck (options_menu, "Show points",
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-/*
-  item = CreateMenuCheck (options_menu, "Show missings",
-    func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-*/
+
+  if (!display->missing_p) {
+    item = CreateMenuCheck (options_menu, "Show missings",
+      func, GINT_TO_POINTER (DOPT_MISSINGS),
+      display->options.missings_show_p, gg);
+    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  }
 
   /*-- Add a separator --*/
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
