@@ -794,6 +794,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_selection_prob_adj_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_widget_set_name (GTK_WIDGET(hscale), "selection_prob_scale");
   gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 1, 2, top, top+1,
@@ -823,6 +824,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_perturb_adj_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_widget_set_name (GTK_WIDGET(hscale), "perturbation_scale");
   gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 1, 2, top, top+1,
