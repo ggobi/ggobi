@@ -1,7 +1,6 @@
 Add warning messages to XML parser.
   E.g. reading incomplete or excess elements.
 
-
 Plugins
   showPluginInfo should color the input plugins differently.
 
@@ -123,7 +122,6 @@ API code needed:
      reading/writing the missings matrix
      imputation of missing values
   setting variable ranges
-  adding, deleting variables
   sphering
 
 I/O -- the biggest part is now in place.  extend
@@ -157,14 +155,8 @@ Tour:
   scaling so that it doesn't run off the screen.
 
 Tour (dfs):
-  Change the tour control panels.  Let there be a scrolling
-    column of checkboxes, just as there is now, and then add
-    a table of variable circles (separately scrolled) to the
-    right of it, which contains a circle for each variable
-    checked to the left.  (Need to clarify some features of
-    this design -- is there any need for variable selection
-    in the variable circles?)
-
+  Tour controls:  sometime change the variable circles to
+    little rectangles for the 1d modes.
   Add a button that allows variables to be cloned based on the
     current tour projection.  (Clarification:  from what data
     do I construct the new variable(s)?  How many are there?)
@@ -183,9 +175,10 @@ Smoothing -- as a demo, at least, of the use of R
 Food for thought:
   * maps; data as polygons -- for summer 2001?  Or will someone
     else do this and link their tool to ggobi?
-  * Do we need rotation at all?
   * If we bin the screen hierarchically, the bins could be used
     for edges as well as for points.  (ie quad trees)
+
+-- Completed --------------------------------------------------------
 
 ! it now works to start ggobi without an argument; a necessary step
 ! in the API preparation.
@@ -375,3 +368,19 @@ Food for thought:
 ! As the number of colorschemes increases, use a tree
   to represent them.  (Do this in gtk2 only?)
     Done. See the Tools->Color schemes... dialog.
+
+! Link by variable -- turn this into a cascaded menu (or something)
+!   with a list of categorical variables
+
+! Warning message about "linkbyvar when no categorical variable
+!   is present" pops up over and over again
+
+! Change the tour control panels.  Let there be a scrolling
+!   column of checkboxes, just as there is now, and then add
+!   a table of variable circles (separately scrolled) to the
+!   right of it, which contains a circle for each variable
+!   checked to the left.  (Need to clarify some features of
+!   this design -- is there any need for variable selection
+!   in the variable circles?)
+
+! Do we need rotation at all?  -- added
