@@ -115,9 +115,12 @@ getDBMSLoginElementIndex(const char *name)
 int 
 setDBMSLoginElement(DBMSInfoElement i, char * val, DBMSLoginInfo *info)
 {
-/* Arrange to have this done by the caller. */
+/* Arrange to have this done by the caller -- it causes a fatal error
+   on Suns. */
+/*
    if(val && !val[0])	
      val = NULL; 
+*/
 
    switch(i) {
      case HOST:
