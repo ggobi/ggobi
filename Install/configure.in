@@ -122,7 +122,7 @@ if test -n "${with_xml}" && test "${with_xml}" != "no" ; then
    dnl locally
    dnl Can override the use of libxml.tar.gz  by setting XML_CONFIG
    dnl environment variable.
- if test -f libxml.tar.gz && test -z "${XML_CONFIG}" ; then
+ if test -r libxml.tar.gz && test -z "${XML_CONFIG}" ; then
    echo "Building ggobi-specific version of libxml"
    (gunzip -c libxml.tar.gz | tar xf -)
    LIBXML_VERSION=`tar tzvf libxml.tar.gz | head -n 1 | sed 's/^.*libxml2-//' | sed 's|/$||'`
@@ -153,9 +153,9 @@ dnl      echo $f
 dnl    done
 dnl  fi
 
- if test -d "${with_xml}" && test -e ${with_xml}/entities.c ; then
+ if test -d "${with_xml}" && test -r ${with_xml}/entities.c ; then
    echo "Using libxml distribution directory ${with_xml}"
-   if test -e "${with_xml}/xml2-config" ; then
+   if test -r "${with_xml}/xml2-config" ; then
     XML_VERSION="2"
    else
     XML_VERSION="1"
@@ -194,8 +194,8 @@ dnl  fi
     # check if the user has given us the include directory rather than
     # the top-level libxml distribution directory.
 
-   if test -e "${with_xml}/tree.h" ; then
-    if test ! -e "${with_xml}/entities.c" ; then
+   if test -r "${with_xml}/tree.h" ; then
+    if test ! -r "${with_xml}/entities.c" ; then
      with_xml=`cd ${with_xml}/.. ; pwd`
     else
       XML_INC_DIRS="${with_xml}"
@@ -224,7 +224,7 @@ dnl  fi
    for f in $XML_INC_DIRS ${DEFAULT_INC_DIRS} ; do 
      for ext in / /xml /libxml ; do
        TMP=""
-       if test -f $f$ext/parser.h ; then
+       if test -r $f$ext/parser.h ; then
          TMP=$f$ext 
          XML_INC_DIRS="-I${TMP}"
        fi
