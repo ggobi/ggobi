@@ -65,7 +65,7 @@ Updating the Web Page
 =====================
 
 Update the GGOBI_SRC directory, so that the notes documents are
-updated. Then pdflatex the documentation files in the $GGOBI_SRC/notes
+updated. Then pdflatex the documentation files in the $GGOBI_SRC/Docs
 directory because these will be loaded up from this directory.
 
 To checkout the CVS module,  use

@@ -14,7 +14,9 @@
 #ifndef RBNODE
 #define RBNODE
 
-typedef short int bool;
+#include <gtk/gtk.h>
+
+typedef gshort bool;
 
 #if !defined(TRUE)
 #define true  ((bool) 1)
@@ -35,7 +37,7 @@ typedef struct RBNode
 
 
     NodeColor Color;             /* node color (black, red) */
-    int index;	
+    gint index;	
     char key[255];
 }Node;
 
@@ -57,7 +59,7 @@ Node* Minimum(Tree* T, Node* X);
 Node* Successor(Tree* T, Node* X);
 Node* DeleteNode(Tree* T, Node* Z);
 bool IsEmpty(Tree* T);
-int max(int x, int y);
+gint max(gint x, gint y);
 Node* GetRoot(Tree* T);
 void Print(Node* X);
 void InorderTravel(Tree* T, Node* X);	

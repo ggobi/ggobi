@@ -1,15 +1,6 @@
 /* read_excel.c */
 /* This code was written by Dongshin Kim, at Iowa State University
    under supervision by Dianne Cook */
-/*
-    This software may only be used by you under license from AT&T Corp.
-    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
-    AT&T's Internet website having the URL:
-    <http://www.research.att.com/areas/stat/ggobi/license.html>
-    If you received this software without first entering into a license
-    with AT&T, you have an infringing copy of this software and cannot use
-    it without violating AT&T's intellectual property rights.
-*/
 
 #include <stdlib.h>
 #include <string.h>
@@ -24,8 +15,9 @@
 
 #define BLOCKSIZE 1000
 #define INITSTRSIZE 512
-#define DELIMITER 44 /* DELIMETER: ',' */
+#define DELIMITER 44 /* DELIMITER: ',' */
 
+/* These static variables will have to go */
 gboolean g_is_column = 0;
 gboolean g_is_row = 0;
 gint g_tmp;
@@ -38,7 +30,6 @@ void read_row_labels(datad* d,FILE* fp);
 gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_category);
 gboolean setup_category(datad* d, gint* text_table, Tree* text_category);
 void InorderTravel_setup_category(Tree* T, Node* X, vartabled* vt);
-
 
 void InorderTravel_setup_category(Tree* T, Node* X, vartabled* vt)
 {
@@ -71,9 +62,23 @@ gboolean setup_category(datad* d, gint* text_table, Tree* text_category)
       vt->level_names = (gchar **) g_malloc(text_table[i] * sizeof(gchar *));
       g_tmp = 0;
       InorderTravel_setup_category(&text_category[i],text_category[i].Root,vt);
+
+      /* Debugging, dfs */
+      if (vt->nlevels > 0) {
+      g_printerr ("nlevels: %d\n", vt->nlevels);
+      {
+        gint k;
+        for (k=0; k<vt->nlevels; k++)
+          g_printerr ("level_name: %s\n", vt->level_names[k]);
+      }
+      }
+
+
       for(j=0;j<d->nrows;j++)
       {
         gint inx;
+        if (vt->nmissing && MISSING_P(j, i))
+          continue;
         inx = (gint) d->raw.vals[j][i];
         vt->level_counts[inx-1]++; 
       }
@@ -83,7 +88,7 @@ gboolean setup_category(datad* d, gint* text_table, Tree* text_category)
 }
 gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_category)
 {
-  gchar ch;
+  gint ch;
   gchar tmp[256];
   gint inx = 0;
   gint i,j;
@@ -99,7 +104,7 @@ gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_category)
 
   if(g_is_column)
   {
-    /* Stirp off one row */
+    /* Strip off one row */
     while(true)
     {
       ch = fgetc(fp);
@@ -176,7 +181,7 @@ gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_category)
                 node->index = text_table[j]+1;
                 text_table[j] = node->index;
                 InsertFixup(&text_category[j],node);
-	      }
+              }
               d->raw.vals[i][j] = node->index;
             }
           }
@@ -200,7 +205,7 @@ gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_category)
 void read_row_labels(datad* d,FILE* fp)
 {
   gint i;
-  gchar ch;
+  gint ch;
   gchar tmp[256];
   gchar* tmp2;
   gint inx = 0;
@@ -386,8 +391,8 @@ gboolean is_num(gchar* word)
 
 void whatisfiletype(FILE* fp, gint* ncols, gint* nrows)
 {
-  /* Check if there is column labels */
-  gchar ch;
+  /* Check if there are column labels */
+  gint ch;
   gchar tmp[256];
   gint inx = 0;
   Tree treetmp;
@@ -396,13 +401,26 @@ void whatisfiletype(FILE* fp, gint* ncols, gint* nrows)
   *nrows = 0;
   memset(tmp, '\0', 256);
 
+  g_is_row = g_is_column = false;
+
+  /* dfs: trying to use different information to decide whether
+     row labels are provided, so I can detect errors in the file
+     structure */
+  if (fgetc(fp) == DELIMITER) {
+    g_printerr ("first character is a delimiter\n");
+    g_is_row = true;
+    g_is_column = true;
+  } else {
+    rewind(fp);
+  }
+
   while(true)
   {
     ch = fgetc(fp);
     if(ch == DELIMITER)
     {
       *ncols = *ncols + 1;
-      if(!is_num(tmp))
+      if(!g_is_column && !is_num(tmp))
       {
         /* at least one string value in the first row */
         g_is_column = true;
@@ -424,25 +442,31 @@ void whatisfiletype(FILE* fp, gint* ncols, gint* nrows)
       inx++;
     }
   }
+  g_printerr ("column labels? %d ncols = %d\n", g_is_column, *ncols);
   rewind(fp);
 
   inx = 0;
   memset(tmp, '\0', 256);
+  /*
   g_is_row = true;
+  */
 
   while(true)
   {
-    /* strip one line */
-    while(true)
-    {
-      ch = fgetc(fp);
-      if((ch == 10)||(ch == 13))
+    /* if column labels are present, skip the first row */
+    if (g_is_column) {
+      while(true)
       {
-        break;
+        ch = fgetc(fp);
+        if((ch == 10)||(ch == 13))
+        {
+          break;
+        }
+        if(ch == EOF)
+          return;
       }
-      if(ch == EOF)
-        return;
     }
+
     while(true)
     {
       ch = fgetc(fp);
@@ -467,7 +491,11 @@ void whatisfiletype(FILE* fp, gint* ncols, gint* nrows)
       if(node!=GetNIL(&treetmp))
       {
         /* there is the same one-> not row label */
-        g_is_row = false;
+        if (g_is_row) {
+          g_printerr ("The strings in the first column are not unique, so they can't be row labels.\nRemove the initial comma from the first line.\n");
+          exit(0);
+      }
+        /* g_is_row = false; */
       }
       else
       {
@@ -477,13 +505,16 @@ void whatisfiletype(FILE* fp, gint* ncols, gint* nrows)
         InsertFixup(&treetmp,node);
       }
     }
+    /*
     else
     {
       g_is_row = false;
     }
+    */
     memset(tmp,'\0',256);
     inx=0;
   }
+
 }
 
 
@@ -536,15 +567,18 @@ gboolean read_excel_data(InputDescription *desc, ggobid *gg)
     /* Determine file type, g_is_row, g_is_col
      * Calculate ncols, nrows */
     whatisfiletype(fp, &ncols, &nrows);
+    g_printerr ("whatis.. returns %d %d\n", ncols, nrows);
     if(g_is_column)
       d->nrows = nrows;
     else
       d->nrows = nrows + 1;
+    /*
     if(g_is_row)
       d->ncols = ncols - 1;
     else
+    */
       d->ncols = ncols;
-
+    g_printerr ("we conclude: %d %d\n", d->ncols, d->nrows);
 
     /* Initialize vartable */
     vartable_alloc(d);
@@ -556,7 +590,7 @@ gboolean read_excel_data(InputDescription *desc, ggobid *gg)
     /* Read Rows */
     read_row_labels(d,fp);
 
-    /* Dummy for furture purpose */
+    /* Dummy for future purpose */
     br_glyph_ids_alloc(d);
     br_glyph_ids_init(d,gg);
     br_color_ids_alloc(d,gg);

@@ -231,7 +231,7 @@ Node* GetNIL(Tree* T)
   return T->NIL;
 }
 
-int max(int x, int y)
+gint max(gint x, gint y)
 {
   if(x < y)
     return y;
@@ -242,9 +242,9 @@ int max(int x, int y)
 bool IsEmpty(Tree* T)
 {
   if(T->Root == T->NIL)
-    return true;
+    return (gshort) 1; /*true;*/
   else
-    return false;
+    return (gshort) 0; /*false;*/
 }
 
 Node* DeleteNode(Tree* T, Node* Z)
