@@ -70,7 +70,7 @@ read_binary (FILE *fp, datad *d, ggobid *gg)
 
         /* Allocate the missing values array */
         if (d->nmissing == 0)
-          arrays_alloc (&d->missing, d->nrows, d->ncols);
+          arrays_alloc_zero (&d->missing, d->nrows, d->ncols);
         d->missing.vals[i][j] = 1;
         vt = vartable_element_get (j, d);
         vt->nmissing++;
@@ -264,7 +264,7 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
            * allocate space to contain the missing values matrix.
            * Initialize all previous values to 0.
           */
-          arrays_alloc (&d->missing, nblocks*BLOCKSIZE, d->ncols);
+          arrays_alloc_zero (&d->missing, nblocks*BLOCKSIZE, d->ncols);
         }
 
         d->nmissing++;
