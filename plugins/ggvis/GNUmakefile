@@ -24,7 +24,7 @@ endif
 #GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
 GGOBI_LIB=
 
-HEADERS=ggvis defines
+HEADERS=ggvis
 SRC=ggvis init ggv_cbacks stressplot histogram mds ggv_qsort \
  ggv_utils Dtarget anchor shepard
 OBJS=$(SRC:%=%.o)
