@@ -4,6 +4,7 @@
 #include "GGobiAPI.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "plugin.h"
 #include "ggvis.h"
@@ -21,9 +22,8 @@ ggv_stressplot_configure_cb (GtkWidget *w, GdkEventExpose *event,
   if (w->allocation.width < 2 || w->allocation.height < 2)
     return retval;
 
-  if (ggv->stressplot_pix != NULL) {
+  if (ggv->stressplot_pix != NULL)
     gdk_pixmap_unref (ggv->stressplot_pix);
-  }
   ggv->stressplot_pix = gdk_pixmap_new (w->window,
     w->allocation.width, w->allocation.height, -1);
 
@@ -57,7 +57,6 @@ stress_pixmap_copy (ggvisd *ggv, ggobid *gg)
                    da->allocation.height);
 }
 
-
 gint
 ggv_stressplot_expose_cb (GtkWidget *w, GdkEventExpose *event,
   PluginInstance *inst)
@@ -73,11 +72,6 @@ ggv_stressplot_expose_cb (GtkWidget *w, GdkEventExpose *event,
     return retval;
   if (w->allocation.width < 2 || w->allocation.height < 2)
     return retval;
-
-  /*-- clear the pixmap --*/
-  stress_pixmap_clear (ggv, gg);
-
-  /*-- do the drawing --*/
 
   /*-- copy the pixmap to the screen --*/
   stress_pixmap_copy (ggv, gg);

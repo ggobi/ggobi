@@ -379,14 +379,14 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
   gtk_container_add (GTK_CONTAINER(frame), vb);
 
-  da = gtk_drawing_area_new ();
-  gtk_drawing_area_size (GTK_DRAWING_AREA (da),
+  ggv->histogram_da = gtk_drawing_area_new ();
+  gtk_drawing_area_size (GTK_DRAWING_AREA (ggv->histogram_da),
     HISTOGRAM_WIDTH, HISTOGRAM_HEIGHT);
-  gtk_signal_connect (GTK_OBJECT (da), "expose_event",
+  gtk_signal_connect (GTK_OBJECT (ggv->histogram_da), "expose_event",
     GTK_SIGNAL_FUNC(ggv_histogram_expose_cb), inst);
-  gtk_signal_connect (GTK_OBJECT (da), "configure_event",
+  gtk_signal_connect (GTK_OBJECT (ggv->histogram_da), "configure_event",
     GTK_SIGNAL_FUNC(ggv_histogram_configure_cb), inst);
-  gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
+  gtk_widget_set_events (ggv->histogram_da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (vb), da, true, true, 2);
 
 

@@ -42,16 +42,16 @@ typedef struct {
   vector_d stressvalues;  /*-- allocated to hold NSTRESSVALUES values --*/
   gint nstressvalues;     /*-- the number of stress values */
 
+  GtkWidget *histogram_da;
   GdkPixmap *histogram_pix;
 
   gint mds_dims;
   gdouble mds_stepsize;
 
-  gdouble mds_Dtarget_power;
+  gdouble mds_Dtarget_power;  /* was mds_power */
+  gdouble mds_weight_power;   /* was mds_weightpow */
+  gdouble mds_dist_power;     /* was mds_distpow */
 
-  gdouble mds_weight_power;
-
-  gdouble mds_dist_power;
   gdouble mds_lnorm;
   gdouble mds_dist_power_over_lnorm;
   gdouble mds_lnorm_over_dist_power;
