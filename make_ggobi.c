@@ -75,7 +75,7 @@ dataset_init(ggobid *gg, gboolean cleanup)
 gboolean
 fileset_read (gchar *ldata_in, ggobid *gg)
 {
- gboolean ok;
+  gboolean ok;
   gg->filename = g_strdup (ldata_in);
   strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
 
@@ -83,32 +83,33 @@ fileset_read (gchar *ldata_in, ggobid *gg)
    case xml:
 #ifdef USE_XML
      ok = data_xml_read(gg->fname, gg);
-     break;
 #endif
+     break;
    case ascii:
+     break;
    case binary:
    case Sprocess:
-       array_read (gg);
-       gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
-       gg->nrgroups = 0;              /*-- for now --*/
+     array_read (gg);
+     gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
+     gg->nrgroups = 0;              /*-- for now --*/
       
-       missing_values_read (gg->fname, true, gg);
+     missing_values_read (gg->fname, true, gg);
       
-       collabels_read (gg->fname, true, gg);
-       rowlabels_read (gg->fname, true, gg);
-       vgroups_read (gg->fname, true, gg);
+     collabels_read (gg->fname, true, gg);
+     rowlabels_read (gg->fname, true, gg);
+     vgroups_read (gg->fname, true, gg);
       
       
-       point_glyphs_read (gg->fname, true, gg);
-       point_colors_read (gg->fname, true, gg);
-       hidden_read (gg->fname, true, gg);
-      
-       segments_read (gg->fname, true, gg);
-       line_colors_read (gg->fname, true, gg);
-    break;
+     point_glyphs_read (gg->fname, true, gg);
+     point_colors_read (gg->fname, true, gg);
+     hidden_read (gg->fname, true, gg);
+    
+     segments_read (gg->fname, true, gg);
+     line_colors_read (gg->fname, true, gg);
+     break;
   }
 
- return ok;  /* need to check return codes of reading routines */
+  return ok;  /* need to check return codes of reading routines */
 }
 
 void
