@@ -36,8 +36,8 @@ extern gint _finite (gdouble);
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern gint finite (gdouble);  /*-- defined in math.h, but being ignored --*/
-extern gdouble erf (gdouble);  /*-- defined in math.h, but being ignored --*/
+extern gint finite (gdouble);  /*-- not defined on all unixes --*/
+extern gdouble erf (gdouble);  /*-- not defined on all unixes --*/
 #ifdef __cplusplus
 }
 #endif
