@@ -276,6 +276,13 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
     transform_values_init (jvar, d, gg);
   }
 
+/*
+ * Be extremely careful in this latter portion: make sure
+ * that d->ncols is being incremented in the right place.
+ * A problem in that sequence just made me chase mysterious
+ * bugs for two days.
+*/
+
   d->ncols += ncols;
 
   /*-- pipeline --*/

@@ -225,7 +225,6 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
         break;
       }
     }
-g_printerr ("selecting variable %d\n", jvar);
 
 /* looking for modifiers; don't know which ones we'll want */
     alt_mod = ((bevent->state & GDK_MOD1_MASK) == GDK_MOD1_MASK);
