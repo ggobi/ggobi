@@ -147,15 +147,18 @@ void
 display_tour_init (displayd *dsp, ggobid *gg) {
   gint i, j;
   datad *d = dsp->d;
+  cpaneld *cpanel = &dsp->cpanel;
   gint nc = d->ncols;
 
   alloc_tour(dsp, gg);
  
     /* Initialize starting subset of active variables */
   dsp->ntour_vars = nc;
-  dsp->tour_vars[0] = 0;
+  for (j=0; j<nc; j++)
+    dsp->tour_vars[j] = j;
+  /*  dsp->tour_vars[0] = 0;
   dsp->tour_vars[1] = 1;
-  dsp->tour_vars[2] = 2;
+  dsp->tour_vars[2] = 2;*/
 
   /* declare starting base as first p chosen variables */
   for (i=0; i<nc; i++)
@@ -182,8 +185,8 @@ display_tour_init (displayd *dsp, ggobid *gg) {
   dsp->isins[0] = 0;*/
 
   zero_tau(dsp, gg);
-  dsp->delta = 0.0;
   dsp->dv = 1.0;
+  dsp->delta = cpanel->tour_step*M_PI_2/15.0;
   dsp->tour_nsteps = 0; 
   dsp->tour_stepcntr = 0;
 
@@ -399,39 +402,60 @@ void path(displayd *dsp, gint nd) {
 
       copy_mat(dsp->v0, dsp->tv, nd, nd);
 
-      /*-- obtain ranks to use in sorting eigenvals and eigenvec --*/
-      for (i=0; i<nd; i++) {
-        pairs[i].f = (gfloat) dsp->lambda[i];
-        pairs[i].indx = i;
-      }
-      qsort ((gchar *) pairs, dsp->lambda, sizeof (paird), pcompare);
+      /* we want eigenvalues in order from largest to smallest, ie
+         smallest angle to largest angle */
+      /* only do this if nd > 2 otherwise it is easy */
+      if (nd > 2) {
+        /*-- obtain ranks to use in sorting eigenvals and eigenvec --*/
+        for (i=0; i<nd; i++) {
+          pairs[i].f = (gfloat) dsp->lambda[i];
+          pairs[i].indx = i;
+        }
+        qsort ((gchar *) pairs, dsp->lambda, sizeof (paird), pcompare);
 
-     /*-- sort the eigenvalues and eigenvectors into temporary arrays --*/
-     for (i=0; i<nd; i++) {
-       k = (nd - i) - 1;  /*-- to reverse the order --*/
-       rank = pairs[i].indx;
-       e[k] = dsp->lambda[rank];
-       for (j=0; j<nd; j++)
-         dsp->tv[j][k] = dsp->v0[j][rank];
-     }
+       /*-- sort the eigenvalues and eigenvectors into temporary arrays --*/
+       for (i=0; i<nd; i++) {
+         k = (nd - i) - 1;  /*-- to reverse the order --*/
+         rank = pairs[i].indx;
+         e[k] = dsp->lambda[rank];
+         for (j=0; j<nd; j++)
+           dsp->tv[j][k] = dsp->v0[j][rank];
+       }
 
-     /*-- copy the sorted eigenvalues and eigenvectors back --*/
-     for (i=0; i<nd; i++) {
-       dsp->lambda[i] = e[i];
-       for (j=0; j<nd; j++)
-         dsp->v0[j][i] = dsp->tv[j][i];
+       /*-- copy the sorted eigenvalues and eigenvectors back --*/
+       for (i=0; i<nd; i++) {
+         dsp->lambda[i] = e[i];
+         for (j=0; j<nd; j++)
+           dsp->v0[j][i] = dsp->tv[j][i];
+       }
+  
+       /* need to do v1 too */
+       for (i=0; i<nd; i++) {
+         k = (nd - i) - 1;  /*-- to reverse the order --*/
+         rank = pairs[i].indx;
+         for (j=0; j<nd; j++)
+           dsp->tv[j][k] = dsp->v1[j][rank];
+       }
+       for (i=0; i<nd; i++) {
+         for (j=0; j<nd; j++)
+           dsp->v1[j][i] = dsp->tv[j][i];
+       }
      }
+     else if (nd == 2) {
+       if (dsp->lambda[1] > dsp->lambda[0]) {
+         e[0] = dsp->lambda[1];
+         dsp->lambda[1] = dsp->lambda[0];
+         dsp->lambda[0] = e[0];
+         for (j=0; j<nd; j++) {
+           dsp->tv[j][1] = dsp->v0[j][0];
+           dsp->v0[j][0] = dsp->v0[j][1];
+           dsp->v0[j][1] = dsp->tv[j][1];
+           dsp->tv[j][1] = dsp->v1[j][0];
+           dsp->v1[j][0] = dsp->v1[j][1];
+           dsp->v1[j][1] = dsp->tv[j][1];
+	 }
 
-     /* need to do v1 too */
-     for (i=0; i<nd; i++) {
-       k = (nd - i) - 1;  /*-- to reverse the order --*/
-       rank = pairs[i].indx;
-       for (j=0; j<nd; j++)
-         dsp->tv[j][k] = dsp->v1[j][rank];
-     }
-     for (i=0; i<nd; i++) {
-       for (j=0; j<nd; j++)
-         dsp->v1[j][i] = dsp->tv[j][i];
+       }
      }
 
      /* copy the eigenvectors into a permanent structure. need this
@@ -630,7 +654,8 @@ void speed_set (gint slidepos, ggobid *gg) {
     else
       cpanel->tour_step = sqrt((double)(slidepos-80)) + 0.0375;
   }
-  dsp->delta = cpanel->tour_step/dsp->dv;
+  /*  dsp->delta = cpanel->tour_step/dsp->dv;*/
+  dsp->delta = cpanel->tour_step*M_PI_2/15.0;
 }
 
 void
@@ -683,8 +708,8 @@ gt_basis (displayd *dsp, ggobid *gg, gint nd)
     /*
      * Orthogonalize the basis on the first using Gram-Schmidt
     */
-    for (k=0; k<nd; k++)
-      for (j=1; j<nd; j++)
+    for (k=0; k<nd-1; k++)
+      for (j=k+1; j<nd; j++)
         gram_schmidt(dsp->u1[k], dsp->u1[j], d->ncols);
   }
   else

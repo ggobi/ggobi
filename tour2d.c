@@ -102,7 +102,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
   extern void path(displayd *, gint);
   extern void tour_reproject(displayd *, gint);
 
-  if (!dsp->tour_get_new_target && reached_target(dsp)) {
+  if (!dsp->tour_get_new_target && !reached_target(dsp)) {
     increment_tour(dsp, 2);
   }
   else { /* do final clean-up and get new target */
