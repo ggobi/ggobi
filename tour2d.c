@@ -507,10 +507,12 @@ tour2d_run(displayd *dsp, ggobid *gg)
         t2d_ppdraw(dsp->t2d.ppval, gg);
       else
       {
-        do_last_increment(dsp->t2d.tinc, dsp->t2d.tau, 
-          dsp->t2d.dist_az, (gint) 2);
-        tour_reproject(dsp->t2d.tinc, dsp->t2d.G, dsp->t2d.Ga, dsp->t2d.Gz,
-          dsp->t2d.F, dsp->t2d.Va, d->ncols, (gint) 2);
+        if (dsp->t2d.tau.els[0] > 0.0 || dsp->t2d.tau.els[1] > 0.0) {
+          do_last_increment(dsp->t2d.tinc, dsp->t2d.tau, 
+            dsp->t2d.dist_az, (gint) 2);
+          tour_reproject(dsp->t2d.tinc, dsp->t2d.G, dsp->t2d.Ga, dsp->t2d.Gz,
+            dsp->t2d.F, dsp->t2d.Va, d->ncols, (gint) 2);
+	}
       }
     }
     nv = 0;
@@ -590,24 +592,21 @@ tour2d_run(displayd *dsp, ggobid *gg)
         dsp->t2d.Vz,
         dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 
         &dsp->t2d.dist_az, &dsp->t2d.tang, cpanel->t2d_step);
-      if (pathprob != 0) {
-        if (pathprob == 1) {
-          gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
-            d->ncols, (gint) 2);
-          arrayd_copy(&dsp->t2d.Fa, &dsp->t2d.F);
-	  /*          copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
-	}
-        else if (pathprob == 2) {
-          gt_basis(dsp->t2d.Fz, dsp->t2d.nactive, dsp->t2d.active_vars, 
-            d->ncols, (gint) 2);
-	}
-        else if (pathprob == 3) {
-          tour2d_scramble(gg);
-	}
+      if (pathprob == 0) 
+        dsp->t2d.get_new_target = false;
+      else if (pathprob == 1) { /* problems with Fa so need to force a jump */
+        tour2d_scramble(gg);
+        pathprob = path(dsp->t2d.Fa, dsp->t2d.Fz, dsp->t2d.F, d->ncols, 
+          (gint) 2, dsp->t2d.Ga,
+          dsp->t2d.Gz, dsp->t2d.G, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.Va,
+          dsp->t2d.Vz,
+          dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 
+          &dsp->t2d.dist_az, &dsp->t2d.tang, cpanel->t2d_step);
+      }
+      else if (pathprob == 2 || pathprob == 3) { /* problems with Fz,
+				    so will force a new choice of Fz */
         dsp->t2d.get_new_target = true;
       }
-      else 
-        dsp->t2d.get_new_target = false;
     }
   }
   

@@ -265,15 +265,17 @@ Purpose        : Looks for the best projection to discriminate
                  between groups.
 *********************************************************************/
 
-gint zero (gfloat *ptr, gint length)
+gint zero (gdouble *ptr, gint length)
 { gint i;
   for (i=0; i<length; i++)
-    ptr[i] = 0;
+    ptr[i] = 0.0;
   return (0);
 }
 
-gint compute_groups (gint *group, gint *ngroup, gint *groups, gint nrows, gfloat *gdata)
-{ gint i, j, *groupval;
+gint compute_groups (gint *group, gint *ngroup, gint *groups, 
+  gint nrows, gfloat *gdata)
+{ 
+  gint i, j, *groupval;
 
   /* initialize data */
   groupval = malloc (nrows*sizeof(gint));
@@ -303,12 +305,14 @@ gint compute_groups (gint *group, gint *ngroup, gint *groups, gint nrows, gfloat
   return ((*groups==1) || (*groups==nrows));
 }
 
-gint alloc_discriminant_p (discriminant_param *dp, gfloat *gdata, gint nrows, gint ncols)
+gint alloc_discriminant_p (discriminant_param *dp, gfloat *gdata, 
+  gint nrows, gint ncols)
 {
   dp->group    = malloc (nrows*sizeof(gint));
   dp->ngroup   = malloc (nrows*sizeof(gint));
 
-  if (compute_groups (dp->group, dp->ngroup, &(dp->groups), nrows, gdata)) return (1);
+  if (compute_groups (dp->group, dp->ngroup, &dp->groups, nrows, 
+    gdata)) return (1);
 
   /* initialize temporary space */
   dp->cov      = malloc (ncols*ncols*sizeof(gfloat));
@@ -334,75 +338,144 @@ gint free_discriminant_p (discriminant_param *dp)
   return 0;
 }
 
+/* what does this function do? */
+double ludcomp(double *a,int n) 
+{ 
+  int i,j,k,ier,pivot;
+  double *s,det,temp,c;
+
+  det=1;
+  s = (double *) malloc(n*sizeof(double));
+  for(i=0; i<n; i++) {       
+    s[i] = a[i*n+1];
+    for (j=1; j<n; j++)
+    if (s[i] < a[i*n+j]) 
+      s[i] = a[i*n+j];
+  }
+  for(k=0; k<n-1; k++) {       
+    for(i=k; i<n; i++) {       
+      temp = fabs(a[i*n+k]/s[i]);
+      if(i==k) {      
+        c=temp; 
+        pivot=i;
+      }
+      else if (c < temp) {
+        c = temp; 
+        pivot=i;
+        }
+      }
+
+      /* If all elements of a row(or column) of A are zero, |A| = 0 */
+      if (c==0) {       
+        det=0;
+        return(det);
+      }
+      if (pivot!=k) {
+        det*=-1; 
+        printf("Change!!\n");
+        for(j=k; j<n; j++) {       
+          temp = a[k*n+j]; 
+          a[k*n+j]=a[pivot*n+j]; 
+          a[pivot*n+j]=temp;
+        }
+        temp = s[k];
+        s[k] = s[pivot];
+        s[pivot]=temp;
+      }
+      for (i=k+1; i<n; i++) {       
+        temp = a[i*n+k]/a[k*n+k];
+        a[i*n+k] = temp;
+        for(j=k+1; j<n; j++)
+          a[i*n+j] -= temp*a[k*n+j];
+      }
+      det *= a[k*n+k];
+    }
+    k = n-1;
+    det *= a[(n-1)*n+(n-1)];
+    printf("det in ludecomp = %f\n",det);
+    ier=0;
+    return(det);
+}
+               
 gint discriminant (array_f *pdata, void *param, gfloat *val)
-{ discriminant_param *dp = (discriminant_param *) param;
-  gint i, j, k, lda, n, job;
-  /*gint info, inert[3];*/  /*eispack*/
-  /*gfloat detw[2], detwb[2];*/
+{ 
+  discriminant_param *dp = (discriminant_param *) param;
+  gint i, j, k, lda, job, right, left;
+  gint n, p, g, dd;
+  gdouble det;
+
+  n = pdata->nrows;
+  p = pdata->ncols;
+
+  /* how does group info get into here?  if comes in through 
+      allocate_discriminant_p. it would be safe to have it
+      computed here in case the groups change in brushing */
 
   /* Compute means */
+  zero (dp->mean, dp->groups*p);
+  zero (dp->ovmean, p);
+  zero (dp->cov, p*p);
 
-  zero (dp->mean, dp->groups*pdata->ncols);
-  zero (dp->ovmean, pdata->ncols);
-  zero (dp->cov, pdata->ncols*pdata->ncols);
-
-  for (i=0; i<pdata->nrows; i++)
-  { for (k=0; k<pdata->ncols; k++)
-    { dp->mean[k*pdata->nrows+dp->group[i]] += pdata->vals[i][k];  
-      dp->ovmean[k] += pdata->vals[i][k];
+  for (i=0; i<n; i++)
+  { 
+    for (k=0; k<p; k++)
+    { 
+      dp->mean[k+p*dp->group[i]] += (gdouble) pdata->vals[i][k];  
+      dp->ovmean[k] += (gdouble) pdata->vals[i][k];
     }
   }
 
-  for (k=0; k<pdata->ncols; k++)
-  { for (i=0; i<dp->groups; i++)
-    { dp->mean[k*pdata->nrows+i] /= dp->ngroup[i];
-    /*     sprintf (msg, "mean[%i,%i]=%f", i, k, dp->mean[k*pdata->nrows+i]); print();   */
+  for (k=0; k<p; k++)
+  { 
+    for (i=0; i<dp->groups; i++)
+    { 
+      dp->mean[k*p+i] /= (gdouble) dp->ngroup[i];
+    /*     sprintf (msg, "mean[%i,%i]=%f", i, k, dp->mean[k*n+i]); print(); */
     }
-    dp->ovmean[k] /= pdata->nrows;
+    dp->ovmean[k] /= (gdouble) n;
   }
 
   /* Compute W */
 
-  for (i=0; i<pdata->nrows; i++)
-  { for (j=0; j<pdata->ncols; j++)
-    { for (k=0; k<=pdata->ncols; k++)
-      { dp->cov[k*pdata->ncols+j] += 
-        (pdata->vals[i][j]-dp->mean[j*pdata->nrows+dp->group[i]])*
-        (pdata->vals[i][k]-dp->mean[k*pdata->nrows+dp->group[i]])/
-         dp->ngroup[dp->group[i]];
+  for (i=0; i<n; i++)
+  { 
+    for (j=0; j<p; j++)
+    { 
+      /*      for (k=0; k<=p; k++)*/
+      for (k=0; k<=j; k++)
+      { 
+        dp->cov[k*p+j] += 
+          ((gdouble) pdata->vals[i][j]-dp->mean[j+p*dp->group[i]])*
+          ((gdouble) pdata->vals[i][k]-dp->mean[k+p*dp->group[i]])/
+           ((gdouble) (dp->ngroup[dp->group[i]]));
       }
-      dp->cov[j*pdata->ncols+k] = dp->cov[k*pdata->ncols+j];
+      dp->cov[j*p+k] = dp->cov[k*p+j];
     }
   }
 
-  lda = pdata->ncols;
-  n   = pdata->ncols;
-  job = 10;
+  /*  lda = p;
+  n   = p;
+  job = 10;*/
 
-  memcpy (dp->a, dp->cov, pdata->ncols*pdata->ncols*sizeof(gfloat));
-  /* i want to avoid using eispack */
-  /*  dsifa_ (dp->a, &lda, &n, dp->kpvt, &info);
-      dsidi_ (dp->a, &lda, &n, dp->kpvt, detw, inert, dp->work, &job);*/
-  
+  memcpy(dp->a,dp->cov,p*p*sizeof(double)); 
+  det= ludcomp(dp->a,p); 
+  *val = det;
+
   /* Compute W+B */
 
-  for (i=0; i<dp->groups; i++)
-  { for (j=0; j<pdata->ncols; j++)
-    { for (k=0; k<pdata->ncols; k++)
-      { dp->cov[k*pdata->ncols+j] += 
-          (dp->mean[k*pdata->nrows+i]-dp->ovmean[k])*
-          (dp->mean[j*pdata->nrows+i]-dp->ovmean[j])/
-           dp->groups;
-      }
+  for (j=0; j<p; j++) 
+  {	
+    for(k=0; k<p; k++)
+    {
+      for (i=0; i< dp->groups; i++)	
+        dp->cov[p*j+k] += (dp->mean[i*p+j]-dp->ovmean[j])*
+          (dp->mean[i*p+k]-dp->ovmean[k])/(gdouble)(dp->groups-1);
     }
   }
 
-  memcpy (dp->a, dp->cov, pdata->ncols*pdata->ncols*sizeof(gfloat));
-  /* i want to avoid using eispack */
-  /*  dsifa_ (dp->a, &lda, &n, dp->kpvt, &info);
-      dsidi_ (dp->a, &lda, &n, dp->kpvt, detwb, inert, dp->work, &job);*/
-  
-  /*  *val = -detw[0]/detwb[0]*pow(10,detw[1]-detwb[1]);*/
+  memcpy(dp->a,dp->cov,p*p*sizeof(double)); 
+  det = ludcomp(dp->a,p); 
+  *val = 1.0-*val/det;
 
   printf ("Index=%f\n", *val);
 
@@ -423,7 +496,8 @@ gint alloc_cartgini_p (cartgini_param *dp, gint nrows, gfloat *gdata)
 
   dp->group    = malloc (nrows*sizeof(gint));
   dp->ngroup   = malloc (nrows*sizeof(gint));
-  if (compute_groups (dp->group, dp->ngroup, &(dp->groups), nrows, gdata)) return (1);
+  if (compute_groups (dp->group, dp->ngroup, &dp->groups, nrows, gdata)) 
+    return (1);
 
   /* initialize temporary space */
   dp->x        = malloc (nrows*sizeof(gfloat));
@@ -434,7 +508,8 @@ gint alloc_cartgini_p (cartgini_param *dp, gint nrows, gfloat *gdata)
 }
 
 gint free_cartgini_p (cartgini_param *dp)
-{ free (dp->ngroup);
+{ 
+  free (dp->ngroup);
   free (dp->group);
   free (dp->x);
   free (dp->index);
@@ -444,38 +519,47 @@ gint free_cartgini_p (cartgini_param *dp)
 }
 
 gint cartgini (array_f *pdata, void *param, gfloat *val)
-{ cartgini_param *dp = (cartgini_param *) param;
-  gint i, k;
+{ 
+  cartgini_param *dp = (cartgini_param *) param;
+  gint i, k, n, p;
   gfloat dev, prob;
- 
-  if (pdata->ncols!=1) return(-1);
-  for (i=0; i<pdata->nrows; i++) 
-  { dp->x[i] = pdata->vals[i][0];
+
+  n = pdata->nrows;
+  p = pdata->ncols;
+  if (p != 1) 
+    return(-1);
+
+  for (i=0; i<n; i++) { 
+    dp->x[i] = pdata->vals[i][0];
+    /*    dp->index[i] = pdata->group[i];*/
     dp->index[i] = i;
   }
 
+  /* Sort observations from lowest to highest */
   base = dp->x;
-  qsort (dp->index, pdata->nrows, sizeof(gint), smallest);
+  qsort (dp->index, n, sizeof(gint), smallest);
  
   *val = 2;
-  for (i=0; i<dp->groups; i++)
-  { dp->nright[i] = 0;
-    *val -= (dp->ngroup[i]/pdata->nrows)*(dp->ngroup[i]/pdata->nrows);
+  for (i=0; i<dp->groups; i++) { 
+    dp->nright[i] = 0;
+    *val -= (dp->ngroup[i]/n)*(dp->ngroup[i]/n);
   }
   
-  for (i=0; i<pdata->nrows-1; i++)
-  { (dp->nright[dp->group[dp->index[i]]])++;
+  for (i=0; i<n-1; i++) { 
+    (dp->nright[dp->group[dp->index[i]]])++;
     dev = 2;
-    for (k=0; k<dp->groups; k++)
-    { prob = ((gfloat) dp->nright[k])/((gfloat) (i+1));
+    for (k=0; k<dp->groups; k++) { 
+      prob = ((gfloat) dp->nright[k])/((gfloat) (i+1));
       dev -= prob*prob;
-      prob = ((gfloat) (dp->ngroup[k]-dp->nright[k]))/((gfloat) (pdata->nrows-i-1));
+      prob = ((gfloat) (dp->ngroup[k]-dp->nright[k]))/
+        ((gfloat) (n-i-1));
       dev -= prob*prob;
     }
     if (dev<*val) *val = dev;
   }
 
   *val *= -1;
+  printf ("Index=%f\n", *val);
 /*  sprintf (msg, "Index=%f", *val);print();              */
 
   return(0);
@@ -485,7 +569,7 @@ gint alloc_cartentropy_p (cartentropy_param *dp, gint nrows, gfloat *gdata)
 { /* initialize data */
   dp->group    = malloc (nrows*sizeof(gint));
   dp->ngroup   = malloc (nrows*sizeof(gint));
-  if (compute_groups (dp->group, dp->ngroup, &(dp->groups), nrows, gdata)) return (1);
+  if (compute_groups (dp->group, dp->ngroup, &dp->groups, nrows, gdata)) return (1);
 
   /* initialize temporary space */
   dp->x        = malloc (nrows*sizeof(gfloat));

@@ -129,9 +129,14 @@ typedef struct {
 } subd_param;
 
 typedef struct {
-  gint *group, *ngroup, groups;
+  /*  gint *group;
+      gint *ngroup, *groups, *index;*/
+  gint groups;
+  gint *ngroup, *group, *index;
   /* temporary space */
-  gfloat *cov, *mean, *ovmean, *a, *work;
+  gdouble *cov, *mean, *ovmean;
+  gdouble *a;
+  gfloat *work;
   gint *kpvt;
 
 } discriminant_param;

@@ -8,7 +8,9 @@
 #endif
 #include <math.h>
 #include <stdlib.h>
-#include <time.h>
+/*#include <time.h>
+  #include <sys/time.h>*/
+#include <unistd.h>
 
 #include "vars.h"
 #include "externs.h"
@@ -82,12 +84,16 @@ gram_schmidt(gdouble *x1, gdouble *x2, gint n)
 {
   gint j;
   gdouble ip;
+  gdouble tol=0.99;
 
   ip = inner_prod(x1, x2, n);
-  for (j=0; j<n; j++)
-    x2[j] = x2[j] - ip*x1[j];
 
-  norm(x2, n);
+  if (fabs(ip) < tol) { /*  If the two vectors are not orthogonal already */
+    for (j=0; j<n; j++)
+      x2[j] = x2[j] - ip*x1[j];
+    norm(x2, n);
+  }
+
 }
 
 /* checks columns of matrix are orthonormal */
@@ -258,28 +264,23 @@ eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau,
  * projdim = proj dim
  */
 gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, array_d Ga,
-  array_d Gz, array_d G, vector_f lambda, array_d tv, array_d Va, 
-  array_d Vz,
+  array_d Gz, array_d G, vector_f lambda, array_d tv, array_d Va, array_d Vz,
   vector_f tau, vector_f tinc, gint *ns, gint *stcn, gfloat *pdist_az, 
-  gfloat *ptang, gfloat step) {
-
-  gint i, j, k, rank;
-  gdouble tol = 0.0001;
+  gfloat *ptang, gfloat step) 
+{
+  gint i, j, k;
+  gdouble tol = 0.01;
   gdouble tmpd1 = 0.0, tmpd2 = 0.0, tmpd =0.0;
   gboolean doit = true;
   paird *pairs = (paird *) g_malloc (projdim * sizeof (paird));
   gfloat *e = (gfloat *) g_malloc (projdim * sizeof (gfloat));
   gint dI; /* dimension of intersection of base pair */
   gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
-  array_d tmpvc;
 
   gfloat dist_az = *pdist_az;
   gfloat tang = *ptang;
   gint nsteps = *ns;
   gint stepcntr = *stcn;
-
-  /*  arrayd_init_null(&tmpvc);
-      arrayd_alloc(&tmpvc, projdim, datadim);*/
 
   zero_tau(tau, projdim);
   zero_tinc(tinc, projdim);
@@ -292,13 +293,6 @@ gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, array_d
       G.vals[i][j] = 0.0;
       Va.vals[i][j] = 0.0;
     }
-  /*  copy_mat(F.vals, Fa.vals, datadim, projdim);
-  copy_mat(Ga.vals, Fa.vals, datadim, projdim);
-  copy_mat(Gz.vals, Fz.vals, datadim, projdim);
-  copy_mat(Va.vals, Fz.vals, datadim, projdim);
-  copy_mat(G.vals, Fa.vals, datadim, projdim);*/
-  stepcntr = 1;
-  nsteps = 1;
   dist_az = 0.0;
   tang = 0.0;
   
@@ -309,26 +303,23 @@ gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, array_d
     
   /* Check that Fa and Fz are both orthonormal. */
   if (!checkcolson(Fa.vals, datadim, projdim)) {
-    printf("Columns of Fa are not orthonormal: generating random Fa\n");
+g_printerr("Columns of Fa are not orthonormal: get new Fa\n");
 g_printerr ("Fa: ");
 for (i=0; i<datadim; i++) g_printerr ("%f ", Fa.vals[0][i]);
 g_printerr ("\n    ");
 for (i=0; i<datadim; i++) g_printerr ("%f ", Fa.vals[1][i]);
 g_printerr ("\n");
     return(1);
-    /*    doit = false;*/
   }
   if (!checkcolson(Fz.vals, datadim, projdim)) {
-    printf("Columns of Fz are not orthonormal: generating random Fz\n");
+g_printerr("Columns of Fz are not orthonormal: generating new Fz\n");
     return(2);
-    /*    doit = false;*/
   }
 
   /* Check that Fa and Fz are the same */
   if (!checkequiv(Fa.vals, Fz.vals, datadim, projdim)) {
-    printf("Fa equiv Fz: generating random Fz\n");
+g_printerr("Fa equiv Fz: generating random Fz\n");
     return(3);
-    /*    doit = false;*/
   }
 
   /* Do SVD of Fa'Fz: span(Fa,Fz).*/
@@ -375,7 +366,7 @@ g_printerr ("\n");
           lambda.els[i] = 1.0;
         }
       }
-    
+
       /*  Compute principal angles */
       for (i=0; i<projdim; i++) {
         tau.els[i] = (gfloat) acos((gdouble) lambda.els[i]);
@@ -383,12 +374,13 @@ g_printerr ("\n");
 
       /*  Calculate principal directions */
       if (projdim > dI) { /* Span is ok - proceed */
+
+        /* Rotate Fa to get Ga */
         for (i=0; i<datadim; i++)
           for (j=0; j<projdim; j++)
             tv.vals[j][i] = 0.0;
         arrayd_copy(&Va, &tv);
 
-        /* Rotate Fa to get Ga */
         if (!matmult_uv(Fa.vals, tv.vals, datadim, projdim, projdim, 
           projdim, Ga.vals))
           printf("Could not multiply u and v, cols!=rows \n");
@@ -399,6 +391,7 @@ g_printerr ("\n");
             gram_schmidt(Ga.vals[i], Ga.vals[j], datadim);
 	}
         
+        /* Rotate Fz to get Gz */
         for (i=0; i<datadim; i++)
           for (j=0; j<projdim; j++)
             tv.vals[j][i] = 0.0;
@@ -424,13 +417,15 @@ g_printerr ("\n");
           for (j=i+1; j<projdim; j++)
             gram_schmidt(Gz.vals[i], Gz.vals[j], datadim);
 	}
+
       }
-      else { /* Span not ok, cannot do interp path, so reinitialize */
+      /*      else { * Span not ok, cannot do interp path, so reinitialize *
         arrayd_copy(&Fa, &Ga);
         arrayd_copy(&Fa, &Gz);
         for (i=0; i<projdim; i++)
           tau.els[i] = 0.0;
-      }
+        * Need to clean this up - It seems this never occurs *
+	} Don't think this is needed */
 
       /* Construct current basis*/
       for (i=0; i<projdim; i++)
@@ -466,27 +461,41 @@ g_printerr ("\n");
         tmpd += ((gdouble)tau.els[i]*(gdouble)tau.els[i]);
       dist_az = (gfloat)sqrt(tmpd);
 
-      if (dist_az < tol)
+      if (dist_az < 0.0001) {
+	/*        printf("returning before standardizing tau's\n");
+        for (i=0; i<projdim; i++) 
+          printf("tau %d %f ",i,tau.els[i]);
+	  printf("\n");*/
+	/*        zero_tau(tau, projdim);
+        zero_tinc(tinc, projdim);
+        zero_lambda(lambda, projdim);
+        for (i=0; i<projdim; i++)
+          for (j=0; j<datadim; j++)
+          {
+            Ga.vals[i][j] = 0.0;
+            Gz.vals[i][j] = 0.0;
+            G.vals[i][j] = 0.0;
+            Va.vals[i][j] = 0.0;
+            Fz.vals[i][j] = 0.0;
+	    }
+        dist_az = 0.0;
+        tang = 0.0;
+        *pdist_az = dist_az;
+        *ptang = tang;*/
+        arrayd_copy(&Fa, &F);
         return(3);
+      }
       
       for (i=0; i<projdim; i++) {
-        if (tau.els[i] > tol)
+        if (tau.els[i] > tol) {
           tau.els[i] /= dist_az;
+	}
         else 
           tau.els[i] = 0.0;
       }
 
       *pdist_az = dist_az;
       *ptang = tang;
-      /* Reset increment counters.*/
-      /*      nsteps = (gint) floor((gdouble)(dist_az/delta))+1;*/
-      /*      for (i=1; i<projdim; i++) {
-        if ((gint) floor((gdouble)(dG/delta)) < nsteps) 
-          nsteps = (gint) floor((gdouble)(dG/delta));
-      }
-      stepcntr = 1;
-      *ns = nsteps;
-      *stcn = stepcntr;*/
   }
   else {
     arrayd_copy(&Fa, &F);
@@ -502,6 +511,7 @@ g_printerr ("\n");
 
   }
 
+  /*  printf("dist_az %f \n",dist_az);*/
 /* free temporary arrays */
   g_free ((gpointer) pairs);
   for (j=0; j<2; j++)
@@ -564,32 +574,23 @@ increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn,
   gfloat tang = *ptang;
   gint nsteps = *ns;
   gint stepcntr = *stcn;
+  /*  time_t bt;
+  struct tm *nowtm;
+  struct timeval tv; 
 
-  /*  stepcntr++;*/
+  bt = time(NULL);
+  nowtm = localtime(&bt);
+  gettimeofday(&tv,NULL);*/
 
   tang += delta;
 
-  /* Why do I need to do this? Di */
-  /*g_printerr("tinc ");   */
-  /*  for (i=0; i<projdim; i++) 
-      if (tinc.els[i] > tau.els[i]) {*/
   if (tang >= dist_az)
       attheend = true;
-      /*      nsteps = stepcntr;*/
-  /*    }
-	printf("\n ");   */
 
-  if (attheend) {
-    for (i=0; i<projdim; i++)
-      tinc.els[i] = tau.els[i]*dist_az;
-  }
-  else {
+  if (!attheend) {
     for (i=0; i<projdim; i++)
       tinc.els[i] = (tang*tau.els[i]);
-    /*      tinc.els[i] += (delta*tau.els[i]/dist_az);*/
   }
-  /*  printf("%f %f %f %f %f %f %f %d\n ",tang, delta, tinc.els[0], tinc.els[1], 
-      tau.els[0], tau.els[1], dist_az, (glong) time((glong *) 0));*/
 
   *ptang = tang;
   *ns = nsteps;
@@ -603,7 +604,6 @@ reached_target(gint nsteps, gint stepcntr, gfloat tang, gfloat dist_az,
 {
   gboolean arewethereyet = false;
 
-  /*  if (nsteps == 1 || stepcntr == nsteps)*/
   if (basmeth == 0) {
     if (tang >= dist_az)
       arewethereyet = true;
@@ -660,9 +660,6 @@ do_last_increment(vector_f tinc, vector_f tau, gfloat dist_az, gint projdim)
 void speed_set (gint slidepos, gfloat *st, gfloat *dlt,  
   gint *ns, gint *stcn) {
 
-  gfloat fracpath;
-  gfloat tol = 0.0001;
-
   gfloat step = *st;
   gfloat delta = *dlt;
   gint nsteps = *ns;
@@ -672,9 +669,6 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt,
   {
     step = 0.0;
     delta = 0.0;
-    /*    step = 0.0;
-    nsteps = 1;
-	  stepcntr = 1;*/
   }
   else
   {
@@ -686,18 +680,8 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt,
       step = ((gfloat) slidepos - 5.) / 2000.;
     else if ((slidepos >= 50))/* && (slidepos < 90))*/
       step = (gfloat) pow((double)(slidepos-50)/100.,(gdouble)1.5) + 0.0225;
-    /*    else
-	  step = (gfloat) sqrt((double)(slidepos-50)) + 0.1868;*/
 
     delta = (step*M_PI_2)/(10.0);
-
-    /*    if (nsteps > 1)
-      fracpath = stepcntr/nsteps;
-    else 
-      fracpath = 1.0;
-
-    nsteps = (gint) floor((gdouble)(dist_az/delta))+1;
-    stepcntr = (gint) floor(fracpath*nsteps);*/
 
   }
 

@@ -19,12 +19,12 @@ and Ch. heikertingeri, and 6 measurements on each.
     6 = the aedeagus width from the side in microns.
 </description>
 <variables count="7">
-  <realvariable name="tars1" />
-  <realvariable name="tars2" />
-  <realvariable name="head" />
-  <realvariable name="aede1" />
-  <realvariable name="aede2" />
-  <realvariable name="aede3" />
+  <realvariable name="t1-tars1" />
+  <realvariable name="t2-tars2" />
+  <realvariable name="head"  />
+  <realvariable name="a1-aede1" />
+  <realvariable name="a2-aede2" />
+  <realvariable name="a3-aede3" />
   <categoricalvariable name="species">
     <levels count="3">
       <level value="1"> Concinna </level>

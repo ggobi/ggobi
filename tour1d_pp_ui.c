@@ -113,7 +113,7 @@ t1d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
     &dsp->t1d.target_selection_method);
 }
 
-gchar *t1d_pp_func_lbl[] = {"PCA"};
+gchar *t1d_pp_func_lbl[] = {"PCA","LDA"};
 /*,"LDA","CART Gini","CART Entropy", 
                             "CART Variance","SUB-D"
                             };*/

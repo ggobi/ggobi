@@ -34,7 +34,7 @@ void eigenvalues (gfloat *cov, int p, gfloat *ew,
                   gint matz, gfloat *ev, gfloat *fv1, gfloat *fv2);
 gint subd (array_f *pdata, void *param, gfloat *val);
 
-gint zero (gfloat *ptr, gint length);
+gint zero (gdouble *ptr, gint length);
 gint compute_groups (gint *group, gint *ngroup, gint *groups, gint nrows, 
   gfloat *gdata);
 gint alloc_discriminant_p (discriminant_param *dp, gfloat *gdata, gint nrows, 
