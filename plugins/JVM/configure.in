@@ -54,4 +54,4 @@ AC_SUBST(LD_PATH)
 AC_SUBST(PWD)
 AC_SUBST(JAVA_GNOME_DIR)
 
-AC_OUTPUT(local.config Gtk/plugin.xml setLD.bsh setLD.csh)
+AC_OUTPUT(local.config Gtk/plugin.xml setLD.bsh setLD.csh plugin.xml)
