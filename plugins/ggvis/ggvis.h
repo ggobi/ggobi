@@ -170,6 +170,7 @@ void ggv_init_Dtarget (gint, ggvisd *ggv);
 
 void mds_func (gboolean, PluginInstance *);
 void mds_once (gboolean doit, ggvisd *ggv, ggobid *gg);
+void mds_open_display_cb (GtkWidget *btn, PluginInstance *inst);
 
 void clusters_changed_cb (ggobid *, datad *, void *);
 void create_shepard_data_cb (PluginInstance *inst, guint action, GtkWidget *w);

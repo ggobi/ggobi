@@ -42,12 +42,6 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
   vartabled *vt;
   gdouble range;
 
-/*
- *rowids = (glong *) g_malloc (dsrc->nrows * sizeof(glong));
- *for (i=0; i<dsrc->nrows; i++) {
- *  rowids[i] = (glong) dsrc->rowid.id.els[i];
- *}
-*/
   rowids = (gchar **) g_malloc (dsrc->nrows * sizeof(gchar *));
   for (i=0; i<dsrc->nrows; i++) {
     rowids[i] = g_strdup (dsrc->rowIds[i]);
@@ -94,9 +88,8 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
     rownames[i] = (gchar *) g_array_index (dsrc->rowlab, gchar *, i);
 
   colnames = (gchar **) g_malloc (nc * sizeof(gchar *));
-  colnames[0] = "Pos1";
-  colnames[1] = "Pos2";
-  colnames[2] = "Pos3";
+  for (j=0; j<nc; j++)
+    colnames[j] = g_strdup_printf ("Pos%d", j+1);
 
   /*
    * In case there is no initial scatterplot because the datasets
@@ -385,11 +378,11 @@ g_printerr ("e is null\n");
 
 /*-- --*/
 
-void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
+void mds_open_display_cb (GtkWidget *btn, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
-  gboolean state = btn->active;
+  GtkWidget *window, *w;
 
   if (ggv->Dtarget.nrows == 0) {
     quick_message ("I can't identify a distance matrix", false);
@@ -417,6 +410,27 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
         vt->lim.max = 2.0;
     }
   }
+  
+  window = (GtkWidget *) inst->data;
+  w = widget_find_by_name (window, "RunMDS");
+  gtk_widget_set_sensitive (w, true);
+  w = widget_find_by_name (window, "Step");
+  gtk_widget_set_sensitive (w, true);
+  w = widget_find_by_name (window, "Reinit");
+  gtk_widget_set_sensitive (w, true);
+  w = widget_find_by_name (window, "Scramble");
+  gtk_widget_set_sensitive (w, true);
+}
+
+void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
+{
+  ggvisd *ggv = ggvisFromInst (inst);
+  gboolean state = btn->active;
+
+  if (ggv->Dtarget.nrows == 0) {
+    quick_message ("I can't identify a distance matrix", false);
+    return;
+  }
 
   mds_func (state, inst);
 }
@@ -430,11 +444,7 @@ void mds_step_cb (GtkWidget *btn, PluginInstance *inst)
     quick_message ("I can't identify a distance matrix", false);
     return;
   }
-  if (!ggv->dpos) {
-    /*-- initialize, allocate and populate dpos --*/
-    ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, ggv, gg);
-    ggv_pos_init (ggv);
-  }
+
   mds_once (true, ggv, gg);
   update_ggobi (ggv, gg);
 }
@@ -447,11 +457,7 @@ void mds_reinit_cb (GtkWidget *btn, PluginInstance *inst)
     quick_message ("I can't identify a distance matrix", false);
     return;
   }
-  if (!ggv->dpos) {
-    /*-- initialize, allocate and populate dpos --*/
-    ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, ggv, gg);
-    ggv_pos_init (ggv);
-  }
+
   ggv_pos_reinit (ggv);
   update_ggobi (ggv, gg);
 }
@@ -464,11 +470,7 @@ void mds_scramble_cb (GtkWidget *btn, PluginInstance *inst)
     quick_message ("I can't identify a distance matrix", false);
     return;
   }
-  if (!ggv->dpos) {
-    /*-- initialize, allocate and populate dpos --*/
-    ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, ggv, gg);
-    ggv_pos_init (ggv);
-  }
+
   ggv_scramble (ggv, gg);
   update_ggobi (ggv, gg);
 }
