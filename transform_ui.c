@@ -89,10 +89,14 @@ scale_get_a (ggobid *gg) {
   GtkWidget *entry_a;
   entry_a = widget_find_by_name (gg->tform_ui.window, "TRANSFORM:entry_a");
 
-  val_str = gtk_editable_get_chars (GTK_EDITABLE (entry_a), 0, -1);
-  if (val_str != NULL && strlen (val_str) > 0) {
-    val = (gfloat) atof (val_str);
-    g_free (val_str);
+  if (entry_a) {
+    val_str = gtk_editable_get_chars (GTK_EDITABLE (entry_a), 0, -1);
+    if (val_str != NULL && strlen (val_str) > 0) {
+      val = (gfloat) atof (val_str);
+      g_free (val_str);
+    }
+  } else {
+    g_printerr ("Failed to locate the entry widget\n");
   }
 
   return val;
@@ -104,10 +108,14 @@ scale_get_b (ggobid *gg) {
   GtkWidget *entry_b;
   entry_b = widget_find_by_name (gg->tform_ui.window, "TRANSFORM:entry_b");
 
-  val_str = gtk_editable_get_chars (GTK_EDITABLE (entry_b), 0, -1);
-  if (val_str != NULL && strlen (val_str) > 0) {
-    val = (gfloat) atof (val_str);
-    g_free (val_str);
+  if (entry_b) {
+    val_str = gtk_editable_get_chars (GTK_EDITABLE (entry_b), 0, -1);
+    if (val_str != NULL && strlen (val_str) > 0) {
+      val = (gfloat) atof (val_str);
+      g_free (val_str);
+    }
+  } else {
+    g_printerr ("Failed to locate the entry widget\n");
   }
 
   return val;
@@ -288,7 +296,7 @@ transform_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
     entry_b = gtk_entry_new ();
-    gtk_widget_set_name (entry_a, "TRANSFORM:entry_b");
+    gtk_widget_set_name (entry_b, "TRANSFORM:entry_b");
     gtk_entry_set_text (GTK_ENTRY (entry_b), "1");
     gtk_widget_set_usize (entry_b, width, -1);
     gtk_box_pack_start (GTK_BOX (hb), entry_b, false, false, 0);
