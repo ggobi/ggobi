@@ -16,6 +16,10 @@ If read xml file from a URL, then want to compute the relative files
 by filling out the InputDescription. See fileset_generate....
 
 Colors:
+
+  We want to be able to specify the activeColorScheme in the
+  xml data file.
+
   Fix the names and ids in the color map specification. Need to
   determine what is the relationship between these.
 
@@ -28,6 +32,7 @@ Colors:
   Work out our terminology -- is there a difference between
   a colorscheme and a colormap?  If not, let's just use one
   term.
+
 
 --------- notes on colors ---------------------------------------
 
