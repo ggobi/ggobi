@@ -141,8 +141,6 @@ class datad {
 
 /*-------------------- transformation --------------------------------*/
 
- gint std_type;  /* Can be 0, 1 or 2 */
-
  /* sphering transformation */
  struct _Sphere_d {
    gint nvars, *vars;  /*-- vars available for sphering --*/

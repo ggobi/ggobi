@@ -89,6 +89,9 @@ vartable_stats_print (datad *d, ggobid *gg)
   }
 }
 
+/*
+ * Sets lim_raw from d->raw, and lim_tform from d->tform.
+*/
 void
 vartable_stats_set (datad *d, ggobid *gg) 
 {

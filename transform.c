@@ -10,6 +10,14 @@
     it without violating AT&T's intellectual property rights.
 */
 
+/*
+ * I'm trying to apply each transformation to the user-specified
+ * limits along with the data, and for most transformations, that
+ * isn't too hard to do.  However, rank, normal score, and z-score
+ * seem to raise a problem.  Perhaps the user-specified limits
+ * should be turned off in those cases.  --dfs
+*/
+
 #include <stdlib.h>
 #include <math.h>
 #include <gtk/gtk.h>
@@ -154,13 +162,13 @@ transform0_values_set (gint tform0, gint jcol, datad *d, ggobid *gg)
       break;
 
     case RAISE_MIN_TO_0:
-      domain_incr = fabs (d->vartable[jcol].lim_raw_gp.min);
+      domain_incr = fabs (d->vartable[jcol].lim_raw.min);
       domain_adj = raise_min_to_0;
       inv_domain_adj = inv_raise_min_to_0;
       break;
 
     case RAISE_MIN_TO_1:
-      domain_incr = fabs (d->vartable[jcol].lim_raw_gp.min);
+      domain_incr = fabs (d->vartable[jcol].lim_raw.min);
       domain_adj = raise_min_to_1;
       inv_domain_adj = inv_raise_min_to_1;
       break;
@@ -205,11 +213,19 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
   gfloat fmedian, ref;
   gboolean allequal, tform_ok = true;
   gdouble dtmp;
+  lims slim, slim_tform;  /*-- specified limits --*/
 
   gint tform1 = option_menu_index (GTK_OPTION_MENU (gg->tform_ui.stage1_opt));
   gfloat boxcoxparam = gg->tform_ui.boxcox_adj->value;
   gfloat incr = d->vartable[jcol].domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = d->vartable[jcol].domain_adj;
+
+  
+  /*-- adjust the transformed value of the user-supplied limits --*/
+  if (d->vartable[jcol].lim_specified_p) {
+    slim.min = d->vartable[jcol].lim_specified.min;
+    slim.max = d->vartable[jcol].lim_specified.max;
+  }
 
   switch (tform1)
   {
@@ -217,6 +233,11 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
         d->tform.vals[m][jcol] = (*domain_adj)(d->raw.vals[m][jcol], incr);
+      }
+      /*-- apply the same transformation to the specified limits --*/
+      if (d->vartable[jcol].lim_specified_p) {
+        slim_tform.min = (*domain_adj)(slim.min, incr);
+        slim_tform.max = (*domain_adj)(slim.max, incr);
       }
     break;
 
@@ -241,6 +262,13 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         }
       }
       g_free ((gpointer) x);
+
+      /*-- apply the same transformation to the specified limits --*/
+      if (d->vartable[jcol].lim_specified_p) {
+        slim_tform.min = ((*domain_adj)(slim.min, incr) - mean) / stddev;
+        slim_tform.max = ((*domain_adj)(slim.max, incr) - mean) / stddev;
+      }
+
     }
     break;
 
@@ -263,6 +291,14 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
             m = d->rows_in_plot[i];
             d->tform.vals[m][jcol] = (gfloat)
               log ((gdouble) ((*domain_adj)(d->raw.vals[m][jcol], incr)));
+          }
+
+          /*-- apply the same transformation to the specified limits --*/
+          if (d->vartable[jcol].lim_specified_p) {
+            slim_tform.min = (gfloat)
+              log ((gdouble) ((*domain_adj)(slim.min, incr)));
+            slim_tform.max = (gfloat)
+              log ((gdouble) ((*domain_adj)(slim.max, incr)));
           }
         }
       }
@@ -293,6 +329,14 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
             d->tform.vals[m][jcol] = (gfloat) dtmp;
           }
         }
+
+        /*-- apply the same transformation to the specified limits --*/
+        if (d->vartable[jcol].lim_specified_p) {
+          dtmp = pow ((gdouble) (*domain_adj)(slim.min, incr), boxcoxparam);
+          slim_tform.min = (gfloat) (dtmp - 1.0) / boxcoxparam;
+          dtmp = pow ((gdouble) (*domain_adj)(slim.max, incr), boxcoxparam);
+          slim_tform.max = (gfloat) (dtmp - 1.0) / boxcoxparam;
+        }
       }
 
     break;
@@ -303,6 +347,16 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         d->tform.vals[m][jcol] = (d->raw.vals[m][jcol] + incr < 0) ?
           fabs ((gdouble)(*domain_adj)(d->raw.vals[m][jcol], incr)) :
           (*domain_adj)(d->raw.vals[m][jcol], incr);
+      }
+
+      /*-- apply the same transformation to the specified limits --*/
+      if (d->vartable[jcol].lim_specified_p) {
+        slim_tform.min = (slim.min + incr < 0) ?
+          fabs ((gdouble)(*domain_adj)(slim.min, incr)) :
+          (*domain_adj)(slim.min, incr);
+        slim_tform.max = (slim.max + incr < 0) ?
+          fabs ((gdouble)(*domain_adj)(slim.max, incr)) :
+          (*domain_adj)(slim.max, incr);
       }
     break;
 
@@ -323,6 +377,14 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
             pow ((gdouble) (*domain_adj)(d->raw.vals[m][jcol], incr),
               (gdouble) (-1.0));
         }
+
+        /*-- apply the same transformation to the specified limits --*/
+        if (d->vartable[jcol].lim_specified_p) {
+          slim_tform.min = (gfloat)
+            pow ((gdouble) (*domain_adj)(slim.min, incr), (gdouble) (-1.0));
+          slim_tform.max = (gfloat)
+            pow ((gdouble) (*domain_adj)(slim.max, incr), (gdouble) (-1.0));
+        }
       }
     break;
 
@@ -340,6 +402,14 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
           m = d->rows_in_plot[i];
           d->tform.vals[m][jcol] = (gfloat)
             log10 ((gdouble) (*domain_adj)(d->raw.vals[m][jcol], incr));
+        }
+
+        /*-- apply the same transformation to the specified limits --*/
+        if (d->vartable[jcol].lim_specified_p) {
+          slim_tform.min = (gfloat)
+            log10 ((gdouble) (*domain_adj)(slim.min, incr));
+          slim_tform.max = (gfloat)
+            log10 ((gdouble) (*domain_adj)(slim.max, incr));
         }
       }
     break;
@@ -362,6 +432,12 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         m = d->rows_in_plot[i];
         d->tform.vals[m][jcol] =
           ((*domain_adj)(d->raw.vals[m][jcol], incr) - min)/diff;
+      }
+
+      /*-- apply the same transformation to the specified limits --*/
+      if (d->vartable[jcol].lim_specified_p) {
+        slim_tform.min = ((*domain_adj)(slim.min, incr) - min) / diff;
+        slim_tform.max = ((*domain_adj)(slim.max, incr) - min) / diff;
       }
     break;
 
@@ -407,6 +483,12 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         d->tform.vals[m][jcol] =
           ((*domain_adj)(d->raw.vals[m][jcol], incr) > fmedian) ? 1.0 : 0.0;
       }
+
+      /*-- apply the same transformation to the specified limits --*/
+      if (d->vartable[jcol].lim_specified_p) {
+        slim_tform.min = 0.0;
+        slim_tform.max = 1.0;
+      }
     break;
 
     case RANK:
@@ -428,6 +510,9 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
             (gfloat) m :
             qnorm ((gfloat) (m+1) / (gfloat) (d->nrows_in_plot+1));
       }
+
+      /*-- apply the same transformation to the specified limits --*/
+      /*-- how? --*/
 
       g_free ((gpointer) pairs);
     }
@@ -471,9 +556,18 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         m = d->rows_in_plot[i];
         d->tform.vals[m][jcol] = (gfloat) zscore_data[m]; 
       }
+
+      /*-- apply the same transformation to the specified limits --*/
+      /*-- how? --*/
+
       g_free ((gpointer) zscore_data);
     }
     break;
+  }
+
+  if (tform_ok && d->vartable[jcol].lim_specified_p) {
+    d->vartable[jcol].lim_specified_tform.min = slim_tform.min;
+    d->vartable[jcol].lim_specified_tform.max = slim_tform.max;
   }
 
   return (tform_ok);
@@ -494,6 +588,12 @@ transform2_apply (gint jcol, datad *d, ggobid *gg)
   gint i, m;
   gboolean tform_ok = true;
   gint tform2 = option_menu_index (GTK_OPTION_MENU (gg->tform_ui.stage2_opt));
+
+  lims slim, slim_tform;  /*-- specified limits --*/
+  if (d->vartable[jcol].lim_specified_p) {
+    slim.min = d->vartable[jcol].lim_specified_tform.min;
+    slim.max = d->vartable[jcol].lim_specified_tform.max;
+  }
 
   switch (tform2)
   {
@@ -519,6 +619,13 @@ transform2_apply (gint jcol, datad *d, ggobid *gg)
           m = d->rows_in_plot[i];
           d->tform.vals[m][jcol] = (x[i] - mean)/stddev;
         }
+
+        /*-- apply the same transformation to the specified limits --*/
+        if (d->vartable[jcol].lim_specified_p) {
+          slim_tform.min = (slim.min - mean) / stddev;
+          slim_tform.max = (slim.max - mean) / stddev;
+        }
+
       }
     }
     break;
@@ -526,6 +633,12 @@ transform2_apply (gint jcol, datad *d, ggobid *gg)
     default:
       fprintf (stderr, "Unhandled switch-case in transform2_apply\n");
   }
+
+  if (tform_ok && d->vartable[jcol].lim_specified_p) {
+    d->vartable[jcol].lim_specified_tform.min = slim_tform.min;
+    d->vartable[jcol].lim_specified_tform.max = slim_tform.max;
+  }
+
   return tform_ok;
 }
 

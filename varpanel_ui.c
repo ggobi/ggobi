@@ -140,12 +140,10 @@ updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
     d->vartable[nc-1].mean = d->vartable[jvar].mean;
     d->vartable[nc-1].median = d->vartable[jvar].median;
     d->vartable[nc-1].lim.min =
-      d->vartable[nc-1].lim_raw.min = d->vartable[nc-1].lim_raw_gp.min =
-      d->vartable[nc-1].lim_tform.min = d->vartable[nc-1].lim_tform_gp.min =
+      d->vartable[nc-1].lim_raw.min = d->vartable[nc-1].lim_tform.min = 
       d->vartable[jvar].lim_raw.min;
     d->vartable[nc-1].lim.max =
-      d->vartable[nc-1].lim_raw.max = d->vartable[nc-1].lim_raw_gp.max =
-      d->vartable[nc-1].lim_tform.max = d->vartable[nc-1].lim_tform_gp.max =
+      d->vartable[nc-1].lim_raw.max = d->vartable[nc-1].lim_tform.max = 
       d->vartable[jvar].lim_raw.max;
    } 
 

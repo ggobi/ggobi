@@ -40,8 +40,6 @@ datad_new(datad *d, ggobid *gg)
 
   memset(d, 0, sizeof(datad));
 
-  d->std_type = 0;
-
   /*-- initialize arrays to NULL --*/
   arrayf_init (&d->raw);
   arrayf_init (&d->tform);

@@ -135,12 +135,14 @@ collabels_process_word (gchar *word, gint field, gint nvar, datad *d)
     case 1:
       var = atof (word);
       /*-- don't set lim_specified_p to true unless both are present --*/
-      d->vartable[nvar].lim_specified.min = var;
+      d->vartable[nvar].lim_specified.min =
+        d->vartable[nvar].lim_specified_tform.min = var;
       break;
     case 2:
       var = atof (word);
       d->vartable[nvar].lim_specified_p = true;
-      d->vartable[nvar].lim_specified.max = var;
+      d->vartable[nvar].lim_specified.max =
+        d->vartable[nvar].lim_specified_tform.max = var;
       break;
     default:
       /*-- bail out: too many fields --*/

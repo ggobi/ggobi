@@ -144,8 +144,6 @@ pipeline_init (datad *d, ggobid *gg)
   arrayf_copy (&d->raw, &d->tform);
 
   vartable_stats_set (d, gg);
-
-  vartable_lim_raw_gp_set (d, gg);
   vartable_lim_update (d, gg);
   tform_to_world (d, gg);
 

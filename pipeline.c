@@ -18,7 +18,6 @@
 
 static gfloat mean_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, datad *, ggobid *);
 static gfloat median_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, datad *, ggobid *);
-static void min_max (gfloat **, gint *, gint, gfloat *, gfloat *, datad *, ggobid *);
 
 /* ------------ Dynamic allocation, freeing section --------- */
 
@@ -88,6 +87,29 @@ pipeline_arrays_add_column (gint jvar, datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
+min_max (gfloat **vals, gint jvar, gfloat *min, gfloat *max,
+  datad *d, ggobid *gg)
+/*
+ * Find the minimum and maximum values of variable jvar
+ * using min-max scaling.
+*/
+{
+  int i, k;
+/*
+ * Choose an initial value for *min and *max
+*/
+  *min = *max = vals[d->rows_in_plot[0]][jvar];
+
+  for (i=0; i<d->nrows_in_plot; i++) {
+    k = d->rows_in_plot[i];
+    if (vals[k][jvar] < *min)
+      *min = vals[k][jvar];
+    else if (vals[k][jvar] > *max)
+      *max = vals[k][jvar];
+  }
+}
+
+void
 limits_adjust (gfloat *min, gfloat *max)
 /*
  * This test could be cleverer.  It could test the ratios
@@ -117,79 +139,38 @@ limits_adjust (gfloat *min, gfloat *max)
   }
 }
 
-void
-vartable_lim_raw_gp_set (datad *d, ggobid *gg)
+/*
+static void
+vartable_lim_set (gfloat **matrix, gint jvar, datad *d, ggobid *gg)
 {
-  gint j, *cols;
   gfloat min, max;
 
-  cols = (gint *) g_malloc (1 * sizeof (gint));
-  for (j=0; j<d->ncols; j++) {
-    cols[0] = j;
-
-    min_max (d->raw.vals, cols, 1, &min, &max, d, gg);
-    limits_adjust (&min, &max);
-    d->vartable[j].lim_raw_gp.min = min;
-    d->vartable[j].lim_raw_gp.max = max;
-  }
-
-  g_free ((gpointer) cols);
+  min_max (matrix, jvar, &min, &max, d, gg);
+  limits_adjust (&min, &max);
+  d->vartable[jvar].lim_raw.min = min;
+  d->vartable[jvar].lim_raw.max = max;
 }
-
-void
-vartable_lim_tform_gp_set (datad *d, ggobid *gg)
-{
-  gint j, *cols;
-  gfloat min, max;
-
-  cols = (gint *) g_malloc (1 * sizeof (gint));
-  for (j=0; j<d->ncols; j++) {
-    cols[0] = j;
-
-    min_max (d->tform.vals, cols, 1, &min, &max, d, gg);
-    limits_adjust (&min, &max);
-    d->vartable[j].lim_tform_gp.min = min;
-    d->vartable[j].lim_tform_gp.max = max;
-  }
-
-  g_free ((gpointer) cols);
-}
+*/
 
 void
 vartable_lim_update (datad *d, ggobid *gg)
 {
   gint j;
   gfloat min, max;
-  gint *cols;
 
-  /* 
-   * First update the limits taken from the tform data. 
-  */
-  vartable_lim_tform_gp_set (d, gg);
-
-  /*
-   * Take tform[][], one variable group at a time, and generate
-   * the min and max for each variable group (and thus for each
-   * column).
-  */
-  cols = (gint *) g_malloc (1 * sizeof (gint));
   for (j=0; j<d->ncols; j++) {
-    cols[0] = j;
 
-    switch (d->std_type)
-    {
-      case 0:
-        /*-- isn't this already done? --*/
-/*      min_max (gg->tform, cols, 1, &min, &max);*/
-        min = d->vartable[j].lim_tform_gp.min;
-        max = d->vartable[j].lim_tform_gp.max;
-        break;
-      case 1:
-        mean_largest_dist (d->tform.vals, cols, 1, &min, &max, d, gg);
-        break;
-      case 2:
-        median_largest_dist (d->tform.vals, cols, 1, &min, &max, d, gg);
-        break;
+/* redundant with vartable_stats_set
+    vartable_lim_set (d->raw.vals, j, d, gg);
+    vartable_lim_set (d->tform.vals, j, d, gg);
+*/
+
+    if (d->vartable[j].lim_specified_p) {
+      min = d->vartable[j].lim_specified_tform.min;
+      max = d->vartable[j].lim_specified_tform.max;
+    } else {
+      min = d->vartable[j].lim_tform.min;
+      max = d->vartable[j].lim_tform.max;
     }
 
     limits_adjust (&min, &max);
@@ -197,38 +178,12 @@ vartable_lim_update (datad *d, ggobid *gg)
     d->vartable[j].lim.min = min;
     d->vartable[j].lim.max = max;
   }
-  g_free ((gpointer) cols);
 }
 
 /*-------------------------------------------------------------------------*/
 /*                       pipeline                                          */
 /*-------------------------------------------------------------------------*/
 
-void
-min_max (gfloat **vals, gint *cols, gint ncols, gfloat *min, gfloat *max,
-  datad *d, ggobid *gg)
-/*
- * Find the minimum and maximum values of each column or variable
- * group using using the min-max scaling.
-*/
-{
-  int i, j, k, n;
-/*
- * Choose an initial value for *min and *max
-*/
-  *min = *max = vals[d->rows_in_plot[0]][cols[0]];
-
-  for (n=0; n<ncols; n++) {
-    j = cols[n];
-    for (i=0; i<d->nrows_in_plot; i++) {
-      k = d->rows_in_plot[i];
-      if (vals[k][j] < *min)
-        *min = vals[k][j];
-      else if (vals[k][j] > *max)
-        *max = vals[k][j];
-    }
-  }
-}
 
 gint
 icompare (gint *x1, gint *x2)

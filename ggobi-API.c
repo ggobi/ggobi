@@ -1031,10 +1031,9 @@ GGOBI(setVariableValues)(gint whichVar, gdouble *vals, gint num,
 void
 GGOBI(update_data)(datad *d, ggobid *gg)
 {
-   vartable_stats_set (d, gg);
-   vartable_lim_raw_gp_set (d, gg);
-   vartable_lim_update (d, gg);
-   tform_to_world (d, gg);
+  vartable_stats_set (d, gg);
+  vartable_lim_update (d, gg);
+  tform_to_world (d, gg);
 }
 
 gint

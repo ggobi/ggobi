@@ -317,7 +317,6 @@ extern void varpanel_populate (datad *, ggobid *);
 extern void varpanel_refresh (ggobid *);
 extern void vartable_alloc (datad *d, ggobid *);
 extern void vartable_init (datad *d, ggobid *);
-extern void vartable_lim_raw_gp_set (datad *, ggobid *);
 extern void vartable_lim_update (datad *d, ggobid *);
 extern void vartable_open (ggobid *);
 extern void vartable_realloc (gint, datad *, ggobid *);

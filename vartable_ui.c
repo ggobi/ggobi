@@ -60,6 +60,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   gint j, k;
   gchar *val_str;
   gfloat val;
+  gboolean min_p = false, max_p = false;
 
   /*-- minimum --*/
   val_str = gtk_entry_get_text (GTK_ENTRY (gg->vartable_ui.umin));
@@ -68,8 +69,9 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
     for (k=0; k<ncols; k++) {
       j = cols[k];
 
-      d->vartable[j].lim_specified_p = true;
-      d->vartable[j].lim_specified.min = val;
+      min_p = true;
+      d->vartable[j].lim_specified.min =
+        d->vartable[j].lim_specified_tform.min = val;
 
       gtk_clist_set_text (clist, j, CLIST_USER_MIN,
         g_strdup_printf("%8.3f", val));
@@ -84,14 +86,26 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
     for (k=0; k<ncols; k++) {
       j = cols[k];
 
-      d->vartable[j].lim_specified_p = true;
-      d->vartable[j].lim_specified.max = val;
+      max_p = true;
+      d->vartable[j].lim_specified.max =
+        d->vartable[j].lim_specified_tform.max = val;
 
       gtk_clist_set_text (clist, j, CLIST_USER_MAX,
         g_strdup_printf("%8.3f", val));
     }
   } else
     gtk_clist_set_text (clist, j, CLIST_USER_MAX, g_strdup (""));
+
+  d->vartable[j].lim_specified_p = min_p && max_p;  /*-- require both --*/
+
+  /*
+   * the first function could be needed if transformation has been
+   * going on, because lim_tform could be out of step.
+  */
+  vartable_stats_set (d, gg);
+  vartable_lim_update (d, gg);
+  tform_to_world (d, gg);
+  displays_tailpipe (REDISPLAY_ALL, gg);
 
   g_free (cols);
   gtk_widget_destroy (dialog);
@@ -173,6 +187,13 @@ void range_unset_cb (GtkWidget *w, ggobid *gg)
     gtk_clist_set_text (clist, j, CLIST_USER_MAX, g_strdup(""));
   }
   g_free ((gchar *) cols);
+
+
+  /*-- these 4 lines the same as in dialog_range_set --*/
+  vartable_stats_set (d, gg);
+  vartable_lim_update (d, gg);
+  tform_to_world (d, gg);
+  displays_tailpipe (REDISPLAY_ALL, gg);
 }
 
 void select_all_cb (GtkWidget *w, ggobid *gg)
@@ -382,6 +403,13 @@ vartable_open (ggobid *gg)
       d->vartable_clist = gtk_clist_new_with_titles (NCOLS_CLIST, titles);
       gtk_clist_set_selection_mode (GTK_CLIST (d->vartable_clist),
         GTK_SELECTION_MULTIPLE);
+
+/*-- trying to add tooltips to the headers; it doesn't seem to work --*/
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+        gtk_clist_get_column_widget (
+          GTK_CLIST (d->vartable_clist), CLIST_USER_MIN),
+        "User specified minimum; untransformed", NULL);
+/*-- --*/
 
       /*-- right justify all the numerical columns --*/
       for (k=0; k<NCOLS_CLIST; k++)

@@ -88,23 +88,18 @@ typedef struct {
  /*-- unadjusted, unaffected by imputation --*/
  gfloat mean, median;
 
+ lims lim_raw;       /*-- range of the raw data          --*/
+ lims lim_tform;     /*-- range of d->tform              --*/
+
  /*
   * If the user has supplied limits, lim_specified_p = true
   * and the limits are stored in lim_specified.{min,max}
  */
  gboolean lim_specified_p;
  lims lim_specified;
+ lims lim_specified_tform;
 
- /*
-  * lim contains the limits in use: the first use use min/max scaling
- */
- lims lim_raw;            /*-- range of the raw data          --*/
- lims lim_raw_gp;         /*-- range of the raw data, grouped --*/
- lims lim_tform;          /*-- range of tform2                --*/
- lims lim_tform_gp;       /*-- range of tform2, grouped       --*/
- lims lim;                /*-- limits in use, maybe not min/max  --*/
-
- gboolean selected;  /*-- temporary?  I'll use this for transformation --*/
+ lims lim;      /*-- limits in use: lim_specified or lim_tform --*/
 
  /*-- transformations --*/
  gint tform0;
@@ -117,6 +112,8 @@ typedef struct {
 
  /*-- jittering --*/
  gfloat jitter_factor;
+
+ gboolean selected;
 
 } vartabled;
 
