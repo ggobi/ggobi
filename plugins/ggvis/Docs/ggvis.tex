@@ -24,10 +24,12 @@ available as part of the xgobi software.
 \section{The data}
 
 First, you need some data.  The ascii format supported by ggobi is not
-adequate for the specification of edges, so you'll probably use an xml
-file with a minimum of two datasets:  a set of cases or nodes, and a set
-of edges.  The records in the node data must have
-\XMLAttribute{id}s:
+adequate for the specification of edges, so you'll either use an xml file
+or define the graph in R and feed it to ggobi using Rggobi.
+
+If you use an xml file, it will have at least two datasets: a set of
+cases or nodes, and a set of edges.  The records in the node data must
+have \XMLAttribute{id}s:
 
 \begin{verbatim}
 <record id="0"> ... </record>
@@ -62,22 +64,69 @@ two lists, one for datasets which can supply nodes and one for datasets
 which can supply edges.  In most cases, only one choice is possible,
 but more complex arrangements can occur.
 
-The {\em snetwork.xml} data supplied with ggobi has exactly one set of
-nodes and one set of edges.  For this data, there are no choices to be
-made, and you can simply move on to run multidimensional scaling.
+The {\em snetwork.xml} data supplied with ggobi (which portrays a
+simple social network) has exactly one set of nodes and one set of
+edges.  For this data, there are no choices to be made, and you can
+simply move on to run multidimensional scaling.
 
-With the {\em morsecodes.xml} data, there are in fact two sets of edges.
-The first one, ``distance,'' supplies the distances to be used in
-determining the point positions.  The second set, ``edges,'' is a set of edges
+The {\em morsecodes.xml} data (the results of an experiment about
+rates of confusion of Morse codes) has two sets of edges.  The first
+one, ``distance,'' supplies the distances to be used in determining
+the point positions.  The second set, ``edges,'' is a set of edges
 that can be used for display, because it emphasizes the structure of
 of the data.
 
+Once the nodes and edges have been specified, move to the next tab.
+
+\section{Definition of D}
+
+In the next step, the target distance matrix D must be specified, either
+simply from a set of unweighted edges or from a set of edges together with
+a variable of weights.
+
+For the social network data, the distances will simply be the minimum
+number of edges traversed in traveling between a pair of nodes.  (Edge
+direction is ignored.)  Specify ``Unweighted,'' activate ``Complete
+distances'' so the matrix will be populated with distances between
+pairs of nodes that do not share an edge, and click ``Populate D.''
+
+For the {\em morsecodes} data, we actually began with a confusion
+matrix representing the fraction of times that one character in the
+Morse code was confused with another in an experiment.  We had to
+translate that matrix into a set of edges and and a weighting variable
+(named {\b D}) so that it would correspond to data structures ggobi
+expects.  So that ggvis can turn it back into a matrix again, select
+``D from variable'' in the option menu, click on ``D'' in the list of
+variables, and do not activate ``Complete distances'' before clicking
+``Populate D.''
+
+Once the target distance matrix D has been populated, a new
+scatterplot display appears.  Proceed to the next tab, ``Run,''
+to begin running the multidimensional scaling algorithm.
+
 \section{Running MDS}
 
-This section documentation has not yet been written, but we can
-refer you to documentation for the older {\em xgvis}
-(\cite{xgvis_jcgs2002}, http://www.research.att.com/areas/stat/xgobi/), which
-was used with xgobi, ggobi's predecessor.
+Before clicking on the ``Run MDS'' button, choose the dimension
+of the space into which you want to project the data.  Both the
+social network graph and the Morse code data project well into
+3-dimensional spaces, but it's also interesting to see how they
+look in the plane.
+
+You can now click on the ``Run MDS'' button to start the
+algorithm.  You may want to start with a large step size, and
+then reduce the step size as the layout converges.
+
+The sliders below the histogram of the target distances are quite
+useful in tuning the layout.  Increasing the exponent of {\bf D}
+increases the influences of the large distances.  For the social
+network data, this slider controls the length of the edges close to
+the center and the spread of the leaf nodes.
+
+This rest of the documentation for this section has not yet been
+written, but we can refer you to documentation for the older {\em
+xgvis} (\cite{xgvis_jcgs2002},
+http://www.research.att.com/areas/stat/xgobi/), which was used with
+xgobi, ggobi's predecessor.
 
 \section{Manipulations}
 
@@ -179,10 +228,8 @@ Another plugin, GraphLayout, offers several methods for laying
 out graphs.  One of its methods, called neato, produces layouts
 that are similar to those of ggvis.
 
-\section{Future work}
-
-A third plugin, not yet named, will allow manipulations of
-graphs, independent of the layout method used.
+In addition, there is a plugin (``GraphAction'') for manipulations
+that are specific to graphs.
 
 \bibliography{references}
 
