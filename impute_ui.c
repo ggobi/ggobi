@@ -90,7 +90,7 @@ impute_window_open (ggobid *gg)
     
     gg->impute.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->impute.window),
-      "assign values");
+      "Missing values");
     gtk_signal_connect (GTK_OBJECT (gg->impute.window),
       "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), NULL);
   
@@ -106,27 +106,18 @@ impute_window_open (ggobid *gg)
                         GTK_SIGNAL_FUNC (missings_datad_cb),
                         (gpointer) gg);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Generate a new dataset representing the missingness information",
+      "Generate a new dataset from the 1's and 0's representing missingness",
       NULL);
     gtk_box_pack_start (GTK_BOX (vbox), btn, true, true, 2);
+
+    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
+      false, true, 2);
 
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox,
       GTK_SELECTION_EXTENDED,
       (GtkSignalFunc) NULL, gg);
 
-    /*-- option menu to specify variables --*/
-/*
-    opt = gtk_option_menu_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "For which variables should imputation be performed?",
-      NULL);
-    populate_option_menu (opt, whichvars_lbl,
-      sizeof (whichvars_lbl) / sizeof (gchar *),
-      (GtkSignalFunc) whichvars_set_cb, gg);
-    gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 2);
-*/
-    
     /*-- Create a new notebook, place the position of the tabs --*/
     gg->impute.notebook = gtk_notebook_new ();
     gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->impute.notebook),
