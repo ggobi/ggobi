@@ -662,9 +662,10 @@ void tour_func (gboolean state, ggobid *gg)
   if (state) {
     tour_idled = gtk_idle_add_priority (G_PRIORITY_LOW,
                                        (GtkFunction) tour_idle_func, gg);
+    gg->tour_idled = 1;
   } else {
     gtk_idle_remove (tour_idled);
-    tour_idled = 0;
+    gg->tour_idled = 0;
   }
 
 /*

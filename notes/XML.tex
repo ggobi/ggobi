@@ -1,0 +1,219 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\title{XML Input Format}
+\begin{document}
+\section{Using XML Input Formats}
+There is now support for reading the data from an XML
+file.
+This is an alternative to having the inputs
+for a dataset be contained in a collection of multiple but associated files
+that provide the different characteristics such as 
+\begin{itemize}
+\item data
+\item observation labels
+\item glyph information
+\item color
+\item connected segments.
+\end{itemize}
+Instead, the XML format allows all the information to be specified in
+a single file.  Additionally, different sections of information can be
+omitted.
+
+
+One of the advantages of XML is that it can be validated externally.
+In other words, a well-formed file can be tested outside of the
+application for which it serves as input.  This helps to prepare and
+maintain correct input files.  Given the ability of R, S and Omegahat
+(and an increasing number of other statistical applications) to read
+XML, the dataset can be used in other applications with little or no
+additional code.  (Of course, read.table() and associated functions in
+R/S makes reading the old file formats easy.)
+
+XML parsers can check whether the document is well-formed.  This means
+that all obligatory sections are present, that sections are in the
+correct place.  Additionally, identifiers can be specified for each
+row and validating parsers can check that they are unique.
+
+Additionally, more useful information can be added
+to the data source.
+This includes items such as 
+\begin{itemize}
+\item how missing values
+are encoded (for the entire dataset or per variable),
+\item how many records there are, 
+\item levels of a variable that are not observed
+but known to exist (e.g. ethnicities not encountered in a survey)
+\item the source of the data
+\item tooltips for use in describing the data
+\item the type of each variable (e.g. factor or numeric)
+\end{itemize}
+The fact that the number of records and variables are specified in the
+file format means that only one pass of the file is needed to read the
+data and no reallocation is needed as more observations than expected
+are located.  Additionally, it is easier to handle non-rectangular
+data.  For example, sparse data and variable number of values per
+observational unit (e.g in medical studies).
+
+
+Additionally, the growing usage of XML means that there are editors
+and browser to create and view XML files.
+
+There is no doubt that the XML format appears more verbose and indeed
+it is. However, its more rigid structure benefits the authors of the
+input files as well as the application programmers.  It is more
+convenient and significantly less error-prone to have related
+information be in the same location.  For example, specifying the
+color of a line segment connecting two points in one file and the
+actual connection in another means that one has to have a mechanism to
+link the two specifications. Frequently this is a simple order in
+which they appear in the different files.  Removing individual lines
+of information commonly leads to lengthy searches for why the input
+does not produce the desired result.  Often this is because of an
+``off-by-one'' connection.
+
+
+Note that the XML approach will also be used to generate and
+potentially read plot descriptions for persistence and exchange with
+other software systems.
+
+
+A final benefit to using XML is that we have support for reading
+compressed files.  The XML parser we employ (Daniel Veillard's libxml)
+can parse XML directly from compressed files.  For large datasets,
+this is convenient as we don't have to uncompress the files before
+using them.
+
+Being able to specify file-specific defaults allows one to easily
+change the characterstics of the plots without excessive editing of
+the contents of the file.  For example, to use a different glyph type,
+we need only specify a different value for the \texttt{glyphType}
+attribute in the \texttt{ggobidata} tag.  This greatly simplifies
+experimenting with different parameter values.
+
+
+
+\section{The File Format}
+The format of the file is described by the 
+DTD (Document Type Definition) 
+\texttt{ggobi.dtd}
+
+The file starts with the usual XML
+declarations that identify it as XML
+(and its version)
+and the particular document type
+and associated DTD.
+\begin{verbatim}
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+\end{verbatim}
+The string ggobidata indicates that this is the top-level tag for the
+document, and this is what appears next.  The attributes of this tag
+specify the number of records in the dataset.  The identifier for a
+missing value can also be specified as an attribute
+(\texttt{missingValue}). (We might allow this to be overridden for
+each variable.)
+
+Also, default values for different characteristics of the observations
+can be specified here.  For example, the glyph type and size, the
+color of an observation, etc. can all be specified here.  These are
+applied to the individual observations for which they are not
+specified.  So, such an entry might look like
+\begin{verbatim}
+<ggobidata numRecords="" color="2" glyphType="fc" glyphSize="3">
+\end{verbatim}
+The remainder of the dataset is specified as sub-elements or sub-tags
+within this \texttt{ggobidata} element.  Thus, there must be a
+termination of this \texttt{ggobidata} at the end of the file.
+
+The first of the sub-elements is a description of the datasets.  This
+includes the source, any references, etc.  This is currently
+free-format.  A convenient attribute is \texttt{source} which
+indicates where it can be found.
+
+The next element of the file 
+lists the variables.
+\begin{verbatim}
+<variables>
+<variable name="A" group="1" />
+<variable name="B" group="1" />
+</variables
+\end{verbatim}
+The name of the variable
+can be specified as the text within the
+variable tag rather than as an attribute.
+
+The name of the transformed variable can be specified via the
+attribute \texttt{transformedName}.
+
+The group attribute allows variables to be joined for the same purpose
+as ifentified by the .vgroups file in the old format.
+
+Additionally, instructions as to how to create the variable can be
+specified as a programming command via the Programming Instruction
+(PI)
+\begin{verbatim}
+<variable>
+<?R rnorm(10)>
+</variable>
+\end{verbatim}
+
+The next section of the file is the data itself.  The individual
+\texttt{record} tags are contained within the \texttt{records}
+element.  The body or content of each \texttt{record} is a simply
+ASCII listing of the values. Each value is separated
+by white space (space character, tabs or new lines).
+
+
+\section{Using XML Files}
+To use data that is contained in an XML file, 
+invoke ggobi with the command line flag
+\texttt{-x}.
+
+In the future, ggobi could be smart enough to include the detection of
+the XML format.
+
+
+
+\section{Conversion of Old Files}
+The distribution contains an application named xmlConvert that can be
+used to read datasets provided in the old file format to XML.  This
+can be used by specifying the name of the file containing the
+old-style data in the same manner as ggobi expects.
+The output is written to standard output
+and can be redirected to a file using basic shell commands.
+For example,
+\begin{verbatim}
+  xmlConvert data/flea > flea.xml
+\end{verbatim}
+In the future, we will support writing the output to a file. (We need
+to process the command line arguments and look for a -o flag).
+
+
+Note that this dynamically loads the libraries libGGobi.so and
+libxml.so.  Thus the directories that contain these libraries must be
+referenced in the environment variable 
+\texttt{LD_LIBRARY_PATH}.
+Alternatively, the makefile can be edited to statically link these
+libraries.
+
+
+\section{Compilation}
+To activate the XML mechanism, define the variable
+\texttt{USE_XML} in  local.config.
+
+When we use autoconf, this can be done by
+\begin{verbatim}
+  ./configure --with-xml
+\end{verbatim}
+
+This requires the XML parsing libray libxml (also know as gnome-xml) by Daniel Veillard.
+(\texttt{Daniel.Veillard@w3.org}).
+See \texttt{http://xmlsoft.org/#Downloads}
+\section{References}
+The XML Handbook, Charles F Goldfarb and Paul Prescod
+ Prentice Hall.
+
+http://www.w3.org/XML
+
+\end{document}

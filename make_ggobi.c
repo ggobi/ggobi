@@ -9,6 +9,10 @@
 #include "vars.h"
 #include "externs.h"
 
+#ifdef USE_XML
+#include "read_xml.h"
+#endif
+
 
 /*-- initialize variables which don't depend on the size of the data --*/
 void globals_init (ggobid *gg) {
@@ -54,7 +58,6 @@ dataset_init(ggobid *gg)
 
     pipeline_init (gg);
 
-
     /*-- initialize the first display --*/
     display = scatterplot_new (false, NULL, gg);
     /* Need to make certain this is the only one there.
@@ -72,24 +75,34 @@ fileset_read (gchar *ldata_in, ggobid *gg)
   gg->filename = g_strdup (ldata_in);
   strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
 
-  array_read (gg);
-  gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
-  gg->nrgroups = 0;              /*-- for now --*/
+  switch(gg->data_mode) {
+   case xml:
+     data_xml_read(gg->fname, gg);
+     break;
+   case ascii:
+   case binary:
+   case Sprocess:
+       array_read (gg);
+       gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
+       gg->nrgroups = 0;              /*-- for now --*/
+      
+       missing_values_read (gg->fname, true, gg);
+      
+       collabels_read (gg->fname, true, gg);
+       rowlabels_read (gg->fname, true, gg);
+       vgroups_read (gg->fname, true, gg);
+      
+      
+       point_glyphs_read (gg->fname, true, gg);
+       point_colors_read (gg->fname, true, gg);
+       hidden_read (gg->fname, true, gg);
+      
+       segments_read (gg->fname, true, gg);
+       line_colors_read (gg->fname, true, gg);
+    break;
+  }
 
-  missing_values_read (gg->fname, true, gg);
-
-  collabels_read (gg->fname, true, gg);
-  rowlabels_read (gg->fname, true, gg);
-  vgroups_read (gg->fname, true, gg);
-
-  point_glyphs_read (gg->fname, true, gg);
-  point_colors_read (gg->fname, true, gg);
-  hidden_read (gg->fname, true, gg);
-
-  segments_read (gg->fname, true, gg);
-  line_colors_read (gg->fname, true, gg);
-
-  return true;  /* need to check return codes of reading routines */
+ return true;  /* need to check return codes of reading routines */
 }
 
 void

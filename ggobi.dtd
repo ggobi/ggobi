@@ -1,0 +1,61 @@
+<!--
+  The DTD for the GGobi input file format.
+  See data/flea.xml in the distribution for an example.
+ -->
+
+<!ENTITY % glyphTypes " + | x | or | fr | oc | fc | . ">
+<!ENTITY % Boolean (true | T | TRUE | false | F | FALSE)>
+
+<!ELEMENT description ( #PCDATA )>
+
+<!ELEMENT variables ( variable )*>
+
+<!-- Allows the name to be the only entry -->
+<!ELEMENT variable ( #PCDATA )>
+
+<!ELEMENT records ( record )*>
+<!ELEMENT record  ( #PCDATA )>
+
+<!ELEMENT segments ( segment )*>
+<!ELEMENT segment EMPTY>
+
+<!ELEMENT ggobidata (description, variables, records, (segments)*)
+
+
+<!ATTLIST records
+     count CDATA  #REQUIRED
+>
+
+<!ATTLIST variable
+    name          NMTOKEN #IMPLIED
+    transformName NMTOKEN #IMPLIED
+    missingValue  CDATA   #IMPLIED
+    group         CDATA   #IMPLIED
+>
+
+
+
+<!ATTLIST record
+   label     NMTOKEN                   #REQUIRED
+   id        NMTOKEN                   #IMPLIED
+   color     CDATA                     #IMPLIED
+   glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
+   glyphType ( %glyphTypes; )          #IMPLIED
+   hidden    %Boolean;                 FALSE
+   group     CDATA                     #IMPLIED
+>   
+
+<!ATTLIST segment
+   source      CDATA  #REQUIRED
+   destination CDATA  #REQUIRED
+   color       CDATA  #IMPLIED
+   width       CDATA  #IMPLIED
+>
+
+<!ATTLIST ggobidata
+   numRecords   CDATA #REQUIRED 
+   missingValue CDATA #IMPLIED
+   color     CDATA                     #IMPLIED
+   glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
+   glyphType ( %glyphTypes; )          #IMPLIED   
+>

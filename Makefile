@@ -1,5 +1,7 @@
 EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 
+include local.config
+
 CC = gcc
 CFLAGS= -g -ansi -Wall -fpic
 SHARED_LD_FLAGS= -shared
@@ -59,14 +61,27 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  display_tree.o \
  ggobi-API.o
 
+
+ifdef USE_XML
+ XML_SRC= read_xml.c write_xml.c
+ XML_OB= read_xml.o write_xml.o
+
+ CFLAGS+= -I/home/duncan/XML -DUSE_XML=1
+ OB+= $(XML_OB)
+
+ XML_LIBS=-lxml -lz
+ XML_LIB_DIRS=-L/home/duncan/XML/libxml
+
+endif
+
 ggobi: $(OB)
-	$(CC) $(OB) -o ggobi `gtk-config --cflags --libs`
+	$(CC) $(OB) -o ggobi $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --cflags --libs`
 
 pure: ggobi.o $(OB)
 	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
 	${CC} -o ggobi $(OB) `gtk-config --cflags --libs`
 
-DM=/usr/dfs/src/dmalloc-4.5.1
+
 dm: $(OB)
 	$(CC) `gtk-config --cflags` $(OB) -o ggobi `gtk-config --libs` -L$(DM) -ldmalloc
 
@@ -85,6 +100,26 @@ clean:
 # depends: $(SRC)
 # 	$(CC) $(DEPENDS_FLAG) $(CFLAGS) -I. `gtk-config --cflags` $(SRC) > $@	
 
+
+# Emacs's tags for navigating through the source.
+etags:
+	etags $(SRC)
+
+# The version for vi
+tags:
+	tags $(SRC)
+
+local.config:
+	@echo "# Whether to enable support for reading XML data" > $@
+	@echo "# USE_XML=1" > $@
+	@echo "# Location of dmalloc" > $@
+	@echo "# DM=1" > $@
+
+
+ifdef USE_XML
+xmlConvert: xmlConvert.o libGGobi.so
+	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS) -L. -lGGobi 
+endif
 
 # include .depends
 # DO NOT DELETE

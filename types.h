@@ -4,6 +4,9 @@
 #include <gtk/gtk.h>
 /* types.h */
 
+
+typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT,UNKNOWN_GLYPH} GlyphType;
+
 typedef struct {
     glong x, y;
 } lcoords;
@@ -157,6 +160,7 @@ typedef struct {
 } DisplayOptions;
 
 extern DisplayOptions DefaultDisplayOptions;
+
 
 #define TYPES_H
 

@@ -104,7 +104,6 @@ GGOBI(destroyCurrentDisplay)(ggobid *gg)
 void
 GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int nc, ggobid *gg)
 {
-extern void rowlabels_alloc(void);
  int i, j;
 
   GGOBI(displays_release)(gg);
@@ -120,7 +119,7 @@ extern void rowlabels_alloc(void);
 
   arrayf_alloc(&gg->raw, nr, nc);
 
-  rowlabels_alloc();
+  rowlabels_alloc(gg);
   /*  gg.rowlab = (gchar **) g_malloc(nr * sizeof(gchar*)); */
 
   vardata_alloc(gg);

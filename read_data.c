@@ -12,6 +12,13 @@
 
 #define INITSTRSIZE 512
 
+
+/* Make certain this matches GlyphTypes. */
+const gchar * const GlyphNames[] = {
+          "+", "x", "or", "fr", "oc", "fc", ".", ""
+        };
+
+
 /*------------------------------------------------------------------------*/
 /*                          row labels                                    */
 /*------------------------------------------------------------------------*/
@@ -473,21 +480,9 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
          * Else if the input is a string and a number
         */
         } else {
-          if (strcmp (gtype, "+") == 0)
-            glyph.type = 1;
-          else if (g_strcasecmp (gtype, "x") == 0)
-            glyph.type = 2;
-          else if (g_strcasecmp (gtype, "or") == 0)
-            glyph.type = 3;
-          else if (g_strcasecmp (gtype, "fr") == 0)
-            glyph.type = 4;
-          else if (g_strcasecmp (gtype, "oc") == 0)
-            glyph.type = 5;
-          else if (g_strcasecmp (gtype, "fc") == 0)
-            glyph.type = 6;
-          else if (g_strcasecmp (gtype, ".") == 0)
-            glyph.type = 7;
-          else {
+          glyph.type = mapGlyphName(gtype);
+
+          if(glyph.type == UNKNOWN_GLYPH) {
             readGlyphErr ();
             use_defaults = true;
             break;
@@ -521,6 +516,38 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
     br_glyph_ids_init (gg);
 
   return (ok);
+}
+
+GlyphType 
+mapGlyphName(const gchar *gtype)
+{
+ GlyphType type;
+ int i;
+  type = UNKNOWN_GLYPH;
+  for(i = 0; i < sizeof(GlyphNames)/sizeof(GlyphNames[0]) - 1; i++) {
+    if(strcmp(gtype, GlyphNames[i]) == 0) {
+     type = i+1;
+     break;
+    }
+  }
+  /*
+  if (strcmp (gtype, "+") == 0)
+    glyph.type = 1;
+  else if (g_strcasecmp (gtype, "x") == 0)
+    glyph.type = 2;
+  else if (g_strcasecmp (gtype, "or") == 0)
+    glyph.type = 3;
+  else if (g_strcasecmp (gtype, "fr") == 0)
+    glyph.type = 4;
+  else if (g_strcasecmp (gtype, "oc") == 0)
+    glyph.type = 5;
+  else if (g_strcasecmp (gtype, "fc") == 0)
+    glyph.type = 6;
+  else if (g_strcasecmp (gtype, ".") == 0)
+    glyph.type = 7;
+  */
+
+ return(type);
 }
 
 gboolean

@@ -331,6 +331,10 @@ struct _ggobid {
   struct {
    varseldatad vdata0, vdata1, vdata2, vdata3;
   } scatmat_menu;
+
+
+  gint tour_idled; 
+
 }; /*  ggobid; */
 
 

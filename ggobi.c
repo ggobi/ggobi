@@ -38,6 +38,8 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
     if (strcmp (av[1], "-s") == 0)
       gg->data_mode = Sprocess;
 
+    else if (strcmp (av[1], "-x") == 0)
+      gg->data_mode = xml;
     /*
      * -:  look to stdin for the input data
     */
@@ -177,6 +179,7 @@ ggobi_alloc()
   tmp->app.prev_projection = XYPLOT;
 
   tmp->color_ui.margin = 10;
+  tmp->tour_idled = 0;
 
   all_ggobis = g_realloc(all_ggobis, sizeof(ggobid*)*(num_ggobis+1));
   all_ggobis[num_ggobis] = tmp;
