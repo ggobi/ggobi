@@ -52,11 +52,9 @@ scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   CreateMenuItem (gg->app.scatterplot_mode_menu, "2D Tour",
     "^t", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (TOUR2D) : gg, gg);
-#ifdef CORRELATION_TOUR_IMPLEMENTED
   CreateMenuItem (gg->app.scatterplot_mode_menu, "2x1D Tour",
     "^c", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (COTOUR) : gg, gg);
-#endif
 
   /* Add a separator */
   CreateMenuItem (gg->app.scatterplot_mode_menu, NULL,
