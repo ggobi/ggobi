@@ -127,7 +127,7 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
       d = (datad *) l->data;
       inrange = false;
 
-      if (d == source_d)
+      if (d == source_d || d->idTable == NULL)
         continue;        /*-- skip the originating datad --*/
 
       ptr = g_hash_table_lookup(d->idTable, source_d->rowIds[k]);
