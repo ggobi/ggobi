@@ -109,8 +109,7 @@ rowlabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
     sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
   if (fileName == NULL)
     found = false;
-
-  if( ( fp = fopen(fileName, "r") ) == NULL ) {
+  else if( ( fp = fopen(fileName, "r") ) == NULL ) {
     g_free(fileName);
     found = false;
   }
