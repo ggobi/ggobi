@@ -313,6 +313,7 @@ gboolean   point_in_which_bin (gint, gint, gint *, gint *, datad *, splotd *);
 void       populate_option_menu (GtkWidget *, gchar **, gint, GtkSignalFunc, ggobid *);
 void       position_popup_menu (GtkMenu *menu, gint *px, gint *py, gpointer);
 gboolean   processRestoreFile(const gchar * const fileName, ggobid *gg);
+void       procs_activate (gboolean state, displayd *display, ggobid *gg);
 void       quick_message (const gchar * const, gboolean);
 void       quit_ggobi(ggobid *gg, gint action, GtkWidget *w);
 gdouble    randvalue (void);

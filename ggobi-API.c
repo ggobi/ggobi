@@ -914,6 +914,8 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
   closePlugins(gg);
 #endif
 
+  procs_activate (off, gg->current_display, gg);
+
   display_free_all (gg);
 
   if (closeWindow && gg->main_window)

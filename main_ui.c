@@ -288,7 +288,7 @@ viewmode_set (PipelineMode m, ggobid *gg)
 /*
  * Turn the tour procs on and off here
 */
-static void
+void
 procs_activate (gboolean state, displayd *display, ggobid *gg)
 {
   switch (gg->viewmode) {
@@ -646,6 +646,7 @@ quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
   }
   closePlugins(gg);
 #endif
+  procs_activate (off, gg->current_display, gg);
   gtk_main_quit();
 }
 
@@ -673,10 +674,11 @@ make_ui (ggobid *gg)
 #endif
 
 /*
- * I used to set allow_shrink to true, but somehow it causes what we experience as
- * auto_shrink-ing.  That is, when changing viewmode or selecting variables, the size
- * of the ggobi console window can suddenly change.  This seems to fix that, with the
- * perhaps undesirable side effect that I can't reduce the size of the console below
+ * I used to set allow_shrink to true, but somehow it causes what we
+ * experience as auto_shrink-ing.  That is, when changing viewmode or
+ * selecting variables, the size of the ggobi console window can suddenly
+ * change.  This seems to fix that, with the perhaps undesirable side
+ * effect that I can't reduce the size of the console below
  * its initial size.  -- dfs
 */
 /*gtk_window_set_policy (GTK_WINDOW (window), allow_shrink, allow_grow, auto_shrink);*/
