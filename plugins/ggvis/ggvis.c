@@ -218,7 +218,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
 /*-- "Specify datasets" list widgets --*/
 
-  hbox = gtk_hbox_new (false, 10);
+  hbox = gtk_hbox_new (true, 10);
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
 
 /*
@@ -250,7 +250,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   }
   gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
   gtk_container_add (GTK_CONTAINER (swin), clist);
-  gtk_box_pack_start (GTK_BOX (hbox), swin, false, false, 2);
+  gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
 
 /*
  * edge sets
@@ -281,7 +281,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   }
   gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
   gtk_container_add (GTK_CONTAINER (swin), clist);
-  gtk_box_pack_start (GTK_BOX (hbox), swin, false, false, 2);
+  gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
 
 
 
