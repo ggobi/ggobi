@@ -272,6 +272,9 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
     case parcoords:
       sp->whiskers = (GdkSegment *) g_malloc (2 * nr * sizeof (GdkSegment));
       break;
+   case tsplot:
+      sp->whiskers = (GdkSegment *) g_malloc ((nr-1) * sizeof (GdkSegment));
+      break;
   }
 }
 
@@ -302,6 +305,9 @@ splot_free (splotd *sp, displayd *display, ggobid *gg) {
       g_free ((gpointer) sp->arrowheads);
       break;
     case parcoords:
+      g_free ((gpointer) sp->whiskers);
+      break;
+    case tsplot:
       g_free ((gpointer) sp->whiskers);
       break;
   }
@@ -515,7 +521,9 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   if (display->displaytype == parcoords) {
     sp_whiskers_make (sp, display, gg);
   }
-
+  else if (display->displaytype == tsplot) {
+    tsplot_whiskers_make (sp, display, gg);
+  }
 }
 
 /*----------------------------------------------------------------------*/

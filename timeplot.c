@@ -221,7 +221,7 @@ tsplot_var_selected (gint jvar, displayd *display)
   GList *l = display->splots;
   while (l) {
     s = (splotd *) l->data;
-    if (s->xyvars.y == jvar) {
+    if (s->xyvars.y == jvar || s->xyvars.x == jvar ) {
       selected = true;
       break;
     }
@@ -289,7 +289,8 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
 	k++;
       }
 
-      if (jvar_sp != NULL && nplots > 1) {
+      if (jvar_sp != NULL && nplots > 1 && 
+         cpanel->tsplot_selection_mode == VAR_DELETE) {
 	/*-- Delete the plot from the list, and destroy it. --*/
 	display->splots = g_list_remove (display->splots, (gpointer) jvar_sp);
 
@@ -329,7 +330,7 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
 	nplots--;
       }
 
-    } else {
+    } else if(cpanel->tsplot_selection_mode != VAR_DELETE){
 
       if (cpanel->tsplot_selection_mode == VAR_REPLACE) {
 	*jvar_prev = sp->xyvars.y;
@@ -387,4 +388,59 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
     true, true, false);
 
   return redraw;
+}
+
+/*--------------------------------------------------------------------*/
+/*               The whiskers for timeseries lines                    */  
+/*--------------------------------------------------------------------*/
+
+static void
+tsplot_rewhisker (splotd *sp, ggobid *gg) {
+  gint i, k;
+  displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = (cpaneld *) &display->cpanel;
+  datad *d = display->d;
+  gboolean draw_whisker;
+
+  for (k=0; k<(d->nrows_in_plot-1); k++) {
+    i = d->rows_in_plot[k];
+    
+    /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
+    if (!display->options.missings_show_p &&
+          d->nmissing > 0 &&
+          (d->missing.vals[i][sp->xyvars.x] || 
+           d->missing.vals[i][sp->xyvars.y] ||
+	   d->missing.vals[i+1][sp->xyvars.x] || 
+           d->missing.vals[i+1][sp->xyvars.y]))
+    {
+      draw_whisker = false;
+    }
+    else
+      draw_whisker = true;
+    /* --- all whiskers --- */
+    if (draw_whisker) {
+      sp->whiskers[i].x1 = sp->screen[i].x;
+      sp->whiskers[i].y1 = sp->screen[i].y;
+      sp->whiskers[i].x2 = sp->screen[i+1].x;
+      sp->whiskers[i].y2 = sp->screen[i+1].y;
+    }      
+  }
+}
+
+
+/*-- set the positions of the whiskers for sp and prev_sp --*/
+void
+tsplot_whiskers_make (splotd *sp, displayd *display, ggobid *gg) {
+  GList *splist;
+  splotd *splot;
+  splotd *sp_next = NULL;
+
+  for (splist = display->splots; splist; splist = splist->next) {
+    splot = (splotd *) splist->data;
+    if (splot == sp) {
+      sp_next = (splist->next == NULL) ? NULL : (splotd *) splist->next->data;
+    }
+  }
+
+  tsplot_rewhisker (sp, gg);
 }

@@ -3,8 +3,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <sys/stat.h>
+#ifndef G_OS_WIN32
 #include <unistd.h>
+#include <sys/stat.h>
+#else
+#include <glib.h>
+#include <io.h>
+#endif
 
 #include <string.h>
 
@@ -51,7 +56,11 @@ fileset_generate(const char *fileName, DataMode guess)
 {
   InputDescription *desc = (InputDescription *)
     calloc(1, sizeof(InputDescription));
+#ifndef G_OS_WIN32
   struct stat buf;
+#else
+  int ft=0;
+#endif
   int i, j;
   int numGroups;
   GSList *groups;
@@ -61,9 +70,11 @@ fileset_generate(const char *fileName, DataMode guess)
 
   groups = FileTypeGroups;
 
-
+#ifndef G_OS_WIN32
   if(stat(fileName, &buf) != 0) {
-
+#else
+  if(access(fileName, ft) != 0){
+#endif
     if(isURL(fileName)) {
       desc->mode = xml_data;
       desc->fileName = g_strdup(fileName);
@@ -302,12 +313,21 @@ isASCIIFile(const char *fileName)
   return(true);
 }
 
+#ifdef G_OS_WIN32
+gboolean
+check_file_exists(const char *fileName)
+{
+  gint i=0;
+  return (access(fileName, i) == 0);
+}
+#else
 gboolean
 check_file_exists(const char *fileName)
 {
   struct stat buf;
-  return(stat(fileName, &buf) == 0);
+  return (stat(fileName, &buf) == 0);
 }
+#endif
 
 GSList *
 initFileTypeGroups()

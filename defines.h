@@ -183,10 +183,12 @@ extern const gint ViewTypeIndeces[3];
 #define BIN_FTS         8
 #define BIN_ENTROPY     9
 
-/*-- parallel coordinates and scatterplot matrices?  --*/
-#define VAR_REPLACE 0
-#define VAR_INSERT  1
-#define VAR_APPEND  2
+/*-- parallel coordinates, scatterplot matrices and tsplots  --*/
+#define VAR_REPLACE  0
+#define VAR_INSERT   1
+#define VAR_APPEND   2
+#define VAR_DELETE   3
+#define VAR_OVERLAY  4
 
 #define ARRANGE_ROW 0
 #define ARRANGE_COL 1

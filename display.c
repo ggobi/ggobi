@@ -133,7 +133,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
           splotd *sp;
           for (splist = display->splots; splist; splist = splist->next) {
             sp = (splotd *) splist->data;
-            sp_whiskers_make (sp, display, gg);
+            tsplot_whiskers_make (sp, display, gg);
           }
         }
 

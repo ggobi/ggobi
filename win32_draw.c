@@ -13,6 +13,7 @@
 #include "vars.h"
 #include "externs.h"
 
+
 /*
  * Batched drawing:   I may need to continue drawing this
  * way to achieve adequate speed in Windows.
@@ -215,19 +216,29 @@ build_glyph (glyphv *gl, icoords *xypos, gint jpos,
 
 void
 build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp) {
-  gint n = 2*j;
-
-  whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
-  whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
-  whisker_segs[*nwhisker_segs].x2 = sp->whiskers[n].x2;
-  whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
-  n++;
-  *nwhisker_segs += 1;
-  whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
-  whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
-  whisker_segs[*nwhisker_segs].x2 = sp->whiskers[n].x2;
-  whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
-  *nwhisker_segs += 1;
+  displayd *display = (displayd *) sp->displayptr;
+  gint n;
+  if (display->displaytype == parcoords){
+    n = 2*j;
+    whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
+    whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
+    whisker_segs[*nwhisker_segs].x2 = sp->whiskers[n].x2;
+    whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
+    n++;
+    *nwhisker_segs += 1;
+    whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
+    whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
+    whisker_segs[*nwhisker_segs].x2 = sp->whiskers[n].x2;
+    whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
+    *nwhisker_segs += 1;
+  }
+  else if (display->displaytype == tsplot) {
+    whisker_segs[*nwhisker_segs].x1 = sp->whiskers[j].x1;
+    whisker_segs[*nwhisker_segs].y1 = sp->whiskers[j].y1;
+    whisker_segs[*nwhisker_segs].x2 = sp->whiskers[j].x2;
+    whisker_segs[*nwhisker_segs].y2 = sp->whiskers[j].y2; 
+    *nwhisker_segs += 1; 
+  }
 }
 
 void
@@ -268,6 +279,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;
   gint nwhisker_segs = 0;
   gboolean draw_case;
+  gint dtype = display->displaytype;
 
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
@@ -285,11 +297,12 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
           open_rects, &nr_open,   filled_rects, &nr_filled,
           open_arcs, &nc_open,    filled_arcs, &nc_filled);
 
-        if (display->displaytype == parcoords &&
+        if ((dtype == parcoords || dtype == tsplot) &&
             display->options.edges_show_p)
         {
           build_whisker_segs (m, &nwhisker_segs, sp);
         }
+
       }
     }
   }
@@ -324,7 +337,8 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
             open_rects, &nr_open,   filled_rects, &nr_filled,
             open_arcs, &nc_open,    filled_arcs, &nc_filled);
 
-          if (display->displaytype == parcoords) {
+          if (display->displaytype == parcoords ||
+	      display->displaytype == tsplot) {
             build_whisker_segs (j, &nwhisker_segs, sp);
           }
         }
