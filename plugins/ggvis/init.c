@@ -50,6 +50,8 @@ ggvis_init (ggvisd *ggv)
   ggv->Dtarget_source = LinkDist;
   ggv->complete_Dtarget = false;
 
+  ggv->mds_group_ind = deflt;
+
   /*-- used in mds.c --*/
   vectord_init_null (&ggv->pos_mean);
   vectord_init_null (&ggv->weights);

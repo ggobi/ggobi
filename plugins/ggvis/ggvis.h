@@ -18,6 +18,10 @@ typedef enum {metric, nonmetric} MDSMetricInd;
 typedef enum {KruskalShepard, classic} MDSKSInd;
 typedef enum {LinkDist, VarValues} MDSDtargetSource;
 
+#define EXCLUDED 0
+#define INCLUDED 1
+#define ANCHOR   2
+#define DRAGGED  4 
 
 typedef struct {
 

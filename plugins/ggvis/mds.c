@@ -37,10 +37,11 @@ extern void update_histogram (ggvisd *);
 #define IJ i*ggv->Dtarget.ncols+j 
 #define JI j*ggv->Dtarget.nrows+i
 
-gboolean point_is_out = false, point_is_in = true;
-gint point_is_anchor = 2, point_is_dragged = 4;
 gdouble delta = 1E-10;
+/* these belong in ggv */
 gdouble stress, stress_dx, stress_dd, stress_xx;
+/* */
+
 
 gdouble
 sig_pow (gdouble x, gdouble p)
@@ -80,7 +81,7 @@ get_center (ggvisd *ggv)
   n = 0;
 
   for (i=0; i<ggv->pos.nrows; i++) {
-    if (ggv->point_status.els[i] != point_is_out) {
+    if (ggv->point_status.els[i] != EXCLUDED) {
       for(k=0; k<ggv->mds_dims; k++) 
         ggv->pos_mean.els[k] += ggv->pos.vals[i][k];
       n++;
@@ -100,7 +101,7 @@ get_center_scale (ggvisd *ggv)
   ggv->pos_scl = 0.;
 
   for(i=0; i<ggv->pos.nrows; i++) {
-    if (ggv->point_status.els[i] != point_is_out) {
+    if (ggv->point_status.els[i] != EXCLUDED) {
       for (k=0; k<ggv->mds_dims; k++) 
         ggv->pos_scl += ((ggv->pos.vals[i][k] - ggv->pos_mean.els[k]) *
                          (ggv->pos.vals[i][k] - ggv->pos_mean.els[k]));
@@ -118,7 +119,7 @@ center_pos (ggvisd *ggv)
   get_center (ggv);
 
   for (i=0; i<ggv->pos.nrows; i++)
-    if (ggv->point_status.els[i] != point_is_out)
+    if (ggv->point_status.els[i] != EXCLUDED)
       for (k=0; k<ggv->mds_dims; k++)
         ggv->pos.vals[i][k] -= ggv->pos_mean.els[k];
 }
@@ -133,7 +134,7 @@ scale_pos (ggvisd *ggv)
   get_center_scale (ggv);
 
   for (i=0; i<ggv->pos.nrows; i++)
-    if (ggv->point_status.els[i] != point_is_out)
+    if (ggv->point_status.els[i] != EXCLUDED)
       for (k=0; k<ggv->mds_dims; k++)
         pos[i][k] = (pos[i][k] - ggv->pos_mean.els[k]) /
                     ggv->pos_scl + ggv->pos_mean.els[k];
@@ -148,7 +149,7 @@ ggv_center_scale_pos (ggvisd *ggv)
   get_center_scale (ggv);
 
   for (i=0; i<ggv->pos.nrows; i++)
-    if (ggv->point_status.els[i] != point_is_out)
+    if (ggv->point_status.els[i] != EXCLUDED)
       for (k=0; k<ggv->mds_dims; k++)
         pos[i][k] = (pos[i][k] - ggv->pos_mean.els[k])/ggv->pos_scl;
 }
@@ -191,8 +192,8 @@ set_weights (ggvisd *ggv)
 {
   gint i, j;
   gdouble this_weight;
-  static gdouble local_weight_power = 0.;
-  static gdouble local_within_between = 1.;
+  gdouble local_weight_power = 0.;
+  gdouble local_within_between = 1.;
 
   /* the weights will be used in metric and nonmetric scaling 
    * as soon as mds_weightpow != 0. or mds_within_between != 1.
@@ -349,13 +350,14 @@ power_transform (ggvisd *ggv)
 
 
 /* for sorting in isotonic regression */
-static double *tmpVector;
-static int aIndex, bIndex;
-static double aReal, bReal;
-int realCompare(const void* aPtr, const void* bPtr)
+static gdouble *tmpVector;
+static gint aIndex, bIndex;
+static gdouble aReal, bReal;
+/* */
+gint realCompare(const void* aPtr, const void* bPtr)
 {
-  aIndex = *(int*)aPtr;
-  bIndex = *(int*)bPtr;
+  aIndex = *(gint*)aPtr;
+  bIndex = *(gint*)bPtr;
   aReal = tmpVector[aIndex];
   bReal = tmpVector[bIndex];
   if (aReal < bReal) return -1;
@@ -585,18 +587,11 @@ void mds_func (gboolean state, PluginInstance *inst)
 void
 mds_once (gboolean doit, ggvisd *ggv)
 {
-/*
- * All these statics will have to become part of ggv
-*/
-  static gint i, j, k, n;
-
-  static gboolean gradient_p = true;
-  
-  static gint prev_active_dist = -1;
-
-  static gdouble dist_config, dist_trans, resid, weight;
-  static gdouble step_mag, gsum, psum, gfactor;
-  static gdouble tmp;
+  gint num_active_dist_prev = ggv->num_active_dist;
+  gdouble dist_config, dist_trans, resid, weight;
+  gint i, j, k, n;
+  gdouble step_mag, gsum, psum, gfactor;
+  gdouble tmp;
 
   datad *dpos = ggv->dpos;
 
@@ -622,32 +617,29 @@ mds_once (gboolean doit, ggvisd *ggv)
   /* random selection vector */
   set_random_selection (ggv);
 
-  /* -------- collect activity status for each point: excluded,
-     erased, anchor (2), dragged ------- */
+  /*-- set the status for each point: excluded, included, anchor, dragged --*/
   if (ggv->point_status.nels < ggv->pos.nrows)
      vectori_realloc (&ggv->point_status, ggv->pos.nrows);
-  /* out */
   for (i=0; i<ggv->pos.nrows; i++) 
-    ggv->point_status.els[i] = point_is_out;
-  /* in */
+    ggv->point_status.els[i] = EXCLUDED;
   for (i=0; i<dpos->nrows_in_plot; i++) { 
     n = dpos->rows_in_plot[i]; 
     if(!dpos->hidden_now.els[n])
-      ggv->point_status.els[n] = point_is_in;
+      ggv->point_status.els[n] = INCLUDED;
   }
   /* excluded points and anchors of either kind */  
 /*
   if (d->ncols == d->ncols_used) {
     for (i=0; i<ggv->pos.nrows; i++)
       if (xg->clusv[(int)GROUPID(i)].excluded == 1) 
-        point_status[i] = point_is_out;
+        point_status[i] = EXCLUDED;
     if(anchor_group != NULL) {
       if (mds_group_ind == anchorfixed || mds_group_ind == anchorscales) {
         for (i=0; i<ggv->pos.nrows; i++) {
-          if (point_status[i] != point_is_out &&
+          if (point_status[i] != EXCLUDED &&
               anchor_group[(int) xg->raw_data[(i)][xg->ncols-1]])
           {
-            point_status[i] = point_is_anchor;
+            point_status[i] = ANCHOR;
           }
         }
       }
@@ -658,15 +650,15 @@ mds_once (gboolean doit, ggvisd *ggv)
 /*
   if (xg->is_point_moving && moving_point != -1) {
     if(move_type==0) {
-      point_status[moving_point] = point_is_dragged;
+      point_status[moving_point] = DRAGGED;
     } else if(move_type==1) {
       for (i=0; i<ggv->pos.nrows; i++)
-        if (point_status[i] != point_is_out && SAMEGLYPH(d,i,moving_point)) 
-          point_status[i] = point_is_dragged;
+        if (point_status[i] != EXCLUDED && SAMEGLYPH(d,i,moving_point)) 
+          point_status[i] = DRAGGED;
     } else if(move_type==2) {
       for (i=0; i<ggv->pos.nrows; i++)
-        if (point_status[i] != point_is_out)
-          point_status[i] = point_is_dragged;
+        if (point_status[i] != EXCLUDED)
+          point_status[i] = DRAGGED;
     }
   }
 */
@@ -684,10 +676,10 @@ mds_once (gboolean doit, ggvisd *ggv)
        the set of distances is!  */
 
     /* these points are not moved by the gradient */
-    if (ggv->point_status.els[i] == point_is_out || 
+    if (ggv->point_status.els[i] == EXCLUDED || 
         (ggv->mds_group_ind == anchorfixed &&
-         ggv->point_status.els[i] == point_is_anchor) ||
-        ggv->point_status.els[i] == point_is_dragged) 
+         ggv->point_status.els[i] == ANCHOR) ||
+        ggv->point_status.els[i] == DRAGGED) 
     {
       continue;
     }
@@ -699,11 +691,11 @@ mds_once (gboolean doit, ggvisd *ggv)
       if (i == j && ggv->KruskalShepard_classic == KruskalShepard) continue; 
 
       /* these points do not contribute to the gradient */
-      if (ggv->point_status.els[j] == point_is_out) continue;
+      if (ggv->point_status.els[j] == EXCLUDED) continue;
       if ((ggv->mds_group_ind == anchorscales ||
            ggv->mds_group_ind == anchorfixed) && 
-           ggv->point_status.els[j] != point_is_anchor &&
-           ggv->point_status.els[j] != point_is_dragged)
+           ggv->point_status.els[j] != ANCHOR &&
+           ggv->point_status.els[j] != DRAGGED)
       {
             continue;
       }
@@ -781,10 +773,11 @@ g_printerr ("num_active_dist: %d\n", ggv->num_active_dist);
     /* all of the following need to be run thru rows_in_plot and erase ! */
 
     /* Zero out the gradient matrix. */
-    if (gradient_p) {
+    if (ggv->gradient.nrows != ggv->pos.nrows ||
+        ggv->gradient.ncols != ggv->pos.ncols)
+    {
       arrayd_free (&ggv->gradient, ggv->gradient.nrows, ggv->gradient.ncols);
       arrayd_alloc (&ggv->gradient, ggv->pos.nrows, ggv->pos.ncols);
-      gradient_p = false;
     }
     arrayd_zero (&ggv->gradient);
 
@@ -857,33 +850,43 @@ g_printerr ("num_active_dist: %d\n", ggv->num_active_dist);
     /* ------------- end gradient accumulation ----------- */   
 
     /* center the classical gradient */
-    if (ggv->KruskalShepard_classic == classic)
+    if (ggv->KruskalShepard_classic == classic) {
       for (k=0; k<ggv->mds_dims; k++) {
         tmp = 0.;  n = 0;
         for (i=0; i<ggv->pos.nrows; i++) {
-          if (ggv->point_status.els[i] == point_is_in || 
+          if (ggv->point_status.els[i] == INCLUDED || 
               (ggv->mds_group_ind == anchorscales &&
-               ggv->point_status.els[i] == point_is_anchor)) 
+               ggv->point_status.els[i] == ANCHOR)) 
           {
             tmp += ggv->gradient.vals[i][k]; 
             n++;
           }
         }
         tmp /= n;
-        for (i=0; i<ggv->pos.nrows; i++)
-          if (ggv->point_status.els[i] == point_is_in || 
+        for (i=0; i<ggv->pos.nrows; i++) {
+          if (ggv->point_status.els[i] == INCLUDED || 
               (ggv->mds_group_ind == anchorscales &&
-               ggv->point_status.els[i] == point_is_anchor)) 
+               ggv->point_status.els[i] == ANCHOR)) 
+          {
             ggv->gradient.vals[i][k] -= tmp;
+          }
+        }
       }
+    }
+
+for (i=0; i<ggv->pos.nrows; i++) {
+ for (k=0; k<ggv->mds_dims; k++) {
+  g_printerr ("%d,%d  %2.3f\n", i, k, ggv->gradient.vals[i][k]); 
+ }
+}
 
     /* gradient normalizing factor to scale gradient to a fraction of
        the size of the configuration */
     gsum = psum = 0.0 ;
     for (i=0; i<ggv->pos.nrows; i++) {
-      if (ggv->point_status.els[i] == point_is_in || 
+      if (ggv->point_status.els[i] == INCLUDED || 
           (ggv->mds_group_ind == anchorscales &&
-           ggv->point_status.els[i] == point_is_anchor)) 
+           ggv->point_status.els[i] == ANCHOR)) 
       {
         gsum += L2_norm (ggv->gradient.vals[i], ggv);
         psum += L2_norm (ggv->pos.vals[i], ggv);
@@ -894,9 +897,15 @@ g_printerr ("num_active_dist: %d\n", ggv->num_active_dist);
 
     /* add the gradient matrix to the position matrix and drag points */
     for (i=0; i<ggv->pos.nrows; i++) {
-      if (ggv->point_status.els[i] != point_is_dragged) {
-        for (k = ggv->mds_freeze_var; k<ggv->mds_dims; k++)
+      if (ggv->point_status.els[i] != DRAGGED) {
+        for (k = ggv->mds_freeze_var; k<ggv->mds_dims; k++) {
+/*
+g_printerr ("i %d k %d prev %f gfactor %f gradient %f new %f\n",
+i, k, ggv->pos.vals[i][k], gfactor,  ggv->gradient.vals[i][k],
+ggv->pos.vals[i][k] + (gfactor * ggv->gradient.vals[i][k]));
+*/
           ggv->pos.vals[i][k] += (gfactor * ggv->gradient.vals[i][k]);
+        }
       } else {
         for (k=0; k < ggv->mds_dims; k++) 
           ggv->pos.vals[i][k] = dpos->tform.vals[i][k] ;
@@ -909,9 +918,8 @@ g_printerr ("num_active_dist: %d\n", ggv->num_active_dist);
   } /*   if (doit && num_active_dist > 0) { */
 
   /* update Shepard labels */
-  if (ggv->num_active_dist != prev_active_dist) {
+  if (ggv->num_active_dist != num_active_dist_prev) {
     /*update_shepard_labels (ggv->num_active_dist);*/
-    prev_active_dist = ggv->num_active_dist;
   }
 
 } /* end mds_once() */
