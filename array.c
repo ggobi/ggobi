@@ -77,7 +77,7 @@ arrayf_alloc (array_f *arrp, gint nr, gint nc)
 void
 arrayf_alloc_zero (array_f *arrp, gint nr, gint nc)
 {
-  int i;
+  gint i;
 
   if ((arrp->nrows != 0)||(arrp->ncols != 0))
     arrayf_free (arrp, 0, 0);
@@ -93,7 +93,7 @@ arrayf_alloc_zero (array_f *arrp, gint nr, gint nc)
 void
 arrayf_add_rows (array_f *arrp, gint nr)
 {
-  int i;
+  gint i;
 
   if (nr > arrp->nrows) {
 
@@ -105,17 +105,43 @@ arrayf_add_rows (array_f *arrp, gint nr)
   }
 }
 
-/* increase the number of columns in a floating point array */
+/* append columns to a floating point array for a total of nc columns */
 void
 arrayf_add_cols (array_f *arrp, gint nc)
 {
-  int i;
+  gint i;
 
   if (nc > arrp->ncols) {
     for (i=0; i<arrp->nrows; i++)
       arrp->vals[i] = (gfloat *) g_realloc (arrp->vals[i],
                                             nc * sizeof (gfloat));
     arrp->ncols = nc;
+  }
+}
+
+/*-- eliminate nc columns, starting at column jcol --*/
+void
+arrayf_delete_cols (array_f *arrp, gint nc, gint jcol)
+{
+  gint i, j, k;
+
+  if (nc > 0 && nc < arrp->ncols) {  /*-- forbid deleting every column --*/
+
+    gint ncols_new = arrp->ncols - nc;
+
+    if (jcol + nc <= arrp->ncols-1) {  /*-- copy before reallocating --*/
+      for (j=jcol+nc, k=jcol; j<arrp->ncols; j++, k++) {
+        /*-- copy column j into column k --*/
+        for (i=0; i<arrp->nrows; i++)
+          arrp->vals[i][k] = arrp->vals[i][j];
+      }
+    }
+
+    for (i=0; i<arrp->nrows; i++)
+      arrp->vals[i] = (gfloat *) g_realloc (arrp->vals[i],
+                                            ncols_new * sizeof (gfloat));
+
+    arrp->ncols -= nc;
   }
 }
 
@@ -227,7 +253,7 @@ arrays_add_rows (array_s *arrp, gint nr)
   }
 }
 
-/* increase the number of columns in a short integer array */
+/* append columns to a short array for a total of nc columns */
 void
 arrays_add_cols (array_s *arrp, gint nc)
 {
@@ -238,6 +264,32 @@ arrays_add_cols (array_s *arrp, gint nc)
       arrp->vals[i] = (gshort *) g_realloc (arrp->vals[i],
                                             nc * sizeof (gshort));
     arrp->ncols = nc;
+  }
+}
+
+/*-- eliminate nc columns, starting at column jcol --*/
+void
+arrays_delete_cols (array_s *arrp, gint nc, gint jcol)
+{
+  gint i, j, k;
+
+  if (nc > 0 && nc < arrp->ncols) {  /*-- forbid deleting every column --*/
+
+    gint ncols_new = arrp->ncols - nc;
+
+    if (jcol + nc <= arrp->ncols-1) {  /*-- copy before reallocating --*/
+      for (j=jcol+nc, k=jcol; j<arrp->ncols; j++, k++) {
+        /*-- copy column j into column k --*/
+        for (i=0; i<arrp->nrows; i++)
+          arrp->vals[i][k] = arrp->vals[i][j];
+      }
+    }
+
+    for (i=0; i<arrp->nrows; i++)
+      arrp->vals[i] = (gshort *) g_realloc (arrp->vals[i],
+                                            ncols_new * sizeof (gshort));
+
+    arrp->ncols -= nc;
   }
 }
 
@@ -331,7 +383,7 @@ arrayl_add_rows (array_l *arrp, gint nr)
   }
 }
 
-/* increase the number of columns in a long array */
+/* append columns to a long array for a total of nc columns */
 void
 arrayl_add_cols (array_l *arrp, gint nc)
 {
@@ -342,5 +394,31 @@ arrayl_add_cols (array_l *arrp, gint nc)
       arrp->vals[i] = (glong *)
         g_realloc (arrp->vals[i], nc * sizeof (glong));
     arrp->ncols = nc;
+  }
+}
+
+/*-- eliminate nc columns, starting at column jcol --*/
+void
+arrayl_delete_cols (array_l *arrp, gint nc, gint jcol)
+{
+  gint i, j, k;
+
+  if (nc > 0 && nc < arrp->ncols) {  /*-- forbid deleting every column --*/
+
+    gint ncols_new = arrp->ncols - nc;
+
+    if (jcol + nc <= arrp->ncols-1) {  /*-- copy before reallocating --*/
+      for (j=jcol+nc, k=jcol; j<arrp->ncols; j++, k++) {
+        /*-- copy column j into column k --*/
+        for (i=0; i<arrp->nrows; i++)
+          arrp->vals[i][k] = arrp->vals[i][j];
+      }
+    }
+
+    for (i=0; i<arrp->nrows; i++)
+      arrp->vals[i] = (glong *) g_realloc (arrp->vals[i],
+                                           ncols_new * sizeof (glong));
+
+    arrp->ncols -= nc;
   }
 }

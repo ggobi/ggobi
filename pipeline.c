@@ -78,7 +78,7 @@ pipeline_arrays_add_column (gint jvar, datad *d, ggobid *gg)
     d->jitdata.vals[i][nc-1] = 0; 
   }
 
-  /*-- world data is not populated --*/
+  /*-- world data is allocated but not populated --*/
 }
 
 
@@ -139,19 +139,6 @@ limits_adjust (gfloat *min, gfloat *max)
   }
 }
 
-/*
-static void
-vartable_lim_set (gfloat **matrix, gint jvar, datad *d, ggobid *gg)
-{
-  gfloat min, max;
-
-  min_max (matrix, jvar, &min, &max, d, gg);
-  limits_adjust (&min, &max);
-  d->vartable[jvar].lim_raw.min = min;
-  d->vartable[jvar].lim_raw.max = max;
-}
-*/
-
 void
 vartable_lim_update (datad *d, ggobid *gg)
 {
@@ -159,11 +146,6 @@ vartable_lim_update (datad *d, ggobid *gg)
   gfloat min, max;
 
   for (j=0; j<d->ncols; j++) {
-
-/* redundant with vartable_stats_set
-    vartable_lim_set (d->raw.vals, j, d, gg);
-    vartable_lim_set (d->tform.vals, j, d, gg);
-*/
 
     if (d->vartable[j].lim_specified_p) {
       min = d->vartable[j].lim_specified_tform.min;

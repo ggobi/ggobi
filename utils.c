@@ -52,22 +52,6 @@ randvalue (void) {
 /*-- returns two random numbers on [-1,1] --*/
 void
 rnorm2 (gdouble *drand, gdouble *dsave) {
-
-/*
-#if defined (_WIN32)
-  *drand = 2.0 * randvalue() - 1.0;
-  *dsave = 2.0 * randvalue() - 1.0;
-#elif defined (USE_RANDOM)
-  glong lrand, lsave;
-  lrand = random ();
-  lsave = random ();
-  *drand = 2.0 * (gdouble) lrand / (gdouble) INT_MAX - 1.0;
-  *dsave = 2.0 * (gdouble) lsave / (gdouble) INT_MAX - 1.0;
-#else
-  *drand = 2.0 * drand48() - 1.0;
-  *dsave = 2.0 * drand48() - 1.0;
-#endif
-*/
   *drand = 2.0 * genrand () - 1.0;
   *dsave = 2.0 * genrand () - 1.0;
 }

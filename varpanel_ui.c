@@ -107,7 +107,6 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   datad *d, ggobid *gg) 
 {
   gint nc = d->ncols + 1;
-/*  gint j;*/
   
   /*-- set a view of the data values before adding the new label --*/
   vartable_row_append (d->ncols-1, d, gg);
