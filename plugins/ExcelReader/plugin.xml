@@ -27,7 +27,23 @@
   </footnote>. If the data came to be in Excel
   from a database query, or some other input mechanism such as from a
   URL, there need be no local file.
- 
+
+ <para/>
+
+Examples for other input sources include ADO, OIM files from MSSQL and
+SAS, ... 
+Since we are using DCOM, we can also use it for displaying help pages
+and other clients.
+
+<para/>
+
+We might also make GGobi a COM server and allow it to be invoked from
+Excel rather than vice-versa.  One of the simplest ways to program
+this is to create the COM server as an R COM server and use the Rggobi
+mechanism to implement the different methods.  This is reasonably
+easy. See <s:package>RDCOMServer</s:package>.
+
+
 
 <para/>
 The mechanism for reading the data is as follows.
