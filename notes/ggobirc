@@ -68,7 +68,7 @@ cvs
  </plugin>
 <plugin name="Barplot Display Type" load="immediate"><!-- load may be on demand. -->
    <description>Display barplot for a variable.</description>
-   <author>Heike Hoffman, Debbyg Swayne, Duncan Temple Lang</author>
+   <author>Heike Hoffman, Debby Swayne, Duncan Temple Lang</author>
    <dll name="plugins/CategoricalPlots/CategoricalPlots.so">
     <init onUpdateDisplayMenu="addBarplotMenuItems" />
   </dll>
