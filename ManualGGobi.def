@@ -71,7 +71,6 @@ EXPORTS
  ggobiInit
  GGobi_nrecords
  GGobi_ncols
- GGobi_getDataModeDescription
  GGobi_getDataModeNames
  fileset_read_init
  display_menu_build

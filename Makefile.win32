@@ -206,7 +206,7 @@ endif
 #     -L ../gtk-win/glib \
 #     -L ../gtk-win/pthreads 
 
-.c.o:
+.c.o:  config.h
 	$(CC) -c $(CFLAGS) $(DEFINES) $(INC)  $*.c
 
 # Emacs's tags for navigating through the source.
@@ -220,12 +220,18 @@ tags:
 
 ggobi-API.o ggobi.o: config.h
 
+ifdef USE_DEVELOPER_CONFIG
 config.h: developerConfigure
 	./developerConfigure
 
 developerConfigure: developerConfigure.in
 	autoconf $< > $@
 	chmod +x $@
+else
+config.h: VersionInfo Install/configureWin
+	(cd Install ; ./configureWin)
+endif
+
 
 # If USE_XML, may need to add XML_LIB_DIRS and XML_INC_DIRS
 local.config:
@@ -297,7 +303,8 @@ include VersionInfo
 
 installer: tmp/ggobirc libs ggobi.iss ggobi.exe libggobi.a ggobi.dll
 	$(INNO) $(INNO_FLAGS) ggobi.iss
-	mv Output/setup.exe Output/ggobi_${MAJOR_VERSION}.${MINOR_VERSION}-${PATCH_LEVEL}.exe
+	mv Output/setup.exe Output/ggobi_${MAJOR_VERSION}.${MINOR_VERSION}-${PATCH_LEVEL}${VERSION_QUALIFIER}.exe
+
 
 # xmlConvert
 winggobi.zip: ggobi 
