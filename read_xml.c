@@ -868,6 +868,7 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
   if (tmp) {
     arrayf_alloc (&d->raw, d->nrows, d->ncols);
     hidden_alloc (d);
+    hidden_init (d);
   }
 
   data->current_variable = 0;

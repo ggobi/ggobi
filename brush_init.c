@@ -73,10 +73,11 @@ br_color_ids_alloc (datad *d, ggobid *gg)
   vectors_realloc (&d->color, d->nrows);
   vectors_realloc (&d->color_now, d->nrows);
   vectors_realloc (&d->color_prev, d->nrows);
-
+/*  allocation and initialization should be separate
   for (i=0; i<d->nrows; i++)
     d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] =
       gg->color_0;
+*/
 }
 
 void
@@ -99,14 +100,15 @@ hidden_alloc (datad *d)
   vectorb_realloc (&d->hidden, d->nrows);
   vectorb_realloc (&d->hidden_now, d->nrows);
   vectorb_realloc (&d->hidden_prev, d->nrows);
- 
+/*  allocation and initialization should be separate
   memset (d->hidden.els, '\0', sizeof (gboolean)*d->nrows);
   memset (d->hidden_now.els, '\0', sizeof (gboolean)*d->nrows);
   memset (d->hidden_prev.els, '\0', sizeof (gboolean)*d->nrows);
+*/
 }
 
 void
-hidden_init (datad *d, ggobid *gg)
+hidden_init (datad *d)
 {
   gint i;
 

@@ -586,7 +586,7 @@ hidden_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
        addInputSuffix(desc, suffixes[whichSuffix]);
   } else {
     if (reinit)
-      hidden_init (d, gg);
+      hidden_init (d);
   }
 
   if(fileName) 
