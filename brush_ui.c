@@ -330,7 +330,7 @@ motion_notify_cb(GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
 #if TEST_BRUSH_MOTION_CB
     fprintf(stderr,
             "emiting brush motion signal (w) %p (gg) %p (sp) %p (event) %p\n",
-            w, gg, sp, event);
+              (void *) w,  (void*) gg,  (void*) sp, (void *)event);
     fflush(stderr);
 #endif
 /*XX is this the correct source object? */
