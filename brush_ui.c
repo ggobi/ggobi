@@ -304,6 +304,29 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
     assign_points_to_bins (d, gg);
     /*-- reset the number and properties of the brush groups --*/
     clusters_set (d, gg);
+
+/*   ??
+ *  gtk_signal_emit (GTK_OBJECT (gg->main_window),
+ *    gg->signal_symbols_changed, gg); 
+ */
+
+    /*-- If we've also been brushing an edge set, set its clusters --*/
+    if (display->e != NULL && cpanel->br_edge_targets != BR_OFF) {
+      clusters_set (display->e, gg);
+    }
+    /*-- If we've been brushing by variable, set everybody's clusters --*/
+    if (cpanel->br_linkby == BR_LINKBYVAR) {
+      GSList *l;
+      datad *dd;
+      for (l = gg->d; l; l = l->next) {
+        dd = (datad *) l->data;
+        if (dd != d) {
+          clusters_set (dd, gg);
+        }
+      }
+    }
+
+    /*-- this updates the tables for every datad --*/
     cluster_table_update (d, gg);
   }
 
