@@ -1,0 +1,5 @@
+if test -n "${LD_LIBRARY_PATH}" ; then
+ LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:@LD_PATH@
+else
+ LD_LIBRARY_PATH=@LD_PATH@
+fi

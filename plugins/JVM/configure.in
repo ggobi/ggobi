@@ -46,7 +46,12 @@ AC_SUBST(JAVAH)
 AC_SUBST(JAVA)
 
 PWD=`pwd`
+
+LD_PATH=`${JAVA} -classpath . vendor java.library.path`
+LD_PATH="${LD_PATH}:${PWD}:${PWD}/../.."
+AC_SUBST(LD_PATH)
+
 AC_SUBST(PWD)
 AC_SUBST(JAVA_GNOME_DIR)
 
-AC_OUTPUT(local.config Gtk/plugin.xml)
+AC_OUTPUT(local.config Gtk/plugin.xml setLD.bsh setLD.csh)
