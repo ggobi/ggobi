@@ -11,16 +11,14 @@ API code needed:
   sticky labels
   imputation of missing values
 
-sphering:
-  sphering needs to check whether the d it's working with has
-     changed
-  the interface is still a bit confusing; talk to Andreas
-
 various stuff not yet implemented: 
   1d, xy cycling  .... or leave it as a demo in R for now?
   some window closings  (display tree, ...)
   row groups are only partially implemented; line groups
     will wait until we know what we want to do about lines.
+
+datad
+  check for note in transform.c
 
 
 when brushing or identifying in parcoords, use leave/enter events to
@@ -64,7 +62,6 @@ Food for thought:
   * maps; data as polygons -- for summer 2001?
 
   * Do we need rotation any more?
-
 
 ! it now works to start ggobi without an argument; a necessary step
 ! in the API preparation.
@@ -144,3 +141,8 @@ Food for thought:
 !   whenever the number (or contents) of the d's has changed.
 
 ! moving points -- works in 2d plots
+
+! sphering needs to check whether the d it's working with has
+!    changed; done
+! sphering: redesigned the tool window
+

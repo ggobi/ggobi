@@ -38,6 +38,21 @@ void sphere_totvar_set (gfloat x, datad *d, ggobid* gg)
 /*                          callbacks                                      */
 /*-------------------------------------------------------------------------*/
 
+static void
+deleteit (ggobid *gg) {
+  gtk_widget_hide (gg->sphere_ui.window);
+
+  gdk_pixmap_unref (gg->sphere_ui.scree_pixmap);
+  gtk_widget_destroy (gg->sphere_ui.window);
+
+  gg->sphere_ui.window = NULL;
+  gg->sphere_ui.scree_da = NULL;
+  gg->sphere_ui.scree_pixmap = NULL;
+  gg->sphere_ui.condnum_entry = NULL;
+  gg->sphere_ui.totvar_entry = NULL;
+  gg->sphere_ui.apply_btn = NULL;
+}
+
 void
 sphere_npcs_set_cb (GtkAdjustment *adj, ggobid *gg) 
 {
@@ -47,20 +62,93 @@ sphere_npcs_set_cb (GtkAdjustment *adj, ggobid *gg)
   sphere_npcs_set (n, d, gg);
 }
 
-static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
-  gtk_widget_hide (gg->sphere_ui.window);
+static void
+delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
+  deleteit (gg);
+}
 
-  gdk_pixmap_unref (gg->sphere_ui.scree_pixmap);
+void
+sphere_tform_clear (ggobid *gg) {
+/*-- remove the sphering transformation from all variables --*/
+  gint j;
+  datad *d = gg->current_display->d;
+  for (j=0; j<d->ncols; j++) {
+    if (d->vardata[j].tform2 == SPHERE) {
+      transform_variable (2, NO_TFORM2, 0, j, d, gg);
+    }
+  }
+}
 
-  gtk_widget_destroy (gg->sphere_ui.apply_btn);
-  gtk_widget_destroy (gg->sphere_ui.condnum_entry);
-  gtk_widget_destroy (gg->sphere_ui.totvar_entry);
-  gtk_widget_destroy (gg->sphere_ui.scree_da);
-  gtk_widget_destroy (gg->sphere_ui.window);
+static void
+sphere_apply_cb (GtkWidget *w, ggobid *gg) { 
+/*
+ * finally, sphere the number of principal components selected;
+ * executed when the apply button is pressed
+*/
+  gint j;
+  datad *d = gg->current_display->d;
+  gfloat firstpc = d->sphere.eigenval[0];
+  gfloat lastpc = d->sphere.eigenval[d->sphere.npcs-1];
 
-  gg->sphere_ui.scree_da = NULL;
-  gg->sphere_ui.scree_pixmap = NULL;
-  gg->sphere_ui.window = NULL;
+  /* 
+   * if datad has changed, refuse to do anything until the
+   * user has closed and reopened the tool window.
+  */
+  if (gg->sphere_ui.d != d) {
+    g_printerr ("Close and reopen this window, please\n");
+    return;
+  }
+
+  sphere_tform_clear (gg);
+
+  if (d->sphere.npcs > 0 && d->sphere.npcs <= d->sphere.nvars)
+  {
+    if (lastpc == 0.0 || firstpc/lastpc > 10000.0) {
+      quick_message ("Need to choose fewer PCs. Var-cov close to singular.",
+        false);
+    }
+    else {
+      spherize_data (d->sphere.npcs, d->sphere.nvars, d->sphere.vars, d, gg);
+      sphere_varcovar_set (d, gg);
+/*    pc_axes_sensitive_set (true);*/
+
+      /*-- set transform2 to SPHERE for the first npcs variables --*/
+      for (j=0; j<d->sphere.npcs; j++) {
+/*      d->vardata[ d->sphere.vars[j] ].tform2 = SPHERE;*/
+        transform2_values_set (SPHERE, d->sphere.vars[j], d, gg);
+        tform_label_update (d->sphere.vars[j], d, gg);
+      }
+      /*-- --*/
+
+/*
+      for (j=0; j<d->sphere.nvars; j++)
+        tform_label_update (d->sphere.vars[j], d, gg);
+*/
+
+      /*-- these three lines replicated from transform.c --*/
+      vardata_lim_update (d, gg);
+      tform_to_world (d, gg);
+      displays_tailpipe (REDISPLAY_PRESENT, gg);
+    }
+  }
+}
+
+/*
+ * reset the scree plot when the number of identify of the selected
+ * variables has changed
+*/
+static void
+sphere_reset_cb (GtkWidget *w, ggobid *gg) { 
+  sphere_tform_clear (gg);
+  scree_plot_make (gg);
+}
+
+/*
+ * close the window
+*/
+static void
+sphere_close_cb (GtkWidget *w, ggobid *gg) { 
+  deleteit (gg);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -95,14 +183,13 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 
   gint *sphvars = (gint *) g_malloc (d->ncols * sizeof (gint));
   gfloat *evals = (gfloat *) g_malloc (d->ncols * sizeof (gfloat));
-  gint nsphvars = spherevars_get (sphvars, d, gg);
 
   CHECK_GG (gg);
 
   eigenvals_get (evals, d, gg);
 
-for (j=0; j<nsphvars; j++)
-g_printerr ("(expose) sphvar %d eval %f\n", sphvars[j], evals[j]);
+for (j=0; j<d->sphere.nvars; j++)
+g_printerr ("(expose) sphvar %d eval %f\n", d->sphere.vars[j], evals[j]);
 
   /* clear the pixmap */
   gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
@@ -115,8 +202,8 @@ g_printerr ("(expose) sphvar %d eval %f\n", sphvars[j], evals[j]);
   gdk_draw_line (gg->sphere_ui.scree_pixmap, gg->plot_GC, 10, 90, 190, 90);
   gdk_draw_line (gg->sphere_ui.scree_pixmap, gg->plot_GC, 10, 90, 10, 10);
 
-  for (j=0; j<nsphvars; j++) {
-    xpos = (gint) (180./(gfloat)(nsphvars-1)*j+10);
+  for (j=0; j<d->sphere.nvars; j++) {
+    xpos = (gint) (180./(gfloat)(d->sphere.nvars-1)*j+10);
     ypos = (gint) (90. - evals[j]/evals[0]*80.);
 
     tickmk = g_strdup_printf ("%d", j+1);
@@ -145,12 +232,14 @@ g_printerr ("(expose) sphvar %d eval %f\n", sphvars[j], evals[j]);
 
 /*
  * Calculate the svd and display results in a scree plot
+ * Called when the sphere panel is opened, and when the reset
+ * button is pressed.
 */
-void scree_plot_make (ggobid *gg)  /*-- when sphere panel is opened --*/
+void scree_plot_make (ggobid *gg)
 {
   datad *d = gg->current_display->d;
 
-  if (pca_calc (d, gg)) {
+  if (pca_calc (d, gg)) {  /*-- spherevars_set is called here --*/
     gboolean rval = false;
     gtk_signal_emit_by_name (GTK_OBJECT (gg->sphere_ui.scree_da),
       "expose_event", (gpointer) gg, (gpointer) &rval);
@@ -164,20 +253,22 @@ void scree_plot_make (ggobid *gg)  /*-- when sphere panel is opened --*/
 /*                     Create and map the sphere panel                     */
 /*-------------------------------------------------------------------------*/
 
-/*-- this should be independent of datad --*/
 void
 sphere_panel_open (ggobid *gg)
 {
   GtkWidget *frame0, *main_vbox, *vbox, *frame;
   GtkWidget *label;
   GtkWidget *spinner;
-  gint nvars;
   datad *d = gg->current_display->d;
 
   spherevars_set (d, gg);
+/*
+  gint nvars;
   nvars = nspherevars_get (d, gg);
+*/
 
   if (gg->sphere_ui.window == NULL) {
+    gg->sphere_ui.d = d;
 
     gg->sphere_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->sphere_ui.window),
@@ -190,9 +281,18 @@ sphere_panel_open (ggobid *gg)
     main_vbox = gtk_vbox_new (false, 2);
     gtk_container_add (GTK_CONTAINER (gg->sphere_ui.window), main_vbox);
 
-    /*-- element 1 of main_vbox: scree plot --*/
+    /*-- element 1: reset scree plot when n selected vars changes --*/
+    gg->sphere_ui.reset_btn = gtk_button_new_with_label ("Reset scree plot");
+    gtk_box_pack_start (GTK_BOX (main_vbox), gg->sphere_ui.reset_btn,
+      false, false, 0);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.reset_btn,
+      "Reset scree plot when the selected variables have been reset",
+      NULL);
+    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.reset_btn), "clicked",
+                        GTK_SIGNAL_FUNC (sphere_reset_cb), gg);
+
+    /*-- element 2 of main_vbox: scree plot --*/
     frame = gtk_frame_new ("Scree plot");
-/*    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);*/
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
     gtk_box_pack_start (GTK_BOX (main_vbox), frame, true, true, 2);
@@ -217,7 +317,7 @@ sphere_panel_open (ggobid *gg)
                         (GtkSignalFunc) scree_configure_cb,
                         (gpointer) gg);
 
-    /*-- element 2 of main_vbox: controls in a labelled frame --*/
+    /*-- element 3 of main_vbox: controls in a labelled frame --*/
     frame0 = gtk_frame_new ("Specify number of PCs");
     gtk_frame_set_shadow_type (GTK_FRAME (frame0), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (main_vbox), frame0, true, false, 1);
@@ -228,8 +328,8 @@ sphere_panel_open (ggobid *gg)
 
     /* Spinner: number of principal components */
     /*-- the parameters of the adjustment should be reset each time --*/
-    gg->sphere_ui.npcs_adj = gtk_adjustment_new ((gfloat) nvars, 1.0,
-       (gfloat) d->ncols, 1.0, 5.0, 0.0);
+    gg->sphere_ui.npcs_adj = gtk_adjustment_new ((gfloat) d->sphere.nvars,
+       1.0, (gfloat) d->ncols, 1.0, 5.0, 0.0);
 
     gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.npcs_adj),
                         "value_changed",
@@ -277,15 +377,23 @@ sphere_panel_open (ggobid *gg)
     gtk_widget_show (gg->sphere_ui.condnum_entry);
 
 
-    /*-- third: after choosing nPCs, the apply button --*/
-    gg->sphere_ui.apply_btn = gtk_button_new_with_label ("Apply");
+    /*-- last: after choosing nPCs, the apply button --*/
+    gg->sphere_ui.apply_btn = gtk_button_new_with_label ("Apply sphering");
     gtk_box_pack_start (GTK_BOX (main_vbox), gg->sphere_ui.apply_btn,
       false, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.apply_btn,
-      "Apply principal components transformation to the first n variables",
+      "Apply principal components transformation to the first n selected variables",
       NULL);
     gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.apply_btn), "clicked",
                         GTK_SIGNAL_FUNC (sphere_apply_cb), gg);
+
+    gg->sphere_ui.close_btn = gtk_button_new_with_label ("Close");
+    gtk_box_pack_start (GTK_BOX (main_vbox), gg->sphere_ui.close_btn,
+      false, false, 0);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.close_btn,
+      "Close the sphering window", NULL);
+    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.close_btn), "clicked",
+                        GTK_SIGNAL_FUNC (sphere_close_cb), gg);
   }
 
   gtk_widget_show_all (gg->sphere_ui.window);

@@ -21,6 +21,7 @@ extern gdouble erf (gdouble);  /*-- defined in math.h, but being ignored --*/
 
 static gchar *domain_error_message = "Data outside the domain of function.";
 
+/*-- uh-oh, I bet these belong in datad -- dfs --*/
 /*
  * These variables should always match the displayed values in
  * the variable transformation panel -- domain_adj, too

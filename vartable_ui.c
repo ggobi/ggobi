@@ -168,7 +168,7 @@ vartable_open (ggobid *gg)
     gtk_signal_connect (GTK_OBJECT (gg->vardata_window),
       "delete_event", GTK_SIGNAL_FUNC (delete_cb), gg);
     gtk_window_set_title (GTK_WINDOW (gg->vardata_window),
-      "Variable statistics");
+      "Variable selection and statistics");
 
     vbox = gtk_vbox_new (false, 5);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);

@@ -121,17 +121,6 @@ spherevars_set (datad *d, ggobid *gg) {
     d->sphere.nvars = plotted_cols_get (d->sphere.vars, false, d, gg);
 }
 
-gint
-spherevars_get (gint *vars, datad *d, ggobid *gg) {
-  gint j;
-  for (j=0; j<d->sphere.nvars; j++)
-    vars[j] = d->sphere.vars[j];
-  return d->sphere.nvars;
-}
-
-gint 
-nspherevars_get (datad *d, ggobid *gg) { return d->sphere.nvars; }
-
 /*-------------------------------------------------------------------------*/
 /*    eigenvector and eigenvalues routines                                 */
 /*-------------------------------------------------------------------------*/
@@ -308,48 +297,6 @@ spherize_data (gint num_pcs, gint nsvars, gint *svars, datad *d, ggobid *gg)
   }
 }
 
-void
-sphere_apply_cb (GtkWidget *w, ggobid *gg) { 
-/*
- * finally, sphere the number of principal components selected;
- * executed when the apply button is pressed
-*/
-  gint j;
-  datad *d = gg->current_display->d;
-  gfloat firstpc = d->sphere.eigenval[0];
-  gfloat lastpc = d->sphere.eigenval[d->sphere.npcs-1];
-
-  /*-- reset the transformations appropriately for all sphere.vars --*/
-  for (j=0; j<d->sphere.nvars; j++)
-    d->vardata[j].tform2 = (j < d->sphere.npcs) ? SPHERE : NO_TFORM2;
-  /*-- --*/
-
-  if ((d->sphere.npcs > 0) &&
-      (d->sphere.npcs <= d->sphere.nvars))
-  {
-    if (lastpc == 0.0 || firstpc/lastpc > 10000.0) {
-      quick_message ("Need to choose fewer PCs. Var-cov close to singular.",
-        false);
-    }
-    else {
-      spherize_data (d->sphere.npcs,
-        d->sphere.nvars, d->sphere.vars, d, gg);
-      sphere_varcovar_set (d, gg);
-/*    pc_axes_sensitive_set (true);*/
-
-/*-- somehow the transformation has to be reset before this is done --*/
-      for (j=0; j<d->sphere.nvars; j++)
-        tform_label_update (d->sphere.vars[j], d, gg);
-
-      /*-- these three lines replicated from transform.c --*/
-      vardata_lim_update (d, gg);
-      tform_to_world (d, gg);
-      displays_tailpipe (REDISPLAY_PRESENT, gg);
-    }
-  }
-}
-
-
 /*-------------------------------------------------------------------------*/
 /*          Principal components analysis routines:                        */
 /*  executed when the sphere button is pressed and the scree plot opened   */
@@ -357,12 +304,12 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
 
 /*-- why is this?  until apply is clicked, they're not going to be
      transformed, are they?
---*/
 void sphere_transform_set (datad *d, ggobid *gg) {
   gint j;
   for (j=0; j<d->sphere.nvars; j++)
     transform2_values_set (SPHERE, d->sphere.vars[j], d, gg); 
 }
+--*/
 
 
 gboolean
@@ -374,7 +321,10 @@ pca_calc (datad *d, ggobid *gg) {
   }
 
   spherevars_set (d, gg);
+/*
+ * I don't understand the reason for this, so I'm commenting it out -- dfs
   sphere_transform_set (d, gg);
+*/
   sphere_varcovar_set (d, gg);
   
    /* If nspherevars > 1 use svd routine, otherwise just standardize */
