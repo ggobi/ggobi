@@ -101,6 +101,17 @@ export TEXINPUTS=$TEXINPUTS:$OMEGA_HOME
 
 3. cd Web, make install
 
+(You may need to set GGOBI_SRC to the location of the src code, and
+hence the notes directory which contains pieces for the web site. And
+also TAR_FILE, RGGOBI_TAR_FILE to the locations of the tar.gz files.
+
+Also with the CVSROOT variable set to
+   franz.stat.wisc.edu:/home/xgobi/CVSRoot
+and CVS_RSH set to
+   ssh
+)
+
+
 R-GGobi Installation from cvs
 =============================
 
