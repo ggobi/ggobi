@@ -141,44 +141,62 @@ setup and importantly provides a uniform and increasingly familiar
 interface for the user for specifying files.
 
 
-
-
 \section{The File Format}
-The format of the file is described by the 
-DTD (Document Type Definition) 
-\texttt{ggobi.dtd}
 
-The file starts with the usual XML
-declarations that identify it as XML
-(and its version)
-and the particular document type
-and associated DTD.
+The format of the file is described by the DTD (Document Type
+Definition) \texttt{ggobi.dtd}.  [Not at the moment, I bet.]
+The file starts with the usual XML declarations that identify it as
+XML (and its version) and the particular document type and associated
+DTD.
+
+% This doesn't work now; I get a core dump.
+%<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
 \begin{verbatim}
 <?xml version="1.0"?>
-<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+<ggobidata>
 \end{verbatim}
+%
 The string ggobidata indicates that this is the top-level tag for the
-document, and this is what appears next.  The attributes of this tag
-specify the number of records in the dataset.  The identifier for a
-missing value can also be specified as an attribute
-(\texttt{missingValue}). (We might allow this to be overridden for
-each variable.)
-
-Also, default values for different characteristics of the observations
-can be specified here.  For example, the glyph type and size, the
-color of an observation, etc. can all be specified here.  These are
-applied to the individual observations for which they are not
-specified.  So, such an entry might look like
+document, and this is what appears next.  To specify that more than
+one dataset is inlcuded, use the \texttt{count} attribute:
+%
 \begin{verbatim}
-<ggobidata numRecords="" color="2" glyphType="fc" glyphSize="3">
+<ggobidata count="2">
 \end{verbatim}
+%
+This tag must be terminated at the end of the file:
+\begin{verbatim}
+</ggobidata>
+\end{verbatim}
+
+\subsection{Data}
+
+This is followed by the \texttt{data} tag, which begins the
+entries for a dataset:
+
+\begin{verbatim}
+<data name="Flea beetles">
+\end{verbatim}
+%
+Here you can also specify the name which will appear in the titlebars
+of ggobi windows.
+
+There can be multiple datasets within a file, and there can be two
+types of relationships among their elements: 
+\begin{itemize}
+\item records in multiple datasets can represent different variables
+  recorded for the same subject, as described in section
+  \ref{LinkingRecords}, or
+\item one dataset can contain a description of edges which connect
+  points in another, as described in section \ref{Edges}.
+\end{itemize}
+
 The remainder of the dataset is specified as sub-elements or sub-tags
-within this \texttt{ggobidata} element.  Thus, there must be a
-termination of this \texttt{ggobidata} at the end of the file.
-
-
+within this \texttt{data} element.
 
 \subsection{Colormap}
+
 The user can specify rows of a color table in RGB format.  (Perhaps
 different formats such HSV, etc. can be supported directly by GTK
 also.)  The idea is that colors for records, etc.  are specified as
@@ -217,10 +235,6 @@ are accumulated so that the size of the table is the sum of the two
 sizes.  This can lead to oversized tables.
 
 
-
-
-
-
 External color map files can be formatted using XML (see
 \file{data/stdColorMap.xml}) or as a simple rectangular array.  In the
 latter case, each row should contain 3 values separated by white
@@ -257,106 +271,148 @@ amount.  This allows one to easily use different scales such as 0 to 1
 or 0 to 100, etc. This is designed to assist when the software
 creating the file does not facilitate such rescaling.
 
+\subsection{Description}
 
-\section{Description}
+The second of the sub-elements within the \texttt{data} tag is
+a description of the datasets.
 
-The second of the sub-elements is a description of the datasets.  This
-includes the source, any references, etc.  This is currently
+\begin{verbatim}
+<description>
+Physical measurements on flea beetles.
+</description>
+\end{verbatim}
+
+This includes the source, any references, etc.  This is currently
 free-format.  A convenient attribute is \texttt{source} which
 indicates where it can be found.
 
 \subsection{Variables}
-The next element of the file 
-lists the variables.
+
+The next section of the file contains the descriptions of
+the variables.  It begins with the \texttt{variables} tag,
+which must include the number of variables:
+
 \begin{verbatim}
-<variables>
-<variable name="A" group="1" />
-<variable name="B" group="1" />
+<variables count="3">
 </variables
 \end{verbatim}
-The name of the variable
-can be specified as the text within the
-variable tag rather than as an attribute.
+%
+Between the \texttt{variables} tags, the file lists the variables,
+which can be continuous or categorical.  Continuous variables are
+specified simply:
+\begin{verbatim}
+<realvariable>
+ <name> tars1 </name>
+</realvariable>
+\end{verbatim}
+% 
+For categorical variables, it's also necessary to list their
+levels and specify the mapping between data value and level, because
+the data values in the \texttt{record} tag are numbers.
+\begin{verbatim}
+<categoricalvariable>
+  <name> fraudp </name>
+  <levels count="3">
+    <level value="0">low</level>
+    <level value="1">medium</level>
+    <level value="2">high</level>
+  </levels>
+</categoricalvariable>
+\end{verbatim}
 
-The name of the transformed variable can be specified via the
-attribute \texttt{transformedName}.
+%The name of the variable can be specified as the text within the
+%variable tag rather than as an attribute.
 
-The group attribute allows variables to be joined for the same purpose
-as ifentified by the .vgroups file in the old format.  Variables
-within the same group are scaled ``jointly''.
+%The name of the transformed variable can be specified via the
+%attribute \texttt{transformedName}.
+
+% this is obsolete, but can we specify ranges?
+%The group attribute allows variables to be joined for the same purpose
+%as ifentified by the .vgroups file in the old format.  Variables
+%within the same group are scaled ``jointly''.
 
 Additionally, instructions as to how to create the variable can be
-specified as a programming command via the Programming Instruction
-(PI)
+specified as a programming command via the Programming Instruction (PI)
 \begin{verbatim}
-<variable>
+<realvariable>
 <?R rnorm(10)>
-</variable>
+</realvariable>
 \end{verbatim}
 
 \subsection{Records}
+
 The next section of the file is the data itself.  The individual
 \texttt{record} tags are contained within the \texttt{records}
-element.  The body or content of each \texttt{record} is a simply
-ASCII listing of the values. Each value is separated by white space
-(space character, tabs or new lines).
+element, which must include the \texttt{count} attribute, specifying
+the number of records in the data.
 
+\begin{verbatim}
+<records count="74" color="2" glyphType="fc" glyphSize="3" missingValue=".">
+
+</records>
+\end{verbatim}
+%
+It may optionally include tags specifying the default color (the
+index in the color table), glyph type and size, or the character to
+interpret as a missing value.
+
+The body or content of each \texttt{record} is a simply ASCII listing
+of the values. Each value is separated by white space (space
+character, tabs or new lines).
 
 A record can be considered ``hidden''.  This is set via a logical
 value for the attribute \texttt{hidden}.
 
-
 Each record can be given an \XMLAttribute{id} attribute value.  This
-is different from a label in that it is not used by the ggobid
-instance when displaying plots.  Instead, it is used only when reading
-the line segment information that connects different points.  (See
-below). The \XMLAttribute{id} is a symbolic name or tag used to
-uniquely identify a record.  These are mainted by the parser and can
-be used as alternatives to row numbers when specifying the source and
-destination records in a line segment.
+is different from a label in that it is not used by ggobi instance
+when displaying plots.  Instead, it is used only to uniquely identify
+a record within a dataset, and it has two purposes.
 
+\subsubsection{Linking Records}
+\label{LinkingRecords}
 
-\subsection{Segments}
-Connections between points can be specified via the \XMLTag{segments}
-tag.  Like records, the individual \XMLTag{segment} entries are
-contained within a \XMLTag{segments} entry.  Also, the latter must
-specify the \XMLAttribute{size} attribute to identify how many entries
-to expect.
+The \XMLAttribute{id} can be used in the case where different
+datasets contain different variable for the same subjects, or
+for some of the same subjects.  For instance, dataset A may contain
+usage data for a set of customers, while dataset B contains
+demographic data for a subset of those customers.  Those datasets
+will be linked for brushing and identification if they have the
+same value for \XMLAttribute{id}.
 
-Each line segment can have characteristics such as line color, width,
-whether it is hidden or not, etc.  Default values for these
-characteristics can be set via the attributes of the \XMLTag{segments}
-tag.
+\subsubsection{Edges}
+\label{Edges}
 
-Each individual segment must have a \XMLAttribute{source} and
-\XMLAttribute{destination} attribute.  The value for each of these is
-a record identifier.  This can be simply the row number (starting at
-1).  Alternatively, as explained above, this can be the value of an
-\XMLAttribute{id} assigned to a \XMLAttribute{record} tag earlier in
-the input.
+The \XMLAttribute{id} is also a critical part of the specification
+of edges.  In order to specify a set of edges, or line segments,
+between pairs of points in a dataset, it's necessary to define
+a second dataset whose records have \XMLAttribute{source}
+and \XMLAttribute{destination} tags, like this:
 
-The different appearance characteristics of the line
-are specified via
-the attributes
-\XMLAttribute{width}, 
-\XMLAttribute{color},
-\XMLAttribute{type}
-and
-\XMLAttribute{hidden}
+\begin{verbatim}
+<record source="0" destination="2"> </record>
+\end{verbatim}
+% 
+The values used for \XMLAttribute{source} and \XMLAttribute{destination}
+must correspond to the \XMLAttribute{id}s specified elsewhere.
 
-
-
-
+A record which includes this edge specification can also include
+any other attribute or property of a record:
+\begin{verbatim}
+<record source="0" destination="2" color="3"> 4.2 6 9.6 </record>
+\end{verbatim}
+%
+If other data values are present, this dataset is like any other
+dataset, and the values can be displayed in scatterplots, 
+parallel coordinate plots, and so on.
 
 
 \section{Using XML Files}
-To use data that is contained in an XML file, invoke ggobi with the
-command line flag \texttt{-x}.
+To use data that is contained in an XML file, invoke ggobi with no
+command line flag, or with the command line flag \texttt{-x}.
 
+% Does it do this now?
 In the future, ggobi could be smart enough to include the detection of
 the XML format.
-
-
 
 \section{Conversion of Old Files}
 The distribution contains an application named xmlConvert that can be

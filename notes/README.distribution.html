@@ -66,7 +66,12 @@ Then, run the compile ggobi
 If you add or remove a <i>.c</i> or <i>.h</i> file from the ggobi
 codebase, then you will have edited the <b>Makefile</b> in the
 <i>ggobi/</i> directory of your working copy of the code checked out
-from CVS.  You will also need to tell the installation scripts about
+from CVS.   (If you do your development work under MS Windows, you
+will have instead edited <b>Makefile.win32.</b>  You need to add or
+remove the file from the one you do not use.)
+
+<p>
+You will also need to tell the installation scripts about
 the change.  When one calls <code>make ADMIN=1</code> this uses the
 rules in the <i>GNUmakefile.admin</i> in the <i>Install/</i>
 directory.  This file is responsible for copying all of the relevant
@@ -75,16 +80,14 @@ It copies all of the C files listed in the regular, top-level
 <b>Makefile</b> in the <b>SRC</b> variable.
 Therefore, any new files that are needed for the build
 or files that are removed should be handled automatically.
-<p/>
 
+<p>
 Now, when one goes to build the distribution in
 <i>/tmp/Install/ggobi</i> the <i>src/GNUmakefile</i> needs to know
 which files to compile.  So you must edit the file
 <b>Install/GNUmakefile_src.in</b> in your working directory (i.e. not
 the directory <i>/tmp/Install/ggobi/</i>) and edit the list of files
 specified there in the <b>SRC</b> variable.
-    
-
 
 <h3>Committing Removed files</h3>
 
