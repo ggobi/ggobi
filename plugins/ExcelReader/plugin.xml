@@ -6,7 +6,7 @@
     <init description="ExcelDataDescription" onLoad="onLoad"/>
    </dll>
    <usage>
-     ggobi --init=ggobi.init  --datamode=excel
+    ggobi --init=ggobi.init --datamode=excel d:\\duncan\\quakesNoNames.xls 
    </usage>
    <documentation xmlns:r="http://cran.r-project.org"
                   xmlns:com="http://www.microsoft.com"

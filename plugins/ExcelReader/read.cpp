@@ -23,12 +23,14 @@ extern void COMError(HRESULT hr);
 extern void GetScodeString(HRESULT hr, LPTSTR buf, int bufSize);
 
 BSTR AsBstr(char *str);
+char *FromBstr(BSTR str);
+
 
 IDispatch *getWorkbooks(IDispatch *);
 HRESULT getProperty(IDispatch *, BSTR name, VARIANT *v);
 IDispatch *call(IDispatch *iface, BSTR name, VARIANT *args, int numArgs);
 
-int createDataset(VARIANT *var, ggobid *gg);
+datad *createDataset(VARIANT *var, ggobid *gg);
 
 gboolean readData(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 
@@ -51,7 +53,7 @@ Error(char *str)
 
 /* datad * */
 void
-readDataFile(gchar *fileName, ggobid *gg)
+readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
 {
   HRESULT hr;
   CLSID classID;
@@ -75,8 +77,10 @@ readDataFile(gchar *fileName, ggobid *gg)
   VARIANT v;
   VariantInit(&v);
   V_VT(&v) = VT_BSTR;
-  V_BSTR(&v) = AsBstr("D:\\duncan\\quakes.csv");
-  //  V_BSTR(&v) = L"D:\\duncan\\quakes.csv";
+  if(!fileName || !fileName[0])
+    fileName = "D:\\duncan\\quakes.csv";
+
+  V_BSTR(&v) = AsBstr(fileName);   //  V_BSTR(&v) = L"D:\\duncan\\quakes.csv";
 
   IDispatch *sheet, *cells, *s;
 
@@ -86,8 +90,9 @@ readDataFile(gchar *fileName, ggobid *gg)
   getProperty(sheet, L"UsedRange", &v);
     cells = V_DISPATCH(&v);
   getProperty(cells, L"Value", &v);
-  fprintf(stderr, "Vaues: %d, array? %d\n", V_VT(&v), (int) (V_ISARRAY(&v) ? 1 : 0));
-  createDataset(&v, gg);
+
+  datad *d = createDataset(&v, gg);
+  d->name = g_strdup(fileName);
  
   cells->Release();
   sheet->Release();
@@ -166,19 +171,22 @@ ExcelDataDescription(const char * const fileName, const char * const modeName,
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
   memset(desc, '\0', sizeof(InputDescription));
 
-  desc->fileName = g_strdup("");
+  gchar *ptr = (gchar *)fileName;
+  if(!ptr)
+    ptr = "D:\\duncan\\quakes.csv";
+  desc->fileName = g_strdup(ptr);
   //  desc->name = g_strdup("<Excel>");
   desc->mode = unknown_data;
   desc->desc_read_input = readData;
 
-  fprintf(stderr, "In Description %s\n", fileName);fflush(stderr);
+
   return(desc);
 }
 
 gboolean 
 readData(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 {
-  readDataFile("D:\\duncan\\quakes.csv", gg);
+  readDataFile(desc->fileName, desc, gg);
   return(true);
 }
 
@@ -199,11 +207,12 @@ asReal(VARIANT *v)
   return(V_R8(v));
 }
 
-int
+datad *
 createDataset(VARIANT *var, ggobid *gg)
 {
   SAFEARRAY *arr;
   VARIANT value;
+  gboolean hasColNames = true;
 
   if(V_ISBYREF(var))
     arr = *V_ARRAYREF(var);
@@ -212,51 +221,60 @@ createDataset(VARIANT *var, ggobid *gg)
 
   long lb, ub;
   long i, j, ctr, col;
-  UINT numDim = SafeArrayGetDim(arr);
-  fprintf(stderr, "Num. dimension %d\n", (int) numDim);
+  long indices[2];
   long dim[2][2];
+  UINT numDim;
+  datad *d = NULL;
+
+  numDim = SafeArrayGetDim(arr); //  should be two - always!
 
   for(i = 0; i < numDim; i++) {
     SafeArrayGetLBound(arr, i+1, &dim[i][0]);
     SafeArrayGetUBound(arr, i+1, &dim[i][1]);
-    fprintf(stderr, "Dimension %d: %ld %ld\n", i, dim[i][0], dim[i][1]);fflush(stderr);
   }
 
-  datad *d = NULL;
+  indices[0] = dim[0][0];
+  indices[1] = dim[1][0];
+  SafeArrayGetElement(arr, indices, &value);
+  hasColNames = (V_VT(&value) == VT_BSTR);
 
-  int nrow = dim[0][1] - dim[0][0]; // currently skipping the first row.
+  int nrow = dim[0][1] - dim[0][0] + (hasColNames ? 0 : 1);
   int ncol =  dim[1][1] - dim[1][0] + 1;
-  fprintf(stderr, "Dimensions %d x %d\n", nrow, ncol);fflush(stderr);
 
-  //  d = datad_new(d, gg);
-  //  gdouble *vals = (gdouble *)g_malloc(sizeof(double) * nrow);
   d = datad_create(nrow, ncol, gg);
 
-  fprintf(stderr, "Created the dataset %d\n", d->nrows);fflush(stderr);
-
-  long indices[2];
-
   for(j = dim[1][0], col = 0;  j <= dim[1][1]; j++, col++) {
+    indices[1] =j;
     for(ctr = 0, i = dim[0][0] + 1; i <= dim[0][1]; i++, ctr++) {
       indices[0] =i;
-      indices[1] =j;
       SafeArrayGetElement(arr, indices, &value);
       d->raw.vals[ctr][col] = asReal(&value);
     }
-    GGOBI(setVariableName)(col, g_strdup_printf("Var %d", col+1), true, d, gg);
-#if 0
-    fprintf(stderr, "Variable....\n");
-    int varId = GGOBI(addVariable)(vals, nrow, g_strdup_printf("Var %d", j+1), true, d, gg);
-    fprintf(stderr, "Variable %d\n", varId);
-#endif
+
+    gchar *varName = NULL;
+    if(hasColNames) {
+      indices[0] = dim[0][0];
+      SafeArrayGetElement(arr, indices, &value);
+      if(V_VT(&value) == VT_BSTR)
+         varName = g_strdup(FromBstr(V_BSTR(&value)));
+    }
+    if(!varName)
+      varName = g_strdup_printf("Var %d", col+1);
+    GGOBI(setVariableName)(col, varName, true, d, gg);
   }
 
   datad_init(d, gg, 0);
 
   //  g_free(vals);
 
- return(0);
+ return(d);
 }
+
+
+/* 
+  Following taken from the Omegahat package RDCOMServer/src.
+  Keep in sync. if changed, please.
+*/
 
 
 
@@ -273,4 +291,18 @@ AsBstr(char *str)
   ans = SysAllocStringLen(wstr, size);
   free(wstr);
   return(ans);
+}
+
+char *
+FromBstr(BSTR str)
+{
+  char *ptr;
+  DWORD len = wcslen(str);
+  ptr = (char *) g_malloc((len+1)*sizeof(char));
+  ptr[len] = '\0';
+  DWORD ok = WideCharToMultiByte(CP_ACP, 0, str, len, ptr, len, NULL, NULL);
+  if(ok == 0) {
+    ptr = NULL;
+  }
+  return(ptr);
 }
