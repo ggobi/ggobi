@@ -3,8 +3,26 @@
 
 #include "plugin.h"
 
+#if 0
+#include "read_xml.h"
+#endif
+
+#include "GGobiAPI.h"
+
+
+void R_PreserveObject(SEXP);
+void R_ReleaseObject(SEXP);
+
 gboolean initR(GGobiPluginInfo *pluginfo);
 SEXP Rg_evalCmd(const char *cmd);
+
+
+typedef struct {
+   const char *sourceFile;
+   const char *constructor;
+} RPluginData;
+
+typedef struct _RRunTimeData RRunTimeData;
 
 struct _RRunTimeData {
     USER_OBJECT_ pluginObject;
@@ -41,6 +59,8 @@ initR(GGobiPluginInfo *pluginfo)
 	  (void) Rg_evalCmd(init);
       }
   }
+
+  fprintf(stderr, "Started R\n");fflush(stderr);
 
   return(true);
 }
@@ -81,29 +101,27 @@ Rg_evalCmd(const char *cmd)
 Rboolean
 Rsource(const char *name)
 {
-  int ok = 0;
   int errorOccurred = 0;
 
- if(canRead(name)) {
-      SEXP tmp, val, e;
-    /* These are static methods so cannot use them:
-       R_LoadProfile(fp, R_NilValue);  
-       R_ReplFile(fp, R_NilValue, 0, 0);
-     */
+  if(canRead(name)) {
+     SEXP tmp, val, e;
 
-  PROTECT(e = allocVector(LANGSXP, 2));
-  PROTECT(val = Rf_findFun(Rf_install("source"), R_GlobalEnv));
-  SETCAR(e, val);
-  PROTECT(tmp = NEW_CHARACTER(1));
-  SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(name));
-  SETCAR(CDR(e), tmp);
-  val = tryEval(e, &errorOccurred);
-    ok = TRUE;
+     PROTECT(e = allocVector(LANGSXP, 2));
+     SETCAR(e, Rf_install("source"));
+     SETCAR(CDR(e), tmp = NEW_CHARACTER(1));
+     SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(name));
 
-  UNPROTECT(3);
- }
+     val = tryEval(e, &errorOccurred);
+     if(errorOccurred) {
+	 fprintf(stderr, "Failed to source %s\n", name);fflush(stderr);
+     }
 
-  return(ok);
+     UNPROTECT(1);
+  } else {
+    fprintf(stderr,"Cannot locate file %s for source()ing it.\n", name);fflush(stderr);
+  }
+
+  return(errorOccurred == 0);
 }
 
 
@@ -111,7 +129,7 @@ gboolean
 RLoadPlugin(gboolean initializing, GGobiPluginInfo *plugin)
 {
     RPluginData *data = (RPluginData *) plugin->data;
-    fprintf(stderr, "Loading R plugin %s %s\n", data->sourceFile, data->constructor);fflush(stderr);
+    fprintf(stderr, "Loading R plugin from file `%s'\n", data->sourceFile);fflush(stderr);
     if(data->sourceFile)
 	Rsource(data->sourceFile);
     return(true);
@@ -222,10 +240,168 @@ RUpdateDisplayMenu(ggobid *gg, PluginInstance *inst)
     return(true);
 }
 
-
 gboolean
 RUnloadPlugin(gboolean quitting, GGobiPluginInfo *plugin)
 {
     return(true);
 }
 
+
+enum {GET_DIMS, GET_VARIABLE_NAMES,
+      GET_RECORD, GET_SOURCE_DESCRIPTION, 
+      GET_NUM_RECORDS, GET_NUM_VARIABLES};
+
+
+gboolean
+getDims(int *nrow, int *ncol, USER_OBJECT_ obj)
+{
+    USER_OBJECT_ e, val;
+    int wasError;
+    PROTECT(e = allocVector(LANGSXP, 1));
+    SETCAR(e, VECTOR_ELT(obj, GET_DIMS));
+    val = tryEval(e, &wasError);
+    if(!wasError) {
+	*nrow = INTEGER_DATA(val)[0];
+	*ncol = INTEGER_DATA(val)[1];
+    }
+    UNPROTECT(1);
+    return(wasError == 0);
+}
+
+USER_OBJECT_
+getVariableNames(USER_OBJECT_ obj)
+{
+    USER_OBJECT_ e, val;
+    int wasError;
+    PROTECT(e = allocVector(LANGSXP, 1));
+    SETCAR(e, VECTOR_ELT(obj, GET_VARIABLE_NAMES));
+    val = tryEval(e, &wasError);
+    UNPROTECT(1);
+
+    return(val);
+}
+
+
+gboolean
+R_readInputFromDescription(InputDescription *desc, ggobid *gg, GGobiPluginInfo *info)
+{
+    USER_OBJECT_ obj = (USER_OBJECT_) desc->userData;
+    USER_OBJECT_ varNames, e, tmp;
+    int nrow, ncol, i, j;
+    datad *gdata;
+    int wasError;
+gboolean init = true;
+
+    if(getDims(&nrow, &ncol, obj) == false) {
+	return(false);
+    }
+    varNames = getVariableNames(obj);
+    if(varNames==NULL || varNames == NULL_USER_OBJECT)
+	return(false);
+    gdata = datad_create(nrow, ncol, gg);
+    gdata->name = g_strdup("rrandom");
+    for(j = 0; j < ncol; j++) {
+	const char *tmp;
+	tmp = CHAR_DEREF(STRING_ELT(varNames, j));
+	GGOBI(setVariableName)(j, g_strdup(tmp), false, gdata, gg);
+    }
+
+
+    PROTECT(e = allocVector(LANGSXP,2));
+    SETCAR(e, VECTOR_ELT(obj, GET_RECORD));
+    SETCAR(CDR(e), tmp = NEW_INTEGER(1));
+    for(i = 0 ; i < nrow; i++) {
+	USER_OBJECT_ els;
+	INTEGER_DATA(tmp)[0] = i+1;
+	els = tryEval(e, &wasError);
+        for(j = 0; j < ncol; j++)
+	    gdata->raw.vals[i][j] = NUMERIC_DATA(els)[j];
+    }
+
+    start_ggobi(gg, true, init);
+
+    return(true);
+}
+
+/**
+  This is called with a filename which may be null and a mode name.
+  We then go to R and call the function specified in the getDescription
+  value of the plugin's XML definition.  
+ */
+InputDescription *
+R_GetInputDescription(const char * const fileName, const char * const modeName, 
+                       ggobid *gg, GGobiPluginInfo *info)
+{
+    int wasError;
+    USER_OBJECT_ obj, e, tmp;
+    InputDescription *desc = NULL;
+
+    RPluginData *data = (RPluginData *) info->data;
+
+    PROTECT(e = allocVector(LANGSXP, 3));
+    SETCAR(e, Rf_install(data->constructor));
+    SETCAR(CDR(e), tmp = NEW_CHARACTER(1));
+    if(fileName)
+	SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(fileName));
+    SETCAR(CDR(CDR(e)), tmp = NEW_CHARACTER(1));
+    if(fileName)
+	SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(fileName));
+
+    obj = tryEval(e, &wasError);
+    if(!wasError) {
+	desc = g_malloc(sizeof(InputDescription));
+	memset(desc, '\0', sizeof(InputDescription));
+
+	R_PreserveObject(obj);
+	desc->fileName = g_strdup(data->constructor);
+	desc->mode = unknown_data;
+        desc->userData = obj;
+	desc->desc_read_input = R_readInputFromDescription;
+    }
+    UNPROTECT(1);
+
+    return(desc);
+}
+
+
+/**
+  This routine interprets the XML input (already read) for a plugin that uses this
+  R meta-plugin. It patches the DLL name, etc. into the new plugins information so
+  that we can ensure that it is loaded, tell whether it the onLoad routine has been 
+  run, etc.
+  Most importantly, it stores the identifiers for the R code that implements
+  the plugin in a special structure and replaces the onCreate routine and 
+  onLoad symbol names with the names of special C routines that will be called
+  to do this. 
+ */
+gboolean
+R_processPlugin(xmlNodePtr node, GGobiPluginInfo *plugin, GGobiPluginType type, 
+                GGobiPluginInfo *langPlugin, GGobiInitInfo *info)
+{
+    GGobiPluginDetails *details;
+    RPluginData *data = (RPluginData *)g_malloc(sizeof(RPluginData));
+
+    memset(data, '\0',sizeof(RPluginData));
+    details = plugin->details;
+    plugin->data = data;
+
+    data->sourceFile = details->onLoad;
+
+
+    if(type == GENERAL_PLUGIN) {
+	data->constructor = plugin->info.g->onCreate;
+	plugin->info.g->onCreate = g_strdup("RCreatePlugin");
+	plugin->info.g->onClose = g_strdup("RDestroyPlugin");
+	plugin->info.g->onUpdateDisplay = g_strdup("RUpdateDisplayMenu");
+    } else {
+	data->constructor = plugin->info.i->read_symbol_name; /* getDescription; */
+        plugin->info.i->getDescription = g_strdup("R_GetInputDescription");
+    }
+
+    details->onLoad = g_strdup("RLoadPlugin");
+    details->onUnload = g_strdup("RUnloadPlugin");
+
+    setLanguagePluginInfo(details, "R", info);
+
+    return(true);
+}

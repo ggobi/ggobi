@@ -10,11 +10,11 @@
 #include <string.h>
 
 
-gboolean postgres_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *);
+gboolean postgres_read(InputDescription *desc, ggobid *gg, GGobiPluginInfo *);
 int read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
 
 PGresult *query(const char * const query, PGconn *conn);
-int processResult(PGresult *result, ggobid *gg);
+datad *processResult(PGresult *result, ggobid *gg);
 PGconn* makeConnection(DBMSLoginInfo *info);
 
 /**
@@ -28,7 +28,7 @@ PGconn* makeConnection(DBMSLoginInfo *info);
  */
 InputDescription *
 postgres_input_description(const char * const fileName, const char * const modeName, 
-                             ggobid *gg, GGobiInputPluginInfo *info)
+                             ggobid *gg, GGobiPluginInfo *info)
 {
   InputDescription *desc;
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
@@ -50,7 +50,7 @@ postgres_input_description(const char * const fileName, const char * const modeN
  input routines in GGobi.
  */
 gboolean 
-postgres_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
+postgres_read(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 {
     DBMSLoginInfo *info ;
     info = initDBMSLoginInfo(NULL, plugin->details->namedArgs);
@@ -73,14 +73,17 @@ read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
 {
     PGconn *conn;
     PGresult *result;
-
+    datad *d;
     conn = makeConnection(info);    
     if(!conn) {
 	return(-1);
     }
 
     result = query(info->dataQuery, conn);
-    processResult(result, gg);
+    d = processResult(result, gg);
+    if(d) {
+	d->name = g_strdup(info->dataQuery);
+    }
     PQclear(result);
     PQfinish(conn);
     
@@ -120,7 +123,7 @@ query(const char * const query, PGconn *conn)
     return(result);
 }
 
-int
+datad *
 processResult(PGresult *result, ggobid *gg)
 {
   int i, j;
@@ -163,24 +166,40 @@ processResult(PGresult *result, ggobid *gg)
       }
   }
 
-  return(1);
+  return(d);
 }
 
 #ifdef STANDALONE
+typedef struct {
+    int nr;
+    int nc;
+} DataFrame;
+
+gboolean
+getResults(PGresult *result, DataFrame *frame)
+{
+  frame->nr = PQntuples(result);
+  frame->nc = PQnfields(result);
+  return(true);
+}
+
 int
 main(int argc, char *argv[])
 {
+  DataFrame frame;
   PGconn *conn;
   PGresult *result;
   float *data;
   int nr, nc;
-  DataFrame frame;
+
   DBMSLoginInfo info;
   memset(&info, '\0', sizeof(DBMSLoginInfo));
 
     conn = makeConnection(&info);
-    result = query(conn);
-    processResult(result, &frame);
+    result = query("select * from flea;", conn);
+    getResults(result, &frame);
+    PQclear(result);
+    PQfinish(conn);
 
     fprintf(stderr, "Result: %d, %d\n", frame.nr, frame.nc);
     return(0); 

@@ -114,6 +114,9 @@ getDBMSLoginElementIndex(const char *name)
 int 
 setDBMSLoginElement(DBMSInfoElement i, char * const val, DBMSLoginInfo *info)
 {
+    if(val && !val[0])
+	val = NULL;
+
    switch(i) {
      case HOST:
        info->host = val;
@@ -128,13 +131,19 @@ setDBMSLoginElement(DBMSInfoElement i, char * const val, DBMSLoginInfo *info)
        info->dbname = val;
        break;
      case PORT:
-       info->port = atoi(val);
+       if(val)
+	   info->port = atoi(val);
+       else
+	   info->port = 0;
        break;
      case SOCKET:
        info->socket = val;
        break;
      case FLAGS:
-       info->flags = atoi(val);
+       if(val)
+	   info->flags = atoi(val);
+       else
+	   info->port = 0;
        break;
      case DATA_QUERY:
        info->dataQuery = val;

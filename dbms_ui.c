@@ -124,12 +124,14 @@ GGOBI(getDBMSGUIInfo)(GtkButton *button, DBMSGUIInput *guiInput)
 
    val = gtk_editable_get_chars(GTK_EDITABLE(guiInput->textInput[i]), 0, -1);
 
+#if 0
    if(val && val[0])
      /*val = g_strdup(val);*/ 
      /* Is this necessary with gtk_editable_get_chars? I bet not.  dfs */
      ;
    else 
      continue;
+#endif
 
    setDBMSLoginElement((DBMSInfoElement) i, val, info);
    val = NULL;

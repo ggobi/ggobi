@@ -49,7 +49,7 @@ Dynload *dynload = &unixDynload;
 #endif 
 
 void addPluginDetails(GGobiPluginDetails *info, GtkWidget *list, ggobid *gg, gboolean active);
-void addInputPlugin(GGobiInputPluginInfo *info, GtkWidget *list, ggobid *gg);
+void addInputPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg);
 void addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg);
 
 gboolean
@@ -134,14 +134,19 @@ registerPlugins(ggobid *gg, GList *plugins)
 
   while(el) {
     plugin = (GGobiPluginInfo *) el->data;
+    if(plugin->type != GENERAL_PLUGIN) {
+	el = el->next;
+	continue;
+    }
+
     ok = true;
 
     if(!plugin->details->loaded) {
 	loadPluginLibrary(plugin->details, plugin);
     }
 
-    if(plugin->onCreate) {
-      f = (OnCreate) getPluginSymbol(plugin->onCreate, plugin->details);
+    if(plugin->info.g->onCreate) {
+      f = (OnCreate) getPluginSymbol(plugin->info.g->onCreate, plugin->details);
       if(f) {
         inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
         inst->data = NULL;
@@ -177,8 +182,8 @@ pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins)
 
   while(el) {
     plugin = (PluginInstance *) el->data;
-    if(plugin->info->onUpdateDisplay) {
-      f = (OnUpdateDisplayMenu) getPluginSymbol(plugin->info->onUpdateDisplay,
+    if(plugin->info->type == GENERAL_PLUGIN && plugin->info->info.g->onUpdateDisplay) {
+      f = (OnUpdateDisplayMenu) getPluginSymbol(plugin->info->info.g->onUpdateDisplay,
                                                 plugin->info->details);
       if(f) {
         ok = f(gg, plugin);
@@ -287,17 +292,15 @@ addPlugins(GList *plugins, GtkWidget *list, ggobid *gg, GGobiPluginType type)
 {
   gint n = g_list_length(plugins), i;
   GGobiPluginInfo *plugin;
-  GGobiInputPluginInfo *iplugin;
 
   for(i = 0; i < n ; i++) {
+    plugin = (GGobiPluginInfo*) g_list_nth_data(plugins, i);
     switch(type) {
       case GENERAL_PLUGIN:
-       plugin = (GGobiPluginInfo*) g_list_nth_data(plugins, i);
-       addPlugin(plugin, list, gg);
+         addPlugin(plugin, list, gg);
        break;
        case INPUT_PLUGIN:
-         iplugin = (GGobiInputPluginInfo*) g_list_nth_data(plugins, i);
-         addInputPlugin(iplugin, list, gg);
+         addInputPlugin(plugin, list, gg);
        break;
        default:
        break;
@@ -319,7 +322,7 @@ addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg)
 }
 
 void
-addInputPlugin(GGobiInputPluginInfo *info, GtkWidget *list, ggobid *gg)
+addInputPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg)
 {
     addPluginDetails(info->details, list, gg, true);
 }
@@ -352,8 +355,8 @@ closePlugins(ggobid *gg)
   el = gg->pluginInstances;
   while(el) { 
     plugin = (PluginInstance *) el->data;
-    if(plugin->info->onClose) {
-      DLFUNC f =  getPluginSymbol(plugin->info->onClose, plugin->info->details);
+    if(plugin->info->info.g->onClose) {
+      DLFUNC f =  getPluginSymbol(plugin->info->info.g->onClose, plugin->info->details);
       f(gg, plugin->info, plugin);
     }
     tmp = el;
@@ -367,18 +370,19 @@ closePlugins(ggobid *gg)
 GGobiInputPluginInfo *
 runInteractiveInputPlugin(ggobid *gg)
 {
-  GGobiInputPluginInfo* plugin = NULL;
+  GGobiPluginInfo* plugin = NULL;
 #ifdef USE_XML
   GList *l = sessionOptions->info->inputPlugins;
 
   for(; l; l = l->next) {
-    plugin =  (GGobiInputPluginInfo*) l->data;
-    if(plugin->interactive) {
+    plugin =  (GGobiPluginInfo*) l->data;
+    if(plugin->info.i->interactive) {
       if(!sessionOptions->data_type ||
-         strcmp(sessionOptions->data_type, plugin->modeName) == 0)
+         strcmp(sessionOptions->data_type, plugin->info.i->modeName) == 0)
       {
         InputGetDescription f;
-        f = (InputGetDescription) getPluginSymbol(plugin->getDescription,
+	loadPluginLibrary(plugin->details, plugin);
+        f = (InputGetDescription) getPluginSymbol(plugin->info.i->getDescription,
                                                   plugin->details);
         if(f) {
           InputDescription *desc;

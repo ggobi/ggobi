@@ -36,15 +36,15 @@ DataMode getInputType(xmlNode *node);
 #ifdef SUPPORT_PLUGINS
 void getPlugins(xmlDocPtr doc, GGobiInitInfo *info);
 GGobiPluginInfo *processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
-GGobiInputPluginInfo *processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
-void getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc);
+GGobiPluginInfo *processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
+void getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc, gboolean isLanguage);
 
 
 void getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr doc);
 gboolean getPluginDetails(xmlNodePtr node, GGobiPluginDetails *plugin, xmlDocPtr doc);
 gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin);
 
-void *getPluginLanguage(xmlNodePtr node, GGobiInputPluginInfo *gplugin,  GGobiPluginType type, GGobiInitInfo *info);
+gboolean getPluginLanguage(xmlNodePtr node, GGobiPluginInfo *gplugin,  GGobiPluginType type, GGobiInitInfo *info);
 #endif
 
 GHashTable *getPluginNamedOptions(xmlNodePtr node, GGobiPluginDetails *info, xmlDocPtr doc);
@@ -451,7 +451,7 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
        if(plugin)
          info->plugins = g_list_append(info->plugins, plugin);
        } else if(strcmp(el->name, "inputPlugin") == 0) {
-         GGobiInputPluginInfo *inputPlugin = processInputPlugin(el, info, doc);
+         GGobiPluginInfo *inputPlugin = processInputPlugin(el, info, doc);
          if(inputPlugin)
            info->inputPlugins = g_list_append(info->inputPlugins, inputPlugin);
        }
@@ -465,7 +465,7 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
   reading the description, author, etc.
  */
 
-#define GET_PROP_VALUE(field,name) plugin->field = ((tmp = (char *) xmlGetProp(c, name)) != NULL) ? g_strdup(tmp) : NULL
+#define GET_PROP_VALUE(field,name) symInfo->field = ((tmp = (char *) xmlGetProp(c, name)) != NULL) ? g_strdup(tmp) : NULL
 
 
 /**
@@ -476,22 +476,26 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 {
   gboolean load;
   GGobiPluginInfo *plugin;
+  gboolean isLanguage;
 
   plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
   memset(plugin, '\0', sizeof(GGobiPluginInfo));
   plugin->details = g_malloc(sizeof(GGobiPluginDetails));
   memset(plugin->details, '\0', sizeof(GGobiPluginDetails));
+  plugin->info.g = g_malloc(sizeof(GGobiGeneralPluginInfo));
+  memset(plugin->info.g, '\0', sizeof(GGobiGeneralPluginInfo));
 
   load = getPluginDetails(node, plugin->details, doc);
+  
+  isLanguage = (xmlGetProp(node, "providesLanguage") != NULL);
 
-  getPluginSymbols(node, plugin, doc);
+  getPluginSymbols(node, plugin, doc, isLanguage);
   getPluginOptions(node, plugin->details, doc);
 
   plugin->details->depends = getPluginDependencies(node, plugin->details, doc);
 
-
      /* Weird casting going on here to avoid a void*. */
-  getPluginLanguage(node, (GGobiInputPluginInfo*) plugin, GENERAL_PLUGIN, info);
+  getPluginLanguage(node, plugin, GENERAL_PLUGIN, info);
 
   if(load) {
     loadPluginLibrary(plugin->details, plugin);
@@ -604,9 +608,10 @@ getPluginDependencies(xmlNodePtr node, GGobiPluginDetails *info, xmlDocPtr doc)
 
 
 void
-getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc)
+getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc, gboolean isLanguage)
 {
   xmlNodePtr c;
+  GGobiGeneralPluginInfo *symInfo = plugin->info.g;
   const xmlChar *tmp;
 
   c = getXMLElement(node,"dll");
@@ -619,6 +624,18 @@ getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc)
   GET_PROP_VALUE(onCreate, "onCreate");
   GET_PROP_VALUE(onClose, "onClose");
   GET_PROP_VALUE(onUpdateDisplay, "onUpdateDisplayMenu");
+
+  if(isLanguage) {
+      tmp = xmlGetProp(c, "processPlugin");
+      if(tmp) {
+	  GGobiLanguagePluginData *data;
+	  data = (GGobiLanguagePluginData *) g_malloc(sizeof(GGobiLanguagePluginData));
+	  data->processPluginName = g_strdup(tmp);
+	  plugin->data = data;
+      } else {
+	  fprintf(stderr, "No `processPlugin' entry found for language plugin!\n");fflush(stderr);
+      }
+  }
 }
 
 
@@ -630,7 +647,7 @@ loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin)
     return(true);
   }
 
-   /* Load any plugins on which this one dependens. Make certain they 
+   /* Load any plugins on which this one depends. Make certain they 
       are fully loaded and initialized. Potential for inter-dependencies
       that would make this an infinite loop. Hope the user doesn't get this
       wrong as there are no checks at present.
@@ -671,6 +688,7 @@ getPluginDetails(xmlNodePtr node, GGobiPluginDetails *plugin, xmlDocPtr doc)
 {
   gboolean load = false;
   const xmlChar *tmp;
+  GGobiPluginDetails *symInfo = plugin;
   xmlChar * val;
   xmlNodePtr el;
 
@@ -745,94 +763,53 @@ setLanguagePluginInfo(GGobiPluginDetails *details, const char *language, GGobiIn
     return(true);
 }
 
-void *
-getPluginLanguage(xmlNodePtr node,GGobiInputPluginInfo *iplugin, GGobiPluginType type, GGobiInitInfo *info)
+gboolean
+getPluginLanguage(xmlNodePtr node, GGobiPluginInfo *plugin, GGobiPluginType type, GGobiInitInfo *info)
 {
-  void *value = NULL;
-  const xmlChar *tmp;
-  tmp = xmlGetProp(node, "language");
-  if(tmp) {
-    GGobiPluginDetails *details;
-    if(strcmp(tmp, "java") == 0) {
-      JavaInputPluginData *data;
+    gboolean done = false;
+    const xmlChar *tmp;
+    tmp = xmlGetProp(node, "language");
 
-      data = (JavaInputPluginData *)g_malloc(sizeof(JavaInputPluginData));
-      memset(data, '\0',sizeof(JavaInputPluginData));
+    if(tmp) {
+	GGobiPluginInfo *langPlugin = getLanguagePlugin(info->plugins, tmp);
+	GGobiLanguagePluginData *d;
+	ProcessPluginInfo f;
 
-      tmp = xmlGetProp(node, "class");
-      data->className = g_strdup(tmp); 
-      fixJavaClassName((gchar *)data->className);
-
-      if(type == INPUT_PLUGIN) {
-        iplugin->data = data;
-        iplugin->getDescription = g_strdup("JavaGetInputDescription");
-        details = iplugin->details;
-      } else {
-        GGobiPluginInfo *p = (GGobiPluginInfo *)iplugin;
-        p->data = data;
-        p->onCreate = g_strdup("JavaCreatePlugin");
-        p->onClose = g_strdup("JavaDestroyPlugin");
-        p->onUpdateDisplay = g_strdup("JavaUpdateDisplayMenu"); 
-        details = p->details;
-      }
-      value = data;
+	d = (GGobiLanguagePluginData *) langPlugin->data;
+	loadPluginLibrary(langPlugin->details, langPlugin);
+	if(d) {
+	    f = (ProcessPluginInfo) getPluginSymbol(d->processPluginName, langPlugin->details);
+	    if(f) {
+		done = f(node, plugin, type, langPlugin, info);
+	    }
+	}
+	if(done == false)
+	    fprintf(stderr, "Problem processing language plugin processor.");
+    } else
+	done = true;
 
 
-      setLanguagePluginInfo(details, "JVM", info);
-      details->onLoad = g_strdup("JavaLoadPlugin");
-      details->onUnload = g_strdup("JavaUnloadPlugin");
-
-    } else {
-      RPluginData *data = (RPluginData *)g_malloc(sizeof(RPluginData));
-      memset(data, '\0',sizeof(RPluginData));
-      tmp = xmlGetProp(node, "init");
-      if(tmp) {
-	  data->sourceFile = g_strdup(tmp);
-      }
-      tmp = xmlGetProp(node, "create");
-      if(tmp) {
-	  data->constructor = g_strdup(tmp);
-      }
-
-      value = (void *) data;
-      if(type == INPUT_PLUGIN) {
-        iplugin->data = data;
-        iplugin->getDescription = g_strdup("R_GetInputDescription");
-        details = iplugin->details;
-      } else {
-        GGobiPluginInfo *p = (GGobiPluginInfo *)iplugin;
-        p->data = data;
-        p->onCreate = g_strdup("RCreatePlugin");
-        p->onClose = g_strdup("RDestroyPlugin");
-        p->onUpdateDisplay = g_strdup("RUpdateDisplayMenu"); 
-
-	details = p->details;
-      }
-      value = data;
-      setLanguagePluginInfo(details, "R", info);
-      details->onLoad = g_strdup("RLoadPlugin");
-      details->onUnload = g_strdup("RUnloadPlugin");
-    }
-  }
-
-  return(value);
+    return(done);
 }
 
 
-GGobiInputPluginInfo *
+GGobiPluginInfo *
 processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 {
-  GGobiInputPluginInfo *plugin;
+  GGobiPluginInfo *plugin;
   gboolean load;
 
-  plugin = (GGobiInputPluginInfo *) g_malloc(sizeof(GGobiInputPluginInfo));
-  memset(plugin, '\0', sizeof(GGobiInputPluginInfo)); 
+  plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
+  memset(plugin, '\0', sizeof(GGobiPluginInfo)); 
   plugin->details = g_malloc(sizeof(GGobiPluginDetails));
   memset(plugin->details, '\0', sizeof(GGobiPluginDetails));
+  plugin->info.i = g_malloc(sizeof(GGobiInputPluginInfo));
+  memset(plugin->info.i, '\0', sizeof(GGobiInputPluginInfo));
+
 
   load = getPluginDetails(node, plugin->details, doc);
 
-  getInputPluginValues(node, plugin, doc);
+  getInputPluginValues(node, plugin->info.i, doc);
 
   getPluginOptions(node, plugin->details, doc);
   plugin->details->depends = getPluginDependencies(node, plugin->details, doc);
@@ -850,6 +827,7 @@ void
 getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr doc)
 {
   xmlNodePtr c;
+  GGobiInputPluginInfo *symInfo = plugin;
   const xmlChar *tmp;
 
   tmp = xmlGetProp(node, "interactive");

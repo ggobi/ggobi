@@ -614,6 +614,10 @@ implementing an input plugin in Java, Python or Plugin.  In such a
 case, we have a well defined \C-level interface and we can invoke the
 corresponding methods in the class of the corresponding language.
 
+We get the meta- or language-plugins to process their own sub-plugin
+information. This forces the library to be loaded, but the 
+language not necessarily started!
+
 \section{Plugin Arguments}
 It would be convenient to be able to parameterize a plugin at
 run-time, or specifically when it is created, by providing parameters

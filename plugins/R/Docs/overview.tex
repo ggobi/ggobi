@@ -97,24 +97,27 @@ its body and returns them in a list.  The first element is the
 longer needed (i.e. when it is deactivated by the user or the GGobi
 instance disappears).  The second function is
 \SFunction{onUpdateDisplay}, and is called by GGobi each time the
-display menu is recreated. Again, these functions
-are direct parallels of the C routines that are called for
-plugins implemented directly in C.
+display menu is recreated. Again, these functions are direct parallels
+of the C routines that are called for plugins implemented directly in
+C.
 
 We do not have an \SFunction{onCreate} as we do in C-level plugins.
 The reason for this is that the command in the \SFunction{create}
-attribute performs the same role, and it is in this
-command that one does any initialization of the S object.
-
-\SFunction{ggobiTestPlu
+attribute performs the same role, and it is in this command that one
+does any initialization of the S object.
 
 
 We will change this format and make the meta-plugin understand it.
+Done now. onCreate and onLoad.
+
+Need to figure out whether they are expressions, file names or
+function names.
 
 
 \subsection{Plugins by Function Lists}
-
-
+This is not worth supporting.  Almost every plugin will need to be
+able to store state somehow.  We could pass the arguments for each
+call, but that is not as simple just using a closure.
 
 \subsection{Plugins by Explicit Methods}
 

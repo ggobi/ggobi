@@ -19,6 +19,7 @@
 #include <stdlib.h> /* for getenv */
 
 
+
 /**
  The default Java context in which to execute calls.
  */
@@ -35,6 +36,11 @@ static JavaVM *jvm;
  */
 #define CLASSPATH_OPT "-Djava.class.path="
 
+typedef struct _JavaRunTimeData JavaRunTimeData;
+typedef struct {
+   const char *className;
+   JavaRunTimeData *runTime;
+} JavaInputPluginData;
 
 gboolean initJVM(GGobiPluginInfo *info);
 jobject  runPlugin(const char * const klass, JNIEnv *env);
@@ -146,7 +152,7 @@ gboolean initJVM(GGobiPluginInfo *info)
  and popup a new plot.
  */
 gboolean 
-JavaReadInput(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
+JavaReadInput(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 {
     datad *gdata;
     JavaRunTimeData *rt = ((JavaInputPluginData *) plugin->data)->runTime;
@@ -157,6 +163,9 @@ JavaReadInput(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
     jobjectArray jnames;
     jstring jname;
     JNIEnv *env = std_env;
+
+    const char *tmp;
+    jboolean isCopy;
 
 /* Need to figure out who is actually calling this and if it supplies the init. */
 gboolean init = true;
@@ -170,11 +179,9 @@ gboolean init = true;
 
     gdata->name = g_strdup(desc->fileName);
 
+    mid = JVMENV GetMethodID(env, rt->klass, "getVariableNames", "()[Ljava/lang/String;");
+    jnames = JVMENV CallObjectMethod(env, rt->instance, mid);
     for(j = 0; j < ncol; j++) {
-	const char *tmp;
-        jboolean isCopy;
-        mid = JVMENV GetMethodID(env, rt->klass, "getVariableNames", "()[Ljava/lang/String;");
-        jnames = JVMENV CallObjectMethod(env, rt->instance, mid);
         jname = JVMENV GetObjectArrayElement(env, jnames, j);
         tmp =  JVMENV GetStringUTFChars(env, jname, &isCopy);
 	GGOBI(setVariableName)(j, g_strdup(tmp), false, gdata, gg);
@@ -208,7 +215,7 @@ gboolean init = true;
  */
 InputDescription *
 JavaGetInputDescription(const char * const fileName, const char * const modeName,
-                         ggobid *gg, GGobiInputPluginInfo *info)
+                         ggobid *gg, GGobiPluginInfo *info)
 {
     JavaInputPluginData *data = (JavaInputPluginData *) info->data;
     InputDescription *desc;
@@ -482,4 +489,42 @@ runPlugin(const char * const klass, JNIEnv *env)
    (*env)->DeleteLocalRef(env, cls);
 
    return(obj);
+}
+
+
+/**
+ Process a plugin that uses this JVM meta-plugin.
+ It patches up the 
+ */
+gboolean
+Java_processPlugin(xmlNodePtr node, GGobiPluginInfo *plugin, GGobiPluginType type, 
+                    GGobiPluginInfo *langPlugin, GGobiInitInfo *info)
+{
+      const xmlChar *tmp;
+      JavaInputPluginData *data;
+      GGobiPluginDetails *details;
+
+      data = (JavaInputPluginData *)g_malloc(sizeof(JavaInputPluginData));
+      memset(data, '\0',sizeof(JavaInputPluginData));
+      plugin->data = data;
+      details = plugin->details;
+
+      tmp = xmlGetProp(node, "class");
+      data->className = g_strdup(tmp); 
+      fixJavaClassName((gchar *)data->className);
+
+      if(type == INPUT_PLUGIN) {
+        plugin->info.i->getDescription = g_strdup("JavaGetInputDescription");
+
+      } else {
+        plugin->info.g->onCreate = g_strdup("JavaCreatePlugin");
+        plugin->info.g->onClose = g_strdup("JavaDestroyPlugin");
+        plugin->info.g->onUpdateDisplay = g_strdup("JavaUpdateDisplayMenu"); 
+      }
+
+      setLanguagePluginInfo(details, "JVM", info);
+      details->onLoad = g_strdup("JavaLoadPlugin");
+      details->onUnload = g_strdup("JavaUnloadPlugin");
+
+      return(true);
 }

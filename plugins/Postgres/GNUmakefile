@@ -23,6 +23,8 @@ CFLAGS+=-g -I$(PG_INCLUDE_DIR) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cfla
 Postgres.so: pgInput.o
 	$(CC) -shared -o $@ pgInput.o -L$(PG_LIB_DIR) -lpq $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs)
 
+pg: pgInput.c
+	$(CC) -o $@ $(CFLAGS) -DSTANDALONE=1 pgInput.c -L$(PG_LIB_DIR) -lpq $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs)
 
 local.config:  configure
 	./configure

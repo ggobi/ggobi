@@ -1,25 +1,34 @@
-<plugin name="R">
+<plugin name="R" providesLanguage="R">
    <description>Loads the R engine for use by other plugins</description>
    <author>Duncan Temple Lang</author>
    <options>
     <named>
-     <init>print(rnorm(10))</init>
+      <init>library(RGtk); source(system.file("examples", "testgtk.S", package="RGtk"))</init>
     </named>
     <args>
      <arg>--slave</arg>
     </args>
    </options>
    <dll name="/home/duncan/Projects/ggobi/ggobi/plugins/R/Rplugin.so">
-    <init onLoad="loadR" />
+    <init onLoad="loadR" processPlugin="R_processPlugin" />
+  </dll>
+</plugin>
+
+<plugin name="Rtest" language="R">
+ <description>Test of the R plugin mechanism.</description>
+  <author>Duncan Temple Lang</author>
+  <dll>
+    <init onLoad="plugins/R/R/testPlugin.R" onCreate="ggobiTestPlugin" />
+  </dll>
+</plugin>
+
+<plugin name="Rfile" language="R" type="mutable">
+ <description>Test of the R plugin mechanism.</description>
+  <author>Duncan Temple Lang</author>
+  <dll>
+   <init onCreate="fileSelectPlugin" onLoad="plugins/R/R/fileSelection.R" />
   </dll>
 </plugin>
 
 
 
-<plugin name="Rtest" command="ggobiTestPlugin()" source="plugins/R/R/testPlugin.S" language="R">
- <description>Test of the R plugin mechanism.</description>
-  <author>Duncan Temple Lang</author>
-  <dependencies>
-     <dependency name="R" />
-  </dependencies>
-</plugin>

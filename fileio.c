@@ -117,15 +117,17 @@ fileset_generate(const gchar *fileName, DataMode guess, ggobid *gg)
       gint i, n;
       n = g_list_length(els);
       for(i = 0; i < n; i++) {
-        GGobiInputPluginInfo *plugin;
+        GGobiPluginInfo *plugin;
+        GGobiInputPluginInfo *info;
         plugin = g_list_nth_data(els, i);
-        if(plugin->modeName &&
-           strcmp(plugin->modeName, sessionOptions->data_type) == 0)
+	info = plugin->info.i;
+        if(info->modeName &&
+           strcmp(info->modeName, sessionOptions->data_type) == 0)
         {
           InputGetDescription f;
-          f = (InputGetDescription) getPluginSymbol(plugin->getDescription,
-                                                    plugin->details);/*dfs*/
-                                                    /*&plugin->details);*/
+          f = (InputGetDescription) getPluginSymbol(info->getDescription,
+                                                    plugin->details);
+                                                    
           if(f) {
             InputDescription *desc;
             desc = f(fileName, sessionOptions->data_type, gg, plugin);

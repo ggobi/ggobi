@@ -1,3 +1,4 @@
+cat("Ok, in testPlugin.R\n")
 ggobiTestPlugin <-
 function(gg, inst)
 {

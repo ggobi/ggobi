@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-gboolean mysql_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *);
+gboolean mysql_read(InputDescription *desc, ggobid *gg, GGobiPluginInfo *);
 int read_mysql_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
 
 
@@ -29,7 +29,7 @@ int processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg);
  */
 InputDescription *
 mysql_input_description(const char * const fileName, const char * const modeName, 
-                             ggobid *gg, GGobiInputPluginInfo *info)
+                             ggobid *gg, GGobiPluginInfo *info)
 {
   InputDescription *desc;
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
@@ -51,7 +51,7 @@ mysql_input_description(const char * const fileName, const char * const modeName
  input routines in GGobi.
  */
 gboolean 
-mysql_read(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
+mysql_read(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 {
     DBMSLoginInfo *info ;
     info = initDBMSLoginInfo(NULL, plugin->details->namedArgs);

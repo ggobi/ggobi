@@ -6,13 +6,14 @@ extern "C" {
 #endif
 
 typedef struct _GGobiInputPluginInfo GGobiInputPluginInfo;
+typedef struct _GGobiPluginInfo GGobiPluginInfo;
 typedef struct _ggobid ggobid;
 typedef struct _InputDescription InputDescription;
 
-typedef gboolean (*InputReader)(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *);
-typedef gboolean (*InputProbe)(const char * const input, GGobiInputPluginInfo *);
+typedef gboolean (*InputReader)(InputDescription *desc, ggobid *gg, GGobiPluginInfo *);
+typedef gboolean (*InputProbe)(const char * const input, GGobiPluginInfo *);
 
-typedef InputDescription* (*InputGetDescription)(const char * const fileName, const char * const input, ggobid *gg, GGobiInputPluginInfo*);
+typedef InputDescription* (*InputGetDescription)(const char * const fileName, const char * const input, ggobid *gg, GGobiPluginInfo*);
 
 
 struct _InputDescription {
