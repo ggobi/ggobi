@@ -9,12 +9,15 @@
 #include "vars.h"
 #include "externs.h"
 
-extern void sgenrand (gulong);
-extern double genrand (void);
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern void sgenrand (unsigned long);
+extern double genrand (void);
+extern void lsgenrand(unsigned long seed_array);
 
 #ifdef __cplusplus
 }
