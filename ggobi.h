@@ -63,9 +63,21 @@ typedef struct {
   /* scatterplot.c */
  GtkAccelGroup *sp_accel_group;
 
+  /* The top-level window created in make_ui(). */
+ GtkWidget *main_window;
+
 } GGobiApp;
 
-
+/*
+  These are hooks for other applications (e.g. R) to 
+  facilitate callbacks at a higher level that GTK events/signals.
+  This one is used for responding to identifying points.
+ */
+typedef void (*IdentifyProc)(void *user_data, gint id, splotd *sp, GtkWidget *w, ggobid *gg);
+typedef struct {
+  IdentifyProc handler;
+  void *user_data;
+} IdentifyHandler;
 
 struct _ggobid {
 
@@ -253,7 +265,20 @@ struct _ggobid {
     bin_struct **binarray;
     icoords bin0, bin1;
 
+    gboolean firsttime;
   } brush;
+
+
+  struct _Mode_SubMenu {
+    GtkWidget *reset_item;
+    GtkWidget *link_item;
+    GtkWidget *io_item;
+ 
+    gboolean firsttime_reset;
+    gboolean firsttime_link;
+    gboolean firsttime_io;
+   
+  } mode_menu;
 
   struct _Color_UI {
     GtkWidget *symbol_window;
@@ -341,6 +366,10 @@ struct _ggobid {
 
   } write;
 
+
+  gboolean close_pending;
+
+  IdentifyHandler identify_handler;
 }; /*  ggobid; */
 
 

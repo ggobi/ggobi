@@ -1,3 +1,6 @@
+#ifndef GGOBI_EXTERNS_H
+#define GGOBI_EXTERNS_H
+
 #include <stdio.h>
 
 extern ggobid *ValidateGGobiRef (ggobid *gg, gboolean fatal);
@@ -284,4 +287,15 @@ extern void zoom_step (splotd *, gint, gint, rectd *, ggobid* gg);
 ggobid * ggobi_get (gint);
 displayd * display_alloc_init (enum displaytyped type, gboolean missing_p, ggobid *gg);
 
+/* The new way of handling window closures, so that we don't
+   just exit.
+ */
+void ggobi_close(GtkObject *w, ggobid *gg);
+int ggobi_remove_by_index(ggobid *gg, int which);
+int ggobi_remove(ggobid *gg);
+
+#include "GGobiAPI.h"
+
 #define CHECK_GG(a) ValidateGGobiRef(a, true)
+
+#endif

@@ -9,7 +9,6 @@
 #include "vars.h"
 #include "externs.h"
 
-
 ggobid **all_ggobis;
 int num_ggobis;
 
@@ -164,6 +163,39 @@ gint main (gint argc, gchar *argv[])
  return (0);
 }
 
+int
+ggobi_remove(ggobid *gg)
+{ 
+  int i;
+  for(i = 0; i < num_ggobis; i++) {
+    if(all_ggobis[i] == gg) {
+      return(ggobi_remove_by_index(gg, i));
+    }
+  }
+
+  return(-1);
+}
+
+int
+ggobi_remove_by_index(ggobid *gg, int which)
+{
+  /* Move all the entries after the one being removed
+     down by one in the array to compact it.
+   */
+  if(which < num_ggobis -1) {
+    memcpy(all_ggobis + which, all_ggobis + which + 1, num_ggobis-which);
+  }
+  /* Now patch up the array so that it has the correct number of elements. */
+  num_ggobis--;
+  if(num_ggobis > 0)
+    all_ggobis = g_realloc(all_ggobis, sizeof(ggobid*) * num_ggobis);
+  else
+    all_ggobis = NULL;
+
+  g_free(gg);
+
+  return(which);
+}
 
 ggobid*
 ggobi_alloc()
@@ -175,10 +207,14 @@ ggobi_alloc()
   memset(tmp, '\0', sizeof(ggobid));
   tmp->app.direction = FORWARD;
   tmp->firsttime = true;
+  tmp->brush.firsttime = true;
   tmp->mode = XYPLOT;
   tmp->prev_mode = XYPLOT;
   tmp->projection = XYPLOT;
   tmp->prev_projection = XYPLOT;
+
+  tmp->mode_menu.firsttime_reset = tmp->mode_menu.firsttime_link = 
+      tmp->mode_menu.firsttime_io =  true;
 
   tmp->color_ui.margin = 10;
   tmp->tour_idled = 0;
@@ -218,8 +254,19 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
   parse_command_line (&argc, argv, gg);
   g_print ("data_in = %s\n", gg->data_in);
 
+
   make_ggobi (gg->data_in, processEvents, gg);
 
   g_free (gg->data_in);
  return (num_ggobis);
+}
+
+
+/*
+  Called in response to a window being destroyed.
+ */
+void
+ggobi_close(GtkObject *w, ggobid *gg)
+{
+  GGOBI(close)(gg, false);
 }

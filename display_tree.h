@@ -9,6 +9,7 @@
 /* Global variable for the */
 typedef struct {
 
+  GtkWidget *window;
   GtkWidget *tree;
   int numItems;
 

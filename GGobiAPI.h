@@ -171,13 +171,28 @@ extern displayd *GGOBI(setCurrentDisplay)(int which, ggobid *gg);
 extern splotd *GGOBI(getPlot)(displayd *display, int which);
 
 
-extern void GGOBI(moveBrush) (gint ulx, gint uly);
-extern void GGOBI(sizeBrush) (gint width, gint height);
+extern void GGOBI(moveBrush) (gint ulx, gint uly, ggobid *gg);
+extern void GGOBI(sizeBrush) (gint width, gint height, ggobid *gg);
 
 extern int GGOBI(getNumGGobis)();
 
 gboolean GGOBI(setColorMap)(double *vals, int nr, ggobid *gg);
 gboolean GGOBI(registerColorMap)(ggobid *gg);
+
+gboolean GGOBI(close)(ggobid *gg, gboolean closeWindow);
+
+void GGOBI(setIdentifyHandler)(IdentifyProc proc,  void *data, ggobid *gg);
+
+/* These perhaps should be specified in natural coordinates.
+   For now, pixels
+*/
+
+void GGOBI(getBrushSize)(int *w, int *h, ggobid *gg);
+void GGOBI(getBrushLocation)(int *x, int *y, ggobid *gg);
+
+void GGOBI(setBrushSize)(int w, int h, ggobid *gg);
+void GGOBI(setBrushLocation)(int x, int y, ggobid *gg);
+
 
 #endif /* End of conditional inclusion of entire file.*/
 

@@ -88,6 +88,7 @@ plot_tree_display(ggobid *gg)
 
  gg->app.display_tree.tree = tree;
  gg->app.display_tree.numItems = numItems;
+ gg->app.display_tree.window = plot_tree_window;
 
  return(GTK_TREE( tree ));
 }

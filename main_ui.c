@@ -148,13 +148,6 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
 void
 mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
 {
-  static GtkWidget *reset_item = NULL;
-  static GtkWidget *link_item = NULL;
-  static GtkWidget *io_item = NULL;
-
-  static gboolean firsttime_reset = true;
-  static gboolean firsttime_link = true;
-  static gboolean firsttime_io = true;
 
   if (state == off) {
 
@@ -168,24 +161,24 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
         break;
 
       case ROTATE:
-        submenu_destroy (io_item);
+        submenu_destroy (gg->mode_menu.io_item);
         break;
 
       case TOUR2D:
-        submenu_destroy (io_item);
+        submenu_destroy (gg->mode_menu.io_item);
         break;
 
       case SCALE:
-        submenu_destroy (reset_item);
+        submenu_destroy (gg->mode_menu.reset_item);
         break;
 
       case BRUSH:
-        submenu_destroy (reset_item);
-        submenu_destroy (link_item);
+        submenu_destroy (gg->mode_menu.reset_item);
+        submenu_destroy (gg->mode_menu.link_item);
         break;
 
       case IDENT:
-        submenu_destroy (link_item);
+        submenu_destroy (gg->mode_menu.link_item);
         break;
 
     }
@@ -203,56 +196,56 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case ROTATE:
         rotation_menus_make (gg);
 
-        io_item = submenu_make ("_I/O", 'I', gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item),
+        gg->mode_menu.io_item = submenu_make ("_I/O", 'I', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
                                    gg->app.rotation_io_menu); 
-        if (firsttime_io) {
-          submenu_insert (io_item, gg->main_menubar, -1);
-          firsttime_io = false;
+        if (gg->mode_menu.firsttime_io) {
+          submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
+          gg->mode_menu.firsttime_io = false;
         }
         break;
 
       case TOUR2D:
         tour2d_menus_make (gg);
 
-        io_item = submenu_make ("_I/O", 'I', gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item),
+        gg->mode_menu.io_item = submenu_make ("_I/O", 'I', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
                                    gg->app.tour2d_io_menu); 
-        if (firsttime_io) {
-          submenu_insert (io_item, gg->main_menubar, -1);
-          firsttime_io = false;
+        if (gg->mode_menu.firsttime_io) {
+          submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
+          gg->mode_menu.firsttime_io = false;
         }
         break;
 
       case SCALE :
         scale_menus_make (gg);
 
-        reset_item = submenu_make ("_Reset", 'R', gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (reset_item),
+        gg->mode_menu.reset_item = submenu_make ("_Reset", 'R', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.reset_item),
                                    gg->app.scale_reset_menu); 
-        if (firsttime_reset) {
-          submenu_insert (reset_item, gg->main_menubar, -1);
-          firsttime_reset = false;
+        if (gg->mode_menu.firsttime_reset) {
+          submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
+          gg->mode_menu.firsttime_reset = false;
         }
         break;
 
       case BRUSH :
         brush_menus_make (gg);
 
-        reset_item = submenu_make ("_Reset", 'R', gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (reset_item),
+        gg->mode_menu.reset_item = submenu_make ("_Reset", 'R', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.reset_item),
                                    gg->brush.reset_menu); 
-        if (firsttime_reset) {
-          submenu_insert (reset_item, gg->main_menubar, -1);
-          firsttime_reset = false;
+        if (gg->mode_menu.firsttime_reset) {
+          submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
+          gg->mode_menu.firsttime_reset = false;
         }
 
-        link_item = submenu_make ("_Link", 'L', gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (link_item),
+        gg->mode_menu.link_item = submenu_make ("_Link", 'L', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
                                    gg->brush.link_menu); 
-        if (firsttime_link) {
-          submenu_insert (link_item, gg->main_menubar, -1);
-          firsttime_link = false;
+        if (gg->mode_menu.firsttime_link) {
+          submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
+          gg->mode_menu.firsttime_link = false;
         }
 
         break;
@@ -260,12 +253,12 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case IDENT:
         identify_menus_make (gg);
 
-        link_item = submenu_make ("_Link", 'L', gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (link_item),
+        gg->mode_menu.link_item = submenu_make ("_Link", 'L', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
                                    gg->app.identify_link_menu); 
-        if (firsttime_link) {
-          submenu_insert (link_item, gg->main_menubar, -1);
-          firsttime_link = false;
+        if (gg->mode_menu.firsttime_link) {
+          submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
+          gg->mode_menu.firsttime_link = false;
         }
         break;
 
@@ -536,7 +529,8 @@ quit_ggobi(void)
  gtk_main_quit();
 }
 
-void make_ui (ggobid *gg) {
+void 
+make_ui (ggobid *gg) {
   GtkWidget *window;
   GtkWidget *hbox, *vbox;
   GList *items, *subitems;
@@ -546,14 +540,15 @@ void make_ui (ggobid *gg) {
   gg->tips = gtk_tooltips_new ();
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gg->app.main_window = window;
   GGobi_widget_set(window, gg, true);
 
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
 
   gtk_signal_connect (GTK_OBJECT (window), "delete_event",
-                      GTK_SIGNAL_FUNC (gtk_exit), NULL);
+                      GTK_SIGNAL_FUNC (ggobi_close), gg);
   gtk_signal_connect (GTK_OBJECT (window), "destroy",
-                      GTK_SIGNAL_FUNC (gtk_exit), NULL);
+                      GTK_SIGNAL_FUNC (ggobi_close), gg);
 
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 

@@ -28,7 +28,7 @@ DisplayOptions DefaultDisplayOptions = {
 /*----------------------------------------------------------------------*/
 
 /*-- replot all splots in display --*/
-static void
+void
 display_plot (displayd *display, guint type, ggobid *gg) {
   GList *slist;
   splotd *sp;
@@ -225,7 +225,8 @@ void
 display_free (displayd* display, gboolean force, ggobid *gg) {
   GList *l;
   splotd *sp = NULL;
-
+  extern int num_ggobis;
+  int count;
 /*
  * If the current splot belongs to this display, turn off its
  * event handlers before freeing all the splots belonging to this
@@ -236,7 +237,7 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
      sp_event_handlers_toggle (gg->current_splot, off);
   }
 
-  if (force || g_list_length (gg->displays) > 1) {
+  if (num_ggobis > 1 || force || g_list_length (gg->displays) > 1) {
 
     /* If the display tree is active, remove the corresponding
        entry.
@@ -258,7 +259,8 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
       }
     }
 
-    for (l=display->splots; l; l=l->next) {
+    count = g_list_length(display->splots);
+    for (l=display->splots; count > 0 && l; l=l->next, count--) {
       sp = (splotd *) l->data;
       splot_free (sp, display, gg);
     }
@@ -272,10 +274,20 @@ void
 display_free_all (ggobid *gg) {
   GList *dlist;
   displayd *display;
+  int count = g_list_length(gg->displays);
 
-  for (dlist = gg->displays; dlist; dlist = dlist->next) {
-    display = (displayd *) dlist->data;
-    display_free (display, false, gg); /* Perhaps this should be true to get the final one.*/
+  /* Have to count down rather than rely on dlist being non-null.
+     This is because when we remove the last entry, we get garbage
+     not a null value.
+   */
+  for (dlist = gg->displays; count > 0 && dlist ; dlist = dlist->next, count--) {
+    /*    display = (displayd *) dlist->data; */
+    display = (displayd*) g_list_nth_data(gg->displays,count-1);
+     /* Perhaps this force should be true to get the final one.
+        It will work now if there is more than one ggobi instance
+        running.
+      */
+    display_free (display, false, gg); 
   }
 }
 

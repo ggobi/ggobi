@@ -243,13 +243,13 @@ brush_free (ggobid *gg)
 void
 brush_init (ggobid *gg)
 {
-  static gboolean firsttime = true;
+  
 
   gg->glyph_id.type = gg->glyph_0.type = FILLED_CIRCLE;
   gg->glyph_id.size = gg->glyph_0.size = 3;
   gg->color_id = gg->color_0 = 0;
 
-  if (firsttime) {
+  if (gg->brush.firsttime) {
     brush_pos_init (gg);
 
     /*
@@ -266,7 +266,7 @@ brush_init (ggobid *gg)
 
     brush_alloc (gg);
 
-    firsttime = false;
+    gg->brush.firsttime = false;
 
   } else {
   }

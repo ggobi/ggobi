@@ -320,12 +320,26 @@ The return value is a matrix of numeric values containing the data
 values.  The names of the rows and columns are the XGobi row labels
 and variable names respectively.
 
-
+Note that subsetting on a ggobi instance reference (basically an
+integer returned by \SFunction{getDefaultGGobi} and \SFunction{ggobi})
+works in a manner consistent with R.
+\begin{verbatim}
+ g <- ggobi(mtcars)
+ g[1:10,]
+ g[1:10, c("mpg","cyl")]
+ g[1:10, 1:2]
+\end{verbatim}
+For large datasets and situations where one wants to extract
+relatively few columns, it might be more efficient to use the
+\SFunction{ggobi.getVariable} function.
+This avoids copying the entire dataset into an R structure,
+and works only on the specified variables.
 
 \subsection{getColors}
 
 
 \subsection{set}
+
 
 \subsection{getGlyphs}
 

@@ -720,3 +720,99 @@ GGOBI(registerColorMap)(ggobid *gg)
 
  return(true);
 }
+
+/*
+  Whether to destory the window or not.
+  If this is being called from an event handler
+  in response to the window being destroyed, we would
+  get a circularity. However, when called programmatically
+  from within the process (or from e.g. R) we need to force
+  it to be closed.
+ */
+gboolean
+GGOBI(close)(ggobid *gg, gboolean closeWindow)
+{
+  if(gg->close_pending)
+    return(false);
+
+  gg->close_pending = true;
+  display_free_all(gg);
+
+  if(closeWindow && gg->app.main_window)
+    gtk_widget_destroy(gg->app.main_window);
+
+  if(gg->app.display_tree.window)
+    gtk_widget_destroy(gg->app.display_tree.window);
+  if(gg->app.vardata_window)
+    gtk_widget_destroy(gg->app.vardata_window);
+
+  gg->close_pending = false;
+  /* Now fix up the list of ggobi's */
+  return(ggobi_remove(gg) != -1);
+}
+
+void
+GGOBI(setIdentifyHandler)(IdentifyProc proc,  void *data, ggobid *gg)
+{
+  gg->identify_handler.handler = proc;
+  gg->identify_handler.user_data = data;
+}
+
+
+void
+GGOBI(getBrushSize)(int *w, int *h, ggobid *gg)
+{
+ *w = ABS(gg->brush.brush_pos.x1 - gg->brush.brush_pos.x2);
+ *h = ABS(gg->brush.brush_pos.y1 - gg->brush.brush_pos.y2);
+}
+
+void
+GGOBI(getBrushLocation)(int *x, int *y, ggobid *gg)
+{
+ *x = MIN(gg->brush.brush_pos.x1, gg->brush.brush_pos.x2);
+ *y = MIN(gg->brush.brush_pos.y1, gg->brush.brush_pos.y2);
+}
+
+void
+redraw(ggobid *gg)
+{
+  /*
+ active_paint_lines(gg);
+ active_paint_lines(gg);
+  */
+ brush_once(true, gg);
+ display_plot(gg->current_display, FULL, gg);
+}
+
+
+void GGOBI(setBrushSize)(int w, int h, ggobid *gg)
+{
+ gg->brush.brush_pos.x1 = MIN(gg->brush.brush_pos.x1, gg->brush.brush_pos.x2);
+ gg->brush.brush_pos.y1 = MIN(gg->brush.brush_pos.y1, gg->brush.brush_pos.y2);
+
+ gg->brush.brush_pos.x2 =  gg->brush.brush_pos.x1 + w;
+ gg->brush.brush_pos.y2 =  gg->brush.brush_pos.y1 + h;
+
+ redraw(gg);
+ display_plot(gg->current_display, FULL, gg);
+}
+
+
+void GGOBI(setBrushLocation)(int x, int y, ggobid *gg)
+{
+ int wd, ht;
+ GGOBI(getBrushSize)(&wd, &ht, gg);
+ 
+
+ gg->brush.brush_pos.x1 = x;
+ gg->brush.brush_pos.y1 = y;
+ GGOBI(setBrushSize)(wd, ht, gg);
+
+ redraw(gg);
+}
+
+void
+GGOBI(getPlotPixelSize)(int *w, int *h, splotd *sp)
+{
+
+}
