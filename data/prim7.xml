@@ -14,7 +14,7 @@
 <variable>X6</variable>
 <variable>X7</variable>
 </variables>
-<records count="500" glyphType="5" glyphSize="3" color="1">
+<records count="500" glyph="fc 3" color="1">
 <record id="0" color="8">
 5.752 4.553 1.526 0.156 23.512 -5.530 -0.148 
 </record>
