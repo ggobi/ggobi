@@ -36,3 +36,19 @@ RSggobi
    support the first two choices, and eventually, via the plugin
    the third choice.)
 
+Builds for different os:
+  Windows binary of both ggobi and Rggobi.
+  tar.gz for unix users.
+
+Mailing Lists: 
+
+  How are we going to announce the ggobi release? 
+    R mailing list
+    submission to JSS, manual and web page with code?
+    Specifically to people that have emailed the help list, and 
+      developers individually
+    List the project on specific web sites, such as
+      http://www.freshmeat.net (suggested by an astronomer recently)
+      http://kdnuggest.com
+
+
