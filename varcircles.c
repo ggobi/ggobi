@@ -21,15 +21,21 @@ static gboolean da_expose_cb (GtkWidget *, GdkEventExpose *, gpointer cbd);
 #define LBL 1
 #define DA  2
 
+void
+varcircles_delete_nth (gint jvar, datad *d)
+{
+  GtkWidget *w;
+  w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.vb, jvar);
+  if (w != NULL) {
+    d->varpanel_ui.vb = g_slist_remove (d->varpanel_ui.vb, (gpointer) w);
+    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.table), w);
+g_printerr ("removed circle %d\n", jvar);
+  }
+}
+
 GtkWidget *
 varcircles_get_nth (gint which, gint jvar, datad *d) {
   GtkWidget *w;
-  gint j, n;
-
-  if ((n = g_slist_length (d->varpanel_ui.vb)) < jvar+1) {
-    for (j=n; j<d->ncols; j++)
-      varcircles_add (j, d, d->gg);
-  }
 
   switch (which) {
     case VB:
@@ -79,8 +85,12 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
     );
   gdk_flush();
 
+  /*-- we need any old vb; loop in case the first vars were deleted --*/
+  vb = NULL;
+  j = 0;
+  while (vb == NULL && j < ncols)
+    vb = varcircles_get_nth (VB, j++, d);
 
-  vb = varcircles_get_nth (VB, 0, d);
   if (gg->varpanel_ui.layoutByRow) {
     gint vport_width, vb_width;
 
@@ -112,11 +122,10 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
   d->varpanel_ui.tncols = tncols;
   d->varpanel_ui.tnrows = tnrows;
 
-
   for (j=0; j<ncols; j++) {
     /*-- if they're in the container, ref and remove them --*/
     vb = varcircles_get_nth (VB, j, d);
-    if (vb->parent != NULL && vb->parent == d->varpanel_ui.table)
+    if (vb != NULL && vb->parent != NULL && vb->parent == d->varpanel_ui.table)
     {
       gtk_widget_ref (vb);
       gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.table), vb);

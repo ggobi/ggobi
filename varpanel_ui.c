@@ -25,6 +25,18 @@
 /*                         utilities                                       */
 /*-------------------------------------------------------------------------*/
 
+void
+checkbox_delete_nth (gint jvar, datad *d)
+{
+  GtkWidget *w;
+  w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.checkbox, jvar);
+  if (w != NULL) {
+    d->varpanel_ui.checkbox = g_slist_remove (d->varpanel_ui.checkbox,
+                                              (gpointer) w);
+    gtk_widget_destroy (w);
+  }
+}
+
 
 GtkWidget *
 checkbox_get_nth (gint jvar, datad *d)

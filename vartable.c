@@ -171,6 +171,11 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 {
   gint j, jfrom, jto;
   gint *keepers, nkeepers;
+  gint n;
+  gint *vars;
+  GList *dlist;
+  displayd *display;
+  splotd *sp;
 
   keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
   nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
@@ -211,13 +216,63 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   arrayl_alloc (&d->world, d->nrows, nkeepers);
 
   /*-- delete checkboxes --*/
+  for (j=ncols-1; j>=0; j--) {
+    checkbox_delete_nth (cols[j], d);
+  }
 
   /*-- delete variable circles --*/
+  for (j=ncols-1; j>=0; j--) {
+    varcircles_delete_nth (cols[j], d);
+  }
+  varcircles_layout_reset (d->ncols-ncols, d, gg);
 
   d->ncols -= ncols;
 
   /*-- run the pipeline  --*/
   tform_to_world (d, gg);
+
+  /*-- clean up the plotted variables for each display type and mode --*/
+  for (dlist = gg->displays; dlist; dlist = dlist->next) {
+    display = (displayd *) dlist->data;
+
+    switch (display->displaytype) {
+      case scatterplot:
+        sp = (splotd *) display->splots->data;
+        /*-- make sure p1dvar is reasonable --*/
+        if (sp->p1dvar >= d->ncols-1)
+          sp->p1dvar = 0;
+
+        /*-- make sure xyvars are reasonable --*/
+        if (sp->xyvars.x >= d->ncols-1)
+          sp->xyvars.x = 0;
+        if (sp->xyvars.y >= d->ncols-1 || sp->xyvars.y == sp->xyvars.x)
+          sp->xyvars.y = 1;
+
+        /*-- make sure tour_vars are reasonable --*/
+        n = 0;
+        vars = (gint *)
+          g_malloc (MIN (display->ntour_vars, d->ncols) * sizeof (gint));
+        for (j=0; j<display->ntour_vars; j++)
+          if (display->tour_vars[j] < d->ncols-1)
+            vars[n++] = display->tour_vars[j];
+
+        for (j=0; j<n; j++)
+          display->tour_vars[j] = vars[j];
+        display->ntour_vars = n;
+
+        g_free (vars);
+      break;
+
+/*-- delete or replace variables in these two modes --*/
+      case scatmat:
+      break;
+
+      case parcoords:
+      break;
+    }
+  }
+
+  displays_tailpipe (REDISPLAY_ALL, gg);
 }
 
 /*-------------------------------------------------------------------------*/

@@ -394,6 +394,13 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
 
+/*
+ * This may be the place to respond to the possibility that a
+ * plotted variable has just been deleted.  It's no big deal for
+ * the scatterplot -- unless one of the plotted variables is now
+ * beyond d->ncols.
+*/
+
   switch (display->displaytype) {
 
     case scatterplot:
@@ -402,25 +409,25 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
           p1d_reproject (sp,
             (display->missing_p) ? d->missing_world.vals : d->world.vals,
             d, gg);
-          break;
+        break;
 
         case XYPLOT:
           xy_reproject (sp,
             (display->missing_p) ? d->missing_world.vals : d->world.vals,
             d, gg);
-          break;
+        break;
 
         case TOUR1D:
-            tour1d_projdata(sp,
+          tour1d_projdata (sp,
             (display->missing_p) ? d->missing_world.vals : d->world.vals,
             d, gg);
-          break;
+        break;
 
         case TOUR2D:
-            tour2d_projdata(sp,
+          tour2d_projdata(sp,
             (display->missing_p) ? d->missing_world.vals : d->world.vals,
             d, gg);
-          break;
+        break;
       }
       break;
 
