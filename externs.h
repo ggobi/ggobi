@@ -232,7 +232,7 @@ extern void scatterplot_cpanel_init (cpaneld *, gint, ggobid *);
 extern void scatterplot_main_menus_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 extern displayd* scatterplot_new (gboolean, splotd *sp, datad *d, ggobid *);
 extern void scatterplot_show_rulers (displayd *, gint);
-extern gboolean scree_mapped_p (void);
+extern gboolean scree_mapped_p (ggobid *);
 extern gint selected_cols_get (gint *, gboolean, datad *d, ggobid *);
 extern void smooth_window_open (ggobid *);
 extern void sp_event_handlers_toggle (splotd *, gboolean);

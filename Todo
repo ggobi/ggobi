@@ -11,6 +11,10 @@ API code needed:
   sticky labels
   imputation of missing values
 
+datad:
+  sphering needs to check whether the d it's working with has
+  changed
+
 various stuff not yet implemented: 
   1d, xy cycling  .... or leave it as a demo in R for now?
   some window closings  (display tree, ...)
@@ -53,7 +57,8 @@ Food for thought:
   * Now using the variable statistics panel for variable selection for
      initiating parcoords and scatmat plots
      transformation, imputation, jittering, saving
-    We surely need a more obvious variable selection dialog -- see vardialog_ui.c
+    We surely need a more obvious variable selection dialog -- see
+    vardialog_ui.c
 
   * Categorical data?  Better labelling, at least?
 

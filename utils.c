@@ -341,29 +341,26 @@ gint
 plotted_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg) 
 {
   gint mode = mode_get (gg);
-  gint j, ncols = 0;
+  gint ncols = 0;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
-  for (j=0; j<d->ncols; j++) {
-    /*-- if j is plotted in the current splot ... --*/
-    switch (display->displaytype) {
-      case scatterplot:
-        switch (mode) {
-          case P1PLOT:
-            cols[ncols++] = sp->p1dvar;
-            break;
-          case XYPLOT:
-            cols[ncols++] = sp->xyvars.x;
-            cols[ncols++] = sp->xyvars.y;
-            break;
-        }
-        break;
-      case scatmat:
-        break;
-      case parcoords:
-        break;
-    }
+  switch (display->displaytype) {
+    case scatterplot:
+      switch (mode) {
+        case P1PLOT:
+          cols[ncols++] = sp->p1dvar;
+          break;
+        case XYPLOT:
+          cols[ncols++] = sp->xyvars.x;
+          cols[ncols++] = sp->xyvars.y;
+          break;
+      }
+      break;
+    case scatmat:
+      break;
+    case parcoords:
+      break;
   }
 
   return ncols;

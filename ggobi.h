@@ -245,9 +245,13 @@ struct _ggobid {
 
  struct _Sphere {
    GtkWidget *window;
-   GtkAdjustment *npcs_adj;
+   GtkObject *npcs_adj;
    GtkWidget *totvar_entry, *condnum_entry;
-   GtkWidget *sphere_apply_btn;
+   GtkWidget *apply_btn;
+
+   GtkWidget *scree_da;
+   GdkPixmap *scree_pixmap;
+
  } sphere_ui;
 
 /*-------------------- subsetting ------------------------------------*/

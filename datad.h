@@ -97,11 +97,10 @@ typedef struct /*-- datad --*/ {
 
  gint std_type;  /* Can be 0, 1 or 2 */
 
+ /* sphering transformation */
  struct _Sphere_d {
-   /* sphering transformation */
-   gint nspherevars;
-   gint *spherevars;
-   gint sphere_npcs;
+   gint nvars, *vars;  /*-- vars available for sphering --*/
+   gint npcs;          /*-- the first npcs vars of vars will be sphered --*/
 
    gfloat *eigenval;
    gfloat **eigenvec;
