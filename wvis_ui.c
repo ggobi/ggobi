@@ -31,7 +31,7 @@ static gint ymargin = 20;
 static void bin_counts_reset (gint jvar, datad *d, ggobid *gg);
 
 GtkWidget *createColorSchemeTree(int numTypes, gchar *schemeTypes[], ggobid *gg, GtkWidget *notebook);
-void selection_made_cb (GtkWidget *clist, gint row, gint column,
+static void selection_made_cb (GtkWidget *clist, gint row, gint column,
   GdkEventButton *event, ggobid *gg);
 static void entry_set_scheme_name (ggobid *gg);
 
