@@ -230,7 +230,7 @@ g_printerr ("through spring_once (ten times)\n");
       tform_to_world_by_var (jvar, d, gg);
     }
   }
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+  displays_tailpipe (FULL, gg);
 }
 
 
