@@ -51,7 +51,6 @@ static gint
 motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gint k;
-  static gint prev_nearest;
   ggobid *gg = GGobiFromSPlot(sp);
 
 /*
@@ -60,10 +59,12 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 */
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
-  gdk_window_get_pointer (w->window, &gg->app.cursor_pos.x, &gg->app.cursor_pos.y, NULL);
+  gdk_window_get_pointer (w->window,
+    &gg->app.cursor_pos.x, &gg->app.cursor_pos.y, NULL);
   k = find_nearest_point (&gg->app.cursor_pos, sp, gg);
+  gg->app.nearest_point = k;
 
-  if (k != prev_nearest) {
+  if (k != gg->app.nearest_point_prev) {
 
     splot_pixmap0_to_pixmap1 (sp, false, gg);
 
@@ -75,7 +76,7 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
     if (k != -1)
       displays_add_point_labels (sp, k, gg);
 
-    prev_nearest = k;
+    gg->app.nearest_point_prev = k;
   }
 
   return true;  /* no need to propagate the event */

@@ -193,6 +193,7 @@ exclusion_window_open (ggobid *gg) {
 
     /*-- destroy all the widgets that were in the table --*/
     gint table_rows = GTK_TABLE (exclusion_table)->nrows;
+
     for (k=0; k<table_rows-1; k++)
       cluster_free (k, gg);
 

@@ -6,10 +6,12 @@
 
 void
 cluster_free (gint k, ggobid *gg) {
-  gtk_widget_destroy (gg->clusv[k].da);
-  gtk_widget_destroy (gg->clusv[k].lbl);
-  gtk_widget_destroy (gg->clusv[k].hide_tgl);
-  gtk_widget_destroy (gg->clusv[k].exclude_tgl);
+  if (gg->clusv[k].da) {
+    gtk_widget_destroy (gg->clusv[k].da);
+    gtk_widget_destroy (gg->clusv[k].lbl);
+    gtk_widget_destroy (gg->clusv[k].hide_tgl);
+    gtk_widget_destroy (gg->clusv[k].exclude_tgl);
+  }
 }
 
 

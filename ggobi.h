@@ -46,6 +46,7 @@ typedef struct {
   /* identify_ui.c */
   GtkWidget *identify_link_menu;
   icoords cursor_pos;
+  gint nearest_point, nearest_point_prev; 
 
   /* texture */
   gfloat *gy;
