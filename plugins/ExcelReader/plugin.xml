@@ -1,0 +1,103 @@
+<inputPlugin name="ExcelReader" load="immediate" interactive="true">
+   <description>input plugin for reading data from Excel using COM</description>
+   <author>Duncan Temple Lang</author>
+   <modeName>excel</modeName>
+   <dll name="plugins/ExcelReader/ExcelReader">
+    <init description="ExcelDataDescription" onLoad="onLoad"/>
+   </dll>
+   <usage>
+     ggobi --init=ggobi.init  --datamode=excel
+   </usage>
+   <documentation xmlns:r="http://cran.r-project.org"
+                  xmlns:com="http://www.microsoft.com"
+                  xmlns:c="http://www.c.org">
+
+ This plugin is intended to allow one to read data directly from Excel
+  or from an Excel file.  We use COM to create an instance of Excel
+  and then load the specified file into it.  This allows us to read
+  files directly without having to request that the user export it in
+  comma-separted format (CSV).  Indeed, the data need never exist in a
+  file, but instead we could instruct the plugin to use an existing
+  Excel instance and read its data. If the data came to be in Excel
+  from a database query, or some other input mechanism such as from a
+  URL, there need be no local file.
+
+<para/>
+The mechanism for reading the data is as follows.
+ We then query the
+  workbook for its sheets and loop over these to create a GGobi
+  dataset from each of these.  For each worksheet, we ask for the its
+  <com:property>UsedRange</com:property> property.  This gives us the
+  range of cells and, assuming that the data is contiguously layed
+  out, i.e. with no blank lines or columns.  Individual cells may be
+  blank in which case we treat this element as a missing value.
+  At present, we treat data quite simply.
+  We start by assuming everything is a number.
+<para/> 
+
+Getting the dimensions of a dataset from a sheet
+is done using the following steps.
+
+<code>
+ur = sheet[["UsedRange"]]
+
+nr = ur$End(xlDown) - ur[["Row"]] + 1
+nc = ur$End(xlToRight) - ur[["Column"]] + 1
+</code>
+At this point, we can allocate our datad
+instance. We can add the record and column names later.
+
+<para/> 
+
+To get the actual values, we need only ask the
+<com:class>Range</com:class> object <var>ur</var> for its
+<com:property>Value</com:property> values.  This is returned as a
+two-dimensional array.  We then traverse this and fill in the values
+in the corresponding dataset positions in GGobi.
+
+<para/>
+
+ We handle the different values by converting them from their
+respective <c:type>VARIANT</c:type> structures.
+We can also perform heuristics to determine whether the
+
+<para/>
+
+We can use different strategies for handling large data. For example,
+if we don't want to handle all the values in memory at one time in
+both GGobi and in the COM array, we can change to looping over either
+the columns or the cells and making more
+calls to Excel. For example, we might
+loop something like
+<code>
+<![CDATA[
+for(j = 0; j < nc; j++) {
+ for(i = 0; i < nr ; i++) {
+   datad->raw.vals[i][j] = ur$Item(i+i, j+i);
+ }
+}
+]]>
+</code>
+
+Dealing with categorical values, etc.
+requires a great deal of extra processing
+to compute or augment the levels.
+
+<para/>
+
+ In the future, someone might want to make this plugin customizable
+via a dialog.  One could make it operate as a regular plugin and have
+a dialog popup when selected from a menu.  This dialog would then
+allow the user to specify the range, whether the first consisted of
+names or regular values, the "symbol" to use for a missing value, and
+so on.
+
+<para/>
+We should note that we can do this from R using the
+<r:package>RDCOMClient</r:package> and with an
+<r:package>RExcelClient</r:package> and it would be better to put the
+effort into developing that code. We could then use that via an R
+plugin to ggobi, an R DCOM server, or via Rggobi.
+
+   </documentation>
+</inputPlugin>
