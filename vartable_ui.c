@@ -1114,7 +1114,9 @@ vartable_stats_set_by_var (gint j, datad *d) {
       CLIST_MEAN, stmp);
     g_free (stmp);
 
-    stmp = g_strdup_printf ("%8.3f", vt->median);
+    /*-- for categorical variables, don't display the median --*/
+    stmp = (vt->categorical_p) ?
+      g_strdup("") : g_strdup_printf ("%8.3f", vt->median);
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
       CLIST_MEDIAN, stmp);
     g_free (stmp);
