@@ -4,10 +4,18 @@
   
   <modeNames>
     <modeName>testInput</modeName>
+    <modeName>randomData</modeName>
   </modeNames>
   <dll name="plugins/TestInput/TestInput"> 
       <init description="test_input_description" />
   </dll>
+  <description>
+   From the development directory,
+   <usage>
+    run --datamode=testInput --plugin=plugins/TestInput/plugin.xml
+    run --datamode=randomData --plugin=plugins/TestInput/plugin.xml
+   </usage>
+  </description>
 </inputPlugin>
 
 
