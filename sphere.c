@@ -557,7 +557,7 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
       b[j] = tmpf / eigenval[j]; 
     }
     for (j=0; j<pcvars->nels; j++)
-      d->tform.vals[i][pcvars->els[j]] = b[j];
+      d->raw.vals[i][pcvars->els[j]] = d->tform.vals[i][pcvars->els[j]] = b[j];
   }
 
   g_free (b);
