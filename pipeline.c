@@ -105,7 +105,9 @@ pipeline_arrays_check_dimensions (datad *d)
       d->sampled.els[i] = true;
   }
 
-  /*-- d->sampled --*/
+  /*-- d->rows_in_plot --*/
+  if (d->rows_in_plot.nels < d->nrows)
+    arrayg_add_rows (&d->jitdata, d->nrows);
 }
 
 /*-------------------------------------------------------------------------*/
