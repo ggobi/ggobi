@@ -27,6 +27,7 @@ void graphact_init (graphactd *ga);
 void init_edge_vectors (gboolean reinit, PluginInstance *inst);
 graphactd * graphactFromInst (PluginInstance *inst);
 void ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst);
+void ga_orphans_hide_cb (GtkWidget *btn, PluginInstance *inst);
 void ga_nodes_show_cb (GtkWidget *btn, PluginInstance *inst);
 void count_visible_edges (PluginInstance *inst);
 void show_neighbors_toggle_cb (GtkToggleButton *button, PluginInstance *inst);

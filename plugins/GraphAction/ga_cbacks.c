@@ -39,7 +39,6 @@ count_visible_edges (PluginInstance *inst)
     i = d->rows_in_plot.els[m];
     for (k=0; k<ga->inEdges[i].nels; k++) {
       edgeid = ga->inEdges[i].els[k];
-      /*a = d->rowid.idv.els[endpoints[edgeid].a];*/
       a = endpoints[edgeid].a;
       /*-- no need for b, because i = b --*/
       if (e->sampled.els[edgeid] && !e->hidden_now.els[edgeid] &&
@@ -50,7 +49,6 @@ count_visible_edges (PluginInstance *inst)
     }
     for (k=0; k<ga->outEdges[i].nels; k++) {
       edgeid = ga->outEdges[i].els[k];
-      /*b = d->rowid.idv.els[endpoints[edgeid].b];*/
       b = endpoints[edgeid].b;
       /*-- no need for a, because i = a --*/
       if (e->sampled.els[edgeid] && !e->hidden_now.els[edgeid] &&
@@ -88,7 +86,6 @@ hide_inEdge (gint i, PluginInstance *inst)
 
   for (k=0; k<ga->inEdges[i].nels; k++) {
     edgeid = ga->inEdges[i].els[k];
-    /*a = d->rowid.idv.els[endpoints[edgeid].a];*/
     a = endpoints[edgeid].a;
     /*-- no need for b, because i = b --*/
 
@@ -121,7 +118,6 @@ hide_outEdge (gint i, PluginInstance *inst)
 
   for (k=0; k<ga->outEdges[i].nels; k++) {
     edgeid = ga->outEdges[i].els[k];
-    /*b = d->rowid.idv.els[endpoints[edgeid].b];*/
     b = endpoints[edgeid].b;
 
     e->hidden_now.els[edgeid] = e->hidden.els[edgeid] = true;
@@ -175,6 +171,63 @@ ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst)
   }
 
   displays_tailpipe (FULL, gg);
+}
+
+void
+ga_orphans_hide_cb (GtkWidget *btn, PluginInstance *inst)
+{
+  ggobid *gg = inst->gg;
+  graphactd *ga = graphactFromInst (inst);
+  datad *d = gg->current_display->d;
+  datad *e = gg->current_display->e;
+  gint m, i, k, edgeid, a, b;
+  gboolean included;
+  endpointsd *endpoints;
+  gint nd = g_slist_length (gg->d);
+
+  endpoints = resolveEdgePoints(e, d);
+  if (endpoints == NULL) {
+    g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
+/**/return;
+  }
+
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot.els[m];
+    included = false;
+    for (k=0; k<ga->inEdges[i].nels; k++) {
+      edgeid = ga->inEdges[i].els[k];
+      a = endpoints[edgeid].a;
+      /*-- no need for b, because i = b --*/
+      if (e->sampled.els[edgeid] && !e->excluded.els[edgeid] &&
+          !e->hidden.els[edgeid] &&
+          !d->excluded.els[a] && !d->excluded.els[i])
+      {
+        included = true;
+        break;
+      }
+    }
+    if (!included) {
+      for (k=0; k<ga->outEdges[i].nels; k++) {
+        edgeid = ga->outEdges[i].els[k];
+        b = endpoints[edgeid].b;
+        /*-- no need for a, because i = a --*/
+        if (e->sampled.els[edgeid] && !e->excluded.els[edgeid] &&
+            !e->hidden.els[edgeid] &&
+            !d->excluded.els[b] && !d->excluded.els[i])
+        {
+          included = true;
+          break;
+        }
+      }
+    }
+    if (!included) {
+      d->hidden_now.els[i] = d->hidden.els[i] = true;
+      if (!gg->linkby_cv && nd > 1)
+        symbol_link_by_id (true, i, d, gg);
+    }
+  }
+  displays_tailpipe (FULL, gg);
+
 }
 
 void

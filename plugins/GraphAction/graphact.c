@@ -223,7 +223,9 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
 
   /*-- --*/
-  frame = gtk_frame_new ("Show/hide leaf nodes");
+
+  /*-- Thin the graph in different ways --*/
+  frame = gtk_frame_new ("Thin the graph");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 1);
 
   vbox = gtk_vbox_new (false, 1);
@@ -231,20 +233,30 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
 
   hbox = gtk_hbox_new (true, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
-  btn = gtk_button_new_with_label ("Hide");
+  btn = gtk_button_new_with_label ("Shadow leaves");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Recursively hide leaf nodes and edges", NULL);
+    "Recursively shadow brush leaf nodes and edges", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (ga_leaf_hide_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
-  btn = gtk_button_new_with_label ("Show");
+
+  btn = gtk_button_new_with_label ("Shadow orphans");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "Shadow brush nodes without any edges that are both included and not shadowed",
+    NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (ga_orphans_hide_cb), inst);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+
+
+  btn = gtk_button_new_with_label ("Show all");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Show all nodes and edges", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
-  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
-  label = gtk_label_new ("Leaf");
+  label = gtk_label_new ("Thin");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
   /*-- --*/
 
