@@ -117,6 +117,7 @@ ifneq (${PLUGIN_DIRS},)
 buildPlugins:  @EMBED_LIB@
 	  for f in $(PLUGIN_DIRS) ; do \
 	    echo "Building plugin $$f" ; \
+	    LOCAL_BUILD=1; export LOCAL_BUILD ; \
 	    export GGOBI_HOME ; $(GGOBI_HOME)/share/tools/plugin $$f ; \
 	  done \
 

@@ -14,6 +14,12 @@ endif
 
 include local.config
 
+ifdef LOCAL_BUILD
+
+ GGOBI_CFLAGS=$(shell $(MAKE) --quiet -C $(GGOBI_HOME)/src cflags TOP=$(GGOBI_HOME))
+ GGOBI_LIBS=$(shell $(MAKE) --quiet -C $(GGOBI_HOME)/src libs TOP=$(GGOBI_HOME))
+
+else
 
 ifdef GGOBI_CONFIG
  GGOBI_CFLAGS=$(shell $(GGOBI_CONFIG) --cflags)
@@ -24,6 +30,8 @@ ifndef GGOBI_LIB
  GGOBI_LIB=-L$(GGOBI_HOME) -lggobi
 endif
  GGOBI_CFLAGS=$(GGOBI_INCLUDE_DIR)
+endif
+
 endif
 
 ifndef SRC
