@@ -50,7 +50,6 @@ cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
   /*-- path len... --*/
 }
 
-static void tour2dadv_window_open (ggobid *gg);
 
 static void speed2d_set_cb (GtkAdjustment *adj, ggobid *gg) {
   extern void tour2d_speed_set (gint, ggobid *);
@@ -83,11 +82,11 @@ static void tour2dpp_cb (GtkWidget *w, ggobid *gg)
   tour2dpp_window_open (gg);
 }
 
+#ifdef TOUR_ADV_IMPLEMENTED
 static void tour2dadv_cb (GtkWidget *w, ggobid *gg) {
-  #ifdef TOUR_ADV_IMPLEMENTED
   tour2dadv_window_open (gg);
-  #endif
 }
+#endif
 
 static gchar *manip_lbl[] = {"Off", "Oblique", "Vert", "Horiz", "Radial",
                              "Angular"};
@@ -102,9 +101,10 @@ static void manip_cb (GtkWidget *w, gpointer cbd)
 
 void
 cpanel_tour2d_make (ggobid *gg) {
-  GtkWidget *box, *tgl, *btn, *sbar, *lbl, *vb;
+  GtkWidget *box, *btn, *sbar, *lbl, *vb;
   GtkObject *adj;
   GtkWidget *manip_opt;
+  /*GtkWidget *tgl;*/
   
   gg->control_panel[TOUR2D] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[TOUR2D]), 5);
@@ -195,7 +195,7 @@ cpanel_tour2d_make (ggobid *gg) {
 /*
  * advanced features button
 */
-  #ifdef TOUR_ADV_IMPLEMENTED
+#ifdef TOUR_ADV_IMPLEMENTED
   btn = gtk_button_new_with_label ("Advanced features ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for additional grand tour features", NULL);
@@ -203,7 +203,7 @@ cpanel_tour2d_make (ggobid *gg) {
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (tour2dadv_cb), gg);
-  #endif
+#endif
 
   gtk_widget_show_all (gg->control_panel[TOUR2D]);
 }
@@ -225,6 +225,9 @@ The following are considered advanced features for now:
   section tour
 */
 
+
+#ifdef TOUR_ADV_IMPLEMENTED
+static void tour2dadv_window_open (ggobid *gg);
 static GtkWidget *window = NULL;
 
 static gchar *pathlen_lbl[] = {"1/10", "1/5", "1/4", "1/3", "1/2", "1",
@@ -279,7 +282,9 @@ static void epsilon_cb (GtkAdjustment *adj, gpointer cbd) {
 static void hide_cb (GtkWidget *w ) {
   gtk_widget_hide (w);
 }
+#endif
 
+#ifdef TOUR_ADV_IMPLEMENTED
 static void tour2dadv_window_open (ggobid *gg) {
   GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
   GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;
@@ -486,6 +491,7 @@ static void tour2dadv_window_open (ggobid *gg) {
   gtk_widget_show_all (window);
 
 }
+#endif
 
 /*----------------------------------------------------------------------*/
 /*                              I/O events                              */
