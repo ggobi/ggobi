@@ -117,7 +117,7 @@ SRC=\
 
 ifdef USE_XML
  XML_INC_DIRS=$(foreach el,@XML_INC_DIRS@, -I$(el))
- XML_LIBS=$(foreach el,@XML_LIB_DIRS@, -L$(el)) -lxml
+ XML_LIBS=$(foreach el,@XML_LIB_DIRS@, -L$(el)) -lxml2
 endif
 
 ifdef USE_MYSQL

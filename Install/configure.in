@@ -119,7 +119,7 @@ if test -n "${with_xml}" ; then
 
    ORIG_CPPFLAGS=$CPPFLAGS
    for f in $XML_INC_DIRS ${DEFAULT_INC_DIRS} ; do 
-     for ext in / /xml ; do
+     for ext in / /xml /libxml ; do
        TMP=""
        if test -f $f$ext/parser.h ; then
          TMP=$f$ext 
@@ -150,7 +150,7 @@ dnl      AC_CHECK_HEADER(parserInternals.h, XML_INC_DIRS=$f$ext)
   else
     XML_UTILS=xmlConvert
     USE_XML="USE_XML=1"
-    XML_SRC="read_xml.c write_xml.c"
+    XML_SRC="read_xml.c write_xml.c read_init.c"
     XML_CFLAG_DEFINES="-DUSE_XML=1"
     enable_embed="yes"
 dnl -DDIR_SEPARATOR=\"'/'\""
