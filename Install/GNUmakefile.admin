@@ -43,7 +43,7 @@ DOC_FILES=$(DOC_TEX_FILES:%=notes/%.$(DOC_EXTENSION)) notes/ggobi.css notes/Embe
 C_SRC_FILES=$(SRC) $(XML_SRC) xmlConvert.c 
 
 C_HEADER_FILES=\
-  GGobiAPI cpanel datad defines display display_tree \
+  GGobiAPI brushing cpanel datad defines display display_tree \
   externs ggobi noop-checkbutton read_mysql read_xml  \
   splot types vars varseldata write_xml writedata vartable gtkext fileio \
   print
