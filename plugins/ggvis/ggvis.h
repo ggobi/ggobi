@@ -154,6 +154,8 @@ void ggv_weight_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_center_scale_pos (ggvisd *ggv);
 greal ggv_randvalue (gint type);
 void update_stress (ggvisd *ggv, ggobid *gg);
+void ggv_compute_Dtarget (gint selected_var, ggvisd *ggv);
+void ggv_init_Dtarget (gint, ggvisd *ggv);
 
 void mds_func (gboolean, PluginInstance *);
 void mds_once (gboolean doit, ggvisd *ggv, ggobid *gg);

@@ -268,62 +268,26 @@ trans_dist_init_defaults (ggvisd *ggv)
       }
     }
   }
-
 }
 
 
-/*
- * This code should actually be moved out of the callback
- * and stashed someplace else.
-*/
 void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
 {
-/*
-  GtkWidget *notebook = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT(button), "notebook");
-*/
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
   GtkWidget *clist;
-  gint i, j, selected_var;
-  gdouble infinity;
-  gboolean changing;
-  gint end1, end2, end3;
-  gdouble d12;
-  gdouble **Dvals;
-  endpointsd *endpoints;
-  datad *dsrc, *e;
+  gint selected_var = -1;
+  datad *dsrc;
   displayd *dsp = gg->current_display;
   GtkWidget *window, *entry;
   gchar *lbl;
-  gdouble dtmp;
 
-  /*
-   * this is awkward -- it allows dsrc to be initialized once
-   *   but never reset
-  */
-  if (!ggv->dsrc)
-    ggv->dsrc = dsp->d;
+  /*-- for now, use the d from the current display --*/
+  ggv->dsrc = dsp->d;
   dsrc = ggv->dsrc;
  
-/*
-How big is this distance matrix?  if (ggv->complete_Dtarget), then
-it can be larger than e->edge.n.    Perhaps it should be of
-dimension d->nrows x d->nrows.
-Sometimes it will be extremely sparse, but then we probably
-aren't running ggvis on extremely large data, so maybe the
-large size of it isn't important.
-*/
-
   /*-- allocate Dtarget --*/
   arrayd_alloc (&ggv->Dtarget, dsrc->nrows, dsrc->nrows);
-  /*-- initalize Dtarget --*/
-  infinity = (gdouble) (2 * dsrc->nrows);
-  for (i=0; i<dsrc->nrows; i++) {
-    for (j=0; j<dsrc->nrows; j++)
-      ggv->Dtarget.vals[i][j] = infinity;
-    ggv->Dtarget.vals[i][i] = 0.0;
-  }
 
   ggv->e = gg->current_display->e;
   if (ggv->Dtarget_source == VarValues) {
@@ -335,13 +299,19 @@ large size of it isn't important.
     /*-- this is the edgeset for distance computations, not
          necessarily the edgeset to be displayed (eg, morsecode) --*/
     ggv->e = gtk_object_get_data (GTK_OBJECT(clist), "datad");
-    if (!ggv->e) {
+    if (ggv->e == NULL) {
+g_printerr ("e is null\n");
       quick_message ("I can't identify a set of edges", false);
       return;
     }
     selected_var = get_one_selection_from_clist (clist, ggv->e);
+    if (selected_var == -1) {
+      quick_message ("Please specify a variable", false);
+      return;
+    }
   }
-  if (!ggv->e) {
+
+  if (ggv->e == NULL) {
     if (!edgeset_add (dsp)) {
       quick_message ("Please specify an edge set", false);
       return;
@@ -349,12 +319,31 @@ large size of it isn't important.
       ggv->e = dsp->e;
     }
   }
-  e = ggv->e;
 
+  if (dsrc->rowid.idv.nels == 0) {
+    g_printerr ("Make sure the current display is a plot of the nodes.\n");
+    g_printerr ("  Currently nodes: %s edges: %s\n", dsrc->name, ggv->e->name);
+    return;
+  }
+
+  /*-- initalize Dtarget --*/
+  ggv_init_Dtarget (selected_var, ggv);
+/*
+  infinity = (gdouble) (2 * dsrc->nrows);
+  for (i=0; i<dsrc->nrows; i++) {
+    for (j=0; j<dsrc->nrows; j++)
+      ggv->Dtarget.vals[i][j] = infinity;
+    ggv->Dtarget.vals[i][i] = 0.0;
+  }
+*/
+
+  ggv_compute_Dtarget (selected_var, ggv);
+
+/*
+  e = ggv->e;
   Dvals = ggv->Dtarget.vals;
   endpoints = e->edge.endpoints;
 
-  /*-- populate --*/
   if (!ggv->complete_Dtarget) {
     for (i = 0; i < e->edge.n; i++) {
       end1 = dsrc->rowid.idv.els[endpoints[i].a];
@@ -362,7 +351,7 @@ large size of it isn't important.
       Dvals[end1][end2] = (ggv->Dtarget_source == VarValues) ?
         e->tform.vals[i][selected_var] : 1.0;
     }
-  } else {  /*-- complete Dtarget using a shortest path algorithm --*/
+  } else {
 
     changing = true;
     while (changing) {
@@ -374,8 +363,6 @@ large size of it isn't important.
           e->tform.vals[i][selected_var] : 1.0;
 
         for (end3 = 0; end3 < dsrc->nrows; end3++) {
-          /* So we have a direct link from end1 to end2.  Can this be */
-          /* used to shortcut a path from end1 to end3 or end2 to end3? */
           if (Dvals[end1][end3] > d12 + Dvals[end2][end3]) {
             Dvals[end3][end1] = Dvals[end1][end3] = d12 + Dvals[end2][end3];
             changing = true;
@@ -384,9 +371,9 @@ large size of it isn't important.
             Dvals[end3][end2] = Dvals[end2][end3] = d12 + Dvals[end1][end3];
             changing = true;
           }
-        }    /* end3 */
-      }    /* end1 and end2 */
-    }    /* while changing. */
+        }
+      }
+    }
   }
   ggv->ndistances = ggv->Dtarget.nrows * ggv->Dtarget.ncols;
 
@@ -407,6 +394,8 @@ large size of it isn't important.
   }
   ggv->mds_threshold_low =  ggv->Dtarget_min;
   ggv->mds_threshold_high = ggv->Dtarget_max;
+*/
+
 
   /*-- update the entry to let people know Dtarget has been computed --*/
   window = (GtkWidget *) inst->data;
