@@ -1037,8 +1037,12 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   if (sp == gg->current_splot)
     splot_draw_border (sp, drawable, gg);
 
-  /*-- draw these cues whether this is the current plot or not --*/
-  if (sp == gg->current_splot || display->displaytype == scatterplot) {
+  /*-- draw these cues whether this is the current display or not --*/
+  if (g_list_length (display->splots) == 1  /*-- scatterplot --*/
+      || sp == display->current_splot)  /*-- ... in a multi-plot display --*/
+  {
+/*dfs here*/
+  /*if (sp == gg->current_splot || display->displaytype == scatterplot) {*/
     if (cpanel->viewmode == BRUSH) {
       brush_draw_brush (sp, drawable, d, gg);
       brush_draw_label (sp, drawable, d, gg);

@@ -386,6 +386,7 @@ display_add (displayd *display, ggobid *gg)
 
   gg->current_splot = (splotd *)
     g_list_nth_data (gg->current_display->splots, 0);
+  display->current_splot = gg->current_splot;
   splot_set_current (gg->current_splot, on, gg);
 
 
@@ -447,6 +448,7 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
 
       gg->current_splot = (splotd *)
         g_list_nth_data (gg->current_display->splots, 0);
+      dsp->current_splot = gg->current_splot;
       splot_set_current (gg->current_splot, on, gg);
       sp = gg->current_splot;
       if (sp != NULL) {

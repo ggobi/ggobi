@@ -378,6 +378,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
          * gg.current_splot was deleted?
         */
         gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
+        display->current_splot = gg->current_splot;
 
         redraw = false;
       }
@@ -516,7 +517,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
       gtk_table_resize (GTK_TABLE (gg->current_display->table),
                         scatmat_nvars, scatmat_nvars);
 
-      gg->current_splot = sp_new;
+      gg->current_splot = sp->displayptr->current_splot = sp;
       sp_event_handlers_toggle (sp_new, on);
       redraw = true;
     }

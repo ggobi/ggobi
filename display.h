@@ -32,7 +32,8 @@ struct _displayd {
 
  struct _displayd *embeddedIn;
 
- GList *splots;  /* doubly linked list of splots */
+ GList *splots;          /*-- doubly linked list of splots --*/
+ splotd *current_splot;  /*-- multi-plot displays need this notion --*/
 
  datad *d;  /*-- pointer to a particular gg->d[] --*/
  datad *e;  /*-- pointer to a particular gg->d[] --*/

@@ -297,7 +297,6 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
     cpaneld *cpanel = &display->cpanel;
 
     sp_event_handlers_toggle (sp, state);
-
     viewmode_activate (sp, cpanel->viewmode, state, gg);
 
     /*
@@ -326,11 +325,26 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
       display_prev = (displayd *) sp_prev->displayptr;
       cpanel = &display_prev->cpanel;
 
+      /*
+       * This feels like a kludge, but I don't know where else
+       * to do it.  We want to handle a special case:  we're
+       * brushing in a multi-plot display, and we move to a new
+       * splot within the same display.  
+       * In the future, there may be other things we want to undo,
+       * but for now we just want to turn off the effects of
+       * in the previous splot.
+      */
+      if (g_list_length (display_prev->splots) > 1 /*-- multi-plot display --*/
+          && display == display_prev)   /*-- display not changing --*/
+      {
+        reinit_transient_brushing (display, gg);
+      }
+
       if (gg->current_display != display)
         display_set_current (display, gg);  /* old one off, new one on */
     }
 
-    gg->current_splot = sp;
+    gg->current_splot = sp->displayptr->current_splot = sp;
     splot_set_current (sp, on, gg);
 
     viewmode_submenus_update (prev_viewmode, gg);

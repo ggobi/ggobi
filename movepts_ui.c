@@ -87,7 +87,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   gboolean button1_p, button2_p;
   gboolean inwindow, wasinwindow;
 
-  gg->current_splot = sp;  /*-- just in case --*/
+  gg->current_splot = sp->displayptr->current_splot = sp;/*-- just in case --*/
 
   /*
    * allow point motion only for
@@ -155,7 +155,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   datad *d = gg->current_display->d;
   
   gg->current_display = display;
-  gg->current_splot = sp;
+  gg->current_splot = sp->displayptr->current_splot = sp;
 
   /*
    * allow point motion only for

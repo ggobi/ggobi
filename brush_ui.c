@@ -226,7 +226,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   datad *d, *e;
 
-  gg->current_splot = sp;
+  gg->current_splot = sp->displayptr->current_splot = sp;
   gg->current_display = sp->displayptr;
   cpanel = &gg->current_display->cpanel;
   d = gg->current_display->d;

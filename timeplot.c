@@ -310,6 +310,7 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
           /* just for insurance, to handle the unforeseen */
           if (gg->current_splot == NULL) 
             gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
+          display->current_splot = gg->current_splot;
 
           /*-- dfs, keeping event handling in sync --*/
           splot_set_current (gg->current_splot, on, gg);
@@ -371,7 +372,7 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
           l = l->next ;
         }
 
-        gg->current_splot = sp_new;
+        gg->current_splot = sp->displayptr->current_splot = sp_new;
         sp_event_handlers_toggle (sp_new, on);
         redraw = true;
       }

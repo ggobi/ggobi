@@ -328,6 +328,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         /* just for insurance, to handle the unforeseen */
         if (gg->current_splot == NULL)
           gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
+        display->current_splot = gg->current_splot;
 
 /*-- dfs, testing -- all this, or just event_handlers_toggle? --*/
         splot_set_current (gg->current_splot, on, gg);
@@ -390,7 +391,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         l = l->next ;
       }
 
-      gg->current_splot = sp_new;
+      gg->current_splot = sp->displayptr->current_splot = sp_new;
       sp_event_handlers_toggle (sp_new, on);
       redraw = true;
     }

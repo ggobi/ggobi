@@ -373,9 +373,9 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
 /*
  * Some of the routines called here, like procs_activate
  * and reinit_transient brushing, are routines that we want
- * to have executed when a new viewmode
- * is selected for the current display, but not when the
- * viewmode changes because a new display becomes current.
+ * to have executed when a new viewmode is selected for the
+ * current display, but not when the viewmode changes because
+ * a new display becomes current.
  * Because of that, we don't put them in viewmode_activate.
 */
   PipelineMode prev_viewmode = gg->viewmode;
@@ -398,9 +398,11 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
       viewmode_activate (sp, gg->viewmode, on, gg);
 
       procs_activate (on, display, gg);
-      if (gg->viewmode != BRUSH && prev_viewmode == BRUSH)
-        if (cpanel->br_mode == BR_TRANSIENT)
+      if (gg->viewmode != BRUSH && prev_viewmode == BRUSH) {
+        if (cpanel->br_mode == BR_TRANSIENT) {
           reinit_transient_brushing (display, gg);
+        }
+      }
 
       /*
        * work out which mode menus (Options, Reset, I/O) need

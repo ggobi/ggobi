@@ -294,7 +294,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean button1_p, button2_p;
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
-  gg->current_splot = sp;
+  gg->current_splot = sp->displayptr->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
   sp->mousepos_o.x = sp->mousepos.x;
