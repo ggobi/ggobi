@@ -77,6 +77,7 @@ gfloat mean_fn2(gfloat *x1, gfloat *x2, gint n)
   return(tmean);
 }
 
+/*
 void
 alloc_holes_p(holes_param *hp, gint nrows)
 {
@@ -92,7 +93,7 @@ free_holes_p(holes_param *hp)
   g_free(hp->h0);
   g_free(hp->h1);
 }
-
+*/
 /********************************************************************
 Index          : Holes
 Transformation : needs sphered variables/principal components
@@ -100,12 +101,12 @@ Purpose        : computes a projection into a normal density fn
 Note           : only works for 2d now, could be generalized
 *********************************************************************/
 
-gint holes(array_f *pdata, void *param, gfloat *val)
+/* gint holes(array_f *pdata, void *param, gfloat *val)
 {
   holes_param *hp = (holes_param *) param;
   gint i, m;
 
-  /* Calculate coefficients */
+  * Calculate coefficients *
   for (i=0; i<pdata->nrows; i++)
   {
     m = i;
@@ -113,12 +114,12 @@ gint holes(array_f *pdata, void *param, gfloat *val)
     hp->h1[m] = exp(-pdata->vals[m][1]*pdata->vals[m][1]/2.) ;
   }
 
-  /* Calculate index */
+  * Calculate index *
   hp->acoefs = mean_fn2(hp->h0,hp->h1,pdata->nrows);
   *val = (1. - hp->acoefs)/(gfloat) ONEMINUSEXPMINUS1 ;
   return(0);
 }
-
+*/
 /********************************************************************
 
 Index          : Central Mass
@@ -128,13 +129,13 @@ Note           : only works for 2d now, could be generalized
 
 *********************************************************************/
 
-gint
+/* gint
 central_mass(array_f *pdata, void *param, gfloat *val)
 {
   holes_param *hp = (holes_param *) param;
   gint i, m;
 
-  /* Calculate coefficients */
+  * Calculate coefficients *
   for (i=0; i<pdata->nrows; i++)
   {
     m = i;
@@ -142,23 +143,23 @@ central_mass(array_f *pdata, void *param, gfloat *val)
     hp->h1[m] = exp(-pdata->vals[m][1]*pdata->vals[m][1]/2.) ;
   }
 
-  /* Calculate index */
+  * Calculate index *
   hp->acoefs = mean_fn2(hp->h0,hp->h1,pdata->nrows);
   *val = (hp->acoefs - (gfloat)EXPMINUS1)/(float)ONEMINUSEXPMINUS1 ;
   return(0);
 }
-
+*/
 /***************************************************/
 /*  2D Holes index for raw data                    */
 /*   holes_raw1                                    */
 /*   holes_raw2 : use inverse function             */
 /***************************************************/
 
-gint holes_raw1(array_f *pdata, void *param, gfloat *val)
+/* gint holes_raw1(array_f *pdata, void *param, gfloat *val)
 { 
-/*
+*
    holes_param *hp = (holes_param *) param;
-*/
+*
    gint i, p=pdata->ncols, n=pdata->nrows;
    gfloat m1, m2, x1, x2, temp;
    gdouble *cov;
@@ -193,7 +194,6 @@ gint holes_raw1(array_f *pdata, void *param, gfloat *val)
    for(i=0; i<n; i++) {  
      x1 = pdata->vals[i][0]-m1; 
      x2 = pdata->vals[i][1]-m2;
-     /*     temp = (cov[3]*x1*x1-2*cov[1]*x1*x2+cov[0]*x2*x2)/det;*/
      temp = (cov[3]*x1*x1-2*cov[1]*x1*x2+cov[0]*x2*x2);
      acoefs += exp(-temp/2);
    }
@@ -209,10 +209,10 @@ gint holes_raw2( array_f *pdata, void *param, gfloat *val)
    gint i, p=pdata->ncols, n=pdata->nrows;
    gfloat m1, m2,x1,x2,temp;
    gdouble *cov;
-/*
+*
    holes_param *hp = (holes_param *) param;
    gfloat det;
-*/
+*
    gfloat acoefs;
 
    cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
@@ -242,7 +242,7 @@ gint holes_raw2( array_f *pdata, void *param, gfloat *val)
    free(cov);
    return(0);
 }
-
+*/
 
 /**********************************************************/
 /*  2D Central Mass index for raw data                    */
@@ -250,11 +250,11 @@ gint holes_raw2( array_f *pdata, void *param, gfloat *val)
 /*   central_mass_raw2 : use inverse function             */
 /**********************************************************/
 
-gint central_mass_raw1(array_f *pdata, void *param, gfloat *val)
+/* gint central_mass_raw1(array_f *pdata, void *param, gfloat *val)
 {
-/*
+*
    holes_param *hp = (holes_param *) param;
-*/
+*
    gint i, p=pdata->ncols, n=pdata->nrows;
    gfloat m1, m2,x1,x2,temp;
    gdouble *cov;
@@ -295,7 +295,7 @@ gint central_mass_raw1(array_f *pdata, void *param, gfloat *val)
 
 gint central_mass_raw2(array_f *pdata, void *param, gfloat *val)
 {
-   /*holes_param *hp = (holes_param *) param;*/
+   *holes_param *hp = (holes_param *) param;*
    gint i, p=pdata->ncols, n=pdata->nrows;
    gfloat m1, m2,x1,x2,temp;
    gdouble *cov;
@@ -328,7 +328,7 @@ gint central_mass_raw2(array_f *pdata, void *param, gfloat *val)
    return(0);
 
 }
-
+*/
 /*void
 holes_deriv(holes_param *hp, gfloat **data, gfloat **pdata)
 {
@@ -505,7 +505,7 @@ void t2d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
 
 }
 
-/* This is writes text to the pp window to in form the
+/* This is writes text to the pp window to inform the
 user that optimize is finding a new maximum */ 
 void t2d_ppdraw_think(displayd *dsp, ggobid *gg)
 {
@@ -630,37 +630,13 @@ projection.
 
 *********************************************************************/
 
-
-/*gfloat t2d_calc_indx (array_f data, array_d proj, 
-                gint *rows, gint nrows, 
-                gint ncols,
-                gint (*index) (array_f*, void*, gfloat*),
-                void *param)*/
 gfloat t2d_calc_indx (array_f pd,
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param)
 { 
   gfloat indexval;
-  /* gint k; */
-
-  /*  arrayf_init_null (&pdata);
-      arrayf_alloc_zero (&pdata, nrows, 2);*/
-
-  /* fill projected data array */
-  /*  for (m=0; m<nrows; m++)
-  { 
-    i = rows[m];
-    pdata.vals[i][0] = 0.0;
-    pdata.vals[i][1] = 0.0;
-    for (j=0; j<ncols; j++)
-    { 
-      pdata.vals[i][0] += data.vals[i][j]*(gfloat)proj.vals[0][j];
-      pdata.vals[i][1] += data.vals[i][j]*(gfloat)proj.vals[1][j];
-    }
-    }*/
 
   index (&pd, param, &indexval);
-  /*  arrayf_free (&pdata, 0, 0);*/
 
   return(indexval);
 }
@@ -672,10 +648,6 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   gint kout, nrows = d->nrows_in_plot;
   gfloat *gdata;
   gint i, j, k;
-  /* gint pdim = 2; */
-
-  /*  gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
-      reset_pp, gg);*/
 
   if (d->nrows_in_plot == 1)  /* can't do pp on no data! */
     return(false);
@@ -697,12 +669,10 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       dsp->t2d_pp_op.pdata.vals[i][k] = 
           (d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[0]]*
           dsp->t2d_pp_op.proj_best.vals[k][0]);
-	   /*          dsp->t2d.F.vals[k][dsp->t2d.active_vars.els[0]]);*/
       for (j=1; j<dsp->t2d.nactive; j++)
         dsp->t2d_pp_op.pdata.vals[i][k] += 
           (d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[j]]*
           dsp->t2d_pp_op.proj_best.vals[k][j]);
-	   /*          dsp->t2d.F.vals[k][dsp->t2d.active_vars.els[j]]);*/
     }
 
   gdata  = g_malloc (nrows*sizeof(gfloat));
@@ -715,19 +685,14 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       gdata[i] = 0;
   }
 
-/*  dsp->t2d_pp_op.index_best = -1.0;  set best val to be current val */
   switch (indxtype)
   { 
     case HOLES: 
-      /*      alloc_holes_p (&hp, nrows);*/
-      /*      dsp->t2d.ppval = t2d_calc_indx (d->tform, 
-	      dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, holes_raw1, &hp);*/
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata, 
         holes_raw, &dsp->t2d_pp_param);
       if (basismeth == 1) {
         kout = optimize0 (&dsp->t2d_pp_op, holes_raw, &dsp->t2d_pp_param);
       }
-      /*      free_holes_p(&hp);*/
     break;
     case CENTRAL_MASS: 
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
@@ -737,9 +702,6 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
           &dsp->t2d_pp_param);
     break;
     case LDA: 
-      /*      alloc_discriminant_p (&dp, nrows, ncols); 
-      if (!compute_groups (dp.group, dp.ngroup, &dp.groups, nrows, 
-      gdata)) {*/
       if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
         &dsp->t2d_pp_param.numgroups, nrows, gdata)) {
         dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
@@ -747,12 +709,8 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
         if (basismeth == 1)
           kout = optimize0 (&dsp->t2d_pp_op, discriminant, &dsp->t2d_pp_param);
       }
-      /*      free_discriminant_p (&dp);*/
       break;
     case CGINI: 
-      /*      alloc_cartgini_p (&cgp, nrows); 
-      if (!compute_groups (cgp.group, cgp.ngroup, &cgp.groups, nrows, 
-      gdata)) {*/
       if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
         &dsp->t2d_pp_param.numgroups, nrows, 
 			   gdata)) {
@@ -761,12 +719,8 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
         if (basismeth == 1)
           kout = optimize0 (&dsp->t2d_pp_op, cartgini, &dsp->t2d_pp_param);
       }
-      /*      free_cartgini_p (&cgp);*/
       break;
     case CENTROPY: 
-      /*      alloc_cartentropy_p (&cep, nrows);
-      if (!compute_groups (cep.group, cep.ngroup, &cep.groups, nrows, 
-      gdata)) {*/
       if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
         &dsp->t2d_pp_param.numgroups, nrows, 
 			   gdata)) {
@@ -775,7 +729,6 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
         if (basismeth == 1)
           kout = optimize0 (&dsp->t2d_pp_op, cartentropy, &dsp->t2d_pp_param);
       }
-      /*      free_cartentropy_p (&cep);*/
       break;
     break;
     default: 

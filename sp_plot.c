@@ -1238,8 +1238,8 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 */
           if (ix != dawidth/2) {
             vt = vartable_element_get (j, d);
-            varlab = g_strdup_printf("%s:%4.3f",vt->collab_tform,
-              dsp->t1d.F.vals[0][j]);
+            varlab = g_strdup_printf("%s:%4.3f(%.2f)",vt->collab_tform,
+              dsp->t1d.F.vals[0][j],vt->lim.max-vt->lim.min);
             gdk_text_extents (
 #if GTK_MAJOR_VERSION == 2
               gtk_style_get_font (style),
@@ -1436,8 +1436,10 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
           /* Drawing the axes values now */
           if (dsp->options.axes_values_p) {
-            varval = g_strdup_printf ("%d:%4.3f,%4.3f",j+1,
-              dsp->t2d.F.vals[0][j],dsp->t2d.F.vals[1][j]);
+            vt = vartable_element_get (j, d);
+            varval = g_strdup_printf ("%d:%4.3f,%4.3f(%.2f)",j+1,
+              dsp->t2d.F.vals[0][j],dsp->t2d.F.vals[1][j],
+              vt->lim.max-vt->lim.min);
             if (j == 0) {
               gdk_text_extents (
 #if GTK_MAJOR_VERSION == 2

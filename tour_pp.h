@@ -44,16 +44,7 @@ void zero (gdouble *ptr, gint length);
 void zero_int (gint *mem, gint size);
 gint compute_groups (vector_i group, vector_i ngroup, gint *groups, 
   gint nrows, gfloat *gdata);
-gint alloc_discriminant_p (discriminant_param *dp, /* gfloat *gdata, */
-  gint nrows, gint ncols);
-gint free_discriminant_p (discriminant_param *dp);
 gint discriminant (array_f *pdata, void *param, gfloat *val);
-
-gint alloc_cartgini_p (cartgini_param *cgp, gint nrows);
-gint free_cartgini_p (cartgini_param *cgp);
 gint cartgini (array_f *pdata, void *param, gfloat *val);
-
-gint alloc_cartentropy_p (cartentropy_param *dp, gint nrows);
-gint free_cartentropy_p (cartentropy_param *dp);
 gint cartentropy (array_f *pdata, void *param, gfloat *val);
 

@@ -51,7 +51,7 @@ The authors can be contacted at the following email addresses:
 #define EXPMINUS1 0.3678794411714423
 #define ONEMINUSEXPMINUS1 0.63212056
 
-/*void print()
+/* void print()
 { FILE *f = fopen ("dump", "a");
   if (f)
   { fprintf (f, "%s\n", msg);
@@ -67,7 +67,7 @@ void t1d_ppcool_set(gfloat slidepos, displayd *dsp, ggobid *gg) {
   dsp->t1d_pp_op.cooling = slidepos;
 }
 
-void
+/* void
 alloc_holes1d_p(holes_param *hp, gint nrows)
 {
   hp->h0 = (gfloat *) g_malloc(
@@ -79,12 +79,13 @@ free_holes1d_p(holes_param *hp)
 {
   g_free(hp->h0);
 }
+*/
 
 /***************************************************/
 /*  1D Holes index for raw data                    */
 /***************************************************/
 
-gint holes1d_raw1(array_f *pdata, void *param, gfloat *val)
+/* gint holes1d_raw1(array_f *pdata, void *param, gfloat *val)
 {  
    gint i, n=pdata->nrows;
    gfloat m1, x1, temp;
@@ -111,12 +112,12 @@ gint holes1d_raw1(array_f *pdata, void *param, gfloat *val)
    *val = (1.-acoefs/n)/(gfloat) ONEMINUSEXPMINUS1;
    return(0);
 }
-
+*/
 /**********************************************************/
 /*  1D Central Mass index for raw data                    */
 /**********************************************************/
 
-gint central_mass1d_raw1(array_f *pdata, void *param, gfloat *val)
+/* gint central_mass1d_raw1(array_f *pdata, void *param, gfloat *val)
 {
    gint i, n=pdata->nrows;
    gfloat m1, x1, temp;
@@ -143,7 +144,7 @@ gint central_mass1d_raw1(array_f *pdata, void *param, gfloat *val)
    *val = (acoefs/n-(gfloat)EXPMINUS1)/(gfloat) ONEMINUSEXPMINUS1;
    return(0);
 }
-
+*/
 /********************************************************************
 
 Index          : PCA-d
@@ -170,7 +171,6 @@ gint pca (array_f *pdata, void *param, gfloat *val)
 { gint i, j;
 
   center (pdata);
-  /* dump (pdata, 6, 1); */
 
   *val = 0.0;
   for (i=0; i<pdata->ncols; i++)
@@ -178,7 +178,7 @@ gint pca (array_f *pdata, void *param, gfloat *val)
       *val += pdata->vals[j][i]*pdata->vals[j][i];
   }
   *val /= (pdata->nrows-1);
-  /*  sprintf (msg, "PCA-Index=%f", *val); print();*/
+
   return (0);
 }
 
@@ -196,16 +196,16 @@ Purpose        : Looks for d-dimensional structure in the projected data
 Note           : Requires eispack.c
 *********************************************************************/
 
-gint alloc_subd_p (subd_param *sp, gint nrows, gint ncols)
+/*gint alloc_subd_p (subd_param *sp, gint nrows, gint ncols)
 {
-  /* Some default values */
+  * Some default values *
   sp->min_neighbour  = 10;
   sp->max_neighbour  = 30;
   sp->dim            =  1;
   sp->data_step      =  1;
   sp->neighbour_step =  1;
 
-  /* initialize temporary space */
+  * initialize temporary space *
   sp->dist  = g_malloc (nrows*sizeof(gfloat));
   sp->index = g_malloc (nrows*sizeof(gint));
   sp->nmean = g_malloc (ncols*sizeof(gfloat));
@@ -290,7 +290,7 @@ gfloat variance_explained (gfloat *ew, gint d, gint p)
 void eigenvalues (gfloat *cov, gint p, gfloat *ew, 
                   gint matz, gfloat *ev, gfloat *fv1, gfloat *fv2)
 { gfloat lp, lq;
-  /*gint ierr;*/ /* eispack */
+
   if (p==2)
   { lp = 0.5*(*(cov+0) + *(cov+3));
     lq = *(cov+0)* *(cov+3) - *(cov+1)* *(cov+2);
@@ -299,8 +299,7 @@ void eigenvalues (gfloat *cov, gint p, gfloat *ew,
   }
   else
     {}
-  /* i want to avoid using eispack */
-    /*    rs_ (&p, &p, cov, ew, &matz, ev, fv1, fv2, &ierr);*/
+    *    rs_ (&p, &p, cov, ew, &matz, ev, fv1, fv2, &ierr);*
 }      
 
 gint subd (array_f *pdata, void *param, gfloat *val)
@@ -330,11 +329,8 @@ gint subd (array_f *pdata, void *param, gfloat *val)
       {
         for (k = 0; k<pdata->ncols; k++) sp->mean[k] = sp->nmean[k]/(j+1);
         covariance (pdata, sp->index, j, sp->mean, sp->cov);
-        /* printf ("cov=%f,%f,%f,%f\n", cov[0], cov[1], cov[2], cov[3]); */
         eigenvalues (sp->cov, pdata->ncols, sp->ew, matz, sp->ev, sp->fv1, sp->fv2);
-        /* printf ("ew[0]=%f ew[1]=%f\n", ew[0], ew[1]); */
         varexp = variance_explained (sp->ew, sp->dim, pdata->ncols);
-        /* printf ("varexp=%f\n", varexp); */
         dimmax = (varexp>dimmax ? varexp : dimmax);
       }
     }
@@ -343,7 +339,7 @@ gint subd (array_f *pdata, void *param, gfloat *val)
   *val /= nused;
   return (0);
 }
-
+*/
 /*gint cartgini (array_f *pdata, void *param, gfloat *val)
 { 
   cartgini_param *dp = (cartgini_param *) param;
@@ -455,16 +451,16 @@ gint subd (array_f *pdata, void *param, gfloat *val)
   return(0);
 }
 */
-gint alloc_cartvariance_p (cartvariance_param *dp, gint nrows, gfloat *gdata)
+/*gint alloc_cartvariance_p (cartvariance_param *dp, gint nrows, gfloat *gdata)
 { gint i;
-  /* initialize data */
+  * initialize data *
 
   dp->y = g_malloc (nrows*sizeof(gfloat));
 
   for (i=0; i<nrows; i++)
     dp->y[i] = gdata[i];
 
-  /* initialize temporary space */
+  * initialize temporary space *
   dp->x        = g_malloc (nrows*sizeof(gfloat));
   dp->index    = g_malloc (nrows*sizeof(gint));
 
@@ -518,12 +514,9 @@ gint cartvariance (array_f *pdata, void *param, gfloat *val)
     if (dev<*val) *val = dev;
   }
   
-/*  sprintf (msg, "Index=%f", *val); print();  */
   return(0);
 }
-
-/* End of inclusion of Sigbert's tour1d_pp.c */
-
+*/
 
 /* This function interacts with control  buttons in ggobi */
 void t1d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
@@ -738,13 +731,10 @@ projection.
 *********************************************************************/
 
 gfloat t1d_calc_indx (array_f pd, 
-		      /*                gint *rows, gint nrows, 
-					gint ncols,*/
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param)
 { 
   gfloat indexval;
-  /*  gint i, j, m;*/
 
   index (&pd, param, &indexval);
 
@@ -756,12 +746,8 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
 {
   datad *d = dsp->d;
   gint kout, nrows = d->nrows_in_plot;
-  /*  subd_param sp; */
   gfloat *gdata;
   gint i, j;
-
-  /*  gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
-      reset_pp, gg);*/
 
   if (d->nrows_in_plot == 1)  /* can't do pp on no data! */
     return(false);
@@ -817,47 +803,30 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
         kout = optimize0 (&dsp->t1d_pp_op, pca, NULL);
       break;
     case LDA:
-      /*      alloc_discriminant_p (&dp, 
-			    nrows, ncols);
-      if (!compute_groups (dp.group, dp.ngroup, &dp.groups, nrows, 
-      gdata)) {*/
-      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, &dsp->t1d_pp_param.numgroups, nrows, 
-			   gdata)) {
+      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
+          &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-          /* d->rows_in_plot, d->nrows, d->ncols, */
           discriminant, &dsp->t1d_pp_param);
         if (basismeth == 1)
           kout = optimize0 (&dsp->t1d_pp_op, discriminant, &dsp->t1d_pp_param);
       }
-      /*      free_discriminant_p (&dp);*/
       break;
     case CGINI: 
-      /*      alloc_cartgini_p (&cgp, nrows);
-            dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols,
-        cartgini, &cgp);
-      if (!compute_groups (cgp.group, cgp.ngroup, &cgp.groups, nrows, 
-			   gdata)) {*/
-      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, &dsp->t1d_pp_param.numgroups, nrows, 
-			   gdata)) {
+      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
+          &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
           cartgini, &dsp->t1d_pp_param);
         if (basismeth == 1)
           kout = optimize0 (&dsp->t1d_pp_op, cartgini, &dsp->t1d_pp_param);
-	/*        free_cartgini_p (&cgp); */
       }
       break;
    case CENTROPY: 
-     /*      alloc_cartentropy_p (&cep, nrows);
-      if (!compute_groups (cep.group, cep.ngroup, &cep.groups, nrows, 
-      gdata)) {*/
-      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, &dsp->t1d_pp_param.numgroups, nrows, 
-			   gdata)) {
+      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
+          &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata,
           cartentropy, &dsp->t1d_pp_param);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &dsp->t1d_pp_param);
-      /*      free_cartentropy_p (&cep);*/
       }
       break;
       /*    case CART_VAR: 

@@ -18,9 +18,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 The authors can be contacted at the following email addresses:
     dicook@iastate.edu    sigbert@wiwi.hu-berlin.de
 */
-void alloc_holes_p (holes_param *hp, gint nrows);
-void free_holes_p (holes_param *hp);
-
 gint skewness_raw2(array_f *pdata, void *param, gfloat *val);
 gint skewness_raw1( array_f *pdata, void *param, gfloat *val);
 gint skewness( array_f *pdata, void *param, gfloat *val);
@@ -33,9 +30,6 @@ gint holes( array_f *pdata,void *param, gfloat *val);
 gint holes_raw1(array_f *pdata,void *param, gfloat *val);
 gint holes_raw2(array_f *pdata,void *param, gfloat *val);
 
-/*gfloat t2d_calc_indx(array_f, array_d, gint *, gint, gint,
-                gint (*index) (array_f*, void*, gfloat*),
-                void *param);*/
 gfloat t2d_calc_indx(array_f, gint (*index) (array_f*, void*, gfloat*),
                 void *param);
-gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *, ggobid *);
+gboolean t2d_switch_index(gint, gint, displayd *, ggobid *);

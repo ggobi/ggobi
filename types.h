@@ -158,7 +158,6 @@ typedef struct {
   gfloat ppval, oppval; /* for projection pursuit */
 } tour;
 
-/* Sigbert's code for pp */
 typedef struct {
   vector_i ngroup, group; /* for class indices */
   gint numgroups; /* previously called groups in class code */
@@ -168,70 +167,11 @@ typedef struct {
   vector_d x; /* for gini, entropy */
 } pp_param;
 
-typedef struct {
-  gint min_neighbour, max_neighbour, dim, data_step, neighbour_step;
-  /* temporary space */
-  gfloat *dist, *mean, *nmean, *fv1, *fv2, *ew, *ev, *cov;
-  gint *index;
-} subd_param;
-
-typedef struct {
-  /*  gint *group;
-      gint *ngroup, *groups, *index;*/
-  gint groups;
-  gint *ngroup, *group, *index;
-  /* temporary space */
-  gdouble *cov, *mean, *ovmean;
-  gdouble *a;
-  gfloat *work;
-  gint *kpvt;
-
-} discriminant_param;
-
-typedef struct {
-  gint *ngroup, *group, groups;
-
-  /* temporary space */
-  gint *nright, *index;
-  gdouble *x;
-
-} cartgini_param;
-
-typedef struct {
-  gint *ngroup, *group, groups;
-
-  /* temporary space */
-  gint *nright, *index;
-  gdouble *x;
-
-} cartentropy_param;
-
-typedef struct {
-  gfloat *y;
-
-  /* temporary space */
-  gfloat *x;
-  gint *index;
-
-} cartvariance_param;
-
 typedef struct
 { gfloat temp_start, temp_end, cooling, heating, temp, index_best;
   gint restart, maxproj, success;
   array_f proj_best, data, pdata;
 } optimize0_param; 
-/* end Sigbert's code */
-
-/* pp */
-typedef struct
-{
-  gint nrows, ncols;
-  gfloat *h0, *h1;
-  gfloat acoefs;
-  gfloat **derivs;
-  gfloat *alpha, *beta;
-} holes_param;
-/* end pp */
 
 /*
  * display options

@@ -593,17 +593,15 @@ gint holes_raw(array_f *pdata, void *param, gfloat *val)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n, k,j;
-  /*  gdouble *m, */
   gdouble tmp,x1,x2;
   gdouble *cov;
   gdouble acoefs;
+  gdouble tol = 0.0001;
 
   p = pdata->ncols; 
   n = pdata->nrows;
   cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
   zero(cov,p*p);
-  /*  m = (double *) malloc(p*sizeof(double));
-  zero(cov,p*p); zero(m,p);*/
 
   for(j=0; j<p; j++) {
     pp->ovmean.els[j] = 0.0;
@@ -621,9 +619,6 @@ gint holes_raw(array_f *pdata, void *param, gfloat *val)
       pp->cov.vals[k][j] /= ((double)(n-1)); 
       if (j != k)
         pp->cov.vals[j][k] = pp->cov.vals[k][j];
-	/*        cov[k*p+j] +=((pdata->vals[i][j])-(m[j]))* 
-                     ((pdata->vals[i][k])-(m[k]))/(double)(n-1); 
-		     cov[j*p+k] = cov[k*p+j]; */
       }
   }
 
@@ -638,8 +633,12 @@ gint holes_raw(array_f *pdata, void *param, gfloat *val)
       for (j=0; j<p; j++)
         pp->cov.vals[i][j] = cov[i*p+j];
   }
-  else
-    pp->cov.vals[0][0] = 1./pp->cov.vals[0][0];
+  else {
+    if (pp->cov.vals[0][0] > tol)
+      pp->cov.vals[0][0] = 1./pp->cov.vals[0][0];
+    else
+      pp->cov.vals[0][0] = 10000.0;
+  }
 
   acoefs = 0.0;
   for (i=0; i<n; i++) { 
@@ -655,11 +654,8 @@ gint holes_raw(array_f *pdata, void *param, gfloat *val)
   }
   *val = (1.0-acoefs/(gdouble)n)/(gdouble) (1.0-exp(-p/2.0));
 
-  /*  g_printerr("%f \n",*val); */
-  /*  free(m);*/
   g_free(cov);
 
-  /*  g_printerr("hello 2\n");*/
   return(0);
 }
 
@@ -677,16 +673,12 @@ gint central_mass_raw(array_f *pdata, void *param, gfloat *val)
   gdouble tmp,x1,x2;
   gdouble *cov;
   gdouble acoefs;
+  gdouble tol = 0.0001;
 
   p = pdata->ncols; 
   n = pdata->nrows;
   cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
   zero(cov,p*p);
-  /*  m = (gdouble *) g_malloc(p*sizeof(gdouble));
-  zero(cov,p*p); zero(m,p);
-  for(i=0; i<n; i++) { 
-    for(j=0; j<p; j++)
-    m[j] += pdata->vals[i][j]/(double)n;}*/
 
   for(j=0; j<p; j++) {
     pp->ovmean.els[j] = 0.0;
@@ -704,9 +696,6 @@ gint central_mass_raw(array_f *pdata, void *param, gfloat *val)
       pp->cov.vals[k][j] /= ((double)(n-1)); 
       if (j != k)
         pp->cov.vals[j][k] = pp->cov.vals[k][j];
-	/*        cov[k*p+j] +=((pdata->vals[i][j])-(m[j]))* 
-                     ((pdata->vals[i][k])-(m[k]))/(double)(n-1); 
-		     cov[j*p+k] = cov[k*p+j]; */
       }
   }
 
@@ -719,8 +708,12 @@ gint central_mass_raw(array_f *pdata, void *param, gfloat *val)
       for (j=0; j<p; j++)
         pp->cov.vals[i][j] = cov[i*p+j];
   }
-  else
-    pp->cov.vals[0][0] = 1./pp->cov.vals[0][0];
+  else {
+    if (pp->cov.vals[0][0] > tol)
+      pp->cov.vals[0][0] = 1./pp->cov.vals[0][0];
+    else
+      pp->cov.vals[0][0] = 10000.0;
+  }
 
   acoefs = 0.0;
   for (i=0; i<n; i++) { 
@@ -798,42 +791,8 @@ gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups,
   return ((*numgroups==1) || (*numgroups==nrows));
 }
 
-gint alloc_discriminant_p (discriminant_param *dp, /*gfloat *gdata, */
-  gint nrows, gint ncols)
-{
-  dp->group    = g_malloc (nrows*sizeof(gint));
-  dp->ngroup   = g_malloc (nrows*sizeof(gint));
-
-  /*  if (compute_groups (dp->group, dp->ngroup, &dp->groups, nrows, 
-      gdata)) return (1);*/
-
-  /* initialize temporary space */
-  dp->cov      = g_malloc ((ncols+ncols)*sizeof(gdouble));
-  dp->a        = g_malloc ((ncols+ncols)*sizeof(gdouble));
-  dp->mean     = g_malloc (nrows*ncols*sizeof(gdouble));
-  dp->ovmean   = g_malloc (ncols*sizeof(gdouble));
-  dp->kpvt     = g_malloc (ncols*sizeof(gint));
-  dp->work     = g_malloc (nrows*sizeof(gint));
-
-  return 0;
-}
-
-gint free_discriminant_p (discriminant_param *dp)
-{ g_free(dp->group);
-  g_free(dp->ngroup);
-  g_free(dp->cov);
-  g_free(dp->a);
-  g_free(dp->mean);
-  g_free(dp->ovmean);
-  g_free(dp->kpvt);
-  g_free(dp->work);
-
-  return 0;
-}
-
 gint discriminant (array_f *pdata, void *param, gfloat *val)
 { 
-  /*  discriminant_param *dp = (discriminant_param *) param;*/
   pp_param *pp = (pp_param *) param;
   gint i, j, k, l;
   gint n, p;
@@ -848,10 +807,6 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
 
   /* Compute means */
-  /*  zero (dp->mean, dp->groups*p);
-  zero (dp->ovmean, p);
-  zero (dp->cov, p*p);*/
-
   for (k=0; k<p; k++) {
     for (l=0; l<pp->numgroups; l++)
       pp->mean.vals[l][k] = 0.0;
@@ -862,8 +817,6 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
     { 
       pp->mean.vals[pp->group.els[i]][k] += (gdouble) pdata->vals[i][k]; 
       pp->ovmean.els[k] += (gdouble) pdata->vals[i][k];
-      /*      dp->mean[k+p*dp->group[i]] += (gdouble) pdata->vals[i][k];  
-	      dp->ovmean[k] += (gdouble) pdata->vals[i][k];*/
     }
   }
 
@@ -871,9 +824,7 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   { 
     for (i=0; i<pp->numgroups; i++)
     { 
-      /*      dp->mean[k*p+i] /= (gdouble) dp->ngroup[i];*/
-      pp->mean.vals[i][k] /= (gdouble) pp->ngroup.els[i];/* [k+p*i] */
-    /*     sprintf (msg, "mean[%i,%i]=%f", i, k, dp->mean[k*n+i]); print(); */
+      pp->mean.vals[i][k] /= (gdouble) pp->ngroup.els[i];
     }
     pp->ovmean.els[k] /= (gdouble) n;
   }
@@ -944,13 +895,8 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   { 
     for (j=0; j<p; j++)
     { 
-      /*      for (k=0; k<=p; k++)*/
       for (k=0; k<=j; k++)
       { 
-	/*        dp->cov[k*p+j] += 
-          ((gdouble) pdata->vals[i][j]-dp->mean[j+p*dp->group[i]])*
-          ((gdouble) pdata->vals[i][k]-dp->mean[k+p*dp->group[i]]);
-	  dp->cov[j*p+k] = dp->cov[k*p+j];*/
         pp->cov.vals[k][j] += 
           ((gdouble) pdata->vals[i][j]-pp->ovmean.els[j])*
           ((gdouble) pdata->vals[i][k]-pp->ovmean.els[k]);
@@ -970,14 +916,10 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   }
   else
     det = fabs((gdouble) pp->cov.vals[0][0]);
-  /*  memcpy(dp->a,dp->cov,p*p*sizeof(double)); 
-      det = ludcmp(dp->a, p, Pv); */
+
   *val = 1.0-*val/det; /*1-W/(W+B)*/
 /*  *val = *val/det; B/(W+B) */
 
-  /*  printf ("Index=%f\n", *val);*/
-
-/*  sprintf (msg, "index=%f\n", *val); print(); */
   g_free(Pv);
   g_free(cov);
 
@@ -1082,45 +1024,15 @@ void countngroup(int *group, int *ngroup, int n)
 
 }
 
-gint alloc_cartgini_p (cartgini_param *dp, gint nrows)
-{ /* initialize data */
-  gint n = nrows;
-
-  dp->group    = g_malloc(n*sizeof(gint));
-  dp->ngroup   = g_malloc(n*sizeof(gint));
-
-  /* initialize temporary space */
-  dp->x        = g_malloc(n*sizeof(gdouble));
-  dp->nright   = g_malloc(n*sizeof(gint));
-  dp->index    = g_malloc(n*sizeof(gint));
-
-  return 0;
-}
-
-gint free_cartgini_p (cartgini_param *dp)
-{ 
-  g_free (dp->group);
-  g_free (dp->ngroup);
-  g_free (dp->x);
-  g_free (dp->nright);
-  g_free (dp->index);
-
-  return 0;
-}
-
 gint cartgini (array_f *pdata, void *param, gfloat *val)
 { 
-  /*  cartgini_param *dp = (cartgini_param *) param;*/
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right, l;
   gfloat dev, prob, maxindex, index;
 
   n = pdata->nrows;
   p = pdata->ncols;
-  /*
-  if (p != 1) 
-    return(-1);
-  */
+
 /* Sort pdata by group */ 
   right = pdata->nrows-1;
   left = 0;
@@ -1138,7 +1050,6 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
   for (l=0; l<p; l++)
   {
     for (i=0; i<n; i++) { 
-      /*    dp->x[i] = pdata->vals[i][0];*/
       pp->x.els[i] = pdata->vals[i][l];
       pp->index.els[i] = pp->group.els[i];
     }
@@ -1172,49 +1083,17 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
   } 
   *val = 1-maxindex ;
   return(0);
-
-  /*******************/
-
-}
-
-gint alloc_cartentropy_p (cartentropy_param *dp, gint nrows)
-{ /* initialize data */
-  gint n = nrows;
-
-  dp->group    = g_malloc (n*sizeof(gint));
-  dp->ngroup   = g_malloc (n*sizeof(gint));
-
-  /* initialize temporary space */
-  dp->x        = g_malloc (n*sizeof(gdouble));
-  dp->nright   = g_malloc (n*sizeof(gint));
-  dp->index    = g_malloc (n*sizeof(gint));
-
-  return 0;
-}
-
-gint free_cartentropy_p (cartentropy_param *dp)
-{ g_free (dp->ngroup);
-  g_free (dp->group);
-  g_free (dp->x);
-  g_free (dp->index);
-  g_free (dp->nright);
-
-  return 0;
 }
 
 gint cartentropy (array_f *pdata, void *param, gfloat *val)
 { 
-  /*  cartentropy_param *dp = (cartentropy_param *) param;*/
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right,l;
   gfloat dev, prob, maxindex, index;
 
   n = pdata->nrows;
   p = pdata->ncols;
-  /*
-  if (p != 1) 
-    return(-1);
-  */
+
 /* Sort pdata by group */ 
   right = pdata->nrows-1;
   left = 0;
@@ -1265,8 +1144,6 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val)
   } 
   *val = 1-maxindex/log(g) ;
   return(0);
-
-/**************************************/
 
 }
 
