@@ -8,13 +8,15 @@
    <usage>
     ggobi --init=ggobi.init --datamode=excel d:\\duncan\\quakesNoNames.xls 
    </usage>
-   <documentation xmlns:r="http://cran.r-project.org"
+   <documentation xmlns:r="http://www.r-project.org"
+                  xmlns:s="http://cm.bell-labs.com/stat/S4"
                   xmlns:com="http://www.microsoft.com"
                   xmlns:c="http://www.c.org">
 
  This plugin is intended to allow one to read data directly from Excel
   or from an Excel file.  We use COM to create an instance of Excel
-  and then load the specified file into it.  This allows us to read
+  and then load the specified file into it, be it a regular XSL or CSV file. 
+  This allows us to read
   files directly without having to request that the user export it in
   comma-separted format (CSV).  Indeed, the data need never exist in a
   file, but instead we could instruct the plugin to use an existing
@@ -61,12 +63,12 @@ The mechanism for reading the data is as follows.
 Getting the dimensions of a dataset from a sheet
 is done using the following steps.
 
-<code>
+<s:code>
 ur = sheet[["UsedRange"]]
 
 nr = ur$End(xlDown) - ur[["Row"]] + 1
 nc = ur$End(xlToRight) - ur[["Column"]] + 1
-</code>
+</s:code>
 At this point, we can allocate our datad
 instance. We can add the record and column names later.
 
@@ -92,7 +94,7 @@ both GGobi and in the COM array, we can change to looping over either
 the columns or the cells and making more
 calls to Excel. For example, we might
 loop something like
-<code>
+<c:code>
 <![CDATA[
 for(j = 0; j < nc; j++) {
  for(i = 0; i < nr ; i++) {
@@ -100,11 +102,11 @@ for(j = 0; j < nc; j++) {
  }
 }
 ]]>
-</code>
+</c:code>
 
-Dealing with categorical values, etc.
-requires a great deal of extra processing
-to compute or augment the levels.
+Dealing with categorical values, etc.  requires a great extra
+processing to compute or augment the levels.  We can use the XML code
+and facilities within that to do this.
 
 <para/>
 
@@ -136,7 +138,7 @@ Excel server and more code!
 <para/>
 
 There are several missing features.
-<itemizedList>
+<itemizedlist>
 <listitem>
 Only handles numbers; not dates, strings, etc.
 One can add converters for these different VARIANT types
@@ -157,7 +159,7 @@ No support for colors, glyphs, etc.
 <listitem>
 No support for additional command line arguments
 such as
- <itemizedList>
+ <itemizedlist>
  <listitem> --headers=true to specify whether the first row gives the variable
   names,
  </listitem>
@@ -168,10 +170,10 @@ such as
  --rows="20..30", --columns="1,2,4,6",
 to do on-the-fly subsetting.
  </listitem>
- </itemizedList>
+ </itemizedlist>
 If one wants to do this, use a different
 interface such as R, Python or Perl to  program these operations for DCOM.
 </listitem>
-</itemizedList>
+</itemizedlist>
 </bugs>
 </inputPlugin>
