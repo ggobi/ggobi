@@ -7,16 +7,9 @@ typedef enum {deflt, within, between, anchorscales, anchorfixed} MDSGroupInd;
 
 typedef struct _noded {
   gint i;
-  GList *edges;  /*-- integers only, I think --*/
-  GList *connectedNodes;  /*-- noded's --*/
-
-/*  for showing/hiding trailing nodes and edges, I think
-  gboolean onRing_p;
-  gboolean expanded_p;
-  gboolean homeNode_p;
-  gint homeNode;
-  gint subtreeRootNode;
-*/
+  /*GList *edges;*/
+  GList *inEdges, *outEdges; /*-- GINT_TO_POINTER --*/
+  GList *srcNodes, *destNodes;  /*-- noded's --*/
 
   /*-- indexes of reference nodes --*/
   struct _noded *parentNode;
