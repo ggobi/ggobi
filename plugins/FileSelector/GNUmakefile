@@ -6,9 +6,10 @@ endif
 
 ifdef ADMIN
  include Install/GNUmakefile.admin
+else
+-include local.config
 endif
 
--include local.config
 -include $(GGOBI_HOME)/local.config
 
 GTK_EXTRA_INCLUDE_DIR=$(shell $(GTK_EXTRA_CONFIG) --cflags)
