@@ -244,7 +244,7 @@ tsplot_var_selected (gint jvar, displayd *display)
 
 gboolean
 tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
-    gint button, cpaneld *cpanel,  ggobid *gg)
+    gint toggle, gint mouse, cpaneld *cpanel,  ggobid *gg)
 {
   gboolean redraw = true;
   gint nplots = g_list_length (gg->current_display->splots);
@@ -269,7 +269,7 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
    *  if left button click, the x variable no matter what
    *  selection_mode prevails.
   */
-  if (button == 1) {
+  if (mouse == 1) {
     l = display->splots;
     s = (splotd *) l->data;
     if (s->xyvars.x == jvar) redraw=false;  /*-- this is already the x var --*/
@@ -281,7 +281,7 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
       }
     }
 
-  } else if (button == 2 || button == 3) {
+  } else if (mouse == 2 || mouse == 3) {
 
     if (tsplot_var_selected (jvar, display)) {
 

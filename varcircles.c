@@ -30,6 +30,11 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
   GList *children = gtk_container_children (GTK_CONTAINER (d->vcirc_ui.table));
   gint n = 0;
 
+/*
+g_printerr ("0: nchildren = %d\n", g_list_length (children));
+g_printerr ("0: nboxes = %d\n", g_slist_length (d->vcirc_ui.vb));
+*/
+
   switch (projection) {
 #ifdef ROTATION_IMPLEMENTED
     case TOUR2D3:
@@ -96,6 +101,9 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
         /* if in the subset but not among the children, pack and unref */
         if (display->t2d.subset_vars_p.els[j]) {
           if (g_list_index (children, box) == -1) {
+/*
+g_printerr ("box %d in subset but not among children; pack and unref\n", j);
+*/
             gtk_box_pack_start (GTK_BOX (d->vcirc_ui.table), box,
                                 false, false, 2);
             gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
@@ -106,14 +114,25 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
             if (G_OBJECT (box)->ref_count > 1)
 #endif
               gtk_widget_unref (box);
+          } else {
+/*
+g_printerr ("box %d in subset AND among children; do nothing\n", j);
+*/
           }
           n++;
 
         /* if not in the subset but among the children, ref and remove */
         } else { 
           if (g_list_index (children, box) >= 0) {
+/*
+g_printerr ("%d is not in subset but IS among children; ref & remove\n", j);
+*/
             gtk_widget_ref (box);
             gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), box);
+          } else {
+/*
+g_printerr ("%d is not in subset and is NOT among children; do nothing\n", j);
+*/
           }
         }
       }
@@ -151,6 +170,12 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
     default:
     break;
   }
+
+/*
+children = gtk_container_children (GTK_CONTAINER (d->vcirc_ui.table));
+g_printerr ("1: nchildren = %d\n", g_list_length (children));
+g_printerr ("1: nboxes = %d\n", g_slist_length (d->vcirc_ui.vb));
+*/
 }
 
 GtkWidget *
@@ -623,11 +648,11 @@ varcircle_sel_cb (GtkWidget *w, GdkEvent *event, gint jvar)
 
   if (event->type == GDK_BUTTON_PRESS) {
     GdkEventButton *bevent = (GdkEventButton *) event;
-    gint button = bevent->button;
+    gint mouse = bevent->button;
     gboolean alt_mod, shift_mod, ctrl_mod;
 
     /*-- respond only to button 1 and button 2 --*/
-    if (button != 1 && button != 2)
+    if (mouse != 1 && mouse != 2)
       return false;
 
 /* looking for modifiers; don't know which ones we'll want */
@@ -637,7 +662,8 @@ varcircle_sel_cb (GtkWidget *w, GdkEvent *event, gint jvar)
 /* */
 
     /*-- general variable selection --*/
-    varsel (w, cpanel, sp, jvar, button, alt_mod, ctrl_mod, shift_mod, d, gg);
+    varsel (w, cpanel, sp, jvar, -1 /* toggle */, mouse,
+      alt_mod, ctrl_mod, shift_mod, d, gg);
     varcircles_refresh (d, gg);
     return true;
   }

@@ -241,7 +241,7 @@ typedef struct
     displayd *(*create)(gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
     displayd *(*createWithVars)(gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg);
 
-    gboolean (*variable_select)(GtkWidget *w, displayd *dpy, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg);
+    gboolean (*variable_select)(GtkWidget *, displayd *, splotd *, gint jvar, gint toggle, gint mouse, cpaneld *cpanel, ggobid *gg);
 
     gint  (*variable_plotted_p)(displayd *dpy, gint *cols, gint ncols, datad *d);
 

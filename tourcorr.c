@@ -851,7 +851,7 @@ tourcorr_manip_var_set (gint j, gint btn, ggobid *gg)
 }
 
 gboolean
-tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
+tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean changed = true;
@@ -869,7 +869,7 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 
   } else if (GTK_IS_BUTTON(w)) {
     /*-- w is the label --*/
-    if (button == 1) 
+    if (mouse == 1) 
       changed = tourcorr_subset_horvar_set (jvar, d, dsp, gg);
     else
       changed = tourcorr_subset_vervar_set (jvar, d, dsp, gg);
@@ -877,17 +877,11 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
   } else if (GTK_IS_DRAWING_AREA(w)) {
 
     if (d->vcirc_ui.jcursor == GDK_HAND2) {
-      tourcorr_manip_var_set (jvar, button, gg);
+      tourcorr_manip_var_set (jvar, mouse, gg);
       d->vcirc_ui.jcursor = (gint) NULL;
     }
     else {
       tourcorr_active_var_set (jvar, d, dsp, gg);
-      /*      if (button == 1) { 
-        tourcorr_active_horvar_set (jvar, d, dsp, gg);
-      }
-      else if (button == 2 || button == 3) {
-        tourcorr_active_vervar_set (jvar, d, dsp, gg);
-	}*/
     }
   }
   sp->tourcorr.initmax = true;

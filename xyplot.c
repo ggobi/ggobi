@@ -49,11 +49,11 @@ xyplot_activate (gint state, displayd *display, ggobid *gg)
 }   
 
 gboolean
-xyplot_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
+xyplot_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint toggle, gint mouse)
 {
   gboolean redraw = true;
 
-  if (button == 1) {
+  if (toggle == VARSEL_X || mouse == 1) {
     if (jvar == sp->xyvars.x)
       redraw = false;
     else if (jvar == sp->xyvars.y) {
@@ -63,7 +63,7 @@ xyplot_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
       *jvar_prev = sp->xyvars.x;
     }
     sp->xyvars.x = jvar;
-  } else if (button == 2 || button == 3) {
+  } else if (toggle == VARSEL_Y || mouse == 2 || mouse == 3) {
     if (jvar == sp->xyvars.y)
       redraw = false;
     else if (jvar == sp->xyvars.x) {
@@ -133,7 +133,7 @@ cycle_fixedx (splotd *sp, displayd *display, datad *d, ggobid *gg)
 
   if (varno != sp->xyvars.y) {
     jvar_prev = sp->xyvars.y;
-    if (xyplot_varsel (sp, varno, &jvar_prev, 2)) {
+    if (xyplot_varsel (sp, varno, &jvar_prev, -1, 2)) {
       varpanel_refresh (display, gg);
       display_tailpipe (display, FULL, gg);
     }
@@ -172,7 +172,7 @@ cycle_fixedy (splotd *sp, displayd *display, datad *d, ggobid *gg)
 
   if (varno != sp->xyvars.x) {
     jvar_prev = sp->xyvars.x;
-    if (xyplot_varsel (sp, varno, &jvar_prev, 1))
+    if (xyplot_varsel (sp, varno, &jvar_prev, -1, 1))
       varpanel_refresh (display, gg);
       display_tailpipe (display, FULL, gg);
   }
@@ -233,11 +233,11 @@ cycle_xy (splotd *sp, displayd *display, datad *d, ggobid *gg)
 
   if (jx != sp->xyvars.x) {
     jvar_prev = sp->xyvars.x;
-    redraw = xyplot_varsel (sp, jx, &jvar_prev, 1);
+    redraw = xyplot_varsel (sp, jx, &jvar_prev, -1, 1);
   }
   if (jy != sp->xyvars.y) {
     jvar_prev = sp->xyvars.y;
-    redraw = redraw | xyplot_varsel (sp, jy, &jvar_prev, 2);
+    redraw = redraw | xyplot_varsel (sp, jy, &jvar_prev, -1, 2);
   }
 
   if (redraw) {

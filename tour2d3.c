@@ -255,7 +255,7 @@ void tour2d3_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
 
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
 gboolean
-tour2d3_subset_var_set (gint jvar, gint *jprev, gint button, datad *d,
+tour2d3_subset_var_set (gint jvar, gint *jprev, gint toggle, datad *d,
   displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->t2d3.subset_vars_p.els[jvar];
@@ -263,15 +263,15 @@ tour2d3_subset_var_set (gint jvar, gint *jprev, gint button, datad *d,
   gboolean changed = false;
   gint xyz;
 
-  *jprev = dsp->t2d3.subset_vars.els[button];
+  *jprev = dsp->t2d3.subset_vars.els[toggle];
 
   /*-- require exactly 3 variables in the subset --*/
   if (in_subset) {               /*-- handle a swap --*/
 
-    if (dsp->t2d3.subset_vars.els[button] == jvar)
+    if (dsp->t2d3.subset_vars.els[toggle] == jvar)
 /**/  return false;
 
-    switch (button) {
+    switch (toggle) {
       case VARSEL_X:
         xyz = (jvar == dsp->t2d3.subset_vars.els[VARSEL_Y]) ?
           VARSEL_Y : VARSEL_Z;
@@ -289,11 +289,11 @@ tour2d3_subset_var_set (gint jvar, gint *jprev, gint button, datad *d,
       break;
     }
 
-    dsp->t2d3.subset_vars.els[xyz] = dsp->t2d3.subset_vars.els[button];
-    dsp->t2d3.subset_vars.els[button] = jvar;
+    dsp->t2d3.subset_vars.els[xyz] = dsp->t2d3.subset_vars.els[toggle];
+    dsp->t2d3.subset_vars.els[toggle] = jvar;
     changed = true;
   } else {
-    dsp->t2d3.subset_vars.els[button] = jvar;
+    dsp->t2d3.subset_vars.els[toggle] = jvar;
     changed = true;
   }
 
@@ -312,58 +312,38 @@ tour2d3_subset_var_set (gint jvar, gint *jprev, gint button, datad *d,
 
 /*-- add or remove jvar from the set of active variables --*/
 void 
-tour2d3_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tour2d3_active_vars_swap (gint jvar_out, gint jvar_in, datad *d,
+  displayd *dsp, ggobid *gg)
 {
-  gint j, jtmp, k;
-  gboolean active = dsp->t2d3.active_vars_p.els[jvar];
+  gint k;
+  gint a, b;
+  gboolean both_in_subset = dsp->t2d3.subset_vars_p.els[jvar_out] &&
+                            dsp->t2d3.subset_vars_p.els[jvar_in];
 
-  /* deselect var if t2d3.nactive > 2 */
-  if (active) {
-    if (dsp->t2d3.nactive > 2) {
-      for (j=0; j<dsp->t2d3.nactive; j++) {
-        if (jvar == dsp->t2d3.active_vars.els[j]) 
-          break;
-      }
-      if (j<dsp->t2d3.nactive-1) {
-        for (k=j; k<dsp->t2d3.nactive-1; k++) {
-          dsp->t2d3.active_vars.els[k] = dsp->t2d3.active_vars.els[k+1];
-        }
-      }
-      dsp->t2d3.nactive--;
- 
-      gt_basis(dsp->t2d3.Fa, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
-        d->ncols, (gint) 2);
-      arrayd_copy(&dsp->t2d3.Fa, &dsp->t2d3.F);
+  if (both_in_subset) {  /* swap their positions in active_vars */
+    for (k=0; k<dsp->t2d3.nactive; k++) {
+      if (dsp->t2d3.active_vars.els[k] == jvar_in)
+        a = k;
+      else if (dsp->t2d3.active_vars.els[k] == jvar_out)
+        b = k;
+    }
+    dsp->t2d3.active_vars.els[a] = jvar_out;
+    dsp->t2d3.active_vars.els[b] = jvar_in;
 
-      dsp->t2d3.active_vars_p.els[jvar] = false;
-    }
+  } else {
+    dsp->t2d3.active_vars_p.els[jvar_out] = false;
+    dsp->t2d3.active_vars_p.els[jvar_in] = true;
+
+    for (k=0; k<dsp->t2d3.nactive; k++)
+      if (dsp->t2d3.active_vars.els[k] == jvar_out)
+        dsp->t2d3.active_vars.els[k] = jvar_in;
   }
-  else { /* not active, so add the variable */
-    if (jvar > dsp->t2d3.active_vars.els[dsp->t2d3.nactive-1]) {
-      dsp->t2d3.active_vars.els[dsp->t2d3.nactive] = jvar;
-    }
-    else if (jvar < dsp->t2d3.active_vars.els[0]) {
-      for (j=dsp->t2d3.nactive; j>0; j--) {
-          dsp->t2d3.active_vars.els[j] = dsp->t2d3.active_vars.els[j-1];
-      }
-      dsp->t2d3.active_vars.els[0] = jvar;
-    }
-    else {
-      for (j=0; j<dsp->t2d3.nactive-1; j++) {
-        if (jvar > dsp->t2d3.active_vars.els[j] &&
-            jvar < dsp->t2d3.active_vars.els[j+1])
-        {
-          jtmp = j+1;
-          break;
-        }
-      }
-      for (j=dsp->t2d3.nactive-1;j>=jtmp; j--) 
-          dsp->t2d3.active_vars.els[j+1] = dsp->t2d3.active_vars.els[j];
-      dsp->t2d3.active_vars.els[jtmp] = jvar;
-    }
-    dsp->t2d3.nactive++;
-    dsp->t2d3.active_vars_p.els[jvar] = true;
-  }
+
+/*
+  gt_basis(dsp->t2d3.Fa, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
+    d->ncols, (gint) 2);
+  arrayd_copy(&dsp->t2d3.Fa, &dsp->t2d3.F);
+*/
 
   dsp->t2d3.get_new_target = true;
 }
@@ -377,7 +357,8 @@ tour2d3_manip_var_set (gint j, ggobid *gg)
 }
 
 gboolean
-tour2d3_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
+tour2d3_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d,
+  ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean changed = true;
@@ -386,22 +367,18 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
   if (GTK_IS_TOGGLE_BUTTON(w)) {
     /* add/remove jvar to/from the subset of variables that <may> be active */
 
-    changed = tour2d3_subset_var_set(jvar, &jprev, button, d, dsp, gg);
+    changed = tour2d3_subset_var_set(jvar, &jprev, toggle, d, dsp, gg);
     if (changed) {
       varcircles_visibility_set (dsp, gg);
-
-      /*-- now add/remove the variable to/from the active set, too --*/
-      tour2d3_active_var_set (jprev, d, dsp, gg);  /*-- remove --*/
-      tour2d3_active_var_set (jvar, d, dsp, gg);   /*-- add --*/
+      tour2d3_active_vars_swap (jprev, jvar, d, dsp, gg);
     }
   } else if (GTK_IS_BUTTON(w)) {  /*-- it's the label --*/
 
-    /*-- 'button' is the mouse button; translate it to one of the toggles --*/
-    changed = tour2d3_subset_var_set(jvar, &jprev, button-1, d, dsp, gg);
+    /*-- 'mouse' is the mouse button; translate it to one of the toggles --*/
+    changed = tour2d3_subset_var_set(jvar, &jprev, mouse-1, d, dsp, gg);
     if (changed) {
       varcircles_visibility_set (dsp, gg);
-      tour2d3_active_var_set (jprev, d, dsp, gg);  /*-- remove --*/
-      tour2d3_active_var_set (jvar, d, dsp, gg);   /*-- add --*/
+      tour2d3_active_vars_swap (jprev, jvar, d, dsp, gg);
     }
 
   } else if (GTK_IS_DRAWING_AREA(w)) {
@@ -410,13 +387,6 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
       tour2d3_manip_var_set (jvar, gg);
       varcircles_cursor_set_default (d);
     }
-
-/*  There's no such thing as setting variables active or inactive
-    by clicking on the variable circles for this mode.
-    } else {
-      tour2d3_active_var_set (jvar, d, dsp, gg);
-    }
-*/
   }
 
   return changed;
@@ -464,10 +434,8 @@ tour2d3_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
 
 void tour2d3_scramble(ggobid *gg)
 {
-  int i, j;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  gint nc = d->ncols;
 
   arrayd_zero (&dsp->t2d3.Fa);
   arrayd_zero (&dsp->t2d3.Fz);
@@ -615,10 +583,9 @@ void tour2d3_func (gboolean state, displayd *dsp, ggobid *gg)
 
 void tour2d3_reinit(ggobid *gg)
 {
-  int i, j;
+  gint i;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  gint nc = d->ncols;
   splotd *sp = gg->current_splot;
 
   arrayd_zero (&dsp->t2d3.Fa);

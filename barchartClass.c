@@ -10,8 +10,8 @@
 
  /* Making these available to ggobiClass.c */
 static gboolean barchartVarSel(GtkWidget *w, displayd * display, splotd * sp,
-                               gint jvar,
-                               gint btn, cpaneld * cpanel, ggobid * gg);
+                               gint jvar, gint toggle, gint mouse,
+                               cpaneld * cpanel, ggobid * gg);
 static gint barchartVarIsPlotted(displayd * dpy, gint * cols, gint ncols,
                                  datad * d);
 static gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel,
@@ -77,10 +77,10 @@ static gchar *barchart_tree_label(splotd * sp, datad * d, ggobid * gg)
 
 gboolean
 barchartVarSel(GtkWidget *w, displayd * display, splotd * sp, gint jvar,
-               gint btn, cpaneld * cpanel, ggobid * gg)
+               gint toggle, gint mouse, cpaneld * cpanel, ggobid * gg)
 {
   gint jvar_prev = -1;
-  gboolean redraw = p1d_varsel(sp, jvar, &jvar_prev, btn);
+  gboolean redraw = p1d_varsel(sp, jvar, &jvar_prev, toggle, mouse);
   if (redraw) {
     displayd *display = (displayd *) sp->displayptr;
     datad *d = display->d;
@@ -281,11 +281,12 @@ gint barchartSPlotKeyEventHandler(displayd * dpy, splotd * sp, gint keyval)
 {
   gint action = -1;
   switch (keyval) {
-  case GDK_h:
-  case GDK_H:
-    action = EXTENDED_DISPLAY_MODE;
+    case GDK_h:
+    case GDK_H:
+      action = EXTENDED_DISPLAY_MODE;
     break;
-  default:
+    default:
+    break;
   }
   return (action);
 }

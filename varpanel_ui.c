@@ -111,7 +111,8 @@ varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, datad *d)
 }
 
 void
-varsel (GtkWidget *w, cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
+varsel (GtkWidget *w, cpaneld *cpanel, splotd *sp, gint jvar,
+  gint toggle, gint mousebtn,
   gint alt_mod, gint ctrl_mod, gint shift_mod, datad *d, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
@@ -125,7 +126,7 @@ varsel (GtkWidget *w, cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   }
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-     redraw = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->variable_select(w, display, sp, jvar, btn, cpanel, gg);
+     redraw = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->variable_select(w, display, sp, jvar, toggle, mousebtn, cpanel, gg);
   }
 
   gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[VARIABLE_SELECTION_SIGNAL], 
@@ -210,40 +211,38 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
   splotd *sp = gg->current_splot;
-  gint xyz;
 
   if (d != display->d)
     return true;
 
   if (event->type == GDK_BUTTON_PRESS) {
     GdkEventButton *bevent = (GdkEventButton *) event;
-    gint button = bevent->button;
+    gint mousebutton = -1;
+    gint togglebutton = -1;
     gboolean alt_mod, shift_mod, ctrl_mod;
     gint j, jvar;
 
     jvar = -1;
     for (j=0; j<d->ncols; j++) {
       if (varpanel_widget_get_nth (VARSEL_X, j, d) == w) {
-        xyz = VARSEL_X;
+        togglebutton = VARSEL_X;
         jvar = j;
         break;
       } else if (varpanel_widget_get_nth (VARSEL_Y, j, d) == w) {
-        xyz = VARSEL_Y;
+        togglebutton = VARSEL_Y;
         jvar = j;
         break;
       } else if (varpanel_widget_get_nth (VARSEL_Z, j, d) == w) {
-        xyz = VARSEL_Z;
+        togglebutton = VARSEL_Z;
         jvar = j;
         break;
       } else if (varpanel_widget_get_nth (VARSEL_LABEL, j, d) == w) {
-        xyz = -1;
+        togglebutton = -1;
+        mousebutton = bevent->button;
         jvar = j;
         break;
       }
     }
-   /*-- emulate the old behavior by translating xyz into button --*/
-   if (xyz > -1)
-     button = xyz;
 
 /* looking for modifiers; don't know which ones we'll want */
     alt_mod = ((bevent->state & GDK_MOD1_MASK) == GDK_MOD1_MASK);
@@ -252,7 +251,8 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 /* */
 
     /*-- general variable selection --*/
-    varsel (w, cpanel, sp, jvar, button, alt_mod, ctrl_mod, shift_mod, d, gg);
+    varsel (w, cpanel, sp, jvar, togglebutton, mousebutton,
+      alt_mod, ctrl_mod, shift_mod, d, gg);
     varpanel_refresh (display, gg);
     return true;
   }

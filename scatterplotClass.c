@@ -97,7 +97,7 @@ selectXVar(GtkWidget *w, displayd *display, gint jvar, ggobid *gg)
   splotd *sp = (splotd *) display->splots->data;
   cpaneld *cpanel = &display->cpanel;
 
-  varsel (w, cpanel, sp, jvar, 1, false, false, false, d, gg);
+  varsel (w, cpanel, sp, jvar, VARSEL_X, -1, false, false, false, d, gg);
 }
 
 static void
@@ -199,35 +199,36 @@ varpanelRefresh(displayd *display, splotd *sp, datad *d)
 }
 
 static gboolean
-variableSelect(GtkWidget *w, displayd *display, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg)
+variableSelect(GtkWidget *w, displayd *display, splotd *sp, gint jvar, gint toggle, gint mouse, cpaneld *cpanel, ggobid *gg)
 {
   gboolean redraw = false;
   gint jvar_prev = -1;
+
   switch (cpanel->projection) {
     case P1PLOT:
-      redraw = p1d_varsel (sp, jvar, &jvar_prev, btn);
+      redraw = p1d_varsel (sp, jvar, &jvar_prev, toggle, mouse);
       if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
         reinit_transient_brushing (display, gg);
     break;
     case XYPLOT:
-      redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
+      redraw = xyplot_varsel (sp, jvar, &jvar_prev, toggle, mouse);
       if (redraw)
         if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
           reinit_transient_brushing (display, gg);
     break;
     case TOUR1D:
-      redraw = tour1d_varsel (w, jvar, btn, display->d, gg);
+      redraw = tour1d_varsel (w, jvar, toggle, mouse, display->d, gg);
     break;
 #ifdef ROTATION_IMPLEMENTED
     case TOUR2D3:
-      redraw = tour2d3_varsel (w, jvar, btn, display->d, gg);
+      redraw = tour2d3_varsel (w, jvar, toggle, mouse, display->d, gg);
     break;
 #endif
     case TOUR2D:
-      redraw = tour2d_varsel (w, jvar, btn, display->d, gg);
+      redraw = tour2d_varsel (w, jvar, toggle, mouse, display->d, gg);
     break;
     case COTOUR:
-      redraw = tourcorr_varsel (w, jvar, btn, display->d, gg);
+      redraw = tourcorr_varsel (w, jvar, toggle, mouse, display->d, gg);
     break;
     /*-- to pacify compiler if we change these to an enum --*/
     default:

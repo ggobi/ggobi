@@ -164,7 +164,7 @@ p1d_reproject (splotd *sp, greal **world_data, datad *d, ggobid *gg)
 }
 
 gboolean
-p1d_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
+p1d_varsel (splotd *sp, gint jvar, gint *jprev, gint toggle, gint mouse)
 {
   gboolean redraw = true;
   displayd *display = (displayd *) sp->displayptr;
@@ -175,13 +175,14 @@ p1d_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
      allow = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->allow_reorientation;
   }
 
-     /*-- if button == -1, don't change orientation. That protects changes made during cycling --*/
-  if (allow && button > 0) 
-    display->p1d_orientation = (button == 1) ? HORIZONTAL : VERTICAL;
+  /*-- if button == -1, don't change orientation. That protects
+       changes made during cycling --*/
+  if (allow && mouse > 0) 
+    display->p1d_orientation = (mouse == 1) ? HORIZONTAL : VERTICAL;
 
   redraw = (orientation != display->p1d_orientation) || (jvar != sp->p1dvar);
 
-  *jvar_prev = sp->p1dvar;
+  *jprev = sp->p1dvar;
   sp->p1dvar = jvar;
 
   if (orientation != display->p1d_orientation)
@@ -252,7 +253,7 @@ p1dcycle_func (ggobid *gg)
 
   if (varno != sp->p1dvar) {
     jvar_prev = sp->p1dvar;
-    if (p1d_varsel (sp, varno, &jvar_prev, -1)) {
+    if (p1d_varsel (sp, varno, &jvar_prev, -1, -1)) {
       varpanel_refresh (display, gg);
       display_tailpipe (display, FULL, gg);
     }

@@ -378,7 +378,7 @@ tour1d_manip_var_set (gint j, gint btn, ggobid *gg)
 }
 
 gboolean
-tour1d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
+tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
@@ -405,7 +405,7 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 
     /*-- any button --*/
     if (d->vcirc_ui.jcursor == GDK_HAND2) {
-      tour1d_manip_var_set (jvar, button, gg);
+      tour1d_manip_var_set (jvar, mouse, gg);
       varcircles_cursor_set_default (d);
 
     } else {

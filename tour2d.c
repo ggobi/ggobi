@@ -378,7 +378,8 @@ tour2d_manip_var_set (gint j, ggobid *gg)
 }
 
 gboolean
-tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
+tour2d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse,
+  datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean changed = true;
@@ -464,24 +465,14 @@ tour2d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
 
 void tour2d_scramble(ggobid *gg)
 {
-  int i, j;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  gint nc = d->ncols;
 
   arrayd_zero (&dsp->t2d.Fa);
   arrayd_zero (&dsp->t2d.Fz);
   arrayd_zero (&dsp->t2d.F);
   arrayd_zero (&dsp->t2d.Ga);
   arrayd_zero (&dsp->t2d.Gz);
-
-/*
-  for (i=0; i<2; i++)
-    for (j=0; j<nc; j++)
-      dsp->t2d.Fa.vals[i][j] = dsp->t2d.Fz.vals[i][j] = 
-        dsp->t2d.F.vals[i][j] = dsp->t2d.Ga.vals[i][j] = 
-        dsp->t2d.Gz.vals[i][j] = 0.0;
-*/
 
   gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
     d->ncols, (gint) 2);
@@ -698,10 +689,9 @@ void tour2d_func (gboolean state, displayd *dsp, ggobid *gg)
 
 void tour2d_reinit(ggobid *gg)
 {
-  int i, j;
+  gint i;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  gint nc = d->ncols;
   splotd *sp = gg->current_splot;
 
   arrayd_zero (&dsp->t2d.Fa);
@@ -709,14 +699,6 @@ void tour2d_reinit(ggobid *gg)
   arrayd_zero (&dsp->t2d.F);
   arrayd_zero (&dsp->t2d.Ga);
   arrayd_zero (&dsp->t2d.Gz);
-
-/*
-  for (i=0; i<2; i++)
-    for (j=0; j<nc; j++)
-      dsp->t2d.Fa.vals[i][j] = dsp->t2d.Fz.vals[i][j] = 
-        dsp->t2d.F.vals[i][j] = dsp->t2d.Ga.vals[i][j] = 
-        dsp->t2d.Gz.vals[i][j] = 0.0;
-*/
 
   for (i=0; i<2; i++)
   {
