@@ -57,7 +57,7 @@ void scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *display);
 void scatterplotDisplayInit(scatterplotDisplayd *display);
 
 
-displayd *createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg);
+displayd *createScatterplot(displayd *, gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg);
 
 #endif
 

@@ -131,8 +131,16 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
 
 #define MAXNPCPLOTS 5
+
 displayd *
-parcoords_new (gboolean missing_p, gint nvars, gint *vars,
+parcoords_new_with_vars(gboolean missing_p, gint nvars, gint *vars,
+	       datad *d, ggobid *gg) 
+{
+	return(parcoords_new(NULL, missing_p, nvars, vars, d, gg));
+}
+
+displayd *
+parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
 	       datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame, *w;
@@ -141,12 +149,13 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
   gint i;
   splotd *sp;
   gint nplots;
-  displayd *display;
   gint arrangement = ARRANGE_ROW;  /*-- default initial orientation --*/
   gint width, screenwidth;
   gint height, screenheight;
 
-  display = gtk_type_new(GTK_TYPE_GGOBI_PARCOORDS_DISPLAY);
+  if(!display) 
+    display = gtk_type_new(GTK_TYPE_GGOBI_PARCOORDS_DISPLAY);
+
   display_set_values(display, d, gg);
 
   if (nvars == 0) {
@@ -161,34 +170,39 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
   }
 
   parcoords_cpanel_init (&display->cpanel, gg);
-
-  display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);
+  
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow)
+     display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);
 
 /*
  * Add the main menu bar
 */
   vbox = GTK_WIDGET(display); 
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
-  gg->parcoords.accel_group = gtk_accel_group_new ();
-  factory = get_main_menu (menu_items,
-    sizeof (menu_items) / sizeof (menu_items[0]),
-    gg->parcoords.accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, &mbar, (gpointer) display);
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->window) {
+    gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
-  /*-- add a tooltip to the file menu --*/
-  w = gtk_item_factory_get_widget (factory, "<main>/File");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    gtk_menu_get_attach_widget (GTK_MENU(w)),
-    "File menu for this display", NULL);
+    gg->parcoords.accel_group = gtk_accel_group_new ();
+    factory = get_main_menu (menu_items,
+			     sizeof (menu_items) / sizeof (menu_items[0]),
+			     gg->parcoords.accel_group, 
+			     GTK_GGOBI_WINDOW_DISPLAY(display)->window, &mbar, (gpointer) display);
 
-  /*
-   * After creating the menubar, and populating the file menu,
-   * add the Options and Link menus another way
-  */
-  parcoords_display_menus_make (display, gg->parcoords.accel_group,
+    /*-- add a tooltip to the file menu --*/
+    w = gtk_item_factory_get_widget (factory, "<main>/File");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+			  gtk_menu_get_attach_widget (GTK_MENU(w)),
+			  "File menu for this display", NULL);
+
+    /*
+     * After creating the menubar, and populating the file menu,
+     * add the Options and Link menus another way
+     */
+    parcoords_display_menus_make (display, gg->parcoords.accel_group,
                                 (GtkSignalFunc) display_options_cb, mbar, gg);
-  gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+  }
 
 
 /*
@@ -243,7 +257,11 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
       sp->da, true, true, 0);
   }
 
-  gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+  if(GTK_GGOBI_WINDOW_DISPLAY(display)->window)
+     gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+  else {
+	  /* display == vbox  gtk_container_add(GTK_CONTAINER(display), vbox);      */
+  }
 
   return display;
 }

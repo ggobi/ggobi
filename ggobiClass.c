@@ -376,6 +376,12 @@ GtkType gtk_ggobi_display_get_type(void)
 }
 
 
+void
+initWindowDisplayd(windowDisplayd *dpy)
+{
+   GTK_GGOBI_WINDOW_DISPLAY(dpy)->useWindow = true;
+}
+
 GtkType gtk_ggobi_window_display_get_type(void)
 {
   static GtkType data_type = 0;
@@ -386,7 +392,7 @@ GtkType gtk_ggobi_window_display_get_type(void)
       sizeof(struct _windowDisplayd),
       sizeof(GtkGGobiWindowDisplayClass),
       (GtkClassInitFunc) NULL,
-      (GtkObjectInitFunc) NULL,
+      (GtkObjectInitFunc) initWindowDisplayd,
       /* reserved_1 */ NULL,
       /* reserved_2 */ NULL,
       (GtkClassInitFunc) NULL,

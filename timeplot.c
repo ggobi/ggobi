@@ -119,8 +119,15 @@ tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg)
 
 
 #define MAXNTSPLOTS 6
+
 displayd *
-tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg) 
+tsplot_new_with_vars (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg) 
+{
+  return(tsplot_new(NULL, missing_p, nvars, vars, d, gg));
+}
+
+displayd *
+tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   GtkWidget *mbar, *w;
@@ -128,9 +135,10 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
   gint i;
   splotd *sp;
   gint nplots;
-  displayd *display;
 
-  display = gtk_type_new(GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY);
+  if(!display)
+      display = gtk_type_new(GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY);
+
   display_set_values(display, d, gg);
 
   if (nvars == 0) {
@@ -145,33 +153,37 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
 
   tsplot_cpanel_init (&display->cpanel, gg);
 
-  display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);
+  if(GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow)
+      display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);
 
 /*
  * Add the main menu bar
 */
   vbox = GTK_WIDGET(display); 
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
-  gg->tsplot.accel_group = gtk_accel_group_new ();
-  factory = get_main_menu (menu_items,
-    sizeof (menu_items) / sizeof (menu_items[0]),
-    gg->tsplot.accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
-    &mbar, (gpointer) display);
+  if(GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow) {
+    gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
-  /*-- add a tooltip to the file menu --*/
-  w = gtk_item_factory_get_widget (factory, "<main>/File");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gtk_menu_get_attach_widget (GTK_MENU(w)),
-    "File menu for this display", NULL);
+    gg->tsplot.accel_group = gtk_accel_group_new ();
+    factory = get_main_menu (menu_items,
+			     sizeof (menu_items) / sizeof (menu_items[0]),
+			     gg->tsplot.accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
+			     &mbar, (gpointer) display);
+
+    /*-- add a tooltip to the file menu --*/
+    w = gtk_item_factory_get_widget (factory, "<main>/File");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gtk_menu_get_attach_widget (GTK_MENU(w)),
+			  "File menu for this display", NULL);
 
   /*
    * After creating the menubar, and populating the file menu,
    * add the Display Options and Link menus another way
   */
-  tsplot_display_menus_make (display, gg->tsplot.accel_group,
-                            (GtkSignalFunc) display_options_cb, mbar, gg);
-  gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+    tsplot_display_menus_make (display, gg->tsplot.accel_group,
+			       (GtkSignalFunc) display_options_cb, mbar, gg);
+    gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+  }
 
 
 /*
@@ -210,7 +222,10 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
 			sp->da, true, true, 0);
   }
 
-  gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+  if(GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow)
+      gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+  else
+      gtk_widget_show_all(GTK_WIDGET(gg->tsplot.arrangement_box));
 
   return display;
 }

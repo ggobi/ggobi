@@ -878,8 +878,11 @@ extern void GGobi_update_data(datad *, ggobid *gg);
  Get a list of the human readable names of the different 
  input modes for data  sources. These include
  ASCII, XML, database, URL, etc.
+
+ Caller is responsible for freeing the array, but not its
+ elements!
  */
-gchar *const * GGobi_getDataModeNames(int *n);
+const gchar ** GGobi_getDataModeNames(int *n);
 
 
 /** 

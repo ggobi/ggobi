@@ -131,7 +131,7 @@ extended_display_open_cb (GtkWidget *w, ExtendedDisplayCreateData *data)
      return;
   }
 
-  display_add(dpy, gg);
+/*  display_add(dpy, gg); */
   varpanel_refresh(dpy, gg);
 }
 

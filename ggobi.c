@@ -69,7 +69,7 @@ const gchar * const ViewTypes[] =
 "Parallel Coordinates",
 #endif
 };
-const gint ViewTypeIndices[] = {};
+const gint ViewTypeIndices[];
 
 
 FatalErrorHandler FatalError = &exit;

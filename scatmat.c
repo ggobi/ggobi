@@ -88,6 +88,8 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
   gtk_widget_show (submenu);
 }
 
+
+#if 0
 displayd *
 scatmat_new (gboolean missing_p, gint numRows, gint *rows,
 	     gint numCols, gint *cols, datad *d, ggobid *gg) 
@@ -219,11 +221,161 @@ scatmat_new (gboolean missing_p, gint numRows, gint *rows,
 
   /*-- position the display toward the lower left of the main window --*/
   display_set_position (wdpy, gg);
-
   gtk_widget_show_all (wdpy->window);
 
   return display;
 }
+
+#else
+
+displayd *
+scatmat_new (displayd *display,
+	       gboolean missing_p, gint numRows, gint *rows,
+	       gint numCols, gint *cols, datad *d, ggobid *gg) 
+{
+  GtkWidget *vbox, *frame;
+  GtkWidget *mbar, *w;
+  GtkItemFactory *factory;
+  gint i, j, ctr;
+  gint width, height;
+  gint scr_width, scr_height;
+  gint scatmat_nrows, scatmat_ncols;
+  splotd *sp;
+  windowDisplayd *wdpy = NULL;
+  GtkAccelGroup *scatmat_accel_group;
+
+  if(!display)
+     display = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_DISPLAY);
+
+  display_set_values (display, d, gg);
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+    wdpy = GTK_GGOBI_WINDOW_DISPLAY(display);
+
+  /* If the caller didn't specify the rows and columns, 
+     use the default which is the number of variables
+     in the dataset or the maximum number of columns
+     within a scatterplot matrix.
+     ! Need to check rows and cols are allocated. !
+   */
+  if (numRows == 0 || numCols == 0) {
+    scatmat_nrows = scatmat_ncols = MIN (d->ncols, sessionOptions->info->numScatMatrixVars);
+    if(scatmat_nrows < 0) {
+	scatmat_nrows = scatmat_ncols = d->ncols;
+    }
+    for (j=0; j<scatmat_nrows; j++)
+      rows[j] = cols[j] = j;
+  } else { 
+    scatmat_nrows = numRows;
+    scatmat_ncols = numCols;
+  }
+
+  display->p1d_orientation = HORIZONTAL;
+
+  scatmat_cpanel_init (&display->cpanel, gg);
+
+  if(wdpy && wdpy->useWindow)
+    display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 5, gg);
+
+/*
+ * Add the main menu bar
+*/
+  vbox = gtk_vbox_new (FALSE, 1);
+  gtk_container_border_width (GTK_CONTAINER (vbox), 1);
+  if(wdpy && wdpy->useWindow) {
+    gtk_container_add (GTK_CONTAINER (wdpy->window), vbox);
+
+  scatmat_accel_group = gtk_accel_group_new ();
+  factory = get_main_menu (menu_items,
+    sizeof (menu_items) / sizeof (menu_items[0]),
+    scatmat_accel_group, wdpy->window, &mbar,
+    (gpointer) display);
+
+  /*-- add a tooltip to the file menu --*/
+  w = gtk_item_factory_get_widget (factory, "<main>/File");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+    gtk_menu_get_attach_widget (GTK_MENU(w)),
+    "File menu for this display", NULL);
+
+  /*
+   * After creating the menubar, and populating the file menu,
+   * add the Options and Link menus another way
+  */
+   scatmat_display_menus_make (display, scatmat_accel_group,
+			       (GtkSignalFunc) display_options_cb, mbar, gg);
+   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+  }
+/*
+ * splots in a table 
+*/
+  frame = gtk_frame_new (NULL);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 3);
+  gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 1);
+
+  gtk_widget_show (frame);
+
+  /*
+   * make the matrix take up no more than some fraction
+   * the screen by default, and make the plots square.
+  */
+  scr_width = gdk_screen_width () / 2;
+  scr_height = gdk_screen_height () / 2;
+  width = (WIDTH * scatmat_ncols > scr_width) ?
+    (scr_width / scatmat_ncols) : WIDTH;
+  height = (HEIGHT * scatmat_nrows > scr_height) ?
+    (scr_height / scatmat_nrows) : HEIGHT;
+  width = height = MIN (width, height);
+  /* */
+
+  display->table = gtk_table_new (scatmat_ncols, scatmat_nrows, false);
+  gtk_container_add (GTK_CONTAINER (frame), display->table);
+  display->splots = NULL;
+  ctr = 0;
+  for (i=0; i<scatmat_ncols; i++) {
+    for (j=0; j<scatmat_nrows; j++, ctr++) {
+/* Can we use SCATTER_SPLOT or do we need SCATMAT_SPLOT. */
+      sp = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_SPLOT);
+      splot_init(sp, display, width, height, gg);
+
+      sp->xyvars.x = rows[i]; 
+      sp->xyvars.y = cols[j]; 
+      sp->p1dvar = (rows[i] == cols[j]) ? cols[j] : -1;
+
+      display->splots = g_list_append (display->splots, (gpointer) sp);
+
+      gtk_table_attach (GTK_TABLE (display->table), sp->da, i, i+1, j, j+1,
+			(GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
+			(GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+			1, 1);
+      gtk_widget_show (sp->da);
+    }
+  }
+
+  display->scatmat_cols = NULL;
+  for (j=0; j<scatmat_ncols; j++)
+    display->scatmat_cols = g_list_append (display->scatmat_cols,
+                                           GINT_TO_POINTER (cols[j]));
+  display->scatmat_rows = NULL;
+  for (i=0; i<scatmat_nrows; i++)
+    display->scatmat_rows = g_list_append (display->scatmat_rows,
+                                           GINT_TO_POINTER (cols[i]));
+
+  gtk_widget_show (display->table);
+
+  /*-- position the display toward the lower left of the main window --*/
+  if(wdpy && wdpy->useWindow) {
+    display_set_position (wdpy, gg);
+    gtk_widget_show_all (wdpy->window);
+  } else {
+    gtk_container_add(GTK_CONTAINER(display), vbox);
+  }
+
+
+  return display;
+}
+
+#endif
+
 
 /*
  * check symmetry assumption -- the plot could have been rendered

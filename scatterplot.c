@@ -95,7 +95,7 @@ scatterplot_show_rulers (displayd *display, gint projection)
     break;
   }
 
-  gtk_drawing_area_size (GTK_DRAWING_AREA (sp->da), width, height);
+  gtk_drawing_area_size(GTK_DRAWING_AREA (sp->da), width, height);
 }
 
 void
@@ -185,7 +185,7 @@ display_datad_added_cb (ggobid *gg, datad *d, void *win)
   windowDisplayd *display =  GTK_GGOBI_WINDOW_DISPLAY(GTK_OBJECT(win));
 
   /*-- this is all true even when the display is first opened --*/
-  if (GTK_WIDGET_REALIZED (display->window)) {
+  if (display->window && GTK_WIDGET_REALIZED (display->window)) {
       scatterplot_display_edge_menu_update (GTK_GGOBI_DISPLAY(display),
         gg->app.sp_accel_group, display_options_cb, gg);
   }
@@ -203,45 +203,43 @@ gtk_scatter_plot_new(displayd *dpy, gint width, gint height, ggobid *gg)
 }
 
 displayd *
-createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg);
-
-displayd *
 scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, datad *d, ggobid *gg)
 {
-  return(createScatterplot(missing_p, NULL, numVars, vars, d, gg));
+  return(createScatterplot(NULL, missing_p, NULL, numVars, vars, d, gg));
 }
 
 displayd *
 scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) 
 {
-  return(createScatterplot(missing_p, sp, 0, NULL, d, gg));
+  return(createScatterplot(NULL, missing_p, sp, 0, NULL, d, gg));
 }
 
 
 
 
 displayd *
-createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg)
+createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg)
 {
   GtkWidget *table, *vbox, *w;
   GtkItemFactory *factory;
-  displayd *display;
   PipelineMode projection;
 
   if (d == NULL || d->ncols < 1)
     return (NULL);
 
-  if (sp == NULL || sp->displayptr == NULL) {
+  if (!display) {
+   if(sp == NULL || sp->displayptr == NULL) {
     display = gtk_type_new(GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY);
     display_set_values(display, d, gg);
-  } else {
+   } else {
     display = (displayd*) sp->displayptr;
     display->d = d;
+   }
   }
 
   /* Want to make certain this is true, and perhaps it may be different
      for other plot types and so not be set appropriately in DefaultOptions.
-    display->options.axes_center_p = true;
+     display->options.axes_center_p = true;
    */
 
   projection = (d->ncols >= 2) ? XYPLOT : P1PLOT;
@@ -249,7 +247,7 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
 
   vbox = GTK_WIDGET(display); /* gtk_vbox_new (false, 1); */
 
-  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow) {
     display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);  /*-- 3 = width = any small int --*/
 
     /*-- Add the main menu bar --*/
@@ -376,7 +374,7 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
                     (GtkAttachOptions) (GTK_EXPAND|GTK_SHRINK|GTK_FILL),
                     0, 0 );
 
-  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display)) 
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow) 
      gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
 
    /*-- hide any extraneous rulers --*/

@@ -99,13 +99,15 @@ GGOBI(getDataModeDescription)(DataMode mode)
 /**
  Caller should now free the return value, but not the elements of the
  array.
+ This is computed dynamically by querying each of the input plugins 
+ for its collection of mode names.
 */
-gchar *const *
+const gchar **
 GGOBI(getDataModeNames)(int *n)
 {
    int ctr = 0, num, k, i;
    GList *plugins;
-   gchar **ans;
+   const gchar **ans;
    GGobiPluginInfo *plugin;
 
    plugins = sessionOptions->info->inputPlugins;
@@ -115,7 +117,7 @@ GGOBI(getDataModeNames)(int *n)
       ctr += plugin->info.i->numModeNames;
    }
 
-   ans = (gchar **) g_malloc(sizeof(gchar *) * ctr);
+   ans = (const gchar **) g_malloc(sizeof(gchar *) * ctr);
    ctr = 0;
    for(i = 0; i < num ; i++) {
       plugin = g_list_nth_data(plugins, i);  
@@ -197,9 +199,9 @@ GGobi_setMissingValueIdentifier(MissingValue_p f)
 }
 
 
-const gchar * DefaultRowNames = NULL;
+static const gchar * const DefaultRowNames = NULL;
 
-const gchar **
+const gchar ** const
 getDefaultRowNamesPtr()
 {
   return(&DefaultRowNames);
@@ -450,9 +452,8 @@ GGOBI(newScatmat) (gint *rows, gint *columns, gint nr, gint nc,
 {
   displayd *display; 
 
-  display = scatmat_new (false, nr, rows, nc, columns, d, gg);
-  display_add (display, gg); 
-/*XX  display_add (display, gg); the caller should add this display. */
+  display = scatmat_new (NULL, false, nr, rows, nc, columns, d, gg);
+  display_add (display, gg); /*XX  the caller should add this display. */
 
   return (display);
 }
@@ -462,7 +463,7 @@ GGOBI(newParCoords)(gint *vars, gint numVars, datad *d, ggobid *gg)
 {
   displayd *display = NULL;
 
-  display = parcoords_new (false, numVars, vars, d, gg);
+  display = parcoords_new (display, false, numVars, vars, d, gg);
   display_add (display, gg);
 
   return (display);
@@ -473,7 +474,7 @@ GGOBI(newTimeSeries)(gint *yvars, gint numVars, datad *d, ggobid *gg)
 { 
   displayd *display = NULL; 
  
-  display = tsplot_new (false, numVars, yvars, d, gg); 
+  display = tsplot_new (display, false, numVars, yvars, d, gg); 
   display_add (display, gg); 
  
   return (display);
@@ -1321,6 +1322,7 @@ GGOBI(removeVariableByIndex)(gint which, datad *d, ggobid *gg)
   gint i, j;
   for (i = 0; i < d->nrows; i++) {
    for (j = which+1; j < d->ncols; j++) {
+/*XXX Fill in */
    }
   }
 

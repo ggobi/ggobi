@@ -167,8 +167,9 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 
 /*
 
-We need to allow people to programmatically change a setting and force the update.  The current framework is all based on GUI events and so we don't update the GUI components here as we assume they
-are set appropriately.  A Model View Controller approach is needed.
+We need to allow people to programmatically change a setting and force the update. 
+The current framework is all based on GUI events and so we don't update the GUI components 
+here as we assume they are set appropriately.  A Model View Controller approach is needed.
 
 */
 void
@@ -464,6 +465,7 @@ display_alloc_init (gboolean missing_p, datad *d, ggobid *gg)
   displayd *display;
 
   display = gtk_type_new(GTK_TYPE_GGOBI_WINDOW_DISPLAY);
+  GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow = true;
   display_set_values(display, d, gg);
 
   return (display);
@@ -484,7 +486,7 @@ display_add (displayd *display, ggobid *gg)
     return(-1);
   }
 
-  if (GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
+  if (GTK_IS_GGOBI_WINDOW_DISPLAY(display)  && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow) {
     GGobi_widget_set(GTK_GGOBI_WINDOW_DISPLAY(display)->window, gg, true);
     if(g_list_length(display->splots))
           display_set_current (display, gg);  /*-- this may initialize the mode --*/
@@ -689,7 +691,7 @@ display_set_current (displayd *new_display, ggobid *gg)
       GTK_IS_GGOBI_WINDOW_DISPLAY(gg->current_display))
   {
     title = computeTitle (false, gg->current_display, gg);
-    if (title) {
+    if (title && GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window) {
       gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window), title);
       g_free (title); 
     }
@@ -711,10 +713,12 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   /* Now do the setup for the new display.  */
   if (GTK_IS_GGOBI_WINDOW_DISPLAY(new_display)) {
-    title = computeTitle (true, new_display, gg);
-    if (title) {
-      gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(new_display)->window), title);   
-      g_free (title); 
+    if(GTK_GGOBI_WINDOW_DISPLAY(new_display)->useWindow) {
+      title = computeTitle (true, new_display, gg);
+      if (title) {
+        gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(new_display)->window), title);   
+        g_free (title); 
+      }
     }
 
     if(GTK_IS_GGOBI_EXTENDED_DISPLAY(new_display)) {
@@ -876,7 +880,7 @@ gboolean
 isEmbeddedDisplay (displayd *dpy)
 {
   gboolean ans = false;
-  ans = (GTK_IS_GGOBI_WINDOW_DISPLAY(dpy) == false);
+  ans = (GTK_IS_GGOBI_WINDOW_DISPLAY(dpy) == false || GTK_GGOBI_WINDOW_DISPLAY(dpy)->useWindow);
 
   return (ans);
 }

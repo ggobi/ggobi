@@ -62,33 +62,32 @@ static const GtkItemFactoryEntry menu_items[] = {
 };
 
 
-displayd *createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d, ggobid * gg);
 
 displayd *
 barchart_new(gboolean missing_p, splotd * sp, datad * d, ggobid * gg)
 {
-  return(createBarchart(missing_p, sp, -1, d, gg));
+  return(createBarchart(NULL, missing_p, sp, -1, d, gg));
 }
 
 displayd *
 barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, datad * d, ggobid * gg)
 {
- return(createBarchart(missing_p, NULL, vars ? vars[0] : 0, d, gg));
+ return(createBarchart(NULL, missing_p, NULL, vars ? vars[0] : 0, d, gg));
 }
 
 
 
 displayd *
-createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d,
+createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, datad * d,
   ggobid * gg)
 {
   GtkWidget *table, *vbox;
-  displayd *display;
 
   if (d == NULL || d->ncols < 1)
     return (NULL);
 
-  if (sp == NULL || sp->displayptr == NULL) {
+  if(!display) {
+   if (sp == NULL || sp->displayptr == NULL) {
     /* Use GTK_TYPE_GGOBI_BARCHART_DISPLAY, or the regular extended display
        and set the titleLabel immediately afterward. If more goes into barchart,
        we will do the former. And that's what we do.
@@ -98,9 +97,10 @@ createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d,
      */
     display = gtk_type_new(GTK_TYPE_GGOBI_BARCHART_DISPLAY);
     display_set_values(display, d, gg);
-  } else {
+   } else {
     display = (displayd *) sp->displayptr;
     display->d = d;
+   }
   }
 
   /* Want to make certain this is true, and perhaps it may be different
@@ -110,29 +110,32 @@ createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d,
 
   barchart_cpanel_init(&display->cpanel, gg);
 
-  display_window_init(GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);   /*-- 3 = width = any small int --*/
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow)
+     display_window_init(GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);   /*-- 3 = width = any small int --*/
 
   /*-- Add the main menu bar --*/
   vbox = GTK_WIDGET(display);  
   gtk_container_border_width(GTK_CONTAINER(vbox), 1);
-  gtk_container_add(GTK_CONTAINER
-                    (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->window) {
 
-  gg->app.sp_accel_group = gtk_accel_group_new();
-  get_main_menu((GtkItemFactoryEntry *) menu_items,
-                sizeof(menu_items) / sizeof(menu_items[0]),
-                gg->app.sp_accel_group,
-                GTK_GGOBI_WINDOW_DISPLAY(display)->window,
-                &display->menubar, (gpointer) display);
-  /*
-   * After creating the menubar, and populating the file menu,
-   * add the other menus manually
-   */
-  barchart_display_menus_make(display, gg->app.sp_accel_group,
-                              (GtkSignalFunc) display_options_cb, gg);
+    gtk_container_add(GTK_CONTAINER
+		      (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
+    
+    gg->app.sp_accel_group = gtk_accel_group_new();
+    get_main_menu((GtkItemFactoryEntry *) menu_items,
+		  sizeof(menu_items) / sizeof(menu_items[0]),
+		  gg->app.sp_accel_group,
+		  GTK_GGOBI_WINDOW_DISPLAY(display)->window,
+		  &display->menubar, (gpointer) display);
+    /*
+     * After creating the menubar, and populating the file menu,
+     * add the other menus manually
+     */
+    barchart_display_menus_make(display, gg->app.sp_accel_group,
+				(GtkSignalFunc) display_options_cb, gg);
 
-  gtk_box_pack_start(GTK_BOX(vbox), display->menubar, false, true, 0);
-
+    gtk_box_pack_start(GTK_BOX(vbox), display->menubar, false, true, 0);
+  }
 
   /*-- Initialize a single splot --*/
   if (sp == NULL) {
@@ -197,7 +200,10 @@ createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d,
                    0, 0);
 
 
-  gtk_widget_show_all(GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow)
+     gtk_widget_show_all(GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+  else
+     gtk_widget_show_all(table);
 
   /*-- hide any extraneous rulers --*/
 

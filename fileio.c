@@ -158,8 +158,8 @@ fileset_generate(const gchar * fileName,
             handlesFile = true;
 	}
 
-        if ((isUnknownMode && handlesFile) 
-             || pluginSupportsInputMode(modeName, oplugin)) 
+        if ((isUnknownMode && handlesFile)
+	    || (modeName && oplugin && pluginSupportsInputMode(modeName, oplugin))) 
 	{
           InputDescription *desc;
 	  desc = callInputPluginGetDescription(fileName, modeName, oplugin, gg);

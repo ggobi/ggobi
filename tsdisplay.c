@@ -11,12 +11,12 @@ displayd *
 timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
 {
   gint *selected_vars, nselected_vars = 0;
-  displayd *dpy;
+  displayd *dpy = NULL;
 
   selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
   nselected_vars = selected_cols_get (selected_vars, d, gg);
 
-  dpy = tsplot_new (false, nselected_vars, selected_vars, d, gg);
+  dpy = tsplot_new (dpy, false, nselected_vars, selected_vars, d, gg);
 
   g_free(selected_vars);
 
