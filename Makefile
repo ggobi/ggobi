@@ -8,9 +8,12 @@ CC = gcc
 
 # This defaults to $(CC) and is reset to CXX by any optional 
 # segment that needs to use C++, e.g  USE_MYSQL 
-LD=$(CC)
+LD=$(CXX)
+#LD=$(CC)
 
 CFLAGS= -g -ansi -Wall -fpic
+CXXFLAGS=$(CFLAGS)
+
 SHARED_LD_FLAGS= -shared
 LDFLAGS=
 
@@ -114,6 +117,9 @@ pure: ggobi.o $(OB)
 ggobi.sched: $(OB)
 	$(CC) -S $(OB) $(LDFLAGS)  $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --cflags --libs`
 
+mt19937-1.o: mt19937-1.c
+	$(CC) $(CFLAGS) `gtk-config --cflags` -c $<
+
 dm: $(OB)
 	$(CC) `gtk-config --cflags` $(OB) -o ggobi `gtk-config --libs` -L$(DM) -ldmalloc
 
@@ -127,6 +133,10 @@ clean:
 .c.o:
 	$(CC) -c $(CFLAGS) -I. `gtk-config --cflags` $*.c
 
+# A version that compiles all C code (except for mt19937-1.c) as 
+# C++.
+#	$(CXX) -c $(CXXFLAGS) -I. `gtk-config --cflags` $*.c
+
 
 ifdef DEPENDS_FLAG
 depends: $(SRC)
@@ -136,13 +146,6 @@ include depends
 
 endif
 
-# Emacs's tags for navigating through the source.
-etags:
-	etags $(SRC)
-
-# The version for vi
-tags:
-	tags $(SRC)
 
 # If USE_XML, may need to add XML_LIB_DIRS and XML_INC_DIRS
 local.config:
@@ -175,4 +178,18 @@ sqldep:
 make_ggobi.o: read_mysql.h
 endif
 
+
+# Emacs's tags for navigating through the source.
+TAGS etags:
+	etags $(SRC)
+
+# The version for vi
+tags:
+	tags $(SRC)
+
+
+datad.o read_xml.o: datad.c datad.h
+
 # DO NOT DELETE
+
+
