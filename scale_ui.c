@@ -397,7 +397,7 @@ cpanel_scale_make (ggobid *gg) {
   gg->scale.pan_radio = gtk_radio_button_new_with_label (NULL, "Pan");
   GTK_TOGGLE_BUTTON (gg->scale.pan_radio)->active = true;
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->scale.pan_radio,
-    "Activate panning for click style interaction",
+    "Activate panning for click style interaction (use space bar)",
     NULL);
   gtk_signal_connect (GTK_OBJECT (gg->scale.pan_radio), "toggled",
                       GTK_SIGNAL_FUNC (clickoptions_cb), gg);
@@ -406,7 +406,7 @@ cpanel_scale_make (ggobid *gg) {
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (gg->scale.pan_radio));
   gg->scale.zoom_radio = gtk_radio_button_new_with_label (group, "Zoom");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->scale.zoom_radio,
-    "Activate zooming for click style interactione", NULL);
+    "Activate zooming for click style interaction (use i and o keys to zoom in and out)", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), gg->scale.zoom_radio, TRUE, TRUE, 0);
 
 /*

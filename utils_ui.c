@@ -114,6 +114,9 @@ GtkWidget *CreateMenuCheck (displayd *display,
     /* --- Create menu item --- */
     menuitem = gtk_check_menu_item_new_with_label (szName);
 
+    /*-- display always, not just when the mouse floats over --*/
+    gtk_check_menu_item_set_show_toggle (menuitem, true);
+
     GGobi_widget_set(GTK_WIDGET(menuitem), gg, true);
 
     /* --- Attach the display pointer --- */
