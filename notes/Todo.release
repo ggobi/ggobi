@@ -1,3 +1,6 @@
+XML:
+ colorschemes -- how do we want to specify them?
+  
 colormaps
  Reconcile our current use of colorschemes with our previous
    use of colormaps.  This is important both for the xml 
@@ -6,10 +9,11 @@ colormaps
 
 documentation:
   XML.tex
-   colorschemes -- how do we want to specify them?
+   colorschemes
   manual
    Review and update to respond to recent changes in the design
      (dfs: made many changes in mid-March)
+  We might want to list contributors on the web site.
 
 test scripts, demos
  Make a directory for RSggobi scripts; baptize it with ratcns.S
