@@ -181,7 +181,6 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   d->nrows = nr;
 
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
-  d->nrgroups = 0;              /*-- for now --*/
 
   d->rows_in_plot = NULL;
 

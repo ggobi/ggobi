@@ -105,16 +105,6 @@ struct _datad {
  clusteruid *clusvui;
  vector_i clusterid;
 
- /*----------------------- row grouping -----------------------------*/
- /*
-  * these are the point groups, constructed from a categorical
-  * variable when it's selected to use for linked and grouped brushing.
- */
-
- gint nrgroups, nrgroups_in_plot;
- gint *rgroup_ids;
- groupd *rgroups;
-
  /*------------------------ jittering --------------------------------*/
 
  struct _Jitterd {

@@ -923,3 +923,25 @@ disconnect_motion_signal (splotd *sp) {
     sp->motion_id = 0;
   }
 }
+
+/*--------------------------------------------------------------------*/
+/*                           Cursors                                  */
+/*--------------------------------------------------------------------*/
+
+/*
+ * Return to the default cursor
+*/
+void
+splot_cursor_set (gint jcursor, splotd *sp)
+{
+  GdkWindow *window = sp->da->window;
+
+  if (jcursor == NULL) {
+    gdk_cursor_destroy (sp->cursor);
+    sp->jcursor = (gint) NULL;
+  } else {
+    sp->jcursor = (gint) jcursor;
+    sp->cursor = gdk_cursor_new (sp->jcursor);
+    gdk_window_set_cursor (window, sp->cursor);
+  }
+}

@@ -229,7 +229,6 @@ GGOBI(setDimensions)(gint nrow, gint ncol, datad *d, ggobid *gg)
 {
   d->nrows = nrow;
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
-  d->nrgroups = 0;              /*-- for now --*/
 
   rowlabels_alloc (d, gg);
   br_glyph_ids_alloc (d);

@@ -100,8 +100,14 @@ static void manip_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
 
   dsp->tc_manip_mode = GPOINTER_TO_INT (cbd);
+
+  if (dsp->tc_manip_mode == CMANIP_OFF)
+    splot_cursor_set ((gint) NULL, sp);
+  else
+    splot_cursor_set (GDK_HAND2, sp);
 }
 /*
 static gchar *pathlen_lbl[] = {"1/10", "1/5", "1/4", "1/3", "1/2", "1",

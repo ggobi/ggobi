@@ -344,7 +344,6 @@ read_ascii_data(InputDescription *desc, ggobid *gg)
   }
 
   d->nrows_in_plot = d->nrows;    /*-- for now --*/
-  d->nrgroups = 0;                /*-- for now --*/
 
   missing_values_read (desc, true, d, gg);
       

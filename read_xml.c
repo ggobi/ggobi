@@ -526,7 +526,6 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
 
   d->nrows = strToInteger(tmp);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
-  d->nrgroups = 0;              /*-- for now --*/
 
   rowlabels_alloc (d, data->gg);
   br_glyph_ids_alloc (d);

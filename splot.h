@@ -22,6 +22,9 @@ typedef struct {
  GtkWidget *da;                 /* drawing_area */
  GdkPixmap *pixmap0, *pixmap1;  /* 2-stage drawing */
 
+ GdkCursor *cursor;
+ gint jcursor;
+
  RedrawStyle redraw_style;
 
  /* Drawing area dimensions */

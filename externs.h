@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void splot_cursor_set (gint jcursor, splotd *sp);
 gchar *datasetName (datad *d, ggobid *gg);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 GtkWidget * create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, GtkSignalFunc func, ggobid *);
