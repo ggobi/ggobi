@@ -55,6 +55,7 @@
 22809   5/8   API (Duncan); hide/exclude table
 23452   5/9   API (Duncan)
 23715   5/9   line brushing (not tested)
+23950   5/9   line brushing nearly finished
 
 my personal target:  about 40.8K lines?  That's the number of lines in
 xgobi, subtracting the rpc, xgvis and tour code.

@@ -6,8 +6,15 @@ Bugs:
                        replacement mode isn't working
                        maybe its cpanel isn't initialized correctly?
   the brush isn't redrawing when a new color is selected
-  reset zoom doesn't work; reset pan is fine
   closing the 'choose symbol' window dumps core
+  line brushing:  hide doesn't work, nor does undo
+
+various stuff not yet implemented: 
+  1d, xy cycling
+  window closings
+  reset zoom doesn't work; reset pan is fine
+  sticky labels
+  
 
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
@@ -15,22 +22,18 @@ Scaling:
 
 Imputation of missing values
 
-Erase/hiding/exclusion  (done; could use a redo button)
-  fix up for api
-
 Use a set of decoration arrays (points and lines) instead of nlinkable
 
 Smoothing
 
 API code
 
-Line brushing: code is in but not debugged
-
 Line editing
 Move points
 
 I/O
 
+Rotation
 
 ! it now works to start ggobi without an argument; a necessary step
 ! in the API preparation.
@@ -80,3 +83,8 @@ I/O
 ! when reading from the file menu, the variable labels aren't read
 !    I was using filename (with suffix) instead of fname (without)
 !    Do I need to keep filename for anything?
+
+! Line brushing: 95% finished
+
+! Erase/hiding/exclusion  (done; could use a redo button)
+!   fix up for api
