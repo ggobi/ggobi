@@ -82,12 +82,16 @@ subset_display_update (datad *d, ggobid *gg)
   set_adjustment (gg->subset_ui.estep, d->subset.estep_adj);
 
   /*-- ... and set the values of the text entries, too --*/
-  if (gg->subset_ui.random_entry)
-    gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.random_entry),
-      g_strdup_printf ("%d", d->subset.random_n));
-  if (gg->subset_ui.nrows_entry)
-    gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.nrows_entry),
-      g_strdup_printf ("%d", d->nrows));
+  if (gg->subset_ui.random_entry) {
+    gchar *txt = g_strdup_printf ("%d", d->subset.random_n);
+    gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.random_entry), txt);
+    g_free (txt);
+  }
+  if (gg->subset_ui.nrows_entry) {
+    gchar *txt = g_strdup_printf ("%d", d->nrows);
+    gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.nrows_entry), txt);
+    g_free (txt);
+  }
   /*-- --*/
 }
 
