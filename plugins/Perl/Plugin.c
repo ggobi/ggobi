@@ -142,13 +142,14 @@ SV *
 createPerlReferenceObject(gpointer ptr, const char *className)
 {
     SV *ref = NULL;
-
+    float f = (float) ((long)ptr);
     dSP;
     ENTER ;
     SAVETMPS;
     PUSHMARK(SP);   
 
     XPUSHs(sv_2mortal(newSVpv(className, 0)));
+    XPUSHs(sv_2mortal(newSVnv(f)));
 
     PUTBACK;
     call_method("new", G_SCALAR | G_EVAL | G_KEEPERR);
