@@ -18,7 +18,7 @@ Binaries and source code can be downloaded from
 There are also instructions on how to download code from the cvs
 archive, using anonymous cvs.
 
-Ways to build GGobi under Linux or Unix 
+Ways to build GGobi under linux or unix 
 =======================================
 
 There are various ways to use ggobi and hence different features that
@@ -41,21 +41,20 @@ one can enable when compiling ggobi.
   f) Perl   interface
       (allowing ggobi to be controlled from Perl)       
 
-Regardless of how the GGobi distribution is compiled, 
-one can choose to activate one or all of
-
-
+There is also optional support for reading data directly from a MySQL
+database. (The configuration for this has not been ironed out yet.)
 
 We strongly recommend compiling with XML support, because it provides
 more flexibility for file input and output and facilitates
 portability. For this option, you will need to have Daniel Veillard's
-libxml installed. See instructions for getting this library
-and building it in INSTALL-xml.html (& below).
+libxml2 installed and you will need to indicate where the development
+header files are located. See instructions for getting this library
+and building it below.
 
 Nevertheless we provide instructions for all the different build
-methods, starting with the simplest. (Note that GNU make is really necessary,
-but on several systems, make should default to this. You may need to 
-explicitly use gmake on other systems.)
+methods, starting with the simplest. (Note that gmake is really used,
+but make should default to this on linux. You may need to force make
+to be gmake on other unix systems.)
 
 a) Stand-alone
 
@@ -70,14 +69,15 @@ ggobi <datafilename>
 
 b) Stand-alone with XML support
 
-You need to build the libxml library before starting (instructions below).
+You need to build the libxml2 library before starting (instructions below).
 Then type:
 
-./configure --with-xml=$HOME/XML/libxml-1.8.9
+./configure --with-xml=$HOME/XML/libxml2-x.x.x
 make
 
-where $HOME/XML/libxml-1.8.9 is replaces as necessary by the directory
-and version of libxml you downloaded and unpacked.
+where $HOME/XML is of course replaced by the directory in which
+you're building libxml2, and the x's in libxml2-x.x.x are replaced by
+by the version of libxml2 you downloaded and unpacked.
 
 c) Stand-alone and embeddable ggobi library
 
@@ -91,7 +91,7 @@ make lib
 
 d) Stand-alone and embeddable ggobi library with XML support
 
-./configure --with-xml=$HOME/XML/libxml-1.8.9 --enable-embed
+./configure --with-xml=$HOME/XML/libxml2-x.x.x --enable-embed
 make or gmake
 
 e) R interface
@@ -99,7 +99,7 @@ e) R interface
 Install R after downloading and following instructions from
   http://www.R-project.org
 
-From the ggobi web site, download Rggobi_0.1-0.tar.gz.
+From the ggobi web site, download Rggobi_0.4-1.tar.gz.
 
 Set various system parameters:
 
@@ -141,27 +141,27 @@ XML support:
 
 Some Linux systems have a version of libxml installed by default in
 /usr/lib or /usr/local/lib and headers in
-/usr/local/include/gnome-xml.  In some cases, these are older versions
-of libxml and will not work (easily) with ggobi. While it would be
-simpler to install libxml-1.8.9 on your system and replace the
-existing one, that approach may break other applications.
+/usr/local/include/gnome-xml.  In some cases, these are older
+versions of libxml and will not work with ggobi. While it would be
+simpler to install libxml2 on your system and replace the existing
+one, that approach may break other applications.
 
-To deal with this need for a more recent version of libxml while
+To deal with this need for a more recent version of libxml2 while
 leaving the older version as the installed default library, one has
 to follow these steps:
    
-   1) download libxml and compile libxml in non-system directory as
+   1) download libxml2 and compile it in a non-system directory as
       described above.  This directory might be in your home
       directory. The compilation should leave you with a directory
-      libxml-1.8.9/ which contains (amongst other things)
-          a) a libmxml/ directory in which the header files such as
+      libxml2-2.x.x/ which contains (amongst other things)
+          a) an include directory in which the header files such as
              parser.h and tree.h reside;
-          b) a .libs/ directory in which libxml.so resides.
+          b) a .libs/ directory in which libxml2.so resides.
              Note the name of this top-level directory. 
 
    2) configure the ggobi distribution using the --with-xml flag as
        cd ggobi
-       ./configure --with-xml=/top-level/directory/of/libxml-1.8.9
+       ./configure --with-xml=/top-level/directory/of/libxml2
 
        make
 
@@ -172,13 +172,13 @@ default one in /usr/lib or wherever.  The ggobi script in bin/ however
 takes care of this by setting the LD_LIBRARY_PATH appropriately to
 refer to the .libs/ directory.
 
-Getting libxml:
+Getting libxml2:
 ==============
 
-You will need to have the libxml library, version 1.8.8 or higher (in
-the 1.8.* series). You can download this from
+You will need to have the libxml2 library, NOT libxml-1.x.x. You can
+download this from
 
-   ftp.gnome.org/pub/GNOME/stable/sources/libxml
+   ftp.gnome.org/pub/GNOME/stable/sources/libxml2
 
 Untar it, change directory to the top level of that
 source tree and give the two commands
@@ -239,15 +239,14 @@ ftp://ftp.nanotech.wisc.edu/pub/khan/gnu-win32/mingw32/snapshots/gcc-2.95.2-1/
 Download all the files for msvcrt (mingw-msvcrt-20000203.zip,
 gcc-2.95.2-1-msvcrt.zip, binutils-19990818-1-msvcrt.zip,
 binutils-fixes-msvcrt.zip, ld-msvcrt.zip) from
-
+http://user.sgic.fi/~tml/gimp/win32/ 
 
 Download the current development version of gtk+ for windows.
 (libiconv-dev-20001007.zip, glib-dev-20001023.zip,
 gtk+-dev-20001023.zip) 
-http://user.sgic.fi/~tml/gimp/win32/ 
 
 and finally at http://www.penguin.at0.net/~fredo/
-you need libxml2-2.1.1-mingw.zip 
+you need libxml2-x.x.x-mingw.zip 
 
 optional: get
 the cygwin 1.1 distribution. The bash shell is really helpful at
@@ -280,7 +279,7 @@ all gtk+ applications will run without having to have a copy of the dll
 in each folder. Since the gtk+ distribution is changing rapidly it is not
 a good idea to put this stuff in your system folder.
 
-Lastly unzip libxml, everything is compiled for windows already so it
+Lastly unzip libxml2, everything is compiled for windows already so it
 just needs to be unzipped.
 
 Compiling
