@@ -203,12 +203,16 @@ void linking_method_set(displayd * display, datad * d, ggobid * gg)
       }
     }
     if (!gg->linkby_cv) {
+      GtkWidget *option_menu = widget_find_by_name (gg->control_panel[BRUSH],
+        "BRUSH:linkby_option_menu");
       gchar *message =
         g_strdup_printf
-          ("You have specified linking by categorical variable, but \n no categorical variable is selected for the current dataset.\n");
+          ("You have specified linking by categorical variable, but \n no categorical variable is selected for the current dataset. \nResetting to 'Link by ID.'\n");
       quick_message(message, false);
       gdk_flush();
       g_free(message);
+      gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), BR_LINKBYID);
+      cpanel->br_linkby = BR_LINKBYID;
     }
   }
 }
