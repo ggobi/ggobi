@@ -1,0 +1,11 @@
+AC_INIT(testplugin.c)
+
+AC_PATH_PROG(GTK_CONFIG, gtk-config)
+
+if test -z "${GTK_CONFIG}" ; then
+  echo "Cannot find gtk-config"
+  exit 1
+fi
+
+AC_SUBST(GTK_CONFIG)
+AC_OUTPUT(local.config)
