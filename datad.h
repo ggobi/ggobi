@@ -213,7 +213,12 @@ struct _datad {
  /*-- edges --*/
   struct _EdgeData {
     gint n;
-    endpointsd *endpoints;
+    SymbolicEndpoints *sym_endpoints;
+    GList *endpointList;    /* a list of endpointsd elements corresponding to the resolved 
+                               record ids relative to a given datad. This is akin to a table
+                               indexed by datad elements. */
+
+    endpointsd *old_endpoints; /* this stores the edges in the old manner, interpreting the src, dest values as integers. */
 
     gint nxed_by_brush;
     vector_b xed_by_brush;
@@ -238,4 +243,6 @@ void freeLevelHashEntry(gpointer key, gpointer value, gpointer data);
 /*-- used as an attribute of variable notebooks --*/
 typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
 
+extern endpointsd *resolveEdgePoints(datad *e, datad *d);
+extern gboolean edge_add (gint, gint, datad *, datad *);
 #endif

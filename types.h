@@ -62,6 +62,16 @@ typedef struct {
   gint jpartner;
 } endpointsd;
 
+/* The symbolic edge description which keeps the endpoints as record ids */
+typedef gchar *RecordKey;
+typedef struct {
+
+  RecordKey a;
+  RecordKey b;
+  gint jpartner;
+
+} SymbolicEndpoints;
+
 
 
 /*-- arrays --*/

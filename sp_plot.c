@@ -61,8 +61,10 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
 {
   gint a, b;
   gboolean draw_edge;
+  endpointsd *endpoints;
 
-  draw_edge = edge_endpoints_get (m, &a, &b, d, e->edge.endpoints);
+  endpoints = resolveEdgePoints(e, d);
+  draw_edge = edge_endpoints_get (m, &a, &b, d, endpoints, e);
 
   /*-- determine whether edge m should be plotted --*/
   /*-- usually checking sampled is redundant because we're looping
@@ -641,7 +643,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   datad *e = display->e;
   endpointsd *endpoints;
   gboolean edges_show_p, arrowheads_show_p;
-  gint nels = d->rowid.idv.nels;
+  gint nels;
   gint lwidth, ltype;
   GlyphType gtype;
   colorschemed *scheme = gg->activeColorScheme;
@@ -649,8 +651,9 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   if (e == (datad *) NULL || e->edge.n == 0) {
 /**/return;
   }
-
-  if (nels == 0) {  /*-- d has no record ids --*/
+ 
+  nels = d->rowid.idv.nels;
+  if (nels == 0 && d->idTable == NULL) {  /*-- d has no record ids --*/
 /**/return;
   }
 
@@ -665,7 +668,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     gint ncolors = MIN(MAXNCOLORS, scheme->n);
     gint k_prev = -1, n_prev = -1, p_prev = -1;
 
-    endpoints = e->edge.endpoints;
+    endpoints = resolveEdgePoints(e, d);
 
     for (k=0; k<NGLYPHSIZES; k++)
       for (n=0; n<NEDGETYPES; n++)
@@ -720,7 +723,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
               if (!splot_plot_edge (j, true, d, e, sp, display, gg))
                 continue;
 
-              edge_endpoints_get (j, &a, &b, d, e->edge.endpoints);
+              edge_endpoints_get (j, &a, &b, d, endpoints, e);
 
               gtype = e->glyph_now.els[j].type;
               if (gtype == FC || gtype == FR)
@@ -768,7 +771,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
  *                  gint ja = d->rowid.idv.els[endpoints[jp].a];
  *                  gint jb = d->rowid.idv.els[endpoints[jp].b];
 */
-                    edge_endpoints_get (jp, &ja, &jb, d, endpoints);
+                    edge_endpoints_get (jp, &ja, &jb, d, endpoints, e);
 
                     sp->arrowheads[nl].x1 =
                       (gint) (.2*sp->screen[ja].x + .8*sp->screen[jb].x);
@@ -843,11 +846,13 @@ splot_add_edge_highlight_cue (splotd *sp, GdkDrawable *drawable, gint k,
   datad *d = dsp->d;
   datad *e = dsp->e;
   gint a, b;
+  endpointsd *endpoints;
   colorschemed *scheme = gg->activeColorScheme;
   gboolean draw_edge = (dsp->options.edges_undirected_show_p ||
                         dsp->options.edges_directed_show_p);
 
-  draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, e->edge.endpoints);
+  endpoints = resolveEdgePoints(e, d);
+  draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, endpoints, e);
 
 /*
  * How to distinguish between sticky and nearest edges?
@@ -881,10 +886,14 @@ splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
   GtkStyle *style = gtk_widget_get_style (sp->da);
   gint xp, yp;
   gint a, b;
+  endpointsd *endpoints;
+
 
   gboolean draw_edge = (dsp->options.edges_undirected_show_p ||
                         dsp->options.edges_directed_show_p);
-  draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, e->edge.endpoints);
+
+  endpoints = resolveEdgePoints(e, d);
+  draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, endpoints, e);
 
 /*
  * Do we distinguish between nearest and sticky edge labels?

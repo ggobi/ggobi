@@ -38,9 +38,11 @@ find_nearest_edge (splotd *sp, displayd *display, ggobid *gg)
   near = 20*20;  /* If nothing is close, don't show any label */
 
   if (e && e->edge.n > 0) {
+    endpointsd *endpoints = resolveEdgePoints(e, d);
+
     xdist = sqdist = 1000 * 1000;
     for (j=0; j<e->edge.n; j++) {
-      doit = edge_endpoints_get (j, &from, &to, d, e->edge.endpoints);
+      doit = edge_endpoints_get (j, &from, &to, d, endpoints, e);
       doit = doit && (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
 
       if (doit) {

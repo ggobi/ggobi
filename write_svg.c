@@ -160,8 +160,10 @@ splot_write_svg (splotd *sp, ggobid *gg)
   if (!gg->mono_p) {
     gint j, nl, to, from;
     gboolean doit;
+    endpointsd *endpoints;
 
     datad_colors_used_get (&ncolors_used, colors_used, e, gg);
+    endpoints = resolveEdgePoints(e, d);
 
     /*
      * Now loop through colors_used[], plotting the points of each
@@ -177,8 +179,8 @@ splot_write_svg (splotd *sp, ggobid *gg)
         if (e->hidden_now.els[j]) {
           doit = false;
         } else {
-          from = e->edge.endpoints[j].a;
-          to = e->edge.endpoints[j].b;
+          from = endpoints[j].a;
+          to = endpoints[j].b;
           doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
         }
         if (doit) {

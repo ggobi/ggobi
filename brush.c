@@ -798,7 +798,10 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
   glong y2 = sp->brush_pos.y2;
   gint a, b;
 
-  if (!edge_endpoints_get (k, &a, &b, d, e->edge.endpoints))
+  endpointsd *endpoints;
+  endpoints = resolveEdgePoints(e, d);
+
+  if (!edge_endpoints_get (k, &a, &b, d, endpoints, e))
     return false;
 
   /*-- test for intersection with the vertical edge --*/

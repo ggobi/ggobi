@@ -268,6 +268,9 @@ local.config:
 	@echo "# DM=1" >> $@
 
 
+readXML: read_xml.o read_data.o fileio.o read_color.o read_init.o plugin.o brush_init.o ggobi.o
+	$(CC) -o $@ $^ $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) -lgtk -lgdk
+
 xmlConvert: xmlConvert.o libggobi.so
 	$(CC) -g -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS:%=-L%) -L. -lggobi $(DL_RESOLVE_PATH) -lgtk
 

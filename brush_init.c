@@ -68,8 +68,6 @@ br_color_ids_free (datad *d, ggobid *gg)
 void
 br_color_ids_alloc (datad *d, ggobid *gg)
 {
-  gint i;
-
   vectors_realloc (&d->color, d->nrows);
   vectors_realloc (&d->color_now, d->nrows);
   vectors_realloc (&d->color_prev, d->nrows);

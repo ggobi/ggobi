@@ -180,16 +180,17 @@ write_edge_record_p (gint i, datad *e, ggobid *gg)
 
   if (e->edge.n == e->nrows) {
     for (l = gg->d; l; l=l->next) {
+      endpointsd *endpoints = resolveEdgePoints(e, d);
       d = (datad *) l->data;
-      if (d != e) {
-        if (d->rowid.idv.nels > e->edge.endpoints[i].a &&
-            d->rowid.idv.nels > e->edge.endpoints[i].b)
+      if (endpoints) {
+        if (d->rowid.idv.nels > endpoints[i].a &&
+            d->rowid.idv.nels > endpoints[i].b)
         {
 /*
  *        a = d->rowid.idv.els[e->edge.endpoints[i].a];
  *        b = d->rowid.idv.els[e->edge.endpoints[i].b];
 */
-          if (!edge_endpoints_get (i, &a, &b, d, e->edge.endpoints) ||
+          if (!edge_endpoints_get (i, &a, &b, d, endpoints, e) ||
               !d->sampled.els[a] || !d->sampled.els[b] ||
               d->hidden.els[a] || d->hidden.els[b])
           {
@@ -295,8 +296,13 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
 
   /*-- edges if present and requested --*/
   if (gg->save.edges_p && d->edge.n == d->nrows) {
-    fprintf(f, " source=\"%d\"", d->edge.endpoints[i].a);
-    fprintf(f, " destination=\"%d\"", d->edge.endpoints[i].b);
+      if(d->edge.old_endpoints) {
+         fprintf(f, " source=\"%d\"", d->edge.old_endpoints[i].a);
+	 fprintf(f, " destination=\"%d\"", d->edge.old_endpoints[i].b);
+      } else {
+         fprintf(f, " source=\"%s\"", d->edge.sym_endpoints[i].a);
+	 fprintf(f, " destination=\"%s\"", d->edge.sym_endpoints[i].b);
+      }
   }
 
   if(d->rowlab && d->rowlab->data
@@ -431,8 +437,13 @@ gboolean
 write_xml_edge(FILE *f, datad *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f, "<edge ");
- fprintf(f, "source=\"%d\" destination=\"%d\"", d->edge.endpoints[i].a
-                                              , d->edge.endpoints[i].b);
+ if(d->edge.old_endpoints) {
+   fprintf(f, "source=\"%d\" destination=\"%d\"", d->edge.old_endpoints[i].a
+                                                , d->edge.old_endpoints[i].b);
+ } else {
+   fprintf(f, "source=\"%s\" destination=\"%s\"", d->edge.sym_endpoints[i].a
+                                                , d->edge.sym_endpoints[i].b);
+ }
  fprintf(f, " />");
 
  return(true);

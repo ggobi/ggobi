@@ -104,9 +104,6 @@ typedef struct _XMLUserData {
   GHashTable *idTable;
   gboolean usesStringIds;
 
-  gchar **edge_sources;
-  gchar **edge_dests;
-
   gint recordLabelsVariable;
 
   GHashTable **autoLevels;

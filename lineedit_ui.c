@@ -133,7 +133,6 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   else if (d->rowid.id.nels == 0)
     g_printerr ("Not yet initializing new rowids\n");
   else {  
-    extern gboolean edge_add (gint, gint, datad *, datad *);
     edge_add (gg->edgeedit.a, d->nearest_point, d, e);
   }
 

@@ -290,7 +290,7 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
 
   data->autoLevels = NULL;
 
-  data->usesStringIds = false;
+  data->usesStringIds = true; /*XXX false; */
 
   data->idNamesTable = NULL;
 }
@@ -525,9 +525,6 @@ resetRecordInfo(XMLParserData *data)
 void
 resolveEdgeIds(XMLParserData *parserData)
 {
-  if(parserData->edge_sources) {
-
-  }
 
 }
 
@@ -551,8 +548,10 @@ edgesumcompare (const void *val1, const void *val2)
   return (1);
 }
 
+
+/* Can go when we remove the old mechanism for edges via integer ids. */
 void 
-setEdgePartners (XMLParserData *parserData)
+setOldEdgePartners (XMLParserData *parserData)
 {
   datad *d = getCurrentXMLData(parserData);
   gint i, k, sum;
@@ -561,8 +560,8 @@ setEdgePartners (XMLParserData *parserData)
     /*-- sort the edges in the order of source + destination --*/
     endpointsd *etmp = g_malloc (d->edge.n * sizeof(endpointsd));
     for (i=0; i<d->edge.n; i++) {
-      etmp[i].a = d->edge.endpoints[i].a;
-      etmp[i].b = d->edge.endpoints[i].b;
+      etmp[i].a = d->edge.old_endpoints[i].a;
+      etmp[i].b = d->edge.old_endpoints[i].b;
       etmp[i].jpartner = i;
     }
     qsort ((gchar *) etmp, d->edge.n, sizeof (endpointsd), edgesumcompare);
@@ -576,8 +575,8 @@ setEdgePartners (XMLParserData *parserData)
           if (etmp[k].a + etmp[k].b != sum)
             break;
           if (etmp[k].b == etmp[i].a && etmp[k].a == etmp[i].b) {
-            d->edge.endpoints[etmp[i].jpartner].jpartner = etmp[k].jpartner;
-            d->edge.endpoints[etmp[k].jpartner].jpartner = etmp[i].jpartner;
+            d->edge.old_endpoints[etmp[i].jpartner].jpartner = etmp[k].jpartner;
+            d->edge.old_endpoints[etmp[k].jpartner].jpartner = etmp[i].jpartner;
 /*
 g_printerr ("partners: a,b,j %d %d %d  a,b,j %d %d %d\n",
 d->edge.endpoints[i].a, d->edge.endpoints[i].b, d->edge.endpoints[i].jpartner,
@@ -593,6 +592,60 @@ d->edge.endpoints[k].a, d->edge.endpoints[k].b, d->edge.endpoints[k].jpartner);
     g_free (etmp);
   }
 }
+
+void 
+setEdgePartners (XMLParserData *parserData)
+{
+  datad *d = getCurrentXMLData(parserData);
+  gint i, k, sum;
+
+  if(d->edge.old_endpoints) {
+       setOldEdgePartners(parserData);
+       return;
+  }
+
+/*XXX Need to implement this for the string case. */
+  return;
+
+  if (d->edge.n) {
+    /*-- sort the edges in the order of source + destination --*/
+    endpointsd *etmp = g_malloc (d->edge.n * sizeof(endpointsd));
+    for (i=0; i<d->edge.n; i++) {
+      etmp[i].a = d->edge.old_endpoints[i].a;
+      etmp[i].b = d->edge.old_endpoints[i].b;
+      etmp[i].jpartner = i;
+    }
+    qsort ((gchar *) etmp, d->edge.n, sizeof (endpointsd), edgesumcompare);
+
+    sum = 0;
+    for (i=0; i<d->edge.n-1; i++) {
+      if (etmp[i].a + etmp[i].b != sum) {
+        sum = etmp[i].a + etmp[i].b;
+        k = i+1;
+        while (k < d->edge.n) {
+          if (etmp[k].a + etmp[k].b != sum)
+            break;
+          if (etmp[k].b == etmp[i].a && etmp[k].a == etmp[i].b) {
+            d->edge.old_endpoints[etmp[i].jpartner].jpartner = etmp[k].jpartner;
+            d->edge.old_endpoints[etmp[k].jpartner].jpartner = etmp[i].jpartner;
+/*
+g_printerr ("partners: a,b,j %d %d %d  a,b,j %d %d %d\n",
+d->edge.endpoints[i].a, d->edge.endpoints[i].b, d->edge.endpoints[i].jpartner,
+d->edge.endpoints[k].a, d->edge.endpoints[k].b, d->edge.endpoints[k].jpartner);
+*/
+          }
+          k++;
+        }
+      }
+    }
+
+/*g_printerr ("assigned jpartners\n");*/
+    g_free (etmp);
+  }
+}
+
+
+
 
 void endXMLElement(void *user_data, const xmlChar *name)
 {
@@ -1852,8 +1905,6 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState t
 
   parserData->current_data = data;
 
-  parserData->edge_sources = parserData->edge_dests = NULL;
-
   if(type == EDGES) {
     setDatasetInfo(attrs, parserData);
   }
@@ -1881,11 +1932,12 @@ setEdge(gint start, gint end, gint i, datad *d)
 {
     /*-- if encountering the first edge, allocate endpoints array --*/
     if (d->edge.n == 0) 
-      edges_alloc (d->nrows, d);
+      edges_alloc (d->nrows, d, true);
 
-    d->edge.endpoints[i].a = start;
-    d->edge.endpoints[i].b = end;
-    d->edge.endpoints[i].jpartner = -1;  /*-- default value --*/
+    d->edge.old_endpoints[i].a = start;
+    d->edge.old_endpoints[i].b = end;
+    d->edge.old_endpoints[i].jpartner = -1;  /*-- default value --*/
+
 /* Replacing this code with a single sweep in setEdgePartners */
 /*
     gint k;
@@ -1989,20 +2041,24 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   /* Read the edge source and destination pair if, present. */
   tmp = getAttribute(attrs, "source");   
   if (tmp != (const gchar *) NULL) {
-
+   const gchar *dest;
+   dest = getAttribute(attrs, "destination");
+   if(!dest) {
+      xml_warning("edget specification error", "", "source but no destination attribute for record.", data);
+      return(true);
+   }
    if(data->usesStringIds) {
-     if(data->edge_sources == NULL) {
-        data->edge_sources = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
-        data->edge_dests = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
+     if(d->edge.sym_endpoints == NULL) {
+        d->edge.n = d->nrows;
+        d->edge.sym_endpoints = (SymbolicEndpoints *) g_malloc(sizeof(SymbolicEndpoints) * d->edge.n);
      }
        
-     data->edge_sources[data->current_record] = intern(data, tmp);
-     data->edge_dests[data->current_record] = intern(data,
-       getAttribute(attrs, "destination"));
+     d->edge.sym_endpoints[data->current_record].a = intern(data, tmp);
+     d->edge.sym_endpoints[data->current_record].b = intern(data, dest);
+     d->edge.sym_endpoints[data->current_record].jpartner = -1;
    } else {
     start = strToInteger(tmp);
-    tmp = getAttribute(attrs, "destination");   
-    if (tmp != (const gchar *) NULL) {
+    if (dest != (const gchar *) NULL) {
       end = strToInteger(tmp);
       setEdge(start, end, i, d);
     }
