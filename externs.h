@@ -232,6 +232,7 @@ extern void scatmat_cpanel_init (cpaneld *, ggobid *);
 extern void scatmat_main_menus_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 extern displayd* scatmat_new (gboolean, gint, gint *, gint, gint *, datad *, ggobid *);
 extern gboolean scatmat_varsel (cpaneld *, splotd *, gint, gint *, gint, gboolean, ggobid *);
+extern gboolean scatmat_varsel_simple (cpaneld *, splotd *, gint, gint *, gint, gboolean, ggobid *);
 extern void scatterplot_cpanel_init (cpaneld *, gint, ggobid *);
 extern void scatterplot_main_menus_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 extern displayd* scatterplot_new (gboolean, splotd *sp, datad *d, ggobid *);

@@ -45,7 +45,6 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  display_tree.c \
  ggobi-API.c 
-#vdialog_ui.c \
 
 OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  utils.o utils_ui.o utils_gdk.o array.o vector.o mt19937-1.o \
@@ -74,7 +73,6 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  display_tree.o \
  ggobi-API.o
-#vdialog_ui.o \
 
 
 # Needs to be \ for windows

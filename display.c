@@ -241,7 +241,6 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
 
   display_add (display, gg);
 
-g_printerr ("(display_create) calling varpanel_refresh\n");
   varpanel_refresh (gg);
 
   return (display);

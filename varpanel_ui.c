@@ -55,7 +55,8 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
     break;
 
     case scatmat:
-      redraw = scatmat_varsel (cpanel, sp, jvar, &jvar_prev, btn, alt_mod, gg);
+      redraw = scatmat_varsel_simple (cpanel, sp, jvar, &jvar_prev,
+        btn, alt_mod, gg);
     break;
 
     case scatterplot:
@@ -503,10 +504,11 @@ varpanel_refresh (ggobid *gg) {
 
           case parcoords:
           {
-            GList *l = display->splots;
+            GList *l;
             for (j=0; j<d->ncols; j++)
               varpanel_checkbutton_set_active (j, false, d);
 
+            l = display->splots;
             while (l) {
               j = ((splotd *) l->data)->p1dvar;
               varpanel_checkbutton_set_active (j, true, d);
@@ -516,8 +518,17 @@ varpanel_refresh (ggobid *gg) {
           break;
 
           case scatmat:
-            for (j=0; j<d->ncols; j++) {
+          {
+            GList *l;
+            for (j=0; j<d->ncols; j++)
+              varpanel_checkbutton_set_active (j, false, d);
+            l = display->scatmat_cols;  /*-- assume rows = cols --*/
+            while (l) {
+              j = GPOINTER_TO_INT (l->data);
+              varpanel_checkbutton_set_active (j, true, d);
+              l = l->next;
             }
+          }
           break;
 
           case scatterplot:
@@ -549,6 +560,9 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
   splotd *sp = gg->current_splot;
+
+  if (d != display->d)
+    return true;
 
   if (event->type == GDK_BUTTON_PRESS) {
     GdkEventButton *bevent = (GdkEventButton *) event;
@@ -604,7 +618,7 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gg->varpanel_ui.scrolled_window = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (
     GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
-    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
   gtk_box_pack_start (GTK_BOX (parent),
     gg->varpanel_ui.scrolled_window, true, true, 2);
   gtk_widget_show (gg->varpanel_ui.scrolled_window);
@@ -628,7 +642,7 @@ void varpanel_populate (datad *d, ggobid *gg)
 
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (gg->varpanel_ui.varpanel),
-    frame, true, true, 2);
+    frame, false, false, 2);
 
   /*-- add an ebox to the frame --*/
   ebox = gtk_event_box_new ();

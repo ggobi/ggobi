@@ -386,11 +386,11 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
        * Prepare to decrease the size of each plot.
       */
       if (button == 1) {  /* insert or append a column */
-        col = (cpanel->scatmat_selection_mode == VAR_INSERT) ? spcol : spcol-1;
+        col = (cpanel->scatmat_selection_mode == VAR_INSERT) ? spcol : spcol+1;
         ratio = (gfloat) scatmat_ncols / (gfloat) (scatmat_ncols+1);
         width = (gint) (ratio * (gfloat) width);
       } else {
-        row = (cpanel->scatmat_selection_mode == VAR_INSERT) ? sprow : sprow-1;
+        row = (cpanel->scatmat_selection_mode == VAR_INSERT) ? sprow : sprow+1;
         ratio = (gfloat) scatmat_nrows / (gfloat) (scatmat_nrows+1);
         height = (gint) (ratio * (gfloat) height);
       }
@@ -493,6 +493,281 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
   return redraw;
 }
 
+
+/*
+ * Assume symmetry.
+*/
+
+gboolean
+scatmat_varsel_simple (cpaneld *cpanel, splotd *sp,
+  gint jvar, gint *jvar_prev, gint button, gboolean alt_mod, ggobid *gg)
+{
+  gboolean redraw = true;
+  gboolean Delete = false;
+  gint k, width, height;
+  GList *l;
+  splotd *s, *sp_new;
+  GtkWidget *da;
+  gfloat ratio = 1.0;
+  GtkTableChild *child;
+  displayd *display = gg->current_display;
+  gint scatmat_ncols = g_list_length (display->scatmat_cols);
+  gint scatmat_nrows = g_list_length (display->scatmat_rows);
+
+  /* The row and column of gg.current_splot */
+  gint sprow = -1, spcol = -1;
+
+  /* If jvar is one of the plotted variables, its row and column */
+  gint jvar_row = -1, jvar_col = -1;
+
+  splot_get_dimensions (gg->current_splot, &width, &height);
+
+/*
+ * If the alt key is pressed and jvar is plotted, delete a
+ * row and a column.  And we have to delete the variable that's
+ * selected, ignoring the current plot.
+*/
+
+  if (alt_mod == true) {
+    if (scatmat_ncols > 1) {
+      ratio = (gfloat) scatmat_ncols / (gfloat) (scatmat_ncols-1);
+      width = (gint) (ratio * (gfloat) width);
+
+      jvar_col = jvar_row = spcol = sprow =
+        g_list_index (display->scatmat_cols, GINT_TO_POINTER (jvar));
+
+      l = (GTK_TABLE (display->table))->children;
+      while (l) {
+        Delete = false;
+        child = (GtkTableChild *) l->data;
+        l = l->next;
+        da = child->widget;
+
+        if (child->left_attach == jvar_col)
+          Delete = true;
+        else if (child->left_attach > jvar_col) {  /* if to the right */
+          child->left_attach--;
+          child->right_attach--;
+        }
+        if (child->top_attach == jvar_row) {
+          Delete = true;
+        } else if (child->top_attach > jvar_row) {  /* if below */
+          child->top_attach--;
+          child->bottom_attach--;
+        }
+
+        if (Delete) {
+          s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
+          display->splots = g_list_remove (display->splots,
+                                           (gpointer) s);
+          gtk_container_remove (GTK_CONTAINER (display->table), da);
+
+          if (s == gg->current_splot)
+            sp_event_handlers_toggle (s, off);
+          splot_free (s, display, gg);
+        } else {
+          gtk_widget_set_usize (da, -1, -1);
+          gtk_widget_set_usize (da, width, height);
+        }
+      }
+
+      /*
+       * Delete the list elements for the row&column that are being deleted
+      */
+      display->scatmat_cols = g_list_remove_nth (display->scatmat_cols,
+                                                 spcol);
+      display->scatmat_rows = g_list_remove_nth (display->scatmat_rows,
+                                                 sprow);
+
+      gtk_table_resize (GTK_TABLE (display->table),
+                        g_list_length (display->scatmat_rows),
+                        g_list_length (display->scatmat_cols));
+
+/*
+ * I'm not sure this is necessary -- am I checking whether the
+ * gg.current_splot was deleted?
+*/
+      gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
+    }
+    redraw = false;
+
+  } else {
+
+/*
+ * Otherwise, replace, insert or append a row <and> a column --
+ * depending on the value of scatmat_selection_mode.
+*/
+
+    /*
+     * Find the row and column index of the currently selected plot
+    */
+    for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
+      child = (GtkTableChild *) l->data;
+      da = child->widget;
+      s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
+      if (s == gg->current_splot) {
+        sprow = child->top_attach;
+        spcol = child->left_attach;
+      }
+
+      /*
+       * ... and the row/column indices of jvar, if present
+      */
+      if (s->p1dvar == -1) {
+        if (s->xyvars.x == jvar)
+          jvar_col = child->left_attach;
+        if (s->xyvars.y == jvar)
+          jvar_row = child->top_attach;
+      } else {
+        if (s->p1dvar == jvar) {
+          jvar_col = child->left_attach;
+          jvar_row = child->top_attach;
+        }
+      }
+    }
+
+    if (jvar_col != jvar_row || sprow != spcol) {
+      g_printerr ("Please select one of the plots on the diagonal\n");
+/**/  return false;
+    }
+
+    if (cpanel->scatmat_selection_mode == VAR_REPLACE) {
+
+      redraw = true;
+      l = (GTK_TABLE (display->table))->children;
+      while (l) {
+        child = (GtkTableChild *) l->data;
+        l = l->next;
+        da = child->widget;
+        s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
+
+        if (child->left_attach == spcol) {
+          *jvar_prev = s->xyvars.x;
+          s->xyvars.x = jvar;
+          s->p1dvar = (s->xyvars.x == s->xyvars.y) ? jvar : -1;
+        }
+
+        if (child->top_attach == sprow) {
+          *jvar_prev = s->xyvars.y;
+          s->xyvars.y = jvar;
+          s->p1dvar = (s->xyvars.x == s->xyvars.y) ? jvar : -1;
+        }
+      }
+
+      display->scatmat_cols = g_list_replace_nth (display->scatmat_cols,
+        GINT_TO_POINTER (jvar), spcol);
+      /*scatmat_cols_print (display);*/
+
+      display->scatmat_rows = g_list_replace_nth (display->scatmat_rows,
+        GINT_TO_POINTER (jvar), sprow);
+      /*scatmat_rows_print (display);*/
+
+    } else {  /* VAR_INSERT or VAR_APPEND */
+      gint newvar;
+      gint row = -1, col = -1;
+
+      /*
+       * First adjust the table, inserting or appending a row
+       * and resetting the attachment values.
+      */
+
+      /*
+       * Prepare to decrease the size of each plot: symmetry says
+       * that one of these two sets of variables is redundant.
+      */
+      col = (cpanel->scatmat_selection_mode == VAR_INSERT) ? spcol : spcol+1;
+      ratio = (gfloat) scatmat_ncols / (gfloat) (scatmat_ncols+1);
+      width = (gint) (ratio * (gfloat) width);
+
+      row = (cpanel->scatmat_selection_mode == VAR_INSERT) ? sprow : sprow+1;
+      ratio = (gfloat) scatmat_nrows / (gfloat) (scatmat_nrows+1);
+      height = (gint) (ratio * (gfloat) height);
+
+      /*
+       * Fix up the attachments of the rows below and columns to the right
+       * of the inserted/appended row/column.
+      */
+      for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
+        child = (GtkTableChild *) l->data;
+        da = child->widget;
+        gtk_widget_set_usize (da, -1, -1);
+        gtk_widget_set_usize (da, width, height);
+
+        if (child->left_attach >= col) {
+          child->left_attach++;
+          child->right_attach++;
+        } 
+        if (child->top_attach >= row) {
+          child->top_attach++;
+          child->bottom_attach++;
+        }
+      }
+
+      /*
+       * Now create the new plots and fill in the new row/column.
+       * Work out the correct p1dvar/xyvars values for each new plot.
+      */
+
+      scatmat_ncols++;
+      display->scatmat_cols = g_list_insert (display->scatmat_cols,
+                                             GINT_TO_POINTER (jvar),
+                                             col);
+
+      scatmat_nrows++;
+      display->scatmat_rows = g_list_insert (display->scatmat_rows,
+                                             GINT_TO_POINTER (jvar),
+                                             row);
+
+      /*-- note the strong assumption of symmetry here --*/
+      for (k=0; k<scatmat_nrows; k++) {
+        /* which variable is plotting in the k'th intersecting row/column? */
+        newvar = GPOINTER_TO_INT (g_list_nth_data (display->scatmat_rows, k));
+
+        sp_new = splot_new (display, width, height, gg);
+        sp_new->xyvars.x = jvar;
+        sp_new->xyvars.y = newvar;
+        sp_new->p1dvar = (sp_new->xyvars.x == sp_new->xyvars.y) ? jvar : -1;
+
+        gtk_table_attach (GTK_TABLE (display->table),
+          sp_new->da, col, col+1, k, k+1,
+          (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
+          (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+          1, 1);
+        gtk_widget_show (sp_new->da);
+
+        /* We don't care where, I think */
+        display->splots = g_list_append (display->splots,
+          (gpointer) sp_new);
+
+        if (k != row) {  /*-- except at the intersection, do it twice --*/
+          sp_new = splot_new (display, width, height, gg);
+          sp_new->xyvars.x = newvar;
+          sp_new->xyvars.y = jvar;
+          sp_new->p1dvar = (sp_new->xyvars.x == sp_new->xyvars.y) ? jvar : -1;
+
+          gtk_table_attach (GTK_TABLE (display->table),
+            sp_new->da, k, k+1, row, row+1,
+            (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
+            (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+            1, 1);
+          gtk_widget_show (sp_new->da);
+
+          /* We don't care where, I think */
+          display->splots = g_list_append (display->splots,
+            (gpointer) sp_new);
+        }
+      }
+
+      gtk_table_resize (GTK_TABLE (gg->current_display->table),
+                        scatmat_nrows, scatmat_ncols);
+
+      gg->current_splot = sp_new;
+      redraw = true;
+    }
+  }
+
+  return redraw;
+}
 
 /**
   This creates the scatter matrix window contents using static

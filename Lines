@@ -87,6 +87,7 @@
 31051   8/3   folded in Duncan's work to read multiple datad's in xml!
 31043   8/3   fixed bugs that emerged once multiple datad's could be tested
 31225   8/8   Duncan committed work on plotLayout; I fixed a bug in brushing
+31391   8/22  replaced variable circles with checkboxes; collapsed tform[12]
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.
