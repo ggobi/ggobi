@@ -264,25 +264,41 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint nc = d->ncols;
+  gint nvert, nhoriz;
 
   if (nc < MIN_NVARS_FOR_COTOUR)
     return;
 
   alloc_tourcorr(dsp, gg);
 
-  /* Initialize first two variables as the vertical and rest of the
-     variables as the horizontal variables */
-  dsp->tcorr1.nsubset = dsp->tcorr1.nactive = 2;
-  for (j=0; j<2; j++) {
-    dsp->tcorr1.subset_vars.els[j] = dsp->tcorr1.active_vars.els[j] = j;
-    dsp->tcorr1.subset_vars_p.els[j] = dsp->tcorr1.active_vars_p.els[j] = true;
+  if (nc == 3) {  /*-- ... which is equal to MIN_NVARS_FOR_COTOUR --*/
+    nhoriz = 2;
+    nvert = 1;
+  } else if (nc < 8) {
+    nhoriz = nc-2;
+    nvert = 2;
+  } else {
+    nhoriz = 3;
+    nvert = 2;
   }
 
-/*  does this make sense?  dfs
-  for (j=0; j<nc; j++)
-    dsp->tcorr1.active_vars_p.els[j] = false;
-*/
+/*-------------------------------------------------------------------*/
 
+  /*-- vertical --*/
+  dsp->tcorr2.nsubset = dsp->tcorr2.nactive = nvert;
+  for (j=0; j<nvert; j++) {
+    dsp->tcorr2.subset_vars.els[j] = dsp->tcorr2.active_vars.els[j] = j;
+    dsp->tcorr2.subset_vars_p.els[j] = dsp->tcorr2.active_vars_p.els[j] = true;
+  }
+
+  /*-- horizontal --*/
+  dsp->tcorr1.nsubset = dsp->tcorr1.nactive = nhoriz;
+  for (j=0; j<nhoriz; j++) {
+    dsp->tcorr1.subset_vars.els[j] = dsp->tcorr1.active_vars.els[j] = j+nvert;
+    dsp->tcorr1.subset_vars_p.els[j+nvert] = dsp->tcorr1.active_vars_p.els[j+nvert] = true;
+  }
+
+/*
   if (nc < 8) {
     dsp->tcorr2.nsubset = dsp->tcorr2.nactive = nc-2;
     for (j=0; j<2; j++) {
@@ -304,6 +320,7 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
       dsp->tcorr2.subset_vars_p.els[j+2] = dsp->tcorr2.active_vars_p.els[j+2] = false;
     }
   }
+*/
 
   /* declare starting vertical base as first variable */
   for (i=0; i<1; i++)
@@ -381,7 +398,7 @@ void tourcorr_pause (cpaneld *cpanel, gboolean state, ggobid *gg)
   }
 }
 
-void
+gboolean
 tourcorr_subset_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->tcorr1.subset_vars_p.els[jvar];
@@ -393,10 +410,14 @@ tourcorr_subset_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
  * For the moment, don't allow this if jvar is in the vertical subset
 */
   if (dsp->tcorr2.subset_vars_p.els[jvar])
-    return;
+    return false;
 
   if (in_subset) {
-    if (dsp->tcorr1.nsubset + dsp->tcorr2.nsubset > MIN_NVARS_FOR_COTOUR) {
+    /*-- allow the change if there are more than 3 cotour variables,
+         and if there's more than 1 horizontal variables --*/
+    if (dsp->tcorr1.nsubset + dsp->tcorr2.nsubset > MIN_NVARS_FOR_COTOUR &&
+        dsp->tcorr1.nsubset > 1)
+    {
       dsp->tcorr1.subset_vars_p.els[jvar] = false;
       dsp->tcorr1.nsubset -= 1;
       changed = true;
@@ -412,6 +433,8 @@ tourcorr_subset_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     for (j=0, k=0; j<d->ncols; j++)
       if (dsp->tcorr1.subset_vars_p.els[j])
         dsp->tcorr1.subset_vars.els[k++] = j;
+
+  return changed;
 }
 
 void 
@@ -474,7 +497,7 @@ tourcorr_active_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 
 }
 
-void
+gboolean
 tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
@@ -486,10 +509,12 @@ tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
  * For the moment, don't allow this if jvar is in the other subset
 */
   if (dsp->tcorr1.subset_vars_p.els[jvar])
-    return;
+    return false;
 
   if (in_subset) {
-    if (dsp->tcorr1.nsubset + dsp->tcorr2.nsubset > MIN_NVARS_FOR_COTOUR) {
+    if (dsp->tcorr1.nsubset + dsp->tcorr2.nsubset > MIN_NVARS_FOR_COTOUR &&
+        dsp->tcorr2.nsubset > 1)
+    {
       dsp->tcorr2.subset_vars_p.els[jvar] = false;
       dsp->tcorr2.nsubset -= 1;
       changed = true;
@@ -505,6 +530,8 @@ tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     for (j=0, k=0; j<d->ncols; j++)
       if (dsp->tcorr2.subset_vars_p.els[j])
         dsp->tcorr2.subset_vars.els[k++] = j;
+
+  return changed;
 }
 
 void 
@@ -579,10 +606,11 @@ tourcorr_manip_var_set (gint j, gint btn, ggobid *gg)
     dsp->tc2_manip_var = j;
 }
 
-void
+gboolean
 tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
+  gboolean changed = true;
   splotd *sp = gg->current_splot;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
@@ -592,21 +620,25 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
     gboolean fade = gg->tourcorr.fade_vars;
 
     if (button == 1) { 
-      tourcorr_subset_horvar_set (jvar, d, dsp, gg);
-      varcircles_visibility_set (dsp, gg);
+      changed = tourcorr_subset_horvar_set (jvar, d, dsp, gg);
+      if (changed) {
+        varcircles_visibility_set (dsp, gg);
 
-      /*-- now add/remove the variable to/from the active set, too --*/
-      gg->tourcorr.fade_vars = false;
-      tourcorr_active_horvar_set (jvar, d, dsp, gg);
-      gg->tourcorr.fade_vars = fade;
+        /*-- now add/remove the variable to/from the active set, too --*/
+        gg->tourcorr.fade_vars = false;
+        tourcorr_active_horvar_set (jvar, d, dsp, gg);
+        gg->tourcorr.fade_vars = fade;
+      }
     } else {
-      tourcorr_subset_vervar_set (jvar, d, dsp, gg);
-      varcircles_visibility_set (dsp, gg);
+      changed = tourcorr_subset_vervar_set (jvar, d, dsp, gg);
+      if (changed) {
+        varcircles_visibility_set (dsp, gg);
 
-      /*-- now add/remove the variable to/from the active set, too --*/
-      gg->tourcorr.fade_vars = false;
-      tourcorr_active_vervar_set (jvar, d, dsp, gg);
-      gg->tourcorr.fade_vars = fade;
+        /*-- now add/remove the variable to/from the active set, too --*/
+        gg->tourcorr.fade_vars = false;
+        tourcorr_active_vervar_set (jvar, d, dsp, gg);
+        gg->tourcorr.fade_vars = fade;
+      }
     }
 
   } else if (GTK_IS_DRAWING_AREA(w)) {
@@ -625,6 +657,7 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
     }
   }
   sp->tourcorr.initmax = true;
+  return changed;
 }
 
 void

@@ -174,7 +174,7 @@ variableSelect(GtkWidget *w, displayd *display, splotd *sp, gint jvar, gint btn,
       redraw = tour1d_varsel (w, jvar, btn, display->d, gg);
     break;
     case COTOUR:
-      tourcorr_varsel (w, jvar, btn, display->d, gg);
+      redraw = tourcorr_varsel (w, jvar, btn, display->d, gg);
     break;
     /*-- to pacify compiler if we change these to an enum --*/
     default:

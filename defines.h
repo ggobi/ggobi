@@ -120,7 +120,8 @@ typedef enum {NULLMODE = -1,
 /*-- touring --*/
 #define VAR_CIRCLE_DIAM 36
 
-#define MIN_NVARS_FOR_COTOUR 4
+#define MIN_NVARS_FOR_COTOUR 3  /* require: 3 in subset, 2 active */
+                                /* at least 1 vert, at least 1 horiz */
 #define MIN_NVARS_FOR_TOUR2D 3  /* require: 3 in subset, 2 active */
 #define MIN_NVARS_FOR_TOUR1D 2  /* require: 2 in subset, 1 active */
 

@@ -457,7 +457,7 @@ void       tourcorr_realloc_up (gint nc, datad *d, ggobid *gg);
 void       tourcorr_reinit (ggobid *);
 void       tourcorr_scramble (ggobid *);
 void       tourcorr_speed_set (gint, ggobid *);
-void       tourcorr_varsel (GtkWidget *w, gint jvar, gint btn, datad *, ggobid *);
+gboolean   tourcorr_varsel (GtkWidget *w, gint jvar, gint btn, datad *, ggobid *);
 void       tour_do_step (displayd *, ggobid *);
 void       tour_manip_colors_init (ggobid *);
 void       tour_reproject (vector_f, array_d, array_d, array_d, array_d, array_d, gint, gint);
