@@ -27,37 +27,30 @@
    count CDATA #REQUIRED
 >
 
-
 <!ELEMENT categoricalvariable (levels)>
 
 <!ELEMENT records ( record )*>
-<!ELEMENT record  ( #PCDATA )>
+<!ELEMENT record ANY >
 
-<!ELEMENT edges ( edge )*>
-<!ELEMENT edge EMPTY>
-<!ELEMENT edgevariables ( edgevariable )*>
-<!ELEMENT edgevariable ( #PCDATA )>
-<!ELEMENT edgerecords ( edgerecord )*>
-<!ELEMENT edgerecord  ( #PCDATA )>
-<!ENTITY % lineTypes " solid | dot | dash ">
+<!ELEMENT ggobidata ((brush)?, (activeColorScheme)?, (data)+)>
 
-<!ELEMENT ggobidata (data)+, (activeColorScheme)*>
-
-<!ELEMENT data ((description)*, (colormap)?, (variables)*, records, (edges)*)>
+<!-- I don't see how a datad can have a colormap -->
+<!ELEMENT data ((description)?, (colormap)?, (variables)?, records, (edges)?)>
 
 <!ELEMENT color ( #PCDATA) >
 <!-- id is a number or either of "fg" and "bg" -->
 <!ATTLIST color  
-       id CDATA     #IMPLIED
-       r  CDATA     #IMPLIED
-       g  CDATA     #IMPLIED
-       b  CDATA     #IMPLIED
-       range CDATA  #IMPLIED
+    id       CDATA  #IMPLIED
+    r        CDATA  #IMPLIED
+    g        CDATA  #IMPLIED
+    b        CDATA  #IMPLIED
+    range    CDATA  #IMPLIED
 >
 
+<!ELEMENT activeColorScheme ( #PCDATA ) >
 <!ATTLIST activeColorScheme
-    name          NMTOKEN #IMPLIED
-    file          NMTOKEN #IMPLIED
+    name     CDATA   #IMPLIED
+    file     CDATA   #IMPLIED
 >
       
 <!ELEMENT colormap (color)+ >
@@ -92,48 +85,42 @@
 <!ATTLIST variable
     name          NMTOKEN #IMPLIED
     nickname      NMTOKEN #IMPLIED
+    quickHelp     CDATA   #IMPLIED
     transformName NMTOKEN #IMPLIED
     missingValue  CDATA   #IMPLIED
-    group         CDATA   #IMPLIED
-    displayRange  CDATA   #IMPLIED
-    displayMax    CDATA   #IMPLIED
-    displayMin    CDATA   #IMPLIED
+    min           CDATA   #IMPLIED
+    max           CDATA   #IMPLIED
 >
 
 <!ATTLIST realvariable
     name          CDATA   #IMPLIED
     nickname      NMTOKEN #IMPLIED
+    quickHelp     CDATA   #IMPLIED
     transformName CDATA   #IMPLIED
     missingValue  CDATA   #IMPLIED
-    group         CDATA   #IMPLIED
-    displayRange  CDATA   #IMPLIED
-    displayMax    CDATA   #IMPLIED
-    displayMin    CDATA   #IMPLIED
-    min CDATA #IMPLIED
-    max CDATA #IMPLIED
+    min           CDATA   #IMPLIED
+    max           CDATA   #IMPLIED
 >
 
 <!ATTLIST categoricalvariable
     name          NMTOKEN #IMPLIED
     nickname      NMTOKEN #IMPLIED
+    quickHelp     CDATA   #IMPLIED
     transformName NMTOKEN #IMPLIED
     missingValue  CDATA   #IMPLIED
-    group         CDATA   #IMPLIED
-    displayRange  CDATA   #IMPLIED
-    displayMax    CDATA   #IMPLIED
-    displayMin    CDATA   #IMPLIED
+    min           CDATA   #IMPLIED
+    max           CDATA   #IMPLIED
 >
-
-
 
 <!ATTLIST record
    label     CDATA                     #IMPLIED
    id        CDATA                     #IMPLIED
+   nodename  CDATA                     #IMPLIED
    color     CDATA                     #IMPLIED
+   glyph     CDATA                     #IMPLIED
    glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
    glyphType ( %glyphTypes; )          #IMPLIED
    hidden    ( %Boolean; )             "FALSE"
-   group     CDATA                     #IMPLIED
 
    source      CDATA  #IMPLIED
    destination CDATA  #IMPLIED
@@ -147,24 +134,6 @@
 >
 
 
-<!ATTLIST edgerecords
-   count CDATA  #REQUIRED
->
-
-<!ATTLIST edgevariable
-    name          NMTOKEN #IMPLIED
-    missingValue  CDATA   #IMPLIED
->
-
-<!ATTLIST edgerecord
-   label     NMTOKEN                   #REQUIRED
-   id        NMTOKEN                   #IMPLIED
-   color     CDATA                     #IMPLIED
-   lineWidth ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
-   group     CDATA                     #IMPLIED 
->   
-
-
 <!ATTLIST data
    name         CDATA #IMPLIED
    count        CDATA #IMPLIED
@@ -174,7 +143,17 @@
    glyphType ( %glyphTypes; )          #IMPLIED   
 >
 
+<!-- to initialize the brushing color and glyph -->
+<!ELEMENT brush ( #PCDATA )>
+<!ATTLIST brush
+   color        CDATA #IMPLIED
+   glyph        CDATA #IMPLIED
+>
+
 <!ATTLIST ggobidata
     count  CDATA #IMPLIED
 >
 
+<!ELEMENT real ( #PCDATA )>
+<!ELEMENT int ( #PCDATA )>
+<!ELEMENT na EMPTY>
