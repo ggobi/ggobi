@@ -45,6 +45,8 @@ AC_SUBST(JAVAC)
 AC_SUBST(JAVAH)
 AC_SUBST(JAVA)
 
+PWD=`pwd`
+AC_SUBST(PWD)
 AC_SUBST(JAVA_GNOME_DIR)
 
-AC_OUTPUT(local.config)
+AC_OUTPUT(local.config Gtk/plugin.xml)

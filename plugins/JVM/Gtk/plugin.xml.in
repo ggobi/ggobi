@@ -1,0 +1,31 @@
+<plugin name="JVM" load="immediate">
+   <description>Loads the Java Virtual Machine for use by other plugins</description>
+   <author>Duncan Temple Lang</author>
+   <options>
+    <named>
+      <classpath>.:@PWD@/plugins/JVM:@PWD@/plugins/JVM/Gtk:@JAVA_GNOME_DIR@/lib/gtk.jar:@JAVA_GNOME_DIR@/lib/gnome.jar</classpath>
+    </named>
+    <args>
+     <arg>-Dggobi=ABC</arg>
+    </args>
+   </options>
+   <dll name="plugins/JVM/JVM.so">
+    <init onLoad="loadJVM" />
+  </dll>
+</plugin>
+
+ <plugin name="javaGtkTest" language="java" class="GtkColorDialog">
+  <description>Test for using java-gnome in GGobi plugins</description>
+   <author>Duncan Temple Lang</author>
+   <dependencies>
+     <dependency name="JVM" />
+   </dependencies>
+ </plugin>
+
+ <plugin name="javaGtkCallbackTest" language="java" class="GGobiCallbackTest">
+  <description>Test for using java-gnome in GGobi plugins</description>
+   <author>Duncan Temple Lang</author>
+   <dependencies>
+     <dependency name="JVM" />
+   </dependencies>
+ </plugin>

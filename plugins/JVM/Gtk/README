@@ -1,0 +1,19 @@
+This is a small collection of examples illustrating how one can
+use the java-gnome bindings for Java to Gtk within a GGobi plugin.
+
+You will have to install that package and then set your classpath and
+LD_LIBRARY_PATH appropriately to find the Java classes and JNI
+libraries that implement that interface.
+
+Assuming you specified the location of the java-gnome package when
+configuring the JVM plugin, you can put the following contents of the
+plugin.xml file in this directory into the <plugins> </plugins>
+section of your GGobi intialization file.  (Otherwise, edit the file
+and set the classpath correctly.)
+
+
+Note that there is no need to call Gtk.main() in any of these classes
+as the gtk event loop is already being run by GGobi.  If you do call
+it, things will actually block!
+
+
