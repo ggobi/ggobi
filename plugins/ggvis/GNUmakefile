@@ -21,9 +21,6 @@ else
  CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
 endif
 
-#GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
-GGOBI_LIB=
-
 HEADERS=ggvis
 SRC=ggvis init ggv_cbacks stressplot histogram mds ggv_qsort \
  ggv_utils Dtarget anchor shepard
