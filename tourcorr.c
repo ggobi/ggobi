@@ -262,7 +262,7 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr2.u.vals[0][dsp->tcorr2.vars.els[0]] = 1.0;
 
   dsp->tc1_manip_var = dsp->tcorr1.vars.els[0];
-  dsp->tc2_manip_var = dsp->tcorr2.vars.els[0];
+  dsp->tc2_manip_var = dsp->tcorr2.vars.els[2];
 
   dsp->tcorr1.dv = 1.0;
   dsp->tcorr1.delta = cpanel->tcorr1_step*M_PI_2/10.0;
@@ -601,50 +601,51 @@ void tourcorr_reinit(ggobid *gg)
   int j, m;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  extern void tour_reproject(vector_f, array_f, array_f, array_f, 
+  /*  extern void tour_reproject(vector_f, array_f, array_f, array_f, 
     array_f, array_f, gint, gint);
   extern void zero_tinc(vector_f, gint);
   extern void zero_tau(vector_f, gint);
-  extern void zero_lambda(vector_f, gint);
+  extern void zero_lambda(vector_f, gint);*/
 
   for (j=0; j<d->ncols; j++) {
     /*    m = dsp->tcorr1.vars.els[j];*/
     /*    dsp->tcorr1.u0.vals[0][j] = 0.;*/
     dsp->tcorr1.u.vals[0][j] = 0.;
-    dsp->tcorr1.v0.vals[0][j] = 0.;
     dsp->tcorr1.u0.vals[0][j] = 0.;
+    /*    dsp->tcorr1.v0.vals[0][j] = 0.;
     dsp->tcorr1.v1.vals[0][j] = 0.;
-    dsp->tcorr1.u1.vals[0][j] = 0.;
+    dsp->tcorr1.u1.vals[0][j] = 0.;*/
   }
   m = dsp->tcorr1.vars.els[0];
   /*  dsp->tcorr1.u0.vals[0][m] = 1.;*/
   dsp->tcorr1.u.vals[0][m] = 1.;
   dsp->tcorr1.u0.vals[0][m] = 1.;
-  dsp->tcorr1.v0.vals[0][m] = 1.;
+  /*  dsp->tcorr1.v0.vals[0][m] = 1.;*/
 
   dsp->tcorr1.get_new_target = true;
 
   for (j=0; j<d->ncols; j++) {
     dsp->tcorr2.u.vals[0][j] = 0.;
     dsp->tcorr2.u0.vals[0][j] = 0.;
-    dsp->tcorr2.v0.vals[0][j] = 0.;
+    /*    dsp->tcorr2.v0.vals[0][j] = 0.;
     dsp->tcorr2.u1.vals[0][j] = 0.;
-    dsp->tcorr2.v1.vals[0][j] = 0.;
+    dsp->tcorr2.v1.vals[0][j] = 0.;*/
   }
   m = dsp->tcorr2.vars.els[0];
   /*  dsp->tcorr2.u0.vals[0][m] = 1.;*/
   dsp->tcorr2.u.vals[0][m] = 1.;
   dsp->tcorr2.u0.vals[0][m] = 1.;
-  dsp->tcorr2.v0.vals[0][m] = 1.;
+  /*  dsp->tcorr2.v0.vals[0][m] = 1.;*/
 
   dsp->tcorr2.get_new_target = true;
 
-  zero_tinc(dsp->tcorr1.tinc, 1);
+  /*  zero_tinc(dsp->tcorr1.tinc, 1);
   zero_tinc(dsp->tcorr2.tinc, 1);
   zero_tau(dsp->tcorr1.tau, 1);
   zero_tau(dsp->tcorr2.tau, 1);
   zero_lambda(dsp->tcorr1.lambda, 1);
   zero_lambda(dsp->tcorr2.lambda, 1);
+  */
 
   dsp->tcorr1.nsteps = 0;
   dsp->tcorr2.nsteps = 0;

@@ -276,6 +276,14 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
   zero_tau(tau, nd);
   zero_tinc(tinc, nd);
   zero_lambda(lambda, nd);
+  copy_mat(u.vals, u0.vals, nc, nd);
+  copy_mat(v0.vals, u0.vals, nc, nd);
+  copy_mat(v1.vals, u1.vals, nc, nd);
+  copy_mat(uvevec.vals, u1.vals, nc, nd);
+  copy_mat(v.vals, u0.vals, nc, nd);
+  stepcntr = 0;
+  nsteps = 0;
+  dv = 0.0;
   
   /* 2 is hard-wired because it relates to cos, sin
                          and nothing else. */
@@ -299,6 +307,7 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
 
   /* Do SVD of u0'u1: span(u0,u1).*/
   if (doit) {
+    
     if (!matmult_utv(u0.vals, u1.vals, nc, nd, nc, nd, tv.vals))
       printf("#cols != #rows in the two matrices");
       
@@ -450,24 +459,25 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
       stepcntr = 0;
       *ns = nsteps;
       *stcn = stepcntr;
-    }
-    else {
-      zero_tau(tau, nd);
-      zero_tinc(tau, nd);
-      zero_lambda(tau, nd);
-      copy_mat(u.vals, u0.vals, nc, nd);
-      copy_mat(v0.vals, u0.vals, nc, nd);
-      copy_mat(v1.vals, u1.vals, nc, nd);
-      copy_mat(uvevec.vals, u1.vals, nc, nd);
-      copy_mat(v.vals, u0.vals, nc, nd);
-      stepcntr = 0;
-      nsteps = 0;
-      dv = 0.0;
-      *pdv = dv;
-      *ns = nsteps;
-      *stcn = stepcntr;
+  }
+  else {
+    /*    zero_tau(tau, nd);
+    zero_tinc(tau, nd);
+    zero_lambda(tau, nd);
+    copy_mat(u.vals, u0.vals, nc, nd);
+    copy_mat(v0.vals, u0.vals, nc, nd);
+    copy_mat(v1.vals, u1.vals, nc, nd);
+    copy_mat(uvevec.vals, u1.vals, nc, nd);
+    copy_mat(v.vals, u0.vals, nc, nd);
+    stepcntr = 0;
+    nsteps = 0;
+    dv = 0.0;*/ /* i don't think i need this if i initialize all these
+                   at the start of the function - di */
+    *pdv = dv;
+    *ns = nsteps;
+    *stcn = stepcntr;
 
-    }
+  }
 
 /* free temporary arrays */
   g_free ((gpointer) pairs);
@@ -712,5 +722,6 @@ gt_basis (array_f u1, gint nvars, vector_i vars, gint nc, gint nd)
     for (i=0; i<nd; i++)
       u1.vals[i][vars.els[i]] = 1.;
   }
+
 }
 

@@ -536,20 +536,24 @@ void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
 
 void tour1d_reinit(ggobid *gg)
 {
-  int i, j;
+  int i, j, m;
   displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
 
   for (i=0; i<1; i++) {
-    for (j=0; j<dsp->t1d.nvars; j++) {
+    for (j=0; j<d->ncols; j++) {
       dsp->t1d.u0.vals[i][j] = 0.;
       dsp->t1d.u.vals[i][j] = 0.;
     }
-    dsp->t1d.u0.vals[i][i] = 1.;
-    dsp->t1d.u.vals[i][i] = 1.;
+    dsp->t1d.u0.vals[i][dsp->t1d.vars.els[i]] = 1.;
+    dsp->t1d.u.vals[i][dsp->t1d.vars.els[i]] = 1.;
   }
 
   dsp->t1d.get_new_target = true;
 
+  display_tailpipe (dsp, gg);
+
+  varcircles_refresh (d, gg);
 }
 
 void tour1d_vert(cpaneld *cpanel, gboolean state)
