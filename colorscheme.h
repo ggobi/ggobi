@@ -3,9 +3,10 @@
 
 #include <gdk/gdk.h>
 
-typedef enum {diverging, sequential, spectral, qualitative,
-  UNKNOWN_COLOR_TYPE} colorscaletype;
-typedef enum {rgb, hsv, cmy, cmyk, UNKNOWN_COLOR_SYSTEM} colorsystem;
+typedef enum { diverging, sequential, spectral, qualitative,
+  UNKNOWN_COLOR_TYPE
+} colorscaletype;
+typedef enum { rgb, hsv, cmy, cmyk, UNKNOWN_COLOR_SYSTEM } colorsystem;
 
 typedef struct {
   gchar *name;
@@ -27,12 +28,11 @@ typedef struct {
   GdkColor rgb_accent; /*-- high-contrast accent color, rgb --*/
 } colorschemed;
 
-colorschemed *findColorSchemeByName(GList *schemes, const gchar *name);
+colorschemed *findColorSchemeByName(GList * schemes, const gchar * name);
 
-#ifdef USE_XML
-gint getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col);
-#endif
+gint getColor(xmlNodePtr node, xmlDocPtr doc, gfloat ** original,
+              GdkColor * col);
 
 colorschemed *read_colorscheme(char *fileName, GList **);
-void colorscheme_init (colorschemed *scheme);
+void colorscheme_init(colorschemed * scheme);
 #endif
