@@ -518,10 +518,14 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
   
 
   /*-- add the label last so it will be in front of other markings --*/
-  if (cpanel->identify_display_type == ID_CASE_LABEL)
+  if (cpanel->identify_display_type == ID_RECORD_LABEL)
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
+
+  else if (cpanel->identify_display_type == ID_RECORD_NO) {
+    lbl = g_strdup_printf ("%d", k);
+
   /*-- if categorical, use level name ... --*/
-  else if (cpanel->identify_display_type == ID_VAR_LABELS) {
+  } else if (cpanel->identify_display_type == ID_VAR_LABELS) {
     vartabled *vt;
     GtkWidget *clist =
       get_clist_from_object (GTK_OBJECT (gg->control_panel[IDENT]));
@@ -557,12 +561,16 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
 
       if (j == 0) {
         lbl = (vt->categorical_p) ?
-                g_strdup_printf ("%s=%s", vt->collab_tform, vt->level_names[lval]) :
-   	        g_strdup_printf ("%s=%g", vt->collab_tform, d->tform.vals[k][vars[j]]);
+          g_strdup_printf ("%s=%s",
+            vt->collab_tform, vt->level_names[lval]) :
+          g_strdup_printf ("%s=%g",
+            vt->collab_tform, d->tform.vals[k][vars[j]]);
       } else {
         lbl = (vt->categorical_p) ?
-          g_strdup_printf ("%s, %s=%s", lbl, vt->collab_tform, vt->level_names[lval]) :
-          g_strdup_printf ("%s, %s=%g", lbl, vt->collab_tform, d->tform.vals[k][vars[j]]);
+          g_strdup_printf ("%s, %s=%s",
+            lbl, vt->collab_tform, vt->level_names[lval]) :
+          g_strdup_printf ("%s, %s=%g",
+            lbl, vt->collab_tform, d->tform.vals[k][vars[j]]);
       }
     }
   }

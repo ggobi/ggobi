@@ -35,7 +35,7 @@ id_remove_labels_cb (GtkWidget *w, ggobid *gg)
   /* This will become an event on the datad when we move to
      Gtk objects (soon now!) */
   gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], 
-		  -1, (gint) UNSTICKY, d);
+    -1, (gint) UNSTICKY, d);
 
   displays_plot (NULL, QUICK, gg);
 }
@@ -58,8 +58,8 @@ id_all_sticky_cb (GtkWidget *w, ggobid *gg)
   /* This will become an event on the datad when we move to
      Gtk objects (soon now!) */
   gtk_signal_emit(GTK_OBJECT(gg),
-		  GGobiSignals[STICKY_POINT_ADDED_SIGNAL], -1,
-		  (gint) STICKY, d);
+    GGobiSignals[STICKY_POINT_ADDED_SIGNAL], -1,
+    (gint) STICKY, d);
   displays_plot (NULL, QUICK, gg);
 }
 
@@ -153,7 +153,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       /* This will become an event on the datad when we move to
          Gtk objects (soon now!) */
       gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL],
-		      sp, k, d); 
+        sp, k, d); 
     }
     d->nearest_point_prev = k;
   }
@@ -213,9 +213,9 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
 /*----------------------------------------------------------------------*/
 
 static gchar *display_lbl[] = {
-  "Case label",
+  "Record label",
+  "Record number",
   "Variable labels",
-  /*"Point coords"*/
   };
 void
 cpanel_identify_make(ggobid *gg) {
@@ -281,7 +281,7 @@ cpanel_identify_make(ggobid *gg) {
 void
 cpanel_identify_init (cpaneld *cpanel, ggobid *gg)
 {
-  cpanel->identify_display_type = ID_CASE_LABEL;
+  cpanel->identify_display_type = ID_RECORD_LABEL;
 }
 
 void
