@@ -210,6 +210,10 @@ scatterplot_display_menus_make (displayd *display,
 
   /*-- Options menu --*/
   topmenu = submenu_make ("_Options", 'O', accel_group);
+  /*-- add a tooltip --*/
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), topmenu,
+    "Options menu for this display", NULL);
+
   options_menu = gtk_menu_new ();
 
   item = CreateMenuCheck (options_menu, "Show points",

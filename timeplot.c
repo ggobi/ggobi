@@ -13,10 +13,12 @@
 /*--------------------------------------------------------------------*/
 
 static GtkItemFactoryEntry menu_items[] = {
-  { "/_FFile",         NULL,     NULL,     0,                    "<Branch>" },
-  { "/FFile/Print",    "",       (GtkItemFactoryCallback) display_print_cb, 0, "<Item>" },
-  { "/FFile/sep",      NULL,     NULL,     0, "<Separator>" },
-  { "/FFile/Close",    "",       (GtkItemFactoryCallback) display_close_cb, 0, "<Item>" },
+  { "/_File",         NULL,     NULL,     0,                    "<Branch>" },
+#ifdef PRINTING_IMPLEMENTED
+  { "/File/Print",    "",       (GtkItemFactoryCallback) display_print_cb, 0, "<Item>" },
+  { "/File/sep",      NULL,     NULL,     0, "<Separator>" },
+#endif
+  { "/File/Close",    "",       (GtkItemFactoryCallback) display_close_cb, 0, "<Item>" },
 };
 /* The rest of the menus will be appended once the menubar is created */
 
@@ -30,6 +32,10 @@ tsplot_display_menus_make (displayd *display,
  * Display options menu
 */
   submenu = submenu_make ("_Options", 'D', accel_group);
+  /*-- add a tooltip --*/
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), submenu,
+    "Options menu for this display", NULL);
+
   options_menu = gtk_menu_new ();
 
   item = CreateMenuCheck (options_menu, "Show points",
@@ -124,7 +130,8 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars,
   datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
-  GtkWidget *mbar;
+  GtkWidget *mbar, *w;
+  GtkItemFactory *factory;
   gint i;
   splotd *sp;
   gint nplots;
@@ -151,8 +158,15 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars,
   gtk_container_add (GTK_CONTAINER (display->window), vbox);
 
   gg->tsplot.accel_group = gtk_accel_group_new ();
-  get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
+  factory = get_main_menu (menu_items,
+    sizeof (menu_items) / sizeof (menu_items[0]),
     gg->tsplot.accel_group, display->window, &mbar, (gpointer) display);
+
+  /*-- add a tooltip to the file menu --*/
+  w = gtk_item_factory_get_widget (factory, "<main>/File");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+    gtk_menu_get_attach_widget (GTK_MENU(w)),
+    "File menu for this display", NULL);
 
   /*
    * After creating the menubar, and populating the file menu,

@@ -133,32 +133,23 @@ ruler_ranges_set (gboolean force, displayd *display, splotd *sp, ggobid *gg) {
 /*----------------------------------------------------------------------*/
 
 static GtkItemFactoryEntry menu_items[] = {
-  {"/_FFile",        
-    NULL,    
-    NULL,            
-    0,            
-    "<Branch>" },
-  {"/FFile/Print",   
-    "",      
+  {"/_File",        NULL,    NULL,            0,            "<Branch>" },
+#ifdef PRINTING_IMPLEMENTED
+  {"/File/Print",   "",      
     (GtkItemFactoryCallback)display_print_cb,
-    0,
-    "<Item>" },
-  {"/FFile/sep",     
-    NULL,    
-    NULL,            
-    0,
-    "<Separator>" },
-  {"/FFile/Close",   
-    "",      
+    0, "<Item>" },
+  {"/File/sep",     NULL,    NULL,            0, "<Separator>" },
+#endif
+  {"/File/Close",   "",      
     (GtkItemFactoryCallback) display_close_cb,
-    0,
-    "<Item>" },
+    0, "<Item>" },
 };
 
 
 displayd *
 scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
-  GtkWidget *table, *vbox;
+  GtkWidget *table, *vbox, *w;
+  GtkItemFactory *factory;
   displayd *display;
   extern void scatterplot_display_menus_make (displayd *display,
     GtkAccelGroup *, GtkSignalFunc, ggobid *);
@@ -190,9 +181,17 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   gtk_container_add (GTK_CONTAINER (display->window), vbox);
 
   gg->app.sp_accel_group = gtk_accel_group_new ();
-  get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 gg->app.sp_accel_group, display->window, &display->menubar,
-                 (gpointer) display);
+  factory = get_main_menu (menu_items,
+    sizeof (menu_items) / sizeof (menu_items[0]),
+    gg->app.sp_accel_group, display->window, &display->menubar,
+    (gpointer) display);
+
+  /*-- add a tooltip to the file menu --*/
+  w = gtk_item_factory_get_widget (factory, "<main>/File");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+    gtk_menu_get_attach_widget (GTK_MENU(w)),
+    "File menu for this display", NULL);
+
   /*
    * After creating the menubar, and populating the file menu,
    * add the other menus manually
