@@ -465,7 +465,6 @@ void barchart_init_vectors(barchartSPlotd * sp)
     sp->bar->col_low_bin = NULL;
     sp->bar->bar_hit = NULL;
     sp->bar->old_bar_hit = NULL;
-    vectori_init_null (&sp->bar->index_to_rank);
   }
 }
 
