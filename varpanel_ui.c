@@ -443,7 +443,8 @@ varpanel_clear (datad *d, ggobid *gg)
 
 
 /*-- for each datad, a scrolled window, vbox, hbox, togglebuttons and label --*/
-void varpanel_populate (datad *d, ggobid *gg)
+void 
+varpanel_populate (datad *d, ggobid *gg)
 {
   gint j, nd;
 
@@ -465,10 +466,14 @@ void varpanel_populate (datad *d, ggobid *gg)
 
   gtk_object_set_data(GTK_OBJECT(d->varpanel_ui.hpane), "datad", d);/*setdata*/
   /*-- only add a tab if there are variables --*/
-  if (g_slist_length (d->vartable) > 0) {
+  if (g_slist_length (d->vartable) > 0 || d->ncols > 0) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-      d->varpanel_ui.hpane, gtk_label_new (d->name));
+			      d->varpanel_ui.hpane, gtk_label_new (d->name));
   }
+
+  /* Check if we have been here before and already created the box, etc.. */
+  if(d->vcbox_ui.ebox && GTK_IS_WIDGET(d->vcbox_ui.ebox))
+    return;
 
   /*-- create an ebox, and put it in the hpane --*/
   d->vcbox_ui.ebox = gtk_event_box_new ();
