@@ -13,6 +13,7 @@
 #ifdef USE_STRINGS_H
 #include <strings.h>
 #endif
+#include <stdlib.h>
 
 #include "vars.h"
 #include "externs.h"
@@ -105,7 +106,7 @@ static void
 add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
 {
   GtkWidget *dialog, *table;
-  GtkWidget *label, *entry, *w;
+  GtkWidget *entry, *w;
   gchar *lbl;
   cpaneld *cpanel = &dsp->cpanel;
   GtkAttachOptions table_opt = GTK_SHRINK|GTK_FILL|GTK_EXPAND;
@@ -393,7 +394,6 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 void
 edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = sp->displayptr;
-  cpaneld *cpanel = &display->cpanel;
 
   if (state == on) {
     if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))

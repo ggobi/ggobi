@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "ggobi.h"
 #include "GGobiAPI.h"
 

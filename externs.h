@@ -261,6 +261,7 @@ gboolean   gram_schmidt (gdouble *, gdouble*, gint);
 void       gt_basis (array_d, gint, vector_i, gint, gint);
 void       br_hidden_alloc (datad *);
 void       br_hidden_init (datad *);
+gboolean   hasEdgePoints(datad *e, datad *d);
 gboolean   hidden_read (InputDescription *desc, gboolean, datad *, ggobid *);
 gint       include_hiddens (gboolean include, datad *d, ggobid *gg);
 void       identify_event_handlers_toggle (splotd *, gboolean);

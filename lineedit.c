@@ -85,7 +85,7 @@ gboolean record_add (gint a, gint b, gchar *lbl, gchar *id, greal *raw,
     unresolveAllEdgePoints(e);
     resolveEdgePoints (e, d);
   } else {
-    GList *l;
+    GSList *l;
     datad *dd;
     for (l=gg->d; l; l=l->next) {
       dd = (datad *) l->data;
