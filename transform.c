@@ -643,7 +643,7 @@ void tform_label_update (gint jcol, datad *d, ggobid *gg)
   collab_tform_update (jcol, d, gg);
 
   /*-- update the displayed variable circle labels --*/
-  varlabel_set (jcol, gg);
+  varlabel_set (jcol, d, gg);
 
   /*-- update the variable statistics table --*/
   vartable_tform_set (jcol, d, gg);

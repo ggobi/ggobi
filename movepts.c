@@ -65,7 +65,7 @@ movepts_history_add (gint id, splotd *sp, datad *d, ggobid *gg)
 }
 
 void
-move_pt_history_delete_last (datad *d, ggobid *gg)
+movepts_history_delete_last (datad *d, ggobid *gg)
 {
   gint n;
 

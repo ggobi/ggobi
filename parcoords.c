@@ -113,14 +113,15 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   for (l=display->splots; l; l=l->next) {
     sp = (splotd *) l->data;
     gtk_widget_set_usize (sp->da, width, height);
-    gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box), sp->da, true, true, 0);
+    gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box),
+                        sp->da, true, true, 0);
   }
 
   gtk_widget_show_all (gg->parcoords.arrangement_box);
 
   display_tailpipe (display, gg);
 
-  varpanel_refresh (gg);
+  varpanel_refresh (display->d, gg);
 }
 
 

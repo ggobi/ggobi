@@ -89,6 +89,14 @@ varsel_from_menu (GtkWidget *w, gpointer data)
   datad *d = display->d;
   cpaneld *cpanel = &display->cpanel;
 
+/*-- shouldn't the menu be destroyed here? --*/
+  g_printerr ("is w a menu? %d\n", (GTK_IS_MENU(w)));
+  g_printerr ("is w a menuitem? %d\n", (GTK_IS_MENU_ITEM(w)));
+/*
+  g_printerr ("is w's ancestor a menu? %d\n",
+    (GTK_IS_MENU(gtk_widget_get_ancestor(w))));
+*/
+
   varsel (cpanel, gg->current_splot, vdata->jvar, vdata->btn,
     vdata->alt_mod, vdata->ctrl_mod, vdata->shift_mod, d, gg);
 }
@@ -151,26 +159,36 @@ rotation_menu_build (gint jvar, ggobid *gg)
 {
   GtkWidget *menu;
   
-  gg->rotation_menu.vdata0.sp = gg->rotation_menu.vdata1.sp = gg->rotation_menu.vdata2.sp = gg->current_splot;
-  gg->rotation_menu.vdata0.jvar = gg->rotation_menu.vdata1.jvar = gg->rotation_menu.vdata2.jvar = jvar;
-  gg->rotation_menu.vdata0.alt_mod = gg->rotation_menu.vdata1.alt_mod = gg->rotation_menu.vdata2.alt_mod = false;
+  gg->rotation_menu.vdata0.sp = gg->rotation_menu.vdata1.sp =
+    gg->rotation_menu.vdata2.sp = gg->current_splot;
+  gg->rotation_menu.vdata0.jvar = gg->rotation_menu.vdata1.jvar =
+    gg->rotation_menu.vdata2.jvar = jvar;
+  gg->rotation_menu.vdata0.alt_mod = gg->rotation_menu.vdata1.alt_mod =
+    gg->rotation_menu.vdata2.alt_mod = false;
 
   gg->rotation_menu.vdata0.btn = 1;
   gg->rotation_menu.vdata1.btn = 2;
   gg->rotation_menu.vdata2.btn = 3;
 
-  gg->rotation_menu.vdata2.gg = gg->rotation_menu.vdata1.gg = gg->rotation_menu.vdata0.gg = gg;
+  gg->rotation_menu.vdata2.gg = gg->rotation_menu.vdata1.gg =
+    gg->rotation_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
   CreateMenuItem (menu, "Select X  L",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->rotation_menu.vdata0, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel,
+    gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu),
+    (gpointer) &gg->rotation_menu.vdata0, gg);
   CreateMenuItem (menu, "Select Y  M",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->rotation_menu.vdata1, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel,
+    gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu),
+    (gpointer) &gg->rotation_menu.vdata1, gg);
   CreateMenuItem (menu, "Select Z  R",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->rotation_menu.vdata2, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel,
+    gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu),
+    (gpointer) &gg->rotation_menu.vdata2, gg);
 
   return menu;
 }
@@ -180,16 +198,19 @@ tour2d_menu_build (gint jvar, ggobid *gg)
 {
   GtkWidget *menu;
 
-  gg->tour2d_menu.vdata0.sp = gg->tour2d_menu.vdata1.sp = gg->tour2d_menu.vdata2.sp = gg->current_splot;
-  gg->tour2d_menu.vdata0.jvar = gg->tour2d_menu.vdata1.jvar = gg->tour2d_menu.vdata2.jvar = jvar;
-  gg->tour2d_menu.vdata0.alt_mod = gg->tour2d_menu.vdata1.alt_mod = gg->tour2d_menu.vdata2.alt_mod = false;
+  gg->tour2d_menu.vdata0.sp = gg->tour2d_menu.vdata1.sp =
+    gg->tour2d_menu.vdata2.sp = gg->current_splot;
+  gg->tour2d_menu.vdata0.jvar = gg->tour2d_menu.vdata1.jvar =
+    gg->tour2d_menu.vdata2.jvar = jvar;
+  gg->tour2d_menu.vdata0.alt_mod = gg->tour2d_menu.vdata1.alt_mod =
+    gg->tour2d_menu.vdata2.alt_mod = false;
   gg->tour2d_menu.vdata0.shift_mod = gg->tour2d_menu.vdata2.shift_mod = false;
   gg->tour2d_menu.vdata1.shift_mod = true;
   gg->tour2d_menu.vdata0.ctrl_mod = gg->tour2d_menu.vdata1.ctrl_mod = false;
   gg->tour2d_menu.vdata2.ctrl_mod = true;
 
-  gg->tour2d_menu.vdata2.gg =   gg->tour2d_menu.vdata1.gg =   gg->tour2d_menu.vdata0.gg = gg;
-
+  gg->tour2d_menu.vdata2.gg = gg->tour2d_menu.vdata1.gg =  
+    gg->tour2d_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
   CreateMenuItem (menu, "Tour   L,M",
@@ -226,7 +247,8 @@ parcoords_menu_build (gint jvar, ggobid *gg)
 {
   GtkWidget *menu;
 
-  gg->parcoords_menu.vdata0.sp = gg->parcoords_menu.vdata1.sp = gg->current_splot;
+  gg->parcoords_menu.vdata0.sp = gg->parcoords_menu.vdata1.sp =
+    gg->current_splot;
   gg->parcoords_menu.vdata0.jvar = gg->parcoords_menu.vdata1.jvar = jvar;
   gg->parcoords_menu.vdata0.alt_mod = false;
   gg->parcoords_menu.vdata1.alt_mod = true;
@@ -715,7 +737,7 @@ void varpanel_populate (datad *d, ggobid *gg)
 }
 
 void
-make_varpanel (GtkWidget *parent, datad *d, ggobid *gg) {
+varpanel_make (GtkWidget *parent, ggobid *gg) {
 
   gg->selvarfg_GC = NULL;
 
@@ -730,17 +752,26 @@ make_varpanel (GtkWidget *parent, datad *d, ggobid *gg) {
     gg->varpanel_ui.scrolled_window, true, true, 2);
   gtk_widget_show (gg->varpanel_ui.scrolled_window);
 
-  gg->varpanel_ui.varpanel = gtk_table_new (d->varpanel_ui.vnrows,
-    d->varpanel_ui.vncols, true);
-
-  /* pack the table into the scrolled window */
+  /*-- create a vbox in the scrolled window --*/
+  gg->varpanel_ui.varpanel = gtk_vbox_new (false, 10);
   gtk_scrolled_window_add_with_viewport (
     GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
     gg->varpanel_ui.varpanel);
   gtk_widget_show (gg->varpanel_ui.varpanel);
 
+
+  /*
+   * figure out how many rows and columns the table should have --
+   * actually, once it's done for the first one, then use the vncols
+   * value from the first table to set up the second table; not
+   * yet implemented.
   varpanel_layout_init (d, gg);
+  d->varpanel_ui.table = gtk_table_new (d->varpanel_ui.vnrows,
+    d->varpanel_ui.vncols, true);
+  gtk_box_pack_start (GTK_BOX (gg->varpanel_ui.varpanel),
+    d->varpanel_ui.table, true, true, 2);
   varpanel_populate (d, gg);
+  */
 
   gtk_widget_show_all (gg->varpanel_ui.scrolled_window);
 }
@@ -766,26 +797,32 @@ varpanel_layout_init (datad *d, ggobid *gg) {
 void
 varpanel_size_init (gint cpanel_height, ggobid* gg)
 {
+/*
   gint i;
   GtkTable *t = GTK_TABLE (gg->varpanel_ui.varpanel);
   GtkTableRowCol c, r;
   gint width = 0, height = 0;
   GtkWidget *vport = GTK_WIDGET
     ((GTK_BIN (gg->varpanel_ui.scrolled_window))->child);
+*/
 
   /*-- Find the width of the first few columns --*/
+/*
   for (i=0; i<MIN (t->ncols, 3); i++) {
     c = t->cols[i];
     width += c.requisition + c.spacing;
   }
+*/
 
   /*-- Find the height of the first few rows --*/
+/*
   for (i=0; i<MIN (t->nrows, 4); i++) {
     r = t->rows[i];
     height += r.requisition + r.spacing;
   }
 
   gtk_widget_set_usize (vport, width, MAX (height, cpanel_height));
+*/
 }
 
 

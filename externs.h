@@ -7,7 +7,10 @@
 extern "C" {
 #endif
 
-extern void globals_init (ggobid *gg);
+extern void pipeline_arrays_free (datad *d, ggobid *gg);
+extern void missing_world_free (datad *d, ggobid *gg);
+extern void datad_free (datad *, ggobid *);
+extern void globals_init (ggobid *);
 extern ggobid* ggobi_alloc (void);
 extern GtkWidget* CreateMenuCheck (displayd *, GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 extern GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *gg) ;
@@ -146,7 +149,8 @@ extern gboolean line_colors_read (gchar *, gboolean, datad *, ggobid *);
 extern void lineedit_event_handlers_toggle (splotd *, gboolean);
 extern void make_symbol_window (ggobid *gg);
 extern void make_ui (ggobid *gg);
-extern void make_varpanel (GtkWidget *, datad *d, ggobid *gg);
+extern void varpanel_make (GtkWidget *, ggobid *);
+extern void varpanel_add_data (datad *, ggobid *);
 extern GlyphType mapGlyphName (const gchar *gtype);
 extern void missing_alloc (gint, gint);
 extern void missing_arrays_add_column (gint, datad *d, ggobid *gg);

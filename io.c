@@ -31,7 +31,7 @@ filesel_ok (GtkWidget *w, datad *d, GtkFileSelection *fs)
   switch (action) {
     case READ_FILESET:
       /*-- deal with suffixes? --*/
-      if (fileset_read_init (fname, d, gg)) 
+      if (fileset_read_init (fname, gg)) 
         ;
       break;
     case EXTEND_FILESET:  /*-- not yet enabled --*/

@@ -79,8 +79,9 @@ typedef struct /*-- datad --*/ {
 /*----------------- variable selection panel -------------------------*/
 
  struct _Varpaneld {
-   GtkWidget **da, **label;
+   GtkWidget *table;
    gint vnrows, vncols, nvars;
+   GtkWidget **da, **label;
  } varpanel_ui;
 
 /*-------------------- transformation --------------------------------*/

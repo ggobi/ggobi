@@ -588,7 +588,7 @@ make_ui (ggobid *gg) {
                      gg->control_panel[gg->mode]);
 
   /*-- Variable selection panel --*/
-  make_varpanel (hbox, gg);
+  varpanel_make (hbox, gg);
 
   gtk_widget_show_all (hbox);
 
