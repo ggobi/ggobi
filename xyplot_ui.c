@@ -110,10 +110,19 @@ xyplot_event_handlers_toggle (splotd *sp, gboolean state) {
 
 void
 cpanel_xyplot_make (ggobid *gg) {
-  GtkWidget *cycle_tgl, *chdir_btn, *cycle_sbar, *opt;
-  
+  GtkWidget *frame, *vb, *cycle_tgl, *chdir_btn, *cycle_sbar, *opt;
+
   gg->control_panel[XYPLOT] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[XYPLOT]), 5);
+
+  frame = gtk_frame_new ("Plot cycling");
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]), frame,
+    false, false, 3);
+
+  vb = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 4);
+  gtk_container_add (GTK_CONTAINER (frame), vb);
 
   cycle_tgl = gtk_check_button_new_with_label ("Cycle");
   gtk_widget_set_name (cycle_tgl, "XYPLOT:cycle_toggle");
@@ -121,7 +130,7 @@ cpanel_xyplot_make (ggobid *gg) {
     "Cycle through pairwise plots", NULL);
   gtk_signal_connect (GTK_OBJECT (cycle_tgl), "toggled",
                      GTK_SIGNAL_FUNC (cycle_cb), (gpointer) gg);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]), cycle_tgl,
+  gtk_box_pack_start (GTK_BOX (vb), cycle_tgl,
     false, false, 3);
 
 /*
@@ -131,7 +140,7 @@ cpanel_xyplot_make (ggobid *gg) {
   gtk_widget_set_name (opt, "XYPLOT:cycle_axis");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Fix one of the axes during plot cycling or let them both float", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]), opt,
+  gtk_box_pack_start (GTK_BOX (vb), opt,
     false, false, 0);
   populate_option_menu (opt, (gchar**) fix_axis_lbl,
                         sizeof (fix_axis_lbl) / sizeof (gchar *),
@@ -151,7 +160,7 @@ cpanel_xyplot_make (ggobid *gg) {
   cycle_sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->xyplot.cycle_delay_adj));
   scale_set_default_values (GTK_SCALE (cycle_sbar));
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]),
+  gtk_box_pack_start (GTK_BOX (vb),
                       cycle_sbar, false, false, 1);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), cycle_sbar,
     "Adjust cycling speed", NULL);
@@ -159,7 +168,7 @@ cpanel_xyplot_make (ggobid *gg) {
   chdir_btn = gtk_button_new_with_label ("Change direction");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), chdir_btn,
     "Change cycling direction", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]),
+  gtk_box_pack_start (GTK_BOX (vb),
                       chdir_btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (chdir_btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), gg);
