@@ -352,13 +352,6 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
   nc = dim;
 
-/*
-  rowids = (glong *) g_malloc (nvisible * sizeof(glong));
-  for (m=0; m<nvisible; m++) {
-    i = visible[m];
-    rowids[m] = (glong) d->rowid.id.els[i];
-  }
-*/
   rowids = (gchar **) g_malloc (nvisible * sizeof(gchar *));
   for (m=0; m<nvisible; m++) {
     i = visible[m];

@@ -360,41 +360,6 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 */
   g_free (visible);
 
-/*-- add the new variables to this datad --*/
-/*
-    name = g_strdup_printf ("x");
-    newvar_add_with_values (x, d->nrows, name, d, gg);
-    g_free (name);
-
-    name = g_strdup_printf ("y");
-    newvar_add_with_values (y, d->nrows, name, d, gg);
-    g_free (name);
-
-    name = g_strdup_printf ("depth");
-    newvar_add_with_values (depth, d->nrows, name, d, gg);
-    g_free (name);
-
-    name = g_strdup_printf ("in degree");
-    newvar_add_with_values (inDegree, d->nrows, name, d, gg);
-    g_free (name);
-
-    name = g_strdup_printf ("out degree");
-    newvar_add_with_values (outDegree, d->nrows, name, d, gg);
-    g_free (name);
-
-    name = g_strdup_printf ("nparents");
-    newvar_add_with_values (nParents, d->nrows, name, d, gg);
-    g_free (name);
-
-    name = g_strdup_printf ("nchildren");
-    newvar_add_with_values (nChildren, d->nrows, name, d, gg);
-    g_free (name);
-
-    name = g_strdup_printf ("nsiblings");
-    newvar_add_with_values (nSiblings, d->nrows, name, d, gg);
-    g_free (name);
-*/
-
 /*-- overwrite new radial variables --*/
 /*
     gint j;
