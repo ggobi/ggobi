@@ -4,33 +4,18 @@ concentric circles, with the first node in the list appearing at the
 center.
 
 In order to use two more layout methods, pick up the graphviz package
-from www.graphviz.org/pub/graphviz.  I just (October 3, 2002) tested
-the build process using graphviz-1.8.10.tar.gz, and it's working well.
+from www.graphviz.org/pub/graphviz.  I just (January 16, 2003) tested
+the build process using graphviz-current.tar.gz, and it's working well.
 
-When you build it, instead of using configure and gmake, follow the
-instructions in graphviz/INSTALL.old, which does a better job of building
-and installing the libraries and include files we need.
+The older instructions in this file instructed you to read the
+instructions in INSTALL.old, but the default process is now working
+very nicely, so you can now follow the instructions in INSTALL:  that
+is, just use configure and gmake.
 
 Here are the lines I use in my local.config file under linux:
 
 GRAPHVIZ = 1
-GVIZ_ARCH=linux.i386
-GVIZ=/usr/local/lib/graphviz
-GVINC=$(GVIZ)/include
-GVLIB=$(GVIZ)/lib
-
-GVIZ_EXTLIB_INC=-I/usr/include/freetype2
-GVIZ_EXTLIB_LIB=-ljpeg -lpng -lfreetype -lz
+GVINC=/usr/local/include/graphviz
+GVLIB=/usr/local/lib/graphviz
 
 You can see how those are used in the GNUmakefile.
-
-Notice that I built the libraries to include jpeg, png, etc.  Here
-are your two options with respect to those graphics libraries:
-
- 1. If you'd like to use some of the command-line graph layout and
-    drawing programs in the graphviz package (dot, neato, etc), then
-    you need to include those libraries so that the programs can
-    render layouts in jpeg, png, etc.
- 2. If you don't expect to use those programs, then ggobi will be
-    doing all the drawing, and you can edit gvconfig.h to exclude 
-    the graphics libraries.
