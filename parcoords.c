@@ -262,12 +262,12 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
   splotd *s, *sp_new;
   GtkWidget *box, *w;
   gfloat ratio = 1.0;
-  displayd *display=gg->current_display;
+  displayd *display = gg->current_display;
 
   /* The index of gg.current_splot */
-  gint sp_indx = g_list_index (gg->current_display->splots, sp);
+  gint sp_indx = g_list_index (display->splots, sp);
 
-  gtk_window_set_policy (GTK_WINDOW (gg->current_display->window),
+  gtk_window_set_policy (GTK_WINDOW (display->window),
         false, false, false);
 
   splot_get_dimensions (sp, &width, &height);

@@ -45,6 +45,16 @@ scatterplot_show_vrule (displayd *display, gboolean show) {
 void
 scatterplot_show_rulers (displayd *display, gint projection)
 {
+/*
+ * Retrieve the size of the drawing area before the axes are added
+ * or removed, and then set the da size afterwards.  This prevents
+ * plots that have been reduced in size from suddenly being resized
+ * up to the original default size.
+*/
+  splotd *sp = display->splots->data;
+  gint width = sp->da->allocation.width;
+  gint height = sp->da->allocation.height;
+
   switch (projection) {
     case P1PLOT:
       if (display->p1d_orientation == VERTICAL) {
@@ -69,6 +79,8 @@ scatterplot_show_rulers (displayd *display, gint projection)
       scatterplot_show_hrule (display, false);
     break;
   }
+
+  gtk_drawing_area_size (GTK_DRAWING_AREA (sp->da), width, height);
 }
 
 void
