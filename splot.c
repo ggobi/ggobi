@@ -954,6 +954,7 @@ splot_cursor_set (gint jcursor, splotd *sp)
   if (jcursor == (gint) NULL) {
     gdk_cursor_destroy (sp->cursor);
     sp->jcursor = (gint) NULL;
+    gdk_window_set_cursor (window, NULL);
   } else {
     sp->jcursor = (gint) jcursor;
     sp->cursor = gdk_cursor_new (sp->jcursor);
