@@ -90,7 +90,7 @@ installed_file_name(char *name)
   char *tmp;
   char *dirPtr, *dir;
   dir = sessionOptions->cmdArgs[0];
-  dirPtr = strrchr(dir, '\\');
+  dirPtr = strrchr(dir, G_DIR_SEPARATOR);
 
   tmp = (char *) g_malloc( ((dirPtr - dir) + strlen(name)+ 3)*sizeof(char));
   strncpy(tmp, dir, dirPtr-dir + 1);
