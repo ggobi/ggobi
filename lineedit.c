@@ -57,12 +57,6 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
     g_free (stmp);
   }
 
-/*
-  * this may still need tuning, because added records with
-  * categorical variables should have values
-  * that match one of the existing level values, and we're
-  * not testing for that yet.
-*/
   if (dtarget->ncols) {
     raw = (greal *) g_malloc (dtarget->ncols * sizeof(greal));
     for (j=0; j<dtarget->ncols; j++) {
@@ -72,10 +66,39 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
         found_missings = true;
       } else {
         x = (greal) atof (vals[j]);
-        if (vt->vartype == categorical)
-          raw[j] = (greal) floor(x + .5);
-        else
-          raw[j] = x;
+        if (vt->vartype == categorical) {
+	  /* Loop over levels, and add to the one that is closest to x.
+	   * Also, increment vt->level_counts[level] */
+	  gint k, level=0, dist, ddist;
+	  for (k=0; k<vt->nlevels; k++) {
+	    dist = fabs((greal)vt->level_values[k] - x);
+	    if (k == 0) ddist = dist; /* initialize ddist */
+	    else {
+	      if (dist < ddist) {
+		level = k;
+		ddist = dist;
+	      }
+	    }
+	  } 
+	  raw[j] = (greal)vt->level_values[level];
+          vt->level_counts[level]++;
+
+          /* then update the table -- ugh -- no event for this yet.  I
+            should make the expose event repopulate the table ... and
+            I should update the table whenever any cases are added,
+            categorical or not, come to think of it.  nNAs could
+            change, as well as Any of the real variable stats.
+          */
+	  {
+            if (d->vartable_clist[categorical] != NULL) {
+              gint vartable_rownum_from_varno (gint jvar, vartyped vartype, datad *d);
+              gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
+	        level+1+vartable_rownum_from_varno (j, vt->vartype, d),
+                CAT_CLIST_LEVEL_COUNT,
+                g_strdup_printf ("%d", vt->level_counts[level]));
+	    }
+          }
+        } else raw[j] = x;
       }
     }
   }
@@ -553,8 +576,8 @@ pt_screen_to_raw (icoords *screen, gint id, gboolean horiz, gboolean vert,
 }
 
 void
-fetch_default_record_values (gchar **vals, datad *dtarget, displayd *display,
-  ggobid *gg)
+fetch_default_record_values (gchar **vals, datad *dtarget, 
+  displayd *display, ggobid *gg)
 {
   gint j;
   gcoords eps;
@@ -567,12 +590,23 @@ fetch_default_record_values (gchar **vals, datad *dtarget, displayd *display,
       -1, true, true, /* no id, both horiz and vert are true */
       raw, &eps, dtarget, gg->current_splot, gg);
     for (j=0; j<dtarget->ncols; j++) {
-      /*-- if variable j is categorical, make it an integer --*/
-      /* see longer remark in record_add */
       vt = vartable_element_get (j, dtarget);
-      if (vt->vartype == categorical)
-        vals[j] = g_strdup_printf ("%d", (gint) floor(raw[j]+.5));
-      else
+      if (vt->vartype == categorical) {
+	/* Loop over levels, and choose the one that is closest to x. */
+	gint k, level=0, dist, ddist;
+	for (k=0; k<vt->nlevels; k++) {
+	  dist = fabs((greal)vt->level_values[k] - raw[j]);
+	  if (k == 0) ddist = dist; /* initialize ddist */
+	  else {
+	    if (dist < ddist) {
+		level = k;
+		ddist = dist;
+	    }
+	  }
+	} 
+	vals[j] = g_strdup_printf("%d", vt->level_values[level]);
+        /*vals[j] = g_strdup_printf ("%d", (gint) floor(raw[j]+.5));*/
+      } else
         vals[j] = g_strdup_printf ("%g", raw[j]);
     }
     g_free (raw);
