@@ -34,48 +34,8 @@ find_glyph_type_and_size (gint gid, glyphv *glyph)
 }
 
 /*----------------------------------------------------------------------*/
-/*                     Linking to other datad's                         */
-/*----------------------------------------------------------------------*/
 
-void
-color_link_by_id (gint source_i, datad *source_d, ggobid *gg)
-{
-  datad *d;
-  GSList *l;
-  gint i, id;
-  gint k = source_i;
-  /*-- this is the cpanel for the display being brushed --*/
-  cpaneld *cpanel = &gg->current_display->cpanel;
-
-  if (source_d->rowid.id.nels > 0) {
-    id = source_d->rowid.id.els[k];
-
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-      if (d != source_d) {
-        if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
-          /*-- i is the row number, irrespective of rows_in_plot --*/
-          i = d->rowid.idv.els[id]; 
-          if (!d->hidden_now.els[id]) {
-            switch (cpanel->br_mode) {
-              case BR_PERSISTENT:
-                d->color.els[i] = d->color_now.els[i] = source_d->color.els[k];
-                break;
-              case BR_TRANSIENT:
-                d->color_now.els[i] = source_d->color.els[k];
-                break;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-
-/*----------------------------------------------------------------------*/
-
-/*-- called by brush_motion, and when the brushing mode is turned on/off --*/
+/*-- called by brush_motion, brush_mode_cb, and in the api --*/
 gboolean
 brush_once (gboolean force, splotd *sp, ggobid *gg)
 {
@@ -437,6 +397,11 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
 /*                      Glyph brushing                                  */
 /*----------------------------------------------------------------------*/
 
+/*
+ * This currently isn't using the same arguments as its
+ * _color_ and _hidden_ cousins because we can't brush on line
+ * type yet.
+*/
 static gboolean
 update_glyph_vectors (gint i, gboolean changed, datad *d, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -495,6 +460,8 @@ build_glyph_vectors (datad *d, ggobid *gg)
   icoords imin, imax;
   gboolean changed = false;
   cpaneld *cpanel = &gg->current_display->cpanel;
+  gint nd = g_slist_length (gg->d);
+  extern void glyph_link_by_id (gint k, datad *source_d, ggobid *gg);
 
   brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
@@ -518,6 +485,10 @@ build_glyph_vectors (datad *d, ggobid *gg)
 
         } else {  /* update the vectors for this point only */
           changed = update_glyph_vectors (j, changed, d, gg);
+
+          /*-- link by id --*/
+          if (nd > 1) glyph_link_by_id (j, d, gg);
+          /*-- --*/
         }
       }
     }
@@ -560,10 +531,10 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
           d->color.els[i] = d->color_now.els[i] = gg->color_id;
-          break;
+        break;
         case BR_TRANSIENT:
           d->color_now.els[i] = gg->color_id;
-          break;
+        break;
       }
     } else d->color_now.els[i] = d->color.els[i];
   }
@@ -580,6 +551,8 @@ build_color_vectors (datad *d, ggobid *gg)
   icoords imin, imax;
   gboolean changed = false;
   cpaneld *cpanel = &gg->current_display->cpanel;
+  gint nd = g_slist_length (gg->d);
+  extern void color_link_by_id (gint k, datad *source_d, ggobid *gg);
 
   brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
@@ -604,6 +577,10 @@ build_color_vectors (datad *d, ggobid *gg)
         } else {  /* update the vectors for this point only */
           changed = update_color_vectors (j, changed,
             d->pts_under_brush.els, d, gg);
+
+          /*-- link by id --*/
+          if (nd > 1) color_link_by_id (j, d, gg);
+          /*-- --*/
         }
       }
     }
@@ -638,7 +615,7 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
     else
       doit = (d->hidden_now.els[i] != d->hidden.els[i]);
   }
-/* */
+  /* */
 
 /*
  * If doit is false, it's guaranteed that there will be no change.
@@ -649,10 +626,10 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
           d->hidden.els[i] = d->hidden_now.els[i] = true;
-          break;
+        break;
         case BR_TRANSIENT:
           d->hidden_now.els[i] = true;
-          break;
+        break;
       }
     } else d->hidden_now.els[i] = d->hidden.els[i];
   }
@@ -669,6 +646,8 @@ build_hidden_vectors (datad *d, ggobid *gg)
   icoords imin, imax;
   gboolean changed = false;
   cpaneld *cpanel = &gg->current_display->cpanel;
+  gint nd = g_slist_length (gg->d);
+  extern void hidden_link_by_id (gint k, datad *source_d, ggobid *gg);
 
   brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
@@ -694,6 +673,10 @@ build_hidden_vectors (datad *d, ggobid *gg)
         } else {  /* update the vectors for this point only */
           changed = update_hidden_vectors (j, changed,
             d->pts_under_brush.els, d, gg);
+
+          /*-- link by id --*/
+          if (nd > 1) hidden_link_by_id (j, d, gg);
+          /*-- --*/
         }
       }
     }
@@ -737,8 +720,8 @@ active_paint_points (datad *d, ggobid *gg)
           d->npts_under_brush++ ;
           d->pts_under_brush.els[pt] = 1;
 
-          /* brush other members of this row group */
           if (d->nrgroups > 0) {
+            /* brush other members of this row group */
             gp = d->rgroup_ids[pt];
             if (gp < d->nrgroups) {  /* exclude points without an rgroup */
               for (k=0; k<d->rgroups[gp].nels; k++) {

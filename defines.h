@@ -202,6 +202,13 @@ extern const gint ViewTypeIndeces[3];
 #define ZSCORE       5
 #define DISCRETE2    6
 
+/*
+ * identification
+*/
+#define STICKY_TOGGLE 0
+#define STICKY_ADD    1
+#define STICKY_REMOVE 2
+
 
 /*
  * jittering

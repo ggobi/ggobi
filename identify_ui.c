@@ -90,6 +90,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   datad *d = gg->current_display->d;
   gboolean button1_p, button2_p;
+  gint nd = g_slist_length (gg->d);
+  extern void identify_link_by_id (gint k, datad *source_d, ggobid *gg);
 
 /*
  * w = sp->da
@@ -101,6 +103,10 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
   k = find_nearest_point (&sp->mousepos, sp, d, gg);
   d->nearest_point = k;
+
+  /*-- link by id --*/
+  if (nd > 1) identify_link_by_id (k, d, gg);
+  /*-- --*/
 
   if (k != d->nearest_point_prev) {
     displays_plot (NULL, QUICK, gg);
@@ -116,41 +122,18 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   return true;  /* no need to propagate the event */
 }
 
-static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
 /*
  * If nearest_point is a member of gg->sticky_ids, remove it; if
  * it isn't, add it.
 */
-  ggobid *gg = GGobiFromSPlot (sp);
-  gint id;
-  gboolean id_in_list = false;
-  gpointer ptr;
-  datad *d = gg->current_display->d;
 
-  if (d->nearest_point != -1) {
-
-    if (g_slist_length (d->sticky_ids) > 0) {
-      GSList *l;
-      for (l = d->sticky_ids; l; l = l->next) {
-        id = GPOINTER_TO_INT (l->data);
-        if (id == d->nearest_point) {
-          id_in_list = true;
-          ptr = l->data;
-          break;
-        }
-      }
-
-      if (id_in_list)
-        d->sticky_ids = g_slist_remove (d->sticky_ids, ptr);
-    }
-
-    if (!id_in_list) {
-      ptr = GINT_TO_POINTER (d->nearest_point);
-      d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
-    }
-  }
+  ggobid *gg = GGobiFromSPlot(sp);
+  displayd *display = sp->displayptr;
+  datad *d = display->d;
+  extern void sticky_id_toggle (datad *, ggobid *);
+  sticky_id_toggle (d, gg);
 
   return true;
 }

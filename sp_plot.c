@@ -37,6 +37,9 @@ splot_colors_used_get (splotd *sp, gint *ncolors_used,
   gint i, k, m;
 
   *ncolors_used = 0;
+
+  if (d == NULL || d->nrows == 0)
+/**/return;
           
   /*
    * Loop once through d->color_now[], collecting the colors currently
@@ -804,7 +807,13 @@ splot_redraw (splotd *sp, gint redraw_style, ggobid *gg) {
   }
 
   splot_pixmap1_to_window (sp, gg);
-  if (sp == gg->current_splot)
+
+  /*
+   * Somehow the very first window is initially drawn without a border. 
+   * I ought to be able to fix that more nicely some day, but in the
+   * meantime, what's an extra rectangle?
+  */
+  if (sp == gg->current_splot) 
     splot_draw_border (sp, sp->da->window, gg);
 
   sp->redraw_style = EXPOSE;

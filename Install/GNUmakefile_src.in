@@ -16,6 +16,7 @@ SRC=\
     brush_api.c \
     brush_bins.c \
     brush_init.c \
+    brush_link.c \
     brush_ui.c \
     color.c \
     color_ui.c \
