@@ -283,7 +283,9 @@ scatmat_add_plot (gint xvar, gint yvar, gint col, gint row,
 {
   splotd *sp_new;
 
-  sp_new = splot_new (display, width, height, gg);
+  sp_new = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_SPLOT);
+  splot_init(sp_new, display, width, height, gg);
+
   sp_new->xyvars.x = xvar;
   sp_new->xyvars.y = yvar;
   sp_new->p1dvar = (sp_new->xyvars.x == sp_new->xyvars.y) ? xvar : -1;
