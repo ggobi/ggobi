@@ -59,7 +59,7 @@ typedef struct {
   KeyEventHandlerFunc handlerRoutine;
   void *userData;
   char *description;
-  ReleaseData *release;
+  ReleaseData *releaseData;
   ProgrammingLanguage language;
 } KeyEventHandler;
 

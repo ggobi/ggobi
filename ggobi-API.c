@@ -1318,7 +1318,7 @@ GGOBI(nrecords)(datad *data)
  See notes/NumberedKeys.*, splot.c and ggobi.h also for more details 
  */
 KeyEventHandler *
-GGOBI(registerNumberedKeyEventHandler)(KeyEventHandlerFunc routine, void *userData, char *description, ReleaseData *relaseData, ggobid *gg, ProgrammingLanguage lang)
+GGOBI(registerNumberedKeyEventHandler)(KeyEventHandlerFunc routine, void *userData, char *description, ReleaseData *releaseData, ggobid *gg, ProgrammingLanguage lang)
 {
   KeyEventHandler *old = gg->NumberedKeyEventHandler;
   KeyEventHandler *newValue;
@@ -1330,7 +1330,7 @@ GGOBI(registerNumberedKeyEventHandler)(KeyEventHandlerFunc routine, void *userDa
     newValue->userData = userData;
     newValue->description = g_strdup(description);
     newValue->language = lang;
-    newValue->ReleaseData = releaseData;
+    newValue->releaseData = releaseData;
   }
 
   gg->NumberedKeyEventHandler = newValue;
