@@ -24,7 +24,7 @@ ifndef PERL
  PERL=perl
 endif
 
-GGOBI_CFLAGS=$(shell cd $(GGOBI_HOME) ; make cflags)
+GGOBI_CFLAGS=$(shell cd $(GGOBI_HOME) ; $(MAKE) cflags)
 
 CFLAGS+= -g -Wall $(PERL_CFLAGS) $(GGOBI_INCLUDE_DIR) $(GGOBI_CFLAGS)
 

@@ -12,7 +12,7 @@ endif
 -include $(GGOBI_HOME)/local.config
 
 ifdef WIN32
-  GGOBI_MAKEFILE=-f Makefile.win32
+ GGOBI_MAKEFILE=-f Makefile.win32
 endif
 
 
@@ -23,7 +23,7 @@ ifdef GGOBI_CONFIG
 else
  GGOBI_INCLUDE_DIR=-I../..
  GGOBI_LIB=-L../.. -lggobi
- CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags $(GGOBI_MAKEFILE)) $(GGOBI_INCLUDE_DIR)
+ CFLAGS+=$(shell cd $(GGOBI_HOME) ; $(MAKE) cflags $(GGOBI_MAKEFILE)) $(GGOBI_INCLUDE_DIR)
 endif
 
 #GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi

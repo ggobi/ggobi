@@ -30,20 +30,17 @@ ifdef GGOBI_CONFIG
 else
  GGOBI_INCLUDE_DIR=-I../..
  GGOBI_LIB=-L../.. -lggobi
- CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags $(GGOBI_MAKEFILE)) $(GGOBI_INCLUDE_DIR)
+ CFLAGS+=$(shell cd $(GGOBI_HOME) ; $(MAKE) cflags $(GGOBI_MAKEFILE)) $(GGOBI_INCLUDE_DIR)
 endif
 
 
 ifdef GRAPHVIZ
-
 ifndef GRAPHVIZ_INCLUDES
    GRAPHVIZ_INCLUDES= $(shell $(DOTNEATO_CONFIG) --cflags)
 endif
-
 ifndef GRAPHVIZ_LIBS
  GRAPHVIZ_LIBS= $(shell $(DOTNEATO_CONFIG) --libs)
 endif
-
  CFLAGS+=-Wno-unknown-pragmas
  CFLAGS+=-DGRAPHVIZ=1 $(GRAPHVIZ_INCLUDES)
  LDFLAGS+=$(GRAPHVIZ_LIBS)

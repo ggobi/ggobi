@@ -27,7 +27,7 @@ else
 endif
 
 
-CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags)
+CFLAGS+=$(shell cd $(GGOBI_HOME) ; $(MAKE) cflags)
 
 CFLAGS+=$(GGOBI_INCLUDE_DIR) 
 
