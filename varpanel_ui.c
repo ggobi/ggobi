@@ -90,9 +90,9 @@ static void
 varsel_from_menu (GtkWidget *w, gpointer data)
 {
   varseldatad *vdata = (varseldatad *) data;
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
 
-  varsel (cpanel, current_splot, vdata->jvar, vdata->btn,
+  varsel (cpanel, xg.current_splot, vdata->jvar, vdata->btn,
     vdata->alt_mod, vdata->ctrl_mod, vdata->shift_mod);
 }
 
@@ -102,7 +102,7 @@ p1d_menu_build (gint jvar)
   GtkWidget *menu;
   static varseldatad vdata0, vdata1;
 
-  vdata0.sp = vdata1.sp = current_splot;
+  vdata0.sp = vdata1.sp = xg.current_splot;
   vdata0.jvar = vdata1.jvar = jvar;
   vdata0.alt_mod = vdata1.alt_mod = false;
 
@@ -128,7 +128,7 @@ xyplot_menu_build (gint jvar)
   GtkWidget *menu;
   static varseldatad vdata0, vdata1;
 
-  vdata0.sp = vdata1.sp = current_splot;
+  vdata0.sp = vdata1.sp = xg.current_splot;
   vdata0.jvar = vdata1.jvar = jvar;
   vdata0.alt_mod = vdata1.alt_mod = false;
 
@@ -154,7 +154,7 @@ rotation_menu_build (gint jvar)
   GtkWidget *menu;
   static varseldatad vdata0, vdata1, vdata2;
 
-  vdata0.sp = vdata1.sp = vdata2.sp = current_splot;
+  vdata0.sp = vdata1.sp = vdata2.sp = xg.current_splot;
   vdata0.jvar = vdata1.jvar = vdata2.jvar = jvar;
   vdata0.alt_mod = vdata1.alt_mod = vdata2.alt_mod = false;
 
@@ -182,7 +182,7 @@ tour2d_menu_build (gint jvar)
   GtkWidget *menu;
   static varseldatad vdata0, vdata1, vdata2;
 
-  vdata0.sp = vdata1.sp = vdata2.sp = current_splot;
+  vdata0.sp = vdata1.sp = vdata2.sp = xg.current_splot;
   vdata0.jvar = vdata1.jvar = vdata2.jvar = jvar;
   vdata0.alt_mod = vdata1.alt_mod = vdata2.alt_mod = false;
   vdata0.shift_mod = vdata2.shift_mod = false;
@@ -226,7 +226,7 @@ parcoords_menu_build (gint jvar)
   GtkWidget *menu;
   static varseldatad vdata0, vdata1;
 
-  vdata0.sp = vdata1.sp = current_splot;
+  vdata0.sp = vdata1.sp = xg.current_splot;
   vdata0.jvar = vdata1.jvar = jvar;
   vdata0.alt_mod = false;
   vdata1.alt_mod = true;
@@ -248,7 +248,7 @@ scatmat_menu_build (gint jvar)
   GtkWidget *menu;
   static varseldatad vdata0, vdata1, vdata2, vdata3;
 
-  vdata0.sp = vdata1.sp = vdata2.sp = vdata3.sp = current_splot;
+  vdata0.sp = vdata1.sp = vdata2.sp = vdata3.sp = xg.current_splot;
   vdata0.jvar = vdata1.jvar = vdata2.jvar = vdata3.jvar = jvar;
   vdata0.alt_mod = vdata1.alt_mod = false;
   vdata2.alt_mod = vdata3.alt_mod = 3;
@@ -275,7 +275,7 @@ scatmat_menu_build (gint jvar)
 
 static gint
 popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd) {
-  displayd *display = current_display;
+  displayd *display = xg.current_display;
   cpaneld *cpanel;
   gint jvar = GPOINTER_TO_INT (cbd);
   GtkWidget *p1d_menu, *xyplot_menu;
@@ -408,8 +408,8 @@ variable_clone (gint jvar) {
 static gint
 varsel_cb (GtkWidget *w, GdkEvent *event, gpointer cbd)
 {
-  cpaneld *cpanel = &current_display->cpanel;
-  splotd *sp = current_splot;
+  cpaneld *cpanel = &xg.current_display->cpanel;
+  splotd *sp = xg.current_splot;
   gint jvar = GPOINTER_TO_INT (cbd);
 
   if (event->type == GDK_BUTTON_PRESS) {
@@ -443,16 +443,16 @@ varcircle_draw (gint jvar)
   /*--  a single pixmap is shared among all variable circles --*/
   static GdkPixmap *vpixmap = NULL;
   gint r = VAR_CIRCLE_DIAM/2;
-  cpaneld *cpanel = &current_display->cpanel;
-  splotd *sp = current_splot;
+  cpaneld *cpanel = &xg.current_display->cpanel;
+  splotd *sp = xg.current_splot;
   gboolean chosen = false;
   GList *l;
   splotd *s;
 
-  if (current_splot == NULL || jvar < 0 || jvar >= xg.ncols)
+  if (xg.current_splot == NULL || jvar < 0 || jvar >= xg.ncols)
     return;  /*-- return --*/
 
-  if (selvarfg_GC == NULL) 
+  if (xg.selvarfg_GC == NULL) 
     init_var_GCs (da[jvar]);
 
   if (vpixmap == NULL) {
@@ -461,26 +461,26 @@ varcircle_draw (gint jvar)
   }
 
   /*-- clear the pixmap --*/
-  gdk_draw_rectangle (vpixmap, unselvarbg_GC, true,
+  gdk_draw_rectangle (vpixmap, xg.unselvarbg_GC, true,
                       0, 0, VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
 
   /*-- add a filled circle for the background --*/
-  gdk_draw_arc (vpixmap, selvarbg_GC, true,
+  gdk_draw_arc (vpixmap, xg.selvarbg_GC, true,
                 0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM,
                 0, 64 * 360);
 
   /*-- add the appropriate line --*/
-  switch (current_display->displaytype) {
+  switch (xg.current_display->displaytype) {
 
     case  parcoords:  /* only one mode, a 1d plot */
-      l = current_display->splots;
+      l = xg.current_display->splots;
       while (l) {
         s = (splotd *) l->data;
         if (s->p1dvar == jvar) {
-          if (current_display->p1d_orientation == HORIZONTAL)
-            gdk_draw_line (vpixmap, selvarfg_GC, r, r, r+r, r);
+          if (xg.current_display->p1d_orientation == HORIZONTAL)
+            gdk_draw_line (vpixmap, xg.selvarfg_GC, r, r, r+r, r);
           else
-            gdk_draw_line (vpixmap, selvarfg_GC, r, r, r, 0);
+            gdk_draw_line (vpixmap, xg.selvarfg_GC, r, r, r, 0);
           chosen = true;
           break;
         }
@@ -492,19 +492,19 @@ varcircle_draw (gint jvar)
       switch (cpanel->projection) {
         case P1PLOT:
           if (jvar == sp->p1dvar) {
-            if (current_display->p1d_orientation == HORIZONTAL)
-              gdk_draw_line (vpixmap, selvarfg_GC, r, r, r+r, r);
+            if (xg.current_display->p1d_orientation == HORIZONTAL)
+              gdk_draw_line (vpixmap, xg.selvarfg_GC, r, r, r+r, r);
             else
-              gdk_draw_line (vpixmap, selvarfg_GC, r, r, r, 0);
+              gdk_draw_line (vpixmap, xg.selvarfg_GC, r, r, r, 0);
             chosen = true;
           }
           break;
         case XYPLOT:
           if (jvar == sp->xyvars.x) {
-            gdk_draw_line (vpixmap, selvarfg_GC, r, r, r+r, r);
+            gdk_draw_line (vpixmap, xg.selvarfg_GC, r, r, r+r, r);
             chosen = true;
           } else if (jvar == sp->xyvars.y) {
-            gdk_draw_line (vpixmap, selvarfg_GC, r, r, r, 0);
+            gdk_draw_line (vpixmap, xg.selvarfg_GC, r, r, r, 0);
             chosen = true;
           }
           break;
@@ -512,15 +512,15 @@ varcircle_draw (gint jvar)
       break;
 
     case  scatmat:
-      l = current_display->splots;
+      l = xg.current_display->splots;
       while (l) {
         s = (splotd *) l->data;
         if (s->p1dvar == -1) {
           if (s->xyvars.x == jvar) {
-            gdk_draw_line (vpixmap, selvarfg_GC, r, r, r+r, r);
+            gdk_draw_line (vpixmap, xg.selvarfg_GC, r, r, r+r, r);
             chosen = true;
           } else if (s->xyvars.y == jvar) {
-            gdk_draw_line (vpixmap, selvarfg_GC, r, r, r, 0);
+            gdk_draw_line (vpixmap, xg.selvarfg_GC, r, r, r, 0);
             chosen = true;
           }
         }
@@ -536,11 +536,11 @@ varcircle_draw (gint jvar)
    * add an open circle for the outline
   */
   if (chosen) {
-    gdk_draw_arc (vpixmap, selvarfg_GC, false,
+    gdk_draw_arc (vpixmap, xg.selvarfg_GC, false,
                 0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM,
                 0, 64 * 360);
   } else {
-    gdk_draw_arc (vpixmap, unselvarfg_GC, false,
+    gdk_draw_arc (vpixmap, xg.unselvarfg_GC, false,
                 0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM,
                 0, 64 * 360);
   }
@@ -549,7 +549,7 @@ varcircle_draw (gint jvar)
   /*
    * copy the pixmap to the window
   */
-  gdk_draw_pixmap (da[jvar]->window, unselvarfg_GC, vpixmap, 0, 0, 0, 0,
+  gdk_draw_pixmap (da[jvar]->window, xg.unselvarfg_GC, vpixmap, 0, 0, 0, 0,
     VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
 }
 
@@ -635,7 +635,7 @@ void varpanel_populate ()
 void
 make_varpanel (GtkWidget *parent) {
 
-  selvarfg_GC = NULL;
+  xg.selvarfg_GC = NULL;
 
   varpanel_accel_group = gtk_accel_group_new ();
 

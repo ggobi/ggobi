@@ -594,7 +594,7 @@ line_colors_read (gchar *ldata_in, gboolean reinit)
   if (reinit)
     br_line_color_ids_alloc ();
 
-  if (!mono_p) {
+  if (!xg.mono_p) {
     /*
      * Check if line colors file exists.
     */
@@ -743,7 +743,7 @@ nlinkable_read (gchar *ldata_in, gboolean init)
   if (init)
     xg.nlinkable = xg.nrows;
 
-  if (ldata_in != NULL && data_in != "" && strcmp (ldata_in, "stdin") != 0)
+  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
     if ( (fp=open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
   
@@ -854,7 +854,7 @@ missing_values_read (gchar *ldata_in, gboolean init)
         g_print ("Problem reading %s.missing", ldata_in);
         g_print (" at row %d, column %d.\n", i, j);
         g_print ("Make sure dimensions of %s and %s.missing match\n",
-          data_in, data_in);
+          ldata_in, ldata_in);
         fclose (fp);
         exit (1);
       }

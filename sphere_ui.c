@@ -97,32 +97,32 @@ for (j=0; j<nsphvars; j++)
 g_printerr ("(expose) sphvar %d eval %f\n", sphvars[j], evals[j]);
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (plot_GC, &xg.bg_color);
-  gdk_draw_rectangle (scree_pixmap, plot_GC,
+  gdk_gc_set_foreground (xg.plot_GC, &xg.bg_color);
+  gdk_draw_rectangle (scree_pixmap, xg.plot_GC,
                       true, 0, 0,
                       w->allocation.width,
                       w->allocation.height);
 
-  gdk_gc_set_foreground (plot_GC, &xg.accent_color);
-  gdk_draw_line (scree_pixmap, plot_GC, 10, 90, 190, 90);
-  gdk_draw_line (scree_pixmap, plot_GC, 10, 90, 10, 10);
+  gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
+  gdk_draw_line (scree_pixmap, xg.plot_GC, 10, 90, 190, 90);
+  gdk_draw_line (scree_pixmap, xg.plot_GC, 10, 90, 10, 10);
 
   for (j=0; j<nsphvars; j++) {
     xpos = (gint) (180./(gfloat)(nsphvars-1)*j+10);
     ypos = (gint) (90. - evals[j]/evals[0]*80.);
 
     tickmk = g_strdup_printf ("%d", j+1);
-    gdk_draw_string (scree_pixmap, style->font, plot_GC, xpos, 95, tickmk);
+    gdk_draw_string (scree_pixmap, style->font, xg.plot_GC, xpos, 95, tickmk);
     g_free (tickmk);
 
     if (j>0) 
-      gdk_draw_line (scree_pixmap, plot_GC, xstrt, ystrt, xpos, ypos);
+      gdk_draw_line (scree_pixmap, xg.plot_GC, xstrt, ystrt, xpos, ypos);
 
     xstrt = xpos;
     ystrt = ypos;
   }
 
-  gdk_draw_pixmap (w->window, plot_GC, scree_pixmap,
+  gdk_draw_pixmap (w->window, xg.plot_GC, scree_pixmap,
                    0, 0, 0, 0,
                    w->allocation.width,
                    w->allocation.height);

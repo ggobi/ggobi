@@ -56,5 +56,5 @@ setVariableName(gint jvar, gchar *name)
 void 
 destroyCurrentDisplay ()
 {
-  display_free(current_display);
+  display_free (xg.current_display);
 }

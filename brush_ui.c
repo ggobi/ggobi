@@ -16,19 +16,19 @@ static GtkWidget *brush_on_btn;
 
 static void brush_on_cb (GtkToggleButton *button)
 {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   cpanel->brush_on_p = button->active;
 }
 
 static void brush_undo_cb (GtkToggleButton *button)
 {
-  brush_undo (current_splot);
+  brush_undo (xg.current_splot);
 }
 
 static gchar *scope_lbl[] = {"Points", "Lines", "Points and lines"};
 static void brush_scope_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   cpanel->br_scope = GPOINTER_TO_INT (cbd);
 }
 
@@ -36,14 +36,14 @@ static gchar *cg_lbl[] =
   {"Color and glyph", "Color only", "Glyph only", "Glyph size only", "Erase"};
 static void brush_cg_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   cpanel->br_target = GPOINTER_TO_INT (cbd);
 }
 
 static gchar *mode_lbl[] = {"Persistent", "Transient"};
 static void brush_mode_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   cpanel->br_mode = GPOINTER_TO_INT (cbd);
 }
 
@@ -95,7 +95,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
   mousepos_get_motion (w, event, &button1_p, &button2_p);
 
   if (button1_p || button2_p)
-    brush_motion (&mousepos, button1_p, button2_p, cpanel);
+    brush_motion (&xg.mousepos, button1_p, button2_p, cpanel);
 
   return true;
 }
@@ -107,9 +107,9 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean retval = true;
   gboolean button1_p, button2_p;
 
-  current_splot = sp;
-  current_display = (displayd *) sp->displayptr;
-  cpanel = &current_display->cpanel;
+  xg.current_splot = sp;
+  xg.current_display = (displayd *) sp->displayptr;
+  cpanel = &xg.current_display->cpanel;
 
   brush_prev_vectors_update ();
 
@@ -122,7 +122,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   brush_set_pos (event->x, event->y);
 
-  brush_motion (&mousepos, button1_p, button2_p, cpanel);
+  brush_motion (&xg.mousepos, button1_p, button2_p, cpanel);
 
   return retval;
 }
@@ -132,8 +132,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -255,15 +255,15 @@ void
 cpanel_brush_make () {
   GtkWidget *btn;
   
-  control_panel[BRUSH] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[BRUSH]), 5);
+  xg.control_panel[BRUSH] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[BRUSH]), 5);
 
   brush_on_btn = gtk_check_button_new_with_label ("Brush on");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), brush_on_btn,
     "Make the brush active or inactive", NULL);
   gtk_signal_connect (GTK_OBJECT (brush_on_btn), "toggled",
                      GTK_SIGNAL_FUNC (brush_on_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
                       brush_on_btn, false, false, 0);
 
 /*
@@ -272,7 +272,7 @@ cpanel_brush_make () {
   scope_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), scope_opt,
     "Brush points only, lines only, or both points and lines", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
                       scope_opt, false, false, 0);
   populate_option_menu (scope_opt, scope_lbl,
                         sizeof (scope_lbl) / sizeof (gchar *),
@@ -286,7 +286,7 @@ cpanel_brush_make () {
   cg_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), cg_opt,
     "Brush with color and glyph, color, glyph, glyph size; or erase", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
                       cg_opt, false, false, 0);
   populate_option_menu (cg_opt, cg_lbl,
                         sizeof (cg_lbl) / sizeof (gchar *),
@@ -299,7 +299,7 @@ cpanel_brush_make () {
   mode_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), mode_opt,
     "Persistent or transient brushing", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
                       mode_opt, false, false, 0);
   populate_option_menu (mode_opt, mode_lbl,
                         sizeof (mode_lbl) / sizeof (gchar *),
@@ -311,7 +311,7 @@ cpanel_brush_make () {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
     "Undo the most recent brushing changes, from button down to button up",
     NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
                       btn, false, false, 0);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (brush_undo_cb), NULL);
@@ -325,7 +325,7 @@ cpanel_brush_make () {
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (open_symbol_window_cb),
                       (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
                       btn, false, false, 1);
 
 /*
@@ -336,10 +336,10 @@ cpanel_brush_make () {
                         btn,
                         "Open panel for hiding or excluding brushed groups",
                         NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
                       btn, false, false, 1);
 
-  gtk_widget_show_all (control_panel[BRUSH]);
+  gtk_widget_show_all (xg.control_panel[BRUSH]);
 }
 
 /*--------------------------------------------------------------------*/

@@ -624,13 +624,13 @@ tour_do_step (displayd *dsp) {
 /*
 void * tour_thread (void *args)
 {
-  displayd *dsp = current_display;
+  displayd *dsp = xg.current_display;
   cpaneld *cpanel = &dsp->cpanel;
 
   while (true) {
     if (mode_get () == TOUR2D && !cpanel->is_tour_paused) {
       gdk_threads_enter ();
-      run_tour (current_display);
+      run_tour (dsp);
       gdk_threads_leave ();
     }
   }
@@ -643,12 +643,12 @@ static int tour_idle = 0;
 gint
 tour_idle_func (gpointer idled)
 {
-  displayd *dsp = current_display;
+  displayd *dsp = xg.current_display;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean doit = !cpanel->is_tour_paused;
 
   if (doit) {
-    run_tour (current_display);
+    run_tour (dsp);
     gdk_flush ();
   }
 

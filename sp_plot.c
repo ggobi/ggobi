@@ -117,17 +117,17 @@ splot_draw_to_pixmap0_unbinned (splotd *sp)
   displayd *display = (displayd *) sp->displayptr;
   gboolean draw_case;
 
-  if (plot_GC == NULL)
+  if (xg.plot_GC == NULL)
     init_plot_GC (sp->pixmap0);
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (plot_GC, &xg.bg_color);
-  gdk_draw_rectangle (sp->pixmap0, plot_GC,
+  gdk_gc_set_foreground (xg.plot_GC, &xg.bg_color);
+  gdk_draw_rectangle (sp->pixmap0, xg.plot_GC,
                       TRUE, 0, 0,
                       da->allocation.width,
                       da->allocation.height);
 
-  if (!mono_p) {
+  if (!xg.mono_p) {
     splot_point_colors_used_get (sp, &npoint_colors_used,
       point_colors_used, false);
 
@@ -138,7 +138,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp)
     */
     for (k=0; k<npoint_colors_used; k++) {
       current_color = point_colors_used[k];
-      gdk_gc_set_foreground (plot_GC, &xg.default_color_table[current_color]);
+      gdk_gc_set_foreground (xg.plot_GC,
+        &xg.default_color_table[current_color]);
 
 #ifdef _WIN32
       win32_draw_to_pixmap_unbinned (current_color, sp);
@@ -182,11 +183,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp)
           if (display->displaytype == parcoords) {
             if (display->segments_show_p) {
               n = 2*m;
-              gdk_draw_line (sp->pixmap0, plot_GC,
+              gdk_draw_line (sp->pixmap0, xg.plot_GC,
                 sp->whiskers[n].x1, sp->whiskers[n].y1,
                 sp->whiskers[n].x2, sp->whiskers[n].y2);
               n++;
-              gdk_draw_line (sp->pixmap0, plot_GC,
+              gdk_draw_line (sp->pixmap0, xg.plot_GC,
                 sp->whiskers[n].x1, sp->whiskers[n].y1,
                 sp->whiskers[n].x2, sp->whiskers[n].y2);
             }
@@ -215,7 +216,7 @@ splot_draw_to_pixmap0_binned (splotd *sp)
   static gint npoint_colors_used = 0;
   static gushort point_colors_used[NCOLORS+2];
 
-  if (plot_GC == NULL)
+  if (xg.plot_GC == NULL)
     init_plot_GC (sp->pixmap0);
 
 /*
@@ -246,15 +247,15 @@ splot_draw_to_pixmap0_binned (splotd *sp)
   loc_clear1.y = (bin1.y == xg.br_nbins-1) ? sp->max.y : loc1.y - BRUSH_MARGIN;
 
 
-  gdk_gc_set_foreground (plot_GC, &xg.bg_color);
-  gdk_draw_rectangle (sp->pixmap0, plot_GC,
+  gdk_gc_set_foreground (xg.plot_GC, &xg.bg_color);
+  gdk_draw_rectangle (sp->pixmap0, xg.plot_GC,
                       true,  /* fill */
                       loc_clear0.x, loc_clear0.y,
                       1 + loc_clear1.x - loc_clear0.x ,
                       1 + loc_clear1.y - loc_clear0.y);
 
   if (display->points_show_p) {
-    if (!mono_p) {
+    if (!xg.mono_p) {
 
       splot_point_colors_used_get (sp, &npoint_colors_used,
         point_colors_used, true);  /* true = binned */
@@ -265,7 +266,8 @@ splot_draw_to_pixmap0_binned (splotd *sp)
       */
       for (k=0; k<npoint_colors_used; k++) {
         current_color = point_colors_used[k];
-        gdk_gc_set_foreground (plot_GC, &xg.default_color_table[current_color]);
+        gdk_gc_set_foreground (xg.plot_GC,
+          &xg.default_color_table[current_color]);
 
 #ifdef _WIN32
         win32_draw_to_pixmap_binned (&bin0, &bin1, current_color, sp);
@@ -280,11 +282,11 @@ splot_draw_to_pixmap0_binned (splotd *sp)
                 /* parallel coordinate plot whiskers */
                 if (display->displaytype == parcoords) {
                   n = 2*i;
-                  gdk_draw_line (sp->pixmap0, plot_GC,
+                  gdk_draw_line (sp->pixmap0, xg.plot_GC,
                     sp->whiskers[n].x1, sp->whiskers[n].y1,
                     sp->whiskers[n].x2, sp->whiskers[n].y2);
                   n++;
-                  gdk_draw_line (sp->pixmap0, plot_GC,
+                  gdk_draw_line (sp->pixmap0, xg.plot_GC,
                     sp->whiskers[n].x1, sp->whiskers[n].y1,
                     sp->whiskers[n].x2, sp->whiskers[n].y2);
                 }
@@ -319,7 +321,7 @@ splot_add_plot_labels (splotd *sp) {
   cpaneld *cpanel = &display->cpanel;
   gint dtype = display->displaytype;
 
-  gdk_gc_set_foreground (plot_GC, &xg.accent_color);
+  gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
 
   if (dtype == scatterplot || dtype == scatmat) {
     if ((dtype == scatterplot && cpanel->projection == XYPLOT) ||
@@ -330,7 +332,7 @@ splot_add_plot_labels (splotd *sp) {
         xg.vardata[ sp->xyvars.x ].collab_tform,
         strlen (xg.vardata[ sp->xyvars.x ].collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (sp->pixmap1, style->font, plot_GC,
+      gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
         xg.vardata[ sp->xyvars.x ].collab_tform);
@@ -339,7 +341,7 @@ splot_add_plot_labels (splotd *sp) {
         xg.vardata[ sp->xyvars.y ].collab_tform,
         strlen (xg.vardata[ sp->xyvars.y ].collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (sp->pixmap1, style->font, plot_GC,
+      gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
         5, 5 + ascent + descent,
         xg.vardata[ sp->xyvars.y ].collab_tform);
     }
@@ -352,7 +354,7 @@ splot_add_plot_labels (splotd *sp) {
         xg.vardata[ sp->p1dvar ].collab_tform,
         strlen (xg.vardata[ sp->p1dvar ].collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (sp->pixmap1, style->font, plot_GC,
+      gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
         xg.vardata[ sp->p1dvar ].collab_tform);
@@ -364,7 +366,7 @@ splot_add_plot_labels (splotd *sp) {
       xg.vardata[ sp->p1dvar ].collab_tform,
       strlen (xg.vardata[ sp->p1dvar ].collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (sp->pixmap1, style->font, plot_GC,
+    gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
       5,
       sp->max.y - 5,
       xg.vardata[ sp->p1dvar ].collab_tform);
@@ -382,26 +384,26 @@ splot_add_point_label (splotd *sp, gint k) {
     &lbearing, &rbearing, &width, &ascent, &descent);
 
   if (sp->screen[k].x <= sp->max.x/2)
-    gdk_draw_string (sp->pixmap1, style->font, plot_GC,
+    gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
       sp->screen[k].x+2, sp->screen[k].y-2, xg.rowlab[k]);
   else
-    gdk_draw_string (sp->pixmap1, style->font, plot_GC,
+    gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
       sp->screen[k].x - width - 2, sp->screen[k].y-2, xg.rowlab[k]);
 }
 
 void
 splot_draw_border (splotd *sp) {
   if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
-    gdk_gc_set_foreground (plot_GC, &xg.accent_color);
-    gdk_gc_set_line_attributes (plot_GC,
+    gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
+    gdk_gc_set_line_attributes (xg.plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
-    gdk_draw_rectangle (sp->pixmap1, plot_GC,
+    gdk_draw_rectangle (sp->pixmap1, xg.plot_GC,
       FALSE, 1, 1, sp->da->allocation.width-3, sp->da->allocation.height-3);
-    gdk_draw_pixmap (sp->da->window, plot_GC, sp->pixmap1,
+    gdk_draw_pixmap (sp->da->window, xg.plot_GC, sp->pixmap1,
       0, 0, 0, 0, sp->da->allocation.width, sp->da->allocation.height);
 
-    gdk_gc_set_line_attributes (plot_GC,
+    gdk_gc_set_line_attributes (xg.plot_GC,
       0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
   }
 }
@@ -456,7 +458,7 @@ segments_draw (splotd *sp)
   gboolean doit;
   displayd *display = (displayd *) sp->displayptr;
 
-  if (!mono_p) {
+  if (!xg.mono_p) {
     splot_line_colors_used_get (sp, &nline_colors_used, line_colors_used);
 
     /*
@@ -512,13 +514,14 @@ segments_draw (splotd *sp)
           }
         }
       }
-      if (!mono_p)
-        gdk_gc_set_foreground (plot_GC, &xg.default_color_table[current_color]);
+      if (!xg.mono_p)
+        gdk_gc_set_foreground (xg.plot_GC,
+          &xg.default_color_table[current_color]);
 
-      gdk_draw_segments (sp->pixmap1, plot_GC, sp->segments, nl);
+      gdk_draw_segments (sp->pixmap1, xg.plot_GC, sp->segments, nl);
 
       if (display->segments_directed_show_p) {
-        gdk_draw_segments (sp->pixmap1, plot_GC, sp->arrowheads, nl);
+        gdk_draw_segments (sp->pixmap1, xg.plot_GC, sp->arrowheads, nl);
       }
     }
   }
@@ -536,12 +539,12 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned) {
   gint mode = mode_get ();
 
   if (!binned)
-    gdk_draw_pixmap (sp->pixmap1, plot_GC, sp->pixmap0,
+    gdk_draw_pixmap (sp->pixmap1, xg.plot_GC, sp->pixmap0,
                      0, 0, 0, 0,
                      w->allocation.width,
                      w->allocation.height);
   else
-    gdk_draw_pixmap (sp->pixmap1, plot_GC, sp->pixmap0,
+    gdk_draw_pixmap (sp->pixmap1, xg.plot_GC, sp->pixmap0,
                       loc0.x, loc0.y,
                       loc0.x, loc0.y,
                       1 + loc1.x - loc0.x ,
@@ -559,7 +562,7 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned) {
     splot_add_plot_labels (sp);
   }
 
-  if (sp == current_splot) {
+  if (sp == xg.current_splot) {
     splot_draw_border (sp);
 
     switch (mode) {
@@ -578,7 +581,7 @@ void
 splot_pixmap1_to_window (splotd *sp) {
   GtkWidget *w = sp->da;
 
-  gdk_draw_pixmap (w->window, plot_GC, sp->pixmap1,
+  gdk_draw_pixmap (w->window, xg.plot_GC, sp->pixmap1,
                    0, 0, 0, 0,
                    w->allocation.width,
                    w->allocation.height);

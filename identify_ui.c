@@ -32,7 +32,7 @@ displays_add_point_labels (splotd *splot, gint k) {
   splotd *sp;
   GtkWidget *w;
 
-  for (dlist = displays; dlist; dlist = dlist->next) {
+  for (dlist = xg.displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
     for (slist = display->splots; slist; slist = slist->next) {
       sp = (splotd *) slist->data;
@@ -57,7 +57,7 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
  * sp = gtk_object_get_data (GTK_OBJECT (w), "splotd"));
 */
 
-  gdk_gc_set_foreground (plot_GC, &xg.accent_color);
+  gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
   gdk_window_get_pointer (w->window, &cursor_pos.x, &cursor_pos.y, NULL);
   k = find_nearest_point (&cursor_pos, sp);
 
@@ -143,8 +143,8 @@ void
 cpanel_identify_make() {
   GtkWidget *btn;
   
-  control_panel[IDENT] = gtk_vbox_new(false, VBOX_SPACING);
-  gtk_container_set_border_width(GTK_CONTAINER(control_panel[IDENT]), 5);
+  xg.control_panel[IDENT] = gtk_vbox_new(false, VBOX_SPACING);
+  gtk_container_set_border_width(GTK_CONTAINER(xg.control_panel[IDENT]), 5);
 
 /*
  * button for removing all labels
@@ -155,7 +155,7 @@ cpanel_identify_make() {
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (id_remove_labels_cb),
                       (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[IDENT]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[IDENT]),
                       btn, false, false, 1);
 
 /*
@@ -167,9 +167,9 @@ cpanel_identify_make() {
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (id_all_sticky_cb),
                       (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[IDENT]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[IDENT]),
                       btn, false, false, 1);
 
-  gtk_widget_show_all (control_panel[IDENT]);
+  gtk_widget_show_all (xg.control_panel[IDENT]);
 }
 

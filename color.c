@@ -99,11 +99,11 @@ init_plot_GC (GdkWindow *w) {
   gdk_color_white (gdk_colormap_get_system (), &white);
   gdk_color_black (gdk_colormap_get_system (), &black);
 
-  plot_GC = gdk_gc_new (w);
-  gdk_gc_set_foreground (plot_GC, &white);
-  gdk_gc_set_background (plot_GC, &black);
+  xg.plot_GC = gdk_gc_new (w);
+  gdk_gc_set_foreground (xg.plot_GC, &white);
+  gdk_gc_set_background (xg.plot_GC, &black);
   /* line_width, GdkLineStyle, GdkCapStyle, GdkJoinStyle */
-  gdk_gc_set_line_attributes (plot_GC,
+  gdk_gc_set_line_attributes (xg.plot_GC,
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 }
 
@@ -119,24 +119,24 @@ init_var_GCs (GtkWidget *w) {
 /*
  * the unselected variable GCs: thin lines
 */
-  unselvarbg_GC = gdk_gc_new (window);
+  xg.unselvarbg_GC = gdk_gc_new (window);
   bg = style->bg[GTK_STATE_NORMAL];
-  gdk_gc_set_foreground (unselvarbg_GC, &bg);
+  gdk_gc_set_foreground (xg.unselvarbg_GC, &bg);
 
-  unselvarfg_GC = gdk_gc_new (window);
-  gdk_gc_set_line_attributes(unselvarfg_GC,
+  xg.unselvarfg_GC = gdk_gc_new (window);
+  gdk_gc_set_line_attributes (xg.unselvarfg_GC,
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (unselvarfg_GC, &black);
+  gdk_gc_set_foreground (xg.unselvarfg_GC, &black);
 
 
 /*
  * the selected variable GC: thick lines
 */
-  selvarfg_GC = gdk_gc_new (window);
-  gdk_gc_set_line_attributes(selvarfg_GC,
+  xg.selvarfg_GC = gdk_gc_new (window);
+  gdk_gc_set_line_attributes (xg.selvarfg_GC,
     2, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (selvarfg_GC, &black);
+  gdk_gc_set_foreground (xg.selvarfg_GC, &black);
 
-  selvarbg_GC = gdk_gc_new (window);
-  gdk_gc_set_foreground (selvarbg_GC, &white);
+  xg.selvarbg_GC = gdk_gc_new (window);
+  gdk_gc_set_foreground (xg.selvarbg_GC, &white);
 }

@@ -70,11 +70,11 @@ win32_draw_arcs (GdkDrawable *drawable,
 {
   gint i;
   for (i=0; i<narcs; i++) {
-    gdk_draw_arc (drawable, plot_GC, false,
+    gdk_draw_arc (drawable, xg.plot_GC, false,
       arcs[i].x, arcs[i].y,
       arcs[i].width, arcs[i].height, 0, (gshort) 23040);
     if (filled)
-      gdk_draw_arc (drawable, plot_GC, filled,
+      gdk_draw_arc (drawable, xg.plot_GC, filled,
         arcs[i].x, arcs[i].y,
         arcs[i].width, arcs[i].height, 0, (gshort) 23040);
   }
@@ -224,23 +224,23 @@ draw_glyphs (GdkDrawable *drawable,
   arcd *open_arcs,     gint nc_open,
   arcd *filled_arcs,   gint nc_filled)
 {
-  if (plot_GC == NULL)
+  if (xg.plot_GC == NULL)
     init_plot_GC (drawable);
 
   if (np)
-    gdk_draw_points (drawable, plot_GC, points, np);
+    gdk_draw_points (drawable, xg.plot_GC, points, np);
   if (ns)
-    gdk_draw_segments (drawable, plot_GC, segs, ns);
+    gdk_draw_segments (drawable, xg.plot_GC, segs, ns);
 
   if (nr_open)
-    win32_draw_rectangles (drawable, plot_GC, OPEN, open_rects, nr_open);
+    win32_draw_rectangles (drawable, xg.plot_GC, OPEN, open_rects, nr_open);
   if (nr_filled)
-    win32_draw_rectangles (drawable, plot_GC, FILL, filled_rects, nr_filled);
+    win32_draw_rectangles (drawable, xg.plot_GC, FILL, filled_rects, nr_filled);
 
   if (nc_open)
-    win32_draw_arcs (drawable, plot_GC, OPEN, open_arcs, nc_open);
+    win32_draw_arcs (drawable, xg.plot_GC, OPEN, open_arcs, nc_open);
   if (nc_filled)
-    win32_draw_arcs (drawable, plot_GC, FILL, filled_arcs, nc_filled);
+    win32_draw_arcs (drawable, xg.plot_GC, FILL, filled_arcs, nc_filled);
 }
 
 void
@@ -271,7 +271,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp)
       }
     }
   }
-  gdk_draw_segments (sp->pixmap0, plot_GC, whisker_segs, nwhisker_segs);
+  gdk_draw_segments (sp->pixmap0, xg.plot_GC, whisker_segs, nwhisker_segs);
   draw_glyphs (sp->pixmap0,
     points, npt,           segs, nseg,
     open_rects, nr_open,   filled_rects, nr_filled,
@@ -307,7 +307,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
       }
     }
   }
-  gdk_draw_segments (sp->pixmap0, plot_GC, whisker_segs, nwhisker_segs);
+  gdk_draw_segments (sp->pixmap0, xg.plot_GC, whisker_segs, nwhisker_segs);
   draw_glyphs (sp->pixmap0,
     points, npt,           segs, nseg,
     open_rects, nr_open,   filled_rects, nr_filled,

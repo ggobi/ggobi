@@ -34,7 +34,7 @@ static void mdir_cb (GtkWidget *w, gpointer cbd)
 static gint
 motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  current_splot = sp;
+  xg.current_splot = sp;
 
   g_printerr ("(mp_motion_notify_cb) sp size %d %d\n", sp->max.x, sp->max.y);
 
@@ -44,11 +44,11 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  current_display = (displayd *) sp->displayptr;
-  current_splot = sp;
+  xg.current_display = (displayd *) sp->displayptr;
+  xg.current_splot = sp;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -63,10 +63,10 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  current_splot = sp;
+  xg.current_splot = sp;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -94,14 +94,15 @@ void
 cpanel_movepts_make () {
   GtkWidget *btn, *opt, *box, *hb, *lbl;
   
-  control_panel[MOVEPTS] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[MOVEPTS]), 5);
+  xg.control_panel[MOVEPTS] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[MOVEPTS]), 5);
 
 /*
  * option menu: direction of motion 
 */
   hb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[MOVEPTS]), hb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[MOVEPTS]),
+                      hb, false, false, 0);
 
   lbl = gtk_label_new ("Direction of motion:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 1);
@@ -124,7 +125,7 @@ cpanel_movepts_make () {
     "Use variable groups: move an entire group together", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
                      GTK_SIGNAL_FUNC (use_groups_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[MOVEPTS]), btn, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[MOVEPTS]), btn, false, false, 1);
 
 /*
  * Box to hold reset buttons
@@ -145,7 +146,8 @@ cpanel_movepts_make () {
                      GTK_SIGNAL_FUNC (undo_last_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), btn, false, false, 1);
 
-  gtk_box_pack_start (GTK_BOX (control_panel[MOVEPTS]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[MOVEPTS]),
+                      box, false, false, 1);
 
-  gtk_widget_show_all (control_panel[MOVEPTS]);
+  gtk_widget_show_all (xg.control_panel[MOVEPTS]);
 }

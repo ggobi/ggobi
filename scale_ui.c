@@ -34,14 +34,14 @@ scale_init () {
 */
 void
 reset_pan_cb (GtkWidget *w, gpointer cbd) {
-  splotd *sp = current_splot;
+  splotd *sp = xg.current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
   sp->ishift.x = sp->max.x/2;
   sp->ishift.y = sp->max.y/2;
 
   splot_plane_to_screen (display, &display->cpanel, sp);
-  ruler_ranges_set (current_display, sp);
+  ruler_ranges_set (xg.current_display, sp);
   splot_redraw (sp, FULL);
 }
 void
@@ -66,7 +66,7 @@ interaction_style_cb (GtkToggleButton *w) {
   gtk_widget_set_sensitive (pan_opt, (scale_style == CLICK));
   gtk_widget_set_sensitive (zoom_opt, (scale_style == CLICK));
 
-  splot_redraw (current_splot, QUICK);
+  splot_redraw (xg.current_splot, QUICK);
 }
 
 static void clickoptions_cb (GtkToggleButton *w)
@@ -75,7 +75,7 @@ static void clickoptions_cb (GtkToggleButton *w)
   g_printerr ("in interaction_style_cb: %s\n",
     (scale_click_opt == PAN) ? "PAN" : "ZOOM");
 
-  splot_redraw (current_splot, QUICK);
+  splot_redraw (xg.current_splot, QUICK);
 }
 
 static gchar *panoptions_lbl[] = {"Oblique",
@@ -94,7 +94,7 @@ static void zoomoptions_cb (GtkWidget *w, gpointer cbd)
 {
   scale_zoom_opt = GPOINTER_TO_INT (cbd);
   g_printerr ("cbd: %s\n", zoomoptions_lbl[scale_zoom_opt]);
-  splot_redraw (current_splot, QUICK);
+  splot_redraw (xg.current_splot, QUICK);
 }
 
 /*--------------------------------------------------------------------*/
@@ -111,7 +111,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   mousepos_get_motion (w, event, &button1_p, &button2_p);
 
   /*-- I'm not sure this could ever happen --*/
-  if (mousepos.x == mousepos_o.x && mousepos.y == mousepos_o.y)
+  if (xg.mousepos.x == xg.mousepos_o.x && xg.mousepos.y == xg.mousepos_o.y)
     return false;
 
   switch (scale_style) {
@@ -125,7 +125,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
       /*-- redisplay this plot --*/
       splot_plane_to_screen (display, &display->cpanel, sp);
-      ruler_ranges_set (current_display, sp);
+      ruler_ranges_set (xg.current_display, sp);
       splot_redraw (sp, FULL);
       break;
 
@@ -135,8 +135,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
   }  /*-- end switch (scale_style) --*/
 
-  mousepos_o.x = mousepos.x;
-  mousepos_o.y = mousepos.y;
+  xg.mousepos_o.x = xg.mousepos.x;
+  xg.mousepos_o.y = xg.mousepos.y;
 
   return true;
 }
@@ -190,11 +190,11 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  current_splot = sp;
-  current_display = (displayd *) sp->displayptr;
+  xg.current_splot = sp;
+  xg.current_display = (displayd *) sp->displayptr;
 
-  mousepos_o.x = mousepos.x = event->x;
-  mousepos_o.y = mousepos.y = event->y;
+  xg.mousepos_o.x = xg.mousepos.x = event->x;
+  xg.mousepos_o.y = xg.mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -208,8 +208,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -284,8 +284,8 @@ cpanel_scale_make () {
 
   scale_init ();
 
-  control_panel[SCALE] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[SCALE]), 5);
+  xg.control_panel[SCALE] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[SCALE]), 5);
 
   
 /*
@@ -293,7 +293,8 @@ cpanel_scale_make () {
 */
   frame = gtk_frame_new ("Interaction style");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (control_panel[SCALE]), frame, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[SCALE]),
+                      frame, false, false, 0);
 
   hbox = gtk_hbox_new (true, 1);
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 3);
@@ -320,7 +321,8 @@ cpanel_scale_make () {
 */
   frame = gtk_frame_new ("Click-style controls");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (control_panel[SCALE]), frame, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[SCALE]),
+                      frame, false, false, 0);
 
   vbox = gtk_vbox_new (true, 1);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 3);
@@ -396,7 +398,7 @@ cpanel_scale_make () {
   gtk_widget_set_sensitive (pan_opt, (scale_style == CLICK));
   gtk_widget_set_sensitive (zoom_opt, (scale_style == CLICK));
 
-  gtk_widget_show_all (control_panel[SCALE]);
+  gtk_widget_show_all (xg.control_panel[SCALE]);
 }
 
 void
@@ -405,22 +407,22 @@ scale_click_zoom_rect_calc (splotd *sp, gint sc_zoom_opt) {
   mid.x = sp->max.x / 2;
   mid.y = sp->max.y / 2;
 
-  if (mousepos.x <= mid.x && mousepos.y <= mid.y) {
+  if (xg.mousepos.x <= mid.x && xg.mousepos.y <= mid.y) {
     /* upper left quadrant of plot, based on the value of mid */
-    scale_click_rect.x = mousepos.x;
-    scale_click_rect.y = mousepos.y;
-  } else if (mousepos.x <= mid.x && mousepos.y > mid.y) {
+    scale_click_rect.x = xg.mousepos.x;
+    scale_click_rect.y = xg.mousepos.y;
+  } else if (xg.mousepos.x <= mid.x && xg.mousepos.y > mid.y) {
     /* lower left quadrant of plot */
-    scale_click_rect.x = mousepos.x;
-    scale_click_rect.y = mid.y - (mousepos.y - mid.y);
-  } else if (mousepos.x > mid.x && mousepos.y > mid.y) {
+    scale_click_rect.x = xg.mousepos.x;
+    scale_click_rect.y = mid.y - (xg.mousepos.y - mid.y);
+  } else if (xg.mousepos.x > mid.x && xg.mousepos.y > mid.y) {
     /* lower right quadrant of plot */
-    scale_click_rect.x = mid.x - (mousepos.x - mid.x);
-    scale_click_rect.y = mid.y - (mousepos.y - mid.y);
-  } else if (mousepos.x > mid.x && mousepos.y <= mid.y) {
+    scale_click_rect.x = mid.x - (xg.mousepos.x - mid.x);
+    scale_click_rect.y = mid.y - (xg.mousepos.y - mid.y);
+  } else if (xg.mousepos.x > mid.x && xg.mousepos.y <= mid.y) {
     /* upper right quadrant of plot */
-    scale_click_rect.x = mid.x - (mousepos.x - mid.x);
-    scale_click_rect.y = mousepos.y;
+    scale_click_rect.x = mid.x - (xg.mousepos.x - mid.x);
+    scale_click_rect.y = xg.mousepos.y;
   }
   scale_click_rect.x = (mid.x - scale_click_rect.x < 20) ?
                        (mid.x - 20) :
@@ -463,10 +465,10 @@ scaling_visual_cues_draw (splotd *sp) {
   switch (scale_style) {
 
     case DRAG:
-      gdk_draw_line (sp->pixmap1, plot_GC,
+      gdk_draw_line (sp->pixmap1, xg.plot_GC,
         0, sp->ishift.y,
         sp->da->allocation.width, sp->ishift.y);
-      gdk_draw_line (sp->pixmap1, plot_GC,
+      gdk_draw_line (sp->pixmap1, xg.plot_GC,
         sp->ishift.x, 0,
         sp->ishift.x, sp->da->allocation.height);
       break;
@@ -474,13 +476,13 @@ scaling_visual_cues_draw (splotd *sp) {
     case CLICK:
       switch (scale_click_opt) {
         case PAN:
-          gdk_draw_line (sp->pixmap1, plot_GC,
+          gdk_draw_line (sp->pixmap1, xg.plot_GC,
             sp->max.x/2, sp->max.y/2,
-            mousepos.x, mousepos.y);
+            xg.mousepos.x, xg.mousepos.y);
           break;
         case ZOOM:
           scale_click_zoom_rect_calc (sp, scale_zoom_opt);
-          gdk_draw_rectangle (sp->pixmap1, plot_GC, false,
+          gdk_draw_rectangle (sp->pixmap1, xg.plot_GC, false,
             scale_click_rect.x, scale_click_rect.y,
             scale_click_rect.width, scale_click_rect.height);
           break;

@@ -144,15 +144,15 @@ parse_command_line (gint *argc, gchar **av)
       xg.ncols = atoi (*av); av++;
       xg.Spath = g_strconcat (*av, G_DIR_SEPARATOR_S); av++;
 
-      data_in = g_strdup (*av);
+      xg.data_in = g_strdup (*av);
     }
   }
   else /* if (xg.data_mode == ascii || xg.data_mode == binary) */
   {
     if (*argc == 0)
-      data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
+      xg.data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
     else
-      data_in = g_strdup_printf (av[0]);
+      xg.data_in = g_strdup_printf (av[0]);
   }
 
   return 1;
@@ -179,9 +179,9 @@ gint XGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
 
   vis = gdk_visual_get_system ();
 
-  mono_p = (vis->depth == 1 ||
-            vis->type == GDK_VISUAL_STATIC_GRAY ||
-            vis->type == GDK_VISUAL_GRAYSCALE);
+  xg.mono_p = (vis->depth == 1 ||
+               vis->type == GDK_VISUAL_STATIC_GRAY ||
+               vis->type == GDK_VISUAL_GRAYSCALE);
 
   g_print ("progname = %s\n", g_get_prgname());
 
@@ -191,10 +191,10 @@ gint XGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
   xg.file_read_type = read_all;
 
   parse_command_line (&argc, argv);
-  g_print ("data_in = %s\n", data_in);
+  g_print ("data_in = %s\n", xg.data_in);
 
-  make_ggobi (data_in, processEvents);
+  make_ggobi (xg.data_in, processEvents);
 
-  g_free (data_in);
+  g_free (xg.data_in);
   return (0);
 }

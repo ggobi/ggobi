@@ -30,7 +30,7 @@ void tour2d_pause (cpaneld *cpanel, gboolean state) {
 
 static void tour2d_pause_cb (GtkToggleButton *button)
 {
-  tour2d_pause (&current_display->cpanel, button->active);
+  tour2d_pause (&xg.current_display->cpanel, button->active);
 }
 
 static void reinit_cb (GtkWidget *w) {
@@ -65,8 +65,8 @@ cpanel_tour2d_make () {
   GtkObject *adj;
   GtkWidget *manip_opt;
   
-  control_panel[TOUR2D] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[TOUR2D]), 5);
+  xg.control_panel[TOUR2D] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[TOUR2D]), 5);
 
 /*
  * speed scrollbar
@@ -84,7 +84,7 @@ cpanel_tour2d_make () {
     "Adjust speed of tour motion", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]), sbar,
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[TOUR2D]), sbar,
     false, false, 1);
 
 /*
@@ -106,7 +106,7 @@ cpanel_tour2d_make () {
                      GTK_SIGNAL_FUNC (reinit_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[TOUR2D]), box, false, false, 1);
 
 
 /*
@@ -114,7 +114,7 @@ cpanel_tour2d_make () {
 */
 
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[TOUR2D]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Manual manipulation:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -136,7 +136,7 @@ cpanel_tour2d_make () {
     "Show principal component axes or plain variable axes", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                       GTK_SIGNAL_FUNC (pcaxes_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[TOUR2D]),
                       tgl, false, false, 1);
 
 /*
@@ -145,7 +145,7 @@ cpanel_tour2d_make () {
   btn = gtk_button_new_with_label ("Projection pursuit ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
     "Open panel for grand tour projection pursuit", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[TOUR2D]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (tour2dpp_cb), NULL);
@@ -156,12 +156,12 @@ cpanel_tour2d_make () {
   btn = gtk_button_new_with_label ("Advanced features ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
     "Open panel for additional grand tour features", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[TOUR2D]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (tour2dadv_cb), NULL);
 
-  gtk_widget_show_all (control_panel[TOUR2D]);
+  gtk_widget_show_all (xg.control_panel[TOUR2D]);
 }
 
 
@@ -210,7 +210,7 @@ static void step_cb (GtkToggleButton *tgl, GtkWidget *btn)
 }
 static void go_cb (GtkButton *button)
 {
-  displayd *dsp = current_display; 
+  displayd *dsp = xg.current_display; 
 
   g_printerr ("go\n");
   g_printerr ("in go_cb %f \n",dsp->tau[0]);
@@ -469,11 +469,11 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  current_splot = sp;
-  current_display = (displayd *) sp->displayptr;
+  xg.current_splot = sp;
+  xg.current_display = (displayd *) sp->displayptr;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -487,8 +487,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 

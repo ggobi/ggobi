@@ -209,11 +209,11 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
   GtkWidget *da;
   gfloat ratio = 1.0;
   GtkTableChild *child;
-  displayd *display = current_display;
+  displayd *display = xg.current_display;
   gint scatmat_ncols = g_list_length (display->scatmat_cols);
   gint scatmat_nrows = g_list_length (display->scatmat_rows);
 
-  /* The row and column of current_splot */
+  /* The row and column of xg.current_splot */
   gint sprow = -1, spcol = -1;
 
   /* If jvar is one of the plotted variables, its row and column */
@@ -226,7 +226,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
     child = (GtkTableChild *) l->data;
     da = child->widget;
     s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
-    if (s == current_splot) {
+    if (s == xg.current_splot) {
       sprow = child->top_attach;
       spcol = child->left_attach;
     }
@@ -247,7 +247,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
     }
   }
 
-  splot_get_dimensions (current_splot, &width, &height);
+  splot_get_dimensions (xg.current_splot, &width, &height);
 
 /*
  * If the alt key is pressed and jvar is plotted, delete a
@@ -297,7 +297,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
                                            (gpointer) s);
           gtk_container_remove (GTK_CONTAINER (display->table), da);
 
-          if (s == current_splot)
+          if (s == xg.current_splot)
             sp_event_handlers_toggle (s, off);
           splot_free (s, display);
         } else {
@@ -324,9 +324,9 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
 
 /*
  * I'm not sure this is necessary -- am I checking whether the
- * current_splot was deleted?
+ * xg.current_splot was deleted?
 */
-      current_splot = (splotd *) g_list_nth_data (display->splots, 0);
+      xg.current_splot = (splotd *) g_list_nth_data (display->splots, 0);
     }
     redraw = false;
 
@@ -474,16 +474,16 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
           gtk_widget_show (sp_new->da);
 
           /* We don't care where, I think */
-          display->splots = g_list_append (current_display->splots,
+          display->splots = g_list_append (xg.current_display->splots,
             (gpointer) sp_new);
         }
       }
 
 
-      gtk_table_resize (GTK_TABLE (current_display->table),
+      gtk_table_resize (GTK_TABLE (xg.current_display->table),
                         scatmat_nrows, scatmat_ncols);
 
-      current_splot = sp_new;
+      xg.current_splot = sp_new;
       redraw = true;
     }
   }

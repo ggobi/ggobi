@@ -12,7 +12,7 @@
 void
 assign_points_to_bins ()
 {
-  splotd *sp = current_splot;
+  splotd *sp = xg.current_splot;
   gint i, k, ih, iv;
 
   /*
@@ -109,7 +109,7 @@ gboolean
 point_in_which_bin (gint x, gint y, gint *ih, gint *iv)
 {
   gboolean inwindow = true;
-  splotd *sp = current_splot;
+  splotd *sp = xg.current_splot;
 
   *ih = (gint) ((gfloat) xg.br_nbins * (gfloat) x / (sp->max.x+1.0));
   *iv = (gint) ((gfloat) xg.br_nbins * (gfloat) y / (sp->max.y+1.0));

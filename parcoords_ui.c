@@ -18,25 +18,25 @@ static void arrangement_cb (GtkWidget *w, gpointer cbd)
   gint indx = GPOINTER_TO_INT (cbd);
   g_printerr ("cbd: %s\n", arrangement_lbl[indx]);
 
-  if (indx != current_display->cpanel.parcoords_arrangement)
-    parcoords_reset_arrangement (current_display, indx);
+  if (indx != xg.current_display->cpanel.parcoords_arrangement)
+    parcoords_reset_arrangement (xg.current_display, indx);
 
-  current_display->cpanel.parcoords_arrangement = indx;
+  xg.current_display->cpanel.parcoords_arrangement = indx;
 }
 
 static gchar *type_lbl[] = {"Texturing", "ASH", "Dotplot"};
 static void type_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   cpanel->p1d_type = GPOINTER_TO_INT (cbd);
 
-  display_tailpipe (current_display);
+  display_tailpipe (xg.current_display);
 }
 
 static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append"};
 static void selection_mode_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   cpanel->parcoords_selection_mode = GPOINTER_TO_INT (cbd);
 }
 
@@ -63,14 +63,14 @@ cpanel_parcoords_make () {
   GtkWidget *vbox, *vb, *lbl, *sbar, *opt;
   GtkObject *adj;
   
-  control_panel[PCPLOT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[PCPLOT]), 5);
+  xg.control_panel[PCPLOT] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[PCPLOT]), 5);
 
 /*
  * arrangement of plots, row or column
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[PCPLOT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Plot arrangement:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -89,7 +89,7 @@ cpanel_parcoords_make () {
  * option menu: selection mode
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[PCPLOT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -108,7 +108,7 @@ cpanel_parcoords_make () {
  * option menu
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[PCPLOT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Spreading method:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -128,7 +128,7 @@ cpanel_parcoords_make () {
  * ASH smoothness
 */
   vbox = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[PCPLOT]), vbox,
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[PCPLOT]), vbox,
     false, false, 0);
 
   lbl = gtk_label_new ("ASH smoothness:"),
@@ -188,7 +188,7 @@ cpanel_parcoords_make () {
                         sizeof (varscale_lbl) / sizeof (gchar *),
                         varscale_cb);
 
-  gtk_widget_show_all (control_panel[PCPLOT]);
+  gtk_widget_show_all (xg.control_panel[PCPLOT]);
 }
 
 

@@ -20,21 +20,21 @@ static gint margin = 10;  /* between glyphs in the symbol_display */
 static void
 redraw_fg (GtkWidget *w, gint k) {
 
-  if (plot_GC == NULL)
+  if (xg.plot_GC == NULL)
     init_plot_GC (w->window);
 
-  gdk_gc_set_foreground (plot_GC, &xg.default_color_table[k]);
-  gdk_draw_rectangle (w->window, plot_GC,
+  gdk_gc_set_foreground (xg.plot_GC, &xg.default_color_table[k]);
+  gdk_draw_rectangle (w->window, xg.plot_GC,
     true, 0, 0, w->allocation.width, w->allocation.height);
 
   /*
    * Draw a background border around the box containing the selected color
   */
   if (k == xg.color_id) {
-    gdk_gc_set_foreground (plot_GC, &xg.bg_color);
-    gdk_draw_rectangle (w->window, plot_GC,
+    gdk_gc_set_foreground (xg.plot_GC, &xg.bg_color);
+    gdk_draw_rectangle (w->window, xg.plot_GC,
       false, 0, 0, w->allocation.width-1, w->allocation.height-1);
-    gdk_draw_rectangle (w->window, plot_GC,
+    gdk_draw_rectangle (w->window, xg.plot_GC,
       false, 1, 1, w->allocation.width-2, w->allocation.height-2);
   }
 }
@@ -92,20 +92,20 @@ redraw_symbol_display (GtkWidget *w) {
 
   spacing = w->allocation.width/NGLYPHTYPES;
 
-  if (plot_GC == NULL)
+  if (xg.plot_GC == NULL)
     init_plot_GC (w->window);
 
-  gdk_gc_set_foreground (plot_GC, &xg.bg_color);
-  gdk_draw_rectangle (w->window, plot_GC,
+  gdk_gc_set_foreground (xg.plot_GC, &xg.bg_color);
+  gdk_draw_rectangle (w->window, xg.plot_GC,
     true, 0, 0, w->allocation.width, w->allocation.height);
-  gdk_gc_set_foreground (plot_GC, &xg.default_color_table[xg.color_id]);
+  gdk_gc_set_foreground (xg.plot_GC, &xg.default_color_table[xg.color_id]);
 
   /*
    * The factor of three is dictated by the sizing of circles
   */
   pos.y = margin + 3/2;
   pos.x = spacing/2;
-  gdk_draw_point (w->window, plot_GC, pos.x, pos.y);
+  gdk_draw_point (w->window, xg.plot_GC, pos.x, pos.y);
 
   pos.y = 0;
   for (i=0; i<NGLYPHSIZES; i++) {
@@ -137,18 +137,18 @@ redraw_symbol_display (GtkWidget *w) {
     draw_glyph (w->window, &g, &pos, 0);
   }
   
-  if (!mono_p) {
+  if (!xg.mono_p) {
     icoords p;
     /*-- NGLYPHSIZES is the size of the largest glyph --*/
     gint radius = (3*NGLYPHSIZES)/2 + margin/2;
     find_selection_circle_pos (&p);
 
-    gdk_gc_set_foreground (plot_GC, &xg.accent_color);
-    gdk_gc_set_line_attributes (plot_GC,
+    gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
+    gdk_gc_set_line_attributes (xg.plot_GC,
       2, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    gdk_draw_arc (w->window, plot_GC, false, p.x-radius, p.y-radius,
+    gdk_draw_arc (w->window, xg.plot_GC, false, p.x-radius, p.y-radius,
       2*radius, 2*radius, 0, (gshort) 23040);
-    gdk_gc_set_line_attributes (plot_GC,
+    gdk_gc_set_line_attributes (xg.plot_GC,
       0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
   }
 }
@@ -156,22 +156,22 @@ redraw_symbol_display (GtkWidget *w) {
 static void
 redraw_bg (GtkWidget *w) {
 
-  if (plot_GC == NULL)
+  if (xg.plot_GC == NULL)
     init_plot_GC (w->window);
 
-  gdk_gc_set_foreground (plot_GC, &xg.bg_color);
-  gdk_draw_rectangle (w->window, plot_GC,
+  gdk_gc_set_foreground (xg.plot_GC, &xg.bg_color);
+  gdk_draw_rectangle (w->window, xg.plot_GC,
     true, 0, 0, w->allocation.width, w->allocation.height);
 }
 
 static void
 redraw_accent (GtkWidget *w) {
 
-  if (plot_GC == NULL)
+  if (xg.plot_GC == NULL)
     init_plot_GC (w->window);
 
-  gdk_gc_set_foreground (plot_GC, &xg.accent_color);
-  gdk_draw_rectangle (w->window, plot_GC,
+  gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
+  gdk_draw_rectangle (w->window, xg.plot_GC,
     true, 0, 0, w->allocation.width, w->allocation.height);
 }
 
@@ -181,7 +181,7 @@ color_changed_cb (GtkWidget *colorsel)
   gdouble color[3];
   GdkColor gdk_color;
   GdkColormap *cmap = gdk_colormap_get_system ();
-  splotd *sp = current_splot;
+  splotd *sp = xg.current_splot;
   GtkWidget *wheel = GTK_COLOR_SELECTION (colorsel)->wheel_area;
 
   /* Get current color */
@@ -319,7 +319,7 @@ set_color_fg ( GtkWidget *w, GdkEventButton *event )
   gint i;
   gint prev = xg.color_id;
   gint k = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w), "index"));
-  splotd *sp = current_splot;
+  splotd *sp = xg.current_splot;
 
   for (i=0; i<xg.nrows; i++)
     xg.color_prev[i] = xg.color_ids[i];
@@ -379,7 +379,7 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event) {
   glyphv g;
   gint i, dsq, nearest_dsq, type, size, rval = false;
   icoords pos, ev;
-  splotd *sp = current_splot;
+  splotd *sp = xg.current_splot;
 
   for (i=0; i<xg.nrows; i++) { 
     xg.glyph_prev[i].type = xg.glyph_ids[i].type;

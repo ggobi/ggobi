@@ -38,23 +38,24 @@ size_allocate_cb (GtkWidget *w, GdkEvent *event)
   if (!initd ) {  /*-- only do this once --*/
 
     /*-- Use the largest control panel, which is currently COTOUR --*/
-    gint lgst = COTOUR;
+    GtkWidget *largest_panel = xg.control_panel[COTOUR];
+    GtkWidget *mode_panel = xg.control_panel[mode];
 
     /* remove the xyplot panel */
-    gtk_widget_ref (control_panel[mode]);
-    gtk_container_remove (GTK_CONTAINER (mode_frame), control_panel[mode]);
+    gtk_widget_ref (mode_panel);
+    gtk_container_remove (GTK_CONTAINER (mode_frame), mode_panel);
 
     /* add the largest panel and resize */
-    gtk_container_add (GTK_CONTAINER (mode_frame), control_panel[lgst]);
+    gtk_container_add (GTK_CONTAINER (mode_frame), largest_panel);
     gtk_container_check_resize (GTK_CONTAINER (w));
 
     /* remove the largest panel and restore the xyplot panel */
-    gtk_widget_ref (control_panel[lgst]);
-    gtk_container_remove (GTK_CONTAINER (mode_frame), control_panel[lgst]);
-    gtk_container_add (GTK_CONTAINER (mode_frame), control_panel[mode]);
+    gtk_widget_ref (largest_panel);
+    gtk_container_remove (GTK_CONTAINER (mode_frame), largest_panel);
+    gtk_container_add (GTK_CONTAINER (mode_frame), mode_panel);
 
     /*-- widen the variable selection panel --*/
-    varpanel_size_init (control_panel[lgst]->requisition.height);
+    varpanel_size_init (largest_panel->requisition.height);
 
     initd = true;
   }
@@ -105,19 +106,20 @@ main_display_options_cb (gpointer data, guint action, GtkCheckMenuItem *w) {
       break;
 
     case 2:
-      if (current_display != NULL) {
+      if (xg.current_display != NULL) {
+        displayd *display = xg.current_display;
 
-        if (current_display->displaytype == scatterplot) {
-          if (current_display->hrule != NULL &&
-              current_display->cpanel.projection == XYPLOT)
+        if (display->displaytype == scatterplot) {
+          if (display->hrule != NULL &&
+              display->cpanel.projection == XYPLOT)
           {
             if (w->active) {
-              gtk_widget_show (current_display->hrule);
-              gtk_widget_show (current_display->vrule);
+              gtk_widget_show (display->hrule);
+              gtk_widget_show (display->vrule);
             }
             else {
-              gtk_widget_hide (current_display->hrule);
-              gtk_widget_hide (current_display->vrule);
+              gtk_widget_hide (display->hrule);
+              gtk_widget_hide (display->vrule);
             }
           }
         }
@@ -291,17 +293,17 @@ projection_get () {
 */
 void 
 mode_set (gint m) {
-  displayd *display = current_display;
+  displayd *display = xg.current_display;
 
   mode = m;
   if (mode != prev_mode) {
     /* Add a reference to the widget so it isn't destroyed */
-    gtk_widget_ref (control_panel[prev_mode]);
+    gtk_widget_ref (xg.control_panel[prev_mode]);
     gtk_container_remove (GTK_CONTAINER (mode_frame),
-                          control_panel[prev_mode]);
+                          xg.control_panel[prev_mode]);
   
     gtk_frame_set_label (GTK_FRAME (mode_frame), mode_name[mode]);
-    gtk_container_add (GTK_CONTAINER (mode_frame), control_panel[mode]);
+    gtk_container_add (GTK_CONTAINER (mode_frame), xg.control_panel[mode]);
   }
 
   /*
@@ -381,20 +383,22 @@ mode_activate (splotd *sp, gint m, gboolean state) {
 void
 mode_set_cb (gpointer cbd, guint action, GtkWidget *widget)
 {
-  if (current_display != NULL && current_splot != NULL) {
+  if (xg.current_display != NULL && xg.current_splot != NULL) {
+    splotd *sp = xg.current_splot;
+    displayd *display = xg.current_display;
 
-    sp_event_handlers_toggle (current_splot, off);
-    mode_activate (current_splot, mode, off);
-    mode_submenus_activate (current_splot, mode, off);
+    sp_event_handlers_toggle (sp, off);
+    mode_activate (sp, mode, off);
+    mode_submenus_activate (sp, mode, off);
 
-    current_display->cpanel.mode = action;
+    display->cpanel.mode = action;
     mode_set (action);  /* mode = action */
 
-    sp_event_handlers_toggle (current_splot, on);
-    mode_activate (current_splot, mode, on);
-    mode_submenus_activate (current_splot, mode, on);
+    sp_event_handlers_toggle (sp, on);
+    mode_activate (sp, mode, on);
+    mode_submenus_activate (sp, mode, on);
 
-    display_tailpipe (current_display);
+    display_tailpipe (display);
   }
 }
 
@@ -599,7 +603,7 @@ void make_ui () {
   gtk_frame_set_shadow_type (GTK_FRAME (mode_frame), GTK_SHADOW_IN);
 
   make_control_panels ();
-  gtk_container_add (GTK_CONTAINER (mode_frame), control_panel[mode]);
+  gtk_container_add (GTK_CONTAINER (mode_frame), xg.control_panel[mode]);
 
   /*-- Variable selection panel --*/
   make_varpanel (hbox);

@@ -37,56 +37,54 @@ draw_glyph (GdkDrawable *drawable, glyphv *gl, icoords *xypos, gint jpos)
   switch (gl->type) {
 
     case PLUS_GLYPH:
-      gdk_draw_line (drawable, plot_GC,
+      gdk_draw_line (drawable, xg.plot_GC,
         xypos[jpos].x - size, xypos[jpos].y,
         xypos[jpos].x + size, xypos[jpos].y);
-      gdk_draw_line (drawable, plot_GC,
+      gdk_draw_line (drawable, xg.plot_GC,
         xypos[jpos].x, xypos[jpos].y - size,
         xypos[jpos].x, xypos[jpos].y + size);
       break;
     case X_GLYPH:
-      gdk_draw_line (drawable, plot_GC,
+      gdk_draw_line (drawable, xg.plot_GC,
         xypos[jpos].x - size, xypos[jpos].y - size,
         xypos[jpos].x + size, xypos[jpos].y + size);
-      gdk_draw_line (drawable, plot_GC,
+      gdk_draw_line (drawable, xg.plot_GC,
         xypos[jpos].x + size, xypos[jpos].y - size,
         xypos[jpos].x - size, xypos[jpos].y + size);
       break;
     case OPEN_RECTANGLE:
-      gdk_draw_rectangle (drawable, plot_GC, false,
+      gdk_draw_rectangle (drawable, xg.plot_GC, false,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size);
       break;
     case FILLED_RECTANGLE:
-      gdk_draw_rectangle (drawable, plot_GC, false,
+      gdk_draw_rectangle (drawable, xg.plot_GC, false,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size);
-      gdk_draw_rectangle (drawable, plot_GC, true,
+      gdk_draw_rectangle (drawable, xg.plot_GC, true,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size);
       break;
     case OPEN_CIRCLE:
-      gdk_draw_arc (drawable, plot_GC, false,
+      gdk_draw_arc (drawable, xg.plot_GC, false,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size, 0, (gshort) 23040);
       break;
     case FILLED_CIRCLE:
-      gdk_draw_arc (drawable, plot_GC, false,
+      gdk_draw_arc (drawable, xg.plot_GC, false,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size, 0, (gshort) 23040);
-      gdk_draw_arc (drawable, plot_GC, true,
+      gdk_draw_arc (drawable, xg.plot_GC, true,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size, 0, (gshort) 23040);
       break;
     case POINT_GLYPH:
-      gdk_draw_point (drawable, plot_GC, xypos[jpos].x, xypos[jpos].y);
+      gdk_draw_point (drawable, xg.plot_GC, xypos[jpos].x, xypos[jpos].y);
       break;
     default:
       g_printerr ("build_glyph: impossible glyph type %d\n", gl->type);
   }
 }
-
-/*-- mousepos is a global variable --*/
 
 void
 mousepos_get_pressed (GtkWidget *w, GdkEventButton *event,
@@ -95,8 +93,8 @@ mousepos_get_pressed (GtkWidget *w, GdkEventButton *event,
   *btn1_down_p = false;
   *btn2_down_p = false;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
   if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
     *btn1_down_p = true;
   else if ((event->state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
@@ -107,7 +105,7 @@ mousepos_get_pressed (GtkWidget *w, GdkEventButton *event,
 
 void
 mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
-              gboolean *btn1_down_p, gboolean *btn2_down_p)
+                     gboolean *btn1_down_p, gboolean *btn2_down_p)
 {
   GdkModifierType state;
 
@@ -117,7 +115,7 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
   /*-- that is, if using motion hints --*/
   if (event->is_hint) {
 
-    gdk_window_get_pointer (w->window, &mousepos.x, &mousepos.y, &state);
+    gdk_window_get_pointer (w->window, &xg.mousepos.x, &xg.mousepos.y, &state);
     if ((state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
       *btn1_down_p = true;
     else if ((state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
@@ -127,8 +125,8 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
 
   } else {
 
-    mousepos.x = event->x;
-    mousepos.y = event->y;
+    xg.mousepos.x = event->x;
+    xg.mousepos.y = event->y;
     if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
       *btn1_down_p = true;
     else if ((event->state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)

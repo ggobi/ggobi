@@ -36,7 +36,7 @@ brush_once (gboolean force)
   gint lrx = MAX (brush_pos.x1, brush_pos.x2);
   gint lry = MAX (brush_pos.y1, brush_pos.y2);
   gboolean changed = false;
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
 
   if (!point_in_which_bin (ulx, uly, &xg.bin0.x, &xg.bin0.y)) {
     xg.bin0.x = MAX (xg.bin0.x, 0);
@@ -134,7 +134,7 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   cpaneld *cpanel)
 {
   gboolean changed = false;
-  splotd *sp = current_splot;
+  splotd *sp = xg.current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
   if (button1_p)
@@ -178,7 +178,7 @@ under_brush (gint k)
  * Determine if point is under the brush.
 */
 {
-  splotd *sp = current_splot;
+  splotd *sp = xg.current_splot;
   gint pt;
   gint x1 = MIN (brush_pos.x1, brush_pos.x2);
   gint x2 = MAX (brush_pos.x1, brush_pos.x2);
@@ -224,7 +224,7 @@ brush_draw_label (splotd *sp) {
     gdk_text_extents (style->font, 
       str, strlen (str),
       &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (sp->pixmap1, style->font, plot_GC,
+    gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
       sp->max.x - width - 5,
       ascent + descent + 5,
       str);
@@ -237,7 +237,7 @@ brush_draw_brush (splotd *sp) {
 /*
  * Use brush_pos to draw the brush.
 */
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   gboolean point_painting_p =
      (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDL);
   gboolean line_painting_p =
@@ -248,48 +248,48 @@ brush_draw_brush (splotd *sp) {
   gint y1 = MIN (brush_pos.y1, brush_pos.y2);
   gint y2 = MAX (brush_pos.y1, brush_pos.y2);
 
-  if (!mono_p) {
+  if (!xg.mono_p) {
     if ((xg.default_color_table[xg.color_id].red != xg.bg_color.red) ||
         (xg.default_color_table[xg.color_id].blue != xg.bg_color.blue) ||
         (xg.default_color_table[xg.color_id].green != xg.bg_color.green))
     {
-      gdk_gc_set_foreground (plot_GC, &xg.default_color_table[xg.color_id]);
+      gdk_gc_set_foreground (xg.plot_GC, &xg.default_color_table[xg.color_id]);
     } else {
-      gdk_gc_set_foreground (plot_GC, &xg.accent_color);
+      gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
     }
   }
 
   if (point_painting_p)
   {
-    gdk_draw_rectangle (sp->pixmap1, plot_GC, false,
+    gdk_draw_rectangle (sp->pixmap1, xg.plot_GC, false,
       x1, y1, (x2>x1)?(x2-x1):(x1-x2), (y2>y1)?(y2-y1):(y1-y2));
     /* Mark the corner to which the cursor will be attached */
-    gdk_draw_rectangle (sp->pixmap1, plot_GC, true,
+    gdk_draw_rectangle (sp->pixmap1, xg.plot_GC, true,
       brush_pos.x2-1, brush_pos.y2-1, 2, 2);
 
     /*
      * highlight brush
     */
     if (cpanel->brush_on_p) {
-      gdk_draw_rectangle (sp->pixmap1, plot_GC, false,
+      gdk_draw_rectangle (sp->pixmap1, xg.plot_GC, false,
         x1-1, y1-1, (x2>x1)?(x2-x1+2):(x1-x2+2), (y2>y1)?(y2-y1+2):(y1-y2+2)); 
 
       /* Mark the corner to which the cursor will be attached */
-      gdk_draw_rectangle (sp->pixmap1, plot_GC, true,
+      gdk_draw_rectangle (sp->pixmap1, xg.plot_GC, true,
         brush_pos.x2-2, brush_pos.y2-2, 4, 4);
     }
   }
 
   if (line_painting_p) {
-    gdk_draw_line (sp->pixmap1, plot_GC,
+    gdk_draw_line (sp->pixmap1, xg.plot_GC,
       x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2 );
-    gdk_draw_line (sp->pixmap1, plot_GC,
+    gdk_draw_line (sp->pixmap1, xg.plot_GC,
       x1, y1 + (y2 - y1)/2, x2, y1 + (y2 - y1)/2 );
 
     if (cpanel->brush_on_p) {
-      gdk_draw_line (sp->pixmap1, plot_GC,
+      gdk_draw_line (sp->pixmap1, xg.plot_GC,
         x1 + (x2 - x1)/2 + 1, y1, x1 + (x2 - x1)/2 + 1, y2 );
-      gdk_draw_line (sp->pixmap1, plot_GC,
+      gdk_draw_line (sp->pixmap1, xg.plot_GC,
         x1, y1 + (y2 - y1)/2 + 1, x2, y1 + (y2 - y1)/2 + 1 );
     }
   }
@@ -301,7 +301,7 @@ brush_draw_brush (splotd *sp) {
 
 static gboolean
 update_glyph_arrays (gint i, gboolean changed) {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   gboolean doit = true;
 
 /* setting the value of changed */
@@ -356,7 +356,7 @@ build_glyph_vectors ()
   static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   icoords imin, imax;
   gboolean changed = false;
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
 
   brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax);
 
@@ -401,7 +401,7 @@ build_glyph_vectors ()
 
 static gboolean
 update_color_arrays (gint i, gboolean changed) {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   gboolean doit = true;
 
 /* setting the value of doit */
@@ -440,7 +440,7 @@ build_color_vectors (void)
   static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   icoords imin, imax;
   gboolean changed = false;
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
 
   brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax);
 
@@ -484,7 +484,7 @@ build_color_vectors (void)
 
 static gboolean
 update_erase_arrays (gint i, gboolean changed) {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   gboolean doit = true;
 
   /*
@@ -527,7 +527,7 @@ build_erase_vectors (void)
   static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   icoords imin, imax;
   gboolean changed = false;
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
 
   brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax);
 
@@ -570,7 +570,7 @@ active_paint_points (void)
 {
   gint ih, iv, j, pt, k, gp;
   gboolean changed;
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
 /*
  * Set under_new_brush[j] to 1 if point j is inside the rectangular brush.
 */

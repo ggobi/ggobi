@@ -18,8 +18,8 @@ static void scale_set_default_values (GtkScale *scale )
 
 static void chdir_cb (GtkButton *button)
 {
-  if (current_display != NULL) {
-    cpaneld *cpanel = &current_display->cpanel;
+  if (xg.current_display != NULL) {
+    cpaneld *cpanel = &xg.current_display->cpanel;
 
     cpanel->ro_direction = -1 * cpanel->ro_direction;
   }
@@ -36,8 +36,8 @@ static void reinit_cb (GtkWidget *w) {
 static gchar *type_lbl[] = {"Rotate", "Rock", "Interpolate"};
 static void type_cb (GtkWidget *w, gpointer cbd)
 {
-  if (current_display != NULL) {
-    cpaneld *cpanel = &current_display->cpanel;
+  if (xg.current_display != NULL) {
+    cpaneld *cpanel = &xg.current_display->cpanel;
     gint indx = GPOINTER_TO_INT (cbd);
 
     cpanel->ro_type = indx;
@@ -49,8 +49,8 @@ static void type_cb (GtkWidget *w, gpointer cbd)
 static gchar *axis_lbl[] = {"Y Axis", "X Axis", "Oblique Axis"};
 static void axis_cb (GtkWidget *w, gpointer cbd)
 {
-  if (current_display != NULL) {
-    cpaneld *cpanel = &current_display->cpanel;
+  if (xg.current_display != NULL) {
+    cpaneld *cpanel = &xg.current_display->cpanel;
     gint indx = GPOINTER_TO_INT (cbd);
 
     cpanel->ro_axis = indx;
@@ -85,8 +85,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   g_printerr ("rotate button_press: %d\n", event->button);
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -100,8 +100,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -171,8 +171,8 @@ cpanel_rotation_make () {
   GtkWidget *btn, *sbar, *box;
   GtkObject *adj;
   
-  control_panel[ROTATE] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[ROTATE]), 5);
+  xg.control_panel[ROTATE] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[ROTATE]), 5);
 
 /*
  * speed scrollbar
@@ -190,7 +190,7 @@ cpanel_rotation_make () {
     "Adjust speed of rotation", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (control_panel[ROTATE]), sbar,
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[ROTATE]), sbar,
     false, false, 1);
 
 /*
@@ -212,7 +212,7 @@ cpanel_rotation_make () {
                      GTK_SIGNAL_FUNC (reinit_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (control_panel[ROTATE]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[ROTATE]), box, false, false, 1);
 
 /*
  * Button to change direction
@@ -220,7 +220,7 @@ cpanel_rotation_make () {
   btn = gtk_button_new_with_label ("Change direction");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
     "Change direction of rotation", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[ROTATE]), btn, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[ROTATE]), btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), NULL);
 
@@ -231,7 +231,7 @@ cpanel_rotation_make () {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), ro_type_opt,
     "Rotate freely, rock locally, or interpolate between two orthogonal projections",
     NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[ROTATE]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[ROTATE]),
                       ro_type_opt, false, false, 0);
   populate_option_menu (ro_type_opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
@@ -243,12 +243,12 @@ cpanel_rotation_make () {
   ro_axis_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), ro_axis_opt,
     "Choose axis of rotation",   NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[ROTATE]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[ROTATE]),
                       ro_axis_opt, false, false, 0);
   populate_option_menu (ro_axis_opt, axis_lbl,
                         sizeof (axis_lbl) / sizeof (gchar *),
                         axis_cb);
-  gtk_widget_show_all (control_panel[ROTATE]);
+  gtk_widget_show_all (xg.control_panel[ROTATE]);
 }
 
 /*--------------------------------------------------------------------*/

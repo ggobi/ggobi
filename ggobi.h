@@ -18,26 +18,7 @@ struct _xgobid;
 
 typedef struct {
 
- gchar *_data_in;
- GtkWidget *_control_panel[NMODES];
-
- GdkGC *_plot_GC;
- GdkGC *_selvarfg_GC, *_selvarbg_GC;     /* white background, thick lines */
- GdkGC *_unselvarfg_GC, *_unselvarbg_GC; /* grey background, thin lines */
-
  struct _xgobid *_thisXg;
- GList *_displays;
- displayd *_current_display;
-
- /* The splot which has the mouse and keyboard focus */
- splotd *_current_splot; 
-
- icoords _mousepos, _mousepos_o;
-
- gboolean _mono_p;
-
-
-
 
   /* main_ui */
   GtkWidget *_menubar;
@@ -86,6 +67,21 @@ typedef struct {
 
 
 typedef struct _xgobid {
+
+ gchar *data_in;
+
+ GdkGC *plot_GC;
+ GdkGC *selvarfg_GC, *selvarbg_GC;     /* white background, thick lines */
+ GdkGC *unselvarfg_GC, *unselvarbg_GC; /* grey background, thin lines */
+
+ GList *displays;
+ displayd *current_display;
+ splotd *current_splot; 
+
+ icoords mousepos, mousepos_o;
+ gboolean mono_p;
+
+ GtkWidget *control_panel[NMODES];
 
 /************************** Data variables *************************/
 
@@ -244,23 +240,7 @@ typedef struct _xgobid {
 
 
 
-#define data_in xg.app._data_in
-#define control_panel xg.app._control_panel
-#define plot_GC xg.app._plot_GC
-#define selvarfg_GC xg.app._selvarfg_GC
-#define selvarbg_GC xg.app._selvarbg_GC
-#define unselvarfg_GC xg.app._unselvarfg_GC
-#define unselvarbg_GC xg.app._unselvarbg_GC
-
 #define thisXg xg.app._thisXg
-#define displays xg.app._displays
-#define current_display xg.app._current_display
-
-#define current_splot xg.app._current_splot
-#define mousepos xg.app._mousepos
-#define mousepos_o xg.app._mousepos_o
-#define mono_p xg.app._mono_p
-
 
 #define menubar xg.app._menubar
 #define main_accel_group xg.app._main_accel_group
@@ -285,15 +265,9 @@ typedef struct _xgobid {
 #define rotation_io_menu xg.app._rotation_io_menu
 #define scale_reset_menu xg.app._scale_reset_menu
 
-
-
 XGOBI_ xgobid xg;
 
-
 #define XGOBI_H
-
-
-
 
 #endif
 

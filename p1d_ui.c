@@ -8,20 +8,20 @@ static GtkWidget *type_opt;
 static gchar *type_lbl[] = {"Texturing", "ASH"};
 static void type_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
   cpanel->p1d_type = GPOINTER_TO_INT (cbd);
 
-  display_tailpipe (current_display);
+  display_tailpipe (xg.current_display);
 }
 
 static GtkObject *ash_smoothness_adj;
 static void ash_smoothness_cb (GtkAdjustment *adj, gpointer cbd) {
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
 
   /*-- adj->value ranges from .01 to .5 --*/
   cpanel->nASHes = (gint) ((gfloat) cpanel->nbins * (adj->value / 2.0));
 
-  display_tailpipe (current_display);
+  display_tailpipe (xg.current_display);
 }
 
 static GtkObject *cycle_speed_adj;
@@ -52,8 +52,8 @@ cpanel_p1dplot_make () {
   GtkWidget *tgl, *btn, *vb;
   GtkWidget *sbar;
   
-  control_panel[P1PLOT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[P1PLOT]), 5);
+  xg.control_panel[P1PLOT] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[P1PLOT]), 5);
 
 /*
  * option menu
@@ -61,7 +61,7 @@ cpanel_p1dplot_make () {
   type_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), type_opt,
     "Display either textured dot plots or average shifted histograms", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[P1PLOT]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[P1PLOT]),
                       type_opt, false, false, 0);
   populate_option_menu (type_opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
@@ -70,7 +70,7 @@ cpanel_p1dplot_make () {
  * ASH smoothness
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[P1PLOT]), vb,
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[P1PLOT]), vb,
     false, false, 0);
 
   gtk_box_pack_start (GTK_BOX (vb), gtk_label_new ("ASH smoothness:"),
@@ -99,7 +99,7 @@ cpanel_p1dplot_make () {
                         "Cycle through 1D plots", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                       GTK_SIGNAL_FUNC (cycle_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[P1PLOT]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[P1PLOT]),
                       tgl, false, false, 1);
 
   /* value, lower, upper, step_increment, page_increment, page_size */
@@ -115,18 +115,18 @@ cpanel_p1dplot_make () {
     "Adjust cycling speed", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (control_panel[P1PLOT]), sbar,
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[P1PLOT]), sbar,
     false, false, 1);
 
   btn = gtk_button_new_with_label ("Change direction");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
     "Change cycling direction", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[P1PLOT]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[P1PLOT]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), NULL);
 
-  gtk_widget_show_all (control_panel[P1PLOT]);
+  gtk_widget_show_all (xg.control_panel[P1PLOT]);
 }
 
 

@@ -218,7 +218,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
   gint jvar, gint *jvar_prev, gboolean alt_mod)
 {
   gboolean redraw = true;
-  gint nplots = g_list_length (current_display->splots);
+  gint nplots = g_list_length (xg.current_display->splots);
   gint k, width, height;
   gint jvar_indx, new_indx;
   GList *l;
@@ -226,14 +226,14 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
   GtkWidget *box, *w;
   gfloat ratio = 1.0;
 
-  /* The index of current_splot */
-  gint sp_indx = g_list_index (current_display->splots, sp);
+  /* The index of xg.current_splot */
+  gint sp_indx = g_list_index (xg.current_display->splots, sp);
 
   /* If jvar is one of the plotted variables, its corresponding plot */
   splotd *jvar_sp = NULL;
 
   k = 0;
-  l = current_display->splots;
+  l = xg.current_display->splots;
   while (l) {
     s = (splotd *) l->data;
     if (s->p1dvar == jvar) {
@@ -245,7 +245,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
     k++;
   }
 
-  gtk_window_set_policy (GTK_WINDOW (current_display->window),
+  gtk_window_set_policy (GTK_WINDOW (xg.current_display->window),
         false, false, false);
 
   splot_get_dimensions (sp, &width, &height);
@@ -259,7 +259,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
   if (alt_mod == true) {
     if (jvar_sp != NULL && nplots > 1) {
       /*-- Delete the plot from the list, and destroy it. --*/
-      current_display->splots = g_list_remove (current_display->splots,
+      xg.current_display->splots = g_list_remove (xg.current_display->splots,
                                                (gpointer) jvar_sp);
 
       /*-- keep the window from shrinking by growing all plots --*/
@@ -269,7 +269,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
       else
         height = (gint) (ratio * (gfloat) height);
 
-      l = current_display->splots;
+      l = xg.current_display->splots;
       while (l) {
         w = ((splotd *) l->data)->da;
         gtk_widget_ref (w);
@@ -283,21 +283,21 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
 
       /*
        * If the plot being removed is the current plot, reset
-       * current_splot.
+       * xg.current_splot.
       */
-      if (jvar_sp == current_splot) {
+      if (jvar_sp == xg.current_splot) {
         sp_event_handlers_toggle (sp, off);
 
         new_indx = (jvar_indx == 0) ? 0 : MIN (nplots-1, jvar_indx);
-        current_splot = (splotd *)
-          g_list_nth_data (current_display->splots, new_indx);
+        xg.current_splot = (splotd *)
+          g_list_nth_data (xg.current_display->splots, new_indx);
         /* just for insurance, to handle the unforeseen */
-        if (current_splot == NULL) 
-          current_splot = (splotd *)
-            g_list_nth_data (current_display->splots, 0);
+        if (xg.current_splot == NULL) 
+          xg.current_splot = (splotd *)
+            g_list_nth_data (xg.current_display->splots, 0);
       }
 
-      splot_free (jvar_sp, current_display);
+      splot_free (jvar_sp, xg.current_display);
 
       nplots--;
 /*      redraw = false;*/
@@ -321,21 +321,21 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         height = (gint) (ratio * (gfloat) height);
       /* */
 
-      sp_new = splot_new (current_display, width, height);
+      sp_new = splot_new (xg.current_display, width, height);
       sp_new->p1dvar = jvar; 
 
       if (cpanel->parcoords_selection_mode == VAR_INSERT)
-        current_display->splots = g_list_insert (current_display->splots,
+        xg.current_display->splots = g_list_insert (xg.current_display->splots,
           (gpointer) sp_new, sp_indx);
       else if (cpanel->parcoords_selection_mode == VAR_APPEND)
-        current_display->splots = g_list_insert (current_display->splots,
+        xg.current_display->splots = g_list_insert (xg.current_display->splots,
           (gpointer) sp_new, MIN (sp_indx+1, nplots));
 
       box = (sp->da)->parent;
       gtk_box_pack_end (GTK_BOX (box), sp_new->da, false, false, 0);
       gtk_widget_show (sp_new->da);
 
-      l = current_display->splots;
+      l = xg.current_display->splots;
       while (l) {
         w = ((splotd *) l->data)->da;
         gtk_widget_ref (w);
@@ -350,12 +350,12 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         l = l->next ;
       }
 
-      current_splot = sp_new;
+      xg.current_splot = sp_new;
       redraw = true;
     }
   }
 
-  gtk_window_set_policy (GTK_WINDOW (current_display->window),
+  gtk_window_set_policy (GTK_WINDOW (xg.current_display->window),
     true, true, false);
 
   return redraw;

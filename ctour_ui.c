@@ -62,8 +62,8 @@ cpanel_ctour_make () {
   GtkObject *adj;
   GtkWidget *manip_opt, *pathlen_opt;
   
-  control_panel[COTOUR] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[COTOUR]), 5);
+  xg.control_panel[COTOUR] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[COTOUR]), 5);
 
 /*
  * speed scrollbar
@@ -81,7 +81,7 @@ cpanel_ctour_make () {
     "Adjust speed of tour motion", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (control_panel[COTOUR]), sbar,
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[COTOUR]), sbar,
     false, false, 1);
 
 /*
@@ -103,14 +103,14 @@ cpanel_ctour_make () {
                      GTK_SIGNAL_FUNC (reinit_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (control_panel[COTOUR]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[COTOUR]), box, false, false, 1);
 
 
 /*
  * manipulation option menu with label
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[COTOUR]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[COTOUR]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Manual manipulation:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -129,7 +129,7 @@ cpanel_ctour_make () {
  * path length option menu 
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[COTOUR]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[COTOUR]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Path length:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -152,7 +152,7 @@ cpanel_ctour_make () {
     "Synchronize the horizontal and vertical axes", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                       GTK_SIGNAL_FUNC (syncaxes_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[COTOUR]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[COTOUR]),
                       tgl, false, false, 1);
 
 /*
@@ -161,7 +161,7 @@ cpanel_ctour_make () {
   btn = gtk_button_new_with_label ("Projection pursuit ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
     "Open panel for correlation tour projection pursuit", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[COTOUR]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[COTOUR]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (ctourpp_cb), NULL);
@@ -172,12 +172,12 @@ cpanel_ctour_make () {
   btn = gtk_button_new_with_label ("Advanced features ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
     "Open panel for additional correlation tour features", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[COTOUR]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[COTOUR]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (ctouradv_cb), NULL);
 
-  gtk_widget_show_all (control_panel[COTOUR]);
+  gtk_widget_show_all (xg.control_panel[COTOUR]);
 }
 
 /*----------------------------------------------------------------------*/
@@ -241,11 +241,11 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  current_splot = sp;
-  current_display = (displayd *) sp->displayptr;
+  xg.current_splot = sp;
+  xg.current_display = (displayd *) sp->displayptr;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -259,8 +259,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  mousepos.x = event->x;
-  mousepos.y = event->y;
+  xg.mousepos.x = event->x;
+  xg.mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 

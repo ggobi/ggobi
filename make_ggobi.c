@@ -48,9 +48,10 @@ fileset_read_init (gchar *ldata_in)
 
     /*-- initialize the first display --*/
     display = scatterplot_new (false);
-    displays = g_list_append (displays, (gpointer) display);
+    xg.displays = g_list_append (xg.displays, (gpointer) display);
     display_set_current (display);
-    current_splot = (splotd *) g_list_nth_data (current_display->splots, 0);
+    xg.current_splot = (splotd *)
+      g_list_nth_data (xg.current_display->splots, 0);
  }
 
  return (ans);
@@ -123,7 +124,7 @@ make_ggobi (gchar *ldata_in, gboolean processEvents) {
   displayd *display;
 
   /*-- some initializations --*/
-  displays = NULL;
+  xg.displays = NULL;
   xg.nrows = xg.ncols = 0;
 
   globals_init (); /*-- variables that don't depend on the data --*/
@@ -138,9 +139,10 @@ make_ggobi (gchar *ldata_in, gboolean processEvents) {
 
       /*-- initialize the first display --*/
       display = scatterplot_new (false);
-      displays = g_list_append (displays, (gpointer) display);
+      xg.displays = g_list_append (xg.displays, (gpointer) display);
       display_set_current (display);
-      current_splot = (splotd *) g_list_nth_data (current_display->splots, 0);
+      xg.current_splot = (splotd *)
+        g_list_nth_data (xg.current_display->splots, 0);
     }
   }
 

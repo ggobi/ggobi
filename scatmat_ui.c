@@ -14,7 +14,7 @@ static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append"};
 static void selection_mode_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
-  cpaneld *cpanel = &current_display->cpanel;
+  cpaneld *cpanel = &xg.current_display->cpanel;
 
   switch (indx) {
     case 0:
@@ -37,14 +37,14 @@ void
 cpanel_scatmat_make () {
   GtkWidget *vb, *lbl, *opt;
   
-  control_panel[SCATMAT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[SCATMAT]), 5);
+  xg.control_panel[SCATMAT] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[SCATMAT]), 5);
 
 /*
  * option menu: selection mode
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[SCATMAT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[SCATMAT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -59,7 +59,7 @@ cpanel_scatmat_make () {
                         sizeof (selection_mode_lbl) / sizeof (gchar *),
                         selection_mode_cb);
 
-  gtk_widget_show_all (control_panel[SCATMAT]);
+  gtk_widget_show_all (xg.control_panel[SCATMAT]);
 }
 
 

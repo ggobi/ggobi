@@ -70,7 +70,7 @@ plot_tree_display()
   tree = gtk_tree_new();
 
   numItems = 0;
-  for (dlist = displays; dlist; dlist = dlist->next, numItems++) {
+  for (dlist = xg.displays; dlist; dlist = dlist->next, numItems++) {
     display = (displayd *) dlist->data;
     display_add_tree(display, numItems, tree);
   }
@@ -241,7 +241,7 @@ tree_display_entry_remove(displayd *display, GtkWidget *tree)
   if(tree == NULL)
     return(-1);
 
-  for (dlist = displays; dlist; dlist = dlist->next, which++) {
+  for (dlist = xg.displays; dlist; dlist = dlist->next, which++) {
     tmp = (displayd *) dlist->data;
     if(tmp == display)
       return(tree_display_entry_remove_by_index(which, tree));

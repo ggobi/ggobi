@@ -11,9 +11,6 @@
 #include "externs.h"
 
 #if defined (_WIN32)
-extern gdouble floor (gdouble);    
-extern gdouble ceil (gdouble);     
-extern gdouble fabs (gdouble);
 #include <sys/stat.h> 
 #else
 /* on linux, this sometimes insists on being spelled out */
@@ -353,7 +350,7 @@ print_attachments () {
   GtkTableChild *child;
 
   g_printerr ("attachments:\n");
-  for (l=(GTK_TABLE (current_display->table))->children; l; l=l->next) {
+  for (l=(GTK_TABLE (xg.current_display->table))->children; l; l=l->next) {
     child = (GtkTableChild *) l->data;
     g_printerr (" %d %d, %d %d\n",
       child->left_attach, child->right_attach,
@@ -424,7 +421,7 @@ plotted_cols_get (gint *cols, gboolean add_vgroups)
 {
   gint mode = mode_get ();
   gint j, ncols;
-  splotd *sp = current_splot;
+  splotd *sp = xg.current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
   for (j=0; j<xg.ncols; j++) {

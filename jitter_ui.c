@@ -24,7 +24,7 @@ jitter_cb (GtkButton *button)
 */
 static void
 degree_cb (GtkAdjustment *adj, gpointer cbd) {
-  if (current_display->missing_p) {
+  if (xg.current_display->missing_p) {
     missing_jitter_value_set (adj->value);
     missing_rejitter ();
   } else {

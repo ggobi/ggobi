@@ -163,16 +163,16 @@ static gint
 splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   displayd *display = (displayd *) sp->displayptr; 
-  splotd *sp_prev = current_splot;
+  splotd *sp_prev = xg.current_splot;
 
-  if (sp != current_splot) {
+  if (sp != sp_prev) {
 
-    splot_set_current (current_splot, off);
+    splot_set_current (sp_prev, off);
 
-    if (current_display != display)
+    if (xg.current_display != display)
       display_set_current (display);  /* old one off, new one on */
 
-    current_splot = sp;
+    xg.current_splot = sp;
 
     /* add border to current_splot */
     sp->redraw_style = QUICK;

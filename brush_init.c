@@ -232,7 +232,6 @@ void
 brush_init ()
 {
   static gboolean firsttime = true;
-  gint i, m;
 
   xg.glyph_id.type = xg.glyph_0.type = FILLED_CIRCLE;
   xg.glyph_id.size = xg.glyph_0.size = 3;

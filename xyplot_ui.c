@@ -41,15 +41,15 @@ cpanel_xyplot_make () {
   GtkWidget *cycle_tgl, *chdir_btn, *cycle_sbar, *opt;
   GtkObject *adj;
   
-  control_panel[XYPLOT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[XYPLOT]), 5);
+  xg.control_panel[XYPLOT] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[XYPLOT]), 5);
 
   cycle_tgl = gtk_check_button_new_with_label ("Cycle");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), cycle_tgl,
     "Cycle through pairwise plots", NULL);
   gtk_signal_connect (GTK_OBJECT (cycle_tgl), "toggled",
                      GTK_SIGNAL_FUNC (cycle_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[XYPLOT]), cycle_tgl,
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[XYPLOT]), cycle_tgl,
     false, false, 3);
 
 /*
@@ -58,7 +58,7 @@ cpanel_xyplot_make () {
   opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), opt,
     "Fix one of the axes during plot cycling or let them both float", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[XYPLOT]), opt,
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[XYPLOT]), opt,
     false, false, 0);
   populate_option_menu (opt, fix_axis_lbl,
                         sizeof (fix_axis_lbl) / sizeof (gchar *),
@@ -75,7 +75,7 @@ cpanel_xyplot_make () {
   cycle_sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   scale_set_default_values (GTK_SCALE (cycle_sbar));
 
-  gtk_box_pack_start (GTK_BOX (control_panel[XYPLOT]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[XYPLOT]),
                       cycle_sbar, false, false, 1);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), cycle_sbar,
     "Adjust cycling speed", NULL);
@@ -83,10 +83,10 @@ cpanel_xyplot_make () {
   chdir_btn = gtk_button_new_with_label ("Change direction");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), chdir_btn,
     "Change cycling direction", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[XYPLOT]),
+  gtk_box_pack_start (GTK_BOX (xg.control_panel[XYPLOT]),
                       chdir_btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (chdir_btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), NULL);
 
-  gtk_widget_show_all (control_panel[XYPLOT]);
+  gtk_widget_show_all (xg.control_panel[XYPLOT]);
 }
