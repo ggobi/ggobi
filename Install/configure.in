@@ -424,6 +424,7 @@ if test -n "${with_R}" && test "${with_R}" != "no" ; then
     echo "You cannot install the Rggobi interface without first downloading Rggobi.tar.gz"
     echo "and then un-tarring it"
     echo ""
+    exit 1
   fi
 fi
 

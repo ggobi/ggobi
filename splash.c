@@ -33,6 +33,7 @@ splash_show (ggobid *gg, guint action, GtkWidget *w)
   char *versionInfo;
   GdkPixmap *splash_pix;
   GtkWidget *splashw, *label;
+  gchar homePrefix[] = "    GGobi home: ";
   GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   GtkWidget *ebox = gtk_event_box_new ();
   GtkWidget *hbox = gtk_vbox_new (false, 0);
@@ -49,8 +50,12 @@ splash_show (ggobid *gg, guint action, GtkWidget *w)
   versionInfo = (char *) g_malloc(sizeof(gchar)*(strlen("Version ") + 
                                                  strlen(GGOBI_VERSION_STRING) + 
                                                  2 +
-                                                 strlen(GGOBI_RELEASE_DATE) + 1));
-  sprintf(versionInfo,"%s %s, %s", "Version", GGOBI_VERSION_STRING, GGOBI_RELEASE_DATE);
+                                                 strlen(GGOBI_RELEASE_DATE) + 1)
+				                 + strlen(homePrefix)
+				                 + strlen(sessionOptions->ggobiHome));
+  sprintf(versionInfo,"%s %s, %s%s%s", 
+	               "Version", GGOBI_VERSION_STRING, GGOBI_RELEASE_DATE,
+	               homePrefix, sessionOptions->ggobiHome);
   label = gtk_label_new(versionInfo);
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
   g_free(versionInfo);

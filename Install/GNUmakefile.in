@@ -75,6 +75,13 @@ else
 endif
 
 
+uninstall:
+	$(RM) $(EMBED_LIB:%=$(libdir)/%) $(GTK_EXT:%=$(libdir)/%)
+	$(RM) -fr $(ggobi_install_home)
+	$(RM) $(bindir)/ggobi-config
+	$(RM) $(bindir)/ggobi
+	$(RM) -fr $(includedir)
+
 ggobirc: Plugins
 	echo "<ggobirc>" > $@
 	echo "<plugins>" >> $@ 
@@ -87,9 +94,9 @@ ggobirc: Plugins
 
 Rggobi: @EMBED_LIB@
 	if test -d Rggobi ; then \
-		@R_BIN@ INSTALL -c @R_PKG_DIR@ $@  \
+		@R_BIN@ INSTALL -c @R_PKG_DIR@ $@  ; \
 	else \
-		@echo "No Rggobi directory here. Untar the Rggobi distribution first!"
+		echo "No Rggobi directory here. Untar the Rggobi distribution first!" ; \
 	fi
 
 

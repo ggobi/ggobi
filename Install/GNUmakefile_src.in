@@ -165,7 +165,8 @@ cflags:
 	@echo "$(CFLAGS)"
 
 libs:
-	@echo "$(LIBS)"
+	@echo "-L$(TOP)/lib -lggobi $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS) @LIBS@"
+# This is very close to $(LIBS) but we need to put ggobi in there.
 
 clean:
 	for f in $(OBJ) $(OBJ:%.o=%.lo) ; do \
