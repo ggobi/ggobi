@@ -144,6 +144,7 @@ extern displayd *createPlot(gint type, gchar **varnames);
 /*-- point glyph types and sizes --*/
 extern gint *GGOBI(getGlyphTypes)(gint *n);
 extern const gchar **const GGOBI(getGlyphTypeNames)(gint *n);
+extern gchar const* GGOBI(getGlyphTypeName)(gint n);
 
 extern gint *GGOBI(getCaseGlyphTypes)(gint *, gint n, datad *, ggobid *gg);
 extern gint GGOBI(getCaseGlyphType)(gint id, datad *, ggobid *gg);
@@ -198,6 +199,8 @@ extern int GGOBI(getNumGGobis)();
 gboolean GGOBI(setColorMap)(gdouble *vals, gint nr, ggobid *gg);
 gboolean GGOBI(registerColorMap)(ggobid *gg);
 
+extern const gchar *const GGOBI(getColorName)(gint cid, ggobid *gg, gboolean inDefault);
+
 gboolean GGOBI(close)(ggobid *gg, gboolean closeWindow);
 
 void GGOBI(setIdentifyHandler)(IdentifyProc proc,  void *data, ggobid *gg);
@@ -223,6 +226,8 @@ extern const gchar *GGOBI(getModeName)(gint which);
 extern int GGOBI(full_mode_set)(gint action, ggobid *gg);
 
 extern int GGOBI(setBrushColor)(gint cid, ggobid *gg);
+extern gint GGOBI(getBrushColor)(ggobid *gg);
+
 extern gboolean GGOBI(setBrushGlyph)(gint type, gint size, ggobid *gg);
 extern int GGOBI(getVariableIndex)(const gchar *name, datad *, ggobid *gg);
 extern int GGOBI(removeVariableByIndex)(gint which, datad *, ggobid *gg);
@@ -245,6 +250,8 @@ ggobid * GGOBI(ggobi_get)(gint);
 
 gint GGOBI(ncols)(datad *d);
 gint GGOBI(nrecords)(datad *dg);
+
+
 
 
 const gchar *const * GGOBI(getDataModeNames)(int *n);

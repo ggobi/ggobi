@@ -1010,6 +1010,23 @@ GGOBI(setBrushColor)(gint cid, ggobid *gg)
   return(old);
 }
 
+gint 
+GGOBI(getBrushColor)(ggobid *gg)
+{
+  return(gg->color_id);
+}
+
+const gchar *const 
+GGOBI(getColorName)(gint cid, ggobid *gg, gboolean inDefault)
+{
+  if(gg->colorNames && cid > -1 && cid < gg->ncolors) {
+    return(gg->colorNames[cid]);
+  }
+
+ return(NULL);
+}
+
+
 gint
 GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update, 
   datad *d, ggobid *gg)
