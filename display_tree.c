@@ -206,17 +206,17 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
   switch (type) {
     case scatterplot:
     case scatmat:
-      n = strlen (d->vardata[splot->xyvars.x].collab) +
-          strlen (d->vardata[splot->xyvars.y].collab) + 5;
+      n = strlen (d->vartable[splot->xyvars.x].collab) +
+          strlen (d->vartable[splot->xyvars.y].collab) + 5;
       buf = (gchar*) g_malloc (n * sizeof (gchar*));
       sprintf (buf, "%s v %s",
-        d->vardata[splot->xyvars.x].collab,
-        d->vardata[splot->xyvars.y].collab);
+        d->vartable[splot->xyvars.x].collab,
+        d->vartable[splot->xyvars.y].collab);
      break;
     case parcoords:
-      n = strlen (d->vardata[splot->p1dvar].collab);
+      n = strlen (d->vartable[splot->p1dvar].collab);
       buf = (gchar*) g_malloc(n* sizeof (gchar*));
-      sprintf(buf, "%s", d->vardata[splot->p1dvar].collab);
+      sprintf(buf, "%s", d->vartable[splot->p1dvar].collab);
      break;
   }
 

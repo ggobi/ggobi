@@ -93,10 +93,10 @@ rejitter (datad *d, ggobid *gg) {
       */
       if (d->jitter.convex) {
         fworld = (gfloat) (d->world.vals[m][k] - d->jitdata.vals[m][k]);
-        fjit = d->vardata[k].jitter_factor * (frand - fworld);
+        fjit = d->vartable[k].jitter_factor * (frand - fworld);
       }
       else
-        fjit = d->vardata[k].jitter_factor * frand;
+        fjit = d->vartable[k].jitter_factor * frand;
 
       d->jitdata.vals[m][k] = (glong) fjit;
     }
@@ -104,11 +104,6 @@ rejitter (datad *d, ggobid *gg) {
   tform_to_world (d, gg);
   /*-- do not redisplay the missing values displays --*/
   displays_tailpipe (REDISPLAY_PRESENT, gg);
-
-/*
-  if (clear_vartable) 
-    vartable_unselect_all ();
-*/
 
   g_free ((gpointer) selected_cols);
 }
@@ -127,7 +122,7 @@ jitter_value_set (gfloat value, datad *d, ggobid *gg) {
     ncols = plotted_cols_get (cols, false, d, gg);
 
   for (j=0; j<ncols; j++)
-    d->vardata[cols[j]].jitter_factor = value;
+    d->vartable[cols[j]].jitter_factor = value;
 
   g_free ((gpointer) cols);
 }

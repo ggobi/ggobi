@@ -8,8 +8,8 @@ typedef struct /*-- datad --*/ {
  GArray *rowlab;
 
  gint ncols;
- vardatad *vardata;
- GtkWidget *vardata_clist;
+ vartabled *vartable;
+ GtkWidget *vartable_clist;
  gboolean single_column;
 
  array_f raw, tform1, tform2;

@@ -1,4 +1,4 @@
-/* vardata.c */
+/* vartable.c */
 
 #include <stdlib.h>
 #include <math.h>
@@ -15,46 +15,46 @@ extern gfloat no_change (gfloat);
 }
 #endif
 
-void vardata_alloc (datad *d, ggobid *gg)
+void vartable_alloc (datad *d, ggobid *gg)
 {
-  if (d->vardata != NULL)
-    g_free ((gpointer) d->vardata);
+  if (d->vartable != NULL)
+    g_free ((gpointer) d->vartable);
 
-  d->vardata = (vardatad *) g_malloc (d->ncols * sizeof (vardatad));
+  d->vartable = (vartabled *) g_malloc (d->ncols * sizeof (vartabled));
 }
 
-void vardata_realloc (gint n, datad *d, ggobid *gg)
+void vartable_realloc (gint n, datad *d, ggobid *gg)
 {
-  d->vardata = (vardatad *) g_realloc ((gpointer) d->vardata,
-    n * sizeof (vardatad));
+  d->vartable = (vartabled *) g_realloc ((gpointer) d->vartable,
+    n * sizeof (vartabled));
 }
 
 
-void vardata_init (datad *d, ggobid *gg)
+void vartable_init (datad *d, ggobid *gg)
 {
   gint j;
   for (j=0; j<d->ncols; j++) {
-    d->vardata[j].selected = false;
-    d->vardata[j].nmissing = 0;
-    d->vardata[j].mean = 0.0;
-    d->vardata[j].median = 0.0;
-    d->vardata[j].lim_raw.min = 0.0;
-    d->vardata[j].lim_raw.max = 0.0;
-    d->vardata[j].lim_tform.min = 0.0;
-    d->vardata[j].lim_tform.max = 0.0;
+    d->vartable[j].selected = false;
+    d->vartable[j].nmissing = 0;
+    d->vartable[j].mean = 0.0;
+    d->vartable[j].median = 0.0;
+    d->vartable[j].lim_raw.min = 0.0;
+    d->vartable[j].lim_raw.max = 0.0;
+    d->vartable[j].lim_tform.min = 0.0;
+    d->vartable[j].lim_tform.max = 0.0;
 
-    d->vardata[j].domain_incr = 0.;
-    d->vardata[j].domain_adj = no_change;
-    d->vardata[j].inv_domain_adj = no_change;
-    d->vardata[j].tform1 = NO_TFORM1;
-    d->vardata[j].param = 0.;
-	d->vardata[j].tform2 = NO_TFORM2;
+    d->vartable[j].domain_incr = 0.;
+    d->vartable[j].domain_adj = no_change;
+    d->vartable[j].inv_domain_adj = no_change;
+    d->vartable[j].tform1 = NO_TFORM1;
+    d->vartable[j].param = 0.;
+	d->vartable[j].tform2 = NO_TFORM2;
 
-    d->vardata[j].jitter_factor = 0.0;
+    d->vartable[j].jitter_factor = 0.0;
 
-    d->vardata[j].collab = NULL;
-    d->vardata[j].collab_tform = NULL;
-    d->vardata[j].groupid = 0;
+    d->vartable[j].collab = NULL;
+    d->vartable[j].collab_tform = NULL;
+    d->vartable[j].groupid = 0;
   }
 }
 
@@ -72,8 +72,8 @@ nvgroups (datad *d, ggobid *gg)
   gint j, ngr = 0;
 
   for (j=0; j<d->ncols; j++)
-    if (d->vardata[j].groupid > ngr)
-      ngr = d->vardata[j].groupid;
+    if (d->vartable[j].groupid > ngr)
+      ngr = d->vartable[j].groupid;
 
   return (ngr+1);
 }
@@ -89,8 +89,8 @@ vgroups_sort (datad *d, ggobid *gg)
   */
   maxid = 0;
   for (j=0; j<d->ncols; j++) {
-    if (d->vardata[j].groupid > maxid)
-      maxid = d->vardata[j].groupid;
+    if (d->vartable[j].groupid > maxid)
+      maxid = d->vartable[j].groupid;
   }
 
   /*
@@ -101,7 +101,7 @@ vgroups_sort (datad *d, ggobid *gg)
   while (id <= maxid) {
     found = false;
     for (j=0; j<d->ncols; j++) {
-      if (d->vardata[j].groupid == id) {
+      if (d->vartable[j].groupid == id) {
         newid++;
         found = true;
         break;
@@ -109,8 +109,8 @@ vgroups_sort (datad *d, ggobid *gg)
     }
     if (found)
       for (j=0; j<d->ncols; j++)
-        if (d->vardata[j].groupid == id)
-          d->vardata[j].groupid = newid;
+        if (d->vartable[j].groupid == id)
+          d->vartable[j].groupid = newid;
     id++;
   }
 }
@@ -122,20 +122,20 @@ vgroups_sort (datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-vardata_stats_print (datad *d, ggobid *gg) 
+vartable_stats_print (datad *d, ggobid *gg) 
 {
   gint j;
   for (j=0; j<d->ncols; j++) {
     g_printerr ("mean=%f, median=%f\n",
-      d->vardata[j].mean, d->vardata[j].median);
+      d->vartable[j].mean, d->vartable[j].median);
     g_printerr ("lims: %7.2f %7.2f %7.2f %7.2f\n",
-      d->vardata[j].lim_raw.min, d->vardata[j].lim_raw.max,
-      d->vardata[j].lim_tform.min, d->vardata[j].lim_tform.max);
+      d->vartable[j].lim_raw.min, d->vartable[j].lim_raw.max,
+      d->vartable[j].lim_tform.min, d->vartable[j].lim_tform.max);
   }
 }
 
 void
-vardata_stats_set (datad *d, ggobid *gg) 
+vartable_stats_set (datad *d, ggobid *gg) 
 {
   gint j, i, m, np;
   gfloat *sumv = (gfloat *) g_malloc0 (d->ncols * sizeof (gfloat));
@@ -148,10 +148,10 @@ vardata_stats_set (datad *d, ggobid *gg)
   */
 
   for (j=0; j<d->ncols; j++) {
-    d->vardata[j].lim_raw.min = d->raw.vals[0][j];
-    d->vardata[j].lim_raw.max = d->raw.vals[0][j];
-    d->vardata[j].lim_tform.min = d->tform2.vals[0][j];
-    d->vardata[j].lim_tform.max = d->tform2.vals[0][j];
+    d->vartable[j].lim_raw.min = d->raw.vals[0][j];
+    d->vartable[j].lim_raw.max = d->raw.vals[0][j];
+    d->vartable[j].lim_tform.min = d->tform2.vals[0][j];
+    d->vartable[j].lim_tform.max = d->tform2.vals[0][j];
   }
 
   for (j=0; j<d->ncols; j++) {
@@ -162,26 +162,26 @@ vardata_stats_set (datad *d, ggobid *gg)
         ;
       else {
 
-        if (d->raw.vals[i][j] < d->vardata[j].lim_raw.min)
-          d->vardata[j].lim_raw.min = d->raw.vals[i][j];
-        else if (d->raw.vals[i][j] > d->vardata[j].lim_raw.max)
-          d->vardata[j].lim_raw.max = d->raw.vals[i][j];
+        if (d->raw.vals[i][j] < d->vartable[j].lim_raw.min)
+          d->vartable[j].lim_raw.min = d->raw.vals[i][j];
+        else if (d->raw.vals[i][j] > d->vartable[j].lim_raw.max)
+          d->vartable[j].lim_raw.max = d->raw.vals[i][j];
 
-        if (d->tform2.vals[i][j] < d->vardata[j].lim_tform.min)
-          d->vardata[j].lim_tform.min = d->tform2.vals[i][j];
-        else if (d->tform2.vals[i][j] > d->vardata[j].lim_tform.max)
-          d->vardata[j].lim_tform.max = d->tform2.vals[i][j];
+        if (d->tform2.vals[i][j] < d->vartable[j].lim_tform.min)
+          d->vartable[j].lim_tform.min = d->tform2.vals[i][j];
+        else if (d->tform2.vals[i][j] > d->vartable[j].lim_tform.max)
+          d->vartable[j].lim_tform.max = d->tform2.vals[i][j];
 
         sumv[j] += d->raw.vals[i][j];
         x[np] = d->raw.vals[i][j];
         np++;
       }
     }
-    d->vardata[j].mean = sumv[j] / (gfloat) d->nrows;
+    d->vartable[j].mean = sumv[j] / (gfloat) d->nrows;
 
     /*-- median: sort the temporary vector, and find its center --*/
     qsort((void *) x, np, sizeof (gfloat), fcompare);
-    d->vardata[j].median = 
+    d->vartable[j].median = 
       ((np % 2) != 0) ?  x[(np-1)/2] : (x[np/2-1] + x[np/2])/2. ;
   }
 

@@ -34,7 +34,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  movepts_ui.c movepts.c \
  parcoords_ui.c parcoords.c \
  scatmat_ui.c scatmat.c \
- varpanel_ui.c vartable_ui.c vardata.c \
+ varpanel_ui.c vartable_ui.c vartable.c \
  transform_ui.c transform.c sphere_ui.c sphere.c svd.c \
  subset_ui.c subset.c jitter_ui.c jitter.c smooth_ui.c \
  impute_ui.c impute.c \
@@ -63,7 +63,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  movepts_ui.o movepts.o \
  parcoords_ui.o parcoords.o \
  scatmat_ui.o scatmat.o \
- varpanel_ui.o vartable_ui.o vardata.o \
+ varpanel_ui.o vartable_ui.o vartable.o \
  transform_ui.o transform.o sphere_ui.o sphere.o svd.o \
  subset_ui.o subset.o jitter_ui.o jitter.o smooth_ui.o \
  impute_ui.o impute.o \

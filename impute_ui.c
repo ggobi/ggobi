@@ -42,7 +42,7 @@ impute_cb (GtkWidget *w, ggobid *gg) {
 
   if (redraw) {
     if (gg->impute.rescale_p)
-      vardata_lim_update (d, gg);
+      vartable_lim_update (d, gg);
     tform_to_world (d, gg);
     displays_tailpipe (REDISPLAY_ALL, gg);
   }

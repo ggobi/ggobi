@@ -59,7 +59,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   
   vgroups_sort (d, gg);
   for (j=0; j<d->ncols; j++)
-    d->vardata[j].groupid = d->vardata[j].groupid_ori;
+    d->vartable[j].groupid = d->vartable[j].groupid_ori;
 
   pipeline_init (d, gg);
 

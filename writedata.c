@@ -347,7 +347,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
       return false;
     } else {
       for (j=0; j<nc; j++)
-        fprintf (fp, "%d ", d->vardata[colv[j]].groupid + 1);
+        fprintf (fp, "%d ", d->vartable[colv[j]].groupid + 1);
       fprintf (fp, "\n");
       fclose (fp);
     }
@@ -464,10 +464,10 @@ save_collabels (gchar *rootname, gint *colv, gint nc, datad *d, ggobid *gg)
   else {
     if (gg->save.stage == RAWDATA) {
       for (j=0; j<nc; j++)
-        fprintf (fp, "%s\n", d->vardata[colv[j]].collab);
+        fprintf (fp, "%s\n", d->vartable[colv[j]].collab);
     } else {  /*-- TFORMDATA --*/
       for (j=0; j<nc; j++)
-        fprintf (fp, "%s\n", d->vardata[colv[j]].collab_tform);
+        fprintf (fp, "%s\n", d->vartable[colv[j]].collab_tform);
     }
     fclose (fp);
     return true;

@@ -63,7 +63,7 @@ subset_apply (gboolean rescale_p, datad *d, ggobid *gg) {
   rows_in_plot_set (d, gg);
 
   if (rescale_p)
-    vardata_lim_update (d, gg);  /*-- ?? --*/
+    vartable_lim_update (d, gg);  /*-- ?? --*/
 
   tform_to_world (d, gg);
 

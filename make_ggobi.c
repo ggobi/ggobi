@@ -136,10 +136,10 @@ pipeline_init (datad *d, ggobid *gg)
   arrayf_copy (&d->raw, &d->tform1);
   arrayf_copy (&d->tform1, &d->tform2);
 
-  vardata_stats_set (d, gg);
+  vartable_stats_set (d, gg);
 
-  vardata_lim_raw_gp_set (d, gg);
-  vardata_lim_update (d, gg);
+  vartable_lim_raw_gp_set (d, gg);
+  vartable_lim_update (d, gg);
   tform_to_world (d, gg);
 
   if (d->nmissing > 0) {

@@ -73,7 +73,7 @@ sphere_tform_clear (ggobid *gg) {
   gint j;
   datad *d = gg->current_display->d;
   for (j=0; j<d->ncols; j++) {
-    if (d->vardata[j].tform2 == SPHERE) {
+    if (d->vartable[j].tform2 == SPHERE) {
       transform_variable (2, NO_TFORM2, 0, j, d, gg);
     }
   }
@@ -114,7 +114,7 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
 
       /*-- set transform2 to SPHERE for the first npcs variables --*/
       for (j=0; j<d->sphere.npcs; j++) {
-/*      d->vardata[ d->sphere.vars[j] ].tform2 = SPHERE;*/
+/*      d->vartable[ d->sphere.vars[j] ].tform2 = SPHERE;*/
         transform2_values_set (SPHERE, d->sphere.vars[j], d, gg);
         tform_label_update (d->sphere.vars[j], d, gg);
       }
@@ -126,7 +126,7 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
 */
 
       /*-- these three lines replicated from transform.c --*/
-      vardata_lim_update (d, gg);
+      vartable_lim_update (d, gg);
       tform_to_world (d, gg);
       displays_tailpipe (REDISPLAY_PRESENT, gg);
     }

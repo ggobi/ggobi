@@ -160,12 +160,12 @@ splot_write_svg (splotd *sp, ggobid *gg)
   fprintf (f,
     "<svg width=\"%dpx\" height=\"%dpx\" viewBox=\"%f %f %f %f\">\n",
     da->allocation.width, da->allocation.height,
-    d->vardata[sp->xyvars.x].lim_tform.min,
-    d->vardata[sp->xyvars.y].lim_tform.min,
-    d->vardata[sp->xyvars.x].lim_tform.max -
-      d->vardata[sp->xyvars.x].lim_tform.min,
-    d->vardata[sp->xyvars.y].lim_tform.max -
-      d->vardata[sp->xyvars.y].lim_tform.min
+    d->vartable[sp->xyvars.x].lim_tform.min,
+    d->vartable[sp->xyvars.y].lim_tform.min,
+    d->vartable[sp->xyvars.x].lim_tform.max -
+      d->vartable[sp->xyvars.x].lim_tform.min,
+    d->vartable[sp->xyvars.y].lim_tform.max -
+      d->vartable[sp->xyvars.y].lim_tform.min
   );
   fprintf (f, "<g>\n");
 
@@ -486,21 +486,21 @@ splot_add_plot_labels (splotd *sp, ggobid *gg) {
     {
 
       gdk_text_extents (style->font, 
-        d->vardata[ sp->xyvars.x ].collab_tform,
-        strlen (d->vardata[ sp->xyvars.x ].collab_tform),
+        d->vartable[ sp->xyvars.x ].collab_tform,
+        strlen (d->vartable[ sp->xyvars.x ].collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
-        d->vardata[ sp->xyvars.x ].collab_tform);
+        d->vartable[ sp->xyvars.x ].collab_tform);
 
       gdk_text_extents (style->font, 
-        d->vardata[ sp->xyvars.y ].collab_tform,
-        strlen (d->vardata[ sp->xyvars.y ].collab_tform),
+        d->vartable[ sp->xyvars.y ].collab_tform,
+        strlen (d->vartable[ sp->xyvars.y ].collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
         5, 5 + ascent + descent,
-        d->vardata[ sp->xyvars.y ].collab_tform);
+        d->vartable[ sp->xyvars.y ].collab_tform);
     }
 
     if ((dtype == scatterplot && cpanel->projection == P1PLOT) ||
@@ -508,25 +508,25 @@ splot_add_plot_labels (splotd *sp, ggobid *gg) {
     {
 
       gdk_text_extents (style->font,
-        d->vardata[ sp->p1dvar ].collab_tform,
-        strlen (d->vardata[ sp->p1dvar ].collab_tform),
+        d->vartable[ sp->p1dvar ].collab_tform,
+        strlen (d->vartable[ sp->p1dvar ].collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
-        d->vardata[ sp->p1dvar ].collab_tform);
+        d->vartable[ sp->p1dvar ].collab_tform);
     }
 
   } else if (dtype == parcoords) {
 
     gdk_text_extents (style->font,
-      d->vardata[ sp->p1dvar ].collab_tform,
-      strlen (d->vardata[ sp->p1dvar ].collab_tform),
+      d->vartable[ sp->p1dvar ].collab_tform,
+      strlen (d->vartable[ sp->p1dvar ].collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
     gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
       5,
       sp->max.y - 5,
-      d->vardata[ sp->p1dvar ].collab_tform);
+      d->vartable[ sp->p1dvar ].collab_tform);
 
   }
 }

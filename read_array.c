@@ -65,10 +65,10 @@ read_binary (FILE *fp, datad *d, ggobid *gg)
   d->ncols = nc;
 
   /*
-   * As soon as the number of columns is known, allocate vardata.
+   * As soon as the number of columns is known, allocate vartable.
   */
-  vardata_alloc (d, gg);
-  vardata_init (d, gg);
+  vartable_alloc (d, gg);
+  vartable_init (d, gg);
 
   d->nrows = nr;
 
@@ -89,7 +89,7 @@ read_binary (FILE *fp, datad *d, ggobid *gg)
         if (d->nmissing == 0)
           arrays_alloc (&d->missing, d->nrows, d->ncols);
         d->missing.vals[i][j] = 1;
-        d->vardata[j].nmissing++;
+        d->vartable[j].nmissing++;
         d->nmissing++;
       }
     }
@@ -225,9 +225,9 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
   /*-- Read in the first row of the data and calculate ncols. --*/
   d->ncols = row1_read (fp, row1, row1_missing, d, gg);
 
-  /*-- Once the number of columns is known, allocate vardata. --*/
-  vardata_alloc (d, gg);
-  vardata_init (d, gg);
+  /*-- Once the number of columns is known, allocate vartable. --*/
+  vartable_alloc (d, gg);
+  vartable_init (d, gg);
 
 /*
  * allocate the first block.
@@ -282,7 +282,7 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
         }
 
         d->nmissing++;
-        d->vardata[jcols].nmissing++;
+        d->vartable[jcols].nmissing++;
         d->missing.vals[nrows][jcols] = 1;
         d->raw.vals[nrows][jcols] = 0.0;
       }

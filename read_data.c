@@ -147,7 +147,7 @@ collabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
       while (initstr[len-1] == '\n' || initstr[len-1] == ' ')
         len-- ;
       initstr[len] = '\0';
-      d->vardata[nvar].collab = g_strdup (initstr) ;
+      d->vartable[nvar].collab = g_strdup (initstr) ;
 
       if (nvar++ >= d->ncols)
         break;
@@ -158,14 +158,14 @@ collabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
         nvar, d->ncols);
 
       if (d->single_column) {
-        g_free (d->vardata[1].collab);
-        d->vardata[1].collab = g_strdup_printf ("%s", d->vardata[0].collab);
-        g_free (d->vardata[0].collab);
-        d->vardata[0].collab = g_strdup ("Index");
+        g_free (d->vartable[1].collab);
+        d->vartable[1].collab = g_strdup_printf ("%s", d->vartable[0].collab);
+        g_free (d->vartable[0].collab);
+        d->vartable[0].collab = g_strdup ("Index");
 
       } else {
         for (j=nvar; j<d->ncols; j++) {
-          d->vardata[j].collab = g_strdup_printf ("Var %d", j+1);
+          d->vartable[j].collab = g_strdup_printf ("Var %d", j+1);
         }
       }
     }
@@ -174,14 +174,14 @@ collabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
   {
     if (init) {
       for (j=0; j<d->ncols; j++) {
-        d->vardata[j].collab = g_strdup_printf ("Var %d", j+1);
+        d->vartable[j].collab = g_strdup_printf ("Var %d", j+1);
       }
     }
   }
 
 
   for (j=0; j<d->ncols; j++) {
-    d->vardata[j].collab_tform = g_strdup (d->vardata[j].collab);
+    d->vartable[j].collab_tform = g_strdup (d->vartable[j].collab);
   }
 
   return (found);
@@ -209,7 +209,7 @@ vgroups_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
   if (found) {
     i = 0;
     while ((fscanf (fp, "%d", &itmp) != EOF) && (i < d->ncols))
-      d->vardata[i++].groupid_ori = itmp;
+      d->vartable[i++].groupid_ori = itmp;
 
     if (init && i < d->ncols) {
       g_printerr (
@@ -217,7 +217,7 @@ vgroups_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
       g_printerr ("Creating extra generic groups.\n");
 
       for (j=i; j<d->ncols; j++)
-        d->vardata[j].groupid_ori = j;
+        d->vartable[j].groupid_ori = j;
     }
 
     vgroups_sort (d, gg);
@@ -226,11 +226,11 @@ vgroups_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
 
     if (init)
       for (j=0; j<d->ncols; j++)
-        d->vardata[j].groupid_ori = j;
+        d->vartable[j].groupid_ori = j;
   }
 
   for (j=0; j<d->ncols; j++)
-    d->vardata[j].groupid = d->vardata[j].groupid_ori;
+    d->vartable[j].groupid = d->vartable[j].groupid_ori;
 
   return (found);
 }
@@ -780,7 +780,7 @@ missing_values_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
       arrays_alloc (&d->missing, d->nrows, d->ncols);
 
     for (j=0; j<d->ncols; j++)
-      d->vardata[j].nmissing = 0;
+      d->vartable[j].nmissing = 0;
 
     j = 0;
     i = 0;
@@ -803,7 +803,7 @@ missing_values_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
       d->missing.vals[row][col] = itmp;
       if (itmp != 0) {
         nmissing++;
-        d->vardata[col].nmissing++;
+        d->vartable[col].nmissing++;
       }
     }
 

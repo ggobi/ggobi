@@ -84,15 +84,15 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint i)
 {
 /*
    fprintf(f, "<variable");
-   fprintf(f," name=\"%s\"", gg->vardata[i].collab);
-   if(strcmp(gg->vardata[i].collab, gg->vardata[i].collab_tform) != 0) {
-     fprintf(f," transformName=\"%s\"", gg->vardata[i].collab_tform);
+   fprintf(f," name=\"%s\"", gg->vartable[i].collab);
+   if(strcmp(gg->vartable[i].collab, gg->vartable[i].collab_tform) != 0) {
+     fprintf(f," transformName=\"%s\"", gg->vartable[i].collab_tform);
    }
    fprintf(f, " />");
 */
 
   fprintf(f, "<variable>");
-  fprintf(f,"%s", d->vardata[i].collab);
+  fprintf(f,"%s", d->vartable[i].collab);
   fprintf(f, "</variable>");
 
   return(true);

@@ -101,7 +101,7 @@ typedef struct {
 
  /*-- and doubtless more, as we go along --*/
 
-} vardatad;
+} vartabled;
 
 
 /* these data types seem to be missing in gdk */

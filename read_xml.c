@@ -710,14 +710,14 @@ newVariable(const CHAR **attrs, XMLParserData *data)
   if (tmp) {
     data->variable_transform_name_as_attribute = true;
 
-    d->vardata[data->current_variable].collab_tform =  g_strdup(tmp);
+    d->vartable[data->current_variable].collab_tform =  g_strdup(tmp);
   }
 
  tmp = getAttribute(attrs, "name");
  if(tmp != NULL) {
-  d->vardata[data->current_variable].collab = g_strdup(tmp);
+  d->vartable[data->current_variable].collab = g_strdup(tmp);
   if (data->variable_transform_name_as_attribute == false)
-    d->vardata[data->current_variable].collab_tform = g_strdup(tmp);
+    d->vartable[data->current_variable].collab_tform = g_strdup(tmp);
  }
 
   tmp = getAttribute(attrs, "group");
@@ -726,7 +726,7 @@ newVariable(const CHAR **attrs, XMLParserData *data)
       /* Do we need to subtract 1 from this. */
   }
 
-  d->vardata[data->current_variable].groupid_ori = groupId;
+  d->vartable[data->current_variable].groupid_ori = groupId;
 
   return (true);
 }
@@ -755,8 +755,8 @@ allocVariables (const CHAR **attrs, XMLParserData *data)
 
   arrayf_alloc (&d->raw, d->nrows, d->ncols);
 
-  vardata_alloc (d, data->gg);
-  vardata_init (d, data->gg);
+  vartable_alloc (d, data->gg);
+  vartable_init (d, data->gg);
  
   hidden_alloc (d, data->gg);
 
@@ -785,11 +785,11 @@ setVariableName(XMLParserData *data, const CHAR *name, gint len)
   /* Handle the case where we have multiple calls to the characters
      handler for the same variable because the data is split
    */
-  if (d->vardata[j].collab != NULL) {
+  if (d->vartable[j].collab != NULL) {
     /* need to append tmp to the existing value.*/
   }
 
-  d->vardata[j].collab = tmp;
+  d->vartable[j].collab = tmp;
 
   /* Note that if we do have multiple calls to this for the same
      variable then we cannot handle the case where the 
@@ -797,8 +797,8 @@ setVariableName(XMLParserData *data, const CHAR *name, gint len)
      unless we use a flag in XMLParserData. This is
      variable_transform_name_as_attribute.
    */
-  if (d->vardata[j].collab_tform == NULL) {
-    d->vardata[j].collab_tform = g_strdup (tmp);
+  if (d->vartable[j].collab_tform == NULL) {
+    d->vartable[j].collab_tform = g_strdup (tmp);
   }
 
   return (true);
@@ -888,8 +888,8 @@ allocEdgeVariables (const CHAR **attrs, XMLParserData *data)
   data->gg->edge.ncols = asInteger (tmp);
 
   arrayf_alloc (&data->gg->raw, data->gg->nrows, data->d->ncols);
-  vardata_alloc (data->gg);
-  vardata_init (data->gg);
+  vartable_alloc (data->gg);
+  vartable_init (data->gg);
   hidden_alloc (data->gg);
 */
 
@@ -908,8 +908,8 @@ newEdgeVariable (const CHAR **attrs, XMLParserData *data)
   tmp = getAttribute (attrs, "name");
   if (tmp != NULL) {
     gint k = data->current_edgevariable;
-    data->gg->edge.vardata[k].collab = g_strdup (tmp);
-    data->gg->edge.vardata[k].collab_tform = g_strdup (tmp);
+    data->gg->edge.vartable[k].collab = g_strdup (tmp);
+    data->gg->edge.vartable[k].collab_tform = g_strdup (tmp);
   }
 */
 
@@ -1041,14 +1041,14 @@ setEdgeVariableName (XMLParserData *data, const CHAR *name, gint len)
   tmp[len] = '\0';
   memcpy (tmp, name, len);
 
-  if (data->gg->edge.vardata[j].collab != NULL) {
+  if (data->gg->edge.vartable[j].collab != NULL) {
     ;
   }
 
-  data->gg->edge.vardata[j].collab = tmp;
+  data->gg->edge.vartable[j].collab = tmp;
 
-  if (data->gg->edge.vardata[j].collab_tform == NULL) {
-    data->gg->edge.vardata[j].collab_tform = g_strdup (tmp);
+  if (data->gg->edge.vartable[j].collab_tform == NULL) {
+    data->gg->edge.vartable[j].collab_tform = g_strdup (tmp);
   }
 */
 

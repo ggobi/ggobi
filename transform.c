@@ -58,10 +58,10 @@ cols_in_group (gint *cols, gint varno, datad *d, ggobid *gg)
  * Figure out which columns are in the same vgroup as varno
 */
   gint j, ncols = 0;
-  gint groupno = d->vardata[varno].groupid;
+  gint groupno = d->vartable[varno].groupid;
 
   for (j=0; j<d->ncols; j++) {
-    if (d->vardata[j].groupid == groupno)
+    if (d->vartable[j].groupid == groupno)
       cols[ncols++] = j;
   }
   return (ncols);
@@ -148,12 +148,12 @@ qnorm (gdouble pr)
 void
 transform_values_init (gint j, datad *d, ggobid *gg) 
 {
-  d->vardata[j].tform1 = NO_TFORM1;
-  d->vardata[j].tform2 = NO_TFORM2;
-  d->vardata[j].domain_incr = 0.;
-  d->vardata[j].param = 0.;
-  d->vardata[j].domain_adj = no_change;
-  d->vardata[j].inv_domain_adj = no_change;
+  d->vartable[j].tform1 = NO_TFORM1;
+  d->vartable[j].tform2 = NO_TFORM2;
+  d->vartable[j].domain_incr = 0.;
+  d->vartable[j].param = 0.;
+  d->vartable[j].domain_adj = no_change;
+  d->vartable[j].inv_domain_adj = no_change;
 }
 
 void
@@ -170,13 +170,13 @@ transform0_values_set (gint tform_type, gint jcol, datad *d, ggobid *gg)
       break;
 
     case RAISE_MIN_TO_0:
-      domain_incr = fabs (d->vardata[jcol].lim_raw_gp.min);
+      domain_incr = fabs (d->vartable[jcol].lim_raw_gp.min);
       domain_adj = raise_min_to_0;
       inv_domain_adj = inv_raise_min_to_0;
       break;
 
     case RAISE_MIN_TO_1:
-      domain_incr = fabs (d->vardata[jcol].lim_raw_gp.min);
+      domain_incr = fabs (d->vartable[jcol].lim_raw_gp.min);
       domain_adj = raise_min_to_1;
       inv_domain_adj = inv_raise_min_to_1;
       break;
@@ -193,10 +193,10 @@ transform0_values_set (gint tform_type, gint jcol, datad *d, ggobid *gg)
       inv_domain_adj = no_change;
   }
 
-  d->vardata[jcol].tform0 = tform0;
-  d->vardata[jcol].domain_incr = domain_incr;
-  d->vardata[jcol].domain_adj = domain_adj;
-  d->vardata[jcol].inv_domain_adj = inv_domain_adj;
+  d->vartable[jcol].tform0 = tform0;
+  d->vartable[jcol].domain_incr = domain_incr;
+  d->vartable[jcol].domain_adj = domain_adj;
+  d->vartable[jcol].inv_domain_adj = inv_domain_adj;
 }
 
 void
@@ -206,8 +206,8 @@ transform1_values_set (gint tform_type, gfloat expt, gint jcol,
   tform1 = tform_type;
   boxcoxparam = expt;
   
-  d->vardata[jcol].tform1 = tform_type;
-  d->vardata[jcol].param = expt;
+  d->vartable[jcol].tform1 = tform_type;
+  d->vartable[jcol].param = expt;
 }
 
 gboolean 
@@ -503,7 +503,7 @@ void
 transform2_values_set (gint tform_type, gint jcol, datad *d, ggobid *gg)
 {
   tform2 = tform_type;
-  d->vardata[jcol].tform2 = tform_type;
+  d->vartable[jcol].tform2 = tform_type;
 }
 
 gboolean 
@@ -570,19 +570,19 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
 {
   gchar *lbl0, *lbl1;
 
-  g_free ((gpointer) d->vardata[j].collab_tform);
+  g_free ((gpointer) d->vartable[j].collab_tform);
 
   /*-- skip the stage0 changes except negation --*/
-  switch (d->vardata[j].tform0) {
+  switch (d->vartable[j].tform0) {
     case NEGATE:
-      lbl0 = g_strdup_printf ("-%s", d->vardata[j].collab);
+      lbl0 = g_strdup_printf ("-%s", d->vartable[j].collab);
       break;
     default:
-      lbl0 = g_strdup (d->vardata[j].collab);
+      lbl0 = g_strdup (d->vartable[j].collab);
       break;
   }
 
-  switch (d->vardata[j].tform1) {
+  switch (d->vartable[j].tform1) {
     case NO_TFORM1:
       lbl1 = g_strdup (lbl0);
       break;
@@ -590,7 +590,7 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
       lbl1 = g_strdup_printf ("(%s-m)/s", lbl0);
       break;
     case BOXCOX:
-      lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, d->vardata[j].param);
+      lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, d->vartable[j].param);
       break;
     case ABSVALUE:
       lbl1 = g_strdup_printf ("Abs(%s)", lbl0);
@@ -618,19 +618,19 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
       break;
   }
 
-  switch (d->vardata[j].tform2) {
+  switch (d->vartable[j].tform2) {
     case NO_TFORM2:
-      d->vardata[j].collab_tform = g_strdup_printf (lbl1);
+      d->vartable[j].collab_tform = g_strdup_printf (lbl1);
       break;
     case STANDARDIZE2:
-      d->vardata[j].collab_tform = g_strdup_printf ("(%s-m)/s", lbl1);
+      d->vartable[j].collab_tform = g_strdup_printf ("(%s-m)/s", lbl1);
       break;
     case PERMUTE:
       break;
     case SORT:
       break;
     case SPHERE:
-      d->vardata[j].collab_tform = g_strdup_printf ("PC%d", j+1);
+      d->vartable[j].collab_tform = g_strdup_printf ("PC%d", j+1);
       break;
   }
 
@@ -744,7 +744,7 @@ transform (gint stage, gint tform_type, gfloat param, datad *d, ggobid *gg)
   g_free ((gpointer) cols);
   g_free ((gpointer) selected_cols);
 
-  vardata_lim_update (d, gg);
+  vartable_lim_update (d, gg);
   tform_to_world (d, gg);
 
   /*

@@ -496,8 +496,8 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
         max = d->missing_lim.max;
         min = d->missing_lim.min;
       } else {
-        max = d->vardata[sp->p1dvar].lim.max;
-        min = d->vardata[sp->p1dvar].lim.min;
+        max = d->vartable[sp->p1dvar].lim.max;
+        min = d->vartable[sp->p1dvar].lim.min;
       }
       rdiff = max - min;
 
@@ -522,8 +522,8 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
         max = d->missing_lim.max;
         min = d->missing_lim.min;
       } else {
-        max = d->vardata[sp->xyvars.x].lim.max;
-        min = d->vardata[sp->xyvars.x].lim.min;
+        max = d->vartable[sp->xyvars.x].lim.max;
+        min = d->vartable[sp->xyvars.x].lim.min;
       }
       rdiff = max - min;
       world.x = planar.x;
@@ -536,8 +536,8 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
         max = d->missing_lim.max;
         min = d->missing_lim.min;
       } else {
-        max = d->vardata[sp->xyvars.y].lim.max;
-        min = d->vardata[sp->xyvars.y].lim.min;
+        max = d->vartable[sp->xyvars.y].lim.max;
+        min = d->vartable[sp->xyvars.y].lim.min;
       }
       rdiff = max - min;
       world.y = planar.y;

@@ -78,7 +78,7 @@ read_mysql_data(MySQLLoginInfo *login, gint init, datad *d, ggobid *gg)
   vgroups_sort (d, gg);
   { gint j;
     for (j=0; j<d->ncols; j++)
-      d->vardata[j].groupid = d->vardata[j].groupid_ori;
+      d->vartable[j].groupid = d->vartable[j].groupid_ori;
   }
 
   segments_alloc (gg->nsegments, gg);
@@ -178,9 +178,9 @@ GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched,
 
    for(i = 0; i < ncols; i++) {
     MYSQL_FIELD *field = mysql_fetch_field(res);
-    d->vardata[i].collab = g_strdup(field->name);
-    d->vardata[i].collab_tform = g_strdup(field->name);
-    d->vardata[i].groupid = d->vardata[i].groupid_ori = i;
+    d->vartable[i].collab = g_strdup(field->name);
+    d->vartable[i].collab_tform = g_strdup(field->name);
+    d->vartable[i].groupid = d->vartable[i].groupid_ori = i;
    }
 
     while((row = mysql_fetch_row(res)) != NULL) { 
@@ -241,8 +241,8 @@ GGOBI(setDimensions)(gint nrow, gint ncol, datad *d, ggobid *gg)
 
   arrayf_alloc (&d->raw, d->nrows, d->ncols);
 
-  vardata_alloc (d, gg);
-  vardata_init (d, gg);
+  vartable_alloc (d, gg);
+  vartable_init (d, gg);
   hidden_alloc (d, gg);
 }
 

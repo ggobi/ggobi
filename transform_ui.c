@@ -87,7 +87,7 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
     transform_opt_menus_set_history (j, d, gg);
   }
 
-  vardata_lim_update (d, gg);
+  vartable_lim_update (d, gg);
   tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_PRESENT, gg);
 }
@@ -222,9 +222,9 @@ void
 transform_opt_menus_set_history (gint j, datad *d, ggobid *gg)
 {
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform_ui.stage0_opt),
-    d->vardata[j].tform0);
+    d->vartable[j].tform0);
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform_ui.stage1_opt),
-    d->vardata[j].tform1);
+    d->vartable[j].tform1);
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform_ui.stage2_opt),
-    d->vardata[j].tform2);
+    d->vartable[j].tform2);
 }

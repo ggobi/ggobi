@@ -73,7 +73,10 @@ struct _ggobid {
  gint mode, prev_mode;
  gint projection, prev_projection;
 
- GtkWidget *vardata_window;
+ struct _VarTableUI {
+   GtkWidget *window;
+   GtkWidget *notebook;
+ } vartable_ui;
 
 /*----------------------- missing values ---------------------------*/
 

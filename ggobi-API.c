@@ -27,8 +27,8 @@ void GGOBI(displays_release)(ggobid *gg);
 void GGOBI(display_release)(displayd *display, ggobid *gg);
 void GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg);
 void GGOBI(data_release)(datad *, ggobid *gg);
-void GGOBI(vardata_free)(datad *, ggobid *gg);
-void GGOBI(vardatum_free)(vardatad *var, ggobid *gg);
+void GGOBI(vartable_free)(datad *, ggobid *gg);
+void GGOBI(vardatum_free)(vartabled *var, ggobid *gg);
 
 #ifdef __cplusplus
 }
@@ -59,12 +59,12 @@ GGOBI(getVariableNames)(gint transformed, datad *d, ggobid *gg)
 {
   gchar **names;
   gint nc = d->ncols, i;
-  vardatad *form;
+  vartabled *form;
 
   names = (gchar**) g_malloc (sizeof(gchar*)*nc);
 
   for (i = 0; i < nc; i++) {
-    form = d->vardata + i;
+    form = d->vartable + i;
     names[i] = transformed ? form->collab_tform : form->collab;
   }
 
@@ -79,17 +79,17 @@ GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed,
   gchar *old;
 
   if (transformed)
-    old = d->vardata[jvar].collab_tform;
+    old = d->vartable[jvar].collab_tform;
   else
-    old = d->vardata[jvar].collab;
+    old = d->vartable[jvar].collab;
 
   if (old)
     g_free (old);
 
   if (transformed)
-    d->vardata[jvar].collab_tform = g_strdup(name);
+    d->vartable[jvar].collab_tform = g_strdup(name);
   else {
-    d->vardata[jvar].collab = g_strdup(name);
+    d->vartable[jvar].collab = g_strdup(name);
     gtk_object_set (GTK_OBJECT(d->varpanel_ui.label[jvar]),
       "label", name, NULL);
    }
@@ -143,8 +143,8 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
 
   rowlabels_alloc (d, gg);
 
-  vardata_alloc (d, gg);
-  vardata_init (d, gg);
+  vartable_alloc (d, gg);
+  vartable_init (d, gg);
 
   br_glyph_ids_alloc (d, gg);
   br_glyph_ids_init (d, gg);
@@ -156,9 +156,9 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   hidden_alloc (d, gg);
 
   for (j = 0; j < nc ; j++) {
-   d->vardata[j].groupid_ori = j;
-   d->vardata[j].collab = g_strdup(colnames[j]);
-   d->vardata[j].collab_tform = g_strdup(colnames[j]);
+   d->vartable[j].groupid_ori = j;
+   d->vartable[j].collab = g_strdup(colnames[j]);
+   d->vartable[j].collab_tform = g_strdup(colnames[j]);
    for (i = 0; i < nr ; i++) {
      if (j == 0) {
        lbl = g_strdup (rownames[i]);
@@ -230,23 +230,23 @@ GGOBI(data_release)(datad *d, ggobid *gg)
     d->rowlab = NULL;
   }
 
-  GGOBI(vardata_free)(d, gg);
+  GGOBI(vartable_free)(d, gg);
 }
 
 void
-GGOBI(vardata_free)(datad *d, ggobid *gg)
+GGOBI(vartable_free)(datad *d, ggobid *gg)
 {
  int i;
 
   for(i = 0; i < d->ncols ; i++) {
-    GGOBI(vardatum_free)(d->vardata+i, gg);
+    GGOBI(vardatum_free)(d->vartable+i, gg);
   }
-  g_free (d->vardata);
-  d->vardata = NULL;
+  g_free (d->vartable);
+  d->vartable = NULL;
 }
 
 void 
-GGOBI(vardatum_free)(vardatad *var, ggobid *gg)
+GGOBI(vardatum_free)(vartabled *var, ggobid *gg)
 {
  if (var->collab)
   g_free (var->collab);
@@ -807,23 +807,23 @@ GGOBI(registerColorMap)(ggobid *gg)
 gboolean
 GGOBI(close)(ggobid *gg, gboolean closeWindow)
 {
-  if(gg->close_pending)
-    return(false);
+  if (gg->close_pending)
+    return (false);
 
   gg->close_pending = true;
-  display_free_all(gg);
+  display_free_all (gg);
 
   if (closeWindow && gg->main_window)
-    gtk_widget_destroy(gg->main_window);
+    gtk_widget_destroy (gg->main_window);
 
   if (gg->display_tree.window)
     gtk_widget_destroy (gg->display_tree.window);
-  if (gg->vardata_window)
-    gtk_widget_destroy (gg->vardata_window);
+  if (gg->vartable_ui.window)
+    gtk_widget_destroy (gg->vartable_ui.window);
 
   gg->close_pending = false;
   /* Now fix up the list of ggobi's */
-  return(ggobi_remove(gg) != -1);
+  return (ggobi_remove(gg) != -1);
 }
 
 void
@@ -1039,9 +1039,9 @@ GGOBI(setVariableValues)(gint whichVar, gdouble *vals, gint num,
 void
 GGOBI(update_data)(datad *d, ggobid *gg)
 {
-   vardata_stats_set (d, gg);
-   vardata_lim_raw_gp_set (d, gg);
-   vardata_lim_update (d, gg);
+   vartable_stats_set (d, gg);
+   vartable_lim_raw_gp_set (d, gg);
+   vartable_lim_update (d, gg);
    tform_to_world (d, gg);
 }
 
@@ -1075,7 +1075,7 @@ GGOBI(getVariableIndex)(const gchar *name, datad *d, ggobid *gg)
 {
   gint i;
   for (i = 0; i < d->ncols; i++)
-    if (strcmp (d->vardata[i].collab, name) == 0)
+    if (strcmp (d->vartable[i].collab, name) == 0)
       return (i);
 
   return(-1);

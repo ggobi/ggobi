@@ -210,8 +210,8 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
         true, true, 2);
 
       label = gtk_label_new ("Random");
-      gtk_notebook_append_page (GTK_NOTEBOOK
-        (gg->subset_ui.notebook), frame, label);
+      gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
+                                frame, label);
       
 /*
  * Consecutive block

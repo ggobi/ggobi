@@ -111,7 +111,7 @@ limits_adjust (gfloat *min, gfloat *max)
 }
 
 void
-vardata_lim_raw_gp_set (datad *d, ggobid *gg)
+vartable_lim_raw_gp_set (datad *d, ggobid *gg)
 {
   gint j, *cols, ncols;
   gfloat min, max;
@@ -122,7 +122,7 @@ vardata_lim_raw_gp_set (datad *d, ggobid *gg)
   for (k=0; k<nvgr; k++) {
     ncols = 0;
     for (j=0; j<d->ncols; j++) {
-      if (d->vardata[j].groupid == k)
+      if (d->vartable[j].groupid == k)
         cols[ncols++] = j;
       else
         cols[j] = j;
@@ -131,8 +131,8 @@ vardata_lim_raw_gp_set (datad *d, ggobid *gg)
     min_max (d->raw.vals, cols, ncols, &min, &max, d, gg);
     limits_adjust (&min, &max);
     for (j=0; j<ncols; j++) {
-      d->vardata[cols[j]].lim_raw_gp.min = min;
-      d->vardata[cols[j]].lim_raw_gp.max = max;
+      d->vartable[cols[j]].lim_raw_gp.min = min;
+      d->vartable[cols[j]].lim_raw_gp.max = max;
     }
   }
 
@@ -140,7 +140,7 @@ vardata_lim_raw_gp_set (datad *d, ggobid *gg)
 }
 
 void
-vardata_lim_tform_gp_set (datad *d, ggobid *gg)
+vartable_lim_tform_gp_set (datad *d, ggobid *gg)
 {
   gint j, n, *cols, ncols;
   gfloat min, max;
@@ -151,15 +151,15 @@ vardata_lim_tform_gp_set (datad *d, ggobid *gg)
   for (k=0; k<nvgr; k++) {
     ncols = 0;
     for (j=0; j<d->ncols; j++) {
-      if (d->vardata[j].groupid == k)
+      if (d->vartable[j].groupid == k)
         cols[ncols++] = j;
     }
 
     min_max (d->tform2.vals, cols, ncols, &min, &max, d, gg);
     limits_adjust (&min, &max);
     for (n=0; n<ncols; n++) {
-      d->vardata[cols[n]].lim_tform_gp.min = min;
-      d->vardata[cols[n]].lim_tform_gp.max = max;
+      d->vartable[cols[n]].lim_tform_gp.min = min;
+      d->vartable[cols[n]].lim_tform_gp.max = max;
     }
   }
 
@@ -167,7 +167,7 @@ vardata_lim_tform_gp_set (datad *d, ggobid *gg)
 }
 
 void
-vardata_lim_update (datad *d, ggobid *gg)
+vartable_lim_update (datad *d, ggobid *gg)
 {
   gint j, k, n;
   gfloat min, max;
@@ -177,7 +177,7 @@ vardata_lim_update (datad *d, ggobid *gg)
   /* 
    * First update the limits taken from the tform2 data. 
   */
-  vardata_lim_tform_gp_set (d, gg);
+  vartable_lim_tform_gp_set (d, gg);
 
   /*
    * Take tform2[][], one variable group at a time, and generate
@@ -188,7 +188,7 @@ vardata_lim_update (datad *d, ggobid *gg)
   for (k=0; k<nvgr; k++) {
     ncols = 0;
     for (j=0; j<d->ncols; j++) {
-      if (d->vardata[j].groupid == k)
+      if (d->vartable[j].groupid == k)
         cols[ncols++] = j;
     }
 
@@ -197,8 +197,8 @@ vardata_lim_update (datad *d, ggobid *gg)
       case 0:
         /*-- isn't this already done? --*/
 /*      min_max (gg->tform2, cols, ncols, &min, &max);*/
-        min = d->vardata[cols[0]].lim_tform_gp.min;
-        max = d->vardata[cols[0]].lim_tform_gp.max;
+        min = d->vartable[cols[0]].lim_tform_gp.min;
+        max = d->vartable[cols[0]].lim_tform_gp.max;
         break;
       case 1:
         mean_largest_dist (d->tform2.vals, cols, ncols, &min, &max, d, gg);
@@ -211,8 +211,8 @@ vardata_lim_update (datad *d, ggobid *gg)
     limits_adjust (&min, &max);
 
     for (n=0; n<ncols; n++) {
-      d->vardata[cols[n]].lim.min = min;
-      d->vardata[cols[n]].lim.max = max;
+      d->vartable[cols[n]].lim.min = min;
+      d->vartable[cols[n]].lim.max = max;
     }
   }
   g_free ((gpointer) cols);
@@ -372,8 +372,8 @@ tform_to_world (datad *d, ggobid *gg)
 
   for (j=0; j<d->ncols; j++) {
 
-    max = d->vardata[j].lim.max;
-    min = d->vardata[j].lim.min;
+    max = d->vartable[j].lim.max;
+    min = d->vartable[j].lim.min;
     range = max - min;
 
     for (i=0; i<d->nrows_in_plot; i++) {
@@ -426,8 +426,8 @@ world_to_raw_by_var (gint pt, gint var, displayd *display, datad *d, ggobid *gg)
     max = d->missing_lim.max;
     min = d->missing_lim.min;
   } else {
-    max = d->vardata[var].lim.max;
-    min = d->vardata[var].lim.min;
+    max = d->vartable[var].lim.max;
+    min = d->vartable[var].lim.min;
   }
   rdiff = max - min;
 

@@ -412,11 +412,11 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
 
   /*-- set a view of the data values before building the new circle --*/
   vartable_row_append (d->ncols-1, d, gg);
-  vardata_realloc (nc, d, gg);
-  d->vardata[nc-1].collab =
-    g_strdup (newName && newName[0] ? newName : d->vardata[jvar].collab);
-  d->vardata[nc-1].collab_tform =
-    g_strdup (newName && newName[0] ? newName : d->vardata[jvar].collab);
+  vartable_realloc (nc, d, gg);
+  d->vartable[nc-1].collab =
+    g_strdup (newName && newName[0] ? newName : d->vartable[jvar].collab);
+  d->vartable[nc-1].collab_tform =
+    g_strdup (newName && newName[0] ? newName : d->vartable[jvar].collab);
 
   /*
    * Follow the algorithm by which the table has been populated
@@ -446,12 +446,12 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
 
 
   /*-- now the rest of the variables --*/
-  d->vardata[nc-1].groupid = d->vardata[nc-1].groupid_ori =
-    d->vardata[d->ncols-1].groupid + 1; 
+  d->vartable[nc-1].groupid = d->vartable[nc-1].groupid_ori =
+    d->vartable[d->ncols-1].groupid + 1; 
 
-  d->vardata[nc-1].jitter_factor = d->vardata[jvar].jitter_factor;
+  d->vartable[nc-1].jitter_factor = d->vartable[jvar].jitter_factor;
 
-  d->vardata[nc-1].nmissing = d->vardata[jvar].nmissing;
+  d->vartable[nc-1].nmissing = d->vartable[jvar].nmissing;
 
   if(update) {
     updateAddedColumn (nc, jvar, d, gg);
@@ -465,16 +465,16 @@ gboolean
 updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
 {
   if(jvar > -1) {
-    d->vardata[nc-1].mean = d->vardata[jvar].mean;
-    d->vardata[nc-1].median = d->vardata[jvar].median;
-    d->vardata[nc-1].lim.min =
-      d->vardata[nc-1].lim_raw.min = d->vardata[nc-1].lim_raw_gp.min =
-      d->vardata[nc-1].lim_tform.min = d->vardata[nc-1].lim_tform_gp.min =
-      d->vardata[jvar].lim_raw.min;
-    d->vardata[nc-1].lim.max =
-      d->vardata[nc-1].lim_raw.max = d->vardata[nc-1].lim_raw_gp.max =
-      d->vardata[nc-1].lim_tform.max = d->vardata[nc-1].lim_tform_gp.max =
-      d->vardata[jvar].lim_raw.max;
+    d->vartable[nc-1].mean = d->vartable[jvar].mean;
+    d->vartable[nc-1].median = d->vartable[jvar].median;
+    d->vartable[nc-1].lim.min =
+      d->vartable[nc-1].lim_raw.min = d->vartable[nc-1].lim_raw_gp.min =
+      d->vartable[nc-1].lim_tform.min = d->vartable[nc-1].lim_tform_gp.min =
+      d->vartable[jvar].lim_raw.min;
+    d->vartable[nc-1].lim.max =
+      d->vartable[nc-1].lim_raw.max = d->vartable[nc-1].lim_raw_gp.max =
+      d->vartable[nc-1].lim_tform.max = d->vartable[nc-1].lim_tform_gp.max =
+      d->vartable[jvar].lim_raw.max;
    } 
 
   transform_values_init (nc-1, d, gg);
@@ -699,7 +699,7 @@ varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
   gtk_widget_show (vb);
 
   d->varpanel_ui.label[k] =
-    gtk_button_new_with_label (d->vardata[k].collab);
+    gtk_button_new_with_label (d->vartable[k].collab);
 
   gtk_widget_show (d->varpanel_ui.label[k]);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
@@ -856,5 +856,5 @@ vartable_refresh (datad *d, ggobid *gg) {
 void
 varlabel_set (gint j, datad *d, ggobid *gg) {
   gtk_label_set_text (GTK_LABEL (GTK_BIN (d->varpanel_ui.label[j])->child),
-    d->vardata[j].collab_tform);
+    d->vartable[j].collab_tform);
 }

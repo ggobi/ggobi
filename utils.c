@@ -281,10 +281,10 @@ get_vgroup_cols (gint k, gint *cols, datad *d, ggobid *gg) {
  * Return all columns in the same vgroup as k
 */
   gint j, ncols = 0;
-  gint groupno = d->vardata[k].groupid;
+  gint groupno = d->vartable[k].groupid;
 
   for (j=0; j<d->ncols; j++)
-    if (d->vardata[j].groupid == groupno)
+    if (d->vartable[j].groupid == groupno)
        cols[ncols++] = j;
 
   return ncols;
@@ -302,16 +302,16 @@ selected_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg)
   gboolean included;
 
   for (j=0; j<d->ncols; j++)
-    if (d->vardata[j].selected)
+    if (d->vartable[j].selected)
       cols[ncols++] = j;
 
   if (add_vgroups) {
     /*-- now add their fellow vgroup members --*/
     for (j=0; j<d->ncols; j++) {
-      groupno = d->vardata[j].groupid;
+      groupno = d->vartable[j].groupid;
       /*-- look for j's fellow group members --*/
       for (k=0; k<d->ncols; k++) {
-        if (k != j && d->vardata[k].groupid == groupno) {
+        if (k != j && d->vartable[k].groupid == groupno) {
           /*-- if k is not already in cols, add it */
           included = false;
           for (n=0; n<ncols; n++) {

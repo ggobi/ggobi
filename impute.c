@@ -53,8 +53,8 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
        j = selected_cols[k];
 
       /* First find the maximum and minimum values of the non-missing data */
-      maxval = d->vardata[j].lim_raw.min;
-      maxval = d->vardata[j].lim_raw.max;
+      maxval = d->vartable[j].lim_raw.min;
+      maxval = d->vartable[j].lim_raw.max;
 
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
