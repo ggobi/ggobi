@@ -183,6 +183,8 @@ marshal.h: marshal.list
 marshal.c: marshal.list
 	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --body > $@
 
+marshal.o: marshal.h 
+
 ifneq ($(GTK_2),)
  make_ggobi.o: marshal.h GtkSignalDef.c
 endif
