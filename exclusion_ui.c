@@ -448,7 +448,8 @@ static void update_cb(GtkWidget * w, ggobid * gg)
   cluster_window_open(gg);
 }
 
-static gboolean nclusters_changed(ggobid * gg)
+static gboolean 
+nclusters_changed(ggobid * gg)
 {
   datad *d;
   gint k, nrows = 0;
