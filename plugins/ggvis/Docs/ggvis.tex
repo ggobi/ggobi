@@ -14,11 +14,8 @@
 \maketitle
 
 \begin{abstract}
-
 ggvis is a graph layout plugin for ggobi, and this manual
-describes its use.  It can be expected to change and grow in the
-coming months.
-
+describes its use.  It can be expected to change and grow.
 \end{abstract}
 
 \section{The data}
@@ -40,11 +37,11 @@ The edge records use those \XMLAttribute{id}s to specify a
 <record source="0" destination="2"> ... </record>
 \end{verbatim}
 
-The sample data that is discussed here is part of the ggobi
-distribution: \file{snetwork.xml}, an artificial social network
-of 140 people who are connected by 205 edges, representing
-some form of social contact.  Notice that there are two variables
-recorded for each node, and two variables for each edge.  
+The sample data that is discussed here is part of the ggobi distribution:
+\file{snetwork.xml}, an artificial social network of 140 people who are
+connected by 205 edges, representing some (unspecified) form of social
+contact.  Notice that there are two variables recorded for each node,
+and two variables for each edge.
 
 In a ggobi scatterplot display, use the {\bf Edges} menu to
 display the edges, and maybe the ``arrowheads'' which indicate
@@ -57,7 +54,25 @@ There are two layout algorithms presently implemented in ggvis,
 classical multidimensional scaling (with an optional force
 adjustment algorithm), and a radial layout.
 
-\subsection {Multidimensional scaling}
+Find the ``Graph layout ...'' item on ggobi's Tools menu
+to open the ggvis control panel.  It contains a ``notebook''
+widget with one page for each layout method.
+
+\subsection {Network layout}
+
+This layout uses classical multidimensional scaling (CMDS).  CMDS yields a
+layout in which the sum of squares of the physical distances between nodes
+is as close as possible to the sum of squares of the ``link distances,''
+that is, the number of edges in the shortest path between $node_i$
+to $node_j$.
+
+Click on ``cmds.''
+
+Layouts produced by MDS are dominated by large distances, so it
+is sometimes useful to apply a few iterations of a force adjustment
+algorithm to spread out the leaf nodes.  Force adjustment algorithms
+are sometime called spring algorithms because they model a graph as
+a physical system, a collection of weights and springs.
 
 \subsection {Radial layout}
 
@@ -73,6 +88,6 @@ adjustment algorithm), and a radial layout.
 
 \section{Animation via R}
 
-% Bibliography:  Graham Wills layout paper, xgvis papers
+% Bibliography: MDS reference, Graham Wills layout paper, xgvis papers
 
 \end{document}
