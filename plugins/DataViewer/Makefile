@@ -27,7 +27,7 @@ SRC=worksheet
 OBJS=$(SRC:%=%.o)
 
 $(PKG).so: $(OBJS)
-	$(CC) -shared $(OBJS) -o $@ $(GGOBI_LIB)  $(EXTRA_LIBS)  $(GTK_CONFIG --libs)
+	$(CC) -shared $(OBJS) -o $@ $(GGOBI_LIB)  $(EXTRA_LIBS)  $(shell $(GTK_CONFIG) --libs)
 
 clean:
 	rm -f *.o 
