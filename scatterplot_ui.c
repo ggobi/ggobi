@@ -102,7 +102,7 @@ scatterplot_display_edge_menu_update (displayd *display,
   if (d->rowid.idv.nels > 0 || d->rowIds) {
     for (k=0; k<nd; k++) { 
       e = (datad*) g_slist_nth_data (gg->d, k);
-      if (e != d && e->edge.n > 0)
+      if (/* e != d && */ e->edge.n > 0)
         ne++;
     }
   }

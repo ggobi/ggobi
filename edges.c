@@ -110,7 +110,7 @@ gboolean edgeset_add(displayd * display)
     if (d->rowid.idv.nels > 0) {
       for (k = 0; k < nd; k++) {
         e = (datad *) g_slist_nth_data(gg->d, k);
-        if (e != d && e->edge.n > 0) {
+        if (/* e != d && */ e->edge.n > 0) {
           setDisplayEdge(display, e);
           added = true;
           break;
