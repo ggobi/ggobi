@@ -520,7 +520,7 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
 
 gboolean
 pca_calc (datad *d, ggobid *gg) {
-  gboolean svd_ok;
+  gboolean svd_ok = false;
 
   eigenvec_zero (d, gg);
 
