@@ -38,7 +38,7 @@ gdouble tr(gdouble **a, gint n);
 
 void nrerror(gchar *string) {
   printf ("\nError: %s\n",string);
-  abort;
+  /*abort;*/
 }
 
 
@@ -471,7 +471,7 @@ g_printerr ("trace of c after decomposition: %.2f\n",sum);
     }
   }
 
-  arrayd_free (&c);
+  arrayd_free (&c, 0, 0);
   g_free (d);
   g_free (e);
 
