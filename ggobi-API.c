@@ -1545,7 +1545,7 @@ GGOBI(setTour2DProjectionMatrix)(gdouble *Fvalues, gint ncols, gint ndim,
 
     /* Pause the tour */
     if (!cpanel->t2d.paused)
-      tour2d_pause(cpanel, true, gg);
+      tour2d_pause(cpanel, true, dsp, gg);
 
     /* Set the projection vector F */
     for (i=0; i<ndim; i++) 
@@ -1593,4 +1593,20 @@ GGOBI(getTour2DProjectionMatrix)(gint ncols, gint ndim, gboolean vals_scaled,
   return ((const gdouble **) Fvals);
 }
 
-
+/* something like this -- dfs --
+void
+GGOBI(edge_menus_update)(ggobid *gg)
+{
+  GList *dlist;
+  displayd *display;
+  for (dlist = gg->displays; dlist != NULL; dlist = dlist->next) {
+    display = (displayd *) dlist->data;
+    if (GTK_WIDGET_REALIZED (GTK_GGOBI_WINDOW_DISPLAY(display)->window) &&
+        GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(display))
+    {
+      scatterplot_display_edge_menu_update (GTK_GGOBI_DISPLAY(display),
+        gg->app.sp_accel_group, display_options_cb, gg);
+    }
+  }
+}
+*/
