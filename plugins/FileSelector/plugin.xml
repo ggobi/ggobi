@@ -1,4 +1,4 @@
- <inputPlugin name="fileSelect">
+ <inputPlugin name="fileSelect" interactive="true">
   <description>Prompts user to select a file from a directory
   browser. Currently expects XML format.</description>
   <author>Duncan Temple Lang</author>

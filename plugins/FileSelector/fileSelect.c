@@ -16,11 +16,11 @@ typedef struct {
 } DialogInput;
 
 
-gboolean show_fileselector(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *);
+gboolean show_fileselector(InputDescription *desc, ggobid *gg, GGobiPluginInfo *);
 
 InputDescription *
 get_description(const char *const fileName, const char *const modeName,
-                  ggobid *gg, GGobiInputPluginInfo *info)
+                  ggobid *gg, GGobiPluginInfo *info)
 {
 
   InputDescription *desc;
@@ -79,7 +79,7 @@ cancel_clicked(GtkWidget *widget, DialogInput *data)
 }
 
 gboolean
-show_fileselector(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *info)
+show_fileselector(InputDescription *desc, ggobid *gg, GGobiPluginInfo *info)
 {
     GtkWidget *w, *dlg;
     gint type;
