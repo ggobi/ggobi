@@ -23,12 +23,11 @@
 #define WIDTH   370
 #define HEIGHT  370
 
-
 gfloat barchart_sort_index (gfloat *yy, gint ny, ggobid *gg, splotd *sp);
 void barchart_clean_init (splotd *sp);
 void barchart_init_categorical (splotd *sp, datad *d);
 void barchart_set_initials (splotd *sp, datad *d);
-void rectangle_inset (bind *bin);
+void rectangle_inset (gbind *bin);
 void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg);
 void barchart_allocate_structure (splotd *sp, datad *d);
 void button_draw_with_shadows (GdkPoint *region, GdkDrawable *drawable, ggobid *gg);
@@ -185,12 +184,11 @@ void barchart_clean_init (splotd *sp) {
   datad *d = display->d;
   gint i, j;
 
-/*dfs-barchart*/ sp->bar->nbins = -1;
+  sp->bar->nbins = -1;
 
   sp->bar->new_nbins = -1;
   barchart_allocate_structure (sp,d);
 
-/* dfs-barchart -- make sure these are all initialized: */
   for (i=0; i<sp->bar->nbins; i++) {
     sp->bar->bins[i].count = 0;
     for (j=0; j<sp->bar->ncolors; j++) {
@@ -384,7 +382,7 @@ void barchart_recalc_group_dimensions (splotd *sp, ggobid *gg) {
 
 }
 
-void rectangle_inset (bind *bin) {
+void rectangle_inset (gbind *bin) {
 /* works around the gdk convention, that the areas of filled and framed rectangles differ
    by one pixel in each dimension */
 
@@ -478,15 +476,15 @@ void barchart_allocate_structure (splotd *sp, datad *d) {
   sp->bar->nbins = nbins;
 
 /* allocate space */
-  sp->bar->bins = (bind *) g_malloc (nbins * sizeof (bind));
-  sp->bar->cbins = (bind **) g_malloc (nbins * sizeof (bind *));
+  sp->bar->bins = (gbind *) g_malloc (nbins * sizeof (gbind));
+  sp->bar->cbins = (gbind **) g_malloc (nbins * sizeof (gbind *));
   sp->bar->ncolors = scheme->n;
   sp->bar->bar_hit = (gboolean *) g_malloc ((nbins+2) * sizeof(gboolean));
   sp->bar->old_bar_hit = (gboolean *) g_malloc ((nbins+2) * sizeof(gboolean));
 
 
   for (i=0; i < sp->bar->nbins; i++) {
-    sp->bar->cbins[i] = (bind *) g_malloc (sp->bar->ncolors * sizeof (bind));
+    sp->bar->cbins[i] = (gbind *) g_malloc (sp->bar->ncolors * sizeof (gbind));
   }
 
 
@@ -700,9 +698,9 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
     if (rank > 0) {
       sp->bar->low_pts_missing = TRUE;
       if (sp->bar->low_bin == NULL)
-        sp->bar->low_bin = (bind *) g_malloc (sizeof(bind));
+        sp->bar->low_bin = (gbind *) g_malloc (sizeof(gbind));
       if (sp->bar->col_low_bin == NULL)
-        sp->bar->col_low_bin = (bind *) g_malloc (sp->bar->ncolors*sizeof(bind));
+        sp->bar->col_low_bin = (gbind *) g_malloc (sp->bar->ncolors*sizeof(gbind));
       sp->bar->low_bin->count = rank;
     }
     bin = 0;
@@ -724,10 +722,10 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
           if (sp->bar->high_pts_missing == FALSE) {
             sp->bar->high_pts_missing = TRUE; 
             if (sp->bar->high_bin == NULL)
-              sp->bar->high_bin = (bind *) g_malloc (sizeof(bind));
+              sp->bar->high_bin = (gbind *) g_malloc (sizeof(gbind));
             if (sp->bar->col_high_bin == NULL)
-              sp->bar->col_high_bin = (bind *)
-                g_malloc (sp->bar->ncolors *sizeof(bind));
+              sp->bar->col_high_bin = (gbind *)
+                g_malloc (sp->bar->ncolors *sizeof(gbind));
             sp->bar->high_bin->count = 0; 
           }
           sp->bar->high_bin->count++;
@@ -1238,6 +1236,5 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   }
   
 }
-
 
 #endif
