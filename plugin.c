@@ -75,41 +75,48 @@ load_plugin_library(GGobiPluginDetails *plugin)
   fileName = plugin->dllName;
 
   if(!fileName || !fileName[0]) {
-      plugin->loaded = true;  
-      return(NULL);
+    plugin->loaded = true;  
+    return(NULL);
   }
 
   if(canRead(fileName) == false) {
-    fileName = (char *) g_malloc((strlen(fileName)+ strlen(DLL_EXTENSION) + 1)*sizeof(char));
+    fileName = (char *)
+      g_malloc((strlen(fileName)+ strlen(DLL_EXTENSION) + 1)*sizeof(char));
     strcpy(fileName, plugin->dllName);
     strcpy(fileName+strlen(plugin->dllName), DLL_EXTENSION);
     fileName[strlen(plugin->dllName) + strlen(DLL_EXTENSION)] = '\0';
   }
 
   if(canRead(fileName) == false) {
-      if(sessionOptions->verbose != GGOBI_SILENT)
-	  fprintf(stderr, "can't locate plugin library %s:\n", plugin->dllName);fflush(stderr);      
-      if(fileName != plugin->dllName)
-	  g_free(fileName);
-      plugin->loaded = true;
+    if(sessionOptions->verbose != GGOBI_SILENT) {
+      fprintf(stderr, "can't locate plugin library %s:\n", plugin->dllName);
+      fflush(stderr);
+    }
+    if(fileName != plugin->dllName)
+      g_free(fileName);
+    plugin->loaded = true;
     return(NULL);
   }
 
    handle = dynload->open(fileName, plugin);
    if(!handle && sessionOptions->verbose != GGOBI_SILENT) {
-    char buf[1000];
-      dynload->getError(buf, plugin);
-      fprintf(stderr, "error on loading plugin library %s: %s\n", plugin->dllName, buf);fflush(stderr);
+     char buf[1000];
+     dynload->getError(buf, plugin);
+     fprintf(stderr, "error on loading plugin library %s: %s\n",
+       plugin->dllName, buf);
+     fflush(stderr);
    }
 
-   /* Set loaded to true even if we fail. This will cause us not to try to load it again! 
-      The code that is interested in whether it is actually loaded and the symbols available
-      should check the `library' handle being non-NULL.
+   /* Set loaded to true even if we fail. This will cause us not to
+      try to load it again!
+      The code that is interested in whether it is actually loaded
+      and the symbols available should check the `library' handle
+      being non-NULL.
     */
    plugin->loaded = true;  /* (handle != NULL); */
 
    if(fileName != plugin->dllName)
-      g_free(fileName);
+     g_free(fileName);
    return(handle);
 }
 
@@ -135,14 +142,14 @@ registerPlugins(ggobid *gg, GList *plugins)
   while(el) {
     plugin = (GGobiPluginInfo *) el->data;
     if(plugin->type != GENERAL_PLUGIN) {
-	el = el->next;
-	continue;
+      el = el->next;
+      continue;
     }
 
     ok = true;
 
     if(!plugin->details->loaded) {
-	loadPluginLibrary(plugin->details, plugin);
+      loadPluginLibrary(plugin->details, plugin);
     }
 
     if(plugin->info.g->onCreate) {
@@ -381,7 +388,7 @@ runInteractiveInputPlugin(ggobid *gg)
          strcmp(sessionOptions->data_type, plugin->info.i->modeName) == 0)
       {
         InputGetDescription f;
-	loadPluginLibrary(plugin->details, plugin);
+        loadPluginLibrary(plugin->details, plugin);
         f = (InputGetDescription) getPluginSymbol(plugin->info.i->getDescription,
                                                   plugin->details);
         if(f) {
