@@ -55,7 +55,6 @@ symbol_table_populate (datad *d)
       d->symbol_table[j][k][m].nshown++;
   }
 
-
   return nclusters;
 }
 
@@ -70,6 +69,13 @@ clusters_set (datad *d, ggobid *gg) {
   /*-- reallocate the array of cluster structures --*/
   d->clusv = (clusterd *)
     g_realloc (d->clusv, nclusters * sizeof (clusterd));
+
+  /*
+   * make sure new clusters are not excluded, without changing the
+   * status of pre-existing clusters.
+  */
+  for (i=d->nclusters; i<nclusters; i++)
+    d->clusv[i].excluded_p = false;
 
   /*
    * populate the clusv structures using the information in the

@@ -108,6 +108,7 @@ void cluster_table_labels_update(datad * d, ggobid * gg)
   }
 }
 
+/*
 static void rescale_cb(GtkWidget * w, ggobid * gg)
 {
   datad *d = datad_get_from_notebook(gg->cluster_ui.notebook, gg);
@@ -118,23 +119,21 @@ static void rescale_cb(GtkWidget * w, ggobid * gg)
   vartable_limits_set(d);
   vartable_stats_set(d);
 
-  if (cpanel->projection == TOUR1D) {
+  if (cpanel->projection == TOUR1D)
     dsp->t1d.get_new_target = true;
-  }
-  if (cpanel->projection == TOUR2D3) 
+  else if (cpanel->projection == TOUR2D3) 
     dsp->t2d3.get_new_target = true;
-  if (cpanel->projection == TOUR2D) {
+  else if (cpanel->projection == TOUR2D) {
     dsp->t2d.get_new_target = true;
-  }
-  if (cpanel->projection == COTOUR) {
+  else if (cpanel->projection == COTOUR) {
     dsp->tcorr1.get_new_target = true;
     dsp->tcorr2.get_new_target = true;
   }
 
   tform_to_world(d, gg);
-  displays_tailpipe(FULL, gg);   /*-- points rebinned --*/
+  displays_tailpipe(FULL, gg);
 }
-
+*/
 
 static gint hide_cluster_cb(GtkToggleButton * btn, gpointer cbd)
 {
@@ -147,13 +146,13 @@ static gint hide_cluster_cb(GtkToggleButton * btn, gpointer cbd)
   for (i = 0; i < d->nrows; i++) {
     if (d->sampled.els[i]) {
       if (d->clusterid.els[i] == k) {
-        d->hidden.els[i] = d->hidden_now.els[i] = true;
+        d->hidden.els[i] = d->hidden_now.els[i] = btn->active;
       }
     }
   }
 
-  rows_in_plot_set(d, gg);
-  assign_points_to_bins(d, gg);
+  /*rows_in_plot_set(d, gg);*/
+  /*assign_points_to_bins(d, gg);*/
   clusters_set(d, gg);
 
   cluster_table_labels_update(d, gg);
@@ -162,58 +161,47 @@ static gint hide_cluster_cb(GtkToggleButton * btn, gpointer cbd)
   return false;
 }
 
-static gint show_cluster_cb(GtkToggleButton * btn, gpointer cbd)
+static gint exclude_cluster_cb(GtkToggleButton * btn, gpointer cbd)
 {
   gint k = GPOINTER_TO_INT(cbd);
-  gint i;
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(btn), true);
   datad *d = datad_get_from_notebook(gg->cluster_ui.notebook, gg);
+  displayd *dsp = gg->current_display; 
+  cpaneld *cpanel = &dsp->cpanel;
 
-  /*-- operating on the current sample, whether hidden or shown --*/
-  for (i = 0; i < d->nrows; i++) {
-    if (d->sampled.els[i]) {
-      if (d->clusterid.els[i] == k) {
-        d->hidden.els[i] = d->hidden_now.els[i] = false;
-      }
-    }
-  }
-
-  clusters_set(d, gg);
-  cluster_table_labels_update(d, gg);
+  d->clusv[k].excluded_p = btn->active;
 
   rows_in_plot_set(d, gg);
+  /*assign_points_to_bins(d, gg);*/
+  clusters_set(d, gg);
+
+  cluster_table_labels_update(d, gg);
 
   /*
    * Don't re-set the limits, but re-run the pipeline in case
    * the data about to be shown isn't on the current scale
-   */
   tform_to_world(d, gg);
-  displays_tailpipe(FULL, gg);  /*-- points rebinned in here --*/
-
-  return false;
-}
-
-/*-- show/hide complement --*/
-static gint comp_cluster_cb(GtkToggleButton * btn, gpointer cbd)
-{
-  gint k = GPOINTER_TO_INT(cbd);
-  gint i;
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(btn), true);
-  datad *d = datad_get_from_notebook(gg->cluster_ui.notebook, gg);
-
-  /*-- operating on the current sample, whether hidden or shown --*/
-  for (i = 0; i < d->nrows; i++) {
-    if (d->sampled.els[i]) {
-      if (d->clusterid.els[i] == k) {
-        d->hidden.els[i] = d->hidden_now.els[i] = !d->hidden.els[i];
-      }
-    }
-  }
-  rows_in_plot_set(d, gg);
-  assign_points_to_bins(d, gg);
-  clusters_set(d, gg);
-  cluster_table_labels_update(d, gg);
+  displays_tailpipe(FULL, gg);
   displays_plot(NULL, FULL, gg);
+   */
+
+  limits_set(true, true, d, gg);
+  vartable_limits_set(d);
+  vartable_stats_set(d);
+
+  if (cpanel->projection == TOUR1D)
+    dsp->t1d.get_new_target = true;
+  else if (cpanel->projection == TOUR2D3) 
+    dsp->t2d3.get_new_target = true;
+  else if (cpanel->projection == TOUR2D)
+    dsp->t2d.get_new_target = true;
+  else if (cpanel->projection == COTOUR) {
+    dsp->tcorr1.get_new_target = true;
+    dsp->tcorr2.get_new_target = true;
+  }
+
+  tform_to_world(d, gg);
+  displays_tailpipe(FULL, gg);
 
   return false;
 }
@@ -351,14 +339,23 @@ void cluster_add(gint k, datad * d, ggobid * gg)
     (GtkAttachOptions) 0, (GtkAttachOptions) 0, 5, 2);
 
 
-  d->clusvui[k].h_btn = gtk_button_new_with_label("H");
-  gtk_signal_connect(GTK_OBJECT(d->clusvui[k].h_btn), "clicked",
+  d->clusvui[k].h_btn = gtk_toggle_button_new_with_label("H");
+  gtk_signal_connect(GTK_OBJECT(d->clusvui[k].h_btn), "toggled",
     GTK_SIGNAL_FUNC(hide_cluster_cb), GINT_TO_POINTER(k));
   GGobi_widget_set(d->clusvui[k].h_btn, gg, true);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
     d->clusvui[k].h_btn,
     1, 2, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
 
+  d->clusvui[k].e_btn = gtk_toggle_button_new_with_label("E");
+  gtk_signal_connect(GTK_OBJECT(d->clusvui[k].e_btn), "toggled",
+    GTK_SIGNAL_FUNC(exclude_cluster_cb), GINT_TO_POINTER(k));
+  GGobi_widget_set(d->clusvui[k].e_btn, gg, true);
+  gtk_table_attach(GTK_TABLE(d->cluster_table),
+    d->clusvui[k].e_btn,
+    2, 3, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+
+/*
   d->clusvui[k].s_btn = gtk_button_new_with_label("S");
   gtk_signal_connect(GTK_OBJECT(d->clusvui[k].s_btn), "clicked",
                      GTK_SIGNAL_FUNC(show_cluster_cb), GINT_TO_POINTER(k));
@@ -374,26 +371,27 @@ void cluster_add(gint k, datad * d, ggobid * gg)
   gtk_table_attach(GTK_TABLE(d->cluster_table),
     d->clusvui[k].c_btn,
     3, 4, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+*/
 
   str = g_strdup_printf("%ld", d->clusv[k].nhidden);
   d->clusvui[k].nh_lbl = gtk_label_new(str);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
     d->clusvui[k].nh_lbl,
-    4, 5, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+    3, 4, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
   g_free(str);
 
   str = g_strdup_printf("%ld", d->clusv[k].nshown);
   d->clusvui[k].ns_lbl = gtk_label_new(str);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
     d->clusvui[k].ns_lbl,
-    5, 6, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+    4, 5, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
   g_free(str);
 
   str = g_strdup_printf("%ld", d->clusv[k].n);
   d->clusvui[k].n_lbl = gtk_label_new(str);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
     d->clusvui[k].n_lbl,
-    6, 7, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+    5, 6, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
   g_free(str);
 }
 
@@ -402,8 +400,11 @@ void cluster_free(gint k, datad * d, ggobid * gg)
   if (d->clusvui[k].da) {
     gtk_widget_destroy(d->clusvui[k].da);
     gtk_widget_destroy(d->clusvui[k].h_btn);
+    gtk_widget_destroy(d->clusvui[k].e_btn);
+/*
     gtk_widget_destroy(d->clusvui[k].s_btn);
     gtk_widget_destroy(d->clusvui[k].c_btn);
+*/
     gtk_widget_destroy(d->clusvui[k].nh_lbl);
     gtk_widget_destroy(d->clusvui[k].ns_lbl);
     gtk_widget_destroy(d->clusvui[k].n_lbl);
@@ -532,7 +533,7 @@ void cluster_window_open(ggobid * gg)
       scrolled_window, gtk_label_new(d->name));
     gtk_widget_show(scrolled_window);
 
-    d->cluster_table = gtk_table_new(d->nclusters + 1, 7, false);
+    d->cluster_table = gtk_table_new(d->nclusters + 1, 6, true);
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW
       (scrolled_window), d->cluster_table);
 
@@ -559,6 +560,15 @@ void cluster_window_open(ggobid * gg)
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
+      "Exclude all cases with the corresponding symbol",
+      NULL);
+    lbl = gtk_label_new("Exclude");
+    gtk_container_add(GTK_CONTAINER(ebox), lbl);
+    gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
+      2, 3, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+/*
+    ebox = gtk_event_box_new();
+    gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
       "Show all cases with the corresponding symbol",
       NULL);
     lbl = gtk_label_new("Show");
@@ -574,6 +584,7 @@ void cluster_window_open(ggobid * gg)
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
       3, 4, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+*/
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
@@ -582,7 +593,7 @@ void cluster_window_open(ggobid * gg)
     lbl = gtk_label_new("Hidden");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-      4, 5, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+      3, 4, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
@@ -591,7 +602,7 @@ void cluster_window_open(ggobid * gg)
     lbl = gtk_label_new("Shown");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-      5, 6, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+      4, 5, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
@@ -600,7 +611,7 @@ void cluster_window_open(ggobid * gg)
     lbl = gtk_label_new("N");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-      6, 7, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+      5, 6, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     d->clusvui = (clusteruid *)
       g_realloc(d->clusvui, d->nclusters * sizeof(clusteruid));
@@ -635,6 +646,7 @@ void cluster_window_open(ggobid * gg)
   gtk_box_pack_start(GTK_BOX(hbox), btn, true, true, 0);
 
   /*-- Rescale button --*/
+/*
   btn = gtk_button_new_with_label("Rescale");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Reset the plotting limits; use to rescale in response to hiding (or showing) points.",
@@ -642,6 +654,7 @@ void cluster_window_open(ggobid * gg)
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
     GTK_SIGNAL_FUNC(rescale_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(hbox), btn, true, true, 0);
+*/
 
   /*-- Close button --*/
   btn = gtk_button_new_with_label("Close");

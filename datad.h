@@ -123,7 +123,7 @@ struct _datad {
   gint nclusters;
   clusterd *clusv;
   clusteruid *clusvui;
-  vector_i clusterid;
+  vector_i clusterid;  /* cluster membership for each record */
 
  /*------------------------ jittering --------------------------------*/
 

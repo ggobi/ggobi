@@ -481,6 +481,7 @@ reverse_video_cb (GtkWidget *ok_button, ggobid* gg) {
   gushort r, g, b;
   gint rval = false;
   colorschemed *scheme = gg->activeColorScheme;
+  gboolean writeable = false, best_match = true;
 
   r = scheme->rgb_accent.red;
   g = scheme->rgb_accent.green;
@@ -496,6 +497,13 @@ reverse_video_cb (GtkWidget *ok_button, ggobid* gg) {
   scheme->rgb_bg.green = g;
   scheme->rgb_bg.blue = b;
   scheme->rgb_bg.pixel = pixel;
+
+  scheme->rgb_hidden.red =   65535 - scheme->rgb_hidden.red;
+  scheme->rgb_hidden.green = 65535 - scheme->rgb_hidden.green;
+  scheme->rgb_hidden.blue =  65535 - scheme->rgb_hidden.blue;
+  if (!gdk_colormap_alloc_color(gdk_colormap_get_system(),
+                                &scheme->rgb_hidden, writeable, best_match))
+    g_printerr("failure allocating hidden color\n");
 
   gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
     "expose_event", (gpointer) gg, (gpointer) &rval);

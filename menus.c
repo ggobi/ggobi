@@ -338,42 +338,12 @@ brush_menus_make (ggobid *gg)
                       (gpointer) GINT_TO_POINTER (RESET_UNHIDE_EDGES));
   gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
-  item = gtk_menu_item_new_with_label ("Rescale");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (BRUSH_RESET_SCALE));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
   item = gtk_menu_item_new_with_label ("Reset brush size");
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (RESET_INIT_BRUSH));
   gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-/* item = gtk_menu_item_new_with_label ("Reset edgecolors");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER(4));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Reset point colors");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (1));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Reset glyphs");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (2));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-*/
-
 
   gtk_widget_show_all (gg->menus.reset_menu);
 
@@ -673,7 +643,6 @@ viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display,
       identify_menus_make (gg);
     break;
 
-    case EDGEED:
     case NULLMODE:
     case NMODES:  /*-- why is this part of the enum? --*/
 

@@ -24,6 +24,8 @@ typedef struct {
   gfloat *bg;           /*-- high-contrast background color, rgb --*/
   GdkColor rgb_bg;     /*-- high-contrast background color, rgb --*/
 
+  GdkColor rgb_hidden;  /*-- for hidden points and edges, close to bg --*/
+
   gfloat *accent;       /*-- high-contrast accent color, rgb --*/
   GdkColor rgb_accent; /*-- high-contrast accent color, rgb --*/
 } colorschemed;

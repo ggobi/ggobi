@@ -75,6 +75,30 @@ void colorscheme_init(colorschemed * scheme)
     g_printerr("failure allocating background color\n");
 
 /*
+ * color for showing hidden points and edges to preserve context
+ * in a few situations:  when doing "un-hide" brushing and when showing
+ * neighbors in the GraphAction plugin
+*/
+ {
+    gfloat red, green, blue;
+    if (scheme->bg[0] + scheme->bg[1] + scheme->bg[2] > 1.5) {
+      red = MAX (0.0,   scheme->bg[0] - .3);
+      green = MAX (0.0, scheme->bg[1] - .3);
+      blue = MAX (0.0,  scheme->bg[2] - .3);
+    } else {
+      red = MIN (1.0,   scheme->bg[0] + .3);
+      green = MIN (1.0, scheme->bg[1] + .3);
+      blue = MIN (1.0,  scheme->bg[2] + .3);
+    }
+    scheme->rgb_hidden.red =   (guint16) (red * 65535.0);
+    scheme->rgb_hidden.green = (guint16) (green * 65535.0);
+    scheme->rgb_hidden.blue =  (guint16) (blue * 65535.0);
+    if (!gdk_colormap_alloc_color(gdk_colormap_get_system(),
+                                  &scheme->rgb_hidden, writeable, best_match))
+      g_printerr("failure allocating hidden color\n");
+ }
+
+/*
  * accent color:  that is, the color that's used for
  * axes and labels, and not for brushing.
 */
@@ -86,7 +110,7 @@ void colorscheme_init(colorschemed * scheme)
                                 best_match))
     g_printerr("failure allocating background color\n");
 
-  g_free(success);
+  g_free (success);
 }
 
 /*-- If gg->colorSchemes == NULL, then provide one and make it active --*/
@@ -172,22 +196,6 @@ colorschemed *default_scheme_init()
   return scheme;
 }
 
-/*
-static const gfloat default_rgb[MAXNCOLORS][3] = {
-  {0.73, 0.33, 0.83},
-  {0.51, 0.44, 1.00},
-  {0.00, 0.75, 1.00},
-  {0.00, 0.98, 0.60},
-  {0.60, 0.80, 0.20},
-  {1.00, 1.00, 0.00},
-  {1.00, 0.84, 0.00},
-  {1.00, 0.55, 0.00},
-  {1.00, 0.27, 0.00},
-  {1.00, 0.08, 0.58}
-};
-static const gfloat bg_rgb  []    = {0, 0, 0};  * -> bg_color *
-static const gfloat accent_rgb [] = {1, 1, 1};  * -> fg_color *
-*/
 
 /* API */
 static guint m[MAXNCOLORS][3];
@@ -241,9 +249,6 @@ void special_colors_init(ggobid * gg)
     (guint16) (.7*65535.0);
   if (!gdk_colormap_alloc_color (cmap, &gg->lightgray, writeable, best_match))
     g_printerr("trouble allocating light gray\n");
-
-
-
 }
 
 void init_plot_GC(GdkWindow * w, ggobid * gg)

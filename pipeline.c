@@ -288,9 +288,11 @@ rows_in_plot_set (datad *d, ggobid *gg) {
   d->nrows_in_plot = 0;
 
   for (i=0; i<d->nrows; i++) {
-    if (!d->hidden.els[i] && d->sampled.els[i]) {
+    /*if (!d->hidden.els[i] && d->sampled.els[i]) {*/
+    if (d->nclusters && d->clusv[d->clusterid.els[i]].excluded_p)
+      ;
+    else if (d->sampled.els[i])
       d->rows_in_plot.els[d->nrows_in_plot++] = i;
-    }
   }
 
   klass = GTK_GGOBI_DATA_CLASS(GTK_OBJECT(d)->klass);
