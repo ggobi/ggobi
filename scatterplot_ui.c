@@ -143,9 +143,8 @@ scatterplot_display_edge_menu_update (displayd *display,
 
       for (k=0; k<nd; k++) { 
         e = (datad *) g_slist_nth_data (gg->d, k);
-        if (e == d)
-          continue;
-        else if (e->edge.n > 0) {
+        /* if (e == d) continue; */
+        if (e->edge.n > 0) {
           lbl = datasetName (e, gg);
           item = CreateMenuItem (submenu, lbl,
             NULL, NULL, NULL, gg->main_accel_group,
