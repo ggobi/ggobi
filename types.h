@@ -51,6 +51,9 @@ typedef struct {
   gint jpartner;
 } endpointsd;
 
+
+typedef gfloat greal;  /*-- so we can use either floats or doubles --*/
+
 /*-- arrays --*/
 /*-- double: some plugins will want these --*/
 typedef struct {
@@ -67,11 +70,16 @@ typedef struct {
   gshort **vals;
   guint nrows, ncols;
 } array_s;
-/*-- long: for gg.world, jitdata --*/
+/*-- long: for world, jitdata --*/
 typedef struct {
   glong **vals;
   guint nrows, ncols;
 } array_l;
+/*-- real: for the new world, jitdata --*/
+typedef struct {
+  greal **vals;
+  guint nrows, ncols;
+} array_g;
 
 /*-- vectors --*/
 typedef struct {

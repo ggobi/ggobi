@@ -599,3 +599,138 @@ arrayl_delete_cols (array_l *arrp, gint nc, gint *cols)
   }
   g_free (keepers);
 }
+
+/*-------------------------------------------------------------------------*/
+/*                     greal array management                              */
+/*-------------------------------------------------------------------------*/
+
+void
+arrayg_init_null (array_g *arrp)
+{
+  arrp->nrows = arrp->ncols = 0;
+  arrp->vals = (greal **) NULL;
+}
+
+void
+arrayg_free (array_g *arrp, gint nr, gint nc)
+{
+  gint i;
+
+  /*-- if nr != 0, free only the last nrows-nr rows --*/
+
+  for (i=nr; i<arrp->nrows; i++)
+    if (arrp->vals[i] != NULL)
+      g_free (arrp->vals[i]);
+
+  if (nr == 0) {
+    if (arrp->vals != NULL)
+      g_free (arrp->vals);
+    arrp->vals = (greal **) NULL;
+  }
+
+  arrp->nrows = nr;
+  arrp->ncols = nc;
+}
+
+/* Zero a greal array. */
+void
+arrayg_zero (array_g *arrp)
+{
+  int i, j;
+  for (i=0; i<arrp->nrows; i++) {
+    for (j=0; j<arrp->ncols; j++) {
+      arrp->vals[i][j] = 0;
+    }
+  }
+}
+
+/* allocate a greal array */
+void
+arrayg_alloc (array_g *arrp, gint nr, gint nc)
+{
+  int i;
+
+  if ((arrp->nrows != 0)||(arrp->ncols != 0))
+    arrayg_free (arrp, 0, 0);
+
+  arrp->vals = (greal **) g_malloc (nr * sizeof (greal *));
+  for (i = 0; i < nr; i++)
+    arrp->vals[i] = (greal *) g_malloc (nc * sizeof (greal));
+  arrp->nrows = nr;
+  arrp->ncols = nc;
+}
+
+/* allocate a greal array populated with 0 */
+void
+arrayg_alloc_zero (array_g *arrp, gint nr, gint nc)
+{
+  int i;
+
+  if ((arrp->nrows != 0)||(arrp->ncols != 0))
+    arrayg_free (arrp, 0, 0);
+
+  arrp->vals = (greal **) g_malloc (nr * sizeof (greal *));
+  for (i = 0; i < nr; i++)
+    arrp->vals[i] = (greal *) g_malloc0 (nc * sizeof (greal));
+  arrp->nrows = nr;
+  arrp->ncols = nc;
+}
+
+/* increase the number of rows in a greal integer array */
+void
+arrayg_add_rows (array_g *arrp, gint nr)
+{
+  int i;
+
+  if (nr > arrp->nrows) {
+
+    arrp->vals = (greal **) g_realloc (arrp->vals, nr * sizeof (greal *));
+    for (i = arrp->nrows; i < nr; i++)
+      arrp->vals[i] = (greal *) g_malloc0 (arrp->ncols * sizeof (greal));
+
+    arrp->nrows = nr;
+  }
+}
+
+/* append columns to a greal array for a total of nc columns */
+void
+arrayg_add_cols (array_g *arrp, gint nc)
+{
+  gint i;
+
+  if (nc > arrp->ncols) {
+    for (i=0; i<arrp->nrows; i++)
+      arrp->vals[i] = (greal *) g_realloc (arrp->vals[i],
+                                           nc * sizeof (greal));
+    arrp->ncols = nc;
+  }
+}
+
+/*-- eliminate the nc columns contained in *cols --*/
+void
+arrayg_delete_cols (array_g *arrp, gint nc, gint *cols)
+{
+  gint i, k;
+  gint jto, jfrom;
+  gint *keepers = g_malloc ((arrp->ncols-nc) * sizeof (gint));
+  gint nkeepers = find_keepers (arrp->ncols, nc, cols, keepers);
+
+  if (nc > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      jto = k;
+      jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
+      if (jto != jfrom) {
+        for (i=0; i<arrp->nrows; i++)
+          arrp->vals[i][jto] = arrp->vals[i][jfrom];
+      }
+    }
+
+    for (i=0; i<arrp->nrows; i++)
+      arrp->vals[i] = (greal *) g_realloc (arrp->vals[i],
+                                           nkeepers * sizeof (greal));
+    arrp->ncols = nkeepers;
+  }
+  g_free (keepers);
+}
