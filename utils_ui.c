@@ -299,6 +299,66 @@ void scale_set_default_values (GtkScale *scale)
 /*      Notebook containing the variable list for each datad          */
 /*--------------------------------------------------------------------*/
 
+static void
+variable_notebook_subwindow_add (datad *d, GtkSelectionMode mode, 
+  GtkSignalFunc func, GtkWidget *notebook, ggobid *gg)
+{
+  GtkWidget *swin, *clist;
+  gint j;
+  gchar *row[1];
+  vartabled *vt;
+
+  /* Create a scrolled window to pack the CList widget into */
+  swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+                            swin, gtk_label_new (d->name));
+  gtk_widget_show (swin);
+
+  /* add the CList */
+  clist = gtk_clist_new (1);
+  gtk_clist_set_selection_mode (GTK_CLIST (clist), mode);
+  gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
+  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+                     GTK_SIGNAL_FUNC (func),
+                     gg);
+
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    row[0] = g_strdup_printf (vt->collab_tform);
+    gtk_clist_append (GTK_CLIST (clist), row);
+    g_free (row[0]);
+  }
+  gtk_container_add (GTK_CONTAINER (swin), clist);
+}
+
+static void variable_notebook_adddata_cb (GtkObject *obj, datad *d,
+  ggobid *gg, GtkWidget *notebook)
+{
+  /*
+   * Get the mode and func from the first notebook page?
+   * func is null except in wvis_ui.c
+  */
+  GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0);
+  if (swin) {
+    GtkWidget *clist;
+    GtkSelectionMode mode = GTK_SELECTION_SINGLE;
+    GtkSignalFunc func = NULL;
+    clist = GTK_BIN (swin)->child;
+    if (clist) {
+      mode = GTK_CLIST(clist)->selection_mode;
+      /*
+       * should also be possible to retrieve the signal function that
+       * responds to "select_row" signal
+      */
+    }
+    variable_notebook_subwindow_add (d, mode, func, notebook, gg);
+    gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
+                                g_slist_length (gg->d) > 1);
+  }
+}
+
 GtkWidget *
 get_clist_from_object (GtkObject *obj)
 {
@@ -384,13 +444,10 @@ GtkWidget *
 create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
   GtkSignalFunc func, ggobid *gg)
 {
-  GtkWidget *notebook, *swin, *clist;
+  GtkWidget *notebook;
   gint nd = g_slist_length (gg->d);
   GSList *l;
   datad *d;
-  gint j;
-  gchar *row[1];
-  vartabled *vt;
 
   /* Create a notebook, set the position of the tabs */
   notebook = gtk_notebook_new ();
@@ -398,40 +455,22 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
 
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (g_slist_length (d->vartable)) {
+      variable_notebook_subwindow_add (d, mode, func, notebook, gg);
+    }
+  }
+
   /*-- listen for variable_added events on main_window --*/
   gtk_signal_connect_object (GTK_OBJECT (gg->main_window),
     "variable_added", GTK_SIGNAL_FUNC (variable_notebook_addvar_cb),
      GTK_OBJECT (notebook));
 
-  for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
-    if (g_slist_length (d->vartable)) {
-
-      /* Create a scrolled window to pack the CList widget into */
-      swin = gtk_scrolled_window_new (NULL, NULL);
-      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
-        GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-      gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-                                swin, gtk_label_new (d->name));
-      gtk_widget_show (swin);
-
-      /* add the CList */
-      clist = gtk_clist_new (1);
-      gtk_clist_set_selection_mode (GTK_CLIST (clist), mode);
-      gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
-      gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-                         GTK_SIGNAL_FUNC (func),
-                         gg);
-
-      for (j=0; j<d->ncols; j++) {
-        vt = vartable_element_get (j, d);
-        row[0] = g_strdup_printf (vt->collab_tform);
-        gtk_clist_append (GTK_CLIST (clist), row);
-        g_free (row[0]);
-      }
-      gtk_container_add (GTK_CONTAINER (swin), clist);
-    }
-  }
+  /*-- listen for variable_added events on main_window --*/
+  gtk_signal_connect (GTK_OBJECT (gg->main_window),
+    "datad_added", GTK_SIGNAL_FUNC (variable_notebook_adddata_cb),
+     GTK_OBJECT (notebook));
 
   return notebook;
 }
