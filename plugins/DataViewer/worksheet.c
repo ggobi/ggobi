@@ -85,7 +85,7 @@ show_data_edit_window(PluginInstance *inst, GtkWidget *widget)
      window = create_ggobi_worksheet_window(inst->gg, inst);
      inst->data = window;
   } else {
-      gtk_widget_show_now((GtkWidget*) inst->data);
+     gtk_widget_show_now((GtkWidget*) inst->data);
   }
 }
 
