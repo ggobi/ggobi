@@ -245,7 +245,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
                                      (GtkSignalFunc) motion_notify_cb,
                                      (gpointer) cpanel);
 
-  GGobi_widget_set(sp->da, gg, true);
+  GGobi_widget_set (sp->da, gg, true);
 
   brush_set_pos ((gint) event->x, (gint) event->y, sp);
 

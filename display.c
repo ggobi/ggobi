@@ -27,6 +27,7 @@ DisplayOptions DefaultDisplayOptions = {
                                          false, /* edges_directed_show_p */
                                          false, /* edges_undirected_show_p */
                                          true,  /* edges_show_p*/
+                                         true,  /* whiskers_show_p*/
                                          true,  /* missings_show_p  */
                                          true,  /* axes_show_p */
                                          true,  /* axes_center_p */
@@ -114,6 +115,10 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
       break;
     case DOPT_SEGS:
       display->options.edges_show_p = w->active;
+      display_plot (display, FULL, gg);
+      break;
+    case DOPT_WHISKERS:
+      display->options.whiskers_show_p = w->active;
       display_plot (display, FULL, gg);
       break;
     case DOPT_MISSINGS:  /*-- only in scatmat and parcoords --*/

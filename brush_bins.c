@@ -67,27 +67,18 @@ assign_points_to_bins (datad *d, ggobid *gg)
 void
 get_extended_brush_corners (icoords *bin0, icoords *bin1, datad *d, splotd *sp)
 {
-  static brush_coords obrush;
-  static gboolean initd = false;
-  brush_coords *brush_pos = &sp->brush_pos;
-  gint x1 = MIN (brush_pos->x1, brush_pos->x2);
-  gint y1 = MIN (brush_pos->y1, brush_pos->y2);
-  gint x2 = MAX (brush_pos->x1, brush_pos->x2);
-  gint y2 = MAX (brush_pos->y1, brush_pos->y2);
+  brush_coords *brush = &sp->brush_pos;
+  brush_coords *obrush = &sp->brush_pos_o;
+  gint x1 = MIN (brush->x1, brush->x2);
+  gint y1 = MIN (brush->y1, brush->y2);
+  gint x2 = MAX (brush->x1, brush->x2);
+  gint y2 = MAX (brush->y1, brush->y2);
   gint ox1, oy1, ox2, oy2;
 
-  if (!initd)
-  {
-    /* from initial values */
-    obrush.x1 = obrush.y1 = 20;
-    obrush.x2 = obrush.y2 = 40;
-    initd = true;
-  }
-
-  ox1 = MIN (obrush.x1, obrush.x2);
-  oy1 = MIN (obrush.y1, obrush.y2);
-  ox2 = MAX (obrush.x1, obrush.x2);
-  oy2 = MAX (obrush.y1, obrush.y2);
+  ox1 = MIN (obrush->x1, obrush->x2);
+  oy1 = MIN (obrush->y1, obrush->y2);
+  ox2 = MAX (obrush->x1, obrush->x2);
+  oy2 = MAX (obrush->y1, obrush->y2);
 
 /*
  * What bins contain the brush and the previous brush?  Allow
@@ -113,10 +104,10 @@ get_extended_brush_corners (icoords *bin0, icoords *bin1, datad *d, splotd *sp)
     bin1->y = MIN (bin1->y, d->brush.nbins - 1);
   }
 
-  obrush.x1 = brush_pos->x1;
-  obrush.y1 = brush_pos->y1;
-  obrush.x2 = brush_pos->x2;
-  obrush.y2 = brush_pos->y2;
+  obrush->x1 = brush->x1;
+  obrush->y1 = brush->y1;
+  obrush->x2 = brush->x2;
+  obrush->y2 = brush->y2;
 }
 
 gboolean

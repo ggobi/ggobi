@@ -149,6 +149,9 @@ brush_pos_init (splotd *sp)
 {
   sp->brush_pos.x1 = sp->brush_pos.y1 = 20;
   sp->brush_pos.x2 = sp->brush_pos.y2 = 40;
+
+  sp->brush_pos_o.x1 = sp->brush_pos_o.y1 = 20;
+  sp->brush_pos_o.x2 = sp->brush_pos_o.y2 = 40;
 }
 
 /*----------------------------------------------------------------------*/
@@ -247,7 +250,6 @@ void
 brush_activate (gboolean state, displayd *display, ggobid *gg)
 {
   datad *d = display->d;
-  datad *e = display->e;
 
   if (state)
     assign_points_to_bins (d, gg);
@@ -257,7 +259,7 @@ brush_activate (gboolean state, displayd *display, ggobid *gg)
      * If transient brushing, restore the color of the transiently
      * brushed points to their previous color
     */
-    extern void reinit_transient_brushing (datad *, datad *e, ggobid *);
-    reinit_transient_brushing (d, e, gg);
+    extern void reinit_transient_brushing (displayd *, ggobid *);
+    reinit_transient_brushing (display, gg);
   }
 }

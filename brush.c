@@ -106,7 +106,7 @@ brush_undo (splotd *sp, datad *d, ggobid *gg) {
 }
 
 void
-reinit_transient_brushing (datad *d, datad *e, ggobid *gg)
+reinit_transient_brushing (displayd *dsp, ggobid *gg)
 {
 /*
  * If a new variable is selected or a variable is transformed
@@ -116,7 +116,8 @@ reinit_transient_brushing (datad *d, datad *e, ggobid *gg)
  * don't make the same change for persistent brushing.
 */
   gint i, m, k;
-  displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
+  datad *e = dsp->e;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean point_painting_p =
      (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDE);
@@ -142,28 +143,51 @@ reinit_transient_brushing (datad *d, datad *e, ggobid *gg)
 
 void
 brush_set_pos (gint x, gint y, splotd *sp) {
+  brush_coords *brush = &sp->brush_pos;
+  brush_coords *obrush = &sp->brush_pos_o;
+/*
   brush_coords *brush_pos = &sp->brush_pos;
-  gint xdist = brush_pos->x2 - brush_pos->x1 ;
-  gint ydist = brush_pos->y2 - brush_pos->y1 ;
+*/
+  gint xdist = brush->x2 - brush->x1 ;
+  gint ydist = brush->y2 - brush->y1 ;
+
+  /*-- copy the current coordinates to the backup brush structure --*/
+  obrush->x1 = brush->x1;
+  obrush->y1 = brush->y1;
+  obrush->x2 = brush->x2;
+  obrush->y2 = brush->y2;
+
   /*
    * (x2,y2) is the corner that's moving.
   */
-  brush_pos->x1 = x - xdist ;
-  brush_pos->x2 = x ;
-  brush_pos->y1 = y - ydist ;
-  brush_pos->y2 = y ;
+  brush->x1 = x - xdist ;
+  brush->x2 = x ;
+  brush->y1 = y - ydist ;
+  brush->y2 = y ;
 }
 
+/*
+ * This is not doing the right thing in a parallel
+ * coordinates plot
+*/
 static gboolean
 binning_permitted (displayd *display)
 {
   datad *d = display->d;
   datad *e = display->e;
   gboolean permitted = true;
+  gint type = display->displaytype;
 
   if (d->nrgroups > 0)
     permitted = false;
-  else {  /*-- if we're drawing edges --*/
+
+  /*-- if we're drawing whiskers --*/
+  else if ((type == parcoords || type == tsplot) &&
+             display->options.whiskers_show_p)
+  {
+      permitted = false;
+
+  } else {  /*-- if we're drawing edges --*/
     if (e != NULL && e->edge.n > 0) {
       if (display->options.edges_undirected_show_p ||
           display->options.edges_directed_show_p ||
@@ -225,6 +249,7 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
         splot_redraw (sp, BINNED, gg);
         if (gg->brush.updateAlways_p)
           displays_plot (sp, FULL, gg);
+
       } else {  /*-- just redraw the brush --*/
         splot_redraw (sp, QUICK, gg);  
       }

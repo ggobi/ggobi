@@ -181,11 +181,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
           if (display->options.points_show_p)
             draw_glyph (sp->pixmap0, &d->glyph_now[m], sp->screen, m, gg);
 
-          /*-- parallel coordinate plot whiskers --*/
+          /*-- whiskers: parallel coordinate and time series plots --*/
           if (display->displaytype == parcoords ||
               display->displaytype == tsplot)
           {
-            if (display->options.edges_show_p) {
+            if (display->options.whiskers_show_p) {
               if (display->displaytype == parcoords) {
                 n = 2*m;
                 gdk_draw_line (sp->pixmap0, gg->plot_GC,
@@ -644,12 +644,11 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
                      w->allocation.width,
                      w->allocation.height);
   }
-  else
-    gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
+  else { gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
                       loc0->x, loc0->y,
                       loc0->x, loc0->y,
-                      1 + loc1->x - loc0->x ,
-                      1 + loc1->y - loc0->y);
+                      1 + loc1->x - loc0->x, 1 + loc1->y - loc0->y);
+  }
 
   if (display->options.edges_directed_show_p ||
       display->options.edges_undirected_show_p)

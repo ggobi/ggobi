@@ -93,7 +93,7 @@ static void
 t1d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
   displayd *dsp = gg->current_display; 
 
-  extern void t1d_optimz(gint, gboolean, gint);
+  extern void t1d_optimz(gint, gboolean *, gint *);
   /*  extern void t1d_optimz(gint, ggobid *);*/
   t1d_optimz(w->active, &dsp->t1d.get_new_target, 
     &dsp->t1d.target_basis_method);
@@ -110,7 +110,7 @@ static void func_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  displayd *dsp = &gg->current_display;
+  displayd *dsp = gg->current_display;
   gint indx = GPOINTER_TO_INT (cbd);
   g_printerr ("cbd: %s\n", func_lbl[indx]);
 
@@ -137,6 +137,7 @@ static void func_cb (GtkWidget *w, gpointer cbd)
   }
 }
 
+/*
 static void bitmap_cb (GtkButton *button)
 {
   g_printerr ("drop a new bitmp\n");
@@ -149,6 +150,7 @@ static void
 record_bitmap_cb (GtkToggleButton  *w) {
   g_printerr ("record bitmap?  %d\n", w->active);
 }
+*/
 
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",         NULL,         NULL, 0, "<Branch>" },
@@ -193,7 +195,7 @@ static GtkItemFactoryEntry menu_items[] = {
 
 void
 tour1dpp_window_open (ggobid *gg) {
-  GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *btn, *tgl, *entry;
+  GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *entry;
   GtkWidget *da, *label, *hb, *opt;
 
   if (window == NULL) {

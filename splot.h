@@ -53,7 +53,7 @@ typedef struct {
  gint motion_id, press_id, release_id, key_press_id;
  icoords mousepos, mousepos_o;
 
- brush_coords brush_pos;  
+ brush_coords brush_pos, brush_pos_o;  
 
 /*
  * plot1d  (used in parcoords as well as scatterplot)

@@ -307,6 +307,9 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
     if (state == on) {
       varpanel_refresh (gg);
     }
+
+    /*-- only required after leaving an splot in transient brushing --*/
+    displays_plot (NULL, FULL, gg);
   }
 }
 

@@ -35,8 +35,8 @@ tsplot_display_menus_make (displayd *display,
   item = CreateMenuCheck (options_menu, "Show points",
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-  item = CreateMenuCheck (options_menu, "Show lines",
-    func, GINT_TO_POINTER (DOPT_SEGS), on, gg);
+  item = CreateMenuCheck (options_menu, "Show line segments",
+    func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 /*
   item = CreateMenuCheck (options_menu, "Show missings",

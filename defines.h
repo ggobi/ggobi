@@ -56,12 +56,13 @@ extern const gint ViewTypeIndeces[3];
 #define DOPT_SEGS_D    1
 #define DOPT_SEGS_U    2
 #define DOPT_SEGS      3
-#define DOPT_MISSINGS  4
-#define DOPT_GRIDLINES 5
-#define DOPT_AXES      6
-#define DOPT_AXES_C    7
-#define DOPT_BUFFER    8
-#define DOPT_LINK      9
+#define DOPT_WHISKERS  4
+#define DOPT_MISSINGS  5
+#define DOPT_GRIDLINES 6
+#define DOPT_AXES      7
+#define DOPT_AXES_C    8
+#define DOPT_BUFFER    9
+#define DOPT_LINK     10
 
 /*-- redisplay options --*/
 #define REDISPLAY_ALL     0
