@@ -24,15 +24,25 @@
 
 void 
 cpanel_t1d_init (cpaneld *cpanel, ggobid *gg) {
-  cpanel->t1d_paused = false;
-  cpanel->t1d_step = TOURSTEP0;
-  cpanel->t1d_nASHes = 20;
-  cpanel->t1d_nbins = 200;
-  cpanel->t1d_vert = false;
+  cpanel->t1d.paused = false;
+  cpanel->t1d.step = TOURSTEP0;
+  cpanel->t1d.nASHes = 20;
+  cpanel->t1d.nbins = 200;
+  cpanel->t1d.vert = false;
 
-  cpanel->t1d_pp_indx = 0;
-  cpanel->t1d_slidepos = 10.;
-  cpanel->t1d_ASH_smooth = 0.19;
+  cpanel->t1d.pp_indx = 0;
+
+  cpanel->t1d.ASH_add_lines_p = false;
+  cpanel->t1d.slidepos = 10.;
+  cpanel->t1d.ASH_smooth = 0.19;
+}
+
+static void
+ASH_add_lines_cb (GtkToggleButton *button, ggobid *gg)
+{
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  cpanel->t1d.ASH_add_lines_p = button->active;
+  splot_redraw (gg->current_splot, FULL, gg);
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/
@@ -51,17 +61,22 @@ cpanel_tour1d_set (cpaneld *cpanel, ggobid* gg)
   w = widget_find_by_name (pnl, "TOUR1D:speed_bar");
   adj = gtk_range_get_adjustment (GTK_RANGE (w));
   gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
-    cpanel->t1d_slidepos);
+    cpanel->t1d.slidepos);
 
   /*-- paused --*/
   btn = widget_find_by_name (pnl, "TOUR1D:pause_button");
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->t1d_paused);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->t1d.paused);
+
+  /*-- ASH smoothness parameter --*/
+  w = widget_find_by_name (pnl, "TOUR1D:ASH_add_lines");
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (w),
+    cpanel->t1d.ASH_add_lines_p);
 
   /* ASH smoothness */
   w = widget_find_by_name (pnl, "TOUR1D:ASH_smooth");
   adj = gtk_range_get_adjustment (GTK_RANGE (w));
   gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
-    cpanel->t1d_ASH_smooth);
+    cpanel->t1d.ASH_smooth);
 
   /*-- manual manip --*/
   /*-- PC axes --*/
@@ -102,8 +117,8 @@ static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg)
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
-  cpanel->t1d_nASHes = (gint) ((gfloat) cpanel->t1d_nbins * (adj->value / 2.0));
-  cpanel->t1d_ASH_smooth = adj->value;
+  cpanel->t1d.nASHes = (gint) ((gfloat) cpanel->t1d.nbins * (adj->value / 2.0));
+  cpanel->t1d.ASH_smooth = adj->value;
 
   display_tailpipe (gg->current_display, FULL, gg);
 }
@@ -128,7 +143,7 @@ static void tour1dadv_cb (GtkWidget *w, ggobid *gg) {
 
 void
 cpanel_tour1d_make (ggobid *gg) {
-  GtkWidget *box, *btn, *sbar, *vb;
+  GtkWidget *frame, *framevb, *box, *btn, *sbar, *vb;
   GtkObject *adj;
   
   gg->control_panel[TOUR1D] = gtk_vbox_new (false, VBOX_SPACING);
@@ -190,12 +205,32 @@ cpanel_tour1d_make (ggobid *gg) {
 
   gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]), box, false, false, 1);
 
-/*
- * ASH smoothness
-*/
-  vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]), vb,
+  /*-- frame around ASH parameters --*/
+  frame = gtk_frame_new ("ASH parameters");
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]), frame,
+    false, false, 3);
+
+  framevb = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (framevb), 4);
+  gtk_container_add (GTK_CONTAINER (frame), framevb);
+
+  /*-- ASH line segments --*/
+  btn = gtk_check_button_new_with_label ("ASH: add lines");
+  gtk_widget_set_name (btn, "TOUR1D:ASH_add_lines");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "When displaying ASHes, add lines connecting each point to the baseline.",
+    NULL);
+  /*-- cpanel may not be available, so initialize this to false --*/
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), false);
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+    GTK_SIGNAL_FUNC (ASH_add_lines_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (framevb), btn,
     false, false, 0);
+
+  /*-- ASH smoothness --*/
+  vb = gtk_vbox_new (false, 0);
+  gtk_box_pack_start (GTK_BOX (framevb), vb, false, false, 0);
 
   gtk_box_pack_start (GTK_BOX (vb), gtk_label_new ("ASH smoothness:"),
     false, false, 0);
@@ -587,7 +622,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
     pause_button = widget_find_by_name (gg->control_panel[TOUR1D],
       "TOUR1D:pause_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
-      !cpanel->t1d_paused);
+      !cpanel->t1d.paused);
   }
 
 
