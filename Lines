@@ -112,6 +112,7 @@
 40256   4/3   ??
 40460   4/11  Keeping both the original mt and cokus rng's for now.
 40557   4/16  Making sure menus items are implemented etc.
+41174   4/17  Adding new variables
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

@@ -330,7 +330,7 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
     splot_set_current (sp, on, gg);
 
     /* remove border from the previous splot */
-    if(sp_prev != NULL) {
+    if (sp_prev != NULL) {
       sp_prev->redraw_style = QUICK;
       gtk_widget_queue_draw (sp_prev->da);
     }
@@ -492,16 +492,21 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   sp->pixmap0 = NULL;
   sp->pixmap1 = NULL;
 
-/*  splot_p1d_init ();*/
+/*  could become splot_p1d_init ();*/
   sp->p1dvar = 0;
 
-/*  splot_xyplot_init ();*/
+/*  could become splot_xyplot_init ();*/
   sp->xyvars.x = 0;
   sp->xyvars.y = 1;
 
-/*  splot_scale_init ();*/
+/*  could become splot_scale_init ();*/
   sp->scale.x = sp->scale.y = SCALE_DEFAULT;
   sp->tour_scale.x = sp->tour_scale.y = TOUR_SCALE_DEFAULT;
+
+  sp->key_press_id = 0;
+  sp->press_id = 0;
+  sp->release_id = 0;
+  sp->motion_id = 0;
 
   return sp;
 }

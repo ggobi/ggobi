@@ -266,13 +266,9 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
 
   splot_get_dimensions (sp, &width, &height);
 
-/*
- * If jvar is plotted, delete it.
- * We don't care what the current splot, and we don't use the
- * argument sp.
-*/
-  if (parcoords_var_selected (jvar, display) &&
-      cpanel->parcoords_selection_mode == VAR_DELETE)
+  /*-- VAR_DELETE  --*/
+  if (cpanel->parcoords_selection_mode == VAR_DELETE &&
+      parcoords_var_selected (jvar, display))
   {
     /* If jvar is one of the plotted variables, its corresponding plot */
     splotd *jvar_sp = NULL;
@@ -291,6 +287,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
     }
 
     if (jvar_sp != NULL && nplots > 1) {
+
       /*-- Delete the plot from the list, and destroy it. --*/
       display->splots = g_list_remove (display->splots, (gpointer) jvar_sp);
 
@@ -324,8 +321,11 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         gg->current_splot = (splotd *)
           g_list_nth_data (display->splots, new_indx);
         /* just for insurance, to handle the unforeseen */
-        if (gg->current_splot == NULL) 
+        if (gg->current_splot == NULL)
           gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
+
+/*-- dfs, testing -- all this, or just event_handlers_toggle? --*/
+        splot_set_current (gg->current_splot, on, gg);
       }
 
       splot_free (jvar_sp, display, gg);
@@ -333,6 +333,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
       nplots--;
     }
 
+  /*-- VAR_REPLACE or VAR_INSERT or VAR_APPEND  --*/
   } else if (!parcoords_var_selected (jvar, display)) {
 
     if (cpanel->parcoords_selection_mode == VAR_REPLACE) {
@@ -342,6 +343,10 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
       redraw = true;
 
     } else {
+
+      /*-- prepare to reset the current plot --*/
+/*-- dfs: add this to timeplot.c --*/
+      sp_event_handlers_toggle (sp, off);
 
       /*-- keep the window from growing by shrinking all plots --*/
       ratio = (gfloat) nplots / (gfloat) (nplots+1);
@@ -382,6 +387,8 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
       }
 
       gg->current_splot = sp_new;
+/*-- dfs: add this to timeplot.c --*/
+      sp_event_handlers_toggle (sp_new, on);
       redraw = true;
     }
   }

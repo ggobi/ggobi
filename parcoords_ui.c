@@ -17,8 +17,14 @@
 /*                       Callbacks                                      */
 /*----------------------------------------------------------------------*/
 
-static void ash_smoothness_cb (GtkAdjustment *adj, gpointer cbd) {
-  g_printerr ("%f\n", adj->value);
+static void
+ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
+{
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  cpanel->nASHes = (gint) ((gfloat) cpanel->nbins * (adj->value / 2.0));
+
+  display_tailpipe (gg->current_display, gg);
 }
 
 static gchar *arrangement_lbl[] = {"Row", "Column"};
@@ -26,7 +32,6 @@ static void arrangement_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget(w, true);
-  g_printerr ("cbd: %s\n", arrangement_lbl[indx]);
 
   if (indx != gg->current_display->cpanel.parcoords_arrangement)
     parcoords_reset_arrangement (gg->current_display, indx, gg);
@@ -148,9 +153,9 @@ cpanel_parcoords_make (ggobid *gg) {
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vbox), lbl, false, false, 0);
 
-  adj = gtk_adjustment_new (0.1, 0.0, 0.5, 0.01, .01, 0.0);
+  adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (ash_smoothness_cb), NULL);
+                      GTK_SIGNAL_FUNC (ash_smoothness_cb), gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
