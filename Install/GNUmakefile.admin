@@ -30,7 +30,7 @@ DATA_SRC_FILES=\
    roos.col roos.dat roos.doc roos.missing roos.row \
    flea.xml pigs.xml ratcns.xml sat.xml sleep.xml eies.xml buckyball.xml \
    stdColorMap.xml prim7.xml olive.col olive.dat olive.row olive.xml \
-   places.xml algal-bloom.xml snetwork.xml \
+   places.xml algal-bloom.xml sarsHK.xml snetwork.xml \
    laser.col laser.dat laser.doc laser.xml Shipman.xml tips.xml \
    ggobi.dtd
 
@@ -46,7 +46,7 @@ DOC_EXTENSION=pdf
 
 DOC_FILES=$(DOC_TEX_FILES:%=Docs/%.$(DOC_EXTENSION)) Docs/ggobi.css Docs/EmbeddingFAQ.html Docs/plotLayout.html $(shell find notes -name '*.jpg') Docs/commandArgs.html
 
-C_SRC_FILES=$(SRC) $(XML_SRC) ggobiMain.c xmlConvert.c rotate_ui.c tour2d3.c tour2d3_ui.c
+C_SRC_FILES=$(SRC) $(XML_SRC) ggobiMain.c xmlConvert.c
 
 C_HEADER_FILES=\
   GGobiAPI barchartDisplay brushing colorscheme cpanel datad defines \
