@@ -736,6 +736,7 @@ vartable_open (ggobid *gg)
      "N NAs"};
   GSList *l;
   datad *d;
+  gchar *lbl;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
@@ -774,8 +775,14 @@ vartable_open (ggobid *gg)
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
       GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
+/*
+ * We're showing all datasets for now, whether they have variables
+ * or not.  That could change.
+*/
+    lbl = datasetName (d, gg);
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->vartable_ui.notebook),
-                              scrolled_window, gtk_label_new (d->name));
+                              scrolled_window, gtk_label_new (lbl));
+    g_free (lbl);
 
     gtk_widget_show (scrolled_window);
 

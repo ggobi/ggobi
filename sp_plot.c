@@ -204,6 +204,17 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
                       da->allocation.width,
                       da->allocation.height);
 
+/*
+ * Draw edges under points
+*/
+  if (display->options.edges_undirected_show_p ||
+      display->options.edges_arrowheads_show_p ||
+      display->options.edges_directed_show_p)
+  {
+    if (dtype == scatterplot || dtype == scatmat)
+      edges_draw (sp, sp->pixmap0, gg);
+  }
+
   if (!gg->mono_p && loop_over_points) {
     splot_colors_used_get (sp, &ncolors_used, colors_used, d, gg);
 
@@ -256,15 +267,6 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     }  /* deal with mono later */
   }
 
-
-  /*-- shifted in from splot_pixmap0_to_pixmap1 --*/
-  if (display->options.edges_undirected_show_p ||
-      display->options.edges_arrowheads_show_p ||
-      display->options.edges_directed_show_p)
-  {
-    if (dtype == scatterplot || dtype == scatmat)
-      edges_draw (sp, sp->pixmap0, gg);
-  }
   if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
     splot_draw_tour_axes(sp, sp->pixmap0, gg);
   }
@@ -1057,7 +1059,6 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       display->options.edges_directed_show_p)
   {
     if (displaytype == scatterplot || displaytype == scatmat) {
-      /* edges_draw (sp, gg); */
       if (e->nearest_point != -1)
         splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);
     }

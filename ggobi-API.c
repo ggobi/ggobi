@@ -1296,9 +1296,9 @@ GGOBI(datasetIndex)(const char *name,  ggobid *gg)
   maintained in the specified ggobid object.
  */
 gchar **
-GGOBI(getDatasetNames)(int *n, ggobid *gg)
+GGOBI(getDatasetNames)(gint *n, ggobid *gg)
 {
-  int i;
+  gint i;
   datad *d;
   gchar **names;
   GSList *tmp = gg->d;

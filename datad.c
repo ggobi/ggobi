@@ -131,3 +131,38 @@ datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
     return ((datad *) g_slist_nth_data (gg->d, indx));
   }
 }
+
+gint
+ndatad_with_vars_get (ggobid *gg)
+{
+  gint nd;
+  GSList *l;
+  datad *d;
+
+  /*-- silly to do this every time, perhaps, but harmless, I think --*/
+  if (g_slist_length (gg->d) > 1) {
+    nd = 0;
+    for (l = gg->d; l; l = l->next) {
+      d = (datad *) l->data;
+      if (g_slist_length (d->vartable) > 0)
+        nd++;
+    }
+  }  else nd = 1;
+
+  return nd;
+}
+
+gchar *
+datasetName (datad *d, ggobid *gg)
+{
+  gint which = g_slist_index (gg->d, d);
+  gchar *lbl = (gchar *)NULL;
+
+  if (d->name && d->name[0])
+    lbl = g_strdup(d->name);
+  else
+    lbl = g_strdup_printf ("data matrix %d", which);
+
+  return (lbl);
+}
+

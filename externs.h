@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+gchar *datasetName (datad *d, ggobid *gg);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 GtkWidget * create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, GtkSignalFunc func, ggobid *);
 displayd * display_alloc_init (enum displaytyped, gboolean, datad *, ggobid *);
@@ -231,6 +232,7 @@ void movepts_event_handlers_toggle (splotd *, gboolean);
 void movepts_history_add (gint id, splotd *sp, datad *, ggobid *);
 void movepts_history_delete_last (datad *, ggobid *);
 gdouble myrint (gdouble x);
+gint ndatad_with_vars_get (ggobid *gg);
 void newvar_add (gint vtype, gchar *vname, datad *, ggobid *);
 void newvar_add_with_values (gdouble *, gint, gchar *, datad *, ggobid *);
 gint option_menu_index (GtkOptionMenu *);

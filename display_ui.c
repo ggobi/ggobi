@@ -48,18 +48,6 @@ display_open_cb (GtkWidget *w, datad *d)
 }
 
 
-gchar *
-datasetName (datad *d, int which)
-{
-  gchar *lbl = (gchar *)NULL;
-  if (d->name && d->name[0])
-    lbl = g_strdup(d->name);
-  else
-    lbl = g_strdup_printf ("data matrix %d", which);
-
-  return (lbl);
-}
-
 void
 display_menu_build (ggobid *gg)
 {
@@ -97,16 +85,20 @@ display_menu_build (ggobid *gg)
 
       for (k=0; k<nd; k++) { 
         datad *d = (datad*) g_slist_nth_data (gg->d, k);
-        lbl = datasetName (d, k);
-        item = CreateMenuItem (submenu, lbl,
-          NULL, NULL, gg->display_menu, gg->main_accel_group,
-          GTK_SIGNAL_FUNC (display_open_cb),
-          d, gg);
-        gtk_object_set_data (GTK_OBJECT (item),
-          "displaytype", GINT_TO_POINTER (scatterplot));
-        gtk_object_set_data (GTK_OBJECT (item),
-          "missing_p", GINT_TO_POINTER (0));
-        g_free (lbl);
+
+        /*-- add an item for each datad with variables --*/
+        if (g_slist_length (d->vartable) > 0) {
+          lbl = datasetName (d, gg);
+          item = CreateMenuItem (submenu, lbl,
+            NULL, NULL, gg->display_menu, gg->main_accel_group,
+            GTK_SIGNAL_FUNC (display_open_cb),
+            d, gg);
+          gtk_object_set_data (GTK_OBJECT (item),
+            "displaytype", GINT_TO_POINTER (scatterplot));
+          gtk_object_set_data (GTK_OBJECT (item),
+            "missing_p", GINT_TO_POINTER (0));
+          g_free (lbl);
+        }
       }
 
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
@@ -129,16 +121,20 @@ display_menu_build (ggobid *gg)
 
       for (k=0; k<nd; k++) { 
         datad *d = (datad*) g_slist_nth_data (gg->d, k);
-        lbl = datasetName (d, k);
-        item = CreateMenuItem (submenu, lbl,
-          NULL, NULL, gg->display_menu, gg->main_accel_group,
-          GTK_SIGNAL_FUNC (display_open_cb),
-          g_slist_nth_data (gg->d, k), gg);
-        gtk_object_set_data (GTK_OBJECT (item),
-          "displaytype", GINT_TO_POINTER (scatmat));
-        gtk_object_set_data (GTK_OBJECT (item),
-          "missing_p", GINT_TO_POINTER (0));
-        g_free (lbl);
+
+        /*-- add an item for each datad with variables --*/
+        if (g_slist_length (d->vartable) > 0) {
+          lbl = datasetName (d, gg);
+          item = CreateMenuItem (submenu, lbl,
+            NULL, NULL, gg->display_menu, gg->main_accel_group,
+            GTK_SIGNAL_FUNC (display_open_cb),
+            g_slist_nth_data (gg->d, k), gg);
+          gtk_object_set_data (GTK_OBJECT (item),
+            "displaytype", GINT_TO_POINTER (scatmat));
+          gtk_object_set_data (GTK_OBJECT (item),
+            "missing_p", GINT_TO_POINTER (0));
+          g_free (lbl);
+        }
       }
 
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
@@ -162,16 +158,20 @@ display_menu_build (ggobid *gg)
 
       for (k=0; k<nd; k++) { 
         datad *d = (datad*) g_slist_nth_data (gg->d, k);
-        lbl = datasetName (d, k);
-        item = CreateMenuItem (submenu, lbl,
-          NULL, NULL, gg->display_menu, gg->main_accel_group,
-          GTK_SIGNAL_FUNC (display_open_cb),
-          g_slist_nth_data (gg->d, k), gg);
-        gtk_object_set_data (GTK_OBJECT (item),
-          "displaytype", GINT_TO_POINTER (parcoords));
-        gtk_object_set_data (GTK_OBJECT (item),
-          "missing_p", GINT_TO_POINTER (0));
-        g_free (lbl);
+
+        /*-- add an item for each datad with variables --*/
+        if (g_slist_length (d->vartable) > 0) {
+          lbl = datasetName (d, gg);
+          item = CreateMenuItem (submenu, lbl,
+            NULL, NULL, gg->display_menu, gg->main_accel_group,
+            GTK_SIGNAL_FUNC (display_open_cb),
+            g_slist_nth_data (gg->d, k), gg);
+          gtk_object_set_data (GTK_OBJECT (item),
+            "displaytype", GINT_TO_POINTER (parcoords));
+          gtk_object_set_data (GTK_OBJECT (item),
+            "missing_p", GINT_TO_POINTER (0));
+          g_free (lbl);
+        }
       }
 
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
@@ -195,16 +195,20 @@ display_menu_build (ggobid *gg)
 
       for (k=0; k<nd; k++) { 
         datad *d = (datad*) g_slist_nth_data (gg->d, k);
-        lbl = datasetName (d, k);
-        item = CreateMenuItem (submenu, lbl,
-          NULL, NULL, gg->display_menu, gg->main_accel_group,
-          GTK_SIGNAL_FUNC (display_open_cb),
-          g_slist_nth_data (gg->d, k), gg);
-        gtk_object_set_data (GTK_OBJECT (item),
-          "displaytype", GINT_TO_POINTER (tsplot));
-        gtk_object_set_data (GTK_OBJECT (item),
-          "missing_p", GINT_TO_POINTER (0));
-        g_free (lbl);
+
+        /*-- add an item for each datad with variables --*/
+        if (g_slist_length (d->vartable) > 0) {
+          lbl = datasetName (d, gg);
+          item = CreateMenuItem (submenu, lbl,
+            NULL, NULL, gg->display_menu, gg->main_accel_group,
+            GTK_SIGNAL_FUNC (display_open_cb),
+            g_slist_nth_data (gg->d, k), gg);
+          gtk_object_set_data (GTK_OBJECT (item),
+            "displaytype", GINT_TO_POINTER (tsplot));
+          gtk_object_set_data (GTK_OBJECT (item),
+            "missing_p", GINT_TO_POINTER (0));
+          g_free (lbl);
+        }
       }
 
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);

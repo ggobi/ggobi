@@ -144,13 +144,15 @@ scatterplot_display_edge_menu_update (displayd *display,
         e = (datad *) g_slist_nth_data (gg->d, k);
         if (e == d)
           continue;
-        lbl = datasetName (e, k);
-        item = CreateMenuItem (submenu, lbl,
-          NULL, NULL, NULL, gg->main_accel_group,
-          GTK_SIGNAL_FUNC (edgeset_add_cb), e, gg);
-        gtk_object_set_data (GTK_OBJECT (item),
-          "display", GINT_TO_POINTER (display));
-        g_free (lbl);
+        else if (e->edge.n > 0) {
+          lbl = datasetName (e, gg);
+          item = CreateMenuItem (submenu, lbl,
+            NULL, NULL, NULL, gg->main_accel_group,
+            GTK_SIGNAL_FUNC (edgeset_add_cb), e, gg);
+          gtk_object_set_data (GTK_OBJECT (item),
+            "display", GINT_TO_POINTER (display));
+          g_free (lbl);
+        }
       }
 
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);

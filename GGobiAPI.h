@@ -263,7 +263,6 @@ gint GGOBI(nrecords)(datad *dg);
 
 const gchar *const * GGOBI(getDataModeNames)(int *n);
 
-gchar *datasetName(datad *d, int which);
 gint  *createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gboolean useWindow);
 
   /*

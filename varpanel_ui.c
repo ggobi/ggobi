@@ -402,37 +402,42 @@ varpanel_clear (datad *d, ggobid *gg)
 /*-- for each datad, a scrolled window, vbox, and column of check buttons --*/
 void varpanel_checkboxes_populate (datad *d, ggobid *gg)
 {
-  gint j;
+  gint j, nd;
+
+  nd = ndatad_with_vars_get (gg); 
 
   /*-- we don't know the length of gg->d when the notebook is created --*/
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-    g_slist_length (gg->d) > 1);
+    nd > 1);
 
-  /*-- create an ebox: needed for tooltips? --*/
-  d->varpanel_ui.ebox = gtk_event_box_new ();
-  gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                            d->varpanel_ui.ebox,
-                            gtk_label_new (d->name));
+  /*-- only add a tab if there are variables --*/
+  if (g_slist_length (d->vartable) > 0) {
+    /*-- create an ebox: needed for tooltips? --*/
+    d->varpanel_ui.ebox = gtk_event_box_new ();
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
+                              d->varpanel_ui.ebox,
+                              gtk_label_new (d->name));
 
-  /*-- create a scrolled window, and put it in the ebox --*/
-  d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
-    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-  gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox), d->vcbox_ui.swin);
+    /*-- create a scrolled window, and put it in the ebox --*/
+    d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
+      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+    gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox), d->vcbox_ui.swin);
 
-  /*-- add a vbox to the swin --*/
-  d->vcbox_ui.vbox = gtk_vbox_new (false, 0);
-  gtk_scrolled_window_add_with_viewport (
-    GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
-    d->vcbox_ui.vbox);
+    /*-- add a vbox to the swin --*/
+    d->vcbox_ui.vbox = gtk_vbox_new (false, 0);
+    gtk_scrolled_window_add_with_viewport (
+      GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
+      d->vcbox_ui.vbox);
   
-  gtk_widget_show_all (d->varpanel_ui.ebox);
-  gdk_flush ();
+    gtk_widget_show_all (d->varpanel_ui.ebox);
+    gdk_flush ();
 
-  d->vcbox_ui.checkbox = NULL;
+    d->vcbox_ui.checkbox = NULL;
 
-  for (j=0; j<d->ncols; j++)
-    varpanel_checkbox_add (j, d, gg);
+    for (j=0; j<d->ncols; j++)
+      varpanel_checkbox_add (j, d, gg);
+  }
 }
 
 
