@@ -71,8 +71,37 @@ static void open_symbol_window_cb (GtkWidget *w, ggobid *gg)
 static void
 brush_reset_cb (GtkWidget *w, gpointer cbd)
 {
-  gchar *lbl = (gchar *) cbd;
-  g_printerr ("cbd: %s\n", lbl);
+  ggobid *gg = GGobiFromWidget (w, true);
+  gint action = GPOINTER_TO_INT (cbd);
+  gint m, i, k;
+
+  switch (action) {
+    case 0:  /*-- un-hide all points --*/
+      for (m=0; m<gg->nrows_in_plot; m++) {
+        i = gg->rows_in_plot[m];
+        gg->hidden[i] = gg->hidden_now[i] = false;
+      }
+      displays_plot (NULL, gg);
+      break;
+    case 1:  /*-- reset point colors -- to what? --*/
+      break;
+    case 2:  /*-- reset point glyphs -- to what? --*/
+      break;
+
+    case 3:  /*-- un-hide all lines --*/
+      for (k=0; k<gg->nsegments; k++) {
+        gg->line.hidden_now.data[k] = gg->line.hidden.data[k] = false;
+      }
+      displays_plot (NULL, gg);
+      break;
+    case 4:  /*-- reset line colors -- to what? --*/
+      break;
+
+    case 5:  /*-- reset brush size --*/
+      brush_pos_init (gg);
+      splot_redraw (gg->current_splot, QUICK, gg);
+      break;
+  }
 }
 
 /* Actions from the Link menu in the main menubar */
@@ -203,28 +232,46 @@ brush_menus_make (ggobid *gg) {
 */
   gg->brush.reset_menu = gtk_menu_new ();
 
+  item = gtk_menu_item_new_with_label ("Show all points");
+  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER (0));
+  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+
   item = gtk_menu_item_new_with_label ("Reset point colors");
+  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) "pointcolors");
-  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Reset brush size");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) "brushsize");
-  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Reset linecolors");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) "linecolors");
+                      (gpointer) GINT_TO_POINTER (1));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset glyphs");
+  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) "glyphs");
+                      (gpointer) GINT_TO_POINTER (2));
+  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+
+  item = gtk_menu_item_new_with_label ("Show all lines");
+  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER (3));
+  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+
+  item = gtk_menu_item_new_with_label ("Reset linecolors");
+  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER(4));
+  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+
+  item = gtk_menu_item_new_with_label ("Reset brush size");
+  gtk_object_set_data (GTK_OBJECT (item), "GGobi", (gpointer) gg);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER (5));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
   gtk_widget_show_all (gg->brush.reset_menu);
