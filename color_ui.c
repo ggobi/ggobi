@@ -285,6 +285,9 @@ redraw_line_display (GtkWidget *w, ggobid *gg)
   margin = gg->color_ui.margin;
   spacing = gg->color_ui.spacing;
 
+  if (gg->plot_GC == NULL)
+    init_plot_GC (w->window, gg);
+
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (w->window, gg->plot_GC,
     true, 0, 0, w->allocation.width, w->allocation.height);
