@@ -7,7 +7,7 @@
 
 #include "plugin.h"
 
-#include "gtksheet.h"
+#include "gtkextra/gtksheet.h"
 #if 0
 #include "pixmaps.h"
 #endif
@@ -22,15 +22,12 @@ void       show_data_edit_window(PluginInstance *inst, GtkWidget *widget);
 
 
 gboolean
-addToMenu(ggobid *gg, GGobiPluginInfo *plugin)
+addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  PluginInstance *inst = g_malloc(sizeof(PluginInstance));
   GtkWidget *menu, *entry, *data_item;
 
   inst->data = NULL;
   inst->info = plugin;
-
-  GGOBI_addPluginInstance(inst, gg);
 
   menu = gtk_menu_new();
   entry = gtk_menu_item_new_with_label("View");
@@ -88,6 +85,11 @@ static GtkItemFactoryEntry menu_items[] = {
 void
 show_data_edit_window(PluginInstance *inst, GtkWidget *widget)
 {
+  if(g_slist_length(inst->gg->d) < 1) {
+      fprintf(stderr, "No datasets to show\n");fflush(stderr);
+      return;
+  }
+
   if(inst->data == NULL) {
     GtkWidget *window;
      window = create_ggobi_worksheet_window(inst->gg, inst);
@@ -115,7 +117,7 @@ create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
   main_vbox=gtk_vbox_new(FALSE,1);
   gtk_container_set_border_width(GTK_CONTAINER(main_vbox),0); 
   gtk_container_add(GTK_CONTAINER(window), main_vbox);
-  gtk_widget_show(main_vbox);
+
 
   notebook=gtk_notebook_new();
   gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_BOTTOM);
@@ -124,6 +126,7 @@ create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
 
   add_ggobi_sheets(gg, notebook);
 
+  gtk_widget_show(main_vbox);
   gtk_widget_show(window);
 
   return(window);
@@ -175,10 +178,12 @@ add_ggobi_data(datad *data, GtkWidget *w)
   gint i, j;
   GtkSheet *sheet;
   const gfloat **raw;
+  vartabled *vt;
   sheet = GTK_SHEET(w);
-
   for(i = 0; i < data->ncols; i++) {
-    char *name = data->vartable[i].collab;
+    char *name;
+    vt = (vartabled*) g_slist_nth_data (data->vartable, i);
+    name = vt->collab;
     gtk_sheet_column_button_add_label(sheet, i, name);
     gtk_sheet_set_column_title(sheet, i, name);
   }
