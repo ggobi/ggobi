@@ -8,6 +8,7 @@ EXPORTS
  GGobi_addToolsMenuItem
  GGobi_setData
  GGobi_newScatterplot
+ GGobi_addVariable
  get_main_menu
  populate_option_menu
  create_variable_notebook
@@ -48,5 +49,10 @@ EXPORTS
  GGOBI_getSessionOptions
  edge_endpoints_get
  symbol_link_by_id
+ setDisplayEdge
+ GGobi_getDefaultDisplayOptions
+ getDefaultRowNamesPtr
+ datad_init
+
  
  
