@@ -32,13 +32,13 @@ extern "C" {
  * We can either use the Mersenne Twister code in mt19937-1.c
  * or the rewrite by Shawn Cokus in cokus.c.
 */
-#define COKUS
+#undef COKUS
 #ifdef COKUS
 extern void seedMT(guint32);
 extern guint32 randomMT(void);
 #else
-extern void sgenrand (unsigned long);
-extern double genrand (void);
+extern void init_genrand (unsigned long);
+extern double genrand_real1 (void);
 #endif
 
 #ifdef __cplusplus
@@ -55,7 +55,7 @@ init_random_seed () {
 #ifdef COKUS
   seedMT ((guint32) time ((glong *) 0));
 #else
-  sgenrand ((glong) time ((glong *) 0));
+  init_genrand ((glong) time ((glong *) 0));
 #endif
 }
 
@@ -66,7 +66,7 @@ randvalue (void) {
 #ifdef COKUS
   return (.5 * (gdouble) randomMT() / (gdouble) MAXLONG);
 #else
-  return (genrand ());   
+  return (genrand_real1 ());   
 #endif
 }
 
@@ -77,8 +77,8 @@ rnorm2 (gdouble *drand, gdouble *dsave) {
   *drand = (gdouble) randomMT () / (gdouble) MAXLONG - 1.0;
   *dsave = (gdouble) randomMT () / (gdouble) MAXLONG - 1.0;
 #else
-  *drand = 2.0 * genrand () - 1.0;
-  *dsave = 2.0 * genrand () - 1.0;
+  *drand = 2.0 * genrand_real1 () - 1.0;
+  *dsave = 2.0 * genrand_real1 () - 1.0;
 #endif
 }
 

@@ -93,7 +93,7 @@ SRC=array.c ash1d.c \
  xyplot.c xyplot_ui.c \
 \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
- mt19937-1.c cokus.c \
+ mt19937ar.c cokus.c \
  fileio.c print.c \
  xlines.c
 
@@ -161,7 +161,7 @@ main_ui.o: write_xml.h
 read_xml.o: read_xml.h
 endif
 
-OB+=mt19937-1.o cokus.o  
+OB+=mt19937ar.o cokus.o  
 
 ifdef USE_DBMS
  SRC+= dbms.c dbms_ui.c
@@ -199,7 +199,7 @@ pure: ggobi.o $(OB) $(EXTRA_OB)
 ggobi.sched: $(OB)
 	$(CC) -S $(OB) $(LDFLAGS)  $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --cflags --libs`
 
-mt19937-1.o: mt19937-1.c
+mt19937ar.o: mt19937ar.c
 	$(CC) $(CFLAGS) `gtk-config --cflags` -c $<
 
 efence: $(OB)
@@ -227,7 +227,7 @@ clean:
 .c.o:
 	$(CC) -c -I. $(CFLAGS) `gtk-config --cflags`  $*.c
 
-# A version that compiles all C code (except for mt19937-1.c) as 
+# A version that compiles all C code (except for mt19937ar.c) as 
 # C++.
 #	$(CXX) -c $(CXXFLAGS) -I. `gtk-config --cflags` $*.c
 
