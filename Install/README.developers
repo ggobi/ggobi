@@ -16,11 +16,19 @@ cd /tmp/Install/ggobi
 make (or gmake)
 
 
+Creating new modules on franz
+=============================
 
+Logon to franz and change directory to 
+  ~xgobi/CVSRoot
+
+Then do 
+   chgrp -R xgobi papers
+   chmod -R g+w papers
 
 
 Creating the Windows Distribution
-
+=================================
 We use Inno Setup (http://www.jrsoftware.org) by Jordan Russell to
 create a self-installing executable for ggobi.  This handles
 installing the relevant files (the executable and 3rd party DLLs),
