@@ -288,9 +288,14 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
           }
 
           if (dtype == scatterplot) {
-            if (proj == P1PLOT &&
+            if (
+/*
+   before I can draw the TOUR1D lines, I need to find where 0
+   falls in screen coordinates
+*/
+                /*proj == TOUR1D ||*/ (proj == P1PLOT &&
                 cpanel->p1d.type == ASH &&
-                cpanel->p1d.ASH_add_lines_p)
+                cpanel->p1d.ASH_add_lines_p))
             {
               if (display->p1d_orientation == HORIZONTAL)
                 gdk_draw_line (sp->pixmap0, gg->plot_GC,
