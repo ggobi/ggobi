@@ -1,0 +1,9 @@
+ <inputPlugin name="fileSelect">
+  <description>Prompts user to select a file from a directory
+  browser. Currently expects XML format.</description>
+  <author>Duncan Temple Lang</author>
+  <modeName>fileselect</modeName>
+  <dll name="plugins/FileSelect/FileSelect"> 
+       <init description="get_description"/>
+  </dll>
+ </inputPlugin>

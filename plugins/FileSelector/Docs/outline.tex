@@ -1,0 +1,15 @@
+The idea is that we will create an interactive input plugin that will
+allow the user select files interactively using the gtk+-extra file
+selector (or something similar).  This will guess the mode of the file
+using the existing mechanism wheen it attempts to load the data.
+
+We might also create a plugin that handles all input plugins.  The
+idea is that we create a plugin that replaces or adds an alternative
+Open menu item.  When invoked by the user, it would bring up a similar
+GUI, but one that added a format control.  It would read these from
+the input plugins available when the GUI was created.  The user would
+select the file and the format and the associated plugin would be
+used.
+
+
+
