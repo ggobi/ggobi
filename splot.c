@@ -167,10 +167,12 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
   splotd *sp_prev = gg->current_splot;
   if (sp != sp_prev) {
 
+   if(sp_prev != NULL) {
     splot_set_current (sp_prev, off, gg);
 
     if (gg->current_display != display)
       display_set_current (display, gg);  /* old one off, new one on */
+    }
 
     gg->current_splot = sp;
 
@@ -181,8 +183,10 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
     splot_set_current (sp, on, gg);
 
     /* remove border from the previous splot */
-    sp_prev->redraw_style = QUICK;
-    gtk_widget_queue_draw (sp_prev->da);
+    if(sp_prev != NULL) {
+      sp_prev->redraw_style = QUICK;
+      gtk_widget_queue_draw (sp_prev->da);
+    }
   }
 
 }
