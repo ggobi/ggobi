@@ -12,10 +12,10 @@ endif
 OBJS=ggvis.o init.o cmds.o spring.o radial.o
 
 ggvis.so: $(OBJS)
-	$(CC) -g -shared $(OBJS) -o $@ $(EXTRA_LIBS) -L$(GGOBI_HOME) -lggobi `gtk-config --libs` 
+	$(CC) -g -shared $(OBJS) -o $@ $(EXTRA_LIBS)  -L$(GGOBI_HOME) -lggobi `gtk-config --libs` 
 
 .c.o:
-	$(CC) -g -c -I. -I$(GGOBI_HOME) $(CFLAGS) `gtk-config --cflags`  $*.c
+	$(CC) -g -c -I. -I$(GGOBI_HOME) $(CFLAGS) $(XML_INC_DIRS:%=-I%) `gtk-config --cflags`  $*.c
 
 clean:
 	rm -f *.o *.so

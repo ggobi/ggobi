@@ -230,47 +230,46 @@ setSubtreeSpans (ggvisd *ggv, datad *d) {
 static void
 setChildNodePositions (noded *n, ggvisd *ggv, datad *d)
 {
+  gint i;
   noded *nchild;
   gdouble theta;
   GList *l, *children = NULL;
 
-  /*-- scale the positions onto 1, 100? --*/
-
-  gdouble y = 6.0;  /*-- where does this come from? --*/
-  gdouble x =
-    (gdouble) ((n->nStepsToCenter+1) * 50.0) /
-    (gdouble) ggv->radial->nStepsToCenter;
-  gdouble symbolSpan = atan (y/x);
-
-  // theta is the boundary of the fan
+  // the initial value of theta is the angle of the boundary of the fan
   if (n->i == ggv->radial->centerNode->i) theta = 0;
   else if (n->nChildren == 1) theta = n->theta;
   else {
-    // With 2*symbolSpan, I get the behavior I would expect to
-    // see with 1*symbolSpan.  With 4*symbolSpan, I get a nice
-    // space between fans, but then very small fans get too
-    // compressed.  3 seems to be a reasonable compromise.
-    gdouble span = n->span - 3*symbolSpan;
-    theta = n->theta - span/2;
+    theta = n->theta - n->span/2;
   }
 
-  // Build an array of the child nodes -- for the purpose
-  // of sorting them -- how about an alphabetical sorting
-  // by label?  Do I have one?
+  // Build an array of the child nodes 
   childNodes (&children, n);
 
+  i = 0;
   for (l = children; l; l = l->next) {
     nchild = (noded *) l->data;
 
-    nchild->theta = theta + nchild->span/2.0 ;
+    if (i == 0) {
+      nchild->theta = theta;
 
+      if (nchild->span > 0)
+        theta += nchild->span/2;
+      else  // if it's a leaf node
+        theta += .5 * (n->span)/(gdouble)(n->subtreeSize-1);
+
+      i++;
+    } else {
+      nchild->theta = theta + nchild->span/2;
+
+      if (nchild->span > 0)
+        theta += nchild->span;
+      else  // if it's a leaf node
+        theta += (n->span)/(gdouble)(n->subtreeSize-1);
+    }
+      
     nchild->pos.x = nchild->nStepsToCenter * cos(nchild->theta);
     nchild->pos.y = nchild->nStepsToCenter * sin(nchild->theta);
 
-    if (nchild->span > 0)
-      theta += nchild->span;
-    else  // if it's a leaf node
-      theta += (n->span - 3*symbolSpan)/(n->subtreeSize-1);
 
     if (nchild->nChildren > 0)
       setChildNodePositions(nchild, ggv, d);
