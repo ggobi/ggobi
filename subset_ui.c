@@ -10,6 +10,7 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include <gtk/gtk.h>
 #include "vars.h"
@@ -73,6 +74,32 @@ set_adjustment (GtkWidget *w, GtkAdjustment *adj_new)
       gtk_spin_button_set_adjustment (btn, adj_new);
     }
   }
+}
+
+static const gchar *const substr_lbl[] = {
+ "Is identical to the string",
+ "Includes the string",
+ "Begins with the string",
+ "Ends with the string",
+ "Does not include the string",
+};
+static void subset_string_pos_cb (GtkWidget *w, gpointer cbd)
+{
+  ggobid *gg = GGobiFromWidget (w, true);
+  datad *d = datad_get_from_widget (w, gg);
+  GtkWidget *tgl = (GtkWidget *)
+    gtk_object_get_data (GTK_OBJECT(gg->subset_ui.window), "SS:IGNORE_CASE");
+
+  d->subset.string_pos = GPOINTER_TO_INT (cbd);
+
+  /*
+   * I'm not allowing the user to ignore the case of the string
+   * when I'm using strstr to test whether the string is included
+  */
+  if (d->subset.string_pos == 1 || d->subset.string_pos == 4)
+    gtk_widget_set_sensitive (tgl, false);
+  else
+    gtk_widget_set_sensitive (tgl, true);
 }
 
 static void
@@ -145,15 +172,18 @@ static void
 subset_cb (GtkWidget *w, ggobid *gg)
 {
   gint subset_type;
-  gchar *sample_str, *rowlab;
+  gchar *sample_str, *substr;
   gint bstart, bsize;
   gint estart, estep;
   gboolean redraw;
   datad *d = datad_get_from_widget (w, gg);
-  GtkWidget *entry;
+  GtkWidget *entry, *tgl;
   gchar *str;
   greal min, max;
   gboolean proceed = true;
+/*
+  gboolean casep;
+*/
 
   if (!d)
     return;
@@ -206,10 +236,16 @@ subset_cb (GtkWidget *w, ggobid *gg)
       redraw = subset_sticky (d, gg);
     break;
     case SS_ROWLAB:
+      /* use a toggle widget to specify whether to ignore case or not */
       entry = (GtkWidget *)
         gtk_object_get_data (GTK_OBJECT(gg->subset_ui.window), "SS:ROWLAB");
-      rowlab = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-      redraw = subset_rowlab (rowlab, d, gg);
+      tgl = (GtkWidget *)
+        gtk_object_get_data (GTK_OBJECT(gg->subset_ui.window),
+          "SS:IGNORE_CASE");
+      substr = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
+      redraw = subset_rowlab (substr, d->subset.string_pos,
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(tgl)),
+        d, gg);
     break;
   }
 
@@ -252,7 +288,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
   GtkWidget *button, *t;
   GtkWidget *vbox, *frame, *hb, *vb, *button_hbox, *close_hbox;
-  GtkWidget *label, *btn, *spinbtn, *entry;
+  GtkWidget *label, *btn, *spinbtn, *entry, *opt;
   GtkWidget *varnotebook;
   datad *d;
   gchar *clist_titles[1] = {"datasets"};
@@ -513,25 +549,48 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
         frame, label);
 
-      /*------------------------------------------------------*/
-      /*-- Cases whose row label is the specified row label --*/
-      /*------------------------------------------------------*/
+      /*---------------------------------------------------------*/
+      /*-- Cases whose row label includes the specified string --*/
+      /*---------------------------------------------------------*/
       frame = gtk_frame_new ("Cases with specified row label");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-      hb = gtk_hbox_new (false, 2);
-      gtk_container_add (GTK_CONTAINER (frame), hb);
+      vb = gtk_vbox_new (false, 5);
+      gtk_container_add (GTK_CONTAINER (frame), vb);
 
-      label = gtk_label_new ("Row label:");
+      hb = gtk_hbox_new (false, 5);
+      gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 5);
+
+      label = gtk_label_new ("Substring:");
       gtk_box_pack_start (GTK_BOX (hb), label, false, false, 2);
-  
+
       entry = gtk_entry_new ();
       gtk_object_set_data (GTK_OBJECT(gg->subset_ui.window),
         "SS:ROWLAB", entry);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-        "Type in the label shared by the cases you want in the subset",
+        "Type in a string to specify the cases you want in the subset",
         NULL);
-      gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
+      gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);
+
+      hb = gtk_hbox_new (false, 5);
+      gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 5);
+
+      opt = gtk_option_menu_new ();
+      gtk_object_set_data (GTK_OBJECT(gg->subset_ui.window),
+        "SS:ROWLAB_POS", opt);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+        "Specify the position in the row labels to check for the substring",
+        NULL);
+      gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);
+      populate_option_menu (opt, (gchar**) substr_lbl,
+        sizeof (substr_lbl) / sizeof (gchar *),
+        (GtkSignalFunc) subset_string_pos_cb, "GGobi", gg);
+
+      btn = gtk_check_button_new_with_label ("Ignore case");
+      gtk_object_set_data (GTK_OBJECT(gg->subset_ui.window),
+        "SS:IGNORE_CASE", btn);
+      gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(btn), true);
+      gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 0);
 
       label = gtk_label_new ("Row label");
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),

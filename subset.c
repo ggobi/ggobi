@@ -15,6 +15,9 @@
 #include "vars.h"
 #include "externs.h"
 
+extern int strcasecmp(const char *, const char *);
+extern int strncasecmp(const char *, const char *, size_t);
+
 void
 subset_init (datad *d, ggobid *gg)
 {
@@ -216,10 +219,16 @@ subset_sticky (datad *d, ggobid *gg)
 }
 
 gboolean
-subset_rowlab (gchar *rowlab, datad *d, ggobid *gg)
+subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
+  datad *d, ggobid *gg)
 {
   gint i;
   gint top = d->nrows;
+  size_t slen, slen2;
+  gchar *lbl;
+
+  if (substr == NULL || (slen = strlen(substr)) == 0)
+    return false;
 
   /*-- remove all sticky labels --*/
   GtkWidget *w = widget_find_by_name (gg->control_panel[IDENT],
@@ -230,8 +239,50 @@ subset_rowlab (gchar *rowlab, datad *d, ggobid *gg)
   subset_clear (d, gg);
 
   for (i=0; i<top; i++) {
-    if (!strcmp ((gchar *) g_array_index (d->rowlab, gchar *, i), rowlab)) {
-      add_to_subset (i, d, gg);
+    switch (substr_pos) {
+      case 0:  /* is identical to the string */
+        if (ignore_case) {
+          if (!strcasecmp ((gchar *) g_array_index (d->rowlab, gchar *, i),
+            substr)) 
+              add_to_subset (i, d, gg);
+        } else {
+          if (!strcmp ((gchar *) g_array_index (d->rowlab, gchar *, i),
+            substr)) 
+              add_to_subset (i, d, gg);
+        }
+      break;
+      case 1:  /* includes the string -- I have to do more work
+                  to ignore case */
+        if (strstr ((gchar *) g_array_index (d->rowlab, gchar *, i), substr))
+          add_to_subset (i, d, gg);
+      break;
+      case 2:  /* begins with the string */
+        if (ignore_case) {
+          if (!strncasecmp ((gchar *) g_array_index (d->rowlab, gchar *, i),
+            substr, slen)) 
+              add_to_subset (i, d, gg);
+        } else {
+          if (!strncmp ((gchar *) g_array_index (d->rowlab, gchar *, i),
+            substr, slen)) 
+              add_to_subset (i, d, gg);
+        }
+      break;
+      case 3:  /* ends with the string */
+        lbl = (gchar *) g_array_index (d->rowlab, gchar *, i);
+        if ((slen2 = strlen(lbl)) >= slen) {
+          if (ignore_case) {
+            if (!strcmp (&lbl[slen2-slen], substr))
+              add_to_subset (i, d, gg);
+          } else {
+            if (!strcasecmp (&lbl[slen2-slen], substr))
+              add_to_subset (i, d, gg);
+          }
+        }
+      break;
+      case 4:  /* does not include the string: ditto about case */
+        if (!strstr ((gchar *) g_array_index (d->rowlab, gchar *, i), substr))
+          add_to_subset (i, d, gg);
+      break;
     }
   }
 
