@@ -30,6 +30,8 @@ const gchar *GGOBI(getFileName)(ggobid *gg);
 extern DataMode GGOBI(getDataMode)(ggobid *gg);
 extern const gchar * const GGOBI(getDataModeDescription)(DataMode mode);
 
+extern DataMode GGOBI(setDataMode) (DataMode newMode, ggobid *gg);
+
 /*
  * data, but also row and column labels, lines, colors, blahblah
  * how to do that from R?  Easier once we have xml i/o.
