@@ -354,6 +354,7 @@ struct _ggobid {
    gint motion_notify_id;
    icoords mousepos;
    gint binning_method;
+   gint update_method;
  } wvis;
 
 /*-------------------- scaling ---------------------------------------*/

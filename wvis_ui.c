@@ -163,8 +163,29 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
       }
     }
   }
+
 }
 
+static void
+record_colors_reset (gint selected_var, datad *d, ggobid *gg)
+{
+  gint i, k, m;
+  vartabled *vt = vartable_element_get (selected_var, d);
+  gfloat min = vt->lim_tform.min;
+  gfloat max = vt->lim_tform.max;
+  gfloat val;
+
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot[m];
+    for (k=0; k<gg->ncolors; k++) {
+      val = min + gg->wvis.pct[k] * (max - min);
+      if (d->tform.vals[i][selected_var] <= val) {
+        d->color.els[i] = d->color_now.els[i] = k;
+        break;
+      }
+    }
+  }
+}
 
 
 /*-- called when closed from the close button --*/
@@ -215,6 +236,12 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
 
       gtk_signal_emit_by_name (GTK_OBJECT (w), "expose_event",
         (gpointer) gg, (gpointer) &rval);
+
+      if (gg->wvis.update_method == WVIS_UPDATE_CONTINUOUSLY) {
+        record_colors_reset (selected_var, d, gg);
+        clusters_set (d, gg);
+        displays_plot (NULL, FULL, gg);
+      }
     }
   }
 
@@ -275,6 +302,14 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint selected_var = get_one_selection_from_clist (clist);
+
+  record_colors_reset (selected_var, d, gg);
+  clusters_set (d, gg);
+  displays_plot (NULL, FULL, gg);
+
   if (gg->wvis.motion_notify_id) {
     gtk_signal_disconnect (GTK_OBJECT (w), gg->wvis.motion_notify_id);
     gg->wvis.motion_notify_id = 0;
@@ -308,7 +343,7 @@ bin_boundaries_set (gint selected_var, datad *d, ggobid *gg)
 {
   gint k;
 
-  if (gg->wvis.binning_method == EQUAL_WIDTH_BINS || selected_var == -1) {
+  if (gg->wvis.binning_method == WVIS_EQUAL_WIDTH_BINS || selected_var == -1) {
     /*
      * These numbers are the upper boundaries of each interval.
      * By default, they start at .1 and end at 1.0.
@@ -317,7 +352,7 @@ bin_boundaries_set (gint selected_var, datad *d, ggobid *gg)
       gg->wvis.pct[k] = (gfloat) (k+1) /  (gfloat) gg->wvis.npct;
       gg->wvis.n[k] = 0;
     }
-  } else if (gg->wvis.binning_method == EQUAL_COUNT_BINS) {
+  } else if (gg->wvis.binning_method == WVIS_EQUAL_COUNT_BINS) {
     gint i, m;
     gfloat min, max, range, midpt;
     vartabled *vt = vartable_element_get (selected_var, d);
@@ -351,7 +386,7 @@ bin_boundaries_set (gint selected_var, datad *d, ggobid *gg)
     for (k=0; k<ngroups; k++)
       gg->wvis.pct[k] = 1.0;
     i = 0;
-    for (k=0; k<ngroups; k++) {
+    for (k=0; k<ngroups-1; k++) {  /*-- no need to figure out the last one --*/
       m = 0;
       while (m < groupsize || i == 0 || pairs[i].f == pairs[i-1].f) {
         m++;
@@ -379,6 +414,12 @@ static void binning_method_cb (GtkWidget *w, gpointer cbd)
   gg->wvis.npct = 0;  /*-- force bin_boundaries_set to be called --*/
   gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
     (gpointer) gg, (gpointer) &rval);
+}
+
+static void update_method_cb (GtkWidget *w, gpointer cbd)
+{
+  ggobid *gg = GGobiFromWidget (w, true);
+  gg->wvis.update_method = GPOINTER_TO_INT (cbd);
 }
 
 static void
@@ -840,7 +881,10 @@ wvis_window_open (ggobid *gg) {
 #endif
   static gchar *const binning_method_lbl[] = {
     "Constant bin width",
-    "Constant bin count"};
+    "Constant bin count (approx)"};
+  static gchar *const update_method_lbl[] = {
+    "Update on mouse release",
+    "Update continuously"};
 
   if (gg->d == NULL || g_slist_length (gg->d) == 0)
     return;
@@ -878,7 +922,7 @@ wvis_window_open (ggobid *gg) {
   */
     frame = gtk_frame_new ("Choose color scheme");
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-    gtk_box_pack_start (GTK_BOX (vbox), frame, true, false, 1);
+    gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 1);
 
     vbs = gtk_vbox_new (false, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbs), 5);
@@ -905,12 +949,12 @@ wvis_window_open (ggobid *gg) {
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Choose a color scale", NULL);
 
-    gtk_box_pack_start (GTK_BOX (vbs), opt, true, false, 1);
+    gtk_box_pack_start (GTK_BOX (vbs), opt, false, false, 1);
 
     btn = gtk_button_new_with_label ("Apply color scheme to brushing colors");
     gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Make this the current color scheme for brushing in ggobi, preserving current groups.  If the number of groups is less than the highest index of a currently-used color, this won't work.",
+      "Make this the current color scheme for brushing in ggobi, preserving current groups.  If the number of groups is less than the number of colors currently in use, this won't work.",
       NULL);
     gtk_box_pack_start (GTK_BOX (vbs), btn, false, false, 0);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
@@ -922,11 +966,11 @@ wvis_window_open (ggobid *gg) {
     /*-- colors, symbols --*/
     /*-- now we get fancy:  draw the scale, with glyphs and colors --*/
     vb = gtk_vbox_new (false, 0);
-    gtk_box_pack_start (GTK_BOX (vbox), vb, true, true, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
     gg->wvis.da = gtk_drawing_area_new ();
     gtk_drawing_area_size (GTK_DRAWING_AREA (gg->wvis.da), 400, 200);
     gtk_object_set_data (GTK_OBJECT (gg->wvis.da), "notebook", notebook);
-    gtk_box_pack_start (GTK_BOX (vb), gg->wvis.da, true, true, 0);
+    gtk_box_pack_start (GTK_BOX (vb), gg->wvis.da, false, false, 0);
 
     gtk_signal_connect (GTK_OBJECT (gg->wvis.da),
                         "configure_event",
@@ -949,16 +993,31 @@ wvis_window_open (ggobid *gg) {
                | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
                | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
+    /*-- add an hbox to hold a button and a menu --*/
+    hb = gtk_hbox_new (false, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
+
     btn = gtk_button_new_with_label ("Apply color scheme by variable");
     gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Apply the color scale, using the values of the variable selected in the notebook above",
+      "Apply the color scale, using the values of the variable selected in the list above",
       NULL);
-    gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
+    gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 0);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (scale_apply_cb), gg);
     gtk_widget_set_name (btn, "WVIS:apply");
     gtk_widget_set_sensitive (btn, false);
+
+    /*-- option menu for choosing the method of updating --*/
+    opt = gtk_option_menu_new ();
+    gtk_widget_set_name (opt, "WVIS:update_method");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+      "How to update the displays in response to movements of the sliders (only works after color scheme has been applied by variable",
+      NULL);
+    gtk_box_pack_start (GTK_BOX (hb), opt, true, true, 0);
+    populate_option_menu (opt, (gchar**) update_method_lbl,
+                          sizeof (update_method_lbl) / sizeof (gchar *),
+                          (GtkSignalFunc) update_method_cb, gg);
 
     /*-- add a close button --*/
     gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
