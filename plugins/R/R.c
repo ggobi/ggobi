@@ -528,6 +528,10 @@ RGGobi_getHelpMenu(USER_OBJECT_ sgg)
 USER_OBJECT_
 RGGobi_getDisplayWindow(USER_OBJECT_ sdpy)
 {
- displayd *dpy = (displayd *) (long) NUMERIC_POINTER(VECTOR_ELT(sdpy, 1))[0];
- return(R_createRef(dpy->window, "GtkWidget"));
+ displayd *dpy;
+ dpy = (displayd *) (long) NUMERIC_POINTER(VECTOR_ELT(sdpy, 1))[0];
+ if(GTK_IS_GGOBI_WINDOW_DISPLAY(dpy)) {
+   return(R_createRef(GTK_GGOBI_WINDOW_DISPLAY(dpy)->window, "GtkWidget"));
+ } else
+   return (R_NilValue);
 }
