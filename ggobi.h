@@ -319,7 +319,7 @@ struct _ggobid {
 
  struct _WeightedVis {
    GtkWidget *window;
-   datad *d;
+   datad *d;  /*-- won't be needed, I don't think --*/
 
  } wvis_ui;
 
