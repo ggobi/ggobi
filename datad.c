@@ -46,7 +46,6 @@ datad_new(datad *d, ggobid *gg)
 
   /*-- linking by categorical variable --*/
   d->linkvar_vt = NULL;
-  d->linkvar_arrays = NULL;
 
   sphere_init (d);
 

@@ -61,7 +61,6 @@ struct _datad {
 
  /*-- to support brushing by categorical variable --*/
  vartabled *linkvar_vt;   /*-- the linking variable --*/
- GSList *linkvar_arrays;  /*-- each element is a GArray * --*/
  /*-- --*/
 
  gint ncols;
