@@ -314,7 +314,8 @@ create_ggobi_sheet(datad *data, ggobid *gg)
   gtk_widget_show(scrolled_window);
 
   gtk_signal_connect(GTK_OBJECT(sheet), "changed", cell_changed, data);
-  gtk_signal_connect(GTK_OBJECT(gg), "splot_new", monitor_new_plot, sheet);
+  gtk_signal_connect_while_alive (GTK_OBJECT(gg), "splot_new",
+    monitor_new_plot, sheet, GTK_OBJECT (sheet));
 
   gtk_signal_connect (GTK_OBJECT(sheet), "select_row", select_row_cb, data);
 
@@ -335,9 +336,13 @@ void
 connect_to_splot(splotd *sp, GtkSheet *sheet)
 {
   ggobid *gg = sp->displayptr->ggobi;
-  gtk_signal_connect(GTK_OBJECT(gg), "identify_point", identify_cell, sheet);
-  gtk_signal_connect(GTK_OBJECT(gg), "move_point", move_point_value, sheet);
-  gtk_signal_connect(GTK_OBJECT(gg), "brush_motion", brush_change, sheet);
+
+  gtk_signal_connect_while_alive (GTK_OBJECT(gg), "identify_point",
+    identify_cell, sheet, GTK_OBJECT(sheet));
+  gtk_signal_connect_while_alive (GTK_OBJECT(gg), "move_point",
+    move_point_value, sheet, GTK_OBJECT(sheet));
+  gtk_signal_connect_while_alive (GTK_OBJECT(gg), "brush_motion",
+    brush_change, sheet, GTK_OBJECT(sheet));
 }
 
 
