@@ -221,6 +221,10 @@ getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col)
 }
 
 
+/**
+  Find the color scheme element in the list with the specified
+  name.
+ */
 colorschemed *
 findColorSchemeByName(GList *schemes, const gchar *name)
 {

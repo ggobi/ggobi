@@ -37,7 +37,9 @@ gint getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info);
 gint getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
 GGobiDisplayDescription* getDisplayDescription(xmlNodePtr node);
 enum displaytyped getDisplayType(const xmlChar *type);
+gint getPreferences(const xmlDocPtr doc, GGobiInitInfo *info);
 
+#include "colorscheme.h"
 
 GGobiInitInfo *
 read_init_file(const char *filename)
@@ -58,6 +60,7 @@ read_init_file(const char *filename)
   info->descriptions = NULL;
   info->filename = g_strdup(filename);
 
+  getPreferences(doc, info);
   getPreviousFiles(doc, info);
   getPreviousGGobiDisplays(doc, info);
 #if SUPPORT_PLUGINS
@@ -89,6 +92,33 @@ getXMLElement(xmlNodePtr node, const char *tagName)
   }
 
   return(node);
+}
+
+gint
+getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
+{
+  xmlNode *node, *el;
+  gint n, i;
+  node = getXMLDocElement(doc, "preferences");
+
+  el = getXMLElement(node, "colorschemes");
+  if(el) {
+      char *tmp;
+      tmp = xmlGetProp(el, "file");
+      info->colorSchemeFile = g_strdup(tmp);
+  }
+
+  el = getXMLElement(node, "background");
+  if(el) {
+      char *tmp;
+      el = getXMLElement(el, "color");
+      info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
+      getColor(el, doc, NULL, info->bgColor);
+      if(gdk_colormap_alloc_color(gdk_colormap_get_system(), info->bgColor, false, true) == false)
+	  fprintf(stderr, "Can't allocate background color\n"); fflush(stderr);
+  }
+
+  return(0);
 }
 
 gint
@@ -386,6 +416,7 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
                GET_PROP_VALUE(onCreate, "onCreate");
                GET_PROP_VALUE(onClose, "onClose");
                GET_PROP_VALUE(onUnload, "onUnload");
+               GET_PROP_VALUE(onUpdateDisplay, "onUpdateDisplayMenu");
                break;
             }
             c = c->next;

@@ -36,6 +36,9 @@ typedef struct _GGobiInitInfo {
     GList *plugins;  /* list of known available plugins */
 
     char *filename; /* the name of the file from which this information was read. */
+
+    char *colorSchemeFile; /* */
+    GdkColor *bgColor;
 } GGobiInitInfo;
 
 GGobiInitInfo *read_init_file(const char *filename);
