@@ -48,7 +48,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 
 #ifdef USE_XML
     else if (strcmp (av[1], "-xml") == 0)
-      gg->data_mode = xml;
+      gg->data_mode = xml_data;
     else if (strcmp (av[1], "-v") == 0 || strcmp (av[1], "--validate") == 0) {
       extern int xmlDoValidityCheckingDefaultValue;
       xmlDoValidityCheckingDefaultValue = 1;
@@ -56,7 +56,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 #endif
 #ifdef USE_MYSQL
     else if (strcmp (av[1], "-mysql") == 0) {
-      gg->data_mode = mysql;
+      gg->data_mode = mysql_data;
     }
 #endif
 
