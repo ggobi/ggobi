@@ -191,7 +191,7 @@ display_datad_added_cb (ggobid *gg, datad *d, void *win)
   }
 }
 
-CHECK_EVENT_SIGNATURE(display_datad_added_cb, datad_added_f);
+CHECK_EVENT_SIGNATURE(display_datad_added_cb, datad_added_f)
 
 
 splotd *
