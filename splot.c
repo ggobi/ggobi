@@ -292,7 +292,7 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
 
     case IDENT:
       identify_event_handlers_toggle (sp, state);
-      break;
+    break;
 
     case EDGEED:
       edgeedit_event_handlers_toggle (sp, state);
@@ -914,19 +914,39 @@ splot_screen_to_plane (splotd *sp, gint pt, lcoords *eps,
 {
   icoords prev_planar;
 
+/*
+ * All this code shouldn't be necessary, because (eg) if we're
+ * in tour and using tour_scale, we should already know that.
+ * Look through the movepts code and see if I'm inappropriately
+ * resetting iscale somewhere.
+*/
+  displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
+  gfloat scale_x, scale_y;
+  scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
+  scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
+  scale_x /= 2;
+  sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
+  scale_y /= 2;
+  sp->iscale.y = (glong) (-1 * (gfloat) sp->max.y * scale_y);
+
   if (horiz) {
-    prev_planar.x = sp->planar[pt].x;
     sp->screen[pt].x -= sp->max.x/2;
+
+    prev_planar.x = sp->planar[pt].x;
     sp->planar[pt].x = sp->screen[pt].x * PRECISION1 / sp->iscale.x ;
     sp->planar[pt].x += sp->pmid.x;
+
     eps->x = sp->planar[pt].x - prev_planar.x;
   }
 
   if (vert) {
-    prev_planar.y = sp->planar[pt].y;
     sp->screen[pt].y -= sp->max.y/2;
+
+    prev_planar.y = sp->planar[pt].y;
     sp->planar[pt].y = sp->screen[pt].y * PRECISION1 / sp->iscale.y ;
     sp->planar[pt].y += sp->pmid.y;
+
     eps->y = sp->planar[pt].y - prev_planar.y;
   }
 }
@@ -942,7 +962,21 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
     case XYPLOT:
       d->world.vals[ipt][sp->xyvars.x] = sp->planar[ipt].x;
       d->world.vals[ipt][sp->xyvars.y] = sp->planar[ipt].y;
-      break;
+    break;
+
+    case TOUR2D:
+    {
+      gint j, var;
+      /*if (!gg->is_pp) {*/
+        for (j=0; j<display->t2d.nactive; j++) {
+          var = display->t2d.active_vars.els[j];
+          d->world.vals[ipt][var] += 
+           ((gfloat)gg->movepts.eps.x * display->t2d.F.vals[0][var] +
+            (gfloat)gg->movepts.eps.y * display->t2d.F.vals[1][var]);
+        }
+      /*}*/
+    }
+    break;
 
     default:
       g_printerr ("reverse pipeline only implemented for xyplotting\n");

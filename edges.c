@@ -83,7 +83,7 @@ datad *
 setDisplayEdge(displayd *dpy, datad *e)
 {
   GList *l;
-  datad *old;
+  datad *old = NULL;
 
   dpy->e = e;
   for (l=dpy->splots; l; l=l->next) {

@@ -6,16 +6,16 @@ include local.config
 
 ggobi:
 
-CC = gcc
-#CC = cc
+#CC = gcc
+CC = cc
 
 # This defaults to $(CC) and is reset to CXX by any optional 
 # segment that needs to use C++, e.g  USE_MYSQL 
 LD=$(CXX)
 LD=$(CC)
 
-CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
-#CFLAGS= -g -ansi -DHAVE_CONFIG_H  # when using Irix cc
+#CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
+CFLAGS= -g -ansi -DHAVE_CONFIG_H  # when using Irix cc
 CXXFLAGS=$(CFLAGS)
 
 ifdef TEST_KEYS
@@ -148,7 +148,7 @@ ifdef USE_XML
  XML_OB= read_xml.o write_xml.o read_init.o write_state.o read_color.o
 
 # XML_FLAGS+= -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
- CFLAGS+= $(XML_INC_DIRS:%=%) -DUSE_XML=$(USE_XML) $(XML_FLAGS) -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
+ CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=$(USE_XML) $(XML_FLAGS) -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
 
  SRC+=$(XML_SRC)
  OB+= $(XML_OB)
@@ -178,7 +178,14 @@ ggobi: $(OB) $(EXTRA_OB)
 
 pure: ggobi.o $(OB)
 	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
-	$(LD) $(OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
+	-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/ggvis \
+	$(LD) $(OB) $(LDFLAGS) -o ggobi \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggvis.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/cmds.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/init.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/radial.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/spring.o \
+	$(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
 
 
 %.sched: %.c

@@ -56,7 +56,8 @@ cpanel_tourcorr_set (cpaneld *cpanel, ggobid* gg)
 
   /*-- manual manip --*/
   w = widget_find_by_name (pnl, "COTOUR:manip");
-  gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->tc_manip_mode);
+  if (w)
+    gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->tc_manip_mode);
 
   /*-- PC axes --*/
   /*-- backtracking --*/

@@ -45,7 +45,7 @@ read_colorscheme(gchar *fileName, GList **list)
    /* If this is a colormaps archive, then process each one individually. */
 
   node = xmlDocGetRootElement(doc);
-  if(strcmp(node->name, "colormap") == 0) {
+  if(strcmp((char *)node->name, "colormap") == 0) {
       scheme = process_colorscheme(node, doc);
       if(list) {
         *list = g_list_append(*list, scheme);
@@ -78,9 +78,9 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
 
   scheme = (colorschemed*) g_malloc(sizeof(colorschemed));
 
-  scheme->name = g_strdup(xmlGetProp(root, "name"));
-  scheme->type = getColorSchemeType(xmlGetProp(root, "type"));
-  scheme->system = getColorSchemeSystem(xmlGetProp(root, "system"));
+  scheme->name = g_strdup((gchar *) xmlGetProp(root, (xmlChar *) "name"));
+  scheme->type = getColorSchemeType(xmlGetProp(root, (xmlChar *) "type"));
+  scheme->system = getColorSchemeSystem(xmlGetProp(root, (xmlChar *) "system"));
 
 /*
   scheme->system_min = 0.0;
@@ -93,17 +93,17 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
     scheme->system_max = (gfloat) asNumber(tmp);
 */
 
-  tmp = xmlGetProp(root, "criticalvalue");
+  tmp = xmlGetProp(root, (xmlChar *) "criticalvalue");
   if(tmp)
-    scheme->criticalvalue = (gint) asNumber(tmp);
+    scheme->criticalvalue = (gint) asNumber((char *)tmp);
 
-  tmp = xmlGetProp(root, "ncolors");
+  tmp = xmlGetProp(root, (xmlChar *) "ncolors");
   if(tmp)
-    scheme->n = (gint) asNumber(tmp);
+    scheme->n = (gint) asNumber((char *)tmp);
 
   node = getXMLElement(root, "description");
   val = xmlNodeListGetString(doc, XML_CHILDREN(node), 1);
-  scheme->description = g_strdup(val);
+  scheme->description = g_strdup((gchar *) val);
   g_free (val);
 
   node = getXMLElement(root, "foreground");
@@ -125,13 +125,13 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
 colorscaletype
 getColorSchemeType(const xmlChar *type)
 {
-  if(strcmp(type, "diverging") == 0)
+  if(strcmp((char *) type, "diverging") == 0)
     return(diverging);
-  else if(strcmp(type, "sequential") == 0) 
+  else if(strcmp((char *) type, "sequential") == 0) 
     return(sequential);
-  else if(strcmp(type, "spectral") == 0) 
+  else if(strcmp((char *) type, "spectral") == 0) 
     return(spectral);
-  else if(strcmp(type, "qualitative") == 0) 
+  else if(strcmp((char *) type, "qualitative") == 0) 
     return(qualitative);
   else 
     return(UNKNOWN_COLOR_TYPE);
@@ -140,13 +140,13 @@ getColorSchemeType(const xmlChar *type)
 colorsystem
 getColorSchemeSystem(const xmlChar *type)
 {
-  if(strcmp(type, "rgb") == 0)
+  if(strcmp((char *) type, "rgb") == 0)
     return(rgb);
-  else if(strcmp(type, "hsv") == 0) 
+  else if(strcmp((char *) type, "hsv") == 0) 
     return(hsv);
-  else if(strcmp(type, "cmy") == 0) 
+  else if(strcmp((char *) type, "cmy") == 0) 
     return(cmy);
-  else if(strcmp(type, "cmyk") == 0) 
+  else if(strcmp((char *) type, "cmyk") == 0) 
     return(cmyk);
   else 
     return(UNKNOWN_COLOR_SYSTEM);
@@ -219,11 +219,11 @@ getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col)
 
   /*-- color values must be scaled onto [0,65535] --*/
   gchar *tmpVal;
-  tmpVal = xmlGetProp(node, "min");
+  tmpVal = (gchar *) xmlGetProp(node, (xmlChar *) "min");
   if(tmpVal) {
      colorsystem_min /= asNumber(tmpVal);
   }
-  tmpVal = xmlGetProp(node, "max");
+  tmpVal = (gchar *) xmlGetProp(node, (xmlChar *) "max");
   if(tmpVal) {
      colorsystem_max /= asNumber(tmpVal);
   }
@@ -235,7 +235,7 @@ getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col)
     xmlChar *val;
     if(tmp->type != XML_TEXT_NODE) {
       val = xmlNodeListGetString(doc, XML_CHILDREN(tmp), 1);
-      vals[i] = asNumber(val);
+      vals[i] = asNumber((char *)val);
       g_free (val);
       i++;
     }

@@ -36,21 +36,21 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
   ggv->radial->nodes = (noded *) g_malloc (nnodes * sizeof (noded));
   nodes = ggv->radial->nodes;
 
-  for (i = 0; i <d->nrows_in_plot; i++) {
+  for (i = 0; i <nnodes; i++) {
     k = d->rows_in_plot[i];
-    nodes[k].edges = NULL;
-    nodes[k].subtreeSize = 0;
-    nodes[k].nChildren = 0;
-    nodes[k].nStepsToCenter = nnodessq;
-    nodes[k].i = k;
-    nodes[k].connectedNodes = NULL;
-    nodes[k].parentNode = NULL;
+    ggv->radial->nodes[i].edges = NULL;
+    ggv->radial->nodes[i].subtreeSize = 0;
+    ggv->radial->nodes[i].nChildren = 0;
+    ggv->radial->nodes[i].nStepsToCenter = nnodessq;
+    ggv->radial->nodes[i].i = k;
+    ggv->radial->nodes[i].connectedNodes = NULL;
+    ggv->radial->nodes[i].parentNode = NULL;
 
     if (nedges <= 1) {
-      nodes[k].nStepsToLeaf = 0;
-      nodes[k].nChildren = 0;
+      ggv->radial->nodes[i].nStepsToLeaf = 0;
+      ggv->radial->nodes[i].nChildren = 0;
     } else {
-      nodes[k].nStepsToLeaf = nnodessq;
+      ggv->radial->nodes[i].nStepsToLeaf = nnodessq;
     }
   }
 

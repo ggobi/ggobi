@@ -59,7 +59,7 @@ datad_new(datad *d, ggobid *gg)
  Creates and initializes the datad object.
  */
 datad*
-datad_create(int nr, int nc, ggobid *gg)
+datad_create(gint nr, gint nc, ggobid *gg)
 {
   datad *d;
   d = datad_new(NULL, gg);

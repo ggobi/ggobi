@@ -30,7 +30,7 @@ else
  EXTRA_LIBS=$(GTKEXTRA_LIB_DIR:%=-L%) $(GTKEXTRA_LIB_DIR:%=-Xlinker -rpath -Xlinker %) -lgtkextra 
 endif
 
-CFLAGS+=-g $(GTKEXTRA_INCLUDES) $(GNOME_SUPPORT_INCLUDE_DIR:%=-I%) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags)
+CFLAGS+=-g $(GTKEXTRA_INCLUDES) $(GNOME_SUPPORT_INCLUDE_DIR:%=-I%) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags) $(XML_INC_DIRS:%=-I%)
 
 
 SRC=worksheet

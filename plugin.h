@@ -60,14 +60,14 @@ struct   _GGobiInputPluginInfo {
 
 struct _GGobiPluginInfo {
 
-    GGobiPluginDetails *details;
-    GGobiPluginType type;
-    union {
-	GGobiGeneralPluginInfo *g;
-	GGobiInputPluginInfo   *i;
-    } info;
+  GGobiPluginDetails *details;
+  GGobiPluginType type;
+  union {
+    GGobiGeneralPluginInfo *g;
+    GGobiInputPluginInfo   *i;
+  } info;
 
-    void *data;
+  void *data;
 };
 
 

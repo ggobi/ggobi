@@ -15,9 +15,9 @@
 
 typedef struct {
     enum displaytyped type; /* the type of the plot. */
-    int numVars;            /* the number of variables in the plot. */
+    gint numVars;           /* the number of variables in the plot. */
     gchar **varNames;       /* the variables in the plot. */
-    int data;               /* with which datad is this associated */
+    gint data;              /* with which datad is this associated */
 } GGobiDisplayDescription;
 
 typedef struct {
@@ -26,7 +26,7 @@ typedef struct {
 } GGobiDescription;
 
 typedef struct _GGobiInitInfo {
-    int numInputs;               /* number of previously read input sources */
+    gint numInputs;               /* number of previously read input sources */
     GGobiDescription *descriptions;
 
 #if 0
@@ -36,9 +36,9 @@ typedef struct _GGobiInitInfo {
     GList *plugins;  /* list of known available plugins */
     GList *inputPlugins;  /* list of the input reading plugins */
 
-    char *filename; /* the name of the file from which this information was read. */
+    gchar *filename; /* the name of the file from which this information was read. */
 
-    char *colorSchemeFile; /* */
+    gchar *colorSchemeFile; /* */
     GdkColor *bgColor;
     GdkColor *fgColor;
     glyphd    glyph;
@@ -54,10 +54,10 @@ typedef struct _GGobiInitInfo {
     gint     compress;
 } GGobiInitInfo;
 
-GGobiInitInfo *read_init_file(const char *filename, GGobiInitInfo *info);
+GGobiInitInfo *read_init_file(const gchar *filename, GGobiInitInfo *info);
 #ifdef USE_XML
-xmlNode *getXMLDocElement(const xmlDocPtr doc, const char *tagName);
-xmlNode *getXMLElement(const xmlNodePtr doc, const char *tagName);
+xmlNode *getXMLDocElement(const xmlDocPtr doc, const gchar *tagName);
+xmlNode *getXMLElement(const xmlNodePtr doc, const gchar *tagName);
 #endif
 
 #endif /* end of GGOBI_READ_INIT_H */

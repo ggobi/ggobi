@@ -12,32 +12,40 @@
 ggvisd *   GGVisFromInst (PluginInstance *inst);
 void       close_ggvis_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_ggvis_window(ggobid *gg, PluginInstance *inst);
-void       show_ggvis_window(PluginInstance *inst, GtkWidget *widget);
+void       show_ggvis_window (GtkWidget *widget, PluginInstance *inst);
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   GtkWidget *entry;
-  extern GtkWidget *GGobi_addToolsMenuItem (const char *label, ggobid *gg);
+  extern GtkWidget *GGobi_addToolsMenuItem (const gchar *label, ggobid *gg);
 
   inst->data = NULL;
   inst->info = plugin;
+  inst->gg = gg;
 
   entry = GGobi_addToolsMenuItem ("Graph layout ...", gg);
-  gtk_signal_connect_object (GTK_OBJECT(entry), "activate",
-                             GTK_SIGNAL_FUNC (show_ggvis_window),
-                             (gpointer) inst);
+  gtk_signal_connect (GTK_OBJECT(entry), "activate",
+                      GTK_SIGNAL_FUNC (show_ggvis_window), inst);
   return(true);
 }
 
 
 void
-show_ggvis_window(PluginInstance *inst, GtkWidget *widget)
+show_ggvis_window (GtkWidget *widget, PluginInstance *inst)
 {
   if (g_slist_length(inst->gg->d) < 1) {
     g_printerr ("No datasets to show\n");
     return;
   }
+
+{
+  ggobid *gg = inst->gg;
+  displayd *display = gg->current_display;
+  datad *d = display->d;
+g_printerr ("show_ggvis_window\n");
+g_printerr (" display = %d d = %d\n", (gint)display, (gint)d);
+}
 
   if (inst->data == NULL) {
     GtkWidget *window;
@@ -151,7 +159,7 @@ set_dist_matrix_from_edges (datad *d, datad *e, ggobid *gg, ggvisd *ggv)
   scale_array_max (&ggv->dist, nNodes, nNodes);
 }
 
-static void radial_cb (GtkButton *button, PluginInstance *inst)
+void radial_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   ggvisd *ggv = GGVisFromInst (inst);
@@ -166,6 +174,11 @@ static void radial_cb (GtkButton *button, PluginInstance *inst)
 
   if (d == NULL || e == NULL)
     return;
+
+g_printerr ("radial_cb\n");
+g_printerr (" display = %d d = %d\n",
+  (gint)gg->current_display, (gint)gg->current_display->d);
+g_printerr (" nrows %d ncols %d \n", d->nrows, d->ncols);
 
   initLayout (gg, ggv, d, e);
 
@@ -188,6 +201,8 @@ static void radial_cb (GtkButton *button, PluginInstance *inst)
     gdouble *y = g_malloc0 (d->nrows * sizeof (gdouble));
     gchar *name;
 
+    /*-- here's a problem: if nrows != nrows_in_plot, this won't
+         do the right thing --*/
     for (i=0; i<d->nrows; i++) {
       x[i] = ggv->radial->nodes[i].pos.x;
       y[i] = ggv->radial->nodes[i].pos.y;
@@ -292,6 +307,13 @@ GtkWidget *
 create_ggvis_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
+{
+  ggobid *gg = inst->gg;
+  displayd *display = gg->current_display;
+  datad *d = display->d;
+g_printerr ("create_ggvis_window\n");
+g_printerr (" display = %d d = %d\n", (gint)display, (gint)d);
+}
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/

@@ -94,7 +94,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
    *   scatterplots in xyplot mode
    *   the splotd members of a scatmat that are xyplots.
   */
-  if ((display->displaytype == scatterplot && cpanel->projection == XYPLOT) ||
+  if ((display->displaytype == scatterplot &&
+        (cpanel->projection == XYPLOT || cpanel->projection == TOUR2D)) ||
       (display->displaytype == scatmat && sp->p1dvar == -1))
   {
 
@@ -162,7 +163,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
    *   scatterplots in xyplot mode
    *   the splotd members of a scatmat that are xyplots.
   */
-  if ((display->displaytype == scatterplot && cpanel->projection == XYPLOT) ||
+  if ((display->displaytype == scatterplot &&
+        (cpanel->projection == XYPLOT || cpanel->projection == TOUR2D)) ||
       (display->displaytype == scatmat && sp->p1dvar == -1))
   {
 /*
@@ -211,7 +213,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   gg->buttondown = 0;
 
-  if (cpanel->projection == XYPLOT) {
+  if (cpanel->projection == XYPLOT || cpanel->projection == TOUR2D)
+  {
     gdk_pointer_ungrab (event->time);  /*-- grabbed in mousepos_get_pressed --*/
   }
 

@@ -330,12 +330,26 @@ world_to_raw (gint pt, splotd *sp, datad *d, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
+  enum displaytyped dtype = display->displaytype;
+  PipelineMode proj = cpanel->projection;
+  gint j;
 
-  if ((display->displaytype == scatterplot && cpanel->projection == XYPLOT) ||
-      (display->displaytype == scatmat && sp->p1dvar == -1))
-  {
+  if (dtype == scatterplot) {
+    switch (proj) {
+      case XYPLOT:
+        world_to_raw_by_var (pt, sp->xyvars.x, display, d, gg);
+        world_to_raw_by_var (pt, sp->xyvars.y, display, d, gg);
+      break;
+      case TOUR2D:
+        for (j=0; j<display->t2d.nactive; j++)
+          world_to_raw_by_var (pt, display->t2d.active_vars.els[j],
+            display, d, gg);
+      break;
+    }
+  } else if (dtype == scatmat && sp->p1dvar == -1) {
     world_to_raw_by_var (pt, sp->xyvars.x, display, d, gg);
     world_to_raw_by_var (pt, sp->xyvars.y, display, d, gg);
   }
+
 }
 

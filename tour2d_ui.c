@@ -61,7 +61,8 @@ cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
 
   /*-- manual manip --*/
   w = widget_find_by_name (pnl, "TOUR2D:manip");
-  gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->t2d_manip_mode);
+  if (w)
+    gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->t2d_manip_mode);
 
   /*-- PC axes --*/
   /*-- backtracking --*/

@@ -854,7 +854,7 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
  }
 
 
- if (strcmp(tagName, "categoricalvariable") == 0) {
+ if (strcmp((const char *)tagName, "categoricalvariable") == 0) {
      el->categorical_p = true;
  }
 

@@ -442,7 +442,7 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-GGobi_addDisplayMenuItem (const char *label, ggobid *gg)
+GGobi_addDisplayMenuItem (const gchar *label, ggobid *gg)
 {
   GtkWidget *entry = NULL;
 
@@ -466,7 +466,7 @@ GGobi_addDisplayMenuItem (const char *label, ggobid *gg)
 }
 
 GtkWidget *
-GGobi_addToolsMenuItem (const char *label, ggobid *gg)
+GGobi_addToolsMenuItem (const gchar *label, ggobid *gg)
 {
   GtkWidget *entry = NULL, *tools_menu = NULL;
   GtkItemFactory *factory;
@@ -474,7 +474,7 @@ GGobi_addToolsMenuItem (const char *label, ggobid *gg)
   factory = gtk_item_factory_from_path ("<main>");
   tools_menu = gtk_item_factory_get_widget (factory, "<main>/Tools");
 
-  if (tools_menu != NULL) {
+  if (tools_menu != NULL && label != (gchar *)NULL && strlen(label) > 0) {
 
     entry = gtk_menu_item_new_with_label (label);
     gtk_widget_show (entry);

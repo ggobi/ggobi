@@ -877,6 +877,10 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
             nl = 0;
 
             for (j=0; j<e->edge.n; j++) {
+/*
+ * I'm checking hidden_now here quite vigorously, but what about
+ * sampled?   -- dfs
+*/
               doit = true;
               if (e->hidden_now.els[j]) {
                 doit = false;
