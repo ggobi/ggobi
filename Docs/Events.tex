@@ -99,7 +99,7 @@ arguments: the plot in which the identification took place, a
 reference to the \CStruct{GdkEventMotion} event, and the GGobi
 instance.
 \begin{verbatim}
- void (*callback)(void *userData, splotd *sp, GdkMotionEvent *ev, ggobid *gg, GtkWidget *w);
+ void (*callback)(void *userData, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkWidget *w);
 \end{verbatim}
 
 \item[move point]
@@ -109,7 +109,7 @@ This can be used to track those changes, updating other dependent data,
 displays, etc.
 The form of the handler function should be:
 \begin{verbatim}
-void (*callback)(void *userData, ggobid *gg, splotd *sp, GdkEvetMotion* ev, GtkWidget *w,);
+void (*callback)(void *userData, ggobid *gg, splotd *sp, GdkEventMotion* ev, GtkWidget *w,);
 \end{verbatim}
 
 \item[new plot] The signal name is \SignalName{splot_new}.  This is

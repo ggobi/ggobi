@@ -12,6 +12,9 @@
 #include "pixmaps.h"
 #endif
 
+#include <stdlib.h>
+#include "errno.h"
+
 void       add_ggobi_sheets(ggobid *gg, GtkWidget *notebook);
 void       close_worksheet_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
@@ -20,6 +23,17 @@ GtkWidget *create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst);
 
 void       show_data_edit_window(PluginInstance *inst, GtkWidget *widget);
 
+GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
+void update_cell(gint row, gint column, double value, datad *data);
+void cell_changed(GtkSheet *sheet, gint row, gint column, datad *data);
+
+void brush_change(GtkWidget *w, ggobid *gg, splotd *sp, GtkSheet *sheet);
+void move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet);
+void monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkSheet *sheet);
+void identify_cell(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet);
+
+
+void connect_to_existing_displays(ggobid *gg, GtkSheet *sheet);
 
 gboolean
 addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
@@ -123,7 +137,6 @@ add_ggobi_sheets(ggobid *gg, GtkWidget *notebook)
   }
 }
 
-
 GtkWidget*
 create_ggobi_sheet(datad *data, ggobid *gg)
 {
@@ -140,8 +153,58 @@ create_ggobi_sheet(datad *data, ggobid *gg)
 
   gtk_widget_show(scrolled_window);
 
+  gtk_signal_connect(GTK_OBJECT(sheet), "changed", cell_changed, data);
+  gtk_signal_connect(GTK_OBJECT(gg->main_window), "splot_new", monitor_new_plot, sheet);
+
+  connect_to_existing_displays(gg, GTK_SHEET(sheet));
+
   return(scrolled_window);
 }
+
+void
+connect_to_splot(splotd *sp, GtkSheet *sheet)
+{
+  gtk_signal_connect(GTK_OBJECT(sp->da), "identify_point", identify_cell, sheet);
+  gtk_signal_connect(GTK_OBJECT(sp->da), "move_point", move_point_value, sheet);
+  gtk_signal_connect(GTK_OBJECT(sp->da), "brush_motion", brush_change, sheet);
+}
+
+
+void
+connect_to_display(displayd *dpy, GtkSheet *sheet)
+{
+    GList *el;
+    splotd *sp;
+
+    el = dpy->splots;
+    while(el) {
+	sp = (splotd *) el->data;
+	connect_to_splot(sp, sheet);
+	el = el->next;
+    }
+}
+
+
+void
+connect_to_existing_displays(ggobid *gg, GtkSheet *sheet)
+{
+    GList *el;
+    displayd *dpy;
+    el = gg->displays;
+    while(el) {
+	dpy = (displayd *) el->data;
+	connect_to_display(dpy, sheet);
+	el = el->next;
+    }
+}
+
+
+void
+monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkSheet *sheet)
+{
+    connect_to_splot(sp, sheet);
+}
+
 
 void 
 add_ggobi_data(datad *data, GtkWidget *w)
@@ -184,4 +247,76 @@ void closeWindow(ggobid *gg, PluginInstance *inst)
       GTK_SIGNAL_FUNC (close_worksheet_window), inst);
     gtk_widget_destroy((GtkWidget*) inst->data);
   }
+}
+
+void
+update_cell(gint row, gint column, double value, datad *data)
+{
+    data->raw.vals[row][column] = data->tform.vals[row][column] = value;
+    tform_to_world (data, data->gg);
+    displays_tailpipe (REDISPLAY_ALL, FULL, data->gg); 
+}
+
+
+void
+cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
+{
+    char *val, *tmp;
+    ggobid *gg;
+    float value;
+    val = gtk_sheet_cell_get_text(sheet, row, column);
+    value = strtod(val, &tmp);
+    if(val == tmp) {
+	fprintf(stderr, "Error in strtod: %d\n", errno);fflush(stderr);
+	return;
+    }
+/*
+    fprintf(stderr, "[%s] Changed value of cell %d, %d to `%s' %f\n", data->name, row, column, val, value);fflush(stderr);
+*/
+
+#if 1
+    update_cell(row, column, value, data);
+#endif
+}
+
+void
+identify_cell(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet)
+{
+    if(ev->id < 0)
+	return;
+
+    gtk_sheet_moveto(sheet, ev->id, 2, 0.5, 0.5);
+    gtk_sheet_select_row(sheet, ev->id);
+}
+
+void
+move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet)
+{
+
+    int cols[2];
+    int n = 2, i;
+    char buf[20];
+    if(ev->id < 0)
+	return;
+
+    switch(sp->displayptr->displaytype) {
+	case parcoords:
+	    cols[0] = sp->p1dvar;
+	    n = 1;
+	    break;
+	default:
+	    cols[0] = sp->xyvars.x;
+	    cols[1] = sp->xyvars.y;
+    }
+
+    for(i = 0; i < n ; i++) {
+	sprintf(buf, "%f", sp->displayptr->d->raw.vals[ev->id][cols[i]]);
+	gtk_sheet_set_cell(sheet, ev->id, cols[i], GTK_JUSTIFY_CENTER, buf);
+    }
+}
+
+void
+brush_change(GtkWidget *w, ggobid *gg, splotd *sp, GtkSheet *sheet)
+{
+
 }
