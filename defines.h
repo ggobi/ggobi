@@ -37,11 +37,12 @@
 
 #define NDISPLAYTYPES 3
 
+extern const gchar* const ViewTypes[NDISPLAYTYPES];
+extern const gint ViewTypeIndeces[NDISPLAYTYPES];
+
+
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};
-
-extern const gchar* const ViewTypes[3];
-extern const gint ViewTypeIndeces[3];
 
 /* display options */
 #define DOPT_POINTS    0
