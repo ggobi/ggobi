@@ -1,6 +1,6 @@
-tars1
-tars2
-head
-aede1
-aede2
-aede3
+tars1 0 40
+tars2     8       60
+head	30	30		 
+aede1 50
+aede2     16
+aede3 	 	90 180

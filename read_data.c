@@ -122,6 +122,33 @@ rowlabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
 /*                       column labels                                    */
 /*------------------------------------------------------------------------*/
 
+static void
+collabels_process_word (gchar *word, gint field, gint nvar, datad *d) 
+{
+  gfloat var;
+
+  switch (field) {
+    case 0:
+      d->vartable[nvar].lim_specified_p = false;
+      d->vartable[nvar].collab = g_strdup (word) ;
+      break;
+    case 1:
+      var = atof (word);
+      /*-- don't set lim_specified_p to true unless both are present --*/
+      d->vartable[nvar].lim_specified.min = var;
+      break;
+    case 2:
+      var = atof (word);
+      d->vartable[nvar].lim_specified_p = true;
+      d->vartable[nvar].lim_specified.max = var;
+      break;
+    default:
+      /*-- bail out: too many fields --*/
+      g_printerr ("Too many fields in row %d of collab file\n", nvar+1);
+      exit (1);
+  }
+}
+
 /*
  * Change: we'll no longer support blanks in column names,
  * because we want the option of adding meaningful 2nd and 3rd
@@ -136,7 +163,7 @@ collabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
   gint j, nvar = 0;
   gboolean found = false;
   FILE *fp;
-  gchar initstr[INITSTRSIZE];
+  gchar str[INITSTRSIZE];
 
   /*
    * Check if variable label file exists, and open if so.
@@ -150,49 +177,74 @@ collabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
    * file exists
   */
   if (found) {
-    gint len;
+    gint ch, len = 0, field = 0;
+    gboolean whitespace = false;
     nvar = 0;
 
-    while (fgets (initstr, INITSTRSIZE-1, fp) != NULL) {
+    while ((ch = fgetc (fp)) != EOF) {
 
-      len = MIN ((gint) strlen (initstr), COLLABLEN-1) ;
-     
-      /* trim trailing blanks, and eliminate the carriage return */
-      while (initstr[len-1] == '\n' || initstr[len-1] == ' ')
-        len-- ;
-      initstr[len] = '\0';
-      d->vartable[nvar].collab = g_strdup (initstr) ;
+      if (ch == ' ' || ch == '	') {  /*-- blank or tab --*/
+        whitespace = true;
 
-      if (nvar++ >= d->ncols)
-        break;
+      } else if (ch == '\n') {
+        /*-- process preceding string --*/
+        str[len] = '\0';
+        collabels_process_word (str, field, nvar, d);
+
+        field = len = 0;
+        nvar++;
+        if (nvar >= d->ncols)
+          break;
+        whitespace = false;
+      } else {  /*-- process the next character --*/
+
+        /*-- if following some number of blanks or tabs, process string --*/
+        if (whitespace && len > 0) {
+          /*-- process string --*/
+          str[len] = '\0';
+          collabels_process_word (str, field, nvar, d);
+
+          field++;
+          len = 0;
+        }
+
+        if (field == 0 && len == COLLABLEN-1) {
+          ;  /*-- make sure the column label isn't too long */
+        } else {
+          /*-- append character to str --*/
+          str[len] = ch;
+          len++;
+          if (len > INITSTRSIZE)
+            break;
+          whitespace = false;
+        }
+      }
     }
 
     if (init && nvar != d->ncols) {
       g_printerr ("number of labels = %d, number of cols = %d\n",
         nvar, d->ncols);
 
-      if (d->single_column) {
+      if (d->single_column) { /*-- will this be triggered? --*/
         g_free (d->vartable[1].collab);
         d->vartable[1].collab = g_strdup_printf ("%s", d->vartable[0].collab);
         g_free (d->vartable[0].collab);
         d->vartable[0].collab = g_strdup ("Index");
 
       } else {
-        for (j=nvar; j<d->ncols; j++) {
+        for (j=nvar; j<d->ncols; j++)
           d->vartable[j].collab = g_strdup_printf ("Var %d", j+1);
-        }
       }
     }
   }
   else
   {
     if (init) {
-      for (j=0; j<d->ncols; j++) {
+      for (j=0; j<d->ncols; j++)
+        d->vartable[j].lim_specified_p = false;
         d->vartable[j].collab = g_strdup_printf ("Var %d", j+1);
-      }
     }
   }
-
 
   for (j=0; j<d->ncols; j++) {
     d->vartable[j].collab_tform = g_strdup (d->vartable[j].collab);
