@@ -2,10 +2,29 @@ This plugin provides support for the Java Virtual Machine within
 GGobi. It is a meta-plugin in the sense that input and regular plugins
 developed in Java can be run via this plugin.
 
-Bindings for programming Gtk from within Java
-are available from
+Bindings for programming Gtk from within Java are available from
   http://java-gnome.sourceforge.net/
 
 Hopefully this will serve as an example for embedding the Python and
 Perl interpreters in GGobi in the same manner to allow plugins to be
 developed using those languages.
+
+To run this, you will need to do the following:
+
+a)  copy the contents of the plugin.xml file into your 
+    GGobi initialization file (~/.ggobirc by default)
+    and place them within the <plugins> </plugins> section.
+
+b) set your LD_LIBRARY_PATH  include the GGobi directory, this
+   directory and the relevant JDK directories. You can use 
+   the setLD.csh or setLD.bsh scripts to do this. The former
+   is for those whose shell is csh or tcsh. The latter is for
+   Bourne shell users. You need to source these into your existing
+   shell, as in
+    source setLD.csh
+   or
+    . setLD.bsh
+
+Assuming you have compiled this plugin, you can go ahead and run
+GGobi, e.g. 
+      ../../ggobi ../../data/flea.xml 

@@ -1286,6 +1286,9 @@ GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg)
 gchar *
 GGOBI(getDescription)(ggobid *gg)
 {
+  if(!gg->input)
+	return(NULL);
+
   return(g_strdup(gg->input->fileName));
 }
 
