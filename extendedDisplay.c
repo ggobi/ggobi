@@ -50,7 +50,7 @@ gtk_display_title_label(displayd *dpy)
  And can also lookup the name of a previously instantiated GtkType.
 */
 
-GSList *ExtendedDisplayTypes;
+GSList *ExtendedDisplayTypes = NULL;
 
 int
 addDisplayType(GtkType type)
