@@ -51,7 +51,7 @@ typedef struct {
   datad *dpos;  /*-- the new datad which contains the values in pos --*/
   datad *e;     /*-- edge set, corresponds both to dsrc and dpos --*/
 
-  gboolean mds_running;
+  gboolean running_p;
   guint idle_id;
   
   array_d Dtarget;  /*-- D in the documentation; dist in the xgvis code --*/
@@ -64,24 +64,24 @@ typedef struct {
 
   dissimd *dissim;
 
-  gint mds_dims;
-  gdouble mds_stepsize;
+  gint dim;
+  gdouble stepsize;
 
-  gdouble mds_Dtarget_power;  /* was mds_power */
-  gdouble mds_weight_power;   /* was mds_weightpow */
-  gdouble mds_dist_power;     /* was mds_distpow */
+  gdouble Dtarget_power;  /* was mds_power */
+  gdouble weight_power;   /* was mds_weightpow */
+  gdouble dist_power;     /* was mds_distpow */
 
-  gdouble mds_lnorm;
-  gdouble mds_dist_power_over_lnorm;
-  gdouble mds_lnorm_over_dist_power;
+  gdouble lnorm;
+  gdouble dist_power_over_lnorm;
+  gdouble lnorm_over_dist_power;
 
-  gdouble mds_isotonic_mix;
-  gdouble mds_within_between;
-  gdouble mds_rand_select_val;
-  gdouble mds_rand_select_new;
-  gdouble mds_perturb_val;
-  gdouble mds_threshold_high;
-  gdouble mds_threshold_low;
+  gdouble isotonic_mix;
+  gdouble within_between;
+  gdouble rand_select_val;
+  gdouble rand_select_new;
+  gdouble perturb_val;
+  gdouble threshold_high;
+  gdouble threshold_low;
 
   vector_d pos_mean;
   vector_d weights;
@@ -94,7 +94,7 @@ typedef struct {
   gdouble pos_scl;
   gdouble Dtarget_max, Dtarget_min;
   vector_d rand_sel;
-  gint mds_freeze_var;
+  gint freeze_var;
   gint ndistances;
   gint num_active_dist;
   gint prev_nonmetric_active_dist;
@@ -105,8 +105,8 @@ typedef struct {
   MDSDtargetSource Dtarget_source;
   gboolean complete_Dtarget;
 
-  gboolean mds_group_p;
-  MDSGroupInd mds_group_ind;
+  gboolean group_p;
+  MDSGroupInd group_ind;
   vector_b anchor_group;
 
 } ggvisd;

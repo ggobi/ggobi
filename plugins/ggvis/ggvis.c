@@ -492,7 +492,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  adj = gtk_adjustment_new ((gfloat)ggv->mds_dims, 1.0, 10.0, 1.0, 1.0, 1.0);
+  adj = gtk_adjustment_new ((gfloat)ggv->dim, 1.0, 10.0, 1.0, 1.0, 1.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_dims_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
@@ -541,7 +541,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   top = 0;
 
   /*-- Data (Dtarget) power --*/
-/* Add a second adjustment for mds_isotonic_mix, [0:1] */
+/* Add a second adjustment for isotonic_mix, [0:1] */
   label = gtk_label_new ("Data power (D^p)");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
@@ -561,7 +561,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  /*-- additional adjustment for mds_isotonic_mix */
+  /*-- additional adjustment for isotonic_mix */
   isotonic_mix_adj = gtk_adjustment_new (100.0, 0.0, 101.0, 1.0, 1.0, 1.0);
   gtk_signal_connect (GTK_OBJECT (isotonic_mix_adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_Dtarget_power_cb), inst);
@@ -712,7 +712,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL),
     2, 2);
 
-  adj = gtk_adjustment_new (ggv->mds_rand_select_val, 0.0, 1.0, .01, .01, 0.0);
+  adj = gtk_adjustment_new (ggv->rand_select_val, 0.0, 1.0, .01, .01, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_selection_prob_adj_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
@@ -741,7 +741,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  adj = gtk_adjustment_new (ggv->mds_perturb_val, 0.0, 1.0, 0.01, 0.01, 0.0);
+  adj = gtk_adjustment_new (ggv->perturb_val, 0.0, 1.0, 0.01, 0.01, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_perturb_adj_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));

@@ -16,7 +16,7 @@ ggvis_init (ggvisd *ggv)
   ggv->dpos = NULL;
   ggv->e = NULL;
 
-  ggv->mds_running = false;
+  ggv->running_p = false;
   ggv->idle_id = 0;
 
   arrayd_init_null (&ggv->Dtarget);
@@ -37,24 +37,24 @@ ggvis_init (ggvisd *ggv)
   vectorb_init_null (&ggv->dissim->bars_included);
   vectori_init_null (&ggv->dissim->bins);
 
-  ggv->mds_dims = 3;
+  ggv->dim = 3;
 
-  ggv->mds_stepsize = 0.02;
-  ggv->mds_dist_power = 1.0;
-  ggv->mds_Dtarget_power = 1.0;
-  ggv->mds_lnorm = 2.0;
-  ggv->mds_dist_power_over_lnorm = 1.0;
-  ggv->mds_weight_power = 0.0;
+  ggv->stepsize = 0.02;
+  ggv->dist_power = 1.0;
+  ggv->Dtarget_power = 1.0;
+  ggv->lnorm = 2.0;
+  ggv->dist_power_over_lnorm = 1.0;
+  ggv->weight_power = 0.0;
 
-  ggv->mds_isotonic_mix = 1.0;
-  ggv->mds_dist_power_over_lnorm = 0.5;
-  ggv->mds_lnorm_over_dist_power = 2.0;
-  ggv->mds_within_between = 1.0;
-  ggv->mds_rand_select_val = 1.0;  /* selection probability */
-  ggv->mds_rand_select_new = false;
-  ggv->mds_perturb_val = 1.0;
-  ggv->mds_threshold_high = 0.0;
-  ggv->mds_threshold_low = 0.0;
+  ggv->isotonic_mix = 1.0;
+  ggv->dist_power_over_lnorm = 0.5;
+  ggv->lnorm_over_dist_power = 2.0;
+  ggv->within_between = 1.0;
+  ggv->rand_select_val = 1.0;  /* selection probability */
+  ggv->rand_select_new = false;
+  ggv->perturb_val = 1.0;
+  ggv->threshold_high = 0.0;
+  ggv->threshold_low = 0.0;
 
   ggv->metric_nonmetric = metric;
   ggv->KruskalShepard_classic = KruskalShepard;
@@ -62,8 +62,8 @@ ggvis_init (ggvisd *ggv)
   ggv->Dtarget_source = LinkDist;
   ggv->complete_Dtarget = false;
 
-  ggv->mds_group_p = false;
-  ggv->mds_group_ind = within;
+  ggv->group_p = false;
+  ggv->group_ind = within;
   vectorb_init_null (&ggv->anchor_group);
 
   /*-- used in mds.c --*/
@@ -79,8 +79,7 @@ ggvis_init (ggvisd *ggv)
   arrayd_init_null (&ggv->gradient);
 
   ggv->pos_scl = 0.0;
-  ggv->mds_rand_select_val = 1.0;
-  ggv->mds_freeze_var = 0;
+  ggv->freeze_var = 0;
   ggv->Dtarget_max = DBL_MAX;
   ggv->Dtarget_min = DBL_MIN;
   ggv->prev_nonmetric_active_dist = 0;

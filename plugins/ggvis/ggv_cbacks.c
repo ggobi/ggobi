@@ -21,7 +21,7 @@ ggv_scramble (ggvisd *ggv, ggobid *gg)
 */
 
   for (i = 0; i < ggv->pos.nrows; i++)
-    for (j = 0; j < ggv->mds_dims; j++)
+    for (j = 0; j < ggv->dim; j++)
       ggv->pos.vals[i][j] = ggv_randvalue(UNIFORM);
 
   ggv_center_scale_pos_all (ggv);
@@ -32,7 +32,7 @@ void
 ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
 {
   gint i, j;
-  gint nc = ggv->mds_dims;   /*-- default:  3d --*/
+  gint nc = ggv->dim;   /*-- default:  3d --*/
   glong *rowids;
   gchar **rownames, **colnames;
   gdouble *values;
@@ -153,8 +153,8 @@ ggv_center_scale_pos_all (ggvisd *ggv)
 {
   gint i, j;
 
-  if (ggv->pos_mean.nels < ggv->mds_dims)
-    vectord_realloc (&ggv->pos_mean, ggv->mds_dims);
+  if (ggv->pos_mean.nels < ggv->dim)
+    vectord_realloc (&ggv->pos_mean, ggv->dim);
   vectord_zero (&ggv->pos_mean);
 
   /* find center */
@@ -224,7 +224,7 @@ ggv_pos_reinit (ggvisd *ggv)
   vartabled *vt;
 
 /*-- populates pos; what about dpos?  --*/
-  for (j=0; j<ggv->mds_dims; j++) {
+  for (j=0; j<ggv->dim; j++) {
     if (j < dsrc->ncols) {
       vt = vartable_element_get (j, dsrc);
       min = vt->lim_tform.min;
@@ -410,8 +410,8 @@ g_printerr ("e is null\n");
       }
     }
   }
-  ggv->mds_threshold_low =  ggv->Dtarget_min;
-  ggv->mds_threshold_high = ggv->Dtarget_max;
+  ggv->threshold_low =  ggv->Dtarget_min;
+  ggv->threshold_high = ggv->Dtarget_max;
 */
 
 
@@ -520,23 +520,23 @@ void mds_scramble_cb (GtkWidget *btn, PluginInstance *inst)
 void ggv_stepsize_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_stepsize = adj->value;
- g_printerr ("mds_stepsize = %f\n", ggv->mds_stepsize);
+  ggv->stepsize = adj->value;
+ g_printerr ("stepsize = %f\n", ggv->stepsize);
 }
 
 void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_dims = (gint) (adj->value);
+  ggv->dim = (gint) (adj->value);
 }
 void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_dist_power = adj->value;
+  ggv->dist_power = adj->value;
 
-  ggv->mds_lnorm_over_dist_power = ggv->mds_lnorm/ggv->mds_dist_power;
-  ggv->mds_dist_power_over_lnorm = ggv->mds_dist_power/ggv->mds_lnorm;
+  ggv->lnorm_over_dist_power = ggv->lnorm/ggv->dist_power;
+  ggv->dist_power_over_lnorm = ggv->dist_power/ggv->lnorm;
 
   /*-- sanity check before execution --*/
   if (ggv->Dtarget.nrows == 0)
@@ -548,8 +548,8 @@ void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 
 /*
    This callback is attached to two adjustments:
-     one controls mds_Dtarget_power  (range: 1:6)
-     the other controls mds_isotonic_mix (range: 0:1)
+     one controls Dtarget_power  (range: 1:6)
+     the other controls isotonic_mix (range: 0:1)
 */
 void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
@@ -558,9 +558,9 @@ void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 
   /*-- I'm trusting that the adjustment is in sync with the option menu --*/
   if (ggv->metric_nonmetric == metric) {
-    ggv->mds_Dtarget_power = adj->value;
+    ggv->Dtarget_power = adj->value;
   } else {
-    ggv->mds_isotonic_mix = adj->value / 100.0;
+    ggv->isotonic_mix = adj->value / 100.0;
   }
 
   /*-- sanity check before execution --*/
@@ -573,12 +573,12 @@ void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 void ggv_lnorm_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_lnorm = adj->value;
+  ggv->lnorm = adj->value;
 }
 void ggv_weight_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_weight_power = adj->value;
+  ggv->weight_power = adj->value;
 }
 
 void ggv_metric_cb (GtkWidget *w, gpointer cbd)
@@ -628,7 +628,7 @@ void ggv_kruskal_cb (GtkWidget *w, gpointer cbd)
 void ggv_brush_groupsp_cb (GtkToggleButton *w, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_group_p = w->active;
+  ggv->group_p = w->active;
 }
 void ggv_brush_groups_opt_cb (GtkWidget *w, gpointer cbd)
 {
@@ -637,14 +637,14 @@ void ggv_brush_groups_opt_cb (GtkWidget *w, gpointer cbd)
   ggvisd *ggv = ggvisFromInst (inst);
 
   /* within, between, anchorscales, anchorfixed */
-  ggv->mds_group_ind = GPOINTER_TO_INT (cbd);
+  ggv->group_ind = GPOINTER_TO_INT (cbd);
 }
 
 void
 ggv_perturb_adj_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_perturb_val = adj->value;
+  ggv->perturb_val = adj->value;
 }
 
 void
@@ -659,9 +659,9 @@ ggv_perturb_btn_cb (GtkWidget *btn, PluginInstance *inst)
     return;
 
   for (i = 0; i < ggv->pos.nrows; i++)
-    for (k = ggv->mds_freeze_var; k < ggv->mds_dims; k++) {
-      ggv->pos.vals[i][k] = (1.0-ggv->mds_perturb_val) * ggv->pos.vals[i][k] +
-        (ggv->mds_perturb_val) * ggv_randvalue(NORMAL);
+    for (k = ggv->freeze_var; k < ggv->dim; k++) {
+      ggv->pos.vals[i][k] = (1.0-ggv->perturb_val) * ggv->pos.vals[i][k] +
+        (ggv->perturb_val) * ggv_randvalue(NORMAL);
     }
 
   ggv_center_scale_pos (ggv);
@@ -679,7 +679,7 @@ ggv_selection_prob_adj_cb (GtkAdjustment *adj, PluginInstance *inst)
   ggobid *gg = inst->gg;
   ggvisd *ggv = ggvisFromInst (inst);
 
-  ggv->mds_rand_select_val = adj->value;
+  ggv->rand_select_val = adj->value;
 
   /*-- sanity check before execution --*/
   if (ggv->Dtarget.nrows == 0)
@@ -697,7 +697,7 @@ ggv_selection_prob_btn_cb (GtkWidget *btn, PluginInstance *inst)
   ggobid *gg = inst->gg;
   ggvisd *ggv = ggvisFromInst (inst);
 
-  ggv->mds_rand_select_new = true;
+  ggv->rand_select_new = true;
 
   /*-- sanity check before execution --*/
   if (ggv->Dtarget.nrows == 0)
@@ -715,5 +715,5 @@ void ggv_constrained_cb (GtkWidget *w, gpointer cbd)
   /*-- 0: no variables frozen        --*/
   /*-- 1: first variable frozen      --*/
   /*-- 2: first two variables frozen --*/
-  ggv->mds_freeze_var = GPOINTER_TO_INT (cbd);
+  ggv->freeze_var = GPOINTER_TO_INT (cbd);
 }

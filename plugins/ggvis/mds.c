@@ -37,6 +37,14 @@ extern void Myqsort(void* bot, int nmemb, int size, CompareFunc compar);
 #define IJ i*ggv->Dtarget.ncols+j 
 #define JI j*ggv->Dtarget.nrows+i
 
+#define IS_DRAGGED(i) (ggv->point_status.els[(i)] == DRAGGED)
+#define IS_INCLUDED(i) (ggv->point_status.els[(i)] == INCLUDED)
+#define IS_EXCLUDED(i) (ggv->point_status.els[(i)] == EXCLUDED)
+#define IS_ANCHOR(i) (ggv->point_status.els[(i)] == ANCHOR)
+
+#define ANCHOR_SCALE (ggv->group_p && ggv->group_ind == anchorscales)
+#define ANCHOR_FIXED (ggv->group_p && ggv->group_ind == anchorfixed)
+
 gdouble delta = 1E-10;
 /* these belong in ggv */
 gdouble stress, stress_dx, stress_dd, stress_xx;
@@ -56,14 +64,14 @@ Lp_distance_pow (gint i, gint j, ggvisd *ggv)
   gint k;
   gdouble **pos = ggv->pos.vals;
 
-  if (ggv->mds_lnorm == 2. && ggv->mds_dist_power == 1.) {
-    for (k = 0; k < ggv->mds_dims; k++) 
+  if (ggv->lnorm == 2. && ggv->dist_power == 1.) {
+    for (k = 0; k < ggv->dim; k++) 
       dsum += (pos[i][k] - pos[j][k]) * (pos[i][k] - pos[j][k]);
     return (sqrt(dsum));
   } else { /* non-Euclidean or Dtarget power != 1. */
-    for (k = 0; k < ggv->mds_dims; k++) 
-      dsum += pow (fabs (pos[i][k] - pos[j][k]), ggv->mds_lnorm);
-    return (pow(dsum, ggv->mds_dist_power_over_lnorm));
+    for (k = 0; k < ggv->dim; k++) 
+      dsum += pow (fabs (pos[i][k] - pos[j][k]), ggv->lnorm);
+    return (pow(dsum, ggv->dist_power_over_lnorm));
   }
 }
 
@@ -74,22 +82,20 @@ get_center (ggvisd *ggv)
 {
   gint i, k, n;
 
-  if (ggv->pos_mean.nels < ggv->mds_dims)
-    vectord_realloc (&ggv->pos_mean, ggv->mds_dims);
+  if (ggv->pos_mean.nels < ggv->dim)
+    vectord_realloc (&ggv->pos_mean, ggv->dim);
   vectord_zero (&ggv->pos_mean);
 
   n = 0;
 
   for (i=0; i<ggv->pos.nrows; i++) {
-    if (ggv->point_status.els[i] != EXCLUDED &&
-        ggv->point_status.els[i] != DRAGGED)
-    {
-      for(k=0; k<ggv->mds_dims; k++) 
+    if (!IS_EXCLUDED(i) && !IS_DRAGGED(i)) {
+      for(k=0; k<ggv->dim; k++) 
         ggv->pos_mean.els[k] += ggv->pos.vals[i][k];
       n++;
     }
   }
-  for(k=0; k<ggv->mds_dims; k++) 
+  for(k=0; k<ggv->dim; k++) 
     ggv->pos_mean.els[k] /= n;
 }
 
@@ -103,16 +109,14 @@ get_center_scale (ggvisd *ggv)
   ggv->pos_scl = 0.;
 
   for(i=0; i<ggv->pos.nrows; i++) {
-    if (ggv->point_status.els[i] != EXCLUDED &&
-        ggv->point_status.els[i] != DRAGGED)
-    {
-      for (k=0; k<ggv->mds_dims; k++) 
+    if (!IS_EXCLUDED(i) && !IS_DRAGGED(i)) {
+      for (k=0; k<ggv->dim; k++) 
         ggv->pos_scl += ((ggv->pos.vals[i][k] - ggv->pos_mean.els[k]) *
                          (ggv->pos.vals[i][k] - ggv->pos_mean.els[k]));
       n++;
     }
   }
-  ggv->pos_scl = sqrt(ggv->pos_scl/(gdouble)n/(gdouble)ggv->mds_dims);
+  ggv->pos_scl = sqrt(ggv->pos_scl/(gdouble)n/(gdouble)ggv->dim);
 }
 
 
@@ -125,10 +129,8 @@ ggv_center_scale_pos (ggvisd *ggv)
   get_center_scale (ggv);
 
   for (i=0; i<ggv->pos.nrows; i++) {
-    if (ggv->point_status.els[i] != EXCLUDED &&
-        ggv->point_status.els[i] != DRAGGED)
-    {
-      for (k=0; k<ggv->mds_dims; k++)
+    if (!IS_EXCLUDED(i) && !IS_DRAGGED(i)) {
+      for (k=0; k<ggv->dim; k++)
         pos[i][k] = (pos[i][k] - ggv->pos_mean.els[k])/ggv->pos_scl;
     }
   }
@@ -143,7 +145,7 @@ dot_prod (gint i, gint j, ggvisd *ggv)
   gint k;
   gdouble **pos = ggv->pos.vals;
 
-  for (k=0; k<ggv->mds_dims; k++) 
+  for (k=0; k<ggv->dim; k++) 
     dsum += (pos[i][k] - ggv->pos_mean.els[k]) *
             (pos[j][k] - ggv->pos_mean.els[k]);
 
@@ -156,7 +158,7 @@ L2_norm (gdouble *p1, ggvisd *ggv)
   gdouble dsum = 0.0;
   gint k;
 
-  for (k = ggv->mds_freeze_var; k < ggv->mds_dims; k++)  
+  for (k = ggv->freeze_var; k < ggv->dim; k++)  
     dsum += (p1[k] - ggv->pos_mean.els[k])*(p1[k] - ggv->pos_mean.els[k]);
 
   return(dsum);
@@ -164,7 +166,7 @@ L2_norm (gdouble *p1, ggvisd *ggv)
 
 
 /*
- * weights are only set if mds_weightpow != 0; for 0 there's simpler
+ * weights are only set if weightpow != 0; for 0 there's simpler
  *code throughout, and we save space
 */
 void
@@ -176,12 +178,12 @@ set_weights (ggvisd *ggv)
   gdouble local_within_between = 1.;
 
   /* the weights will be used in metric and nonmetric scaling 
-   * as soon as mds_weightpow != 0. or mds_within_between != 1.
+   * as soon as weightpow != 0. or within_between != 1.
    * weights vector only if needed */
-  if ((ggv->mds_weight_power != local_weight_power &&
-       ggv->mds_weight_power != 0.) || 
-     (ggv->mds_within_between != local_within_between &&
-      ggv->mds_within_between != 1.)) 
+  if ((ggv->weight_power != local_weight_power &&
+       ggv->weight_power != 0.) || 
+     (ggv->within_between != local_within_between &&
+      ggv->within_between != 1.)) 
   {
     if (ggv->weights.nels < ggv->ndistances)  /* power weights */
       vectord_realloc (&ggv->weights, ggv->ndistances);
@@ -192,9 +194,9 @@ set_weights (ggvisd *ggv)
           ggv->weights.els[IJ] = DBL_MAX;
           continue;
         }
-        if (ggv->mds_weight_power != 0.) {
+        if (ggv->weight_power != 0.) {
           if(ggv->Dtarget.vals[i][j] == 0.) { /* cap them */
-            if (ggv->mds_weight_power < 0.) {
+            if (ggv->weight_power < 0.) {
               ggv->weights.els[IJ] = 1E5;
               continue;
             }
@@ -202,21 +204,21 @@ set_weights (ggvisd *ggv)
               ggv->weights.els[IJ] = 1E-5;
             }
           }
-          this_weight = pow(ggv->Dtarget.vals[i][j], ggv->mds_weight_power); 
+          this_weight = pow(ggv->Dtarget.vals[i][j], ggv->weight_power); 
           /* cap them */
           if (this_weight > 1E5)  this_weight = 1E5;
           else if (this_weight < 1E-5) this_weight = 1E-5;
           /* within-between weighting */
           if (SAMEGLYPH(ggv->dpos,i,j)) 
-            this_weight *= (2. - ggv->mds_within_between);
+            this_weight *= (2. - ggv->within_between);
           else
-            this_weight *= ggv->mds_within_between;
+            this_weight *= ggv->within_between;
           ggv->weights.els[IJ] = this_weight;
-        } else { /* mds_weightpow == 0. */
+        } else { /* weightpow == 0. */
           if (SAMEGLYPH(ggv->dpos,i,j)) 
-            this_weight = (2. - ggv->mds_within_between);
+            this_weight = (2. - ggv->within_between);
           else 
-            this_weight = ggv->mds_within_between;
+            this_weight = ggv->within_between;
           ggv->weights.els[IJ] = this_weight;
         }
       }
@@ -230,17 +232,17 @@ set_random_selection (ggvisd *ggv)
 {
   gint i;
 
-  if (ggv->mds_rand_select_val != 1.0) { 
+  if (ggv->rand_select_val != 1.0) { 
     if (ggv->rand_sel.nels < ggv->ndistances) {
       vectord_realloc (&ggv->rand_sel, ggv->ndistances);
       for (i=0; i<ggv->ndistances; i++) { 
         ggv->rand_sel.els[i] = (gdouble) randvalue();  /* uniform on [0,1] */
       }
     }
-    if (ggv->mds_rand_select_new) {
+    if (ggv->rand_select_new) {
       for (i=0; i<ggv->ndistances; i++)
         ggv->rand_sel.els[i] = (gdouble) randvalue();
-      ggv->mds_rand_select_new = false;
+      ggv->rand_select_new = false;
     }
   }
 } /* end set_random_selection() */
@@ -259,7 +261,7 @@ update_stress (ggvisd *ggv, ggobid *gg)
       dist_trans  = ggv->trans_dist.els[IJ];
       if (dist_trans == DBL_MAX) continue;
       dist_config = ggv->config_dist.els[IJ];
-      if (ggv->mds_weight_power == 0. && ggv->mds_within_between == 1.) { 
+      if (ggv->weight_power == 0. && ggv->within_between == 1.) { 
         stress_dx += dist_trans  * dist_config;
         stress_xx += dist_config * dist_config;
         stress_dd += dist_trans  * dist_trans;
@@ -292,9 +294,9 @@ power_transform (ggvisd *ggv)
   gdouble tmp, fac;
   gint i;
 
-  if (ggv->mds_Dtarget_power == 1.) { 
+  if (ggv->Dtarget_power == 1.) { 
     return; 
-  } else if (ggv->mds_Dtarget_power == 2.) {
+  } else if (ggv->Dtarget_power == 2.) {
     if (ggv->KruskalShepard_classic == KruskalShepard) { 
       for (i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
@@ -309,18 +311,18 @@ power_transform (ggvisd *ggv)
       }
     }
   } else {
-    fac = pow (ggv->Dtarget_max, ggv->mds_Dtarget_power-1);
+    fac = pow (ggv->Dtarget_max, ggv->Dtarget_power-1);
     if (ggv->KruskalShepard_classic == KruskalShepard) { 
       for(i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
         if (tmp != DBL_MAX)
-          ggv->trans_dist.els[i] = pow(tmp, ggv->mds_Dtarget_power)/fac;
+          ggv->trans_dist.els[i] = pow(tmp, ggv->Dtarget_power)/fac;
       }
     } else { 
       for(i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
         if(tmp != DBL_MAX)
-          ggv->trans_dist.els[i] = -pow(-tmp, ggv->mds_Dtarget_power)/fac;
+          ggv->trans_dist.els[i] = -pow(-tmp, ggv->Dtarget_power)/fac;
       }
     }
   }
@@ -365,7 +367,7 @@ isotonic_transform (ggvisd *ggv, ggobid *gg)
   }
   /* block weights */
   if (ggv->bl_w.nels < ggv->ndistances &&
-       (ggv->mds_weight_power != 0. || ggv->mds_within_between != 1.))
+       (ggv->weight_power != 0. || ggv->within_between != 1.))
   {
     vectord_realloc (&ggv->bl_w, ggv->ndistances);
     g_printerr ("allocated block weights \n");
@@ -413,7 +415,7 @@ isotonic_transform (ggvisd *ggv, ggobid *gg)
   for (i = 0; i < ggv->ndistances; i += ggv->bl.els[i]) {        
     if (ggv->trans_dist.els[ggv->trans_dist_index.els[i]] != DBL_MAX) {
       ii = i + ggv->bl.els[i];
-      if (ggv->mds_weight_power == 0. && ggv->mds_within_between == 1.) {
+      if (ggv->weight_power == 0. && ggv->within_between == 1.) {
         tmp_distsum = 0.;  
         for (j = i; j < ii; j++)
           tmp_distsum += ggv->trans_dist.els[ggv->trans_dist_index.els[j]];
@@ -442,7 +444,7 @@ isotonic_transform (ggvisd *ggv, ggobid *gg)
       t_d_i  = ggv->trans_dist.els[ggv->trans_dist_index.els[i]];
       t_d_ii = ggv->trans_dist.els[ggv->trans_dist_index.els[ii]];
       if (t_d_i > t_d_ii) { /* pool blocks starting at i and ii */
-        if (ggv->mds_weight_power == 0. && ggv->mds_within_between == 1.) {
+        if (ggv->weight_power == 0. && ggv->within_between == 1.) {
           ggv->trans_dist.els[ggv->trans_dist_index.els[i]] = 
             (t_d_i * ggv->bl.els[i] + t_d_ii * ggv->bl.els[ii]) /
             (ggv->bl.els[i] + ggv->bl.els[ii]);
@@ -470,40 +472,39 @@ isotonic_transform (ggvisd *ggv, ggobid *gg)
     }
   }
 
-  /* mix isotonic with raw according to mds_isotonic_mix entered
-     interactively */
-  if (ggv->mds_isotonic_mix != 1.0) {
+  /* mix isotonic with raw according to isotonic_mix entered interactively */
+  if (ggv->isotonic_mix != 1.0) {
     for (i = 0 ; i < ggv->Dtarget.nrows; i++) 
       for (j = 0; j < ggv->Dtarget.ncols; j++) {
         ij = IJ;
         if (ggv->trans_dist.els[ij] != DBL_MAX) {
-          if (ggv->mds_Dtarget_power == 1.0) {
+          if (ggv->Dtarget_power == 1.0) {
             if (ggv->KruskalShepard_classic == KruskalShepard) {
               ggv->trans_dist.els[ij] =
-                ggv->mds_isotonic_mix * ggv->trans_dist.els[ij] + 
-                 (1 - ggv->mds_isotonic_mix) * ggv->Dtarget.vals[i][j];
+                ggv->isotonic_mix * ggv->trans_dist.els[ij] + 
+                 (1 - ggv->isotonic_mix) * ggv->Dtarget.vals[i][j];
             } else {
               ggv->trans_dist.els[ij] =
-                ggv->mds_isotonic_mix * ggv->trans_dist.els[ij] - 
-                (1 - ggv->mds_isotonic_mix) *
+                ggv->isotonic_mix * ggv->trans_dist.els[ij] - 
+                (1 - ggv->isotonic_mix) *
                 ggv->Dtarget.vals[i][j]*ggv->Dtarget.vals[i][j];
             }
-          } else { /* mds_Dtarget_power != 1.0 */
+          } else { /* Dtarget_power != 1.0 */
             if (ggv->KruskalShepard_classic == KruskalShepard) {
               ggv->trans_dist.els[ij] =
-                ggv->mds_isotonic_mix * ggv->trans_dist.els[ij] + 
-                (1 - ggv->mds_isotonic_mix) *
-                pow(ggv->Dtarget.vals[i][j], ggv->mds_Dtarget_power);
+                ggv->isotonic_mix * ggv->trans_dist.els[ij] + 
+                (1 - ggv->isotonic_mix) *
+                pow(ggv->Dtarget.vals[i][j], ggv->Dtarget_power);
             } else {
               ggv->trans_dist.els[ij] =
-                ggv->mds_isotonic_mix * ggv->trans_dist.els[ij] - 
-                (1 - ggv->mds_isotonic_mix) *
-                pow(ggv->Dtarget.vals[i][j], 2*ggv->mds_Dtarget_power);
+                ggv->isotonic_mix * ggv->trans_dist.els[ij] - 
+                (1 - ggv->isotonic_mix) *
+                pow(ggv->Dtarget.vals[i][j], 2*ggv->Dtarget_power);
             }
           }
         } /* end if(trans_dist[ij] != DBL_MAX) */
       } /* end for (j = 0; j < dist.ncols; j++) */
-  } /* end if(mds_isotonic_mix != 1.0) */
+  } /* end if(isotonic_mix != 1.0) */
 
   /*-- update histogram of transformed D --*/
   ggv_Dtarget_histogram_update (ggv, gg);
@@ -531,7 +532,7 @@ mds_idle_func (PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
-  gboolean doit = ggv->mds_running;
+  gboolean doit = ggv->running_p;
 
   if (doit) {
     mds_once (true, ggv, gg);
@@ -546,17 +547,17 @@ void mds_func (gboolean state, PluginInstance *inst)
   ggvisd *ggv = ggvisFromInst (inst);
 
   if (state) {
-    if (!ggv->mds_running) {
+    if (!ggv->running_p) {
       ggv->idle_id = gtk_idle_add_priority (G_PRIORITY_LOW,
         (GtkFunction) mds_idle_func, inst);
     }
-    ggv->mds_running = true;
+    ggv->running_p = true;
   } else {
-    if (ggv->mds_running) {
+    if (ggv->running_p) {
       gtk_idle_remove (ggv->idle_id);
       ggv->idle_id = 0;
     }
-    ggv->mds_running = false;
+    ggv->running_p = false;
   }
 }
 
@@ -624,14 +625,13 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
       }
     }
 */
-  /* excluded points and anchors of either kind */  
-  if (ggv->mds_group_p && ggv->anchor_group.nels > 0 &&
-      (ggv->mds_group_ind == anchorfixed ||
-       ggv->mds_group_ind == anchorscales))
+  /* anchors of either kind */  
+  if (ggv->group_p && ggv->anchor_group.nels > 0 &&
+      (ggv->group_ind == anchorfixed || ggv->group_ind == anchorscales))
   {
     for (i=0; i<ggv->pos.nrows; i++) {
-      if (ggv->point_status.els[i] != EXCLUDED &&
-          ggv->anchor_group.els[dpos->clusterid.els[i]])  /* which d? */
+      if (!IS_EXCLUDED(i) &&
+          ggv->anchor_group.els[ggv->dsrc->clusterid.els[i]])  /* which d? */
       {
         ggv->point_status.els[i] = ANCHOR;
       }
@@ -645,9 +645,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
   {
     if (gg->movepts.cluster_p) {
       for (i=0; i<ggv->pos.nrows; i++) {
-        if (ggv->point_status.els[i] != EXCLUDED &&
-            SAMEGLYPH(dpos,i,dpos->nearest_point)) 
-        {
+        if (!IS_EXCLUDED(i) && SAMEGLYPH(dpos,i,dpos->nearest_point)) {
           ggv->point_status.els[i] = DRAGGED;
         }
       }
@@ -668,12 +666,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
        the set of distances is!  */
 
     /* these points are not moved by the gradient */
-    if (ggv->point_status.els[i] == EXCLUDED || 
-        (ggv->mds_group_p &&
-         ggv->mds_group_ind == anchorfixed &&
-         ggv->point_status.els[i] == ANCHOR) ||
-        ggv->point_status.els[i] == DRAGGED) 
-    {
+    if (IS_EXCLUDED(i) || IS_DRAGGED(i) || (ANCHOR_FIXED && IS_ANCHOR(i))) {
       continue;
     }
 
@@ -684,17 +677,9 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
       if (i == j && ggv->KruskalShepard_classic == KruskalShepard) continue; 
 
       /* these points do not contribute to the gradient */
-      if (ggv->point_status.els[j] == EXCLUDED) continue;
-
-      /*  using brush groups with an anchor group */
-      if (ggv->mds_group_p &&
-           (ggv->mds_group_ind == anchorscales ||
-            ggv->mds_group_ind == anchorfixed) && 
-          ggv->point_status.els[j] != ANCHOR &&
-          ggv->point_status.els[j] != DRAGGED)
-      {
+      if (IS_EXCLUDED(j)) continue;
+      if ((ANCHOR_SCALE || ANCHOR_FIXED) && !IS_ANCHOR(j) && !IS_DRAGGED(j))
         continue;
-      }
 
       /* if the target distance is missing, skip */
       if (ggv->Dtarget.vals[i][j] == DBL_MAX) continue;
@@ -703,12 +688,10 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
       if (ggv->weights.nels != 0 && ggv->weights.els[IJ] == 0.) continue;
 
       /* using groups */
-      if (ggv->mds_group_p &&
-          ggv->mds_group_ind == within &&
+      if (ggv->group_p && ggv->group_ind == within &&
           !SAMEGLYPH(dpos,i,j))
         continue;
-      if (ggv->mds_group_p &&
-          ggv->mds_group_ind == between &&
+      if (ggv->group_p && ggv->group_ind == between &&
           SAMEGLYPH(dpos,i,j))
         continue;
 
@@ -716,15 +699,15 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
        * if the target distance is within the thresholds
        * set using the barplot of distances, keep going.
        */
-      if (ggv->Dtarget.vals[i][j] < ggv->mds_threshold_low || 
-          ggv->Dtarget.vals[i][j] > ggv->mds_threshold_high) continue;
+      if (ggv->Dtarget.vals[i][j] < ggv->threshold_low || 
+          ggv->Dtarget.vals[i][j] > ggv->threshold_high) continue;
 
       /*
        * random selection: needs to be done symmetrically
        */
-      if (ggv->mds_rand_select_val < 1.0) {
-        if (i < j && ggv->rand_sel.els[IJ] > ggv->mds_rand_select_val) continue;
-        if (i > j && ggv->rand_sel.els[JI] > ggv->mds_rand_select_val) continue;
+      if (ggv->rand_select_val < 1.0) {
+        if (i < j && ggv->rand_sel.els[IJ] > ggv->rand_select_val) continue;
+        if (i > j && ggv->rand_sel.els[JI] > ggv->rand_select_val) continue;
       }
 
       /* 
@@ -732,7 +715,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
        * assume weights exist if test is positive, and
        * can now assume that weights are >0 for non-NA
        */
-      if (ggv->mds_weight_power != 0. || ggv->mds_within_between != 1.) {
+      if (ggv->weight_power != 0. || ggv->within_between != 1.) {
         if (ggv->weights.els[IJ] == 0.) continue;
       }        
 
@@ -789,7 +772,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
         if (dist_trans  == DBL_MAX)
           continue;
         dist_config = ggv->config_dist.els[IJ];
-        if (ggv->mds_weight_power == 0. && ggv->mds_within_between == 1.) {
+        if (ggv->weight_power == 0. && ggv->within_between == 1.) {
           weight = 1.0;
         } else {
           weight = ggv->weights.els[IJ];
@@ -803,30 +786,30 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
           /* scale dependent version: 
           resid = (dist_trans - dist_config);
           */
-          if (ggv->mds_lnorm != 2) {
+          if (ggv->lnorm != 2) {
             /* non-Euclidean Minkowski/Lebesgue metric */
             step_mag = weight * resid *
-              pow (dist_config, 1 - ggv->mds_lnorm_over_dist_power);
-            for (k = 0; k < ggv->mds_dims; k++) {
+              pow (dist_config, 1 - ggv->lnorm_over_dist_power);
+            for (k = 0; k < ggv->dim; k++) {
               ggv->gradient.vals[i][k] += step_mag * 
                 sig_pow(ggv->pos.vals[i][k]-ggv->pos.vals[j][k],
-                  ggv->mds_lnorm-1.0);
+                  ggv->lnorm-1.0);
             }
           } else { /* Euclidean Minkowski/Lebesgue metric */
             /* Note the simplification of the code for the special
-             * cases when mds_distpow takes on an integer value.  */
-            if (ggv->mds_dist_power == 1)
+             * cases when dist_power takes on an integer value.  */
+            if (ggv->dist_power == 1)
               step_mag = weight * resid / dist_config;
-            else if(ggv->mds_dist_power == 2)
+            else if(ggv->dist_power == 2)
               step_mag = weight * resid;
-            else if (ggv->mds_dist_power == 3)
+            else if (ggv->dist_power == 3)
               step_mag = weight * resid * dist_config;
-            else if (ggv->mds_dist_power == 4)
+            else if (ggv->dist_power == 4)
               step_mag = weight * resid * dist_config * dist_config;
             else
               step_mag = weight * resid *
-                pow(dist_config, ggv->mds_dist_power-2.);
-            for (k = 0; k < ggv->mds_dims; k++) {
+                pow(dist_config, ggv->dist_power-2.);
+            for (k = 0; k < ggv->dim; k++) {
               ggv->gradient.vals[i][k] += step_mag *
                 (ggv->pos.vals[i][k]-ggv->pos.vals[j][k]); /* Euclidean! */
             }
@@ -839,12 +822,13 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
           resid = (dist_trans - dist_config);
           */
           step_mag = weight * resid; 
-          for (k = 0; k < ggv->mds_dims; k++) {
+          for (k = 0; k < ggv->dim; k++) {
             ggv->gradient.vals[i][k] += step_mag *
               (ggv->pos.vals[j][k] - ggv->pos_mean.els[k]);
-              /* exact formula would be:
-              ((1-1/pos.nrows)*pos.vals[j][k] - (1-2/pos.nrows)*pos_mean[k] - pos.vals[i][k]/pos.nrows); 
-              */
+            /* exact formula would be:
+             * ((1-1/pos.nrows)*pos.vals[j][k] -
+             *  (1-2/pos.nrows)*pos_mean[k] - pos.vals[i][k]/pos.nrows); 
+            */
           }
         }
 
@@ -854,25 +838,17 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
 
     /* center the classical gradient */
     if (ggv->KruskalShepard_classic == classic) {
-      for (k=0; k<ggv->mds_dims; k++) {
+      for (k=0; k<ggv->dim; k++) {
         tmp = 0.;  n = 0;
         for (i=0; i<ggv->pos.nrows; i++) {
-          if (ggv->point_status.els[i] == INCLUDED || 
-              (ggv->mds_group_p &&
-               ggv->mds_group_ind == anchorscales &&
-               ggv->point_status.els[i] == ANCHOR)) 
-          {
+          if (IS_INCLUDED(i) || (ANCHOR_SCALE && IS_ANCHOR(i))) {
             tmp += ggv->gradient.vals[i][k]; 
             n++;
           }
         }
         tmp /= n;
         for (i=0; i<ggv->pos.nrows; i++) {
-          if (ggv->point_status.els[i] == INCLUDED || 
-              (ggv->mds_group_p &&
-               ggv->mds_group_ind == anchorscales &&
-               ggv->point_status.els[i] == ANCHOR)) 
-          {
+          if (IS_INCLUDED(i) || (ANCHOR_SCALE && IS_ANCHOR(i))) {
             ggv->gradient.vals[i][k] -= tmp;
           }
         }
@@ -883,26 +859,21 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
        the size of the configuration */
     gsum = psum = 0.0 ;
     for (i=0; i<ggv->pos.nrows; i++) {
-      if (ggv->point_status.els[i] == INCLUDED || 
-          (ggv->mds_group_p &&
-           ggv->mds_group_ind == anchorscales &&
-           ggv->point_status.els[i] == ANCHOR)) 
-      {
+      if (IS_INCLUDED(i) || (ANCHOR_SCALE && IS_ANCHOR(i))) {
         gsum += L2_norm (ggv->gradient.vals[i], ggv);
         psum += L2_norm (ggv->pos.vals[i], ggv);
       }
     }
     if (gsum < delta) gfactor = 0.0;
-    else gfactor = ggv->mds_stepsize * sqrt(psum/gsum);
+    else gfactor = ggv->stepsize * sqrt(psum/gsum);
 
     /* add the gradient matrix to the position matrix and drag points */
     for (i=0; i<ggv->pos.nrows; i++) {
-      if (ggv->point_status.els[i] != DRAGGED) {
-        for (k = ggv->mds_freeze_var; k<ggv->mds_dims; k++) {
+      if (!IS_DRAGGED(i)) {
+        for (k = ggv->freeze_var; k<ggv->dim; k++)
           ggv->pos.vals[i][k] += (gfactor * ggv->gradient.vals[i][k]);
-        }
       } else {
-        for (k=0; k < ggv->mds_dims; k++) 
+        for (k=0; k < ggv->dim; k++) 
           ggv->pos.vals[i][k] = dpos->tform.vals[i][k] ;
       }
     }

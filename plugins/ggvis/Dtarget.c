@@ -135,6 +135,6 @@ for (i=0; i<n; i++) {
       }
     }
   }
-  ggv->mds_threshold_low =  ggv->Dtarget_min;
-  ggv->mds_threshold_high = ggv->Dtarget_max;
+  ggv->threshold_low =  ggv->Dtarget_min;
+  ggv->threshold_high = ggv->Dtarget_max;
 }
