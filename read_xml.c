@@ -796,12 +796,15 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
   const gchar *tmp = strtok((gchar*) line, " \t\n");
   datad *d = getCurrentXMLData(data);
   vartabled *vt = NULL;
-  while (tmp) {
+  while (tmp && (tmp < (gchar *) (line + len))) {
 
     /* If reading past the last column or row, stop */
     if (data->current_record >= d->raw.nrows ||
         data->current_element >= d->raw.ncols)
     {
+      g_printerr ("Row %d (counting from 1) has too many elements\n",
+        data->current_record+1);
+      data->current_element = 0;
       break;
     }
 
