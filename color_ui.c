@@ -345,11 +345,10 @@ set_color_id (GtkWidget *w, GdkEventButton *event, ggobid *gg)
   else
     set_color_fg (w, event, gg);
 
+  splot_redraw (gg->current_splot, QUICK, gg);  /*-- redraw brush --*/
   return FALSE;
 }
   
-
-
 static gint
 color_expose_bg (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 {
@@ -363,12 +362,9 @@ color_expose_accent (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   return FALSE;
 }
 
-
 static void
 choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
-/*
- * Reset glyph_id to the nearest glyph.
-*/
+/*-- Reset glyph_id to the nearest glyph.  --*/
   glyphv g;
   gint i, dsq, nearest_dsq, type, size, rval = false;
   icoords pos, ev;
@@ -434,11 +430,10 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
 
   gg->glyph_id.type = type;
   gg->glyph_id.size = size;
-  gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display), "expose_event",
+  gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
+    "expose_event",
     (gpointer) sp, (gpointer) &rval);
 }
-
-
 
 static gint
 color_expose_show (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
