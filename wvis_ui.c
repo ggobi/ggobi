@@ -113,7 +113,7 @@ colorscheme_add_to_menu (GtkWidget *menu, gchar *lbl, colorschemed *scheme,
   menuitem = gtk_menu_item_new_with_label (lbl);
   gtk_menu_append (GTK_MENU (menu), menuitem);
 
-  if (scheme && func) {
+  if (func) {
     gtk_object_set_data (GTK_OBJECT (menuitem), "notebook", ptr);
     GGobi_widget_set (menuitem, gg, true);
     gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
@@ -604,6 +604,9 @@ wvis_window_open (ggobid *gg) {
     "--- QUALITATIVE ---"};
   gint n, ncolorscaletype_lbl = 4;
   /* */
+
+  if (gg->d == NULL || g_slist_length (gg->d) == 0)
+    return;
 
   if (gg->wvis.window == NULL) {
 

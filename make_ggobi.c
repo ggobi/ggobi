@@ -46,18 +46,27 @@ void globals_init (ggobid *gg) {
 
   gg->d = NULL;
 
-#ifdef DATAD_NEW_SIGNAL_IMPLEMENTED
+#ifdef DATAD_ADDED_SIGNAL_IMPLEMENTED
   /*-- If this signal has not been initialized yet, do it now --*/
-  if (gtk_signal_lookup ("datad_new", GTK_TYPE_WIDGET) == 0) {
-    gg->signal_datad_new =
+  if (gtk_signal_lookup ("datad_added", GTK_TYPE_WIDGET) == 0) {
+    gg->signal_datad_added =
       gtk_object_class_user_signal_new (gtk_type_class (GTK_TYPE_WIDGET),
-        "datad_new",
+        "datad_added",
         GTK_RUN_LAST | GTK_RUN_ACTION,
         gtk_marshal_NONE__POINTER,
         GTK_TYPE_NONE, 1,
         GTK_TYPE_POINTER);
   }
 #endif
+  if (gtk_signal_lookup ("variable_added", GTK_TYPE_WIDGET) == 0) {
+    gg->signal_variable_added =
+      gtk_object_class_user_signal_new (gtk_type_class (GTK_TYPE_WIDGET),
+        "variable_added",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER,
+        GTK_TYPE_NONE, 1,
+        GTK_TYPE_POINTER);
+  }
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/

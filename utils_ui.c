@@ -323,9 +323,11 @@ get_clist_from_object (GtkObject *obj)
 gint  /*-- assumes GTK_SELECTION_SINGLE --*/
 get_one_selection_from_clist (GtkWidget *clist)
 {
-  GList *selection = GTK_CLIST (clist)->selection;
   gint selected_var = -1;
-  if (selection) selected_var = (gint) selection->data;
+  if (clist) {
+    GList *selection = GTK_CLIST (clist)->selection;
+    if (selection) selected_var = (gint) selection->data;
+  }
 
   return selected_var;
 }
@@ -348,6 +350,36 @@ get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist)
 }
 /*-------------------------------------------------------------------------*/
 
+/*
+* Notice that this callback could be used to respond to any
+* change in the varialbe list, because it doesn't count the
+* number of variables; it just clears the list and then
+* rebuilds it.
+*/
+static void variable_notebook_addvar_cb (GtkWidget *notebook, ggobid *gg)
+{
+  GtkWidget *swin, *clist;
+
+  /*-- add one or more variables to this datad --*/
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  gint kd = g_slist_index (gg->d, d);
+
+  /*-- get the clist associated with this data; clear and rebuild --*/
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), kd);
+  if (swin) {
+    gint j;
+    gchar *row[1];
+    vartabled *vt;
+    clist = GTK_BIN (swin)->child;
+    gtk_clist_clear (GTK_CLIST (clist));
+    for (j=0; j<d->ncols; j++) {
+      vt = vartable_element_get (j, d);
+      row[0] = g_strdup_printf (vt->collab_tform);
+      gtk_clist_append (GTK_CLIST (clist), row);
+    }
+  }
+}
+
 GtkWidget *
 create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
   GtkSignalFunc func, ggobid *gg)
@@ -365,6 +397,11 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
+
+  /*-- listen for variable_added events on main_window --*/
+  gtk_signal_connect_object (GTK_OBJECT (gg->main_window),
+    "variable_added", GTK_SIGNAL_FUNC (variable_notebook_addvar_cb),
+     GTK_OBJECT (notebook));
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;

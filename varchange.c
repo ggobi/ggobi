@@ -108,6 +108,10 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
   /*-- --*/
 
   addvar_propagate (d_ncols_prev, 1, d, gg);
+
+  /*-- emit variable_added signal --*/
+  gtk_signal_emit (GTK_OBJECT (gg->main_window),
+    gg->signal_variable_added, gg); 
 }
 
 /*
