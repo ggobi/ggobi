@@ -13,6 +13,7 @@ extern datad *datad_new(datad *d, ggobid *gg);
 extern "C" {
 #endif
 
+extern datad * datad_get_from_notebook (GtkWidget *notebook, ggobid *);
 extern displayd * datad_init (datad *, ggobid *, gboolean);
 extern GtkWidget* CreateMenuCheck (displayd *, GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 extern GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
@@ -372,5 +373,4 @@ extern gboolean updateAddedColumn (gint nc, gint jvar, datad *, ggobid *);
 #define CHECK_GG(a) ValidateGGobiRef(a, true)
 
 #endif
-
 

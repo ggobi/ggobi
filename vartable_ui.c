@@ -73,9 +73,7 @@ selection_made (GtkWidget *cl, gint row, gint column,
 {
   gint varno;
   gchar *varno_str;
-  gint indx =
-    gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->vartable_ui.notebook));
-  datad *d = (datad*) g_slist_nth_data (gg->d, indx);
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
 
   gtk_clist_get_text (GTK_CLIST (d->vartable_clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
@@ -90,9 +88,7 @@ deselection_made (GtkWidget *cl, gint row, gint column,
 {
   gint varno;
   gchar *varno_str;
-  gint indx =
-    gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->vartable_ui.notebook));
-  datad *d = (datad*) g_slist_nth_data (gg->d, indx);
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
 
   gtk_clist_get_text (GTK_CLIST (d->vartable_clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
@@ -121,9 +117,7 @@ arithmetic_compare (GtkCList *cl, gconstpointer ptr1, gconstpointer ptr2)
 
 void sortbycolumn_cb (GtkWidget *cl, gint column, ggobid *gg)
 {
-  gint indx =
-    gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->vartable_ui.notebook));
-  datad *d = (datad*) g_slist_nth_data (gg->d, indx);
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
 
   gtk_clist_set_sort_column (GTK_CLIST (d->vartable_clist), column);
   if (column == 1)  /*-- variable name --*/

@@ -99,3 +99,15 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
   return (display);
 }
+
+/*
+ * Several tables use notebook widgets to separate the controls
+ * corresponding to different datad's.  This is a way to figure
+ * out which datad we should be operating on in that case.
+*/
+datad *
+datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
+  GtkNotebook *nb = GTK_NOTEBOOK (notebook);
+  gint indx = gtk_notebook_get_current_page (nb);
+  return ((datad *) g_slist_nth_data (gg->d, indx));
+}

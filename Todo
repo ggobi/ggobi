@@ -15,9 +15,6 @@ datad work:
 output:
 *  the 'create file set' panel needs thought:  specify
     datad to save if xml is not selected?
-Brushing: 
-*  when moving between datad's, the colors shown in the exclude window
-    get confused
 
 various stuff not yet implemented:
   1d, xy cycling  .... or run as a demo in R for now?
@@ -161,3 +158,7 @@ Food for thought:
 !  add a divider between the sections; using etched frames 
 !  it doesn't refresh correctly.
 !  the menus pop up in the wrong place
+
+! Brushing: 
+!  when moving between datad's, the colors shown in the exclude window
+!   get confused

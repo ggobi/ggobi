@@ -18,7 +18,7 @@ exclusion_symbol_show (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
   ggobid *gg = GGobiFromWidget (w, true);
   icoords pos;
   glyphv g;
-  datad *d = gg->current_display->d;
+  datad *d = datad_get_from_notebook (gg->exclusion_ui.notebook, gg);
 
   /*-- fill in the background color --*/
   gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
@@ -45,10 +45,9 @@ hide_cluster_cb (GtkToggleButton *btn, gpointer cbd)
   gint k = GPOINTER_TO_INT (cbd);
   gint i;
   ggobid *gg = GGobiFromWidget (GTK_WIDGET (btn), true);
-  datad *d = gg->current_display->d;
+  datad *d = datad_get_from_notebook (gg->exclusion_ui.notebook, gg);
 
   d->clusv[k].hidden = btn->active;
-
 
   for (i=0; i<d->nrows; i++) {
     if (d->sampled[i]) {
@@ -68,10 +67,9 @@ exclude_cluster_cb (GtkToggleButton *btn, gpointer cbd)
   gint k = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget (GTK_WIDGET (btn), true);
   gint i;
-  datad *d = gg->current_display->d;
+  datad *d = datad_get_from_notebook (gg->exclusion_ui.notebook, gg);
 
   d->clusv[k].included = !btn->active;
-
 
   for (i=0; i<d->nrows; i++) {
     if (d->sampled[i])  {
@@ -103,6 +101,7 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
   gint dawidth = 2*NGLYPHSIZES+1 + 10;  /*-- use margin = 5 --*/
 
   d->clusv[k].da = gtk_drawing_area_new ();
+  gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.label[k]), "datad", d);
   gtk_drawing_area_size (GTK_DRAWING_AREA (d->clusv[k].da),
     dawidth, dawidth);
 
@@ -118,8 +117,8 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
     GTK_SIGNAL_FUNC (exclusion_symbol_cb), GINT_TO_POINTER (k));
   GGobi_widget_set (d->clusv[k].da, gg, true);
   gtk_table_attach (GTK_TABLE (d->exclusion_table),
-    d->clusv[k].da,
-    0, 1, k+1, k+2, (GtkAttachOptions)0, (GtkAttachOptions)0, 5, 2);  /*-- don't fill --*/
+    d->clusv[k].da, 0, 1, k+1, k+2,
+    (GtkAttachOptions)0, (GtkAttachOptions)0, 5, 2);  /*-- don't fill --*/
 
   d->clusv[k].hide_tgl = gtk_check_button_new ();
   GTK_TOGGLE_BUTTON (d->clusv[k].hide_tgl)->active = d->clusv[k].hidden;
@@ -150,7 +149,7 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
 static void closeit (ggobid *gg) {
   gint n;
 /* loop over all d's? */
-  datad *d = gg->current_display->d;
+  datad *d = datad_get_from_notebook (gg->exclusion_ui.notebook, gg);
 
   for (n=0; n<d->nclusters; n++)
     cluster_free (n, d, gg);
