@@ -36,6 +36,7 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
   g_assert (d->missing.ncols == d->ncols);
 
   if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
+    gdouble drand;
 
     if (impute_type == IMP_ABOVE) {
       w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_above");
@@ -67,8 +68,9 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
     }
 
     for (k=0; k<nvars; k++) {
-       j = vars[k];
-       vt = vartable_element_get (j, d);
+      gdouble jmult;
+      j = vars[k];
+      vt = vartable_element_get (j, d);
 
       /* Use find the limits of the non-missing data */
       minval = vt->lim_display.min;
@@ -76,15 +78,20 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
       range = maxval - minval;
 
       /* Then fill it in */
-      if (impute_type == IMP_ABOVE)
+      if (impute_type == IMP_ABOVE) {
         impval = maxval + (val/100.) * range;
-      else if (impute_type == IMP_BELOW)
+        jmult = (impval - maxval) * .2;  /* using 20% of the space */
+      } else if (impute_type == IMP_BELOW) {
         impval = minval - (val/100.) * range;
+        jmult = (minval - impval) * .2;
+      }
 
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot.els[i];
         if (d->missing.vals[m][j]) {
-          d->raw.vals[m][j] = d->tform.vals[m][j] = impval;
+          drand = randvalue();
+          drand = (drand - .5) * jmult;
+          d->raw.vals[m][j] = d->tform.vals[m][j] = impval + (gfloat)drand;
         }
       }
     }
@@ -117,6 +124,11 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
   return ok;
 }
 
+/* this is not conditioning on symbol and color, and it
+ * most certainly could.  It's more work:  work one
+ * group at a time.
+
+*/
 gboolean
 impute_mean_or_median (gint type, gint nvars, gint *vars, 
    datad *d, ggobid *gg)
