@@ -187,7 +187,7 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->defaults.color = -1;
   data->defaults.glyphType = -1;
   data->defaults.glyphSize = -1;
-  data->defaults.edgeWidth = -1;  /*-- this has no home in ggobi yet --*/
+  data->defaults.edgeWidth = -1;  /*-- this has no home in ggobi --*/
   data->defaults.hidden = false;
 }
 
@@ -254,6 +254,11 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 
   data->current_level++; /*-- current_level here ranges from 0 : nlevels-1 --*/
 
+/*-- dfs: placeholder for proper debugging --*/
+  if (g_list_length (el->level_values) == el->nlevels)
+    g_printerr ("trouble: adding too many levels to %s\n", el->collab);
+/* */
+
   if (tmp != NULL) {
     itmp = strToInteger (tmp);
     if (itmp < 0) g_printerr ("trouble: levels must be >= 0\n");
@@ -279,7 +284,9 @@ categoricalLevels(const xmlChar **attrs, XMLParserData *data)
     el->nlevels = strToInteger(tmp);
     el->level_values = NULL;
     el->level_names = g_array_new (false, false, sizeof(gchar *));       
+/*
     g_array_set_size(el->level_names, el->nlevels);
+*/
   }
 
   data->current_level = -1; /* We'll increment the first one. */
@@ -297,6 +304,11 @@ addLevel(XMLParserData *data, const gchar *c, gint len)
   vartabled *el = vartable_element_get (data->current_variable, d);
 
   gchar *val = g_strdup(c);
+
+/*-- dfs: placeholder for proper debugging --*/
+  if (el->level_names->len == el->nlevels)
+    g_printerr ("trouble: adding too many levels to %s\n", el->collab);
+
   g_array_append_val(el->level_names, val);
 }
 
@@ -314,7 +326,7 @@ void endXMLElement(void *user_data, const xmlChar *name)
    case REAL_VARIABLE:
    case CATEGORICAL_VARIABLE:
      data->current_variable++;
-     break;
+   break;
    case COLOR:
      data->current_color++;
    break;
@@ -506,6 +518,9 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
   data->current_record = 0;
   data->current_variable = 0;
   data->current_element = 0;
+
+/*-- dfs: this seems to be needed; are there more? --*/
+  data->rowIds = NULL;
 
   return (true);
 }
@@ -1198,11 +1213,8 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData)
   gchar *name;
   const gchar *tmp;
 
-
   data = datad_new(NULL, parserData->gg);
   data->readXMLRecord = readXMLRecord;
-
-
 
   tmp = getAttribute(attrs, (char *) "name");
   if(tmp == NULL) {
@@ -1213,7 +1225,7 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData)
  
   data->name = name;
   parserData->current_data = data;
-   
+
  return(true);
 }
 
@@ -1264,6 +1276,7 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   tmp = getAttribute(attrs, "id");
   if(tmp) {
     if (data->rowIds == NULL) {
+/*-- dfs;  when can data->rowIds be freed? --*/
      data->rowIds = (gchar **) g_malloc(d->nrows * sizeof(gchar *));
      memset(data->rowIds, '\0', d->nrows);
     }

@@ -106,7 +106,12 @@ getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
 
   el = XML_CHILDREN(node);
   for(i = 0; el ; el = el->next) {
-    memset((void*) info->descriptions+i, '\0', sizeof(GGobiDescription)); 
+/*
+ * dfs; trying to get past my compiler
+*/
+    /*memset((void*) info->descriptions+i, '\0', sizeof(GGobiDescription));*/
+    memset(info->descriptions+i, '\0', sizeof(GGobiDescription)); 
+/* */
     if(el->type != XML_TEXT_NODE) {
       getPreviousInput(el, &(info->descriptions[i].input));
       i++;

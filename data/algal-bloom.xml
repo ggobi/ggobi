@@ -1,0 +1,277 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
+<ggobidata count="4">
+
+<data name="Algal Bloom: Experimental Conditions">
+<description>
+</description>
+<variables count="8">
+ <categoricalvariable name="Condition">
+   <levels count="8">
+     <level value="1"> 1 </level>
+     <level value="2"> 2 </level>
+     <level value="3"> 3 </level>
+     <level value="4"> 4 </level>
+     <level value="5"> 5 </level>
+     <level value="6"> 6 </level>
+     <level value="7"> 7 </level>
+     <level value="8"> 8 </level>
+   </levels>
+ </categoricalvariable>
+ <categoricalvariable name="Phosph">
+   <levels count="2">
+     <level value="0"> low </level>
+     <level value="1"> high </level>
+   </levels>
+ </categoricalvariable>
+ <categoricalvariable name="Nitrog">
+   <levels count="2">
+     <level value="0"> low </level>
+     <level value="1"> high </level>
+   </levels>
+ </categoricalvariable>
+ <categoricalvariable name="Carbon">
+   <levels count="2">
+     <level value="0"> low </level>
+     <level value="1"> high </level>
+   </levels>
+ </categoricalvariable>
+ <realvariable name="Day 4"  min="0.200"  max="0.900" />
+ <realvariable name="Day 6"  min="0.200"  max="0.900" />
+ <realvariable name="Day 8"  min="0.200"  max="0.900" />
+ <realvariable name="Day 10" min="0.200"  max="0.900" />
+</variables>
+<records  count="8">
+ <record id="101"> 1  0 0 0  0.312 0.448 0.576 0.326   </record>
+ <record id="102"> 2  1 0 0  0.391 0.242 0.309 0.323   </record>
+ <record id="103"> 3  0 1 0  0.412 0.434 0.280 0.481   </record>
+ <record id="104"> 4  1 1 0  0.376 0.251 0.201 0.312   </record>
+ <record id="105"> 5  0 0 1  0.479 0.639 0.656 0.679   </record>
+ <record id="106"> 6  1 0 1  0.481 0.583 0.631 0.648   </record>
+ <record id="107"> 7  0 1 1  0.465 0.657 0.736 0.680   </record>
+ <record id="108"> 8  1 1 1  0.451 0.768 0.814 0.799   </record>
+</records>
+</data>
+
+<data name="Algal Bloom: Measurements">
+<description>
+</description>
+<variables count="6">
+ <categoricalvariable name="Condition">
+   <levels count="8">
+     <level value="1"> 1 </level>
+     <level value="2"> 2 </level>
+     <level value="3"> 3 </level>
+     <level value="4"> 4 </level>
+     <level value="5"> 5 </level>
+     <level value="6"> 6 </level>
+     <level value="7"> 7 </level>
+     <level value="8"> 8 </level>
+   </levels>
+ </categoricalvariable>
+ <categoricalvariable name="Phosph">
+   <levels count="2">
+     <level value="0"> low </level>
+     <level value="1"> high </level>
+   </levels>
+ </categoricalvariable>
+ <categoricalvariable name="Nitrog">
+   <levels count="2">
+     <level value="0"> low </level>
+     <level value="1"> high </level>
+   </levels>
+ </categoricalvariable>
+ <categoricalvariable name="Carbon">
+   <levels count="2">
+     <level value="0"> low </level>
+     <level value="1"> high </level>
+   </levels>
+ </categoricalvariable>
+ <realvariable name="Algal Count"  min="0.200"  max="0.900" />
+ <realvariable name="Day" />
+</variables>
+<records count="64">
+ <record id="1">  1  0 0 0  0.312 4 </record>
+ <record id="2">  2  1 0 0  0.391 4 </record>
+ <record id="3">  3  0 1 0  0.412 4 </record>
+ <record id="4">  4  1 1 0  0.376 4 </record>
+ <record id="5">  5  0 0 1  0.479 4 </record>
+ <record id="6">  6  1 0 1  0.481 4 </record>
+ <record id="7">  7  0 1 1  0.465 4 </record>
+ <record id="8">  8  1 1 1  0.451 4 </record>
+ <record id="9">  1  0 0 0  0.200 4 </record>
+ <record id="10"> 2  1 0 0  0.200 4 </record>
+ <record id="11"> 3  0 1 0  0.200 4 </record>
+ <record id="12"> 4  1 1 0  0.200 4 </record>
+ <record id="13"> 5  0 0 1  0.200 4 </record>
+ <record id="14"> 6  1 0 1  0.200 4 </record>
+ <record id="15"> 7  0 1 1  0.200 4 </record>
+ <record id="16"> 8  1 1 1  0.200 4 </record>
+ <record id="17"> 1  0 0 0  0.448 6 </record>
+ <record id="18"> 2  1 0 0  0.242 6 </record>
+ <record id="19"> 3  0 1 0  0.434 6 </record>
+ <record id="20"> 4  1 1 0  0.251 6 </record>
+ <record id="21"> 5  0 0 1  0.639 6 </record>
+ <record id="22"> 6  1 0 1  0.583 6 </record>
+ <record id="23"> 7  0 1 1  0.657 6 </record>
+ <record id="24"> 8  1 1 1  0.768 6 </record>
+ <record id="25"> 1  0 0 0  0.200 6 </record>
+ <record id="26"> 2  1 0 0  0.200 6 </record>
+ <record id="27"> 3  0 1 0  0.200 6 </record>
+ <record id="28"> 4  1 1 0  0.200 6 </record>
+ <record id="29"> 5  0 0 1  0.200 6 </record>
+ <record id="30"> 6  1 0 1  0.200 6 </record>
+ <record id="31"> 7  0 1 1  0.200 6 </record>
+ <record id="32"> 8  1 1 1  0.200 6 </record>
+ <record id="33"> 1  0 0 0  0.576 8 </record>
+ <record id="34"> 2  1 0 0  0.309 8 </record>
+ <record id="35"> 3  0 1 0  0.280 8 </record>
+ <record id="36"> 4  1 1 0  0.201 8 </record>
+ <record id="37"> 5  0 0 1  0.656 8 </record>
+ <record id="38"> 6  1 0 1  0.631 8 </record>
+ <record id="39"> 7  0 1 1  0.736 8 </record>
+ <record id="40"> 8  1 1 1  0.814 8 </record>
+ <record id="41"> 1  0 0 0  0.200 8 </record>
+ <record id="42"> 2  1 0 0  0.200 8 </record>
+ <record id="43"> 3  0 1 0  0.200 8 </record>
+ <record id="44"> 4  1 1 0  0.200 8 </record>
+ <record id="45"> 5  0 0 1  0.200 8 </record>
+ <record id="46"> 6  1 0 1  0.200 8 </record>
+ <record id="47"> 7  0 1 1  0.200 8 </record>
+ <record id="48"> 8  1 1 1  0.200 8 </record>
+ <record id="49"> 1  0 0 0  0.326 10 </record>
+ <record id="50"> 2  1 0 0  0.323 10 </record>
+ <record id="51"> 3  0 1 0  0.481 10 </record>
+ <record id="52"> 4  1 1 0  0.312 10 </record>
+ <record id="53"> 5  0 0 1  0.679 10 </record>
+ <record id="54"> 6  1 0 1  0.648 10 </record>
+ <record id="55"> 7  0 1 1  0.680 10 </record>
+ <record id="56"> 8  1 1 1  0.799 10 </record>
+ <record id="57"> 1  0 0 0  0.200 10 </record>
+ <record id="58"> 2  1 0 0  0.200 10 </record>
+ <record id="59"> 3  0 1 0  0.200 10 </record>
+ <record id="60"> 4  1 1 0  0.200 10 </record>
+ <record id="61"> 5  0 0 1  0.200 10 </record>
+ <record id="62"> 6  1 0 1  0.200 10 </record>
+ <record id="63"> 7  0 1 1  0.200 10 </record>
+ <record id="64"> 8  1 1 1  0.200 10 </record>
+</records>
+</data>
+
+<data name="Lines for Experimental Conditions">
+<records count=12>
+ <record source="101" destination="102"> </record>
+ <record source="101" destination="103"> </record>
+ <record source="101" destination="105"> </record>
+ <record source="102" destination="104"> </record>
+ <record source="102" destination="106"> </record>
+ <record source="103" destination="104"> </record>
+ <record source="103" destination="107"> </record>
+ <record source="104" destination="108"> </record>
+ <record source="105" destination="106"> </record>
+ <record source="105" destination="107"> </record>
+ <record source="106" destination="108"> </record>
+ <record source="107" destination="108"> </record>
+</records>
+</data>
+
+<data name="Lines for Measurements">
+<records count="92">
+ <record source="1" destination="9"> </record>
+ <record source="1" destination="17"> </record>
+ <record source="2" destination="10"> </record>
+ <record source="2" destination="18"> </record>
+ <record source="3" destination="11"> </record>
+ <record source="3" destination="19"> </record>
+ <record source="4" destination="12"> </record>
+ <record source="4" destination="20"> </record>
+ <record source="5" destination="13"> </record>
+ <record source="5" destination="21"> </record>
+ <record source="6" destination="14"> </record>
+ <record source="6" destination="22"> </record>
+ <record source="7" destination="15"> </record>
+ <record source="7" destination="23"> </record>
+ <record source="8" destination="16"> </record>
+ <record source="8" destination="24"> </record>
+ <record source="9" destination="10"> </record>
+ <record source="9" destination="11"> </record>
+ <record source="9" destination="13"> </record>
+ <record source="9" destination="25"> </record>
+ <record source="10" destination="12"> </record>
+ <record source="10" destination="14"> </record>
+ <record source="10" destination="26"> </record>
+ <record source="11" destination="12"> </record>
+ <record source="11" destination="15"> </record>
+ <record source="11" destination="27"> </record>
+ <record source="12" destination="16"> </record>
+ <record source="12" destination="28"> </record>
+ <record source="13" destination="14"> </record>
+ <record source="13" destination="15"> </record>
+ <record source="13" destination="29"> </record>
+ <record source="14" destination="16"> </record>
+ <record source="14" destination="30"> </record>
+ <record source="15" destination="16"> </record>
+ <record source="15" destination="31"> </record>
+ <record source="16" destination="32"> </record>
+ <record source="17" destination="25"> </record>
+ <record source="17" destination="33"> </record>
+ <record source="18" destination="26"> </record>
+ <record source="18" destination="34"> </record>
+ <record source="19" destination="27"> </record>
+ <record source="19" destination="35"> </record>
+ <record source="20" destination="28"> </record>
+ <record source="20" destination="36"> </record>
+ <record source="21" destination="29"> </record>
+ <record source="21" destination="37"> </record>
+ <record source="22" destination="30"> </record>
+ <record source="22" destination="38"> </record>
+ <record source="23" destination="31"> </record>
+ <record source="23" destination="39"> </record>
+ <record source="24" destination="32"> </record>
+ <record source="24" destination="40"> </record>
+ <record source="25" destination="41"> </record>
+ <record source="26" destination="42"> </record>
+ <record source="27" destination="43"> </record>
+ <record source="28" destination="44"> </record>
+ <record source="29" destination="45"> </record>
+ <record source="30" destination="46"> </record>
+ <record source="31" destination="47"> </record>
+ <record source="32" destination="48"> </record>
+ <record source="33" destination="41"> </record>
+ <record source="33" destination="49"> </record>
+ <record source="34" destination="42"> </record>
+ <record source="34" destination="50"> </record>
+ <record source="35" destination="43"> </record>
+ <record source="35" destination="51"> </record>
+ <record source="36" destination="44"> </record>
+ <record source="36" destination="52"> </record>
+ <record source="37" destination="45"> </record>
+ <record source="37" destination="53"> </record>
+ <record source="38" destination="46"> </record>
+ <record source="38" destination="54"> </record>
+ <record source="39" destination="47"> </record>
+ <record source="39" destination="55"> </record>
+ <record source="40" destination="48"> </record>
+ <record source="40" destination="56"> </record>
+ <record source="41" destination="57"> </record>
+ <record source="42" destination="58"> </record>
+ <record source="43" destination="59"> </record>
+ <record source="44" destination="60"> </record>
+ <record source="45" destination="61"> </record>
+ <record source="46" destination="62"> </record>
+ <record source="47" destination="63"> </record>
+ <record source="48" destination="64"> </record>
+ <record source="49" destination="57"> </record>
+ <record source="50" destination="58"> </record>
+ <record source="51" destination="59"> </record>
+ <record source="52" destination="60"> </record>
+ <record source="53" destination="61"> </record>
+ <record source="54" destination="62"> </record>
+ <record source="55" destination="63"> </record>
+ <record source="56" destination="64"> </record>
+</records>
+</data>
+
+</ggobidata>
+

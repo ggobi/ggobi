@@ -159,10 +159,10 @@ hidden_link_by_id (gint k, datad *source_d, ggobid *gg)
 /*   Linking within and between datad's using a categorical variable    */
 /*----------------------------------------------------------------------*/
 
+/*
 void
 linkvar_arrays_init (vartabled *vt, datad *d, ggobid *gg)
 {
-/*
   gint i, k;
   gint link_index = g_slist_index (d->vartable, vt);
   GArray *arr;
@@ -195,8 +195,8 @@ linkvar_arrays_init (vartabled *vt, datad *d, ggobid *gg)
       }
     }
   }
-*/
 }
+*/
 
 
 void
@@ -217,7 +217,7 @@ linking_method_set (displayd *display, datad *d, ggobid *gg)
         gg->linkby_cv = true;
         if (d->linkvar_vt == NULL || d->linkvar_vt != vt) {
           d->linkvar_vt = vt;
-          linkvar_arrays_init (vt, d, gg);
+          /*linkvar_arrays_init (vt, d, gg);*/
         }
       }
     }
@@ -230,8 +230,6 @@ brush_link_by_var (gint jlinkby, vector_b *levelv,
 {
   gint m, i, level_value;
 
-for (i=0; i<levelv->nels; i++)
-g_printerr ("  levels[%d] = %d \n", i, levelv->els[i]);
   /*
    * for this datad, loop once over all rows in plot 
   */
