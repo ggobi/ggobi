@@ -387,7 +387,7 @@ get_clist_from_object (GtkObject *obj)
 
     /*-- find the current notebook page, then get the current clist --*/
     notebook = (GtkWidget *) gtk_object_get_data (obj, "notebook");
-    if (notebook) {
+    if (notebook && GTK_IS_NOTEBOOK(notebook)) {
       page = gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook));
       swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
       if (swin) {
