@@ -6,16 +6,16 @@ include local.config
 
 ggobi:
 
-#CC = gcc
-CC = cc
+CC = gcc
+#CC = cc
 
 # This defaults to $(CC) and is reset to CXX by any optional 
 # segment that needs to use C++, e.g  USE_MYSQL 
 LD=$(CXX)
 LD=$(CC)
 
-#CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
-CFLAGS= -g -ansi -DHAVE_CONFIG_H  # when using Irix cc
+CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
+#CFLAGS= -g -ansi -DHAVE_CONFIG_H  # when using Irix cc
 CXXFLAGS=$(CFLAGS)
 
 ifdef TEST_KEYS
@@ -104,7 +104,8 @@ SRC=array.c ash1d.c \
  xlines.c
 
 OB=array.o ash1d.o \
- barchart.o barchart_ui.o brush_api.o brush_bins.o brush.o brush_init.o brush_link.o brush_ui.o \
+ barchart.o barchart_ui.o \
+ brush_api.o brush_bins.o brush.o brush_init.o brush_link.o brush_ui.o \
  color.o color_ui.o cpanel.o \
  datad.o display.o display_tree.o display_ui.o \
  edges.o exclusion.o exclusion_ui.o \
