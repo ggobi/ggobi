@@ -245,41 +245,51 @@ g_printerr ("selected variables don't correspond to what is identified\n");
       for (j=0; j<nvars; j++) {
         vt = vartable_element_get (vars[j], d);
         if (vt == NULL) continue;
-        if (vt->vartype == categorical) {
-          /*
-           * since the level values can be any arbitrary integers,
-           * it's necessary to dig out the level name using the list
-           * of level values.
-          */
-          gint n, ktmp;
-          gint kval = (gint) d->tform.vals[k][vars[j]];
-          lval = -1;
-          for (n=0; n<vt->nlevels; n++) {
-            ktmp = vt->level_values[n];
-            if (ktmp == kval) {
-              lval = n;
-              break;
+
+        /*  missing value  */
+        if (d->nmissing && d->missing.vals[k][vars[j]]) {
+          if (j == 0)
+            lbl = g_strdup_printf ("%s=NA", vt->collab_tform);
+          else
+            lbl = g_strdup_printf ("%s, %s=NA", lbl, vt->collab_tform);
+        } else {   /* not missing */
+
+          if (vt->vartype == categorical) {
+            /*
+             * since the level values can be any arbitrary integers,
+             * it's necessary to dig out the level name using the list
+             * of level values.
+            */
+            gint n, ktmp;
+            gint kval = (gint) d->tform.vals[k][vars[j]];
+            lval = -1;
+            for (n=0; n<vt->nlevels; n++) {
+              ktmp = vt->level_values[n];
+              if (ktmp == kval) {
+                lval = n;
+                break;
+              }
             }
           }
-        }
-        if (lval == -1) {
-          g_printerr ("The levels for %s aren't specified correctly\n",
-            vt->collab);
-          return NULL;
-        }
+          if (lval == -1) {
+            g_printerr ("The levels for %s aren't specified correctly\n",
+              vt->collab);
+            return NULL;
+          }
   
-        if (j == 0) {
-          lbl = (vt->vartype == categorical) ?
-            g_strdup_printf ("%s=%s",
-              vt->collab_tform, vt->level_names[lval]) :
-            g_strdup_printf ("%s=%g",
-              vt->collab_tform, d->tform.vals[k][vars[j]]);
-        } else {
-          lbl = (vt->vartype == categorical) ?
-            g_strdup_printf ("%s, %s=%s",
-              lbl, vt->collab_tform, vt->level_names[lval]) :
-            g_strdup_printf ("%s, %s=%g",
-              lbl, vt->collab_tform, d->tform.vals[k][vars[j]]);
+          if (j == 0) {
+            lbl = (vt->vartype == categorical) ?
+              g_strdup_printf ("%s=%s",
+                vt->collab_tform, vt->level_names[lval]) :
+              g_strdup_printf ("%s=%g",
+                vt->collab_tform, d->tform.vals[k][vars[j]]);
+          } else {
+            lbl = (vt->vartype == categorical) ?
+              g_strdup_printf ("%s, %s=%s",
+                  lbl, vt->collab_tform, vt->level_names[lval]) :
+              g_strdup_printf ("%s, %s=%g",
+                lbl, vt->collab_tform, d->tform.vals[k][vars[j]]);
+          }
         }
       }
       g_free (vars);
