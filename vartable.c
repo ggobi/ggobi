@@ -181,6 +181,7 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
 
   vt_to->collab = g_strdup (vt_from->collab);
   vt_to->collab_tform = g_strdup (vt_from->collab_tform);
+  vt_to->nickname = g_strdup (vt_from->nickname);
 
   vt_to->vartype = vt_from->vartype;
   vt_to->nlevels = vt_from->nlevels;

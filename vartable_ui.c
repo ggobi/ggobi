@@ -507,6 +507,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
   if (vname != NULL && strlen(vname) > 1) {
     vt = vartable_element_get (jvar, d);
     vt->collab = g_strdup (vname);
+    vt->nickname = g_strndup (vname, 2);
 
     vartable_collab_set_by_var (jvar, d);
     tform_label_update (jvar, d, gg);
