@@ -11,4 +11,4 @@ fi
 AC_SUBST(GTK_CONFIG)
 AC_SUBST(GTK_EXTRA_CONFIG)
 
-AC_OUTPUT(local.config)
+AC_OUTPUT(local.config Makevars)

@@ -6,4 +6,4 @@ AC_PATH_PROG(MYSQL_CONFIG, mysql_config)
 AC_SUBST(GTK_CONFIG)
 AC_SUBST(MYSQL_CONFIG)
 
-AC_OUTPUT(local.config)
+AC_OUTPUT(local.config Makevars)

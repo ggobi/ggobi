@@ -4,7 +4,7 @@ endif
 
 DIR_NAME=FileSelect
 
-include $(GGOBI_HOME)/plugins/GNUmakefile.Plugin
+include $(GGOBI_HOME)/plugins/GNUmakefile.PluginAdmin
 
 createDist::
 	cp icon.xpm $(INSTALL_DIR)/$(DIR_NAME)

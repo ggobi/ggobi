@@ -1,0 +1,8 @@
+
+IMLIB_CONFIG=@IMLIB_CONFIG@
+
+PLUGIN_CFLAGS=$(shell $(IMLIB_CONFIG) --cflags-gdk)
+PLUGIN_LIBS=$(shell $(IMLIB_CONFIG) --libs-gdk)
+
+SRC=ImagePlugin.c
+OBJS=ImagePlugin.o

@@ -1,0 +1,3 @@
+R_HOME=@R_HOME@
+PLUGIN_CFLAGS=-I$(R_HOME)/include  -D_R_=1 -DUSE_R=1
+PLUGIN_LIBS=-L$(R_HOME)/bin -lR

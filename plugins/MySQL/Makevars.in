@@ -1,0 +1,4 @@
+MYSQL_CONFIG=@MYSQL_CONFIG@
+
+PLUGIN_CFLAGS=$(shell $(MYSQL_CONFIG) --cflags)
+PLUGIN_LIBS=$(shell $(MYSQL_CONFIG) --libs)

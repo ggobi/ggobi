@@ -7,10 +7,17 @@ DIR_NAME=R
 R_SRC=fileSelection.R randomInput.R testPlugin.R
 DOCS=overview.pdf
 
-include $(GGOBI_HOME)/plugins/GNUmakefile.Plugin
+HEADER_FILES=REval.h
+
+ifndef  RS_COMMON_H
+ RS_COMMON_H=$(OMEGA_HOME)/include/Corba/RSCommon.h
+endif
+
+include $(GGOBI_HOME)/plugins/GNUmakefile.PluginAdmin
 
 createDist:: $(DOCS:%=Docs/%)
 	if test ! -d $(INSTALL_DIR)/$(DIR_NAME)/R ; then mkdir $(INSTALL_DIR)/$(DIR_NAME)/R ; fi
 	cp $(R_SRC:%=R/%) $(INSTALL_DIR)/$(DIR_NAME)/R
 	if test ! -d $(INSTALL_DIR)/$(DIR_NAME)/Docs ; then mkdir $(INSTALL_DIR)/$(DIR_NAME)/Docs ; fi
 	cp $(DOCS:%=Docs/%) $(INSTALL_DIR)/$(DIR_NAME)/Docs
+	cp $(RS_COMMON_H) $(INSTALL_DIR)/$(DIR_NAME)

@@ -22,4 +22,4 @@ AC_SUBST(R_HOME)
 AC_PATH_PROG(GTK_CONFIG, gtk-config)
 AC_SUBST(GTK_CONFIG)
 
-AC_OUTPUT(local.config)
+AC_OUTPUT(local.config Makevars)

@@ -1,0 +1,6 @@
+AC_INIT(ImagePlugin.c)
+
+AC_PATH_PROG(IMLIB_CONFIG, imlib-config)
+AC_SUBST(IMLIB_CONFIG)
+
+AC_OUTPUT(Makevars)

@@ -1,0 +1,6 @@
+PG_CONFIG=@PG_CONFIG@
+
+PLUGIN_CFLAGS=-I$(shell $(PG_CONFIG) --includedir)
+PLUGIN_LIBS=-L$(shell $(PG_CONFIG) --libdir) -lpq
+
+

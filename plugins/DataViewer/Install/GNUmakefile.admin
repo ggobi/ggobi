@@ -4,5 +4,5 @@ endif
 
 DIR_NAME=DataViewer
 
-include $(GGOBI_HOME)/plugins/GNUmakefile.Plugin
+include $(GGOBI_HOME)/plugins/GNUmakefile.PluginAdmin
 
