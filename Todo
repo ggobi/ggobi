@@ -12,8 +12,6 @@ the correct data mode is passed.  Take it out of ggobi.
 From John Plummer: 
   It would be nice if the file finder remembered the
     directory where the last file retrieved was stored.
-  Reset->'show all points' doesn't override the clusters tool.  
-    What to do?
   Let any variable be the label used in identification
 
 Bugs: 
@@ -214,3 +212,5 @@ Food for thought:
 !For subsetting et al
 !  add an option menu allowing the selection of a datad
 
+! Reset->'show all points' doesn't override the clusters tool.  
+!   What to do?

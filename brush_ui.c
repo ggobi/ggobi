@@ -31,6 +31,7 @@ static void brush_on_cb (GtkToggleButton *button, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->brush_on_p = button->active;
+  splot_redraw (gg->current_splot, QUICK, gg);
 }
 
 static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)

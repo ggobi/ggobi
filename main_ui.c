@@ -107,9 +107,17 @@ projection_get (ggobid* gg) {
  * panel should display checkboxes or circles
 */
 gboolean
-varpanel_highd (gint mode)
+varpanel_highd (ggobid *gg)
 {
-  return (mode == TOUR1D || mode == TOUR2D || mode == COTOUR);
+  displayd *display = gg->current_display;
+  gboolean highd = false;
+  gint projection = gg->projection;
+
+  if (display->displaytype == scatterplot)
+    if (projection == TOUR1D || projection == TOUR2D || projection == COTOUR)
+      highd = true;
+
+  return (highd);
 }
 gboolean
 varpanel_permits_circles_or_checkboxes (gint mode)
@@ -138,7 +146,7 @@ varpanel_reinit (ggobid *gg)
   GSList *l;
   datad *d;
 
-  if (varpanel_highd(gg->projection) && varpanel_shows_checkboxes (gg))
+  if (varpanel_highd(gg) && varpanel_shows_checkboxes (gg))
   {  /*-- remove checkboxes and add circles --*/
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
@@ -159,7 +167,7 @@ varpanel_reinit (ggobid *gg)
       if (GTK_OBJECT (d->vcirc_ui.vbox)->ref_count > 1)
         gtk_widget_unref (d->vcirc_ui.vbox);
     }
-  } else if (!varpanel_highd(gg->projection) && varpanel_shows_circles (gg))
+  } else if (!varpanel_highd(gg) && varpanel_shows_circles (gg))
   {  /*-- remove circles and add checkboxes --*/
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
