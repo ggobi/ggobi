@@ -820,7 +820,6 @@ void vartable_populate (datad *d, ggobid *gg)
   d->varpanel_ui.da = (GtkWidget **)
     g_malloc (d->ncols * sizeof (GtkWidget *));
 
-g_printerr ("allocating %d pixmaps\n", d->ncols);
   d->varpanel_ui.da_pix = (GdkPixmap **)
     g_malloc (d->ncols * sizeof (GdkPixmap *));
   for (j=0; j<d->ncols; j++) d->varpanel_ui.da_pix[j] = NULL;
