@@ -70,12 +70,12 @@ data.  It represents a significant improvement on its predecessor, XGobi,
 with multiple plotting windows, more flexible color management, XML file
 handling, and better portability to Windows.
 
-The most significant change may be that ggobi can be embedded in other
-software and controlled using an API (application programming
-interface).  This design has been developed and tested in partnership
-with R.  When ggobi is used with R, the result is a full marriage
-between ggobi's direct manipulation graphical environment and R's
-familiar extensible environment for statistical data analysis.
+The most significant change may be that ggobi is so easy to extend, either
+with the addition of ``plugins'' or by embedding it in other software;
+either way, it can be controlled using an API (application programming
+interface).  When ggobi is embedded in R, for example, the result is a
+full marriage between ggobi's direct manipulation graphical environment
+and R's familiar extensible environment for statistical data analysis.
 
 It has the same graphical functionality whether it is running
 standalone or embedded in other software.  That functionality
@@ -89,6 +89,11 @@ Several displays can be open simultaneously and linked for labeling
 and brushing.  Missing data are accommodated and their patterns can
 be examined.
 \end{abstract}
+
+\newpage
+
+\tableofcontents
+\newpage
 
 \section{Introduction}
 
@@ -133,11 +138,11 @@ Italy (Umbria, East and West Liguria).
 
 Start GGobi for the olive oils data by typing:
 
-\begin{quote}
+\begin{verbatim}
 ggobi olive
-\end{quote}
+\end{verbatim}
 
-Two windows will appear, the GGobi console (control panel),
+Two windows will appear, the GGobi console
 and a scatterplot, as shown in Figure~\ref{fig1}.
 
 The console has a panel of controls on the left, labeled {\bf
@@ -365,7 +370,7 @@ section contains more detailed information on the functionality.
 
 \subsection{The major functions}
 
-Across the top of the control panel, as seen in in Figure \ref{fig1},
+Across the top of the console, as seen in in Figure \ref{fig1},
 stretches a row of menu buttons:  {\bf File}, {\bf Display,} {\bf
 ViewMode}, {\bf Tools}, {\bf Options} and {\bf DisplayTree} are
 always visible; others appear as appropriate.
@@ -415,14 +420,15 @@ The {\bf Tools} menu gives access to
 \item a variable transformation pipeline,
 \item an variable sphering panel,
 \item jittering controls,
-\item a panel for automatically brushing by mapping a selected
-      variable to the color scale,
+\item a panel for selecting a new color scheme for drawing, and
+ then for automatically brushing points and edges by mapping the
+ color scheme onto a selected varriable.
 \item a panel for hiding groups of cases,
 \item subsetting functions for systematic and random subsampling, 
 \item a tool for managing missing values.
 \end{itemize}
 
-Each tool is discussed in section ~\ref{Tools}.
+Each of these tools is discussed in section ~\ref{Tools}.
 
 There are a couple of distinctions between view modes and tools.  The
 view mode functions determine the mouse interactions in the display
@@ -466,8 +472,8 @@ To reset the current plot and display, just click once (left, right
 or middle) in the plot you wish to address.  To understand the
 effects of this selection, open a few displays and set them in
 different ViewModes, then click on different plots and see what
-happens.  The white border should follow your actions, and the
-console should update so that its panels correspond to the
+happens.  The white border follows your actions, and the
+console updates so that its control panel corresponds to the
 current display type and view mode.
 
 \subsubsection{Display types}
@@ -546,7 +552,7 @@ points are connected with line segments.
 
 The time series display uses the checkbox variable selection interface,
 and the behavior of the checkboxes depends on the state of the
-{\bf Selection mode} option menu in the control panel.
+{\bf Selection mode} option menu in the console.
 
 \begin{itemize}
 \item Replace: If you want to replace the horizontal (time) variable,
@@ -582,14 +588,15 @@ must be separated by carriage returns.  Columns, or variables, can be
 separated by any number of tabs or spaces.  The file needs to have the
 suffix {\em .dat}.
 
-You can supply variable and case labels in associated files.
-Variable (column) labels can be in a file named {\bf datafile.col}
-(or {\bf datafile.column}, {\bf datafile.collab}, or {\bf
-datafile.var}).  Case (row) labels can be supplied in a file named
-{\bf datafile.row} (or {\bf data\-file.row\-lab} or {\bf
-data\-file.case}).  There should be one label per line, and the label
-can include blanks.  If variable or case labels are not supplied,
-default labels using column or row numbers are used.
+You can supply variable and case labels in associated files.  Variable
+(column) labels can be in a file named {\bf datafile.col} (or {\bf
+datafile.column}, {\bf datafile.collab}, or {\bf datafile.var}).  Variable
+ranges can be specified by adding two more fields, using ``|'' as the
+field separator.  Case (row) labels can be supplied in a file named {\bf
+datafile.row} (or {\bf data\-file.row\-lab} or {\bf data\-file.case}).
+There should be one label per line, and the label can include blanks.
+If variable or case labels are not supplied, default labels using column
+or row numbers are used.
 
 The files {\bf datafile.glyphs} and {\bf datafile.colors} can be
 used to set the plotting characters and colors to be used in
@@ -597,15 +604,24 @@ drawing each point.  Glyphs can be specified in two ways:
 
 \begin{itemize}
 \item with a string for glyph type and a number for glyph size, where the
-string is one of ``.'' (a single-pixel point), ``plus'', ``x'', ``or''
-(open rectangle), ``fr'' (filled rectangle), ``oc'' (open circle), ``fc''
-(filled circle),
- and the number is between 0 and 7, or
-\item with one number per line, where the number is between one and
-49.  Here's how to generate that number: the type is between 1 and 7,
-using the ordering just presented, and the size is between 1 and 8
-(though it must be 1 for the single-pixel glyph).  The number is then
-$8 \times (type-1) + size$.
+glyph type is one of
+  \begin {itemize}
+  \itemsep 0em
+  \item ``.'' (a single-pixel point),
+  \item ``plus'',
+  \item ``x'',
+  \item ``oc'' (open circle),
+  \item ``or'' (open rectangle),
+  \item ``fc'' (filled circle), or
+  \item ``fr'' (filled rectangle).
+  \end {itemize}
+and the glyph size is between 0 and 7, or
+
+\item with one number per line, where the number is between 0 and
+43.  Here's how to generate that number: the type is between 0 and 6,
+using the ordering just presented, and the size is between 0 and 7.
+The number is then 0 for the single-pixel glyph, and
+$7 \times (type-1) + size + 1$ for all other glyphs.
 \end{itemize}
 
 Filled circles may be the most visually appealing glyph, but take
@@ -614,8 +630,7 @@ sample data files usually use a small filled rectangle as the default
 glyph.
 
 Colors must be integers from 0 to the number of colors in
-the colormap - 1.  (Currently, only one colormap is used, and it
-contains 10 colors.)
+the colormap - 1.
 
 \subsection {XML}
 \label{slbl:XML}
@@ -628,28 +643,39 @@ specification, such as
 \item multiple datasets within a single XML file, all available within
       a single GGobi process,
 \item rules for linking between datasets, and
-\item edges: line segments connecting pairs of points.
-% Let's leave this out for now ...
+\item rules for specifying edges: line segments connecting pairs of points.
+% Leave this out for now, because I only know how to do it on
+% the command line.
 % \item the colormap to be used in brushing.
 \end{itemize}
 
+% Should this be moved to a section on plugins?
 \subsection {Database access}
 \label{slbl:MySQL}
 
 It is possible to interface ggobi with either a Postgres or MySQL
 database. Details of this are described in the document {\em GGobi and
-  Database Management Systems}, available through the web site. 
+Database Management Systems}, available through the web site. 
+
+Database access is implemented as a plugin.
 
 \section{Integration of ggobi with other software systems}
 \label{slbl:Integration}
 
-The application programming interface (API) makes it possible to
-access ggobi from other software. The main example that currently
-exists is the integration of ggobi in R. This is described in the
-document {\em Using the R-GGobi Link} available through the web site.
-Other examples include the GGobi plugin for \textit{Gnumeric}, and the
-Python and Perl modules for GGobi.
+There are two ways to integrate ggobi with other software: by embedding
+ggobi in other software (that is, compiling ggobi into a shared object
+file and linking against it) or by extending ggobi with plugins.  Either
+way, the application programming interface (API) makes it possible to
+control ggobi ``from the outside.''
 
+The main examplea of embedding that currently exists is the integration
+of ggobi in R. This is described in the document {\em Using the R-GGobi
+Link} available through the web site.   It will be possible to do the
+same thing from Perl and Python.  There also exists a ggobi plugin
+for Gnumeric.
+
+There are several examples of plugins for ggobi now distributed with
+the code, including a simple spreadsheet viewer.
 
 \section{View modes: projection and interaction}
 \label{slbl:ViewModes}
@@ -667,7 +693,7 @@ the main GGobi window and a a single scatterplot display.   When
 GGobi starts, it's in {\bf XYPlot} mode by default, so the
 scatterplot window shows a 2-dimensional projection of the data.  If
 you select {\bf Scale} or {\bf Brush} (or any choice in the bottom
-half of the menu), the control panel at the left of the main window
+half of the menu), the control panel at the left of the console
 changes, reflecting the different interactions available to you in
 each mode.  However, the projection in the window doesn't change.
 (There may be cues added to the plot to tell you the view mode of the
@@ -702,7 +728,7 @@ top of the ViewMode menu.
 \subsection{1D plots}
 
 The 1D plot can be displayed in two ways:  as a textured dot plot
-or an average shifted histogram.
+or an average shifted histogram, or ASH.
 
 The textured dot plot uses a method described in
 \cite{TukeyTukey90}.  This method spreads the data laterally by
@@ -710,14 +736,20 @@ amounts that are partly constrained and partly random, resulting in a
 fairly smooth spreading of the points and minimizing artifacts of the
 plotting method, such as stripes, clusters, or gaps.
 
-The average shifted histogram is due to Scott (\cite{Scott92}),
+The ASH is due to Scott (\cite{Scott92}),
 and the code is also his.  In this method, several histograms are
 calculated using the same bin width but different origins, and the
 averaged results are plotted.  The smoothing parameter essentially
-controls the bin width.
+controls the bin width.  Line segments can be added that run between
+the plotted point and the baseline of the ASH.  This is helpful
+when the smoothing parameter is low, because it helps your eye
+make out the the shape of the ASH.
 
 The 1D plot will be arranged horizontally if you select a variable
 with a left click, and vertically if you use a middle or right click.
+
+The cycling controls can be used to make ggobi step through the
+plots automatically, one after another.
 
 To activate this view mode from the keyboard, type {\em d} or {\em D}
 with the focus in the plot window, or type Control-{\em d} or
@@ -725,11 +757,10 @@ Control-{\em D} with the focus in the console.
 
 \subsection{XY plots}
 
-The XY plots are the rudimentary 2 variable scatterplot (or
-draughtsman plot) displays. Two variables are chosen, one to be
-plotted horizontally and the other vertically. Controls allow for
-variables to be cycled in and out of the plot, generating an animation
-through all pairwise plots.
+The XY plots are the rudimentary 2 variable scatterplot (or draughtsman
+plot) displays. Two variables are chosen, one to be plotted horizontally
+and the other vertically. The cycling controls can be used to make ggobi
+step automatically from one pairwise plot to the next.
 
 To activate this view mode from the keyboard, type {\em x} or {\em X}
 with the focus in the plot window, or type Control-{\em x} or
@@ -894,6 +925,11 @@ Control-{\em C} with the focus in the console.
 \subsection{Scaling of axes}
 \label{slbl:Scaling}
 
+There are three ways to perform view scaling:  {\bf Drag} and {\bf Click}
+scaling are visible in the interface, and available in all viewmodes.
+When axes are present in scatterplots, you can also scale the
+view using the axes themselves.
+
 The two styles of interaction, {\bf Drag} and {\bf Click}, are quite
 different.  Drag-style scaling is a perfect example of a direct
 manipulation interface, in which the points follow cursor motion in a
@@ -951,6 +987,16 @@ By the default, the panning and zooming of the plot is unconstrained,
 moving or rescaling vertically and horizontally with each action.
 The pan and zoom options allow it to be constrained so that only
 one axis is affected, convenient for browsing one variable at a time.
+
+\subsubsection{Using the axes}
+
+To pan the data in simple 1D and 2D projections, simply drag the mouse
+in the axis widgets with the left button pressed.  To zoom, drag with
+the middle or right button pressed.
+
+At this writing, we don't require that ggobi be in the scaling viewmode to
+scale this way, but we may add that restriction if this raises 
+difficulties for us as ggobi programmers.
 
 \subsection{Brush: brushing of points and edges}
 \label{slbl:Brush}
@@ -1023,6 +1069,14 @@ edge type for brushing.  At the top of the panel, there is a table of
 all possible point glyphs and another table of all possible edge types.
 Clicking on a point glyph sets both the glyph and edge type.
 
+The reason that glyphs and edge types are linked is that points in one
+display may be linked to edges in another, and then brushing a point
+with a new glyph may case a linked edge to acquire a new edge type at
+the same time.  (Since there are more point types than edge types for
+now, it's clear which edge type to select if a new glyph is chosen,
+but it isn't clear which glyph to select if a new edge type is chosen.
+For that reason, the edge symbols don't yet respond to button clicks.)
+
 Below those tables is a row of rectangles of color which represent the
 current color scale.  Clicking on one of these sets the brushing color.
 Double-clicking on one of these rectangles, or on the two rectangles
@@ -1053,11 +1107,13 @@ can be linked if they have a chosen categorical variable in common.
 
 \subsubsection{Color schemes ...}
 
-See the description in section \ref{slbl:ColorSchemes}.
+Since this button is also found on the Tools menu, it is
+documented in section \ref{slbl:ColorSchemes}.
 
 \subsubsection{Color \& glyph groups ...}
 
-See the description in section \ref{slbl:ColorAndGlyphGroups}.
+Since this button is also found on the Tools menu, it is
+documented in section \ref{slbl:ColorAndGlyphGroups}.
 
 \subsubsection{Options menu}
 %
@@ -1179,7 +1235,7 @@ variables with the same units or potential range (such as percentages)
 to use the same range, and facilitates visual comparisons.
 
 The selected variables can also be cloned, and the new variables
-you create will be added to the table as well as the main control panel.
+you create will be added to the table as well as the console.
 
 \label{NewVariable}
 There's another way to add new variables, and that relies on the {\em New
@@ -1275,7 +1331,8 @@ the XML file, like this:
 
 Warning: If you mistakenly launch a color scheme which does not have
 as many colors as you're specifying in the XML data file, strange
-things may happen; ggobi doesn't yet know how to respond.
+things may happen; ggobi will attempt to catch this and warn you,
+but we aren't quite sure what it should do in this case.
 
 \subsubsection{Choosing a color scheme interactively}
 
@@ -1296,7 +1353,7 @@ line specifies the file {\tt colorschemes.xml}, which is included in the
 GGobi distribution.  (You will probably need to modify the path name,
 of course.)
 
-\begin{quote}
+\begin{verbatim}
 <?xml version="1.0"?>
 <!DOCTYPE ggobirc>
 <ggobirc>
@@ -1304,7 +1361,7 @@ of course.)
   <colorschemes file="/usr/ggobi/data/colorschemes.xml" />
 </preferences>
 </ggobirc>
-\end{quote}
+\end{verbatim}
 
 The sample file presently contains 20 or so color schemes, of
 different types and sizes, and they're based on the work of
@@ -1534,23 +1591,23 @@ plots.  (See \ref{slbl:GraphicalDisplays} for more detail.)
 This design change has had far-reaching effects.
 
 First, user interactions available for the simple scatterplot display
-can now be made available for other display types.  In XGobi, for
+can now be made available for other display types.  In xgobi, for
 instance, there is a parallel coordinates display, but it's not
-possible to brush it -- in GGobi, it is.
+possible to brush it -- in ggobi, it is.
 
 Unfortunately, having multiple displays introduces a new source of
-ambiguity: you now have to tell GGobi which display, and which plot
+ambiguity: you now have to tell ggobi which display, and which plot
 within a display, you want to address.  Do that by simply clicking
 inside the target plot.  GGobi will draw a thick white outline around
 that plot so that you can check which plot your actions will be
-addressing.  The ViewMode panel in the main GGobi window should
+addressing.  The ViewMode control panel in the ggobi console should
 always correspond to the state of the current display, too.  We need
 more user experience before we can tell whether this approach is
 satisfactory.
 
-The basis for linking has changed, too:  since all displays are
-linked by default, it's no longer necessary to run multiple processes
-in order to achieve linked displays.
+The basis for linking has changed, too.  All displays of the same data
+are now linked by default, so it's no longer necessary to run
+multiple processes in order to achieve linked displays.
 
 One of the most interesting implications of using multiple displays
 is that a GGobi process is no longer restricted to a single data
@@ -1559,7 +1616,7 @@ matrices in a single file, as described in section \ref{slbl:XML}.
 In addition, it's possible to add data matrices using the Read button
 on the File menu or using R.  (The R~-~GGobi interface will be
 introduced below, and it's more fully described in section
-\ref{slbl:Integration}.)
+\ref{slbl:Integration} and in other documentation.)
 
 The rules for linking in XGobi had evolved into a rather complicated
 hodge-podge with special handling of ``row groups,'' the
@@ -1604,33 +1661,33 @@ date.  For instance, it's no longer possible to specify edges
 in the ascii data format, but they can be specified in XML -- and
 they can have associated data values.
 
-A few XML data files are included in the sample GGobi data, and
+A few XML data files are included in the sample ggobi data, and
 the details of their format is described in {\em XML Input Format}
-(XML.pdf) which is included as part of the GGobi distribution.
+(XML.pdf) which is included as part of the ggobi distribution.
 
 Another innovation in data access is the ability to read data
 directly from a MySQL database, as described in section \ref{slbl:MySQL}.
 
 \subsection{Integration}
 
-Many XGobi users are also users of the SPlus or R statistics software, and
-have used the S function which launches an XGobi process viewing S data.
+Many xgobi users are also users of the SPlus or R statistics software, and
+have used the S function which launches an xgobi process viewing S data.
 Once that launch occurred, the resulting process was utterly independent
 of its parent.  The XGobi authors did some experiments in the early 90s
 to achieve a more intimate connection, but made little headway with S,
 though interprocess communication was used successfully with ArcView
 (\cite{SwayneBujaHubbell91,SMCM97}).
 
-With GGobi, that problem has been solved, and it's now possible
-to have real-time integration between GGobi and a variety of
+With ggobi, that problem has been solved, and it's now possible
+to have real-time integration between ggobi and a variety of
 other software environments.  An example of this integration is
-the embedding of GGobi into R (or S), with the addition of a set of
+the embedding of ggobi into R (or S), with the addition of a set of
 R (or S) functions that manipulate GGobi data and displays,
 resetting data values, projection, and the appearance of the plot.
 
 For more details, see section \ref{slbl:Integration}, or read
 {\em Using the R-GGobi Link} (in RGGobi.pdf), another piece of
-documentation included in the GGobi distribution.
+documentation included in the ggobi distribution.
 
 \subsection {Variable selection}
 
@@ -1706,8 +1763,12 @@ the {\bf Options} menu.
 \section{Known problems}
 
 \begin{itemize}
+\item The checkboxes aren't sufficiently informative -- in
+  some projections, they really ought to indicate whether a variable is
+  plotted vertically or horizontally.  We need a new widget, a richer
+  kind of checkbox.
 \item The combination of linking by variable and edge brushing
-      doesn't work yet.  [Or does it?]
+  doesn't work yet.  [Or does it?]
 \end{itemize}
 
 \section{Future work}
@@ -1717,7 +1778,7 @@ Soon:
 \begin{itemize}
 \item A two-button toggle widget for variable selection
 \item Categorical data displays
-\item Graph layout
+\item Graph layout  (currently being implemented as a plugin)
 \end{itemize}
 
 Longer term:
