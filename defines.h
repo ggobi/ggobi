@@ -216,7 +216,9 @@ extern const gint ViewTypeIndeces[3];
 /*
  * scaling
 */
-#define SCALE_MIN 0.02
+#define SCALE_DEFAULT      0.7
+#define TOUR_SCALE_DEFAULT 0.6
+#define SCALE_MIN          0.02
 
 #define DRAG  0
 #define CLICK 1

@@ -48,9 +48,19 @@ reset_pan_cb (GtkWidget *w, ggobid *gg) {
   splot_redraw (sp, FULL, gg);
 }
 void
-reset_zoom_cb (GtkWidget *w, gpointer cbd) {
-  gchar *lbl = (gchar *) cbd;
-  g_printerr ("reset zoom: %s\n", lbl);
+reset_zoom_cb (GtkWidget *w, ggobid *gg) {
+  gint projection = projection_get (gg);
+  splotd *sp = gg->current_splot;
+  displayd *dsp = (displayd *) sp->displayptr;
+
+  if (projection == TOUR2D)
+    sp->tour_scale.x = sp->tour_scale.y = TOUR_SCALE_DEFAULT;
+  else
+    sp->scale.x = sp->scale.y = SCALE_DEFAULT;
+
+  splot_plane_to_screen (dsp, &dsp->cpanel, sp, gg);
+  ruler_ranges_set (dsp, sp, gg);
+  splot_redraw (sp, FULL, gg);
 }
 
 void
@@ -60,8 +70,7 @@ interaction_style_cb (GtkToggleButton *w, ggobid *gg)
  * This is connected to the Drag button
 */
   scale_style = (w->active) ? DRAG : CLICK;
-  g_printerr ("in interaction_style_cb: %s\n",
-    (scale_style == DRAG) ? "DRAG" : "CLICK");
+
 /*
  * If DRAG, disable all the click-style controls
 */
@@ -255,9 +264,6 @@ scale_event_handlers_toggle (splotd *sp, gboolean state) {
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-
-
-
 void
 scale_menus_make (ggobid *gg) {
   GtkWidget *item;
@@ -276,7 +282,7 @@ scale_menus_make (ggobid *gg) {
   item = gtk_menu_item_new_with_label ("Reset zoom");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (reset_zoom_cb),
-                      (gpointer) "scale");
+                      (gpointer) gg);
   gtk_menu_append (GTK_MENU (gg->app.scale_reset_menu), item);
 
   gtk_widget_show_all (gg->app.scale_reset_menu);

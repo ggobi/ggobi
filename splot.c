@@ -336,8 +336,8 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   sp->xyvars.y = 1;
 
 /*  splot_scale_init ();*/
-  sp->scale.x = sp->scale.y = .7;
-  sp->tour_scale.x = sp->tour_scale.y = .6;
+  sp->scale.x = sp->scale.y = SCALE_DEFAULT;
+  sp->tour_scale.x = sp->tour_scale.y = TOUR_SCALE_DEFAULT;
 
   return sp;
 }

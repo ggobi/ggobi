@@ -1,12 +1,11 @@
 Bugs: 
+  none I need to deal with at the moment
 
 various stuff not yet implemented: 
   1d, xy cycling
   window closings
-  reset zoom doesn't work; reset pan is fine
   sticky labels
   
-
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
   couple that with a thumbnail view that sits just below the scaling controls
@@ -83,3 +82,5 @@ Rotation
 ! closing the 'choose symbol' window dumps core
 ! the brush isn't redrawing when a new color is selected
 ! the axes aren't being initialized properly for cloned variables.
+
+! reset zoom doesn't work  ; added

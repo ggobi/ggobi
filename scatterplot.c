@@ -183,7 +183,7 @@ display_alloc_init(enum displaytyped type, gboolean missing_p, ggobid *gg)
 
   display->ggobi = gg;
 
-return(display);
+  return (display);
 }
 
 displayd *

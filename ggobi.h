@@ -171,9 +171,6 @@ struct _ggobid {
  array_f raw, tform1, tform2;
  array_l world, jitter;
 
- /*-- Scaling --*/
- fcoords scale0, tour_scale0;
-
 /* Missing values */
  gint nmissing;
  array_s missing;  /*-- array of shorts --*/
