@@ -349,10 +349,18 @@ varpanel_widgets_add (gint nc, datad *d, ggobid *gg)
 {
   gint j;
   gint n = g_slist_length (d->vcbox_ui.box);
-  
+
   /*-- create the variable widgets --*/
   for (j=n; j<nc; j++)
     varpanel_add_row (j, d, gg);
+
+  /* 
+   * If there were no variables before, a tab hasn't been added;
+   * add one now.
+  */
+  if (n == 0)
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
+      d->varpanel_ui.hpane, gtk_label_new (d->name));
 }
 
 /*-------------------------------------------------------------------------*/
@@ -410,43 +418,44 @@ void varpanel_populate (datad *d, ggobid *gg)
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
     nd > 1);
 
+
+  /*-- create a paned widget --*/
+  d->varpanel_ui.hpane = gtk_hpaned_new ();
+  gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+  gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+  /*-- set the handle position all the way to the right --*/
+  gtk_paned_set_position (GTK_PANED(d->varpanel_ui.hpane), -1);
+
+  gtk_object_set_data(GTK_OBJECT(d->varpanel_ui.hpane), "datad", d);/*setdata*/
   /*-- only add a tab if there are variables --*/
   if (g_slist_length (d->vartable) > 0) {
-    /*-- create a paned widget --*/
-    d->varpanel_ui.hpane = gtk_hpaned_new ();
-    gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
-    gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
-    /*-- set the handle position all the way to the right --*/
-    gtk_paned_set_position (GTK_PANED(d->varpanel_ui.hpane), -1);
-
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                              d->varpanel_ui.hpane,
-                              gtk_label_new (d->name));
-
-    /*-- create an ebox, and put it in the hpane --*/
-    d->vcbox_ui.ebox = gtk_event_box_new ();
-    gtk_paned_pack1 (GTK_PANED(d->varpanel_ui.hpane),
-      d->vcbox_ui.ebox, true, false);
-
-    /*-- create a scrolled window, and put it in the ebox --*/
-    d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
-      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_container_add (GTK_CONTAINER (d->vcbox_ui.ebox), d->vcbox_ui.swin);
-
-    /*-- add a vbox to the swin --*/
-    d->vcbox_ui.vbox = gtk_vbox_new (false, 0);
-    gtk_scrolled_window_add_with_viewport (
-      GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
-      d->vcbox_ui.vbox);
-  
-    gtk_widget_show_all (d->varpanel_ui.hpane);
-    gdk_flush ();
-
-    d->vcbox_ui.box = NULL;
-    for (j=0; j<d->ncols; j++)
-      varpanel_add_row (j, d, gg);
+      d->varpanel_ui.hpane, gtk_label_new (d->name));
   }
+
+  /*-- create an ebox, and put it in the hpane --*/
+  d->vcbox_ui.ebox = gtk_event_box_new ();
+  gtk_paned_pack1 (GTK_PANED(d->varpanel_ui.hpane),
+    d->vcbox_ui.ebox, true, false);
+
+  /*-- create a scrolled window, and put it in the ebox --*/
+  d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+  gtk_container_add (GTK_CONTAINER (d->vcbox_ui.ebox), d->vcbox_ui.swin);
+
+  /*-- add a vbox to the swin --*/
+  d->vcbox_ui.vbox = gtk_vbox_new (false, 0);
+  gtk_scrolled_window_add_with_viewport (
+    GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
+    d->vcbox_ui.vbox);
+  
+  gtk_widget_show_all (d->varpanel_ui.hpane);
+  gdk_flush ();
+
+  d->vcbox_ui.box = NULL;
+  for (j=0; j<d->ncols; j++)
+    varpanel_add_row (j, d, gg);
 }
 
 
