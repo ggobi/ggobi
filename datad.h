@@ -113,11 +113,6 @@ class datad {
 
  brush_coords brush_pos;  
  gint npts_under_brush;
-/*
- gboolean *pts_under_brush;
- gshort *color_ids, *color_now, *color_prev;
- gboolean *hidden, *hidden_now, *hidden_prev;
-*/
  vector_b pts_under_brush;
  vector_s color_ids, color_now, color_prev;  /* 0:ncolors-1 */
  vector_b hidden, hidden_now, hidden_prev;
@@ -183,8 +178,8 @@ class datad {
 
    /* The following are methods that one might want to override in order to 
       modify how records are handled.
-      As more are needed, migrate the bodies of the C routines in read_xml.c, etc.
-      to here.
+      As more are needed, migrate the bodies of the C routines in
+      read_xml.c, etc.  to here.
     */
 #ifdef USE_XML
   virtual gboolean readXMLRecord(const CHAR **attrs, struct _XMLUserData *data);

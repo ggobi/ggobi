@@ -369,7 +369,7 @@ ValidateGGobiRef(ggobid *gg, gboolean fatal)
     return(gg);
   }
 
-  g_printerr("Incorrect reference to ggobid.\n");
+  g_printerr ("Incorrect reference to ggobid.\n");
 
  if (fatal)
   exit(10);
