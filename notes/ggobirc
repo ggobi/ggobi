@@ -85,12 +85,30 @@
  <plugin name="test plugin" load="immediate">
    <description>Test of the plugin mechanism.</description>
      <author>Duncan Temple Lang</author>
-     <dll name="plugins/TestPlugin/TestPlugin.dll">
+     <dll name="plugins/TestPlugin/TestPlugin">
       <init onCreate="init" onClose="close" onLoad="load" onUnload="unload" />
      </dll>
  </plugin>
-</plugins>
 
+ <inputPlugin name="postgres">
+  <description>Reads data from a Postgres DBMS</description>
+   <author>Duncan Temple Lang</author>
+     <dll name="plugins/Postgres/Postgres"> 
+       <modeName>postgres</modeName>
+       <init description="postgres_input_description" read="read_postgres" probe="isPostgresInput" />
+     </dll>
+ </inputPlugin>
+
+
+ <inputPlugin name="testInput">
+  <description>Generates random data via an input plugin</description>
+   <author>Duncan Temple Lang</author>
+     <dll name="plugins/TestInput/TestInput"> 
+       <modeName>testInput</modeName>
+       <init description="test_input_description" />
+     </dll>
+ </inputPlugin>
+</plugins>
 </ggobirc>
 
 
