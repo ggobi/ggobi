@@ -1,0 +1,7 @@
+<plugin name="ggvis" load="immediate"><!-- load may be on demand. -->
+   <description>multidimensional scaling</description>
+   <author>Deborah Swayne and Andreas Buja</author>
+   <dll name="plugins/ggvis/ggvis.so">
+    <init onCreate="addToToolsMenu" onClose="closeWindow" />
+  </dll>
+</plugin>
