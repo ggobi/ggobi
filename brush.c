@@ -349,7 +349,8 @@ brush_boundaries_set (cpaneld *cpanel,
 }
 
 void
-brush_draw_label (splotd *sp, datad *d, ggobid *gg) {
+brush_draw_label (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg)
+{
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
 
@@ -358,7 +359,7 @@ brush_draw_label (splotd *sp, datad *d, ggobid *gg) {
     gdk_text_extents (style->font, 
       str, strlen (str),
       &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
+    gdk_draw_string (drawable, style->font, gg->plot_GC,
       sp->max.x - width - 5,
       ascent + descent + 5,
       str);
@@ -367,7 +368,7 @@ brush_draw_label (splotd *sp, datad *d, ggobid *gg) {
 }
 
 void
-brush_draw_brush (splotd *sp, datad *d, ggobid *gg) {
+brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
 /*
  * Use brush_pos to draw the brush.
 */
@@ -398,35 +399,35 @@ brush_draw_brush (splotd *sp, datad *d, ggobid *gg) {
 
   if (point_painting_p)
   {
-    gdk_draw_rectangle (sp->pixmap1, gg->plot_GC, false,
+    gdk_draw_rectangle (drawable, gg->plot_GC, false,
       x1, y1, (x2>x1)?(x2-x1):(x1-x2), (y2>y1)?(y2-y1):(y1-y2));
     /* Mark the corner to which the cursor will be attached */
-    gdk_draw_rectangle (sp->pixmap1, gg->plot_GC, true,
+    gdk_draw_rectangle (drawable, gg->plot_GC, true,
       brush_pos->x2-1, brush_pos->y2-1, 2, 2);
 
     /*
      * highlight brush
     */
     if (cpanel->brush_on_p) {
-      gdk_draw_rectangle (sp->pixmap1, gg->plot_GC, false,
+      gdk_draw_rectangle (drawable, gg->plot_GC, false,
         x1-1, y1-1, (x2>x1)?(x2-x1+2):(x1-x2+2), (y2>y1)?(y2-y1+2):(y1-y2+2)); 
 
       /* Mark the corner to which the cursor will be attached */
-      gdk_draw_rectangle (sp->pixmap1, gg->plot_GC, true,
+      gdk_draw_rectangle (drawable, gg->plot_GC, true,
         brush_pos->x2-2, brush_pos->y2-2, 4, 4);
     }
   }
 
   if (edge_painting_p) {
-    gdk_draw_line (sp->pixmap1, gg->plot_GC,
+    gdk_draw_line (drawable, gg->plot_GC,
       x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2 );
-    gdk_draw_line (sp->pixmap1, gg->plot_GC,
+    gdk_draw_line (drawable, gg->plot_GC,
       x1, y1 + (y2 - y1)/2, x2, y1 + (y2 - y1)/2 );
 
     if (cpanel->brush_on_p) {
-      gdk_draw_line (sp->pixmap1, gg->plot_GC,
+      gdk_draw_line (drawable, gg->plot_GC,
         x1 + (x2 - x1)/2 + 1, y1, x1 + (x2 - x1)/2 + 1, y2 );
-      gdk_draw_line (sp->pixmap1, gg->plot_GC,
+      gdk_draw_line (drawable, gg->plot_GC,
         x1, y1 + (y2 - y1)/2 + 1, x2, y1 + (y2 - y1)/2 + 1 );
     }
   }

@@ -605,18 +605,18 @@ scale_click_zoom_rect_calc (splotd *sp, gint sc_zoom_opt, ggobid *gg) {
 
 
 void
-scaling_visual_cues_draw (splotd *sp, ggobid *gg) {
+scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   
   switch (cpanel->scale_style) {
 
     case DRAG:
       /*-- draw horizontal line --*/
-      gdk_draw_line (sp->pixmap1, gg->plot_GC,  
+      gdk_draw_line (drawable, gg->plot_GC,  
         0, sp->da->allocation.height/2,  
         sp->da->allocation.width, sp->da->allocation.height/2);
       /*-- draw vertical line --*/
-      gdk_draw_line (sp->pixmap1, gg->plot_GC,
+      gdk_draw_line (drawable, gg->plot_GC,
         sp->da->allocation.width/2, 0,
         sp->da->allocation.width/2, sp->da->allocation.height);
       break;
@@ -624,13 +624,13 @@ scaling_visual_cues_draw (splotd *sp, ggobid *gg) {
     case CLICK:
       switch (cpanel->scale_click_opt) {
         case PAN:
-          gdk_draw_line (sp->pixmap1, gg->plot_GC,
+          gdk_draw_line (drawable, gg->plot_GC,
             sp->max.x/2, sp->max.y/2,
             sp->mousepos.x, sp->mousepos.y);
           break;
         case ZOOM:
           scale_click_zoom_rect_calc (sp, cpanel->scale_zoom_opt, gg);
-          gdk_draw_rectangle (sp->pixmap1, gg->plot_GC, false,
+          gdk_draw_rectangle (drawable, gg->plot_GC, false,
             gg->scale.click_rect.x, gg->scale.click_rect.y,
             gg->scale.click_rect.width, gg->scale.click_rect.height);
           break;

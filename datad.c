@@ -95,6 +95,8 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   pipeline_init (d, gg);
   clusters_set (d, gg);  /*-- find the clusters for data just read in --*/
 
+  d->nearest_point = -1;
+
   if (cleanup) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
 

@@ -73,9 +73,6 @@ typedef struct /*-- ggobi --*/ {
 
  struct _ggobid *thisGG;
 
- /*-- used in identification, line editing, and point motion --*/
- gint nearest_point, nearest_point_prev; 
-
  GtkWidget *scatmat_mode_menu;
  GtkWidget *scatterplot_mode_menu;
  GtkWidget *rotation_io_menu;

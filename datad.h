@@ -142,6 +142,7 @@ class datad {
 
 /*---------------------- identification ------------------------------*/
 
+ /*-- used in identification, line editing, and point motion --*/
  gint nearest_point, nearest_point_prev;
  GSList *sticky_ids;
 

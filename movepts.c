@@ -148,9 +148,11 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
   tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_ALL, gg);
 
-  if (k != -1) {
-    splot_add_point_label (sp, id, true, gg);
-    displays_add_point_labels (sp, id, gg);
-  }
+/*
+ *if (k != -1) {
+ *  splot_add_point_label (sp, id, true, gg);
+ *  displays_add_point_labels (sp, id, gg);
+ *}
+*/
 }
 

@@ -219,7 +219,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
     display_tour1d_init(display, gg);
   }
 
-  if (display->displaytype == scatterplot && d->ncols >= 2) {
+  if (display->displaytype == scatterplot && d->ncols >= 4) {
     display_tourcorr_init(display, gg);
   }
 
