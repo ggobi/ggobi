@@ -21,7 +21,7 @@ struct _PrintOptions {
 
   int width;
   int height;
-  OutputDescription *fileName;
+  OutputDescription *file;
 
   /* Add more fields here to store other settings. */  
 
@@ -38,15 +38,26 @@ struct _PrintOptions {
   have a version that does the printing via SVG.
  */
 struct _PrintInfo;
-typedef gboolean (*PrintHandler)(PrintOptions *options, struct _PrintInfo *data,  void *userData);
-extern PrintHandler DefaultPrintHandler;
+typedef gboolean (*PrintDialogHandler)(PrintOptions *options, struct _PrintInfo *data,  void *userData);
+
+struct _GGobiPrintHandler;
+typedef struct _GGobiPrintHandler   GGobiPrintHandler;
+typedef PrintOptions *(*PrintCallbackHandler)(PrintOptions *options, displayd *dpy, ggobid *gg, GGobiPrintHandler *);
+
+struct _GGobiPrintHandler {
+  PrintCallbackHandler callback;
+  PrintDialogHandler dialog;  
+  void *userData;
+};
+
+extern GGobiPrintHandler DefaultPrintHandler;
 
 typedef struct _PrintInfo {
   PrintOptions *options;
   displayd *dpy;
   ggobid *ggobi;
 
-  PrintHandler handler;
+  PrintDialogHandler handler;
   void *userData;
 
   GtkWidget *dialog;
@@ -62,12 +73,14 @@ typedef struct _PrintInfo {
   when the user clicks on the Ok button of the dialog.
  */
 
-PrintOptions *showPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintHandler print, void *userData);
+PrintOptions *showPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, GGobiPrintHandler*);
 
 
 GtkWidget *
-createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintHandler print, void *userData);
+createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintDialogHandler print, void *userData);
 
+void setStandardPrintHandlers();
+PrintOptions *getDefaultPrintOptions();
 
 gboolean PrintAsSVG(PrintOptions *options, PrintInfo *info, void *userData);
 #endif

@@ -249,5 +249,5 @@ datad.o read_xml.o: datad.c datad.h
 	cp ggobi $@
 
 # DO NOT DELETE
-
+print.o: print.c print.h
 

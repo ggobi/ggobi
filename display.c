@@ -166,13 +166,15 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 void
 display_print_cb (displayd *display, guint action, GtkWidget *w) 
 {
- ggobid *gg;
+  ggobid *gg;
+  gg = display->ggobi;
 
- if(DefaultPrintHandler == NULL) {
-   DefaultPrintHandler = PrintAsSVG;
- }
+  if(gg->printOptions == NULL) {
+    gg->printOptions = getDefaultPrintOptions();
+  }
 
- showPrintDialog(gg->printOptions, display, display->ggobi, DefaultPrintHandler, (void *) NULL);
+  if(DefaultPrintHandler.callback)
+    (*DefaultPrintHandler.callback)(gg->printOptions, display, display->ggobi, &DefaultPrintHandler);
 }
 
 /*-- Called when a plot window is closed from the menu --*/

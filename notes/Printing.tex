@@ -45,10 +45,29 @@ values presented in the dialog are taken from the associated
 
 
 \section{Setting the Global Print Options}
-The user can click 
+
+The user set global options that will apply to any newly create
+displays and/or existing displays.  They do this by selecting the
+Print Options in the main control panel associated with a
 
 \section{Host Application Printing}
-In R, we 
+
+From R, we set the \Cvariable{DefaultPrintHandler} using the function
+\SFunction{setPrintHandler.ggobi}.  (This can, in the future, be made
+to apply to the current setting or to modify the handler for each
+display if it is useful to have display-specific print handlers. It
+may be confusing.)
+
+The C-routine that we register stores an S function that the routine
+can access when it is called in response to the user event.  This
+function takes two argunents. The first is the display that is to be
+printed. This is an object of class \SClass{ggobiDisplay}.  The second
+argument is an object of class \SClass{ggobiPrintOptions} which
+mirrors the internal \Cstruct{PrintOptions} structure associated with
+this print invocation.
+
+
+
 
 
 \end{document}

@@ -23,7 +23,7 @@
 #include "config.h"
 #endif
 
-
+#include "print.h"
 
 
 static GGobiOptions sessionoptions;
@@ -285,9 +285,13 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   if(sessionOptions->verbose)
     g_printerr("data_in = %s\n", sessionOptions->data_in);
 
+  if(DefaultPrintHandler.callback == NULL)
+    setStandardPrintHandlers();
+
   make_ggobi (sessionOptions, processEvents, gg);
 
   /* g_free (sessionOptions->data_in); */
+
 
   return (num_ggobis);
 }

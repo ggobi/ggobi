@@ -11,20 +11,20 @@
 #include <libgnomeui/gnome-stock.h>
 #endif
 
-PrintHandler DefaultPrintHandler;
-
 gboolean PrintAsSVG(PrintOptions *options, PrintInfo *info, void *userData);
 
 static void addDialogButtons(GtkWidget *dialog, PrintInfo *data);
 static void cancelPrint(GtkButton *button, PrintInfo *info);
 static void handlePrintOptions(GtkButton *button, PrintInfo *info);
 
+GGobiPrintHandler DefaultPrintHandler;
+
 PrintOptions *
-showPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintHandler print, void *userData)
+showPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, GGobiPrintHandler *printHandler)
 {
  GtkWidget *dlg;
 
- dlg = createPrintDialog(options, dpy, gg, print, userData);
+ dlg = createPrintDialog(options, dpy, gg, printHandler->dialog, printHandler->userData);
  gdk_window_show(dlg->window);
  gdk_window_raise(dlg->window);
 
@@ -33,7 +33,7 @@ showPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintHandler p
 
 
 GtkWidget *
-createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintHandler print, void *userData)
+createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintDialogHandler print, void *userData)
 {
  char *title;
  GtkWidget *dialog;
@@ -141,4 +141,34 @@ PrintAsSVG(PrintOptions *options, PrintInfo *info, void *userData)
   display_write_svg(info->ggobi);
 
  return(true);
+}
+
+
+void 
+setStandardPrintHandlers()
+{
+ DefaultPrintHandler.callback = &showPrintDialog;
+ DefaultPrintHandler.dialog = PrintAsSVG;
+ DefaultPrintHandler.userData = NULL;
+}
+
+
+PrintOptions*
+getDefaultPrintOptions()
+{
+ GdkColor black, white;
+
+ PrintOptions *opts = (PrintOptions *) g_malloc(sizeof(PrintOptions));
+
+ opts->width = 480;
+ opts->height = 400;
+ opts->file = (OutputDescription *) g_malloc(sizeof(OutputDescription));
+  opts->file->fileName = g_strdup("foo.svg");
+
+ 
+  gdk_color_white(gdk_colormap_get_system (), &white);
+  gdk_color_black(gdk_colormap_get_system (), &black);
+ opts->background = white;
+ opts->foreground = black;
+  return(opts);
 }
