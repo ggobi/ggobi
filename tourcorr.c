@@ -104,7 +104,7 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
   vectorb_alloc_zero(&dsp->tcorr1.active_vars_p, nc);
 
   vectorf_alloc(&dsp->tcorr1.lambda, nc);
-  vectorf_alloc(&dsp->tcorr1.tau, nc);
+  vectorf_alloc_zero(&dsp->tcorr1.tau, nc);
   vectorf_alloc(&dsp->tcorr1.tinc, nc);
 
   /* manipulation controls */
@@ -131,7 +131,7 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
   vectorb_alloc_zero(&dsp->tcorr2.active_vars_p, nc);
 
   vectorf_alloc(&dsp->tcorr2.lambda, nc);
-  vectorf_alloc(&dsp->tcorr2.tau, nc);
+  vectorf_alloc_zero(&dsp->tcorr2.tau, nc);
   vectorf_alloc(&dsp->tcorr2.tinc, nc);
 }
 
@@ -294,7 +294,6 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
     dsp->tcorr2.subset_vars_p.els[j] = dsp->tcorr2.active_vars_p.els[j] = true;
   }
 
-
   /*-- horizontal --*/
   dsp->tcorr1.nsubset = dsp->tcorr1.nactive = nhoriz;
   for (j=0; j<nhoriz; j++) {
@@ -352,7 +351,7 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
 
   /* vertical */
   dsp->tcorr2.dist_az = 0.0;
-  dsp->tcorr2.delta = 0.0; /*cpanel->tcorr2.step*M_PI_2/10.0;*/
+  dsp->tcorr2.delta = cpanel->tcorr2.step*M_PI_2/10.0; 
   dsp->tcorr2.tang = 0.0;
   dsp->tcorr2.idled = 0;
   dsp->tcorr2.get_new_target = true;
@@ -376,7 +375,7 @@ tourcorr_fade_vars_cb (GtkCheckMenuItem *w, guint action)
   gg->tourcorr.fade_vars = !gg->tourcorr.fade_vars;
 }
 
-void tourcorr_speed_set(gint slidepos, ggobid *gg) {
+void tourcorr_speed_set(gfloat slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -467,10 +466,22 @@ tourcorr_subset_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     }
 
     if (changed) {
+      dsp->tc1_manipvar_inc = false;
       /*-- reset subset_vars based on subset_vars_p --*/
       for (j=0, k=0; j<d->ncols; j++)
-        if (dsp->tcorr1.subset_vars_p.els[j])
+        if (dsp->tcorr1.subset_vars_p.els[j]) {
           dsp->tcorr1.subset_vars.els[k++] = j;
+          if (j == dsp->tc1_manip_var)
+            dsp->tc1_manipvar_inc = true;
+	}
+
+      /*-- Manip var needs to be one of the active vars --*/
+      if (!dsp->tc1_manipvar_inc) {
+        dsp->tc1_manip_var = dsp->tcorr1.subset_vars.els[0];
+      }
+      
+      zero_tau(dsp->tcorr1.tau, 1);
+      dsp->tcorr1.get_new_target = true;
 
       varcircles_visibility_set (dsp, gg);
       /*-- add/remove jvar to/from the horizontal active set --*/
@@ -607,10 +618,21 @@ tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     }
 
     if (changed) {
+      dsp->tc2_manipvar_inc = false;
       /*-- reset subset_vars based on subset_vars_p --*/
       for (j=0, k=0; j<d->ncols; j++)
-        if (dsp->tcorr2.subset_vars_p.els[j])
+        if (dsp->tcorr2.subset_vars_p.els[j]) {
           dsp->tcorr2.subset_vars.els[k++] = j;
+          if (j == dsp->tc2_manip_var)
+            dsp->tc2_manipvar_inc = true;
+	}
+      /*-- Manip var needs to be one of the active vars --*/
+      if (!dsp->tc2_manipvar_inc) {
+        dsp->tc2_manip_var = dsp->tcorr2.subset_vars.els[0];
+      }
+      
+      zero_tau(dsp->tcorr2.tau, 1);
+      dsp->tcorr2.get_new_target = true;
 
       varcircles_visibility_set (dsp, gg);
       /*-- add/remove jvar to/from the horizontal active set --*/

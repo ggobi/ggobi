@@ -269,7 +269,7 @@ tour2d_all_vars_cb (GtkCheckMenuItem *w, guint action)
   gg->tour2d.all_vars = !gg->tour2d.all_vars;
 }
 
-void tour2d_speed_set(gint slidepos, ggobid *gg) {
+void tour2d_speed_set(gfloat slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -313,10 +313,23 @@ tour2d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   }
 
   /*-- reset subset_vars based on subset_vars_p --*/
-  if (changed)
+  if (changed) {
+    dsp->t2d_manipvar_inc = false;
     for (j=0, k=0; j<d->ncols; j++)
-      if (dsp->t2d.subset_vars_p.els[j])
+      if (dsp->t2d.subset_vars_p.els[j]) {
         dsp->t2d.subset_vars.els[k++] = j;
+        if (j == dsp->t2d_manip_var)
+          dsp->t2d_manipvar_inc = true;
+      }
+    /*-- Manip var needs to be one of the active vars --*/
+    if (!dsp->t2d_manipvar_inc) {
+      dsp->t2d_manip_var = dsp->t2d.subset_vars.els[0];
+    }
+      
+    zero_tau(dsp->t2d.tau, 2);
+    dsp->t2d.get_new_target = true;
+
+  }
 
   return changed;
 }

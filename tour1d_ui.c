@@ -33,7 +33,8 @@ cpanel_t1d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t1d.pp_indx = 0;
 
   cpanel->t1d.ASH_add_lines_p = false;
-  cpanel->t1d.slidepos = 10.;
+  cpanel->t1d.slidepos = 50.;/* If this is changed, it needs to be 
+     changed in th cpanel_tour1d_make routine also. */
   cpanel->t1d.ASH_smooth = 0.19;
 }
 
@@ -88,7 +89,7 @@ cpanel_tour1d_set (cpaneld *cpanel, ggobid* gg)
 
 static void speed1d_set_cb (GtkAdjustment *adj, ggobid *gg) {
 
-  tour1d_speed_set ((gint)adj->value, gg);
+  tour1d_speed_set(adj->value, gg);
 }
 
 static void tour1d_pause_cb (GtkToggleButton *button, ggobid *gg)
@@ -155,7 +156,7 @@ cpanel_tour1d_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (10.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+  adj = gtk_adjustment_new (40.0, 0.0, 100.0, 1.0, 1.0, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (speed1d_set_cb), (gpointer) gg);
 

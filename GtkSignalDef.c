@@ -113,4 +113,15 @@
         GTK_TYPE_NONE, 3,
         GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER);  /* record index and datad pointer **/
   }
+
+  if (gtk_signal_lookup ("tour_step", GTK_TYPE_GGOBI) == 0) {
+    GGobiSignals[TOUR_STEP_SIGNAL] =
+      g_signal_new ("tour_step_removed",
+        G_TYPE_FROM_CLASS(GTK_TYPE_GGOBI),
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        0, NULL, NULL,
+        gtk_marshal_NONE__POINTER_POINTER,
+        GTK_TYPE_NONE, 2,
+        GTK_TYPE_POINTER, GTK_TYPE_POINTER); 
+  }
 #endif

@@ -31,7 +31,7 @@ cpanel_t2d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t2d.step = TOURSTEP0;
   cpanel->t2d.ls_dir = TOUR_LS_IN;
   cpanel->t2d.path_len = 1.;
-  cpanel->t2d.slidepos = 10.;/* If this is changed, it needs to be 
+  cpanel->t2d.slidepos = 50.;/* If this is changed, it needs to be 
      changed in th cpanel_tour2d_make routine also. */
 
   cpanel->t2d.manip_mode = MANIP_OBLIQUE;
@@ -74,7 +74,7 @@ cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
 
 static void speed2d_set_cb (GtkAdjustment *adj, ggobid *gg) {
 
-  tour2d_speed_set ((gint)adj->value, gg);
+  tour2d_speed_set(adj->value, gg);
 }
 
 static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
@@ -144,7 +144,7 @@ cpanel_tour2d_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (10.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+  adj = gtk_adjustment_new (50.0, 0.0, 100.0, 1.0, 1.0, 0.0);
 
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (speed2d_set_cb), (gpointer) gg);

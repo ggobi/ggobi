@@ -233,7 +233,7 @@ display_tour2d3_init (displayd *dsp, ggobid *gg) {
   dsp->t2d.target_selection_method = 0;
 }
 
-void tour2d3_speed_set(gint slidepos, ggobid *gg) {
+void tour2d3_speed_set(gfloat slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -309,12 +309,12 @@ tour2d3_subset_var_set (gint jvar, gint *jprev, gint toggle, datad *d,
     for (j=0; j<3; j++) {
       k = dsp->t2d3.subset_vars.els[j];
       dsp->t2d3.subset_vars_p.els[k] = true;
-      if (dsp->t2d3.active_vars.els[j] == dsp->t2d3_manip_var)
+      if (k == dsp->t2d3_manip_var)
         dsp->t2d3_manipvar_inc = true;
     }
     /*-- Manip var needs to be one of the active vars --*/
     if (!dsp->t2d3_manipvar_inc) 
-      dsp->t2d3_manip_var = dsp->t2d3.active_vars.els[0];
+      dsp->t2d3_manip_var = dsp->t2d3.subset_vars.els[0];
 
     zero_tau(dsp->t2d3.tau, 2);
     dsp->t2d3.get_new_target = true;

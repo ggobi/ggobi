@@ -270,9 +270,10 @@ tour1d_all_vars_cb (GtkCheckMenuItem *w, guint action)
 
   if (gg->tour1d.all_vars)
   {
-    for (j=0; j<d->ncols; j++)
+    for (j=0; j<d->ncols; j++) {
       dsp->t1d.subset_vars.els[j] = dsp->t1d.active_vars.els[j] = j;
       dsp->t1d.subset_vars_p.els[j] = dsp->t1d.active_vars_p.els[j] = true;
+    }
     dsp->t1d.get_new_target = true;
     zero_tau(dsp->t1d.tau, 1);
     varcircles_visibility_set (dsp, gg);
@@ -286,7 +287,7 @@ tour1d_all_vars_cb (GtkCheckMenuItem *w, guint action)
   }
 }
 
-void tour1d_speed_set(gint slidepos, ggobid *gg) {
+void tour1d_speed_set(gfloat slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -331,10 +332,23 @@ tour1d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   }
 
   /*-- reset subset_vars based on subset_vars_p --*/
-  if (changed)
-    for (j=0, k=0; j<d->ncols; j++)
-      if (dsp->t1d.subset_vars_p.els[j])
+  if (changed) {
+    dsp->t1d_manipvar_inc = false;
+    for (j=0, k=0; j<d->ncols; j++) {
+      if (dsp->t1d.subset_vars_p.els[j]) {
         dsp->t1d.subset_vars.els[k++] = j;
+        if (j == dsp->t1d_manip_var)
+          dsp->t1d_manipvar_inc = true;
+      }
+    }
+    /*-- Manip var needs to be one of the active vars --*/
+    if (!dsp->t1d_manipvar_inc) {
+      dsp->t1d_manip_var = dsp->t1d.subset_vars.els[0];
+    }
+      
+    zero_tau(dsp->t1d.tau, 1);
+    dsp->t1d.get_new_target = true;
+  }
 
   return changed;
 }
@@ -688,6 +702,10 @@ tour1d_run(displayd *dsp, ggobid *gg)
     }
   }
   /*  tour_reproject(dsp, 2);*/
+  /*  gtk_signal_emit(GTK_OBJECT(gg),
+    GGobiSignals[TOUR_STEP_SIGNAL], dsp->t1d.F,
+    (gint) 1, d);*/
+
   display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);

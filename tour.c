@@ -682,26 +682,29 @@ do_last_increment(vector_f tinc, vector_f tau, gfloat dist_az, gint projdim)
 
 }
 
-void speed_set (gint slidepos, gfloat *st, gfloat *dlt) 
+void speed_set (gfloat slidepos, gfloat *st, gfloat *dlt) 
 {
   gfloat step = *st;
   gfloat delta = *dlt;
 
-  if (slidepos < 5)
+  if (slidepos < 5.)
   {
     step = 0.0;
     delta = 0.0;
   }
   else
   {
-    /*
-     * To cause tour to speed up wildly at the right of the
-     * scrollbar range.
-    */
-    if (slidepos < 50)
+    /*    if (slidepos < 50)
       step = ((gfloat) slidepos - 5.) / 2000.;
-    else if ((slidepos >= 50))/* && (slidepos < 90))*/
+    else if ((slidepos >= 50))
       step = (gfloat) pow((double)(slidepos-50)/100.,(gdouble)1.5) + 0.0225;
+    */
+    if (slidepos < 30.)
+      step = (slidepos - 5.)/2000.;
+    else if (slidepos >= 30. && slidepos < 90.) 
+      step = (gfloat) pow((double)(slidepos-30.)/100.,(gdouble)1.5) + 0.0125;
+    else 
+      step = (gfloat) pow((double)(slidepos)/100.,(gdouble)2.0) - 0.81 + 0.477;
 
     delta = (step*M_PI_2)/(10.0);
 

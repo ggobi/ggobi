@@ -28,7 +28,7 @@ cpanel_tcorr_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->tcorr1.step = TOURSTEP0;
   cpanel->tcorr2.paused = false;
   cpanel->tcorr2.step = TOURSTEP0;
-  cpanel->tcorr.slidepos = 10.;
+  cpanel->tcorr.slidepos = 50.;
   cpanel->tcorr.manip_mode = CMANIP_COMB;
 }
 
@@ -71,7 +71,7 @@ static void ctouradv_window_open (void);
 
 static void speedcorr_set_cb (GtkAdjustment *adj, ggobid *gg) {
 
-  tourcorr_speed_set ((gint)adj->value, gg);
+  tourcorr_speed_set(adj->value, gg);
 }
 
 static void tourcorr_pause_cb (GtkToggleButton *button, ggobid *gg)
@@ -157,7 +157,7 @@ cpanel_ctour_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (10.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+  adj = gtk_adjustment_new (50.0, 0.0, 100.0, 1.0, 1.0, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (speedcorr_set_cb), (gpointer) gg);
 

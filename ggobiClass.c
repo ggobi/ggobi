@@ -164,6 +164,15 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
 						   GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI_DATA);     /* record index and datad pointer */
   }
 
+  if (gtk_signal_lookup("tour_step", GTK_TYPE_GGOBI) == 0) {
+    GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL] =
+        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
+                                         "tour_step",
+                                         GTK_RUN_LAST | GTK_RUN_ACTION,
+                                         gtk_marshal_NONE__POINTER,
+                                         GTK_TYPE_NONE, 1,
+                                         GTK_TYPE_GGOBI_DATA);
+  }
 }
 
 /****************************/
