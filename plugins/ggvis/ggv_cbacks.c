@@ -318,10 +318,6 @@ mds_open_display (PluginInstance *inst)
   }
   
   window = (GtkWidget *) inst->data;
-  /*
-  w = widget_find_by_name (window, "RunMDS");
-  gtk_widget_set_sensitive (w, true);
-  */
   w = widget_find_by_name (window, "Step");
   gtk_widget_set_sensitive (w, true);
 }
@@ -335,37 +331,40 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   gboolean state = btn->active;
+  gint selected_var = -1;
+  datad *dsrc;
+  ggobid *gg = inst->gg;
 
-  if (ggv->Dtarget.nrows == 0) {
-    /* construct a distance matrix before running mds */
-    gint selected_var = -1;
-    datad *dsrc;
+  if (state) {
 
-    /* These were set in the first clist in the first tab */
+    gboolean first_time = false;
+    gboolean new_dsrc = false;  /* node set */
+    gboolean new_weights = false;
+
+
+    /*
+     * make sure we have a node set, an edge set, and (if needed)
+     * a source of distances or edge weights 
+    */
+
     /* Make sure the node set is present and can support edges */
     if (ggv->dsrc == NULL || ggv->dsrc->rowIds == NULL) {
       g_printerr ("node set not correctly specified\n");
       return;
     }
+    dsrc = ggv->dsrc;
     /* Make sure there's an edge set */
+    ggv->e = gtk_object_get_data (GTK_OBJECT(ggv->clist_dist), "datad");
     if (ggv->e == NULL || ggv->e->edge.n == 0) {
       g_printerr ("edge set not correctly specified\n");
       return;
     }
-
-    dsrc = ggv->dsrc;
-
-     /*-- allocate Dtarget --*/
-    arrayd_alloc (&ggv->Dtarget, dsrc->nrows, dsrc->nrows);
-
+    /*
+     * If we are using a distance vector or a vector of edge weights, make
+     * sure a variable has been selected.  (Do the variable values have
+     * to be non-negative?)
+    */
     if (ggv->mds_task == DissimAnalysis || ggv->Dtarget_source == VarValues) {
- 
-      /* can override the setting of the second clist in the preceding tab */
-      ggv->e = gtk_object_get_data (GTK_OBJECT(ggv->clist_dist), "datad");
-      if (ggv->e == NULL) {
-        quick_message ("I can't identify a set of edges", false);
-        return;
-      }
       selected_var = get_one_selection_from_clist (GTK_WIDGET(ggv->clist_dist),
         ggv->e);
       if (selected_var == -1) {
@@ -374,20 +373,56 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
       }
     }
 
-    /*-- initalize Dtarget --*/
-    ggv_init_Dtarget (selected_var, ggv);
-    ggv_compute_Dtarget (selected_var, ggv);
-
-    if (ggv->Dtarget.nrows == 0) {
-      quick_message ("I can't identify a distance matrix", false);
-      return;
+    /* 
+     * Check the settings on a few flags so we'll know what has to
+     * be initialized or re-initialized
+     */
+    if (ggv->Dtarget.nrows == 0)
+      first_time = true;
+    else if (ggv->Dtarget.nrows != ggv->dsrc->nrows)
+      new_dsrc = true;
+    /* possible bug:  if the user resets this variable while mds is
+       running, the change won't show up here */
+    if (ggv->mds_task == DissimAnalysis || ggv->Dtarget_source == VarValues) {
+      if (selected_var != ggv->weight_var) {
+        new_weights = true;
+        ggv->weight_var = selected_var;
+      }
     }
 
-    g_printerr ("%d x %d\n", ggv->Dtarget.nrows, ggv->Dtarget.ncols);
+    /*
+     * If this is the first time through or the node set changed,
+     * allocate space for the distance matrix. (There's no need
+     * to free it before allocating; arrayd_alloc handles that.)
+     */
+    if (first_time || new_dsrc)
+      arrayd_alloc (&ggv->Dtarget, dsrc->nrows, dsrc->nrows);
 
-    trans_dist_init_defaults (ggv);
-    /*-- open display --*/
-    mds_open_display (inst);
+    /*
+     * If anything changed, construct a distance matrix, and
+     * make sure we were successful.  Initialize (or reinitialize)
+     * some variables.  [We'll need more reinitialization here
+     * if new_weights or new_dsrc -- see what's initialized in
+     * init.c]
+    */
+    if (new_weights || first_time || new_dsrc) {
+      ggv_init_Dtarget (ggv->weight_var, ggv);  /* populate with INF */
+      ggv_compute_Dtarget (ggv->weight_var, ggv);
+      if (ggv->Dtarget.nrows == 0) {
+        quick_message ("I can't identify a distance matrix", false);
+        return;
+      }
+      g_printerr ("%d x %d\n", ggv->Dtarget.nrows, ggv->Dtarget.ncols);
+
+      trans_dist_init_defaults (ggv);
+    }
+
+    if (first_time) {
+      /*-- open display --*/
+      mds_open_display (inst);
+    }
+
+    ggv_Dtarget_histogram_update (ggv, gg);
   }
 
   mds_func (state, inst);
