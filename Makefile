@@ -18,12 +18,33 @@ CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
 #CFLAGS= -g -ansi -DHAVE_CONFIG_H  # when using Irix cc
 CXXFLAGS=$(CFLAGS)
 
+ifndef GTK_CFLAGS
+GTK_CFLAGS=`gtk-config --cflags`
+endif
+
+ifndef GTK_LIBS
+GTK_LIBS=`gtk-config --cflags --libs`
+endif
+
 ifdef TEST_KEYS
  CFLAGS+= -DTEST_KEYS=1
 endif
 
 ifndef DOXYGEN
   DOXYGEN=doxygen
+endif
+
+
+ifdef GTK_2
+GLIB_GENMARSHAL=glib-genmarshal
+
+marshal.h: marshal.list
+	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --header > $@
+
+marshal.c: marshal.list
+	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --body > $@
+
+make_ggobi.o: marshal.h GtkSignalDef.c
 endif
 
 # used to comment out sections of code for incompletely
@@ -92,7 +113,6 @@ SRC=array.c ash1d.c \
  writedata.c writedata_ui.c write_svg.c \
  xyplot.c xyplot_ui.c \
 \
- gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937ar.c cokus.c \
  fileio.c print.c \
  xlines.c
@@ -126,9 +146,17 @@ OB=array.o ash1d.o \
  writedata.o writedata_ui.o write_svg.o \
  xyplot.o xyplot_ui.o \
 \
- gtkextruler.o gtkexthruler.o gtkextvruler.o \
  fileio.o print.o \
- xlines.o 
+ xlines.o \
+
+ifdef GTK_2
+ SRC+=marshal.c
+ OB+= marshal.o
+else
+ SRC+=gtkextruler.c gtkexthruler.c gtkextvruler.c 
+ OB+=gtkextruler.o gtkexthruler.o gtkextvruler.o 
+endif
+
 
 
 ifdef TEST_EVENTS
@@ -169,7 +197,7 @@ ifdef USE_DBMS
 endif
 
 ggobi: $(OB) $(EXTRA_OB)
-	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS)  $(EXTRA_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
+	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS)  $(EXTRA_LIBS) ${GTK_LIBS}  $(DL_RESOLVE_PATH)
 
 
 pure: ggobi.o $(OB) $(EXTRA_OB)
@@ -225,7 +253,7 @@ clean:
 	rm -f *.o ggobi libggobi.so
 
 .c.o:
-	$(CC) -c -I. $(CFLAGS) `gtk-config --cflags`  $*.c
+	$(CC) -c -I. $(CFLAGS) $(GTK_CFLAGS)  $*.c
 
 # A version that compiles all C code (except for mt19937ar.c) as 
 # C++.
@@ -292,7 +320,12 @@ print.o: print.c print.h
 %.o: %.d
 
 %.d: %.c
-	$(CC) -M $(CFLAGS) -I. `gtk-config --cflags` $< > $@
+	$(CC) -M $(CFLAGS) -I. $(GTK_CFLAGS) $< > $@
+
+%.e: %.c
+	$(CC) -E $(CFLAGS) -I. $(GTK_CFLAGS) $< > $@
+
+
 
 # Where is the output?
 apiDoc: Install/apiDocConfig

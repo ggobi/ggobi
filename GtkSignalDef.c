@@ -1,5 +1,5 @@
 #define gtk_object_class_user_signal_new g_signal_new
-
+#if 0
        /*-- If this signal has not been initialized yet, do it now --*/
   if (gtk_signal_lookup ("datad_added", GTK_TYPE_WIDGET) == 0) {
     GGobiSignals[DATAD_ADDED_SIGNAL] =
@@ -12,7 +12,6 @@
         2,
         GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
-#if 1
   if (gtk_signal_lookup ("brush_motion", GTK_TYPE_WIDGET) == 0) {
     GGobiSignals[BRUSH_MOTION_SIGNAL] = 
 	g_signal_new("brush_motion",
