@@ -290,8 +290,6 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
 
   data->autoLevels = NULL;
 
-  data->usesStringIds = true; /*XXX false; No longer need alpha in the XML file*/
-
   data->idNamesTable = NULL;
 }
 
@@ -548,102 +546,68 @@ edgesumcompare (const void *val1, const void *val2)
   return (1);
 }
 
-
-/* Can go when we remove the old mechanism for edges via integer ids. */
-void 
-setOldEdgePartners (endpointsd *endpoints, gint n)
+gint
+edgecompare (const void *val1, const void *val2)
 {
-  gint i, k, sum;
+  const SortableEndpoints *e1 = (const SortableEndpoints *) val1;
+  const SortableEndpoints *e2 = (const SortableEndpoints *) val2;
+  gint acomp, bcomp;
 
-  if (n) {
-    /*-- sort the edges in the order of source + destination --*/
-    endpointsd *etmp = g_malloc (n * sizeof(endpointsd));
-    for (i=0; i < n; i++) {
-      etmp[i].a = endpoints[i].a;
-      etmp[i].b = endpoints[i].b;
-      etmp[i].jpartner = i;
-    }
-    qsort ((gchar *) etmp, n, sizeof (endpointsd), edgesumcompare);
+  acomp = strcmp(e1->a, e2->a);
+  bcomp = strcmp(e1->b, e2->b);
 
-    sum = 0;
-    for (i=0; i < n-1; i++) {
-      if (etmp[i].a + etmp[i].b != sum) {
-        sum = etmp[i].a + etmp[i].b;
-        k = i+1;
-        while (k < n) {
-          if (etmp[k].a + etmp[k].b != sum)
-            break;
-          if (etmp[k].b == etmp[i].a && etmp[k].a == etmp[i].b) {
-            endpoints[etmp[i].jpartner].jpartner = etmp[k].jpartner;
-            endpoints[etmp[k].jpartner].jpartner = etmp[i].jpartner;
-/*
-g_printerr ("partners: a,b,j %d %d %d  a,b,j %d %d %d\n",
-d->edge.endpoints[i].a, d->edge.endpoints[i].b, d->edge.endpoints[i].jpartner,
-d->edge.endpoints[k].a, d->edge.endpoints[k].b, d->edge.endpoints[k].jpartner);
-*/
-          }
-          k++;
-        }
-      }
-    }
-
-/*g_printerr ("assigned jpartners\n");*/
-    g_free (etmp);
-  }
+  if (acomp < 0 || (acomp == 0 && bcomp < 0))
+    return (-1);
+  else if (acomp == 0 && bcomp == 0)
+    return (0);
+  else
+    return (1);
 }
 
 void 
 setEdgePartners (XMLParserData *parserData)
 {
-  datad *d = getCurrentXMLData(parserData);
-  gint i, k, sum;
+  datad *e = getCurrentXMLData(parserData);
+  SortableEndpoints *ep;
+  gint i, k, n;
 
-  if(d->edge.old_endpoints) {
-       setOldEdgePartners(d->edge.old_endpoints, d->edge.n);
-       return;
+  if (e->edge.n <= 0)
+    return;
+
+  n = e->edge.n * (e->edge.n - 1);
+  ep = (SortableEndpoints *)
+    g_malloc (n * sizeof (SortableEndpoints));
+
+  /*-- I'm assuming that we have no edges from i to i --*/
+  for (i=0, k=0; i<e->edge.n; i++) {
+    ep[k].a = g_strdup ((gchar *) e->edge.sym_endpoints[i].a);
+    ep[k].b = g_strdup ((gchar *) e->edge.sym_endpoints[i].b);
+    ep[k].jcase = i;
+    k++;
+    ep[k].a = g_strdup ((gchar *) e->edge.sym_endpoints[i].b);
+    ep[k].b = g_strdup ((gchar *) e->edge.sym_endpoints[i].a);
+    ep[k].jcase = i;
+    k++;
+  }
+  n = k;
+  ep = (SortableEndpoints *)
+    g_realloc (ep, n * sizeof (SortableEndpoints));
+  qsort ((gchar *) ep, n, sizeof (SortableEndpoints), edgecompare);
+
+  for (i=1; i<n; i++) {
+    k = i-1;
+    if (strcmp(ep[i].a, ep[k].a) == 0 && strcmp(ep[i].b, ep[k].b) == 0) {
+      e->edge.sym_endpoints[ ep[i].jcase ].jpartner = ep[k].jcase;
+      e->edge.sym_endpoints[ ep[k].jcase ].jpartner = ep[i].jcase;
+    }
   }
 
-/*XXX Need to implement this for the string case. */
-  return;
-
-  if (d->edge.n) {
-    /*-- sort the edges in the order of source + destination --*/
-    endpointsd *etmp = g_malloc (d->edge.n * sizeof(endpointsd));
-    for (i=0; i<d->edge.n; i++) {
-      etmp[i].a = d->edge.old_endpoints[i].a;
-      etmp[i].b = d->edge.old_endpoints[i].b;
-      etmp[i].jpartner = i;
-    }
-    qsort ((gchar *) etmp, d->edge.n, sizeof (endpointsd), edgesumcompare);
-
-    sum = 0;
-    for (i=0; i<d->edge.n-1; i++) {
-      if (etmp[i].a + etmp[i].b != sum) {
-        sum = etmp[i].a + etmp[i].b;
-        k = i+1;
-        while (k < d->edge.n) {
-          if (etmp[k].a + etmp[k].b != sum)
-            break;
-          if (etmp[k].b == etmp[i].a && etmp[k].a == etmp[i].b) {
-            d->edge.old_endpoints[etmp[i].jpartner].jpartner = etmp[k].jpartner;
-            d->edge.old_endpoints[etmp[k].jpartner].jpartner = etmp[i].jpartner;
-/*
-g_printerr ("partners: a,b,j %d %d %d  a,b,j %d %d %d\n",
-d->edge.endpoints[i].a, d->edge.endpoints[i].b, d->edge.endpoints[i].jpartner,
-d->edge.endpoints[k].a, d->edge.endpoints[k].b, d->edge.endpoints[k].jpartner);
-*/
-          }
-          k++;
-        }
-      }
-    }
-
-/*g_printerr ("assigned jpartners\n");*/
-    g_free (etmp);
+  for (i=0, k=0; i<e->edge.n; i++) {
+    g_free (ep[k].a);
+    g_free (ep[k].b);
   }
+  g_free (ep);
 }
-
-
 
 
 void endXMLElement(void *user_data, const xmlChar *name)
@@ -884,9 +848,6 @@ setGeneralInfo (const xmlChar **attrs, XMLParserData *data)
   }
 
   tmp = getAttribute(attrs, "ids");
-  if (tmp != NULL) {
-    data->usesStringIds = !strcmp(tmp, "alpha");
-  }
 
   return(true);
 }
@@ -1854,11 +1815,13 @@ releaseCurrentDataInfo(XMLParserData *parserData)
    if(!parserData->current_data) 
      return;
 
+/*
    if(parserData->idTable && parserData->usesStringIds == false) {
       g_hash_table_foreach(parserData->idTable,
         (GHFunc) freeLevelHashEntry, parserData);
       g_hash_table_destroy(parserData->idTable); 
    }
+*/
 
    if(parserData->autoLevels) {
       int i;
@@ -1929,24 +1892,9 @@ getCurrentXMLData(XMLParserData* parserData)
 void
 setEdge(gint start, gint end, gint i, datad *d)
 {
-    /*-- if encountering the first edge, allocate endpoints array --*/
-    if (d->edge.n == 0) 
-      edges_alloc (d->nrows, d, true);
-
-    d->edge.old_endpoints[i].a = start;
-    d->edge.old_endpoints[i].b = end;
-    d->edge.old_endpoints[i].jpartner = -1;  /*-- default value --*/
-
-/* Replacing this code with a single sweep in setEdgePartners */
-/*
-    gint k;
-    for (k=0; k<i; k++) {
-      if (d->edge.endpoints[k].a == end && d->edge.endpoints[k].b == start) {
-        d->edge.endpoints[i].jpartner = k;
-        d->edge.endpoints[k].jpartner = i;
-      }
-    }
-*/
+  /*-- if encountering the first edge, allocate endpoints array --*/
+  if (d->edge.n == 0) 
+    edges_alloc (d->nrows, d, true);
 }
 
 gboolean
@@ -1956,7 +1904,6 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   const gchar *tmp;
   gchar *stmp;
   gint i = data->current_record;
-  gint start, end;
 
   if (i == d->nrows) {
     g_printerr ("There are more records than declared for '%s'; exiting.\n",
@@ -1992,43 +1939,26 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   tmp = getAttribute(attrs, "id");
   if(tmp) {
     guint *ptr;
-    int value;
+    /*int value;*/
     gchar *dupTmp;
     /* No need to check since this will either be the first and hence
        NULL or already created, so can use an else for this condition. */
-    if(data->usesStringIds) {
-      if(data->idTable == NULL) {
-        data->idTable = g_hash_table_new(g_str_hash, g_str_equal);
-        d->idTable = data->idTable;
-        d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
-        memset(d->rowIds, '\0', sizeof(gchar *) * d->nrows);
-      } else {
-        if(g_hash_table_lookup(data->idTable, tmp))
-           ggobi_XML_error_handler(data,
-             "duplicated id in record %d of dataset %s\n", 
-             data->current_record + 1, data->current_data->name);
-      }
-    } else if(d->rowid.id.nels == 0) {
-      rowids_alloc (d);
-    }
-
-
-    if(data->usesStringIds) {
-      ptr = (guint *) g_malloc(sizeof(guint));
-      ptr[0] = i;
-      g_hash_table_insert(data->idTable, dupTmp = intern(data, tmp), ptr);
-      d->rowIds[i] = dupTmp;
+    if(data->idTable == NULL) {
+      data->idTable = g_hash_table_new(g_str_hash, g_str_equal);
+      d->idTable = data->idTable;
+      d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
+      memset(d->rowIds, '\0', sizeof(gchar *) * d->nrows);
     } else {
-      value = strToInteger (tmp);
-      if(value < 0) {
-        ggobi_XML_error_handler(data,
-          "negative value specified for `id' in record %d of dataset %s\n", 
-          (int) i+1, data->current_data->name);
-        value = 0;
-      }
-      d->rowid.maxId = d->rowid.maxId > value ? d->rowid.maxId : value; 
-      d->rowid.id.els[i] = value;
+      if(g_hash_table_lookup(data->idTable, tmp))
+         ggobi_XML_error_handler(data,
+           "duplicated id in record %d of dataset %s\n", 
+           data->current_record + 1, data->current_data->name);
     }
+
+    ptr = (guint *) g_malloc(sizeof(guint));
+    ptr[0] = i;
+    g_hash_table_insert(data->idTable, dupTmp = intern(data, tmp), ptr);
+    d->rowIds[i] = dupTmp;
   }
 
 /*
@@ -2043,25 +1973,23 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
    const gchar *dest;
    dest = getAttribute(attrs, "destination");
    if(!dest) {
-      xml_warning("edget specification error", "", "source but no destination attribute for record.", data);
+      xml_warning("edge specification error", "", "source but no destination attribute for record.", data);
       return(true);
    }
-   if(data->usesStringIds) {
-     if(d->edge.sym_endpoints == NULL) {
-        d->edge.n = d->nrows;
-        d->edge.sym_endpoints = (SymbolicEndpoints *) g_malloc(sizeof(SymbolicEndpoints) * d->edge.n);
-     }
-       
-     d->edge.sym_endpoints[data->current_record].a = intern(data, tmp);
-     d->edge.sym_endpoints[data->current_record].b = intern(data, dest);
-     d->edge.sym_endpoints[data->current_record].jpartner = -1;
-   } else {
-    start = strToInteger(tmp);
-    if (dest != (const gchar *) NULL) {
-      end = strToInteger(tmp);
-      setEdge(start, end, i, d);
-    }
+   if (strcmp (tmp, dest) == 0) {
+      xml_warning("edge specification error", "", "source is the same as destination for record.", data);
+      return(true);
    }
+
+   if(d->edge.sym_endpoints == NULL) {
+     d->edge.n = d->nrows;
+     d->edge.sym_endpoints = (SymbolicEndpoints *)
+       g_malloc(sizeof(SymbolicEndpoints) * d->edge.n);
+   }
+     
+   d->edge.sym_endpoints[data->current_record].a = intern(data, tmp);
+   d->edge.sym_endpoints[data->current_record].b = intern(data, dest);
+   d->edge.sym_endpoints[data->current_record].jpartner = -1;
   }
 
   return(true);
