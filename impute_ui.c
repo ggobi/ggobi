@@ -21,7 +21,7 @@ static void close_btn_cb (GtkWidget *w, ggobid *gg) {
 }
 /*-- called when closed from the window manager --*/
 static void
-close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
+close_wmgr_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
   gtk_widget_hide (gg->impute.window);
 }
 
@@ -102,7 +102,7 @@ impute_window_open (ggobid *gg)
     gtk_window_set_title (GTK_WINDOW (gg->impute.window),
       "Missing values");
     gtk_signal_connect (GTK_OBJECT (gg->impute.window),
-      "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), NULL);
+      "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), gg);
   
     gtk_container_set_border_width (GTK_CONTAINER (gg->impute.window), 5);
 
@@ -258,8 +258,8 @@ impute_window_open (ggobid *gg)
 
     gtk_object_set_data (GTK_OBJECT (gg->impute.window),
       "notebook", notebook);
-    gtk_widget_show_all (gg->impute.window);
   }
 
+  gtk_widget_show_all (gg->impute.window);
   gdk_window_raise (gg->impute.window->window);
 }
