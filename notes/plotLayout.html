@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>GGobi: Examples of Programmatic Plot Layout</title>
+<link rel=stylesheet href="ggobi.css">
+</head>
+
+<body>
+<h1>GGobi: Examples of Programmatic Plot Layout</h1>
+
+First, we create a few plot descriptions which we
+can put into different display windows.
+<pre class="r">
+<a name="plot4">plot4 <- ashDescription("tars2")</a>
+<a name="plot5">plot5 <- scatmatrixDescription("tars1", "tars2", "head")</a>
+<a name="plot6">plot6 <- parallelCoordDescription("tars1", "tars2", "head")</a>
+</pre>
+
+<h2>A Multi-column Layout</h2>
+<table border="1">
+<tr>
+<th align="left">
+<pre class="r">
+cl <- gtkCells(2,2)[-3,]
+cl[3,1] <- 1
+plotLayout(<a href="#plot4">plot4</a>, <a href="#plot5">plot5</a>, <a href="#plot6">plot6</a>,
+             mfrow=c(2,2), cells=t(cl))
+</pre>
+</th>
+<th><img src="plotLayout22.jpg"></th>
+</tr>
+</table>
+
+
+<h2>A Simple Mixed Plot Type</h2>
+<table border="1">
+<tr>
+<th align="left">
+<pre class="r">
+dpy <- plotLayout(<a href="#plot4">plot4</a>, <a href="#plot5">plot5</a>, mfrow=c(1,2))
+</pre>
+</th>
+<th>
+<img src="plotLayout12.jpg">
+</th>    
+</tr>
+
+</table>
+
+
+<h2>Specifying Individual Cell Positions</h2>
+<table border="1">
+<tr>
+<th align="left">
+This shows how we can leave cells
+blank and locate the individual plots.
+<pre class="r">
+plotLayout(<a href="#plot4">plot4</a>, <a href="#plot5">plot5</a>, <a href="#plot6">plot6</a>, mfrow=c(3,2),
+             cells=t(gtkCells(3,2)[c(1,4,5),]))    
+</pre>
+</th>
+<th>
+<img src="plotLayout32.jpg">
+</th>    
+</tr>
+
+</table>
+
+
+<hr>
+<address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Mon Aug  7 18:00:24 EDT 2000
+<!-- hhmts end -->
+</body> </html>

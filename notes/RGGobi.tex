@@ -174,8 +174,185 @@ content of the individual elements of the collection are.  In R, we
 have a programming language and so we can use it to allow the user
 create these groups of plots and to add them to a particular window.
 
-There are a variety of different ways we can interface to creating
-individual and groups of plots.
+
+The current mechanism for creating plots from R is a two step process.
+\begin{enumerate}
+\item one creates descriptions of the individual plots that one
+wants to create. These are very simple, involving just the type of
+plot and identifiers for the variables it is to contain.
+\item pass these plots to the function
+\SFunction{plotLayout} to create the plots and lay them out within
+a new (or existing) window.
+\end{enumerate}
+
+\subsection{Plot Descriptions}
+There are 5 types of plot descriptions that one can create.
+The first 4 are the basic plots offered by GGobi.
+These are
+\begin{itemize}
+\item parallel coordinate plots;
+\item 1D ASH plot;
+\item scatterplot; and
+\item scatter plot matrix. 
+\end{itemize}
+The $5^{\mbox{th}}$ type is a general container that 
+is used to house any number of these basic types\footnote{At present,
+we don not allow containers within containers.}.
+
+To create a description of a plot, one decides the desired plot type
+and calls the corresponding function
+\begin{table}[htbp]
+  \begin{center}
+    \leavevmode
+    \begin{tabular}{ll}
+ parallel coordinate plots & 
+\SFunction{parallelCoordDescription}
+\\
+ 1D ASH plot & 
+\SFunction{ashDescription}
+\\
+ scatterplot & 
+\SFunction{scatterplotDescription}
+\\
+ scatter plot matrix & 
+\SFunction{scatmatrixDescription}
+\\
+    \end{tabular}
+    \caption{Plot Description Functions}
+    \label{tab:PlotDescriptions}
+  \end{center}
+\end{table}
+Each of these takes the variables involved in the plot as their first
+arguments (or argument for the ASH plot).  These can be specified
+either as the names or indices (starting from 1) of the variables
+within a dataset managed by a ggobi instance.  All of the description
+functions allow one to associate a particular ggobi instance and
+dataset with the description.   These default to being unspecified
+and can be provided when the plot is being created.
+By specifying these, one indicates that
+the description is to be used with a particular ggobi and/or dataset.
+
+We recommend that people use names to identify variables
+and also datasets.
+
+\begin{verbatim}
+ plot4 <- scatterplotDescription("tars1", "tars2")
+ plot5 <- scatmatrixDescription("tars1", "tars2", "head")
+\end{verbatim}
+
+
+\subsection{From Descriptions to Plots}
+To instantiate the descriptions into visible plots, one uses the
+\SFunction{plotLayout}.  By default, this creates a new ggobi display
+- a separate window - associated with a given variable selection
+panel. Into this, it is adds each of the plots created by converting
+the corresponding description into an actual plot.  By default, the
+plots are added vertically to form a $k \times 1$ table or grid, where
+$k$ is the number of plot descriptions passed to the function.
+
+As noted in the previous paragraphs, the plots do not have to be
+homogeneous and can even be plots within plots (i.e. the container of
+plots).
+
+
+The layout of the plots can be controlled in two ways.  Firstly, we
+can specify a different arrangment for the grid into which the plots
+are added.  Rather than accepting the default $k \times 1$ layout, one
+can specify the number of rows and columns in that same way that one
+partitions an \R{} graphics device using \SArg{mfrow}.  This is an
+integer vector containing two elements: the number of rows and the
+number of columns of the grid, in that order.
+
+\begin{verbatim}
+  plotLayout(plot4, plot5)
+  plotLayout(plot4, plot5, mfrow=c(1,2))
+\end{verbatim}
+
+
+More fine grained control over the positioning of the individual plots
+can be obtained using the \SArg{cells} argument. One can specify the
+left, right, top and bottom cells that are to border a particular
+plot.  For example, suppose we have a $2 \times 2$ screen and we want
+to display 3 plots within it.  The first two plots are to occupy the
+first row and the final plot is to span both columns of the second
+row. To do this, we specify the three plot descriptions and provide a
+$4 \times 2$ matrix containing the boundaries of each plot as the
+\SArg{cells} argument.  Each column in this matrix contains the index
+of the bordering cells in the grid layout. The first plot therefore is
+given as $1$ for the column on the left, $2$ for the column on the
+right and $1$ and $2$ as the top and bottom rows.  Similarly, the
+second plot which is to appear in the top-right cell is given as $(1,
+2, 1, 2)$, differeing only in the column column cells.
+
+The final plot occupies the second row and so has top and bottom rows
+of $2$ and $3$ respectively.  The column specifications are $(1, 3)$
+indicating that first column is on the left and the right side of the
+plot borders the third column of the $2 \times 2$ grid.
+
+
+The result is something like
+% Figure goes here.
+
+
+The function \SFunction{gtkCells} is a simple way to create the
+cell-border specification for a regularly spaced $r \times c$ grid.
+One can the subset the resulting matrix and insert other
+specifications to create the appropriate specification for a
+particular cell layout for a collection of plots.
+
+As an example, suppose we have a $3 \times 2$ grid and we want to
+place $3$ plots in the following positions: $(1,1)$, $(2,2)$ and
+$(3,1)$ where each pair gives the row and column indeces.
+\begin{verbatim}
+ plotLayout(plota, plotb, plotc, mfrow=c(3,2),
+                cells = t(gtkCells(3,2)[c(1,4,5),]))
+\end{verbatim}
+Note that the result of \SFunction{gtkCells} is (currently) a matrix
+$(r \ast c) \times 4$ matrix and must be transposed to be used in
+\SFunction{plotLayout}.  Also, the elements are organized row-wise,
+i.e.  the first $r$ elements correspond to the cells in the first row
+of the grid, the second $r$ elements to the next row, etc.
+
+
+
+Rather than creating a new display for the collection of plot
+descriptions being instantiated, one can add them to an existing ggobi
+display window. This is usually done when it is more convenient to
+create an empty display and add plot descriptions as they are
+available. To add a plot to an existing display, merely provide the
+index of the display within the specified ggobi instance as the
+argument \SArg{display}.  This is the value returned from an earlier
+call to \SFunction{plotLayout}.
+\begin{verbatim}
+ dpy <- plotLayout(, mfrow=c(3,2))
+ plotLayout(plot1, plotb, plotc, cells= t(gtkCells(3,2)[c(1,4,5),]),
+                            display = dpy)
+ plotLayout(plot1, plotb, plotc, cells= t(gtkCells(3,2)[c(1,4,5),]),
+                            display = dpy)
+\end{verbatim}
+
+
+
+\subsection{Nested/Container Plots}
+The scatterplot matrix and parallel coordinate plots can contain more
+than one sub-plot.  However, they can be treated as a single cell of
+the grid/table layout. The entire plot or \textit{embedded display}
+receives the space allocated the particular cell (as specified by the
+\SArg{cells} argument.)  Each sub-plot is then given the appropriate
+amount of that space.  In a parallel coordinates plot, the sub-plots
+are arranged in $1 \times k$ table (i.e. one row and $k$ columns, one
+per variable).  In a scatter plot matrix, the sub-plots are arranged
+in a regular grid of dimensions $k \times k$, all having the same
+dimensions.
+
+In the next version of this code (when it is tidied up and
+consolidated), we will use the general \SClass{GGobiPlotList} function
+that acts as a nested description of plots along with their layouts.
+In this way, one can provide recursively defined nested plots that are
+self-describing.
+
+
+
 
 
 \section{Managing Windows}
