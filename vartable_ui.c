@@ -46,6 +46,7 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
   g_free (cols);
 }
 
+/* not implemented
 static void
 delete_vars_cb (GtkWidget *w, ggobid *gg)
 {
@@ -58,6 +59,7 @@ delete_vars_cb (GtkWidget *w, ggobid *gg)
 
   g_free (cols);
 }
+*/
 
 static GtkCList *
 vartable_clist_get (ggobid *gg) {
@@ -341,22 +343,6 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
                       GTK_SIGNAL_FUNC (range_unset_cb), gg);
   /*-- --*/
 
-  /*-- frame for the rescale button --*/
-  frame = gtk_frame_new ("Apply settings");
-  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), frame);
-  vb = gtk_vbox_new (true, 5);
-  gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
-  gtk_container_add (GTK_CONTAINER (frame), vb);
-
-  btn = gtk_button_new_with_label ("Rescale");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Rescale plots using specified limits and scaling behavior", NULL);
-  gtk_box_pack_start (GTK_BOX (vb), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (rescale_cb), gg);
-  /*-- --*/
-
   /*-- ok button --*/
   okay_btn = gtk_button_new_with_label ("Okay");
   gtk_signal_connect (GTK_OBJECT (okay_btn), "clicked",
@@ -443,8 +429,24 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
   }
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 0) {
+    GtkNotebook *nb;
+    gint indx;
+    GtkWidget *swin;
+    GtkAdjustment *adj;
     void newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg);
     newvar_add (vtype, vname, d, gg);
+
+    /*-- scroll to the bottom to highlight the new variable --*/
+    nb = GTK_NOTEBOOK (gg->vartable_ui.notebook);
+    indx = gtk_notebook_get_current_page (nb);
+    /*-- each notebook page's child is a scrolled window --*/
+    swin = gtk_notebook_get_nth_page (nb, indx);
+    adj = gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (swin));
+    adj->value += adj->page_increment;
+    gtk_adjustment_value_changed (adj);
+
+    /*-- destroy the dialog widget --*/
+    gtk_widget_destroy (dialog);
   }
 }
 
@@ -706,7 +708,17 @@ void sortbycolumn_cb (GtkWidget *cl, gint column, ggobid *gg)
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
 
   gtk_clist_set_sort_column (GTK_CLIST (d->vartable_clist), column);
-  if (column == 1)  /*-- variable name --*/
+
+/*
+   If column is already sorted in forward order, it would be useful to
+   sort it in reverse order, but how do I determine its sort order?
+   I can either keep an integer vector and keep track of each column's
+   sort order, or I can just reset the sort order for the whole clist.
+   The lists and trees are so different in gtk 1.3 that it doesn't
+   seem worthwhile to work on this now.
+*/
+
+  if (column >= 1 && column <= 3)  /*-- name, cat?, tform --*/
     gtk_clist_set_compare_func (GTK_CLIST (d->vartable_clist), NULL);
   else
     gtk_clist_set_compare_func (GTK_CLIST (d->vartable_clist),
@@ -901,13 +913,26 @@ vartable_open (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (hbox), hb, true, false, 1);
   /*-- --*/
 
-  /*-- set and unset ranges --*/
+  /*-- Set and apply limits --*/
+  hb = gtk_hbox_new (false, 2);
+
+  /*-- set and clear variable ranges --*/
   btn = gtk_button_new_with_label ("Limits ... ");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Set user min and max for the selected variable(s)", NULL);
-  gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 1);
+    "Set user min and max for the selected variable(s), and define rescaling behavior", NULL);
+  gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (open_range_set_dialog), gg);
+
+  /*-- rescale after resetting variable ranges --*/
+  btn = gtk_button_new_with_label ("Rescale");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Rescale plots using specified limits and scaling behavior", NULL);
+  gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (rescale_cb), gg);
+
+  gtk_box_pack_start (GTK_BOX (hbox), hb, true, false, 1);
   /*--  --*/
 
   /*-- Clone, new, delete ... --*/
