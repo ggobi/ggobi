@@ -33,7 +33,7 @@ Rggobi: lib/libggobi.so
 	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)
 
 clean:
-	for f in (src gtkext/src) ; do \
+	for f in src gtkext/src ; do \
 	  $(MAKE) -C $$f clean ; \
 	done
 
