@@ -15,7 +15,7 @@ CC = gcc
 LD=$(CXX)
 LD=$(CC)
 
-CFLAGS= -g2 -ansi -Wall -pedantic -fpic -DHAVE_CONFIG_H
+CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
 CXXFLAGS=$(CFLAGS)
 
 ifdef TEST_KEYS
@@ -125,14 +125,14 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o splash.o cpanel.o \
  eispack.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  fileio.o \
- print.o 
+ print.o  
 
 
 ifdef USE_XML
- XML_SRC= read_xml.c write_xml.c
- XML_OB= read_xml.o write_xml.o
+ XML_SRC= read_xml.c write_xml.c  read_init.c
+ XML_OB= read_xml.o write_xml.o read_init.o
 
- CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=1
+ CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=1 
  SRC+=$(XML_SRC)
  OB+= $(XML_OB)
 
@@ -140,7 +140,7 @@ ifdef DL_RESOLVE_FLAG
  DL_RESOLVE_PATH+=$(XML_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %)
 endif
 
- XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml -lz 
+ XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml$(USE_XML) -lz 
 
 main_ui.o: write_xml.h
 read_xml.o: read_xml.h
@@ -196,7 +196,7 @@ clean:
 	rm -f *.o ggobi libggobi.so
 
 .c.o:
-	$(CC) -c -I. `gtk-config --cflags` $(CFLAGS) $*.c
+	$(CC) -c -I. $(CFLAGS) `gtk-config --cflags`  $*.c
 
 # A version that compiles all C code (except for mt19937-1.c) as 
 # C++.
@@ -262,3 +262,5 @@ datad.o read_xml.o: datad.c datad.h
 # DO NOT DELETE
 print.o: print.c print.h
 
+%.d: %.c
+	$(CC) -M $(CFLAGS) -I. `gtk-config --cflags` $< > $@
