@@ -19,7 +19,12 @@ and Ch. heikertingeri, and 6 measurements on each.
     6 = the aedeagus width from the side in microns.
 </description>
 <variables count="7">
-  <realvariable name="tars1" nickname="t1" />
+  <realvariable name="tars1" nickname="t1">
+  <description>width of the first joint of the first tarsus in microns 
+ (the sum of measurements for both tarsi).
+  </description>
+  <quickHelp>width of first joint</quickHelp>    
+  </realvariable>
   <realvariable name="tars2" nickname="t2" />
   <realvariable name="head" />
   <realvariable name="aede1" nickname="a1" />

@@ -669,13 +669,13 @@ make_ui (ggobid *gg)
   GGobi_widget_set (window, gg, true);
 
 #ifdef TEST_GGOBI_EVENTS
-  gtk_signal_connect (GTK_OBJECT(gg->main_window),
+  gtk_signal_connect (GTK_OBJECT(gg),
    "splot_new", test_new_plot_cb, (gpointer) "A new plot");
-  gtk_signal_connect(GTK_OBJECT(gg->main_window),
+  gtk_signal_connect(GTK_OBJECT(gg),
    "datad_added", test_data_add_cb, NULL);
-  gtk_signal_connect(GTK_OBJECT(gg->main_window),
+  gtk_signal_connect(GTK_OBJECT(gg),
    "sticky_point_added", test_sticky_points, NULL);
-  gtk_signal_connect(GTK_OBJECT(gg->main_window),
+  gtk_signal_connect(GTK_OBJECT(gg),
    "sticky_point_removed", test_sticky_points, NULL);
 #endif
 

@@ -237,7 +237,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
       gtk_signal_connect (GTK_OBJECT (clist), "select_row",
         (GtkSignalFunc) subset_datad_set_cb, gg);
-      gtk_signal_connect (GTK_OBJECT (gg->main_window), "datad_added",
+      gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
         (GtkSignalFunc) subset_clist_datad_added_cb, GTK_OBJECT (clist));
       /*-- --*/
 

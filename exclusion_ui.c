@@ -596,7 +596,7 @@ void cluster_window_open(ggobid * gg)
   }
 
   /*-- listen for datad_added events on main_window --*/
-  gtk_signal_connect(GTK_OBJECT(gg->main_window),
+  gtk_signal_connect(GTK_OBJECT(gg),
                      "datad_added",
                      GTK_SIGNAL_FUNC(exclusion_notebook_adddata_cb),
                      GTK_OBJECT(gg->cluster_ui.notebook));

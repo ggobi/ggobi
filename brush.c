@@ -126,6 +126,9 @@ brush_prev_vectors_update (datad *d, ggobid *gg) {
 void
 brush_undo (splotd *sp, datad *d, ggobid *gg) {
   gint m, i;
+  if(!d)
+    return;
+
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];
     d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i];
