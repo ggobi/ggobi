@@ -85,7 +85,7 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
   vectorb_alloc_zero(&dsp->t2d.active_vars_p, nc);
 
   vectorf_alloc(&dsp->t2d.lambda, nc);
-  vectorf_alloc(&dsp->t2d.tau, nc);
+  vectorf_alloc_zero(&dsp->t2d.tau, nc);
   vectorf_alloc(&dsp->t2d.tinc, nc);
 
   /* manipulation variables */
