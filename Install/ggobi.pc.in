@@ -10,5 +10,5 @@ Requires: gtk+-2.0, libxml-2.0
 Libs: @INSTALL_SRC_LIBS@ -lggobi
 Cflags: @INSTALL_SRC_CFLAGS@ @XML_CFLAG_DEFINES@ @DEFS@ @OTHER_CFLAGS@
 
-Home=@GGOBI_ROOT@
+Home=@GGOBI_INSTALL_HOME@
 
