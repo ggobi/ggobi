@@ -346,10 +346,6 @@ varcircles_populate (datad *d, ggobid *gg)
     true, true, 2);
   gtk_widget_show (d->vcirc_ui.swin);
 
-/*
-  d->vcirc_ui.table = gtk_table_new (d->vcirc_ui.tnrows,
-                                     d->vcirc_ui.tncols, true);
-*/
   d->vcirc_ui.table = gtk_vbox_new (false, 0);
 
   gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
@@ -362,21 +358,10 @@ varcircles_populate (datad *d, ggobid *gg)
   d->vcirc_ui.label = NULL;
   d->vcirc_ui.da_pix = NULL;
 
-/*
-  k = 0;
-  for (i=0; i<d->vcirc_ui.tnrows; i++) {
-    for (j=0; j<d->vcirc_ui.tncols; j++) {
-*/
   for (j=0; j<d->ncols; j++) {
     vb = varcircle_create (j, d, gg);
     varcircle_pack (vb, d);
   }
-/*
-      k++;
-      if (k == d->ncols) break;
-    }
-  }
-*/
 
   /*-- the second child of the vbox: an hbox with buttons --*/
   d->vcirc_ui.hbox = gtk_hbox_new (false, 0);

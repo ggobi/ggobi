@@ -172,14 +172,13 @@ struct _datad {
     GtkWidget *ebox;        /*-- child2 of pane widget --*/
     GtkWidget *vbox;        /*-- child of ebox --*/
     GtkWidget *swin, *hbox; /*-- children of vbox --*/
-    GtkWidget *table;       /*-- sole child of swin --*/
+    GtkWidget *table;       /*-- sole child of swin; now a vbox --*/
     GtkWidget *manip_btn, *freeze_btn; /*-- children of hbox --*/
 
     GdkCursor *cursor;
     gint jcursor;
 
    /*-- components and properties of the table --*/
-    gint tnrows, tncols;    /*-- table dimensions --*/
     GSList *vb, *da, *label;
     GSList *da_pix;         /*-- backing pixmaps --*/
     gint nvars;
