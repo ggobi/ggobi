@@ -313,6 +313,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
   /*-- VAR_DELETE --*/
   if (cpanel->scatmat_selection_mode == VAR_DELETE) {
     if (scatmat_var_selected (jvar, display)) {
+      gboolean deleted_p = false;  /*-- have we deleted yet? --*/
       /* if jvar is one of the plotted variables, its row and column */
       gint jvar_rc;
       jvar_rc = g_list_index (display->scatmat_cols, GINT_TO_POINTER (jvar));
@@ -340,7 +341,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
           child->bottom_attach--;
         }
 
-        if (Delete) {
+        if (Delete && !deleted_p) {
 
           s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
           display->splots = g_list_remove (display->splots,
@@ -356,6 +357,9 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
           if (s == gg->current_splot)
             sp_event_handlers_toggle (s, off);
           splot_free (s, display, gg);
+
+          deleted_p = true;
+
         } else {
           gtk_widget_set_usize (da, -1, -1);
           gtk_widget_set_usize (da, width, height);
