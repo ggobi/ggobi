@@ -142,7 +142,8 @@ GTK_EXT_LD=-lgtkext
 
 OBJ=$(SRC:%.c=%.o)
 
-CFLAGS= @SRC_DEBUG@ -I$(TOP)/include -I$(TOP)/gtkext/include $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ @DEFS@
+CFLAGS= @SRC_DEBUG@ -I$(TOP)/include -I$(TOP)/gtkext/include $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ 
+#@DEFS@ - contains the HAVE_CONFIG_H
 
 LIBS=-L$(TOP)/lib $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS) @LIBS@
 
