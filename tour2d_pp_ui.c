@@ -28,17 +28,26 @@ static GtkAdjustment *param_adj;
 
 /*-- called when closed from the close menu item --*/
 static void close_menuitem_cb (displayd *dsp, gint action, GtkWidget *w) {
-  /*  free_optimize0_p(&dsp->t2d_pp_op); should this go here? */
-
   gtk_widget_hide (dsp->t2d_window);
   t2d_optimz(0, &dsp->t2d.get_new_target, 
     &dsp->t2d.target_selection_method, dsp);
+
+  /*  free_optimize0_p(&dsp->t2d_pp_op); * should this go here? *
+  free_pp(&dsp->t2d_pp_param); seems not, causes a crash because window
+                               just gets hidden, so shouldn't
+                               free the arrays. */
 }
 /*-- called when closed from the window manager --*/
 static void
 close_wmgr_cb (GtkWidget *w, GdkEventButton *event, displayd *dsp) {
-
   gtk_widget_hide (dsp->t2d_window);
+  t2d_optimz(0, &dsp->t2d.get_new_target, 
+    &dsp->t2d.target_selection_method, dsp);
+
+  /*  free_optimize0_p(&dsp->t2d_pp_op); * should this go here? *
+  free_pp(&dsp->t2d_pp_param); seems not, causes a crash because window
+                               just gets hidden, so shouldn't
+                               free the arrays. */
 }
 
 /*
@@ -540,6 +549,7 @@ tour2dpp_window_open (ggobid *gg) {
     }
 
     alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 2);
+    alloc_pp(&dsp->t2d_pp_param, d->nrows_in_plot, dsp->t2d.nactive, 2);
 
     gtk_widget_show_all (dsp->t2d_window);
   }

@@ -308,6 +308,8 @@ tour2d_all_vars_cb (GtkCheckMenuItem *w, guint action)
       free_optimize0_p(&dsp->t2d_pp_op);
       alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
         2);
+      free_pp(&dsp->t2d_pp_param);
+      alloc_pp(&dsp->t2d_pp_param, d->nrows_in_plot, dsp->t2d.nactive, 2);
       t2d_pp_reinit(dsp, gg);
     }  
   }
@@ -451,6 +453,8 @@ tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     free_optimize0_p(&dsp->t2d_pp_op);
     alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
       2);
+    free_pp(&dsp->t2d_pp_param);
+    alloc_pp(&dsp->t2d_pp_param, d->nrows_in_plot, dsp->t2d.nactive, 2);
     t2d_pp_reinit(dsp, gg);
   }
 
@@ -594,7 +598,8 @@ tour2d_run(displayd *dsp, ggobid *gg)
       dsp->t2d.F, dsp->t2d.Va, d->ncols, (gint) 2);
 
     /* plot pp indx */
-    if (dsp->t2d_ppda != NULL) {
+    if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+      /*    if (dsp->t2d_ppda != NULL) {*/
 
       dsp->t2d.oppval = dsp->t2d.ppval;
       revert_random = t2d_switch_index(cpanel->t2d.pp_indx,
@@ -841,8 +846,9 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
     tour2d_func(T2DOFF, gg->current_display, gg);
 
   /* If de-selected variables are still fading out of the tour
-     we will need to take them out before starting manipulation */
-  for (j=0; j<d->ncols; j++)
+     we will need to take them out before starting manipulation - 
+     no we don't 8/5/02 */
+  /*  for (j=0; j<d->ncols; j++)
     if (dsp->t2d.active_vars_p.els[j] == false) {
        if (dsp->t2d.F.vals[0][j] > 0.0) 
          dsp->t2d.F.vals[0][j] = 0.0;
@@ -852,7 +858,7 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   norm(dsp->t2d.F.vals[0],d->ncols);
   norm(dsp->t2d.F.vals[1],d->ncols);
   if (!gram_schmidt(dsp->t2d.F.vals[0], dsp->t2d.F.vals[1],
-    d->ncols))
+  d->ncols))*/
 #ifdef EXCEPTION_HANDLING
     g_printerr("");/*t2d.F[0] equivalent to t2d.F[1]\n");*/
 #else
@@ -1283,7 +1289,8 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     }
 
     /* plot pp indx */
-    if (dsp->t2d_ppda != NULL) {
+    if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+      /*    if (dsp->t2d_ppda != NULL) {*/
 
       dsp->t2d.oppval = dsp->t2d.ppval;
       pp_problem = t2d_switch_index(cpanel->t2d.pp_indx, 

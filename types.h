@@ -160,6 +160,15 @@ typedef struct {
 
 /* Sigbert's code for pp */
 typedef struct {
+  vector_i ngroup, group; /* for class indices */
+  gint numgroups; /* previously called groups in class code */
+  array_d cov, tcov, mean; /* for lda, holes, cm */
+  vector_d ovmean; /* for lda, holes, cm */
+  vector_i nright, index; /* for gini, entropy */
+  vector_d x; /* for gini, entropy */
+} pp_param;
+
+typedef struct {
   gint min_neighbour, max_neighbour, dim, data_step, neighbour_step;
   /* temporary space */
   gfloat *dist, *mean, *nmean, *fv1, *fv2, *ew, *ev, *cov;

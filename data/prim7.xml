@@ -16,7 +16,7 @@
  <realvariable name="X7"/>
  <realvariable name="Cluster" />
 </variables>
-<records count="500" glyph="fc 3" color="6">
+<records count="500" glyph="fc 3" color="2">
 <record id="1" label="0" color="4" glyph="oc 3">
 5.752 4.553 1.526 0.156 23.512 -5.530 -0.148 8.000
 </record>
@@ -1524,7 +1524,7 @@
 </description>
 <variables count="0">
 </variables>
-<records count="9" glyph="fc 4" color="6">
+<records count="9" glyph="fc 4" color="2">
 <record source="30" destination="333" label="0">
 </record>
 <record source="30" destination="392" label="1" color="1">

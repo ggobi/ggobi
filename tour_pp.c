@@ -182,7 +182,8 @@ void normal_fill (array_f *data, gfloat delta, array_f *base)
 void orthonormal (array_f *proj)
 { 
   gint i, j, k;
-  gfloat *ip = g_malloc (proj->ncols*sizeof(gfloat)), norm;
+  gfloat *ip = g_malloc (proj->ncols*sizeof(gfloat));
+  gfloat norm;
 
   /* First norm vector p_i */
   for (i=0; i<proj->nrows; i++)
@@ -433,11 +434,11 @@ void inverse(gdouble *a, gint n)
   gdouble *b,*inv,d;
   gint *P,i,j;
 
-  P = (gint *) malloc(n*sizeof(gint));
-  inv = (gdouble *) malloc(n*n*sizeof(gdouble));
+  P = (gint *) g_malloc(n*sizeof(gint));
+  inv = (gdouble *) g_malloc(n*n*sizeof(gdouble));
   d = ludcmp(a,n,P);
  
-  b = (gdouble *) malloc(n*sizeof(gdouble));
+  b = (gdouble *) g_malloc(n*sizeof(gdouble));
   for(i=0; i<n; i++)
   {  
     for(j=0; j<n; j++)
@@ -450,8 +451,9 @@ void inverse(gdouble *a, gint n)
   }
   memcpy(a,inv,n*n*sizeof(gdouble));
 
-  free(P);
-  free(inv);
+  g_free(P);
+  g_free(inv);
+  g_free(b);
 }    
 
 gdouble
@@ -480,57 +482,105 @@ tour_pp_solve(gdouble *a,gdouble *b,gint n,gint *Pivot)
 }
 
 
-gdouble ludcmp(gdouble *a,gint n,gint *Pivot) 
+gdouble ludcmp(gdouble *a, gint n, gint *Pivot) 
 { 
-    gint i,j,k,ier;
-    gdouble *s,det,temp,c;
-    det=1;
-    s = (gdouble *) malloc(n*sizeof(gdouble));
-    for(i=0;i<n; i++)
-    {  s[i] = a[i*n+1];
-       for(j=1; j<n; j++)
-          if(s[i] < a[i*n+j]) s[i] = a[i*n+j];
+  gint i,j,k,ier;
+  gdouble *s,det,temp,c;
+  det=1;
+
+  s = (gdouble *) g_malloc(n*sizeof(gdouble));
+
+  for (i=0;i<n; i++) {  
+    s[i] = a[i*n+1];
+    for(j=1; j<n; j++)
+      if(s[i] < a[i*n+j]) s[i] = a[i*n+j];
+  }
+  for (k=0;k<n-1; k++) {  
+    for(i=k; i<n; i++) {   
+      temp = fabs(a[i*n+k]/s[i]);
+      if(i==k) { 
+        c=temp; Pivot[k]=i;
+      }
+      else if(c <temp) {
+        c = temp; Pivot[k]=i;
+      }
+    }  
+    /* If all elements of a row(or column) of A are zero, |A| = 0 */
+    if(c==0) {   
+      det=0;
+      return(det);
     }
-    for(k=0;k<n-1; k++)
-    {  for(i=k; i<n; i++)
-       {   temp = fabs(a[i*n+k]/s[i]);
-           if(i==k) { c=temp; Pivot[k]=i;}
-           else if(c <temp) {c = temp; Pivot[k]=i;}
-       }  
-        /* If all elements of a row(or column) of A are zero, |A| = 0 */
-       if(c==0) 
-       {   det=0;
-           return(det);
-       }
-       if(Pivot[k]!=k)
-       {   det*=-1; 
-           for(j=k; j<n; j++)
-           {   temp =a[k*n+j]; 
-               a[k*n+j]=a[Pivot[k]*n+j]; 
-               a[Pivot[k]*n+j]=temp;
-            }       
-           temp = s[k];
-           s[k] = s[Pivot[k]];   
-           s[Pivot[k]]=temp;
-       }
-       for(i=k+1; i<n; i++)
-       {   temp =a[i*n+k]/a[k*n+k];
-           a[i*n+k] = temp;
-           for(j=k+1; j<n; j++)
-              a[i*n+j] -= temp*a[k*n+j];
-       }
-       det *= a[k*n+k];
+    if(Pivot[k]!=k) {   
+      det*=-1; 
+      for(j=k; j<n; j++) {   
+        temp = a[k*n+j]; 
+        a[k*n+j]=a[Pivot[k]*n+j]; 
+        a[Pivot[k]*n+j]=temp;
+      }
+      temp = s[k];
+      s[k] = s[Pivot[k]];   
+      s[Pivot[k]]=temp;
     }
-    k = n-1;
-    det *= a[(n-1)*n+(n-1)];
-    ier=0; 
-    free(s);
-    return(det);
+    for(i=k+1; i<n; i++) {   
+      temp = a[i*n+k]/a[k*n+k];
+      a[i*n+k] = temp;
+      for(j=k+1; j<n; j++)
+      a[i*n+j] -= temp*a[k*n+j];
+    }
+    det *= a[k*n+k];
+  }
+  k = n-1;
+  det *= a[(n-1)*n+(n-1)];
+  ier=0; 
+
+  g_free(s);
+
+  return(det);
 }                               
   
 /********************************************************************
              Arbitrary dimensional pp indices
 *********************************************************************/
+
+gint alloc_pp(pp_param *pp, gint nrows, gint ncols, gint ndim)
+{
+  gint nr = nrows;/* number of cases */
+  gint nc = MAX(ncols,2); /* ncols = number of active vars */
+  gint nd = MAX(ndim,2); /* projection dimension */
+  gint ncolors = 50; /* This is a guess at the max num of colors -
+                        it really shouldn't be hard-coded */
+
+  vectori_alloc_zero(&pp->group, nr);
+  vectori_alloc_zero(&pp->ngroup, nr);
+
+  arrayd_alloc_zero(&pp->cov, nd, nd);
+  arrayd_alloc_zero(&pp->tcov, nd, nd); /* temporary usage in lda */
+  arrayd_alloc_zero(&pp->mean, ncolors, nd); /* means for each group */
+  vectord_alloc_zero(&pp->ovmean, nc); /* mean for each projection */
+
+  vectori_alloc_zero(&pp->index, nr);/* used in gini/entropy */
+  vectori_alloc_zero(&pp->nright, nr);/* used in gini/entropy */
+  vectord_alloc_zero(&pp->x, nr); /* used in gini/entropy */
+
+  return 0;
+}
+
+gint free_pp (pp_param *pp)
+{
+  vectori_free(&pp->group);
+  vectori_free(&pp->ngroup);
+
+  arrayd_free(&pp->cov, 0, 0);
+  arrayd_free(&pp->tcov, 0, 0);
+  arrayd_free(&pp->mean, 0, 0);
+  vectord_free(&pp->ovmean);
+
+  vectori_free(&pp->index);
+  vectori_free(&pp->nright);
+  vectord_free(&pp->x);
+
+  return 0;
+}
 
 /********************************************************************
 
@@ -541,47 +591,76 @@ Purpose        : Looks for the projection with no data in center.
 
 gint holes_raw(array_f *pdata, void *param, gfloat *val)
 { 
-   int i, p, n,k,j;
-   double *m,tmp,x1,x2;
-   double *cov;
-   double acoefs;
-   p = pdata->ncols; n = pdata->nrows;
-   cov = (double *) malloc(p*p*sizeof(double));
-   m = (double *) malloc(p*sizeof(double));
-   zero(cov,p*p); zero(m,p);
-   for(i=0; i<n; i++)
-   { for(j=0; j<p; j++)
-     m[j] += pdata->vals[i][j]/(double)n;}
+  pp_param *pp = (pp_param *) param;
+  int i, p, n, k,j;
+  /*  gdouble *m, */
+  gdouble tmp,x1,x2;
+  gdouble *cov;
+  gdouble acoefs;
 
-  for (i=0; i<n; i++) 
-  { for (j=0; j<p; j++) 
-    { for(k=0; k<=j; k++) 
-      { cov[k*p+j] +=((pdata->vals[i][j])-(m[j]))* 
+  p = pdata->ncols; 
+  n = pdata->nrows;
+  cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
+  zero(cov,p*p);
+  /*  m = (double *) malloc(p*sizeof(double));
+  zero(cov,p*p); zero(m,p);*/
+
+  for(j=0; j<p; j++) {
+    pp->ovmean.els[j] = 0.0;
+    for(i=0; i<n; i++) 
+      pp->ovmean.els[j] += pdata->vals[i][j];
+    pp->ovmean.els[j] /= ((gdouble)n);
+  }
+
+  for (j=0; j<p; j++) { 
+    for (k=0; k<=j; k++) { 
+      pp->cov.vals[k][j] = 0.0;
+      for (i=0; i<n; i++) 
+        pp->cov.vals[k][j] += (((pdata->vals[i][j])-pp->ovmean.els[j])*
+         ((pdata->vals[i][k])-(pp->ovmean.els[k])));
+      pp->cov.vals[k][j] /= ((double)(n-1)); 
+      if (j != k)
+        pp->cov.vals[j][k] = pp->cov.vals[k][j];
+	/*        cov[k*p+j] +=((pdata->vals[i][j])-(m[j]))* 
                      ((pdata->vals[i][k])-(m[k]))/(double)(n-1); 
-        cov[j*p+k] = cov[k*p+j]; 
-      } 
-    } 
+		     cov[j*p+k] = cov[k*p+j]; */
+      }
   }
 
-  inverse(cov,p);
-  acoefs=0.0;
-
-  for(i=0; i<n; i++)
-  { tmp = 0;  
-    for (j=0; j<p; j++) 
-    {   x1 = pdata->vals[i][j]-m[j];
-         for(k=0; k<p; k++)
-        {  x2 = pdata->vals[i][k]-m[k]; 
-           tmp+= x1*x2*cov[j*p+k];
-        }
-    } 
-    acoefs +=exp(-tmp/(double)2);
+  /*  g_printerr("cov %f %f %f %f\n",pp->cov.vals[0][0],
+      pp->cov.vals[0][1],pp->cov.vals[1][0],pp->cov.vals[1][1]);*/
+  if (p>1) {
+    for (i=0; i<p; i++)
+      for (j=0; j<p; j++)
+        cov[i*p+j] = pp->cov.vals[i][j];
+    inverse(cov, p);
+    for (i=0; i<p; i++)
+      for (j=0; j<p; j++)
+        pp->cov.vals[i][j] = cov[i*p+j];
   }
-   *val = (1.-acoefs/(double)n)/(double) (1-exp(-p/(double)2));
- 
-   free(m);
-   free(cov);
-   return(0);
+  else
+    pp->cov.vals[0][0] = 1./pp->cov.vals[0][0];
+
+  acoefs = 0.0;
+  for (i=0; i<n; i++) { 
+    tmp = 0.0;  
+    for (j=0; j<p; j++) {   
+      x1 = pdata->vals[i][j]-pp->ovmean.els[j];
+      for (k=0; k<p; k++) {  
+        x2 = pdata->vals[i][k]-pp->ovmean.els[k]; 
+        tmp += (x1*x2*pp->cov.vals[j][k]);
+      }
+    } 
+    acoefs += exp(-tmp/2.0);
+  }
+  *val = (1.0-acoefs/(gdouble)n)/(gdouble) (1.0-exp(-p/2.0));
+
+  /*  g_printerr("%f \n",*val); */
+  /*  free(m);*/
+  g_free(cov);
+
+  /*  g_printerr("hello 2\n");*/
+  return(0);
 }
 
 /********************************************************************
@@ -593,48 +672,72 @@ Purpose        : Looks for the projection with lots of data in center.
 
 gint central_mass_raw(array_f *pdata, void *param, gfloat *val)
 { 
+  pp_param *pp = (pp_param *) param;
+  int i, p, n,k,j;
+  gdouble tmp,x1,x2;
+  gdouble *cov;
+  gdouble acoefs;
 
-   int i, p, n,k,j;
-   double *m,tmp,x1,x2;
-   double *cov;
-   double acoefs;
-   p = pdata->ncols; n = pdata->nrows;
-   cov = (double *) malloc(p*p*sizeof(double));
-   m = (double *) malloc(p*sizeof(double));
-   zero(cov,p*p); zero(m,p);
-   for(i=0; i<n; i++)
-   { for(j=0; j<p; j++)
-     m[j] += pdata->vals[i][j]/(double)n;}
+  p = pdata->ncols; 
+  n = pdata->nrows;
+  cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
+  zero(cov,p*p);
+  /*  m = (gdouble *) g_malloc(p*sizeof(gdouble));
+  zero(cov,p*p); zero(m,p);
+  for(i=0; i<n; i++) { 
+    for(j=0; j<p; j++)
+    m[j] += pdata->vals[i][j]/(double)n;}*/
 
-  for (i=0; i<n; i++) 
-  { for (j=0; j<p; j++) 
-    { for(k=0; k<=j; k++) 
-      { cov[k*p+j] +=((pdata->vals[i][j])-(m[j]))* 
+  for(j=0; j<p; j++) {
+    pp->ovmean.els[j] = 0.0;
+    for(i=0; i<n; i++) 
+      pp->ovmean.els[j] += pdata->vals[i][j];
+    pp->ovmean.els[j] /= ((gdouble)n);
+  }
+
+  for (j=0; j<p; j++) { 
+    for (k=0; k<=j; k++) { 
+      pp->cov.vals[k][j] = 0.0;
+      for (i=0; i<n; i++) 
+        pp->cov.vals[k][j] += (((pdata->vals[i][j])-pp->ovmean.els[j])*
+         ((pdata->vals[i][k])-(pp->ovmean.els[k])));
+      pp->cov.vals[k][j] /= ((double)(n-1)); 
+      if (j != k)
+        pp->cov.vals[j][k] = pp->cov.vals[k][j];
+	/*        cov[k*p+j] +=((pdata->vals[i][j])-(m[j]))* 
                      ((pdata->vals[i][k])-(m[k]))/(double)(n-1); 
-        cov[j*p+k] = cov[k*p+j]; 
-      } 
-    } 
+		     cov[j*p+k] = cov[k*p+j]; */
+      }
   }
 
-  inverse(cov,p);
-  acoefs=0.0;
-
-  for(i=0; i<n; i++)
-  { tmp = 0;  
-    for (j=0; j<p; j++)
-
-    {   x1 = pdata->vals[i][j]-m[j];
-         for(k=0; k<p; k++)
-        {  x2 = pdata->vals[i][k]-m[k]; 
-           tmp+= x1*x2*cov[j*p+k];
-        }
-    } 
-    acoefs +=exp(-tmp/(double)2);
+  if (p>1) {
+    for (i=0; i<p; i++)
+      for (j=0; j<p; j++)
+        cov[i*p+j] = pp->cov.vals[i][j];
+    inverse(cov, p);
+    for (i=0; i<p; i++)
+      for (j=0; j<p; j++)
+        pp->cov.vals[i][j] = cov[i*p+j];
   }
-  *val = (acoefs/n-exp(-p/(double)2))/(double) (1-exp(-p/(double)2));
-   free(m);
-   free(cov);
-   return(0);
+  else
+    pp->cov.vals[0][0] = 1./pp->cov.vals[0][0];
+
+  acoefs = 0.0;
+  for (i=0; i<n; i++) { 
+    tmp = 0.0;  
+    for (j=0; j<p; j++) {   
+      x1 = pdata->vals[i][j]-pp->ovmean.els[j];
+      for (k=0; k<p; k++) {  
+        x2 = pdata->vals[i][k]-pp->ovmean.els[k]; 
+        tmp += (x1*x2*pp->cov.vals[j][k]);
+      }
+    } 
+    acoefs += exp(-tmp/2.0);
+  }
+  *val = (acoefs/n-exp(-p/2.0))/((gdouble) (1-exp(-p/2.0)));
+
+  g_free(cov);
+  return(0);
 }
 
 /********************************************************************
@@ -660,7 +763,7 @@ void zero_int(gint *mem, int size)
   mem[i] = 0;
 }
   
-gint compute_groups (gint *group, gint *ngroup, gint *groups, 
+gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups, 
   gint nrows, gfloat *gdata)
 { 
   gint i, j, *groupval;
@@ -668,31 +771,31 @@ gint compute_groups (gint *group, gint *ngroup, gint *groups,
   /* initialize data */
   groupval = g_malloc (nrows*sizeof(gint));
 
-  *groups = 0;
+  *numgroups = 0;
   for (i=0; i<nrows; i++)
-  { for (j=0; j<*groups; j++)
+  { for (j=0; j<*numgroups; j++)
     { if (groupval[j]==gdata[i])
-      { ngroup[j]++;
+      { ngroup.els[j]++;
         break;
       }
     }
-    if (j==*groups )
+    if (j==*numgroups )
     { groupval[j]  = gdata[i];
-      ngroup[j] = 1;
-      (*groups)++;
+      ngroup.els[j] = 1;
+      (*numgroups)++;
     }
   }
 
   for (i=0; i<nrows; i++)
-  { for (j=0; j<*groups; j++)
+  { for (j=0; j<*numgroups; j++)
     { if (groupval[j]==gdata[i])
-        group[i] = j;
+        group.els[i] = j;
     }
   }
 
   g_free(groupval);
 
-  return ((*groups==1) || (*groups==nrows));
+  return ((*numgroups==1) || (*numgroups==nrows));
 }
 
 gint alloc_discriminant_p (discriminant_param *dp, /*gfloat *gdata, */
@@ -730,44 +833,113 @@ gint free_discriminant_p (discriminant_param *dp)
 
 gint discriminant (array_f *pdata, void *param, gfloat *val)
 { 
-  discriminant_param *dp = (discriminant_param *) param;
-  gint i, j, k;
+  /*  discriminant_param *dp = (discriminant_param *) param;*/
+  pp_param *pp = (pp_param *) param;
+  gint i, j, k, l;
   gint n, p;
   gdouble det;
   gint *Pv; /* dummy structure for pivot in ludcmp - not used */
+  gdouble *cov; /* need to get rid of this variable */
 
   n = pdata->nrows;
   p = pdata->ncols;
 
-  Pv = (int *) malloc(p*sizeof(int));
+  Pv = (gint *) g_malloc(p*sizeof(gint));
+  cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
 
   /* Compute means */
-  zero (dp->mean, dp->groups*p);
+  /*  zero (dp->mean, dp->groups*p);
   zero (dp->ovmean, p);
-  zero (dp->cov, p*p);
+  zero (dp->cov, p*p);*/
 
-  for (i=0; i<n; i++)
-  { 
-    for (k=0; k<p; k++)
+  for (k=0; k<p; k++) {
+    for (l=0; l<pp->numgroups; l++)
+      pp->mean.vals[l][k] = 0.0;
+    pp->ovmean.els[k] = 0.0;
+  }
+  for (k=0; k<p; k++) {
+    for (i=0; i<n; i++)
     { 
-      dp->mean[k+p*dp->group[i]] += (gdouble) pdata->vals[i][k];  
-      dp->ovmean[k] += (gdouble) pdata->vals[i][k];
+      pp->mean.vals[pp->group.els[i]][k] += (gdouble) pdata->vals[i][k]; 
+      pp->ovmean.els[k] += (gdouble) pdata->vals[i][k];
+      /*      dp->mean[k+p*dp->group[i]] += (gdouble) pdata->vals[i][k];  
+	      dp->ovmean[k] += (gdouble) pdata->vals[i][k];*/
     }
   }
 
   for (k=0; k<p; k++)
   { 
-    for (i=0; i<dp->groups; i++)
+    for (i=0; i<pp->numgroups; i++)
     { 
       /*      dp->mean[k*p+i] /= (gdouble) dp->ngroup[i];*/
-      dp->mean[k+p*i] /= (gdouble) dp->ngroup[i];
+      pp->mean.vals[i][k] /= (gdouble) pp->ngroup.els[i];/* [k+p*i] */
     /*     sprintf (msg, "mean[%i,%i]=%f", i, k, dp->mean[k*n+i]); print(); */
     }
-    dp->ovmean[k] /= (gdouble) n;
+    pp->ovmean.els[k] /= (gdouble) n;
   }
 
   /* Compute W */
+  for (j=0; j<p; j++)
+    for (k=0; k<p; k++)
+      pp->cov.vals[j][k] = 0.0;
+  for (i=0; i<n; i++)
+  { 
+    for (j=0; j<p; j++)
+    { 
+      for (k=0; k<=j; k++)
+      { 
+        pp->cov.vals[k][j] += 
+          ((gdouble) pdata->vals[i][j]-pp->mean.vals[pp->group.els[i]][j])*
+          ((gdouble) pdata->vals[i][k]-pp->mean.vals[pp->group.els[i]][k]);
+        pp->cov.vals[j][k] = pp->cov.vals[k][j];
+      }
+    }
+  }
 
+  if (p>1) {
+    for (i=0; i<p; i++)
+      for (j=0; j<p; j++)
+        cov[i*p+j] = pp->cov.vals[i][j];
+    det = ludcmp(cov, p, Pv); 
+    for (i=0; i<p; i++)
+      for (j=0; j<p; j++)
+        pp->cov.vals[i][j] = cov[i*p+j];
+  }
+  else
+    det = fabs((gdouble) pp->cov.vals[0][0]);
+    *val = det;
+
+  /* Compute B */
+  /*  for (j=0; j<p; j++)
+    for (k=0; k<p; k++)
+      pp->cov.vals[j][k] = 0.0;
+  for (j=0; j<p; j++) 
+  {	
+    for(k=0; k<p; k++)
+    {
+      for (i=0; i< pp->numgroups; i++)	
+        pp->cov.vals[j][k] += (pp->mean.vals[i][j]-pp->ovmean.els[j])*
+          (pp->mean.vals[i][k]-pp->ovmean.els[k])*(gdouble)(pp->ngroup.els[i]);
+    }
+  }
+
+  if (p>1) {
+    for (i=0; i<p; i++)
+      for (j=0; j<p; j++)
+        cov[i*p+j] = pp->cov.vals[i][j];
+    det = ludcmp(cov, p, Pv); 
+    for (i=0; i<p; i++)
+      for (j=0; j<p; j++)
+        pp->cov.vals[i][j] = cov[i*p+j];
+  }
+  else
+    det = fabs((gdouble) pp->cov.vals[0][0]);
+    *val = det;*/
+
+  /* Compute W+B */
+  for (j=0; j<p; j++)
+    for (k=0; k<p; k++)
+      pp->cov.vals[j][k] = 0.0;
   for (i=0; i<n; i++)
   { 
     for (j=0; j<p; j++)
@@ -775,42 +947,39 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
       /*      for (k=0; k<=p; k++)*/
       for (k=0; k<=j; k++)
       { 
-        dp->cov[k*p+j] += 
+	/*        dp->cov[k*p+j] += 
           ((gdouble) pdata->vals[i][j]-dp->mean[j+p*dp->group[i]])*
           ((gdouble) pdata->vals[i][k]-dp->mean[k+p*dp->group[i]]);
-        dp->cov[j*p+k] = dp->cov[k*p+j];
+	  dp->cov[j*p+k] = dp->cov[k*p+j];*/
+        pp->cov.vals[k][j] += 
+          ((gdouble) pdata->vals[i][j]-pp->ovmean.els[j])*
+          ((gdouble) pdata->vals[i][k]-pp->ovmean.els[k]);
+        pp->cov.vals[j][k] = pp->cov.vals[k][j];
       }
     }
   }
 
-  /*  lda = p;
-  n   = p;
-  job = 10;*/
-
-  memcpy(dp->a,dp->cov,p*p*sizeof(double)); 
-  det = ludcmp(dp->a, p, Pv); 
-  *val = det;
-
-  /* Compute W+B */
-
-  for (j=0; j<p; j++) 
-  {	
-    for(k=0; k<p; k++)
-    {
-      for (i=0; i< dp->groups; i++)	
-        dp->cov[p*j+k] += (dp->mean[i*p+j]-dp->ovmean[j])*
-          (dp->mean[i*p+k]-dp->ovmean[k])*(gdouble)(dp->ngroup[i]);
-    }
+  if (p>1) {
+    for (i=0; i<p; i++)
+      for (j=0; j<p; j++)
+        cov[i*p+j] = pp->cov.vals[i][j];
+    det = ludcmp(cov, p, Pv); 
+    for (i=0; i<p; i++)
+      for (j=0; j<p; j++)
+        pp->cov.vals[i][j] = cov[i*p+j];
   }
-
-  memcpy(dp->a,dp->cov,p*p*sizeof(double)); 
-  det = ludcmp(dp->a, p, Pv); 
-  *val = 1.0-*val/det;
+  else
+    det = fabs((gdouble) pp->cov.vals[0][0]);
+  /*  memcpy(dp->a,dp->cov,p*p*sizeof(double)); 
+      det = ludcmp(dp->a, p, Pv); */
+  *val = 1.0-*val/det; /*1-W/(W+B)*/
+/*  *val = *val/det; B/(W+B) */
 
   /*  printf ("Index=%f\n", *val);*/
 
 /*  sprintf (msg, "index=%f\n", *val); print(); */
-  free(Pv);
+  g_free(Pv);
+  g_free(cov);
 
   return (0);
 }
@@ -941,8 +1110,9 @@ gint free_cartgini_p (cartgini_param *dp)
 
 gint cartgini (array_f *pdata, void *param, gfloat *val)
 { 
-  cartgini_param *dp = (cartgini_param *) param;
-  gint i, k, n, p, g = dp->groups, left, right,l;
+  /*  cartgini_param *dp = (cartgini_param *) param;*/
+  pp_param *pp = (pp_param *) param;
+  gint i, k, n, p, g = pp->numgroups, left, right, l;
   gfloat dev, prob, maxindex, index;
 
   n = pdata->nrows;
@@ -954,44 +1124,45 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
 /* Sort pdata by group */ 
   right = pdata->nrows-1;
   left = 0;
-  zero_int(dp->index,n);
+  zero_int(pp->index.els,n);
   for (i=0; i<n; i++)
-    dp->index[i] = dp->group[i];
-  sort_group(pdata,dp->index,left,right);
+    pp->index.els[i] = pp->group.els[i];
+  sort_group(pdata,pp->index.els,left,right);
 
 /* data relocation and make index */ 
-  zero(dp->x,n);
+  zero(pp->x.els,n);
 
 /* Calculate Gini index in each coordinate 
              and find minimum              */
 
-  for(l=0; l<p; l++)
+  for (l=0; l<p; l++)
   {
     for (i=0; i<n; i++) { 
       /*    dp->x[i] = pdata->vals[i][0];*/
-      dp->x[i] = pdata->vals[i][l];
-      dp->index[i] = dp->group[i];
+      pp->x.els[i] = pdata->vals[i][l];
+      pp->index.els[i] = pp->group.els[i];
     }
 
     left=0;
     right=n-1;
-    sort_data(dp->x, dp->index,left,right) ;
+    sort_data(pp->x.els, pp->index.els, left, right) ;
 
  /* Calculate gini index */
-    zero_int(dp->nright,g);
+    zero_int(pp->nright.els,g);
     index = 1;
     for (i=0; i<g; i++) { 
-      dp->nright[i] = 0;
-      index -= (((gdouble)dp->ngroup[i])/((gdouble)n))*
-        (((gdouble)dp->ngroup[i])/((gdouble)n));
+      pp->nright.els[i] = 0;
+      index -= (((gdouble)pp->ngroup.els[i])/((gdouble)n))*
+        (((gdouble)pp->ngroup.els[i])/((gdouble)n));
     }
     for (i=0; i<n-1; i++)  {
-      (dp->nright[dp->index[i]])++;
+      (pp->nright.els[pp->index.els[i]])++;
       dev=1;
       for (k=0; k<g; k++) {
-        prob = ((gdouble) dp->nright[k])/((gdouble)(i+1));
+        prob = ((gdouble) pp->nright.els[k])/((gdouble)(i+1));
         dev -= prob*prob*((gdouble)(i+1)/(gdouble)n);
-        prob = ((gdouble) (dp->ngroup[k]-dp->nright[k]))/((gdouble)(n-i-1));
+        prob = ((gdouble) (pp->ngroup.els[k]-pp->nright.els[k]))/
+          ((gdouble)(n-i-1));
         dev -= prob*prob*((gdouble)(n-i-1)/(gdouble)n);
       }
       if (dev<index) index = dev;
@@ -1033,8 +1204,9 @@ gint free_cartentropy_p (cartentropy_param *dp)
 
 gint cartentropy (array_f *pdata, void *param, gfloat *val)
 { 
-  cartentropy_param *dp = (cartentropy_param *) param;
-  gint i, k, n, p, g = dp->groups, left, right,l;
+  /*  cartentropy_param *dp = (cartentropy_param *) param;*/
+  pp_param *pp = (pp_param *) param;
+  gint i, k, n, p, g = pp->numgroups, left, right,l;
   gfloat dev, prob, maxindex, index;
 
   n = pdata->nrows;
@@ -1046,42 +1218,43 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val)
 /* Sort pdata by group */ 
   right = pdata->nrows-1;
   left = 0;
-  zero_int(dp->index,n);
+  zero_int(pp->index.els,n);
   for (i=0; i<n; i++)
-    dp->index[i] = dp->group[i];
-  sort_group(pdata,dp->index,left,right);
+    pp->index.els[i] = pp->group.els[i];
+  sort_group(pdata,pp->index.els,left,right);
 
 /* data relocation and make index */ 
-  zero(dp->x,n);
+  zero(pp->x.els,n);
 
 /* Calculate index in each coordinate and find minimum  */
   for(l=0; l<p; l++)
   {
     for (i=0; i<n; i++) { 
-      dp->x[i] = pdata->vals[i][l];
-      dp->index[i] = dp->group[i];
+      pp->x.els[i] = pdata->vals[i][l];
+      pp->index.els[i] = pp->group.els[i];
     }
 
     left=0;
     right=n-1;
-    sort_data(dp->x, dp->index,left,right) ;
+    sort_data(pp->x.els, pp->index.els,left,right) ;
 
  /* Calculate index */
-    zero_int(dp->nright,g);
+    zero_int(pp->nright.els,g);
     index = 0;
     for (i=0; i<g; i++) { 
-      dp->nright[i] = 0;
-      index -= (((gdouble)dp->ngroup[i])/((gdouble)n))*
-        log(((gdouble)dp->ngroup[i])/((gdouble)n));
+      pp->nright.els[i] = 0;
+      index -= (((gdouble)pp->ngroup.els[i])/((gdouble)n))*
+        log(((gdouble)pp->ngroup.els[i])/((gdouble)n));
     }
     for (i=0; i<n-1; i++)  {
-      (dp->nright[dp->index[i]])++;
+      (pp->nright.els[pp->index.els[i]])++;
       dev=0;
       for (k=0; k<g; k++) {
-        prob = ((double) dp->nright[k])/((double)(i+1));
+        prob = ((double) pp->nright.els[k])/((double)(i+1));
         if (prob > 0)
           dev -= prob*log(prob)*((gdouble)(i+1)/(gdouble)n);
-        prob = ((double) (dp->ngroup[k]-dp->nright[k]))/((double)(n-i-1));
+        prob = ((double) (pp->ngroup.els[k]-pp->nright.els[k]))/
+          ((double)(n-i-1));
         if (prob > 0)
           dev -= prob*log(prob)*((gdouble)(n-i-1)/(gdouble)n);
       }

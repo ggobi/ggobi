@@ -755,13 +755,8 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   ggobid *gg)
 {
   datad *d = dsp->d;
-  gint kout, nrows = d->nrows_in_plot, ncols=d->ncols;
+  gint kout, nrows = d->nrows_in_plot;
   /*  subd_param sp; */
-  discriminant_param dp;
-  cartgini_param cgp;
-  cartentropy_param cep;
-  cartvariance_param cvp;
-  holes_param hp;
   gfloat *gdata;
   gint i, j;
 
@@ -804,58 +799,65 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   { 
     case HOLES: 
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        holes_raw, NULL);
+        holes_raw, &dsp->t1d_pp_param);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, holes_raw, &hp);
+        kout = optimize0 (&dsp->t1d_pp_op, holes_raw, &dsp->t1d_pp_param);
       break;
     case CENTRAL_MASS: 
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        central_mass_raw, NULL);
+        central_mass_raw, &dsp->t1d_pp_param);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, central_mass_raw, &hp);
+        kout = optimize0 (&dsp->t1d_pp_op, central_mass_raw, 
+          &dsp->t1d_pp_param);
       break;
     case PCA: 
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
         pca, NULL);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, pca, &cvp);
+        kout = optimize0 (&dsp->t1d_pp_op, pca, NULL);
       break;
     case LDA:
-      alloc_discriminant_p (&dp, /* gdata, */
-			    nrows, ncols); /*pdim);*/
+      /*      alloc_discriminant_p (&dp, 
+			    nrows, ncols);
       if (!compute_groups (dp.group, dp.ngroup, &dp.groups, nrows, 
+      gdata)) {*/
+      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, &dsp->t1d_pp_param.numgroups, nrows, 
 			   gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
           /* d->rows_in_plot, d->nrows, d->ncols, */
-          discriminant, &dp);
+          discriminant, &dsp->t1d_pp_param);
         if (basismeth == 1)
-          kout = optimize0 (&dsp->t1d_pp_op, discriminant, &dp);
+          kout = optimize0 (&dsp->t1d_pp_op, discriminant, &dsp->t1d_pp_param);
       }
-      free_discriminant_p (&dp);
+      /*      free_discriminant_p (&dp);*/
       break;
     case CGINI: 
-      alloc_cartgini_p (&cgp, nrows);
-      /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
+      /*      alloc_cartgini_p (&cgp, nrows);
+            dsp->t1d.ppval = t1d_calc_indx (d->tform, 
         dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols,
-        cartgini, &cgp);*/
+        cartgini, &cgp);
       if (!compute_groups (cgp.group, cgp.ngroup, &cgp.groups, nrows, 
+			   gdata)) {*/
+      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, &dsp->t1d_pp_param.numgroups, nrows, 
 			   gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-          cartgini, &cgp);
+          cartgini, &dsp->t1d_pp_param);
         if (basismeth == 1)
-          kout = optimize0 (&dsp->t1d_pp_op, cartgini, &cgp);
-        free_cartgini_p (&cgp); 
+          kout = optimize0 (&dsp->t1d_pp_op, cartgini, &dsp->t1d_pp_param);
+	/*        free_cartgini_p (&cgp); */
       }
       break;
    case CENTROPY: 
-      alloc_cartentropy_p (&cep, nrows);
+     /*      alloc_cartentropy_p (&cep, nrows);
       if (!compute_groups (cep.group, cep.ngroup, &cep.groups, nrows, 
+      gdata)) {*/
+      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, &dsp->t1d_pp_param.numgroups, nrows, 
 			   gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata,
-        cartentropy, &cep);
+          cartentropy, &dsp->t1d_pp_param);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &cep);
-      free_cartentropy_p (&cep);
+        kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &dsp->t1d_pp_param);
+      /*      free_cartentropy_p (&cep);*/
       }
       break;
       /*    case CART_VAR: 

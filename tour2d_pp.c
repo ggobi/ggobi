@@ -669,11 +669,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   ggobid *gg)
 {
   datad *d = dsp->d;
-  holes_param hp;
-  discriminant_param dp;
-  cartgini_param cgp;
-  cartentropy_param cep;
-  gint kout, nrows = d->nrows_in_plot, ncols=d->ncols;
+  gint kout, nrows = d->nrows_in_plot;
   gfloat *gdata;
   gint i, j, k;
   /* gint pdim = 2; */
@@ -723,58 +719,63 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   switch (indxtype)
   { 
     case HOLES: 
-      alloc_holes_p (&hp, nrows);
+      /*      alloc_holes_p (&hp, nrows);*/
       /*      dsp->t2d.ppval = t2d_calc_indx (d->tform, 
 	      dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, holes_raw1, &hp);*/
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata, 
-        holes_raw, &hp);
+        holes_raw, &dsp->t2d_pp_param);
       if (basismeth == 1) {
-        kout = optimize0 (&dsp->t2d_pp_op, holes_raw, &hp);
+        kout = optimize0 (&dsp->t2d_pp_op, holes_raw, &dsp->t2d_pp_param);
       }
-      free_holes_p(&hp);
+      /*      free_holes_p(&hp);*/
     break;
     case CENTRAL_MASS: 
-      alloc_holes_p (&hp, nrows);
-      /*      dsp->t2d.ppval = t2d_calc_indx (d->tform, 
-	      dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, central_mass_raw1, &hp);*/
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-        central_mass_raw, &hp);
+        central_mass_raw, &dsp->t2d_pp_param);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t2d_pp_op, central_mass_raw, &hp);
-      free_holes_p(&hp);
+        kout = optimize0 (&dsp->t2d_pp_op, central_mass_raw, 
+          &dsp->t2d_pp_param);
     break;
     case LDA: 
-      alloc_discriminant_p (&dp, nrows, ncols); 
+      /*      alloc_discriminant_p (&dp, nrows, ncols); 
       if (!compute_groups (dp.group, dp.ngroup, &dp.groups, nrows, 
-			   gdata)) {
+      gdata)) {*/
+      if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
+        &dsp->t2d_pp_param.numgroups, nrows, gdata)) {
         dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-          discriminant, &dp);
+          discriminant, &dsp->t2d_pp_param);
         if (basismeth == 1)
-          kout = optimize0 (&dsp->t2d_pp_op, discriminant, &dp);
+          kout = optimize0 (&dsp->t2d_pp_op, discriminant, &dsp->t2d_pp_param);
       }
-      free_discriminant_p (&dp);
+      /*      free_discriminant_p (&dp);*/
       break;
     case CGINI: 
-      alloc_cartgini_p (&cgp, nrows); 
+      /*      alloc_cartgini_p (&cgp, nrows); 
       if (!compute_groups (cgp.group, cgp.ngroup, &cgp.groups, nrows, 
+      gdata)) {*/
+      if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
+        &dsp->t2d_pp_param.numgroups, nrows, 
 			   gdata)) {
         dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-          cartgini, &cgp);
+          cartgini, &dsp->t2d_pp_param);
         if (basismeth == 1)
-          kout = optimize0 (&dsp->t2d_pp_op, cartgini, &cgp);
+          kout = optimize0 (&dsp->t2d_pp_op, cartgini, &dsp->t2d_pp_param);
       }
-      free_cartgini_p (&cgp);
+      /*      free_cartgini_p (&cgp);*/
       break;
     case CENTROPY: 
-      alloc_cartentropy_p (&cep, nrows);
+      /*      alloc_cartentropy_p (&cep, nrows);
       if (!compute_groups (cep.group, cep.ngroup, &cep.groups, nrows, 
+      gdata)) {*/
+      if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
+        &dsp->t2d_pp_param.numgroups, nrows, 
 			   gdata)) {
         dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-          cartentropy, &cep);
+          cartentropy, &dsp->t2d_pp_param);
         if (basismeth == 1)
-          kout = optimize0 (&dsp->t2d_pp_op, cartentropy, &cep);
+          kout = optimize0 (&dsp->t2d_pp_op, cartentropy, &dsp->t2d_pp_param);
       }
-      free_cartentropy_p (&cep);
+      /*      free_cartentropy_p (&cep);*/
       break;
     break;
     default: 

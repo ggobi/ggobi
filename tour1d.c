@@ -289,6 +289,8 @@ tour1d_all_vars_cb (GtkCheckMenuItem *w, guint action)
       free_optimize0_p(&dsp->t1d_pp_op);
       alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
         1);
+      free_pp(&dsp->t1d_pp_param);
+      alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
       t1d_pp_reinit(dsp, gg);
     }  
   }
@@ -431,16 +433,12 @@ tour1d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     free_optimize0_p(&dsp->t1d_pp_op);
     alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
       1);
+    free_pp(&dsp->t1d_pp_param);
+    alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
     t1d_pp_reinit(dsp, gg);
   }  
   dsp->t1d.get_new_target = true;
 
-  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
-    free_optimize0_p(&dsp->t1d_pp_op);
-    alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive,
-      1);
-    t1d_pp_reinit(dsp, gg);
-  }
 }
 
 static void
@@ -476,6 +474,8 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobi
         free_optimize0_p(&dsp->t1d_pp_op);
         alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
           1);
+        free_pp(&dsp->t1d_pp_param);
+        alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
         t1d_pp_reinit(dsp, gg);
       }
     }
@@ -493,6 +493,8 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobi
         free_optimize0_p(&dsp->t1d_pp_op);
         alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
           1);
+        free_pp(&dsp->t1d_pp_param);
+        alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
         t1d_pp_reinit(dsp, gg);
       }
     }
@@ -608,7 +610,8 @@ tour1d_run(displayd *dsp, ggobid *gg)
       dsp->t1d.F, dsp->t1d.Va, d->ncols, (gint) 1);
 
     /* plot pp indx */
-    if (dsp->t1d_ppda != NULL) {
+    if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+      /*    if (dsp->t1d_ppda != NULL) {*/
 
       dsp->t1d.oppval = dsp->t1d.ppval;
       revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
@@ -969,7 +972,8 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     }
  
     /* plot pp index */
-    if (dsp->t1d_ppda != NULL) {
+    /*    if (dsp->t1d_ppda != NULL) {*/
+    if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
       dsp->t1d.oppval = dsp->t1d.ppval;
       pp_problem = t1d_switch_index(cpanel->t1d.pp_indx, 
         0, dsp, gg);
