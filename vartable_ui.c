@@ -443,7 +443,6 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
     gint indx;
     GtkWidget *swin;
     GtkAdjustment *adj;
-    void newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg);
     newvar_add (vtype, vname, d, gg);
 
     /*-- scroll to the bottom to highlight the new variable --*/
