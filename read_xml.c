@@ -566,7 +566,6 @@ setEdgePartners (XMLParserData *parserData)
       etmp[i].jpartner = i;
     }
     qsort ((gchar *) etmp, d->edge.n, sizeof (endpointsd), edgesumcompare);
-/*g_printerr ("sorted\n");*/
 
     sum = 0;
     for (i=0; i<d->edge.n-1; i++) {
@@ -1842,8 +1841,14 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState t
     sprintf(name, "data%d", (gint) g_slist_length(parserData->gg->d));
   } else
     name = g_strdup(tmp);
-
   data->name = name;
+
+  tmp = getAttribute(attrs, "nickname");
+  if (tmp != NULL) {
+    data->nickname = g_strdup(tmp);
+    /*-- if word is shorter than 5 characters, g_strndup pads with nulls --*/
+  } else data->nickname = g_strndup (data->name, 5);
+
   parserData->current_data = data;
 
   parserData->edge_sources = parserData->edge_dests = NULL;

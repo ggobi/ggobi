@@ -3,7 +3,7 @@
 
 <ggobidata count="4">
 
-<data name="Algal Bloom: Exp Conditions">
+<data name="Algal Bloom: Exp Conditions" nickname="ExpCond">
 <description>
 Data from
   Box, Hunter and Hunter
@@ -14,14 +14,14 @@ Data from
 "This investigation was concerned with the study of the growth of algal
 blooms and the effects of phosphorus, nitrogen, and carbon on algae
 growth.  A 2^3 factorial experiment was performed, using laboratory
-batch cultures of blue-gree Microcystis aeruginosa.  Carbon (as bi-
+batch cultures of blue-green Microcystis aeruginosa.  Carbon (as bi-
 carbonate), phosphorus (as phosphate), and nitrogen (as nitrate) were
 the variable factors.  The response was algal population, measured
 spectrophotometrically."
 
 The responses are measured in some absorbance units.
 
-(Source: R. W. Mann, "Significane of Phosphorus, Nitrogen and
+(Source: R. W. Mann, "Significance of Phosphorus, Nitrogen and
 Carbon as Regulators of the Growth of the Alga Microcystis aeruginosa,"
 Master's Thesis, Department of Civil Engineering, Tufts University,
 Medford, Mass., June 1971.)
@@ -74,7 +74,7 @@ Medford, Mass., June 1971.)
 </records>
 </data>
 
-<data name="Measurements">
+<data name="Measurements" nickname="Measmnts">
 <description>
 </description>
 <variables count="6">
@@ -179,7 +179,7 @@ Medford, Mass., June 1971.)
 </records>
 </data>
 
-<data name="Lines for Exp Cond">
+<data name="Lines for Exp Cond" nickname="ExpCondL">
 <records count="12">
  <record source="101" destination="102"> </record>
  <record source="101" destination="103"> </record>
@@ -196,7 +196,7 @@ Medford, Mass., June 1971.)
 </records>
 </data>
 
-<data name="Lines for Meas">
+<data name="Lines for Meas" nickname="MsmntsL">
 <records count="92">
  <record source="1" destination="9"> </record>
  <record source="1" destination="17"> </record>

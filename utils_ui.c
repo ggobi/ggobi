@@ -334,8 +334,13 @@ variable_notebook_subwindow_add (datad *d, GtkSignalFunc func,
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
   gtk_object_set_data(GTK_OBJECT(swin), "datad", d);  /*setdata*/
+/*
+ * name or nickname?  Which one we'd prefer to use depends on the
+ * size of the space we're working in -- maybe this will become an
+ * argument.
+*/
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-    swin, gtk_label_new (d->name));
+    swin, gtk_label_new (d->nickname)); 
 
   /* add the CList */
   clist = gtk_clist_new (1);

@@ -63,6 +63,7 @@ struct _datad {
      can be indexed in the list of data elements within the ggobid structure.
    */
   const gchar *name;
+  const gchar *nickname;
   InputDescription *input;
 
   struct _ggobid *gg; /*-- a pointer to the parent --*/

@@ -145,7 +145,6 @@
 <!ATTLIST record
    label     CDATA                     #IMPLIED
    id        CDATA                     #IMPLIED
-   nodename  CDATA                     #IMPLIED
    color     CDATA                     #IMPLIED
    glyph     CDATA                     #IMPLIED
    glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
@@ -166,6 +165,7 @@
 
 <!ATTLIST data
    name         CDATA #IMPLIED
+   nickname     NMTOKEN #IMPLIED
    count        CDATA #IMPLIED
    missingValue CDATA #IMPLIED
    color        CDATA #IMPLIED

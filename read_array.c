@@ -396,6 +396,7 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
       if ((fp = fopen (desc->fileName, "rb")) != NULL) {
         read_binary (fp, d, gg);
         d->name = g_strdup(fname);
+        d->nickname = g_strndup (d->name, 5);
       } else
         return(false);
     }  else {
@@ -420,6 +421,7 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
              information stripped out --*/
         d->name = (name != NULL && strlen(name)) > 0 ?
           g_strdup (name) : g_strdup(gg->input->baseName);
+        d->nickname = g_strndup (d->name, 5);
 
         g_strfreev (words);
       }

@@ -3,7 +3,7 @@
 
 <ggobidata count="2">
 
-<data name="Attributes">
+<data name="Attributes" nickname="Attrib">
 <description>
 This is a subset of the "EIES data" found here:
   http://www.heinz.cmu.edu/project/INSNA/data_inf.html
@@ -149,7 +149,7 @@ and b's relationship to a.
 
 </data>
 
-<data name="Acquaintanceship at T1">
+<data name="Acquaintanceship at T1" nickname="Acq">
 <description>
 </description>
 <variables count="2">
