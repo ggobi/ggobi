@@ -2,7 +2,7 @@ AC_INIT(R.c)
 
 
 if test -z "$R_HOME" ; then
- AC_PATH_PROG(R_HOME, R)
+ AC_PATH_PROG(R, R)
  R_HOME=`${R} RHOME`
 fi
 
