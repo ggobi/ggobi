@@ -273,14 +273,14 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 
   /*-- checkbox: automatically update the center node when
     responding to identify events --*/
-  btn = gtk_check_button_new_with_label("Automatically update layout when center node changes");  
+  btn = gtk_check_button_new_with_label("Automatically update layout when center node is reset");  
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
     GTK_SIGNAL_FUNC (radial_auto_update_cb), (gpointer) inst);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
     gl->radialAutoUpdate);
   gtk_widget_set_name (btn, "RADIAL:autoupdate");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Automatically update the layout when a new sticky label is assigned, or wait until the apply button is pressed", 
+    "Automatically update the layout when a new sticky label is assigned in Identify mode, or wait until the apply button is pressed", 
     NULL);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
