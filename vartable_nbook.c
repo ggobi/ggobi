@@ -10,6 +10,9 @@
 */
 /* interface code for the variable statistics table: notebook only */
 
+#include <string.h>
+#include <stdlib.h>
+
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
