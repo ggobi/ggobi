@@ -410,8 +410,8 @@ gboolean sphere_svd (datad *d, ggobid *gg)
 {
   gint i, j, k, rank;
   gint nels = d->sphere.vars.nels;
-  /*  gfloat **eigenvec = d->sphere.eigenvec.vals;*/
-  gfloat **eigenvec = d->sphere.vc.vals;
+  gfloat **eigenvec = d->sphere.eigenvec.vals;
+  /*  gfloat **eigenvec = d->sphere.vc.vals;*/
   gfloat *eigenval = d->sphere.eigenval.els;
 
   gboolean vc_equals_I = vc_identity_p (eigenvec, nels);
@@ -450,8 +450,9 @@ gboolean sphere_svd (datad *d, ggobid *gg)
   /*-- copy the sorted eigenvalues and eigenvectors back --*/
   for (i=0; i<nels; i++) {
     eigenval[i] = e[i];
-    for (j=0; j<nels; j++)
+    for (j=0; j<nels; j++) {
       eigenvec[j][i] = b[j][i];
+    }
   }
 
   /*-- free temporary variables --*/
