@@ -306,13 +306,17 @@ nclusters_changed (ggobid *gg)
     nrows = 0;
     page = gtk_notebook_get_nth_page (GTK_NOTEBOOK (gg->cluster_ui.notebook),
                                       k);
-    d = (datad *) gtk_object_get_data (GTK_OBJECT (page), "datad");
-    nrows = GTK_TABLE (d->cluster_table)->nrows;
+    if (page) {
+      d = (datad *) gtk_object_get_data (GTK_OBJECT (page), "datad");
+      nrows = GTK_TABLE (d->cluster_table)->nrows;
 
-    if (nrows != d->nclusters+1) {  /*-- add one for the titles --*/
+      if (nrows != d->nclusters+1) {  /*-- add one for the titles --*/
+        changed = true;
+      }
+    } else {  /*-- if page is NULL, a new datad has been added --*/
       changed = true;
-      break;
     }
+    if (changed) break;
   }
   return changed;
 }
@@ -330,6 +334,12 @@ cluster_table_update (datad *d, ggobid *gg)
       cluster_table_labels_update (d, gg);  /*-- d, or all d's? --*//* do all */
     }
   }
+}
+
+static void exclusion_notebook_adddata_cb (GtkObject *obj, datad *d,
+  ggobid *gg, GtkWidget *notebook)
+{
+  cluster_table_update (d, gg);
 }
 
 void
@@ -457,6 +467,11 @@ cluster_window_open (ggobid *gg) {
     for (k=0; k<d->nclusters; k++)
       cluster_add (k, d, gg);
   }
+
+  /*-- listen for variable_added events on main_window --*/
+  gtk_signal_connect (GTK_OBJECT (gg->main_window),
+    "datad_added", GTK_SIGNAL_FUNC (exclusion_notebook_adddata_cb),
+     GTK_OBJECT (gg->cluster_ui.notebook));
 
   /*-- give the window an initial height --*/
   gtk_widget_set_usize (GTK_WIDGET (scrolled_window), -1, 150);
