@@ -64,8 +64,8 @@ pure: ggobi.o $(OB)
 	${CC} `gtk-config --cflags` -o ggobi $(OB) `gtk-config --libs`
 
 
-libXGobi.so: $(OB)
-	$(CC) $(SHARED_LD_FLAGS) -o $@ $(OBJ) `gtk-config --libs`
+libGGobi.so: $(OB)
+	$(CC) $(SHARED_LD_FLAGS) -o $@ $(OB) `gtk-config --libs`
 
 clean: 
 	rm -f *.o ggobi

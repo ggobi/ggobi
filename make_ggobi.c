@@ -1,4 +1,5 @@
 #include <math.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,6 +20,26 @@ void globals_init () {
 void modes_init () {
   brush_init ();
 }
+
+gboolean
+fileset_read_init(gchar *data_in)
+{
+ gboolean ans = fileset_read(data_in);
+  if(ans) {
+        displayd *display;
+
+        pipeline_init ();
+
+        /*-- initialize the first display --*/
+        display = scatterplot_new (false);
+        displays = g_list_append (displays, (gpointer) display);
+        display_set_current (display);
+        current_splot = (splotd *) g_list_nth_data (current_display->splots, 0);
+  }
+
+ return(ans);
+} 
+
 
 gboolean
 fileset_read (gchar *data_in)
@@ -78,7 +99,7 @@ pipeline_init ()
 }
 
 void
-make_ggobi (gchar *data_in) {
+make_ggobi (gchar *data_in, gboolean processEvents) {
   displayd *display;
 g_printerr ("(make_ggobi) data_in = %s\n", data_in);
 
@@ -102,6 +123,7 @@ g_printerr ("(make_ggobi) data_in = %s\n", data_in);
     }
   }
 
+ if(processEvents)
   gtk_main ();
 }
 

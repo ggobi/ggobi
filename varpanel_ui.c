@@ -556,6 +556,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
 {
   gint k = GPOINTER_TO_INT (cbd);
   varcircle_draw (k); 
+
   return true;
 }
 

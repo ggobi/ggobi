@@ -1,0 +1,67 @@
+Since GGobi allows you to create multiple different
+plots, windows, etc.,  there is now a need to be able
+to identify 
+a) which plots belong to which Ggobi,
+b) to be able to make an individual plot
+  current.
+
+Issue a) arises when one has multiple Ggobis running
+simultaneously. The Windows world solves this by having the windows be
+contained within a super-application window; e.g. the documents within
+a Word application are all bounded within the Word window, but each
+has its own separate frame/internal window.
+
+The latter (b) can of course be done by clicking on it, but this can
+be frustrating, as casual pointer activity can lead to undesired
+changes in the global selection.  Basically, the modal approach can be
+confusing if unaccompanied by some visual cue in a standard location
+(e.g. on the control panel, menu item, etc.)
+
+How about having a tree like the file managers, Linux and Windows
+control-panel, etc.
+
+ ash
+ scatterplot
+ scattermatrix
+    |- Y v W
+    |- X v Y
+    |- X v Z
+ ash
+
+The active plot would be highlighted, colored differently, etc.
+
+This has the advantage of then allowing operations to work over groups
+of plots.  For example, one might close all selected ones; or print
+them; save them to a file; etc.
+
+An alternative view is the little miniature virtual window manager as
+in fvwm which allows one to manipulate the virtual desktops and move
+windows between them, etc.
+
+
+The code in display_tree.c arranges to create a window with the
+hierarchical representation of the then open displayd objects being
+managed by ggobi in its `displays' list. 
+
+
+As the `displays' list is modified by users creating new windows and
+destroying/closing existing ones, the tree is automatically updated
+appropriately.  This is effected in the display_free() and
+display_new().
+
+
+Different operations can be added to this window.
+Actions operating on particular sub-plots and displays
+can be be specified using this interface.
+These actions include:
+ closing windows,
+ removing plots,
+ printing plots, 
+ saving plots. 
+ 
+The tree must support multiple selections in this case. However, when
+specifying the current/active component, this must result in a single
+selection.  Accordingly, we can either allow the tree be set to
+different selection mode, perhaps via a menu. Or alternatively,
+operate on all the selected items, and make the first or last that
+actual current object.

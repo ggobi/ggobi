@@ -159,19 +159,19 @@ parse_command_line (gint *argc, gchar **av)
   return 1;
 }
 
-gint XGOBI(main)(gint argc, gchar *argv[]);
+gint XGOBI(main)(gint argc, gchar *argv[], gboolean processEvents);
 
 gint main (gint argc, gchar *argv[])
 { 
- return (XGOBI(main)(argc, argv));
+ return (XGOBI(main)(argc, argv, true));
 }
 
   /* Available so that we can call this from R
      without any confusion between which main().
    */
-gint XGOBI (main)(gint argc, gchar *argv[])
+gint XGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
 {
-  extern void make_ggobi (gchar *);
+  extern void make_ggobi (gchar *, gboolean);
   GdkVisual *vis;
 
   gtk_init (&argc, &argv);
@@ -182,6 +182,7 @@ gint XGOBI (main)(gint argc, gchar *argv[])
             vis->type == GDK_VISUAL_STATIC_GRAY ||
             vis->type == GDK_VISUAL_GRAYSCALE);
 
+  
   g_print ("progname = %s\n", g_get_prgname());
 
   xg.std_type = 0;
@@ -192,7 +193,7 @@ gint XGOBI (main)(gint argc, gchar *argv[])
   parse_command_line (&argc, argv);
   g_print ("data_in = %s\n", data_in);
 
-  make_ggobi (data_in);
+  make_ggobi (data_in, processEvents);
 
   g_free (data_in);
   return (0);

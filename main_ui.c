@@ -390,7 +390,7 @@ mode_set_cb (gpointer cbd, guint action, GtkWidget *widget)
 
 /*-- these will be moved to another file eventually, I'm sure --*/
 
-extern gboolean fileset_read (gchar *);
+extern gboolean fileset_read_init (gchar *);
 void
 filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 {
@@ -401,17 +401,7 @@ g_printerr ("fname=%s, action=%d\n", fname, action);
 
   switch (action) {
     case 0:  /*-- input: read a new set of files --*/
-      if (fileset_read (fname)) {
-        displayd *display;
-
-        pipeline_init ();
-
-        /*-- initialize the first display --*/
-        display = scatterplot_new (false);
-        displays = g_list_append (displays, (gpointer) display);
-        display_set_current (display);
-        current_splot = (splotd *) g_list_nth_data (current_display->splots, 0);
-      }
+      if (fileset_read_init(fname)) 
       break;
     case 1:  /*-- output: extend the current file set --*/
       break;
