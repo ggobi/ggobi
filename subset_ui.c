@@ -29,9 +29,16 @@ delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data)
 }
 
 static void
-rescalep_cb (GtkToggleButton *button, ggobid *gg)
+rescale_cb (GtkButton *button, ggobid *gg)
 {
-  gg->subset_ui.rescale_p = button->active;
+  datad *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+
+  limits_set (true, true, d, gg);
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+
+  tform_to_world (d, gg);
+  displays_tailpipe (REDISPLAY_ALL, gg);
 }
 
 static void
@@ -86,7 +93,7 @@ subset_cb (GtkWidget *w, ggobid *gg)
   }
 
   if (redraw)
-    subset_apply (gg->subset_ui.rescale_p, d, gg);
+    subset_apply (d, gg);
 }
 
 static void
@@ -103,7 +110,7 @@ include_all_cb (GtkWidget *w, ggobid *gg) {
 
   if (d != NULL) {
     subset_include_all (d, gg);
-    subset_apply (gg->subset_ui.rescale_p, d, gg);
+    subset_apply (d, gg);
   }
 }
 
@@ -412,11 +419,11 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
                           (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
 
-      button = gtk_check_button_new_with_label ("Rescale");
+      button = gtk_button_new_with_label ("Rescale");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
-                            "Rescale the data when drawing a new subset", NULL);
-      gtk_signal_connect (GTK_OBJECT (button), "toggled",
-                          GTK_SIGNAL_FUNC (rescalep_cb), (gpointer) gg);
+        "Rescale the data after choosing a new subset", NULL);
+      gtk_signal_connect (GTK_OBJECT (button), "clicked",
+                          GTK_SIGNAL_FUNC (rescale_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
     
       button = gtk_button_new_with_label ("Include all");

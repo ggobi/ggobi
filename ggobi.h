@@ -127,6 +127,8 @@ struct _ggobid {
    GtkWidget *window;
    GtkWidget *notebook;
  } vartable_ui;
+ gboolean lims_use_visible;
+
 
 /*----------------------- missing values ---------------------------*/
 
@@ -134,10 +136,10 @@ struct _ggobid {
 
 /*--------------- clusters: hiding, excluding ----------------------*/
 
- struct _ExclusionUI {
+ struct _ClusterUI {
    GtkWidget *window;
    GtkWidget *notebook;
- } exclusion_ui;
+ } cluster_ui;
  
 /*----------------------- row grouping -----------------------------*/
 
@@ -323,7 +325,6 @@ struct _ggobid {
 /*-------------------- subsetting ------------------------------------*/
 
  struct _SubsetUI {
-   gboolean rescale_p;
    GtkWidget *window;
    GtkWidget *notebook;
    /*-- entry widgets from which to get values for sample, rowlab --*/
@@ -349,7 +350,7 @@ struct _ggobid {
 /*-------------------- imputation ------------------------------------*/
 
  struct _Impute {
-   gboolean rescale_p, bgroup_p;
+   gboolean bgroup_p;
    gint whichvars;
    GtkWidget *window;
    GtkWidget *notebook;

@@ -30,11 +30,23 @@ static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   datad *d = gg->current_display->d;
+  splotd *sp = gg->current_splot;
 
   if (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDL)
-    point_brush_undo (gg->current_splot, d, gg);
+    point_brush_undo (sp, d, gg);
   if (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL)
-    line_brush_undo (gg->current_splot, d, gg);
+    line_brush_undo (sp, d, gg);
+
+  /*-- when rows_in_plot changes ... --*/
+  rows_in_plot_set (d, gg);
+  assign_points_to_bins (d, gg);
+  clusters_set (d, gg);
+  /*-- --*/
+
+  if (gg->cluster_ui.window != NULL)
+    cluster_table_update (d, gg);
+
+  displays_plot (NULL, FULL, gg);
 }
 
 void
@@ -82,9 +94,9 @@ static void open_symbol_window_cb (GtkWidget *w, ggobid *gg)
   make_symbol_window (gg);
 }
 
-static void exclusion_window_cb (GtkToggleButton *button, ggobid *gg)
+static void cluster_window_cb (GtkToggleButton *button, ggobid *gg)
 {
-  exclusion_window_open (gg);
+  cluster_window_open (gg);
 }
 
 
@@ -239,6 +251,10 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+  displayd *display = (displayd *) sp->displayptr;
+  ggobid *gg = GGobiFromSPlot(sp);
+  cpaneld *cpanel = &display->cpanel;
+  datad *d = display->d;
   gboolean retval = true;
 
   sp->mousepos.x = (gint) event->x;
@@ -246,19 +262,17 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
-  /*
-   * We're redrawing everything on button release; we have no
-   * way of knowing at this point whether things changed or
-   * not, since that information is not accumulated.
-  if (gg->brush_on) {
-    if (gg->jump_brush || gg->is_line_painting) {
-      plot_once(gg);
-    }
+  if (cpanel->br_mode == BR_PERSISTENT) {
+    rows_in_plot_set (d, gg);
+    assign_points_to_bins (d, gg);
+    /*-- reset the number and properties of the brush groups --*/
+    clusters_set (d, gg);
+    cluster_table_update (d, gg);
   }
-  */
 
   return retval;
 }
+
 
 /*--------------------------------------------------------------------*/
 /*                   Resetting the main menubar                       */
@@ -483,15 +497,15 @@ cpanel_brush_make (ggobid *gg) {
                       btn, false, false, 1);
 
 /*
- * button for opening hide/exclude panel
+ * button for opening clusters table
 */
-  btn = gtk_button_new_with_label ("Hide or exclude ...");
+  btn = gtk_button_new_with_label ("Clusters ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
                         btn,
                         "Open panel for hiding or excluding brushed groups",
                         NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (exclusion_window_cb),
+                      GTK_SIGNAL_FUNC (cluster_window_cb),
                       (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
                       btn, false, false, 1);

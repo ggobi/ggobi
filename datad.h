@@ -53,7 +53,7 @@ class datad {
 
  struct _ggobid *gg;  /*-- a pointer to the parent --*/
 
- gint nrows;
+ guint nrows;
  GArray *rowlab;  /*-- allocates memory in chunks --*/
 
  /*-- row ids to support generalized linking --*/
@@ -93,11 +93,13 @@ class datad {
 
  /*--------------- clusters: hiding, excluding ----------------------*/
 
- GtkWidget *exclusion_table;
- vector_b included;
+ symbol_cell symbol_table[NGLYPHSIZES][NGLYPHTYPES][NCOLORS];
+
+ GtkWidget *cluster_table;  /*-- table of symbol groups from brushing --*/
  
  gint nclusters;
  clusterd *clusv;
+ clusteruid *clusvui;
  vector_i clusterid;
 
  /*----------------------- row grouping -----------------------------*/

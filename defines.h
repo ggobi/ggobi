@@ -91,18 +91,6 @@ extern const gint ViewTypeIndeces[3];
 #define ASH     1
 #define DOTPLOT 2
 
-#define NGLYPHTYPES 7
-#define NGLYPHSIZES 8
-#define NGLYPHS ((NGLYPHTYPES-1)*NGLYPHSIZES + 1)
-
-#define PLUS_GLYPH       1
-#define X_GLYPH          2
-#define OPEN_RECTANGLE   3
-#define FILLED_RECTANGLE 4
-#define OPEN_CIRCLE      5
-#define FILLED_CIRCLE    6
-#define POINT_GLYPH      7
-
 #define FORWARD  1
 #define BACKWARD -1
 
@@ -125,38 +113,11 @@ extern const gint ViewTypeIndeces[3];
 #define RO_INTERP 2
 /* */
 
-/*
- * brushing
-*/
-/* br_scope */
-#define BR_POINTS 0
-#define BR_LINES  1
-#define BR_PANDL  2  /* points and lines */
-/* br_mode */
-#define BR_PERSISTENT 0
-#define BR_TRANSIENT  1
-/* br_target */
-#define BR_CANDG 0  /* color and glyph */
-#define BR_COLOR 1
-#define BR_GLYPH 2  /*-- glyph type and size --*/
-#define BR_GSIZE 3  /*-- glyph size only --*/
-#define BR_HIDE  4
-/* for binning the screen */
-#define BRUSH_NBINS  20
-#define BRUSH_MARGIN 10
-#define BINBLOCKSIZE 50
-/* */
 
 #define MAXNCOLS 500
 
 #define COLLABLEN 25
 #define ROWLABLEN 50
-
-
-#define OPEN 0
-#define FILL 1
-
-#define NCOLORS 10
 
 /*
  * EXP1: Raw data are scaled to -2^EXP1, +2^EXP1

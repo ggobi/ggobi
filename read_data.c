@@ -366,7 +366,6 @@ rgroups_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
       nels[i] = d->nrows/10;
       d->rgroups[i].els = (gint *) g_malloc (nels[i] * sizeof (gint));
       d->rgroups[i].nels = 0;
-      d->rgroups[i].included = true;
     }
     d->nrgroups = 0;
   

@@ -83,6 +83,12 @@ dialog_range_cancel (GtkWidget *w, ggobid *gg)
 }
 
 static void
+limits_type_cb (GtkToggleButton *w, ggobid *gg) 
+{
+  gg->lims_use_visible = w->active;
+}
+
+static void
 dialog_range_set (GtkWidget *w, ggobid *gg) 
 {
   GtkWidget *dialog = gtk_widget_get_toplevel (w);
@@ -100,12 +106,12 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   if (umin_entry == NULL || !GTK_IS_ENTRY(umin_entry)) {
     g_printerr ("found the wrong widget; bail out\n");
     return;
-  } else g_printerr ("found the umin entry widget\n");
+  }
   umax_entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "umax_entry");
   if (umax_entry == NULL || !GTK_IS_ENTRY(umax_entry)) {
     g_printerr ("found the wrong widget; bail out\n");
     return;
-  } else g_printerr ("found the umax entry widget\n");
+  }
 
   /*-- minimum --*/
   val_str = gtk_editable_get_chars (GTK_EDITABLE (umin_entry),
@@ -150,7 +156,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
      * the first function could be needed if transformation has been
      * going on, because lim_tform could be out of step.
     */
-    limits_set (false, false, d);  
+    limits_set (false, false, d, gg);  
     vartable_limits_set (d);
     vartable_stats_set (d);
 
@@ -168,6 +174,18 @@ range_unset_cb (GtkWidget *w, ggobid *gg)
   range_unset (gg);
 }
 
+static void rescale_cb (GtkWidget *w, ggobid *gg) {
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+
+  limits_set (true, true, d, gg);  
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+
+  tform_to_world (d, gg);
+  displays_tailpipe (REDISPLAY_ALL, gg);  /*-- points rebinned in here --*/
+}
+
+
 /*
  * open a dialog with two text entry widgets in it,
  * and fetch the range for the selected variables in
@@ -178,6 +196,8 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *frame, *vb, *hb, *btn, *okay_btn, *cancel_btn;
   GtkWidget *dialog, *umin, *umax;
+  GtkWidget *radio1, *radio2;
+  GSList *group;
   gint k;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
@@ -199,21 +219,48 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   if (!ok)
 /**/return;
 
-
   dialog = gtk_dialog_new ();
 
-  /*-- frame for setting the range --*/
-  frame = gtk_frame_new ("Set range");
+  /*-- frame for a pair of radio buttons --*/
+  frame = gtk_frame_new ("Define rescaling behavior");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), frame);
 
   vb = gtk_vbox_new (true, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
+  gtk_container_add (GTK_CONTAINER (frame), vb);
+
+  radio1 = gtk_radio_button_new_with_label (NULL, "Use visible points");
+  GTK_TOGGLE_BUTTON (radio1)->active = TRUE;
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
+    "When rescaling, use only the cases that are visible: ie, not hidden by brushing and not excluded by subsampling",
+    NULL);
+  gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
+                      GTK_SIGNAL_FUNC (limits_type_cb), gg);
+  gtk_box_pack_start (GTK_BOX (vb), radio1, false, false, 0);
+
+  group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
+  radio2 = gtk_radio_button_new_with_label (group, "Use all points");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
+    "When rescaling, use all cases",
+    NULL);
+  gtk_box_pack_start (GTK_BOX (vb), radio2, TRUE, TRUE, 0);
+  /*-- --*/
+
+
+  /*-- frame for setting the user-specified limits --*/
+  frame = gtk_frame_new ("Override default limits");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), frame);
+
+  vb = gtk_vbox_new (true, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 
   /*-- make an hbox to hold a label and a text entry widget --*/
   hb = gtk_hbox_new (true, 5);
   gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Minimum: "),
-    true, true, 2);
+    true, true, 0);
 
   umin = gtk_entry_new ();
   gtk_widget_set_usize (umin,
@@ -221,7 +268,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
                         "0000000000"), -1);
   gtk_widget_set_name (umin, "umin_entry");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), umin,
-    "Range minimum for the selected variable(s)", NULL);
+    "Minimum for the selected variable(s)", NULL);
   gtk_box_pack_start (GTK_BOX (hb), umin, true, true, 2);
 
   gtk_container_add (GTK_CONTAINER (vb), hb);
@@ -237,19 +284,21 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
                         "0000000000"), -1);
   gtk_widget_set_name (umax, "umax_entry");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), umax,
-    "Range minimum for the selected variable(s)", NULL);
+    "Maximum for the selected variable(s)", NULL);
   gtk_box_pack_start (GTK_BOX (hb), umax, true, true, 2);
 
   gtk_container_add (GTK_CONTAINER (vb), hb);
   /*-- --*/
 
   /*-- frame for the unset range button --*/
-  frame = gtk_frame_new ("Unset range");
+  frame = gtk_frame_new ("Restore default limits");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), frame);
   vb = gtk_vbox_new (true, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
   gtk_container_add (GTK_CONTAINER (frame), vb);
-  btn = gtk_button_new_with_label ("Unset range");
+
+  btn = gtk_button_new_with_label ("Clear user limits");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Unset user min and max for the selected variable(s)", NULL);
   gtk_box_pack_start (GTK_BOX (vb), btn, false, false, 1);
@@ -257,6 +306,21 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
                       GTK_SIGNAL_FUNC (range_unset_cb), gg);
   /*-- --*/
 
+  /*-- frame for the rescale button --*/
+  frame = gtk_frame_new ("Apply settings");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), frame);
+  vb = gtk_vbox_new (true, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
+  gtk_container_add (GTK_CONTAINER (frame), vb);
+
+  btn = gtk_button_new_with_label ("Rescale");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Rescale plots using specified limits and scaling behavior", NULL);
+  gtk_box_pack_start (GTK_BOX (vb), btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (rescale_cb), gg);
+  /*-- --*/
 
   /*-- ok button --*/
   okay_btn = gtk_button_new_with_label ("Okay");
@@ -294,11 +358,7 @@ void range_unset (ggobid *gg)
 
 
   /*-- these 4 lines the same as in dialog_range_set --*/
-/*
-  vartable_stats_set (d, gg);
-  vartable_lim_update (d, gg);
-*/
-  limits_set (false, false, d);  
+  limits_set (false, false, d, gg);  
   vartable_limits_set (d);
   vartable_stats_set (d);
 
@@ -783,7 +843,7 @@ vartable_open (ggobid *gg)
   /*-- --*/
 
   /*-- set and unset ranges --*/
-  btn = gtk_button_new_with_label ("Range ... ");
+  btn = gtk_button_new_with_label ("Limits ... ");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Set user min and max for the selected variable(s)", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 1);

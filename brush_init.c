@@ -201,11 +201,9 @@ brush_alloc (datad *d, ggobid *gg)
 
   d->brush.nbins = BRUSH_NBINS;
 
-  vectorb_realloc (&d->included, nr);
   vectorb_realloc (&d->pts_under_brush, nr);
 
   for (i=0; i<nr; i++) {
-    d->included.els[i] = true;
     d->pts_under_brush.els[i] = false;
   }
 
@@ -277,7 +275,6 @@ brush_init (datad *d, ggobid *gg)
   d->brush.bin0.x = d->brush.bin1.x = BRUSH_NBINS;
   d->brush.bin0.y = d->brush.bin1.y = BRUSH_NBINS;
 
-  vectorb_init (&d->included);
   vectorb_init (&d->pts_under_brush);
   brush_alloc (d, gg);
 }

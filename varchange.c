@@ -105,7 +105,7 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
   }
   
   /*-- update the vartable struct --*/
-  limits_set_by_var (jvar, true, true, d);
+  limits_set_by_var (jvar, true, true, d, gg);
   d->vartable[jvar].collab = 
     d->vartable[jvar].collab_tform = g_strdup (vname);
   /*-- --*/
@@ -138,7 +138,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
     d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
   
   /*-- update the vartable struct --*/
-  limits_set_by_var (jvar, true, true, d);
+  limits_set_by_var (jvar, true, true, d, gg);
   d->vartable[jvar].collab = 
     d->vartable[jvar].collab_tform = g_strdup (vname);
   /*-- --*/

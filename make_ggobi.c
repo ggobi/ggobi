@@ -33,6 +33,8 @@ void globals_init (ggobid *gg) {
   gg->glyph_id.size = gg->glyph_0.size = 3;
   gg->color_id = 0;
   gg->color_0 = 4;
+
+  gg->lims_use_visible = true;
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/
@@ -147,7 +149,7 @@ pipeline_init (datad *d, ggobid *gg)
   /*-- run the first half of the pipeline --*/
   arrayf_copy (&d->raw, &d->tform);
 
-  limits_set (true, true, d);  
+  limits_set (true, true, d, gg);  
   vartable_limits_set (d);  /*-- does this do something here?  --*/
   vartable_stats_set (d);  /*-- does this do something here?  --*/
 

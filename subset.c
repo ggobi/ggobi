@@ -11,8 +11,6 @@
 
 /*
 Todo:
- not yet rebinning the screen when rows_in_plot changes
-   -- move some of this code once hiding/exclusion are implemented
  only half-handling rgroups
  probably a bit more work will be needed when tour is added
 */
@@ -33,20 +31,15 @@ add_to_subset (gint i, datad *d, ggobid *gg) {
   gboolean added = false;
 
   if (d->nrgroups > 0) {
-    if (d->rgroups[i].included) {
-      added = true;
-      d->rgroups[i].sampled = true;
-      for (j=0; j<d->rgroups[i].nels; j++) {
-        el = d->rgroups[i].els[j];
-        d->sampled.els[el] = true;
-      }
+    added = true;
+    d->rgroups[i].sampled = true;
+    for (j=0; j<d->rgroups[i].nels; j++) {
+      el = d->rgroups[i].els[j];
+      d->sampled.els[el] = true;
     }
-
   } else {
-    if (d->included.els[i] == true) {
-      added = true;
-      d->sampled.els[i] = true;
-    }
+    added = true;
+    d->sampled.els[i] = true;
   }
 
   return added;
@@ -69,16 +62,13 @@ subset_clear (datad *d, ggobid *gg) {
 /*------------------------------------------------------------------*/
 
 void
-subset_apply (gboolean rescale_p, datad *d, ggobid *gg) {
+subset_apply (datad *d, ggobid *gg) {
 
   rows_in_plot_set (d, gg);
+  clusters_set (d, gg);
 
-  if (rescale_p) {
-    /*vartable_lim_update (d, gg);*/
-    limits_set (true, true, d);  
-    vartable_limits_set (d);
-    vartable_stats_set (d);
-  }
+  if (gg->cluster_ui.window != NULL)
+    cluster_table_update (d, gg);
 
   tform_to_world (d, gg);
 
@@ -90,11 +80,7 @@ subset_apply (gboolean rescale_p, datad *d, ggobid *gg) {
   }
 */
 
-  displays_tailpipe (REDISPLAY_ALL, gg);
-
-  /*-- for each plot?  for each plot in brushing mode? 
-   * after the new screen coords are found --*/
-  /*assign_points_to_bins ();*/
+  displays_tailpipe (REDISPLAY_ALL, gg);  /*-- points rebinned here --*/
 }
 
 void
@@ -158,7 +144,7 @@ subset_block (gint bstart, gint bsize, datad *d, ggobid *gg)
     subset_clear (d, gg);
 
     for (i=bstart; i<b_end; i++) {
-      add_to_subset (i, d, gg);  /*-- only added included rows --*/
+      add_to_subset (i, d, gg);
     }
 
     doneit = true;

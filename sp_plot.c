@@ -644,15 +644,6 @@ edges_draw (splotd *sp, ggobid *gg)
           if (!plot_imputed_values && plotted_var_missing(from, to, gg))
             doit = false;
 */
-        /* If either from or to is not included, move on */
-/*
-          else if (gg->ncols == gg->ncols_used) {
-            if (!gg->clusv[(int)GROUPID(from)].included)
-              doit = False;
-            else if (!gg->clusv[(int)GROUPID(to)].included)
-              doit = False;
-        }
-*/
         }
 
         if (doit) {

@@ -24,7 +24,6 @@ assign_points_to_bins (datad *d, ggobid *gg)
   splotd *sp = gg->current_splot;
   gint i, k, ih, iv;
 
-
   /*
    * Reset bin counts to zero -- but don't bother to free any space.
   */
@@ -62,6 +61,7 @@ assign_points_to_bins (datad *d, ggobid *gg)
       }
     }
   }
+
 }
 
 void

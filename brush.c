@@ -98,7 +98,6 @@ point_brush_undo (splotd *sp, datad *d, ggobid *gg) {
     d->glyph_ids[i].type = d->glyph_now[i].type = d->glyph_prev[i].type;
     d->glyph_ids[i].size = d->glyph_now[i].size = d->glyph_prev[i].size;
   }
-  splot_redraw (sp, FULL, gg);
 }
 
 void
@@ -709,7 +708,6 @@ line_brush_undo (splotd *sp, datad *d, ggobid *gg) {
       d->line.hidden_now.els[k] =
       d->line.hidden_prev.els[k];
   }
-  splot_redraw (sp, FULL, gg);
 }
 
 gboolean

@@ -20,9 +20,16 @@ delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data) {
   gtk_widget_hide (w);
 }
 
-static void rescalep_cb (GtkToggleButton *button, ggobid *gg)
+static void rescale_cb (GtkButton *button, ggobid *gg)
 {
-  gg->impute.rescale_p = button->active;
+  datad *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+
+  limits_set (true, true, d, gg);
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+
+  tform_to_world (d, gg);
+  displays_tailpipe (REDISPLAY_ALL, gg);
 }
 static void group_cb (GtkToggleButton *button, ggobid *gg)
 {
@@ -50,13 +57,6 @@ impute_cb (GtkWidget *w, ggobid *gg) {
   }
 
   if (redraw) {
-    if (gg->impute.rescale_p) {
-      /*vartable_lim_update (d, gg);*/
-      limits_set (true, true, d);  
-      vartable_limits_set (d);
-      vartable_stats_set (d);
-    }
-
     tform_to_world (d, gg);
     displays_tailpipe (REDISPLAY_ALL, gg);
   }
@@ -123,7 +123,7 @@ impute_window_open (ggobid *gg) {
     /*-- Add a toggle button, condition on group or not --*/
     tgl = gtk_check_button_new_with_label ("Condition on symbol and color");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-      "Condition the random imputation on the symbol and color; these groups can be seen in the hide/exclude window",
+      "Condition the random imputation on the symbol and color; these groups can be seen in the case clusters window",
       NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                        GTK_SIGNAL_FUNC (group_cb), (gpointer) gg);
@@ -206,11 +206,11 @@ impute_window_open (ggobid *gg) {
       "Impute or assign values to missings", NULL);
     gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
 
-    button = gtk_check_button_new_with_label ("Rescale");
+    button = gtk_button_new_with_label ("Rescale");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
-                          "Rescale the data when imputing", NULL);
-    gtk_signal_connect (GTK_OBJECT (button), "toggled",
-                        GTK_SIGNAL_FUNC (rescalep_cb), (gpointer) gg);
+                          "Rescale the data after imputing", NULL);
+    gtk_signal_connect (GTK_OBJECT (button), "clicked",
+                        GTK_SIGNAL_FUNC (rescale_cb), (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
   }
 

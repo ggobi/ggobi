@@ -269,9 +269,11 @@ tform_to_world (datad *d, ggobid *gg)
 
 /*
  * Combine the values in two arrays:
- *   included[] (which come from the hide/exclude panel)
+ *   hidden[] (which come from erasing operations)
  *   sampled[] (which come from the subset panel)
  * to determine which cases should be plotted.
+ *
+ * rows_in_plot = sampled && !hidden
 */
 
 void
@@ -281,7 +283,7 @@ rows_in_plot_set (datad *d, ggobid *gg) {
   d->nrows_in_plot = 0;
 
   for (i=0; i<d->nrows; i++) {
-    if (d->included.els[i] && d->sampled.els[i]) {
+    if (!d->hidden.els[i] && d->sampled.els[i]) {
       d->rows_in_plot[d->nrows_in_plot++] = i;
     }
   }

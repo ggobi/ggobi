@@ -14,6 +14,46 @@
 
 #include <gtk/gtk.h>
 
+#define NGLYPHTYPES 7
+#define NGLYPHSIZES 8
+#define NGLYPHS ((NGLYPHTYPES-1)*NGLYPHSIZES + 1)
+
+#define PLUS_GLYPH       1
+#define X_GLYPH          2
+#define OPEN_RECTANGLE   3
+#define FILLED_RECTANGLE 4
+#define OPEN_CIRCLE      5
+#define FILLED_CIRCLE    6
+#define POINT_GLYPH      7
+
+#define OPEN 0
+#define FILL 1
+
+#define NCOLORS 10
+
+
+/*
+ * brushing
+*/
+/* br_scope */
+#define BR_POINTS 0
+#define BR_LINES  1
+#define BR_PANDL  2  /* points and lines */
+/* br_mode */
+#define BR_PERSISTENT 0
+#define BR_TRANSIENT  1
+/* br_target */
+#define BR_CANDG 0  /* color and glyph */
+#define BR_COLOR 1
+#define BR_GLYPH 2  /*-- glyph type and size --*/
+#define BR_GSIZE 3  /*-- glyph size only --*/
+#define BR_HIDE  4
+/* for binning the screen */
+#define BRUSH_NBINS  20
+#define BRUSH_MARGIN 10
+#define BINBLOCKSIZE 50
+/* */
+
 typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT,UNKNOWN_GLYPH} GlyphType;
 
 typedef enum { RESET_UNHIDE_POINTS, RESET_POINT_COLORS, RESET_GLYPHS, 
@@ -33,14 +73,21 @@ typedef struct {
   gint width, height;
 } rectd; 
 
-/* cluster; to be used in Group Exclusion tool */
 typedef struct {
-  glong n;  /*-- Can I know the number of elements in this cluster? --*/
+  guint n, nhidden, nshown;
+} symbol_cell;
+
+typedef struct {
+  glong n, nshown, nhidden;
   gint glyphtype, glyphsize;
   gshort color;
-  gboolean hidden, included;
-  GtkWidget *da, *lbl, *hide_tgl, *exclude_tgl;
 } clusterd;
+typedef struct {
+  GtkWidget *da;
+  /*-- buttons and labels for hide, show, complement --*/
+  GtkWidget *h_btn, *s_btn, *c_btn;
+  GtkWidget *nh_lbl, *ns_lbl, *n_lbl;
+} clusteruid;
 
 /* glyph vectors */
 typedef struct {
@@ -58,7 +105,6 @@ typedef struct {
 /* row groups */
 typedef struct {
   gint id, nels, *els;
-  gboolean included;  /* for linked brushing */
   gboolean sampled;   /* for subsetting */
 } rgroupd;
 
