@@ -34,6 +34,14 @@ typedef struct {
  gint br_mode, br_scope, br_target;
 
 /*
+ * scaling
+*/
+  gint scale_style;       /* DRAG or CLICK */
+  gint scale_click_opt;   /* PAN or ZOOM */
+  gint scale_pan_opt;     /* P_OBLIQUE, P_HORIZ, P_VERT */
+  gint scale_zoom_opt;    /* Z_OBLIQUE, Z_ASPECT, Z_HORIZ, Z_VERT */
+
+/*
  * line editing
 */
 

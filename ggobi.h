@@ -14,9 +14,6 @@ typedef enum {read_all, read_block, draw_sample} FileReadType;
 struct _ggobid;
 
 typedef struct {
-} spherical;
-
-typedef struct {
 
  struct _ggobid *thisGG;
 
@@ -45,9 +42,6 @@ typedef struct {
 
   /* rotate_ui */
   GtkWidget *rotation_io_menu;
-
-  /* scale_ui.c */
-  GtkWidget *scale_reset_menu;
 
   varseldatad vdata0;
   varseldatad vdata1;
@@ -335,6 +329,14 @@ struct _ggobid {
     GtkAdjustment *ss_bstart_adj, *ss_bsize_adj;
     GtkAdjustment *ss_estart_adj, *ss_estep_adj;
   } subset;
+
+  struct _Scale {
+    GtkWidget *scale_reset_menu;
+    /*-- widgets whose sensitivity needs to be turned on and off --*/
+    GtkWidget *pan_opt, *zoom_opt, *pan_radio, *zoom_radio;
+    rectd click_rect;
+
+  } scale;
 
   struct {
    varseldatad vdata0, vdata1;

@@ -202,9 +202,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case ROTATE:
         rotation_menus_make (gg);
 
-        gg->mode_menu.io_item = submenu_make ("_I/O", 'I', gg->main_accel_group);
+        gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
+          gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
-                                   gg->app.rotation_io_menu); 
+          gg->app.rotation_io_menu); 
         if (gg->mode_menu.firsttime_io) {
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_io = false;
@@ -214,9 +215,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case TOUR2D:
         tour2d_menus_make (gg);
 
-        gg->mode_menu.io_item = submenu_make ("_I/O", 'I', gg->main_accel_group);
+        gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
+          gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
-                                   gg->app.tour2d_io_menu); 
+          gg->app.tour2d_io_menu); 
         if (gg->mode_menu.firsttime_io) {
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_io = false;
@@ -226,9 +228,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case SCALE :
         scale_menus_make (gg);
 
-        gg->mode_menu.reset_item = submenu_make ("_Reset", 'R', gg->main_accel_group);
+        gg->mode_menu.reset_item = submenu_make ("_Reset", 'R',
+          gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.reset_item),
-                                   gg->app.scale_reset_menu); 
+          gg->scale.scale_reset_menu); 
         if (gg->mode_menu.firsttime_reset) {
           submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_reset = false;
@@ -238,17 +241,19 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case BRUSH :
         brush_menus_make (gg);
 
-        gg->mode_menu.reset_item = submenu_make ("_Reset", 'R', gg->main_accel_group);
+        gg->mode_menu.reset_item = submenu_make ("_Reset", 'R',
+          gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.reset_item),
-                                   gg->brush.reset_menu); 
+          gg->brush.reset_menu); 
         if (gg->mode_menu.firsttime_reset) {
           submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_reset = false;
         }
 
-        gg->mode_menu.link_item = submenu_make ("_Link", 'L', gg->main_accel_group);
+        gg->mode_menu.link_item = submenu_make ("_Link", 'L',
+          gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
-                                   gg->brush.link_menu); 
+          gg->brush.link_menu); 
         if (gg->mode_menu.firsttime_link) {
           submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_link = false;
@@ -259,9 +264,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case IDENT:
         identify_menus_make (gg);
 
-        gg->mode_menu.link_item = submenu_make ("_Link", 'L', gg->main_accel_group);
+        gg->mode_menu.link_item = submenu_make ("_Link", 'L',
+          gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
-                                   gg->app.identify_link_menu); 
+          gg->app.identify_link_menu); 
         if (gg->mode_menu.firsttime_link) {
           submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_link = false;
@@ -428,8 +434,10 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
     case 1:  /*-- output: extend the current file set --*/
       break;
     case 2:  /*-- output: create a new file set --*/
+#ifdef USE_XML
       /*-- temporary:  just create a full xml set here --*/
-      write_xml (g_strdup_printf ("%s.xml", fname), gg);
+      write_xml ((const gchar *) g_strdup_printf ("%s.xml", fname), gg);
+#endif
       break;
   }
 }
