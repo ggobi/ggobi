@@ -522,7 +522,9 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
   GdkColor gdk_color;
   GdkColormap *cmap = gdk_colormap_get_system ();
   splotd *sp = gg->current_splot;
+#if GTK_MAJOR_VERSION == 1
   GtkWidget *wheel = GTK_COLOR_SELECTION (colorsel)->wheel_area;
+#endif
   colorschemed *scheme = gg->activeColorScheme;
 
   /* Get current color */
@@ -558,9 +560,13 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
      * If wheel doesn't have the grab, it means that the button
      * has been released:  update all plots.
     */
+#if GTK_MAJOR_VERSION == 1
     if (!GTK_WIDGET_HAS_GRAB (wheel)) {
+#endif
       displays_plot ((splotd *) NULL, FULL, gg);
+#if GTK_MAJOR_VERSION == 1
     }
+#endif
   }
 }
 
