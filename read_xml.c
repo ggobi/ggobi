@@ -573,8 +573,15 @@ setEdgePartners (XMLParserData *parserData)
 
   if (e->edge.n <= 0)
     return;
+  /*
+   * if there are this many edges, malloc is likely to fail, and
+   * we probably can't read the bidirectionality anyway
+  */
+  if (e->edge.n >= 1000) 
+    return;
 
   n = e->edge.n * (e->edge.n - 1);
+
   ep = (SortableEndpoints *)
     g_malloc (n * sizeof (SortableEndpoints));
 
