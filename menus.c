@@ -323,19 +323,50 @@ brush_menus_make (ggobid *gg)
   /*-- Reset menu --*/
   gg->menus.reset_menu = gtk_menu_new ();
 
-  item = gtk_menu_item_new_with_label ("Show all points");
+/*
+   Adding include/exclude for points; do I need to add menu items
+   for the edges as well?  -- dfs
+*/
+  item = gtk_menu_item_new_with_label ("Exclude shadowed points in current display");
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (RESET_UNHIDE_POINTS));
+                      (gpointer) GINT_TO_POINTER (RESET_EXCLUDE_SHADOW_POINTS));
   gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
-
-  item = gtk_menu_item_new_with_label ("Show all edges");
+  item = gtk_menu_item_new_with_label ("Include shadowed points in current display");
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (RESET_UNHIDE_EDGES));
+                      (gpointer) GINT_TO_POINTER (RESET_INCLUDE_SHADOW_POINTS));
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
+
+  item = gtk_menu_item_new_with_label ("Un-shadow all points in current display");
+  GGobi_widget_set (item, gg, true);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER (RESET_UNSHADOW_POINTS));
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
+
+  item = gtk_menu_item_new_with_label ("Exclude shadowed edges in current display");
+  GGobi_widget_set (item, gg, true);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER (RESET_EXCLUDE_SHADOW_EDGES));
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
+
+  item = gtk_menu_item_new_with_label ("Include shadowed edges in current display");
+  GGobi_widget_set (item, gg, true);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER (RESET_INCLUDE_SHADOW_EDGES));
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
+
+  item = gtk_menu_item_new_with_label ("Un-shadow all edges in current display");
+  GGobi_widget_set (item, gg, true);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER (RESET_UNSHADOW_EDGES));
   gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset brush size");

@@ -207,10 +207,19 @@ void brush_reset(ggobid * gg, gint action)
   cpaneld *cpanel = &display->cpanel;
 
   g_assert (d->hidden.nels == d->nrows);
-  g_assert (e->hidden.nels == e->nrows);
+  if (e)
+    g_assert (e->hidden.nels == e->nrows);
 
   switch (action) {
-  case RESET_UNHIDE_POINTS:   /*-- un-hide all points --*/
+
+  case RESET_EXCLUDE_SHADOW_POINTS:   /*-- exclude all shadowed points --*/
+    include_hiddens (false, d, gg);
+  break;
+  case RESET_INCLUDE_SHADOW_POINTS:   /*-- include all shadowed points --*/
+    include_hiddens (true, d, gg);
+  break;
+
+  case RESET_UNSHADOW_POINTS:   /*-- un-hide all points --*/
     for (i = 0; i < d->nrows; i++)
       d->hidden.els[i] = d->hidden_now.els[i] = false;
     rows_in_plot_set(d, gg);
@@ -225,7 +234,21 @@ void brush_reset(ggobid * gg, gint action)
       /*-- --*/
     break;
 
-  case RESET_UNHIDE_EDGES:   /*-- un-hide all edges --*/
+/*
+ * Ambiguity:  If an edge is connected to a shadowed point, it's
+ * drawn in shadow -- yet it isn't "hidden", so it doesn't respond
+ * to this operation.  -- dfs
+*/
+  case RESET_EXCLUDE_SHADOW_EDGES:   /*-- exclude all shadowed edges --*/
+    if (e)
+      include_hiddens (false, e, gg);
+  break;
+  case RESET_INCLUDE_SHADOW_EDGES:   /*-- include all shadowed edges --*/
+    if (e)
+      include_hiddens (true, e, gg);
+  break;
+
+  case RESET_UNSHADOW_EDGES:   /*-- un-hide all edges --*/
     if (e != NULL) {
       for (k = 0; k < e->edge.n; k++)
         e->hidden_now.els[k] = e->hidden.els[k] = false;
@@ -240,15 +263,6 @@ void brush_reset(ggobid * gg, gint action)
       displays_tailpipe(FULL, gg);
         /*-- --*/
     }
-    break;
-
-  case BRUSH_RESET_SCALE:      /* reset view scale after hiding or unhiding */
-    limits_set(true, true, d, gg);
-    vartable_limits_set(d);
-    vartable_stats_set(d);
-
-    tform_to_world(d, gg);
-    displays_tailpipe(FULL, gg);
     break;
 
   case RESET_INIT_BRUSH:   /*-- reset brush size --*/
