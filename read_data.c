@@ -679,8 +679,10 @@ hidden_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
   if(fileName == NULL)
     found = false;
 
-  if( ( fp = fopen(fileName, "r") ) == NULL ) {
-    found = false;
+  if (found) {
+    if ((fp = fopen(fileName, "r")) == NULL ) {
+      found = false;
+    }
   }
 
   if (found) {

@@ -503,7 +503,8 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
 /*
  * Initialize the data portion of the splot object
 */
-
+  sp->edges = NULL;
+  sp->arrowheads = NULL;
   splot_alloc (sp, display, gg);
 
   sp->displayptr = display;

@@ -14,6 +14,7 @@ LD=$(CXX)
 LD=$(CC)
 
 CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
+#CFLAGS= -g2 -ansi -DHAVE_CONFIG_H  # when using Irix cc
 CXXFLAGS=$(CFLAGS)
 
 ifdef TEST_KEYS

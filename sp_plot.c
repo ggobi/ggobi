@@ -204,10 +204,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
                   sp->whiskers[n].x1, sp->whiskers[n].y1,
                   sp->whiskers[n].x2, sp->whiskers[n].y2);
               }
-              else {
-                gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                  sp->whiskers[m].x1, sp->whiskers[m].y1,
-                  sp->whiskers[m].x2, sp->whiskers[m].y2);
+              else { /*-- if time series plot --*/
+                if (m < d->nrows_in_plot-1)  /*-- there are n-1 whiskers --*/
+                  gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                    sp->whiskers[m].x1, sp->whiskers[m].y1,
+                    sp->whiskers[m].x2, sp->whiskers[m].y2);
               }
             }
           }
