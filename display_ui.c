@@ -244,6 +244,11 @@ display_menu_build (ggobid *gg)
     } 
   }
 
+#ifdef SUPPORT_PLUGINS  
+  if (sessionOptions->info != NULL)
+    pluginsUpdateDisplayMenu(gg, gg->pluginInstances);
+#endif
+
   /*-- these two lines replace gtk_menu_popup --*/
   gtk_widget_show_all (gg->display_menu);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->display_menu_item),

@@ -64,6 +64,7 @@ registerPlugins(ggobid *gg, GList *plugins)
 
   while(el) {
     plugin = (GGobiPluginInfo *) el->data;
+    ok = true;
     if(plugin->onCreate) {
       f = (OnCreate) getPluginSymbol(plugin->onCreate, plugin);
       if(f) {
@@ -75,6 +76,34 @@ registerPlugins(ggobid *gg, GList *plugins)
 	      GGOBI_addPluginInstance(inst, gg);
 	  } else
 	      g_free(inst);
+      }
+    } else {
+	  inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
+          inst->data = NULL;
+          inst->info = plugin;
+          GGOBI_addPluginInstance(inst, gg);
+    }
+    el = el->next;
+  }
+
+  return(ok);
+}
+
+gboolean 
+pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins)
+{
+  GList *el = plugins;
+  OnUpdateDisplayMenu f;
+  PluginInstance *plugin;
+  PluginInstance *inst;
+  gboolean ok = true;
+
+  while(el) {
+    plugin = (PluginInstance *) el->data;
+    if(plugin->info->onUpdateDisplay) {
+      f = (OnUpdateDisplayMenu) getPluginSymbol(plugin->info->onUpdateDisplay, plugin->info);
+      if(f) {
+	  ok = f(gg, plugin);
       }
     }
     el = el->next;

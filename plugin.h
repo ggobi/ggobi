@@ -20,6 +20,7 @@ typedef struct {
     char *onCreate; 
     char *onClose; 
     char *onUnload; 
+    char *onUpdateDisplay; 
 
     char *description;
     char *author;
@@ -40,6 +41,8 @@ typedef gboolean (*OnCreate)(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance
 typedef gboolean (*OnClose)(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst);
 typedef gboolean (*OnUnload)(gboolean quitting, GGobiPluginInfo *plugin);
 
+typedef gboolean (*OnUpdateDisplayMenu)(ggobid *gg, PluginInstance *inst);
+
 
 typedef struct {
 
@@ -59,6 +62,7 @@ HINSTANCE load_plugin_library(GGobiPluginInfo *plugin);
 DLFUNC getPluginSymbol(const char *name, GGobiPluginInfo *plugin);
 
 gboolean registerPlugins(ggobid *gg, GList *plugins);
+gboolean pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins);
 
 int      GGOBI_addPluginInstance(PluginInstance *inst, ggobid *gg);
 gboolean GGOBI_removePluginInstance(PluginInstance *inst, ggobid *gg);

@@ -204,6 +204,9 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
   
   globals_init (gg); /*-- variables that don't depend on the data --*/
   color_table_init (gg);
+  if(sessionOptions->info && sessionOptions->info->bgColor) {
+      gg->bg_color = *(sessionOptions->info->bgColor);
+  }
   wvis_init (gg);
   make_ui (gg);
 
