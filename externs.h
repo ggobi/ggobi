@@ -291,6 +291,7 @@ extern gboolean xyplot_varsel (splotd *, gint, gint *, gint);
 extern void zoom_by_drag (splotd *, ggobid *gg);
 extern void zoom_step (splotd *, gint, gint, rectd *, ggobid* gg);
 extern void writeall_window_open (ggobid *);
+extern void rowlabels_free (ggobid *);
 
 ggobid * ggobi_get (gint);
 displayd * display_alloc_init (enum displaytyped type, gboolean missing_p, ggobid *gg);

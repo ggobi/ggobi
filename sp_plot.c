@@ -394,6 +394,7 @@ splot_add_point_label (splotd *sp, gint k, ggobid *gg) {
   GtkStyle *style = gtk_widget_get_style (sp->da);
   GdkPoint diamond[5];
   gint diamond_dim = 5;
+  gchar *lbl;
 
   /*-- draw a thickened line to highlight the current case --*/
   if (dsp->displaytype == parcoords) {
@@ -432,20 +433,22 @@ splot_add_point_label (splotd *sp, gint k, ggobid *gg) {
   }
 
   /*-- add the label last so it will be in front of other markings --*/
+printf ("%d %s\n", k, g_array_index (gg->rowlab, gchar *, k));
+  lbl = (gchar *) g_array_index (gg->rowlab, gchar *, k);
   gdk_text_extents (style->font,  
-    gg->rowlab[k], strlen (gg->rowlab[k]),
+    lbl, strlen (lbl),
     &lbearing, &rbearing, &width, &ascent, &descent);
 
   if (sp->screen[k].x <= sp->max.x/2)
     gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
       sp->screen[k].x+diamond_dim,
       sp->screen[k].y-diamond_dim,
-      gg->rowlab[k]);
+      lbl);
   else
     gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
       sp->screen[k].x - width - diamond_dim,
       sp->screen[k].y - diamond_dim,
-      gg->rowlab[k]);
+      lbl);
 }
 
 void

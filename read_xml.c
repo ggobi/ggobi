@@ -385,12 +385,12 @@ setDatasetInfo(const CHAR **attrs, XMLParserData *data)
  data->gg->nrows_in_plot = data->gg->nrows;  /*-- for now --*/
  data->gg->nrgroups = 0;              /*-- for now --*/
 
- rowlabels_alloc(data->gg);
- br_glyph_ids_alloc(data->gg);
- br_glyph_ids_init(data->gg);
+ rowlabels_alloc (data->gg);
+ br_glyph_ids_alloc (data->gg);
+ br_glyph_ids_init (data->gg);
 
- br_color_ids_alloc(data->gg);
- br_color_ids_init(data->gg);
+ br_color_ids_alloc (data->gg);
+ br_color_ids_init (data->gg);
 
 
   tmp = getAttribute(attrs, "missingValue");
@@ -441,8 +441,9 @@ newRecord(const CHAR **attrs, XMLParserData *data)
   data->current_element = 0;
 
   tmp = getAttribute(attrs, "label");
-  if(tmp)
-    data->gg->rowlab[data->current_record] = g_strdup(tmp);
+  if (tmp)
+    g_array_insert_val (data->gg->rowlab, data->current_record, g_strdup(tmp));
+/*  data->gg->rowlab[data->current_record] = g_strdup(tmp);*/
 
 
   setColor(attrs, data, i);
@@ -823,24 +824,25 @@ addConnection(const CHAR **attrs, XMLParserData *data)
  return(ok);
 }
 
-int
-rowId(const char *tmp, XMLParserData *data)
+gint
+rowId (const gchar *tmp, XMLParserData *data)
 {
- int value = atoi(tmp) - 1;
- if(value < 0) {
+  gint value = atoi(tmp) - 1;
+  if (value < 0) {
    /* Now look up the ids for the rows. */
-   int i;
-   for(i=0; i < data->gg->nrows; i++) {
-     if(strcmp(tmp,data->gg->rowlab[i]) == 0
-	|| (data->rowIds != NULL && data->rowIds[i] && strcmp(tmp,data->rowIds[i]) == 0)) {
-       value =i;
-       break;
-     }
-   } 
-
-
- }
- return(value);
+   gint i;
+   for (i=0; i < data->gg->nrows; i++) {
+/*   if (strcmp(tmp,data->gg->rowlab[i]) == 0*/
+     if (strcmp (tmp, g_array_index (data->gg->rowlab, gchar *, i)) == 0 ||
+         (data->rowIds != NULL && data->rowIds[i] &&
+          strcmp(tmp,data->rowIds[i]) == 0))
+      {
+        value = i;
+        break;
+      }
+    } 
+  }
+  return (value);
 }
 
 

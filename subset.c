@@ -213,11 +213,10 @@ subset_rowlab (gchar *rowlab, ggobid *gg)
   gint i;
   gint top = (gg->nrgroups > 0) ? gg->nrgroups : gg->nrows;
 
-
   subset_clear (gg);
 
   for (i=0; i<top; i++) {
-    if (!strcmp (gg->rowlab[i], rowlab)) {
+    if (!strcmp ((gchar *) g_array_index (gg->rowlab, gchar *, i), rowlab)) {
       add_to_subset ((gg->nrgroups > 0) ? gg->rgroup_ids[i] : i, gg);
     }
   }

@@ -164,29 +164,28 @@ GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg)
 }
 
 void
-GGOBI(setDimensions)(int nrow, int ncol, ggobid *gg)
+GGOBI(setDimensions)(gint nrow, gint ncol, ggobid *gg)
 {
- gg->nrows = nrow;
- gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
- gg->nrgroups = 0;              /*-- for now --*/
+  gg->nrows = nrow;
+  gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
+  gg->nrgroups = 0;              /*-- for now --*/
 
- rowlabels_alloc(gg);
- br_glyph_ids_alloc(gg);
- br_glyph_ids_init(gg);
+  rowlabels_alloc (gg);
+  br_glyph_ids_alloc (gg);
+  br_glyph_ids_init (gg);
 
- br_color_ids_alloc(gg);
- br_color_ids_init(gg);
+  br_color_ids_alloc (gg);
+  br_color_ids_init (gg);
 
 
- gg->ncols = ncol;
+  gg->ncols = ncol;
 
- arrayf_alloc(&gg->raw, gg->nrows, gg->ncols);
+  arrayf_alloc (&gg->raw, gg->nrows, gg->ncols);
 
- vardata_alloc(gg);
- vardata_init(gg);
+  vardata_alloc (gg);
+  vardata_init (gg);
 
- hidden_alloc(gg);
-
+  hidden_alloc (gg);
 }
 
 
@@ -352,8 +351,8 @@ GGOBI(getMySQLGUIInfo)(GtkButton *button, MySQLGUIInput *guiInput)
 void
 GGOBI(cancelMySQLGUI)(GtkButton *button, MySQLGUIInput *guiInput)
 {
-  gtk_widget_destroy(guiInput->dialog);
-  g_free(guiInput);
+  gtk_widget_destroy (guiInput->dialog);
+  g_free (guiInput);
 }
 
 void

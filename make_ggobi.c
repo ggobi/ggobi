@@ -120,7 +120,6 @@ fileset_read (gchar *ldata_in, ggobid *gg)
      rowlabels_read (gg->fname, true, gg);
      vgroups_read (gg->fname, true, gg);
       
-      
      point_glyphs_read (gg->fname, true, gg);
      point_colors_read (gg->fname, true, gg);
      hidden_read (gg->fname, true, gg);

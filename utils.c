@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <time.h>
 #include <math.h>
 
@@ -181,82 +180,8 @@ glyphNames (gchar **names) {
 }
 
 /* ---------------------------------------------------------------------*/
-/*              Some I/O routines                                       */
+/*                     Missing data routines                            */
 /* ---------------------------------------------------------------------*/
-
-/*
- * Open a file for reading
-*/
-FILE *open_file_r (gchar *f, gchar *suffix)
-{
-  FILE *fp = NULL;
-  gchar *fname;
-
-  fname = g_strdup_printf ("%s%s", f, suffix);
-
-#ifndef _WIN32
-  if (access (fname, R_OK) == 0)
-#endif
-    fp = fopen (fname, "r");
-
-  if (fp != NULL) {
-    /*
-     * Make sure it isn't an empty file -- get a single character
-    */
-    gint ch = getc (fp);
-    if (ch == EOF) {
-      g_printerr ("%s is an empty file!\n", fname);
-      fclose (fp);
-      fp = NULL;
-    } else ungetc (ch, fp);
-  }
-
-  g_free (fname);
-  return fp;
-}
-
-FILE *open_ggobi_file_r (gchar *fname, gint nsuffixes, gchar **suffixes,
-  gboolean optional)
-{
-  FILE *fp = NULL;
-  gint n;
-
-  if (nsuffixes == 0)
-    fp = open_file_r (fname, "");
-
-  else {
-    for (n=0; n<nsuffixes; n++) {
-      if ((fp = open_file_r (fname, suffixes[n])) != NULL)
-        break;
-    }
-  }
-
-  if (fp == NULL && !optional) {
-    GString *gstr = g_string_new ("Unable to open ");
-    if (nsuffixes > 0) {
-      for (n=0; n<nsuffixes; n++) {
-        if (n < nsuffixes-1)
-          g_string_sprintfa (gstr, " %s%s or", fname, suffixes[n]);
-        else
-          g_string_sprintfa (gstr, " %s%s", fname, suffixes[n]);
-      }
-
-    } else 
-      g_string_sprintfa (gstr, "%s", fname);
-
-    g_printerr ("%s\n", gstr->str);
-    g_string_free (gstr, true);
-  }
-
-  return fp;
-}
-
-/* ---------------------------------------------------------------------*/
-/*              End of I/O routines                                     */
-/* ---------------------------------------------------------------------*/
-
-
-/* missing routines */
 
 GtkTableChild *
 gtk_table_get_child (GtkWidget *w, gint left, gint top) {
@@ -462,7 +387,7 @@ address_check (ggobid *gg)
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %d nseg %d rowlab %s jitfac %f\n",
     gg->data_mode, (gint) gg->world.data[0][0], gg->nsegments,
-    gg->rowlab[0], gg->jitter.factor);
+    g_array_index (gg->rowlab, gchar *, 0), gg->jitter.factor);
 
   return 1;
 }

@@ -332,10 +332,12 @@ subset_window_open (ggobid *gg) {
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset.ss_rowlab_entry,
       "Type in the label shared by the cases you want in the subset",
       NULL);
-    gtk_box_pack_start (GTK_BOX (hb), gg->subset.ss_rowlab_entry, true, true, 2);
+    gtk_box_pack_start (GTK_BOX (hb),
+      gg->subset.ss_rowlab_entry, true, true, 2);
 
     label = gtk_label_new ("Row label");
-    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.ss_notebook), frame, label);
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.ss_notebook),
+      frame, label);
 
 /* 
  * hbox to hold a few buttons

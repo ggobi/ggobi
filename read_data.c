@@ -24,24 +24,28 @@ const gchar * const GlyphNames[] = {
 /*------------------------------------------------------------------------*/
 
 void rowlabels_free (ggobid *gg) {
-  gint i;
 
+/*
+  gint i;
   for (i=0; i<gg->nrows; i++)
     g_free (gg->rowlab[i]);
   g_free (gg->rowlab);
+*/
+  g_array_free (gg->rowlab, true);  /* unsure about the 2nd arg */
 }
 
 
 void
 rowlabels_alloc (ggobid *gg) 
 {
-  gint i;
-
+/* gint i; */
   if (gg->rowlab != NULL) rowlabels_free (gg);
-  
+/*
   gg->rowlab = (gchar **) g_malloc (gg->nrows * sizeof (gchar *));
   for (i=0; i<gg->nrows; i++)
     gg->rowlab[i] = (gchar *) g_malloc (ROWLABLEN * sizeof (gchar));
+*/
+  gg->rowlab = g_array_new (false, false, sizeof (gchar *));
 }
 
 gboolean
@@ -52,6 +56,7 @@ rowlabels_read (gchar *ldata_in, gboolean init, ggobid *gg)
     ".row", ".rowlab", ".case"
   };
   gchar initstr[INITSTRSIZE];
+  gchar *lbl;
   gint ncase;
   gboolean found = false;
   FILE *fp;
@@ -81,7 +86,8 @@ rowlabels_read (gchar *ldata_in, gboolean init, ggobid *gg)
         while (initstr[len-1] == ' ' || initstr[len-1] == '\n')
           len-- ;
         initstr[len] = '\0';
-        gg->rowlab[ncase] = g_strdup (initstr) ;
+        lbl = g_strdup (initstr);
+        g_array_append_val (gg->rowlab, lbl);
   
         if (ncase++ >= gg->nrows)
           break;
@@ -96,8 +102,10 @@ rowlabels_read (gchar *ldata_in, gboolean init, ggobid *gg)
     if (init && ncase != gg->nrows) {
       g_printerr ("number of labels = %d, number of rows = %d\n",
         ncase, gg->nrows);
-      for (i=ncase; i<gg->nrows; i++)
-        gg->rowlab[i] = g_strdup (" ");
+      for (i=ncase; i<gg->nrows; i++) {
+        lbl = g_strdup (" ");
+        g_array_append_val (gg->rowlab, lbl);
+      }
     }
   }
   else
@@ -105,10 +113,13 @@ rowlabels_read (gchar *ldata_in, gboolean init, ggobid *gg)
     if (init) {  /* apply defaults if initializing; else, do nothing */
 
       for (i=0; i<gg->nrows; i++) {
-        if (gg->file_read_type == read_all)
-          gg->rowlab[i] = g_strdup_printf ("%d", i+1);
-        else
-          gg->rowlab[i] = g_strdup_printf ("%ld", gg->file_rows_sampled[i]+1);
+        if (gg->file_read_type == read_all) {
+          lbl = g_strdup_printf ("%d", i+1);
+          g_array_append_val (gg->rowlab, lbl);
+        } else {
+          lbl = g_strdup_printf ("%ld", gg->file_rows_sampled[i]+1);
+          g_array_append_val (gg->rowlab, lbl);
+        }
       }
     }
   }

@@ -106,9 +106,11 @@ GGOBI(destroyCurrentDisplay)(ggobid *gg)
   and put them in separate routines.
  */
 void
-GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int nc, ggobid *gg)
+GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
+  gint nr, gint nc, ggobid *gg)
 {
- int i, j;
+  gint i, j;
+  gchar *lbl;
 
   GGOBI(displays_release)(gg);
   GGOBI(data_release)(gg);
@@ -123,8 +125,7 @@ GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int n
 
   arrayf_alloc(&gg->raw, nr, nc);
 
-  rowlabels_alloc(gg);
-  /*  gg.rowlab = (gchar **) g_malloc(nr * sizeof(gchar*)); */
+  rowlabels_alloc (gg);
 
   vardata_alloc(gg);
   vardata_init(gg);
@@ -136,15 +137,18 @@ GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int n
   br_color_ids_init(gg);
 
 
-  hidden_alloc(gg);
+  hidden_alloc (gg);
 
-  for(j = 0; j < nc ; j++) {
+  for (j = 0; j < nc ; j++) {
    gg->vardata[j].groupid_ori = j;
    gg->vardata[j].collab = g_strdup(colnames[j]);
    gg->vardata[j].collab_tform = g_strdup(colnames[j]);
-   for(i = 0; i < nr ; i++) {
-     if(j == 0) {
-       gg->rowlab[i] = g_strdup(rownames[i]);
+   for (i = 0; i < nr ; i++) {
+     if (j == 0) {
+/*     gg->rowlab[i] = g_strdup(rownames[i]);*/
+       lbl = g_strdup (rownames[i]);
+       g_array_append_val (gg->rowlab, lbl);
+       g_free (lbl);
      }
 
      gg->raw.data[i][j] = values[i + j*nr];
@@ -213,11 +217,10 @@ GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg)
 void
 GGOBI(data_release)(ggobid *gg)
 {
- extern void rowlabels_free(void);
- if(gg->rowlab) {
-    rowlabels_free();
+  if (gg->rowlab) {
+    rowlabels_free (gg);
     gg->rowlab = NULL;
- }
+  }
 
   GGOBI(vardata_free)(gg);
 }
@@ -393,7 +396,7 @@ GGOBI(getTFormData)(ggobid *gg)
 const gchar **
 GGOBI(getCaseNames)(ggobid *gg)
 {
- return((const gchar **) gg->rowlab);
+  return ((const gchar **) gg->rowlab);
 }
 
 /*
@@ -411,20 +414,22 @@ void
 GGOBI(setCaseName)(gint index, const gchar *label, ggobid *gg)
 {
   gchar *old;
-  if(index < 0 || index >= gg->nrows) {
+  if (index < 0 || index >= gg->nrows) {
     warning("Index is out of range of observations in setCaseName");
     return; 
   }
 
-  old = gg->rowlab[index];
+/*  old = gg->rowlab[index];*/
+  old = g_array_index (gg->rowlab, gchar *, index);
+  g_free (old);
 
-  g_free(old);
-  gg->rowlab[index] = (gchar *)label;
+/*  gg->rowlab[index] = (gchar *) label;*/
+  g_array_insert_val (gg->rowlab, index, label);
 }
 
 
 void
-warning(const char *msg)
+warning (const gchar *msg)
 {
  fprintf(stderr, "%s\n", msg);
  fflush(stderr);

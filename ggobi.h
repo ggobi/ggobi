@@ -172,7 +172,8 @@ struct _ggobid {
  vardatad *vardata;
 
 /* row labels */
- gchar **rowlab;
+/* gchar **rowlab;*/
+ GArray *rowlab;
 
 /* gboolean: does this data contain only one variable? False by default */
  gboolean single_column;

@@ -115,13 +115,13 @@ write_xml_records(FILE *f, ggobid *gg)
 }
 
 gboolean
-write_xml_record(FILE *f, ggobid *gg, int i)
+write_xml_record(FILE *f, ggobid *gg, gint i)
 {
-  int j;
+  gint j;
   gchar *gstr;
   fprintf(f, "<record");
 
-  fprintf(f, " label=\"%s\"", gg->rowlab[i]);
+  fprintf(f, " label=\"%s\"", g_array_index (gg->rowlab, gchar *, i));
   fprintf(f, " color=\"%d\"", gg->color_ids[i]);
 /*
   fprintf(f, " glyphSize=\"%d\"", gg->glyph_ids[i].size);

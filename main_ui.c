@@ -404,64 +404,7 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
     return(-1);
 }
 
-
-/*-- these will be moved to another file eventually, I'm sure --*/
-
-void
-filesel_ok (GtkWidget *w, GtkFileSelection *fs)
-{
-  ggobid *gg;
-  extern const gchar* const key_get (void);
-
-  gchar *fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
-  guint action = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (fs),
-                 "action"));
-  gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), key_get());
-
-  switch (action) {
-    case 0:  /*-- input: read a new set of files --*/
-      if (fileset_read_init (fname, gg)) 
-        ;
-      break;
-    case 1:  /*-- output: extend the current file set --*/
-      break;
-    case 2:  /*-- output: create a new file set --*/
-#ifdef USE_XML
-      /*-- temporary:  just create a full xml set here --*/
-      write_xml ((const gchar *) g_strdup_printf ("%s.xml", fname), gg);
-#endif
-      break;
-  }
-}
-
-
-void
-filename_get (ggobid *gg, guint action, GtkWidget *w) 
-{
-  extern const gchar* const key_get (void);
-
-  GtkWidget *fs = gtk_file_selection_new ("read ggobi data");
-  gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs));
-/*  gtk_object_set_data (GTK_OBJECT (fs), GGobiGTKey, gg);*/
-  gtk_object_set_data (GTK_OBJECT (fs), key_get(), gg);
-  gtk_object_set_data (GTK_OBJECT (fs), "action", GINT_TO_POINTER (action));
-
-  gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION (fs)->ok_button),
-                      "clicked", GTK_SIGNAL_FUNC (filesel_ok), (gpointer) fs);
-                            
-  /*-- Ensure that the dialog box is destroyed. --*/
-    
-  gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION (fs)->ok_button),
-                             "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-                             (gpointer) fs);
-
-  gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION(fs)->cancel_button),
-                             "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-                             (gpointer) fs);
-    
-  gtk_widget_show (fs);
-}
-
+extern void filename_get (ggobid *, guint, GtkWidget *);
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",            NULL,     NULL,          0, "<Branch>" },
   { "/File/Read ...",    NULL,     filename_get,     0 },
