@@ -238,11 +238,12 @@ ftp://ftp.nanotech.wisc.edu/pub/khan/gnu-win32/mingw32/snapshots/gcc-2.95.2-1/
 Download all the files for msvcrt (mingw-msvcrt-20000203.zip,
 gcc-2.95.2-1-msvcrt.zip, binutils-19990818-1-msvcrt.zip,
 binutils-fixes-msvcrt.zip, ld-msvcrt.zip) from
-http://user.sgic.fi/~tml/gimp/win32/ 
+
 
 Download the current development version of gtk+ for windows.
 (libiconv-dev-20001007.zip, glib-dev-20001023.zip,
 gtk+-dev-20001023.zip) 
+http://user.sgic.fi/~tml/gimp/win32/ 
 
 and finally at http://www.penguin.at0.net/~fredo/
 you need libxml2-2.1.1-mingw.zip 

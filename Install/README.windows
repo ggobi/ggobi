@@ -1,0 +1,41 @@
+To build ggobi for Windows, you will need the following.
+
+Download glib-dev, gtk+-dev, libiconv-dev, and extralibs-dev.
+These are available from Tor Lillqvist's site at
+   http://user.sgic.fi/~tml/gimp/win32/downloads.html
+(You do not need the gimp-dev file on this site.)
+
+
+
+
+
+For running ggobi, you will need to ensure that all
+the necessary DLLs are in your path.
+
+You will need to have the directories containing
+each of 
+  glib-1.3.dll
+  gdk-1.3.dll
+  gtk-1.3.dll
+  gnu-intl.dll
+  iconv-1.3.dll
+  gmodule-1.3.dll
+in your path.
+
+I set this in my .bashrc file. You can also set it in your
+AUTOEXEC.BAT file.  The exact content of the path setting depend on
+where you unzipped the different files you downloaded.  I unzipped
+them all from the same directory, say A/. The result is that I put the
+following in my path:
+  
+Alternatively, I copy all of the DLLs from these directories into
+a single directory (e.g. ~/libs/) and add that to my path.
+
+  cd ~/libs
+  cp ~/Install/gtk/src/gtk+/gtk/gtk-1.3.dll .
+  cp ~/Install/gtk/src/gdk+/gdk/gdk-1.3.dll .
+  cp ~/Install/src/glib/glib-1.3.dll .
+  cp ~/Install/src/libiconv-1.3/src/iconv-1.3.dll .
+  cp ~/Install/src/glib/gmodule/gmodule-1.3.dll .
+  cp ~/Install/gtk/src/intl/gnu-int.dll .
+ 
