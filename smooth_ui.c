@@ -32,7 +32,7 @@ window_cb (GtkToggleButton *button)
   g_printerr ("show window: %d\n", button->active);
 }
 
-static void
+void
 width_cb (GtkAdjustment *adj, gpointer cbd) {
   g_printerr ("width %f\n", adj->value);
 }
