@@ -194,6 +194,8 @@ typedef struct
     GtkGGobiWindowDisplayClass parent_class;
 
     gboolean binning_ok; /* see binning_permitted in brush.c */
+    gboolean (*binningPermitted)(displayd *dpy;)
+
     gboolean allow_reorientation; /* see p1d_varsel for changing vertical/horizontal orientation */
     gboolean options_menu_p; /* whether this supports an option menu in the control panel. Default is yes! */
 
@@ -207,6 +209,7 @@ typedef struct
     const gchar * const (*title_label)(displayd *dpy);
 
     displayd *(*create)(gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
+    displayd *(*createWithVars)(gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg);
 
     gboolean (*variable_select)(displayd *dpy, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg);
 

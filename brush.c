@@ -205,7 +205,13 @@ binning_permitted (displayd *display, ggobid *gg)
     return(false);
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    return(GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->binning_ok);
+     /* If there is a function to determine this, call it. Otherwise just 
+        get the value of binning_ok in the class. */
+    GtkGGobiExtendedDisplayClass *klass;
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    if(klass->binningPermitted)
+       return(klass->binningPermitted(display));
+    return(klass->binning_ok);
   }
 
   /*-- if we're adding lines to ASHes --*/
