@@ -1,7 +1,6 @@
 #ifndef GGOBI_API_H
 #define GGOBI_API_H
 
-
 #include <gtk/gtk.h>
 #include "ggobi.h"
 #include "defines.h"

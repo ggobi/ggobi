@@ -3,8 +3,10 @@
 
 #include <stdio.h>
 
-#include "ggobi.h"
-#include "datad.h"
+#include "vars.h"
+#include "externs.h"
+
+#include <gtk/gtk.h>
 
 #ifdef __cplusplus 
 extern "C" {

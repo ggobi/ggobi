@@ -56,10 +56,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <gtk/gtk.h>
 
 #include "read_xml.h"
 
-#include "ggobi.h"
 #include "externs.h"
 
 #include "GGobiAPI.h"
@@ -152,7 +152,7 @@ data_xml_read (const gchar *filename, ggobid *gg)
 
 
   {
-    GList *l;
+    GSList *l;
     datad *d;
     ok = true;
     for (l = gg->d; l; l = l->next) {
@@ -411,23 +411,23 @@ gboolean
 setDatasetInfo (const CHAR **attrs, XMLParserData *data)
 {
   const char *tmp = getAttribute(attrs, "numRecords");
+  datad *d = data->gg->current_display->d;
 
   if (tmp == NULL) {
     g_printerr ("No numRecords attribute\n");
     exit(101);
   }
 
-/*-- needs to be for one datad object at a time --*/
-  data->nrows = asInteger(tmp);
-  data->nrows_in_plot = data->d->nrows;  /*-- for now --*/
-  data->nrgroups = 0;              /*-- for now --*/
+  d->nrows = asInteger(tmp);
+  d->nrows_in_plot = d->nrows;  /*-- for now --*/
+  d->nrgroups = 0;              /*-- for now --*/
 
-  rowlabels_alloc (data->d, data->gg);
-  br_glyph_ids_alloc (data->d, data->gg);
-  br_glyph_ids_init (data->d, data->gg);
+  rowlabels_alloc (d, data->gg);
+  br_glyph_ids_alloc (d, data->gg);
+  br_glyph_ids_init (d, data->gg);
 
-  br_color_ids_alloc (data->d, data->gg);
-  br_color_ids_init (data->d, data->gg);
+  br_color_ids_alloc (d, data->gg);
+  br_color_ids_init (d, data->gg);
 
   tmp = getAttribute(attrs, "missingValue");
   if(tmp != NULL) {
@@ -472,14 +472,16 @@ getAttribute(const CHAR **attrs, char *name)
 gboolean 
 newRecord(const CHAR **attrs, XMLParserData *data)
 {
- const char *tmp;
- int i = data->current_record;
+  const gchar *tmp;
+  gint i = data->current_record;
+  datad *d = data->gg->current_display->d;
+
   data->current_element = 0;
 
   tmp = getAttribute(attrs, "label");
   if (tmp) {
     gchar *stmp = g_strdup (tmp);
-    g_array_insert_val (data->d->rowlab, data->current_record, stmp);
+    g_array_insert_val (d->rowlab, data->current_record, stmp);
   }
 
 
@@ -490,8 +492,8 @@ newRecord(const CHAR **attrs, XMLParserData *data)
   tmp = getAttribute(attrs, "id");
   if(tmp) {
     if(data->rowIds == NULL) {
-     data->rowIds = (gchar **) g_malloc(data->d->nrows * sizeof(gchar *));
-     memset(data->rowIds, '\0', data->d->nrows);
+     data->rowIds = (gchar **) g_malloc(d->nrows * sizeof(gchar *));
+     memset(data->rowIds, '\0', d->nrows);
     }
 
     data->rowIds[i] = g_strdup(tmp);
@@ -504,27 +506,27 @@ newRecord(const CHAR **attrs, XMLParserData *data)
 gboolean
 setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
 {
- const char *tmp;
+  const char *tmp;
+  ggobid *gg = data->gg;
+  datad *d = data->gg->current_display->d;
+
   tmp = getAttribute(attrs, "hidden");
   if(tmp) {
     gboolean hidden = asLogical(tmp);
 
 
-    if(i < 0) {
-     if(type == RECORD)
+    if (i < 0) {
+     if (type == RECORD)
        data->defaults.hidden = hidden;
      else {
        data->defaults.lineHidden = hidden;
      }     
     } else
      if(type == RECORD)
-       data->d->hidden[i] =
-         data->d->hidden_now[i] =
-         data->d->hidden_prev[i] = hidden;
+       d->hidden[i] = d->hidden_now[i] = d->hidden_prev[i] = hidden;
      else {
-       data->gg->line.hidden.vals[i] =
-         data->gg->line.hidden_now.vals[i] =
-         data->gg->line.hidden_prev.vals[i] = hidden;
+       gg->line.hidden.vals[i] = gg->line.hidden_now.vals[i] =
+         gg->line.hidden_prev.vals[i] = hidden;
      }
   }
 
@@ -548,8 +550,10 @@ asLogical(const gchar *sval)
 gboolean
 setColor(const CHAR **attrs, XMLParserData *data, int i)
 {
- const char *tmp;
- int value = data->defaults.color;
+  const gchar *tmp;
+  gint value = data->defaults.color;
+  datad *d = data->gg->current_display->d;
+
   tmp = getAttribute(attrs, "color");
   if(tmp) {
     value = asInteger(tmp);
@@ -562,19 +566,18 @@ setColor(const CHAR **attrs, XMLParserData *data, int i)
     if(i < 0)
      data->defaults.color = value;
     else 
-     data->d->color_ids[i] =
-       data->d->color_now[i] =
-       data->d->color_prev[i] = value;    
+     d->color_ids[i] = d->color_now[i] = d->color_prev[i] = value;    
   }
 
- return(value != -1);
+ return (value != -1);
 }
 
 gboolean
-setGlyph(const CHAR **attrs, XMLParserData *data, int i)
+setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
 {
-  const char *tmp;
-  int value;
+  const gchar *tmp;
+  gint value;
+  datad *d = data->gg->current_display->d;
 
   value = data->defaults.glyphSize;
   tmp = getAttribute(attrs, "glyphSize");
@@ -589,8 +592,8 @@ setGlyph(const CHAR **attrs, XMLParserData *data, int i)
    if (i < 0)
      data->defaults.glyphSize = value;
    else
-     data->d->glyph_ids[i].size = data->d->glyph_now[i].size 
-             = data->d->glyph_prev[i].size = value;
+     d->glyph_ids[i].size = d->glyph_now[i].size 
+             = d->glyph_prev[i].size = value;
   }
 
 
@@ -607,17 +610,17 @@ setGlyph(const CHAR **attrs, XMLParserData *data, int i)
     if(i < 0)
       data->defaults.glyphSize = value;
     else
-     data->d->glyph_ids[i].type = data->d->glyph_now[i].type = 
-           data->d->glyph_prev[i].type = value;
+     d->glyph_ids[i].type = d->glyph_now[i].type = 
+           d->glyph_prev[i].type = value;
   }
 
 
   tmp = getAttribute(attrs, "glyph");
   if(tmp != NULL) {
-    const char *next;
-    int j;
+    const gchar *next;
+    gint j;
     next = tmp;
-    next = strtok((char *)tmp, " ");
+    next = strtok((gchar *)tmp, " ");
     j = 0;
     while(next) {
       if(j == 0) {
@@ -625,13 +628,15 @@ setGlyph(const CHAR **attrs, XMLParserData *data, int i)
           if(i < 0)
             data->defaults.glyphType = value;
           else
-            data->d->glyph_ids[i].type = data->d->glyph_now[i].type = data->d->glyph_prev[i].type = value;       
+            d->glyph_ids[i].type = d->glyph_now[i].type =
+              d->glyph_prev[i].type = value;       
       } else {
         value = atoi(next);
         if(i < 0)
-            data->defaults.glyphSize = value;
+          data->defaults.glyphSize = value;
         else
-            data->d->glyph_ids[i].size = data->d->glyph_now[i].size = data->d->glyph_prev[i].size = value;     
+          d->glyph_ids[i].size = d->glyph_now[i].size =
+            d->glyph_prev[i].size = value;     
       }
      j++;
      next = strtok(NULL, " ");
@@ -639,12 +644,13 @@ setGlyph(const CHAR **attrs, XMLParserData *data, int i)
 
   }
 
- return(value != -1);
+  return (value != -1);
 }
 
 
 void
-xml_warning(const char *attribute, const char *value, const char *msg, XMLParserData *data)
+xml_warning(const gchar *attribute, const gchar *value, const gchar *msg,
+  XMLParserData *data)
 {
   g_printerr ("Incorrect data (record %d)\n",  data->current_record);
   g_printerr ("\t%s %s: value = %s\n",  attribute, msg, value);
@@ -662,10 +668,11 @@ setRecordValues (XMLParserData *data, const CHAR *line, gint len)
 {
   gdouble value;
   const gchar *tmp = strtok((gchar*) line, " \t\n");
+  datad *d = data->gg->current_display->d;
 
   while (tmp) {
     value = asNumber (tmp);
-    data->d->raw.vals[data->current_record][data->current_element++] = value;
+    d->raw.vals[data->current_record][data->current_element++] = value;
     tmp = strtok (NULL, " \t\n");
   }
 
@@ -693,21 +700,22 @@ asNumber(const char *sval)
 gboolean
 newVariable(const CHAR **attrs, XMLParserData *data)
 {
- int groupId = data->current_variable;
- const char *tmp;
+  gint groupId = data->current_variable;
+  const gchar *tmp;
+  datad *d = data->gg->current_display->d;
 
   tmp = getAttribute(attrs, "transformName");
-  if(tmp) {
+  if (tmp) {
     data->variable_transform_name_as_attribute = true;
 
-    data->d->vardata[data->current_variable].collab_tform =  g_strdup(tmp);
+    d->vardata[data->current_variable].collab_tform =  g_strdup(tmp);
   }
 
  tmp = getAttribute(attrs, "name");
  if(tmp != NULL) {
-  data->d->vardata[data->current_variable].collab = g_strdup(tmp);
-  if(data->variable_transform_name_as_attribute == false)
-    data->d->vardata[data->current_variable].collab_tform = g_strdup(tmp);
+  d->vardata[data->current_variable].collab = g_strdup(tmp);
+  if (data->variable_transform_name_as_attribute == false)
+    d->vardata[data->current_variable].collab_tform = g_strdup(tmp);
  }
 
   tmp = getAttribute(attrs, "group");
@@ -716,9 +724,9 @@ newVariable(const CHAR **attrs, XMLParserData *data)
       /* Do we need to subtract 1 from this. */
   }
 
-  data->d->vardata[data->current_variable].groupid_ori = groupId;
+  d->vardata[data->current_variable].groupid_ori = groupId;
 
- return(true);
+  return (true);
 }
 
 
@@ -733,23 +741,24 @@ newVariable(const CHAR **attrs, XMLParserData *data)
 gboolean 
 allocVariables (const CHAR **attrs, XMLParserData *data)
 {
- const char *tmp = getAttribute (attrs, "count");
+  const gchar *tmp = getAttribute (attrs, "count");
+  datad *d = data->gg->current_display->d;
 
- if(tmp == NULL) {
+  if(tmp == NULL) {
     g_printerr ("No count for variables attribute\n");
     exit(101);
- }
+  }
 
- data->d->ncols = asInteger(tmp);
+  d->ncols = asInteger(tmp);
 
- arrayf_alloc (&data->d->raw, data->d->nrows, data->d->ncols);
+  arrayf_alloc (&d->raw, d->nrows, d->ncols);
 
- vardata_alloc (data->d, data->gg);
- vardata_init (data->d, data->gg);
+  vardata_alloc (d, data->gg);
+  vardata_init (d, data->gg);
  
- hidden_alloc (data->d, data->gg);
+  hidden_alloc (d, data->gg);
 
- return (true);
+  return (true);
 }
 
 
@@ -766,6 +775,7 @@ setVariableName(XMLParserData *data, const CHAR *name, gint len)
 {
   gchar *tmp = (gchar *) g_malloc (sizeof(gchar) * (len+1));
   gint j = data->current_variable;
+  datad *d = data->gg->current_display->d;
 
   tmp[len] = '\0';
   memcpy (tmp, name, len);
@@ -773,11 +783,11 @@ setVariableName(XMLParserData *data, const CHAR *name, gint len)
   /* Handle the case where we have multiple calls to the characters
      handler for the same variable because the data is split
    */
-  if (data->d->vardata[j].collab != NULL) {
+  if (d->vardata[j].collab != NULL) {
     /* need to append tmp to the existing value.*/
   }
 
-  data->d->vardata[j].collab = tmp;
+  d->vardata[j].collab = tmp;
 
   /* Note that if we do have multiple calls to this for the same
      variable then we cannot handle the case where the 
@@ -785,8 +795,8 @@ setVariableName(XMLParserData *data, const CHAR *name, gint len)
      unless we use a flag in XMLParserData. This is
      variable_transform_name_as_attribute.
    */
-  if (data->d->vardata[j].collab_tform == NULL) {
-    data->d->vardata[j].collab_tform = g_strdup (tmp);
+  if (d->vardata[j].collab_tform == NULL) {
+    d->vardata[j].collab_tform = g_strdup (tmp);
   }
 
   return (true);
@@ -804,11 +814,12 @@ gboolean
 allocEdges (const CHAR **attrs, XMLParserData *data)
 {
   const char *tmp = getAttribute (attrs, "count");
+  datad *d = data->gg->current_display->d;
 
   if (tmp) {
     gint value = asInteger (tmp);
     data->gg->nedges = value;
-    edges_alloc (value, data->d, data->gg);
+    edges_alloc (value, d, data->gg);
 /*  br_line_color_alloc(data->gg);*/
     br_line_color_init (data->gg);
   }
@@ -1047,14 +1058,16 @@ setEdgeVariableName (XMLParserData *data, const CHAR *name, gint len)
 gint
 rowId (const gchar *tmp, XMLParserData *data)
 {
+  datad *d = data->gg->current_display->d;
   gint value = atoi(tmp) - 1;
+
   if (value < 0) {
    /* Now look up the ids for the rows. */
    gint i;
-   for (i=0; i < data->d->nrows; i++) {
-     if (strcmp (tmp, g_array_index (data->d->rowlab, gchar *, i)) == 0 ||
+   for (i=0; i < d->nrows; i++) {
+     if (strcmp (tmp, g_array_index (d->rowlab, gchar *, i)) == 0 ||
          (data->rowIds != NULL && data->rowIds[i] &&
-          strcmp(tmp,data->rowIds[i]) == 0))
+          strcmp(tmp, data->rowIds[i]) == 0))
       {
         value = i;
         break;

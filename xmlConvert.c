@@ -5,8 +5,7 @@
  */
 
 
-#include "ggobi.h"
-#include "externs.h"
+#include <gtk/gtk.h>
 #include "write_xml.h"
 
 gint
@@ -30,7 +29,7 @@ main (gint argc, gchar *argv[])
 
   gg->data_in = argv[1];
 
-  fileset_read (gg->data_in, d, gg);
+  fileset_read (gg->data_in, gg);
   if(0) {
     tmpname = (gchar*) g_malloc(sizeof(gchar)*strlen(gg->fname)+5);
     sprintf (tmpname, "%s%s", gg->fname, ".tmp");

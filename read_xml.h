@@ -1,9 +1,7 @@
 #ifndef READ_XML_H
 #define READ_XML_H
 
-#include <gtk/gtk.h>
-
-#include "ggobi.h"
+#include "vars.h"
 
 /*#include <libxml/parser.h>*/
 #include <parser.h>

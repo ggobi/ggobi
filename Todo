@@ -21,9 +21,6 @@ various stuff not yet implemented:
 when brushing or identifying in parcoords, use leave/enter events to
   change the current_splot.
 
-Window menu:  build it more permanently, and then rebuild it
-  whenever the number (or contents) of the d's has changed.
-
 keep working on array and vector management
 
 color:  allow additional colormaps -- .cmap file
@@ -136,3 +133,5 @@ Food for thought:
 ! exclusion:  rebuilding the table on the fly -- just destroy and
 !   rebuild, as we did in xgobi
 
+! Window menu:  build it more permanently, and then rebuild it
+!   whenever the number (or contents) of the d's has changed.

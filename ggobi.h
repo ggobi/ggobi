@@ -337,7 +337,5 @@ struct _ggobid {
 
 }; /*  ggobid; */
 
-#define GGOBI_H
-
 #endif
 
