@@ -72,42 +72,6 @@ glayoutFromInst (PluginInstance *inst)
   return gl;
 }
 
-void
-scale_array_max (array_d *dist, gint nr, gint nc)
-{
-  /*extern gdouble delta;*/  /* in mds.c */
-  gdouble max;
-  gint i, j;
-  gdouble **d = dist->vals;
-
-  if (dist->nrows < nr || dist->ncols < nc)
-    g_printerr ("This array is smaller than nr or nc\n");
-  else {
-
-    max = 0.0;
-    for (j=0; j<nc; j++) {
-      for (i=0; i<nr; i++) {
-        if (d[i][j] != DBL_MAX) {
-          if (d[i][j] > max) max = d[i][j];
-          if (d[i][j] < 0.0) 
-            g_printerr ("Negative value %e in dist array at i=%d, j=%d\n",
-              d[i][j], i, j);
-        }
-      }
-    }
-
-    if (max < 1E-10) 
-      printf("Range of dist array too small: max=%e\n", max);
-
-    for (j=0; j<nc; j++) {
-      for (i=0; i<nr; i++) {
-        if(d[i][j] != DBL_MAX)
-          d[i][j] /= max;
-      }
-    }
-  }
-}
-
 static void
 glayout_datad_set_cb (GtkWidget *cl, gint row, gint column,
   GdkEventButton *event, PluginInstance *inst)
@@ -177,7 +141,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gl->window = window;
 
-  gtk_window_set_title(GTK_WINDOW(window), "glayout");
+  gtk_window_set_title(GTK_WINDOW(window), "Graph Layout");
   gtk_signal_connect (GTK_OBJECT (window), "destroy",
                       GTK_SIGNAL_FUNC (close_glayout_window), inst);
 
