@@ -1,4 +1,7 @@
 #define gtk_object_class_user_signal_new g_signal_new
+/* see ggobiClass.c for the new signatures that need to be replicated here. */
+#error "These need to be updated. Please contact ggobi-core@ggobi.org"
+
 #if 0
        /*-- If this signal has not been initialized yet, do it now --*/
   if (gtk_signal_lookup ("datad_added", GTK_TYPE_GGOBI) == 0) {

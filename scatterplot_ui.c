@@ -19,7 +19,7 @@
 
 void
 scatterplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
-  ggobid *gg, gboolean useIds)
+			    ggobid *gg, gboolean useIds)
 {
 
   /*-- ViewMode menu --*/
