@@ -113,6 +113,15 @@ jitter_window_open (ggobid *gg) {
       notebook = create_variable_notebook (vbox, GTK_SELECTION_EXTENDED,
         (GtkSignalFunc) NULL, gg);
 
+      /*-- option menu --*/
+      opt = gtk_option_menu_new ();
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+        "The jittering is either distributed uniform or normal", NULL);
+      gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
+      populate_option_menu (opt, type_lbl,
+                            sizeof (type_lbl) / sizeof (gchar *),
+                            (GtkSignalFunc) type_cb, gg);
+
       /*-- vbox for label and rangewidget --*/
       vb = gtk_vbox_new (true, 2);
       gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 1);
@@ -141,15 +150,6 @@ jitter_window_open (ggobid *gg) {
       gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                          GTK_SIGNAL_FUNC (jitter_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
-
-      /*-- option menu --*/
-      opt = gtk_option_menu_new ();
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-        "The jittering is either distributed uniform or normal", NULL);
-      gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
-      populate_option_menu (opt, type_lbl,
-                            sizeof (type_lbl) / sizeof (gchar *),
-                            (GtkSignalFunc) type_cb, gg);
 
       /*-- Close button --*/
       gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(), false, true, 2);
