@@ -415,6 +415,7 @@ ggobiInit(int *argc, char **argv[])
 		       sizeof(typeLoaders)/sizeof(typeLoaders)[0]);
 }
 
+
   /* Available so that we can call this from R
      without any confusion between which main().
    */
@@ -431,10 +432,12 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 
   parse_command_line (&argc, argv);
 
-
 #ifdef SUPPORT_INIT_FILES
   process_initialization_files();
 #endif
+
+  registerDefaultPlugins(sessionOptions->info);
+
 
   if(sessionOptions->verbose == GGOBI_VERBOSE)
     g_printerr("progname = %s\n", g_get_prgname());

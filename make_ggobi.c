@@ -151,12 +151,7 @@ gboolean read_input(InputDescription * desc, ggobid * gg)
     return (ok);
 
   switch (desc->mode) {
-  case xml_data:
-  case url_data:
-    ok = data_xml_read(desc, gg);
-    break;
-
-  case mysql_data:
+   case mysql_data:
 #ifdef USE_MYSQL
     {
       extern MySQLLoginInfo DefaultMySQLInfo;
@@ -175,15 +170,8 @@ gboolean read_input(InputDescription * desc, ggobid * gg)
   case Sprocess_data:
     break;
 
-  case ascii_data:
-    ok = read_ascii_data(desc, gg);
-    break;
-
-  case csv_data:
-    ok = read_csv_data(desc, gg);
-    break;
-
   default:
+     /* Usethe plugin structure. */
     if (desc->desc_read_input) {
       ok = desc->desc_read_input(desc, gg, NULL);
     } else

@@ -248,6 +248,8 @@ struct _ggobid {
 
 /*---------------------- touring -------------------------------------*/
 
+
+#ifndef NEW_TOUR_CLASSES
   struct _Tour2d3 {
     gint idled;
   } tour2d3;
@@ -268,7 +270,9 @@ struct _ggobid {
     gint idled;
     gboolean fade_vars;
   } tourcorr;
+#else
 
+#endif
 /*-------------------- parallel coordinates --------------------------*/
 
   struct _Parcoords {

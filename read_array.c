@@ -198,7 +198,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, datad *d, ggobid *gg) {
 }
 
 static gboolean
-read_ascii (FILE *fp, datad *d, ggobid *gg)
+ReadAscii (FILE *fp, datad *d, ggobid *gg)
 {
   gint j, jrows, nrows, jcols, fs;
   gint nitems;
@@ -300,7 +300,7 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
 
   /*-- Close the data file --*/
   if (fclose (fp) == EOF)
-    g_printerr ("read_ascii: error in fclose");
+    g_printerr ("ReadAscii: error in fclose");
 
   d->nrows = nrows;
 
@@ -308,7 +308,7 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
     g_printerr ("size of data: %d x %d\n", d->nrows, d->ncols);
 
   if (nitems != d->nrows * d->ncols) {
-    g_printerr ("read_ascii: nrows*ncols != nitems read\n");
+    g_printerr ("ReadAscii: nrows*ncols != nitems read\n");
     g_printerr ("(nrows= %d, ncols= %d, nitems read= %d)\n",
       d->nrows, d->ncols, nitems);
     (*FatalError)(0);
@@ -328,6 +328,32 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
 
   return(true);
 }
+
+
+gboolean
+read_ascii(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
+{
+   return(read_ascii_data(desc, gg));
+}
+
+
+InputDescription *
+read_ascii_input_description(const char * const fileName, const char * const modeName, 
+			   ggobid *gg, GGobiPluginInfo *info)
+{
+  InputDescription *desc;
+  desc = (InputDescription*) g_malloc(sizeof(InputDescription));
+  memset(desc, '\0', sizeof(InputDescription));
+
+  desc->fileName = g_strdup(fileName);
+  desc->mode = ascii_data;
+  desc->desc_read_input = &read_ascii;	
+  completeFileDesc(fileName, desc);
+
+
+  return(desc);
+}
+
 
 gboolean
 read_ascii_data(InputDescription *desc, ggobid *gg)
@@ -383,7 +409,7 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
     signal (SIGALRM, stdin_empty);
 #endif
 
-    return(read_ascii (fp, d, gg));
+    return(ReadAscii (fp, d, gg));
   }
   else
   {
@@ -407,8 +433,10 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
           (const gchar *) sep, 0);
         gchar **p;
 
-        if (!words)
+        if (!words) {
+          fclose(fp);
 /**/      return (false);
+	}
 
         for (p=words; *p; p++) {
           if (**p) {
@@ -416,7 +444,7 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
           }
         }
 
-        read_ascii (fp, d, gg);
+        ReadAscii (fp, d, gg);
         /*-- set the name to the filename with all the directory
              information stripped out --*/
         d->name = (name != NULL && strlen(name)) > 0 ?

@@ -144,6 +144,31 @@ const gchar * const xmlDataTagNames[] = {
   ""
   };
 
+
+gboolean
+read_xml(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
+{
+   return(data_xml_read(desc, gg));
+}
+
+InputDescription *
+read_xml_input_description(const char * const fileName, const char * const modeName, 
+			   ggobid *gg, GGobiPluginInfo *info)
+{
+  InputDescription *desc;
+  desc = (InputDescription*) g_malloc(sizeof(InputDescription));
+  memset(desc, '\0', sizeof(InputDescription));
+
+  desc->fileName = g_strdup(fileName);
+  desc->mode = isURL(fileName) ? url_data : xml_data;
+  desc->desc_read_input = &read_xml;	
+
+  return(desc);
+}
+
+
+
+
 void
 ggobi_XML_warning_handler(void *data, const gchar *msg, ...)
 {

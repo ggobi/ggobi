@@ -88,7 +88,7 @@ char *
 installed_file_name(char *name)
 {
   char *tmp;
-  char *dirPtr, *dir;
+/*  char *dirPtr, *dir; */
 
   tmp = (char *) g_malloc( (strlen(sessionOptions->ggobiHome)  + strlen(name)+ 3)*sizeof(char));
   sprintf(tmp, "%s%s", sessionOptions->ggobiHome, name);
@@ -168,15 +168,20 @@ DLFUNC
 getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
 {
   char tmp[100];
+  HINSTANCE lib;
 #ifdef HAVE_UNDERSCORE_SYMBOL_PREFIX
   sprintf(tmp, "_%s", name);
 #else
   sprintf(tmp, "%s", name);
 #endif
-  if(plugin->library == NULL && plugin->loaded != DL_LOADED) {
-     plugin->library = load_plugin_library(plugin, true);   
-  }
-  return(dynload->resolve(plugin->library, tmp));
+
+  if(!plugin)
+     lib = NULL;
+  else if(plugin->library == NULL && plugin->loaded != DL_LOADED) {
+     lib = plugin->library = load_plugin_library(plugin, true);   
+  } 
+
+  return(dynload->resolve(lib, tmp));
 }
 
 
@@ -553,4 +558,72 @@ checkDLL()
   }
 
   f();
+}
+
+
+#include "externs.h"
+
+GGobiInputPluginInfo XMLInputPluginInfo = {
+	"xml",
+	"",
+	"",
+	"read_xml_input_description",
+	false,
+	read_xml,
+	isXMLFile,
+	xml_data
+};
+
+
+GGobiInputPluginInfo CSVInputPluginInfo = {
+	"csv",
+	"",
+	"",
+	"read_csv_input_description",
+	false,
+	read_csv,
+	isCSVFile,
+	csv_data
+};
+
+
+GGobiInputPluginInfo ASCIIInputPluginInfo = {
+	"ascii",
+	"",
+	"",
+	"read_ascii_input_description",
+	false,
+	read_ascii,
+	isASCIIFile,
+	ascii_data
+};
+
+
+GGobiPluginInfo  *
+createGGobiInputPluginInfo(GGobiInputPluginInfo *info)
+{
+  GGobiPluginInfo  *plugin; 
+  plugin = (GGobiPluginInfo *) malloc(sizeof(GGobiPluginInfo));
+  memset(plugin, '\0', sizeof(GGobiPluginInfo));
+
+  plugin->type = INPUT_PLUGIN;
+  plugin->info.i = info;
+  plugin->details = NULL;
+
+  return(plugin);
+}
+
+void
+registerDefaultPlugins(GGobiInitInfo *info)
+{
+  GGobiPluginInfo  *plugin; 
+  
+  plugin = createGGobiInputPluginInfo(&XMLInputPluginInfo);
+  info->inputPlugins = g_list_append(info->inputPlugins, plugin);
+
+  plugin = createGGobiInputPluginInfo(&CSVInputPluginInfo);
+  info->inputPlugins = g_list_append(info->inputPlugins, plugin);
+
+  plugin = createGGobiInputPluginInfo(&ASCIIInputPluginInfo);
+  info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 }

@@ -470,8 +470,10 @@ data_mode_set (gchar *filename)
     data_mode = ascii_data;
   else if (strcmp (suffix, ".bin") == 0)
     data_mode = binary_data;
+#if 0
   else if (strcmp (suffix, ".xml") == 0)
     data_mode = xml_data;
+#endif
   else
      data_mode = ascii_data;
   return data_mode;

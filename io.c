@@ -148,7 +148,7 @@ void
 filename_get_r (ggobid *gg, guint action, GtkWidget *w) 
 {
   GtkWidget *fs = gtk_file_selection_new ("read ggobi data");
-  gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs));
+  gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs)); 
 
   /*
    * I would like to put in the directory here without the

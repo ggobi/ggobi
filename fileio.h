@@ -11,7 +11,7 @@ typedef struct _ggobid ggobid;
 typedef struct _InputDescription InputDescription;
 
 typedef gboolean (*InputReader)(InputDescription *desc, ggobid *gg, GGobiPluginInfo *);
-typedef gboolean (*InputProbe)(const char * const input, GGobiPluginInfo *);
+typedef gboolean (*InputProbe)(const char * const input, ggobid *gg, GGobiPluginInfo *);
 
 typedef InputDescription* (*InputGetDescription)(const char * const fileName, const char * const input, ggobid *gg, GGobiPluginInfo*);
 
@@ -55,8 +55,9 @@ gboolean check_file_exists(const gchar *fileName);
 GSList *initFileTypeGroups(void);
 DataMode verifyDataMode(const gchar *fileName, DataMode mode, InputDescription *desc);
 DataMode guessDataMode(const gchar *fileName, InputDescription *desc);
-gboolean isXMLFile(const gchar *fileName, InputDescription *desc);
-gboolean isASCIIFile(const gchar *fileName);
+gboolean isXMLFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info);
+gboolean isCSVFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info);
+gboolean isASCIIFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *plugin);
 gboolean endsWith(const gchar *str, const gchar *what);
 ExtensionList *getInputDescriptionGroup(DataMode mode);
 

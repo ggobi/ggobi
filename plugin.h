@@ -56,8 +56,12 @@ struct   _GGobiInputPluginInfo {
     gboolean interactive;
 
     InputReader plugin_read_input;
-    InputProbe  probe;
-
+    InputProbe  probe; /* Used when guessing the format. Each plugin is asked whether it supports
+                          this file. It can do so by looking at the extension, reading the
+                          start of the file, etc. 
+                        */
+    
+    DataMode mode;
 };
 
 struct _GGobiPluginInfo {

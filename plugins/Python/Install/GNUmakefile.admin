@@ -1,0 +1,18 @@
+ifndef GGOBI_HOME
+ GGOBI_HOME=../..
+endif
+
+DIR_NAME=Python
+
+DOCS=
+
+include $(GGOBI_HOME)/plugins/GNUmakefile.PluginAdmin
+
+ifndef NO_DOCS
+ DEPS=$(DOCS:%=Docs/%)
+endif
+
+createDist::
+	-mkdir -p $(INSTALL_DIR)/$(DIR_NAME)/Install
+	cp Install/*.py $(INSTALL_DIR)/$(DIR_NAME)/Install
+	cp plugin.xml.in $(INSTALL_DIR)/$(DIR_NAME)

@@ -27,9 +27,11 @@ void whatisfiletype(FILE* fp, gint* ncols, gint* nrows);
 gboolean is_num(gchar* word);
 void read_col_labels(datad* d,FILE* fp);
 void read_row_labels(datad* d,FILE* fp);
-gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_category);
+static gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_category);
 gboolean setup_category(datad* d, gint* text_table, Tree* text_category);
 void InorderTravel_setup_category(Tree* T, Node* X, vartabled* vt);
+
+gboolean  read_csv_data(InputDescription *desc, ggobid *gg);
 
 void InorderTravel_setup_category(Tree* T, Node* X, vartabled* vt)
 {
@@ -89,7 +91,30 @@ gboolean setup_category(datad* d, gint* text_table, Tree* text_category)
   }
   return true;
 }
-gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_category)
+
+gboolean
+read_csv(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
+{
+   return(read_csv_data(desc, gg));
+}
+
+InputDescription *
+read_csv_input_description(const char * const fileName, const char * const modeName, 
+			   ggobid *gg, GGobiPluginInfo *info)
+{
+  InputDescription *desc;
+  desc = (InputDescription*) g_malloc(sizeof(InputDescription));
+  memset(desc, '\0', sizeof(InputDescription));
+
+  desc->fileName = g_strdup(fileName);
+  desc->mode = csv_data;
+  desc->desc_read_input = &read_csv;	
+
+  return(desc);
+}
+
+
+static gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_category)
 {
   gint ch;
   gchar tmp[256];

@@ -96,8 +96,7 @@ InputDescription *
 fileset_generate(const gchar * fileName, DataMode guess,
                                    ggobid * gg)
 {
-  InputDescription *desc = (InputDescription *)
-      calloc(1, sizeof(InputDescription));
+  InputDescription *desc;
 #ifndef WIN32
   struct stat buf;
 #else
@@ -112,19 +111,35 @@ fileset_generate(const gchar * fileName, DataMode guess,
 
   groups = FileTypeGroups;
 
+  desc = (InputDescription *) calloc(1, sizeof(InputDescription));
+
 #ifdef SUPPORT_PLUGINS
-  if (guess == unknown_data && sessionOptions->data_type) {
+  if (1) {
     GList *els = sessionOptions->info->inputPlugins;
     if (els) {
       gint i, n;
       n = g_list_length(els);
       for (i = 0; i < n; i++) {
+        gboolean handlesFile = false;
         GGobiPluginInfo *plugin;
         GGobiInputPluginInfo *info;
         plugin = g_list_nth_data(els, i);
         info = plugin->info.i;
-        if (1 || (info->modeName &&
-            strcmp(info->modeName, sessionOptions->data_type) == 0)) {
+
+         /* Use the probe only if the user has not given us a 
+            specific format/plugin. */
+	if(sessionOptions->data_mode == unknown_data) {
+          if(info->probe) 
+     	    handlesFile = info->probe(fileName, gg, plugin);
+	  else
+            handlesFile = true;
+	}
+
+        if ((sessionOptions->data_mode == unknown_data && handlesFile) 
+             ||  sessionOptions->data_mode == info->mode 
+             || (sessionOptions->data_type && info->modeName &&
+					   strcmp(info->modeName, sessionOptions->data_type) == 0)) 
+	{
           InputGetDescription f;
           f = (InputGetDescription) getPluginSymbol(info->getDescription,
                                                     plugin->details);
@@ -225,7 +240,6 @@ fileset_generate(const gchar * fileName, DataMode guess,
 
   } else {
     desc->fileName = g_strdup(fileName);
-    desc->mode = guess;
     desc->mode = guess = verifyDataMode(desc->fileName, desc->mode, desc);
     if (desc->mode == unknown_data) {
       return (NULL);
@@ -364,7 +378,7 @@ gboolean isURL(const gchar * fileName)
            strncmp(fileName, "ftp:", 4) == 0));
 }
 
-gboolean isASCIIFile(const gchar * fileName)
+gboolean isASCIIFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *plugin)
 {
   FILE *f;
   gchar word[128];
@@ -417,15 +431,25 @@ verifyDataMode(const gchar * fileName, DataMode mode,
                InputDescription * desc)
 {
   switch (mode) {
+#if 0
   case xml_data:
   case url_data:
     if (!isXMLFile(fileName, desc))
       mode = unknown_data;
     break;
+#endif
+#if 0
   case ascii_data:
     if (!isASCIIFile(fileName))
       mode = unknown_data;
     break;
+#endif
+#if 0
+  case csv_data:
+    if (!isCSVFile(fileName))
+      mode = unknown_data;
+    break;
+#endif
   default:
     mode = guessDataMode(fileName, desc);
   }
@@ -433,14 +457,21 @@ verifyDataMode(const gchar * fileName, DataMode mode,
   return (mode);
 }
 
-gboolean isXMLFile(const gchar * fileName, InputDescription * desc)
+gboolean 
+isXMLFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info)
+/*XXX InputDescription * desc) */
 {
+
   FILE *f;
   gint c;
+  gchar *tmp;
 
-  gchar *tmp = strrchr(fileName, '.');
+  if(isURL(fileName))
+    return(true);
+
+  tmp = strrchr(fileName, '.');
   if (tmp && (strcmp(tmp, ".xmlz") == 0 || strcmp(tmp, ".gz") == 0)) {
-    desc->canVerify = false;
+	  /* desc->canVerify = false; */
     return (true);
   }
 
@@ -449,7 +480,7 @@ gboolean isXMLFile(const gchar * fileName, InputDescription * desc)
   if (f == NULL)
     return (false);
 
-  desc->canVerify = true;
+/*  desc->canVerify = true; */
   while ((c = getc(f)) != EOF) {
     if (c == ' ' || c == '\t' || c == '\n')
       continue;
@@ -469,7 +500,7 @@ gboolean isXMLFile(const gchar * fileName, InputDescription * desc)
 
 
 gboolean 
-isExcelFile(const gchar * fileName)
+isCSVFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *plugin)
 {
   char tmp[20];
   char extention[20];
@@ -510,14 +541,18 @@ DataMode guessDataMode(const gchar * fileName, InputDescription * desc)
   if (f == NULL)
     return (unknown_data);
 
+#if 0
   if (isXMLFile(fileName, desc))
     return (xml_data);
+#endif
 
-  if (isASCIIFile(fileName))
+  if (isASCIIFile(fileName, NULL, NULL))
     return (ascii_data);
 
-  if (isExcelFile(fileName))
+#if 0
+  if (isCSVFile(fileName))
       return (csv_data);
+#endif
 
   return (unknown_data);
 }
