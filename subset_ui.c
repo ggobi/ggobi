@@ -31,7 +31,7 @@ delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data)
 static void
 rescale_cb (GtkButton *button, ggobid *gg)
 {
-  datad *d = gg->current_data->d;
+  datad *d = gg->current_display->d;
   /* 
    * if datad has changed, refuse to do anything until the
    * user has closed and reopened subset_ui.window.
