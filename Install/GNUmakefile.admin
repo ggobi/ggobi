@@ -17,7 +17,8 @@ DIRS=\
    plugins share
 
 
-PLUGIN_DIRS=MySQL Postgres DataViewer FileSelector TestInput TestPlugin R JVM
+PLUGIN_DIRS=MySQL Postgres DataViewer FileSelector TestInput TestPlugin R
+# JVM
 #ggvis
 
 SHARE_FILES=Install/ggobirc.in
@@ -40,7 +41,7 @@ DATA_FILES=$(DATA_SRC_FILES:%=data/%)  notes/colorschemes.xml
 LICENSES= LGPL.txt license.html license.txt minterms.html minterms.txt
 
 DOC_TEX_FILES=\
-    DBMS Embedded RGGobi XML \
+    manual DBMS Embedded RGGobi XML \
 
 DOC_EXTENSION=pdf
 
