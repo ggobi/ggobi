@@ -833,6 +833,10 @@ getPluginLanguage(xmlNodePtr node, GGobiPluginInfo *plugin, GGobiPluginType type
 	GGobiLanguagePluginData *d;
 	ProcessPluginInfo f;
 
+	if(d == NULL) {
+	    fprintf(stderr, "No language plugin %s\n", tmp); fflush(stderr);
+            return(false);
+	}
 	d = (GGobiLanguagePluginData *) langPlugin->data;
 	loadPluginLibrary(langPlugin->details, langPlugin);
 	if(d) {
