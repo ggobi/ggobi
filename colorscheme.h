@@ -1,6 +1,5 @@
 #ifndef GGOBI_COLOR_SCHEME_H
 #define GGOBI_COLOR_SCHEME_H
-#ifdef USE_XML
 
 #include <gdk/gdk.h>
 
@@ -28,10 +27,11 @@ typedef struct {
   GdkColor rgb_accent; /*-- high-contrast accent color, rgb --*/
 } colorschemed;
 
-colorschemed *read_colorscheme(char *fileName, GList **);
 colorschemed *findColorSchemeByName(GList *schemes, const gchar *name);
 
+#ifdef USE_XML
 gint getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col);
-
+colorschemed *read_colorscheme(char *fileName, GList **);
 #endif
+
 #endif

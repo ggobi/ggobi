@@ -84,7 +84,7 @@ GGOBI(getDataModeDescription)(DataMode mode)
 const gchar *const *
 GGOBI(getDataModeNames)(int *n)
 {
-  extern const gchar * const DataModeNames[];
+  extern const gchar * const DataModeNames[num_data_modes];
   if(n)
     *n = num_data_modes;
   return(DataModeNames);
@@ -167,8 +167,10 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   gchar *lbl;
   vartabled *vt;
 
-  GGOBI(displays_release)(gg);
-  GGOBI(data_release)(d, gg);
+  if(cleanup) {
+      GGOBI(displays_release)(gg);
+      GGOBI(data_release)(d, gg);
+  }
 
   d->input = desc;
   if(d->name == NULL)
@@ -219,11 +221,14 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   if (datad_init (d, gg, cleanup) != NULL) {
       /* Have to patch up the displays list since we removed
          every entry and that makes for meaningless entries.
+ 
+         IS THIS TRUE? Only if cleanup was specified!
+         This looks very dangerous. Should use g_list_remove();
        */
     gg->displays->next = NULL;
 
-    display_menu_build (gg);
   }
+  display_menu_build (gg);
 }
 
 

@@ -50,8 +50,8 @@ gint totalNumGGobis;
 const gchar * const ViewTypes[] =
   {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
 const gint ViewTypeIndices[] = {scatterplot, scatmat, parcoords};           
-const gchar *const DataModeNames[] =
-  {"ASCII", "binary", "R/S data", "XML", "MySQL", "Unknown"};
+const gchar *const DataModeNames[num_data_modes] =
+  {"ASCII", "binary", "R/S data", "XML", "MySQL", "URL", "Unknown"};
 
 
 void initSessionOptions();
