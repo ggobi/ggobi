@@ -70,6 +70,13 @@ return false;
 /*
   resolveEdgePoints(e, d);
   ... this won't recalculate the endpoints; find out from Duncan what to do ..
+
+DTL: So need to call unresolveEdgePoints(e, d) to remove it from the 
+     list of previously resolved entries.
+     Can do better by just re-allocing the endpoints in the DatadEndpoints struct
+     and putting the new entry into that, except we have to check it resolves
+     correctly, etc. So unresolveEdgePoints() will just cause entire collection
+     to be recomputed.
 */
 
   return true;
@@ -256,13 +263,9 @@ computeResolvedEdgePoints(datad *e, datad *d)
 }
 
 
-/*
- Find the resolved edgepoints array associated with
- this dataset (d) by resolving the symbolic edge definitions
- in e.
-*/
-endpointsd *
-resolveEdgePoints(datad *e, datad *d)
+
+static endpointsd *
+do_resolveEdgePoints(datad *e, datad *d, gboolean compute)
 {
   endpointsd *ans = NULL;
   DatadEndpoints *ptr;
@@ -284,16 +287,84 @@ resolveEdgePoints(datad *e, datad *d)
      return(NULL);
 
   /* So no entry in the table yet. So compute the endpoints and add that to the table. */
-  if(ans == NULL) {
+  if(ans == NULL && compute) {
      /* resolve the endpoints */
     ans = computeResolvedEdgePoints(e, d);
-    if(ans == &DegenerateEndpoints)
-      return(NULL);
     ptr = (DatadEndpoints *) g_malloc(sizeof(DatadEndpoints));
     ptr->data = d;
-    ptr->endpoints = ans;
+    ptr->endpoints = (ans == &DegenerateEndpoints) ? NULL : ans;
     e->edge.endpointList = g_list_append(e->edge.endpointList, ptr);
   }
 
   return(ans);
+}
+
+
+/*
+ Find the resolved edgepoints array associated with
+ this dataset (d) by resolving the symbolic edge definitions
+ in e.
+*/
+endpointsd *
+resolveEdgePoints(datad *e, datad *d)
+{
+  return(do_resolveEdgePoints(e, d, true));
+}
+
+
+gboolean
+hasEdgePoints(datad *e, datad *d)
+{
+  return(do_resolveEdgePoints(e, d, false) ? true : false);
+}
+
+static void
+cleanEdgePoint(gpointer data, gpointer userData)
+{
+   DatadEndpoints *el = (DatadEndpoints *)data;
+   if(el && el->endpoints) {
+     g_free(el->endpoints);
+   }
+}
+
+void
+unresolveAllEdgePoints(datad *e)
+{
+   if(e->edge.endpointList) {
+      g_list_foreach(e->edge.endpointList, cleanEdgePoint, NULL);
+      g_list_free(e->edge.endpointList);
+   }
+}
+
+
+gboolean
+unresolveEdgePoints(datad *e, datad *d)
+{
+  DatadEndpoints *ptr;
+  GList *tmp;
+
+  if(e->edge.n < 1)
+    return(false);
+
+  for(tmp = e->edge.endpointList; tmp ; tmp = tmp->next) {
+     ptr = (DatadEndpoints *) tmp->data;
+     if(ptr->data == d) {
+       if(ptr->endpoints)
+          g_free(ptr->endpoints);
+
+          /* equivalent to 
+               g_list_remove(e->edge.endpointList, tmp) 
+             except we don't do the extra looping. Probably
+             minute since # of datasets is small!
+           */
+       if(tmp == e->edge.endpointList) {
+          e->edge.endpointList = tmp->next;
+       } else {
+          tmp->prev = tmp->next;
+       }
+       return(true);
+     }
+  }
+
+  return(false);
 }

@@ -84,6 +84,10 @@ datad_create(gint nr, gint nc, ggobid *gg)
   d->ncols = nc;
   d->nrows = nr;
 
+  d->nearest_point = -1;
+
+  d->missings_show_p = true;
+
   vectori_init_null (&d->rows_in_plot);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
@@ -143,10 +147,6 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
   pipeline_init (d, gg);
   clusters_set (d, gg);  /*-- find the clusters for data just read in --*/
-
-  d->nearest_point = -1;
-
-  d->missings_show_p = true;
 
   if (cleanup || g_list_length(gg->displays) == 0) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
