@@ -422,7 +422,7 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 void
 splot_add_rows (gint nrows, splotd *sp)
 {
-  vectorf_realloc (&sp->p1d_data, nrows);
+  vectorf_realloc (&sp->p1d.spread_data, nrows);
 
   sp->planar = (lcoords *) g_realloc (sp->planar,
     nrows * sizeof (lcoords));
@@ -445,8 +445,8 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
-  vectorf_init_null (&sp->p1d_data);
-  vectorf_alloc (&sp->p1d_data, nr);
+  vectorf_init_null (&sp->p1d.spread_data);
+  vectorf_alloc (&sp->p1d.spread_data, nr);
 
   switch (display->displaytype) {
     case scatterplot:
@@ -469,7 +469,7 @@ splot_free (splotd *sp, displayd *display, ggobid *gg) {
 
   g_free ((gpointer) sp->planar);
   g_free ((gpointer) sp->screen);
-  vectorf_free (&sp->p1d_data);
+  vectorf_free (&sp->p1d.spread_data);
 
   switch (display->displaytype) {
     case scatterplot:
@@ -525,7 +525,7 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   sp->pixmap0 = NULL;
   sp->pixmap1 = NULL;
   sp->redraw_style = FULL;
-  sp->tour1d.firsttime = true; /* Ensure that the 1D tour should be initialized. */
+  /*sp->tour1d.firsttime = true;*//* Ensure that the 1D tour should be initialized. */
 
 #ifdef BARCHART_IMPLEMENTED
 /* initialize barchart data */
@@ -757,7 +757,8 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
       tsplot_whiskers_make (sp, display, gg);
     break;
     case scatterplot:
-      p1d_ash_baseline_set (sp);
+      ash_baseline_set (&sp->p1d.ash_baseline, sp);
+      ash_baseline_set (&sp->tour1d.ash_baseline, sp);
     break;
     case scatmat:
 #ifdef BARCHART_IMPLEMENTED
