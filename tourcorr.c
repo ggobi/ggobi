@@ -1011,7 +1011,6 @@ void
 tourcorr_manip_end(splotd *sp) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
@@ -1019,9 +1018,7 @@ tourcorr_manip_end(splotd *sp)
   disconnect_motion_signal (sp);
 
   arrayd_copy(&dsp->tcorr1.F, &dsp->tcorr1.Fa);
-  /*  copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, d->ncols, 1);*/
   arrayd_copy(&dsp->tcorr2.F, &dsp->tcorr2.Fa);
-  /*  copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->ncols, 1);*/
   dsp->tcorr1.get_new_target = true;
   dsp->tcorr2.get_new_target = true;
 
