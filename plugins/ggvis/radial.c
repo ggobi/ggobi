@@ -132,9 +132,9 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 
 /*-- This may not belong here, but where exactly?  As soon as the
      panel is opened  --*/
-  gtk_signal_connect (GTK_OBJECT(gg->main_window),
+  gtk_signal_connect (GTK_OBJECT(gg),
     "sticky_point_added", highlight_sticky_edges, inst);
-  gtk_signal_connect (GTK_OBJECT(gg->main_window),
+  gtk_signal_connect (GTK_OBJECT(gg),
     "sticky_point_removed", highlight_sticky_edges, inst);
 
   init = (ggv->radial == NULL || d->nrows != ggv->radial->d->nrows);

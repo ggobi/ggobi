@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include "errno.h"
 
+#include "parcoordsClass.h"
+
 void       add_ggobi_sheets(ggobid *gg, GtkWidget *notebook);
 void       close_worksheet_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
@@ -309,7 +311,7 @@ create_ggobi_sheet(datad *data, ggobid *gg)
   gtk_widget_show(scrolled_window);
 
   gtk_signal_connect(GTK_OBJECT(sheet), "changed", cell_changed, data);
-  gtk_signal_connect(GTK_OBJECT(gg->main_window), "splot_new", monitor_new_plot, sheet);
+  gtk_signal_connect(GTK_OBJECT(gg), "splot_new", monitor_new_plot, sheet);
 
   gtk_signal_connect (GTK_OBJECT(sheet), "select_row", select_row_cb, data);
 
@@ -325,9 +327,10 @@ create_ggobi_sheet(datad *data, ggobid *gg)
 void
 connect_to_splot(splotd *sp, GtkSheet *sheet)
 {
-  gtk_signal_connect(GTK_OBJECT(sp->da), "identify_point", identify_cell, sheet);
-  gtk_signal_connect(GTK_OBJECT(sp->da), "move_point", move_point_value, sheet);
-  gtk_signal_connect(GTK_OBJECT(sp->da), "brush_motion", brush_change, sheet);
+  ggobid *gg = sp->displayptr->ggobi;
+  gtk_signal_connect(GTK_OBJECT(gg), "identify_point", identify_cell, sheet);
+  gtk_signal_connect(GTK_OBJECT(gg), "move_point", move_point_value, sheet);
+  gtk_signal_connect(GTK_OBJECT(gg), "brush_motion", brush_change, sheet);
 }
 
 
@@ -531,12 +534,10 @@ move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, 
     if(ev->id < 0)
 	return;
 
-    switch(sp->displayptr->displaytype) {
-	case parcoords:
+    if(GTK_IS_GGOBI_PARCOORDS_SPLOT(sp)) {
 	    cols[0] = sp->p1dvar;
 	    n = 1;
-	    break;
-	default:
+    } else {
 	    cols[0] = sp->xyvars.x;
 	    cols[1] = sp->xyvars.y;
     }
