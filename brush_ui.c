@@ -222,6 +222,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromSPlot(sp);
   datad *d;
+  gint grab_ok;
 
 
   gg->current_splot = sp;
@@ -233,6 +234,13 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   line_brush_prev_vectors_update (d, gg);
 
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
+
+  grab_ok = gdk_pointer_grab (sp->da->window,
+    false,
+    (GdkEventMask) (GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK),
+    (GdkWindow *) NULL,
+    (GdkCursor *) NULL,
+    event->time);
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                      "motion_notify_event",
@@ -261,6 +269,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos.y = (gint) event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+  gdk_pointer_ungrab (event->time);
 
   if (cpanel->br_mode == BR_PERSISTENT) {
     rows_in_plot_set (d, gg);

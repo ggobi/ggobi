@@ -140,6 +140,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   cpaneld *cpanel = &display->cpanel;
   ggobid *gg = GGobiFromSPlot (sp);
   datad *d = gg->current_display->d;
+  gint grab_ok;
   
   gg->current_display = (displayd *) sp->displayptr;
   gg->current_splot = sp;
@@ -154,6 +155,12 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   {
     sp->mousepos.x = (gint) event->x;
     sp->mousepos.y = (gint) event->y;
+    grab_ok = gdk_pointer_grab (sp->da->window,
+      false,
+      (GdkEventMask) (GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK),
+      (GdkWindow *) NULL,
+      (GdkCursor *) NULL,
+      event->time);
     sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                         "motion_notify_event",
                                         (GtkSignalFunc) motion_notify_cb,
@@ -202,8 +209,11 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   if (cpanel->projection == XYPLOT) {
     sp->mousepos.x = (gint) event->x;
     sp->mousepos.y = (gint) event->y;
-    if (sp->motion_id)
+    gdk_pointer_ungrab (event->time);
+    if (sp->motion_id) {
       gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+      sp->motion_id = 0;
+    }
   }
 
   return retval;
