@@ -7,8 +7,18 @@
 <h1></h1>
 
 This is a very simple HTML file that contains a few embedded
-objects. The interesting thing is that they are
-live, dynamic GGobi displays.
+objects. The interesting thing is that they are live, dynamic GGobi
+displays with surrounding annotations and text.  One can select an
+individual plot to make that the active one.  Then one can brush and
+identify points, etc.
+
+<OBJECT TYPE="app/x-R-generic" NAME="ggobi" HIDDEN>
+  <PARAM NAME="init"
+         VALUE='ggobi(ggobi.find.file("data/flea.xml"));
+                NULL
+              '/>
+</OBJECT>
+
 <p>
 <table border="1">
 <tr>
@@ -18,11 +28,13 @@ live, dynamic GGobi displays.
              value='
                  gg <- getGGobi(1);
                  dpy <- scatterplot.ggobi(1,2, .gobi = gg);
-                 w <- getDisplayWidget(dpy);
+                 w <- getDisplayWindow.ggobi(dpy);
+     print(w);
                  w$Hide();
                  box <- gtkVBox(TRUE, 1);
                  gtkWidgetReparent(gtkChildren(w)[[1]],  box);
                  box
+     
              '>
       
      </OBJECT>
@@ -33,16 +45,24 @@ live, dynamic GGobi displays.
              value='
                  gg <- getGGobi(1);
                  dpy <- scatmat.ggobi(c(1,2), .gobi = gg);
-                 w <- getDisplayWidget(dpy);
+                 w <- getDisplayWindow.ggobi(dpy);
                  w$Hide();
                  box <- gtkVBox(TRUE, 1);
                  gtkWidgetReparent(gtkChildren(w)[[1]],  box);
                  box
+
              '>
       
      </OBJECT>     
  </th>          
 </tr>
+<tr>
+<th colspan=2 align="left">
+Here is some text between the displays that
+can be used to provide more contextual information
+  for the "reader".
+</th>  
+</tr>  
 <tr>
 <th colspan=2>
      <OBJECT TYPE="app/x-R-generic" NAME="xyplot" WIDTH=600  HEIGHT=200>
@@ -50,11 +70,12 @@ live, dynamic GGobi displays.
              value='
                  gg <- getGGobi(1);
                  dpy <- parcoords.ggobi(c(1,2,3,4), .gobi = gg);
-                 w <- getDisplayWidget(dpy);
+                 w <- getDisplayWindow.ggobi(dpy);
                  w$Hide();
                  box <- gtkVBox(TRUE, 1);
                  gtkWidgetReparent(gtkChildren(w)[[1]],  box);
                  box
+  
              '>
       
      </OBJECT>       
@@ -74,7 +95,7 @@ the RGtk and Rggobi code!)
              value='
                  gg &lt;- getGGobi(1);
                  dpy &lt;- scatmat.ggobi(c(1,2), .gobi = gg);
-                 w &lt;- getDisplayWidget(dpy);
+                 w &lt;- getDisplayWindow.ggobi(dpy);
                  w$Hide();
                  box &lt;- gtkVBox(TRUE, 1);
                  gtkWidgetReparent(gtkChildren(w)[[1]],  box);
@@ -89,7 +110,7 @@ the RGtk and Rggobi code!)
              value='
                  gg &lt;- getGGobi(1);
                  dpy &lt;- parcoords.ggobi(c(1,2,3,4), .gobi = gg);
-                 w &lt;- getDisplayWidget(dpy);
+                 w &lt;- getDisplayWindow.ggobi(dpy);
                  w$Hide();
                  box &lt;- gtkVBox(TRUE, 1);
                  gtkWidgetReparent(gtkChildren(w)[[1]],  box);
@@ -108,14 +129,9 @@ the RGtk and Rggobi code!)
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Wed Dec 19 11:48:39 EST 2001
+Last modified: Thu Mar 14 13:33:42 EST 2002
 <!-- hhmts end -->
 </body> </html>
 
 
-<OBJECT TYPE="app/x-R-generic" NAME="ggobi" HIDDEN>
-  <PARAM NAME="init"
-         VALUE='ggobi("/home/duncan/Projects/ggobi/ggobi/data/flea.xml");
-                NULL
-              '/>
-</OBJECT>
+

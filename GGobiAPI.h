@@ -296,7 +296,9 @@ extern displayd *createPlot(gint type, gchar **varnames);
 
 /**
  @ingroup Displays
- Create a top-level display for a scatter......
+ Create a top-level display for a matrix of X-Y/scatter plots.
+
+ See GGobi_newScatmat()
  */
 gint  *createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gboolean useWindow);
 

@@ -185,7 +185,7 @@ glyphIDfromName (gchar *glyphName) {
 gint
 glyphNames (gchar **names) {
   guint i;
-  static gchar* gnames[] =
+  static const gchar* const gnames[] =
     {"plus", "x", "openrectangle",  "filledrectangle", "opencircle",
     "filledcircle", "point"};
   for (i=0; i < sizeof(gnames)/sizeof(gnames[0]); i++) 

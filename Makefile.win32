@@ -84,7 +84,7 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  display_tree.o \
  datad.o \
- mt19937-1.o mt19937ar.o \
+ mt19937-1.o  mt19937ar.o \
  write_svg.o \
  impute.o impute_ui.o \
  noop-checkbutton.o \

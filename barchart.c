@@ -36,7 +36,7 @@ void button_draw_with_shadows (GdkPoint *region, GdkDrawable *drawable, ggobid *
 /*                          Options section                             */
 /*----------------------------------------------------------------------*/
 
-static GtkItemFactoryEntry menu_items[] = {
+static const GtkItemFactoryEntry menu_items[] = {
   {"/_File",
     NULL,
     NULL,
@@ -947,11 +947,12 @@ gboolean barchart_active_paint_points (splotd *sp, datad *d) {
   return d->npts_under_brush;
 }
 
-static ggobid *CurrentGGobi;
+static ggobid *CurrentGGobi = NULL;
+
 gint
 barpsort (const void *arg1, const void *arg2)
 {
-ggobid *gg = CurrentGGobi;
+  ggobid *gg = CurrentGGobi;
 
   gint val = 0;
   gint *x1 = (gint *) arg1;

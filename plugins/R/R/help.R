@@ -3,28 +3,11 @@
 library(RGtk)
 library(Rggobi)
 source("~/Projects/org/omegahat/R/Gtk/examples/gtkhtml.S")
-source("~/Projects/org/omegahat/R/Gtk/examples/command.S")
+
 
 # We need the routine RGGobi_getHelpMenu.
 dyn.load("plugins/R/Rplugin.so")
 
-
-getDisplayWidget <-
-  #
-  # This returns the reference to the widget
-  # that is the displayd window. From this, we can
-  # get the children and the individual plots.
-  #
-  # This is used in the ggobi.html file to embed the
-  # ggobi plots
-  #
-function(dpy)
-{
-   w <- .Call("RGGobi_getDisplayWindow", dpy)
-   
-   class(w) <- gtkObjectGetClasses(w, check = FALSE)
-   w
-}
 
 createRHelpPluginInstance <-
   #
