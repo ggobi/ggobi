@@ -5,6 +5,8 @@ include local.config
 CC = gcc
 CFLAGS= -g -ansi -Wall -fpic
 SHARED_LD_FLAGS= -shared
+LDFLAGS=
+
 
 #DEPENDS_FLAG=-MM
 
@@ -77,12 +79,18 @@ ifdef USE_XML
 endif
 
 ggobi: $(OB)
-	$(CC) $(OB) -o ggobi $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --cflags --libs`
+	$(CC) $(OB) $(LDFLAGS) -o ggobi $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --cflags --libs`
 
 pure: ggobi.o $(OB)
 	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
 	${CC} -o ggobi $(OB) `gtk-config --cflags --libs`
 
+
+%.sched: %.c
+	$(CC) -dS -c $(CFLAGS) -I. `gtk-config --cflags` $*.c
+
+ggobi.sched: $(OB)
+	$(CC) -S $(OB) $(LDFLAGS)  $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --cflags --libs`
 
 dm: $(OB)
 	$(CC) `gtk-config --cflags` $(OB) -o ggobi `gtk-config --libs` -L$(DM) -ldmalloc

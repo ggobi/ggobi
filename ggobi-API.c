@@ -603,11 +603,19 @@ GGOBI(getCaseHiddens)(gint *pts, gint howMany, ggobid *gg)
 /*        setting and getting segments                                     */
 /*-------------------------------------------------------------------------*/
 
+/*
+  The additional argument update allows one to pre-allocate
+  an entire block for segment_endpoints and then write into
+  it, rather than reallocate the vector for each new segment.
+  
+  To do this, the value of update should be false.
+ */
 void
-GGOBI(setObservationSegment)(gint x, gint y, ggobid *gg)
+GGOBI(setObservationSegment)(gint x, gint y, ggobid *gg, gboolean update)
 {
   if(GGOBI(isConnectedSegment)(x, y, gg) == false) {
-    segments_alloc(gg->nsegments+1, gg);
+    if(update)
+      segments_alloc(gg->nsegments+1, gg);
     gg->segment_endpoints[gg->nsegments].a = x;
     gg->segment_endpoints[gg->nsegments].b = y;
     gg->nsegments++;
@@ -868,6 +876,13 @@ GGOBI(setBrushGlyph)(int type, int size, ggobid *gg)
   return(true); /* Should be true iff there is a change. */
 }
 
+void 
+GGOBI(getBrushGlyph)(int *type, int *size, ggobid *gg)
+{
+  *type = gg->glyph_id.type;
+  *size = gg->glyph_id.size;
+}
+
 
 /*
   Returns the dimensions of the specified
@@ -931,4 +946,81 @@ GGOBI(setBrushColor)(int cid, ggobid *gg)
     gg->color_id = cid;
 
   return(old);
+}
+
+int
+GGOBI(addVariable)(double *vals, char *name, ggobid *gg)
+{
+  return(-1);
+}
+
+int
+GGOBI(removeVariable)(char *name, ggobid *gg)
+{
+  int which = GGOBI(getVariableIndex)(name, gg);
+  if(which > -1 && which < gg->ncols)
+    return(GGOBI(removeVariableByIndex)(which, gg));
+
+ return(-1);
+}
+
+int
+GGOBI(removeVariableByIndex)(int which, ggobid *gg)
+{
+  int i, j;
+  for(i = 0; i < gg->nrows; i++) {
+   for(j = which+1; j < gg->ncols; j++) {
+   }
+  }
+
+  gg->ncols--;
+
+  return(-1);
+}
+
+
+int 
+GGOBI(getVariableIndex)(const gchar *name, ggobid *gg)
+{
+  int i;
+  for(i = 0; i < gg->ncols; i++)
+    if(strcmp(gg->vardata[i].collab, name) == 0)
+      return(i);
+
+  return(-1);
+}
+
+void
+GGOBI(setPlotRange)(double *x, double *y, int displayNum, int plotNum, ggobid *gg)
+{
+  splotd *sp;
+  displayd *display;
+
+  fcoords tfmin, tfmax;
+  tfmin.x = x[0];
+  tfmin.y = y[0];
+  tfmax.x = x[1];
+  tfmax.y = y[1];
+
+  display = GGOBI(getDisplay)(displayNum, gg);
+  sp = GGOBI(getPlot)(display, plotNum);
+
+  if (GTK_WIDGET_VISIBLE (display->hrule)) {
+    if (((gfloat) GTK_EXT_RULER (display->hrule)->lower != tfmin.x) ||
+        ((gfloat) GTK_EXT_RULER (display->hrule)->upper != tfmax.x))
+    {
+      gtk_ext_ruler_set_range (GTK_EXT_RULER (display->hrule),
+                               (gdouble) tfmin.x, (gdouble) tfmax.x);
+    }
+  }
+
+  if (GTK_WIDGET_VISIBLE (display->vrule)) {
+    if (((gfloat) GTK_EXT_RULER (display->vrule)->upper != tfmin.y) ||
+        ((gfloat) GTK_EXT_RULER (display->vrule)->lower != tfmax.y))
+    {
+      gtk_ext_ruler_set_range (GTK_EXT_RULER (display->vrule),
+                               (gdouble) tfmax.y, (gdouble) tfmin.y);
+    }
+  }
+
 }

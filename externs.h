@@ -200,6 +200,7 @@ extern displayd* scatterplot_new (gboolean, splotd *sp, ggobid *gg);
 extern void scatterplot_show_rulers (displayd *, gint);
 extern void segments_alloc (gint, ggobid *gg);
 extern void segments_create (ggobid *gg);
+extern void segments_free (ggobid *gg);
 extern gboolean segments_read (gchar *, gboolean, ggobid *gg);
 extern gint selected_cols_get (gint *, gboolean, ggobid *gg);
 extern void smooth_window_open (ggobid *gg);

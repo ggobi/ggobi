@@ -156,7 +156,7 @@ extern void GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, ggobid *gg);
 extern void GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, ggobid *gg);
 
 extern gboolean  GGOBI(isConnectedSegment)(gint a, gint b, ggobid *gg);
-extern void GGOBI(setObservationSegment)(gint x, gint y, ggobid *gg);
+extern void GGOBI(setObservationSegment)(gint x, gint y, ggobid *gg, gboolean update);
 
 extern gboolean GGOBI(getShowLines)();
 extern gboolean GGOBI(setShowLines)(gboolean val);
@@ -193,6 +193,8 @@ void GGOBI(setIdentifyHandler)(IdentifyProc proc,  void *data, ggobid *gg);
    For now, pixels
 */
 
+extern void GGOBI(getBrushGlyph)(int *type, int *size, ggobid *gg);
+
 void GGOBI(getBrushSize)(int *w, int *h, ggobid *gg);
 void GGOBI(getBrushLocation)(int *x, int *y, ggobid *gg);
 
@@ -209,5 +211,7 @@ extern int GGOBI(full_mode_set)(int action, ggobid *gg);
 
 extern int GGOBI(setBrushColor)(int cid, ggobid *gg);
 extern gboolean GGOBI(setBrushGlyph)(int type, int size, ggobid *gg);
+extern int GGOBI(getVariableIndex)(const gchar *name, ggobid *gg);
+extern int GGOBI(removeVariableByIndex)(int which, ggobid *gg);
 #endif /* End of conditional inclusion of entire file.*/
 

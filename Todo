@@ -21,6 +21,7 @@ various stuff not yet implemented:
 array and vector management
 
 color:  allow additional colormaps -- .cmap file
+  (DTL: This is supported in the XML.)
   
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
