@@ -26,10 +26,6 @@ static void addordelete_cb (GtkToggleButton *button)
 {
   g_printerr("active %d\n", button->active);
 }
-static void show_edges_cb (GtkToggleButton *button)
-{
-  g_printerr("active %d\n", button->active);
-}
 static void remove_edges_cb (GtkToggleButton *button)
 {
   g_printerr("move all edges\n");
@@ -137,16 +133,6 @@ cpanel_edgeedit_make (ggobid *gg) {
     "Delete edges using the mouse", NULL);
   gtk_box_pack_start (GTK_BOX (hb), radio2, false, false, 0);
 
-/*
- * Show edges toggle
-*/
-  btn = gtk_check_button_new_with_label ("Show edges");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Show connected edges", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]),
-                      btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-                      GTK_SIGNAL_FUNC (show_edges_cb), NULL);
 
 /*
  * Remove edges button

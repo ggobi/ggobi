@@ -128,7 +128,6 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
  * If nearest_point is a member of gg->sticky_ids, remove it; if
  * it isn't, add it.
 */
-
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = sp->displayptr;
   datad *d = display->d;

@@ -105,6 +105,12 @@ typedef struct {
 
 /* tour variables are in display.h */
 
+/*
+ * edge editing
+*/
+ gboolean ee_adding_p;
+ gboolean ee_deleting_p;
+
 } cpaneld;
 
 #endif

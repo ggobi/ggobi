@@ -30,17 +30,11 @@ In progress, needing design discussions:
 various stuff not yet implemented:
   Options on options menu
   show/hide missings button
-  some window closings  (display tree ok; check others)
-  "row groups" are only partially implemented
-  1d, xy cycling  .... or run as a demo in R for now? (disabled for now)
-     (xy cycling implemented)
+  1d cycling 
 
 Graphs
-  Edges with data: a separate region of the variable selection panel
-  Let other line functionality wait until graphs are designed:
-    line type brushing
-    line editing
-    line groups
+  line type brushing
+  line editing
 
 API code needed:
   sticky labels
@@ -57,9 +51,6 @@ I/O -- the biggest part is now in place.  extend
   How do we write out missings in xml?
   If all glyphs are the same, there's no need to write 
     a glyph description in each record
-
-color:  allow additional colormaps -- .cmap file
-  (DTL: This is supported in the XML.)
 
 saving plots as .svg files
   work out how to do nested transformations for printing parcoords
@@ -92,11 +83,8 @@ Scaling:
 Smoothing -- as a demo, at least, of the use of R
 
 Food for thought:
-  * Use a set of decoration arrays (points and lines) instead of nlinkable
-  * Categorical data?  Better labelling, at least?
   * maps; data as polygons -- for summer 2001?
   * Do we need rotation at all?
-  * Should we restore erasing?  How do we sync it with the panel?
 
 ! it now works to start ggobi without an argument; a necessary step
 ! in the API preparation.

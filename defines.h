@@ -266,7 +266,7 @@ typedef enum {NULLMODE = -1,
 
 #define EVENT_METHOD(i,x) GTK_WIDGET_CLASS(GTK_OBJECT(i)->klass)->x
 #define MISSING_P(i,j) (d->missing.vals[i][j] != 0)
-
+#define BETWEEN(a,b,x) ( ((a)<=(x) && (x)<=(b)) || ((a)>=(x) && (x)>=(b)) )
 
 typedef enum {
   C,
@@ -275,6 +275,5 @@ typedef enum {
   PERL,
   PYTHON
   } ProgrammingLanguage;
-
 
 #endif /* End of conditional definition. */
