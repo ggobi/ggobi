@@ -7,6 +7,10 @@ DLLTOOL=dlltool
 DLLWRAP=dllwrap
 WIN32=1
 
+INNO=C:\\Program\ Files\\Inno\ Setup\\Compil32.exe
+INNO=/cygdrive/c/Inno3/iscc.exe
+#INNO_FLAGS=/cc
+
 include local.config
 
   # if building from the CVS repository
@@ -16,7 +20,7 @@ LOCAL_INCLUDES=.
 DEBUG=-g
 #DEBUG=-O2
 
-DEFINES=-DGGOBI_MAIN
+DEFINES=-DGGOBI_MAIN -DHAVE_CONFIG_H=1
 
 CFLAGS= $(DEBUG) -ansi -Wall  -mno-cygwin -mpentium \
          -fnative-struct -mwindows   $(INCLUDES:%=-I%) \
@@ -170,6 +174,16 @@ etags:
 tags:
 	tags $(SRC)
 
+
+ggobi-API.o ggobi.o: config.h
+
+config.h: developerConfigure
+	./developerConfigure
+
+developerConfigure: developerConfigure.in
+	autoconf $< > $@
+	chmod +x $@
+
 # If USE_XML, may need to add XML_LIB_DIRS and XML_INC_DIRS
 local.config:
 	@echo "# Whether to enable support for reading XML data" > $@
@@ -214,10 +228,22 @@ libs:
 	mkdir libs
 	cp ${XML_LIB_DIRS}/*.dll ${LIB_ICONV}/*.dll ${LIB_DIRS}/*.dll libs/
 
-Install/ggobi.iss: Install/ggobi.iss.in
-	sed -e "s|@GGOBI_HOME@|${SPWD}\\\\|g" Install/ggobi.iss.in > Install/ggobi.iss
+Install/configureWin: Install/configureWin.in
+	(cd Install ; autoconf configureWin.in > configureWin)
 
-installer: libs Install/ggobi.iss ggobi.exe libggobi.a libggobi.dll
+Install/ggobi.iss: Install/ggobi.iss.in Install/configureWin
+	(cd Install ; ./configureWin)
+
+# Create ggobi.iss locally so the files can be found
+# from here and replace the new lines with line-feeds.
+ggobi.iss: Install/ggobi.iss
+	cp Install/ggobi.iss ggobi.iss-temp
+	perl -p -e 's/\n/\r\n/;' ggobi.iss-temp > ggobi.iss
+	rm ggobi.iss-temp
+
+installer: libs ggobi.iss ggobi.exe libggobi.a libggobi.dll
+	$(INNO) $(INNO_FLAGS) ggobi.iss
+	mv Output/setup.exe Output/ggobi.exe
 
 # xmlConvert
 winggobi.zip: ggobi 

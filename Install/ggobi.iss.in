@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=ggobi
-AppVerName=ggobi_0.99-3
+AppVerName=ggobi_@MAJOR_VERSION@.@MINOR_VERSION@-@PATCH_LEVEL@
 AppPublisher=ggobi
 AppPublisherURL=http://www.ggobi.org
 AppSupportURL=http://www.ggobi.org
@@ -11,7 +11,7 @@ AppUpdatesURL=http://www.ggobi.org/Download
 DefaultDirName={pf}\ggobi
 DefaultGroupName=ggobi
 AllowNoIcons=yes
-AlwaysCreateUninstallIcon=yes
+;AlwaysCreateUninstallIcon=yes
 LicenseFile=@GGOBI_HOME@LICENSING\license.txt
 ; uncomment the following line if you want your installation to run on NT 3.51 too.
 ; MinVersion=4,3.51
