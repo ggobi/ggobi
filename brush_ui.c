@@ -120,6 +120,7 @@ brush_reset(ggobid *gg, gint action)
       }
       displays_plot (NULL, FULL, gg);
       break;
+
     case RESET_POINT_COLORS:  /*-- reset point colors -- to what? --*/
       break;
     case RESET_GLYPHS:  /*-- reset point glyphs -- to what? --*/
@@ -131,6 +132,7 @@ brush_reset(ggobid *gg, gint action)
       }
       displays_plot (NULL, FULL, gg);
       break;
+
     case RESET_LINES:  /*-- reset line colors -- to what? --*/
       break;
 
@@ -306,6 +308,7 @@ brush_menus_make (ggobid *gg) {
                       (gpointer) GINT_TO_POINTER (0));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
+/*
   item = gtk_menu_item_new_with_label ("Reset point colors");
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
@@ -319,6 +322,7 @@ brush_menus_make (ggobid *gg) {
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (2));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+*/
 
   item = gtk_menu_item_new_with_label ("Show all lines");
   GGobi_widget_set (item, gg, true);
@@ -327,12 +331,14 @@ brush_menus_make (ggobid *gg) {
                       (gpointer) GINT_TO_POINTER (3));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
+/*
   item = gtk_menu_item_new_with_label ("Reset linecolors");
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER(4));
   gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
+*/
 
   item = gtk_menu_item_new_with_label ("Reset brush size");
   GGobi_widget_set (item, gg, true);

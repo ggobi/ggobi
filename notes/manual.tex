@@ -59,7 +59,7 @@ data.  It represents a big step in the evolution of XGobi, with
 multiple plotting windows, more flexible color management, XML file
 handling, and better portability to Windows.
 
-The biggest evolutionary step is that ggobi can be embedded in other
+The most significant change is that ggobi can be embedded in other
 software and controlled using an API (application programming
 interface).  This design has been developed and tested in partnership
 with R.  When ggobi is used with R, the result is a full marriage
@@ -296,11 +296,108 @@ moving or rescaling vertically and horizontally with each action.
 The pan and zoom options allow it to be constrained so that only
 one axis is affected, convenient for browsing one variable at a time.
 
-\subsection{Linked brushing of points and lines}
+\subsection{Brush: Linked brushing of points and lines}
 \label{slbl:Color}
 
+Brushing is often performed when only a single display is visible,
+but it is most interesting and useful to perform brushing with more
+than one linked display showing different views of the same data.  
 
-\subsection{Linked identification of points with labels}
+To interactively paint points, drag left to move the ``brush'' within
+the plotting window, or drag middle to change the size or shape of
+the brush while you paint.  (If you lose the brush by pulling it
+outside the plotting window, you can grab it again if you press the
+left or middle button while the cursor is inside the display window.)
+
+\subsubsection{Brush On}
+%
+When the {\bf Brush on} toggle is checked, moving the brush
+over a plotted point causes that point to change its color or
+plotting character (called a glyph).  If the brush is turned off, the
+brush can be freely moved across the plotting window and it does not
+change the points.  
+
+This is useful if you are plotting a very large number of points,
+and you want to position the brush before painting, because you
+can move it much more quickly across the plot.  [This isn't true
+in the default mode, where the brush jumps to the cursor.  Shall
+I re-add the other mode?]
+
+%
+\subsubsection{Points and lines}
+If {\bf Points} is selected, the brush is drawn as a rectangle.
+As the brush is moved across the points, any points contained by
+the brush are redrawn using the currently selected glyph and color.
+If {\bf Lines} is selected, the brush is drawn as a crosshair, and
+as the brush is moved in the window, any lines intersecting either
+the vertical or horizontal ``hair'' are redrawn in the chosen color.
+(There is no line brushing implementation for line types yet.)
+If both {\bf Points} and {\bf Lines} are
+selected, the brush is drawn as a crosshair inside a rectangle,
+and both point and line brushing are performed.
+
+\subsubsection{Color and glyph}
+%
+use the {\bf Color and glyph} menu to choose whether to brush
+with color, glyph, or both, or whether to hide the points you
+paint.
+
+%
+\subsubsection{Brushing modes:  persistent, transient}
+%
+These are two brushing modes.
+\medskip
+\noindent
+\\{\bf Persistent}:  When you brush a point, it retains its new color or glyph
+when the brush has moved away.
+\\{\bf Transient}:  As the brush moves off a point, it returns to the color and
+glyph it had before the brush covered it.
+
+\subsubsection{Undo}
+%
+Clicking on the {\bf Undo} button restores the glyph and color and
+visibility of all points painted between the last mouse-down and
+mouse-up.
+
+\subsubsection{Reset Menu}
+%
+When the brushing mode is active, the Reset Menu in the main
+menu bar contains these items:
+
+\begin{tabbing}
+ {\bf Show all points} \hspace{.5in} \= Make all points visible. \\
+%{\bf Reset point colors} \> Restore all points to the default color. \\
+%{\bf Reset glyphs} \> Restore all points to the default glyph. \\
+ {\bf Show all lines} \> Make all lines visible. \\
+%{\bf Reset line colors} \> Restore all lines to the default color. \\
+ {\bf Reset brush size} \> Reset the brush to its default size and position. \\
+\end{tabbing}
+%
+
+\subsection{Linked identification of points}
+
+This mode is used to display labels near points in the plotting
+window.  The labels are taken from the file of row or case labels
+supplied by the user; if the file is not present, the row number of
+each case is used.  To see these labels, simply move the cursor
+inside the plotting window.  The label of the point nearest the
+cursor is displayed.
+
+Identification in one window is instantly reflected in all linked windows.
+
+To cause a label to become ``sticky,'' click left when the target label
+is printed.  The printing style changes and the label now remains
+printed as the cursor moves off, and even remains printed as you leave
+the {\bf Identify} mode.  It is possible to rescale or rotate data, and
+the sticky labels will continue to be printed next to their associated
+points.
+
+To cause a label to become ``unsticky,'' return to the {\bf Identify}
+mode and click left again when the target point is nearest the cursor.
+It is also possible to restore all labels to unsticky status by
+clicking on the {\bf Remove Labels} button.  You can also see all the
+labels at once by clicking on {\bf Make all sticky}. 
+
 \subsection{Line editing}
 
 \section {Display types}
@@ -343,10 +440,53 @@ The selected variables can also be cloned, and the new variables
 you create will be added to the table as well as the main control panel.
 
 \subsection{Jittering}
+
+Select {\em Variable jittering ...} to open a panel that allows
+random noise to be added to selected variables.
+
+First specify the variables you wish to jitter.  By default, the
+variables plotted in the current display will be affected; if you
+wish to select others, use the {\bf Variable selection and
+statistics} tool.
+
+Choose between uniform and random jitter, and then set the degree of
+jitter using the slider.  To rejitter without changing the degree of
+jitter, simply click on the {\bf Jitter} button.
+
 \subsection{Imputation controls for missing data}
 \subsection{Sphere}
 \label{slbl:Sphere}
 \subsection{Subsetting}
+
+Select {\em Case subsetting and sampling ...} to open a panel
+that allows subsets to be specified in one of five ways.
+
+{\bf Random sample without replacement}:  Specify the number of
+cases to be in the sample.
+\\{\bf Consecutive block}:  Specify the first and last row of the block.
+\\{\bf Every nth case}:  Specify the interval and the first row.
+\\{\bf Sticky labels}:  All cases with a ``sticky'' label will
+  be in the subset.  (See {\em Identification} for a description
+  of sticky labels.)
+\\{\bf Row labels}: Type in a row label, and all cases with that
+  label will be in the subset.
+
+Select one of those five, then click on {\bf Subset} in the
+bottom row of the panel.  If you want to re-include all rows, 
+select the {\bf Include all} button in the bottom row.
+
+If the {\bf Rescale} button is checked, then the plots will be
+rescaled to exclude all points not in the subset.  If it is
+not checked, the points will be hidden but not excluded from
+plot scaling operations.
+
+One purpose of subsetting is to allow the use of ggobi on data matrices
+that are so large that dynamic and interactive operations begin to
+become painfully slow.  By selecting a smaller subset, a user can
+work on that subset at a comfortable speed of rotation and
+interaction.  Another purpose is to do graphical cross-validation:
+if the feature you see is still there in repeated subsamples, there's
+a good chance it's not just an artifact of visualization.
 
 \section{Implementation}
 
