@@ -60,6 +60,9 @@
     transformName NMTOKEN #IMPLIED
     missingValue  CDATA   #IMPLIED
     group         CDATA   #IMPLIED
+    displayRange  CDATA   #IMPLIED
+    displayMax    CDATA   #IMPLIED
+    displayMin    CDATA   #IMPLIED
 >
 
 
