@@ -18,6 +18,10 @@
 
 #include "ggobi.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct _ggobid; 
 
 
@@ -315,4 +319,9 @@ void display_set_values(displayd *display, datad *d, ggobid *gg);
  /* For the extended cases. */
 const gchar * const gtk_display_tree_label(displayd *dpy);
 const gchar * const gtk_display_title_label(displayd *dpy);
+
+#ifdef __cplusplus
+} /* end of extern "C" */
+#endif
+
 #endif

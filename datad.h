@@ -17,6 +17,11 @@
 #include "vartable.h"
 
 #include <libxml/parser.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct _XMLUserData;
 
 struct _ggobid;
@@ -248,5 +253,9 @@ extern gboolean edge_add (gint, gint, datad *, datad *);
 extern void setOldEdgePartners (endpointsd *endpoints, gint n);
 
 void datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate);
+
+#ifdef __cplusplus
+} /* end of extern "C" */
+#endif
 
 #endif

@@ -11,6 +11,11 @@
 #ifndef GGOBI_H
 #define GGOBI_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct _ggobid;
 
 #include "defines.h"
@@ -557,5 +562,9 @@ typedef GtkType(*GtkTypeLoad) (void);
 void ggobi_sleep(guint interval);
 
 #include "GGobiEvents.h"
+
+#ifdef __cplusplus
+} /* end of extern "C" */
+#endif
 
 #endif
