@@ -21,6 +21,8 @@ static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
 static void edges_draw (splotd *, GdkDrawable *, ggobid *gg);
 static void splot_nearest_edge_highlight (splotd *, gint, gboolean nearest, ggobid *);
 
+static void splot_draw_tour_axes(splotd *, GdkDrawable *, ggobid *);
+
 #ifdef WIN32
 extern void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
 extern void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
@@ -1032,6 +1034,8 @@ splot_draw_to_pixmap1 (splotd *sp, ggobid *gg)
         scaling_visual_cues_draw (sp, sp->pixmap1, gg);
       break;
     }
+
+    splot_draw_tour_axes(sp, sp->pixmap1, gg);
   }
 }
 
@@ -1101,4 +1105,122 @@ splot_redraw (splotd *sp, enum redrawStyle redraw_style, ggobid *gg) {
   }
 
   sp->redraw_style = EXPOSE;
+}
+
+/*------------------------------------------------------------------------*/
+/*                   draw tour axes                                       */
+/*------------------------------------------------------------------------*/
+static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
+{
+  gint j, ix, iy;
+  gint proj = projection_get (gg);
+  displayd *dsp = (displayd *) sp->displayptr;
+  gint lbearing, rbearing, width, ascent, descent;
+  GtkStyle *style = gtk_widget_get_style (sp->da);
+  datad *d = dsp->d;
+  
+  if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
+    switch (proj) {
+      case TOUR1D:
+        for (j=0; j<d->ncols; j++) {
+          ix = sp->da->allocation.width/2 + 
+            (gint) (dsp->t1d.u.vals[0][j]*
+            (gfloat) sp->da->allocation.width/3);
+          iy = sp->da->allocation.height - 10 - j*10;
+          gdk_draw_line(drawable, gg->plot_GC,
+            sp->da->allocation.width/2,sp->da->allocation.height - 10 - j*10,
+            ix, iy);
+          if (abs(ix - sp->da->allocation.width/2) > 5)
+          {
+            gdk_text_extents (style->font, 
+              d->vartable[j].collab_tform,
+              strlen (d->vartable[j].collab_tform),
+              &lbearing, &rbearing, &width, &ascent, &descent);
+            if (dsp->t1d.u.vals[0][j] < 0)
+              gdk_draw_string (drawable, style->font, gg->plot_GC,
+                ix - 20, iy - 5,
+                d->vartable[j].collab_tform);
+            else
+              gdk_draw_string (drawable, style->font, gg->plot_GC,
+                ix + 5, iy - 5,
+                d->vartable[j].collab_tform);
+	  }
+	}     
+        break;
+      case TOUR2D:
+        for (j=0; j<d->ncols; j++) {
+          ix = sp->da->allocation.width/2 + 
+            (gint) (dsp->t2d.u.vals[0][j]*
+            (gfloat) sp->da->allocation.width/3);
+          iy = sp->da->allocation.height - (sp->da->allocation.height/2 + 
+            (gint) (dsp->t2d.u.vals[1][j]*
+            (gfloat) sp->da->allocation.height/3));
+          gdk_draw_line(drawable, gg->plot_GC,
+            sp->da->allocation.width/2,sp->da->allocation.height/2,
+            ix, iy);
+          if (abs(ix - sp->da->allocation.width/2) > 5 ||
+	      abs(iy - sp->da->allocation.height/2) > 5)
+          {
+            gdk_text_extents (style->font, 
+              d->vartable[j].collab_tform,
+              strlen (d->vartable[j].collab_tform),
+              &lbearing, &rbearing, &width, &ascent, &descent);
+            gdk_draw_string (drawable, style->font, gg->plot_GC,
+              ix + 5, iy - 5,
+              d->vartable[j].collab_tform);
+	  }
+	}     
+        break;
+      case COTOUR:
+        for (j=0; j<d->ncols; j++) {
+          /* horizontal */
+          ix = sp->da->allocation.width/2 + 
+            (gint) (dsp->tcorr1.u.vals[0][j]*
+            (gfloat) sp->da->allocation.width/3);
+          iy = sp->da->allocation.height - 10 - j*10;
+          gdk_draw_line(drawable, gg->plot_GC,
+            sp->da->allocation.width/2,sp->da->allocation.height - 10 - j*10,
+            ix, iy);
+          if (abs(ix - sp->da->allocation.width/2) > 5)
+          {
+            gdk_text_extents (style->font, 
+              d->vartable[j].collab_tform,
+              strlen (d->vartable[j].collab_tform),
+              &lbearing, &rbearing, &width, &ascent, &descent);
+            if (dsp->tcorr1.u.vals[0][j] < 0)
+              gdk_draw_string (drawable, style->font, gg->plot_GC,
+                ix - 20, iy - 5,
+                d->vartable[j].collab_tform);
+            else
+              gdk_draw_string (drawable, style->font, gg->plot_GC,
+                ix + 5, iy - 5,
+                d->vartable[j].collab_tform);
+	  }
+          /* vertical */
+          ix = 10 + j*10;
+          iy = sp->da->allocation.height - (sp->da->allocation.height/2 + 
+            (gint) (dsp->tcorr2.u.vals[0][j]*
+            (gfloat) sp->da->allocation.height/3));
+          gdk_draw_line(drawable, gg->plot_GC,
+            10+j*10,sp->da->allocation.height/2,
+            ix, iy);
+          if (abs(iy - sp->da->allocation.height/2) > 5)
+          {
+            gdk_text_extents (style->font, 
+              d->vartable[j].collab_tform,
+              strlen (d->vartable[j].collab_tform),
+              &lbearing, &rbearing, &width, &ascent, &descent);
+            if (dsp->tcorr2.u.vals[0][j] < 0)
+              gdk_draw_string (drawable, style->font, gg->plot_GC,
+                ix + 5, iy + 5,
+                d->vartable[j].collab_tform);
+            else
+              gdk_draw_string (drawable, style->font, gg->plot_GC,
+                ix + 5, iy - 5,
+                d->vartable[j].collab_tform);
+	  }
+	}     
+        break;
+    }
+  }
 }

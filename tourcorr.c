@@ -474,7 +474,7 @@ void
 tourcorr_run(displayd *dsp, ggobid *gg)
 {
   datad *d = dsp->d;
-  extern gboolean reached_target(gint, gint);
+  extern gboolean reached_target(gint, gint, gint, gfloat *, gfloat *);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
@@ -488,7 +488,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   gint i, nv;
 
   if (!dsp->tcorr1.get_new_target && 
-      !reached_target(dsp->tcorr1.nsteps, dsp->tcorr1.stepcntr)) {
+      !reached_target(dsp->tcorr1.nsteps, dsp->tcorr1.stepcntr, 0, 0, 0)) {
 
     increment_tour(dsp->tcorr1.tinc, dsp->tcorr1.tau, &dsp->tcorr1.nsteps, 
       &dsp->tcorr1.stepcntr, dsp->tcorr1.dv, dsp->tcorr1.delta, (gint) 1);
@@ -526,7 +526,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   }
 
   if (!dsp->tcorr2.get_new_target && 
-      !reached_target(dsp->tcorr2.nsteps, dsp->tcorr2.stepcntr)) {
+      !reached_target(dsp->tcorr2.nsteps, dsp->tcorr2.stepcntr, 0, 0, 0)) {
     increment_tour(dsp->tcorr2.tinc, dsp->tcorr2.tau, &dsp->tcorr2.nsteps, 
       &dsp->tcorr2.stepcntr, dsp->tcorr2.dv, dsp->tcorr2.delta, (gint) 1);
 

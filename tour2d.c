@@ -336,7 +336,7 @@ tour2d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
 void
 tour2d_run(displayd *dsp, ggobid *gg)
 {
-  extern gboolean reached_target(gint, gint, gint, gint *, gint *);
+  extern gboolean reached_target(gint, gint, gint, gfloat *, gfloat *);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
