@@ -5,6 +5,26 @@
 
 <data name="Algal Bloom: Exp Conditions">
 <description>
+Data from
+  Box, Hunter and Hunter
+  "Statistics for Experimenters"
+  Wiley 1978
+  p. 442-3
+
+"This investigation was concerned with the study of the growth of algal
+blooms and the effects of phosphorus, nitrogen, and carbon on algae
+growth.  A 2^3 factorial experiment was performed, using laboratory
+batch cultures of blue-gree Microcystis aeruginosa.  Carbon (as bi-
+carbonate), phosphorus (as phosphate), and nitrogen (as nitrate) were
+the variable factors.  The response was algal population, measured
+spectrophotometrically."
+
+The responses are measured in some absorbance units.
+
+(Source: R. W. Mann, "Significane of Phosphorus, Nitrogen and
+Carbon as Regulators of the Growth of the Alga Microcystis aeruginosa,"
+Master's Thesis, Department of Civil Engineering, Tufts University,
+Medford, Mass., June 1971.)
 </description>
 <variables count="8">
  <categoricalvariable name="Condition">
