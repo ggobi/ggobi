@@ -207,7 +207,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
       if (j == 0) {
         lbl = g_strdup (rownames[i]);
         g_array_append_val (d->rowlab, lbl);
-        g_free (lbl);
+        /* g_free (lbl); */
       }
 
       d->raw.vals[i][j] = values[i + j*nr];
