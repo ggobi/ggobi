@@ -21,8 +21,6 @@ Do we want a man page?
   file format and points people to the documentation.
 
 GUI
-  'delete variable' hasn't been implemented -- and probably won't
-      be for a while.
 
 RSggobi
   Work out some setData issues: when adding new data, we want to
@@ -35,6 +33,10 @@ Builds for different os:
   Windows binary of both ggobi and Rggobi.
   tar.gz for unix users.
 
+New release of gtk+
+  Find out what it will take to make an initial port of
+     ggobi to gtk+2.0
+  
 Mailing Lists: 
 
   How are we going to announce the ggobi release? 
