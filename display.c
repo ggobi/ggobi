@@ -165,6 +165,7 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
 
   display->ggobi = gg;
   display->d = d;
+  display->embeddedIn = NULL;
 
   return (display);
 }
@@ -238,9 +239,10 @@ display_add (displayd *display, ggobid *gg)
 {
   splotd *prev_splot = gg->current_splot;
 
-  GGobi_widget_set(display->window, gg, true);
-
-  display_set_current (display, gg);
+  if(isEmbeddedDisplay(display) == false) {
+    GGobi_widget_set(display->window, gg, true);
+    display_set_current (display, gg);
+  }
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
     /* If the tree of displays is active, add this to it. */
@@ -259,8 +261,10 @@ display_add (displayd *display, ggobid *gg)
   /*
    * Make sure the border for the previous plot is turned off
   */
-  prev_splot->redraw_style = QUICK;
-  gtk_widget_queue_draw (prev_splot->da);
+  if(prev_splot != NULL) {
+    prev_splot->redraw_style = QUICK;
+    gtk_widget_queue_draw (prev_splot->da);
+  }
 
  return(g_list_length(gg->displays));
 }
@@ -308,11 +312,14 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
     }
 
     count = g_list_length(display->splots);
-    for (l=display->splots; count > 0 && l; l=l->next, count--) {
-      sp = (splotd *) l->data;
-      splot_free (sp, display, gg);
+    if(isEmbeddedDisplay(display) == false) {
+      for (l=display->splots; count > 0 && l; l=l->next, count--) {
+        sp = (splotd *) l->data;
+        splot_free (sp, display, gg);
+      }
+
+     gtk_widget_destroy (display->window);
     }
-    gtk_widget_destroy (display->window);
     g_free (display);
   } else
     quick_message ("Sorry, you can't delete the only display\n", false);
@@ -351,7 +358,7 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   gtk_accel_group_unlock (gg->main_accel_group);
 
-  if (gg->firsttime == false) {
+  if (gg->firsttime == false &&  isEmbeddedDisplay(gg->current_display) == false) {
 
     switch (gg->current_display->displaytype) {
       case scatterplot:
@@ -376,11 +383,12 @@ display_set_current (displayd *new_display, ggobid *gg)
     }
   }
 
-  title = computeTitle(new_display, gg);
-  if(title) {
+  if(isEmbeddedDisplay(new_display) == false) {
+   title = computeTitle(new_display, gg);
+   if(title) {
       gtk_window_set_title (GTK_WINDOW (new_display->window), title);   
       g_free(title); 
-  }
+   }
 
   switch (new_display->displaytype) {
     case scatterplot:
@@ -406,6 +414,7 @@ display_set_current (displayd *new_display, ggobid *gg)
                                  gg->parcoords.mode_menu); 
       submenu_insert (gg->mode_item, gg->main_menubar, 2);
       break;
+  }
   }
 
   gg->current_display = new_display;
@@ -534,4 +543,15 @@ display_window_init (displayd *display, gint width, ggobid *gg)
                       GTK_SIGNAL_FUNC (display_delete_cb), (gpointer) display);
 
   GGobi_widget_set (GTK_WIDGET (display->window), gg, true);
+}
+
+
+gboolean
+isEmbeddedDisplay(displayd *dpy)
+{
+  gboolean ans = false;
+   if(dpy->embeddedIn != NULL)
+     ans = true;
+
+ return(ans);
 }
