@@ -570,5 +570,5 @@ isEmbeddedDisplay (displayd *dpy)
   if (dpy->embeddedIn != NULL)
     ans = true;
 
-  return(ans);
+  return (ans);
 }

@@ -122,6 +122,7 @@ class datad {
    GtkWidget *table;
    gint vnrows, vncols, nvars;
    GtkWidget **da, **label;
+   GdkPixmap **da_pix;
  } varpanel_ui;
 
 /*-------------------- transformation --------------------------------*/

@@ -531,47 +531,51 @@ void
 varcircle_draw (gint jvar, datad *d, ggobid *gg)
 {
   /*--  a single pixmap is shared among all variable circles --*/
-  static GdkPixmap *vpixmap = NULL;
   gint r = VAR_CIRCLE_DIAM/2;
   gint x,y;
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  splotd *sp = gg->current_splot;
   gboolean chosen = false;
   GList *l;
   splotd *s;
+  splotd *sp = gg->current_splot;
+  displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
 
   if (gg->current_splot == NULL || jvar < 0 || jvar >= d->ncols)
+    return;  /*-- return --*/
+  if (display->d != d)
     return;  /*-- return --*/
 
   if (gg->selvarfg_GC == NULL) 
     init_var_GCs (d->varpanel_ui.da[jvar], gg);
 
-  if (vpixmap == NULL) {
-    vpixmap = gdk_pixmap_new (d->varpanel_ui.da[jvar]->window,
-              VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1, -1);
-  }
+  if (d->varpanel_ui.da_pix[jvar] == NULL)
+    d->varpanel_ui.da_pix[jvar] = gdk_pixmap_new (
+      d->varpanel_ui.da[jvar]->window,
+      VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1, -1);
 
   /*-- clear the pixmap --*/
-  gdk_draw_rectangle (vpixmap, gg->unselvarbg_GC, true,
+  gdk_draw_rectangle (d->varpanel_ui.da_pix[jvar], gg->unselvarbg_GC, true,
                       0, 0, VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
 
   /*-- add a filled circle for the background --*/
-  gdk_draw_arc (vpixmap, gg->selvarbg_GC, true,
+  gdk_draw_arc (d->varpanel_ui.da_pix[jvar], gg->selvarbg_GC, true,
                 0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM,
                 0, 64 * 360);
 
   /*-- add the appropriate line --*/
-  switch (gg->current_display->displaytype) {
+  switch (display->displaytype) {
 
     case  parcoords:  /* only one mode, a 1d plot */
-      l = gg->current_display->splots;
+      l = display->splots;
       while (l) {
         s = (splotd *) l->data;
         if (s->p1dvar == jvar) {
-          if (gg->current_display->p1d_orientation == HORIZONTAL)
-            gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r+r, r);
+          if (display->p1d_orientation == HORIZONTAL)
+            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+              gg->selvarfg_GC, r, r, r+r, r);
           else
-            gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r, 0);
+            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+              gg->selvarfg_GC, r, r, r, 0);
           chosen = true;
           break;
         }
@@ -583,41 +587,48 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
       switch (cpanel->projection) {
         case P1PLOT:
           if (jvar == sp->p1dvar) {
-            if (gg->current_display->p1d_orientation == HORIZONTAL)
-              gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r+r, r);
+            if (display->p1d_orientation == HORIZONTAL)
+              gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+                gg->selvarfg_GC, r, r, r+r, r);
             else
-              gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r, 0);
+              gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+                gg->selvarfg_GC, r, r, r, 0);
             chosen = true;
           }
           break;
         case XYPLOT:
           if (jvar == sp->xyvars.x) {
-            gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r+r, r);
+            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+              gg->selvarfg_GC, r, r, r+r, r);
             chosen = true;
           } else if (jvar == sp->xyvars.y) {
-            gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r, 0);
+            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+              gg->selvarfg_GC, r, r, r, 0);
             chosen = true;
-	  }
+          }
           break;
         case TOUR2D:
-          x = (gint) (gg->current_display->u[0][jvar]*(gfloat)r);
-          y = (gint) (gg->current_display->u[1][jvar]*(gfloat)r);
-          gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r+x, r-y);
+          x = (gint) (display->u[0][jvar]*(gfloat)r);
+          y = (gint) (display->u[1][jvar]*(gfloat)r);
+          gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+            gg->selvarfg_GC, r, r, r+x, r-y);
           chosen = true;
           break;
       }
       break;
 
     case  scatmat:
-      l = gg->current_display->splots;
+      l = display->splots;
       while (l) {
         s = (splotd *) l->data;
         if (s->p1dvar == -1) {
           if (s->xyvars.x == jvar) {
-            gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r+r, r);
+            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+              gg->selvarfg_GC, r, r, r+r, r);
             chosen = true;
           } else if (s->xyvars.y == jvar) {
-            gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r, 0);
+            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+              gg->selvarfg_GC, r, r, r, 0);
             chosen = true;
           }
         }
@@ -633,13 +644,13 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
    * add an open circle for the outline
   */
   if (chosen) {
-    gdk_draw_arc (vpixmap, gg->selvarfg_GC, false,
-                0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM,
-                0, 64 * 360);
+    gdk_draw_arc (d->varpanel_ui.da_pix[jvar],
+      gg->selvarfg_GC, false,
+      0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
   } else {
-    gdk_draw_arc (vpixmap, gg->unselvarfg_GC, false,
-                0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM,
-                0, 64 * 360);
+    gdk_draw_arc (d->varpanel_ui.da_pix[jvar],
+      gg->unselvarfg_GC, false,
+      0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
   }
 
 
@@ -647,8 +658,8 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
    * copy the pixmap to the window
   */
   gdk_draw_pixmap (d->varpanel_ui.da[jvar]->window, gg->unselvarfg_GC,
-                   vpixmap, 0, 0, 0, 0,
-                   VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
+    d->varpanel_ui.da_pix[jvar], 0, 0, 0, 0,
+    VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
 }
 
 void tour_draw_circles (datad *d, ggobid *gg)
@@ -664,13 +675,18 @@ gboolean
 da_expose_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
-  gint k = GPOINTER_TO_INT (cbd);
+  gint j = GPOINTER_TO_INT (cbd);
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (w), "datad");
 
   /* are there two gg assignments here? */
   /*gg = ggobi_get (0);*/
 
-  varcircle_draw (k, d, gg); 
+  if (d->varpanel_ui.da_pix[j] == NULL)
+    varcircle_draw (j, d, gg); 
+  else
+    gdk_draw_pixmap (d->varpanel_ui.da[j]->window, gg->unselvarfg_GC,
+      d->varpanel_ui.da_pix[j], 0, 0, 0, 0,
+      VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
 
   return true;
 }
@@ -803,6 +819,12 @@ void vartable_populate (datad *d, ggobid *gg)
 
   d->varpanel_ui.da = (GtkWidget **)
     g_malloc (d->ncols * sizeof (GtkWidget *));
+
+g_printerr ("allocating %d pixmaps\n", d->ncols);
+  d->varpanel_ui.da_pix = (GdkPixmap **)
+    g_malloc (d->ncols * sizeof (GdkPixmap *));
+  for (j=0; j<d->ncols; j++) d->varpanel_ui.da_pix[j] = NULL;
+
   d->varpanel_ui.label = (GtkWidget **)
     g_malloc (d->ncols * sizeof (GtkWidget *));
 
