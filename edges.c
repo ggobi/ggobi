@@ -186,11 +186,16 @@ datad *setDisplayEdge(displayd * dpy, datad * e)
  */
 gboolean edgeset_add(displayd * display)
 {
-  datad *d = display->d;
+  datad *d;
   datad *e;
   gint k;
   gboolean added = false;
-  ggobid *gg = GGobiFromDisplay(display);
+  ggobid *gg;
+  if(!display)
+     return(false);
+
+  d = display->d;
+  gg = GGobiFromDisplay(display);
 
   if (gg->d != NULL) {
     gint nd = g_slist_length(gg->d);
