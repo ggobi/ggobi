@@ -258,10 +258,9 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   */
   display->vrule = gtk_ext_vruler_new ();
   gtk_signal_connect_object (GTK_OBJECT (sp->da),
-                             "motion_notify_event",
-                             (GtkSignalFunc) EVENT_METHOD (display->vrule,
-                                                           motion_notify_event),
-                             GTK_OBJECT (display->vrule));
+    "motion_notify_event",
+    (GtkSignalFunc) EVENT_METHOD (display->vrule, motion_notify_event),
+    GTK_OBJECT (display->vrule));
 
   gtk_table_attach (GTK_TABLE (table),
                     display->vrule, 0, 1, 0, 1,
