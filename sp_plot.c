@@ -111,6 +111,97 @@ splot_check_colors (gushort maxcolorid, gint *ncolors_used,
   }
 }
 
+gboolean
+splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
+  splotd *sp, displayd *display, ggobid *gg)
+{
+  gboolean draw_edge;
+  endpointsd *endpoints = e->edge.endpoints;
+  gint a = d->rowid.idv.els[endpoints[m].a];
+  gint b = d->rowid.idv.els[endpoints[m].b];
+
+  /*-- determine whether edge m should be plotted --*/
+  /*-- usually checking sampled is redundant because we're looping
+       over rows_in_plot, but maybe we're not always --*/
+  draw_edge = true;
+
+  if (!e->sampled.els[m]) {
+    draw_edge = false;
+
+  } else if (ignore_hidden && e->hidden_now.els[m]) {
+    draw_edge = false;
+
+  } else if (!splot_plot_case (a, true, d, sp, display, gg) ||
+             !splot_plot_case (b, true, d, sp, display, gg))
+  {
+    draw_edge = false;
+
+  /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
+  } else if (e->nmissing > 0 && !e->missings_show_p) {
+    switch (display->displaytype) {
+      case parcoords:
+        if (e->missing.vals[m][sp->p1dvar])
+          draw_edge = false;
+      break;
+
+      case scatmat:
+        if (sp->p1dvar != -1) {
+          if (e->missing.vals[m][sp->p1dvar])
+            draw_edge = false;
+        } else {
+          if (e->missing.vals[m][sp->xyvars.x] ||
+              e->missing.vals[m][sp->xyvars.y])
+          {
+            draw_edge = false;
+          }
+        }
+      break;
+
+      case tsplot:
+        if (e->missing.vals[m][sp->xyvars.y]|| 
+            e->missing.vals[m][sp->xyvars.x])
+          draw_edge = false;
+      break;
+
+      case scatterplot:
+      {
+        gint proj = projection_get (gg);
+        switch (proj) {
+          case P1PLOT:
+            if (e->missing.vals[m][sp->p1dvar])
+              draw_edge = false;
+          break;
+          case XYPLOT:
+            if (e->missing.vals[m][sp->xyvars.x])
+              draw_edge = false;
+            else if (e->missing.vals[m][sp->xyvars.y])
+              draw_edge = false;
+          break;
+          case TOUR1D:
+            if (e->missing.vals[m][display->t1d.active_vars.els[m]])
+              draw_edge = false;
+          break;
+
+          case TOUR2D:
+            if (e->missing.vals[m][display->t2d.active_vars.els[m]])
+              draw_edge = false;
+          break;
+
+          case COTOUR:
+            if (e->missing.vals[m][display->tcorr1.active_vars.els[m]])
+              draw_edge = false;
+            else if (e->missing.vals[m][display->tcorr2.active_vars.els[m]])
+              draw_edge = false;
+          break;
+        }
+      }
+      break;
+      default:
+      break;
+    }
+  }
+  return draw_edge;
+}
 
 gboolean
 splot_plot_case (gint m, gboolean ignore_hidden, datad *d,
@@ -1026,7 +1117,6 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gint i, j, m;
   gint k, n, p;
   gint a, b;
-  gboolean doit;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   datad *e = display->e;
@@ -1070,6 +1160,8 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     for (i=0; i<e->nrows_in_plot; i++) {
       m = e->rows_in_plot[i];
       if (!e->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
+      /* we don't want to do all these checks twice, do we? */
+      /*if (splot_plot_edge (m, true, d, e, sp, display, gg)) {*/
         gtype = e->glyph_now.els[m].type;
         if (gtype == FC || gtype == FR)
           ltype = SOLID;
@@ -1100,31 +1192,15 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
             nl = 0;
 
             for (j=0; j<e->edge.n; j++) {
-/*
- * I'm checking hidden_now and sampled here, but what about missings
- * among the edge records?  Wouldn't know what variables to use in
- * splot_plot_case, so leave it alone for now. -- dfs
-*/
-              doit = true;
-              if (e->hidden_now.els[j] || !e->sampled.els[j]) {
-                doit = false;
-              /*-- nels = d->rowid.idv.nels --*/
-              } else if (endpoints[j].a >= nels || endpoints[j].b >= nels) {
-                doit = false;
-              }
-              if (!doit)
+              /*-- nels = d->rowid.idv.nels; this would be a bug --*/
+              if (endpoints[j].a >= nels || endpoints[j].b >= nels)
+                continue;
+
+              if (!splot_plot_edge (j, true, d, e, sp, display, gg))
                 continue;
 
               a = d->rowid.idv.els[endpoints[j].a];
               b = d->rowid.idv.els[endpoints[j].b];
-              /*
-               * This checks for hidden, sampled <and> missingness
-              */
-              doit = splot_plot_case (a, true, d, sp, display, gg) &&
-                     splot_plot_case (b, true, d, sp, display, gg);
-
-              if (!doit)
-                continue;
 
               gtype = e->glyph_now.els[j].type;
               if (gtype == FC || gtype == FR)
@@ -1167,9 +1243,6 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
                     sp->arrowheads[nl].x2 = sp->screen[b].x;
                     sp->arrowheads[nl].y2 = sp->screen[b].y;
                   } else {  /*-- draw the partner's arrowhead --*/
-/*
- * Do I need to check whether j is a visible point in e?  -- dfs
-*/
                     gint jp = endpoints[j].jpartner;
                     gint ja = d->rowid.idv.els[endpoints[jp].a];
                     gint jb = d->rowid.idv.els[endpoints[jp].b];
