@@ -84,7 +84,6 @@ struct _datad {
   gint ncols;
   GSList *vartable;
   GtkWidget *vartable_clist;
-  gboolean single_column; /*-- not handling single-column case now --*/
 
   array_f raw, tform;
   array_g world, jitdata;
@@ -222,9 +221,6 @@ struct _datad {
    gboolean(*readXMLRecord) (const xmlChar ** attrs,
                              struct _XMLUserData * data);
 };
-
-
-gint alloc_edgeIDs(datad * d);
 
 
 extern datad *datad_new(datad *, struct _ggobid *);
