@@ -15,8 +15,7 @@ Bugs:
 various stuff not yet implemented: 
   1d, xy cycling
   window closings
-  sticky labels (because I don't know how to do it -- maybe just draw
-    a box around the label?  or underline it?)
+  sticky labels -- just draw them without the underline and the diamond
 
   row groups
   line groups

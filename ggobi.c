@@ -30,8 +30,8 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
  * Now parse the command line.
 */
   for ( ; *argc>1 && av[1][0]=='-'; (*argc)--,av++) {
-
-    if (strcmp (av[1], "-x") == 0)
+   
+    if (strcmp (av[1], "-xml") == 0)
       gg->data_mode = xml;
     else if (strcmp (av[1], "-mysql") == 0)
       gg->data_mode = mysql;

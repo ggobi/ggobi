@@ -12,12 +12,10 @@
 #define ALLROWS        0
 #define DISPLAYEDROWS  1
 #define LABELLEDROWS   2
-#define SPECIFIEDROWS  3
 
 /*-- column_ind --*/
 #define ALLCOLS       0
-#define SELECTEDCOLS   1
-#define SPECIFIEDCOLS 2
+#define SELECTEDCOLS  1
 
 /*-- missing_ind --*/
 #define MISSINGSNA      0

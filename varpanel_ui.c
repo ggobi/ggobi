@@ -689,7 +689,7 @@ void varpanel_populate (ggobid *gg)
 {
   gint i, j, k;
 
-  /*-- previous allocated da and varlabel are freed in varpanel_clear --*/
+  /*-- da and varlabel are freed in varpanel_clear --*/
 
   gg->varpanel_ui.da = (GtkWidget **)
     g_malloc (gg->ncols * sizeof (GtkWidget *));

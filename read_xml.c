@@ -67,7 +67,7 @@
 
 void startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs);
 void endXMLElement(void *user_data, const CHAR *name);
-void characters(void *user_data, const CHAR *ch, int len);
+void Characters(void *user_data, const CHAR *ch, int len);
 
 
 const gchar * const xmlDataTagNames[] = {
@@ -123,7 +123,7 @@ data_xml_read(const gchar *filename, ggobid *gg)
 
   xmlParserHandler->startElement = startXMLElement;
   xmlParserHandler->endElement = endXMLElement;
-  xmlParserHandler->characters = characters;
+  xmlParserHandler->characters = Characters;
 
 
   initParserData(&data, xmlParserHandler, gg);
@@ -316,7 +316,7 @@ tagType(const gchar *name, gboolean endTag)
    is passed can work with it more easily.
  */
 void 
-characters(void *user_data, const CHAR *ch, int len)
+Characters(void *user_data, const CHAR *ch, int len)
 {
  char *tmp;
  int dlen = len;
@@ -441,9 +441,12 @@ newRecord(const CHAR **attrs, XMLParserData *data)
   data->current_element = 0;
 
   tmp = getAttribute(attrs, "label");
-  if (tmp)
-    g_array_insert_val (data->gg->rowlab, data->current_record, g_strdup(tmp));
+  if (tmp) {
+    gchar *stmp = g_strdup (tmp);
+    g_array_insert_val (data->gg->rowlab, data->current_record, stmp);
+/*    g_free (stmp);*/
 /*  data->gg->rowlab[data->current_record] = g_strdup(tmp);*/
+  }
 
 
   setColor(attrs, data, i);

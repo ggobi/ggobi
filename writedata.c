@@ -33,44 +33,6 @@ set_rowv (gint *rowv, gchar *rootname, ggobid *gg)
 
   switch (gg->save.row_ind) {
 
-    case SPECIFIEDROWS:
-      /*
-       * If the user is supplying a file named rootname.rowindx, read it
-       * in and verify that it's reasonable: that is, contains no dups.
-       * ... Actually, that would be painfully slow.  Just verify that the
-       * values are legal.
-      */
-
-      fname = g_strdup_printf ("%s.rowindx", rootname);
-      fp = fopen (fname, "r");
-      g_free (fname);
-
-      if (fp == NULL) {
-        message = g_strdup_printf ("The file '%s.rowindx' can not be read\n",
-          rootname);
-        quick_message (message, false);
-        g_free (message);
-        return false;
-      } else {
-        i = 0;
-        while (fscanf (fp, "%d", &rowv[i]) != EOF) {
-          if (rowv[i] <= 0 || rowv[i] > gg->nrows) {
-            message = g_strdup_printf ("%s, %d,\n%s",
-              "Your rowindx file contains an impermissible value",
-              rowv[i], "which is either <=0 or > nrows");
-            quick_message (message, false);
-            g_free (message);
-            fclose (fp);
-            return false;
-          }
-          (rowv[i])--;
-          i++;
-        }
-        nrows = i;
-        fclose (fp);
-      }
-      break;
-
     case DISPLAYEDROWS:
     /*
      * Otherwise just copy the row numbers representing unerased
@@ -123,44 +85,6 @@ set_colv (gint *colv, gchar *rootname, ggobid *gg)
   FILE *fp;
 
   switch (gg->save.column_ind) {
-
-    case SPECIFIEDCOLS:
-      /*
-       * If the user is supplying a file named rootname.colindx, read it
-       * in and verify that it's reasonable: that is, contains no dups.
-       * ... Actually, that would be painfully slow.  Just verify that the
-       * values are legal.
-      */
-
-      fname = g_strdup_printf ("%s.colindx", rootname);
-      fp = fopen (fname, "r");
-      g_free (fname);
-
-      if (fp == NULL) {
-        message = g_strdup_printf ("The file '%s' can not be read\n", fname);
-        quick_message (message, false);
-        g_free (message);
-        return false;
-      } else {
-        i = 0;
-        while (fscanf(fp, "%d", &colv[i]) != EOF) {
-          if (colv[i] <= 0 || colv[i] > gg->ncols) {
-            message = g_strdup_printf ("%s, %d,\n %s\n",
-              "Your colindx file contains an impermissible value",
-              colv[i],
-              "which is either <=0 or >ncols\n");
-            quick_message (message, false);
-            g_free (message);
-            fclose (fp);
-            return false;
-          }
-          (colv[i])--;
-          i++;
-        }
-        ncols = i;
-        fclose (fp);
-      }
-      break;
 
     case ALLCOLS:
       /* 

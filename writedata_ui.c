@@ -35,8 +35,7 @@ static void jitterp_set_cb (GtkWidget *w, gpointer cbd)
 
 static gchar *rowdata_lbl[] = {"All cases",
                                "Displayed cases",
-                               "Labeled cases",
-                               "Specified cases"};
+                               "Labeled cases"};
 void rowind_set (gint ind, ggobid *gg) { gg->save.row_ind = ind; }
 static void rowind_set_cb (GtkWidget *w, gpointer cbd)
 {
@@ -45,8 +44,7 @@ static void rowind_set_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *columndata_lbl[] = {"All variables",
-                                  "Selected variables",
-                                  "Specified variables"};
+                                  "Selected variables"};
 void columnind_set (gint ind, ggobid *gg) { gg->save.column_ind = ind; }
 static void columnind_set_cb (GtkWidget *w, gpointer cbd)
 {
@@ -55,7 +53,7 @@ static void columnind_set_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *missing_lbl[] = {"Missings as 'na'",
-                               "Missings as '.'"
+                               "Missings as '.'",
                                "Imputed values"};
 void missingind_set (gint ind, ggobid *gg) { gg->save.missing_ind = ind; }
 static void missingind_set_cb (GtkWidget *w, gpointer cbd)
@@ -142,6 +140,7 @@ writeall_window_open (ggobid *gg) {
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
 
     /*-- Jitter? --*/
+/*
     j++;
     opt = gtk_option_menu_new ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
@@ -157,6 +156,7 @@ writeall_window_open (ggobid *gg) {
       0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
     gtk_table_attach (GTK_TABLE (table), opt,
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
+*/
 
     /*-- Which rows --*/
     j++;

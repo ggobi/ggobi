@@ -433,22 +433,30 @@ splot_add_point_label (splotd *sp, gint k, ggobid *gg) {
   }
 
   /*-- add the label last so it will be in front of other markings --*/
-printf ("%d %s\n", k, g_array_index (gg->rowlab, gchar *, k));
   lbl = (gchar *) g_array_index (gg->rowlab, gchar *, k);
   gdk_text_extents (style->font,  
     lbl, strlen (lbl),
     &lbearing, &rbearing, &width, &ascent, &descent);
 
-  if (sp->screen[k].x <= sp->max.x/2)
+  /*-- underline the nearest point label?  --*/
+  if (sp->screen[k].x <= sp->max.x/2) {
     gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
       sp->screen[k].x+diamond_dim,
       sp->screen[k].y-diamond_dim,
       lbl);
-  else
+    gdk_draw_line (sp->pixmap1, gg->plot_GC,
+      sp->screen[k].x+diamond_dim, sp->screen[k].y-diamond_dim+1,
+      sp->screen[k].x+diamond_dim+width, sp->screen[k].y-diamond_dim+1);
+      
+  } else {
     gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
       sp->screen[k].x - width - diamond_dim,
       sp->screen[k].y - diamond_dim,
       lbl);
+    gdk_draw_line (sp->pixmap1, gg->plot_GC,
+      sp->screen[k].x - width - diamond_dim, sp->screen[k].y - diamond_dim+1,
+      sp->screen[k].x - diamond_dim, sp->screen[k].y - diamond_dim+1);
+  }
 }
 
 void

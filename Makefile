@@ -78,9 +78,6 @@ ifdef USE_XML
 endif
 
 ifdef USE_MYSQL
- MYSQL_DIST=/usr/local/src/mysql-3.23.16-alpha/
- MYSQL_INCLUDE_DIRS=$(MYSQL_DIST)/include
- MYSQL_LIB_DIRS=$(MYSQL_DIST)/libmysql/.libs
  CFLAGS+= -I$(MYSQL_INCLUDE_DIRS) -DUSE_MYSQL=1 -Wall
  MYSQL_LIBS=-lmysqlclient $(MYSQL_LIB_DIRS:%=-L%) $(MYSQL_LIB_DIRS:%=-Xlinker -rpath -Xlinker %)
  SRC+=read_mysql.c
@@ -88,7 +85,7 @@ ifdef USE_MYSQL
 endif
 
 ggobi: $(OB)
-	$(CC) $(OB) $(LDFLAGS) -o ggobi $(XML_LIB_DIRS) $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`
+	$(CC) $(OB) $(LDFLAGS) -o ggobi $(XML_LIB_DIRS) $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --libs`
 
 pure: ggobi.o $(OB)
 	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
@@ -143,8 +140,7 @@ endif
 
 
 ifdef USE_MYSQL
-
-read_mysql.o: read_mysql.h
+read_mysql.o: read_mysql.c read_mysql.h
 
 sql: read_mysql.o
 	$(CC) -o $@ read_mysql.o $(MYSQL_LIBS)
