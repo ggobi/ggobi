@@ -48,10 +48,22 @@ array_contains (gint* arr, gint n, gint el)
 vartabled *
 vartable_element_get (gint j, datad *d)
 {
-/*
-  return ((vartabled *) (d->vartable->data + j*sizeof(vartabled *)));
-*/
   return ((vartabled *) g_slist_nth_data (d->vartable, j));
+}
+vartabled *
+vartable_element_get_by_name (gchar *collab, datad *d)
+{
+  gint j;
+  vartabled *vt;
+
+  for (j=0; j<g_slist_length (d->vartable); j++) {
+    vt = (vartabled *) g_slist_nth_data (d->vartable, j);
+    if (strcmp (vt->collab, collab) == 0) {
+      return (vt);
+    }
+  }
+
+  return ((vartabled *) NULL);
 }
 void
 vartable_element_append (vartabled *vt, datad *d)

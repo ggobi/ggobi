@@ -1,0 +1,20 @@
+When linking by a categorical variable, here's the process
+
+For now, we'll do the testing and initialize the linkvar_arrays
+(like xgobi's rgroups) whenever the mouse goes down.  This is
+not ideal, because it might cause a noticeable pause at this point,
+but it'll do until we redesign the interface.
+
+Every time the the mouse goes down:
+
+  if (linkby == BR_LINKBYVAR) {
+    get the currently selected variable
+    if (no variable selected || selected variable is not categorical)
+      do nothing;
+    else {
+      if this is not the current gg->link_variable {
+        gg->linkvar_name = the name of this variable
+        linkvar_arrays_init (gg->linkvar_name, d, gg);
+      }
+    }
+    brush as usual

@@ -140,7 +140,10 @@ struct _ggobid {
    GtkWidget *notebook;
  } cluster_ui;
  
-/*----------------------- row grouping -----------------------------*/
+/*---------------- brushing by categorical variable ----------------*/
+
+  gchar *linkvar_name;
+  GSList *linkvar_arrays;  /*-- each element is a GArray * --*/
 
 /*--------------------------------------------------------------------*/
 /*                         color                                      */

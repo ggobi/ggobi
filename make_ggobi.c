@@ -38,6 +38,10 @@ void globals_init (ggobid *gg) {
   gg->color_0 = 0;
   gg->color_id = 1;
 
+  /*-- for linking by categorical variable --*/
+  gg->linkvar_name = (gchar *) NULL;
+  gg->linkvar_arrays = NULL;
+
   gg->lims_use_visible = true;
   gg->buttondown = 0;  /*-- no button is pressed --*/
 

@@ -210,11 +210,11 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
    break;
 
    case CATEGORICAL_LEVELS:
-       categoricalLevels(attrs, data);
-     break;
+     categoricalLevels(attrs, data);
+   break;
    case CATEGORICAL_LEVEL:
-       setLevelIndex(attrs, data);
-     break;
+     setLevelIndex(attrs, data);
+   break;
 
    case RECORDS: /* Used to be DATASET */
      setDatasetInfo(attrs, data);
@@ -248,11 +248,21 @@ int
 setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 {
   const gchar *tmp = getAttribute(attrs, "value");
+  datad *d = getCurrentXMLData(data);
+  vartabled *el = vartable_element_get (data->current_variable, d);
 
+/*
   if (tmp != NULL) {
     data->current_level = strToInteger(tmp);
   } else
-    data->current_level++;
+*/
+  data->current_level++; /*-- current_level here ranges from 0 : nlevels-1 --*/
+
+  if (tmp != NULL)
+    el->level_values[data->current_level] = strToInteger (tmp);
+  else
+    el->level_values[data->current_level] = data->current_level;
+   
 
   return(data->current_level);
 }
@@ -287,8 +297,9 @@ addLevel(XMLParserData *data, const gchar *c, gint len)
   vartabled *el = vartable_element_get (data->current_variable, d);
 
   gchar *val = g_strdup(c);
-/*    g_array_append_val(el->levels, c); */
-  g_array_insert_val(el->level_names, data->current_level, val);
+  g_array_append_val(el->level_names, val);
+
+  /*g_array_insert_val(el->level_names, data->current_level, val);*/
 }
 
 
@@ -404,7 +415,6 @@ Characters(void *user_data, const xmlChar *ch, int len)
   c = (const xmlChar *) tmp;
  }
 
-
  switch(data->state) {
    case RECORD:
      setRecordValues (data, c, dlen);
@@ -418,10 +428,10 @@ Characters(void *user_data, const xmlChar *ch, int len)
      setColorValue (data, c, dlen);
      break;
    case CATEGORICAL_LEVEL:
-       addLevel(data, (const char *) c, dlen);
-     break;
+     addLevel(data, (const char *) c, dlen);
+   break;
    default:
-     break;
+   break;
 
  }
 
