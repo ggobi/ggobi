@@ -204,6 +204,7 @@ initializePerlPlugin(PerlPluginData *details, ggobid *gg, PluginInstance *inst)
        /* create the references */
     instData->ggobiRef = createPerlReferenceObject(gg, "GGobi::GGobiRef");
     instData->pluginInstanceRef = createPerlReferenceObject(inst, "GGobi::PluginInstRef");
+   
     return(instData);
 }
 
@@ -304,6 +305,7 @@ PerlCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 	SPAGAIN;
         if(n > 0) {
 	    instData->perlObj = POPs;
+            SvREFCNT_inc(instData->perlObj);
 	    status = true;
 	} else
 	    status = false;
