@@ -268,25 +268,24 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
             if (edges_show_p) {
               gchar dash_list[2];
 
-              if (n_prev == -1 || n_prev != n) {  /* type */
-                switch (n) {
-                  case SOLID:
-                    ltype = GDK_LINE_SOLID;
-                  break;
-                  case WIDE_DASH:
-                    ltype = GDK_LINE_ON_OFF_DASH;
-                    dash_list[0] = 8;
-                    dash_list[1] = 2;
-                    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
-                  break;
-                  case NARROW_DASH:
-                    ltype = GDK_LINE_ON_OFF_DASH;
-                    dash_list[0] = 4;
-                    dash_list[1] = 2;
-                    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
-                  break;
-                }
+              switch (n) {
+                case SOLID:
+                  ltype = GDK_LINE_SOLID;
+                break;
+                case WIDE_DASH:
+                  ltype = GDK_LINE_ON_OFF_DASH;
+                  dash_list[0] = 8;
+                  dash_list[1] = 2;
+                  gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+                break;
+                case NARROW_DASH:
+                  ltype = GDK_LINE_ON_OFF_DASH;
+                  dash_list[0] = 4;
+                  dash_list[1] = 2;
+                  gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+                break;
               }
+
 	      if (k_prev == -1 || k_prev != i || n_prev == -1 || n_prev != n) {
                 gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
                   (gint) ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
@@ -457,6 +456,8 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   colorschemed *scheme = gg->activeColorScheme;
+  gint lwidth;
+  gint size = gg->glyph_id.size;
 
   /*-- just rely on the cursor for adding points; no other markup --*/
 
@@ -471,15 +472,12 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
         k != -1 &&
         k != gg->edgeedit.a) {
 
-{ /* XXX do I need to unset this when I'm done?   dfs */
-  gint lwidth;
-  gint k = gg->glyph_id.size;
+      lwidth = (size<3) ? 0 : (size-2)*2;
+      gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
+        GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_ROUND);
 
-  lwidth = (k<3) ? 0 : (k-2)*2;
-  gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
-    GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_ROUND);
-}
-
+      /* This isn't really the color I want to use, but I don't know
+	 how to get at the color of the endpoints here. */
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
       gdk_draw_line (drawable, gg->plot_GC,
         sp->screen[ gg->edgeedit.a ].x, sp->screen[ gg->edgeedit.a ].y,
