@@ -48,8 +48,11 @@ datad_get_from_widget (GtkWidget *w, ggobid *gg)
     GtkWidget *clist = (GtkWidget *)
       gtk_object_get_data (GTK_OBJECT (w), "datad_clist");
     if (clist) {
-      gint kd = get_one_selection_from_clist (clist, d);  /* in utils_ui.c */
-      if (kd >= 0) d = (datad *) g_slist_nth_data (gg->d, kd);
+      GList *selection = GTK_CLIST (clist)->selection;
+      if (selection) {
+        gint kd = (gint) selection->data;
+        if (kd >= 0) d = (datad *) g_slist_nth_data (gg->d, kd);
+      }
     }
   }
 
@@ -343,7 +346,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
       label = gtk_label_new ("Random");
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
-                                frame, label);
+        frame, label);
       
       /*-----------------------*/
       /*-- Consecutive block --*/
@@ -395,7 +398,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
       label = gtk_label_new ("Block");
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
-                                frame, label);
+        frame, label);
 
       /*---------------------------*/
       /*-- Points within a range --*/
@@ -444,7 +447,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
       label = gtk_label_new ("Range");
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
-                                frame, label);
+        frame, label);
 
       /*--------------------*/
       /*-- Every nth case --*/
@@ -529,7 +532,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
       label = gtk_label_new ("Row label");
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
-                                frame, label);
+        frame, label);
 
       /*-- hbox to hold a few buttons --*/
       button_hbox = gtk_hbox_new (true, 2);
