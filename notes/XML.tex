@@ -99,7 +99,15 @@ directory and starting the ggobi application
 This searches for a file named data/flea.xml and if this is not found,
 \file{data/flea.xml.gz} and then \file{data/flea.xmlz}.  The parser
 automatically determines whether it is compressed or not.  This
-support can be turned off.
+support can be turned off.  Some simple tests illustrate that the XML
+representation can be about about 50\% larger than their simpler ASCII
+equivalents (i.e. without the markup) but that the compression brings
+them to about $1/3$ the size. The speed at which the compressed file
+is read is almost the same as the uncompressed XML, and is about 33\%
+longer than the ASCII equivalents. (These were done on a $100000
+\times 5$ matrix.  Note also that all the color and glyph information
+was included in the XML and not provided in the ASCII, so the XML
+looks slightly better than the above numbers suggest.)
 
 Note also that the XML parsing library has support for reading files
 via ftp and http.

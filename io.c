@@ -39,7 +39,6 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
   guint len = strlen (fname);
   gchar *filename;
 
-
   switch (action) {
     case READ_FILESET:
       if (fileset_read_init (fname, gg)) 
@@ -70,6 +69,7 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
           else
             filename = g_strdup (fname);
           g_printerr ("filename=%s\n", filename);
+          d = g_slist_nth_data(gg->d, 0);
           ggobi_file_set_create (filename, d, gg);
           g_free (filename);
           break;

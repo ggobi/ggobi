@@ -28,7 +28,7 @@ const gchar * const ViewTypes[] =
   {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
 const gint ViewTypeIndices[] = {scatterplot, scatmat, parcoords};           
 const gchar *const ModeNames[] =
-  {"ASCII", "binary", "R/S data", "XML", "MySQL"};
+  {"ASCII", "binary", "R/S data", "XML", "MySQL", "Unknown"};
 
 gint
 parse_command_line (gint *argc, gchar **av, ggobid *gg)
@@ -208,7 +208,7 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
 
   g_print ("progname = %s\n", g_get_prgname());
 
-  gg->data_mode = ascii_data;
+  gg->data_mode = unknown_data;
 
   parse_command_line (&argc, argv, gg);
   g_print ("data_in = %s\n", gg->data_in);

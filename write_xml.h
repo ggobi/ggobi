@@ -13,8 +13,10 @@ extern "C" {
 #endif
 
 gboolean write_xml (const gchar *filename, ggobid *gg);
-gboolean write_xml_stream (FILE *f, datad *, ggobid *gg, const gchar *);
-gboolean write_xml_header (FILE *f, ggobid *gg);
+gboolean write_xml_stream (FILE *f, ggobid *gg, const gchar *);
+gboolean write_xml_dataset(FILE *f, datad *d, ggobid *gg);
+gboolean write_xml_header (FILE *f, int numDatasets, ggobid *gg);
+gboolean write_xml_footer(FILE *f, ggobid *gg);
 gboolean write_xml_description (FILE *f, ggobid *gg);
 gboolean write_xml_variables (FILE *f, datad *, ggobid *gg);
 gboolean write_xml_variable (FILE *f, datad *, ggobid *gg, gint i);

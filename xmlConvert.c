@@ -13,32 +13,35 @@ main (gint argc, gchar *argv[])
 {
   ggobid *gg;
   datad *d;
-
+  char *fileName;
   gchar *tmpname;
   gtk_init (&argc, &argv);
   gg = ggobi_alloc ();
-  d = g_malloc (sizeof (datad));
-  gg->d = g_slist_append (gg->d, d);
 
-  gg->data_mode = ascii;
-  d->nrows_in_plot = -1;
-  d->nrows = d->ncols = 0;
+
+  fileName = gg->data_in = argv[1];
+  gg->data_mode = ascii_data;
+ 
+  fileName = gg->data_in = argv[2];
+  gg->data_mode = xml_data;
+
   gg->displays = NULL;
   globals_init (gg); /*-- variables that don't depend on the data --*/
   color_table_init (gg);
 
-  gg->data_in = argv[1];
 
-  fileset_read (gg->data_in, gg);
+  fileset_read (fileName, gg);
+  d = (datad *)g_slist_nth_data(gg->d,0);
+
   if(0) {
     tmpname = (gchar*) g_malloc(sizeof(gchar)*strlen(gg->fname)+5);
     sprintf (tmpname, "%s%s", gg->fname, ".tmp");
     write_xml (tmpname, gg);
     g_free (tmpname);
   }
-  else
-    write_xml_stream (stdout, d, gg, NULL);
-
+  else {
+    write_xml_stream (stdout, gg, NULL);
+  }
 
   return(0);
 }

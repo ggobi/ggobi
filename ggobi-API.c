@@ -50,6 +50,15 @@ GGOBI(getFileName) (ggobid *gg)
   return(gg->filename);
 }
 
+const gchar *
+GGOBI(setFileName) (const gchar *fileName, ggobid *gg)
+{
+ const gchar *old = g_strdup(GGOBI(getFileName)(gg));
+ fileset_read_init(fileName, gg);
+ return(old);
+}
+
+
 DataMode
 GGOBI(getDataMode) (ggobid *gg)
 {
@@ -1240,4 +1249,26 @@ GGOBI(getDatasetNames)(int *n, ggobid *gg)
   }
 
   return(names);
+}
+
+/*
+ Added to the API and to avoid breaking code (e.g. in RSggobi)
+ we add it here with a new name GGOBI(ggobi_get).
+*/
+ggobid * 
+GGOBI(ggobi_get)(gint which)
+{
+  return(ggobi_get(which));
+}
+
+gint
+GGOBI(ncols)(datad *data)
+{
+ return(data->ncols);
+}
+
+gint
+GGOBI(nrecords)(datad *data)
+{
+ return(data->nrows);
 }

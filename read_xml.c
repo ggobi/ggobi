@@ -274,6 +274,7 @@ endXMLElement(void *user_data, const CHAR *name)
      if(data->reading_colormap_file_p == false)
        GGOBI(registerColorMap)(data->gg);
    default:
+     data = NULL; /* just any code so we can stop.*/
      break;
  }
 }

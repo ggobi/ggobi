@@ -19,40 +19,56 @@ write_xml (const gchar *filename,  ggobid *gg)
    return (false);
   }
 
-  tmp = gg->d;
-  while((tmp != NULL)) {
-    d = (datad*) tmp->data;
-    ok = write_xml_stream (f, d, gg, filename);
-    tmp = tmp->next;
-  }
+  write_xml_stream (f, gg, filename);
 
   fclose(f);
   return ok;
 }
 
 gboolean
-write_xml_stream (FILE *f, datad *d, ggobid *gg, const gchar *filename)
+write_xml_stream (FILE *f, ggobid *gg, const gchar *filename)
 {
-  write_xml_header (f, gg);
-  write_dataset_header (f, d, gg);
-  write_xml_description (f, gg);
-  write_xml_variables (f, d, gg);
-  write_xml_records (f, d, gg);
-/*-- skip for now, because there's no need to write the default edges --*/
-/*    write_xml_edges(f, gg);*/
-  write_dataset_footer(f, gg);
+ gint numDatasets, i;
+ datad *d;
+  numDatasets = g_slist_length(gg->d);
+  write_xml_header (f, -1, gg);
+
+  for(i = 0; i < numDatasets; i++) {
+    d = (datad *) g_slist_nth_data(gg->d, i);
+    write_xml_dataset(f, d, gg);
+  }
+
+  write_xml_footer(f, gg);
+  return(true);
+}
+
+gboolean
+write_xml_dataset(FILE *f, datad *d, ggobid *gg)
+{
+    write_dataset_header (f, d, gg);
+    write_xml_description (f, gg);
+    write_xml_variables (f, d, gg);
+    write_xml_records (f, d, gg);
+    /*-- skip for now, because there's no need to write the default edges --*/
+    /*    write_xml_edges(f, gg);*/
+    write_dataset_footer(f, gg);
 
   return(true);
 }
 
 gboolean
-write_xml_header (FILE *f, ggobid *gg)
+write_xml_header (FILE *f, int numDatasets, ggobid *gg)
 {
 
  fprintf(f, "<?xml version=\"1.0\"?>");
  fprintf(f, "\n");
  fprintf(f, "<!DOCTYPE xgobidata SYSTEM \"xgobi.dtd\">");
  fprintf(f, "\n\n");
+
+ if(numDatasets < 0)
+    numDatasets = g_slist_length(gg->d);
+
+ fprintf(f, "<ggobidata count=\"%d\">\n", numDatasets);
 
 /* fflush(f);*/
 
@@ -213,7 +229,7 @@ writeFloat(FILE *f, double value)
 gboolean
 write_dataset_header (FILE *f, datad *d, ggobid *gg)
 {
- fprintf(f,"<ggobidata ");
+ fprintf(f,"<data ");
  fprintf(f, "numRecords=\"%d\"", d->nrows);
  fprintf(f,">\n");
 
@@ -222,6 +238,13 @@ write_dataset_header (FILE *f, datad *d, ggobid *gg)
 
 gboolean
 write_dataset_footer(FILE *f, ggobid *gg)
+{
+ fprintf(f,"</data>\n");
+ return(true);
+}
+
+gboolean
+write_xml_footer(FILE *f, ggobid *gg)
 {
  fprintf(f,"</ggobidata>\n");
  return(true);

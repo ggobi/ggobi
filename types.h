@@ -14,7 +14,7 @@
 #include <gtk/gtk.h>
 /* types.h */
 
-typedef enum {ascii_data, binary_data, Sprocess_data, xml_data, mysql_data} DataMode;
+typedef enum {ascii_data, binary_data, Sprocess_data, xml_data, mysql_data, unknown_data} DataMode;
 typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT,UNKNOWN_GLYPH} GlyphType;
 
 typedef struct {

@@ -75,7 +75,8 @@ fileset_read (gchar *ldata_in, ggobid *gg)
   strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
 
   /*-- determine the data_mode based on the suffix of the input file --*/
-  gg->data_mode = data_mode_set (gg->filename);
+  if(gg->data_mode == unknown_data)
+     gg->data_mode = data_mode_set (gg->filename);
 
   switch (gg->data_mode) {
     case xml_data:

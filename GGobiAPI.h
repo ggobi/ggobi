@@ -23,6 +23,15 @@ extern "C" {
   This is not a copy of the value used by ggobi.
  */
 const gchar *GGOBI(getFileName)(ggobid *gg);
+
+/*
+ Read the data from the specified file..
+ To force a particular data mode (e.g. XML, ASCII, binary, etc.)
+ rather than leaving it to the auto-detection,  use setDataMode()
+ before calling this routine..
+*/
+const gchar *GGOBI(setFileName) (const gchar *fileName, ggobid *gg);
+
 /*
   Returns whether the data was read from a binary
   or ASCII file.
@@ -72,7 +81,7 @@ extern const gchar *GGOBI(getViewTypeName)(enum displaytyped type);
   Returns a description of the type of the currently
   active display window.
  */
-extern const gchar *GGOBI(getCurrentDisplayType)();
+extern const gchar *GGOBI(getCurrentDisplayType)(ggobid *gg);
 
 
 /*
@@ -230,6 +239,11 @@ extern gchar *GGOBI(getDescription)(ggobid *gg);
 extern void GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg);
 
 extern int GGOBI(datasetIndex)(const char *name,  ggobid *gg);
+
+ggobid * GGOBI(ggobi_get)(gint);
+
+gint GGOBI(ncols)(datad *d);
+gint GGOBI(nrecords)(datad *dg);
 
 #ifdef __cplusplus
 }

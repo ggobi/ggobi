@@ -36,7 +36,6 @@ C_HEADER_FILES=\
   GGobiAPI cpanel datad defines display display_tree \
   externs ggobi noop-checkbutton read_mysql read_xml  \
   splot types vars varseldata write_xml writedata 
-
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)
 
@@ -54,11 +53,8 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
 	cp $(C_HEADER_FILES:%=%.h) $(TMP_INSTALL_DIR)/include
 
 
-
-
 %.pdf: %.tex
 	(cd $(@D) ; TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $(<F))
-
 
 
 GTK_EXTRA_SRC= gtkextruler.c   gtkexthruler.c   gtkextvruler.c 

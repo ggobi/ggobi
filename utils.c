@@ -380,7 +380,7 @@ data_mode_set (gchar *filename)
 {
   gint len = strlen (filename);
   gchar *suffix = (gchar *) &filename[len-4];
-  DataMode data_mode = ascii_data;
+  DataMode data_mode = unknown_data;
 
   if (strcmp (suffix, ".dat") == 0)
     data_mode = ascii_data;
@@ -388,6 +388,7 @@ data_mode_set (gchar *filename)
     data_mode = binary_data;
   else if (strcmp (suffix, ".xml") == 0)
     data_mode = xml_data;
-
+  else
+     data_mode = ascii_data;
   return data_mode;
 }
