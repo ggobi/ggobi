@@ -84,6 +84,7 @@ show_fileselector(InputDescription *desc, ggobid *gg)
     GtkWidget *w, *dlg;
     gint type;
     DialogInput *data;
+    char buf[1000];
 
     data = (DialogInput *) g_malloc(sizeof(DialogInput));
 
@@ -92,7 +93,8 @@ show_fileselector(InputDescription *desc, ggobid *gg)
     data->desc = desc;
     data->w = w;
     data->gg = gg;
-    data->cwd = getcwd(NULL, 0);
+    getcwd(buf, sizeof(buf));
+    data->cwd = g_strdup(buf);
 
 
     gtk_icon_file_selection_show_tree(GTK_ICON_FILESEL(w), TRUE); 
