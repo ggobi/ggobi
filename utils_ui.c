@@ -404,7 +404,6 @@ get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist)
 * number of variables; it just clears the list and then
 * rebuilds it.
 */
-/*void variable_notebook_addvar_cb (GtkWidget *notebook, ggobid *gg)*/
 void variable_notebook_addvar_cb (GtkObject *obj, vartabled *vt,
   ggobid *gg, GtkWidget *notebook)
 {
