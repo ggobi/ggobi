@@ -426,6 +426,7 @@ if test -n "${with_R}" && test "${with_R}" != "no" ; then
       R_PKG_DIR="-l $with_R"
     fi
     PACKAGES="Rggobi ${PACKAGES}"
+    WILL_BUILD_RGGOBI="yes"
   else
     echo ""
     echo "**Error"
@@ -708,6 +709,7 @@ echo " Version:                $GGOBI_VERSION_STRING"
 echo " Installation directory: $INSTALL_DIR"
 echo " XML:                    version ${XML_VERSION}"
 echo " Plugins:                ${PLUGIN_DIRS}"
+echo " Rggobi:                 ${WILL_BUILD_RGGOBI-no}" 
 echo ""
 echo "*******************************"
 
