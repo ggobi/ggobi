@@ -101,9 +101,9 @@ struct _displayd {
 /*
  * corr tour
 */
- tour tcor1, tcor2;
+ tour tcorr1, tcorr2;
 
-  struct _ggobid *ggobi;
+ struct _ggobid *ggobi;
 
 };  /* displayd; */
 

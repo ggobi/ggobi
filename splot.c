@@ -438,6 +438,12 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
             (display->missing_p) ? d->missing_world.vals : d->world.vals,
             d, gg);
         break;
+
+        case COTOUR:
+          tourcorr_projdata(sp,
+            (display->missing_p) ? d->missing_world.vals : d->world.vals,
+            d, gg);
+        break;
       }
       break;
 
@@ -540,7 +546,8 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   g_return_if_fail (cpanel->projection == XYPLOT ||
                     cpanel->projection == P1PLOT ||
                     cpanel->projection == TOUR1D ||
-                    cpanel->projection == TOUR2D);
+                    cpanel->projection == TOUR2D ||
+                    cpanel->projection == COTOUR);
 
 /*
  * screen to plane 
@@ -610,6 +617,12 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
 
 
     case TOUR2D:
+      break;
+
+    case TOUR1D:
+      break;
+
+    case COTOUR:
       break;
 
     default:

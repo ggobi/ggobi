@@ -53,7 +53,7 @@ scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
     "^t", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (TOUR2D) : gg, gg);
 #ifdef CORRELATION_TOUR_IMPLEMENTED
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "Correlation Tour",
+  CreateMenuItem (gg->app.scatterplot_mode_menu, "2x1D Tour",
     "^c", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (COTOUR) : gg, gg);
 #endif

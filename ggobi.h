@@ -182,6 +182,11 @@ struct _ggobid {
    gint idled; 
  } tour1d;
 
+ struct _TourCorr {
+   GtkWidget *io_menu;
+   gint idled; 
+ } tourcorr;
+
 /*-------------------- parallel coordinates --------------------------*/
 
  struct _Parcoords {

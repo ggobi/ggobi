@@ -326,11 +326,12 @@ tour2d_run(displayd *dsp, ggobid *gg)
       dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
   }
   else { /* do final clean-up and get new target */
-    if (!dsp->t2d.get_new_target)
+    if (!dsp->t2d.get_new_target) {
       do_last_increment(dsp->t2d.tinc, dsp->t2d.tau, (gint) 2);
+      tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1,
+	  dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
+    }
     copy_mat(dsp->t2d.u0.vals, dsp->t2d.u.vals, d->ncols, 2);
-    tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1,
-      dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
     gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, d->ncols, (gint) 2);
     path(dsp->t2d.u0, dsp->t2d.u1, dsp->t2d.u, d->ncols, (gint) 2, dsp->t2d.v0,
       dsp->t2d.v1, dsp->t2d.v, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.uvevec,

@@ -224,6 +224,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
                 sp->whiskers[n].x2, sp->whiskers[n].y2);
             }
           }
+
         }
       }
 #endif

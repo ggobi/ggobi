@@ -181,7 +181,6 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case XYPLOT:
       case LINEED:
       case MOVEPTS:
-      case COTOUR:
       break;
 
       case ROTATE:
@@ -193,6 +192,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       break;
 
       case TOUR2D:
+        submenu_destroy (gg->mode_menu.io_item);
+      break;
+
+      case COTOUR:
         submenu_destroy (gg->mode_menu.io_item);
       break;
 
@@ -216,7 +219,6 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case P1PLOT:
       case XYPLOT:
       case TSPLOT:
-      case COTOUR:
       case LINEED:
       case MOVEPTS:
       break;
@@ -259,6 +261,19 @@ I've had the chance to do some more testing, though. -- dfs
 
       case TOUR2D:
         tour2d_menus_make (gg);
+
+        gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
+          gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
+          gg->tour2d.io_menu); 
+        if (gg->mode_menu.firsttime_io) {
+          submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
+          gg->mode_menu.firsttime_io = false;
+        }
+      break;
+
+      case COTOUR:
+        tourcorr_menus_make (gg);
 
         gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
           gg->main_accel_group);
@@ -523,6 +538,17 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
       /*-- if turning off the 1d tour --*/
       } else if (prev_mode == TOUR1D && gg->mode != TOUR1D) {
         tour1d_func (off, display, gg);
+      }
+    }
+
+    if (gg->mode == COTOUR || prev_mode == COTOUR) {
+      /*-- if turning on the 1d tour --*/
+      if (gg->mode == COTOUR && prev_mode != COTOUR) {
+        if (!display->cpanel.tcorr1_paused)
+          tourcorr_func (on, display, gg);
+      /*-- if turning off the 1d tour --*/
+      } else if (prev_mode == COTOUR && gg->mode != COTOUR) {
+        tourcorr_func (off, display, gg);
       }
     }
 

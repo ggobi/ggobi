@@ -374,12 +374,14 @@ void
 varcircle_draw (gint jvar, datad *d, ggobid *gg)
 {
   gint r = VAR_CIRCLE_DIAM/2;
+  gint i;
   gint x,y;
   gboolean chosen = false;
   splotd *sp = gg->current_splot;
   displayd *display;
   cpaneld *cpanel;
   gint k, len;
+  gboolean xvar = false;
   GtkWidget *da = varcircles_get_nth (DA, jvar, d);
   GdkPixmap *da_pix;
 
@@ -419,8 +421,8 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
     case  scatterplot:
       switch (cpanel->projection) {
         case TOUR1D:
-          x = 0;
-          y = (gint) (display->t1d.u.vals[0][jvar]*(gfloat)r);
+          x = (gint) (display->t1d.u.vals[0][jvar]*(gfloat)r);
+          y = 0;
           gdk_draw_line (da_pix,
             gg->selvarfg_GC, r, r, r+x, r-y);
 
@@ -444,6 +446,43 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
             }
           }
           break;
+        case COTOUR:
+	  /*          for (i=0; i<display->tcorr1.nvars; i++)
+            if (jvar == display->tcorr1.vars.els[i]) {
+
+              xvar = true;
+              break;
+	      }*/
+
+	  /*          if (xvar) {*/
+            x = (gint) (display->tcorr1.u.vals[0][jvar]*(gfloat)r);
+            y = (gint) (display->tcorr2.u.vals[0][jvar]*(gfloat)r);
+            gdk_draw_line (da_pix,
+              gg->selvarfg_GC, r, r, r+x, r-y);
+
+            for (k=0; k<display->tcorr1.nvars; k++) {
+              if (display->tcorr1.vars.els[k] == jvar) {
+                chosen = true;
+                break;
+              }
+	    }
+            for (k=0; k<display->tcorr2.nvars; k++) {
+              if (display->tcorr2.vars.els[k] == jvar) {
+                chosen = true;
+              break;
+	      }
+	    }
+            break;
+
+	    /*	  } 
+          else {
+
+            x = 0;
+            y = (gint) (display->tcorr2.u.vals[0][jvar]*(gfloat)r);
+            gdk_draw_line (da_pix,
+              gg->selvarfg_GC, r, r, r+x, r-y);
+
+	      }*/
       }
       break;
 

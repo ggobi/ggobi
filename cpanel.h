@@ -93,6 +93,14 @@ typedef struct {
  gint t1d_nbins, t1d_nASHes;
  gboolean t1d_vert;
 
+/*
+ * corr tour
+*/
+ gboolean tcorr1_paused;
+ gfloat tcorr1_step; 
+ gboolean tcorr2_paused;
+ gfloat tcorr2_step; 
+
 /* tour variables are in display.h */
 
 } cpaneld;

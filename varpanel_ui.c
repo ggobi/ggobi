@@ -122,6 +122,9 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
         case TOUR1D:
           tour1d_varsel (gg, jvar, btn);
         break;
+        case COTOUR:
+          tourcorr_varsel (gg, jvar, btn);
+        break;
         default:
         break;
     }
@@ -476,6 +479,13 @@ varpanel_tooltips_set (ggobid *gg)
                 NULL);
             break;
             case TOUR1D:
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+                checkbox_get_nth (j, d),
+/*                d->varpanel_ui.checkbox.vals[j],*/
+                "Click to select a variable to be available for touring",
+                NULL);
+            break;
+            case COTOUR:
               gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
                 checkbox_get_nth (j, d),
 /*                d->varpanel_ui.checkbox.vals[j],*/

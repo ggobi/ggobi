@@ -192,16 +192,16 @@ void
 set_tour1dvar(ggobid *gg, gint jvar)
 {
   gint j, jtmp, k;
-  gboolean selected=false;
+  gboolean active=false;
   displayd *dsp = gg->current_display;
 
   for (j=0; j<dsp->t1d.nvars; j++)
     if (jvar == dsp->t1d.vars.els[j])
-      selected = true;
+      active = true;
 
   /* deselect var if t1d.nvars > 2 */
-  if (selected) {
-    if (dsp->t1d.nvars > 2) {
+  if (active) {
+    if (dsp->t1d.nvars > 1) {
       for (j=0; j<dsp->t1d.nvars; j++) {
         if (jvar == dsp->t1d.vars.els[j]) 
           break;
@@ -214,7 +214,7 @@ set_tour1dvar(ggobid *gg, gint jvar)
       dsp->t1d.nvars--;
     }
   }
-  else { /* not selected, so add the variable */
+  else { /* not active, so add the variable */
     if (jvar > dsp->t1d.vars.els[dsp->t1d.nvars-1]) {
       dsp->t1d.vars.els[dsp->t1d.nvars] = jvar;
     }
@@ -331,11 +331,12 @@ tour1d_run(displayd *dsp, ggobid *gg)
       dsp->t1d.u, dsp->t1d.uvevec, d->ncols, (gint) 1);
   }
   else { /* do final clean-up and get new target */
-    if (!dsp->t1d.get_new_target)
+    if (!dsp->t1d.get_new_target) {
       do_last_increment(dsp->t1d.tinc, dsp->t1d.tau, (gint) 1);
+      tour_reproject(dsp->t1d.tinc, dsp->t1d.v, dsp->t1d.v0, dsp->t1d.v1,
+        dsp->t1d.u, dsp->t1d.uvevec, d->ncols, (gint) 1);
+    }
     copy_mat(dsp->t1d.u0.vals, dsp->t1d.u.vals, d->ncols, 1);
-    tour_reproject(dsp->t1d.tinc, dsp->t1d.v, dsp->t1d.v0, dsp->t1d.v1,
-      dsp->t1d.u, dsp->t1d.uvevec, d->ncols, (gint) 1);
     gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, d->ncols, (gint) 1);
     path(dsp->t1d.u0, dsp->t1d.u1, dsp->t1d.u, d->ncols, (gint) 1, dsp->t1d.v0,
       dsp->t1d.v1, dsp->t1d.v, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.uvevec,

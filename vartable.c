@@ -90,6 +90,12 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
           for (k=0; k<display->t2d.nvars; k++)
             cols[ncols++] = display->t2d.vars.els[k];
         break;
+        case COTOUR:
+          for (k=0; k<display->tcorr1.nvars; k++)
+            cols[ncols++] = display->tcorr1.vars.els[k];
+          for (k=0; k<display->tcorr2.nvars; k++)
+            cols[ncols++] = display->tcorr2.vars.els[k];
+        break;
       }
     break;
     case scatmat:
@@ -264,6 +270,7 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   arrayf_delete_cols (&d->tform, ncols, cols);
   tour2d_realloc_down (ncols, cols, d, gg);
   tour1d_realloc_down (ncols, cols, d, gg);
+  tourcorr_realloc_down (ncols, cols, d, gg);
   if (d->nmissing)
     arrays_delete_cols (&d->missing, ncols, cols);
 
@@ -305,7 +312,7 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
         if (sp->xyvars.y >= d->ncols-1 || sp->xyvars.y == sp->xyvars.x)
           sp->xyvars.y = 1;
 
-        /*-- make sure tour_vars are reasonable --*/
+        /*-- make sure 2d tour_vars are reasonable --*/
         n = 0;
         vars = (gint *)
           g_malloc (MIN (display->t2d.nvars, d->ncols) * sizeof (gint));
@@ -319,7 +326,7 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
         g_free (vars);
 
-        /*-- make sure tour_vars are reasonable --*/
+        /*-- make sure 1d tour_vars are reasonable --*/
         n = 0;
         vars = (gint *)
           g_malloc (MIN (display->t1d.nvars, d->ncols) * sizeof (gint));
@@ -333,6 +340,33 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
         g_free (vars);
       break;
+
+        /*-- make sure corr tour_vars are reasonable --*/
+        n = 0;
+        vars = (gint *)
+          g_malloc (MIN (display->tcorr1.nvars, d->ncols) * sizeof (gint));
+        for (j=0; j<display->tcorr1.nvars; j++)
+          if (display->tcorr1.vars.els[j] < d->ncols-1)
+            vars[n++] = display->tcorr1.vars.els[j];
+
+        for (j=0; j<n; j++)
+          display->tcorr1.vars.els[j] = vars[j];
+        display->tcorr1.nvars = n;
+
+        g_free (vars);
+
+        n = 0;
+        vars = (gint *)
+          g_malloc (MIN (display->tcorr2.nvars, d->ncols) * sizeof (gint));
+        for (j=0; j<display->tcorr2.nvars; j++)
+          if (display->tcorr2.vars.els[j] < d->ncols-1)
+            vars[n++] = display->tcorr2.vars.els[j];
+
+        for (j=0; j<n; j++)
+          display->tcorr2.vars.els[j] = vars[j];
+        display->tcorr2.nvars = n;
+
+        g_free (vars);
 
 /*-- delete or replace variables in these two modes --*/
       case scatmat:
@@ -522,6 +556,7 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
   tour2d_realloc_up (d->ncols, d, gg);
   tour1d_realloc_up (d->ncols, d, gg);
+  tourcorr_realloc_up (d->ncols, d, gg);
 
   for (k=0; k<ncols; k++) {
     n = cols[k];              /*-- variable being cloned --*/

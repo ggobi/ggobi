@@ -202,6 +202,7 @@ ggobi_alloc()
   tmp->color_ui.margin = 10;
   tmp->tour2d.idled = 0;
   tmp->tour1d.idled = 0;
+  tmp->tourcorr.idled = 0;
 
   totalNumGGobis++;
 

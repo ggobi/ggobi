@@ -12,29 +12,30 @@
 #include "vars.h"
 #include "externs.h"
 
-/*void
-zero_tau (displayd *dsp, ggobid *gg) {
+void
+zero_tau (vector_f tau, gint nd) {
 
   gint k;
-  datad *d = dsp->d;
 
-  for (k=0; k<d->ncols; k++) {
-    dsp->lambda.els[k]  = 0.0;
-    dsp->tau.els[k]  = 0.0;
-    dsp->tinc.els[k] = 0.0;
-  }
-}*/
+  for (k=0; k<nd; k++) 
+    tau.els[k] = 0.0;
+}
 
-/*void
-zero_tinc(displayd *dsp, ggobid *gg) {
-  datad *d = dsp->d;
+void
+zero_tinc(vector_f tinc, gint nd) {
   gint k;
 
-  for (k=0; k<d->ncols; k++) {
-    dsp->tinc.els[k] = 0.0;
-  }
-}*/
+  for (k=0; k<nd; k++) 
+    tinc.els[k] = 0.0;
+}
 
+void
+zero_lambda(vector_f lambda, gint nd) {
+  gint k;
+
+  for (k=0; k<nd; k++) 
+    lambda.els[k] = 0.0;
+}
 
 void
 norm(gfloat *x, gint n)
@@ -106,6 +107,23 @@ gboolean checkcolson(gfloat **ut, gint nc, gint nd) {
         ok = false;
         return(ok);
       }
+    }
+  }
+
+  return(ok);
+}
+
+/* checks columns of matrix are orthonormal */
+gboolean checkequiv(gfloat **u0, gfloat **u1, gint nc, gint nd) {
+  gint j, k;
+  gfloat tol = 0.0001;
+  gboolean ok = true;
+
+  for (j=0; j<nd; j++) {
+    if (fabs(1.-inner_prod(u0[j], u1[j], nc)) < tol) {
+      ok = false;
+      /*      printf("checkequiv %f \n",inner_prod(u0[j], u1[j], nc));*/
+      return(ok);
     }
   }
 
@@ -242,8 +260,8 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
   /*  datad *d = dsp->d;
   gint nc = d->ncols;*/
   gint i, j, k, rank;
-  gdouble tol = 0.01;
-  gdouble tmpd1, tmpd2, tmpd;
+  gdouble tol = 0.0001;
+  gdouble tmpd1 = 0.0, tmpd2 = 0.0, tmpd =0.0;
   gboolean doit = true;
   paird *pairs = (paird *) g_malloc (nd * sizeof (paird));
   gfloat *e = (gfloat *) g_malloc (nd * sizeof (gfloat));
@@ -254,15 +272,10 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
   gint nsteps = *ns;
   gint stepcntr = *stcn;
 
-  /*  for (i=0; i<d->ncols; i++)
-    printf("%f ",u0.vals[0][i]);
-  printf("\n");
-
-  printf("u1 \n");
-  for (i=0; i<d->ncols; i++)
-    printf("%f ",u1[0][i]);
-  printf("\n");*/
-
+  zero_tau(tau, nd);
+  zero_tinc(tinc, nd);
+  zero_lambda(lambda, nd);
+  
   /* 2 is hard-wired because it relates to cos, sin
                          and nothing else. */
   for (i=0; i<2; i++) 
@@ -275,6 +288,12 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
   }
   if (!checkcolson(u1.vals, nc, nd)) {
     printf("Columns of u1 are not orthonormal");
+    doit = false;
+  }
+
+  /* Check that u0 and u1 are the same */
+  if (!checkequiv(u0.vals, u1.vals, nc, nd)) {
+    printf("Start and target planes are equal\n");
     doit = false;
   }
 
@@ -433,11 +452,22 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
       *stcn = stepcntr;
     }
     else {
-      for (i=0; i<nd; i++)
-	tau.els[i] = 0.0;
+      zero_tau(tau, nd);
+      zero_tinc(tau, nd);
+      zero_lambda(tau, nd);
+      copy_mat(u.vals, u0.vals, nc, nd);
       copy_mat(v0.vals, u0.vals, nc, nd);
-      copy_mat(v1.vals, u0.vals, nc, nd);
+      copy_mat(v1.vals, u1.vals, nc, nd);
+      copy_mat(uvevec.vals, u1.vals, nc, nd);
+      copy_mat(v.vals, u0.vals, nc, nd);
+      stepcntr = 0;
       nsteps = 0;
+      dv = 0.0;
+      *pdv = dv;
+      *ns = nsteps;
+      *stcn = stepcntr;
+
+      printf("in not doit part \n");
     }
 
 /* free temporary arrays */
@@ -487,13 +517,6 @@ void tour_reproject(vector_f tinc, array_f v, array_f v0, array_f v1,
     for (j=k+1; j<nd; j++)
       gram_schmidt(u.vals[k], u.vals[j], nc);
 
-  /*  printf("v, u \n");
-    for (i=0; i<nc; i++) {
-      for (j=0; j<2; j++)
-        printf("%f %f ",v.vals[j][i],u.vals[j][i]);
-      printf("\n");
-    }*/
-
   for (j=0; j<2; j++)
     g_free (ptinc[j]);
   g_free (ptinc);
@@ -540,7 +563,6 @@ increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn,
 }
 
 gboolean
-/*reached_target(displayd *dsp) {*/
 reached_target(gint nsteps, gint stepcntr) {
   gboolean arewethereyet = false;
 
@@ -561,7 +583,6 @@ do_last_increment(vector_f tinc, vector_f tau, gint nd)
 
 }
 
-/*void speed_set (gint slidepos, ggobid *gg) {*/
 void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dv, 
   gint *ns, gint *stcn) {
 
@@ -577,6 +598,9 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dv,
   if (slidepos < 5)
   {
     step = 0.0;
+    delta = 0.0;
+    nsteps = 0;
+    stepcntr = 0;
   }
   else
   {
@@ -590,13 +614,19 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dv,
       step = (gfloat) pow((double)(slidepos-50)/100.,(gdouble)1.5) + 0.0225;
     else
       step = (gfloat) sqrt((double)(slidepos-50)) + 0.1868;
+
+    delta = step*M_PI_2/10.0;
+    if (nsteps > 0)
+      fracpath = stepcntr/nsteps;
+    else 
+      fracpath = 1.0;
+
+    nsteps = (gint) floor((gdouble)(dv/delta))+1;
+    stepcntr = (gint) floor(fracpath*nsteps);
+
   }
-  delta = step*M_PI_2/10.0;
 
-  fracpath = stepcntr/nsteps;
-
-  nsteps = (gint) floor((gdouble)(dv/delta))+1;
-  stepcntr = (gint) floor(fracpath*nsteps);
+    printf("slidepos: %d; nsteps: %d; stepcntr: %d; delta: %f; dv: %f\n",slidepos,nsteps,stepcntr, delta,dv);
 
   *st = step;
   *dlt = delta;
@@ -605,17 +635,25 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dv,
 }
 
 void
-/*gt_basis (displayd *dsp, ggobid *gg, gint nd)*/
 gt_basis (array_f u1, gint nvars, vector_i vars, gint nc, gint nd)
 /*
  * Generate d random p dimensional vectors to form new ending basis
 */
 {
-  /*  datad *d = dsp->d;*/
-  gint j, k, check = 1, nvals = nvars*nd;
+  gint i, j, k, check = 1, nvals = nvars*nd, ntimes;
   gdouble frunif[2];
   gdouble r, fac, frnorm[2];
+  gboolean oddno;
 
+  if ((nvals % 2) == 1) 
+    oddno = true;
+  else  
+    oddno=false;
+
+  if (oddno)
+    ntimes = nvals/2+1;
+  else
+    ntimes = nvals/2;
 /*
  * Method suggested by Press, Flannery, Teukolsky, and Vetterling (1986)
  * "Numerical Recipes" p.202-3, for generating random normal variates .
@@ -628,8 +666,8 @@ gt_basis (array_f u1, gint nvars, vector_i vars, gint nc, gint nd)
     for (k=0; k<nd; k++)
       u1.vals[k][j] = 0.0 ;
 
-  if (nvars > 2) {
-      for (j=0; j<nvals/2+1; j++) {
+  if (nvars > nd) {
+      for (j=0; j<ntimes; j++) {
           while (check) {
  
             rnorm2(&frunif[0], &frunif[1]);
@@ -645,17 +683,17 @@ gt_basis (array_f u1, gint nvars, vector_i vars, gint nc, gint nd)
 	  }
           check = 1;
           if (nd == 1) {
-            if (2*j <= nvars) {
+            if (oddno && j == ntimes-1) {
               u1.vals[0][vars.els[2*j]] = (gfloat) frnorm[0];
-              if (2*j+1 < nvars) 
-                u1.vals[0][vars.els[2*j+1]] = (gfloat) frnorm[1];
+	    }
+            else {
+              u1.vals[0][vars.els[2*j]] = (gfloat) frnorm[0];
+              u1.vals[0][vars.els[2*j+1]] = (gfloat) frnorm[1];
 	    }
 	  }
           else if (nd == 2) {
-            if (j <= nvars) {
               u1.vals[0][vars.els[j]] = (gfloat) frnorm[0];
               u1.vals[1][vars.els[j]] = (gfloat) frnorm[1];
-	    }
 	  }
       }
     for (k=0; k<nd; k++)
@@ -670,10 +708,10 @@ gt_basis (array_f u1, gint nvars, vector_i vars, gint nc, gint nd)
           gram_schmidt(u1.vals[k], u1.vals[j], nc);
     }
   }
-  else
+  else /* if there is only one variable */
   {
-    for (k=0; k<nd; k++) 
-      u1.vals[k][vars.els[k]] = 1.;
+    for (i=0; i<nd; i++)
+      u1.vals[i][vars.els[i]] = 1.;
   }
 }
 
