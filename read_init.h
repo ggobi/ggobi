@@ -15,6 +15,7 @@
 
 typedef struct {
     enum displaytyped type; /* the type of the plot. */
+    gchar *typeName;     /* use for the extended type. */
     gint numVars;           /* the number of variables in the plot. */
     gchar **varNames;       /* the variables in the plot. */
     gint data;              /* with which datad is this associated */

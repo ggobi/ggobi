@@ -418,7 +418,9 @@ getDisplayDescription(xmlNodePtr node)
   xmlChar *tmp;
 
   dpy = (GGobiDisplayDescription*) g_malloc(sizeof(GGobiDisplayDescription));
-  dpy->type = getDisplayType(xmlGetProp(node, (xmlChar *) "type"));
+  dpy->type = getDisplayType(tmp = xmlGetProp(node, (xmlChar *) "type"));
+  if(dpy->type == extended_display_type)
+    dpy->typeName = g_strdup(tmp);
   tmp = xmlGetProp(node, (xmlChar *) "data");
   if(tmp) {
     dpy->data = strToInteger((char *)tmp) - 1;
@@ -932,6 +934,26 @@ getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin,
 gint resolveVariableName(const gchar *name, datad *d);
 
 displayd *
+createExtendedDisplay(const gchar * const type, gint *vars, gint numVars, datad *d, ggobid *gg)
+{
+  displayd *dpy;
+
+  GtkGGobiExtendedDisplayClass *klass;
+  GtkType gtype = gtk_type_from_name(type);
+  klass = gtk_type_class(gtype);
+  if(!klass->createWithVars)
+     return(NULL);
+  dpy = klass->createWithVars(false, numVars, vars, d, gg);
+  if(!dpy)
+    return(NULL);
+
+  display_add(dpy, gg);
+
+  return(dpy);
+}
+
+
+displayd *
 createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc) 
 {
   displayd *dpy;
@@ -955,12 +977,9 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
                               desc->numVars, data, gg);
     break;
     case extended_display_type:
-#if 0
-/*XX  for time series. */
-      dpy = GGOBI(newTimeSeries)(vars, desc->numVars, data, gg);
-#endif
-      g_printerr("Handle the extended display types soon");
-      dpy = NULL;
+      dpy = createExtendedDisplay(desc->typeName, vars, desc->numVars, data, gg);
+      if(!dpy)
+        g_printerr("Cannot currently handle the extended display %s type.", desc->typeName);
     break;
     case unknown_display_type:
     default:
@@ -972,6 +991,7 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
 
   return(dpy);
 }
+
 
 gint
 resolveVariableName(const gchar *name, datad *d)
