@@ -906,7 +906,6 @@ To activate this view mode from the keyboard, type {\em c} or {\em C}
 with the focus in the plot window, or type Control-{\em c} or
 Control-{\em C} with the focus in the console.
 
-% dfs here %
 \subsection{Scaling of axes}
 \label{slbl:Scaling}
 
@@ -922,6 +921,10 @@ Click-style scaling may take you a few minutes to get used to, but
 you'll find that it gives you very precise control and is especially
 useful when you have a lot of data.
 
+To activate this view mode from the keyboard, type {\em s} or {\em S}
+with the focus in the plot window, or type Control-{\em s} or
+Control-{\em S} with the focus in the console.
+
 \subsubsection{Drag}
 
 For the default setting, Drag, the actions of the mouse can be
@@ -929,7 +932,8 @@ described in terms of a camera:  you're operating a camera and
 looking at a projection of the data in the viewfinder.  When you use
 the left button, the camera is panning freely around, following the
 mouse exactly.  When you use the middle or right button, you're
-zooming the camera in and out -- and the aspect ratio changes, too.
+zooming the camera in and out, and changing the aspect ratio of
+the plot.
 
 \subsubsection{Click}
 
@@ -948,7 +952,7 @@ browsing time-dependent data, for instance.
 With {\bf Zoom} selected, the visual guide changes again: this time,
 the mouse controls a rectangle, and two keys are used: {\boldmath $<$}
 to zoom in and {\boldmath $>$} to zoom out an amount inversely
-proportional to the size of the rectangle -- ie, large rectangles
+proportional to the size of the rectangle -- that is, large rectangles
 yield small movements.
 
 \subsubsection{Reset}
@@ -976,13 +980,17 @@ the brush while you paint.  (If you lose the brush by pulling it
 outside the plotting window, you can grab it again if you press the
 left or middle button while the cursor is inside the display window.)
 
-\subsubsection{Brush On}
+To activate this view mode from the keyboard, type {\em b} or {\em B}
+with the focus in the plot window, or type Control-{\em b} or
+Control-{\em B} with the focus in the console.
+
+\subsubsection{Brush on}
 %
-When the {\bf Brush on} toggle is checked, moving the brush
+When the {\bf Brush on} checkbox is checked, moving the brush
 over a plotted point causes that point to change its color or
 plotting character (called a glyph).  If the brush is turned off, the
 brush can be freely moved across the plotting window and it does not
-change the points.  
+change the points.
 
 This is useful if you are plotting a very large number of points,
 and you want to position the brush before painting, because you
@@ -990,13 +998,13 @@ can move it much more quickly across the plot.
 
 \subsubsection{Point and edge brushing}
 %
-If {\bf Point brushing} is in any state but `Off,' the brush has a
+If {\bf Point brushing} is in any state but {\it Off}, the brush has a
 rectangular outline.  As the brush is moved across the points, any
 points contained by the brush are affected.  You may be changing the
 color, glyph shape, glyph size, or the visible state of the point,
 depending on the menu setting.
 
-Similarly, if {\bf Edge brushing} is in any state but `Off,' the
+Similarly, if {\bf Edge brushing} is in any state but {\it Off}, the
 brush includes a crosshair, and as the brush is moved in the window,
 any edges (line segments) intersecting either the vertical or
 horizontal ``hair'' are affected.  You may be changing the color,
@@ -1008,7 +1016,7 @@ edge brushing are performed.
 
 \subsubsection{Brushing modes:  persistent, transient}
 %
-These are two brushing modes.
+There are two brushing modes.
 \medskip
 \noindent
 \\{\bf Persistent}:  When you brush a point or edge, it retains its new
@@ -1022,30 +1030,41 @@ Clicking on the {\bf Undo} button restores the characteristics
 of all points and edges painted between the last mouse-down and
 mouse-up.
 
-\subsubsection{Options menu}
-%
-When the brushing mode is active, the Options menu in the main
-menu bar includes this item:
-\medskip
-\noindent
-\\{\bf Update brushing continuously}: Update linked
-  brushing with every mouse motion.  The alternative is to update linked
-  views only when the mouse is released.
+\subsubsection{Choose color \& glyph ...}
 
-\subsubsection{Reset menu}
-%
-When the brushing mode is active, the Reset Menu in the main
-menu bar contains these items:
+Clicking on this button opens the {\bf Choose color \& glyph} panel,
+which can be used to choose the point color and glyph as well as the
+edge type for brushing.  At the top of the panel, there is a table of
+all possible point glyphs and another table of all possible edge types.
+Clicking on a point glyph sets both the glyph and edge type.
 
-\begin{tabbing}
- {\bf Show all points} \hspace{.5in} \= Make all points visible. \\
-%{\bf Reset point colors} \> Restore all points to the default color. \\
-%{\bf Reset glyphs} \> Restore all points to the default glyph. \\
- {\bf Show all edges} \> Make all edges visible. \\
-%{\bf Reset edge colors} \> Restore all edges to the default color. \\
- {\bf Reset brush size} \> Reset the brush to its default size and position. \\
-\end{tabbing}
-%
+Below those tables is a row of rectangles of color which represent the
+current color scale.  Clicking on one of these sets the brushing color.
+Double-clicking on one of these rectangles, or on the two rectangles
+just below them for the background and accent colors, opens a color
+selection widget with access to the full color map.  The {\bf Reverse
+video} button allows you to swap the background and accent colors.
+
+\subsubsection{Link by ID or by variable}
+\label{LinkingRules}
+
+This option menu is used to define which of two linking rules is to
+be used.  The default rule, {\it Link by ID}, dictates that points
+representing records that have the same {\it id}, as specified in the XML
+description (or in the API), will respond identically to brushing events.
+Ids are unique within a dataset, so this rule has no effect when only
+a single dataset is being studied.
+
+The second rule, {\it Link by variable}, uses the levels of a categorical
+variable to link points.  To choose a variable, open the {\bf variable
+manipulation} tool, and select a categorical variable.  Now when a
+case is brushed in one display, all cases with the same value of the
+categorical variable will change accordingly, in this and all other
+displays.  For example, a categorical variable may classify cities into
+two types, ``coastal'' and ``inland''.  If a coastal city is pointed at
+in one display, all coastal cities in this and all other displays will
+be highlighted.  In this linking mode, displays of different datasets
+can be linked if they have a chosen categorical variable in common.
 
 \subsubsection{Brush by variable ...}
 
@@ -1055,6 +1074,34 @@ See the description in section \ref{slbl:BrushByVariable}.
 
 See the description in section \ref{slbl:ColorAndGlyphGroups}.
 
+\subsubsection{Options menu}
+%
+When the brushing mode is active, the Options menu in the main
+menu bar includes this item:
+\medskip
+\noindent
+\\{\bf Update brushing continuously}: Update linked
+  brushing with every mouse motion.  The alternative is to update linked
+  views only when the mouse is released, which is more efficient when
+  there are a great many points in the plot, or a great many plots on
+  the screen.
+
+\subsubsection{Reset menu}
+%
+When the brushing mode is active, the Reset Menu in the main
+menu bar contains these items:
+
+\begin{tabbing}
+ {\bf Show all points} \hspace{.5in} \= Make all points visible. \\
+ {\bf Show all edges} \> Make all edges visible. \\
+ {\bf Reset brush size} \> Reset the brush to its default size and position. \\
+%{\bf Reset point colors} \> Restore all points to the default color. \\
+%{\bf Reset glyphs} \> Restore all points to the default glyph. \\
+%{\bf Reset edge colors} \> Restore all edges to the default color. \\
+\end{tabbing}
+%
+
+% dfs here %
 \subsection{Identification}
 \label{slbl:Identify}
 
@@ -1079,6 +1126,17 @@ mode and click left again when the target point is nearest the
 cursor.  It is also possible to restore all labels to unsticky status
 by clicking on the {\bf Remove labels} button.  You can also see all
 the labels at once by clicking on {\bf Make all sticky}.
+
+To activate this view mode from the keyboard, type {\em i} or {\em I}
+with the focus in the plot window, or type Control-{\em i} or
+Control-{\em I} with the focus in the console.
+
+\subsection{Move Points}
+\label{slbl:MovePoints}
+
+To activate this view mode from the keyboard, type {\em m} or {\em M}
+with the focus in the plot window, or type Control-{\em m} or
+Control-{\em M} with the focus in the console.
 
 \newpage
 \section{Tools}
@@ -1301,31 +1359,6 @@ corresponding to each open data set are generated above the variable
 selection window on the main controls window. Linking between these
 data sets is facilitated though the interface described in Section
 \ref{LinkingRules}.
-
-\section{Linking}
-\label{LinkingRules}
-
-If two display windows represent the same dataset, then points which
-represent the same case are linked:  that is, they are drawn with the
-same symbol (color and glyph), and if a case is labelled in one
-display, it will be identically labelled in all displays.
-
-If the ggobi process has multiple datasets, then the linking rules
-have been defined in the XML file (or through the API).
-
-1.  If you have specified a categorical variable to use for linking,
-then all datasets with a variable of the same name are affected, and
-all cases which have the same level of that variable are linked.
-(The labels for the levels aren't used in that determination, just
-the numerical representation of the level.)  [This has not yet been
-implemented as of \date.]
-
-2.  If you are not using a categorical variable for linking, then
-cases are linked by {\bf id}: if two cases share the same {\bf id},
-then they are linked.   Ids are unique within a dataset.  If you have
-not specifically assigned an id to a case, then it doesn't have one.
-
-This is described in more detail in the XML documentation.
 
 \section{Edges}
 
