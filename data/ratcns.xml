@@ -74,7 +74,7 @@ Reference (available on the web at pnas.org):
 <variable>Class1</variable>
 <variable>Class2</variable>
 </variables>
-<records count="112" glyph="fr 1">
+<records count="112" glyph="fc 1">
 <record label="keratin" >
 1.000 0.200 0.310 0.240 0.400 0.270 0.190 0.050 0.000 1.000 1.000
 </record>

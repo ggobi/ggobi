@@ -47,7 +47,19 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gint k;
   gint x = xmargin;
   gint y = ymargin;
+  GdkColormap *cmap = gdk_colormap_get_system ();
+  GdkColor gray1, gray2, gray3;
+  gboolean writeable = false, best_match = true, success;
+  GdkPoint *points;
 
+  gray1.red = gray1.blue = gray1.green = (guint16) (.2*65535.0);
+  gray2.red = gray2.blue = gray2.green = (guint16) (.5*65535.0);
+  gray3.red = gray3.blue = gray3.green = (guint16) (.8*65535.0);
+  success = gdk_colormap_alloc_color(cmap, &gray1, writeable, best_match);
+  success = gdk_colormap_alloc_color(cmap, &gray2, writeable, best_match);
+  success = gdk_colormap_alloc_color(cmap, &gray3, writeable, best_match);
+
+  /*-- this part might be in a pixmap --*/
   for (k=0; k<gg->ncolors; k++) {
     gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[k]);
     gdk_draw_rectangle (w->window, gg->plot_GC,
@@ -59,7 +71,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gdk_gc_set_line_attributes (gg->plot_GC,
     0, GDK_LINE_ON_OFF_DASH, GDK_CAP_ROUND, GDK_JOIN_ROUND);
   x = xmargin + wid; y = ymargin + 10;
-  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
+  gdk_gc_set_foreground (gg->plot_GC, &gray2);
   for (k=1; k<gg->ncolors; k++) {
     gdk_draw_line (w->window, gg->plot_GC,
       xmargin, y, w->allocation.width - xmargin, y);
@@ -70,6 +82,65 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   }
   gdk_gc_set_line_attributes (gg->plot_GC,
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+
+  /*-- draw the dark shadows --*/
+  x = xmargin + wid; y = ymargin + 10;
+  points = (GdkPoint *) g_malloc (7 * sizeof (GdkPoint));
+  gdk_gc_set_foreground (gg->plot_GC, &gray1);
+  for (k=1; k<gg->ncolors; k++) {
+    points [0].x = x - 10;
+    points [0].y = y + 5;
+    points [1].x = x + 10;
+    points [1].y = y + 5;
+    points [2].x = x + 10;
+    points [2].y = y - 5;
+
+    points [3].x = points[2].x - 2;
+    points [3].y = points[2].y + 2;
+    points [4].x = points[1].x - 2;
+    points [4].y = points[1].y - 2;
+    points [5].x = points[0].x + 2;
+    points [5].y = points[0].y - 2;
+
+    points [6].x = x - 10;
+    points [6].y = y + 5;
+    gdk_draw_polygon (w->window, gg->plot_GC,
+                      TRUE, points, 7);
+    x += wid;
+    y += hgt;
+  }
+
+  /*-- draw the light shadows --*/
+  x = xmargin + wid; y = ymargin + 10;
+  points = (GdkPoint *) g_malloc (7 * sizeof (GdkPoint));
+  gdk_gc_set_foreground (gg->plot_GC, &gray3);
+  for (k=1; k<gg->ncolors; k++) {
+    points [0].x = x - 10;
+    points [0].y = y + 5;
+    points [1].x = x - 10;
+    points [1].y = y - 5;
+    points [2].x = x + 10;
+    points [2].y = y - 5;
+
+    points [3].x = points[2].x - 2;
+    points [3].y = points[2].y + 2;
+    points [4].x = points[1].x + 2;
+    points [4].y = points[1].y + 2;
+    points [5].x = points[0].x + 2;
+    points [5].y = points[0].y - 2;
+
+    points [6].x = x - 10;
+    points [6].y = y + 5;
+    gdk_draw_polygon (w->window, gg->plot_GC,
+                      TRUE, points, 7);
+    x += wid;
+    y += hgt;
+  }
+/*
+  gdk_color_free (&gray1);
+  gdk_color_free (&gray2);
+  gdk_color_free (&gray3);
+*/
 }
 
 static const gchar *const nclasses_lbl[] = {"5", "6", "7"};
