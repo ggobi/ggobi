@@ -1,12 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi2.dtd">
+
 <ggobidata count="2">
 
-<data name="COI Nodes" points="T" edges="F" edgesIn="COI Edges">
+<data name="COI Nodes">
 <description>
-
 </description>
 <variables count="2">
-  <realvariable>biz_in</realvariable>
-  <realvariable>biz_out</realvariable>
+  <variable>biz_in</variable>
+  <variable>biz_out</variable>
 </variables>
 <records  count="5">
 <record label="2012175830">  8 7  </record>
@@ -17,16 +19,15 @@
 </records>
 </data>
 
-<!-- -------------------------------------------------------- -->
-
-<data name="COI Edges" points="F" edges="F" edgeEndpointsIn="COI Nodes">
+<data name="COI Edges">
+<description>
+</description>
 
 <records count="4">
 <record source="1" destination="2"> </record>
 <record source="2" destination="3"> </record>
 <record source="3" destination="4"> </record>
 <record source="2" destination="4"> </record>
-</edges>
 </records>
 
 </data>

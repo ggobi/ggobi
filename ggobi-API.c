@@ -807,9 +807,11 @@ GGOBI(getNumGGobis)()
 gboolean
 GGOBI(setColorMap)(double *vals, int nr, ggobid *gg)
 {
- int i;
+ gint i;
 
- gg->default_color_table = (GdkColor*) g_realloc(gg->default_color_table, sizeof(GdkColor) * nr);
+
+ gg->default_color_table = (GdkColor*)
+   g_realloc (gg->default_color_table, sizeof(GdkColor) * nr);
  gg->ncolors = nr;
 
  for(i = 0; i < nr; i++) {

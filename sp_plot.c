@@ -579,6 +579,10 @@ edges_draw (splotd *sp, ggobid *gg)
 /**/return;
   }
 
+  if (d->rowid.idv.nels == 0) {  /*-- d has no record ids --*/
+/**/return;
+  }
+
   if (!gg->mono_p) {
     if (display->options.edges_directed_show_p ||
         display->options.edges_undirected_show_p)
@@ -599,6 +603,12 @@ edges_draw (splotd *sp, ggobid *gg)
         if (e->hidden_now.els[j]) {
           doit = false;
         } else {
+          if (endpoints[j].a >= d->rowid.idv.nels || 
+              endpoints[j].b >= d->rowid.idv.nels)
+          {
+            doit = false;
+            break;
+          }
           a = d->rowid.idv.els[endpoints[j].a];
           b = d->rowid.idv.els[endpoints[j].b];
 

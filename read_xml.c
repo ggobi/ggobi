@@ -74,14 +74,12 @@ const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
 
 const gchar * const xmlDataTagNames[] = {
                                           "ggobidata",
-                                          "data",
+                                          "data",        /* DATASET */
                                           "description",
                                           "record",
                                           "records",
                                           "variables",
                                           "variable",
-                                          "data",
-
                                           "colormap",
                                           "color",
                                           ""
@@ -194,33 +192,33 @@ startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
  switch (type) {
    case VARIABLES:
      allocVariables (attrs, data);
-     break;
+   break;
    case VARIABLE:
      newVariable (attrs, data);
-     break;
+   break;
    case RECORDS: /* Used to be DATASET */
      setDatasetInfo(attrs, data);
-     break;
+   break;
    case TOP:
      setGeneralInfo(attrs, data);
-     break;
+   break;
    case RECORD:
      newRecord(attrs, data);
-     break;
+   break;
    case COLORMAP:
      setColorMap(attrs, data);
-     break;
+   break;
    case COLOR:
      setColormapEntry(attrs, data);
-     break;
+   break;
    case DESCRIPTION:
      /* description text pending */
-     break;
+   break;
    case DATASET:
      setDataset(attrs, data);
-     break;
+   break;
    default:
-     break;
+   break;
  }
 }
 
@@ -257,8 +255,8 @@ endXMLElement(void *user_data, const CHAR *name)
 XmlTagType
 tagType(const CHAR *name, gboolean endTag)
 {
- int n = sizeof(xmlDataTagNames)/sizeof(xmlDataTagNames)[0] - 1; 
- int i;
+ gint n = sizeof(xmlDataTagNames)/sizeof(xmlDataTagNames)[0] - 1; 
+ gint i;
  const gchar *tmp = (const gchar *)name;
  /*
   if(endTag) {
@@ -867,7 +865,6 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
 }
 
 /*
-
   This is reentrant.  
   First we check the size attribute. Then we check the
   for the specification of an external file.
@@ -900,16 +897,19 @@ setColorMap(const CHAR **attrs, XMLParserData *data)
  }
 
  if(size > 0 || file) {
+  ggobid *gg = data->gg;
   if(file) {
-    data->gg->ncolors +=  size;
-    data->gg->default_color_table = (GdkColor *) g_realloc (data->gg->default_color_table , data->gg->ncolors * sizeof (GdkColor));
-    data->gg->colorNames = (gchar **) g_realloc (data->gg->colorNames, data->gg->ncolors * sizeof (gchar *));
-    memset(data->gg->colorNames + (data->gg->ncolors-size), '\0', size*sizeof(gchar *));
+    gg->ncolors +=  size;
+    gg->default_color_table = (GdkColor *)
+      g_realloc (gg->default_color_table , gg->ncolors * sizeof (GdkColor));
+    gg->colorNames = (gchar **)
+      g_realloc (gg->colorNames, gg->ncolors * sizeof (gchar *));
+    memset(gg->colorNames + (gg->ncolors-size), '\0', size*sizeof(gchar *));
   } else {
-    data->gg->ncolors = size;
-    data->gg->default_color_table = (GdkColor *) g_malloc (size * sizeof (GdkColor));
-    data->gg->colorNames = (gchar **) g_malloc (size * sizeof (gchar *));
-    memset(data->gg->colorNames, '\0', size * sizeof (gchar *));
+    gg->ncolors = size;
+    gg->default_color_table = (GdkColor *) g_malloc (size * sizeof (GdkColor));
+    gg->colorNames = (gchar **) g_malloc (size * sizeof (gchar *));
+    memset(gg->colorNames, '\0', size * sizeof (gchar *));
   }
  }
 
@@ -1018,12 +1018,11 @@ setColorValues(GdkColor *color, double *vals)
  */
 
 gboolean
-xmlParseColorMap(const gchar *fileName, int size, XMLParserData *data)
+xmlParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
 {
 
  xmlParserCtxtPtr ctx;
-   
- char *tmp, *tmp1;
+ gchar *tmp, *tmp1;
 
  tmp = g_strdup(data->input->dirName);   /* getFileDirectory(data->input->filename); */
  tmp1 = find_xml_file(fileName, tmp, data->gg);
