@@ -594,10 +594,22 @@ binningPermitted(displayd* dpy)
 {
   cpaneld *cpanel = &dpy->cpanel;
   ggobid *gg = dpy->ggobi;
-  if(projection_get(gg) == P1PLOT &&
+  datad *e = dpy->e;
+
+  if (projection_get(gg) == P1PLOT &&
        cpanel->p1d.type == ASH &&
-         cpanel->p1d.ASH_add_lines_p)
+       cpanel->p1d.ASH_add_lines_p)
      return(false);
+
+  /*-- if we're drawing edges --*/
+  if (e != NULL && e->edge.n > 0) {
+    if (dpy->options.edges_undirected_show_p ||
+        dpy->options.edges_directed_show_p ||
+        dpy->options.whiskers_show_p)
+    {
+      return (false);
+    }
+  }
 
   return(true);
 }
