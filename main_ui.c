@@ -6,6 +6,9 @@
 #include "vars.h"
 #include "externs.h"
 
+
+#include "display_tree.h"
+
 static gint mode = XYPLOT, prev_mode = XYPLOT;
 static gint projection = XYPLOT, prev_projection = XYPLOT;
 
@@ -444,6 +447,13 @@ static GtkItemFactoryEntry menu_items[] = {
                       NULL ,        brush_options_cb, 0, "<CheckItem>" },
   { "/Display/Brushing/Update linked brushing continuously",  
                       NULL ,        brush_options_cb, 1, "<CheckItem>" },
+
+
+  {"/_Plots", NULL, NULL, 0, "<Branch>"},
+  {
+   "/Plots/Displays",    
+          NULL, show_display_tree, 0, NULL},
+
 
   { "/_Help",         NULL,         NULL, 0, "<LastBranch>" },
   { "/Help/About XGobi",  

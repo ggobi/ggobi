@@ -1,6 +1,8 @@
 EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 
-CC = gcc -g -ansi -Wall
+CC = gcc
+CFLAGS= -g -ansi -Wall -fpic
+SHARED_LD_FLAGS= -shared
 
 SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c \
  read_array.c read_data.c \
@@ -24,7 +26,8 @@ SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c \
  transform_ui.c transform.c sphere_ui.c sphere.c svd.c \
  utils_ui.c \
  subset_ui.c subset.c jitter_ui.c jitter.c smooth_ui.c \
- gtkextruler.c gtkexthruler.c gtkextvruler.c
+ gtkextruler.c gtkexthruler.c gtkextvruler.c \
+ display_tree.c
 
 
 OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o utils.o \
@@ -49,7 +52,8 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o utils.o \
  transform_ui.o transform.o sphere_ui.o sphere.o svd.o \
  utils_ui.o \
  subset_ui.o subset.o jitter_ui.o jitter.o smooth_ui.o \
- gtkextruler.o gtkexthruler.o gtkextvruler.o
+ gtkextruler.o gtkexthruler.o gtkextvruler.o \
+ display_tree.o
 
 
 ggobi: $(OB)
@@ -59,8 +63,12 @@ pure: ggobi.o $(OB)
 	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
 	${CC} `gtk-config --cflags` -o ggobi $(OB) `gtk-config --libs`
 
+
+libXGobi.so: $(OB)
+	$(CC) $(SHARED_LD_FLAGS) -o $@ $(OBJ) `gtk-config --libs`
+
 clean: 
 	rm -f *.o ggobi
 
 .c.o:
-	$(CC) -c -I. `gtk-config --cflags` $*.c
+	$(CC) -c $(CFLAGS) -I. `gtk-config --cflags` $*.c

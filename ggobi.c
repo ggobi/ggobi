@@ -149,7 +149,17 @@ parse_command_line (gint *argc, gchar **av)
   return 1;
 }
 
+gint XGOBI(main)(gint argc, gchar *argv[]);
+
 gint main (gint argc, gchar *argv[])
+{ 
+ return(XGOBI(main)(argc, argv));
+}
+
+  /* Available so that we can call this from R
+     without any confusion between which main().
+   */
+gint XGOBI(main)(gint argc, gchar *argv[])
 {
   extern void make_ggobi (gchar *);
   GdkVisual *vis;

@@ -1,3 +1,6 @@
+#ifndef DISPLAY_H
+#define DISPLAY_H
+
 #ifndef DEFINES_H
 #include "defines.h"
 #endif
@@ -68,5 +71,5 @@ typedef struct {
 
 } displayd;
 
-#define DISPLAY_H
 
+#endif

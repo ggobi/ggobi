@@ -6,6 +6,8 @@
 #include "vars.h"
 #include "externs.h"
 
+#include "display_tree.h"
+
 /*----------------------------------------------------------------------*/
 /*               Drawing routines                                       */
 /*----------------------------------------------------------------------*/
@@ -88,6 +90,11 @@ display_options_cb (GtkCheckMenuItem *w, guint action) {
 void
 display_print_cb (displayd *display, guint action, GtkWidget *w) {
 }
+
+/*
+  Called when a plot window is closed via the "Close"
+  menu item.
+ */
 void
 display_close_cb (displayd *display, guint action, GtkWidget *w) {
   display_free (display);
@@ -144,6 +151,9 @@ display_new (gpointer cbd, guint action, GtkWidget *widget)
   display_set_current (display);
   displays = g_list_append (displays, (gpointer) display);
 
+    /* If the tree of displays is active, add this to it. */
+  display_add_tree(display, -1, display_tree.tree);
+
   current_splot = (splotd *) g_list_nth_data (current_display->splots, 0);
   splot_set_current (current_splot, on);
 
@@ -168,7 +178,7 @@ display_new (gpointer cbd, guint action, GtkWidget *widget)
 void
 display_free (displayd* display) {
   GList *l;
-  splotd *sp;
+  splotd *sp = NULL;
 
 /*
  * If the current splot belongs to this display, turn off its
@@ -182,14 +192,23 @@ display_free (displayd* display) {
 
   if (g_list_length (displays) > 1) {
 
+    /* If the display tree is active, remove the corresponding
+       entry.
+     */
+    tree_display_entry_remove(display, display_tree.tree); 
+
     g_list_remove (displays, display);
+
     if (display == current_display) {
       display_set_current (g_list_nth_data (displays, 0));
       current_splot = (splotd *) g_list_nth_data (current_display->splots, 0);
       splot_set_current (current_splot, on);
 
-      sp->redraw_style = QUICK;
-      gtk_widget_queue_draw (sp->da);
+      sp = current_splot;
+      if(sp != NULL) {
+        sp->redraw_style = QUICK;
+        gtk_widget_queue_draw (sp->da);
+      }
 /*      splot_redraw (current_splot, QUICK);*/
     }
 

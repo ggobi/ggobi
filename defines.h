@@ -1,5 +1,7 @@
 /* defines.h */
 
+#define XGOBI(a) XGobi_##a
+
 #define false 0
 #define true 1
 
