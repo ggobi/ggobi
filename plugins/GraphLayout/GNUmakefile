@@ -40,6 +40,10 @@ ifdef GRAPHVIZ
  LDFLAGS+=$(shell $(DOTNEATO_CONFIG) --libs)
 endif
 
+ifdef WITH_R
+ CFLAGS+= -I$(OMEGA_HOME)/include/Corba -I$(R_HOME)/include -DWITH_R=1 -DUSE_R=1 -D_R_=1
+endif
+
 HEADERS=glayout defines
 SRC=glayout init radial graphviz
 OBJS=$(SRC:%=%.o)

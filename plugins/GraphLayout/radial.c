@@ -123,13 +123,26 @@ hasPathToCenter (noded *n, noded *referringnode, datad *d, datad *e,
 /*                   callbacks                                     */
 /*-----------------------------------------------------------------*/
 
-void radial_cb (GtkButton *button, PluginInstance *inst)
+
+void do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg);
+void 
+radial_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   glayoutd *gl = glayoutFromInst (inst);
   displayd *dsp = gg->current_display;
   datad *d = gl->dsrc;
   datad *e = gl->e;
+
+  do_radial(gl, d, e, dsp, gg);
+}
+
+
+
+
+void 
+do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
+{
   glong *visible;
   gint nvisible;
 /*-- to add variables --*/
@@ -828,4 +841,46 @@ setNodePositions (glayoutd *gl, datad *d) {
 
   setChildNodePositions (gl->radial->centerNode, gl, d);
 }
+
+
+
+#ifdef WITH_R
+#ifdef NEW
+#undef NEW
+#endif
+#include "RSCommon.h"
+
+USER_OBJECT_
+S_radial_cb(USER_OBJECT_ plugin, USER_OBJECT_ centerNode, USER_OBJECT_ data, 
+              USER_OBJECT_ edges, USER_OBJECT_ display)
+{
+   datad *d, *e;
+   glayoutd *gl;
+   ggobid *gg;
+   PluginInstance *inst;
+   displayd *dsp;
+
+   inst = (PluginInstance *) R_ExternalPtrAddr(plugin);
+
+   gl = glayoutFromInst (inst);
+
+   if(!gl) {
+    gl = (glayoutd *) g_malloc (sizeof (glayoutd));
+    glayout_init (gl);
+    inst->data = gl;
+   }
+
+   gl->centerNodeIndex = INTEGER_DATA(centerNode)[0];
+
+   gg = inst->gg;
+   gl->dsrc = d = (datad *) R_ExternalPtrAddr(data);
+   gl->e = e = (datad *) R_ExternalPtrAddr(edges);
+
+   dsp =  (displayd *) R_ExternalPtrAddr(data);
+
+   do_radial(gl, d, e, dsp, gg);
+
+   return(NULL_USER_OBJECT);
+}
+#endif
 
