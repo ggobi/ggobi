@@ -312,7 +312,15 @@ variable_notebook_subwindow_add (datad *d, GtkSignalFunc func,
   gchar *row[1];
   vartabled *vt;
   GtkSelectionMode mode = (GtkSelectionMode)
-    gtk_object_get_data (GTK_OBJECT(notebook), "SELECTION");
+          gtk_object_get_data(GTK_OBJECT(notebook), "SELECTION");
+
+#ifdef GTK_2_0
+/* It appears (simple test) that the default mode is GTK_SELECTION_NONE. And then
+   calling gtk_clist_set_selection_mode will cause the default: case to assert a failure.
+   In Gtk 1.2, the default value is GTK_SELECTION_SINGLE (on my machines). */
+  if(mode == GTK_SELECTION_NONE)
+     mode = GTK_SELECTION_SINGLE;
+#endif
 
   if (d->ncols == 0)
     return;
@@ -350,8 +358,8 @@ variable_notebook_subwindow_add (datad *d, GtkSignalFunc func,
   clist = gtk_clist_new (1);
   gtk_clist_set_selection_mode (GTK_CLIST (clist), mode);
   gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-    GTK_SIGNAL_FUNC (func), gg);
+  if(func)
+     gtk_signal_connect (GTK_OBJECT (clist), "select_row", GTK_SIGNAL_FUNC (func), gg);
 
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get (j, d);
