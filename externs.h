@@ -730,3 +730,10 @@ void ggobiInit(int *argc, char **argv[]);
 
 GGobiPluginInfo *readPluginFile(const char * const fileName, GGobiInitInfo *info);
 gboolean registerPlugin(ggobid *gg, GGobiPluginInfo *plugin);
+
+
+#ifdef WIN32
+/* needed by transform.c */
+extern double erf(double x);
+extern double erfc(double x);
+#endif
