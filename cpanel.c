@@ -98,6 +98,7 @@ cpanel_set (displayd *display, ggobid *gg) {
   extern void cpanel_tour1d_set (cpaneld *, ggobid *);
   extern void cpanel_tour2d_set (cpaneld *, ggobid *);
   extern void cpanel_tourcorr_set (cpaneld *, ggobid *);
+  gboolean displaytype_known = true;
 
   switch (display->displaytype) {
     case scatterplot:
@@ -131,10 +132,14 @@ cpanel_set (displayd *display, ggobid *gg) {
       cpanel_brush_set (cpanel, gg);
       cpanel_identify_set (cpanel, gg);
     break;
+
     default:
+      displaytype_known = false;
     return;
   }
 
   if (cpanel->viewmode < COTOUR) cpanel->projection = cpanel->viewmode;
-  viewmode_set (cpanel->viewmode, gg);
+
+  if (displaytype_known)
+    viewmode_set (cpanel->viewmode, gg);
 }
