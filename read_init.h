@@ -51,6 +51,7 @@ typedef struct _GGobiInitInfo {
     gint     numTimePlotVars;
 
     gchar   *sessionFile;
+    gint     compress;
 } GGobiInitInfo;
 
 GGobiInitInfo *read_init_file(const char *filename, GGobiInitInfo *info);

@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html> <head>
 <title>GGobi Version Change Information</title>
+<link rel="stylesheet" href="ggobi.css">
 </head>
 
 <body>
@@ -14,7 +15,7 @@ often forget.
 <h2>Version 0.9.6</h2>
 <dl>
 
-  <dt> Additions to the preferences specifiable in an
+  <dt><li> Additions to the preferences specifiable in an
        initialization file.
       <br>
      &lt;autoplot&gt;, &lt;allowNoDisplays&gt;,
@@ -23,83 +24,100 @@ often forget.
       that can be a logical value
       (TRUE, true, True, T, 1 or
        FALSE, False, false, F, 0)
+      <br>
       Also, &lt;numDefaultPlotVars&gt;
       sets the default number of variables to display
       in the different plots.
+      <br>
+      &lt;sessionFile&gt; gives the name
+      to which the session is saved.
 
       <dl>
-        <dt>&lt;autoplot on="true|false"&gt;
+        <dt><li>&lt;autoplot on="true|false"&gt;
         <dd> controls whether the initial scatterplot is
             created and displayed for a newly created
             GGobi instance with data.
-	<dt>&lt;allowNoDisplays&gt;
+	<dt><li>&lt;allowNoDisplays&gt;
 	 <dd> controls whether one can close the last
-	     display for a GGobi instance and therefor
+	     display for a GGobi instance and therefore
 	     have no plots displayed, but only the
 	     main GGobi window for that instance.
-	 <dt> &lt;quitOnLastGGobi&gt;
+	 <dt><li> &lt;quitOnLastGGobi&gt;
 	 <dd> controls whether closing the last remaining
 	     GGobi instance main window terminates the GGobi session.
-	 <dt> &lt;numDefaultPlotVars&gt;
+	 <dt><li> &lt;numDefaultPlotVars&gt;
 	 <dd>
           The attributes are <b>scatmat</b>, <b>parcoords</b>.
 	  The value for each gives the default number of variables to
           display in the display. If this is negative, all variables are used.
-      </dl> 
+
+	 <dt><li> &lt;sessionFile&gt;
+	 <dd> The attributes are <b>name</b>
+	      which gives the name of the file to which to write the
+	     session information, and
+	     <b>compress</b> which is a non-negative integer value
+	     specifying the compression level. Since the file
+	     is short, 0 is a suitable value to allow the file
+	     to be read as regular text.
+       </dl> 
       
   <dd>
-  <dt>Added an item `Close' to the File menu that closes the 
+  <dt><li>Added an item `Close' to the File menu that closes the 
     particular GGobi instance. 
 
   <dd>Quit terminates the application.
 
-  <dt> Java meta-plugin that allows developers to create
+  <dt><li> Java meta-plugin that allows developers to create
        plugins implemented in Java.
   <dd> Examples in the <code>plugins/JVM</code> directory.
 
-  <dt> Extended facilities in the DataViewer plugin
+  <dt><li> Extended facilities in the DataViewer plugin
       to link point brushing, identification and movement
       to the cells in the worksheets. Also changes
        made in a cell are updated in the GGobi dataset and plots.
   <dd>
 
-  <dt> GGobi plugin for Gnumeric allowing ggobi to be used
+  <dt><li> GGobi plugin for Gnumeric allowing ggobi to be used
       in spreadsheets.
   <dd>
 
-  <dt> Database connectivity implemented via plugins for
+  <dt><li> Database connectivity implemented via plugins for
       Postgres and MySQL.
   <dd>
 
-  <dt> Meta plugin using R that allows one to write plugins
+  <dt><li> Meta plugin using R that allows one to write plugins
       for GGobi using the S language.
   <dd>
 
-  <dt> Splash screen has version information.
+  <dt><li> Splash screen has version information.
   <dd>
 
-  <dt> Updates for the Tree of displays.
+  <dt><li> Updates for the Tree of displays.
   <dd>
       <dl>
-	<dt> Updates dynamically to reflect changes in the
+	<dt><li> Updates dynamically to reflect changes in the
 	    variables displayed in a  plot.
 	<dd>
-	<dt> Displays the name of the dataset from
+	<dt><li> Displays the name of the dataset from
  	    associated with the variables in the plot.
 	<dd>
-	<dt> Selecting the node for that display
+	<dt><li> Selecting the node for that display
 	    (i.e. one of the top-most nodes)
 	    causes the first plot in that display
 	    to become active.
 	<dd>
       </dl>
 
-  <dt> Storing the session queries the user for
+  <dt><li> Storing the session queries the user for
       the name of the file to which the
       session information should saved.
   <dd>
+  <dt><li> The session information now includes all ggobis, the
+      preferences, input sources (i.e. files, URIs, etc.) visited, etc.
       
-  <dt> Thanks to John Plummer for detailed bug reports.
+  <dd>
+      
+  <dt><li> Thanks to John Plummer for detailed bug reports.
   <dd>
 </dl>
 
@@ -107,32 +125,32 @@ often forget.
 <h2>Version 0.9.5</h2>
 <dl>
 
-  <dt> java-gnome examples in Gtk/ directory.
+  <dt><li> java-gnome examples in Gtk/ directory.
   <dd>
       
-  <dt> Dependencies for plugins forces the loading of needed plugins
+  <dt><li> Dependencies for plugins forces the loading of needed plugins
        before a plugin is loaded itself.
   <dd>
 
-  <dt> Support for options for plugins both in the initialization
+  <dt><li> Support for options for plugins both in the initialization
        file (XML) and command line.
-  <dd>
+  <dd> Named and un-named.
 
-  <dt> Java Virtual Machine plugin that supports writing
+  <dt><li> Java Virtual Machine plugin that supports writing
        (regular and input)  plugins  in Java.
   <dd>
        See notes/ggobirc &amp; plugins/JVM/ggobi.
       
-  <dt> Some fixes for the ``notification'' of plugin methods.
+  <dt><li> Some fixes for the ``notification'' of plugin methods.
   <dd>
 </dl>
 
 <h2>Version 0.9.4</h2>
 <dl>
-  <dt>
+  <dt><li>
   <li> Added a row identifier argument to setData()  for supporting edges.
   <dd>
-  <dt>
+  <dt><li>
   <li> Command line arguments that take a value can be  specified
       as
 <pre>
@@ -143,11 +161,11 @@ often forget.
        -argName <i>value</i>
 </pre>      
   <dd>
-  <dt>
+  <dt><li>
   <li> <b>-noinit</b> command line argument for ignoring
       <a href="Features.html#InitializationFile">initialization file</a>. 
   <dd>
-  <dt>
+  <dt><li>
   <li> <b>--silent</b> argument to limit messages displayed on the console.
   <dd>
 </dl>
@@ -158,6 +176,6 @@ often forget.
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Thu Dec  6 23:44:26 EST 2001
+Last modified: Fri Dec  7 09:21:39 EST 2001
 <!-- hhmts end -->
 </body> </html>

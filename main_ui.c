@@ -878,7 +878,8 @@ store_session(ggobid *gg, gint action, GtkWidget *w)
 
       gtk_widget_show(dlg);
   } else {
-     write_ggobi_as_xml(gg, sessionOptions->info->sessionFile);
+      ggobi_write_session(sessionOptions->info->sessionFile);
+      /* write_ggobi_as_xml(gg, sessionOptions->info->sessionFile); */
   }
 }
 

@@ -214,6 +214,17 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
       }
   }
 
+  el = getXMLElement(node, "sessionFile");
+  if(el) {
+      gchar *tmp;
+      tmp = xmlGetProp(el, "name");
+      if(tmp)
+	  info->sessionFile = g_strdup(tmp);
+      tmp = xmlGetProp(el, "compress");
+      if(tmp)
+	  info->compress = asNumber(tmp);
+  }
+
   return(0);
 }
 

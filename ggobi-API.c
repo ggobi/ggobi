@@ -876,12 +876,10 @@ GGOBI(registerColorMap)(ggobid *gg)
 
 
 /*
-  Whether to destory the window or not.
-  If this is being called from an event handler
-  in response to the window being destroyed, we would
-  get a circularity. However, when called programmatically
-  from within the process (or from e.g. R) we need to force
-  it to be closed.
+  Whether to destory the window or not.  If this is being called from an
+  event handler in response to the window being destroyed, we would get
+  a circularity. However, when called programmatically from within the
+  process (or from e.g. R) we need to force it to be closed.
  */
 gboolean
 GGOBI(close)(ggobid *gg, gboolean closeWindow)

@@ -68,7 +68,6 @@ struct _GGobiPluginInfo {
     } info;
 
     void *data;
-
 };
 
 
