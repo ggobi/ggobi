@@ -983,6 +983,10 @@ void GGobi_setSessionOptions(GGobiOptions *opts);
 
 const gchar *GGobi_getLevelName(vartabled *vt, double value);
 
+
+
+colorschemed *alloc_colorscheme();
+
 #ifdef __cplusplus
 }
 #endif

@@ -71,6 +71,22 @@ read_colorscheme(gchar *fileName, GList **list)
 }
 
 colorschemed *
+alloc_colorscheme()
+{
+  colorschemed *scheme;
+
+  scheme = (colorschemed*) g_malloc(sizeof(colorschemed));
+  memset(scheme, '\0', sizeof(colorschemed));
+
+  scheme->rgb = NULL;
+  scheme->rgb_bg.pixel = -1;
+  scheme->rgb_accent.pixel = -1;
+  scheme->colorNames = g_array_new(false, false, sizeof(gchar *));
+
+  return(scheme);
+}
+
+colorschemed *
 process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
 {
   colorschemed *scheme;
@@ -78,15 +94,11 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
   const xmlChar *tmp;
   xmlChar *val;
 
-  scheme = (colorschemed*) g_malloc(sizeof(colorschemed));
-  scheme->rgb = NULL;
-  scheme->rgb_bg.pixel = -1;
-  scheme->rgb_accent.pixel = -1;
+  scheme = alloc_colorscheme();
 
   scheme->name = g_strdup((gchar *) xmlGetProp(root, (xmlChar *) "name"));
   scheme->type =  getColorSchemeType(xmlGetProp(root, (xmlChar *) "type"));
   scheme->system = getColorSchemeSystem(xmlGetProp(root, (xmlChar *) "system"));
-  scheme->colorNames = g_array_new(false, false, sizeof(gchar *));
 
 /*
   scheme->system_min = 0.0;
