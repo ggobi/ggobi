@@ -65,11 +65,6 @@ gboolean edge_add(gint a, gint b, datad * d, datad * e)
 /*XXX This should be done on all the datasets and the symbolic datapoints too perhaps. */
   endpoints = resolveEdgePoints(e, d);
 
-#ifdef OLD_STYLE_IDS
-  gint n = e->edge.n;
-  endpoints[n].a = d->rowid.idv.els[a];
-  endpoints[n].b = d->rowid.idv.els[b];
-#endif
 /*XXX don't we need to do something with jpartner, etc. */
   return true;
 }
@@ -89,9 +84,8 @@ datad *setDisplayEdge(displayd * dpy, datad * e)
   GList *l;
   datad *old = NULL;
 
-  dpy->e = e;
-
   if(resolveEdgePoints(e, dpy->d)) {
+    dpy->e = e;
      /*XXX  This needs to be more general, working on all displays.
             Need to emit an event and have the displays respond to it by checking
             whether the edgeset_add returns true. */
@@ -146,11 +140,9 @@ gboolean edgeset_add(displayd * display)
  */
 void edgeset_add_cb(GtkWidget * w, datad * e)
 {
+  ggobid *gg = GGobiFromWidget(w, true);
   displayd *display = (displayd *) gtk_object_get_data(GTK_OBJECT(w),
                                                        "display");
-
-  ggobid *gg = GGobiFromWidget(w, true);
-
   setDisplayEdge(display, e);
 
   display_plot(display, FULL, gg);   /*- moving edge drawing */
@@ -160,7 +152,8 @@ void edgeset_add_cb(GtkWidget * w, datad * e)
    */
   if (!display->options.edges_undirected_show_p &&
       !display->options.edges_directed_show_p &&
-      !display->options.edges_arrowheads_show_p) {
+      !display->options.edges_arrowheads_show_p)
+  {
     GtkWidget *ww = widget_find_by_name(display->edge_menu,
                                         "DISPLAY MENU: show undirected edges");
     if (ww) {
@@ -223,28 +216,32 @@ computeResolvedEdgePoints(datad *e, datad *d)
   GHashTable *tbl = d->idTable;
   int ctr = 0, i;
   guint *tmp;
+  gboolean resolved_p = false;
 
   ans = g_malloc( sizeof(endpointsd) * e->edge.n);
  
   for(i = 0; i < e->edge.n; i++, ctr++) {
     tmp = (guint *) g_hash_table_lookup(tbl, e->edge.sym_endpoints[i].a);
     if(!tmp) {
-     ans[ctr].a = -1;
-     continue;
+      ans[ctr].a = -1;
+      continue;
     }
 
     ans[ctr].a = *tmp;
 
     tmp = (guint *) g_hash_table_lookup(tbl, e->edge.sym_endpoints[i].b);
     if(!tmp) {
-      ans[ctr].a = -1;
+      ans[ctr].a = ans[ctr].b = -1;
       continue;
+    } else {
+      ans[ctr].b = *tmp;
+      ans[ctr].jpartner = e->edge.sym_endpoints[i].jpartner;
+      if (!resolved_p && ans[ctr].a != -1)
+        resolved_p = true;
     }
-    ans[ctr].b = *tmp;
-    ans[ctr].jpartner = e->edge.sym_endpoints[i].jpartner;
   }
 
-  if(ctr == 0) {
+  if(ctr == 0 || resolved_p == false) {
     g_free(ans);
     ans = &DegenerateEndpoints;
   }
@@ -284,6 +281,8 @@ resolveEdgePoints(datad *e, datad *d)
   if(ans == NULL) {
      /* resolve the endpoints */
     ans = computeResolvedEdgePoints(e, d);
+    if(ans == &DegenerateEndpoints)
+      return(NULL);
     ptr = (DatadEndpoints *) g_malloc(sizeof(DatadEndpoints));
     ptr->data = d;
     ptr->endpoints = ans;
