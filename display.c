@@ -624,7 +624,7 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
 
 
 /*
- * replot all splots in display -- except splot, if present
+ * replot all splots in all displays -- except splot, if present
 */
 void
 displays_plot (splotd *splot, RedrawStyle type, ggobid *gg) {
