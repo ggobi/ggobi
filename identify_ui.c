@@ -146,7 +146,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   d->nearest_point = k;
 
   /*-- link by id --*/
-  if (nd > 1 && k >= 0) identify_link_by_id (k, d, gg);
+  if (nd > 1) identify_link_by_id (k, d, gg);
   /*-- --*/
 
   if (k != d->nearest_point_prev) {

@@ -86,8 +86,8 @@ sticky_id_toggle (datad *d, ggobid *gg)
        /* This will become an event on the datad when we move to
           Gtk objects (soon now!) */
       gtk_signal_emit(GTK_OBJECT(gg),
-		      GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], d->nearest_point,
-		      (gint) UNSTICKY, d);
+        GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], d->nearest_point,
+        (gint) UNSTICKY, d);
     } else {
       ptr = GINT_TO_POINTER (d->nearest_point);
       d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
@@ -95,8 +95,8 @@ sticky_id_toggle (datad *d, ggobid *gg)
        /* This will become an event on the datad when we move to
           Gtk objects (soon now!) */
       gtk_signal_emit(GTK_OBJECT(gg),
-		      GGobiSignals[STICKY_POINT_ADDED_SIGNAL], d->nearest_point,
-		      (gint) STICKY, d);
+        GGobiSignals[STICKY_POINT_ADDED_SIGNAL], d->nearest_point,
+        (gint) STICKY, d);
     }
   }
 }
@@ -114,14 +114,21 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
   gboolean inrange;
 
   /*-- k is the row number in source_d --*/
-  if (k < 0)
+
+  if (k < 0) {  /*-- handle this case separately --*/
+    for (l = gg->d; l; l = l->next) {
+      d = (datad *) l->data;
+      if (d != source_d)
+        d->nearest_point_prev = d->nearest_point = -1;
+    }
     return;
+  }
 
   if(source_d->rowIds) {
            /* if there is no */
-     if(!source_d->rowIds[k]) {
-	return;
-     }
+    if(!source_d->rowIds[k]) {
+       return;
+    }
     for (l = gg->d; l; l = l->next) {
       gpointer ptr;
       d = (datad *) l->data;
@@ -132,9 +139,9 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
 
       ptr = g_hash_table_lookup(d->idTable, source_d->rowIds[k]);
       if(ptr) {
-   	   inrange = true;
-           d->nearest_point_prev = d->nearest_point;
-           d->nearest_point = * ((guint *)ptr);
+        inrange = true;
+        d->nearest_point_prev = d->nearest_point;
+        d->nearest_point = * ((guint *)ptr);
       }
 
       if (!inrange) {
