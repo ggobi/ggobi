@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1></h1>
+
+GGobi makes extensive use of XML and inputs provided in the XML
+format, while still maintaining supporting for the older input style
+used in xgobi.  This use of XML, and specifically the parser provided
+as part of the <a href="http://www.xmlsoft.org">libxml</a>
+distribution, increases the dependencies on other software that must
+be available to install and run GGobi.  Because there are many
+different versions of <b>libxml</b>, some installed on the system and
+others installed by individual users, matching the correct version of
+GGobi with the correct version of <b>libxml</b> with both at
+configuration- and run-time becomes very complex.  Our approach
+intends to err on the side of simplicity rather than maximal
+flexibility.
+
+<p>
+We have made two versions of the GGobi source
+available:
+<a href="http://www.ggobi.org/Download/ggobi.tar.gz">ggobi.tar.gz</a>
+and
+<a href="http://www.ggobi.org/Download/ggobi-xml.tar.gz">ggobi-xml.tar.gz</a>.
+The difference between these is that the second (ggobi-xml.tar.gz)
+contains an unaltered version of a libxml distribution
+that is known to work with GGobi.
+If you already have libxml (version 2)
+available on your machine, you can download
+<a href="http://www.ggobi.org/Download/ggobi.tar.gz">ggobi.tar.gz</a>
+which is (currently) half the size of
+<a
+href="http://www.ggogi.org/Download/ggobi-xml.tar.gz">ggobi-xml.tar.gz</a>.
+If you have an incompatible version of libxml, or
+cannot install <a href="http://www.xmlsoft.org">libxml</a>
+on the system, it will probably be simplest to download
+<a
+href="http://www.ggogi.org/Download/ggobi-xml.tar.gz">ggobi-xml.tar.gz</a>
+and have the GGobi installation build the contained libxml
+distribution.
+<p>
+In either case, one builds GGobi with XML support
+with the commands
+<pre>
+  ./configure --with-xml   <i>[any other configuration arguments]</i>
+  make
+</pre>
+
+
+<p>
+
+We strongly suggest that you perform a complete installation of <a
+href="http://www.xmlsoft.org">libxml, version 2</a> onto your system
+before compiling the GGobi distribution.
+(A version of libxml known to work with GGobi is available
+with in the <a
+href="http://www.ggobi.org/Download/ggobi-xml.tar.gz">(bigger) tar
+file</a>.)
+This will make libxml available to all users of the system
+in a standard location.
+To do this you will need <i>root</i> access
+for your machine, or need to ask your system administrator to do it
+for you.  The steps are simple.
+<ol>
+  <li> Download libxml
+  <li> configure the distribution for the build: use the command
+<pre>
+     ./configure 
+</pre>
+If you want it to be installed in a non-default
+ directory, use a command such as
+<pre>
+   ./configure --prefix=/whatever/directory/it/should/go/in
+</pre>
+  <li> Build the library
+<pre>
+  make
+</pre>      
+  <li> Install the executables, libraries, etc.
+      into the system area where others can access them.
+<pre>
+  make install
+</pre>
+</ol>
+
+At this point, the GGobi configuration script will be able to find the
+information it needs about the libxml installation and will succeed in
+working. It uses the executable <b>xml2-config</b> (created during the
+<code>make install</code> part of the libxml installation) to get this
+information, and the directory in which this is installed (the
+<code>bin/</code> directory) should be in your path when configuring
+GGobi.
+
+<p>
+
+Given the installed XML library, one builds the GGobi
+distribution by changing to the
+<code>ggobi/</code> directory
+and issuing the command
+<pre>
+ ./configure --with-xml
+</pre>
+
+
+
+
+
+
+
+<hr>
+<address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Wed Sep 19 10:08:14 EDT 2001
+<!-- hhmts end -->
+</body> </html>
