@@ -65,6 +65,18 @@ cluster_table_labels_update (datad *d, ggobid *gg)
   }
 }
 
+static void rescale_cb (GtkWidget *w, ggobid *gg) {
+  datad *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+
+  limits_set (true, true, d, gg);  
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+
+  tform_to_world (d, gg);
+  displays_tailpipe (REDISPLAY_ALL, gg);  /*-- points rebinned in here --*/
+}
+
+
 static gint
 hide_cluster_cb (GtkToggleButton *btn, gpointer cbd)
 {
@@ -108,11 +120,17 @@ show_cluster_cb (GtkToggleButton *btn, gpointer cbd)
       }
     }
   }
-  rows_in_plot_set (d, gg);
-  assign_points_to_bins (d, gg);
+
   clusters_set (d, gg);
   cluster_table_labels_update (d, gg);
-  displays_plot (NULL, FULL, gg);
+
+  rows_in_plot_set (d, gg);
+  /*
+   * Don't re-set the limits, but re-run the pipeline in case
+   * the data about to be shown isn't on the current scale
+  */
+  tform_to_world (d, gg);
+  displays_tailpipe (REDISPLAY_ALL, gg);  /*-- points rebinned in here --*/
 
   return false;
 }
@@ -259,17 +277,6 @@ static void destroyit (gboolean kill, ggobid *gg) {
 
 static void update_cb (GtkWidget *w, ggobid *gg) {
   cluster_window_open (gg);
-}
-
-static void rescale_cb (GtkWidget *w, ggobid *gg) {
-  datad *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
-
-  limits_set (true, true, d, gg);  
-  vartable_limits_set (d);
-  vartable_stats_set (d);
-
-  tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, gg);  /*-- points rebinned in here --*/
 }
 
 /*-- called when closed from the close button --*/
