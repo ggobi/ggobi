@@ -446,14 +446,6 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg)
     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
     if(klass->alloc_whiskers)
       sp->whiskers = klass->alloc_whiskers(sp, nr, d);
-  } else {
-    switch (display->displaytype) {
-      case scatterplot:
-      case scatmat:
-       break;
-      default:
-      break;
-    }
   }
 }
 
@@ -469,22 +461,8 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
      gtk_object_destroy(GTK_OBJECT(sp));
-  } else {
-   switch (display->displaytype) {
-    case scatterplot:
-      if (sp->edges != NULL) g_free ((gpointer) sp->edges);
-      if (sp->arrowheads != NULL) g_free ((gpointer) sp->arrowheads);
-    break;
-    case scatmat:
-      if (sp->edges != NULL) g_free ((gpointer) sp->edges);
-      if (sp->arrowheads != NULL) g_free ((gpointer) sp->arrowheads);
-    break;
-    default:
-    break;
-   }
-
-   gtk_widget_destroy (GTK_WIDGET(sp));
-  }
+  } else
+     gtk_widget_destroy (GTK_WIDGET(sp));
 }
 
 void
@@ -610,48 +588,6 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
       GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->world_to_plane(sp, d, gg);
-  } else {
-
-   switch (display->displaytype) {
-
-    case scatterplot:
-      switch (cpanel->projection) {
-        case P1PLOT:
-          p1d_reproject (sp, d->world.vals, d, gg);
-        break;
-
-        case XYPLOT:
-          xy_reproject (sp, d->world.vals, d, gg);
-        break;
-
-        case TOUR1D:
-          tour1d_projdata (sp, d->world.vals, d, gg);
-        break;
-
-        case TOUR2D:
-          tour2d_projdata(sp, d->world.vals, d, gg);
-        break;
-
-        case COTOUR:
-          tourcorr_projdata(sp, d->world.vals, d, gg);
-        break;
-
-        default:
-        break;
-      }
-      
-      break;
-
-    case scatmat:
-      if (sp->p1dvar == -1)
-        xy_reproject (sp, d->world.vals, d, gg);
-      else
-        p1d_reproject (sp, d->world.vals, d, gg);
-    break;
-
-    default:
-    break;
-   }
   }
 }
 
@@ -709,26 +645,15 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
     sp->screen[i].y += (sp->max.y / 2);
   }
 
-  if(klass) {
-    klass->sub_plane_to_screen(sp, display, d, gg);
+  if(klass && klass->sub_plane_to_screen) {
+     klass->sub_plane_to_screen(sp, display, d, gg);
   } else {
 /*XX convenience */
    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
      GtkGGobiExtendedDisplayClass *k = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
      if(k->sub_plane_to_screen)
        k->sub_plane_to_screen(sp, display, d, gg);
-   } else {
-    switch (display->displaytype) {
-     case scatterplot:
-      ash_baseline_set (&sp->p1d.ash_baseline, sp);
-      ash_baseline_set (&sp->tour1d.ash_baseline, sp);
-     break;
-     case scatmat:
-     case unknown_display_type:
-     default:
-     break;
-    }
-   }
+   } 
   }
 }
 

@@ -167,7 +167,7 @@ void quick_message (const gchar * const message, gboolean modal) {
 
 
 GtkItemFactory *
-get_main_menu (GtkItemFactoryEntry menu_items[],
+get_main_menu (const GtkItemFactoryEntry menu_items [],
                gint nmenu_items,
                GtkAccelGroup *accel_group,
                GtkWidget  *window,

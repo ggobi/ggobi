@@ -178,58 +178,10 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
     } else {
       g_printerr("No method for generating XML description of %s display type\n", klass->titleLabel); 
     }
-  } else {
-   switch(dpy->displaytype) {
-    case scatterplot:
-      add_xml_scatterplot_variables(node, plots, dpy);
-    break;
-    case scatmat:
-      add_xml_scatmat_variables(node, plots, dpy);
-    break;
-    case unknown_display_type:
-    default:
-    break;
-  }
   }
 
  return(node);
 }
-
-
-
-
-
-/*
-  Write out the variables in a scatter plot matrix
-  to the current node in the XML tree.
- */
-void
-add_xml_scatmat_variables(xmlNodePtr node, GList *plots, displayd *dpy)
-{
-  splotd *plot = plots->data;
-  int n, n1, i;
-
-  n1 = g_list_length(plots);
-  n = sqrt(n1);
-
-  for(i = 0; i < n1 ; i+=n) {
-      plot = (splotd *) g_list_nth_data(plots, i);
-      XML_addVariable(node, plot->xyvars.x, dpy->d);
-  }
-}
-
-/*
-  Write out the variables in a scatterplot
-  to the current node in the XML tree.
- */
-void
-add_xml_scatterplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
-{
-  splotd *plot = (splotd *)plots->data;
-  XML_addVariable(node, plot->xyvars.x, dpy->d);
-  XML_addVariable(node, plot->xyvars.y, dpy->d);
-}
-
 
 /*
   Utility method for adding an XML node of the form
@@ -259,17 +211,10 @@ getDisplayTypeName(displayd *dpy)
 {
   const gchar *val;
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
-    /* Perhaps compute the name of the type and use that. 
-     */
+      /* Perhaps compute the name of the type and use that. */
     val = gtk_type_name(GTK_OBJECT_TYPE(GTK_OBJECT(dpy)));
   } else {
   switch(dpy->displaytype) {
-    case scatterplot:
-      val = "scatterplot";
-    break;
-    case scatmat:
-      val = "scatmat";
-    break;
     default:
       val = "";
     break;

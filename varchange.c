@@ -221,10 +221,8 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 static gint
 plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
 {
-  gint j, k, projection;
-  GList *dlist, *l;
+  GList *dlist;
   displayd *display;
-  splotd *sp;
   gint jplotted = -1;
 
   /*-- check each display for each variable --*/
@@ -236,96 +234,10 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
     if (jplotted >= 0)
       break;
 
-    switch (display->displaytype) {
-      case scatterplot:
-        sp = (splotd *) display->splots->data;  /*-- only one splot --*/
-        projection = projection_get (gg);
-
-        switch (projection) {
-          case P1PLOT:
-            for (j=0; j<ncols; j++) {
-              if (sp->p1dvar == cols[j]) {
-                jplotted = sp->p1dvar;
-                return jplotted;
-              }
-            }
-          break;
-          case XYPLOT:
-            for (j=0; j<ncols; j++) {
-              if (sp->xyvars.x == cols[j]) {
-                jplotted = sp->xyvars.x;
-                return jplotted;
-              }
-              if (sp->xyvars.y == cols[j]) {
-                jplotted = sp->xyvars.y;
-                return jplotted;
-              }
-            }
-          break;
-          case TOUR1D:
-            for (j=0; j<ncols; j++) {
-              for (k=0; k<display->t1d.nactive; k++) {
-                if (display->t1d.active_vars.els[k] == cols[j]) {
-                  jplotted = display->t1d.active_vars.els[k];
-                  return jplotted;
-                }
-              }
-            }
-          break;
-          case TOUR2D:
-            for (j=0; j<ncols; j++) {
-              for (k=0; k<display->t2d.nactive; k++) {
-                if (display->t2d.active_vars.els[k] == cols[j]) {
-                  jplotted = display->t2d.active_vars.els[k];
-                  return jplotted;
-                }
-              }
-            }
-          break;
-          case COTOUR:
-            for (j=0; j<ncols; j++) {
-              for (k=0; k<display->tcorr1.nactive; k++) {
-                if (display->tcorr1.active_vars.els[k] == cols[j]) {
-                  jplotted = display->tcorr1.active_vars.els[k];
-                  return jplotted;
-                }
-              }
-              for (k=0; k<display->tcorr2.nactive; k++) {
-                if (display->tcorr2.active_vars.els[k] == cols[j]) {
-                  jplotted = display->tcorr2.active_vars.els[k];
-                  return jplotted;
-                }
-              }
-            }
-          break;
-        }
-      break;  /*-- end case scatterplot, with all its modes --*/
-
-      case scatmat:
-        for (l = display->splots; l; l = l->next) {
-          sp = (splotd *) l->data;
-
-          for (j=0; j<ncols; j++) {
-            if (sp->p1dvar == -1) {
-              if (sp->xyvars.x == cols[j]) {
-                jplotted = sp->xyvars.x;
-                return jplotted;
-              }
-              if (sp->xyvars.y == cols[j]) {
-                jplotted = sp->xyvars.y;
-                return jplotted;
-              }
-            } else if (sp->p1dvar == cols[j]) {
-              jplotted = sp->p1dvar;
-              return jplotted;
-            }
-          }
-        }
-      break;
-
-      case unknown_display_type:
-      default:
-      break;
+    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+      GtkGGobiExtendedDisplayClass *klass;
+      klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+      jplotted = klass->variable_plotted_p(display, cols, ncols, d);
     }
   }
 

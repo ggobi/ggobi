@@ -1,6 +1,7 @@
 #include "parcoordsClass.h"
 
 #include <string.h>
+#include "write_state.h"
 
 #include "externs.h"
 

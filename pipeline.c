@@ -322,48 +322,12 @@ void
 world_to_raw (gint pt, splotd *sp, datad *d, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
-  cpaneld *cpanel = &display->cpanel;
-  enum displaytyped dtype = display->displaytype;
-  PipelineMode proj = cpanel->projection;
-  gint j;
 
-  if (dtype == scatterplot) {
-    switch (proj) {
-      case P1PLOT:
-        if (display->p1d_orientation == VERTICAL)
-          world_to_raw_by_var (pt, sp->p1dvar, display, d, gg);
-        else
-          world_to_raw_by_var (pt, sp->p1dvar, display, d, gg);
-      break;
-      case XYPLOT:
-        world_to_raw_by_var (pt, sp->xyvars.x, display, d, gg);
-        world_to_raw_by_var (pt, sp->xyvars.y, display, d, gg);
-      break;
-      case TOUR2D:
-        for (j=0; j<display->t2d.nactive; j++)
-          world_to_raw_by_var (pt, display->t2d.active_vars.els[j],
-            display, d, gg);
-      break;
-      case TOUR1D:
-        for (j=0; j<display->t1d.nactive; j++)
-          world_to_raw_by_var (pt, display->t1d.active_vars.els[j],
-            display, d, gg);
-      break;
-      case COTOUR:
-        for (j=0; j<display->tcorr1.nactive; j++)
-          world_to_raw_by_var (pt, display->tcorr1.active_vars.els[j],
-            display, d, gg);
-        for (j=0; j<display->tcorr2.nactive; j++)
-          world_to_raw_by_var (pt, display->tcorr2.active_vars.els[j],
-            display, d, gg);
-      break;
-      default:
-      break;
-    }
-  } else if (dtype == scatmat && sp->p1dvar == -1) {
-    world_to_raw_by_var (pt, sp->xyvars.x, display, d, gg);
-    world_to_raw_by_var (pt, sp->xyvars.y, display, d, gg);
-  }
-
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+     GtkGGobiExtendedDisplayClass *klass;
+     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+     if(klass->world_to_raw)
+         klass->world_to_raw(display, sp, pt, d, gg);
+  } 
 }
 

@@ -18,6 +18,9 @@
 #include "vars.h"
 #include "externs.h"
 
+#include "scatmatClass.h"
+#include "scatterplotClass.h"
+
 #define WIDTH 200
 #define HEIGHT 200
 #define MAXNVARS 4   /* only used to set up the initial matrix */
@@ -86,10 +89,8 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
 }
 
 displayd *
-scatmat_new (gboolean missing_p,
-  gint numRows, gint *rows,
-  gint numCols, gint *cols,
-  datad *d, ggobid *gg) 
+scatmat_new (gboolean missing_p, gint numRows, gint *rows,
+	     gint numCols, gint *cols, datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   GtkWidget *mbar, *w;
@@ -103,7 +104,8 @@ scatmat_new (gboolean missing_p,
   windowDisplayd *wdpy;
   GtkAccelGroup *scatmat_accel_group;
 
-  display = display_alloc_init (scatmat, missing_p, d, gg);
+  display = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_DISPLAY);
+  display_set_values (display, extended_display_type, d, gg);
   wdpy = GTK_GGOBI_WINDOW_DISPLAY(display);
 
   /* If the caller didn't specify the rows and columns, 
@@ -186,7 +188,10 @@ scatmat_new (gboolean missing_p,
   ctr = 0;
   for (i=0; i<scatmat_ncols; i++) {
     for (j=0; j<scatmat_nrows; j++, ctr++) {
-      sp = splot_new (display, width, height, gg);
+/* Can we use SCATTER_SPLOT or do we need SCATMAT_SPLOT. */
+      sp = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_SPLOT);
+      splot_init(sp, display, width, height, gg);
+
       sp->xyvars.x = rows[i]; 
       sp->xyvars.y = cols[j]; 
       sp->p1dvar = (rows[i] == cols[j]) ? cols[j] : -1;
@@ -194,9 +199,9 @@ scatmat_new (gboolean missing_p,
       display->splots = g_list_append (display->splots, (gpointer) sp);
 
       gtk_table_attach (GTK_TABLE (display->table), sp->da, i, i+1, j, j+1,
-        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
-        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
-        1, 1);
+			(GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
+			(GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+			1, 1);
       gtk_widget_show (sp->da);
     }
   }

@@ -200,7 +200,6 @@ gint       find_keepers (gint ncols_current, gint nc, gint *cols, gint *keepers)
 gint       find_nearest_point (icoords *, splotd *, datad *, ggobid *);
 GtkWidget *get_clist_from_object (GtkObject *);
 void       get_extended_brush_corners (icoords *, icoords *, datad *, splotd *);
-GtkItemFactory *get_main_menu (GtkItemFactoryEntry[], gint, GtkAccelGroup *, GtkWidget  *, GtkWidget **, gpointer);
 gint       get_one_selection_from_clist (GtkWidget *clist);
 gint       getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
 gint       get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist);
@@ -566,6 +565,99 @@ void       xy_reproject (splotd *, glong **, datad *, ggobid *);
 void       zoom_by_drag (splotd *, ggobid *);
 void       zoom_step (splotd *, gint, gint, rectd *, ggobid*);
 
+datad*     ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
+gchar*     computeTitle (gboolean, displayd *, ggobid *);
+datad*     datad_get_from_notebook (GtkWidget *notebook, ggobid *);
+gchar*     datasetName (datad *d, ggobid *gg);
+GList*     g_list_remove_nth (GList *, gint);
+GList*     g_list_replace_nth (GList *, gpointer, gint);
+gfloat     jitter_randval (gint);
+ggobid*    GGobiFromDisplay (displayd *display);
+ggobid*    GGobiFromSPlot (splotd *sp);
+ggobid*    GGobiFromWidget (GtkWidget *w, gboolean);
+ggobid*    GGobiFromWindow (GdkWindow *w);
+ggobid*    ValidateGGobiRef (ggobid *gg, gboolean fatal);
+gdouble    calc_norm (gdouble *, gint);
+gushort    datad_colors_used_get (gint *ncolors_used, gushort *colors_used, datad *, ggobid *); 
+ggobid*    ggobi_alloc (ggobid *tmp);
+ggobid*    ggobi_get (gint);
+gdouble    inner_prod (gdouble *, gdouble *, gint);
+gdouble    myrint (gdouble x);
+gdouble    randvalue (void);
+splotd*    splot_new (displayd *, gint, gint, ggobid *);
+gboolean   array_read (datad *, InputDescription *,  ggobid *);
+gboolean   br_edge_vectors_check_size (gint, datad *, ggobid *);
+gboolean   brush_once (gboolean force, splotd *, ggobid *);
+gboolean   build_symbol_vectors_by_var (cpaneld *, datad *, ggobid *);
+gboolean   checkequiv(gdouble **u0, gdouble **u1, gint nc, gint nd);
+gboolean   collabels_read (InputDescription *desc, gboolean, datad *, ggobid *);
+gboolean   colors_remap (colorschemed *scheme, gboolean force, ggobid *gg);
+gboolean   display_type_handles_action (displayd *, PipelineMode m);
+gboolean   edges_read (InputDescription *desc, gboolean, datad *, ggobid *);
+gboolean   edgeset_add (displayd *);
+gboolean   fileset_read (const gchar *, ggobid *);
+gboolean   fileset_read_init (const gchar *ldata_in, ggobid *);
+gboolean   ggobi_file_set_create (gchar *rootname, datad *, ggobid *);
+gboolean   hidden_read (InputDescription *desc, gboolean, datad *, ggobid *);
+gboolean   impute_fixed (gint, gint nvars, gint *vars, datad *, ggobid *);
+gboolean   isCrossed (gdouble, gdouble, gdouble, gdouble, gdouble, gdouble, gdouble, gdouble);
+gboolean   missing_values_read (InputDescription *desc, gboolean, datad *, ggobid *);
+gboolean   mouseinwindow (splotd *);
+gboolean   p1d_varsel (splotd *, gint, gint *, gint);
+gboolean   parcoords_varsel (cpaneld *, splotd *, gint, gint *, ggobid *);
+gboolean   pca_calc (datad *, ggobid *);
+gboolean   point_colors_read (InputDescription *desc, gboolean, datad *, ggobid *);
+gboolean   point_glyphs_read (InputDescription *desc, gboolean, datad *, ggobid *);
+gboolean   point_in_which_bin (gint, gint, gint *, gint *, datad *, splotd *);
+gboolean   reached_target(gfloat, gfloat, gint, gfloat *, gfloat *);
+gboolean   read_ascii_data(InputDescription *desc, ggobid *gg);
+gboolean   rowlabels_read (InputDescription *desc, gboolean, datad *, ggobid *);
+gboolean   scatmat_varsel (cpaneld *, splotd *, gint, gint *, gint, gboolean, ggobid *);
+gboolean   scatmat_varsel_simple (cpaneld *, splotd *, gint, gint *, ggobid *);
+gboolean   scree_mapped_p (ggobid *);
+gboolean   spherize_set_pcvars (datad *, ggobid *);
+gboolean   splot_event_handled (GtkWidget *, GdkEventKey *, cpaneld *, splotd *, ggobid *);
+gboolean   splot_plot_case (gint m, gboolean, datad *, splotd *, displayd *, ggobid *);
+gboolean   subset_block (gint, gint, datad *, ggobid *);
+gboolean   subset_everyn (gint, gint, datad *, ggobid *);
+gboolean   subset_random (gint, datad *, ggobid *);
+gboolean   subset_rowlab (gchar *, datad *, ggobid *);
+gboolean   subset_sticky (datad *, ggobid *);
+gboolean   t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg);
+gboolean   transform1_apply (gint, datad *, ggobid *);
+gboolean   transform2_apply (gint, datad *, ggobid *);
+gboolean   widget_initialized (GtkWidget *w);
+gboolean   xyplot_varsel (splotd *, gint, gint *, gint);
+displayd*  ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal);
+displayd*  datad_init (datad *, ggobid *, gboolean);
+displayd*  display_alloc_init (enum displaytyped, gboolean, datad *, ggobid *);
+displayd*  display_create (gint displaytype, gboolean missing_p, datad *, ggobid *);
+GlyphType  mapGlyphName (const gchar *gtype);
+displayd*  parcoords_new (gboolean, gint, gint *, datad *, ggobid *);
+displayd*  scatmat_new (gboolean, gint, gint *, gint, gint *, datad *, ggobid *);
+displayd*  scatterplot_new (gboolean, splotd *sp, datad *d, ggobid *);
+RedrawStyle  viewmode_activate (splotd *, PipelineMode, gboolean, ggobid *);
+datad *    datad_new(datad *d, ggobid *gg);
+displayd * createDisplayFromDescription (ggobid *, GGobiDisplayDescription *desc);
+GtkWidget *GGobi_addToolsMenuItem (gchar *label, ggobid *gg);
+GtkWidget *get_clist_from_object (GtkObject *);
+GtkItemFactory *get_main_menu (const GtkItemFactoryEntry[], gint, GtkAccelGroup *, GtkWidget  *, GtkWidget **, gpointer);
+vartabled *vartable_element_get (gint j, datad *d);
+vartabled *vartable_element_get_by_name (gchar *collab, datad *d);
+GtkWidget* CreateMenuCheck (GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
+GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
+RedrawStyle brush_activate (gboolean, displayd *, ggobid *);
+GtkWidget* create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, GtkSignalFunc func, ggobid *);
+colorschemed* default_scheme_init ();
+RedrawStyle identify_activate (gint, displayd *, ggobid *);
+RedrawStyle p1d_activate (gint, displayd *, ggobid *);
+PipelineMode projection_get (ggobid *);
+GtkWidget* submenu_make (gchar *, guint, GtkAccelGroup *);
+PipelineMode viewmode_get (ggobid *);
+GtkWidget* widget_find_by_name (GtkWidget *, gchar *);
+RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
+
+
 /*tsplot functions*/
 GtkWidget* cpanel_tsplot_make (ggobid *);
 void      cpanel_tsplot_set (cpaneld *, GtkWidget *, ggobid *);
@@ -630,7 +722,28 @@ void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
 void varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, datad *d);
 GtkWidget *varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, datad *d);
 
+
+void display_plot (displayd *display, RedrawStyle type, ggobid *gg);
+
 gboolean array_contains (gint* arr, gint n, gint el);
+
+void world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg);
+void splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg);
+void scatterXYAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc);
+void scatter1DAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc);
+
+#define VAR_CIRCLE_DIAM 40
+
+
+gboolean processRestoreFile(const gchar * const fileName, ggobid *gg);
+
+void scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventMotion *event, ggobid *gg);
+void scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *event, ggobid *gg);
+
+displayd *scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, datad *d, ggobid *gg);
+
+gboolean array_contains (gint* arr, gint n, gint el);
+
 
 #endif
 

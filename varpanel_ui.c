@@ -122,7 +122,6 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 {
   displayd *display = (displayd *) sp->displayptr;
   gboolean redraw = false;
-  gint jvar_prev = -1;
 
   if (display == NULL || !GTK_IS_GGOBI_WINDOW_DISPLAY(display) || 
             !GTK_IS_WIDGET (GTK_GGOBI_WINDOW_DISPLAY(display)->window)) 
@@ -133,55 +132,6 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
      redraw = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->variable_select(display, sp, jvar, btn, cpanel, gg);
-  } else {
-
-   switch (display->displaytype) {
-
-    case scatmat:
-      redraw = scatmat_varsel_simple (cpanel, sp, jvar, &jvar_prev, gg);
-    break;
-
-    case scatterplot:
-      switch (cpanel->projection) {
-        case P1PLOT:
-          redraw = p1d_varsel (sp, jvar, &jvar_prev, btn);
-          if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
-            reinit_transient_brushing (display, gg);
-        break;
-        case XYPLOT:
-          redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
-          if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
-            reinit_transient_brushing (display, gg);
-        break;
-        case TOUR2D:
-          tour2d_varsel (jvar, btn, d, gg);
-        break;
-        case TOUR1D:
-          tour1d_varsel (jvar, btn, d, gg);
-        break;
-        case COTOUR:
-          tourcorr_varsel (jvar, btn, d, gg);
-        break;
-        /*-- to pacify compiler if we change these to an enum --*/
-        case NULLMODE:
-        case ROTATE:
-        case SCALE:
-        case BRUSH:
-        case IDENT:
-        case EDGEED:
-        case MOVEPTS:
-        case SCATMAT:
-        case PCPLOT:
-        case NMODES:
-        default:
-        break;
-    }
-    break;
-
-    case unknown_display_type:
-    default:
-    break;
-  }
   }
 
     /* Change the source object for this event to something more meaningful! */
@@ -249,65 +199,13 @@ varpanel_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
 void
 varpanel_refresh (displayd *display, ggobid *gg) 
 {
-  gint j;
   splotd *sp = gg->current_splot;
-  cpaneld *cpanel = &display->cpanel;
-  GList *l;
   datad *d = display->d;
 
   if (sp != NULL && d != NULL) {
-
     if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
       GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->varpanel_refresh(display, sp, d);
-    } else {
-
-     switch (display->displaytype) {
-      case scatmat:
-        for (j=0; j<d->ncols; j++) {
-          varpanel_toggle_set_active (VARSEL_X, j, false, d);
-          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-          varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-        }
-        l = display->scatmat_cols;  /*-- assume rows = cols --*/
-        while (l) {
-          j = GPOINTER_TO_INT (l->data);
-          varpanel_toggle_set_active (VARSEL_X, j, true, d);
-          l = l->next;
-        }
-      break;
-
-      case scatterplot:
-        switch (cpanel->projection) {
-          case P1PLOT:
-            for (j=0; j<d->ncols; j++) {
-              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-
-              varpanel_toggle_set_active (VARSEL_X, j, j == sp->p1dvar, d);
-            }
-          break;
-          case XYPLOT:
-            for (j=0; j<d->ncols; j++) {
-              varpanel_toggle_set_active (VARSEL_X, j, 
-                (j == sp->xyvars.x), d);
-              varpanel_widget_set_visible (VARSEL_Y, j, true, d);
-              varpanel_toggle_set_active (VARSEL_Y, j, 
-                (j == sp->xyvars.y), d);
-            }
-          break;
-          /*-- to pacify compiler --*/
-  	  default:
-          break;
-      }
-      break;
-
-
-      case unknown_display_type:
-      default:
-      break;
-
     }
-   }
   }
 }
 
@@ -510,16 +408,12 @@ void
 GGOBI(selectScatterplotX) (gint jvar, ggobid *gg) 
 {
   displayd *display = gg->current_display;
-  if (display->displaytype != scatterplot)
-    return;
-  else {
-
-    datad *d = display->d;
-    splotd *sp = (splotd *) display->splots->data;
-    cpaneld *cpanel = &display->cpanel;
-
-    varsel (cpanel, sp, jvar, 1, false, false, false, d, gg);
-  }
+  GtkGGobiExtendedDisplayClass *klass;
+  if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(display))
+	  return;
+  klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+  if(klass->select_X)
+	  klass->select_X(display, jvar, gg);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -529,7 +423,6 @@ GGOBI(selectScatterplotX) (gint jvar, ggobid *gg)
 void
 varpanel_tooltips_set (displayd *display, ggobid *gg) 
 {
-  gint projection = projection_get (gg);
   gint j;
   datad *d = display->d;
   GtkWidget *wx, *wy, *label;
@@ -546,78 +439,6 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
        GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
        if(klass->varpanel_tooltips_set)
 	       klass->varpanel_tooltips_set(display, gg, wx, wy, label);
-    } else {
-
-     switch (display->displaytype) {
-
-      case scatmat:
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-          "Select to replace/insert/append a variable, or to delete it",
-          NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-          "Click to replace/insert/append a variable, or to delete it",
-          NULL);
-      break;
-
-      case scatterplot:
-        switch (projection) {
-          case P1PLOT:
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-              "Select to plot",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-              "Click left to plot horizontally, right or middle to plot vertically",
-              NULL);
-          break;
-          case XYPLOT:
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-              "Press to select the horizontally plotted variable",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-              "Press to select the vertically plotted variable",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-              "Click left to select the horizontal variable, middle for vertical",
-              NULL);
-
-          break;
-          case TOUR2D:
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-              "Click to select a variable to be available for touring",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-              "Click to select a variable to be available for touring",
-              NULL);
-          break;
-          case TOUR1D:
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-              "Click to select a variable to be available for touring",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-              "Click to select a variable to be available for touring",
-              NULL);
-          break;
-          case COTOUR:
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-              "Click to select a variable to be toured horizontally",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-              "Click to select a variable to be toured vertically",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-              "Click to select a variable to be available for touring",
-              NULL);
-          break;
-          /*-- to pacify compiler if we change these to an enum --*/
-  	  default:
-          break;
-      }
-      break;
-
-      case unknown_display_type:
-      default:
-      break;
     }
-   } 
   }
 }

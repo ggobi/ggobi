@@ -40,6 +40,8 @@ display_set_position (windowDisplayd *display, ggobid *gg)
   gtk_widget_set_uposition (display->window, posx, posy);
 }
 
+
+#ifdef SHOULD_BE_REMOVED
 static void
 display_open_cb (GtkWidget *w, datad *d)
 {
@@ -52,16 +54,62 @@ display_open_cb (GtkWidget *w, datad *d)
   display_create (display_type, missing_p, d, gg);
 }
 
+/* 
+  Create an instance of one of the builtin in display types.
+  For the Gtk-based extended display types, see
+  extended_display_open_cb() in display_ui.c and ensure that
+  changes made here are propogated to there.
+  (In the long run, it would be nice to have all of the display
+   types as real Gtk classes and have only one mechanism.)
+ */
+displayd *
+display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
+{
+  displayd *display;
+  gint *selected_vars, nselected_vars = 0;
+
+  if (d == NULL || d->nrows == 0)  /*-- if used before we have data --*/
+    return (NULL);
+
+  /*-- if trying to make a missing values plot without missing data --*/
+  if (missing_p && d->nmissing == 0) 
+    return (NULL);
+
+  /*-- find out what variable are selected in the var statistics panel --*/
+  selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+  nselected_vars = selected_cols_get (selected_vars, d, gg);
+
+  /*
+   * Turn off event handlers, remove submenus, and redraw the
+   * previous plot without a border.
+  */
+  splot_set_current (gg->current_splot, off, gg);
+
+  switch (displaytype) {
+    case scatmat:
+      display = scatmat_new (missing_p, nselected_vars, selected_vars, 
+			     nselected_vars, selected_vars,  d, gg);
+      break;
+    default:
+      break;
+  }
+
+  display_add (display, gg);
+
+  varpanel_refresh (display, gg);
+  g_free (selected_vars);
+
+  return (display);
+}
+#endif /* SHOULD_BE_REMOVED */
+
+
 
 void
 display_menu_build (ggobid *gg)
 {
-  GtkWidget *item;
   gint nd;
   datad *d0;
-  gint k;
-  GtkWidget *submenu, *anchor;
-  gchar *lbl;
 
   if(gg == NULL || gg->d == NULL)
       return;
@@ -74,121 +122,6 @@ display_menu_build (ggobid *gg)
 
   if (nd > 0) {
     gg->display_menu = gtk_menu_new ();
-
-    if (nd == 1) {
-      item = CreateMenuItem (gg->display_menu, "New scatterplot",
-        NULL, NULL, gg->main_menubar, gg->main_accel_group,
-        GTK_SIGNAL_FUNC (display_open_cb), (gpointer) d0, gg);
-      gtk_object_set_data (GTK_OBJECT (item),
-        "displaytype", GINT_TO_POINTER (scatterplot));
-      gtk_object_set_data (GTK_OBJECT (item),
-        "missing_p", GINT_TO_POINTER (0));
-
-    } else {  /*-- prepare the cascading menu for multiple data matrices --*/
-      datad *d;
-
-      submenu = gtk_menu_new ();
-      anchor = CreateMenuItem (gg->display_menu, "New scatterplot",
-        NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
-
-      k = 0;
-      while ((d = (datad*) g_slist_nth_data (gg->d, k++)) != NULL) {
-
-        /*-- add an item for each datad with variables --*/
-        if (g_slist_length (d->vartable) > 0) {
-          lbl = datasetName (d, gg);
-          item = CreateMenuItem (submenu, lbl,
-            NULL, NULL, gg->display_menu, gg->main_accel_group,
-            GTK_SIGNAL_FUNC (display_open_cb),
-            d, gg);
-          gtk_object_set_data (GTK_OBJECT (item),
-            "displaytype", GINT_TO_POINTER (scatterplot));
-          gtk_object_set_data (GTK_OBJECT (item),
-            "missing_p", GINT_TO_POINTER (0));
-          g_free (lbl);
-        }
-      }
-
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
-    }
-
-    if (nd == 1) {
-      item = CreateMenuItem (gg->display_menu, "New scatterplot matrix",
-        NULL, NULL, gg->main_menubar, gg->main_accel_group,
-        GTK_SIGNAL_FUNC (display_open_cb), (gpointer) d0, gg);
-      gtk_object_set_data (GTK_OBJECT (item),
-        "displaytype", GINT_TO_POINTER (scatmat));
-      gtk_object_set_data (GTK_OBJECT (item),
-        "missing_p", GINT_TO_POINTER (0));
-
-    } else {  /*-- prepare the menu for multiple data matrices --*/
-
-      submenu = gtk_menu_new ();
-      anchor = CreateMenuItem (gg->display_menu, "New scatterplot matrix",
-        NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
-
-      for (k=0; k<nd; k++) { 
-        datad *d = (datad*) g_slist_nth_data (gg->d, k);
-
-        /*-- add an item for each datad with variables --*/
-        if (g_slist_length (d->vartable) > 0) {
-          lbl = datasetName (d, gg);
-          item = CreateMenuItem (submenu, lbl,
-            NULL, NULL, gg->display_menu, gg->main_accel_group,
-            GTK_SIGNAL_FUNC (display_open_cb),
-            g_slist_nth_data (gg->d, k), gg);
-          gtk_object_set_data (GTK_OBJECT (item),
-            "displaytype", GINT_TO_POINTER (scatmat));
-          gtk_object_set_data (GTK_OBJECT (item),
-            "missing_p", GINT_TO_POINTER (0));
-          g_free (lbl);
-        }
-      }
-
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
-    } 
-
-#ifdef BUILTIN_PARCOORDS
-/*XX*/
-    if (nd == 1) {
-      item = CreateMenuItem (gg->display_menu, "New parallel coordinates plot",
-        NULL, NULL, gg->main_menubar, gg->main_accel_group,
-        GTK_SIGNAL_FUNC (display_open_cb), (gpointer) d0, gg);
-      gtk_object_set_data (GTK_OBJECT (item),
-        "displaytype", GINT_TO_POINTER (parcoords));
-      gtk_object_set_data (GTK_OBJECT (item),
-        "missing_p", GINT_TO_POINTER (0));
-
-    } else {  /*-- prepare the menu for multiple data matrices --*/
-
-      submenu = gtk_menu_new ();
-      anchor = CreateMenuItem (gg->display_menu,
-        "New parallel coordinates plot",
-        NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
-
-      for (k=0; k<nd; k++) { 
-        datad *d = (datad*) g_slist_nth_data (gg->d, k);
-
-        /*-- add an item for each datad with variables --*/
-        if (g_slist_length (d->vartable) > 0) {
-          lbl = datasetName (d, gg);
-          item = CreateMenuItem (submenu, lbl,
-            NULL, NULL, gg->display_menu, gg->main_accel_group,
-            GTK_SIGNAL_FUNC (display_open_cb),
-            g_slist_nth_data (gg->d, k), gg);
-          gtk_object_set_data (GTK_OBJECT (item),
-            "displaytype", GINT_TO_POINTER (parcoords));
-          gtk_object_set_data (GTK_OBJECT (item),
-            "missing_p", GINT_TO_POINTER (0));
-          g_free (lbl);
-        }
-      }
-
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
-    }
-#endif 
-
- 
 
     if(g_slist_length(ExtendedDisplayTypes)) {
        buildExtendedDisplayMenu(gg, nd, d0);

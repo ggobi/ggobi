@@ -4,8 +4,6 @@
 #include "vars.h"
 #include "externs.h"
 
-#define VAR_CIRCLE_DIAM 40
-
 static GtkWidget * varcircle_create (gint, datad *, ggobid *gg);
 static void varcircle_attach (GtkWidget *, gint, gint, datad *);
 static void varcircle_draw (gint, datad *, ggobid *gg); 
@@ -558,8 +556,6 @@ varcircles_refresh (datad *d, ggobid *gg) {
 void
 varcircle_draw (gint jvar, datad *d, ggobid *gg)
 {
-  gint r = VAR_CIRCLE_DIAM/2;
-  gint x,y;
   gboolean chosen = false;
   splotd *sp = gg->current_splot;
   displayd *display;
@@ -613,103 +609,11 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
                 0, 64 * 360);
 
   /*-- add the appropriate line --*/
-  switch (display->displaytype) {
-
-    case  scatterplot:
-      switch (cpanel->projection) {
-        case TOUR1D:
-          x = (gint) (display->t1d.F.vals[0][jvar]*(gfloat)r);
-          y = 0;
-          gdk_draw_line (da_pix,
-            gg->selvarfg_GC, r, r, r+x, r-y);
-
-          if (jvar == display->t1d_manip_var) {
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 150*64, 60*64);
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
-          }
-
-          for (k=0; k<display->t1d.nactive; k++) {
-            if (display->t1d.active_vars.els[k] == jvar) {
-              chosen = true;
-              break;
-            }
-          }
-        break;
-        case TOUR2D:
-          x = (gint) (display->t2d.F.vals[0][jvar]*(gfloat)r);
-          y = (gint) (display->t2d.F.vals[1][jvar]*(gfloat)r);
-          gdk_draw_line (da_pix,
-            gg->selvarfg_GC, r, r, r+x, r-y);
-
-          if (jvar == display->t2d_manip_var) {
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 0*64, 360*64);
-          }
-
-          for (k=0; k<display->t2d.nactive; k++) {
-            if (display->t2d.active_vars.els[k] == jvar) {
-              chosen = true;
-              break;
-            }
-          }
-        break;
-        case COTOUR:
-          /*          for (i=0; i<display->tcorr1.nactive; i++)
-            if (jvar == display->tcorr1.active_vars.els[i]) {
-              xvar = true;
-              break;
-            }*/
-          /*          if (xvar) {*/
-          x = (gint) (display->tcorr1.F.vals[0][jvar]*(gfloat)r);
-          y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
-          gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r+x, r-y);
-
-          if (jvar == display->tc1_manip_var) {
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 150*64, 60*64);
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
-          }
-          if (jvar == display->tc2_manip_var) {
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 60*64, 60*64);
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 240*64, 60*64);
-          }
-
-          for (k=0; k<display->tcorr1.nactive; k++) {
-            if (display->tcorr1.active_vars.els[k] == jvar) {
-              chosen = true;
-              break;
-            }
-          }
-          for (k=0; k<display->tcorr2.nactive; k++) {
-            if (display->tcorr2.active_vars.els[k] == jvar) {
-              chosen = true;
-              break;
-            }
-          }
-        break;
-
-        /*      } 
-          else {
-
-            x = 0;
-            y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
-            gdk_draw_line (da_pix,
-              gg->selvarfg_GC, r, r, r+x, r-y);
-
-          }*/
-
-        default:
-        break;
-      }
-      break;
-
-    default:
-      ;
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    GtkGGobiExtendedDisplayClass *klass;
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    if(klass->varcircle_draw)
+      chosen = klass->varcircle_draw(display, jvar, da_pix, gg);
   }
 
   /*

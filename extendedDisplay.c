@@ -18,21 +18,23 @@ gtk_display_tree_label(displayd *dpy)
 const gchar * const
 gtk_display_title_label(displayd *dpy)
 {
-  GtkGGobiExtendedDisplayClass *klass;
-  extendedDisplayd *edpy;
-  gchar * const label = "?";
-  klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
-  if(klass->titleLabel)
-    return(klass->treeLabel);
-  if(klass->title_label)
-    return(klass->title_label(dpy));
-  
-  edpy = GTK_GGOBI_EXTENDED_DISPLAY(dpy);
-  if(edpy->titleLabel) {
-    return(edpy->titleLabel);
-  }
-  
-  return(label);
+	GtkGGobiExtendedDisplayClass *klass;
+	extendedDisplayd *edpy;
+	gchar * const label = "?";
+
+	edpy = GTK_GGOBI_EXTENDED_DISPLAY(dpy);
+	if(edpy->titleLabel) {
+		return(edpy->titleLabel);
+	}
+
+	klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
+	if(klass->titleLabel)
+		return(klass->treeLabel);
+	if(klass->title_label)
+		return(klass->title_label(dpy));
+
+
+	return(label);
 }
 
 

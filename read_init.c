@@ -448,15 +448,7 @@ getDisplayDescription(xmlNodePtr node)
 enum displaytyped
 getDisplayType(const xmlChar *type)
 {
-  enum displaytyped val = unknown_display_type;
-  if(strcmp((char *)type, "scatterplot") == 0) 
-    val = scatterplot;
-  else if(strcmp((char *)type, "scatmatrix") == 0)
-    val = scatmat;
-  else
-    val = extended_display_type;
-
-  return(val);
+  return(extended_display_type);
 }
 
 
@@ -959,19 +951,19 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
   for (i = 0; i < desc->numVars; i++)
     vars[i] = resolveVariableName(desc->varNames[i], data);
   switch(desc->type) {
+#if 0
+/*XX*/
     case scatterplot:
       dpy = GGOBI(newScatterplot)(vars[0], vars[1], data, gg);
     break;
-#if 0
-/*XX*/
     case parcoords:
       dpy = GGOBI(newParCoords)(vars, desc->numVars, data, gg);
     break;
-#endif
     case scatmat:
       dpy = GGOBI(newScatmat)(vars, vars, desc->numVars,
                               desc->numVars, data, gg);
     break;
+#endif
     case extended_display_type:
       dpy = createExtendedDisplay(desc->typeName, vars, desc->numVars, data, gg);
       if(!dpy)

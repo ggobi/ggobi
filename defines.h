@@ -40,7 +40,13 @@
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};
 
-enum displaytyped {scatterplot, scatmat, 
+enum displaytyped {
+#if 0
+	           scatterplot, 
+#endif
+#if 0
+		   scatmat, 
+#endif
 #if 0
                    parcoords, 
 #endif

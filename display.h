@@ -193,6 +193,8 @@ typedef struct
 {
     GtkGGobiWindowDisplayClass parent_class;
 
+    gboolean show_edges_p; /* used in splot_draw_to_pixmap0_unbinned by scatmat and scatterplot (only) */
+
     gboolean binning_ok; /* see binning_permitted in brush.c */
     gboolean (*binningPermitted)(displayd *dpy);
 
@@ -245,6 +247,24 @@ typedef struct
 
     void (*add_plot_labels)(displayd *dpy, splotd *sp, GdkDrawable *, datad *, ggobid *);
 
+    gboolean (*varpanel_highd)(displayd *dpy);
+
+    void (*move_points_motion_cb)(displayd *, splotd *, GtkWidget *w, GdkEventMotion *event, ggobid *);
+    void (*move_points_button_cb)(displayd *, splotd *, GtkWidget *w, GdkEventButton *event, ggobid *);
+
+    void (*world_to_raw)(displayd *, splotd *, gint, datad *, ggobid *);
+    void (*viewmode_set)(displayd *, ggobid *);
+
+    gboolean (*varcircle_draw)(displayd *, gint jvar, GdkPixmap *da_pix, ggobid *gg);
+    void (*select_X)(displayd *, gint, ggobid *);
+
+    void (*tour1d_realloc)(displayd *, gint, datad *);
+    void (*tour2d_realloc)(displayd *, gint, datad *);
+    void (*tourcorr_realloc)(displayd *, gint, datad *);
+
+    void (*set_show_axes_option)(displayd *, gboolean);
+    void (*set_show_axes_label_option)(displayd *, gboolean);
+
 /* For splots */
 
     void (*sub_plane_to_screen)(splotd *sp, displayd *dpy, datad *d, ggobid *gg);
@@ -256,7 +276,7 @@ typedef struct {
 
    windowDisplayd dpy;
 
-   gchar * const titleLabel;
+   gchar * titleLabel;
 
    GtkWidget *cpanelWidget;
    

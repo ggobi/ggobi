@@ -82,7 +82,7 @@ make_control_panels (ggobid *gg)
 #endif
   cpanel_movepts_make (gg);
 
-  cpanel_parcoords_make (gg);
+
   cpanel_scatmat_make (gg);
 
   /* Leave the extendeded display types to be done on demand. */
@@ -126,11 +126,13 @@ static gboolean
 varpanel_highd (displayd *display)
 {
   gboolean highd = false;
-  gint projection = display->cpanel.projection;
 
-  if (display != NULL && display->displaytype == scatterplot)
-    if (projection == TOUR1D || projection == TOUR2D || projection == COTOUR)
-      highd = true;
+  if(display && GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+     GtkGGobiExtendedDisplayClass *klass;
+     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+     if(klass->varpanel_highd)
+       highd = klass->varpanel_highd(display);
+  }
 
   return (highd);
 }
@@ -259,18 +261,14 @@ viewmode_set (PipelineMode m, ggobid *gg)
    * type is selected.  (For parcoords and scatmat plots, the
    * value of projection is irrelevant.)
   */
-  if (display->displaytype == scatterplot) {
-    if (gg->viewmode <= COTOUR)
-      display->cpanel.projection = gg->viewmode;
-    gg->projection = display->cpanel.projection;
+   {
+    GtkGGobiExtendedDisplayClass *klass;
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+    if(klass->viewmode_set)
+        klass->viewmode_set(display, gg);
+   }
 
-    if (gg->projection != gg->prev_projection) {
-      scatterplot_show_rulers (display, gg->projection);
-      gg->prev_projection = gg->projection;
-    }
-  }
-
-  if (gg->viewmode != gg->prev_viewmode) {
+   if (gg->viewmode != gg->prev_viewmode) {
     /* 
      * If moving between modes whose variable selection interface
      * differs, swap in the correct display.

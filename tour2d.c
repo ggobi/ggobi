@@ -124,60 +124,16 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
-  gint old_ncols, i;
 
-  /*printf("%d\n", nc);*/
   for (l=gg->displays; l; l=l->next) {
+    GtkGGobiExtendedDisplayClass *klass;
     dsp = (displayd *) l->data;
-    if (dsp->displaytype != scatterplot)
+
+    if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp))
       continue;
-
-    /*
-     * because display_tour2d_init_null has been performed even if
-     * alloc_tour2d has not, Fa.ncols has been initialized.
-    */
-    old_ncols = dsp->t2d.Fa.ncols;
-
-    if (nc >= MIN_NVARS_FOR_TOUR2D) {
-      if (old_ncols < MIN_NVARS_FOR_TOUR2D)       
-        display_tour2d_init(dsp, gg);
-
-      if (dsp->d == d) {
-        arrayd_add_cols (&dsp->t2d.Fa, nc);
-        arrayd_add_cols (&dsp->t2d.Fz, nc);
-        arrayd_add_cols (&dsp->t2d.F, nc);
-        arrayd_add_cols (&dsp->t2d.Ga, nc);
-        arrayd_add_cols (&dsp->t2d.Gz, nc);
-        arrayd_add_cols (&dsp->t2d.G, nc);
-        arrayd_add_cols (&dsp->t2d.Va, nc);
-        arrayd_add_cols (&dsp->t2d.Vz, nc);
-        arrayd_add_cols (&dsp->t2d.tv, nc);
-
-        vectori_realloc (&dsp->t2d.active_vars, nc);
-        vectorf_realloc (&dsp->t2d.lambda, nc);
-        vectorf_realloc (&dsp->t2d.tau, nc);
-        vectorf_realloc (&dsp->t2d.tinc, nc);
-
-        arrayd_add_cols (&dsp->t2d_manbasis, (gint) nc);
-
-        /* need to zero extra cols */
-        for (i=old_ncols; i<nc; i++) {
-          dsp->t2d.Fa.vals[0][i] = dsp->t2d.Fa.vals[1][i] = 0.0;
-          dsp->t2d.Fz.vals[0][i] = dsp->t2d.Fz.vals[1][i] = 0.0;
-          dsp->t2d.F.vals[0][i] = dsp->t2d.F.vals[1][i] = 0.0;
-          dsp->t2d.Ga.vals[0][i] = dsp->t2d.Ga.vals[1][i] = 0.0;
-          dsp->t2d.Gz.vals[0][i] = dsp->t2d.Gz.vals[1][i] = 0.0;
-          dsp->t2d.G.vals[0][i] = dsp->t2d.G.vals[1][i] = 0.0;
-          dsp->t2d.Va.vals[0][i] = dsp->t2d.Va.vals[1][i] = 0.0;
-          dsp->t2d.Vz.vals[0][i] = dsp->t2d.Vz.vals[1][i] = 0.0;
-          dsp->t2d.tv.vals[0][i] = dsp->t2d.tv.vals[1][i] = 0.0;
-          dsp->t2d.active_vars.els[i] = 0;
-          dsp->t2d.lambda.els[i] = 0.0;
-          dsp->t2d.tau.els[i] = 0.0;
-          dsp->t2d.tinc.els[i] = 0.0;
-        }
-      }
-    }
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dsp)->klass);
+    if(klass->tour2d_realloc)
+        klass->tour2d_realloc(dsp, nc, d);
   }
 }
 

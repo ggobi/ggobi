@@ -355,15 +355,11 @@ displayd *
 GGOBI(newScatterplot) (gint ix, gint iy, datad *d, ggobid *gg)
 {
   displayd *display = NULL;
-  splotd* sp;
+  gint vars[2];
 
-  display = display_alloc_init (scatterplot, false, d, gg);
-  sp = splot_new (display, 400, 400, gg);
-
-  sp->xyvars.x = ix;
-  sp->xyvars.y = iy;
-
-  display = scatterplot_new (false, sp, d, gg);
+  vars[0] = ix;
+  vars[1] = iy;
+  display = scatterplot_new_with_vars(false, 2, vars, d, gg);
   display_add (display, gg);
 
   return (display);

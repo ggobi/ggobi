@@ -117,68 +117,13 @@ selected_cols_get (gint *cols, datad *d, ggobid *gg)
 gint
 plotted_cols_get (gint *cols, datad *d, ggobid *gg) 
 {
-  PipelineMode mode = viewmode_get (gg);
   gint ncols = 0;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
-  gint k;
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
        GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
        ncols = klass->plotted_vars_get(display, cols, d, gg);
-  } else {
-
-    switch (display->displaytype) {
-     case scatterplot:
-       switch (mode) {
-        case P1PLOT:
-          cols[ncols++] = sp->p1dvar;
-        break;
-        case XYPLOT:
-          cols[ncols++] = sp->xyvars.x;
-          cols[ncols++] = sp->xyvars.y;
-        break;
-        case TOUR1D:
-          for (k=0; k<display->t1d.nactive; k++)
-            cols[ncols++] = display->t1d.active_vars.els[k];
-        break;
-         case TOUR2D:
-          for (k=0; k<display->t2d.nactive; k++)
-            cols[ncols++] = display->t2d.active_vars.els[k];
-        break;
-        case COTOUR:
-          for (k=0; k<display->tcorr1.nactive; k++)
-            cols[ncols++] = display->tcorr1.active_vars.els[k];
-          for (k=0; k<display->tcorr2.nactive; k++)
-            cols[ncols++] = display->tcorr2.active_vars.els[k];
-        break;
-        default:
-        break;
-      }
-    break;
-    case scatmat:
-    {
-      GList *l;
-      splotd *s;
-      for (l=display->splots; l; l=l->next) {
-        s = (splotd *) l->data;
-        if (s->p1dvar == -1) {
-          if (!array_contains (cols, ncols, s->xyvars.x))
-            cols[ncols++] = s->xyvars.x;
-          if (!array_contains (cols, ncols, s->xyvars.y))
-            cols[ncols++] = s->xyvars.y;
-        } else {
-          if (!array_contains (cols, ncols, s->p1dvar))
-            cols[ncols++] = s->p1dvar;
-        }
-      }
-    }
-    break;
-
-    case unknown_display_type:
-    default:
-    break;
-   }
   }
 
   return ncols;

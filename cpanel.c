@@ -81,39 +81,9 @@ cpanel_set (displayd *display, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gboolean displaytype_known = true;
-  datad *d = display->d;
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-     displaytype_known = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->cpanel_set(display, cpanel, gg);
-  } else {
-   switch (display->displaytype) {
-    case scatterplot:
-      cpanel_p1d_set (cpanel, gg);
-      cpanel_xyplot_set (cpanel, gg);
-#ifdef ROTATION_IMPLEMENTED
-      cpanel_rotation_set (cpanel, gg);
-#endif
-      cpanel_brush_set (cpanel, gg);
-      cpanel_scale_set (cpanel, gg);
-      cpanel_tour1d_set (cpanel, gg);
-      if (d->ncols >= MIN_NVARS_FOR_TOUR2D)
-        cpanel_tour2d_set (cpanel, gg);
-      if (d->ncols >= MIN_NVARS_FOR_COTOUR)
-        cpanel_tourcorr_set (cpanel, gg);
-#ifdef EDIT_EDGES_IMPLEMENTED
-      cpanel_edgeedit_set (cpanel, gg);
-#endif
-      cpanel_identify_set (cpanel, gg);
-    break;
-    case scatmat:
-      cpanel_scatmat_set (cpanel, gg);
-      cpanel_brush_set (cpanel, gg);
-      cpanel_identify_set (cpanel, gg);
-    break;
-    default:
-      displaytype_known = false;
-    return;
-   }
+   displaytype_known = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->cpanel_set(display, cpanel, gg);
   }
 
   if (cpanel->viewmode < COTOUR) cpanel->projection = cpanel->viewmode;

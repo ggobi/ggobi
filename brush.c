@@ -198,8 +198,6 @@ binning_permitted (displayd *display, ggobid *gg)
 {
   datad *e = display->e;
   gboolean permitted = true;
-  gint type = display->displaytype;
-  cpaneld *cpanel = &display->cpanel;
 
   if (gg->linkby_cv)
     return(false);
@@ -214,16 +212,9 @@ binning_permitted (displayd *display, ggobid *gg)
     return(klass->binning_ok);
   }
 
-  /*-- if we're adding lines to ASHes --*/
-  if (type == scatterplot &&
-           projection_get(gg) == P1PLOT &&
-           cpanel->p1d.type == ASH &&
-           cpanel->p1d.ASH_add_lines_p)
-  {
-      permitted = false;
-  /*-- if we're drawing whiskers --*/
-  } else {  /*-- if we're drawing edges --*/
-    if (e != NULL && e->edge.n > 0) {
+
+    /*-- if we're drawing edges --*/
+   if (e != NULL && e->edge.n > 0) {
       if (display->options.edges_undirected_show_p ||
           display->options.edges_directed_show_p ||
           display->options.whiskers_show_p)
@@ -231,7 +222,7 @@ binning_permitted (displayd *display, ggobid *gg)
         permitted = false;
       }
     }
-  }
+
   return permitted;
 }
 

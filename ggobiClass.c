@@ -8,6 +8,9 @@
 
 #include "barchartDisplay.h"
 #include "parcoordsClass.h"
+#include "scatterplotClass.h"
+#include "scatmatClass.h"
+
 
 extern gint num_ggobis, totalNumGGobis;
 extern ggobid **all_ggobis;
@@ -327,9 +330,18 @@ GtkType gtk_ggobi_splot_get_type(void)
   return data_type;
 }
 
-static void extendedSPlotClassInit(GtkGGobiExtendedSPlotClass * klass)
+void
+extendedSPlotFree(splotd *sp)
+{
+  if (sp->edges != NULL) g_free ((gpointer) sp->edges);
+  if (sp->arrowheads != NULL) g_free ((gpointer) sp->arrowheads);
+}
+
+static void 
+extendedSPlotClassInit(GtkGGobiExtendedSPlotClass * klass)
 {
   klass->tree_label = NULL;
+  GTK_OBJECT_CLASS(klass)->destroy = extendedSPlotFree;
 }
 
 GtkType gtk_ggobi_extended_splot_get_type(void)
@@ -408,7 +420,7 @@ GtkType gtk_ggobi_extended_display_get_type(void)
 
 static void timeSeriesDisplayInit(timeSeriesDisplayd * dpy)
 {
-  dpy->extendedDpy.titleLabel = "time series";
+  dpy->extendedDpy.titleLabel = NULL;
 }
 
 GtkType gtk_ggobi_time_series_display_get_type(void)
@@ -441,24 +453,39 @@ GtkType gtk_ggobi_time_series_display_get_type(void)
 
 static void barchartDisplayInit(barchartDisplayd * dpy)
 {
-  dpy->extendedDpy.titleLabel = "barchart";
+   dpy->extendedDpy.titleLabel = NULL;
 }
 
-GtkType gtk_ggobi_barchart_display_get_type(void)
+/**
+ This is where we register the barchart class with the Gtk type/class system.
+This is invoked "transparently" when we use the GTK_GGOBI... macros
+ */
+GtkType
+gtk_ggobi_barchart_display_get_type (void)
 {
   static GtkType data_type = 0;
 
-  if (!data_type) {
-    static const GtkTypeInfo data_info = {
-      "GtkGGobiBarChartDisplay",
-      sizeof(barchartDisplayd),
-      sizeof(GtkGGobiBarChartDisplayClass),
-      (GtkClassInitFunc) barchartDisplayClassInit,
-      (GtkObjectInitFunc) barchartDisplayInit,
-      /* reserved_1 */ NULL,
-      /* reserved_2 */ NULL,
-      (GtkClassInitFunc) NULL,
-    };
+  if (!data_type)
+    {
+	    /* only register once. */
+      static const GtkTypeInfo data_info =
+      {
+        "GtkGGobiBarChartDisplay", /* Name of the class */
+        sizeof (barchartDisplayd),       /* size of the instance of this class. */
+	sizeof (GtkGGobiBarChartDisplayClass), /* size of the class definition itself, methods, etc.*/
+	(GtkClassInitFunc) barchartDisplayClassInit, /* routine to initialize the class, set the method pointers and constants */
+	(GtkObjectInitFunc) barchartDisplayInit, 
+/* very basic routine to initialize an instance of this class, 
+   after it is allocated by the Gtk system using gtk_type_new(). 
+   Typically we will have a higher level routine say, gtk_<myclass>_new_with...() 
+   which will in turn call gtk_type_new() and then initializes the structure with
+   its own arguments.
+*/
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
 
     data_type =
         gtk_type_unique(gtk_ggobi_extended_display_get_type(), &data_info);
@@ -590,6 +617,116 @@ GtkType gtk_ggobi_par_coords_splot_get_type(void)
     data_type =
         gtk_type_unique(gtk_ggobi_extended_splot_get_type(), &data_info);
   }
+
+  return data_type;
+}
+
+/********************************/
+
+GtkType 
+gtk_ggobi_scatter_splot_get_type(void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiScatterSPlot",
+	sizeof (scatterSPlotd),
+	sizeof (GtkGGobiScatterSPlotClass),
+	(GtkClassInitFunc) scatterSPlotClassInit,
+	(GtkObjectInitFunc) NULL,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_extended_splot_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
+
+
+GtkType
+gtk_ggobi_scatterplot_display_get_type (void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiScatterplotDisplay",
+	sizeof (scatterplotDisplayd),
+	sizeof (GtkGGobiScatterplotDisplayClass),
+	(GtkClassInitFunc) scatterplotDisplayClassInit,
+	(GtkObjectInitFunc) scatterplotDisplayInit,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_extended_display_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
+
+
+
+
+/******************************************/
+
+GtkType 
+gtk_ggobi_scatmat_splot_get_type(void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiScatmatSPlot",
+	sizeof (scatmatSPlotd),
+	sizeof (GtkGGobiScatmatSPlotClass),
+	(GtkClassInitFunc) scatmatSPlotClassInit,
+	(GtkObjectInitFunc) NULL,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_extended_splot_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
+GtkType
+gtk_ggobi_scatmat_display_get_type (void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiScatmatDisplay",
+	sizeof (scatmatDisplayd),
+	sizeof (GtkGGobiScatmatDisplayClass),
+	(GtkClassInitFunc) scatmatDisplayClassInit,
+	(GtkObjectInitFunc) NULL,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_extended_display_get_type (), &data_info);
+    }
 
   return data_type;
 }

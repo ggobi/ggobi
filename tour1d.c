@@ -132,58 +132,16 @@ tour1d_realloc_up (gint nc, datad *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
-  gint old_ncols, i;
 
   for (l=gg->displays; l; l=l->next) {
+    GtkGGobiExtendedDisplayClass *klass;
     dsp = (displayd *) l->data;
-    if (dsp->displaytype != scatterplot)
+
+    if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp))
       continue;
-
-    /*
-     * because display_tour1d_init_null has been performed even if
-     * alloc_tour1d has not, Fa.ncols has been initialized.
-    */
-    old_ncols = dsp->t1d.Fa.ncols;
-
-    if (old_ncols < MIN_NVARS_FOR_TOUR1D && nc >= MIN_NVARS_FOR_TOUR1D) {
-      display_tour1d_init(dsp, gg);
-    }
-
-    if (dsp->d == d) {
-      arrayd_add_cols (&dsp->t1d.Fa, nc);
-      arrayd_add_cols (&dsp->t1d.Fz, nc);
-      arrayd_add_cols (&dsp->t1d.F, nc);
-      arrayd_add_cols (&dsp->t1d.Ga, nc);
-      arrayd_add_cols (&dsp->t1d.Gz, nc);
-      arrayd_add_cols (&dsp->t1d.G, nc);
-      arrayd_add_cols (&dsp->t1d.Va, nc);
-      arrayd_add_cols (&dsp->t1d.Vz, nc);
-      arrayd_add_cols (&dsp->t1d.tv, nc);
-
-      vectori_realloc (&dsp->t1d.active_vars, nc);
-      vectorf_realloc (&dsp->t1d.lambda, nc);
-      vectorf_realloc (&dsp->t1d.tau, nc);
-      vectorf_realloc (&dsp->t1d.tinc, nc);
-
-      arrayd_add_cols (&dsp->t1d_manbasis, (gint) nc);
-
-      /* need to zero extra cols */
-      for (i=old_ncols; i<nc; i++) {
-        dsp->t1d.Fa.vals[0][i] = 0.0;
-        dsp->t1d.Fz.vals[0][i] = 0.0;
-        dsp->t1d.F.vals[0][i]  = 0.0;
-        dsp->t1d.Ga.vals[0][i] = 0.0;
-        dsp->t1d.Gz.vals[0][i] = 0.0;
-        dsp->t1d.G.vals[0][i] = 0.0;
-        dsp->t1d.Va.vals[0][i] = 0.0;
-        dsp->t1d.Vz.vals[0][i] = 0.0;
-        dsp->t1d.tv.vals[0][i] = 0.0;
-        dsp->t1d.active_vars.els[i] = 0;
-        dsp->t1d.lambda.els[i] = 0.0;
-        dsp->t1d.tau.els[i] = 0.0;
-        dsp->t1d.tinc.els[i] = 0.0;
-      }
-    }
+    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dsp)->klass);
+    if(klass->tour1d_realloc)
+        klass->tour1d_realloc(dsp, nc, d);
   }
 }
 
@@ -211,7 +169,8 @@ free_tour1d(displayd *dsp)
 }
 
 void 
-display_tour1d_init (displayd *dsp, ggobid *gg) {
+display_tour1d_init (displayd *dsp, ggobid *gg) 
+{
   gint i, j;
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;

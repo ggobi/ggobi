@@ -56,39 +56,6 @@ displays_print (ggobid *gg) {
 }
 */
 
-static void 
-display_datad_added_cb (GtkObject *obj /*gg->main_window*/,
-  datad *d, ggobid *gg, GtkObject *win)
-{
-  windowDisplayd *display = NULL;
-
-#if 0
-  displayd *dsp;
-  gint k;
-  GList *l;
-  for (l=gg->displays, k = 0; l; l=l->next, k++) {
-    windowDisplayd *wdsp = (windowDisplayd *) l->data;
-    if (wdsp->window == (GtkWidget *) win) {
-      display = (displayd *) l->data;
-      break;
-    }
-  }
-#else
-  display = (windowDisplayd*) win;
-#endif
-
-  /*-- this is all true even when the display is first opened --*/
-  if (GTK_WIDGET_REALIZED (display->window)) {
-    if (display->dpy.displaytype == scatterplot) {
-      scatterplot_display_edge_menu_update (GTK_GGOBI_DISPLAY(display), gg->app.sp_accel_group, 
-        display_options_cb, gg);
-    }
-  }
-  /*-- I'll need a scatmat_edge_menu_update, too, I think --*/
-}
-
-
-
 /*----------------------------------------------------------------------*/
 /*               Drawing routines                                       */
 /*----------------------------------------------------------------------*/
@@ -96,7 +63,8 @@ display_datad_added_cb (GtkObject *obj /*gg->main_window*/,
 /*-- replot all splots in display --*/
 /*-- type = EXPOSE, QUICK, BINNED, FULL --*/
 void
-display_plot (displayd *display, RedrawStyle type, ggobid *gg) {
+display_plot (displayd *display, RedrawStyle type, ggobid *gg) 
+{
   GList *slist;
   splotd *sp;
 
@@ -163,7 +131,6 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
         display->options.edges_arrowheads_show_p = w->active;
         gtk_object_set_data (GTK_OBJECT (w), "propagate",
           GINT_TO_POINTER(false));
-
         if (!w->active && display->options.edges_directed_show_p) { 
           ww = widget_find_by_name (display->edge_menu,
             "DISPLAY MENU: show directed edges");
@@ -230,51 +197,23 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 
     case DOPT_AXES:
       display->options.axes_show_p = w->active;
-
-      if (display->displaytype == scatterplot) {
-        switch (display->cpanel.projection) {
-          case XYPLOT:
-            if (display->hrule != NULL) {
-              scatterplot_show_vrule (display, w->active);
-              scatterplot_show_hrule (display, w->active);
-            }
-          break;
-          case P1PLOT:
-            if (display->hrule != NULL) {
-              if (display->p1d_orientation == VERTICAL)
-                scatterplot_show_vrule (display, w->active);
-              else
-                scatterplot_show_hrule (display, w->active);
-            }
-          case TOUR1D:
-          case TOUR2D:
-          case COTOUR:
-            display_plot (display, FULL, gg); /* di changed QUICK to FULL */
-          break;
-          default:
-          break;
-        }
+      if(GTK_IS_GGOBI_EXTENDED_DISPLAY_CLASS(display)) {
+        GtkGGobiExtendedDisplayClass *klass;
+	klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+	if(klass->set_show_axes_option)
+   	   klass->set_show_axes_option(display, w->active);
       }
     break;
 
     case DOPT_AXESLAB:
       display->options.axes_label_p = w->active;
-      
-      if (display->displaytype == scatterplot) {
-        switch (display->cpanel.projection) {
-          case XYPLOT:
-          break;
-          case P1PLOT:
-          break;
-          case TOUR1D:
-          case TOUR2D:
-          case COTOUR:
-            display_plot (display, FULL, gg);  /* di changed QUICK to FULL */
-          break;
-          default:
-          break;  
-        } 
-      }   
+
+      if(GTK_IS_GGOBI_EXTENDED_DISPLAY_CLASS(display)) {
+        GtkGGobiExtendedDisplayClass *klass;
+	klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+	if(klass->set_show_axes_label_option)
+   	   klass->set_show_axes_label_option(display, w->active);
+      }      
     break;
 
 /* unused
@@ -341,9 +280,6 @@ display_set_values(displayd *display, enum displaytyped type, datad *d, ggobid *
 {
   display->displaytype = type; 
 
-  if (type == scatterplot)
-    display->p1d_orientation = HORIZONTAL;
-
   /* Should copy in the contents of DefaultOptions to create
      an indepedently modifiable configuration copied from
      the current template.
@@ -365,59 +301,6 @@ display_alloc_init (enum displaytyped type, gboolean missing_p, datad *d, ggobid
   return (display);
 }
 
-/* 
-  Create an instance of one of the builtin in display types.
-  For the Gtk-based extended display types, see
-  extended_display_open_cb() in display_ui.c and ensure that
-  changes made here are propogated to there.
-  (In the long run, it would be nice to have all of the display
-   types as real Gtk classes and have only one mechanism.)
- */
-displayd *
-display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
-{
-  displayd *display;
-  gint *selected_vars, nselected_vars = 0;
-
-  if (d == NULL || d->nrows == 0)  /*-- if used before we have data --*/
-    return (NULL);
-
-  /*-- if trying to make a missing values plot without missing data --*/
-  if (missing_p && d->nmissing == 0) 
-    return (NULL);
-
-  /*-- find out what variable are selected in the var statistics panel --*/
-  selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
-  nselected_vars = selected_cols_get (selected_vars, d, gg);
-
-  /*
-   * Turn off event handlers, remove submenus, and redraw the
-   * previous plot without a border.
-  */
-  splot_set_current (gg->current_splot, off, gg);
-
-  switch (displaytype) {
-    case scatterplot:
-      display = scatterplot_new (missing_p, NULL, d, gg);
-      break;
-
-    case scatmat:
-      display = scatmat_new (missing_p,
-        nselected_vars, selected_vars, nselected_vars, selected_vars,
-        d, gg);
-      break;
-
-    default:
-      break;
-  }
-
-  display_add (display, gg);
-
-  varpanel_refresh (display, gg);
-  g_free (selected_vars);
-
-  return (display);
-}
 
 gint
 display_add (displayd *display, ggobid *gg)
@@ -632,13 +515,6 @@ display_set_current (displayd *new_display, ggobid *gg)
         f(gg->current_display, gg->viewmode_item);
       else
         submenu_destroy (gg->viewmode_item); /* default if no method provided. */
-    } else {
-    switch (gg->current_display->displaytype) {
-      case scatterplot:
-      case scatmat:
-      default:
-      break;
-    }
     }
   }
 
@@ -658,31 +534,6 @@ display_set_current (displayd *new_display, ggobid *gg)
         GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(new_display)->klass)->display_set;
       if(f)
         f(new_display, gg);
-    } else {
-      switch (new_display->displaytype) {
-      case scatterplot:
-        scatterplot_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) viewmode_set_cb, gg, true);
-        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-                                   gg->app.scatterplot_mode_menu); 
-        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
-      break;
-
-      case scatmat:
-        scatmat_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) viewmode_set_cb, gg, true);
-        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-                                   gg->app.scatmat_mode_menu); 
-        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
-      break;
-
-      default:
-      break;
-    }
     }
   }
 
@@ -718,17 +569,6 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     tmp = gtk_display_title_label(display);
-  } else {
-    switch (display->displaytype) {
-      case scatterplot:
-        tmp = "scatterplot display ";
-      break;
-      case scatmat:
-        tmp = "scatterplot matrix ";
-      break;
-      default:
-      break;
-    }
   }
 
   if (display->d->name != NULL) {
@@ -795,9 +635,6 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg)
       assign_points_to_bins (d, gg);
     }
 
-    if (display->displaytype == scatterplot)
-      ruler_ranges_set (false, display, sp, gg);
-
     if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
       void (*f)(gboolean, displayd *, splotd *, ggobid *);
       f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->ruler_ranges_set;
@@ -836,9 +673,6 @@ display_window_init (windowDisplayd *display, gint width, ggobid *gg)
                       GTK_SIGNAL_FUNC (display_delete_cb), (gpointer) display);
 
   GGobi_widget_set (GTK_WIDGET (display->window), gg, true);
-
-  gtk_signal_connect (GTK_OBJECT (gg->main_window), "datad_added",
-    (GtkSignalFunc) display_datad_added_cb, display);
 }
 
 
@@ -859,21 +693,11 @@ isEmbeddedDisplay (displayd *dpy)
 gboolean
 display_type_handles_action (displayd *display, PipelineMode viewmode) 
 {
-  gint dtype = display->displaytype;
   gboolean handles = false;
   PipelineMode v = viewmode;
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-
     handles = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->handles_action(display, v);
-
-  } else  if (dtype == scatterplot) { 
-       /*-- handles all view modes, but watch out for display types --*/
-    if (v != SCATMAT && v != PCPLOT)
-      handles = true;
-  } else if (dtype == scatmat) {
-    if (v == SCALE || v == BRUSH || v == IDENT || v == MOVEPTS || v == SCATMAT)
-      handles = true;
   } 
 
   return handles;

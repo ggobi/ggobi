@@ -20,7 +20,7 @@
 
 static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
 static void edges_draw (splotd *, GdkDrawable *, ggobid *gg);
-static void splot_nearest_edge_highlight (splotd *, gint, gboolean nearest, ggobid *);
+void splot_nearest_edge_highlight (splotd *, gint, gboolean nearest, ggobid *);
 
 static void splot_draw_tour_axes(splotd *, GdkDrawable *, ggobid *);
 
@@ -144,57 +144,6 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
       if(klass->draw_edge_p) {
          draw_edge = klass->draw_edge_p(sp, m, d, e, gg);
       }
-    } else {
-     switch (display->displaytype) {
-      case scatmat:
-        if (sp->p1dvar != -1) {
-          if (e->missing.vals[m][sp->p1dvar])
-            draw_edge = false;
-        } else {
-          if (e->missing.vals[m][sp->xyvars.x] ||
-              e->missing.vals[m][sp->xyvars.y])
-          {
-            draw_edge = false;
-          }
-        }
-      break;
-
-      case scatterplot:
-      {
-        gint proj = projection_get (gg);
-        switch (proj) {
-          case P1PLOT:
-            if (e->missing.vals[m][sp->p1dvar])
-              draw_edge = false;
-          break;
-          case XYPLOT:
-            if (e->missing.vals[m][sp->xyvars.x])
-              draw_edge = false;
-            else if (e->missing.vals[m][sp->xyvars.y])
-              draw_edge = false;
-          break;
-          case TOUR1D:
-            if (e->missing.vals[m][display->t1d.active_vars.els[m]])
-              draw_edge = false;
-          break;
-
-          case TOUR2D:
-            if (e->missing.vals[m][display->t2d.active_vars.els[m]])
-              draw_edge = false;
-          break;
-
-          case COTOUR:
-            if (e->missing.vals[m][display->tcorr1.active_vars.els[m]])
-              draw_edge = false;
-            else if (e->missing.vals[m][display->tcorr2.active_vars.els[m]])
-              draw_edge = false;
-          break;
-        }
-      }
-      break;
-      default:
-      break;
-     }
     }
   }
   return draw_edge;
@@ -225,60 +174,7 @@ splot_plot_case (gint m, gboolean ignore_hidden, datad *d,
       if(klass->draw_case_p) {
          draw_case = klass->draw_case_p(sp, m, d, gg);
       }
-    } else {
-
-    switch (display->displaytype) {
-      case scatmat:
-        if (sp->p1dvar != -1) {
-          if (d->missing.vals[m][sp->p1dvar])
-            draw_case = false;
-        } else {
-          if (d->missing.vals[m][sp->xyvars.x] ||
-              d->missing.vals[m][sp->xyvars.y])
-          {
-            draw_case = false;
-          }
-        }
-      break;
-
-
-      case scatterplot:
-      {
-        gint proj = projection_get (gg);
-        switch (proj) {
-          case P1PLOT:
-            if (d->missing.vals[m][sp->p1dvar])
-              draw_case = false;
-          break;
-          case XYPLOT:
-            if (d->missing.vals[m][sp->xyvars.x])
-              draw_case = false;
-            else if (d->missing.vals[m][sp->xyvars.y])
-              draw_case = false;
-          break;
-          case TOUR1D:
-            if (d->missing.vals[m][display->t1d.active_vars.els[m]])
-              draw_case = false;
-          break;
-
-          case TOUR2D:
-            if (d->missing.vals[m][display->t2d.active_vars.els[m]])
-              draw_case = false;
-          break;
-
-          case COTOUR:
-            if (d->missing.vals[m][display->tcorr1.active_vars.els[m]])
-              draw_case = false;
-            else if (d->missing.vals[m][display->tcorr2.active_vars.els[m]])
-              draw_case = false;
-          break;
-        }
-      }
-      break;
-      default:
-      break;
     }
-   }
   }
   return draw_case;
 }
@@ -297,14 +193,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   GtkWidget *da = sp->da;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
-  gint dtype = display->displaytype;
   colorschemed *scheme = gg->activeColorScheme;
   gushort maxcolorid;
-  icoords *baseline;
+
 #ifndef WIN32
-  cpaneld *cpanel = &display->cpanel;
-  gint proj = cpanel->projection;
-  gint i, m, n;
+  gint i, m;
   gboolean (*f)(splotd *, datad*, ggobid*, gboolean) = NULL;
 #endif
 
@@ -319,8 +212,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   */
   gboolean loop_over_points;
 
+  GtkGGobiExtendedDisplayClass *displayKlass = NULL;
+
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-   loop_over_points = display->options.points_show_p || GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->loop_over_points;
+   displayKlass =  GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+   loop_over_points = display->options.points_show_p || displayKlass->loop_over_points;
   } else
    loop_over_points = display->options.points_show_p;
 
@@ -342,7 +238,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
       display->options.edges_arrowheads_show_p ||
       display->options.edges_directed_show_p)
   {
-    if (dtype == scatterplot || dtype == scatmat)
+    if(displayKlass && displayKlass->show_edges_p)
       edges_draw (sp, sp->pixmap0, gg);
   }
 
@@ -382,34 +278,12 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
             draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen, m, gg);
           }
 
-          if (dtype == scatterplot) {
-            /*-- add ash baseline to p1d or tour1d --*/
-            if ((proj == TOUR1D && cpanel->t1d.ASH_add_lines_p) ||
-                (proj == P1PLOT &&
-                 cpanel->p1d.type == ASH &&
-                 cpanel->p1d.ASH_add_lines_p))
-            {
-              baseline = (proj == TOUR1D) ? &sp->tour1d.ash_baseline :
-                                            &sp->p1d.ash_baseline;
-
-              if (display->p1d_orientation == HORIZONTAL)
-                gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                  sp->screen[m].x, sp->screen[m].y,
-                  sp->screen[m].x, baseline->y);
-              else
-                gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                  sp->screen[m].x, sp->screen[m].y,
-                  baseline->x, sp->screen[m].y);
-            }
-          /*-- whiskers: parallel coordinate and time series plots --*/
-          } else if(klass && klass->within_draw_to_unbinned) {
+	  if(klass && klass->within_draw_to_unbinned) {
   	       klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
 	  }
         }
       }
      }
-
-
 
 #endif
     }  /* deal with mono later */
@@ -424,7 +298,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   icoords loc_clear0, loc_clear1;
 #ifndef WIN32
   gint ih, iv;
-  gint i, m, n;
+  gint i, m;
 #endif
   gint k;
   displayd *display = (displayd *) sp->displayptr;
@@ -553,13 +427,9 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 static void
 splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) 
 {
-  gint lbearing, rbearing, width, ascent, descent;
-  GtkStyle *style = gtk_widget_get_style (sp->da);
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  gint dtype = display->displaytype;
   datad *d = display->d;
-  vartabled *vt, *vtx, *vty;
   colorschemed *scheme = gg->activeColorScheme;
 
   gboolean proceed = (cpanel->projection == XYPLOT ||
@@ -571,78 +441,6 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     return;
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-
-  if (dtype == scatterplot || dtype == scatmat) {
-    if ((dtype == scatterplot && cpanel->projection == XYPLOT) ||
-        (dtype == scatmat && sp->p1dvar == -1))
-    {
-      /*-- xyplot: right justify the label --*/
-      vtx = vartable_element_get (sp->xyvars.x, d);
-      gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        vtx->collab_tform, strlen (vtx->collab_tform),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC,
-        sp->max.x - width - 5,  /*-- right justify --*/
-        sp->max.y - 5,
-        vtx->collab_tform);
-
-      vty = vartable_element_get (sp->xyvars.y, d);
-      gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        vty->collab_tform, strlen (vty->collab_tform),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC,
-        5, 5 + ascent + descent,
-        vty->collab_tform);
-    }
-
-    /*-- 1dplot: center the label --*/
-    if ((dtype == scatterplot && cpanel->projection == P1PLOT) ||
-        (dtype == scatmat && sp->p1dvar != -1))
-    {
-      vt = vartable_element_get (sp->p1dvar, d);
-      gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        vt->collab_tform, strlen (vt->collab_tform),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC,
-        sp->max.x/2 - width/2,  /*-- center --*/
-        sp->max.y - 5,
-        vt->collab_tform);
-    }
-
-  }
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     void (*f)(splotd *, GdkDrawable*, ggobid*);
@@ -845,7 +643,6 @@ void
 splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest, ggobid *gg)
 {
-  displayd *dsp = (displayd *) sp->displayptr;
   colorschemed *scheme = gg->activeColorScheme;
   gboolean useDefault = false;
 
@@ -1284,7 +1081,6 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   datad *e = display->e;
   datad *d = display->d;
   cpaneld *cpanel = &display->cpanel;
-  gint displaytype = display->displaytype;
   gint proj = cpanel->projection;
 
 /*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
@@ -1292,7 +1088,8 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       display->options.edges_arrowheads_show_p ||
       display->options.edges_directed_show_p)
   {
-    if (displaytype == scatterplot || displaytype == scatmat) {
+    if ((GTK_IS_GGOBI_EXTENDED_DISPLAY(display)  
+	  && GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->show_edges_p)) {
       if (e->nearest_point != -1)
         splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);
     }

@@ -19,7 +19,7 @@ static gchar *tsTreeLabel(splotd *sp, datad *d, ggobid *gg);
 
 
 void
-tsWorldToPlane(splotd *sp, datad *d, ggobid *gg)
+tsWorldToPlane(splotd *sp,  datad *d, ggobid *gg)
 {
       xy_reproject (sp, d->world.vals, d, gg);
 }

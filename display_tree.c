@@ -234,13 +234,6 @@ display_tree_label(displayd *display)
     val = (gchar *) gtk_display_tree_label(display);
  else
   switch(display->displaytype) {
-    case scatterplot:
-      val = "Scatterplot";
-      break;
-    case scatmat:
-      val = "Scatterplot Matrix";
-      break;
-
     case unknown_display_type:
       val = (gchar *) NULL;
       break;
@@ -265,69 +258,11 @@ display_tree_label(displayd *display)
 gchar *
 splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,  datad *d, ggobid *gg)
 {
-  gchar *buf = "";
-  gint n;
-  vartabled *vt, *vtx, *vty;
-
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(splot)) {
       return(GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(splot)->klass)->tree_label(splot, d, gg));
   }
 
-  switch (type) {
-    case scatterplot:
-    {
-     displayd *display = (displayd *) splot->displayptr; 
-     cpaneld *cpanel = &display->cpanel;
-
-     switch (cpanel->projection) {
-        case P1PLOT:
-        case TOUR1D:
-          vt = vartable_element_get (splot->p1dvar, d);
-          n = strlen (vt->collab);
-          buf = (gchar*) g_malloc(n* sizeof (gchar*));
-          sprintf(buf, "%s", vt->collab);
-        break;
-
-        case XYPLOT:
-          vtx = vartable_element_get (splot->xyvars.x, d);
-          vty = vartable_element_get (splot->xyvars.y, d);
-
-          n = strlen (vtx->collab) + strlen (vty->collab) + 5;
-          buf = (gchar*) g_malloc (n * sizeof (gchar*));
-          sprintf (buf, "%s v %s", vtx->collab, vty->collab);
-        break;
-
-        case TOUR2D:
-          n = strlen ("in grand tour");
-          buf = (gchar*) g_malloc (n * sizeof (gchar*));
-          sprintf (buf, "%s", "in grand tour");
-        break;
-
-        case COTOUR:
-          n = strlen ("in correlation tour");
-          buf = (gchar*) g_malloc (n * sizeof (gchar*));
-          sprintf (buf, "%s", "in correlation tour");
-        break;
-        default:
-        break;
-     }
-    }
-    break;
-    case scatmat:
-      vtx = vartable_element_get (splot->xyvars.x, d);
-      vty = vartable_element_get (splot->xyvars.y, d);
-
-      n = strlen (vtx->collab) + strlen (vty->collab) + 5;
-      buf = (gchar*) g_malloc (n * sizeof (gchar*));
-      sprintf (buf, "%s v %s", vtx->collab, vty->collab);
-    break;
-    case unknown_display_type:
-    break;
-    default:
-      break;
-  }
-
-  return (buf);
+  return (NULL);
 }
 
 

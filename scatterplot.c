@@ -16,6 +16,8 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 
+#include "scatterplotClass.h"
+
 #ifndef GTK_2_0
 #include "gtkext.h"
 #else
@@ -53,6 +55,7 @@ scatterplot_show_vrule (displayd *display, gboolean show) {
       gtk_widget_hide (display->vrule);
   }
 }
+
 void
 scatterplot_show_rulers (displayd *display, gint projection)
 {
@@ -175,6 +178,46 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 
 
+static void 
+display_datad_added_cb (GtkObject *obj /*gg->main_window*/,
+			datad *d, ggobid *gg, GtkObject *win)
+{
+  windowDisplayd *display =  GTK_GGOBI_WINDOW_DISPLAY(win);
+
+    /*-- this is all true even when the display is first opened --*/
+  if (GTK_WIDGET_REALIZED (display->window)) {
+      scatterplot_display_edge_menu_update (GTK_GGOBI_DISPLAY(display), gg->app.sp_accel_group, 
+					    display_options_cb, gg);
+  }
+}
+
+splotd *
+gtk_scatter_plot_new(displayd *dpy, gint width, gint height, ggobid *gg)
+{
+   splotd *sp = gtk_type_new(GTK_TYPE_GGOBI_SCATTER_SPLOT);
+   splot_init(sp, dpy, width, height, gg);
+   return(sp);  
+}
+
+displayd *
+scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, datad *d, ggobid *gg)
+{
+  splotd *sp;
+  displayd *display;
+
+  if(numVars < 2)
+     return(NULL);
+
+  sp = gtk_scatter_plot_new(NULL, 400, 400, gg);
+  sp->xyvars.x = vars[0];
+  sp->xyvars.y = vars[1];
+ 
+  display = scatterplot_new(missing_p, sp, d, gg); 
+  sp->displayptr = display;
+
+  return(display);
+}
+
 displayd *
 scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) 
 {
@@ -186,8 +229,9 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
   if (d == NULL || d->ncols < 1)
     return (NULL);
 
-  if (sp == NULL) {
-    display = display_alloc_init (scatterplot, missing_p, d, gg);
+  if (sp == NULL || sp->displayptr == NULL) {
+     display = gtk_type_new(GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY);
+     display_set_values(display, extended_display_type, d, gg);
   } else {
     display = (displayd*) sp->displayptr;
     display->d = d;
@@ -231,24 +275,23 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
 
   /*-- Initialize a single splot --*/
   if (sp == NULL) {
-    sp = splot_new (display, WIDTH, HEIGHT, gg);
+    sp = gtk_scatter_plot_new (display, WIDTH, HEIGHT, gg);
   }
 
   display->splots = NULL;
   display->splots = g_list_append (display->splots, (gpointer) sp);
 
   /*-- Initialize tours if possible --*/
-  if (display->displaytype == scatterplot) {
+ {
+/*XX seems like only scatterplot gets in here. (i.e. not scatmat) */
     display_tour1d_init_null (display, gg);
     if (d->ncols >= MIN_NVARS_FOR_TOUR1D)
       display_tour1d_init (display, gg);
-  }
-  if (display->displaytype == scatterplot) {
+
     display_tour2d_init_null (display, gg);
     if (d->ncols >= MIN_NVARS_FOR_TOUR2D)
       display_tour2d_init (display, gg);
-  }
-  if (display->displaytype == scatterplot) {
+
     display_tourcorr_init_null (display, gg);
     if (d->ncols >= MIN_NVARS_FOR_COTOUR)
       display_tourcorr_init (display, gg);
@@ -322,6 +365,9 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
    /*-- hide any extraneous rulers --*/
   scatterplot_show_rulers (display, projection);
   ruler_ranges_set (true, display, sp, gg);
+
+  gtk_signal_connect (GTK_OBJECT (gg->main_window), "datad_added",
+		        (GtkSignalFunc) display_datad_added_cb, display);
 
   return display;
 }
