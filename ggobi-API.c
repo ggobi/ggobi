@@ -166,6 +166,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   gint i, j;
   gchar *lbl;
   vartabled *vt;
+  extern void varpanel_clear (datad *, ggobid *);
 
   if(cleanup) {
       /* Release all the displays associated with this datad
