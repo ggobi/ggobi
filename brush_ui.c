@@ -252,7 +252,7 @@ motion_notify_cb(GtkWidget * w, GdkEventMotion * event, cpaneld * cpanel)
     fflush(stderr);
 #endif
 /*XX is this the correct source object? */
-    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[BRUSH_MOTION_SIGNAL], sp, event, sp->displayptr);
+    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[BRUSH_MOTION_SIGNAL], sp, event, sp->displayptr->d);
   }
   return true;
 }
