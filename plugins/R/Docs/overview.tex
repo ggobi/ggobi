@@ -1,7 +1,12 @@
 \documentclass{article}
 \usepackage{times}
 \usepackage{fullpage}
+\input{WebMacros}
+\input{SMacros}
+\input{CMacros}
+\input{XMLMacros}
 
+\author{Duncan Temple Lang}
 \title{Implementing Plugins for GGobi with R}
 \begin{document}
 \maketitle
@@ -89,7 +94,7 @@ A simple example is given in the following XML stanza.
 \end{verbatim}
 When this plugin is loaded by GGobi, we source the file
 \file{plugins/R/R/testPlugin.S}.  This defines a function named
-\SFuncion{ggobiTestPlugin} and this is the function that is called to
+\SFunction{ggobiTestPlugin} and this is the function that is called to
 create the plugin instance.
 
 The \SFunction{ggobiTestPlugin} function defines two functions within

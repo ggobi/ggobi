@@ -19,6 +19,9 @@ fi
 
 if test -e Install/config.h ; then
   mv Install/config.h .
+  if test ! -r GGobiConfig.h ; then
+    ln -s config.h GGobiConfig.h
+  fi
 fi
 
 AC_OUTPUT()

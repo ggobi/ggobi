@@ -43,7 +43,7 @@ Python: lib/libggobi.so
 	$(MAKE) -C Python
 
 
-ifneq(${PLUGIN_DIRS},)
+ifneq (${PLUGIN_DIRS},)
 Plugins:  @EMBED_LIB@
 	if test -n "${PLUGIN_DIRS}" ; then \
 	  for f in $(PLUGIN_DIRS) ; do \

@@ -418,23 +418,34 @@ AC_SUBST(PLUGIN_DIRS)
 
 if test -n "$MYSQL_PLUGIN" ; then 
  mysql_xml=plugins/MySQL/plugin.xml
+else
+ mysql_xml=/dev/null
 fi
 
 if test -n "$POSTGRES_PLUGIN" ; then 
  postgres_xml=plugins/Postgres/plugin.xml
+else
+ postgres_xml=/dev/null
 fi
 
 if test -n "$DATAVIEWER_PLUGIN" ; then 
  dataviewer_xml=plugins/DataViewer/plugin.xml
+else
+ dataviewer_xml=/dev/null
 fi
 
 if test -n "$FILESELECTOR_PLUGIN" ; then 
  fileselect_xml=plugins/FileSelect/plugin.xml
+else
+ fileselect_xml=/dev/null
 fi
 
 if test -n "${PLUGIN_DIRS}" ; then
  testInput_xml=plugins/TestInput/plugin.xml
  testPlugin_xml=plugins/TestPlugin/plugin.xml
+else
+ testInput_xml=/dev/null
+ testPlugin_xml=/dev/null
 fi
 
 AC_SUBST_FILE(mysql_xml)
@@ -454,6 +465,8 @@ AC_SUBST(INSTALL_DIR)
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
 AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate share/ggobirc)
+
+cp src/config.h include/GGobiConfig.h
 
 dnl Ensure the resulting ggobi scripts executable.
 chmod +x bin/ggobi

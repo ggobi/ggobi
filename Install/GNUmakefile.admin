@@ -17,7 +17,8 @@ DIRS=\
    plugins share
 
 
-PLUGIN_DIRS=MySQL Postgres DataViewer FileSelector TestInput TestPlugin 
+PLUGIN_DIRS=MySQL Postgres DataViewer FileSelector TestInput TestPlugin R JVM
+#ggvis
 
 SHARE_FILES=Install/ggobirc.in
 

@@ -82,3 +82,4 @@ AC_SUBST(XML_LIB_DIRS)
 AC_CONFIG_HEADER(config.h)
 
 AC_OUTPUT(GNUmakefile ../gtkext/src/GNUmakefile)
+cp config.h ../include/GGobiConfig.h

@@ -448,7 +448,6 @@ typedef struct {
      */
   gboolean showControlPanel;
 
-#ifdef USE_XML
     /**
       @ingroup SessionOptions
       Data for the initialization settings.
@@ -475,7 +474,6 @@ typedef struct {
      list of colorSchemes.
      */
   gchar *activeColorScheme;
-#endif
 } GGobiOptions;
 
 

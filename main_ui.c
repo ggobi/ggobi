@@ -20,7 +20,9 @@
 #include "externs.h"
 #include "display_tree.h"
 
+#ifdef USE_XML
 #include "write_state.h"
+#endif
 
 #ifdef SUPPORT_PLUGINS
 #include "plugin.h"
@@ -600,7 +602,9 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 
 
+/*
 #ifndef AS_GGOBI_LIBRARY
+*/
 /*
   Wrapper for gtk_main_quit so that we can override this in
   other applications to avoid quitting when the user selects
@@ -612,17 +616,18 @@ quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
   extern void closePlugins(ggobid *gg);
   gint n, i;
   ggobid *el;
+#ifdef SUPPORT_PLUGINS
   n = GGobi_getNumGGobis();
   for(i = 0; i < n ; i++) {
     el = GGobi_ggobi_get(i);
-    if(el != gg)
+    if(el != gg) 
       closePlugins(el);
   }
   closePlugins(gg);
-
+#endif
   gtk_main_quit();
 }
-#endif
+
 
 void 
 make_ui (ggobid *gg) {
