@@ -11,8 +11,6 @@
 #include "ggobi.h"
 #include "externs.h"
 
-extern gdouble randvalue (void);
-
 /*
  * The code in this file is taken from code written by Paul Tukey and
  * John Tukey, as described in their paper entitled

@@ -23,7 +23,6 @@ static void scale_set_default_values (GtkScale *scale )
 }
 
 void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
-  extern void tour_func (gboolean, ggobid *);
   cpanel->tour_paused_p = state;
 
   tour_func (!cpanel->tour_paused_p, gg);

@@ -324,7 +324,6 @@ void
 mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
-  extern void tour_func (gboolean, ggobid *);
 
   if (state == off) {
 
@@ -405,8 +404,6 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
   } else
     return(-1);
 }
-
-extern void filename_get_r (ggobid *, guint, GtkWidget *);
 
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",            NULL,     NULL,             0, "<Branch>" },

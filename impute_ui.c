@@ -6,9 +6,6 @@
 #include "vars.h"
 #include "externs.h"
 
-extern gboolean impute_random (ggobid *);
-extern gboolean impute_fixed (gint, ggobid *);
-
 static void
 delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data) {
   gtk_widget_hide (w);
@@ -34,12 +31,12 @@ impute_cb (GtkWidget *w, ggobid *gg) {
 
   switch (impute_type) {
     case IMP_RANDOM:
-      impute_random (gg);
+      impute_random (d, gg);
       break;
     case IMP_FIXED:
     case IMP_BELOW:
     case IMP_ABOVE:
-      redraw = impute_fixed (impute_type, gg);
+      redraw = impute_fixed (impute_type, d, gg);
       break;
   }
 

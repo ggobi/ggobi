@@ -49,7 +49,6 @@ subset_clear (datad *d, ggobid *gg) {
   for (i=0; i<d->nrows; i++)
     d->sampled[i] = false;
 
-
   for (i=0; i<d->nrgroups; i++) {
     rgid = d->rgroup_ids[i];
     d->rgroups[rgid].sampled = false;
@@ -112,9 +111,8 @@ subset_random (gint n, datad *d, ggobid *gg) {
 
   if (n > 0 && n < top) {
 
-    for (t=0, m=0; t<top && m<n; t++)
-    {
-      rrand = (gfloat) randvalue();
+    for (t=0, m=0; t<top && m<n; t++) {
+      rrand = (gfloat) randvalue ();
       if (((top - t) * rrand) < (n - m)) {
         if (add_to_subset (t, d, gg))
           m++;
@@ -164,8 +162,7 @@ subset_everyn (gint estart, gint estep, datad *d, ggobid *gg)
   gboolean doneit = false;
 
   top -= 1;
-  if (estart >= 0 && estart < top-1 && estep >= 0 && estep < top)
-  {
+  if (estart >= 0 && estart < top-1 && estep >= 0 && estep < top) {
     subset_clear (d, gg);
 
     i = estart;

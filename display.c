@@ -8,8 +8,6 @@
 
 #include "display_tree.h"
 
-extern void vardialog_open (ggobid *gg, gchar *title);
-
 DisplayOptions DefaultDisplayOptions = {
                                          true,  /* points_show_p */
                                          false, /* edges_directed_show_p */

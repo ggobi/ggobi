@@ -14,8 +14,6 @@
 #define EXTEND_FILESET 1
 #define WRITE_FILESET  2
 
-extern gboolean ggobi_file_set_create (gchar *rootname, ggobid *gg);
-
 void
 filesel_ok (GtkWidget *w, datad *d, GtkFileSelection *fs)
 {

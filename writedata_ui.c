@@ -84,7 +84,6 @@ static void delete_cb (GtkWidget *w, GdkEvent *event) {
   window = NULL;
 }
 
-extern void filename_get_w (GtkWidget *, ggobid *);
 void
 writeall_window_open (ggobid *gg) {
   GtkWidget *vbox, *table, *opt, *btn;

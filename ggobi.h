@@ -67,63 +67,20 @@ struct _ggobid {
  gchar *filename;      /* full file name, including path */
  gchar *fname;         /* file name without suffix: .dat, .missing */
 
- /* gboolean: does the data contain only one column? False by default */
-/*
- gboolean single_column;
-*/
-
 /*----------------------- pipeline ---------------------------------*/
-
-/*
- gint ncols, nrows;
- vardatad *vardata;
- GArray *rowlab;
-*/
 
  gint mode, prev_mode;
  gint projection, prev_projection;
-
-/*
- array_f raw, tform1, tform2;
- array_l world, jitdata;
-*/
 
  GtkWidget *vardata_window;
 
 /*----------------------- missing values ---------------------------*/
 
-/*
- gint nmissing;
- array_s missing;
- array_l missing_jitter, missing_world;
- gfloat missing_jitter_factor;
- lims missing_lim;
-*/
-
 /*---------------- deleting the hidden points; subsetting ----------*/
-
-/*
- gint *rows_in_plot;
- gint nrows_in_plot;
- gboolean *sampled;
-*/
 
 /*--------------- clusters: hiding, excluding ----------------------*/
  
-/*
- clusterd *clusv;
- gint nclust;
- vector_i clusterid;
- gboolean *included;
-*/
-
 /*----------------------- row grouping -----------------------------*/
-
-/*
- gint nrgroups, nrgroups_in_plot;
- gint *rgroup_ids;
- rgroupd *rgroups;
-*/
 
 /*----------------- segments in scatterplots -----------------------------*/
 
@@ -174,16 +131,6 @@ struct _ggobid {
 
 /*--------------------------- jittering --------------------------------*/
 
-/*
- struct _Jitter {
-   gfloat factor;
-   gboolean type;
-   gboolean vgroup;
-   gboolean convex;
-   gfloat *jitfacv;
- } jitter;
-*/
-
 /*------------------------- writing out data ---------------------------*/
 
  struct _Save {
@@ -230,15 +177,6 @@ struct _ggobid {
 
  glyphv glyph_id, glyph_0;
 
-/*
- gint npts_under_brush;
- gboolean *pts_under_brush;
- gshort *color_ids, *color_now, *color_prev;
- glyphv glyph_id, glyph_0;
- glyphv *glyph_ids, *glyph_now, *glyph_prev;
- gboolean *hidden, *hidden_now, *hidden_prev;
-*/
-
  struct _Brush_UI {
    GtkWidget *reset_menu;
    GtkWidget *link_menu;
@@ -247,13 +185,6 @@ struct _ggobid {
    GtkWidget *scope_opt;
    GtkWidget *brush_on_btn;
    brush_coords brush_pos ;  
-
-   /* binning */
-/*
-   gint nbins;
-   bin_struct **binarray;
-   icoords bin0, bin1;
-*/
 
    gboolean firsttime;
  } brush;
@@ -307,31 +238,21 @@ struct _ggobid {
    GtkAdjustment *npcs_adj;
    GtkWidget *totvar_entry, *condnum_entry;
    GtkWidget *sphere_apply_btn;
-
-/*
-   gint nspherevars;
-   gint *spherevars;
-   gint sphere_npcs;
-
-   gfloat *eigenval;
-   gfloat **eigenvec;
-   gfloat **vc;
-   gfloat *tform1_mean;
-*/
  } sphere_ui;
 
 /*-------------------- subsetting ------------------------------------*/
 
- struct _Subset {
+ struct _SubsetUI {
    gboolean rescale_p;
    GtkWidget *window;
    GtkWidget *notebook;
    /*-- entry widgets from which to get values for sample, rowlab --*/
-   GtkWidget *random_entry, *rowlab_entry;
-   /*-- adjustments from which to get values for blocksize, everyn --*/
-   GtkAdjustment *bstart_adj, *bsize_adj;
-   GtkAdjustment *estart_adj, *estep_adj;
- } subset;
+   GtkWidget *random_entry, *nrows_entry, *rowlab_entry;
+   /*-- spinners --*/
+   GtkWidget *bstart, *bsize;
+   GtkWidget *bstart_incr, *bsize_incr;
+   GtkWidget *estart, *estep;
+ } subset_ui;
 
 /*-------------------- scaling ---------------------------------------*/
 
@@ -371,11 +292,6 @@ struct _ggobid {
    GtkWidget *varpanel;
    GtkWidget *scrolled_window;
    GtkAccelGroup *varpanel_accel_group;
-   
-/*
-   GtkWidget **da, **varlabel;
-   gint vnrows, vncols, nvars;
-*/
  } varpanel_ui;
 
 /*----------------- variable selection menus -------------------------*/

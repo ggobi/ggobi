@@ -29,6 +29,14 @@ typedef struct /*-- datad --*/ {
  gint nrows_in_plot;
  gboolean *sampled;
 
+ struct _Subset {
+   gint random_n;
+   /*-- adjustments from which to get values for blocksize, everyn --*/
+   GtkAdjustment *bstart_adj, *bsize_adj;
+   GtkAdjustment *bstart_incr_adj, *bsize_incr_adj;
+   GtkAdjustment *estart_adj, *estep_adj;
+ } subset;
+
  /*--------------- clusters: hiding, excluding ----------------------*/
 
  gboolean *included;
