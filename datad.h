@@ -53,6 +53,10 @@ class datad {
 
  gint nrows;
  GArray *rowlab;
+/*
+ *GArray *rowid_name;  <- use a hash table
+ *vector_i rowid;
+*/
 
  gint ncols;
  vartabled *vartable;
@@ -87,12 +91,11 @@ class datad {
  /*--------------- clusters: hiding, excluding ----------------------*/
 
  GtkWidget *exclusion_table;
-/* gboolean *included;*/
  vector_b included;
  
  gint nclusters;
  clusterd *clusv;
- vector_i clusterids;
+ vector_i clusterid;
 
  /*----------------------- row grouping -----------------------------*/
 

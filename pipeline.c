@@ -32,6 +32,12 @@ pipeline_arrays_free (datad *d, ggobid *gg)
   arrayl_free (&d->world, 0, 0);
   arrayl_free (&d->jitdata, 0, 0);
 
+  /*-- should these be freed here as well? --*/
+  vectori_free (&d->clusterid);
+/*
+ * vectori_free (&d->rowid);
+*/
+
   g_free ((gpointer) d->rows_in_plot);
   vectorb_free (&d->sampled);
 }

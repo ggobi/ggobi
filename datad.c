@@ -52,7 +52,12 @@ datad_new(datad *d, ggobid *gg)
   arrayl_init (&d->missing_world);
   arrayl_init (&d->missing_jitter);
 
-  vectori_init (&d->clusterids);
+  vectori_init (&d->clusterid);
+
+  /*-- linking --*/
+/*
+ * vectori_init (&d->rowid);
+*/
 
   /*-- edges --*/
   vectors_init (&d->line.color);

@@ -230,7 +230,7 @@ control panel should update so that its panels correspond to the
 current display type and ViewMode.
 
 \subsubsection{Missing data displays}
-\ref{slbl:MissingData}
+% \ref{slbl:MissingData}
 
 
 \subsection{Selecting variables for plotting}
@@ -313,6 +313,35 @@ one axis is affected, convenient for browsing one variable at a time.
 \section{Tools}
 \subsection{Variable selection and statistics table}
 \label{slbl:VarStats}
+
+This important table is opened by selecting the first entry on the
+{\bf Tools} menu.  It has several important functions:
+\begin{itemize}
+\itemsep 0em
+\item the display of variable statistics,
+\item variable selection for other tools,
+\item setting variable ranges, and
+\item cloning variables.
+\end{itemize}
+
+Its first purpose is to display a few statistics for each variable:
+the current variable transformation (if any); the minimum, maximum,
+mean, and median of the raw data; the number of missing values per variable.
+
+You can also use it to select variables -- not for plotting, but to
+be operated on by other tools.  Variables are selected by highlighting
+rows, and the control and shift keys are modifiers that allow multiple
+rows to be highlighted.  The variable transformation tool, among
+others, will operate on the variables selected in this way.
+
+These selected variables will also respond to operations contained
+within this panel:  you can reset the variable ranges that are used
+for projecting the data into the plotting window.  This is especially
+useful for a data set where several of the variables have the same units.
+
+The selected variables can also be cloned, and the new variables
+you create will be added to the table as well as the main control panel.
+
 \subsection{Jittering}
 \subsection{Imputation controls for missing data}
 \subsection{Sphere}

@@ -46,7 +46,7 @@ scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 */
 
   CreateMenuItem (gg->app.scatterplot_mode_menu, "1D Tour",
-    "^t", "", NULL, accel_group, func,
+    "^g", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (TOUR1D) : gg, gg);
 
   CreateMenuItem (gg->app.scatterplot_mode_menu, "2D Tour",

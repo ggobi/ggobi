@@ -36,8 +36,8 @@ clusters_set (datad *d, ggobid *gg) {
    *  clusterid is the groups vector: an integer for each case,
    *  indicating its cluster membership
   */
-  if (d->clusterids.nels != d->nrows) {
-    vectori_alloc_zero (&d->clusterids, d->nrows);
+  if (d->clusterid.nels != d->nrows) {
+    vectori_alloc_zero (&d->clusterid, d->nrows);
   }
 
   /*
@@ -150,7 +150,7 @@ clusters_set (datad *d, ggobid *gg) {
             d->glyph_ids[i].size == d->clusv[n].glyphsize &&
             d->color_ids.els[i] == d->clusv[n].color)
         {
-          d->clusterids.els[i] = n;
+          d->clusterid.els[i] = n;
         }
       }
     }
@@ -166,7 +166,7 @@ clusters_set (datad *d, ggobid *gg) {
   if (nclust > 1) {
     for (i=0; i<d->nrows; i++) {
       if (d->sampled.els[i]) {
-        k = d->clusterids.els[i];
+        k = d->clusterid.els[i];
 
         d->hidden.els[i] = d->clusv[k].hidden;
         d->included.els[i] = d->clusv[k].included;

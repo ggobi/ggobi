@@ -95,11 +95,6 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  mt19937-1.o  \
  fileio.o
 
-
-# Needs to be \ for windows
-# Does glib/gtk have something for this
-CFLAGS+= -DDIR_SEPARATOR="'/'"
-
 ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c
  XML_OB= read_xml.o write_xml.o

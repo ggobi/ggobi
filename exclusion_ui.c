@@ -60,7 +60,7 @@ hide_cluster_cb (GtkToggleButton *btn, gpointer cbd)
 
   for (i=0; i<d->nrows; i++) {
     if (d->sampled.els[i]) {
-      if (d->clusterids.els[i] == k) {
+      if (d->clusterid.els[i] == k) {
         d->hidden.els[i] = d->hidden_now.els[i] = btn->active;
       }
     }
@@ -82,7 +82,7 @@ exclude_cluster_cb (GtkToggleButton *btn, gpointer cbd)
 
   for (i=0; i<d->nrows; i++) {
     if (d->sampled.els[i])  {
-      if (d->clusterids.els[i] == k) {
+      if (d->clusterid.els[i] == k) {
         d->included.els[i] = d->included.els[i] = !btn->active;
       }
     }

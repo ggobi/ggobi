@@ -107,6 +107,7 @@
 35729   10/23 progress in sphering; bug fixes in delete_vars
 37183   12/4  I don't know!
 37950   12/18 Nicholas's time series code?
+39312   2/15  lots of tour code; a few new event handlers
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

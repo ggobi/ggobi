@@ -178,7 +178,7 @@ impute_random (datad *d, ggobid *gg)
         */
         for (i=0; i<d->nrows_in_plot; i++) {
           k = d->rows_in_plot[i];
-          if (d->clusterids.els[k] == n) { 
+          if (d->clusterid.els[k] == n) { 
             if (!d->hidden_now.els[k]) {   /* ignore erased values altogether */
               if (d->missing.vals[k][j])
                 missv[nmissing++] = k;
