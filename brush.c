@@ -198,6 +198,7 @@ binning_permitted (displayd *display, ggobid *gg)
   datad *e = display->e;
   gboolean permitted = true;
   gint type = display->displaytype;
+  cpaneld *cpanel = &display->cpanel;
 
   if (gg->linkby_cv)
     permitted = false;
@@ -205,8 +206,15 @@ binning_permitted (displayd *display, ggobid *gg)
   else if (type == barchart)
     permitted = false;
 #endif
+  /*-- if we're adding lines to ASHes --*/
+  else if (type == scatterplot &&
+           projection_get(gg) == P1PLOT &&
+           cpanel->p1d.type == ASH &&
+           cpanel->p1d.ASH_add_lines_p)
+  {
+      permitted = false;
   /*-- if we're drawing whiskers --*/
-  else if ((type == parcoords || type == tsplot) &&
+  } else if ((type == parcoords || type == tsplot) &&
              display->options.whiskers_show_p)
   {
       permitted = false;
