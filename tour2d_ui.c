@@ -23,17 +23,7 @@ static void scale_set_default_values (GtkScale *scale )
 }
 
 void tour2d_pause (cpaneld *cpanel, gboolean state) {
-  extern void *tour_thread (void *);
-  extern pthread_t tour2d_tid;
-
   cpanel->is_tour_paused = state;
-
-g_printerr ("(pause) state=%d\n", state);
-  if (state) {
-    pthread_cancel (tour2d_tid);
-  } else {
-    pthread_create (&tour2d_tid, NULL, tour_thread, NULL);
-  }
 }
 
 static void tour2d_pause_cb (GtkToggleButton *button)
