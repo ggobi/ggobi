@@ -41,7 +41,11 @@ The second form passes the data frame as the first argument.
  > ggobi(mtcars)
 \end{verbatim}
 Both of these create ggobi in the same manner as the stand-alone
-application via the command line.  One can pass a vector of strings as
+application via the command line. 
+%  That claim isn't true.  Starting ggobi from a data frame does
+%  not initialize a display, but creating it with an external file
+%  does, just like the stand-alone application.   dfs
+One can pass a vector of strings as
 arguments which are processed as command line arguments.  When
 specifying the name of a file, one can specify whether this is XML,
 ASCII or binary.
@@ -57,7 +61,6 @@ later command.
  > ggobi()
 \end{verbatim}
 
-
 The opposite of creating a ggobi instance is closing its displays and
 removing it from the session.  This is done via
 \SFunction{close.ggobi}.  As usual, the particular instance to operate
@@ -66,15 +69,21 @@ default instance.
 
 \note{I have seen this crash, but can't yet see why.}
 
+%  Removing variables has not been implemented in ggobi itself.  dfs
+%At any point, the dataset can be augmented or reduced by
+%adding or removing variables.
+%\begin{verbatim}
+% addVariable.ggobi()
+% removeVariable.ggobi()
+%\end{verbatim}
 
-At any point, the dataset can be augmented or reduced by
-adding or removing variables.
+At any point, the dataset can be augmented by adding variables.
 \begin{verbatim}
  addVariable.ggobi()
- removeVariable.ggobi()
 \end{verbatim}
 
-\section{}
+%   Is there a reason for this empty section header?   dfs
+% \section{}
 
 
 \section{System Values}
@@ -90,6 +99,7 @@ They can be queried via the functions
 and 
 \SFunction{getGlyphSizes.ggobi}
 
+% This function seems to be broken.  dfs
 \begin{verbatim}
 > getGlyphTypes.ggobi()
  +  x or fr oc fc  . 
