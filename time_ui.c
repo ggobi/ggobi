@@ -10,6 +10,7 @@
 /*----------------------------------------------------------------------*/
 
 
+#ifdef TS_EXTENSIONS_IMPLEMENTED
 /* 
  * Toggles between a single plot with all selected series and individual
  * plots of all selected series
@@ -26,6 +27,7 @@ static void arrangement_cb (GtkWidget *w, gpointer cbd)
 
   gg->current_display->cpanel.tsplot_arrangement = indx;
 }
+#endif
 
 /* 
  * Five selection modes, Replace, Insert and Append behave as in parcoords 
@@ -37,7 +39,11 @@ static void arrangement_cb (GtkWidget *w, gpointer cbd)
  * variable is already in that plot. 
  */ 
 
+#ifdef TS_EXTENSIONS_IMPLEMENTED
 static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append","Delete", "Overlay"};
+#else
+static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append","Delete"};
+#endif
 static void selection_mode_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
@@ -45,19 +51,20 @@ static void selection_mode_cb (GtkWidget *w, gpointer cbd)
   cpanel->tsplot_selection_mode = GPOINTER_TO_INT (cbd);
 }
 
+#ifdef TS_EXTENSIONS_IMPLEMENTED
 /*
  * "Common" scales all series by 
  * argmax(argmax(var[i]) forall i)-argmin(argmin(var[i] forall i)), 
  * while "Independent" scales each series independently by its min 
  * and max to [0,1].
  */
-
 static gchar *varscale_lbl[] = {"Common", "Independent"};
 static void varscale_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
   g_printerr ("cbd: %s\n", varscale_lbl[indx]);
 }
+#endif
 
 /*--------------------------------------------------------------------*/
 /*                   Control panel section                            */
@@ -70,6 +77,7 @@ cpanel_tsplot_make (ggobid *gg) {
   gg->control_panel[TSPLOT] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[TSPLOT]), 5);
 
+#ifdef TS_EXTENSIONS_IMPLEMENTED
 /*
  * arrangement of plots, row or column
 */
@@ -89,6 +97,8 @@ cpanel_tsplot_make (ggobid *gg) {
   populate_option_menu (opt, arrangement_lbl,
                         sizeof (arrangement_lbl) / sizeof (gchar *),
                         arrangement_cb, gg);
+#endif
+
 /*
  * option menu: selection mode
 */
@@ -112,6 +122,7 @@ cpanel_tsplot_make (ggobid *gg) {
  * Variable scales
 */
 
+#ifdef TS_EXTENSIONS_IMPLEMENTED
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[TSPLOT]), vb, false, false, 0);
 
@@ -127,6 +138,7 @@ cpanel_tsplot_make (ggobid *gg) {
   populate_option_menu (opt, varscale_lbl,
                         sizeof (varscale_lbl) / sizeof (gchar *),
                         varscale_cb, gg);
+#endif
 
 
   gtk_widget_show_all (gg->control_panel[TSPLOT]);

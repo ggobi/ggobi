@@ -381,7 +381,6 @@ splot_add_plot_labels (splotd *sp, ggobid *gg) {
     if ((dtype == scatterplot && cpanel->projection == XYPLOT) ||
         (dtype == scatmat && sp->p1dvar == -1))
     {
-
       gdk_text_extents (style->font, 
         d->vartable[ sp->xyvars.x ].collab_tform,
         strlen (d->vartable[ sp->xyvars.x ].collab_tform),
@@ -403,7 +402,6 @@ splot_add_plot_labels (splotd *sp, ggobid *gg) {
     if ((dtype == scatterplot && cpanel->projection == P1PLOT) ||
         (dtype == scatmat && sp->p1dvar != -1))
     {
-
       gdk_text_extents (style->font,
         d->vartable[ sp->p1dvar ].collab_tform,
         strlen (d->vartable[ sp->p1dvar ].collab_tform),
@@ -427,6 +425,26 @@ splot_add_plot_labels (splotd *sp, ggobid *gg) {
 
   } else if (dtype ==tsplot) {
 
+    GList *l = display->splots;
+    if (l->data == sp) {
+      gdk_text_extents (style->font, 
+        d->vartable[ sp->xyvars.x ].collab_tform,
+        strlen (d->vartable[ sp->xyvars.x ].collab_tform),
+        &lbearing, &rbearing, &width, &ascent, &descent);
+      gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
+        sp->max.x - width - 5,
+        sp->max.y - 5,
+        d->vartable[ sp->xyvars.x ].collab_tform);
+    }
+    gdk_text_extents (style->font, 
+      d->vartable[ sp->xyvars.y ].collab_tform,
+      strlen (d->vartable[ sp->xyvars.y ].collab_tform),
+      &lbearing, &rbearing, &width, &ascent, &descent);
+    gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
+      5, 5 + ascent + descent,
+      d->vartable[ sp->xyvars.y ].collab_tform);
+
+/*
     gdk_text_extents (style->font,
       d->vartable[ sp->xyvars.y ].collab_tform,
       strlen (d->vartable[ sp->xyvars.y ].collab_tform),
@@ -435,7 +453,7 @@ splot_add_plot_labels (splotd *sp, ggobid *gg) {
       5,
       sp->max.y - 5,
       d->vartable[ sp->xyvars.y ].collab_tform);
-
+*/
   }
 
 }

@@ -133,7 +133,7 @@ tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 }
 
 
-#define MAXNPCPLOTS 6
+#define MAXNTSPLOTS 6
 displayd *
 tsplot_new (gboolean missing_p, gint nvars, gint *vars,
   datad *d, ggobid *gg) 
@@ -147,7 +147,7 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars,
 
   display = display_alloc_init (tsplot, missing_p, d, gg);
   if (nvars == 0) {
-    nplots = MIN ((d->ncols-1), MAXNPCPLOTS);
+    nplots = MIN ((d->ncols-1), MAXNTSPLOTS);
     for (i=1; i<nplots; i++)
       vars[i] = i;
   } else {
@@ -206,7 +206,7 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars,
       sp->xyvars.y = i; 
     } else
        sp = sub_plots[i];
-gre*/
+*/
 
     display->splots = g_list_append (display->splots, (gpointer) sp);
     gtk_box_pack_start (GTK_BOX (gg->tsplot.arrangement_box),
@@ -257,15 +257,19 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
 
   splot_get_dimensions (sp, &width, &height);
 
+  /*
+   *  if left button click, the x variable no matter what
+   *  selection_mode prevails.
+  */
   if (button == 1) {
     l = display->splots;
     s = (splotd *) l->data;
-    if (s->xyvars.x == jvar) redraw=false;
-    else{
+    if (s->xyvars.x == jvar) redraw=false;  /*-- this is already the x var --*/
+    else {
       while (l) {
-	s = (splotd *) l->data;
+        s = (splotd *) l->data;
         s->xyvars.x = jvar;
-	l = l->next;
+        l = l->next;
       }
     }
 
@@ -284,108 +288,115 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
       k = 0;
       l = display->splots;
       while (l) {
-	s = (splotd *) l->data;
-	if (s->xyvars.y == jvar) {
-	  jvar_sp = s;
-	  jvar_indx = k;
-	  break;
-	}
-	l = l->next;
-	k++;
+        s = (splotd *) l->data;
+        if (s->xyvars.y == jvar) {
+          jvar_sp = s;
+          jvar_indx = k;
+          break;
+        }
+        l = l->next;
+        k++;
       }
 
       if (jvar_sp != NULL && nplots > 1 && 
          cpanel->tsplot_selection_mode == VAR_DELETE) {
-	/*-- Delete the plot from the list, and destroy it. --*/
-	display->splots = g_list_remove (display->splots, (gpointer) jvar_sp);
+        /*-- Delete the plot from the list, and destroy it. --*/
+        display->splots = g_list_remove (display->splots, (gpointer) jvar_sp);
 
-	/*-- keep the window from shrinking by growing all plots --*/
-	ratio = (gfloat) nplots / (gfloat) (nplots-1);
+        /*-- keep the window from shrinking by growing all plots --*/
+        ratio = (gfloat) nplots / (gfloat) (nplots-1);
         height = (gint) (ratio * (gfloat) height);
 
-	l = display->splots;
-	while (l) {
-	  w = ((splotd *) l->data)->da;
-	  gtk_widget_ref (w);
-	  /*-- shrink each plot --*/
-	  gtk_widget_set_usize (w, -1, -1);
-	  gtk_widget_set_usize (w, width, height);
-	  /* */
-	  l = l->next ;
-	}
-	/* */
+        l = display->splots;
+        while (l) {
+          w = ((splotd *) l->data)->da;
+          gtk_widget_ref (w);
+          /*-- shrink each plot --*/
+          gtk_widget_set_usize (w, -1, -1);
+                 gtk_widget_set_usize (w, width, height);
+          /* */
+          l = l->next ;
+        }
+        /* */
 
-	/*
-	 * If the plot being removed is the current plot, reset
-	 * gg->current_splot.
-	 */
-	if (jvar_sp == gg->current_splot) {
-	  sp_event_handlers_toggle (sp, off);
+        /*
+         * If the plot being removed is the current plot, reset
+         * gg->current_splot.
+         */
+        if (jvar_sp == gg->current_splot) {
+          sp_event_handlers_toggle (sp, off);
 
-	  new_indx = (jvar_indx == 0) ? 0 : MIN (nplots-1, jvar_indx);
-	  gg->current_splot = (splotd *)
-	    g_list_nth_data (display->splots, new_indx);
-	  /* just for insurance, to handle the unforeseen */
-	  if (gg->current_splot == NULL) 
-	    gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
-	}
+          new_indx = (jvar_indx == 0) ? 0 : MIN (nplots-1, jvar_indx);
+          gg->current_splot = (splotd *)
+            g_list_nth_data (display->splots, new_indx);
+          /* just for insurance, to handle the unforeseen */
+          if (gg->current_splot == NULL) 
+            gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
 
-	splot_free (jvar_sp, display, gg);
+          /*-- dfs, keeping event handling in sync --*/
+          splot_set_current (gg->current_splot, on, gg);
+        }
 
-	nplots--;
+        splot_free (jvar_sp, display, gg);
+
+        nplots--;
       }
 
-    } else if(cpanel->tsplot_selection_mode != VAR_DELETE){
+    } else if(cpanel->tsplot_selection_mode != VAR_DELETE) {
 
       if (cpanel->tsplot_selection_mode == VAR_REPLACE) {
-	*jvar_prev = sp->xyvars.y;
-	sp->xyvars.y = jvar;
-	/*sp->xyvars.x = 0 */
-	redraw = true;
+        *jvar_prev = sp->xyvars.y;
+        sp->xyvars.y = jvar;
+        /*sp->xyvars.x = 0 */
+        redraw = true;
 
       } else {
 
-	/*-- keep the window from growing by shrinking all plots --*/
-	ratio = (gfloat) nplots / (gfloat) (nplots+1);
-	/*       if (cpanel->parcoords_arrangement == ARRANGE_ROW) */
-	/*         width = (gint) (ratio * (gfloat) width); */
-	/*       else */
+        /*-- prepare to reset the current plot --*/
+        sp_event_handlers_toggle (sp, off);
+
+        /*-- keep the window from growing by shrinking all plots --*/
+        ratio = (gfloat) nplots / (gfloat) (nplots+1);
+        /*       if (cpanel->parcoords_arrangement == ARRANGE_ROW) */
+        /*         width = (gint) (ratio * (gfloat) width); */
+        /*       else */
         height = (gint) (ratio * (gfloat) height);
-	/* */
-	l = display->splots;
-	sp_new = splot_new (display, width, height, gg);
-	sp_new->xyvars.y = jvar;
+        /* */
+        l = display->splots;
+        sp_new = splot_new (display, width, height, gg);
+        sp_new->xyvars.y = jvar;
         /*sp_new->xyvars.x = (splotd *) l->data.xyvars.x;*/
 
-	if (cpanel->tsplot_selection_mode == VAR_INSERT)
-	  display->splots = g_list_insert (display->splots,
-					   (gpointer) sp_new, sp_indx);
-	else if (cpanel->tsplot_selection_mode == VAR_APPEND)
-	  display->splots = g_list_insert (display->splots,
-					   (gpointer) sp_new, MIN (sp_indx+1, nplots));
+        if (cpanel->tsplot_selection_mode == VAR_INSERT)
+          display->splots = g_list_insert (display->splots,
+                                           (gpointer) sp_new, sp_indx);
+        else if (cpanel->tsplot_selection_mode == VAR_APPEND)
+          display->splots = g_list_insert (display->splots,
+            (gpointer) sp_new, MIN (sp_indx+1, nplots));
 
-	box = (sp->da)->parent;
-	gtk_box_pack_end (GTK_BOX (box), sp_new->da, false, false, 0);
-	gtk_widget_show (sp_new->da);
+        box = (sp->da)->parent;
+        gtk_box_pack_end (GTK_BOX (box), sp_new->da, false, false, 0);
+        gtk_widget_show (sp_new->da);
 
-	/*l = display->splots;*/
-	while (l) {
-	  w = ((splotd *) l->data)->da;
-	  gtk_widget_ref (w);
+        /*l = display->splots;*/
+        while (l) {
+          w = ((splotd *) l->data)->da;
+          gtk_widget_ref (w);
 
-	  /* shrink each plot */
-	  gtk_widget_set_usize (w, -1, -1);
-	  gtk_widget_set_usize (w, width, height);
-	  /* */
+          /* shrink each plot */
+          gtk_widget_set_usize (w, -1, -1);
+          gtk_widget_set_usize (w, width, height);
+          /* */
 
-	  gtk_container_remove (GTK_CONTAINER (box), w);
-	  gtk_box_pack_start (GTK_BOX (box), w, true, true, 0);
-	  gtk_widget_unref (w);  /*-- decrease the ref_count by 1 --*/
-	  l = l->next ;
-	}
+          gtk_container_remove (GTK_CONTAINER (box), w);
+          gtk_box_pack_start (GTK_BOX (box), w, true, true, 0);
+          gtk_widget_unref (w);  /*-- decrease the ref_count by 1 --*/
+          l = l->next ;
+        }
 
-	gg->current_splot = sp_new;
-	redraw = true;
+        gg->current_splot = sp_new;
+        sp_event_handlers_toggle (sp_new, on);
+        redraw = true;
       }
     }
   }
@@ -414,7 +425,7 @@ tsplot_rewhisker (splotd *sp, ggobid *gg) {
           d->nmissing > 0 &&
           (d->missing.vals[i][sp->xyvars.x] || 
            d->missing.vals[i][sp->xyvars.y] ||
-	   d->missing.vals[i+1][sp->xyvars.x] || 
+           d->missing.vals[i+1][sp->xyvars.x] || 
            d->missing.vals[i+1][sp->xyvars.y]))
     {
       draw_whisker = false;
