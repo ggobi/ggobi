@@ -110,12 +110,14 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
 
   el = getXMLElement(node, "background");
   if(el) {
-      /*char *tmp;*/
-      el = getXMLElement(el, "color");
-      info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
-      getColor(el, doc, NULL, info->bgColor);
-      if(gdk_colormap_alloc_color(gdk_colormap_get_system(), info->bgColor, false, true) == false)
-	  fprintf(stderr, "Can't allocate background color\n"); fflush(stderr);
+    el = getXMLElement(el, "color");
+    info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
+    getColor(el, doc, NULL, info->bgColor);
+    if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
+      info->bgColor, false, true) == false)
+    {
+      g_printerr ("Can't allocate background color\n");
+    }
   }
 
   return(0);

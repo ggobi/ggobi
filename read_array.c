@@ -332,7 +332,7 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
 gboolean
 read_ascii_data(InputDescription *desc, ggobid *gg)
 {
-  datad *d; /* datad_new (gg);*/
+  datad *d;
 
   d = datad_new (NULL, gg);
 
