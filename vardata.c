@@ -43,6 +43,10 @@ void vardata_init ()
 	xg.vardata[j].tform2 = NO_TFORM2;
 
     xg.vardata[j].jitter_factor = 0.0;
+
+    xg.vardata[j].collab = NULL;
+    xg.vardata[j].collab_tform = NULL;
+    xg.vardata[j].groupid = 0;
   }
 }
 
