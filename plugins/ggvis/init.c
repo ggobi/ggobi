@@ -68,6 +68,7 @@ ggvis_init (ggvisd *ggv, ggobid *gg)
   ggv->mds_task = GraphLayout;
   ggv->Dtarget_source = LinkDist;
   ggv->complete_Dtarget = true;
+  ggv->weight_var = -1;
   /* 
      Then loop over datads, looking for one devoted to specifying
      dissimilarities for MDS
