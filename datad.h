@@ -45,6 +45,7 @@ class datad {
      can be indexed in the list of data elements within the ggobid structure.
    */
  const gchar *name;
+ struct _ggobid *gg;  /*-- a pointer to the parent --*/
 
  gint nrows;
  GArray *rowlab;
@@ -129,12 +130,12 @@ class datad {
 /*----------------- variable selection panel -------------------------*/
 
  struct _Varpaneld {
-   GtkWidget *swin;          /*-- child of the notebook --*/
-   GtkWidget *ebox;          /*-- child of the scrolled_window --*/
+   GtkWidget *swin;       /*-- child of the notebook --*/
+   GtkWidget *ebox;       /*-- child of the scrolled_window --*/
 
    /*-- widgets for the simplest modes: checkboxes --*/
-   GtkWidget *vbox;          /*-- child of the ebox --*/
-   GtkWidget **checkbox;     /*-- single column of checkboxes --*/
+   GtkWidget *vbox;      /*-- child of the ebox --*/
+   GSList *checkbox;     /*-- single column of checkboxes --*/
 
    /*-- widgets for the richest modes: variable circles --*/
    GtkWidget *table;    /*-- replaces the vbox for circles --*/

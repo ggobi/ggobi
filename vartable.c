@@ -211,38 +211,6 @@ vartable_row_append (gint j, datad *d, ggobid *gg)
 }
 
 /*
-void
-variable_clone (gint jvar, const gchar *newName, gboolean update,
-  datad *d, ggobid *gg) 
-{
-  gint nc = d->ncols + 1;
-
-  vartable_realloc (nc, d, gg);
-  d->vartable[nc-1].collab =
-    g_strdup ((newName && newName[0]) ? newName : d->vartable[jvar].collab);
-  d->vartable[nc-1].collab_tform =
-    g_strdup ((newName && newName[0]) ? newName : d->vartable[jvar].collab);
-  
-  *-- set a view of the data values before adding the new label --*
-  vartable_row_append (d->ncols-1, d, gg);
-
-  d->varpanel_ui.checkbox = (GtkWidget **)
-    g_realloc (d->varpanel_ui.checkbox, nc * sizeof (GtkWidget *));
-  varpanel_checkbox_add (nc-1, d, gg);
-
-  *-- now the rest of the variables --*
-  d->vartable[nc-1].jitter_factor = d->vartable[jvar].jitter_factor;
-  d->vartable[nc-1].nmissing = d->vartable[jvar].nmissing;
-
-  if (update) {
-    vartable_update_cloned_var (nc, jvar, d, gg);
-  }
-
-  gtk_widget_show_all (gg->varpanel_ui.notebook);
-}
-*/
-
-/*
  * n: the index of the new variable
  * jvar: the index of the variable being cloned
 */
@@ -304,11 +272,8 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 */
 
   /*-- variable checkboxes --*/
-  /*-- should be in varpanel_ui.c: checkboxes_add --*/
-  d->varpanel_ui.checkbox = (GtkWidget **)
-    g_realloc (d->varpanel_ui.checkbox, d->ncols+ncols * sizeof (GtkWidget *));
   for (k=0; k<ncols; k++)
-    varpanel_checkbox_add (d->ncols+k, d, gg);
+    varpanel_checkbox_add (k, d, gg);
 
   /*-- variable circles --*/
 /*

@@ -20,7 +20,7 @@
 #ifdef USE_CLASSES
 datad::datad(ggobid *gg) 
 {
-  datad_new(this, gg);
+  datad_new (this, gg);
 }
 
 
@@ -28,15 +28,17 @@ datad *
 datad_new (ggobid *gg) 
 {
   datad *d = (datad *) g_malloc (sizeof (datad));
-  return(datad_new(d, gg));
+  return (datad_new (d, gg));
 }
 #endif
 
 datad *
 datad_new(datad *d, ggobid *gg)
 { 
-  if(d == NULL)
+  if (d == NULL)
     d = (datad *) g_malloc (sizeof (datad));
+
+  d->gg = gg;
 
   memset(d, 0, sizeof(datad));
 

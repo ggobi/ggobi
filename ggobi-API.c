@@ -98,8 +98,9 @@ GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed,
   if (transformed)
     d->vartable[jvar].collab_tform = g_strdup(name);
   else {
+    extern GtkWidget *checkbox_get_nth (gint, datad *);
     d->vartable[jvar].collab = g_strdup(name);
-    gtk_object_set (GTK_OBJECT(d->varpanel_ui.checkbox[jvar]),
+    gtk_object_set (GTK_OBJECT(checkbox_get_nth (jvar, d)),
       "label", name, NULL);
    }
 }

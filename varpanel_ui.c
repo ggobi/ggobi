@@ -21,6 +21,24 @@
 #include "vars.h"
 #include "externs.h"
 
+/*-------------------------------------------------------------------------*/
+/*                         utilities                                       */
+/*-------------------------------------------------------------------------*/
+
+GtkWidget *
+checkbox_get_nth (gint jvar, datad *d) {
+  GtkWidget *w;
+  gint j, n;
+
+  if ((n = g_slist_length (d->varpanel_ui.checkbox)) < jvar+1) {
+    for (j=n; j<d->ncols; j++)
+      varpanel_checkbox_add (j, d, d->gg);
+  }
+
+  w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.checkbox, jvar);
+  return w;
+}
+
 
 /*-------------------------------------------------------------------------*/
 /*                     Variable selection                                  */
@@ -30,9 +48,11 @@ void
 varpanel_checkbutton_set_active (gint jvar, gboolean active, datad *d)
 {
   gboolean active_prev;
+  GtkWidget *w;
 
   if (jvar >= 0 && jvar < d->ncols) {
-    GtkWidget *w = GTK_WIDGET (d->varpanel_ui.checkbox[jvar]);
+    w = checkbox_get_nth (jvar, d);
+
     if (GTK_WIDGET_REALIZED (w)) {
 
       active_prev = GTK_TOGGLE_BUTTON (w)->active;
@@ -192,7 +212,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 
     jvar = -1;
     for (j=0; j<d->ncols; j++) {
-      if (d->varpanel_ui.checkbox[j] == w) {
+      if (checkbox_get_nth (jvar, d) == w) {
         jvar = j;
         break;
       }
@@ -227,28 +247,31 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 void
 varpanel_checkbox_add (gint j, datad *d, ggobid *gg) 
 {
-g_printerr ("(before) cbox[%d] = %d\n", j, (gint) d->varpanel_ui.checkbox[j]);
-  d->varpanel_ui.checkbox[j] =
-    gtk_noop_check_button_new_with_label (d->vartable[j].collab);
-g_printerr ("(after) cbox[%d] = %d\n", j, (gint) d->varpanel_ui.checkbox[j]);
-  GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.checkbox[j]), gg, true);
+  GtkWidget *w = gtk_noop_check_button_new_with_label (d->vartable[j].collab);
 
-  gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.checkbox[j]),
+  GGobi_widget_set (w, gg, true);
+  d->varpanel_ui.checkbox = g_slist_append (d->varpanel_ui.checkbox, w);
+
+  gtk_signal_connect (GTK_OBJECT (w),
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
 
   gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
-    d->varpanel_ui.checkbox[j], false, false, 0);
-  gtk_widget_show (d->varpanel_ui.checkbox[j]);
+    w, false, false, 0);
+  gtk_widget_show (w);
 }
 
 /*-- delete nc checkboxes, starting at jcol --*/
 void
 varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
   gint j;
+  GtkWidget *w;
 
   if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every checkbox --*/
-    for (j=jcol; j<jcol+nc; j++)
-      gtk_widget_destroy (d->varpanel_ui.checkbox[j]);
+    for (j=jcol; j<jcol+nc; j++) {
+      w = checkbox_get_nth (jcol, d);
+      d->varpanel_ui.checkbox = g_slist_remove (d->varpanel_ui.checkbox, w);
+      gtk_widget_destroy (w);  /*-- maybe not necessary? --*/
+    }
   }
 }
 
@@ -314,8 +337,7 @@ void varpanel_populate (datad *d, ggobid *gg)
   gtk_widget_show_all (d->varpanel_ui.swin);
   gdk_flush ();
 
-  d->varpanel_ui.checkbox = (GtkWidget **)
-    g_malloc (d->ncols * sizeof (GtkWidget *));
+  d->varpanel_ui.checkbox = NULL;
 
   for (j=0; j<d->ncols; j++)
     varpanel_checkbox_add (j, d, gg);
@@ -323,9 +345,10 @@ void varpanel_populate (datad *d, ggobid *gg)
 
 
 void
-varlabel_set (gint j, datad *d, ggobid *gg) {
-  gtk_label_set_text (GTK_LABEL (GTK_BIN (d->varpanel_ui.checkbox[j])->child),
-    d->vartable[j].collab_tform);
+varlabel_set (gint jvar, datad *d, ggobid *gg) {
+  GtkWidget *w = checkbox_get_nth (jvar, d);
+  gtk_label_set_text (GTK_LABEL (GTK_BIN (w)->child),
+                      d->vartable[jvar].collab_tform);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -366,21 +389,23 @@ varpanel_tooltips_set (ggobid *gg)
     d = (datad*) g_slist_nth_data (gg->d, k);
     /*-- for each variable --*/
     for (j=0; j<d->ncols; j++) {
-      if (d->varpanel_ui.checkbox == NULL)
+      if (checkbox_get_nth (j, d) == NULL)
         break;
       
       switch (display->displaytype) {
 
         case parcoords:
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
-            d->varpanel_ui.checkbox[j],
+            checkbox_get_nth (j, d),
+/*            d->varpanel_ui.checkbox.vals[j],*/
             "Click to replace/insert/append a variable, or to delete it",
             NULL);
         break;
 
         case scatmat:
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
-            d->varpanel_ui.checkbox[j],
+            checkbox_get_nth (j, d),
+/*            d->varpanel_ui.checkbox.vals[j],*/
             "Click to replace/insert/append a variable, or to delete it",
             NULL);
         break;
@@ -389,19 +414,22 @@ varpanel_tooltips_set (ggobid *gg)
           switch (projection) {
             case P1PLOT:
               gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
-                d->varpanel_ui.checkbox[j],
+                checkbox_get_nth (j, d),
+/*                d->varpanel_ui.checkbox.vals[j],*/
                 "Click left to plot horizontally, middle to plot vertically",
                 NULL);
             break;
             case XYPLOT:
               gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
-                d->varpanel_ui.checkbox[j],
+                checkbox_get_nth (j, d),
+/*                d->varpanel_ui.checkbox.vals[j],*/
                 "Click left to select the horizontal variable, middle for vertical",
                 NULL);
             break;
             case TOUR2D:
               gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
-                d->varpanel_ui.checkbox[j],
+                checkbox_get_nth (j, d),
+/*                d->varpanel_ui.checkbox.vals[j],*/
                 "Click to select a variable to be available for touring",
                 NULL);
             break;

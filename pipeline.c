@@ -385,11 +385,11 @@ world_to_raw_by_var (gint pt, gint var, displayd *display, datad *d, ggobid *gg)
   d->raw.vals[pt][var] = d->tform.vals[pt][var] = x;
 }
 
-  /*
-   * allow the reverse pipeline only for
-   *   scatterplots in xyplot mode
-   *   the splotd members of a scatmat that are xyplots.
-  */
+/*
+ * allow the reverse pipeline only for
+ *   scatterplots in xyplot mode
+ *   the splotd members of a scatmat that are xyplots.
+*/
 void
 world_to_raw (gint pt, splotd *sp, datad *d, ggobid *gg)
 {

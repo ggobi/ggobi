@@ -71,7 +71,6 @@ typedef struct {
   gint nels;
 } vector_b;
 
-
 typedef struct {  /*-- used for obtaining ranks --*/
   gfloat f;
   gint indx;
