@@ -388,7 +388,6 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 
     changed = tour2d3_subset_var_set(jvar, &jprev, button, d, dsp, gg);
     if (changed) {
-      tour2d3_func(T2D3OFF, gg->current_display, gg);
       varcircles_visibility_set (dsp, gg);
 
       /*-- now add/remove the variable to/from the active set, too --*/
