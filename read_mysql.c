@@ -228,9 +228,8 @@ GGOBI(setDimensions)(gint nrow, gint ncol, datad *d, ggobid *gg)
   br_glyph_ids_alloc (d, gg);
   br_glyph_ids_init (d, gg);
 
-  br_color_ids_alloc (d, gg);
-  br_color_ids_init (d, gg);
-
+  br_color_ids_alloc (d);
+  br_color_ids_init (d);
 
   d->ncols = ncol;
 

@@ -156,14 +156,13 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   vartable_alloc (d);
   vartable_init (d);
 
-  br_glyph_ids_alloc (d, gg);
+  br_glyph_ids_alloc (d);
   br_glyph_ids_init (d, gg);
 
   br_color_ids_alloc (d, gg);
   br_color_ids_init (d, gg);
 
-
-  hidden_alloc (d, gg);
+  hidden_alloc (d);
 
   for (j = 0; j < nc ; j++) {
    d->vartable[j].collab = g_strdup(colnames[j]);

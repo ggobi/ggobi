@@ -432,7 +432,7 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
   gboolean use_defaults = false;
 
   if (reinit)
-    br_glyph_ids_alloc (d, gg);
+    br_glyph_ids_alloc (d);
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
     if ((fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
@@ -753,7 +753,7 @@ hidden_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
   FILE *fp;
 
   if (reinit)
-    hidden_alloc (d, gg);
+    hidden_alloc (d);
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
     if ((fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)

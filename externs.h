@@ -51,7 +51,7 @@ void arrays_zero (array_s *);
 void assign_points_to_bins (datad *, ggobid *);
 void br_color_ids_alloc (datad *, ggobid *);
 void br_color_ids_init (datad *, ggobid *);
-void br_glyph_ids_alloc (datad *, ggobid *);
+void br_glyph_ids_alloc (datad *);
 void br_glyph_ids_init (datad *, ggobid *);
 void br_line_color_alloc (ggobid *);
 void br_line_color_init (ggobid *);
@@ -149,7 +149,7 @@ void get_main_menu (GtkItemFactoryEntry[], gint, GtkAccelGroup *, GtkWidget  *, 
 ggobid* ggobi_alloc (void);
 gboolean ggobi_file_set_create (gchar *rootname, datad *, ggobid *);
 void globals_init (ggobid *);
-void hidden_alloc (datad *, ggobid *);
+void hidden_alloc (datad *);
 void hidden_init (datad *, ggobid *);
 gboolean hidden_read (gchar *, gboolean, datad *, ggobid *);
 void identify_event_handlers_toggle (splotd *, gboolean);

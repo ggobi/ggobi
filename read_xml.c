@@ -425,7 +425,7 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
   d->nrgroups = 0;              /*-- for now --*/
 
   rowlabels_alloc (d, data->gg);
-  br_glyph_ids_alloc (d, data->gg);
+  br_glyph_ids_alloc (d);
   br_glyph_ids_init (d, data->gg);
 
   br_color_ids_alloc (d, data->gg);
@@ -433,9 +433,9 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
 
   setDefaultDatasetValues(attrs, data);
 
-  if(tmp) {
+  if (tmp) {
     arrayf_alloc (&d->raw, d->nrows, d->ncols);
-    hidden_alloc (d, data->gg);
+    hidden_alloc (d);
   }
 
   data->current_variable = 0;
@@ -745,7 +745,7 @@ allocVariables (const CHAR **attrs, XMLParserData *data)
   d->ncols = asInteger(tmp);
 
   arrayf_alloc (&d->raw, d->nrows, d->ncols);
-  hidden_alloc (d, data->gg);
+  hidden_alloc (d);
 
   vartable_alloc (d);
   vartable_init (d);
