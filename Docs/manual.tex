@@ -407,8 +407,9 @@ and to the interaction type:
       horizontal and vertical axes,
 \item Scale: axis scaling,
 \item Brush: setting point glyphs, edge types, and point and edge colors,
-\item Identify: labeling points
-\item Move Points: direct manipulation of point positions.
+\item Identify: labeling points,
+\item Edit Edges: add points or edges.
+\item Move Points: direct manipulation of point positions,
 \end{itemize}
 
 When you choose a new view mode, the controls at the left of the main
@@ -1292,6 +1293,50 @@ to make it the center for the rotation and tour modes.
 To activate this view mode from the keyboard, type {\em i} or {\em I}
 with the focus in the plot window, or type Control-{\em i} or
 Control-{\em I} with the focus in the console.
+
+\subsection{Edit Edges}
+\label{slbl:EditEdges}
+
+Here we add points or edges to the datasets by adding them to
+the displays.  
+
+Adding edges:  Press the mouse button when the cursor is near the
+source node, and drag it around the window.  You'll see a temporary
+edge between the source and the nearest node, drawn using the current
+color and ``glyph.''  When you release the button, one of two things
+will happen:  If you pressed the left mouse button, a dialog window
+will appear with default values describing the new edge; if you
+pressed the middle or right button, the edge will simply be added
+with those same default values.
+
+Adding points:  Simply click a mouse button when the cursor is
+where you want the new point to be located.  As above, the left
+button raises a dialog, and the other buttons simply add the point.
+
+The default values that are assigned are the record label and record
+id (often the same), and the variable values (if the dataset being
+augmented has variables).  By default, the record label and record id
+are simply the new record number (represented as a string).  If this
+string already exists as a record id, the new record will not be added.
+
+The default variable values are assigned based on where you clicked
+on the screen and on the current projection.  For any variables not
+part of the current projection, the default value is 0.
+
+Edge and point deletion have not been implemented.  For now at
+least, you'll have to shadow brush any unwanted elements to get
+rid of them.
+
+To activate this mode from the keyboard, type {\em e} or {\em E}
+with the focus in the plot window, or type Control-{\em e} or
+Control-{\em E} with the focus in the console.
+
+Note: This mode and the next, "Move Points," may seem like peculiar,
+even dangerous, additions to data analysis software.  They were
+initially added for the use of another community of xgobi users:
+discrete mathematicians use xgobi and ggobi to visualize graphs.  In
+that context, moving and editing graphs is quite natural ~--~ as it
+sometimes turns out to be in the context of data analysis, too.
 
 \subsection{Move Points}
 \label{slbl:MovePoints}
