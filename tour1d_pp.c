@@ -733,7 +733,7 @@ projection.
 *********************************************************************/
 
 gfloat t1d_calc_indx (array_f pd, 
-                gint (*index) (array_f*, void*, gfloat*),
+                Tour_PPIndex_f index,
                 void *param)
 { 
   gfloat indexval;

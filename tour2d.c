@@ -47,6 +47,8 @@ extern gdouble erf (gdouble);  /*-- not defined on all unixes --*/
 #define T2DON true
 #define T2DOFF false
 
+static void tour2d_speed_set_display(gfloat slidepos, displayd *dsp);
+
 void
 display_tour2d_init_null (displayd *dsp, ggobid *gg)
 {
@@ -113,7 +115,6 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
   arrayd_alloc(&dsp->t2d_Rmat2, 3, 3);
   arrayd_alloc(&dsp->t2d_mvar_3dbasis, 3, 3);
   arrayd_alloc(&dsp->t2d_manbasis, 3, nc);
-
 }
 
 /*-- eliminate the nc columns contained in *cols --*/
@@ -269,6 +270,8 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   dsp->t2d_axes = true;
   dsp->t2d_pp_op.temp_start = 1.0;
   dsp->t2d_pp_op.cooling = 0.99;
+
+  tour2d_speed_set_display(sessionOptions->defaultTourSpeed, dsp);
 }
 
 /*-- called from the Options menu --*/
@@ -318,9 +321,14 @@ tour2d_all_vars_cb (GtkCheckMenuItem *w, guint action)
 }
 
 void tour2d_speed_set(gfloat slidepos, ggobid *gg) {
-  cpaneld *cpanel;
-  displayd *dsp = gg->current_display;
 
+  displayd *dsp = gg->current_display;
+  tour2d_speed_set_display(slidepos, dsp);
+}
+
+static void tour2d_speed_set_display(gfloat slidepos, displayd *dsp) 
+{
+  cpaneld *cpanel;
   if (dsp != NULL)
     cpanel = &dsp->cpanel;
   if (cpanel == NULL)

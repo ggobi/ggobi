@@ -19,6 +19,10 @@ The authors can be contacted at the following email addresses:
     dicook@iastate.edu    sigbert@wiwi.hu-berlin.de
 */
 
+
+typedef gint (*Tour_PPIndex_f)(array_f *pd, void *params, gfloat *val);
+
+
 gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
 gint free_optimize0_p (optimize0_param *op);
 gboolean iszero (array_f *data);

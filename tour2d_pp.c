@@ -598,13 +598,13 @@ void t2d_pp_reinit(displayd *dsp, ggobid *gg)
   for (i=0; i<dsp->t2d_pp_op.proj_best.nrows; i++)
     for (j=0; j<dsp->t2d_pp_op.proj_best.ncols; j++)
       dsp->t2d_pp_op.proj_best.vals[i][j] = 
-      dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
+	  dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
   dsp->t2d.ppval = 0.0;
   dsp->t2d.oppval = -1.0;
   dsp->t2d_pp_op.index_best = 0.0;
   label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
-  dsp->t2d_indx_min, dsp->t2d_ppindx_mat[dsp->t2d_ppindx_count], 
-  dsp->t2d_indx_max);
+			   dsp->t2d_indx_min, dsp->t2d_ppindx_mat[dsp->t2d_ppindx_count], 
+			   dsp->t2d_indx_max);
   gtk_label_set_text(GTK_LABEL(dsp->t2d_pplabel),label);
 
   t2d_clear_ppda(dsp, gg);
@@ -633,7 +633,7 @@ projection.
 *********************************************************************/
 
 gfloat t2d_calc_indx (array_f pd,
-                gint (*index) (array_f*, void*, gfloat*),
+                Tour_PPIndex_f index,
                 void *param)
 { 
   gfloat indexval;
@@ -691,14 +691,14 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   { 
     case HOLES: 
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata, 
-        holes_raw, &dsp->t2d_pp_param);
+				      holes_raw, &dsp->t2d_pp_param);
       if (basismeth == 1) {
         kout = optimize0 (&dsp->t2d_pp_op, holes_raw, &dsp->t2d_pp_param);
       }
     break;
     case CENTRAL_MASS: 
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-        central_mass_raw, &dsp->t2d_pp_param);
+				      central_mass_raw, &dsp->t2d_pp_param);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, central_mass_raw, 
           &dsp->t2d_pp_param);
@@ -707,7 +707,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
         &dsp->t2d_pp_param.numgroups, nrows, gdata)) {
         dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-          discriminant, &dsp->t2d_pp_param);
+					discriminant, &dsp->t2d_pp_param);
         if (basismeth == 1)
           kout = optimize0 (&dsp->t2d_pp_op, discriminant, &dsp->t2d_pp_param);
       }
@@ -717,7 +717,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
         &dsp->t2d_pp_param.numgroups, nrows, 
 			   gdata)) {
         dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-          cartgini, &dsp->t2d_pp_param);
+					cartgini, &dsp->t2d_pp_param);
         if (basismeth == 1)
           kout = optimize0 (&dsp->t2d_pp_op, cartgini, &dsp->t2d_pp_param);
       }
