@@ -103,7 +103,6 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   displayd *display = NULL;
 
   if (cleanup) {
-    void varpanel_clear (datad *, ggobid *);
     varpanel_clear (d, gg);
   }
 
