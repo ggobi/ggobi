@@ -556,16 +556,14 @@ display_free_all (ggobid *gg) {
     if (display == NULL)
       break;
 
-    if(display->t1d.idled)
+    if(display->d->ncols >= 1 && display->t1d.idled)
       gtk_idle_remove(display->t1d.idled);
-    if(display->t2d.idled)
+    if(display->d->ncols >= 2 && display->t2d.idled)
       gtk_idle_remove(display->t2d.idled);
-    if(display->tcorr1.idled)
+    if(display->d->ncols >= 4 && display->tcorr1.idled)
       gtk_idle_remove(display->tcorr1.idled);
-    if(display->tcorr2.idled)
+    if(display->d->ncols >= 4 && display->tcorr2.idled)
       gtk_idle_remove(display->tcorr2.idled);
-    if(display->tour_idled)
-      gtk_idle_remove(display->tour_idled);
 
 
      /* If the second argument 'force' is true, it eliminates the
