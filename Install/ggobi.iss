@@ -22,7 +22,9 @@ Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "A
 [Files]
 Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "C:\cygwin\home\duncan\libs\*.*"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+; Source: "C:\cygwin\home\duncan\libs\lib\*.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "C:\cygwin\home\duncan\Projects\ggobi\data\*.*"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\*.html"; DestDir: "{app}\Docs"; CopyMode: alwaysoverwrite
 
 [INI]
 Filename: "{app}\ggobi.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.ggobi.org"
