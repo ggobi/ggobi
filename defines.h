@@ -283,6 +283,10 @@ typedef enum {NULLMODE = -1,
 #define IMP_BELOW  2
 #define IMP_ABOVE  3
 
+/*-- color by variable --*/
+#define EQUAL_WIDTH_BINS 0
+#define EQUAL_COUNT_BINS 1
+
 /*-- macros --*/
 
 #define EVENT_METHOD(i,x) GTK_WIDGET_CLASS(GTK_OBJECT(i)->klass)->x
