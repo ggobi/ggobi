@@ -2,6 +2,8 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="1">
+<brush color="5" glyph="fc 3" />
+
 <data name="olive oil">
 <description>
 </description>
@@ -35,7 +37,6 @@
 <realvariable name="arachidic" />
 <realvariable name="eicosenoic" />
 </variables>
-<brush color="5" glyph="fc 3" />
 <records count="572" glyph="fc 2" color="1">
 <record label="North-Apulia">
 1.000 1.000 1075.000 75.000 226.000 7823.000 672.000 36.000 60.000 29.000
