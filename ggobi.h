@@ -1,11 +1,7 @@
 #ifndef GGOBI_H
 #define GGOBI_H
 
-
-#ifndef DEFINES_H
 #include "defines.h"
-#endif
-
 #include "types.h"
 #include "display.h"
 #include "display_tree.h"
@@ -64,8 +60,6 @@ typedef struct {
 
 } XGobiApp;
 
-
-
 typedef struct _xgobid {
 
  gchar *data_in;
@@ -98,17 +92,17 @@ typedef struct _xgobid {
  glong file_start_row;     /* needed for block type */
  glong file_length;        /* needed for sample */
  glong file_sample_size;   /* needed for both */
- /*
-  * To be used in reading in associated row-wise files
- */
+ /*-- used in reading in associated row-wise files --*/
  glong *file_rows_sampled; /* of length file_sample_size */
 
+ gint ncols, nrows;
+ gint nlinkable, nlinkable_in_plot;
 
  array_f raw, tform1, tform2;
  array_l world, jitter;
 
- fcoords scale0;
- fcoords tour_scale0;
+ /*-- Scaling --*/
+ fcoords scale0, tour_scale0;
 
 /* Missing values */
  gint nmissing;
@@ -118,30 +112,23 @@ typedef struct _xgobid {
  lims missing_lim;  /*-- usually 0,1, but potentially wider --*/
 /* */
 
- gint ncols, nrows;
-
  /* Deleting the erased points; subsetting */
  gboolean delete_erased_pts;
  gint *rows_in_plot;
  gint nrows_in_plot;
  gboolean *in_subset;
 
-
-/* Row grouping */
+ /* Row grouping */
  glong nrgroups, nrgroups_in_plot;
  glong *rgroup_ids;
  rgroupd *rgroups;
 
-
  /* Hiding/excluding the erased points */
  cluster *clusv;
  int nclust;
- gboolean *included; /* it's too slow to get this from rows_in_plot */
+ gboolean *included;
 
- gulong *senddata;
- gint nlinkable, nlinkable_in_plot;  /* used in sizing senddata */;
-
-/* Line grouping */
+/* Line groups */
  glong nlgroups;
  glong *lgroup_ids;
  rgroupd *lgroups;  /* id, nels, *els */
@@ -153,18 +140,7 @@ typedef struct _xgobid {
  gint nsegments;
  endpointsd *segment_endpoints;
 
-
- /*
-  * Vectors of min and max values - including current fixed or imputed data
-  * lim_raw contains the min_max limits -- for the raw_data!
-  * lim_tform contains the limits of the tform_data -- used in
-  *   parallel coordinates in case the main window is displaying
-  *   sphered data
-  * lim contains the limits in use
- */
-
  vardatad *vardata;
-
 
 /* row labels */
  gchar **rowlab;
@@ -172,35 +148,26 @@ typedef struct _xgobid {
 /* gboolean: does this data contain only one variable? False by default */
  gboolean single_column;
 
-/* link to S */
- gchar *Spath;
-
 /*
  * brushing
 */
- glyphv glyph_id, glyph_0;
- glyphv *glyph_ids, *glyph_now, *glyph_prev;
-
  gint ncolors;
  GdkColor *default_color_table, *color_table;  /* brushing colors */
- GdkColor bg_color;      /* background color */
- GdkColor accent_color;  /* color for axes and labels */
+ GdkColor bg_color;          /* background color */
+ GdkColor accent_color;      /* color for axes and labels */
  gushort color_id, color_0;  /* 0:ncolors-1 */
  /* point brushing */
  gboolean *under_new_brush;
  gushort *color_ids, *color_now, *color_prev;  /* 0:ncolors-1 */
+ glyphv glyph_id, glyph_0;
+ glyphv *glyph_ids, *glyph_now, *glyph_prev;
  gboolean *erased, *erased_now, *erased_prev;
  /* line brushing */
  gushort *xed_by_new_brush;
  gushort *line_color_ids, *line_color_now, *line_color_prev;  /* 0:ncolors-1 */
-
  /* binning */
  gint br_nbins;
  bin_struct **br_binarray;
- /*
-  * These are initialized so that the first merge_brushbins()
-  * call will behave reasonably.
- */
  icoords bin0, bin1;
 
  /*
@@ -220,8 +187,6 @@ typedef struct _xgobid {
  gint ntourvars;
  gint *tourvars;
 
- 
-
 /************************** Display variables *************************/
 
   GtkTooltips *tips;
@@ -231,13 +196,9 @@ typedef struct _xgobid {
 */
  gint pan_or_zoom;
 
-
  XGobiApp app;
 
 } xgobid;
-
-
-
 
 
 #define thisXg xg.app._thisXg

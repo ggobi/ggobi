@@ -135,25 +135,11 @@ parse_command_line (gint *argc, gchar **av)
     exit(0);
   }
 
-  if (xg.data_mode == Sprocess) {
-    if (*argc < 3) {
-      g_printerr ("Usage: xgobi [-s nrows ncols path] filename\n");
-      exit(0);
-    } else {
-      xg.nrows = atoi (*av); av++;
-      xg.ncols = atoi (*av); av++;
-      xg.Spath = g_strconcat (*av, G_DIR_SEPARATOR_S); av++;
-
-      xg.data_in = g_strdup (*av);
-    }
-  }
-  else /* if (xg.data_mode == ascii || xg.data_mode == binary) */
-  {
-    if (*argc == 0)
-      xg.data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
-    else
-      xg.data_in = g_strdup_printf (av[0]);
-  }
+  /* (xg.data_mode == ascii || xg.data_mode == binary) */
+  if (*argc == 0)
+    xg.data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
+  else
+    xg.data_in = g_strdup_printf (av[0]);
 
   return 1;
 }

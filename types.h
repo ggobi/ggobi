@@ -124,7 +124,7 @@ typedef struct {
   gboolean in_subset;  /* for subsetting */
 } rgroupd;
 
-#define XGOBI_TYPES_H
+#define TYPES_H
 
 
 #endif

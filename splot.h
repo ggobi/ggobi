@@ -1,6 +1,7 @@
-#ifndef DEFINES_H
+#ifndef SPLOT_H
+#define SPLOT_H
+
 #include "defines.h"
-#endif
 
 typedef struct {
 
@@ -72,4 +73,4 @@ typedef struct {
 
 } splotd;
 
-#define SPLOT_H
+#endif

@@ -1,17 +1,9 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#ifndef DEFINES_H
 #include "defines.h"
-#endif
-
-#ifndef CPANEL_H
 #include "cpanel.h"
-#endif
-
-#ifndef SPLOT_H
 #include "splot.h"
-#endif
 
 typedef struct {
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE xgobidata SYSTEM "xgobi.dtd">
 
-<xgobidata numRecords="74" defaultColor="2" defautGlyph="fc 3">
+<xgobidata numRecords="74" defaultColor="2" defaultGlyph="fc 3">
 <description>
 This data is from a paper by A. A. Lubischew, "On the Use of
 Discriminant Functions in Taxonomy", Biometrics, Dec 1962, pp.455-477.

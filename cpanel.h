@@ -1,8 +1,8 @@
-#include <gtk/gtk.h>
+#ifndef CPANEL_H
+#define CPANEL_H
 
-#ifndef DEFINES_H
-#include "defines.h"
-#endif
+#include <gtk/gtk.h>
+#include "defines.h"  /*-- and defines includes cpanel.h?  weird --*/
 
 /*
  * This is at the display, or window, level.  Every display type
@@ -61,4 +61,4 @@ typedef struct {
 
 } cpaneld;
 
-#define CPANEL_H
+#endif

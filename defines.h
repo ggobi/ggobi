@@ -1,7 +1,6 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-
 /* defines.h */
 
 #define XGOBI(a) XGobi_##a
