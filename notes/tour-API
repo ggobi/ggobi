@@ -1,0 +1,50 @@
+these are some notes based on discussion 12/19/01:
+=================================================
+
+functions to be implemented in the API:
+
+set_projection(F, mode)     where F is a matrix dxp (proj dim x num cols)
+                            that defines the projection of variables.
+                            mode is the tour type, that is display tour type,
+                            that we want to set the projection in. it
+                            can be TOUR1D, TOUR2D, TOURCORR currently.
+                            there may be more tour types in the future.
+
+get_projection(mode)
+
+set_lims()                  these functions are for setting the min/max
+get_lims()                  to use for scaling the raw data into the plot.
+                            they are not truly a part of the tour API,
+                            but may be needed to build exact copies of the
+                            ggobi plot in an R window.
+
+set_scale_shift()           these are routines to setting/getting the        
+get_scale_shfit()           screen scaling and shifting. they are not part
+                            of the tour API, but may be needed to build
+                            exact copies of the ggobi plot in an R window.
+
+pause_tour_proc()           to pause the tour
+
+stop_tour_proc()            to remove the tour idle process
+
+get_idleid()                to get the identity of the tour idle process
+                            in case we want to take it over from R
+
+set_target_projection()     similar to set_prejection, but used to fill in
+                            the next target plane that the tour will
+                            interpolate towards
+
+set_active_vars(tourvars, mode)  sets the binary vector (length num cols) of 
+get_active_vars(mode)       indicators for the tour. a 1 represents a 
+                            variable that is actively being toured, and 
+                            a 0 means the variables is not part
+                            of the current tour.
+
+set_speed(delta, mode)      this is a float constant that alters the
+get_speed(mode)             step size in the tour.
+
+set_history(tourhist, mode) gets/sets an array of basis planes
+get_history(mode)
+
+in the first release we will ideally have set_projection and
+get_projection available through the API.
