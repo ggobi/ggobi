@@ -30,4 +30,8 @@ typedef struct {
 colorschemed *read_colorscheme(char *fileName, GList **);
 colorschemed *findColorSchemeByName(GList *schemes, const gchar *name);
 
+#ifdef USE_XML
+int getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col);
+#endif
+
 #endif
