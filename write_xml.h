@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-gboolean write_xml (const gchar *, datad *, ggobid *);
+gboolean write_xml (const gchar *filename, ggobid *gg);
 gboolean write_xml_stream (FILE *f, datad *, ggobid *gg, const gchar *);
 gboolean write_xml_header (FILE *f, ggobid *gg);
 gboolean write_xml_description (FILE *f, ggobid *gg);

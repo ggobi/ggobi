@@ -8,17 +8,23 @@
  */
 
 gboolean
-write_xml (const gchar *filename, datad *d, ggobid *gg)
+write_xml (const gchar *filename,  ggobid *gg)
 {
   FILE *f;
   gboolean ok = false;
-
+  datad *d;
+  GSList *tmp = gg->d;
   f = fopen (filename,"w");
   if (f == NULL) {
    return (false);
   }
 
-  ok = write_xml_stream (f, d, gg, filename);
+  tmp = gg->d;
+  while((tmp != NULL)) {
+    d = (datad*) tmp->data;
+    ok = write_xml_stream (f, d, gg, filename);
+  }
+
   fclose(f);
   return ok;
 }
