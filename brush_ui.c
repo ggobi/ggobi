@@ -129,7 +129,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
   /*
-   * We're redrawing everything on buttonrelease; we have no
+   * We're redrawing everything on button release; we have no
    * way of knowing at this point whether things changed or
    * not, since that information is not accumulated.
   if (xg.brush_on) {

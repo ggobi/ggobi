@@ -18,8 +18,8 @@ void
 zoom_step (splotd *sp, gint zoom_opt, gint in_or_out, rectd *rect)
 {
   gint projection = projection_get ();
-  gfloat *scale_x = (projection == GRTOUR) ? &sp->tour_scale.x : &sp->scale.x;
-  gfloat *scale_y = (projection == GRTOUR) ? &sp->tour_scale.y : &sp->scale.y;
+  gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
+  gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;
   gfloat scalefac_x = 1.0, scalefac_y = 1.0;
   icoords mid;
 

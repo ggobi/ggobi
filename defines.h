@@ -43,7 +43,7 @@ enum displaytyped {scatterplot, scatmat, parcoords};
 #define P1PLOT   0
 #define XYPLOT   1
 #define ROTATE   2
-#define GRTOUR   3
+#define TOUR2D   3
 #define COTOUR   4
 
 #define SCALE    5

@@ -4,10 +4,10 @@ the axes aren't being initialized properly for cloned variables.
 
 still having problems with variable selection in scatterplot matrices
 
-sphering labels aren't being reset
+! sphering labels aren't being reset
 
-selected_variables_get isn't always right -- maybe it gets messed
-  up after the clear?  (so maybe it's fixed)
+! selected_variables_get isn't always right -- maybe it gets messed
+!   up after the clear?  (so maybe it's fixed)
 
 Find out how to handle threads!  and to generate signals, too.
 
@@ -31,4 +31,4 @@ Brushing:
 
 Use a notebook for the advanced tour panel
 
-
+Rename gtour_ui.c to tour2d_ui.c

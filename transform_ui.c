@@ -191,6 +191,11 @@ open_transform_popup () {
   gdk_window_raise (window->window);
 }
 
+/*
+ * I'm a bit bewildered about this at the moment, but I guess its
+ * purpose might be to handle the case where the transformation is
+ * executed through the api
+*/
 void
 transform_opt_menus_set_history (gint j)
 {

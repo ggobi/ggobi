@@ -608,12 +608,27 @@ collab_tform_update (gint j)
     case SORT:
       break;
     case SPHERE:
-      xg.vardata[j].collab_tform = g_strdup_printf ("PC(%s)/%d", lbl1, j+1);
+      xg.vardata[j].collab_tform = g_strdup_printf ("PC%d", j+1);
       break;
   }
 
   g_free ((gpointer) lbl0);
   g_free ((gpointer) lbl1);
+}
+
+void tform_label_update (gint jcol)
+{
+  /*-- update the values of the variable labels --*/
+  collab_tform_update (jcol);
+
+  /*-- update the displayed variable circle labels --*/
+  varlabel_set (jcol);
+
+  /*-- update the variable statistics table --*/
+  vartable_tform_set (jcol);
+
+  /*-- adjust the settings on the transformation panel --*/
+  transform_opt_menus_set_history (jcol);
 }
 
 /*---------------------------------------------------------------------*/
@@ -669,17 +684,7 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol)
       break;
   }
 
-  /*-- update the values of the variable labels --*/
-  collab_tform_update (jcol);
-
-  /*-- update the displayed variable circle labels --*/
-  varlabel_set (jcol);
-
-  /*-- update the variable statistics table --*/
-  vartable_tform_set (jcol);
-
-  /*-- adjust the settings on the transformation panel --*/
-  transform_opt_menus_set_history (jcol);
+  tform_label_update (jcol);
 }
 
 void

@@ -56,7 +56,7 @@ world_to_raw (cpaneld *cpanel, splotd *sp, gint pt)
       world_to_raw_by_var (pt, sp->spinvars.z);
       break;
 
-    case GRTOUR:
+    case TOUR2D:
       for (i=0; i<sp->n_tourvars; i++)
         world_to_raw_by_var (pt, sp->tourvars[i]);
       break;

@@ -56,8 +56,8 @@ cpanel_gtour_make () {
   GtkObject *adj;
   GtkWidget *manip_opt;
   
-  control_panel[GRTOUR] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (control_panel[GRTOUR]), 5);
+  control_panel[TOUR2D] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (control_panel[TOUR2D]), 5);
 
 /*
  * speed scrollbar
@@ -75,7 +75,7 @@ cpanel_gtour_make () {
     "Adjust speed of tour motion", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (control_panel[GRTOUR]), sbar,
+  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]), sbar,
     false, false, 1);
 
 /*
@@ -97,7 +97,7 @@ cpanel_gtour_make () {
                      GTK_SIGNAL_FUNC (reinit_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (control_panel[GRTOUR]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]), box, false, false, 1);
 
 
 /*
@@ -105,7 +105,7 @@ cpanel_gtour_make () {
 */
 
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (control_panel[GRTOUR]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Manual manipulation:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -127,7 +127,7 @@ cpanel_gtour_make () {
     "Show principal component axes or plain variable axes", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                       GTK_SIGNAL_FUNC (pcaxes_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[GRTOUR]),
+  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]),
                       tgl, false, false, 1);
 
 /*
@@ -136,7 +136,7 @@ cpanel_gtour_make () {
   btn = gtk_button_new_with_label ("Projection pursuit ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
     "Open panel for grand tour projection pursuit", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[GRTOUR]),
+  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (gtourpp_cb), NULL);
@@ -147,12 +147,12 @@ cpanel_gtour_make () {
   btn = gtk_button_new_with_label ("Advanced features ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
     "Open panel for additional grand tour features", NULL);
-  gtk_box_pack_start (GTK_BOX (control_panel[GRTOUR]),
+  gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (gtouradv_cb), NULL);
 
-  gtk_widget_show_all (control_panel[GRTOUR]);
+  gtk_widget_show_all (control_panel[TOUR2D]);
 }
 
 

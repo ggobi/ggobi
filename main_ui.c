@@ -179,7 +179,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
         submenu_destroy (io_item);
         break;
 
-      case GRTOUR:
+      case TOUR2D:
         submenu_destroy (io_item);
         break;
 
@@ -219,7 +219,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
         }
         break;
 
-      case GRTOUR:
+      case TOUR2D:
         gtour_menus_make ();
 
         io_item = submenu_make ("_I/O", 'I', main_accel_group);
@@ -309,7 +309,7 @@ mode_set (gint m) {
 
   /*
    * The projection type is one of P1PLOT, XYPLOT, ROTATE,
-   * GRTOUR or COTOUR.  It only changes if another projection
+   * TOUR2D or COTOUR.  It only changes if another projection
    * type is selected.  (For parcoords and scatmat plots, the
    * value of projection is irrelevant.)
   */
@@ -340,7 +340,7 @@ mode_activate (splotd *sp, gint m, gboolean state) {
       case MOVEPTS:
       case COTOUR:
       case ROTATE:
-      case GRTOUR:
+      case TOUR2D:
       case SCALE:
       case IDENT:
         break;
@@ -357,7 +357,7 @@ mode_activate (splotd *sp, gint m, gboolean state) {
       case MOVEPTS:
       case COTOUR:
       case ROTATE:
-      case GRTOUR:
+      case TOUR2D:
       case SCALE:
       case IDENT:
         break;

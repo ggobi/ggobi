@@ -30,7 +30,7 @@ scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func) {
   CreateMenuItem (scatterplot_mode_menu, "Rotation",
     "^r", "", NULL, accel_group, func, GINT_TO_POINTER (ROTATE));
   CreateMenuItem (scatterplot_mode_menu, "Grand Tour",
-    "^g", "", NULL, accel_group, func, GINT_TO_POINTER (GRTOUR));
+    "^g", "", NULL, accel_group, func, GINT_TO_POINTER (TOUR2D));
   CreateMenuItem (scatterplot_mode_menu, "Correlation Tour",
     "^c", "", NULL, accel_group, func, GINT_TO_POINTER (COTOUR));
 

@@ -309,7 +309,7 @@ popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd) {
               gtk_menu_popup (GTK_MENU (rotation_menu), NULL, NULL, NULL, NULL,
                 bevent->button, bevent->time);
               break;
-            case GRTOUR:
+            case TOUR2D:
             case COTOUR:
               tour_menu = gtour_menu_build (jvar);
               gtk_menu_popup (GTK_MENU (tour_menu), NULL, NULL, NULL, NULL,

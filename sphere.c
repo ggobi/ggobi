@@ -319,6 +319,8 @@ void sphere_apply_cb (void) {
  * finally, sphere the number of principal components selected;
  * executed when the apply button is pressed
 */
+  gint j;
+
   if ((sphere_npcs > 0) && (sphere_npcs <= nspherevars))
   {
     if (eigenval[sphere_npcs-1] == 0.0 ||
@@ -331,6 +333,9 @@ void sphere_apply_cb (void) {
       spherize_data (sphere_npcs, nspherevars, spherevars);
       sphere_varcovar_set ();
 /*    pc_axes_sensitive_set (true);*/
+
+      for (j=0; j<nspherevars; j++)
+        tform_label_update (spherevars[j]);
 
       /*-- these three lines replicated from transform.c --*/
       vardata_lim_update ();

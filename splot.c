@@ -113,7 +113,7 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
       rotation_event_handlers_toggle (sp, state);
       break;
 
-    case GRTOUR:
+    case TOUR2D:
       gtour_event_handlers_toggle (sp, state);
       break;
 
@@ -396,8 +396,8 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp)
   gint i, k;
   gfloat scale_x, scale_y;
 
-  scale_x = (cpanel->projection == GRTOUR) ? sp->tour_scale.x : sp->scale.x;
-  scale_y = (cpanel->projection == GRTOUR) ? sp->tour_scale.y : sp->scale.y;
+  scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
+  scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
 
   /*
    * Calculate is, a scale factor.  Scale so as to use the entire
