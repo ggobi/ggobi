@@ -104,11 +104,15 @@ ggobi_remove (ggobid *gg)
   return (-1);
 }
 
+/*
+      Also, need to close and free the displays associated with the ggobi.
+ */
 gint
 ggobi_remove_by_index (ggobid *gg, gint which)
 {
   GSList *l;
   datad *d;
+  int numDatasets, i;
 
   /* Move all the entries after the one being removed
      down by one in the array to compact it.
@@ -123,10 +127,16 @@ ggobi_remove_by_index (ggobid *gg, gint which)
   else
     all_ggobis = NULL;
 
-  for (l = gg->d; l; l = l->next) {
+  /* 
+      This was crashing in R. Probably because when we exhaust the list
+      and remove the final element, we get back garbage.
+      This isn't a problem in stand-alone as it never gets called.
+   */
+  numDatasets = g_slist_length(gg->d);
+  for (i=0,l = gg->d; l != NULL && i < numDatasets; i++, l = l->next) {
     d = (datad *) l->data;
-    gg->d = g_slist_remove (gg->d, d);
     datad_free (d, gg);
+    gg->d = g_slist_remove (gg->d, d);
   }
 
   g_free (gg);
