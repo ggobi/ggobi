@@ -312,7 +312,7 @@ setColorScheme(const xmlChar **attrs, XMLParserData *data)
   tmp = getAttribute(attrs, "file");
   if(tmp) {
      /* process this file to append its color schemes into the global list. */
-     read_colorscheme(tmp, &data->gg->colorSchemes); 
+     read_colorscheme((gchar *)tmp, &data->gg->colorSchemes); 
    }
 
    tmp = getAttribute(attrs, "name");
@@ -895,7 +895,6 @@ setMissingValue(XMLParserData *data, datad *d, vartabled *vt)
   vt->nmissing++;
   d->raw.vals[data->current_record][data->current_element] = 0;
   d->nmissing++;
-
 }
 
 /*
@@ -932,14 +931,15 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
      *  2. the file specifies a string for NA and this is that string
     */
     if ((data->NA_identifier == NULL &&
-          (strcasecmp (tmp, "na") == 0 || strcmp (tmp, ".") == 0)) ||
+          (strcmp (tmp, "na") == 0 ||
+           strcmp (tmp, "NA") == 0 ||
+           strcmp (tmp, ".") == 0)) ||
         (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0))
     {
       setMissingValue(data, d, vt);
     } else {
       value = asNumber (tmp);
       if(vt->categorical_p && checkLevelValue(vt, value) == false) {
-            /* add the name of the variable and the record number to this message! */
         ggobi_XML_error_handler(data, 
           "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n", 
           (int) data->current_record + 1, vt->collab,
