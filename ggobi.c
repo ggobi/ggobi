@@ -399,6 +399,14 @@ ggobi_alloc(ggobid *tmp)
   return (tmp);
 }
 
+void
+ggobiInit(int *argc, char **argv[])
+{
+  gtk_init (argc, argv);
+
+  registerDisplayTypes((GtkTypeLoad *) typeLoaders,
+		       sizeof(typeLoaders)/sizeof(typeLoaders)[0]);
+}
 
   /* Available so that we can call this from R
      without any confusion between which main().
@@ -412,10 +420,7 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   sessionOptions->cmdArgs = argv;
   sessionOptions->numArgs = argc;
 
-  gtk_init (&argc, &argv);
-
-  registerDisplayTypes((GtkTypeLoad *) typeLoaders,
-		       sizeof(typeLoaders)/sizeof(typeLoaders)[0]);
+  ggobiInit(&argc, &argv);
 
   vis = gdk_visual_get_system ();
 

@@ -753,6 +753,7 @@ displayd *scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars
 
 gboolean array_contains (gint* arr, gint n, gint el);
 
+void ggobiInit(int *argc, char **argv[]);
 
 #endif
 

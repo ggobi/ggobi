@@ -36,7 +36,8 @@ rowids_alloc (datad *d)
 }
 
 void
-rowidv_init (datad *d) {
+rowidv_init (datad *d) 
+{
   gint i, k;
 
   if (d->rowid.id.nels > 0) {
