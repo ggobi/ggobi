@@ -113,10 +113,11 @@ getDBMSLoginElementIndex(const char *name)
 }
 
 int 
-setDBMSLoginElement(DBMSInfoElement i, char * const val, DBMSLoginInfo *info)
+setDBMSLoginElement(DBMSInfoElement i, char * val, DBMSLoginInfo *info)
 {
-    if(val && !val[0])
-	val = NULL;
+/* Arrange to have this done by the caller. */
+   if(val && !val[0])	
+     val = NULL; 
 
    switch(i) {
      case HOST:
