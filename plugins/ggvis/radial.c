@@ -58,7 +58,8 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   if (d == NULL || e == NULL)
     return;
 
-/*-- This may not belong here, but where exactly?  --*/
+/*-- This may not belong here, but where exactly?  As soon as the
+     panel is opened  --*/
   gtk_signal_connect (GTK_OBJECT(gg->main_window),
     "sticky_point_added", highlight_sticky_edges, inst);
   gtk_signal_connect (GTK_OBJECT(gg->main_window),
@@ -226,33 +227,8 @@ void highlight_sticky_edges (GtkWidget *w, gint index, gint state, datad *d,
   list_clear (connectedEdges);
 
   displays_plot (NULL, FULL, gg);
-
-/*
-  n->inEdges
-  n->outEdges
-
-  if (state) {
-
-  } else {
-
-  }
-    if a == k || b == k
-      highlight the edge in e -- for starters
-    else unhighlight the edge
-*/
-
 }
 
-
-/*-- this should be in radial.c or radial_ui.c --*/
-void highlight_edges_cb (GtkButton *button, PluginInstance *inst)
-{
-  ggobid *gg = inst->gg;
-  ggvisd *ggv = GGVisFromInst (inst);
-  datad *d = gg->current_display->d;
-  datad *e = gg->current_display->e;
-
-}
 
 /*-----------------------------------------------------------------*/
 

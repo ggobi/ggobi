@@ -291,6 +291,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
   /*-- highlight the edges connected to nodes with sticky labels --*/
+/*
   btn = gtk_button_new_with_label ("highlight edges");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (highlight_edges_cb), inst);
@@ -299,6 +300,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   label = gtk_label_new ("Radial");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                             frame, label);
+*/
   /*-- --*/
 
   gtk_widget_show_all (window);
