@@ -1113,7 +1113,7 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
 {
   barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
   brush_coords *brush_pos = &rawsp->brush_pos;
-  gint i;
+  gint i, m, indx;
   GdkRectangle brush_rect;
   GdkRectangle dummy;
   gint x1 = MIN(brush_pos->x1, brush_pos->x2);
@@ -1121,6 +1121,7 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
   gint y1 = MIN(brush_pos->y1, brush_pos->y2);
   gint y2 = MAX(brush_pos->y1, brush_pos->y2);
   gboolean *hits;
+  vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
 
   hits = (gboolean *) g_malloc((sp->bar->nbins + 2) * sizeof(gboolean));
 
@@ -1151,21 +1152,33 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
 
   d->npts_under_brush = 0;
 
-  {
-    gint m;
-    for (i = 0; i < d->nrows_in_plot; i++) {
-      m = d->rows_in_plot[i];
+  for (i = 0; i < d->nrows_in_plot; i++) {
+    m = d->rows_in_plot[i];
 
-      /*-- skip missings?  --*/
-      if (d->nmissing > 0 && !d->missings_show_p
-          && MISSING_P(m, rawsp->p1dvar))
-        continue;
+    /*-- skip missings?  --*/
+    if (d->nmissing > 0 && !d->missings_show_p
+        && MISSING_P(m, rawsp->p1dvar))
+      continue;
 
-      d->pts_under_brush.els[m] = hits[(gint)rawsp->planar[i].x + 1];
-      if (hits[(gint)rawsp->planar[i].x + 1])
-        d->npts_under_brush++;
+    /*-- dfs -- this seems to assume that the values of planar begin at 0,
+         which may not be true ... this change makes it work for categorical,
+         but breaks it otherwise --*/
+    if (vtx->vartype == categorical) {
+      indx = (gint) (rawsp->planar[m].x - rawsp->p1d.lim.min + 1);
+    } else {
+      indx = (gint) (rawsp->planar[m].x + 1);
     }
+
+    d->pts_under_brush.els[m] = hits[indx];
+    if (hits[indx])
+      d->npts_under_brush++;
+/*
+      d->pts_under_brush.els[m] = hits[(gint)rawsp->planar[m].x + 1];
+      if (hits[(gint)rawsp->planar[m].x + 1])
+        d->npts_under_brush++;
+*/
   }
+
   g_free((gpointer) hits);
 
   return d->npts_under_brush;
