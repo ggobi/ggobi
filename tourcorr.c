@@ -118,11 +118,6 @@ tourcorr_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
       vectorf_delete_els (&dsp->tcorr1.tau, nc, cols);
       vectorf_delete_els (&dsp->tcorr1.tinc, nc, cols);
 
-/*-- why 2? --*/
-/*
-      arrayf_delete_cols (&dsp->tc1_manbasis, (gint) 2, cols);
-      arrayf_delete_cols (&dsp->tc2_manbasis, (gint) 2, cols);
-*/
       arrayf_delete_cols (&dsp->tc1_manbasis, (gint) nc, cols);
       arrayf_delete_cols (&dsp->tc2_manbasis, (gint) nc, cols);
 
@@ -166,8 +161,8 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
       vectorf_realloc (&dsp->tcorr1.tau, nc);
       vectorf_realloc (&dsp->tcorr1.tinc, nc);
 
-      arrayf_add_cols (&dsp->tc1_manbasis, (gint) 2);
-      arrayf_add_cols (&dsp->tc2_manbasis, (gint) 2);
+      arrayf_add_cols (&dsp->tc1_manbasis, (gint) nc);
+      arrayf_add_cols (&dsp->tc2_manbasis, (gint) nc);
 
       arrayf_add_cols (&dsp->tcorr2.u0, nc);
       arrayf_add_cols (&dsp->tcorr2.u1, nc);
@@ -675,6 +670,7 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   gfloat ftmp, tol = 0.01; 
   gboolean dontdoit = false;
   extern void gram_schmidt(gfloat *, gfloat*, gint);
+  extern gfloat calc_norm(gfloat *, gint);
 
   dsp->tc1_phi = 0.;
   dsp->tc2_phi = 0.;
@@ -688,8 +684,9 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   dsp->tc2_manipvar_inc = false;
 
   /* need to turn off tour */
-  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
-    tourcorr_pause(cpanel, CTON, gg);
+  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused) {
+    tourcorr_func(CTOFF, gg->current_display, gg);
+  }
 
   /* check if manip var is one of existing vars */
   /* n1vars, n2vars is the number of variables, excluding the
@@ -860,8 +857,8 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     copy_mat(dsp->tcorr2.u0.vals, dsp->tcorr2.u.vals, d->ncols, 1);
     dsp->tcorr1.get_new_target = true;
     dsp->tcorr2.get_new_target = true;
-    if (cpanel->tcorr1_paused || cpanel->tcorr2_paused)
-      tourcorr_pause(cpanel, CTOFF, gg);
+    if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
+      tourcorr_func(CTON, gg->current_display, gg);
   }
 }
 
@@ -883,8 +880,8 @@ tourcorr_manip_end(splotd *sp)
   dsp->tcorr2.get_new_target = true;
 
   /* need to turn on tour? */
-  if (cpanel->tcorr1_paused || cpanel->tcorr2_paused)
-    tourcorr_pause(cpanel, CTOFF, gg);
+  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
+    tourcorr_func(CTON, gg->current_display, gg);
 
 }
 

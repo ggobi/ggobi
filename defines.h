@@ -150,6 +150,12 @@ typedef enum {NULLMODE = -1,
 #define TOUR_LS_OUT 1
 #define M_PI_2  1.57079632679489661923
 
+#define MANIP_OBLIQUE 0
+#define MANIP_VERT 1
+#define MANIP_HOR 2
+#define MANIP_RADIAL 3
+#define MANIP_ANGULAR 4
+
 #define CMANIP_COMB 0
 #define CMANIP_VERT 1
 #define CMANIP_HOR 2

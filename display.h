@@ -70,26 +70,26 @@ struct _displayd {
 /*
  * Tour display
  */
-  gint ntour_vars; 
-  vector_i tour_vars;
-  array_f u0, u1, u, uold, v0, v1, v, uvevec, tv;
-  vector_f lambda, tau, tinc;
-  gfloat dv, delta;
-  /*  gfloat ts[2], coss[2], sins[2];
-  gint icoss[2], isins[2];*//* di - not sure i need this in the new code.*/
   gint tour_idled;
-  gboolean tour_get_new_target;
-  gint tour_nsteps, tour_stepcntr;
 
 /*
- * Correlation Tour
+ * Manipulation Vars
 */
-  array_f tc1_manbasis, tc2_manbasis;
-  gint tc1_manip_var, tc2_manip_var;
-  gint tc1_pos_old, tc1_pos, tc2_pos_old, tc2_pos;
+  array_f tc1_manbasis, tc2_manbasis, t1d_manbasis;
+  gint tc1_manip_var, tc2_manip_var, t1d_manip_var;
+  gint tc1_pos_old, tc1_pos, tc2_pos_old, tc2_pos, t1d_pos_old, t1d_pos;
   gint tc_manip_mode;
-  gboolean tc1_manipvar_inc, tc2_manipvar_inc;
-  gfloat tc1_phi, tc2_phi;
+  gboolean tc1_manipvar_inc, tc2_manipvar_inc, t1d_manipvar_inc;
+  gfloat tc1_phi, tc2_phi, t1d_phi;
+
+  gint t2d_manip_var, t2d_manipvar_inc;
+  gint t2d_pos1_old, t2d_pos1, t2d_pos2_old, t2d_pos2;
+  gint t2d_manip_mode;
+  array_f t2d_Rmat1, t2d_Rmat2;
+  array_f t2d_manbasis;
+  array_f t2d_mvar_3dbasis;
+  gboolean t2d_no_dir_flag;
+  gfloat t2d_rx, t2d_ry;
 
 /*
  * 2d tour

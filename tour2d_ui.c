@@ -56,14 +56,10 @@ static void scale_set_default_values (GtkScale *scale )
   gtk_scale_set_draw_value (scale, false);
 }
 
-void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
-  cpanel->t2d_paused = state;
-
-  tour2d_func (!cpanel->t2d_paused, gg->current_display, gg);
-}
-
 static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
+  extern void tour2d_pause(cpaneld *, gboolean, ggobid *);
+
   tour2d_pause (&gg->current_display->cpanel, button->active, gg);
 }
 
@@ -97,8 +93,11 @@ static gchar *manip_lbl[] = {"Oblique", "Vert", "Horiz", "Radial",
                              "Angular"};
 static void manip_cb (GtkWidget *w, gpointer cbd)
 {
-  gint indx = GPOINTER_TO_INT (cbd);
-  g_printerr ("cbd: %s\n", manip_lbl[indx]);
+  ggobid *gg = GGobiFromWidget(w, true);
+  displayd *dsp = gg->current_display;
+
+  dsp->t2d_manip_mode = GPOINTER_TO_INT (cbd);
+
 }
 
 void
@@ -254,9 +253,6 @@ static void go_cb (GtkButton *button, ggobid *gg)
 {
   displayd *dsp = gg->current_display; 
   extern void tour2d_do_step(displayd *,ggobid *);
-
-  g_printerr ("go\n");
-  g_printerr ("in go_cb %f \n",dsp->tau.els[0]);
 
   tour2d_do_step (dsp, gg);
 }
@@ -522,7 +518,12 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 static gint
 motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  g_printerr ("(gt_motion_notify_cb)\n");
+  ggobid *gg = GGobiFromSPlot(sp);
+  extern void tour2d_manip(gint, gint, splotd *, ggobid *);
+
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
+  tour2d_manip(sp->mousepos.x, sp->mousepos.y, sp, gg);
 
   return true;
 }
@@ -530,9 +531,15 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
-  gg->current_splot = sp;
-  gg->current_display = (displayd *) sp->displayptr;
+  extern void tour2d_manip_init(gint, gint, splotd *);
+  gint grab_ok;
+
+  grab_ok = gdk_pointer_grab (sp->da->window,
+    false,
+    (GdkEventMask) (GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK),
+    (GdkWindow *) NULL,
+    (GdkCursor *) NULL,
+    event->time);
 
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
@@ -542,18 +549,22 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
                                       (GtkSignalFunc) motion_notify_cb,
                                       (gpointer) sp);
 
+  tour2d_manip_init(sp->mousepos.x, sp->mousepos.y, sp);
+
   return true;
 }
 static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+  extern void tour2d_manip_end(splotd *);
   gboolean retval = true;
 
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
 
-  if (sp->motion_id)
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+  tour2d_manip_end(sp);
+
+  gdk_pointer_ungrab (event->time);
 
   return retval;
 }

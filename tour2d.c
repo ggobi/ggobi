@@ -10,6 +10,9 @@
 #include "vars.h"
 #include "externs.h"
 
+#define T2DON true
+#define T2DOFF false
+
 void
 alloc_tour2d (displayd *dsp, ggobid *gg)
 {
@@ -50,6 +53,16 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
   vectorf_init_null(&dsp->t2d.tinc);
   vectorf_alloc(&dsp->t2d.tinc, nc);
 
+  /* manipulation variables */
+  arrayf_init_null(&dsp->t2d_Rmat1);
+  arrayf_alloc(&dsp->t2d_Rmat1, 3, 3);
+  arrayf_init_null(&dsp->t2d_Rmat2);
+  arrayf_alloc(&dsp->t2d_Rmat2, 3, 3);
+  arrayf_init_null(&dsp->t2d_mvar_3dbasis);
+  arrayf_alloc(&dsp->t2d_mvar_3dbasis, 3, 3);
+  arrayf_init_null(&dsp->t2d_manbasis);
+  arrayf_alloc(&dsp->t2d_manbasis, 3, nc);
+
 }
 
 /*-- eliminate the nc columns contained in *cols --*/
@@ -74,6 +87,8 @@ tour2d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
       vectorf_delete_els (&dsp->t2d.lambda, nc, cols);
       vectorf_delete_els (&dsp->t2d.tau, nc, cols);
       vectorf_delete_els (&dsp->t2d.tinc, nc, cols);
+
+      arrayf_delete_cols (&dsp->t2d_manbasis, (gint) nc, cols);
     }
   }
 }
@@ -100,6 +115,8 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
       vectorf_realloc (&dsp->t2d.lambda, nc);
       vectorf_realloc (&dsp->t2d.tau, nc);
       vectorf_realloc (&dsp->t2d.tinc, nc);
+
+      arrayf_add_cols (&dsp->t2d_manbasis, (gint) nc);
     }
   }
 }
@@ -127,6 +144,10 @@ free_tour2d(displayd *dsp)
   arrayf_free(&dsp->t2d.uvevec, 0, 0);
   arrayf_free(&dsp->t2d.tv, 0, 0);
 
+  arrayf_free(&dsp->t2d_Rmat1, 0, 0);
+  arrayf_free(&dsp->t2d_Rmat2, 0, 0);
+  arrayf_free(&dsp->t2d_mvar_3dbasis, 0, 0);
+  arrayf_free(&dsp->t2d_manbasis, 0, 0);
 }
 
 void 
@@ -194,6 +215,12 @@ void tour2d_speed_set(gint slidepos, ggobid *gg) {
     &dsp->t2d.nsteps, &dsp->t2d.stepcntr);
 }
 
+void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
+  cpanel->t2d_paused = state;
+
+  tour2d_func (!cpanel->t2d_paused, gg->current_display, gg);
+}
+
 void 
 tour2dvar_set (gint jvar, ggobid *gg)
 {
@@ -253,7 +280,9 @@ tour2dvar_set (gint jvar, ggobid *gg)
 static void
 tour2d_manip_var_set (gint j, ggobid *gg)
 {
-  g_printerr ("set the manipulation variable; not yet implemented\n");
+  displayd *dsp = gg->current_display;
+
+  dsp->t2d_manip_var = j;    
 }
 
 void
@@ -339,7 +368,6 @@ tour2d_run(displayd *dsp, ggobid *gg)
   }
   
   display_tailpipe (dsp, gg);
-
   varcircles_refresh (d, gg);
 }
 
@@ -404,6 +432,284 @@ void tour2d_reinit(ggobid *gg)
 
 }
 
+/* Variable manipulation */
+void
+tour2d_manip_init(gint p1, gint p2, splotd *sp) 
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  cpaneld *cpanel = &dsp->cpanel;
+  ggobid *gg = GGobiFromSPlot(sp);
+  gint j, k;
+  gint n1vars = dsp->t2d.nvars;
+  gfloat ftmp, tol = 0.01; 
+  gdouble dtmp1;
+  gboolean dontdoit = false;
+  extern void gram_schmidt(gfloat *, gfloat*, gint);
+  extern gfloat calc_norm(gfloat *, gint);
 
+  /* need to turn off tour */
+  if (!cpanel->t2d_paused)
+    tour2d_func(T2DOFF, gg->current_display, gg);
 
+  dsp->t2d_manipvar_inc = false;
+  dsp->t2d_pos1 = dsp->t2d_pos1_old = p1;
+  dsp->t2d_pos2 = dsp->t2d_pos2_old = p2;
+  /* check if manip var is one of existing vars */
+  /* n1vars, n2vars is the number of variables, excluding the
+     manip var in hor and vert directions */
+  for (j=0; j<dsp->t2d.nvars; j++)
+    if (dsp->t2d.vars.els[j] == dsp->t2d_manip_var) {
+      dsp->t2d_manipvar_inc = true;
+      n1vars--;
+    }
 
+  if (n1vars > 1)
+  {
+    /* make manip basis, from existing projection */
+    /* 0,1 will be the remainder of the projection, and
+       2 will be the indicator vector for the manip var */
+    for (j=0; j<d->ncols; j++) 
+    {
+      dsp->t2d_manbasis.vals[0][j] = dsp->t2d.u.vals[0][j];
+      dsp->t2d_manbasis.vals[1][j] = dsp->t2d.u.vals[1][j];
+      dsp->t2d_manbasis.vals[2][j] = 0.;
+    }
+    dsp->t2d_manbasis.vals[2][dsp->t2d_manip_var] = 1.;
+
+    for (j=0; j<3; j++)
+    {
+      for (k=0; k<3; k++)
+        dsp->t2d_mvar_3dbasis.vals[j][k] = 0.;
+      dsp->t2d_mvar_3dbasis.vals[j][j] = 1.;
+    }
+
+    gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
+      d->ncols);
+    gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
+      d->ncols);
+    ftmp = calc_norm (dsp->t2d_manbasis.vals[2], d->ncols);
+    if (ftmp < tol)
+      dontdoit = true;
+
+    dsp->t2d_no_dir_flag = false;
+    if (dsp->t2d_manip_mode == MANIP_RADIAL)
+    {
+      if ((dsp->t2d.u.vals[0][dsp->t2d_manip_var]*
+        dsp->t2d.u.vals[0][dsp->t2d_manip_var] +
+        dsp->t2d.u.vals[1][dsp->t2d_manip_var]*
+        dsp->t2d.u.vals[1][dsp->t2d_manip_var]) < tol)
+        dsp->t2d_no_dir_flag = true;
+      else
+      {
+        dsp->t2d_rx = dsp->t2d.u.vals[0][dsp->t2d_manip_var];
+        dsp->t2d_ry = dsp->t2d.u.vals[1][dsp->t2d_manip_var];
+        dtmp1 = sqrt(dsp->t2d_rx*dsp->t2d_rx+dsp->t2d_ry*dsp->t2d_ry);
+        dsp->t2d_rx /= dtmp1;
+        dsp->t2d_ry /= dtmp1;
+      }
+    }
+  }
+
+  if (dontdoit) {
+    if (sp->motion_id)
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+  }
+
+}
+
+void
+tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg) 
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  gint actual_nvars = dsp->t2d.nvars;
+  gboolean offscreen = false;
+  gfloat phi, cosphi, sinphi, ca, sa, cosm, cospsi, sinpsi;
+  gfloat distx, disty, x1, x2, y1, y2;
+  gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
+  gfloat tol = 0.01;
+  gdouble dtmp1, dtmp2;
+  gfloat len_motion;
+  gint i,j,k;
+  extern void gram_schmidt(gfloat *, gfloat*, gint);
+  extern void copy_mat(gfloat **, gfloat **, gint, gint);
+
+  /* check if off the plot window */
+  if (p1 > sp->max.x || p1 < 0 ||
+      p2 > sp->max.y || p2 < 0)
+    offscreen = true;
+
+  if (dsp->t2d_manipvar_inc)
+    actual_nvars = dsp->t2d.nvars-1;
+
+  if (!offscreen) {
+    dsp->t2d_pos1_old = dsp->t2d_pos1;
+    dsp->t2d_pos2_old = dsp->t2d_pos2;
+  
+    dsp->t2d_pos1 = p1;
+    dsp->t2d_pos2 = p2;
+
+    if (actual_nvars > 1)
+    {
+      if (dsp->t2d_manip_mode != MANIP_ANGULAR)
+      {
+        if (dsp->t2d_manip_mode == MANIP_OBLIQUE) 
+        {
+          distx = dsp->t2d_pos1 - dsp->t2d_pos1_old;
+          disty = dsp->t2d_pos2 - dsp->t2d_pos2_old;
+        }
+        else if (dsp->t2d_manip_mode == MANIP_VERT) 
+        {
+          distx = 0.;
+          disty = dsp->t2d_pos2 - dsp->t2d_pos2_old;
+        }
+        else if (dsp->t2d_manip_mode == MANIP_HOR) 
+        {
+          distx = dsp->t2d_pos1 - dsp->t2d_pos1_old;
+          disty = 0.;
+        }
+        else if (dsp->t2d_manip_mode == MANIP_RADIAL) 
+        {
+          if (dsp->t2d_no_dir_flag)
+          {
+            distx = dsp->t2d_pos1 - dsp->t2d_pos1_old;
+            disty = dsp->t2d_pos2 - dsp->t2d_pos2_old;
+            dsp->t2d_rx = distx;
+            dsp->t2d_ry = disty; 
+            dtmp1 = sqrt(dsp->t2d_rx*dsp->t2d_rx+dsp->t2d_ry*dsp->t2d_ry);
+            dsp->t2d_rx /= dtmp1;
+            dsp->t2d_ry /= dtmp1;
+            dsp->t2d_no_dir_flag = false;
+          }
+          distx = (dsp->t2d_rx*(dsp->t2d_pos1 - dsp->t2d_pos1_old) + 
+            dsp->t2d_ry*(dsp->t2d_pos2_old - dsp->t2d_pos2))*dsp->t2d_rx;
+          disty = (dsp->t2d_rx*(dsp->t2d_pos1 - dsp->t2d_pos1_old) + 
+            dsp->t2d_ry*(dsp->t2d_pos2_old - dsp->t2d_pos2))*dsp->t2d_ry;
+        }
+        dtmp1 = (gdouble) (distx*distx+disty*disty);
+        len_motion = (gfloat) sqrt(dtmp1);
+
+        if (len_motion != 0)
+        {
+          phi = len_motion / denom;
+     
+          ca = distx/len_motion;
+          sa = disty/len_motion;
+      
+          cosphi = (gfloat) cos((gdouble) phi);
+          sinphi = (gfloat) sin((gdouble) phi);
+          cosm = 1.0 - cosphi;
+          dsp->t2d_Rmat2.vals[0][0] = ca*ca*cosphi + sa*sa;
+          dsp->t2d_Rmat2.vals[0][1] = -cosm*ca*sa;
+          dsp->t2d_Rmat2.vals[0][2] = sinphi*ca;
+          dsp->t2d_Rmat2.vals[1][0] = -cosm*ca*sa;
+          dsp->t2d_Rmat2.vals[1][1] = sa*sa*cosphi + ca*ca;
+          dsp->t2d_Rmat2.vals[1][2] = sinphi*sa;
+          dsp->t2d_Rmat2.vals[2][0] = -sinphi*ca;
+          dsp->t2d_Rmat2.vals[2][1] = -sinphi*sa;
+          dsp->t2d_Rmat2.vals[2][2] = cosphi;
+        }
+      }
+      else 
+      { /* angular constrained manipulation */
+        if (dsp->t2d_pos1_old != sp->max.x/2 && 
+          dsp->t2d_pos2_old != sp->max.y/2 &&
+          dsp->t2d_pos1 != sp->max.x/2 && 
+          dsp->t2d_pos2 != sp->max.y/2)
+        {
+          x1 = dsp->t2d_pos1_old - sp->max.x/2;
+          y1 = dsp->t2d_pos2_old - sp->max.y/2;
+          dtmp1 = sqrt(x1*x1+y1*y1);
+          x1 /= dtmp1;
+          y1 /= dtmp1;
+          x2 = dsp->t2d_pos1 - sp->max.x/2;
+          y2 = dsp->t2d_pos2 - sp->max.y/2;
+          dtmp2 = sqrt(x2*x2+y2*y2);
+          x2 /= dtmp2;
+          y2 /= dtmp2;
+          if (dtmp1 > tol && dtmp2 > tol)
+          {
+            cospsi = x1*x2+y1*y2;
+            sinpsi = x1*y2-y1*x2;
+          }
+          else
+          {
+            cospsi = 1.;    
+            sinpsi = 0.;
+          }
+        }
+        else
+        {
+          cospsi = 1.;
+          sinpsi = 0.;
+        }
+        dsp->t2d_Rmat2.vals[0][0] = cospsi;
+        dsp->t2d_Rmat2.vals[0][1] = sinpsi;
+        dsp->t2d_Rmat2.vals[0][2] = 0.;
+        dsp->t2d_Rmat2.vals[1][0] = -sinpsi;
+        dsp->t2d_Rmat2.vals[1][1] = cospsi;
+        dsp->t2d_Rmat2.vals[1][2] = 0.;
+        dsp->t2d_Rmat2.vals[2][0] = 0.;
+        dsp->t2d_Rmat2.vals[2][1] = 0.;
+        dsp->t2d_Rmat2.vals[2][2] = 1.;
+      }
+
+      for (i=0; i<3; i++) 
+        for (j=0; j<3; j++)
+        {
+          dtmp1 = 0.;
+          for (k=0; k<3; k++)
+            dtmp1 += (dsp->t2d_mvar_3dbasis.vals[i][k]*
+              dsp->t2d_Rmat2.vals[k][j]);
+          dsp->t2d_Rmat1.vals[i][j] = dtmp1;
+        }
+      copy_mat(dsp->t2d_mvar_3dbasis.vals, dsp->t2d_Rmat1.vals, 3, 3);
+  
+      gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
+        dsp->t2d_mvar_3dbasis.vals[1], 3);
+      gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
+        dsp->t2d_mvar_3dbasis.vals[2], 3);
+      gram_schmidt(dsp->t2d_mvar_3dbasis.vals[1], 
+        dsp->t2d_mvar_3dbasis.vals[2], 3);
+
+      for (j=0; j<d->ncols; j++)
+      {
+        dsp->t2d.u.vals[0][j] = 
+          dsp->t2d_manbasis.vals[0][j]*dsp->t2d_mvar_3dbasis.vals[0][0] +
+          dsp->t2d_manbasis.vals[1][j]*dsp->t2d_mvar_3dbasis.vals[0][1] +
+          dsp->t2d_manbasis.vals[2][j]*dsp->t2d_mvar_3dbasis.vals[0][2];
+        dsp->t2d.u.vals[1][j] = 
+          dsp->t2d_manbasis.vals[0][j]*dsp->t2d_mvar_3dbasis.vals[1][0] +
+          dsp->t2d_manbasis.vals[1][j]*dsp->t2d_mvar_3dbasis.vals[1][1] +
+          dsp->t2d_manbasis.vals[2][j]*dsp->t2d_mvar_3dbasis.vals[1][2];
+      }
+    }
+    display_tailpipe (dsp, gg);
+    varcircles_refresh (d, gg);
+  }
+}
+
+void
+tour2d_manip_end(splotd *sp) 
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  cpaneld *cpanel = &dsp->cpanel;
+  ggobid *gg = GGobiFromSPlot(sp);
+  extern void copy_mat(gfloat **, gfloat **, gint, gint);
+
+  if (sp->motion_id)
+    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+
+  copy_mat(dsp->t2d.u0.vals, dsp->t2d.u.vals, d->ncols, 2);
+  dsp->t2d.get_new_target = true;
+
+  /* need to turn on tour? */
+  if (!cpanel->t2d_paused)
+    tour2d_func(T2DON, gg->current_display, gg);
+
+}
+
+#undef T2DON
+#undef T2DOFF

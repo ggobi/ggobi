@@ -585,6 +585,13 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
           gdk_draw_line (da_pix,
             gg->selvarfg_GC, r, r, r+x, r-y);
 
+          if (jvar == display->t1d_manip_var) {
+            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 150*64, 60*64);
+            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
+          }
+
           for (k=0; k<display->t1d.nvars; k++) {
             if (display->t1d.vars.els[k] == jvar) {
               chosen = true;
@@ -597,6 +604,11 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
           y = (gint) (display->t2d.u.vals[1][jvar]*(gfloat)r);
           gdk_draw_line (da_pix,
             gg->selvarfg_GC, r, r, r+x, r-y);
+
+          if (jvar == display->t2d_manip_var) {
+            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 0*64, 360*64);
+          }
 
           for (k=0; k<display->t2d.nvars; k++) {
             if (display->t2d.vars.els[k] == jvar) {

@@ -15,6 +15,9 @@
 
 #include "tour1d_pp.h"
 
+#define T1DON true
+#define T1DOFF false
+
 void
 alloc_tour1d (displayd *dsp, ggobid *gg)
 {
@@ -22,31 +25,31 @@ alloc_tour1d (displayd *dsp, ggobid *gg)
   gint nc = d->ncols;
 
   arrayf_init_null(&dsp->t1d.u0);
-  arrayf_alloc(&dsp->t1d.u0, nc, nc);
+  arrayf_alloc(&dsp->t1d.u0, 2, nc);
 
   arrayf_init_null(&dsp->t1d.u1);
-  arrayf_alloc(&dsp->t1d.u1, nc, nc);
+  arrayf_alloc(&dsp->t1d.u1, 2, nc);
 
   arrayf_init_null(&dsp->t1d.u);
-  arrayf_alloc(&dsp->t1d.u, nc, nc);
+  arrayf_alloc(&dsp->t1d.u, 2, nc);
 
   /*  arrayf_init_null(&dsp->t1d.uold);
   arrayf_alloc(&dsp->t1d.uold, nc, nc);*/
 
   arrayf_init_null(&dsp->t1d.v0);
-  arrayf_alloc(&dsp->t1d.v0, nc, nc);
+  arrayf_alloc(&dsp->t1d.v0, 2, nc);
 
   arrayf_init_null(&dsp->t1d.v1);
-  arrayf_alloc(&dsp->t1d.v1, nc, nc);
+  arrayf_alloc(&dsp->t1d.v1, 2, nc);
 
   arrayf_init_null(&dsp->t1d.v);
-  arrayf_alloc(&dsp->t1d.v, nc, nc);
+  arrayf_alloc(&dsp->t1d.v, 2, nc);
 
   arrayf_init_null(&dsp->t1d.uvevec);
-  arrayf_alloc(&dsp->t1d.uvevec, nc, nc);
+  arrayf_alloc(&dsp->t1d.uvevec, 2, nc);
 
   arrayf_init_null(&dsp->t1d.tv);
-  arrayf_alloc(&dsp->t1d.tv, nc, nc);
+  arrayf_alloc(&dsp->t1d.tv, 2, nc);
 
   vectori_init_null(&dsp->t1d.vars);
   vectori_alloc(&dsp->t1d.vars, nc);
@@ -56,6 +59,10 @@ alloc_tour1d (displayd *dsp, ggobid *gg)
   vectorf_alloc(&dsp->t1d.tau, nc);
   vectorf_init_null(&dsp->t1d.tinc);
   vectorf_alloc(&dsp->t1d.tinc, nc);
+
+  /* manipulation controls */
+  arrayf_init_null(&dsp->t1d_manbasis);
+  arrayf_alloc(&dsp->t1d_manbasis, 2, nc);
 }
 
 /*-- eliminate the nc columns contained in *cols --*/
@@ -80,6 +87,8 @@ tour1d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
       vectorf_delete_els (&dsp->t1d.lambda, nc, cols);
       vectorf_delete_els (&dsp->t1d.tau, nc, cols);
       vectorf_delete_els (&dsp->t1d.tinc, nc, cols);
+
+      arrayf_delete_cols (&dsp->t1d_manbasis, (gint) nc, cols);
     }
   }
 }
@@ -106,6 +115,8 @@ tour1d_realloc_up (gint nc, datad *d, ggobid *gg)
       vectorf_realloc (&dsp->t1d.lambda, nc);
       vectorf_realloc (&dsp->t1d.tau, nc);
       vectorf_realloc (&dsp->t1d.tinc, nc);
+
+      arrayf_add_cols (&dsp->t1d_manbasis, (gint) nc);
     }
   }
 }
@@ -128,6 +139,8 @@ free_tour1d(displayd *dsp)
 
   arrayf_free(&dsp->t1d.uvevec, 0, 0);
   arrayf_free(&dsp->t1d.tv, 0, 0);
+
+  arrayf_free(&dsp->t1d_manbasis, 0, 0);
 }
 
 void 
@@ -148,12 +161,12 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
   dsp->t1d.vars.els[2] = 2;*/
 
   /* declare starting base as first p chosen variables */
-  for (i=0; i<nc; i++)
+  for (i=0; i<2; i++)
     for (j=0; j<nc; j++)
       dsp->t1d.u0.vals[i][j] = dsp->t1d.u1.vals[i][j] = dsp->t1d.u.vals[i][j] = 
         dsp->t1d.v0.vals[i][j] = dsp->t1d.v1.vals[i][j] = 0.0;
 
-  for (i=0; i<nc; i++)
+  for (i=0; i<2; i++)
   {
     dsp->t1d.u1.vals[i][dsp->t1d.vars.els[i]] =
       dsp->t1d.u0.vals[i][dsp->t1d.vars.els[i]] = 
@@ -195,6 +208,11 @@ void tour1d_speed_set(gint slidepos, ggobid *gg) {
     &dsp->t1d.nsteps, &dsp->t1d.stepcntr);
 }
 
+void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
+  cpanel->t1d_paused = state;
+
+  tour1d_func (!cpanel->t1d_paused, gg->current_display, gg);
+}
 
 void 
 tour1dvar_set (gint jvar, ggobid *gg)
@@ -250,9 +268,12 @@ tour1dvar_set (gint jvar, ggobid *gg)
 }
 
 static void
-tour1d_manip_var_set (gint j, ggobid *gg)
+tour1d_manip_var_set (gint j, gint btn, ggobid *gg)
 {
-  g_printerr ("set the manipulation variable; not yet implemented\n");
+  displayd *dsp = gg->current_display;
+
+  if (btn == 1)
+    dsp->t1d_manip_var = j;    
 }
 
 void
@@ -260,7 +281,7 @@ tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
   if (button == 1 || button == 2) {
     if (d->vcirc_ui.jcursor == GDK_HAND2) {
-      tour1d_manip_var_set (jvar, gg);
+      tour1d_manip_var_set (jvar, button, gg);
       varcircles_cursor_set_default (d);
 
     } else {
@@ -536,4 +557,164 @@ void tour1d_vert(cpaneld *cpanel, gboolean state)
   cpanel->t1d_vert = state;
 }
 
+/* Variable manipulation */
+void
+tour1d_manip_init(gint p1, gint p2, splotd *sp) 
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  cpaneld *cpanel = &dsp->cpanel;
+  ggobid *gg = GGobiFromSPlot(sp);
+  gint j;
+  gint n1vars = dsp->t1d.nvars;
+  gfloat ftmp, tol = 0.01; 
+  gboolean dontdoit = false;
+  extern void gram_schmidt(gfloat *, gfloat*, gint);
 
+  dsp->t1d_phi = 0.;
+
+  /* gets mouse position */
+  if (cpanel->t1d_vert) 
+    dsp->t1d_pos = dsp->t1d_pos_old = p2;
+  else
+    dsp->t1d_pos = dsp->t1d_pos_old = p1;
+
+  /* initializes indicator for manip var being one of existing vars */
+  dsp->t1d_manipvar_inc = false;
+
+  /* need to turn off tour */
+  if (!cpanel->t1d_paused)
+    tour1d_func(T1DOFF, gg->current_display, gg);
+
+  /* check if manip var is one of existing vars */
+  /* n1vars, n2vars is the number of variables, excluding the
+     manip var in hor and vert directions */
+  for (j=0; j<dsp->t1d.nvars; j++)
+    if (dsp->t1d.vars.els[j] == dsp->t1d_manip_var) {
+      dsp->t1d_manipvar_inc = true;
+      n1vars--;
+    }
+
+  /* make manip basis, from existing projection */
+  /* 0 will be the remainder of the projection, and
+     1 will be the indicator vector for the manip var */
+  for (j=0; j<d->ncols; j++) {
+    dsp->t1d_manbasis.vals[0][j] = dsp->t1d.u.vals[0][j];
+    dsp->t1d_manbasis.vals[1][j] = 0.;
+  }
+  dsp->t1d_manbasis.vals[1][dsp->t1d_manip_var]=1.;
+
+  if (n1vars > 0)
+  {
+    gram_schmidt(dsp->t1d_manbasis.vals[0],  dsp->t1d_manbasis.vals[1],
+      d->ncols);
+    ftmp = calc_norm (dsp->t1d_manbasis.vals[1], d->ncols);
+    if (ftmp < tol)
+      dontdoit = true;
+  }
+
+  if (dontdoit) {
+    if (sp->motion_id)
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+  }
+}
+
+void
+tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg) 
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  cpaneld *cpanel = &dsp->cpanel;
+  gfloat xcosphi=1., xsinphi=0.;
+  gfloat distx, disty;
+  gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
+  gint actual_nxvars = dsp->t1d.nvars;
+  gint j;
+  gboolean offscreen = false;
+
+  /* check if off the plot window */
+  if (p1 > sp->max.x || p1 < 0 ||
+      p2 > sp->max.y || p2 <0)
+    offscreen = true;
+
+  if (dsp->t1d_manipvar_inc)
+    actual_nxvars = dsp->t1d.nvars-1;
+
+  if (!offscreen) {
+    dsp->t1d_pos_old = dsp->t1d_pos;
+  
+    dsp->t1d_pos = p1;
+
+    if (actual_nxvars > 0)
+    {
+      if (cpanel->t1d_vert)
+      {
+        distx = 0.;
+        disty = dsp->tc2_pos_old - dsp->tc2_pos;
+      }
+      else
+      {
+        distx = dsp->t1d_pos - dsp->t1d_pos_old;
+        disty = 0.;
+      }
+
+      dsp->t1d_phi = dsp->t1d_phi + distx / denom;
+  
+      xcosphi = (gfloat) cos((gdouble) dsp->t1d_phi);
+      xsinphi = (gfloat) sin((gdouble) dsp->t1d_phi);
+      if (xcosphi > 1.0)
+      {
+        xcosphi = 1.0;
+        xsinphi = 0.0;
+      }
+      else if (xcosphi < -1.0)
+      {
+        xcosphi = -1.0;
+        xsinphi = 0.0;
+      }
+    }
+
+    /* generate the projection basis */
+    if (actual_nxvars > 0) 
+    {
+      for (j=0; j<d->ncols; j++)
+        dsp->t1d.u.vals[0][j] = xcosphi * dsp->t1d_manbasis.vals[0][j] + 
+         xsinphi * dsp->t1d_manbasis.vals[1][j];
+    }
+ 
+    display_tailpipe (dsp, gg);
+    varcircles_refresh (d, gg);
+  }
+  else {
+    if (sp->motion_id)
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+    copy_mat(dsp->t1d.u0.vals, dsp->t1d.u.vals, d->ncols, 1);
+    dsp->t1d.get_new_target = true;
+    if (!cpanel->t1d_paused)
+      tour1d_func(T1DON, gg->current_display, gg);
+  }
+}
+
+void
+tour1d_manip_end(splotd *sp) 
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  cpaneld *cpanel = &dsp->cpanel;
+  ggobid *gg = GGobiFromSPlot(sp);
+  extern void copy_mat(gfloat **, gfloat **, gint, gint);
+
+  if (sp->motion_id)
+    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+
+  copy_mat(dsp->t1d.u0.vals, dsp->t1d.u.vals, d->ncols, 1);
+  dsp->t1d.get_new_target = true;
+
+  /* need to turn on tour? */
+  if (!cpanel->t1d_paused)
+    tour1d_pause(cpanel, T1DOFF, gg);
+
+}
+
+#undef T1DON
+#undef T1DOFF
