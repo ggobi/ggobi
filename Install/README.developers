@@ -1,4 +1,4 @@
-Adding new files to depository:
+Adding new files to repository:
 ==============================
 
 Edit Install/GNUmakfile_src.in 
@@ -10,7 +10,7 @@ Edit Install/GNUmakefile.admin
 Checking installation:
 =====================
 
-make ADMIN=1 DOC_TEX_FILES=
+make ADMIN=1 DOC_TEX_FILES= NO_XGOBI_GROUP
 cd /tmp/ggobi/Install/ggobi
 ./configure
 make (or gmake)
