@@ -407,9 +407,16 @@ gboolean isASCIIFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *plugin
   gboolean isascii = true;
 
   if(!canRead(fileName)) {
+     /* first test whether fileName already ends with .dat! */
      gchar buf[256];
-     sprintf(buf, "%s.dat", fileName);
-     return(isASCIIFile(buf, gg, plugin));
+     gchar* suffix = ".dat";
+     gint slen = strlen(fileName);
+     if (slen >= 4 && !strcmp(&fileName[slen-4], suffix)) {
+       sprintf(buf, "%s.dat", fileName);
+       return(isASCIIFile(buf, gg, plugin));
+     } else {
+       return (false);
+     }
   }
 
   f = fopen(fileName, "r");
