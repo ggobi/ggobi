@@ -451,17 +451,38 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
   extern gint num_ggobis;
   gint count;
   displayd *dsp;
+
+
+  if (num_ggobis > 1 || force || g_list_length (gg->displays) > 1) {
+
+    /* These are probably mutually exclusive 
+       and so we could use an else-if sequence
+       but the results are catastrophic if we get it
+       wrong so we play on the safe side of the fence.
+     */
+  if(display->t2d.idled) {
+      tour2d_func(false, display, gg);
+  }
+  if(display->t1d.idled) {
+      tour1d_func(false, display, gg);
+  }
+  if(display->tcorr1.idled) {
+      tourcorr_func(false, display, gg);
+  }
+
 /*
  * If the current splot belongs to this display, turn off its
  * event handlers before freeing all the splots belonging to this
  * display.
+
+  This was outside and before the conditional of being able to close
+  this display.
 */
   dsp = (displayd *) gg->current_splot->displayptr;
   if (dsp == display) {
      sp_event_handlers_toggle (gg->current_splot, off);
   }
 
-  if (num_ggobis > 1 || force || g_list_length (gg->displays) > 1) {
 
     /*-- If the display tree is active, remove the corresponding entry. --*/
     tree_display_entry_remove (display, gg->display_tree.tree, gg); 

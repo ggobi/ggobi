@@ -688,13 +688,6 @@ void tourcorr_func (gboolean state, displayd *dsp, ggobid *gg)
     }
     gg->tourcorr.idled = 0;
   }
-
-/*
-   if (state)
-     tour_idle = gtk_timeout_add (40, tour_idle_func, NULL);
-   else
-     gtk_timeout_remove (tour_idle);
-*/
 }
 
 void tourcorr_reinit(ggobid *gg)
