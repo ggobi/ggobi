@@ -111,25 +111,31 @@ const gchar * const xmlDataTagNames[] = {
 void
 ggobi_XML_warning_handler(void *data, const gchar *msg, ...)
 {
-  xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
-  fprintf(stderr, "Warning from XML parsing [%d, %d]: %s",
-    p->input->line, p->input->col, msg);
-/*
-  fprintf(stderr, msg, ...); 
-*/
-  fflush(stderr);  
+    va_list ap;
+    xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
+
+    va_start(ap, msg);
+    fprintf(stderr, "Warning from XML parsing [%d, %d]: ",
+	    (int) p->input->line, (int) p->input->col);
+
+    vfprintf(stderr, msg, ap); 
+
+    fflush(stderr);  
 }
 
 void
 ggobi_XML_error_handler(void *data, const gchar *msg, ...)
 {
-  xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
-  fprintf(stderr, "Error in XML parsing [line %d, column %d]: %s",
-    p->input->line, p->input->col, msg);
-/*
-  fprintf(stderr, msg, ...); 
-*/
-  fflush(stderr);
+    va_list ap;
+    xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
+
+    fprintf(stderr, "Error in XML parsing [line %d, column %d]: ",
+  	      (int) p->input->line, (int) p->input->col);
+
+    va_start(ap, msg);
+    vfprintf(stderr, msg, ap); 
+
+    fflush(stderr);
 }
 
 
@@ -931,7 +937,10 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
       value = asNumber (tmp);
       if(vt->categorical_p && checkLevelValue(vt, value) == false) {
             /* add the name of the variable and the record number to this message! */
-	 ggobi_XML_error_handler(data, "incorrect level in record %d, variable %s the XML input file\n", (int) data->current_record + 1, vt->collab);
+	 ggobi_XML_error_handler(data, 
+				 "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n", 
+				 (int) data->current_record + 1, vt->collab,
+				 data->current_data->name ? data->current_data->name : "");
       }
       d->raw.vals[data->current_record][data->current_element] = value;
     }
