@@ -264,13 +264,6 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 
   nc = 8;
 
-/*
-  rowids = (glong *) g_malloc (nvisible * sizeof(glong));
-  for (m=0; m<nvisible; m++) {
-    i = visible[m];
-    rowids[m] = (glong) d->rowid.id.els[i];
-  }
-*/
   rowids = (gchar **) g_malloc (nvisible * sizeof(gchar *));
   for (m=0; m<nvisible; m++) {
     i = visible[m];
@@ -421,7 +414,7 @@ void radial_center_set_cb (ggobid *gg, gint index,
   GtkWidget *entry = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(gl->window),
     "CENTERNODE");
 
-  if (state == STICKY) {
+  if (state == STICKY && index >= 0) {
     gtk_entry_set_text (GTK_ENTRY (entry),
       (gchar *) g_array_index (d->rowlab, gchar *, index));
     gl->centerNodeIndex = index;
