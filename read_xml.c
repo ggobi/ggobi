@@ -305,9 +305,12 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     case REAL:   
     case INT:   
     case NA:  
-      if(data->recordString)
-        setRecordValues(data, data->recordString, data->recordStringLength);
-    break;
+        if(data->recordString) { 
+          setRecordValues(data, data->recordString, data->recordStringLength);
+	  if(type != NA)
+            data->current_element++;
+	}
+       break;
     case QUICK_HELP:
       break;
     default:
@@ -467,6 +470,8 @@ void endXMLElement(void *user_data, const xmlChar *name)
       data = NULL; /* just any code so we can stop.*/
     break;
   }
+  if(data)
+    resetRecordInfo(data);
 }
 
 
@@ -548,6 +553,7 @@ Characters(void *user_data, const xmlChar *ch, gint len)
   }
 
   switch(data->state) {
+    case NA:
     case RECORD:
     case REAL:
     case INT:

@@ -436,7 +436,10 @@ add_ggobi_data(datad *data, GtkWidget *w)
 
     for(j = 0; j < data->ncols; j++) {
       char buf[10];
-      sprintf(buf, "%.3g", raw[i][j]);
+      if(data->nmissing && data->missing.vals[i][j])
+        sprintf(buf, "<NA>");
+      else
+        sprintf(buf, "%.3g", raw[i][j]);
       gtk_sheet_set_cell(sheet, i, j, GTK_JUSTIFY_RIGHT, buf);
     }
   }

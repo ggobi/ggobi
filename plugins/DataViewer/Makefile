@@ -23,7 +23,8 @@ else
  GGOBI_LIB=-L../.. -lggobi
 endif
 
-CFLAGS+=-INLINE:=ON
+GGOBI_CFLAGS=$(shell cd $(GGOBI_HOME) ; make cflags)
+# CFLAGS+=-INLINE:=ON
 
 ifdef GTK_EXTRA_CONFIG
  GTKEXTRA_INCLUDES=$(shell $(GTK_EXTRA_CONFIG) --cflags)
@@ -32,7 +33,7 @@ else
  EXTRA_LIBS=$(GTKEXTRA_LIB_DIR:%=-L%) $(GTKEXTRA_LIB_DIR:%=-Xlinker -rpath -Xlinker %) -lgtkextra 
 endif
 
-CFLAGS+=-g $(GTKEXTRA_INCLUDES) $(GNOME_SUPPORT_INCLUDE_DIR:%=-I%) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags) $(XML_INC_DIRS:%=-I%)
+CFLAGS+=-g $(GTKEXTRA_INCLUDES) $(GGOBI_CFLAGS) $(GGOBI_INCLUDE_DIR) 
 
 
 SRC=worksheet
