@@ -39,6 +39,11 @@ typedef struct {
 } endpointsd;
 
 /*-- arrays --*/
+/*-- double: some plugins will want these --*/
+typedef struct {
+  gdouble **vals;
+  guint nrows, ncols;
+} array_d;
 /*-- floating point: for gg.raw_data, tform1, tform2 --*/
 typedef struct {
   gfloat **vals;
