@@ -117,7 +117,7 @@ endif
 
 OBJ=$(SRC:%.c=%.o)
 
-CFLAGS= @SRC_DEBUG@ -I../include -I../gtkext/include $(shell $(GTK_CONFIG) --cflags ) $(XML_INC_DIRS) $(MYSQL_INC_DIRS) @XML_CFLAG_DEFINES@
+CFLAGS= @SRC_DEBUG@ -I../include -I../gtkext/include $(shell $(GTK_CONFIG) --cflags ) $(XML_INC_DIRS) $(MYSQL_INC_DIRS) @XML_CFLAG_DEFINES@ @DEFS@
 
 LIBS=-L$(TOP)/lib -lgtkext $(XML_LIBS) $(shell $(GTK_CONFIG) --libs)
 

@@ -270,6 +270,12 @@ gint  *createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg
    */
 KeyEventHandler *GGOBI(registerNumberedKeyEventHandler)(KeyEventHandlerFunc routine, void *userData, char *description, ReleaseData *data, ggobid *gg, ProgrammingLanguage lang);
 KeyEventHandler *GGOBI(removeNumberedKeyEventHandler)(ggobid *gg);
+
+
+extern  char * const GGOBI(getVersionDate)();
+extern  char * const GGOBI(getVersionString)();
+extern  int* const GGOBI(getVersionNumbers)();
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,0 +1,20 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+ /* */
+#undef MAJOR_VERSION
+
+ /* */
+#undef MINOR_VERSION
+
+ /* */
+#undef PATCH_LEVEL
+
+ /* */
+#undef GGOBI_VERSION_STRING
+
+ /* */
+#undef GGOBI_RELEASE_DATE
+
+
+#endif

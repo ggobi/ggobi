@@ -1,0 +1,72 @@
+\documentclass{article}
+\usepackage{fullpage}
+\input{WebMacros}
+\input{CMacros}
+\title{Version Information in ggobi}
+\begin{document}
+\maketitle
+The ggobi executable provides information about the version that was
+compiled. This is useful for bug reports and also determining
+information at run time, such as in the S, Perl and Python interfaces.
+Reporting the version in bugs is helpful for the developers.  Finding
+the particular version at run time can allow code in other languages
+to behave differently for different ggobi releases.
+
+Debby added the version information in \file{version.h}.  I have moved
+it to \file{VersionInfo} and this is used in the autoconf
+configuration scripts and inserted into a file \file{config.h} that is
+created during the installation.  Developers working with a CVS
+version of this and not performing the configuration associated with
+installation will not have the new functionality. (If people want it,
+let me know and I can change things.  It is not hard, I just don't
+want to add extra hoops for developers to jump through.)
+
+\section{Stand-alone ggobi}
+You can get two pieces of version of information
+from the stand-alone ggobi from the command line.
+Use 
+\begin{verbatim}
+ggobi -version
+\end{verbatim}
+and
+\begin{verbatim}
+ggobi --version
+\end{verbatim}
+(with two '-' characters)
+to get
+the release date and
+the major, minor and patch-level numbers,
+respectively.
+
+\section{Embedded ggobi}
+
+The ggobi API provides three routines to get the version information.
+These are \Croutine{GGOBI(getVersionDate)} and
+\Croutine{GGOBI(getVersionNumbers)}
+\Croutine{GGOBI(getVersionString)}.  The first returns the date as a
+string and this is the value of the \CppMacro{GGOBI_VERSION_STRING}.
+The second routine returns an array of three integers corresponding to
+the major, minor and patch-level values, and in that order.  The third
+routine provides these numbers as a string, separating the major and
+minor numbers with a period (`.') and the patch-level with a `-'.  The
+return values are not copies of data but fixed constants. Do not free
+these returned values.
+
+In the \S{} interface, the function \Sfunction{getVersion.ggobi}
+returns a list containing the date string, an integer vector
+containing the major, minor and patch numbers
+and string version of these numbers.
+
+
+\section{Release-time Duties}
+
+When releasing a version, please remember to update the VersionInfo
+file.  You should increment the \CppMacro{PATCH_LEVEL},
+\CppMacro{MINOR_VERSION} or \CppMacro{MAJOR_VERSION}.  Also, set the
+\CppMacro{GGOBI_RELEASE_DATE}.
+
+In the future, I may make the \file{VersionInfo} file automatically
+generated to update the date information.  In that case, we would edit
+the \file{VersionInfo.in} and not the \file{VersionInfo} file.
+
+\end{document}

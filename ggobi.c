@@ -19,8 +19,11 @@
 #include "vars.h"
 #include "externs.h"
 
-#include "version.h"
-static gchar *version_date = "October 10, 2000";
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+
 
 
 static GGobiOptions sessionoptions;
@@ -95,11 +98,11 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
      * -version:  print version date, return
     */
     else if (strcmp (av[1], "-version") == 0) {
-      g_printerr ("This version of GGobi is dated %s\n", version_date);
+      g_printerr ("This version of GGobi is dated %s\n", GGOBI(getVersionDate()));
       exit (0);
     }
     else if (strcmp (av[1], "--version") == 0) {
-      g_printerr ("%s\n", VERSION_STRING);
+      g_printerr ("%s\n", GGOBI(getVersionString()));
       exit (0);
     }
 

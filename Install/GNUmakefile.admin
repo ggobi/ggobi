@@ -44,7 +44,7 @@ C_SRC_FILES=$(SRC) $(XML_SRC) xmlConvert.c
 C_HEADER_FILES=\
   GGobiAPI cpanel datad defines display display_tree \
   externs ggobi noop-checkbutton read_mysql read_xml  \
-  splot types vars varseldata write_xml writedata vartable gtkext fileio version
+  splot types vars varseldata write_xml writedata vartable gtkext fileio 
 
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)
@@ -63,6 +63,7 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
 	cp $(LICENSES:%=LICENSING/%) Install/INSTALL Install/README $(TMP_INSTALL_DIR)
 	cp Install/configure.in Install/configure  Install/Makeconf.in Install/GNUmakefile.in $(TMP_INSTALL_DIR)
 	cp Install/GNUmakefile_src.in $(TMP_INSTALL_DIR)/src/GNUmakefile.in
+	cp Install/config.h.in $(TMP_INSTALL_DIR)/src/
 	cp Install/setLD.bsh.in Install/setLD.csh.in Install/ggobi-config.in $(TMP_INSTALL_DIR)/bin
 	cp Install/ggobi.in $(TMP_INSTALL_DIR)/bin
 	cp Install/bugTemplate.in $(TMP_INSTALL_DIR)/

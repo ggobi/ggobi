@@ -1347,4 +1347,33 @@ GGOBI(removeNumberedKeyEventHandler)(ggobid *gg)
  return(GGOBI(registerNumberedKeyEventHandler(NULL, NULL, NULL, NULL, gg, C)));
 }
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+static gchar *version_date = GGOBI_RELEASE_DATE;
+int GgobiVersionNumbers[] = {MAJOR_VERSION, MINOR_VERSION, PATCH_LEVEL};
+static gchar *version_string =  GGOBI_VERSION_STRING;
+#else
+static gchar *version_date = "October 10, 2000";
+int GgobiVersionNumbers[] = {-1,-1,-1};
+static gchar *version_string = "developer";
+#endif
+
+char * const 
+GGOBI(getVersionDate)()
+{
+  return(version_date);
+}
+
+char * const 
+GGOBI(getVersionString)()
+{
+  return(version_string);
+}
+
+int* const 
+GGOBI(getVersionNumbers)()
+{
+  return(GgobiVersionNumbers);
+}
+
 
