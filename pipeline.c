@@ -40,6 +40,7 @@ pipeline_arrays_free (datad *d, ggobid *gg)
 
   vectori_free (&d->rows_in_plot);
   vectorb_free (&d->sampled);
+  vectorb_free (&d->excluded);
 }
 
 void
@@ -59,6 +60,7 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
 
   vectori_alloc (&d->rows_in_plot, nr);
   vectorb_alloc (&d->sampled, nr);
+  vectorb_alloc (&d->excluded, nr);
 }
 
 static void
@@ -96,13 +98,20 @@ pipeline_arrays_check_dimensions (datad *d)
   if (d->jitdata.nrows < d->nrows)
     arrayg_add_rows (&d->jitdata, d->nrows);
 
-  /*-- d->sampled --*/
   if ((n = d->sampled.nels) < d->nrows) {
     gint i;
     /*-- include any new rows in the sample -- add to rows_in_plot? --*/
     vectorb_realloc (&d->sampled, d->nrows);
     for (i=n; i<d->nrows; i++)
       d->sampled.els[i] = true;
+  }
+
+  if ((n = d->excluded.nels) < d->nrows) {
+    gint i;
+    /*-- don't excluded new rows --*/
+    vectorb_realloc (&d->excluded, d->nrows);
+    for (i=n; i<d->nrows; i++)
+      d->excluded.els[i] = false;
   }
 
   /*-- d->rows_in_plot --*/
@@ -271,13 +280,12 @@ tform_to_world (datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 /*
- * Combine the values in three arrays:
- *   clusv[].excluded (which come from the exclusion panel)
- *   hidden[] (which come from erasing operations)
+ * Combine the values in two arrays:
+ *   excluded[] (which comes from the exclusion panel or from linking)
  *   sampled[] (which come from the subset panel)
  * to determine which cases should be plotted.
  *
- * rows_in_plot = sampled && !hidden
+ * rows_in_plot = sampled && !excluded
 */
 
 void
@@ -288,13 +296,9 @@ rows_in_plot_set (datad *d, ggobid *gg) {
 
   d->nrows_in_plot = 0;
 
-  for (i=0; i<d->nrows; i++) {
-    /*if (!d->hidden.els[i] && d->sampled.els[i]) {*/
-    if (d->hidden.els[i] && d->nclusters && d->clusv[d->clusterid.els[i]].excluded_p)
-      ;
-    else if (d->sampled.els[i])
+  for (i=0; i<d->nrows; i++)
+    if (d->sampled.els[i] && !d->excluded.els[i])
       d->rows_in_plot.els[d->nrows_in_plot++] = i;
-  }
 
   klass = GTK_GGOBI_DATA_CLASS(GTK_OBJECT(d)->klass);
   gtk_signal_emit (GTK_OBJECT(d),

@@ -201,6 +201,7 @@ void pipeline_init(datad * d, ggobid * gg)
   pipeline_arrays_alloc(d, gg);
   for (i = 0; i < d->nrows; i++) {
     d->sampled.els[i] = true;
+    d->excluded.els[i] = false;
   }
   /*-- maybe some points are tagged "hidden" in the data --*/
   rows_in_plot_set(d, gg);
