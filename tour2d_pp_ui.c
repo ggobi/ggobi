@@ -109,7 +109,7 @@ replot_freq_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
 static void
 t2d_optimz_cb (GtkToggleButton  *w, displayd *dsp) {
   if (dsp == NULL) {
-    g_printerr ("No display corresponds to these controls\n");
+    g_printerr ("No display corresponds to these projection pursuit controls; close this panel.\n");
     return;
   }
 
@@ -118,6 +118,7 @@ t2d_optimz_cb (GtkToggleButton  *w, displayd *dsp) {
 }
 
 static void t2d_pptemp_set_cb (GtkAdjustment *adj, displayd *dsp) {
+
   t2d_pptemp_set(adj->value, dsp, dsp->d->gg);
 }
 
