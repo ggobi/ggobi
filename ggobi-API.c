@@ -224,11 +224,14 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
 
   for (j = 0; j < nc ; j++) {
     vt = vartable_element_get (j, d);
-    vt->collab = g_strdup(colnames[j]);
-    vt->collab_tform = g_strdup(colnames[j]);
+    vt->collab = (colnames != NULL && colnames[j] != NULL) ?
+      g_strdup(colnames[j]) : g_strdup_printf("V%d", j+1);
+    vt->collab_tform = g_strdup (vt->collab);
+
     for (i = 0; i < nr ; i++) {
       if (j == 0) {
-        lbl = g_strdup (rownames[i]);
+        lbl = (rownames != NULL && rownames[i] != NULL) ?
+          g_strdup (rownames[i]) : g_strdup_printf ("%d", i+1);
         g_array_append_val (d->rowlab, lbl);
         /* g_free (lbl); */
       }
