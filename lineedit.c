@@ -167,6 +167,8 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
 /*
  * This will be handled with signals, where each splotd listens
  * for (maybe) point_added or edge_added events.
+ * New bug: sp->bar needs to be reinitialized.  This code need
+ * to be class-sensitive, and it isn't.
 */
 /* could put some code in splot_record_add  */
   if (mode == ADDING_EDGES) {
@@ -198,6 +200,13 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
             if(klass->alloc_whiskers)
               sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp,
                 d->nrows, d);
+
+            /*-- each plot type should have its own realloc routines --*/
+            if (GTK_IS_GGOBI_BARCHART_SPLOT(sp)) {
+              barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+              barchart_clean_init (bsp);
+              barchart_recalc_counts (bsp, d, gg);
+            }
           }
         }
       }
@@ -501,6 +510,7 @@ fetch_default_record_values (gchar **vals, datad *dtarget, displayd *display,
 {
   gint j;
   gcoords eps;
+  vartabled *vt;
 
   if (dtarget == display->d) {
     /*-- use the screen position --*/
@@ -508,8 +518,15 @@ fetch_default_record_values (gchar **vals, datad *dtarget, displayd *display,
     pt_screen_to_raw (&gg->current_splot->mousepos,
       -1, true, true, /* no id, both horiz and vert are true */
       raw, &eps, dtarget, gg->current_splot, gg);
-    for (j=0; j<dtarget->ncols; j++)
-      vals[j] = g_strdup_printf ("%g", raw[j]);
+    for (j=0; j<dtarget->ncols; j++) {
+      /*-- if variable j is categorical, make it an integer --*/
+      /* it may have to be forced to one of the existing level values ... */
+      vt = vartable_element_get (j, dtarget);
+      if (vt->vartype == categorical)
+        vals[j] = g_strdup_printf ("%d", (gint) floor(raw[j]+.5));
+      else
+        vals[j] = g_strdup_printf ("%g", raw[j]);
+    }
     g_free (raw);
   } else {  /* for edges, use NA's */
     for (j=0; j<dtarget->ncols; j++)
