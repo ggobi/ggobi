@@ -197,6 +197,10 @@ parse_command_line (gint *argc, gchar **av)
       (*argc)--; av++;
     } else if((ptr = getOptValue("restore", av[1]))) {
       sessionOptions->restoreFile = ptr;
+    } else if((ptr = getOptValue("tourSpeed", av[1]))) {
+      sessionOptions->defaultTourSpeed = atof(ptr);
+    } else if((ptr = getOptValue("tour1dSpeed", av[1]))) {
+      sessionOptions->defaultTour1dSpeed = atof(ptr);
     } else if((ptr = getOptValue("plugin", av[1]))) {
       sessionOptions->pluginFiles = g_slist_append(sessionOptions->pluginFiles, g_strdup(ptr));
     } else if(strcmp(av[1], "-home") == 0 || strcmp(av[1], "--home") == 0) {
@@ -632,7 +636,9 @@ initSessionOptions(int argc, char **argv)
   sprintf(tmp, "%s%s%c%s", sessionOptions->ggobiHome,
 	                   "data", G_DIR_SEPARATOR, "colorschemes.xml");
   sessionOptions->info->colorSchemeFile = tmp;
-  
+
+  sessionOptions->defaultTourSpeed = 50.0;  
+  sessionOptions->defaultTour1dSpeed = 40.0;  
 }
 
 

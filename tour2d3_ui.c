@@ -17,6 +17,7 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "tour.h"
 
 /* This function initializes the rotation variables - it should only be
    called once, when a new tour is started since a new
@@ -27,8 +28,7 @@ void
 cpanel_t2d3_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t2d3.step = TOURSTEP0;
   cpanel->t2d3.paused = false;
-  cpanel->t2d3.slidepos = 50.;/* If this is changed, it needs to be 
-     changed in th cpanel_tour2d3_make routine also. */
+  cpanel->t2d3.slidepos = sessionOptions->defaultTourSpeed;
   cpanel->t2d3.manip_mode = MANIP_OBLIQUE;
 }
 
@@ -117,7 +117,7 @@ cpanel_tour2d3_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (50.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+  adj = gtk_adjustment_new (sessionOptions->defaultTourSpeed, 0.0, MAX_TOUR_SPEED, 1.0, 1.0, 0.0);
 
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (speed2d3_set_cb), (gpointer) gg);

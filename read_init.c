@@ -23,6 +23,8 @@
 #include "GGobiAPI.h"
 
 #include "externs.h"
+#include "tour.h"
+
 
 gint     getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
 DataMode getPreviousInput(xmlNode *node, InputDescription *input);
@@ -96,6 +98,7 @@ read_init_file(const gchar *filename, GGobiInitInfo *info)
 #ifndef WIN32
   xmlDoValidityCheckingDefaultValue = oldValiditySetting;
 #endif
+
   /* Causes a crash when started with -init notes/ggobirc,
      but not if there is a -colorschemes filename
      g_free(fileName); 
@@ -129,6 +132,24 @@ getXMLElement(xmlNodePtr node, const char *tagName)
 
   return(node);
 }
+
+
+static void
+getTourSpeedValue(xmlNodePtr node, const xmlDocPtr doc, const gchar *name, gfloat *value)
+{
+  xmlNodePtr el = getXMLElement(node, name);
+  if(el) {
+      gchar *tmp;
+      gfloat val;
+      tmp =  xmlNodeListGetString(doc, XML_CHILDREN(el), 1);
+      val = atof(tmp);
+      if(val > 0 && val < MAX_TOUR_SPEED)
+	  *value = val;
+      else
+	  g_printerr("Value for %s in preferences file is invalid: %f\n", name, val);
+  }
+}
+
 
 gint
 getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
@@ -232,6 +253,10 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
     if(tmp)
       info->compress = asNumber(tmp);
   }
+
+
+  getTourSpeedValue(node, doc, "tourSpeed", &sessionOptions->defaultTourSpeed);
+  getTourSpeedValue(node, doc, "tour1dSpeed", &sessionOptions->defaultTourSpeed);
 
   return(0);
 }

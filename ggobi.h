@@ -517,6 +517,10 @@ typedef struct {
       */
   gchar *ggobiHome;
 
+
+  gfloat defaultTourSpeed;
+  gfloat defaultTour1dSpeed;
+
 } GGobiOptions;
 
 

@@ -17,6 +17,7 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "tour.h"
 
 /* This function initializes the tour variables - it should only be
    called more than once, when a new tour is started since a new
@@ -33,8 +34,7 @@ cpanel_t1d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t1d.pp_indx = 0;
 
   cpanel->t1d.ASH_add_lines_p = false;
-  cpanel->t1d.slidepos = 50.;/* If this is changed, it needs to be 
-     changed in th cpanel_tour1d_make routine also. */
+  cpanel->t1d.slidepos = sessionOptions->defaultTour1dSpeed;
   cpanel->t1d.ASH_smooth = 0.19;
 }
 
@@ -158,7 +158,7 @@ cpanel_tour1d_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (40.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+  adj = gtk_adjustment_new (sessionOptions->defaultTour1dSpeed, 0.0, MAX_TOUR_SPEED, 1.0, 1.0, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (speed1d_set_cb), (gpointer) gg);
 
