@@ -301,7 +301,7 @@ rows_in_plot_set (datad *d, ggobid *gg) {
     klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL], 
     nprev, -1, gg);  /* the argument shown with -1 has no current use */
 
-  return (nprev == d->nrows_in_plot);
+  return; /* (nprev == d->nrows_in_plot); */
 }
 
 /*-------------------------------------------------------------------------*/
