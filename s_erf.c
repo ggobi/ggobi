@@ -105,7 +105,14 @@
  *	   	erfc/erf(NaN) is NaN
  */
 
-
+/*-- to make the compiler happy, compiling with gtk2 --*/
+#include "math.h"
+#ifdef __STDC__
+	double __ieee754_exp(double x);	/* default IEEE double exp */
+#else
+	double __ieee754_exp(x);	/* default IEEE double exp */
+#endif
+/*-- --*/
 
 #define __HI(x) *(1+(int*)&x)
 #define __LO(x) *(int*)&x
