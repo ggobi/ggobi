@@ -135,27 +135,29 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   el = getXMLElement(node, "background");
   if(el) {
     el = getXMLElement(el, "color");
-    info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
-    getColor(el, doc, NULL, info->bgColor);
-    if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
-      info->bgColor, false, true) == false)
-    {
-      g_printerr ("Can't allocate background color\n");
+    if(el) {
+	info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
+	getColor(el, doc, NULL, info->bgColor);
+	if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
+				     info->bgColor, false, true) == false)
+	{
+	    g_printerr ("Can't allocate background color\n");
+	}
     }
-  }
 
   info->fgColor = NULL;  /*-- this needs to be initialized --*/
   el = getXMLElement(node, "foreground");
   if(el) {
     el = getXMLElement(el, "color");
-    info->fgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
-    getColor(el, doc, NULL, info->fgColor);
-    if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
-      info->fgColor, false, true) == false)
-    {
-      g_printerr ("Can't allocate foreground color\n");
+    if(el) {
+	info->fgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
+	getColor(el, doc, NULL, info->fgColor);
+	if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
+				     info->fgColor, false, true) == false)
+	{
+	    g_printerr ("Can't allocate foreground color\n");
+	}
     }
-  }
 
 
   el = getXMLElement(node, "glyph");
@@ -567,7 +569,7 @@ processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 void
 getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr doc)
 {
-    xmlNodePtr c /*, ptr*/;
+    xmlNodePtr c;
     const xmlChar *tmp;
 
     tmp = xmlGetProp(node, "interactive");
