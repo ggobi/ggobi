@@ -87,19 +87,22 @@ typedef struct {
  /*-- scatterplot matrix --*/
  gint scatmat_selection_mode;
 
- /*-- 2d touring --*/
- gboolean t2d_paused;
- gboolean t2d_local_scan;
- gboolean t2d_stepping;
- gboolean t2d_backtracking;
- gfloat t2d_step; 
- gint t2d_ls_dir;
- gfloat t2d_path_len;
- gint t2d_pp_indx;
- gfloat t2d_slidepos;
+ /*-- 2d touring control pane --*/
+ struct _Tour2DCPanel {
+   gboolean paused;
+   gboolean local_scan;
+   gboolean stepping;
+   gboolean backtracking;
+   gfloat step; 
+   gint ls_dir;
+   gfloat path_len;
+   gint pp_indx;
+   gfloat slidepos;
+   gint manip_mode;
+ } t2d;
 
+ /*-- 1d tour control panel --*/
  struct _Tour1DCpanel {
-   /*-- 1d tour --*/
    gboolean paused;
    gfloat step; 
    gint nbins, nASHes;
@@ -110,12 +113,19 @@ typedef struct {
    gfloat ASH_add_lines_p;
  } t1d;
 
- /*-- corr tour --*/
- gboolean tcorr1_paused;
- gfloat tcorr1_step; 
- gboolean tcorr2_paused;
- gfloat tcorr2_step; 
- gfloat tc_slidepos;
+ /*-- corr tour control panel --*/
+ struct _TourCorrCpanel {
+   gfloat slidepos;
+   gint manip_mode;
+ } tcorr;
+ struct _TourCorr1Cpanel {
+   gboolean paused;
+   gfloat step; 
+ } tcorr1;
+ struct _TourCorr2Cpanel {
+   gboolean paused;
+   gfloat step; 
+ } tcorr2;
 
 /* tour variables are in display.h */
 

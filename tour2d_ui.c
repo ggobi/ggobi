@@ -24,17 +24,19 @@
 
 void 
 cpanel_t2d_init (cpaneld *cpanel, ggobid *gg) {
-  cpanel->t2d_paused = false;
-  cpanel->t2d_local_scan = false;
-  cpanel->t2d_stepping = false;
-  cpanel->t2d_backtracking = false;
-  cpanel->t2d_step = TOURSTEP0;
-  cpanel->t2d_ls_dir = TOUR_LS_IN;
-  cpanel->t2d_path_len = 1.;
-  cpanel->t2d_slidepos = 10.;/* If this is changed, it needs to be 
+  cpanel->t2d.paused = false;
+  cpanel->t2d.local_scan = false;
+  cpanel->t2d.stepping = false;
+  cpanel->t2d.backtracking = false;
+  cpanel->t2d.step = TOURSTEP0;
+  cpanel->t2d.ls_dir = TOUR_LS_IN;
+  cpanel->t2d.path_len = 1.;
+  cpanel->t2d.slidepos = 10.;/* If this is changed, it needs to be 
      changed in th cpanel_tour2d_make routine also. */
 
-  cpanel->t2d_pp_indx = 0;
+  cpanel->t2d.manip_mode = MANIP_OFF;
+
+  cpanel->t2d.pp_indx = 0;
 }
 
 void
@@ -46,23 +48,22 @@ cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
 {
   GtkWidget *w, *btn;
   GtkWidget *pnl = gg->control_panel[TOUR2D];
-  displayd *dsp = gg->current_display;
   GtkAdjustment *adj;
 
   /*-- speed --*/
   w = widget_find_by_name (pnl, "TOUR2D:speed_bar");
   adj = gtk_range_get_adjustment (GTK_RANGE (w));
   gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
-    cpanel->t2d_slidepos);
+    cpanel->t2d.slidepos);
 
   /*-- paused --*/
   btn = widget_find_by_name (pnl, "TOUR2D:pause_button");
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->t2d_paused);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->t2d.paused);
 
   /*-- manual manip --*/
   w = widget_find_by_name (pnl, "TOUR2D:manip");
   if (w)
-    gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->t2d_manip_mode);
+    gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->t2d.manip_mode);
 
   /*-- PC axes --*/
   /*-- backtracking --*/
@@ -72,30 +73,24 @@ cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
 
 
 static void speed2d_set_cb (GtkAdjustment *adj, ggobid *gg) {
-  extern void tour2d_speed_set (gint, ggobid *);
 
   tour2d_speed_set ((gint)adj->value, gg);
 }
 
 static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
-  extern void tour2d_pause(cpaneld *, gboolean, ggobid *);
 
   tour2d_pause (&gg->current_display->cpanel, button->active, gg);
 }
 
 static void reinit_cb (GtkWidget *w, ggobid *gg) {
-  extern void tour2d_reinit(ggobid *);
 
   tour2d_reinit(gg);
-
 }
 
 static void scramble_cb (GtkWidget *w, ggobid *gg) {
-  extern void tour2d_scramble(ggobid *);
 
   tour2d_scramble(gg);
-
 }
 
 /*static void pcaxes_cb (GtkToggleButton *button)
@@ -121,11 +116,12 @@ static void manip_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   displayd *dsp = gg->current_display;
+  cpaneld *cpanel = &dsp->cpanel;
   splotd *sp = gg->current_splot;
 
-  dsp->t2d_manip_mode = GPOINTER_TO_INT (cbd);
+  cpanel->t2d.manip_mode = GPOINTER_TO_INT (cbd);
 
-  if (dsp->t2d_manip_mode == MANIP_OFF)
+  if (cpanel->t2d.manip_mode == MANIP_OFF)
     splot_cursor_set ((gint) NULL, sp);
   else
     splot_cursor_set (GDK_HAND2, sp);
@@ -306,8 +302,6 @@ static void step_cb (GtkToggleButton *tgl, GtkWidget *btn)
 static void go_cb (GtkButton *button, ggobid *gg)
 {
   displayd *dsp = gg->current_display; 
-  extern void tour2d_do_step(displayd *,ggobid *);
-
   tour2d_do_step (dsp, gg);
 }
 
@@ -574,7 +568,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
     pause_button = widget_find_by_name (gg->control_panel[TOUR2D],
       "TOUR2D:pause_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
-      !cpanel->t2d_paused);
+      !cpanel->t2d.paused);
   }
 
   return true;
@@ -584,7 +578,6 @@ static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   ggobid *gg = GGobiFromSPlot(sp);
-  extern void tour2d_manip(gint, gint, splotd *, ggobid *);
   gboolean button1_p, button2_p;
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
@@ -602,11 +595,11 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   displayd *dsp = gg->current_display;
-  extern void tour2d_manip_init(gint, gint, splotd *);
+  cpaneld *cpanel = &dsp->cpanel;
   gboolean button1_p, button2_p;
 
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
-  if (dsp->t2d_manip_mode != MANIP_OFF) 
+  if (cpanel->t2d.manip_mode != MANIP_OFF) 
   {
     sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -620,7 +613,6 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  extern void tour2d_manip_end(splotd *);
   gboolean retval = true;
   GdkModifierType state;
 

@@ -109,8 +109,6 @@ static void
 t1d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
   displayd *dsp = gg->current_display; 
 
-  extern void t1d_optimz(gint, gboolean *, gint *);
-  /*  extern void t1d_optimz(gint, ggobid *);*/
   t1d_optimz(w->active, &dsp->t1d.get_new_target, 
     &dsp->t1d.target_selection_method);
 }
@@ -125,7 +123,6 @@ void t1d_pp_func_cb (GtkWidget *w, gpointer cbd)
   cpaneld *cpanel = &gg->current_display->cpanel;
   displayd *dsp = gg->current_display;
   gint indx = GPOINTER_TO_INT (cbd);
-  extern void t1d_clear_ppda(ggobid *);
   gchar *label = g_strdup("PP index: (0.000) 0.0000 (0.000)");
 
   cpanel->t1d.pp_indx = indx;
@@ -189,7 +186,6 @@ ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 */
   gint wid = w->allocation.width, hgt = w->allocation.height;
   /*  static gboolean init = true;*/
-  extern void t1d_clear_ppda(ggobid *);
 
   /*  if (init) {
     t1d_clear_ppda(gg);

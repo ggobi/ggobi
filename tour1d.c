@@ -268,7 +268,6 @@ tour1d_fade_vars_cb (GtkCheckMenuItem *w, guint action)
 void tour1d_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
-  extern void speed_set (gint, gfloat *, gfloat *, gint *, gint *);
 
   cpanel->t1d.slidepos = slidepos;
   speed_set(slidepos, &cpanel->t1d.step, &dsp->t1d.delta, 
@@ -362,8 +361,6 @@ void
 tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
-  extern gint realloc_optimize0_p(optimize0_param *, gint, gint, gint);
-  extern void t1d_pp_reinit(ggobid *);
 
 /*-- any button --*/
   if (d->vcirc_ui.jcursor == GDK_HAND2) {
@@ -443,16 +440,6 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg)
 void
 tour1d_run(displayd *dsp, ggobid *gg)
 {
-  extern gboolean reached_target(gint, gint, gfloat, gfloat, gint, gfloat *, gfloat *);
-  extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
-    gfloat, gfloat *, gint);
-  extern void do_last_increment(vector_f, vector_f, gfloat, gint);
-  extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
-    array_d, array_d, vector_f, array_d, array_d, array_d,
-    vector_f, vector_f, gint *, gint *, gfloat *, gfloat *, gfloat);
-  extern void tour_reproject(vector_f, array_d, array_d, array_d, 
-    array_d, array_d, gint, gint);
-  extern void t1d_ppdraw(gfloat, ggobid *);
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   /*  static gint count = 0;*/
@@ -620,7 +607,6 @@ void tour1d_reinit(ggobid *gg)
   gint i, j;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  extern void t1d_pp_reinit(ggobid *);
 
   for (i=0; i<1; i++) {
     for (j=0; j<d->ncols; j++) {
@@ -686,7 +672,6 @@ tour1d_manip_init(gint p1, gint p2, splotd *sp)
   gint n1vars = dsp->t1d.nactive;
   gfloat ftmp, tol = 0.01; 
   gboolean dontdoit = false;
-  extern void gram_schmidt(gdouble *, gdouble *, gint);
 
   dsp->t1d_phi = 0.;
 
@@ -816,7 +801,6 @@ tour1d_manip_end(splotd *sp)
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
-  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
 
   disconnect_motion_signal (sp);
 

@@ -286,7 +286,7 @@ procs_activate (gboolean state, displayd *display, ggobid *gg)
 {
   switch (gg->viewmode) {
     case TOUR2D:
-      if (!display->cpanel.t2d_paused)
+      if (!display->cpanel.t2d.paused)
         tour2d_func (state, display, gg);
     break;
     case TOUR1D:
@@ -294,7 +294,7 @@ procs_activate (gboolean state, displayd *display, ggobid *gg)
         tour1d_func (state, display, gg);
     break;
     case COTOUR:
-      if (!display->cpanel.tcorr1_paused)
+      if (!display->cpanel.tcorr1.paused)
         tourcorr_func (state, display, gg);
     break;
     default:
@@ -306,6 +306,7 @@ RedrawStyle
 viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
   RedrawStyle redraw_style = NONE;
 
   if (state == off) {
@@ -325,13 +326,13 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       break;
       case TOUR2D:
       {
-        if (display->t2d_manip_mode != MANIP_OFF)
+        if (cpanel->t2d.manip_mode != MANIP_OFF)
           splot_cursor_set ((gint) NULL, sp);
       }
       break;
       case COTOUR:
       {
-        if (display->tc_manip_mode != MANIP_OFF)
+        if (cpanel->tcorr.manip_mode != MANIP_OFF)
           splot_cursor_set ((gint) NULL, sp);
       }
       break;
@@ -364,16 +365,12 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       }
       break;
       case TOUR2D:
-      {
-        if (display->t2d_manip_mode != MANIP_OFF)
+        if (cpanel->t2d.manip_mode != MANIP_OFF)
           splot_cursor_set (GDK_HAND2, sp);
-      }
       break;
       case COTOUR:
-      {
-        if (display->tc_manip_mode != MANIP_OFF)
+        if (cpanel->tcorr.manip_mode != MANIP_OFF)
           splot_cursor_set (GDK_HAND2, sp);
-      }
       break;
       default:
       break;
@@ -899,11 +896,6 @@ store_session(ggobid *gg, gint action, GtkWidget *w)
       gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->ok_button),
 			  "clicked", GTK_SIGNAL_FUNC (store_session_in_file), dlg);
 
-/* replacing with gtk_signal_connect -- dfs
-      gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->cancel_button),
-         "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-	     (gpointer) dlg);
-*/
       gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->cancel_button),
          "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
 	     (gpointer) dlg);

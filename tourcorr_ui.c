@@ -24,11 +24,12 @@
 
 void 
 cpanel_tcorr_init (cpaneld *cpanel, ggobid *gg) {
-  cpanel->tcorr1_paused = false;
-  cpanel->tcorr1_step = TOURSTEP0;
-  cpanel->tcorr2_paused = false;
-  cpanel->tcorr2_step = TOURSTEP0;
-  cpanel->tc_slidepos = 10.;
+  cpanel->tcorr1.paused = false;
+  cpanel->tcorr1.step = TOURSTEP0;
+  cpanel->tcorr2.paused = false;
+  cpanel->tcorr2.step = TOURSTEP0;
+  cpanel->tcorr.slidepos = 10.;
+  cpanel->tcorr.manip_mode = CMANIP_OFF;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/
@@ -41,23 +42,22 @@ cpanel_tourcorr_set (cpaneld *cpanel, ggobid* gg)
 {
   GtkWidget *w, *btn;
   GtkWidget *pnl = gg->control_panel[COTOUR];
-  displayd *dsp = gg->current_display;
   GtkAdjustment *adj;
 
   /*-- speed --*/
   w = widget_find_by_name (pnl, "COTOUR:speed_bar");
   adj = gtk_range_get_adjustment (GTK_RANGE (w));
   gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
-    cpanel->tc_slidepos);
+    cpanel->tcorr.slidepos);
 
   /*-- paused --*/
   btn = widget_find_by_name (pnl, "COTOUR:pause_button");
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->tcorr1_paused);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->tcorr1.paused);
 
   /*-- manual manip --*/
   w = widget_find_by_name (pnl, "COTOUR:manip");
   if (w)
-    gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->tc_manip_mode);
+    gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->tcorr.manip_mode);
 
   /*-- PC axes --*/
   /*-- backtracking --*/
@@ -70,26 +70,22 @@ static void ctouradv_window_open (void);
 #endif
 
 static void speedcorr_set_cb (GtkAdjustment *adj, ggobid *gg) {
-  extern void tourcorr_speed_set (gint, ggobid *);
 
   tourcorr_speed_set ((gint)adj->value, gg);
 }
 
 static void tourcorr_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
-  extern void tourcorr_pause(cpaneld *, gboolean, ggobid *);
 
   tourcorr_pause (&gg->current_display->cpanel, button->active, gg);
 }
 
 static void tourcorr_reinit_cb (GtkWidget *w, ggobid *gg) {
-  extern void tourcorr_reinit(ggobid *);
 
   tourcorr_reinit(gg);
 }
 
 static void tourcorr_scramble_cb (GtkWidget *w, ggobid *gg) {
-  extern void tourcorr_scramble(ggobid *);
 
   tourcorr_scramble(gg);
 }
@@ -124,11 +120,12 @@ static void manip_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   displayd *dsp = gg->current_display;
+  cpaneld *cpanel = &dsp->cpanel;
   splotd *sp = gg->current_splot;
 
-  dsp->tc_manip_mode = GPOINTER_TO_INT (cbd);
+  cpanel->tcorr.manip_mode = GPOINTER_TO_INT (cbd);
 
-  if (dsp->tc_manip_mode == CMANIP_OFF)
+  if (cpanel->tcorr.manip_mode == CMANIP_OFF)
     splot_cursor_set ((gint) NULL, sp);
   else
     splot_cursor_set (GDK_HAND2, sp);
@@ -360,7 +357,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
       "COTOUR:pause_button");
 
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
-      !cpanel->tcorr1_paused || !cpanel->tcorr2_paused);
+      !cpanel->tcorr1.paused || !cpanel->tcorr2.paused);
   }
 
 
@@ -371,7 +368,6 @@ static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   ggobid *gg = GGobiFromSPlot(sp);
-  extern void tourcorr_manip(gint, gint, splotd *, ggobid *);
   gboolean button1_p, button2_p;
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
@@ -390,11 +386,11 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   displayd *dsp = gg->current_display;
-  extern void tourcorr_manip_init(gint, gint, splotd *);
+  cpaneld *cpanel = &dsp->cpanel;
   gboolean button1_p, button2_p;
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
-  if (dsp->tc_manip_mode != CMANIP_OFF) 
+  if (cpanel->tcorr.manip_mode != CMANIP_OFF) 
   {
     sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -409,7 +405,6 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  extern void tourcorr_manip_end(splotd *);
   gboolean retval = true;
   GdkModifierType state;
 

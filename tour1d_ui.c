@@ -87,27 +87,22 @@ cpanel_tour1d_set (cpaneld *cpanel, ggobid* gg)
 
 
 static void speed1d_set_cb (GtkAdjustment *adj, ggobid *gg) {
-  extern void tour1d_speed_set (gint, ggobid *);
 
   tour1d_speed_set ((gint)adj->value, gg);
 }
 
 static void tour1d_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
-  extern void tour1d_pause(cpaneld *, gboolean, ggobid *);
 
   tour1d_pause (&gg->current_display->cpanel, button->active, gg);
 }
 
 static void reinit_cb (GtkWidget *w, ggobid *gg) {
-  extern void tour1d_reinit(ggobid *);
 
   tour1d_reinit(gg);
-
 }
 
 static void scramble_cb (GtkWidget *w, ggobid *gg) {
-  extern void tour1d_scramble(ggobid *);
 
   tour1d_scramble(gg);
 }
@@ -349,7 +344,6 @@ static void step_cb (GtkToggleButton *tgl, GtkWidget *btn)
 static void go_cb (GtkButton *button, ggobid *gg)
 {
   displayd *dsp = gg->current_display; 
-  extern void tour1d_do_step(displayd *,ggobid *);
 
   tour1d_do_step (dsp, gg);
 }
@@ -633,7 +627,6 @@ static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   ggobid *gg = GGobiFromSPlot(sp);
-  extern void tour1d_manip(gint, gint, splotd *, ggobid *);
   gboolean button1_p, button2_p;
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
@@ -650,7 +643,6 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  extern void tour1d_manip_init(gint, gint, splotd *);
   gboolean button1_p, button2_p;
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
@@ -666,7 +658,6 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  extern void tour1d_manip_end(splotd *);
   gboolean retval = true;
   GdkModifierType state;
 

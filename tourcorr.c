@@ -349,7 +349,7 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr2.F.vals[0][dsp->tcorr2.active_vars.els[0]] = 1.0;
 
   dsp->tcorr1.dist_az = 0.0;
-  dsp->tcorr1.delta = cpanel->tcorr1_step*M_PI_2/10.0;
+  dsp->tcorr1.delta = cpanel->tcorr1.step*M_PI_2/10.0;
   dsp->tcorr1.tang = 0.0;
   dsp->tcorr1.nsteps = 1; 
   dsp->tcorr1.stepcntr = 1;
@@ -359,7 +359,7 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
 
   /* vertical */
   dsp->tcorr2.dist_az = 0.0;
-  dsp->tcorr2.delta = 0.0; /*cpanel->tcorr2_step*M_PI_2/10.0;*/
+  dsp->tcorr2.delta = 0.0; /*cpanel->tcorr2.step*M_PI_2/10.0;*/
   dsp->tcorr2.tang = 0.0;
   dsp->tcorr2.nsteps = 1; 
   dsp->tcorr2.stepcntr = 1;
@@ -368,7 +368,6 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr2.get_new_target = true;
 
   /* manip */
-  dsp->tc_manip_mode = CMANIP_OFF;
   dsp->tc1_manip_var = dsp->tcorr1.active_vars.els[0];
   dsp->tc2_manip_var = dsp->tcorr2.active_vars.els[0];
 
@@ -390,26 +389,25 @@ tourcorr_fade_vars_cb (GtkCheckMenuItem *w, guint action)
 void tourcorr_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
-  extern void speed_set (gint, gfloat *, gfloat *, gint *, gint *);
 
-  speed_set(slidepos, &cpanel->tcorr1_step, &dsp->tcorr1.delta,  
+  speed_set(slidepos, &cpanel->tcorr1.step, &dsp->tcorr1.delta,  
     &dsp->tcorr1.nsteps, &dsp->tcorr1.stepcntr);
 
-  speed_set(slidepos, &cpanel->tcorr2_step, &dsp->tcorr2.delta,  
+  speed_set(slidepos, &cpanel->tcorr2.step, &dsp->tcorr2.delta,  
     &dsp->tcorr2.nsteps, &dsp->tcorr2.stepcntr);
 
-  cpanel->tc_slidepos = slidepos;
+  cpanel->tcorr.slidepos = slidepos;
 }
 
 void tourcorr_pause (cpaneld *cpanel, gboolean state, ggobid *gg)
 {
-  cpanel->tcorr1_paused = state;
-  cpanel->tcorr2_paused = state;
+  cpanel->tcorr1.paused = state;
+  cpanel->tcorr2.paused = state;
 
-  tourcorr_func (!cpanel->tcorr1_paused, gg->current_display, gg);
-  tourcorr_func (!cpanel->tcorr2_paused, gg->current_display, gg);
+  tourcorr_func (!cpanel->tcorr1.paused, gg->current_display, gg);
+  tourcorr_func (!cpanel->tcorr2.paused, gg->current_display, gg);
 
-  if (cpanel->tcorr1_paused && cpanel->tcorr2_paused) {
+  if (cpanel->tcorr1.paused && cpanel->tcorr2.paused) {
     /*-- whenever motion stops, we need a FULL redraw --*/
     display_tailpipe (gg->current_display, FULL, gg);
   }
@@ -594,16 +592,6 @@ tourcorr_run(displayd *dsp, ggobid *gg)
 {
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  extern gboolean reached_target(gint, gint, gfloat, gfloat, gint, gfloat *, gfloat *);
-  extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
-    gfloat, gfloat *, gint);
-  extern void do_last_increment(vector_f, vector_f, gfloat, gint);
-  extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
-    array_d, array_d, vector_f, array_d, array_d, array_d,
-    vector_f, vector_f, gint *, gint *, gfloat *, gfloat *, gfloat);
-  extern void tour_reproject(vector_f, array_d, array_d, array_d, 
-    array_d, array_d, gint, gint);
-  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
   gint i, nv;
   gint pathprob = 0;
 
@@ -647,7 +635,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         dsp->tcorr1.tau, dsp->tcorr1.tinc, &dsp->tcorr1.nsteps, 
         &dsp->tcorr1.stepcntr, 
         &dsp->tcorr1.dist_az, &dsp->tcorr1.tang, 
-        cpanel->tcorr1_step);
+        cpanel->tcorr1.step);
       dsp->tcorr1.get_new_target = false;
     }
   }
@@ -688,7 +676,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
 	   dsp->tcorr2.Vz,
         dsp->tcorr2.tau, dsp->tcorr2.tinc, &dsp->tcorr2.nsteps, 
         &dsp->tcorr2.stepcntr, &dsp->tcorr2.dist_az, 
-        &dsp->tcorr2.tang, cpanel->tcorr2_step);
+        &dsp->tcorr2.tang, cpanel->tcorr2.step);
       dsp->tcorr2.get_new_target = false;
     }
   }
@@ -709,7 +697,7 @@ tourcorr_idle_func (displayd *dsp)
 {
   ggobid *gg = GGobiFromDisplay (dsp);
   cpaneld *cpanel = &dsp->cpanel;
-  gboolean doit = !cpanel->tcorr1_paused;
+  gboolean doit = !cpanel->tcorr1.paused;
 
   if (doit) {
     tourcorr_run(dsp, gg);
@@ -825,11 +813,9 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   gint n1vars = dsp->tcorr1.nactive, n2vars = dsp->tcorr2.nactive;
   gfloat ftmp, tol = 0.01; 
   gboolean dontdoit = false;
-  extern void gram_schmidt(gdouble *, gdouble*, gint);
-  extern gdouble calc_norm(gdouble *, gint);
 
   /* need to turn off tour */
-  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused) {
+  if (!cpanel->tcorr1.paused && !cpanel->tcorr2.paused) {
     tourcorr_func(CTOFF, gg->current_display, gg);
   }
 
@@ -926,26 +912,26 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
     if (actual_nxvars > 0 || actual_nyvars > 0)
     {
-      if (dsp->tc_manip_mode == CMANIP_VERT)
+      if (cpanel->tcorr.manip_mode == CMANIP_VERT)
       {
         distx = 0.;
         if (actual_nyvars > 0)
           disty = dsp->tc2_pos_old - dsp->tc2_pos;
       }
-      else if (dsp->tc_manip_mode == CMANIP_HOR)
+      else if (cpanel->tcorr.manip_mode == CMANIP_HOR)
       {
         if (actual_nxvars > 0)
           distx = dsp->tc1_pos - dsp->tc1_pos_old;
         disty = 0.;
       }
-      else if (dsp->tc_manip_mode == CMANIP_COMB)
+      else if (cpanel->tcorr.manip_mode == CMANIP_COMB)
       {
         if (actual_nxvars > 0)
           distx = dsp->tc1_pos - dsp->tc1_pos_old;
         if (actual_nyvars > 0)
           disty = dsp->tc2_pos_old - dsp->tc2_pos;
       }
-      else if (dsp->tc_manip_mode == CMANIP_EQUAL)
+      else if (cpanel->tcorr.manip_mode == CMANIP_EQUAL)
       {
         if (actual_nxvars > 0)
           distx = dsp->tc1_pos - dsp->tc1_pos_old;
@@ -1013,7 +999,7 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     /*    copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->ncols, 1);*/
     dsp->tcorr1.get_new_target = true;
     dsp->tcorr2.get_new_target = true;
-    if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
+    if (!cpanel->tcorr1.paused && !cpanel->tcorr2.paused)
       tourcorr_func(CTON, gg->current_display, gg);
   }
 }
@@ -1024,7 +1010,6 @@ tourcorr_manip_end(splotd *sp)
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
-  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
 
   disconnect_motion_signal (sp);
 
@@ -1034,7 +1019,7 @@ tourcorr_manip_end(splotd *sp)
   dsp->tcorr2.get_new_target = true;
 
   /* need to turn on tour? */
-  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused) {
+  if (!cpanel->tcorr1.paused && !cpanel->tcorr2.paused) {
     tourcorr_func(CTON, gg->current_display, gg);
 
     /*-- whenever motion stops, we need a FULL redraw --*/

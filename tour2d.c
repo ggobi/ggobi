@@ -254,7 +254,7 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   }
 
   dsp->t2d.dist_az = 0.0;
-  dsp->t2d.delta = cpanel->t2d_step*M_PI_2/10.0;
+  dsp->t2d.delta = cpanel->t2d.step*M_PI_2/10.0;
   dsp->t2d.tang = 0.0;
   dsp->t2d.nsteps = 1; 
   dsp->t2d.stepcntr = 1;
@@ -263,7 +263,6 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   dsp->t2d.get_new_target = true;
 
   /* manip */
-  dsp->t2d_manip_mode = MANIP_OFF;
   dsp->t2d_manip_var = 0;
 
   /* pp */
@@ -284,19 +283,18 @@ tour2d_fade_vars_cb (GtkCheckMenuItem *w, guint action)
 void tour2d_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
-  extern void speed_set (gint, gfloat *, gfloat *, gint *, gint *);
 
-  cpanel->t2d_slidepos = slidepos;
-  speed_set(slidepos, &cpanel->t2d_step, &dsp->t2d.delta, 
+  cpanel->t2d.slidepos = slidepos;
+  speed_set(slidepos, &cpanel->t2d.step, &dsp->t2d.delta, 
     &dsp->t2d.nsteps, &dsp->t2d.stepcntr);
 }
 
 void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
-  cpanel->t2d_paused = state;
+  cpanel->t2d.paused = state;
 
-  tour2d_func (!cpanel->t2d_paused, gg->current_display, gg);
+  tour2d_func (!cpanel->t2d.paused, gg->current_display, gg);
 
-  if (cpanel->t2d_paused) {
+  if (cpanel->t2d.paused) {
     /*-- whenever motion stops, we need a FULL redraw --*/
     display_tailpipe (gg->current_display, FULL, gg);
   }
@@ -309,7 +307,6 @@ tour2dvar_set (gint jvar, ggobid *gg)
   gboolean active=false;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
 
   for (j=0; j<dsp->t2d.nactive; j++)
     if (jvar == dsp->t2d.active_vars.els[j])
@@ -377,8 +374,6 @@ void
 tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
-  extern gint realloc_optimize0_p(optimize0_param *, gint, gint, gint);
-  extern void t2d_pp_reinit(ggobid *);
 
 /*-- we don't care which button it is --*/
   if (d->vcirc_ui.jcursor == GDK_HAND2) {
@@ -422,7 +417,6 @@ void tour2d_scramble(ggobid *gg)
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
   gint nc = d->ncols;
-  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
 
   for (i=0; i<2; i++)
     for (j=0; j<nc; j++)
@@ -448,19 +442,6 @@ void tour2d_scramble(ggobid *gg)
 void
 tour2d_run(displayd *dsp, ggobid *gg)
 {
-  extern gboolean reached_target(gint, gint, gfloat, gfloat, gint, gfloat *, gfloat *);
-  extern gboolean reached_target2(vector_f, vector_f, gint, gfloat *, gfloat *, gint);
-  extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
-    gfloat, gfloat *, gint);
-  extern void do_last_increment(vector_f, vector_f, gfloat, gint);
-  extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
-    array_d, array_d, vector_f, array_d, array_d, array_d,
-    vector_f, vector_f, gint *, gint *, gfloat *, gfloat *, gfloat);
-  extern void tour_reproject(vector_f, array_d, array_d, array_d, 
-    array_d, array_d, gint, gint);
-  extern void t2d_ppdraw(gfloat, ggobid *);
-  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
-  extern gboolean checkequiv(gdouble **, gdouble **, gint, gint);
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint i, j, nv;
@@ -485,7 +466,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
     /* plot pp indx */
     if (dsp->t2d_ppda != NULL) {
 
-      revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
+      revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
         0, gg);
       /*      count++;
       if (count == 10) {
@@ -553,7 +534,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
       }
       else if (dsp->t2d.target_selection_method == 1) {
         /* pp guided tour  */
-        revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
+        revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
           dsp->t2d.target_selection_method, gg);
 
         if (!revert_random) {
@@ -573,7 +554,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
               for (j=0; j<dsp->t2d.nactive; j++)
                 dsp->t2d_pp_op.proj_best.vals[j][i] = 
                   dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[j]];
-            revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
+            revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
               dsp->t2d.target_selection_method, gg);
           }
           t2d_ppdraw(dsp->t2d.ppval, gg);
@@ -596,7 +577,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
         dsp->t2d.Gz, dsp->t2d.G, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.Va,
         dsp->t2d.Vz,
         dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 
-        &dsp->t2d.dist_az, &dsp->t2d.tang, cpanel->t2d_step);
+        &dsp->t2d.dist_az, &dsp->t2d.tang, cpanel->t2d.step);
       if (pathprob == 0) 
         dsp->t2d.get_new_target = false;
       else if (pathprob == 1) { /* problems with Fa so need to force a jump */
@@ -606,7 +587,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
           dsp->t2d.Gz, dsp->t2d.G, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.Va,
           dsp->t2d.Vz,
           dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 
-          &dsp->t2d.dist_az, &dsp->t2d.tang, cpanel->t2d_step);
+          &dsp->t2d.dist_az, &dsp->t2d.tang, cpanel->t2d.step);
       }
       else if (pathprob == 2 || pathprob == 3) { /* problems with Fz,
 				    so will force a new choice of Fz */
@@ -630,7 +611,7 @@ tour2d_idle_func (displayd *dsp)
 {
   ggobid *gg = GGobiFromDisplay (dsp);
   cpaneld *cpanel = &dsp->cpanel;
-  gboolean doit = !cpanel->t2d_paused;
+  gboolean doit = !cpanel->t2d.paused;
 
   if (doit) {
     tour2d_run (dsp, gg);
@@ -663,7 +644,6 @@ void tour2d_reinit(ggobid *gg)
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
   gint nc = d->ncols;
-  extern void t2d_pp_reinit(ggobid *);
 
   for (i=0; i<2; i++)
     for (j=0; j<nc; j++)
@@ -712,12 +692,9 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   gint n1vars = dsp->t2d.nactive;
   gfloat ftmp, tol = 0.01; 
   gdouble dtmp1;
-  extern void gram_schmidt(gdouble *, gdouble*, gint);
-  extern gdouble calc_norm(gdouble *, gint);
-  extern gdouble inner_prod(gdouble *, gdouble *, gint);
 
   /* need to turn off tour */
-  if (!cpanel->t2d_paused)
+  if (!cpanel->t2d.paused)
     tour2d_func(T2DOFF, gg->current_display, gg);
 
   dsp->t2d_manipvar_inc = false;
@@ -780,7 +757,7 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
     }
 
     dsp->t2d_no_dir_flag = false;
-    if (dsp->t2d_manip_mode == MANIP_RADIAL)
+    if (cpanel->t2d.manip_mode == MANIP_RADIAL)
       { /* check if variable is currently visible in plot */
       if ((dsp->t2d.F.vals[0][dsp->t2d_manip_var]*
         dsp->t2d.F.vals[0][dsp->t2d_manip_var] +
@@ -806,17 +783,16 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   datad *d = dsp->d;
+  cpaneld *cpanel = &dsp->cpanel;
   gint actual_nvars = dsp->t2d.nactive;
   gboolean offscreen = false;
   gfloat phi, cosphi, sinphi, ca, sa, cosm, cospsi, sinpsi;
   gfloat distx, disty, x1, x2, y1, y2;
-  gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
+  gfloat denom = (gfloat) MIN(sp->max.x, sp->max.y)/2.;
   gfloat tol = 0.01;
   gdouble dtmp1, dtmp2;
   gfloat len_motion;
   gint i,j,k;
-  extern void gram_schmidt(gdouble *, gdouble*, gint);
-  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
 
   /* check if off the plot window */
   if (p1 > sp->max.x || p1 < 0 ||
@@ -835,25 +811,25 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
     if (actual_nvars > 1)
     {
-      if (dsp->t2d_manip_mode != MANIP_ANGULAR)
+      if (cpanel->t2d.manip_mode != MANIP_ANGULAR)
       {
-        if (dsp->t2d_manip_mode == MANIP_OBLIQUE) 
+        if (cpanel->t2d.manip_mode == MANIP_OBLIQUE) 
         {
           distx = dsp->t2d_pos1 - dsp->t2d_pos1_old;
           disty = dsp->t2d_pos2_old - dsp->t2d_pos2;
           /* seems to go in the wrong direction - 90deg? */
         }
-        else if (dsp->t2d_manip_mode == MANIP_VERT) 
+        else if (cpanel->t2d.manip_mode == MANIP_VERT) 
         {
           distx = 0.;
           disty = dsp->t2d_pos2_old - dsp->t2d_pos2;
         }
-        else if (dsp->t2d_manip_mode == MANIP_HOR) 
+        else if (cpanel->t2d.manip_mode == MANIP_HOR) 
         {
           distx = dsp->t2d_pos1 - dsp->t2d_pos1_old;
           disty = 0.;
         }
-        else if (dsp->t2d_manip_mode == MANIP_RADIAL) 
+        else if (cpanel->t2d.manip_mode == MANIP_RADIAL) 
         {
           if (dsp->t2d_no_dir_flag)
           {
@@ -982,7 +958,6 @@ tour2d_manip_end(splotd *sp)
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
-  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
 
   disconnect_motion_signal (sp);
 
@@ -991,7 +966,7 @@ tour2d_manip_end(splotd *sp)
   dsp->t2d.get_new_target = true;
 
   /* need to turn on tour? */
-  if (!cpanel->t2d_paused) {
+  if (!cpanel->t2d.paused) {
     tour2d_func(T2DON, gg->current_display, gg);
 
     /*-- whenever motion stops, we need a FULL redraw --*/

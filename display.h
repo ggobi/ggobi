@@ -81,13 +81,13 @@ struct _displayd {
   array_d tc1_manbasis, tc2_manbasis, t1d_manbasis;
   gint tc1_manip_var, tc2_manip_var, t1d_manip_var;
   gint tc1_pos_old, tc1_pos, tc2_pos_old, tc2_pos, t1d_pos_old, t1d_pos;
-  gint tc_manip_mode;
+  /*gint tc_manip_mode;*/
   gboolean tc1_manipvar_inc, tc2_manipvar_inc, t1d_manipvar_inc;
   gfloat tc1_phi, tc2_phi, t1d_phi;
 
   gint t2d_manip_var, t2d_manipvar_inc;
   gint t2d_pos1_old, t2d_pos1, t2d_pos2_old, t2d_pos2;
-  gint t2d_manip_mode;
+  /*gint t2d_manip_mode;*/
   array_d t2d_Rmat1, t2d_Rmat2;
   array_d t2d_manbasis;
   array_d t2d_mvar_3dbasis;
