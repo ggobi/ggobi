@@ -178,8 +178,9 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
   then! If we put it in and there are two edgesets and the selected one is not valid,
   we show the other one which was not asked for.
   Want to test whether there is only one edgetset. But this is a heuristic. 
-*/
+
       if (display->e == NULL) edgeset_add (display); 
+*/
       if (display->e != NULL) {
         title = computeTitle (false, gg->current_display, gg);
         if (title) {
