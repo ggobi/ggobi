@@ -232,4 +232,8 @@ void datad_instance_init(datad * d);
 
 
 void freeLevelHashEntry(gpointer key, gpointer value, gpointer data);
+
+/*-- used as an attribute of variable notebooks --*/
+typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
+
 #endif

@@ -141,7 +141,7 @@ impute_window_open (ggobid *gg)
     
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vb,
-      GTK_SELECTION_EXTENDED, all_vartypes,
+      GTK_SELECTION_EXTENDED, all_vartypes, all_datatypes,
       (GtkSignalFunc) NULL, gg);
 
     /*-- Create a new notebook, place the position of the tabs --*/

@@ -517,7 +517,8 @@ void cpanel_brush_make(ggobid * gg)
 
   /*-- provide a variable list so that any variable can be the label --*/
   notebook = create_variable_notebook (framevb,
-    GTK_SELECTION_SINGLE, categorical, (GtkSignalFunc) NULL, gg);
+    GTK_SELECTION_SINGLE, categorical, all_datatypes,
+    (GtkSignalFunc) NULL, gg);
   gtk_object_set_data (GTK_OBJECT (gg->control_panel[BRUSH]),
     "notebook", notebook);
   option_menu = gtk_option_menu_new();

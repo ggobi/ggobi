@@ -301,8 +301,8 @@ void scale_set_default_values (GtkScale *scale)
 /*--------------------------------------------------------------------*/
 
 void
-variable_notebook_subwindow_add (datad *d,
-  GtkSignalFunc func, GtkWidget *notebook, vartyped vtype, ggobid *gg)
+variable_notebook_subwindow_add (datad *d, GtkSignalFunc func,
+  GtkWidget *notebook, vartyped vtype, datatyped dtype, ggobid *gg)
 {
   GtkWidget *swin, *clist;
   gint j;
@@ -370,9 +370,20 @@ variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
 {
   GtkSignalFunc func = NULL;
   vartyped vtype;
+  datatyped dtype;
 
   vtype = (vartyped) gtk_object_get_data (GTK_OBJECT(notebook), "vartype");
-  variable_notebook_subwindow_add (d, func, notebook, vtype, gg);
+  dtype = (vartyped) gtk_object_get_data (GTK_OBJECT(notebook), "datatype");
+
+  if ((dtype == all_datatypes) ||
+      (dtype == no_edgesets && d->edge.n == 0) ||
+      (dtype == edgesets_only && d->edge.n > 0))
+  {
+    if (g_slist_length (d->vartable)) {
+      variable_notebook_subwindow_add (d, func, notebook, vtype, dtype, gg);
+    }
+  }
+
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_OBJECT(notebook)),
                               g_slist_length (gg->d) > 1);
 }
@@ -446,7 +457,8 @@ get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist,
 * rebuilds it.
 */
 void 
-variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which, datad *data, void *notebook)
+variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
+  datad *data, void *notebook)
 {
   GtkWidget *swin, *clist;
 
@@ -485,8 +497,7 @@ CHECK_EVENT_SIGNATURE(variable_notebook_list_changed_cb, variable_list_changed_f
 
 GtkWidget *
 create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
-  vartyped vtype,
-  GtkSignalFunc func, ggobid *gg)
+  vartyped vtype, datatyped dtype, GtkSignalFunc func, ggobid *gg)
 {
   GtkWidget *notebook;
   gint nd = g_slist_length (gg->d);
@@ -500,11 +511,17 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
   gtk_object_set_data (GTK_OBJECT(notebook), "SELECTION", (gpointer) mode);
   gtk_object_set_data (GTK_OBJECT(notebook), "vartype", (gpointer) vtype);
+  gtk_object_set_data (GTK_OBJECT(notebook), "datatype", (gpointer) dtype);
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
-    if (g_slist_length (d->vartable)) {
-      variable_notebook_subwindow_add (d, func, notebook, vtype, gg);
+    if ((dtype == all_datatypes) ||
+        (dtype == no_edgesets && d->edge.n == 0) ||
+        (dtype == edgesets_only && d->edge.n > 0))
+    {
+      if (g_slist_length (d->vartable)) {
+        variable_notebook_subwindow_add (d, func, notebook, vtype, dtype, gg);
+      }
     }
   }
 

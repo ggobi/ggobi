@@ -127,7 +127,6 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
  
-
   if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     gboolean changed;
     gboolean (*f)(icoords, splotd *sp, datad *, ggobid *);
@@ -242,7 +241,8 @@ cpanel_identify_make(ggobid *gg) {
 
   /*-- provide a variable list so that any variable can be the label --*/
   notebook = create_variable_notebook (gg->control_panel[IDENT],
-    GTK_SELECTION_EXTENDED, all_vartypes, (GtkSignalFunc) NULL, gg);
+    GTK_SELECTION_EXTENDED, all_vartypes, all_datatypes,
+    (GtkSignalFunc) NULL, gg);
   gtk_object_set_data (GTK_OBJECT (gg->control_panel[IDENT]),
     "notebook", notebook);
 

@@ -64,7 +64,7 @@ wvis_variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
       */
     }
     variable_notebook_subwindow_add (d, func, GTK_WIDGET(notebook),
-      all_vartypes, gg);
+      all_vartypes, all_datatypes, gg);
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
                                 g_slist_length (gg->d) > 1);
   }
@@ -91,17 +91,20 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (g_slist_length (d->vartable)) {
-      variable_notebook_subwindow_add (d, func, notebook, all_vartypes, gg);
+      variable_notebook_subwindow_add (d, func, notebook,
+        all_vartypes, all_datatypes, gg);
     }
   }
 
   /*-- listen for variable_added and _list_changed events on main_window --*/
   /*-- ... list_changed would be adequate --*/
   gtk_signal_connect (GTK_OBJECT (gg),
-    "variable_added", GTK_SIGNAL_FUNC (variable_notebook_varchange_cb),
+    "variable_added",
+     GTK_SIGNAL_FUNC (variable_notebook_varchange_cb),
      GTK_OBJECT (notebook));
   gtk_signal_connect (GTK_OBJECT (gg),
-    "variable_list_changed", GTK_SIGNAL_FUNC (variable_notebook_list_changed_cb),
+    "variable_list_changed",
+     GTK_SIGNAL_FUNC (variable_notebook_list_changed_cb),
      GTK_OBJECT (notebook));
 
   /*-- listen for variable_added events on main_window --*/
