@@ -208,29 +208,29 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
 
       /* need to zero extra cols */
       for (i=old_ncols; i<nc; i++) {
-        dsp->tcorr1.Fa.vals[0][i] = dsp->tcorr1.Fa.vals[1][i] = 0.0;
-        dsp->tcorr1.Fz.vals[0][i] = dsp->tcorr1.Fz.vals[1][i] = 0.0;
-        dsp->tcorr1.F.vals[0][i] = dsp->tcorr1.F.vals[1][i] = 0.0;
-        dsp->tcorr1.Ga.vals[0][i] = dsp->tcorr1.Ga.vals[1][i] = 0.0;
-        dsp->tcorr1.Gz.vals[0][i] = dsp->tcorr1.Gz.vals[1][i] = 0.0;
-        dsp->tcorr1.G.vals[0][i] = dsp->tcorr1.G.vals[1][i] = 0.0;
-        dsp->tcorr1.Va.vals[0][i] = dsp->tcorr1.Va.vals[1][i] = 0.0;
-        dsp->tcorr1.Vz.vals[0][i] = dsp->tcorr1.Vz.vals[1][i] = 0.0;
-        dsp->tcorr1.tv.vals[0][i] = dsp->tcorr1.tv.vals[1][i] = 0.0;
+        dsp->tcorr1.Fa.vals[0][i] = 0.0;
+        dsp->tcorr1.Fz.vals[0][i] = 0.0;
+        dsp->tcorr1.F.vals[0][i] = 0.0;
+        dsp->tcorr1.Ga.vals[0][i] = 0.0;
+        dsp->tcorr1.Gz.vals[0][i] = 0.0;
+        dsp->tcorr1.G.vals[0][i] = 0.0;
+        dsp->tcorr1.Va.vals[0][i] = 0.0;
+        dsp->tcorr1.Vz.vals[0][i] = 0.0;
+        dsp->tcorr1.tv.vals[0][i] = 0.0;
         dsp->tcorr1.active_vars.els[i] = 0;
         dsp->tcorr1.lambda.els[i] = 0.0;
         dsp->tcorr1.tau.els[i] = 0.0;
         dsp->tcorr1.tinc.els[i] = 0.0;
 
-        dsp->tcorr2.Fa.vals[0][i] = dsp->tcorr2.Fa.vals[1][i] = 0.0;
-        dsp->tcorr2.Fz.vals[0][i] = dsp->tcorr2.Fz.vals[1][i] = 0.0;
-        dsp->tcorr2.F.vals[0][i] = dsp->tcorr2.F.vals[1][i] = 0.0;
-        dsp->tcorr2.Ga.vals[0][i] = dsp->tcorr2.Ga.vals[1][i] = 0.0;
-        dsp->tcorr2.Gz.vals[0][i] = dsp->tcorr2.Gz.vals[1][i] = 0.0;
-        dsp->tcorr2.G.vals[0][i] = dsp->tcorr2.G.vals[1][i] = 0.0;
-        dsp->tcorr2.Va.vals[0][i] = dsp->tcorr2.Va.vals[1][i] = 0.0;
-        dsp->tcorr2.Vz.vals[0][i] = dsp->tcorr2.Vz.vals[1][i] = 0.0;
-        dsp->tcorr2.tv.vals[0][i] = dsp->tcorr2.tv.vals[1][i] = 0.0;
+        dsp->tcorr2.Fa.vals[0][i] = 0.0;
+        dsp->tcorr2.Fz.vals[0][i] = 0.0;
+        dsp->tcorr2.F.vals[0][i] = 0.0;
+        dsp->tcorr2.Ga.vals[0][i] = 0.0;
+        dsp->tcorr2.Gz.vals[0][i] = 0.0;
+        dsp->tcorr2.G.vals[0][i] = 0.0;
+        dsp->tcorr2.Va.vals[0][i] = 0.0;
+        dsp->tcorr2.Vz.vals[0][i] = 0.0;
+        dsp->tcorr2.tv.vals[0][i] = 0.0;
         dsp->tcorr2.active_vars.els[i] = 0;
         dsp->tcorr2.lambda.els[i] = 0.0;
         dsp->tcorr2.tau.els[i] = 0.0;

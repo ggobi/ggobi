@@ -326,7 +326,7 @@ eigenvec_set (datad *d, ggobid *gg)
 
   for (i=0; i<nels; i++)
     for (j=0; j<nels; j++)
-      eigenvec[i][j] = vc[i][j];
+      eigenvec[i][j] = (gdouble) vc[i][j];
 
 }
 
@@ -497,11 +497,11 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
       tmpf = 0.;
       for (k=0; k<svars->nels; k++) {
         if (d->sphere.vars_stdized)
-          tmpf = tmpf + eigenvec[k][j] *
+          tmpf = tmpf + (gfloat) eigenvec[k][j] *
             (d->tform.vals[i][svars->els[k]] - tform_mean[svars->els[k]]) /
             tform_stddev[svars->els[k]];
         else
-          tmpf = tmpf + eigenvec[k][j] *
+          tmpf = tmpf + (gfloat) eigenvec[k][j] *
             (d->tform.vals[i][svars->els[k]] - tform_mean[svars->els[k]]);
       }
       b[j] = tmpf / eigenval[j]; 

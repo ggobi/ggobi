@@ -145,15 +145,15 @@ tour1d_realloc_up (gint nc, datad *d, ggobid *gg)
 
       /* need to zero extra cols */
       for (i=old_ncols; i<nc; i++) {
-        dsp->t1d.Fa.vals[0][i] = dsp->t1d.Fa.vals[1][i] = 0.0;
-        dsp->t1d.Fz.vals[0][i] = dsp->t1d.Fz.vals[1][i] = 0.0;
-        dsp->t1d.F.vals[0][i] = dsp->t1d.F.vals[1][i] = 0.0;
-        dsp->t1d.Ga.vals[0][i] = dsp->t1d.Ga.vals[1][i] = 0.0;
-        dsp->t1d.Gz.vals[0][i] = dsp->t1d.Gz.vals[1][i] = 0.0;
-        dsp->t1d.G.vals[0][i] = dsp->t1d.G.vals[1][i] = 0.0;
-        dsp->t1d.Va.vals[0][i] = dsp->t1d.Va.vals[1][i] = 0.0;
-        dsp->t1d.Vz.vals[0][i] = dsp->t1d.Vz.vals[1][i] = 0.0;
-        dsp->t1d.tv.vals[0][i] = dsp->t1d.tv.vals[1][i] = 0.0;
+        dsp->t1d.Fa.vals[0][i] = 0.0;
+        dsp->t1d.Fz.vals[0][i] = 0.0;
+        dsp->t1d.F.vals[0][i]  = 0.0;
+        dsp->t1d.Ga.vals[0][i] = 0.0;
+        dsp->t1d.Gz.vals[0][i] = 0.0;
+        dsp->t1d.G.vals[0][i] = 0.0;
+        dsp->t1d.Va.vals[0][i] = 0.0;
+        dsp->t1d.Vz.vals[0][i] = 0.0;
+        dsp->t1d.tv.vals[0][i] = 0.0;
         dsp->t1d.active_vars.els[i] = 0;
         dsp->t1d.lambda.els[i] = 0.0;
         dsp->t1d.tau.els[i] = 0.0;
