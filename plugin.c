@@ -125,10 +125,10 @@ load_plugin_library(GGobiPluginDetails *plugin, gboolean recurse)
 
    handle = load_plugin_library(plugin, false);
    if(!handle) {
-     free(plugin->dllName);
+     g_free(plugin->dllName);
      plugin->dllName = tmp;
    } else {
-     free(tmp);
+     g_free(tmp);
    }
    return(handle);
   }
@@ -694,7 +694,7 @@ createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *detai
   }
 #endif
 
-  plugin = (GGobiPluginInfo *) malloc(sizeof(GGobiPluginInfo));
+  plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
   memset(plugin, '\0', sizeof(GGobiPluginInfo));
 
   plugin->type = INPUT_PLUGIN;
@@ -703,7 +703,7 @@ createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *detai
 
   if(modeNames) {
      guint i;
-     plugin->info.i->modeNames = (gchar**) malloc(sizeof(gchar*) * numModes);
+     plugin->info.i->modeNames = (gchar**) g_malloc(sizeof(gchar*) * numModes);
      plugin->info.i->numModeNames = numModes;
      for(i = 0; i < numModes; i++)
         plugin->info.i->modeNames[i] = g_strdup(modeNames[i]);
