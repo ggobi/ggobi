@@ -78,22 +78,22 @@ full marriage between ggobi's direct manipulation graphical environment
 and R's familiar extensible environment for statistical data analysis.
 
 It has the same graphical functionality whether it is running
-standalone or embedded in other software.  That functionality
-includes 2-D displays of projections of points and edges in
-high-dimensional spaces, as well as scatterplot matrices, parallel
-coordinate and time series plots.  Projection tools include average
-shifted histograms of single variables, plots of pairs of variables,
-and grand tours of multiple variables.  Views of the data can be
-reshaped.  Points can be labeled and brushed with glyphs and colors.
-Several displays can be open simultaneously and linked for labeling
-and brushing.  Missing data are accommodated and their patterns can
-be examined.
+standalone or embedded in other software.  That functionality includes
+2-D displays of projections of points and edges in high-dimensional
+spaces, as well as scatterplot matrices, parallel coordinate, time
+series plots and bar charts.  Projection tools include average shifted
+histograms of single variables, plots of pairs of variables, and grand
+tours of multiple variables.  Views of the data can be reshaped.
+Points can be labeled and brushed with glyphs and colors.  Several
+displays can be open simultaneously and linked for labeling and
+brushing.  Missing data are accommodated and their patterns can be
+examined.
 \end{abstract}
 
 \newpage
 
-\tableofcontents
-\newpage
+%\tableofcontents
+%\newpage
 
 \section{Introduction}
 
@@ -126,7 +126,7 @@ a directory called {\bf data,} and there you will find the file {\bf
 olive.xml}, a dataset on olive oil samples from Italy \cite{FALT83}.
 This data set takes advantage of an XML input/output format, a feature
 in GGobi that wasn't available in XGobi. It requires that GGobi has
-been compiled with XML support. If Ggobi has been compiled without XML
+been compiled with XML support. If GGobi has been compiled without XML
 support, the set of files olive.dat, olive.col, olive.row, similar to
 the XGobi data file input, can be used. The olive oil data consists of
 the percentage composition of 8 fatty acids (palmitic, palmitoleic,
@@ -134,7 +134,11 @@ stearic, oleic, linoleic, linolenic, arachidic, eicosenoic) found in
 the lipid fraction of 572 Italian olive oils. There are 9 collection
 areas, 4 from southern Italy (North and South Apulia, Calabria,
 Sicily), two from Sardinia (Inland and Coastal) and 3 from northern
-Italy (Umbria, East and West Liguria).
+Italy (Umbria, East and West Liguria). 
+
+The data is interesting because it represents a quality control study
+of olive oils. It is proposed that the olive oils from different
+regions have different fatty acid signatures. 
 
 Start GGobi for the olive oils data by typing:
 
@@ -178,7 +182,17 @@ Display, ViewMode and Tools menus.
   characteristics of the data and the view.
 \end {itemize}
 
-Using the Display menu, open another scatterplot display. Notice that
+Using the ViewMode menu, choose {\bf Identify}. Look at the
+buttons inside the leftmost portion of the ggobi console. Notice that
+they're contained by a frame labeled {\bf Identify,} which is the view
+mode of the current plot.  This frame contains most of the row
+labeling controls, which are described in the section
+\ref{slbl:Identify}. Move the cursor around the plot window with mouse
+movement, and observe the labels of the point closest to the cursor is
+written. The labels for this data set show the geographic area where
+the sample was taken.
+
+Using the Display menu, open a barchart display. Notice that
 the new window has a narrow white band drawn around the outside of
 the plotting area:  that means that the new window is now the
 ``current display'' and its plot is the ``current plot.''  Click in the
@@ -188,40 +202,29 @@ console when you alternate between the two:  it should always show
 the variables that are plotted in the current plot.
 
 Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
-and Area vs Region in the second, and make that the current plot.
-Using the ViewMode menu, choose {\bf Identify}. Look at the buttons
-inside the leftmost portion of the ggobi console. Notice that
-they're contained by a frame labeled {\bf Identify,} which is the
-view mode of the current plot.  This frame contains most of the row
-labeling controls, which are described in the section
-\ref{slbl:Identify}. Move the cursor around the plot window with mouse
-movement, and observe the labels of the point closest to the cursor is
-written. The labels for this data set show the geographic area
-where the sample was taken.
-
-Using the ViewMode menu, choose {\bf Brush.}  Look at the buttons and
-menus inside the leftmost portion of the ggobi console.  Notice
-that they're contained by a frame labeled {\bf Brush,} which is the
-view mode of the current plot.  This frame contains most of the
+and disply Region in the barchart, and make the barchart the current
+plot.  Using the ViewMode menu, choose {\bf Brush.}  Look at the
+buttons and menus inside the leftmost portion of the ggobi console.
+Notice that they're contained by a frame labeled {\bf Brush,} which is
+the view mode of the current plot.  This frame contains most of the
 brushing controls, which are described in the section
 \ref{slbl:Brush}.  A few of the brushing controls, though, are in the
 main menubar: in the Reset menu and at the bottom of the Options menu.
 
 The rectangle that appears in the current plot is the ``paintbrush,''
-and dragging it over points changes their color. Change the color of
-the brush by opening up the {\bf Choose color \& glyph} panel (Figure
-\ref{fig2}). Now change the size of the brush, holding down the
-middle or right button and dragging the mouse.  Make it almost as
-tall as the window but very thin, and then hold down the left button
-and drag the mouse to  paint the first region, then the second and
-third regions.  Since you're brushing in the {\bf Transient} style,
-the points resume their original color when the paintbrush no longer
-surrounds them.
+and dragging it over bars (or in a scatterplot the points) changes
+their color. Change the color of the brush by opening up the {\bf
+Choose color \& glyph} panel (Figure \ref{fig2}). Hold down the left
+button and drag the mouse to paint the first region, then the second
+and third regions, or click on the bars.  Since you're brushing in the
+{\bf Transient} style, the points resume their original color when the
+paintbrush no longer surrounds them.
 
 While you brush, keep an eye on the plot of linoleic vs eicosenoic,
 and notice where the painted points fall in that scatterplot (Figure
-\ref{fig3}).  Using two linked 2d plots is one way to explore the
-relationship among three variables.
+\ref{fig3}).  The oils from region 1, south Italy, are separable from
+the other two regions using eicosenoic acid. Using two linked 2d plots
+is one way to explore the relationship among three variables.
 
 \begin{figure}[htp]
 %\vspace{-0.5in}
@@ -248,8 +251,7 @@ eicosenoic acid.
 \end{figure}
 
 Now change to {\bf Persistent} brushing and paint the 3 Regions
-different colors. You may also want to use different symbols to
-represent the different Areas, as you'll see shortly in Figure 5.
+different colors. 
 
 Next open up the {\bf Variable transformation} tool, select all of
 the fatty acid variables -- hold the control button down and select
@@ -317,15 +319,14 @@ acid (a purple circle will be seen now in the variable circle for
 linoleic acid).  {\bf Oblique} is already selected in the {\bf Manual
 manipulation} menu.  Now in the plot window, hold down any mouse
 button while you drag the cursor. The coefficient corresponding to
-linoleic acid will increase and decrease following the mouse,
-inducing a rotation of the scattercloud.  If the axes are still
-showing in the scatterplot window, the axis in magenta corresponds
-to the variable you're manipulating.  Similarly rotate oleic acid
-and arachidic acid in and out of the plot, with the aim of finding a
-projection where the two regions are maximally separated (for
-example, Figure \ref{fig6}).  There are 5 choices of manipulation
-mode (unconstrained oblique, vertical, horizontal, radial and
-angular) to explore.
+linoleic acid will increase and decrease following the mouse, inducing
+a rotation of the scattercloud.  If the axes are still showing in the
+scatterplot window, the axis in magenta corresponds to the variable
+you're manipulating.  Similarly rotate oleic acid and arachidic acid
+in and out of the plot, with the aim of finding a projection where the
+two regions are well separated (for example, Figure \ref{fig6}).
+There are 5 choices of manipulation mode (unconstrained oblique,
+vertical, horizontal, radial and angular) to explore.
 
 \begin{figure}[htp]
 \hbox{\pdfimage width 3in {Figures/olive-tour1.jpg}\pdfimage width 3in {Figures/olive-tour2.jpg}}
@@ -388,8 +389,9 @@ The display types include
 \itemsep 0em
 \item scatterplot,
 \item scatterplot matrix, 
-\item parallel coordinates plot, and
-\item time series plots.
+\item parallel coordinates plot, 
+\item time series plots, and
+\item barchart.
 \end{itemize}
 
 Each display type
@@ -423,7 +425,7 @@ The {\bf Tools} menu gives access to
 \itemsep 0em
 \item a variable manipulation table,
 \item a variable transformation pipeline,
-\item an variable sphering panel,
+\item a variable sphering panel,
 \item jittering controls,
 \item a panel for selecting a new color scheme for drawing, and
  then for automatically brushing points and edges by mapping the
@@ -814,11 +816,25 @@ pause checkbox stops and starts the tour. {\bf Reinit} initializes the tour
 to the projection (the ASH) of the first active variable.  {\bf Scramble} sets
 the view to a random projection.
 
-Variables can be toggled into and out of the tour by clicking on the
-variable circles. The active variable space is the subset of variables
-currently selected, and their variable circles are drawn with
-a bold outline. When a variable is toggled out of the tour it fades out
-gradually, to maintain continuity of motion.
+Variables can be toggled into and out of the subset of active
+variables by clicking on the the toggle buttons. The variable will be
+immediately removed from the tour. 
+
+The variable circles on the right hand side of the control panel add
+further control for adding or removing variables from the current
+tour. The active variable space is the subset of variables currently
+selected, and their variable circles are drawn with a bold
+outline. When a variable is de-selected on the variable circles the
+variable fades out gradually, to maintain continuity of motion.
+
+The reason for the two displays is to make handling of large numbers
+of variables more convenient. It might not make sense to include all
+the variables into a tour at once. The toggle buttons provide an
+efficient way to interact with the variable list. The variable circles
+provide information about the variables in the tour, how they are
+project to give the current projection, and information on which
+variable is the current manip variable. It is possible to select and
+de-select these variables to fine tune the tour. 
 
 The variable projection coefficients can be manually manipulated
 using manual controls. To select the variable to manipulate, click on
@@ -827,8 +843,8 @@ Horizontal mouse motions in the plot window then alter the coefficient for
 the manipulation variable, constrained by the values of the coefficients
 of other active variables (which may also change).
 
-The variable axes can be toggled on or off using the options menu at
-the top of the plot window.
+The variable axes and projection coeeficient values can be toggled on
+or off using the options menu at the top of the plot window.
 
 To activate this view mode from the keyboard, type {\em t} or {\em T}
 with the focus in the plot window, or type Control-{\em t} or
@@ -836,13 +852,15 @@ Control-{\em T} with the focus in the console.
 
 \subsubsection{Projection Pursuit}
 
-A rudimentary guided tour is available when the {\bf Projection Pursuit}
-button is selected. It is controlled through a separate pop-up projection
+A guided tour is available when the {\bf Projection Pursuit} button is
+selected. It is controlled through a separate pop-up projection
 pursuit window, which contains a plot of the projection pursuit index.
-When {\bf Optimize} is selected, the tour is guided by the index rather
-than proceeding randomly.  The numbers displayed to the right of the {\bf
-PP index} label are the minimum, current value, and maximum of the index.
-(Currently only the principal component index is implemented.)
+When {\bf Optimize} is selected, the tour is guided by the index
+rather than proceeding randomly.  The numbers displayed to the right
+of the {\bf PP index} label are the minimum, current value, and
+maximum of the index.  A selection of indices is available.
+
+\subsubsection{Options}
 
 The {\bf Options} menu on the main menu bar contains controls for
 laying out variable circles in the variable selection panel in
@@ -862,11 +880,16 @@ of rotation to be adjusted. The pause checkbox stops and starts the
 tour. {\bf Reinit} initializes the tour to the projection of the first two
 active variables. {\bf Scramble} sets the view to a random projection.
 
-Variables can be toggled into and out of the tour by clicking on the
-variable circles. The active variable space is the subset of variables
-currently entered into a tour, and their variable circles are drawn with
-a bold outline. When a variable is toggled out of the tour it fades out
-gradually, to maintain continuity of motion.
+Variables can be toggled into and out of the subset of active
+variables by clicking on the the toggle buttons. The variable will be
+immediately removed from the tour. 
+
+The variable circles on the right hand side of the control panel add
+further control for adding or removing variables from the current
+tour. The active variable space is the subset of variables currently
+selected, and their variable circles are drawn with a bold
+outline. When a variable is de-selected on the variable circles the
+variable fades out gradually, to maintain continuity of motion.
 
 The variable projection coefficients can be manually manipulated using
 manual controls. To select the variable to manipulate, click on the
@@ -892,16 +915,21 @@ Control-{\em G} with the focus in the console.
 
 \subsubsection{Projection Pursuit}
 
-A rudimentary guided tour is available from the projection pursuit control
-panel. Projection pursuit in the 2D tour requires the variables to be
-sphered ahead of time, so the user needs to first enter the {\bf Tools}
-menu and use the {\bf Sphering...} tool to clone sphered counterparts of
-the currently active variables. Once these variables have been selected
-and all others deselected, then the {\bf Projection Pursuit} option can
-be chosen. This pops up a new window which provides an interface for
-guiding the tour.
-(Currently only the holes and central mass indices are implemented. )
+A guided tour is available when the {\bf Projection Pursuit} button is
+selected. It is controlled through a separate pop-up projection
+pursuit window, which contains a plot of the projection pursuit index.
+When {\bf Optimize} is selected, the tour is guided by the index
+rather than proceeding randomly.  The numbers displayed to the right
+of the {\bf PP index} label are the minimum, current value, and
+maximum of the index.  A selection of indices is available.
 
+Often, sphering the data ahead of time provides more interesting
+results with the 2D guided tour, especially for the holes and central
+mass indices. Use the {\bf Tools} menu and use the {\bf Sphering...}
+tool to clone sphered counterparts of the currently active variables
+to do this.
+
+\subsubsection{Options}
 
 The {\bf Options} menu on the main menu bar contains controls for
 laying out variable circles in the variable selection panel in
