@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "noop-checkbutton.h"
+
 #include "vars.h"
 #include "externs.h"
 
@@ -13,26 +15,22 @@
 /*                     Variable selection                                  */
 /*-------------------------------------------------------------------------*/
 
-gboolean
-varpanel_checkbutton_get_active (gint jvar, datad *d)
-{
-  gboolean active = false;
-
-  if (jvar >= 0 && jvar < d->ncols)
-    if (GTK_WIDGET_REALIZED (d->varpanel_ui.label[jvar]))
-      active = gtk_toggle_button_get_active (
-        GTK_TOGGLE_BUTTON (d->varpanel_ui.label[jvar]));
-
-  return active;
-}
-
 void
 varpanel_checkbutton_set_active (gint jvar, gboolean active, datad *d)
 {
-  if (jvar >= 0 && jvar < d->ncols)
-    if (GTK_WIDGET_REALIZED (d->varpanel_ui.label[jvar]))
-      gtk_toggle_button_set_active (
-        GTK_TOGGLE_BUTTON (d->varpanel_ui.label[jvar]), active);
+  gboolean active_prev;
+
+  if (jvar >= 0 && jvar < d->ncols) {
+    GtkWidget *w = GTK_WIDGET (d->varpanel_ui.label[jvar]);
+    if (GTK_WIDGET_REALIZED (d->varpanel_ui.label[jvar])) {
+
+      active_prev = GTK_TOGGLE_BUTTON (w)->active;
+      GTK_TOGGLE_BUTTON (w)->active = active;
+
+      if (active != active_prev)
+        gtk_widget_queue_draw (w);
+    }
+  }
 }
 
 
@@ -504,8 +502,17 @@ varpanel_refresh (ggobid *gg) {
         switch (display->displaytype) {
 
           case parcoords:
-            for (j=0; j<d->ncols; j++) {
+          {
+            GList *l = display->splots;
+            for (j=0; j<d->ncols; j++)
+              varpanel_checkbutton_set_active (j, false, d);
+
+            while (l) {
+              j = ((splotd *) l->data)->p1dvar;
+              varpanel_checkbutton_set_active (j, true, d);
+              l = l->next;
             }
+          }
           break;
 
           case scatmat:
@@ -534,6 +541,7 @@ varpanel_refresh (ggobid *gg) {
   }
 }
 
+/*-- responds to a button_press_event --*/
 static gint
 varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 {
@@ -568,31 +576,17 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 
     if (ctrl_mod) {
       variable_clone (jvar, NULL, true, d, gg);
-      return (false);
+      return (true);
     }
     
     /*-- general variable selection --*/
     varsel (cpanel, sp, jvar, button, alt_mod, ctrl_mod, shift_mod, d, gg);
+    varpanel_refresh (gg);
     return true;
   }
 
   return false;
 }
-
-static gint
-clicked_cb (GtkWidget *w, GdkEvent *event, datad *d)
-{
-/*
- * The clicked signal is delivered after the pressed signal,
- * apparently, so I can use this routine to clean up after
- * the variable selection, resetting the state of each checkbox.
-*/
-  ggobid *gg = GGobiFromWidget (w, true);
-  varpanel_refresh (gg);
-
-  return true;
-}
-
 
 /*-------------------------------------------------------------------------*/
 /*                  initialize and populate the var panel                  */
@@ -651,13 +645,11 @@ void varpanel_populate (datad *d, ggobid *gg)
     g_malloc (d->ncols * sizeof (GtkWidget *));
   for (j=0; j<d->ncols; j++) {
     d->varpanel_ui.label[j] =
-      gtk_check_button_new_with_label (d->vartable[j].collab);
+      gtk_noop_check_button_new_with_label (d->vartable[j].collab);
     GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.label[j]), gg, true);
 
     gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.label[j]),
       "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
-    gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.label[j]),
-      "clicked", GTK_SIGNAL_FUNC (clicked_cb), d);
 
     gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
       d->varpanel_ui.label[j], true, true, 0);
