@@ -106,7 +106,6 @@ void
 range_set_cb (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *frame, *vb, *hb, *okay_button;
-
   GtkWidget *dialog = gtk_dialog_new ();
 
   frame = gtk_frame_new ("Set range");
