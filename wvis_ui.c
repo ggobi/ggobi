@@ -871,8 +871,11 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 static void
 entry_set_scheme_name (ggobid *gg)
 {
-  gtk_entry_set_text (GTK_ENTRY (gg->wvis.entry),
+  gtk_entry_set_text (GTK_ENTRY (gg->wvis.entry_preview),
     (gg->wvis.scheme != NULL) ? gg->wvis.scheme->name :
+                                gg->activeColorScheme->name);
+
+  gtk_entry_set_text (GTK_ENTRY (gg->wvis.entry_applied),
                                 gg->activeColorScheme->name);
 }
 
@@ -882,7 +885,7 @@ wvis_window_open (ggobid *gg)
   GtkWidget *vbox;
   GtkWidget *frame1, *vb1, *hb;
   GtkWidget *notebook = NULL;
-  GtkWidget *btn, *vb, *opt;
+  GtkWidget *btn, *vb, *opt, *label;
 
   /*-- for colorscales --*/
   GtkWidget *hpane, *tr, *sw;
@@ -1014,18 +1017,16 @@ wvis_window_open (ggobid *gg)
 
     hb = gtk_hbox_new (true, 0);
     gtk_box_pack_start (GTK_BOX (vbs), hb, true, true, 5);
-
-    gtk_box_pack_start (GTK_BOX (hb),
-      gtk_label_new ("Color scheme name "), true, true, 0);
-
-    gg->wvis.entry = gtk_entry_new();
-    gtk_entry_set_editable (GTK_ENTRY (gg->wvis.entry), false);
-    entry_set_scheme_name (gg);
-
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->wvis.entry,
+    label = gtk_label_new ("Color scheme (preview)");
+    gtk_misc_set_alignment (GTK_MISC(label), 0, .5);
+    gtk_box_pack_start (GTK_BOX (hb), label, true, true, 0);
+    gg->wvis.entry_preview = gtk_entry_new();
+    gtk_entry_set_editable (GTK_ENTRY (gg->wvis.entry_preview), false);
+    /*entry_set_scheme_name (gg);*/
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->wvis.entry_preview,
       "The name of the color scheme whose colors are displayed below.  This may be the currently active color scheme, or the scheme you're previewing using the tree to the left left.",
       NULL);
-    gtk_box_pack_start (GTK_BOX (hb), gg->wvis.entry, true, true, 0);
+    gtk_box_pack_start (GTK_BOX (hb), gg->wvis.entry_preview, true, true, 0);
 
     btn = gtk_button_new_with_label ("Apply color scheme to brushing colors");
     gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
@@ -1036,6 +1037,19 @@ wvis_window_open (ggobid *gg)
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (scale_set_cb), gg);
     gtk_widget_set_name (btn, "WVIS:setcolorscheme");
+
+    hb = gtk_hbox_new (true, 0);
+    gtk_box_pack_start (GTK_BOX (vbs), hb, true, true, 5);
+    label = gtk_label_new ("Color scheme (applied)");
+    gtk_misc_set_alignment (GTK_MISC(label), 0, .5);
+    gtk_box_pack_start (GTK_BOX (hb), label, true, true, 0);
+    gg->wvis.entry_applied = gtk_entry_new();
+    gtk_entry_set_editable (GTK_ENTRY (gg->wvis.entry_applied), false);
+    entry_set_scheme_name (gg);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->wvis.entry_applied,
+      "The name of the currently active color scheme.",
+      NULL);
+    gtk_box_pack_start (GTK_BOX (hb), gg->wvis.entry_applied, true, true, 0);
   /**/
 
     /*-- colors, symbols --*/

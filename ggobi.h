@@ -346,16 +346,12 @@ struct _ggobid {
 /*---------------- brushing by weights -------------------------------*/
 
   struct _WeightedVis {
-    GtkWidget *window, *entry, *da;
+    GtkWidget *window, *entry_preview, *entry_applied, *da;
     GdkPixmap *pix;
     GdkColor gray1, gray2, gray3;
 
     colorschemed *scheme; /*-- current color scheme --*/
 
-/*
-   gint ncolors;    
-   GdkColor *color_table, bg_color, accent_color;
-*/
     GdkGC *GC;
 
     gfloat *pct;
