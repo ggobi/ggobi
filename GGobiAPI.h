@@ -168,7 +168,7 @@ extern gint GGobi_getViewTypeIndex(gchar *viewType);
   Converts a symbolic constant to the name of a view type.
   See getCurrentDisplay.
  */
-extern const gchar *GGobi_getViewTypeName(enum displaytyped type);
+extern const gchar *GGobi_getViewTypeName(displayd *dpy);
 
 /**
  @ingroup GGobi

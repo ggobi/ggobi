@@ -40,20 +40,6 @@
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};
 
-enum displaytyped {
-#if 0
-	           scatterplot, 
-#endif
-#if 0
-		   scatmat, 
-#endif
-#if 0
-                   parcoords, 
-#endif
-		   extended_display_type,
-                   unknown_display_type};
-
-
 extern const gchar* const ViewTypes[3];
 extern const gint ViewTypeIndeces[3];
 
@@ -82,30 +68,6 @@ typedef enum {NULLMODE = -1,
  	       EXTENDED_DISPLAY_MODE,
                NMODES} PipelineMode;
 
-#if 0
-
-#define NMODES 14  /*-- exclude NULLMODE --*/
-
-#define NULLMODE -1
-
-#define P1PLOT   0
-#define XYPLOT   1
-#define ROTATE   2
-#define TOUR1D   3
-#define TOUR2D   4
-#define COTOUR   5
-
-#define SCALE    6
-#define BRUSH    7
-#define IDENT    8
-#define EDGEED   9
-#define MOVEPTS  10
-
-#define SCATMAT 11
-#define PCPLOT  12
-#define TSPLOT  13
-
-#endif /* Plot mode defines */
 /* */
 
 #define TEXTURE 0

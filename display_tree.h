@@ -29,7 +29,7 @@ void show_display_tree (gpointer cbd, guint action, GtkWidget *widget);
 void show_display_tree (ggobid *gg, GtkWidget *widget);
 
 GtkWidget *splot_subtree_create(displayd *display, ggobid *gg);
-gchar *splot_tree_label (splotd *, gint, enum displaytyped, datad *, ggobid *);
+gchar *splot_tree_label (splotd *, gint, datad *, ggobid *);
 
 void display_tree_delete_cb(GtkWidget *w, GdkEvent *event, ggobid *gg);
 

@@ -55,7 +55,6 @@ GSList *getPluginDependencies(xmlNodePtr node, GGobiPluginDetails *info, xmlDocP
 
 gint getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info);
 GGobiDisplayDescription* getDisplayDescription(xmlNodePtr node);
-enum displaytyped getDisplayType(const xmlChar *type);
 gint getPreferences(const xmlDocPtr doc, GGobiInitInfo *info);
 
 
@@ -413,20 +412,19 @@ getDisplayDescription(xmlNodePtr node)
   xmlChar *tmp;
 
   dpy = (GGobiDisplayDescription*) g_malloc(sizeof(GGobiDisplayDescription));
-  dpy->type = getDisplayType(tmp = xmlGetProp(node, (xmlChar *) "type"));
-  if(dpy->type == extended_display_type)
-    dpy->typeName = g_strdup(tmp);
+  tmp = xmlGetProp(node, (xmlChar *) "type");
+  dpy->typeName = g_strdup(tmp);
   tmp = xmlGetProp(node, (xmlChar *) "data");
   if(tmp) {
     dpy->data = strToInteger((char *)tmp) - 1;
   } else
     dpy->data = 0;
 
+  if(xmlGetProp(node, (xmlChar *) "unsupported"))
+    dpy->canRecreate = false;
+
   dpy->numVars = 0;
- 
-  if(dpy->type == unknown_display_type) {
-    return(dpy);
-  }
+
 
   el = XML_CHILDREN(node);
   while(el) {
@@ -445,11 +443,7 @@ getDisplayDescription(xmlNodePtr node)
   return(dpy);
 }
 
-enum displaytyped
-getDisplayType(const xmlChar *type)
-{
-  return(extended_display_type);
-}
+
 
 
 /*****************************************************************/
@@ -926,8 +920,10 @@ createExtendedDisplay(const gchar * const type, gint *vars, gint numVars, datad 
   GtkGGobiExtendedDisplayClass *klass;
   GtkType gtype = gtk_type_from_name(type);
   klass = gtk_type_class(gtype);
-  if(!klass->createWithVars)
+  if(!klass->createWithVars) {
+     g_printerr("Cannot currently handle the extended display %s type.", type);
      return(NULL);
+  }
   dpy = klass->createWithVars(false, numVars, vars, d, gg);
   if(!dpy)
     return(NULL);
@@ -941,39 +937,20 @@ createExtendedDisplay(const gchar * const type, gint *vars, gint numVars, datad 
 displayd *
 createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc) 
 {
-  displayd *dpy;
+  displayd *dpy = NULL;
   datad *data;
   gint *vars, i;
+
+  if(desc->canRecreate == false)
+    return(NULL);
 
   data = (datad*) gg->d->data;
 
   vars = (gint*) g_malloc(sizeof(gint) * desc->numVars);
   for (i = 0; i < desc->numVars; i++)
     vars[i] = resolveVariableName(desc->varNames[i], data);
-  switch(desc->type) {
-#if 0
-/*XX*/
-    case scatterplot:
-      dpy = GGOBI(newScatterplot)(vars[0], vars[1], data, gg);
-    break;
-    case parcoords:
-      dpy = GGOBI(newParCoords)(vars, desc->numVars, data, gg);
-    break;
-    case scatmat:
-      dpy = GGOBI(newScatmat)(vars, vars, desc->numVars,
-                              desc->numVars, data, gg);
-    break;
-#endif
-    case extended_display_type:
-      dpy = createExtendedDisplay(desc->typeName, vars, desc->numVars, data, gg);
-      if(!dpy)
-        g_printerr("Cannot currently handle the extended display %s type.", desc->typeName);
-    break;
-    case unknown_display_type:
-    default:
-      dpy = NULL;
-    break;
-  }
+
+  dpy = createExtendedDisplay(desc->typeName, vars, desc->numVars, data, gg);
 
   g_free(vars);
 

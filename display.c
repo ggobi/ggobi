@@ -268,18 +268,18 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display)
 /*----------------------------------------------------------------------*/
 
 
-/*XXX consolidate this and display_alloc_init(), i.e. remove the latter! */
+/*XXX consolidate this and display_alloc_init(), i.e. remove the latter! 
+ This display class is really a virtual class.
+*/
 displayd *
-gtk_ggobi_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg)
+gtk_ggobi_display_new(gboolean missing_p, datad *d, ggobid *gg)
 {
-  return(display_alloc_init(type, missing_p, d, gg));
+  return(display_alloc_init(missing_p, d, gg));
 }
 
 void
-display_set_values(displayd *display, enum displaytyped type, datad *d, ggobid *gg)
+display_set_values(displayd *display, datad *d, ggobid *gg)
 {
-  display->displaytype = type; 
-
   /* Should copy in the contents of DefaultOptions to create
      an indepedently modifiable configuration copied from
      the current template.
@@ -291,12 +291,12 @@ display_set_values(displayd *display, enum displaytyped type, datad *d, ggobid *
 }
 
 displayd *
-display_alloc_init (enum displaytyped type, gboolean missing_p, datad *d, ggobid *gg)
+display_alloc_init (gboolean missing_p, datad *d, ggobid *gg)
 {
   displayd *display;
 
   display = gtk_type_new(GTK_TYPE_GGOBI_WINDOW_DISPLAY);
-  display_set_values(display, type, d, gg);
+  display_set_values(display, d, gg);
 
   return (display);
 }

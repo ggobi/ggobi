@@ -176,6 +176,7 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
     if(klass->xml_describe) {
       klass->xml_describe(node, plots, dpy);
     } else {
+      xmlSetProp(node, "unsupported", "true");
       g_printerr("No method for generating XML description of %s display type\n", klass->titleLabel); 
     }
   }
@@ -209,19 +210,13 @@ XML_addVariable(xmlNodePtr node, gint j, datad *d)
 const char *
 getDisplayTypeName(displayd *dpy)
 {
-  const gchar *val;
+  const gchar *val = "";
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
       /* Perhaps compute the name of the type and use that. */
     val = gtk_type_name(GTK_OBJECT_TYPE(GTK_OBJECT(dpy)));
-  } else {
-  switch(dpy->displaytype) {
-    default:
-      val = "";
-    break;
-  }
   }
 
-    return(val);
+  return(val);
 }
 
 /*

@@ -59,7 +59,7 @@ update_display_tree_plots_by_variable(DisplayTree *tree, gint whichVar, datad *d
         sp = (splotd*) g_list_nth_data(dpy->splots, i);
         tmp = (GtkWidget *) g_list_nth_data(kids, i);
         tmp = (GtkWidget *) g_list_nth_data(gtk_container_children(GTK_CONTAINER(tmp)), 0);
-	lab = splot_tree_label(sp, i, dpy->displaytype, dpy->d, gg);
+	lab = splot_tree_label(sp, i, dpy->d, gg);
         gtk_label_set_text(GTK_LABEL(tmp), lab);
 	g_free(lab);
     }
@@ -205,7 +205,7 @@ gtk_signal_connect (GTK_OBJECT(tree), "select_child",
   for (slist = display->splots; slist ; slist = slist->next, ctr++) {
     sp = (splotd *) slist->data;
     /*-- buf is allocated in splot_tree_label, but freed here --*/
-    buf = splot_tree_label (sp, ctr, display->displaytype, d, gg);
+    buf = splot_tree_label (sp, ctr, d, gg);
     item = gtk_tree_item_new_with_label (buf);
     if(buf) 
       g_free (buf);
@@ -228,18 +228,10 @@ gtk_signal_connect (GTK_OBJECT(tree), "select_child",
 gchar * 
 display_tree_label(displayd *display)
 {
- gchar * val, *tmp;
+ gchar * val = NULL, *tmp;
 
  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display))
     val = (gchar *) gtk_display_tree_label(display);
- else
-  switch(display->displaytype) {
-    case unknown_display_type:
-      val = (gchar *) NULL;
-      break;
-    default:
-      break;
-  }
 
   if(val) {
       tmp = g_malloc(sizeof(gchar *) * (strlen(val) + strlen(display->d->name + 3 + 1)));
@@ -256,7 +248,7 @@ display_tree_label(displayd *display)
   type `type'.
  */
 gchar *
-splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,  datad *d, ggobid *gg)
+splot_tree_label(splotd *splot, gint ctr, datad *d, ggobid *gg)
 {
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(splot)) {
       return(GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(splot)->klass)->tree_label(splot, d, gg));

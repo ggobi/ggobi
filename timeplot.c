@@ -141,7 +141,7 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
   displayd *display;
 
   display = gtk_type_new(GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY);
-  display_set_values(display, extended_display_type, d, gg);
+  display_set_values(display, d, gg);
 
   if (nvars == 0) {
     nplots = MIN ((d->ncols-1), sessionOptions->info->numTimePlotVars);

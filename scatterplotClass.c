@@ -1113,6 +1113,8 @@ addMarkupCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 void
 scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
 {
+  klass->parent_class.createWithVars = scatterplot_new_with_vars;
+  klass->parent_class.create = scatterplot_new;
   klass->parent_class.show_edges_p = true;
   klass->parent_class.binningPermitted = binningPermitted;
 

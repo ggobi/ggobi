@@ -105,7 +105,7 @@ scatmat_new (gboolean missing_p, gint numRows, gint *rows,
   GtkAccelGroup *scatmat_accel_group;
 
   display = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_DISPLAY);
-  display_set_values (display, extended_display_type, d, gg);
+  display_set_values (display, d, gg);
   wdpy = GTK_GGOBI_WINDOW_DISPLAY(display);
 
   /* If the caller didn't specify the rows and columns, 

@@ -41,67 +41,7 @@ display_set_position (windowDisplayd *display, ggobid *gg)
 }
 
 
-#ifdef SHOULD_BE_REMOVED
-static void
-display_open_cb (GtkWidget *w, datad *d)
-{
-  ggobid *gg = GGobiFromWidget (w, true);
-  gint display_type = GPOINTER_TO_INT
-    (gtk_object_get_data (GTK_OBJECT (w), "displaytype"));
-  gboolean missing_p = GPOINTER_TO_INT
-    (gtk_object_get_data (GTK_OBJECT (w), "missing_p"));
 
-  display_create (display_type, missing_p, d, gg);
-}
-
-/* 
-  Create an instance of one of the builtin in display types.
-  For the Gtk-based extended display types, see
-  extended_display_open_cb() in display_ui.c and ensure that
-  changes made here are propogated to there.
-  (In the long run, it would be nice to have all of the display
-   types as real Gtk classes and have only one mechanism.)
- */
-displayd *
-display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
-{
-  displayd *display;
-  gint *selected_vars, nselected_vars = 0;
-
-  if (d == NULL || d->nrows == 0)  /*-- if used before we have data --*/
-    return (NULL);
-
-  /*-- if trying to make a missing values plot without missing data --*/
-  if (missing_p && d->nmissing == 0) 
-    return (NULL);
-
-  /*-- find out what variable are selected in the var statistics panel --*/
-  selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
-  nselected_vars = selected_cols_get (selected_vars, d, gg);
-
-  /*
-   * Turn off event handlers, remove submenus, and redraw the
-   * previous plot without a border.
-  */
-  splot_set_current (gg->current_splot, off, gg);
-
-  switch (displaytype) {
-    case scatmat:
-      display = scatmat_new (missing_p, nselected_vars, selected_vars, 
-			     nselected_vars, selected_vars,  d, gg);
-      break;
-    default:
-      break;
-  }
-
-  display_add (display, gg);
-
-  varpanel_refresh (display, gg);
-  g_free (selected_vars);
-
-  return (display);
-}
-#endif /* SHOULD_BE_REMOVED */
 
 
 
@@ -167,21 +107,30 @@ extended_display_open_cb (GtkWidget *w, ExtendedDisplayCreateData *data)
     return;
 
   splot_set_current (gg->current_splot, off, gg);   
-  if(data->klass->createWithVars) {
+  if(data->klass->create) {
+    dpy = data->klass->create(false, NULL, data->d, gg);
+  } else if(data->klass->createWithVars) {
     gint *selected_vars, nselected_vars = 0;
 
      selected_vars = (gint *) g_malloc (data->d->ncols * sizeof (gint));
      nselected_vars = selected_cols_get (selected_vars, data->d, gg);
+#if 0
+     if(nselected_vars < 1) {
+        nselected_vars = 1;
+	selected_vars[0] = 0;
+     }
+#endif
      dpy = data->klass->createWithVars(false, nselected_vars, selected_vars, data->d, gg);
      g_free(selected_vars);
   } else {
-     if(!data->klass->create) {
        /* How to get the name of the class from the class! GTK_OBJECT_CLASS(gtk_type_name(data->klass)->type) */
        g_printerr("Real problems! An extended display (%s) without a create routine!\n",  "?");
        return;
-     }
+  }
 
-    dpy = data->klass->create(false, NULL, data->d, gg);
+  if(!dpy) {
+     g_printerr("Failed to create display of type %s\n", data->klass->titleLabel);
+     return;
   }
 
   display_add(dpy, gg);

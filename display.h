@@ -28,7 +28,6 @@ struct _ggobid;
 #define GTK_IS_GGOBI_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_DISPLAY))
 
 GtkType gtk_ggobi_display_get_type();
-displayd *gtk_ggobi_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
 
 typedef struct _GtkGGobiDisplayClass
 {
@@ -45,8 +44,6 @@ struct _displayd {
 /*
  * Used by all displays
 */
- enum displaytyped displaytype;
-
 
    /*-- for scatterplots, where edge menus need to be rebuilt on the fly --*/
  GtkWidget *menubar;
@@ -282,7 +279,7 @@ typedef struct {
    
 } extendedDisplayd;
 
-void display_set_values(displayd *display, enum displaytyped type, datad *d, ggobid *gg);
+void display_set_values(displayd *display, datad *d, ggobid *gg);
 
  /* For the extended cases. */
 const gchar * const gtk_display_tree_label(displayd *dpy);

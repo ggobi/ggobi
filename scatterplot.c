@@ -231,7 +231,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
 
   if (sp == NULL || sp->displayptr == NULL) {
      display = gtk_type_new(GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY);
-     display_set_values(display, extended_display_type, d, gg);
+     display_set_values(display, d, gg);
   } else {
     display = (displayd*) sp->displayptr;
     display->d = d;

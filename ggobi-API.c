@@ -335,6 +335,7 @@ GGOBI(vardatum_free)(vartabled *var, ggobid *gg)
 */
 
 
+/**XX*/
 const gchar * const*
 GGOBI(getViewTypes)(int *n)
 {
@@ -414,23 +415,24 @@ GGOBI(createPlot)(int type, char **varnames)
 const gchar* 
 GGOBI(getCurrentDisplayType)(ggobid *gg)
 {
-  return(GGOBI(getViewTypeName)(gg->current_display->displaytype));
+/*XX */
+  return(GGOBI(getViewTypeName)(gg->current_display));
 }
 
 const gchar *
-GGOBI(getViewTypeName)(enum displaytyped type)
+GGOBI(getViewTypeName)(displayd *dpy)
 {
-  gint n, i;
-  const gint *types = GGOBI(getViewTypeIndices)(&n);
-  const gchar * const *names = GGOBI(getViewTypes)(&n);
+  gchar *val;
 
-  for (i = 0; i < n; i++) {
-    if (types[i] == type) {
-      return (names[i]);
-    }
-  }
+  if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) 
+     return(NULL);
 
-  return (NULL);
+/*
+ or use gtk_type_name(GTK_OBJECT_TYPE(dpy))
+ */
+  val = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass)->treeLabel;
+
+  return (val);
 }
 
 
