@@ -113,7 +113,9 @@ various stuff not yet implemented:
 
 API code needed:
   sticky labels
-  imputation of missing values
+  missing values
+     reading/writing the missings matrix
+     imputation of missing values
   setting variable ranges
   adding, deleting variables
   sphering
