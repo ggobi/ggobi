@@ -692,12 +692,16 @@ GGOBI(getCaseHiddens)(gint *pts, gint howMany, datad *d, ggobid *gg)
 /*        setting and getting edges                                        */
 /*-------------------------------------------------------------------------*/
 
-
-/*-- this isn't going to work any more -- dfs --*/
+#ifdef OBSOLETE_EDGE_CODE
 gboolean 
-GGOBI(isConnectedEdge)(gint a, gint b, datad *d, ggobid *gg)
+GGOBI(isConnectedEdge)(gint a, gint b, datad *d, datad *e, ggobid *gg)
 {
   gint tmp, i;
+
+/*
+  gint a = d->rowid.idv.els[endpoints[m].a];
+  gint b = d->rowid.idv.els[endpoints[m].b];
+*/
 
   if(a > b) {
      tmp = a;
@@ -736,6 +740,7 @@ GGOBI(setObservationEdge)(gint x, gint y, datad *d, ggobid *gg, gboolean update)
     d->edge.n++;
   }
 }
+#endif
 
 
 gboolean 
@@ -1576,3 +1581,5 @@ GGOBI(getTour2DProjectionMatrix)(gint ncols, gint ndim, gboolean vals_scaled,
 
   return ((const gdouble **) Fvals);
 }
+
+

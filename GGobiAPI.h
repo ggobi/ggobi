@@ -921,6 +921,7 @@ extern void GGobi_setIdentifyHandler(IdentifyProc proc,  void *data, ggobid *gg)
   records.
 
  */
+#ifdef OBSOLETE_EDGE_CODE
 /**
  @ingroup Edges
   Query whether the observations/records identified by number
@@ -932,6 +933,7 @@ extern gboolean  GGobi_isConnectedEdge(gint a, gint b, datad *d, ggobid *gg);
   @ingroup Edges
  */
 extern void GGobi_setObservationEdge(gint x, gint y, datad *, ggobid *, gboolean update);
+#endif
 
 /**
   @ingroup Edges
