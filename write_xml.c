@@ -8,7 +8,7 @@
  */
 
 gboolean
-write_xml(const gchar *filename, datad *d, ggobid *gg)
+write_xml (const gchar *filename, datad *d, ggobid *gg)
 {
   FILE *f;
   gboolean ok = false;
@@ -18,7 +18,7 @@ write_xml(const gchar *filename, datad *d, ggobid *gg)
    return (false);
   }
 
-  ok = write_xml_stream(f, d, gg, filename);
+  ok = write_xml_stream (f, d, gg, filename);
   fclose(f);
   return ok;
 }

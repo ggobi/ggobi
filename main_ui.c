@@ -405,6 +405,7 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
     return(-1);
 }
 
+extern void display_write_svg (ggobid *);
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",            NULL,     NULL,             0, "<Branch>" },
   { "/File/Read ...",    NULL,     filename_get_r,   0 },
@@ -416,7 +417,7 @@ static GtkItemFactoryEntry menu_items[] = {
                          NULL,     writeall_window_open,     2 },
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-  { "/File/Print",       NULL,     NULL,          0 },
+  { "/File/Print",       NULL,     display_write_svg,          0 },
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Quit",    "<ctrl>Q",     quit_ggobi,  0 },
 
