@@ -325,13 +325,13 @@ struct _ggobid {
 
   struct _Subset {
     gboolean rescale_p;
-    GtkWidget *subset_window;
-    GtkWidget *ss_notebook;
+    GtkWidget *window;
+    GtkWidget *notebook;
     /*-- the entry widgets from which to get values for sample, rowlab --*/
-    GtkWidget *ss_random_entry, *ss_rowlab_entry;
+    GtkWidget *random_entry, *rowlab_entry;
     /*-- the adjustments from which to get values for blocksize, everyn --*/
-    GtkAdjustment *ss_bstart_adj, *ss_bsize_adj;
-    GtkAdjustment *ss_estart_adj, *ss_estep_adj;
+    GtkAdjustment *bstart_adj, *bsize_adj;
+    GtkAdjustment *estart_adj, *estep_adj;
   } subset;
 
   struct _Scale {
@@ -365,6 +365,15 @@ struct _ggobid {
   struct {
    varseldatad vdata0, vdata1, vdata2, vdata3;
   } scatmat_menu;
+
+  struct _Impute {
+    gboolean rescale_p, vgroup_p;
+    gint whichvars;
+    GtkWidget *window;
+    GtkWidget *notebook;
+    /*-- the entry widgets from which to get values to impute --*/
+    GtkWidget *entry_above, *entry_below, *entry_val;
+  } impute;
 
   gint tour_idled; 
 

@@ -453,7 +453,7 @@ static GtkItemFactoryEntry menu_items[] = {
                       NULL,         smooth_window_open,    0, NULL },
 
   { "/Tools/Impute missing values ...", 
-                      NULL,         NULL, 0, NULL },
+                      NULL,         impute_window_open,    0, NULL },
 
   { "/_Display",      NULL,         NULL, 0, "<Branch>" },
   { "/Display/Show tooltips",  

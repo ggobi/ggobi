@@ -1,26 +1,34 @@
 Bugs: 
 
-  Set the brush to any region  (manually) and then
-  reduce the size of the window.  
-  Note that the brush size stays fixed and is not scaled
-  and points enter the region but are not "brushed"
-     
- adding and removing plots in scatmat continues to be problematic
+  Set the brush to any region  (manually) and then reduce the
+   size of the window.  Note that the brush size stays
+   fixed and is not scaled and points enter the region but are
+   not "brushed"
+
+  adding and removing plots in scatmat continues to be problematic
+
+Think about variable selection for
+    initiating (or updating) parcoords and scatmat plots
+    transformation, imputation, jittering, saving
+  Shall we use the variable statistics panel, or a separate
+  variable selection dialog?  (in vardialog_ui.c)
 
 various stuff not yet implemented: 
   1d, xy cycling
   window closings
-  sticky labels -- just draw them without the underline and the diamond
+
+  line type brushing
+  line editing
 
   row groups
   line groups
 
-  brush_pos should be per-display.  when brushing or identifying in
+  moving points
+
+brush_pos should be per-display.  when brushing or identifying in
   parcoords, use leave/enter events to change the current_splot.
 
   exclusion:  rebuilding the table on the fly
-
-For making slides, work out how to switch the background to white
 
 keep working on array and vector management
 
@@ -34,19 +42,12 @@ Scaling:
 Imputation of missing values -- only the simple-minded stuff, and leave
   the rest to R
 
-allow initializing parcoords and scatmat plots from selected vars
-
 Use a set of decoration arrays (points and lines) instead of nlinkable
 
 Smoothing -- to take advantage of the R loess code
   wait until we think about decoration?
 
-API code
-
-line type brushing
-
-Move points
-Line editing
+API code -- sticky labels
 
 old-style I/O -- the biggest part is now in place.  extend
   user options to write_xml.  Add the ability to extend the
@@ -54,9 +55,10 @@ old-style I/O -- the biggest part is now in place.  extend
 
 Rotation -- maybe never
 
+Categorical data?
+
 Graphs
   Edges with data: a separate region of the variable selection panel
-  Linking points to edges
 
 Maps
   polygonal data
@@ -128,3 +130,5 @@ Maps
 ! Then open it up again to the original size approximately
 ! and all the points will have gravitated towards the 0,0 
 ! (upper left) corner.
+
+! sticky labels -- just draw them without the underline and the diamond

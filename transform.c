@@ -552,7 +552,7 @@ transform2_apply (gint tform_type, gint jcol, ggobid *gg)
     case SORT:
     case SPHERE:
     default:
-      fprintf(stderr, "Unhandled switch-case in transform2_apply\n");
+      fprintf (stderr, "Unhandled switch-case in transform2_apply\n");
   }
   return tform_ok;
 }

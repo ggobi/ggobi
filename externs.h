@@ -253,6 +253,7 @@ extern void submenu_destroy (GtkWidget *);
 extern void submenu_insert (GtkWidget *, GtkWidget *, gint);
 extern GtkWidget* submenu_make (gchar *, gint, GtkAccelGroup *);
 extern void subset_window_open (ggobid *gg);
+extern void impute_window_open (ggobid *gg);
 extern void textur (gfloat *, gfloat *, gint, gint, gfloat, gint, ggobid *gg);
 extern void tform1_to_tform2_copy (void);
 extern void tform_label_update (gint, ggobid *gg);

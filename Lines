@@ -63,6 +63,8 @@
 28544   6/6   lots of io added -- ability to save a file set, with options
 28579   6/7   fixed a few bugs in opening new data in midstream
 28650   6/20  added resetting variable transformations
+29041   6/20  added sticky labels to identification
+29477   6/21  added simple imputation of missings values
 
 note: There are about 40.8K lines in xgobi,
 subtracting the rpc, xgvis and tour code.

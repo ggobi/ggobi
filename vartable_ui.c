@@ -10,7 +10,6 @@
 #define NCOLS_CLIST 9
 
 
-
 void delete_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
 {
   gtk_widget_hide (gg->app.vardata_window);
@@ -157,7 +156,8 @@ vartable_open (ggobid *gg)
     gg->app.vardata_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_signal_connect (GTK_OBJECT (gg->app.vardata_window),
       "delete_event", GTK_SIGNAL_FUNC (delete_cb), gg);
-    gtk_window_set_title (GTK_WINDOW (gg->app.vardata_window), "Variable statistics");
+    gtk_window_set_title (GTK_WINDOW (gg->app.vardata_window),
+      "Variable statistics");
 
     vbox = gtk_vbox_new (false, 5);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
@@ -167,13 +167,14 @@ vartable_open (ggobid *gg)
     /* Create a scrolled window to pack the CList widget into */
     scrolled_window = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+      GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 
     gtk_box_pack_start (GTK_BOX (vbox), scrolled_window, TRUE, TRUE, 0);
     gtk_widget_show (scrolled_window);
 
     gg->app.clist = gtk_clist_new_with_titles (NCOLS_CLIST, titles);
-    gtk_clist_set_selection_mode (GTK_CLIST (gg->app.clist), GTK_SELECTION_MULTIPLE);
+    gtk_clist_set_selection_mode (GTK_CLIST (gg->app.clist),
+      GTK_SELECTION_MULTIPLE);
 
     /*-- left justify all the numerical columns --*/
     gtk_clist_set_column_justification (GTK_CLIST (gg->app.clist),

@@ -238,6 +238,12 @@ extern const gint ViewTypeIndeces[3];
 #define Z_HORIZ   2
 #define Z_VERT    3
 
+/*-- imputation --*/
+#define IMP_RANDOM 0
+#define IMP_FIXED  1
+#define IMP_BELOW  2
+#define IMP_ABOVE  3
+
 /*-- macros --*/
 
 #define EVENT_METHOD(i,x) GTK_WIDGET_CLASS(GTK_OBJECT(i)->klass)->x

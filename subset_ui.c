@@ -36,37 +36,37 @@ subset_cb (GtkWidget *w, ggobid *gg) {
   gint subset_type;
   gint sample_size;
   gchar *sample_str, *rowlab;
-  gint ss_bstart, ss_bsize;
-  gint ss_estart, ss_estep;
+  gint bstart, bsize;
+  gint estart, estep;
   gboolean redraw;
 
   subset_type = 
-    gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->subset.ss_notebook));
+    gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->subset.notebook));
 
   switch (subset_type) {
     case SS_RANDOM:
       sample_str = 
-        gtk_editable_get_chars (GTK_EDITABLE (gg->subset.ss_random_entry),
+        gtk_editable_get_chars (GTK_EDITABLE (gg->subset.random_entry),
                                            0, -1);
       sample_size = atoi (sample_str);
       redraw = subset_random (sample_size, gg);
       break;
     case SS_BLOCK:
-      ss_bstart = (gint) gg->subset.ss_bstart_adj->value;
-      ss_bsize = (gint) gg->subset.ss_bsize_adj->value;
-      redraw = subset_block (ss_bstart-1, ss_bsize, gg);
+      bstart = (gint) gg->subset.bstart_adj->value;
+      bsize = (gint) gg->subset.bsize_adj->value;
+      redraw = subset_block (bstart-1, bsize, gg);
       break;
     case SS_EVERYN:
-      ss_estart = (gint) gg->subset.ss_estart_adj->value;
-      ss_estep = (gint) gg->subset.ss_estep_adj->value;
-      redraw = subset_everyn (ss_estart-1, ss_estep, gg);
+      estart = (gint) gg->subset.estart_adj->value;
+      estep = (gint) gg->subset.estep_adj->value;
+      redraw = subset_everyn (estart-1, estep, gg);
       break;
     case SS_STICKY:
       redraw = subset_sticky (gg);
       break;
     case SS_ROWLAB:
       rowlab =
-        gtk_editable_get_chars (GTK_EDITABLE (gg->subset.ss_rowlab_entry),
+        gtk_editable_get_chars (GTK_EDITABLE (gg->subset.rowlab_entry),
         0, -1);
       redraw = subset_rowlab (rowlab, gg);
       break;
@@ -87,7 +87,7 @@ include_all_cb (GtkWidget *w, ggobid *gg) {
 /*     adjusting the increments for block and everyn subsetting     */
 /*------------------------------------------------------------------*/
 
-/*-- Set the increment for ss_block_start --*/
+/*-- Set the increment for block_start --*/
 void set_start_incr_cb (GtkAdjustment *adj, GtkSpinButton *spin )
 {
 /*-- Set the spin widget's adjustment->step_increment to adj->value --*/
@@ -97,7 +97,7 @@ void set_start_incr_cb (GtkAdjustment *adj, GtkSpinButton *spin )
   gtk_spin_button_set_adjustment (spin, adj_spin);
 }
 
-/*-- Set the increment for ss_block_size --*/
+/*-- Set the increment for block_size --*/
 void set_block_incr_cb (GtkAdjustment *adj, GtkSpinButton *spin )
 {
 /*-- Set the spin widget's adjustment->step_increment to adj->value --*/
@@ -122,25 +122,25 @@ subset_window_open (ggobid *gg) {
   if (gg->nrows == 0)  /*-- if used before we have data --*/
     return;
 
-  if (gg->subset.subset_window == NULL) {
+  if (gg->subset.window == NULL) {
     
-    gg->subset.subset_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (gg->subset.subset_window),
+    gg->subset.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (gg->subset.window),
       "subset data");
-    gtk_signal_connect (GTK_OBJECT (gg->subset.subset_window),
+    gtk_signal_connect (GTK_OBJECT (gg->subset.window),
       "delete_event", GTK_SIGNAL_FUNC (delete_cb), NULL);
   
-    gtk_container_set_border_width (GTK_CONTAINER (gg->subset.subset_window),
+    gtk_container_set_border_width (GTK_CONTAINER (gg->subset.window),
       5);
 
     vbox = gtk_vbox_new (false, 2);
-    gtk_container_add (GTK_CONTAINER (gg->subset.subset_window), vbox);
+    gtk_container_add (GTK_CONTAINER (gg->subset.window), vbox);
     
     /* Create a new notebook, place the position of the tabs */
-    gg->subset.ss_notebook = gtk_notebook_new ();
-    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->subset.ss_notebook),
+    gg->subset.notebook = gtk_notebook_new ();
+    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->subset.notebook),
       GTK_POS_TOP);
-    gtk_box_pack_start (GTK_BOX (vbox), gg->subset.ss_notebook,
+    gtk_box_pack_start (GTK_BOX (vbox), gg->subset.notebook,
       false, false, 2);
     
 /*
@@ -155,18 +155,18 @@ subset_window_open (ggobid *gg) {
     label = gtk_label_new ("Sample size");
     gtk_box_pack_start (GTK_BOX (hb), label, false, false, 2);
   
-    gg->subset.ss_random_entry = gtk_entry_new ();
-    gtk_entry_set_max_length (GTK_ENTRY (gg->subset.ss_random_entry), 8);
-    gtk_entry_set_text (GTK_ENTRY (gg->subset.ss_random_entry),
+    gg->subset.random_entry = gtk_entry_new ();
+    gtk_entry_set_max_length (GTK_ENTRY (gg->subset.random_entry), 8);
+    gtk_entry_set_text (GTK_ENTRY (gg->subset.random_entry),
       g_strdup_printf ("%d", gg->nrows));
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset.ss_random_entry,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset.random_entry,
       "Type in the desired sample size", NULL);
-    gtk_box_pack_start (GTK_BOX (hb), gg->subset.ss_random_entry,
+    gtk_box_pack_start (GTK_BOX (hb), gg->subset.random_entry,
       true, true, 2);
 
     label = gtk_label_new ("Random");
     gtk_notebook_append_page (GTK_NOTEBOOK
-      (gg->subset.ss_notebook), frame, label);
+      (gg->subset.notebook), frame, label);
       
 /*
  * Consecutive block
@@ -185,9 +185,9 @@ subset_window_open (ggobid *gg) {
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
-    gg->subset.ss_bstart_adj = (GtkAdjustment *)
+    gg->subset.bstart_adj = (GtkAdjustment *)
       gtk_adjustment_new (1.0, 1.0, (fnr-2.0), 1.0, 5.0, 0.0);
-    start_spinner = gtk_spin_button_new (gg->subset.ss_bstart_adj, 0, 0);
+    start_spinner = gtk_spin_button_new (gg->subset.bstart_adj, 0, 0);
 
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (start_spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (start_spinner),
@@ -203,9 +203,9 @@ subset_window_open (ggobid *gg) {
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
-    gg->subset.ss_bsize_adj = (GtkAdjustment *)
+    gg->subset.bsize_adj = (GtkAdjustment *)
       gtk_adjustment_new (fnr/10.0, 1.0, fnr, 1.0, 5.0, 0.0);
-    block_spinner = gtk_spin_button_new (gg->subset.ss_bsize_adj, 0, 0);
+    block_spinner = gtk_spin_button_new (gg->subset.bsize_adj, 0, 0);
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (block_spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (block_spinner),
                                      GTK_SHADOW_OUT);
@@ -256,7 +256,7 @@ subset_window_open (ggobid *gg) {
     gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,1,2);
 
     label = gtk_label_new ("Block");
-    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.ss_notebook), frame, label);
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.notebook), frame, label);
 
 /*
  * Every nth case
@@ -275,9 +275,9 @@ subset_window_open (ggobid *gg) {
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
-    gg->subset.ss_estart_adj = (GtkAdjustment *) gtk_adjustment_new (1.0,
+    gg->subset.estart_adj = (GtkAdjustment *) gtk_adjustment_new (1.0,
                           1.0, fnr-2.0, 1.0, 5.0, 0.0);
-    start_spinner = gtk_spin_button_new (gg->subset.ss_estart_adj, 0, 0);
+    start_spinner = gtk_spin_button_new (gg->subset.estart_adj, 0, 0);
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (start_spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (start_spinner),
                                      GTK_SHADOW_OUT);
@@ -292,9 +292,9 @@ subset_window_open (ggobid *gg) {
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
-    gg->subset.ss_estep_adj = (GtkAdjustment *)
+    gg->subset.estep_adj = (GtkAdjustment *)
       gtk_adjustment_new (fnr/10.0, 1.0, fnr-1, 1.0, 5.0, 0.0);
-    block_spinner = gtk_spin_button_new (gg->subset.ss_estep_adj, 0, 0);
+    block_spinner = gtk_spin_button_new (gg->subset.estep_adj, 0, 0);
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (block_spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (block_spinner),
                                      GTK_SHADOW_OUT);
@@ -304,7 +304,7 @@ subset_window_open (ggobid *gg) {
     gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
 
     label = gtk_label_new ("Every n");
-    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.ss_notebook),
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.notebook),
       frame, label);
 
 /*
@@ -314,7 +314,7 @@ subset_window_open (ggobid *gg) {
     gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
     gtk_widget_set_usize (frame, 100, 75);
     label = gtk_label_new ("Sticky");
-    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.ss_notebook),
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.notebook),
       frame, label);
 
 /*
@@ -329,16 +329,16 @@ subset_window_open (ggobid *gg) {
     label = gtk_label_new ("Row label:");
     gtk_box_pack_start (GTK_BOX (hb), label, false, false, 2);
   
-    gg->subset.ss_rowlab_entry = gtk_entry_new ();
-    gtk_entry_set_max_length (GTK_ENTRY (gg->subset.ss_rowlab_entry), 32);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset.ss_rowlab_entry,
+    gg->subset.rowlab_entry = gtk_entry_new ();
+    gtk_entry_set_max_length (GTK_ENTRY (gg->subset.rowlab_entry), 32);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset.rowlab_entry,
       "Type in the label shared by the cases you want in the subset",
       NULL);
     gtk_box_pack_start (GTK_BOX (hb),
-      gg->subset.ss_rowlab_entry, true, true, 2);
+      gg->subset.rowlab_entry, true, true, 2);
 
     label = gtk_label_new ("Row label");
-    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.ss_notebook),
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.notebook),
       frame, label);
 
 /* 
@@ -375,5 +375,5 @@ subset_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
   }
 
-    gtk_widget_show_all (gg->subset.subset_window);
+    gtk_widget_show_all (gg->subset.window);
 }
