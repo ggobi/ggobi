@@ -28,7 +28,6 @@ The authors can be contacted at the following email addresses:
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
 
 #include "vars.h"
 #include "externs.h"
@@ -151,12 +150,16 @@ central_mass(array_f *pdata, void *param, gfloat *val)
 /***************************************************/
 
 gint holes_raw1( array_f *pdata, void *param, gfloat *val)
-{  holes_param *hp = (holes_param *) param;
-   gint i,m,p=pdata->ncols, n=pdata->nrows;
+{ 
+/*
+   holes_param *hp = (holes_param *) param;
+*/
+   gint i, p=pdata->ncols, n=pdata->nrows;
    gfloat m1, m2,x1,x2,temp;
-   gfloat *cov,det,acoefs;
+   gdouble *cov;
+   gfloat det,acoefs;
 
-   cov = (gfloat *) malloc(p*p*sizeof(gfloat));
+   cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
    for(i=0; i<(p*p); i++) cov[i] = 0;
    m1=0; m2=0;
    for(i=0; i<n; i++)
@@ -189,12 +192,17 @@ gint holes_raw1( array_f *pdata, void *param, gfloat *val)
 }
 
 gint holes_raw2( array_f *pdata, void *param, gfloat *val)
-{  holes_param *hp = (holes_param *) param;
-   gint i,m,p=pdata->ncols, n=pdata->nrows;
+{ 
+   gint i, p=pdata->ncols, n=pdata->nrows;
    gfloat m1, m2,x1,x2,temp;
-   gfloat *cov,det,acoefs;
+   gdouble *cov;
+/*
+   holes_param *hp = (holes_param *) param;
+   gfloat det;
+*/
+   gfloat acoefs;
 
-   cov = (gdouble *) malloc(p*p*sizeof(gfloat));
+   cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
    for(i=0; i<(p*p); i++) cov[i] = 0;
    m1=0; m2=0;
    for(i=0; i<n; i++)
@@ -231,13 +239,15 @@ gint holes_raw2( array_f *pdata, void *param, gfloat *val)
 
 gint central_mass_raw1(array_f *pdata, void *param, gfloat *val)
 {
-
+/*
    holes_param *hp = (holes_param *) param;
-   gint i,m,p=pdata->ncols, n=pdata->nrows;
+*/
+   gint i, p=pdata->ncols, n=pdata->nrows;
    gfloat m1, m2,x1,x2,temp;
-   gfloat *cov,det,acoefs;
+   gdouble *cov;
+   gfloat det,acoefs;
 
-   cov = (gfloat *) malloc(p*p*sizeof(gfloat));
+   cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
    for(i=0; i<(p*p); i++) cov[i] = 0;
    m1=0; m2=0;
    for(i=0; i<n; i++)
@@ -271,12 +281,14 @@ gint central_mass_raw1(array_f *pdata, void *param, gfloat *val)
 }
 
 gint central_mass_raw2(array_f *pdata, void *param, gfloat *val)
-{ holes_param *hp = (holes_param *) param;
-   gint i,m,p=pdata->ncols, n=pdata->nrows;
+{
+   /*holes_param *hp = (holes_param *) param;*/
+   gint i, p=pdata->ncols, n=pdata->nrows;
    gfloat m1, m2,x1,x2,temp;
-   gfloat *cov,det,acoefs;
+   gdouble *cov;
+   gfloat acoefs;
 
-   cov = (gdouble *) malloc(p*p*sizeof(gfloat));
+   cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
    for(i=0; i<(p*p); i++) cov[i] = 0;
    m1=0; m2=0;
    for(i=0; i<n; i++)
