@@ -54,6 +54,9 @@ datad_new(datad *d, ggobid *gg)
   /*-- linking by categorical variable --*/
   d->linkvar_vt = NULL;
 
+  d->rowIds = NULL;
+  d->idTable = NULL;
+
   sphere_init (d);
 
   jitter_vars_init (d, gg);
@@ -103,12 +106,23 @@ datad_create(gint nr, gint nc, ggobid *gg)
   return(d);
 }
 void
-datad_free (datad *d, ggobid *gg) {
+datad_free (datad *d, ggobid *gg) 
+{
   arrayf_free (&d->raw, 0, 0);
   pipeline_arrays_free (d, gg);
 
   if (d->nmissing)
     arrays_free (&d->missing, 0, 0);
+
+
+   /* rowIds and idTable are intrinsically linked !*/
+  if(d->idTable) {
+    g_hash_table_foreach(d->idTable, freeLevelHashEntry, d->idTable);
+    g_hash_table_destroy(d->idTable); 
+  }
+
+  if(d->rowIds) 
+    g_free(d->rowIds);
 
   g_free (d);
 }

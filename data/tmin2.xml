@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<ggobidata ids="alpha">
+<ggobidata ids="alpha" count="2">
+
 <data name="Calls">
 <description>
  This is a simple example for testing automatically
@@ -28,14 +29,26 @@
 </variables>
 
 <records count="7">
- <record id="a1" label="a1"> 42 4870  0 0 <string>AB C</string></record>
- <record id="b2"> 42 4880  0 1 <string>DEF</string> </record>
- <record id="c3">  7 4890  1 2 <string>GHI</string> </record>
- <record id="d4"> 12 5000  2 1 <string>J</string> </record>
- <record id="e5"> 18 5100  2 2 <string>KLM</string> </record>
- <record id="f6"> 12 5000  2 1 <string>NOP QRST</string> </record>
- <record id="g7"><real>18</real>
- <real>5200</real><int>2</int><int>2</int><string>Happy Birthday</string></record>
+ <record id="a1" label="a1"> 0 10  0 0 <string>AB C</string></record>
+ <record id="b2"> 1  20 0 1 <string>DEF</string> </record>
+ <record id="c3"> 2  30 1 2 <string>GHI</string> </record>
+ <record id="d4"> 3  40 2 1 <string>J</string> </record>
+ <record id="e5"> 4  50 2 2 <string>KLM</string> </record>
+ <record id="f6"> 5  60 2 1 <string>NOP QRST</string> </record>
+ <record id="g7"><real>6</real>
+ <real>70</real><int>2</int><int>2</int><string>Happy Birthday</string></record>
+</records>
+</data>
+
+<data name="foo">
+<variables count="2">
+<realvariable name="X" />
+<realvariable name="Y" />
+</variables>
+<records count="3"> 
+<record id="b2" label="one->1">1.0 2.0</record>
+<record id="d4" label="two->3">2.0 1.0</record>
+<record id="f6" label="three->5">2.0 2.0</record>
 </records>
 </data>
 </ggobidata>

@@ -76,6 +76,10 @@ struct _datad {
     vector_i idv;
     int maxId;
   } rowid;
+
+  GHashTable *idTable;
+  char **rowIds;
+
  /*-- --*/
 
  /*-- to support brushing by categorical variable --*/
@@ -226,4 +230,7 @@ struct _datad {
 
 extern datad *datad_new(datad *, struct _ggobid *);
 void datad_instance_init(datad * d);
+
+
+void freeLevelHashEntry(gpointer key, gpointer value, gpointer data);
 #endif

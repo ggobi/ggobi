@@ -242,7 +242,8 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->state = UNKNOWN;
   data->terminateStrings_p = true;
   data->NA_identifier = NULL;
-  data->rowIds = NULL;
+
+  data->idTable = NULL;
   data->handlers = handler;
   data->defaults.color = -1;
   data->defaults.glyphType = sessionOptions->info->glyph.type;
@@ -692,6 +693,11 @@ setGeneralInfo (const xmlChar **attrs, XMLParserData *data)
     data->expectedDatasetCount = strToInteger(tmp);
   }
 
+  tmp = getAttribute(attrs, "ids");
+  if (tmp != NULL) {
+    data->usesStringIds = !strcmp(tmp, "alpha");
+  }
+
   return(true);
 }
 
@@ -732,7 +738,7 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
   data->current_element = 0;
 
 /*-- dfs: this seems to be needed; are there more? --*/
-  data->rowIds = NULL;
+  data->idTable = NULL;
 
   return (true);
 }
@@ -1283,29 +1289,6 @@ setVariableName(XMLParserData *data, const xmlChar *name, gint len)
 
 /*----------------------------------------------------------------------*/
 
-gint
-rowId (const gchar *tmp, XMLParserData *data)
-{
-  datad *d = getCurrentXMLData(data);
-  gint value = strToInteger(tmp) - 1;
-
-  if (value < 0) {
-   /* Now look up the ids for the rows. */
-   gint i;
-   for (i=0; i < d->nrows; i++) {
-     if (strcmp (tmp, g_array_index (d->rowlab, gchar *, i)) == 0 ||
-         (data->rowIds != NULL && data->rowIds[i] &&
-          strcmp(tmp, data->rowIds[i]) == 0))
-      {
-        value = i;
-        break;
-      }
-    } 
-  }
-  return (value);
-}
-
-
 
 /*
  Prints the attributes.
@@ -1614,10 +1597,12 @@ asciiParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
   glib-2.0 defines this as a void routine, i.e. no return value.
   glib-1.2 however expects a return value of type gboolean.
  */
-static void
+void
 freeLevelHashEntry(gpointer key, gpointer value, gpointer data)
 {
   g_free(value);
+  if(data)
+    g_free(key);
 /*  return(true); */
 }
 
@@ -1627,14 +1612,17 @@ releaseCurrentDataInfo(XMLParserData *parserData)
    if(!parserData->current_data) 
      return;
 
-   if(parserData->rowIds) 
-      g_free(parserData->rowIds);
-   parserData->rowIds = NULL;
+   if(parserData->idTable && parserData->usesStringIds == false) {
+      g_hash_table_foreach(parserData->idTable, freeLevelHashEntry, parserData);
+      g_hash_table_destroy(parserData->idTable); 
+   }
 
    if(parserData->autoLevels) {
       int i;
       for(i = 0; i < parserData->current_data->ncols ; i++) {
          if(parserData->autoLevels[i]) {
+                 /* don't free the keys (so pass NULL as third argument) 
+                    since these are used in the level_names array.*/
  	     g_hash_table_foreach(parserData->autoLevels[i], freeLevelHashEntry, NULL);
   	     g_hash_table_destroy(parserData->autoLevels[i]); 
 	 }
@@ -1720,24 +1708,43 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
  
   tmp = getAttribute(attrs, "id");
   if(tmp) {
+    guint *ptr;
     int value;
-    if (data->rowIds == NULL) {
-     data->rowIds = (gchar **) g_malloc(d->nrows * sizeof(gchar *));
-     memset(data->rowIds, '\0', d->nrows);
+    gchar *dupTmp;
+	    /* No need to check since this will either be the first and hence NULL or already created,
+               so can use an else for this condition. */
+    if(data->idTable == NULL) {
+        data->idTable = g_hash_table_new(g_str_hash, g_str_equal);
+	if(data->usesStringIds) {
+   	    d->idTable = data->idTable;
+	    d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
+	    memset(d->rowIds, '\0', sizeof(gchar *) * d->nrows);
+	}
+    } else {
+       if(g_hash_table_lookup(data->idTable, tmp))
+         ggobi_XML_error_handler(data, "duplicated id in record %d of dataset %s\n", 
+                                   data->current_record + 1, data->current_data->name);
     }
-    if (d->rowid.id.nels == 0) {
+
+    if (data->usesStringIds == false && d->rowid.id.nels == 0) {
       rowids_alloc (d);
     }
 
-    data->rowIds[i] = g_strdup(tmp);
-    value = strToInteger (tmp);
-    if(value < 0) {
-       ggobi_XML_error_handler(data, "negative value specified for `id' in record %d of dataset %s\n", 
+    ptr = (guint *) g_malloc(sizeof(guint));
+    ptr[0] = i;
+    g_hash_table_insert(data->idTable, dupTmp = g_strdup(tmp), ptr);
+    if(data->usesStringIds) {
+      d->rowIds[i] = dupTmp;
+    } else {
+      value = strToInteger (tmp);
+      if(value < 0) {
+         ggobi_XML_error_handler(data, "negative value specified for `id' in record %d of dataset %s\n", 
                                  (int) i+1, data->current_data->name);
-       value = 0;
+         value = 0;
+      }
+      d->rowid.maxId = d->rowid.maxId > value ? d->rowid.maxId : value; 
+      d->rowid.id.els[i] = value;
     }
-    d->rowid.maxId = d->rowid.maxId > value ? d->rowid.maxId : value; 
-    d->rowid.id.els[i] = value;
   }
 
 /*
@@ -1906,3 +1913,38 @@ getAutoLevelIndex(const char * const label, XMLParserData *data, vartabled *el)
 
   return(index);
 }
+
+
+
+
+#ifdef USE_ROW_ID
+static gint
+rowId (const gchar *tmp, XMLParserData *data)
+{
+  gint value = -1; /*  = strToInteger(tmp) - 1; */
+
+  if (value < 0) {
+   /* Now look up the ids for the rows. */
+   if(data->idTable) {
+     gpointer ptr = g_hash_table_lookup(data->idTable, tmp);
+     if(ptr)
+       value = *((guint *) ptr);
+   }
+
+#if 0
+   gint i;
+   datad *d = getCurrentXMLData(data);
+   for (i=0; i < d->nrows; i++) {
+     if (strcmp (tmp, g_array_index (d->rowlab, gchar *, i)) == 0 ||
+         (data->rowIds != NULL && data->rowIds[i] &&
+          strcmp(tmp, data->rowIds[i]) == 0))
+      {
+        value = i;
+        break;
+      }
+    }
+#endif 
+  }
+  return (value);
+}
+#endif

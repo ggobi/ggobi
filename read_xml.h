@@ -93,10 +93,13 @@ typedef struct _XMLUserData {
 
   /* Local set of record identifiers that are used here
      for matching purposes when specifying edges.
-     These are not set in the ggobid structure and 
+     These are not set in the datad structure and 
      are different from the record's label attribute.
+     Currently these are used to verify that the id's are unique
+     within a dataset.
    */
-  gchar **rowIds;
+  GHashTable *idTable;
+  gboolean usesStringIds;
 
   gint recordLabelsVariable;
 
@@ -163,9 +166,6 @@ extern "C" {
   void categoricalLevels(const xmlChar ** attrs, XMLParserData * data);
   int setLevelIndex(const xmlChar ** attrs, XMLParserData * data);
   void addLevel(XMLParserData * data, const char *c, int len);
-
-
-  gint rowId(const gchar * tmp, XMLParserData * data);
 
   gboolean data_xml_read(InputDescription * desc, ggobid * gg);
 

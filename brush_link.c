@@ -22,28 +22,42 @@ void symbol_link_by_id(gint k, datad * sd, ggobid * gg)
 /*-- sd = source_d --*/
   datad *d;
   GSList *l;
-  gint i, id;
+  gint i, id = -1;
   /*-- this is the cpanel for the display being brushed --*/
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   /*-- k is the row number in source_d --*/
 
-  if (sd->rowid.id.nels > 0) {
+  if(sd->rowIds) {
+    gpointer ptr = g_hash_table_lookup(sd->idTable, sd->rowIds[k]);
+    if(ptr)
+        id = * ((guint *)ptr);
+  } else if (sd->rowid.id.nels > 0) 
     id = sd->rowid.id.els[k];
-    if (id < 0)      /*-- this would indicate a bug --*/
-      return;
+
+  if (id < 0)      /*-- this would indicate a bug --*/
+     return;
 
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
       if (d == sd)
         continue;        /*-- skip the originating datad --*/
 
-      /*-- if this id exists, it is in the range of d's ids ... --*/
-      if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
+      i = -1;
+      if(sd->rowIds) {
+         gpointer ptr = g_hash_table_lookup(d->idTable, sd->rowIds[id]);
+         if(ptr) {
+           i = * ((guint *)ptr);
+         }        
+      } else  if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
+        /*-- if this id exists, it is in the range of d's ids ... --*/
+
         /*-- i is the row number, irrespective of rows_in_plot --*/
         i = d->rowid.idv.els[id];
-        if (i < 0)      /*-- then no cases in d have this id --*/
-          continue;
+      } 
+
+      if (i < 0)      /*-- then no cases in d have this id --*/
+         continue;
 
         /*-- if we get here, d has one case with the indicated id --*/
         if (d->sampled.els[i]) {
@@ -150,9 +164,7 @@ void symbol_link_by_id(gint k, datad * sd, ggobid * gg)
             break;
           }
         }
-      }
     }
-  }
 }
 
 /*----------------------------------------------------------------------*/

@@ -117,6 +117,35 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
   if (k < 0)
     return;
 
+  if(source_d->rowIds) {
+           /* if there is no */
+     if(!source_d->rowIds[k]) {
+	return;
+     }
+    for (l = gg->d; l; l = l->next) {
+      gpointer ptr;
+      d = (datad *) l->data;
+      inrange = false;
+
+      if (d == source_d)
+        continue;        /*-- skip the originating datad --*/
+
+      ptr = g_hash_table_lookup(d->idTable, source_d->rowIds[k]);
+      if(ptr) {
+   	   inrange = true;
+           d->nearest_point_prev = d->nearest_point;
+           d->nearest_point = * ((guint *)ptr);
+      }
+
+      if (!inrange) {
+        d->nearest_point_prev = d->nearest_point;
+        d->nearest_point = -1;
+      }
+    }
+    return;
+  }
+
+
   if (source_d->rowid.id.nels > 0) {
     id = source_d->rowid.id.els[k];
     if (id < 0)  /*-- this would indicate a bug --*/
@@ -128,7 +157,7 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
 
       if (d == source_d)
         continue;        /*-- skip the originating datad --*/
-
+    
       /*-- if this id exists is in the range of d's ids ... --*/
       if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
         /*-- i is the row number, irrespective of rows_in_plot --*/
@@ -168,7 +197,7 @@ sticky_id_link_by_id (gint whattodo, gint k, datad *source_d, ggobid *gg)
 {
   datad *d;
   GSList *l;
-  gint i, n, id;
+  gint i, n, id = -1;
   gboolean i_in_list = false;
   GSList *ll;
   gpointer ptr = NULL;
@@ -176,41 +205,52 @@ sticky_id_link_by_id (gint whattodo, gint k, datad *source_d, ggobid *gg)
 
   /*-- k is the row number in source_d --*/
 
-  if (source_d->rowid.id.nels > 0) {
+  if(source_d->rowIds && source_d->rowIds[k]) {
+      ptr = g_hash_table_lookup(source_d->idTable, source_d->rowIds[k]);
+      if(ptr) 
+         id = *(guint *) ptr;
+  } else if (source_d->rowid.id.nels > 0) 
     id = source_d->rowid.id.els[k];
-    if (id < 0)  /*-- this would indicate a bug --*/
-      return;
+
+  if (id < 0)  /*-- this would indicate a bug --*/
+     return;
 
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
       if (d == source_d)
         continue;        /*-- skip the originating datad --*/
+
+      i = -1;
  
       /*-- if this id exists is in the range of d's ids ... --*/
-      if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
+      if(d->idTable) {
+        gpointer ptr = g_hash_table_lookup(d->idTable, source_d->rowIds[k]);
+        if(ptr) 
+           i = *(guint *) ptr;        
+      } else if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
         /*-- i is the row number, irrespective of rows_in_plot --*/
         i = d->rowid.idv.els[id];
-        if (i < 0)  /*-- then no cases in d have this id --*/
+      }
+
+      if (i < 0)  /*-- then no cases in d have this id --*/
           continue;
 
-        if (g_slist_length (d->sticky_ids) > 0) {
-          for (ll = d->sticky_ids; ll; ll = ll->next) {
-            n = GPOINTER_TO_INT (ll->data);
-            if (n == i) {  /*-- the row number of the id --*/
-              i_in_list = true;
-              ptr = ll->data;
-              break;
-            }
+      if (g_slist_length (d->sticky_ids) > 0) {
+        for (ll = d->sticky_ids; ll; ll = ll->next) {
+          n = GPOINTER_TO_INT (ll->data);
+          if (n == i) {  /*-- the row number of the id --*/
+            i_in_list = true;
+            ptr = ll->data;
+            break;
           }
         }
+      }
 
-        if (i_in_list && whattodo == STICKY_REMOVE) {
-          d->sticky_ids = g_slist_remove (d->sticky_ids, ptr);
-        } else if (!i_in_list && whattodo == STICKY_ADD) {
-          ptr = GINT_TO_POINTER (i);
-          d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
-        }
+      if (i_in_list && whattodo == STICKY_REMOVE) {
+        d->sticky_ids = g_slist_remove (d->sticky_ids, ptr);
+      } else if (!i_in_list && whattodo == STICKY_ADD) {
+        ptr = GINT_TO_POINTER (i);
+        d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
       }
     }
-  }
 }
