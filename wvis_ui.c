@@ -123,8 +123,7 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
 /*
  * gg->wvis sometimes has its own scheme, and then we'll use it.
  * If it's null, we use gg->activeColorScheme.  We update
- * gg->activeColorScheme to the value of scheme
- * when Apply is clicked.
+ * gg->activeColorScheme to the value of scheme when the user asks.
 */
 
   if (scheme) {
@@ -772,9 +771,8 @@ static void scale_set_cb (GtkWidget *w, ggobid* gg)
     if (!colors_remap (scheme, gg))
       return;
 
-    colorscheme_init (scheme);
-
-    gg->wvis.scheme = NULL;  /*-- ?? --*/
+    gg->activeColorScheme = scheme;
+    gg->wvis.scheme = NULL;
   }
 
   displays_plot (NULL, FULL, gg);
