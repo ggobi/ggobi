@@ -776,6 +776,25 @@ gboolean GGOBI(setShowLines)(displayd *dsp, gboolean val)
   return(old);
 }
 
+/* setShowAxes  will require this code:
+
+{
+  GtkWidget *topmenu, *menu, *item;
+  topmenu = widget_find_by_name (dspnew->menubar, "DISPLAY:options_topmenu");
+  if (topmenu) {
+    menu = GTK_MENU_ITEM(topmenu)->submenu;
+    if (menu) {
+      item = widget_find_by_name (menu, "DISPLAY:show_axes");
+      if (item) {
+        gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item, false);
+      }
+    }
+  }
+}
+
+
+*/
+
 DisplayOptions *
 GGOBI(getDefaultDisplayOptions)()
 {
