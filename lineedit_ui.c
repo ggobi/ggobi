@@ -66,29 +66,24 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
   k = find_nearest_point (&sp->mousepos, sp, d, gg);
+  d->nearest_point = k;
 
   if (cpanel->ee_adding_p) {
     if (gg->edgeedit.a == -1) {  /*-- looking for starting point --*/
 
-      d->nearest_point = k;
       if (k != d->nearest_point_prev) {
         displays_plot (NULL, QUICK, gg);
-        d->nearest_point_prev = k;
       }
 
     } else {  /*-- found starting point; looking for ending point --*/
 
-      if (k != -1 && k != gg->edgeedit.a) {
-        d->nearest_point = k;
+      displays_plot (NULL, QUICK, gg);
+      /*-- add a dotted line from gg->edgeedit.a to gg->nearest_point --*/
 
-        displays_plot (NULL, QUICK, gg);
-        /*-- add a dotted line from gg->edgeedit.a to gg->nearest_point --*/
-
-        d->nearest_point_prev = d->nearest_point;
-      }
     }
   }
 
+  d->nearest_point_prev = d->nearest_point;
   return true;
 }
 
@@ -96,18 +91,16 @@ static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   ggobid *gg = GGobiFromSPlot(sp);
-  gg->current_splot = sp;
-  gg->current_display = (displayd *) sp->displayptr;
+  displayd *display = sp->displayptr;
+  datad *d = display->d;
 
+  gg->current_splot = sp;
+  gg->current_display = display;
+  
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
 
-/*
-  sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                      "motion_notify_event",
-                                      (GtkSignalFunc) motion_notify_cb,
-                                      (gpointer) sp);
-*/
+  gg->edgeedit.a = d->nearest_point;
 
   return true;
 }
@@ -117,16 +110,24 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
   ggobid *gg = GGobiFromSPlot (sp);
+  displayd *display = sp->displayptr;
+  datad *d = display->d;
+  datad *e = display->e;
 
   gg->buttondown = 0;
 
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
 
-  if (sp->motion_id) {
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
-    sp->motion_id = 0;
-  }
+  /*
+   * add the edge to display->e.  If display->e is NULL, then
+   * initialize it first.
+   *
+   * If record indices are in use, use them; if not, initialize
+   * indices for display->d.
+  */
+  g_printerr ("add the edge from %d to %d\n",
+    d->nearest_point, gg->edgeedit.a);
 
   return retval;
 }

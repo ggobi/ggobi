@@ -615,11 +615,13 @@ splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
   displayd *dsp = (displayd *) sp->displayptr;
   datad *d = dsp->d;
 
-  if (k >= d->nrows)
+  if (k < 0 || k >= d->nrows)
     return;
 
   splot_add_diamond_cue (k, sp, drawable, gg);
-  if (!gg->buttondown) { /*-- only add the label if the mouse is up --*/
+
+  /*-- only add the label if the mouse is up --*/
+  if (!gg->buttondown) {
     splot_add_record_label (nearest, k, sp, drawable, gg);
   }
 }
@@ -632,9 +634,19 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
   cpaneld *cpanel = &display->cpanel;
 
   if (cpanel->ee_adding_p) {
-    if (gg->edgeedit.a == -1) {  /*-- looking for starting point --*/
+    if (k != -1)
       splot_add_diamond_cue (k, sp, drawable, gg);
-      splot_add_record_label (nearest, k, sp, drawable, gg);
+
+    if (gg->buttondown) {   /*-- button is down: choosing end point --*/
+      if (k != -1 && k != gg->edgeedit.a) {
+        gdk_draw_line (drawable, gg->plot_GC,
+          sp->screen[ gg->edgeedit.a ].x, sp->screen[ gg->edgeedit.a ].y,
+          sp->screen[ k ].x, sp->screen[ k ].y);
+      } else {
+        gdk_draw_line (drawable, gg->plot_GC,
+          sp->screen[ gg->edgeedit.a ].x, sp->screen[ gg->edgeedit.a ].y,
+          sp->mousepos.x, sp->mousepos.y);
+      }
     }
   }
 }
