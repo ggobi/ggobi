@@ -284,7 +284,7 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
 
   } else {
 
-    colorsel = colordlg->colorsel;
+    colorsel = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->colorsel;
 
     if (w == gg->color_ui.bg_da) {
       color[0] = (gdouble) gg->bg_color.red / 65535.0;

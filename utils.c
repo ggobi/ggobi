@@ -9,6 +9,7 @@
     it without violating AT&T's intellectual property rights.
 */
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
