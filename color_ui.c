@@ -389,7 +389,9 @@ set_color_id (GtkWidget *w, GdkEventButton *event, ggobid *gg)
   */
   gg->color_ui.current_da = w;
 
-  if (w == gg->color_ui.bg_da || w == gg->color_ui.accent_da)
+  if (w == gg->color_ui.bg_da ||
+      w == gg->color_ui.accent_da ||
+      w == gg->color_ui.hidden_da)
     set_one_color (w, event, gg);
   else
     set_color_fg (w, event, gg);
@@ -475,6 +477,25 @@ color_expose_accent (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   redraw_accent (w, gg);
   return FALSE;
 }
+
+static void
+redraw_hidden (GtkWidget *w, ggobid *gg)
+{
+  colorschemed *scheme = gg->activeColorScheme;
+
+  if (gg->plot_GC == NULL)
+    init_plot_GC (w->window, gg);
+
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+  gdk_draw_rectangle (w->window, gg->plot_GC,
+    true, 0, 0, w->allocation.width, w->allocation.height);
+}
+static gint
+color_expose_hidden (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
+{
+  redraw_hidden (w, gg);
+  return FALSE;
+}
 static void
 reverse_video_cb (GtkWidget *ok_button, ggobid* gg) {
   gulong pixel;
@@ -502,15 +523,17 @@ reverse_video_cb (GtkWidget *ok_button, ggobid* gg) {
   scheme->rgb_hidden.green = 65535 - scheme->rgb_hidden.green;
   scheme->rgb_hidden.blue =  65535 - scheme->rgb_hidden.blue;
   if (!gdk_colormap_alloc_color(gdk_colormap_get_system(),
-                                &scheme->rgb_hidden, writeable, best_match))
-    g_printerr("failure allocating hidden color\n");
+    &scheme->rgb_hidden, writeable, best_match))
+      g_printerr("failure allocating hidden color\n");
 
   gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
     "expose_event", (gpointer) gg, (gpointer) &rval);
   gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.line_display),
     "expose_event", (gpointer) gg, (gpointer) &rval);
+
   redraw_bg (gg->color_ui.bg_da, gg);
   redraw_accent (gg->color_ui.accent_da, gg);
+  redraw_hidden (gg->color_ui.hidden_da, gg);
 
   displays_plot ((splotd *) NULL, FULL, gg);
 }
@@ -636,6 +659,13 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
     color[2] = (gdouble) scheme->rgb_accent.blue / 65535.0;
 
     gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
+
+  } else if (w == gg->color_ui.hidden_da) {
+    color[0] = (gdouble) scheme->rgb_hidden.red / 65535.0;
+    color[1] = (gdouble) scheme->rgb_hidden.green / 65535.0;
+    color[2] = (gdouble) scheme->rgb_hidden.blue / 65535.0;
+
+    gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
   }
   else {
       for (i=0; i<MAXNCOLORS; i++) {
@@ -725,8 +755,8 @@ symbol_window_redraw (ggobid *gg)
 void
 make_symbol_window (ggobid *gg) {
 
-  GtkWidget *vbox, *fg_frame, *bg_frame, *accent_frame, *btn;
-  GtkWidget *fg_table, *bg_table, *accent_table, *ebox, *hbox;
+  GtkWidget *vbox, *fg_frame, *bg_frame, *accent_frame, *hidden_frame, *btn;
+  GtkWidget *fg_table, *bg_table, *accent_table, *hidden_table, *ebox, *hbox;
   gint i, j, k;
   gint width, height;
 
@@ -880,7 +910,7 @@ make_symbol_window (ggobid *gg) {
       k++;
     }
 
-    /*-- hbox to contain bg and accent color frames --*/
+    /*-- hbox to contain bg, accent and hidden color frames --*/
     hbox = gtk_hbox_new (false, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hbox, true, true, 0);
 
@@ -951,6 +981,40 @@ make_symbol_window (ggobid *gg) {
 
     gtk_table_attach (GTK_TABLE (accent_table),
       gg->color_ui.accent_da, 0, 1, 0, 1,
+      GTK_FILL, GTK_FILL, 10, 10);
+
+    /*-- Shadow (hidden) color --*/
+    hidden_frame = gtk_frame_new ("Shadow color");
+    gtk_box_pack_start (GTK_BOX (hbox), hidden_frame, true, true, 0);
+
+    ebox = gtk_event_box_new ();
+    gtk_container_add (GTK_CONTAINER (hidden_frame), ebox);
+
+    hidden_table = gtk_table_new (1, 5, true);
+    gtk_container_add (GTK_CONTAINER (ebox), hidden_table);
+
+    gg->color_ui.hidden_da = gtk_drawing_area_new ();
+#if GTK_MAJOR_VERSION == 2
+    gtk_widget_set_double_buffered(gg->color_ui.hidden_da, false);
+#endif
+    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.hidden_da),
+      PSIZE, PSIZE);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+      gg->color_ui.hidden_da, "Double click to reset color for labels and axes",
+      NULL);
+    gtk_widget_set_events (gg->color_ui.hidden_da,
+                           GDK_EXPOSURE_MASK
+                           | GDK_ENTER_NOTIFY_MASK
+                           | GDK_LEAVE_NOTIFY_MASK
+                           | GDK_BUTTON_PRESS_MASK);
+
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.hidden_da),
+      "expose_event", GTK_SIGNAL_FUNC (color_expose_hidden), gg);
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.hidden_da),
+      "button_press_event", GTK_SIGNAL_FUNC (set_color_id), gg);
+
+    gtk_table_attach (GTK_TABLE (hidden_table),
+      gg->color_ui.hidden_da, 0, 1, 0, 1,
       GTK_FILL, GTK_FILL, 10, 10);
 
     /*-- Temporary, perhaps: reverse video button --*/
