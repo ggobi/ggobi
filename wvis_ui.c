@@ -597,12 +597,94 @@ selection_made_cb (GtkWidget *clist, gint row, gint column,
 }
 
 #ifdef USE_XML
+/*
+ * Find out whether it's possible to use the new scheme
+ * without losing brushing information.  If so, go ahead
+ * and change index values if that's required
+*/
+static gboolean colors_remap (colorschemed *scheme, ggobid *gg)
+{
+  gint i, k;
+  gboolean all_colors_p[MAXNCOLORS];
+  GSList *l;
+  datad *d;
+  gushort colors_used[MAXNCOLORS];
+  gint maxcolorindex, ncolors_used;
+  gboolean remap_ok = true;
+
+  for (k=0; k<MAXNCOLORS; k++)
+    all_colors_p[colors_used[k]] = false;
+
+  /*-- find out all the colors (indices) are currently in use --*/
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    datad_colors_used_get (&ncolors_used, colors_used, d, gg);
+    for (k=0; k<ncolors_used; k++)
+      all_colors_p[colors_used[k]] = true;
+  }
+ 
+  /*-- find out how many colors are currently in use --*/
+  ncolors_used = 0;
+  for (k=0; k<MAXNCOLORS; k++)
+    if (all_colors_p[k])
+      ncolors_used++;
+
+  /*-- find the largest color index currently in use --*/
+  maxcolorindex = -1;
+  for (k=MAXNCOLORS; k>0; k--) {
+    if (all_colors_p[k]) {
+      maxcolorindex = k;
+      break;
+    }
+  }
+
+  if (maxcolorindex < scheme->n)
+    /* no problem, go right ahead */
+    ;
+  else if (ncolors_used >= scheme->n) {
+    /* fatal: bail out with a warning */
+    quick_message ("Sorry, ...", false);
+    remap_ok = false;   
+  } else if (maxcolorindex >= scheme->n && ncolors_used < scheme->n) {
+    /*-- build the vector that will be used to reset the current indices --*/
+    gint *newind = (gint *) g_malloc ((maxcolorindex+1) * sizeof (gint));
+    gint n = 0;
+
+    /*
+     * just map them into the first few colors for now.  later, might
+     * want to spread the colors out.
+    */
+    for (k=0; k<maxcolorindex; k++) {
+      if (all_colors_p[k]) {
+        newind[k] = n;  /*-- n can not grow larger than maxcolorindex-1 --*/
+        n++;
+      }
+    }
+
+    for (l = gg->d; l; l = l->next) {
+      d = (datad *) l->data;
+      for (i=0; i<d->nrows; i++) {
+        d->color.els[i] = newind[ d->color.els[i] ];
+        d->color_now.els[i] = newind[ d->color_now.els[i] ];
+        /*-- what about color_prev?  --*/
+      }
+    }
+
+  } else {
+    g_printerr ("nothing else should possibly happen, no?\n");
+  }
+
+  return remap_ok;
+}
+#endif
+
+#ifdef USE_XML
 static void scale_set_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint ncolors_used;
-  gushort colors_used[MAXNCOLORS+2];
+  gushort colors_used[MAXNCOLORS+2];  /* why +2?  bg, accent? irrelevant? */
   gint k;
   gboolean rval = false;
   extern void symbol_window_redraw (ggobid *);
@@ -617,6 +699,13 @@ static void scale_set_cb (GtkWidget *w, ggobid* gg)
     if (gg->wvis.scheme) {
       colorschemed *scheme = gg->wvis.scheme;
 
+/*
+ * First of all, need to check all datad's, not just this one.
+ * Second, only rule out a new color scheme if the number of
+ * colors doesn't work.  As long as the number of colors is ok,
+ * then reset the values of the colors according to some rule ...
+ * which I must now devise.
+*/
       datad_colors_used_get (&ncolors_used, colors_used, d, gg);
       for (k=0; k<ncolors_used; k++) {
         if (colors_used[k] >= scheme->n) {
