@@ -370,9 +370,9 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
           {
             build_whisker_segs (m, &nwhisker_segs, sp);
           } else if (GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(display) &&
-                     projection_get(gg) == P1PLOT &&
-                     cpanel->p1d.type == ASH &&
-                     cpanel->p1d.ASH_add_lines_p) {
+            ((projection_get(gg) == TOUR1D && cpanel->t1d.ASH_add_lines_p) ||
+             (projection_get(gg) == P1PLOT && cpanel->p1d.type == ASH &&
+              cpanel->p1d.ASH_add_lines_p))) {
             build_ash_segs (m, &nash_segs, sp);
           }
         }
@@ -382,8 +382,9 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
   if (nwhisker_segs)
     gdk_draw_segments (sp->pixmap0, gg->plot_GC,
       sp->win32.whisker_segs, nwhisker_segs);
-  if (nash_segs)
+  if (nash_segs) {
     gdk_draw_segments (sp->pixmap0, gg->plot_GC, sp->win32.ash_segs, nash_segs);
+  }
   draw_glyphs (sp, sp->pixmap0,
     sp->win32.points, npt,           sp->win32.segs, nseg,
     sp->win32.open_rects, nr_open,   sp->win32.filled_rects, nr_filled,
@@ -407,11 +408,6 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
     for (iv=bin0->y; iv<=bin1->y; iv++) {
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
         j = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
-/*
-        if (d->color_now.els[j] == current_color &&
-            splot_plot_case (j, d, sp, display, gg) &&
-            (draw_hidden == d->hidden_now.els[j]))
-*/
         if (splot_plot_case (j, d, sp, display, gg)) {
           if ((draw_hidden && d->hidden_now.els[j]) ||  /*-- hiddens --*/
              (d->color_now.els[j] == current_color &&   /*-- unhiddens --*/
