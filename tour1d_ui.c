@@ -128,7 +128,7 @@ cpanel_tour1d_make (ggobid *gg) {
   btn = gtk_check_button_new_with_label ("Pause");
   gtk_widget_set_name (btn, "TOUR1D:pause_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Stop tour motion temporarily", NULL);
+    "Stop tour motion temporarily (keyboard shortcut: w)", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
                      GTK_SIGNAL_FUNC (tour1d_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
