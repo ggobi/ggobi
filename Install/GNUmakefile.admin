@@ -21,7 +21,7 @@ TOOLS=Install/plugin.in
 PLUGIN_DIRS=ImageLib MySQL Postgres DataViewer FileSelector \
             R GraphLayout ggvis JVM GraphAction ExcelReader \
 	    ImageLib Perl Python PluginManager \
-	    TestInput TestPlugin DescribeDisplay
+	    TestInput TestPlugin DescribeDisplay VarCloud
 #Help
 
 
