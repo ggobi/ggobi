@@ -86,6 +86,7 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
   scheme->name = g_strdup((gchar *) xmlGetProp(root, (xmlChar *) "name"));
   scheme->type = getColorSchemeType(xmlGetProp(root, (xmlChar *) "type"));
   scheme->system = getColorSchemeSystem(xmlGetProp(root, (xmlChar *) "system"));
+  scheme->colorNames = g_array_new(true, true, sizeof(gchar*));
 
 /*
   scheme->system_min = 0.0;
@@ -192,7 +193,15 @@ gint
 getForegroundColor(gint index, xmlNodePtr node, xmlDocPtr doc,
   colorschemed *scheme)
 {
-  return(getColor(node, doc, &(scheme->data[index]), &scheme->rgb[index]));
+    gint value;
+    gchar *name;
+    value = getColor(node, doc, &(scheme->data[index]), &scheme->rgb[index]);
+
+    name = xmlGetProp(node, (xmlChar *) "name");
+/*    g_array_index(scheme->colorNames, (gchar *), value-1) =  name ? g_strdup(name) : NULL; */
+    g_array_append_val(scheme->colorNames, name ? g_strdup(name) : NULL);
+
+    return(value);
 }
 
 gint

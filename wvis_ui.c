@@ -30,6 +30,7 @@ static gint ymargin = 20;
 
 static void bin_counts_reset (gint jvar, datad *d, ggobid *gg);
 
+GtkWidget *createColorSchemeTree(int numTypes, gchar *schemeTypes[], ggobid *gg, GtkWidget *notebook);
 void selection_made_cb (GtkWidget *clist, gint row, gint column,
   GdkEventButton *event, ggobid *gg);
 
@@ -142,13 +143,18 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
  * and there's probably a way to do it better.
 */
   clist = get_clist_from_object (GTK_OBJECT (w));
-  d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  selected_var = get_one_selection_from_clist (clist);
-  if (d && selected_var != -1) {
-    gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
-      (gpointer) gg, (gpointer) &rval);
-    bin_counts_reset (selected_var, d, gg);
+  if(clist == NULL) {
+      d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+      selected_var = get_one_selection_from_clist (clist);
+  } else {
+      d = (datad *) g_list_nth_data(gg->d, 0);
+      selected_var = 0;
   }
+  if (d && selected_var != -1) {
+      gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
+			       (gpointer) gg, (gpointer) &rval);
+  }
+  bin_counts_reset (selected_var, d, gg);
   gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
     (gpointer) gg, (gpointer) &rval);
 }
@@ -876,20 +882,21 @@ wvis_window_open (ggobid *gg)
 {
   GtkWidget *vbox;
   GtkWidget *frame1, *vb1, *hb;
-  GtkWidget *notebook;
+  GtkWidget *notebook = NULL;
   GtkWidget *btn, *vb, *opt;
   int currentSelection = 0, i=0;
 
 #ifdef USE_XML
   /*-- for colorscales --*/
+  GtkWidget *hpane, *tr, *sw;
   GtkWidget *frame2, *vbs, *menu;
   GList *l;
   colorschemed *scheme;
   static gchar *colorscaletype_lbl[UNKNOWN_COLOR_TYPE] = {
-    "--- DIVERGING ---",
-    "--- SEQUENTIAL ---",
-    "--- SPECTRAL ---",
-    "--- QUALITATIVE ---"};
+    "DIVERGING",
+    "SEQUENTIAL",
+    "SPECTRAL",
+    "QUALITATIVE"};
   gint n;
   gint ncolorscaletype_lbl = sizeof(colorscaletype_lbl)/sizeof(colorscaletype_lbl[0]);
 #endif
@@ -911,10 +918,17 @@ wvis_window_open (ggobid *gg)
     gtk_signal_connect (GTK_OBJECT (gg->wvis.window),
       "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), gg);
 
+    hpane = gtk_hpaned_new();
+    gtk_container_add (GTK_CONTAINER (gg->wvis.window), hpane);
+
+    sw = gtk_scrolled_window_new(NULL, NULL);
+    gtk_container_add (GTK_CONTAINER (hpane), sw);
+
     vbox = gtk_vbox_new (false, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
     gtk_box_set_spacing (GTK_BOX(vbox), 5);
-    gtk_container_add (GTK_CONTAINER (gg->wvis.window), vbox);
+
+    gtk_container_add (GTK_CONTAINER (hpane), vbox);    
 
 /*
  * First the frame for the section on choosing new colormaps,
@@ -952,6 +966,10 @@ wvis_window_open (ggobid *gg)
     notebook = wvis_create_variable_notebook (vb1, GTK_SELECTION_SINGLE,
       (GtkSignalFunc) selection_made_cb, gg);
 
+    tr = createColorSchemeTree(UNKNOWN_COLOR_TYPE, colorscaletype_lbl, gg, notebook);
+    gtk_widget_set_usize(sw, 200, 20);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(sw), tr);
+
     /*-- Insert an option menu for choosing the method of binning --*/
     opt = gtk_option_menu_new ();
     gtk_widget_set_name (opt, "WVIS:binning_method");
@@ -972,13 +990,13 @@ wvis_window_open (ggobid *gg)
     gtk_container_set_border_width (GTK_CONTAINER (vbs), 5);
     gtk_container_add (GTK_CONTAINER (frame2), vbs);
 
+#if 0
     opt = gtk_option_menu_new ();
     menu = gtk_menu_new ();
 
     colorscheme_add_to_menu (menu, "Default", NULL,
       (GtkSignalFunc) colorscheme_set_cb, notebook, gg);
  
-    
     for (n=0; n<ncolorscaletype_lbl; n++, i++) {
       colorscheme_add_to_menu (menu, colorscaletype_lbl[n], NULL,
 			       NULL, notebook, gg);
@@ -1002,6 +1020,9 @@ wvis_window_open (ggobid *gg)
       "Choose a color scale", NULL);
 
     gtk_box_pack_start (GTK_BOX (vbs), opt, false, false, 1);
+
+#endif
+
 
     btn = gtk_button_new_with_label ("Apply color scheme to brushing colors");
     gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
@@ -1081,7 +1102,7 @@ wvis_window_open (ggobid *gg)
 
     btn = gtk_button_new_with_label ("Close");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Close the window", NULL);
+			  "Close the window", NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 2);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (close_btn_cb), gg);
@@ -1091,3 +1112,72 @@ wvis_window_open (ggobid *gg)
   gdk_window_raise (gg->wvis.window->window);
 }
 
+GtkWidget *createSchemeColorsTree(colorschemed *scheme);
+
+/**
+ Create the tree displaying the colorscheme information.
+ This displays the different levels:
+    types of schemes, 
+    different schemes within each type, 
+    colors within each scheme.
+ 
+ */
+GtkWidget *
+createColorSchemeTree(int numTypes, gchar *schemeTypes[], ggobid *gg, GtkWidget *notebook)
+{
+     GtkWidget *item;
+     GtkWidget **trees, *top, *tree;
+     int n;
+     GList *l;
+     colorschemed *scheme;
+
+     top = gtk_tree_new();
+     trees = (GtkWidget **) g_malloc(sizeof(GtkTree*) * numTypes);
+
+     for (n = 0; n < numTypes; n++) {
+	trees[n] = gtk_tree_new();
+        item = gtk_tree_item_new_with_label(schemeTypes[n]);
+        gtk_tree_append(GTK_TREE(top), item);
+        gtk_tree_item_set_subtree(GTK_TREE_ITEM(item), trees[n]);
+     }
+
+     for(l = gg->colorSchemes; l ; l = l->next) {
+	 scheme = (colorschemed *) l->data;
+	 item = gtk_tree_item_new_with_label(scheme->name);
+	 GGobi_widget_set(item, gg, true);
+
+	 gtk_object_set_data (GTK_OBJECT (item), "notebook", notebook);
+	 gtk_signal_connect(GTK_OBJECT(item), "select", (GtkSignalFunc) colorscheme_set_cb, scheme);
+	 gtk_tree_append(GTK_TREE(trees[scheme->type]), item);
+	 gtk_widget_show(item);
+/*
+  Have to read the names properly first.
+	 tree = createSchemeColorsTree(scheme);
+	 gtk_tree_item_set_subtree(GTK_TREE_ITEM(item), tree);      
+*/
+     }
+     gtk_widget_show_all(top);
+
+     return(top);
+}
+
+GtkWidget *
+createSchemeColorsTree(colorschemed *scheme)
+{
+    GtkWidget *tree, *item;
+    gchar *name;
+    int n, i;
+
+    n = scheme->n;
+    tree = gtk_tree_new();
+    for(i = 0; i < n; i++) {
+	name = g_array_index(scheme->colorNames, gchar *, i);
+	if(!name)
+	    name = "missing color name";
+	item = gtk_tree_item_new_with_label(name);
+	gtk_tree_append(GTK_TREE(tree), item);
+	gtk_widget_show(item);
+    }
+
+    return(tree);
+}
