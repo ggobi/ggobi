@@ -601,6 +601,8 @@ gboolean barchart_redraw (splotd *sp, datad *d, ggobid *gg, gboolean binned);
 void barchart_splot_add_plot_labels (splotd *, GdkDrawable *, ggobid *);
 GtkWidget* cpanel_barchart_make (ggobid *gg);
 void cpanel_barchart_set (cpaneld *cpanel, GtkWidget *panel, ggobid *gg);
+
+void barchart_scale_event_handlers_toggle(splotd *sp, gboolean state);
 #endif
 
 

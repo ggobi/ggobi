@@ -252,6 +252,11 @@ barchartCPanelWidget(displayd *dpy, gint viewmode, gchar **modeName, ggobid *gg)
 gboolean 
 barchartEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, gint viewMode)
 {
+      if(viewMode == SCALE) {
+         barchart_scale_event_handlers_toggle (sp, state);    
+	 return(true);
+      }	
+
       if(viewMode != EXTENDED_DISPLAY_MODE && viewMode != SCALE)
         return(true);
 
