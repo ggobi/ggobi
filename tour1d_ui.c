@@ -94,8 +94,9 @@ static void speed1d_set_cb (GtkAdjustment *adj, ggobid *gg) {
 
 static void tour1d_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
+  displayd *dsp = gg->current_display;
 
-  tour1d_pause (&gg->current_display->cpanel, button->active, gg);
+  tour1d_pause (&dsp->cpanel, button->active, dsp, gg);
 }
 
 static void reinit_cb (GtkWidget *w, ggobid *gg) {

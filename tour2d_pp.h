@@ -38,4 +38,4 @@ gint holes_raw2(array_f *pdata,void *param, gfloat *val);
                 void *param);*/
 gfloat t2d_calc_indx(array_f, gint (*index) (array_f*, void*, gfloat*),
                 void *param);
-gboolean t2d_switch_index(gint, gint, ggobid *);
+gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *, ggobid *);

@@ -79,8 +79,9 @@ static void speed2d_set_cb (GtkAdjustment *adj, ggobid *gg) {
 
 static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
+  displayd *dsp = gg->current_display;
 
-  tour2d_pause (&gg->current_display->cpanel, button->active, gg);
+  tour2d_pause (&dsp->cpanel, button->active, dsp, gg);
 }
 
 static void reinit_cb (GtkWidget *w, ggobid *gg) {
@@ -211,8 +212,8 @@ cpanel_tour2d_make (ggobid *gg) {
     "Set the manual manipulation method", NULL);
   gtk_box_pack_end (GTK_BOX (vb), manip_opt, false, false, 0);
   populate_option_menu (manip_opt, manip_lbl,
-                        sizeof (manip_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) manip_cb, gg);
+    sizeof (manip_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) manip_cb, "GGobi", (gpointer) gg);
 
 /*
  * PC Axes toggle

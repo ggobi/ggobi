@@ -59,15 +59,11 @@ The authors can be contacted at the following email addresses:
   }
 }*/
 
-void t1d_pptemp_set(gfloat slidepos, ggobid *gg) {
-  displayd *dsp = gg->current_display; 
-
+void t1d_pptemp_set(gfloat slidepos, displayd *dsp, ggobid *gg) {
   dsp->t1d_pp_op.temp_start = slidepos;
 }
 
-void t1d_ppcool_set(gfloat slidepos, ggobid *gg) {
-  displayd *dsp = gg->current_display; 
-
+void t1d_ppcool_set(gfloat slidepos, displayd *dsp, ggobid *gg) {
   dsp->t1d_pp_op.cooling = slidepos;
 }
 
@@ -554,9 +550,8 @@ void t1d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
   *bm = bas_meth;
 }
 
-void t1d_clear_pppixmap(ggobid *gg)
+void t1d_clear_pppixmap(displayd *dsp, ggobid *gg)
 {
-  displayd *dsp = gg->current_display;
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
   gint wid = dsp->t1d_ppda->allocation.width, 
@@ -579,9 +574,8 @@ void t1d_clear_pppixmap(ggobid *gg)
                    wid, hgt);
 }
 
-void t1d_clear_ppda(ggobid *gg)
+void t1d_clear_ppda(displayd *dsp, ggobid *gg)
 {
-  displayd *dsp = gg->current_display;
   gint i;
 
   /* clear the ppindx matrix */
@@ -593,17 +587,16 @@ void t1d_clear_ppda(ggobid *gg)
     dsp->t1d_ppindx_mat[i] = 0.0;
   }
 
-  t1d_clear_pppixmap(gg);
+  t1d_clear_pppixmap(dsp, gg);
 }
 
-void t1d_ppdraw_all(gint wid, gint hgt, gint margin, ggobid *gg)
+void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
 {
-  displayd *dsp = gg->current_display;
   /*gint xpos, ypos, xstrt, ystrt;*/
   GdkPoint pptrace[100];
   gint i;
 
-  t1d_clear_pppixmap(gg);
+  t1d_clear_pppixmap(dsp, gg);
 
   for (i=0; i<dsp->t1d_ppindx_count; i++) 
   {
@@ -622,10 +615,9 @@ void t1d_ppdraw_all(gint wid, gint hgt, gint margin, ggobid *gg)
 
 /* This is writes text to the pp window to in form the
 user that optimize is finding a new maximum */ 
-void t1d_ppdraw_think(ggobid *gg)
+void t1d_ppdraw_think(displayd *dsp, ggobid *gg)
 {
-  displayd *dsp = gg->current_display;
-  splotd *sp = gg->current_splot;
+  splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
   colorschemed *scheme = gg->activeColorScheme;
   GtkStyle *style = gtk_widget_get_style (sp->da);
   gchar *varlab;
@@ -656,9 +648,8 @@ void t1d_ppdraw_think(ggobid *gg)
 }
 
 /* This is the pp index plot drawing routine */ 
-void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
+void t1d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
 {
-  displayd *dsp = gg->current_display;
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
   gint wid = dsp->t1d_ppda->allocation.width, 
@@ -668,7 +659,7 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
 
   if (init) {
-    t1d_clear_ppda(gg);
+    t1d_clear_ppda(dsp, gg);
     init = false;
   }
 
@@ -692,7 +683,7 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
       dsp->t1d_ppindx_count++;
     }
     else if (dsp->t1d_ppindx_count > 0 && dsp->t1d_ppindx_count < 80) {
-      t1d_ppdraw_all(wid, hgt, margin, gg);
+      t1d_ppdraw_all(wid, hgt, margin, dsp, gg);
       dsp->t1d_ppindx_count++;
     }
     else if (dsp->t1d_ppindx_count >= 80) 
@@ -700,15 +691,14 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
       /* cycle values back into array */
       for (j=0; j<=dsp->t1d_ppindx_count; j++)
         dsp->t1d_ppindx_mat[j] = dsp->t1d_ppindx_mat[j+1];
-      t1d_ppdraw_all(wid, hgt, margin, gg);
+      t1d_ppdraw_all(wid, hgt, margin, dsp, gg);
     }
   g_free (label);
 }
 
-void t1d_pp_reinit(ggobid *gg)
+void t1d_pp_reinit(displayd *dsp, ggobid *gg)
 {
   gint i, j;
-  displayd *dsp = gg->current_display;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
 
   for (i=0; i<dsp->t1d_pp_op.proj_best.nrows; i++)
@@ -722,7 +712,7 @@ void t1d_pp_reinit(ggobid *gg)
   dsp->t1d_indx_max);
   gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
 
-  t1d_clear_ppda(gg);
+  t1d_clear_ppda(dsp, gg);
   g_free (label);
 }
 
@@ -761,9 +751,9 @@ gfloat t1d_calc_indx (array_f pd,
   return(indexval);
 }
 
-gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
+gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
+  ggobid *gg)
 {
-  displayd *dsp = gg->current_display; 
   datad *d = dsp->d;
   gint kout, nrows = d->nrows_in_plot, ncols=d->ncols;
   /*  subd_param sp; */

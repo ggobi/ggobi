@@ -289,7 +289,7 @@ tour1d_all_vars_cb (GtkCheckMenuItem *w, guint action)
       free_optimize0_p(&dsp->t1d_pp_op);
       alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
         1);
-      t1d_pp_reinit(gg);
+      t1d_pp_reinit(dsp, gg);
     }  
   }
 }
@@ -311,15 +311,17 @@ void tour1d_step_cb(displayd *dsp, tour td, gint projdim, ggobid *gg,
 }
 #endif
 
-void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg)
+void tour1d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg)
 {
+  if (dsp == NULL)
+    return;
   cpanel->t1d.paused = state;
 
-  tour1d_func (!cpanel->t1d.paused, gg->current_display, gg);
+  tour1d_func (!cpanel->t1d.paused, dsp, gg);
 
   if (cpanel->t1d.paused) {
     /*-- whenever motion stops, we need a FULL redraw --*/
-    display_tailpipe (gg->current_display, FULL, gg);
+    display_tailpipe (dsp, FULL, gg);
   }
 }
 
@@ -431,7 +433,7 @@ tour1d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     free_optimize0_p(&dsp->t1d_pp_op);
     alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive,
       1);
-    t1d_pp_reinit(gg);
+    t1d_pp_reinit(dsp, gg);
   }
 }
 
@@ -468,7 +470,7 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobi
         free_optimize0_p(&dsp->t1d_pp_op);
         alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
           1);
-        t1d_pp_reinit(gg);
+        t1d_pp_reinit(dsp, gg);
       }
     }
 
@@ -485,7 +487,7 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobi
         free_optimize0_p(&dsp->t1d_pp_op);
         alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
           1);
-        t1d_pp_reinit(gg);
+        t1d_pp_reinit(dsp, gg);
       }
     }
   }
@@ -588,7 +590,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
   gboolean revert_random = false;
   gint pathprob = 0;
   gint i, nv;
-  extern void t1d_ppdraw_think(ggobid *);
+  extern void t1d_ppdraw_think(displayd *, ggobid *);
 
   /* Controls interpolation steps */
   if (!dsp->t1d.get_new_target && 
@@ -604,8 +606,8 @@ tour1d_run(displayd *dsp, ggobid *gg)
 
       dsp->t1d.oppval = dsp->t1d.ppval;
       revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
-        0, gg);
-      t1d_ppdraw(dsp->t1d.ppval, gg);
+        0, dsp, gg);
+      t1d_ppdraw(dsp->t1d.ppval, dsp, gg);
     }
 
   }
@@ -652,10 +654,10 @@ tour1d_run(displayd *dsp, ggobid *gg)
         dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[0]]=1.0;
 
         dsp->t1d.oppval = -1.0;
-        t1d_ppdraw_think(gg);
+        t1d_ppdraw_think(dsp, gg);
         gdk_flush ();
         revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
-          dsp->t1d.target_selection_method, gg);
+          dsp->t1d.target_selection_method, dsp, gg);
 
         if (!revert_random) {
           for (i=0; i<dsp->t1d.nactive; i++) {
@@ -683,9 +685,9 @@ g_printerr ("\n");*/
               dsp->t1d_pp_op.proj_best.vals[0][j] = 
                 dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[j]];
             revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
-              dsp->t1d.target_selection_method, gg);
+              dsp->t1d.target_selection_method, dsp, gg);
           }*/
-	  /*          t1d_ppdraw(dsp->t1d.ppval, gg);*/
+	  /*          t1d_ppdraw(dsp->t1d.ppval, dsp, gg);*/
   /*          count = 0;*/
          ggobi_sleep(2);
         }
@@ -799,7 +801,7 @@ void tour1d_reinit(ggobid *gg)
   varcircles_refresh (d, gg);
 
   if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) 
-    t1d_pp_reinit(gg);
+    t1d_pp_reinit(dsp, gg);
 }
 
 void tour1d_scramble(ggobid *gg)
@@ -827,7 +829,7 @@ void tour1d_scramble(ggobid *gg)
   varcircles_refresh (d, gg);
 
   if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) 
-    t1d_pp_reinit(gg);
+    t1d_pp_reinit(dsp, gg);
 }
 
 void tour1d_vert(cpaneld *cpanel, gboolean state)
@@ -964,8 +966,8 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     if (dsp->t1d_ppda != NULL) {
       dsp->t1d.oppval = dsp->t1d.ppval;
       pp_problem = t1d_switch_index(cpanel->t1d.pp_indx, 
-        0, gg);
-      t1d_ppdraw(dsp->t1d.ppval, gg);
+        0, dsp, gg);
+      t1d_ppdraw(dsp->t1d.ppval, dsp, gg);
     }
 
     display_tailpipe (dsp, FULL, gg);
@@ -996,10 +998,10 @@ tour1d_manip_end(splotd *sp)
 
   /* need to turn on tour? */
   if (!cpanel->t1d.paused) {
-    tour1d_pause(cpanel, T1DOFF, gg);
+    tour1d_pause(cpanel, T1DOFF, dsp, gg);
 
     /*-- whenever motion stops, we need a FULL redraw --*/
-    display_tailpipe (gg->current_display, FULL, gg);
+    display_tailpipe (dsp, FULL, gg);
   }
 }
 

@@ -44,4 +44,4 @@ gint cartvariance (array_f *pdata, void *param, gfloat *val);
 gfloat t1d_calc_indx(array_f, /* gint *, gint, gint,*/
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param);
-gboolean t1d_switch_index(gint, gint, ggobid *);
+gboolean t1d_switch_index(gint, gint, displayd *, ggobid *);

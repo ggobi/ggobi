@@ -308,27 +308,35 @@ tour2d_all_vars_cb (GtkCheckMenuItem *w, guint action)
       free_optimize0_p(&dsp->t2d_pp_op);
       alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
         2);
-      t2d_pp_reinit(gg);
+      t2d_pp_reinit(dsp, gg);
     }  
   }
 }
 
 void tour2d_speed_set(gfloat slidepos, ggobid *gg) {
-  displayd *dsp = gg->current_display; 
-  cpaneld *cpanel = &dsp->cpanel;
+  cpaneld *cpanel;
+  displayd *dsp = gg->current_display;
+
+  if (dsp != NULL)
+    cpanel = &dsp->cpanel;
+  if (cpanel == NULL)
+    return;
 
   cpanel->t2d.slidepos = slidepos;
   speed_set(slidepos, &cpanel->t2d.step, &dsp->t2d.delta);
 }
 
-void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
+void tour2d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg) {
+  if (dsp == NULL)
+    return;
+
   cpanel->t2d.paused = state;
 
-  tour2d_func (!cpanel->t2d.paused, gg->current_display, gg);
+  tour2d_func (!cpanel->t2d.paused, dsp, gg);
 
   if (cpanel->t2d.paused) {
     /*-- whenever motion stops, we need a FULL redraw --*/
-    display_tailpipe (gg->current_display, FULL, gg);
+    display_tailpipe (dsp, FULL, gg);
   }
 }
 
@@ -443,7 +451,7 @@ tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     free_optimize0_p(&dsp->t2d_pp_op);
     alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
       2);
-    t2d_pp_reinit(gg);
+    t2d_pp_reinit(dsp, gg);
   }
 }
 
@@ -571,7 +579,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
   gboolean chosen;
   gfloat eps = .01;
   gint pathprob = 0;
-  extern void t2d_ppdraw_think(ggobid *);
+  extern void t2d_ppdraw_think(displayd *,ggobid *);
 
   /* Controls interpolation steps */
   if (!dsp->t2d.get_new_target && 
@@ -587,9 +595,9 @@ tour2d_run(displayd *dsp, ggobid *gg)
     if (dsp->t2d_ppda != NULL) {
 
       dsp->t2d.oppval = dsp->t2d.ppval;
-      revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
-        0, gg);
-      t2d_ppdraw(dsp->t2d.ppval, gg);
+      revert_random = t2d_switch_index(cpanel->t2d.pp_indx,
+        0, dsp, gg);
+      t2d_ppdraw(dsp->t2d.ppval, dsp, gg);
     }
   }
   else { /* we're at the target plane */
@@ -658,10 +666,10 @@ tour2d_run(displayd *dsp, ggobid *gg)
         dsp->t2d.Fz.vals[1][dsp->t2d.active_vars.els[1]]=1.0;
 
         dsp->t2d.oppval = -1.0;
-        t2d_ppdraw_think(gg);
+        t2d_ppdraw_think(dsp, gg);
 /*XX*/  gdk_flush ();
         revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
-          dsp->t2d.target_selection_method, gg);
+          dsp->t2d.target_selection_method, dsp, gg);
 
         if (!revert_random) {
           for (i=0; i<2; i++)
@@ -691,9 +699,9 @@ g_printerr ("\n");
                 dsp->t2d_pp_op.proj_best.vals[i][j] = 
                   dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[j]];
             revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
-              dsp->t2d.target_selection_method, gg);
+              dsp->t2d.target_selection_method, dsp, gg);
 	      }*/
-  /*          t2d_ppdraw(dsp->t2d.ppval, gg);*/
+  /*          t2d_ppdraw(dsp->t2d.ppval, dsp, gg);*/
   /*          count = 0;*/
 
           ggobi_sleep(2);  
@@ -810,7 +818,7 @@ void tour2d_reinit(ggobid *gg)
   varcircles_refresh (d, gg);
 
   if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) 
-    t2d_pp_reinit(gg);
+    t2d_pp_reinit(dsp, gg);
 }
 
 /* Variable manipulation */
@@ -1278,8 +1286,8 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
       dsp->t2d.oppval = dsp->t2d.ppval;
       pp_problem = t2d_switch_index(cpanel->t2d.pp_indx, 
-        0, gg);
-      t2d_ppdraw(dsp->t2d.ppval, gg);
+        0, dsp, gg);
+      t2d_ppdraw(dsp->t2d.ppval, dsp, gg);
     }
 
     display_tailpipe (dsp, FULL, gg);
@@ -1302,10 +1310,10 @@ tour2d_manip_end(splotd *sp)
 
   /* need to turn on tour? */
   if (!cpanel->t2d.paused) {
-    tour2d_func(T2DON, gg->current_display, gg);
+    tour2d_func(T2DON, dsp, gg);
 
     /*-- whenever motion stops, we need a FULL redraw --*/
-    display_tailpipe (gg->current_display, FULL, gg);
+    display_tailpipe (dsp, FULL, gg);
   }
 }
 

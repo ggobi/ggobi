@@ -27,17 +27,17 @@ static GtkAdjustment *param_adj;
 */
 
 /*-- called when closed from the close menu item --*/
-static void close_menuitem_cb (ggobid *gg, gint action, GtkWidget *w) {
+static void close_menuitem_cb (displayd *dsp, gint action, GtkWidget *w) {
   /*  free_optimize0_p(&dsp->t2d_pp_op); should this go here? */
-  displayd *dsp = gg->current_display;
+
   gtk_widget_hide (dsp->t2d_window);
   t2d_optimz(0, &dsp->t2d.get_new_target, 
     &dsp->t2d.target_selection_method, dsp);
 }
 /*-- called when closed from the window manager --*/
 static void
-close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
-  displayd *dsp = gg->current_display;
+close_wmgr_cb (GtkWidget *w, GdkEventButton *event, displayd *dsp) {
+
   gtk_widget_hide (dsp->t2d_window);
 }
 
@@ -49,8 +49,7 @@ hide_cb (GtkWidget *w) {
 */
 
 static void
-options_cb(ggobid *gg, guint action, GtkCheckMenuItem *w) {
-  displayd *dsp = gg->current_display; 
+options_cb(displayd *dsp, guint action, GtkCheckMenuItem *w) {
   
   switch (action) {
 
@@ -108,21 +107,23 @@ replot_freq_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
   }*/
 
 static void
-t2d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
-  displayd *dsp = gg->current_display; 
+t2d_optimz_cb (GtkToggleButton  *w, displayd *dsp) {
+  if (dsp == NULL) {
+    g_printerr ("No display corresponds to these controls\n");
+    return;
+  }
 
   t2d_optimz(w->active, &dsp->t2d.get_new_target, 
     &dsp->t2d.target_selection_method, dsp);
 }
 
-static void t2d_pptemp_set_cb (GtkAdjustment *adj, ggobid *gg) {
-
-  t2d_pptemp_set(adj->value, gg);
+static void t2d_pptemp_set_cb (GtkAdjustment *adj, displayd *dsp) {
+  t2d_pptemp_set(adj->value, dsp, dsp->d->gg);
 }
 
-static void t2d_ppcool_set_cb (GtkAdjustment *adj, ggobid *gg) {
+static void t2d_ppcool_set_cb (GtkAdjustment *adj, displayd *dsp) {
 
-  t2d_ppcool_set(adj->value, gg);
+  t2d_ppcool_set(adj->value, dsp, dsp->d->gg);
 }
 
 /*
@@ -137,12 +138,19 @@ gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","LDA","Gini-C","Entropy-C"};
 
 void t2d_pp_func_cb (GtkWidget *w, gpointer cbd)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  displayd *dsp = gg->current_display;
+  displayd *dsp = (displayd *) gtk_object_get_data (GTK_OBJECT(w), "displayd");
+  ggobid *gg;
+  cpaneld *cpanel = NULL;
   gint indx = GPOINTER_TO_INT (cbd);
   gchar *label = g_strdup("PP index: (0.000) 0.0000 (0.000)");
 
+  if (dsp == NULL) {
+    g_printerr ("No display corresponds to these controls\n");
+    return;
+  }
+  gg = GGobiFromDisplay (dsp);
+
+  cpanel = &dsp->cpanel;
   cpanel->t2d.pp_indx = indx;
   dsp->t2d.get_new_target = true;
 
@@ -152,7 +160,7 @@ void t2d_pp_func_cb (GtkWidget *w, gpointer cbd)
   sprintf(label,"PP index: (%3.1f) %5.3f (%3.1f) ",0.0,dsp->t2d.ppval,0.0);
   gtk_label_set_text(GTK_LABEL(dsp->t2d_pplabel),label);
 
-  t2d_clear_ppda(gg);
+  t2d_clear_ppda(dsp, gg);
 
   /*  if (indx == SUBD || LDA || CART_GINI || CART_ENTROPY || CART_VAR || PCA)
     gtk_widget_hide (param_vb);
@@ -191,22 +199,22 @@ t2d_ppda_configure_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
 }
 
 static gint
-t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
+t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
 {
-  displayd *dsp = gg->current_display;
+  ggobid *gg = dsp->d->gg;
 /*
   gint margin=10;
   gint j;
   gint xpos, ypos, xstrt, ystrt;
   gchar *tickmk;
   GtkStyle *style = gtk_widget_get_style (dsp->t2d_ppda);
-  datad *d = gg->current_display->d;
+  datad *d = dsp->d;
 */
   gint wid = w->allocation.width, hgt = w->allocation.height;
   /*  static gboolean init = true;*/
 
   /*  if (init) {
-    t2d_clear_ppda(gg);
+    t2d_clear_ppda(dsp, gg);
     init=false;
     }*/
 
@@ -266,12 +274,15 @@ tour2dpp_window_open (ggobid *gg) {
   /*GtkWidget **btn, *label, *da, *entry;*/
   GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar;
   GtkObject *adj;
-  displayd *dsp = gg->current_display;
+  displayd *dsp = gg->current_display;  /* ok as long as we only use the gui */
   datad *d = dsp->d;
   gboolean vars_sphered = true;
   /*-- to initialize the checkboxes in the menu --*/
   GtkItemFactory *factory;
   GtkWidget *item;
+
+  if (dsp == NULL)
+    return;
 
   /* check if selected variables are sphered beforeing allowing window
      to popup */
@@ -303,9 +314,10 @@ tour2dpp_window_open (ggobid *gg) {
       gtk_window_set_title (GTK_WINDOW (dsp->t2d_window), 
         "projection pursuit - 2D");
       gtk_signal_connect (GTK_OBJECT (dsp->t2d_window), "delete_event",
-                          GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) gg);
+                          GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) dsp);
       /*gtk_window_set_policy (GTK_WINDOW (dsp->t2d_window), true, true, false);*/
       gtk_container_set_border_width (GTK_CONTAINER (dsp->t2d_window), 10);
+      gtk_object_set_data (GTK_OBJECT (dsp->t2d_window), "displayd", dsp);
 
 /*
  * Add the main menu bar
@@ -318,7 +330,7 @@ tour2dpp_window_open (ggobid *gg) {
       factory = get_main_menu (menu_items,
         sizeof (menu_items) / sizeof (menu_items[0]),
         dsp->t2d_pp_accel_group, dsp->t2d_window, &dsp->t2d_mbar,
-        (gpointer) gg);
+        (gpointer) dsp);
       gtk_box_pack_start (GTK_BOX (vbox), dsp->t2d_mbar, false, true, 0);
 
 
@@ -350,7 +362,7 @@ tour2dpp_window_open (ggobid *gg) {
         "Guide the tour using projection pursuit optimization or tour passively",
         NULL);
       gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                          GTK_SIGNAL_FUNC (t2d_optimz_cb), (gpointer) gg);
+                          GTK_SIGNAL_FUNC (t2d_optimz_cb), (gpointer) dsp);
       gtk_box_pack_start (GTK_BOX (vbc),
                         tgl, false, false, 1);
 
@@ -367,7 +379,7 @@ tour2dpp_window_open (ggobid *gg) {
   /*-- value, lower, upper, step --*/
     adj = gtk_adjustment_new (1.0, 0.1, 3.0, 0.1, 0.1, 0.0);
     gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (t2d_pptemp_set_cb), gg);
+                      GTK_SIGNAL_FUNC (t2d_pptemp_set_cb), dsp);
 
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
     gtk_widget_set_name (sbar, "TOUR2D:PP_TEMPST");
@@ -390,7 +402,7 @@ tour2dpp_window_open (ggobid *gg) {
 
     adj = gtk_adjustment_new (0.90, 0.50, 1.0, 0.05, 0.05, 0.0);
     gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (t2d_ppcool_set_cb), gg);
+                      GTK_SIGNAL_FUNC (t2d_ppcool_set_cb), dsp);
 
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
     gtk_widget_set_name (sbar, "TOUR2D:PP_COOLING");
@@ -463,8 +475,8 @@ tour2dpp_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
       /*    gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);*/
       populate_option_menu (opt, t2d_pp_func_lbl,
-                          sizeof (t2d_pp_func_lbl) / sizeof (gchar *),
-                          (GtkSignalFunc) t2d_pp_func_cb, gg);
+        sizeof (t2d_pp_func_lbl) / sizeof (gchar *),
+        (GtkSignalFunc) t2d_pp_func_cb, "displayd", (gpointer) dsp);
 
     /*    param_vb = gtk_vbox_new (false, 3);
     gtk_container_set_border_width (GTK_CONTAINER (param_vb), 4);
@@ -507,7 +519,7 @@ tour2dpp_window_open (ggobid *gg) {
       gtk_signal_connect (GTK_OBJECT (dsp->t2d_ppda),
                           "expose_event",
                           (GtkSignalFunc) t2d_ppda_expose_cb,
-                          (gpointer) gg);
+                          (gpointer) dsp);
   
       gtk_container_add (GTK_CONTAINER (frame), dsp->t2d_ppda);
       gtk_widget_show_all (dsp->t2d_window);

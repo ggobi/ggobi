@@ -43,19 +43,23 @@ gint nset;
 /* reset pp variables */
 void reset_pp(datad *d, gint nprev, gint b, ggobid *gg, void *data)
 {
-  displayd *dsp = gg->current_display; 
+  displayd *dsp;
+  GList *l;
+  for (l=gg->displays; l; l=l->next) {
+    dsp = (displayd *) l->data;
 
-  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
-    free_optimize0_p(&dsp->t1d_pp_op);
-    alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
-      1);
-    t1d_pp_reinit(gg);
-  }
-  if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
-    free_optimize0_p(&dsp->t2d_pp_op);
-    alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
-      2);
-    t2d_pp_reinit(gg);
+    if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+      free_optimize0_p(&dsp->t1d_pp_op);
+      alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
+        1);
+      t1d_pp_reinit(dsp, gg);
+    }
+    if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+      free_optimize0_p(&dsp->t2d_pp_op);
+      alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
+        2);
+      t2d_pp_reinit(dsp, gg);
+    }
   }
 }
 
