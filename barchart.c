@@ -266,7 +266,11 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 
     bin = GTK_GGOBI_SPLOT(sp)->planar[m].x;
 #ifdef BARCHART_DFS
-    bin = sp->bar->index_to_rank[m];
+    {
+    vartabled *vtx = vartable_element_get(GTK_GGOBI_SPLOT(sp)->p1dvar, d);
+    if (vtx->vartype == categorical)
+      bin = sp->bar->index_to_rank[m];
+    }
 #endif
     if ((bin >= 0) && (bin < sp->bar->nbins)) {
       sp->bar->cbins[bin][d->color_now.els[m]].count++;
@@ -884,7 +888,8 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
       }
 
       if (bin > sp->bar->nbins - 1) {
-/* check whether the value is the maximum, if so, add it to the last bin - slight inconsistency with histograms */
+/* check whether the value is the maximum, if so, add it to the last bin -
+   slight inconsistency with histograms */
         if (yy == sp->bar->breaks[sp->bar->nbins] + sp->bar->offset) {
           bin--;
           sp->bar->bins[bin].count++;
@@ -893,9 +898,10 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
             sp->bar->high_pts_missing = TRUE;
             if (sp->bar->high_bin == NULL)
               sp->bar->high_bin = (gbind *) g_malloc(sizeof(gbind));
-            if (sp->bar->col_high_bin == NULL)
+            if (sp->bar->col_high_bin == NULL) {
               sp->bar->col_high_bin = (gbind *)
                   g_malloc(sp->bar->ncolors * sizeof(gbind));
+            }
             sp->bar->high_bin->count = 0;
           }
           sp->bar->high_bin->count++;
@@ -1290,7 +1296,6 @@ barchart_scaling_visual_cues_draw(splotd * rawsp, GdkDrawable * drawable,
   displayd *display = gg->current_display;
   datad *d = display->d;
   barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
-
   vtx = vartable_element_get(GTK_GGOBI_SPLOT(sp)->p1dvar, d);
 
   if (!vtx->vartype == categorical) {
