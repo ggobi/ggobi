@@ -218,6 +218,8 @@ matgram_schmidt(gfloat **x1, gfloat **x2, gint nr, gint nc)
   gfloat ip;
 
   for (j=0; j<nc; j++) {
+    norm(x1[j], nr);
+    norm(x2[j], nr);
     ip = inner_prod(x1[j], x2[j], nr);
     for (k=0; k<nr; k++)
       x2[j][k] = x2[j][k] - ip*x1[j][k];
@@ -286,8 +288,8 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
   copy_mat(v1.vals, u1.vals, nc, nd);
   copy_mat(uvevec.vals, u1.vals, nc, nd);
   copy_mat(v.vals, u0.vals, nc, nd);*/
-  stepcntr = 0;
-  nsteps = 0;
+  stepcntr = 1;
+  nsteps = 1;
   dv = 0.0;
   
   /* 2 is hard-wired because it relates to cos, sin
@@ -420,6 +422,23 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
         for (i=0; i<nd; i++)
           tau.els[i] = 0.0;
       }
+
+      /* Check tau */
+      for (i=0; i<nd; i++) {
+        ptinc[0][i] = (gfloat) cos((gdouble) tau.els[i]);
+        ptinc[1][i] = (gfloat) sin((gdouble) tau.els[i]);
+      }
+
+      for (i=0; i<nd; i++) {
+        tmpd1 = ptinc[0][i];
+        tmpd2 = ptinc[1][i];
+        for (j=0; j<nc; j++) {
+          tmpd = v0.vals[i][j]*tmpd1 + v1.vals[i][j]*tmpd2;
+          v.vals[i][j] = tmpd;
+        }
+      }
+      /*      printf("\n%f %f\n",inner_prod(u1.vals[0],v.vals[0],nc),
+	      inner_prod(u1.vals[1],v.vals[1],nc));*/
 
       /* Construct current basis*/
       for (i=0; i<nd; i++)
@@ -562,7 +581,7 @@ increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn,
       nsteps = stepcntr;
     }
 
-  if (attheend || nsteps == 0 || 
+  if (attheend || nsteps == 1 || 
       nsteps == stepcntr) {
     for (i=0; i<nd; i++)
       tinc.els[i] = tau.els[i];
@@ -582,7 +601,7 @@ reached_target(gint nsteps, gint stepcntr, gint basmeth,
 {
   gboolean arewethereyet = false;
 
-  if (nsteps == 0 || stepcntr == nsteps)
+  if (nsteps == 1 || stepcntr == nsteps)
     arewethereyet = true;
   if (basmeth == 1) {
     if (*indxval < *oindxval)
@@ -624,8 +643,8 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dv,
   {
     step = 0.0;
     delta = 0.0;
-    nsteps = 0;
-    stepcntr = 0;
+    nsteps = 1;
+    stepcntr = 1;
   }
   else
   {

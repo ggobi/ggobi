@@ -395,6 +395,8 @@ tour2d_run(displayd *dsp, ggobid *gg)
     tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1, 
       dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
 
+    /*    printf("%f ",dsp->t2d.u.vals[0][0]);*/
+
     /* plot pp indx */
     if (dsp->t2d_ppda != NULL) {
 
@@ -651,7 +653,6 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
     }
 
     while (ftmp < tol) {
-      printf("in fixit routine\n");
         gt_basis(dsp->t2d.tv, dsp->t2d.nvars, dsp->t2d.vars, 
           d->ncols, (gint) 1);
         for (j=0; j<d->ncols; j++) 
@@ -723,13 +724,13 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
         if (dsp->t2d_manip_mode == MANIP_OBLIQUE) 
         {
           distx = dsp->t2d_pos1 - dsp->t2d_pos1_old;
-          disty = dsp->t2d_pos2 - dsp->t2d_pos2_old;
+          disty = dsp->t2d_pos2_old - dsp->t2d_pos2;
           /* seems to go in the wrong direction - 90deg? */
         }
         else if (dsp->t2d_manip_mode == MANIP_VERT) 
         {
           distx = 0.;
-          disty = dsp->t2d_pos2 - dsp->t2d_pos2_old;
+          disty = dsp->t2d_pos2_old - dsp->t2d_pos2;
         }
         else if (dsp->t2d_manip_mode == MANIP_HOR) 
         {
@@ -741,7 +742,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
           if (dsp->t2d_no_dir_flag)
           {
             distx = dsp->t2d_pos1 - dsp->t2d_pos1_old;
-            disty = dsp->t2d_pos2 - dsp->t2d_pos2_old;
+            disty = dsp->t2d_pos2_old - dsp->t2d_pos2;
             dsp->t2d_rx = distx;
             dsp->t2d_ry = disty; 
             dtmp1 = sqrt(dsp->t2d_rx*dsp->t2d_rx+dsp->t2d_ry*dsp->t2d_ry);
@@ -750,9 +751,9 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
             dsp->t2d_no_dir_flag = false;
           }
           distx = (dsp->t2d_rx*(dsp->t2d_pos1 - dsp->t2d_pos1_old) + 
-            dsp->t2d_ry*(dsp->t2d_pos2_old - dsp->t2d_pos2))*dsp->t2d_rx;
+            dsp->t2d_ry*(dsp->t2d_pos2 - dsp->t2d_pos2_old))*dsp->t2d_rx;
           disty = (dsp->t2d_rx*(dsp->t2d_pos1 - dsp->t2d_pos1_old) + 
-            dsp->t2d_ry*(dsp->t2d_pos2_old - dsp->t2d_pos2))*dsp->t2d_ry;
+            dsp->t2d_ry*(dsp->t2d_pos2 - dsp->t2d_pos2_old))*dsp->t2d_ry;
         }
         dtmp1 = (gdouble) (distx*distx+disty*disty);
         len_motion = (gfloat) sqrt(dtmp1);
