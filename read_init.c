@@ -63,7 +63,7 @@ gint getPreferences(const xmlDocPtr doc, GGobiInitInfo *info);
 
 
 GGobiInitInfo *
-read_init_file(const char *filename, GGobiInitInfo *info)
+read_init_file(const gchar *filename, GGobiInitInfo *info)
 {
   xmlDocPtr  doc;
   gchar *fileName;
@@ -134,7 +134,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   if(info->colorSchemeFile == NULL) {
     el = getXMLElement(node, "colorschemes");
     if(el) {
-      char *tmp;
+      gchar *tmp;
       tmp = xmlGetProp(el, "file");
       info->colorSchemeFile = g_strdup(tmp);
     }
@@ -145,13 +145,13 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   if(el) {
     el = getXMLElement(el, "color");
     if(el) {
-	info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
-	getColor(el, doc, NULL, info->bgColor);
-	if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
-				     info->bgColor, false, true) == false)
-	{
-	    g_printerr ("Can't allocate background color\n");
-	}
+      info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
+      getColor(el, doc, NULL, info->bgColor);
+      if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
+           info->bgColor, false, true) == false)
+      {
+        g_printerr ("Can't allocate background color\n");
+      }
     }
   }
 
@@ -160,28 +160,28 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   if(el) {
     el = getXMLElement(el, "color");
     if(el) {
-	info->fgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
-	getColor(el, doc, NULL, info->fgColor);
-	if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
-				     info->fgColor, false, true) == false)
-	{
-	    g_printerr ("Can't allocate foreground color\n");
-	}
+      info->fgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
+      getColor(el, doc, NULL, info->fgColor);
+      if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
+                 info->fgColor, false, true) == false)
+      {
+        g_printerr ("Can't allocate foreground color\n");
+      }
     }
   }
 
 
   el = getXMLElement(node, "glyph");
   if(el) {
-    char *tmp;
+    gchar *tmp;
 
     tmp = xmlGetProp(el, "type");
     if(tmp) {
-	info->glyph.type = mapGlyphName(tmp);
+      info->glyph.type = mapGlyphName(tmp);
     }
     tmp = xmlGetProp(el, "size");
     if(tmp) {
-	info->glyph.size = asNumber(tmp);
+      info->glyph.size = asNumber(tmp);
     }
   }
 
@@ -230,46 +230,46 @@ getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
 DataMode
 getPreviousInput(xmlNode *node, InputDescription *input)
 {
-   const gchar *tmp;
-   DataMode mode = getInputType(node);
-   input->mode = mode;
-   if((tmp = xmlGetProp(node, "name"))) {
-     input->fileName = g_strdup(tmp);
-   } else 
-     input->fileName = NULL;
+  const gchar *tmp;
+  DataMode mode = getInputType(node);
+  input->mode = mode;
+  if((tmp = xmlGetProp(node, "name"))) {
+    input->fileName = g_strdup(tmp);
+  } else 
+    input->fileName = NULL;
 
 
-   /* This shold be connected to 
-        completeFileDesc(input->fileName, input);
-   */
-   if(input->fileName) {
-     gchar *ptr, *tmp1, *tmp2 = NULL;
-     gint i;
-     tmp1 = strrchr(input->fileName, G_DIR_SEPARATOR);
-     if(tmp1) {
-       tmp2 = strrchr(tmp1, '.');
-       if(tmp2)
-         input->givenExtension = g_strdup(tmp2+1);
-       input->baseName = g_malloc((tmp2 - tmp1 +1)*sizeof(gchar));
-       for(i = 0, ptr = tmp1 + 1 ; ptr < tmp2; ptr++, i++) {   
-         input->baseName[i] = *ptr;
-       }
-       input->baseName[i] = '\0';
-       input->dirName = g_malloc((tmp1 - input->fileName +1)*sizeof(gchar));
-       for(i=0, ptr = input->fileName; ptr < tmp1; ptr++, i++) {   
-         input->dirName[i] = *ptr;
-       }
-       input->dirName[i] = '\0';
-     } else {
-       input->fileName = NULL;
-       input->dirName = NULL;
-       input->baseName = NULL;
-     }
-   }
+  /* This shold be connected to 
+       completeFileDesc(input->fileName, input);
+  */
+  if(input->fileName) {
+    gchar *ptr, *tmp1, *tmp2 = NULL;
+    gint i;
+    tmp1 = strrchr(input->fileName, G_DIR_SEPARATOR);
+    if(tmp1) {
+      tmp2 = strrchr(tmp1, '.');
+      if(tmp2)
+        input->givenExtension = g_strdup(tmp2+1);
+      input->baseName = g_malloc((tmp2 - tmp1 +1)*sizeof(gchar));
+      for(i = 0, ptr = tmp1 + 1 ; ptr < tmp2; ptr++, i++) {   
+        input->baseName[i] = *ptr;
+      }
+      input->baseName[i] = '\0';
+      input->dirName = g_malloc((tmp1 - input->fileName +1)*sizeof(gchar));
+      for(i=0, ptr = input->fileName; ptr < tmp1; ptr++, i++) {   
+        input->dirName[i] = *ptr;
+      }
+      input->dirName[i] = '\0';
+    } else {
+      input->fileName = NULL;
+      input->dirName = NULL;
+      input->baseName = NULL;
+    }
+  }
 
-   input->canVerify = 0;
+  input->canVerify = 0;
 
-   return(mode);
+  return(mode);
 }
 
 DataMode
@@ -417,16 +417,16 @@ getDisplayType(const xmlChar *type)
 GGobiPluginInfo*
 getLanguagePlugin(GList *plugins, const char* name)
 {
-    GList *el = plugins;
+  GList *el = plugins;
 
-    while(el) {
-        GGobiPluginInfo *info;
-        info = (GGobiPluginInfo *) el->data;
-        if(strcmp(info->details->name, name) == 0)
-	    return(info);
-	el = el->next;
-    }
-    return(NULL);
+  while(el) {
+    GGobiPluginInfo *info;
+    info = (GGobiPluginInfo *) el->data;
+    if(strcmp(info->details->name, name) == 0)
+      return(info);
+    el = el->next;
+  }
+  return(NULL);
 }
 
 
@@ -445,17 +445,17 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
 
   el = XML_CHILDREN(node);
   while(el) {
-    if(el->type != XML_TEXT_NODE) {
-	if(strcmp(el->name, "plugin") == 0) {
-	    plugin = processPlugin(el, info, doc);
-	    if(plugin)
-		info->plugins = g_list_append(info->plugins, plugin);
-	} else 	if(strcmp(el->name, "inputPlugin") == 0) {
-	    GGobiInputPluginInfo *inputPlugin = processInputPlugin(el, info, doc);
-	    if(inputPlugin)
-		info->inputPlugins = g_list_append(info->inputPlugins, inputPlugin);
-	}
-    }
+   if(el->type != XML_TEXT_NODE) {
+     if(strcmp(el->name, "plugin") == 0) {
+       plugin = processPlugin(el, info, doc);
+       if(plugin)
+         info->plugins = g_list_append(info->plugins, plugin);
+       } else if(strcmp(el->name, "inputPlugin") == 0) {
+         GGobiInputPluginInfo *inputPlugin = processInputPlugin(el, info, doc);
+         if(inputPlugin)
+           info->inputPlugins = g_list_append(info->inputPlugins, inputPlugin);
+       }
+     }
     el = el->next;
   }
 }
@@ -507,15 +507,15 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 gboolean
 getPluginOptions(xmlNodePtr node, GGobiPluginDetails *details, xmlDocPtr doc)
 {
-   xmlNodePtr c;
-   c = getXMLElement(node, "options");
-   if(!c)
-       return(false);
+  xmlNodePtr c;
+  c = getXMLElement(node, "options");
+  if(!c)
+    return(false);
 
-   details->args = getPluginUnnamedArguments(c, details, doc);
-   details->namedArgs = getPluginNamedOptions(c, details, doc);
+  details->args = getPluginUnnamedArguments(c, details, doc);
+  details->namedArgs = getPluginNamedOptions(c, details, doc);
 
-   return(true);
+  return(true);
 }
 
 /**
@@ -526,22 +526,22 @@ getPluginOptions(xmlNodePtr node, GGobiPluginDetails *details, xmlDocPtr doc)
 GSList *
 getPluginUnnamedArguments(xmlNodePtr node, GGobiPluginDetails *details, xmlDocPtr doc)
 {
-    GSList *l = NULL;
-    xmlNodePtr c, el;
-    c = getXMLElement(node, "args");
-    if(!c)
-	return(NULL);
+  GSList *l = NULL;
+  xmlNodePtr c, el;
+  c = getXMLElement(node, "args");
+  if(!c)
+    return(NULL);
 
-    el = XML_CHILDREN(c);
-    while(el) {
-        if(el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
-	    xmlChar *val;
-	    val = xmlNodeListGetString(doc, XML_CHILDREN(el), 1);
-	    l = g_slist_append(l, g_strdup(val));
-	}
-        el = el->next;
+  el = XML_CHILDREN(c);
+  while(el) {
+    if(el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
+      xmlChar *val;
+      val = xmlNodeListGetString(doc, XML_CHILDREN(el), 1);
+      l = g_slist_append(l, g_strdup(val));
     }
-    return(l);
+    el = el->next;
+  }
+  return(l);
 }
 
 
@@ -554,23 +554,23 @@ getPluginUnnamedArguments(xmlNodePtr node, GGobiPluginDetails *details, xmlDocPt
 GHashTable *
 getPluginNamedOptions(xmlNodePtr node, GGobiPluginDetails *details, xmlDocPtr doc)
 {
-    GHashTable *tbl;
-    xmlNodePtr c, el;
-    c = getXMLElement(node, "named");
-    if(!c)
-	return(NULL);    
+  GHashTable *tbl;
+  xmlNodePtr c, el;
+  c = getXMLElement(node, "named");
+  if(!c)
+    return(NULL);    
 
-    tbl = g_hash_table_new(g_str_hash, g_str_equal);
-    el = XML_CHILDREN(c);
-    while(el) {
-        if(el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
-	    xmlChar *val;
-	    val = xmlNodeListGetString(doc, XML_CHILDREN(el), 1);
-	    g_hash_table_insert(tbl, g_strdup(el->name), g_strdup(val));
-	}
-	el = el->next;
+  tbl = g_hash_table_new(g_str_hash, g_str_equal);
+  el = XML_CHILDREN(c);
+  while(el) {
+    if(el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
+      xmlChar *val;
+      val = xmlNodeListGetString(doc, XML_CHILDREN(el), 1);
+      g_hash_table_insert(tbl, g_strdup(el->name), g_strdup(val));
     }
-    return(tbl);
+    el = el->next;
+  }
+  return(tbl);
 }
 
 
@@ -582,88 +582,88 @@ getPluginNamedOptions(xmlNodePtr node, GGobiPluginDetails *details, xmlDocPtr do
 GSList *
 getPluginDependencies(xmlNodePtr node, GGobiPluginDetails *info, xmlDocPtr doc)
 {
-   GSList *list = NULL;
-   xmlNodePtr c, el;
-   c = getXMLElement(node, "dependencies");
-   if(!c)
-       return(NULL);
+  GSList *list = NULL;
+  xmlNodePtr c, el;
+  c = getXMLElement(node, "dependencies");
+  if(!c)
+    return(NULL);
  
-    el = XML_CHILDREN(c);
-    while(el) {
-        if(el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
-	    xmlChar *val;
-            val = xmlGetProp(el, "name");
-            if(val) {
-                list = g_slist_append(list, g_strdup(val));
-	    }
-	}
-        el = el->next;
+  el = XML_CHILDREN(c);
+  while(el) {
+    if(el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
+      xmlChar *val;
+      val = xmlGetProp(el, "name");
+      if(val) {
+        list = g_slist_append(list, g_strdup(val));
+      }
     }
-    return(list);
+    el = el->next;
+  }
+  return(list);
 }
 
 
 void
 getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc)
 {
-    xmlNodePtr c;
-    const xmlChar *tmp;
+  xmlNodePtr c;
+  const xmlChar *tmp;
 
-    c = getXMLElement(node,"dll");
-    if(!c)
-	return;
-    c = getXMLElement(c, "init");
-    if(!c)
-        return;
+  c = getXMLElement(node,"dll");
+  if(!c)
+    return;
+  c = getXMLElement(c, "init");
+  if(!c)
+    return;
 
-    GET_PROP_VALUE(onCreate, "onCreate");
-    GET_PROP_VALUE(onClose, "onClose");
-    GET_PROP_VALUE(onUpdateDisplay, "onUpdateDisplayMenu");
+  GET_PROP_VALUE(onCreate, "onCreate");
+  GET_PROP_VALUE(onClose, "onClose");
+  GET_PROP_VALUE(onUpdateDisplay, "onUpdateDisplayMenu");
 }
 
 
 gboolean
 loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin)
 {
-    /* If it has already been loaded, just return. */
-    if(plugin->loaded) {
-	return(true);
-    }
+  /* If it has already been loaded, just return. */
+  if(plugin->loaded) {
+    return(true);
+  }
 
-       /* Load any plugins on which this one dependens. Make certain they 
-          are fully loaded and initialized. Potential for inter-dependencies
-          that would make this an infinite loop. Hope the user doesn't get this
-          wrong as there are no checks at present.
-        */
-    if(plugin->depends) {
-        GSList *el = plugin->depends;
-	while(el) {
-            char *tmp = (char*) el->data;
-            GGobiPluginInfo *info;
-            info = getLanguagePlugin(sessionOptions->info->plugins, tmp);
-            if(sessionOptions->verbose == GGOBI_VERBOSE) {
-		fprintf(stderr, "Loading dependent plugin %s\n", tmp);fflush(stderr);
-	    }
-            loadPluginLibrary(info->details, info);
-	    el = el->next;
-	}
-    }
-
-    plugin->library = load_plugin_library(plugin);
-    plugin->loaded = (plugin->library != NULL);
-
-    if(plugin->loaded && plugin->onLoad) {
-      OnLoad f = (OnLoad) getPluginSymbol(plugin->onLoad, plugin);
-      if(f) {
-        f(0, realPlugin);
-      } else {
-        gchar buf[1000];
-        dynload->getError(buf, plugin);
-        fprintf(stderr, "error on loading plugin library %s: %s\n",
-                plugin->dllName, buf);fflush(stderr);
+   /* Load any plugins on which this one dependens. Make certain they 
+      are fully loaded and initialized. Potential for inter-dependencies
+      that would make this an infinite loop. Hope the user doesn't get this
+      wrong as there are no checks at present.
+    */
+  if(plugin->depends) {
+    GSList *el = plugin->depends;
+    while(el) {
+      gchar *tmp = (gchar*) el->data;
+      GGobiPluginInfo *info;
+      info = getLanguagePlugin(sessionOptions->info->plugins, tmp);
+      if(sessionOptions->verbose == GGOBI_VERBOSE) {
+        fprintf(stderr, "Loading dependent plugin %s\n", tmp);fflush(stderr);
       }
+      loadPluginLibrary(info->details, info);
+      el = el->next;
     }
-    return(false);
+  }
+
+  plugin->library = load_plugin_library(plugin);
+  plugin->loaded = (plugin->library != NULL);
+
+  if(plugin->loaded && plugin->onLoad) {
+    OnLoad f = (OnLoad) getPluginSymbol(plugin->onLoad, plugin);
+    if(f) {
+      f(0, realPlugin);
+    } else {
+      gchar buf[1000];
+      dynload->getError(buf, plugin);
+      fprintf(stderr, "error on loading plugin library %s: %s\n",
+              plugin->dllName, buf);fflush(stderr);
+    }
+  }
+  return(false);
 }
 
 gboolean 
@@ -716,14 +716,14 @@ getPluginDetails(xmlNodePtr node, GGobiPluginDetails *plugin, xmlDocPtr doc)
 }
 
 void
-fixJavaClassName(char *name)
+fixJavaClassName(gchar *name)
 {
-    char *p = name;
+  gchar *p = name;
     
-    while(p && (p = strchr(p, '.')) != NULL) {
-        p[0] = '/';
-	p++;
-    }
+  while(p && (p = strchr(p, '.')) != NULL) {
+    p[0] = '/';
+    p++;
+  }
 }
 
 void *
@@ -733,49 +733,50 @@ getPluginLanguage(xmlNodePtr node,GGobiInputPluginInfo *iplugin, GGobiPluginType
   const xmlChar *tmp;
   tmp = xmlGetProp(node, "language");
   if(tmp) {
-      GGobiPluginDetails *details;
-      if(strcmp(tmp, "java") == 0) {
-	  JavaInputPluginData *data;
+    GGobiPluginDetails *details;
+    if(strcmp(tmp, "java") == 0) {
+      JavaInputPluginData *data;
 
-          data = (JavaInputPluginData *)g_malloc(sizeof(JavaInputPluginData));
-          memset(data, '\0',sizeof(JavaInputPluginData));
+      data = (JavaInputPluginData *)g_malloc(sizeof(JavaInputPluginData));
+      memset(data, '\0',sizeof(JavaInputPluginData));
 
-	  tmp = xmlGetProp(node, "class");
-	  data->className = g_strdup(tmp); 
-          fixJavaClassName(data->className);
+      tmp = xmlGetProp(node, "class");
+      data->className = g_strdup(tmp); 
+      fixJavaClassName((gchar *)data->className);
 
-          if(type == INPUT_PLUGIN) {
-	      iplugin->data = data;
-	      iplugin->getDescription = g_strdup("JavaGetInputDescription");
-              details = iplugin->details;
-	  } else {
-              GGobiPluginInfo *p = (GGobiPluginInfo *)iplugin;
-	      p->data = data;
-              p->onCreate = g_strdup("JavaCreatePlugin");
-              p->onClose = g_strdup("JavaDestroyPlugin");
-              p->onUpdateDisplay = g_strdup("JavaUpdateDisplayMenu"); 
-              details = p->details;
-	  }
-          value = data;
-
-
-	  {
-	      GGobiPluginInfo *tmp = getLanguagePlugin(info->plugins, "JVM");
-              if(!tmp) {
-	      } else {
-		  GGobiPluginDetails *jdetails = tmp->details;
-		  details->dllName = g_strdup(jdetails->dllName);
-		  details->library = jdetails->library;
-		  details->loaded = 0; /* jdetails->loaded; */
-
-                  details->onLoad = g_strdup("JavaLoadPlugin");
-                  details->onUnload = g_strdup("JavaUnloadPlugin");
-
-		  /*    details->depends = g_slist_append(details->depends, tmp); */
-		  details->depends = g_slist_append(details->depends, g_strdup(jdetails->name));
-	      }
-	  }
+      if(type == INPUT_PLUGIN) {
+        iplugin->data = data;
+        iplugin->getDescription = g_strdup("JavaGetInputDescription");
+        details = iplugin->details;
+      } else {
+        GGobiPluginInfo *p = (GGobiPluginInfo *)iplugin;
+        p->data = data;
+        p->onCreate = g_strdup("JavaCreatePlugin");
+        p->onClose = g_strdup("JavaDestroyPlugin");
+        p->onUpdateDisplay = g_strdup("JavaUpdateDisplayMenu"); 
+        details = p->details;
       }
+      value = data;
+
+
+      {
+        GGobiPluginInfo *tmp = getLanguagePlugin(info->plugins, "JVM");
+        if(!tmp) {
+        } else {
+          GGobiPluginDetails *jdetails = tmp->details;
+          details->dllName = g_strdup(jdetails->dllName);
+          details->library = jdetails->library;
+          details->loaded = 0; /* jdetails->loaded; */
+
+          details->onLoad = g_strdup("JavaLoadPlugin");
+          details->onUnload = g_strdup("JavaUnloadPlugin");
+
+          /*    details->depends = g_slist_append(details->depends, tmp); */
+          details->depends = g_slist_append(details->depends,
+            g_strdup(jdetails->name));
+        }
+      }
+    }
   }
 
   return(value);
@@ -812,31 +813,31 @@ processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 void
 getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr doc)
 {
-    xmlNodePtr c;
-    const xmlChar *tmp;
+  xmlNodePtr c;
+  const xmlChar *tmp;
 
-    tmp = xmlGetProp(node, "interactive");
-    if(tmp) {
-	plugin->interactive = (tmp[0] == 'T' || tmp[0] == 't');
-    }
+  tmp = xmlGetProp(node, "interactive");
+  if(tmp) {
+    plugin->interactive = (tmp[0] == 'T' || tmp[0] == 't');
+  }
 
-    c = getXMLElement(node, "modeName");
-    if(c) {
-      xmlChar *val = xmlNodeListGetString(doc, XML_CHILDREN(c), 1);      
-      plugin->modeName = val;
-    }
+  c = getXMLElement(node, "modeName");
+  if(c) {
+    xmlChar *val = xmlNodeListGetString(doc, XML_CHILDREN(c), 1);      
+    plugin->modeName = val;
+  }
 
-    c = getXMLElement(node,"dll");
-    if(!c)
-	return;
+  c = getXMLElement(node,"dll");
+  if(!c)
+    return;
 
-    c = getXMLElement(c, "init");
-    if(!c)
-        return;
+  c = getXMLElement(c, "init");
+  if(!c)
+    return;
 
-    GET_PROP_VALUE(read_symbol_name, "read");
-    GET_PROP_VALUE(probe_symbol_name, "probe");
-    GET_PROP_VALUE(getDescription, "description");
+  GET_PROP_VALUE(read_symbol_name, "read");
+  GET_PROP_VALUE(probe_symbol_name, "probe");
+  GET_PROP_VALUE(getDescription, "description");
 }
 
 #endif /* end of SUPPORT_PLUGINS */
@@ -881,7 +882,7 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
 }
 
 gint
-resolveVariableName(const char *name, datad *d)
+resolveVariableName(const gchar *name, datad *d)
 { 
   gint j;
   vartabled *vt;
