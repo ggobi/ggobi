@@ -483,7 +483,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
       {
         dsp->t1d_pp_op.index_best = dsp->t1d.ppval;
         dsp->t1d.oppval = dsp->t1d.ppval;
-        for (j=0; j<dsp->t1d.nactive; j++)
+        for (j=0; j<dsp->t1d.nactive; j++) 
           dsp->t1d_pp_op.proj_best.vals[0][j] = 
             dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]];
       }
@@ -520,14 +520,17 @@ tour1d_run(displayd *dsp, ggobid *gg)
         /* get new target according to the selected pp index */
         for (i=0; i<d->ncols; i++)
           dsp->t1d.Fz.vals[0][i] = 0.0;
+        dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[0]]=1.0;
 
         revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
           dsp->t1d.target_selection_method, gg);
 
         if (!revert_random) {
-          for (i=0; i<dsp->t1d.nactive; i++)
-            dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[i]] = 
-              dsp->t1d_pp_op.proj_best.vals[0][i];
+          for (i=0; i<dsp->t1d.nactive; i++) {
+            if (finite(dsp->t1d_pp_op.proj_best.vals[0][i]) != 0)
+              dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[i]] = 
+                dsp->t1d_pp_op.proj_best.vals[0][i];
+	  }
 
           /* if the best projection is the same as the previous one, switch 
               to a random projection */
@@ -550,7 +553,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
           Sleep(2);
 #endif
         }
-        else
+        else /* Use random target */
         {
           gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
             d->ncols, (gint) 1);
@@ -563,7 +566,21 @@ tour1d_run(displayd *dsp, ggobid *gg)
 		      dsp->t1d.Vz,
         dsp->t1d.tau, dsp->t1d.tinc, &dsp->t1d.nsteps, &dsp->t1d.stepcntr, 
         &dsp->t1d.dist_az, &dsp->t1d.tang, cpanel->t1d.step);
-      dsp->t1d.get_new_target = false;
+      if (pathprob == 0) 
+        dsp->t1d.get_new_target = false;
+      else if (pathprob == 1) { /* problems with Fa so need to force a jump */
+        tour1d_scramble(gg);
+        pathprob = path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
+          (gint) 1, dsp->t1d.Ga,
+          dsp->t1d.Gz, dsp->t1d.G, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
+          dsp->t1d.Vz,
+          dsp->t1d.tau, dsp->t1d.tinc, &dsp->t1d.nsteps, &dsp->t1d.stepcntr, 
+          &dsp->t1d.dist_az, &dsp->t1d.tang, cpanel->t1d.step);
+      }
+      else if (pathprob == 2 || pathprob == 3) { /* problems with Fz,
+				    so will force a new choice of Fz */
+        dsp->t1d.get_new_target = true;
+      }
     }
   }
   /*  tour_reproject(dsp, 2);*/
