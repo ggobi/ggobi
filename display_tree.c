@@ -113,14 +113,6 @@ plot_tree_display(ggobid *gg)
     "The display tree is already visible. It should be correct!\n");
   fflush(stderr);
   return(NULL);
-
-  /* 
-   This can attempt to remove the contents of the window,
-   and allow them to be rebuilt so as to be consistent with the
-   current display list.
-  tree = gg->display_tree.tree;
-  gtk_container_remove(GTK_CONTAINER(gtk_widget_get_ancestor(plot_tree_window, GTK_TYPE_WINDOW)), tree);
-  */
  }
 
   tree = gtk_tree_new();
@@ -157,11 +149,12 @@ GtkWidget *
 display_add_tree(displayd *display, gint entry, GtkWidget *tree, ggobid *gg)
 {
   GtkWidget *item, *subTree;
-
+  gchar *label;
   if(tree == NULL)
     return(NULL);
 
-  item = gtk_tree_item_new_with_label(display_tree_label(display));
+  item = gtk_tree_item_new_with_label(label = display_tree_label(display));
+  g_free(label);
   gtk_signal_connect (GTK_OBJECT(item), "select",
                       GTK_SIGNAL_FUNC(display_tree_display_child_select),
                       display);
@@ -238,7 +231,7 @@ gtk_signal_connect (GTK_OBJECT(tree), "select_child",
 gchar *
 display_tree_label(displayd *display)
 {
- gchar *val;
+ gchar *val, *tmp;
 
   switch(display->displaytype) {
     case scatterplot:
@@ -258,7 +251,13 @@ display_tree_label(displayd *display)
     break;
   }
 
- return(val);
+  if(val) {
+      tmp = g_malloc(sizeof(gchar *) * (strlen(val) + strlen(display->d->name + 3 + 1)));
+      sprintf(tmp, "%s (%s)", val, display->d->name);
+  } else
+      tmp = val;
+
+ return(tmp);
 }
 
 /*

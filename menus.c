@@ -615,7 +615,7 @@ viewmode_submenus_update (PipelineMode prev_mode, ggobid *gg)
       }
     }
   } else {
-    if (mode_has_reset_menu (mode)) {
+    if (mode_has_reset_menu (mode) && gg->menus.reset_item == NULL) {
       gg->menus.reset_item = submenu_make ("_Reset", 'R',
         gg->main_accel_group);
       submenu_insert (gg->menus.reset_item,
