@@ -30,12 +30,13 @@ static gboolean build_symbol_vectors (cpaneld *, datad *, ggobid *);
 void
 find_glyph_type_and_size (gint gid, glyphd *glyph)
 {
-/*  gid ranges from 1:49, type from 0 to 6, size from 0 to 7
-  for (i in 1:49) { cat (as.integer((i-1)/8), " ") + 1 }
-  for (i in 1:49) { cat ((i-1) %% 8, " ") }
-*/
-  glyph->type = ( (gid-1) / (gint) NGLYPHSIZES ) + 1 ;
-  glyph->size = ( (gid-1) % (gint) NGLYPHSIZES ) ;
+/*  gid ranges from 0:42, type from 0 to 6, size from 0 to 7 */
+  if (gid == 0) {
+    glyph->type = glyph->size = 0;  /*-- single-pixel point --*/
+  } else {
+    glyph->type = ( (gid-1) / (gint) (NGLYPHSIZES) ) + 1 ;
+    glyph->size = ( (gid-1) % (gint) (NGLYPHSIZES) ) ;
+  }
 }
 
 /*----------------------------------------------------------------------*/

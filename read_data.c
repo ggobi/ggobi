@@ -25,7 +25,7 @@
 /* Make certain this matches GlyphType. */
 const gchar * const GlyphNames[] = {
 /*        ".", "+", "x", "or", "fr", "oc", "fc", "" */
-          ".", "plus", "x", "or", "fr", "oc", "fc", ""
+          ".", "plus", "x", "oc", "or", "fc", "fr", ""
         };
 
 
@@ -324,12 +324,12 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
 static void
 readGlyphErr (void) {
   g_printerr ("The .glyphs file must contain either one number per line,\n");
-  g_printerr ("with the number between 1 and %d; using defaults,\n",
+  g_printerr ("with the number between 0 and %d; using defaults,\n",
     NGLYPHS);
   g_printerr ("or a string and a number, with the string being one of\n");
   g_printerr ("plus, x, or, fr, oc, fc, .  and the number between 1 and %d.\n",
 /*  g_printerr ("+, x, or, fr, oc, fc, .  and the number between 1 and %d.\n",*/
-    NGLYPHSIZES);
+    NGLYPHSIZES-1);
 }
 
 gboolean
@@ -385,6 +385,7 @@ point_glyphs_read (InputDescription *desc, gboolean reinit,
       } else {
         fscanf (fp, "%s", gtype);
 /*-- we're writing out size=1 for point glyphs, so this 'if' isn't right --*/
+/*-- wrong --*/
 /*
         gsize = 1;
         if (strcmp (gtype, ".") != 0)
@@ -399,21 +400,18 @@ point_glyphs_read (InputDescription *desc, gboolean reinit,
         break;
       }
 
-      /*
-       * If the input is a single number on a line
-      */
+      /*-- If the input is a single number on a line --*/
+      /*-- gid is on 0:48; type from 0 to 6, size from 0 to 7 --*/
       if (glyph_format == glyphNumber) {
-
-        if (gid < 1 || gid > NGLYPHS) {
+        if (gid < 0 || gid > NGLYPHS) {
+          g_printerr ("illegal glyph number: %d; using defaults\n", gid);
           use_defaults = true;
           break;
         }
 
         find_glyph_type_and_size (gid, &glyph);
 
-      /*
-       * Else if the input is a string and a number
-      */
+      /*-- Else if the input is a string and a number --*/
       } else {
         glyph.type = mapGlyphName (gtype);
 
@@ -467,8 +465,8 @@ mapGlyphName (const gchar *gtype)
   type = UNKNOWN_GLYPH;
   for (i = 0; i < sizeof (GlyphNames)/sizeof (GlyphNames[0]) - 1; i++) {
     if (strcmp(gtype, GlyphNames[i]) == 0) {
-     type = (GlyphType) (i);
-     break;
+      type = (GlyphType) (i);
+      break;
     }
   }
 

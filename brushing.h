@@ -16,7 +16,7 @@
 
 #define NGLYPHTYPES 7  /* 0:6 */
 #define NGLYPHSIZES 8  /* 0:7 */
-#define NGLYPHS ((NGLYPHTYPES-1)*NGLYPHSIZES + 1)  /* 1:49 */
+#define NGLYPHS ((NGLYPHTYPES-1)*NGLYPHSIZES + 1)  /* 0:48 */
 
 #define OPEN 0
 #define FILL 1
