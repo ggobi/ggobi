@@ -37,8 +37,8 @@ color_link_by_id (gint k, datad *source_d, ggobid *gg)
       d = (datad *) l->data;
       if (d == source_d)
         continue;        /*-- skip the originating datad --*/
- 
-      /*-- if this id exists is in the range of d's ids ... --*/
+
+      /*-- if this id exists, it is in the range of d's ids ... --*/
       if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
         /*-- i is the row number, irrespective of rows_in_plot --*/
         i = d->rowid.idv.els[id];

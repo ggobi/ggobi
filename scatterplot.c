@@ -161,7 +161,6 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
     display->d = d;
   }
 
-
   /* Want to make certain this is true, and perhaps it may be different
      for other plot types and so not be set appropriately in DefaultOptions.
     display->options.axes_center_p = true;

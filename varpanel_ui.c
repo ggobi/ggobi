@@ -349,6 +349,15 @@ varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
 /*                  initialize and populate the var panel                  */
 /*-------------------------------------------------------------------------*/
 
+void
+varpanel_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
+  gint page_num, ggobid *gg)
+{
+  extern void varpanel_reinit (ggobid *gg);
+  varpanel_reinit (gg);
+}
+
+
 /*
  * build the notebook to contain an ebox which will be switched
  * between checkboxes and circles
@@ -362,8 +371,11 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gg->varpanel_ui.notebook = gtk_notebook_new ();
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
     GTK_POS_TOP);
+  gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.notebook), "switch-page",
+    GTK_SIGNAL_FUNC (varpanel_switch_page_cb), gg);
   gtk_box_pack_start (GTK_BOX (parent), gg->varpanel_ui.notebook,
     true, true, 2);
+
 
   gtk_widget_show (gg->varpanel_ui.notebook);
 }

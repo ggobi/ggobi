@@ -106,14 +106,13 @@ projection_get (ggobid* gg) {
  * Use the mode to determine whether the variable selection
  * panel should display checkboxes or circles
 */
-gboolean
-varpanel_highd (ggobid *gg)
+static gboolean
+varpanel_highd (displayd *display)
 {
-  displayd *display = gg->current_display;
   gboolean highd = false;
-  gint projection = gg->projection;
+  gint projection = display->cpanel.projection;
 
-  if (display->displaytype == scatterplot)
+  if (display != NULL && display->displaytype == scatterplot)
     if (projection == TOUR1D || projection == TOUR2D || projection == COTOUR)
       highd = true;
 
@@ -127,58 +126,56 @@ varpanel_permits_circles_or_checkboxes (gint mode)
 /*
  * Use the widget state to figure out which is currently displayed.
 */
-gboolean
-varpanel_shows_circles (ggobid *gg)
+static gboolean
+varpanel_shows_circles (datad *d)
 {
-  datad *d = gg->current_display->d;
-  return GTK_WIDGET_MAPPED (d->vcirc_ui.vbox);
+  return GTK_WIDGET_REALIZED (d->vcirc_ui.vbox);
 }
-gboolean
-varpanel_shows_checkboxes (ggobid *gg)
+static gboolean
+varpanel_shows_checkboxes (datad *d)
 {
-  datad *d = gg->current_display->d;
-  return GTK_WIDGET_MAPPED (d->vcbox_ui.swin);
+  return GTK_WIDGET_REALIZED (d->vcbox_ui.swin);
 }
 
-static void
+void
 varpanel_reinit (ggobid *gg)
 {
-  GSList *l;
   datad *d;
+  gboolean highd;
+  displayd *display = gg->current_display;
+  if (display == NULL) return;
 
-  if (varpanel_highd(gg) && varpanel_shows_checkboxes (gg))
-  {  /*-- remove checkboxes and add circles --*/
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-      /*
-       * add a reference to the checkboxes' scrolled window
-       * (so it won't disappear), then remove it from the ebox.
-      */
-      gtk_widget_ref (d->vcbox_ui.swin);
-      gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
-                                           d->vcbox_ui.swin);
-      /*
-       * Now add the parent vbox for the table of variable circles
-       * to the ebox
-      */
-      gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
+  d = display->d;
+  highd = varpanel_highd (display);
+
+  if (highd && varpanel_shows_checkboxes (d)) {
+    /*-- remove checkboxes and add circles --*/
+    /*
+     * add a reference to the checkboxes' scrolled window
+     * (so it won't disappear), then remove it from the ebox.
+    */
+    gtk_widget_ref (d->vcbox_ui.swin);
+    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
+                                         d->vcbox_ui.swin);
+    /*
+     * Now add the parent vbox for the table of variable circles
+     * to the ebox
+    */
+    gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
                                         d->vcirc_ui.vbox);
-      /*-- update the reference count for the vbox --*/
-      if (GTK_OBJECT (d->vcirc_ui.vbox)->ref_count > 1)
-        gtk_widget_unref (d->vcirc_ui.vbox);
-    }
-  } else if (!varpanel_highd(gg) && varpanel_shows_circles (gg))
-  {  /*-- remove circles and add checkboxes --*/
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-      gtk_widget_ref (d->vcirc_ui.vbox);
-      gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
-                                           d->vcirc_ui.vbox);
-      gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
-                                        d->vcbox_ui.swin);
-      if (GTK_OBJECT (d->vcbox_ui.swin)->ref_count > 1)
-        gtk_widget_unref (d->vcbox_ui.swin);
-    }
+    /*-- update the reference count for the vbox --*/
+    if (GTK_OBJECT (d->vcirc_ui.vbox)->ref_count > 1)
+      gtk_widget_unref (d->vcirc_ui.vbox);
+
+  } else if (!highd && varpanel_shows_circles (d)) {
+    /*-- remove circles and add checkboxes --*/
+    gtk_widget_ref (d->vcirc_ui.vbox);
+    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
+                                         d->vcirc_ui.vbox);
+    gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
+                                      d->vcbox_ui.swin);
+    if (GTK_OBJECT (d->vcbox_ui.swin)->ref_count > 1)
+      gtk_widget_unref (d->vcbox_ui.swin);
   }
 }
 

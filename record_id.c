@@ -56,6 +56,7 @@ rowidv_init (datad *d) {
      *   row.id.els = {1,3,5}
      *   row.idv.els = {-1,0,-1,1,-1,2}
     */  
+
     for (i=0; i<d->nrows; i++) {
       k = d->rowid.id.els[i];
       d->rowid.idv.els[k] = i;
