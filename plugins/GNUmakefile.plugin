@@ -1,0 +1,60 @@
+ifndef GGOBI_HOME
+ GGOBI_HOME=../..
+endif
+
+ifdef GGOBI_DEVELOPER
+-include $(GGOBI_HOME)/local.config
+else
+-include $(GGOBI_HOME)/Makeconf
+endif
+
+ifdef ADMIN
+ include Install/GNUmakefile.admin
+endif
+
+include local.config
+
+
+ifdef GGOBI_CONFIG
+ GGOBI_CFLAGS=$(shell $(GGOBI_CONFIG) --cflags)
+ GGOBI_LIB=$(shell $(GGOBI_CONFIG) --libs)
+else
+ GGOBI_INCLUDE_DIR=-I$(GGOBI_HOME)
+ GGOBI_LIB=-L$(GGOBI_HOME) -lggobi
+ GGOBI_CFLAGS=$(GGOBI_INCLUDE_DIR)
+endif
+
+ifndef SRC
+ SRC=$(wildcard *.c *.f)
+endif
+
+ifndef OBJS
+ OBJS=$(patsubst %.c,%.o, $(SRC))
+endif
+
+ifndef SO_LD_FLAGS
+ SO_LD_FLAGS=-shared
+endif
+
+GTK_LIBS=$(shell $(GTK_CONFIG) --libs)
+
+GTK_CFLAGS=$(shell $(GTK_CONFIG) --cflags)
+
+%.o: %.c
+	$(CC) -c $(PLUGIN_CFLAGS) $(CFLAGS) $(GTK_CFLAGS) $(GGOBI_CFLAGS) $<
+
+%.so: $(OBJS)
+	$(CC) $(SO_LD_FLAGS) $(PLUGIN_LD_FLAGS) $(OBJS) -o $@ $(PLUGIN_LIBS) $(GGOBI_LIB) $(GTK_LIBS)
+
+objects: 
+	@echo "$(OBJS)"
+
+clean:
+	rm -f *.o *.so
+
+local.config: local.config.in configure
+	./configure
+
+
+show:
+	@echo $(OBJS)

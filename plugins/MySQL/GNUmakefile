@@ -33,9 +33,6 @@ $(PKG).so: $(OBJS)
 local.config:  configure
 	./configure
 
-configure: configure.in
-	autoconf
-
 clean:
 	-rm $(OBJS)
 
