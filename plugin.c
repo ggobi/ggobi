@@ -138,10 +138,16 @@ load_plugin_library(GGobiPluginDetails *plugin)
 DLFUNC 
 getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
 {
+  char tmp[100];
+#ifdef HAVE_UNDERSCORE_SYMBOL_PREFIX
+  sprintf(tmp, "_%s", name);
+#else
+  sprintf(tmp, "%s", name);
+#endif
   if(plugin->library == NULL && plugin->loaded != DL_LOADED) {
      plugin->library = load_plugin_library(plugin);   
   }
-  return(dynload->resolve(plugin->library, name));
+  return(dynload->resolve(plugin->library, tmp));
 }
 
 
