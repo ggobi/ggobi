@@ -285,7 +285,7 @@ void scatterplot_show_hrule (displayd *, gboolean show);
 void scatterplot_show_rulers (displayd *, gint);
 void scatterplot_show_vrule (displayd *, gboolean show);
 gboolean scree_mapped_p (ggobid *);
-void scree_plot_make (datad *, ggobid *);
+void scree_plot_make (ggobid *);
 gint selected_cols_get (gint *, datad *d, ggobid *);
 void smooth_window_open (ggobid *);
 void sp_event_handlers_toggle (splotd *, gboolean);

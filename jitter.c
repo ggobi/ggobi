@@ -107,16 +107,22 @@ rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
 
 void
 jitter_value_set (gfloat value, datad *d, ggobid *gg) {
-  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+
   gint j;
-  gint ncols = selected_cols_get (cols, d, gg);
+/*
+ *gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+ *gint ncols = selected_cols_get (cols, d, gg);
+ *if (ncols == 0)
+ *  ncols = plotted_cols_get (cols, d, gg);
+*/
 
-  if (ncols == 0)
-    ncols = plotted_cols_get (cols, d, gg);
+  for (j=0; j<nvars; j++)
+    d->vartable[vars[j]].jitter_factor = value;
 
-  for (j=0; j<ncols; j++)
-    d->vartable[cols[j]].jitter_factor = value;
-
-  g_free ((gpointer) cols);
+  g_free ((gpointer) vars);
 }
 

@@ -187,8 +187,9 @@ void pca_diagnostics_set (datad *d, ggobid *gg) {
   gfloat ftmp1=0.0, ftmp2=0.0;
   gfloat firstpc, lastpc;
 
-  g_assert (d->sphere.npcs > 0);
-  g_assert (d->sphere.eigenval.nels >= d->sphere.npcs);
+  if (d == NULL || d->sphere.npcs <= 0
+      || d->sphere.eigenval.nels < d->sphere.npcs)
+        return;
 
   firstpc = d->sphere.eigenval.els[0];
   lastpc = d->sphere.eigenval.els[d->sphere.npcs-1];
@@ -240,30 +241,36 @@ npcs_get (datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-spherevars_set (datad *d, ggobid *gg) {
+spherevars_set (ggobid *gg) {
   extern void vars_stdized_send_event (datad *d, ggobid *gg);
   extern void sphere_npcs_range_set (gint n, ggobid *gg);
-  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  gint j, ncols;
+  gint j, nvars, *vars;
+  datad *d;
+  GtkWidget *clist;
 
-  ncols = selected_cols_get (cols, d, gg);
-  if (ncols == 0)
-    ncols = plotted_cols_get (cols, d, gg);
+  if (gg->sphere_ui.window == NULL) return;
 
-  if (d->sphere.vars.els == NULL || d->sphere.vars.nels != ncols) {
-    sphere_malloc (ncols, d, gg);
+  clist = get_clist_from_object (GTK_OBJECT(gg->sphere_ui.window));
+  if (clist == NULL) return;
+
+  d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+  nvars = get_selections_from_clist (d->ncols, vars, clist);
+
+  if (d->sphere.vars.els == NULL || d->sphere.vars.nels != nvars) {
+    sphere_malloc (nvars, d, gg);
   }
 
-  for (j=0; j<ncols; j++)
-    d->sphere.vars.els[j] = cols[j];
+  for (j=0; j<nvars; j++)
+    d->sphere.vars.els[j] = vars[j];
 
   /*-- update the "vars stdized?" text entry --*/
   vars_stdized_send_event (d, gg);
 
   /*-- reset the spinner so that its max is the number of sphered vars --*/
-  sphere_npcs_range_set (ncols, gg);
+  sphere_npcs_range_set (nvars, gg);
 
-  g_free (cols);
+  g_free (vars);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -482,7 +489,6 @@ pca_calc (datad *d, ggobid *gg) {
   gboolean svd_ok;
 
   eigenvec_zero (d, gg);
-/*spherevars_set (d, gg);*/
 
   sphere_varcovar_set (d, gg);
   

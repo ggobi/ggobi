@@ -6,7 +6,7 @@
 #include "vars.h"
 #include "externs.h"
 
-extern void spherevars_set (datad *, ggobid *);
+extern void spherevars_set (ggobid *);
 extern void sphere_varcovar_set (datad *, ggobid *);
 extern void spherize_data (vector_i *svars, vector_i *pcvars, datad *, ggobid *);
 
@@ -207,7 +207,7 @@ scree_restore_cb (GtkWidget *w, datad *d)
     /*-- update the "vars stdized?" text entry --*/
     vars_stdized_send_event (d, gg);
 
-    scree_plot_make (d, gg);
+    scree_plot_make (gg);
 
   }  else {
     g_printerr ("sorry, there are no sphered variables to use\n");
@@ -222,8 +222,8 @@ static void
 scree_update_cb (GtkWidget *w, datad *d)
 { 
   ggobid *gg = GGobiFromWidget (w, true);
-  spherevars_set (d, gg);
-  scree_plot_make (d, gg);
+  spherevars_set (gg);
+  scree_plot_make (gg);
 }
 
 /*-- called when closed from the close button --*/
@@ -324,8 +324,18 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
  * Called when the sphere panel is opened, and when the update
  * button is pressed.
 */
-void scree_plot_make (datad *d, ggobid *gg)
+void scree_plot_make (ggobid *gg)
 {
+  GtkWidget *clist;
+  datad *d;
+
+  if (gg->sphere_ui.window == NULL) return;
+
+  clist = get_clist_from_object (GTK_OBJECT(gg->sphere_ui.window));
+  if (clist == NULL) return;
+
+  d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+
   if (pca_calc (d, gg)) {  /*-- spherevars_set is called here --*/
     gboolean rval = false;
     gtk_signal_emit_by_name (GTK_OBJECT (gg->sphere_ui.scree_da),
@@ -347,6 +357,7 @@ sphere_panel_open (ggobid *gg)
   GtkWidget *label;
   GtkWidget *spinner;
   datad *d;
+  GtkWidget *notebook;
   /*-- for the clist of sphered variables --*/
   GtkWidget *scrolled_window;
   gchar *titles[1] = {"sphered variables"};
@@ -356,12 +367,16 @@ sphere_panel_open (ggobid *gg)
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
 /**/return;
 
+/*
+ * Maybe I'll change this, and leave all the following entries
+ * and lists blank until variables are chosen in the new variable list.
+*/
   d = gg->current_display->d;
-  spherevars_set (d, gg); 
+  spherevars_set (gg); 
 
   if (gg->sphere_ui.window == NULL) {
     GtkWidget *btn;
-    gg->sphere_ui.d = d;
+    /*gg->sphere_ui.d = d;*/
 
     gg->sphere_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->sphere_ui.window),
@@ -374,6 +389,10 @@ sphere_panel_open (ggobid *gg)
     /*-- partition the screen vertically: scree plot, choose nPCs, apply --*/
     vbox = gtk_vbox_new (false, 2);
     gtk_container_add (GTK_CONTAINER (gg->sphere_ui.window), vbox);
+
+    /* Create a notebook, set the position of the tabs */
+    notebook = create_variable_notebook (vbox, GTK_SELECTION_EXTENDED,
+      (GtkSignalFunc) NULL, gg);
 
     /*-- element 1: update scree plot when n selected vars changes --*/
     btn = gtk_button_new_with_label ("Update scree plot");
@@ -560,10 +579,13 @@ sphere_panel_open (ggobid *gg)
       "Close the sphering window", NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (close_btn_cb), gg);
+
+    gtk_object_set_data (GTK_OBJECT (gg->sphere_ui.window),
+      "notebook", notebook);
   }
 
   gtk_widget_show_all (gg->sphere_ui.window);
   gdk_flush ();
 
-  scree_plot_make (d, gg);
+  scree_plot_make (gg);
 }
