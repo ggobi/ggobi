@@ -11,15 +11,19 @@
 #define HISTOGRAM_HEIGHT 100
 #define HISTOGRAM_MARGIN  10
 
+typedef int (*CompareFunc)(const void *, const void *);
+
 typedef enum {deflt, within, between, anchorscales, anchorfixed} MDSGroupInd;
 typedef enum {metric, nonmetric} MDSMetricInd;
 typedef enum {KruskalShepard, classic} MDSKSInd;
 typedef enum {LinkDist, VarValues} MDSDtargetSource;
 
+
 typedef struct {
 
-  array_g Dtarget;
-  array_g pos;
+  array_d Dtarget;
+  array_d pos;
+
 
   GdkPixmap *stressplot_pix;
   GdkPixmap *histogram_pix;
@@ -28,14 +32,14 @@ typedef struct {
   gint mds_dims;
   gdouble mds_stepsize;
   gdouble mds_power;
-  gdouble mds_dist_power;
+  gdouble mds_D_power;
   gdouble mds_lnorm;
   gdouble mds_weight_power;
 
 /* callbacks not written */
   gdouble mds_isotonic_mix;
-  gdouble mds_distpow_over_lnorm;
-  gdouble mds_lnorm_over_distpow;
+  gdouble mds_D_power_over_lnorm;
+  gdouble mds_lnorm_over_D_power;
   gdouble mds_within_between;
   gdouble mds_rand_select_val;
   gdouble mds_rand_select_new;
@@ -43,11 +47,29 @@ typedef struct {
   gdouble mds_threshold_high;
   gdouble mds_threshold_low;
 
+  vector_d pos_mean;
+  vector_d weights;
+  vector_d trans_dist;
+  vector_d config_dist;
+  vector_i point_status;
+  vector_i trans_dist_index, bl;
+  array_d gradient;
+  vector_d bl_w;
+  gdouble pos_scl;
+  gdouble dist_max;
+  vector_d rand_sel;
+  gint mds_freeze_var;
+  gint ndistances;
+  gint num_active_dist;
+  gint prev_nonmetric_active_dist;
+
 /* callbacks written */
   MDSMetricInd metric_nonmetric;
   MDSKSInd KruskalShepard_classic;
   MDSDtargetSource Dtarget_source;
   gboolean complete_Dtarget;
+
+  MDSGroupInd mds_group_ind;
 
 } ggvisd;
 

@@ -44,11 +44,11 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
   datad *e = gg->current_display->e;
   GtkWidget *clist;
   gint i, j, selected_var;
-  greal infinity;
+  gdouble infinity;
   gboolean changing;
   gint end1, end2, end3;
-  greal d12;
-  greal **Dvals;
+  gdouble d12;
+  gdouble **Dvals;
   endpointsd *endpoints;
 
 /*
@@ -61,9 +61,9 @@ large size of it isn't important.
 */
 
   /*-- allocate --*/
-  arrayg_alloc (&ggv->Dtarget, d->nrows, d->nrows);
+  arrayd_alloc (&ggv->Dtarget, d->nrows, d->nrows);
   /*-- initalize --*/
-  infinity = (greal) (2 * d->nrows);
+  infinity = (gdouble) (2 * d->nrows);
   for (i=0; i<d->nrows; i++) {
     for (j=0; j<d->nrows; j++)
       ggv->Dtarget.vals[i][j] = infinity;
@@ -156,11 +156,11 @@ void ggv_power_cb (GtkAdjustment *adj, PluginInstance *inst)
   ggv->mds_power = adj->value;
  g_printerr ("mds_power = %f\n", ggv->mds_power);
 }
-void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst)
+void ggv_D_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_dist_power = adj->value;
- g_printerr ("mds_dist_power = %f\n", ggv->mds_dist_power);
+  ggv->mds_D_power = adj->value;
+ g_printerr ("mds_D_power = %f\n", ggv->mds_D_power);
 }
 void ggv_lnorm_cb (GtkAdjustment *adj, PluginInstance *inst)
 {

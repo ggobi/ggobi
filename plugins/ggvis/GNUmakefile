@@ -26,7 +26,7 @@ GGOBI_LIB=
 
 
 HEADERS=ggvis defines
-SRC=ggvis init ggv_cbacks stressplot histogram
+SRC=ggvis init ggv_cbacks stressplot histogram mds
 OBJS=$(SRC:%=%.o)
 
 $(PKG).so: $(OBJS)
