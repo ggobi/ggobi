@@ -120,12 +120,14 @@ void radial_cb (GtkButton *button, PluginInstance *inst);
 void highlight_edges_cb (GtkButton *button, PluginInstance *inst);
 ggvisd* GGVisFromInst (PluginInstance *inst);
 void highlight_sticky_edges (ggobid *, gint, gint , datad *d, void *inst);
+
+#ifdef CMDS
 gint cmds (array_d *D, array_d *X);
 void spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos);
+#endif
 
 #ifdef GRAPHVIZ
-void dot_layout_cb (GtkButton *button, PluginInstance *inst);
-void neato_layout_cb (GtkButton *button, PluginInstance *inst);
+void dot_neato_layout_cb (GtkWidget *, PluginInstance *inst);
 #endif
 
 #define GGVIS_H

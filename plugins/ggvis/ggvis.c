@@ -151,6 +151,7 @@ set_dist_matrix_from_edges (datad *d, datad *e, ggobid *gg, ggvisd *ggv)
   scale_array_max (&ggv->dist, nNodes, nNodes);
 }
 
+#ifdef CMDS
 /*-- move this to cmds_ui.c? --*/
 static void cmds_cb (GtkButton *button, PluginInstance *inst)
 {
@@ -235,6 +236,7 @@ g_printerr ("through spring_once (ten times)\n");
   }
   displays_tailpipe (FULL, gg);
 }
+#endif
 
 
 GtkWidget *
@@ -259,6 +261,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
     GTK_POS_TOP);
   gtk_box_pack_start (GTK_BOX (main_vbox), notebook, false, false, 2);
 
+#ifdef CMDS
   /*-- network tab: cmds --*/
   frame = gtk_frame_new ("Network layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
@@ -280,6 +283,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   label = gtk_label_new ("Network");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                             frame, label);
+#endif
 
   /*-- radial tab --*/
   frame = gtk_frame_new ("Radial layout");
@@ -316,16 +320,18 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
   btn = gtk_button_new_with_label ("dot");
+  gtk_widget_set_name (btn, "dot");
 #ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (dot_layout_cb), (gpointer) inst);
+                      GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
 #endif
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
   btn = gtk_button_new_with_label ("neato");
+  gtk_widget_set_name (btn, "neato");
 #ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (neato_layout_cb), (gpointer) inst);
+                      GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
 #endif
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 

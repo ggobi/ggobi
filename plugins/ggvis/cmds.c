@@ -1,5 +1,7 @@
 /*  Heike Hofmann */
 
+#ifdef CMDS
+
 #include <gtk/gtk.h>
 #include "ggobi.h"
 #include "externs.h"
@@ -478,3 +480,4 @@ g_printerr ("trace of c after decomposition: %.2f\n",sum);
   return 0;
 }
 
+#endif

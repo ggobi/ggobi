@@ -34,6 +34,7 @@ EXTLIB_LIB=-ljpeg -lpng -lfreetype -lz
 
 CFLAGS+= -DGRAPHVIZ=1 $(GVINC)
 LDFLAGS+=$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan -lgd -lcdt $(EXTLIB_LIB)
+LDFLAGS+=$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan $(GVIZ)/build/$(ARCH)/lib/libgd.a -lcdt $(EXTLIB_LIB)
 endif
 
 ifdef BINARY_IO_IMPLEMENTED

@@ -53,4 +53,5 @@ ggvis_init (ggvisd *ggv) {
   ggv->KruskalShepard_classic = KRUSKALSHEPARD;
 
   ggv->radial = NULL;
+  ggv->graphviz = NULL;
 }
