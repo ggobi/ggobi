@@ -77,14 +77,6 @@ struct _datad {
   GArray *rowlab; /*-- allocates memory in chunks --*/
 
  /*-- row ids to support generalized linking --*/
-/*
-  struct _RowID {
-    vector_i id;
-    vector_i idv;
-    int maxId;
-  } rowid;
-*/
-
   GHashTable *idTable;
   char **rowIds;
 
