@@ -7,8 +7,6 @@
 #define WIDTH   150
 #define HEIGHT  300
 
-static GtkAccelGroup *pc_accel_group;
-static GtkWidget *arrangement_box;
 
 /*--------------------------------------------------------------------*/
 /*                   Display section                                  */
@@ -86,17 +84,17 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   for (l=display->splots; l; l=l->next) {
     w = ((splotd *) l->data)->da;
     gtk_widget_ref (w);
-    gtk_container_remove (GTK_CONTAINER (arrangement_box), w);
+    gtk_container_remove (GTK_CONTAINER (gg->parcoords.arrangement_box), w);
   }
 
-  frame = arrangement_box->parent;
-  gtk_widget_destroy (arrangement_box);
+  frame = gg->parcoords.arrangement_box->parent;
+  gtk_widget_destroy (gg->parcoords.arrangement_box);
 
   if (arrangement == ARRANGE_ROW)
-    arrangement_box = gtk_hbox_new (true, 0);
+    gg->parcoords.arrangement_box = gtk_hbox_new (true, 0);
   else
-    arrangement_box = gtk_vbox_new (true, 0);
-  gtk_container_add (GTK_CONTAINER (frame), arrangement_box);
+    gg->parcoords.arrangement_box = gtk_vbox_new (true, 0);
+  gtk_container_add (GTK_CONTAINER (frame), gg->parcoords.arrangement_box);
 
   display->p1d_orientation = (arrangement == ARRANGE_ROW) ? VERTICAL :
                                                             HORIZONTAL;
@@ -115,10 +113,10 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   for (l=display->splots; l; l=l->next) {
     sp = (splotd *) l->data;
     gtk_widget_set_usize (sp->da, width, height);
-    gtk_box_pack_start (GTK_BOX (arrangement_box), sp->da, true, true, 0);
+    gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box), sp->da, true, true, 0);
   }
 
-  gtk_widget_show_all (arrangement_box);
+  gtk_widget_show_all (gg->parcoords.arrangement_box);
 
   display_tailpipe (display, gg);
 
@@ -157,15 +155,15 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots, ggobid *
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (display->window), vbox);
 
-  pc_accel_group = gtk_accel_group_new ();
+  gg->parcoords.pc_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 pc_accel_group, display->window, &mbar, (gpointer) display);
+                 gg->parcoords.pc_accel_group, display->window, &mbar, (gpointer) display);
 
   /*
    * After creating the menubar, and populating the file menu,
    * add the Display Options and Link menus another way
   */
-  parcoords_display_menus_make (display, pc_accel_group,
+  parcoords_display_menus_make (display, gg->parcoords.pc_accel_group,
                                  display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
@@ -182,8 +180,8 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots, ggobid *
  * this is the box that would have to change from horizontal to vertical
  * when the plot arrangement changes
 */
-  arrangement_box = gtk_hbox_new (true, 0);
-  gtk_container_add (GTK_CONTAINER (frame), arrangement_box);
+  gg->parcoords.arrangement_box = gtk_hbox_new (true, 0);
+  gtk_container_add (GTK_CONTAINER (frame), gg->parcoords.arrangement_box);
 
   display->splots = NULL;
 
@@ -198,7 +196,7 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots, ggobid *
        sp = sub_plots[i];
 
     display->splots = g_list_append (display->splots, (gpointer) sp);
-    gtk_box_pack_start (GTK_BOX (arrangement_box), sp->da, true, true, 0);
+    gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box), sp->da, true, true, 0);
   }
 
   gtk_widget_show_all (display->window);

@@ -169,6 +169,14 @@ ggobi_alloc()
   tmp = g_malloc(sizeof(ggobid));
 
   memset(tmp, '\0', sizeof(ggobid));
+  tmp->app.firsttime = true;
+  tmp->app.direction = FORWARD;
+  tmp->app.mode = XYPLOT;
+  tmp->app.prev_mode = XYPLOT;
+  tmp->app.projection = XYPLOT;
+  tmp->app.prev_projection = XYPLOT;
+
+  tmp->color_ui.margin = 10;
 
   all_ggobis = g_realloc(all_ggobis, sizeof(ggobid*)*(num_ggobis+1));
   all_ggobis[num_ggobis] = tmp;

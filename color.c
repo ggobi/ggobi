@@ -5,7 +5,7 @@
 #include "vars.h"
 #include "externs.h"
 
-static gfloat default_rgb[NCOLORS][3] = {
+static const gfloat default_rgb[NCOLORS][3] = {
   {1.00, 0.08, 0.58},
   {1.00, 0.27, 0.00},
   {1.00, 0.55, 0.00},
@@ -18,8 +18,8 @@ static gfloat default_rgb[NCOLORS][3] = {
   {0.73, 0.33, 0.83}
 };
 
-static gfloat bg_rgb[]     = {0, 0, 0};  /* -> bg_color */
-static gfloat accent_rgb[] = {1, 1, 1};  /* -> fg_color */
+static const gfloat bg_rgb  []    = {0, 0, 0};  /* -> bg_color */
+static const gfloat accent_rgb [] = {1, 1, 1};  /* -> fg_color */
 
 /* API */
 static guint m[NCOLORS][3];

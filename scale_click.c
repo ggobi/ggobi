@@ -15,9 +15,9 @@ pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 }
 
 void
-zoom_step (splotd *sp, gint zoom_opt, gint in_or_out, rectd *rect)
+zoom_step (splotd *sp, gint zoom_opt, gint in_or_out, rectd *rect, ggobid* gg)
 {
-  gint projection = projection_get ();
+  gint projection = projection_get (gg);
   gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
   gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;
   gfloat scalefac_x = 1.0, scalefac_y = 1.0;

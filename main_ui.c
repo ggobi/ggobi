@@ -7,13 +7,11 @@
 #include "externs.h"
 #include "display_tree.h"
 
-static gint mode = XYPLOT, prev_mode = XYPLOT;
-static gint projection = XYPLOT, prev_projection = XYPLOT;
 
 const gchar * const GGobiGTKey = "GGobi";
 
 
-static GtkWidget *mode_frame;
+
 static char *mode_name[] = {
   "1D Plot",
   "XYPlot",
@@ -40,23 +38,23 @@ size_allocate_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
 
     /*-- Use the largest control panel, which is currently COTOUR --*/
     GtkWidget *largest_panel = gg->control_panel[COTOUR];
-    GtkWidget *mode_panel = gg->control_panel[mode];
+    GtkWidget *mode_panel = gg->control_panel[gg->app.mode];
 
     /* remove the xyplot panel */
     gtk_widget_ref (mode_panel);
-    gtk_container_remove (GTK_CONTAINER (mode_frame), mode_panel);
+    gtk_container_remove (GTK_CONTAINER (gg->app.mode_frame), mode_panel);
 
     /* add the largest panel and resize */
-    gtk_container_add (GTK_CONTAINER (mode_frame), largest_panel);
+    gtk_container_add (GTK_CONTAINER (gg->app.mode_frame), largest_panel);
     gtk_container_check_resize (GTK_CONTAINER (w));
 
     /* remove the largest panel and restore the xyplot panel */
     gtk_widget_ref (largest_panel);
-    gtk_container_remove (GTK_CONTAINER (mode_frame), largest_panel);
-    gtk_container_add (GTK_CONTAINER (mode_frame), mode_panel);
+    gtk_container_remove (GTK_CONTAINER (gg->app.mode_frame), largest_panel);
+    gtk_container_add (GTK_CONTAINER (gg->app.mode_frame), mode_panel);
 
     /*-- widen the variable selection panel --*/
-    varpanel_size_init (largest_panel->requisition.height);
+    varpanel_size_init (largest_panel->requisition.height, gg);
 
     initd = true;
   }
@@ -87,7 +85,7 @@ make_control_panels (ggobid *gg) {
 void
 main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w) 
 {
-  if (mode_frame == NULL)  /* so it isn't executed on startup */
+  if (gg->app.mode_frame == NULL)  /* so it isn't executed on startup */
     return;
   else
     g_printerr ("(main_display_options_cb) action = %d\n", action);
@@ -101,9 +99,9 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
 
     case 1:
       if (w->active)
-        gtk_widget_hide (mode_frame);
+        gtk_widget_hide (gg->app.mode_frame);
       else
-        gtk_widget_show (mode_frame);
+        gtk_widget_show (gg->app.mode_frame);
       break;
 
     case 2:
@@ -280,12 +278,12 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
 }
 
 gint
-mode_get () {
-  return mode;
+mode_get (ggobid* gg) {
+  return gg->app.mode;
 }
 gint
-projection_get () {
-  return projection;
+projection_get (ggobid* gg) {
+  return gg->app.projection;
 }
 
 
@@ -296,15 +294,15 @@ void
 mode_set (gint m, ggobid *gg) {
   displayd *display = gg->current_display;
 
-  mode = m;
-  if (mode != prev_mode) {
+  gg->app.mode = m;
+  if (gg->app.mode != gg->app.prev_mode) {
     /* Add a reference to the widget so it isn't destroyed */
-    gtk_widget_ref (gg->control_panel[prev_mode]);
-    gtk_container_remove (GTK_CONTAINER (mode_frame),
-                          gg->control_panel[prev_mode]);
+    gtk_widget_ref (gg->control_panel[gg->app.prev_mode]);
+    gtk_container_remove (GTK_CONTAINER (gg->app.mode_frame),
+                          gg->control_panel[gg->app.prev_mode]);
   
-    gtk_frame_set_label (GTK_FRAME (mode_frame), mode_name[mode]);
-    gtk_container_add (GTK_CONTAINER (mode_frame), gg->control_panel[mode]);
+    gtk_frame_set_label (GTK_FRAME (gg->app.mode_frame), mode_name[gg->app.mode]);
+    gtk_container_add (GTK_CONTAINER (gg->app.mode_frame), gg->control_panel[gg->app.mode]);
   }
 
   /*
@@ -314,16 +312,16 @@ mode_set (gint m, ggobid *gg) {
    * value of projection is irrelevant.)
   */
   if (display->displaytype == scatterplot) {
-    if (mode <= COTOUR)
-      projection = display->cpanel.projection = mode;
+    if (gg->app.mode <= COTOUR)
+      gg->app.projection = display->cpanel.projection = gg->app.mode;
 
-    if (projection != prev_projection) {
-      scatterplot_show_rulers (display, projection);
-      prev_projection = projection;
+    if (gg->app.projection != gg->app.prev_projection) {
+      scatterplot_show_rulers (display, gg->app.projection);
+      gg->app.prev_projection = gg->app.projection;
     }
   }
 
-  prev_mode = mode;
+  gg->app.prev_mode = gg->app.mode;
 
 /*  varpanel_refresh ();*/
 }
@@ -390,15 +388,15 @@ mode_set_cb (GtkWidget *widget, gint action)
     displayd *display = gg->current_display;
 
     sp_event_handlers_toggle (sp, off);
-    mode_activate (sp, mode, off, gg);
-    mode_submenus_activate (sp, mode, off, gg);
+    mode_activate (sp, gg->app.mode, off, gg);
+    mode_submenus_activate (sp, gg->app.mode, off, gg);
 
     display->cpanel.mode = action;
     mode_set (action, gg);  /* mode = action */
 
     sp_event_handlers_toggle (sp, on);
-    mode_activate (sp, mode, on, gg);
-    mode_submenus_activate (sp, mode, on, gg);
+    mode_activate (sp, gg->app.mode, on, gg);
+    mode_submenus_activate (sp, gg->app.mode, on, gg);
 
     display_tailpipe (display, gg);
   }
@@ -618,13 +616,13 @@ void make_ui (ggobid *gg) {
  * Create a frame to hold the mode panels, set its label
  * and contents, using the default mode for the default display.
 */
-  mode_frame = gtk_frame_new (mode_name[mode]);
-  gtk_box_pack_start (GTK_BOX (hbox), mode_frame, false, false, 3);
-  gtk_container_set_border_width (GTK_CONTAINER (mode_frame), 3);
-  gtk_frame_set_shadow_type (GTK_FRAME (mode_frame), GTK_SHADOW_IN);
+  gg->app.mode_frame = gtk_frame_new (mode_name[gg->app.mode]);
+  gtk_box_pack_start (GTK_BOX (hbox), gg->app.mode_frame, false, false, 3);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->app.mode_frame), 3);
+  gtk_frame_set_shadow_type (GTK_FRAME (gg->app.mode_frame), GTK_SHADOW_IN);
 
   make_control_panels (gg);
-  gtk_container_add (GTK_CONTAINER (mode_frame), gg->control_panel[mode]);
+  gtk_container_add (GTK_CONTAINER (gg->app.mode_frame), gg->control_panel[gg->app.mode]);
 
   /*-- Variable selection panel --*/
   make_varpanel (hbox, gg);

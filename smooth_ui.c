@@ -33,7 +33,7 @@ window_cb (GtkToggleButton *button)
 }
 
 void
-width_cb (GtkAdjustment *adj, gpointer cbd) {
+width_cb (GtkAdjustment *adj, ggobid *gg) {
   g_printerr ("width %f\n", adj->value);
 }
 
@@ -100,7 +100,7 @@ smooth_window_open (ggobid *gg) {
 
     adj = gtk_adjustment_new (1.0, 0.0, 1.0, 0.01, .01, 0.0);
     gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                        GTK_SIGNAL_FUNC (width_cb), NULL);
+                        GTK_SIGNAL_FUNC (width_cb), gg);
 
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,

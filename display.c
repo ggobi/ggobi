@@ -283,35 +283,32 @@ display_free_all (ggobid *gg) {
 void
 display_set_current (displayd *new_display, ggobid *gg) 
 {
-  static GtkWidget *mode_item = NULL;
-  static gboolean firsttime = true;
-
   if(new_display == NULL)
    return;
 
   gtk_accel_group_unlock (gg->app.main_accel_group);
 
-  if (!firsttime) {
+  if (gg->app.firsttime == false) {
 
     switch (gg->current_display->displaytype) {
       case scatterplot:
         gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
           (gg->current_display->missing_p) ? "scatterplot display (missings)" :
                                             "scatterplot display"); 
-        submenu_destroy (mode_item);
+        submenu_destroy (gg->app.mode_item);
         break;
 
       case scatmat:
         gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
           (gg->current_display->missing_p) ? "scatterplot matrix (missings)" :
                                          "scatterplot matrix"); 
-        submenu_destroy (mode_item);
+        submenu_destroy (gg->app.mode_item);
         break;
 
       case parcoords:
         gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
                               "parallel coordinates display");
-        submenu_destroy (mode_item);
+        submenu_destroy (gg->app.mode_item);
         break;
     }
   }
@@ -324,10 +321,10 @@ display_set_current (displayd *new_display, ggobid *gg)
           "*** scatterplot display ***"); 
 
       scatterplot_main_menus_make (gg->app.main_accel_group, mode_set_cb, gg, true);
-      mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (mode_item),
+      gg->app.mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
+      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->app.mode_item),
                                  gg->app.scatterplot_mode_menu); 
-      submenu_insert (mode_item, gg->app.menubar, 2);
+      submenu_insert (gg->app.mode_item, gg->app.menubar, 2);
       break;
 
     case scatmat:
@@ -337,10 +334,10 @@ display_set_current (displayd *new_display, ggobid *gg)
           "*** scatterplot matrix ***"); 
 
       scatmat_main_menus_make (gg->app.main_accel_group, mode_set_cb, gg, true);
-      mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (mode_item),
+      gg->app.mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
+      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->app.mode_item),
                                  gg->app.scatmat_mode_menu); 
-      submenu_insert (mode_item, gg->app.menubar, 2);
+      submenu_insert (gg->app.mode_item, gg->app.menubar, 2);
       break;
 
     case parcoords:
@@ -348,10 +345,10 @@ display_set_current (displayd *new_display, ggobid *gg)
                             "*** parallel coordinates display ***");
 
       parcoords_main_menus_make (gg->app.main_accel_group, mode_set_cb, gg, true);
-      mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (mode_item),
+      gg->app.mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
+      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->app.mode_item),
                                  gg->app.parcoords_mode_menu); 
-      submenu_insert (mode_item, gg->app.menubar, 2);
+      submenu_insert (gg->app.mode_item, gg->app.menubar, 2);
       break;
   }
 
@@ -361,7 +358,7 @@ display_set_current (displayd *new_display, ggobid *gg)
   varpanel_refresh (gg);
 
   gtk_accel_group_lock (gg->app.main_accel_group);
-  firsttime = false;
+  gg->app.firsttime = false;
 }
 
 /* Some of these will probably be folded together eventually */

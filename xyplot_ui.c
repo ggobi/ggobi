@@ -7,18 +7,18 @@
 #include "externs.h"
 
 /* Move to cpanel.h */
-static gboolean cycle_p = false;
 
-static gchar *fix_axis_lbl[] = {"No fixed axes", "Fix X", "Fix Y"};
+
+static const gchar *const fix_axis_lbl[] = {"No fixed axes", "Fix X", "Fix Y"};
 static void fix_axis_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
   g_printerr ("cbd: %s\n", fix_axis_lbl[indx]);
 }
 
-static void cycle_cb (GtkToggleButton *button)
+static void cycle_cb (GtkToggleButton *button, ggobid *gg)
 {
-  cycle_p = button->active;
+  gg->app.cycle_p = button->active;
 }
 static void scale_set_default_values (GtkScale *scale )
 {
@@ -30,10 +30,9 @@ static void cycle_speed_cb (GtkAdjustment *adj, gpointer cbd) {
   g_printerr ("%d\n", ((gint) adj->value));
 }
 
-static gint direction = FORWARD;
-static void chdir_cb (GtkButton *button)
+static void chdir_cb (GtkButton *button, ggobid* gg)
 {
-  direction = -1 * direction;
+  gg->app.direction = -1 * gg->app.direction;
 }
 
 void
@@ -48,7 +47,7 @@ cpanel_xyplot_make (ggobid *gg) {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), cycle_tgl,
     "Cycle through pairwise plots", NULL);
   gtk_signal_connect (GTK_OBJECT (cycle_tgl), "toggled",
-                     GTK_SIGNAL_FUNC (cycle_cb), (gpointer) NULL);
+                     GTK_SIGNAL_FUNC (cycle_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]), cycle_tgl,
     false, false, 3);
 
@@ -60,7 +59,7 @@ cpanel_xyplot_make (ggobid *gg) {
     "Fix one of the axes during plot cycling or let them both float", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]), opt,
     false, false, 0);
-  populate_option_menu (opt, fix_axis_lbl,
+  populate_option_menu (opt, (gchar**) fix_axis_lbl,
                         sizeof (fix_axis_lbl) / sizeof (gchar *),
                         fix_axis_cb, gg);
   
@@ -86,7 +85,7 @@ cpanel_xyplot_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]),
                       chdir_btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (chdir_btn), "clicked",
-                      GTK_SIGNAL_FUNC (chdir_cb), NULL);
+                      GTK_SIGNAL_FUNC (chdir_cb), gg);
 
   gtk_widget_show_all (gg->control_panel[XYPLOT]);
 }

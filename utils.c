@@ -419,7 +419,7 @@ selected_cols_get (gint *cols, gboolean add_vgroups, ggobid *gg)
 gint
 plotted_cols_get (gint *cols, gboolean add_vgroups, ggobid *gg) 
 {
-  gint mode = mode_get ();
+  gint mode = mode_get (gg);
   gint j, ncols;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;

@@ -11,10 +11,9 @@
 #define WIDTH   400
 #define HEIGHT  400
 
-static GtkAccelGroup *sp_accel_group;
-
 void
-scatterplot_show_hrule (displayd *display, gboolean show) {
+scatterplot_show_hrule (displayd *display, gboolean show) 
+{
   if (show) {
     if (!GTK_WIDGET_VISIBLE (display->hrule))
       gtk_widget_show (display->hrule);
@@ -216,14 +215,14 @@ scatterplot_new (gboolean missing_p, splotd *sp, ggobid *gg) {
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (display->window), vbox);
 
-  sp_accel_group = gtk_accel_group_new ();
+  gg->app.sp_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 sp_accel_group, display->window, &mbar, (gpointer) display);
+                 gg->app.sp_accel_group, display->window, &mbar, (gpointer) display);
   /*
    * After creating the menubar, and populating the file menu,
    * add the Display Options and Link menus another way
   */
-  scatterplot_display_menus_make (display, sp_accel_group,
+  scatterplot_display_menus_make (display, gg->app.sp_accel_group,
     display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 

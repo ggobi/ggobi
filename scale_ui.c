@@ -169,10 +169,10 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
           break;
         case ZOOM:
           if (event->keyval == GDK_i || event->keyval == GDK_I) {
-            zoom_step (sp, scale_zoom_opt, ZOOM_IN, &scale_click_rect);
+            zoom_step (sp, scale_zoom_opt, ZOOM_IN, &scale_click_rect, gg);
             redraw = true;
           } else if (event->keyval == GDK_o || event->keyval == GDK_O) {
-            zoom_step (sp, scale_zoom_opt, ZOOM_OUT, &scale_click_rect);
+            zoom_step (sp, scale_zoom_opt, ZOOM_OUT, &scale_click_rect, gg);
             redraw = true;
           }
           break;

@@ -4,7 +4,6 @@
 #include "vars.h"
 #include "externs.h"
 
-static GtkWidget *type_opt;
 static gchar *type_lbl[] = {"Texturing", "ASH"};
 
 static void type_cb (GtkWidget *w, gpointer cbd)
@@ -16,7 +15,7 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   display_tailpipe (gg->current_display, gg);
 }
 
-static GtkObject *ash_smoothness_adj;
+
 static void ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg) 
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -27,11 +26,10 @@ static void ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
   display_tailpipe (gg->current_display, gg);
 }
 
-static GtkObject *cycle_speed_adj;
-static gboolean cycle_p = false;
-static void cycle_cb (GtkToggleButton *button)
+
+static void cycle_cb (GtkToggleButton *button, ggobid* gg)
 {
-  cycle_p = button->active;
+  gg->ash.cycle_p = button->active;
 }
 static void cycle_speed_cb (GtkAdjustment *adj, gpointer cbd) {
   g_printerr ("%d\n", ((gint) adj->value));
@@ -61,12 +59,12 @@ cpanel_p1dplot_make (ggobid *gg) {
 /*
  * option menu
 */
-  type_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), type_opt,
+  gg->ash.type_opt = gtk_option_menu_new ();
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->ash.type_opt,
     "Display either textured dot plots or average shifted histograms", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]),
-                      type_opt, false, false, 0);
-  populate_option_menu (type_opt, type_lbl,
+                      gg->ash.type_opt, false, false, 0);
+  populate_option_menu (gg->ash.type_opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
                         type_cb, gg);
 /*
@@ -80,11 +78,11 @@ cpanel_p1dplot_make (ggobid *gg) {
     false, false, 0);
 
   /*-- value, lower, upper, step --*/
-  ash_smoothness_adj = gtk_adjustment_new (0.19, 0.01, 0.5, 0.01, .01, 0.0);
-  gtk_signal_connect (GTK_OBJECT (ash_smoothness_adj), "value_changed",
+  gg->ash.ash_smoothness_adj = gtk_adjustment_new (0.19, 0.01, 0.5, 0.01, .01, 0.0);
+  gtk_signal_connect (GTK_OBJECT (gg->ash.ash_smoothness_adj), "value_changed",
                       GTK_SIGNAL_FUNC (ash_smoothness_cb), gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (ash_smoothness_adj));
+  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.ash_smoothness_adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust ASH smoothness", NULL);
   gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
@@ -101,7 +99,7 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
                         "Cycle through 1D plots", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                      GTK_SIGNAL_FUNC (cycle_cb), (gpointer) NULL);
+                      GTK_SIGNAL_FUNC (cycle_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]),
                       tgl, false, false, 1);
 
@@ -109,11 +107,11 @@ cpanel_p1dplot_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  cycle_speed_adj = gtk_adjustment_new (1.0, 0.0, 100.0, 1.0, 1.0, 0.0);
-  gtk_signal_connect (GTK_OBJECT (cycle_speed_adj), "value_changed",
-                      GTK_SIGNAL_FUNC (cycle_speed_cb), NULL);
+  gg->ash.cycle_speed_adj = gtk_adjustment_new (1.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+  gtk_signal_connect (GTK_OBJECT (gg->ash.cycle_speed_adj), "value_changed",
+                      GTK_SIGNAL_FUNC (cycle_speed_cb), gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (cycle_speed_adj));
+  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.cycle_speed_adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust cycling speed", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
@@ -127,7 +125,7 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (chdir_cb), NULL);
+                      GTK_SIGNAL_FUNC (chdir_cb), gg);
 
   gtk_widget_show_all (gg->control_panel[P1PLOT]);
 }
@@ -142,18 +140,18 @@ cpanel_p1d_init (cpaneld *cpanel) {
 
 /*-- scatterplot only; need a different routine for parcoords --*/
 void
-cpanel_p1d_set (cpaneld *cpanel)
+cpanel_p1d_set (cpaneld *cpanel, ggobid* gg)
 /*
  * To handle the case where there are multiple scatterplots
  * which may have different p1d options and parameters selected
 */
 {
   /*-- Texturing or ASH --*/
-  gtk_option_menu_set_history (GTK_OPTION_MENU (type_opt),
+  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->ash.type_opt),
                                cpanel->p1d_type);
 
   /*-- ASH smoothness parameter --*/
-  gtk_adjustment_set_value (GTK_ADJUSTMENT (ash_smoothness_adj),
+  gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->ash.ash_smoothness_adj),
     2 * (gfloat) cpanel->nASHes / (gfloat) cpanel->nbins);
 
   /*-- Cycling on or off --*/

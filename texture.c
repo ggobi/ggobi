@@ -23,12 +23,18 @@ extern gdouble randvalue (void);
 
 gint myrnd (gint);
 
+/* 
+ This variable is used as a temporary global value which
+ is used to communicate with qsort and psort since we have no
+ provision from textur to pass additional arguments.
 
+ In a multi-threaded version, we would need to protect this.
+*/
+static ggobid *CurrentGGobi;
 gint
 psort (const void *arg1, const void *arg2)
 {
-extern ggobid *ggobi_get(int which);
-ggobid *gg = ggobi_get(0);
+ggobid *gg = CurrentGGobi;
 
   gint val = 0;
   gint *x1 = (gint *) arg1;
@@ -191,9 +197,11 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages,
     gg->app.gy[i] = yy[i];
   }
 
+CurrentGGobi = gg;
+
   qsort ((void *) indx, (size_t) ny, sizeof (gint), psort);
   qsort ((void *) yy, (size_t) ny, sizeof (gfloat), fcompare);
-
+CurrentGGobi = NULL;
 /*
  * Bug here:  this is screwy if ny < 4.
 */

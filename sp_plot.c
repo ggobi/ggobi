@@ -13,13 +13,6 @@ extern void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *);
 extern void win32_draw_to_pixmap_unbinned (gint, splotd *);
 #endif
 
-/*
- * The corners of the bin to be copied from pixmap0 to pixmap1.
- * They're defined in splot_draw_to_pixmap0_binned and used in
- * splot_pixmap0_to_pixmap1 when binned == true.
-*/
-static icoords bin0, bin1;
-static icoords loc0, loc1;
 
 /* colors_used now contains integers, 0:ncolors-1 */
 static void
@@ -62,8 +55,8 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
       */
       /*get_extended_brush_corners (&bin0, &bin1);*/
 
-      for (ih=bin0.x; ih<=bin1.x; ih++) {
-        for (iv=bin0.y; iv<=bin1.y; iv++) {
+      for (ih= gg->app.bin0.x; ih<= gg->app.bin1.x; ih++) {
+        for (iv=gg->app.bin0.y; iv<=gg->app.bin1.y; iv++) {
           for (m=0; m<gg->br_binarray[ih][iv].nels; m++) {
             j = gg->rows_in_plot[gg->br_binarray[ih][iv].els[m]];
 
@@ -227,27 +220,27 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
  * clear what's necessary.
 */
 
-  get_extended_brush_corners (&bin0, &bin1, gg);
+  get_extended_brush_corners (&gg->app.bin0, &gg->app.bin1, gg);
 
 /*
  * Determine locations of bin corners: upper left edge of loc0;
  * lower right edge of loc1.
 */
-  loc0.x = (gint) ((gfloat) bin0.x / (gfloat) gg->br_nbins * (sp->max.x+1.0));
-  loc0.y = (gint) ((gfloat) bin0.y / (gfloat) gg->br_nbins * (sp->max.y+1.0));
-  loc1.x = (gint)
-    ((gfloat) (bin1.x+1) / (gfloat) gg->br_nbins * (sp->max.x+1.0));
-  loc1.y = (gint)
-    ((gfloat) (bin1.y+1) / (gfloat) gg->br_nbins * (sp->max.y+1.0));
+  gg->app.loc0.x = (gint) ((gfloat) gg->app.bin0.x / (gfloat) gg->br_nbins * (sp->max.x+1.0));
+  gg->app.loc0.y = (gint) ((gfloat) gg->app.bin0.y / (gfloat) gg->br_nbins * (sp->max.y+1.0));
+  gg->app.loc1.x = (gint)
+    ((gfloat) (gg->app.bin1.x+1) / (gfloat) gg->br_nbins * (sp->max.x+1.0));
+  gg->app.loc1.y = (gint)
+    ((gfloat) (gg->app.bin1.y+1) / (gfloat) gg->br_nbins * (sp->max.y+1.0));
 
 /*
  * Clear an area a few pixels inside that region.  Watch out
  * for border effects.
 */
-  loc_clear0.x = (bin0.x == 0) ? 0 : loc0.x + BRUSH_MARGIN;
-  loc_clear0.y = (bin0.y == 0) ? 0 : loc0.y + BRUSH_MARGIN;
-  loc_clear1.x = (bin1.x == gg->br_nbins-1) ? sp->max.x : loc1.x - BRUSH_MARGIN;
-  loc_clear1.y = (bin1.y == gg->br_nbins-1) ? sp->max.y : loc1.y - BRUSH_MARGIN;
+  loc_clear0.x = (gg->app.bin0.x == 0) ? 0 : gg->app.loc0.x + BRUSH_MARGIN;
+  loc_clear0.y = (gg->app.bin0.y == 0) ? 0 : gg->app.loc0.y + BRUSH_MARGIN;
+  loc_clear1.x = (gg->app.bin1.x == gg->br_nbins-1) ? sp->max.x : gg->app.loc1.x - BRUSH_MARGIN;
+  loc_clear1.y = (gg->app.bin1.y == gg->br_nbins-1) ? sp->max.y : gg->app.loc1.y - BRUSH_MARGIN;
 
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
@@ -273,10 +266,10 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
           &gg->default_color_table[current_color]);
 
 #ifdef _WIN32
-        win32_draw_to_pixmap_binned (&bin0, &bin1, current_color, sp);
+        win32_draw_to_pixmap_binned (&gg->app.bin0, &gg->app.bin1, current_color, sp);
 #else
-        for (ih=bin0.x; ih<=bin1.x; ih++) {
-          for (iv=bin0.y; iv<=bin1.y; iv++) {
+        for (ih=gg->app.bin0.x; ih<=gg->app.bin1.x; ih++) {
+          for (iv=gg->app.bin0.y; iv<=gg->app.bin1.y; iv++) {
             for (m=0; m<gg->br_binarray[ih][iv].nels; m++) {
               i = gg->rows_in_plot[gg->br_binarray[ih][iv].els[m]];
               if (!gg->hidden_now[i] && gg->color_now[i] == current_color) {
@@ -539,7 +532,7 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   GtkWidget *w = sp->da;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  gint mode = mode_get ();
+  gint mode = mode_get (gg);
 
   if (!binned) {
     gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
@@ -549,10 +542,10 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   }
   else
     gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
-                      loc0.x, loc0.y,
-                      loc0.x, loc0.y,
-                      1 + loc1.x - loc0.x ,
-                      1 + loc1.y - loc0.y);
+                      gg->app.loc0.x, gg->app.loc0.y,
+                      gg->app.loc0.x, gg->app.loc0.y,
+                      1 + gg->app.loc1.x - gg->app.loc0.x ,
+                      1 + gg->app.loc1.y - gg->app.loc0.y);
 
   if (display->options.segments_directed_show_p ||
       display->options.segments_undirected_show_p)

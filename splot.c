@@ -61,7 +61,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 
   splot_plane_to_screen (display, cpanel, sp, gg);
 
-  if (mode_get () == BRUSH)
+  if (mode_get (gg) == BRUSH)
     assign_points_to_bins (gg);
 
   sp->redraw_style = FULL;

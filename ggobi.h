@@ -74,6 +74,61 @@ typedef struct {
   varseldatad vdata0;
   varseldatad vdata1;
 
+  GtkWidget *mode_item;
+  gboolean firsttime;  
+
+
+  /* xyplot_ui */
+  gboolean cycle_p;
+  gint direction;
+
+  /* vartable_ui */
+  GtkWidget *vardata_window;
+  GtkWidget *clist;
+
+  /* sp_plot.c */
+
+/*
+ * The corners of the bin to be copied from pixmap0 to pixmap1.
+ * They're defined in splot_draw_to_pixmap0_binned and used in
+ * splot_pixmap0_to_pixmap1 when binned == true.
+*/
+ icoords bin0, bin1;
+ icoords loc0, loc1;
+
+  /* sphere_ui */
+ GtkWidget *window;
+ GtkAdjustment *npcs_adj;
+ GtkWidget *totvar_entry, *condnum_entry;
+ GtkWidget *sphere_apply_btn;
+
+  /* scatterplot.c */
+ GtkAccelGroup *sp_accel_group;
+
+  /* subset_ui*/
+ gboolean rescale_p;
+ GtkWidget *subset_window;
+ GtkWidget *ss_notebook;
+
+/*-- the entry widgets from which to get values for sample, rowlab --*/
+ GtkWidget *ss_random_entry, *ss_rowlab_entry;
+/*-- the adjustments from which to get values for blocksize, everyn --*/
+ GtkAdjustment *ss_bstart_adj, *ss_bsize_adj;
+ GtkAdjustment *ss_estart_adj, *ss_estep_adj;
+
+  /* ggobi.h */
+ GtkWidget *stage0_opt, *stage1_opt, *stage2_opt;
+ GtkAdjustment *boxcox_adj;
+
+  /* main_ui.c */
+ gint mode , prev_mode;
+ gint projection, prev_projection;
+ GtkWidget *mode_frame;
+
+
+
+
+
 } GGobiApp;
 
 struct _ggobid {
@@ -221,6 +276,64 @@ struct _ggobid {
 
  spherical sphere;
 
+
+  struct _Ash {
+     GtkWidget *type_opt;
+     GtkObject *ash_smoothness_adj;
+     GtkObject *cycle_speed_adj;
+     gboolean cycle_p;
+  } ash;
+
+  struct _Parcoords {
+    GtkAccelGroup *pc_accel_group;
+    GtkWidget *arrangement_box;
+  } parcoords;
+
+
+  struct _Color_UI {
+   GtkWidget *symbol_window;
+   GtkWidget *symbol_display;
+
+   GtkWidget *colorseldlg;
+   GtkWidget *bg_da, *accent_da, *fg_da[NCOLORS], *current_da;
+
+   gint margin;  /* between glyphs in the symbol_display */
+  } color_ui;
+
+
+  struct _Varpanel_ui {
+    GtkWidget *varpanel;
+    GtkWidget *scrolled_window;
+    GtkWidget **da, **varlabel;
+    GtkAccelGroup *varpanel_accel_group;
+    
+    gint vnrows, vncols;
+  } varpanel_ui;
+
+
+  struct {
+   varseldatad vdata0, vdata1;
+  } p1d_menu;
+
+  struct {
+   varseldatad vdata0, vdata1;
+  } parcoords_menu;
+
+  struct {
+   varseldatad vdata0, vdata1;
+  } xyplot_menu;
+
+  struct {
+   varseldatad vdata0, vdata1, vdata2;
+  } rotation_menu;
+
+  struct {
+   varseldatad vdata0, vdata1, vdata2;
+  } tour2d_menu;
+
+  struct {
+   varseldatad vdata0, vdata1, vdata2, vdata3;
+  } scatmat_menu;
 }; /*  ggobid; */
 
 

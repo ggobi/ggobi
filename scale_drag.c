@@ -25,7 +25,7 @@ pan_by_drag (splotd *sp, ggobid *gg)
 void
 zoom_by_drag (splotd *sp, ggobid *gg)
 {
-  gint projection = projection_get ();
+  gint projection = projection_get (gg);
   gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
   gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;
   gint npix = 10;  /*-- number of pixels from the crosshair required --*/

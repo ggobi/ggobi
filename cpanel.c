@@ -54,7 +54,7 @@ cpanel_set (displayd *display, ggobid *gg) {
 
   switch (display->displaytype) {
     case scatterplot:
-      cpanel_p1d_set (cpanel);
+      cpanel_p1d_set (cpanel, gg);
       cpanel_rotation_set (cpanel);
       cpanel_brush_set (cpanel);
       break;

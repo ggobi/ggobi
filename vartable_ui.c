@@ -9,12 +9,11 @@
 
 #define NCOLS_CLIST 9
 
-static GtkWidget *vardata_window = (GtkWidget *) NULL;
-static GtkWidget *clist = NULL;
 
-void delete_cb (GtkWidget *cl, GdkEventButton *event, gpointer data)
+
+void delete_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
 {
-  gtk_widget_hide (vardata_window);
+  gtk_widget_hide (gg->app.vardata_window);
 }
 
 void
@@ -25,17 +24,17 @@ vartable_select_var (gint jvar, gboolean selected, ggobid *gg)
 
   /*-- loop over the rows in the table, looking for jvar --*/
   for (j=0; j<gg->ncols; j++) {
-    if (clist != NULL) {
-      gtk_clist_get_text (GTK_CLIST (clist), j, 0, &varno_str);
+    if (gg->app.clist != NULL) {
+      gtk_clist_get_text (GTK_CLIST (gg->app.clist), j, 0, &varno_str);
       varno = (gint) atoi (varno_str);
     } else varno = j;
     
     if (varno == jvar) {
-      if (clist != NULL) {
+      if (gg->app.clist != NULL) {
         if (selected)
-          gtk_clist_select_row (GTK_CLIST (clist), jvar, 1);
+          gtk_clist_select_row (GTK_CLIST (gg->app.clist), jvar, 1);
         else
-          gtk_clist_unselect_row (GTK_CLIST (clist), jvar, 1);
+          gtk_clist_unselect_row (GTK_CLIST (gg->app.clist), jvar, 1);
       }
       gg->vardata[jvar].selected = selected;
     }
@@ -47,8 +46,8 @@ vartable_unselect_all (ggobid *gg)
 {
   gint j;
 
-  if (clist != NULL)
-    gtk_clist_unselect_all (GTK_CLIST (clist));
+  if (gg->app.clist != NULL)
+    gtk_clist_unselect_all (GTK_CLIST (gg->app.clist));
 
   for (j=0; j<gg->ncols; j++)
     gg->vardata[j].selected = false;
@@ -61,7 +60,7 @@ selection_made (GtkWidget *cl, gint row, gint column,
   gint varno;
   gchar *varno_str;
 
-  gtk_clist_get_text (GTK_CLIST (clist), row, 0, &varno_str);
+  gtk_clist_get_text (GTK_CLIST (gg->app.clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
   gg->vardata[varno].selected = true;
 
@@ -74,7 +73,7 @@ deselection_made (GtkWidget *cl, gint row, gint column,
   gint varno;
   gchar *varno_str;
 
-  gtk_clist_get_text (GTK_CLIST (clist), row, 0, &varno_str);
+  gtk_clist_get_text (GTK_CLIST (gg->app.clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
   gg->vardata[varno].selected = false;
   g_printerr ("deselected row= %d, varno= %d\n", row, varno);
@@ -102,13 +101,13 @@ arithmetic_compare (GtkCList *cl, gconstpointer ptr1, gconstpointer ptr2)
 
 void sortbycolumn_cb (GtkWidget *cl, gint column, ggobid *gg)
 {
-  gtk_clist_set_sort_column (GTK_CLIST (clist), column);
+  gtk_clist_set_sort_column (GTK_CLIST (gg->app.clist), column);
   if (column == 1)  /*-- variable name --*/
-    gtk_clist_set_compare_func (GTK_CLIST (clist), NULL);
+    gtk_clist_set_compare_func (GTK_CLIST (gg->app.clist), NULL);
   else
-    gtk_clist_set_compare_func (GTK_CLIST (clist),
+    gtk_clist_set_compare_func (GTK_CLIST (gg->app.clist),
                                 (GtkCListCompareFunc) arithmetic_compare);
-  gtk_clist_sort (GTK_CLIST (clist));
+  gtk_clist_sort (GTK_CLIST (gg->app.clist));
 
   return;
 }
@@ -116,7 +115,7 @@ void sortbycolumn_cb (GtkWidget *cl, gint column, ggobid *gg)
 void
 vartable_row_append (gint j, ggobid *gg)
 {
-  if (clist != NULL) {
+  if (gg->app.clist != NULL) {
     gint k;
     gchar **row;
     row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
@@ -131,7 +130,7 @@ vartable_row_append (gint j, ggobid *gg)
     row[7] = g_strdup_printf ("%8.3f", gg->vardata[j].median);
     row[8] = g_strdup_printf ("%d", gg->vardata[j].nmissing);
 
-    gtk_clist_append ((GtkCList *) clist, row);
+    gtk_clist_append ((GtkCList *) gg->app.clist, row);
 
     for (k=0; k<NCOLS_CLIST; k++)
       g_free ((gpointer) row[k]);
@@ -153,16 +152,16 @@ vartable_open (ggobid *gg)
      "Mean", "Median",
      "N missing"};
 
-  if (vardata_window == NULL) {
+  if (gg->app.vardata_window == NULL) {
 
-    vardata_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_signal_connect (GTK_OBJECT (vardata_window),
-      "delete_event", GTK_SIGNAL_FUNC (delete_cb), NULL);
-    gtk_window_set_title (GTK_WINDOW (vardata_window), "Variable statistics");
+    gg->app.vardata_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_signal_connect (GTK_OBJECT (gg->app.vardata_window),
+      "delete_event", GTK_SIGNAL_FUNC (delete_cb), gg);
+    gtk_window_set_title (GTK_WINDOW (gg->app.vardata_window), "Variable statistics");
 
     vbox = gtk_vbox_new (false, 5);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
-    gtk_container_add (GTK_CONTAINER (vardata_window), vbox);
+    gtk_container_add (GTK_CONTAINER (gg->app.vardata_window), vbox);
     gtk_widget_show (vbox);
     
     /* Create a scrolled window to pack the CList widget into */
@@ -173,62 +172,62 @@ vartable_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vbox), scrolled_window, TRUE, TRUE, 0);
     gtk_widget_show (scrolled_window);
 
-    clist = gtk_clist_new_with_titles (NCOLS_CLIST, titles);
-    gtk_clist_set_selection_mode (GTK_CLIST (clist), GTK_SELECTION_MULTIPLE);
+    gg->app.clist = gtk_clist_new_with_titles (NCOLS_CLIST, titles);
+    gtk_clist_set_selection_mode (GTK_CLIST (gg->app.clist), GTK_SELECTION_MULTIPLE);
 
     /*-- left justify all the numerical columns --*/
-    gtk_clist_set_column_justification (GTK_CLIST (clist),
+    gtk_clist_set_column_justification (GTK_CLIST (gg->app.clist),
       2, GTK_JUSTIFY_RIGHT);
-    gtk_clist_set_column_justification (GTK_CLIST (clist),
+    gtk_clist_set_column_justification (GTK_CLIST (gg->app.clist),
       4, GTK_JUSTIFY_RIGHT);
-    gtk_clist_set_column_justification (GTK_CLIST (clist),
+    gtk_clist_set_column_justification (GTK_CLIST (gg->app.clist),
       5, GTK_JUSTIFY_RIGHT);
-    gtk_clist_set_column_justification (GTK_CLIST (clist),
+    gtk_clist_set_column_justification (GTK_CLIST (gg->app.clist),
       6, GTK_JUSTIFY_RIGHT);
-    gtk_clist_set_column_justification (GTK_CLIST (clist),
+    gtk_clist_set_column_justification (GTK_CLIST (gg->app.clist),
       7, GTK_JUSTIFY_RIGHT);
-    gtk_clist_set_column_justification (GTK_CLIST (clist),
+    gtk_clist_set_column_justification (GTK_CLIST (gg->app.clist),
       8, GTK_JUSTIFY_RIGHT);
 
     /*-- make the first column invisible --*/
-    gtk_clist_set_column_visibility (GTK_CLIST (clist), 0, false);
+    gtk_clist_set_column_visibility (GTK_CLIST (gg->app.clist), 0, false);
 
     /*-- set the column width automatically --*/
     for (k=0; k<NCOLS_CLIST; k++)
-      gtk_clist_set_column_auto_resize (GTK_CLIST (clist), k, true);
+      gtk_clist_set_column_auto_resize (GTK_CLIST (gg->app.clist), k, true);
 
     /*-- populate the table --*/
     for (j=0 ; j<gg->ncols ; j++)
       vartable_row_append (j, gg);
 
     /*-- track selections --*/
-    gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+    gtk_signal_connect (GTK_OBJECT (gg->app.clist), "select_row",
                        GTK_SIGNAL_FUNC (selection_made),
                        gg);
-    gtk_signal_connect (GTK_OBJECT (clist), "unselect_row",
+    gtk_signal_connect (GTK_OBJECT (gg->app.clist), "unselect_row",
                        GTK_SIGNAL_FUNC (deselection_made),
                        gg);
 
     /*-- re-sort when receiving a mouse click on a column header --*/
-    gtk_signal_connect (GTK_OBJECT (clist), "click_column",
+    gtk_signal_connect (GTK_OBJECT (gg->app.clist), "click_column",
                        GTK_SIGNAL_FUNC (sortbycolumn_cb),
                        gg);
 
     /* It isn't necessary to shadow the border, but it looks nice :) */
-    gtk_clist_set_shadow_type (GTK_CLIST (clist), GTK_SHADOW_OUT);
+    gtk_clist_set_shadow_type (GTK_CLIST (gg->app.clist), GTK_SHADOW_OUT);
 
-    gtk_container_add (GTK_CONTAINER (scrolled_window), clist);
-    gtk_widget_show (clist);
+    gtk_container_add (GTK_CONTAINER (scrolled_window), gg->app.clist);
+    gtk_widget_show (gg->app.clist);
 
     gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
-      clist->requisition.width + 3 /*-- COLUMN_INSET --*/ +
+      gg->app.clist->requisition.width + 3 /*-- COLUMN_INSET --*/ +
       GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
       150);
 
-    gtk_widget_show_all (vardata_window);
+    gtk_widget_show_all (gg->app.vardata_window);
   }
 
-  gdk_window_raise (vardata_window->window);
+  gdk_window_raise (gg->app.vardata_window->window);
 }
 
 
@@ -236,7 +235,7 @@ vartable_open (ggobid *gg)
 void
 vartable_tform_set (gint varno, ggobid *gg) {
 
-  if (clist != NULL)
-    gtk_clist_set_text (GTK_CLIST (clist), varno,
+  if (gg->app.clist != NULL)
+    gtk_clist_set_text (GTK_CLIST (gg->app.clist), varno,
       3, gg->vardata[varno].collab_tform);
 }

@@ -5,13 +5,6 @@
 
 #define PSIZE 20
 
-static GtkWidget *symbol_window = NULL;
-static GtkWidget *symbol_display;
-
-static GtkWidget *colorseldlg = NULL;
-static GtkWidget *bg_da, *accent_da, *fg_da[NCOLORS], *current_da;
-
-static gint margin = 10;  /* between glyphs in the symbol_display */
 
 
 /*
@@ -45,7 +38,7 @@ find_selection_circle_pos (icoords *pos, ggobid *gg) {
   glyphv g;
 
   if (gg->glyph_id.type == POINT_GLYPH) {
-    pos->y = margin + 3/2;
+    pos->y = gg->color_ui.margin + 3/2;
     pos->x = gg->app.spacing/2;
 
   } else {
@@ -53,7 +46,7 @@ find_selection_circle_pos (icoords *pos, ggobid *gg) {
     pos->y = 0;
     for (i=0; i<NGLYPHSIZES; i++) {
       g.size = i;
-      pos->y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
+      pos->y += (gg->color_ui.margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
       pos->x = gg->app.spacing + gg->app.spacing/2;
 
       if (gg->glyph_id.type == PLUS_GLYPH && gg->glyph_id.size == g.size)
@@ -103,14 +96,14 @@ redraw_symbol_display (GtkWidget *w, ggobid *gg) {
    * The factor of three is dictated by the sizing of circles
    *  ... this should no longer be true; it should be 2*width + 1
   */
-  pos.y = margin + 3/2;
+  pos.y = gg->color_ui.margin + 3/2;
   pos.x = gg->app.spacing/2;
   gdk_draw_point (w->window, gg->plot_GC, pos.x, pos.y);
 
   pos.y = 0;
   for (i=0; i<NGLYPHSIZES; i++) {
     g.size = i;
-    pos.y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
+    pos.y += (gg->color_ui.margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
     pos.x = gg->app.spacing + gg->app.spacing/2;
 
     g.type = PLUS_GLYPH;
@@ -140,7 +133,7 @@ redraw_symbol_display (GtkWidget *w, ggobid *gg) {
   if (!gg->mono_p) {
     icoords p;
     /*-- NGLYPHSIZES is the size of the largest glyph --*/
-    gint radius = (3*NGLYPHSIZES)/2 + margin/2;
+    gint radius = (3*NGLYPHSIZES)/2 + gg->color_ui.margin/2;
     find_selection_circle_pos (&p, gg);
 
     gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
@@ -194,18 +187,18 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
   /* Allocate color */
   gdk_colormap_alloc_color (cmap, &gdk_color, false, true);
 
-  if (current_da == bg_da) {
+  if (gg->color_ui.current_da == gg->color_ui.bg_da) {
     gg->bg_color = gdk_color;
-    redraw_bg (bg_da, gg);
-  } else if (current_da == accent_da) {
+    redraw_bg (gg->color_ui.bg_da, gg);
+  } else if (gg->color_ui.current_da == gg->color_ui.accent_da) {
     gg->accent_color = gdk_color;
-    redraw_accent (accent_da, gg);
+    redraw_accent (gg->color_ui.accent_da, gg);
   } else {
     gg->default_color_table[gg->color_id] = gdk_color;
-    redraw_fg (fg_da[gg->color_id], gg->color_id, gg);
+    redraw_fg (gg->color_ui.fg_da[gg->color_id], gg->color_id, gg);
   }
 
-  redraw_symbol_display (symbol_display, gg);
+  redraw_symbol_display (gg->color_ui.symbol_display, gg);
 
   if (sp->da != NULL) {
     gboolean rval = false;
@@ -231,8 +224,8 @@ color_expose_fg (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 }
 
 static void
-dlg_close_cb (GtkWidget *ok_button ) {
-  gtk_widget_hide (colorseldlg);
+dlg_close_cb (GtkWidget *ok_button, ggobid* gg) {
+  gtk_widget_hide (gg->color_ui.colorseldlg);
 }
 
 static gint
@@ -244,14 +237,14 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
 
   /* Check if we've received a button pressed event */
 
-  if (colorseldlg == NULL) {
+  if (gg->color_ui.colorseldlg == NULL) {
     handled = true;
 
     /* Create color selection dialog */
-    colorseldlg = gtk_color_selection_dialog_new ("Select color");
+    gg->color_ui.colorseldlg = gtk_color_selection_dialog_new ("Select color");
 
     /* Get the ColorSelection widget */
-    colorsel = GTK_COLOR_SELECTION_DIALOG (colorseldlg)->colorsel;
+    colorsel = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->colorsel;
 
     /*
      * Connect to the "color_changed" signal, set the client-data
@@ -263,26 +256,26 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
     /*
      * Connect up the buttons
     */
-    ok_button = GTK_COLOR_SELECTION_DIALOG (colorseldlg)->ok_button;
-    cancel_button = GTK_COLOR_SELECTION_DIALOG (colorseldlg)->cancel_button;
-    help_button = GTK_COLOR_SELECTION_DIALOG (colorseldlg)->help_button;
+    ok_button = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->ok_button;
+    cancel_button = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->cancel_button;
+    help_button = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->help_button;
     gtk_signal_connect (GTK_OBJECT (ok_button), "clicked",
-                        (GtkSignalFunc) dlg_close_cb, NULL);
+                        (GtkSignalFunc) dlg_close_cb, gg);
     gtk_signal_connect (GTK_OBJECT (cancel_button), "clicked",
-                        (GtkSignalFunc) dlg_close_cb, NULL);
+                        (GtkSignalFunc) dlg_close_cb, gg);
 
   } else {
 
-    colorsel = GTK_COLOR_SELECTION_DIALOG (colorseldlg)->colorsel;
+    colorsel = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->colorsel;
 
-    if (w == bg_da) {
+    if (w == gg->color_ui.bg_da) {
       color[0] = (gdouble) gg->bg_color.red / 65535.0;
       color[1] = (gdouble) gg->bg_color.green / 65535.0;
       color[2] = (gdouble) gg->bg_color.blue / 65535.0;
 
       gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
 
-    } else if (w == accent_da) {
+    } else if (w == gg->color_ui.accent_da) {
       color[0] = (gdouble) gg->accent_color.red / 65535.0;
       color[1] = (gdouble) gg->accent_color.green / 65535.0;
       color[2] = (gdouble) gg->accent_color.blue / 65535.0;
@@ -291,7 +284,7 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
     }
     else {
       for (i=0; i<NCOLORS; i++) {
-        if (w == fg_da[i]) {
+        if (w == gg->color_ui.fg_da[i]) {
           color[0] = (gdouble) gg->default_color_table[i].red / 65535.0;
           color[1] = (gdouble) gg->default_color_table[i].green / 65535.0;
           color[2] = (gdouble) gg->default_color_table[i].blue / 65535.0;
@@ -302,7 +295,7 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
   }
 
   /* Show the dialog */
-  gtk_widget_show (colorseldlg);
+  gtk_widget_show (gg->color_ui.colorseldlg);
 
   return handled;
 }
@@ -329,11 +322,11 @@ set_color_fg ( GtkWidget *w, GdkEventButton *event , ggobid *gg)
     open_colorsel_dialog (w, gg);
   } else {
     gint rval = false;
-    gtk_signal_emit_by_name (GTK_OBJECT (symbol_display), "expose_event",
+    gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display), "expose_event",
       (gpointer) sp, (gpointer) &rval);
   }
 
-  redraw_fg (fg_da[prev], prev, gg);
+  redraw_fg (gg->color_ui.fg_da[prev], prev, gg);
   redraw_fg (w, k, gg);
 }
 static gint
@@ -345,9 +338,9 @@ set_color_id (GtkWidget *w, GdkEventButton *event, ggobid *gg)
    * and background color swatches, keep track of which drawing area
    * was most recently pressed.
   */
-  current_da = w;
+  gg->color_ui.current_da = w;
 
-  if (w == bg_da || w == accent_da)
+  if (w == gg->color_ui.bg_da || w == gg->color_ui.accent_da)
     set_one_color (w, event, gg);
   else
     set_color_fg (w, event, gg);
@@ -389,7 +382,7 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   ev.x = (gint) event->x;
   ev.y = (gint) event->y;
 
-  pos.y = margin + 3/2;
+  pos.y = gg->color_ui.margin + 3/2;
   pos.x = gg->app.spacing/2;
   g.type = POINT_GLYPH;
   g.size = 1;
@@ -399,7 +392,7 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   pos.y = 0;
   for (i=0; i<NGLYPHSIZES; i++) {
     g.size = i;
-    pos.y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
+    pos.y += (gg->color_ui.margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
     pos.x = gg->app.spacing + gg->app.spacing/2;
 
     g.type = PLUS_GLYPH;
@@ -441,7 +434,7 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
 
   gg->glyph_id.type = type;
   gg->glyph_id.size = size;
-  gtk_signal_emit_by_name (GTK_OBJECT (symbol_display), "expose_event",
+  gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display), "expose_event",
     (gpointer) sp, (gpointer) &rval);
 }
 
@@ -456,12 +449,12 @@ color_expose_show (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 }
 
 static void
-hide_symbol_window () {
+hide_symbol_window (ggobid* gg) {
 
-  gtk_widget_hide (symbol_window);
+  gtk_widget_hide (gg->color_ui.symbol_window);
 
-  if (colorseldlg != NULL && GTK_WIDGET_VISIBLE (colorseldlg))
-    gtk_widget_hide (colorseldlg);
+  if (gg->color_ui.colorseldlg != NULL && GTK_WIDGET_VISIBLE (gg->color_ui.colorseldlg))
+    gtk_widget_hide (gg->color_ui.colorseldlg);
 }
 
 void
@@ -477,52 +470,52 @@ make_symbol_window (ggobid *gg) {
    * closed using the window manager -- even though I'm capturing
    * a delete_event.
   */
-  if (!GTK_IS_WIDGET (symbol_window))
-    symbol_window = NULL;
+  if (!GTK_IS_WIDGET (gg->color_ui.symbol_window))
+    gg->color_ui.symbol_window = NULL;
 
-  if (symbol_window == NULL) {
-    symbol_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (symbol_window), "color/glyph chooser");
+  if (gg->color_ui.symbol_window == NULL) {
+    gg->color_ui.symbol_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (gg->color_ui.symbol_window), "color/glyph chooser");
 
     /*
      * I thought this would be enough to prevent the window from
      * being destroyed, but it doesn't seem to be.
     */
-    gtk_signal_connect (GTK_OBJECT (symbol_window), "delete_event",
-                        GTK_SIGNAL_FUNC (hide_symbol_window), (gpointer) NULL);
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.symbol_window), "delete_event",
+                        GTK_SIGNAL_FUNC (hide_symbol_window), (gpointer) gg);
 
     vbox = gtk_vbox_new (false, 2);
-    gtk_container_add (GTK_CONTAINER (symbol_window), vbox);
+    gtk_container_add (GTK_CONTAINER (gg->color_ui.symbol_window), vbox);
 
     /*
      * the current brush color and bg; the circle will be drawn
      * in the current fg (accent) color
     */
-    symbol_display = gtk_drawing_area_new (); 
+    gg->color_ui.symbol_display = gtk_drawing_area_new (); 
 
     /*
      * margin pixels between glyphs and at the edges
     */
     /*-- 2*(NGLYPHSIZES+1) is the size of the largest glyph --*/
-    width = NGLYPHTYPES*2*(NGLYPHSIZES+1) + margin*(NGLYPHTYPES+1);
+    width = NGLYPHTYPES*2*(NGLYPHSIZES+1) + gg->color_ui.margin*(NGLYPHTYPES+1);
 
-    height = margin;
+    height = gg->color_ui.margin;
     for (i=0; i<NGLYPHSIZES; i++)
-      height += (margin + 2*(i+2));
-    height += margin;
+      height += (gg->color_ui.margin + 2*(i+2));
+    height += gg->color_ui.margin;
 
-    gtk_drawing_area_size (GTK_DRAWING_AREA (symbol_display), width, height);
-    gtk_box_pack_start (GTK_BOX (vbox), symbol_display, false, false, 0);
+    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.symbol_display), width, height);
+    gtk_box_pack_start (GTK_BOX (vbox), gg->color_ui.symbol_display, false, false, 0);
 
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-      symbol_display, "Click to select glyph", NULL);
+      gg->color_ui.symbol_display, "Click to select glyph", NULL);
 
-    gtk_signal_connect (GTK_OBJECT (symbol_display), "expose_event",
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.symbol_display), "expose_event",
       GTK_SIGNAL_FUNC (color_expose_show), gg);
-    gtk_signal_connect (GTK_OBJECT (symbol_display), "button_press_event",
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.symbol_display), "button_press_event",
       GTK_SIGNAL_FUNC (choose_glyph_cb), gg);
 
-    gtk_widget_set_events (symbol_display, GDK_EXPOSURE_MASK
+    gtk_widget_set_events (gg->color_ui.symbol_display, GDK_EXPOSURE_MASK
           | GDK_ENTER_NOTIFY_MASK
           | GDK_LEAVE_NOTIFY_MASK
           | GDK_BUTTON_PRESS_MASK);
@@ -539,27 +532,27 @@ make_symbol_window (ggobid *gg) {
     k = 0;
     for (i=0; i<5; i++) {
       for (j=0; j<2; j++) {
-        fg_da[k] = gtk_drawing_area_new ();
-        gtk_object_set_data (GTK_OBJECT (fg_da[k]),
+        gg->color_ui.fg_da[k] = gtk_drawing_area_new ();
+        gtk_object_set_data (GTK_OBJECT (gg->color_ui.fg_da[k]),
                              "index",
                              GINT_TO_POINTER (k));
-        gtk_drawing_area_size (GTK_DRAWING_AREA (fg_da[k]), PSIZE, PSIZE);
+        gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.fg_da[k]), PSIZE, PSIZE);
 
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), fg_da[k],
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->color_ui.fg_da[k],
           "Click to select brushing color, double click to reset",
           NULL);
 
-        gtk_widget_set_events (fg_da[k],
+        gtk_widget_set_events (gg->color_ui.fg_da[k],
                                GDK_EXPOSURE_MASK
                                | GDK_ENTER_NOTIFY_MASK
                                | GDK_LEAVE_NOTIFY_MASK
                                | GDK_BUTTON_PRESS_MASK);
 
-        gtk_signal_connect (GTK_OBJECT (fg_da[k]), "button_press_event",
+        gtk_signal_connect (GTK_OBJECT (gg->color_ui.fg_da[k]), "button_press_event",
           GTK_SIGNAL_FUNC (set_color_id), gg);
-        gtk_signal_connect (GTK_OBJECT (fg_da[k]), "expose_event",
+        gtk_signal_connect (GTK_OBJECT (gg->color_ui.fg_da[k]), "expose_event",
           GTK_SIGNAL_FUNC (color_expose_fg), gg);
-        gtk_table_attach (GTK_TABLE (fg_table), fg_da[k], i, i+1, j, j+1,
+        gtk_table_attach (GTK_TABLE (fg_table), gg->color_ui.fg_da[k], i, i+1, j, j+1,
           GTK_FILL, GTK_FILL, 10, 10);
 
         k++;
@@ -579,22 +572,22 @@ make_symbol_window (ggobid *gg) {
     bg_table = gtk_table_new (1, 5, true);
     gtk_container_add (GTK_CONTAINER (ebox), bg_table);
 
-    bg_da = gtk_drawing_area_new ();
-    gtk_drawing_area_size (GTK_DRAWING_AREA (bg_da), PSIZE, PSIZE);
+    gg->color_ui.bg_da = gtk_drawing_area_new ();
+    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.bg_da), PSIZE, PSIZE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-      bg_da, "Double click to reset", NULL);
-    gtk_widget_set_events (bg_da,
+      gg->color_ui.bg_da, "Double click to reset", NULL);
+    gtk_widget_set_events (gg->color_ui.bg_da,
                            GDK_EXPOSURE_MASK
                            | GDK_ENTER_NOTIFY_MASK
                            | GDK_LEAVE_NOTIFY_MASK
                            | GDK_BUTTON_PRESS_MASK);
 
-    gtk_signal_connect (GTK_OBJECT (bg_da), "expose_event",
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.bg_da), "expose_event",
       GTK_SIGNAL_FUNC (color_expose_bg), gg);
-    gtk_signal_connect (GTK_OBJECT (bg_da), "button_press_event",
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.bg_da), "button_press_event",
       GTK_SIGNAL_FUNC (set_color_id), gg);
 
-    gtk_table_attach (GTK_TABLE (bg_table), bg_da, 0, 1, 0, 1,
+    gtk_table_attach (GTK_TABLE (bg_table), gg->color_ui.bg_da, 0, 1, 0, 1,
       GTK_FILL, GTK_FILL, 10, 10);
 
 /*
@@ -609,22 +602,22 @@ make_symbol_window (ggobid *gg) {
     accent_table = gtk_table_new (1, 5, true);
     gtk_container_add (GTK_CONTAINER (ebox), accent_table);
 
-    accent_da = gtk_drawing_area_new ();
-    gtk_drawing_area_size (GTK_DRAWING_AREA (accent_da), PSIZE, PSIZE);
+    gg->color_ui.accent_da = gtk_drawing_area_new ();
+    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.accent_da), PSIZE, PSIZE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-      accent_da, "Double click to reset color for labels and axes", NULL);
-    gtk_widget_set_events (accent_da,
+      gg->color_ui.accent_da, "Double click to reset color for labels and axes", NULL);
+    gtk_widget_set_events (gg->color_ui.accent_da,
                            GDK_EXPOSURE_MASK
                            | GDK_ENTER_NOTIFY_MASK
                            | GDK_LEAVE_NOTIFY_MASK
                            | GDK_BUTTON_PRESS_MASK);
 
-    gtk_signal_connect (GTK_OBJECT (accent_da), "expose_event",
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.accent_da), "expose_event",
       GTK_SIGNAL_FUNC (color_expose_accent), gg);
-    gtk_signal_connect (GTK_OBJECT (accent_da), "button_press_event",
+    gtk_signal_connect (GTK_OBJECT (gg->color_ui.accent_da), "button_press_event",
       GTK_SIGNAL_FUNC (set_color_id), gg);
 
-    gtk_table_attach (GTK_TABLE (accent_table), accent_da, 0, 1, 0, 1,
+    gtk_table_attach (GTK_TABLE (accent_table), gg->color_ui.accent_da, 0, 1, 0, 1,
       GTK_FILL, GTK_FILL, 10, 10);
 
 /*
@@ -637,5 +630,5 @@ make_symbol_window (ggobid *gg) {
                         GTK_SIGNAL_FUNC (hide_symbol_window), NULL);
   }
 
-  gtk_widget_show_all (symbol_window);
+  gtk_widget_show_all (gg->color_ui.symbol_window);
 }

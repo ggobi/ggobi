@@ -10,12 +10,6 @@
 
 #define VAR_CIRCLE_DIAM 40
 
-static GtkWidget *varpanel = NULL;
-static GtkWidget *scrolled_window;
-static GtkWidget **da, **varlabel;
-static GtkAccelGroup *varpanel_accel_group;
-
-static gint vnrows, vncols;
 
 /* */
 static void varcircle_add (gint, gint, gint, ggobid *gg);
@@ -93,24 +87,23 @@ GtkWidget *
 p1d_menu_build (gint jvar, ggobid *gg)
 {
   GtkWidget *menu;
-  /*  static varseldatad vdata0, vdata1; */
 
-  gg->app.vdata0.sp = gg->app.vdata1.sp = gg->current_splot;
-  gg->app.vdata0.jvar = gg->app.vdata1.jvar = jvar;
-  gg->app.vdata0.alt_mod = gg->app.vdata1.alt_mod = false;
+  gg->p1d_menu.vdata0.sp = gg->p1d_menu.vdata1.sp = gg->current_splot;
+  gg->p1d_menu.vdata0.jvar = gg->p1d_menu.vdata1.jvar = jvar;
+  gg->p1d_menu.vdata0.alt_mod = gg->p1d_menu.vdata1.alt_mod = false;
 
-  gg->app.vdata0.btn = 1;
-  gg->app.vdata1.btn = 2;
+  gg->p1d_menu.vdata0.btn = 1;
+  gg->p1d_menu.vdata1.btn = 2;
 
   menu = gtk_menu_new ();
 
   CreateMenuItem (menu, "Select X    L",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &(gg->app.vdata0), gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &(gg->p1d_menu.vdata0), gg);
 
   CreateMenuItem (menu, "Select Y    M,R",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &(gg->app.vdata1), gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &(gg->p1d_menu.vdata1), gg);
 
   return menu;
 }
@@ -119,24 +112,26 @@ GtkWidget *
 xyplot_menu_build (gint jvar, ggobid *gg)
 {
   GtkWidget *menu;
-  static varseldatad vdata0, vdata1;
 
-  vdata0.sp = vdata1.sp = gg->current_splot;
-  vdata0.jvar = vdata1.jvar = jvar;
-  vdata0.alt_mod = vdata1.alt_mod = false;
+  gg->xyplot_menu.vdata0.sp = gg->xyplot_menu.vdata1.sp = gg->current_splot;
+  gg->xyplot_menu.vdata0.jvar = gg->xyplot_menu.vdata1.jvar = jvar;
+  gg->xyplot_menu.vdata0.alt_mod = gg->xyplot_menu.vdata1.alt_mod = false;
 
-  vdata0.btn = 1;
-  vdata1.btn = 2;
+  gg->xyplot_menu.vdata0.btn = 1;
+  gg->xyplot_menu.vdata1.btn = 2;
+
+  gg->xyplot_menu.vdata0.gg = gg;
+  gg->xyplot_menu.vdata1.gg = gg;
 
   menu = gtk_menu_new ();
 
   CreateMenuItem (menu, "Select X    L",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata0, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->xyplot_menu.vdata0, gg);
 
   CreateMenuItem (menu, "Select Y    M,R",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata1, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->xyplot_menu.vdata1, gg);
 
   return menu;
 }
@@ -145,26 +140,27 @@ GtkWidget *
 rotation_menu_build (gint jvar, ggobid *gg)
 {
   GtkWidget *menu;
-  static varseldatad vdata0, vdata1, vdata2;
+  
+  gg->rotation_menu.vdata0.sp = gg->rotation_menu.vdata1.sp = gg->rotation_menu.vdata2.sp = gg->current_splot;
+  gg->rotation_menu.vdata0.jvar = gg->rotation_menu.vdata1.jvar = gg->rotation_menu.vdata2.jvar = jvar;
+  gg->rotation_menu.vdata0.alt_mod = gg->rotation_menu.vdata1.alt_mod = gg->rotation_menu.vdata2.alt_mod = false;
 
-  vdata0.sp = vdata1.sp = vdata2.sp = gg->current_splot;
-  vdata0.jvar = vdata1.jvar = vdata2.jvar = jvar;
-  vdata0.alt_mod = vdata1.alt_mod = vdata2.alt_mod = false;
+  gg->rotation_menu.vdata0.btn = 1;
+  gg->rotation_menu.vdata1.btn = 2;
+  gg->rotation_menu.vdata2.btn = 3;
 
-  vdata0.btn = 1;
-  vdata1.btn = 2;
-  vdata2.btn = 3;
+  gg->rotation_menu.vdata2.gg = gg->rotation_menu.vdata1.gg = gg->rotation_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
   CreateMenuItem (menu, "Select X  L",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata0, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->rotation_menu.vdata0, gg);
   CreateMenuItem (menu, "Select Y  M",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata1, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->rotation_menu.vdata1, gg);
   CreateMenuItem (menu, "Select Z  R",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata2, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->rotation_menu.vdata2, gg);
 
   return menu;
 }
@@ -173,26 +169,28 @@ GtkWidget *
 tour2d_menu_build (gint jvar, ggobid *gg)
 {
   GtkWidget *menu;
-  static varseldatad vdata0, vdata1, vdata2;
 
-  vdata0.sp = vdata1.sp = vdata2.sp = gg->current_splot;
-  vdata0.jvar = vdata1.jvar = vdata2.jvar = jvar;
-  vdata0.alt_mod = vdata1.alt_mod = vdata2.alt_mod = false;
-  vdata0.shift_mod = vdata2.shift_mod = false;
-  vdata1.shift_mod = true;
-  vdata0.ctrl_mod = vdata1.ctrl_mod = false;
-  vdata2.ctrl_mod = true;
+  gg->tour2d_menu.vdata0.sp = gg->tour2d_menu.vdata1.sp = gg->tour2d_menu.vdata2.sp = gg->current_splot;
+  gg->tour2d_menu.vdata0.jvar = gg->tour2d_menu.vdata1.jvar = gg->tour2d_menu.vdata2.jvar = jvar;
+  gg->tour2d_menu.vdata0.alt_mod = gg->tour2d_menu.vdata1.alt_mod = gg->tour2d_menu.vdata2.alt_mod = false;
+  gg->tour2d_menu.vdata0.shift_mod = gg->tour2d_menu.vdata2.shift_mod = false;
+  gg->tour2d_menu.vdata1.shift_mod = true;
+  gg->tour2d_menu.vdata0.ctrl_mod = gg->tour2d_menu.vdata1.ctrl_mod = false;
+  gg->tour2d_menu.vdata2.ctrl_mod = true;
+
+  gg->tour2d_menu.vdata2.gg =   gg->tour2d_menu.vdata1.gg =   gg->tour2d_menu.vdata0.gg = gg;
+
 
   menu = gtk_menu_new ();
   CreateMenuItem (menu, "Tour   L,M",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata0, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->tour2d_menu.vdata0, gg);
   CreateMenuItem (menu, "Manip  <Shift> L,M",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata1, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->tour2d_menu.vdata1, gg);
   CreateMenuItem (menu, "Freeze <Ctrl> L,M",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata2, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->tour2d_menu.vdata2, gg);
 
   return menu;
 }
@@ -217,20 +215,21 @@ GtkWidget *
 parcoords_menu_build (gint jvar, ggobid *gg)
 {
   GtkWidget *menu;
-  static varseldatad vdata0, vdata1;
 
-  vdata0.sp = vdata1.sp = gg->current_splot;
-  vdata0.jvar = vdata1.jvar = jvar;
-  vdata0.alt_mod = false;
-  vdata1.alt_mod = true;
+  gg->parcoords_menu.vdata0.sp = gg->parcoords_menu.vdata1.sp = gg->current_splot;
+  gg->parcoords_menu.vdata0.jvar = gg->parcoords_menu.vdata1.jvar = jvar;
+  gg->parcoords_menu.vdata0.alt_mod = false;
+  gg->parcoords_menu.vdata1.alt_mod = true;
+
+  gg->parcoords_menu.vdata1.gg = gg->parcoords_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
   CreateMenuItem (menu, "Select Y      M,R",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata0, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->parcoords_menu.vdata0, gg);
   CreateMenuItem (menu, "Delete Y <alt>M,R",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata1, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->parcoords_menu.vdata1, gg);
 
   return menu;
 }
@@ -239,29 +238,30 @@ GtkWidget *
 scatmat_menu_build (gint jvar, ggobid *gg)
 {
   GtkWidget *menu;
-  static varseldatad vdata0, vdata1, vdata2, vdata3;
 
-  vdata0.sp = vdata1.sp = vdata2.sp = vdata3.sp = gg->current_splot;
-  vdata0.jvar = vdata1.jvar = vdata2.jvar = vdata3.jvar = jvar;
-  vdata0.alt_mod = vdata1.alt_mod = false;
-  vdata2.alt_mod = vdata3.alt_mod = 3;
+  gg->scatmat_menu.vdata0.sp = gg->scatmat_menu.vdata1.sp = gg->scatmat_menu.vdata2.sp = gg->scatmat_menu.vdata3.sp = gg->current_splot;
+  gg->scatmat_menu.vdata0.jvar = gg->scatmat_menu.vdata1.jvar = gg->scatmat_menu.vdata2.jvar = gg->scatmat_menu.vdata3.jvar = jvar;
+  gg->scatmat_menu.vdata0.alt_mod = gg->scatmat_menu.vdata1.alt_mod = false;
+  gg->scatmat_menu.vdata2.alt_mod = gg->scatmat_menu.vdata3.alt_mod = 3;
 
-  vdata0.btn = vdata2.btn = 1;
-  vdata1.btn = vdata3.btn = 2;
+  gg->scatmat_menu.vdata0.btn = gg->scatmat_menu.vdata2.btn = 1;
+  gg->scatmat_menu.vdata1.btn = gg->scatmat_menu.vdata3.btn = 2;
+
+  gg->scatmat_menu.vdata3.gg = gg->scatmat_menu.vdata2.gg = gg->scatmat_menu.vdata1.gg = gg->scatmat_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
   CreateMenuItem (menu, "Select row  L",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata0, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->scatmat_menu.vdata0, gg);
   CreateMenuItem (menu, "Select col  M,R",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata1, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->scatmat_menu.vdata1, gg);
   CreateMenuItem (menu, "Delete row  <alt>L",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata2, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->scatmat_menu.vdata2, gg);
   CreateMenuItem (menu, "Delete col  <alt>M,R",
-    NULL, NULL, varpanel, varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &vdata3, gg);
+    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
+    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->scatmat_menu.vdata3, gg);
 
   return menu;
 }
@@ -285,7 +285,7 @@ popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd)
   if (event->type == GDK_BUTTON_PRESS) {
     GdkEventButton *bevent = (GdkEventButton *) event;
     if (bevent->button == 1) {
-      gint projection = projection_get ();
+      gint projection = projection_get (gg);
 
       switch (display->displaytype) {
 
@@ -371,20 +371,20 @@ variable_clone (gint jvar, ggobid *gg) {
    * Follow the algorithm by which the table
    * has been populated
   */
-  if (vnrows*vncols <= gg->ncols) {
-    vnrows++;
-    gtk_table_resize (GTK_TABLE (varpanel), vnrows, vncols);
+  if (gg->varpanel_ui.vnrows*gg->varpanel_ui.vncols <= gg->ncols) {
+    gg->varpanel_ui.vnrows++;
+    gtk_table_resize (GTK_TABLE (gg->varpanel_ui.varpanel), gg->varpanel_ui.vnrows, gg->varpanel_ui.vncols);
   }
 
   k = 0;
-  for (i=0; i<vnrows; i++) {
-    for (j=0; j<vncols; j++) {
+  for (i=0; i<gg->varpanel_ui.vnrows; i++) {
+    for (j=0; j<gg->varpanel_ui.vncols; j++) {
       if (k < gg->ncols)
         ;
       else {
-        da = (GtkWidget **) g_realloc (da,
+        gg->varpanel_ui.da = (GtkWidget **) g_realloc (gg->varpanel_ui.da,
           (gg->ncols+1) * sizeof (GtkWidget *));
-        varlabel = (GtkWidget **) g_realloc (varlabel,
+        gg->varpanel_ui.varlabel = (GtkWidget **) g_realloc (gg->varpanel_ui.varlabel,
           (gg->ncols+1) * sizeof (GtkWidget *));
         varcircle_add (i, j, k, gg);
       }
@@ -393,7 +393,7 @@ variable_clone (gint jvar, ggobid *gg) {
     }
   }
 
-  gtk_widget_show_all (varpanel);
+  gtk_widget_show_all (gg->varpanel_ui.varpanel);
   gg->ncols++;
 
   vartable_row_append (gg->ncols-1, gg);
@@ -449,10 +449,10 @@ varcircle_draw (gint jvar, ggobid *gg)
     return;  /*-- return --*/
 
   if (gg->selvarfg_GC == NULL) 
-    init_var_GCs (da[jvar], gg);
+    init_var_GCs (gg->varpanel_ui.da[jvar], gg);
 
   if (vpixmap == NULL) {
-    vpixmap = gdk_pixmap_new (da[jvar]->window,
+    vpixmap = gdk_pixmap_new (gg->varpanel_ui.da[jvar]->window,
               VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1, -1);
   }
 
@@ -545,7 +545,7 @@ varcircle_draw (gint jvar, ggobid *gg)
   /*
    * copy the pixmap to the window
   */
-  gdk_draw_pixmap (da[jvar]->window, gg->unselvarfg_GC, vpixmap, 0, 0, 0, 0,
+  gdk_draw_pixmap (gg->varpanel_ui.da[jvar]->window, gg->unselvarfg_GC, vpixmap, 0, 0, 0, 0,
     VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
 }
 
@@ -576,44 +576,44 @@ varcircle_add (gint i, gint j, gint k, ggobid *gg)
   gtk_container_border_width (GTK_CONTAINER (vb), 1);
   gtk_widget_show (vb);
 
-  varlabel[k] = gtk_button_new_with_label (gg->vardata[k].collab);
+  gg->varpanel_ui.varlabel[k] = gtk_button_new_with_label (gg->vardata[k].collab);
 
-  gtk_widget_show (varlabel[k]);
+  gtk_widget_show (gg->varpanel_ui.varlabel[k]);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    varlabel[k], "Click left to select", NULL);
-  gtk_container_add (GTK_CONTAINER (vb), varlabel[k]);
+    gg->varpanel_ui.varlabel[k], "Click left to select", NULL);
+  gtk_container_add (GTK_CONTAINER (vb), gg->varpanel_ui.varlabel[k]);
 
-  gtk_signal_connect (GTK_OBJECT (varlabel[k]), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.varlabel[k]), "button_press_event",
     GTK_SIGNAL_FUNC (popup_varmenu), GINT_TO_POINTER (k));
 
 
-  GGobi_widget_set(GTK_WIDGET(varlabel[k]), gg, true);
+  GGobi_widget_set(GTK_WIDGET(gg->varpanel_ui.varlabel[k]), gg, true);
   /*
    * a drawing area to contain the variable circle
   */
 
-  da[k] = gtk_drawing_area_new ();
-  gtk_drawing_area_size (GTK_DRAWING_AREA (da[k]),
+  gg->varpanel_ui.da[k] = gtk_drawing_area_new ();
+  gtk_drawing_area_size (GTK_DRAWING_AREA (gg->varpanel_ui.da[k]),
     VAR_CIRCLE_DIAM+2, VAR_CIRCLE_DIAM+2);
-  gtk_widget_set_events (da[k], GDK_EXPOSURE_MASK
+  gtk_widget_set_events (gg->varpanel_ui.da[k], GDK_EXPOSURE_MASK
              | GDK_ENTER_NOTIFY_MASK
              | GDK_LEAVE_NOTIFY_MASK
              | GDK_BUTTON_PRESS_MASK
              | GDK_BUTTON_RELEASE_MASK);
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    da[k], "Click to select; see menu", NULL);
+    gg->varpanel_ui.da[k], "Click to select; see menu", NULL);
 
-  gtk_signal_connect (GTK_OBJECT (da[k]), "expose_event",
+  gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.da[k]), "expose_event",
     GTK_SIGNAL_FUNC (da_expose_cb), GINT_TO_POINTER (k));
-  gtk_signal_connect (GTK_OBJECT (da[k]), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.da[k]), "button_press_event",
     GTK_SIGNAL_FUNC (varsel_cb), GINT_TO_POINTER (k));
 
-  GGobi_widget_set(GTK_WIDGET(da[k]), gg, true);
+  GGobi_widget_set(GTK_WIDGET(gg->varpanel_ui.da[k]), gg, true);
 
-  gtk_widget_show (da[k]);
-  gtk_container_add (GTK_CONTAINER (vb), da[k]);
-  gtk_table_attach (GTK_TABLE (varpanel), vb, j, j+1, i, i+1,
+  gtk_widget_show (gg->varpanel_ui.da[k]);
+  gtk_container_add (GTK_CONTAINER (vb), gg->varpanel_ui.da[k]);
+  gtk_table_attach (GTK_TABLE (gg->varpanel_ui.varpanel), vb, j, j+1, i, i+1,
     GTK_FILL, GTK_FILL, 0, 0);
 }
 
@@ -624,18 +624,18 @@ void varpanel_populate (ggobid *gg)
 
   /*-- realloc in case they've been alloc'ed before --*/
 
-  if (da == NULL) {
-    da = (GtkWidget **) g_malloc (gg->ncols * sizeof (GtkWidget *));
-    varlabel = (GtkWidget **) g_malloc (gg->ncols * sizeof (GtkWidget *));
+  if (gg->varpanel_ui.da == NULL) {
+    gg->varpanel_ui.da = (GtkWidget **) g_malloc (gg->ncols * sizeof (GtkWidget *));
+    gg->varpanel_ui.varlabel = (GtkWidget **) g_malloc (gg->ncols * sizeof (GtkWidget *));
   } else {
-    da = (GtkWidget **) g_realloc (da, gg->ncols * sizeof (GtkWidget *));
-    varlabel = (GtkWidget **) g_realloc (varlabel,
+    gg->varpanel_ui.da = (GtkWidget **) g_realloc (gg->varpanel_ui.da, gg->ncols * sizeof (GtkWidget *));
+    gg->varpanel_ui.varlabel = (GtkWidget **) g_realloc (gg->varpanel_ui.varlabel,
                                          gg->ncols * sizeof (GtkWidget *));
   }
 
   k = 0;
-  for (i=0; i<vnrows; i++) {
-    for (j=0; j<vncols; j++) {
+  for (i=0; i<gg->varpanel_ui.vnrows; i++) {
+    for (j=0; j<gg->varpanel_ui.vncols; j++) {
       varcircle_add (i, j, k, gg);
       k++;
       if (k == gg->ncols) break;
@@ -648,26 +648,26 @@ make_varpanel (GtkWidget *parent, ggobid *gg) {
 
   gg->selvarfg_GC = NULL;
 
-  varpanel_accel_group = gtk_accel_group_new ();
+  gg->varpanel_ui.varpanel_accel_group = gtk_accel_group_new ();
 
   /* create a new scrolled window. */
-  scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+  gg->varpanel_ui.scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-  gtk_box_pack_start (GTK_BOX (parent), scrolled_window, true, true, 2);
-  gtk_widget_show (scrolled_window);
+  gtk_box_pack_start (GTK_BOX (parent), gg->varpanel_ui.scrolled_window, true, true, 2);
+  gtk_widget_show (gg->varpanel_ui.scrolled_window);
 
-  varpanel = gtk_table_new (vnrows, vncols, true);
+  gg->varpanel_ui.varpanel = gtk_table_new (gg->varpanel_ui.vnrows, gg->varpanel_ui.vncols, true);
 
   /* pack the table into the scrolled window */
   gtk_scrolled_window_add_with_viewport (
-    GTK_SCROLLED_WINDOW (scrolled_window), varpanel);
-  gtk_widget_show (varpanel);
+    GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window), gg->varpanel_ui.varpanel);
+  gtk_widget_show (gg->varpanel_ui.varpanel);
 
   varpanel_layout_init (gg);
   varpanel_populate (gg);
 
-  gtk_widget_show_all (scrolled_window);
+  gtk_widget_show_all (gg->varpanel_ui.scrolled_window);
 }
 
 /*
@@ -677,25 +677,25 @@ make_varpanel (GtkWidget *parent, ggobid *gg) {
 void
 varpanel_layout_init (ggobid *gg) {
 
-  vnrows = (gint) sqrt ((gdouble) gg->ncols);
-  vncols = vnrows;
+  gg->varpanel_ui.vnrows = (gint) sqrt ((gdouble) gg->ncols);
+  gg->varpanel_ui.vncols = gg->varpanel_ui.vnrows;
 
-  while (vnrows*vncols < gg->ncols) {
-    vnrows++;
-    if (vnrows*vncols < gg->ncols)
-      vncols++;
+  while (gg->varpanel_ui.vnrows*gg->varpanel_ui.vncols < gg->ncols) {
+    gg->varpanel_ui.vnrows++;
+    if (gg->varpanel_ui.vnrows*gg->varpanel_ui.vncols < gg->ncols)
+      gg->varpanel_ui.vncols++;
   }
 }
 
 
 void
-varpanel_size_init (gint cpanel_height)
+varpanel_size_init (gint cpanel_height, ggobid* gg)
 {
   gint i;
-  GtkTable *t = GTK_TABLE (varpanel);
+  GtkTable *t = GTK_TABLE (gg->varpanel_ui.varpanel);
   GtkTableRowCol c, r;
   gint width = 0, height = 0;
-  GtkWidget *vport = GTK_WIDGET ((GTK_BIN (scrolled_window))->child);
+  GtkWidget *vport = GTK_WIDGET ((GTK_BIN (gg->varpanel_ui.scrolled_window))->child);
 
   /*-- Find the width of the first few columns --*/
   for (i=0; i<MIN (t->ncols, 3); i++) {
@@ -718,12 +718,12 @@ varpanel_refresh (ggobid *gg) {
   gint j;
 
   for (j=0; j<gg->ncols; j++)
-    if (GTK_WIDGET_REALIZED (da[j]))
-      gtk_widget_queue_draw (da[j]);
+    if (GTK_WIDGET_REALIZED (gg->varpanel_ui.da[j]))
+      gtk_widget_queue_draw (gg->varpanel_ui.da[j]);
 }
 
 void
 varlabel_set (gint j, ggobid *gg) {
-  gtk_label_set_text (GTK_LABEL (GTK_BIN (varlabel[j])->child),
+  gtk_label_set_text (GTK_LABEL (GTK_BIN (gg->varpanel_ui.varlabel[j])->child),
     gg->vardata[j].collab_tform);
 }

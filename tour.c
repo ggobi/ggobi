@@ -639,7 +639,9 @@ void * tour_thread (void *args)
 }
 */
 
+
 static gint tour_idled = 0;  /*-- could be at display level --*/
+
 gint
 tour_idle_func (ggobid *gg)
 {
