@@ -233,18 +233,16 @@ impute_window_open (ggobid *gg)
 
     btn = gtk_button_new_with_label ("Impute");
     gtk_signal_connect (GTK_OBJECT (btn),
-                        "clicked",
-                        GTK_SIGNAL_FUNC (impute_cb),
-                        (gpointer) gg);
+      "clicked", GTK_SIGNAL_FUNC (impute_cb), (gpointer) gg);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Impute or assign values to missings", NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
 
     btn = gtk_button_new_with_label ("Rescale");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Rescale the data after imputing", NULL);
+      "Rescale the data after imputing", NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (rescale_cb), (gpointer) gg);
+      GTK_SIGNAL_FUNC (rescale_cb), (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
 
     /*-- add a close button --*/
