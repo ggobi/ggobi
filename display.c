@@ -581,7 +581,9 @@ display_free_all (ggobid *gg) {
    */
   for (dlist = gg->displays; count > 0 && dlist; dlist = dlist->next, count--)
   {
-    gint nc = display->d->ncols;
+    gint nc;
+    display = (displayd *) dlist->data;
+    nc = display->d->ncols;
     /*    display = (displayd *) dlist->data; */
     display = (displayd*) g_list_nth_data (gg->displays,count-1);
     if (display == NULL)
