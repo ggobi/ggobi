@@ -92,9 +92,13 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
      * have ids, they need to be assigned.
     */
     if (d->rowIds == NULL) {
-      d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
+      gchar **rowids = (gchar **) g_malloc (d->nrows * sizeof(gchar *));
       for (i=0; i<d->nrows; i++)
-        d->rowIds[i] = g_strdup_printf ("%d", i);
+        rowids[i] = g_strdup_printf ("%d", i);
+      datad_record_ids_set (d, rowids, true);
+      for (i=0; i<d->nrows; i++)
+        g_free (rowids[i]);
+      g_free (rowids);
     }
     datad_record_ids_set (dnew, d->rowIds, true);
     /*-- --*/
