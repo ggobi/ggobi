@@ -560,7 +560,7 @@ In the same way that we embed the JVM, we have also embedded the R
 interpreter.  This allows one to develop plugins in the R language,
 creating regular and input plugins with R functions.
 
-\subection{Perl \& Python}
+\subsection{Perl \&  Python}
 
 It is also possible to embed the Perl or Python interpreters into
 GGobi (as well as GGobi in either of these languages).  Then we can
@@ -719,7 +719,7 @@ Give this exports file, we are ready to compile the DLL.
 The following general rule 
 \begin{verbatim}
 $(PKG).dll: $(OBJS) $(PKG).def
-	$(CC) -mwindows -s -shared -o $@ $(PKG).def $(OBJS) $(GGOBI_LIB) $(LIBS) $(XML_LIBS) 
+        $(CC) -mwindows -s -shared -o $@ $(PKG).def $(OBJS) $(GGOBI_LIB) $(LIBS) $(XML_LIBS) 
 \end{verbatim}
 builds the DLL for the plugin.
 
@@ -742,6 +742,43 @@ to them within this directory, e.g. as
 </plugins>
 </ggobirc>
 \end{verbatim}
+
+
+
+\section{Identifying Plugins for GGobi}
+It is possible to specify plugin specifications on the command line
+using the \flag{-plugin} flag.  This allows us to use plugins without
+having them specified in the initialization file.  For example,
+suppose we want to use a particular plugin that is described in the
+file \file{myPlugin.xml} in a directory named \dir{dir} but do not
+want to put it permanently in our initialization file.
+We can do this by invoking GGobi as
+\begin{verbatim}
+ggobi --plugin=dir/myPlugin.xml
+\end{verbatim}
+This will cause GGobi to read the initialization file and then also
+the \file{myPlugin.xml} file.  That file can have one or more
+\XMLElement{plugin} or \XMLElement{inputPlugin} entries.  If the file
+has multiple plugins, you should enclose them within a top-level
+\XMLElement{plugins} element.
+
+One can specify any number of plugin files on the command line,
+e.g.
+\begin{verbatim}
+ ggobi --plugin=dir/myPlugin  --plugin=otherDir/otherPlugin.xml
+\end{verbatim}
+These files are processed in the order specified on the command line.
+
+
+\section{Plugin Documentation}
+One can and should document plugins so that users can understand them.
+While one can create separate stand-alone documents, it is often
+beneficial to add the documentation to the \file{plugin.xml} file
+directly. Using \url{http://www.docbook.org}{Docbook}-like markup, one
+can author documentation that is readily converted to HTML, PDF, etc.
+We have provided a simple XSL file that converts the documentation to
+HTML.  (This uses the Omegahat XSL and Docbook XSL files also.)  See
+\file{plugin.xml} in the \dir{ExcelReader} plugin for an example.
 
 
 
