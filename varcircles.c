@@ -197,12 +197,64 @@ manip_select_cb (GtkWidget *w, GdkEvent *event, datad *d)
   return true;
 }
 
+static gint
+freeze_select_cb (GtkWidget *w, GdkEvent *event, datad *d)
+{
+g_printerr ("not yet implemented\n");
+  
+  return true;
+}
+
+static gint
+da_manip_expose_cb (GtkWidget *w, GdkEvent *event, datad *d)
+{
+/*  ggobid *gg = d->gg;*/
+  GdkColormap *cmap = gdk_colormap_get_system ();
+  GdkGC *gc = gdk_gc_new (w->window);
+  GdkColor color = {0, 0xffff, 0x0000, 0xffff};
+  gboolean writeable = false, best_match = true;
+
+  gdk_colormap_alloc_color  (cmap, &color, writeable, best_match);
+  gdk_gc_set_foreground (gc, &color);
+  gdk_draw_rectangle (w->window, gc,
+                      true,  /* fill */
+                      0, 0,
+                      w->allocation.width, w->allocation.height);
+
+  gdk_gc_destroy (gc);
+
+  return true;
+}
+
+static gint
+da_freeze_expose_cb (GtkWidget *w, GdkEvent *event, datad *d)
+{
+/*  ggobid *gg = d->gg;*/
+  GdkColormap *cmap = gdk_colormap_get_system ();
+  GdkGC *gc = gdk_gc_new (w->window);
+  GdkColor color = {0, 0x0000, 0xffff, 0x0000};
+  gboolean writeable = false, best_match = true;
+
+  gdk_colormap_alloc_color  (cmap, &color, writeable, best_match);
+  gdk_gc_set_foreground (gc, &color);
+  gdk_draw_rectangle (w->window, gc,
+                      true,  /* fill */
+                      0, 0,
+                      w->allocation.width, w->allocation.height);
+
+  gdk_gc_destroy (gc);
+
+  return true;
+}
+
+
 /*-- create the variable circles interface --*/
 void
 varcircles_populate (datad *d, ggobid *gg)
 {
   gint i, j, k;
   GtkWidget *vb;
+  GtkWidget *da;
 
   varcircles_layout_init (d, gg);
   d->vcirc_ui.jcursor = NULL;  /*-- start with the default cursor --*/
@@ -240,9 +292,18 @@ varcircles_populate (datad *d, ggobid *gg)
   }
 
   /*-- the second child of the vbox: an hbox with buttons --*/
-  d->vcirc_ui.hbox = gtk_hbox_new (false, 5);
+  d->vcirc_ui.hbox = gtk_hbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.vbox), d->vcirc_ui.hbox,
     false, false, 2);
+
+  /* -- a drawing area to place next to the manip button as a color key --*/
+  da = gtk_drawing_area_new ();
+  gtk_drawing_area_size (GTK_DRAWING_AREA (da), 8, 8);
+  gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
+  gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da,
+    false, false, 2);
+  gtk_signal_connect (GTK_OBJECT (da), "expose_event",
+    GTK_SIGNAL_FUNC (da_manip_expose_cb), d);
 
   d->vcirc_ui.manip_btn = gtk_button_new_with_label ("Manip");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), d->vcirc_ui.manip_btn,
@@ -252,6 +313,24 @@ varcircles_populate (datad *d, ggobid *gg)
     true, true, 2);
   gtk_signal_connect (GTK_OBJECT (d->vcirc_ui.manip_btn),
     "button_press_event", GTK_SIGNAL_FUNC (manip_select_cb), d);
+
+  /* -- a drawing area to place next to the manip button as a color key --*/
+  da = gtk_drawing_area_new ();
+  gtk_drawing_area_size (GTK_DRAWING_AREA (da), 8, 8);
+  gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
+  gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da,
+    false, false, 2);
+  gtk_signal_connect (GTK_OBJECT (da), "expose_event",
+    GTK_SIGNAL_FUNC (da_freeze_expose_cb), d);
+
+  d->vcirc_ui.freeze_btn = gtk_button_new_with_label ("Freeze");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), d->vcirc_ui.freeze_btn,
+    "Click here, then click on the variable you wish to freeze",
+    NULL);
+  gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), d->vcirc_ui.freeze_btn,
+    true, true, 2);
+  gtk_signal_connect (GTK_OBJECT (d->vcirc_ui.freeze_btn),
+    "button_press_event", GTK_SIGNAL_FUNC (freeze_select_cb), d);
 
   gtk_widget_show_all (d->vcirc_ui.vbox);
 }
