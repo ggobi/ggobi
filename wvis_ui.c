@@ -189,7 +189,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
   gint selected_var = get_one_selection_from_clist (clist);
 
   icoords *mousepos = &gg->wvis.mousepos;
-  gint nearest_color = gg->wvis.nearest_color;
+  gint color = gg->wvis.nearest_color;
 
   gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
 
@@ -198,10 +198,11 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
           (gfloat) (w->allocation.width - 2*xmargin);
 
     /*-- don't allow it to cross its neighbors' boundaries --*/
-    if (val >= gg->wvis.pct[nearest_color-1] &&
-        val <= gg->wvis.pct[nearest_color+1])
+    if ((color == 0 && val <= gg->wvis.pct[color+1]) ||
+        (color == gg->wvis.npct-1 && val >= gg->wvis.pct[color+1]) ||
+        (val >= gg->wvis.pct[color-1] && val <= gg->wvis.pct[color+1]))
     {
-      gg->wvis.pct[nearest_color] = val;
+      gg->wvis.pct[color] = val;
 
       if (selected_var != -1 && selected_var < d->ncols)
         bin_counts_reset (selected_var, d, gg);
