@@ -66,7 +66,9 @@ typedef struct {
  vector_f p1d_data; /* the spreading data */
  lims p1d_lim;      /* limits of the spreading data */
  gfloat p1d_mean;
-
+ /*-- line segments in parallel coordinates plot --*/
+ GArray *p1d_segs;
+ 
 
 /*
  * tour1d (variables used to record the state of the 1D tour for this plot)
@@ -76,6 +78,7 @@ typedef struct {
    gint keepmax; /* Is this ever used */
    gboolean firsttime;
  } tour1d;
+
 /*
  * xyplot
 */

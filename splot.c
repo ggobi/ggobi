@@ -580,6 +580,7 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
 
 /*  could become splot_p1d_init ();*/
   sp->p1dvar = 0;
+  sp->p1d_segs = NULL;
 
 /*  could become splot_xyplot_init ();*/
   sp->xyvars.x = 0;
@@ -708,7 +709,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   gint i, k;
   gfloat scale_x, scale_y;
   datad *d = display->d;
-  long ltmp;
+  glong ltmp;
 
 
 #ifdef BARCHART_IMPLEMENTED

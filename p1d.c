@@ -175,3 +175,30 @@ p1d_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
 
   return redraw;
 }
+
+/*---------------------------------------------------------------------*/
+
+void
+p1d_build_segments (splotd *sp, ggobid *gg)
+{
+}
+
+/*
+ * If drawing an ASH in a scatterplot or scatterplot display,
+ * then it may become possible to add line segments ...
+*/
+void
+add_p1d_segs (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
+  displayd *display = sp->displayptr;
+  datad *d = display->d;
+
+  if (sp->p1d_segs == NULL) {
+    sp->p1d_segs = g_array_new (FALSE, FALSE, sizeof (GdkSegment));
+    p1d_build_segments (sp, gg);
+  } else if (sp->p1d_segs->len != d->nrows_in_plot) {
+    g_array_free (sp->p1d_segs, false);  /*-- no need to free each segment? --*/
+    sp->p1d_segs = g_array_new (FALSE, FALSE, sizeof (GdkSegment));
+    p1d_build_segments (sp, gg);
+  }
+
+}

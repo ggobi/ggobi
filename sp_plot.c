@@ -262,6 +262,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     */
     for (k=0; k<ncolors_used; k++) {
       current_color = colors_used[k];
+
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
 
 #ifdef WIN32
@@ -417,6 +418,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
       */
       for (k=0; k<ncolors_used; k++) {
         current_color = colors_used[k];
+
         gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
 
 #ifdef WIN32
