@@ -646,7 +646,7 @@ GGOBI(getCaseHiddens)(gint *pts, gint howMany, datad *d, ggobid *gg)
 
 
 gboolean 
-GGOBI(isConnectedEdge)(gint a, gint b, ggobid *gg)
+GGOBI(isConnectedEdge)(gint a, gint b, datad *d, ggobid *gg)
 {
   gint tmp, i;
 
@@ -656,12 +656,12 @@ GGOBI(isConnectedEdge)(gint a, gint b, ggobid *gg)
      b = tmp;
   }
 
-  for(i = 0; i < gg->nedges ; i++) {
+  for(i = 0; i < d->nedges ; i++) {
     
-    if(gg->edge_endpoints[i].a == a && gg->edge_endpoints[i].b == b)
+    if(d->edge_endpoints[i].a == a && d->edge_endpoints[i].b == b)
        return(true);
 
-    if(gg->edge_endpoints[i].a > a) {
+    if(d->edge_endpoints[i].a > a) {
       return(false);
     } 
   }
@@ -679,12 +679,12 @@ GGOBI(isConnectedEdge)(gint a, gint b, ggobid *gg)
 void
 GGOBI(setObservationEdge)(gint x, gint y, datad *d, ggobid *gg, gboolean update)
 {
-  if (GGOBI(isConnectedEdge)(x, y, gg) == false) {
+  if (GGOBI(isConnectedEdge)(x, y, d, gg) == false) {
     if (update)
-      edges_alloc (gg->nedges+1, d, gg);
-    gg->edge_endpoints[gg->nedges].a = x;
-    gg->edge_endpoints[gg->nedges].b = y;
-    gg->nedges++;
+      edges_alloc (d->nedges+1, d, gg);
+    d->edge_endpoints[d->nedges].a = x;
+    d->edge_endpoints[d->nedges].b = y;
+    d->nedges++;
   }
 }
 

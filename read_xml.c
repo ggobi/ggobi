@@ -511,7 +511,6 @@ gboolean
 setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
 {
   const char *tmp;
-  ggobid *gg = data->gg;
   datad *d = getCurrentXMLData(data);
 
   tmp = getAttribute(attrs, "hidden");
@@ -529,8 +528,8 @@ setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
      if(type == ROW)
        d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = hidden;
      else {
-       gg->line.hidden.els[i] = gg->line.hidden_now.els[i] =
-         gg->line.hidden_prev.els[i] = hidden;
+       d->line.hidden.els[i] = d->line.hidden_now.els[i] =
+         d->line.hidden_prev.els[i] = hidden;
      }
   }
 

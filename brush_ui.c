@@ -34,7 +34,7 @@ static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)
   if (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDL)
     point_brush_undo (gg->current_splot, d, gg);
   if (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL)
-    line_brush_undo (gg->current_splot, gg);
+    line_brush_undo (gg->current_splot, d, gg);
 }
 
 void
@@ -120,8 +120,8 @@ brush_reset(ggobid *gg, gint action)
       break;
 
     case RESET_UNHIDE_LINES:  /*-- un-hide all lines --*/
-      for (k=0; k<gg->nedges; k++) {
-        gg->line.hidden_now.els[k] = gg->line.hidden.els[k] = false;
+      for (k=0; k<d->nedges; k++) {
+        d->line.hidden_now.els[k] = d->line.hidden.els[k] = false;
       }
       displays_plot (NULL, FULL, gg);
       break;
@@ -193,7 +193,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   d = gg->current_display->d;
 
   point_brush_prev_vectors_update (d, gg);
-  line_brush_prev_vectors_update (gg);
+  line_brush_prev_vectors_update (d, gg);
 
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 

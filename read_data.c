@@ -665,8 +665,8 @@ line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
   int whichSuffix;
 
   if (reinit) {
-          /*    br_line_color_alloc (gg);*/
-    br_line_vectors_check_size (gg->nedges, gg);
+    /*  br_line_color_alloc (gg); */
+    br_line_vectors_check_size (d->nedges, d, gg);
   }
 
   if (!gg->mono_p) {
@@ -674,11 +674,12 @@ line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
      * Check if line colors file exists.
     */
 
-     fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+     fileName = findAssociatedFile (desc, suffixes,
+       sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
      if(fileName == NULL)
        ok = false;
 
-     if(ok &&  ( fp = fopen(fileName, "r") ) == NULL ) {
+     if (ok &&  ( fp = fopen(fileName, "r") ) == NULL ) {
        ok = false;
      }
 
@@ -690,7 +691,7 @@ line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
         */
 
         i = 0;
-        while (i < gg->nedges) {
+        while (i < d->nedges) {
           retval = fscanf (fp, "%d", &id);
           if (retval <= 0 || id < 0 || id >= NCOLORS) {
             ok = false;
@@ -698,8 +699,8 @@ line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
             break;
           }
 
-          gg->line.color.els[i] = gg->line.color_now.els[i] =
-                                         gg->line.color_prev.els[i] = id;
+          d->line.color.els[i] =
+            d->line.color_now.els[i] = d->line.color_prev.els[i] = id;
           i++;
         }
         fclose(fp);
@@ -712,7 +713,7 @@ line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
   }
 
   if (!ok)
-    br_line_color_init (gg);
+    br_line_color_init (d, gg);
 
   return (ok);
 }
@@ -746,7 +747,7 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
   if ((fp = fopen (fileName, "r")) != NULL) {
     gint a, b;
 
-    gg->nedges = 0;
+    d->nedges = 0;
     /*
      * Allocate space for <bsize> connecting lines.
     */
@@ -773,14 +774,14 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
          * Sort lines data such that a <= b
         */
         if (a <= b) {
-          gg->edge_endpoints[gg->nedges].a = a;
-          gg->edge_endpoints[gg->nedges].b = b;
+          d->edge_endpoints[d->nedges].a = a;
+          d->edge_endpoints[d->nedges].b = b;
         } else {
-          gg->edge_endpoints[gg->nedges].a = b;
-          gg->edge_endpoints[gg->nedges].b = a;
+          d->edge_endpoints[d->nedges].a = b;
+          d->edge_endpoints[d->nedges].b = a;
         }
 
-        (gg->nedges)++;
+        (d->nedges)++;
         jlinks++;
         if (jlinks == bsize) {
           /*

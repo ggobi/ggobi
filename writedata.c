@@ -29,7 +29,7 @@ gboolean brush_save_colors (gchar *, gint *, gint, datad *, ggobid *);
 gboolean brush_save_erase (gchar *, gint *, gint, datad *, ggobid *);
 gboolean brush_save_glyphs (gchar *, gint *, gint, datad *, ggobid *);
 gboolean save_lines (gchar *, gboolean, gboolean, gint *, gint, datad *d, ggobid *);
-gint linedata_get (endpointsd *, gshort *, gint *, gint, ggobid *);
+gint linedata_get (endpointsd *, gshort *, gint *, gint, datad *, ggobid *);
 
 static gint
 set_rowv (gint *rowv, gchar *rootname, datad *d, ggobid *gg)
@@ -330,8 +330,8 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
 
     /*-- decide whether to save line colors --*/
     skipit = true;
-    for (k=0; k<gg->nedges; k++) {
-      if (gg->line.color_now.els[k] != 0) {
+    for (k=0; k<d->nedges; k++) {
+      if (d->line.color_now.els[k] != 0) {
         skipit = false;
         break;
       }
@@ -624,7 +624,7 @@ brush_save_erase (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
 
 gint
 linedata_get (endpointsd *tlinks, gshort *tcolors,
-  gint *rowv, gint nr, ggobid *gg)
+  gint *rowv, gint nr, datad *d, ggobid *gg)
 {
 /*
  * For each end of the link, determine whether the
@@ -635,10 +635,10 @@ linedata_get (endpointsd *tlinks, gshort *tcolors,
   gint i, k;
   gint a, b, start_a, start_b;
 
-  for (k=0; k<gg->nedges; k++) {
+  for (k=0; k<d->nedges; k++) {
     start_a = start_b = -1;
-    a = gg->edge_endpoints[k].a - 1;
-    b = gg->edge_endpoints[k].b - 1;
+    a = d->edge_endpoints[k].a - 1;
+    b = d->edge_endpoints[k].b - 1;
     for (i=0; i<nr; i++) {
       if (rowv[i] == a) {
         start_a = i;
@@ -656,7 +656,7 @@ linedata_get (endpointsd *tlinks, gshort *tcolors,
     if (start_a != -1 && start_b != -1) {  /* Both ends included */
       tlinks[nl].a = start_a + 1;
       tlinks[nl].b = start_b + 1;
-      tcolors[nl] = gg->line.color_now.els[k];
+      tcolors[nl] = d->line.color_now.els[k];
       nl++;
     }
   }
@@ -676,10 +676,10 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
   if (lines_p || colors_p) {
 
     if (nr == d->nrows) {
-      nl = gg->nedges;
-      tlinks = gg->edge_endpoints;
+      nl = d->nedges;
+      tlinks = d->edge_endpoints;
       if (!gg->mono_p)
-        linecolors = gg->line.color_now.els;
+        linecolors = d->line.color_now.els;
 
     } else {
       /*
@@ -687,10 +687,10 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
        * Determine the number of links to be saved -- may as
        * well build a temporary links structure to use, actually.
       */
-      tlinks = (endpointsd *) g_malloc (gg->nedges * sizeof (endpointsd));
+      tlinks = (endpointsd *) g_malloc (d->nedges * sizeof (endpointsd));
       if (!gg->mono_p)
-        linecolors = (gshort *) g_malloc (gg->nedges * sizeof (gshort));
-      nl = linedata_get (tlinks, linecolors, rowv, nr, gg);
+        linecolors = (gshort *) g_malloc (d->nedges * sizeof (gshort));
+      nl = linedata_get (tlinks, linecolors, rowv, nr, d, gg);
     }
   }
 

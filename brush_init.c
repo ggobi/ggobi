@@ -124,43 +124,43 @@ hidden_init (datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-br_line_vectors_free (ggobid *gg)
+br_line_vectors_free (datad *d, ggobid *gg)
 {
-  vectors_free (&gg->line.color);
-  vectors_free (&gg->line.color_now);
-  vectors_free (&gg->line.color_prev);
-  vectorb_free (&gg->line.hidden);
-  vectorb_free (&gg->line.hidden_now);
-  vectorb_free (&gg->line.hidden_prev);
-  vectorb_free (&gg->line.xed_by_brush);
+  vectors_free (&d->line.color);
+  vectors_free (&d->line.color_now);
+  vectors_free (&d->line.color_prev);
+  vectorb_free (&d->line.hidden);
+  vectorb_free (&d->line.hidden_now);
+  vectorb_free (&d->line.hidden_prev);
+  vectorb_free (&d->line.xed_by_brush);
 }
 
 void
-br_line_vectors_check_size (gint ns, ggobid *gg) {
+br_line_vectors_check_size (gint ns, datad *d, ggobid *gg) {
   /*-- assume these vectors are always of the same size --*/
-  if (gg->line.color.nels != ns) {
-    vectors_realloc (&gg->line.color, ns);
-    vectors_realloc (&gg->line.color_now, ns);
-    vectors_realloc (&gg->line.color_prev, ns);
-    vectorb_realloc (&gg->line.hidden, ns);
-    vectorb_realloc (&gg->line.hidden_now, ns);
-    vectorb_realloc (&gg->line.hidden_prev, ns);
-    vectorb_realloc (&gg->line.xed_by_brush, ns);
+  if (d->line.color.nels != ns) {
+    vectors_realloc (&d->line.color, ns);
+    vectors_realloc (&d->line.color_now, ns);
+    vectors_realloc (&d->line.color_prev, ns);
+    vectorb_realloc (&d->line.hidden, ns);
+    vectorb_realloc (&d->line.hidden_now, ns);
+    vectorb_realloc (&d->line.hidden_prev, ns);
+    vectorb_realloc (&d->line.xed_by_brush, ns);
   }
 }
 
 void
-br_line_color_init (ggobid *gg)
+br_line_color_init (datad *d, ggobid *gg)
 {
   gint j;
 
-  br_line_vectors_check_size (gg->nedges, gg);
+  br_line_vectors_check_size (d->nedges, d, gg);
 
-  for (j=0; j<gg->nedges; j++) {
-    gg->line.color.els[j] = gg->line.color_now.els[j] =
-      gg->line.color_prev.els[j] = gg->color_0;
-    gg->line.hidden.els[j] = gg->line.hidden_now.els[j] =
-      gg->line.hidden_prev.els[j] = false;
+  for (j=0; j<d->nedges; j++) {
+    d->line.color.els[j] = d->line.color_now.els[j] =
+      d->line.color_prev.els[j] = gg->color_0;
+    d->line.hidden.els[j] = d->line.hidden_now.els[j] =
+      d->line.hidden_prev.els[j] = false;
   }
 }
 

@@ -160,9 +160,9 @@ splot_write_svg (splotd *sp, ggobid *gg)
     gint j, nl, to, from;
     gboolean doit;
     extern void splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
-      gushort *colors_used, ggobid *gg);
+      gushort *colors_used, datad *, ggobid *gg);
 
-    splot_line_colors_used_get (sp, &ncolors_used, colors_used, gg);
+    splot_line_colors_used_get (sp, &ncolors_used, colors_used, d, gg);
 
     /*
      * Now loop through colors_used[], plotting the points of each
@@ -174,16 +174,16 @@ splot_write_svg (splotd *sp, ggobid *gg)
       cx = hexcolor (&gg->default_color_table[current_color]);
       nl = 0;
 
-      for (j=0; j<gg->nedges; j++) {
-        if (gg->line.hidden_now.els[j]) {
+      for (j=0; j<d->nedges; j++) {
+        if (d->line.hidden_now.els[j]) {
           doit = false;
         } else {
-          from = gg->edge_endpoints[j].a - 1;
-          to = gg->edge_endpoints[j].b - 1;
+          from = d->edge_endpoints[j].a - 1;
+          to = d->edge_endpoints[j].b - 1;
           doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
         }
         if (doit) {
-          if (gg->line.color_now.els[j] == current_color) {
+          if (d->line.color_now.els[j] == current_color) {
             fprintf (f,
               "<path style=\"stroke: %s\" d=\"M %d %d L %d %d z\"/>\n",
               cx,

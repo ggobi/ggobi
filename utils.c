@@ -342,7 +342,7 @@ address_check (datad *d, ggobid *gg)
 {
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %d nseg %d rowlab %s jitfac %f\n",
-    gg->input->mode, (gint) d->world.vals[0][0], gg->nedges,
+    gg->input->mode, (gint) d->world.vals[0][0], d->nedges,
     g_array_index (d->rowlab, gchar *, 0), d->jitter.factor);
 
   return 1;

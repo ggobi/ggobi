@@ -242,9 +242,9 @@ set_tour2dvar(ggobid *gg, gint jvar)
           break;
       }
       if (j<dsp->t2d.nvars-1) {
-        for (k=j; k<dsp->t2d.nvars-1; k++){
+        for (k=j; k<dsp->t2d.nvars-1; k++) {
           dsp->t2d.vars.els[k] = dsp->t2d.vars.els[k+1];
-	}
+	    }
       }
       dsp->t2d.nvars--;
     }

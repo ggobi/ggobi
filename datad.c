@@ -54,6 +54,15 @@ datad_new(datad *d, ggobid *gg)
 
   vectori_init (&d->clusterids);
 
+  /*-- edges --*/
+  vectors_init (&d->line.color);
+  vectors_init (&d->line.color_now);
+  vectors_init (&d->line.color_prev);
+  vectorb_init (&d->line.hidden);
+  vectorb_init (&d->line.hidden_now);
+  vectorb_init (&d->line.hidden_prev);
+  vectorb_init (&d->line.xed_by_brush);
+
   sphere_init (d);
 
   gg->d = g_slist_append (gg->d, d);

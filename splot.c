@@ -244,7 +244,7 @@ void
 splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
   datad *d = display->d;
   gint nr = d->nrows;
-  gint nl = gg->nedges;
+  gint nl = d->nedges;
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
@@ -279,11 +279,11 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
 }
 
 void
-splot_edges_realloc (splotd *sp, ggobid *gg) {
+splot_edges_realloc (splotd *sp, datad *d, ggobid *gg) {
   sp->edges = (GdkSegment *) g_realloc ((gpointer) sp->edges,
-    gg->nedges * sizeof (GdkSegment));
+    d->nedges * sizeof (GdkSegment));
   sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
-    gg->nedges * sizeof (GdkSegment));
+    d->nedges * sizeof (GdkSegment));
 }
 
 void
@@ -522,6 +522,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
     sp_whiskers_make (sp, display, gg);
   }
   else if (display->displaytype == tsplot) {
+    extern void tsplot_whiskers_make (splotd *, displayd *, ggobid *);
     tsplot_whiskers_make (sp, display, gg);
   }
 }

@@ -53,8 +53,8 @@ gboolean write_xml_variable (FILE *f, datad *, ggobid *gg, gint i, XmlWriteInfo 
 gboolean write_xml_records (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
 
-gboolean write_xml_edges(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_edge(FILE *f, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_edges(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_edge(FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
 
 gboolean write_dataset_header(FILE *f, datad *, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_dataset_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo);

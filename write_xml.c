@@ -57,7 +57,7 @@ write_xml_dataset(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
     write_xml_variables (f, d, gg, xmlWriteInfo);
     write_xml_records (f, d, gg, xmlWriteInfo);
     /*-- skip for now, because there's no need to write the default edges --*/
-    /*    write_xml_edges(f, gg);*/
+    /*    write_xml_edges(f, d, gg);*/
     write_dataset_footer(f, gg, xmlWriteInfo);
 
   return(true);
@@ -215,15 +215,15 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
 }
 
 gboolean
-write_xml_edges (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_edges (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
- int i;
- if(gg->nedges < 1)
+ gint i;
+ if (d->nedges < 1)
   return(true);
 
- fprintf(f, "<edges count=%d>\n", gg->nedges);
- for(i = 0; i < gg->nedges; i++) {
-  write_xml_edge(f, gg, i, xmlWriteInfo);
+ fprintf(f, "<edges count=%d>\n", d->nedges);
+ for(i = 0; i < d->nedges; i++) {
+  write_xml_edge(f, d, gg, i, xmlWriteInfo);
   fprintf(f, "\n");
  }
  fprintf(f, "/edges>\n");
@@ -232,11 +232,11 @@ write_xml_edges (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 }
 
 gboolean
-write_xml_edge(FILE *f, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
+write_xml_edge(FILE *f, datad *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f, "<edge ");
- fprintf(f, "source=\"%d\" destination=\"%d\"", gg->edge_endpoints[i].a
-                                              , gg->edge_endpoints[i].b);
+ fprintf(f, "source=\"%d\" destination=\"%d\"", d->edge_endpoints[i].a
+                                              , d->edge_endpoints[i].b);
  fprintf(f, " />");
 
  return(true);

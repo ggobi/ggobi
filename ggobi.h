@@ -105,25 +105,6 @@ struct _ggobid {
  
 /*----------------------- row grouping -----------------------------*/
 
-/*----------------- segments in scatterplots -----------------------------*/
-
- gint nedges;
- endpointsd *edge_endpoints;
-
- /*-- line brushing --*/
- struct _LineData {
-   gint *nxed_by_brush;
-   vector_b xed_by_brush;
-   vector_s color, color_now, color_prev;
-   vector_b hidden, hidden_now, hidden_prev;
- } line;
-
- /*-- line groups --*/
- gint nlgroups;
- gint *lgroup_ids;
- rgroupd *lgroups;  /* id, nels, *els */
-
-
 /*--------------------------------------------------------------------*/
 /*                         color                                      */
 /*--------------------------------------------------------------------*/

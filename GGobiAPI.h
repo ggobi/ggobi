@@ -169,7 +169,7 @@ extern gboolean * GGOBI(getCaseHiddens) (gint *pts, gint howMany, datad *, ggobi
 extern void GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, datad *, ggobid *gg);
 extern void GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, datad *, ggobid *gg);
 
-extern gboolean  GGOBI(isConnectedEdge)(gint a, gint b, ggobid *gg);
+extern gboolean  GGOBI(isConnectedEdge)(gint a, gint b, datad *d, ggobid *gg);
 extern void GGOBI(setObservationEdge)(gint x, gint y, datad *, ggobid *, gboolean update);
 
 extern gboolean GGOBI(getShowLines)();

@@ -129,6 +129,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
         }
 
         if (display->displaytype == tsplot) {
+          extern void tsplot_whiskers_make (splotd *, displayd *, ggobid *);
           GList *splist;
           splotd *sp;
           for (splist = display->splots; splist; splist = splist->next) {
