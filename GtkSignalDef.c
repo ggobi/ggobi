@@ -8,15 +8,16 @@
 #else
        /*-- If this signal has not been initialized yet, do it now --*/
   if (gtk_signal_lookup ("datad_added", GTK_TYPE_GGOBI) == 0) {
+      /* This signal is  f(ggobid *, datad *d, gpointer userData) */
     GGobiSignals[DATAD_ADDED_SIGNAL] =
 	g_signal_new ("datad_added", 
         GTK_TYPE_GGOBI, 
         GTK_RUN_LAST | GTK_RUN_ACTION,
         0, NULL, NULL,
-        gtk_marshal_VOID__POINTER_POINTER,
+        gtk_marshal_VOID__POINTER,
         GTK_TYPE_NONE, 
-        2,
-        GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+        1,
+        GTK_TYPE_POINTER);
   }
   if (gtk_signal_lookup ("brush_motion", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[BRUSH_MOTION_SIGNAL] = 
@@ -58,8 +59,8 @@
         GTK_TYPE_GGOBI,
         GTK_RUN_LAST|GTK_RUN_ACTION,
         0, NULL, NULL,
-        gtk_marshal_VOID__INT_POINTER_POINTER_POINTER, GTK_TYPE_NONE, 4,
-        GTK_TYPE_INT, GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+        gtk_marshal_VOID__POINTER_INT_POINTER, GTK_TYPE_NONE, 3,
+        GTK_TYPE_POINTER, GTK_TYPE_INT, GTK_TYPE_POINTER);
   }
 
   if (gtk_signal_lookup ("splot_new", GTK_TYPE_GGOBI) == 0) {
@@ -69,8 +70,8 @@
         GTK_TYPE_GGOBI,
         GTK_RUN_LAST|GTK_RUN_ACTION,
         0, NULL, NULL,
-        gtk_marshal_NONE__POINTER_POINTER, GTK_TYPE_NONE, 2,
-        GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+        gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
+        GTK_TYPE_POINTER);
   }
 
   if (gtk_signal_lookup ("variable_added", GTK_TYPE_GGOBI) == 0) {
