@@ -266,10 +266,10 @@ I've had the chance to do some more testing, though. -- dfs
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
           gg->tour2d.io_menu); 
-        if (gg->mode_menu.firsttime_io) {
+/*        if (gg->mode_menu.firsttime_io) {*/
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
-          gg->mode_menu.firsttime_io = false;
-        }
+/*          gg->mode_menu.firsttime_io = false;*/
+/*        }*/
       break;
 
       case COTOUR:
@@ -278,7 +278,7 @@ I've had the chance to do some more testing, though. -- dfs
         gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
-          gg->tour2d.io_menu); 
+          gg->tourcorr.io_menu); 
 /*        if (gg->mode_menu.firsttime_io) {*/
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
 /*          gg->mode_menu.firsttime_io = false;*/
@@ -500,8 +500,8 @@ mode_set_cb (GtkWidget *widget, gint action)
   GGOBI(full_mode_set)(action, gg);
 }
 
-int
-GGOBI(full_mode_set)(int action, ggobid *gg)
+gint
+GGOBI(full_mode_set)(gint action, ggobid *gg)
 {
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
@@ -518,6 +518,7 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
     /*
      * Turn the tour procs on and off here
     */
+/*-- dfs: check whether these can be moved to mode_activate --*/
 
     if (gg->mode == TOUR2D || prev_mode == TOUR2D) {
       /*-- if turning on the 2d tour --*/
@@ -753,9 +754,10 @@ make_ui (ggobid *gg) {
   gtk_container_add (GTK_CONTAINER (window), vbox);
 
   gg->main_accel_group = gtk_accel_group_new ();
-  gg->main_menu_factory = get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                                  gg->main_accel_group, window,
-                                  &gg->main_menubar, (gpointer) gg);
+  gg->main_menu_factory = get_main_menu (menu_items,
+                            sizeof (menu_items) / sizeof (menu_items[0]),
+                            gg->main_accel_group, window,
+                            &gg->main_menubar, (gpointer) gg);
 
   display_menu_init (gg);
 

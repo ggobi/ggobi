@@ -196,8 +196,10 @@ ggobi_alloc()
   tmp->projection = XYPLOT;
   tmp->prev_projection = XYPLOT;
 
+/*  See comment in main_ui.c -- dfs
   tmp->mode_menu.firsttime_reset = tmp->mode_menu.firsttime_link = 
       tmp->mode_menu.firsttime_io =  true;
+*/
 
   tmp->color_ui.margin = 10;
   tmp->tour2d.idled = 0;

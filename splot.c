@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
@@ -99,17 +100,81 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
   return retval;
 }
 
-/*
-static gint key_press_cb (GtkWidget *w, GdkEventKey *event)
+/*-- this will be called by a key_press_cb for each scatterplot mode --*/
+gboolean
+scatterplot_event_handled (GtkWidget *w, GdkEventKey *event,
+  cpaneld *cpanel, splotd *sp, ggobid *gg)
 {
-  g_printerr ("%d\n", w != NULL);
-  g_printerr ("%d\n", GTK_IS_WIDGET (w));
-  g_printerr ("%d\n", event != NULL);
+  static guint32 etime = (guint32) 0;
+  gboolean common_event = true;
+  extern gint GGOBI(full_mode_set)(gint action, ggobid *gg);
+  gint action = -1;
 
-  g_printerr ("splot key_press: %d\n", event->keyval);
-  return true;
-}
+/*
+ * I can't say this is the best way to handle this bug, but it
+ * seems to work.  By switching modes before the processing
+ * of the keypress is completed, I somehow start an infinite 
+ * loop in the new mode -- as soon as its key press signal handler
+ * is connected, it starts handling the identical key press
+ * event that was just handled in the previous mode.  This test of
+ * event->time ensures that the same key press event won't be handled
+ * a second time.  There's got to be a better way ...
 */
+  if (event->time == etime) return false;  /*-- already processed --*/
+
+  switch (event->keyval) {
+  case GDK_1:
+    g_printerr ("you pressed the 1 key\n");
+  break;
+  case GDK_2:
+    g_printerr ("you pressed the 2 key\n");
+  break;
+
+  case GDK_d:
+  case GDK_D:
+    action = P1PLOT;
+  break;
+  case GDK_x:
+  case GDK_X:
+    action = XYPLOT;
+  break;
+  case GDK_t:
+  case GDK_T:
+    action = TOUR2D;
+  break;
+  case GDK_c:
+  case GDK_C:
+    action = COTOUR;
+  break;
+  case GDK_s:
+  case GDK_S:
+    action = SCALE;
+  break;
+  case GDK_b:
+  case GDK_B:
+    action = BRUSH;
+  break;
+  case GDK_i:
+  case GDK_I:
+    action = IDENT;
+  break;
+  case GDK_m:
+  case GDK_M:
+    action = MOVEPTS;
+  break;
+  default:
+    g_printerr ("splot key_press: %d\n", event->keyval);
+    common_event = false;
+  }
+
+  if (action >= 0) {
+    etime = event->time;
+    GGOBI(full_mode_set)(action, gg);
+  }
+
+  return common_event;
+}
+
 
 void
 sp_event_handlers_toggle (splotd *sp, gboolean state) {
@@ -117,10 +182,12 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
   gint m = display->cpanel.mode;
 
   switch (m) {
-    case PCPLOT:
     case P1PLOT:
-    case TSPLOT:
+      p1d_event_handlers_toggle (sp, state);
+      break;
+
     case XYPLOT:
+      xyplot_event_handlers_toggle (sp, state);
       break;
 
     case ROTATE:
@@ -157,6 +224,9 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
 
     case MOVEPTS:
       movepts_event_handlers_toggle (sp, state);
+      break;
+
+    default:
       break;
   }
 }

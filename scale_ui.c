@@ -18,10 +18,8 @@
 #include "externs.h"
 
 /*
- * These should all be moved to cpanel.h, to be consistent.
+ * These should all be moved to cpanel.c, to be consistent.
 */
-
-
 void
 cpanel_scale_init (cpaneld *cpanel, ggobid *gg) {
 
@@ -155,53 +153,15 @@ static void zoomoptions_cb (GtkWidget *w, gpointer cbd)
 /*--------------------------------------------------------------------*/
 
 static gint
-motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
-{
-  gboolean button1_p, button2_p;
-  ggobid *gg = GGobiFromSPlot(sp);
-  displayd *display = (displayd *) sp->displayptr;
-  cpaneld *cpanel = &display->cpanel;
-
-  /*-- get the mouse position and find out which buttons are pressed --*/
-  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
-
-  /*-- I'm not sure this could ever happen --*/
-  if (sp->mousepos.x == sp->mousepos_o.x && sp->mousepos.y == sp->mousepos_o.y)
-    return false;
-
-  switch (cpanel->scale_style) {
-
-    case DRAG:
-      if (button1_p) {
-        pan_by_drag (sp, gg);
-      } else if (button2_p) {
-        zoom_by_drag (sp, gg);
-      }
-
-      /*-- redisplay this plot --*/
-      splot_plane_to_screen (display, &display->cpanel, sp, gg);
-      ruler_ranges_set (gg->current_display, sp, gg);
-      splot_redraw (sp, FULL, gg);
-      break;
-
-    case CLICK:
-      splot_redraw (sp, QUICK, gg);
-      break;
-
-  }  /*-- end switch (scale_style) --*/
-
-  sp->mousepos_o.x = sp->mousepos.x;
-  sp->mousepos_o.y = sp->mousepos.y;
-
-  return true;
-}
-
-static gint
 key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 {
   gboolean redraw = false;
   ggobid *gg = GGobiFromSPlot(sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
+  
+/*-- add a key_press_cb in each mode, and let it begin with these lines --*/
+  if (scatterplot_event_handled (w, event, cpanel, sp, gg))
+    return true;
 
   switch (cpanel->scale_style) {
     case DRAG:
@@ -244,6 +204,49 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 
   return true;
 }
+
+static gint
+motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
+{
+  gboolean button1_p, button2_p;
+  ggobid *gg = GGobiFromSPlot(sp);
+  displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
+
+  /*-- get the mouse position and find out which buttons are pressed --*/
+  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
+
+  /*-- I'm not sure this could ever happen --*/
+  if (sp->mousepos.x == sp->mousepos_o.x && sp->mousepos.y == sp->mousepos_o.y)
+    return false;
+
+  switch (cpanel->scale_style) {
+
+    case DRAG:
+      if (button1_p) {
+        pan_by_drag (sp, gg);
+      } else if (button2_p) {
+        zoom_by_drag (sp, gg);
+      }
+
+      /*-- redisplay this plot --*/
+      splot_plane_to_screen (display, &display->cpanel, sp, gg);
+      ruler_ranges_set (gg->current_display, sp, gg);
+      splot_redraw (sp, FULL, gg);
+      break;
+
+    case CLICK:
+      splot_redraw (sp, QUICK, gg);
+      break;
+
+  }  /*-- end switch (scale_style) --*/
+
+  sp->mousepos_o.x = sp->mousepos.x;
+  sp->mousepos_o.y = sp->mousepos.y;
+
+  return true;
+}
+
 
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)

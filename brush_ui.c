@@ -161,8 +161,23 @@ brush_options_cb (gpointer data, guint action, GtkCheckMenuItem *w)
 }
 
 /*--------------------------------------------------------------------*/
-/*                         Mouse events                               */
+/*      Handling keyboard and mouse events in the plot window         */
 /*--------------------------------------------------------------------*/
+
+static gint
+key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
+{
+  ggobid *gg = GGobiFromSPlot(sp);
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  /*-- handle the keys for setting the mode and launching generic events --*/
+  if (scatterplot_event_handled (w, event, cpanel, sp, gg))
+    return true;
+
+  /*-- insert mode-specific key presses (if any) here --*/
+
+  return true;
+}
 
 static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
@@ -247,8 +262,13 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
 void
 brush_event_handlers_toggle (splotd *sp, gboolean state) {
+  displayd *display = (displayd *) sp->displayptr;
 
   if (state == on) {
+    sp->key_press_id = gtk_signal_connect (GTK_OBJECT (display->window),
+                                           "key_press_event",
+                                           (GtkSignalFunc) key_press_cb,
+                                           (gpointer) sp);
     sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "button_press_event",
                                       (GtkSignalFunc) button_press_cb,
@@ -258,8 +278,12 @@ brush_event_handlers_toggle (splotd *sp, gboolean state) {
                                         (GtkSignalFunc) button_release_cb,
                                         (gpointer) sp);
   } else {
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
+    if (sp->key_press_id)
+      gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
+    if (sp->press_id)
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
+    if (sp->release_id)
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
   }
 }
 

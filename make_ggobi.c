@@ -66,7 +66,7 @@ fileset_read_init (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
     n = g_slist_length(gg->d);
     for(i= howMany; i < n; i++) {
        d = (datad *) g_slist_nth_data(gg->d, i);
-       datad_init(d, gg,  (i + howMany) == 0);
+       datad_init (d, gg,  (i + howMany) == 0);
     }
   }
 
@@ -89,7 +89,8 @@ fileset_read (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
   }
 
   if(desc->mode == unknown_data) {
-    g_printerr("Cannot determine the format of the data in file %s\n", desc->fileName); 
+    g_printerr ("Cannot determine the format of the data in file
+                %s\n", desc->fileName); 
     return(false);
   }
 
@@ -175,6 +176,10 @@ pipeline_init (datad *d, ggobid *gg)
   }
 }
 
+/*
+ * the first display is initialized in datad_init, so turn on
+ * event handlers there as well
+*/
 void
 make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) {
   gboolean init_data = false;
