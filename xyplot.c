@@ -38,7 +38,7 @@ xyplot_activate (gint state, displayd *display, ggobid *gg)
   } else {
     /*
      * Turn cycling off when leaving the mode, but don't worry
-     * about turning it on when re-entering.
+     * for now about turning it on when re-entering.
     */
     GtkWidget *w = widget_find_by_name (gg->control_panel[XYPLOT], 
                                         "XYPLOT:cycle_toggle");

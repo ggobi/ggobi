@@ -17,6 +17,10 @@
 #include "vars.h"
 #include "externs.h"
 
+/*--------------------------------------------------------------------*/
+/*                           Cycling                                  */
+/*--------------------------------------------------------------------*/
+
 static const gchar *const fix_axis_lbl[] = {"No fixed axes", "Fix X", "Fix Y"};
 static void fix_axis_cb (GtkWidget *w, gpointer cbd)
 {
@@ -30,7 +34,6 @@ static void fix_axis_cb (GtkWidget *w, gpointer cbd)
 void
 xyplot_cycle_activate (gboolean state, cpaneld *cpanel, ggobid *gg)
 {
-  extern GtkFunction xycycle_func (ggobid *gg);
   if (state) {
     gg->xyplot.cycle_id = gtk_timeout_add (cpanel->xyplot.cycle_delay,
       (GtkFunction) xycycle_func, (gpointer) gg);
@@ -53,7 +56,6 @@ static void cycle_cb (GtkToggleButton *button, ggobid *gg)
 }
 
 static void cycle_speed_cb (GtkAdjustment *adj, ggobid *gg) {
-  extern GtkFunction xycycle_func (ggobid *gg);
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
 
@@ -183,6 +185,7 @@ cpanel_xyplot_make (ggobid *gg) {
 void
 cpanel_xyplot_init (cpaneld *cpanel, ggobid *gg)
 {
+  /*-- cycling --*/
   cpanel->xyplot.cycle_dir = FORWARD;
   cpanel->xyplot.cycle_p = false;
   cpanel->xyplot.cycle_axis = NOFIXED;
