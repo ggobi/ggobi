@@ -610,10 +610,11 @@ used to set the plotting characters and colors to be used in
 drawing each point.  Glyphs can be specified in two ways:
 
 \begin{itemize}
-\item with a string for glyph type and a number for glyph size, where
-the string is one of ``plus'', ``x'', ``or'' (open rectangle), ``fr''
-(filled rectangle), ``oc'' (open circle), ``fc'' (filled circle),
-``.'' (a one-pixel point), and the number is between 1 and 8, or
+\item with a string for glyph type and a number for glyph size, where the
+string is one of ``.'' (a single-pixel point), ``plus'', ``x'', ``or''
+(open rectangle), ``fr'' (filled rectangle), ``oc'' (open circle), ``fc''
+(filled circle),
+ and the number is between 0 and 7, or
 \item with one number per line, where the number is between one and
 49.  Here's how to generate that number: the type is between 1 and 7,
 using the ordering just presented, and the size is between 1 and 8

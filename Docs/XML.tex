@@ -368,19 +368,21 @@ Glyph type and size can also be specified in a single string:
 \begin{verbatim}
 glyph="fc 3"
 \end{verbatim}
-GlyphSize can range from 0 to 7; legal values for glyphType and
-for the first part of the glyph tag are described in this table:
+GlyphSize can range from 0 to 7; glyphType from 0 to 6, with 0
+representing a single-pixel point and 6 a filled circle, and
+the rest as shown in the table below.  Legal values
+for the first string in the glyph tag are described in this table:
 
 \begin{tabular}{l|l|l}
 glyphType & glyph specifier & resulting glyph \\
 \hline
-0 & plus & glyph resembling a ``+'' \\
-1 & x    & glyph resembling an ``x'' \\
-2 & or   & open rectangle \\
-3 & fr   & filled rectangle \\
-4 & oc   & open circle \\
-5 & fc   & filled circle \\
-6 & .    & point
+0 & .    & point \\
+1 & plus & glyph resembling a ``+'' \\
+2 & x    & glyph resembling an ``x'' \\
+3 & or   & open rectangle \\
+4 & fr   & filled rectangle \\
+5 & oc   & open circle \\
+6 & fc   & filled circle
 \end{tabular}
 
 The body or content of each \texttt{record} is a simply ASCII listing
