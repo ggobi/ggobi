@@ -12,7 +12,7 @@ DefaultDirName={pf}\ggobi
 DefaultGroupName=ggobi
 AllowNoIcons=yes
 AlwaysCreateUninstallIcon=yes
-LicenseFile=C:\cygwin\home\duncan\Projects\ggobi\LICENSING\license.txt
+LicenseFile=C:\cygwin\home\duncan\Projects\ggobi\ggobi\LICENSING\license.txt
 ; uncomment the following line if you want your installation to run on NT 3.51 too.
 ; MinVersion=4,3.51
 
@@ -20,33 +20,33 @@ LicenseFile=C:\cygwin\home\duncan\Projects\ggobi\LICENSING\license.txt
 Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "Additional icons:"; MinVersion: 4,4
 
 [Files]
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\ggobi.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "C:\cygwin\home\duncan\libs\*.*"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\data\*.*"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\*.html"; DestDir: "{app}\Docs"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\ggobi.ico"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\data\*.*"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\notes\*.html"; DestDir: "{app}\Docs"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\Install\ggobi.ico"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 
-Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\ggobirc"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\colorschemes.xml"; DestDir: "{app}\share"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\notes\ggobirc"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\notes\colorschemes.xml"; DestDir: "{app}\share"; CopyMode: alwaysoverwrite
 
-Source: "C:\cygwin\home\duncan\Projects\ggobi\*.h"; DestDir: "{app}\include"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\*.h"; DestDir: "{app}\include"; CopyMode: alwaysoverwrite
 
-Source: "C:\cygwin\home\duncan\Projects\ggobi\libggobi.a"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\libggobi.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\libggobi.def"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\libggobi.a"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\libggobi.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\libggobi.def"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
 
 
 [INI]
 Filename: "{app}\ggobi.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.ggobi.org"
 
 [Icons]
-Name: "{group}\GGobi"; Filename: "{app}\ggobi.exe"; IconFilename: "C:\WINDOWS\WINUPD.ICO" ; WorkingDir: "{app}" ; Flags: runminimized
+Name: "{group}\GGobi"; Filename: "{app}\ggobi.exe"; IconFilename: "{app}\ggobi.ico" ; WorkingDir: "{app}" ; Flags: runminimized
 
 Name: "{group}\GGobi on the Web"; Filename: "{app}\ggobi.url"
-;Name: "{userdesktop}\GGobi"; Filename: "{app}\ggobi.exe"; IconFilename: "C:\cygwin\home\duncan\Projects\ggobi\notes\ggobi.ico";  Tasks: desktopicon
+Name: "{userdesktop}\GGobi"; Filename: "{app}\ggobi.exe"; IconFilename: "{app}\ggobi.ico";  Tasks: desktopicon
 
 ; IconFilename: "C:\WINDOWS\WINUPD.ICO";
-Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe";  MinVersion: 4,4; Tasks: desktopicon; WorkingDir: "{app}\data"; Comment: "GGobi Interactive, Dynamic Visualization Software"; Flags: runminimized ; IconFilename: "C:\WINDOWS\A.ICO"
+Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe";  MinVersion: 4,4; Tasks: desktopicon; WorkingDir: "{app}\data"; Comment: "GGobi Interactive, Dynamic Visualization Software"; Flags: runminimized ; IconFilename: "{app}\ggobi.ico"
 
 [Run]
 ; Must put the "" around the data file since otherwise app may get broken into

@@ -361,6 +361,10 @@ closePlugins(ggobid *gg)
   PluginInstance *plugin;
 
   el = gg->pluginInstances;
+  if(!el || g_list_length(el) == 0) {
+    return;
+  }
+
   while(el) { 
     plugin = (PluginInstance *) el->data;
     if(plugin->info->info.g->onClose) {

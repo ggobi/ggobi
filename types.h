@@ -220,7 +220,7 @@ typedef struct
   gint index;
   lcoords planar;
   GdkRectangle rect;
-} bind;
+} gbind;
 /* end bind */
 
 /* structure for a barchart, in splotd only a pointer to this structure is made to save memory */
@@ -234,8 +234,8 @@ typedef struct
 
  gint ncolors;
  gint maxbincounts;
- bind  *bins;
- bind  **cbins;
+ gbind  *bins;
+ gbind  **cbins;
  gfloat *breaks;
 
  GdkPoint anchor_rgn[4];
@@ -247,10 +247,10 @@ typedef struct
 /* whenever points in histograms "overflow" to the left or right of the first or last bin, they need a place to stay */
  gboolean high_pts_missing;
  gboolean low_pts_missing;
- bind *high_bin;
- bind *low_bin;
- bind *col_high_bin;
- bind *col_low_bin;
+ gbind *high_bin;
+ gbind *low_bin;
+ gbind *col_high_bin;
+ gbind *col_low_bin;
 
 /* identify bars */
  gboolean *bar_hit;

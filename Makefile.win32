@@ -84,7 +84,7 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  display_tree.o \
  datad.o \
- mt19937-1.o \
+ mt19937-1.o mt19937ar.o \
  write_svg.o \
  impute.o impute_ui.o \
  noop-checkbutton.o \
@@ -100,10 +100,14 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  wvis_ui.o write_state.o  \
  plugin.o  \
  wvis.o \
- dbms.o dbms_ui.o
+ dbms.o dbms_ui.o \
+ noop-toggle.o
 
 # eispack.o
 # pp_ui.o
+
+foo:
+	echo "${XML_INC_DIR}"
 
 ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c
@@ -127,7 +131,7 @@ EXP=lib$(IMPBASE).exp
 
 DEF=$(DLL:.dll=.def)
 
-LIBS= -L$(GDK_LIB_DIR) -L$(GTK_LIB_DIR) -L$(GLIB_LIB_DIR) -lgdk-1.3 -lgtk-1.3 -lglib-1.3 
+LIBS= -L$(GDK_LIB_DIR) -L$(GTK_LIB_DIR) -L$(GLIB_LIB_DIR) -lgdk -lgtk -lglib-1.3 
 
 ggobi: $(OB)
 	$(CC) $(DEBUG) -o ggobi $(OB) $(LIBS) $(XML_LIBS) -lm 

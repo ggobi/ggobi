@@ -277,11 +277,11 @@ build_ash_segs (gint i, gint *nsegs, splotd *sp)
     ash_segs[*nsegs].x1 = sp->screen[i].x;
     ash_segs[*nsegs].y1 = sp->screen[i].y;
     ash_segs[*nsegs].x2 = sp->screen[i].x;
-    ash_segs[*nsegs].y2 = sp->ash_baseline.y;
+    ash_segs[*nsegs].y2 = sp->p1d.ash_baseline.y;
   } else {
     ash_segs[*nsegs].x1 = sp->screen[i].x;
     ash_segs[*nsegs].y1 = sp->screen[i].y;
-    ash_segs[*nsegs].x2 = sp->ash_baseline.x;
+    ash_segs[*nsegs].x2 = sp->p1d.ash_baseline.x;
     ash_segs[*nsegs].y2 = sp->screen[i].y;
   }
 
@@ -387,7 +387,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
         j = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
         if (d->color_now.els[j] == current_color &&
-            splot_plot_case (j, d, sp, display, gg))
+            splot_plot_case (j, false, d, sp, display, gg))
         {
           build_glyph (&d->glyph_now.els[j], sp->screen, j,
             points, &npt,           segs, &nseg,
