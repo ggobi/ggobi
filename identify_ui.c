@@ -125,7 +125,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
     if(f) {
       changed = f(sp->mousepos, sp, d, gg);
       if (changed) {
-	      displays_plot (NULL, QUICK, gg);
+        displays_plot (NULL, QUICK, gg);
       }
       return(true);
     }
@@ -189,9 +189,9 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
   
   if (state == on) {
-      if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-	  sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-						 "key_press_event", (GtkSignalFunc) key_press_cb, (gpointer) sp);
+    if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+      sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+        "key_press_event", (GtkSignalFunc) key_press_cb, (gpointer) sp);
 
     sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
       "button_press_event", (GtkSignalFunc) button_press_cb, (gpointer) sp);

@@ -557,9 +557,9 @@ viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display, ggobid
     /*-- create and insert menu items if called for --*/
     if (mode_has_options_menu (mode, gg->current_display, gg)) {
       gg->menus.options_item = submenu_make ("_Options", 'O',
-					     gg->main_accel_group);
+        gg->main_accel_group);
       submenu_insert (gg->menus.options_item,
-		      gg->main_menubar, 4);
+        gg->main_menubar, 4);
     }
   }
 
