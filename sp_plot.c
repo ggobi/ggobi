@@ -25,7 +25,6 @@ extern void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, g
 extern void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
 #endif
 
-
 /* colors_used now contains integers, 0:ncolors-1 */
 void
 splot_colors_used_get (splotd *sp, gint *ncolors_used,
@@ -176,7 +175,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     for (k=0; k<ncolors_used; k++) {
       current_color = colors_used[k];
       gdk_gc_set_foreground (gg->plot_GC,
-        &gg->default_color_table[current_color]);
+        &gg->color_table[current_color]);
 
 #ifdef WIN32
       win32_draw_to_pixmap_unbinned (current_color, sp, gg);
@@ -294,7 +293,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
       for (k=0; k<ncolors_used; k++) {
         current_color = colors_used[k];
         gdk_gc_set_foreground (gg->plot_GC,
-          &gg->default_color_table[current_color]);
+          &gg->color_table[current_color]);
 
 #ifdef WIN32
         win32_draw_to_pixmap_binned (bin0, bin1, current_color, sp, gg);
@@ -450,7 +449,7 @@ splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
     gdk_gc_set_line_attributes (gg->plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
     gdk_gc_set_foreground (gg->plot_GC,
-      &gg->default_color_table[d->color_now.els[k]]);
+      &gg->color_table[d->color_now.els[k]]);
 
     n = 2*k;
     gdk_draw_line (drawable, gg->plot_GC,
@@ -783,7 +782,7 @@ edges_draw (splotd *sp, ggobid *gg)
       }
       if (!gg->mono_p)
         gdk_gc_set_foreground (gg->plot_GC,
-          &gg->default_color_table[current_color]);
+          &gg->color_table[current_color]);
 
       if (edges_show_p)
         gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->edges, nl);
@@ -829,7 +828,7 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
     gdk_gc_set_line_attributes (gg->plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
     gdk_gc_set_foreground (gg->plot_GC,
-      &gg->default_color_table[e->color_now.els[k]]);
+      &gg->color_table[e->color_now.els[k]]);
 
     gdk_draw_line (sp->pixmap1, gg->plot_GC,
       sp->screen[a].x, sp->screen[a].y,

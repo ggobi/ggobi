@@ -133,7 +133,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
     */
     for (k=0; k<ncolors_used; k++) {
       current_color = colors_used[k];
-      cx = hexcolor (&gg->default_color_table[current_color]);
+      cx = hexcolor (&gg->color_table[current_color]);
 
 
 #ifdef WIN32
@@ -170,7 +170,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
     */
     for (k=0; k<ncolors_used; k++) {
       current_color = colors_used[k];
-      cx = hexcolor (&gg->default_color_table[current_color]);
+      cx = hexcolor (&gg->color_table[current_color]);
       nl = 0;
 
       for (j=0; j<e->edge.n; j++) {

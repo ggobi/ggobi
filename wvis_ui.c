@@ -15,6 +15,7 @@
 #include "vars.h"
 #include "externs.h"
 
+
 static void
 delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data)
 {
@@ -26,7 +27,7 @@ nclasses_set_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
 }
 
-static const gchar *const nclasses_lbl[] = {"5", "6", "7", "8"};
+static const gchar *const nclasses_lbl[] = {"5", "6", "7"};
 void
 wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
   GtkWidget *opt, *vbox, *hbox, *hb, *menu, *menuitem;

@@ -33,7 +33,7 @@ cluster_symbol_show (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
 
   /*-- draw the appropriate symbol in the appropriate color --*/
   gdk_gc_set_foreground (gg->plot_GC,
-                        &gg->default_color_table[d->clusv[k].color]);
+                        &gg->color_table[d->clusv[k].color]);
   g.type = d->clusv[k].glyphtype;
   g.size = d->clusv[k].glyphsize;
 

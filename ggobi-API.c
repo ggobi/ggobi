@@ -812,14 +812,14 @@ GGOBI(setColorMap)(double *vals, int nr, ggobid *gg)
  gint i;
 
 
- gg->default_color_table = (GdkColor*)
-   g_realloc (gg->default_color_table, sizeof(GdkColor) * nr);
+ gg->color_table = (GdkColor*)
+   g_realloc (gg->color_table, sizeof(GdkColor) * nr);
  gg->ncolors = nr;
 
  for(i = 0; i < nr; i++) {
-   gg->default_color_table[i].red = vals[i];
-   gg->default_color_table[i].green = vals[i + nr];
-   gg->default_color_table[i].blue = vals[i + 2*nr];
+   gg->color_table[i].red = vals[i];
+   gg->color_table[i].green = vals[i + nr];
+   gg->color_table[i].blue = vals[i + 2*nr];
  }
 
  return(GGOBI(registerColorMap)(gg));
@@ -834,7 +834,7 @@ GGOBI(registerColorMap)(ggobid *gg)
   GdkColormap *cmap = gdk_colormap_get_system ();
 
   success = (gboolean *) g_malloc(sizeof(gboolean) * gg->ncolors);
-  gdk_colormap_alloc_colors (cmap, gg->default_color_table, gg->ncolors,
+  gdk_colormap_alloc_colors (cmap, gg->color_table, gg->ncolors,
     false, true, success);
 
   g_free(success);

@@ -43,9 +43,9 @@ getColorTable (ggobid *gg)
   gint k;
 
   for (k=0; k<NCOLORS; k++) {
-    m[k][0] = gg->default_color_table[k].red;
-    m[k][1] = gg->default_color_table[k].green;
-    m[k][2] = gg->default_color_table[k].blue;
+    m[k][0] = gg->color_table[k].red;
+    m[k][1] = gg->color_table[k].green;
+    m[k][2] = gg->color_table[k].blue;
   }
 
   return (guint **) m;
@@ -59,15 +59,15 @@ color_table_init (ggobid *gg) {
   GdkColormap *cmap = gdk_colormap_get_system ();
   gboolean writeable = false, best_match = true, success[NCOLORS];
 
-  gg->default_color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
+  gg->color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
 
   for (i=0; i<NCOLORS; i++) {
-    gg->default_color_table[i].red   = (guint16) (default_rgb[i][0]*65535.0);
-    gg->default_color_table[i].green = (guint16) (default_rgb[i][1]*65535.0);
-    gg->default_color_table[i].blue  = (guint16) (default_rgb[i][2]*65535.0);
+    gg->color_table[i].red   = (guint16) (default_rgb[i][0]*65535.0);
+    gg->color_table[i].green = (guint16) (default_rgb[i][1]*65535.0);
+    gg->color_table[i].blue  = (guint16) (default_rgb[i][2]*65535.0);
   }
 
-  gdk_colormap_alloc_colors (cmap, gg->default_color_table, NCOLORS,
+  gdk_colormap_alloc_colors (cmap, gg->color_table, NCOLORS,
     writeable, best_match, success);
 
   gg->ncolors = NCOLORS;  /* add foreground and background once I know them */
@@ -78,10 +78,10 @@ color_table_init (ggobid *gg) {
   */
   for (i=0; i<NCOLORS; i++) {
     if (!success[i]) {
-      gg->default_color_table[i].red =   (guint16) 65535;
-      gg->default_color_table[i].green = (guint16) 65535;
-      gg->default_color_table[i].blue =  (guint16) 65535;
-      if (gdk_colormap_alloc_color (cmap, &gg->default_color_table[i],
+      gg->color_table[i].red =   (guint16) 65535;
+      gg->color_table[i].green = (guint16) 65535;
+      gg->color_table[i].blue =  (guint16) 65535;
+      if (gdk_colormap_alloc_color (cmap, &gg->color_table[i],
         writeable, best_match) == false)
       {
         g_printerr("Unable to allocate colors, not even white!\n");

@@ -983,14 +983,14 @@ setColorMap(const CHAR **attrs, XMLParserData *data)
   ggobid *gg = data->gg;
   if(file) {
     gg->ncolors +=  size;
-    gg->default_color_table = (GdkColor *)
-      g_realloc (gg->default_color_table , gg->ncolors * sizeof (GdkColor));
+    gg->color_table = (GdkColor *)
+      g_realloc (gg->color_table , gg->ncolors * sizeof (GdkColor));
     gg->colorNames = (gchar **)
       g_realloc (gg->colorNames, gg->ncolors * sizeof (gchar *));
     memset(gg->colorNames + (gg->ncolors-size), '\0', size*sizeof(gchar *));
   } else {
     gg->ncolors = size;
-    gg->default_color_table = (GdkColor *) g_malloc (size * sizeof (GdkColor));
+    gg->color_table = (GdkColor *) g_malloc (size * sizeof (GdkColor));
     gg->colorNames = (gchar **) g_malloc (size * sizeof (gchar *));
     memset(gg->colorNames, '\0', size * sizeof (gchar *));
   }
@@ -1027,10 +1027,10 @@ setColormapEntry(const CHAR **attrs, XMLParserData *data)
           Thus we can skip values, etc.
         */
      which = data->current_color = strToInteger(tmp) - 1;
-     color = data->gg->default_color_table + which;
+     color = data->gg->color_table + which;
    }
  } else {
-     color = data->gg->default_color_table + data->current_color;
+     color = data->gg->color_table + data->current_color;
  }
 
  for(i = 0; i < 3; i++) {
@@ -1071,7 +1071,7 @@ setColorValue(XMLParserData *data, const CHAR *line, int len)
  int which = 0;
  const char *tmp = strtok((char*) line, " \t\n");
 
- GdkColor *color = data->gg->default_color_table + data->current_color;
+ GdkColor *color = data->gg->color_table + data->current_color;
  
  while(tmp) {
   values[which++] = asNumber(tmp);

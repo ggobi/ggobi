@@ -113,28 +113,8 @@ other input about the display of the data from files as well.  If
 the data is in a file named
 
 .nf
-.B filename
-.fi
-
-.RS .25i
-or
-.RE
-
-.nf
 .B filename.dat
 .fi
-
-.RS .25i
-(either of which must be an ASCII file), or
-.RE
-
-.nf
-.B filename.bin
-.fi
-.RS .25i
-
-(the binary version of the data), then the other files are as follows:
-.RE
 
 .nf
 .B filename.row
@@ -151,9 +131,6 @@ label per line.
 
 .nf
 .B filename.col
-.B filename.collab
-.B filename.column
-.B filename.var
 .fi
 .RS .25i
 
@@ -207,17 +184,6 @@ line.  The glyph types are as follows:
 Erase: a column of 1s (to have a point hidden on startup) and 0s (to
 have the point plotted).  There should be one value per line and as
 many lines as there are rows in the data.
-.RE
-
-.nf
-.B filename.lines
-.fi
-.RS .25i
-
-Line segments: specifications for the pattern of line segments which
-connect pairs of points.  The file should contain two numbers per
-line.  The pair of numbers represents the row numbers of the two
-points that should be connected.
 .RE
 
 .nf

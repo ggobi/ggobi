@@ -352,12 +352,12 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
   gint y2 = MAX (brush_pos->y1, brush_pos->y2);
 
   if (!gg->mono_p) {
-    if ((gg->default_color_table[gg->color_id].red != gg->bg_color.red) ||
-        (gg->default_color_table[gg->color_id].blue != gg->bg_color.blue) ||
-        (gg->default_color_table[gg->color_id].green != gg->bg_color.green))
+    if ((gg->color_table[gg->color_id].red != gg->bg_color.red) ||
+        (gg->color_table[gg->color_id].blue != gg->bg_color.blue) ||
+        (gg->color_table[gg->color_id].green != gg->bg_color.green))
     {
       gdk_gc_set_foreground (gg->plot_GC,
-                             &gg->default_color_table[gg->color_id]);
+                             &gg->color_table[gg->color_id]);
     } else {
       gdk_gc_set_foreground (gg->plot_GC,
                              &gg->accent_color);

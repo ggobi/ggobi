@@ -26,7 +26,7 @@ redraw_fg (GtkWidget *w, gint k, ggobid *gg) {
   if (gg->plot_GC == NULL)
     init_plot_GC (w->window, gg);
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->default_color_table[k]);
+  gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[k]);
   gdk_draw_rectangle (w->window, gg->plot_GC,
     true, 0, 0, w->allocation.width, w->allocation.height);
 
@@ -106,7 +106,7 @@ redraw_symbol_display (GtkWidget *w, ggobid *gg) {
   gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
   gdk_draw_rectangle (w->window, gg->plot_GC,
     true, 0, 0, w->allocation.width, w->allocation.height);
-  gdk_gc_set_foreground (gg->plot_GC, &gg->default_color_table[gg->color_id]);
+  gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[gg->color_id]);
 
   /*
    * The factor of three is dictated by the sizing of circles
@@ -210,7 +210,7 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
       gg->accent_color = gdk_color;
       redraw_accent (gg->color_ui.accent_da, gg);
     } else {
-      gg->default_color_table[gg->color_id] = gdk_color;
+      gg->color_table[gg->color_id] = gdk_color;
       redraw_fg (gg->color_ui.fg_da[gg->color_id], gg->color_id, gg);
     }
 
@@ -305,9 +305,9 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
   else {
       for (i=0; i<NCOLORS; i++) {
       if (w == gg->color_ui.fg_da[i]) {
-        color[0] = (gdouble) gg->default_color_table[i].red / 65535.0;
-        color[1] = (gdouble) gg->default_color_table[i].green / 65535.0;
-        color[2] = (gdouble) gg->default_color_table[i].blue / 65535.0;
+        color[0] = (gdouble) gg->color_table[i].red / 65535.0;
+        color[1] = (gdouble) gg->color_table[i].green / 65535.0;
+        color[2] = (gdouble) gg->color_table[i].blue / 65535.0;
           gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
       }
     }
@@ -344,7 +344,7 @@ set_color_fg ( GtkWidget *w, GdkEventButton *event , ggobid *gg)
   } else {
     gint rval = false;
     gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
-      "expose_event", (gpointer) sp, (gpointer) &rval);
+      "expose_event", (gpointer) gg, (gpointer) &rval);
   }
 
   redraw_fg (gg->color_ui.fg_da[prev], prev, gg);
@@ -469,6 +469,36 @@ color_expose_show (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   redraw_symbol_display (w, gg);
 
   return FALSE;
+}
+
+static void
+reverse_video_cb (GtkWidget *ok_button, ggobid* gg) {
+  gulong pixel;
+  gushort r, g, b;
+  gint rval = false;
+
+  r = gg->accent_color.red;
+  g = gg->accent_color.green;
+  b = gg->accent_color.blue;
+  pixel = gg->accent_color.pixel;
+
+  gg->accent_color.red = gg->bg_color.red;
+  gg->accent_color.green = gg->bg_color.green;
+  gg->accent_color.blue = gg->bg_color.blue;
+  gg->accent_color.pixel = gg->bg_color.pixel;
+
+  gg->bg_color.red = r;
+  gg->bg_color.green = g;
+  gg->bg_color.blue = b;
+  gg->bg_color.pixel = pixel;
+
+  gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
+    "expose_event",
+    (gpointer) gg, (gpointer) &rval);
+  redraw_bg (gg->color_ui.bg_da, gg);
+  redraw_accent (gg->color_ui.accent_da, gg);
+
+  displays_plot ((splotd *) NULL, FULL, gg);
 }
 
 static void
@@ -666,6 +696,14 @@ make_symbol_window (ggobid *gg) {
     gtk_table_attach (GTK_TABLE (accent_table),
       gg->color_ui.accent_da, 0, 1, 0, 1,
       GTK_FILL, GTK_FILL, 10, 10);
+
+    /*-- Temporary, perhaps: reverse video button --*/
+    btn = gtk_button_new_with_label ("Reverse video");
+    gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
+    gtk_signal_connect (GTK_OBJECT (btn),
+                        "clicked",
+                        GTK_SIGNAL_FUNC (reverse_video_cb),
+                        (gpointer) gg);
 
     /*-- Close button --*/
     btn = gtk_button_new_with_label ("Close");
