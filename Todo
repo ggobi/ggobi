@@ -28,8 +28,6 @@ the correct data mode is passed.  Take it out of ggobi.
 Missings:
   It should be possible in xml to acknowledge various
     types of missingness: left censored, missing, etc.
-  We don't yet have a show/hide missings button -- at what
-    level should it operate?  per-datad or per-display?
 
 ASH:
   Add an option to connect the points?  This could be done
@@ -269,3 +267,6 @@ Food for thought:
 
 ! xmlConvert doesn't write out missing information;
 !   probably writing out in xml doesn't either
+
+! We don't yet have a show/hide missings button -- at what
+!   level should it operate?  per-datad or per-display?
