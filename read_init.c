@@ -520,6 +520,9 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info, gboolean single)
 
   if(single) {
     el = getXMLDocElement(doc, "plugin");
+    if(!el) {
+	el = getXMLDocElement(doc, "inputPlugin");
+    }
   } else {
     node = getXMLDocElement(doc, "plugins");
     if(node)
