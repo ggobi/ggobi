@@ -1,22 +1,48 @@
-#include "jvm.h"
+/**
+  This file provides the basic C-level methods for a Java
+  plugin for GGobi. What this means is that we can load the
+  Java Virtual Machine (JVM) inside the GGobi process and
+  access Java classes. In practice, this will mean that we
+  can implement plugins (both regular and input plugins)
+  using Java classes. 
+  Additionally, the file ggobiAccess.c provides native methods
+  for Java classes that allow those Java classes to dynamically
+  access the GGobi instances and their data structures.
+  When combined with the Gtk bindings for Java (http://java-gnome.sourceforge.net/)
+  one can develop plugins that extend both the functionality and appearance
+  of GGobi via Java code rather than lower-level C code.
+ */
 
+#include "jvm.h"
 #include "GGobiAPI.h"
 
+
+/**
+ The default Java context in which to execute calls.
+ */
 static JNIEnv *std_env = NULL;
+
+/**
+  The JVM. Not necessary to keep it here as we can get it
+  at any time via the JNI method GetJavaVM().
+ */
 static JavaVM *jvm;
 
+/**
+   the identifier for the classpath option when starting the JVM.
+ */
 #define CLASSPATH_OPT "-Djava.class.path="
 
 
-jobject runPlugin(const char * const klass, JNIEnv *env);
 gboolean initJVM(void);
-
-char *getInputDescription(JavaInputPluginData *rt, JNIEnv *env);
+jobject  runPlugin(const char * const klass, JNIEnv *env);
+char *   getInputDescription(JavaInputPluginData *rt, JNIEnv *env);
 jboolean getDims(int *nrow, int *ncol, JavaRunTimeData *rt, JNIEnv *env);
 
 /**
   This is the initial entry point for the plugin that starts the
   virtual machine.
+  @see initJVM()
  */
 gboolean loadJVM(gboolean initializing, GGobiPluginInfo *pluginInfo)
 {
@@ -24,7 +50,8 @@ gboolean loadJVM(gboolean initializing, GGobiPluginInfo *pluginInfo)
 } 
 
 /**
-  This starts the Virtual Machine.
+  This actually starts the Virtual Machine.
+ 
  */
 gboolean initJVM()
 {
@@ -32,16 +59,24 @@ gboolean initJVM()
   JavaVMInitArgs vm2_args;
   JavaVMInitArgs *vm_args = &vm2_args;
   JavaVMOption options[1];
-  char *classpath="plugins/JVM", *ptr;
+  char *ptr;
   jint res;
 
+  /* This is the default classpath. Need to modify this to be dynamically 
+     specified by the plugin information.
+   */
+  char *classpath="plugins/JVM";
+
+  /* Prepare the arguments used to initialize the JVM. Note we only get one chance. */
     vm_args = (JavaVMInitArgs *) &vm2_args;
     vm_args->version = JNI_VERSION_1_2;
 
+    /* Set the classpath option by allocating the space for the string and filling it in. */
     options[0].optionString = ptr = (char*) calloc(strlen(CLASSPATH_OPT) + strlen(classpath) + 1, sizeof(char));
     strcpy(ptr, CLASSPATH_OPT);
     strcat(ptr, classpath);
 
+    /* Now fix up the arguments and start the JVM. */
     vm_args->options = options;
     vm_args->nOptions = sizeof(options)/sizeof(options[0]);
     vm_args->ignoreUnrecognized = JNI_FALSE;
@@ -49,6 +84,7 @@ gboolean initJVM()
 	return(JNI_FALSE);
     }
 
+    /* Start the JVM. */
     res = JNI_CreateJavaVM(&jvm, (void**) &std_env, (void*) vm_args);
 
     if(res < 0 || std_env == NULL) {
@@ -57,35 +93,31 @@ gboolean initJVM()
     }
 
     status = JNI_TRUE;
-    /* runPlugin("ggobi/ggobi", std_env) != NULL; */
     return(status);
 }
 
-jobject
-runPlugin(const char * const klass, JNIEnv *env)
-{
+/*******************************************************************************
+  
+                     Generic support for Java Input Plugins.
 
- jclass cls;
- jmethodID id;
- jobject obj;
+ There are basically two methods: get the description and read the data.
 
-   cls = (*env)->FindClass(env, klass); 
-   if(!cls) {
-       fprintf(stderr, "Cannot find class %s\n", klass);
-       exit(3);
-   }
-   id = (*env)->GetMethodID(env, cls, "<init>", "()V");
-   if(!id) {
-       fprintf(stderr, "Cannot find method in class %s\n", klass);
-       exit(3);
-   }
-   obj = (*env)->NewObject(env, cls, id);
-   (*env)->DeleteLocalRef(env, cls);
-
-   return(obj);
-}
+ *******************************************************************************/
 
 
+/**
+ This method pulls the information to create the datad in GGobi from the Java
+ plugin instance. 
+ It asks for the dimensions of the dataset using the getNumRecords() and getNumVariables()
+ methods. It uses this to initialize the datad via the C routine datad_create.
+ Then it queries the object for the variable names and assigns each one to the
+ datad via  GGobi_setVariableName() method.
+ Then it loops over the records and asks for an array of the values for each one.
+ This is done via getRecord() and it copies the contents of the array to the 
+ corresponding row in the datad values array.
+ Finally, it gives the GGobi instance a shove to initialize the dataset
+ and popup a new plot.
+ */
 gboolean 
 JavaReadInput(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
 {
@@ -102,9 +134,11 @@ JavaReadInput(InputDescription *desc, ggobid *gg, GGobiInputPluginInfo *plugin)
 /* Need to figure out who is actually calling this and if it supplies the init. */
 gboolean init = true;
 
+      /* Ask the Java instance for the dimensions of the new dataset. */
     if(getDims(&nrow, &ncol, rt, env) == JNI_FALSE)
 	return(false);
 
+      /* Create the new datad in the GGobi instance and get ready to populate it.*/
     gdata = datad_create(nrow, ncol, gg);
 
     gdata->name = g_strdup(desc->fileName);
@@ -136,6 +170,14 @@ gboolean init = true;
     return(true);
 }
 
+
+/**
+  This is the routine that gets a description of the dataset that is
+  to be read in by the Input Plugin for the given file and data mode.
+  It starts by creating the Java object for this plugin instance and
+  calling its constructor with two arguments: the file name and the 
+  data mode name.
+ */
 InputDescription *
 JavaGetInputDescription(const char * const fileName, const char * const modeName,
                          ggobid *gg, GGobiInputPluginInfo *info)
@@ -144,6 +186,7 @@ JavaGetInputDescription(const char * const fileName, const char * const modeName
     InputDescription *desc;
     JNIEnv *env = std_env;
 
+      /* */
     if(data->runTime == NULL) {
         jclass klass;
         jmethodID cid;
@@ -172,6 +215,12 @@ JavaGetInputDescription(const char * const fileName, const char * const modeName
     return(desc);
 }
 
+
+/**
+  This is the routine that calls the Java method getSourceDescription()
+  for the plugin object and gets a brief description of the plugin data
+  source. The idea is that this description can be used in the 
+ */
 char *
 getInputDescription(JavaInputPluginData *data, JNIEnv *env)
 {
@@ -336,4 +385,32 @@ JavaUpdateDisplayMenu(ggobid *gg, PluginInstance *inst)
 
    ans = JVMENV CallBooleanMethod(env, d->obj, mid);
    return(ans);
+}
+
+
+/**
+
+ */
+jobject
+runPlugin(const char * const klass, JNIEnv *env)
+{
+
+ jclass cls;
+ jmethodID id;
+ jobject obj;
+
+   cls = (*env)->FindClass(env, klass); 
+   if(!cls) {
+       fprintf(stderr, "Cannot find class %s\n", klass);
+       exit(3);
+   }
+   id = (*env)->GetMethodID(env, cls, "<init>", "()V");
+   if(!id) {
+       fprintf(stderr, "Cannot find method in class %s\n", klass);
+       exit(3);
+   }
+   obj = (*env)->NewObject(env, cls, id);
+   (*env)->DeleteLocalRef(env, cls);
+
+   return(obj);
 }
