@@ -87,7 +87,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
   gboolean button1_p, button2_p;
 
   /*-- get the mouse position and find out which buttons are pressed --*/
-  mousepos_get (w, event, &button1_p, &button2_p);
+  mousepos_get_motion (w, event, &button1_p, &button2_p);
 
   if (button1_p || button2_p)
     brush_motion (&mousepos, button1_p, button2_p, cpanel);
@@ -106,7 +106,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   current_display = (displayd *) sp->displayptr;
   cpanel = &current_display->cpanel;
 
-  mousepos_get (w, event, &button1_p, &button2_p);
+  mousepos_get_pressed (w, event, &button1_p, &button2_p);
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                      "motion_notify_event",
