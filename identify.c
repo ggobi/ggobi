@@ -66,7 +66,7 @@ sticky_id_toggle (datad *d, ggobid *gg)
 
   if (d->nearest_point != -1) {
 
-    if (g_slist_length (d->sticky_ids) > 0) {
+    if (d->sticky_ids && g_slist_length (d->sticky_ids) > 0) {
       GSList *l;
       for (l = d->sticky_ids; l; l = l->next) {
         i = GPOINTER_TO_INT (l->data);

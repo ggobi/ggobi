@@ -111,6 +111,11 @@ if test -n  "${UNAME}" ; then
 fi
 
 AC_PATH_PROG(INSTALL, install)
+
+if test -z "${INSTALL}" ; then
+  echo "******* Cannot find the executable 'install'. Will not be able to install the different pieces."
+fi
+
 AC_SUBST(INSTALL)
 
 

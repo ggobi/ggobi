@@ -579,6 +579,7 @@ computeGGobiHome(char *str)
 void
 initSessionOptions(int argc, char **argv)
 {
+  gchar *tmp;
   sessionOptions = &sessionoptions;
   sessionOptions->data_mode = unknown_data;
 
@@ -600,6 +601,12 @@ initSessionOptions(int argc, char **argv)
   sessionOptions->info->numScatMatrixVars = MAXNVARS;
   sessionOptions->info->numParCoordsVars = MAXNPCPLOTS;
   sessionOptions->info->numTimePlotVars = MAXNTSPLOTS;
+
+  tmp = g_malloc(sizeof(gchar) * (strlen(sessionOptions->ggobiHome) + strlen("data/colorschemes.xml") + 2));
+  sprintf(tmp, "%s%s%c%s", sessionOptions->ggobiHome,
+	                   "data", G_DIR_SEPARATOR, "colorschemes.xml");
+  sessionOptions->info->colorSchemeFile = tmp;
+  
 }
 
 
