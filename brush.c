@@ -629,8 +629,6 @@ active_paint_points (datad *d, ggobid *gg)
   gboolean changed;
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
-  void brush_link_by_var (gint jlinkby, vector_b *levels, cpaneld *,
-    datad *, ggobid *);
 
   /* Zero out pts_under_brush[] before looping */
   d->npts_under_brush = 0;
@@ -798,9 +796,9 @@ active_paint_edges (displayd *display, ggobid *gg)
   if (cpanel->brush_on_p) {
     if (gg->linkby_cv) {
       /*-- link by categorical variable --*/
-      /*changed = build_edge_symbol_vectors_by_var (cpanel, d, gg);*/
+      /*changed = build_symbol_vectors_by_var (cpanel, e, gg);*/
     } else {
-      /*-- link by id?  not yet --*/
+      /*-- link by id  --*/
       changed = build_edge_symbol_vectors (cpanel, e, gg);
     }
   }
