@@ -261,12 +261,16 @@ ggobi_alloc()
   tmp->printOptions = NULL;
   tmp->pluginInstances = NULL;
 
+#ifdef USE_XML
   tmp->colorSchemes = sessionOptions->colorSchemes;
 
   if(sessionOptions->activeColorScheme)
-      tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes, sessionOptions->activeColorScheme);
+      tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,
+        sessionOptions->activeColorScheme);
   else
-      tmp->activeColorScheme = (colorschemed *) g_list_nth_data(tmp->colorSchemes, 0);
+      tmp->activeColorScheme = (colorschemed *)
+        g_list_nth_data(tmp->colorSchemes, 0);
+#endif
 
   totalNumGGobis++;
 
@@ -276,7 +280,8 @@ ggobi_alloc()
   num_ggobis++;
 
 #ifdef TEST_KEYS
-  GGOBI(registerNumberedKeyEventHandler)(DummyKeyTest, g_strdup("A string for the key handler"),"Test handler", NULL, tmp, C);
+  GGOBI(registerNumberedKeyEventHandler)(DummyKeyTest,
+    g_strdup("A string for the key handler"),"Test handler", NULL, tmp, C);
 #endif
 
   return (tmp);

@@ -162,12 +162,13 @@ hidden_link_by_id (gint k, datad *source_d, ggobid *gg)
 void
 linkvar_arrays_init (vartabled *vt, datad *d, ggobid *gg)
 {
+/*
   gint i, k;
   gint link_index = g_slist_index (d->vartable, vt);
   GArray *arr;
   GSList *l;
 
-  /*-- free any existing linkvar_arrays --*/
+  *-- free any existing linkvar_arrays --*
   if (d->linkvar_arrays != NULL) {
     for (l=d->linkvar_arrays; l; l=l->next) {
       g_array_free ((GArray *) l->data, false);
@@ -176,16 +177,16 @@ linkvar_arrays_init (vartabled *vt, datad *d, ggobid *gg)
     d->linkvar_arrays = NULL;
   }
 
-  /* 
+  * 
    * initialize nlevels GArrays to contain
    * the vector of indices for each level
-  */
+  *
   for (k=0; k<vt->nlevels; k++) {
     arr = g_array_new (false, false, sizeof(gint));
     d->linkvar_arrays = g_slist_append (d->linkvar_arrays, arr);
   }
 
-  /*-- populate the GArrays, making one pass through the data --*/
+  *-- populate the GArrays, making one pass through the data --*
   for (i=0; i<d->nrows; i++) {
     for (k=0; k<vt->nlevels; k++) {
       if (d->raw.vals[i][link_index] == vt->level_values[k]) {
@@ -194,6 +195,7 @@ linkvar_arrays_init (vartabled *vt, datad *d, ggobid *gg)
       }
     }
   }
+*/
 }
 
 
@@ -223,19 +225,22 @@ linking_method_set (displayd *display, datad *d, ggobid *gg)
 }
 
 void
-brush_link_by_var (gint jlinkby, gboolean *levels, cpaneld *cpanel,
-  datad *d, ggobid *gg)
+brush_link_by_var (gint jlinkby, vector_b *levelv,
+  cpaneld *cpanel, datad *d, ggobid *gg)
 {
-  gint m, i, level;
+  gint m, i, level_value;
 
+for (i=0; i<levelv->nels; i++)
+g_printerr ("  levels[%d] = %d \n", i, levelv->els[i]);
   /*
    * for this datad, loop once over all rows in plot 
   */
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];
-    level = (gint)d->raw.vals[i][jlinkby];
 
-    if (levels[level]) {  /*-- if it's to acquire the new symbol --*/
+    level_value = (gint)d->raw.vals[i][jlinkby];
+
+    if (levelv->els[level_value]) {  /*-- if it's to acquire the new symbol --*/
       if (cpanel->br_mode == BR_PERSISTENT) {
         switch (cpanel->br_point_targets) {
           case BR_CANDG:  /*-- color and glyph, type and size --*/

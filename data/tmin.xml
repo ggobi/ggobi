@@ -5,22 +5,31 @@
 <data name="Customers">
 <description>
 </description>
-<variables count="3">
+<variables count="4">
  <realvariable name="avgusage" />
- <realvariable name="fraudp" />
+ <realvariable name="foo" />
+ <categoricalvariable name="fraudp">
+   <levels count="3">
+     <level value="0"> low </level>
+     <level value="1"> medium </level>
+     <level value="2"> high </level>
+   </levels>
+ </categoricalvariable>
  <categoricalvariable name="bizres">
-   <levels count="2">
-     <level value="0"> false </level>
-     <level value="1"> true </level>
+   <levels count="3">
+     <level value="0"> biz </level>
+     <level value="1"> res </level>
+     <level value="2"> unknown </level>
    </levels>
  </categoricalvariable>
 </variables>
-<records  count="5">
- <record id="0">  1 1 0  </record>
- <record id="1">  2 2 1  </record>
- <record id="2">  3 3 0  </record>
- <record id="3">  4 4 1  </record>
- <record id="5">  5 5 0  </record>
+<records  count="6">
+ <record id="0">  1   1 1 0  </record>
+ <record id="1">  1.5 2 1 1  </record>
+ <record id="2">  3.5 3 0 2  </record>
+ <record id="3">  4   4 0 0  </record>
+ <record id="5">  5   5 2 1  </record>
+ <record id="6">  6   6 2 2  </record>
 </records>
 
 </data>
@@ -29,24 +38,32 @@
 <description>
 
 </description>
-<variables count="3">
+<variables count="4">
  <realvariable name="nseconds" />
- <realvariable name="timeofday" />
+ <realvariable name="whatever" />
+ <categoricalvariable name="fraudp">
+   <levels count="3">
+     <level value="0"> low </level>
+     <level value="1"> medium </level>
+     <level value="2"> high </level>
+   </levels>
+ </categoricalvariable>
  <categoricalvariable name="bizres">
-   <levels count="2">
-     <level value="0"> false </level>
-     <level value="1"> true </level>
+   <levels count="3">
+     <level value="0"> biz </level>
+     <level value="1"> res </level>
+     <level value="2"> unknown </level>
    </levels>
  </categoricalvariable>
 </variables>
 
 <records count="6">
- <record source="0" destination="2"> 42 4870  0 </record>
- <record source="2" destination="3"> 42 4880  1 </record>
- <record source="0" destination="3">  7 4890  0 </record>
- <record source="3" destination="5"> 17 4900  1 </record>
- <record source="1" destination="5"> 12 5000  0 </record>
- <record source="1" destination="0"> 18 5100  1 </record>
+ <record source="0" destination="2"> 42 4870  0 0 </record>
+ <record source="2" destination="3"> 42 4880  0 1 </record>
+ <record source="0" destination="3">  7 4890  1 2 </record>
+ <record source="3" destination="5"> 17 4900  1 0 </record>
+ <record source="1" destination="5"> 12 5000  2 1 </record>
+ <record source="1" destination="0"> 18 5100  2 2 </record>
 </records>
 </data>
   

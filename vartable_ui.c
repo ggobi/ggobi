@@ -940,8 +940,8 @@ vartable_collab_set_by_var (gint j, datad *d)
     vt = vartable_element_get (j, d);
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
       CLIST_VARNAME, vt->collab);
-    ind = (vt->categorical_p) ? g_strdup ("y") :
-                                           g_strdup ("");
+    ind = (vt->categorical_p) ? g_strdup_printf ("y:%d", vt->nlevels) :
+                                g_strdup ("");
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
       CLIST_TYPE, ind);
     g_free (ind);

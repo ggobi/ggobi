@@ -415,6 +415,7 @@ void vectorb_free (vector_b *);
 void vectorb_init_null (vector_b *);
 void vectorb_realloc (vector_b *, gint);
 void vectorb_realloc_zero (vector_b *, gint);
+void vectorb_zero (vector_b *vecp);
 void vectorf_alloc (vector_f *, gint);
 void vectorf_alloc_zero (vector_f *, gint);
 void vectorf_delete_els (vector_f *vecp, gint nels, gint *els);

@@ -180,7 +180,7 @@ brush_set_pos (gint x, gint y, splotd *sp) {
 static gboolean
 binning_permitted (displayd *display, ggobid *gg)
 {
-  datad *d = display->d;
+  /*datad *d = display->d;*/
   datad *e = display->e;
   gboolean permitted = true;
   gint type = display->displaytype;
@@ -680,7 +680,7 @@ active_paint_points (datad *d, ggobid *gg)
   gboolean changed;
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
-  void brush_link_by_var (gint jlinkby, gboolean *levels, cpaneld *,
+  void brush_link_by_var (gint jlinkby, vector_b *levels, cpaneld *,
     datad *, ggobid *);
 
   /* Zero out pts_under_brush[] before looping */
@@ -710,27 +710,44 @@ active_paint_points (datad *d, ggobid *gg)
 
   /*---------------------------------------------------------------------*/
 
+/*
+ * We're working too hard here, looping whether there's any
+ * change or not.  Maybe there's an easy way to set the value
+ * of changed by keeping track of pts_under_brush_prev?
+*/
+
   /*-- link by categorical variable --*/
   if (gg->linkby_cv) {
-    gint i, m, level;
-    gboolean *levels = g_malloc0 (d->linkvar_vt->nlevels * sizeof(gboolean));
+    gint i, m, level_value, level_value_max;
+    vector_b levelv;
     gint jlinkby = g_slist_index (d->vartable, d->linkvar_vt);
     /*-- for other datad's --*/
     GSList *l;
+    GList *lv;
     datad *dd;
     vartabled *vtt;
+
+    level_value_max = d->linkvar_vt->nlevels;
+    for (lv = d->linkvar_vt->level_values; lv; lv = lv->next) {
+      level_value = GPOINTER_TO_INT (lv->data);
+      if (level_value > level_value_max) level_value_max = level_value;
+    }
+    
+    vectorb_alloc (&levelv, level_value_max+1);
+    vectorb_zero (&levelv);
 
     /*-- find the levels which are among the points under the brush --*/
     for (m=0; m<d->nrows_in_plot; m++) {
       i = d->rows_in_plot[m];
       if (d->pts_under_brush.els[i]) {
-        level = (gint) d->raw.vals[i][jlinkby];
-        levels[level] = true;
+        level_value = (gint) d->raw.vals[i][jlinkby];
+        levelv.els[level_value] = true;
       }
     }
 
+
     /*-- first do this d --*/
-    brush_link_by_var (jlinkby, levels, cpanel, d, gg);
+    brush_link_by_var (jlinkby, &levelv, cpanel, d, gg);
 
     /*-- now for the rest of them --*/
     for (l = gg->d; l; l = l->next) {
@@ -739,12 +756,12 @@ active_paint_points (datad *d, ggobid *gg)
         vtt = vartable_element_get_by_name (d->linkvar_vt->collab, dd);
         if (vtt != NULL) {
           jlinkby = g_slist_index (dd->vartable, vtt);
-          brush_link_by_var (jlinkby, levels, cpanel, dd, gg);
+          brush_link_by_var (jlinkby, &levelv, cpanel, dd, gg);
         }
       }
     }
 
-    g_free (levels);
+    vectorb_free (&levelv);
     changed = true;
   }
 

@@ -248,16 +248,22 @@ int
 setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 {
   const gchar *tmp = getAttribute(attrs, "value");
+  gint itmp;
   datad *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
 
   data->current_level++; /*-- current_level here ranges from 0 : nlevels-1 --*/
 
-  if (tmp != NULL)
-    el->level_values[data->current_level] = strToInteger (tmp);
-  else
-    el->level_values[data->current_level] = data->current_level;
-   
+  if (tmp != NULL) {
+    itmp = strToInteger (tmp);
+    if (itmp < 0) g_printerr ("trouble: levels must be >= 0\n");
+    el->level_values = g_list_append (el->level_values,
+      GINT_TO_POINTER(itmp));
+  } else {
+    el->level_values = g_list_append (el->level_values,
+      GINT_TO_POINTER(data->current_level));
+  }
+ 
   return(data->current_level);
 }
 
@@ -271,8 +277,8 @@ categoricalLevels(const xmlChar **attrs, XMLParserData *data)
 
   if (tmp != NULL) {
     el->nlevels = strToInteger(tmp);
-    el->level_values = (gint *) g_malloc (el->nlevels * sizeof(gint));
-    el->level_names = g_array_new(false, false, sizeof(gchar *));       
+    el->level_values = NULL;
+    el->level_names = g_array_new (false, false, sizeof(gchar *));       
     g_array_set_size(el->level_names, el->nlevels);
   }
 
@@ -292,8 +298,6 @@ addLevel(XMLParserData *data, const gchar *c, gint len)
 
   gchar *val = g_strdup(c);
   g_array_append_val(el->level_names, val);
-
-  /*g_array_insert_val(el->level_names, data->current_level, val);*/
 }
 
 
@@ -445,7 +449,7 @@ skipWhiteSpace(const xmlChar *ch, int *len)
    (*len)--;
   }
 
-return(tmp);
+  return(tmp);
 }
 
 
