@@ -338,7 +338,7 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
       buf = (gchar*) g_malloc(n* sizeof (gchar*));
       sprintf(buf, "%s", vty->collab);
     break;
-#ifdef BARCHYART_IMPLEMENTED
+#ifdef BARCHART_IMPLEMENTED
     case barchart:
       vt = vartable_element_get (splot->p1dvar, d);
       n = strlen (vt->collab);
@@ -348,6 +348,8 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
 #endif
     case unknown_display_type:
     break;
+    default:
+      break;
   }
 
   return (buf);
