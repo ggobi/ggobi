@@ -475,7 +475,7 @@ extern void tsplot_reset_arrangement (displayd *, gint, ggobid *);
 extern gboolean tsplot_varsel (cpaneld *, splotd *, gint, gint, gint *, ggobid *);
 
 /* The new way of handling window closures, so that we don't just exit. */
-void ggobi_close (GtkObject *w, ggobid *);
+gboolean ggobi_close (ggobid *gg, GdkEvent *ev, GtkObject *w);
 gint ggobi_remove_by_index (ggobid *gg, gint which);
 gint ggobi_remove (ggobid *);
 

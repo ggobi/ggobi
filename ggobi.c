@@ -423,10 +423,11 @@ initSessionOptions()
 /*
   Called in response to a window being destroyed.
  */
-void
-ggobi_close (GtkObject *w, ggobid *gg)
+gboolean
+ggobi_close (ggobid *gg, GdkEvent *ev, GtkObject *w)
 {
-  GGOBI(close)(gg, false);
+  GGOBI(close)(gg, true);
+  return(true);
 }
 
 

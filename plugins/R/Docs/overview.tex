@@ -20,35 +20,36 @@
 
 \end{abstract}
 
- Plugins for GGobi provide a powerful mechanism for providing
- functionality that is not directly in ggobi.
- It allows one to add new ways to read data, save output from GGobi
- and provide new run-time features and tools.
- While one can develop plugins in C, the programming language 
- used to develop GGobi,  it is often more convenient to use
- a higher-level interpreted language such as R or Python.
- This partly because one can typically develope code more
- rapidly using these languages than with C.
- More importantly however it is because of the range of existing
- functionality related to data analysis in a language like R, Matlab
- or Octave.
+Plugins for GGobi provide a powerful mechanism for providing
+functionality that is not directly in ggobi.  It allows one to add new
+ways to read data, save output from GGobi and provide new run-time
+features and tools.  While one can develop plugins in C, the
+programming language used to develop GGobi, it is often more
+convenient to use a higher-level interpreted language such as R or
+Python.  This partly because one can typically develope code more
+rapidly using these languages than with C.  More importantly however
+it is because of the range of existing functionality related to data
+analysis in a language like R, Matlab or Octave.
 
 
 \section{R Plugins for GGobi}
-There are two styles of plugins.  The most commonly used one involves
-supplying the R engine within GGobi a list of function objects that
-are invoked by GGobi when the plugin needs to react or provide
-information to GGobi.  The functions in the collection typically share
-a common state that is mutable, i.e. can change across calls to these
-functions.  This is achieved using R's closure mechanism.
+There are two potential styles of plugins.  The most commonly used one
+involves supplying the R engine within GGobi a list of function
+objects that are invoked by GGobi when the plugin needs to react or
+provide information to GGobi.  The functions in the collection
+typically share a common state that is mutable, i.e. can change across
+calls to these functions.  This is achieved using R's closure
+mechanism.
 
 The second style of plugin involves providing an S object to the
-R-GGobi engine and then GGobi calls specific generic functions with
-that object as the primary argument.  The idea is that the developer
-of the plugin will provide specific methods for the class of the
-plugin object and, in this way, provides different functionality for
+R-GGobi engine and then the R-GGobi connection calls specific generic
+functions with that object as the primary argument.  The idea is that
+the developer of the plugin will provide methods for the class of the
+plugin object and, in this way, provide different functionality for
 different plugin types. The methods can use either the S3 or newer
-S4-style class mechanism.
+S4-style class mechanism.  While this is feasible, we will not pursue
+it in the near future as the first approach using closures is more
+general and is almost as simple.
 
 Both input plugins and regular plugins can be implemented in this
 setup. In this way, we can use R to create run-time, analysis
@@ -120,9 +121,36 @@ able to store state somehow.  We could pass the arguments for each
 call, but that is not as simple just using a closure.
 
 \subsection{Plugins by Explicit Methods}
+This is the second style of plugins that uses calls to generic global
+functions in S, using S-level dispatching on the class of the plugin
+object.  This does not support mutability.  This is not likely to be
+implemented unless people really want it and find a good reason
+why closures cannot be used! 
+
+\section{Examples}
+Plotting examples.
+
+Using Grid to dynamically modify plots in R based on
+brushing/identification/move events in ggobi.
+
+R to annotate with model fits, etc.
+
+Clustering, trees, etc. Dendograms with brushing in ggobi identifying
+leaves.
+
+Using Gtk to build new GUI components.  (Ideally, make ggobid, etc.
+GtkObject's with their own GtkTypes, etc. so we can use reflectance.)
 
 
 \section{Input Plugins}
+
+
+\section{Examples}
+Database connectivity via the Postgres, MySQL, Oracle, ODBC packages.
+
+Reading R objects and data from S3, SAS, Stata, formats using 
+the foreign package.
+
 
 \section{R Plugins using R GGobi}
 One can also control GGobi directly from the S language using the
