@@ -136,7 +136,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   if(el) {
     el = getXMLElement(el, "color");
     info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
-    getColor(el, doc, NULL, info->bgColor, 0, 1);
+    getColor(el, doc, NULL, info->bgColor);
     if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
       info->bgColor, false, true) == false)
     {
@@ -149,7 +149,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   if(el) {
     el = getXMLElement(el, "color");
     info->fgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
-    getColor(el, doc, NULL, info->fgColor, 0, 1);
+    getColor(el, doc, NULL, info->fgColor);
     if (gdk_colormap_alloc_color(gdk_colormap_get_system(),
       info->fgColor, false, true) == false)
     {
@@ -567,7 +567,7 @@ processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 void
 getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr doc)
 {
-    xmlNodePtr c, ptr;
+    xmlNodePtr c /*, ptr*/;
     const xmlChar *tmp;
 
     tmp = xmlGetProp(node, "interactive");
