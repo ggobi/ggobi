@@ -29,13 +29,13 @@ DisplayOptions DefaultDisplayOptions = {
 
 /*-- replot all splots in display --*/
 static void
-display_plot (displayd *display, guint type) {
+display_plot (displayd *display, guint type, ggobid *gg) {
   GList *slist;
   splotd *sp;
 
   for (slist = display->splots; slist; slist = slist->next) {
     sp = (splotd *) slist->data;
-    splot_redraw (sp, type);
+    splot_redraw (sp, type, gg);
   }
 }
 
@@ -44,30 +44,31 @@ display_plot (displayd *display, guint type) {
 /*----------------------------------------------------------------------*/
 
 void
-display_options_cb (GtkCheckMenuItem *w, guint action) {
-
+display_options_cb (GtkCheckMenuItem *w, guint action) 
+{
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
   displayd *display = (displayd *)
     gtk_object_get_data (GTK_OBJECT (w), "display");
 
   switch (action) {
     case DOPT_POINTS:
       display->options.points_show_p = w->active;
-      display_plot (display, FULL);
+      display_plot (display, FULL, gg);
       break;
     case DOPT_SEGS_D:
       display->options.segments_directed_show_p = w->active;
-      display_plot (display, QUICK);
+      display_plot (display, QUICK, gg);
       break;
     case DOPT_SEGS_U:
       display->options.segments_undirected_show_p = w->active;
-      display_plot (display, QUICK);
+      display_plot (display, QUICK, gg);
       break;
     case DOPT_SEGS:
       display->options.segments_show_p = w->active;
-      display_plot (display, FULL);
+      display_plot (display, FULL, gg);
       break;
     case DOPT_MISSINGS:  /*-- only in scatmat and parcoords --*/
-      if (!display->missing_p && gg.nmissing > 0) {
+      if (!display->missing_p && gg->nmissing > 0) {
         display->options.missings_show_p = w->active;
 
         if (display->displaytype == parcoords) {
@@ -75,11 +76,11 @@ display_options_cb (GtkCheckMenuItem *w, guint action) {
           splotd *sp;
           for (splist = display->splots; splist; splist = splist->next) {
             sp = (splotd *) splist->data;
-            sp_whiskers_make (sp, display);
+            sp_whiskers_make (sp, display, gg);
           }
         }
 
-        display_plot (display, FULL);
+        display_plot (display, FULL, gg);
       }
       break;
     case DOPT_GRIDLINES:
@@ -111,12 +112,18 @@ display_print_cb (displayd *display, guint action, GtkWidget *w) {
   menu item.
  */
 void
-display_close_cb (displayd *display, guint action, GtkWidget *w) {
-  display_free (display, false);
+display_close_cb (displayd *display, guint action, GtkWidget *w) 
+{
+  ggobid *gg = GGobiFromDisplay(display);
+
+  display_free (display, false, gg);
 }
+
 void
-display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display) {
-  display_free (display, false);
+display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display) 
+{
+  ggobid *gg = GGobiFromWidget(w, true);
+  display_free (display, false, gg);
 }
 
 /*----------------------------------------------------------------------*/
@@ -124,9 +131,10 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display) {
 /*----------------------------------------------------------------------*/
 
 void
-display_new (gpointer cbd, guint action, GtkWidget *widget)
+display_new (ggobid *gg, guint action, GtkWidget *widget)
 {
- display_create(action, &gg);
+ 
+ display_create(action, gg);
 }
 
 displayd *
@@ -141,31 +149,31 @@ display_create(guint action, ggobid *gg)
    * Turn off event handlers, remove submenus, and redraw the
    * previous plot without a border.
   */
-  splot_set_current (gg->current_splot, off);
+  splot_set_current (gg->current_splot, off, gg);
 
   switch (action) {
 
     case 0:
-      display = scatterplot_new (false, NULL);
+      display = scatterplot_new (false, NULL, gg);
       break;
 
     case 1:
-      display = scatmat_new (false, NULL, 0, 0);
+      display = scatmat_new (false, NULL, 0, 0, gg);
       break;
 
     case 2:
-      display = parcoords_new (false, NULL, 0);
+      display = parcoords_new (false, NULL, 0, gg);
       break;
 
     case 3:  /*-- scatterplot of missing values --*/
       if (gg->nmissing)
-        display = scatterplot_new (true, NULL);
+        display = scatterplot_new (true, NULL, gg);
 
       break;
 
     case 4:  /*-- scatterplot matrix of missing values --*/
       if (gg->nmissing)
-        display = scatmat_new (true, NULL, 0, 0);
+        display = scatmat_new (true, NULL, 0, 0, gg);
       break;
 
     default:
@@ -181,21 +189,24 @@ gint
 display_add(displayd *display, ggobid *gg)
 {
   splotd *prev_splot = gg->current_splot;
-  display_set_current (display);
+
+  GGobi_widget_set(display->window, gg, true);
+
+  display_set_current (display, gg);
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
     /* If the tree of displays is active, add this to it. */
-  display_add_tree(display, -1, gg->app.display_tree.tree);
+  display_add_tree(display, -1, gg->app.display_tree.tree, gg);
 
   gg->current_splot = (splotd *)
     g_list_nth_data (gg->current_display->splots, 0);
-  splot_set_current (gg->current_splot, on);
+  splot_set_current (gg->current_splot, on, gg);
 
   /*
    * The current display types start without signal handlers, but
    * I may need to add handlers later for some unforeseen display.
   */
-  mode_set (gg->current_display->cpanel.mode);  /* don't activate */
+  mode_set (gg->current_display->cpanel.mode, gg);  /* don't activate */
 
   /*
    * Make sure the border for the previous plot is turned off
@@ -212,7 +223,7 @@ display_add(displayd *display, ggobid *gg)
  * current_display and current_splot if necessary.
 */ 
 void
-display_free (displayd* display, gboolean force) {
+display_free (displayd* display, gboolean force, ggobid *gg) {
   GList *l;
   splotd *sp = NULL;
 
@@ -221,27 +232,27 @@ display_free (displayd* display, gboolean force) {
  * event handlers before freeing all the splots belonging to this
  * display.
 */
-  displayd *d = (displayd *) gg.current_splot->displayptr;
+  displayd *d = (displayd *) gg->current_splot->displayptr;
   if (d == display) {
-     sp_event_handlers_toggle (gg.current_splot, off);
+     sp_event_handlers_toggle (gg->current_splot, off);
   }
 
-  if (force || g_list_length (gg.displays) > 1) {
+  if (force || g_list_length (gg->displays) > 1) {
 
     /* If the display tree is active, remove the corresponding
        entry.
      */
-    tree_display_entry_remove(display, gg.app.display_tree.tree); 
+    tree_display_entry_remove(display, gg->app.display_tree.tree, gg); 
 
-    g_list_remove (gg.displays, display);
+    g_list_remove (gg->displays, display);
 
-    if (display == gg.current_display && (g_list_length (gg.displays) > 1)) {
-      display_set_current (g_list_nth_data (gg.displays, 0));
-      gg.current_splot = (splotd *)
-        g_list_nth_data (gg.current_display->splots, 0);
-      splot_set_current (gg.current_splot, on);
+    if (display == gg->current_display && (g_list_length (gg->displays) > 1)) {
+      display_set_current (g_list_nth_data (gg->displays, 0), gg);
+      gg->current_splot = (splotd *)
+        g_list_nth_data (gg->current_display->splots, 0);
+      splot_set_current (gg->current_splot, on, gg);
 
-      sp = gg.current_splot;
+      sp = gg->current_splot;
       if(sp != NULL) {
         sp->redraw_style = QUICK;
         gtk_widget_queue_draw (sp->da);
@@ -250,7 +261,7 @@ display_free (displayd* display, gboolean force) {
 
     for (l=display->splots; l; l=l->next) {
       sp = (splotd *) l->data;
-      splot_free (sp, display);
+      splot_free (sp, display, gg);
     }
     gtk_widget_destroy (display->window);
     g_free (display);
@@ -259,46 +270,46 @@ display_free (displayd* display, gboolean force) {
 }
 
 void
-display_free_all () {
+display_free_all (ggobid *gg) {
   GList *dlist;
   displayd *display;
 
-  for (dlist = gg.displays; dlist; dlist = dlist->next) {
+  for (dlist = gg->displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
-    display_free (display, false); /* Perhaps this should be true to get the final one.*/
+    display_free (display, false, gg); /* Perhaps this should be true to get the final one.*/
   }
 }
 
 void
-display_set_current (displayd *new_display) {
-
+display_set_current (displayd *new_display, ggobid *gg) 
+{
   static GtkWidget *mode_item = NULL;
   static gboolean firsttime = true;
 
   if(new_display == NULL)
    return;
 
-  gtk_accel_group_unlock (gg.app.main_accel_group);
+  gtk_accel_group_unlock (gg->app.main_accel_group);
 
   if (!firsttime) {
 
-    switch (gg.current_display->displaytype) {
+    switch (gg->current_display->displaytype) {
       case scatterplot:
-        gtk_window_set_title (GTK_WINDOW (gg.current_display->window),
-          (gg.current_display->missing_p) ? "scatterplot display (missings)" :
+        gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
+          (gg->current_display->missing_p) ? "scatterplot display (missings)" :
                                             "scatterplot display"); 
         submenu_destroy (mode_item);
         break;
 
       case scatmat:
-        gtk_window_set_title (GTK_WINDOW (gg.current_display->window),
-          (gg.current_display->missing_p) ? "scatterplot matrix (missings)" :
+        gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
+          (gg->current_display->missing_p) ? "scatterplot matrix (missings)" :
                                          "scatterplot matrix"); 
         submenu_destroy (mode_item);
         break;
 
       case parcoords:
-        gtk_window_set_title (GTK_WINDOW (gg.current_display->window),
+        gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
                               "parallel coordinates display");
         submenu_destroy (mode_item);
         break;
@@ -312,11 +323,11 @@ display_set_current (displayd *new_display) {
           "*** scatterplot display (missings) *** " :
           "*** scatterplot display ***"); 
 
-      scatterplot_main_menus_make (gg.app.main_accel_group, mode_set_cb);
-      mode_item = submenu_make ("_View", 'V', gg.app.main_accel_group);
+      scatterplot_main_menus_make (gg->app.main_accel_group, mode_set_cb, gg, true);
+      mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (mode_item),
-                                 gg.app.scatterplot_mode_menu); 
-      submenu_insert (mode_item, gg.app.menubar, 2);
+                                 gg->app.scatterplot_mode_menu); 
+      submenu_insert (mode_item, gg->app.menubar, 2);
       break;
 
     case scatmat:
@@ -325,31 +336,31 @@ display_set_current (displayd *new_display) {
           "*** scatterplot matrix (missings) *** " :
           "*** scatterplot matrix ***"); 
 
-      scatmat_main_menus_make (gg.app.main_accel_group, mode_set_cb);
-      mode_item = submenu_make ("_View", 'V', gg.app.main_accel_group);
+      scatmat_main_menus_make (gg->app.main_accel_group, mode_set_cb, gg, true);
+      mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (mode_item),
-                                 gg.app.scatmat_mode_menu); 
-      submenu_insert (mode_item, gg.app.menubar, 2);
+                                 gg->app.scatmat_mode_menu); 
+      submenu_insert (mode_item, gg->app.menubar, 2);
       break;
 
     case parcoords:
       gtk_window_set_title (GTK_WINDOW (new_display->window),
                             "*** parallel coordinates display ***");
 
-      parcoords_main_menus_make (gg.app.main_accel_group, mode_set_cb);
-      mode_item = submenu_make ("_View", 'V', gg.app.main_accel_group);
+      parcoords_main_menus_make (gg->app.main_accel_group, mode_set_cb, gg, true);
+      mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (mode_item),
-                                 gg.app.parcoords_mode_menu); 
-      submenu_insert (mode_item, gg.app.menubar, 2);
+                                 gg->app.parcoords_mode_menu); 
+      submenu_insert (mode_item, gg->app.menubar, 2);
       break;
   }
 
-  gg.current_display = new_display;
-  cpanel_set (gg.current_display);
+  gg->current_display = new_display;
+  cpanel_set (gg->current_display, gg);
 
-  varpanel_refresh ();
+  varpanel_refresh (gg);
 
-  gtk_accel_group_lock (gg.app.main_accel_group);
+  gtk_accel_group_lock (gg->app.main_accel_group);
   firsttime = false;
 }
 
@@ -360,18 +371,18 @@ display_set_current (displayd *new_display) {
  * if splot is NULL, replot everything
 */
 void
-displays_plot (splotd *splot) {
+displays_plot (splotd *splot, ggobid *gg) {
   GList *dlist, *slist;
   displayd *display;
   splotd *sp;
 
-  for (dlist = gg.displays; dlist; dlist = dlist->next) {
+  for (dlist = gg->displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
     for (slist = display->splots; slist; slist = slist->next) {
       sp = (splotd *) slist->data;
       if (sp != NULL) {
         if (splot == NULL || sp != splot) {
-          splot_redraw (sp, FULL);
+          splot_redraw (sp, FULL, gg);
         }
       }
     }
@@ -381,7 +392,7 @@ displays_plot (splotd *splot) {
 
 /*-- reproject and replot all splots in display --*/
 void
-display_tailpipe (displayd *display) {
+display_tailpipe (displayd *display, ggobid *gg) {
   GList *splist = display->splots;
   splotd *sp;
   cpaneld *cpanel;
@@ -389,8 +400,8 @@ display_tailpipe (displayd *display) {
   while (splist) {
     sp = (splotd *) splist->data;
     cpanel = &display->cpanel;
-    splot_world_to_plane (cpanel, sp);  /*-- includes p1d_spread_var --*/
-    splot_plane_to_screen (display, cpanel, sp);
+    splot_world_to_plane (cpanel, sp, gg);  /*-- includes p1d_spread_var --*/
+    splot_plane_to_screen (display, cpanel, sp, gg);
     splist = splist->next;
   }
 
@@ -399,21 +410,21 @@ display_tailpipe (displayd *display) {
     sp = (splotd *) splist->data;
 
     if (display->displaytype == scatterplot)
-      ruler_ranges_set (display, sp);
+      ruler_ranges_set (display, sp, gg);
 
-    splot_redraw (sp, FULL);
+    splot_redraw (sp, FULL, gg);
     splist = splist->next;
   }
 }
 
 /*-- Reproject and plot all plots in all displays: modulo missingness --*/
 void
-displays_tailpipe (gint which) {
+displays_tailpipe (gint which, ggobid *gg) {
   GList *dlist;
   displayd *display;
   gboolean redisplay = true;
 
-  for (dlist = gg.displays; dlist; dlist = dlist->next) {
+  for (dlist = gg->displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
 
     if (which != REDISPLAY_ALL) {
@@ -422,7 +433,21 @@ displays_tailpipe (gint which) {
     }
 
     if (redisplay)
-      display_tailpipe (display);
+      display_tailpipe (display, gg);
   }
 }
 
+void
+display_window_init(displayd *display, int width, ggobid *gg)
+{
+  display->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_object_set_data (GTK_OBJECT (display->window),
+                       "displayd",
+                       (gpointer) display);
+  gtk_window_set_policy (GTK_WINDOW (display->window), true, true, false);
+  gtk_container_set_border_width (GTK_CONTAINER (display->window), width);
+  gtk_signal_connect (GTK_OBJECT (display->window), "delete_event",
+                      GTK_SIGNAL_FUNC (display_delete_cb), (gpointer) display);
+
+  GGobi_widget_set(GTK_WIDGET(display->window), gg, true);
+}

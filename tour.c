@@ -8,9 +8,9 @@
 #include "externs.h"
 
 void
-alloc_tour(displayd *dsp)
+alloc_tour(displayd *dsp, ggobid *gg)
 {
-  gint nc = gg.ncols;
+  gint nc = gg->ncols;
   gint i;
 
 /* 2 x ncols */
@@ -85,20 +85,20 @@ free_tour(displayd *dsp)
 }
 
 void
-zero_tau(displayd *dsp) {
+zero_tau(displayd *dsp, ggobid *gg) {
   gint k;
 
-  for (k=0; k<gg.ncols; k++) {
+  for (k=0; k<gg->ncols; k++) {
     dsp->tau[k]  = 0.0;
     dsp->tinc[k] = 0.0;
   }
 }
 
 void
-zero_tinc(displayd *dsp) {
+zero_tinc(displayd *dsp, ggobid *gg) {
   gint k;
 
-  for (k=0; k<gg.ncols; k++) {
+  for (k=0; k<gg->ncols; k++) {
     dsp->tinc[k] = 0.0;
   }
 }
@@ -119,10 +119,10 @@ cpanel_tour_init(cpaneld *cpanel) {
 }
 
 void 
-display_tour_init(displayd *dsp) {
+display_tour_init(displayd *dsp, ggobid *gg) {
     gint i, j;
 
-    alloc_tour(dsp);
+    alloc_tour(dsp, gg);
  
     /* Initialize starting subset of active variables */
     dsp->ntour_vars = 3;
@@ -132,7 +132,7 @@ display_tour_init(displayd *dsp) {
 
     /* declare starting base as first two chosen variables */
     for (i=0; i<2; i++)
-      for (j=0; j<gg.ncols; j++)
+      for (j=0; j<gg->ncols; j++)
         dsp->u0[i][j] = dsp->u1[i][j] = dsp->u[i][j] = dsp->uold[i][j] =
           dsp->v0[i][j] = dsp->v1[i][j] = 0.0;
 
@@ -154,20 +154,20 @@ display_tour_init(displayd *dsp) {
     dsp->isins[1] = PRECISION2;
     dsp->isins[0] = 0;
 
-    zero_tau(dsp);
+    zero_tau(dsp, gg);
     dsp->delta = 0.0;
     dsp->dv = 1.0;
 }
 
 void
-tour_reproject (splotd *sp, glong **world_data)
+tour_reproject (splotd *sp, glong **world_data, ggobid *gg)
 /*
  * This routine uses the data projected ginto the span of
  * the starting basis and ending basis, and then rotates in this
  * space.
 */
 {
-  gint i, j, m, n=gg.ncols;
+  gint i, j, m, n=gg->ncols;
   gfloat costf[2], sintf[2];
   gint costi[2], sinti[2];
   displayd *dsp = (displayd *) sp->displayptr;
@@ -196,9 +196,9 @@ tour_reproject (splotd *sp, glong **world_data)
   }
 
   /* This version of tour doesn't use preprojection */
-  for (m=0; m<gg.nrows_in_plot; m++)
+  for (m=0; m<gg->nrows_in_plot; m++)
   {
-    i = gg.rows_in_plot[m];
+    i = gg->rows_in_plot[m];
 
     sp->planar[i].x = 0;
     sp->planar[i].y = 0;
@@ -211,7 +211,7 @@ tour_reproject (splotd *sp, glong **world_data)
 }
 
 void
-do_last_increment(displayd *dsp, cpaneld *cpanel)
+do_last_increment(displayd *dsp, cpaneld *cpanel, ggobid *gg)
 {
   gboolean doit = false;
 
@@ -223,7 +223,7 @@ do_last_increment(displayd *dsp, cpaneld *cpanel)
     doit = true;
   }
   if (doit) {
-    display_tailpipe (dsp);
+    display_tailpipe (dsp, gg);
   }
 }
 
@@ -238,12 +238,12 @@ copy_basis(gfloat **source, gfloat **target, gint n, gint d)
 }
 
 void
-init_basis(displayd *dsp)
+init_basis(displayd *dsp, ggobid *gg)
 {
 /*
  * Set u0 (old first basis) to be u(t) (new first basis)
 */
-  copy_basis(dsp->u, dsp->u0, gg.ncols, 2);
+  copy_basis(dsp->u, dsp->u0, gg->ncols, 2);
 }
 
 
@@ -348,7 +348,7 @@ check_proximity(gfloat **base1, gfloat **base2, gint n)
 }
 
 void
-gt_basis(displayd *dsp)
+gt_basis(displayd *dsp, ggobid *gg)
 /*
  * Generate two random p dimensional vectors to form new ending basis
 */
@@ -365,7 +365,7 @@ gt_basis(displayd *dsp)
   /* Zero out u1 before filling; this might fix a bug we are
      encountering with returning from a receive tour.
   */
-  for (j=0; j<gg.ncols; j++)
+  for (j=0; j<gg->ncols; j++)
     dsp->u1[0][j] = dsp->u1[1][j] = 0.0 ;
 
   if (dsp->ntour_vars > 2) {
@@ -387,12 +387,12 @@ gt_basis(displayd *dsp)
       dsp->u1[0][dsp->tour_vars[j]] = (gfloat) frnorm[0];
       dsp->u1[1][dsp->tour_vars[j]] = (gfloat) frnorm[1];
     }
-    norm(dsp->u1[0], gg.ncols);
-    norm(dsp->u1[1], gg.ncols);
+    norm(dsp->u1[0], gg->ncols);
+    norm(dsp->u1[1], gg->ncols);
 /*
  * Orthogonalize the second vector on the first using Gram-Schmidt
 */
-    gram_schmidt(dsp->u1[0], dsp->u1[1], gg.ncols);
+    gram_schmidt(dsp->u1[0], dsp->u1[1], gg->ncols);
   }
   else
   {
@@ -402,11 +402,11 @@ gt_basis(displayd *dsp)
 }
 
 void
-basis_dir_ang(displayd *dsp)
+basis_dir_ang(displayd *dsp, ggobid *gg)
 {
   gfloat x, y ;
   gint k;
-  gint n = gg.ncols;
+  gint n = gg->ncols;
   static gfloat angle_tol = 0.001;
 
 /* calculate values to minimize angle between two base pairs */
@@ -445,10 +445,10 @@ basis_dir_ang(displayd *dsp)
 }
 
 void
-princ_dirs(displayd *dsp)
+princ_dirs(displayd *dsp, ggobid *gg)
 {
   gint j;
-  gint n = gg.ncols;
+  gint n = gg->ncols;
   
 /* calculate first princ dirs */ /* if there are frozen vars u0 won't
                                      have norm 1, but since this is just
@@ -473,9 +473,9 @@ princ_dirs(displayd *dsp)
 }
 
 void
-princ_angs(displayd *dsp, cpaneld *cpanel)
+princ_angs(displayd *dsp, cpaneld *cpanel, ggobid *gg)
 {
-  gint j, k, n=gg.ncols;
+  gint j, k, n=gg->ncols;
   gfloat tmpf1, tmpf2;
   gfloat tol2 = 0.01;
   static gfloat angle_tol = 0.001;
@@ -512,7 +512,7 @@ princ_angs(displayd *dsp, cpaneld *cpanel)
 
   if ((dsp->tau[0] < tol2) && (dsp->tau[1] < tol2))
   {
-    zero_tau(dsp);
+    zero_tau(dsp, gg);
     k = 0;
     for (j=0; j<dsp->ntour_vars; j++)
     {
@@ -531,7 +531,7 @@ princ_angs(displayd *dsp, cpaneld *cpanel)
     dsp->tau[0] = 0.;
   if (dsp->tau[1] < tol2)
     dsp->tau[1] = 0.;
-  zero_tinc(dsp);
+  zero_tinc(dsp, gg);
   
   dsp->dv = sqrt(dsp->tau[0]*dsp->tau[0] + dsp->tau[1]*dsp->tau[1]);
   dsp->delta = cpanel->tour_step/dsp->dv;
@@ -544,33 +544,33 @@ princ_angs(displayd *dsp, cpaneld *cpanel)
 }
 
 void
-geodesic_tour_path(displayd *dsp, cpaneld *cpanel) {
-  basis_dir_ang(dsp);
-  princ_dirs(dsp);
-  princ_angs(dsp, cpanel);
+geodesic_tour_path(displayd *dsp, cpaneld *cpanel, ggobid *gg) {
+  basis_dir_ang(dsp, gg);
+  princ_dirs(dsp, gg);
+  princ_angs(dsp, cpanel, gg);
 }
 
 void
-determine_endbasis_and_path(displayd *dsp, cpaneld *cpanel)
+determine_endbasis_and_path(displayd *dsp, cpaneld *cpanel, ggobid *gg)
 {
   /* general scan tour */
-    if (!check_proximity(dsp->u, dsp->u0, gg.ncols))
+    if (!check_proximity(dsp->u, dsp->u0, gg->ncols))
     {
-      init_basis(dsp);
+      init_basis(dsp, gg);
     }
-    gt_basis(dsp);
+    gt_basis(dsp, gg);
 
 /*
  * Calculate path.
 */
-  zero_tau(dsp);
-  geodesic_tour_path(dsp, cpanel);
+  zero_tau(dsp, gg);
+  geodesic_tour_path(dsp, cpanel, gg);
 }
 
 void
-increment_tour (displayd *dsp)
+increment_tour (displayd *dsp, ggobid *gg)
 {
-  display_tailpipe (dsp);
+  display_tailpipe (dsp, gg);
 
   /*  tour_var_lines(gg);*/
 }
@@ -593,7 +593,7 @@ check_tour (displayd *dsp, cpaneld *cpanel)
 }
 
 void
-run_tour (displayd *dsp)
+run_tour (displayd *dsp, ggobid *gg)
 {
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -602,7 +602,7 @@ run_tour (displayd *dsp)
  * the current path, if not then increments the tour a step.
 */
   if (check_tour (dsp, cpanel)) {
-    increment_tour (dsp);
+    increment_tour (dsp, gg);
   }
 /*
  * Calculation of new path for various different modes.
@@ -611,20 +611,20 @@ run_tour (displayd *dsp)
 /*
  * Do a final projection into the ending plane if just finished a tour
 */
-      do_last_increment (dsp, cpanel);
-      determine_endbasis_and_path (dsp, cpanel);
+      do_last_increment (dsp, cpanel, gg);
+      determine_endbasis_and_path (dsp, cpanel, gg);
   }
 }
 
 void 
-tour_do_step (displayd *dsp) {
-  run_tour (dsp);
+tour_do_step (displayd *dsp, ggobid *gg) {
+  run_tour (dsp, gg);
 }
 
 /*
 void * tour_thread (void *args)
 {
-  displayd *dsp = gg.current_display;
+  displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
 
   while (true) {
@@ -641,14 +641,14 @@ void * tour_thread (void *args)
 
 static int tour_idle = 0;
 gint
-tour_idle_func (gpointer idled)
+tour_idle_func (gpointer idled, ggobid *gg)
 {
-  displayd *dsp = gg.current_display;
+  displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean doit = !cpanel->is_tour_paused;
 
   if (doit) {
-    run_tour (dsp);
+    run_tour (dsp, gg);
     gdk_flush ();
   }
 

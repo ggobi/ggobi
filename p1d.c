@@ -24,7 +24,7 @@
 #define FORGETITAXIS_MAX 200.
 
 void
-p1d_spread_var (displayd *display, gfloat *yy, splotd *sp) {
+p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, ggobid *gg) {
 /*
  * Set up the next dot plot.
 */
@@ -39,11 +39,11 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp) {
       sp->p1d_lim.min = FORGETITAXIS_MIN ;
       sp->p1d_lim.max = FORGETITAXIS_MAX ;
 
-      textur (yy, sp->p1d_data, gg.nrows_in_plot, option, del, stages);
+      textur (yy, sp->p1d_data, gg->nrows_in_plot, option, del, stages);
       break;
 
     case ASH:
-      do_ash1d (yy, gg.nrows_in_plot,
+      do_ash1d (yy, gg->nrows_in_plot,
                cpanel->nbins, cpanel->nASHes,
                sp->p1d_data, &min, &max);
       sp->p1d_lim.min = min;
@@ -53,14 +53,14 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp) {
     case DOTPLOT:
       sp->p1d_lim.min = FORGETITAXIS_MIN ;
       sp->p1d_lim.max = FORGETITAXIS_MAX ;
-      for (i=0; i<gg.nrows_in_plot; i++)
+      for (i=0; i<gg->nrows_in_plot; i++)
         sp->p1d_data[i] = 50;  /*-- halfway between _MIN and _MAX --*/
       break;   
   }
 }
 
 void
-p1d_reproject (splotd *sp, glong **world_data)
+p1d_reproject (splotd *sp, glong **world_data, ggobid *gg)
 {
 /*
  * Project the y variable down from the ncols-dimensional world_data[]
@@ -76,27 +76,27 @@ p1d_reproject (splotd *sp, glong **world_data)
   if (sp == NULL)
     return;
 
-  yy = (gfloat *) g_malloc (gg.nrows_in_plot * sizeof (gfloat));
+  yy = (gfloat *) g_malloc (gg->nrows_in_plot * sizeof (gfloat));
   jvar = sp->p1dvar;
 
   if (display->missing_p) {
-    for (i=0; i<gg.nrows_in_plot; i++)
-      yy[i] = (gfloat) gg.missing.data[gg.rows_in_plot[i]][jvar];
+    for (i=0; i<gg->nrows_in_plot; i++)
+      yy[i] = (gfloat) gg->missing.data[gg->rows_in_plot[i]][jvar];
   } else {
-    for (i=0; i<gg.nrows_in_plot; i++)
-      yy[i] = gg.tform2.data[gg.rows_in_plot[i]][jvar];
+    for (i=0; i<gg->nrows_in_plot; i++)
+      yy[i] = gg->tform2.data[gg->rows_in_plot[i]][jvar];
   }
 
-  p1d_spread_var (display, yy, sp);
+  p1d_spread_var (display, yy, sp, gg);
 
   /* Then project it */
   rdiff = sp->p1d_lim.max - sp->p1d_lim.min;
-  for (i=0; i<gg.nrows_in_plot; i++) {
-    m = gg.rows_in_plot[i];
+  for (i=0; i<gg->nrows_in_plot; i++) {
+    m = gg->rows_in_plot[i];
 
     /*
      * Use p1d_data[i] not [m] because p1d_data[] is populated
-     * only up to gg.nrows_in_plot
+     * only up to gg->nrows_in_plot
     */
     ftmp = -1.0 + 2.0*(sp->p1d_data[i] - sp->p1d_lim.min)/rdiff;
 
@@ -116,11 +116,11 @@ p1d_reproject (splotd *sp, glong **world_data)
     */
     if (!display->missing_p) {
       if (display->p1d_orientation == VERTICAL) {
-        sp->planar[m].x += gg.jitter.data[m][jvar];
-        sp->planar[m].y -= gg.jitter.data[m][jvar];
+        sp->planar[m].x += gg->jitter.data[m][jvar];
+        sp->planar[m].y -= gg->jitter.data[m][jvar];
       } else {
-        sp->planar[m].x -= gg.jitter.data[m][jvar];
-        sp->planar[m].y += gg.jitter.data[m][jvar];
+        sp->planar[m].x -= gg->jitter.data[m][jvar];
+        sp->planar[m].y += gg->jitter.data[m][jvar];
       }
     }
   }

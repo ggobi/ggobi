@@ -6,10 +6,24 @@
 #include "display.h"
 #include "display_tree.h"
 
+#include "varseldata.h"
+
 typedef enum {ascii, Sprocess, binary, xml} DataMode;
 typedef enum {read_all, read_block, draw_sample} FileReadType;
 
 struct _ggobid;
+
+
+typedef struct {
+ gint nspherevars;
+ gint *spherevars;
+ gint sphere_npcs;
+
+ gfloat *eigenval;
+ gfloat **eigenvec;
+ gfloat **vc;
+ gfloat *tform1_mean;
+} spherical;
 
 typedef struct {
 
@@ -57,9 +71,12 @@ typedef struct {
   /* scale_ui.c */
   GtkWidget *scale_reset_menu;
 
+  varseldatad vdata0;
+  varseldatad vdata1;
+
 } GGobiApp;
 
-typedef struct _ggobid {
+struct _ggobid {
 
  gchar *data_in;
 
@@ -199,10 +216,16 @@ typedef struct _ggobid {
 
  GGobiApp app;
 
-} ggobid;
+ spherical sphere;
+
+}; /*  ggobid; */
 
 
-GGOBI_ ggobid gg;
+/* 
+  GGOBI_ ggobid gg;
+ */
+/* extern ggobid gg; */
+
 
 #define GGOBI_H
 

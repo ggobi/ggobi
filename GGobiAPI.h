@@ -37,11 +37,11 @@ const gchar * const GGOBI(getDataModeDescription)(DataMode mode);
  * of doubles, arranged by column. Hence the double* for now.
  * A double array (double **) would be useful also.
 */
-void GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int nc);
+void GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int nc, ggobid *gg);
 
 
 /* Whether to get the transformed names or the regular ones. */
-gchar **GGOBI(getVariableNames)(gboolean transformed);
+gchar **GGOBI(getVariableNames)(gboolean transformed, ggobid *gg);
 
 
 
@@ -49,7 +49,7 @@ gchar **GGOBI(getVariableNames)(gboolean transformed);
    Set the name of the jvar'th variable, either the regular
    name or that of the variable's tranformed counterpart.
  */
-void GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed);
+void GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed, ggobid *gg);
 
 
 extern gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents);
@@ -120,52 +120,52 @@ void GGOBI(destroyCurrentDisplay)();
   */
 const gchar ** GGOBI(getCaseNames)();
 
-void GGOBI(setCaseName)(gint pt, const gchar *lbl);
+void GGOBI(setCaseName)(gint pt, const gchar *lbl, ggobid *gg);
 
 
-displayd *newScatterplot (gint ix, gint iy, gchar *viewType);
-displayd *newScatmat (gint *rows, gint *columns);
-displayd *newParCoords (gint *vars);
+displayd *GGOBI(newScatterplot)(gint ix, gint iy, ggobid *gg);
+displayd *GGOBI(newScatmat)(gint *rows, gint *columns, int nr, int nc, ggobid *gg);
+displayd *GGOBI(newParCoords)(gint *vars, int num, ggobid *gg);
 displayd *createPlot(int type, char **varnames);
 
 
 gint *GGOBI(getGlyphTypes)(int *n);
 
-gint *GGOBI(getCaseGlyphTypes)(gint *, gint n);
-gint GGOBI(getCaseGlyphType)(gint id);
+gint *GGOBI(getCaseGlyphTypes)(gint *, gint n, ggobid *gg);
+gint GGOBI(getCaseGlyphType)(gint id, ggobid *gg);
 
-gint *GGOBI(getCaseGlyphSizes)(gint *, gint n);
-gint GGOBI(getCaseGlyphSize)(gint id);
-
-
-void GGOBI(setCaseGlyph) (gint pt, gint type, gint size);
-void GGOBI(setCaseGlyphs) (gint *pts, gint n, gint type, gint size);
+gint *GGOBI(getCaseGlyphSizes)(gint *, gint n, ggobid *gg);
+gint GGOBI(getCaseGlyphSize)(gint id, ggobid *gg);
 
 
-gint GGOBI(getCaseColor) (gint pt);
-gint * GGOBI(getCaseColors) (gint *pts, gint howMany);
+void GGOBI(setCaseGlyph) (gint pt, gint type, gint size, ggobid *gg);
+void GGOBI(setCaseGlyphs) (gint *pts, gint n, gint type, gint size, ggobid *gg);
 
-void GGOBI(setCaseColor)(gint pt, gint colorIndex);
-void GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx);
 
-gboolean  GGOBI(isConnectedSegment)(gint a, gint b);
-void setObservationSegment(gint x, gint y);
+gint GGOBI(getCaseColor) (gint pt, ggobid *gg);
+gint * GGOBI(getCaseColors) (gint *pts, gint howMany, ggobid *gg);
+
+void GGOBI(setCaseColor)(gint pt, gint colorIndex, ggobid *gg);
+void GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx, ggobid *gg);
+
+gboolean  GGOBI(isConnectedSegment)(gint a, gint b, ggobid *gg);
+void setObservationSegment(gint x, gint y, ggobid *gg);
 
 gboolean GGOBI(getShowLines)();
 gboolean GGOBI(setShowLines)(gboolean val);
 
 DisplayOptions *GGOBI(getDefaultDisplayOptions)();
 
-displayd *GGOBI(getDisplay)(int which);
+displayd *GGOBI(getDisplay)(int which, ggobid *gg);
 
-DisplayOptions *GGOBI(getDisplayOptions)(int displayNum);
+DisplayOptions *GGOBI(getDisplayOptions)(int displayNum, ggobid *gg);
 
 
 displayd * GGOBI(getCurrentDisplay)();
 gint GGOBI(getCurrentDisplayIndex)();
 /* gint GGOBI(getCurrentPlot)(displayd *display); */
 
-displayd *GGOBI(setCurrentDisplay)(int which);
+displayd *GGOBI(setCurrentDisplay)(int which, ggobid *gg);
 
 splotd *GGOBI(getPlot)(displayd *display, int which);
 

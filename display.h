@@ -5,7 +5,12 @@
 #include "cpanel.h"
 #include "splot.h"
 
-typedef struct {
+#include "ggobi.h"
+
+struct _ggobid; 
+typedef struct _ggobid ggobid;
+
+struct _displayd {
 
 /*
  * Used by all displays
@@ -60,7 +65,9 @@ typedef struct {
 */
   gint ncorrvars_x, *corrvars_x, ncorrvars_y, *corrvars_y;
 
-} displayd;
+  struct _ggobid *ggobi;
+
+};  /* displayd; */
 
 
 #endif

@@ -31,18 +31,21 @@ scale_init () {
 
 /*
  * Activated from the Reset menu in the main menubar
+
+ Changed the user data type to gg as the "shift" string was
+ not being used.
 */
 void
-reset_pan_cb (GtkWidget *w, gpointer cbd) {
-  splotd *sp = gg.current_splot;
+reset_pan_cb (GtkWidget *w, ggobid *gg) {
+  splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
   sp->ishift.x = sp->max.x/2;
   sp->ishift.y = sp->max.y/2;
 
-  splot_plane_to_screen (display, &display->cpanel, sp);
-  ruler_ranges_set (gg.current_display, sp);
-  splot_redraw (sp, FULL);
+  splot_plane_to_screen (display, &display->cpanel, sp, gg);
+  ruler_ranges_set (gg->current_display, sp, gg);
+  splot_redraw (sp, FULL, gg);
 }
 void
 reset_zoom_cb (GtkWidget *w, gpointer cbd) {
@@ -51,7 +54,8 @@ reset_zoom_cb (GtkWidget *w, gpointer cbd) {
 }
 
 void
-interaction_style_cb (GtkToggleButton *w) {
+interaction_style_cb (GtkToggleButton *w, ggobid *gg) 
+{
 /*
  * This is connected to the Drag button
 */
@@ -66,16 +70,16 @@ interaction_style_cb (GtkToggleButton *w) {
   gtk_widget_set_sensitive (pan_opt, (scale_style == CLICK));
   gtk_widget_set_sensitive (zoom_opt, (scale_style == CLICK));
 
-  splot_redraw (gg.current_splot, QUICK);
+  splot_redraw (gg->current_splot, QUICK, gg);
 }
 
-static void clickoptions_cb (GtkToggleButton *w)
+static void clickoptions_cb (GtkToggleButton *w, ggobid *gg)
 {
   scale_click_opt = (w->active) ? PAN : ZOOM;
   g_printerr ("in interaction_style_cb: %s\n",
     (scale_click_opt == PAN) ? "PAN" : "ZOOM");
 
-  splot_redraw (gg.current_splot, QUICK);
+  splot_redraw (gg->current_splot, QUICK, gg);
 }
 
 static gchar *panoptions_lbl[] = {"Oblique",
@@ -92,9 +96,11 @@ static gchar *zoomoptions_lbl[] = {"Oblique",
                                    "Vert only"};
 static void zoomoptions_cb (GtkWidget *w, gpointer cbd)
 {
+  ggobid *gg = GGobiFromWidget(w, true);
   scale_zoom_opt = GPOINTER_TO_INT (cbd);
+
   g_printerr ("cbd: %s\n", zoomoptions_lbl[scale_zoom_opt]);
-  splot_redraw (gg.current_splot, QUICK);
+  splot_redraw (gg->current_splot, QUICK, gg);
 }
 
 /*--------------------------------------------------------------------*/
@@ -105,38 +111,39 @@ static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   gboolean button1_p, button2_p;
+  ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = (displayd *) sp->displayptr;
 
   /*-- get the mouse position and find out which buttons are pressed --*/
-  mousepos_get_motion (w, event, &button1_p, &button2_p);
+  mousepos_get_motion (w, event, &button1_p, &button2_p, gg);
 
   /*-- I'm not sure this could ever happen --*/
-  if (gg.mousepos.x == gg.mousepos_o.x && gg.mousepos.y == gg.mousepos_o.y)
+  if (gg->mousepos.x == gg->mousepos_o.x && gg->mousepos.y == gg->mousepos_o.y)
     return false;
 
   switch (scale_style) {
 
     case DRAG:
       if (button1_p) {
-        pan_by_drag (sp);
+        pan_by_drag (sp, gg);
       } else if (button2_p) {
-        zoom_by_drag (sp);
+        zoom_by_drag (sp, gg);
       }
 
       /*-- redisplay this plot --*/
-      splot_plane_to_screen (display, &display->cpanel, sp);
-      ruler_ranges_set (gg.current_display, sp);
-      splot_redraw (sp, FULL);
+      splot_plane_to_screen (display, &display->cpanel, sp, gg);
+      ruler_ranges_set (gg->current_display, sp, gg);
+      splot_redraw (sp, FULL, gg);
       break;
 
     case CLICK:
-      splot_redraw (sp, QUICK);
+      splot_redraw (sp, QUICK, gg);
       break;
 
   }  /*-- end switch (scale_style) --*/
 
-  gg.mousepos_o.x = gg.mousepos.x;
-  gg.mousepos_o.y = gg.mousepos.y;
+  gg->mousepos_o.x = gg->mousepos.x;
+  gg->mousepos_o.y = gg->mousepos.y;
 
   return true;
 }
@@ -145,6 +152,7 @@ static gint
 key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 {
   gboolean redraw = false;
+  ggobid *gg = GGobiFromSPlot(sp);
 
   switch (scale_style) {
     case DRAG:
@@ -155,7 +163,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
       switch (scale_click_opt) {
         case PAN:
           if (event->keyval == GDK_space) {
-            pan_step (sp, scale_pan_opt);
+            pan_step (sp, scale_pan_opt, gg);
             redraw = true;
           }
           break;
@@ -178,8 +186,8 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   /*-- redisplay this plot --*/
   if (redraw) {
     displayd *display = (displayd *) sp->displayptr;
-    splot_plane_to_screen (display, &display->cpanel, sp);
-    splot_redraw (sp, FULL);
+    splot_plane_to_screen (display, &display->cpanel, sp, gg);
+    splot_redraw (sp, FULL, gg);
   }
 
   return true;
@@ -189,12 +197,13 @@ static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
+  ggobid *gg = GGobiFromSPlot(sp);
 
-  gg.current_splot = sp;
-  gg.current_display = (displayd *) sp->displayptr;
+  gg->current_splot = sp;
+  gg->current_display = (displayd *) sp->displayptr;
 
-  gg.mousepos_o.x = gg.mousepos.x = event->x;
-  gg.mousepos_o.y = gg.mousepos.y = event->y;
+  gg->mousepos_o.x = gg->mousepos.x = event->x;
+  gg->mousepos_o.y = gg->mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -207,9 +216,10 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
+  ggobid *gg = GGobiFromSPlot(sp);
 
-  gg.mousepos.x = event->x;
-  gg.mousepos.y = event->y;
+  gg->mousepos.x = event->x;
+  gg->mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -249,27 +259,27 @@ scale_event_handlers_toggle (splotd *sp, gboolean state) {
 
 
 void
-scale_menus_make () {
+scale_menus_make (ggobid *gg) {
   GtkWidget *item;
 
 /*
  * Reset menu
 */
-  gg.app.scale_reset_menu = gtk_menu_new ();
+  gg->app.scale_reset_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Reset pan");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (reset_pan_cb),
-                      (gpointer) "shift");
-  gtk_menu_append (GTK_MENU (gg.app.scale_reset_menu), item);
+                      (gpointer) gg);
+  gtk_menu_append (GTK_MENU (gg->app.scale_reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset zoom");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (reset_zoom_cb),
                       (gpointer) "scale");
-  gtk_menu_append (GTK_MENU (gg.app.scale_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->app.scale_reset_menu), item);
 
-  gtk_widget_show_all (gg.app.scale_reset_menu);
+  gtk_widget_show_all (gg->app.scale_reset_menu);
 }
 
 /*--------------------------------------------------------------------*/
@@ -277,15 +287,15 @@ scale_menus_make () {
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_scale_make () {
+cpanel_scale_make (ggobid *gg) {
   GtkWidget *frame, *f, *vbox, *hbox, *vb, *lbl;
   GtkWidget *radio1, *radio2;
   GSList *group;
 
   scale_init ();
 
-  gg.control_panel[SCALE] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg.control_panel[SCALE]), 5);
+  gg->control_panel[SCALE] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[SCALE]), 5);
 
   
 /*
@@ -293,7 +303,7 @@ cpanel_scale_make () {
 */
   frame = gtk_frame_new ("Interaction style");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[SCALE]),
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[SCALE]),
                       frame, false, false, 0);
 
   hbox = gtk_hbox_new (true, 1);
@@ -302,16 +312,16 @@ cpanel_scale_make () {
 
   radio1 = gtk_radio_button_new_with_label (NULL, "Drag");
   GTK_TOGGLE_BUTTON (radio1)->active = TRUE;
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), radio1,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
     "Drag left to pan, drag middle or right to zoom (most direct style)",
     NULL);
   gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
-                      GTK_SIGNAL_FUNC (interaction_style_cb), NULL);
+                      GTK_SIGNAL_FUNC (interaction_style_cb), gg);
   gtk_box_pack_start (GTK_BOX (hbox), radio1, TRUE, TRUE, 0);
 
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
   radio2 = gtk_radio_button_new_with_label (group, "Click");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), radio2,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
     "Use mouse clicks and key presses to pan and zoom (useful for large data)",
     NULL);
   gtk_box_pack_start (GTK_BOX (hbox), radio2, TRUE, TRUE, 0);
@@ -321,7 +331,7 @@ cpanel_scale_make () {
 */
   frame = gtk_frame_new ("Click-style controls");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[SCALE]),
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[SCALE]),
                       frame, false, false, 0);
 
   vbox = gtk_vbox_new (true, 1);
@@ -341,16 +351,16 @@ cpanel_scale_make () {
 
   pan_radio = gtk_radio_button_new_with_label (NULL, "Pan");
   GTK_TOGGLE_BUTTON (pan_radio)->active = true;
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), pan_radio,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), pan_radio,
     "Activate panning for click style interaction",
     NULL);
   gtk_signal_connect (GTK_OBJECT (pan_radio), "toggled",
-                      GTK_SIGNAL_FUNC (clickoptions_cb), NULL);
+                      GTK_SIGNAL_FUNC (clickoptions_cb), gg);
   gtk_box_pack_start (GTK_BOX (hbox), pan_radio, TRUE, TRUE, 0);
 
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (pan_radio));
   zoom_radio = gtk_radio_button_new_with_label (group, "Zoom");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), zoom_radio,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), zoom_radio,
     "Activate zooming for click style interactione", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), zoom_radio, TRUE, TRUE, 0);
 
@@ -366,13 +376,13 @@ cpanel_scale_make () {
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   pan_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), pan_opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), pan_opt,
     "Specify any constraints on the panning direction.  Drag the arrow to set the angle and distance, then hit the spacebar to pan.",
     NULL);
   gtk_box_pack_end (GTK_BOX (vb), pan_opt, false, false, 0);
   populate_option_menu (pan_opt, panoptions_lbl,
                         sizeof (panoptions_lbl) / sizeof (gchar *),
-                        panoptions_cb);
+                        panoptions_cb, gg);
 /*
  * zooming controls
 */
@@ -385,44 +395,44 @@ cpanel_scale_make () {
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   zoom_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), zoom_opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), zoom_opt,
     "Specify any constraints on the zoom.  Drag the box to set the distance, then hit 'i' to zoom in, 'o' to zoom out.",
     NULL);
   gtk_box_pack_end (GTK_BOX (vb), zoom_opt, false, false, 0);
   populate_option_menu (zoom_opt, zoomoptions_lbl,
                         sizeof (zoomoptions_lbl) / sizeof (gchar *),
-                        zoomoptions_cb);
+                        zoomoptions_cb, gg);
 
   gtk_widget_set_sensitive (pan_radio, (scale_style == CLICK));
   gtk_widget_set_sensitive (zoom_radio, (scale_style == CLICK));
   gtk_widget_set_sensitive (pan_opt, (scale_style == CLICK));
   gtk_widget_set_sensitive (zoom_opt, (scale_style == CLICK));
 
-  gtk_widget_show_all (gg.control_panel[SCALE]);
+  gtk_widget_show_all (gg->control_panel[SCALE]);
 }
 
 void
-scale_click_zoom_rect_calc (splotd *sp, gint sc_zoom_opt) {
+scale_click_zoom_rect_calc (splotd *sp, gint sc_zoom_opt, ggobid *gg) {
   icoords mid;
   mid.x = sp->max.x / 2;
   mid.y = sp->max.y / 2;
 
-  if (gg.mousepos.x <= mid.x && gg.mousepos.y <= mid.y) {
+  if (gg->mousepos.x <= mid.x && gg->mousepos.y <= mid.y) {
     /* upper left quadrant of plot, based on the value of mid */
-    scale_click_rect.x = gg.mousepos.x;
-    scale_click_rect.y = gg.mousepos.y;
-  } else if (gg.mousepos.x <= mid.x && gg.mousepos.y > mid.y) {
+    scale_click_rect.x = gg->mousepos.x;
+    scale_click_rect.y = gg->mousepos.y;
+  } else if (gg->mousepos.x <= mid.x && gg->mousepos.y > mid.y) {
     /* lower left quadrant of plot */
-    scale_click_rect.x = gg.mousepos.x;
-    scale_click_rect.y = mid.y - (gg.mousepos.y - mid.y);
-  } else if (gg.mousepos.x > mid.x && gg.mousepos.y > mid.y) {
+    scale_click_rect.x = gg->mousepos.x;
+    scale_click_rect.y = mid.y - (gg->mousepos.y - mid.y);
+  } else if (gg->mousepos.x > mid.x && gg->mousepos.y > mid.y) {
     /* lower right quadrant of plot */
-    scale_click_rect.x = mid.x - (gg.mousepos.x - mid.x);
-    scale_click_rect.y = mid.y - (gg.mousepos.y - mid.y);
-  } else if (gg.mousepos.x > mid.x && gg.mousepos.y <= mid.y) {
+    scale_click_rect.x = mid.x - (gg->mousepos.x - mid.x);
+    scale_click_rect.y = mid.y - (gg->mousepos.y - mid.y);
+  } else if (gg->mousepos.x > mid.x && gg->mousepos.y <= mid.y) {
     /* upper right quadrant of plot */
-    scale_click_rect.x = mid.x - (gg.mousepos.x - mid.x);
-    scale_click_rect.y = gg.mousepos.y;
+    scale_click_rect.x = mid.x - (gg->mousepos.x - mid.x);
+    scale_click_rect.y = gg->mousepos.y;
   }
   scale_click_rect.x = (mid.x - scale_click_rect.x < 20) ?
                        (mid.x - 20) :
@@ -460,15 +470,15 @@ scale_click_zoom_rect_calc (splotd *sp, gint sc_zoom_opt) {
 }
 
 void
-scaling_visual_cues_draw (splotd *sp) {
+scaling_visual_cues_draw (splotd *sp, ggobid *gg) {
   
   switch (scale_style) {
 
     case DRAG:
-      gdk_draw_line (sp->pixmap1, gg.plot_GC,
+      gdk_draw_line (sp->pixmap1, gg->plot_GC,
         0, sp->ishift.y,
         sp->da->allocation.width, sp->ishift.y);
-      gdk_draw_line (sp->pixmap1, gg.plot_GC,
+      gdk_draw_line (sp->pixmap1, gg->plot_GC,
         sp->ishift.x, 0,
         sp->ishift.x, sp->da->allocation.height);
       break;
@@ -476,13 +486,13 @@ scaling_visual_cues_draw (splotd *sp) {
     case CLICK:
       switch (scale_click_opt) {
         case PAN:
-          gdk_draw_line (sp->pixmap1, gg.plot_GC,
+          gdk_draw_line (sp->pixmap1, gg->plot_GC,
             sp->max.x/2, sp->max.y/2,
-            gg.mousepos.x, gg.mousepos.y);
+            gg->mousepos.x, gg->mousepos.y);
           break;
         case ZOOM:
-          scale_click_zoom_rect_calc (sp, scale_zoom_opt);
-          gdk_draw_rectangle (sp->pixmap1, gg.plot_GC, false,
+          scale_click_zoom_rect_calc (sp, scale_zoom_opt, gg);
+          gdk_draw_rectangle (sp->pixmap1, gg->plot_GC, false,
             scale_click_rect.x, scale_click_rect.y,
             scale_click_rect.width, scale_click_rect.height);
           break;

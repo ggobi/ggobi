@@ -25,7 +25,7 @@ static GtkItemFactoryEntry menu_items[] = {
 
 static void
 parcoords_display_menus_make (displayd *display, 
-  GtkAccelGroup *accel_group, GtkSignalFunc func, GtkWidget *mbar)
+  GtkAccelGroup *accel_group, GtkSignalFunc func, GtkWidget *mbar, ggobid *gg)
 {
   GtkWidget *options_menu, *link_menu;
   GtkWidget *submenu;
@@ -37,21 +37,21 @@ parcoords_display_menus_make (displayd *display,
   options_menu = gtk_menu_new ();
 
   CreateMenuCheck (display, options_menu, "Show points",
-    func, GINT_TO_POINTER (DOPT_POINTS), on);
+    func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   CreateMenuCheck (display, options_menu, "Show lines",
-    func, GINT_TO_POINTER (DOPT_SEGS), on);
+    func, GINT_TO_POINTER (DOPT_SEGS), on, gg);
   CreateMenuCheck (display, options_menu, "Show missings",
-    func, GINT_TO_POINTER (DOPT_MISSINGS), on);
+    func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
   CreateMenuCheck (display, options_menu, "Show gridlines",
-    func, GINT_TO_POINTER (DOPT_GRIDLINES), off);
+    func, GINT_TO_POINTER (DOPT_GRIDLINES), off, gg);
   CreateMenuCheck (display, options_menu, "Show axes",
-    func, GINT_TO_POINTER (DOPT_AXES), on);
+    func, GINT_TO_POINTER (DOPT_AXES), on, gg);
 
   /* Add a separator */
-  CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL);
+  CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
   CreateMenuCheck (display, options_menu, "Double buffer",
-    func, GINT_TO_POINTER (DOPT_BUFFER), on);
+    func, GINT_TO_POINTER (DOPT_BUFFER), on, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
   submenu_append (submenu, mbar);
@@ -65,7 +65,7 @@ parcoords_display_menus_make (displayd *display,
   link_menu = gtk_menu_new ();
 
   CreateMenuCheck (display, link_menu, "Link to other plots",
-    func, GINT_TO_POINTER (DOPT_LINK), on);
+    func, GINT_TO_POINTER (DOPT_LINK), on, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), link_menu);
   submenu_append (submenu, mbar);
@@ -74,7 +74,7 @@ parcoords_display_menus_make (displayd *display,
 
 
 void
-parcoords_reset_arrangement (displayd *display, gint arrangement) {
+parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   GList *l;
   GtkWidget *frame, *w;
   splotd *sp;
@@ -120,15 +120,15 @@ parcoords_reset_arrangement (displayd *display, gint arrangement) {
 
   gtk_widget_show_all (arrangement_box);
 
-  display_tailpipe (display);
+  display_tailpipe (display, gg);
 
-  varpanel_refresh ();
+  varpanel_refresh (gg);
 }
 
 
 #define MAXNPCPLOTS 5
 displayd *
-parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots) 
+parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   GtkWidget *mbar;
@@ -138,22 +138,8 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots)
   displayd *display;
 
   if(sub_plots == NULL) {
-     nplots = MIN (gg.ncols, MAXNPCPLOTS);
-
-     display = (displayd *) g_malloc (sizeof (displayd));
-   
-     display->displaytype = parcoords;
-     display->missing_p = missing_p;
-    /* create a row of vertical plots by default */
-     display->p1d_orientation = VERTICAL;
-   
-    /* Copy in the contents of DefaultOptions to create
-       an indepedently modifiable configuration copied from
-       the current template.
-     */
-     display->options = DefaultDisplayOptions;
-
-
+     nplots = MIN (gg->ncols, MAXNPCPLOTS);
+     display = display_alloc_init(parcoords, missing_p, gg);
   } else {
      nplots = numSubPlots;
      display = (displayd *) sub_plots[0]->displayptr;
@@ -162,14 +148,7 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots)
 
   parcoords_cpanel_init (&display->cpanel);
 
-  display->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_object_set_data (GTK_OBJECT (display->window),
-                       "displayd",
-                       (gpointer) display);
-  gtk_window_set_policy (GTK_WINDOW (display->window), true, true, false);
-  gtk_container_set_border_width (GTK_CONTAINER (display->window), 3);
-  gtk_signal_connect (GTK_OBJECT (display->window), "delete_event",
-                      GTK_SIGNAL_FUNC (display_delete_cb), (gpointer) display);
+  display_window_init(display, 3, gg);
 
 /*
  * Add the main menu bar
@@ -187,7 +166,7 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots)
    * add the Display Options and Link menus another way
   */
   parcoords_display_menus_make (display, pc_accel_group,
-    display_options_cb, mbar);
+                                 display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 
@@ -210,7 +189,7 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots)
 
   for (i=0; i<nplots; i++) {
     if(sub_plots == NULL) {
-      sp = splot_new (display, WIDTH, HEIGHT);
+      sp = splot_new (display, WIDTH, HEIGHT, gg);
        /*
         * instead of maintaining a list, each plot knows its variable
         */
@@ -229,10 +208,10 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots)
 
 gboolean
 parcoords_varsel (cpaneld *cpanel, splotd *sp,
-  gint jvar, gint *jvar_prev, gboolean alt_mod)
+  gint jvar, gint *jvar_prev, gboolean alt_mod, ggobid *gg)
 {
   gboolean redraw = true;
-  gint nplots = g_list_length (gg.current_display->splots);
+  gint nplots = g_list_length (gg->current_display->splots);
   gint k, width, height;
   gint jvar_indx, new_indx;
   GList *l;
@@ -241,13 +220,13 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
   gfloat ratio = 1.0;
 
   /* The index of gg.current_splot */
-  gint sp_indx = g_list_index (gg.current_display->splots, sp);
+  gint sp_indx = g_list_index (gg->current_display->splots, sp);
 
   /* If jvar is one of the plotted variables, its corresponding plot */
   splotd *jvar_sp = NULL;
 
   k = 0;
-  l = gg.current_display->splots;
+  l = gg->current_display->splots;
   while (l) {
     s = (splotd *) l->data;
     if (s->p1dvar == jvar) {
@@ -259,7 +238,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
     k++;
   }
 
-  gtk_window_set_policy (GTK_WINDOW (gg.current_display->window),
+  gtk_window_set_policy (GTK_WINDOW (gg->current_display->window),
         false, false, false);
 
   splot_get_dimensions (sp, &width, &height);
@@ -273,7 +252,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
   if (alt_mod == true) {
     if (jvar_sp != NULL && nplots > 1) {
       /*-- Delete the plot from the list, and destroy it. --*/
-      gg.current_display->splots = g_list_remove (gg.current_display->splots,
+      gg->current_display->splots = g_list_remove (gg->current_display->splots,
                                                (gpointer) jvar_sp);
 
       /*-- keep the window from shrinking by growing all plots --*/
@@ -283,7 +262,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
       else
         height = (gint) (ratio * (gfloat) height);
 
-      l = gg.current_display->splots;
+      l = gg->current_display->splots;
       while (l) {
         w = ((splotd *) l->data)->da;
         gtk_widget_ref (w);
@@ -297,21 +276,21 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
 
       /*
        * If the plot being removed is the current plot, reset
-       * gg.current_splot.
+       * gg->current_splot.
       */
-      if (jvar_sp == gg.current_splot) {
+      if (jvar_sp == gg->current_splot) {
         sp_event_handlers_toggle (sp, off);
 
         new_indx = (jvar_indx == 0) ? 0 : MIN (nplots-1, jvar_indx);
-        gg.current_splot = (splotd *)
-          g_list_nth_data (gg.current_display->splots, new_indx);
+        gg->current_splot = (splotd *)
+          g_list_nth_data (gg->current_display->splots, new_indx);
         /* just for insurance, to handle the unforeseen */
-        if (gg.current_splot == NULL) 
-          gg.current_splot = (splotd *)
-            g_list_nth_data (gg.current_display->splots, 0);
+        if (gg->current_splot == NULL) 
+          gg->current_splot = (splotd *)
+            g_list_nth_data (gg->current_display->splots, 0);
       }
 
-      splot_free (jvar_sp, gg.current_display);
+      splot_free (jvar_sp, gg->current_display, gg);
 
       nplots--;
 /*      redraw = false;*/
@@ -335,21 +314,21 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         height = (gint) (ratio * (gfloat) height);
       /* */
 
-      sp_new = splot_new (gg.current_display, width, height);
+      sp_new = splot_new (gg->current_display, width, height, gg);
       sp_new->p1dvar = jvar; 
 
       if (cpanel->parcoords_selection_mode == VAR_INSERT)
-        gg.current_display->splots = g_list_insert (gg.current_display->splots,
+        gg->current_display->splots = g_list_insert (gg->current_display->splots,
           (gpointer) sp_new, sp_indx);
       else if (cpanel->parcoords_selection_mode == VAR_APPEND)
-        gg.current_display->splots = g_list_insert (gg.current_display->splots,
+        gg->current_display->splots = g_list_insert (gg->current_display->splots,
           (gpointer) sp_new, MIN (sp_indx+1, nplots));
 
       box = (sp->da)->parent;
       gtk_box_pack_end (GTK_BOX (box), sp_new->da, false, false, 0);
       gtk_widget_show (sp_new->da);
 
-      l = gg.current_display->splots;
+      l = gg->current_display->splots;
       while (l) {
         w = ((splotd *) l->data)->da;
         gtk_widget_ref (w);
@@ -364,12 +343,12 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         l = l->next ;
       }
 
-      gg.current_splot = sp_new;
+      gg->current_splot = sp_new;
       redraw = true;
     }
   }
 
-  gtk_window_set_policy (GTK_WINDOW (gg.current_display->window),
+  gtk_window_set_policy (GTK_WINDOW (gg->current_display->window),
     true, true, false);
 
   return redraw;
@@ -380,14 +359,14 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
 /*--------------------------------------------------------------------*/
 
 static void
-sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
+sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
   gint i, k, m;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = (cpaneld *) &display->cpanel;
   gboolean draw_whisker;
 
-  for (k=0; k<gg.nrows_in_plot; k++) {
-    i = gg.rows_in_plot[k];
+  for (k=0; k<gg->nrows_in_plot; k++) {
+    i = gg->rows_in_plot[k];
     m = 2*i;
 
     /*-- if it's the leftmost plot, don'r draw the left whisker --*/
@@ -395,9 +374,9 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     else if (!display->options.missings_show_p &&
-          gg.nmissing > 0 &&
-          (gg.missing.data[i][sp->p1dvar] ||
-           gg.missing.data[i][sp_prev->p1dvar]))
+          gg->nmissing > 0 &&
+          (gg->missing.data[i][sp->p1dvar] ||
+           gg->missing.data[i][sp_prev->p1dvar]))
     {
       draw_whisker = false;
     }
@@ -439,7 +418,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
     if (sp_next == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    else if (!display->options.missings_show_p && gg.nmissing > 0 &&
+    else if (!display->options.missings_show_p && gg->nmissing > 0 &&
             (MISSING_P(i,sp->p1dvar) || MISSING_P(i,sp_next->p1dvar)))
     {
       draw_whisker = false;
@@ -479,7 +458,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
 
 /*-- set the positions of the whiskers for sp and prev_sp --*/
 void
-sp_whiskers_make (splotd *sp, displayd *display) {
+sp_whiskers_make (splotd *sp, displayd *display, ggobid *gg) {
   GList *splist;
   splotd *splot;
   splotd *sp_prev = NULL, *sp_prev_prev = NULL, *sp_next = NULL;
@@ -497,8 +476,8 @@ sp_whiskers_make (splotd *sp, displayd *display) {
   }
 
   if (sp_prev != NULL)
-    sp_rewhisker (sp_prev_prev, sp_prev, sp);
+    sp_rewhisker (sp_prev_prev, sp_prev, sp, gg);
 
   if (sp_next == NULL)
-    sp_rewhisker (sp_prev, sp, NULL);
+    sp_rewhisker (sp_prev, sp, NULL, gg);
 }

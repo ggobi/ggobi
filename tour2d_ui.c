@@ -6,7 +6,7 @@
 #include "vars.h"
 #include "externs.h"
 
-static void tour2dadv_window_open (void);
+static void tour2dadv_window_open (ggobid *gg);
 
 void speed_set (gint speed) {
   g_printerr ("speed=%d\n", speed);
@@ -29,9 +29,9 @@ void tour2d_pause (cpaneld *cpanel, gboolean state) {
   tour_func (!cpanel->is_tour_paused);
 }
 
-static void tour2d_pause_cb (GtkToggleButton *button)
+static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
-  tour2d_pause (&gg.current_display->cpanel, button->active);
+  tour2d_pause (&gg->current_display->cpanel, button->active);
 }
 
 static void reinit_cb (GtkWidget *w) {
@@ -43,13 +43,15 @@ static void pcaxes_cb (GtkToggleButton *button)
 }
 
 
-static void tour2dpp_cb (GtkWidget *w) {
+static void tour2dpp_cb (GtkWidget *w, ggobid *gg) 
+{
   g_printerr ("open projection pursuit panel\n");
-  tour2dpp_window_open ();
+  tour2dpp_window_open (gg);
 }
-static void tour2dadv_cb (GtkWidget *w) {
+
+static void tour2dadv_cb (GtkWidget *w, ggobid *gg) {
   g_printerr ("open advanced tour features panel\n");
-  tour2dadv_window_open ();
+  tour2dadv_window_open (gg);
 }
 
 static gchar *manip_lbl[] = {"Oblique", "Vert", "Horiz", "Radial",
@@ -61,13 +63,13 @@ static void manip_cb (GtkWidget *w, gpointer cbd)
 }
 
 void
-cpanel_tour2d_make () {
+cpanel_tour2d_make (ggobid *gg) {
   GtkWidget *box, *tgl, *btn, *sbar, *lbl, *vb;
   GtkObject *adj;
   GtkWidget *manip_opt;
   
-  gg.control_panel[TOUR2D] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg.control_panel[TOUR2D]), 5);
+  gg->control_panel[TOUR2D] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[TOUR2D]), 5);
 
 /*
  * speed scrollbar
@@ -81,11 +83,11 @@ cpanel_tour2d_make () {
                       GTK_SIGNAL_FUNC (speed_set_cb), NULL);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), sbar,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust speed of tour motion", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[TOUR2D]), sbar,
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), sbar,
     false, false, 1);
 
 /*
@@ -94,20 +96,20 @@ cpanel_tour2d_make () {
   box = gtk_hbox_new (true, 2);
 
   btn = gtk_check_button_new_with_label ("Pause");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Stop tour motion temporarily", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-                     GTK_SIGNAL_FUNC (tour2d_pause_cb), (gpointer) NULL);
+                     GTK_SIGNAL_FUNC (tour2d_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   btn = gtk_button_new_with_label ("Reinit");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Reset projection", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                      GTK_SIGNAL_FUNC (reinit_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[TOUR2D]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), box, false, false, 1);
 
 
 /*
@@ -115,54 +117,54 @@ cpanel_tour2d_make () {
 */
 
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[TOUR2D]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Manual manipulation:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   manip_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), manip_opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), manip_opt,
     "Set the manual manipulation method", NULL);
   gtk_box_pack_end (GTK_BOX (vb), manip_opt, false, false, 0);
   populate_option_menu (manip_opt, manip_lbl,
                         sizeof (manip_lbl) / sizeof (gchar *),
-                        manip_cb);
+                        manip_cb, gg);
 
 /*
  * PC Axes toggle
 */
   tgl = gtk_check_button_new_with_label ("PC axes");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
     "Show principal component axes or plain variable axes", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                       GTK_SIGNAL_FUNC (pcaxes_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[TOUR2D]),
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]),
                       tgl, false, false, 1);
 
 /*
  * projection pursuit button
 */
   btn = gtk_button_new_with_label ("Projection pursuit ...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for grand tour projection pursuit", NULL);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[TOUR2D]),
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (tour2dpp_cb), NULL);
+                      GTK_SIGNAL_FUNC (tour2dpp_cb), gg);
 
 /*
  * advanced features button
 */
   btn = gtk_button_new_with_label ("Advanced features ...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for additional grand tour features", NULL);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[TOUR2D]),
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (tour2dadv_cb), NULL);
+                      GTK_SIGNAL_FUNC (tour2dadv_cb), gg);
 
-  gtk_widget_show_all (gg.control_panel[TOUR2D]);
+  gtk_widget_show_all (gg->control_panel[TOUR2D]);
 }
 
 
@@ -209,14 +211,14 @@ static void step_cb (GtkToggleButton *tgl, GtkWidget *btn)
   g_printerr ("step: %d\n", tgl->active);
   gtk_widget_set_sensitive (btn, tgl->active);
 }
-static void go_cb (GtkButton *button)
+static void go_cb (GtkButton *button, ggobid *gg)
 {
-  displayd *dsp = gg.current_display; 
+  displayd *dsp = gg->current_display; 
 
   g_printerr ("go\n");
   g_printerr ("in go_cb %f \n",dsp->tau[0]);
 
-  tour_do_step (dsp);
+  tour_do_step (dsp, gg);
 }
 
 static void storebases_cb (GtkToggleButton *button)
@@ -239,7 +241,7 @@ static void hide_cb (GtkWidget *w ) {
   gtk_widget_hide (w);
 }
 
-static void tour2dadv_window_open () {
+static void tour2dadv_window_open (ggobid *gg) {
   GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
   GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;
   GtkObject *adj;
@@ -262,7 +264,7 @@ static void tour2dadv_window_open () {
 
     /*-- local scan toggle --*/
     tgl = gtk_check_button_new_with_label ("Local scan");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Perform the tour within a small local region", NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                         GTK_SIGNAL_FUNC (localscan_cb), (gpointer) NULL);
@@ -273,18 +275,18 @@ static void tour2dadv_window_open () {
     box = gtk_hbox_new (true, 2);
 
     tgl = gtk_check_button_new_with_label ("Step");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Prepare to run the grand tour one step at a time", NULL);
     gtk_box_pack_start (GTK_BOX (box), tgl, true, true, 1);
 
     btn = gtk_button_new_with_label ("Go");
     gtk_widget_set_sensitive (btn, false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Take one step of the grand tour", NULL);
     gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                       GTK_SIGNAL_FUNC (go_cb), (gpointer) NULL);
+                       GTK_SIGNAL_FUNC (go_cb), (gpointer) gg);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                        GTK_SIGNAL_FUNC (step_cb), GTK_WIDGET (btn));
 
@@ -301,12 +303,12 @@ static void tour2dadv_window_open () {
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
     pathlen_opt = gtk_option_menu_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), pathlen_opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), pathlen_opt,
       "Set the path length", NULL);
     gtk_box_pack_end (GTK_BOX (hb), pathlen_opt, false, false, 0);
     populate_option_menu (pathlen_opt, pathlen_lbl,
                           sizeof (pathlen_lbl) / sizeof (gchar *),
-                          pathlen_cb);
+                          pathlen_cb, gg);
 
     /*-- interpolation option menu inside hbox --*/
     hb = gtk_hbox_new (false, 0);
@@ -316,12 +318,12 @@ static void tour2dadv_window_open () {
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
     opt = gtk_option_menu_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Set the interpolation method", NULL);
     gtk_box_pack_end (GTK_BOX (hb), opt, false, false, 0);
     populate_option_menu (opt, interp_lbl,
                           sizeof (interp_lbl) / sizeof (gchar *),
-                          interp_cb);
+                          interp_cb, gg);
 
 /*-- tour history functions: vbox to be placed in the notebook page --*/
     vb = gtk_vbox_new (true, 0);
@@ -331,7 +333,7 @@ static void tour2dadv_window_open () {
 
     /*-- Store bases toggle --*/
     tgl = gtk_check_button_new_with_label ("Store bases");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Store basis vectors", NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                         GTK_SIGNAL_FUNC (storebases_cb), (gpointer) NULL);
@@ -388,12 +390,12 @@ static void tour2dadv_window_open () {
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
     tgl = gtk_check_button_new_with_label ("Display basis");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Display basis as bitmap", NULL);
     gtk_box_pack_start (GTK_BOX (hb), tgl, false, false, 0);
 
     entry = gtk_entry_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), entry,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
       "Enter bitmap number", NULL);
     gtk_widget_set_usize (entry,
                           gdk_string_width (entry->style->font, "XXXX"),
@@ -407,7 +409,7 @@ static void tour2dadv_window_open () {
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook), box, lbl);
 
     tgl = gtk_check_button_new_with_label ("Section");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Downlight points that are not within epsilon of the center plane",
       NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
@@ -427,7 +429,7 @@ static void tour2dadv_window_open () {
                         GTK_SIGNAL_FUNC (epsilon_cb), NULL);
 
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), sbar,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
       "Set the width of the cross-section",
       NULL);
     gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
@@ -470,11 +472,12 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  gg.current_splot = sp;
-  gg.current_display = (displayd *) sp->displayptr;
+  ggobid *gg = GGobiFromSPlot(sp);
+  gg->current_splot = sp;
+  gg->current_display = (displayd *) sp->displayptr;
 
-  gg.mousepos.x = event->x;
-  gg.mousepos.y = event->y;
+  gg->mousepos.x = event->x;
+  gg->mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -487,9 +490,10 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
+  ggobid *gg = GGobiFromSPlot(sp);
 
-  gg.mousepos.x = event->x;
-  gg.mousepos.y = event->y;
+  gg->mousepos.x = event->x;
+  gg->mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -520,33 +524,33 @@ tour2d_event_handlers_toggle (splotd *sp, gboolean state) {
 
 
 void
-tour2d_menus_make () {
+tour2d_menus_make (ggobid *gg) {
   GtkWidget *item;
 
 /*
  * I/O menu
 */
-  gg.app.tour2d_io_menu = gtk_menu_new ();
+  gg->app.tour2d_io_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Save coefficients");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (tour2d_io_cb),
                       (gpointer) "write_coeffs");
-  gtk_menu_append (GTK_MENU (gg.app.tour2d_io_menu), item);
+  gtk_menu_append (GTK_MENU (gg->app.tour2d_io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Save history");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (tour2d_io_cb),
                       (gpointer) "write_history");
-  gtk_menu_append (GTK_MENU (gg.app.tour2d_io_menu), item);
+  gtk_menu_append (GTK_MENU (gg->app.tour2d_io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Read history");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (tour2d_io_cb),
                       (gpointer) "read_history");
-  gtk_menu_append (GTK_MENU (gg.app.tour2d_io_menu), item);
+  gtk_menu_append (GTK_MENU (gg->app.tour2d_io_menu), item);
 
-  gtk_widget_show_all (gg.app.tour2d_io_menu);
+  gtk_widget_show_all (gg->app.tour2d_io_menu);
 }
 
 /*----------------------------------------------------------------------*/

@@ -43,15 +43,12 @@ hide_cb (GtkWidget *w ) {
 }
 
 void
-smooth_window_open (void) {
+smooth_window_open (ggobid *gg) {
 
   GtkWidget *tgl, *lbl;
   GtkWidget *vbox, *vb;
   GtkWidget *sbar, *opt;
   GtkObject *adj;
-  extern void populate_option_menu (GtkWidget *, gchar **, gint,
-                                    GtkSignalFunc);
-
   if (window == NULL) {
     
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -66,7 +63,7 @@ smooth_window_open (void) {
  * Smooth toggle
 */
     tgl = gtk_check_button_new_with_label ("Smooth");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Add one or more smoothed lines to the current plot", NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                        GTK_SIGNAL_FUNC (smooth_cb), (gpointer) NULL);
@@ -84,12 +81,12 @@ smooth_window_open (void) {
 
     opt = gtk_option_menu_new ();
     gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Set the smoothing function", NULL);
     gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
     populate_option_menu (opt, smoother_lbl,
                           sizeof (smoother_lbl) / sizeof (gchar *),
-                          smoother_cb);
+                          smoother_cb, gg);
 
 /*
  * vbox for label and rangewidget
@@ -106,7 +103,7 @@ smooth_window_open (void) {
                         GTK_SIGNAL_FUNC (width_cb), NULL);
 
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), sbar,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
       "Set the width of the smoothing window", NULL);
     gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
@@ -117,7 +114,7 @@ smooth_window_open (void) {
  * Use color groups toggle
 */
     tgl = gtk_check_button_new_with_label ("Use groups");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Add one smoothed line for each point color", NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                        GTK_SIGNAL_FUNC (groups_cb), (gpointer) NULL);
@@ -128,7 +125,7 @@ smooth_window_open (void) {
  * Show smoothing window
 */
     tgl = gtk_check_button_new_with_label ("Show window");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Show the smoothing window on the scatterplot display", NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                        GTK_SIGNAL_FUNC (window_cb), (gpointer) NULL);

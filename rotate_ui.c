@@ -16,10 +16,10 @@ static void scale_set_default_values (GtkScale *scale )
   gtk_scale_set_draw_value (scale, false);
 }
 
-static void chdir_cb (GtkButton *button)
+static void chdir_cb (GtkButton *button, ggobid *gg)
 {
-  if (gg.current_display != NULL) {
-    cpaneld *cpanel = &gg.current_display->cpanel;
+  if (gg->current_display != NULL) {
+    cpaneld *cpanel = &gg->current_display->cpanel;
 
     cpanel->ro_direction = -1 * cpanel->ro_direction;
   }
@@ -36,8 +36,10 @@ static void reinit_cb (GtkWidget *w) {
 static gchar *type_lbl[] = {"Rotate", "Rock", "Interpolate"};
 static void type_cb (GtkWidget *w, gpointer cbd)
 {
-  if (gg.current_display != NULL) {
-    cpaneld *cpanel = &gg.current_display->cpanel;
+  ggobid *gg = GGobiFromWidget(w, true);
+
+  if (gg->current_display != NULL) {
+    cpaneld *cpanel = &gg->current_display->cpanel;
     gint indx = GPOINTER_TO_INT (cbd);
 
     cpanel->ro_type = indx;
@@ -49,8 +51,9 @@ static void type_cb (GtkWidget *w, gpointer cbd)
 static gchar *axis_lbl[] = {"Y Axis", "X Axis", "Oblique Axis"};
 static void axis_cb (GtkWidget *w, gpointer cbd)
 {
-  if (gg.current_display != NULL) {
-    cpaneld *cpanel = &gg.current_display->cpanel;
+  ggobid *gg = GGobiFromWidget(w, true);
+  if (gg->current_display != NULL) {
+    cpaneld *cpanel = &gg->current_display->cpanel;
     gint indx = GPOINTER_TO_INT (cbd);
 
     cpanel->ro_axis = indx;
@@ -83,10 +86,12 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+  ggobid *gg = GGobiFromSPlot(sp);
+
   g_printerr ("rotate button_press: %d\n", event->button);
 
-  gg.mousepos.x = event->x;
-  gg.mousepos.y = event->y;
+  gg->mousepos.x = event->x;
+  gg->mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -98,10 +103,11 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+  ggobid *gg = GGobiFromSPlot(sp);
   gboolean retval = true;
 
-  gg.mousepos.x = event->x;
-  gg.mousepos.y = event->y;
+  gg->mousepos.x = event->x;
+  gg->mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -133,33 +139,33 @@ rotation_event_handlers_toggle (splotd *sp, gboolean state)
 
 
 void
-rotation_menus_make () {
+rotation_menus_make (ggobid *gg) {
   GtkWidget *item;
 
 /*
  * I/O menu
 */
-  gg.app.rotation_io_menu = gtk_menu_new ();
+  gg->app.rotation_io_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Save coefficients");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (rotation_io_cb),
                       (gpointer) "write_coeffs");
-  gtk_menu_append (GTK_MENU (gg.app.rotation_io_menu), item);
+  gtk_menu_append (GTK_MENU (gg->app.rotation_io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Save projection");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (rotation_io_cb),
                       (gpointer) "write_projection");
-  gtk_menu_append (GTK_MENU (gg.app.rotation_io_menu), item);
+  gtk_menu_append (GTK_MENU (gg->app.rotation_io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Read projection");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (rotation_io_cb),
                       (gpointer) "read_projection");
-  gtk_menu_append (GTK_MENU (gg.app.rotation_io_menu), item);
+  gtk_menu_append (GTK_MENU (gg->app.rotation_io_menu), item);
 
-  gtk_widget_show_all (gg.app.rotation_io_menu);
+  gtk_widget_show_all (gg->app.rotation_io_menu);
 }
 
 /*--------------------------------------------------------------------*/
@@ -167,12 +173,12 @@ rotation_menus_make () {
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_rotation_make () {
+cpanel_rotation_make (ggobid *gg) {
   GtkWidget *btn, *sbar, *box;
   GtkObject *adj;
   
-  gg.control_panel[ROTATE] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg.control_panel[ROTATE]), 5);
+  gg->control_panel[ROTATE] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[ROTATE]), 5);
 
 /*
  * speed scrollbar
@@ -186,11 +192,11 @@ cpanel_rotation_make () {
                       GTK_SIGNAL_FUNC (rotation_speed_cb), NULL);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), sbar,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust speed of rotation", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[ROTATE]), sbar,
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[ROTATE]), sbar,
     false, false, 1);
 
 /*
@@ -199,56 +205,56 @@ cpanel_rotation_make () {
   box = gtk_hbox_new (true, 2);
 
   ro_paused_btn = gtk_check_button_new_with_label ("Pause");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), ro_paused_btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ro_paused_btn,
     "Stop rotation temporarily", NULL);
   gtk_signal_connect (GTK_OBJECT (ro_paused_btn), "toggled",
                      GTK_SIGNAL_FUNC (rotate_pause_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), ro_paused_btn, true, true, 1);
 
   btn = gtk_button_new_with_label ("Reinit");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Reset projection", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                      GTK_SIGNAL_FUNC (reinit_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[ROTATE]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[ROTATE]), box, false, false, 1);
 
 /*
  * Button to change direction
 */
   btn = gtk_button_new_with_label ("Change direction");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Change direction of rotation", NULL);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[ROTATE]), btn, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[ROTATE]), btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (chdir_cb), NULL);
+                      GTK_SIGNAL_FUNC (chdir_cb), gg);
 
 /*
  * option menu: rotate/rock/interpolate
 */
   ro_type_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), ro_type_opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ro_type_opt,
     "Rotate freely, rock locally, or interpolate between two orthogonal projections",
     NULL);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[ROTATE]),
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[ROTATE]),
                       ro_type_opt, false, false, 0);
   populate_option_menu (ro_type_opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
-                        type_cb);
+                        type_cb, gg);
 
 /*
  * option menu: y/x/oblique axis
 */
   ro_axis_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), ro_axis_opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ro_axis_opt,
     "Choose axis of rotation",   NULL);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[ROTATE]),
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[ROTATE]),
                       ro_axis_opt, false, false, 0);
   populate_option_menu (ro_axis_opt, axis_lbl,
                         sizeof (axis_lbl) / sizeof (gchar *),
-                        axis_cb);
-  gtk_widget_show_all (gg.control_panel[ROTATE]);
+                        axis_cb, gg);
+  gtk_widget_show_all (gg->control_panel[ROTATE]);
 }
 
 /*--------------------------------------------------------------------*/

@@ -16,28 +16,29 @@
 /*                          row labels                                    */
 /*------------------------------------------------------------------------*/
 
-void rowlabels_free () {
+void rowlabels_free (ggobid *gg) {
   gint i;
 
-  for (i=0; i<gg.nrows; i++)
-    g_free (gg.rowlab[i]);
-  g_free (gg.rowlab);
+  for (i=0; i<gg->nrows; i++)
+    g_free (gg->rowlab[i]);
+  g_free (gg->rowlab);
 }
 
 
 void
-rowlabels_alloc () {
+rowlabels_alloc (ggobid *gg) 
+{
   gint i;
 
-  if (gg.rowlab != NULL) rowlabels_free ();
+  if (gg->rowlab != NULL) rowlabels_free (gg);
   
-  gg.rowlab = (gchar **) g_malloc (gg.nrows * sizeof (gchar *));
-  for (i=0; i<gg.nrows; i++)
-    gg.rowlab[i] = (gchar *) g_malloc (ROWLABLEN * sizeof (gchar));
+  gg->rowlab = (gchar **) g_malloc (gg->nrows * sizeof (gchar *));
+  for (i=0; i<gg->nrows; i++)
+    gg->rowlab[i] = (gchar *) g_malloc (ROWLABLEN * sizeof (gchar));
 }
 
 gboolean
-rowlabels_read (gchar *ldata_in, gboolean init)
+rowlabels_read (gchar *ldata_in, gboolean init, ggobid *gg)
 {
   gint i;
   static gchar *suffixes[] = {
@@ -49,7 +50,7 @@ rowlabels_read (gchar *ldata_in, gboolean init)
   FILE *fp;
 
   if (init)
-    rowlabels_alloc ();
+    rowlabels_alloc (gg);
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
     if ((fp = open_ggobi_file_r (ldata_in, 3, suffixes, true)) != NULL)
@@ -65,7 +66,7 @@ rowlabels_read (gchar *ldata_in, gboolean init)
 
     k = 0;  /* k is the file row */
     while (fgets (initstr, INITSTRSIZE-1, fp) != NULL) {
-      if (gg.file_read_type == read_all || k == gg.file_rows_sampled[ncase])
+      if (gg->file_read_type == read_all || k == gg->file_rows_sampled[ncase])
       {
         len = MIN ((int) strlen (initstr), ROWLABLEN-1) ;
 
@@ -73,9 +74,9 @@ rowlabels_read (gchar *ldata_in, gboolean init)
         while (initstr[len-1] == ' ' || initstr[len-1] == '\n')
           len-- ;
         initstr[len] = '\0';
-        gg.rowlab[ncase] = g_strdup (initstr) ;
+        gg->rowlab[ncase] = g_strdup (initstr) ;
   
-        if (ncase++ >= gg.nrows)
+        if (ncase++ >= gg->nrows)
           break;
       }
       k++;  /* read the next row ... */
@@ -85,22 +86,22 @@ rowlabels_read (gchar *ldata_in, gboolean init)
      * If there aren't enough labels, use blank labels for
      * the remainder.
     */
-    if (init && ncase != gg.nrows) {
+    if (init && ncase != gg->nrows) {
       g_printerr ("number of labels = %d, number of rows = %d\n",
-        ncase, gg.nrows);
-      for (i=ncase; i<gg.nrows; i++)
-        gg.rowlab[i] = g_strdup (" ");
+        ncase, gg->nrows);
+      for (i=ncase; i<gg->nrows; i++)
+        gg->rowlab[i] = g_strdup (" ");
     }
   }
   else
   {
     if (init) {  /* apply defaults if initializing; else, do nothing */
 
-      for (i=0; i<gg.nrows; i++) {
-        if (gg.file_read_type == read_all)
-          gg.rowlab[i] = g_strdup_printf ("%d", i+1);
+      for (i=0; i<gg->nrows; i++) {
+        if (gg->file_read_type == read_all)
+          gg->rowlab[i] = g_strdup_printf ("%d", i+1);
         else
-          gg.rowlab[i] = g_strdup_printf ("%ld", gg.file_rows_sampled[i]+1);
+          gg->rowlab[i] = g_strdup_printf ("%ld", gg->file_rows_sampled[i]+1);
       }
     }
   }
@@ -113,7 +114,7 @@ rowlabels_read (gchar *ldata_in, gboolean init)
 /*------------------------------------------------------------------------*/
 
 gboolean
-collabels_read (gchar *ldata_in, gboolean init)
+collabels_read (gchar *ldata_in, gboolean init, ggobid *gg)
 {
   static gchar *suffixes[] = {
     ".col", ".column", ".collab", ".var"
@@ -146,25 +147,25 @@ collabels_read (gchar *ldata_in, gboolean init)
       while (initstr[len-1] == '\n' || initstr[len-1] == ' ')
         len-- ;
       initstr[len] = '\0';
-      gg.vardata[nvar].collab = g_strdup (initstr) ;
+      gg->vardata[nvar].collab = g_strdup (initstr) ;
 
-      if (nvar++ >= gg.ncols)
+      if (nvar++ >= gg->ncols)
         break;
     }
 
-    if (init && nvar != gg.ncols) {
+    if (init && nvar != gg->ncols) {
       g_printerr ("number of labels = %d, number of cols = %d\n",
-        nvar, gg.ncols);
+        nvar, gg->ncols);
 
-      if (gg.single_column) {
-        g_free (gg.vardata[1].collab);
-        gg.vardata[1].collab = g_strdup_printf ("%s", gg.vardata[0].collab);
-        g_free (gg.vardata[0].collab);
-        gg.vardata[0].collab = g_strdup ("Index");
+      if (gg->single_column) {
+        g_free (gg->vardata[1].collab);
+        gg->vardata[1].collab = g_strdup_printf ("%s", gg->vardata[0].collab);
+        g_free (gg->vardata[0].collab);
+        gg->vardata[0].collab = g_strdup ("Index");
 
       } else {
-        for (j=nvar; j<gg.ncols; j++) {
-          gg.vardata[j].collab = g_strdup_printf ("Var %d", j+1);
+        for (j=nvar; j<gg->ncols; j++) {
+          gg->vardata[j].collab = g_strdup_printf ("Var %d", j+1);
         }
       }
     }
@@ -172,15 +173,15 @@ collabels_read (gchar *ldata_in, gboolean init)
   else
   {
     if (init) {
-      for (j=0; j<gg.ncols; j++) {
-        gg.vardata[j].collab = g_strdup_printf ("Var %d", j+1);
+      for (j=0; j<gg->ncols; j++) {
+        gg->vardata[j].collab = g_strdup_printf ("Var %d", j+1);
       }
     }
   }
 
 
-  for (j=0; j<gg.ncols; j++) {
-    gg.vardata[j].collab_tform = g_strdup (gg.vardata[j].collab);
+  for (j=0; j<gg->ncols; j++) {
+    gg->vardata[j].collab_tform = g_strdup (gg->vardata[j].collab);
   }
 
   return (found);
@@ -191,7 +192,7 @@ collabels_read (gchar *ldata_in, gboolean init)
 /*------------------------------------------------------------------------*/
 
 gboolean
-vgroups_read (gchar *ldata_in, gboolean init)
+vgroups_read (gchar *ldata_in, gboolean init, ggobid *gg)
 /*
  * Read in the grouping numbers for joint scaling of variables
 */
@@ -207,29 +208,29 @@ vgroups_read (gchar *ldata_in, gboolean init)
 
   if (found) {
     i = 0;
-    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg.ncols))
-      gg.vardata[i++].groupid_ori = itmp;
+    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg->ncols))
+      gg->vardata[i++].groupid_ori = itmp;
 
-    if (init && i < gg.ncols) {
+    if (init && i < gg->ncols) {
       g_printerr (
         "Number of variables and number of group types do not match.\n");
       g_printerr ("Creating extra generic groups.\n");
 
-      for (j=i; j<gg.ncols; j++)
-        gg.vardata[j].groupid_ori = j;
+      for (j=i; j<gg->ncols; j++)
+        gg->vardata[j].groupid_ori = j;
     }
 
-    vgroups_sort ();
+    vgroups_sort (gg);
 
   } else {
 
     if (init)
-      for (j=0; j<gg.ncols; j++)
-        gg.vardata[j].groupid_ori = j;
+      for (j=0; j<gg->ncols; j++)
+        gg->vardata[j].groupid_ori = j;
   }
 
-  for (j=0; j<gg.ncols; j++)
-    gg.vardata[j].groupid = gg.vardata[j].groupid_ori;
+  for (j=0; j<gg->ncols; j++)
+    gg->vardata[j].groupid = gg->vardata[j].groupid_ori;
 
   return (found);
 }
@@ -239,19 +240,19 @@ vgroups_read (gchar *ldata_in, gboolean init)
 /*------------------------------------------------------------------------*/
 
 void
-rgroups_free () {
+rgroups_free (ggobid *gg) {
   gint i, j;
 
-  for (i=0; i<gg.nrgroups; i++)
-    for (j=0; j<gg.rgroups[i].nels; j++)
-      g_free ((gpointer) gg.rgroups[i].els);
+  for (i=0; i<gg->nrgroups; i++)
+    for (j=0; j<gg->rgroups[i].nels; j++)
+      g_free ((gpointer) gg->rgroups[i].els);
 
-  g_free ((gpointer) gg.rgroups);
-  g_free ((gpointer) gg.rgroup_ids);
+  g_free ((gpointer) gg->rgroups);
+  g_free ((gpointer) gg->rgroup_ids);
 }
 
 gboolean
-rgroups_read (gchar *ldata_in, gboolean init)
+rgroups_read (gchar *ldata_in, gboolean init, ggobid *gg)
 /*
  * Read in the grouping numbers for joint scaling of variables
 */
@@ -264,14 +265,14 @@ rgroups_read (gchar *ldata_in, gboolean init)
   glong *nels;
   gint nr;
 
-  if (gg.nrgroups > 0) rgroups_free ();
+  if (gg->nrgroups > 0) rgroups_free (gg);
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
     if ((fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
   
   if (!found) {
-    gg.nrgroups = 0;
+    gg->nrgroups = 0;
   } else {
   
     /*
@@ -279,26 +280,26 @@ rgroups_read (gchar *ldata_in, gboolean init)
      * see if the rgroups structures should be freed.
     */
     if (!init)
-      if (gg.nrgroups > 0)
-        rgroups_free ();
+      if (gg->nrgroups > 0)
+        rgroups_free (gg);
   
     /* rgroup_ids starts by containing the values in the file */
-    gg.rgroup_ids = (glong *) g_malloc (gg.nrows * sizeof (glong));
-    nels = (glong *) g_malloc (gg.nrows * sizeof (glong));
+    gg->rgroup_ids = (glong *) g_malloc (gg->nrows * sizeof (glong));
+    nels = (glong *) g_malloc (gg->nrows * sizeof (glong));
      
     i = 0;
-    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg.nrows))
-      gg.rgroup_ids[i++] = itmp;
+    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg->nrows))
+      gg->rgroup_ids[i++] = itmp;
   
     /* check the number of group ids read -- should be nrows */
-    if (init && i < gg.nrows)
+    if (init && i < gg->nrows)
     {
       g_printerr (
         "Number of rows and number of row group types do not match.\n");
       g_printerr ("Creating extra generic groups.\n");
 
-      for (k=i; k<gg.nrows; k++)
-        gg.rgroup_ids[k] = k;
+      for (k=i; k<gg->nrows; k++)
+        gg->rgroup_ids[k] = k;
     }
   
     /*
@@ -306,15 +307,15 @@ rgroups_read (gchar *ldata_in, gboolean init)
      * nrows/10 elements in each group
     */
 
-    gg.rgroups = (rgroupd *) g_malloc (gg.nrows * sizeof (rgroupd));
-    for (i=0; i<gg.nrows; i++) {
-      nels[i] = gg.nrows/10;
-      gg.rgroups[i].els = (glong *)
+    gg->rgroups = (rgroupd *) g_malloc (gg->nrows * sizeof (rgroupd));
+    for (i=0; i<gg->nrows; i++) {
+      nels[i] = gg->nrows/10;
+      gg->rgroups[i].els = (glong *)
         g_malloc ((guint) nels[i] * sizeof (glong));
-      gg.rgroups[i].nels = 0;
-      gg.rgroups[i].included = true;
+      gg->rgroups[i].nels = 0;
+      gg->rgroups[i].included = true;
     }
-    gg.nrgroups = 0;
+    gg->nrgroups = 0;
   
 /*
  * For now, only assign linkable points to rgroups.
@@ -323,33 +324,33 @@ rgroups_read (gchar *ldata_in, gboolean init)
      * On this sweep, find out how many groups there are and how
      * many elements are in each group
     */
-    nr = gg.nrows;
+    nr = gg->nrows;
 
     for (i=0; i<nr; i++) {
       found_rg = false;
-      for (k=0; k<gg.nrgroups; k++) {
+      for (k=0; k<gg->nrgroups; k++) {
   
         /* if we've found this id before ... */
-        if (gg.rgroup_ids[i] == gg.rgroups[k].id) {
+        if (gg->rgroup_ids[i] == gg->rgroups[k].id) {
   
           /* Reallocate els[k] if necessary */
-          if (gg.rgroups[k].nels == nels[k]) {
+          if (gg->rgroups[k].nels == nels[k]) {
             nels[k] *= 2;
-            gg.rgroups[k].els = (glong *)
-              g_realloc ((gpointer) gg.rgroups[k].els,
+            gg->rgroups[k].els = (glong *)
+              g_realloc ((gpointer) gg->rgroups[k].els,
                 (nels[k] * sizeof (glong)));
           }
   
           /* Add the element, increment the element counter */
-          gg.rgroups[k].els[ gg.rgroups[k].nels ] = i;
-          gg.rgroups[k].nels++;
+          gg->rgroups[k].els[ gg->rgroups[k].nels ] = i;
+          gg->rgroups[k].nels++;
   
           /*
            * Now the value in rgroup_ids has to change so that
            * it can point to the correct member in the array of
            * rgroups structures
           */
-          gg.rgroup_ids[i] = k;
+          gg->rgroup_ids[i] = k;
   
           found_rg = true;
           break;
@@ -358,31 +359,36 @@ rgroups_read (gchar *ldata_in, gboolean init)
   
       /* If it's a new group id, add it */
       if (!found_rg) {
-        gg.rgroups[gg.nrgroups].id = gg.rgroup_ids[i]; /* from file */
-        gg.rgroups[gg.nrgroups].nels = 1;
-        gg.rgroups[gg.nrgroups].els[0] = i;
-        gg.rgroup_ids[i] = gg.nrgroups;  /* rgroup_ids reset to index */
-        gg.nrgroups++;
+        gg->rgroups[gg->nrgroups].id = gg->rgroup_ids[i]; /* from file */
+        gg->rgroups[gg->nrgroups].nels = 1;
+        gg->rgroups[gg->nrgroups].els[0] = i;
+        gg->rgroup_ids[i] = gg->nrgroups;  /* rgroup_ids reset to index */
+        gg->nrgroups++;
       }
     }
-    gg.nrgroups_in_plot = gg.nrgroups;
+    gg->nrgroups_in_plot = gg->nrgroups;
   
     /* Reallocate everything now that we know how many there are */
-    gg.rgroups = (rgroupd *) g_realloc ((gpointer) gg.rgroups,
-      (gulong) (gg.nrgroups * sizeof (rgroupd)));
+    gg->rgroups = (rgroupd *) g_realloc ((gpointer) gg->rgroups,
+      (gulong) (gg->nrgroups * sizeof (rgroupd)));
   
     /* Now reallocate the arrays within each rgroups structure */
-    for (k=0; k<gg.nrgroups; k++) {
-      gg.rgroups[k].els = (glong *)
-        g_realloc ((gpointer) gg.rgroups[k].els,
-          (gulong) (gg.rgroups[k].nels * sizeof (glong)));
+    for (k=0; k<gg->nrgroups; k++) {
+      gg->rgroups[k].els = (glong *)
+        g_realloc ((gpointer) gg->rgroups[k].els,
+          (gulong) (gg->rgroups[k].nels * sizeof (glong)));
     }
   
     g_free ((gpointer) nels);
   }
 
-  if (gg.nrgroups != 0)
-    g_printerr ("gg.nrgroups=%ld\n", gg.nrgroups);
+#ifdef LINKABLE
+  if (gg->nlinkable != gg->nrows)
+    g_printerr ("gg->nlinkable=%d gg->nrows=%d\n", gg->nlinkable, gg->nrows);
+#endif
+
+  if (gg->nrgroups != 0)
+    g_printerr ("gg.nrgroups=%ld\n", gg->nrgroups);
 
   return (found);
 }
@@ -402,7 +408,7 @@ readGlyphErr (void) {
 /*------------------------------------------------------------------------*/
 
 gboolean
-point_glyphs_read (gchar *ldata_in, gboolean reinit)
+point_glyphs_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
 {
   gboolean ok = true;
   gchar *suffixes[] = {".glyphs"};
@@ -414,14 +420,14 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit)
   gboolean use_defaults = false;
 
   if (reinit)
-    br_glyph_ids_alloc ();
+    br_glyph_ids_alloc (gg);
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
     if ((fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
   if (!found && reinit)
-    br_glyph_ids_init ();
+    br_glyph_ids_init (gg);
 
   else
   {
@@ -438,7 +444,7 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit)
 
     ungetc (c, fp);
     i = 0; k = 0;
-    while (i < gg.nrows) {  /* should there be a test on k as well? */
+    while (i < gg->nrows) {  /* should there be a test on k as well? */
 
       if (glyph_format == glyphNumber) {
         retval = fscanf (fp, "%d", &gid);
@@ -456,8 +462,8 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit)
         break;
       }
 
-      if (gg.file_read_type == read_all ||
-         (gg.file_rows_sampled != NULL && k == gg.file_rows_sampled[i]))
+      if (gg->file_read_type == read_all ||
+         (gg->file_rows_sampled != NULL && k == gg->file_rows_sampled[i]))
       {
         /*
          * If the input is a single number on a line
@@ -506,10 +512,10 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit)
           break;
         }
 
-        gg.glyph_ids[i].type = gg.glyph_now[i].type =
-          gg.glyph_prev[i].type = glyph.type;
-        gg.glyph_ids[i].size = gg.glyph_now[i].size =
-          gg.glyph_prev[i].size = glyph.size;
+        gg->glyph_ids[i].type = gg->glyph_now[i].type =
+          gg->glyph_prev[i].type = glyph.type;
+        gg->glyph_ids[i].size = gg->glyph_now[i].size =
+          gg->glyph_prev[i].size = glyph.size;
 
         i++;  /* increment the array index */
       }
@@ -520,13 +526,13 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit)
   }
 
   if (!found || use_defaults)
-    br_glyph_ids_init ();
+    br_glyph_ids_init (gg);
 
   return (ok);
 }
 
 gboolean
-point_colors_read (gchar *ldata_in, gboolean reinit)
+point_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
 {
   gboolean ok = false;
   gboolean found = false;
@@ -536,7 +542,7 @@ point_colors_read (gchar *ldata_in, gboolean reinit)
   gint id;
 
   if (reinit)
-    br_color_ids_alloc ();
+    br_color_ids_alloc (gg);
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0) {
     if ( (fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
@@ -548,7 +554,7 @@ point_colors_read (gchar *ldata_in, gboolean reinit)
       ok = true;
 
       i = 0; k = 0;
-      while (i < gg.nrows) {  /* should there be a test on k as well? */
+      while (i < gg->nrows) {  /* should there be a test on k as well? */
 
         retval = fscanf (fp, "%d", &id);
         if (retval <= 0 || id < 0 || id >= NCOLORS) {
@@ -557,10 +563,10 @@ point_colors_read (gchar *ldata_in, gboolean reinit)
           break;
         }
 
-        if (gg.file_read_type == read_all ||
-           (gg.file_rows_sampled != NULL && k == gg.file_rows_sampled[i]))
+        if (gg->file_read_type == read_all ||
+           (gg->file_rows_sampled != NULL && k == gg->file_rows_sampled[i]))
         {
-          gg.color_ids[i] = gg.color_now[i] = gg.color_prev[i] = id;
+          gg->color_ids[i] = gg->color_now[i] = gg->color_prev[i] = id;
 
           i++;  /* increment the array index */
         }
@@ -571,7 +577,7 @@ point_colors_read (gchar *ldata_in, gboolean reinit)
   }
 
   if (!ok)
-    br_color_ids_init ();
+    br_color_ids_init (gg);
 
   return (ok);
 }
@@ -581,7 +587,7 @@ point_colors_read (gchar *ldata_in, gboolean reinit)
 /*------------------------------------------------------------------------*/
 
 gboolean
-line_colors_read (gchar *ldata_in, gboolean reinit)
+line_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
 {
   gint i, id, retval;
   gboolean ok = false;
@@ -589,9 +595,9 @@ line_colors_read (gchar *ldata_in, gboolean reinit)
   gchar *suffixes[] = {".linecolors"};
 
   if (reinit)
-    br_line_color_ids_alloc ();
+    br_line_color_ids_alloc (gg);
 
-  if (!gg.mono_p) {
+  if (!gg->mono_p) {
     /*
      * Check if line colors file exists.
     */
@@ -607,7 +613,7 @@ line_colors_read (gchar *ldata_in, gboolean reinit)
         */
 
         i = 0;
-        while (i < gg.nsegments) {
+        while (i < gg->nsegments) {
           retval = fscanf (fp, "%d", &id);
           if (retval <= 0 || id < 0 || id >= NCOLORS) {
             ok = false;
@@ -615,8 +621,8 @@ line_colors_read (gchar *ldata_in, gboolean reinit)
             break;
           }
 
-          gg.line_color_ids[i] = gg.line_color_now[i] =
-            gg.line_color_prev[i] = id;
+          gg->line_color_ids[i] = gg->line_color_now[i] =
+            gg->line_color_prev[i] = id;
           i++;
         }
         fclose(fp);
@@ -625,13 +631,13 @@ line_colors_read (gchar *ldata_in, gboolean reinit)
   }
 
   if (!ok)
-    br_line_color_ids_init ();
+    br_line_color_ids_init (gg);
 
   return (ok);
 }
 
 gboolean
-segments_read (gchar *rootname, gboolean startup)
+segments_read (gchar *rootname, gboolean startup, ggobid *gg)
   /* startup - Initializing ggobi? */
 {
   gint fs, nblocks, bsize = 500;
@@ -642,13 +648,13 @@ segments_read (gchar *rootname, gboolean startup)
 
   if ((rootname == NULL) || (strcmp (rootname, "") == 0) || 
       strcmp (rootname, "stdin") == 0) {
-    segments_create ();
+    segments_create (gg);
     return (ok);
   } else {
     fname = g_malloc (128 * sizeof (gchar));
     /* This is for the in-process case */
     if (rootname == (gchar *) NULL)
-      strcpy (fname, gg.filename);
+      strcpy (fname, gg->filename);
     /* This is for the startup case */
     else
       strcpy (fname, rootname);
@@ -658,11 +664,11 @@ segments_read (gchar *rootname, gboolean startup)
   if ((fp = fopen (fname, "r")) != NULL) {
     gint a, b;
 
-    gg.nsegments = 0;
+    gg->nsegments = 0;
     /*
      * Allocate space for <bsize> connecting lines.
     */
-    segments_alloc (bsize);
+    segments_alloc (bsize, gg);
     nblocks = 1;
     while (1)
     {
@@ -675,7 +681,7 @@ segments_read (gchar *rootname, gboolean startup)
         exit (1);
       }
 
-      if (a < 1 || b > gg.nrows) {
+      if (a < 1 || b > gg->nrows) {
         ok = false;
         g_printerr ("Entry in .lines file > number of rows or < 1\n");
         exit (1);
@@ -685,21 +691,21 @@ segments_read (gchar *rootname, gboolean startup)
          * Sort lines data such that a <= b
         */
         if (a <= b) {
-          gg.segment_endpoints[gg.nsegments].a = a;
-          gg.segment_endpoints[gg.nsegments].b = b;
+          gg->segment_endpoints[gg->nsegments].a = a;
+          gg->segment_endpoints[gg->nsegments].b = b;
         } else {
-          gg.segment_endpoints[gg.nsegments].a = b;
-          gg.segment_endpoints[gg.nsegments].b = a;
+          gg->segment_endpoints[gg->nsegments].a = b;
+          gg->segment_endpoints[gg->nsegments].b = a;
         }
 
-        (gg.nsegments)++;
+        (gg->nsegments)++;
         jlinks++;
         if (jlinks == bsize) {
           /*
            * Allocate space for <bsize> more connecting links.
           */
           nblocks++;
-          segments_alloc (nblocks*bsize);
+          segments_alloc (nblocks*bsize, gg);
           jlinks = 0;
         }
       }
@@ -711,19 +717,20 @@ segments_read (gchar *rootname, gboolean startup)
       g_printerr ("Error in closing .lines file");
   }
   else
-    segments_create ();
+    segments_create (gg);
 
   if (fname != (gchar *) NULL)
     g_free ((gpointer) fname);
   return (ok);
 }
 
+
 /*------------------------------------------------------------------------*/
 /*                          erasing                                       */
 /*------------------------------------------------------------------------*/
 
 gboolean
-hidden_read (gchar *ldata_in, gboolean reinit)
+hidden_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
 /*
  * Read in the hidden vector
 */
@@ -734,7 +741,7 @@ hidden_read (gchar *ldata_in, gboolean reinit)
   FILE *fp;
 
   if (reinit)
-    hidden_alloc ();
+    hidden_alloc (gg);
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
     if ((fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
@@ -743,20 +750,20 @@ hidden_read (gchar *ldata_in, gboolean reinit)
   if (found) {
     gint k = 0;  /* k is the file row, used if file_read_type != read_all */
     i = 0;
-    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg.nrows)) {
-      if (gg.file_read_type == read_all || k == gg.file_rows_sampled[i]) {
-        gg.hidden[i] = gg.hidden_now[i] = gg.hidden_prev[i] = (gboolean) itmp;
+    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg->nrows)) {
+      if (gg->file_read_type == read_all || k == gg->file_rows_sampled[i]) {
+        gg->hidden[i] = gg->hidden_now[i] = gg->hidden_prev[i] = (gboolean) itmp;
         i++;
       }
       k++;
     }
   
-    if (i < gg.nrows)
+    if (i < gg->nrows)
       g_printerr ("Problem in reading hide file; not enough rows\n");
 
   } else {
     if (reinit)
-      hidden_init ();
+      hidden_init (gg);
   }
 
   return (found);
@@ -768,7 +775,7 @@ hidden_read (gchar *ldata_in, gboolean reinit)
 
 
 void
-missing_values_read (gchar *ldata_in, gboolean init)
+missing_values_read (gchar *ldata_in, gboolean init, ggobid *gg)
 {
   gchar *suffixes[] = {".missing"};
   gint i, j, ok, itmp, row, col;
@@ -776,7 +783,7 @@ missing_values_read (gchar *ldata_in, gboolean init)
   FILE *fp;
   gboolean found = false;
 
-  if (gg.file_read_type != read_all)
+  if (gg->file_read_type != read_all)
     return;
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
@@ -784,11 +791,11 @@ missing_values_read (gchar *ldata_in, gboolean init)
       found = true;
 
   if (found) {
-    if (init || gg.nmissing == 0)
-      arrays_alloc (&gg.missing, gg.nrows, gg.ncols);
+    if (init || gg->nmissing == 0)
+      arrays_alloc (&gg->missing, gg->nrows, gg->ncols);
 
-    for (j=0; j<gg.ncols; j++)
-      gg.vardata[j].nmissing = 0;
+    for (j=0; j<gg->ncols; j++)
+      gg->vardata[j].nmissing = 0;
 
     j = 0;
     i = 0;
@@ -796,8 +803,8 @@ missing_values_read (gchar *ldata_in, gboolean init)
       row = i;
       col = j;
       j++;
-      if (j==gg.ncols) { j=0; i++; }
-      if (i==gg.nrows && j>0) ok = false;
+      if (j==gg->ncols) { j=0; i++; }
+      if (i==gg->nrows && j>0) ok = false;
 
       if (!ok) {
         g_print ("Problem reading %s.missing", ldata_in);
@@ -808,19 +815,19 @@ missing_values_read (gchar *ldata_in, gboolean init)
         exit (1);
       }
 
-      gg.missing.data[row][col] = itmp;
+      gg->missing.data[row][col] = itmp;
       if (itmp != 0) {
         nmissing++;
-        gg.vardata[col].nmissing++;
+        gg->vardata[col].nmissing++;
       }
     }
 
-    if (gg.nmissing != 0 && gg.nmissing != nmissing) {
-      g_print ("I found %d missing values in your data file\n", gg.nmissing);
+    if (gg->nmissing != 0 && gg->nmissing != nmissing) {
+      g_print ("I found %d missing values in your data file\n", gg->nmissing);
       g_print (" but %d missing values in your .missing file.", nmissing);
       g_print ("I'll use the .missing results.\n");
     }
-    gg.nmissing = nmissing;
+    gg->nmissing = nmissing;
 
     fclose (fp);
   }

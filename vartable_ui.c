@@ -5,6 +5,7 @@
 
 #include <gtk/gtk.h>
 #include "vars.h"
+#include "externs.h"
 
 #define NCOLS_CLIST 9
 
@@ -17,13 +18,13 @@ void delete_cb (GtkWidget *cl, GdkEventButton *event, gpointer data)
 }
 
 void
-vartable_select_var (gint jvar, gboolean selected)
+vartable_select_var (gint jvar, gboolean selected, ggobid *gg)
 {
   gint j, varno;
   gchar *varno_str;
 
   /*-- loop over the rows in the table, looking for jvar --*/
-  for (j=0; j<gg.ncols; j++) {
+  for (j=0; j<gg->ncols; j++) {
     if (clist != NULL) {
       gtk_clist_get_text (GTK_CLIST (clist), j, 0, &varno_str);
       varno = (gint) atoi (varno_str);
@@ -36,46 +37,46 @@ vartable_select_var (gint jvar, gboolean selected)
         else
           gtk_clist_unselect_row (GTK_CLIST (clist), jvar, 1);
       }
-      gg.vardata[jvar].selected = selected;
+      gg->vardata[jvar].selected = selected;
     }
   }
 }
 
 void
-vartable_unselect_all () 
+vartable_unselect_all (ggobid *gg) 
 {
   gint j;
 
   if (clist != NULL)
     gtk_clist_unselect_all (GTK_CLIST (clist));
 
-  for (j=0; j<gg.ncols; j++)
-    gg.vardata[j].selected = false;
+  for (j=0; j<gg->ncols; j++)
+    gg->vardata[j].selected = false;
 }
 
 void
 selection_made (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, gpointer data)
+  GdkEventButton *event, ggobid *gg)
 {
   gint varno;
   gchar *varno_str;
 
   gtk_clist_get_text (GTK_CLIST (clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
-  gg.vardata[varno].selected = true;
+  gg->vardata[varno].selected = true;
 
   return;
 }
 void
 deselection_made (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, gpointer data)
+  GdkEventButton *event, ggobid *gg)
 {
   gint varno;
   gchar *varno_str;
 
   gtk_clist_get_text (GTK_CLIST (clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
-  gg.vardata[varno].selected = false;
+  gg->vardata[varno].selected = false;
   g_printerr ("deselected row= %d, varno= %d\n", row, varno);
 
   return;
@@ -99,7 +100,7 @@ arithmetic_compare (GtkCList *cl, gconstpointer ptr1, gconstpointer ptr2)
   return ((f1 < f2) ? -1 : (f1 > f2) ? 1 : 0);
 }
 
-void sortbycolumn_cb (GtkWidget *cl, gint column, gpointer data)
+void sortbycolumn_cb (GtkWidget *cl, gint column, ggobid *gg)
 {
   gtk_clist_set_sort_column (GTK_CLIST (clist), column);
   if (column == 1)  /*-- variable name --*/
@@ -113,7 +114,7 @@ void sortbycolumn_cb (GtkWidget *cl, gint column, gpointer data)
 }
 
 void
-vartable_row_append (gint j)
+vartable_row_append (gint j, ggobid *gg)
 {
   if (clist != NULL) {
     gint k;
@@ -121,14 +122,14 @@ vartable_row_append (gint j)
     row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
 
     row[0] = g_strdup_printf ("%d", j);
-    row[1] = g_strdup (gg.vardata[j].collab);
-    row[2] = g_strdup_printf ("%d", gg.vardata[j].groupid);
+    row[1] = g_strdup (gg->vardata[j].collab);
+    row[2] = g_strdup_printf ("%d", gg->vardata[j].groupid);
     row[3] = g_strdup ("");
-    row[4] = g_strdup_printf ("%8.3f", gg.vardata[j].lim_raw.min);
-    row[5] = g_strdup_printf ("%8.3f", gg.vardata[j].lim_raw.max);
-    row[6] = g_strdup_printf ("%8.3f", gg.vardata[j].mean);
-    row[7] = g_strdup_printf ("%8.3f", gg.vardata[j].median);
-    row[8] = g_strdup_printf ("%d", gg.vardata[j].nmissing);
+    row[4] = g_strdup_printf ("%8.3f", gg->vardata[j].lim_raw.min);
+    row[5] = g_strdup_printf ("%8.3f", gg->vardata[j].lim_raw.max);
+    row[6] = g_strdup_printf ("%8.3f", gg->vardata[j].mean);
+    row[7] = g_strdup_printf ("%8.3f", gg->vardata[j].median);
+    row[8] = g_strdup_printf ("%d", gg->vardata[j].nmissing);
 
     gtk_clist_append ((GtkCList *) clist, row);
 
@@ -140,7 +141,7 @@ vartable_row_append (gint j)
 
 
 void
-vartable_open ()
+vartable_open (ggobid *gg)
 {                                  
   gint j, k;
   GtkWidget *vbox;
@@ -197,21 +198,21 @@ vartable_open ()
       gtk_clist_set_column_auto_resize (GTK_CLIST (clist), k, true);
 
     /*-- populate the table --*/
-    for (j=0 ; j<gg.ncols ; j++)
-      vartable_row_append (j);
+    for (j=0 ; j<gg->ncols ; j++)
+      vartable_row_append (j, gg);
 
     /*-- track selections --*/
     gtk_signal_connect (GTK_OBJECT (clist), "select_row",
                        GTK_SIGNAL_FUNC (selection_made),
-                       NULL);
+                       gg);
     gtk_signal_connect (GTK_OBJECT (clist), "unselect_row",
                        GTK_SIGNAL_FUNC (deselection_made),
-                       NULL);
+                       gg);
 
     /*-- re-sort when receiving a mouse click on a column header --*/
     gtk_signal_connect (GTK_OBJECT (clist), "click_column",
                        GTK_SIGNAL_FUNC (sortbycolumn_cb),
-                       NULL);
+                       gg);
 
     /* It isn't necessary to shadow the border, but it looks nice :) */
     gtk_clist_set_shadow_type (GTK_CLIST (clist), GTK_SHADOW_OUT);
@@ -233,9 +234,9 @@ vartable_open ()
 
 
 void
-vartable_tform_set (gint varno) {
+vartable_tform_set (gint varno, ggobid *gg) {
 
   if (clist != NULL)
     gtk_clist_set_text (GTK_CLIST (clist), varno,
-      3, gg.vardata[varno].collab_tform);
+      3, gg->vardata[varno].collab_tform);
 }

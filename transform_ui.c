@@ -19,7 +19,8 @@ static gchar *stage0_lbl[] = {"No transformation",
 static void stage0_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
-  transform (0, indx, -99.);
+  ggobid *gg = GGobiFromWidget(w, true);
+  transform (0, indx, -99., gg);
 }
 
 static gchar *stage1_lbl[] = {"No transformation",
@@ -37,16 +38,18 @@ static gchar *stage1_lbl[] = {"No transformation",
 static void
 stage1_cb (GtkWidget *w, gpointer cbd)
 {
+ ggobid *gg;
   gint indx = GPOINTER_TO_INT (cbd);
-  transform (1, indx, boxcox_adj->value);
+  gg = GGobiFromWidget(w, true);
+  transform (1, indx, boxcox_adj->value, gg);
 }
 
 /*
  * Set the spin widget's adjustment->step_increment to adj->value
 */
-void boxcox_cb (GtkAdjustment *adj, GtkWidget *spin )
+void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
 {
-  transform (1, BOXCOX, adj->value);
+  transform (1, BOXCOX, adj->value, gg);
 }
 
 static gchar *stage2_lbl[] = {"No transformation",
@@ -56,11 +59,14 @@ static gchar *stage2_lbl[] = {"No transformation",
                               "Sphere ..."};
 static void stage2_cb (GtkWidget *w, gpointer cbd)
 {
+ ggobid *gg;
   gint indx = GPOINTER_TO_INT (cbd);
+  gg = GGobiFromWidget(w, true);
+
   if (indx == SPHERE) {
-    sphere_panel_open ();
+    sphere_panel_open (gg);
   } else {
-    transform (2, indx, -99);
+    transform (2, indx, -99, gg);
   }
 }
 
@@ -72,13 +78,14 @@ static void reset_tform_cb (GtkButton *button)
 
 static GtkWidget *window = NULL;
 void
-transform_window_open () {
+transform_window_open (ggobid *gg) 
+{
 
   GtkWidget *lbl, *hbox;
   GtkWidget *vbox, *frame, *hb, *vb, *btn;
   GtkWidget *spinner;
 
-  if (gg.nrows == 0)  /*-- if used before we have data --*/
+  if (gg->nrows == 0)  /*-- if used before we have data --*/
     return;
 
   if (window == NULL) {
@@ -110,12 +117,12 @@ transform_window_open () {
 
     stage0_opt = gtk_option_menu_new ();
     gtk_container_set_border_width (GTK_CONTAINER (stage0_opt), 4);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), stage0_opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), stage0_opt,
       "Stage 1: Adjust the domain of the variables",
       NULL);
     populate_option_menu (stage0_opt, stage0_lbl,
                           sizeof (stage0_lbl) / sizeof (gchar *),
-                          stage0_cb);
+                          stage0_cb, gg);
     gtk_container_add (GTK_CONTAINER (frame), stage0_opt);
 
     /*
@@ -130,12 +137,12 @@ transform_window_open () {
     gtk_container_add (GTK_CONTAINER (frame), vb);
 
     stage1_opt = gtk_option_menu_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), stage1_opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), stage1_opt,
       "Stage 2: Power transformations et al",
       NULL);
     populate_option_menu (stage1_opt, stage1_lbl,
                           sizeof (stage1_lbl) / sizeof (gchar *),
-                          stage1_cb);
+                          stage1_cb, gg);
     gtk_box_pack_start (GTK_BOX (vb), stage1_opt, true, false, 1);
 
     hb = gtk_vbox_new (false, 2);  /*-- changed from hbox to vbox --*/
@@ -151,12 +158,12 @@ transform_window_open () {
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (spinner),
                                      GTK_SHADOW_OUT);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinner,
       "Set the Box-Cox power function parameter", NULL);
     gtk_box_pack_end (GTK_BOX (hb), spinner, true, true, 0);
     gtk_signal_connect (GTK_OBJECT (boxcox_adj), "value_changed",
 		                GTK_SIGNAL_FUNC (boxcox_cb),
-		                NULL);
+		                (gpointer) gg);
 
     /*
      * Stage 2: Sorting and permutation
@@ -167,11 +174,11 @@ transform_window_open () {
 
     stage2_opt = gtk_option_menu_new ();
     gtk_container_set_border_width (GTK_CONTAINER (stage2_opt), 4);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), stage2_opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), stage2_opt,
       "Stage 3: Permutation, sorting, and sphering", NULL);
     populate_option_menu (stage2_opt, stage2_lbl,
                           sizeof (stage2_lbl) / sizeof (gchar *),
-                          stage2_cb);
+                          stage2_cb, gg);
     gtk_container_add (GTK_CONTAINER (frame), stage2_opt);
 
     /*
@@ -182,7 +189,7 @@ transform_window_open () {
 
     btn = gtk_button_new_with_label ("Reset all");
     gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 0);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Set all transformation stages to 'no transformation' for the selected variables",
       NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
@@ -200,12 +207,12 @@ transform_window_open () {
  * executed through the api
 */
 void
-transform_opt_menus_set_history (gint j)
+transform_opt_menus_set_history (gint j, ggobid *gg)
 {
   gtk_option_menu_set_history (GTK_OPTION_MENU (stage0_opt),
-    gg.vardata[j].tform0);
+    gg->vardata[j].tform0);
   gtk_option_menu_set_history (GTK_OPTION_MENU (stage1_opt),
-    gg.vardata[j].tform1);
+    gg->vardata[j].tform1);
   gtk_option_menu_set_history (GTK_OPTION_MENU (stage2_opt),
-    gg.vardata[j].tform2);
+    gg->vardata[j].tform2);
 }

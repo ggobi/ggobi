@@ -11,36 +11,37 @@
 
 
 /*-- initialize variables which don't depend on the size of the data --*/
-void globals_init () {
-  gg.glyph_id.type = gg.glyph_0.type = FILLED_CIRCLE;
-  gg.glyph_id.size = gg.glyph_0.size = 3;
-  gg.color_id = gg.color_0 = 0;
+void globals_init (ggobid *gg) {
+  gg->glyph_id.type = gg->glyph_0.type = FILLED_CIRCLE;
+  gg->glyph_id.size = gg->glyph_0.size = 3;
+  gg->color_id = gg->color_0 = 0;
 
   /*-- initialize arrays to NULL --*/
-  arrayf_init (&gg.raw);
-  arrayf_init (&gg.tform1);
-  arrayf_init (&gg.tform2);
-  arrayl_init (&gg.world);
-  arrayl_init (&gg.jitter);
+  arrayf_init (&gg->raw);
+  arrayf_init (&gg->tform1);
+  arrayf_init (&gg->tform2);
+  arrayl_init (&gg->world);
+  arrayl_init (&gg->jitter);
 
-  arrays_init (&gg.missing);
-  arrayl_init (&gg.missing_world);
-  arrayl_init (&gg.missing_jitter);
+  arrays_init (&gg->missing);
+  arrayl_init (&gg->missing_world);
+  arrayl_init (&gg->missing_jitter);
 
-  vectori_init (&gg.clusterid);
+  vectori_init (&gg->clusterid);
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/
-void modes_init () {
-  brush_init ();
+void modes_init (ggobid* gg) {
+  brush_init (gg);
 }
 
+
 gboolean
-fileset_read_init (gchar *ldata_in)
+fileset_read_init (gchar *ldata_in, ggobid *gg)
 {
-  gboolean ans = fileset_read (ldata_in);
+  gboolean ans = fileset_read (ldata_in, gg);
   if (ans) {
-    dataset_init(&gg);
+    dataset_init(gg);
   }
 
  return (ans);
@@ -51,104 +52,119 @@ dataset_init(ggobid *gg)
 {
     displayd *display;
 
-    pipeline_init ();
+    pipeline_init (gg);
+
 
     /*-- initialize the first display --*/
-    display = scatterplot_new (false, NULL);
+    display = scatterplot_new (false, NULL, gg);
     /* Need to make certain this is the only one there.
        See
      */
     gg->displays = g_list_append (gg->displays, (gpointer) display);
-    display_set_current (display);
+    display_set_current (display, gg);
     gg->current_splot = (splotd *)
       g_list_nth_data (gg->current_display->splots, 0);
 }
 
 gboolean
-fileset_read (gchar *ldata_in)
+fileset_read (gchar *ldata_in, ggobid *gg)
 {
-  gg.filename = g_strdup (ldata_in);
-  strip_suffixes ();  /*-- produces gg.fname, the root name --*/
+  gg->filename = g_strdup (ldata_in);
+  strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
 
-  array_read ();
-  gg.nrows_in_plot = gg.nrows;  /*-- for now --*/
-  gg.nrgroups = 0;              /*-- for now --*/
+  array_read (gg);
+  gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
+  gg->nrgroups = 0;              /*-- for now --*/
 
-  missing_values_read (gg.fname, true);
+  missing_values_read (gg->fname, true, gg);
 
-  collabels_read (gg.fname, true);
-  rowlabels_read (gg.fname, true);
-  vgroups_read (gg.fname, true);
+  collabels_read (gg->fname, true, gg);
+  rowlabels_read (gg->fname, true, gg);
+  vgroups_read (gg->fname, true, gg);
 
-  point_glyphs_read (gg.fname, true);
-  point_colors_read (gg.fname, true);
-  hidden_read (gg.fname, true);
 
-  segments_read (gg.fname, true);
-  line_colors_read (gg.fname, true);
+  array_read (gg);
+  gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
+#ifdef LINKABLE
+  gg->nlinkable = gg->nrows;      /*-- for now --*/
+#endif
+  gg->nrgroups = 0;              /*-- for now --*/
+
+  missing_values_read (gg->fname, true, gg);
+
+  collabels_read (gg->fname, true, gg);
+  rowlabels_read (gg->fname, true, gg);
+  vgroups_read (gg->fname, true, gg);
+
+  point_glyphs_read (gg->fname, true, gg);
+  point_colors_read (gg->fname, true, gg);
+  hidden_read (gg->fname, true, gg);
+
+  segments_read (gg->fname, true, gg);
+  line_colors_read (gg->fname, true, gg);
 
   return true;  /* need to check return codes of reading routines */
 }
 
 void
-pipeline_init () 
+pipeline_init (ggobid *gg) 
 {
   gint i;
 
   /*-- a handful of allocations and initializations --*/
-  pipeline_arrays_alloc ();
-  for (i=0; i<gg.nrows; i++) {
-    gg.rows_in_plot[i] = i;
-    gg.sampled[i] = true;
+  pipeline_arrays_alloc (gg);
+  for (i=0; i<gg->nrows; i++) {
+    gg->rows_in_plot[i] = i;
+    gg->sampled[i] = true;
   }
 
   /*-- some initializations --*/
-  modes_init ();
-  varpanel_layout_init ();
-  varpanel_populate ();
+  modes_init (gg);
+  varpanel_layout_init (gg);
+  varpanel_populate (gg);
 
   /*-- run the first half of the pipeline --*/
-  arrayf_copy (&gg.raw, &gg.tform1);
-  arrayf_copy (&gg.tform1, &gg.tform2);
+  arrayf_copy (&gg->raw, &gg->tform1);
+  arrayf_copy (&gg->tform1, &gg->tform2);
 
-  vardata_stats_set ();
+  vardata_stats_set (gg);
 
-  vardata_lim_raw_gp_set ();
-  vardata_lim_update ();
-  tform_to_world ();
+  vardata_lim_raw_gp_set (gg);
+  vardata_lim_update (gg);
+  tform_to_world (gg);
 
-  if (gg.nmissing > 0) {
-    missing_lim_set ();
-    missing_world_alloc ();
-    missing_to_world ();
+  if (gg->nmissing > 0) {
+    missing_lim_set (gg);
+    missing_world_alloc (gg);
+    missing_to_world (gg);
   }
 }
 
 void
-make_ggobi (gchar *ldata_in, gboolean processEvents) {
+make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
   displayd *display;
 
   /*-- some initializations --*/
-  gg.displays = NULL;
-  gg.nrows = gg.ncols = 0;
+  gg->displays = NULL;
+  gg->nrows = gg->ncols = 0;
 
-  globals_init (); /*-- variables that don't depend on the data --*/
-  color_table_init ();
-  make_ui ();
+  globals_init (gg); /*-- variables that don't depend on the data --*/
+  color_table_init (gg);
+  make_ui (gg);
 
   if (ldata_in != NULL) {
-    if (fileset_read (ldata_in)) {
-      pipeline_init ();
+    if (fileset_read (ldata_in, gg)) {
+      pipeline_init (gg);
 
-      display_free_all ();  /*-- destroy any existing displays --*/
+      display_free_all (gg);  /*-- destroy any existing displays --*/
 
       /*-- initialize the first display --*/
-      display = scatterplot_new (false, NULL);
-      gg.displays = g_list_append (gg.displays, (gpointer) display);
+      display = scatterplot_new (false, NULL, gg);
+      gg->displays = g_list_append (gg->displays, (gpointer) display);
 
-      display_set_current (display);
-      gg.current_splot = (splotd *)
-        g_list_nth_data (gg.current_display->splots, 0);
+      display_set_current (display, gg);
+      gg->current_splot = (splotd *)
+        g_list_nth_data (gg->current_display->splots, 0);
     }
   }
 

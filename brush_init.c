@@ -14,34 +14,34 @@
 /*-------------------------------------------------------------------------*/
 
 void
-br_glyph_ids_free ()
+br_glyph_ids_free (ggobid *gg)
 {
-  g_free (gg.glyph_ids);
-  g_free (gg.glyph_now);
-  g_free (gg.glyph_prev);
+  g_free (gg->glyph_ids);
+  g_free (gg->glyph_now);
+  g_free (gg->glyph_prev);
 }
 
 void
-br_glyph_ids_alloc ()
+br_glyph_ids_alloc (ggobid *gg)
 {
-  gg.glyph_ids = (glyphv *) g_realloc (gg.glyph_ids,
-                                       gg.nrows * sizeof (glyphv));
-  gg.glyph_now = (glyphv *) g_realloc (gg.glyph_now,
-                                       gg.nrows * sizeof (glyphv));
-  gg.glyph_prev = (glyphv *) g_realloc (gg.glyph_prev,
-                                       gg.nrows * sizeof (glyphv));
+  gg->glyph_ids = (glyphv *) g_realloc (gg->glyph_ids,
+                                       gg->nrows * sizeof (glyphv));
+  gg->glyph_now = (glyphv *) g_realloc (gg->glyph_now,
+                                       gg->nrows * sizeof (glyphv));
+  gg->glyph_prev = (glyphv *) g_realloc (gg->glyph_prev,
+                                       gg->nrows * sizeof (glyphv));
 }
 
 void
-br_glyph_ids_init ()
+br_glyph_ids_init (ggobid *gg)
 {
   gint j;
 
-  for (j=0; j<gg.nrows; j++) {
-    gg.glyph_ids[j].type = gg.glyph_now[j].type =
-      gg.glyph_prev[j].type = gg.glyph_0.type;
-    gg.glyph_ids[j].size = gg.glyph_now[j].size =
-      gg.glyph_prev[j].size = gg.glyph_0.size;
+  for (j=0; j<gg->nrows; j++) {
+    gg->glyph_ids[j].type = gg->glyph_now[j].type =
+      gg->glyph_prev[j].type = gg->glyph_0.type;
+    gg->glyph_ids[j].size = gg->glyph_now[j].size =
+      gg->glyph_prev[j].size = gg->glyph_0.size;
   }
 }
 
@@ -50,36 +50,36 @@ br_glyph_ids_init ()
 /*-------------------------------------------------------------------------*/
 
 void
-br_color_ids_free ()
+br_color_ids_free (ggobid *gg)
 {
-  g_free (gg.color_ids);
-  g_free (gg.color_now);
-  g_free (gg.color_prev);
+  g_free (gg->color_ids);
+  g_free (gg->color_now);
+  g_free (gg->color_prev);
 }
 
 void
-br_color_ids_alloc ()
+br_color_ids_alloc (ggobid *gg)
 {
   gint i;
 
-  gg.color_ids = (gushort *)  g_realloc (gg.color_ids,
-                                         gg.nrows * sizeof (gushort));
-  gg.color_now = (gushort *)  g_realloc (gg.color_now,
-                                         gg.nrows * sizeof (gushort));
-  gg.color_prev = (gushort *) g_realloc (gg.color_prev,
-                                         gg.nrows * sizeof (gushort));
-  for (i=0; i<gg.nrows; i++)
-    gg.color_ids[i] = gg.color_now[i] = gg.color_prev[i] = gg.color_0;
+  gg->color_ids = (gushort *)  g_realloc (gg->color_ids,
+                                         gg->nrows * sizeof (gushort));
+  gg->color_now = (gushort *)  g_realloc (gg->color_now,
+                                         gg->nrows * sizeof (gushort));
+  gg->color_prev = (gushort *) g_realloc (gg->color_prev,
+                                         gg->nrows * sizeof (gushort));
+  for (i=0; i<gg->nrows; i++)
+    gg->color_ids[i] = gg->color_now[i] = gg->color_prev[i] = gg->color_0;
 }
 
 void
-br_color_ids_init ()
+br_color_ids_init (ggobid *gg)
 {
   gint i;
 
-  gg.color_id = gg.color_0;
-  for (i=0; i<gg.nrows; i++)
-    gg.color_ids[i] = gg.color_now[i] = gg.color_prev[i] = gg.color_0;
+  gg->color_id = gg->color_0;
+  for (i=0; i<gg->nrows; i++)
+    gg->color_ids[i] = gg->color_now[i] = gg->color_prev[i] = gg->color_0;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -87,23 +87,23 @@ br_color_ids_init ()
 /*-------------------------------------------------------------------------*/
 
 void
-hidden_alloc (void)
+hidden_alloc (ggobid *gg)
 {
-  if (gg.hidden != NULL) g_free (gg.hidden);
-  if (gg.hidden_now != NULL) g_free (gg.hidden_now);
-  if (gg.hidden_prev != NULL) g_free (gg.hidden_prev);
+  if (gg->hidden != NULL) g_free (gg->hidden);
+  if (gg->hidden_now != NULL) g_free (gg->hidden_now);
+  if (gg->hidden_prev != NULL) g_free (gg->hidden_prev);
 
-  gg.hidden = (gboolean *) g_malloc (gg.nrows * sizeof (gboolean));
-  gg.hidden_now = (gboolean *) g_malloc (gg.nrows * sizeof (gboolean));
-  gg.hidden_prev = (gboolean *) g_malloc (gg.nrows * sizeof (gboolean));
+  gg->hidden = (gboolean *) g_malloc (gg->nrows * sizeof (gboolean));
+  gg->hidden_now = (gboolean *) g_malloc (gg->nrows * sizeof (gboolean));
+  gg->hidden_prev = (gboolean *) g_malloc (gg->nrows * sizeof (gboolean));
 }
 void
-hidden_init (void)
+hidden_init (ggobid *gg)
 {
   gint i;
 
-  for (i=0; i<gg.nrows; i++)
-    gg.hidden[i] = gg.hidden_now[i] = gg.hidden_prev[i] = false;
+  for (i=0; i<gg->nrows; i++)
+    gg->hidden[i] = gg->hidden_now[i] = gg->hidden_prev[i] = false;
 }
 
 
@@ -113,37 +113,37 @@ hidden_init (void)
 
 
 void
-br_line_color_ids_alloc ()
+br_line_color_ids_alloc (ggobid *gg)
 {
-  gint ns = gg.nsegments; 
+  gint ns = gg->nsegments; 
 
-  gg.line_color_ids = (gushort *) g_realloc ((gpointer) gg.line_color_ids,
+  gg->line_color_ids = (gushort *) g_realloc ((gpointer) gg->line_color_ids,
     ns * sizeof (gushort));
-  gg.line_color_now = (gushort *) g_realloc ((gpointer) gg.line_color_now,
+  gg->line_color_now = (gushort *) g_realloc ((gpointer) gg->line_color_now,
     ns * sizeof (gushort));
-  gg.line_color_prev = (gushort *) g_realloc ((gpointer) gg.line_color_prev,
+  gg->line_color_prev = (gushort *) g_realloc ((gpointer) gg->line_color_prev,
     ns * sizeof (gushort));
-  gg.xed_by_new_brush = (gushort *) g_realloc ((gpointer) gg.xed_by_new_brush,
+  gg->xed_by_new_brush = (gushort *) g_realloc ((gpointer) gg->xed_by_new_brush,
     ns * sizeof (gushort));
 }
 
 void
-br_line_color_ids_free ()
+br_line_color_ids_free (ggobid *gg)
 {
-  g_free ((gpointer) gg.line_color_ids);
-  g_free ((gpointer) gg.line_color_now);
-  g_free ((gpointer) gg.line_color_prev);
-  g_free ((gpointer) gg.xed_by_new_brush);
+  g_free ((gpointer) gg->line_color_ids);
+  g_free ((gpointer) gg->line_color_now);
+  g_free ((gpointer) gg->line_color_prev);
+  g_free ((gpointer) gg->xed_by_new_brush);
 }
 
 void
-br_line_color_ids_init ()
+br_line_color_ids_init (ggobid *gg)
 {
   gint j;
 
-  for (j=0; j<gg.nsegments; j++) {
-    gg.line_color_ids[j] = gg.line_color_now[j] = gg.line_color_prev[j] =
-      gg.color_0;
+  for (j=0; j<gg->nsegments; j++) {
+    gg->line_color_ids[j] = gg->line_color_now[j] = gg->line_color_prev[j] =
+      gg->color_0;
   }
 }
 
@@ -152,10 +152,10 @@ br_line_color_ids_init ()
 /*-------------------------------------------------------------------------*/
 
 void
-brush_pos_init ()
+brush_pos_init (ggobid *gg)
 {
-  gg.app.brush_pos.x1 = gg.app.brush_pos.y1 = 20;
-  gg.app.brush_pos.x2 = gg.app.brush_pos.y2 = 40;
+  gg->app.brush_pos.x1 = gg->app.brush_pos.y1 = 20;
+  gg->app.brush_pos.x2 = gg->app.brush_pos.y2 = 40;
 }
 
 /*----------------------------------------------------------------------*/
@@ -163,24 +163,24 @@ brush_pos_init ()
 /*----------------------------------------------------------------------*/
 
 void
-brush_alloc ()
+brush_alloc (ggobid *gg)
 /*
  * Dynamically allocate arrays.
 */
 {
-  guint nr = (guint) gg.nrows;
+  guint nr = (guint) gg->nrows;
   gint i, iv, ih;
   gboolean initd = false;
 
-  gg.br_nbins = BRUSH_NBINS;
+  gg->br_nbins = BRUSH_NBINS;
 
-  gg.included = (gboolean *) g_realloc (gg.included, nr * sizeof (gboolean));
-  gg.under_new_brush = (gboolean *) g_realloc (gg.under_new_brush,
+  gg->included = (gboolean *) g_realloc (gg->included, nr * sizeof (gboolean));
+  gg->under_new_brush = (gboolean *) g_realloc (gg->under_new_brush,
                                                nr * sizeof (gboolean));
 
   for (i=0; i<nr; i++) {
-    gg.included[i] = true;
-    gg.under_new_brush[i] = false;
+    gg->included[i] = true;
+    gg->under_new_brush[i] = false;
   }
 
   /*
@@ -190,16 +190,16 @@ brush_alloc ()
 
   if (!initd) {
     /* binning the plot window; no need to realloc these */
-    gg.br_binarray = (bin_struct **)
-      g_malloc (gg.br_nbins * sizeof (bin_struct *));
-    for (ih=0; ih<gg.br_nbins; ih++) {
-      gg.br_binarray[ih] = (bin_struct *)
-        g_malloc (gg.br_nbins * sizeof (bin_struct));
+    gg->br_binarray = (bin_struct **)
+      g_malloc (gg->br_nbins * sizeof (bin_struct *));
+    for (ih=0; ih<gg->br_nbins; ih++) {
+      gg->br_binarray[ih] = (bin_struct *)
+        g_malloc (gg->br_nbins * sizeof (bin_struct));
 
-      for (iv=0; iv<gg.br_nbins; iv++) {
-        gg.br_binarray[ih][iv].nels = 0;
-        gg.br_binarray[ih][iv].nblocks = 1;
-        gg.br_binarray[ih][iv].els = (gulong *)
+      for (iv=0; iv<gg->br_nbins; iv++) {
+        gg->br_binarray[ih][iv].nels = 0;
+        gg->br_binarray[ih][iv].nblocks = 1;
+        gg->br_binarray[ih][iv].els = (gulong *)
           g_malloc (BINBLOCKSIZE * sizeof (gulong));
       }
     }
@@ -208,51 +208,51 @@ brush_alloc ()
 }
 
 void
-brush_free ()
+brush_free (ggobid *gg)
 /*
  * Dynamically free arrays.
 */
 {
   int j,k;
 
-  br_glyph_ids_free ();
-  br_color_ids_free ();
+  br_glyph_ids_free (gg);
+  br_color_ids_free (gg);
 
-  g_free ((gpointer) gg.under_new_brush);
+  g_free ((gpointer) gg->under_new_brush);
 
-  for (k=0; k<gg.br_nbins; k++) {
-    for (j=0; j<gg.br_nbins; j++)
-      g_free ((gpointer) gg.br_binarray[k][j].els);
-    g_free ((gpointer) gg.br_binarray[k]);
+  for (k=0; k<gg->br_nbins; k++) {
+    for (j=0; j<gg->br_nbins; j++)
+      g_free ((gpointer) gg->br_binarray[k][j].els);
+    g_free ((gpointer) gg->br_binarray[k]);
   }
-  g_free ((gpointer) gg.br_binarray);
+  g_free ((gpointer) gg->br_binarray);
 }
 
 void
-brush_init ()
+brush_init (ggobid *gg)
 {
   static gboolean firsttime = true;
 
-  gg.glyph_id.type = gg.glyph_0.type = FILLED_CIRCLE;
-  gg.glyph_id.size = gg.glyph_0.size = 3;
-  gg.color_id = gg.color_0 = 0;
+  gg->glyph_id.type = gg->glyph_0.type = FILLED_CIRCLE;
+  gg->glyph_id.size = gg->glyph_0.size = 3;
+  gg->color_id = gg->color_0 = 0;
 
   if (firsttime) {
-    brush_pos_init ();
+    brush_pos_init (gg);
 
     /*
      * Used in binning the plot window
     */
-    gg.br_nbins = BRUSH_NBINS;
+    gg->br_nbins = BRUSH_NBINS;
 
     /*
      * These are initialized so that the first merge_brushbins()
      * call will behave reasonably.
     */
-    gg.bin0.x = gg.bin1.x = BRUSH_NBINS;
-    gg.bin0.y = gg.bin1.y = BRUSH_NBINS;
+    gg->bin0.x = gg->bin1.x = BRUSH_NBINS;
+    gg->bin0.y = gg->bin1.y = BRUSH_NBINS;
 
-    brush_alloc ();
+    brush_alloc (gg);
 
     firsttime = false;
 
@@ -261,8 +261,8 @@ brush_init ()
 }
 
 void
-brush_activate (gboolean state)
+brush_activate (gboolean state, ggobid *gg)
 {
   if (state)
-    assign_points_to_bins ();
+    assign_points_to_bins (gg);
 }

@@ -49,7 +49,7 @@ parcoords_cpanel_init (cpaneld* cpanel) {
 }
 
 void
-cpanel_set (displayd *display) {
+cpanel_set (displayd *display, ggobid *gg) {
   cpaneld *cpanel = &display->cpanel;
 
   switch (display->displaytype) {
@@ -67,5 +67,5 @@ cpanel_set (displayd *display) {
       break;
   }
 
-  mode_set (cpanel->mode);
+  mode_set (cpanel->mode, gg);
 }

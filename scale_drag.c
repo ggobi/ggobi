@@ -10,20 +10,20 @@
  * Change shift_wrld appropriately
 */
 void
-pan_by_drag (splotd *sp)
+pan_by_drag (splotd *sp, ggobid *gg)
 {
-  sp->ishift.x += (gg.mousepos.x - gg.mousepos_o.x);
-  sp->ishift.y += (gg.mousepos.y - gg.mousepos_o.y);
+  sp->ishift.x += (gg->mousepos.x - gg->mousepos_o.x);
+  sp->ishift.y += (gg->mousepos.y - gg->mousepos_o.y);
 }
 
 /*
  * scale_style == DRAG and button 2 is pressed; we are zooming. 
- * The mouse has moved to gg.mousepos from gg.mousepos_o and the center
+ * The mouse has moved to gg->mousepos from gg->mousepos_o and the center
  * of the figure is at sp->mid.  Change sp->scale by the
  * appropriate amounts.
 */
 void
-zoom_by_drag (splotd *sp)
+zoom_by_drag (splotd *sp, ggobid *gg)
 {
   gint projection = projection_get ();
   gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
@@ -31,18 +31,18 @@ zoom_by_drag (splotd *sp)
   gint npix = 10;  /*-- number of pixels from the crosshair required --*/
 
   /*-- Scale the scaler if far enough from center --*/
-  if (gg.mousepos_o.x - sp->ishift.x > npix ||
-      sp->ishift.x - gg.mousepos_o.x > npix)
+  if (gg->mousepos_o.x - sp->ishift.x > npix ||
+      sp->ishift.x - gg->mousepos_o.x > npix)
   {
-    *scale_x *= ((gfloat) (gg.mousepos.x - sp->ishift.x) /
-                 (gfloat) (gg.mousepos_o.x - sp->ishift.x));
+    *scale_x *= ((gfloat) (gg->mousepos.x - sp->ishift.x) /
+                 (gfloat) (gg->mousepos_o.x - sp->ishift.x));
   }
 
-  if (gg.mousepos_o.y - sp->ishift.y > npix ||
-      sp->ishift.y - gg.mousepos_o.y > npix)
+  if (gg->mousepos_o.y - sp->ishift.y > npix ||
+      sp->ishift.y - gg->mousepos_o.y > npix)
   {
-    *scale_y *= ((gfloat) (gg.mousepos.y - sp->ishift.y) /
-                 (gfloat) (gg.mousepos_o.y - sp->ishift.y));
+    *scale_y *= ((gfloat) (gg->mousepos.y - sp->ishift.y) /
+                 (gfloat) (gg->mousepos_o.y - sp->ishift.y));
   }
 
   /* Restore if too small. */

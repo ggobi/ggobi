@@ -7,73 +7,73 @@
 #include "vars.h"
 #include "externs.h"
 
-static gfloat mean_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *);
-static gfloat median_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *);
-static void min_max (gfloat **, gint *, gint, gfloat *, gfloat *);
+static gfloat mean_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, ggobid *gg);
+static gfloat median_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, ggobid *gg);
+static void min_max (gfloat **, gint *, gint, gfloat *, gfloat *, ggobid *gg);
 
 /* ------------ Dynamic allocation, freeing section --------- */
 
 void
-pipeline_arrays_free ()
+pipeline_arrays_free (ggobid *gg)
 /*
  * Dynamically free arrays used in data pipeline.
 */
 {
-  arrayf_free (&gg.tform1, 0, 0);
-  arrayf_free (&gg.tform2, 0, 0);
+  arrayf_free (&gg->tform1, 0, 0);
+  arrayf_free (&gg->tform2, 0, 0);
 
-  arrayl_free (&gg.world, 0, 0);
-  arrayl_free (&gg.jitter, 0, 0);
+  arrayl_free (&gg->world, 0, 0);
+  arrayl_free (&gg->jitter, 0, 0);
 
-  g_free ((gpointer) gg.rows_in_plot);
-  g_free ((gpointer) gg.sampled);
+  g_free ((gpointer) gg->rows_in_plot);
+  g_free ((gpointer) gg->sampled);
 }
 
 void
-pipeline_arrays_alloc ()
+pipeline_arrays_alloc (ggobid *gg)
 /*
  * Dynamically allocate arrays.
 */
 {
-  gint nc = gg.ncols, nr = gg.nrows;
+  gint nc = gg->ncols, nr = gg->nrows;
 
-  if (gg.tform1.data != NULL) pipeline_arrays_free ();
+  if (gg->tform1.data != NULL) pipeline_arrays_free (gg);
 
-  arrayf_alloc (&gg.tform1, nr, nc);
-  arrayf_alloc (&gg.tform2, nr, nc);
+  arrayf_alloc (&gg->tform1, nr, nc);
+  arrayf_alloc (&gg->tform2, nr, nc);
 
-  arrayl_alloc (&gg.world, nr, nc);
-  arrayl_alloc_zero (&gg.jitter, nr, nc);
+  arrayl_alloc (&gg->world, nr, nc);
+  arrayl_alloc_zero (&gg->jitter, nr, nc);
 
-  gg.rows_in_plot = (gint *) g_malloc (nr * sizeof (gint));
-  gg.sampled = (gboolean *) g_malloc (nr * sizeof (gboolean));
+  gg->rows_in_plot = (gint *) g_malloc (nr * sizeof (gint));
+  gg->sampled = (gboolean *) g_malloc (nr * sizeof (gboolean));
 }
 
 void
-pipeline_arrays_add_column (gint jvar)
+pipeline_arrays_add_column (gint jvar, ggobid *gg)
 /*
  * Reallocate pipeline arrays to contain one more column, and
  * copy column jvar into the new column
 */
 {
-  gint nc = gg.ncols + 1, nr = gg.nrows;
+  gint nc = gg->ncols + 1, nr = gg->nrows;
   register gint i;
 
-  arrayf_add_cols (&gg.raw, nc);
-  arrayf_add_cols (&gg.tform1, nc);
-  arrayf_add_cols (&gg.tform2, nc);
+  arrayf_add_cols (&gg->raw, nc);
+  arrayf_add_cols (&gg->tform1, nc);
+  arrayf_add_cols (&gg->tform2, nc);
 
-  arrayl_add_cols (&gg.world, nc);
-  arrayl_add_cols (&gg.jitter, nc);
+  arrayl_add_cols (&gg->world, nc);
+  arrayl_add_cols (&gg->jitter, nc);
 
   for (i=0; i<nr; i++) {
-    gg.raw.data[i][nc-1] = gg.raw.data[i][jvar];
+    gg->raw.data[i][nc-1] = gg->raw.data[i][jvar];
 
-    gg.tform1.data[i][nc-1] = gg.tform1.data[i][jvar];
-    gg.tform2.data[i][nc-1] = gg.tform2.data[i][jvar];
+    gg->tform1.data[i][nc-1] = gg->tform1.data[i][jvar];
+    gg->tform2.data[i][nc-1] = gg->tform2.data[i][jvar];
 
-    gg.world.data[i][nc-1] = gg.world.data[i][jvar];
-    gg.jitter.data[i][nc-1] = gg.jitter.data[i][jvar];
+    gg->world.data[i][nc-1] = gg->world.data[i][jvar];
+    gg->jitter.data[i][nc-1] = gg->jitter.data[i][jvar];
   }
 }
 
@@ -113,28 +113,28 @@ limits_adjust (gfloat *min, gfloat *max)
 }
 
 void
-vardata_lim_raw_gp_set ()
+vardata_lim_raw_gp_set (ggobid *gg)
 {
   gint j, *cols, ncols;
   gfloat min, max;
   gint k;
-  gint nvgr = nvgroups ();
+  gint nvgr = nvgroups (gg);
 
-  cols = (gint *) g_malloc (gg.ncols * sizeof (gint));
+  cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
   for (k=0; k<nvgr; k++) {
     ncols = 0;
-    for (j=0; j<gg.ncols; j++) {
-      if (gg.vardata[j].groupid == k)
+    for (j=0; j<gg->ncols; j++) {
+      if (gg->vardata[j].groupid == k)
         cols[ncols++] = j;
       else
         cols[j] = j;
     }
 
-    min_max (gg.raw.data, cols, ncols, &min, &max);
+    min_max (gg->raw.data, cols, ncols, &min, &max, gg);
     limits_adjust (&min, &max);
     for (j=0; j<ncols; j++) {
-      gg.vardata[cols[j]].lim_raw_gp.min = min;
-      gg.vardata[cols[j]].lim_raw_gp.max = max;
+      gg->vardata[cols[j]].lim_raw_gp.min = min;
+      gg->vardata[cols[j]].lim_raw_gp.max = max;
     }
   }
 
@@ -142,26 +142,26 @@ vardata_lim_raw_gp_set ()
 }
 
 void
-vardata_lim_tform_gp_set ()
+vardata_lim_tform_gp_set (ggobid *gg)
 {
   gint j, n, *cols, ncols;
   gfloat min, max;
   gint k;
-  gint nvgr = nvgroups ();
+  gint nvgr = nvgroups (gg);
 
-  cols = (gint *) g_malloc (gg.ncols * sizeof (gint));
+  cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
   for (k=0; k<nvgr; k++) {
     ncols = 0;
-    for (j=0; j<gg.ncols; j++) {
-      if (gg.vardata[j].groupid == k)
+    for (j=0; j<gg->ncols; j++) {
+      if (gg->vardata[j].groupid == k)
         cols[ncols++] = j;
     }
 
-    min_max (gg.tform2.data, cols, ncols, &min, &max);
+    min_max (gg->tform2.data, cols, ncols, &min, &max, gg);
     limits_adjust (&min, &max);
     for (n=0; n<ncols; n++) {
-      gg.vardata[cols[n]].lim_tform_gp.min = min;
-      gg.vardata[cols[n]].lim_tform_gp.max = max;
+      gg->vardata[cols[n]].lim_tform_gp.min = min;
+      gg->vardata[cols[n]].lim_tform_gp.max = max;
     }
   }
 
@@ -169,52 +169,52 @@ vardata_lim_tform_gp_set ()
 }
 
 void
-vardata_lim_update ()
+vardata_lim_update (ggobid *gg)
 {
   gint j, k, n;
   gfloat min, max;
   gint *cols, ncols;
-  gint nvgr = nvgroups ();
+  gint nvgr = nvgroups (gg);
 
   /* 
    * First update the limits taken from the tform2 data. 
   */
-  vardata_lim_tform_gp_set ();
+  vardata_lim_tform_gp_set (gg);
 
   /*
    * Take tform2[][], one variable group at a time, and generate
    * the min and max for each variable group (and thus for each
    * column).
   */
-  cols = (gint *) g_malloc (gg.ncols * sizeof (gint));
+  cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
   for (k=0; k<nvgr; k++) {
     ncols = 0;
-    for (j=0; j<gg.ncols; j++) {
-      if (gg.vardata[j].groupid == k)
+    for (j=0; j<gg->ncols; j++) {
+      if (gg->vardata[j].groupid == k)
         cols[ncols++] = j;
     }
 
-    switch (gg.std_type)
+    switch (gg->std_type)
     {
       case 0:
         /*-- isn't this already done? --*/
-/*      min_max (gg.tform2, cols, ncols, &min, &max);*/
-        min = gg.vardata[cols[0]].lim_tform_gp.min;
-        max = gg.vardata[cols[0]].lim_tform_gp.max;
+/*      min_max (gg->tform2, cols, ncols, &min, &max);*/
+        min = gg->vardata[cols[0]].lim_tform_gp.min;
+        max = gg->vardata[cols[0]].lim_tform_gp.max;
         break;
       case 1:
-        mean_largest_dist (gg.tform2.data, cols, ncols, &min, &max);
+        mean_largest_dist (gg->tform2.data, cols, ncols, &min, &max, gg);
         break;
       case 2:
-        median_largest_dist (gg.tform2.data, cols, ncols, &min, &max);
+        median_largest_dist (gg->tform2.data, cols, ncols, &min, &max, gg);
         break;
     }
 
     limits_adjust (&min, &max);
 
     for (n=0; n<ncols; n++) {
-      gg.vardata[cols[n]].lim.min = min;
-      gg.vardata[cols[n]].lim.max = max;
+      gg->vardata[cols[n]].lim.min = min;
+      gg->vardata[cols[n]].lim.max = max;
     }
   }
   g_free ((gpointer) cols);
@@ -225,7 +225,7 @@ vardata_lim_update ()
 /*-------------------------------------------------------------------------*/
 
 void
-min_max (gfloat **data, gint *cols, gint ncols, gfloat *min, gfloat *max)
+min_max (gfloat **data, gint *cols, gint ncols, gfloat *min, gfloat *max, ggobid *gg)
 /*
  * Find the minimum and maximum values of each column or variable
  * group using using the min-max scaling.
@@ -235,12 +235,12 @@ min_max (gfloat **data, gint *cols, gint ncols, gfloat *min, gfloat *max)
 /*
  * Choose an initial value for *min and *max
 */
-  *min = *max = data[gg.rows_in_plot[0]][cols[0]];
+  *min = *max = data[gg->rows_in_plot[0]][cols[0]];
 
   for (n=0; n<ncols; n++) {
     j = cols[n];
-    for (i=0; i<gg.nrows_in_plot; i++) {
-      k = gg.rows_in_plot[i];
+    for (i=0; i<gg->nrows_in_plot; i++) {
+      k = gg->rows_in_plot[i];
       if (data[k][j] < *min)
         *min = data[k][j];
       else if (data[k][j] > *max)
@@ -264,7 +264,7 @@ icompare (gint *x1, gint *x2)
 
 gfloat
 median_largest_dist (gfloat **data, gint *cols, gint ncols,
-  gfloat *min, gfloat *max)
+  gfloat *min, gfloat *max, ggobid *gg)
 {
 /*
  * Find the minimum and maximum values of each column or variable
@@ -276,13 +276,13 @@ median_largest_dist (gfloat **data, gint *cols, gint ncols,
   gdouble dmedian = 0;
   extern gint fcompare (const void *, const void *);
 
-  np = ncols * gg.nrows_in_plot;
+  np = ncols * gg->nrows_in_plot;
   x = (gfloat *) g_malloc (np * sizeof (gfloat));
   for (n=0; n<ncols; n++) {
     j = cols[n];
-    for (i=0; i<gg.nrows_in_plot; i++) {
-      k = gg.rows_in_plot[i];
-      x[n*gg.nrows_in_plot + i] = data[k][j];
+    for (i=0; i<gg->nrows_in_plot; i++) {
+      k = gg->rows_in_plot[i];
+      x[n*gg->nrows_in_plot + i] = data[k][j];
     }
   }
 
@@ -294,10 +294,10 @@ median_largest_dist (gfloat **data, gint *cols, gint ncols,
    * from the mean over all rows
   */
 
-  for (i=0; i<gg.nrows_in_plot; i++) {
+  for (i=0; i<gg->nrows_in_plot; i++) {
     sumdist = 0.0;
     for (j=0; j<ncols; j++) {
-      dx = (gdouble) data[gg.rows_in_plot[i]][cols[j]] - dmedian;
+      dx = (gdouble) data[gg->rows_in_plot[i]][cols[j]] - dmedian;
       sumdist += (dx*dx);
     }
     if (sumdist > lgdist)
@@ -317,7 +317,7 @@ median_largest_dist (gfloat **data, gint *cols, gint ncols,
 
 gfloat
 mean_largest_dist (gfloat **data, gint *cols, gint ncols,
-  gfloat *min, gfloat *max)
+  gfloat *min, gfloat *max, ggobid *gg)
 {
 /*
  * Find the minimum and maximum values of each column or variable
@@ -331,22 +331,22 @@ mean_largest_dist (gfloat **data, gint *cols, gint ncols,
   */
   sumxi = 0.0;
   for (j=0; j<ncols; j++) {
-    for (i=0; i<gg.nrows_in_plot; i++) {
-      dx = (gdouble) data[gg.rows_in_plot[i]][cols[j]];
+    for (i=0; i<gg->nrows_in_plot; i++) {
+      dx = (gdouble) data[gg->rows_in_plot[i]][cols[j]];
       sumxi += dx;
     }
   }
-  mean = sumxi / (gdouble) gg.nrows_in_plot / (gdouble) ncols;
+  mean = sumxi / (gdouble) gg->nrows_in_plot / (gdouble) ncols;
 
   /*
    * Find the maximum of the sum of squared differences
    * from the mean over all rows
   */
 
-  for (i=0; i<gg.nrows_in_plot; i++) {
+  for (i=0; i<gg->nrows_in_plot; i++) {
     sumdist = 0.0;
     for (j=0; j<ncols; j++) {
-      dx = (gdouble) data[gg.rows_in_plot[i]][cols[j]] - mean;
+      dx = (gdouble) data[gg->rows_in_plot[i]][cols[j]] - mean;
       sumdist += (dx*dx);
     }
     if (sumdist > lgdist)
@@ -362,7 +362,7 @@ mean_largest_dist (gfloat **data, gint *cols, gint ncols,
 }
 
 void
-tform_to_world ()
+tform_to_world (ggobid *gg)
 {
 /*
  * Take tform2[][], one column at a time, and generate
@@ -372,19 +372,19 @@ tform_to_world ()
   gfloat max, min, range, ftmp;
   gfloat precis = PRECISION1;
 
-  for (j=0; j<gg.ncols; j++) {
+  for (j=0; j<gg->ncols; j++) {
 
-    max = gg.vardata[j].lim.max;
-    min = gg.vardata[j].lim.min;
+    max = gg->vardata[j].lim.max;
+    min = gg->vardata[j].lim.min;
     range = max - min;
 
-    for (i=0; i<gg.nrows_in_plot; i++) {
-      m = gg.rows_in_plot[i];
-      ftmp = -1.0 + 2.0*(gg.tform2.data[m][j] - min) / range;
-      gg.world.data[m][j] = (glong) (precis * ftmp);
+    for (i=0; i<gg->nrows_in_plot; i++) {
+      m = gg->rows_in_plot[i];
+      ftmp = -1.0 + 2.0*(gg->tform2.data[m][j] - min) / range;
+      gg->world.data[m][j] = (glong) (precis * ftmp);
 
       /* Add in the jitter values */
-      gg.world.data[m][j] += gg.jitter.data[m][j];
+      gg->world.data[m][j] += gg->jitter.data[m][j];
     }
   }
 }

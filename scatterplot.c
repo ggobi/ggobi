@@ -60,7 +60,7 @@ scatterplot_show_rulers (displayd *display, gint projection)
 }
 
 void
-ruler_ranges_set (displayd *display, splotd *sp) {
+ruler_ranges_set (displayd *display, splotd *sp, ggobid *gg) {
   /*
    * Run 0 and sp->max through the reverse pipeline to find out
    * what their values should be in terms of the data.  Set the
@@ -71,11 +71,11 @@ ruler_ranges_set (displayd *display, splotd *sp) {
   cpaneld *cpanel = &display->cpanel;
 
   scr.x = scr.y = 0;
-  splot_screen_to_tform (cpanel, sp, &scr, &tfmin);
+  splot_screen_to_tform (cpanel, sp, &scr, &tfmin, gg);
 
   scr.x = sp->max.x;
   scr.y = sp->max.y;
-  splot_screen_to_tform (cpanel, sp, &scr, &tfmax);
+  splot_screen_to_tform (cpanel, sp, &scr, &tfmax, gg);
 
   /*
    * Reset only if necessary:  if the ruler is visible and the
@@ -115,7 +115,7 @@ static void
 scatterplot_display_menus_make (displayd *display,
                                 GtkAccelGroup *accel_group,
                                 GtkSignalFunc func,
-                                GtkWidget *mbar)
+                                GtkWidget *mbar, ggobid *gg)
 {
   GtkWidget *options_menu, *link_menu;
   GtkWidget *submenu;
@@ -127,25 +127,25 @@ scatterplot_display_menus_make (displayd *display,
   options_menu = gtk_menu_new ();
 
   CreateMenuCheck (display, options_menu, "Show points",
-    func, GINT_TO_POINTER (DOPT_POINTS), on);
+    func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   CreateMenuCheck (display, options_menu, "Show lines (undirected)",
-    func, GINT_TO_POINTER (DOPT_SEGS_U), off);
+    func, GINT_TO_POINTER (DOPT_SEGS_U), off, gg);
   CreateMenuCheck (display, options_menu, "Show lines (directed)",
-    func, GINT_TO_POINTER (DOPT_SEGS_D), off);
+    func, GINT_TO_POINTER (DOPT_SEGS_D), off, gg);
 /*
   CreateMenuCheck (display, options_menu, "Show missings",
-    func, GINT_TO_POINTER (DOPT_MISSINGS), on);
+    func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
 */
   CreateMenuCheck (display, options_menu, "Show gridlines",
-    func, GINT_TO_POINTER (DOPT_GRIDLINES), off);
+    func, GINT_TO_POINTER (DOPT_GRIDLINES), off, gg);
 
   /* Add a separator */
-  CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL);
+  CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
   CreateMenuCheck (display, options_menu, "Show axes (3D+ modes)",
-    func, GINT_TO_POINTER (DOPT_AXES), on);
+    func, GINT_TO_POINTER (DOPT_AXES), on, gg);
   CreateMenuCheck (display, options_menu, "Center axes (3D+ modes)",
-    func, GINT_TO_POINTER (DOPT_AXES_C), on);
+    func, GINT_TO_POINTER (DOPT_AXES_C), on, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
   submenu_append (submenu, mbar);
@@ -159,7 +159,7 @@ scatterplot_display_menus_make (displayd *display,
   link_menu = gtk_menu_new ();
 
   CreateMenuCheck (display, link_menu, "Link to other plots",
-    func, GINT_TO_POINTER (DOPT_LINK), on);
+    func, GINT_TO_POINTER (DOPT_LINK), on, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), link_menu);
   submenu_append (submenu, mbar);
@@ -168,7 +168,7 @@ scatterplot_display_menus_make (displayd *display,
 
 
 displayd *
-display_alloc_init(enum displaytyped type, gboolean missing_p)
+display_alloc_init(enum displaytyped type, gboolean missing_p, ggobid *gg)
 {
   displayd *display = (displayd *) g_malloc (sizeof (displayd));
   display->displaytype = type; 
@@ -176,19 +176,25 @@ display_alloc_init(enum displaytyped type, gboolean missing_p)
 
   display->p1d_orientation = VERTICAL;
 
+    /* Copy in the contents of DefaultOptions to create
+       an indepedently modifiable configuration copied from
+       the current template.
+     */
   display->options = DefaultDisplayOptions;
+
+  display->ggobi = gg;
 
 return(display);
 }
 
 displayd *
-scatterplot_new (gboolean missing_p, splotd *sp) {
+scatterplot_new (gboolean missing_p, splotd *sp, ggobid *gg) {
   GtkWidget *table, *vbox;
   GtkWidget *mbar;
   displayd *display;
 
   if(sp == NULL) {
-    display = display_alloc_init(scatterplot, missing_p);
+    display = display_alloc_init(scatterplot, missing_p, gg);
   } else {
    display = (displayd*) sp->displayptr;
   }
@@ -201,14 +207,8 @@ scatterplot_new (gboolean missing_p, splotd *sp) {
 
   scatterplot_cpanel_init (&display->cpanel, XYPLOT);
 
-  display->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_object_set_data (GTK_OBJECT (display->window),
-                       "displayd",
-                       (gpointer) display);
-  gtk_window_set_policy (GTK_WINDOW (display->window), true, true, false);
-  gtk_container_set_border_width (GTK_CONTAINER (display->window), 3);
-  gtk_signal_connect (GTK_OBJECT (display->window), "delete_event",
-                      GTK_SIGNAL_FUNC (display_delete_cb), (gpointer) display);
+  display_window_init(display, 3, gg);
+
 /*
  * Add the main menu bar
 */
@@ -224,7 +224,7 @@ scatterplot_new (gboolean missing_p, splotd *sp) {
    * add the Display Options and Link menus another way
   */
   scatterplot_display_menus_make (display, sp_accel_group,
-    display_options_cb, mbar);
+    display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 
@@ -232,7 +232,7 @@ scatterplot_new (gboolean missing_p, splotd *sp) {
    * Initialize a single splot
   */
   if(sp == NULL) {
-   sp = splot_new (display, WIDTH, HEIGHT);
+   sp = splot_new (display, WIDTH, HEIGHT, gg);
   }
 
   display->splots = NULL;
@@ -241,8 +241,8 @@ scatterplot_new (gboolean missing_p, splotd *sp) {
   /* 
    * Initialize tour
    */
-  if (display->displaytype == scatterplot && gg.ncols > 2) 
-    display_tour_init(display);
+  if (display->displaytype == scatterplot && gg->ncols > 2) 
+    display_tour_init(display, gg);
 
   table = gtk_table_new (3, 2, false);  /* rows, columns, homogeneous */
   gtk_box_pack_start (GTK_BOX (vbox), table, true, true, 0);
@@ -291,7 +291,7 @@ scatterplot_new (gboolean missing_p, splotd *sp) {
   gtk_widget_show (table);
   gtk_widget_show_all (display->window);
 
-  ruler_ranges_set (display, sp);
+  ruler_ranges_set (display, sp, gg);
 
   return display;
 }

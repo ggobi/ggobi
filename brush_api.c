@@ -4,9 +4,9 @@
 
 
 void
-GGOBI(moveBrush) (gint ulx, gint uly)  /*-- move brush and paint --*/
+GGOBI(moveBrush) (gint ulx, gint uly, ggobid *gg)  /*-- move brush and paint --*/
 {
-  splotd *sp = gg.current_splot;
+  splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   icoords pos;
@@ -14,17 +14,17 @@ GGOBI(moveBrush) (gint ulx, gint uly)  /*-- move brush and paint --*/
   pos.x = ulx;
   pos.y = uly;
 
-  brush_motion (&pos, true, false, cpanel);
+  brush_motion (&pos, true, false, cpanel, gg);
 }
 
 void
-GGOBI(sizeBrush) (gint width, gint height)  /*-- resize brush without painting --*/
+GGOBI(sizeBrush) (gint width, gint height, ggobid *gg)  /*-- resize brush without painting --*/
 {
-  splotd *sp = gg.current_splot;
+  splotd *sp = gg->current_splot;
 
-  gg.app.brush_pos.x2 = gg.app.brush_pos.x1 + width;
-  gg.app.brush_pos.y2 = gg.app.brush_pos.y1 + height;
+  gg->app.brush_pos.x2 = gg->app.brush_pos.x1 + width;
+  gg->app.brush_pos.y2 = gg->app.brush_pos.y1 + height;
 
-  splot_redraw (sp, QUICK);  
+  splot_redraw (sp, QUICK, gg);  
 }
 

@@ -16,27 +16,31 @@ static gchar *arrangement_lbl[] = {"Row", "Column"};
 static void arrangement_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
+  ggobid *gg = GGobiFromWidget(w, true);
   g_printerr ("cbd: %s\n", arrangement_lbl[indx]);
 
-  if (indx != gg.current_display->cpanel.parcoords_arrangement)
-    parcoords_reset_arrangement (gg.current_display, indx);
+  if (indx != gg->current_display->cpanel.parcoords_arrangement)
+    parcoords_reset_arrangement (gg->current_display, indx, gg);
 
-  gg.current_display->cpanel.parcoords_arrangement = indx;
+  gg->current_display->cpanel.parcoords_arrangement = indx;
 }
 
 static gchar *type_lbl[] = {"Texturing", "ASH", "Dotplot"};
 static void type_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &gg.current_display->cpanel;
+  ggobid *gg = GGobiFromWidget(w, true);
+  cpaneld *cpanel;
+    cpanel = &gg->current_display->cpanel;
   cpanel->p1d_type = GPOINTER_TO_INT (cbd);
 
-  display_tailpipe (gg.current_display);
+  display_tailpipe (gg->current_display, gg);
 }
 
 static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append"};
 static void selection_mode_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &gg.current_display->cpanel;
+  ggobid *gg = GGobiFromWidget(w, true);
+  cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->parcoords_selection_mode = GPOINTER_TO_INT (cbd);
 }
 
@@ -59,18 +63,18 @@ static void varscale_cb (GtkWidget *w, gpointer cbd)
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_parcoords_make () {
+cpanel_parcoords_make (ggobid *gg) {
   GtkWidget *vbox, *vb, *lbl, *sbar, *opt;
   GtkObject *adj;
   
-  gg.control_panel[PCPLOT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg.control_panel[PCPLOT]), 5);
+  gg->control_panel[PCPLOT] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[PCPLOT]), 5);
 
 /*
  * arrangement of plots, row or column
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[PCPLOT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Plot arrangement:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -78,49 +82,49 @@ cpanel_parcoords_make () {
 
   opt = gtk_option_menu_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "When opening a new parallel coordinates display, arrange the 1d plots in a row or a column",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, arrangement_lbl,
                         sizeof (arrangement_lbl) / sizeof (gchar *),
-                        arrangement_cb);
+                        arrangement_cb, gg);
 /*
  * option menu: selection mode
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[PCPLOT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Selecting a variable either replaces the variable in the current plot (swapping if appropriate), inserts a new plot before the current plot, or appends a new plot after it",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, selection_mode_lbl,
                         sizeof (selection_mode_lbl) / sizeof (gchar *),
-                        selection_mode_cb);
+                        selection_mode_cb, gg);
 
 /*
  * option menu
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[PCPLOT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Spreading method:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Display either textured dot plots or average shifted histograms", NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
-                        type_cb);
+                        type_cb, gg);
   /*-- this should be set to the value of cpanel->p1d_type --*/
   gtk_option_menu_set_history (GTK_OPTION_MENU (opt), DOTPLOT);
 
@@ -128,7 +132,7 @@ cpanel_parcoords_make () {
  * ASH smoothness
 */
   vbox = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg.control_panel[PCPLOT]), vbox,
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[PCPLOT]), vbox,
     false, false, 0);
 
   lbl = gtk_label_new ("ASH smoothness:"),
@@ -140,7 +144,7 @@ cpanel_parcoords_make () {
                       GTK_SIGNAL_FUNC (ash_smoothness_cb), NULL);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), sbar,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust ASH smoothness", NULL);
   gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
@@ -161,12 +165,12 @@ cpanel_parcoords_make () {
 
   opt = gtk_option_menu_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Show all visible cases, or show only labelled cases", NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, showcases_lbl,
                         sizeof (showcases_lbl) / sizeof (gchar *),
-                        showcases_cb);
+                        showcases_cb, gg);
 
 /*
  * Variable scales
@@ -180,15 +184,15 @@ cpanel_parcoords_make () {
 
   opt = gtk_option_menu_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Scale variables (and variable groups) on a common scale, or independently",
      NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, varscale_lbl,
                         sizeof (varscale_lbl) / sizeof (gchar *),
-                        varscale_cb);
+                        varscale_cb, gg);
 
-  gtk_widget_show_all (gg.control_panel[PCPLOT]);
+  gtk_widget_show_all (gg->control_panel[PCPLOT]);
 }
 
 
@@ -198,29 +202,35 @@ cpanel_parcoords_make () {
 
 
 
+/*
+  The useIds indicates whether the callback data should be integers
+  identifying the menu item or the global gg.
+  At present, this is always false.
+  See scatmat_main_menus_make and scatterplot_main_menus_make.
+ */
 void
-parcoords_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func) {
+parcoords_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) {
 
 /*
  * I/O menu
 */
-  gg.app.parcoords_mode_menu = gtk_menu_new ();
+  gg->app.parcoords_mode_menu = gtk_menu_new ();
 
-  CreateMenuItem (gg.app.parcoords_mode_menu, "Parallel Coordinates",
-    "^c", "", NULL, accel_group, func, GINT_TO_POINTER (PCPLOT));
+  CreateMenuItem (gg->app.parcoords_mode_menu, "Parallel Coordinates",
+    "^c", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (PCPLOT) : gg, gg);
 
   /* Add a separator */
-  CreateMenuItem (gg.app.parcoords_mode_menu, NULL,
-    "", "", NULL, NULL, NULL, NULL);
+  CreateMenuItem (gg->app.parcoords_mode_menu, NULL,
+    "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuItem (gg.app.parcoords_mode_menu, "Brush",
-    "^b", "", NULL, accel_group, func, GINT_TO_POINTER (BRUSH));
-  CreateMenuItem (gg.app.parcoords_mode_menu, "Identify",
-    "^i", "", NULL, accel_group, func, GINT_TO_POINTER (IDENT));
-  CreateMenuItem (gg.app.parcoords_mode_menu, "Move Points",
-    "^m", "", NULL, accel_group, func, GINT_TO_POINTER (MOVEPTS));
+  CreateMenuItem (gg->app.parcoords_mode_menu, "Brush",
+    "^b", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
+  CreateMenuItem (gg->app.parcoords_mode_menu, "Identify",
+    "^i", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
+  CreateMenuItem (gg->app.parcoords_mode_menu, "Move Points",
+    "^m", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg);
 
-  gtk_widget_show (gg.app.parcoords_mode_menu);
+  gtk_widget_show (gg->app.parcoords_mode_menu);
 }
 
 /*--------------------------------------------------------------------*/

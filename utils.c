@@ -345,12 +345,12 @@ print_dims (displayd *d) {
 }
 
 void
-print_attachments () {
+print_attachments (ggobid *gg) {
   GList *l;
   GtkTableChild *child;
 
   g_printerr ("attachments:\n");
-  for (l=(GTK_TABLE (gg.current_display->table))->children; l; l=l->next) {
+  for (l=(GTK_TABLE (gg->current_display->table))->children; l; l=l->next) {
     child = (GtkTableChild *) l->data;
     g_printerr (" %d %d, %d %d\n",
       child->left_attach, child->right_attach,
@@ -359,22 +359,22 @@ print_attachments () {
 }
 
 gint
-get_vgroup_cols (gint k, gint *cols) {
+get_vgroup_cols (gint k, gint *cols, ggobid *gg) {
 /*
  * Return all columns in the same vgroup as k
 */
   gint j, ncols = 0;
-  gint groupno = gg.vardata[k].groupid;
+  gint groupno = gg->vardata[k].groupid;
 
-  for (j=0; j<gg.ncols; j++)
-    if (gg.vardata[j].groupid == groupno)
+  for (j=0; j<gg->ncols; j++)
+    if (gg->vardata[j].groupid == groupno)
        cols[ncols++] = j;
 
   return ncols;
 }
 
 gint
-selected_cols_get (gint *cols, gboolean add_vgroups)
+selected_cols_get (gint *cols, gboolean add_vgroups, ggobid *gg)
 {
 /*
  * Figure out which columns are selected.  If (add_vgroups),
@@ -384,17 +384,17 @@ selected_cols_get (gint *cols, gboolean add_vgroups)
   gint groupno;
   gboolean included;
 
-  for (j=0; j<gg.ncols; j++)
-    if (gg.vardata[j].selected)
+  for (j=0; j<gg->ncols; j++)
+    if (gg->vardata[j].selected)
       cols[ncols++] = j;
 
   if (add_vgroups) {
     /*-- now add their fellow vgroup members --*/
-    for (j=0; j<gg.ncols; j++) {
-      groupno = gg.vardata[j].groupid;
+    for (j=0; j<gg->ncols; j++) {
+      groupno = gg->vardata[j].groupid;
       /*-- look for j's fellow group members --*/
-      for (k=0; k<gg.ncols; k++) {
-        if (k != j && gg.vardata[k].groupid == groupno) {
+      for (k=0; k<gg->ncols; k++) {
+        if (k != j && gg->vardata[k].groupid == groupno) {
           /*-- if k is not already in cols, add it */
           included = false;
           for (n=0; n<ncols; n++) {
@@ -417,24 +417,24 @@ selected_cols_get (gint *cols, gboolean add_vgroups)
  * this is how we find out which columns are selected for plotting.
 */
 gint
-plotted_cols_get (gint *cols, gboolean add_vgroups) 
+plotted_cols_get (gint *cols, gboolean add_vgroups, ggobid *gg) 
 {
   gint mode = mode_get ();
   gint j, ncols;
-  splotd *sp = gg.current_splot;
+  splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
-  for (j=0; j<gg.ncols; j++) {
+  for (j=0; j<gg->ncols; j++) {
     /*-- if j is plotted in the current splot ... --*/
     switch (display->displaytype) {
       case scatterplot:
         switch (mode) {
           case P1PLOT:
-            vartable_select_var (sp->p1dvar, true);
+            vartable_select_var (sp->p1dvar, true, gg);
             break;
           case XYPLOT:
-            vartable_select_var (sp->xyvars.x, true);
-            vartable_select_var (sp->xyvars.y, true);
+            vartable_select_var (sp->xyvars.x, true, gg);
+            vartable_select_var (sp->xyvars.y, true, gg);
             break;
         }
         break;
@@ -445,24 +445,24 @@ plotted_cols_get (gint *cols, gboolean add_vgroups)
     }
   }
 
-  ncols = selected_cols_get (cols, add_vgroups);
+  ncols = selected_cols_get (cols, add_vgroups, gg);
 
   /*
    * Having highlighted the plotted variables in the variable table
    * we now deselect them
   */
-  vartable_unselect_all ();
+  vartable_unselect_all (gg);
 
   return ncols;
 }
 
 gint
-address_check () 
+address_check (ggobid *gg) 
 {
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %d nseg %d rowlab %s jitfac %f\n",
-    gg.data_mode, (gint) gg.world.data[0][0], gg.nsegments,
-    gg.rowlab[0], gg.jitter_factor);
+    gg->data_mode, (gint) gg->world.data[0][0], gg->nsegments,
+    gg->rowlab[0], gg->jitter_factor);
 
   return 1;
 }

@@ -27,13 +27,16 @@ gint myrnd (gint);
 gint
 psort (const void *arg1, const void *arg2)
 {
+extern ggobid *ggobi_get(int which);
+ggobid *gg = ggobi_get(0);
+
   gint val = 0;
   gint *x1 = (gint *) arg1;
   gint *x2 = (gint *) arg2;
 
-  if (gg.app.gy[*x1] < gg.app.gy[*x2])
+  if (gg->app.gy[*x1] < gg->app.gy[*x2])
     val = -1;
-  else if (gg.app.gy[*x1] > gg.app.gy[*x2])
+  else if (gg->app.gy[*x1] > gg->app.gy[*x2])
     val = 1;
 
   return (val);
@@ -146,7 +149,7 @@ next25 (gint *tt, gint *bigt, gint *smallt)
 }
 
 void
-textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
+textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages, ggobid *gg)
 {
 /*
  * Calculate a texturing shft vector based on data yy
@@ -179,13 +182,13 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
  * gy is needed solely for the psort routine:  psort is used by
  * qsort to put an index vector in the order that yy will assume.
 */
-  gg.app.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
+  gg->app.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
   xx = (gfloat *) g_malloc (ny * sizeof (gfloat));
 
   for (i=0; i<ny; i++)
   {
     indx[i] = i;
-    gg.app.gy[i] = yy[i];
+    gg->app.gy[i] = yy[i];
   }
 
   qsort ((void *) indx, (size_t) ny, sizeof (gint), psort);
@@ -225,7 +228,7 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
 
   if (stages<=1) {
     g_free ((gpointer) indx);
-    g_free ((gpointer) gg.app.gy);
+    g_free ((gpointer) gg->app.gy);
     g_free ((gpointer) xx);
     return;
   }
@@ -324,7 +327,7 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
     shft[i] = xx[i];
 
   g_free ((gpointer) indx);
-  g_free ((gpointer) gg.app.gy);
+  g_free ((gpointer) gg->app.gy);
   g_free ((gpointer) xx);
 
   return;

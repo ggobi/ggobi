@@ -16,6 +16,7 @@
 static gint
 splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 {
+  ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = (displayd *) sp->displayptr; 
   cpaneld *cpanel = &display->cpanel;
   gfloat ftmp;
@@ -35,7 +36,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
    * matrix are correctly initialized.  (And I don't know why, either)
   */
   if (sp->pixmap0 == NULL) {  /*-- ie, splot being initialized --*/
-    splot_world_to_plane (cpanel, sp);
+    splot_world_to_plane (cpanel, sp, gg);
   }
 
   /*-- Create new backing pixmaps of the appropriate size --*/
@@ -58,10 +59,10 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   sp->max.x = w->allocation.width;
   sp->max.y = w->allocation.height;
 
-  splot_plane_to_screen (display, cpanel, sp);
+  splot_plane_to_screen (display, cpanel, sp, gg);
 
   if (mode_get () == BRUSH)
-    assign_points_to_bins ();
+    assign_points_to_bins (gg);
 
   sp->redraw_style = FULL;
   gtk_widget_queue_draw (sp->da);
@@ -74,6 +75,7 @@ static gint
 splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
 {
   gboolean retval = true;
+  ggobid *gg = GGobiFromSPlot(sp);
 
   /*-- sanity checks --*/
   if (sp->pixmap0 == NULL || sp->pixmap1 == NULL)
@@ -81,7 +83,7 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
   if (w->allocation.width == 1 || w->allocation.height == 1)
     return retval;
 
-  splot_redraw (sp, sp->redraw_style);
+  splot_redraw (sp, sp->redraw_style, gg);
 
   return retval;
 }
@@ -144,7 +146,7 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
 }
 
 void
-splot_set_current (splotd *sp, gboolean state) {
+splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
 /*
  * Turn on or off the event handlers in sp
 */
@@ -153,8 +155,8 @@ splot_set_current (splotd *sp, gboolean state) {
     cpaneld *cpanel = &display->cpanel;
 
     sp_event_handlers_toggle (sp, state);
-    mode_activate (sp, cpanel->mode, state);
-    mode_submenus_activate (sp, cpanel->mode, state);
+    mode_activate (sp, cpanel->mode, state, gg);
+    mode_submenus_activate (sp, cpanel->mode, state, gg);
   }
 }
 
@@ -162,23 +164,24 @@ splot_set_current (splotd *sp, gboolean state) {
 static gint
 splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+  ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = (displayd *) sp->displayptr; 
-  splotd *sp_prev = gg.current_splot;
+  splotd *sp_prev = gg->current_splot;
 
   if (sp != sp_prev) {
 
-    splot_set_current (sp_prev, off);
+    splot_set_current (sp_prev, off, gg);
 
-    if (gg.current_display != display)
-      display_set_current (display);  /* old one off, new one on */
+    if (gg->current_display != display)
+      display_set_current (display, gg);  /* old one off, new one on */
 
-    gg.current_splot = sp;
+    gg->current_splot = sp;
 
     /* add border to current_splot */
     sp->redraw_style = QUICK;
     gtk_widget_queue_draw (sp->da);
 
-    splot_set_current (sp, on);
+    splot_set_current (sp, on, gg);
 
     /* remove border from the previous splot */
     sp_prev->redraw_style = QUICK;
@@ -193,9 +196,9 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 /* --------------------------------------------------------------- */
 
 void
-splot_alloc (splotd *sp, displayd *display) {
-  gint nr = gg.nrows;
-  gint nl = gg.nsegments;
+splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
+  gint nr = gg->nrows;
+  gint nl = gg->nsegments;
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
@@ -226,15 +229,15 @@ splot_alloc (splotd *sp, displayd *display) {
 }
 
 void
-splot_segments_realloc (splotd *sp) {
+splot_segments_realloc (splotd *sp, ggobid *gg) {
   sp->segments = (GdkSegment *) g_realloc ((gpointer) sp->segments,
-    gg.nsegments * sizeof (GdkSegment));
+    gg->nsegments * sizeof (GdkSegment));
   sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
-    gg.nsegments * sizeof (GdkSegment));
+    gg->nsegments * sizeof (GdkSegment));
 }
 
 void
-splot_free (splotd *sp, displayd *display) {
+splot_free (splotd *sp, displayd *display, ggobid *gg) {
 
   gtk_widget_hide (sp->da);
 
@@ -275,7 +278,7 @@ splot_dimension_set(splotd* sp, gint width, gint height)
 }
 
 splotd *
-splot_new (displayd *display, gint width, gint height) {
+splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   splotd *sp = (splotd *) g_malloc (sizeof (splotd));
 
 /*
@@ -319,7 +322,7 @@ splot_new (displayd *display, gint width, gint height) {
  * Initialize the data portion of the splot object
 */
 
-  splot_alloc (sp, display);
+  splot_alloc (sp, display, gg);
 
   sp->displayptr = (gpointer) display;
   sp->pixmap0 = NULL;
@@ -350,7 +353,7 @@ splot_get_dimensions (splotd *sp, gint *width, gint *height) {
 /*----------------------------------------------------------------------*/
 
 void
-splot_world_to_plane (cpaneld *cpanel, splotd *sp)
+splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 /*
  * project the data from world_data[],
  * the data expressed in 'world coordinates,' to planar[], the
@@ -365,17 +368,17 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp)
       switch (cpanel->projection) {
         case P1PLOT:
           p1d_reproject (sp,
-            (display->missing_p) ? gg.missing_world.data : gg.world.data);
+            (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
           break;
 
         case XYPLOT:
           xy_reproject (sp,
-            (display->missing_p) ? gg.missing_world.data : gg.world.data);
+            (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
           break;
 
         case TOUR2D:
           tour_reproject (sp,
-            (display->missing_p) ? gg.missing_world.data : gg.world.data);
+            (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
           break;
       }
       break;
@@ -384,22 +387,22 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp)
 
       if (sp->p1dvar == -1)
         xy_reproject (sp,
-          (display->missing_p) ? gg.missing_world.data : gg.world.data);
+          (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
       else
         p1d_reproject (sp,
-          (display->missing_p) ? gg.missing_world.data : gg.world.data);
+          (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
       break;
 
     case parcoords:
       p1d_reproject (sp,
-        (display->missing_p) ? gg.missing_world.data : gg.world.data);
+        (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
       break;
   }
 }
 
 
 void
-splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp)
+splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp, ggobid *gg)
 /*
  * Use the data in projection coordinates and rescale it to the
  * dimensions of the current plotting window, writing it into screen.
@@ -424,8 +427,8 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp)
   /*
    * Calculate new coordinates.
   */
-  for (k=0; k<gg.nrows_in_plot; k++) {
-    i = gg.rows_in_plot[k];
+  for (k=0; k<gg->nrows_in_plot; k++) {
+    i = gg->rows_in_plot[k];
 
     /*-- scale from world to plot window --*/
     sp->screen[i].x = (gint) ((sp->planar[i].x * sp->iscale.x) >> EXP1);
@@ -437,7 +440,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp)
   }
 
   if (display->displaytype == parcoords) {
-    sp_whiskers_make (sp, display);
+    sp_whiskers_make (sp, display, gg);
   }
 }
 
@@ -451,7 +454,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp)
  * without have any impact on the pipeline data structures.
 */
 void
-splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr, fcoords *tfd)
+splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr, fcoords *tfd, ggobid *gg)
 {
   lcoords planar, world;
   gfloat precis = PRECISION1;
@@ -476,11 +479,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr, fcoords *tfd)
   switch (cpanel->projection) {
     case P1PLOT:
       if (display->missing_p) {
-        max = gg.missing_lim.max;
-        min = gg.missing_lim.min;
+        max = gg->missing_lim.max;
+        min = gg->missing_lim.min;
       } else {
-        max = gg.vardata[sp->p1dvar].lim.max;
-        min = gg.vardata[sp->p1dvar].lim.min;
+        max = gg->vardata[sp->p1dvar].lim.max;
+        min = gg->vardata[sp->p1dvar].lim.min;
       }
       rdiff = max - min;
 
@@ -502,11 +505,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr, fcoords *tfd)
     case XYPLOT:
       /* x */
       if (display->missing_p) {
-        max = gg.missing_lim.max;
-        min = gg.missing_lim.min;
+        max = gg->missing_lim.max;
+        min = gg->missing_lim.min;
       } else {
-        max = gg.vardata[sp->xyvars.x].lim.max;
-        min = gg.vardata[sp->xyvars.x].lim.min;
+        max = gg->vardata[sp->xyvars.x].lim.max;
+        min = gg->vardata[sp->xyvars.x].lim.min;
       }
       rdiff = max - min;
       world.x = planar.x;
@@ -516,11 +519,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr, fcoords *tfd)
 
       /* y */
       if (display->missing_p) {
-        max = gg.missing_lim.max;
-        min = gg.missing_lim.min;
+        max = gg->missing_lim.max;
+        min = gg->missing_lim.min;
       } else {
-        max = gg.vardata[sp->xyvars.y].lim.max;
-        min = gg.vardata[sp->xyvars.y].lim.min;
+        max = gg->vardata[sp->xyvars.y].lim.max;
+        min = gg->vardata[sp->xyvars.y].lim.min;
       }
       rdiff = max - min;
       world.y = planar.y;
@@ -557,13 +560,13 @@ splot_screen_to_plane (splotd *sp, gint pt, lcoords *eps,
 }
 
 void
-splot_plane_to_world (cpaneld *cpanel, splotd *sp, gint ipt, lcoords *eps) 
+splot_plane_to_world (cpaneld *cpanel, splotd *sp, gint ipt, lcoords *eps, ggobid *gg) 
 { 
 
   switch (cpanel->projection) {
     case XYPLOT:
-      gg.world.data[ipt][sp->xyvars.x] = sp->planar[ipt].x;
-      gg.world.data[ipt][sp->xyvars.y] = sp->planar[ipt].y;
+      gg->world.data[ipt][sp->xyvars.x] = sp->planar[ipt].x;
+      gg->world.data[ipt][sp->xyvars.y] = sp->planar[ipt].y;
       break;
 
     default:
@@ -574,11 +577,11 @@ splot_plane_to_world (cpaneld *cpanel, splotd *sp, gint ipt, lcoords *eps)
 
 void
 splot_reverse_pipeline (cpaneld *cpanel, splotd *sp, gint ipt,
-                        gboolean horiz, gboolean vert)
+                        gboolean horiz, gboolean vert, ggobid *gg)
 {
   lcoords eps;
 
   splot_screen_to_plane (sp, ipt, &eps, horiz, vert);
-  splot_plane_to_world (cpanel, sp, ipt, &eps);
+  splot_plane_to_world (cpanel, sp, ipt, &eps, gg);
 }
 

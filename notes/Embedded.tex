@@ -147,7 +147,11 @@ routine in whatever manner we wish.
 
 
 
+
+
 Example for smoothing,identify, etc.
+Transforming data.
+
 
 
 The function that is registered can be a closure
@@ -204,6 +208,65 @@ There are still a lot of statics to be dealt with.
 
 We need to remove the macros from ggobi.h as we go to
 make things simpler. Just need to find the time.
+
+(This is just getting it down there on ``paper''....)
+
+
+
+One of the important steps in introducing the potential for having
+multiple instances of the ggobid structure in existence in an
+application is the removal of global variables.  This involves passing
+a reference to the particular ggobid object to each routine that needs
+it. (This is very similar to threading.)  This is typically a tedious
+task, but not very challenging.  (Remove the global variable and
+compile to identify which routines need to have it explicitly passed
+as an argument.  Then change their signatures and recompile.  Iterate
+until messages are gone.)
+
+In an event driven framework, there is an added challenge.  The
+callbacks invoked by the underlying widget toolkit have predefined
+signatures as defined in the implementation of the toolkit.  Hence we
+cannot add an extra argument.  Instead, we must be able to have the
+ggobid object passed to it or computed from within that routine.
+
+In many cases, the user-level data that can be registered with a
+widget to be passed to the routine is not used.  In such cases, we
+specify that the reference to the ggobid object should be supplied as
+that argument.
+
+In other cases, the user-level data is already being used.  There are
+two obvious possibilities for handling these situations.  Firstly, we
+can store the reference to the ggobid object in such a way that we can
+uniquely identify it and that this works for different ggobid
+instances. A simple strategy is to assign it to user-level data
+maintained by a widget.  When the callback is invoked, the source of
+the event (a widget) is supplied as an argument. From that, we can
+retrieve the particular ggobid reference associated with that
+interface. Rather than setting the storing the value in each widget,
+it is convenient to store it only for the top-level window that houses
+each widget. In this way, it is in a single place for each widget
+hierarchy.
+
+An alternative approach is to change the type of the user-level data.
+We would allocate a structure that contained the current data and the
+reference to ggobid and specify this as the user-level data argument.
+For example, suppose we current pass an integer as the user-leve data
+to an callback. This is the case for many menu items.  Then we would
+have a structure
+\begin{verbatim}
+typedef struct {
+  int value;
+  ggobid *gg_reference;
+} IntegerCallbackData;
+\end{verbatim}
+When registering the routine, we would allocate one of these and
+fill in its fields, and then specify it as the user-level argument.
+
+
+This has the potential of being faster than retrieving the value from
+a widget's root window. If speed becomes an issue (as in the tour
+where there may be a large number of events/callbacks) we can
+implement this approach.
 
 
 

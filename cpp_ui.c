@@ -29,7 +29,7 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 
 void
-ctourpp_window_open (void) {
+ctourpp_window_open (ggobid *gg) {
   GtkWidget *hbox, *vbox, *vbc, *frame, *tgl, *entry;
   GtkWidget *da, *label, *hb;
 
@@ -79,7 +79,7 @@ ctourpp_window_open (void) {
  * Optimize toggle
 */
     tgl = gtk_check_button_new_with_label ("Optimize");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Guide the tour using projection pursuit optimization or tour passively",
       NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
@@ -99,7 +99,7 @@ ctourpp_window_open (void) {
 
     entry = gtk_entry_new_with_max_length (32);
     gtk_entry_set_editable (GTK_ENTRY (entry), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), entry,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
       "The value of the projection pursuit index for the current projection",
       NULL);
     gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);

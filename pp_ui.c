@@ -165,7 +165,7 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 
 void
-tour2dpp_window_open (void) {
+tour2dpp_window_open (ggobid *gg) {
   GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *btn, *tgl, *entry;
   GtkWidget *da, *label, *hb, *opt;
 
@@ -215,7 +215,7 @@ tour2dpp_window_open (void) {
  * Optimize toggle
 */
     tgl = gtk_check_button_new_with_label ("Optimize");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Guide the tour using projection pursuit optimization or tour passively",
       NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
@@ -235,7 +235,7 @@ tour2dpp_window_open (void) {
 
     entry = gtk_entry_new_with_max_length (32);
     gtk_entry_set_editable (GTK_ENTRY (entry), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), entry,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
       "The value of the projection pursuit index for the current projection",
       NULL);
     gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);
@@ -253,12 +253,12 @@ tour2dpp_window_open (void) {
 
     opt = gtk_option_menu_new ();
     gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Set the projection pursuit index", NULL);
     gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
     populate_option_menu (opt, func_lbl,
                           sizeof (func_lbl) / sizeof (gchar *),
-                          func_cb);
+                          func_cb, gg);
 
     param_vb = gtk_vbox_new (false, 3);
     gtk_container_set_border_width (GTK_CONTAINER (param_vb), 4);
@@ -272,7 +272,7 @@ tour2dpp_window_open (void) {
                                                       1.0, 30.0,
                                                       1.0, 1.0, 0.0);
     param_scale = gtk_hscale_new (GTK_ADJUSTMENT (param_adj));
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), param_scale,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), param_scale,
       "Set number of terms in the expansion for some indices; bandwidth for others", NULL);
     gtk_range_set_update_policy (GTK_RANGE (param_scale),
                                  GTK_UPDATE_CONTINUOUS);
@@ -297,7 +297,7 @@ tour2dpp_window_open (void) {
  * New bitmap button
 */
     btn = gtk_button_new_with_label ("New bitmap");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Add a bitmap below the plot containing the current scatterplot projection", NULL);
     gtk_box_pack_start (GTK_BOX (vb), btn, false, false, 1);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
@@ -307,7 +307,7 @@ tour2dpp_window_open (void) {
  * Return to bitmap toggle
 */
     tgl = gtk_check_button_new_with_label ("Return to bitmap");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Click left on a bitmap to force the tour to return to this view and pause",
       NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
@@ -319,7 +319,7 @@ tour2dpp_window_open (void) {
  * Record bitmap toggle
 */
     tgl = gtk_check_button_new_with_label ("Record bitmap");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Click left on a bitmap to save it in a file, in tour history format",
       NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",

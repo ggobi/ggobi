@@ -24,7 +24,7 @@
 GtkWidget *CreateMenuItem (GtkWidget *menu,
   char *szName, char *szAccel, char *szTip,
   GtkWidget *win_main, GtkAccelGroup *accel_group,
-  GtkSignalFunc func, gpointer data)
+  GtkSignalFunc func, gpointer data, ggobid *gg)
 {
     GtkWidget *menuitem;
 
@@ -33,6 +33,8 @@ GtkWidget *CreateMenuItem (GtkWidget *menu,
         menuitem = gtk_menu_item_new_with_label (szName);
         gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
                     GTK_SIGNAL_FUNC (func), data);
+
+   GGobi_widget_set(GTK_WIDGET(menuitem), gg,  true);
     } else {
         /* --- Create a separator --- */
         menuitem = gtk_menu_item_new ();
@@ -66,7 +68,7 @@ GtkWidget *CreateMenuItem (GtkWidget *menu,
 
     /* --- If there was a tool tip --- */
     if (szTip && strlen (szTip))
-        gtk_tooltips_set_tip (gg.tips, menuitem, szTip, NULL);
+        gtk_tooltips_set_tip (gg->tips, menuitem, szTip, NULL);
 
     return (menuitem);
 }
@@ -94,12 +96,14 @@ GtkWidget *CreateMenuCheck (displayd *display,
                             gchar *szName,
                             GtkSignalFunc func,
                             gpointer data,
-                            gboolean state)
+                            gboolean state, ggobid *gg)
 {
     GtkWidget *menuitem;
 
     /* --- Create menu item --- */
     menuitem = gtk_check_menu_item_new_with_label (szName);
+
+    GGobi_widget_set(GTK_WIDGET(menuitem), gg, true);
 
     /* --- Attach the display pointer --- */
     gtk_object_set_data (GTK_OBJECT (menuitem), "display", (gpointer) display);
@@ -175,7 +179,7 @@ get_main_menu (GtkItemFactoryEntry menu_items[],
 
   /* This function generates the menu items. Pass the item factory,
      the number of items in the array, the array itself, and any
-     callback data for the the menu items. */
+     callback data for the menu items. */
   gtk_item_factory_create_items (item_factory, nmenu_items, menu_items, cbdata);
 
   /* Attach the new accelerator group to the window. */
@@ -188,7 +192,7 @@ get_main_menu (GtkItemFactoryEntry menu_items[],
 
 void
 populate_option_menu (GtkWidget *opt_menu, gchar **lbl, gint nitems,
-  GtkSignalFunc func)
+  GtkSignalFunc func, ggobid *gg)
 {
   GtkWidget *menu = gtk_menu_new ();
   GtkWidget *menuitem;
@@ -202,7 +206,10 @@ populate_option_menu (GtkWidget *opt_menu, gchar **lbl, gint nitems,
 
     gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
       GTK_SIGNAL_FUNC (func), GINT_TO_POINTER (i));
+
+   GGobi_widget_set(menuitem, gg, true);
   }
+
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_menu), menu);
 }

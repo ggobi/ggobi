@@ -38,7 +38,7 @@ scatmat_cols_print (displayd *display) {
 
 static void
 scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
-  GtkSignalFunc func, GtkWidget *mbar)
+  GtkSignalFunc func, GtkWidget *mbar, ggobid *gg)
 {
   GtkWidget *options_menu, *link_menu;
   GtkWidget *submenu;
@@ -50,18 +50,18 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
   options_menu = gtk_menu_new ();
 
   CreateMenuCheck (display, options_menu, "Show points",
-    func, GINT_TO_POINTER (DOPT_POINTS), on);
+    func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   CreateMenuCheck (display, options_menu, "Show lines (undirected)",
-    func, GINT_TO_POINTER (DOPT_SEGS_U), off);
+    func, GINT_TO_POINTER (DOPT_SEGS_U), off, gg);
   CreateMenuCheck (display, options_menu, "Show lines (directed)",
-    func, GINT_TO_POINTER (DOPT_SEGS_D), off);
+    func, GINT_TO_POINTER (DOPT_SEGS_D), off, gg);
   if (!display->missing_p)
     CreateMenuCheck (display, options_menu, "Show missings",
-      func, GINT_TO_POINTER (DOPT_MISSINGS), on);
+      func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
   CreateMenuCheck (display, options_menu, "Show gridlines",
-    func, GINT_TO_POINTER (DOPT_GRIDLINES), off);
+    func, GINT_TO_POINTER (DOPT_GRIDLINES), off, gg);
   CreateMenuCheck (display, options_menu, "Show axes",
-    func, GINT_TO_POINTER (DOPT_AXES), on);
+    func, GINT_TO_POINTER (DOPT_AXES), on, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
   submenu_append (submenu, mbar);
@@ -74,7 +74,7 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
   link_menu = gtk_menu_new ();
 
   CreateMenuCheck (display, link_menu, "Link to other plots",
-    func, GINT_TO_POINTER (DOPT_LINK), on);
+    func, GINT_TO_POINTER (DOPT_LINK), on, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), link_menu);
   submenu_append (submenu, mbar);
@@ -83,7 +83,7 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
 
 
 displayd *
-scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols) 
+scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   GtkWidget *mbar;
@@ -95,12 +95,9 @@ scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols)
   displayd *display;
 
   if(sub_plots == NULL) {
-    display = (displayd *) g_malloc (sizeof (displayd));
-    display->displaytype = scatmat;
-    display->missing_p = missing_p;
-
-    display->options = DefaultDisplayOptions;
-    scatmat_nrows = scatmat_ncols = MIN (gg.ncols, MAXNVARS);
+    display = display_alloc_init(scatmat, missing_p, gg);
+    /* What about the p1d_orientation here? */
+    scatmat_nrows = scatmat_ncols = MIN (gg->ncols, MAXNVARS);
   } else { 
     scatmat_nrows = numRows;
     scatmat_ncols = numCols;
@@ -109,14 +106,7 @@ scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols)
 
   scatmat_cpanel_init (&display->cpanel);
 
-  display->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_object_set_data (GTK_OBJECT (display->window),
-                       "displayd",
-                       (gpointer) display);
-  gtk_window_set_policy (GTK_WINDOW (display->window), true, true, false);
-  gtk_container_set_border_width (GTK_CONTAINER (display->window), 5);
-  gtk_signal_connect (GTK_OBJECT (display->window), "delete_event",
-                      GTK_SIGNAL_FUNC (display_delete_cb), (gpointer) display);
+  display_window_init(display, 5, gg);
 
 /*
  * Add the main menu bar
@@ -134,7 +124,7 @@ scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols)
    * add the Display Options and Link menus another way
   */
   scatmat_display_menus_make (display, scatmat_accel_group,
-    display_options_cb, mbar);
+                               display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 /*
@@ -167,7 +157,7 @@ scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols)
   for (i=0; i<scatmat_ncols; i++) {
     for (j=0; j<scatmat_nrows; j++, ctr++) {
       if(sub_plots == NULL) {
-        sp = splot_new (display, width, height);
+        sp = splot_new (display, width, height, gg);
         sp->xyvars.x = i; 
         sp->xyvars.y = j; 
         sp->p1dvar = (i == j) ? j : -1;
@@ -204,7 +194,7 @@ scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols)
 
 gboolean
 scatmat_varsel (cpaneld *cpanel, splotd *sp,
-  gint jvar, gint *jvar_prev, gint button, gboolean alt_mod)
+  gint jvar, gint *jvar_prev, gint button, gboolean alt_mod, ggobid *gg)
 {
   gboolean redraw = true;
   gboolean delete = false;
@@ -214,7 +204,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
   GtkWidget *da;
   gfloat ratio = 1.0;
   GtkTableChild *child;
-  displayd *display = gg.current_display;
+  displayd *display = gg->current_display;
   gint scatmat_ncols = g_list_length (display->scatmat_cols);
   gint scatmat_nrows = g_list_length (display->scatmat_rows);
 
@@ -231,7 +221,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
     child = (GtkTableChild *) l->data;
     da = child->widget;
     s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
-    if (s == gg.current_splot) {
+    if (s == gg->current_splot) {
       sprow = child->top_attach;
       spcol = child->left_attach;
     }
@@ -252,7 +242,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
     }
   }
 
-  splot_get_dimensions (gg.current_splot, &width, &height);
+  splot_get_dimensions (gg->current_splot, &width, &height);
 
 /*
  * If the alt key is pressed and jvar is plotted, delete a
@@ -302,9 +292,9 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
                                            (gpointer) s);
           gtk_container_remove (GTK_CONTAINER (display->table), da);
 
-          if (s == gg.current_splot)
+          if (s == gg->current_splot)
             sp_event_handlers_toggle (s, off);
-          splot_free (s, display);
+          splot_free (s, display, gg);
         } else {
           gtk_widget_set_usize (da, -1, -1);
           gtk_widget_set_usize (da, width, height);
@@ -331,7 +321,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
  * I'm not sure this is necessary -- am I checking whether the
  * gg.current_splot was deleted?
 */
-      gg.current_splot = (splotd *) g_list_nth_data (display->splots, 0);
+      gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
     }
     redraw = false;
 
@@ -434,7 +424,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
                                                col);
         scatmat_cols_print (display);
         for (k=0; k<scatmat_nrows; k++) {
-          sp_new = splot_new (display, width, height);
+          sp_new = splot_new (display, width, height, gg);
 
           /* which variable is plotting in the k'th intersecting row? */
           rowvar = GPOINTER_TO_INT (g_list_nth_data (display->scatmat_rows, k));
@@ -462,7 +452,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
                                                row);
         scatmat_rows_print (display);
         for (k=0; k<scatmat_nrows; k++) {
-          sp_new = splot_new (display, width, height);
+          sp_new = splot_new (display, width, height, gg);
 
           sp_new->p1dvar = jvar;  /* placeholder */
 
@@ -479,16 +469,16 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
           gtk_widget_show (sp_new->da);
 
           /* We don't care where, I think */
-          display->splots = g_list_append (gg.current_display->splots,
+          display->splots = g_list_append (gg->current_display->splots,
             (gpointer) sp_new);
         }
       }
 
 
-      gtk_table_resize (GTK_TABLE (gg.current_display->table),
+      gtk_table_resize (GTK_TABLE (gg->current_display->table),
                         scatmat_nrows, scatmat_ncols);
 
-      gg.current_splot = sp_new;
+      gg->current_splot = sp_new;
       redraw = true;
     }
   }

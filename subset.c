@@ -49,6 +49,7 @@ subset_clear (ggobid *gg) {
   for (i=0; i<gg->nrows; i++)
     gg->sampled[i] = false;
 
+
   for (i=0; i<gg->nrgroups; i++) {
     rgid = gg->rgroup_ids[i];
     gg->rgroups[rgid].sampled = false;
@@ -63,9 +64,9 @@ subset_apply (gboolean rescale_p, ggobid *gg) {
   rows_in_plot_set (gg);
 
   if (rescale_p)
-    vardata_lim_update ();  /*-- ?? --*/
+    vardata_lim_update (gg);  /*-- ?? --*/
 
-  tform_to_world ();
+  tform_to_world (gg);
 
 /*
   if (gg->is_pp) {
@@ -75,7 +76,7 @@ subset_apply (gboolean rescale_p, ggobid *gg) {
   }
 */
 
-  displays_tailpipe (REDISPLAY_ALL);
+  displays_tailpipe (REDISPLAY_ALL, gg);
 
   /*-- for each plot?  for each plot in brushing mode? 
    * after the new screen coords are found --*/
@@ -104,6 +105,7 @@ subset_random (gint n, ggobid *gg) {
   gint t, m;
   gboolean doneit = false;
   gfloat rrand;
+
   gint top = (gg->nrgroups > 0) ? gg->nrgroups : gg->nrows;
 
   subset_clear (gg);
@@ -158,6 +160,7 @@ subset_everyn (gint estart, gint estep, ggobid *gg)
 {
   gint i;
   gint top = (gg->nrgroups > 0) ? gg->nrgroups : gg->nrows;
+
   gboolean doneit = false;
 
   top -= 1;
@@ -189,6 +192,7 @@ subset_sticky (ggobid *gg)
   GSList *l;
   gint top = (gg->nrgroups > 0) ? gg->nrgroups : gg->nrows;
 
+
   if (g_slist_length (gg->sticky_ids) > 0) {
 
     subset_clear (gg);
@@ -208,6 +212,7 @@ subset_rowlab (gchar *rowlab, ggobid *gg)
 {
   gint i;
   gint top = (gg->nrgroups > 0) ? gg->nrgroups : gg->nrows;
+
 
   subset_clear (gg);
 

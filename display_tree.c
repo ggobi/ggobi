@@ -35,7 +35,7 @@
   here from display_new() and display_free(), respectively.
  */
 GtkTree*
-plot_tree_display()
+plot_tree_display(ggobid *gg)
 {
  GList *dlist;
  displayd *display;
@@ -50,7 +50,7 @@ plot_tree_display()
     the entire contents of the tree and start rebuilding
     with the current model.
   */
- if(gg.app.display_tree.tree == NULL) {
+ if(gg->app.display_tree.tree == NULL) {
   plot_tree_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(plot_tree_window), "GGobi Displays");
  } else {
@@ -62,7 +62,7 @@ plot_tree_display()
    This can attempt to remove the contents of the window,
    and allow them to be rebuilt so as to be consistent with the
    current display list.
-  tree = gg.display_tree.tree;
+  tree = gg->display_tree.tree;
   gtk_container_remove(GTK_CONTAINER(gtk_widget_get_ancestor(plot_tree_window, GTK_TYPE_WINDOW)), tree);
   */
  }
@@ -70,9 +70,9 @@ plot_tree_display()
   tree = gtk_tree_new();
 
   numItems = 0;
-  for (dlist = gg.displays; dlist; dlist = dlist->next, numItems++) {
+  for (dlist = gg->displays; dlist; dlist = dlist->next, numItems++) {
     display = (displayd *) dlist->data;
-    display_add_tree(display, numItems, tree);
+    display_add_tree(display, numItems, tree, gg);
   }
 
   /*
@@ -84,17 +84,17 @@ plot_tree_display()
 
 
   gtk_signal_connect (GTK_OBJECT (plot_tree_window), "delete_event",
-                      GTK_SIGNAL_FUNC (display_tree_delete_cb), NULL);
+                      GTK_SIGNAL_FUNC (display_tree_delete_cb), gg);
 
- gg.app.display_tree.tree = tree;
- gg.app.display_tree.numItems = numItems;
+ gg->app.display_tree.tree = tree;
+ gg->app.display_tree.numItems = numItems;
 
  return(GTK_TREE( tree ));
 }
 
 
 GtkWidget *
-display_add_tree(displayd *display, int entry, GtkWidget *tree)
+display_add_tree(displayd *display, int entry, GtkWidget *tree, ggobid *gg)
 {
   GtkWidget *item, *subTree;
 
@@ -108,7 +108,7 @@ gtk_signal_connect (GTK_OBJECT(item), "select",
     gtk_widget_show(item);
 
 
-    subTree = splot_subtree_create(display);
+    subTree = splot_subtree_create(display, gg);
     gtk_tree_set_view_mode (GTK_TREE(subTree), GTK_TREE_VIEW_ITEM);
     gtk_tree_item_set_subtree(GTK_TREE_ITEM( item ), subTree);
 
@@ -120,10 +120,10 @@ gtk_signal_connect (GTK_OBJECT(item), "select",
   Called when the display tree window is closed.
  */
 void
-display_tree_delete_cb(GtkWidget *w, GdkEvent *event, GtkWidget *display) 
+display_tree_delete_cb(GtkWidget *w, GdkEvent *event, ggobid *gg) 
 {
- gg.app.display_tree.tree = NULL;
- gg.app.display_tree.numItems = -1;
+ gg->app.display_tree.tree = NULL;
+ gg->app.display_tree.numItems = -1;
 }
 
 
@@ -135,7 +135,7 @@ display_tree_delete_cb(GtkWidget *w, GdkEvent *event, GtkWidget *display)
  */
 
 GtkWidget *
-splot_subtree_create(displayd *display)
+splot_subtree_create(displayd *display, ggobid *gg)
 {
  GList *slist;
  splotd *sp;
@@ -151,7 +151,7 @@ gtk_signal_connect (GTK_OBJECT(tree), "select_child",
       /* Here do the plots within the display. */
     for(slist = display->splots; slist ; slist = slist->next, ctr++) {
         sp = slist->data;
-        item = gtk_tree_item_new_with_label(splot_tree_label(sp, ctr, display->displaytype));
+        item = gtk_tree_item_new_with_label(splot_tree_label(sp, ctr, display->displaytype, gg));
 gtk_signal_connect (GTK_OBJECT(item), "select",
                              GTK_SIGNAL_FUNC(display_tree_splot_child_select), sp);
         gtk_widget_show(item);
@@ -193,21 +193,21 @@ display_tree_label(displayd *display)
   type `type'.
  */
 char *
-splot_tree_label(splotd *splot, int ctr, enum displaytyped type)
+splot_tree_label(splotd *splot, int ctr, enum displaytyped type, ggobid *gg)
 {
  char *buf;
  int n;
  switch(type) {
     case scatterplot:
     case scatmat:
-      n = strlen(gg.vardata[splot->xyvars.x].collab) + strlen(gg.vardata[splot->xyvars.y].collab) + 5;
+      n = strlen(gg->vardata[splot->xyvars.x].collab) + strlen(gg->vardata[splot->xyvars.y].collab) + 5;
       buf = (char*) malloc(n* sizeof(char*));
-      sprintf(buf, "%s v %s",gg.vardata[splot->xyvars.x].collab, gg.vardata[splot->xyvars.y].collab);
+      sprintf(buf, "%s v %s",gg->vardata[splot->xyvars.x].collab, gg->vardata[splot->xyvars.y].collab);
      break;
     case parcoords:
-      n = strlen(gg.vardata[splot->p1dvar].collab);
+      n = strlen(gg->vardata[splot->p1dvar].collab);
       buf = (char*) malloc(n* sizeof(char*));
-      sprintf(buf,"%s",gg.vardata[splot->p1dvar].collab);
+      sprintf(buf,"%s",gg->vardata[splot->p1dvar].collab);
      break;
  }
 
@@ -220,9 +220,9 @@ splot_tree_label(splotd *splot, int ctr, enum displaytyped type)
    the display and plot hierarchy.
  */
 void
-show_display_tree (gpointer cbd, guint action, GtkWidget *widget)
+show_display_tree (ggobid *gg, GtkWidget *widget)
 {
-  plot_tree_display();
+  plot_tree_display(gg);
 }
 
 
@@ -231,7 +231,7 @@ show_display_tree (gpointer cbd, guint action, GtkWidget *widget)
  the corresponding node in the display_tree.
  */
 int
-tree_display_entry_remove(displayd *display, GtkWidget *tree)
+tree_display_entry_remove(displayd *display, GtkWidget *tree, ggobid *gg)
 {
  GList *dlist;
  displayd *tmp;
@@ -240,7 +240,7 @@ tree_display_entry_remove(displayd *display, GtkWidget *tree)
   if(tree == NULL)
     return(-1);
 
-  for (dlist = gg.displays; dlist; dlist = dlist->next, which++) {
+  for (dlist = gg->displays; dlist; dlist = dlist->next, which++) {
     tmp = (displayd *) dlist->data;
     if(tmp == display)
       return(tree_display_entry_remove_by_index(which, tree));
@@ -271,16 +271,16 @@ fprintf(stderr, "Removing display %d\n", which); fflush(stderr);
  This sets that display to be the current or active one.
  */
 void
-display_tree_display_child_select(GtkWidget *item, displayd *display)
+display_tree_display_child_select(GtkWidget *item, displayd *display, ggobid *gg)
 {
 
-  if(gg.app.display_tree.tree == NULL) {
+  if(gg->app.display_tree.tree == NULL) {
     return;
   }
 
   if(display != NULL) {
     /* Top-level of tree, so set that to be the current display. */
-    display_set_current(display);
+    display_set_current(display, gg);
   }  
 }
 
@@ -293,13 +293,14 @@ display_tree_display_child_select(GtkWidget *item, displayd *display)
 void
 display_tree_splot_child_select(GtkWidget *item, splotd *plot)
 {
+  ggobid *gg = GGobiFromSPlot(plot);
 
-  if(gg.app.display_tree.tree == NULL) {
+  if( &(plot->displayptr->ggobi->app.display_tree) == NULL) {
     return;
   }
 
   if(plot != NULL) {
     /* Set the associated splot to be the current one. */
-   splot_set_current(plot, on);
+   splot_set_current(plot, on, gg);
   }  
 }

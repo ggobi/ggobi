@@ -2,10 +2,11 @@
 #define SPLOT_H
 
 #include "defines.h"
+typedef struct _displayd displayd;
 
 typedef struct {
 
- gpointer displayptr;  /* a pointer to the enclosing display */
+ displayd *displayptr;  /* a pointer to the enclosing display */
 
  GtkWidget *da;      /* drawing_area */
  GdkPixmap *pixmap0, *pixmap1;  /* 2-stage drawing */

@@ -44,15 +44,16 @@ gfloat inv_raise_min_to_1 (gfloat x) { return (x - domain_incr - 1.0); }
 static gfloat (*inv_domain_adj) (gfloat x) = no_change;
 
 gint
-cols_in_group (gint *cols, gint varno) {
+cols_in_group (gint *cols, gint varno, ggobid *gg) 
+{
 /*
  * Figure out which columns are in the same vgroup as varno
 */
   gint j, ncols = 0;
-  gint groupno = gg.vardata[varno].groupid;
+  gint groupno = gg->vardata[varno].groupid;
 
-  for (j=0; j<gg.ncols; j++) {
-    if (gg.vardata[j].groupid == groupno)
+  for (j=0; j<gg->ncols; j++) {
+    if (gg->vardata[j].groupid == groupno)
       cols[ncols++] = j;
   }
   return (ncols);
@@ -60,7 +61,7 @@ cols_in_group (gint *cols, gint varno) {
 
 
 static void
-mean_stddev (gdouble *x, gfloat *mean, gfloat *stddev, gint j)
+mean_stddev (gdouble *x, gfloat *mean, gfloat *stddev, gint j, ggobid *gg)
 /*
  * Find the minimum and maximum values of a column or variable
  * group scaling by mean and std_width standard deviations.
@@ -70,9 +71,9 @@ mean_stddev (gdouble *x, gfloat *mean, gfloat *stddev, gint j)
   gint i;
   gdouble sumxi = 0.0, sumxisq = 0.0;
   gdouble dmean, dvar, dstddev;
-  gdouble dn = (gdouble) gg.nrows_in_plot;
+  gdouble dn = (gdouble) gg->nrows_in_plot;
 
-  for (i=0; i<gg.nrows_in_plot; i++) {
+  for (i=0; i<gg->nrows_in_plot; i++) {
     sumxi = sumxi + x[i];
     sumxisq = sumxisq + (x[i] * x[i]);
   }
@@ -86,20 +87,20 @@ mean_stddev (gdouble *x, gfloat *mean, gfloat *stddev, gint j)
 }
 
 gfloat
-median (gfloat **data, gint jcol)
+median (gfloat **data, gint jcol, ggobid *gg)
 {
 /*
  * Find the minimum and maximum values of each column or variable
  * group scaling by median and largest distance
 */
-  gint i, m, np = gg.nrows_in_plot;
+  gint i, m, np = gg->nrows_in_plot;
   gfloat *x;
   gdouble dmedian = 0;
   extern gint fcompare (const void *, const void *);
 
-  x = (gfloat *) g_malloc (gg.nrows_in_plot * sizeof (gfloat));
+  x = (gfloat *) g_malloc (gg->nrows_in_plot * sizeof (gfloat));
   for (i=0; i<np; i++) {
-    m = gg.rows_in_plot[i];
+    m = gg->rows_in_plot[i];
     x[m] = data[m][jcol];
   }
 
@@ -138,21 +139,22 @@ qnorm (gdouble pr)
 
 /*-- reset the transformation for all variables, not just selected ones --*/
 void
-reset_tform_all () {
+reset_tform_all (ggobid *gg) 
+{
   int j;
 
-  for (j=0; j<gg.ncols; j++) {
-    gg.vardata[j].tform1 = NO_TFORM1;
-    gg.vardata[j].tform2 = NO_TFORM2;
-    gg.vardata[j].domain_incr = 0.;
-    gg.vardata[j].param = 0.;
-    gg.vardata[j].domain_adj = no_change;
-    gg.vardata[j].inv_domain_adj = no_change;
+  for (j=0; j<gg->ncols; j++) {
+    gg->vardata[j].tform1 = NO_TFORM1;
+    gg->vardata[j].tform2 = NO_TFORM2;
+    gg->vardata[j].domain_incr = 0.;
+    gg->vardata[j].param = 0.;
+    gg->vardata[j].domain_adj = no_change;
+    gg->vardata[j].inv_domain_adj = no_change;
   }
 }
 
 static void
-transform0_values_set (gint tform_type, gint jcol)
+transform0_values_set (gint tform_type, gint jcol, ggobid *gg)
 {
   tform0 = tform_type;
 
@@ -165,13 +167,13 @@ transform0_values_set (gint tform_type, gint jcol)
       break;
 
     case RAISE_MIN_TO_0:
-      domain_incr = fabs (gg.vardata[jcol].lim_raw_gp.min);
+      domain_incr = fabs (gg->vardata[jcol].lim_raw_gp.min);
       domain_adj = raise_min_to_0;
       inv_domain_adj = inv_raise_min_to_0;
       break;
 
     case RAISE_MIN_TO_1:
-      domain_incr = fabs (gg.vardata[jcol].lim_raw_gp.min);
+      domain_incr = fabs (gg->vardata[jcol].lim_raw_gp.min);
       domain_adj = raise_min_to_1;
       inv_domain_adj = inv_raise_min_to_1;
       break;
@@ -188,23 +190,23 @@ transform0_values_set (gint tform_type, gint jcol)
       inv_domain_adj = no_change;
   }
 
-  gg.vardata[jcol].tform0 = tform0;
-  gg.vardata[jcol].domain_incr = domain_incr;
-  gg.vardata[jcol].domain_adj = domain_adj;
-  gg.vardata[jcol].inv_domain_adj = inv_domain_adj;
+  gg->vardata[jcol].tform0 = tform0;
+  gg->vardata[jcol].domain_incr = domain_incr;
+  gg->vardata[jcol].domain_adj = domain_adj;
+  gg->vardata[jcol].inv_domain_adj = inv_domain_adj;
 }
 
 static void
-transform1_values_set (gint tform_type, gfloat expt, gint jcol) {
+transform1_values_set (gint tform_type, gfloat expt, gint jcol, ggobid *gg) {
   tform1 = tform_type;
   boxcoxparam = expt;
   
-  gg.vardata[jcol].tform1 = tform_type;
-  gg.vardata[jcol].param = expt;
+  gg->vardata[jcol].tform1 = tform_type;
+  gg->vardata[jcol].param = expt;
 }
 
 gboolean 
-transform1_apply (gint tform_type, gfloat expt, gint jcol)
+transform1_apply (gint tform_type, gfloat expt, gint jcol, ggobid *gg)
 {
   gint i, m;
   gfloat min, max, diff;
@@ -218,36 +220,36 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
    * variable transformation panel.
   */
   if (tform_type == -1) {
-    tform_ok = transform1_apply (tform1, boxcoxparam, jcol);
+    tform_ok = transform1_apply (tform1, boxcoxparam, jcol, gg);
     return tform_ok;
   }
 
   switch (tform_type)
   {
     case NO_TFORM1:    /*-- Apply the stage0 transformation --*/
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        gg.tform1.data[m][jcol] = (*domain_adj)(gg.raw.data[m][jcol]);
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        gg->tform1.data[m][jcol] = (*domain_adj)(gg->raw.data[m][jcol]);
       }
       break;
 
     case STANDARDIZE1:    /* (x-mean)/sigma */
       {
         gfloat mean, stddev;
-        gdouble *x = (gdouble *) g_malloc (gg.nrows_in_plot * sizeof (gdouble));
-        for (i=0; i<gg.nrows_in_plot; i++) {
-          m = gg.rows_in_plot[i];
-          x[i] = (*domain_adj) (gg.raw.data[m][jcol]);
+        gdouble *x = (gdouble *) g_malloc (gg->nrows_in_plot * sizeof (gdouble));
+        for (i=0; i<gg->nrows_in_plot; i++) {
+          m = gg->rows_in_plot[i];
+          x[i] = (*domain_adj) (gg->raw.data[m][jcol]);
         }
 
-        mean_stddev (x, &mean, &stddev, jcol);
+        mean_stddev (x, &mean, &stddev, jcol, gg);
 
         if (stddev == 0) {
           quick_message (domain_error_message, false);
         } else {
-          for (i=0; i<gg.nrows_in_plot; i++) {
-            m = gg.rows_in_plot[i];
-            gg.tform1.data[m][jcol] = ((gfloat) x[i] - mean) / stddev;
+          for (i=0; i<gg->nrows_in_plot; i++) {
+            m = gg->rows_in_plot[i];
+            gg->tform1.data[m][jcol] = ((gfloat) x[i] - mean) / stddev;
           }
         }
         g_free ((gpointer) x);
@@ -257,31 +259,31 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
     case BOXCOX:  /* Box-Cox power transform family */
 
       if (fabs (expt-0) < .001) {       /* Natural log */
-        for (i=0; i<gg.nrows_in_plot; i++) {
-          m = gg.rows_in_plot[i];
-          if ((*domain_adj)(gg.raw.data[m][jcol]) <= 0) {
+        for (i=0; i<gg->nrows_in_plot; i++) {
+          m = gg->rows_in_plot[i];
+          if ((*domain_adj)(gg->raw.data[m][jcol]) <= 0) {
             g_printerr ("%f %f\n",
-              gg.raw.data[m][jcol],
-              (*domain_adj)(gg.raw.data[m][jcol]));
+              gg->raw.data[m][jcol],
+              (*domain_adj)(gg->raw.data[m][jcol]));
             quick_message (domain_error_message, false);
             tform_ok = false;
             break;
           }
         }
         if (tform_ok) {  /*-- if all values are in the domain of log --*/
-          for (i=0; i<gg.nrows_in_plot; i++) {
-            m = gg.rows_in_plot[i];
-            gg.tform1.data[m][jcol] = (gfloat)
-              log ((gdouble) ((*domain_adj)(gg.raw.data[m][jcol])));
+          for (i=0; i<gg->nrows_in_plot; i++) {
+            m = gg->rows_in_plot[i];
+            gg->tform1.data[m][jcol] = (gfloat)
+              log ((gdouble) ((*domain_adj)(gg->raw.data[m][jcol])));
           }
         }
       }
 
       else {  /*-- if the exponent is outisde (-.001, .001) --*/
 
-        for (i=0; i<gg.nrows_in_plot; i++) {
-          m = gg.rows_in_plot[i];
-          dtmp = pow ((gdouble) (*domain_adj)(gg.raw.data[m][jcol]),
+        for (i=0; i<gg->nrows_in_plot; i++) {
+          m = gg->rows_in_plot[i];
+          dtmp = pow ((gdouble) (*domain_adj)(gg->raw.data[m][jcol]),
                       expt);
           dtmp = (dtmp - 1.0) / expt;
 
@@ -292,31 +294,31 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
           if (!finite (dtmp)) {
 #endif
             g_printerr ("%f %f %f\n",
-              gg.raw.data[m][jcol],
-              (*domain_adj)(gg.raw.data[m][jcol]),
+              gg->raw.data[m][jcol],
+              (*domain_adj)(gg->raw.data[m][jcol]),
               dtmp);
             quick_message (domain_error_message, false);
             tform_ok = false;
             break;
           }
-          gg.tform1.data[m][jcol] = (gfloat) dtmp;
+          gg->tform1.data[m][jcol] = (gfloat) dtmp;
         }
       }
       break;
 
     case ABSVALUE:
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        gg.tform1.data[m][jcol] = (gg.raw.data[m][jcol] + domain_incr < 0) ?
-          fabs ((gdouble)(*domain_adj)(gg.raw.data[m][jcol])) :
-          (*domain_adj)(gg.raw.data[m][jcol]);
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        gg->tform1.data[m][jcol] = (gg->raw.data[m][jcol] + domain_incr < 0) ?
+          fabs ((gdouble)(*domain_adj)(gg->raw.data[m][jcol])) :
+          (*domain_adj)(gg->raw.data[m][jcol]);
       }
       break;
 
     case INVERSE:    /* 1/x */
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        if ((*domain_adj)(gg.raw.data[m][jcol]) == 0) {
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        if ((*domain_adj)(gg->raw.data[m][jcol]) == 0) {
           quick_message (domain_error_message, false);
           tform_ok = false;
           break;
@@ -324,29 +326,29 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
       }
 
       if (tform_ok) {
-        for (i=0; i<gg.nrows_in_plot; i++) {
-          m = gg.rows_in_plot[i];
-          gg.tform1.data[m][jcol] = (gfloat)
-            pow ((gdouble) (*domain_adj)(gg.raw.data[m][jcol]),
+        for (i=0; i<gg->nrows_in_plot; i++) {
+          m = gg->rows_in_plot[i];
+          gg->tform1.data[m][jcol] = (gfloat)
+            pow ((gdouble) (*domain_adj)(gg->raw.data[m][jcol]),
               (gdouble) (-1.0));
         }
       }
       break;
 
     case LOG10:    /* Base 10 log */
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        if ((*domain_adj)(gg.raw.data[m][jcol]) <= 0) {
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        if ((*domain_adj)(gg->raw.data[m][jcol]) <= 0) {
           quick_message (domain_error_message, false);
           tform_ok = false;
           break;
         }
       }
       if (tform_ok) {  /*-- if all values are in the domain of log10 --*/
-        for (i=0; i<gg.nrows_in_plot; i++) {
-          m = gg.rows_in_plot[i];
-          gg.tform1.data[m][jcol] = (gfloat)
-            log10 ((gdouble) (*domain_adj)(gg.raw.data[m][jcol]));
+        for (i=0; i<gg->nrows_in_plot; i++) {
+          m = gg->rows_in_plot[i];
+          gg->tform1.data[m][jcol] = (gfloat)
+            log10 ((gdouble) (*domain_adj)(gg->raw.data[m][jcol]));
         }
       }
       break;
@@ -354,10 +356,10 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
     case SCALE01:    /* Map onto [0,1] */
       /* First find min and max; they get updated after transformations */
 
-      min = max = (*domain_adj)(gg.raw.data[0][jcol]);
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        ref = (*domain_adj)(gg.raw.data[m][jcol]);
+      min = max = (*domain_adj)(gg->raw.data[0][jcol]);
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        ref = (*domain_adj)(gg->raw.data[m][jcol]);
         if (ref < min) min = ref;
         if (ref > max) max = ref;
       }
@@ -365,10 +367,10 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
       limits_adjust (&min, &max);
       diff = max - min;
 
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        gg.tform1.data[m][jcol] =
-          ((*domain_adj)(gg.raw.data[m][jcol]) - min)/diff;
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        gg->tform1.data[m][jcol] =
+          ((*domain_adj)(gg->raw.data[m][jcol]) - min)/diff;
       }
       break;
 
@@ -376,10 +378,10 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
     case DISCRETE2:    /* x>median */
       /* refuse to discretize if all values are the same */
       allequal = true;
-      ref = gg.raw.data[0][jcol];
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        if (gg.raw.data[m][jcol] != ref) {
+      ref = gg->raw.data[0][jcol];
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        if (gg->raw.data[m][jcol] != ref) {
           allequal = false;
           break;
         }
@@ -393,14 +395,14 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
 
       /* First find median */
 
-      fmedian = median (gg.raw.data, jcol);
+      fmedian = median (gg->raw.data, jcol, gg);
       fmedian = (*domain_adj)(fmedian);
 
       /* Then find the true min and max */
-      min = max = (*domain_adj)(gg.raw.data[0][jcol]);
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        ref = (*domain_adj)(gg.raw.data[m][jcol]);
+      min = max = (*domain_adj)(gg->raw.data[0][jcol]);
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        ref = (*domain_adj)(gg->raw.data[m][jcol]);
         if (ref < min) min = ref;
         if (ref > max) max = ref;
       }
@@ -409,10 +411,10 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
       if (max == fmedian)
         fmedian = (min + max)/2.0;
 
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        gg.tform1.data[m][jcol] =
-          ((*domain_adj)(gg.raw.data[m][jcol]) > fmedian) ? 1.0 : 0.0;
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        gg->tform1.data[m][jcol] =
+          ((*domain_adj)(gg->raw.data[m][jcol]) > fmedian) ? 1.0 : 0.0;
       }
       break;
 
@@ -420,20 +422,20 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
     case NORMSCORE:  /*-- normscore = qnorm applied to rank --*/
     {
       paird *pairs = (paird *)
-        g_malloc (gg.nrows_in_plot * sizeof (paird));
+        g_malloc (gg->nrows_in_plot * sizeof (paird));
     
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        pairs[m].f = gg.raw.data[m][jcol];
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        pairs[m].f = gg->raw.data[m][jcol];
         pairs[m].indx = m;
       }
-      qsort ((gchar *) pairs, gg.nrows_in_plot, sizeof (paird), pcompare);
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        gg.tform1.data[pairs[m].indx][jcol] =
+      qsort ((gchar *) pairs, gg->nrows_in_plot, sizeof (paird), pcompare);
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        gg->tform1.data[pairs[m].indx][jcol] =
           (tform_type == RANK) ?
             (gfloat) m :
-            qnorm ((gfloat) (m+1) / (gfloat) (gg.nrows_in_plot+1));
+            qnorm ((gfloat) (m+1) / (gfloat) (gg->nrows_in_plot+1));
       }
 
       g_free ((gpointer) pairs);
@@ -446,24 +448,24 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
       gdouble zmean=0, zvar=0;
 
       /* Allocate array for z scores */
-      zscore_data = (gdouble *) g_malloc (gg.nrows_in_plot * sizeof (gdouble));
+      zscore_data = (gdouble *) g_malloc (gg->nrows_in_plot * sizeof (gdouble));
 
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        dtmp = (gdouble) (*domain_adj)(gg.raw.data[m][jcol]);
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        dtmp = (gdouble) (*domain_adj)(gg->raw.data[m][jcol]);
         zscore_data[m] = dtmp;
         zmean += dtmp;
         zvar += (dtmp * dtmp);
       }
-      zmean /= (gdouble) gg.nrows_in_plot;
-      zvar = sqrt (zvar / (gdouble) gg.nrows_in_plot - zmean*zmean);
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
+      zmean /= (gdouble) gg->nrows_in_plot;
+      zvar = sqrt (zvar / (gdouble) gg->nrows_in_plot - zmean*zmean);
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
         zscore_data[m] = (zscore_data[m] - zmean) / zvar;
       }
 
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
         if (zscore_data[m] > 0)
           zscore_data[m] =
             erf (zscore_data[m]/sqrt (2.)) / 2.8284271+0.5;
@@ -474,29 +476,29 @@ transform1_apply (gint tform_type, gfloat expt, gint jcol)
           zscore_data[m] = 0.5;
       }
         
-      for (i=0; i<gg.nrows_in_plot; i++) {
-        m = gg.rows_in_plot[i];
-        gg.tform1.data[m][jcol] = (gfloat) zscore_data[m]; 
+      for (i=0; i<gg->nrows_in_plot; i++) {
+        m = gg->rows_in_plot[i];
+        gg->tform1.data[m][jcol] = (gfloat) zscore_data[m]; 
       }
       g_free ((gpointer) zscore_data);
     }
     break;
   }
 
-  arrayf_copy (&gg.tform1, &gg.tform2);  /*-- use rows in plot? --*/
+  arrayf_copy (&gg->tform1, &gg->tform2);  /*-- use rows in plot? --*/
 
   return (tform_ok);
 }
 
 void
-transform2_values_set (gint tform_type, gint jcol)
+transform2_values_set (gint tform_type, gint jcol, ggobid *gg)
 {
   tform2 = tform_type;
-  gg.vardata[jcol].tform2 = tform_type;
+  gg->vardata[jcol].tform2 = tform_type;
 }
 
 static gboolean 
-transform2_apply (gint tform_type, gint jcol)
+transform2_apply (gint tform_type, gint jcol, ggobid *gg)
 {
   gint i, m;
   gboolean tform_ok = true;
@@ -507,7 +509,7 @@ transform2_apply (gint tform_type, gint jcol)
    * variable transformation panel.
   */
   if (tform_type == -1) {
-    tform_ok = transform2_apply (tform2, jcol);
+    tform_ok = transform2_apply (tform2, jcol, gg);
     return tform_ok;
   }
 
@@ -515,26 +517,26 @@ transform2_apply (gint tform_type, gint jcol)
   {
     case NO_TFORM2:  /* Restore the values from transformation, stage 2 */
 
-      arrayf_copy (&gg.tform1, &gg.tform2);
+      arrayf_copy (&gg->tform1, &gg->tform2);
       break;
 
     case STANDARDIZE2:    /* (x-mean)/sigma */
       {
         gfloat mean, stddev;
-        gdouble *x = (gdouble *) g_malloc (gg.nrows_in_plot * sizeof (gdouble));
-        for (i=0; i<gg.nrows_in_plot; i++) {
-          m = gg.rows_in_plot[i];
-          x[i] = (gdouble) gg.tform2.data[i][jcol];
+        gdouble *x = (gdouble *) g_malloc (gg->nrows_in_plot * sizeof (gdouble));
+        for (i=0; i<gg->nrows_in_plot; i++) {
+          m = gg->rows_in_plot[i];
+          x[i] = (gdouble) gg->tform2.data[i][jcol];
         }
 
-        mean_stddev (x, &mean, &stddev, jcol);
+        mean_stddev (x, &mean, &stddev, jcol, gg);
         if (stddev == 0) {
           quick_message (domain_error_message, false);
         } else {
 
-          for (i=0; i<gg.nrows_in_plot; i++) {
-            m = gg.rows_in_plot[i];
-            gg.tform2.data[m][jcol] = (x[i] - mean)/stddev;
+          for (i=0; i<gg->nrows_in_plot; i++) {
+            m = gg->rows_in_plot[i];
+            gg->tform2.data[m][jcol] = (x[i] - mean)/stddev;
           }
         }
       }
@@ -552,23 +554,23 @@ transform2_apply (gint tform_type, gint jcol)
  * we're ready for any sort of success or failure
 */
 void
-collab_tform_update (gint j)
+collab_tform_update (gint j, ggobid *gg)
 {
   gchar *lbl0, *lbl1;
 
-  g_free ((gpointer) gg.vardata[j].collab_tform);
+  g_free ((gpointer) gg->vardata[j].collab_tform);
 
   /*-- skip the stage0 changes except negation --*/
-  switch (gg.vardata[j].tform0) {
+  switch (gg->vardata[j].tform0) {
     case NEGATE:
-      lbl0 = g_strdup_printf ("-%s", gg.vardata[j].collab);
+      lbl0 = g_strdup_printf ("-%s", gg->vardata[j].collab);
       break;
     default:
-      lbl0 = g_strdup (gg.vardata[j].collab);
+      lbl0 = g_strdup (gg->vardata[j].collab);
       break;
   }
 
-  switch (gg.vardata[j].tform1) {
+  switch (gg->vardata[j].tform1) {
     case NO_TFORM1:
       lbl1 = g_strdup (lbl0);
       break;
@@ -576,7 +578,7 @@ collab_tform_update (gint j)
       lbl1 = g_strdup_printf ("(%s-m)/s", lbl0);
       break;
     case BOXCOX:
-      lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, gg.vardata[j].param);
+      lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, gg->vardata[j].param);
       break;
     case ABSVALUE:
       lbl1 = g_strdup_printf ("Abs(%s)", lbl0);
@@ -604,19 +606,19 @@ collab_tform_update (gint j)
       break;
   }
 
-  switch (gg.vardata[j].tform2) {
+  switch (gg->vardata[j].tform2) {
     case NO_TFORM2:
-      gg.vardata[j].collab_tform = g_strdup_printf (lbl1);
+      gg->vardata[j].collab_tform = g_strdup_printf (lbl1);
       break;
     case STANDARDIZE2:
-      gg.vardata[j].collab_tform = g_strdup_printf ("(%s-m)/s", lbl1);
+      gg->vardata[j].collab_tform = g_strdup_printf ("(%s-m)/s", lbl1);
       break;
     case PERMUTE:
       break;
     case SORT:
       break;
     case SPHERE:
-      gg.vardata[j].collab_tform = g_strdup_printf ("PC%d", j+1);
+      gg->vardata[j].collab_tform = g_strdup_printf ("PC%d", j+1);
       break;
   }
 
@@ -624,19 +626,19 @@ collab_tform_update (gint j)
   g_free ((gpointer) lbl1);
 }
 
-void tform_label_update (gint jcol)
+void tform_label_update (gint jcol, ggobid *gg)
 {
   /*-- update the values of the variable labels --*/
-  collab_tform_update (jcol);
+  collab_tform_update (jcol, gg);
 
   /*-- update the displayed variable circle labels --*/
-  varlabel_set (jcol);
+  varlabel_set (jcol, gg);
 
   /*-- update the variable statistics table --*/
-  vartable_tform_set (jcol);
+  vartable_tform_set (jcol, gg);
 
   /*-- adjust the settings on the transformation panel --*/
-  transform_opt_menus_set_history (jcol);
+  transform_opt_menus_set_history (jcol, gg);
 }
 
 /*---------------------------------------------------------------------*/
@@ -647,73 +649,73 @@ void tform_label_update (gint jcol)
  * param is the box-cox exponent, only used in stage 1
 */
 void
-transform_variable (gint stage, gint tform_type, gfloat param, gint jcol)
+transform_variable (gint stage, gint tform_type, gfloat param, gint jcol, ggobid *gg)
 {
   switch (stage) {
     case 0:
-      transform0_values_set (tform_type, jcol);
+      transform0_values_set (tform_type, jcol, gg);
 
       /*-- apply tform1 to the new domain, using pre-existing parameters --*/
       /*-- if it fails, reset tform1 to NULL --*/
-      if (!transform1_apply (-1, 0., jcol)) {
-        transform1_values_set (NO_TFORM1, 0.0, jcol);
-        transform1_apply (NO_TFORM1, 0.0, jcol);
+      if (!transform1_apply (-1, 0., jcol, gg)) {
+        transform1_values_set (NO_TFORM1, 0.0, jcol, gg);
+        transform1_apply (NO_TFORM1, 0.0, jcol, gg);
       }
 
       /*-- try to apply tform2 to the new values of tform1 --*/
       /*-- if it fails, reset tform2 to NULL --*/
-      if (!transform2_apply (-1, jcol)) {
-        transform2_values_set (NO_TFORM2, jcol);
-        arrayf_copy (&gg.tform1, &gg.tform2);
+      if (!transform2_apply (-1, jcol, gg)) {
+        transform2_values_set (NO_TFORM2, jcol, gg);
+        arrayf_copy (&gg->tform1, &gg->tform2);
       }
       break;
 
     case 1:
-      if (transform1_apply (tform_type, param, jcol)) {
-        transform1_values_set (tform_type, param, jcol);
+      if (transform1_apply (tform_type, param, jcol, gg)) {
+        transform1_values_set (tform_type, param, jcol, gg);
       } else { 
-        transform1_values_set (NO_TFORM1, 0., jcol);
-        transform1_apply (NO_TFORM1, 0., jcol);
+        transform1_values_set (NO_TFORM1, 0., jcol, gg);
+        transform1_apply (NO_TFORM1, 0., jcol, gg);
       }
 
-      if (!transform2_apply (-1, jcol)) {
-        transform2_values_set (NO_TFORM2, jcol);
-        arrayf_copy (&gg.tform1, &gg.tform2);
+      if (!transform2_apply (-1, jcol, gg)) {
+        transform2_values_set (NO_TFORM2, jcol, gg);
+        arrayf_copy (&gg->tform1, &gg->tform2);
       }
       break;
 
     case 2:
-      if (transform2_apply (tform_type, jcol)) {
-        transform2_values_set (tform_type, jcol);
+      if (transform2_apply (tform_type, jcol, gg)) {
+        transform2_values_set (tform_type, jcol, gg);
       } else {
-        transform2_values_set (NO_TFORM2, jcol);
-        arrayf_copy (&gg.tform1, &gg.tform2);
+        transform2_values_set (NO_TFORM2, jcol, gg);
+        arrayf_copy (&gg->tform1, &gg->tform2);
       }
       break;
   }
 
-  tform_label_update (jcol);
+  tform_label_update (jcol, gg);
 }
 
 void
-transform (gint stage, gint tform_type, gfloat param) 
+transform (gint stage, gint tform_type, gfloat param, ggobid *gg) 
 {
   gint j, k, n;
   gint ncols, nselected_cols;
-  gint *selected_cols = (gint *) g_malloc (gg.ncols * sizeof (gint));
-  gint *cols = (gint *) g_malloc (gg.ncols * sizeof (gint));
+  gint *selected_cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
+  gint *cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
   gboolean doit;
 /*  displayd *display = (displayd *) current_splot->displayptr;*/
 
-  nselected_cols = selected_cols_get (selected_cols, false);
+  nselected_cols = selected_cols_get (selected_cols, false, gg);
   if (nselected_cols == 0)
-    nselected_cols = plotted_cols_get (selected_cols, false);
+    nselected_cols = plotted_cols_get (selected_cols, false, gg);
 
   /*-- loop over selected columns, getting vgroup members --*/
   for (j=0; j<nselected_cols; j++) {
     n = selected_cols[j];
     doit = true;
-    ncols = get_vgroup_cols (n, cols);
+    ncols = get_vgroup_cols (n, cols, gg);
     for (k=0; k<ncols; k++) {
       if (cols[k] < n) {  /*-- depend on vgroups being sorted --*/
         doit = false;  /*-- this vgroup has already been transformed --*/
@@ -723,20 +725,20 @@ transform (gint stage, gint tform_type, gfloat param)
 
     if (ncols && doit) {
       for (k=0; k<ncols; k++)
-        transform_variable (stage, tform_type, param, cols[k]);
+        transform_variable (stage, tform_type, param, cols[k], gg);
     }
   }
 
   g_free ((gpointer) cols);
   g_free ((gpointer) selected_cols);
 
-  vardata_lim_update ();
-  tform_to_world ();
+  vardata_lim_update (gg);
+  tform_to_world (gg);
 
   /*
    * there's no need to reproject if the variables just transformed
    * are not currently displayed, but we're doing it anyway.
   */
   /*-- do not redisplay the missing values displays --*/
-  displays_tailpipe (REDISPLAY_PRESENT);
+  displays_tailpipe (REDISPLAY_PRESENT, gg);
 }
