@@ -32,6 +32,13 @@ void globals_init (ggobid *gg) {
   arrayl_init (&gg->missing_jitter);
 
   vectori_init (&gg->clusterid);
+
+  vectors_init (&gg->line.color);
+  vectors_init (&gg->line.color_now);
+  vectors_init (&gg->line.color_prev);
+  vectorb_init (&gg->line.hidden);
+  vectorb_init (&gg->line.hidden_now);
+  vectorb_init (&gg->line.hidden_prev);
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/

@@ -10,30 +10,32 @@
 gboolean
 write_xml(const gchar *filename, ggobid *gg)
 {
- FILE *f;
+  FILE *f;
+  gboolean ok = false;
 
-  f = fopen(filename,"w");
-  if(f == NULL) {
-   return(false);
+  f = fopen (filename,"w");
+  if (f == NULL) {
+   return (false);
   }
- fclose(f);
 
- return(write_xml_stream(f, gg, filename));
+  ok = write_xml_stream(f, gg, filename);
+  fclose(f);
+  return ok;
 }
 
 gboolean
 write_xml_stream(FILE *f, ggobid *gg, const gchar *filename)
 {
-
   write_xml_header(f, gg);
   write_dataset_header(f, gg);
-    write_xml_description(f, gg);
-    write_xml_variables(f, gg);
-    write_xml_records(f, gg);
-    write_xml_segments(f, gg);
+  write_xml_description(f, gg);
+  write_xml_variables(f, gg);
+  write_xml_records(f, gg);
+/*-- skip for now, because there's no need to write the default segments --*/
+/*    write_xml_segments(f, gg);*/
   write_dataset_footer(f, gg);
 
- return(true);
+  return(true);
 }
 
 gboolean
@@ -45,7 +47,7 @@ write_xml_header(FILE *f, ggobid *gg)
  fprintf(f, "<!DOCTYPE xgobidata SYSTEM \"xgobi.dtd\">");
  fprintf(f, "\n\n");
 
- fflush(f);
+/* fflush(f);*/
 
  return(true);
 }
@@ -65,7 +67,7 @@ gboolean
 write_xml_variables(FILE *f, ggobid *gg)
 {
  int i;
- fprintf(f,"<variables>\n"); 
+ fprintf(f,"<variables count=\"%d\">\n", gg->ncols); 
 
   for(i = 0; i < gg->ncols; i++) {
    write_xml_variable(f, gg, i);
@@ -80,14 +82,20 @@ write_xml_variables(FILE *f, ggobid *gg)
 gboolean
 write_xml_variable(FILE *f, ggobid *gg, int i)
 {
+/*
    fprintf(f, "<variable");
    fprintf(f," name=\"%s\"", gg->vardata[i].collab);
    if(strcmp(gg->vardata[i].collab, gg->vardata[i].collab_tform) != 0) {
      fprintf(f," transformName=\"%s\"", gg->vardata[i].collab_tform);
    }
    fprintf(f, " />");
+*/
 
- return(true);
+  fprintf(f, "<variable>");
+  fprintf(f,"%s", gg->vardata[i].collab);
+  fprintf(f, "</variable>");
+
+  return(true);
 }
 
 gboolean
@@ -109,23 +117,52 @@ write_xml_records(FILE *f, ggobid *gg)
 gboolean
 write_xml_record(FILE *f, ggobid *gg, int i)
 {
- int j;
+  int j;
+  gchar *gstr;
   fprintf(f, "<record");
 
   fprintf(f, " label=\"%s\"", gg->rowlab[i]);
   fprintf(f, " color=\"%d\"", gg->color_ids[i]);
+/*
   fprintf(f, " glyphSize=\"%d\"", gg->glyph_ids[i].size);
   fprintf(f, " glyphType=\"%d\"", gg->glyph_ids[i].type);
-  fprintf(f, ">");
+*/
+  switch (gg->glyph_ids[i].type) {
+    case PLUS_GLYPH:
+      gstr = "+";
+      break;
+    case X_GLYPH:
+      gstr = "x";
+      break;
+    case OPEN_RECTANGLE:
+      gstr = "or";
+      break;
+    case FILLED_RECTANGLE:
+      gstr = "fr";
+      break;
+    case OPEN_CIRCLE:
+      gstr = "oc";
+      break;
+    case FILLED_CIRCLE:
+      gstr = "fc";
+      break;
+    case POINT_GLYPH:
+      gstr = ".";
+      break;
+  }
+
+  fprintf(f, " glyph=\"%s %d\"", gstr, gg->glyph_ids[i].size);
+
+  fprintf(f, ">\n");
 
   for(j = 0; j < gg->ncols; j++) {
-     writeFloat(f, gg->raw.data[i][j]);
-     if(i < gg->ncols -1 )
-      fprintf(f, " ");
+     writeFloat (f, gg->raw.data[i][j]);
+     if (j < gg->ncols-1 )
+       fprintf(f, " ");
   }
-  fprintf(f, "</record>\n");
+  fprintf(f, "\n</record>");
 
- return(true);
+ return (true);
 }
 
 gboolean

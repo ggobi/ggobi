@@ -62,12 +62,12 @@ br_color_ids_alloc (ggobid *gg)
 {
   gint i;
 
-  gg->color_ids = (gushort *)  g_realloc (gg->color_ids,
-                                         gg->nrows * sizeof (gushort));
-  gg->color_now = (gushort *)  g_realloc (gg->color_now,
-                                         gg->nrows * sizeof (gushort));
-  gg->color_prev = (gushort *) g_realloc (gg->color_prev,
-                                         gg->nrows * sizeof (gushort));
+  gg->color_ids = (gshort *)  g_realloc (gg->color_ids,
+                                         gg->nrows * sizeof (gshort));
+  gg->color_now = (gshort *)  g_realloc (gg->color_now,
+                                         gg->nrows * sizeof (gshort));
+  gg->color_prev = (gshort *) g_realloc (gg->color_prev,
+                                         gg->nrows * sizeof (gshort));
   for (i=0; i<gg->nrows; i++)
     gg->color_ids[i] = gg->color_now[i] = gg->color_prev[i] = gg->color_0;
 }
@@ -111,52 +111,51 @@ hidden_init (ggobid *gg)
 /*                           line color                                    */
 /*-------------------------------------------------------------------------*/
 
-
 void
-br_line_color_alloc (ggobid *gg)
+br_line_vectors_free (ggobid *gg)
 {
-  gint ns = gg->nsegments; 
+  vectors_free (&gg->line.color);
+  vectors_free (&gg->line.color_now);
+  vectors_free (&gg->line.color_prev);
+  vectorb_free (&gg->line.hidden);
+  vectorb_free (&gg->line.hidden_now);
+  vectorb_free (&gg->line.hidden_prev);
 
-  gg->line_color = (gushort *) g_realloc ((gpointer) gg->line_color,
-    ns * sizeof (gushort));
-  gg->line_color_now = (gushort *) g_realloc ((gpointer) gg->line_color_now,
-    ns * sizeof (gushort));
-  gg->line_color_prev = (gushort *) g_realloc ((gpointer) gg->line_color_prev,
-    ns * sizeof (gushort));
-
-  gg->line_hidden = (gushort *) g_realloc ((gpointer) gg->line_hidden,
-    ns * sizeof (gushort));
-  gg->line_hidden_now = (gushort *) g_realloc ((gpointer) gg->line_hidden_now,
-    ns * sizeof (gushort));
-  gg->line_hidden_prev = (gushort *) g_realloc ((gpointer) gg->line_hidden_prev,
-    ns * sizeof (gushort));
-
-  gg->xed_by_brush = (gboolean *) g_realloc ((gpointer) gg->xed_by_brush,
-    ns * sizeof (gboolean));
+  g_free ((gpointer) gg->line.xed_by_brush);
 }
 
 void
-br_line_color_free (ggobid *gg)
-{
-  g_free ((gpointer) gg->line_color);
-  g_free ((gpointer) gg->line_color_now);
-  g_free ((gpointer) gg->line_color_prev);
-  g_free ((gpointer) gg->line_hidden);
-  g_free ((gpointer) gg->line_hidden_now);
-  g_free ((gpointer) gg->line_hidden_prev);
-  g_free ((gpointer) gg->xed_by_brush);
+br_line_vectors_check_size (gint ns, ggobid *gg) {
+  /*-- assume these vectors are always of the same size --*/
+  if (gg->line.color.nels != ns) {
+    vectors_realloc (&gg->line.color, ns);
+    vectors_realloc (&gg->line.color_now, ns);
+    vectors_realloc (&gg->line.color_prev, ns);
+    vectorb_realloc (&gg->line.hidden, ns);
+    vectorb_realloc (&gg->line.hidden_now, ns);
+    vectorb_realloc (&gg->line.hidden_prev, ns);
+  }
 }
 
 void
 br_line_color_init (ggobid *gg)
 {
   gint j;
+  gshort *color, *color_now, *color_prev;
+  gboolean *hidden, *hidden_now, *hidden_prev;
+
+  br_line_vectors_check_size (gg->nsegments, gg);
+
+  color = gg->line.color.data;
+  color_now = gg->line.color_now.data;
+  color_prev = gg->line.color_prev.data;
+  hidden = gg->line.hidden.data;
+  hidden_now = gg->line.hidden_now.data;
+  hidden_prev = gg->line.hidden_prev.data;
 
   for (j=0; j<gg->nsegments; j++) {
-    gg->line_color[j] = gg->line_color_now[j] = gg->line_color_prev[j] =
-      gg->color_0;
-    gg->line_hidden[j] = gg->line_hidden_now[j] = gg->line_hidden_prev[j] =
-      false;
+    color[j] = color_now[j] = color_prev[j] = gg->color_0;
+    hidden[j] = hidden_now[j] = hidden_prev[j] = false;
   }
 }
 

@@ -113,3 +113,93 @@ vectori_copy (vector_i *vecp_from, vector_i *vecp_to)
     for (i=0; i<vecp_from->nels; i++)
       vecp_to->data[i] = vecp_from->data[i];
 }
+
+/*-------------------------------------------------------------------------*/
+/*                   gboolean vector management                            */
+/*-------------------------------------------------------------------------*/
+
+void vectorb_init (vector_b *vecp)
+{
+  vecp->nels = 0;
+  vecp->data = (gboolean *) NULL;
+}
+
+void vectorb_free (vector_b *vecp)
+{
+  g_free ((gpointer) vecp);
+  vecp->nels = 0;
+}
+
+void vectorb_zero (vector_b *vecp)
+{
+  gint i;
+  for (i=0; i<vecp->nels; i++)
+    vecp->data[i] = false;
+}
+
+void vectorb_realloc (vector_b *vecp, gint nels)
+{
+  vecp->data = (gboolean *)
+    g_realloc (vecp->data, nels * sizeof (gboolean));
+  vecp->nels = nels;
+}
+
+void vectorb_realloc_zero (vector_b *vecp, gint nels)
+{
+  vecp->data = (gboolean *) g_realloc (vecp->data, nels * sizeof (gboolean));
+  vecp->nels = nels;
+  vectorb_zero (vecp);
+}
+
+void vectorb_copy (vector_b *vecp_from, vector_b *vecp_to)
+{
+  gint i;
+  if (vecp_from->nels == vecp_to->nels)
+    for (i=0; i<vecp_from->nels; i++)
+      vecp_to->data[i] = vecp_from->data[i];
+}
+
+/*-------------------------------------------------------------------------*/
+/*                     gshort vector management                            */
+/*-------------------------------------------------------------------------*/
+
+void vectors_init (vector_s *vecp)
+{
+  vecp->nels = 0;
+  vecp->data = (gshort *) NULL;
+}
+
+void vectors_free (vector_s *vecp)
+{
+  g_free ((gpointer) vecp);
+  vecp->nels = 0;
+}
+
+void vectors_zero (vector_s *vecp)
+{
+  gint i;
+  for (i=0; i<vecp->nels; i++)
+    vecp->data[i] = 0;
+}
+
+void vectors_realloc (vector_s *vecp, gint nels)
+{
+  vecp->data = (gshort *)
+    g_realloc (vecp->data, nels * sizeof (gshort));
+  vecp->nels = nels;
+}
+
+void vectors_realloc_zero (vector_s *vecp, gint nels)
+{
+  vecp->data = (gshort *) g_realloc (vecp->data, nels * sizeof (gshort));
+  vecp->nels = nels;
+  vectors_zero (vecp);
+}
+
+void vectors_copy (vector_s *vecp_from, vector_s *vecp_to)
+{
+  gint i;
+  if (vecp_from->nels == vecp_to->nels)
+    for (i=0; i<vecp_from->nels; i++)
+      vecp_to->data[i] = vecp_from->data[i];
+}

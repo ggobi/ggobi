@@ -614,7 +614,8 @@ line_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
   gchar *suffixes[] = {".linecolors"};
 
   if (reinit)
-    br_line_color_alloc (gg);
+/*    br_line_color_alloc (gg);*/
+    br_line_vectors_check_size (gg->nsegments, gg);
 
   if (!gg->mono_p) {
     /*
@@ -640,8 +641,8 @@ line_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
             break;
           }
 
-          gg->line_color[i] = gg->line_color_now[i] =
-            gg->line_color_prev[i] = id;
+          gg->line.color.data[i] = gg->line.color_now.data[i] =
+            gg->line.color_prev.data[i] = id;
           i++;
         }
         fclose(fp);

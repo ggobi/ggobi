@@ -420,6 +420,8 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
     case 1:  /*-- output: extend the current file set --*/
       break;
     case 2:  /*-- output: create a new file set --*/
+      /*-- temporary:  just create a full xml set here --*/
+      write_xml (g_strdup_printf ("%s.xml", fname), gg);
       break;
   }
 }

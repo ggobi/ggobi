@@ -47,11 +47,18 @@ typedef struct {
   gfloat *data;
   gint nels;
 } vector_f;
-/*-- vectors --*/
 typedef struct {
   gint *data;
   gint nels;
 } vector_i;
+typedef struct {
+  gshort *data;
+  gint nels;
+} vector_s;
+typedef struct {
+  gboolean *data;
+  gint nels;
+} vector_b;
 
 
 typedef struct {  /*-- used for obtaining ranks --*/

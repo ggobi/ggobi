@@ -483,25 +483,25 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
    * currently in use into the line_colors_used[] vector.
   */
   *ncolors_used = 1;
-  colors_used[0] = gg->line_color_now[0];
+  colors_used[0] = gg->line.color_now.data[0];
 
   if (display->options.segments_directed_show_p ||
       display->options.segments_undirected_show_p)
   {
     for (i=0; i<gg->nsegments; i++) {
-      if (gg->line_hidden_now[i])
+      if (gg->line.hidden_now.data[i])
         new_color = false;
       else {
         new_color = true;
         for (k=0; k<*ncolors_used; k++) {
-          if (colors_used[k] == gg->line_color_now[i]) {
+          if (colors_used[k] == gg->line.color_now.data[i]) {
             new_color = false;
             break;
           }
         }
       }
       if (new_color) {
-        colors_used[*ncolors_used] = gg->line_color_now[i];
+        colors_used[*ncolors_used] = gg->line.color_now.data[i];
         (*ncolors_used)++;
       }
     }
@@ -532,7 +532,7 @@ segments_draw (splotd *sp, ggobid *gg)
       nl = 0;
 
       for (j=0; j<gg->nsegments; j++) {
-        if (gg->line_hidden_now[j]) {
+        if (gg->line.hidden_now.data[j]) {
           doit = false;
         } else {
           from = gg->segment_endpoints[j].a - 1;
@@ -556,7 +556,7 @@ segments_draw (splotd *sp, ggobid *gg)
         }
 
         if (doit) {
-          if (gg->line_color_now[j] == current_color) {
+          if (gg->line.color_now.data[j] == current_color) {
             sp->segments[nl].x1 = sp->screen[from].x;
             sp->segments[nl].y1 = sp->screen[from].y;
             sp->segments[nl].x2 = sp->screen[to].x;

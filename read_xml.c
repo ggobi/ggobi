@@ -480,9 +480,13 @@ setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
      }     
     } else
      if(type == RECORD)
-       data->gg->hidden[i] = data->gg->hidden_now[i] = data->gg->hidden_now[i] = hidden;
+       data->gg->hidden[i] =
+         data->gg->hidden_now[i] =
+         data->gg->hidden_prev[i] = hidden;
      else {
-       data->gg->line_hidden[i] = data->gg->line_hidden_now[i] = data->gg->line_hidden_now[i] = hidden;
+       data->gg->line.hidden.data[i] =
+         data->gg->line.hidden_now.data[i] =
+         data->gg->line.hidden_prev.data[i] = hidden;
      }
   }
 
@@ -520,7 +524,9 @@ setColor(const CHAR **attrs, XMLParserData *data, int i)
     if(i < 0)
      data->defaults.color = value;
     else 
-     data->gg->color_ids[i] = data->gg->color_now[i] = data->gg->color_prev[i] = value;    
+     data->gg->color_ids[i] =
+       data->gg->color_now[i] =
+       data->gg->color_prev[i] = value;    
   }
 
  return(value != -1);
@@ -768,7 +774,7 @@ allocSegments(const CHAR **attrs, XMLParserData *data)
   int value = asInteger(tmp);
   data->gg->nsegments = value;
   segments_alloc(value, data->gg);
-  br_line_color_alloc(data->gg);
+/*  br_line_color_alloc(data->gg);*/
   br_line_color_init(data->gg);
  }
  return(tmp != NULL);
@@ -803,17 +809,16 @@ addConnection(const CHAR **attrs, XMLParserData *data)
     data->gg->segment_endpoints[i].b = MAX(source, dest) + 1;
   }
  
- 
   value = data->defaults.lineColor;
   tmp = getAttribute(attrs, "color");
   if(tmp) {
     value = asInteger(tmp);
   }
   if(value > -1 && value < NCOLORS) {
-    data->gg->line_color[i] = data->gg->line_color_now[i] =
-           data->gg->line_color_prev[i] = value;
+    data->gg->line.color.data[i] =
+      data->gg->line.color_now.data[i] =
+      data->gg->line.color_prev.data[i] = value;
   }
-  
 
  return(ok);
 }
