@@ -1690,8 +1690,8 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
  
   tmp = getAttribute(attrs, "id");
   if(tmp) {
+    int value;
     if (data->rowIds == NULL) {
-/*-- dfs;  when should data->rowIds be freed?  in endXMLElement? --*/
      data->rowIds = (gchar **) g_malloc(d->nrows * sizeof(gchar *));
      memset(data->rowIds, '\0', d->nrows);
     }
@@ -1700,7 +1700,13 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
     }
 
     data->rowIds[i] = g_strdup(tmp);
-    d->rowid.id.els[i] = strToInteger (tmp);
+    value = strToInteger (tmp);
+    if(value < 0) {
+       ggobi_XML_error_handler(data, "negative value specified for `id' in record %d of dataset %s\n", 
+                                 (int) i+1, data->current_data->name);
+       value = 0;
+    }
+    d->rowid.id.els[i] = value;
   }
 
 /*
