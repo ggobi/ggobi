@@ -418,12 +418,13 @@ gint alloc_discriminant_p (discriminant_param *dp, /*gfloat *gdata, */
       gdata)) return (1);*/
 
   /* initialize temporary space */
-  dp->cov      = g_malloc ((ncols+ncols)*sizeof(gdouble));
-  dp->a        = g_malloc ((ncols+ncols)*sizeof(gdouble));
-  dp->mean     = g_malloc (nrows*ncols*sizeof(gdouble));
-  dp->ovmean   = g_malloc (ncols*sizeof(gdouble));
-  dp->kpvt     = g_malloc (ncols*sizeof(gint));
-  dp->work     = g_malloc (nrows*sizeof(gint));
+  dp->cov      = (gdouble *) g_malloc ((ncols+ncols)*sizeof(gdouble));
+  dp->a        = (gdouble *) g_malloc ((ncols+ncols)*sizeof(gdouble));
+  dp->mean     = (gdouble *) g_malloc (nrows*ncols*sizeof(gdouble));
+  dp->ovmean   = (gdouble *) g_malloc (ncols*sizeof(gdouble));
+
+  dp->kpvt     = (gint *) g_malloc (ncols*sizeof(gint));
+  dp->work     = (gfloat *) g_malloc (nrows*sizeof(gfloat));
 
   return 0;
 }
@@ -1181,7 +1182,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, pca, &cvp);
       break;
-    case LDA: 
+    case LDA:
       alloc_discriminant_p (&dp, /* gdata, */
 			    nrows, ncols); /*pdim);*/
       /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
