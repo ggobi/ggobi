@@ -106,8 +106,15 @@ gtk_ext_hruler_class_init (GtkExtHRulerClass *klass)
     ruler_class = (GtkExtRulerClass*) klass;
 
     widget_class->motion_notify_event = gtk_ext_hruler_motion_notify;
+
     widget_class->button_press_event = gtk_ext_hruler_drag_start;
     widget_class->button_release_event = gtk_ext_hruler_drag_end;
+/*
+ * (dfs) If I want to disable the response, I just do this:
+*/
+    widget_class->button_press_event = NULL;
+    widget_class->button_release_event = NULL;
+/* */
 
     ruler_class->draw_ticks = gtk_ext_hruler_draw_ticks;
     ruler_class->draw_pos = gtk_ext_hruler_draw_pos;
