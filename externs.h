@@ -69,6 +69,7 @@ void brush_motion (icoords *, gboolean, gboolean, cpaneld *, datad *, ggobid *);
 gboolean brush_once (gboolean force, datad *d, ggobid *);
 void brush_options_cb (gpointer, guint, GtkCheckMenuItem *);
 void brush_pos_init (datad *);
+void brush_reset(ggobid *gg, gint action);
 void brush_set_pos (gint, gint, datad *, ggobid *);
 void checkbox_delete_nth (gint jvar, datad *);
 void clone_vars (gint *cols, gint ncols, datad *, ggobid *);
