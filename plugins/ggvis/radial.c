@@ -115,8 +115,10 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   datad *d = gg->current_display->d;
   datad *e = gg->current_display->e;
 
-  if (d == NULL || e == NULL)
+  if (d == NULL || e == NULL) {
+    quick_message ("Please specify an edge set", false);
     return;
+  }
 
 /*-- This may not belong here, but where exactly?  As soon as the
      panel is opened  --*/

@@ -1,0 +1,78 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+
+\input{WebMacros}
+\input{SMacros}
+\input{CMacros}
+\input{XMLMacros}
+
+\begin{document}
+
+\title{ggvis: graph layout as a plugin in {\tt ggobi}}
+\author{Deborah F. Swayne}
+\date{}
+\maketitle
+
+\begin{abstract}
+
+ggvis is a graph layout plugin for ggobi, and this manual
+describes its use.  It can be expected to change and grow in the
+coming months.
+
+\end{abstract}
+
+\section{The data}
+
+First, you need some data.  The ascii format is not adequate
+for the specification of edges, so you'll probably use an xml
+file with at least two datasets:  a set of cases or nodes, and
+a set of edges.  The records in the node data must have
+\XMLAttribute{id}s:
+
+\begin{verbatim}
+<record id="0"> ... </record>
+\end{verbatim}
+
+The edge records use those \XMLAttribute{id}s to specify a
+\XMLAttribute{source} and \XMLAttribute{destination}:
+
+\begin{verbatim}
+<record source="0" destination="2"> ... </record>
+\end{verbatim}
+
+The sample data that is discussed here is part of the ggobi
+distribution: \file{snetwork.xml}, an artificial social network
+of 140 people who are connected by 205 edges, representing
+some form of social contact.  Notice that there are two variables
+recorded for each node, and two variables for each edge.  
+
+In a ggobi scatterplot display, use the {\bf Edges} menu to
+display the edges, and maybe the ``arrowheads'' which indicate
+edge direction.  (Until the edges are displayed, neither layout
+algorithm will work.)
+
+\section{Layout}
+
+There are two layout algorithms presently implemented in ggvis,
+classical multidimensional scaling (with an optional force
+adjustment algorithm), and a radial layout.
+
+\subsection {Multidimensional scaling}
+
+\subsection {Radial layout}
+
+\section{Interactions}
+
+% One specifies a plugin using the usual XML \XMLTag{plugin} syntax in
+% an initialization file for GGobi.  For an R plugin, one specifies a
+% \XMLAttr{language} attribute with a value \verb+"R"+.  (One should
+% declare the R (meta-) plugin itself before this.)  In addition to the
+% usual \XMLTag{description} and \XMLTag{author} information, one
+% provides values for the \XMLAttr{init} and \XMLAttr{create} attributes
+% of the \XMLTag{plugin} tag.
+
+\section{Animation via R}
+
+% Bibliography:  Graham Wills layout paper, xgvis papers
+
+\end{document}
