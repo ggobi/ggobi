@@ -763,7 +763,7 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
   vartabled *vt;
 
   while (tmp) {
-    if (strcmp (tmp, data->NA_identifier) == 0) {
+    if (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0) {
       if (d->nmissing == 0) {
         arrays_alloc (&d->missing, d->nrows, d->ncols);
         arrays_zero (&d->missing);
