@@ -93,6 +93,8 @@ splot_clear_pixmap0 (splotd *sp, ggobid *gg)
                       sp->da->allocation.height);
 }
 
+/* I'm replacing this routine -- dfs */
+#if 0
 void
 splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 {
@@ -128,9 +130,23 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   } else
    loop_over_points = display->options.points_show_p;
 
-/*
- * Draw edges under points
-*/
+  if (display->options.whiskers_show_p) loop_over_points = true;
+  /*
+   * There's a problem with parallel coordinates -- once 'draw points'
+   * is turned off, we don't get whiskers, either.  Somehow we need to
+   * have the whiskers treated with the edges rather than with the
+   * points, but I don't know how to do that at the moment.
+   *
+   * The time series display has the same problem -- I thought it
+   * had switched to using edges, but it hasn't.  (I should take care
+   * of that one of these days, since Nicholas probably won't want to.)
+   *
+   * loop_over_points has to be always true for both those displays,
+   * and then the decision about whether to draw the points needs to
+   * be deferred.  This won't slow down the scatterplot of the
+   * barchart, apparently, because they have redraw methods.
+   */
+
   if (display->options.edges_undirected_show_p ||
       display->options.edges_arrowheads_show_p ||
       display->options.edges_directed_show_p)
@@ -165,8 +181,13 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot.els[i];
           if (d->hidden_now.els[m] && splot_plot_case (m, d, sp, display, gg)) {
-            draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
-              m, gg);
+            /* This double-check accommodates the parallel coordinates
+	     * and time series displays, because we have to ignore
+             * points_show_p in order to draw the whiskers without the points.
+	    */
+            if (display->options.points_show_p)
+              draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
+                m, gg);
             if (klass && klass->within_draw_to_unbinned)
               klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
           }
@@ -205,8 +226,13 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
               !d->hidden_now.els[m] &&
               splot_plot_case (m, d, sp, display, gg))
             {
-              draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
-                m, gg);
+              /* This double-check accommodates the parallel coordinates
+               * and time series displays, because we have to ignore
+               * points_show_p in order to draw the whiskers without the points.
+              */
+              if (display->options.points_show_p)
+                draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
+                  m, gg);
               if (klass && klass->within_draw_to_unbinned)
                 klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
             }
@@ -216,6 +242,148 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
       }
     }
 
+  }
+
+  return;
+}
+#endif
+
+void
+splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
+{
+  gint k;
+  gushort current_color;
+  gint ncolors_used;
+  gushort colors_used[MAXNCOLORS+2];
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
+  colorschemed *scheme = gg->activeColorScheme;
+  gushort maxcolorid;
+  gboolean loop_over_points;
+
+  gint i, m;
+  gboolean (*f)(splotd *, datad*, ggobid*, gboolean) = NULL;  /* redraw */
+
+  GtkGGobiExtendedSPlotClass *klass = NULL;
+  GtkGGobiExtendedDisplayClass *displayKlass = NULL;
+
+  g_assert (d->hidden.nels == d->nrows);
+
+  /*
+   * There's a problem with parallel coordinates -- once 'draw points'
+   * is turned off, we don't get whiskers, either.  Somehow we need to
+   * have the whiskers treated with the edges rather than with the
+   * points, but I don't know how to do that at the moment.
+   *
+   * The time series display has the same problem -- I thought it
+   * had switched to using edges, but it hasn't.  (I should take care
+   * of that one of these days, since Nicholas probably won't want to.)
+   *
+   * loop_over_points has to be always true for both those displays,
+   * and then the decision about whether to draw the points needs to
+   * be deferred.    -- dfs
+   */
+
+  if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display)); 
+    /* 
+     * This has to be true for the whiskered displays if either points
+     * or whiskers are to be drawn.
+     */
+    loop_over_points = (display->options.points_show_p ||
+                        display->options.whiskers_show_p) &&
+                       displayKlass->loop_over_points;
+  } else {
+    loop_over_points = display->options.points_show_p;
+  }
+
+  if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+    f = klass->redraw;
+  }
+
+  /* Draw edges -- this doesn't include whiskers, alas */
+  if (displayKlass && displayKlass->show_edges_p) {
+    if (display->options.edges_undirected_show_p ||
+        display->options.edges_arrowheads_show_p ||
+        display->options.edges_directed_show_p)
+    {
+      splot_edges_draw (sp, draw_hidden, sp->pixmap0, gg);
+    }
+  }
+
+  /* Now deal with points -- and whiskers */
+
+  if (displayKlass && displayKlass->loop_over_points && f && 
+      display->options.points_show_p)
+  {
+    /* 
+     * Only the barchart has a redraw routine, as far as I can tell,
+     * and it does its own handling of hiddens and colors.  I could
+     * certainly add redraw routines for the other displays ... dfs
+    */
+    f(sp, d, gg, false);
+
+  } else {
+
+    if (draw_hidden) {
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+
+#ifdef WIN32
+      win32_draw_to_pixmap_unbinned (-1, sp, draw_hidden, gg);
+#else
+      for (i=0; i<d->nrows_in_plot; i++) {
+        m = d->rows_in_plot.els[i];
+        if (d->hidden_now.els[m] && splot_plot_case (m, d, sp, display, gg)) {
+          /*
+           * This double-check accommodates the parallel coordinates and
+           * time series displays, because we have to ignore points_show_p
+           * in order to draw the whiskers but not the points.
+          */
+          if (display->options.points_show_p)
+            draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
+              m, gg);
+          /* draw the whiskers ... or, potentially, other decorations */
+          if (klass && klass->within_draw_to_unbinned)
+            klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+        }
+      }
+#endif
+    } else {  /*-- un-hidden points --*/
+
+      maxcolorid = datad_colors_used_get (&ncolors_used, colors_used, d, gg);
+      splot_check_colors (maxcolorid, &ncolors_used, colors_used, d, gg);
+      /*
+       * Now loop through colors_used[], plotting the points of each
+       * color.  This avoids the need to reset the foreground so often.
+      */
+      for (k=0; k<ncolors_used; k++) {
+        current_color = colors_used[k];
+        gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
+#ifdef WIN32
+        win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
+#else
+        for (i=0; i<d->nrows_in_plot; i++) {
+          m = d->rows_in_plot.els[i];
+          if (d->color_now.els[m] == current_color &&
+            !d->hidden_now.els[m] &&
+            splot_plot_case (m, d, sp, display, gg))
+          {
+            /*
+             * As above, this test accommodates the parallel coordinates
+             * and time series displays, because we have to ignore points_show_p
+             * in order to draw the whiskers but not the points.
+            */
+            if (display->options.points_show_p)
+              draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
+                m, gg);
+            if (klass && klass->within_draw_to_unbinned)
+              klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+          }
+        }
+#endif
+      }
+    }
   }
 
   return;
@@ -336,7 +504,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
               draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
                 sp->screen, i, gg);
 
-              /* parallel coordinate plot whiskers */
+              /* parallel coordinate plot and time series plot whiskers */
               if(klass && klass->within_draw_to_binned) {
                 klass->within_draw_to_binned(sp, m,
                   sp->pixmap0, gg->plot_GC);
