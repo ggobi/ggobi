@@ -679,6 +679,69 @@ a Gnome hashtable.
 
 
 \section{Building plugins on Windows}
+Compiling a plugin on Windows is less well organized than it might be.
+However, it is quite simple if you are using the MinGW compiler.  In
+the future we will provide more tools to support this. Since we
+usually distributed binaries for GGobi and the plugins, this has
+been less of an issue.
+
+The steps are quite straightforward when building directly within the
+developer's version from CVS (rather than the distributed source).
+The ggvis plugin serves as a good example.  First, ensure that the
+make variable WIN32 is defined either in the local.config file within
+the plugin directory or the top-level local.config in the GGobi root
+directory.  We use the CFLAGS from the top-leve GGobi
+compilation. These can be dynamically determined using
+\begin{verbatim}
+ make cflags
+\end{verbatim}
+in that top-level directory.
+
+We then create the different object (.o) files.  Now we are ready to
+create the DLL. To do this we must first create a list of the exported
+symbols. Since a plugin typically only makes a small number of its
+symbols available to the GGobi engine (e.g. the onLoad, onCreate,
+onClose, onUnload entries), it is typically easiest to create this
+list by hand. (We could generated it directly from the XML describing
+the plugin, but we currently don't support this.)
+One creates a text file name \textit{plugin.def}
+and edit it to contain something like the following:
+\begin{verbatim}
+EXPORTS
+ addToToolsMenu
+ closeWindow
+\end{verbatim}
+The lines after the \verb+EXPORTS+ line 
+list the names of the symbols that are to be made available
+to GGobi.
+
+Give this exports file, we are ready to compile the DLL.
+The following general rule 
+\begin{verbatim}
+$(PKG).dll: $(OBJS) $(PKG).def
+	$(CC) -mwindows -s -shared -o $@ $(PKG).def $(OBJS) $(GGOBI_LIB) $(LIBS) $(XML_LIBS) 
+\end{verbatim}
+builds the DLL for the plugin.
+
+Currently, we place the DLLs for the plugins in the 
+\dir{plugins} directory of the GGobi installation.
+The GGobirc file that lists the plugins should refer
+to them within this directory, e.g. as
+\begin{verbatim}
+<?xml version="1.0"?>
+<!DOCTYPE ggobirc>
+<ggobirc>
+<plugins>
+<plugin name="ggvis" load="immediate"><!-- load may be on demand. -->
+   <description>multidimensional scaling</description>
+   <author>Deborah Swayne and Andreas Buja</author>
+   <dll name="plugins/ggvis">
+    <init onCreate="addToToolsMenu" onClose="closeWindow" />
+  </dll>
+</plugin>
+</plugins>
+</ggobirc>
+\end{verbatim}
 
 
 
