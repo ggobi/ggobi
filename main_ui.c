@@ -676,5 +676,5 @@ GGOBI(getModeNames)(int *n)
 {
   /*  extern const gchar *const* GGOBI(ModeNames); */
   *n = sizeof(GGOBI(ModeNames))/sizeof(GGOBI(ModeNames)[0]);
-  return(GGOBI(ModeNames));
+  return (GGOBI(ModeNames));
 }

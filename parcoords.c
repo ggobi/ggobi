@@ -126,6 +126,9 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
                         sp->da, true, true, 0);
   }
 
+  /*-- position the display toward the lower left of the main window --*/
+  display_set_position (display, gg);
+
   gtk_widget_show_all (gg->parcoords.arrangement_box);
 
   display_tailpipe (display, gg);

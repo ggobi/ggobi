@@ -13,6 +13,7 @@ extern datad *datad_new(datad *d, ggobid *gg);
 extern "C" {
 #endif
 
+extern void display_set_position (displayd *d, ggobid *gg);
 extern void rotation_menus_make (ggobid *);
 extern void scale_menus_make (ggobid *);
 extern void varpanel_tooltips_set (ggobid *);

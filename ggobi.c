@@ -132,8 +132,9 @@ ggobi_remove_by_index (ggobid *gg, gint which)
   }
   /* Now patch up the array so that it has the correct number of elements. */
   num_ggobis--;
-  if(num_ggobis > 0)
-    all_ggobis = (ggobid**) g_realloc (all_ggobis, sizeof(ggobid*) * num_ggobis);
+  if (num_ggobis > 0)
+    all_ggobis = (ggobid**)
+      g_realloc (all_ggobis, sizeof(ggobid*) * num_ggobis);
   else
     all_ggobis = NULL;
 
@@ -142,7 +143,7 @@ ggobi_remove_by_index (ggobid *gg, gint which)
       and remove the final element, we get back garbage.
       This isn't a problem in stand-alone as it never gets called.
    */
-  numDatasets = g_slist_length(gg->d);
+  numDatasets = g_slist_length (gg->d);
   for (i=0,l = gg->d; l != NULL && i < numDatasets; i++, l = l->next) {
     d = (datad *) l->data;
     datad_free (d, gg);
@@ -223,7 +224,7 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
   Called in response to a window being destroyed.
  */
 void
-ggobi_close(GtkObject *w, ggobid *gg)
+ggobi_close (GtkObject *w, ggobid *gg)
 {
   GGOBI(close)(gg, false);
 }

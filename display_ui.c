@@ -13,6 +13,28 @@
 #include "vars.h"
 #include "externs.h"
 
+void
+display_set_position (displayd *display, ggobid *gg)
+{
+  gint x, y, width, height;
+  gint posx, posy;
+
+  /*-- get the size and position of the gg->main_window) --*/
+  gdk_window_get_root_origin (gg->main_window->window, &x, &y);
+  gdk_window_get_size (gg->main_window->window, &width, &height);
+
+  gtk_widget_realize (display->window);
+  if (x==0 && y==0) {  /*-- can't get any info for the first display --*/
+    posx = gdk_screen_width()/4;
+    posy = gdk_screen_height()/4;
+  } else {
+    posx = x+(3*width)/4;
+    posy = y+(3*height)/4;
+  }
+
+  gtk_widget_set_uposition (display->window, posx, posy);
+}
+
 static void
 display_open_cb (GtkWidget *w, datad *d)
 {
@@ -27,7 +49,7 @@ display_open_cb (GtkWidget *w, datad *d)
 
 
 gchar *
-datasetName(datad *d, int which)
+datasetName (datad *d, int which)
 {
   gchar *lbl = (gchar *)NULL;
   if (d->name && d->name[0])
@@ -35,7 +57,7 @@ datasetName(datad *d, int which)
   else
     lbl = g_strdup_printf ("data matrix %d", which);
 
-  return(lbl);
+  return (lbl);
 }
 
 void

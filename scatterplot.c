@@ -303,6 +303,10 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   gtk_widget_show (display->hrule);
   gtk_widget_show (display->vrule);
   gtk_widget_show (table);
+
+  /*-- position the display toward the lower left of the main window --*/
+  display_set_position (display, gg);
+
   gtk_widget_show_all (display->window);
   
   ruler_ranges_set (display, sp, gg);

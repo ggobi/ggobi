@@ -23,7 +23,6 @@ assign_points_to_bins (datad *d, ggobid *gg)
 {
   splotd *sp = gg->current_splot;
   gint i, k, ih, iv;
-g_printerr ("nbins = %d\n", d->brush.nbins);
 
 
   /*

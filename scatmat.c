@@ -202,6 +202,10 @@ scatmat_new (gboolean missing_p,
                                            GINT_TO_POINTER (i));
 
   gtk_widget_show (display->table);
+
+  /*-- position the display toward the lower left of the main window --*/
+  display_set_position (display, gg);
+
   gtk_widget_show_all (display->window);
 
   return display;
