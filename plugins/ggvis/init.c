@@ -59,6 +59,8 @@ ggvis_init (ggvisd *ggv)
   ggv->metric_nonmetric = metric;
   ggv->KruskalShepard_classic = KruskalShepard;
 
+  ggv->num_active_dist = 0;
+
   ggv->Dtarget_source = LinkDist;
   ggv->complete_Dtarget = false;
 

@@ -38,7 +38,6 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
   datad *dnew;
   InputDescription *desc = NULL;
   displayd *dspnew;
-  gboolean edges_displayed;
   vartabled *vt;
   gdouble range;
 
@@ -122,24 +121,6 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
 */
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
   
-/* setDisplayEdge (dspnew, e); */
-/*
-  if (dsp)
-    edges_displayed = display_copy_edge_options (dsp, dspnew);
-*/
-  if (!edges_displayed) {
-    /*GGOBI(setShowLines)(dspnew, true);*/
-/*
-    GtkWidget *item;
-    dspnew->options.edges_undirected_show_p = true;
-    item = widget_find_by_name (dspnew->edge_menu,
-            "DISPLAY MENU: show directed edges");
-    if (item)
-      gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
-        dspnew->options.edges_directed_show_p);
-*/
-  }
-
   display_tailpipe (dspnew, FULL, gg);
 
   ggv->dpos = dnew;
@@ -206,18 +187,6 @@ printminmax (gchar *cmt, ggvisd *ggv)
 void
 ggv_pos_init (ggvisd *ggv)
 {
-/*
-  gint i, j, m;
-  datad *dpos = ggv->dpos;
-  gdouble **pos = ggv->pos.vals;
-
-  for (m=0; m<dpos->nrows_in_plot; m++) {
-    i = dpos->rows_in_plot[m];
-    for (j=0; j<dpos->ncols; j++) {
-      pos[i][j] = dpos->tform.vals[i][j] ;
-    }
-  }
-*/
   ggv_center_scale_pos_all (ggv);
 }
 
@@ -486,8 +455,40 @@ void ggv_stepsize_cb (GtkAdjustment *adj, PluginInstance *inst)
 void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->dim = (gint) (adj->value);
+  ggobid *gg = inst->gg;
+  gint dim = (gint) adj->value;
+  gint i, j;
+  gchar *vname;
+  datad *d = ggv->dpos;
+  gdouble *dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gdouble));
+  gboolean running = ggv->running_p;
+
+  if (ggv->running_p) mds_func (false, inst);
+  
+  if (dim > ggv->dim) {  /*-- add variables as needed --*/
+    gdouble min, range;
+    vartabled *vt;
+
+    arrayd_add_cols (&ggv->pos, dim);
+    vectord_realloc (&ggv->pos_mean, dim);
+
+    dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gdouble));
+    for (i=0; i<d->nrows; i++)
+      dtmp[i] = 2 * (randvalue() - .5);  /* on [-1, 1] */
+    for (j=ggv->dim; j<dim; j++) {
+      vname = g_strdup_printf ("Pos%d", j+1);
+      newvar_add_with_values (dtmp, d->nrows, vname, d, gg);
+      g_free (vname);
+    }
+    g_free (dtmp);
+
+  }
+
+  ggv->dim = dim;
+
+  if (running) mds_func (true, inst);
 }
+
 void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
