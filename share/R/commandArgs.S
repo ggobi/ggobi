@@ -15,7 +15,9 @@
 getArgInfo <-
 function(fileName = "../../Docs/commandArgs.xml")
 {
-  require(XML)
+  if(!require(XML)) {
+    stop("You don't have the XML package installed. Get it from http://www.omegahat.org or via install.packages('XML')")
+  }
   args <- xmlRoot(xmlTreeParse(fileName))
 
   info <- list()
