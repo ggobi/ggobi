@@ -227,12 +227,15 @@ extern gboolean GGOBI(raiseWindow)(gint which, gboolean raiseOrIcon, gboolean up
 extern gchar *GGOBI(getDescription)(ggobid *gg);
 extern void GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg);
 
+extern int GGOBI(datasetIndex)(const char *name,  ggobid *gg);
+
 #ifdef __cplusplus
 }
 #endif
 
 
 gchar *datasetName(datad *d, int which);
+gint  *createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gboolean useWindow);
 
 #endif /* End of conditional inclusion of entire file.*/
 
