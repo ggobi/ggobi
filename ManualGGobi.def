@@ -35,6 +35,7 @@ EXPORTS
  vectord_init_null
  vectord_zero
  vectori_zero
+ vectori_free
  tform_to_world
  get_clist_from_object
  quick_message
@@ -45,4 +46,7 @@ EXPORTS
  GGobi_setVariableName
  start_ggobi
  GGOBI_getSessionOptions
-
+ edge_endpoints_get
+ symbol_link_by_id
+ 
+ 

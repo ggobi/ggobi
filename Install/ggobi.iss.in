@@ -32,6 +32,7 @@ Source: "@GGOBI_HOME@notes\colorschemes.xml"; DestDir: "{app}\share"; CopyMode: 
 Source: "@GGOBI_HOME@*.h"; DestDir: "{app}\include"; CopyMode: alwaysoverwrite
 
 Source: "@GGOBI_HOME@plugins\ggvis\ggvis.dll"; DestDir: "{app}\plugins"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@plugins\GraphAction\GraphAction.dll"; DestDir: "{app}\plugins"; CopyMode: alwaysoverwrite
 
 Source: "@GGOBI_HOME@libggobi.a"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
 Source: "@GGOBI_HOME@ggobi.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite

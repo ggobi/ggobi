@@ -9,6 +9,14 @@
     <init onCreate="addToToolsMenu" onClose="closeWindow" />
   </dll>
 </plugin>
+
+<plugin name="GraphAction" load="immediate"><!-- load may be on demand. -->
+   <description>For graph manipulation.</description>
+   <author>Deborah Swayne</author>
+   <dll name="plugins/GraphAction">
+    <init onCreate="addToToolsMenu" onClose="closeWindow" />
+  </dll>
+</plugin>
 </plugins>
 </ggobirc>
 

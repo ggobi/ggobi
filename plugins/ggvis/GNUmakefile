@@ -34,19 +34,18 @@ CFLAGS+=-g
 
 
 ifdef WIN32
-$(PKG).dll:
-
-ggvis.a: $(OBJS)
-	ar cr $@ $(OBJS)
-	ranlib $@
-$(PKG).dll: ggvis.a ggvis.def
-	$(CC) -mwindows -s -shared -o $@ ggvis.def ggvis.a $(GGOBI_LIB) $(LIBS) $(XML_LIBS)
+$(PKG).dll: $(OBJS) $(PKG).def
+	$(CC) -mwindows -s -shared -o $@ $(PKG).def $(OBJS) $(GGOBI_LIB) $(LIBS) $(XML_LIBS)
 else
 $(PKG).so: $(OBJS)
 	$(CC) -shared -o $@ $(OBJS) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%) $(LDFLAGS)
 endif
 local.config:  configure
 	./configure
+
+tmp:
+	@echo "$(XML_LIBS)"
+	@echo "$(LIBS)"
 
 configure: configure.in
 	autoconf
