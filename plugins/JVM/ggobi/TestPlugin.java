@@ -38,6 +38,9 @@ public class TestPlugin
 
     public boolean onUpdateDisplay() {
 	System.err.println("In TestPlugin onUpdateDisplay()");
+        datad d = gg.getDataset(0);
+	System.err.println("Got dataset " + d);
+	System.err.println("dataset name: " + d.getName());
 	return(true);
     }
 

@@ -1,5 +1,8 @@
 package ggobi;
 
+/**
+ This version 
+ */
 public interface BulkPlugin 
          extends InputPlugin
 {

@@ -611,7 +611,7 @@ getPluginLanguage(xmlNodePtr node,GGobiInputPluginInfo *iplugin, GGobiPluginType
 	      p->data = data;
               p->onCreate = g_strdup("JavaCreatePlugin");
               p->onClose = g_strdup("JavaDestroyPlugin");
-              /* p->onUpdateDisplay = g_strdup("JavaCreatePlugin"); */
+              p->onUpdateDisplay = g_strdup("JavaUpdateDisplayMenu"); 
               details = p->details;
 	  }
           value = data;

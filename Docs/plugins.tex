@@ -226,14 +226,22 @@ We can add support for classification tree software
 written in Java by embedding the JVM within GGobi.
 
 \item[Interpreters]
-Java, Python, Perl.
+Java (done), Python, Perl.
+
+Given Java's support for high-level network access, database
+connectivity, XML parsing, etc., coupled with its relative ease of
+programming and portability, it may be convenient to develop input
+plugins using Java.  This can be done relatively easily given a Java
+Virtual Machine plugin and some support classes provided by GGobi
+itself. When combined with the Gtk bindings for Java, Java plugins
+will be able enhance GGobi without the need for developing in C.
+
 
 \item[Help System]
 
-\item[Data description]
-Viewer for descriptions of datasets
-that are available from the XML
-format.
+
+\item[Data description] Viewer for descriptions of datasets that are
+available from the XML format.
 
 \end{description}
 
@@ -358,6 +366,7 @@ It would be useful to have a plugin for reading
 \item Oracle databases,
 \item data serialized by other applications,
 \item streaming data,
+\item Genetic or network configuration and performance data stored in XML.
 \end{itemize}
 
 One basic way to get access to R \& Octave data is to embed the entire
@@ -388,30 +397,48 @@ options) by looking through the known input formats.
 
 \subsection{Java Input Plugins}
 
-Given Java's support for high-level network access, database
-connectivity, XML parsing, etc., coupled with its relative ease of
-programming and portability, it may be convenient to develop input
-plugins using Java.  This can be done relatively easily given the JVM
-plugin and some support classes provided by GGobi itself.
+The JVM (Java Virtual Machine) plugin allows us to implement plugins,
+including input plugins, in Java.  The basic idea is quite simple and
+involves implementing a particular Java interface.
+In practice, you might even be able to copy one of the Java
+classes in the GGobi distribution that implements an input plugin.
 
-The basic idea is that a Java input plugin provides basic methods for
-filling a description of the data such as the name of the data source,
-its format/mode, and then to actually read the data.
+The simplest Java input plugin works as follows.  One registers a Java
+class as the implementation of the plugin. When the plugin is needed,
+a new instance of that class is created.  Currently, the constructor
+is called with the name of the file and of the data mode for which it
+has been requested. (Both of these might be \JNull.)  Then, the
+\JMethod{getSourceDescription} method is invoked.  This is called with
+the value \JTrue{} indicating that we want a brief description that
+can be used as text in menus, etc.
 
+At this point, control returns to GGobi, but not for long. It then
+asks the Java object to read the data.  In this simple plugin setup,
+the Java object is supposed to read and store the data and then GGobi
+asks for the different pieces, i.e.  dimensions, variable names and
+records. In the future, more efficient input plugin interfaces
+will be made available.
 
+There are four methods that GGobi invokes when it extracts the data
+from the Java input plugin object. These are \JMethod{getNumRecords},
+\JMethod{getNumVariables} and \JMethod{getVariableNames}.  They are
+defined as part of the \JInterface{InputPlugin} interface and are
+expected to do what the names suggest.  The Java-GGobi plugin
+mechanism takes care of creating a new dataset for the GGobi instance
+using the dimensions it retrieves from the Java object.  Then it
+copies the variable names.  Finally, it iterates over the records and
+calls the \JMethod{getRecord} method that is defined in the
+\JInterface{RecordWisePlugin} interface.  GGobi copies the values to
+the \CStruct{datad} and finishes by calling \Croutine{start_ggobi}.
 
-We provide a collection of different interfaces which range from the
-minimal methods needed to read data to reading coloschemes, etc.  A
-plugin implements the relevant interfaces and we check whether the
+We will provide a collection of different interfaces which range from
+the minimal methods needed to read data to reading coloschemes, etc.
+A plugin implements the relevant interfaces and we check whether the
 plugin does in fact implement these. If so, we invoke the relevant
-methods.
-
-
-The simplest thing to do in order to implement a new input plugin is
-to extend the appropriate GGobi input plugin class.
-
-
-
+methods.  In the future, the Java code will be able to access the
+GGobi instance and the associated C routines directly and can ``push''
+data into GGobi rather than cumulating and waiting for GGobi to
+``pull'' it out.
 
 \section{Creating a Plugin}
 
@@ -478,21 +505,7 @@ C, but a high-level interpreted language.  An obvious example is
 implementing an input plugin in Java, Python or Plugin.  In such a
 case, we have a well defined \C-level interface and we can invoke the
 corresponding methods in the class of the corresponding language.
-For the case of a regular, top-level plugin, these are
-\begin{itemize}
-\item 
-\end{itemize}
-and for an input plugin
-these are
-\begin{itemize}
-\item 
-\end{itemize}
 
-\subsection{Java}
-The input plugin is expected to fill in an \CStruct{InputDescription}
-instance. We provide a Java class for such a plugin that provides
-methods for specifying the fields in this instance.  This class is
-named \JClass{GGobiInputPlugin}.
 
 
 \begin{comment}

@@ -65,9 +65,13 @@ configure: configure.in
 	autoconf
 
 
-ggobiAccess.o: ggobi_ggobi.h
+ggobiAccess.o: ggobi_ggobi.h ggobi_datad.h
+
 ggobi_%.h: ggobi/%.class
 	$(JAVAH) -classpath . $(subst .class,,$(subst /,., $<))
+
+ggobi/%.class: ggobi/%.java
+	$(MAKE) -C ggobi $(@F)
 
 libJavaGGobi.so: ggobiAccess.o
 	$(CC) -shared -o $@ ggobiAccess.o $(GGOBI_LIB) $(EXTRA_LIBS)  $(shell $(GTK_CONFIG) --libs)
