@@ -165,7 +165,7 @@ static gint hide_cluster_cb(GtkToggleButton * btn, gpointer cbd)
 }
 
 /*-- include or exclude hidden cases --*/
-static gint include_hiddens (gboolean include, datad *d, ggobid *gg)
+gint include_hiddens (gboolean include, datad *d, ggobid *gg)
 {
   gint i;
   displayd *dsp = gg->current_display;

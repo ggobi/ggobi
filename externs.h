@@ -258,6 +258,7 @@ void       gt_basis (array_d, gint, vector_i, gint, gint);
 void       hidden_alloc (datad *);
 void       hidden_init (datad *);
 gboolean   hidden_read (InputDescription *desc, gboolean, datad *, ggobid *);
+gint       include_hiddens (gboolean include, datad *d, ggobid *gg);
 void       identify_event_handlers_toggle (splotd *, gboolean);
 gchar *    identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *);
 void       identify_link_by_id (gint k, datad *source_d, ggobid *gg);
