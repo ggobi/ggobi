@@ -101,6 +101,8 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
   gboolean inrange;
 
   /*-- k is the row number in source_d --*/
+  if (k < 0)
+    return;
 
   if (source_d->rowid.id.nels > 0) {
     id = source_d->rowid.id.els[k];
