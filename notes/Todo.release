@@ -1,14 +1,15 @@
-XML format
-
 colormaps
  Reconcile our current use of colorschemes with our previous
    use of colormaps.  This is important both for the xml 
    specification and for the API.
    (See ../Todo for details)
 
-manual
- Review and update to respond to recent changes in the design
-   (dfs: made many changes in mid-March)
+documentation:
+  XML.tex
+   colorschemes -- how do we want to specify them?
+  manual
+   Review and update to respond to recent changes in the design
+     (dfs: made many changes in mid-March)
 
 test scripts, demos
  Make a directory for RSggobi scripts; baptize it with ratcns.S
@@ -21,7 +22,6 @@ Do we want a man page?
  One exists, but it's very sketchy.  It documents the ascii
  file format and points people to the documentation.
 
-GUI
 
 RSggobi
  Work out some setData issues: when adding new data, we want to
@@ -34,11 +34,6 @@ Builds for different os:
  Windows binary of both ggobi and Rggobi.
  tar.gz for unix users.
 
-New release of gtk+
- Find out what it will take to make an initial port of
-  ggobi to gtk+2.0  (dfs -- I'm working on it.  Need help
-  with rulers and with the new ggobi events.)
-  
 Mailing Lists: 
 
   How are we going to announce the ggobi release? 
