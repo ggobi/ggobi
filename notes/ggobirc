@@ -91,6 +91,14 @@
      </dll>
 </plugin>
 
+<plugin name="ggvis" load="immediate"><!-- load may be on demand. -->
+   <description>For graph layout and manipulation.</description>
+   <author>Deborah Swayne</author>
+   <dll name="plugins/ggvis/ggvis.so">
+    <init onCreate="addToToolsMenu" onClose="closeWindow" />
+  </dll>
+</plugin>
+
 
  <inputPlugin name="postgres" interactive="true">
   <description>Reads data from a Postgres DBMS</description>

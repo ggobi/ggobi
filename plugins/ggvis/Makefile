@@ -6,7 +6,7 @@ endif
 
 # -rpath or --rpath?  The compiler on fry accepts -rpath.
 
-include local.config
+-include local.config
 -include $(GGOBI_HOME)/local.config
 
 OBJS=ggvis.o init.o cmds.o spring.o
@@ -19,3 +19,5 @@ ggvis.so: $(OBJS)
 
 clean:
 	rm -f *.o *.so
+
+

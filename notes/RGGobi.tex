@@ -560,35 +560,49 @@ instances in existence at any one time.
 Each ggobi has its own
 
 
-\subsection{getData}
+\subsection{getData.ggobi}
 Since the user can load data in a non-programmatic way, there is an
 opportunity for XGobi to have data that has not been introduced to the
 R/S session.  As a result, we need a mechanism to retrieve the current
 values of the active data set.  This is especially important if we
 allow the data to be edited in any way.
 
-The return value is a matrix of numeric values containing the data
-values.  The names of the rows and columns are the XGobi row labels
-and variable names respectively.
+To get the R data values from a GGobi dataset, one can use the
+function \SFunction{getData.ggobi}.  This takes the dataset identifier
+(either a reference, index or name) and the GGobi instance.  (By
+default, it fetches the first dataset in the active GGobi.)  The
+return value is a matrix of numeric values containing the data values.
+The names of the rows and columns are the XGobi row labels and
+variable names respectively.  \note{We might make this a dataframe in
+  the future in order to handle categorical variables.}
 
 Note that subsetting on a ggobi instance reference (basically an
 integer returned by \SFunction{getDefaultGGobi} and \SFunction{ggobi})
-works in a manner consistent with R.
+works in a manner consistent with R, returning a reference
+to the corresponding dataset.
+Then one can uses this to access
+some or all of the values within that dataset.
 \begin{verbatim}
  g <- ggobi(mtcars)
  g[1][1:10,]
  g[[1]][1:10, c("mpg","cyl")]
  g[[1]][1:10, 1:2]
 \end{verbatim}
+
 For large datasets and situations where one wants to extract
 relatively few columns, it might be more efficient to use the
-\SFunction{getVariable.ggobi} function.
-This avoids copying the entire dataset into an R structure,
-and works only on the specified variables.
+\SFunction{getVariable.ggobi} function.  This avoids copying the
+entire dataset into an R structure, and works only on the specified
+variables.  This returns a named list giving the values for the
+variables of interest.  We do not automatically convert this to a
+dataframe as the names of the records in the GGobi data need not be
+unique.  (This restriction for dataframes has been made optional in R
+recently (version 1.4.0) so we migh create a dataframe default soon.)
 
-Similarly, we have defined methods for the functions \SFunction{dim},
-\SFunction{ncol}, \SFunction{nrow}, \SFunction{dimnames},
-\SFunction{names} which act on ggobi dataset instances.
+In the same way that we have overloaded the \SFunction{[] operator, we
+  have defined methods for the functions \SFunction{dim},
+  \SFunction{ncol}, \SFunction{nrow}, \SFunction{dimnames},
+  \SFunction{names} which act on ggobi dataset instances.
 
 
 \subsection{getColors}
@@ -723,14 +737,29 @@ Some of this might change when we experiment with moving these types
 of attributes (color, hidden, etc.) to sub-plot instances rather than
 having them globally in the ggobi instance.
 
-\subsection{getFileName.ggobi}
-Returns the name of the file from which the data in ggobi was read. If
-the data was explicitly set from an R object, this returns a
-description supplied to the ggobi instance. The mode
-\SFunction{getDescription.ggobi()[["Data mode"]]} of the data can be
-used to determine whether the
+\subsection{getFileNames.ggobi}
+Returns the names of the data source (e.g. file, URL, database) from
+which the datasets in GGobi were read. If the data was explicitly set
+from an R object, this returns a description supplied to the ggobi
+instance.  The mode \SFunction{getDescription.ggobi()[["Data mode"]]}
+of the data can be used to determine the format or source of the data
 
-See also \SFunction{getDescription.ggobi}.
+One can get slightly different information describing the data in a
+GGobi instance using \SFunction{getDescription.ggobi}.  Alternatively,
+one can first obtain a reference to a particular dataset within the
+GGobi instance and then ask get the name of the file
+by looking at the \SField{data} element in that object.
+For example,
+\begin{verbatim}
+ g <- ggobi(system.file("data", "flea", package="ggobi"))
+ g[1]$data     
+\end{verbatim}
+The subsetting on \SVariable{g} 
+is short-hand for 
+\begin{verbatim}
+ getDatasetReference.ggobi(1, .gobi=g)
+\end{verbatim}
+
 
 \subsection{getGlyphs.ggobi}
 Return a description of the glyph

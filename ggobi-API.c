@@ -168,8 +168,13 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   vartabled *vt;
 
   if(cleanup) {
+      /* Release all the displays associated with this datad
+         and then release all the GUI components and memory
+         for this datad.
+       */
       GGOBI(displays_release)(gg);
-      GGOBI(data_release)(d, gg);
+      varpanel_clear(d, gg);
+      GGOBI(data_release)(d, gg); 
   }
 
   d->input = desc;
@@ -286,7 +291,6 @@ GGOBI(data_release)(datad *d, ggobid *gg)
     d->rowlab = NULL;
   }
 
-  /*GGOBI(vartable_free)(d, gg);*/
   vartable_free (d);
 }
 

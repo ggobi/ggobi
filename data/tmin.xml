@@ -10,16 +10,16 @@
  <realvariable name="foo" />
  <categoricalvariable name="fraudp">
    <levels count="3">
-     <level value="0"> low </level>
-     <level value="1"> medium </level>
-     <level value="2"> high </level>
+     <level value="0">low</level>
+     <level value="1">medium</level>
+     <level value="2">high</level>
    </levels>
  </categoricalvariable>
  <categoricalvariable name="bizres">
    <levels count="3">
-     <level value="0"> biz </level>
-     <level value="1"> res </level>
-     <level value="2"> unknown </level>
+     <level value="0">biz</level>
+     <level value="1">res</level>
+     <level value="2">unknown</level>
    </levels>
  </categoricalvariable>
 </variables>

@@ -230,7 +230,7 @@ void
 vartable_free (datad *d)
 {
   gint j;
-  for (j=0; j<d->ncols; j++) {
+  for (j=d->ncols-1; j >= 0; j--) {
     vartable_free_element (j, d);
   }
   g_slist_free (d->vartable);

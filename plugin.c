@@ -95,6 +95,8 @@ load_plugin_library(GGobiPluginDetails *plugin)
       fprintf(stderr, "error on loading plugin library %s: %s\n", plugin->dllName, buf);fflush(stderr);
    }
 
+   plugin->loaded = (handle != NULL);
+
    if(fileName != plugin->dllName)
       g_free(fileName);
    return(handle);
