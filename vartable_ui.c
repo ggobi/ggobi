@@ -930,16 +930,16 @@ vartable_open (ggobid *gg)
                       GTK_SIGNAL_FUNC (open_newvar_dialog), gg);
   /*-- --*/
 
+/*
+ * not yet implemented
   btn = gtk_button_new_with_label ("Delete");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Delete selected variables", NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (delete_vars_cb), gg);
-/*
- * not yet implemented
-*/
   gtk_widget_set_sensitive (btn, false);
+*/
 
 
   gtk_box_pack_start (GTK_BOX (hbox), hb, true, false, 1);
