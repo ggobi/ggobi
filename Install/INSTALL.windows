@@ -1,0 +1,59 @@
+We use Inno Setup (http://www.jrsoftware.org) by Jordan Russell to
+create a self-installing executable for ggobi.  This handles
+installing the relevant files (the executable and 3rd party DLLs),
+example data files, and adding ggobi to the user's Start->Programs
+menu and optionally creating an icon on their desktop.
+
+One uses the Inno Setup compiler to create the self-extracting and
+installing executable. To do this, you need to have version 2.0.9 (or
+higher) of Inno Setup installed. Then, run Inno Setup Compiler and
+open the file Install/ggobi.iss in the ggobi/ source.  To compile the
+installation information, you must have compiled ggobi.exe and have
+the necessary 3rd party DLLs available. I have put the latter in a
+single directory named libs/ on my machine.
+
+When the user downloads and runs this executable, they are presented
+with a sequence of dialog screens.
+
+It starts by notifying the user that this will install ggobi and asks
+whether she would like to continue? We expect the user to click Yes
+and proceed to the first page of the ggobi setup program.  The user
+probably doesn't need to close other applications, as is suggested in
+the spash screen.  Clicking the Next button brings them to the license
+page. This shows them the AT&T license. They should read this and
+accept it by clicking on the Yes button.  Accepting the license brings
+them to the page which allows them to specify where on the disk they
+want ggobi installed. The setup program will suggest putting it in the
+ggobi folder within the Program Files folder. This is fine, but the
+user can set any directory she wishes. She can select another
+directory by clicking on the different folders to navigate the file
+system or move to a different disk/partition using the
+options/pull-down menu at the bottom of this dialog page.
+Alternatively, she can type the fully qualified directory name in the
+text field at the top of the page.
+
+Having selected the target directory in which ggobi is installed, the
+next page asks where to put the shortcuts for ggobi. These are menu
+items in the desktop's Start->Programs menu. Usually one accepts the
+default settings which will create a separate ggobi entry in this
+menu. This ggobi menu will contain entries for launching ggobi,
+browsing the ggobi Web site and uninstalling ggobi.  If one doesn't
+want these menu items, click on the checkbox at the bottom of the page
+(Don't create a Start Menu Folder).
+
+Moving to the next page allows the user to specify whether they want
+an icon for ggobi on their desktop. By default, we create this.  The
+user can uncheck the checkbox on this page to avoid creating this
+desktop shortcut for ggobi.
+
+And finally we come to the last page before the installation actually
+occurs.  This gives a summary of the settings to which the user has
+agreed. Confirm these and proceed with the installation by clicking on
+the Install button. To modify these, use the Back button to return to
+the appropriate page for changing the incorrect setting.
+
+Assuming all went well, the installation concludes with a page that
+announces success and also allows the user run ggobi.  If the checkbox
+'Launch ggobi' is checked when the user clicks on the Finish button
+(or hits return), ggobi will be executed. It will start in the 
+

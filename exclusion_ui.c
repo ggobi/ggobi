@@ -328,7 +328,7 @@ cluster_table_update (datad *d, ggobid *gg)
 
 void
 cluster_window_open (ggobid *gg) {
-  GtkWidget *scrolled_window;
+  GtkWidget *scrolled_window = NULL;
   GtkWidget *vbox, *tebox, *btn, *hbox, *lbl;
   GtkWidget *ebox;
   gint k;

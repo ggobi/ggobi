@@ -46,7 +46,7 @@ sticky_id_toggle (datad *d, ggobid *gg)
 {
   gint i;
   gboolean i_in_list = false;
-  gpointer ptr;
+  gpointer ptr = NULL;
   void sticky_id_link_by_id (gint, gint, datad *, ggobid *);
 
   if (d->nearest_point != -1) {
@@ -142,7 +142,7 @@ sticky_id_link_by_id (gint whattodo, gint k, datad *source_d, ggobid *gg)
   gint i, n, id;
   gboolean i_in_list = false;
   GSList *ll;
-  gpointer ptr;
+  gpointer ptr = NULL;
 
 
   /*-- k is the row number in source_d --*/

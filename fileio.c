@@ -18,8 +18,6 @@
 
 #include "GGobiAPI.h"
 
-#define FILE_SEPARATOR '/'
-
 #ifdef USE_XML
 static char *XMLSuffixes[] = {"xml", "xml.gz","xmlz"};
 #endif
@@ -76,7 +74,7 @@ fileset_generate(const char *fileName, DataMode guess)
 #ifndef G_OS_WIN32
   if(stat(fileName, &buf) != 0) {
 #else
-  if(access(fileName, ft) != 0){
+  if(access(fileName, ft) != 0) {
 #endif
     if(isURL(fileName)) {
       desc->mode = xml_data;
@@ -211,7 +209,7 @@ completeFileDesc(const char *fileName, InputDescription *desc)
 #endif
 
        /* Now compute the directory name. */
-  tmp = strrchr(desc->baseName, FILE_SEPARATOR);
+  tmp = strrchr(desc->baseName, G_DIR_SEPARATOR);
   if(tmp) {
     n = (tmp - desc->baseName) + 1;
     desc->dirName = g_malloc(sizeof(char) * n);
