@@ -471,11 +471,12 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) quit_ggobi, 
        0 },
 
+#ifdef USE_XML
   { "/File/Store",   
        NULL,   
        (GtkItemFactoryCallback) store_session, 
        0 },
-
+#endif
 
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
@@ -546,10 +547,13 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) splash_show,
        0 },
   { "/Help/About help ...",  NULL, NULL, 0, NULL },
+
+#ifdef SUPPORT_PLUGINS
   { "/Help/About plugins ...",
        NULL,
        (GtkItemFactoryCallback) show_plugin_list,
        (gint) NULL },
+#endif
 };
 
 
@@ -600,11 +604,13 @@ make_ui (ggobid *gg) {
                             gg->main_accel_group, window,
                             &gg->main_menubar, (gpointer) gg);
 
-  {
+#if USE_XML
+  if(sessionOptions->info->numInputs > 0) {
    GtkWidget *w;
       w = gtk_item_factory_get_widget(gg->main_menu_factory, "/File");
       addPreviousFilesMenu(w, sessionOptions->info, gg);
   }
+#endif
 
   display_menu_init (gg);
 
@@ -655,10 +661,14 @@ GGOBI(getOpModeNames)(int *n)
   return (GGOBI(OpModeNames));
 }
 
+
+
+
+#ifdef SUPPORT_INIT_FILES
+
 void load_previous_file(GtkWidget *w, gpointer cbd);
-
 /*
-
+  Add the previous input sources to the menu.
  */
 void
 addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
@@ -679,6 +689,7 @@ addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
    }
   }
 }
+
 
 ggobid *create_ggobi(InputDescription *desc);
 
@@ -724,6 +735,7 @@ load_previous_file(GtkWidget *w, gpointer cbd)
     }
   } 
 }
+#endif
 
 /*
  This replicates code elsewhere and the two should be merged.
@@ -750,18 +762,24 @@ create_ggobi(InputDescription *desc)
 }
 
 
+#ifdef SUPPORT_PLUGINS
 void
 show_plugin_list(void *garbage, gint action, GtkWidget *w)
 {
   extern GtkWidget * showPluginInfo (GList *plugins);
   showPluginInfo(sessionOptions->info->plugins);
 }
+#endif
 
+
+#ifdef USE_XML
 void
 store_session(ggobid *gg, gint action, GtkWidget *w)
 {
   write_ggobi_as_xml(gg, "duncan");
 }
+#endif
+
 
 void
 create_new_ggobi(ggobid *gg, gint action, GtkWidget *w)

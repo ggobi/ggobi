@@ -209,8 +209,11 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
 #endif
   }
 
+
+#ifdef SUPPORT_PLUGINS
   if (sessionOptions->info != NULL)
     registerPlugins(gg, sessionOptions->info->plugins);
+#endif
 
   start_ggobi(gg, init_data, true);
 

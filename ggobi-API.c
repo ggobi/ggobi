@@ -862,7 +862,7 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
   gg->close_pending = true;
 
   /* close plugin instances */
-#if 1
+#if SUPPORT_PLUGINS
   closePlugins(gg);
 #endif
 

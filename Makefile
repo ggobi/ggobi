@@ -133,6 +133,7 @@ ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c  read_init.c write_state.c
  XML_OB= read_xml.o write_xml.o read_init.o write_state.o
 
+ XML_FLAGS+= -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
  CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=$(USE_XML) $(XML_FLAGS)
 
  SRC+=$(XML_SRC)

@@ -108,7 +108,11 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
       g_printerr ("%s\n", GGOBI(getVersionString()));
       exit (0);
     } else if(strcmp(av[1], "-init") == 0) {
+#ifdef SUPPORT_INIT_FILES
 	sessionOptions->initializationFile = g_strdup(av[2]);
+#else
+        fprintf(stderr, "-init not supported without XML\n");fflush(stderr);
+#endif
         (*argc)--; av++;
     }
   }
@@ -282,7 +286,9 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 
   parse_command_line (&argc, argv, gg);
 
+#ifdef SUPPORT_INIT_FILES
   process_initialization_files();
+#endif
 
   if(sessionOptions->verbose)
     g_printerr("progname = %s\n", g_get_prgname());
