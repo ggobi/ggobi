@@ -2,7 +2,7 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="2">
-<data name="buckyball">
+<data name="buckyball nodes">
 <description>
 </description>
 <variables count="3">
