@@ -46,13 +46,13 @@ br_glyph_ids_alloc (datad *d)
 void
 br_glyph_ids_init (datad *d, ggobid *gg)
 {
-  gint j;
+  gint i;
 
-  for (j=0; j<d->nrows; j++) {
-    d->glyph_ids[j].type = d->glyph_now[j].type =
-      d->glyph_prev[j].type = gg->glyph_0.type;
-    d->glyph_ids[j].size = d->glyph_now[j].size =
-      d->glyph_prev[j].size = gg->glyph_0.size;
+  for (i=0; i<d->nrows; i++) {
+    d->glyph_ids[i].type = d->glyph_now[i].type =
+      d->glyph_prev[i].type = gg->glyph_0.type;
+    d->glyph_ids[i].size = d->glyph_now[i].size =
+      d->glyph_prev[i].size = gg->glyph_0.size;
   }
 }
 

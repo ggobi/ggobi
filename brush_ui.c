@@ -66,9 +66,15 @@ static void brush_cg_cb (GtkWidget *w, gpointer cbd)
 static gchar *mode_lbl[] = {"Persistent", "Transient"};
 static void brush_mode_cb (GtkWidget *w, gpointer cbd)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
+  ggobid *gg = GGobiFromWidget (w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
+  gint prev_mode = cpanel->br_mode;
   cpanel->br_mode = GPOINTER_TO_INT (cbd);
+
+  if (cpanel->br_mode == BR_PERSISTENT && cpanel->br_mode != prev_mode) {
+    datad *d = gg->current_display->d;
+    brush_once (false, d, gg);
+  }
 }
 
 static void open_symbol_window_cb (GtkWidget *w, ggobid *gg) 

@@ -24,7 +24,7 @@ gboolean active_paint_lines (datad *d, ggobid *gg);
   /* corner (x1, y1); corner where the cursor goes (x2,y2) */
 
 void
-find_glyph_type_and_size(gint gid, glyphv *glyph)
+find_glyph_type_and_size (gint gid, glyphv *glyph)
 {
   glyph->type = ( (gid-1) / (gint) NGLYPHSIZES ) + 1 ;
   glyph->size = ( (gid-1) % (gint) NGLYPHSIZES ) + 1 ;
@@ -500,12 +500,10 @@ build_color_vectors (datad *d, ggobid *gg)
   for (ih=imin.x; ih<=imax.x; ih++) {
     for (iv=imin.y; iv<=imax.y; iv++) {
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
-        j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
         /*
-         * k   raw index, based on nrows
-         * j   index based on nrows_in_plot
+         * j is the row number; k is the index of rows_in_plot[]
         */
-
+        j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
 
         /* update the color vectors for every member of the row group */
         if (d->nrgroups > 0) {
@@ -521,11 +519,12 @@ build_color_vectors (datad *d, ggobid *gg)
         }
       }
     }
-    obin0.x = d->brush.bin0.x;
-    obin0.y = d->brush.bin0.y;
-    obin1.x = d->brush.bin1.x;
-    obin1.y = d->brush.bin1.y;
   }
+
+  obin0.x = d->brush.bin0.x;
+  obin0.y = d->brush.bin0.y;
+  obin1.x = d->brush.bin1.x;
+  obin1.y = d->brush.bin1.y;
 
   return (changed);
 }
