@@ -1,6 +1,9 @@
 \documentclass[11pt]{article}
 \usepackage{fullpage}
 
+%% Choose a different style.
+\bibliographystyle{asa}
+
 \input{WebMacros}
 \input{SMacros}
 \input{CMacros}
@@ -83,7 +86,7 @@ but as of this writing, our implementation only works in 2-D.
 
 \subsection {Radial layout}
 
-The radial layout \cite{Wills99} sets the first node in the dataset
+The radial layout (\cite{Wills99}) sets the first node in the dataset
 as the center node, and arranges the rest of the nodes in concentric
 circles around it.  The resulting layout is a tree arranged radially.
 Even if the underlying graph is not very tree-like, the layout can result
@@ -119,11 +122,29 @@ edges can be brushed -- to set the color of the line type and width.
 The ``color schemes'' tool can be used to automatically color the nodes
 or the edges.
 
-Brushing can also be used to thin the plot, for example, by hiding
-nodes with especially high in or out degree, or nodes with large
-values of depth.
-
 Nodes can also be moved, which can help untangle the layout a bit.
+Groups of nodes can be moved together: first brush them with
+the same symbol and color, and then select {\tt Move brush group}
+in the {\tt Move points} ViewMode.
+
+There is only one added manipulation, and that puts it an appearance
+during the use of identification.  When a node is made ``sticky,'' a
+set of nodes and edges are are highlighted using the current brushing
+color:  the sticky node, its edges, and all nodes to which those edges
+are connected.  To remove the highlighting, click again on the node to
+make it unsticky.
+
+\subsection{Thinning the graph}
+
+Brushing can be used to thin the plot, by hiding nodes with especially
+high in or out degree, for example, or nodes with large values of depth.
+Once those nodes are hidden, a new radial layout can be produced.
+Any nodes or edges still visible that no longer have a path to the
+center node will then be hidden as well, so it isn't necessary to erase
+an entire subtree: erasing its root is enough.
+
+If you erase the center node, ggvis will refuse to proceed with
+a new layout until you have restored it.
 
 \section{Plot control from R}
 
@@ -131,30 +152,9 @@ If you have launched ggobi from within R, you can use the API to
 drive the plot.  Here are some fragments of code in the S language
 that I have used.
 
-In the first example, the edge covariates are the weights that
-correspond to each edge at $t_i$.  I use R to animate the graph,
-using color to encode the edge weight.  I use a sequential
-colorscheme.
-
-\begin{verbatim}
-edges <- getData.ggobi(2)
-ntimesteps <- dim(edges)[2]
-
-for (i in 1:ntimesteps) {
-  tgraph (i, edges)
-  ...
-  colors <- integer(dim(edges)[1])
-  colors[lnw>(3*mx/4)] <- 5
-  colors[lnw>(mx/2) & lnw<=(3*mx/4)] <- 4
-  colors[lnw>(mx/4) & lnw<=(mx/2)] <- 3
-  colors[lnw>0 & lnw<=(mx/4)] <- 2
-  setColors.ggobi (colors, 1:length(colors), 2)
-}
-\end{verbatim}
-
-In the second example, I have two xml files representing two
+In the first example, I have two xml files representing two
 related graphs, and I'm interested in comparing them.  This is
-part of the code I use to highlight the edges the two graphs
+part of the code used to highlight the edges the two graphs
 have in common.
 
 \begin{verbatim}
@@ -172,7 +172,49 @@ setColors.ggobi (edgecolors1, .data=2, .gobi=g1)
 ...
 \end{verbatim}
 
+
+In the second example, there is one graph, and its edge covariates are
+the values of a variable recorded for each edge at $t_i$.  I use R to
+animate the graph, using color to encode the edge weight; I first chose
+a sequential colorscheme.  Similarly, one could use setGlyphs.ggobi() to
+set node type or size.  The same command sets edge type or thickness
+when applied to the edge data.  To hide some of the edges, use
+setHiddenCases.ggobi().
+
+\begin{verbatim}
+edges <- getData.ggobi(2)
+ntimesteps <- dim(edges)[2]
+
+for (i in 1:ntimesteps) {
+  tgraph (i, edges)
+  ...
+  colors <- integer(dim(edges)[1])
+  colors[lnw>(3*mx/4)] <- 5
+  colors[lnw>(mx/2) & lnw<=(3*mx/4)] <- 4
+  colors[lnw>(mx/4) & lnw<=(mx/2)] <- 3
+  colors[lnw>0 & lnw<=(mx/4)] <- 2
+  setColors.ggobi (colors, 1:length(colors), 2)
+}
+\end{verbatim}
+
+In an extension of the second example, the xml file includes three
+datasets.  The third is of dimension $ntimesteps$ by $2$, and its
+single time series plot represents the sum of all measurements
+for all edges at each time step.  As the animation runs,
+we highlight the corresponding point in a scatterplot of this time series.
+
+\begin{verbatim}
+tcolors <- integer(ntimesteps)
+tcolors[1:length(tcolors)] <- 3
+tcolors[i] <- 7
+setColors.ggobi (tcolors, 1:length(tcolors), 3)
+\end{verbatim}
+
 \section{Future work}
+
+We want very much to expand the set of available layouts methods.
+We intend to port {\tt xgvis}, an extension to {\tt ggobi's} precedessor,
+{\tt xgobi,} a rich environment for interactive multidimensional scaling.
 
 % Bibliography: MDS reference, Graham Wills layout paper, xgvis papers
 
