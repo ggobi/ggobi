@@ -22,6 +22,7 @@ void rowids_init_null (datad *d)
 {
   vectori_init_null (&d->rowid.id);
   vectori_init_null (&d->rowid.idv);
+  d->rowid.maxId = -1;
 }
 
 void rowids_free (datad *d)
@@ -43,10 +44,10 @@ rowidv_init (datad *d)
   if (d->rowid.id.nels > 0) {
 
     /*
-     * assume sorting, use the maximum value of rowid.id.els
-     * to dimension rowid.idv
-    */
-    gint nels = 1 + d->rowid.id.els[ d->rowid.id.nels-1 ]; 
+     * No longer assume sorting, but instead compute the maximum as we read the id's 
+     * use the maximum value of rowid.id.els given by d->rowid.maxId as the dimension rowid.idv
+     */
+    gint nels = 1 + d->rowid.maxId; 
 
     vectori_alloc (&d->rowid.idv, nels);
     for (i=0; i<nels; i++)
@@ -60,7 +61,10 @@ rowidv_init (datad *d)
 
     for (i=0; i<d->nrows; i++) {
       k = d->rowid.id.els[i];
-      d->rowid.idv.els[k] = i;
+      if(k >= nels)
+        g_printerr("Invalid value (%d) for id; should be between 0 and %d\n", k, nels-1);
+      else
+        d->rowid.idv.els[k] = i;
     }
   }
 }

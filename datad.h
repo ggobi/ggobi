@@ -74,6 +74,7 @@ struct _datad {
   struct _RowID {
     vector_i id;
     vector_i idv;
+    int maxId;
   } rowid;
  /*-- --*/
 

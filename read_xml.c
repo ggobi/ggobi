@@ -1716,7 +1716,7 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
 /*
  * Probably something's missing here:  if any record has an
  * id, then does every record need one?  I think so.  -- dfs
-*/
+ */
  
   tmp = getAttribute(attrs, "id");
   if(tmp) {
@@ -1736,6 +1736,7 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
                                  (int) i+1, data->current_data->name);
        value = 0;
     }
+    d->rowid.maxId = d->rowid.maxId > value ? d->rowid.maxId : value; 
     d->rowid.id.els[i] = value;
   }
 
