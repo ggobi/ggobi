@@ -17,6 +17,10 @@
   <dt>
   <li> <a href="#RSggobi">S-language ggobi Interface</a>
   <dd>
+
+  <dt>
+  <li> <a href="Installation">Installation</a>
+  <dd>
 </dl>
 
   <hr width=50%>
@@ -39,9 +43,38 @@
   <dd>
 </dl>
 
+
+<h2><a name="Installation">Installation</a></h2>
+<dl>
+  <dt>
+  <li> Why do I see <code>G_INLINE_FUNC</code> in the compilation?
+  <dd> This is
+
+  <dt>
+  <li> I get error messages when compiling the C code
+      about the glib.h header file that look something like
+<pre>
+"/home/duncan-jessie/usr/include/glib-1.2/glib.h", line 1573: undefined or not a type: inline
+"/home/duncan-jessie/usr/include/glib-1.2/glib.h", line 1574: parameter not in identifier list: g_bit_nth_lsf
+"/home/duncan-jessie/usr/include/glib-1.2/glib.h", line 1576: only "register" valid as formal parameter storage class
+"/home/duncan-jessie/usr/include/glib-1.2/glib.h", line 1576: parameter not in identifier list: inline      
+</pre>      
+  <dd> This means that your compiler cannot  inline code
+      and so this must be turned off.
+      Do this by adding
+<pre>
+       -DG_INLINE_FUNC=extern
+</pre>
+      to the definition of the make variable OTHER_CFLAGS
+      in the Makeconf file in the top-level directory.
+      Please also send mail about this to
+       <a href="ggobi-help@ggobi.org">ggobi-help@ggobi.org</a>
+      and tell us about your OS and compiler so we can add this to
+      the configuration script.
+</dl>
 <hr>
 <address></address>
 <!-- hhmts start -->
-Last modified: Tue Dec  5 14:27:56 EST 2000
+Last modified: Fri Mar  9 06:14:33 EST 2001
 <!-- hhmts end -->
 </body> </html>

@@ -447,8 +447,7 @@ varpanel_tooltips_set (ggobid *gg)
         case tsplot:
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
             checkbox_get_nth (j, d),  
-            "Click left to replace/insert/append a variable, or to delete it. 
-            Click middle to replace rigid variable",
+            "Click left to replace/insert/append a variable, or to delete it.\nClick middle to replace rigid variable",
             NULL);
         break;
 

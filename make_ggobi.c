@@ -79,8 +79,7 @@ fileset_read (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
   }
 
   if(desc->mode == unknown_data) {
-    g_printerr ("Cannot determine the format of the data in file
-                %s\n", desc->fileName); 
+    g_printerr ("Cannot determine the format of the data in file %s\n", desc->fileName); 
     return(false);
   }
 

@@ -55,6 +55,41 @@ DEFAULT_LIB_DIRS="/usr/lib /usr/local/lib /opt/lib"
 DEFAULT_INC_DIRS="/usr/include /usr/local/include /usr/local/src/include /usr/include/gnome-xml"
 
 
+AC_PROG_CC
+
+LO_DIR=.
+
+c_rules_frag=.CRulesFrag
+
+if test "${GCC}" = "yes" ; then
+
+ PIC_CFLAG=-fPIC
+ SHLIB_LDFLAGS=-shared
+ LO_DIR=.
+
+
+cat << \EOF > ${c_rules_frag}
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+EOF
+else
+   dnl assume Solari's cc compiler
+ PIC_CFLAG=-KPIC
+ OTHER_CFLAGS="-DG_INLINE_FUNC=extern"
+ SHLIB_LDFLAGS=-G
+ LO_DIR=.libs
+
+cat << \EOF > ${c_rules_frag}
+%.lo: %.c
+	@test -d ${LO_DIR} || mkdir ${LO_DIR}
+	$(CC) $(PIC_CFLAG) $(CFLAGS) $(OTHER_CFLAGS) -c $< -o ${LO_DIR}/$*.o
+	mv ${LO_DIR}/$*.o $*.lo
+EOF
+
+fi
+
+AC_SUBST(OTHER_CFLAGS)
+AC_SUBST_FILE(c_rules_frag)
 
  dnl Start looking for the XML libraries.
 if test -n "${with_xml}" ; then
@@ -254,6 +289,10 @@ SRC_LIBS="-L${TOP}/lib -lggobi"
 AC_SUBST(SRC_CFLAGS)
 AC_SUBST(SRC_LIBS)
 
+
+AC_SUBST(PIC_CFLAG)
+AC_SUBST(SHLIB_LDFLAGS)
+AC_SUBST(LO_DIR)
 
 
 AC_SUBST(OS_INFO)

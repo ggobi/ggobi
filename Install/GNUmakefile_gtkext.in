@@ -5,8 +5,8 @@ include $(TOP)/Makeconf
 GTK_CONFIG=@GTK_CONFIG@
 CFLAGS=-I../include $(shell $(GTK_CONFIG) --cflags )
 
-PIC_CFLAG=-fPIC
-SHLIB_LDFLAGS=-shared
+# PIC_CFLAG=
+# SHLIB_LDFLAGS=
 
 SRC=\
   gtkextruler.c \
@@ -24,9 +24,6 @@ $(TOP)/lib/libgtkext.so: libgtkext.so
 
 install: $(TOP)/lib/libgtkext.so
   
-%.lo:	%.c
-	$(CC) $(PIC_CFLAG) $(CFLAGS) -o $@ -c $<
-
 
 clean:
 	for f in $(OBJ) $(OBJ:%.o=%.lo) ; do \

@@ -160,7 +160,8 @@ FILE *open_file_r (gchar *f, gchar *suffix)
     /*
      * Make sure it isn't an empty file -- get a single character
     */
-    gint ch = getc (fp);
+    gint ch;
+    ch = getc (fp);
     if (ch == EOF) {
       g_printerr ("%s is an empty file!\n", fname);
       fclose (fp);

@@ -166,6 +166,7 @@ fileset_generate(const char *fileName, DataMode guess)
       return(NULL);
       break;
     default:
+      break;
   }
 
   completeFileDesc(desc->fileName, desc);
