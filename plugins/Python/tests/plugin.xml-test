@@ -15,12 +15,11 @@
 <plugin name="testPython" language="Python" class="GGobiPythonPlugin" module="GGobiPlugin">
  <description>My test of python meta-plugin</description>
  <author>DTL</author>
- <dll class="GGobiPythonPlugin" module="GGobiPlugin"/>
 </plugin>
 
 
 <plugin name="samplePlugin" language="Python" class="SamplePlugin" module="samplePlugin">
- <description>My test of python meta-plugin</description>
+ <description>My test of subclassing a Python meta-plugin</description>
  <author>DTL</author>
 </plugin>
 </plugins>

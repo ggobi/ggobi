@@ -10,7 +10,7 @@
     </args>
    </options>
    <dll name="@PWD@/JVM.so">
-    <init onLoad="loadJVM" />
+    <init onLoad="loadJVM" processPlugin="Java_processPlugin"/>
   </dll>
 </plugin>
 
