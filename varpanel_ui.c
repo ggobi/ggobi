@@ -39,7 +39,6 @@ checkbox_get_nth (gint jvar, datad *d) {
   return w;
 }
 
-
 /*-------------------------------------------------------------------------*/
 /*                     Variable selection                                  */
 /*-------------------------------------------------------------------------*/
@@ -248,15 +247,13 @@ void
 varpanel_checkbox_add (gint j, datad *d, ggobid *gg) 
 {
   GtkWidget *w = gtk_noop_check_button_new_with_label (d->vartable[j].collab);
-
   GGobi_widget_set (w, gg, true);
-  d->varpanel_ui.checkbox = g_slist_append (d->varpanel_ui.checkbox, w);
-
   gtk_signal_connect (GTK_OBJECT (w),
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
-
   gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
     w, false, false, 0);
+
+  d->varpanel_ui.checkbox = g_slist_append (d->varpanel_ui.checkbox, w);
   gtk_widget_show (w);
 }
 

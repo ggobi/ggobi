@@ -315,58 +315,6 @@ print_attachments (ggobid *gg) {
 }
 
 gint
-selected_cols_get (gint *cols, datad *d, ggobid *gg)
-{
-/*
- * Figure out which columns are selected.
-*/
-  gint j, ncols = 0;
-
-  for (j=0; j<d->ncols; j++) 
-    if (d->vartable[j].selected)
-      cols[ncols++] = j;
-
-  return (ncols);
-}
-
-/*
- * When there aren't any columns in the variable statistics table,
- * this is how we find out which columns are selected for plotting.
- * 
- * I was selecting them in the variable table, and then clearing
- * the table afterwards, but I don't like that -- it triggers callbacks
- * in a mysterious way.
-*/
-gint
-plotted_cols_get (gint *cols, datad *d, ggobid *gg) 
-{
-  gint mode = mode_get (gg);
-  gint ncols = 0;
-  splotd *sp = gg->current_splot;
-  displayd *display = (displayd *) sp->displayptr;
-
-  switch (display->displaytype) {
-    case scatterplot:
-      switch (mode) {
-        case P1PLOT:
-          cols[ncols++] = sp->p1dvar;
-          break;
-        case XYPLOT:
-          cols[ncols++] = sp->xyvars.x;
-          cols[ncols++] = sp->xyvars.y;
-          break;
-      }
-      break;
-    case scatmat:
-      break;
-    case parcoords:
-      break;
-  }
-
-  return ncols;
-}
-
-gint
 address_check (datad *d, ggobid *gg) 
 {
   g_printerr ("::: vars.h :::\n");

@@ -261,6 +261,8 @@ selection_made (GtkWidget *cl, gint row, gint column,
   varno = (gint) atoi (varno_str);
   d->vartable[varno].selected = true;
 
+g_printerr ("var %d is selected\n", varno);
+
   return;
 }
 

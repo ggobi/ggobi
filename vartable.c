@@ -28,6 +28,61 @@ extern gfloat no_change (gfloat, gfloat);
 
 gboolean vartable_update_cloned_var (gint nc, gint jvar, datad *, ggobid *);
 
+/*-------------------------------------------------------------------------*/
+/*                         utilities                                       */
+/*-------------------------------------------------------------------------*/
+
+gint
+selected_cols_get (gint *cols, datad *d, ggobid *gg)
+{
+/*
+ * Figure out which columns are selected.
+*/
+  gint j, ncols = 0;
+
+  for (j=0; j<d->ncols; j++) 
+    if (d->vartable[j].selected)
+      cols[ncols++] = j;
+
+  return (ncols);
+}
+
+/*
+ * When there aren't any columns in the variable statistics table,
+ * this is how we find out which columns are selected for plotting.
+ * 
+ * I was selecting them in the variable table, and then clearing
+ * the table afterwards, but I don't like that -- it triggers callbacks
+ * in a mysterious way.
+*/
+gint
+plotted_cols_get (gint *cols, datad *d, ggobid *gg) 
+{
+  gint mode = mode_get (gg);
+  gint ncols = 0;
+  splotd *sp = gg->current_splot;
+  displayd *display = (displayd *) sp->displayptr;
+
+  switch (display->displaytype) {
+    case scatterplot:
+      switch (mode) {
+        case P1PLOT:
+          cols[ncols++] = sp->p1dvar;
+          break;
+        case XYPLOT:
+          cols[ncols++] = sp->xyvars.x;
+          cols[ncols++] = sp->xyvars.y;
+          break;
+      }
+      break;
+    case scatmat:
+      break;
+    case parcoords:
+      break;
+  }
+
+  return ncols;
+}
 
 /*-------------------------------------------------------------------------*/
 /*                         memory management                               */
@@ -166,11 +221,11 @@ vartable_row_append (gint j, datad *d, ggobid *gg)
 {
   if (d->vartable_clist != NULL) {
     gint k;
-    gchar **row;
-    row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
+    gchar **row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
+    gint nrows = GTK_CLIST (d->vartable_clist)->rows;
 
     if (j == -1) {
-      row[CLIST_VARNO] = g_strdup_printf ("%d", 0);
+      row[CLIST_VARNO] = g_strdup_printf ("%d", nrows);
       row[CLIST_VARNAME] = g_strdup ("");
       row[CLIST_TFORM] = g_strdup ("");
       row[CLIST_USER_MIN] = g_strdup_printf ("%8.3f", 0.0);
@@ -181,7 +236,7 @@ vartable_row_append (gint j, datad *d, ggobid *gg)
       row[CLIST_MEDIAN] = g_strdup_printf ("%8.3f", 0.0);
       row[CLIST_NMISSING] = g_strdup_printf ("%d", 0);
     } else {
-      row[CLIST_VARNO] = g_strdup_printf ("%d", j);
+      row[CLIST_VARNO] = g_strdup_printf ("%d", nrows);
       row[CLIST_VARNAME] = g_strdup (d->vartable[j].collab);
       row[CLIST_TFORM] = g_strdup ("");
       if (d->vartable[j].lim_specified_p) {
@@ -240,15 +295,20 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 {
   gint i, k, n, jvar;
 
+g_printerr ("adding %d columns: ", ncols);
+for (k=0; k<ncols; k++) g_printerr ("%d ", cols[k]);
+g_printerr ("\n");
+g_printerr ("the new ncols will be %d\n", d->ncols+ncols);
+
   vartable_realloc (d->ncols+ncols, d, gg);
   for (k=0; k<ncols; k++) {
-    n = cols[k];     /*-- variable being cloned --*/
-    jvar = d->ncols+k;  /*-- its new index --*/
+    n = cols[k];       /*-- variable being cloned --*/
+    jvar = d->ncols+k; /*-- its new index --*/
 
     /*-- fill in the values in d->vartable --*/
     vartable_update_cloned_var (jvar, n, d, gg);
 
-    transform_values_init (n, d, gg);
+    transform_values_init (jvar, d, gg);
   }
 
   /*-- pipeline --*/
