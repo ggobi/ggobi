@@ -114,6 +114,8 @@ AC_ARG_WITH(Perl,  --with-Perl      Install the Perlggobi module)
 AC_ARG_WITH(gtk2,  --with-gtk2      Configure using gtk+2 rather than gtk+-1.2)
 
 if test -n "${with_gtk2}" && test "${with_gtk2}" != "no" ; then
+
+echo "Looking for gtk2"
  AC_PATH_PROG(PKG_CONFIG, pkg-config,, $PATH)
  if test -z "${PKG_CONFIG}" ; then
    echo "Cannot find pkg-config"
@@ -121,6 +123,9 @@ if test -n "${with_gtk2}" && test "${with_gtk2}" != "no" ; then
  fi
   GTK_CFLAGS="\$(shell \${PKG_CONFIG} --cflags gtk+-2.0) -DGTK_2_0=1 -DGTK_ENABLE_BROKEN"
   GTK_LIBS="\$(shell \${PKG_CONFIG} --libs gtk+-2.0)"
+
+  GTK_CONFIG_CFLAGS='"`${PKG_CONFIG} --cflags gtk+-2.0` -DGTK_2_0=1 -DGTK_ENABLE_BROKEN"'
+  GTK_CONFIG_LIBS='`${PKG_CONFIG} --libs gtk+-2.0`'
   AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal, , $PATH)
   GTK_2="yes"
 fi
@@ -135,10 +140,17 @@ if test -z "${PKG_CONFIG}" ; then
    exit 1
  fi
 
-echo "Setting gtk flags"
  GTK_CFLAGS="\$(shell \${GTK_CONFIG} --cflags)"
  GTK_LIBS="\$(shell \${GTK_CONFIG} --libs)"
+
+ GTK_CONFIG_CFLAGS="`${GTK_CONFIG} --cflags`"
+ GTK_CONFIG_LIBS="`${GTK_CONFIG} --libs`"
 fi
+
+AC_SUBST(GTK_CONFIG_CFLAGS)
+AC_SUBST(GTK_CONFIG_LIBS)
+
+echo "Setting gtk flags: cflags=$GTK_CFLAGS, libs=$GTK_LIBS"
 
 AC_PATH_PROG(UNAME, uname)
 if test -n  "${UNAME}" ; then
@@ -645,7 +657,7 @@ AC_SUBST(INSTALL_DIR)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate share/ggobirc local.config share/tools/plugin)
+AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate share/ggobirc local.config share/tools/plugin ggobi.pc)
 
 cp src/config.h include/GGobiConfig.h
 
@@ -710,7 +722,7 @@ echo "GGobi"
 echo " Version:                $GGOBI_VERSION_STRING"
 echo " Installation directory: $INSTALL_DIR"
 echo " XML:                    version ${XML_VERSION}"
-echo " Plugins:                ${PLUGIN_DIRS}"
+echo " Plugins:               ${PLUGIN_DIRS}"
 echo " Rggobi:                 ${WILL_BUILD_RGGOBI-no}" 
 echo ""
 echo "*******************************"

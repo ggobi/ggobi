@@ -60,6 +60,7 @@ ifeq (${LOCAL_INSTALL},)
 	$(INSTALL) -d $(ggobi_install_home)/lib
 	$(INSTALL) lib/* $(ggobi_install_home)/lib
 	$(INSTALL) -d $(bindir)
+	$(INSTALL) ggobi.pc $(libdir)/pkgconfig
 	$(INSTALL) bin/ggobi-config $(bindir)
 	$(INSTALL) bin/ggobi $(bindir)
 	if ! test -d $(includedir) ; then $(INSTALL) -d $(includedir) ; fi

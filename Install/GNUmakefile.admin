@@ -16,7 +16,7 @@ DIRS=\
    src include lib bin Docs data gtkext/src gtkext/include examples \
    plugins share/tools
 
-TOOLS=Install/plugin.in
+TOOLS=Install/plugin.in 
 
 PLUGIN_DIRS=ImageLib MySQL Postgres DataViewer FileSelector \
             R GraphLayout ggvis JVM GraphAction ExcelReader \
@@ -99,6 +99,7 @@ endif
 	cp Install/ggobi.in $(TMP_INSTALL_DIR)/bin
 	cp Install/bugTemplate.in $(TMP_INSTALL_DIR)/
 	cp Install/local.config.in $(TMP_INSTALL_DIR)/
+	cp Install/ggobi.pc.in $(TMP_INSTALL_DIR)/	
 	cp VersionInfo $(TMP_INSTALL_DIR)/src
 	cp marshal.list GtkSignalDef.c $(TMP_INSTALL_DIR)/src
 	cp Makefile.win32 $(TMP_INSTALL_DIR)/src
