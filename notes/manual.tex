@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[11pt]{article}
 \usepackage{fullpage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,19 +36,20 @@
 % (On fry, that's in /usr/dfs/papers/xgobi.1997/paper.tex)
 %
 %  slbl stands for 'section label'
+
+\begin {document}
+
 \title {GGobi manual}
 \author{
 Deborah F. Swayne, AT\&T Labs -- Research \\
 Dianne Cook, Iowa State University \\
-Andreas Buja, AT\&T Labs -- Research \\
-Duncan Temple Lang, Lucent Bell Labs
+Duncan Temple Lang, Lucent Bell Labs \\
+Andreas Buja, AT\&T Labs -- Research
 }
+\date{January 2001}
 
-
-\begin {document}
 \maketitle
 
-%\date{January 2001}
 
 \begin{abstract}
 
@@ -102,7 +103,9 @@ available in early 2001.
 
 \vbox{
 \vspace{.4in}
-\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
+%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
+\centerline{[Figure 1 here]}
+
 \vspace{.15in} \centerline{ \parbox{6in}
 {Figure~1: Layout of a GGobi session.  The display window contains a
 simple scatterplot.  Brushing has been used, and three different
@@ -117,8 +120,8 @@ symbols are in use.
 
 Across the top of the control panel in Figure 1 stretch a row of buttons for
 selecting major GGobi functions from pull-down menus.  Buttons
-named ``File'', ``Display,'' ``ViewMode'', ``Tools'', ``Options'' and
-``DisplayTree'' organize functions in menus.
+such as ``File'', ``Display,'' ``ViewMode'', ``Tools'', ``Options'' and
+``DisplayTree'' organize functions in menus.  
 
 As expected, the ``File'' button opens a menu for selecting
 input/output functions as well as exiting.
@@ -194,10 +197,28 @@ reading and writing data pertaining to that mode.
 \subsection{Graphical displays}
 \label{slbl:GraphicalDisplays}
 
--- list the display types
+As mentioned earlier, the main display types are
+\begin{itemize}
+\itemsep 0em
+\item scatterplot,
+\item scatterplot matrix, and
+\item parallel coordinates plot.
+\end{itemize}
 
--- describe the notion of the current display, the current plot,
-and how they are selected
+\subsubsection{Current display, current plot}
+
+Since there are multiple displays, some of which contain
+multiple plots, the question arises:  Which plot in which
+display window corresponds to the control panel?  If you
+select the {\bf Brush} {\bf ViewMode}, how can you tell
+which plot is going to respond to brushing?
+
+There is in ggobi a notion of the ``current display'' and
+the ``current plot.''
+
+\subsubsection{Missing data displays}
+
+
 
 \subsection{Selecting variables for plotting}
 \subsection{Control panels}
@@ -230,7 +251,6 @@ and how they are selected
 \subsection{Scatterplot}
 \subsection{Scatterplot matrix}
 \subsection{Parallel coordinate window}
-\subsection{Missing data displays}
 
 \newpage
 \section{Tools}
