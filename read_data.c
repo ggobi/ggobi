@@ -181,6 +181,8 @@ collabels_process_word (gchar *word, gint field, gint j, datad *d)
     case 0:
       vt->lim_specified_p = false;
       vt->collab = g_strdup (word) ;
+      /*-- if word is shorter than 2 characters, g_strndup pads with nulls --*/
+      vt->nickname = g_strndup (word, 2) ;
     break;
     case 1:
       var = atof (word);

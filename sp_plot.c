@@ -1434,7 +1434,6 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gchar *varlab;
   gint dawidth = sp->da->allocation.width;
   gint daheight = sp->da->allocation.height;
-  gchar lbl[3];
   gint axindent = 20;
   vartabled *vt;
   colorschemed *scheme = gg->activeColorScheme;
@@ -1526,26 +1525,20 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           {
             if (dsp->options.axes_label_p) {
               vt = vartable_element_get (j, d);
-              g_snprintf(lbl,3,"%s",vt->collab_tform);
-              gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-                gtk_style_get_font (style),
-#else
-                style->font,
-#endif
-                lbl, 3,
-                &lbearing, &rbearing, &width, &ascent, &descent);
+              varlab = g_strdup (vt->nickname);
 	        } else {
-              varlab = g_strdup_printf("%d",j+1);
-              gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-                gtk_style_get_font (style),
-#else
-                style->font,
-#endif
-                varlab, strlen (varlab),
-                &lbearing, &rbearing, &width, &ascent, &descent);
+              varlab = g_strdup_printf ("%d",j+1);
 	        }
+
+            gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+              gtk_style_get_font (style),
+#else
+              style->font,
+#endif
+              varlab, strlen(varlab),
+              &lbearing, &rbearing, &width, &ascent, &descent);
+
             textheight = ascent+descent;
             ix = ix - axindent - dawidth/8;
             iy = iy - (daheight - daheight/8 - axindent);
@@ -1562,29 +1555,15 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
               iy -= (textheight/2);
             else
               iy += (textheight);
-            if (dsp->options.axes_label_p) {
-              gdk_draw_string (drawable,
+
+            gdk_draw_string (drawable,
 #if GTK_MAJOR_VERSION == 2
-                gtk_style_get_font (style),
+              gtk_style_get_font (style),
 #else
-                style->font,
+              style->font,
 #endif
-                gg->plot_GC,
-                ix, iy,
-                lbl);
-              /* note: don't free lbl */
-            } else {
-              gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-                gtk_style_get_font (style),
-#else
-                style->font,
-#endif
-                gg->plot_GC,
-                ix, iy,
-                varlab);
-              g_free (varlab);
-            }
+              gg->plot_GC, ix, iy, varlab);
+            g_free (varlab);
           }
         }
         gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID, 

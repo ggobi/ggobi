@@ -916,6 +916,13 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
       el->collab_tform = g_strdup(tmp);
   }
 
+  tmp = getAttribute(attrs, "nickname");
+  if(tmp != NULL) {
+    el->nickname = g_strdup(tmp);
+    /*-- no nickname_tform; defeats the purpose of having a 2-letter name --*/
+    /*-- if word is shorter than 2 characters, g_strndup pads with nulls --*/
+  } else el->nickname = g_strndup (el->collab, 2);
+
   tmp = getAttribute(attrs, "recordLabel");
   if (tmp != NULL) {
     data->recordLabelsVariable = data->current_variable;
