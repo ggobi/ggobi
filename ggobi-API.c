@@ -346,7 +346,7 @@ GGOBI(getViewTypes)(int *n)
 const gint *
 GGOBI(getViewTypeIndices)(gint *n)
 {
-  extern gint ViewTypeIndices[];
+  extern const gint ViewTypeIndices[];
   *n = NDISPLAYTYPES;
   return (ViewTypeIndices);
 }
