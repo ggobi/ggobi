@@ -608,7 +608,6 @@ quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
 
   gtk_main_quit();
 }
-
 #endif
 
 void 
@@ -799,10 +798,12 @@ create_ggobi(InputDescription *desc)
 
   read_input(desc, gg);
 
+#ifdef USE_XML
   if(sessionOptions->info != NULL) {
     extern gboolean registerPlugins(ggobid *gg, GList *plugins);
     registerPlugins(gg, sessionOptions->info->plugins);
   }
+#endif
 
   start_ggobi(gg, init_data, true);
 
