@@ -1,0 +1,17 @@
+AUX_FILES=\
+   Makefile GNUmakefile Makevars 
+
+createDist:: configure
+	if test -d $(INSTALL_DIR)/$(DIR_NAME) ; then rm -fr $(INSTALL_DIR)/$(DIR_NAME) ; fi
+	mkdir -p $(INSTALL_DIR)/$(DIR_NAME)
+	cp $(SRC:%=%.c) $(HEADER_FILES) configure configure.in local.config.in plugin.xml $(INSTALL_DIR)/$(DIR_NAME)
+	for i in $(AUX_FILES) $(AUX_FILES:%=%.in) ; do \
+	  if test -r $$i ; then cp $$i $(INSTALL_DIR)/$(DIR_NAME) ;  fi \
+	done
+
+
+configure: configure.in 
+	autoconf
+
+%.pdf: %.tex
+	(TEXINPUTS=.:$(OMEGA_HOME)/Docs:: export TEXINPUTS ; cd $(@D) ; pdflatex $(<F))
