@@ -561,6 +561,9 @@ typedef GtkType(*GtkTypeLoad) (void);
 
 void ggobi_sleep(guint interval);
 
+
+void setMissingValue(int i, int j, datad *d, vartabled *vt);
+
 #include "GGobiEvents.h"
 
 #ifdef __cplusplus

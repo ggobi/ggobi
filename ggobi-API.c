@@ -148,8 +148,19 @@ GGOBI(destroyCurrentDisplay)(ggobid *gg)
   display_free (gg->current_display, false, gg);
 }
 
-/*
 
+MissingValue_p GGobiMissingValue;
+
+MissingValue_p
+GGobi_setMissingValueIdentifier(MissingValue_p f)
+{
+   MissingValue_p old = GGobiMissingValue;
+   GGobiMissingValue = f;
+   return(old);
+}
+
+
+/*
   An initial attempt to allow new data to be introduced
   to the Ggobi session, replacing the existing contents.
  
@@ -233,7 +244,10 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
         /* g_free (lbl); */
       }
 
-      d->raw.vals[i][j] = values[i + j*nr];
+      if(GGobiMissingValue && GGobiMissingValue(values[i + j*nr]))
+         setMissingValue(i, j, d, vt);
+      else
+         d->raw.vals[i][j] = values[i + j*nr];
     }
   }
 

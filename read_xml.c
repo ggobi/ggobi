@@ -75,7 +75,7 @@ void startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs
 void endXMLElement(void *user_data, const xmlChar *name);
 void Characters(void *user_data, const xmlChar *ch, gint len);
 void cumulateRecordData(XMLParserData *data, const xmlChar *ch, gint len);
-void setMissingValue(XMLParserData *data, datad *d, vartabled *vt);
+void xmlSetMissingValue(XMLParserData *data, datad *d, vartabled *vt);
 gint getAutoLevelIndex(const char * const label, XMLParserData *data, vartabled *el);
 static gboolean setRecordValue(const char *tmp, datad *d, XMLParserData *data);
 void resetRecordInfo(XMLParserData *data);
@@ -637,7 +637,7 @@ void endXMLElement(void *user_data, const xmlChar *name)
       resetRecordInfo(data);
     break;
     case NA:
-      setMissingValue(data, getCurrentXMLData(data), NULL);
+      xmlSetMissingValue(data, getCurrentXMLData(data), NULL);
       data->current_element++; 
     break;
     case REAL:
@@ -1124,19 +1124,26 @@ xml_warning(const gchar *attribute, const gchar *value, const gchar *msg,
 }
 
 void
-setMissingValue(XMLParserData *data, datad *d, vartabled *vt)
+setMissingValue(int i, int j, datad *d, vartabled *vt)
 {
   if (d->nmissing == 0) {
     arrays_alloc (&d->missing, d->nrows, d->ncols);
     arrays_zero (&d->missing);
   }
-  d->missing.vals[data->current_record][data->current_element] = 1;
+  d->missing.vals[i][j] = 1;
   if(vt == NULL)
-    vt = vartable_element_get (data->current_element, d);
+    vt = vartable_element_get (j, d);
   vt->nmissing++;
-  d->raw.vals[data->current_record][data->current_element] = 0;
+  d->raw.vals[i][j] = 0;
   d->nmissing++;
 }
+
+void
+xmlSetMissingValue(XMLParserData *data, datad *d, vartabled *vt)
+{
+  setMissingValue(data->current_record, data->current_element, d, vt);
+}
+
 
 static vartabled *
 applyRandomUniforms(datad *d, XMLParserData *data)
@@ -1194,7 +1201,7 @@ setRecordValue(const char *tmp, datad *d, XMLParserData *data)
          strcmp (tmp, ".") == 0)) ||
       (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0))
   {
-    setMissingValue(data, d, vt);
+    xmlSetMissingValue(data, d, vt);
   } else {
 
     value = asNumber (tmp);

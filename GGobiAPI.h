@@ -996,6 +996,9 @@ colorschemed *alloc_colorscheme();
  */
 void GGobi_cleanUpEdgeRelationships(struct _EdgeData *edge, int startPosition);
 
+typedef int (*MissingValue_p)(double);
+MissingValue_p GGobi_setMissingValueIdentifier(MissingValue_p f);
+
 #ifdef __cplusplus
 }
 #endif
