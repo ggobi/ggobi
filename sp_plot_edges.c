@@ -423,10 +423,11 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
+  colorschemed *scheme = gg->activeColorScheme;
 
   /*-- just rely on the cursor for adding points; no other markup --*/
 
-  if (cpanel->ee_adding_edges_p) {
+  if (cpanel->ee_mode == ADDING_EDGES) {
     if (k != -1)
       splot_add_diamond_cue (k, sp, drawable, gg);
 
@@ -436,6 +437,17 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
     if (gg->buttondown && gg->edgeedit.a != -1 &&
         k != -1 &&
         k != gg->edgeedit.a) {
+
+{ /* XXX do I need to unset this when I'm done?   dfs */
+  gint lwidth;
+  gint k = gg->glyph_id.size;
+
+  lwidth = (k<3) ? 0 : (k-2)*2;
+  gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
+    GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_ROUND);
+}
+
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
       gdk_draw_line (drawable, gg->plot_GC,
         sp->screen[ gg->edgeedit.a ].x, sp->screen[ gg->edgeedit.a ].y,
         sp->screen[ k ].x, sp->screen[ k ].y);
