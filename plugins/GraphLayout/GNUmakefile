@@ -14,21 +14,22 @@ endif
 ifdef GGOBI_CONFIG
  GGOBI_INCLUDE_DIR=$(shell $(GGOBI_CONFIG) --cflags)
  GGOBI_LIB=$(shell $(GGOBI_CONFIG) --libs)
+ CFLAGS+=$(shell $(GGOBI_CONFIG) --cflags) $(GGOBI_INCLUDE_DIR)
 else
  GGOBI_INCLUDE_DIR=-I../..
  GGOBI_LIB=-L../.. -lggobi
+ CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
 endif
 
 #GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
 GGOBI_LIB=
 
-CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
-CFLAGS+=-Wno-unknown-pragmas
 
 ifdef GRAPHVIZ
 GVINC=-I$(GVIZ_INC) -I$(GVIZ_SRC) -I$(GVIZ_SRC)/dotneato/common
 GVLIB=$(GVIZ_LIB)
 
+CFLAGS+=-Wno-unknown-pragmas
 CFLAGS+= -DGRAPHVIZ=1 $(GVINC)
 LDFLAGS+=-L$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan
 LDFLAGS+=$(GVLIB)/libgd.a
