@@ -93,10 +93,6 @@ c) Stand-alone and embeddable ggobi library
 ./configure --enable-embed
 make 
 
-OR
-./configure
-make
-
 d) Stand-alone and embeddable ggobi library with XML support
 
 If the libxml2 library is installed on your system (not common!) then
