@@ -251,7 +251,6 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
   parse_command_line (&argc, argv, gg);
   g_print ("data_in = %s\n", gg->data_in);
 
-
   make_ggobi (gg->data_in, processEvents, gg);
 
   g_free (gg->data_in);

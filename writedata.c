@@ -26,9 +26,6 @@ set_rowv (gint *rowv, gchar *rootname, ggobid *gg)
 {
   gint i, j, k;
   gint nrows = 0;
-  gchar *fname;
-  FILE *fp;
-  gchar *message;
   GSList *l;
 
   switch (gg->save.row_ind) {
@@ -80,9 +77,6 @@ set_colv (gint *colv, gchar *rootname, ggobid *gg)
 {
   gint i;
   gint ncols = 0;
-  gchar *fname;
-  gchar *message;
-  FILE *fp;
 
   switch (gg->save.column_ind) {
 

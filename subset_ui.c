@@ -353,7 +353,7 @@ subset_window_open (ggobid *gg) {
     gtk_signal_connect (GTK_OBJECT (button),
                         "clicked",
                         GTK_SIGNAL_FUNC (subset_cb),
-                        (gpointer) &gg);
+                        (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
 
     button = gtk_check_button_new_with_label ("Rescale");

@@ -25,6 +25,7 @@ static void stage_set_cb (GtkWidget *w, gpointer cbd)
   stage_set (GPOINTER_TO_INT (cbd), gg);
 }
 
+/*
 static gchar *jitter_lbl[] = {"Don't add jitter", "Add jitter"};
 void jitterp_set (gboolean jitterp, ggobid *gg) { gg->save.jitter_p = jitterp; }
 static void jitterp_set_cb (GtkWidget *w, gpointer cbd)
@@ -32,6 +33,7 @@ static void jitterp_set_cb (GtkWidget *w, gpointer cbd)
   ggobid *gg = GGobiFromWidget (w, true);
   jitterp_set ((gboolean ) GPOINTER_TO_INT (cbd), gg);
 }
+*/
 
 static gchar *rowdata_lbl[] = {"All cases",
                                "Displayed cases",
