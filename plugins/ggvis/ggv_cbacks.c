@@ -11,6 +11,7 @@
 #include "ggvis.h"
 
 static void ggv_center_scale_pos_all (ggvisd *ggv);
+void mds_open_display (PluginInstance *inst);
 
 void
 ggv_scramble (ggvisd *ggv, ggobid *gg)
@@ -255,7 +256,6 @@ trans_dist_init_defaults (ggvisd *ggv)
   }
 }
 
-
 void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
@@ -343,11 +343,15 @@ g_printerr ("e is null\n");
   g_free (lbl);
 
   trans_dist_init_defaults (ggv);
+
+  /*-- open display --*/
+  mds_open_display (inst);
 }
 
 /*-- --*/
 
-void mds_open_display_cb (GtkWidget *btn, PluginInstance *inst)
+void
+mds_open_display (PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
@@ -385,12 +389,11 @@ void mds_open_display_cb (GtkWidget *btn, PluginInstance *inst)
   gtk_widget_set_sensitive (w, true);
   w = widget_find_by_name (window, "Step");
   gtk_widget_set_sensitive (w, true);
-/*
-  w = widget_find_by_name (window, "Reinit");
-  gtk_widget_set_sensitive (w, true);
-  w = widget_find_by_name (window, "Scramble");
-  gtk_widget_set_sensitive (w, true);
-*/
+}
+
+void mds_open_display_cb (GtkWidget *btn, PluginInstance *inst)
+{
+  mds_open_display (inst);
 }
 
 void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)

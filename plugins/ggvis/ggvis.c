@@ -394,14 +394,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     1, 1);
 
-  btn = gtk_button_new_with_label ("Open display");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "After specifying the MDS dimension, open the MDS scatterplot display",
-    NULL);
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (mds_open_display_cb), inst);
-
   hbox = gtk_hbox_new (false, 1);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
@@ -415,28 +407,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (mds_run_cb), inst);
 
-/*
-  btn = gtk_button_new_with_label ("Reinit");
-  gtk_widget_set_name (btn, "Reinit");
-  gtk_widget_set_sensitive (btn, false);
-  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (mds_reinit_cb), inst);
-
-  btn = gtk_button_new_with_label ("Scramble");
-  gtk_widget_set_name (btn, "Scramble");
-  gtk_widget_set_sensitive (btn, false);
-  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (mds_scramble_cb), inst);
-*/
-
-  /*-- stepsize --*/
-/*
-  table = gtk_table_new (1, 2, false);
-  gtk_container_set_border_width (GTK_CONTAINER (table), 5);
-  gtk_box_pack_start (GTK_BOX (vbox), table, false, false, 2);
-*/
 
   adj = gtk_adjustment_new (0.01, 0.0001, 0.2, 0.02, 0.2, 0.10);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
@@ -449,19 +419,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_scale_set_digits (GTK_SCALE(hscale), 4);
   gtk_box_pack_start (GTK_BOX (hbox), hscale, true, true, 2);
-/*
-  gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, 0, 1,
-    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
-    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
-    2, 2);
-
-  label = gtk_label_new ("Stepsize");
-  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
-  gtk_table_attach (GTK_TABLE (table), label, 1, 2, 0, 1,
-    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
-    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
-    2, 2);
-*/
 
   btn = gtk_button_new_with_label ("Step");
   gtk_widget_set_name (btn, "Step");
@@ -472,34 +429,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   label = gtk_label_new ("Run");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
-
-  /*-- Reset initial layout --*/
-/*
-  hbox = gtk_hbox_new (false, 1);
-  gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
-
-  vbox = gtk_vbox_new (false, 1);
-  gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 2);
-
-  btn = gtk_check_button_new_with_label (" Scramble ");
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (mds_scramble_cb), inst);
-
-  btn = gtk_check_button_new_with_label (" Copy selected vars ");
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
-
-  varnotebook = create_variable_notebook (hbox,
-    GTK_SELECTION_EXTENDED, all_vartypes, no_edgesets,
-    (GtkSignalFunc) NULL, inst->gg);
-  gtk_object_set_data (GTK_OBJECT (window),
-    "notebook", varnotebook);
-
-  label = gtk_label_new ("Starting pos");
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
-*/
-  /*-- --*/
-
 
   /*-- Plot of stress function --*/
   frame = gtk_frame_new ("Stress function");
@@ -549,35 +478,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     sizeof (kruskal_lbl) / sizeof (gchar *),
     (GtkSignalFunc) ggv_kruskal_cb, "PluginInst", inst);
   gtk_box_pack_start (GTK_BOX (hbox), opt, false, false, 2);
-
-/*
-  *-- table --*
-  table = gtk_table_new (1, 2, false);
-  gtk_container_set_border_width (GTK_CONTAINER (table), 2);
-  gtk_box_pack_start (GTK_BOX (vbox), table, false, false, 1);
-
-  top = 0;
-
-  *-- MDS Dimension --*
-  label = gtk_label_new ("Dimension (k)");
-  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
-  gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
-    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
-    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
-    1, 1);
-
-  adj = gtk_adjustment_new ((gfloat)ggv->dim, 1.0, 10.0, 1.0, 1.0, 1.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_dims_cb), inst);
-  hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-  gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
-  ggvis_scale_set_default_values (GTK_SCALE(hscale));
-  gtk_scale_set_digits (GTK_SCALE(hscale), 0);
-  gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,
-    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
-    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
-    1, 1);
-*/
 
 
   frame = gtk_frame_new ("Data (D): Histogram, power, weights");
