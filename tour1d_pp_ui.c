@@ -41,17 +41,17 @@ static void close_menuitem_cb (displayd *dsp, gint action, GtkWidget *w) {
                                just gets hidden, so shouldn't
                                free the arrays. */
 }
-/*-- called when closed from the window manager --*/
+/*-- called when destroyed from the window manager --*/
 static void
 close_wmgr_cb (GtkWidget *w, GdkEventButton *event, displayd *dsp) {
   gtk_widget_hide (dsp->t1d_window);
   t1d_optimz(0, &dsp->t1d.get_new_target, 
     &dsp->t1d.target_selection_method, dsp);
 
-  /*  free_optimize0_p(&dsp->t1d_pp_op); * should this go here? *
-  free_pp(&dsp->t1d_pp_param); seems not, causes a crash because window
-                               just gets hidden, so shouldn't
-                               free the arrays. */
+  free_optimize0_p(&dsp->t1d_pp_op);
+  free_pp(&dsp->t1d_pp_param);
+  gtk_widget_destroy (dsp->t1d_window);
+  dsp->t1d_window = NULL;
 }
 
 static void
