@@ -203,10 +203,7 @@ typedef enum {NULLMODE = -1,
 #define STICKY_ADD    1
 #define STICKY_REMOVE 2
 
-#define ID_RECORD_LABEL 0
-#define ID_RECORD_NO    1
-#define ID_VAR_LABELS   2
-
+enum {ID_RECORD_LABEL, ID_RECORD_NO, ID_VAR_LABELS, ID_RECORD_ID};
 
 /*
  * jittering
