@@ -178,18 +178,21 @@ void linking_method_set(displayd * display, datad * d, ggobid * gg)
     gint jvar;
     GtkWidget *clist;
     clist = get_clist_from_object (GTK_OBJECT (gg->control_panel[BRUSH]));
-    jvar = get_one_selection_from_clist (clist, d);
-
-    vt = vartable_element_get(jvar, d);
-    if (vt->categorical_p) {
-      gg->linkby_cv = true;
-      if (d->linkvar_vt == NULL || d->linkvar_vt != vt) {
-        d->linkvar_vt = vt;
+    if (clist) {
+      jvar = get_one_selection_from_clist (clist, d);
+      if (jvar >= 0) {
+        vt = vartable_element_get(jvar, d);
+        if (vt->categorical_p) {
+          gg->linkby_cv = true;
+          if (d->linkvar_vt == NULL || d->linkvar_vt != vt) {
+            d->linkvar_vt = vt;
+          }
+        }
       }
     }
     if (!gg->linkby_cv) {
       gchar *message =
-          g_strdup_printf
+        g_strdup_printf
           ("You have specified linking by categorical variable, but \n no categorical variable is selected for the current dataset.\n");
       quick_message(message, false);
       gdk_flush();

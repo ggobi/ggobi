@@ -314,6 +314,20 @@ variable_notebook_subwindow_add (datad *d,
   if (d->ncols == 0)
     return;
 
+  if (vtype == categorical_only) {
+    /* is there in fact a categorical variable? */
+    gboolean categorical_variable_present = false;
+    for (j=0; j<g_slist_length (d->vartable); j++) {
+      vt = (vartabled *) g_slist_nth_data (d->vartable, j);
+      if (vt->categorical_p) {
+        categorical_variable_present = true;
+        break;
+      }
+    }
+    if (!categorical_variable_present)
+      return;
+  }
+
   /* Create a scrolled window to pack the CList widget into */
   swin = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
