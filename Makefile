@@ -145,8 +145,9 @@ endif
 XML_LIB_NO=2
 
 ifndef XML_LIBS
- XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml$(XML_LIB_NO) -lz 
+  XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml$(XML_LIB_NO) -lz 
 endif
+
 
 main_ui.o: write_xml.h
 read_xml.o: read_xml.h
