@@ -1,0 +1,98 @@
+<ggobidata count="2">
+
+<!--
+  In this example, the points that define the polygons do
+  exist as data points in ggobi.  This may be because we have
+  data on the nodes, or it may just be because we want to have
+  the points available for brushing.
+
+  An id must be specified in the datad.
+
+  How will the polygon viewer which variables from the data element
+  to use in constructing the polygons?  By default, it will use the
+  first two variables; it will be possible to choose other variables
+  or more variables.
+
+  Just for the heck of it, add a second datad consisting of
+  variables corresponding to each polygon.
+
+  A thought:  I wonder if this would allow us to explore Georgia
+  Thompson's ranking data?  Perhaps we don't even need it, because we
+  could do everything useful with points and edges along, but it's
+  something to think about.
+-->
+
+<data name="polygon nodes">
+<description>
+  The points that define the nodes of the polygons.  Let's suppose
+  these are 3d polygons and there are no additional variables on the
+  nodes.  These points are required to have ids.
+</description>
+
+<variables count="3">
+  <realvariable name="x" />
+  <realvariable name="y" />
+  <realvariable name="z" />
+</variables>
+  
+<records count="50">
+<record id="0"> 0 600  42 </record>
+<record id="1"> 1 200 -60 </record>
+...
+</records>
+</data>
+
+<!-- the polygon data, using the points from the preceding data element -->
+
+<polygondata name="Assorted polygons">
+<description>
+  The polygons themselves, using the ids defined in the
+  preceding data element. 
+
+  The polypoints element is null.  As a result, the default for
+  drawing the polygons is this:  they will be drawn using the first
+  two variables of the first datad.  Other variables can be specified.
+
+  I was going to say that other datad's can be specified, but that
+  isn't really true because id's are unique within a single xml file,
+  so the points can only be specified in one datad.
+
+  Let's suppose we have no variables on the polygons, though
+  we could have.
+</description>
+
+<polygons>
+  
+<records count="6000">
+<record label="Poly1">
+  <polypts num="4"> <ppt>1</ppt>  <ppt>2</ppt> ... </polypts>
+</record>
+<record label="Poly2">
+  <polypts num="6"> <ppt>3</ppt>  <ppt>5</ppt> ... </polypts>
+</record>
+</records>
+
+</polygons>
+</polygondata>
+
+<!-- Covariates corresponding to each polygon; what might they be? -->
+
+<data name="polygon data">
+<description>
+  Covariates corresponding to polygons.
+</description>
+
+<variables count="3">
+  <realvariable name="var1" />
+  <realvariable name="var2" />
+  <realvariable name="var3" />
+</variables>
+  
+<records count="50">
+<record="Poly1"> 4 3 7.8 </record>
+<record="Poly2"> 9.6 -1 3 </record>
+...
+</records>
+</data>
+
+</ggobidata>

@@ -1,13 +1,16 @@
 <ggobidata count="1">
 
-<polygondata name="US Map">
-<description>
+<!--
+  There are two main elements in this file: one regular ggobi data
+  element containing data corresponding to a set of polygons
+  element and one polygondata element.
+
   We think it makes sense to separate the data to be read
-  by the plugin from the data to be read by ggobi -- in
+  by the plugin from the data to be read by ggobi:  in
   particular, the polygon definitions themselves.
 
   In some cases, the "polypoints" that are used to define the
-  polygons will be in here -- in that case, the points will
+  polygons will be in here: in that case, the points will
   not be sensitive to brushing and identification and can not
   be plotted.  That makes sense for maps.
 
@@ -16,16 +19,25 @@
   that exist in some ggobi data element.  (I'll put together
   polyexample.xml to show what that might look like.)
 
+  These two cases may be represented by entirely different
+  plugins, come to think of it, but we can still come up with
+  a consistent way of defining them.
+
   polypoints usually live in 2D, but they may occasionally
   live in higher-dimensional spaces; in that sense, they may
   need variables.  They must specify an id.
 
   polygons may be nested, and because of that, they may need
   more than one categorical variable.
+-->
+
+
+<polygondata name="US Map">
+<description>
+  This polygondata contains two elements: polypoints and polygons.
 </description>
 
 <!-- the points that will be used to define the polygons -->
-
 <polypoints>
 <dimensions count="2">
   <dimension name="latitude" />
