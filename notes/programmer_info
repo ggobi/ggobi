@@ -1,0 +1,47 @@
+What variables live in what include file?
+
+cpanel.h  : ui variables that live in the control panel; they
+            could also be in ggobi.h, in a way, because there's
+            one of them per ggobi instance.
+datad.h   : in the case that we might have multiple data arrays --
+            node variables and edge variables in the graph case,
+            or just two different data arrays, for some reason we
+            haven't thought of yet
+display.h : variables that are per-display -- ie, per window
+ggobi.h   : variables that are per-ggobi (I can't imagine dealing
+            with multiple ggobi's but Duncan allowed for that in
+            the R interface)
+splot.h   : variables that are per-plot (do we ever want
+            to support multiple tours in the same window?)
+
+vartable.h : the data for each variable is described here.
+
+------------------------------------------------------------------
+
+How does one keep the console panels in sync when switching between
+  displays in the same view mode?
+
+Use the routines with names like cpanel_brush_set.
+
+get a pointer to the widget using widget_find_by_name
+    (having named the widget when it was created)
+set the appearance of the widget to match the corresponding variable
+     
+To set the name:
+  gtk_widget_set_name (option_menu, "BRUSH:linkby_option_menu"); 
+To get the widget by name:
+  w = widget_find_by_name (pnl, "BRUSH:linkby_option_menu");
+  
+The name can be any string, of course; I adopted a pretty
+verbose naming convention to make sure I could find the names
+easily when editing or grepping the code.
+    
+To set the widget's appearance:
+
+For a toggle button:
+  GTK_TOGGLE_BUTTON (btn)->active = cpanel->brush_on_p;
+  
+For an option menu:
+  gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->br_linkby);
+  
+
