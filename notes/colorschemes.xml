@@ -1,71 +1,159 @@
 <?xml version="1.0"?>
 <!DOCTYPE colormaps>
 
-<colormaps num="2">
+<colormaps num="20">
 
-<colormap name="Green, peach" ncolors="5" type="diverging" criticalvalue="2"
+<colormap name="Brown -- Blue Green 7" ncolors="7"
+          type="diverging" criticalvalue="4"
           system="rgb" system_min="0" system_max="1">
 <description>
-  From Cindy Brewer, a diverging color scheme ranging
-  between dark green and peach
+  From Cindy Brewer, a diverging color scheme ranging 
+  through shades of brown, then shades of blue-green
 </description>
 <foreground>
-  <color name="Dark Green">
-    <red>0.000</red> <green>0.431</green> <blue>0.114</blue> 
+  <color name="Brown">
+    <red>0.529</red><green>0.322</green><blue>0.000</blue>
   </color>
-  <color name="Light Green">
-     <red>0.302</red><green>0.675</green><blue>0.451</blue>
+  <color name="Light Brown">
+    <red>0.816</red><green>0.655</green><blue>0.333</blue>
   </color>
-  <color name="Pale Green">
-    <red>0.702</red><green>0.863</green><blue>0.765</blue>
-  </color> 
-  <color name="Pale Peach">
-    <red>1.000</red><green>1.000</green><blue>0.800</blue>
+  <color name="Pale Brown">
+    <red>0.980</red><green>0.922</green><blue>0.792</blue>
   </color>
-  <color name="Peach">
-    <red>1.000</red><green>0.800</green><blue>0.502</blue>
+  <color name="Off-White">
+    <red>0.980</red><green>0.980</green><blue>0.980</blue>
+  </color>
+  <color name="Pale Blue Green">
+    <red>0.784</red><green>0.918</green><blue>0.898</blue>
+  </color>
+  <color name="Light Blue Green">
+    <red>0.333</red><green>0.643</green><blue>0.608</blue>
+  </color>
+  <color name="Blue Green">
+    <red>0.000</red><green>0.353</green><blue>0.345</blue>
   </color>
 </foreground> 
 <background>
  <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
 </background>
 <annotations>
- <color><red>1.000</red><green>1.000</green><blue>1.000</blue></color>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue> </color>
 </annotations>
 </colormap>
 
-<colormap name="Red, blue" ncolors="5" type="diverging" criticalvalue="2"
+<colormap name="Brick Red -- Blue 7" ncolors="7"
+          type="diverging" criticalvalue="4"
           system="rgb" system_min="0" system_max="1">
 <description>
-  From Cindy Brewer, a diverging color scheme ranging
-  between red to blue
+  From Cindy Brewer, a diverging color scheme ranging from
+  dark brick red to blue through off-white
 </description>
 <foreground>
-  <color name="Red">
-    <red>1.000</red> <green>0.000</green> <blue>0.047</blue> 
+  <color name="Dark Brick Red">
+    <red>0.596</red><green>0.153</green><blue>0.075</blue>
   </color>
-  <color name="Light Red">
-    <red>0.941</red><green>0.451</green><blue>0.525</blue>
+  <color name="Light Brick Red">
+    <red>0.859</red><green>0.584</green><blue>0.424</blue>
   </color>
-  <color name="Gray">
-    <red>0.816</red><green>0.804</green><blue>0.898</blue>
-  </color> 
+  <color name="Pale Brick Red">
+    <red>0.984</red><green>0.890</green><blue>0.816</blue>
+  </color>
+  <color name="White">
+    <red>0.980</red><green>0.980</green><blue>0.980</blue>
+  </color>
   <color name="Pale Blue">
-    <red>0.522</red><green>1.659</green><blue>0.816</blue>
+    <red>0.788</red><green>0.902</green><blue>0.945</blue>
+  </color>
+  <color name="Light Blue">
+    <red>0.365</red><green>0.627</green><blue>0.745</blue>
   </color>
   <color name="Blue">
-    <red>0.039</red><green>0.314</green><blue>0.631</blue>
+    <red>0.024</red><green>0.294</green><blue>0.549</blue>
   </color>
 </foreground> 
 <background>
- <color><red>1.000</red><green>1.000</green><blue>1.000</blue></color>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
 </background>
 <annotations>
- <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue> </color>
 </annotations>
 </colormap>
 
-<colormap name="Green, violet" ncolors="6" type="diverging" criticalvalue="3"
+<colormap name="Dark Red -- Dark Green 7" ncolors="7"
+          type="diverging" criticalvalue="4"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a diverging color scheme ranging from
+  dark red to dark green through off-white
+</description>
+<foreground>
+  <color name="Dark Red">
+    <red>0.486</red><green>0.157</green><blue>0.196</blue>
+  </color>
+  <color name="Light Red">
+    <red>0.761</red><green>0.565</green><blue>0.549</blue>
+  </color>
+  <color name="Pale Red">
+    <red>0.973</red><green>0.914</green><blue>0.922</blue>
+  </color>
+  <color name="White">
+    <red>0.980</red><green>0.980</green><blue>0.980</blue>
+  </color>
+  <color name="Beige">
+    <red>0.910</red><green>0.941</green><blue>0.714</blue>
+  </color>
+  <color name="Green">
+    <red>0.561</red><green>0.667</green><blue>0.208</blue>
+  </color>
+  <color name="Dark Green">
+    <red>0.235</red><green>0.341</green><blue>0.043</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</background>
+<annotations>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue> </color>
+</annotations>
+</colormap>
+
+<colormap name="Dark Blue -- Green 6" ncolors="6"
+          type="diverging" criticalvalue="4"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a diverging color scheme ranging from
+  a dark purplish blue to a dull green through off-white
+</description>
+<foreground>
+  <color name="Dark Blue">
+    <red>0.302</red><green>0.255</green><blue>0.392</blue>
+  </color>
+  <color name="Light Purplish Blue">
+    <red>0.608</red><green>0.549</green><blue>0.655</blue>
+  </color>
+  <color name="Pale Blue">
+    <red>0.855</red><green>0.855</green><blue>0.918</blue>
+  </color>
+  <color name="White">
+    <red>0.980</red><green>0.980</green><blue>0.980</blue>
+  </color>
+  <color name="Pale Green">
+    <red>0.839</red><green>0.933</green><blue>0.816</blue>
+  </color>
+  <color name="Green">
+    <red>0.455</red><green>0.655</green><blue>0.431</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</background>
+<annotations>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue> </color>
+</annotations>
+</colormap>
+
+<colormap name="Green -- Violet 6" ncolors="6"
+          type="diverging" criticalvalue="3"
           system="rgb" system_min="0" system_max="1">
 <description>
   From Cindy Brewer, a diverging color scheme ranging
@@ -99,41 +187,314 @@
 </annotations>
 </colormap>
 
-<colormap name="Dark Red to Pale Peach" ncolors="6" type="sequential"
+<colormap name="Brown -- Blue Green 5" ncolors="5"
+          type="diverging" criticalvalue="2"
           system="rgb" system_min="0" system_max="1">
 <description>
-  From Cindy Brewer, a sequential color scheme ranging
-  from pale peach to very dark red
+  From Cindy Brewer, a diverging color scheme ranging
+  between brown and blue-green
 </description>
 <foreground>
-  <color name="Pale Peach">    
-    <red>0.498</red><green>0.000</green><blue>0.000</blue>
+  <color name="B">
+    <red>0.780</red><green>0.416</green><blue>0.000</blue>
   </color>
-  <color name="Peach">         
-    <red>0.702</red><green>0.000</green><blue>0.000</blue>
+  <color name="B">
+    <red>0.937</red><green>0.820</green><blue>0.529</blue>
   </color>
-  <color name="Orange">         
-    <red>0.902</red><green>0.200</green><blue>0.000</blue>
+  <color name="B">
+    <red>0.980</red><green>0.980</green><blue>0.980</blue>
+  </color>
+  <color name="B">
+    <red>0.482</red><green>0.776</green><blue>0.741</blue>
+  </color>
+  <color name="B">
+    <red>0.047</red><green>0.506</green><blue>0.502</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</background>
+<annotations>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue></color>
+</annotations>
+</colormap>
+
+<colormap name="Pinkish Red -- Olive Green 5" ncolors="5"
+          type="diverging" criticalvalue="2"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a diverging color scheme ranging
+  between pinkish red and olive green
+</description>
+<foreground>
+  <color name="Dark Pinkish Red">
+    <red>0.733</red><green>0.282</green><blue>0.318</blue>
+  </color>
+  <color name="Pale Pinkish Red">
+    <red>0.941</red><green>0.761</green><blue>0.725</blue>
+  </color>
+  <color name="White">
+    <red>0.980</red><green>0.980</green><blue>0.980</blue>
+  </color>
+  <color name="Light Olive Green">
+    <red>0.741</red><green>0.796</green><blue>0.329</blue>
+  </color>
+  <color name="Olive Green">
+    <red>0.376</red><green>0.549</green><blue>0.071</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</background>
+<annotations>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue></color>
+</annotations>
+</colormap>
+
+<colormap name="Purplish Blue -- Green 5" ncolors="5"
+          type="diverging" criticalvalue="2"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a diverging color scheme ranging
+  between orange and blue
+</description>
+<foreground>
+  <color name="Dark Purplish Blue">
+    <red>0.431</red><green>0.353</green><blue>0.588</blue>
+  </color>
+  <color name="Pale Blue">
+    <red>0.820</red><green>0.804</green><blue>0.882</blue>
+  </color>
+  <color name="Almost White">
+    <red>0.980</red><green>0.980</green><blue>0.980</blue>
+  </color>
+  <color name="Pale Green">
+    <red>0.678</red><green>0.831</green><blue>0.627</blue>
+  </color>
+  <color name="Green">
+    <red>0.125</red><green>0.490</green><blue>0.220</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</background>
+<annotations>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue></color>
+</annotations>
+</colormap>
+
+<colormap name="Orange -- Blue 5" ncolors="5"
+          type="diverging" criticalvalue="2"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a diverging color scheme ranging
+  between orange and blue
+</description>
+<foreground>
+  <color name="Orange">
+    <red>0.843</red><green>0.298</green><blue>0.141</blue>
+  </color>
+  <color name="Pale Orange">
+    <red>0.973</red><green>0.816</green><blue>0.675</blue>
+  </color>
+  <color name="Almost white">
+    <red>0.980</red><green>0.980</green><blue>0.980</blue>
+  </color>
+  <color name="Light Blue">
+    <red>0.627</red><green>0.808</green><blue>0.882</blue>
+  </color>
+  <color name="Blue">
+    <red>0.137</red><green>0.447</green><blue>0.663</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</background>
+<annotations>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue></color>
+</annotations>
+</colormap>
+
+<colormap name="Green -- Peach 5" ncolors="5"
+          type="diverging" criticalvalue="2"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a diverging color scheme ranging
+  between dark green and peach
+</description>
+<foreground>
+  <color name="Dark Green">
+    <red>0.000</red> <green>0.431</green> <blue>0.114</blue> 
+  </color>
+  <color name="Light Green">
+     <red>0.302</red><green>0.675</green><blue>0.451</blue>
+  </color>
+  <color name="Pale Green">
+    <red>0.702</red><green>0.863</green><blue>0.765</blue>
   </color> 
-  <color name="Red">    
-    <red>0.973</red><green>0.471</green><blue>0.169</blue>
+  <color name="Pale Peach">
+    <red>1.000</red><green>1.000</green><blue>0.800</blue>
   </color>
-  <color name="Brick Red">     
-    <red>1.000</red><green>0.753</green><blue>0.502</blue>
+  <color name="Peach">
+    <red>1.000</red><green>0.800</green><blue>0.502</blue>
   </color>
-  <color name="Dark Brick Red">
-    <red>1.000</red><green>0.902</green><blue>0.800</blue>
+</foreground> 
+<background>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</background>
+<annotations>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue></color>
+</annotations>
+</colormap>
+
+<colormap name="Red -- Blue 5" ncolors="5"
+          type="diverging" criticalvalue="2"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a diverging color scheme ranging
+  between red to blue
+</description>
+<foreground>
+  <color name="Red">
+    <red>1.000</red> <green>0.000</green> <blue>0.047</blue> 
+  </color>
+  <color name="Light Red">
+    <red>0.941</red><green>0.451</green><blue>0.525</blue>
+  </color>
+  <color name="Gray">
+    <red>0.816</red><green>0.804</green><blue>0.898</blue>
+  </color> 
+  <color name="Pale Blue">
+    <red>0.522</red><green>1.659</green><blue>0.816</blue>
+  </color>
+  <color name="Blue">
+    <red>0.039</red><green>0.314</green><blue>0.631</blue>
   </color>
 </foreground> 
 <background>
  <color><red>1.000</red><green>1.000</green><blue>1.000</blue></color>
 </background>
 <annotations>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</annotations>
+</colormap>
+
+<colormap name="Reds and Yellows 7" ncolors="7"
+          type="sequential"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a sequential color scheme ranging
+  from very dark red through a range of oranges and yellows
+</description>
+<foreground>
+  <color name="B">
+    <red>0.392</red><green>0.000</green><blue>0.059</blue>
+  </color>
+  <color name="B">
+    <red>0.694</red><green>0.157</green><blue>0.055</blue>
+  </color>
+  <color name="B">
+    <red>0.851</red><green>0.341</green><blue>0.000</blue>
+  </color>
+  <color name="B">
+    <red>0.949</red><green>0.616</green><blue>0.000</blue>
+  </color>
+  <color name="B">
+    <red>0.980</red><green>0.835</green><blue>0.047</blue>
+  </color>
+  <color name="B">
+    <red>0.961</red><green>0.929</green><blue>0.380</blue>
+  </color>
+  <color name="B">
+    <red>1.000</red><green>1.000</green><blue>0.651</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.550</red><green>0.550</green><blue>0.550</blue></color>
+</background>
+<annotations>
  <color><red>0.000</red><green>0.000</green><blue>0.000</blue> </color>
 </annotations>
 </colormap>
 
-<colormap name="Dark Blue to Pale Yellow" ncolors="7" type="sequential"
+<colormap name="Grays 7" ncolors="7"
+          type="sequential"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a gray scale
+</description>
+<foreground>
+  <color name="B">
+    <red>0.098</red><green>0.098</green><blue>0.098</blue>
+  </color>
+  <color name="B">
+    <red>0.247</red><green>0.247</green><blue>0.247</blue>
+  </color>
+  <color name="B">
+    <red>0.376</red><green>0.376</green><blue>0.376</blue>
+  </color>
+  <color name="B">
+    <red>0.529</red><green>0.529</green><blue>0.529</blue>
+  </color>
+  <color name="B">
+    <red>0.729</red><green>0.729</green><blue>0.729</blue>
+  </color>
+  <color name="B">
+    <red>0.878</red><green>0.878</green><blue>0.878</blue>
+  </color>
+  <color name="B">
+    <red>0.980</red><green>0.980</green><blue>0.980</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.400</red><green>0.550</green><blue>0.400</blue></color>
+</background>
+<annotations>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue> </color>
+</annotations>
+</colormap>
+
+<colormap name="Blues 7" ncolors="7"
+          type="sequential"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a sequential color scheme ranging
+  from very dark blue, almost black, through increasingly
+  lighter blues to white
+</description>
+<foreground>
+  <color name="B">
+    <red>0.114</red><green>0.075</green><blue>0.157</blue>
+  </color>
+  <color name="B">
+    <red>0.251</red><green>0.247</green><blue>0.365</blue>
+  </color>
+  <color name="B">
+    <red>0.408</red><green>0.447</green><blue>0.631</blue>
+  </color>
+  <color name="B">
+    <red>0.373</red><green>0.627</green><blue>0.796</blue>
+  </color>
+  <color name="B">
+    <red>0.525</red><green>0.765</green><blue>0.859</blue>
+  </color>
+  <color name="B">
+    <red>0.784</red><green>0.906</green><blue>0.925</blue>
+  </color>
+  <color name="B">
+    <red>0.929</red><green>0.973</green><blue>0.973</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.550</red><green>0.550</green><blue>0.550</blue></color>
+</background>
+<annotations>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue> </color>
+</annotations>
+</colormap>
+
+<colormap name="Blues and Yellows 7" ncolors="7"
+          type="sequential"
           system="rgb" system_min="0" system_max="1">
 <description>
   From Cindy Brewer, a sequential color scheme ranging
@@ -170,26 +531,62 @@
 </annotations>
 </colormap>
 
-<colormap name="P,Y,LG,T,B" ncolors="5" type="qualitative"
+<colormap name="Orangey Reds 6" ncolors="6"
+          type="sequential"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a sequential color scheme ranging
+  from a very dark red to pale peach
+</description>
+<foreground>
+  <color name="Pale Peach">    
+    <red>0.498</red><green>0.000</green><blue>0.000</blue>
+  </color>
+  <color name="Peach">         
+    <red>0.702</red><green>0.000</green><blue>0.000</blue>
+  </color>
+  <color name="Orange">         
+    <red>0.902</red><green>0.200</green><blue>0.000</blue>
+  </color> 
+  <color name="Red">    
+    <red>0.973</red><green>0.471</green><blue>0.169</blue>
+  </color>
+  <color name="Brick Red">     
+    <red>1.000</red><green>0.753</green><blue>0.502</blue>
+  </color>
+  <color name="Dark Brick Red">
+    <red>1.000</red><green>0.902</green><blue>0.800</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue></color>
+</background>
+<annotations>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue> </color>
+</annotations>
+</colormap>
+
+<colormap name="Pink,Gold,...,Blue 5" ncolors="5"
+          type="qualitative"
           system="rgb" system_min="0" system_max="1">
 <description>
   From Cindy Brewer, a qualitative color scheme ranging
-  including pink, yellow, green, pale orange, and blue
+  including pink, gold, green, pale orange, and blue
 </description>
 <foreground>
-  <color name="B">
+  <color name="Pink">
     <red>1.000</red><green>0.500</green><blue>0.800</blue>
   </color>
-  <color name="B">
+  <color name="Gold">
     <red>1.000</red><green>0.900</green><blue>0.000</blue>
   </color>
-  <color name="B">
+  <color name="Light Green">
     <red>0.500</red><green>1.000</green><blue>0.500</blue>
   </color>
-  <color name="B">
+  <color name="Peach">
     <red>1.000</red><green>0.800</green><blue>0.600</blue>
   </color>
-  <color name="B">
+  <color name="Blue">
     <red>0.300</red><green>0.700</green><blue>1.000</blue>
   </color>
 </foreground> 
@@ -201,27 +598,96 @@
 </annotations>
 </colormap>
 
-<colormap name="P,Y,LG,G,B" ncolors="5" type="qualitative"
+<colormap name="Pink,Yellow,...,Blue 5" ncolors="5"
+          type="qualitative"
           system="rgb" system_min="0" system_max="1">
 <description>
   From Cindy Brewer, a qualitative color scheme ranging
   including pink, yellow, light green, green, and blue
 </description>
 <foreground>
-  <color name="B">
+  <color name="Pink">
     <red>1.000</red><green>0.632</green><blue>0.947</blue>
   </color>
-  <color name="B">
+  <color name="Light Yellow">
     <red>1.000</red><green>1.000</green><blue>0.333</blue>
   </color>
-  <color name="B">
+  <color name="Light Green">
     <red>0.500</red><green>1.000</green><blue>0.500</blue>
   </color>
-  <color name="B">
+  <color name="Green">
     <red>1.052</red><green>0.737</green><blue>0.526</blue>
   </color>
-  <color name="B">
+  <color name="Light Blue">
     <red>0.500</red><green>0.800</green><blue>1.000</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</background>
+<annotations>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue> </color>
+</annotations>
+</colormap>
+
+<colormap name="Spectrum 7" ncolors="7"
+          type="spectral"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a spectrum
+</description>
+<foreground>
+  <color name="B">
+    <red>0.890</red><green>0.196</green><blue>0.122</blue>
+  </color>
+  <color name="B">
+    <red>1.000</red><green>0.549</green><blue>0.000</blue>
+  </color>
+  <color name="B">
+    <red>0.988</red><green>0.839</green><blue>0.051</blue>
+  </color>
+  <color name="B">
+    <red>0.988</red><green>0.988</green><blue>0.000</blue>
+  </color>
+  <color name="B">
+    <red>0.604</red><green>0.824</green><blue>0.294</blue>
+  </color>
+  <color name="B">
+    <red>0.235</red><green>0.690</green><blue>0.616</blue>
+  </color>
+  <color name="B">
+    <red>0.149</red><green>0.482</green><blue>0.671</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</background>
+<annotations>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue> </color>
+</annotations>
+</colormap>
+
+<colormap name="Spectrum 5" ncolors="5"
+          type="spectral"
+          system="rgb" system_min="0" system_max="1">
+<description>
+  From Cindy Brewer, a spectrum
+</description>
+<foreground>
+  <color name="B">
+    <red>0.749</red><green>0.000</green><blue>0.000</blue>
+  </color>
+  <color name="B">
+    <red>0.969</red><green>0.627</green><blue>0.000</blue>
+  </color>
+  <color name="B">
+    <red>0.988</red><green>0.988</green><blue>0.000</blue>
+  </color>
+  <color name="B">
+    <red>0.349</red><green>0.706</green><blue>0.247</blue>
+  </color>
+  <color name="B">
+    <red>0.031</red><green>0.294</green><blue>0.549</blue>
   </color>
 </foreground> 
 <background>
