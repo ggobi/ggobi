@@ -66,14 +66,13 @@
 </variables>
 
 <records count="7">
- <record source="0" destination="1"> 42 4870  0 0 <string>ABC</string></record>
- <record source="0" destination="2"> 42 4880  0 1 <string>DEF</string> </record>
- <record source="0" destination="3">  7 4890  1 2 <string>GHI</string> </record>
- <record source="1" destination="5"> 12 5000  2 1 <string>J</string> </record>
- <record source="1" destination="6"> 18 5100  2 2 <string>KLM</string> </record>
- <record source="3" destination="7"> 12 5000  2 1 <string>NOPQRST</string> </record>
- <record source="3" destination="8"><real>18</real>
- <real>5100</real><int>2</int><int>2</int><string>Happy Birthday</string></record>
+ <record id="10" source="0" destination="1"> 42 4870  0 0 <string>ABC</string></record>
+ <record id="11" source="0" destination="2"> 42 4880  0 1 <string>DEF</string> </record>
+ <record id="12" source="0" destination="3">  7 4890  1 2 <string>GHI</string> </record>
+ <record id="13" source="1" destination="5"> 12 5000  2 1 <string>J</string> </record>
+ <record id="14" source="1" destination="6"> 18 5100  2 2 <string>KLM</string> </record>
+ <record id="19" source="3" destination="7"> 12 5000  2 1 <string>NOPQRST</string> </record>
+ <record id="-1" source="3" destination="8"><real>18</real><real>5100</real><int>2</int><int>2</int><string>Happy Birthday</string></record>
 </records>
 </data>
   

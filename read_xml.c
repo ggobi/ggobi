@@ -82,6 +82,7 @@ void setMissingValue(XMLParserData *data, datad *d, vartabled *vt);
 gint getAutoLevelIndex(const char * const label, XMLParserData *data, vartabled *el);
 static gboolean setRecordValue(const char *tmp, datad *d, XMLParserData *data);
 void resetRecordInfo(XMLParserData *data);
+static void releaseCurrentDataInfo(XMLParserData *parserData);
 
 const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
 
@@ -473,6 +474,9 @@ void endXMLElement(void *user_data, const xmlChar *name)
   enum xmlDataState type = tagType(name, true);
 
   switch(type) {
+    case DATASET:
+      releaseCurrentDataInfo(data);
+      break;
     case RECORD:
       setRecordValues(data, data->recordString, data->recordStringLength);
       data->current_record++;
@@ -1592,8 +1596,12 @@ freeLevelHashEntry(gpointer key, gpointer value, gpointer data)
 static void
 releaseCurrentDataInfo(XMLParserData *parserData)
 {
-   if(parserData->current_data) 
+   if(!parserData->current_data) 
      return;
+
+   if(parserData->rowIds) 
+      g_free(parserData->rowIds);
+   parserData->rowIds = NULL;
 
    if(parserData->autoLevels) {
       int i;
@@ -1613,8 +1621,6 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData)
   datad *data;
   gchar *name;
   const gchar *tmp;
-
-  releaseCurrentDataInfo(parserData);
 
   data = gtk_ggobi_data_new(parserData->gg);
 

@@ -470,7 +470,7 @@ getLanguagePlugin(GList *plugins, const char* name)
   GList *el = plugins;
 
   while(el) {
-    GGobiPluginDetails *info;
+    GGobiPluginInfo *info;
     info = (GGobiPluginInfo *) el->data;
     if(strcmp(info->details->name, name) == 0)
       return(info);
@@ -542,8 +542,6 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   load = getPluginDetails(node, plugin->details, doc);
   
   isLanguage = (xmlGetProp(node, (xmlChar *) "providesLanguage") != NULL);
-  if(isLanguage)
-    plugin->type = GENERAL_PLUGIN;
 
   getPluginSymbols(node, plugin, doc, isLanguage);
   getPluginOptions(node, plugin->details, doc);
