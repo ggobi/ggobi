@@ -6,6 +6,8 @@ by filling out the InputDescription. See fileset_generate....
 Fix the names and ids in the color map specification. Need to
 determine what is the relationship between these.
 
+Handle user-specified color maps
+
 Check the fileselection dialog for read (filesel_ok) to ensure that
 the correct data mode is passed.  Take it out of ggobi.
 
@@ -22,8 +24,12 @@ Bugs:
 Reading in new data
   add an option:  add a new datad or replace an existing one
 
+Variable statistics table
+  Should it open by default when other tools open?
+  Let the currently plotted variables be selected by default
+    when it is opened.
+
 In progress, needing design discussions:
-  Should variable limits be disabled for transformed variables?
   Deleting variables: how should plots behave? (disabled for now)
 
 various stuff not yet implemented:
@@ -79,6 +85,12 @@ Tour:
   1d tour
   correlation tour
   history controls
+
+A thought about tour variable selection:  could icons help with
+the trickier parts of the interface? -- ie, to select the frozen
+variable, click on an icon of icicles, the cursor changes to an
+icicle, the user clicks on a variable.  An icon of a hand might work
+for the manipulation variable.
 
 
 display_tree doesn't update itself when splots change

@@ -14,6 +14,7 @@ datad *datad_new(datad *d, ggobid *gg);
 #endif
 
 /* sort +1 */
+void range_unset (ggobid *gg);
 void display_tour2d_init (displayd *dsp, ggobid *gg);
 void display_tour1d_init (displayd *dsp, ggobid *gg);
 void display_tourcorr_init (displayd *dsp, ggobid *gg);

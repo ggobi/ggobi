@@ -139,6 +139,7 @@ qnorm (gdouble pr)
 void
 transform_values_init (gint j, datad *d, ggobid *gg) 
 {
+  d->vartable[j].tform0 = NO_TFORM0;
   d->vartable[j].tform1 = NO_TFORM1;
   d->vartable[j].tform2 = NO_TFORM2;
   d->vartable[j].domain_incr = 0.;

@@ -87,60 +87,55 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   gint ncols = selected_cols_get (cols, d, gg);
   gint j, k;
   gchar *val_str;
-  gfloat val;
+  gfloat min_val, max_val;
   gboolean min_p = false, max_p = false;
 
   /*-- minimum --*/
   val_str = gtk_entry_get_text (GTK_ENTRY (gg->vartable_ui.umin));
   if (val_str != NULL && strlen (val_str) > 0) {
-    val = (gfloat) atof (val_str);
-    for (k=0; k<ncols; k++) {
-      j = cols[k];
-
-      min_p = true;
-      d->vartable[j].lim_specified.min =
-        d->vartable[j].lim_specified_tform.min = val;
-
-      gtk_clist_set_text (clist, j, CLIST_USER_MIN,
-        g_strdup_printf("%8.3f", val));
-    }
-  } else {
-    gtk_clist_set_text (clist, j, CLIST_USER_MIN, g_strdup (""));
+    min_val = (gfloat) atof (val_str);
+    min_p = true;
   }
 
   /*-- maximum --*/
   val_str = gtk_entry_get_text (GTK_ENTRY (gg->vartable_ui.umax));
   if (val_str != NULL && strlen (val_str) > 0) {
-    val = (gfloat) atof (val_str);
+    max_val = (gfloat) atof (val_str);
+    max_p = true;
+  }
+
+  /*-- require setting both, and make sure the values are consistent --*/
+  if (!min_p || !max_p || (min_p && max_p && max_val<min_val)) {
+    range_unset (gg);
+  } else {
+
     for (k=0; k<ncols; k++) {
       j = cols[k];
 
-      max_p = true;
+      d->vartable[j].lim_specified.min =
+        d->vartable[j].lim_specified_tform.min = min_val;
       d->vartable[j].lim_specified.max =
-        d->vartable[j].lim_specified_tform.max = val;
+        d->vartable[j].lim_specified_tform.max = max_val;
 
+      gtk_clist_set_text (clist, j, CLIST_USER_MIN,
+        g_strdup_printf("%8.3f", min_val));
       gtk_clist_set_text (clist, j, CLIST_USER_MAX,
-        g_strdup_printf("%8.3f", val));
+        g_strdup_printf("%8.3f", max_val));
+
+      d->vartable[j].lim_specified_p = min_p && max_p;
     }
-  } else {
-    gtk_clist_set_text (clist, j, CLIST_USER_MAX, g_strdup (""));
+
+    /*
+     * the first function could be needed if transformation has been
+     * going on, because lim_tform could be out of step.
+    */
+    limits_set (false, false, d);  
+    vartable_limits_set (d);
+    vartable_stats_set (d);
+
+    tform_to_world (d, gg);
+    displays_tailpipe (REDISPLAY_ALL, gg);
   }
-
-  for (k=0; k<ncols; k++) {
-    j = cols[k];
-    d->vartable[j].lim_specified_p = min_p && max_p;  /*-- require both --*/
-  }
-
-  /*
-   * the first function could be needed if transformation has been
-   * going on, because lim_tform could be out of step.
-  */
-  limits_set (false, false, d);  
-  vartable_limits_set (d);
-  vartable_stats_set (d);
-
-  tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, gg);
 
   g_free (cols);
   gtk_widget_destroy (dialog);
@@ -235,7 +230,7 @@ range_set_cb (GtkWidget *w, ggobid *gg)
   gtk_widget_show_all (dialog);
 }
 
-void range_unset_cb (GtkWidget *w, ggobid *gg)
+void range_unset (ggobid *gg)
 {
   GtkCList *clist = vartable_clist_get (gg);
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
@@ -264,6 +259,11 @@ void range_unset_cb (GtkWidget *w, ggobid *gg)
 
   tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_ALL, gg);
+}
+
+void range_unset_cb (GtkWidget *w, ggobid *gg)
+{
+  range_unset (gg);
 }
 
 void select_all_cb (GtkWidget *w, ggobid *gg)

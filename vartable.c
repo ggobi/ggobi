@@ -404,6 +404,7 @@ void vartable_init (datad *d)
     d->vartable[j].lim_tform.min = 0.0;
     d->vartable[j].lim_tform.max = 0.0;
 
+    d->vartable[j].tform0 = NO_TFORM0;
     d->vartable[j].domain_incr = 0.;
     d->vartable[j].domain_adj = no_change;
     d->vartable[j].inv_domain_adj = no_change;
