@@ -527,10 +527,11 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
     lbl = g_strdup_printf ("%d", k);
 
   }  else if (cpanel->identify_display_type == ID_RECORD_ID) {
-    if(d->rowIds && d->rowIds[k])
+    if (d->rowIds && d->rowIds[k]) {
       lbl = g_strdup_printf ("%s", d->rowIds[k]);
-    else
-      lbl = g_strdup_printf ("%d", k);
+    } else {
+      lbl = g_strdup_printf ("%d", d->rowid.id.els[k]);
+    }
 
   /*-- if categorical, use level name ... --*/
   } else if (cpanel->identify_display_type == ID_VAR_LABELS) {
