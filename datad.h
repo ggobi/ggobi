@@ -77,11 +77,13 @@ struct _datad {
   GArray *rowlab; /*-- allocates memory in chunks --*/
 
  /*-- row ids to support generalized linking --*/
+/*
   struct _RowID {
     vector_i id;
     vector_i idv;
     int maxId;
   } rowid;
+*/
 
   GHashTable *idTable;
   char **rowIds;
@@ -109,7 +111,7 @@ struct _datad {
 
   vector_i rows_in_plot;  /*-- always of length d->nrows --*/
   gint nrows_in_plot;     /*-- how many elements of rows_in_plot to use --*/
-  vector_b sampled;
+  vector_b sampled, excluded;
 
   struct _Subset {
     gint random_n;
@@ -219,11 +221,10 @@ struct _datad {
   struct _EdgeData {
     gint n;
     SymbolicEndpoints *sym_endpoints;
-    GList *endpointList;    /* a list of endpointsd elements corresponding to the resolved 
-                               record ids relative to a given datad. This is akin to a table
-                               indexed by datad elements. */
-
-    endpointsd *old_endpoints; /* this stores the edges in the old manner, interpreting the src, dest values as integers. */
+    GList *endpointList;   
+      /* a list of endpointsd elements corresponding to the resolved 
+         record ids relative to a given datad. This is akin to a table
+         indexed by datad elements. */
 
     gint nxed_by_brush;
     vector_b xed_by_brush;
@@ -250,7 +251,6 @@ typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
 
 extern endpointsd *resolveEdgePoints(datad *e, datad *d);
 extern gboolean edge_add (gint, gint, datad *, datad *);
-extern void setOldEdgePartners (endpointsd *endpoints, gint n);
 
 void datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate);
 
