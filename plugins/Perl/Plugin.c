@@ -141,13 +141,19 @@ PerlDestroyPlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
     return(status);
 }
 
+/**
+ */
 gboolean
 PerlUpdateDisplayMenu(ggobid *gg, PluginInstance *inst)
 {
     gboolean status = true;
+    fprintf(stderr, "update display menu\n");
     return(status);
 }
 
+/**
+  load the Perl module associated with this plugin 
+*/
 gboolean
 PerlLoadPlugin(gboolean initializing, GGobiPluginInfo *plugin)
 {
@@ -157,10 +163,7 @@ PerlLoadPlugin(gboolean initializing, GGobiPluginInfo *plugin)
     char *moduleName;
 
     moduleName = data->moduleName;
-    fprintf(stderr, "Loading perl plugin: module name %s\n", data->moduleName);
 
-    /* load the Perl module, create the ggobi and plugin instance references
-       as Perl objects. */
 #if 0
     require_pv(moduleName);
 #else
@@ -301,6 +304,7 @@ PerlCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 	SPAGAIN;
         if(n > 0) {
 	    instData->perlObj = POPs;
+	    status = true;
 	} else
 	    status = false;
 
