@@ -132,7 +132,6 @@ GtkWidget *
 create_graphact_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
-  GtkWidget *hb, *entry, *hscale, *vb, *opt;
   GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
   gchar *clist_titles[2] = {"node sets", "edge sets"};
@@ -196,7 +195,7 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   }
   gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
   gtk_container_add (GTK_CONTAINER (swin), clist);
-  gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
+  gtk_box_pack_start (GTK_BOX (hbox), swin, false, false, 2);
 
 /*
  * edge sets
@@ -240,7 +239,7 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
   hbox = gtk_hbox_new (true, 10);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, true, true, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
   btn = gtk_button_new_with_label ("Hide");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (ga_leaf_hide_cb), inst);
@@ -253,6 +252,24 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   label = gtk_label_new ("Leaf");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
   /*-- --*/
+
+
+  /*-- --*/
+  frame = gtk_frame_new ("PathsFinder");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 1);
+
+/*
+ checkbox:  PathsFinder on or off
+ button: restore all nodes and edges
+ slider taking the values {1,2} or {2,4} for the radius or diameter
+    of the path to be reported
+ button: label all nodes and edges
+*/
+
+  label = gtk_label_new ("Paths");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
+  /*-- --*/
+
 
   gtk_widget_show_all (window);
 
