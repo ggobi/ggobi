@@ -358,7 +358,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
         /*
          * add a reference to da here, because it's going to be
          * destroyed in splot_free, and we don't want it destroyed
-         * as a result of gtk_containere_remove.
+         * as a result of gtk_container_remove.
         */
         gtk_widget_ref (da);
         gtk_container_remove (GTK_CONTAINER (display->table), da);

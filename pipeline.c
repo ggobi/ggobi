@@ -55,12 +55,32 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
   d->sampled = (gboolean *) g_malloc (nr * sizeof (gboolean));
 }
 
+static void
+pipeline_arrays_check_dimensions (datad *d) {
+
+/*
+ * I won't do this check for the raw array, because that
+ * has to have been populated before the pipeline can be run.
+*/
+  if (d->tform.ncols < d->ncols)
+    arrayf_add_cols (&d->tform, d->ncols);
+  if (d->world.ncols < d->ncols)
+    arrayl_add_cols (&d->world, d->ncols);
+
+  if (d->jitdata.ncols < d->ncols) {
+    gint i, j, nc = d->jitdata.ncols;
+    arrayl_add_cols (&d->jitdata, d->ncols);
+    for (j=nc; j<d->ncols; j++)
+      for (i=0; i<d->nrows; i++)
+        d->jitdata.vals[i][j] = 0;
+  }
+}
+
+/*
 void
 pipeline_arrays_add_column (gint jvar, datad *d, ggobid *gg)
-/*
  * Reallocate pipeline arrays to contain one more column, and
  * copy column jvar into the new column
-*/
 {
   gint nc = d->ncols + 1, nr = d->nrows;
   register gint i;
@@ -72,14 +92,14 @@ pipeline_arrays_add_column (gint jvar, datad *d, ggobid *gg)
   arrayl_add_cols (&d->jitdata, nc);
 
   for (i=0; i<nr; i++) {
-    /*-- no tform --*/
+    *-- no tform --*
     d->raw.vals[i][nc-1] = d->tform.vals[i][nc-1] = d->raw.vals[i][jvar];
-    /*-- no jitter --*/
+    *-- no jitter --*
     d->jitdata.vals[i][nc-1] = 0; 
   }
 
-  /*-- world data is allocated but not populated --*/
 }
+*/
 
 
 /*-------------------------------------------------------------------------*/
@@ -288,6 +308,8 @@ tform_to_world (datad *d, ggobid *gg)
   gint i, j, m;
   gfloat max, min, range, ftmp;
   gfloat precis = PRECISION1;
+
+  pipeline_arrays_check_dimensions (d);  /*-- realloc if needed --*/
 
   for (j=0; j<d->ncols; j++) {
 

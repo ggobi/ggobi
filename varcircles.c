@@ -12,11 +12,10 @@ static void varcircle_draw (gint, datad *, ggobid *gg);
 static gboolean da_expose_cb (GtkWidget *, GdkEventExpose *, gpointer cbd);
 
 /*
- * Just to get going, use a fixed value: vncols = 5
- *  make this a display option, and make use of the size of
- *  the scrolled window
+ * This is unfortunately needed for now because no widgets have
+ * been realized yet when this is first called.
  *
- * lay it out row-wise.
+ * I'm not sure which layout should be first; this does it row-wise.
 */
 void
 varcircles_layout_init (datad *d, ggobid *gg) {
@@ -92,6 +91,8 @@ varcircles_layout_reset (datad *d, ggobid *gg) {
       d->varpanel_ui.vb[j],
       left_attach, left_attach+1, top_attach, top_attach+1,
       GTK_FILL, GTK_FILL, 0, 0);
+    if (GTK_OBJECT (d->varpanel_ui.vb[j])->ref_count > 1)
+      gtk_widget_unref (d->varpanel_ui.vb[j]);
 
     if (gg->varpanel_ui.layoutByRow) {
       left_attach++; 
@@ -144,6 +145,22 @@ void varcircles_populate (datad *d, ggobid *gg)
   gtk_widget_show_all (d->varpanel_ui.table);
 }
 
+void
+varcircles_delete (gint nc, gint jcol, datad *d, ggobid *gg) {
+  gint j;
+
+  if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every circle --*/
+    for (j=jcol; j<jcol+nc; j++) {
+      /*-- without a ref, this will be destroyed --*/
+      gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.table),
+                            d->varpanel_ui.vb[j]);
+      gdk_pixmap_unref (d->varpanel_ui.da_pix[j]);  /*-- or g_free? --*/
+    }
+  }
+
+  /*-- this may not be enough; time will tell --*/
+  varcircles_layout_reset (d, gg);
+}
 
 void
 varcircles_clear (ggobid *gg) {

@@ -137,6 +137,8 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
 gboolean
 updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
 {
+  gint i;
+
 /*-- vartable --*/
   if (jvar > -1) {
     d->vartable[nc-1].mean = d->vartable[jvar].mean;
@@ -153,7 +155,15 @@ updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
 /*-- --*/
 
 /*-- pipeline --*/
-  pipeline_arrays_add_column (jvar, d, gg);  /* reallocate and copy */
+/*
+  pipeline_arrays_add_column (jvar, d, gg);
+*/
+
+  arrayf_add_cols (&d->raw, nc);  /*-- adding exactly one column --*/
+  arrayf_add_cols (&d->tform, nc);
+  for (i=0; i<d->nrows; i++)
+    d->raw.vals[i][nc-1] = d->tform.vals[i][nc-1] = d->raw.vals[i][jvar];
+
   missing_arrays_add_column (jvar, d, gg);
 
   d->ncols++;
@@ -326,6 +336,18 @@ varpanel_checkbox_add (gint j, datad *d, ggobid *gg)
   gtk_widget_show (d->varpanel_ui.checkbox[j]);
 }
 
+/*-- delete nc checkboxes, starting at jcol --*/
+void
+varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
+  gint j;
+
+  if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every checkbox --*/
+    for (j=jcol; j<jcol+nc; j++)
+      gtk_widget_destroy (d->varpanel_ui.checkbox[j]);
+  }
+}
+
+/*-- should rename varpanel_checkboxes_populate --*/
 /*-- for each datad, a scrolled window, vbox, and column of check buttons --*/
 void varpanel_populate (datad *d, ggobid *gg)
 {

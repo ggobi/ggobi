@@ -124,6 +124,7 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
     gtk_widget_set_usize (sp->da, width, height);
     gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box),
                         sp->da, true, true, 0);
+    gtk_widget_unref (sp->da);  /*-- keep the ref_count appropriate --*/
   }
 
   /*-- position the display toward the lower left of the main window --*/
@@ -370,6 +371,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
 
         gtk_container_remove (GTK_CONTAINER (box), w);
         gtk_box_pack_start (GTK_BOX (box), w, true, true, 0);
+        gtk_widget_unref (w);  /*-- decrease the ref_count by 1 --*/
         l = l->next ;
       }
 

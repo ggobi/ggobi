@@ -62,6 +62,8 @@ size_allocate_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
     gtk_container_remove (GTK_CONTAINER (gg->mode_frame), largest_panel);
     gtk_container_add (GTK_CONTAINER (gg->mode_frame), mode_panel);
 
+    gtk_widget_unref (mode_panel);
+
     initd = true;
   }
 
@@ -319,6 +321,10 @@ mode_set (gint m, ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (gg->mode_frame),
       gg->control_panel[gg->mode]);
 
+    /*-- avoid increasing the object's ref_count infinitely  --*/
+    if (GTK_OBJECT (gg->control_panel[gg->mode])->ref_count > 1)
+      gtk_widget_unref (gg->control_panel[gg->mode]);
+
 
 /*
  * This section is going to get awfully ugly as we add more
@@ -350,6 +356,8 @@ mode_set (gint m, ggobid *gg) {
         */
         gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
                            d->varpanel_ui.table);
+        if (GTK_OBJECT (d->varpanel_ui.table)->ref_count > 1)
+          gtk_widget_unref (d->varpanel_ui.table);
       }
     } else if ((gg->mode != TOUR2D && gg->mode != COTOUR) &&
                (gg->prev_mode == TOUR2D || gg->prev_mode == COTOUR))
@@ -361,6 +369,8 @@ mode_set (gint m, ggobid *gg) {
                               d->varpanel_ui.table);
         gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
                            d->varpanel_ui.vbox);
+        if (GTK_OBJECT (d->varpanel_ui.vbox)->ref_count > 1)
+          gtk_widget_unref (d->varpanel_ui.vbox);
       }
     }
   }
