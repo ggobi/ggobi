@@ -95,10 +95,11 @@ main(int argc, char *argv[])
 
    /* Now fill in the display.*/
  scatmat_new(dpy, false, 3, rows, 2, cols,  data, gg);
- gtk_widget_set_usize(GTK_WIDGET(dpy), 200, 200); 
+ gtk_widget_set_usize(GTK_WIDGET(dpy), 200, 150); 
 
  /* Now put the GUI together. */
  gtk_container_add(GTK_CONTAINER(box2), GTK_WIDGET(dpy)); 
+
 
 /********* Put a regular scatterplot *********/
 
@@ -113,41 +114,58 @@ main(int argc, char *argv[])
 
 
  gtk_container_add(GTK_CONTAINER(box), GTK_WIDGET(box2)); 
+ gtk_widget_show_all(box2);
 
 
  /* Now the lower row consisting of a paracoords plot and 
     and a time series plot. */
 
  pane = gtk_vpaned_new();
-
  box2 = gtk_hpaned_new();
 
  dpy = createWindowlessDisplay(GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY, data, gg);
  tsplot_new(dpy, false, 4, rows, data, gg);
  gtk_container_add(GTK_CONTAINER(box2), GTK_WIDGET(dpy)); 
+ gtk_widget_show_all(GTK_WIDGET(dpy));
+
 
  dpy = createWindowlessDisplay(GTK_TYPE_GGOBI_BARCHART_DISPLAY, data, gg);
  createBarchart(dpy, false, NULL, 3, data, gg);
  gtk_container_add(GTK_CONTAINER(box2), GTK_WIDGET(dpy));
-
+ gtk_widget_show(GTK_WIDGET(dpy));
 
  gtk_container_add(GTK_CONTAINER(pane), GTK_WIDGET(box2));
 
 
+/* Last row. */
  dpy = createWindowlessDisplay(GTK_TYPE_GGOBI_PARCOORDS_DISPLAY, data, gg);
  parcoords_new(dpy, false, 3, rows, data, gg);
- gtk_widget_set_usize(GTK_WIDGET(dpy), 200, 200); 
+ gtk_widget_set_usize(GTK_WIDGET(dpy), 200, 150); 
+
+ gtk_widget_show(GTK_WIDGET(dpy));
+#if 1
  gtk_container_add(GTK_CONTAINER(pane), GTK_WIDGET(dpy)); 
+ gtk_widget_show_all(GTK_WIDGET(dpy));
+#else
+ btn = gtk_frame_new("Hi");
+ gtk_container_add(GTK_CONTAINER(btn), GTK_WIDGET(dpy));
+ gtk_container_add(GTK_CONTAINER(pane), GTK_WIDGET(btn)); 
+ gtk_widget_show_all(GTK_WIDGET(btn));
+#endif
+
 
  gtk_container_add(GTK_CONTAINER(box), GTK_WIDGET(pane)); 
-
-
  gtk_container_add(GTK_CONTAINER(win), box);
 
- gtk_widget_set_usize(win, 720, 800);
+ gtk_widget_set_usize(win, 720, 600);
 
- gtk_widget_show_all(win);
 
+ gtk_widget_show(pane);
+ gtk_widget_show(box2);
+ gtk_widget_show(box);
+ gtk_widget_show(win);
+
+/* gtk_widget_show_all(win); Bad news as it shows the hidden ruler in the bar chart! */
  gtk_main();
 
  return(0);
