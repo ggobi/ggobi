@@ -127,8 +127,23 @@ typedef struct {
 
 /*-- tour elements --*/
 typedef struct {
-  gint datadim, projdim, nactive;
-  vector_i active_vars, active_vars_p;
+  gint datadim, projdim;
+  /*
+   * the variables that are in the current subset, and represented by
+   * circles or rectangles in the right-hand pane.
+  */
+  gint nsubset;
+  vector_i subset_vars;
+  vector_b subset_vars_p;
+  /*
+   * Of the variables in the current subset, these are the variables
+   * that are currently touring.  Their meaning remains the same
+   * despite the variable selection panel redesign.
+  */
+  gint nactive;
+  vector_i active_vars;
+  vector_b active_vars_p;
+  /* */
   array_d Fa, Fz, F, Ga, Gz, G, Va, Vz, tv;
   vector_f lambda, tau, tinc;
   gfloat dist_az, delta, tang;

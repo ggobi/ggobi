@@ -234,7 +234,7 @@ typedef struct
     displayd *(*create)(gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
     displayd *(*createWithVars)(gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg);
 
-    gboolean (*variable_select)(displayd *dpy, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg);
+    gboolean (*variable_select)(GtkWidget *w, displayd *dpy, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg);
 
     gint  (*variable_plotted_p)(displayd *dpy, gint *cols, gint ncols, datad *d);
 
@@ -277,7 +277,7 @@ typedef struct
     void (*viewmode_set)(displayd *, ggobid *);
 
     gboolean (*varcircle_draw)(displayd *, gint jvar, GdkPixmap *da_pix, ggobid *gg);
-    void (*select_X)(displayd *, gint, ggobid *);
+    void (*select_X)(GtkWidget *, displayd *, gint, ggobid *);
 
     void (*tour1d_realloc)(displayd *, gint, datad *);
     void (*tour2d_realloc)(displayd *, gint, datad *);

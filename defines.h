@@ -66,7 +66,7 @@ typedef enum {NULLMODE = -1,
                P1PLOT, XYPLOT, ROTATE, TOUR1D, TOUR2D, COTOUR,
                SCALE, BRUSH, IDENT, EDGEED, MOVEPTS,
                SCATMAT, PCPLOT,
- 	       EXTENDED_DISPLAY_MODE,
+               EXTENDED_DISPLAY_MODE,
                NMODES} PipelineMode;
 
 /* */
@@ -118,6 +118,8 @@ typedef enum {NULLMODE = -1,
 #define VBOX_SPACING 5
 
 /*-- touring --*/
+#define VAR_CIRCLE_DIAM 36
+
 #define MIN_NVARS_FOR_COTOUR 4
 #define MIN_NVARS_FOR_TOUR2D 2
 #define MIN_NVARS_FOR_TOUR1D 1

@@ -60,8 +60,11 @@ display_tour1d_init_null (displayd *dsp, ggobid *gg)
 
   arrayd_init_null(&dsp->t1d.tv);
 
+  vectori_init_null(&dsp->t1d.subset_vars);
+  vectorb_init_null(&dsp->t1d.subset_vars_p);
   vectori_init_null(&dsp->t1d.active_vars);
-  vectori_init_null(&dsp->t1d.active_vars_p);
+  vectorb_init_null(&dsp->t1d.active_vars_p);
+
   vectorf_init_null(&dsp->t1d.lambda);
   vectorf_init_null(&dsp->t1d.tau);
   vectorf_init_null(&dsp->t1d.tinc);
@@ -89,8 +92,11 @@ alloc_tour1d (displayd *dsp, ggobid *gg)
 
   arrayd_alloc(&dsp->t1d.tv, 1, nc);
 
+  vectori_alloc(&dsp->t1d.subset_vars, nc);
+  vectorb_alloc_zero(&dsp->t1d.subset_vars_p, nc);
   vectori_alloc(&dsp->t1d.active_vars, nc);
-  vectori_alloc(&dsp->t1d.active_vars_p, nc);
+  vectorb_alloc_zero(&dsp->t1d.active_vars_p, nc);
+
   vectorf_alloc(&dsp->t1d.lambda, nc);
   vectorf_alloc(&dsp->t1d.tau, nc);
   vectorf_alloc(&dsp->t1d.tinc, nc);
@@ -118,8 +124,11 @@ tour1d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
       arrayd_delete_cols (&dsp->t1d.Vz, nc, cols);
       arrayd_delete_cols (&dsp->t1d.tv, nc, cols);
 
+      vectori_delete_els (&dsp->t1d.subset_vars, nc, cols);
+      vectorb_delete_els (&dsp->t1d.subset_vars_p, nc, cols);
       vectori_delete_els (&dsp->t1d.active_vars, nc, cols);
-      vectori_delete_els (&dsp->t1d.active_vars_p, nc, cols);
+      vectorb_delete_els (&dsp->t1d.active_vars_p, nc, cols);
+
       vectorf_delete_els (&dsp->t1d.lambda, nc, cols);
       vectorf_delete_els (&dsp->t1d.tau, nc, cols);
       vectorf_delete_els (&dsp->t1d.tinc, nc, cols);
@@ -151,8 +160,11 @@ tour1d_realloc_up (gint nc, datad *d, ggobid *gg)
 void
 free_tour1d(displayd *dsp)
 {
+  vectori_free(&dsp->t1d.subset_vars);
+  vectorb_free(&dsp->t1d.subset_vars_p);
   vectori_free(&dsp->t1d.active_vars);
-  vectori_free(&dsp->t1d.active_vars_p);
+  vectorb_free(&dsp->t1d.active_vars_p);
+
   vectorf_free(&dsp->t1d.lambda);
   vectorf_free(&dsp->t1d.tau);
   vectorf_free(&dsp->t1d.tinc);
@@ -184,23 +196,21 @@ display_tour1d_init (displayd *dsp, ggobid *gg)
 
     /* Initialize starting subset of active variables */
   if (nc < 8) {
-    dsp->t1d.nactive = nc;
+    dsp->t1d.nsubset = dsp->t1d.nactive = nc;
     for (j=0; j<nc; j++) {
-      dsp->t1d.active_vars.els[j] = j;
-      dsp->t1d.active_vars_p.els[j] = 1;
+      dsp->t1d.subset_vars.els[j] = dsp->t1d.active_vars.els[j] = j;
+      dsp->t1d.subset_vars_p.els[j] = dsp->t1d.active_vars_p.els[j] = true;
     }
   }
   else {
-    dsp->t1d.nactive = 3;
-    dsp->t1d.active_vars.els[0] = 0;
-    dsp->t1d.active_vars.els[1] = 1;
-    dsp->t1d.active_vars.els[2] = 2;
-    dsp->t1d.active_vars_p.els[0] = 1;
-    dsp->t1d.active_vars_p.els[1] = 1;
-    dsp->t1d.active_vars_p.els[2] = 1;
+    dsp->t1d.nsubset = dsp->t1d.nactive = 3;
+    for (j=0; j<3; j++) {
+      dsp->t1d.subset_vars.els[j] = dsp->t1d.active_vars.els[j] = j;
+      dsp->t1d.subset_vars_p.els[j] = dsp->t1d.active_vars_p.els[j] = true;
+    }
     for (j=3; j<nc; j++) {
-      dsp->t1d.active_vars.els[j] = 0;
-      dsp->t1d.active_vars_p.els[j] = 0;
+      dsp->t1d.subset_vars.els[j] = dsp->t1d.active_vars.els[j] = 0;
+      dsp->t1d.subset_vars_p.els[j] = dsp->t1d.active_vars_p.els[j] = false;
     }
 
   }
@@ -266,17 +276,38 @@ void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
   }
 }
 
+/*-- add/remove jvar to/from the subset of variables that <may> be active --*/
 void 
-tour1dvar_set (gint jvar, ggobid *gg)
+tour1d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+{
+  gboolean in_subset = dsp->t1d.subset_vars_p.els[jvar];
+  gint j, k;
+  gboolean changed = false;
+
+  if (in_subset) {
+    if (dsp->t1d.nsubset > MIN_NVARS_FOR_TOUR1D) {
+      dsp->t1d.subset_vars_p.els[jvar] = false;
+      dsp->t1d.nsubset -= 1;
+      changed = true;
+    }
+  } else {
+    dsp->t1d.subset_vars_p.els[jvar] = true;
+    dsp->t1d.nsubset += 1;
+    changed = true;
+  }
+
+  /*-- reset subset_vars based on subset_vars_p --*/
+  if (changed)
+    for (j=0, k=0; j<d->ncols; j++)
+      if (dsp->t1d.subset_vars_p.els[j])
+        dsp->t1d.subset_vars.els[k++] = j;
+}
+
+void 
+tour1d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
-  gboolean active=false;
-  displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
-
-  for (j=0; j<dsp->t1d.nactive; j++)
-    if (jvar == dsp->t1d.active_vars.els[j])
-      active = true;
+  gboolean active = dsp->t1d.active_vars_p.els[jvar];
 
   /* deselect var if t1d.nactive > 2 */
   if (active) {
@@ -299,7 +330,7 @@ tour1dvar_set (gint jvar, ggobid *gg)
         arrayd_copy(&dsp->t1d.Fa, &dsp->t1d.F);
 /*      copy_mat(dsp->t1d.F.vals, dsp->t1d.Fa.vals, d->ncols, 1);*/
       }
-      dsp->t1d.active_vars_p.els[jvar] = 0;
+      dsp->t1d.active_vars_p.els[jvar] = false;
     }
   }
   else { /* not active, so add the variable */
@@ -325,7 +356,7 @@ tour1dvar_set (gint jvar, ggobid *gg)
       dsp->t1d.active_vars.els[jtmp] = jvar;
     }
     dsp->t1d.nactive++;
-    dsp->t1d.active_vars_p.els[jvar] = 1;
+    dsp->t1d.active_vars_p.els[jvar] = true;
   }
 
   dsp->t1d.get_new_target = true;
@@ -341,33 +372,50 @@ tour1d_manip_var_set (gint j, gint btn, ggobid *gg)
 }
 
 void
-tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
+tour1d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
   splotd *sp = gg->current_splot;
 
-/*-- any button --*/
-  if (d->vcirc_ui.jcursor == GDK_HAND2) {
-    tour1d_manip_var_set (jvar, button, gg);
-    varcircles_cursor_set_default (d);
+  if (GTK_IS_TOGGLE_BUTTON(w)) {
+    /*
+     * add/remove jvar to/from the subset of variables that <may> be active
+    */
+    gboolean fade = gg->tour1d.fade_vars;
 
-  } else {
-    tour1dvar_set (jvar, gg);
+    tour1d_subset_var_set (jvar, d, dsp, gg);
+    varcircles_visibility_set (dsp, gg);
 
-    if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
-      realloc_optimize0_p(&dsp->t1d_pp_op, dsp->t1d.nactive, 
-        dsp->t1d.active_vars);
+    /*-- now add/remove the variable to/from the active set, too --*/
+    gg->tour1d.fade_vars = false;
+    tour1d_active_var_set (jvar, d, dsp, gg);
+    gg->tour1d.fade_vars = fade;
 
-      t1d_pp_reinit(gg);
-      label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
-      dsp->t1d_indx_min, dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count], 
-      dsp->t1d_indx_max);
-      gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
+  } else if (GTK_IS_DRAWING_AREA(w)) {
 
+    /*-- any button --*/
+    if (d->vcirc_ui.jcursor == GDK_HAND2) {
+      tour1d_manip_var_set (jvar, button, gg);
+      varcircles_cursor_set_default (d);
+
+    } else {
+      tour1d_active_var_set (jvar, d, dsp, gg);
+
+      if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+        realloc_optimize0_p(&dsp->t1d_pp_op, dsp->t1d.nactive, 
+          dsp->t1d.active_vars);
+
+        t1d_pp_reinit(gg);
+        label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
+        dsp->t1d_indx_min, dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count], 
+        dsp->t1d_indx_max);
+        gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
+
+      }
+      /* Reinits the vertical height for the ashes */
+      sp->tour1d.initmax = true;
     }
-    /* Reinits the vertical height for the ashes */
-    sp->tour1d.initmax = true;
   }
 }
 
@@ -605,7 +653,7 @@ tour1d_idle_func (displayd *dsp)
 void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
 {
   if (state) {
-    if (dsp->t2d.idled == 0) {
+    if (dsp->t1d.idled == 0) {
       dsp->t1d.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
                                      (GtkFunction) tour1d_idle_func, dsp);
     }

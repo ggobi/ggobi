@@ -117,8 +117,8 @@ varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, datad *d)
 }
 
 void
-varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
-	gint alt_mod, gint ctrl_mod, gint shift_mod, datad *d, ggobid *gg)
+varsel (GtkWidget *w, cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
+  gint alt_mod, gint ctrl_mod, gint shift_mod, datad *d, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   gboolean redraw = false;
@@ -131,11 +131,11 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   }
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-     redraw = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->variable_select(display, sp, jvar, btn, cpanel, gg);
+     redraw = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->variable_select(w, display, sp, jvar, btn, cpanel, gg);
   }
 
   gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[VARIABLE_SELECTION_SIGNAL], 
-		   display->d, jvar, sp);
+    display->d, jvar, sp);
 
   /*-- overkill for scatmat: could redraw one row, one column --*/
   /*-- overkill for parcoords: need to redraw at most 3 plots --*/
@@ -254,7 +254,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 /* */
 
     /*-- general variable selection --*/
-    varsel (cpanel, sp, jvar, button, alt_mod, ctrl_mod, shift_mod, d, gg);
+    varsel (w, cpanel, sp, jvar, button, alt_mod, ctrl_mod, shift_mod, d, gg);
     varpanel_refresh (display, gg);
     return true;
   }
@@ -319,8 +319,8 @@ varpanel_widgets_add (gint nc, datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 /*
- * build the notebook to contain an ebox which will be switched
- * between togglebuttons and circles
+ * build the notebook to contain a paned widget which will contain
+ * checkboxes on the left and circles/rectangles on the right
 */
 void
 varpanel_make (GtkWidget *parent, ggobid *gg) {
@@ -371,17 +371,27 @@ void varpanel_populate (datad *d, ggobid *gg)
 
   /*-- only add a tab if there are variables --*/
   if (g_slist_length (d->vartable) > 0) {
-    /*-- create an ebox: needed for tooltips? --*/
-    d->varpanel_ui.ebox = gtk_event_box_new ();
+    /*-- create a paned widget --*/
+    d->varpanel_ui.hpane = gtk_hpaned_new ();
+    gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+    gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+    /*-- set the handle position all the way to the right --*/
+    gtk_paned_set_position (GTK_PANED(d->varpanel_ui.hpane), -1);
+
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                              d->varpanel_ui.ebox,
+                              d->varpanel_ui.hpane,
                               gtk_label_new (d->name));
+
+    /*-- create an ebox, and put it in the hpane --*/
+    d->vcbox_ui.ebox = gtk_event_box_new ();
+    gtk_paned_pack1 (GTK_PANED(d->varpanel_ui.hpane),
+      d->vcbox_ui.ebox, true, false);
 
     /*-- create a scrolled window, and put it in the ebox --*/
     d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
       GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox), d->vcbox_ui.swin);
+    gtk_container_add (GTK_CONTAINER (d->vcbox_ui.ebox), d->vcbox_ui.swin);
 
     /*-- add a vbox to the swin --*/
     d->vcbox_ui.vbox = gtk_vbox_new (false, 0);
@@ -389,7 +399,7 @@ void varpanel_populate (datad *d, ggobid *gg)
       GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
       d->vcbox_ui.vbox);
   
-    gtk_widget_show_all (d->varpanel_ui.ebox);
+    gtk_widget_show_all (d->varpanel_ui.hpane);
     gdk_flush ();
 
     d->vcbox_ui.box = NULL;
@@ -404,15 +414,16 @@ void varpanel_populate (datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-GGOBI(selectScatterplotX) (gint jvar, ggobid *gg) 
+GGOBI(selectScatterplotX) (GtkWidget *w, gint jvar, ggobid *gg) 
 {
   displayd *display = gg->current_display;
   GtkGGobiExtendedDisplayClass *klass;
+
   if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(display))
-	  return;
+    return;
   klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
   if(klass->select_X)
-	  klass->select_X(display, jvar, gg);
+    klass->select_X(w, display, jvar, gg);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -437,7 +448,7 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
     if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
        GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
        if(klass->varpanel_tooltips_set)
-	       klass->varpanel_tooltips_set(display, gg, wx, wy, label);
+         klass->varpanel_tooltips_set(display, gg, wx, wy, label);
     }
   }
 }

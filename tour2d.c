@@ -43,7 +43,11 @@ display_tour2d_init_null (displayd *dsp, ggobid *gg)
 
   arrayd_init_null(&dsp->t2d.tv);
 
+  vectori_init_null(&dsp->t2d.subset_vars);
+  vectorb_init_null(&dsp->t2d.subset_vars_p);
   vectori_init_null(&dsp->t2d.active_vars);
+  vectorb_init_null(&dsp->t2d.active_vars_p);
+
   vectorf_init_null(&dsp->t2d.lambda);
   vectorf_init_null(&dsp->t2d.tau);
   vectorf_init_null(&dsp->t2d.tinc);
@@ -75,8 +79,11 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
 
   arrayd_alloc(&dsp->t2d.tv, 2, nc);
 
+  vectori_alloc(&dsp->t2d.subset_vars, nc);
+  vectorb_alloc_zero(&dsp->t2d.subset_vars_p, nc);
   vectori_alloc(&dsp->t2d.active_vars, nc);
-  vectori_alloc(&dsp->t2d.active_vars_p, nc);
+  vectorb_alloc_zero(&dsp->t2d.active_vars_p, nc);
+
   vectorf_alloc(&dsp->t2d.lambda, nc);
   vectorf_alloc(&dsp->t2d.tau, nc);
   vectorf_alloc(&dsp->t2d.tinc, nc);
@@ -108,8 +115,11 @@ tour2d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
       arrayd_delete_cols (&dsp->t2d.Vz, nc, cols);
       arrayd_delete_cols (&dsp->t2d.tv, nc, cols);
 
+      vectori_delete_els (&dsp->t2d.subset_vars, nc, cols);
+      vectorb_delete_els (&dsp->t2d.subset_vars_p, nc, cols);
       vectori_delete_els (&dsp->t2d.active_vars, nc, cols);
-      vectori_delete_els (&dsp->t2d.active_vars_p, nc, cols);
+      vectorb_delete_els (&dsp->t2d.active_vars_p, nc, cols);
+
       vectorf_delete_els (&dsp->t2d.lambda, nc, cols);
       vectorf_delete_els (&dsp->t2d.tau, nc, cols);
       vectorf_delete_els (&dsp->t2d.tinc, nc, cols);
@@ -146,8 +156,11 @@ free_tour2d(displayd *dsp)
   /*  datad *d = dsp->d;*/
   /*  gint nc = d->ncols;*/
 
+  vectori_free(&dsp->t2d.subset_vars);
+  vectorb_free(&dsp->t2d.subset_vars_p);
   vectori_free(&dsp->t2d.active_vars);
-  vectori_free(&dsp->t2d.active_vars_p);
+  vectorb_free(&dsp->t2d.active_vars_p);
+
   vectorf_free(&dsp->t2d.lambda);
   vectorf_free(&dsp->t2d.tau);
   vectorf_free(&dsp->t2d.tinc);
@@ -184,21 +197,21 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
  
     /* Initialize starting subset of active variables */
   if (nc < 8) {
-    dsp->t2d.nactive = nc;
+    dsp->t2d.nsubset = dsp->t2d.nactive = nc;
     for (j=0; j<nc; j++) {
-      dsp->t2d.active_vars.els[j] = j;
-      dsp->t2d.active_vars_p.els[j] = 1;
+      dsp->t2d.subset_vars.els[j] = dsp->t2d.active_vars.els[j] = j;
+      dsp->t2d.subset_vars_p.els[j] = dsp->t2d.active_vars_p.els[j] = true;
     }
   }
   else {
-    dsp->t2d.nactive = 3;
+    dsp->t2d.nsubset = dsp->t2d.nactive = 3;
     for (j=0; j<3; j++) {
-      dsp->t2d.active_vars.els[j] = j;
-      dsp->t2d.active_vars_p.els[j] = 1;
+      dsp->t2d.subset_vars.els[j] = dsp->t2d.active_vars.els[j] = j;
+      dsp->t2d.subset_vars_p.els[j] = dsp->t2d.active_vars_p.els[j] = true;
     }
     for (j=3; j<nc; j++) {
-      dsp->t2d.active_vars.els[j] = 0;
-      dsp->t2d.active_vars_p.els[j] = 0;
+      dsp->t2d.subset_vars.els[j] = dsp->t2d.active_vars.els[j] = 0;
+      dsp->t2d.subset_vars_p.els[j] = dsp->t2d.active_vars_p.els[j] = false;
     }
   }
 
@@ -262,17 +275,39 @@ void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
   }
 }
 
+/*-- add/remove jvar to/from the subset of variables that <may> be active --*/
 void 
-tour2dvar_set (gint jvar, ggobid *gg)
+tour2d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+{
+  gboolean in_subset = dsp->t2d.subset_vars_p.els[jvar];
+  gint j, k;
+  gboolean changed = false;
+
+  if (in_subset) {
+    if (dsp->t2d.nsubset > MIN_NVARS_FOR_TOUR2D) {
+      dsp->t2d.subset_vars_p.els[jvar] = false;
+      dsp->t2d.nsubset -= 1;
+      changed = true;
+    }
+  } else {
+    dsp->t2d.subset_vars_p.els[jvar] = true;
+    dsp->t2d.nsubset += 1;
+    changed = true;
+  }
+
+  /*-- reset subset_vars based on subset_vars_p --*/
+  if (changed)
+    for (j=0, k=0; j<d->ncols; j++)
+      if (dsp->t2d.subset_vars_p.els[j])
+        dsp->t2d.subset_vars.els[k++] = j;
+}
+
+/*-- add or remove jvar from the set of active variables --*/
+void 
+tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gint j, jtmp, k;
-  gboolean active=false;
-  displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
-
-  for (j=0; j<dsp->t2d.nactive; j++)
-    if (jvar == dsp->t2d.active_vars.els[j])
-      active = true;
+  gboolean active = dsp->t2d.active_vars_p.els[jvar];
 
   /* deselect var if t2d.nactive > 2 */
   if (active) {
@@ -295,7 +330,7 @@ tour2dvar_set (gint jvar, ggobid *gg)
         arrayd_copy(&dsp->t2d.Fa, &dsp->t2d.F);
 /*        copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
       }
-      dsp->t2d.active_vars_p.els[jvar] = 0;
+      dsp->t2d.active_vars_p.els[jvar] = false;
     }
   }
   else { /* not active, so add the variable */
@@ -320,7 +355,7 @@ tour2dvar_set (gint jvar, ggobid *gg)
       dsp->t2d.active_vars.els[jtmp] = jvar;
     }
     dsp->t2d.nactive++;
-    dsp->t2d.active_vars_p.els[jvar] = 1;
+    dsp->t2d.active_vars_p.els[jvar] = true;
   }
 
   dsp->t2d.get_new_target = true;
@@ -335,24 +370,43 @@ tour2d_manip_var_set (gint j, ggobid *gg)
 }
 
 void
-tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
+tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
 
-/*-- we don't care which button it is --*/
-  if (d->vcirc_ui.jcursor == GDK_HAND2) {
-    tour2d_manip_var_set (jvar, gg);
-    varcircles_cursor_set_default (d);
+  if (GTK_IS_TOGGLE_BUTTON(w)) {
+    /*
+     * add/remove jvar to/from the subset of variables that <may> be active
+    */
+    gboolean fade = gg->tour2d.fade_vars;
 
-  } else {
-    tour2dvar_set (jvar, gg);
-    /*    if (dsp->t2d.target_selection_method == 1)*/
-    /* Check if pp indices are being calculated, if so re-allocate
-       and re-initialize as necessary */
-    if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
-      realloc_optimize0_p(&dsp->t2d_pp_op, dsp->t2d.nactive, 
-        dsp->t2d.active_vars);
-      t2d_pp_reinit(gg);
+    tour2d_subset_var_set (jvar, d, dsp, gg);
+    varcircles_visibility_set (dsp, gg);
+
+    /*-- now add/remove the variable to/from the active set, too --*/
+    gg->tour2d.fade_vars = false;
+    tour2d_active_var_set (jvar, d, dsp, gg);
+    gg->tour2d.fade_vars = fade;
+
+
+  } else if (GTK_IS_DRAWING_AREA(w)) {
+    
+    /*-- we don't care which button it is --*/
+    if (d->vcirc_ui.jcursor == GDK_HAND2) {
+      tour2d_manip_var_set (jvar, gg);
+      varcircles_cursor_set_default (d);
+
+    } else {
+      /*-- add or remove from set of active variables --*/
+      tour2d_active_var_set (jvar, d, dsp, gg);
+      /*    if (dsp->t2d.target_selection_method == 1)*/
+      /* Check if pp indices are being calculated, if so re-allocate
+         and re-initialize as necessary */
+      if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+        realloc_optimize0_p(&dsp->t2d_pp_op, dsp->t2d.nactive, 
+          dsp->t2d.active_vars);
+        t2d_pp_reinit(gg);
+      }
     }
   }
 }
@@ -659,7 +713,7 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   /* If de-selected variables are still fading out of the tour
      we will need to take them out before starting manipulation */
   for (j=0; j<d->ncols; j++)
-    if (dsp->t2d.active_vars_p.els[j] == 0) {
+    if (dsp->t2d.active_vars_p.els[j] == false) {
        if (dsp->t2d.F.vals[0][j] > 0.0) 
          dsp->t2d.F.vals[0][j] = 0.0;
        if (dsp->t2d.F.vals[1][j] > 0.0)

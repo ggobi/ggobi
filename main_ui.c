@@ -147,26 +147,13 @@ varpanel_permits_circles_or_checkboxes (gint mode)
 static gboolean
 varpanel_shows_circles (datad *d)
 {
-  return GTK_WIDGET_REALIZED (d->vcirc_ui.vbox);
+  return GTK_WIDGET_REALIZED (d->vcirc_ui.ebox);
 }
 static gboolean
 varpanel_shows_checkboxes (datad *d)
 {
-  return GTK_WIDGET_REALIZED (d->vcbox_ui.swin);
+  return GTK_WIDGET_REALIZED (d->vcbox_ui.ebox);
 }
-
-/*  This will be the way to hide/show the second child of the hpane.
-    gtk_widget_ref (circles);
-    gtk_container_remove (GTK_CONTAINER (hpaned), circles);
-    gtk_paned_set_handle_size (GTK_PANED(hpaned), 0);
-    gtk_paned_set_gutter_size (GTK_PANED(hpaned), 0);                       
-  } else {
-    gtk_paned_add2 (GTK_PANED(hpaned), circles);
-    gtk_paned_set_handle_size (GTK_PANED(hpaned), 10);
-    gtk_paned_set_gutter_size (GTK_PANED(hpaned), 15);                       
-    gtk_widget_unref (circles);
-  }
-*/
 
 void
 varpanel_reinit (ggobid *gg)
@@ -180,41 +167,42 @@ varpanel_reinit (ggobid *gg)
   highd = varpanel_highd (display);
 
   if (highd && varpanel_shows_checkboxes (d)) {
-    /*-- remove checkboxes and add circles --*/
     /*
-     * add a reference to the checkboxes' scrolled window
-     * (so it won't disappear), then remove it from the ebox.
+     * Add the ebox for the table of variable circles/rectangles
+     * to the paned widget
     */
-    gtk_widget_ref (d->vcbox_ui.swin);
-    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
-                                         d->vcbox_ui.swin);
-    /*
-     * Now add the parent vbox for the table of variable circles
-     * to the ebox
-    */
-    gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
-                                        d->vcirc_ui.vbox);
-    /*-- update the reference count for the vbox --*/
+    varcircles_visibility_set (display, gg);
+    gtk_paned_pack2 (GTK_PANED (d->varpanel_ui.hpane),
+      d->vcirc_ui.ebox, true, true);
+    gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 10);
+    gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 15);
+
+    /*-- update the reference count for the ebox --*/
 #if GTK_MAJOR_VERSION == 1
-    if (GTK_OBJECT (d->vcirc_ui.vbox)->ref_count > 1)
+    if (GTK_OBJECT (d->vcirc_ui.ebox)->ref_count > 1)
 #else
-    if (G_OBJECT (d->vcirc_ui.vbox)->ref_count > 1)
+    if (G_OBJECT (d->vcirc_ui.ebox)->ref_count > 1)
 #endif
-      gtk_widget_unref (d->vcirc_ui.vbox);
+      gtk_widget_unref (d->vcirc_ui.ebox);
 
   } else if (!highd && varpanel_shows_circles (d)) {
-    /*-- remove circles and add checkboxes --*/
-    gtk_widget_ref (d->vcirc_ui.vbox);
-    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
-                                         d->vcirc_ui.vbox);
-    gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
-                                      d->vcbox_ui.swin);
+    /*-- remove circles/rectangles --*/
+    gtk_widget_ref (d->vcirc_ui.ebox);
+    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.hpane),
+                                         d->vcirc_ui.ebox);
+    gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+    gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+    /*-- set the handle position all the way to the right --*/
+    gtk_paned_set_position (GTK_PANED(d->varpanel_ui.hpane), -1);
+
+
+    /*-- adjust the reference count --*/
 #if GTK_MAJOR_VERSION == 1
-    if (GTK_OBJECT (d->vcbox_ui.swin)->ref_count > 1)
+    if (GTK_OBJECT (d->vcbox_ui.ebox)->ref_count > 1)
 #else
-    if (G_OBJECT (d->vcbox_ui.swin)->ref_count > 1)
+    if (G_OBJECT (d->vcbox_ui.ebox)->ref_count > 1)
 #endif
-      gtk_widget_unref (d->vcbox_ui.swin);
+      gtk_widget_unref (d->vcbox_ui.ebox);
   }
 }
 

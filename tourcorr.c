@@ -38,8 +38,11 @@ display_tourcorr_init_null (displayd *dsp, ggobid *gg)
 
   arrayd_init_null(&dsp->tcorr1.tv);
 
+  vectori_init_null(&dsp->tcorr1.subset_vars);
+  vectorb_init_null(&dsp->tcorr1.subset_vars_p);
   vectori_init_null(&dsp->tcorr1.active_vars);
-  vectori_init_null(&dsp->tcorr1.active_vars_p);
+  vectorb_init_null(&dsp->tcorr1.active_vars_p);
+
   vectorf_init_null(&dsp->tcorr1.lambda);
   vectorf_init_null(&dsp->tcorr1.tau);
   vectorf_init_null(&dsp->tcorr1.tinc);
@@ -62,8 +65,11 @@ display_tourcorr_init_null (displayd *dsp, ggobid *gg)
 
   arrayd_init_null(&dsp->tcorr2.tv);
 
+  vectori_init_null(&dsp->tcorr2.subset_vars);
+  vectorb_init_null(&dsp->tcorr2.subset_vars_p);
   vectori_init_null(&dsp->tcorr2.active_vars);
-  vectori_init_null(&dsp->tcorr2.active_vars_p);
+  vectorb_init_null(&dsp->tcorr2.active_vars_p);
+
   vectorf_init_null(&dsp->tcorr2.lambda);
   vectorf_init_null(&dsp->tcorr2.tau);
   vectorf_init_null(&dsp->tcorr2.tinc);
@@ -89,8 +95,11 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
 
   arrayd_alloc(&dsp->tcorr1.tv, 1, nc);
 
+  vectori_alloc(&dsp->tcorr1.subset_vars, nc);
+  vectorb_alloc_zero(&dsp->tcorr1.subset_vars_p, nc);
   vectori_alloc(&dsp->tcorr1.active_vars, nc);
-  vectori_alloc(&dsp->tcorr1.active_vars_p, nc);
+  vectorb_alloc_zero(&dsp->tcorr1.active_vars_p, nc);
+
   vectorf_alloc(&dsp->tcorr1.lambda, nc);
   vectorf_alloc(&dsp->tcorr1.tau, nc);
   vectorf_alloc(&dsp->tcorr1.tinc, nc);
@@ -113,8 +122,11 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
 
   arrayd_alloc(&dsp->tcorr2.tv, 1, nc);
 
+  vectori_alloc(&dsp->tcorr2.subset_vars, nc);
+  vectorb_alloc_zero(&dsp->tcorr2.subset_vars_p, nc);
   vectori_alloc(&dsp->tcorr2.active_vars, nc);
-  vectori_alloc(&dsp->tcorr2.active_vars_p, nc);
+  vectorb_alloc_zero(&dsp->tcorr2.active_vars_p, nc);
+
   vectorf_alloc(&dsp->tcorr2.lambda, nc);
   vectorf_alloc(&dsp->tcorr2.tau, nc);
   vectorf_alloc(&dsp->tcorr2.tinc, nc);
@@ -139,8 +151,11 @@ tourcorr_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
       arrayd_delete_cols (&dsp->tcorr1.Vz, nc, cols);
       arrayd_delete_cols (&dsp->tcorr1.tv, nc, cols);
 
+      vectori_delete_els (&dsp->tcorr1.subset_vars, nc, cols);
+      vectorb_delete_els (&dsp->tcorr1.subset_vars_p, nc, cols);
       vectori_delete_els (&dsp->tcorr1.active_vars, nc, cols);
-      vectori_delete_els (&dsp->tcorr1.active_vars_p, nc, cols);
+      vectorb_delete_els (&dsp->tcorr1.active_vars_p, nc, cols);
+
       vectorf_delete_els (&dsp->tcorr1.lambda, nc, cols);
       vectorf_delete_els (&dsp->tcorr1.tau, nc, cols);
       vectorf_delete_els (&dsp->tcorr1.tinc, nc, cols);
@@ -158,8 +173,11 @@ tourcorr_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
       arrayd_delete_cols (&dsp->tcorr2.Vz, nc, cols);
       arrayd_delete_cols (&dsp->tcorr2.tv, nc, cols);
 
+      vectori_delete_els (&dsp->tcorr2.subset_vars, nc, cols);
+      vectorb_delete_els (&dsp->tcorr2.subset_vars_p, nc, cols);
       vectori_delete_els (&dsp->tcorr2.active_vars, nc, cols);
-      vectori_delete_els (&dsp->tcorr2.active_vars_p, nc, cols);
+      vectorb_delete_els (&dsp->tcorr2.active_vars_p, nc, cols);
+
       vectorf_delete_els (&dsp->tcorr2.lambda, nc, cols);
       vectorf_delete_els (&dsp->tcorr2.tau, nc, cols);
       vectorf_delete_els (&dsp->tcorr2.tinc, nc, cols);
@@ -193,8 +211,11 @@ free_tourcorr(displayd *dsp)
   /*  datad *d = dsp->d;*/
   /*  gint nc = d->ncols;*/
 
+  vectori_free(&dsp->tcorr1.subset_vars);
+  vectorb_free(&dsp->tcorr1.subset_vars_p);
   vectori_free(&dsp->tcorr1.active_vars);
-  vectori_free(&dsp->tcorr1.active_vars_p);
+  vectorb_free(&dsp->tcorr1.active_vars_p);
+
   vectorf_free(&dsp->tcorr1.lambda);
   vectorf_free(&dsp->tcorr1.tau);
   vectorf_free(&dsp->tcorr1.tinc);
@@ -214,8 +235,11 @@ free_tourcorr(displayd *dsp)
   arrayd_free(&dsp->tc1_manbasis, 0, 0);
   arrayd_free(&dsp->tc2_manbasis, 0, 0);
 
+  vectori_free(&dsp->tcorr2.subset_vars);
+  vectorb_free(&dsp->tcorr2.subset_vars_p);
   vectori_free(&dsp->tcorr2.active_vars);
-  vectori_free(&dsp->tcorr2.active_vars_p);
+  vectorb_free(&dsp->tcorr2.active_vars_p);
+
   vectorf_free(&dsp->tcorr2.lambda);
   vectorf_free(&dsp->tcorr2.tau);
   vectorf_free(&dsp->tcorr2.tinc);
@@ -246,34 +270,38 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
 
   alloc_tourcorr(dsp, gg);
 
-  /* Initialize first variable as the vertical and rest of the variables as
-     the horizontal variables */
-  dsp->tcorr1.nactive = 2;
-  dsp->tcorr1.active_vars.els[0] = 0;
-  dsp->tcorr1.active_vars.els[1] = 1;
-  dsp->tcorr1.active_vars_p.els[0] = 1;
-  dsp->tcorr1.active_vars_p.els[1] = 1;
+  /* Initialize first two variables as the vertical and rest of the
+     variables as the horizontal variables */
+  dsp->tcorr1.nsubset = dsp->tcorr1.nactive = 2;
+  for (j=0; j<2; j++) {
+    dsp->tcorr1.subset_vars.els[j] = dsp->tcorr1.active_vars.els[j] = j;
+    dsp->tcorr1.subset_vars_p.els[j] = dsp->tcorr1.active_vars_p.els[j] = true;
+  }
+
+/*  does this make sense?  dfs
   for (j=0; j<nc; j++)
-    dsp->tcorr1.active_vars_p.els[j] = 0;
+    dsp->tcorr1.active_vars_p.els[j] = false;
+*/
 
   if (nc < 8) {
-    dsp->tcorr2.nactive = nc-2;
-    dsp->tcorr2.active_vars_p.els[0] = 0;
-    dsp->tcorr2.active_vars_p.els[1] = 0;
+    dsp->tcorr2.nsubset = dsp->tcorr2.nactive = nc-2;
+    for (j=0; j<2; j++) {
+      dsp->tcorr2.subset_vars_p.els[j] = dsp->tcorr2.active_vars_p.els[j] = false;
+    }
     for (j=0; j<nc-2; j++) {
-      dsp->tcorr2.active_vars.els[j] = j+2;
-      dsp->tcorr2.active_vars_p.els[j+2] = 1;
+      dsp->tcorr2.subset_vars.els[j] = dsp->tcorr2.active_vars.els[j] = j+2;
+      dsp->tcorr2.subset_vars_p.els[j+2] = dsp->tcorr2.active_vars_p.els[j+2] = true;
     }
   }
   else {
-    dsp->tcorr2.nactive = 3;
+    dsp->tcorr2.nsubset = dsp->tcorr2.nactive = 3;
     for (j=0; j<3; j++) {
-      dsp->tcorr2.active_vars.els[j] = j+2;
-      dsp->tcorr2.active_vars_p.els[j+2] = 1;
+      dsp->tcorr2.subset_vars.els[j] = dsp->tcorr2.active_vars.els[j] = j+2;
+      dsp->tcorr2.subset_vars_p.els[j+2] = dsp->tcorr2.active_vars_p.els[j+2] = true;
     }
     for (j=3; j<nc-2; j++) {
-      dsp->tcorr2.active_vars.els[j] = 0;
-      dsp->tcorr2.active_vars_p.els[j+2] = 0;
+      dsp->tcorr2.subset_vars.els[j] = dsp->tcorr2.active_vars.els[j] = 0;
+      dsp->tcorr2.subset_vars_p.els[j+2] = dsp->tcorr2.active_vars_p.els[j+2] = false;
     }
   }
 
@@ -353,17 +381,44 @@ void tourcorr_pause (cpaneld *cpanel, gboolean state, ggobid *gg)
   }
 }
 
+void
+tourcorr_subset_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+{
+  gboolean in_subset = dsp->tcorr1.subset_vars_p.els[jvar];
+  gint j, k;
+  gboolean changed = false;
+
+/*
+ * vardesign
+ * For the moment, don't allow this if jvar is in the vertical subset
+*/
+  if (dsp->tcorr2.subset_vars_p.els[jvar])
+    return;
+
+  if (in_subset) {
+    if (dsp->tcorr1.nsubset + dsp->tcorr2.nsubset > MIN_NVARS_FOR_COTOUR) {
+      dsp->tcorr1.subset_vars_p.els[jvar] = false;
+      dsp->tcorr1.nsubset -= 1;
+      changed = true;
+    }
+  } else {
+    dsp->tcorr1.subset_vars_p.els[jvar] = true;
+    dsp->tcorr1.nsubset += 1;
+    changed = true;
+  }
+
+  /*-- reset subset_vars based on subset_vars_p --*/
+  if (changed)
+    for (j=0, k=0; j<d->ncols; j++)
+      if (dsp->tcorr1.subset_vars_p.els[j])
+        dsp->tcorr1.subset_vars.els[k++] = j;
+}
+
 void 
-tourcorr_horvar_set (gint jvar, ggobid *gg)
+tourcorr_active_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
-  gboolean active=false;
-  displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
-
-  for (j=0; j<dsp->tcorr1.nactive; j++)
-    if (jvar == dsp->tcorr1.active_vars.els[j])
-      active = true;
+  gboolean active = dsp->tcorr1.active_vars_p.els[jvar];
 
   /* deselect var if tcorr1.nactive > 1 */
   if (active) {
@@ -385,7 +440,7 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
         arrayd_copy(&dsp->tcorr1.Fa, &dsp->tcorr1.F);
 	/*        copy_mat(dsp->tcorr1.F.vals, dsp->tcorr1.Fa.vals, d->ncols, 1);*/
       }
-      dsp->tcorr1.active_vars_p.els[jvar] = 0;
+      dsp->tcorr1.active_vars_p.els[jvar] = false;
     }
   }
   else { /* not active, so add the variable */
@@ -412,24 +467,51 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
       dsp->tcorr1.active_vars.els[jtmp] = jvar;
     }
     dsp->tcorr1.nactive++;
-    dsp->tcorr1.active_vars_p.els[jvar] = 1;
+    dsp->tcorr1.active_vars_p.els[jvar] = true;
   }
 
   dsp->tcorr1.get_new_target = true;
 
 }
 
+void
+tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+{
+  gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
+  gint j, k;
+  gboolean changed = false;
+
+/*
+ * vardesign
+ * For the moment, don't allow this if jvar is in the other subset
+*/
+  if (dsp->tcorr1.subset_vars_p.els[jvar])
+    return;
+
+  if (in_subset) {
+    if (dsp->tcorr1.nsubset + dsp->tcorr2.nsubset > MIN_NVARS_FOR_COTOUR) {
+      dsp->tcorr2.subset_vars_p.els[jvar] = false;
+      dsp->tcorr2.nsubset -= 1;
+      changed = true;
+    }
+  } else {
+    dsp->tcorr2.subset_vars_p.els[jvar] = true;
+    dsp->tcorr2.nsubset += 1;
+    changed = true;
+  }
+
+  /*-- reset subset_vars based on subset_vars_p --*/
+  if (changed)
+    for (j=0, k=0; j<d->ncols; j++)
+      if (dsp->tcorr2.subset_vars_p.els[j])
+        dsp->tcorr2.subset_vars.els[k++] = j;
+}
+
 void 
-tourcorr_vervar_set (gint jvar, ggobid *gg)
+tourcorr_active_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
-  gboolean active=false;
-  displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
-
-  for (j=0; j<dsp->tcorr2.nactive; j++)
-    if (jvar == dsp->tcorr2.active_vars.els[j])
-      active = true;
+  gboolean active = dsp->tcorr2.active_vars_p.els[jvar];
 
   /* deselect var if tcorr2.nactive > 1 */
   if (active) {
@@ -452,7 +534,7 @@ tourcorr_vervar_set (gint jvar, ggobid *gg)
         arrayd_copy(&dsp->tcorr2.Fa, &dsp->tcorr2.F);
 	/*        copy_mat(dsp->tcorr2.F.vals, dsp->tcorr2.Fa.vals, d->ncols, 1);*/
       }
-      dsp->tcorr2.active_vars_p.els[jvar] = 0;
+      dsp->tcorr2.active_vars_p.els[jvar] = false;
 
     }
   }
@@ -480,7 +562,7 @@ tourcorr_vervar_set (gint jvar, ggobid *gg)
       dsp->tcorr2.active_vars.els[jtmp] = jvar;
     }
     dsp->tcorr2.nactive++;
-    dsp->tcorr2.active_vars_p.els[jvar] = 1;
+    dsp->tcorr2.active_vars_p.els[jvar] = true;
   }
 
   dsp->tcorr2.get_new_target = true;
@@ -498,18 +580,47 @@ tourcorr_manip_var_set (gint j, gint btn, ggobid *gg)
 }
 
 void
-tourcorr_varsel (gint jvar, gint button, datad *d, ggobid *gg)
+tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 {
-  if (d->vcirc_ui.jcursor == GDK_HAND2) {
-    tourcorr_manip_var_set (jvar, button, gg);
-    d->vcirc_ui.jcursor = (gint) NULL;  /*-- start with the default cursor --*/
-  }
-  else {
+  displayd *dsp = gg->current_display;
+
+  if (GTK_IS_TOGGLE_BUTTON(w)) {
+    /*
+     * add/remove jvar to/from the subset of variables that <may> be active
+    */
+    gboolean fade = gg->tourcorr.fade_vars;
+
     if (button == 1) { 
-      tourcorr_horvar_set (jvar, gg);
+      tourcorr_subset_horvar_set (jvar, d, dsp, gg);
+      varcircles_visibility_set (dsp, gg);
+
+      /*-- now add/remove the variable to/from the active set, too --*/
+      gg->tourcorr.fade_vars = false;
+      tourcorr_active_horvar_set (jvar, d, dsp, gg);
+      gg->tourcorr.fade_vars = fade;
+    } else {
+      tourcorr_subset_vervar_set (jvar, d, dsp, gg);
+      varcircles_visibility_set (dsp, gg);
+
+      /*-- now add/remove the variable to/from the active set, too --*/
+      gg->tourcorr.fade_vars = false;
+      tourcorr_active_vervar_set (jvar, d, dsp, gg);
+      gg->tourcorr.fade_vars = fade;
     }
-    else if (button == 2 || button == 3) {
-      tourcorr_vervar_set (jvar, gg);
+
+  } else if (GTK_IS_DRAWING_AREA(w)) {
+
+    if (d->vcirc_ui.jcursor == GDK_HAND2) {
+      tourcorr_manip_var_set (jvar, button, gg);
+      d->vcirc_ui.jcursor = (gint) NULL;
+    }
+    else {
+      if (button == 1) { 
+        tourcorr_active_horvar_set (jvar, d, dsp, gg);
+      }
+      else if (button == 2 || button == 3) {
+        tourcorr_active_vervar_set (jvar, d, dsp, gg);
+      }
     }
   }
 }

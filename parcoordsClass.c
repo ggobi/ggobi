@@ -192,7 +192,7 @@ plotted(displayd *display, gint *cols, gint ncols, datad *d)
 }
 
 static gboolean
-variableSelect(displayd *dpy, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg)
+variableSelect(GtkWidget *w, displayd *dpy, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg)
 {
   gint jvar_prev = -1;
   return(parcoords_varsel (cpanel, sp, jvar, &jvar_prev, gg));

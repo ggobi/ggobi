@@ -30,8 +30,8 @@ static GtkItemFactoryEntry menu_items[] = {
 */
 static void
 tsplot_display_menus_make (displayd *display, 
-			   GtkAccelGroup *accel_group, GtkSignalFunc func, 
-			   GtkWidget *mbar, ggobid *gg)
+  GtkAccelGroup *accel_group, GtkSignalFunc func, 
+  GtkWidget *mbar, ggobid *gg)
 {
   GtkWidget *options_menu, *submenu, *item;
 
@@ -41,15 +41,15 @@ tsplot_display_menus_make (displayd *display,
   submenu = submenu_make ("_Options", 'D', accel_group);
   /*-- add a tooltip --*/
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), submenu,
-			"Options menu for this display", NULL);
+    "Options menu for this display", NULL);
 
   options_menu = gtk_menu_new ();
 
   item = CreateMenuCheck (options_menu, "Show points",
-			  func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
+      func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
   item = CreateMenuCheck (options_menu, "Show line segments",
-			  func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
+      func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
   /* Add a separator */
@@ -146,7 +146,7 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
   if (nvars == 0) {
     nplots = MIN ((d->ncols-1), sessionOptions->info->numTimePlotVars);
     if(nplots < 0)
-	nplots = d->ncols;
+      nplots = d->ncols;
     for (i=1; i<nplots; i++)
       vars[i] = i;
   } else {
@@ -166,14 +166,14 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
 
   gg->tsplot.accel_group = gtk_accel_group_new ();
   factory = get_main_menu (menu_items,
-			   sizeof (menu_items) / sizeof (menu_items[0]),
-			   gg->tsplot.accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
-			   &mbar, (gpointer) display);
+    sizeof (menu_items) / sizeof (menu_items[0]),
+    gg->tsplot.accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
+    &mbar, (gpointer) display);
 
   /*-- add a tooltip to the file menu --*/
   w = gtk_item_factory_get_widget (factory, "<main>/File");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gtk_menu_get_attach_widget (GTK_MENU(w)),
-			"File menu for this display", NULL);
+    "File menu for this display", NULL);
 
   /*
    * After creating the menubar, and populating the file menu,
@@ -243,8 +243,8 @@ tsplot_var_selected (gint jvar, displayd *display)
 }
 
 gboolean
-tsplot_varsel (displayd *display, splotd *sp, gint jvar, gint button,
-	        cpaneld *cpanel,  ggobid *gg)
+tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
+    gint button, cpaneld *cpanel,  ggobid *gg)
 {
   gboolean redraw = true;
   gint nplots = g_list_length (gg->current_display->splots);
@@ -252,7 +252,7 @@ tsplot_varsel (displayd *display, splotd *sp, gint jvar, gint button,
   gint jvar_indx=-1, new_indx;
   GList *l;
   splotd *s, *sp_new;
-  GtkWidget *box, *w;
+  GtkWidget *box, *da;
   gfloat ratio = 1.0;
 
 
@@ -260,8 +260,8 @@ tsplot_varsel (displayd *display, splotd *sp, gint jvar, gint button,
   gint sp_indx = g_list_index (gg->current_display->splots, sp);
 
   if(GTK_IS_GGOBI_WINDOW_DISPLAY(gg->current_display))
-      gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window),
-			     false, false, false);
+    gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window),
+      false, false, false);
 
   splot_get_dimensions (sp, &width, &height);
 
@@ -312,11 +312,11 @@ tsplot_varsel (displayd *display, splotd *sp, gint jvar, gint button,
 
         l = display->splots;
         while (l) {
-          w = ((splotd *) l->data)->da;
-          gtk_widget_ref (w);
+          da = ((splotd *) l->data)->da;
+          gtk_widget_ref (da);
           /*-- shrink each plot --*/
-          gtk_widget_set_usize (w, -1, -1);
-          gtk_widget_set_usize (w, width, height);
+          gtk_widget_set_usize (da, -1, -1);
+          gtk_widget_set_usize (da, width, height);
           /* */
           l = l->next ;
         }
@@ -388,17 +388,17 @@ tsplot_varsel (displayd *display, splotd *sp, gint jvar, gint button,
         gtk_widget_show (sp_new->da);
 
         while (l) {
-          w = ((splotd *) l->data)->da;
-          gtk_widget_ref (w);
+          da = ((splotd *) l->data)->da;
+          gtk_widget_ref (da);
 
           /* shrink each plot */
-          gtk_widget_set_usize (w, -1, -1);
-          gtk_widget_set_usize (w, width, height);
+          gtk_widget_set_usize (da, -1, -1);
+          gtk_widget_set_usize (da, width, height);
           /* */
 
-          gtk_container_remove (GTK_CONTAINER (box), w);
-          gtk_box_pack_start (GTK_BOX (box), w, true, true, 0);
-          gtk_widget_unref (w);  /*-- decrease the ref_count by 1 --*/
+          gtk_container_remove (GTK_CONTAINER (box), da);
+          gtk_box_pack_start (GTK_BOX (box), da, true, true, 0);
+          gtk_widget_unref (da);  /*-- decrease the ref_count by 1 --*/
           l = l->next ;
         }
 
@@ -410,8 +410,8 @@ tsplot_varsel (displayd *display, splotd *sp, gint jvar, gint button,
   }
 
   if(GTK_IS_GGOBI_WINDOW_DISPLAY(gg->current_display))
-      gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window),
-			     true, true, false);
+    gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window),
+      true, true, false);
 
 
   return redraw;

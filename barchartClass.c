@@ -9,7 +9,8 @@
 
 
  /* Making these available to ggobiClass.c */
-static gboolean barchartVarSel(displayd * display, splotd * sp, gint jvar,
+static gboolean barchartVarSel(GtkWidget *w, displayd * display, splotd * sp,
+                               gint jvar,
                                gint btn, cpaneld * cpanel, ggobid * gg);
 static gint barchartVarIsPlotted(displayd * dpy, gint * cols, gint ncols,
                                  datad * d);
@@ -75,8 +76,8 @@ static gchar *barchart_tree_label(splotd * sp, datad * d, ggobid * gg)
 
 
 gboolean
-barchartVarSel(displayd * display, splotd * sp, gint jvar, gint btn,
-               cpaneld * cpanel, ggobid * gg)
+barchartVarSel(GtkWidget *w, displayd * display, splotd * sp, gint jvar,
+               gint btn, cpaneld * cpanel, ggobid * gg)
 {
   gint jvar_prev = -1;
   gboolean redraw = p1d_varsel(sp, jvar, &jvar_prev, btn);

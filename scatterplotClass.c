@@ -48,38 +48,38 @@ setShowAxesLabelOption(displayd *display, gboolean active)
 static void
 setShowAxesOption(displayd *display, gboolean active)
 {
-        switch (display->cpanel.projection) {
-          case XYPLOT:
-            if (display->hrule != NULL) {
-              scatterplot_show_vrule (display, active);
-              scatterplot_show_hrule (display, active);
-            }
-          break;
-          case P1PLOT:
-            if (display->hrule != NULL) {
-              if (display->p1d_orientation == VERTICAL)
-                scatterplot_show_vrule (display, active);
-              else
-                scatterplot_show_hrule (display, active);
-            }
-          case TOUR1D:
-          case TOUR2D:
-          case COTOUR:
-            display_plot (display, FULL, display->ggobi); /* di changed QUICK to FULL */
-          break;
-          default:
-          break;
-        }
+  switch (display->cpanel.projection) {
+    case XYPLOT:
+      if (display->hrule != NULL) {
+        scatterplot_show_vrule (display, active);
+        scatterplot_show_hrule (display, active);
+      }
+    break;
+    case P1PLOT:
+      if (display->hrule != NULL) {
+        if (display->p1d_orientation == VERTICAL)
+          scatterplot_show_vrule (display, active);
+        else
+          scatterplot_show_hrule (display, active);
+      }
+    case TOUR1D:
+    case TOUR2D:
+    case COTOUR:
+      display_plot (display, FULL, display->ggobi); /* di changed QUICK to FULL */
+    break;
+    default:
+    break;
+  }
 }
 
 static void
-selectXVar(displayd *display, gint jvar, ggobid *gg)
+selectXVar(GtkWidget *w, displayd *display, gint jvar, ggobid *gg)
 {
-    datad *d = display->d;
-    splotd *sp = (splotd *) display->splots->data;
-    cpaneld *cpanel = &display->cpanel;
+  datad *d = display->d;
+  splotd *sp = (splotd *) display->splots->data;
+  cpaneld *cpanel = &display->cpanel;
 
-    varsel (cpanel, sp, jvar, 1, false, false, false, d, gg);
+  varsel (w, cpanel, sp, jvar, 1, false, false, false, d, gg);
 }
 
 static void
@@ -87,60 +87,99 @@ varpanelRefresh(displayd *display, splotd *sp, datad *d)
 {
   cpaneld *cpanel = &display->cpanel;
   gint j;
-        switch (cpanel->projection) {
-          case P1PLOT:
-            for (j=0; j<d->ncols; j++) {
-              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
 
-              varpanel_toggle_set_active (VARSEL_X, j, j == sp->p1dvar, d);
-            }
-          break;
-          case XYPLOT:
-            for (j=0; j<d->ncols; j++) {
-              varpanel_toggle_set_active (VARSEL_X, j, 
-                (j == sp->xyvars.x), d);
-              varpanel_widget_set_visible (VARSEL_Y, j, true, d);
-              varpanel_toggle_set_active (VARSEL_Y, j, 
-                (j == sp->xyvars.y), d);
-            }
-          break;
-          /*-- to pacify compiler --*/
-  	  default:
-          break;
+  switch (cpanel->projection) {
+    case P1PLOT:
+      for (j=0; j<d->ncols; j++) {
+        varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+
+        varpanel_toggle_set_active (VARSEL_X, j, j == sp->p1dvar, d);
       }
+    break;
+    case XYPLOT:
+      for (j=0; j<d->ncols; j++) {
+        varpanel_toggle_set_active (VARSEL_X, j, 
+          (j == sp->xyvars.x), d);
+        varpanel_widget_set_visible (VARSEL_Y, j, true, d);
+        varpanel_toggle_set_active (VARSEL_Y, j, 
+          (j == sp->xyvars.y), d);
+      }
+    break;
+
+    case TOUR1D:
+      for (j=0; j<d->ncols; j++) {
+        varpanel_toggle_set_active (VARSEL_X, j, false, d);
+        varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+      }
+      for (j=0; j<display->t1d.nsubset; j++) {
+        varpanel_toggle_set_active (VARSEL_X,
+          display->t1d.subset_vars.els[j], true, d);
+      }
+    break;
+    case TOUR2D:
+      for (j=0; j<d->ncols; j++) {
+        varpanel_toggle_set_active (VARSEL_X, j, false, d);
+        varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+      }
+      for (j=0; j<display->t2d.nsubset; j++) {
+        varpanel_toggle_set_active (VARSEL_X,
+          display->t2d.subset_vars.els[j], true, d);
+      }
+    break;
+    case COTOUR:
+      for (j=0; j<d->ncols; j++) {
+        varpanel_toggle_set_active (VARSEL_X, j, false, d);
+        varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Y, j, true, d);
+      }
+      for (j=0; j<display->tcorr1.nsubset; j++) {
+        varpanel_toggle_set_active (VARSEL_X,
+          display->tcorr1.subset_vars.els[j], true, d);
+      }
+      for (j=0; j<display->tcorr2.nsubset; j++) {
+        varpanel_toggle_set_active (VARSEL_Y,
+          display->tcorr2.subset_vars.els[j], true, d);
+      }
+    break;
+    /*-- to pacify compiler --*/
+    default:
+    break;
+  }
 }
 
 static gboolean
-variableSelect(displayd *display, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg)
+variableSelect(GtkWidget *w, displayd *display, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg)
 {
-      gboolean redraw = false;
-      gint jvar_prev = -1;
-      switch (cpanel->projection) {
-        case P1PLOT:
-          redraw = p1d_varsel (sp, jvar, &jvar_prev, btn);
-          if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
-            reinit_transient_brushing (display, gg);
-        break;
-        case XYPLOT:
-          redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
-          if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
-            reinit_transient_brushing (display, gg);
-        break;
-        case TOUR2D:
-          tour2d_varsel (jvar, btn, display->d, gg);
-        break;
-        case TOUR1D:
-          tour1d_varsel (jvar, btn, display->d, gg);
-        break;
-        case COTOUR:
-          tourcorr_varsel (jvar, btn, display->d, gg);
-        break;
-        /*-- to pacify compiler if we change these to an enum --*/
-        default:
-        break;
-    }
-      return(redraw);
+  gboolean redraw = false;
+  gint jvar_prev = -1;
+  switch (cpanel->projection) {
+    case P1PLOT:
+      redraw = p1d_varsel (sp, jvar, &jvar_prev, btn);
+      if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
+        reinit_transient_brushing (display, gg);
+    break;
+    case XYPLOT:
+      redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
+      if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
+        reinit_transient_brushing (display, gg);
+    break;
+    case TOUR2D:
+      tour2d_varsel (w, jvar, btn, display->d, gg);
+    break;
+    case TOUR1D:
+      tour1d_varsel (w, jvar, btn, display->d, gg);
+    break;
+    case COTOUR:
+      tourcorr_varsel (w, jvar, btn, display->d, gg);
+    break;
+    /*-- to pacify compiler if we change these to an enum --*/
+    default:
+    break;
+  }
+  return(redraw);
 }
 
 static gboolean
@@ -649,13 +688,13 @@ cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 void
 displaySet(displayd *dpy, ggobid *gg)
 {
-        scatterplot_mode_menu_make (gg->main_accel_group,
-				    (GtkSignalFunc) viewmode_set_cb, gg, true);
-        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-					  gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-                                   gg->app.scatterplot_mode_menu); 
-        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
+  scatterplot_mode_menu_make (gg->main_accel_group,
+    (GtkSignalFunc) viewmode_set_cb, gg, true);
+  gg->viewmode_item = submenu_make ("_ViewMode", 'V',
+    gg->main_accel_group);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
+    gg->app.scatterplot_mode_menu); 
+  submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
 }
 
 static gboolean
@@ -671,7 +710,7 @@ handlesAction(displayd *dpy,  PipelineMode v)
 static gint 
 plotted(displayd *display, gint *cols, gint ncols, datad *d)
 {
-	gint j, k;
+  gint j, k;
         splotd *sp = (splotd *) display->splots->data;  /*-- only one splot --*/
         gint projection = projection_get (display->ggobi);
 
@@ -727,7 +766,7 @@ plotted(displayd *display, gint *cols, gint ncols, datad *d)
           break;
         }
 
-	return(-1);
+  return(-1);
 }
 
 
@@ -784,7 +823,7 @@ varpanelTooltipsReset(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *w
               NULL);
           break;
           /*-- to pacify compiler if we change these to an enum --*/
-  	  default:
+          default:
           break;
       }
 }
@@ -922,7 +961,7 @@ worldToPlane(splotd *sp, datad *d, ggobid *gg)
 static gboolean
 drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
 {
-	gboolean draw_case = true;
+  gboolean draw_case = true;
         gint proj = projection_get (gg);
         switch (proj) {
           case P1PLOT:
@@ -952,7 +991,7 @@ drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
               draw_case = false;
           break;
         }
-	return(draw_case);
+  return(draw_case);
 }
 
 static gboolean
@@ -988,7 +1027,7 @@ drawEdge(splotd *sp, gint m, datad *d, datad *e, ggobid *gg)
               draw_edge = false;
           break;
         }
-	return(draw_edge);
+  return(draw_edge);
 }
 
 void
@@ -1075,9 +1114,9 @@ addPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 /* Same as scatmat... */
     cpaneld *cpanel = &(sp->displayptr->cpanel);
     if(cpanel->projection == XYPLOT)
-	    scatterXYAddPlotLabels(sp, drawable, gg->plot_GC);
+      scatterXYAddPlotLabels(sp, drawable, gg->plot_GC);
     else if(cpanel->projection == P1PLOT)
-	    scatter1DAddPlotLabels(sp, drawable, gg->plot_GC);
+    scatter1DAddPlotLabels(sp, drawable, gg->plot_GC);
 
 
 
@@ -1102,12 +1141,12 @@ withinDrawToUnbinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 
     if (display->p1d_orientation == HORIZONTAL)
       gdk_draw_line (drawable, gc,
-  	   sp->screen[m].x, sp->screen[m].y,
-  	   sp->screen[m].x, baseline->y);
+        sp->screen[m].x, sp->screen[m].y,
+        sp->screen[m].x, baseline->y);
     else
       gdk_draw_line (drawable, gc,
-  	   sp->screen[m].x, sp->screen[m].y,
-  	   baseline->x, sp->screen[m].y);
+        sp->screen[m].x, sp->screen[m].y,
+        baseline->x, sp->screen[m].y);
   }
 }
 
@@ -1175,9 +1214,9 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
 static gint
 splotVariablesGet(splotd *sp, gint *cols, datad *d)
 {
-	cols[0] = sp->xyvars.x;
-	cols[1] = sp->xyvars.y;
-	return(2);
+  cols[0] = sp->xyvars.x;
+  cols[1] = sp->xyvars.y;
+  return(2);
 }
 
 void

@@ -78,7 +78,7 @@ struct _datad {
   gboolean single_column; /*-- not handling single-column case now --*/
 
   array_f raw, tform;
-  array_g world, jitdata;  /* convert these first; planar etc later */
+  array_g world, jitdata;
 
  /*----------------------- missing values ---------------------------*/
 
@@ -149,15 +149,15 @@ struct _datad {
 /*----------------- variable selection panel -------------------------*/
 
   struct _Varpanel_cboxd {
-    GtkWidget *swin;
-    GtkWidget *vbox;       /*-- child of swin --*/
-                                                 /*GSList *checkbox; *//*-- single column of checkboxes --*/
-   /*-- switching from checkboxes to two toggle widgets and a label --*/
-    GSList *box;  /*-- single column of hboxes --*/
-
+    GtkWidget *ebox;   /*-- child1 of pane widget --*/
+    GtkWidget *swin;   /*-- child of ebox --*/
+    GtkWidget *vbox;   /*-- child of swin --*/
+    GSList *box;       /*-- single column of hboxes --*/
   } vcbox_ui;
+
   struct _Varpanel_circd {
-    GtkWidget *vbox;
+    GtkWidget *ebox;        /*-- child2 of pane widget --*/
+    GtkWidget *vbox;        /*-- child of ebox --*/
     GtkWidget *swin, *hbox; /*-- children of vbox --*/
     GtkWidget *table;       /*-- sole child of swin --*/
     GtkWidget *manip_btn, *freeze_btn; /*-- children of hbox --*/
@@ -173,7 +173,7 @@ struct _datad {
   } vcirc_ui;
 
   struct _Varpaneld {
-    GtkWidget *ebox; /*-- child of the notebook --*/
+    GtkWidget *hpane;  /*-- child of the ebox --*/
   } varpanel_ui;
 
 /*-------------------- transformation --------------------------------*/

@@ -425,7 +425,7 @@ void       tour1d_realloc_up (gint nc, datad *d, ggobid *gg);
 void       tour1d_reinit (ggobid *);
 void       tour1d_scramble(ggobid *);
 void       tour1d_speed_set (gint, ggobid *);
-void       tour1d_varsel (gint jvar, gint btn, datad *, ggobid *);
+void       tour1d_varsel (GtkWidget *w, gint jvar, gint btn, datad *, ggobid *);
 void       tour1d_vert (cpaneld *, gboolean);
 void       tour2d_do_step (displayd *,ggobid *);
 void       tour2d_event_handlers_toggle (splotd *, gboolean);
@@ -443,7 +443,7 @@ void       tour2d_realloc_up (gint nc, datad *d, ggobid *gg);
 void       tour2d_reinit (ggobid *);
 void       tour2d_scramble (ggobid *);
 void       tour2d_speed_set (gint, ggobid *);
-void       tour2d_varsel (gint jvar, gint btn, datad *, ggobid *);
+void       tour2d_varsel (GtkWidget *w, gint jvar, gint btn, datad *, ggobid *);
 void       tourcorr_fade_vars_cb (GtkCheckMenuItem *w, guint action);
 void       tourcorr_func (gboolean, displayd *, ggobid *);
 void       tourcorr_io_cb (GtkWidget *w, gpointer *cbd);
@@ -457,7 +457,7 @@ void       tourcorr_realloc_up (gint nc, datad *d, ggobid *gg);
 void       tourcorr_reinit (ggobid *);
 void       tourcorr_scramble (ggobid *);
 void       tourcorr_speed_set (gint, ggobid *);
-void       tourcorr_varsel (gint jvar, gint btn, datad *, ggobid *);
+void       tourcorr_varsel (GtkWidget *w, gint jvar, gint btn, datad *, ggobid *);
 void       tour_do_step (displayd *, ggobid *);
 void       tour_manip_colors_init (ggobid *);
 void       tour_reproject (vector_f, array_d, array_d, array_d, array_d, array_d, gint, gint);
@@ -485,6 +485,7 @@ void       varcircles_layout_cb (GtkCheckMenuItem *w, guint action);
 void       varcircles_layout_reset (gint ncols, datad *, ggobid *);
 void       varcircles_populate (datad *, ggobid *);
 void       varcircles_refresh (datad *, ggobid *);
+void       varcircles_visibility_set (displayd *display, ggobid *gg);
 void       vardialog_open (ggobid *, gchar *title);
 void       variable_clone (gint, const gchar *, gboolean, datad *, ggobid *);
 void       variable_notebook_subwindow_add (datad *d, GtkSignalFunc func, GtkWidget *notebook, ggobid *gg);
@@ -499,7 +500,7 @@ void       varpanel_reinit (ggobid *gg);
 void       varpanel_show_page (displayd*, ggobid*);
 void       varpanel_tooltips_set (displayd *, ggobid *);
 void       varpanel_widgets_add (gint nc, datad *d, ggobid *gg);
-void       varsel (cpaneld *, splotd *, gint jvar, gint btn, gint alt_mod, gint ctrl_mod, gint shift_mod, datad *, ggobid *);
+void       varsel (GtkWidget *, cpaneld *, splotd *, gint jvar, gint btn, gint alt_mod, gint ctrl_mod, gint shift_mod, datad *, ggobid *);
 void       vars_stdized_send_event (datad *d, ggobid *gg);
 void       vartable_alloc (datad *);
 void       vartable_cells_set_by_var (gint j, datad *d);
@@ -520,7 +521,9 @@ void       vartable_show_page (displayd*, ggobid*);
 void       vartable_stats_set_by_var (gint j, datad *);
 void       vartable_stats_set (datad *);
 void       vectorb_alloc (vector_b *, gint);
+void       vectorb_alloc_zero (vector_b *, gint);
 void       vectorb_copy (vector_b *, vector_b *);
+void       vectorb_delete_els (vector_b *vecp, gint nels, gint *els);
 void       vectorb_free (vector_b *);
 void       vectorb_init_null (vector_b *);
 void       vectorb_realloc (vector_b *, gint);
@@ -673,7 +676,7 @@ void      tsplot_menus_make (ggobid *gg);
 void      tsplot_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 displayd* tsplot_new (gboolean, gint, gint *, datad *, ggobid *);
 void      tsplot_reset_arrangement (displayd *, gint, ggobid *);
-gboolean  tsplot_varsel (displayd *display, splotd *sp, gint jvar, gint button, cpaneld *cpanel,  ggobid *gg);
+gboolean  tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar, gint button, cpaneld *cpanel,  ggobid *gg);
 void      tsplot_whiskers_make (splotd *, displayd *, ggobid *);
 
 /* The new way of handling window closures, so that we don't just exit. */
@@ -741,7 +744,6 @@ void splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid 
 void scatterXYAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc);
 void scatter1DAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc);
 
-#define VAR_CIRCLE_DIAM 40
 
 
 gboolean processRestoreFile(const gchar * const fileName, ggobid *gg);
