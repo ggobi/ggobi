@@ -414,7 +414,6 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
       }
     }
   }
-  sp->tour1d.initmax = true;
 
   return changed;
 }
@@ -424,13 +423,16 @@ tour2d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
   greal precis = (greal) PRECISION1;
-  greal tmpf;
+  greal tmpf, maxx, maxy;
 
   if (sp->tour2d.initmax) {
-    sp->tour2d.maxscreenx = 1.0;
-    sp->tour2d.maxscreeny = 1.0;
+    sp->tour2d.maxscreen = precis;
+    sp->tour2d.initmax = false;
   }
 
+  tmpf = precis/sp->tour2d.maxscreen;
+  maxx = sp->tour2d.maxscreen;
+  maxy = sp->tour2d.maxscreen;
   for (m=0; m<d->nrows_in_plot; m++)
   {
     i = d->rows_in_plot[m];
@@ -441,23 +443,18 @@ tour2d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
       sp->planar[i].x += (greal)(dsp->t2d.F.vals[0][j]*world_data[i][j]);
       sp->planar[i].y += (greal)(dsp->t2d.F.vals[1][j]*world_data[i][j]);
     }
-    if (fabs(sp->planar[i].x) > sp->tour2d.maxscreenx)
-      sp->tour2d.maxscreenx = fabs(sp->planar[i].x);
-    if (fabs(sp->planar[i].y) > sp->tour2d.maxscreeny)
-      sp->tour2d.maxscreeny = fabs(sp->planar[i].y);
+    sp->planar[i].x *= tmpf;
+    sp->planar[i].y *= tmpf;
+    if (fabs(sp->planar[i].x) > maxx)
+      maxx = fabs(sp->planar[i].x);
+    if (fabs(sp->planar[i].y) > maxy)
+      maxy = fabs(sp->planar[i].y);
   }
 
-  if ((sp->tour2d.maxscreenx > precis) || (sp->tour2d.maxscreeny > precis)) {
-    tmpf = (sp->tour2d.maxscreenx > sp->tour2d.maxscreeny) ?
-      sp->tour2d.maxscreenx : sp->tour2d.maxscreeny;
+  if ((maxx > precis) || (maxy > precis)) {
+    sp->tour2d.maxscreen = (maxx > maxy) ? maxx : maxy;
     tmpf = precis/tmpf;
-    for (m=0; m<d->nrows_in_plot; m++) {
-      i = d->rows_in_plot[m];
-      sp->planar[i].x *= tmpf;
-      sp->planar[i].y *= tmpf;
-    }
   }
-
 }
 
 void tour2d_scramble(ggobid *gg)

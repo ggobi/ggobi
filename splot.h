@@ -105,13 +105,20 @@ typedef struct
  } tour1d;
 
 /*
- * tour1d (variables used to record the state of the 1D tour for this plot)
+ * tour2d: rescaling so that points don't go outside the planar space
  */
  struct _tour2d {
-   greal maxscreenx;
-   greal maxscreeny;
+   greal maxscreen;
    gboolean initmax;
  } tour2d;
+
+/*
+ * tour2d: rescaling so that points don't go outside the planar space
+ */
+ struct _tourcorr {
+   greal maxscreen;
+   gboolean initmax;
+ } tourcorr;
 
 /*
  * xyplot

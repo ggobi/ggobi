@@ -583,6 +583,7 @@ void
 tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
     /*
@@ -623,13 +624,24 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
       }
     }
   }
+  sp->tourcorr.initmax = true;
 }
 
 void
 tourcorr_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
+  greal precis = (greal) PRECISION1;
+  greal tmpf, maxx, maxy;
 
+  if (sp->tourcorr.initmax) {
+    sp->tourcorr.maxscreen = precis;
+    sp->tourcorr.initmax = false;
+  }
+
+  tmpf = precis/sp->tour2d.maxscreen;
+  maxx = sp->tour2d.maxscreen;
+  maxy = sp->tour2d.maxscreen;
   for (m=0; m<d->nrows_in_plot; m++)
   {
     i = d->rows_in_plot[m];
@@ -640,6 +652,17 @@ tourcorr_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
       sp->planar[i].x += (greal)(dsp->tcorr1.F.vals[0][j]*world_data[i][j]);
       sp->planar[i].y += (greal)(dsp->tcorr2.F.vals[0][j]*world_data[i][j]);
     }
+    sp->planar[i].x *= tmpf;
+    sp->planar[i].y *= tmpf;
+    if (fabs(sp->planar[i].x) > maxx)
+      maxx = fabs(sp->planar[i].x);
+    if (fabs(sp->planar[i].y) > maxy)
+      maxy = fabs(sp->planar[i].y);
+  }
+
+  if ((maxx > precis) || (maxy > precis)) {
+    sp->tourcorr.maxscreen = (maxx > maxy) ? maxx : maxy;
+    tmpf = precis/tmpf;
   }
 }
 
@@ -808,6 +831,7 @@ void tourcorr_reinit(ggobid *gg)
   int j, m;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
+  splotd *sp = gg->current_splot;
 
   for (j=0; j<d->ncols; j++) {
     dsp->tcorr1.F.vals[0][j] = 0.;
@@ -828,6 +852,8 @@ void tourcorr_reinit(ggobid *gg)
   dsp->tcorr2.Fa.vals[0][m] = 1.;
 
   dsp->tcorr2.get_new_target = true;
+
+  sp->tourcorr.initmax = true;
 
   display_tailpipe (dsp, FULL, gg);
 
