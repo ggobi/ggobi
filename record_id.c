@@ -44,8 +44,9 @@ rowidv_init (datad *d)
   if (d->rowid.id.nels > 0) {
 
     /*
-     * No longer assume sorting, but instead compute the maximum as we read the id's 
-     * use the maximum value of rowid.id.els given by d->rowid.maxId as the dimension rowid.idv
+     * No longer assume sorting, but instead compute the maximum as we read
+     * the id's use the maximum value of rowid.id.els given by d->rowid.maxId
+     * as the dimension rowid.idv
      */
     gint nels = 1 + d->rowid.maxId; 
 
@@ -62,7 +63,8 @@ rowidv_init (datad *d)
     for (i=0; i<d->nrows; i++) {
       k = d->rowid.id.els[i];
       if(k >= nels)
-        g_printerr("Invalid value (%d) for id; should be between 0 and %d\n", k, nels-1);
+        g_printerr("Invalid value (%d) for id; should be between 0 and %d\n",
+          k, nels-1);
       else
         d->rowid.idv.els[k] = i;
     }
