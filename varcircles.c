@@ -616,7 +616,7 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
               break;
             }
           }
-          break;
+        break;
         case TOUR2D:
           x = (gint) (display->t2d.u.vals[0][jvar]*(gfloat)r);
           y = (gint) (display->t2d.u.vals[1][jvar]*(gfloat)r);
@@ -634,49 +634,46 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
               break;
             }
           }
-          break;
+        break;
         case COTOUR:
-	  /*          for (i=0; i<display->tcorr1.nvars; i++)
+          /*          for (i=0; i<display->tcorr1.nvars; i++)
             if (jvar == display->tcorr1.vars.els[i]) {
-
               xvar = true;
               break;
-	      }*/
+            }*/
+          /*          if (xvar) {*/
+          x = (gint) (display->tcorr1.u.vals[0][jvar]*(gfloat)r);
+          y = (gint) (display->tcorr2.u.vals[0][jvar]*(gfloat)r);
+          gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r+x, r-y);
 
-	  /*          if (xvar) {*/
-            x = (gint) (display->tcorr1.u.vals[0][jvar]*(gfloat)r);
-            y = (gint) (display->tcorr2.u.vals[0][jvar]*(gfloat)r);
-            gdk_draw_line (da_pix,
-              gg->selvarfg_GC, r, r, r+x, r-y);
+          if (jvar == display->tc1_manip_var) {
+            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 150*64, 60*64);
+            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
+          }
+          if (jvar == display->tc2_manip_var) {
+            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 60*64, 60*64);
+            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 240*64, 60*64);
+          }
 
-            if (jvar == display->tc1_manip_var) {
-              gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 150*64, 60*64);
-              gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
-            }
-            if (jvar == display->tc2_manip_var) {
-              gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 60*64, 60*64);
-              gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 240*64, 60*64);
-            }
-
-            for (k=0; k<display->tcorr1.nvars; k++) {
-              if (display->tcorr1.vars.els[k] == jvar) {
-                chosen = true;
-                break;
-              }
-	    }
-            for (k=0; k<display->tcorr2.nvars; k++) {
-              if (display->tcorr2.vars.els[k] == jvar) {
-                chosen = true;
+          for (k=0; k<display->tcorr1.nvars; k++) {
+            if (display->tcorr1.vars.els[k] == jvar) {
+              chosen = true;
               break;
-	      }
-	    }
-            break;
+            }
+          }
+          for (k=0; k<display->tcorr2.nvars; k++) {
+            if (display->tcorr2.vars.els[k] == jvar) {
+              chosen = true;
+              break;
+            }
+          }
+        break;
 
-	    /*	  } 
+        /*      } 
           else {
 
             x = 0;
@@ -684,7 +681,7 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
             gdk_draw_line (da_pix,
               gg->selvarfg_GC, r, r, r+x, r-y);
 
-	      }*/
+          }*/
         case NULLMODE:
         case P1PLOT:
         case XYPLOT:

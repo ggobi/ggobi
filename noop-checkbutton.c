@@ -77,7 +77,7 @@ gtk_noop_check_button_get_type(void)
       NULL, NULL, (GtkClassInitFunc)NULL
     };
     gtk_noop_check_button_type = gtk_type_unique(GTK_TYPE_CHECK_BUTTON,
-					    &gtk_noop_check_button_info);
+      &gtk_noop_check_button_info);
   }
   return gtk_noop_check_button_type;
 }

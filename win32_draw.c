@@ -338,7 +338,8 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
             open_arcs, &nc_open,    filled_arcs, &nc_filled);
 
           if (display->displaytype == parcoords ||
-	      display->displaytype == tsplot) {
+              display->displaytype == tsplot)
+          {
             build_whisker_segs (j, &nwhisker_segs, sp);
           }
         }

@@ -43,8 +43,8 @@
  *
  */
 
-#define	DONT_INTERSECT    0
-#define	DO_INTERSECT      1
+#define DONT_INTERSECT    0
+#define DO_INTERSECT      1
 #define COLLINEAR         2
 
 /**************************************************************
@@ -56,8 +56,8 @@
  *                                                            *
  **************************************************************/
 
-#define SAME_SIGNS( a, b )	\
-		(((glong) ((gulong) a ^ (gulong) b)) >= 0 )
+#define SAME_SIGNS( a, b ) \
+  (((glong) ((gulong) a ^ (gulong) b)) >= 0 )
 
 /*-- not interested in the intersection point --*/
 gint

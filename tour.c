@@ -372,7 +372,7 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
            tv.vals[j][1] = v1.vals[j][0];
            v1.vals[j][0] = v1.vals[j][1];
            v1.vals[j][1] = tv.vals[j][1];
-	 }
+         }
 
        }
      }
@@ -392,15 +392,15 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
        equivalent to setting the lambda's to be 1.0 at this stage.*/
       dI = 0;
       for (i=0; i<nd; i++) {
-	if (lambda.els[i] > 1.0-tol) {
-	  dI++;
-	  lambda.els[i] = 1.0;
-	}
+        if (lambda.els[i] > 1.0-tol) {
+          dI++;
+          lambda.els[i] = 1.0;
+        }
       }
     
       /*  Compute principal angles */
       for (i=0; i<nd; i++)
-	tau.els[i] = (gfloat) acos((gdouble) lambda.els[i]);
+        tau.els[i] = (gfloat) acos((gdouble) lambda.els[i]);
       
       /*  Calculate principal directions */
       if (nd > dI) {
@@ -410,32 +410,32 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
         copy_mat(tv.vals, v1.vals, nc, nd);
         if (!matmult_uv(u1.vals, tv.vals, nc, nd, nd, nd, v1.vals))
           printf("Could not multiply u and v, cols!=rows \n");
-	/*  Orthonormalize v1 on v0*/
+        /*  Orthonormalize v1 on v0*/
         matgram_schmidt(v0.vals, v1.vals, nc, nd);
 
       }
       else {
         copy_mat(v0.vals, u0.vals, nc, nd);
         copy_mat(v1.vals, u0.vals, nc, nd);
-	for (i=0; i<nd; i++)
-	  tau.els[i] = 0.0;
+        for (i=0; i<nd; i++)
+          tau.els[i] = 0.0;
       }
 
       /* Construct current basis*/
       for (i=0; i<nd; i++)
-	tinc.els[i]=0.0;
+        tinc.els[i]=0.0;
       for (i=0; i<nd; i++) {
-	ptinc[0][i] = (gfloat) cos((gdouble) tinc.els[i]);
-	ptinc[1][i] = (gfloat) sin((gdouble) tinc.els[i]);
+        ptinc[0][i] = (gfloat) cos((gdouble) tinc.els[i]);
+        ptinc[1][i] = (gfloat) sin((gdouble) tinc.els[i]);
       }
 
       for (i=0; i<nd; i++) {
-	tmpd1 = ptinc[0][i];
-	tmpd2 = ptinc[1][i];
-	for (j=0; j<nc; j++) {
-	  tmpd = v0.vals[i][j]*tmpd1 + v1.vals[i][j]*tmpd2;
+        tmpd1 = ptinc[0][i];
+        tmpd2 = ptinc[1][i];
+        for (j=0; j<nc; j++) {
+          tmpd = v0.vals[i][j]*tmpd1 + v1.vals[i][j]*tmpd2;
           v.vals[i][j] = tmpd;
-	}
+        }
       }
 
       matmult_uvt(v.vals, uvevec.vals, nc, nd, nd, nd, u.vals);
@@ -451,15 +451,15 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
       /* Calculate Euclidean norm of principal angles.*/
       dv = 0.0;
       for (i=0; i<nd; i++)
-	dv += (tau.els[i]*tau.els[i]);
+        dv += (tau.els[i]*tau.els[i]);
       dv = (gfloat)sqrt((gdouble)dv);
       *pdv = dv;
 
       /* Reset increment counters.*/
       nsteps = (gint) floor((gdouble)(dv/delta))+1;
       /*      for (i=1; i<nd; i++) {
-	if ((gint) floor((gdouble)(dG/delta)) < nsteps) 
-	  nsteps = (gint) floor((gdouble)(dG/delta));
+        if ((gint) floor((gdouble)(dG/delta)) < nsteps) 
+          nsteps = (gint) floor((gdouble)(dG/delta));
       }*/
       stepcntr = 0;
       *ns = nsteps;
@@ -478,7 +478,7 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
     nsteps = 0;
     dv = 0.0;*/ /* i don't think i need this if i initialize all these
                    at the start of the function - di */ /* i still need the
-							   copy_mat lines */
+                                                           copy_mat lines */
     *pdv = dv;
     *ns = nsteps;
     *stcn = stepcntr;
@@ -692,35 +692,35 @@ gt_basis (array_f u1, gint nvars, vector_i vars, gint nc, gint nd)
       u1.vals[k][j] = 0.0 ;
 
   if (nvars > nd) {
-      for (j=0; j<ntimes; j++) {
-          while (check) {
+    for (j=0; j<ntimes; j++) {
+      while (check) {
  
-            rnorm2(&frunif[0], &frunif[1]);
-            r = frunif[0] * frunif[0] + frunif[1] * frunif[1];
+        rnorm2(&frunif[0], &frunif[1]);
+        r = frunif[0] * frunif[0] + frunif[1] * frunif[1];
    
-            if (r < 1)
-            {
-              check = 0;
-              fac = sqrt(-2. * log(r) / r);
-              frnorm[0] = frunif[0] * fac;
-              frnorm[1] = frunif[1] * fac;
-            }
-	  }
-          check = 1;
-          if (nd == 1) {
-            if (oddno && j == ntimes-1) {
-              u1.vals[0][vars.els[2*j]] = (gfloat) frnorm[0];
-	    }
-            else {
-              u1.vals[0][vars.els[2*j]] = (gfloat) frnorm[0];
-              u1.vals[0][vars.els[2*j+1]] = (gfloat) frnorm[1];
-	    }
-	  }
-          else if (nd == 2) {
-              u1.vals[0][vars.els[j]] = (gfloat) frnorm[0];
-              u1.vals[1][vars.els[j]] = (gfloat) frnorm[1];
-	  }
+        if (r < 1)
+        {
+          check = 0;
+          fac = sqrt(-2. * log(r) / r);
+          frnorm[0] = frunif[0] * fac;
+          frnorm[1] = frunif[1] * fac;
+        }
       }
+      check = 1;
+      if (nd == 1) {
+        if (oddno && j == ntimes-1) {
+          u1.vals[0][vars.els[2*j]] = (gfloat) frnorm[0];
+        }
+        else {
+          u1.vals[0][vars.els[2*j]] = (gfloat) frnorm[0];
+          u1.vals[0][vars.els[2*j+1]] = (gfloat) frnorm[1];
+        }
+      }
+      else if (nd == 2) {
+        u1.vals[0][vars.els[j]] = (gfloat) frnorm[0];
+        u1.vals[1][vars.els[j]] = (gfloat) frnorm[1];
+      }
+    }
     for (k=0; k<nd; k++)
       norm(u1.vals[k], nc);
 

@@ -8,14 +8,30 @@
 [
 .B \-xml
 ]
+[
+.B \-ascii
+]
+[
+.B \-version
+.B \--version
+]
 filename
 
 .SH DESCRIPTION
 .I ggobi
 is an interactive dynamic graphics program for data
-visualization.  It is especially designed for the exploration of
-multivariate data.  Its basic plot is a scatterplot, and these
-are some of the tools available for scatterplot display and
+visualization, especially designed for the exploration of
+multivariate data.  It represents a significant redesign of 
+its precedessor
+.I xgobi (www.research.att.com/areas/stat/xgobi),
+with multiple plotting windows, a color lookup table manager,
+an XML file format for data, and other changes.  It can be
+embedded into other software and controlled using an API
+(Application Programming Interface).
+
+GGobi's plot types include the scatterplot, scatterplot matrix,
+parallel coordinates plot, and time series plot.
+These are some of the tools available for plot display and
 manipulation:
 .RS .25i
 .IP o 2
@@ -23,9 +39,8 @@ Cycling rapidly through two-variable scatter plots.
 .IP o 2
 Grand tours and correlation tours: smooth randomized sequences of
 two-dimensional projections in order to explore a higher-dimensional
-point cloud of multivariate data. 
-''' Projections can be manually
-''' controlled and optimized with projection pursuit.
+point cloud of multivariate data.  Projections can be manually
+controlled and optimized with projection pursuit.
 .IP o 2
 Brushing: the ability to change the color or plotting
 character of a point or a group of points.
@@ -41,28 +56,20 @@ Linked views: Brushing, identification and touring are linked;
 that is, actions in one window are immediately reflected in
 another window displaying the same data.
 .IP o 2
-Moving points:  Points can be moved on the screen.
-''' In higher-dimensional views, the motion is interpreted as
-''' taking place in some plane parallel to the screen.
+Moving points: For low-dimensional projections, points can be moved
+on the screen.
 .IP o 2
 Subsetting: Subsamples can be drawn either systematically or randomly.
 .IP o 2
 Jittering: Variables can be jittered, which is useful for discrete
 variables that take on only few values.
 .IP o 2
-Parallel coordinate display: a display of selected variables
-using parallel (instead of orthogonal) axes.
-.IP o 2
-Scatterplot matrix display: 2-variable scatterplots
-for selected variables.
-.IP o 2
 Missing values: are accepted and can be dealt with by imputation of
 constant values, random values, or user-supplied imputed values.
 Missing value patterns can be examined in a separate linked ggobi
 window.
 .IP o 2
-Variable transformations: A menu of transformations 
-is available.
+Variable transformations: A menu of transformations is available.
 
 ''' .IP o 2
 ''' Smooths: Smooth curves can be drawn through point clouds.
@@ -72,37 +79,66 @@ is available.
 ''' .IP o 2
 ''' Postscript plotting: The contents of the plot windows can be written
 ''' out to postscript files for high-quality plotting.
-''' .IP o 2
-''' Line editing: Any pair of points can be connected with a line segment.
 .RE
 
-ggobi has a direct manipulation interface, and all the above actions
+GGobi has a direct manipulation interface, and all the above actions
 are performed using the mouse.
 
-[Write something new here]
-In addition, ggobi can be used in conjunction with the R or S
-software for scientific computing and data analysis.  Execute
+In addition, ggobi can be treated as a C library and directly
+embedded in (or linked with) other software.  For example, it can be
+controlled from the R command line or from a Perl or Python script.
+
+Execute
 .IR help(ggobi)
-within S or Splus for information; if the ggobi function
-has not been installed, investigate the ggobi distribution files.
+within R for information; if the ggobi function
+has not been installed, see www.ggobi.org for instructions.
 
 .SH OPTIONS
 
 .B \-xml
 .LP
 .RS .25i
-Use a single xml file as input instead of the set of files
-used by xgobi (and still supported in ggobi).   The xml format
-is documented in [].
+Use a single XML file as input.  The XML format is documented in 
+XML.pdf, which is included in the ggobi distribution.  See the
+sample data files.
+.RE
+
+.B \-ascii
+.LP
+.RS .25i
+Use a set of ascii files as input.  These files are almost compatible
+with the files used by xgobi, but the .color files use numbers between
+1 and 10 instead of color names, and some files are not accepted
+(.erase, .vgroups, .edges, .nlinkable, .rgroups).  
 .RE
 
 .SH FILES
 ggobi's file input can take two basic forms:  (1) the style
 of multiple files, sharing a common basename, that was used
-in xgobi, and (2) one file in xml.  A utility, xmlConvert,
-is provided to transform a set of files into an xml file.
+in xgobi, and (2) one file in XML.  A utility, xmlConvert,
+is provided to transform a set of files into an XML file.
 
-The multiple-file format is described here.  The data input file
+The XML format allows multiple datasets to be included within
+a single file.  Those datasets can be related using the
+.I id
+tag.  If cases in two datasets have the same id, they are
+linked for brushing and identification.  The id tag can also
+be used to specify the endpoints for a line segment, or edge,
+between two points.  See XML.pdf for a more detailed explanation.
+
+If the file type is not specified on the command line, ggobi
+will attempt to identify whether the file is XML or ASCII, and
+if the suffix hasn't been specified, it will first look for an XML
+version of the data.
+
+The multiple-file format is described here. 
+
+.nf
+.B filename.dat
+.fi
+.RS .25i
+
+The data input file
 should be an ASCII file with the data matrix arranged in rows and
 columns; in ASCII, rows must be distinguished by carriage
 returns, and columns can be separated by any amount of white
@@ -111,10 +147,6 @@ input file can also be a binary file, which can be produced
 within ggobi once the ASCII data has been read in.) ggobi accepts
 other input about the display of the data from files as well.  If
 the data is in a file named
-
-.nf
-.B filename.dat
-.fi
 
 .nf
 .B filename.row
@@ -131,16 +163,19 @@ label per line.
 
 .nf
 .B filename.col
+.B filename.column
+.B filename.collab
+.B filename.var
 .fi
 .RS .25i
 
 Column or variable labels: a label for each column of the data matrix,
 which becomes part of the ggobi variable selection panel.  The file
-should contain one label per line. 
+should contain one label per line.   The label may contain white space.
 
-To add a short label to be used in the parallel coordinates plot, use
-the vertical bar "|" as a field separator and add the short name, so
-each line looks like this:  fullname|shortname.
+To specify axis ranges, use the vertical bar "|" as a field separator
+and add minimum and maximum values, so that the line looks like
+this:  name|minval|maxval
 .RE
 
 .nf
@@ -148,10 +183,8 @@ each line looks like this:  fullname|shortname.
 .fi
 .RS .25i
 
-Brushing colors: a color for each point in the plot, representing a
-row or case of the data.  The file should contain one color per line.
-(It is probably best if the colors correspond to the colors used in
-brushing; see the later section on resources.)
+Brushing colors: an integer for each case, one per line,
+representing the index of a vector of colors, in the range [0:ncolors-1].
 .RE
 
 .nf
@@ -159,31 +192,26 @@ brushing; see the later section on resources.)
 .fi
 .RS .25i
 
-Brushing glyphs: a glyph type for each point in the plot, representing
-a row or case of the data.  The file should contain one glyph type per
-line.  The glyph types are as follows:
+Brushing glyphs: a glyph type and size for each point in the plot,
+representing a row or case of the data.  The glyph types are as follows:
 .RS .25i
 
 .nf
-1 through 5: Five sizes of '+'
-6 through 10: Five sizes of 'X'
-11 through 15: Five sizes of open rectangle
-16 through 20: Five sizes of filled rectangle
-21 through 25: Five sizes of open circle
-26 through 30: Five sizes of filled circle
-31: A single-pixel point
+plus: the glyph '+'
+x: the glyph 'x'
+or: an open rectangle
+fr: a filled rectangle
+oc: an open circle
+fc: a filled circle
+.: a single-pixel point
 .fi
-.RE
 
-.RE
-.nf
-.B filename.erase
-.fi
-.RS .25i
+The sizes range from 0 to 7.
 
-Erase: a column of 1s (to have a point hidden on startup) and 0s (to
-have the point plotted).  There should be one value per line and as
-many lines as there are rows in the data.
+Note:  Users of Microsoft Windows should avoid using the circle, since these
+are drawn very slowly.
+
+
 .RE
 
 .nf

@@ -270,7 +270,7 @@ tour1dvar_set (gint jvar, ggobid *gg)
       if (j<dsp->t1d.nvars-1) {
         for (k=j; k<dsp->t1d.nvars-1; k++){
           dsp->t1d.vars.els[k] = dsp->t1d.vars.els[k+1];
-	}
+        }
       }
       dsp->t1d.nvars--;
     }
@@ -290,7 +290,7 @@ tour1dvar_set (gint jvar, ggobid *gg)
         if (jvar > dsp->t1d.vars.els[j] && jvar < dsp->t1d.vars.els[j+1]) {
           jtmp = j+1;
           break;
-	}
+        }
       }
       for (j=dsp->t1d.nvars-1;j>=jtmp; j--) 
           dsp->t1d.vars.els[j+1] = dsp->t1d.vars.els[j];
@@ -455,7 +455,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
         nv++;
       }
     if (nv == 1 && dsp->t1d.nvars == 1) /* only generate new dir if num of
-					   active/used variables is > 2 */
+                                           active/used variables is > 2 */
       dsp->t1d.get_new_target = true;
     else {
       if (dsp->t1d.target_basis_method == 0) {
@@ -463,36 +463,36 @@ tour1d_run(displayd *dsp, ggobid *gg)
       }
       else if (dsp->t1d.target_basis_method == 1) {
         /* pp guided tour  */
-          revert_random = t1d_switch_index(cpanel->t1d_pp_indx, 
-            dsp->t1d.target_basis_method, gg);
+        revert_random = t1d_switch_index(cpanel->t1d_pp_indx, 
+          dsp->t1d.target_basis_method, gg);
 
-          if (!revert_random) {
-            for (i=0; i<dsp->t1d.nvars; i++)
-              dsp->t1d.u1.vals[0][dsp->t1d.vars.els[i]] = 
-                dsp->t1d_pp_op.proj_best.vals[i][0];
+        if (!revert_random) {
+          for (i=0; i<dsp->t1d.nvars; i++)
+            dsp->t1d.u1.vals[0][dsp->t1d.vars.els[i]] = 
+              dsp->t1d_pp_op.proj_best.vals[i][0];
 
-            /* if the best projection is the same as the previous one, switch 
+          /* if the best projection is the same as the previous one, switch 
               to a random projection */
-            if (!checkequiv(dsp->t1d.u0.vals, dsp->t1d.u1.vals, d->ncols, 1)) {
-              printf("Using random projection\n");
-              gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
-                d->ncols, (gint) 1);
-              for (j=0; j<dsp->t1d.nvars; j++)
-                dsp->t1d_pp_op.proj_best.vals[j][0] = 
-                  dsp->t1d.u1.vals[0][dsp->t1d.vars.els[j]];
-	      /*              dsp->t1d.ppval = -999.0;*/
-              revert_random = t1d_switch_index(cpanel->t1d_pp_indx, 
-                dsp->t1d.target_basis_method, gg);
-            }
-            t1d_ppdraw(dsp->t1d.ppval, gg);
-            count = 0;
-	    sleep(2);
-	  }
-          else
-	  {
+          if (!checkequiv(dsp->t1d.u0.vals, dsp->t1d.u1.vals, d->ncols, 1)) {
+            printf("Using random projection\n");
             gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
               d->ncols, (gint) 1);
-	  }
+            for (j=0; j<dsp->t1d.nvars; j++)
+              dsp->t1d_pp_op.proj_best.vals[j][0] = 
+                dsp->t1d.u1.vals[0][dsp->t1d.vars.els[j]];
+              /*              dsp->t1d.ppval = -999.0;*/
+            revert_random = t1d_switch_index(cpanel->t1d_pp_indx, 
+              dsp->t1d.target_basis_method, gg);
+          }
+          t1d_ppdraw(dsp->t1d.ppval, gg);
+          count = 0;
+          sleep(2);
+        }
+        else
+        {
+          gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
+            d->ncols, (gint) 1);
+        }
         
       }
       path(dsp->t1d.u0, dsp->t1d.u1, dsp->t1d.u, d->ncols, (gint) 1, dsp->t1d.v0,

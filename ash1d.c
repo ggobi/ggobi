@@ -33,7 +33,7 @@ gint ash1 (gint, gint *, gint, gfloat *, gfloat *, gfloat *,
 
 gint
 do_ash1d (gfloat *vals, gint nvals, gint nbins, gint n_ashes,
-	  gfloat *ashed_vals, gfloat *lims_min, gfloat *lims_max, gfloat *mean);
+  gfloat *ashed_vals, gfloat *lims_min, gfloat *lims_max, gfloat *mean);
 
 #ifdef __cplusplus
 }

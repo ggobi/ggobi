@@ -398,7 +398,7 @@ void t2d_ppdraw(gfloat pp_indx_val, ggobid *gg)
 
 /********************************************************************
 
-	                     INDEX CALCULATION
+                         INDEX CALCULATION
 
 The index function has to be defined as
 
@@ -479,7 +479,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, holes, &hp);
       free_holes_p(&hp);
-      break;
+    break;
     case CENTRAL_MASS: 
       alloc_central_mass (&hp, nrows);
       dsp->t2d.ppval = t2d_calc_indx (d->tform, 
@@ -487,7 +487,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, central_mass, &hp);
       free_central_mass(&hp);
-      break;
+    break;
     case SKEWNESS: 
       /*      alloc_cartgini_p (&cgp, nrows, gdata);
       dsp->t2d.ppval = t2d_calc_indx (d->tform, 
@@ -495,11 +495,11 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
         cartgini, &cgp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, cartgini, &cgp);
-	free_cartgini_p (&cgp);*/
-      break;
+      free_cartgini_p (&cgp);*/
+    break;
     default: 
       return(true);
-      break;
+    break;
   }
   return(false);
 }

@@ -320,7 +320,7 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_signal_connect (GTK_OBJECT (entry), "value_changed",
     GTK_SIGNAL_FUNC (t1d_writeindx_cb), gg);*/
     /*    gtk_signal_connect (GTK_OBJECT (dsp->t1d.ppval), "value_changed",
-	  GTK_SIGNAL_FUNC (t1d_writeindx_cb), gg);*/
+            GTK_SIGNAL_FUNC (t1d_writeindx_cb), gg);*/
 
 /*
  * pp index menu and scale inside frame

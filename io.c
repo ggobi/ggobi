@@ -66,7 +66,7 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
           info.useDefault = true;
           write_xml ((const gchar *) filename, gg, &info);
           g_free (filename);
-	 }
+        }
 #endif
         break;
         case ASCIIDATA:

@@ -346,7 +346,7 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
         /* */
         l = display->splots;
         s = (splotd *) l->data; /* this sets the x var for the new plot
-				   to be the same as that of the first plot. */
+                                   to be the same as that of the first plot. */
         sp_new = splot_new (display, width, height, gg);
         sp_new->xyvars.y = jvar;
         sp_new->xyvars.x = s->xyvars.x;

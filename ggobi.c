@@ -87,7 +87,6 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
  
 #ifdef USE_MYSQL
     else if (strcmp (av[1], "-mysql") == 0) {
-      /*gg->data_mode = mysql_data;*/  /*-- no longer exists --*/
     }
 #endif
 
@@ -110,28 +109,29 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
       exit (0);
     } else if(strcmp(av[1], "-init") == 0) {
 #ifdef SUPPORT_INIT_FILES
-	sessionOptions->initializationFile = g_strdup(av[2]);
+      sessionOptions->initializationFile = g_strdup(av[2]);
 #else
-        fprintf(stderr, "-init not supported without XML\n");fflush(stderr);
+      fprintf(stderr, "-init not supported without XML\n");fflush(stderr);
 #endif
-        (*argc)--; av++;
+      (*argc)--; av++;
     } else if(strcmp(av[1],"-colorschemes") == 0) {
 #ifdef USE_XML
-	read_colorscheme(av[2], &(sessionOptions->colorSchemes));       
+      read_colorscheme(av[2], &(sessionOptions->colorSchemes));       
 #else
-        fprintf(stderr, "-colorschemes not supported without XML\n");fflush(stderr);
+      fprintf(stderr, "-colorschemes not supported without XML\n");
+      fflush(stderr);
 #endif
-        (*argc)--; av++;
+      (*argc)--; av++;
 
     }
  else if(strcmp(av[1],"-activeColorScheme") == 0) {
 #ifdef USE_XML
-        sessionOptions->activeColorScheme = g_strdup(av[2]);
+      sessionOptions->activeColorScheme = g_strdup(av[2]);
 #else
-        fprintf(stderr, "-colorschemes not supported without XML\n");fflush(stderr);
+      fprintf(stderr, "-colorschemes not supported without XML\n");
+      fflush(stderr);
 #endif
-        (*argc)--; av++;
-
+      (*argc)--; av++;
     }
   }
 
@@ -501,25 +501,25 @@ void
 process_initialization_files()
 {
   GGobiInitInfo *info;
-  char buf[100];
-  const char *fileName = NULL;
+  gchar buf[100];
+  const gchar *fileName = NULL;
 
   if(sessionOptions->initializationFile)
-      fileName = sessionOptions->initializationFile;
+    fileName = sessionOptions->initializationFile;
   else {
            /* This use of getenv() is not portable. */
-     fileName = getenv("GGOBIRC");
-     if(!fileName || !fileName[0]) {
-       char *tmp;
-            /* HOME doesn't necessarily make sense in Windows. */
-         tmp = getenv("HOME");
-         if(tmp) {
-           sprintf(buf, "%s/.ggobirc", tmp);
-           fileName = buf;
-	 }
-     }
-     if(fileName)
-     sessionOptions->initializationFile = g_strdup(fileName);
+    fileName = getenv("GGOBIRC");
+    if(!fileName || !fileName[0]) {
+      gchar *tmp;
+      /* HOME doesn't necessarily make sense in Windows. */
+      tmp = getenv("HOME");
+      if(tmp) {
+        sprintf(buf, "%s/.ggobirc", tmp);
+        fileName = buf;
+      }
+    }
+    if(fileName)
+      sessionOptions->initializationFile = g_strdup(fileName);
   }
      
   if(fileName) {

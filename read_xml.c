@@ -247,14 +247,14 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 int
 setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 {
-    const char *tmp = getAttribute(attrs, "value");
+  const gchar *tmp = getAttribute(attrs, "value");
 
-    if (tmp != NULL) {
-	data->current_level = strToInteger(tmp);
-    } else
-	data->current_level++;
+  if (tmp != NULL) {
+    data->current_level = strToInteger(tmp);
+  } else
+    data->current_level++;
 
-    return(data->current_level);
+  return(data->current_level);
 }
 
 void
@@ -263,7 +263,7 @@ categoricalLevels(const xmlChar **attrs, XMLParserData *data)
   datad *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
 
-  const char *tmp = getAttribute(attrs, "count");
+  const gchar *tmp = getAttribute(attrs, "count");
 
   if (tmp != NULL) {
     el->nlevels = strToInteger(tmp);

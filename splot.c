@@ -426,7 +426,7 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
       sp->whiskers = (GdkSegment *) g_malloc ((nr-1) * sizeof (GdkSegment));
     break;
     default:
-	break;
+    break;
   }
 }
 void
@@ -454,7 +454,7 @@ splot_free (splotd *sp, displayd *display, ggobid *gg) {
       g_free ((gpointer) sp->whiskers);
     break;
     default:
-	break;
+    break;
   }
 
   gtk_widget_destroy (sp->da);

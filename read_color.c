@@ -45,17 +45,17 @@ read_colorscheme(char *fileName, GList **list)
   if(strcmp(node->name, "colormap") == 0) {
       scheme = process_colorscheme(node, doc);
       if(list) {
-	  *list = g_list_append(*list, scheme);
+        *list = g_list_append(*list, scheme);
       }
       return(scheme);
   }
 
   node = XML_CHILDREN(node); 
   while(node) {
-      if(node->type != XML_TEXT_NODE) {
-	scheme = process_colorscheme(node, doc);
-	if(list)
-	  *list = g_list_append(*list, scheme);
+    if(node->type != XML_TEXT_NODE) {
+      scheme = process_colorscheme(node, doc);
+      if(list)
+        *list = g_list_append(*list, scheme);
       }
 
       node = node->next;
@@ -110,31 +110,31 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
 colorscaletype
 getColorSchemeType(const xmlChar *type)
 {
-    if(strcmp(type, "diverging") == 0)
-	return(diverging);
-    else if(strcmp(type, "sequential") == 0) 
-	return(diverging);
-    else if(strcmp(type, "spectral") == 0) 
-	return(spectral);
-    else if(strcmp(type, "categorical") == 0) 
-	return(categorical);
-    else 
-	return(UNKNOWN_COLOR_TYPE);
+  if(strcmp(type, "diverging") == 0)
+    return(diverging);
+  else if(strcmp(type, "sequential") == 0) 
+    return(diverging);
+  else if(strcmp(type, "spectral") == 0) 
+    return(spectral);
+  else if(strcmp(type, "categorical") == 0) 
+    return(categorical);
+  else 
+    return(UNKNOWN_COLOR_TYPE);
 }
 
 colorsystem
 getColorSchemeSystem(const xmlChar *type)
 {
-    if(strcmp(type, "rgb") == 0)
-	return(rgb);
-    else if(strcmp(type, "hsv") == 0) 
-	return(hsv);
-    else if(strcmp(type, "cmy") == 0) 
-	return(cmy);
-    else if(strcmp(type, "cmyk") == 0) 
-	return(cmyk);
-    else 
-	return(UNKNOWN_COLOR_SYSTEM);
+  if(strcmp(type, "rgb") == 0)
+    return(rgb);
+  else if(strcmp(type, "hsv") == 0) 
+    return(hsv);
+  else if(strcmp(type, "cmy") == 0) 
+    return(cmy);
+  else if(strcmp(type, "cmyk") == 0) 
+    return(cmyk);
+  else 
+    return(UNKNOWN_COLOR_SYSTEM);
 }
 
 /**
@@ -144,28 +144,28 @@ getColorSchemeSystem(const xmlChar *type)
 void
 getForegroundColors(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme)
 {
-    int n = 0;
-    xmlNodePtr tmp;
-    tmp = XML_CHILDREN(node);
-    while(tmp) {
-        if(tmp->type != XML_TEXT_NODE)
-	    n++;
-	tmp = tmp->next;
-    }
+  gint n = 0;
+  xmlNodePtr tmp;
+  tmp = XML_CHILDREN(node);
+  while(tmp) {
+    if(tmp->type != XML_TEXT_NODE)
+      n++;
+    tmp = tmp->next;
+  }
 
-    scheme->n = n;
-    scheme->data= (float**) g_malloc(n * sizeof(float*));
-    scheme->rgb = (GdkColor*) g_malloc(n * sizeof(GdkColor));
+  scheme->n = n;
+  scheme->data= (gfloat**) g_malloc(n * sizeof(gfloat*));
+  scheme->rgb = (GdkColor*) g_malloc(n * sizeof(GdkColor));
 
-    tmp = XML_CHILDREN(node);
-    n = 0;
-    while(tmp) {
-        if(tmp->type != XML_TEXT_NODE) {
-	    getForegroundColor(n, tmp, doc, scheme);
-	    n++;
-	}
-	tmp = tmp->next;
+  tmp = XML_CHILDREN(node);
+  n = 0;
+  while(tmp) {
+    if(tmp->type != XML_TEXT_NODE) {
+      getForegroundColor(n, tmp, doc, scheme);
+      n++;
     }
+    tmp = tmp->next;
+  }
 }
 
 int
@@ -194,29 +194,29 @@ getAnnotationColor(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme)
 int 
 getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col)
 {
-    xmlNodePtr tmp;
-    int i = 0, numElements = 3; /* RGB only at present. */
-    float *vals;
-    tmp = XML_CHILDREN(node);
+  xmlNodePtr tmp;
+  int i = 0, numElements = 3; /* RGB only at present. */
+  float *vals;
+  tmp = XML_CHILDREN(node);
 
-    vals = (float *) g_malloc(3 * sizeof(float));
-    while(tmp) {
-	xmlChar *val;
-        if(tmp->type != XML_TEXT_NODE) {
-           val = xmlNodeListGetString(doc, XML_CHILDREN(tmp), 1);
-           vals[i] = asNumber(val);
-           i++;
-	}
-        tmp = tmp->next;
+  vals = (float *) g_malloc(3 * sizeof(float));
+  while(tmp) {
+    xmlChar *val;
+    if(tmp->type != XML_TEXT_NODE) {
+      val = xmlNodeListGetString(doc, XML_CHILDREN(tmp), 1);
+      vals[i] = asNumber(val);
+      i++;
     }
-    if(original)
-	*original = vals;
+    tmp = tmp->next;
+  }
+  if(original)
+    *original = vals;
 
-    col->red = vals[0];
-    col->green = vals[1];
-    col->blue = vals[2];
+  col->red = vals[0];
+  col->green = vals[1];
+  col->blue = vals[2];
 
-    return(numElements);
+  return(numElements);
 }
 
 

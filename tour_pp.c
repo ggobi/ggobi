@@ -40,7 +40,7 @@ gint nset;
 
 /********************************************************************
 
-	                     OPTIMIZATION
+                         OPTIMIZATION
 
 The index function has to be defined as
 
@@ -231,7 +231,7 @@ gint optimize0 (optimize0_param *op,
       { /* sprintf (msg, "Success %f", index_work); print(); */
         op->success++;
         /*printf ("Success %f\n", index_work); */
-	/*        arrayf_copy (&proj_work, proj); Sigbert's code, I think 
+    /*        arrayf_copy (&proj_work, proj); Sigbert's code, I think 
                this should be saving it into the best proj rather than work*/
         arrayf_copy (&proj_work, &op->proj_best);
         op->index_best = index_work;
@@ -240,12 +240,12 @@ gint optimize0 (optimize0_param *op,
       k++; 
       if (k >= op->maxproj) 
       { 
-	/*        printf("A #iter = %d \n",k);
+    /*        printf("A #iter = %d \n",k);
         printf ("Best = %f\n", op->index_best);
         for (i=0; i<proj->nrows; i++)        
-	{ for (j=0; j<proj->ncols; j++)
-  	    printf ("%+5.3f ", proj->vals[i][j]);
-  	  printf ("\n");
+    { for (j=0; j<proj->ncols; j++)
+          printf ("%+5.3f ", proj->vals[i][j]);
+        printf ("\n");
         }
         printf ("\n");*/
         return(k);

@@ -386,7 +386,7 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
       if (j<dsp->tcorr1.nvars-1) {
         for (k=j; k<dsp->tcorr1.nvars-1; k++){
           dsp->tcorr1.vars.els[k] = dsp->tcorr1.vars.els[k+1];
-	}
+        }
       }
       dsp->tcorr1.nvars--;
     }
@@ -407,7 +407,7 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
           dsp->tcorr1.vars.els[j+1]) {
           jtmp = j+1;
           break;
-	}
+        }
       }
       for (j=dsp->tcorr1.nvars-1;j>=jtmp; j--) 
           dsp->tcorr1.vars.els[j+1] = dsp->tcorr1.vars.els[j];
@@ -441,7 +441,7 @@ tourcorr_vervar_set (gint jvar, ggobid *gg)
       if (j<dsp->tcorr2.nvars-1) {
         for (k=j; k<dsp->tcorr2.nvars-1; k++){
           dsp->tcorr2.vars.els[k] = dsp->tcorr2.vars.els[k+1];
-	}
+        }
       }
       dsp->tcorr2.nvars--;
     }
@@ -458,10 +458,11 @@ tourcorr_vervar_set (gint jvar, ggobid *gg)
     }
     else {
       for (j=0; j<dsp->tcorr2.nvars-1; j++) {
-        if (jvar > dsp->tcorr2.vars.els[j] && jvar < dsp->tcorr2.vars.els[j+1]) {
+        if (jvar > dsp->tcorr2.vars.els[j] && jvar < dsp->tcorr2.vars.els[j+1])
+        {
           jtmp = j+1;
           break;
-	}
+        }
       }
       for (j=dsp->tcorr2.nvars-1;j>=jtmp; j--) 
           dsp->tcorr2.vars.els[j+1] = dsp->tcorr2.vars.els[j];
@@ -559,7 +560,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         nv++;
       }
     if (nv == 1 && dsp->tcorr1.nvars == 1) /* only generate new dir if num of
-					   active/used variables is > 1 */
+                                           active/used variables is > 1 */
       dsp->tcorr1.get_new_target = true;
     else {
       gt_basis(dsp->tcorr1.u1, dsp->tcorr1.nvars, dsp->tcorr1.vars, d->ncols, 
@@ -595,7 +596,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         nv++;
       }
     if (nv == 1 && dsp->tcorr2.nvars == 1) /* only generate new dir if num of
-					   active/used variables is > 1 */
+                                           active/used variables is > 1 */
       dsp->tcorr2.get_new_target = true;
     else {
       gt_basis(dsp->tcorr2.u1, dsp->tcorr2.nvars, dsp->tcorr2.vars, d->ncols, 

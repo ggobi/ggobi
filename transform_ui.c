@@ -254,8 +254,8 @@ transform_window_open (ggobid *gg)
       "Set the Box-Cox power function parameter", NULL);
     gtk_box_pack_end (GTK_BOX (hb), spinner, true, true, 0);
     gtk_signal_connect (GTK_OBJECT (gg->tform_ui.boxcox_adj), "value_changed",
-		                GTK_SIGNAL_FUNC (boxcox_cb),
-		                (gpointer) gg);
+                        GTK_SIGNAL_FUNC (boxcox_cb),
+                        (gpointer) gg);
 
     /*-- labels and entries for scaling limits --*/
     style = gtk_widget_get_style (spinner);

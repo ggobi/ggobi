@@ -126,7 +126,7 @@ cpanel_set (displayd *display, ggobid *gg) {
       cpanel_identify_set (cpanel, gg);
     break;
     default:
-	  return;
+    return;
   }
 
   if (cpanel->viewmode < COTOUR) cpanel->projection = cpanel->viewmode;

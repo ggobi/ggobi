@@ -299,7 +299,7 @@ tour2dvar_set (gint jvar, ggobid *gg)
         if (jvar > dsp->t2d.vars.els[j] && jvar < dsp->t2d.vars.els[j+1]) {
           jtmp = j+1;
           break;
-	}
+        }
       }
       for (j=dsp->t2d.nvars-1;j>=jtmp; j--) 
           dsp->t2d.vars.els[j+1] = dsp->t2d.vars.els[j];
@@ -424,7 +424,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
         nv++;
       }
     if (nv <= 2 && dsp->t2d.nvars <= 2) /* only generate new dir if num of
-					   active/used variables is > 2 */
+                                           active/used variables is > 2 */
       dsp->t2d.get_new_target = true;
     else {
       if (dsp->t2d.target_basis_method == 0) {
@@ -433,38 +433,38 @@ tour2d_run(displayd *dsp, ggobid *gg)
       }
       else if (dsp->t2d.target_basis_method == 1) {
         /* pp guided tour  */
-          revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
-            dsp->t2d.target_basis_method, gg);
+        revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
+          dsp->t2d.target_basis_method, gg);
 
-          if (!revert_random) {
-            for (i=0; i<2; i++)
-              for (j=0; j<dsp->t2d.nvars; j++)
-                dsp->t2d.u1.vals[i][dsp->t2d.vars.els[j]] = 
-                  dsp->t2d_pp_op.proj_best.vals[j][i];
+        if (!revert_random) {
+          for (i=0; i<2; i++)
+            for (j=0; j<dsp->t2d.nvars; j++)
+              dsp->t2d.u1.vals[i][dsp->t2d.vars.els[j]] = 
+                dsp->t2d_pp_op.proj_best.vals[j][i];
 
-            /* if the best projection is the same as the previous one, switch 
+          /* if the best projection is the same as the previous one, switch 
               to a random projection */
-            if (!checkequiv(dsp->t2d.u0.vals, dsp->t2d.u1.vals, d->ncols, 2)) 
-            {
-              printf("Using random projection\n");
-              gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
-                d->ncols, (gint) 2);
-              for (i=0; i<2; i++)
-                for (j=0; j<dsp->t2d.nvars; j++)
-                  dsp->t2d_pp_op.proj_best.vals[j][i] = 
-                    dsp->t2d.u1.vals[i][dsp->t2d.vars.els[j]];
-              revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
-                dsp->t2d.target_basis_method, gg);
-            }
-            t2d_ppdraw(dsp->t2d.ppval, gg);
-            count = 0;
-            sleep(2);
-	  }
-          else
-	  {
+          if (!checkequiv(dsp->t2d.u0.vals, dsp->t2d.u1.vals, d->ncols, 2)) 
+          {
+            printf("Using random projection\n");
             gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
               d->ncols, (gint) 2);
-	  }
+            for (i=0; i<2; i++)
+              for (j=0; j<dsp->t2d.nvars; j++)
+                dsp->t2d_pp_op.proj_best.vals[j][i] = 
+                  dsp->t2d.u1.vals[i][dsp->t2d.vars.els[j]];
+            revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
+              dsp->t2d.target_basis_method, gg);
+          }
+          t2d_ppdraw(dsp->t2d.ppval, gg);
+          count = 0;
+          sleep(2);
+        }
+        else
+        {
+          gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
+            d->ncols, (gint) 2);
+        }
         
       }
       path(dsp->t2d.u0, dsp->t2d.u1, dsp->t2d.u, d->ncols, (gint) 2, dsp->t2d.v0,

@@ -203,25 +203,25 @@ addVariable(xmlNodePtr node, gint j, datad *d)
 const char *
 getDisplayTypeName(displayd *dpy)
 {
-    const char *val;
-    switch(dpy->displaytype) {
-	case scatterplot:
-    	  val = "scatterplot";
-	break;
-	case scatmat:
-    	  val = "scatmat";
-	break;
-	case parcoords:
-    	  val = "parcoords";
-	break;
-	case tsplot:
-    	  val = "tsplot";
-	break;
-        default:
-          val = "";
-        break;
+  const gchar *val;
 
-    }
+  switch(dpy->displaytype) {
+    case scatterplot:
+      val = "scatterplot";
+    break;
+    case scatmat:
+      val = "scatmat";
+    break;
+    case parcoords:
+      val = "parcoords";
+    break;
+    case tsplot:
+      val = "tsplot";
+    break;
+    default:
+      val = "";
+    break;
+  }
 
     return(val);
 }
