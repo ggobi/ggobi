@@ -956,7 +956,7 @@ An artificial social network of 140 people.
 <record source="Seton" destination="Caitlin" >
 46.600 0
 </record>
-<record source="Seton" destination="Seton" >
+<record source="Seton" destination="Festus" >
 34.000 0
 </record>
 <record source="Timon" destination="Festus" >
@@ -1075,4 +1075,5 @@ An artificial social network of 140 people.
 </record>
 </records>
 </data>
+
 </ggobidata>
