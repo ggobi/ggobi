@@ -194,7 +194,7 @@ restore a previously saved GGobi session.
 </arg>
 
 
-<arg name="restore" novalue="true" type="gnu">
+<arg name="home" novalue="true" type="gnu">
 <description>
 displays the location of the installed
 GGobi files such as the data/, lib/ directories.
