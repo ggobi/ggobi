@@ -688,6 +688,7 @@ void speed_set (gint slidepos, ggobid *gg) {
 
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
+  gfloat fracpath;
 
   if (slidepos < 5)
   {
@@ -705,15 +706,21 @@ void speed_set (gint slidepos, ggobid *gg) {
      * To cause tour to speed up wildly at the right of the
      * scrollbar range.
     */
-    if (slidepos < 80)
+    if (slidepos < 50)
       cpanel->tour_step = ((float) slidepos - 5.) / 2000. ;
-    else if ((slidepos >= 80) && (slidepos < 90))
-      cpanel->tour_step = pow((double)(slidepos-80)/100.,(double)0.9) + 0.0375;
+    else if ((slidepos >= 50) && (slidepos < 90))
+      cpanel->tour_step = pow((double)(slidepos-50)/100.,(double)1.5) + 0.0225;
     else
-      cpanel->tour_step = sqrt((double)(slidepos-80)) + 0.0375;
+      cpanel->tour_step = pow((double)(slidepos-50)/100.,(double)10) + 0.1868;
+      /*      cpanel->tour_step = sqrt((double)(slidepos-50)) + 0.0375;*/
   }
   /*  dsp->delta = cpanel->tour_step/dsp->dv;*/
   dsp->delta = cpanel->tour_step*M_PI_2/10.0;
+
+  fracpath = dsp->tour_stepcntr/dsp->tour_nsteps;
+
+  dsp->tour_nsteps = (gint) floor((gdouble)(dsp->dv/dsp->delta));
+  dsp->tour_stepcntr = (gint) floor(fracpath*dsp->tour_nsteps);
 }
 
 void

@@ -165,6 +165,24 @@ void tour2d_func (gboolean state, ggobid *gg)
 */
 }
 
+void tour2d_reinit(ggobid *gg)
+{
+  int i, j;
+  displayd *dsp = gg->current_display;
+
+  for (i=0; i<2; i++) {
+    for (j=0; j<dsp->ntour_vars; j++) {
+      dsp->u0[i][j] = 0.;
+      dsp->u[i][j] = 0.;
+    }
+    dsp->u0[i][i] = 1.;
+    dsp->u[i][i] = 1.;
+  }
+
+  dsp->tour_get_new_target = true;
+
+}
+
 
 
 

@@ -38,9 +38,13 @@ static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
   tour2d_pause (&gg->current_display->cpanel, button->active, gg);
 }
 
-static void reinit_cb (GtkWidget *w) {
-  g_printerr ("reinit\n");
+static void reinit_cb (GtkWidget *w, ggobid *gg) {
+  extern void tour2d_reinit(ggobid *);
+
+  tour2d_reinit(gg);
+
 }
+
 static void pcaxes_cb (GtkToggleButton *button)
 {
   g_printerr ("pcaxes: %d\n", button->active);
@@ -110,7 +114,7 @@ cpanel_tour2d_make (ggobid *gg) {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Reset projection", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                     GTK_SIGNAL_FUNC (reinit_cb), (gpointer) NULL);
+                     GTK_SIGNAL_FUNC (reinit_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), box, false, false, 1);
