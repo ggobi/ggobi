@@ -101,6 +101,8 @@ tour2d_run(displayd *dsp, ggobid *gg)
   extern void gt_basis(displayd *, ggobid *, gint);
   extern void path(displayd *, gint);
   extern void tour_reproject(displayd *, gint);
+  extern void copy_mat(gfloat **, gfloat**, gint, gint);
+  datad *d = dsp->d;
 
   if (!dsp->tour_get_new_target && !reached_target(dsp)) {
     increment_tour(dsp, 2);
@@ -108,6 +110,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
   else { /* do final clean-up and get new target */
     if (!dsp->tour_get_new_target)
       do_last_increment(dsp, (gint) 2);
+    copy_mat(dsp->u0, dsp->u, d->ncols, 2);
     gt_basis(dsp, gg, (gint) 2);
     path(dsp, (gint) 2);
     dsp->tour_get_new_target = false;

@@ -285,7 +285,7 @@ gboolean matmult_uv(gfloat **ut, gfloat **vt, gint ur, gint uc,
     for (k=0; k<vc; k++) {
       ot[k][j] = 0.0;
       for (i=0; i<uc; i++) {
-        ot[j][k] += ut[i][j]*vt[k][i];
+        ot[k][j] += ut[i][j]*vt[k][i];
       }
     }
   }
@@ -308,7 +308,7 @@ gboolean matmult_utv(gfloat **ut, gfloat **vt, gint ur, gint uc,
     for (k=0; k<vc; k++) {
       ot[k][j] = 0.0;
       for (i=0; i<ur; i++) {
-        ot[j][k] += ut[j][i]*vt[k][i];
+        ot[k][j] += ut[j][i]*vt[k][i];
       }
     }
   }
@@ -380,10 +380,12 @@ void path(displayd *dsp, gint nd) {
   gint dI; /* dimension of intersection of base pair */
   gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
 
-  for (i=0; i<2; i++)
+  /* 2 is hard-wired because it relates to cos, sin
+                         and nothing else. */
+  for (i=0; i<2; i++) 
     ptinc[i] = (gfloat *) g_malloc (nd * sizeof (gfloat));
     
-    /* Check that u0 and u1 are both orthonormal. */
+  /* Check that u0 and u1 are both orthonormal. */
   if (!checkcolson(dsp->u0, nc, nd)) {
     printf("Columns of u0 are not orthonormal");
     doit = false;
@@ -486,9 +488,11 @@ void path(displayd *dsp, gint nd) {
       /*  Calculate principal directions */
       if (nd > dI) {
         copy_mat(dsp->tv, dsp->v0, nc, nd);
-        matmult_uv(dsp->u0, dsp->tv, nc, nd, nc, nd, dsp->v0);
+        if (!matmult_uv(dsp->u0, dsp->tv, nc, nd, nd, nd, dsp->v0))
+          printf("Could not multiply u and v, cols!=rows \n");
         copy_mat(dsp->tv, dsp->v1, nc, nd);
-        matmult_uv(dsp->u1, dsp->tv, nc, nd, nc, nd, dsp->v1);
+        if (!matmult_uv(dsp->u1, dsp->tv, nc, nd, nd, nd, dsp->v1))
+          printf("Could not multiply u and v, cols!=rows \n");
 	/*  Orthonormalize v1 on v0*/
         matgram_schmidt(dsp->v0, dsp->v1, nc, nd);
 
