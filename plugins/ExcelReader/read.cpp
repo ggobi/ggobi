@@ -18,10 +18,14 @@ InputDescription *ExcelDataDescription(const char * const fileName, const char *
 gboolean onLoad(gboolean initializing, GGobiPluginInfo *plugin);
 }
 
+#define MY_V_DISPATCH(v)  V_DISPATCH(v)
+
+void readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg);
 
 extern void COMError(HRESULT hr);
 extern void GetScodeString(HRESULT hr, LPTSTR buf, int bufSize);
 
+void Error(char *str);
 BSTR AsBstr(char *str);
 char *FromBstr(BSTR str);
 
@@ -42,13 +46,45 @@ onLoad(gboolean initializing, GGobiPluginInfo *plugin)
  return(!FAILED(hr) ? true : false);
 }
 
-//typedef char gchar;
+
+InputDescription *
+ExcelDataDescription(const char * const fileName, const char * const modeName, 
+                             ggobid *gg, GGobiPluginInfo *info)
+{
+  InputDescription *desc;
+ 
+  if(!fileName || !fileName[0]) {
+    fprintf(stderr, "No file name specified for the ExcelReader plugin to read.\n"); fflush(stderr);
+    return(NULL);
+  }
+
+  desc = (InputDescription*) g_malloc(sizeof(InputDescription));
+  memset(desc, '\0', sizeof(InputDescription));
+
+  desc->fileName = g_strdup(fileName);
+
+  desc->mode = unknown_data;
+  desc->desc_read_input = readData;
+
+  return(desc);
+}
+
+gboolean 
+readData(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
+{
+  readDataFile(desc->fileName, desc, gg);
+  return(true);
+}
 
 void
-Error(char *str)
+releaseVariants(VARIANT *vars, int n)
 {
-  fprintf(stderr, "%s\n", str);
-  exit(1);
+  for(int i = 0; i < n; i++) {
+    if(V_VT(&vars[i]) == VT_DISPATCH) {
+      V_DISPATCH(&vars[i])->Release();
+    }
+    VariantClear(&vars[i]);
+  }
 }
 
 /* datad * */
@@ -61,7 +97,7 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   IDispatch *iface;
 
   hr = CLSIDFromString(L"Excel.Application", &classID);
-
+  
   if(FAILED(hr)) {
     Error("Can't get Excel's class ID");
   }
@@ -74,26 +110,44 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
 
   IDispatch *books = getWorkbooks(iface);
 
-  VARIANT v;
-  VariantInit(&v);
-  V_VT(&v) = VT_BSTR;
+  IDispatch *sheet, *cells, *s;
+
+  VARIANT *v, vars[5];
+  for(int i = 0; i < sizeof(vars)/sizeof(vars[0]); i++) {
+    VariantInit(vars+i);
+  }
+
   if(!fileName || !fileName[0])
     fileName = "D:\\duncan\\quakes.csv";
 
-  V_BSTR(&v) = AsBstr(fileName);   //  V_BSTR(&v) = L"D:\\duncan\\quakes.csv";
+  v = &vars[0];
+  V_VT(v) = VT_BSTR;
+  V_BSTR(v) = AsBstr(fileName);   // XXX doesn't work V_BSTR(&v) = L"D:\\duncan\\quakes.csv";
 
-  IDispatch *sheet, *cells, *s;
+  s = call(books, L"Open", v, 1);
 
-  s = call(books, L"Open", &v, 1);
-  getProperty(s, L"ActiveSheet", &v);
-    sheet = V_DISPATCH(&v);  
-  getProperty(sheet, L"UsedRange", &v);
-    cells = V_DISPATCH(&v);
-  getProperty(cells, L"Value", &v);
+  /*  Testing the release.
+  if(s) {
+    s->Release();
+  }
+  VariantClear(v);
+  books->Release();
+  iface->Release();
+  releaseVariants(vars, sizeof(vars)/sizeof(vars[0]));
+  return;
+  */
 
-  datad *d = createDataset(&v, gg);
+  getProperty(s, L"ActiveSheet", v = &vars[2]);
+    sheet = V_DISPATCH(v);  
+  getProperty(sheet, L"UsedRange", v = &vars[3]);
+    cells = V_DISPATCH(v);
+  getProperty(cells, L"Value", v = &vars[4]);
+
+  datad *d = createDataset(v, gg);
   d->name = g_strdup(fileName);
- 
+
+  releaseVariants(vars, sizeof(vars)/sizeof(vars[0]));
+
   cells->Release();
   sheet->Release();
   s->Release();
@@ -106,10 +160,13 @@ getWorkbooks(IDispatch *iface)
 {
   VARIANT v;
   HRESULT hr;
-  hr = getProperty(iface, L"Workbooks", &v);
   IDispatch *books;
+
+  getProperty(iface, L"Workbooks", &v);
+
   books = V_DISPATCH(&v);
   books->AddRef();
+  VariantClear(&v);
   return(books);
 }
 
@@ -136,7 +193,6 @@ IDispatch *
 call(IDispatch *iface, BSTR name, VARIANT *args, int numArgs)
 {
   VARIANT v;
-  VariantInit(&v);
   DISPID mid;
   HRESULT hr;
   DISPPARAMS params = {NULL, NULL, 0, 0};
@@ -148,57 +204,21 @@ call(IDispatch *iface, BSTR name, VARIANT *args, int numArgs)
  params.rgvarg = args;
  params.cArgs = numArgs;
 
- EXCEPINFO exceptionInfo;
- UINT nargErr = 1000;
- memset(&exceptionInfo, 0, sizeof(exceptionInfo));
+ VariantInit(&v);
 
- hr = iface->Invoke(mid, IID_NULL, LOCALE_USER_DEFAULT, INVOKE_FUNC, &params, &v, &exceptionInfo, &nargErr);
+ hr = iface->Invoke(mid, IID_NULL, LOCALE_USER_DEFAULT, INVOKE_FUNC, &params, &v, NULL, NULL);
  if(FAILED(hr)) {
-    fprintf(stderr, "Error message %d %d\n", (exceptionInfo.bstrDescription || exceptionInfo.bstrSource ?  1 : 0), (int) nargErr);
     COMError(hr);
-    Error("Can't call method");
  }
 
  IDispatch *ans = V_DISPATCH(&v);
+ ans->AddRef();
+ VariantClear(&v);
+
  return(ans);
 }
 
-InputDescription *
-ExcelDataDescription(const char * const fileName, const char * const modeName, 
-                             ggobid *gg, GGobiPluginInfo *info)
-{
-  InputDescription *desc;
-  desc = (InputDescription*) g_malloc(sizeof(InputDescription));
-  memset(desc, '\0', sizeof(InputDescription));
 
-  gchar *ptr = (gchar *)fileName;
-  if(!ptr)
-    ptr = "D:\\duncan\\quakes.csv";
-  desc->fileName = g_strdup(ptr);
-  //  desc->name = g_strdup("<Excel>");
-  desc->mode = unknown_data;
-  desc->desc_read_input = readData;
-
-
-  return(desc);
-}
-
-gboolean 
-readData(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
-{
-  readDataFile(desc->fileName, desc, gg);
-  return(true);
-}
-
-#ifdef USE_MAIN
-int
-main(int argc, char *argv[])
-{
-  CoInitialize(NULL);
-  readDataFile(NULL);
-  fprintf(stderr, "We're done\n");fflush(stderr);
-}
-#endif
 
 double
 asReal(VARIANT *v)
@@ -228,7 +248,7 @@ createDataset(VARIANT *var, ggobid *gg)
 
   numDim = SafeArrayGetDim(arr); //  should be two - always!
 
-  for(i = 0; i < numDim; i++) {
+  for(i = 0; i < 2; i++) {
     SafeArrayGetLBound(arr, i+1, &dim[i][0]);
     SafeArrayGetUBound(arr, i+1, &dim[i][1]);
   }
@@ -237,6 +257,7 @@ createDataset(VARIANT *var, ggobid *gg)
   indices[1] = dim[1][0];
   SafeArrayGetElement(arr, indices, &value);
   hasColNames = (V_VT(&value) == VT_BSTR);
+  VariantClear(&value);
 
   int nrow = dim[0][1] - dim[0][0] + (hasColNames ? 0 : 1);
   int ncol =  dim[1][1] - dim[1][0] + 1;
@@ -249,6 +270,7 @@ createDataset(VARIANT *var, ggobid *gg)
       indices[0] =i;
       SafeArrayGetElement(arr, indices, &value);
       d->raw.vals[ctr][col] = asReal(&value);
+      VariantClear(&value);
     }
 
     gchar *varName = NULL;
@@ -265,7 +287,7 @@ createDataset(VARIANT *var, ggobid *gg)
 
   datad_init(d, gg, 0);
 
-  //  g_free(vals);
+  SafeArrayDestroyData(arr);
 
  return(d);
 }
@@ -306,3 +328,22 @@ FromBstr(BSTR str)
   }
   return(ptr);
 }
+
+
+void
+Error(char *str)
+{
+  fprintf(stderr, "%s\n", str);
+  exit(1);
+}
+
+
+#ifdef USE_MAIN
+int
+main(int argc, char *argv[])
+{
+  CoInitialize(NULL);
+  readDataFile(NULL);
+  fprintf(stderr, "We're done\n");fflush(stderr);
+}
+#endif

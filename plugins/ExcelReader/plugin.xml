@@ -100,4 +100,48 @@ effort into developing that code. We could then use that via an R
 plugin to ggobi, an R DCOM server, or via Rggobi.
 
    </documentation>
+
+<bugs>
+ Among the missing features are:
+<itemizedList>
+<listitem>
+only handles numbers, not dates, strings, etc.
+</listitem>
+<listitem>
+does not handle categorical variables at all.
+</listitem>
+<listitem>
+currently only reads the "active"
+worksheet, and not any others.
+</listem>
+<lisitem>
+doesn't handle missing values.
+</listitem>
+<lisittem>
+doesn't release the Excel server which keeps
+running in the background.
+</lisitem>
+<listitem>
+no support for edges
+</listitem>
+<listitem>
+no support for additional command line arguments
+such as
+ <itemizedlist>
+ <listitem> --headers=true to specify whether the first row gives the variable
+  names,
+  </listitem>
+ <listitem>
+   --visible=true to make the Excel interface visible to the user
+ </listitem>
+ <listitem>
+ --rows="20..30", --columns="1,2,4,6",
+to do on-the-fly subsetting.
+ </listitem>
+ </itemizedlist>
+ If one wants to do this, use a different
+interface such as R, Python or Perl to  program these operations for DCOM.
+</listitem>
+</itemizedList>
+</bugs>
 </inputPlugin>
