@@ -1,44 +1,230 @@
 \documentclass{article}
+\usepackage{comment}
+\input{pstricks}
+\input{WebMacros}
+\input{CMacros}
+\input{XMLMacros}
 
+\usepackage{times}
+\usepackage{fullpage}
+
+\title{Extending GGobi's Functionality with Plugins}
+\author{Duncan Temple Lang\\
+Debby Swayne}
 \begin{document}
+\maketitle
 \begin{abstract}
-  This is a note on the new plugin mechanism added to ggobi. The goal
-  is to allow optional facilities to be loaded into the running ggobi
-  application.
- This mechanism allows us and other users to provide extensions
- to ggobi. These  might introduce new plot types, ways
- to read data or auxillary tools to view and manipulate
- data.
-
+  This is a note on the new plugin mechanism added to GGobi. The goal
+  is to allow optional facilities to be loaded into the running GGobi
+  application.  This mechanism allows us and other users to provide
+  extensions to GGobi without directly altering the code. These might
+  introduce new plot types, ways to read data, or auxiliary tools to
+  view and manipulate data.  One existing plugin provides a data grid
+  for viewing data. A different class of plugins -- input plugins --
+  provide ways for reading data from different input sources.  The
+  Postgres and MySQL input plugins allow users to retrieve data from
+  database servers.
 \end{abstract}
 
 \section{Motivation}
+New software and functionality will always become available at a
+faster rate than we can add to GGobi. Data will be made available in
+different formats or from different applications. Even if we had
+resources to support these features, some would not be of main-stream
+interest to warrant adding to GGobi at the risk of complicating the
+user interface, configuration, and general development. Instead, we
+(as developers of GGobi) and other developers may want to add to
+GGobi.  Since GGobi is an Open Source project, we encourage and expect
+this to happen.  Ideally, we would not have to learn the details of
+the internals of GGobi, and nor would we have to track the development
+of the GGobi code and repeatedly add our extensions to that moving
+target.  Specifically, we would like to be able to extend GGobi's
+functionality without altering the code of GGobi itself.
+Additionally, we may want to optionally include certain features,
+activating them at run time.
 
-\section{Adding Controls \& Menus}
+In order to provide a convenient way for developers to add
+functionality to GGobi, we have developed a ``plugin'' mechanism.
+Developers create a plugin that can be dynamically loaded into GGobi
+at run time. The plugin can provide functionality to GGobi, access the
+state of the GGobi instance with which it is associated, and even
+modify the user interface. 
+A second class of plugins allows data to be read from different
+input sources. These allow one to have GGobi read data from
+data sources other than the XML and ASCII formats 
+built into GGobi. One might read from centralized databases, binary 
+formats for efficient access, streaming data from a device, and so on.
+These are described in section \ref{sec:InputPlugins}.
 
+We expect plugins to be used for adding functionality and also
+supporting different input and output formats.  Together with the
+ability to treat GGobi as a library and embed it in other
+applications, there are many flexible ways to deploy GGobi and
+integrate it with other software.  While we support plugins for GGobi,
+GGobi also acts as plugin for Gnumeric, the Gnome spreadsheet.
+
+
+\begin{comment}
 \section{Hooks and Events}
 Allow the plugin to write to the stored data
-in the ggobirc.
+in the ggobirc.  
+\end{comment}
 
 \section{API}
+Because GGobi does not and cannot know much about plugins, the
+requirements imposed by GGobi for a plugin developer are few.
+First, one should provide a sample XML stanza that can be included in
+an initialization file to register the plugin when GGobi starts.  This
+should be something like the following in figure \ref{xmlFormat}.
 
-\section{Example}
+\begin{figure}[htbp]
+  \begin{center}
+    \leavevmode
+\begin{verbatim}
+ <plugin name="Data Viewer" load="immediate">
+   <description>Displays datasets in data grid.</description>
+   <author>Duncan Temple Lang</author>
+   <dll name="plugins/DataViewer/DataViewer">
+     <init onCreate="addToMenu"  onClose="closeWindow" />
+   </dll>
+ </plugin>    
+\end{verbatim}
+    \caption{Plugin Registration Format}
+    \label{fig:xmlRegistration}
+  \end{center}
+\end{figure}
 
+This stanza should be placed within the \XMLTag{plugins}
+section of the initialization file.
+
+GGobi currently communicates with the plugin using $5$ entry points.
+Each of these are identified in the \XMLTag{init} element of the
+plugin registration.  One associates the name of a C routine in the
+plugin's shared library with the corresponding method name in this XML
+element.
+ 
+A plugin must provide a value for the \XMLAttribute{onCreate} method.
+The remainder are optional.
+The 
+\begin{table}[htbp]
+  \begin{center}
+    \leavevmode
+    \begin{tabular}{lp{4in}}
+onCreate & 
+this is called when a GGobi instance is created
+and an instance of the plugin is being created
+and associated with this GGobi instance.
+This can be used to add items to the GGobi interface,
+initialize data structures specific to this instance
+of the plugin, and so on. \\
+onClose & this is called when a GGobi instance
+is destroyed/closed. It allows the plugin instance
+to take any steps needed to release resources
+such as freeing memory, saving state, etc. \\
+onUpdateDisplayMenu & 
+this is called each time the Display menu
+is re-configured which happens when a
+dataset is added or removed from the GGobi instance. 
+\\
+onLoad & this routine is called when a the plugin
+is first loaded. This can be used
+to perform global initialization 
+for the plugin, such as computing values
+that are the same across different GGobi
+instances, initializing third party libraries, etc.
+\\
+onUnLoad & this is called when the plugin is de-activated
+or unloaded from the GGobi session.
+(This may not be called.)
+    \end{tabular}
+    \caption{Plugin entry points}
+    \label{tab:entryPoints}
+  \end{center}
+\end{table}
+
+\section{Adding Controls \& Menus}
+Many plugins are dormant extensions to GGobi's functionality. In other
+words, when a plugin instance is created, it doesn't create plots,
+manipulating data, or generally doing its intended task.  Instead, it
+typically just adds items to the GGobi user interface which the user
+can choose to employ.  In order to do this, the plugin may want to add
+menus and menu items to the main window of the GGobi instance
+associated with the plugin.  To help do this,
+GGobi provides two routines in its API:
+\Croutine{GGobi_addToolsMenuItem}
+and \Croutine{GGobi_addDisplayMenuItem}.
+
+\begin{description}
+\item[\Croutine{GGobi_addToolsMenuItem}]
+This adds a menu item to the Tools menu in the main
+window of the GGobi instance.
+This returns the widget for the menu item and
+then the plugin can register its own event handlers
+with that widget.
+The caller need only specify the text to be displayed
+on the menu item.
+\begin{verbatim}
+GtkWidget *GGobi_addToolsMenuItem (const char *label, ggobid *gg)
+\end{verbatim}
+
+\item[\Croutine{GGobi_addDisplayMenuItem}] This is typically used to
+add a plot type to the Display menu.  This is useful in the
+\XMLAttribute{onUpdateDisplayMenu} plugin routine which is called when a
+dataset is added or removed from the GGobi instance.  In the future,
+this will handle multiple datasets and an item for that plot type with
+a cascading menu for each dataset.  The signature of the routine will
+change to support this.
+\end{description}
+
+
+
+\section{Examples}
+
+There are currently three examples of plugins in the GGobi source
+within the \dir{plugins} directory.  The \dir{DataViewer} plugin
+provides a datagrid for viewing the data in a GGobi instance.  This
+adds a new menu to the GGobi main window/control panel.  The user
+creates the data viewer via that menu.
+
+The \dir{CategoricalPlots} is currently a stub in that it does not yet
+create plots. (We are waiting to work out all of the details using
+Heike Hoffman's work to find out what needs to be done for plugins to
+work this way.) However, it does illustrate a way of adding menu items
+to the Display menu for the different datasets.
+
+A test/diagnostic plugin is available in the \dir{TestPlugin}
+that illustrates how to use each of the $5$ callbacks.
 
 \section{Potential Plugin Projects}
 
-\begin{itemize}
+\begin{description}
 
-\item[Data grid]
-Extend the data-grid to 
-allow color-coding the rows, identification,
-editing, etc.
+\item[Data grid] Extend the data-grid to allow color-coding the rows,
+identification, editing, etc.  See the GGobi plugin for Gnumeric for a
+potentially ``better'' way to do this.
 
 \item[Categorical variable data plots]
+Heike Hoffman is working on
+adding plots for categorical variables.
 
-\end{itemize}
+\item[Maps]
+Drawing maps  as backgrounds for plots,
+regions within plots, etc.
+connecting to spatial data would be interesting.
 
-\section{Input Plugins}
+\item[Statistical Computations] We might embed R, Octave, etc.  to
+provide statistical and mathematical functionality.  As we
+
+\item[Trees]
+We can add support for classification tree software
+written in Java by embedding the JVM within GGobi.
+
+\item[Interpreters]
+Java, Python, Perl.
+
+\end{description}
+
+\section{Input Plugins}\label{sec:InputPlugins}
 It is simply a fact that data will be stored in a variety of different
 formats. Since GGobi reads data only in a couple of specific formats,
 the onus is on the user to translate their data into one of these
@@ -53,22 +239,69 @@ by registering it as an input plugin.
 The basic idea of the input plugin mechanism is as follows.  One
 registers the plugin within the \XMLTag{plugins} tag in the
 initialization file.  The format of the XML entry for an input plugin
-is defined in the DTD for the initialization file and illustrated in
-figure \ref{fig:input}.
+is defined in the DTD for the initialization file
+(\file{GGobiInit.dtd}) and illustrated in figure \ref{fig:input}.
 
 \begin{figure}[htbp]
   \begin{center}
     \leavevmode
 \begin{verbatim}
-    
+ <inputPlugin name="postgres" interactive="true">
+  <description>Reads data from a Postgres DBMS</description>
+  <modeName>postgres</modeName>
+   <author>Duncan Temple Lang</author>
+     <dll name="plugins/Postgres/Postgres"> 
+       <init description="postgres_input_description" />
+     </dll>
+ </inputPlugin>    
 \end{verbatim}
     \caption{Input plugin specification}
   \end{center}
 \end{figure}
-
 The simplest thing to do is copy the \file{plugin.xml} file from one
 of the existing input plugin directories and edit that.
 
+The format is very similar to that of the regular plugins.  We
+identify the plugin by name, and provide information (i.e. description
+and author) which can be displayed in the plugins display tool.  Then
+we provide information about where the shared library/DLL is located
+and identify the symbol that is the primary entry point used by GGobi
+to use the plugin.
+
+  There are two main differences between this and the regular plugin.
+First, one can specify the \XMLAttribute{interactive} attribute for
+the \XMLTag{inputPlugin}.  The flag is intended to indicate that the
+plugin is capable of asking the user for information about how to get
+data. For example, the database plugins provide a GUI in which the
+user can input a query to be sent to a database to get data.  The
+\XMLAttribute{interactive} attribute is of interest when GGobi is
+started with no data input specified (i.e. without a data file being
+given on the command line).  In such a case, we look through the list
+of input plugins for the first one that is interactive.  When we find
+it, we run it and have it figure out how to populate the GGobi
+instance with data.
+
+The second addition is the \XMLTag{modename} element.  The string
+inside this tag can be used to activate/deploy this plugin from the
+command line. One can specify the mode for reading data using the
+command line flag \flag{datamode} when starting GGobi.  The value for
+this flag should be the value of the \XMLTag{modename} tag for one of
+the input plugins.  When GGobi starts and finds that the
+\flag{datamode} flag has been specified, it iterates over the input
+plugins and, for each plugin, compares the \XMLTag{modename} to the
+\flag{datamode} value. When it finds a match, it uses that plugin to
+read the data.
+
+\begin{verbatim}
+ ggobi -init notes/ggobirc -datamode postgres
+\end{verbatim}
+
+\textit{Currently, the \flag{datamode} only applies to input plugins.
+In the future, we will support all of the built-in data modes in the
+same way.}
+
+
+\subsection{Available Plugins}
 There are currently three input plugins available for GGobi.  One is a
 simple test of the mechanism that generates a dataset with $3$
 variables and $10$ observations.  The values are generated by the C
@@ -81,7 +314,7 @@ machine, and issue an SQL query to get the data for GGobi to display.
 The information about the location of the database server, the name of
 the database, the user login name and password, the SQL query, etc.
 are typically entered interactively via a simple GUI provided by
-GGobi.  Alternatively, if the \SharedLib{Properties} library is
+GGobi.  Alternatively, if the \SharedLibrary{Properties} library is
 available, some or all of these values can be specified in a file.
 More information is available in \file{DBMS.pdf}.
 
@@ -93,8 +326,23 @@ It would be useful to have a plugin for reading
 \item HDF5 files,
 \item S-Plus and R data frames,
 \item Oracle databases,
-\item data serialized by other applications.
+\item data serialized by other applications,
+\item streaming data.
 \end{itemize}
+
+One basic way to get access to R \& Octave data is to embed the entire
+engine for that system into GGobi and then to call the appropriate
+functions to load the data and then convert it to GGobi.  Of course,
+we can run GGobi within R and pass data to GGobi directly from R.
+
+
+The next round of development for input plugins will possibly allow a
+plugin to add itself to the Open dialog so that the user can specify
+the format or mechanism to use for reading the file.  We may also add
+output plugins that allow serializing the data using a particular
+format and mechanism. Gnumeric provides a similar mechanism that we
+will probably mimic.
+
 
 \subsection{Developing an Input Plugin}
 
@@ -118,7 +366,7 @@ the data.  The heart of this from the perspective of identifying the
 plugin is \Croutine{fileset_generate} in \file{make_ggobi.c}.  This is
 responsible for creating an instance of the \CStruct{InputDescription}
 with the appropriate data for reading the data.  The user identifies
-the plugin by providing a value for the \flag{-datamode}.
+the plugin by providing a value for the \flag{-datamode} argument.
 \Croutine{fileset_generate} reads this value (stored in the session
 options) by looking through the known input formats.
 

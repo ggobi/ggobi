@@ -5,32 +5,54 @@
 <!ENTITY % Boolean         " true | T | TRUE | false | F | FALSE ">
 <!ENTITY % PluginElements "(description, (version)?, author,dll)">
 
+<!ELEMENT modename PCDATA>
+
 <!ELEMENT description #PCDATA>
 <!ELEMENT author      #PCDATA>
-<!ELEMENT dll         ((modename)?,init)>
+<!ELEMENT dll         (init)>
 <!ATTLIST dll
    name CDATA #REQUIRED
 >
 
 
+<!-- 
+   The 5 `methods' by which GGobi communicates 
+   with the plugin.
+
+  -->
 <!ELEMENT init        EMPTY>
 <!ATTLIST init
-   onCreate    CDATA #IMPLIED
-   onClose     CDATA #IMPLIED
-   onLoad      CDATA #IMPLIED
-   onUnLoad    CDATA #IMPLIED
-   description CDATA #IMPLIED
+   onCreate   		 CDATA #IMPLIED
+   onClose    		 CDATA #IMPLIED
+   onLoad     		 CDATA #IMPLIED
+   onUnLoad   		 CDATA #IMPLIED
+   onUpdateDisplayMenu   CDATA #IMPLIED
+   description           CDATA #IMPLIED
 >
+
+
+<!-- A plugin should have a name
+     and an optional immediate argument 
+     which is a logical value indicating whether the DLL
+     should be loaded immediately.
+
+     input plugins also have an interactive attribute indicating
+     whether they can work without the user specifying an input
+     file. The intent is that the plugin will bring up a GUI
+     by which the user can specify the data, e.g. a database query, etc.
+  -->
 
 <!ELEMENT inputPlugin  %PluginElements; >
 <!ATTLIST inputPlugin
     name        CDATA     #REQUIRED
     interactive %Boolean;  #IMPLIED
+    immediate   %Boolean;  #IMPLIED
 >
 
 <!ELEMENT plugin  %PluginElements;>
 <!ATTLIST plugin
     name        CDATA     #REQUIRED
+    immediate   %Boolean;  #IMPLIED
 >
 
 
