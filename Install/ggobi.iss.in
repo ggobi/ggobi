@@ -26,14 +26,16 @@ Source: "@GGOBI_HOME@data\*.*"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
 Source: "@GGOBI_HOME@notes\*.html"; DestDir: "{app}\Docs"; CopyMode: alwaysoverwrite
 Source: "@GGOBI_HOME@Install\ggobi.ico"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 
-Source: "@GGOBI_HOME@notes\ggobirc"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@tmp\ggobirc"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "@GGOBI_HOME@notes\colorschemes.xml"; DestDir: "{app}\share"; CopyMode: alwaysoverwrite
 
 Source: "@GGOBI_HOME@*.h"; DestDir: "{app}\include"; CopyMode: alwaysoverwrite
 
+Source: "@GGOBI_HOME@plugins\ggvis\ggvis.dll"; DestDir: "{app}\plugins"; CopyMode: alwaysoverwrite
+
 Source: "@GGOBI_HOME@libggobi.a"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@libggobi.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@libggobi.def"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@ggobi.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@ggobi.def"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
 
 
 [INI]
