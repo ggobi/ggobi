@@ -228,8 +228,10 @@ init_var_GCs (GtkWidget *w, ggobid *gg) {
   } else
     bblack = sessionOptions->info->bgColor;
 #else
+*/
    gdk_color_black (gdk_colormap_get_system (), &black);
    bblack = &black;
+/*
 #endif
 */
 
