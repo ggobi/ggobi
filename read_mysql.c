@@ -236,8 +236,8 @@ GGOBI(setDimensions)(gint nrow, gint ncol, datad *d, ggobid *gg)
 
   arrayf_alloc (&d->raw, d->nrows, d->ncols);
 
-  vartable_alloc (d, gg);
-  vartable_init (d, gg);
+  vartable_alloc (d);
+  vartable_init (d);
   hidden_alloc (d, gg);
 }
 

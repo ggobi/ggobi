@@ -132,8 +132,8 @@ ggobi.sched: $(OB)
 mt19937-1.o: mt19937-1.c
 	$(CC) $(CFLAGS) `gtk-config --cflags` -c $<
 
-dm: $(OB)
-	$(CC) `gtk-config --cflags` $(OB) -o ggobi `gtk-config --libs` -L$(DM) -ldmalloc
+efence: $(OB)
+	$(CC) $(OB) $(LDFLAGS) $(EFENCE_LIBS) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --cflags --libs`
 
 lib: libggobi.so
 libggobi.so: $(OB)

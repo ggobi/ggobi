@@ -747,10 +747,8 @@ allocVariables (const CHAR **attrs, XMLParserData *data)
   arrayf_alloc (&d->raw, d->nrows, d->ncols);
   hidden_alloc (d, data->gg);
 
-  vartable_alloc (d, data->gg);
-  vartable_init (d, data->gg);
- 
-
+  vartable_alloc (d);
+  vartable_init (d);
 
   return (true);
 }

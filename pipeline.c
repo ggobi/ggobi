@@ -76,31 +76,6 @@ pipeline_arrays_check_dimensions (datad *d) {
   }
 }
 
-/*
-void
-pipeline_arrays_add_column (gint jvar, datad *d, ggobid *gg)
- * Reallocate pipeline arrays to contain one more column, and
- * copy column jvar into the new column
-{
-  gint nc = d->ncols + 1, nr = d->nrows;
-  register gint i;
-
-  arrayf_add_cols (&d->raw, nc);
-  arrayf_add_cols (&d->tform, nc);
-
-  arrayl_add_cols (&d->world, nc);
-  arrayl_add_cols (&d->jitdata, nc);
-
-  for (i=0; i<nr; i++) {
-    *-- no tform --*
-    d->raw.vals[i][nc-1] = d->tform.vals[i][nc-1] = d->raw.vals[i][jvar];
-    *-- no jitter --*
-    d->jitdata.vals[i][nc-1] = 0; 
-  }
-
-}
-*/
-
 /*-------------------------------------------------------------------------*/
 /*                       pipeline                                          */
 /*-------------------------------------------------------------------------*/
@@ -123,8 +98,8 @@ median_largest_dist (gfloat **vals, gint *cols, gint ncols,
   gfloat *min, gfloat *max, datad *d, ggobid *gg)
 {
 /*
- * Find the minimum and maximum values of each column or variable
- * group scaling by median and largest distance
+ * Find the minimum and maximum values of each variable,
+ * scaling by median and largest distance
 */
   gint i, j, k, n, np;
   gdouble dx, sumdist, lgdist = 0.0;
@@ -175,8 +150,8 @@ mean_largest_dist (gfloat **vals, gint *cols, gint ncols,
   gfloat *min, gfloat *max, datad *d, ggobid *gg)
 {
 /*
- * Find the minimum and maximum values of each column or variable
- * group scaling by mean and largest distance
+ * Find the minimum and maximum values of each variable,
+ * scaling by mean and largest distance
 */
   gint i, j;
   gdouble dx, sumxi, mean, sumdist, lgdist = 0.0;

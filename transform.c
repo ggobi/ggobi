@@ -701,7 +701,7 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
 
   switch (d->vartable[j].tform2) {
     case NO_TFORM2:
-      d->vartable[j].collab_tform = g_strdup_printf (lbl1);
+      d->vartable[j].collab_tform = g_strdup (lbl1);
       break;
     case STANDARDIZE2:
       d->vartable[j].collab_tform = g_strdup_printf ("(%s-m)/s", lbl1);
@@ -717,8 +717,11 @@ void tform_label_update (gint jcol, datad *d, ggobid *gg)
   /*-- update the values of the variable labels --*/
   collab_tform_update (jcol, d, gg);
 
-  /*-- update the displayed variable circle labels --*/
+  /*-- update the displayed checkbox label --*/
   varlabel_set (jcol, d, gg);
+
+  /*-- update the displayed variable circle labels --*/
+  /*-- need a routine here --*/
 
   /*-- update the variable statistics table --*/
   vartable_collab_tform_set_by_var (jcol, d);
@@ -792,12 +795,13 @@ transform (gint stage, gint tform_type, gfloat param, datad *d, ggobid *gg)
 
   g_free ((gpointer) cols);
 
-/*  vartable_lim_update (d, gg);*/
-  limits_set (false, true, d);  
-  vartable_limits_set (d);
-  vartable_stats_set (d);
 
-  tform_to_world (d, gg);
+  limits_set (false, true, d);  
+  for (k=0; k<ncols; k++) {
+    vartable_limits_set_by_var (j, d);
+    vartable_stats_set_by_var (j, d);
+    tform_to_world_by_var (j, d, gg);
+  }
 
   /*
    * there's no need to reproject if the variables just transformed

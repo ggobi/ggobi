@@ -153,8 +153,8 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
 
   rowlabels_alloc (d, gg);
 
-  vartable_alloc (d, gg);
-  vartable_init (d, gg);
+  vartable_alloc (d);
+  vartable_init (d);
 
   br_glyph_ids_alloc (d, gg);
   br_glyph_ids_init (d, gg);

@@ -25,6 +25,7 @@
 /*                         utilities                                       */
 /*-------------------------------------------------------------------------*/
 
+
 GtkWidget *
 checkbox_get_nth (gint jvar, datad *d) {
   GtkWidget *w;
@@ -38,6 +39,14 @@ checkbox_get_nth (gint jvar, datad *d) {
   w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.checkbox, jvar);
   return w;
 }
+
+void
+varlabel_set (gint jvar, datad *d, ggobid *gg) {
+  GtkWidget *w = checkbox_get_nth (jvar, d);
+  gtk_label_set_text (GTK_LABEL (GTK_BIN (w)->child),
+                      d->vartable[jvar].collab_tform);
+}
+
 
 /*-------------------------------------------------------------------------*/
 /*                     Variable selection                                  */
@@ -211,11 +220,12 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 
     jvar = -1;
     for (j=0; j<d->ncols; j++) {
-      if (checkbox_get_nth (jvar, d) == w) {
+      if (checkbox_get_nth (j, d) == w) {
         jvar = j;
         break;
       }
     }
+g_printerr ("selecting variable %d\n", jvar);
 
 /* looking for modifiers; don't know which ones we'll want */
     alt_mod = ((bevent->state & GDK_MOD1_MASK) == GDK_MOD1_MASK);
@@ -340,13 +350,6 @@ void varpanel_populate (datad *d, ggobid *gg)
     varpanel_checkbox_add (j, d, gg);
 }
 
-
-void
-varlabel_set (gint jvar, datad *d, ggobid *gg) {
-  GtkWidget *w = checkbox_get_nth (jvar, d);
-  gtk_label_set_text (GTK_LABEL (GTK_BIN (w)->child),
-                      d->vartable[jvar].collab_tform);
-}
 
 /*-------------------------------------------------------------------------*/
 /*                          API; not used                                  */

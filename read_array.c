@@ -76,8 +76,8 @@ read_binary (FILE *fp, datad *d, ggobid *gg)
   /*
    * As soon as the number of columns is known, allocate vartable.
   */
-  vartable_alloc (d, gg);
-  vartable_init (d, gg);
+  vartable_alloc (d);
+  vartable_init (d);
 
   d->nrows = nr;
 
@@ -235,8 +235,8 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
   d->ncols = row1_read (fp, row1, row1_missing, d, gg);
 
   /*-- Once the number of columns is known, allocate vartable. --*/
-  vartable_alloc (d, gg);
-  vartable_init (d, gg);
+  vartable_alloc (d);
+  vartable_init (d);
 
 /*
  * allocate the first block.
