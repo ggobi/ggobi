@@ -191,11 +191,11 @@ draw_3drectangle (GdkDrawable *drawable, gint x, gint y,
   gint h = height/2;
 
   /*-- draw the rectangles --*/
-  gdk_gc_set_foreground (gg->wvis.GC, &gg->mediumgray);
-  gdk_draw_rectangle (drawable, gg->wvis.GC, TRUE, x-w, y-h, width, height);
+  gdk_gc_set_foreground (gg->plot_GC, &gg->mediumgray);
+  gdk_draw_rectangle (drawable, gg->plot_GC, TRUE, x-w, y-h, width, height);
 
   /*-- draw the dark shadows --*/
-  gdk_gc_set_foreground (gg->wvis.GC, &gg->darkgray);
+  gdk_gc_set_foreground (gg->plot_GC, &gg->darkgray);
   points [0].x = x - w;
   points [0].y = y + h;
   points [1].x = x + w;
@@ -212,11 +212,11 @@ draw_3drectangle (GdkDrawable *drawable, gint x, gint y,
 
   points [6].x = x - w;
   points [6].y = y + h;
-  gdk_draw_polygon (drawable, gg->wvis.GC, TRUE, points, 7);
-  gdk_draw_line (drawable, gg->wvis.GC, x-1, y-(h-1), x-1, y+(h-2));
+  gdk_draw_polygon (drawable, gg->plot_GC, TRUE, points, 7);
+  gdk_draw_line (drawable, gg->plot_GC, x-1, y-(h-1), x-1, y+(h-2));
 
   /*-- draw the light shadows --*/
-  gdk_gc_set_foreground (gg->wvis.GC, &gg->lightgray);
+  gdk_gc_set_foreground (gg->plot_GC, &gg->lightgray);
   points [0].x = x - w;  /*-- lower left --*/
   points [0].y = y + (h-1);
   points [1].x = x - w;  /*-- upper left --*/
@@ -233,8 +233,8 @@ draw_3drectangle (GdkDrawable *drawable, gint x, gint y,
 
   points [6].x = points[0].x;
   points [6].y = points[0].y;
-  gdk_draw_polygon (drawable, gg->wvis.GC, TRUE, points, 7);
-  gdk_draw_line (drawable, gg->wvis.GC, x, y-(h-1), x, y+(h-2));
+  gdk_draw_polygon (drawable, gg->plot_GC, TRUE, points, 7);
+  gdk_draw_line (drawable, gg->plot_GC, x, y-(h-1), x, y+(h-2));
 }
 
 
