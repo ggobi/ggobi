@@ -615,6 +615,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
   gint value;
   datad *d = getCurrentXMLData(data);
 
+  /*-- glyphSize  0:7 --*/
   value = data->defaults.glyphSize;
   tmp = getAttribute(attrs, "glyphSize");
   if (tmp) {
@@ -633,6 +634,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
   }
 
 
+  /*-- glyphType  0:6 --*/
   value = data->defaults.glyphType;
   tmp = getAttribute(attrs, "glyphType");
   if(tmp) {
@@ -644,7 +646,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
       xml_warning("glyphType", tmp, "Out of range", data);
   } else {
     if(i < 0)
-      data->defaults.glyphSize = value;
+      data->defaults.glyphType = value;
     else
       d->glyph.els[i].type = d->glyph_now.els[i].type = 
            d->glyph_prev.els[i].type = value;

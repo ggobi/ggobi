@@ -22,7 +22,7 @@ that provide the different characteristics such as
 \item observation labels
 \item glyph information
 \item color
-\item connected segments.
+\item segments between points.
 \end{itemize}
 Instead, the XML format allows all the information to be specified in
 a single file.  Additionally, different sections of information can be
@@ -48,10 +48,10 @@ to the data source.
 This includes items such as 
 \begin{itemize}
 \item how missing values
-are encoded (for the entire dataset or per variable),
+      are encoded (for the entire dataset or per variable),
 \item how many records there are, 
 \item levels of a variable that are not observed
-but known to exist (e.g. ethnicities not encountered in a survey)
+      but known to exist (e.g. ethnicities not encountered in a survey)
 \item the source of the data
 \item tooltips for use in describing the data
 \item the type of each variable (e.g. factor or numeric)
@@ -116,12 +116,11 @@ via ftp and http.
 \end{verbatim}
 
 
-
 Being able to specify file-specific defaults allows one to easily
 change the characterstics of the plots without excessive editing of
 the contents of the file.  For example, to use a different glyph type,
-we need only specify a different value for the \texttt{glyphType}
-attribute in the \texttt{ggobidata} tag.  This greatly simplifies
+we need only specify a different value for the \texttt{glyph}
+attribute in the \texttt{records} tag.  This greatly simplifies
 experimenting with different parameter values.
 
 

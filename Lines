@@ -107,6 +107,9 @@
 35729   10/23 progress in sphering; bug fixes in delete_vars
 37183   12/4  I don't know!
 37950   12/18 Nicholas's time series code?
+
+2001
+
 39312   2/15  lots of tour code; a few new event handlers
 39684   2/23  lots of variable selection code and a few bug fixes
 40256   4/3   ??
@@ -123,6 +126,7 @@
 41569   5/4   the result of excluding some files that aren't in use
 44795   6/8   edge editing code, cpanel updating, bug fixing, ...
 50110   7/9   added brush by variable, ...?
+49429   8/15  pretty stable for a while despite continuous tuning
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

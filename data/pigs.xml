@@ -30,8 +30,7 @@ HERDSZ: breeding herd size
 <variable>PRODUCTION</variable>
 <variable>HERDSZ</variable>
 </variables>
-<records
- count="48" glyphSize="3" glyphType="fc" color="4">
+<records count="48" glyphType="3" glyphSize="0" color="4">
 <record id="1">
 1.000 1967.000 1.000 1.000 0.000 0.000 105.000 8.075 10.800 2645.000 703.000
 </record>
