@@ -68,6 +68,17 @@
 <h2><a name="Installation">Installation</a></h2>
 <dl>
   <dt>
+  <li> When trying to build from scratch on a Unix/Linux box,
+      I get an error during the configuration (i.e. calling
+      <code>configure</code>) about <b>gtk-config</b>.
+  <dd>
+      This is usually a symptom of not having the
+      <b>gtk-config </b> executable/script
+      in your path. To remedy this, locate the
+      command <b>gtk-config</b> and add the directory
+      in which it is contained to your PATH environment variable.
+      Then re-run <code>configure</code>
+  <dt>
   <li> Why do I see <code>G_INLINE_FUNC</code> in the compilation?
   <dd> This is a mechanism to help the header files in the <i>glib</i> library
        to compile inlined functions. Do a web search on
@@ -100,6 +111,6 @@
 <hr>
 <address></address>
 <!-- hhmts start -->
-Last modified: Thu May 17 13:11:50 EDT 2001
+Last modified: Sun Mar  3 16:08:02 EST 2002
 <!-- hhmts end -->
 </body> </html>

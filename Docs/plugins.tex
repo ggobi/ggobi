@@ -508,10 +508,11 @@ options) by looking through the known input formats.
 \subsection{Java Input Plugins}
 
 The JVM (Java Virtual Machine) plugin allows us to implement plugins,
-including input plugins, in Java.  The basic idea is quite simple and
-involves implementing a particular Java interface.
-In practice, you might even be able to copy one of the Java
-classes in the GGobi distribution that implements an input plugin.
+including input plugins, by writing them in the Java language.  The
+basic idea is quite simple and involves implementing a particular Java
+interface.  In practice, you might even be able to copy one of the
+Java classes in the GGobi distribution that implements an input
+plugin.
 
 The simplest Java input plugin works as follows.  One registers a Java
 class as the implementation of the plugin. When the plugin is needed,
@@ -549,6 +550,25 @@ methods.  In the future, the Java code will be able to access the
 GGobi instance and the associated C routines directly and can ``push''
 data into GGobi rather than cumulating and waiting for GGobi to
 ``pull'' it out.
+
+One can use the Java bindings to the Gtk libraries to create interface
+components that have the same look-and-feel as the rest of GGobi.
+
+\subsection{R}
+
+In the same way that we embed the JVM, we have also embedded the R
+interpreter.  This allows one to develop plugins in the R language,
+creating regular and input plugins with R functions.
+
+\subection{Perl \& Python}
+
+It is also possible to embed the Perl or Python interpreters into
+GGobi (as well as GGobi in either of these languages).  Then we can
+write plugins by defining classes in one of these languages by
+extending a basic plugin class and overriding the relevant methods.
+There is now the beginnings of a Perl language plugin.
+
+
 
 \section{Creating a Plugin}
 
