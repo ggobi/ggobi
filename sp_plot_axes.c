@@ -24,14 +24,14 @@
 void
 splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
-  gint j, k, ix, iy;
+  gint j, k, ix, iy, nc;
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->projection;
   gint lbearing, rbearing, width, width2, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
   datad *d = dsp->d;
-  gfloat dst;
+  gfloat dst, val;
   gint textheight = 0, textheight2;
   gchar *varlab, *varval;
   gint dawidth = sp->da->allocation.width;
@@ -259,6 +259,8 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         if (d->ncols < MIN_NVARS_FOR_COTOUR)
           break;
 
+        nc = dsp->tcorr1.nsubset + dsp->tcorr2.nsubset;
+
         /*-- use string height to place the labels --*/
         splot_text_extents ("yA", style, 
           &lbearing, &rbearing, &width, &ascent, &descent);
@@ -266,40 +268,52 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
         /*-- draw vertical lines to mark the min and max positions --*/
         gdk_draw_line(drawable, gg->plot_GC,
-          dawidth/4, daheight - textheight*d->ncols - 10,
+          dawidth/4, daheight - textheight*nc - 10,
           dawidth/4, daheight);
         gdk_draw_line(drawable, gg->plot_GC,
-          3*dawidth/4, daheight - textheight*d->ncols - 10,
+          3*dawidth/4, daheight - textheight*nc - 10,
           3*dawidth/4, daheight);
 
         /*-- draw horizontal lines to mark the min and max positions --*/
         gdk_draw_line(drawable, gg->plot_GC,
           0,                   daheight/4,
-          textheight*d->ncols, daheight/4);
+          textheight*nc, daheight/4);
         gdk_draw_line(drawable, gg->plot_GC,
           0,                   3*daheight/4,
-          textheight*d->ncols, 3*daheight/4);
+          textheight*nc, 3*daheight/4);
 
         gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
           GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
+        k = 0;
         for (j=0; j<d->ncols; j++) {
+          if (!dsp->tcorr1.subset_vars_p.els[j] &&
+              !dsp->tcorr2.subset_vars_p.els[j])
+            continue;
+
           vt = vartable_element_get (j, d);
-          varlab = g_strdup_printf("%s:%3.2f,%3.2f",vt->collab_tform,
-            dsp->tcorr1.F.vals[0][j],dsp->tcorr2.F.vals[0][j]);
+          if (dsp->tcorr1.subset_vars_p.els[j]) {
+            val = (ABS(dsp->tcorr1.F.vals[0][j]) > .004) ?
+              dsp->tcorr1.F.vals[0][j] : 0.0;
+            varlab = g_strdup_printf("%s:%3.2f,0",vt->collab_tform,val);
+          } else {
+            val = (ABS(dsp->tcorr2.F.vals[0][j]) > .004) ?
+              dsp->tcorr2.F.vals[0][j] : 0.0;
+            varlab = g_strdup_printf("%s:0,%3.2f",vt->collab_tform,val);
+          }
 
           /* horizontal */
           ix = dawidth/2 + 
             (gint) (dsp->tcorr1.F.vals[0][j]*
             (gfloat) dawidth/4);
-          iy = daheight - 10 - (d->ncols-1-j)*textheight;
+          iy = daheight - 10 - (nc-1-k)*textheight;
           if (j == dsp->tc1_manip_var)
             gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
           else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
-            dawidth/2,daheight - 10 - 
-            (d->ncols-1-j)*textheight, ix, iy);
+            dawidth/2, daheight - 10 - (nc-1-k)*textheight,
+            ix, iy);
           gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
@@ -310,7 +324,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             style, drawable, gg);
   
           /* vertical */
-          ix = 10 + j*textheight;
+          ix = 10 + k*textheight;
           iy = daheight - (daheight/2 + 
             (gint) (dsp->tcorr2.F.vals[0][j]*
             (gfloat) daheight/4));
@@ -321,11 +335,12 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
-            10+j*textheight,daheight/2,
+            10+k*textheight,daheight/2,
             ix, iy);
 
           g_free (varlab);
           /*-- can't add vertical variable labels --*/
+          k++;
         }     
         gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID, 
           GDK_CAP_ROUND, GDK_JOIN_ROUND);
