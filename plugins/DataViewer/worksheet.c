@@ -331,6 +331,8 @@ cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
     char *val, *tmp;
     ggobid *gg;
     float value;
+    if(row < 0)
+	return;
     val = gtk_sheet_cell_get_text(sheet, row, column);
     value = strtod(val, &tmp);
     if(val == tmp) {
