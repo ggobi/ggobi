@@ -340,7 +340,7 @@ void sphere_apply_cb (void) {
       /*-- these three lines replicated from transform.c --*/
       vardata_lim_update ();
       tform_to_world ();
-      displays_reproject (REDISPLAY_PRESENT);
+      displays_tailpipe (REDISPLAY_PRESENT);
     }
   }
 }

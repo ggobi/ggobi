@@ -72,7 +72,7 @@ make_control_panels () {
   cpanel_p1dplot_make ();
   cpanel_xyplot_make ();
   cpanel_rotation_make ();
-  cpanel_gtour_make ();
+  cpanel_tour2d_make ();
   cpanel_ctour_make ();
 
   cpanel_brush_make ();
@@ -154,7 +154,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
   extern GtkWidget *scale_reset_menu;
   extern GtkWidget *brush_reset_menu, *brush_link_menu;
   extern GtkWidget *identify_link_menu;
-  extern GtkWidget *rotation_io_menu, *gtour_io_menu;
+  extern GtkWidget *rotation_io_menu, *tour2d_io_menu;
 
   static GtkWidget *reset_item = NULL;
   static GtkWidget *link_item = NULL;
@@ -220,10 +220,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
         break;
 
       case TOUR2D:
-        gtour_menus_make ();
+        tour2d_menus_make ();
 
         io_item = submenu_make ("_I/O", 'I', main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), gtour_io_menu); 
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), tour2d_io_menu); 
         if (firsttime_io) {
           submenu_insert (io_item, menubar, -1);
           firsttime_io = false;
@@ -385,7 +385,7 @@ mode_set_cb (gpointer cbd, guint action, GtkWidget *widget)
     mode_activate (current_splot, mode, on);
     mode_submenus_activate (current_splot, mode, on);
 
-    display_reproject (current_display);
+    display_tailpipe (current_display);
   }
 }
 

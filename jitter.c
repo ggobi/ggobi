@@ -104,7 +104,7 @@ rejitter () {
   }
   tform_to_world ();
   /*-- do not redisplay the missing values displays --*/
-  displays_reproject (REDISPLAY_PRESENT);
+  displays_tailpipe (REDISPLAY_PRESENT);
 
 /*
   if (clear_vartable) 

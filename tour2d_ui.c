@@ -1,4 +1,4 @@
-/* gtour_ui.c */
+/* tour2d_ui.c */
 
 #include <gtk/gtk.h>
 #include <strings.h>
@@ -6,7 +6,7 @@
 #include "vars.h"
 #include "externs.h"
 
-static void open_gtouradv_popup (void);
+static void open_tour2dadv_popup (void);
 
 void speed_set (gint speed) {
   g_printerr ("speed=%d\n", speed);
@@ -22,7 +22,7 @@ static void scale_set_default_values (GtkScale *scale )
 }
 static void pause_cb (GtkToggleButton *button)
 {
-  g_printerr ("gtour pause: %d\n", button->active);
+  g_printerr ("tour2d pause: %d\n", button->active);
 }
 static void reinit_cb (GtkWidget *w) {
   g_printerr ("reinit\n");
@@ -33,13 +33,13 @@ static void pcaxes_cb (GtkToggleButton *button)
 }
 
 
-static void gtourpp_cb (GtkWidget *w) {
+static void tour2dpp_cb (GtkWidget *w) {
   g_printerr ("open projection pursuit panel\n");
-  open_gtourpp_popup ();
+  open_tour2dpp_popup ();
 }
-static void gtouradv_cb (GtkWidget *w) {
+static void tour2dadv_cb (GtkWidget *w) {
   g_printerr ("open advanced tour features panel\n");
-  open_gtouradv_popup ();
+  open_tour2dadv_popup ();
 }
 
 static gchar *manip_lbl[] = {"Oblique", "Vert", "Horiz", "Radial",
@@ -51,7 +51,7 @@ static void manip_cb (GtkWidget *w, gpointer cbd)
 }
 
 void
-cpanel_gtour_make () {
+cpanel_tour2d_make () {
   GtkWidget *box, *tgl, *btn, *sbar, *lbl, *vb;
   GtkObject *adj;
   GtkWidget *manip_opt;
@@ -139,7 +139,7 @@ cpanel_gtour_make () {
   gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (gtourpp_cb), NULL);
+                      GTK_SIGNAL_FUNC (tour2dpp_cb), NULL);
 
 /*
  * advanced features button
@@ -150,7 +150,7 @@ cpanel_gtour_make () {
   gtk_box_pack_start (GTK_BOX (control_panel[TOUR2D]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (gtouradv_cb), NULL);
+                      GTK_SIGNAL_FUNC (tour2dadv_cb), NULL);
 
   gtk_widget_show_all (control_panel[TOUR2D]);
 }
@@ -225,7 +225,7 @@ hide_cb (GtkWidget *w ) {
 */
 
 static void
-open_gtouradv_popup () {
+open_tour2dadv_popup () {
   GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
   GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;
   GtkObject *adj;
@@ -430,7 +430,7 @@ open_gtouradv_popup () {
 /*                              I/O events                              */
 /*----------------------------------------------------------------------*/
 
-static void gtour_io_cb (GtkWidget *w, gpointer *cbd) {
+static void tour2d_io_cb (GtkWidget *w, gpointer *cbd) {
   gchar *lbl = (gchar *) cbd;
   g_printerr ("cbd: %s\n", lbl);
 }
@@ -477,7 +477,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 }
 
 void
-gtour_event_handlers_toggle (splotd *sp, gboolean state) {
+tour2d_event_handlers_toggle (splotd *sp, gboolean state) {
   if (state == on) {
     sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                        "button_press_event",
@@ -497,36 +497,36 @@ gtour_event_handlers_toggle (splotd *sp, gboolean state) {
 /*                   Resetting the main menubar                         */
 /*----------------------------------------------------------------------*/
 
-GtkWidget *gtour_io_menu;
+GtkWidget *tour2d_io_menu;
 
 void
-gtour_menus_make () {
+tour2d_menus_make () {
   GtkWidget *item;
 
 /*
  * I/O menu
 */
-  gtour_io_menu = gtk_menu_new ();
+  tour2d_io_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Save coefficients");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (gtour_io_cb),
+                      GTK_SIGNAL_FUNC (tour2d_io_cb),
                       (gpointer) "write_coeffs");
-  gtk_menu_append (GTK_MENU (gtour_io_menu), item);
+  gtk_menu_append (GTK_MENU (tour2d_io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Save history");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (gtour_io_cb),
+                      GTK_SIGNAL_FUNC (tour2d_io_cb),
                       (gpointer) "write_history");
-  gtk_menu_append (GTK_MENU (gtour_io_menu), item);
+  gtk_menu_append (GTK_MENU (tour2d_io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Read history");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (gtour_io_cb),
+                      GTK_SIGNAL_FUNC (tour2d_io_cb),
                       (gpointer) "read_history");
-  gtk_menu_append (GTK_MENU (gtour_io_menu), item);
+  gtk_menu_append (GTK_MENU (tour2d_io_menu), item);
 
-  gtk_widget_show_all (gtour_io_menu);
+  gtk_widget_show_all (tour2d_io_menu);
 }
 
 /*----------------------------------------------------------------------*/

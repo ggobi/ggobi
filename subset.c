@@ -87,7 +87,7 @@ subset_apply (gboolean rescale_p) {
   }
 */
 
-  displays_reproject (REDISPLAY_ALL);
+  displays_tailpipe (REDISPLAY_ALL);
 
   /*-- for each plot?  for each plot in brushing mode? 
    * after the new screen coords are found --*/

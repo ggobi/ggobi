@@ -165,7 +165,7 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 
 void
-open_gtourpp_popup () {
+open_tour2dpp_popup () {
   GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *btn, *tgl, *entry;
   GtkWidget *da, *label, *hb, *opt;
 

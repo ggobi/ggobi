@@ -208,5 +208,5 @@ missing_rejitter () {
   missing_to_world ();
 
   /*-- redisplay only the missings displays --*/
-  displays_reproject (REDISPLAY_MISSING); 
+  displays_tailpipe (REDISPLAY_MISSING); 
 }

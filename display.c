@@ -337,7 +337,7 @@ displays_plot (splotd *splot) {
 
 /*-- reproject and replot all splots in display --*/
 void
-display_reproject (displayd *display) {
+display_tailpipe (displayd *display) {
   GList *splist = display->splots;
   splotd *sp;
   cpaneld *cpanel;
@@ -364,7 +364,7 @@ display_reproject (displayd *display) {
 
 /*-- Reproject and plot all plots in all displays: modulo missingness --*/
 void
-displays_reproject (gint which) {
+displays_tailpipe (gint which) {
   GList *dlist;
   displayd *display;
   gboolean redisplay = true;
@@ -378,7 +378,7 @@ displays_reproject (gint which) {
     }
 
     if (redisplay)
-      display_reproject (display);
+      display_tailpipe (display);
   }
 }
 

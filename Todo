@@ -1,15 +1,10 @@
-Bug: 
+Bugs: 
 
-the axes aren't being initialized properly for cloned variables.
+  the axes aren't being initialized properly for cloned variables.
+  still having problems with variable selection in scatterplot matrices
 
-still having problems with variable selection in scatterplot matrices
-
-! sphering labels aren't being reset
-
-! selected_variables_get isn't always right -- maybe it gets messed
-!   up after the clear?  (so maybe it's fixed)
-
-Find out how to handle threads!  and to generate signals, too.
+Find out how to handle threads
+Find out how to use signals
 
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
@@ -28,8 +23,34 @@ Brushing:
     glyph only
     glyph size only
 
-
-Use a notebook for the advanced tour panel
-
 Rename gtour_ui.c to tour2d_ui.c
-Rename display_reproject to display_tailpipe
+
+
+! Use a notebook for the advanced tour panel
+
+! Rename display_reproject to display_tailpipe
+
+! The parallel coordinates plot is drawing (not because it
+! receives an expose event, either) before it is configured --
+! that's why the lines aren't appearing
+  
+! Jittering doesn't know whether it's supposed to adjust
+! the column jitter value or the missing values jittering
+! factor.
+  
+! I've added an array to the missing values pipeline, but not
+! yet changed how missing_world_data is computed.
+  
+! Try to add the missings work without being too kludgey.
+  
+! The missing program doesn't pay attention to the .missing
+! file unless the file has an na in it.
+  
+! Noted in xgobi:  ashes are not being recomputed after a
+! transformation
+
+! sphering labels aren't being reset
+
+! selected_variables_get isn't always right -- maybe it gets messed
+!   up after the clear?  (so maybe it's fixed)
+

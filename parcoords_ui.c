@@ -30,7 +30,7 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   cpaneld *cpanel = &current_display->cpanel;
   cpanel->p1d_type = GPOINTER_TO_INT (cbd);
 
-  display_reproject (current_display);
+  display_tailpipe (current_display);
 }
 
 static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append"};

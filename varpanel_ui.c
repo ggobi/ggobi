@@ -67,7 +67,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 /* this is redrawing before it has the new window sizes, so the
  * lines aren't right */
   if (redraw) {
-    display_reproject (display);
+    display_tailpipe (display);
   }
 }
 
@@ -175,7 +175,7 @@ rotation_menu_build (gint jvar)
 }
 
 GtkWidget *
-gtour_menu_build (gint jvar)
+tour2d_menu_build (gint jvar)
 {
   GtkWidget *menu;
   static varseldatad vdata0, vdata1, vdata2;
@@ -311,7 +311,7 @@ popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd) {
               break;
             case TOUR2D:
             case COTOUR:
-              tour_menu = gtour_menu_build (jvar);
+              tour_menu = tour2d_menu_build (jvar);
               gtk_menu_popup (GTK_MENU (tour_menu), NULL, NULL, NULL, NULL,
                 bevent->button, bevent->time);
               break;

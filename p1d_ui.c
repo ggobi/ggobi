@@ -11,7 +11,7 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   cpaneld *cpanel = &current_display->cpanel;
   cpanel->p1d_type = GPOINTER_TO_INT (cbd);
 
-  display_reproject (current_display);
+  display_tailpipe (current_display);
 }
 
 static GtkObject *ash_smoothness_adj;
@@ -21,7 +21,7 @@ static void ash_smoothness_cb (GtkAdjustment *adj, gpointer cbd) {
   /*-- adj->value ranges from .01 to .5 --*/
   cpanel->nASHes = (gint) ((gfloat) cpanel->nbins * (adj->value / 2.0));
 
-  display_reproject (current_display);
+  display_tailpipe (current_display);
 }
 
 static GtkObject *cycle_speed_adj;

@@ -114,7 +114,7 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
       break;
 
     case TOUR2D:
-      gtour_event_handlers_toggle (sp, state);
+      tour2d_event_handlers_toggle (sp, state);
       break;
 
     case COTOUR:
