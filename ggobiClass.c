@@ -441,7 +441,7 @@ gtk_ggobi_time_series_display_get_type (void)
     {
       static const GtkTypeInfo data_info =
       {
-	"GtkGGobiTimeSerieDisplay",
+	"GtkGGobiTimeSeriesDisplay",
 	sizeof (timeSeriesDisplayd),
 	sizeof (GtkGGobiTimeSeriesDisplayClass),
 	(GtkClassInitFunc) timeSeriesClassInit,
