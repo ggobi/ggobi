@@ -368,7 +368,7 @@ void       splot_plane_to_screen (displayd *, cpaneld *, splotd *, ggobid *);
 void       splot_plane_to_world (splotd *, gint, ggobid *);
 gboolean   splot_plot_case (gint m, gboolean, datad *, splotd *, displayd *, ggobid *);
 void       splot_redraw (splotd *sp, RedrawStyle, ggobid *);
-void       splot_reverse_pipeline (splotd *, gint, lcoords *, gboolean, gboolean, ggobid *);
+void       splot_reverse_pipeline (splotd *, gint, gcoords *, gboolean, gboolean, ggobid *);
 void       splot_screen_to_tform (cpaneld *, splotd *, icoords *, fcoords *, ggobid *);
 void       splot_set_current (splotd *, gboolean, ggobid *);
 void       splot_set_plot_center (splotd *);
