@@ -85,6 +85,7 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
 	cp Install/bugTemplate.in $(TMP_INSTALL_DIR)/
 	cp Install/local.config.in $(TMP_INSTALL_DIR)/
 	cp VersionInfo $(TMP_INSTALL_DIR)/src
+	cp marshal.list GtkSignalDef.c $(TMP_INSTALL_DIR)/src
 	cp Makefile.win32 $(TMP_INSTALL_DIR)/src
 	if test -n "${DOC_FILES}" ; then cp $(DOC_FILES) $(TMP_INSTALL_DIR)/Docs ; fi
 	cp $(DATA_FILES) $(TMP_INSTALL_DIR)/data

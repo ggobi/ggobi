@@ -1,0 +1,19 @@
+\documentclass{article}
+
+\begin{document}
+
+Now we can specify a particular colorscheme to use in a GGobi instance
+(\Cstruct{ggobid}) directly within the XML data file.  We do this via
+the \XMLTag{activeColorScheme} tag/element which should be directly
+under the \XMLTag{ggobidata} (although this is not vital!).  This
+supports several different ways to specify the colorscheme.  The first
+is via attributes.  One can specify the name of an existing color
+scheme using the \XMLAttr{name} attribute.  The value should
+correspond the the \XMLAttr{name} value in the corresponding
+\XMLTag{colorscheme} tag in the file defining the color schemes.  If
+the scheme is not already defined by the default color scheme file
+given in the intialization, etc.  one can specify a file from which to
+read the schemes.
+
+
+\end{document}

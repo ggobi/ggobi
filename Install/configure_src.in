@@ -1,6 +1,6 @@
 dnl This is the configuration script for ggobi
 dnl to be used when installing it. (It is not 
-dnl necessarily used by in development versions.)
+dnl necessarily used in development versions.)
 
 dnl This tries to find the optional elements
 dnl of ggobi such as

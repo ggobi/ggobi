@@ -1,4 +1,13 @@
 GTK_CONFIG=@GTK_CONFIG@
+
+PKG_CONFIG=@PKG_CONFIG@
+
+GTK_CFLAGS=@GTK_CFLAGS@
+GTK_LIBS=@GTK_LIBS@
+GLIB_GENMARSHAL=@GLIB_GENMARSHAL@
+
+GTK_2=@GTK_2@
+
 CC=@CC@
 
 @USE_XML@
@@ -16,6 +25,7 @@ MV=@MV@
 LO_DIR=@LO_DIR@
 
 %.o: %.c
+	@echo "Making $@"
 	$(CC) $(CFLAGS) $(OTHER_CFLAGS) -c $< -o $@
 
 @c_rules_frag@

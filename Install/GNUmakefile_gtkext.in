@@ -2,18 +2,22 @@ TOP=../..
 
 include $(TOP)/Makeconf
 
-GTK_CONFIG=@GTK_CONFIG@
-CFLAGS=-I../include $(shell $(GTK_CONFIG) --cflags )
+#GTK_CONFIG=@GTK_CONFIG@
+CFLAGS=-I../include $(GTK_CFLAGS)
 
 # PIC_CFLAG=
 # SHLIB_LDFLAGS=
 
 SRC=\
-  gtkextruler.c \
-  gtkexthruler.c \
-  gtkextvruler.c \
   cokus.c \
   mt19937ar.c
+
+ifeq ($(GTK_2),)
+SRC+=\
+  gtkextruler.c \
+  gtkexthruler.c \
+  gtkextvruler.c 
+endif
 
 
 OBJ=$(SRC:%.c=%.o)

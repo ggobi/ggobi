@@ -121,12 +121,15 @@ ifdef USE_XML
 # -lxml2
 endif
 
+GTK_EXT_LD=-lgtkext
+
+
 
 OBJ=$(SRC:%.c=%.o)
 
-CFLAGS= @SRC_DEBUG@ -I../include -I../gtkext/include $(shell $(GTK_CONFIG) --cflags ) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ @DEFS@
+CFLAGS= @SRC_DEBUG@ -I../include -I../gtkext/include $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ @DEFS@
 
-LIBS=-L$(TOP)/lib -lgtkext $(XML_LIBS) $(shell $(GTK_CONFIG) --libs)
+LIBS=-L$(TOP)/lib $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS)
 
 ggobi $(TOP)/bin/ggobi.bin: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
@@ -136,7 +139,7 @@ lib libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
 
 
 ../bin/xmlConvert xmlConvert: xmlConvert.o libggobi.so
-	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi -lgtkext $(XML_LIBS) $(shell $(GTK_CONFIG) --libs) 
+	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS)
 
 
 clean:
@@ -146,3 +149,15 @@ clean:
 
 TAGS:
 	etags $(SRC) $(find ../include -name '*.h')
+
+
+marshal.h: marshal.list
+	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --header > $@
+
+marshal.c: marshal.list
+	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --body > $@
+
+ifneq ($(GTK_2),)
+ make_ggobi.o: marshal.h GtkSignalDef.c
+endif
+

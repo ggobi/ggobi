@@ -12,17 +12,21 @@ PLUGIN_DIRS=@PLUGIN_DIRS@
 
 CUR_DIR=$(shell pwd)
 
-all: lib/libgtkext.so bin/ggobi.bin @EMBED@ $(UTILS) @PACKAGES@ Plugins
+include Makeconf
+
+GTK_EXT=lib/libgtkext.so
+
+all: $(GTK_EXT) bin/ggobi.bin @EMBED@ $(UTILS) @PACKAGES@ Plugins
 
 .PHONY:	lib Rggobi Pythonggobi Perlggobi
 
 lib/libgtkext.so:
 	$(MAKE) -C gtkext/src install
 
-ggobi bin/ggobi.bin: lib/libgtkext.so 
+ggobi bin/ggobi.bin: $(GTK_EXT)
 	$(MAKE) -C src ../bin/ggobi.bin
 
-lib/libggobi.so lib: lib/libgtkext.so 
+lib/libggobi.so lib: $(GTK_EXT)
 	$(MAKE) -C src ../lib/libggobi.so
 
 

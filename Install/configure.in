@@ -69,11 +69,33 @@ AC_ARG_WITH(Perl,  --with-Perl      Install the Perlggobi module)
  dnl Check for gtk-config.
  dnl We are not going anywhere without that.
 
-AC_PATH_PROG(GTK_CONFIG, gtk-config, "<missing>", $PATH)
+AC_ARG_WITH(gtk2,  --with-gtk2      Configure using gtk+2 rather than gtk+-1.2)
 
-if test -z "${GTK_CONFIG}" || test "${GTK_CONFIG}" = "<missing>" ; then
- echo "Cannot find gtk-config"
- exit 1
+if test -n "${with_gtk2}" && test "${with_gtk2}" != "no" ; then
+ AC_PATH_PROG(PKG_CONFIG, pkg-config,, $PATH)
+ if test -z "${PKG_CONFIG}" ; then
+   echo "Cannot find pkg-config"
+   exit 2
+ fi
+  GTK_CFLAGS="\$(shell \${PKG_CONFIG} --cflags gtk+-2.0) -DGTK_2_0=1 -DGTK_ENABLE_BROKEN"
+  GTK_LIBS="\$(shell \${PKG_CONFIG} --libs gtk+-2.0)"
+  AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal, , $PATH)
+  GTK_2="yes"
+fi
+
+AC_SUBST(GTK_2)
+AC_SUBST(GLIB_GENMARSHAL)
+
+if test -z "${PKG_CONFIG}" ; then
+ AC_PATH_PROG(GTK_CONFIG, gtk-config, "<missing>", $PATH)
+ if test -z "${GTK_CONFIG}" || test "${GTK_CONFIG}" = "<missing>" ; then
+   echo "Cannot find gtk-config"
+   exit 1
+ fi
+
+echo "Setting gtk flags"
+ GTK_CFLAGS="\$(shell \${GTK_CONFIG} --cflags)"
+ GTK_LIBS="\$(shell \${GTK_CONFIG} --libs)"
 fi
 
 AC_PATH_PROG(UNAME, uname)
@@ -84,7 +106,6 @@ fi
 
 DEFAULT_LIB_DIRS="/usr/lib /usr/local/lib /opt/lib"
 DEFAULT_INC_DIRS="/usr/include /usr/local/include /usr/local/src/include /usr/include/gnome-xml"
-
 
 AC_PROG_CC
 
@@ -383,6 +404,9 @@ AC_SUBST(MINOR_VERSION)
 AC_SUBST(PATCH_LEVEL)
 
 AC_SUBST(GTK_CONFIG)
+
+AC_SUBST(GTK_CFLAGS)
+AC_SUBST(GTK_LIBS)
 
 if test -n "${enable_debug}" && test "${enable_debug}" != "no" ;  then
  SRC_DEBUG="-g"
