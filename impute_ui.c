@@ -1,4 +1,4 @@
-/* impute_ui.c */
+/* impute_ui.c */  /*-- should be called missing_ui.c --*/
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
@@ -40,6 +40,15 @@ static void rescale_cb (GtkButton *button, ggobid *gg)
 static void group_cb (GtkToggleButton *button, ggobid *gg)
 {
   gg->impute.bgroup_p = button->active;
+}
+static void 
+show_missings_cb (GtkToggleButton *button, ggobid *gg)
+{
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->impute.window));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+
+  d->missings_show_p = button->active;
+  displays_tailpipe (FULL, gg);
 }
 
 static void
@@ -100,12 +109,21 @@ impute_window_open (ggobid *gg)
     vbox = gtk_vbox_new (false, 2);
     gtk_container_add (GTK_CONTAINER (gg->impute.window), vbox);
 
+    /*-- Add a toggle button, show missings or not --*/
+    tgl = gtk_check_button_new_with_label ("Show missing values");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(tgl), on);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
+      "Draw the missing values when plotting",
+      NULL);
+    gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
+      GTK_SIGNAL_FUNC (show_missings_cb), (gpointer) gg);
+    gtk_box_pack_start (GTK_BOX (vbox), tgl, true, true, 2);
+
+
     /*-- add a button to generate a new datad --*/
     btn = gtk_button_new_with_label ("Add missings as new dataset");
     gtk_signal_connect (GTK_OBJECT (btn),
-                        "clicked",
-                        GTK_SIGNAL_FUNC (missings_datad_cb),
-                        (gpointer) gg);
+      "clicked", GTK_SIGNAL_FUNC (missings_datad_cb), (gpointer) gg);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Generate a new dataset from the 1's and 0's representing missingness",
       NULL);
