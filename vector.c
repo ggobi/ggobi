@@ -73,6 +73,31 @@ vectorf_realloc (vector_f *vecp, gint nels)
   vecp->nels = nels;
 }
 
+void
+vectorf_delete_els (vector_f *vecp, gint nels, gint *els)
+{
+  gint k;
+  gint jto, jfrom;
+  gint *keepers = g_malloc ((vecp->nels - nels) * sizeof (gint));
+  gint nkeepers = find_keepers (vecp->nels, nels, els, keepers);
+
+  if (nels > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      jto = k;
+      jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
+      if (jto != jfrom)
+        vecp->vals[jto] = vecp->vals[jfrom];
+    }
+
+    vecp->vals = (gfloat *) g_realloc (vecp->vals,
+                                       nkeepers * sizeof (gfloat));
+    vecp->nels = nkeepers;
+  }
+  g_free (keepers);
+}
+
 /* allocate a floating point vector populated with 0 */
 void
 vectorf_alloc_zero (vector_f *vecp, gint nels)
@@ -169,6 +194,31 @@ vectori_realloc (vector_i *vecp, gint nels)
   }
 
   vecp->nels = nels;
+}
+
+void
+vectori_delete_els (vector_i *vecp, gint nels, gint *els)
+{
+  gint k;
+  gint jto, jfrom;
+  gint *keepers = g_malloc ((vecp->nels - nels) * sizeof (gint));
+  gint nkeepers = find_keepers (vecp->nels, nels, els, keepers);
+
+  if (nels > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      jto = k;
+      jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
+      if (jto != jfrom)
+        vecp->vals[jto] = vecp->vals[jfrom];
+    }
+
+    vecp->vals = (gint *) g_realloc (vecp->vals,
+                                     nkeepers * sizeof (gint));
+    vecp->nels = nkeepers;
+  }
+  g_free (keepers);
 }
 
 void

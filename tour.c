@@ -101,47 +101,44 @@ alloc_tour (displayd *dsp, ggobid *gg)
 
 }
 
+/*-- eliminate the nc columns contained in *cols --*/
 void
-realloc_tour_up(displayd *dsp, ggobid *gg)
+tour_realloc_down (gint nc, gint *cols, displayd *dsp, ggobid *gg)
 {
-  datad *d = dsp->d;
-  gint nc = d->ncols;
+  arrayf_delete_cols (&dsp->u0, nc, cols);
+  arrayf_delete_cols (&dsp->u1, nc, cols);
+  arrayf_delete_cols (&dsp->u, nc, cols);
+  arrayf_delete_cols (&dsp->uold, nc, cols);
+  arrayf_delete_cols (&dsp->v0, nc, cols);
+  arrayf_delete_cols (&dsp->v1, nc, cols);
+  arrayf_delete_cols (&dsp->v, nc, cols);
+  arrayf_delete_cols (&dsp->uvevec, nc, cols);
+  arrayf_delete_cols (&dsp->tv, nc, cols);
 
-  arrayf_add_cols(&dsp->u0, nc);
-  arrayf_add_cols(&dsp->u1, nc);
-  arrayf_add_cols(&dsp->u, nc);
-  arrayf_add_cols(&dsp->uold, nc);
-  arrayf_add_cols(&dsp->v0, nc);
-  arrayf_add_cols(&dsp->v1, nc);
-  arrayf_add_cols(&dsp->v, nc);
-  arrayf_add_cols(&dsp->uvevec, nc);
-  arrayf_add_cols(&dsp->tv, nc);
-  vectori_realloc(&dsp->tour_vars, nc);
-  vectorf_realloc(&dsp->lambda, nc);
-  vectorf_realloc(&dsp->tau, nc);
-  vectorf_realloc(&dsp->tinc, nc);
+  vectori_delete_els (&dsp->tour_vars, nc, cols);
+  vectorf_delete_els (&dsp->lambda, nc, cols);
+  vectorf_delete_els (&dsp->tau, nc, cols);
+  vectorf_delete_els (&dsp->tinc, nc, cols);
 }
 
+/*-- append columns for a total of nc columns --*/
 void
-realloc_tour_down(displayd *dsp, ggobid *gg, gint *cols)
+tour_realloc_up (gint nc, displayd *dsp, ggobid *gg)
 {
-  datad *d = dsp->d;
-  gint nc = d->ncols;
+  arrayf_add_cols (&dsp->u0, nc);
+  arrayf_add_cols (&dsp->u1, nc);
+  arrayf_add_cols (&dsp->u, nc);
+  arrayf_add_cols (&dsp->uold, nc);
+  arrayf_add_cols (&dsp->v0, nc);
+  arrayf_add_cols (&dsp->v1, nc);
+  arrayf_add_cols (&dsp->v, nc);
+  arrayf_add_cols (&dsp->uvevec, nc);
+  arrayf_add_cols (&dsp->tv, nc);
 
-  arrayf_delete_cols(&dsp->u0, nc, cols);
-  arrayf_delete_cols(&dsp->u1, nc, cols);
-  arrayf_delete_cols(&dsp->u, nc, cols);
-  arrayf_delete_cols(&dsp->uold, nc, cols);
-  arrayf_delete_cols(&dsp->v0, nc, cols);
-  arrayf_delete_cols(&dsp->v1, nc, cols);
-  arrayf_delete_cols(&dsp->v, nc, cols);
-  arrayf_delete_cols(&dsp->uvevec, nc, cols);
-  arrayf_delete_cols(&dsp->tv, nc, cols);
-
-  vectori_realloc(&dsp->tour_vars, nc);
-  vectorf_realloc(&dsp->lambda, nc);
-  vectorf_realloc(&dsp->tau, nc);
-  vectorf_realloc(&dsp->tinc, nc);
+  vectori_realloc (&dsp->tour_vars, nc);
+  vectorf_realloc (&dsp->lambda, nc);
+  vectorf_realloc (&dsp->tau, nc);
+  vectorf_realloc (&dsp->tinc, nc);
 }
 
 void

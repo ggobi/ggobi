@@ -140,7 +140,7 @@ arrayf_delete_cols (array_f *arrp, gint nc, gint *cols)
       jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
       if (jto != jfrom) {
         for (i=0; i<arrp->nrows; i++)
-          arrp->vals[i][jto] = arrp->vals[i][jto];
+          arrp->vals[i][jto] = arrp->vals[i][jfrom];
       }
     }
 
@@ -149,6 +149,7 @@ arrayf_delete_cols (array_f *arrp, gint nc, gint *cols)
                                             nkeepers * sizeof (gfloat));
     arrp->ncols = nkeepers;
   }
+  g_free (keepers);
 }
 
 void
@@ -292,7 +293,7 @@ arrays_delete_cols (array_s *arrp, gint nc, gint *cols)
       jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
       if (jto != jfrom) {
         for (i=0; i<arrp->nrows; i++)
-          arrp->vals[i][jto] = arrp->vals[i][jto];
+          arrp->vals[i][jto] = arrp->vals[i][jfrom];
       }
     }
 
@@ -301,6 +302,8 @@ arrays_delete_cols (array_s *arrp, gint nc, gint *cols)
                                             nkeepers * sizeof (gshort));
     arrp->ncols = nkeepers;
   }
+
+  g_free (keepers);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -426,7 +429,7 @@ arrayl_delete_cols (array_l *arrp, gint nc, gint *cols)
       jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
       if (jto != jfrom) {
         for (i=0; i<arrp->nrows; i++)
-          arrp->vals[i][jto] = arrp->vals[i][jto];
+          arrp->vals[i][jto] = arrp->vals[i][jfrom];
       }
     }
 
@@ -435,4 +438,5 @@ arrayl_delete_cols (array_l *arrp, gint nc, gint *cols)
                                            nkeepers * sizeof (glong));
     arrp->ncols = nkeepers;
   }
+  g_free (keepers);
 }
