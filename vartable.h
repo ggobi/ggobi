@@ -32,10 +32,9 @@ enum {CAT_CLIST_VARNO, CAT_CLIST_VARNAME, CAT_CLIST_NLEVELS,
 
 
 typedef enum {ADDVAR_ROWNOS = 0, ADDVAR_BGROUP} NewVariableType; 
-#if 0
-#define ADDVAR_ROWNOS   0
-#define ADDVAR_BGROUP   1
-#endif
+
+extern const double AddVarRowNumbers;
+extern const double AddVarBrushGroup;
 
 typedef enum {real, categorical, integer, counter, uniform, all_vartypes} vartyped;
 

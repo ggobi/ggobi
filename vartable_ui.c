@@ -390,7 +390,9 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
   }
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 0) {
-    newvar_add (vtype, vname, d, gg);
+     newvar_add_with_values(vtype == ADDVAR_BGROUP ? &AddVarBrushGroup : &AddVarRowNumbers,
+                            d->nrows, vname, real,
+                            0, NULL, NULL, NULL, d, gg); 
 
 /* I think we still want to do this ... */
 #ifdef FORMERLY

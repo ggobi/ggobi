@@ -322,7 +322,6 @@ void       movepts_history_add (gint id, splotd *sp, datad *, ggobid *);
 void       movepts_history_delete_last (datad *, ggobid *);
 gdouble    myrint (gdouble x);
 gint       ndatad_with_vars_get (ggobid *gg);
-void       newvar_add (NewVariableType vtype, gchar *vname, datad *d, ggobid *gg);
 void       newvar_add_with_values (gdouble *, gint, gchar *, vartyped type, gint nlevels, gchar **level_names, gint *level_values, gint *level_counts, datad *, ggobid *);
 void       norm (gdouble *, gint);
 gint       option_menu_index (GtkOptionMenu *);

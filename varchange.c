@@ -20,6 +20,10 @@
 #include "vartable.h"
 
 
+const double AddVarRowNumbers = -1.0;
+const double AddVarBrushGroup = -1.0;
+
+
 static void
 addvar_vartable_expand (gint ncols, datad *d, ggobid *gg)
 {
@@ -88,53 +92,7 @@ addvar_propagate (gint ncols_prev, gint ncols_added, datad *d, ggobid *gg)
 }
 
 
-/*
- * Under construction
- * Routine used to add a new variable: defined by brushing
- * groups, for example, or perhaps just the row numbers.
-*/
-void
-newvar_add (NewVariableType vtype, gchar *vname, datad *d, ggobid *gg)
-{
-  gint i;
-  gint d_ncols_prev = d->ncols;
-  gint jvar = d_ncols_prev;
-  vartabled *vt;
 
-  addvar_vartable_expand (1, d, gg);  /*-- add one variable --*/
-
-  d->ncols += 1;
-  addvar_pipeline_realloc (d, gg);
-
-  if (vtype == ADDVAR_ROWNOS) {
-    for (i=0; i<d->nrows; i++)
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) (i+1);
-  } else if (vtype == ADDVAR_BGROUP) {
-    clusters_set (d, gg);
-    for (i=0; i<d->nrows; i++)
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] =
-        (gfloat) d->clusterid.els[i];
-  }
-  
-  vt = vartable_element_get (jvar, d);
-  /*-- update the vartable struct --*/
-  limits_set_by_var (jvar, true, true, d, gg);
-  vt->collab = vt->collab_tform = g_strdup (vname);
-  if (vtype == ADDVAR_ROWNOS)
-    vt->vartype = counter;
-  /*-- the other should be categorical, eventually, and the
-       level names could be color and glyph names if we had them --*/
-  /*-- --*/
-
-  /*-- run the data through the head of the pipeline --*/
-  tform_to_world_by_var (jvar, d, gg);
-
-  addvar_propagate (d_ncols_prev, 1, d, gg);
-
-  /*-- emit variable_added signal --*/
-  gtk_signal_emit (GTK_OBJECT (gg),
-                   GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, d->ncols-1, d); 
-}
 
 /*
  * The first argument is gdouble because this is only used from
@@ -143,10 +101,10 @@ newvar_add (NewVariableType vtype, gchar *vname, datad *d, ggobid *gg)
 */
 void
 newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
-  vartyped type,
-    /*-- if categorical, we need ... --*/
-    gint nlevels, gchar **level_names, gint *level_values, gint *level_counts,
-  datad *d, ggobid *gg)
+			vartyped type,
+			/*-- if categorical, we need ... --*/
+			gint nlevels, gchar **level_names, gint *level_values, gint *level_counts,
+			datad *d, ggobid *gg)
 {
   gint i;
   gint d_ncols_prev = d->ncols;
@@ -167,7 +125,11 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   addvar_pipeline_realloc (d, gg);
 
   for (i=0; i<d->nrows; i++) {
-    if(GGobiMissingValue && GGobiMissingValue(vals[i]))
+     if(vals == &AddVarRowNumbers) {
+      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) (i+1);
+    } else if(vals == &AddVarBrushGroup) {
+      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) d->clusterid.els[i];
+    } else if(GGobiMissingValue && GGobiMissingValue(vals[i]))
       setMissingValue(i, jvar, d, vt);
     else
       d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
@@ -176,8 +138,8 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   /*-- update the vartable struct --*/
   limits_set_by_var (jvar, true, true, d, gg);
   limits_display_set_by_var (jvar, d, gg);
-g_printerr ("jvar %d tform min %f display min %f\n",
-jvar, vt->lim_tform.min, vt->lim_display.min);
+
+
   /*-- run the data through the head of the pipeline --*/
   tform_to_world_by_var (jvar, d, gg);
 
