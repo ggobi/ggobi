@@ -287,4 +287,13 @@ brush_activate (gboolean state, datad *d, ggobid *gg)
 {
   if (state)
     assign_points_to_bins (d, gg);
+
+  else {
+    /*
+     * If transient brushing, restore the color of the transiently
+     * brushed points to their previous color
+    */
+    extern void reinit_transient_brushing (datad *, ggobid *);
+    reinit_transient_brushing (d, gg);
+  }
 }

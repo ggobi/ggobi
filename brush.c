@@ -107,9 +107,9 @@ reinit_transient_brushing (datad *d, ggobid *gg)
 /*
  * If a new variable is selected or a variable is transformed
  * during transient brushing, restore all points to the permanent
- * value, and then re-execute brush_once() to brush the points that
- * are now underneath the brush.  For now, don't make the
- * same change for persistent brushing.
+ * value.  After calling this routine, re-execute brush_once() to
+ * brush the points that are now underneath the brush.  For now,
+ * don't make the same change for persistent brushing.
 */
   gint i, m, k;
   displayd *dsp = gg->current_display;
@@ -139,7 +139,9 @@ reinit_transient_brushing (datad *d, ggobid *gg)
     }
   }
 
-  brush_once (false, d, gg);
+/*
+    brush_once (false, d, gg);
+*/
 }
 
 void

@@ -66,14 +66,16 @@ rowlabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
   if (init)
     rowlabels_alloc (d, gg);
 
-  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
-  if(fileName == NULL)
-    return(false);
+  fileName = findAssociatedFile (desc, suffixes,
+    sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  if (fileName == NULL)
+    found = false;
 
   if( ( fp = fopen(fileName, "r") ) == NULL ) {
     g_free(fileName);
-    return(false);
+    found = false;
   }
+
   /*
    * Read in case labels or initiate them to generic if no label
    * file exists

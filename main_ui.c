@@ -478,6 +478,9 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
 
   if (state == off) {
     switch (m) {
+      case BRUSH:
+        brush_activate (state, d, gg);
+      break;
       default:
       break;
     }
