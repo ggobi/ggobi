@@ -10,18 +10,6 @@
 extern "C" {
 #endif
 
-/*
-void       checkbox_delete_nth (gint jvar, datad *);
-void       varlabel_set (gint, datad *);
-void       varpanel_checkboxes_add (gint, datad *d, ggobid *gg);
-void       varpanel_checkboxes_populate (datad *, ggobid *);
-*/
-
-void       varpanel_label_set (gint, datad *);
-void       varpanel_delete_nth (gint jvar, datad *d);
-void       varpanel_widgets_add (gint nc, datad *d, ggobid *gg);
-void       varpanel_populate (datad *, ggobid *);
-
 /* sort +1 */
 void       GGobi_widget_set (GtkWidget *, ggobid *gg, gboolean isWindow);
 gint       alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
@@ -132,6 +120,8 @@ void       cpanel_xyplot_set (cpaneld *, ggobid *);
 void       ctour_event_handlers_toggle (splotd *, gboolean);
 void       ctourpp_window_open (ggobid *);
 void       datad_free (datad *, ggobid *);
+gboolean   datad_has_edges (datad *d);
+gboolean   datad_has_variables (datad *d);
 gint       delete_vars (gint *, gint, datad *, ggobid *);
 void       disconnect_button_press_signal (splotd *sp);
 void       disconnect_button_release_signal (splotd *sp);
@@ -405,11 +395,15 @@ void       variable_clone (gint, const gchar *, gboolean, datad *, ggobid *);
 void       variable_notebook_subwindow_add (datad *d, GtkSignalFunc func, GtkWidget *notebook, ggobid *gg);
 void       variable_notebook_varchange_cb (GtkObject *obj, vartabled *vt, ggobid *gg, GtkWidget *notebook);
 void       varpanel_clear (datad *, ggobid *);
+void       varpanel_delete_nth (gint jvar, datad *d);
+void       varpanel_label_set (gint, datad *);
 void       varpanel_make (GtkWidget *, ggobid *);
+void       varpanel_populate (datad *, ggobid *);
 void       varpanel_refresh (displayd *, ggobid *);
 void       varpanel_reinit (ggobid *gg);
 void       varpanel_show_page (displayd*, ggobid*);
 void       varpanel_tooltips_set (displayd *, ggobid *);
+void       varpanel_widgets_add (gint nc, datad *d, ggobid *gg);
 void       vars_stdized_send_event (datad *d, ggobid *gg);
 void       varsel (cpaneld *, splotd *, gint jvar, gint btn, gint alt_mod, gint ctrl_mod, gint shift_mod, datad *, ggobid *);
 void       vartable_alloc (datad *);
