@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+extern void position_popup_menu (GtkMenu *menu, gint *px, gint *py, gpointer);
 extern void impute_random (datad *, ggobid *);
 extern gboolean impute_fixed (gint, datad *, ggobid *);
 extern void filename_get_r (ggobid *, guint, GtkWidget *);

@@ -97,7 +97,7 @@ varsel_from_menu (GtkWidget *w, gpointer data)
 }
 
 GtkWidget *
-p1d_menu_build (gint jvar, ggobid *gg)
+p1d_menu_build (gint jvar, datad *d, ggobid *gg)
 {
   GtkWidget *menu;
 
@@ -109,6 +109,7 @@ p1d_menu_build (gint jvar, ggobid *gg)
   gg->p1d_menu.vdata1.btn = 2;
 
   menu = gtk_menu_new ();
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
 
   CreateMenuItem (menu, "Select X    L",
     NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
@@ -122,7 +123,7 @@ p1d_menu_build (gint jvar, ggobid *gg)
 }
 
 GtkWidget *
-xyplot_menu_build (gint jvar, ggobid *gg)
+xyplot_menu_build (gint jvar, datad *d, ggobid *gg)
 {
   GtkWidget *menu;
 
@@ -137,6 +138,7 @@ xyplot_menu_build (gint jvar, ggobid *gg)
   gg->xyplot_menu.vdata1.gg = gg;
 
   menu = gtk_menu_new ();
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
 
   CreateMenuItem (menu, "Select X    L",
     NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
@@ -150,7 +152,7 @@ xyplot_menu_build (gint jvar, ggobid *gg)
 }
 
 GtkWidget *
-rotation_menu_build (gint jvar, ggobid *gg)
+rotation_menu_build (gint jvar, datad *d, ggobid *gg)
 {
   GtkWidget *menu;
   
@@ -169,6 +171,8 @@ rotation_menu_build (gint jvar, ggobid *gg)
     gg->rotation_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
+
   CreateMenuItem (menu, "Select X  L",
     NULL, NULL, gg->varpanel_ui.varpanel,
     gg->varpanel_ui.varpanel_accel_group,
@@ -189,7 +193,7 @@ rotation_menu_build (gint jvar, ggobid *gg)
 }
 
 GtkWidget *
-tour2d_menu_build (gint jvar, ggobid *gg)
+tour2d_menu_build (gint jvar, datad *d, ggobid *gg)
 {
   GtkWidget *menu;
 
@@ -208,6 +212,8 @@ tour2d_menu_build (gint jvar, ggobid *gg)
     gg->tour2d_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
+
   CreateMenuItem (menu, "Tour   L,M",
     NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
     GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->tour2d_menu.vdata0, gg);
@@ -238,7 +244,7 @@ tour2d_menu_build (gint jvar, ggobid *gg)
 */
 
 GtkWidget *
-parcoords_menu_build (gint jvar, ggobid *gg)
+parcoords_menu_build (gint jvar, datad *d, ggobid *gg)
 {
   GtkWidget *menu;
 
@@ -251,6 +257,8 @@ parcoords_menu_build (gint jvar, ggobid *gg)
   gg->parcoords_menu.vdata1.gg = gg->parcoords_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
+
   CreateMenuItem (menu, "Select Y      M,R",
     NULL, NULL, gg->varpanel_ui.varpanel,
     gg->varpanel_ui.varpanel_accel_group,
@@ -266,7 +274,7 @@ parcoords_menu_build (gint jvar, ggobid *gg)
 }
 
 GtkWidget *
-scatmat_menu_build (gint jvar, ggobid *gg)
+scatmat_menu_build (gint jvar, datad *d, ggobid *gg)
 {
   GtkWidget *menu;
 
@@ -291,6 +299,8 @@ scatmat_menu_build (gint jvar, ggobid *gg)
     gg->scatmat_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
+
   CreateMenuItem (menu, "Select row  L",
     NULL, NULL, gg->varpanel_ui.varpanel,
     gg->varpanel_ui.varpanel_accel_group,
@@ -320,6 +330,7 @@ popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   displayd *display = gg->current_display;
+  datad *d = display->d;
   cpaneld *cpanel;
   gint jvar = GPOINTER_TO_INT (cbd);
   GtkWidget *p1d_menu, *xyplot_menu;
@@ -341,38 +352,44 @@ popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd)
         case scatterplot:
           switch (projection) {
             case P1PLOT:
-              p1d_menu = p1d_menu_build (jvar, gg);
-              gtk_menu_popup (GTK_MENU (p1d_menu), NULL, NULL, NULL, NULL,
+              p1d_menu = p1d_menu_build (jvar, d, gg);
+              gtk_menu_popup (GTK_MENU (p1d_menu), NULL, NULL,
+                position_popup_menu, NULL,
                 bevent->button, bevent->time);
               break;
             case XYPLOT:
-              xyplot_menu = xyplot_menu_build (jvar, gg);
-              gtk_menu_popup (GTK_MENU (xyplot_menu), NULL, NULL, NULL, NULL,
+              xyplot_menu = xyplot_menu_build (jvar, d, gg);
+              gtk_menu_popup (GTK_MENU (xyplot_menu), NULL, NULL,
+                position_popup_menu, NULL,
                 bevent->button, bevent->time);
               break;
             case ROTATE:
-              rotation_menu = rotation_menu_build (jvar, gg);
-              gtk_menu_popup (GTK_MENU (rotation_menu), NULL, NULL, NULL, NULL,
+              rotation_menu = rotation_menu_build (jvar, d, gg);
+              gtk_menu_popup (GTK_MENU (rotation_menu), NULL, NULL,
+                position_popup_menu, NULL,
                 bevent->button, bevent->time);
               break;
             case TOUR2D:
             case COTOUR:
-              tour_menu = tour2d_menu_build (jvar, gg);
-              gtk_menu_popup (GTK_MENU (tour_menu), NULL, NULL, NULL, NULL,
+              tour_menu = tour2d_menu_build (jvar, d, gg);
+              gtk_menu_popup (GTK_MENU (tour_menu), NULL, NULL,
+                position_popup_menu, NULL,
                 bevent->button, bevent->time);
               break;
           }
           break;
 
         case scatmat:
-          scatmat_menu = scatmat_menu_build (jvar, gg);
-          gtk_menu_popup (GTK_MENU (scatmat_menu), NULL, NULL, NULL, NULL,
+          scatmat_menu = scatmat_menu_build (jvar, d, gg);
+          gtk_menu_popup (GTK_MENU (scatmat_menu), NULL, NULL,
+                position_popup_menu, NULL,
             bevent->button, bevent->time);
           break;
 
         case parcoords:
-          parcoords_menu = parcoords_menu_build (jvar, gg);
-          gtk_menu_popup (GTK_MENU (parcoords_menu), NULL, NULL, NULL, NULL,
+          parcoords_menu = parcoords_menu_build (jvar, d, gg);
+          gtk_menu_popup (GTK_MENU (parcoords_menu), NULL, NULL,
+                position_popup_menu, NULL,
             bevent->button, bevent->time);
           break;
       }

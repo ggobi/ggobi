@@ -6,20 +6,6 @@
 
 static GtkWidget *display_menu_item;
 
-/*-- I should use this in the variable selection panel, too --*/
-void
-set_position (GtkMenu *menu, gint *px, gint *py, gpointer data)
-{
-  gint w, h;
-  GtkWidget *top = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT (menu), "top");
-
-  gdk_window_get_size (top->window, &w, &h);
-  gdk_window_get_origin (top->window, px, py);
-
-  *py += h;
-}
-
 
 static void
 display_open_cb (GtkWidget *w, datad *d)
@@ -189,7 +175,7 @@ display_menu_open (GtkWidget *w, GdkEvent *event, ggobid *gg)
     if (bevent->button == 1) {
       display_menu = display_menu_build (gg);
       gtk_menu_popup (GTK_MENU (display_menu), NULL, NULL,
-        set_position, gg,
+        position_popup_menu, gg,
         bevent->button, bevent->time);
 
       return true;
@@ -206,17 +192,8 @@ display_menu_init (ggobid *gg)
   gtk_signal_connect (GTK_OBJECT (display_menu_item),
     "button_press_event",
     GTK_SIGNAL_FUNC (display_menu_open), (gpointer) gg);
+
   gtk_widget_show (display_menu_item);
 
   submenu_insert (display_menu_item, gg->main_menubar, 1);
-
-/*
-  GtkWidget *submenu = gtk_menu_new ();
-  GtkWidget *mi = gtk_menu_item_new_with_label ("Scatterplot");
-  gtk_menu_append (GTK_MENU (submenu), mi);
-  gtk_widget_show (submenu);
-  gtk_widget_show (mi);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu_top), submenu);
-*/
 }

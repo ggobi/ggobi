@@ -131,6 +131,13 @@ struct _ggobid {
 
 /*--------------------------- jittering --------------------------------*/
 
+ struct _JitterUI {
+   GtkWidget *window;
+
+   /*-- a pointer to be compared with current_display->d --*/
+   datad *d;
+ } jitter_ui;
+
 /*------------------------- writing out data ---------------------------*/
 
  struct _Save {

@@ -441,34 +441,36 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
                           (gpointer) gg->subset_ui.bsize);
     }
 
+
+    /*
+     * In case this is a different d than was used the last time
+     * the subset panel was opened, attach the right adjustments
+     * to the spin_buttons.
+    */
+    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bstart),
+                                    d->subset.bstart_adj);
+    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bsize),
+                                    d->subset.bsize_adj);
+                                   
+    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bstart_incr),
+                                    d->subset.bstart_incr_adj);
+    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bsize_incr),
+                                    d->subset.bsize_incr_adj);
+
+    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.estart),
+                                    d->subset.estart_adj);
+    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.estep),
+                                    d->subset.estep_adj);
+
+    /*-- ... and set the values of the text entries, too --*/
+    gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.random_entry),
+      g_strdup_printf ("%d", d->subset.random_n));
+    gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.nrows_entry),
+      g_strdup_printf ("%d", d->nrows));
+    /*-- --*/
+
+    gtk_widget_show_all (gg->subset_ui.window);
   }
 
-  /*
-   * In case this is a different d than was used the last time
-   * the subset panel was opened, attach the right adjustments
-   * to the spin_buttons.
-  */
-  gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bstart),
-                                  d->subset.bstart_adj);
-  gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bsize),
-                                  d->subset.bsize_adj);
-                                   
-  gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bstart_incr),
-                                  d->subset.bstart_incr_adj);
-  gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bsize_incr),
-                                  d->subset.bsize_incr_adj);
-
-  gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.estart),
-                                  d->subset.estart_adj);
-  gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.estep),
-                                  d->subset.estep_adj);
-
-  /*-- ... and set the values of the text entries, too --*/
-  gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.random_entry),
-    g_strdup_printf ("%d", d->subset.random_n));
-  gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.nrows_entry),
-    g_strdup_printf ("%d", d->nrows));
-  /*-- --*/
-
-  gtk_widget_show_all (gg->subset_ui.window);
+  gdk_window_raise (gg->subset_ui.window->window);
 }

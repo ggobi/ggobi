@@ -18,8 +18,8 @@ various stuff not yet implemented:
   moving points
   the sphering transformation as it has been updated in xgobi
 
-brush_pos should be per-display.  when brushing or identifying in
-  parcoords, use leave/enter events to change the current_splot.
+when brushing or identifying in parcoords, use leave/enter events to
+  change the current_splot.
 
 exclusion:  rebuilding the table on the fly
 
@@ -129,3 +129,6 @@ Food for thought:
 ! (upper left) corner.
 
 ! sticky labels -- just draw them without the underline and the diamond
+
+! brush_pos should be per-display.  -- in fact made it per-splot
+

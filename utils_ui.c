@@ -262,3 +262,17 @@ submenu_destroy (GtkWidget *item) {
   gtk_widget_hide (item);
   gtk_widget_destroy (item);
 }
+
+void
+position_popup_menu (GtkMenu *menu, gint *px, gint *py, gpointer data)
+{
+  gint w, h;
+  GtkWidget *top = (GtkWidget *)
+    gtk_object_get_data (GTK_OBJECT (menu), "top");
+
+  gdk_window_get_size (top->window, &w, &h);
+  gdk_window_get_origin (top->window, px, py);
+
+  *py += h;
+}
+
