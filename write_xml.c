@@ -284,7 +284,7 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
   }
 
   /*-- edges if present and requested --*/
-  if (gg->save.edges_p && d->edge.n && i <= d->edge.n) {
+  if (gg->save.edges_p && d->edge.n && i < d->edge.n) {
     fprintf(f, " source=\"%s\"", d->edge.sym_endpoints[i].a);
     fprintf(f, " destination=\"%s\"", d->edge.sym_endpoints[i].b);
   }
