@@ -226,7 +226,7 @@ vc_identity_p (gfloat **matrx, gint n)
 */
 gboolean sphere_svd (datad *d, ggobid *gg)
 {
-  gint i, j, rank;
+  gint i, j, k, rank;
   gboolean vc_equals_I = vc_identity_p (d->sphere.eigenvec,
                                         d->sphere.nvars);
   paird *pairs = (paird *) g_malloc (d->sphere.nvars * sizeof (paird));
@@ -248,17 +248,19 @@ gboolean sphere_svd (datad *d, ggobid *gg)
 
   /*-- obtain ranks to use in sorting eigenvals and eigenvec --*/
   for (i=0; i<d->sphere.nvars; i++) {
-    pairs[i].f = d->sphere.vars[i];
+    pairs[i].f = (gfloat) d->sphere.eigenval[i];  /*-- dfs --*/
     pairs[i].indx = i;
   }
   qsort ((gchar *) pairs, d->sphere.nvars, sizeof (paird), pcompare);
 
   /*-- sort the eigenvalues and eigenvectors into temporary arrays --*/
   for (i=0; i<d->sphere.nvars; i++) {
+    k = (d->sphere.nvars - i) - 1;  /*-- to reverse the order --*/
     rank = pairs[i].indx;
-    e[i] = d->sphere.eigenval[rank];
-    for (j=0; j<d->sphere.nvars; j++)
-      b[i][j] = d->sphere.eigenvec[rank][j];
+    e[k] = d->sphere.eigenval[rank];
+    for (j=0; j<d->sphere.nvars; j++) {
+      b[k][j] = d->sphere.eigenvec[rank][j];
+    }
   }
   /*-- copy the sorted eigenvalues and eigenvectors back --*/
   for (i=0; i<d->sphere.nvars; i++) {
