@@ -24,3 +24,6 @@ createDist:: $(JAVA_CODE) GGobi.jar
 	cp $(JAVA_CODE) $(INSTALL_DIR)/$(DIR_NAME)/ggobi
 	cp GGobi.jar $(INSTALL_DIR)/$(DIR_NAME)
 	cp vendor.class $(INSTALL_DIR)/$(DIR_NAME)
+	cp setLD.csh.in setLD.bsh.in plugin.xml.in $(INSTALL_DIR)/$(DIR_NAME)
+	mkdir $(INSTALL_DIR)/$(DIR_NAME)/Gtk
+	cp Gtk/plugin.xml.in Gtk/README $(INSTALL_DIR)/$(DIR_NAME)/Gtk
