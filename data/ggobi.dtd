@@ -67,6 +67,12 @@
 >
          
 
+<!ELEMENT red (#PCDATA)>
+<!ELEMENT green (#PCDATA)>
+<!ELEMENT blue (#PCDATA)>
+
+
+
 <!ATTLIST records
    count CDATA  #REQUIRED
    missingValue CDATA #IMPLIED
