@@ -133,7 +133,7 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 #define MAXNPCPLOTS 5
 displayd *
 parcoords_new (gboolean missing_p, gint nvars, gint *vars,
-  datad *d, ggobid *gg) 
+	       datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame, *w;
   GtkWidget *mbar;
@@ -167,7 +167,7 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
 /*
  * Add the main menu bar
 */
-  vbox = GTK_WIDGET(display); /*XXX gtk_vbox_new (FALSE, 1); */
+  vbox = GTK_WIDGET(display); 
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 

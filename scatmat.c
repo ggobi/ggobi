@@ -585,7 +585,7 @@ createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gbool
 /*
  * Add the main menu bar
 */
-    vbox = GTK_WIDGET(display); /*XX gtk_vbox_new (FALSE, 1); */
+    vbox = GTK_WIDGET(display); 
     gtk_container_border_width (GTK_CONTAINER (vbox), 1);
     gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 

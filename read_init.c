@@ -417,6 +417,8 @@ getDisplayDescription(xmlNodePtr node)
   tmp = xmlGetProp(node, (xmlChar *) "data");
   if(tmp) {
     dpy->data = strToInteger((char *)tmp) - 1;
+    if(dpy->data < 0)
+      dpy->datasetName = g_strdup(tmp);
   } else
     dpy->data = 0;
 
@@ -938,13 +940,35 @@ displayd *
 createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc) 
 {
   displayd *dpy = NULL;
-  datad *data;
+  datad *data = NULL;
   gint *vars, i;
 
   if(desc->canRecreate == false)
     return(NULL);
 
-  data = (datad*) gg->d->data;
+  if(desc->data > -1) {
+     data = (datad *)  g_slist_nth_data(gg->d, desc->data);
+  } else if(desc->datasetName && desc->datasetName[0]) {
+     datad *tmp;
+     GSList *l;
+     for(l = gg->d; l ; l = l->next) {
+        tmp = (datad *) l->data;
+	if(strcmp(desc->datasetName, tmp->name) == 0) {
+	  data = tmp;
+   	  break;
+	}
+     }
+  }
+
+  if(!data) {
+    g_printerr("Cannot resolve dataset ");
+    if(desc->data > -1)
+       g_printerr("with index %d\n", desc->data + 1);
+    else
+       g_printerr("named `%s'\n", desc->datasetName);
+
+    return(NULL);
+  }
 
   vars = (gint*) g_malloc(sizeof(gint) * desc->numVars);
   for (i = 0; i < desc->numVars; i++)

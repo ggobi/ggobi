@@ -356,6 +356,9 @@ ggobi_alloc(ggobid *tmp)
   tmp->printOptions = NULL;
   tmp->pluginInstances = NULL;
 
+  tmp->plot_GC = NULL;
+
+
   tmp->colorSchemes = sessionOptions->colorSchemes;
   if (sessionOptions->activeColorScheme)
     tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,

@@ -203,7 +203,7 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
 
   for (i=1; i < nplots; i++) {
     sp = gtk_time_series_splot_new(display, 2.5*WIDTH, HEIGHT, gg);
-/*XX    sp = splot_new (display, 2.5*WIDTH, HEIGHT, gg); */
+
     sp->xyvars.y = vars[i];
     sp->xyvars.x = 0;
 

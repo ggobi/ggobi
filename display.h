@@ -262,10 +262,6 @@ typedef struct
     void (*set_show_axes_option)(displayd *, gboolean);
     void (*set_show_axes_label_option)(displayd *, gboolean);
 
-/* For splots */
-
-    void (*sub_plane_to_screen)(splotd *sp, displayd *dpy, datad *d, ggobid *gg);
-
 } GtkGGobiExtendedDisplayClass;
 
 

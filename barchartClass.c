@@ -39,9 +39,6 @@ static gint barchartSPlotKeyEventHandler(displayd * dpy, splotd * sp,
 
 
 
-/*XX This doesn't seem to be used. 
-
-*/
 static gint
 barchart_is_variable_plotted(displayd * display, gint * cols, gint ncols,
                              datad * d)

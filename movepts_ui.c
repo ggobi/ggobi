@@ -17,8 +17,6 @@
 #include "vars.h"
 #include "externs.h"
 
-/*XX */
-#include "scatterplotClass.h"
 
 static void reset_all_cb (GtkButton *button, ggobid *gg)
 {

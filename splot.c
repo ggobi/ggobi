@@ -647,14 +647,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
 
   if(klass && klass->sub_plane_to_screen) {
      klass->sub_plane_to_screen(sp, display, d, gg);
-  } else {
-/*XX convenience */
-   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-     GtkGGobiExtendedDisplayClass *k = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-     if(k->sub_plane_to_screen)
-       k->sub_plane_to_screen(sp, display, d, gg);
-   } 
-  }
+  } 
 }
 
 /*----------------------------------------------------------------------*/

@@ -203,11 +203,11 @@ displayd *
 scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, datad *d, ggobid *gg)
 {
   splotd *sp;
-  displayd *display;
+  displayd *display = NULL;
 
   if(numVars < 2)
      return(NULL);
-
+/*XX dislay needs to be non-null here. Need to get the order correct. Change scatterplot_new! */
   sp = gtk_scatter_plot_new(NULL, 400, 400, gg);
   sp->xyvars.x = vars[0];
   sp->xyvars.y = vars[1];

@@ -95,7 +95,7 @@ displayd *barchart_new(gboolean missing_p, splotd * sp, datad * d,
   display_window_init(GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);   /*-- 3 = width = any small int --*/
 
   /*-- Add the main menu bar --*/
-  vbox = GTK_WIDGET(display);   /*XXX gtk_vbox_new (false, 1); */
+  vbox = GTK_WIDGET(display);  
   gtk_container_border_width(GTK_CONTAINER(vbox), 1);
   gtk_container_add(GTK_CONTAINER
                     (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
@@ -1357,8 +1357,6 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
   }
 
 }
-
-/*XX    sp = splot_new (display, WIDTH, HEIGHT, gg); */
 
 splotd *gtk_barchart_splot_new(displayd * dpy, gint width, gint height,
                                ggobid * gg)

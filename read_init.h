@@ -17,6 +17,7 @@ typedef struct {
     gchar *typeName;     /* use for the extended type. */
     gint numVars;           /* the number of variables in the plot. */
     gchar **varNames;       /* the variables in the plot. */
+    gchar *datasetName;     /* name of the dataset in which to find the variables. */
     gint data;              /* with which datad is this associated */
     gboolean canRecreate; /* see the unsupported tag in the output from write_state.*/
 } GGobiDisplayDescription;
