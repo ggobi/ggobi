@@ -100,6 +100,8 @@ typedef struct _XMLUserData {
    */
   int expectedDatasetCount;
 
+  xmlParserCtxtPtr parser;
+
 } XMLParserData;
 
 

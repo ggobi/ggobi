@@ -4,6 +4,7 @@
 #include <parserInternals.h>
 #endif
 
+
 /*
    This is a SAX based parser for reading a single input file
    formatted in XML for the DTD specified in ggobi.dtd.
@@ -72,7 +73,6 @@ void startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs
 void endXMLElement(void *user_data, const xmlChar *name);
 void Characters(void *user_data, const xmlChar *ch, int len);
 
-
 const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
 
 const gchar * const xmlDataTagNames[] = {
@@ -93,6 +93,30 @@ const gchar * const xmlDataTagNames[] = {
                                           ""
                                          };
 
+
+
+
+
+void
+ggobi_XML_warning_handler(void *data, const char *msg, ...)
+{
+    xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
+    fprintf(stderr, "Warning from XML parsing [%d, %d]: %s", p->input->line, p->input->col, msg);
+/*
+    fprintf(stderr, msg, ...); 
+*/
+    fflush(stderr);  
+}
+void
+ggobi_XML_error_handler(void *data, const char *msg, ...)
+{
+    xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
+    fprintf(stderr, "Error in XML parsing [line %d, column %d]: %s", p->input->line, p->input->col, msg);
+/*
+    fprintf(stderr, msg, ...); 
+*/
+    fflush(stderr);
+}
 
 
 /*
@@ -134,6 +158,9 @@ data_xml_read (InputDescription *desc, ggobid *gg)
   xmlParserHandler->endElement = endXMLElement;
   xmlParserHandler->characters = Characters;
 
+  xmlParserHandler->error = ggobi_XML_error_handler;
+  xmlParserHandler->warning = ggobi_XML_warning_handler;
+
   initParserData(&data, xmlParserHandler, gg);
 
   ctx = xmlCreateFileParserCtxt(name);
@@ -142,7 +169,10 @@ data_xml_read (InputDescription *desc, ggobid *gg)
    return(false);
   }
 
+  ctx->validate = 1;
+
   ctx->userData = &data;
+  data.parser = ctx;
   data.input = desc;
   ctx->sax = xmlParserHandler;
 
@@ -1314,4 +1344,5 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
 
   return(true);
 }
+
 
