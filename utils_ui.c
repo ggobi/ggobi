@@ -43,8 +43,9 @@ CreateMenuItem (GtkWidget *menu,
   /* --- If there's a name, create the item and add the signal handler --- */
   if (szName && strlen (szName)) {
     menuitem = gtk_menu_item_new_with_label (szName);
-    gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-                        GTK_SIGNAL_FUNC (func), data);
+    if(func)
+      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+			  GTK_SIGNAL_FUNC (func), data);
 
     GGobi_widget_set (GTK_WIDGET (menuitem), gg,  true);
 
@@ -237,8 +238,10 @@ submenu_make (gchar *lbl, guint key, GtkAccelGroup *accel_group) {
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (item)->child), lbl);
 
   /*-- V -> ViewMode works but O -> Options doesn't --*/
+#ifndef GTK_2_0
   gtk_widget_add_accelerator (item,
     "activate_item", accel_group, tmp_key, GDK_MOD1_MASK, GTK_ACCEL_LOCKED);
+#endif
 
   gtk_widget_show (item);
   return item;

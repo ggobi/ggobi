@@ -121,7 +121,8 @@ static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg)
   display_tailpipe (gg->current_display, FULL, gg);
 
   /* Reinits the vertical height for the ashes */
-  sp->tour1d.initmax = true;
+  if(sp)
+    sp->tour1d.initmax = true;
 }
 
 /*
