@@ -242,9 +242,10 @@ collabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
   else
   {
     if (init) {
-      for (j=0; j<d->ncols; j++)
+      for (j=0; j<d->ncols; j++) {
         d->vartable[j].lim_specified_p = false;
         d->vartable[j].collab = g_strdup_printf ("Var %d", j+1);
+      }
     }
   }
 
