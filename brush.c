@@ -537,7 +537,7 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 /*                      Hide brushing                                   */
 /*----------------------------------------------------------------------*/
 
-static gboolean
+gboolean
 update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   datad *d, ggobid *gg)
 {
@@ -582,7 +582,7 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
  * If we need persistent selection, I'll have to create a new
  * vector that's only used here, or use some temporary vector.
 */
-static gboolean
+gboolean
 update_selected_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   datad *d, ggobid *gg)
 {
@@ -626,7 +626,6 @@ update_selected_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
       }
     }
   }
-g_printerr ("hidden_now[%d] = %d\n", i, d->hidden_now.els[i]);
 
   return (doit);
 }
@@ -646,7 +645,7 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   icoords imin, imax;
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
-  gboolean (*f)(datad *, ggobid *);
+  gboolean (*f)(cpaneld *, datad *, ggobid *);
 
   /* These two are needed for the extended display.
      Should the method be on the extended splot or the display (as it is now).
@@ -659,7 +658,7 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->build_symbol_vectors; 
     if(f)
-      changed = f(d, gg);
+      changed = f(cpanel, d, gg);
   }
 
 /*
@@ -674,7 +673,7 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
           /*
            * j is the row number; k is the index of rows_in_plot.els[]
           */
-        j = d->rows_in_plot.els[ k = d->brush.binarray[ih][iv].els[m] ] ;
+          j = d->rows_in_plot.els[ k = d->brush.binarray[ih][iv].els[m] ] ;
 
           switch (cpanel->br_point_targets) {
             case br_candg:  /*-- color and glyph --*/

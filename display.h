@@ -256,7 +256,7 @@ typedef struct
     void (*display_unset)(displayd *dpy, GtkWidget *);
     void (*display_set)(displayd *dpy, ggobid *gg);
 
-    gboolean (*build_symbol_vectors)(datad *, ggobid *);
+    gboolean (*build_symbol_vectors)(cpaneld *, datad *, ggobid *);
 
     void (*ruler_ranges_set)(gboolean, displayd *, splotd *, ggobid *);
 
