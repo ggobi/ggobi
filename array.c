@@ -269,10 +269,32 @@ arrays_add_cols (array_s *arrp, gint nc)
   }
 }
 
-/*-- eliminate nc columns, starting at column jcol --*/
+/*-- eliminate the nc columns contained in *cols --*/
 void
-arrays_delete_cols (array_s *arrp, gint nc, gint jcol)
+arrays_delete_cols (array_s *arrp, gint nc, gint *cols)
 {
+  gint i, k;
+  gint jto, jfrom;
+  gint *keepers = g_malloc ((arrp->ncols-nc) * sizeof (gint));
+  gint nkeepers = find_keepers (arrp->ncols, nc, cols, keepers);
+
+  if (nc > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      jto = k;
+      jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
+      if (jto != jfrom) {
+        for (i=0; i<arrp->nrows; i++)
+          arrp->vals[i][jto] = arrp->vals[i][jto];
+      }
+    }
+
+    for (i=0; i<arrp->nrows; i++)
+      arrp->vals[i] = (gshort *) g_realloc (arrp->vals[i],
+                                            nkeepers * sizeof (gshort));
+    arrp->ncols = nkeepers;
+  }
 }
 
 /*-------------------------------------------------------------------------*/
@@ -379,8 +401,30 @@ arrayl_add_cols (array_l *arrp, gint nc)
   }
 }
 
-/*-- eliminate nc columns, starting at column jcol --*/
+/*-- eliminate the nc columns contained in *cols --*/
 void
-arrayl_delete_cols (array_l *arrp, gint nc, gint jcol)
+arrayl_delete_cols (array_l *arrp, gint nc, gint *cols)
 {
+  gint i, k;
+  gint jto, jfrom;
+  gint *keepers = g_malloc ((arrp->ncols-nc) * sizeof (gint));
+  gint nkeepers = find_keepers (arrp->ncols, nc, cols, keepers);
+
+  if (nc > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      jto = k;
+      jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
+      if (jto != jfrom) {
+        for (i=0; i<arrp->nrows; i++)
+          arrp->vals[i][jto] = arrp->vals[i][jto];
+      }
+    }
+
+    for (i=0; i<arrp->nrows; i++)
+      arrp->vals[i] = (glong *) g_realloc (arrp->vals[i],
+                                           nkeepers * sizeof (glong));
+    arrp->ncols = nkeepers;
+  }
 }

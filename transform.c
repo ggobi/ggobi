@@ -805,7 +805,6 @@ transform (gint stage, gint tform_type, gfloat param, datad *d, ggobid *gg)
 
   g_free ((gpointer) cols);
 
-
   limits_set (false, true, d);  
   for (k=0; k<ncols; k++) {
     vartable_limits_set_by_var (k, d);

@@ -95,6 +95,7 @@
 33166   9/26  Di has worked on the tour; dfs adding variable circles for 2dtour
 33461   9/27  implemented 2 layout options for var circles; changed main
               menubar; working on adding and deleting variables
+34614   10/9  deleting is working; bugs in transformation are fixed
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

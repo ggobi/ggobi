@@ -153,16 +153,30 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
   vartable_free_var (jfrom, d);
 }
 
+gboolean
+array_contains (gint* arr, gint n, gint el)
+{
+  gint j;
+
+  for (j=0; j<n; j++)
+    if (arr[j] == el)
+      return true;
+  
+  return false;
+}
+
 /*-- eliminate the ncol columns in cols --*/
 void
-delete_vars (gint ncols, gint *cols, datad *d) 
+delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg) 
 {
   gint j, jfrom, jto;
-  gint *keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
-  gint nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
-  g_printerr ("not yet implemented\n");
+  gint *keepers, nkeepers;
+
+  keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
+  nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
 
   /*-- copy and reallocate the array of vartabled structures --*/
+  /*-- delete elements from d->vartable array --*/
   for (j=0; j<nkeepers; j++) {
     jto = j;
     jfrom = keepers[j];
@@ -173,35 +187,37 @@ delete_vars (gint ncols, gint *cols, datad *d)
     vartable_free_var (j, d);
   vartable_realloc (nkeepers, d);
 
-  /*-- delete rows from clist --*/
+  /*-- delete rows from clist; no copying is called for --*/
   {
     GList *l = g_list_last (GTK_CLIST (d->vartable_clist)->selection);
     gint irow;
     while (l) {
       irow = GPOINTER_TO_INT (l->data);
-      gtk_clist_remove (GTK_CLIST (d->vartable_clist), irow);
+      if (!array_contains (keepers, nkeepers, irow))
+        gtk_clist_remove (GTK_CLIST (d->vartable_clist), irow);
       l = l->prev;
     }
   }
 
-  /*-- delete elements from d->vartable array --*/
-
   /*-- delete columns from pipeline arrays --*/
-/*
-  arrayf_delete_cols (&d->raw);
-  arrayf_delete_cols (&d->tform);
+  arrayf_delete_cols (&d->raw, ncols, cols);
+  arrayf_delete_cols (&d->tform, ncols, cols);
   if (d->nmissing)
-    arrays_delete_cols (&d->missing);
-*/
-  /*-- reallocate the rest of the arrays and run the pipeline  --*/
+    arrays_delete_cols (&d->missing, ncols, cols);
+
+  arrayl_delete_cols (&d->jitdata, ncols, cols);
+
+  /*-- reallocate the rest of the arrays --*/
+  arrayl_alloc (&d->world, d->nrows, nkeepers);
 
   /*-- delete checkboxes --*/
+
   /*-- delete variable circles --*/
 
-  /*-- d->ncols -= ncols; --*/
+  d->ncols -= ncols;
 
-/*
-*/
+  /*-- run the pipeline  --*/
+  tform_to_world (d, gg);
 }
 
 /*-------------------------------------------------------------------------*/

@@ -120,7 +120,7 @@ ggobi: $(OB)
 
 pure: ggobi.o $(OB)
 	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
-	${CC} -o ggobi $(OB) `gtk-config --cflags --libs`
+	$(LD) $(OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
 
 
 %.sched: %.c
