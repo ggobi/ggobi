@@ -4,1069 +4,925 @@
 <ggobidata count="2">
 <data name="People">
 <description>
-An artificial social network of 140 people.
 </description>
 <variables count="2">
- <categoricalvariable name="citizenship">
-   <levels count="3">
-     <level value="0"> citizen </level>
-     <level value="1"> green card </level>
-     <level value="2"> visa </level>
-   </levels>
- </categoricalvariable>
- <categoricalvariable name="hours">
-   <levels count="2">
-     <level value="0"> full-time </level>
-     <level value="1"> part-time </level>
-   </levels>
- </categoricalvariable>
+  <categoricalvariable name="citizenship" nickname="ci">
+    <levels count="3">
+      <level value="0"> citizen  </level>
+      <level value="1"> green card  </level>
+      <level value="2"> visa  </level>
+    </levels>
+  </categoricalvariable>
+  <categoricalvariable name="hours" nickname="ho">
+    <levels count="2">
+      <level value="0"> full-time  </level>
+      <level value="1"> part-time  </level>
+    </levels>
+  </categoricalvariable>
 </variables>
 <records count="140" glyph="fr 1" color="0">
-<record id="Abraham" label="Abraham" >
-1 1
-</record>
-<record id="Abigail" label="Abigail" >
-2 0
-</record>
-<record id="Alex" label="Alex">
-1 0
-</record>
-<record id="Amanda" label="Amanda">
-0 0
-</record>
-<record id="Anthony" label="Anthony">
-0 0
-</record>
-<record id="Banquo" label="Banquo">
-1 0
-</record>
-<record id="Beatrice" label="Beatrice">
-1 0
-</record>
-<record id="Billie" label="Billie">
-0 0
-</record>
-<record id="Brad" label="Brad">
-1 0
-</record>
-<record id="Brian" label="Brian">
-0 0
-</record>
-<record id="Caitlin" label="Caitlin">
-0 0
-</record>
-<record id="Caliban" label="Caliban">
-1 0
-</record>
-<record id="Cameron" label="Cameron">
-1 0
-</record>
-<record id="Charity" label="Charity">
-0 0
-</record>
-<record id="Clarice" label="Clarice">
-0 0
-</record>
-<record id="Daniel" label="Daniel">
-1 0
-</record>
-<record id="Demetrius" label="Demetrius">
-1 0
-</record>
-<record id="Desdemona" label="Desdemona">
-2 0
-</record>
-<record id="Devon" label="Devon">
-2 0
-</record>
-<record id="Dwight" label="Dwight">
-2 0
-</record>
-<record id="Dogberry" label="Dogberry">
-1 0
-</record>
-<record id="Eduardo" label="Eduardo">
-0 0
-</record>
-<record id="Elena" label="Elena">
-2 0
-</record>
-<record id="Emma" label="Emma">
-0 0
-</record>
-<record id="Erica" label="Erica">
-1 0
-</record>
-<record id="Eugene" label="Eugene">
-1 0
-</record>
-<record id="Festus" label="Festus">
-1 0
-</record>
-<record id="Finian" label="Finian">
-1 0
-</record>
-<record id="Flo" label="Flo">
-1 0
-</record>
-<record id="Francois" label="Francois">
-1 0
-</record>
-<record id="Frida" label="Frida">
-2 0
-</record>
-<record id="Gabriel" label="Gabriel">
-2 0
-</record>
-<record id="Giovanni" label="Giovanni">
-1 0
-</record>
-<record id="Graham" label="Graham">
-2 0
-</record>
-<record id="Gwen" label="Gwen">
-0 0
-</record>
-<record id="Guido" label="Guido">
-0 0
-</record>
-<record id="Hannah" label="Hannah">
-0 0
-</record>
-<record id="Henry" label="Henry">
-1 0
-</record>
-<record id="Holden" label="Holden">
-1 0
-</record>
-<record id="Horatio" label="Horatio">
-1 0
-</record>
-<record id="Hunter" label="Hunter">
-1 0
-</record>
-<record id="Iago" label="Iago">
-0 0
-</record>
-<record id="Imogene" label="Imogene">
-2 0
-</record>
-<record id="Ivy" label="Ivy">
-2 0
-</record>
-<record id="Jacqueline" label="Jacqueline">
-2 0
-</record>
-<record id="Jared" label="Jared">
-2 0
-</record>
-<record id="Jasmine" label="Jasmine">
-2 0
-</record>
-<record id="Jean-Luc" label="Jean-Luc">
-2 0
-</record>
-<record id="Jenna" label="Jenna">
-0 0
-</record>
-<record id="Jesus" label="Jesus">
-0 0
-</record>
-<record id="Josef" label="Josef">
-0 0
-</record>
-<record id="Jude" label="Jude">
-0 0
-</record>
-<record id="Julia" label="Julia">
-1 0
-</record>
-<record id="Justin" label="Justin">
-0 0
-</record>
-<record id="Katherine" label="Katherine">
-1 0
-</record>
-<record id="Kelly" label="Kelly">
-0 0
-</record>
-<record id="Paul" label="Paul">
-1 0
-</record>
-<record id="Kirk" label="Kirk">
-1 0
-</record>
-<record id="Kyle" label="Kyle">
-0 0
-</record>
-<record id="Kazuko" label="Kazuko">
-0 0
-</record>
-<record id="Kelsey" label="Kelsey">
-0 0
-</record>
-<record id="Kenneth" label="Kenneth">
-0 0
-</record>
-<record id="Kevin" label="Kevin">
-0 0
-</record>
-<record id="Kitty" label="Kitty">
-0 0
-</record>
-<record id="Laertes" label="Laertes">
-1 0
-</record>
-<record id="Lancelot" label="Lancelot">
-0 0
-</record>
-<record id="Laurel" label="Laurel">
-1 0
-</record>
-<record id="Leigh" label="Leigh">
-1 0
-</record>
-<record id="Lennox" label="Lennox">
-0 0
-</record>
-<record id="Liza" label="Liza">
-1 0
-</record>
-<record id="Mack" label="Mack">
-1 0
-</record>
-<record id="Malvolio" label="Malvolio">
-0 0
-</record>
-<record id="Malcolm" label="Malcolm">
-1 0
-</record>
-<record id="Marcus" label="Marcus">
-0 0
-</record>
-<record id="Maria" label="Maria">
-2 0
-</record>
-<record id="Nancy" label="Nancy">
-0 0
-</record>
-<record id="Nandini" label="Nandini">
-1 0
-</record>
-<record id="Nate" label="Nate">
-0 0
-</record>
-<record id="Norman" label="Norman">
-2 0
-</record>
-<record id="Nikki" label="Nikki">
-1 0
-</record>
-<record id="Oberon" label="Oberon">
-1 0
-</record>
-<record id="Olivia" label="Olivia">
-0 0
-</record>
-<record id="Opal" label="Opal">
-1 0
-</record>
-<record id="Orlando" label="Orlando">
-1 0
-</record>
-<record id="Oswald" label="Oswald">
-1 0
-</record>
-<record id="Padma" label="Padma">
-0 0
-</record>
-<record id="Paige" label="Paige">
-0 0
-</record>
-<record id="Paris" label="Paris">
-2 0
-</record>
-<record id="Patrick" label="Patrick">
-2 0
-</record>
-<record id="Pearl" label="Pearl">
-1 0
-</record>
-<record id="Prospero" label="Prospero">
-1 0
-</record>
-<record id="Pierre" label="Pierre">
-0 0
-</record>
-<record id="Philip" label="Philip">
-1 0
-</record>
-<record id="Quentin" label="Quentin">
-2 0
-</record>
-<record id="Rachel" label="Rachel">
-1 0
-</record>
-<record id="Reginald" label="Reginald">
-2 0
-</record>
-<record id="Reuben" label="Reuben">
-0 0
-</record>
-<record id="Rex" label="Rex">
-0 0
-</record>
-<record id="Richard" label="Richard">
-1 0
-</record>
-<record id="Rocco" label="Rocco">
-1 0
-</record>
-<record id="Samuel" label="Samuel">
-2 0
-</record>
-<record id="Seton" label="Seton">
-2 0
-</record>
-<record id="Shane" label="Shane">
-0 0
-</record>
-<record id="Sierra" label="Sierra">
-2 0
-</record>
-<record id="Silvius" label="Silvius">
-0 0
-</record>
-<record id="Timon" label="Timon">
-1 0
-</record>
-<record id="Tiffany" label="Tiffany">
-0 0
-</record>
-<record id="Toby" label="Toby">
-0 0
-</record>
-<record id="Trevor" label="Trevor">
-2 0
-</record>
-<record id="Trixie" label="Trixie">
-2 0
-</record>
-<record id="Ursula" label="Ursula">
-0 0
-</record>
-<record id="Vanessa" label="Vanessa">
-1 0
-</record>
-<record id="Victoria" label="Victoria">
-2 0
-</record>
-<record id="Vivian" label="Vivian">
-0 0
-</record>
-<record id="Vincent" label="Vincent">
-0 0
-</record>
-<record id="Walter" label="Walter">
-0 0
-</record>
-<record id="Warren" label="Warren">
-2 0
-</record>
-<record id="Willis" label="Willis">
-1 0
-</record>
-<record id="Xavier" label="Xavier">
-0 0
-</record>
-<record id="Yvette" label="Yvette">
-2 0
-</record>
-<record id="Zachary" label="Zachary">
-2 0
-</record>
-<record id="Zander" label="Zander">
-2 0
-</record>
-<record id="Zane" label="Zane">
-0 0
-</record>
-<record id="Sven" label="Sven">
-1 0
-</record>
-<record id="Susan" label="Susan">
-0 0
-</record>
-<record id="Seth" label="Seth">
-1 1
-</record>
-<record id="Sybil" label="Sybil">
-0 0
-</record>
-<record id="Sydney" label="Sydney">
-1 0
-</record>
-<record id="Teresa" label="Teresa">
-1 0
-</record>
-<record id="Thurio" label="Thurio">
-1 0
-</record>
-<record id="Gigi" label="Gigi">
-0 0
-</record>
-<record id="Pinky" label="Pinky">
-0 0
-</record>
-<record id="Juno" label="Juno">
-0 0
-</record>
-<record id="Leopold" label="Leopold">
-2 0
-</record>
-<record id="Mamie" label="Mamie">
-2 0
-</record>
-<record id="Carol" label="Carol">
-1 0
-</record>
-<record id="Jasper" label="Jasper">
-0 0
-</record>
-<record id="Gordon" label="Gordon">
-0 1
-</record>
-<record id="Douglas" label="Douglas">
-0 0
-</record>
-<record id="Stephen" label="Stephen">
-1 0
-</record>
-</records>
+<record id="Abraham" label="Abraham">
+1.000 1.000
+</record><record id="Abigail" label="Abigail">
+2.000 0.000
+</record><record id="Alex" label="Alex">
+1.000 0.000
+</record><record id="Amanda" label="Amanda">
+0.000 0.000
+</record><record id="Anthony" label="Anthony">
+0.000 0.000
+</record><record id="Banquo" label="Banquo">
+1.000 0.000
+</record><record id="Beatrice" label="Beatrice">
+1.000 0.000
+</record><record id="Billie" label="Billie">
+0.000 0.000
+</record><record id="Brad" label="Brad">
+1.000 0.000
+</record><record id="Brian" label="Brian">
+0.000 0.000
+</record><record id="Caitlin" label="Caitlin">
+0.000 0.000
+</record><record id="Caliban" label="Caliban">
+1.000 0.000
+</record><record id="Cameron" label="Cameron">
+1.000 0.000
+</record><record id="Charity" label="Charity">
+0.000 0.000
+</record><record id="Clarice" label="Clarice">
+0.000 0.000
+</record><record id="Daniel" label="Daniel">
+1.000 0.000
+</record><record id="Demetrius" label="Demetrius">
+1.000 0.000
+</record><record id="Desdemona" label="Desdemona">
+2.000 0.000
+</record><record id="Devon" label="Devon">
+2.000 0.000
+</record><record id="Dwight" label="Dwight">
+2.000 0.000
+</record><record id="Dogberry" label="Dogberry">
+1.000 0.000
+</record><record id="Eduardo" label="Eduardo">
+0.000 0.000
+</record><record id="Elena" label="Elena">
+2.000 0.000
+</record><record id="Emma" label="Emma">
+0.000 0.000
+</record><record id="Erica" label="Erica">
+1.000 0.000
+</record><record id="Eugene" label="Eugene">
+1.000 0.000
+</record><record id="Festus" label="Festus">
+1.000 0.000
+</record><record id="Finian" label="Finian">
+1.000 0.000
+</record><record id="Flo" label="Flo">
+1.000 0.000
+</record><record id="Francois" label="Francois">
+1.000 0.000
+</record><record id="Frida" label="Frida">
+2.000 0.000
+</record><record id="Gabriel" label="Gabriel">
+2.000 0.000
+</record><record id="Giovanni" label="Giovanni">
+1.000 0.000
+</record><record id="Graham" label="Graham">
+2.000 0.000
+</record><record id="Gwen" label="Gwen">
+0.000 0.000
+</record><record id="Guido" label="Guido">
+0.000 0.000
+</record><record id="Hannah" label="Hannah">
+0.000 0.000
+</record><record id="Henry" label="Henry">
+1.000 0.000
+</record><record id="Holden" label="Holden">
+1.000 0.000
+</record><record id="Horatio" label="Horatio">
+1.000 0.000
+</record><record id="Hunter" label="Hunter">
+1.000 0.000
+</record><record id="Iago" label="Iago">
+0.000 0.000
+</record><record id="Imogene" label="Imogene">
+2.000 0.000
+</record><record id="Ivy" label="Ivy">
+2.000 0.000
+</record><record id="Jacqueline" label="Jacqueline">
+2.000 0.000
+</record><record id="Jared" label="Jared">
+2.000 0.000
+</record><record id="Jasmine" label="Jasmine">
+2.000 0.000
+</record><record id="Jean-Luc" label="Jean-Luc">
+2.000 0.000
+</record><record id="Jenna" label="Jenna">
+0.000 0.000
+</record><record id="Jesus" label="Jesus">
+0.000 0.000
+</record><record id="Josef" label="Josef">
+0.000 0.000
+</record><record id="Jude" label="Jude">
+0.000 0.000
+</record><record id="Julia" label="Julia">
+1.000 0.000
+</record><record id="Justin" label="Justin">
+0.000 0.000
+</record><record id="Katherine" label="Katherine">
+1.000 0.000
+</record><record id="Kelly" label="Kelly">
+0.000 0.000
+</record><record id="Paul" label="Paul">
+1.000 0.000
+</record><record id="Kirk" label="Kirk">
+1.000 0.000
+</record><record id="Kyle" label="Kyle">
+0.000 0.000
+</record><record id="Kazuko" label="Kazuko">
+0.000 0.000
+</record><record id="Kelsey" label="Kelsey">
+0.000 0.000
+</record><record id="Kenneth" label="Kenneth">
+0.000 0.000
+</record><record id="Kevin" label="Kevin">
+0.000 0.000
+</record><record id="Kitty" label="Kitty">
+0.000 0.000
+</record><record id="Laertes" label="Laertes">
+1.000 0.000
+</record><record id="Lancelot" label="Lancelot">
+0.000 0.000
+</record><record id="Laurel" label="Laurel">
+1.000 0.000
+</record><record id="Leigh" label="Leigh">
+1.000 0.000
+</record><record id="Lennox" label="Lennox">
+0.000 0.000
+</record><record id="Liza" label="Liza">
+1.000 0.000
+</record><record id="Mack" label="Mack">
+1.000 0.000
+</record><record id="Malvolio" label="Malvolio">
+0.000 0.000
+</record><record id="Malcolm" label="Malcolm">
+1.000 0.000
+</record><record id="Marcus" label="Marcus">
+0.000 0.000
+</record><record id="Maria" label="Maria">
+2.000 0.000
+</record><record id="Nancy" label="Nancy">
+0.000 0.000
+</record><record id="Nandini" label="Nandini">
+1.000 0.000
+</record><record id="Nate" label="Nate">
+0.000 0.000
+</record><record id="Norman" label="Norman">
+2.000 0.000
+</record><record id="Nikki" label="Nikki">
+1.000 0.000
+</record><record id="Oberon" label="Oberon">
+1.000 0.000
+</record><record id="Olivia" label="Olivia">
+0.000 0.000
+</record><record id="Opal" label="Opal">
+1.000 0.000
+</record><record id="Orlando" label="Orlando">
+1.000 0.000
+</record><record id="Oswald" label="Oswald">
+1.000 0.000
+</record><record id="Padma" label="Padma">
+0.000 0.000
+</record><record id="Paige" label="Paige">
+0.000 0.000
+</record><record id="Paris" label="Paris">
+2.000 0.000
+</record><record id="Patrick" label="Patrick">
+2.000 0.000
+</record><record id="Pearl" label="Pearl">
+1.000 0.000
+</record><record id="Prospero" label="Prospero">
+1.000 0.000
+</record><record id="Pierre" label="Pierre">
+0.000 0.000
+</record><record id="Philip" label="Philip">
+1.000 0.000
+</record><record id="Quentin" label="Quentin">
+2.000 0.000
+</record><record id="Rachel" label="Rachel">
+1.000 0.000
+</record><record id="Reginald" label="Reginald">
+2.000 0.000
+</record><record id="Reuben" label="Reuben">
+0.000 0.000
+</record><record id="Rex" label="Rex">
+0.000 0.000
+</record><record id="Richard" label="Richard">
+1.000 0.000
+</record><record id="Rocco" label="Rocco">
+1.000 0.000
+</record><record id="Samuel" label="Samuel">
+2.000 0.000
+</record><record id="Seton" label="Seton">
+2.000 0.000
+</record><record id="Shane" label="Shane">
+0.000 0.000
+</record><record id="Sierra" label="Sierra">
+2.000 0.000
+</record><record id="Silvius" label="Silvius">
+0.000 0.000
+</record><record id="Timon" label="Timon">
+1.000 0.000
+</record><record id="Tiffany" label="Tiffany">
+0.000 0.000
+</record><record id="Toby" label="Toby">
+0.000 0.000
+</record><record id="Trevor" label="Trevor">
+2.000 0.000
+</record><record id="Trixie" label="Trixie">
+2.000 0.000
+</record><record id="Ursula" label="Ursula">
+0.000 0.000
+</record><record id="Vanessa" label="Vanessa">
+1.000 0.000
+</record><record id="Victoria" label="Victoria">
+2.000 0.000
+</record><record id="Vivian" label="Vivian">
+0.000 0.000
+</record><record id="Vincent" label="Vincent">
+0.000 0.000
+</record><record id="Walter" label="Walter">
+0.000 0.000
+</record><record id="Warren" label="Warren">
+2.000 0.000
+</record><record id="Willis" label="Willis">
+1.000 0.000
+</record><record id="Xavier" label="Xavier">
+0.000 0.000
+</record><record id="Yvette" label="Yvette">
+2.000 0.000
+</record><record id="Zachary" label="Zachary">
+2.000 0.000
+</record><record id="Zander" label="Zander">
+2.000 0.000
+</record><record id="Zane" label="Zane">
+0.000 0.000
+</record><record id="Sven" label="Sven">
+1.000 0.000
+</record><record id="Susan" label="Susan">
+0.000 0.000
+</record><record id="Seth" label="Seth">
+1.000 1.000
+</record><record id="Sybil" label="Sybil">
+0.000 0.000
+</record><record id="Sydney" label="Sydney">
+1.000 0.000
+</record><record id="Teresa" label="Teresa">
+1.000 0.000
+</record><record id="Thurio" label="Thurio">
+1.000 0.000
+</record><record id="Gigi" label="Gigi">
+0.000 0.000
+</record><record id="Pinky" label="Pinky">
+0.000 0.000
+</record><record id="Juno" label="Juno">
+0.000 0.000
+</record><record id="Leopold" label="Leopold">
+2.000 0.000
+</record><record id="Mamie" label="Mamie">
+2.000 0.000
+</record><record id="Carol" label="Carol">
+1.000 0.000
+</record><record id="Jasper" label="Jasper">
+0.000 0.000
+</record><record id="Gordon" label="Gordon">
+0.000 1.000
+</record><record id="Douglas" label="Douglas">
+0.000 0.000
+</record><record id="Stephen" label="Stephen">
+1.000 0.000
+</record></records>
 </data>
 <data name="Contacts">
 <description>
 </description>
-<variables count="2">
- <realvariable name="interactions" />
- <categoricalvariable name="center triangle">
-   <levels count="2">
-     <level value="0"> out </level>
-     <level value="1"> in </level>
-   </levels>
- </categoricalvariable>
+<variables count="3">
+  <realvariable name="interactions" nickname="in"/>
+  <categoricalvariable name="center triangle" nickname="ce">
+    <levels count="2">
+      <level value="0"> out  </level>
+      <level value="1"> in  </level>
+    </levels>
+  </categoricalvariable>
+  <realvariable name="log10(interactions)" nickname="li"/>
 </variables>
 <records count="203" glyph="fr 1" color="0">
-<record source="Amanda" destination="Lancelot" >
-673.600 0
+<record source="Amanda" destination="Lancelot" label="0">
+673.600 0.000 2.828
 </record>
-<record source="Anthony" destination="Oberon" >
-0.900 0
+<record source="Anthony" destination="Oberon" label="1">
+0.900 0.000 -0.046
 </record>
-<record source="Banquo" destination="Caliban" >
-10.100 1
+<record source="Banquo" destination="Caliban" label="2">
+10.100 1.000 1.004
 </record>
-<record source="Banquo" destination="Flo" >
-33.900 0
+<record source="Banquo" destination="Flo" label="3">
+33.900 0.000 1.530
 </record>
-<record source="Banquo" destination="Graham" >
-8.100 0
+<record source="Banquo" destination="Graham" label="4">
+8.100 0.000 0.908
 </record>
-<record source="Banquo" destination="Ivy" >
-0.300 0
+<record source="Banquo" destination="Ivy" label="5">
+0.300 0.000 -0.523
 </record>
-<record source="Banquo" destination="Jacqueline" >
-2.000 0
+<record source="Banquo" destination="Jacqueline" label="6">
+2.000 0.000 0.301
 </record>
-<record source="Banquo" destination="Jared" >
-2.600 0
+<record source="Banquo" destination="Jared" label="7">
+2.600 0.000 0.415
 </record>
-<record source="Banquo" destination="Jude" >
-13.400 0
+<record source="Banquo" destination="Jude" label="8">
+13.400 0.000 1.127
 </record>
-<record source="Banquo" destination="Trevor" >
-1.600 0
+<record source="Banquo" destination="Trevor" label="9">
+1.600 0.000 0.204
 </record>
-<record source="Banquo" destination="Zachary" >
-9.600 0
+<record source="Banquo" destination="Zachary" label="10">
+9.600 0.000 0.982
 </record>
-<record source="Beatrice" destination="Erica" >
-9.900 0
+<record source="Beatrice" destination="Erica" label="11">
+9.900 0.000 0.996
 </record>
-<record source="Beatrice" destination="Francois" >
-7.900 0
+<record source="Beatrice" destination="Francois" label="12">
+7.900 0.000 0.898
 </record>
-<record source="Beatrice" destination="Shane" >
-0.400 0
+<record source="Beatrice" destination="Shane" label="13">
+0.400 0.000 -0.398
 </record>
-<record source="Beatrice" destination="Warren" >
-1.000 0
+<record source="Beatrice" destination="Warren" label="14">
+1.000 0.000 0.000
 </record>
-<record source="Beatrice" destination="Abraham" >
-51.000 0
+<record source="Beatrice" destination="Abraham" label="15">
+51.000 0.000 1.708
 </record>
-<record source="Beatrice" destination="Leopold" >
-1.400 0
+<record source="Beatrice" destination="Leopold" label="16">
+1.400 0.000 0.146
 </record>
-<record source="Billie" destination="Oberon" >
-30.400 0
+<record source="Billie" destination="Oberon" label="17">
+30.400 0.000 1.483
 </record>
-<record source="Brad" destination="Oberon" >
-58.100 0
+<record source="Brad" destination="Oberon" label="18">
+58.100 0.000 1.764
 </record>
-<record source="Brian" destination="Pearl" >
-0.500 0
+<record source="Brian" destination="Pearl" label="19">
+0.500 0.000 -0.301
 </record>
-<record source="Caitlin" destination="Amanda" >
-1651.300 0
+<record source="Caitlin" destination="Amanda" label="20">
+1651.300 0.000 3.218
 </record>
-<record source="Caitlin" destination="Charity" >
-1.400 0
+<record source="Caitlin" destination="Charity" label="21">
+1.400 0.000 0.146
 </record>
-<record source="Caitlin" destination="Jenna" >
-3700.200 0
+<record source="Caitlin" destination="Jenna" label="22">
+3700.200 0.000 3.568
 </record>
-<record source="Caitlin" destination="Justin" >
-2305.000 0
+<record source="Caitlin" destination="Justin" label="23">
+2305.000 0.000 3.363
 </record>
-<record source="Caitlin" destination="Kevin" >
-2410.800 0
+<record source="Caitlin" destination="Kevin" label="24">
+2410.800 0.000 3.382
 </record>
-<record source="Caitlin" destination="Lancelot" >
-2987.900 0
+<record source="Caitlin" destination="Lancelot" label="25">
+2987.900 0.000 3.475
 </record>
-<record source="Caitlin" destination="Olivia" >
-1567.000 0
+<record source="Caitlin" destination="Olivia" label="26">
+1567.000 0.000 3.195
 </record>
-<record source="Caitlin" destination="Paige" >
-2879.400 0
+<record source="Caitlin" destination="Paige" label="27">
+2879.400 0.000 3.459
 </record>
-<record source="Caitlin" destination="Philip" >
-6.700 0
+<record source="Caitlin" destination="Philip" label="28">
+6.700 0.000 0.826
 </record>
-<record source="Caitlin" destination="Seton" >
-91.500 0
+<record source="Caitlin" destination="Seton" label="29">
+91.500 0.000 1.961
 </record>
-<record source="Caitlin" destination="Gigi" >
-20122.199 0
+<record source="Caitlin" destination="Gigi" label="30">
+20122.199 0.000 4.304
 </record>
-<record source="Caitlin" destination="Toby" >
-2808.800 0
+<record source="Caitlin" destination="Toby" label="31">
+2808.800 0.000 3.449
 </record>
-<record source="Caitlin" destination="Walter" >
-3899.700 0
+<record source="Caitlin" destination="Walter" label="32">
+3899.700 0.000 3.591
 </record>
-<record source="Caitlin" destination="Willis" >
-11.000 0
+<record source="Caitlin" destination="Willis" label="33">
+11.000 0.000 1.041
 </record>
-<record source="Caitlin" destination="Zane" >
-344.000 0
+<record source="Caitlin" destination="Zane" label="34">
+344.000 0.000 2.537
 </record>
-<record source="Caitlin" destination="Abraham" >
-62.400 0
+<record source="Caitlin" destination="Abraham" label="35">
+62.400 0.000 1.795
 </record>
-<record source="Caitlin" destination="Thurio" >
-36.400 0
+<record source="Caitlin" destination="Thurio" label="36">
+36.400 0.000 1.561
 </record>
-<record source="Caliban" destination="Abigail" >
-5.900 0
+<record source="Caliban" destination="Abigail" label="37">
+5.900 0.000 0.771
 </record>
-<record source="Caliban" destination="Trixie" >
-6.100 0
+<record source="Caliban" destination="Trixie" label="38">
+6.100 0.000 0.785
 </record>
-<record source="Charity" destination="Caitlin" >
-72.300 0
+<record source="Charity" destination="Caitlin" label="39">
+72.300 0.000 1.859
 </record>
-<record source="Clarice" destination="Oberon" >
-1.100 0
+<record source="Clarice" destination="Oberon" label="40">
+1.100 0.000 0.041
 </record>
-<record source="Daniel" destination="Paul" >
-0.200 0
+<record source="Daniel" destination="Paul" label="41">
+0.200 0.000 -0.699
 </record>
-<record source="Demetrius" destination="Paul" >
-118.800 0
+<record source="Demetrius" destination="Paul" label="42">
+118.800 0.000 2.075
 </record>
-<record source="Eduardo" destination="Holden" >
-10.200 0
+<record source="Eduardo" destination="Holden" label="43">
+10.200 0.000 1.009
 </record>
-<record source="Emma" destination="Nandini" >
-8.300 0
+<record source="Emma" destination="Nandini" label="44">
+8.300 0.000 0.919
 </record>
-<record source="Erica" destination="Beatrice" >
-1.000 0
+<record source="Erica" destination="Beatrice" label="45">
+1.000 0.000 0.000
 </record>
-<record source="Erica" destination="Francois" >
-9.400 0
+<record source="Erica" destination="Francois" label="46">
+9.400 0.000 0.973
 </record>
-<record source="Eugene" destination="Festus" >
-186.200 0
+<record source="Eugene" destination="Festus" label="47">
+186.200 0.000 2.270
 </record>
-<record source="Finian" destination="Katherine" >
-21.000 0
+<record source="Finian" destination="Katherine" label="48">
+21.000 0.000 1.322
 </record>
-<record source="Francois" destination="Erica" >
-10.000 0
+<record source="Francois" destination="Erica" label="49">
+10.000 0.000 1.000
 </record>
-<record source="Giovanni" destination="Banquo" >
-0.600 0
+<record source="Giovanni" destination="Banquo" label="50">
+0.600 0.000 -0.222
 </record>
-<record source="Gwen" destination="Reginald" >
-28.700 0
+<record source="Gwen" destination="Reginald" label="51">
+28.700 0.000 1.458
 </record>
-<record source="Guido" destination="Holden" >
-2.900 0
+<record source="Guido" destination="Holden" label="52">
+2.900 0.000 0.462
 </record>
-<record source="Hannah" destination="Norman" >
-0.100 0
+<record source="Hannah" destination="Norman" label="53">
+0.100 0.000 -1.000
 </record>
-<record source="Holden" destination="Elena" >
-13.900 0
+<record source="Holden" destination="Elena" label="54">
+13.900 0.000 1.143
 </record>
-<record source="Holden" destination="Jean-Luc" >
-5.800 0
+<record source="Holden" destination="Jean-Luc" label="55">
+5.800 0.000 0.763
 </record>
-<record source="Holden" destination="Sierra" >
-0.300 0
+<record source="Holden" destination="Sierra" label="56">
+0.300 0.000 -0.523
 </record>
-<record source="Hunter" destination="Nandini" >
-2.000 0
+<record source="Hunter" destination="Nandini" label="57">
+2.000 0.000 0.301
 </record>
-<record source="Iago" destination="Katherine" >
-22.400 0
+<record source="Iago" destination="Katherine" label="58">
+22.400 0.000 1.350
 </record>
-<record source="Imogene" destination="Pearl" >
-24.300 0
+<record source="Imogene" destination="Pearl" label="59">
+24.300 0.000 1.386
 </record>
-<record source="Jenna" destination="Caitlin" >
-116.600 0
+<record source="Jenna" destination="Caitlin" label="60">
+116.600 0.000 2.067
 </record>
-<record source="Jenna" destination="Justin" >
-452.700 0
+<record source="Jenna" destination="Justin" label="61">
+452.700 0.000 2.656
 </record>
-<record source="Jenna" destination="Olivia" >
-407.600 0
+<record source="Jenna" destination="Olivia" label="62">
+407.600 0.000 2.610
 </record>
-<record source="Jenna" destination="Seton" >
-240.000 0
+<record source="Jenna" destination="Seton" label="63">
+240.000 0.000 2.380
 </record>
-<record source="Jenna" destination="Zane" >
-129.800 0
+<record source="Jenna" destination="Zane" label="64">
+129.800 0.000 2.113
 </record>
-<record source="Jesus" destination="Nandini" >
-0.900 0
+<record source="Jesus" destination="Nandini" label="65">
+0.900 0.000 -0.046
 </record>
-<record source="Josef" destination="Pearl" >
-0.300 0
+<record source="Josef" destination="Pearl" label="66">
+0.300 0.000 -0.523
 </record>
-<record source="Justin" destination="Jenna" >
-323.900 0
+<record source="Justin" destination="Jenna" label="67">
+323.900 0.000 2.510
 </record>
-<record source="Justin" destination="Olivia" >
-730.200 0
+<record source="Justin" destination="Olivia" label="68">
+730.200 0.000 2.863
 </record>
-<record source="Justin" destination="Walter" >
-237.400 0
+<record source="Justin" destination="Walter" label="69">
+237.400 0.000 2.375
 </record>
-<record source="Katherine" destination="Eugene" >
-96.100 0
+<record source="Katherine" destination="Eugene" label="70">
+96.100 0.000 1.983
 </record>
-<record source="Katherine" destination="Festus" >
-212.700 0
+<record source="Katherine" destination="Festus" label="71">
+212.700 0.000 2.328
 </record>
-<record source="Katherine" destination="Finian" >
-16.800 0
+<record source="Katherine" destination="Finian" label="72">
+16.800 0.000 1.225
 </record>
-<record source="Katherine" destination="Leigh" >
-19.500 0
+<record source="Katherine" destination="Leigh" label="73">
+19.500 0.000 1.290
 </record>
-<record source="Katherine" destination="Samuel" >
-23.600 0
+<record source="Katherine" destination="Samuel" label="74">
+23.600 0.000 1.373
 </record>
-<record source="Katherine" destination="Silvius" >
-39.400 0
+<record source="Katherine" destination="Silvius" label="75">
+39.400 0.000 1.595
 </record>
-<record source="Katherine" destination="Timon" >
-111.400 0
+<record source="Katherine" destination="Timon" label="76">
+111.400 0.000 2.047
 </record>
-<record source="Katherine" destination="Abraham" >
-1.600 1
+<record source="Katherine" destination="Abraham" label="77">
+1.600 1.000 0.204
 </record>
-<record source="Katherine" destination="Douglas" >
-17.600 0
+<record source="Katherine" destination="Douglas" label="78">
+17.600 0.000 1.246
 </record>
-<record source="Katherine" destination="Stephen" >
-92.900 0
+<record source="Katherine" destination="Stephen" label="79">
+92.900 0.000 1.968
 </record>
-<record source="Kevin" destination="Jenna" >
-1007.700 0
+<record source="Kevin" destination="Jenna" label="80">
+1007.700 0.000 3.003
 </record>
-<record source="Kevin" destination="Olivia" >
-349.100 0
+<record source="Kevin" destination="Olivia" label="81">
+349.100 0.000 2.543
 </record>
-<record source="Kevin" destination="Seton" >
-12.700 0
+<record source="Kevin" destination="Seton" label="82">
+12.700 0.000 1.104
 </record>
-<record source="Kevin" destination="Zane" >
-227.200 0
+<record source="Kevin" destination="Zane" label="83">
+227.200 0.000 2.356
 </record>
-<record source="Kitty" destination="Oberon" >
-47.000 0
+<record source="Kitty" destination="Oberon" label="84">
+47.000 0.000 1.672
 </record>
-<record source="Lancelot" destination="Amanda" >
-884.100 0
+<record source="Lancelot" destination="Amanda" label="85">
+884.100 0.000 2.947
 </record>
-<record source="Laurel" destination="Katherine" >
-202.000 0
+<record source="Laurel" destination="Katherine" label="86">
+202.000 0.000 2.305
 </record>
-<record source="Lennox" destination="Festus" >
-23.800 0
+<record source="Lennox" destination="Festus" label="87">
+23.800 0.000 1.377
 </record>
-<record source="Lennox" destination="Katherine" >
-58.300 0
+<record source="Lennox" destination="Katherine" label="88">
+58.300 0.000 1.766
 </record>
-<record source="Lennox" destination="Kenneth" >
-0.600 0
+<record source="Lennox" destination="Kenneth" label="89">
+0.600 0.000 -0.222
 </record>
-<record source="Liza" destination="Katherine" >
-34.800 0
+<record source="Liza" destination="Katherine" label="90">
+34.800 0.000 1.542
 </record>
-<record source="Mack" destination="Katherine" >
-32.600 0
+<record source="Mack" destination="Katherine" label="91">
+32.600 0.000 1.513
 </record>
-<record source="Mack" destination="Susan" >
-118.500 0
+<record source="Mack" destination="Susan" label="92">
+118.500 0.000 2.074
 </record>
-<record source="Malvolio" destination="Oberon" >
-3.800 0
+<record source="Malvolio" destination="Oberon" label="93">
+3.800 0.000 0.580
 </record>
-<record source="Malcolm" destination="Julia" >
-395.500 0
+<record source="Malcolm" destination="Julia" label="94">
+395.500 0.000 2.597
 </record>
-<record source="Malcolm" destination="Pearl" >
-0.100 0
+<record source="Malcolm" destination="Pearl" label="95">
+0.100 0.000 -1.000
 </record>
-<record source="Nancy" destination="Holden" >
-3.000 0
+<record source="Nancy" destination="Holden" label="96">
+3.000 0.000 0.477
 </record>
-<record source="Nandini" destination="Desdemona" >
-0.400 0
+<record source="Nandini" destination="Desdemona" label="97">
+0.400 0.000 -0.398
 </record>
-<record source="Nandini" destination="Frida" >
-3.200 0
+<record source="Nandini" destination="Frida" label="98">
+3.200 0.000 0.505
 </record>
-<record source="Nandini" destination="Jasmine" >
-11.000 0
+<record source="Nandini" destination="Jasmine" label="99">
+11.000 0.000 1.041
 </record>
-<record source="Nandini" destination="Maria" >
-0.900 0
+<record source="Nandini" destination="Maria" label="100">
+0.900 0.000 -0.046
 </record>
-<record source="Nandini" destination="Paris" >
-0.500 0
+<record source="Nandini" destination="Paris" label="101">
+0.500 0.000 -0.301
 </record>
-<record source="Nandini" destination="Victoria" >
-0.800 0
+<record source="Nandini" destination="Victoria" label="102">
+0.800 0.000 -0.097
 </record>
-<record source="Nandini" destination="Yvette" >
-10.700 0
+<record source="Nandini" destination="Yvette" label="103">
+10.700 0.000 1.029
 </record>
-<record source="Nandini" destination="Zander" >
-0.200 0
+<record source="Nandini" destination="Zander" label="104">
+0.200 0.000 -0.699
 </record>
-<record source="Nandini" destination="Mamie" >
-22.500 0
+<record source="Nandini" destination="Mamie" label="105">
+22.500 0.000 1.352
 </record>
-<record source="Nate" destination="Paul" >
-15.500 0
+<record source="Nate" destination="Paul" label="106">
+15.500 0.000 1.190
 </record>
-<record source="Norman" destination="Dogberry" >
-8.600 0
+<record source="Norman" destination="Dogberry" label="107">
+8.600 0.000 0.934
 </record>
-<record source="Norman" destination="Henry" >
-28.000 0
+<record source="Norman" destination="Henry" label="108">
+28.000 0.000 1.447
 </record>
-<record source="Norman" destination="Holden" >
-14.600 1
+<record source="Norman" destination="Holden" label="109">
+14.600 1.000 1.164
 </record>
-<record source="Norman" destination="Kyle" >
-2.300 0
+<record source="Norman" destination="Kyle" label="110">
+2.300 0.000 0.362
 </record>
-<record source="Norman" destination="Kazuko" >
-4.800 0
+<record source="Norman" destination="Kazuko" label="111">
+4.800 0.000 0.681
 </record>
-<record source="Norman" destination="Kelsey" >
-22.700 0
+<record source="Norman" destination="Kelsey" label="112">
+22.700 0.000 1.356
 </record>
-<record source="Norman" destination="Kenneth" >
-12.600 0
+<record source="Norman" destination="Kenneth" label="113">
+12.600 0.000 1.100
 </record>
-<record source="Norman" destination="Sven" >
-5.900 0
+<record source="Norman" destination="Sven" label="114">
+5.900 0.000 0.771
 </record>
-<record source="Norman" destination="Abraham" >
-241.300 1
+<record source="Norman" destination="Abraham" label="115">
+241.300 1.000 2.383
 </record>
-<record source="Nikki" destination="Gabriel" >
-0.800 0
+<record source="Nikki" destination="Gabriel" label="116">
+0.800 0.000 -0.097
 </record>
-<record source="Oberon" destination="Caliban" >
-63.800 1
+<record source="Oberon" destination="Caliban" label="117">
+63.800 1.000 1.805
 </record>
-<record source="Oberon" destination="Horatio" >
-22.700 0
+<record source="Oberon" destination="Horatio" label="118">
+22.700 0.000 1.356
 </record>
-<record source="Oberon" destination="Katherine" >
-13.500 1
+<record source="Oberon" destination="Katherine" label="119">
+13.500 1.000 1.130
 </record>
-<record source="Oberon" destination="Kelly" >
-24.400 0
+<record source="Oberon" destination="Kelly" label="120">
+24.400 0.000 1.387
 </record>
-<record source="Oberon" destination="Paul" >
-96.500 1
+<record source="Oberon" destination="Paul" label="121">
+96.500 1.000 1.985
 </record>
-<record source="Oberon" destination="Kirk" >
-28.300 0
+<record source="Oberon" destination="Kirk" label="122">
+28.300 0.000 1.452
 </record>
-<record source="Oberon" destination="Yvette" >
-8.400 0
+<record source="Oberon" destination="Yvette" label="123">
+8.400 0.000 0.924
 </record>
-<record source="Oberon" destination="Abraham" >
-54.700 1
+<record source="Oberon" destination="Abraham" label="124">
+54.700 1.000 1.738
 </record>
-<record source="Oberon" destination="Gordon" >
-81.000 0
+<record source="Oberon" destination="Gordon" label="125">
+81.000 0.000 1.908
 </record>
-<record source="Olivia" destination="Amanda" >
-216.500 0
+<record source="Olivia" destination="Amanda" label="126">
+216.500 0.000 2.335
 </record>
-<record source="Olivia" destination="Caliban" >
-12.100 0
+<record source="Olivia" destination="Caliban" label="127">
+12.100 0.000 1.083
 </record>
-<record source="Olivia" destination="Lancelot" >
-311.000 0
+<record source="Olivia" destination="Lancelot" label="128">
+311.000 0.000 2.493
 </record>
-<record source="Olivia" destination="Walter" >
-248.200 0
+<record source="Olivia" destination="Walter" label="129">
+248.200 0.000 2.395
 </record>
-<record source="Opal" destination="Paul" >
-2.700 0
+<record source="Opal" destination="Paul" label="130">
+2.700 0.000 0.431
 </record>
-<record source="Orlando" destination="Paul" >
-178.000 0
+<record source="Orlando" destination="Paul" label="131">
+178.000 0.000 2.250
 </record>
-<record source="Oswald" destination="Katherine" >
-80.000 0
+<record source="Oswald" destination="Katherine" label="132">
+80.000 0.000 1.903
 </record>
-<record source="Padma" destination="Reginald" >
-2.700 0
+<record source="Padma" destination="Reginald" label="133">
+2.700 0.000 0.431
 </record>
-<record source="Paige" destination="Justin" >
-261.200 0
+<record source="Paige" destination="Justin" label="134">
+261.200 0.000 2.417
 </record>
-<record source="Paige" destination="Olivia" >
-191.800 0
+<record source="Paige" destination="Olivia" label="135">
+191.800 0.000 2.283
 </record>
-<record source="Paige" destination="Tiffany" >
-4837.900 0
+<record source="Paige" destination="Tiffany" label="136">
+4837.900 0.000 3.685
 </record>
-<record source="Paige" destination="Toby" >
-2229.300 0
+<record source="Paige" destination="Toby" label="137">
+2229.300 0.000 3.348
 </record>
-<record source="Paige" destination="Walter" >
-314.000 0
+<record source="Paige" destination="Walter" label="138">
+314.000 0.000 2.497
 </record>
-<record source="Pearl" destination="Alex" >
-9.500 0
+<record source="Pearl" destination="Alex" label="139">
+9.500 0.000 0.978
 </record>
-<record source="Pearl" destination="Imogene" >
-0.800 0
+<record source="Pearl" destination="Imogene" label="140">
+0.800 0.000 -0.097
 </record>
-<record source="Pearl" destination="Julia" >
-48.200 0
+<record source="Pearl" destination="Julia" label="141">
+48.200 0.000 1.683
 </record>
-<record source="Pearl" destination="Malcolm" >
-8.200 0
+<record source="Pearl" destination="Malcolm" label="142">
+8.200 0.000 0.914
 </record>
-<record source="Pearl" destination="Marcus" >
-13.000 0
+<record source="Pearl" destination="Marcus" label="143">
+13.000 0.000 1.114
 </record>
-<record source="Pearl" destination="Patrick" >
-30.100 0
+<record source="Pearl" destination="Patrick" label="144">
+30.100 0.000 1.479
 </record>
-<record source="Pearl" destination="Quentin" >
-8.000 0
+<record source="Pearl" destination="Quentin" label="145">
+8.000 0.000 0.903
 </record>
-<record source="Pearl" destination="Richard" >
-61.000 0
+<record source="Pearl" destination="Richard" label="146">
+61.000 0.000 1.785
 </record>
-<record source="Pearl" destination="Seth" >
-59.300 0
+<record source="Pearl" destination="Seth" label="147">
+59.300 0.000 1.773
 </record>
-<record source="Pearl" destination="Abraham" >
-106.000 0
+<record source="Pearl" destination="Abraham" label="148">
+106.000 0.000 2.025
 </record>
-<record source="Prospero" destination="Cameron" >
-0.800 0
+<record source="Prospero" destination="Cameron" label="149">
+0.800 0.000 -0.097
 </record>
-<record source="Prospero" destination="Imogene" >
-18.600 0
+<record source="Prospero" destination="Imogene" label="150">
+18.600 0.000 1.270
 </record>
-<record source="Prospero" destination="Laertes" >
-0.500 0
+<record source="Prospero" destination="Laertes" label="151">
+0.500 0.000 -0.301
 </record>
-<record source="Prospero" destination="Malcolm" >
-48.200 0
+<record source="Prospero" destination="Malcolm" label="152">
+48.200 0.000 1.683
 </record>
-<record source="Prospero" destination="Richard" >
-2.000 0
+<record source="Prospero" destination="Richard" label="153">
+2.000 0.000 0.301
 </record>
-<record source="Prospero" destination="Rocco" >
-69.400 0
+<record source="Prospero" destination="Rocco" label="154">
+69.400 0.000 1.841
 </record>
-<record source="Prospero" destination="Seth" >
-5.300 0
+<record source="Prospero" destination="Seth" label="155">
+5.300 0.000 0.724
 </record>
-<record source="Prospero" destination="Abraham" >
-0.200 0
+<record source="Prospero" destination="Abraham" label="156">
+0.200 0.000 -0.699
 </record>
-<record source="Pierre" destination="Prospero" >
-0.300 0
+<record source="Pierre" destination="Prospero" label="157">
+0.300 0.000 -0.523
 </record>
-<record source="Pierre" destination="Reginald" >
-0.200 0
+<record source="Pierre" destination="Reginald" label="158">
+0.200 0.000 -0.699
 </record>
-<record source="Philip" destination="Caitlin" >
-51.000 0
+<record source="Philip" destination="Caitlin" label="159">
+51.000 0.000 1.708
 </record>
-<record source="Rachel" destination="Caitlin" >
-174.300 0
+<record source="Rachel" destination="Caitlin" label="160">
+174.300 0.000 2.241
 </record>
-<record source="Reginald" destination="Devon" >
-0.600 0
+<record source="Reginald" destination="Devon" label="161">
+0.600 0.000 -0.222
 </record>
-<record source="Reginald" destination="Dwight" >
-1.900 0
+<record source="Reginald" destination="Dwight" label="162">
+1.900 0.000 0.279
 </record>
-<record source="Reuben" destination="Reginald" >
-24.100 0
+<record source="Reuben" destination="Reginald" label="163">
+24.100 0.000 1.382
 </record>
-<record source="Rex" destination="Reginald" >
-2.400 0
+<record source="Rex" destination="Reginald" label="164">
+2.400 0.000 0.380
 </record>
-<record source="Seton" destination="Caitlin" >
-46.600 0
+<record source="Seton" destination="Caitlin" label="165">
+46.600 0.000 1.668
 </record>
-<record source="Timon" destination="Festus" >
-28.800 0
+<record source="Timon" destination="Festus" label="166">
+28.800 0.000 1.459
 </record>
-<record source="Timon" destination="Katherine" >
-28.900 0
+<record source="Timon" destination="Katherine" label="167">
+28.900 0.000 1.461
 </record>
-<record source="Ursula" destination="Reginald" >
-3.900 0
+<record source="Ursula" destination="Reginald" label="168">
+3.900 0.000 0.591
 </record>
-<record source="Vanessa" destination="Nikki" >
-19.300 0
+<record source="Vanessa" destination="Nikki" label="169">
+19.300 0.000 1.286
 </record>
-<record source="Vivian" destination="Holden" >
-1.000 0
+<record source="Vivian" destination="Holden" label="170">
+1.000 0.000 0.000
 </record>
-<record source="Vincent" destination="Holden" >
-3.000 0
+<record source="Vincent" destination="Holden" label="171">
+3.000 0.000 0.477
 </record>
-<record source="Walter" destination="Justin" >
-225.500 0
+<record source="Walter" destination="Justin" label="172">
+225.500 0.000 2.353
 </record>
-<record source="Willis" destination="Caitlin" >
-73.400 0
+<record source="Willis" destination="Caitlin" label="173">
+73.400 0.000 1.866
 </record>
-<record source="Xavier" destination="Caliban" >
-38.900 0
+<record source="Xavier" destination="Caliban" label="174">
+38.900 0.000 1.590
 </record>
-<record source="Xavier" destination="Norman" >
-40.000 0
+<record source="Xavier" destination="Norman" label="175">
+40.000 0.000 1.602
 </record>
-<record source="Xavier" destination="Stephen" >
-145.300 0
+<record source="Xavier" destination="Stephen" label="176">
+145.300 0.000 2.162
 </record>
-<record source="Zane" destination="Caitlin" >
-213.700 0
+<record source="Zane" destination="Caitlin" label="177">
+213.700 0.000 2.330
 </record>
-<record source="Zane" destination="Kevin" >
-266.800 0
+<record source="Zane" destination="Kevin" label="178">
+266.800 0.000 2.426
 </record>
-<record source="Susan" destination="Katherine" >
-16.500 0
+<record source="Susan" destination="Katherine" label="179">
+16.500 0.000 1.217
 </record>
-<record source="Susan" destination="Liza" >
-1.600 0
+<record source="Susan" destination="Liza" label="180">
+1.600 0.000 0.204
 </record>
-<record source="Susan" destination="Mack" >
-20.400 0
+<record source="Susan" destination="Mack" label="181">
+20.400 0.000 1.310
 </record>
-<record source="Abraham" destination="Banquo" >
-102.800 1
+<record source="Abraham" destination="Banquo" label="182">
+102.800 1.000 2.012
 </record>
-<record source="Abraham" destination="Caliban" >
-212.800 1
+<record source="Abraham" destination="Caliban" label="183">
+212.800 1.000 2.328
 </record>
-<record source="Abraham" destination="Holden" >
-78.000 1
+<record source="Abraham" destination="Holden" label="184">
+78.000 1.000 1.892
 </record>
-<record source="Abraham" destination="Paul" >
-122.400 1
+<record source="Abraham" destination="Paul" label="185">
+122.400 1.000 2.088
 </record>
-<record source="Abraham" destination="Nandini" >
-86.300 0
+<record source="Abraham" destination="Nandini" label="186">
+86.300 0.000 1.936
 </record>
-<record source="Abraham" destination="Norman" >
-32.900 1
+<record source="Abraham" destination="Norman" label="187">
+32.900 1.000 1.517
 </record>
-<record source="Abraham" destination="Nikki" >
-78.800 0
+<record source="Abraham" destination="Nikki" label="188">
+78.800 0.000 1.897
 </record>
-<record source="Abraham" destination="Pearl" >
-122.200 0
+<record source="Abraham" destination="Pearl" label="189">
+122.200 0.000 2.087
 </record>
-<record source="Abraham" destination="Reginald" >
-154.500 0
+<record source="Abraham" destination="Reginald" label="190">
+154.500 0.000 2.189
 </record>
-<record source="Sybil" destination="Norman" >
-11.700 0
+<record source="Sybil" destination="Norman" label="191">
+11.700 0.000 1.068
 </record>
-<record source="Sydney" destination="Nandini" >
-19.400 0
+<record source="Sydney" destination="Nandini" label="192">
+19.400 0.000 1.288
 </record>
-<record source="Teresa" destination="Norman" >
-0.400 0
+<record source="Teresa" destination="Norman" label="193">
+0.400 0.000 -0.398
 </record>
-<record source="Thurio" destination="Caitlin" >
-91.200 0
+<record source="Thurio" destination="Caitlin" label="194">
+91.200 0.000 1.960
 </record>
-<record source="Tiffany" destination="Caitlin" >
-96.400 0
+<record source="Tiffany" destination="Caitlin" label="195">
+96.400 0.000 1.984
 </record>
-<record source="Caitlin" destination="Pinky" >
-12.600 0
+<record source="Caitlin" destination="Pinky" label="196">
+12.600 0.000 1.100
 </record>
-<record source="Juno" destination="Holden" >
-22.000 0
+<record source="Juno" destination="Holden" label="197">
+22.000 0.000 1.342
+</record><record source="Carol" destination="Holden" label="198">
+4.000 0.000 0.602
+</record><record source="Jasper" destination="Pearl" label="199">
+2.800 0.000 0.447
+</record><record source="Jasper" destination="Rachel" label="200">
+2.000 0.000 0.301
 </record>
-<record source="Carol" destination="Holden" >
-4.000 0
+<record source="Jasper" destination="Reginald" label="201">
+2.400 0.000 0.380
 </record>
-<record source="Jasper" destination="Pearl" >
-2.800 0
-</record>
-<record source="Jasper" destination="Rachel" >
-2.000 0
-</record>
-<record source="Jasper" destination="Reginald" >
-2.400 0
-</record>
-<record source="Jasper" destination="Rocco" >
-0.800 0
+<record source="Jasper" destination="Rocco" label="202">
+0.800 0.000 -0.097
 </record>
 </records>
 </data>
-
 </ggobidata>
