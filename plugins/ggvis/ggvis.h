@@ -12,11 +12,6 @@ typedef struct _noded {
   GList *connectedEdges; /*-- each element a GINT_TO_POINTER --*/
   GList *connectedNodes; /*-- each element a noded --*/
 
-/*
-  GList *inEdges, *outEdges;
-  GList *srcNodes, *destNodes;
-*/
-
   /*-- indexes of reference nodes --*/
   struct _noded *parentNode;
 

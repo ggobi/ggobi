@@ -17,12 +17,13 @@ gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   GtkWidget *entry;
+  const gchar *lbl = "Graph layout ...";
 
   inst->data = NULL;
   inst->info = plugin;
   inst->gg = gg;
 
-  entry = GGobi_addToolsMenuItem ("Graph layout ...", gg);
+  entry = GGobi_addToolsMenuItem (lbl, gg);
   gtk_signal_connect (GTK_OBJECT(entry), "activate",
                       GTK_SIGNAL_FUNC (show_ggvis_window), inst);
   return(true);
