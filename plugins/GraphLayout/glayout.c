@@ -109,58 +109,6 @@ scale_array_max (array_d *dist, gint nr, gint nc)
   }
 }
 
-static void
-set_dist_matrix_from_edges (datad *d, datad *e, ggobid *gg, glayoutd *gl)
-{
-  gint nNodes = d->nrows;
-  gint nedges = e->edge.n;
-  endpointsd *endpoints = e->edge.endpoints;
-
-  gint i, j;
-  gdouble infinity = (gdouble) (2*nNodes);
-  gboolean changing;
-  gint end1, end2, end3;
-  gdouble d12;  /* weight */
-  
-  gdouble **dv = gl->dist.vals;
-
-  if (nNodes < 1 || nedges < 1)
-    return;
-
-  /* Ok, we have a nice distance matrix, let's fill it in with infinity. */
-  for (i = 0; i < nNodes; i++) {
-    for (j = 0; j < nNodes; j++)
-      gl->dist.vals[i][j] = infinity;
-    gl->dist.vals[i][i] = 0.0;
-  }
-
-  /* As long as we find a shorter path using the edges, keep going. */
-  changing = true;
-  while (changing) {
-    changing = false;
-    for (i = 0; i < nedges; i++) {
-      end1 = d->rowid.idv.els[endpoints[i].a];
-      end2 = d->rowid.idv.els[endpoints[i].b];
-      /*-- we don't have edge weights yet --*/
-      d12 = 1.0;
-      for (end3 = 0; end3 < nNodes; end3++) {
-        /* So we have a direct link from end1 to end2.  Can this be */
-        /* used to shortcut a path from end1 to end3 or end2 to end3? */
-        if (dv[end1][end3] > d12 + dv[end2][end3]) {
-          dv[end3][end1] = dv[end1][end3] = d12 + dv[end2][end3];
-          changing = true;
-        }
-        if (dv[end2][end3] > d12 + dv[end1][end3]) {
-          dv[end3][end2] = dv[end2][end3] = d12 + dv[end1][end3];
-          changing = true;
-        }
-      }    /* end3 */
-    }    /* end1 and end2 */
-  }    /* while changing. */
-
-  scale_array_max (&gl->dist, nNodes, nNodes);
-}
-
 #ifdef CMDS
 /*-- move this to cmds_ui.c? --*/
 static void cmds_cb (GtkButton *button, PluginInstance *inst)
