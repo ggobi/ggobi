@@ -162,7 +162,7 @@ typedef enum {NULLMODE = -1,
 #define CMANIP_EQUAL 3
 
 /*-- projection pursuit indices --*/
-#define NATURAL_HERMITE 0
+/*#define NATURAL_HERMITE 0
 #define HERMITE         1
 #define CENTRAL_MASS    2
 #define HOLES           3
@@ -177,7 +177,7 @@ typedef enum {NULLMODE = -1,
 #define CART_GINI      12
 #define CART_ENTROPY   13
 #define CART_VAR       14
-#define PCA            15
+#define PCA            15*/
 
 /*-- parallel coordinates, scatterplot matrices and tsplots  --*/
 #define VAR_REPLACE  0

@@ -111,6 +111,12 @@ struct _displayd {
 */
  tour tcorr1, tcorr2;
 
+/* projection pursuit */
+ GtkWidget *t1d_pplabel, *t2d_pplabel;
+ GtkWidget *t1d_ppda, *t2d_ppda;
+ GdkPixmap *t1d_pp_pixmap, *t2d_pp_pixmap;
+ optimize0_param t1d_pp_op, t2d_pp_op;
+
  struct _ggobid *ggobi;
 
 };  /* displayd; */

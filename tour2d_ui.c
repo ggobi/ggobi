@@ -1,4 +1,13 @@
 /* tour2d_ui.c */
+/*
+    This software may only be used by you under license from AT&T Corp.
+    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
+    AT&T's Internet website having the URL:
+    <http://www.research.att.com/areas/stat/ggobi/license.html>
+    If you received this software without first entering into a license
+    with AT&T, you have an infringing copy of this software and cannot use
+    it without violating AT&T's intellectual property rights.
+*/
 
 #ifdef USE_STRINGS_H
 #include <strings.h>
@@ -71,9 +80,9 @@ static void pcaxes_cb (GtkToggleButton *button)
 
 static void tour2dpp_cb (GtkWidget *w, ggobid *gg) 
 {
-  #ifdef TOUR_PP_IMPLEMENTED
+  /*  #ifdef TOUR_PP_IMPLEMENTED*/
   tour2dpp_window_open (gg);
-  #endif
+  /*  #endif*/
 }
 
 static void tour2dadv_cb (GtkWidget *w, ggobid *gg) {
@@ -165,20 +174,20 @@ cpanel_tour2d_make (ggobid *gg) {
 /*
  * PC Axes toggle
 */
-  tgl = gtk_check_button_new_with_label ("PC axes");
+  /*  tgl = gtk_check_button_new_with_label ("PC axes");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
     "Show principal component axes or plain variable axes", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                       GTK_SIGNAL_FUNC (pcaxes_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]),
                       tgl, false, false, 1);
-
+  */
 /*
  * projection pursuit button
 */
   btn = gtk_button_new_with_label ("Projection pursuit ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Open panel for grand tour projection pursuit", NULL);
+    "Open panel for grand tour projection pursuit. Requires selected variables to be sphered.", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",

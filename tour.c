@@ -118,7 +118,7 @@ gboolean checkcolson(gfloat **ut, gint nc, gint nd) {
 gboolean checkequiv(gfloat **u0, gfloat **u1, gint nc, gint nd) {
   gint j;
   gfloat tol = 0.0001;
-  gboolean ok = true;
+  gboolean ok = true; /* false = the two are the same */
 
   for (j=0; j<nd; j++) {
     if (fabs(1.-inner_prod(u0[j], u1[j], nc)) < tol) {
@@ -572,11 +572,21 @@ increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn,
 }
 
 gboolean
-reached_target(gint nsteps, gint stepcntr) {
+reached_target(gint nsteps, gint stepcntr, gint basmeth, 
+  gfloat *indxval, gfloat *oindxval) 
+{
   gboolean arewethereyet = false;
 
   if (nsteps == 0 || stepcntr == nsteps)
     arewethereyet = true;
+  if (basmeth == 1)
+    if (*indxval < *oindxval)
+    {
+      arewethereyet = true;
+      *indxval = *oindxval;
+    }
+    else
+      *oindxval = *indxval;
 
   return(arewethereyet);
 }

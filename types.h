@@ -97,6 +97,8 @@ typedef struct {
   gboolean get_new_target;
   gint nsteps, stepcntr;
   gint target_basis_method;
+  gint index; /* this is for counting planes passed */
+  gfloat ppval; /* for projection pursuit */
 } tour;
 
 /* Sigbert's code for pp */
@@ -148,6 +150,17 @@ typedef struct
   array_f proj_best, data;
 } optimize0_param; 
 /* end Sigbert's code */
+
+/* pp */
+typedef struct
+{
+  gint nrows, ncols;
+  gfloat *h0, *h1;
+  gfloat acoefs;
+  gfloat **derivs;
+  gfloat *alpha, *beta;
+} holes_param;
+/* end pp */
 
 /*
  * display options

@@ -1,4 +1,23 @@
-/* tour1d.c */
+/* tour1d_pp.c */
+/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+The authors can be contacted at the following email addresses:
+    dicook@iastate.edu    sigbert@wiwi.hu-berlin.de
+*/
 
 #include <gtk/gtk.h>
 #ifdef USE_STRINGS_H
@@ -16,11 +35,23 @@
 
 /* Start of inclusion of Sigbert's tour1d_pp.c */
 
-#include "eispack.h"
+/*#include "eispack.h"*/
 #include "tour1d_pp.h"
-
+#include "tour_pp.h"
 
 char msg[1024];
+gfloat ppindx_mat[100]; /* needs to be global for easy
+				  initialization/clearing */
+static gint ppindx_count;
+static gfloat indx_min, indx_max;
+
+/*-- projection pursuit indices --*/
+#define PCA            0
+#define LDA            1
+#define CART_GINI      2
+#define CART_ENTROPY   3
+#define CART_VAR       4
+#define SUBD           5
 
 void print()
 { FILE *f = fopen ("dump", "a");
@@ -184,7 +215,9 @@ void eigenvalues (gfloat *cov, gint p, gfloat *ew,
     ew[1] = lp + sqrt(lp*lp-lq);          
   }
   else
-    rs_ (&p, &p, cov, ew, &matz, ev, fv1, fv2, &ierr);
+    {}
+  /* i want to avoid using eispack */
+    /*    rs_ (&p, &p, cov, ew, &matz, ev, fv1, fv2, &ierr);*/
 }      
 
 gint subd (array_f *pdata, void *param, gfloat *val)
@@ -350,8 +383,9 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   job = 10;
 
   memcpy (dp->a, dp->cov, pdata->ncols*pdata->ncols*sizeof(gfloat));
-  dsifa_ (dp->a, &lda, &n, dp->kpvt, &info);
-  dsidi_ (dp->a, &lda, &n, dp->kpvt, detw, inert, dp->work, &job);
+  /* i want to avoid using eispack */
+  /*  dsifa_ (dp->a, &lda, &n, dp->kpvt, &info);
+      dsidi_ (dp->a, &lda, &n, dp->kpvt, detw, inert, dp->work, &job);*/
   
   /* Compute W+B */
 
@@ -367,8 +401,9 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   }
 
   memcpy (dp->a, dp->cov, pdata->ncols*pdata->ncols*sizeof(gfloat));
-  dsifa_ (dp->a, &lda, &n, dp->kpvt, &info);
-  dsidi_ (dp->a, &lda, &n, dp->kpvt, detwb, inert, dp->work, &job);
+  /* i want to avoid using eispack */
+  /*  dsifa_ (dp->a, &lda, &n, dp->kpvt, &info);
+      dsidi_ (dp->a, &lda, &n, dp->kpvt, detwb, inert, dp->work, &job);*/
   
   *val = -detw[0]/detwb[0]*pow(10,detw[1]-detwb[1]);
 
@@ -578,200 +613,6 @@ gint cartvariance (array_f *pdata, void *param, gfloat *val)
   return(0);
 }
 
-/********************************************************************
-
-	                     OPTIMIZATION
-
-The index function has to be defined as
-
-     gint index (array_f *pdata, void *param, gfloat *val)
-
-with   
-
-Input:  pdata   projected data
-        param   additional parameters for the index 
-                (will not be touched by the optimization routine)
-
-Output: val     the index-value
-        
-The return value should be zero, otherwise the optimization routine
-assume an error has occured during computation of the index. 
-
-*********************************************************************/
-
-gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols)
-{
-  op->temp_start     =  1;
-  op->temp_end       =  0.001;
-  op->cooling        =  0.99;
-  /* is equivalent to log(temp_end/temp_start)/log(cooling) projections */
-  op->heating        =  1;
-  op->restart        =  1;
-  op->success        =  0;
-  op->temp           =  1;
-  op->maxproj        =  op->restart*(1+log(op->temp_end/op->temp_start)/log(op->cooling)); /* :) */
-  arrayf_init_null (&op->proj_best);
-  arrayf_alloc_zero (&op->proj_best, nrows, ncols);
-  arrayf_init_null (&op->data);
-
-  return 0;
-}
-
-gint free_optimize0_p (optimize0_param *op)
-{ arrayf_free (&op->proj_best, 0, 0);
-  arrayf_free (&op->data, 0, 0);
-
-  return 0;
-}
-
-gboolean iszero (array_f *data)
-{ gfloat sum = 0;
-  gint i, j;
-  for (i=0; i<data->nrows; i++)
-  { for (j=0; j<data->ncols; j++)
-      sum += fabs(data->vals[i][j]);
-  }
-  return (sum<1e-6);
-}
-
-gfloat randomval, nrand;
-gint nset;
-
-void initrandom(gfloat start)
-{ randomval = floor (fmod (fabs(start), 62748517.0));
-  nset   = 0;
-}
-
-gfloat uniformrandom()
-{ randomval = fmod (27132.0 * randomval + 7.0, 62748517.0);
-  return (randomval / 62748517.0);
-}
-
-gfloat normalrandom()
-{ gfloat x, y, r;
-  if (nset) { nset = 0; return(nrand); }
-  do
-  { x = 2.0*uniformrandom()-1.0;
-    y = 2.0*uniformrandom()-1.0;
-    r = x*x+y*y;
-  }
-  while (r>=1.0);
-  r = sqrt(-2.0*log(r)/r);
-  nrand = x*r;
-  nset  = 1;
-  return(y*r);
-}
-
-void normal_fill (array_f *data, gfloat delta, array_f *base)
-{ int i, j;
-  for (i=0; i<data->nrows; i++)
-  { for (j=0; j<data->ncols; j++)
-      data->vals[i][j] = base->vals[i][j]+delta*normalrandom();
-  }
-}
-
-void orthonormal (array_f *proj)
-{ gint i, j, k;
-  gfloat *ip = malloc (proj->ncols*sizeof(gfloat)), norm;
-  for (i=0; i<proj->ncols; i++)
-  { /* Compute inner product between p_i and all p_j */
-    for (j=0; j<i; j++)
-    { ip[j] = 0;
-      for (k=0; k<proj->nrows; k++)
-        ip[j] += proj->vals[k][j]*proj->vals[k][i];
-    }
-    /* Subtract now all vectors from p_i */
-    for (j=0; j<i; j++)
-    { for (k=0; k<proj->nrows; k++)
-        proj->vals[k][i] -= ip[j]*proj->vals[k][j];
-    }
-    /* Finally norm vector p_i */
-    norm = 0.0;
-    for (k=0; k<proj->nrows; k++)
-      norm += (proj->vals[k][i]*proj->vals[k][i]);
-    norm = sqrt(norm);
-    for (k=0; k<proj->nrows; k++)
-      proj->vals[k][i] /= norm;
-  }
-}
-
-gint optimize0 (optimize0_param *op,
-                gint (*index) (array_f*, void*, gfloat*),
-                void *param)
-{ gfloat index_work;
-  array_f proj_work, pdata, *proj;
-  int i,j, m, k;
-
-  proj = &(op->proj_best);
-  arrayf_init_null (&proj_work);
-  arrayf_alloc_zero (&proj_work, proj->nrows, proj->ncols);
-  arrayf_init_null (&pdata);
-  arrayf_alloc_zero (&pdata, op->data.nrows, proj->ncols);
-
-  if (iszero(proj))
-  { /* sprintf (msg, "zero projection matrix"); print(); */
-    normal_fill (proj, 1.0, proj);
-  }
-  orthonormal (proj);
-
-  for (i=0; i<op->data.nrows; i++)
-  { for (j=0; j<proj->ncols; j++)
-    { pdata.vals[i][j] = 0;
-      for (m=0; m<op->data.ncols; m++)
-        pdata.vals[i][j] += op->data.vals[i][m]*proj->vals[m][j];
-    }
-  }
-  if (index (&pdata, param, &op->index_best)) return(-1);
-
-  arrayf_copy (proj, &proj_work);
-
-  op->success = k = 0;
-  while (op->restart>0)
-  { /* sprintf (msg, "Restart %i", op->restart); print(); */
-    while (op->temp>op->temp_end)
-    { /* sprintf (msg, "Iteration %i", k); print(); */
-      normal_fill (&proj_work, op->temp, proj);
-      orthonormal (&proj_work);                              
-      op->temp *= op->cooling;
-
-      for (i=0; i<op->data.nrows; i++)
-      { for (j=0; j<proj->ncols; j++)
-        { pdata.vals[i][j] = 0;
-          for (m=0; m<op->data.ncols; m++)
-            pdata.vals[i][j] += op->data.vals[i][m]*proj_work.vals[m][j];
-        }
-      }
-
-      if (index (&pdata, param, &index_work)) return(-1);
-      if (index_work>op->index_best)
-      { /* sprintf (msg, "Success %f", index_work); print(); */
-        op->success++;
-        /*printf ("Success %f\n", index_work); */
-        arrayf_copy (&proj_work, proj);
-        op->index_best = index_work;
-        op->temp *= op->heating;
-      }
-      k++; 
-      if (k>=op->maxproj) 
-      { printf ("Best =%f\n", op->index_best);
-        for (i=0; i<proj->nrows; i++)        
-	{ for (j=0; j<proj->ncols; j++)
-  	    printf ("%+5.3f ", proj->vals[i][j]);
-  	  printf ("\n");
-        }
-        printf ("\n");
-        return(k);
-      }
-    }
-    op->temp = op->temp_start;
-    op->restart--;
-  } 
-
-  printf ("Best =%f\n", op->index_best);
-
-  return (k);
-}
-
 /* End of inclusion of Sigbert's tour1d_pp.c */
 
 /* This function interacts with control  buttons in ggobi */
@@ -789,3 +630,268 @@ void t1d_optimz(gint optimz_on, gboolean *nt, gint *bm) {
   *nt = new_target;
   *bm = bas_meth;
 }
+
+void t1d_clear_pppixmap(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  gint margin=10;
+  gint wid = dsp->t1d_ppda->allocation.width, 
+    hgt = dsp->t1d_ppda->allocation.height;
+
+  /* clear the pixmap */
+  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
+  gdk_draw_rectangle (dsp->t1d_pp_pixmap, gg->plot_GC,
+                      true, 0, 0, wid, hgt);
+
+  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_draw_line (dsp->t1d_pp_pixmap, gg->plot_GC,
+    margin, hgt - margin,
+    wid - margin, hgt - margin);
+  gdk_draw_line (dsp->t1d_pp_pixmap, gg->plot_GC,
+    margin, hgt - margin, margin, margin);
+
+  gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
+                   0, 0, 0, 0,
+                   wid, hgt);
+}
+
+void t1d_clear_ppda(ggobid *gg)
+{
+  gint i;
+
+  /* clear the ppindx matrix */
+  ppindx_count = 0;
+  indx_min=1000.;
+  indx_max=-1000.;
+  for (i=0; i<100; i++) 
+  {
+    ppindx_mat[i] = 0.0;
+  }
+
+  t1d_clear_pppixmap(gg);
+}
+
+void t1d_ppdraw_all(gint wid, gint hgt, gfloat indx_min, gfloat indx_max, 
+  gint margin, ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  gint xpos, ypos, xstrt, ystrt;
+  GdkPoint pptrace[100];
+  gint i;
+
+  t1d_clear_pppixmap(gg);
+
+  for (i=0; i<ppindx_count; i++) 
+  {
+    pptrace[i].x = margin+i*2;
+    pptrace[i].y = hgt-margin-(gint)((gfloat)((ppindx_mat[i]-indx_min)/
+      (gfloat) (indx_max-indx_min)) * (gfloat) (hgt - 2*margin));
+  }
+  gdk_draw_lines (dsp->t1d_pp_pixmap, gg->plot_GC,
+    pptrace, ppindx_count);
+
+  gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
+    0, 0, 0, 0, wid, hgt);
+
+}
+
+/* This is the pp index plot drawing routine */ 
+void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  gint margin=10;
+  gint wid = dsp->t1d_ppda->allocation.width, 
+    hgt = dsp->t1d_ppda->allocation.height;
+  gint j;
+  static gboolean init = true;
+  const gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
+
+  if (init) {
+    t1d_clear_ppda(gg);
+    init = false;
+  }
+
+  ppindx_mat[ppindx_count] = pp_indx_val;
+
+  if (indx_min > pp_indx_val)
+      indx_min = pp_indx_val;
+  if (indx_max < pp_indx_val)
+    indx_max = pp_indx_val;
+
+  if (indx_min == indx_max) indx_min *= 0.9999;
+
+  sprintf(label,"PP index: (%3.1f) %5.3f (%3.1f)",
+    indx_min, ppindx_mat[ppindx_count], indx_max);
+  gtk_label_set_text(dsp->t1d_pplabel,label);
+
+  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  if (ppindx_count == 0) 
+  {
+    ppindx_count++;
+  }
+  else if (ppindx_count > 0 && ppindx_count < 80) {
+    t1d_ppdraw_all(wid, hgt, indx_min, indx_max, margin, gg);
+    ppindx_count++;
+  }
+  else if (ppindx_count >= 80) 
+  {
+    /* cycle values back into array */
+    for (j=0; j<=ppindx_count; j++)
+      ppindx_mat[j] = ppindx_mat[j+1];
+    t1d_ppdraw_all(wid, hgt, indx_min, indx_max, margin, gg);
+  }
+
+}
+
+/********************************************************************
+
+	                     INDEX CALCULATION
+
+The index function has to be defined as
+
+     gint index (array_f *pdata, void *param, gfloat *val)
+
+with   
+
+Input:  pdata   projected data
+        param   additional parameters for the index 
+                (will not be touched by the optimization routine)
+
+Output: val     the index-value
+        
+This function should simply calculate the index value for a provided
+projection.
+
+*********************************************************************/
+
+
+gfloat t1d_calc_indx (array_f data, array_f proj, 
+                gint *rows, gint nrows, 
+                gint ncols,
+                gint (*index) (array_f*, void*, gfloat*),
+                void *param)
+{ 
+  gfloat indexval;
+  array_f pdata;
+  int i, j, m, k;
+
+  arrayf_init_null (&pdata);
+  arrayf_alloc_zero (&pdata, nrows, 1);
+
+  /* fill projected data array */
+  for (m=0; m<nrows; m++)
+  { 
+    i = rows[m];
+    pdata.vals[i][0] = 0.0;
+    for (j=0; j<ncols; j++)
+    { 
+      pdata.vals[i][0] += data.vals[i][j]*proj.vals[0][j];
+    }
+  }
+
+  index (&pdata, param, &indexval);
+  arrayf_free (&pdata, 0, 0);
+
+  return(indexval);
+}
+
+gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
+{
+  displayd *dsp = gg->current_display; 
+  datad *d = dsp->d;
+  gint kout, nrows = d->nrows_in_plot, pdim = 1;
+  subd_param sp; 
+  discriminant_param dp;
+  cartgini_param cgp;
+  cartentropy_param cep;
+  cartvariance_param cvp;
+  gfloat *gdata;
+  gint i, j;
+
+  gdata  = malloc (nrows*sizeof(gfloat));
+
+  for (i=0; i<d->nrows_in_plot; i++)
+    for (j=0; j<dsp->t1d.nvars; j++)
+      dsp->t1d_pp_op.data.vals[i][j] = 
+        d->tform.vals[d->rows_in_plot[i]][dsp->t1d.vars.els[j]];
+
+  for (j=0; j<dsp->t1d.nvars; j++)
+    dsp->t1d_pp_op.proj_best.vals[j][0] = 
+      dsp->t1d.u.vals[0][dsp->t1d.vars.els[j]];
+
+  if (d->clusterid.els==NULL) printf ("No cluster information found\n");
+    for (i=0; i<nrows; i++)
+    { 
+      if (d->clusterid.els!=NULL)
+        gdata[i] = d->clusterid.els[d->rows_in_plot[i]];
+      else
+        gdata[i] = 0;
+    }
+
+  switch (indxtype)
+  { 
+    case PCA: 
+      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
+        dsp->t1d.u, d->rows_in_plot, d->nrows, d->ncols, pca, NULL);
+      if (basismeth == 1)
+        kout = optimize0 (&dsp->t1d_pp_op, pca, &cvp);
+      break;
+    case LDA: 
+      alloc_discriminant_p (&dp, gdata, nrows, pdim);
+      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
+        dsp->t1d.u, d->rows_in_plot, d->nrows, d->ncols, 
+        discriminant, &dp);
+      if (basismeth == 1)
+        kout = optimize0 (&dsp->t1d_pp_op, discriminant, &dp);
+      free_discriminant_p (&dp);
+      break;
+    case CART_GINI: 
+      alloc_cartgini_p (&cgp, nrows, gdata);
+      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
+        dsp->t1d.u, d->rows_in_plot, d->nrows, d->ncols,
+        cartgini, &cgp);
+      if (basismeth == 1)
+        kout = optimize0 (&dsp->t1d_pp_op, cartgini, &cgp);
+      free_cartgini_p (&cgp);
+      break;
+    case CART_ENTROPY: 
+      alloc_cartentropy_p (&cep, nrows, gdata);
+      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
+        dsp->t1d.u, d->rows_in_plot, d->nrows, d->ncols, 
+        cartentropy, &cep);
+      if (basismeth == 1)
+        kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &cep);
+      free_cartentropy_p (&cep);
+      break;
+    case CART_VAR: 
+      alloc_cartvariance_p (&cvp, nrows, gdata);
+      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
+        dsp->t1d.u, d->rows_in_plot, d->nrows, d->ncols, 
+        cartvariance, &cvp);
+      if (basismeth == 1)
+        kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &cep);
+      free_cartvariance_p (&cvp);
+      break;
+    case SUBD: 
+      alloc_subd_p (&sp, nrows, pdim);
+      dsp->t1d.ppval  = t1d_calc_indx (d->tform, dsp->t1d.u, 
+        d->rows_in_plot, d->nrows, d->ncols, subd, &sp);
+      if (basismeth == 1)
+        kout  = optimize0 (&dsp->t1d_pp_op, subd, &sp);
+      free_subd_p (&sp);
+      break;
+    default: 
+      free (gdata);
+      return(true);
+      break;
+  }
+  free (gdata);
+  return(false);
+}
+
+#undef SUBD           
+#undef LDA            
+#undef CART_GINI      
+#undef CART_ENTROPY   
+#undef CART_VAR       
+#undef PCA            

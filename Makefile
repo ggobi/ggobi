@@ -67,15 +67,16 @@ SRC=array.c ash1d.c \
  main_ui.c make_ggobi.c menus.c missing.c \
  movepts.c movepts_ui.c noop-checkbutton.c \
  p1d.c p1d_ui.c parcoords.c parcoords_ui.c pipeline.c \
- ppcorr_ui.c pp_ui.c \
+ ppcorr_ui.c \
  read_array.c read_data.c record_id.c rotate_ui.c \
  scale_api.c scale_click.c scale_drag.c scale_ui.c \
  scatmat.c scatmat_ui.c scatterplot.c scatterplot_ui.c \
  smooth_ui.c sphere.c sphere_ui.c splash.c \
  splot.c sp_plot.c subset.c subset_ui.c svd.c \
  texture.c timeplot.c time_ui.c \
- tour1d.c tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c \
- tour2d.c tour2d_ui.c tour.c tourcorr.c tourcorr_ui.c \
+ tour1d.c tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour_pp.c\
+ tour2d.c tour2d_ui.c tour2d_pp.c tour2d_pp_ui.c \
+ tour.c tourcorr.c tourcorr_ui.c \
  transform.c transform_ui.c \
  utils.c utils_gdk.c utils_ui.c \
  varchange.c varcircles.c varpanel_ui.c vartable.c vartable_ui.c \
@@ -83,7 +84,6 @@ SRC=array.c ash1d.c \
  writedata.c writedata_ui.c write_svg.c \
  xyplot.c xyplot_ui.c \
 \
- eispack.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937-1.c cokus.c \
  fileio.c plugin.c print.c \
@@ -100,15 +100,16 @@ OB=array.o ash1d.o \
  main_ui.o make_ggobi.o menus.o missing.o \
  movepts.o movepts_ui.o noop-checkbutton.o \
  p1d.o p1d_ui.o parcoords.o parcoords_ui.o pipeline.o \
- ppcorr_ui.o pp_ui.o \
+ ppcorr_ui.o \
  read_array.o read_data.o record_id.o rotate_ui.o \
  scale_api.o scale_click.o scale_drag.o scale_ui.o \
  scatmat.o scatmat_ui.o scatterplot.o scatterplot_ui.o \
  smooth_ui.o sphere.o sphere_ui.o splash.o \
  splot.o sp_plot.o subset.o subset_ui.o svd.o \
  texture.o timeplot.o time_ui.o \
- tour1d.o tour1d_pp.o tour1d_pp_ui.o tour1d_ui.o \
- tour2d.o tour2d_ui.o tour.o tourcorr.o tourcorr_ui.o \
+ tour1d.o tour1d_pp.o tour1d_pp_ui.o tour1d_ui.o tour_pp.o\
+ tour2d.o tour2d_ui.o tour2d_pp.o tour2d_pp_ui.o \
+ tour.o tourcorr.o tourcorr_ui.o \
  transform.o transform_ui.o \
  utils.o utils_gdk.o utils_ui.o \
  varchange.o varcircles.o varpanel_ui.o vartable.o vartable_ui.o \
@@ -116,7 +117,6 @@ OB=array.o ash1d.o \
  writedata.o writedata_ui.o write_svg.o \
  xyplot.o xyplot_ui.o \
 \
- eispack.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  fileio.o plugin.o print.o \
  xlines.o 

@@ -25,7 +25,6 @@ SRC=\
     display.c \
     display_tree.c \
     display_ui.c \
-    eispack.c \
     exclusion.c \
     exclusion_ui.c \
     fileio.c \
@@ -57,7 +56,6 @@ SRC=\
     parcoords.c \
     parcoords_ui.c \
     pipeline.c \
-    pp_ui.c \
     ppcorr_ui.c \
     read_array.c \
     read_data.c \
@@ -84,12 +82,15 @@ SRC=\
     timeplot.c \
     time_ui.c \
     tour.c \
+    tour_pp.c \
     tour1d.c \
     tour1d_ui.c \
     tour1d_pp.c \
     tour1d_pp_ui.c \
     tour2d.c \
     tour2d_ui.c \
+    tour2d_pp.c \
+    tour2d_pp_ui.c \
     tourcorr.c \
     tourcorr_ui.c \
     transform.c \

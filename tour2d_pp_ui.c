@@ -1,4 +1,4 @@
-/* tour1d_pp_ui.c */
+/* tour2d_pp_ui.c */
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
@@ -16,13 +16,9 @@
 #define WIDTH   200
 #define HEIGHT  100
 
-/*-- projection pursuit indices --*/
-#define PCA            0
-#define LDA            1
-#define CART_GINI      2
-#define CART_ENTROPY   3
-#define CART_VAR       4
-#define SUBD           5
+#define HOLES           0
+#define CENTRAL_MASS    1
+#define SKEWNESS        2
 
 /*-- the statics will have to be moved to one of the include files - dfs --*/
 static GtkWidget *window = NULL;
@@ -36,8 +32,8 @@ static GtkAdjustment *param_adj;
 
 static void
 hide_cb (GtkWidget *w) {
-  /*  free_optimize0_p(&dsp->t1d_pp_op);  should this go here */
-  gtk_widget_hide(w);
+  /*  free_optimize0_p(&dsp->t2d_pp_op); should this go here? */
+  gtk_widget_hide (w);
 }
 
 static void
@@ -72,6 +68,7 @@ line_options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
       fprintf(stderr, "Unhandled switch-case in line_options_cb\n");
   }
 }
+
 static void
 bitmap_size_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
   g_printerr ("action = %d\n", action);
@@ -101,44 +98,41 @@ replot_freq_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
 }
 
 static void
-t1d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
+t2d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
   displayd *dsp = gg->current_display; 
 
-  extern void t1d_optimz(gint, gboolean *, gint *);
-  /*  extern void t1d_optimz(gint, ggobid *);*/
-  t1d_optimz(w->active, &dsp->t1d.get_new_target, 
-    &dsp->t1d.target_basis_method);
+  extern void t2d_optimz(gint, gboolean *, gint *, displayd *);
+  /*  extern void t2d_optimz(gint, ggobid *);*/
+  t2d_optimz(w->active, &dsp->t2d.get_new_target, 
+    &dsp->t2d.target_basis_method, dsp);
 }
 
 static void
-t1d_writeindx_cb (GtkEntry  *w, ggobid *gg) {
-  displayd *dsp = gg->current_display; 
+sphere_cb (GtkWidget  *w, ggobid *gg) {
+  extern void sphere_panel_open(ggobid *);
 
-  /* draw index value */
-  /*  gtk_entry_set_text (w, dsp->t1d.ppval);*/
+  sphere_panel_open(gg);
 }
 
-gchar *t1d_pp_func_lbl[] = {"PCA","LDA","CART Gini","CART Entropy", 
-                            "CART Variance","SUB-D"
-                            };
-void t1d_pp_func_cb (GtkWidget *w, gpointer cbd)
+gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","Skewness"};
+void t2d_pp_func_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
   displayd *dsp = gg->current_display;
   gint indx = GPOINTER_TO_INT (cbd);
-  extern void t1d_clear_ppda(ggobid *);
+  extern void t2d_clear_ppda(ggobid *);
   const gchar *label = g_strdup("PP index: (0.000) 0.0000 (0.000)");
 
-  cpanel->t1d_pp_indx = indx;
-  dsp->t1d.get_new_target = true;
+  cpanel->t2d_pp_indx = indx;
+  dsp->t2d.get_new_target = true;
 
-  dsp->t1d.ppval = 0.00;
-  dsp->t1d_pp_op.index_best = -100.0;
-  sprintf(label,"PP index: (%3.1f) %5.3f (%3.1f) ",0.0,dsp->t1d.ppval,0.0);
-  gtk_label_set_text(dsp->t1d_pplabel,label);
+  dsp->t2d.ppval = 0.00;
+  dsp->t2d_pp_op.index_best = -100.0;
+  sprintf(label,"PP index: (%3.1f) %5.3f (%3.1f) ",0.0,dsp->t2d.ppval,0.0);
+  gtk_label_set_text(dsp->t2d_pplabel,label);
 
-  t1d_clear_ppda(gg);
+  t2d_clear_ppda(gg);
 
   /*  if (indx == SUBD || LDA || CART_GINI || CART_ENTROPY || CART_VAR || PCA)
     gtk_widget_hide (param_vb);
@@ -163,39 +157,39 @@ record_bitmap_cb (GtkToggleButton  *w) {
 */
 
 static gint
-ppda_configure_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
+t2d_ppda_configure_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
 {
   gint wid = w->allocation.width, hgt = w->allocation.height;
 
-  if (dsp->t1d_pp_pixmap != NULL)
-    gdk_pixmap_unref (dsp->t1d_pp_pixmap);
+  if (dsp->t2d_pp_pixmap != NULL)
+    gdk_pixmap_unref (dsp->t2d_pp_pixmap);
 
-  dsp->t1d_pp_pixmap = gdk_pixmap_new (dsp->t1d_ppda->window,
+  dsp->t2d_pp_pixmap = gdk_pixmap_new (dsp->t2d_ppda->window,
     wid, hgt, -1);
 
   return false;
 }
 
 static gint
-ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
+t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 {
   gint margin=10;
   gint j;
   gint xpos, ypos, xstrt, ystrt;
   gchar *tickmk;
   displayd *dsp = gg->current_display;
-  GtkStyle *style = gtk_widget_get_style (dsp->t1d_ppda);
+  GtkStyle *style = gtk_widget_get_style (dsp->t2d_ppda);
   datad *d = gg->current_display->d;
   gint wid = w->allocation.width, hgt = w->allocation.height;
   static gboolean init = true;
-  extern void t1d_clear_ppda(ggobid *);
+  extern void t2d_clear_ppda(ggobid *);
 
   if (init) {
-    t1d_clear_ppda(gg);
+    t2d_clear_ppda(gg);
     init=false;
   }
 
-  gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
+  gdk_draw_pixmap (dsp->t2d_ppda->window, gg->plot_GC, dsp->t2d_pp_pixmap,
                    0, 0, 0, 0,
                    wid, hgt);
 
@@ -244,79 +238,98 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 
 void
-tour1dpp_window_open (ggobid *gg) {
+tour2dpp_window_open (ggobid *gg) {
   GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *entry;
-  GtkWidget *da, *label, *hb, *opt;
+  GtkWidget *da, *label, *hb, *opt, *btn;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
+  gint i, j;
+  gboolean vars_sphered = true;
 
-  if (window == NULL) {
+  /* check if selected variables are sphered beforeing allowing window
+     to popup */
+  if (dsp->t2d.nvars > d->sphere.pcvars.nels)
+    vars_sphered = false;
+  for (j=0; j<dsp->t2d.nvars; j++) 
+  {
+    for (i=0; i<d->sphere.pcvars.nels; i++) 
+      if (dsp->t2d.vars.els[j] == d->sphere.pcvars.els)
+        break;
+    if ((i == d->sphere.pcvars.nels-1) && 
+       (dsp->t2d.vars.els[j] != d->sphere.pcvars.els[i]))
+    {
+      vars_sphered = false;
+      break;
+    }
+  }
 
-    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (window), 
-      "projection pursuit");
-    gtk_signal_connect (GTK_OBJECT (window), "delete_event",
-                        GTK_SIGNAL_FUNC (hide_cb), (gpointer) NULL);
-    /*    gtk_window_set_policy (GTK_WINDOW (window), true, true, false);*/
-    gtk_container_set_border_width (GTK_CONTAINER (window), 10);
+  if (vars_sphered)
+  {
+    if (window == NULL) {
+
+      window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+      gtk_window_set_title (GTK_WINDOW (window), 
+        "projection pursuit");
+      gtk_signal_connect (GTK_OBJECT (window), "delete_event",
+                          GTK_SIGNAL_FUNC (hide_cb), (gpointer) NULL);
+      /*    gtk_window_set_policy (GTK_WINDOW (window), true, true, false);*/
+      gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
 /*
  * Add the main menu bar
 */
-    vbox = gtk_vbox_new (FALSE, 1);
-    gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-    gtk_container_add (GTK_CONTAINER (window), vbox);
+      vbox = gtk_vbox_new (FALSE, 1);
+      gtk_container_border_width (GTK_CONTAINER (vbox), 1);
+      gtk_container_add (GTK_CONTAINER (window), vbox);
 
-    pp_accel_group = gtk_accel_group_new ();
-    get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
+      pp_accel_group = gtk_accel_group_new ();
+      get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
                    pp_accel_group, window, &mbar, (gpointer) NULL);
-    gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+      gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 /*
  * Divide the window:  controls on the left, plot on the right
 */
-    hbox = gtk_hbox_new (false, 1);
-    gtk_container_border_width (GTK_CONTAINER (hbox), 1);
-    gtk_box_pack_start (GTK_BOX (vbox),
+      hbox = gtk_hbox_new (false, 1);
+      gtk_container_border_width (GTK_CONTAINER (hbox), 1);
+      gtk_box_pack_start (GTK_BOX (vbox),
                         hbox, true, true, 1);
-
 /*
  * Controls
 */
-    control_frame = gtk_frame_new (NULL);
-    gtk_frame_set_shadow_type (GTK_FRAME (control_frame), GTK_SHADOW_IN);
-    gtk_container_set_border_width (GTK_CONTAINER (control_frame), 5);
-    gtk_box_pack_start (GTK_BOX (hbox),
+      control_frame = gtk_frame_new (NULL);
+      gtk_frame_set_shadow_type (GTK_FRAME (control_frame), GTK_SHADOW_IN);
+      gtk_container_set_border_width (GTK_CONTAINER (control_frame), 5);
+      gtk_box_pack_start (GTK_BOX (hbox),
                         control_frame, false, false, 1);
 
-    vbc = gtk_vbox_new (false, 5);
-    gtk_container_set_border_width (GTK_CONTAINER (vbc), 5);
-    gtk_container_add (GTK_CONTAINER (control_frame), vbc);
+      vbc = gtk_vbox_new (false, 5);
+      gtk_container_set_border_width (GTK_CONTAINER (vbc), 5);
+      gtk_container_add (GTK_CONTAINER (control_frame), vbc);
 
 /*
  * Optimize toggle
 */
-    tgl = gtk_check_button_new_with_label ("Optimize");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-      "Guide the tour using projection pursuit optimization or tour passively",
-      NULL);
-    gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                        GTK_SIGNAL_FUNC (t1d_optimz_cb), (gpointer) gg);
-    gtk_box_pack_start (GTK_BOX (vbc),
-                      tgl, false, false, 1);
-
+      tgl = gtk_check_button_new_with_label ("Optimize");
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
+        "Guide the tour using projection pursuit optimization or tour passively",
+        NULL);
+      gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
+                          GTK_SIGNAL_FUNC (t2d_optimz_cb), (gpointer) gg);
+      gtk_box_pack_start (GTK_BOX (vbc),
+                        tgl, false, false, 1);
 /*
  * Index value with label
 */
-    hb = gtk_hbox_new (false, 3);
-    gtk_box_pack_start (GTK_BOX (vbc), hb, false, false, 2);
-
-    dsp->t1d_pplabel = gtk_label_new ("PP index: 0.0000");
-    gtk_misc_set_alignment (GTK_MISC (dsp->t1d_pplabel), 0, 0.5);
-    gtk_box_pack_start (GTK_BOX (hb), dsp->t1d_pplabel, false, false, 0);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), dsp->t1d_pplabel,
-      "The value of the projection pursuit index for the current projection",
-      NULL);
+      hb = gtk_hbox_new (false, 3);
+      gtk_box_pack_start (GTK_BOX (vbc), hb, false, false, 2);
+  
+      dsp->t2d_pplabel = gtk_label_new ("PP index: 0.0000");
+      gtk_misc_set_alignment (GTK_MISC (dsp->t2d_pplabel), 0, 0.5);
+      gtk_box_pack_start (GTK_BOX (hb), dsp->t2d_pplabel, false, false, 0);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), dsp->t2d_pplabel,
+        "The value of the projection pursuit index for the current projection",
+        NULL);
 
     /*    entry = gtk_entry_new_with_max_length (32);
     gtk_entry_set_editable (GTK_ENTRY (entry), false);
@@ -326,9 +339,9 @@ tour1dpp_window_open (ggobid *gg) {
       "The value of the projection pursuit index for the current projection",
       NULL);
     gtk_signal_connect (GTK_OBJECT (entry), "value_changed",
-    GTK_SIGNAL_FUNC (t1d_writeindx_cb), gg);*/
-    /*    gtk_signal_connect (GTK_OBJECT (dsp->t1d.ppval), "value_changed",
-	  GTK_SIGNAL_FUNC (t1d_writeindx_cb), gg);*/
+    GTK_SIGNAL_FUNC (t2d_writeindx_cb), gg);*/
+    /*    gtk_signal_connect (GTK_OBJECT (dsp->t2d.ppval), "value_changed",
+	  GTK_SIGNAL_FUNC (t2d_writeindx_cb), gg);*/
 
 /*
  * pp index menu and scale inside frame
@@ -338,20 +351,29 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vbc), frame, false, false, 0);
     */
 
-    vb = gtk_vbox_new (false, 3);
-    gtk_box_pack_start (GTK_BOX (vbc), vb, false, false, 2);
+    /*    vb = gtk_vbox_new (false, 3);*/
+      vb = gtk_vbox_new (true, 2);
+      gtk_box_pack_start (GTK_BOX (vbc), vb, false, false, 2);
     /*    gtk_container_add (GTK_CONTAINER (frame), vb);*/
 
-    opt = gtk_option_menu_new ();
-    gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-    gtk_misc_set_alignment (opt, 0, 0.5);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "Set the projection pursuit index", NULL);
-    gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-    /*    gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);*/
-    populate_option_menu (opt, t1d_pp_func_lbl,
-                          sizeof (t1d_pp_func_lbl) / sizeof (gchar *),
-                          (GtkSignalFunc) t1d_pp_func_cb, gg);
+      /*      btn = gtk_button_new_with_label ("Sphere Vars");
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+        "Interface to sphering variables (principal components analysis)", NULL);
+      gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+         GTK_SIGNAL_FUNC (sphere_cb), (gpointer) gg);
+      gtk_box_pack_start (GTK_BOX (vb), btn, true, true, 1);
+      */
+
+      opt = gtk_option_menu_new ();
+      gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
+      gtk_misc_set_alignment (opt, 0, 0.5);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+        "Set the projection pursuit index", NULL);
+      gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
+      /*    gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);*/
+      populate_option_menu (opt, t2d_pp_func_lbl,
+                          sizeof (t2d_pp_func_lbl) / sizeof (gchar *),
+                          (GtkSignalFunc) t2d_pp_func_cb, gg);
 
     /*    param_vb = gtk_vbox_new (false, 3);
     gtk_container_set_border_width (GTK_CONTAINER (param_vb), 4);
@@ -378,36 +400,34 @@ tour1dpp_window_open (ggobid *gg) {
 /*
  * Drawing area in a frame
 */
-    frame = gtk_frame_new (NULL);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
-    gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
-    gtk_box_pack_start (GTK_BOX (hbox),
-                        frame, true, true, 1);
+      frame = gtk_frame_new (NULL);
+      gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+      gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+      gtk_box_pack_start (GTK_BOX (hbox),
+                          frame, true, true, 1);
 
-    dsp->t1d_ppda = gtk_drawing_area_new ();
-    gtk_drawing_area_size (GTK_DRAWING_AREA (dsp->t1d_ppda), WIDTH, HEIGHT);
-    gtk_signal_connect (GTK_OBJECT (dsp->t1d_ppda),
-                        "configure_event",
-                        (GtkSignalFunc) ppda_configure_cb,
-                        (gpointer) dsp);
+      dsp->t2d_ppda = gtk_drawing_area_new ();
+      gtk_drawing_area_size (GTK_DRAWING_AREA (dsp->t2d_ppda), WIDTH, HEIGHT);
+      gtk_signal_connect (GTK_OBJECT (dsp->t2d_ppda),
+                          "configure_event",
+                          (GtkSignalFunc) t2d_ppda_configure_cb,
+                          (gpointer) dsp);
 
-    gtk_signal_connect (GTK_OBJECT (dsp->t1d_ppda),
-                        "expose_event",
-                        (GtkSignalFunc) ppda_expose_cb,
-                        (gpointer) gg);
+      gtk_signal_connect (GTK_OBJECT (dsp->t2d_ppda),
+                          "expose_event",
+                          (GtkSignalFunc) t2d_ppda_expose_cb,
+                          (gpointer) gg);
+  
+      gtk_container_add (GTK_CONTAINER (frame), dsp->t2d_ppda);
 
-    gtk_container_add (GTK_CONTAINER (frame), dsp->t1d_ppda);
+    }
 
+    alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nvars, 2);
+
+    gtk_widget_show_all (window);
   }
-
-  alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nvars, 1);
-
-  gtk_widget_show_all (window);
 }
 
-#undef SUBD           
-#undef LDA            
-#undef CART_GINI      
-#undef CART_ENTROPY   
-#undef CART_VAR       
-#undef PCA            
+#undef HOLES
+#undef CENTRAL_MASS
+#undef SKEWNESS

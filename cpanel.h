@@ -85,6 +85,7 @@ typedef struct {
  gfloat t2d_step; 
  gint t2d_ls_dir;
  gfloat t2d_path_len;
+ gint t2d_pp_indx;
 
  /*-- 1d tour --*/
  gboolean t1d_paused;
@@ -92,7 +93,6 @@ typedef struct {
  gint t1d_nbins, t1d_nASHes;
  gboolean t1d_vert;
  gint t1d_pp_indx;
- gfloat t1d_pp_indxval;
 
  /*-- corr tour --*/
  gboolean tcorr1_paused;

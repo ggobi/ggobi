@@ -1,4 +1,13 @@
 /* tour2d.c */
+/*
+    This software may only be used by you under license from AT&T Corp.
+    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
+    AT&T's Internet website having the URL:
+    <http://www.research.att.com/areas/stat/ggobi/license.html>
+    If you received this software without first entering into a license
+    with AT&T, you have an infringing copy of this software and cannot use
+    it without violating AT&T's intellectual property rights.
+*/
 
 #include <gtk/gtk.h>
 #ifdef USE_STRINGS_H
@@ -99,8 +108,13 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
+  gint old_ncols, i;
+
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
+  
+    old_ncols = dsp->t2d.u0.ncols;
+
     if (dsp->d == d) {
       arrayf_add_cols (&dsp->t2d.u0, nc);
       arrayf_add_cols (&dsp->t2d.u1, nc);
@@ -117,6 +131,23 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
       vectorf_realloc (&dsp->t2d.tinc, nc);
 
       arrayf_add_cols (&dsp->t2d_manbasis, (gint) nc);
+
+      /* need to zero extra cols */
+      for (i=old_ncols; i<nc; i++) {
+        dsp->t2d.u0.vals[0][i] = dsp->t2d.u0.vals[1][i] = 0.0;
+        dsp->t2d.u1.vals[0][i] = dsp->t2d.u1.vals[1][i] = 0.0;
+        dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
+        dsp->t2d.v0.vals[0][i] = dsp->t2d.v0.vals[1][i] = 0.0;
+        dsp->t2d.v1.vals[0][i] = dsp->t2d.v1.vals[1][i] = 0.0;
+        dsp->t2d.v.vals[0][i] = dsp->t2d.v.vals[1][i] = 0.0;
+        dsp->t2d.uvevec.vals[0][i] = dsp->t2d.uvevec.vals[1][i] = 0.0;
+        dsp->t2d.tv.vals[0][i] = dsp->t2d.tv.vals[1][i] = 0.0;
+        dsp->t2d.vars.els[i] = 0;
+        dsp->t2d.lambda.els[i] = 0.0;
+        dsp->t2d.tau.els[i] = 0.0;
+        dsp->t2d.tinc.els[i] = 0.0;
+      }
+
     }
   }
 }
@@ -190,6 +221,7 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
 
   /* pp */
   dsp->t2d.target_basis_method = 0;
+  dsp->t2d_ppda = NULL;
 }
 
 void tour2d_speed_set(gint slidepos, ggobid *gg) {
@@ -304,7 +336,7 @@ tour2d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
 void
 tour2d_run(displayd *dsp, ggobid *gg)
 {
-  extern gboolean reached_target(gint, gint);
+  extern gboolean reached_target(gint, gint, gint, gint *, gint *);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
@@ -314,21 +346,56 @@ tour2d_run(displayd *dsp, ggobid *gg)
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
   extern void tour_reproject(vector_f, array_f, array_f, array_f, 
     array_f, array_f, gint, gint);
+  extern void t2d_ppdraw(gfloat, ggobid *);
   datad *d = dsp->d;
-  gint i, nv;
+  cpaneld *cpanel = &dsp->cpanel;
+  gint i, j, nv;
+  static gint count = 0;
+  gboolean revert_random = false;
+  static gfloat oindxval = -999.0;
 
   if (!dsp->t2d.get_new_target && 
-       !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr)) {
+       !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, 
+         dsp->t2d.target_basis_method, &dsp->t2d.ppval, &oindxval)) {
     increment_tour(dsp->t2d.tinc, dsp->t2d.tau, &dsp->t2d.nsteps, 
       &dsp->t2d.stepcntr, dsp->t2d.dv, dsp->t2d.delta, (gint) 2);
     tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1, 
       dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
+
+    /* plot pp indx */
+    if (dsp->t2d_ppda != NULL) {
+
+      revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
+        0, gg);
+      count++;
+      if (count == 10) {
+        count = 0;
+        t2d_ppdraw(dsp->t2d.ppval, gg);
+      }
+    }
   }
   else { /* do final clean-up and get new target */
-    if (!dsp->t2d.get_new_target) {
-      do_last_increment(dsp->t2d.tinc, dsp->t2d.tau, (gint) 2);
-      tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1,
-	  dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
+    if (dsp->t2d.get_new_target) {
+      if (dsp->t2d.target_basis_method == 1)
+      {
+        dsp->t2d_pp_op.index_best = dsp->t2d.ppval;
+        oindxval = dsp->t2d.ppval;
+        for (i=0; i<2; i++)
+          for (j=0; j<dsp->t2d.nvars; j++)
+            dsp->t2d_pp_op.proj_best.vals[j][i] = 
+              dsp->t2d.u.vals[i][dsp->t2d.vars.els[j]];
+      }
+    }
+    else 
+    {
+      if (dsp->t2d.target_basis_method == 1)
+        t2d_ppdraw(dsp->t2d.ppval, gg);
+      else
+      {
+        do_last_increment(dsp->t2d.tinc, dsp->t2d.tau, (gint) 2);
+        tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1,
+          dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
+      }
     }
     copy_mat(dsp->t2d.u0.vals, dsp->t2d.u.vals, d->ncols, 2);
     nv = 0;
@@ -341,7 +408,46 @@ tour2d_run(displayd *dsp, ggobid *gg)
 					   active/used variables is > 2 */
       dsp->t2d.get_new_target = true;
     else {
-      gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, d->ncols, (gint) 2);
+      if (dsp->t2d.target_basis_method == 0) {
+        gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
+          d->ncols, (gint) 2);
+      }
+      else if (dsp->t2d.target_basis_method == 1) {
+        /* pp guided tour  */
+          revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
+            dsp->t2d.target_basis_method, gg);
+
+          if (!revert_random) {
+            for (i=0; i<2; i++)
+              for (j=0; j<dsp->t2d.nvars; j++)
+                dsp->t2d.u1.vals[i][dsp->t2d.vars.els[j]] = 
+                  dsp->t2d_pp_op.proj_best.vals[j][i];
+
+            /* if the best projection is the same as the previous one, switch 
+              to a random projection */
+            if (!checkequiv(dsp->t2d.u0.vals, dsp->t2d.u1.vals, d->ncols, 2)) 
+            {
+              printf("Using random projection\n");
+              gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
+                d->ncols, (gint) 2);
+              for (i=0; i<2; i++)
+                for (j=0; j<dsp->t2d.nvars; j++)
+                  dsp->t2d_pp_op.proj_best.vals[j][i] = 
+                    dsp->t2d.u1.vals[i][dsp->t2d.vars.els[j]];
+              revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
+                dsp->t2d.target_basis_method, gg);
+            }
+            t2d_ppdraw(dsp->t2d.ppval, gg);
+            count = 0;
+            sleep(2);
+	  }
+          else
+	  {
+            gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
+              d->ncols, (gint) 2);
+	  }
+        
+      }
       path(dsp->t2d.u0, dsp->t2d.u1, dsp->t2d.u, d->ncols, (gint) 2, dsp->t2d.v0,
       dsp->t2d.v1, dsp->t2d.v, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.uvevec,
       dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 

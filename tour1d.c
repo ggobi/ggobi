@@ -1,4 +1,13 @@
 /* tour1d.c */
+/*
+    This software may only be used by you under license from AT&T Corp.
+    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
+    AT&T's Internet website having the URL:
+    <http://www.research.att.com/areas/stat/ggobi/license.html>
+    If you received this software without first entering into a license
+    with AT&T, you have an infringing copy of this software and cannot use
+    it without violating AT&T's intellectual property rights.
+*/
 
 #include <gtk/gtk.h>
 #ifdef USE_STRINGS_H
@@ -174,19 +183,8 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
       dsp->t1d.v0.vals[i][dsp->t1d.vars.els[i]] = 
       dsp->t1d.v1.vals[i][dsp->t1d.vars.els[i]] = 1.0;
   }
-
-  /*  dsp->ts[0] = 0;
-  dsp->ts[1] = M_PI_2;
-  dsp->coss[0] = 1.0;
-  dsp->coss[1] = 0.0;
-  dsp->sins[1] = 1.0;
-  dsp->sins[0] = 0.0;
-  dsp->icoss[0] = PRECISION2;
-  dsp->icoss[1] = 0;
-  dsp->isins[1] = PRECISION2;
-  dsp->isins[0] = 0;*/
-
   /*  zero_tau(dsp, gg);*/
+
   dsp->t1d.dv = 1.0;
   dsp->t1d.delta = cpanel->t1d_step*M_PI_2/10.0;
   dsp->t1d.nsteps = 1; 
@@ -197,6 +195,7 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
 
   /* pp */
   dsp->t1d.target_basis_method = 0;
+  dsp->t1d_ppda = NULL;
 }
 
 void tour1d_speed_set(gint slidepos, ggobid *gg) {
@@ -351,7 +350,7 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
 void
 tour1d_run(displayd *dsp, ggobid *gg)
 {
-  extern gboolean reached_target(gint, gint);
+  extern gboolean reached_target(gint, gint, gint, gint *, gint *);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
@@ -361,33 +360,58 @@ tour1d_run(displayd *dsp, ggobid *gg)
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
   extern void tour_reproject(vector_f, array_f, array_f, array_f, 
     array_f, array_f, gint, gint);
+  extern void t1d_ppdraw(gfloat, ggobid *);
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-
-  subd_param sp; 
-  discriminant_param dp;
-  optimize0_param op;
-  cartgini_param cgp;
-  cartentropy_param cep;
-  cartvariance_param cvp;
-  gint nrows, ncols, pdim;
-  gfloat *gdata;
+  static gint count = 0;
   gboolean revert_random = false;
+  static gfloat oindxval = -999.0;
 
-  gint i, j, kout, nv;
+  gint i, j, nv;
 
   if (!dsp->t1d.get_new_target && 
-      !reached_target(dsp->t1d.nsteps, dsp->t1d.stepcntr)) {
+      !reached_target(dsp->t1d.nsteps, dsp->t1d.stepcntr, 
+        dsp->t1d.target_basis_method,&dsp->t1d.ppval, &oindxval)) {
     increment_tour(dsp->t1d.tinc, dsp->t1d.tau, &dsp->t1d.nsteps, 
       &dsp->t1d.stepcntr, dsp->t1d.dv, dsp->t1d.delta, (gint) 1);
     tour_reproject(dsp->t1d.tinc, dsp->t1d.v, dsp->t1d.v0, dsp->t1d.v1,
       dsp->t1d.u, dsp->t1d.uvevec, d->ncols, (gint) 1);
+
+    /* plot pp indx */
+    if (dsp->t1d_ppda != NULL) {
+
+      revert_random = t1d_switch_index(cpanel->t1d_pp_indx, 
+        0, gg);
+      count++;
+      if (count == 10) {
+        count = 0;
+        t1d_ppdraw(dsp->t1d.ppval, gg);
+      }
+    }
+
   }
   else { /* do final clean-up and get new target */
-    if (!dsp->t1d.get_new_target) {
-      do_last_increment(dsp->t1d.tinc, dsp->t1d.tau, (gint) 1);
-      tour_reproject(dsp->t1d.tinc, dsp->t1d.v, dsp->t1d.v0, dsp->t1d.v1,
-        dsp->t1d.u, dsp->t1d.uvevec, d->ncols, (gint) 1);
+    if (dsp->t1d.get_new_target) {
+      if (dsp->t1d.target_basis_method == 1)
+      {
+        dsp->t1d_pp_op.index_best = dsp->t1d.ppval;
+        oindxval = dsp->t1d.ppval;
+        for (i=0; i<2; i++)
+          for (j=0; j<dsp->t1d.nvars; j++)
+            dsp->t1d_pp_op.proj_best.vals[j][i] = 
+              dsp->t1d.u.vals[i][dsp->t1d.vars.els[j]];
+      }
+    }
+    else 
+    {
+      if (dsp->t1d.target_basis_method == 1)
+        t1d_ppdraw(dsp->t1d.ppval, gg);
+      else
+      {
+        do_last_increment(dsp->t1d.tinc, dsp->t1d.tau, (gint) 1);
+        tour_reproject(dsp->t1d.tinc, dsp->t1d.v, dsp->t1d.v0, dsp->t1d.v1,
+          dsp->t1d.u, dsp->t1d.uvevec, d->ncols, (gint) 1);
+      }
     }
     copy_mat(dsp->t1d.u0.vals, dsp->t1d.u.vals, d->ncols, 1);
     nv = 0;
@@ -404,80 +428,37 @@ tour1d_run(displayd *dsp, ggobid *gg)
       }
       else if (dsp->t1d.target_basis_method == 1) {
         /* pp guided tour  */
-          alloc_optimize0_p(&op, dsp->t1d.nvars, 1);
-          arrayf_alloc_zero (&op.data, d->nrows_in_plot, dsp->t1d.nvars); 
-          for (i=0; i<d->nrows_in_plot; i++)
-            for (j=0; j<dsp->t1d.nvars; j++)
-              op.data.vals[i][j] = 
-                d->tform.vals[d->rows_in_plot[i]][dsp->t1d.vars.els[j]];
+          revert_random = t1d_switch_index(cpanel->t1d_pp_indx, 
+            dsp->t1d.target_basis_method, gg);
 
-          /* Only for testing */
-          nrows  = d->nrows_in_plot;
-          ncols  = dsp->t1d.nvars;
-          pdim   = 1;
-          gdata  = malloc (nrows*sizeof(gfloat));
-       
-          if (d->clusterid.els==NULL) printf ("No cluster information found\n");
-          for (i=0; i<nrows; i++)
-	  { if (d->clusterid.els!=NULL)
-              gdata[i] = d->clusterid.els[d->rows_in_plot[i]];
-            else
-              gdata[i] = 0;
-          }
-
-          switch (cpanel->t1d_pp_indx)
-          { case 10: /* SUB-d */
-              alloc_subd_p (&sp, nrows, pdim);
-              kout  = optimize0 (&op, subd, &sp);
-              free_subd_p (&sp);
-              break;
-            case 11: /* Discriminant */
-              alloc_discriminant_p (&dp, gdata, nrows, pdim);
-              kout = optimize0 (&op, discriminant, &dp);
-              free_discriminant_p (&dp);
-              break;
-            case 12: /* CartGini */
-              alloc_cartgini_p (&cgp, nrows, gdata);
-              kout = optimize0 (&op, cartgini, &cgp);
-              free_cartgini_p (&cgp);
-              break;
-            case 13: /* CartEntropy */
-              alloc_cartentropy_p (&cep, nrows, gdata);
-              kout = optimize0 (&op, cartentropy, &cep);
-              free_cartentropy_p (&cep);
-              break;
-            case 14: /* CartVariance */
-              alloc_cartvariance_p (&cvp, nrows, gdata);
-              kout = optimize0 (&op, cartvariance, &cvp);
-              free_cartvariance_p (&cvp);
-              break;
-            case 15: /* PCA */
-              kout = optimize0 (&op, pca, NULL);
-            default: 
-              revert_random = true;
-          }
-          free (gdata);
           if (!revert_random) {
-            sleep(5);
-            for (i=0; i<d->ncols; i++)
-              for (j=0; j<d->ncols; j++)
-                dsp->t1d.u1.vals[i][j] = 0.0;
             for (i=0; i<dsp->t1d.nvars; i++)
               dsp->t1d.u1.vals[0][dsp->t1d.vars.els[i]] = 
-                op.proj_best.vals[i][0];
+                dsp->t1d_pp_op.proj_best.vals[i][0];
+
             /* if the best projection is the same as the previous one, switch 
               to a random projection */
             if (!checkequiv(dsp->t1d.u0.vals, dsp->t1d.u1.vals, d->ncols, 1)) {
+              printf("Using random projection\n");
               gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
                 d->ncols, (gint) 1);
-              printf("Using random projection\n");
+              for (j=0; j<dsp->t1d.nvars; j++)
+                dsp->t1d_pp_op.proj_best.vals[j][0] = 
+                  dsp->t1d.u1.vals[0][dsp->t1d.vars.els[j]];
+	      /*              dsp->t1d.ppval = -999.0;*/
+              revert_random = t1d_switch_index(cpanel->t1d_pp_indx, 
+                dsp->t1d.target_basis_method, gg);
             }
-        }
+            t1d_ppdraw(dsp->t1d.ppval, gg);
+            count = 0;
+	    sleep(2);
+	  }
           else
+	  {
             gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
               d->ncols, (gint) 1);
+	  }
         
-        free_optimize0_p(&op);
       }
       path(dsp->t1d.u0, dsp->t1d.u1, dsp->t1d.u, d->ncols, (gint) 1, dsp->t1d.v0,
         dsp->t1d.v1, dsp->t1d.v, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.uvevec,
@@ -722,3 +703,4 @@ tour1d_manip_end(splotd *sp)
 
 #undef T1DON
 #undef T1DOFF
+

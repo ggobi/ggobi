@@ -1,4 +1,13 @@
 /* tour1d_ui.c */
+/*
+    This software may only be used by you under license from AT&T Corp.
+    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
+    AT&T's Internet website having the URL:
+    <http://www.research.att.com/areas/stat/ggobi/license.html>
+    If you received this software without first entering into a license
+    with AT&T, you have an infringing copy of this software and cannot use
+    it without violating AT&T's intellectual property rights.
+*/
 
 #ifdef USE_STRINGS_H
 #include <strings.h>
@@ -77,9 +86,9 @@ static void tour1d_vert_cb (GtkToggleButton *button, ggobid *gg)
 
 static void tour1dpp_cb (GtkWidget *w, ggobid *gg) 
 {
-  #ifdef TOUR_PP_IMPLEMENTED
+  /*  #ifdef TOUR_PP_IMPLEMENTED*/
   tour1dpp_window_open (gg);
-  #endif
+  /*  #endif*/
 }
 
 void

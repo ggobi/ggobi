@@ -1,3 +1,23 @@
+/* tour1d_pp.h */
+/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+The authors can be contacted at the following email addresses:
+    dicook@iastate.edu    sigbert@wiwi.hu-berlin.de
+*/
 void center (array_f *data);
 gint pca (array_f *pdata, void *param, gfloat *val);
 
@@ -34,36 +54,7 @@ gint alloc_cartvariance_p (cartvariance_param *dp, gint nrows, gfloat *gdata);
 gint free_cartvariance_p (cartvariance_param *dp);
 gint cartvariance (array_f *pdata, void *param, gfloat *val);
 
-gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols);
-gint free_optimize0_p (optimize0_param *op);
-gboolean iszero (array_f *data);
-
-void initrandom(gfloat start);
-gfloat uniformrandom(void);
-gfloat normalrandom(void);
-void normal_fill (array_f *data, gfloat delta, array_f *base);
-void orthonormal (array_f *proj);
-gint optimize0 (optimize0_param *op,
+gfloat t1d_calc_indx(array_f, array_f, gint *, gint, gint,
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+gboolean t1d_switch_index(gint, gint, ggobid *);
