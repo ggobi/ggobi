@@ -296,11 +296,11 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (highlight_edges_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+*/
 
   label = gtk_label_new ("Radial");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                             frame, label);
-*/
   /*-- --*/
 
   gtk_widget_show_all (window);
