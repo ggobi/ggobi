@@ -57,7 +57,7 @@ cpanel_tour1d_set (cpaneld *cpanel, ggobid* gg)
   btn = widget_find_by_name (pnl, "TOUR1D:pause_button");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), cpanel->t1d_paused);
 
-  /* ASH smoothnewss */
+  /* ASH smoothness */
   w = widget_find_by_name (pnl, "TOUR1D:ASH_smooth");
   adj = gtk_range_get_adjustment (GTK_RANGE (w));
   gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
@@ -181,11 +181,12 @@ cpanel_tour1d_make (ggobid *gg) {
     false, false, 0);
 
   /*-- value, lower, upper, step --*/
-  gg->ash.smoothness_adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
-  gtk_signal_connect (GTK_OBJECT (gg->ash.smoothness_adj), "value_changed",
+  adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
+  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (t1d_ash_sm_cb), gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.smoothness_adj));
+/*  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.smoothness_adj));*/
+  sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_name (sbar, "TOUR1D:ASH_smooth");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust ASH smoothness", NULL);

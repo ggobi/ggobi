@@ -190,10 +190,6 @@ struct _ggobid {
 
 /*---------------------- 1d plotting -----------------------------------*/
 
- struct _Ash {
-   GtkWidget *type_opt;
-   GtkObject *smoothness_adj;
- } ash;
  struct _P1D {
    GtkObject *cycle_speed_adj;
    gboolean cycle_p;

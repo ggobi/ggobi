@@ -91,19 +91,21 @@ p1d_event_handlers_toggle (splotd *sp, gboolean state) {
 
 void
 cpanel_p1dplot_make (ggobid *gg) {
-  GtkWidget *tgl, *btn, *vb;
+  GtkWidget *tgl, *btn, *vb, *opt;
   GtkWidget *sbar;
+  GtkObject *adj;
   
   gg->control_panel[P1PLOT] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[P1PLOT]), 5);
 
  /*-- option menu --*/
-  gg->ash.type_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->ash.type_opt,
+  opt = gtk_option_menu_new ();
+  gtk_widget_set_name (opt, "P1PLOT:type_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Display either textured dot plots or average shifted histograms", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]),
-                      gg->ash.type_opt, false, false, 0);
-  populate_option_menu (gg->ash.type_opt, type_lbl,
+                      opt, false, false, 0);
+  populate_option_menu (opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) type_cb, gg);
 /*
@@ -117,11 +119,12 @@ cpanel_p1dplot_make (ggobid *gg) {
     false, false, 0);
 
   /*-- value, lower, upper, step --*/
-  gg->ash.smoothness_adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
-  gtk_signal_connect (GTK_OBJECT (gg->ash.smoothness_adj), "value_changed",
+  adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
+  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                       GTK_SIGNAL_FUNC (ash_smoothness_cb), gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.smoothness_adj));
+  sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_widget_set_name (sbar, "P1PLOT:ASH_smooth");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust ASH smoothness", NULL);
   gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
@@ -190,13 +193,23 @@ cpanel_p1d_set (cpaneld *cpanel, ggobid* gg)
  * which may have different p1d options and parameters selected
 */
 {
+  GtkWidget *pnl = gg->control_panel[P1PLOT];
+  GtkWidget *w;
+  GtkAdjustment *adj;
+
   /*-- Texturing or ASH --*/
-  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->ash.type_opt),
-                               cpanel->p1d.type);
+  w = widget_find_by_name (pnl, "P1PLOT:type_option_menu");
+  gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->p1d.type);
 
   /*-- ASH smoothness parameter --*/
+  w = widget_find_by_name (pnl, "P1PLOT:ASH_smooth");
+  adj = gtk_range_get_adjustment (GTK_RANGE (w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
+    2 * (gfloat) cpanel->p1d.nASHes / (gfloat) cpanel->p1d.nbins);
+/*
   gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->ash.smoothness_adj),
     2 * (gfloat) cpanel->p1d.nASHes / (gfloat) cpanel->p1d.nbins);
+*/
 
   /*-- Cycling on or off --*/
   /*-- Cycling speed --*/
