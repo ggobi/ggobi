@@ -39,6 +39,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \hyphenation{XGobi}
+\hyphenation{GGobi}
 \hyphenation{ggobi}
 \hyphenation{di-men-sion-al two--di-men-sion-al}
 \input epsf
@@ -46,11 +47,6 @@
 
 \parindent 0in
 \parskip 6pt
-
-% I'm taking text from the 1997 xgobi paper wherever possible.
-% (On fry, that's in /usr/dfs/papers/xgobi.1997/paper.tex)
-%
-%  slbl stands for 'section label'
 
 \begin {document}
 
@@ -70,7 +66,7 @@ Duncan Temple Lang, Lucent Bell Labs
 
 The GGobi software is a data visualization system with state-of-the-art
 interactive and dynamic methods for the manipulation of views of
-data.  It represents a significant improvement on its precedessor, XGobi,
+data.  It represents a significant improvement on its predecessor, XGobi,
 with multiple plotting windows, more flexible color management, XML file
 handling, and better portability to Windows.
 
@@ -98,7 +94,7 @@ be examined.
 
 This paper gives an overview of the layout and functionality of GGobi,
 interactive graphical software for exploratory data analysis.  Readers
-who are familiar with xgobi will find much that is familiar in GGobi's
+who are familiar with XGobi will find much that is familiar in GGobi's
 design, and might want to read section \ref{slbl:xgobi} first, where
 key differences between the two programs are described. There are
 several papers that describe parts of the functionality existing in
@@ -190,7 +186,7 @@ Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
 and Area vs Region in the second, and make that the current plot.
 Using the ViewMode menu, choose {\bf Identify}. Look at the buttons
 inside the leftmost portion of the ggobi console. Notice that
-they're contained by a frame labelled {\bf Identify,} which is the
+they're contained by a frame labeled {\bf Identify,} which is the
 view mode of the current plot.  This frame contains most of the row
 labeling controls, which are described in the section
 \ref{slbl:Identify}. Move the cursor around the plot window with mouse
@@ -200,7 +196,7 @@ where the sample was taken.
 
 Using the ViewMode menu, choose {\bf Brush.}  Look at the buttons and
 menus inside the leftmost portion of the ggobi console.  Notice
-that they're contained by a frame labelled {\bf Brush,} which is the
+that they're contained by a frame labeled {\bf Brush,} which is the
 view mode of the current plot.  This frame contains most of the
 brushing controls, which are described in the section
 \ref{slbl:Brush}.  A few of the brushing controls, though, are in the
@@ -313,7 +309,7 @@ variable selection region of the console, and then click on linoleic
 acid (a purple circle will be seen now in the variable circle for
 linoleic acid).  Select {\bf Oblique} in the {\bf Manual
 manipulation} menu.  Now in the plot window, hold down any mouse
-button while you drag the cursor. The coefficent corresponding to
+button while you drag the cursor. The coefficient corresponding to
 linoleic acid will increase and decrease following the mouse,
 inducing a rotation of the scattercloud.  Similarly rotate oleic acid
 and arachidic acid in and out of the plot, with the aim of finding a
@@ -403,7 +399,7 @@ and to the interaction type:
       horizontal and vertical axes,
 \item Scale: axis scaling,
 \item Brush: setting point glyphs, edge types, and point and edge colors,
-\item Identify: labelling points
+\item Identify: labeling points
 \item Move Points: direct manipulation of point positions.
 \end{itemize}
 
@@ -489,7 +485,7 @@ projection modes has its own rules for variable selection.  The
 variable selection interface for the 1DPlot and XYPlot modes is a
 column of checkboxes: clicking left on one of these selects a
 variable to be plotted horizontally, clicking middle or right selects
-a vertical variable.  The tour modes all use a set of labelled
+a vertical variable.  The tour modes all use a set of labeled
 circles for variable selection, and they provide some feedback about
 current projection.  The variable selection behavior for the tour
 modes will be described in the section for each mode.
@@ -727,9 +723,9 @@ plotting method, such as stripes, clusters, or gaps.
 
 The average shifted histogram is due to Scott (\cite{Scott92}),
 and the code is also his.  In this method, several histograms are
-calculated using the same binwidth but different origins, and the
+calculated using the same bin width but different origins, and the
 averaged results are plotted.  The smoothing parameter essentially
-controls the binwidth.
+controls the bin width.
 
 The 1D plot will be arranged horizontally if you select a variable
 with a left click, and vertically if you use a middle or right click.
@@ -1189,7 +1185,7 @@ These selected variables will also respond to operations contained
 within this panel:  you can reset the variable ranges that are used
 for projecting the data into the plotting window.  This allows
 variables with the same units or potential range (such as percentages)
-to use the same range, and facilitiates visual comparisons.
+to use the same range, and facilitates visual comparisons.
 
 The selected variables can also be cloned, and the new variables
 you create will be added to the table as well as the main control panel.
@@ -1239,7 +1235,7 @@ then click {\em Update scree plot.}
 
 Now you're ready to sphere the selected variables.  Working your way down
 the panel, use your visual interpretation of the scree plot together
-with the information in the labelled section ``Prepare to sphere'' to
+with the information in the labeled section ``Prepare to sphere'' to
 decide how many principal components you want to create.  By default,
 all the selected variables will be sphered, but you decide that the first
 few principal components account for a sufficiently high proportion of
@@ -1250,7 +1246,7 @@ are displayed to help you make that choice.
 
 Once you're satisfied with the selected variables and the number of
 principal components, proceed to the last step.  Click on {\em Apply
-sphering} to create new variables and add them ggobi's variable selection
+sphering} to create new variables and add them GGobi's variable selection
 panels.  The names of the selected variables will be added to the
 ``sphered variables'' to help you remember which variables you sphered.
 
@@ -1330,7 +1326,7 @@ select the {\bf Include all} button in the bottom row.
 Click the {\bf Rescale} button to rescale all plots excluding
 the points not in the subset.
 
-One purpose of subsetting is to allow the use of ggobi on data matrices
+One purpose of subsetting is to allow the use of GGobi on data matrices
 that are so large that dynamic and interactive operations begin to
 become painfully slow.  By selecting a smaller subset, a user can
 work on that subset at a comfortable speed of tour motion and
@@ -1370,48 +1366,80 @@ respond to the new values.
 % End of tools section, so end of working through the main menubar
 %
 
-% dfs here %
 \section{Multiple datasets}
 
-Several datasets can be open in ggobi simultaneously. The {\bf File}
-menu interfaces reading in additional data sets. Data tabs
-corresponding to each open data set are generated above the variable
-selection window on the main controls window. Linking between these
-data sets is facilitated though the interface described in Section
-\ref{LinkingRules}.
+Several datasets can be open in GGobi simultaneously. The {\bf File}
+menu interfaces reading in additional data sets. Data tabs corresponding
+to each open data set appear above the variable selection window on
+the main controls window, and in various tool windows. The rules for
+linking these data sets is described in Section \ref{LinkingRules}.
 
 \section{Edges}
 
+A special case of the use of multiple datasets is use of edges (line
+segments).  There are many reasons one would want to display line segments
+in a scatterplot. 
+
+There are several datasets with edges distributed with GGobi: {\em
+algal-bloom.xml}, in which edges are used to structure the display of an
+analysis of variance; {\em buckyball.xml}, data describing a graph -- a
+geometrical object; {\em eies.xml}, social network data; {\em pigs.xml},
+a dataset which includes several time variables; {\em prim7.xml},
+in which line segments are used to illustrate structure in the
+data which was found during extensive exploratory data analysis.
+
+We specify specify line segments (edges) for GGobi by the addition of a
+second dataset in an XML file (or through the API) in which each record
+has tags for {\it source} and {\it destination}.  These edge datasets
+can still have variables, of course, which might represent variables
+measured on transactions or interactions.
+
+A scatterplot which has corresponding edge datasets (which we might call
+edge sets) will have an {\bf Edges} menu in its menubar.  If there's a
+choice of edge sets, you'll see a cascading menu showing their names.
+Edges can have ``arrowheads'' added, to indicate the edge's direction;
+it's also possible to see the arrowheads alone.
+
+Edges can be brushed directly, as described in \ref{slbl:Brush}.
+
+If the records that define each edge also have variables, then
+displays of the variables in those edge datasets are also possible.
+A point in the scatterplot of an edge dataset corresponds to the
+same record as an edge in another scatterplot.  So brushing an
+edge in one is the virtually the same action as brushing a point
+in another.
+
+% dfs here %
 \newpage
 \section{Differences from XGobi}
 \label{slbl:xgobi}
 
-In this section, we summarize the key differences between ggobi
-and xgobi for those readers who are already familiar with xgobi.
+In this section, we summarize the key differences between GGobi
+and XGobi for those readers who are already familiar with XGobi.
 
 \subsection {Multiple displays}
 
-The first thing you'll notice when you look at a ggobi display is
+The first thing you'll notice when you look at a GGobi display is
 that the plotting window has become separated from the control
-panels.  The main reason for that change is so that a ggobi process
+panels.  The main reason for that change is so that a GGobi process
 can have multiple display windows, of the same type or of different
-types.  In addition to the basic scatterplot, ggobi currently has
+types.  In addition to the basic scatterplot, GGobi currently has
 scatterplot matrices, parallel coordinates plots, and time series
 plots.  (See \ref{slbl:GraphicalDisplays} for more detail.)
 
 This design change has had far-reaching effects.
 
 First, user interactions available for the simple scatterplot display
-can now be made available for other display types.  In xgobi, for
+can now be made available for other display types.  In XGobi, for
 instance, there is a parallel coordinates display, but it's not
-possible to brush it -- in ggobi, it is. 
+possible to brush it -- in GGobi, it is.
 
 Unfortunately, having multiple displays introduces a new source of
-ambiguity: you now have to tell ggobi which display, and which plot
+ambiguity: you now have to tell GGobi which display, and which plot
 within a display, you want to address.  Do that by simply clicking
-inside the target plot.  ggobi will draw a thick white outline around
+inside the target plot.  GGobi will draw a thick white outline around
 that plot so that you can check which plot your actions will be
-addressing.  The ViewMode panel in the main ggobi window should
+addressing.  The ViewMode panel in the main GGobi window should
 always correspond to the state of the current display, too.  We need
 more user experience before we can tell whether this approach is
 satisfactory.
@@ -1421,11 +1449,11 @@ linked by default, it's no longer necessary to run multiple processes
 in order to achieve linked displays.
 
 One of the most interesting implications of using multiple displays
-is that a ggobi process is no longer restricted to a single data
+is that a GGobi process is no longer restricted to a single data
 set.  The XML file format makes it easy to specify two or more data
 matrices in a single file, as described in section \ref{slbl:XML}.
 In addition, it's possible to add data matrices using the Read button
-on the File menu or using R.  (The R~-~ggobi interface will be
+on the File menu or using R.  (The R~-~GGobi interface will be
 introduced below, and it's more fully described in section
 \ref{slbl:Integration}.)
 
@@ -1433,7 +1461,7 @@ The rules for linking in XGobi had evolved into a rather complicated
 hodge-podge with special handling of ``row groups,'' the
 ``nlinkable'' notion to exclude points from linking, and linking
 points to line segments (edges).  This has been replaced with a single set
-of rules that can be specified in the xml file.  See section 
+of rules that can be specified in the XML file.  See section 
 \ref{LinkingRules} for details.
 
 With multiple displays, too, we no longer have to launch a new
@@ -1443,12 +1471,12 @@ which represent the presence and absence of data in each cell.
 A convenient side effect of multiple displays is that, since each
 display now sits in a window of its own, it's now very simple to
 adjust the aspect ratio of a plot; this simple operation is very
-awkward in xgobi.
+awkward in XGobi.
 
 \subsection {Data format}
 
 Before we describe other key changes in the visible design, we'll
-introduce the changes in data format.  The xgobi format, in which a
+introduce the changes in data format.  The XGobi format, in which a
 set of files with a common base name is used, is still supported,
 though some file formats have changed ({\em .colors}), and some are no
 longer supported ({\em .bin}, {\em .vgroups}, {\em .lines}).  (See
@@ -1456,7 +1484,7 @@ section \ref{slbl:DataFormat} for more detail.) The functions served
 by the discarded file types are usually served now in a different
 way:  for example, XGobi uses the {\em .vgroups} file to force
 a group of variables to use the same axis ranges.  In GGobi, that's
-accomplished by setting limits in the Variable manipulation tool.
+accomplished by setting limits in the variable manipulation tool.
 
 The new format, in which all the data lives in one file, is written
 in XML.  XML (Extensible Markup Language) is a widely used language
@@ -1466,28 +1494,30 @@ is also used to define documents that are read by other software.
 XML files can be validated automatically, and XML specifications can
 be easily extended, too, by adding to the set of tags in use.
 
-As ggobi grows and develops, we expect to favor the XML format:  it
+As GGobi grows and develops, we will favor the XML format:  it
 will become increasingly difficult to keep the old format up to
 date.  For instance, it's no longer possible to specify edges
 in the ascii data format, but they can be specified in XML -- and
 they can have associated data values.
 
-A few XML data files are included in the sample ggobi data, and
-the details of their format is described in (reference)
+A few XML data files are included in the sample GGobi data, and
+the details of their format is described in {\em XML Input Format}
+(XML.pdf) which is included as part of the GGobi distribution.
 
 Another innovation in data access is the ability to read data
 directly from a MySQL database, as described in section \ref{slbl:MySQL}.
 
 \subsection{Integration}
 
-Many XGobi users are also users of the SPlus or R statistics
-software, and have used the S function which launches an xgobi
-process viewing S data.  Once that launch occurred, the resulting
-process was utterly independent of its parent.  The XGobi authors
-did some experiments in the early 90s to achieve a more intimate
-connection, but made little headway.  (reference)
+Many XGobi users are also users of the SPlus or R statistics software, and
+have used the S function which launches an XGobi process viewing S data.
+Once that launch occurred, the resulting process was utterly independent
+of its parent.  The XGobi authors did some experiments in the early 90s
+to achieve a more intimate connection, but made little headway with S,
+though interprocess communication was used successfully with ArcView
+(\cite{SwayneBujaHubbell91,SMCM97}).
 
-With ggobi, that problem has been solved, and it's now possible
+With GGobi, that problem has been solved, and it's now possible
 to have real-time integration between GGobi and a variety of
 other software environments.  An example of this integration is
 the embedding of GGobi into R (or S), with the addition of a set of
@@ -1495,17 +1525,17 @@ R (or S) functions that manipulate GGobi data and displays,
 resetting data values, projection, and the appearance of the plot.
 
 For more details, see section \ref{slbl:Integration}, or read
-(reference).
+{\em Using the R-GGobi Link} (in RGGobi.pdf), another piece of
+documentation included in the GGobi distribution.
 
 \subsection {Variable selection}
 
-There have been a few changes in variable selection.  The
-familiar variable circles are still used for high-dimensional
-view modes, but we've switched to a simple checkbox interface
-for plots where only one or two variables can be selected
-simultaneously.  In these plots, the rich feedback provided
-by the variable circles is not needed, and may just be confusing
-to novices.
+There have been a few changes in variable selection.  The familiar
+variable circles are still used for high-dimensional view modes, but
+we've switched to a simple checkbox interface for plots where only one
+or two variables can be selected simultaneously.  In these plots, the
+rich feedback provided by the variable circles is not needed, and may
+just be confusing to novices.
 
 The basics of the user interface haven't changed, though:
 click with the left button to select a variable to be plotted
@@ -1514,12 +1544,12 @@ horizontally and the middle (or right) button to plot vertically.
 \subsection {The variable manipulation tool}
 
 The table in the {\bf Variable manipulation tool} can also be used to
-select variables -- not for specifying variable subsets when launching
-a parallel coordinates or scatterplot matrix display.
+select variables -- not for plotting, but for specifying variables
+subsets when launching a parallel coordinates or scatterplot matrix display.
 
 This table can also be used to specify limits for variables or groups
 of variables, and so we have dispensed with the {\em .vgroups}
-functionality in xgobi.
+functionality in XGobi.
 
 Variable cloning is another new feature: it appears as a button
 on the variable selection and statistics table.
@@ -1528,7 +1558,7 @@ For more detail on this table, see section \ref{slbl:VarManip}.
 
 \subsection{Changes in ViewModes and Tools}
 
-{\bf Brush} may be the {\bf ViewMode} that has changed the most,
+{\bf Brush} may be the view mode that has changed the most,
 because GGobi has a much richer notion of color selection than
 XGobi.  Open the {\bf Choose color \& glyph} panel, and then
 double-click on any element of the color palette to bring up a color
@@ -1538,7 +1568,7 @@ colors, and notice that changing the glyph also changes the line
 type to be used in edge brushing.
 
 {\bf Scale} has also changed.  The direct manipulation shifting and
-scaling methods work as they did in xgobi, but we've added  what we
+scaling methods work as they did in XGobi, but we've added what we
 call ``Click-style interaction'' for more precise control.  See section
 \ref{slbl:Scaling}.
 
@@ -1548,7 +1578,7 @@ implemented, but new things are beginning to appear.  In the {\bf
 shifted histogram, as described in section \ref{slbl:1DTour}.
 
 The redesign of the tour methods is reflected in the {\bf Sphering}
-tool, which also appears in the most recent versions of xgobi.
+tool, which also appears in the most recent versions of XGobi.
 Instead of automatically sphering variables in projection pursuit,
 GGobi requires you to specify which variables to sphere.  Since this
 method makes use of variable cloning, it creates new variables,
@@ -1559,7 +1589,7 @@ See section \ref{slbl:Sphering} for details.
 
 \subsection{On-line help}
 
-The on-line help system used in xgobi has been replaced with
+The on-line help system used in XGobi has been replaced with
 ``tooltips,'' so leaving the mouse over a widget for a couple of
 seconds brings up a phrase describing the function of that widget.
 If the tooltips annoy you, you can turn then off using a checkbox on
@@ -1572,11 +1602,7 @@ Soon:
 \begin{itemize}
 \item A two-button toggle widget for variable selection
 \item Reading a set of color scales
-\item Categorical data
-  \begin{itemize}
-  \item For linking
-  \item Categorical data displays
-  \end{itemize}
+\item Categorical data displays
 \item Graph layout
 \end{itemize}
 
@@ -1589,7 +1615,7 @@ Longer term:
 
 \section*{Web Links}
 
-The web site for ggobi:
+The web site for GGobi:
 
 \centerline{{\tt ggobi}: {\tt www.ggobi.org}}
 
