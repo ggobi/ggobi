@@ -162,7 +162,9 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
 {
   gint j;
   gchar *gstr, *gtypestr = NULL;
+/*
   gboolean gsize_p = false, gtype_p = false;
+*/
 
   fprintf(f, "<record");
 
@@ -192,50 +194,39 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
   fprintf(f, " glyphSize=\"%d\"", d->glyph[i].size);
   fprintf(f, " glyphType=\"%d\"", d->glyph[i].type);
 */
- if (!xmlWriteInfo->useDefault ||
-    (xmlWriteInfo->defaultGlyphType != d->glyph.els[i].type))
- {
-  gtype_p = true;
-  switch (d->glyph.els[i].type) {
-    case PLUS_GLYPH:
-      gtypestr = "plus";
+  if (!xmlWriteInfo->useDefault ||
+     xmlWriteInfo->defaultGlyphType != d->glyph.els[i].type ||
+     xmlWriteInfo->defaultGlyphSize != d->glyph.els[i].size)
+  {
+    switch (d->glyph.els[i].type) {
+      case PLUS_GLYPH:
+        gtypestr = "plus";
       break;
-    case X_GLYPH:
-      gtypestr = "x";
+      case X_GLYPH:
+        gtypestr = "x";
       break;
-    case OPEN_RECTANGLE:
-      gtypestr = "or";
+      case OPEN_RECTANGLE:
+        gtypestr = "or";
       break;
-    case FILLED_RECTANGLE:
-      gtypestr = "fr";
+      case FILLED_RECTANGLE:
+        gtypestr = "fr";
       break;
-    case OPEN_CIRCLE:
-      gtypestr = "oc";
+      case OPEN_CIRCLE:
+        gtypestr = "oc";
       break;
-    case FILLED_CIRCLE:
-      gtypestr = "fc";
+      case FILLED_CIRCLE:
+        gtypestr = "fc";
       break;
-    case POINT_GLYPH:
-      gtypestr = ".";
+      case POINT_GLYPH:
+        gtypestr = ".";
       break;
-    default:
-      gtypestr=NULL;
+      default:
+        gtypestr=NULL;
       break;
-  }
+    }
 
-  /*fprintf(f, " glyphType=\"%s\"", gtypestr);*/
+    fprintf (f, " glyph=\"%s %d\"", gtypestr, d->glyph.els[i].size);
  }
-
- if (!xmlWriteInfo->useDefault ||
-     (xmlWriteInfo->defaultGlyphSize != d->glyph.els[i].size))
- {
-   gsize_p = true;
-   /*fprintf(f, " glyphSize=\"%d\"", d->glyph[i].size);*/
- }
-
- if (gtype_p || gsize_p)
-   fprintf (f, " glyph=\"%s %d\"", gtypestr, d->glyph.els[i].size);
-
 
  fprintf(f, ">\n");
 
