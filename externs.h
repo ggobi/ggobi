@@ -15,6 +15,9 @@ extern "C" {
 #endif
 
 /* sort +1 */
+GtkWidget * get_clist_from_widget (GtkWidget *w);
+gint get_one_selection_from_clist (GtkWidget *clist);
+gint get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist);
 GtkWidget * create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, GtkSignalFunc func, ggobid *);
 gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);

@@ -19,27 +19,6 @@
 static gint xmargin = 20;
 static gint ymargin = 20;
 
-static GtkWidget *
-get_clist_from_widget (GtkWidget *w)
-{
-  /*-- find the current notebook page, then get the current clist --*/
-  GtkWidget *notebook = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT(w), "notebook");
-  gint page = gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook));
-  GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
-  GtkWidget *clist = GTK_BIN (swin)->child;
-
-  return clist;
-}
-static gint  /*-- assumes GTK_SELECTION_SINGLE --*/
-get_one_selection_from_clist (GtkWidget *clist)
-{
-  GList *selection = GTK_CLIST (clist)->selection;
-  gint selected_var = -1;
-  if (selection) selected_var = (gint) selection->data;
-
-  return selected_var;
-}
 /*-------------------------------------------------------------------------*/
 
 static void
@@ -390,34 +369,6 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
                    w->allocation.width,
                    w->allocation.height);
 }
-
-/*-- update the contents of the clist --*/
-/*
-static void wvis_setdata_cb (GtkWidget *w, datad *d)
-{
-  ggobid *gg = GGobiFromWidget(w, true);
-  gboolean rval = false;
-  GtkWidget *clist = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(w), "clist");
-  gint j;
-  gchar *row[1];
-
-  GtkWidget *da = gg->wvis.da;
-
-  gtk_clist_clear (GTK_CLIST (clist));
-
-  gtk_clist_freeze (GTK_CLIST (clist));
-  for (j=0; j<d->ncols; j++) {
-    row[0] = g_strdup_printf (d->vartable[j].collab_tform);
-    gtk_clist_append (GTK_CLIST (clist), row);
-  }
-  gtk_clist_thaw (GTK_CLIST (clist));
-
-  gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
-  gtk_signal_emit_by_name (GTK_OBJECT (da), "expose_event",
-    "expose_event",
-    (gpointer) gg, (gpointer) &rval);
-}
-*/
 
 void
 selection_made_cb (GtkWidget *clist, gint row, gint column,

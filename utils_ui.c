@@ -300,6 +300,46 @@ void scale_set_default_values (GtkScale *scale)
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
+get_clist_from_widget (GtkWidget *w)
+{
+  /*-- find the current notebook page, then get the current clist --*/
+  GtkWidget *notebook = (GtkWidget *)
+    gtk_object_get_data (GTK_OBJECT(w), "notebook");
+  gint page = gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook));
+  GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
+  GtkWidget *clist = GTK_BIN (swin)->child;
+
+  return clist;
+}
+gint  /*-- assumes GTK_SELECTION_SINGLE --*/
+get_one_selection_from_clist (GtkWidget *clist)
+{
+  GList *selection = GTK_CLIST (clist)->selection;
+  gint selected_var = -1;
+  if (selection) selected_var = (gint) selection->data;
+
+  return selected_var;
+}
+gint /*-- assumes multiple selection is possible --*/
+get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist)
+{
+  gint nselected_vars = 0;
+  GList *l;
+  gint j;
+
+  for (l = GTK_CLIST (clist)->selection; l; l=l->next) {
+    j = GPOINTER_TO_INT (l->data);
+    if (j >= maxnvars)  break;
+
+    vars[nselected_vars] = j;
+    nselected_vars++;
+  }
+
+  return nselected_vars;
+}
+/*-------------------------------------------------------------------------*/
+
+GtkWidget *
 create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
   GtkSignalFunc func, ggobid *gg)
 {
