@@ -595,6 +595,16 @@ static GtkItemFactoryEntry menu_items[] = {
 void
 quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
 {
+    int n, i;
+    ggobid *el;
+    n = GGobi_getNumGGobis();
+    for(i = 0; i < n ; i++) {
+        el = GGobi_ggobi_get(i);
+        if(el != gg)
+	    closePlugins(el);
+    }
+    closePlugins(gg);
+
   gtk_main_quit();
 }
 
@@ -788,6 +798,9 @@ create_ggobi(InputDescription *desc)
 
   read_input(desc, gg);
 
+  if(sessionOptions->info != NULL)
+      registerPlugins(gg, sessionOptions->info->plugins);
+
   start_ggobi(gg, init_data, true);
 
   return(gg);
@@ -798,9 +811,9 @@ create_ggobi(InputDescription *desc)
 void
 show_plugin_list(void *garbage, gint action, GtkWidget *w)
 {
-  extern GtkWidget * showPluginInfo (GList *plugins);
+  extern GtkWidget * showPluginInfo (GList *plugins, ggobid *gg);
   if(sessionOptions->info && sessionOptions->info)
-    showPluginInfo(sessionOptions->info->plugins);
+    showPluginInfo(sessionOptions->info->plugins, (ggobid*) garbage);
 }
 #endif
 

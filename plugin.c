@@ -40,7 +40,7 @@ load_plugin_library(GGobiPluginInfo *plugin)
    if(!handle) {
     char buf[1000];
       dynload->getError(buf, plugin);
-      fprintf(stderr, "error on loading plugin library %s: %s", plugin->dllName, buf);fflush(stderr);
+      fprintf(stderr, "error on loading plugin library %s: %s\n", plugin->dllName, buf);fflush(stderr);
    }
 
    return(handle);
@@ -59,6 +59,7 @@ registerPlugins(ggobid *gg, GList *plugins)
   GList *el = plugins;
   OnCreate f;
   GGobiPluginInfo *plugin;
+  PluginInstance *inst;
   gboolean ok = true;
 
   while(el) {
@@ -66,7 +67,14 @@ registerPlugins(ggobid *gg, GList *plugins)
     if(plugin->onCreate) {
       f = (OnCreate) getPluginSymbol(plugin->onCreate, plugin);
       if(f) {
-        ok = f(gg, plugin);
+	  inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
+          inst->data = NULL;
+          inst->info = plugin;
+	  ok = f(gg, plugin, inst);
+	  if(ok) {
+	      GGOBI_addPluginInstance(inst, gg);
+	  } else
+	      g_free(inst);
       }
     }
     el = el->next;
@@ -97,18 +105,21 @@ GGOBI_removePluginInstance(PluginInstance *inst, ggobid *gg)
 
  */
 
-void addPlugins(GList *plugins, GtkWidget *list);
-void addPlugin(GGobiPluginInfo *info, GtkWidget *list);
+void addPlugins(GList *plugins, GtkWidget *list, ggobid *gg);
+void addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg);
 
 /*
  We should move to an interface more like Gnumeric's plugin
  info list.
  */
 GtkWidget *
-showPluginInfo(GList *plugins)
+showPluginInfo(GList *plugins, ggobid *gg)
 {
  GtkWidget *win, *main_vbox, *list;
- static const gchar *titles[] = {"Name", "Description", "Author","Location"};
+   /* Number of entries here should be the same as in set_column_width below and 
+      as the number of elements in addPlugin().
+    */
+ static const gchar *titles[] = {"Name", "Description", "Author", "Location", "Loaded", "Active"};
 
   win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   main_vbox=gtk_vbox_new(FALSE,1);
@@ -117,16 +128,17 @@ showPluginInfo(GList *plugins)
   gtk_widget_show(main_vbox);
 
 
-  list = gtk_clist_new_with_titles(sizeof(titles)/sizeof(titles[0]),
-    (gchar **) titles);
+  list = gtk_clist_new_with_titles(sizeof(titles)/sizeof(titles[0]), (gchar **) titles);
 
   gtk_clist_set_column_width(GTK_CLIST(list), 0, 100); 
   gtk_clist_set_column_width(GTK_CLIST(list), 1, 225); 
   gtk_clist_set_column_width(GTK_CLIST(list), 2, 150); 
   gtk_clist_set_column_width(GTK_CLIST(list), 3, 225); 
+  gtk_clist_set_column_width(GTK_CLIST(list), 4,  50); 
+  gtk_clist_set_column_width(GTK_CLIST(list), 5,  50); 
 
   if(plugins)
-    addPlugins(plugins, list);
+    addPlugins(plugins, list, gg);
   gtk_box_pack_start(GTK_BOX(main_vbox), list, TRUE, TRUE, 0);
   gtk_widget_show(list);
   gtk_widget_show(win);
@@ -134,31 +146,70 @@ showPluginInfo(GList *plugins)
   return(win); 
 }
 
+/**
+ Determine whether the specified plugin is active 
+ for the given GGobi instance.
+ */
+gboolean
+isPluginActive(GGobiPluginInfo *info, ggobid *gg)
+{
+  GList *el;
+  PluginInstance *plugin;
+
+  el =  gg->pluginInstances;
+  while(el) { 
+    plugin = (PluginInstance *) el->data;
+    if(plugin->info == info)
+	return(true);
+    el = el->next;
+  }
+
+  return(false);
+}
+
+/**
+ Create a summary line for each plugin, adding it to the table widget.
+
+ @see addPlugin()
+ */
 void
-addPlugins(GList *plugins, GtkWidget *list)
+addPlugins(GList *plugins, GtkWidget *list, ggobid *gg)
 {
  int n = g_list_length(plugins), i;
  GGobiPluginInfo *plugin;
 
  for(i = 0; i < n ; i++) {
    plugin = (GGobiPluginInfo*) g_list_nth_data(plugins, i);
-   addPlugin(plugin, list);
+   addPlugin(plugin, list, gg);
  }
 }
 
+
+/**
+  Create the summary information line for a given plugin,
+  giving the name, description, author, shared library/DLL,
+  whether it is loaded and if it is active.
+  @see addPlugins() 
+ */
 void
-addPlugin(GGobiPluginInfo *info, GtkWidget *list)
+addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg)
 {
-  gchar **els = (gchar **) g_malloc(4*sizeof(gchar*));
+  gchar **els = (gchar **) g_malloc(6*sizeof(gchar*));
   els[0] = info->name;
   els[1] = info->description;
   els[2] = info->author;
   els[3] = info->dllName;
+  els[4] = info->loaded ? "yes" : "no";
+  
+  els[5] = isPluginActive(info, gg) ? "yes" : "no";
+
   gtk_clist_append(GTK_CLIST(list), els);
 }
 
-
-
+/**
+  Close each of the plugins within the specified GGobi instance.
+  This doesn't unload the plugin.
+ */
 void
 closePlugins(ggobid *gg)
 {
@@ -170,7 +221,7 @@ closePlugins(ggobid *gg)
     plugin = (PluginInstance *) el->data;
     if(plugin->info->onClose) {
       DLFUNC f =  getPluginSymbol(plugin->info->onClose, plugin->info);
-      f(gg, plugin);
+      f(gg, plugin, el);
     }
     tmp = el;
     el = el->next;

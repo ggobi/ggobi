@@ -344,7 +344,7 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   xmlChar * val;
 
   plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
-
+  memset(plugin, '\0', sizeof(GGobiPluginInfo));
   plugin->onLoad = NULL;
   plugin->onCreate = NULL;
   plugin->onClose = NULL;
@@ -364,25 +364,21 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   while(el) {
     if(el->type != XML_TEXT_NODE) {
       if(strcmp(el->name, "author") == 0) {
-        val = xmlNodeListGetString(doc, XML_CHILDREN(node), 1);
+        val = xmlNodeListGetString(doc, XML_CHILDREN(el), 1);
         plugin->author = g_strdup((char*) val);
       } else if(strcmp(el->name, "description") == 0) {
-        val = xmlNodeListGetString(doc, XML_CHILDREN(node), 1);
+        val = xmlNodeListGetString(doc, XML_CHILDREN(el), 1);
         plugin->description = g_strdup((char*) val);
       } else if(strcmp(el->name, "dll") == 0) {
         plugin->dllName = g_strdup((char*) xmlGetProp(el, "name"));
         if(XML_CHILDREN(el)) {
-          xmlNodePtr c = XML_CHILDREN(node);
+          xmlNodePtr c = XML_CHILDREN(el);
           while(c) {
             if(el->type != XML_TEXT_NODE && strcmp(c->name, "init") == 0) {
                GET_PROP_VALUE(onLoad, "onLoad");
                GET_PROP_VALUE(onCreate, "onCreate");
                GET_PROP_VALUE(onClose, "onClose");
                GET_PROP_VALUE(onUnload, "onUnload");
-/*
-               plugin->onLoad = g_strdup((char *) xmlGetProp(c, "onLoad"));
-               plugin->onCreate = g_strdup((char *) xmlGetProp(c, "onCreate"));
-*/
                break;
             }
             c = c->next;
@@ -396,15 +392,17 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 
   if(load) {
     plugin->library = load_plugin_library(plugin);
-    if(plugin->onLoad) {
+    plugin->loaded = (plugin->library != NULL);
+
+    if(plugin->loaded && plugin->onLoad) {
       OnLoad f = (OnLoad) getPluginSymbol(plugin->onLoad, plugin);
       if(f) {
         f(0, plugin);
       } else {
         gchar buf[1000];
         dynload->getError(buf, plugin);
-        fprintf(stderr, "error on loading plugin library %s: %s",
-          plugin->dllName, buf);fflush(stderr);
+        fprintf(stderr, "error on loading plugin library %s: %s\n",
+                plugin->dllName, buf);fflush(stderr);
       }
     }
   }

@@ -23,11 +23,21 @@ typedef struct {
 
     char *description;
     char *author;
+
+    gboolean loaded;
 } GGobiPluginInfo;
 
+typedef struct {
+  GGobiPluginInfo *info;
+  ggobid *gg;
+  gboolean active;
+  void *data;
+} PluginInstance;
+
+
 typedef gboolean (*OnLoad)(gboolean initializing, GGobiPluginInfo *plugin);
-typedef gboolean (*OnCreate)(ggobid *gg, GGobiPluginInfo *plugin);
-typedef gboolean (*OnClose)(ggobid *gg, GGobiPluginInfo *plugin);
+typedef gboolean (*OnCreate)(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst);
+typedef gboolean (*OnClose)(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst);
 typedef gboolean (*OnUnload)(gboolean quitting, GGobiPluginInfo *plugin);
 
 
@@ -41,11 +51,6 @@ typedef struct {
 } Dynload;
 
 
-typedef struct {
-  GGobiPluginInfo *info;
-  ggobid *gg;
-  void *data;
-} PluginInstance;
 
 extern Dynload *dynload;
 
