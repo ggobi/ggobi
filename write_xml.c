@@ -23,6 +23,7 @@ write_xml (const gchar *filename,  ggobid *gg)
   while((tmp != NULL)) {
     d = (datad*) tmp->data;
     ok = write_xml_stream (f, d, gg, filename);
+    tmp = tmp->next;
   }
 
   fclose(f);
@@ -109,7 +110,7 @@ write_xml_records(FILE *f, datad *d, ggobid *gg)
 {
  int i;
  fprintf(f, "<records\n");
- fprintf(f, " numRecords=\"%d\"", d->nrows);
+ fprintf(f, " count=\"%d\"", d->nrows);
  fprintf(f, ">\n");
  for(i = 0; i < d->nrows; i++) {
   write_xml_record(f, d, gg, i);
@@ -127,7 +128,10 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i)
   gchar *gstr;
   fprintf(f, "<record");
 
-  fprintf(f, " label=\"%s\"", g_array_index (d->rowlab, gchar *, i));
+  if(d->rowlab && d->rowlab->data
+       && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) {  
+     fprintf(f, " label=\"%s\"", gstr);
+  }
   fprintf(f, " color=\"%d\"", d->color_ids[i]);
 /*
   fprintf(f, " glyphSize=\"%d\"", d->glyph_ids[i].size);
