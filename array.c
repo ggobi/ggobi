@@ -156,6 +156,35 @@ arrayd_delete_cols (array_d *arrp, gint nc, gint *cols)
   g_free (keepers);
 }
 
+/*-- eliminate the nr rows contained in *rows --*/
+void
+arrayd_delete_rows (array_d *arrp, gint nr, gint *rows)
+{
+  gint i, j, k;
+  gint ito, ifrom;
+  gint *keepers = g_malloc ((arrp->nrows-nr) * sizeof (gint));
+  gint nkeepers = find_keepers (arrp->nrows, nr, rows, keepers);
+
+  if (nr > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      ito = k;
+      ifrom = keepers[k];  /*-- ito has to be less than ifrom for copying --*/
+      if (ito != ifrom) {
+        for (j=0; j<arrp->ncols; j++)
+          arrp->vals[ito][j] = arrp->vals[ifrom][j];
+      }
+    }
+
+    for (i=nkeepers; i<arrp->nrows; i++)
+      g_free (arrp->vals[i]);
+    arrp->vals = (gdouble **) g_realloc (arrp->vals,
+                              nkeepers * sizeof (gdouble *));
+  }
+  g_free (keepers);
+}
+
 void
 arrayd_copy (array_d *arrp_from, array_d *arrp_to)
 {
@@ -307,6 +336,35 @@ arrayf_delete_cols (array_f *arrp, gint nc, gint *cols)
       arrp->vals[i] = (gfloat *) g_realloc (arrp->vals[i],
                                             nkeepers * sizeof (gfloat));
     arrp->ncols = nkeepers;
+  }
+  g_free (keepers);
+}
+
+/*-- eliminate the nr rows contained in *rows --*/
+void
+arrayf_delete_rows (array_f *arrp, gint nr, gint *rows)
+{
+  gint i, j, k;
+  gint ito, ifrom;
+  gint *keepers = g_malloc ((arrp->nrows-nr) * sizeof (gint));
+  gint nkeepers = find_keepers (arrp->nrows, nr, rows, keepers);
+
+  if (nr > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      ito = k;
+      ifrom = keepers[k];  /*-- ito has to be less than ifrom for copying --*/
+      if (ito != ifrom) {
+        for (j=0; j<arrp->ncols; j++)
+          arrp->vals[ito][j] = arrp->vals[ifrom][j];
+      }
+    }
+
+    for (i=nkeepers; i<arrp->nrows; i++)
+      g_free (arrp->vals[i]);
+    arrp->vals = (gfloat **) g_realloc (arrp->vals,
+                              nkeepers * sizeof (gfloat *));
   }
   g_free (keepers);
 }
@@ -465,6 +523,35 @@ arrays_delete_cols (array_s *arrp, gint nc, gint *cols)
   g_free (keepers);
 }
 
+/*-- eliminate the nr rows contained in *rows --*/
+void
+arrays_delete_rows (array_s *arrp, gint nr, gint *rows)
+{
+  gint i, j, k;
+  gint ito, ifrom;
+  gint *keepers = g_malloc ((arrp->nrows-nr) * sizeof (gint));
+  gint nkeepers = find_keepers (arrp->nrows, nr, rows, keepers);
+
+  if (nr > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      ito = k;
+      ifrom = keepers[k];  /*-- ito has to be less than ifrom for copying --*/
+      if (ito != ifrom) {
+        for (j=0; j<arrp->ncols; j++)
+          arrp->vals[ito][j] = arrp->vals[ifrom][j];
+      }
+    }
+
+    for (i=nkeepers; i<arrp->nrows; i++)
+      g_free (arrp->vals[i]);
+    arrp->vals = (gshort **) g_realloc (arrp->vals,
+                              nkeepers * sizeof (gshort *));
+  }
+  g_free (keepers);
+}
+
 /*-------------------------------------------------------------------------*/
 /*                      long array management                              */
 /*-------------------------------------------------------------------------*/
@@ -600,6 +687,35 @@ arrayl_delete_cols (array_l *arrp, gint nc, gint *cols)
   g_free (keepers);
 }
 
+/*-- eliminate the nr rows contained in *rows --*/
+void
+arrayl_delete_rows (array_l *arrp, gint nr, gint *rows)
+{
+  gint i, j, k;
+  gint ito, ifrom;
+  gint *keepers = g_malloc ((arrp->nrows-nr) * sizeof (gint));
+  gint nkeepers = find_keepers (arrp->nrows, nr, rows, keepers);
+
+  if (nr > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      ito = k;
+      ifrom = keepers[k];  /*-- ito has to be less than ifrom for copying --*/
+      if (ito != ifrom) {
+        for (j=0; j<arrp->ncols; j++)
+          arrp->vals[ito][j] = arrp->vals[ifrom][j];
+      }
+    }
+
+    for (i=nkeepers; i<arrp->nrows; i++)
+      g_free (arrp->vals[i]);
+    arrp->vals = (glong **) g_realloc (arrp->vals,
+                              nkeepers * sizeof (glong *));
+  }
+  g_free (keepers);
+}
+
 /*-------------------------------------------------------------------------*/
 /*                     greal array management                              */
 /*-------------------------------------------------------------------------*/
@@ -731,6 +847,35 @@ arrayg_delete_cols (array_g *arrp, gint nc, gint *cols)
       arrp->vals[i] = (greal *) g_realloc (arrp->vals[i],
                                            nkeepers * sizeof (greal));
     arrp->ncols = nkeepers;
+  }
+  g_free (keepers);
+}
+
+/*-- eliminate the nr rows contained in *rows --*/
+void
+arrayg_delete_rows (array_g *arrp, gint nr, gint *rows)
+{
+  gint i, j, k;
+  gint ito, ifrom;
+  gint *keepers = g_malloc ((arrp->nrows-nr) * sizeof (gint));
+  gint nkeepers = find_keepers (arrp->nrows, nr, rows, keepers);
+
+  if (nr > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      ito = k;
+      ifrom = keepers[k];  /*-- ito has to be less than ifrom for copying --*/
+      if (ito != ifrom) {
+        for (j=0; j<arrp->ncols; j++)
+          arrp->vals[ito][j] = arrp->vals[ifrom][j];
+      }
+    }
+
+    for (i=nkeepers; i<arrp->nrows; i++)
+      g_free (arrp->vals[i]);
+    arrp->vals = (greal **) g_realloc (arrp->vals,
+                              nkeepers * sizeof (greal *));
   }
   g_free (keepers);
 }
