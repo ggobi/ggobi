@@ -192,7 +192,7 @@ struct _ggobid {
 
  struct _Save {
    gint format, stage, row_ind, column_ind, missing_ind;
-   gboolean jitter_p, lines_p;
+   gboolean jitter_p, edges_p;
  } save;
 
 /*---------------------- 1d plotting -----------------------------------*/

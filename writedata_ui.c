@@ -77,12 +77,12 @@ static void missingind_set_cb (GtkWidget *w, gpointer cbd)
   missingind_set (GPOINTER_TO_INT (cbd), gg);
 }
 
-static gchar *lines_lbl[] = {"Don't save lines", "Save lines"};
-void linesp_set (gboolean linesp, ggobid *gg) { gg->save.lines_p = linesp; }
-static void linesp_set_cb (GtkWidget *w, gpointer cbd)
+static gchar *edges_lbl[] = {"Don't save edges", "Save edges"};
+void edgesp_set (gboolean edgesp, ggobid *gg) { gg->save.edges_p = edgesp; }
+static void edgesp_set_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
-  linesp_set ((gboolean ) GPOINTER_TO_INT (cbd), gg);
+  edgesp_set ((gboolean ) GPOINTER_TO_INT (cbd), gg);
 }
 
 /*-- called when closed from the button --*/
@@ -225,19 +225,19 @@ writeall_window_open (ggobid *gg) {
     gtk_table_attach (GTK_TABLE (table), opt,
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
 
-    /*-- Lines? --*/
+    /*-- edges? --*/
     j++;
     opt = gtk_option_menu_new ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Include line segments?",
       NULL);
-    populate_option_menu (opt, lines_lbl,
-      sizeof (lines_lbl) / sizeof (gchar *), (GtkSignalFunc) linesp_set_cb, gg);
+    populate_option_menu (opt, edges_lbl,
+      sizeof (edges_lbl) / sizeof (gchar *), (GtkSignalFunc) edgesp_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       false);
 
     gtk_table_attach (GTK_TABLE (table),
-      gtk_label_new ("Lines?:"),
+      gtk_label_new ("Edges?:"),
       0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
     gtk_table_attach (GTK_TABLE (table), opt,
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
