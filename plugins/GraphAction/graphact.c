@@ -19,7 +19,7 @@ gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   GtkWidget *entry;
-  const gchar *lbl = "Graph manipulation ...";
+  const gchar *lbl = "Graph operations ...";
 
   inst->data = NULL;
   inst->info = plugin;
@@ -138,7 +138,7 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   ga->window = window;
 
-  gtk_window_set_title(GTK_WINDOW(window), "Graph Action");
+  gtk_window_set_title(GTK_WINDOW(window), "Graph operations");
   gtk_signal_connect (GTK_OBJECT (window), "destroy",
                       GTK_SIGNAL_FUNC (close_graphact_window), inst);
 
