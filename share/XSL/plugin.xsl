@@ -15,10 +15,21 @@
 
 <xsl:import href="d:/duncan/Projects/org/omegahat/Docs/XSL/Rstyle.xsl"/>
 
+<xsl:template match="modeName">
+ <h2>Mode</h2>
+ <xsl:apply-templates/>
+</xsl:template>
+
 <xsl:template match="bugs">
  <h2>Bugs</h2>
  <xsl:apply-templates/>
 </xsl:template>
+
+<xsl:template match="details">
+ <h2>Details</h2>
+ <xsl:apply-templates/>
+</xsl:template>
+
 
 <xsl:template match="dll" />
 
