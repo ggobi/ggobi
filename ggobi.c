@@ -337,7 +337,7 @@ GGobi_widget_set (GtkWidget *w, ggobid *gg, gboolean asIs)
 
 
 ggobid *
-ggobi_get (gint which)
+ggobi_get(gint which)
 {
  extern ggobid** all_ggobis;
  if(which > -1 && which < num_ggobis)
