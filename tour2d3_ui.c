@@ -26,6 +26,7 @@
 void 
 cpanel_t2d3_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t2d3.paused = false;
+  cpanel->t2d3.step = TOURSTEP0;
   cpanel->t2d3.slidepos = 10.;/* If this is changed, it needs to be 
      changed in th cpanel_tour2d3_make routine also. */
   cpanel->t2d3.manip_mode = MANIP_OBLIQUE;
