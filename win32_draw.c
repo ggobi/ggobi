@@ -174,43 +174,37 @@ build_glyph (glyphd *gl, icoords *xypos, gint jpos,
   type = gl->type;
 
   switch (type) {
-    case PLUS_GLYPH:
-    build_plus (xypos, jpos, segv, *ns, size);
-    *ns = *ns+2;
+    case PLUS:
+      build_plus (xypos, jpos, segv, *ns, size);
+      *ns = *ns+2;
     break;
-
-    case X_GLYPH:
-    build_x (xypos, jpos, segv, *ns, size);
-    *ns = *ns+2;
+    case X:
+      build_x (xypos, jpos, segv, *ns, size);
+      *ns = *ns+2;
     break;
-
-    case OPEN_RECTANGLE:
-    build_rect (xypos, jpos, openrectv, *nr_open, size);
-    (*nr_open)++;
+    case OR:
+      build_rect (xypos, jpos, openrectv, *nr_open, size);
+      (*nr_open)++;
     break;
-
-    case FILLED_RECTANGLE:
-    build_rect (xypos, jpos, filledrectv, *nr_filled, size);
-    (*nr_filled)++;
+    case FR:
+      build_rect (xypos, jpos, filledrectv, *nr_filled, size);
+      (*nr_filled)++;
     break;
-
-    case OPEN_CIRCLE:
-    build_circle (xypos, jpos, openarcv, *nc_open, size);
-    (*nc_open)++;
+    case OC:
+      build_circle (xypos, jpos, openarcv, *nc_open, size);
+      (*nc_open)++;
     break;
-
-    case FILLED_CIRCLE:
-    build_circle (xypos, jpos, filledarcv, *nc_filled, size);
-    (*nc_filled)++;
+    case FC:
+      build_circle (xypos, jpos, filledarcv, *nc_filled, size);
+      (*nc_filled)++;
     break;
-
-    case POINT_GLYPH:
-    build_point (xypos, jpos, pointv, *np);
-    (*np)++;
+    case DOT:
+      build_point (xypos, jpos, pointv, *np);
+      (*np)++;
     break;
-
+    UNKNOWN_GLYPH:
     default:
-    g_printerr ("build_glyph: impossible glyph type %d\n", type);
+      g_printerr ("build_glyph: impossible glyph type %d\n", type);
   }
 }
 

@@ -307,27 +307,28 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
      xmlWriteInfo->defaultGlyphSize != d->glyph.els[i].size)
   {
     switch (d->glyph.els[i].type) {
-      case PLUS_GLYPH:
+      case PLUS:
         gtypestr = "plus";
       break;
-      case X_GLYPH:
+      case X:
         gtypestr = "x";
       break;
-      case OPEN_RECTANGLE:
+      case OR:
         gtypestr = "or";
       break;
-      case FILLED_RECTANGLE:
+      case FR:
         gtypestr = "fr";
       break;
-      case OPEN_CIRCLE:
+      case OC:
         gtypestr = "oc";
       break;
-      case FILLED_CIRCLE:
+      case FC:
         gtypestr = "fc";
       break;
-      case POINT_GLYPH:
+      case DOT:
         gtypestr = ".";
       break;
+      case UNKNOWN_GLYPH:
       default:
         gtypestr=NULL;
       break;

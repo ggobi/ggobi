@@ -46,51 +46,52 @@ draw_glyph (GdkDrawable *drawable, glyphd *gl, icoords *xypos, gint jpos, ggobid
 
   switch (gl->type) {
 
-    case PLUS_GLYPH:
+    case PLUS:
       gdk_draw_line (drawable, gg->plot_GC,
         xypos[jpos].x - size, xypos[jpos].y,
         xypos[jpos].x + size, xypos[jpos].y);
       gdk_draw_line (drawable, gg->plot_GC,
         xypos[jpos].x, xypos[jpos].y - size,
         xypos[jpos].x, xypos[jpos].y + size);
-      break;
-    case X_GLYPH:
+    break;
+    case X:
       gdk_draw_line (drawable, gg->plot_GC,
         xypos[jpos].x - size, xypos[jpos].y - size,
         xypos[jpos].x + size, xypos[jpos].y + size);
       gdk_draw_line (drawable, gg->plot_GC,
         xypos[jpos].x + size, xypos[jpos].y - size,
         xypos[jpos].x - size, xypos[jpos].y + size);
-      break;
-    case OPEN_RECTANGLE:
+    break;
+    case OR:
       gdk_draw_rectangle (drawable, gg->plot_GC, false,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size);
-      break;
-    case FILLED_RECTANGLE:
+    break;
+    case FR:
       gdk_draw_rectangle (drawable, gg->plot_GC, false,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size);
       gdk_draw_rectangle (drawable, gg->plot_GC, true,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size);
-      break;
-    case OPEN_CIRCLE:
+    break;
+    case OC:
       gdk_draw_arc (drawable, gg->plot_GC, false,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size, 0, (gshort) 23040);
-      break;
-    case FILLED_CIRCLE:
+    break;
+    case FC:
       gdk_draw_arc (drawable, gg->plot_GC, false,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size, 0, (gshort) 23040);
       gdk_draw_arc (drawable, gg->plot_GC, true,
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size, 0, (gshort) 23040);
-      break;
-    case POINT_GLYPH:
+    break;
+    case DOT:
       gdk_draw_point (drawable, gg->plot_GC, xypos[jpos].x, xypos[jpos].y);
-      break;
+    break;
+    case UNKNOWN_GLYPH:
     default:
       g_printerr ("build_glyph: impossible glyph type %d\n", gl->type);
   }

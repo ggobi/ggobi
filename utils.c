@@ -152,32 +152,32 @@ gdouble myrint (gdouble x) {
 /* The routines below have been added for the R/S connection */
 /* ---------------------------------------------------------------------*/
 
-gint
+GlyphType
 glyphIDfromName (gchar *glyphName) {
-  gint id = -1;
+  GlyphType id = UNKNOWN_GLYPH;
 
   if (g_strcasecmp (glyphName, "plus") == 0)
-    id = PLUS_GLYPH;
+    id = PLUS;
   else if (g_strcasecmp (glyphName, "x") == 0)
-    id = X_GLYPH;
+    id = X;
   else if (g_strcasecmp (glyphName, "point") == 0)
-    id = POINT_GLYPH;
+    id = DOT;
   else if ((g_strcasecmp (glyphName, "open rectangle") == 0) ||
            (g_strcasecmp (glyphName, "open_rectangle") == 0) ||
            (g_strcasecmp (glyphName, "openrectangle") == 0))
-    id = OPEN_RECTANGLE;
+    id = OR;
   else if ((g_strcasecmp (glyphName, "filled rectangle") == 0) ||
            (g_strcasecmp (glyphName, "filled_rectangle") == 0) ||
            (g_strcasecmp (glyphName, "filledrectangle") == 0))
-    id = FILLED_RECTANGLE;
+    id = FR;
   else if ((g_strcasecmp (glyphName, "open circle") == 0) ||
            (g_strcasecmp (glyphName, "open_circle") == 0) ||
            (g_strcasecmp (glyphName, "opencircle") == 0))
-    id = OPEN_CIRCLE;
+    id = OC;
   else if ((g_strcasecmp (glyphName, "filled circle") == 0) ||
            (g_strcasecmp (glyphName, "filled_circle") == 0) ||
            (g_strcasecmp (glyphName, "filledcircle") == 0))
-    id = FILLED_CIRCLE;
+    id = FC;
 
   return id;
 }

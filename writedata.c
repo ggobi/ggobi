@@ -525,28 +525,32 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
 
     for (i=0; i<nr; i++) {
       switch (d->glyph.els[i].type) {
-        case PLUS_GLYPH:
+        case PLUS:
 /*          gstr = "+";*/
           gstr = "plus";
-          break;
-        case X_GLYPH:
+        break;
+        case X:
           gstr = "x";
-          break;
-        case OPEN_RECTANGLE:
+        break;
+        case OR:
           gstr = "or";
-          break;
-        case FILLED_RECTANGLE:
+        break;
+        case FR:
           gstr = "fr";
-          break;
-        case OPEN_CIRCLE:
+        break;
+        case OC:
           gstr = "oc";
-          break;
-        case FILLED_CIRCLE:
+        break;
+        case FC:
           gstr = "fc";
-          break;
-        case POINT_GLYPH:
+        break;
+        case DOT:
           gstr = ".";
-          break;
+        break;
+        case UNKNOWN_GLYPH:
+        default:
+          gstr = ".";
+        break;
       }
 
       fprintf (fp, "%s %d\n", gstr, d->glyph.els[i].size);
