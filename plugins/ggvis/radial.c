@@ -45,34 +45,35 @@ void list_clear (GList *ab)
 
 
 gboolean
-hasPathToCenter (noded *n, datad *d, datad *e, PluginInstance *inst)
+hasPathToCenter (noded *n, noded *referringnode, datad *d, datad *e,
+  PluginInstance *inst)
 {
   gboolean hasPath = false;
   gint k;
   noded *n1;
   ggvisd *ggv = GGVisFromInst (inst);
   noded *centerNode = ggv->radial->centerNode;
-/*
- * The only thing still missing is the handling of hidden edges.
- * I can get from an edge to a node, so maybe I'd better use the edges.
-*/
-
   GList *l, *connectedEdges = list_concat_uniq (n->inEdges, n->outEdges);
+
   for (l = connectedEdges; l; l = l->next) {
     k = GPOINTER_TO_INT (l->data);
 
     /*-- if edge[k] is included and visible ... --*/
     if (e->sampled.els[k] && !d->hidden.els[k]) {
+
       n1 = &ggv->radial->nodes[ d->rowid.idv.els[e->edge.endpoints[k].a] ];
       if (n1->i == n->i)
         n1 = &ggv->radial->nodes[ d->rowid.idv.els[e->edge.endpoints[k].b] ];
+
+      if (referringnode != NULL && n1->i == referringnode->i)
+        continue;  /*-- skip over this node; we've already tested it --*/
       
       /*-- if n1 is included and visible ... --*/
       if (d->sampled.els[n1->i] && !d->hidden.els[n1->i]) {
         /*-- if n1 is no farther from the center than n ... --*/
         if (n1->nStepsToCenter <= n->nStepsToCenter) {
           /*-- if n1 is the center node or has a path to it ... --*/
-          if (n1->i == centerNode->i || hasPathToCenter (n1, d, e, inst)) {
+          if (n1->i == centerNode->i || hasPathToCenter (n1, n, d, e, inst)) {
             hasPath = true;
             break;
           }
