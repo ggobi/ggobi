@@ -197,10 +197,12 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
    * of variables appearing twice.  -- dfs 1/16/2002
   */
   {
-  gboolean rval = false;
-  gtk_signal_emit_by_name (GTK_OBJECT (gg->vartable_ui.window),
-    "expose_event",
-    (gpointer) gg, (gpointer) &rval);
+    if (gg->vartable_ui.window) {
+      gboolean rval = false;
+      gtk_signal_emit_by_name (GTK_OBJECT (gg->vartable_ui.window),
+        "expose_event",
+        (gpointer) gg, (gpointer) &rval);
+    }
   }
 }
 
