@@ -42,11 +42,17 @@ The authors can be contacted at the following email addresses:
 #define EXPMINUS1 0.3678794411714423
 #define ONEMINUSEXPMINUS1 0.63212056
 
-/*****************************************************/
-/* Reference : An Introduction to Numerical Analysis */
-/*             - Kendall E. Atkinson                 */
-/*             (p 449 - 450)                         */
-/*****************************************************/
+void t2d_pptemp_set(gfloat slidepos, ggobid *gg) {
+  displayd *dsp = gg->current_display; 
+
+  dsp->t2d_pp_op.temp_start = slidepos;
+}
+
+void t2d_ppcool_set(gfloat slidepos, ggobid *gg) {
+  displayd *dsp = gg->current_display; 
+
+  dsp->t2d_pp_op.cooling = slidepos;
+}
 
 gfloat mean_fn2(gfloat *x1, gfloat *x2, gint n)
 {

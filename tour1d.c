@@ -246,7 +246,8 @@ display_tour1d_init (displayd *dsp, ggobid *gg)
   dsp->t1d.target_selection_method = 0;
   dsp->t1d_ppda = NULL;
   dsp->t1d_axes = true;
-
+  dsp->t1d_pp_op.temp_start = 1.0;
+  dsp->t1d_pp_op.cooling = 0.99;
 }
 
 /*-- called from the Options menu --*/
@@ -311,7 +312,7 @@ void tour1d_step_cb(displayd *dsp, tour td, gint projdim, ggobid *gg,
 #endif
 
 void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
-  displayd *dsp = gg->current_display;
+  /*  displayd *dsp = gg->current_display;*/
   cpanel->t1d.paused = state;
 
   tour1d_func (!cpanel->t1d.paused, gg->current_display, gg);
@@ -586,7 +587,9 @@ tour1d_run(displayd *dsp, ggobid *gg)
   gboolean revert_random = false;
   gint pathprob = 0;
   gint i, j, nv;
+#ifdef TESTING_TOUR_STEP
   GtkGGobiDisplayClass *klass;
+#endif
 
   if (!dsp->t1d.get_new_target && 
       !reached_target(dsp->t1d.tang, dsp->t1d.dist_az, 

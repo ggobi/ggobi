@@ -227,9 +227,12 @@ gint optimize0 (optimize0_param *op,
   /*  arrayf_init_null (&pdata);
       arrayf_alloc_zero (&pdata, op->data.nrows, proj->ncols);*/
 
-  op->temp_start     =  1; /* make this an interactive parameter */
+  g_printerr("temp start 2 %f\n",op->temp_start);
+  g_printerr("cooling 2%f\n",op->cooling);
+
+  /*  op->temp_start     =  1; * make this an interactive parameter */
   op->temp_end       =  0.001;
-  op->cooling        =  0.99; /* make this an interactive parameter */
+  /*  op->cooling        =  0.99; * make this an interactive parameter */
   /* is equivalent to log(temp_end/temp_start)/log(cooling) projections */
   op->heating        =  1;
   op->restart        =  1;

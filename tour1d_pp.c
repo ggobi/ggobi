@@ -33,21 +33,23 @@ The authors can be contacted at the following email addresses:
 #include "vars.h"
 #include "externs.h"
 
-/* Start of inclusion of Sigbert's tour1d_pp.c */
-
-/*#include "eispack.h"*/
 #include "tour1d_pp.h"
 #include "tour_pp.h"
 
 /*static gchar msg[1024];*/
 
 /*-- projection pursuit indices --*/
-#define PCA            0
-#define LDA            1
-#define CGINI          2
-#define CENTROPY       3
-#define CART_VAR       4
-#define SUBD           5
+#define HOLES          0
+#define CENTRAL_MASS   1
+#define PCA            2
+#define LDA            3
+#define CGINI          4
+#define CENTROPY       5
+#define CART_VAR       6
+#define SUBD           7
+
+#define EXPMINUS1 0.3678794411714423
+#define ONEMINUSEXPMINUS1 0.63212056
 
 /*void print()
 { FILE *f = fopen ("dump", "a");
@@ -56,6 +58,97 @@ The authors can be contacted at the following email addresses:
     fclose(f);
   }
 }*/
+
+void t1d_pptemp_set(gfloat slidepos, ggobid *gg) {
+  displayd *dsp = gg->current_display; 
+
+  dsp->t1d_pp_op.temp_start = slidepos;
+  g_printerr("temp start %f\n",dsp->t1d_pp_op.temp_start);
+}
+
+void t1d_ppcool_set(gfloat slidepos, ggobid *gg) {
+  displayd *dsp = gg->current_display; 
+
+  dsp->t1d_pp_op.cooling = slidepos;
+  g_printerr("cooling %f\n",dsp->t1d_pp_op.cooling);
+}
+
+void
+alloc_holes1d_p(holes_param *hp, gint nrows)
+{
+  hp->h0 = (gfloat *) g_malloc(
+    (guint) nrows*sizeof(gfloat *));
+}
+
+void
+free_holes1d_p(holes_param *hp)
+{
+  g_free(hp->h0);
+}
+
+/***************************************************/
+/*  1D Holes index for raw data                    */
+/***************************************************/
+
+gint holes1d_raw1(array_f *pdata, void *param, gfloat *val)
+{  
+   gint i, n=pdata->nrows;
+   gfloat m1, x1, temp;
+   gfloat var, acoefs;
+
+   m1=0;
+   for(i=0; i<n; i++)
+     m1 += pdata->vals[i][0];
+   m1 /= n;
+
+   var = 0;
+   for(i=0; i<n; i++)
+     var += (pdata->vals[i][0]-m1)*(pdata->vals[i][0]-m1)/(n-1);
+
+   acoefs=0.;
+
+   for(i=0; i<n; i++)
+   {  
+     x1 = pdata->vals[i][0]-m1; 
+     temp = x1*x1/var;
+     acoefs +=exp(-temp/2);
+   }
+
+   *val = (1.-acoefs/n)/(gfloat) ONEMINUSEXPMINUS1;
+   return(0);
+}
+
+/**********************************************************/
+/*  1D Central Mass index for raw data                    */
+/**********************************************************/
+
+gint central_mass1d_raw1(array_f *pdata, void *param, gfloat *val)
+{
+   gint i, n=pdata->nrows;
+   gfloat m1, x1, temp;
+   gfloat var, acoefs;
+
+   m1=0;
+   for(i=0; i<n; i++)
+     m1 += pdata->vals[i][0];
+   m1 /= n;
+
+   var = 0;
+   for(i=0; i<n; i++)
+     var += (pdata->vals[i][0]-m1)*(pdata->vals[i][0]-m1)/(n-1);
+
+   acoefs=0.;
+
+   for(i=0; i<n; i++)
+   {  
+     x1 = pdata->vals[i][0]-m1; 
+     temp = x1*x1/var;
+     acoefs +=exp(-temp/2);
+   }
+
+   *val = (acoefs/n-(gfloat)EXPMINUS1)/(gfloat) ONEMINUSEXPMINUS1;
+   return(0);
+}
 
 /********************************************************************
 
@@ -127,7 +220,7 @@ gint alloc_subd_p (subd_param *sp, gint nrows, gint ncols)
   sp->ev    = g_malloc (ncols*ncols*sizeof(gfloat));
   sp->fv1   = g_malloc (ncols*sizeof(gfloat));
   sp->fv2   = g_malloc (ncols*sizeof(gfloat));
-  sp->cov   = g_malloc (ncols*ncols*sizeof(gfloat));
+  sp->cov   = g_malloc ((ncols+ncols)*sizeof(gfloat));
 
   return 0;
 }
@@ -266,7 +359,9 @@ Purpose        : Looks for the best projection to discriminate
 *********************************************************************/
 
 void zero (gdouble *ptr, gint length)
-{ gint i;
+{ 
+  gint i;
+
   for (i=0; i<length; i++)
     ptr[i] = 0.0;
 }
@@ -323,10 +418,10 @@ gint alloc_discriminant_p (discriminant_param *dp, /*gfloat *gdata, */
       gdata)) return (1);*/
 
   /* initialize temporary space */
-  dp->cov      = g_malloc (ncols*ncols*sizeof(gfloat));
-  dp->a        = g_malloc (ncols*ncols*sizeof(gfloat));
-  dp->mean     = g_malloc (nrows*ncols*sizeof(gfloat));
-  dp->ovmean   = g_malloc (ncols*sizeof(gfloat));
+  dp->cov      = g_malloc ((ncols+ncols)*sizeof(gdouble));
+  dp->a        = g_malloc ((ncols+ncols)*sizeof(gdouble));
+  dp->mean     = g_malloc (nrows*ncols*sizeof(gdouble));
+  dp->ovmean   = g_malloc (ncols*sizeof(gdouble));
   dp->kpvt     = g_malloc (ncols*sizeof(gint));
   dp->work     = g_malloc (nrows*sizeof(gint));
 
@@ -419,10 +514,6 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
 
   Pv = (int *) malloc(n*sizeof(int));
 
-  /* how does group info get into here?  if comes in through 
-      allocate_discriminant_p. it would be safe to have it
-      computed here in case the groups change in brushing */
-
   /* Compute means */
   zero (dp->mean, dp->groups*p);
   zero (dp->ovmean, p);
@@ -498,7 +589,7 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
 
 /********************************************************************
 
-Index          : CartGini, CartEntropy, CartVariance
+Index          : Gini, Entropy, Variance
 Transformation : -
 Purpose        : Looks for the best split in 1d-projected data.
 
@@ -1021,12 +1112,13 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
 {
   displayd *dsp = gg->current_display; 
   datad *d = dsp->d;
-  gint kout, nrows = d->nrows_in_plot, pdim = 1;
+  gint kout, nrows = d->nrows_in_plot, ncols=d->ncols;
   /*  subd_param sp; */
   discriminant_param dp;
   cartgini_param cgp;
   cartentropy_param cep;
   cartvariance_param cvp;
+  holes_param hp;
   gfloat *gdata;
   gint i, j;
 
@@ -1068,6 +1160,18 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
 
   switch (indxtype)
   { 
+    case HOLES: 
+      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
+        holes1d_raw1, NULL);
+      if (basismeth == 1)
+        kout = optimize0 (&dsp->t1d_pp_op, holes1d_raw1, &hp);
+      break;
+    case CENTRAL_MASS: 
+      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
+        central_mass1d_raw1, NULL);
+      if (basismeth == 1)
+        kout = optimize0 (&dsp->t1d_pp_op, central_mass1d_raw1, &hp);
+      break;
     case PCA: 
       /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
 	      dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, pca, NULL);*/
@@ -1079,7 +1183,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       break;
     case LDA: 
       alloc_discriminant_p (&dp, /* gdata, */
-        nrows, pdim);
+			    nrows, ncols); /*pdim);*/
       /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
         dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 
         discriminant, &dp);*/
@@ -1101,12 +1205,11 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       if (!compute_groups (cgp.group, cgp.ngroup, &cgp.groups, nrows, 
 			   gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-     /*  d->rows_in_plot, d->nrows, d->ncols,*/
           cartgini, &cgp);
-      if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, cartgini, &cgp);
+        if (basismeth == 1)
+          kout = optimize0 (&dsp->t1d_pp_op, cartgini, &cgp);
+        free_cartgini_p (&cgp); 
       }
-      /*      free_cartgini_p (&cgp); need to free but this causes a crash!*/
       break;
    case CENTROPY: 
       alloc_cartentropy_p (&cep, nrows);
@@ -1151,3 +1254,5 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
 #undef CENTROPY   
 #undef CART_VAR       
 #undef PCA            
+#undef HOLES
+#undef CENTRAL_MASS

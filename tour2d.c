@@ -249,6 +249,8 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   dsp->t2d.target_selection_method = 0;
   dsp->t2d_ppda = NULL;
   dsp->t2d_axes = true;
+  dsp->t2d_pp_op.temp_start = 1.0;
+  dsp->t2d_pp_op.cooling = 0.99;
 }
 
 /*-- called from the Options menu --*/

@@ -113,6 +113,16 @@ t2d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
     &dsp->t2d.target_selection_method, dsp);
 }
 
+static void t2d_pptemp_set_cb (GtkAdjustment *adj, ggobid *gg) {
+
+  t2d_pptemp_set(adj->value, gg);
+}
+
+static void t2d_ppcool_set_cb (GtkAdjustment *adj, ggobid *gg) {
+
+  t2d_ppcool_set(adj->value, gg);
+}
+
 /*
 static void
 sphere_cb (GtkWidget  *w, ggobid *gg) {
@@ -251,8 +261,7 @@ static GtkItemFactoryEntry menu_items[] = {
 void
 tour2dpp_window_open (ggobid *gg) {
   /*GtkWidget **btn, *label, *da, *entry;*/
-  GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl;
-  GtkWidget *hb, *opt;
+  GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar, *adj;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
   gboolean vars_sphered = true;
@@ -340,6 +349,60 @@ tour2dpp_window_open (ggobid *gg) {
                           GTK_SIGNAL_FUNC (t2d_optimz_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vbc),
                         tgl, false, false, 1);
+
+/*
+ * Box to hold temp start and cooling controls
+*/
+    hb = gtk_hbox_new (true, 2);
+
+    vb = gtk_vbox_new (false, 0);
+
+    gtk_box_pack_start (GTK_BOX (vb), gtk_label_new ("Temp start:"),
+      false, false, 0);
+
+  /*-- value, lower, upper, step --*/
+    adj = gtk_adjustment_new (1.0, 0.5, 1.5, 0.1, 0.1, 0.0);
+    gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
+                      GTK_SIGNAL_FUNC (t2d_pptemp_set_cb), gg);
+
+    sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+    gtk_widget_set_name (sbar, "TOUR2D:PP_TEMPST");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
+    "Adjust starting temp of pp", NULL);
+    gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
+    gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
+    gtk_scale_set_digits (GTK_SCALE (sbar), 2);
+
+    gtk_box_pack_start (GTK_BOX (vb), sbar,
+      false, false, 0);
+    gtk_box_pack_start (GTK_BOX (hb), vb,
+      false, false, 0);
+
+  /*-- value, lower, upper, step --*/
+    vb = gtk_vbox_new (false, 0);
+
+    gtk_box_pack_start (GTK_BOX (vb), gtk_label_new ("Cooling:"),
+      false, false, 0);
+
+    adj = gtk_adjustment_new (0.99, 0.80, 1.20, 0.05, 0.05, 0.0);
+    gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
+                      GTK_SIGNAL_FUNC (t2d_ppcool_set_cb), gg);
+
+    sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+    gtk_widget_set_name (sbar, "TOUR2D:PP_COOLING");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
+    "Adjust cooling", NULL);
+    gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
+    gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
+    gtk_scale_set_digits (GTK_SCALE (sbar), 2);
+
+    gtk_box_pack_start (GTK_BOX (vb), sbar,
+      false, false, 0);
+    gtk_box_pack_start (GTK_BOX (hb), vb,
+      false, false, 0);
+
+    gtk_box_pack_start (GTK_BOX (vbc), hb, false, false, 0);
+
 /*
  * Index value with label
 */
