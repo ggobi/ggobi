@@ -34,9 +34,9 @@
  */
 GtkWidget *
 CreateMenuItem (GtkWidget *menu,
-		gchar *szName, gchar *szAccel, gchar *szTip,
-		GtkWidget *win_main, GtkAccelGroup *accel_group,
-		GtkSignalFunc func, gpointer data, ggobid *gg)
+  gchar *szName, gchar *szAccel, gchar *szTip,
+  GtkWidget *win_main, GtkAccelGroup *accel_group,
+  GtkSignalFunc func, gpointer data, ggobid *gg)
 {
   GtkWidget *menuitem;
 
@@ -119,7 +119,7 @@ GtkWidget *CreateMenuCheck (GtkWidget *menu,
     GGobi_widget_set(GTK_WIDGET(menuitem), gg, true);
 
     /* --- set its state --- */
-    gtk_check_menu_item_set_state (GTK_CHECK_MENU_ITEM (menuitem), state);
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (menuitem), state);
 
     /* --- Add it to the menu --- */
     gtk_menu_append (GTK_MENU (menu), menuitem);
@@ -190,7 +190,8 @@ get_main_menu (const GtkItemFactoryEntry menu_items [],
   /* This function generates the menu items. Pass the item factory,
      the number of items in the array, the array itself, and any
      callback data for the menu items. */
-  gtk_item_factory_create_items (item_factory, nmenu_items, menu_items, cbdata);
+  gtk_item_factory_create_items (item_factory, nmenu_items,
+    (GtkItemFactoryEntry *) menu_items, cbdata);
 
   /* Attach the new accelerator group to the window. */
   gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
@@ -334,6 +335,12 @@ variable_notebook_subwindow_add (datad *d,
     gtk_clist_append (GTK_CLIST (clist), row);
     g_free (row[0]);
   }
+
+  /*-- suggested by Gordon Deane; causes no change under linux --*/
+  gtk_clist_set_column_width(GTK_CLIST(clist), 0,
+    gtk_clist_optimal_column_width (GTK_CLIST(clist), 0));
+  /*--                           --*/
+
   gtk_container_add (GTK_CONTAINER (swin), clist);
   gtk_widget_show_all (swin);
 }
