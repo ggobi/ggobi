@@ -386,7 +386,6 @@ GGOBI(newParCoords)(gint *vars, gint numVars, datad *d, ggobid *gg)
 {
   displayd *display = NULL;
 
-  /* display = display_alloc_init (parcoords, false, d, gg); */
   display = parcoords_new (false, numVars, vars, d, gg);
   display_add (display, gg);
 
