@@ -157,6 +157,49 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 
 /*-------------------------------------------------------------------------*/
 
+void
+varpanel_show_page (displayd *display, ggobid *gg)
+{
+  GtkNotebook *nb;
+  gint page, page_new;
+  datad *d = display->d;
+  GList *l, *children;
+  GtkWidget *child, *tab_label;
+
+  if (gg->varpanel_ui.notebook == NULL)
+    return;
+
+  nb = GTK_NOTEBOOK (gg->varpanel_ui.notebook);
+  page = gtk_notebook_get_current_page (nb);
+
+  if (page < 0)
+    return;
+
+  page_new = 0;
+  children = gtk_container_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
+  for (l = children; l; l = l->next) {
+    child = l->data;
+    tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
+    if (tab_label && GTK_IS_LABEL (tab_label)) {
+      if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
+        if (page != page_new) {
+          gtk_notebook_set_page (nb, page_new);
+          break;
+        }
+      }
+    }
+    page_new++;
+  }
+}
+
+void
+varpanel_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
+  gint page_num, ggobid *gg)
+{
+  extern void varpanel_reinit (ggobid *gg);
+  varpanel_reinit (gg);
+}
+
 
 /*-- here's where we'd reset what's selected according to the current mode --*/
 void
@@ -350,49 +393,6 @@ varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
 /*-------------------------------------------------------------------------*/
 /*                  initialize and populate the var panel                  */
 /*-------------------------------------------------------------------------*/
-
-void
-varpanel_show_page (displayd *display, ggobid *gg)
-{
-  GtkNotebook *nb;
-  gint page, page_new;
-  datad *d = display->d;
-  GList *l, *children;
-  GtkWidget *child, *tab_label;
-
-  if (gg->varpanel_ui.notebook == NULL)
-    return;
-
-  nb = GTK_NOTEBOOK (gg->varpanel_ui.notebook);
-  page = gtk_notebook_get_current_page (nb);
-
-  if (page < 0)
-    return;
-
-  page_new = 0;
-  children = gtk_container_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
-  for (l = children; l; l = l->next) {
-    child = l->data;
-    tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
-    if (tab_label && GTK_IS_LABEL (tab_label)) {
-      if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
-        if (page != page_new) {
-          gtk_notebook_set_page (nb, page_new);
-          break;
-        }
-      }
-    }
-    page_new++;
-  }
-}
-
-void
-varpanel_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
-  gint page_num, ggobid *gg)
-{
-  extern void varpanel_reinit (ggobid *gg);
-  varpanel_reinit (gg);
-}
 
 
 /*

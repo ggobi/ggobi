@@ -297,6 +297,7 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   display->tc1_manip_var = -1;
   display->tc2_manip_var = -1;
 
+  display->t1d_window = NULL;
   display->t1d_pp_pixmap = NULL;
   display->t2d_pp_pixmap = NULL;
 
@@ -510,6 +511,7 @@ display_set_current (displayd *new_display, ggobid *gg)
 {
   gchar *title;
   extern void varpanel_show_page (displayd*, ggobid*);
+  extern void vartable_show_page (displayd*, ggobid*);
 
   if (new_display == NULL)
     return;
@@ -602,9 +604,11 @@ display_set_current (displayd *new_display, ggobid *gg)
   /*
    * if the datad for the new current display doesn't match that
    * of the previous current display, move the variable selection
-   * panel notebook to the appropriate tab.
+   * panel notebook to the appropriate tab.  Do the same thing for
+   * the variable manipulation table.
   */
   varpanel_show_page (gg->current_display, gg);
+  vartable_show_page (gg->current_display, gg);
 
   varpanel_tooltips_set (gg);
 

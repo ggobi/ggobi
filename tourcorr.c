@@ -532,7 +532,7 @@ tourcorr_varsel (gint jvar, gint button, datad *d, ggobid *gg)
     if (button == 1) { 
       tourcorr_horvar_set (jvar, gg);
     }
-    else if ( button == 2) {
+    else if (button == 2 || button == 3) {
       tourcorr_vervar_set (jvar, gg);
     }
   }

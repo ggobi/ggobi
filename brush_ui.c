@@ -1,4 +1,3 @@
-/* brush_ui.c */
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
@@ -104,6 +103,14 @@ static void brush_linkby_cb (GtkWidget *w, gpointer cbd)
 
   cpanel->br_linkby = GPOINTER_TO_INT (cbd);
 }
+
+/*
+static void brush_linkvar_cb (GtkWidget *w, gpointer cbd)
+{
+  ggobid *gg = GGobiFromWidget (w, true);
+  cpaneld *cpanel = &gg->current_display->cpanel;
+}
+*/
 
 static void open_symbol_window_cb (GtkWidget *w, ggobid *gg) 
 {
@@ -261,7 +268,10 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   /*
    * We can't just use brush_motion() here, because we need to
    * make certain that the current splot is redrawn without
-   * binning.  So we replicate a few lines of code from brush_motion()
+   * binning.   That's because if some other plot is also in
+   * transient brushing, the points under its brush need to be
+   * redrawn in this splot.
+   * So we replicate a few lines of code from brush_motion()
    * here and force a complete redraw of all displays.
   */
   if (cpanel->brush_on_p) {
@@ -450,7 +460,45 @@ cpanel_brush_make (ggobid *gg) {
                         sizeof (linkby_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) brush_linkby_cb, gg);
   /*-- initial value: link by id --*/
-  gtk_option_menu_set_history (GTK_OPTION_MENU (option_menu), 0);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (option_menu), BR_LINKBYID);
+
+
+  /*-- if linking by variable, specify the variable here --*/
+/* at this point, we haven't read any datad's yet
+{
+  gchar **catvars;
+  GSList *ld, *lv;
+  GSList *names = NULL;
+  datad *dd;
+  vartabled *vt;
+
+g_printerr ("nd: %d\n", g_slist_length(gg->d));
+  for (ld = gg->d; ld; ld = ld->next) {
+    dd = ld->data;
+    for (lv = dd->vartable; lv; lv = lv->next) {
+      vt = lv->data;
+      if (vt->categorical_p) {
+        if (g_slist_index (names, (gpointer) dd->name) == -1) {
+          names = g_slist_append (names, (gpointer) dd->name);
+g_printerr ("new cvar: %s\n", dd->name);
+        }
+      }
+    }
+  }
+}
+*/
+/*
+  option_menu = gtk_option_menu_new ();
+  gtk_widget_set_name (option_menu, "BRUSH:linkvars_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), option_menu,
+    "If linking by variable, choose a categorical variable here",
+    NULL);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
+                      option_menu, false, false, 0);
+  populate_option_menu (option_menu, catvars,
+                        sizeof (catvars) / sizeof (gchar *),
+                        (GtkSignalFunc) brush_linkvar_cb, gg);
+*/
 
 /*-- button for opening 'brush by variable' panel --*/
   btn = gtk_button_new_with_label ("Brush by variable ...");
@@ -486,6 +534,7 @@ cpanel_brush_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->brush_on_p = true;
 
   cpanel->br_mode = BR_TRANSIENT;
+  cpanel->br_linkby = BR_LINKBYID;
 
   /*-- point brushing on, edge brushing off --*/
   cpanel->br_point_targets = BR_CANDG;

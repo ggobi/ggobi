@@ -47,7 +47,7 @@ scatmat_cpanel_init (cpaneld* cpanel, ggobid *gg) {
   cpanel->viewmode = SCATMAT;
   cpanel->projection = XYPLOT;  /*-- does it need a projection? --*/
 
-  cpanel->parcoords_selection_mode = VAR_REPLACE;
+  cpanel->scatmat_selection_mode = VAR_REPLACE;
 
   /*-- 1d plots --*/
   cpanel->p1d.type = ASH;

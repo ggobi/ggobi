@@ -353,15 +353,13 @@ tour2d_manip_var_set (gint j, ggobid *gg)
 void
 tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
-  if (button == 1 || button == 2) {
+/*-- we don't care which button it is --*/
+  if (d->vcirc_ui.jcursor == GDK_HAND2) {
+    tour2d_manip_var_set (jvar, gg);
+    varcircles_cursor_set_default (d);
 
-    if (d->vcirc_ui.jcursor == GDK_HAND2) {
-      tour2d_manip_var_set (jvar, gg);
-      varcircles_cursor_set_default (d);
-
-    } else {
-      tour2dvar_set (jvar, gg);
-    }
+  } else {
+    tour2dvar_set (jvar, gg);
   }
 }
 

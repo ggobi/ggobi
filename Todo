@@ -14,19 +14,27 @@ From John Plummer:
     directory where the last file retrieved was stored.
   Let any variable be the label used in identification
 
-Bugs: 
+Missings:
+  xmlConvert doesn't write out missing information;
+    probably writing out in xml doesn't either
+  It should be possible in xml to acknowledge various
+    types of missingness: left censored, missing, etc.
+  We don't yet have a show/hide missings button
 
-  Set the brush to any region  (manually) and then reduce the
-   size of the window.  Note that the brush size stays
-   fixed and is not scaled and points enter the region but are
-   not "brushed."
+Bugs: 
 
   It's no longer possible to read an ascii file that doesn't
     have the .dat suffix -- I regard this as a bug.
 
   If a new datad is added, the transformation, jittering, and 
     brush_by_variable tools are not going to show it in their
-    notebooks.
+    notebooks.  Will they if the notebooks are closed and
+    reopened?
+
+  Initialize ggobi without data; add a datad from the menu.
+  The main menubar does not acquire an Options menu --
+  viewmode_submenus_update() is not being called; full_viewmode_set()
+  is not being called.
 
 Reading in new data
   add an option:  add a new datad or replace an existing one
@@ -38,7 +46,6 @@ In progress, needing design discussions:
 
 various stuff not yet implemented:
   Options on options menu
-  show/hide missings button
   1d cycling 
 
 Graphs
@@ -57,7 +64,6 @@ I/O -- the biggest part is now in place.  extend
   current file set by one or more files.  (wait until the
   dtd has been redesigned to handle multiple datad objects)
 
-  How do we write out missings in xml?
   If all glyphs are the same, there's no need to write 
     a glyph description in each record
 
@@ -215,3 +221,8 @@ Food for thought:
 
 ! Reset->'show all points' doesn't override the clusters tool.  
 !   What to do?
+
+! Set the brush to any region  (manually) and then reduce the
+!  size of the window.  Note that the brush size stays
+!  fixed and is not scaled and points enter the region but are
+!  not "brushed."

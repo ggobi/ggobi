@@ -159,7 +159,7 @@ scatterplot_display_edge_menu_update (displayd *display,
       /* Add a separator */
       CreateMenuItem (display->edge_menu, NULL, "", "",
                       NULL, NULL, NULL, NULL, gg);
-    }
+    } /*-- end of adding cascading menu --*/
 
     /*
      * The edge options are handled like other display options,

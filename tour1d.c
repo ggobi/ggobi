@@ -341,21 +341,20 @@ tour1d_manip_var_set (gint j, gint btn, ggobid *gg)
 void
 tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
-  if (button == 1 || button == 2) {
-    if (d->vcirc_ui.jcursor == GDK_HAND2) {
-      tour1d_manip_var_set (jvar, button, gg);
-      varcircles_cursor_set_default (d);
+/*-- any button --*/
+  if (d->vcirc_ui.jcursor == GDK_HAND2) {
+    tour1d_manip_var_set (jvar, button, gg);
+    varcircles_cursor_set_default (d);
 
-    } else {
-      tour1dvar_set (jvar, gg);
-    }
+  } else {
+    tour1dvar_set (jvar, gg);
   }
 }
 
 void
-tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) 
+tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg)
 {
-  int i, j, m;
+  gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
   gfloat min, max, mean;
   gfloat precis = PRECISION1;
