@@ -194,7 +194,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
   cpaneld *cpanel = &display->cpanel;
   PipelineMode projection = cpanel->projection;
-  gint i, m;
+  gint i, j, m;
   gint k = -1;
   const gchar *const *gnames = GGOBI(getOpModeNames)(&k);
   datad *d = display->d;
@@ -369,6 +369,41 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   } else if (projection == TOUR1D) {
   } else if (projection == TOUR2D3) {
   } else if (projection == TOUR2D) {
+    /* n, F, variable labels, variable lims */
+    OPEN_NAMED_LIST(fp, "tour2dparams");
+    /* n */
+    fprintf (fp, "n=%d,", display->t2d.nsubset);
+    /* F */
+    OPEN_NAMED_C(fp, "F");
+    for (k=0; k<display->t2d.nsubset; k++) {
+      j = display->t2d.subset_vars.els[k];
+      fprintf (fp, "%.3f,", display->t2d.F.vals[0][j]);
+    }
+    for (k=0; k<display->t2d.nsubset; k++) {
+      j = display->t2d.subset_vars.els[k];
+      fprintf (fp, "%.3f,", display->t2d.F.vals[1][j]);
+    }
+    CLOSE_C(fp);
+    /* variable labels */
+    OPEN_NAMED_C(fp, "labels");
+    for (k=0; k<display->t2d.nsubset; k++) {
+      j = display->t2d.subset_vars.els[k];
+      vt = vartable_element_get (j, d);
+      fprintf (fp, "%s,", vt->collab_tform);
+    }
+    CLOSE_C(fp);
+    /* variable ranges */
+    OPEN_NAMED_LIST(fp, "ranges");
+    for (k=0; k<display->t2d.nsubset; k++) {
+      j = display->t2d.subset_vars.els[k];
+      vt = vartable_element_get (j, d);
+      OPEN_C(fp);
+      fprintf (fp, "%.3f, %.3f", vt->lim.min, vt->lim.max);
+      CLOSE_C(fp);
+    }
+    CLOSE_C(fp);
+
+    CLOSE_LIST(fp);  /* tour2dparams */
   } else if (projection == COTOUR) {
   }
   ADD_COMMA(fp);
