@@ -41,6 +41,11 @@ if test "${GTK_CONFIG}" = "<missing>" ; then
  exit 1
 fi
 
+AC_PATH_PROG(UNAME, uname)
+if test -n  "${UNAME}" ; then
+ OS_INFO=`uname -a`
+fi
+
 
 DEFAULT_LIB_DIRS="/usr/lib /usr/local/lib /opt/lib"
 DEFAULT_INC_DIRS="/usr/include /usr/local/include /usr/local/src/include /usr/include/gnome-xml"
@@ -246,7 +251,10 @@ AC_SUBST(SRC_CFLAGS)
 AC_SUBST(SRC_LIBS)
 
 
-AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config)
+AC_SUBST(OS_INFO)
+AC_SUBST(GGOBI_VERSION)
+
+AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate)
 
 chmod +x bin/ggobi
 chmod +x bin/ggobi-config

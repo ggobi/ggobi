@@ -1,0 +1,14 @@
+Mail to ggobi-bugs@franz.stat.wisc.edu
+
+Operating System: @OS_INFO@
+ggobi version: @GGOBI_VERSION@
+
+Problem area:  
+ (Please select one)
+ Visualization, GUI, R, Perl, Python, XML, Database, Configuration
+   
+
+Bug Description:
+
+
+Settings and Command-line Arguments:
