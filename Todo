@@ -1,6 +1,7 @@
 Add warning messages to XML parser.
   E.g. reading incomplete or excess elements.
 
+
 Plugins
   showPluginInfo should color the input plugins differently.
 
@@ -28,12 +29,7 @@ Colors:
   Fix the names and ids in the color map specification. Need to
   determine what is the relationship between these.
 
-  As the number of colorschemes increases, use a tree
-  to represent them.  (Do this in gtk2 only?)
-
   Remove the colormap material from read_xml.c
-  
-
 
 --------- notes on colors ---------------------------------------
 
@@ -366,3 +362,7 @@ Food for thought:
 ! Work out our terminology -- is there a difference between
   a colorscheme and a colormap?  If not, let's just use one
   term.
+
+! As the number of colorschemes increases, use a tree
+  to represent them.  (Do this in gtk2 only?)
+    Done. See the Tools->Color schemes... dialog.
