@@ -30,7 +30,6 @@ typedef struct {
   gint nStepsToCenter;
   gint nnodes;
   noded *nodes;
-  datad *d;
 } radiald;
 
 #ifdef GRAPHVIZ
@@ -38,6 +37,9 @@ typedef struct {
 #endif
 
 typedef struct {
+
+  datad *dsrc, *e;
+  GtkWidget *window;
 
   array_d dist_orig;
   array_d dist;

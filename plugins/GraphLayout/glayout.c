@@ -45,10 +45,10 @@ show_glayout_window (GtkWidget *widget, PluginInstance *inst)
     glayoutd *gl = (glayoutd *) g_malloc (sizeof (glayoutd));
 
     glayout_init (gl);
+    inst->data = gl;
 
     window = create_glayout_window (inst->gg, inst);
     gtk_object_set_data (GTK_OBJECT (window), "glayoutd", gl);
-    inst->data = window;  /*-- or this could be the glayout structure --*/
 
 #ifdef HIGHLIGHTSTICKY
 /*-- Can't do this here until I have an agnostic highlight function --*/
@@ -68,8 +68,7 @@ void highlight_edges_cb (GtkButton *button, PluginInstance *inst);
 glayoutd *
 glayoutFromInst (PluginInstance *inst)
 {
-  GtkWidget *window = (GtkWidget *) inst->data;
-  glayoutd *gl = (glayoutd *) gtk_object_get_data (GTK_OBJECT(window), "glayoutd");
+  glayoutd *gl = (glayoutd *) inst->data;
   return gl;
 }
 
@@ -109,93 +108,52 @@ scale_array_max (array_d *dist, gint nr, gint nc)
   }
 }
 
-#ifdef CMDS
-/*-- move this to cmds_ui.c? --*/
-static void cmds_cb (GtkButton *button, PluginInstance *inst)
+static void
+glayout_datad_set_cb (GtkWidget *cl, gint row, gint column,
+  GdkEventButton *event, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   glayoutd *gl = glayoutFromInst (inst);
-  gint i, nNodes, nEdges;
+  gchar *dname;
+  datad *d;
+  GSList *l;
+  gchar *clname = gtk_widget_get_name (GTK_WIDGET(cl));
 
-  datad *d = gg->current_display->d;
-  datad *e = gg->current_display->e;
-  if (d == NULL || e == NULL)
-    return;
-
-  nNodes = d->nrows;
-  nEdges = e->edge.n;
-
-  if (nEdges <= 0)
-    return;
-
-  /*-- allocate distance matrix, nNodes x nNodes --*/
-  if (gl->dist.vals == NULL || gl->dist.nrows != nNodes)
-    arrayd_alloc (&gl->dist, nNodes, nNodes);
-
-  /*-- populate distance matrix with link distances --*/
-  set_dist_matrix_from_edges (d, e, gg, gl);
-
-g_printerr ("distance matrix allocated, populated and scaled\n");
-
-  /*-- allocate position matrix, nNodes x nvariables --*/
-  if (gl->pos.vals == NULL || gl->pos.nrows != nNodes)
-    arrayd_alloc (&gl->pos, nNodes, d->ncols);
-  
-  cmds (&gl->dist, &gl->pos);
-g_printerr ("through cmds\n");
-
-/*-- add three variables and put in the new values --*/
-  {
-    gint k;
-    gdouble *x = g_malloc0 (d->nrows * sizeof (gdouble));
-    gchar *name;
-
-    for (k=0; k<2; k++) {
-      for (i=0; i<d->nrows; i++) {
-        x[i] = gl->pos.vals[i][k];
+  gtk_clist_get_text (GTK_CLIST (cl), row, 0, &dname);
+  for (l = gg->d; l; l = l->next) {
+    d = l->data;
+    if (strcmp (d->name, dname) == 0) {
+      if (strcmp (clname, "nodeset") == 0) {
+        gl->dsrc = d;
+      } else if (strcmp (clname, "edgeset") == 0) {
+        gl->e = d;
       }
-      name = g_strdup_printf ("Pos%d", k);
-      newvar_add_with_values (x, d->nrows, name, d, gg);
-      g_free (name);
+      break;
     }
-    g_free (x);
   }
+  /* Don't free either string; they're just pointers */
 }
-
-/*-- move this to cmds_ui.c? --*/
-static void mds_spring_cb (GtkButton *button, PluginInstance *inst)
+static void 
+glayout_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
 {
-  ggobid *gg = inst->gg;
-  glayoutd *gl = glayoutFromInst (inst);
-  gint i, j, jvar;
-  gchar *name;
-  gint ndims = 2;
+  gchar *row[1];
+  GtkWidget *swin = (GtkWidget *)
+    gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
+  gchar *clname = gtk_widget_get_name (GTK_WIDGET(clist));
 
-  datad *d = gg->current_display->d;
-  datad *e = gg->current_display->e;
-  if (d == NULL || e == NULL)
-    return;
-
-/*-- add a couple of rounds of spring therapy --*/
-  spring_once (ndims, d, e, &gl->dist, &gl->pos);
-g_printerr ("through spring_once (ten times)\n");
-
-  for (j=0; j<ndims; j++) {
-    name = g_strdup_printf ("Pos%d", j);
-    jvar = vartable_index_get_by_name (name, d);
-    g_free (name);
-    if (jvar >= 0) {
-      for (i=0; i<d->nrows; i++) {
-        d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = gl->pos.vals[i][j];
-      }
-      limits_set_by_var (jvar, true, true, d, gg);
-      tform_to_world_by_var (jvar, d, gg);
-    }
+  if (strcmp (clname, "nodeset") == 0 && d->rowid.idv.nels > 0) {
+    row[0] = g_strdup (d->name);
+    gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
+    g_free (row[0]);
   }
-  displays_tailpipe (FULL, gg);
-}
-#endif
+  if (strcmp (clname, "edgeset") == 0 && d->edge.n > 0) {
+    row[0] = g_strdup (d->name);
+    gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
+    g_free (row[0]);
+  }
 
+  gtk_widget_show_all (swin);
+}
 
 GtkWidget *
 create_glayout_window(ggobid *gg, PluginInstance *inst)
@@ -203,10 +161,18 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
   GtkWidget *hb, *entry;
   GtkTooltips *tips = gtk_tooltips_new ();
+  /*-- for lists of datads --*/
+  gchar *clist_titles[2] = {"node sets", "edge sets"};
+  datad *d;
+  GtkWidget *hbox, *swin, *clist;
+  gchar *row[1];
+  GSList *l;
+  glayoutd *gl = glayoutFromInst (inst);
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gl->window = window;
 
   gtk_window_set_title(GTK_WINDOW(window), "glayout");
   gtk_signal_connect (GTK_OBJECT (window), "destroy",
@@ -221,29 +187,76 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
     GTK_POS_TOP);
   gtk_box_pack_start (GTK_BOX (main_vbox), notebook, false, false, 2);
 
-#ifdef CMDS
-  /*-- network tab: cmds --*/
-  frame = gtk_frame_new ("Network layout");
-  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+/*-- "Specify datasets" list widgets --*/
+/*-- this is exactly the same code that appears in ggvis.c --*/
 
-  vbox = gtk_vbox_new (false, 5);
-  gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
-  gtk_container_add (GTK_CONTAINER(frame), vbox);
+  hbox = gtk_hbox_new (true, 10);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
 
-  btn = gtk_button_new_with_label ("cmds");
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (cmds_cb), (gpointer) inst);
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+/*
+ * node sets
+*/
+  /* Create a scrolled window to pack the CList widget into */
+  swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-  btn = gtk_button_new_with_label ("spring");
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (mds_spring_cb), (gpointer) inst);
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+  clist = gtk_clist_new_with_titles (1, &clist_titles[0]);
+  gtk_widget_set_name (GTK_WIDGET(clist), "nodeset");
+  gtk_clist_set_selection_mode (GTK_CLIST (clist),
+    GTK_SELECTION_SINGLE);
+  gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
+  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+    (GtkSignalFunc) glayout_datad_set_cb, inst);
+  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
+    (GtkSignalFunc) glayout_clist_datad_added_cb, GTK_OBJECT (clist));
+  /*-- --*/
 
-  label = gtk_label_new ("Network");
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-                            frame, label);
-#endif
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (d->rowid.idv.nels != 0) {  /*-- node sets --*/
+      row[0] = g_strdup (d->name);
+      gtk_clist_append (GTK_CLIST (clist), row);
+      g_free (row[0]);
+    }
+  }
+  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
+  gtk_container_add (GTK_CONTAINER (swin), clist);
+  gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
+
+/*
+ * edge sets
+*/
+  /* Create a scrolled window to pack the CList widget into */
+  swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+  clist = gtk_clist_new_with_titles (1, &clist_titles[1]);
+  gtk_widget_set_name (GTK_WIDGET(clist), "edgeset");
+  gtk_clist_set_selection_mode (GTK_CLIST (clist),
+    GTK_SELECTION_SINGLE);
+  gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
+  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+    (GtkSignalFunc) glayout_datad_set_cb, inst);
+  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
+    (GtkSignalFunc) glayout_clist_datad_added_cb, GTK_OBJECT (clist));
+  /*-- --*/
+
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (d->edge.n != 0) {  /*-- edge sets --*/
+      row[0] = g_strdup (d->name);
+      gtk_clist_append (GTK_CLIST (clist), row);
+      g_free (row[0]);
+    }
+  }
+  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
+  gtk_container_add (GTK_CONTAINER (swin), clist);
+  gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
+
+  label = gtk_label_new ("Specify datasets");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
 
   /*-- radial tab --*/
   frame = gtk_frame_new ("Radial layout");
@@ -262,8 +275,9 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   entry = gtk_entry_new ();
   gtk_entry_set_editable (GTK_ENTRY (entry), false);
   gtk_object_set_data (GTK_OBJECT(window), "CENTERNODE", entry);
-  gtk_entry_set_text (GTK_ENTRY (entry),
-    (gchar *) g_array_index (gg->current_display->d->rowlab, gchar *, 0));
+  if (gl->dsrc)
+    gtk_entry_set_text (GTK_ENTRY (entry),
+      (gchar *) g_array_index (gl->dsrc->rowlab, gchar *, 0));
   gtk_signal_connect (GTK_OBJECT(gg),
     "sticky_point_added", radial_center_set_cb, inst);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,

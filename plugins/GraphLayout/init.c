@@ -15,6 +15,9 @@ glayout_init (glayoutd *gl) {
   arrayd_init_null (&gl->pos_orig);
   arrayd_init_null (&gl->pos);
 
+  gl->e = NULL;
+  gl->dsrc = NULL;
+
   gl->centerNodeIndex = -1;
   gl->radial = NULL;
 }
