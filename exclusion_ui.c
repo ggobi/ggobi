@@ -16,7 +16,7 @@
 #include "vars.h"
 #include "externs.h"
 
-static gint exclusion_notebook_adddata_cb(ggobid *, datad *, void* notebook);
+static void exclusion_notebook_adddata_cb(ggobid *, datad *, void* notebook);
 
 static void destroyit (gboolean kill, ggobid * gg)
 {
@@ -489,7 +489,7 @@ void cluster_table_update (datad * d, ggobid * gg)
   }
 }
 
-static gint
+static void
 exclusion_notebook_adddata_cb (ggobid *gg, datad * d, void* notebook)
 {
   cluster_window_open (gg);
