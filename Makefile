@@ -27,6 +27,10 @@ LD=$(CC)
 CFLAGS= -g -ansi -Wall -fpic
 CXXFLAGS=$(CFLAGS)
 
+ifdef TEST_KEYS
+ CFLAGS+= -DTEST_KEYS=1
+endif
+
 SHLIB_LDFLAGS= -shared
 SHARED_LD_FLAGS= -shared
 LDFLAGS=
