@@ -112,6 +112,7 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
   /*-- emit variable_added signal --*/
   gtk_signal_emit (GTK_OBJECT (gg->main_window),
                    GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, gg); 
+
 }
 
 /*
@@ -188,6 +189,18 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
     /*-- emit variable_added signal --*/
     gtk_signal_emit (GTK_OBJECT (gg->main_window),
                      GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, gg); 
+  }
+
+  /*
+   * I'm sending this expose event because sometimes the clist
+   * is scrambled after a variable is cloned, with the entire list
+   * of variables appearing twice.  -- dfs 1/16/2002
+  */
+  {
+  gboolean rval = false;
+  gtk_signal_emit_by_name (GTK_OBJECT (gg->vartable_ui.window),
+    "expose_event",
+    (gpointer) gg, (gpointer) &rval);
   }
 }
 
