@@ -56,6 +56,32 @@ displays_print (ggobid *gg) {
 }
 */
 
+static void display_datad_added_cb (GtkObject *obj /*gg->main_window*/,
+  datad *d, ggobid *gg, GtkObject *win)
+{
+  displayd *dsp, *display = NULL;
+  gint k;
+  GList *l;
+
+  for (l=gg->displays, k = 0; l; l=l->next, k++) {
+    dsp = (displayd *) l->data;
+    if (dsp->window == (GtkWidget *) win) {
+      display = (displayd *) l->data;
+      break;
+    }
+  }
+
+  /*-- this is all true even when the display is first opened --*/
+  if (GTK_WIDGET_REALIZED (display->window)) {
+    if (display->displaytype == scatterplot) {
+      scatterplot_display_edge_menu_update (display,
+        gg->app.sp_accel_group, display_options_cb, gg);
+    }
+  }
+  /*-- I'll need a scatmat_edge_menu_update, too, I think --*/
+}
+
+
 
 /*----------------------------------------------------------------------*/
 /*               Drawing routines                                       */
@@ -399,7 +425,6 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
   display_add (display, gg);
 
   varpanel_refresh (display, gg);
-
   g_free (selected_vars);
 
   return (display);
@@ -858,6 +883,9 @@ display_window_init (displayd *display, gint width, ggobid *gg)
                       GTK_SIGNAL_FUNC (display_delete_cb), (gpointer) display);
 
   GGobi_widget_set (GTK_WIDGET (display->window), gg, true);
+
+  gtk_signal_connect (GTK_OBJECT (gg->main_window), "datad_added",
+    (GtkSignalFunc) display_datad_added_cb, display->window);
 }
 
 
