@@ -124,6 +124,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
   if (cleanup) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
+    gg->viewmode = NULLMODE;
 
     /*-- initialize the first display --*/
     display = scatterplot_new (false, NULL, d, gg);
