@@ -418,9 +418,9 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
       brush_pos->x2-1, brush_pos->y2-1, 2, 2);
 
     /*
-     * highlight brush
+     * highlight brush: but only in the current display
     */
-    if (cpanel->brush_on_p) {
+    if (cpanel->brush_on_p && display == gg->current_display) {
       gdk_draw_rectangle (drawable, gg->plot_GC, false,
         x1-1, y1-1, (x2>x1)?(x2-x1+2):(x1-x2+2), (y2>y1)?(y2-y1+2):(y1-y2+2)); 
 
