@@ -832,7 +832,7 @@ load_previous_file(GtkWidget *w, gpointer cbd)
    else {
       read_input(desc, gg);
        /* Need to avoid the initial scatterplot. */
-      start_ggobi(gg, true);
+      start_ggobi(gg, true, gdesc->displays == NULL);
    }
 
    if(gdesc->displays) {
@@ -847,8 +847,7 @@ load_previous_file(GtkWidget *w, gpointer cbd)
 }
 
 /*
- This replicates code elsewhere and the two should be
- merged.
+ This replicates code elsewhere and the two should be merged.
  */
 ggobid *
 create_ggobi(InputDescription *desc)
@@ -866,7 +865,7 @@ create_ggobi(InputDescription *desc)
 
   read_input(desc, gg);
 
-  start_ggobi(gg, init_data);
+  start_ggobi(gg, init_data, true);
 
   return(gg);
 }

@@ -210,7 +210,7 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
   }
 
   registerPlugins(gg, sessionOptions->info->plugins);
-  start_ggobi(gg, init_data);
+  start_ggobi(gg, init_data, true);
 
 
   if (processEvents) {
@@ -219,12 +219,12 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
 }
 
 void
-start_ggobi(ggobid *gg, gboolean init_data)
+start_ggobi(ggobid *gg, gboolean init_data, gboolean createPlot)
 {
   datad *d;
   if (init_data) {
     GSList *l;
-    gboolean firstd = true;
+    gboolean firstd = createPlot;
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
       datad_init (d, gg, firstd);
