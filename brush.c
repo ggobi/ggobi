@@ -161,7 +161,7 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
       d->hidden_now.els[i] = d->hidden.els[i];
     }
   }
-  if (edge_painting_p) {
+  if (edge_painting_p && e != NULL) {
     for (k=0; k<e->edge.n; k++) {
       e->color_now.els[k] = e->color.els[k];
       e->hidden_now.els[k] = e->hidden.els[k];
