@@ -96,9 +96,9 @@ typedef struct
  * tour1d (variables used to record the state of the 1D tour for this plot)
  */
  struct _tour1d {
-   /*gint keepmin;
-   gint keepmax;*/ /* Is this ever used */
-   /*gboolean firsttime;*/
+   gfloat keepmin;
+   gfloat keepmax; /* Is this ever used */
+   gboolean initmax;
    icoords ash_baseline;  /*-- for drawing segments from point to baseline --*/
  } tour1d;
 
