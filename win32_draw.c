@@ -407,9 +407,15 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
     for (iv=bin0->y; iv<=bin1->y; iv++) {
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
         j = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
+/*
         if (d->color_now.els[j] == current_color &&
             splot_plot_case (j, d, sp, display, gg) &&
             (draw_hidden == d->hidden_now.els[j]))
+*/
+      if (splot_plot_case (j, d, sp, display, gg)) {
+        if ((draw_hidden && d->hidden_now.els[j]) ||  /*-- hiddens --*/
+           (d->color_now.els[j] == current_color &&   /*-- unhiddens --*/
+                !draw_hidden && !d->hidden_now.els[j]))
         {
           build_glyph (&d->glyph_now.els[j], sp->screen, j,
             sp->win32.points, &npt,          
