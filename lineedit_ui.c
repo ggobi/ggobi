@@ -184,7 +184,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
     gtk_table_attach (GTK_TABLE (table),
       w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
     entry = gtk_entry_new ();
-    lbl = g_strdup_printf("%d", dtarget->nrows);
+    lbl = g_strdup_printf("%d", dtarget->nrows+1);
     gtk_entry_set_text (GTK_ENTRY(entry), lbl);
     g_free (lbl);
     gtk_widget_set_name (entry, "EE:recordid");
