@@ -146,6 +146,7 @@ splot_subtree_create (displayd *display, ggobid *gg)
   GtkWidget *tree, *item;
   gint ctr = 0;
   datad *d = display->d;
+  gchar *buf;
   
   tree = gtk_tree_new();
 
@@ -156,8 +157,10 @@ gtk_signal_connect (GTK_OBJECT(tree), "select_child",
       /* Here do the plots within the display. */
   for (slist = display->splots; slist ; slist = slist->next, ctr++) {
     sp = (splotd *) slist->data;
-    item = gtk_tree_item_new_with_label (splot_tree_label (sp,
-      ctr, display->displaytype, d, gg));
+    /*-- buf is allocated in splot_tree_label, but freed here --*/
+    buf = splot_tree_label (sp, ctr, display->displaytype, d, gg);
+    item = gtk_tree_item_new_with_label (buf);
+    if (buf) g_free (buf);
 
     gtk_signal_connect (GTK_OBJECT(item), "select",
                         GTK_SIGNAL_FUNC(display_tree_splot_child_select), sp);

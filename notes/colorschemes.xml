@@ -6,8 +6,7 @@
 <!-- Diverging schemes -->
 
 <colormap name="Brown to Blue Green 7" ncolors="7"
-          type="diverging" criticalvalue="4"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="4" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging 
   through shades of brown, then shades of blue-green
@@ -44,8 +43,7 @@
 </colormap>
 
 <colormap name="Brick Red to Blue 7" ncolors="7"
-          type="diverging" criticalvalue="4"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="4" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging from
   dark brick red to blue through off-white
@@ -82,8 +80,7 @@
 </colormap>
 
 <colormap name="Dark Red to Dark Green 7" ncolors="7"
-          type="diverging" criticalvalue="4"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="4" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging from
   dark red to dark green through off-white
@@ -120,8 +117,7 @@
 </colormap>
 
 <colormap name="Dark Blue to Green 6" ncolors="6"
-          type="diverging" criticalvalue="4"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="4" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging from
   a dark purplish blue to a dull green through off-white
@@ -155,8 +151,7 @@
 </colormap>
 
 <colormap name="Green to Violet 6" ncolors="6"
-          type="diverging" criticalvalue="3"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="3" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging
   between green to violet
@@ -190,8 +185,7 @@
 </colormap>
 
 <colormap name="Brown to Blue Green 5" ncolors="5"
-          type="diverging" criticalvalue="2"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="2" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging
   between brown and blue-green
@@ -222,8 +216,7 @@
 </colormap>
 
 <colormap name="Pinkish Red to Olive Green 5" ncolors="5"
-          type="diverging" criticalvalue="2"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="2" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging
   between pinkish red and olive green
@@ -254,8 +247,7 @@
 </colormap>
 
 <colormap name="Purplish Blue to Green 5" ncolors="5"
-          type="diverging" criticalvalue="2"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="2" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging
   between orange and blue
@@ -286,8 +278,7 @@
 </colormap>
 
 <colormap name="Orange to Blue 5" ncolors="5"
-          type="diverging" criticalvalue="2"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="2" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging
   between orange and blue
@@ -318,8 +309,7 @@
 </colormap>
 
 <colormap name="Green to Peach 5" ncolors="5"
-          type="diverging" criticalvalue="2"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="2" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging
   between dark green and peach
@@ -350,8 +340,7 @@
 </colormap>
 
 <colormap name="Red to Blue 5" ncolors="5"
-          type="diverging" criticalvalue="2"
-          system="rgb" system_min="0" system_max="1">
+          type="diverging" criticalvalue="2" system="rgb">
 <description>
   From Cindy Brewer, a diverging color scheme ranging
   between red to blue
@@ -384,8 +373,7 @@
 <!-- Sequential schemes -->
 
 <colormap name="Reds and Yellows 7" ncolors="7"
-          type="sequential"
-          system="rgb" system_min="0" system_max="1">
+          type="sequential" system="rgb">
 <description>
   From Cindy Brewer, a sequential color scheme ranging
   from very dark red through a range of oranges and yellows
@@ -422,8 +410,7 @@
 </colormap>
 
 <colormap name="Grays 7" ncolors="7"
-          type="sequential"
-          system="rgb" system_min="0" system_max="1">
+          type="sequential" system="rgb">
 <description>
   From Cindy Brewer, a gray scale
 </description>
@@ -459,8 +446,7 @@
 </colormap>
 
 <colormap name="Blues 7" ncolors="7"
-          type="sequential"
-          system="rgb" system_min="0" system_max="1">
+          type="sequential" system="rgb">
 <description>
   From Cindy Brewer, a sequential color scheme ranging
   from very dark blue, almost black, through increasingly
@@ -498,8 +484,7 @@
 </colormap>
 
 <colormap name="Blues and Yellows 7" ncolors="7"
-          type="sequential"
-          system="rgb" system_min="0" system_max="1">
+          type="sequential" system="rgb">
 <description>
   From Cindy Brewer, a sequential color scheme ranging
   from very dark blue, almost black, to a very pale yellow
@@ -536,8 +521,7 @@
 </colormap>
 
 <colormap name="Orangey Reds 6" ncolors="6"
-          type="sequential"
-          system="rgb" system_min="0" system_max="1">
+          type="sequential" system="rgb">
 <description>
   From Cindy Brewer, a sequential color scheme ranging
   from a very dark red to pale peach
@@ -571,8 +555,7 @@
 </colormap>
 
 <colormap name="Grays 5" ncolors="5"
-          type="sequential"
-          system="rgb" system_min="0" system_max="1">
+          type="sequential" system="rgb">
 <description>
   From Cindy Brewer, a gray scale.
 </description>
@@ -602,8 +585,7 @@
 </colormap>
 
 <colormap name="Blues 5" ncolors="5"
-          type="sequential"
-          system="rgb" system_min="0" system_max="1">
+          type="sequential" system="rgb">
 <description>
   From Cindy Brewer, a sequential color scheme ranging
   through blue
@@ -634,8 +616,7 @@
 </colormap>
 
 <colormap name="Reds and Yellows 5" ncolors="5"
-          type="sequential"
-          system="rgb" system_min="0" system_max="1">
+          type="sequential" system="rgb">
 <description>
   From Cindy Brewer, a sequential color scheme ranging
   from a very dark red to pale yellow
@@ -668,8 +649,7 @@
 <!-- Qualitative schemes -->
 
 <colormap name="Pink,Gold,...,Blue 5" ncolors="5"
-          type="qualitative"
-          system="rgb" system_min="0" system_max="1">
+          type="qualitative" system="rgb">
 <description>
   From Cindy Brewer, a qualitative color scheme ranging
   including pink, gold, green, pale orange, and blue
@@ -700,8 +680,7 @@
 </colormap>
 
 <colormap name="Pink,Yellow,...,Blue 5" ncolors="5"
-          type="qualitative"
-          system="rgb" system_min="0" system_max="1">
+          type="qualitative" system="rgb">
 <description>
   From Cindy Brewer, a qualitative color scheme ranging
   including pink, yellow, light green, green, and blue
@@ -732,45 +711,43 @@
 </colormap>
 
 <colormap name="New 6" ncolors="6"
-          type="qualitative"
-          system="rgb" system_min="0" system_max="255">
+          type="qualitative" system="rgb">
 <description>
   From Cindy Brewer, a qualitative color scheme ranging
   including pink, yellow, light green, green, and blue
 </description>
 <foreground>
-  <color name="Pink">
+  <color max="255" name="Pink">
     <red>27</red><green>158</green><blue>119</blue>
   </color>
-  <color name="Light Yellow">
+  <color max="255" name="Light Yellow">
     <red>217</red><green>95</green><blue>2</blue>
   </color>
-  <color name="Light Green">
+  <color max="255" name="Light Green">
     <red>117</red><green>112</green><blue>179</blue>
   </color>
-  <color name="Green">
+  <color max="255" name="Green">
     <red>197</red><green>1</green><blue>108</blue>
   </color>
-  <color name="Light Blue">
+  <color max="255" name="Light Blue">
     <red>102</red><green>166</green><blue>30</blue>
   </color>
-  <color name="Light Blue">
+  <color max="255" name="Light Blue">
     <red>230</red><green>171</green><blue>2</blue>
   </color>
 </foreground> 
 <background>
- <color><red>0</red><green>0</green><blue>0</blue></color>
+ <color max="255"><red>0</red><green>0</green><blue>0</blue></color>
 </background>
 <annotations>
- <color><red>255</red><green>255</green><blue>255</blue> </color>
+ <color max="255"><red>255</red><green>255</green><blue>255</blue> </color>
 </annotations>
 </colormap>
 
 <!-- Spectral schemes, adjusted by Cindy -->
 
 <colormap name="Spectrum 7" ncolors="7"
-          type="spectral"
-          system="rgb" system_min="0" system_max="1">
+          type="spectral" system="rgb">
 <description>
   From Cindy Brewer, a spectrum
 </description>
@@ -806,8 +783,7 @@
 </colormap>
 
 <colormap name="Spectrum 5" ncolors="5"
-          type="spectral"
-          system="rgb" system_min="0" system_max="1">
+          type="spectral" system="rgb">
 <description>
   From Cindy Brewer, a spectrum
 </description>

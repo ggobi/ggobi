@@ -55,7 +55,7 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
   if (gg->wvis.color_table) {
 /*
     gdk_colormap_free_colors (gdk_colormap_get_system(),
-      gg->wvis.color_table, gg->wvis.ncolors);
+                              gg->wvis.color_table, gg->wvis.ncolors);
     gdk_colormap_free_colors (gdk_colormap_get_system(),
                               &gg->wvis.bg_color, 1);
     gdk_colormap_free_colors (gdk_colormap_get_system(),
@@ -504,6 +504,64 @@ selection_made_cb (GtkWidget *clist, gint row, gint column,
     gtk_widget_set_sensitive (btn, true);
 }
 
+static void scale_set_cb (GtkWidget *w, ggobid* gg)
+{
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint ncolors_used;
+  gushort colors_used[MAXNCOLORS+2];
+  gint k;
+  gboolean rval = false;
+  extern void symbol_window_redraw (ggobid *);
+
+  /*
+   * If we've been using gg->wvis.color_table, init gg->color_table
+   * using the current scheme.  Then free wvis.color_table, since it
+   * is now redundant.
+  */
+  if (gg->wvis.color_table) {  /* ie, wvis.color_table != gg->color_table */
+
+    if (gg->wvis.scheme) {
+      colorschemed *scheme = gg->wvis.scheme;
+
+      datad_colors_used_get (&ncolors_used, colors_used, d, gg);
+      for (k=0; k<ncolors_used; k++) {
+        if (colors_used[k] >= scheme->n) {
+          quick_message ("Sorry, one of the colors to be reset has an index that is greater than\nthe number of colors in the current set.", false);
+          return;  /*-- for now, bail out rather than reassigning indices --*/
+        }
+      }
+
+      /*-- if no current color index is too high, continue --*/
+      g_free (gg->color_table);
+
+      gg->ncolors = scheme->n;
+      gg->color_table = (GdkColor *)
+        g_malloc (scheme->n * sizeof (GdkColor));
+      color_table_init_from_scheme (scheme, gg->color_table,
+        &gg->bg_color, &gg->accent_color);
+    } else {
+      gg->ncolors = MAXNCOLORS;
+      gg->color_table = (GdkColor *)
+        g_malloc (MAXNCOLORS * sizeof (GdkColor));
+      color_table_init_from_default (gg->color_table,
+        &gg->bg_color, &gg->accent_color);
+    }
+
+    g_free (gg->wvis.color_table);
+    gg->wvis.color_table = NULL;
+    gg->wvis.scheme = NULL;
+    gg->wvis.ncolors = 0;
+  }
+
+  displays_plot (NULL, FULL, gg);
+  gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
+    (gpointer) gg, (gpointer) &rval);
+
+  symbol_window_redraw (gg);
+  cluster_table_update (d, gg);
+}
+
 static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
@@ -526,7 +584,7 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
     if (gg->wvis.color_table) {  /* ie, wvis.color_table != gg->color_table */
 /*
       gdk_colormap_free_colors (gdk_colormap_get_system(),
-        gg->color_table, gg->ncolors);
+                                gg->color_table, gg->ncolors);
       gdk_colormap_free_colors (gdk_colormap_get_system(),
                                 &gg->bg_color, 1);
       gdk_colormap_free_colors (gdk_colormap_get_system(),
@@ -551,7 +609,7 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 
 /*
       gdk_colormap_free_colors (gdk_colormap_get_system(),
-        gg->wvis.color_table, gg->wvis.ncolors);
+                                gg->wvis.color_table, gg->wvis.ncolors);
       gdk_colormap_free_colors (gdk_colormap_get_system(),
                                 &gg->wvis.bg_color, 1);
       gdk_colormap_free_colors (gdk_colormap_get_system(),
@@ -600,7 +658,7 @@ wvis_window_open (ggobid *gg) {
   GtkWidget *notebook;
   GtkWidget *btn, *vb;
   /*-- for colorscales --*/
-  GtkWidget *frame, *opt, *menu;
+  GtkWidget *frame, *vbs, *opt, *menu;
   GList *l;
   colorschemed *scheme;
   static gchar *colorscaletype_lbl[] = {
@@ -623,7 +681,7 @@ wvis_window_open (ggobid *gg) {
       "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), gg);
 
     vbox = gtk_vbox_new (false, 0);
-    gtk_container_set_border_width (GTK_CONTAINER (vbox), 3);
+    gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
     gtk_container_add (GTK_CONTAINER (gg->wvis.window), vbox);
 
     /* Create a notebook, set the position of the tabs */
@@ -637,12 +695,15 @@ wvis_window_open (ggobid *gg) {
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, true, false, 1);
 
+    vbs = gtk_vbox_new (false, 0);
+    gtk_container_set_border_width (GTK_CONTAINER (vbs), 5);
+    gtk_container_add (GTK_CONTAINER (frame), vbs);
+
     opt = gtk_option_menu_new ();
     menu = gtk_menu_new ();
 
     colorscheme_add_to_menu (menu, "Default", NULL,
       colorscheme_set_cb, notebook, gg);
-
     for (n=0; n<ncolorscaletype_lbl; n++) {
       colorscheme_add_to_menu (menu, colorscaletype_lbl[n], NULL,
         NULL, notebook, gg);
@@ -654,13 +715,22 @@ wvis_window_open (ggobid *gg) {
       }
     }
 
-
     gtk_option_menu_set_menu (GTK_OPTION_MENU (opt), menu);
 
-    gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Choose a color scale", NULL);
-    gtk_container_add (GTK_CONTAINER (frame), opt);
+
+    gtk_box_pack_start (GTK_BOX (vbs), opt, true, false, 1);
+
+    btn = gtk_button_new_with_label ("Set color scheme");
+    gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Make this the current color scheme in ggobi, preserving current groups",
+      NULL);
+    gtk_box_pack_start (GTK_BOX (vbs), btn, false, false, 0);
+    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                        GTK_SIGNAL_FUNC (scale_set_cb), gg);
+    gtk_widget_set_name (btn, "WVIS:setcolorscheme");
   /**/
 
     /*-- colors, symbols --*/
@@ -693,7 +763,7 @@ wvis_window_open (ggobid *gg) {
                | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
                | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
-    btn = gtk_button_new_with_label ("Apply");
+    btn = gtk_button_new_with_label ("Apply color scheme by variable");
     gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Apply the color scale, using the values of the variable selected in the notebook above",

@@ -57,8 +57,8 @@ GGobiInitInfo *
 read_init_file(const char *filename, GGobiInitInfo *info)
 {
   xmlDocPtr  doc;
-  char *fileName;
-  int oldValiditySetting = xmlDoValidityCheckingDefaultValue;
+  gchar *fileName;
+  gint oldValiditySetting = xmlDoValidityCheckingDefaultValue;
 
   xmlSubstituteEntitiesDefault(1);   
   xmlDoValidityCheckingDefaultValue = false;

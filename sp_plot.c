@@ -30,8 +30,8 @@ extern void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
 
 /* colors_used now contains integers, 0:ncolors-1 */
 void
-splot_colors_used_get (splotd *sp, gint *ncolors_used,
-  gushort *colors_used, datad *d, ggobid *gg) 
+datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
+  datad *d, ggobid *gg) 
 {
   gboolean new_color;
   gint i, k, m;
@@ -217,7 +217,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   }
 
   if (!gg->mono_p && loop_over_points) {
-    splot_colors_used_get (sp, &ncolors_used, colors_used, d, gg);
+    datad_colors_used_get (&ncolors_used, colors_used, d, gg);
 
     /*
      * Now loop through colors_used[], plotting the points of each
@@ -345,7 +345,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   if (display->options.points_show_p) {
     if (!gg->mono_p) {
 
-      splot_colors_used_get (sp, &ncolors_used, colors_used, d, gg); 
+      datad_colors_used_get (&ncolors_used, colors_used, d, gg); 
 
       /*
        * Now loop through colors_used[], plotting the points of each

@@ -1,5 +1,6 @@
 #ifndef GGOBI_COLOR_SCHEME_H
 #define GGOBI_COLOR_SCHEME_H
+#ifdef USE_XML
 
 #include <gdk/gdk.h>
 
@@ -14,10 +15,9 @@ typedef struct {
   colorsystem system;   /*-- system used in the xml description --*/
   gint criticalvalue;   /*-- if diverging, where's the center? --*/
 
-  gfloat system_min, system_max;  /*-- min and max for system; relevant for rgb --*/
-
   gint n;               /*-- n <= MAXNCOLORS --*/
-  gfloat **data;        /*-- the data in the colortable, in its original system and dimensions --*/
+  gfloat **data;        /*-- the data in the colortable, in its
+                             original system and dimensions --*/
   GdkColor *rgb;         /*-- the data converted to rgb, nx3 --*/
   GArray *colorNames;   /*-- in case we have them --*/
 
@@ -31,8 +31,7 @@ typedef struct {
 colorschemed *read_colorscheme(char *fileName, GList **);
 colorschemed *findColorSchemeByName(GList *schemes, const gchar *name);
 
-#ifdef USE_XML
-gint getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col, gfloat min, gfloat max);
-#endif
+gint getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col);
 
+#endif
 #endif

@@ -310,7 +310,7 @@ gint sphere_npcs_get (datad *, ggobid *);
 void sphere_npcs_set (gint, datad *, ggobid *);
 void sphere_panel_open (ggobid *);
 void splash_show (ggobid *gg, guint action, GtkWidget *w);
-void splot_colors_used_get (splotd *, gint *ncolors_used, gushort *colors_used, datad *, ggobid *); 
+void datad_colors_used_get (gint *ncolors_used, gushort *colors_used, datad *, ggobid *); 
 void splot_dimension_set(splotd* sp, gint width, gint height);
 void splot_edges_realloc (splotd *, datad *, ggobid *);
 gboolean splot_event_handled (GtkWidget *, GdkEventKey *, cpaneld *, splotd *, ggobid *);

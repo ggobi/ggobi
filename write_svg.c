@@ -124,7 +124,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
 
   /*-- draw points --*/
   if (!gg->mono_p) {
-    splot_colors_used_get (sp, &ncolors_used, colors_used, d, gg);
+    datad_colors_used_get (&ncolors_used, colors_used, d, gg);
 
     /*
      * Now loop through colors_used[], plotting the points of each
@@ -161,7 +161,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
     gint j, nl, to, from;
     gboolean doit;
 
-    splot_colors_used_get (sp, &ncolors_used, colors_used, e, gg);
+    datad_colors_used_get (&ncolors_used, colors_used, e, gg);
 
     /*
      * Now loop through colors_used[], plotting the points of each
