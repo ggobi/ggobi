@@ -381,6 +381,19 @@ display_free_all (ggobid *gg) {
   {
     /*    display = (displayd *) dlist->data; */
     display = (displayd*) g_list_nth_data (gg->displays,count-1);
+
+    if(display->t1d.idled)
+      gtk_idle_remove(display->t1d.idled);
+    if(display->t2d.idled)
+      gtk_idle_remove(display->t2d.idled);
+    if(display->tcorr1.idled)
+      gtk_idle_remove(display->tcorr1.idled);
+    if(display->tcorr2.idled)
+      gtk_idle_remove(display->tcorr2.idled);
+    if(display->tour_idled)
+      gtk_idle_remove(display->tour_idled);
+
+
      /* If the second argument 'force' is true, it eliminates the
         final display.
         It will work now if there is more than one ggobi instance
