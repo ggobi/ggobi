@@ -100,6 +100,7 @@ datad_create(gint nr, gint nc, ggobid *gg)
   br_color_ids_init (d, gg);
 
   hidden_alloc (d);
+  hidden_init (d);
 
   return(d);
 }
