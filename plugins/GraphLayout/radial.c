@@ -88,7 +88,7 @@ hasPathToCenter (noded *n, noded *referringnode, datad *d, datad *e,
     k = GPOINTER_TO_INT (l->data);
 
     /*-- if edge[k] is included and visible ... --*/
-    if (e->sampled.els[k] && !d->hidden.els[k]) {
+    if (e->sampled.els[k] && !e->hidden.els[k]) {
 
       n1 = &gl->radial->nodes[ d->rowid.idv.els[e->edge.endpoints[k].a] ];
       if (n1->i == n->i)
@@ -168,10 +168,12 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 
 /*-- This may not belong here, but where exactly?  As soon as the
      panel is opened  --*/
+/*
   gtk_signal_connect (GTK_OBJECT(gg),
     "sticky_point_added", radial_highlight_sticky_edges, inst);
   gtk_signal_connect (GTK_OBJECT(gg),
     "sticky_point_removed", radial_highlight_sticky_edges, inst);
+*/
 
   visible = (glong *) g_malloc (d->nrows_in_plot * sizeof (glong));
   nvisible = visible_set (visible, d);
@@ -301,13 +303,12 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 
   /*-- copy the color and glyph vectors from d to dnew --*/
   for (i=0; i<nvisible; i++) {
-    m = visible[i];
-    dnew->color.els[m] = dnew->color_now.els[m] = dnew->color_prev.els[m] =
-      d->color.els[m];
-    dnew->glyph.els[m].type = dnew->glyph_now.els[m].type =
-      dnew->glyph_prev.els[m].type = d->glyph.els[m].type;
-    dnew->glyph.els[m].size = dnew->glyph_now.els[m].size =
-      dnew->glyph_prev.els[m].size = d->glyph.els[m].size;
+    dnew->color.els[i] = dnew->color_now.els[i] = dnew->color_prev.els[i] =
+      d->color.els[visible[i]];
+    dnew->glyph.els[i].type = dnew->glyph_now.els[i].type =
+      dnew->glyph_prev.els[i].type = d->glyph.els[visible[i]].type;
+    dnew->glyph.els[i].size = dnew->glyph_now.els[i].size =
+      dnew->glyph_prev.els[i].size = d->glyph.els[visible[i]].size;
   }
 
 /*
