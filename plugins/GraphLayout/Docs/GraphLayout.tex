@@ -50,8 +50,28 @@ and two variables for each edge.
 
 In a ggobi scatterplot display, use the {\bf Edges} menu to
 display the edges, and maybe the ``arrowheads'' which indicate
-edge direction.  Note: Until the edges are displayed, neither layout
-algorithm will work.
+edge direction.
+
+\section{Specifying the datasets}
+
+Initiate the plugin by selecting the ``Graph layout ...'' item on ggobi's
+Tools menu.  The GraphLayout control panel contains a ``notebook''
+widget with three tabs.  The first tab, ``Specify datasets,'' contains
+two lists, one for datasets which can supply nodes and one for datasets
+which can supply edges.  In most cases, only one choice is possible,
+but more complex arrangements can occur.
+
+The {\em snetwork.xml} data supplied with ggobi has exactly one set of
+nodes and one set of edges.  For this data, there are no choices to be
+made, and you can simply move on to select a layout method.
+
+With the {\em morsecodes.xml} data, there are in fact two sets of edges.
+The first one, ``distance,'' supplies the distances to be used in
+determining the layout.  The second set, ``edges,'' is a set of edges
+that can be used for display, because it emphasizes the structure of
+of the data.  (The layout methods in this plugin don't actually do a
+good job with the morse code data.  It's handled much better by another
+plugin, called ggvis.)
 
 \section{Layout}
 
@@ -59,10 +79,6 @@ There are three layout algorithms presently implemented in GraphLayout.
 A radial layout method is available without the use of any external
 libraries, and two more methods (called dot and neato) are available
 if you build GraphLayout with graphviz (www.graphviz.org).
-
-Find the ``Graph layout ...'' item on ggobi's Tools menu
-to open the GraphLayout control panel.  It contains a ``notebook''
-widget with one page for each layout method.
 
 Each layout method generates a new dataset when applied, and opens
 a new scatterplot displaying a plot of the node positions.  The
@@ -95,6 +111,25 @@ dataset with the following variables:
   with which it shares an edge.
 \end{itemize}
 
+\subsubsection{Center node}
+
+To reset the center node, choose the {\em Identification} mode in
+any of the displays.  (That's done most easily by typing {\em i} while
+the mouse cursor is inside the display.)  While the point you want
+as center node is labelled, click once to make the label ``sticky.''
+The node most recently made sticky will become the center node.
+(Making a node ``unsticky'' has no effect.)
+
+If you hide the center node, GraphLayout will refuse to proceed with
+a new layout until you have either restored it or chosen a new one.
+
+\subsubsection{Disjoint subgraphs}
+
+The radial layout method as implemented here can not lay out
+disjoint subgraphs independently.  If points are encountered that
+do not have a path to the center node, those points will be hidden,
+and will not affect the layout.
+
 \subsection {Graphviz layouts}
 
 There are two layouts available with the graphviz \cite{GansnerNorth00}
@@ -109,6 +144,11 @@ window will include a tab labelled ``graphviz,'' with a button for
 each of the two layout methods.  In each case, a new dataset with two
 variables is generated (the horizontal and vertical coordinates of
 the node positions).
+
+\subsubsection{Disjoint subgraphs}
+
+Both the graphviz layout can handle disjoint subgraphs, so they
+do not hide points.
 
 \section{Manipulations}
 
@@ -126,24 +166,24 @@ Groups of nodes can be moved together: first brush them with
 the same symbol and color, and then select {\tt Move brush group}
 in the {\tt Move points} ViewMode.
 
-There is only one added manipulation, and that puts it an appearance
-during the use of identification in a radial layout.  When a node is
-made ``sticky,'' a set of nodes and edges are are highlighted using
-the current brushing color:  the sticky node, its edges, and all
-nodes to which those edges are connected.  To remove the
-highlighting, click again on the node to make it unsticky.
+% This functionality is to be implemented in a new plugin.
+% There is only one added manipulation, and that puts it an appearance
+% during the use of identification in a radial layout.  When a node is
+% made ``sticky,'' a set of nodes and edges are are highlighted using
+% the current brushing color:  the sticky node, its edges, and all
+% nodes to which those edges are connected.  To remove the
+% highlighting, click again on the node to make it unsticky.
 
 \subsection{Thinning the graph}
 
 Brushing can be used to thin the plot, by hiding nodes with especially
 high in or out degree, for example, or nodes with large values of depth.
-Once those nodes are hidden, a new radial layout can be produced.
-Any nodes or edges still visible that no longer have a path to the
-center node will then be hidden as well, so it isn't necessary to erase
-an entire subtree: erasing its root is enough.
-
-If you erase the center node, GraphLayout will refuse to proceed with
-a new layout until you have restored it.
+Once those nodes are hidden, a new layout can be produced.
+For the radial layout, any nodes or edges still visible that no longer
+have a path to the center node will then be hidden as well, so it isn't
+necessary to erase an entire subtree: erasing its root is enough.
+For the graphviz layouts, thinning the graphs may result in the
+creation of multiple subgraphs.
 
 \section{Plot control from R}
 
@@ -209,13 +249,22 @@ tcolors[i] <- 7
 setColors.ggobi (tcolors, 1:length(tcolors), 3)
 \end{verbatim}
 
+\section{Related work}
+
+As mentioned earlier, another plugin exists which can lay out
+graphs.  It's called {\em ggvis}, and it uses multidimensional
+scaling to find the point positions.  It is a port of the older
+{\em xgvis} (\cite{xgvis_jcgs2002}, http://www.research.att.com/areas/stat/xgobi/), which
+was used with xgobi, ggobi's predecessor.  GGvis can perform
+layouts in arbitrary dimensions, unlike those in this plugin,
+which are limited to 2D.  The layouts it produces can also
+be tuned in several ways, by adjusting the many parameters of
+the MDS function.
+
 \section{Future work}
 
-We want very much to expand the set of available layout methods.
-We intend to port {\tt xgvis}, an extension to {\tt ggobi's} predecessor,
-{\tt xgobi,} a rich environment for interactive multidimensional scaling.
-
-% Bibliography: MDS reference, Graham Wills layout paper, xgvis papers
+A third plugin, not yet named, will allow manipulations of
+graphs, independent of the layout method used.
 
 \bibliography{references}
 
