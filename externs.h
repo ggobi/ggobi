@@ -320,6 +320,7 @@ void       raw_to_tform_copy (void);
 gboolean   reached_target(gfloat, gfloat, gint, gfloat *, gfloat *);
 gboolean   read_ascii_data(InputDescription *desc, ggobid *gg);
 gint       realloc_optimize0_p(optimize0_param *, gint, vector_i);
+void       recenter_data (gint, datad *, ggobid *);
 void       reinit_transient_brushing (displayd *, ggobid *);
 void       rejitter (gint *, gint, datad *, ggobid *);
 void       reset_pp(displayd *);

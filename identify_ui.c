@@ -26,6 +26,17 @@ static void display_cb (GtkWidget *w, gpointer cbd)
 }
 
 static void
+recenter_cb (GtkWidget *w, ggobid *gg)
+{
+  datad *d = gg->current_display->d;
+  if (g_slist_length (d->sticky_ids) == 1) {
+    gint k;
+    k = GPOINTER_TO_INT (d->sticky_ids->data);
+    recenter_data (k, d, gg);
+  }
+}
+
+static void
 id_remove_labels_cb (GtkWidget *w, ggobid *gg)
 {
   datad *d = gg->current_display->d;
@@ -221,6 +232,7 @@ void
 cpanel_identify_make(ggobid *gg) {
   GtkWidget *btn, *opt;
   GtkWidget *notebook;
+  GtkWidget *frame, *framevb;
   
   gg->control_panel[IDENT] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER(gg->control_panel[IDENT]), 5);
@@ -269,6 +281,27 @@ cpanel_identify_make(ggobid *gg) {
                       (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
                       btn, false, false, 1);
+
+  /*-- frame around button for resetting center --*/
+  frame = gtk_frame_new ("Recenter data");
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]), frame,
+    false, false, 3);
+
+  framevb = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (framevb), 4);
+  gtk_container_add (GTK_CONTAINER (frame), framevb);
+
+  btn = gtk_button_new_with_label ("Recenter");
+  gtk_widget_set_name (btn, "IDENT:recenter_btn");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Make one point sticky, and then click here to recenter the data around that point.",
+    NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (recenter_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (framevb), btn,
+    false, false, 0);
+  /*-- --*/
 
   gtk_widget_show_all (gg->control_panel[IDENT]);
 }

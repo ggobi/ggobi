@@ -291,3 +291,30 @@ limits_set_by_var (gint j, gboolean do_raw, gboolean do_tform,
   vt->lim.max = max;
 }
 
+/*-------------------------------------------------------------------------*/
+/*           recenter: called from identify                                */
+/*-------------------------------------------------------------------------*/
+
+/*  Recenter the data using the current sticky point */
+void
+recenter_data (gint i, datad *d, ggobid *gg) {
+  vartabled *vt;
+  greal x;
+  gint j;
+
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+
+    x = (vt->lim_tform.max - vt->lim_tform.min)/2;
+
+    vt->lim_specified_p = true;
+    vt->lim_specified_tform.min = d->tform.vals[i][j] - x;
+    vt->lim_specified_tform.max = d->tform.vals[i][j] + x;
+  }
+  limits_set (false, true, d, gg);
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+
+  tform_to_world (d, gg);
+  displays_tailpipe (FULL, gg);
+}

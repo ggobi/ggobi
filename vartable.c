@@ -233,6 +233,10 @@ vartable_element_new (datad *d)
   vt->median = 0.0;
 
   vt->lim_specified_p = false;  /*-- no user-specified limits --*/
+  vt->lim_specified.min = 0.0;
+  vt->lim_specified.max = 0.0;
+  vt->lim_specified_tform.min = 0.0;
+  vt->lim_specified_tform.max = 0.0;
 
   vt->lim_raw.min = 0.0;
   vt->lim_raw.max = 0.0;
