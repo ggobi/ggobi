@@ -54,45 +54,30 @@ algorithm will work.
 
 \section{Layout}
 
-There are two layout algorithms presently implemented in GraphLayout,
-classical multidimensional scaling (with an optional force
-adjustment algorithm), and a radial layout.
+There are three layout algorithms presently implemented in GraphLayout.
+A radial layout method is available without the use of any external
+libraries, and two more methods (called dot and neato) are available
+if you build GraphLayout with graphviz (www.graphviz.org).
 
 Find the ``Graph layout ...'' item on ggobi's Tools menu
 to open the GraphLayout control panel.  It contains a ``notebook''
 widget with one page for each layout method.
 
-\subsection {Network layout}
-
-This layout uses classical multidimensional scaling (CMDS).  CMDS yields a
-layout in which the sum of squares of the physical distances between nodes
-is as close as possible to the sum of squares of the ``link distances,''
-that is, the number of edges in the shortest path between $node_i$
-to $node_j$.
-
-Click on ``cmds.''  It adds two variables to the node data, so 
-just plot ``Pos1'' against ``Pos0'' to see the resulting layout.
-
-Layouts produced by MDS are dominated by large distances, so it
-is sometimes useful to apply a few iterations of a force adjustment
-algorithm to spread out the leaf nodes.  Force adjustment algorithms
-are sometime called spring algorithms because they model a graph as
-a physical system, a collection of weights and springs.
-
-These algorithms can generate layouts in spaces of any dimension,
-but as of this writing, our implementation only works in 2-D.
+Each layout method generates a new dataset when applied, and opens
+a new scatterplot displaying a plot of the node positions.  The
+scatterplots are linked across both nodes and edges.
 
 \subsection {Radial layout}
 
 The radial layout \cite{Wills99} sets the first node in the dataset
 as the center node, and arranges the rest of the nodes in concentric
 circles around it.  The resulting layout is a tree arranged radially.
-Even if the underlying graph is not very tree-like, the layout can result
+If the underlying graph is not very tree-like, the layout can result
 in a great many edge crossings, and the layout doesn't do anything to
 minimize these crossings.
 
-Click on ``apply'' under the ``Radial'' tab.  It adds a number of
-variables to the layout:
+Click on ``apply'' under the ``Radial'' tab.  It generates a new
+dataset with the following variables:
 
 \begin{itemize}
 \item x, y: The node positions.  Plot y against x to view the layout.
@@ -108,6 +93,21 @@ variables to the layout:
 \item nsiblings: For $node_i$, the number of nodes with $depth = depth_i$
   with which it shares an edge.
 \end{itemize}
+
+\subsection {Graphviz layouts}
+
+There are two layouts available with the graphviz {\cite
+GansnerNorth00} package:  {\bf dot} makes hierarchical layouts of
+directed graphs, and {\bf neato} makes ``spring'' model layouts of
+undirected graphs.   The software can be obtained at www.graphviz.org,
+and some instructions for building it for ggobi are in the INSTALL
+file in the GraphLayout source directory.
+
+When you have built GraphLayout with the graphviz package, the plugin
+window will include a tab labelled ``graphviz,'' with a button for
+each of the two layout methods.  In each case, a new dataset with two
+variables is generated (the horizontal and vertical coordinates of
+the node positions).
 
 \section{Manipulations}
 
