@@ -434,6 +434,8 @@ vartable_update_cloned_var (gint n, gint jvar, datad *d, ggobid *gg)
       d->vartable[jvar].lim_raw.max =
       d->vartable[jvar].lim_tform.max = d->vartable[n].lim_tform.max;
 
+    d->vartable[jvar].nmissing = d->vartable[n].nmissing;
+
     return (true);
 
   } else return (false); 

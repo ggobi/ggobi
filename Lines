@@ -102,6 +102,7 @@
 35277   10/18 working on transformation and sphering
 35334   10/18 Di committed the 1d tour
 35373   10/19 labels update correctly on transformation and sphering
+35468   10/19 the clist on the sphere panel now initializes correctly
               
 
 note: There are about 40.8K lines in xgobi,

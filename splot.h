@@ -59,6 +59,7 @@ typedef struct {
  gint p1dvar;
  gfloat *p1d_data;  /* the spreading data */
  lims p1d_lim;      /* limits of the spreading data */
+ gfloat p1d_mean;
 
 /*
  * xyplot

@@ -78,7 +78,7 @@ void
 tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
   int i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
-  gfloat min, max, keepmin, keepmax;
+  gfloat min, max, mean, keepmin, keepmax;
   gboolean firsttime = true;
   gfloat precis = PRECISION1;
   cpaneld *cpanel = &dsp->cpanel;
@@ -101,7 +101,7 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
   }
   do_ash1d (yy, d->nrows_in_plot,
        cpanel->t1d_nbins, cpanel->t1d_nASHes,
-       sp->p1d_data, &min, &max);
+       sp->p1d_data, &min, &max, &mean);
   if (firsttime) {
     keepmin = min;
     keepmax = max;
@@ -111,6 +111,8 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
     if (min < keepmin) keepmin = min;
     if (max > keepmax) keepmax = max;
   }
+
+  max = 2*mean;  /* try letting the max for scaling depend on the mean */
   if (cpanel->t1d_vert) {
     for (i=0; i<d->nrows_in_plot; i++) {
       sp->planar[i].x = (glong) (precis*(-1.0+2.0*

@@ -273,13 +273,13 @@ ggobid* GGobiFromWindow (GdkWindow *win)
 ggobid* 
 GGobiFromSPlot(splotd *sp)
 {
- return(sp->displayptr->ggobi);
+ return (sp->displayptr->ggobi);
 }
 
 ggobid* 
 GGobiFromDisplay(displayd *display)
 {
-  return(display->ggobi);
+  return (display->ggobi);
 }
 
 void

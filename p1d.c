@@ -42,7 +42,7 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
   gint i;
   gfloat del = 1.;
   gint option = 1, stages = 3;
-  gfloat min, max;
+  gfloat min, max, mean;
   cpaneld *cpanel = &display->cpanel;
 
   switch (cpanel->p1d_type) {
@@ -56,9 +56,10 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
     case ASH:
       do_ash1d (yy, d->nrows_in_plot,
                cpanel->nbins, cpanel->nASHes,
-               sp->p1d_data, &min, &max);
+               sp->p1d_data, &min, &max, &mean);
       sp->p1d_lim.min = min;
       sp->p1d_lim.max = max;
+      sp->p1d_mean = mean;
       break;   
 
     case DOTPLOT:

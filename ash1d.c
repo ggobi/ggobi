@@ -33,7 +33,7 @@ gint ash1 (gint, gint *, gint, gfloat *, gfloat *, gfloat *,
 
 gint
 do_ash1d (gfloat *vals, gint nvals, gint nbins, gint n_ashes,
-	  gfloat *ashed_vals, gfloat *lims_min, gfloat *lims_max);
+	  gfloat *ashed_vals, gfloat *lims_min, gfloat *lims_max, gfloat *mean);
 
 #ifdef __cplusplus
 }
@@ -42,11 +42,12 @@ do_ash1d (gfloat *vals, gint nvals, gint nbins, gint n_ashes,
 
 gint
 do_ash1d (gfloat *vals, gint nvals, gint nbins, gint n_ashes,
-  gfloat *ashed_vals, gfloat *lims_min, gfloat *lims_max)
+  gfloat *ashed_vals, gfloat *lims_min, gfloat *lims_max, gfloat *mean)
 {
   gint i, k, icheck;
   gint *bins;
   gfloat min, max, ab[2];
+  gfloat sum;
 
   /* for computing nicerange -- extending the range */
   gfloat del, beta = 0.2;
@@ -83,6 +84,7 @@ do_ash1d (gfloat *vals, gint nvals, gint nbins, gint n_ashes,
 
   *lims_min = INT_MAX;
   *lims_max = -1 * INT_MAX;
+  sum = 0;
   for (i=0; i<nvals; i++) {
     ti = (vals[i] - ab[0]) / binwidth  - .5 ;
     k = (gint) ti;
@@ -93,9 +95,11 @@ do_ash1d (gfloat *vals, gint nvals, gint nbins, gint n_ashes,
 
     *lims_min = MIN (ashed_vals[i], *lims_min);
     *lims_max = MAX (ashed_vals[i], *lims_max);
+    sum += ashed_vals[i];
   }
+  *mean = sum / (gfloat) nvals;
 
-  /* Scale onto [0,100] */
+  /* Scale onto [0,100] *//*-- ggobi will handle the scaling --*/
 /*
   for (i=0; i<nvals; i++) {
     ashed_vals[i] = (ashed_vals[i] - min) * 100. / max;

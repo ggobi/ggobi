@@ -224,6 +224,7 @@ npcs_get (datad *d, ggobid *gg)
 
 void
 spherevars_set (datad *d, ggobid *gg) {
+  extern void vars_stdized_send_event (datad *d, ggobid *gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint j, ncols;
 
@@ -237,6 +238,9 @@ spherevars_set (datad *d, ggobid *gg) {
 
   for (j=0; j<ncols; j++)
     d->sphere.vars.vals[j] = cols[j];
+
+  /*-- update the "vars stdized?" text entry --*/
+  vars_stdized_send_event (d, gg);
 
   g_free (cols);
 }
@@ -457,7 +461,7 @@ pca_calc (datad *d, ggobid *gg) {
   gboolean svd_ok;
 
   eigenvec_zero (d, gg);
-  spherevars_set (d, gg);
+/*spherevars_set (d, gg);*/
 
   sphere_varcovar_set (d, gg);
   

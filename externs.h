@@ -13,7 +13,7 @@ datad *datad_new(datad *d, ggobid *gg);
 "C" {
 #endif
 
-/* sort +2 */
+/* sort +1 */
 GtkWidget* CreateMenuCheck (displayd *, GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
 ggobid* GGobiFromDisplay (displayd *display);
@@ -124,7 +124,7 @@ void display_tour_init (displayd *, ggobid *);
 void display_window_init (displayd *, gint, ggobid *);
 void displays_plot (splotd *, gint, ggobid *);
 void displays_tailpipe (gint, ggobid *);
-gint do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *);
+gint do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *, gfloat *);
 void draw_glyph (GdkDrawable *, glyphv *, icoords *, gint, ggobid *);
 gint dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v);
 void edges_alloc (gint, datad *, ggobid *);
@@ -247,7 +247,7 @@ void scatterplot_main_menus_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gb
 displayd* scatterplot_new (gboolean, splotd *sp, datad *d, ggobid *);
 void scatterplot_show_rulers (displayd *, gint);
 gboolean scree_mapped_p (ggobid *);
-void scree_plot_make (ggobid *);
+void scree_plot_make (datad *, ggobid *);
 gint selected_cols_get (gint *, datad *d, ggobid *);
 void smooth_window_open (ggobid *);
 void sp_event_handlers_toggle (splotd *, gboolean);

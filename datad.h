@@ -166,8 +166,8 @@ class datad {
 
 #ifdef USE_CLASSES
  public:
-   datad() {};
-   datad(struct _ggobid *gg);
+   datad () {};
+   datad (struct _ggobid *gg);
 
 
    /* The following are methods that one might want to override in order to 
@@ -205,7 +205,7 @@ gint alloc_edgeIDs(datad *d);
 
 
 
-extern datad *datad_new(datad *, struct _ggobid *);
+extern datad *datad_new (datad *, struct _ggobid *);
 
 #ifdef USE_CLASSES
 class EdgeDatad : public datad 

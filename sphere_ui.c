@@ -98,16 +98,29 @@ static void
 vars_stdized_cb (GtkWidget *w, GdkEvent *event, datad *d)
 {
   gboolean stdized = true;
-  gint k;
+  gint el, k;
 
   for (k=0; k<d->sphere.vars.nels; k++) {
-    if (d->vartable[k].tform2 != STANDARDIZE) {
+    el = d->sphere.vars.vals[k];
+    if (d->vartable[el].tform2 != STANDARDIZE) {
       stdized = false;
       break;
     }
   }
 
   gtk_entry_set_text (GTK_ENTRY (w), (stdized) ? "yes" : "no");
+}
+
+void
+vars_stdized_send_event (datad *d, ggobid *gg)
+{
+  if (gg->sphere_ui.stdized_entry != NULL &&
+      GTK_WIDGET_VISIBLE (gg->sphere_ui.stdized_entry))
+  {
+    gboolean rval = false;
+    gtk_signal_emit_by_name (GTK_OBJECT (gg->sphere_ui.stdized_entry),
+      "expose_event", (gpointer) d, (gpointer) &rval);
+  }
 }
 
 static void
@@ -165,9 +178,28 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
 }
 
 static void
-scree_restore_cb (GtkWidget *w, ggobid *gg)
+scree_restore_cb (GtkWidget *w, datad *d)
 { 
-  g_printerr ("not yet enabled: restore the scree plot\n");
+  extern void sphere_malloc (gint, datad *, ggobid *);
+
+  if (d->sphere.vars_sphered.nels > 0) {
+    ggobid *gg = GGobiFromWidget (w, true);
+    gint ncols = d->sphere.vars_sphered.nels;
+
+    if (d->sphere.vars.vals == NULL || d->sphere.vars.nels != ncols) {
+      sphere_malloc (ncols, d, gg);
+    }
+  
+    vectori_copy (&d->sphere.vars_sphered, &d->sphere.vars);  /* from, to */
+
+    /*-- update the "vars stdized?" text entry --*/
+    vars_stdized_send_event (d, gg);
+
+    scree_plot_make (d, gg);
+
+  }  else {
+    g_printerr ("sorry, there are no sphered variables to use\n");
+  }
 }
 
 /*
@@ -175,9 +207,11 @@ scree_restore_cb (GtkWidget *w, ggobid *gg)
  * variables has changed, or after the variables are transformed
 */
 static void
-sphere_update_cb (GtkWidget *w, ggobid *gg)
+scree_update_cb (GtkWidget *w, datad *d)
 { 
-  scree_plot_make (gg);
+  ggobid *gg = GGobiFromWidget (w, true);
+  spherevars_set (d, gg);
+  scree_plot_make (d, gg);
 }
 
 /*
@@ -275,10 +309,8 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
  * Called when the sphere panel is opened, and when the update
  * button is pressed.
 */
-void scree_plot_make (ggobid *gg)
+void scree_plot_make (datad *d, ggobid *gg)
 {
-  datad *d = gg->current_display->d;
-
   if (pca_calc (d, gg)) {  /*-- spherevars_set is called here --*/
     gboolean rval = false;
     gtk_signal_emit_by_name (GTK_OBJECT (gg->sphere_ui.scree_da),
@@ -300,11 +332,11 @@ sphere_panel_open (ggobid *gg)
   GtkWidget *label;
   GtkWidget *spinner;
   datad *d = gg->current_display->d;
+  /*-- for the clist of sphered variables --*/
+  GtkWidget *scrolled_window;
+  gchar *titles[1] = {"sphered variables"};
+  /*-- --*/
 
-  /*
-   * this line may look redundant, but it's needed for the adjustment
-   * to be correctly initialized 
-  */
   spherevars_set (d, gg); 
 
   if (gg->sphere_ui.window == NULL) {
@@ -324,13 +356,14 @@ sphere_panel_open (ggobid *gg)
 
     /*-- element 1: update scree plot when n selected vars changes --*/
     btn = gtk_button_new_with_label ("Update scree plot");
+    GGobi_widget_set (btn, gg, true);
     gtk_box_pack_start (GTK_BOX (main_vbox), btn,
       false, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Update scree plot when a new set of variables is selected, or when variables are transformed",
       NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (sphere_update_cb), gg);
+                        GTK_SIGNAL_FUNC (scree_update_cb), d);
 
     hbox = gtk_hbox_new (false, 2);
     gtk_box_pack_start (GTK_BOX (main_vbox), hbox, false, false, 0);
@@ -466,36 +499,33 @@ sphere_panel_open (ggobid *gg)
                         GTK_SIGNAL_FUNC (sphere_apply_cb), gg);
 
     /*-- list to show the currently sphered variables --*/
-    /*-- I've asked the mailing list how to specify the number of visible rows --*/
-    {
-      gchar *titles[1] = {"sphered variables"};
-      GtkWidget *scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+    scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+    gtk_box_pack_start (GTK_BOX (vbox), scrolled_window,
+      true, true, 0);
 
-      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-        GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-      gtk_box_pack_start (GTK_BOX (vbox), scrolled_window,
-        true, true, 0);
+    gg->sphere_ui.clist = gtk_clist_new_with_titles (1, titles);
+    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.clist),
+                        "size_allocate",
+                        (GtkSignalFunc) sphere_clist_size_alloc_cb,
+                        (gpointer) gg);
+    gtk_clist_column_titles_passive (GTK_CLIST (gg->sphere_ui.clist));
+    widget_initialize (gg->sphere_ui.clist, false);
 
-      gg->sphere_ui.clist = gtk_clist_new_with_titles (1, titles);
-      gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.clist),
-                          "size_allocate",
-                          (GtkSignalFunc) sphere_clist_size_alloc_cb,
-                          (gpointer) gg);
-      gtk_clist_column_titles_passive (GTK_CLIST (gg->sphere_ui.clist));
-      widget_initialize (gg->sphere_ui.clist, false);
-
-      gtk_container_add (GTK_CONTAINER (scrolled_window),
-        gg->sphere_ui.clist);
-    }
+    gtk_container_add (GTK_CONTAINER (scrolled_window),
+      gg->sphere_ui.clist);
+    /*-- --*/
 
     gg->sphere_ui.restore_btn = gtk_button_new_with_label ("Restore scree plot");
-    gtk_box_pack_start (GTK_BOX (vbox), gg->sphere_ui.restore_btn,
-      false, false, 0);
+    GGobi_widget_set (gg->sphere_ui.restore_btn, gg, true);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.restore_btn,
       "Restore the scree plot to reflect the current principal components",
       NULL);
     gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.restore_btn), "clicked",
-                        GTK_SIGNAL_FUNC (scree_restore_cb), gg);
+                        GTK_SIGNAL_FUNC (scree_restore_cb), d);
+    gtk_box_pack_start (GTK_BOX (vbox), gg->sphere_ui.restore_btn,
+      false, false, 0);
 
     /*-- close button --*/
     btn = gtk_button_new_with_label ("Close");
@@ -510,5 +540,5 @@ sphere_panel_open (ggobid *gg)
   gtk_widget_show_all (gg->sphere_ui.window);
   gdk_flush ();
 
-  scree_plot_make (gg);
+  scree_plot_make (d, gg);
 }
