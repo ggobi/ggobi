@@ -24,4 +24,7 @@ read: read.o error.o
 OMEGA_XSL_DIR=d:/duncan/Projects/org/omegahat/Docs/XSL
 # $(OMEGA_XSL_DIR)/Rstyle.xsl
 plugin.html: plugin.xml $(GGOBI_HOME)/share/XSL/plugin.xsl
-	xsltproc -o $@  $(GGOBI_HOME)/share/XSL/plugin.xsl  $<
+	xsltproc -o $@ -param rstyle "/cygdrive/d/duncan/Projects/org/omegahat/Docs/XSL/Rstyle.xsl" $(GGOBI_HOME)/share/XSL/plugin.xsl  $<
+
+zip: ExcelReader.dll plugin.xml plugin.html
+	zip ExcelReader.zip $^

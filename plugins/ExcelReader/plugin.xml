@@ -45,9 +45,41 @@ this is to create the COM server as an R COM server and use the Rggobi
 mechanism to implement the different methods.  This is reasonably
 easy. See <s:package>RDCOMServer</s:package>.
 
+<para/>
 
+
+ In the future, someone might want to make this plugin customizable
+via a dialog.  One could make it operate as a regular plugin and have
+a dialog popup when selected from a menu.  This dialog would then
+allow the user to specify the range, whether the first consisted of
+names or regular values, the "symbol" to use for a missing value, and
+so on.
 
 <para/>
+We should note that we can do this from R using the
+<r:package>RDCOMClient</r:package> and with an
+<r:package>RExcelClient</r:package> and it would be better to put the
+effort into developing that code. We could then use that via an R
+plugin to ggobi, an R DCOM server, or via Rggobi.
+
+<note>
+The implementation of this plugin is strange, to say the least.
+We use the IDispatch mechanism rather than compiling the stubs
+for the Excel classes.
+There are two reasons for this. 
+<itemizedlist>
+<listitem>
+I am not currently familiar with the ways to generate
+the stubs from type libraries, etc. 
+</listitem>
+<listitem>
+If we did generate stubs using Microsft's Visual C++,
+we would then want to compile them with MinGW
+</listitem>
+</itemizedlist>
+</note>
+
+<details>
 The mechanism for reading the data is as follows.
  We then query the
   workbook for its sheets and loop over these to create a GGobi
@@ -109,22 +141,9 @@ processing to compute or augment the levels.  We can use the XML code
 and facilities within that to do this.
 
 <para/>
+</details>
 
- In the future, someone might want to make this plugin customizable
-via a dialog.  One could make it operate as a regular plugin and have
-a dialog popup when selected from a menu.  This dialog would then
-allow the user to specify the range, whether the first consisted of
-names or regular values, the "symbol" to use for a missing value, and
-so on.
-
-<para/>
-We should note that we can do this from R using the
-<r:package>RDCOMClient</r:package> and with an
-<r:package>RExcelClient</r:package> and it would be better to put the
-effort into developing that code. We could then use that via an R
-plugin to ggobi, an R DCOM server, or via Rggobi.
-
-   </documentation>
+  </documentation>
 
 <bugs>
 
