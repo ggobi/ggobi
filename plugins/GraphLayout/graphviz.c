@@ -301,8 +301,11 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     if (weightvar >= 0) {
       for (i=0; i<nedges; i++) {
         if (e->tform.vals[intv[i]][weightvar] < 1) {
-          quick_message ("The minimum length is 1.0; perform a variable transformation before doing the layout.", false);
+          quick_message ("Can't use weights: the minimum length is 1.0; perform a variable transformation before doing the layout.", false);
           g_printerr ("len: %f\n", e->tform.vals[intv[i]][weightvar]);
+          /* reset weights */
+          for (k=0; i<i; k++)
+            edgev[intv[k]]->u.dist = 1.0;
           break;  /*-- free arrays and quit?  --*/
         }
         edgev[intv[i]]->u.dist = e->tform.vals[intv[i]][weightvar];
