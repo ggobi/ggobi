@@ -85,7 +85,7 @@ display_menu_build (ggobid *gg)
       gtk_object_set_data (GTK_OBJECT (item),
         "missing_p", GINT_TO_POINTER (0));
 
-    } else {  /*-- prepare the menu for multiple data matrices --*/
+    } else {  /*-- prepare the cascading menu for multiple data matrices --*/
 
       submenu = gtk_menu_new ();
       anchor = CreateMenuItem (gg->display_menu, "New scatterplot",

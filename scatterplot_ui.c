@@ -87,84 +87,88 @@ scatterplot_display_menus_make (displayd *display,
                                 GtkSignalFunc func,
                                 GtkWidget *mbar, ggobid *gg)
 {
-  GtkWidget *options_menu, *submenu, *item;
+  GtkWidget *topmenu, *edges_menu, *options_menu;
+  GtkWidget *item;
   gint nd = g_slist_length (gg->d);
-  datad *dnext;
+  datad *e;
   datad *d = display->d;  /*-- this dataset --*/
   gint k, ne = 0;
+  extern void edgeset_add_cb (GtkWidget *w, datad *e);
 
-  /*-- find the number of datad's with edges --*/
-  for (k=0; k<nd; k++) { 
-    dnext = (datad*) g_slist_nth_data (gg->d, k);
-    if (dnext != d && dnext->edge.n > 0)
-      ne++;
-  }
-
-  if (ne > 0) {  
-    extern void edgeset_add_cb (GtkWidget *w, datad *e);
-
-    /*
-     * Edges menu
-    */
-    submenu = submenu_make ("_Edges", 'E', accel_group);
-    options_menu = gtk_menu_new ();
-
-    /*-- add edge set:  a single choice or multiple choices --*/
-    if (ne == 1) {
-      for (k=0; k<nd; k++) { 
-        dnext = (datad*) g_slist_nth_data (gg->d, k);
-        if (dnext != d && dnext->edge.n > 0) {
-          /*-- add a single menu item --*/
-          item = CreateMenuItem (options_menu, "Add edge set",
-            NULL, NULL, gg->main_menubar, gg->main_accel_group,
-            GTK_SIGNAL_FUNC (edgeset_add_cb), (gpointer) dnext, gg);
-          gtk_object_set_data (GTK_OBJECT (item),
-            "display", GINT_TO_POINTER (display));
-        }
-      }
-    } else {  /*-- ne > 1; add cascading menu --*/
-/*
-      GtkWidget *anchor;
-      submenu = gtk_menu_new ();
-      anchor = CreateMenuItem (gg->display_menu, "New scatterplot",
-        NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
-
-      for (k=0; k<nd; k++) { 
-        datad *d = (datad*) g_slist_nth_data (gg->d, k);
-        lbl = datasetName (d, k);
-        item = CreateMenuItem (submenu, lbl,
-          NULL, NULL, gg->display_menu, gg->main_accel_group,
-          GTK_SIGNAL_FUNC (display_open_cb),
-          d, gg);
-        gtk_object_set_data (GTK_OBJECT (item),
-          "displaytype", GINT_TO_POINTER (scatterplot));
-        gtk_object_set_data (GTK_OBJECT (item),
-          "missing_p", GINT_TO_POINTER (0));
-        g_free (lbl);
-      }
-*/
+  /*-- If this datad has ids, find the number of other datad's with edges --*/
+  if (d->rowid.idv.nels > 0) {
+    for (k=0; k<nd; k++) { 
+      e = (datad*) g_slist_nth_data (gg->d, k);
+      if (e != d && e->edge.n > 0)
+        ne++;
     }
 
-    /* Add a separator */
-    CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
+    /*-- if ne > 0, add edge set:  a single choice or multiple choices --*/
+    if (ne > 0) {
 
-    item = CreateMenuCheck (options_menu, "Show lines (undirected)",
-      func, GINT_TO_POINTER (DOPT_SEGS_U), off, gg);
-    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-    item = CreateMenuCheck (options_menu,
-      "Show arrowheads (for directed lines)",
-      func, GINT_TO_POINTER (DOPT_SEGS_D), off, gg);
-    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+      /*-- Edges menu --*/
+      topmenu = submenu_make ("_Edges", 'E', accel_group);
+      edges_menu = gtk_menu_new ();
 
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
-    submenu_append (submenu, mbar);
-    gtk_widget_show (submenu);
+      if (ne == 1) {  
+
+        for (k=0; k<nd; k++) { 
+          e = (datad*) g_slist_nth_data (gg->d, k);
+          if (e != d && e->edge.n > 0) {
+            /*-- add a single menu item --*/
+            item = CreateMenuItem (edges_menu, "Add edge set",
+              NULL, NULL, NULL, gg->main_accel_group,
+              GTK_SIGNAL_FUNC (edgeset_add_cb), (gpointer) e, gg);
+            gtk_object_set_data (GTK_OBJECT (item),
+              "display", GINT_TO_POINTER (display));
+          }
+        }
+      } else if (ne > 1) {  /*-- add cascading menu --*/
+        GtkWidget *submenu, *anchor;
+        gchar *lbl;
+
+        submenu = gtk_menu_new ();
+        anchor = CreateMenuItem (edges_menu, "Add edge set",
+          NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
+
+        for (k=0; k<nd; k++) { 
+          e = (datad *) g_slist_nth_data (gg->d, k);
+          if (e == d)
+            continue;
+          lbl = datasetName (e, k);
+          item = CreateMenuItem (submenu, lbl,
+            NULL, NULL, NULL, gg->main_accel_group,
+            GTK_SIGNAL_FUNC (edgeset_add_cb), e, gg);
+          gtk_object_set_data (GTK_OBJECT (item),
+            "display", GINT_TO_POINTER (display));
+          g_free (lbl);
+        }
+
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
+      }
+
+      /* Add a separator */
+      CreateMenuItem (edges_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
+
+      item = CreateMenuCheck (edges_menu, "Show lines (undirected)",
+        func, GINT_TO_POINTER (DOPT_SEGS_U), off, gg);
+      gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+      item = CreateMenuCheck (edges_menu,
+        "Show arrowheads (for directed lines)",
+        func, GINT_TO_POINTER (DOPT_SEGS_D), off, gg);
+      gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+
+      gtk_menu_item_set_submenu (GTK_MENU_ITEM (topmenu), edges_menu);
+      submenu_append (topmenu, mbar);
+      gtk_widget_show (topmenu);
+    }
   }
+
 
 /*
  * Options menu
 */
-  submenu = submenu_make ("_Options", 'O', accel_group);
+  topmenu = submenu_make ("_Options", 'O', accel_group);
   options_menu = gtk_menu_new ();
 
   item = CreateMenuCheck (options_menu, "Show points",
@@ -186,8 +190,8 @@ scatterplot_display_menus_make (displayd *display,
     func, GINT_TO_POINTER (DOPT_AXES_C), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
-  submenu_append (submenu, mbar);
-  gtk_widget_show (submenu);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (topmenu), options_menu);
+  submenu_append (topmenu, mbar);
+  gtk_widget_show (topmenu);
 }
 

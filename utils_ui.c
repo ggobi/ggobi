@@ -32,7 +32,8 @@
  *
  * returns new menuitem
  */
-GtkWidget *CreateMenuItem (GtkWidget *menu,
+GtkWidget *
+CreateMenuItem (GtkWidget *menu,
   gchar *szName, gchar *szAccel, gchar *szTip,
   GtkWidget *win_main, GtkAccelGroup *accel_group,
   GtkSignalFunc func, gpointer data, ggobid *gg)
