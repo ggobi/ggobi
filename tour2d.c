@@ -512,14 +512,19 @@ tour2d_idle_func (displayd *dsp)
 void tour2d_func (gboolean state, displayd *dsp, ggobid *gg)
 {
   if (state) {
-    dsp->t2d.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
+    if (dsp->t2d.idled == 0) {
+      dsp->t2d.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
                                    (GtkFunction) tour2d_idle_func, dsp);
+    }
     gg->tour2d.idled = 1;
   } else {
-    if (dsp->t2d.idled)
+    if (dsp->t2d.idled != 0) {
       gtk_idle_remove (dsp->t2d.idled);
+      dsp->t2d.idled = 0;
+    }
     gg->tour2d.idled = 0;
   }
+  
 
 /*
    if (state)

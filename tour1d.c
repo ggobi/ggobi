@@ -475,7 +475,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
           /* if the best projection is the same as the previous one, switch 
               to a random projection */
           if (!checkequiv(dsp->t1d.u0.vals, dsp->t1d.u1.vals, d->ncols, 1)) {
-            printf("Using random projection\n");
+            g_printerr ("Using random projection\n");
             gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
               d->ncols, (gint) 1);
             for (j=0; j<dsp->t1d.nvars; j++)
@@ -534,12 +534,16 @@ tour1d_idle_func (displayd *dsp)
 void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
 {
   if (state) {
-    dsp->t1d.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
-                                   (GtkFunction) tour1d_idle_func, dsp);
+    if (dsp->t2d.idled == 0) {
+      dsp->t1d.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
+                                     (GtkFunction) tour1d_idle_func, dsp);
+    }
     gg->tour1d.idled = 1;
   } else {
-    if (dsp->t1d.idled)
+    if (dsp->t1d.idled) {
       gtk_idle_remove (dsp->t1d.idled);
+      dsp->t1d.idled = 0;
+    }
     gg->tour1d.idled = 0;
   }
 

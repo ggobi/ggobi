@@ -623,9 +623,9 @@ tourcorr_do_step(displayd *dsp, ggobid *gg)
 }
 
 gint
-tourcorr_idle_func (ggobid *gg)
+tourcorr_idle_func (displayd *dsp)
 {
-  displayd *dsp = gg->current_display;
+  ggobid *gg = GGobiFromDisplay (dsp);
   cpaneld *cpanel = &dsp->cpanel;
   gboolean doit = !cpanel->tcorr1_paused;
 
@@ -640,11 +640,16 @@ tourcorr_idle_func (ggobid *gg)
 void tourcorr_func (gboolean state, displayd *dsp, ggobid *gg)
 {
   if (state) {
-    dsp->tcorr1.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
-                                   (GtkFunction) tourcorr_idle_func, gg);
+    if (dsp->tcorr1.idled == 0) {
+      dsp->tcorr1.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
+        (GtkFunction) tourcorr_idle_func, dsp);
+    }
     gg->tourcorr.idled = 1;
   } else {
-    gtk_idle_remove (dsp->tcorr1.idled);
+    if (dsp->tcorr1.idled) {
+      gtk_idle_remove (dsp->tcorr1.idled);
+      dsp->tcorr1.idled = 0;
+    }
     gg->tourcorr.idled = 0;
   }
 
