@@ -75,6 +75,7 @@ rowlabels_alloc (datad *d)
 {
   if (d->rowlab != NULL) rowlabels_free (d);
   d->rowlab = g_array_new (false, false, sizeof (gchar *));
+  /* gdk2: g_array_sized_new (false, false, sizeof (gchar *), d->nrows); */
 }
 
 void
