@@ -12,9 +12,6 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% If it turns out that I can use pdflatex, I can use jpeg graphics
-% files and go straight to pdf.
-
 \newif\ifpdf
 \ifx\pdfoutput\undefined
   \pdffalse
@@ -27,7 +24,7 @@
   \usepackage[pdftex]{graphicx}  % uncomment if using graphicx
   \usepackage[pdftex]{hyperref}  % uncomment if using hyperref
 \else
-  %\usepackage{graphicx}  % uncomment if using graphicx
+  \usepackage{graphicx}  % uncomment if using graphicx
   \usepackage[colorlinks=true,
     linkcolor=webgreen,
     filecolor=webbrown,
@@ -125,20 +122,17 @@ Several sample data files are included with the GGobi distribution, in
 a directory called {\bf data,} and there you will find the file {\bf
 olive.xml}, a dataset on olive oil samples from Italy \cite{FALT83}.
 This data set takes advantage of an XML input/output format, a feature
-in GGobi that wasn't available in XGobi. It requires that GGobi has
-been compiled with XML support. If GGobi has been compiled without XML
-support, the set of files olive.dat, olive.col, olive.row, similar to
-the XGobi data file input, can be used. The olive oil data consists of
-the percentage composition of 8 fatty acids (palmitic, palmitoleic,
-stearic, oleic, linoleic, linolenic, arachidic, eicosenoic) found in
-the lipid fraction of 572 Italian olive oils. There are 9 collection
-areas, 4 from southern Italy (North and South Apulia, Calabria,
-Sicily), two from Sardinia (Inland and Coastal) and 3 from northern
-Italy (Umbria, East and West Liguria). 
+in GGobi that wasn't available in XGobi.  The olive oil data consists
+of the percentage composition of 8 fatty acids (palmitic, palmitoleic,
+stearic, oleic, linoleic, linolenic, arachidic, eicosenoic) found in the
+lipid fraction of 572 Italian olive oils. There are 9 collection areas,
+4 from southern Italy (North and South Apulia, Calabria, Sicily), two
+from Sardinia (Inland and Coastal) and 3 from northern Italy (Umbria,
+East and West Liguria).
 
-The data is interesting because it represents a quality control study
-of olive oils. It is proposed that the olive oils from different
-regions have different fatty acid signatures. 
+The data is part of a quality control study of olive oils. It is proposed
+that the olive oils from different regions have different fatty acid
+signatures.
 
 Start GGobi for the olive oils data by typing:
 
@@ -156,11 +150,13 @@ a plot of Area vs Region.  Move the mouse to one of the variable labels
 in the variable selection region, and leave it in place until the
 tooltip appears, explaining how to select new variables for the
 plot.   Begin to get a feeling for the data by looking at several of
-the 2d plots:  Area vs palmitic, Region vs oleic....
+the 2d plots:  Area vs palmitic, Region vs oleic, etc.
 
 \begin{figure}[h]
 %\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
-\hbox{\pdfimage width 3in {Figures/olive1.jpg}\pdfimage width 3in {Figures/olive2.jpg}}
+\hbox{\pdfimage width 3in {Figures/olive1.jpg}
+      \pdfimage width 3in {Figures/olive2.jpg}
+}
 %\vspace{.15in} \centerline{ \parbox{6in}
 \caption{Layout of a ggobi session.  The plotting window contains a
 scatterplot of the Area vs Region, from the olive oils data.
@@ -182,24 +178,22 @@ Display, ViewMode and Tools menus.
   characteristics of the data and the view.
 \end {itemize}
 
-Using the ViewMode menu, choose {\bf Identify}. Look at the
-buttons inside the leftmost portion of the ggobi console. Notice that
-they're contained by a frame labeled {\bf Identify,} which is the view
-mode of the current plot.  This frame contains most of the row
-labeling controls, which are described in the section
-\ref{slbl:Identify}. Move the cursor around the plot window with mouse
-movement, and observe the labels of the point closest to the cursor is
-written. The labels for this data set show the geographic area where
-the sample was taken.
+Using the ViewMode menu, choose {\bf Identify}. Look at the buttons
+inside the leftmost portion of the ggobi console. Notice that they're
+contained by a frame labeled {\bf Identify,} which is the view mode
+of the current plot.  This frame contains most of the row labeling
+controls, which are described in section \ref{slbl:Identify}. Move the
+cursor around the plot window using the mouse, and observe the labels
+of the point closest to the cursor.  The labels for this data set show
+the geographic area where the sample was taken.
 
-Using the Display menu, open a barchart display. Notice that
-the new window has a narrow white band drawn around the outside of
-the plotting area:  that means that the new window is now the
-``current display'' and its plot is the ``current plot.''  Click in the
-plotting region of the other scatterplot to make it the current plot,
-and notice what happens in the variable selection region of the
-console when you alternate between the two:  it should always show
-the variables that are plotted in the current plot.
+Using the Display menu, open a barchart display. Notice that the new
+window has a narrow white band drawn around the outside of the plotting
+area:  that means that the new window is now the ``current display''
+and its plot is the ``current plot.''  Click in the plotting region
+of the other scatterplot to make it the current plot, and notice what
+happens in the console when you alternate between the two.  Both the
+controls and the variable selection region correspond to the current plot.
 
 Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
 and disply Region in the barchart, and make the barchart the current
@@ -227,44 +221,42 @@ the other two regions using eicosenoic acid. Using two linked 2d plots
 is one way to explore the relationship among three variables.
 
 \begin{figure}[htp]
-%\vspace{-0.5in}
-%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
-\pdfimage width 4in {Figures/olive-colorchoose.jpg}
-%\vspace{.15in} \centerline{ \parbox{6in}
-\caption{The chooser for selecting point color and glyph and line
-type and thickness to paint with. It also allows setting the plot
-background color, and has a full color wheel for changing the set of
+\begin{center}
+\includegraphics[width=4in]{Figures/olive-colorchoose.jpg}
+\end{center}
+\caption{The chooser for selecting color and glyph for painting points,
+as well as type and thickness for painting lines. It also allows setting
+the plot background color, and has a full color wheel for tuning the
 colors.
-}%}
+}
 \label{fig2}
 \end{figure}
 
 \begin{figure}[htp]
-%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
-\hbox{\pdfimage width 3in {Figures/olive-brush1.jpg}\pdfimage width 3in {Figures/olive-brush2.jpg}}
-%\vspace{.15in} \centerline{ \parbox{6in}
+\hbox{\pdfimage width 3in {Figures/olive-brush1.jpg}
+      \pdfimage width 3in {Figures/olive-brush2.jpg}
+}
 \caption{Brushing in a GGobi session. Brushing Region 1 shows that it
 corresponds to a cohesive cluster in the variables linoleic and 
 eicosenoic acid.
-}%}
+}
 \label{fig3}
 \end{figure}
 
-Now change to {\bf Persistent} brushing and paint the 3 Regions
-different colors. 
+Change to {\bf Persistent} brushing and paint the three Regions
+using different colors. 
 
-Next open up the {\bf Variable transformation} tool, select all of
-the fatty acid variables -- hold the control button down and select
-them one at a time, or select the first one, then hold down the shift
-button down while you select the last one.  Once they're all
-highlighted, choose {\bf Standardize} in the stage 2 transformation
-panel to standardize all the variables to have mean 0 and variance
-1.  This tool has numerous transformations, which can be applied in
-sequence.  Stage 0 transformations are used to adjust variables'
-values so that they're within the range of some stage 1
-transformations. Stage 2 transformations allow for post-processing of
-stage 1 transformations, so that the variables can be logged and then
-standardized, for example.
+Open the {\bf Variable transformation} tool, select all of the fatty
+acid variables -- either hold down the control button while selecting
+them one at a time, or select the first one, then hold down the
+shift button down while you select the last one.  Once they're all
+highlighted, choose {\bf Standardize} in the ``Stage 2'' transformation
+panel to standardize all the variables to have mean 0 and variance 1.
+This tool has numerous transformations, which can be applied in sequence.
+Stage 0 transformations are used to adjust variables' values so that
+they're within the range of some stage 1 transformations. Stage 2
+transformations allow for post-processing of stage 1 transformations,
+so that the variables can be logged and then standardized, for example.
 
 But that was just an instructive detour; click ``Reset all'' to
 to turn off standardization and any other transformations you've
@@ -286,7 +278,7 @@ displays.
 Now look at the plot of linoleic vs eicosenoic. Open up the {\bf
 Color \& glyph groups ...} tool, and use the Hide and Show buttons to
 make groups of points invisible and then visible again (Figure
-\ref{fig5}). Finally, use these controls hide to the cases from
+\ref{fig5}). Finally, use these controls to hide the cases from
 geographic region 1, and then {\bf Rescale} the plot.
 
 \begin{figure}[htp]
@@ -295,12 +287,12 @@ geographic region 1, and then {\bf Rescale} the plot.
 \label{fig5}
 \end{figure}
 
-Now switch into {\bf 2D Tour} using the {\bf ViewMode} menu. A column of
+Switch into {\bf 2D Tour} using the {\bf ViewMode} menu. A column of
 variable circles is added to the right of the variable toggles, one for
 each selected variable.  Click on the toggle widgets for the variables
 palmitoleic through arachidic to make these variables available for
-touring, and toggle Region and Area out of the tour.  Then click {\bf
-Reinit}.  The tour should now include 7 variables, with one variable
+touring, and toggle Region and Area out of the tour.  Click the {\bf
+Reinit} button.  The tour should now include 7 variables, with one variable
 circle for each.
 
 The scrollbar at the top of the tour controls is used to adjust the
@@ -313,11 +305,11 @@ you see a separation of the two regions (as seen in Figure
 
 Now you are going to use manual tour controls to sharpen up the
 separation by manually changing the coefficients of the variables in
-the projection.  Click on the {\bf Manip} (purple) button below the
+the projection.  Click on the {\bf Manip} (magenta) button below the
 variable selection region of the console, and then click on linoleic
-acid (a purple circle will be seen now in the variable circle for
+acid (a magenta circle will be seen now in the variable circle for
 linoleic acid).  {\bf Oblique} is already selected in the {\bf Manual
-manipulation} menu.  Now in the plot window, hold down any mouse
+manipulation} menu.  In the plot window, hold down any mouse
 button while you drag the cursor. The coefficient corresponding to
 linoleic acid will increase and decrease following the mouse, inducing
 a rotation of the scattercloud.  If the axes are still showing in the
@@ -335,15 +327,17 @@ olive oils.}
 \label{fig6}
 \end{figure}
 
-Next use the Tools menu to open the {\bf Variable manipulation} tool,
-(Figure \ref{fig4}).  It contains a table with a few basic statistics
-for each variable, and the buttons below the table allow you to set
-variable limits, add new variables, and a few other things.  Try
-clicking the mouse in the table -- you can select one row of the
-table at a time, or use the control and shift keys as modifiers to
-select more than one.  Select all the fatty acid variables.
+Next use the Tools menu to open the {\bf Variable manipulation} tool
+(Figure \ref{fig4}).  It contains a notebook widget which separates
+the variables by type, and displays information about them in a set
+of tables.  The buttons below the tables allow you to set variable
+limits, add new variables, and a few other things.  Try clicking the
+mouse in the table -- you can select one row of the table at a time,
+or use the control and shift keys as modifiers to select more than one.
+Select all the fatty acid variables, all of which are in the table
+of real variables.
 
-Now open a parallel coordinates display using the {\bf Display} menu.
+Open a parallel coordinates display using the {\bf Display} menu.
 %Using the {\bf Selection Mode:} menu on the control
 %panel select {\bf Delete} mode to remove Region and Area from the
 %parallel coordinates plot. Then switch to {\bf Append} mode and add
@@ -369,7 +363,7 @@ preserving the colors and glyphs that have been assigned during this
 session.
 
 This has been a brief introduction to the use of GGobi. The following
-section contains more detailed information on the functionality.
+section contains more detailed information on its functionality.
 
 \section{Layout and functionality}
 
@@ -404,7 +398,7 @@ and to the interaction type:
 \item 1DPlot: 1-D dotplots and average shifted histograms,
 \item XYPlot: 2-D scatterplots,
 \item 1D Tour: 1-D tour,
-\item Rotation: 2-D tour constrained to the use of 3 variables,
+\item Rotation: 2-D tour constrained to use exactly 3 variables,
 \item 2D Tour: 2-D tour,
 \item 2x1D Tour: a correlation tour; that is, independent 1-D tours on
       horizontal and vertical axes,
@@ -442,9 +436,9 @@ view mode functions determine the mouse interactions in the display
 windows, while none of the Tools does.  Furthermore, view mode
 functions populate the control panel in the ggobi console, while
 tools open their own windows, as shown in Figure~\ref{fig4}.  For
-example, the {\bf variable manipulation tool} is a window containing
-a table with one row of data for each variable and several buttons,
-and the {\bf variable transformation tool} is also a separate window,
+example, the {\bf Variable Manipulation tool} is a window containing
+tables which describe the variables, as well as several buttons,
+and the {\bf Variable Transformation tool} is also a separate window,
 with a list of variable names and a set of transformation menus.
 
 The {\bf Options} menu allows users to set some options for the main
@@ -487,7 +481,7 @@ current display type and view mode.
 \label{DisplayTypes}
 
 Each display type is briefly described here. 
-As mentioned earlier, there are presently four main display types:
+As mentioned earlier, there are presently five main display types:
 
 % scatterplot
 
@@ -606,13 +600,22 @@ The variable label shortcuts can be used in the Time Series display.
 In general, clicking left (right) corresponds to selecting the {\em X}
 ({\em Y}) toggle button.
 
+% barchart
+
+The {\bf barchart display} contains a single plot, a barchart if the
+variable is categorical, and a histogram if it is real.   Variable
+selection is simple: one variable at a time.  An option menu can be used
+to switch to a spineplot display style, where all the bars are the same
+height, and it is their width that varies instead.
+
+
 \section{Data format}
 \label{slbl:DataFormat}
 
 \subsection {ASCII}
 \label{slbl:ASCII}
 
-The ascii data format used in XGobi are still
+The ascii data format used in XGobi is still
 supported, with some changes and some exclusions.
 
 The only essential file is the one containing the data itself.  Each
@@ -624,7 +627,7 @@ suffix {\em .dat}.
 You can supply variable and case labels in associated files.  Variable
 (column) labels can be in a file named {\bf datafile.col} (or {\bf
 datafile.column}, {\bf datafile.collab}, or {\bf datafile.var}).  Variable
-ranges can be specified by adding two more fields, using ``|'' as the
+ranges can be specified by adding two more fields, using $|$ as the
 field separator.  Case (row) labels can be supplied in a file named {\bf
 datafile.row} (or {\bf data\-file.row\-lab} or {\bf data\-file.case}).
 There should be one label per line, and the label can include blanks.
@@ -662,8 +665,8 @@ much longer to draw under Microsoft Windows.  Consequently, our
 sample data files usually use a small filled rectangle as the default
 glyph.
 
-Colors must be integers from 0 to the number of colors in
-the colormap - 1.
+Colors must be integers from 0 to one less than the number of colors in
+the colormap.
 
 \subsection {XML}
 \label{slbl:XML}
@@ -1174,11 +1177,19 @@ variable to link points.  To choose a variable, open the {\bf variable
 manipulation} tool, and select a categorical variable.  Now when a
 case is brushed in one display, all cases with the same value of the
 categorical variable will change accordingly, in this and all other
-displays.  For example, a categorical variable may classify cities into
-two types, ``coastal'' and ``inland''.  If a coastal city is pointed at
-in one display, all coastal cities in this and all other displays will
-be highlighted.  In this linking mode, displays of different datasets
-can be linked if they have a chosen categorical variable in common.
+displays. 
+
+For example, look at the {\em algal-bloom.xml} data supplied with
+GGobi.  It contains four datasets, one of which contains the levels
+of a factorial experimental, while another represents the response.
+Both include the same categorical variables.  Open two scatterplots,
+one for each of those two datasets.  In the measurements display, plot
+algal count against day.  In the plot of experimental conditions, plot
+the level of phosphorus against the level of carbon.  Prepare to brush
+in the plot of experimental conditions.  Choose brushing by variable,
+and select ``Carbon.''  Highlighting the low values of carbon, note that
+all of the points highlighted in the measurements display are among the
+lowest in algal count.
 
 \subsubsection{Color schemes ...}
 
@@ -1293,22 +1304,23 @@ This powerful tool is opened by selecting the first entry on the
 \item adding other new variables.
 \end{itemize}
 
-Its first purpose is to report information about each variable:
-whether the variable is categorical (and if so, the number of levels
-it has), the current variable transformation (if any); the minimum,
+Its first purpose is to report information about each variable.
+It begins by separating the variables by type: variables are
+currently classified as categorical or real, though more types
+can be specified in XML.  Categorical variables are displayed
+hierarchically, and the information reported includes the number
+of records for each level.  For ``real'' variables, ggobi report
+the current variable transformation (if any); the minimum,
 maximum, mean, and median of the raw data; the number of missing values
-per variable.  (Note: we plan to extend the information supplied about
-categorical variables so that we also show the names of the levels
-and their corresponding numerical values.)
+per variable.
 
-You can also use it to select variables -- not for plotting, but to
-specify subsets when launching a parallel coordinates or scatterplot
-matrix display.  Variables are selected by highlighting rows, and the
-control and shift keys are modifiers that allow multiple rows to be
-highlighted.
+Its second purpose is to specify subsets of variables to be plotted
+when launching a parallel coordinates or scatterplot matrix display.
+Variables are selected by highlighting rows, and the control and shift
+keys are modifiers that allow multiple rows to be highlighted.
 
 These selected variables will also respond to operations contained
-within this panel:  you can reset the variable ranges that are used
+within the panel:  you can reset the variable ranges that are used
 for projecting the data into the plotting window.  This allows
 variables with the same units or potential range (such as percentages)
 to use the same range, and facilitates visual comparisons.
@@ -1347,7 +1359,6 @@ increase or decrease the parameter.
 Many of the stage 2
 transformations are not linear; they include sorting and ranking.
 
-% di: have a look at this, please? %
 \subsection{Sphering}
 \label{slbl:Sphering}
 
@@ -1395,10 +1406,11 @@ using the current color scheme.
 
 \subsubsection{Specifying a color scheme on the command line}
 
-If you're using XML, and you have a colorschemes.xml file, then
-you can also specify a color scheme on the command line when you
-start ggobi.  Use the name of the color scheme, which appears in
-the XML file, like this:
+If you have specified a colorschemes.xml file in your .ggobirc file
+(Note: I don't know how to do this under Windows.),
+then you can also specify a color scheme on the command line when you
+start ggobi.  Use the name of the color scheme, which appears in the
+XML file, like this:
 
 \begin{verbatim}
   ggobi -activeColorScheme "ColorScheme Name"
@@ -1408,29 +1420,27 @@ the XML file, like this:
   ggobi --activeColorScheme="ColorSchemeName"
 \end{verbatim}
 
-Warning: If you mistakenly launch a color scheme which does not have
+Warning: If you launch ggobi with a color scheme which does not have
 as many colors as you're specifying in the XML data file, strange
-things may happen; ggobi will attempt to catch this and warn you,
+things will happen; ggobi will attempt to catch this and warn you,
 but we aren't quite sure what it should do in this case.
 
 \subsubsection{Choosing a color scheme interactively}
 
-Preview a new color scheme by selecting from the menu.  If you would
-like to apply it, click on the button ``Apply color scheme to brushing
-colors.''  That replaces the current set of colors visible in the
-``Choose color \& glyph'' menu and used in all the displays.
+Preview a new color scheme by selecting from the tree at the left.
+If you would like to apply it, click on the button ``Apply color scheme
+to brushing colors.''  That replaces the current set of colors visible
+in the ``Choose color \& glyph'' menu and used in all the displays.
 
-If you are currently using $n$ colors and the color scheme
-you have selected
-has fewer than $n$ colors, you'll be prohibited from applying
-the new scheme.  If you want to use that scheme, you must either
-use brushing to reduce of colors in use.
+If you are currently using $n$ colors and the color scheme you have
+selected has fewer than $n$ colors, you'll be prohibited from applying
+the new scheme.  If you want to use that scheme, you must use brushing
+to reduce of colors in use.
 
 The menu of color schemes is populated using a file specified in your
 .ggobirc file.  Here is a minimal .ggobirc file, in which the relevant
 line specifies the file {\tt colorschemes.xml}, which is included in the
-GGobi distribution.  (You will probably need to modify the path name,
-of course.)
+GGobi distribution.  (You will probably need to modify the path name.)
 
 \begin{verbatim}
 <?xml version="1.0"?>
@@ -1442,7 +1452,7 @@ of course.)
 </ggobirc>
 \end{verbatim}
 
-The sample file presently contains 20 or so color schemes, of
+The sample file presently contains 250 or so color schemes, of
 different types and sizes, and they're based on the work of
 Brewer (\cite{Brewer99}, www.personal.psu.edu/cab38).
 The four types represented are
@@ -1524,13 +1534,15 @@ existing data which serves as an indicator for these ``clusters.''
 \subsection{Subsetting}
 
 Select {\bf Case subsetting and sampling ...} to open a panel
-that allows subsets to be specified in one of five ways.
+that allows subsets to be specified in one of six ways.
 
 {\bf Random sample without replacement}:  Specify the number of
      cases to be in the sample.
 \\{\bf Consecutive block}:  Specify the first and last row of the block.
      (The two controls in the second row control the increment used
      in the control in the first row.)
+\\{\bf Range}:  Select a variable and specify a minimum and maximum
+     value.
 \\{\bf Every nth case}:  Specify the interval and the first row.
 \\{\bf Sticky labels}:  All cases with a ``sticky'' label will
   be in the subset.  If no points have a sticky label, this
@@ -1539,7 +1551,7 @@ that allows subsets to be specified in one of five ways.
 \\{\bf Row labels}: Type in a row label, and all cases with that
   label will be in the subset.
 
-Select one of those five, then click on {\bf Subset} in the
+Select one of those six, then click on {\bf Subset} in the
 bottom row of the panel.  If you want to re-include all rows, 
 select the {\bf Include all} button in the bottom row.
 
@@ -1580,7 +1592,7 @@ By default, missing values are assigned the value $0$, but you
 may sometimes find that to be an inconvenient choice.  Use the
 {\bf Missing values} panel to assign alternative numbers.
 
-Select the variable or variables whose ``imputed'' value you
+Select the variable or variables whose imputed value you
 wish to change, then select a method and fill in the text window
 if necessary, and click {\bf Impute.}
 
@@ -1602,6 +1614,8 @@ above the maximum.
 Click the resale button when you want to update the view to
 respond to the new values.
 
+For more complex imputation, consider using GGobi from within R.
+
 %
 % End of tools section, so end of working through the main menubar
 %
@@ -1613,6 +1627,12 @@ menu interfaces reading in additional data sets. Data tabs corresponding
 to each open data set appear above the variable selection window on
 the main controls window, and in various tool windows. The rules for
 linking these data sets is described in Section \ref{LinkingRules}.
+
+Several of the sample datasets included with ggobi use multiple datasets.
+In most cases, the additional datasets are used to add edges, but {\em
+algal-bloom.xml} contains four datasets, one of which contains the levels
+of a factorial experimental, while another represents the response.
+These two can be linked by variable.
 
 \section{Edges}
 
@@ -1648,6 +1668,9 @@ A point in the scatterplot of an edge dataset corresponds to the
 same record as an edge in another scatterplot.  So brushing an
 edge in one is the virtually the same action as brushing a point
 in another.
+
+Two plugins, GraphLayout and ggvis, offer methods for laying out
+graphs.  They are documented elsewhere.
 
 % dfs here %
 \newpage
@@ -1734,13 +1757,12 @@ is also used to define documents that are read by other software.
 XML files can be validated automatically, and XML specifications can
 be easily extended, too, by adding to the set of tags in use.
 
-As GGobi grows and develops, we will favor the XML format:  it
-will become increasingly difficult to keep the old format up to
-date.  For instance, it's no longer possible to specify edges
-in the ascii data format, but they can be specified in XML -- and
-they can have associated data values.
+We strongly favor the XML format, and we won't try to keep the
+old format up to date.  For instance, it's no longer possible
+to specify edges in the ascii data format, but they can be specified in
+XML -- and they can have associated data values.
 
-A few XML data files are included in the sample ggobi data, and
+Several XML data files are included in the sample ggobi data, and
 the details of their format is described in {\em XML Input Format}
 (XML.pdf) which is included as part of the ggobi distribution.
 
@@ -1783,12 +1805,15 @@ horizontally and the middle (or right) button to plot vertically.
 
 \subsection {The variable manipulation tool}
 
-The table in the {\bf Variable manipulation tool} can also be used to
-select variables -- not for plotting, but for specifying variables
-subsets when launching a parallel coordinates or scatterplot matrix display.
+The {\bf Variable manipulation} tool presents summary statistics for
+each variable.  If a variable has been described in the XML data file
+as categorical, it also shows the name and count for each level.
+The tables can also be used to select variables -- not for plotting, but
+for specifying variables subsets when launching a parallel coordinates
+or scatterplot matrix display.
 
-This table can also be used to specify limits for variables or groups
-of variables, and so we have dispensed with the {\em .vgroups}
+This tool can also be used to specify scaling ranges for variables or
+groups of variables, and so we have dispensed with the {\em .vgroups}
 functionality in XGobi.
 
 Variable cloning is another new feature: it appears as a button
@@ -1842,24 +1867,16 @@ the {\bf Options} menu.
 \section{Known problems}
 
 \begin{itemize}
-\item The combination of linking by variable and edge brushing
-  doesn't work yet.  [Or does it?]
+\item The distributed Windows version is often out of date,
+   with bugs that have long been repaired in the source code.
 \end{itemize}
 
 \section{Future work}
 
-Soon:
-
 \begin{itemize}
-\item Categorical data displays
-\item Graph layout  (implemented as a plugin)
-\end{itemize}
-
-Longer term:
-
-\begin{itemize}
-\item Edge editing (maybe)
-\item Maps
+\item Edge editing
+\item Maps~--~or the linking of GGobi to existing software for
+  spatial data analysis and display
 \end{itemize}
 
 \section*{Web Links}
