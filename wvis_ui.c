@@ -33,6 +33,7 @@ static void bin_counts_reset (gint jvar, datad *d, ggobid *gg);
 GtkWidget *createColorSchemeTree(int numTypes, gchar *schemeTypes[], ggobid *gg, GtkWidget *notebook);
 void selection_made_cb (GtkWidget *clist, gint row, gint column,
   GdkEventButton *event, ggobid *gg);
+static void entry_set_scheme_name (ggobid *gg);
 
 /*--------------------------------------------------------------------*/
 /*      Notebook containing the variable list for each datad          */
@@ -134,6 +135,7 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
 
   if (scheme) {
     gg->wvis.scheme = scheme;
+    entry_set_scheme_name (gg);
     colorscheme_init (scheme);
   }
 
@@ -807,6 +809,8 @@ static void scale_set_cb (GtkWidget *w, ggobid* gg)
   gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
     (gpointer) gg, (gpointer) &rval);
 
+  entry_set_scheme_name (gg);
+
   symbol_window_redraw (gg);
   cluster_table_update (d, gg);
 }
@@ -862,6 +866,14 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
     symbol_window_redraw (gg);
     cluster_table_update (d, gg);
   }
+}
+
+static void
+entry_set_scheme_name (ggobid *gg)
+{
+  gtk_entry_set_text (GTK_ENTRY (gg->wvis.entry),
+    (gg->wvis.scheme != NULL) ? gg->wvis.scheme->name :
+                                gg->activeColorScheme->name);
 }
 
 void
@@ -944,7 +956,8 @@ wvis_window_open (ggobid *gg)
     notebook = wvis_create_variable_notebook (vb1, GTK_SELECTION_SINGLE,
       (GtkSignalFunc) selection_made_cb, gg);
 
-    tr = createColorSchemeTree(UNKNOWN_COLOR_TYPE, colorscaletype_lbl, gg, notebook);
+    tr = createColorSchemeTree(UNKNOWN_COLOR_TYPE, colorscaletype_lbl,
+      gg, notebook);
     gtk_widget_set_usize(sw, 200, 20);
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(sw), tr);
 
@@ -997,9 +1010,22 @@ wvis_window_open (ggobid *gg)
       "Choose a color scale", NULL);
 
     gtk_box_pack_start (GTK_BOX (vbs), opt, false, false, 1);
-
 #endif
 
+    hb = gtk_hbox_new (true, 0);
+    gtk_box_pack_start (GTK_BOX (vbs), hb, true, true, 5);
+
+    gtk_box_pack_start (GTK_BOX (hb),
+      gtk_label_new ("Color scheme name "), true, true, 0);
+
+    gg->wvis.entry = gtk_entry_new();
+    gtk_entry_set_editable (GTK_ENTRY (gg->wvis.entry), false);
+    entry_set_scheme_name (gg);
+
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->wvis.entry,
+      "The name of the color scheme whose colors are displayed below.  This may be the currently active color scheme, or the scheme you're previewing using the tree to the left left.",
+      NULL);
+    gtk_box_pack_start (GTK_BOX (hb), gg->wvis.entry, true, true, 0);
 
     btn = gtk_button_new_with_label ("Apply color scheme to brushing colors");
     gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
