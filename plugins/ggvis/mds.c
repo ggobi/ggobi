@@ -234,7 +234,7 @@ set_random_selection (ggvisd *ggv)
     if (ggv->rand_sel.nels < ggv->ndistances) {
       vectord_realloc (&ggv->rand_sel, ggv->ndistances);
       for (i=0; i<ggv->ndistances; i++) { 
-        ggv->rand_sel.els[i] = (gdouble) randvalue();
+        ggv->rand_sel.els[i] = (gdouble) randvalue();  /* uniform on [0,1] */
       }
     }
     if (ggv->mds_rand_select_new) {

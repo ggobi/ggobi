@@ -124,9 +124,9 @@ void
 create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *vbox_params;
-  GtkWidget *notebook, *varnotebook, *opt;
+  GtkWidget *notebook, *varnotebook, *opt, *metric_opt;
   GtkWidget *label, *frame, *btn, *vbox, *hbox, *vb, *hscale, *table, *hb;
-  GtkObject *adj;
+  GtkObject *adj, *Dtarget_adj, *isotonic_mix_adj;
   gint top;
   GtkAccelGroup *ggv_accel_group;
   GtkWidget *menubar;
@@ -228,7 +228,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   hbox = gtk_hbox_new (true, 1);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
-  /* Run, step and reinit in an hbox */
+  /* Run, step, reinit and scramble in an hbox */
   /*-- run --*/
   btn = gtk_check_button_new_with_label ("Run MDS");
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
@@ -244,6 +244,11 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (mds_reinit_cb), inst);
+
+  btn = gtk_button_new_with_label ("Scramble");
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (mds_scramble_cb), inst);
 
   /*-- stepsize --*/
   table = gtk_table_new (1, 2, false);
@@ -273,7 +278,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
 
   /*-- Reset initial layout --*/
-
+/*
   hbox = gtk_hbox_new (false, 1);
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
 
@@ -282,10 +287,12 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   btn = gtk_check_button_new_with_label (" Scramble ");
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (mds_scramble_cb), inst);
+
   btn = gtk_check_button_new_with_label (" Copy selected vars ");
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
-  /*-- exclude edge sets --*/
   varnotebook = create_variable_notebook (hbox,
     GTK_SELECTION_EXTENDED, all_vartypes, no_edgesets,
     (GtkSignalFunc) NULL, inst->gg);
@@ -294,6 +301,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   label = gtk_label_new ("Starting pos");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
+*/
   /*-- --*/
 
 
@@ -330,11 +338,12 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
   /*-- Metric vs Non-metric --*/
-  opt = gtk_option_menu_new ();
-  populate_option_menu (opt, (gchar**) metric_lbl,
+  metric_opt = gtk_option_menu_new ();
+  populate_option_menu (metric_opt, (gchar**) metric_lbl,
     sizeof (metric_lbl) / sizeof (gchar *),
     (GtkSignalFunc) ggv_metric_cb, "PluginInst", inst);
-  gtk_box_pack_start (GTK_BOX (hbox), opt, false, false, 2);
+  gtk_box_pack_start (GTK_BOX (hbox), metric_opt, false, false, 2);
+  /* attach the label, hscale and two adjustments to this widget */
 
   /*-- Kruskal/Shepard vs Classic --*/
   opt = gtk_option_menu_new ();
@@ -358,7 +367,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  adj = gtk_adjustment_new ((gfloat)ggv->mds_dims, 1.0, 10.0, 0.1, 1.0, 1.0);
+  adj = gtk_adjustment_new ((gfloat)ggv->mds_dims, 1.0, 10.0, 1.0, 1.0, 1.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_dims_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
@@ -406,7 +415,8 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   top = 0;
 
-  /*-- Data power --*/
+  /*-- Data (Dtarget) power --*/
+/* Add a second adjustment for mds_isotonic_mix, [0:1] */
   label = gtk_label_new ("Data power (D^p)");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
@@ -414,17 +424,38 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  adj = gtk_adjustment_new (1.0, 0.0, 7.0, 0.02, 0.01, 1.0);
-  gtk_object_set_data (GTK_OBJECT(adj), "label", label);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
+  Dtarget_adj = gtk_adjustment_new (1.0, 0.0, 7.0, 0.02, 0.01, 1.0);
+  gtk_signal_connect (GTK_OBJECT (Dtarget_adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_Dtarget_power_cb), inst);
-  hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+
+  hscale = gtk_hscale_new (GTK_ADJUSTMENT (Dtarget_adj));
   gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
+
+  /*-- additional adjustment for mds_isotonic_mix */
+  isotonic_mix_adj = gtk_adjustment_new (100.0, 0.0, 101.0, 1.0, 1.0, 1.0);
+  gtk_signal_connect (GTK_OBJECT (isotonic_mix_adj), "value_changed",
+    GTK_SIGNAL_FUNC (ggv_Dtarget_power_cb), inst);
+
+{
+  GtkWidget *menu = gtk_option_menu_get_menu (GTK_OPTION_MENU(metric_opt));
+  GList *children = gtk_container_children (GTK_CONTAINER(menu));
+  GList *l;
+  GtkWidget *child;
+  for (l = children; l; l = l->next) {
+    child = (GtkWidget *) l->data;
+    gtk_object_set_data (GTK_OBJECT(child), "label", label); 
+    gtk_object_set_data (GTK_OBJECT(child), "hscale", hscale);
+    gtk_object_set_data (GTK_OBJECT(child),
+      "isotonic_mix_adj", isotonic_mix_adj); 
+    gtk_object_set_data (GTK_OBJECT(child),
+      "Dtarget_adj", Dtarget_adj); 
+  }
+}
 
   /*-- Weight power --*/
   top++;
@@ -547,16 +578,16 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- selection probability slider and button --*/
   btn = gtk_button_new_with_label ("Resample");
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (ggv_selection_prob_btn_cb), inst);
   gtk_table_attach (GTK_TABLE (table), btn, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL), 
     (GtkAttachOptions) (GTK_FILL),
     2, 2);
 
-  adj = gtk_adjustment_new (ggv->mds_rand_select_val, 0.0, 1.0, .01, .01, 1.00);
-/*
+  adj = gtk_adjustment_new (ggv->mds_rand_select_val, 0.0, 1.0, .01, .01, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_lnorm_cb), inst);
-*/
+    GTK_SIGNAL_FUNC (ggv_selection_prob_adj_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
@@ -576,20 +607,16 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   /*-- perturbation slider and button --*/
   top++;
   btn = gtk_button_new_with_label ("Reperturb");
-/*
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (ggv_reperturb_cb), inst);
-*/
+    GTK_SIGNAL_FUNC (ggv_perturb_btn_cb), inst);
   gtk_table_attach (GTK_TABLE (table), btn, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  adj = gtk_adjustment_new (ggv->mds_perturb_val, 0.0, 1.0, 0.2, 0.2, 1.00);
-/*
+  adj = gtk_adjustment_new (ggv->mds_perturb_val, 0.0, 1.0, 0.01, 0.01, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_perturb_adj_cb), inst);
-*/
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));

@@ -3,6 +3,9 @@
 #include "defines.h"
 #include "plugin.h"
 
+#define UNIFORM 0
+#define NORMAL  1
+
 #define STRESSPLOT_WIDTH  250
 #define STRESSPLOT_HEIGHT 100
 #define STRESSPLOT_MARGIN  10
@@ -114,8 +117,9 @@ typedef struct {
 void ggvis_init (ggvisd *);
 ggvisd* ggvisFromInst (PluginInstance *inst);
 void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst);
-void mds_step_cb (GtkToggleButton *btn, PluginInstance *inst);
-void mds_reinit_cb (GtkToggleButton *btn, PluginInstance *inst);
+void mds_step_cb (GtkWidget *btn, PluginInstance *inst);
+void mds_reinit_cb (GtkWidget *btn, PluginInstance *inst);
+void mds_scramble_cb (GtkWidget *btn, PluginInstance *inst);
 void update_ggobi (ggvisd *ggv, ggobid *gg);
 
 void ggv_dsource_cb (GtkWidget *w, gpointer cbd);
@@ -138,12 +142,18 @@ void ggv_kruskal_cb (GtkWidget *w, gpointer cbd);
 void ggv_groups_cb (GtkWidget *w, PluginInstance *inst);
 void ggv_constrained_cb (GtkWidget *w, PluginInstance *inst);
 void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst);
+void ggv_perturb_adj_cb (GtkAdjustment *adj, PluginInstance *inst);
+void ggv_perturb_btn_cb (GtkWidget *w, PluginInstance *inst);
+void ggv_selection_prob_adj_cb (GtkAdjustment *adj, PluginInstance *inst);
+void ggv_selection_prob_btn_cb (GtkWidget *w, PluginInstance *inst);
 void ggv_stepsize_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_lnorm_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_weight_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_center_scale_pos (ggvisd *ggv);
+greal ggv_randvalue (gint type);
+void update_stress (ggvisd *ggv, ggobid *gg);
 
 void mds_func (gboolean, PluginInstance *);
 void mds_once (gboolean doit, ggvisd *ggv, ggobid *gg);
