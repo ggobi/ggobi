@@ -730,7 +730,7 @@ display_type_handles_action (displayd *display, PipelineMode viewmode)
   return handles;
 }
 
-void
+gboolean
 display_copy_edge_options (displayd *dsp, displayd *dspnew)
 {
   GtkWidget *item;
@@ -759,4 +759,8 @@ display_copy_edge_options (displayd *dsp, displayd *dspnew)
   if (item)
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
       dspnew->options.edges_arrowheads_show_p);
+
+  return (dspnew->options.edges_directed_show_p || 
+          dspnew->options.edges_undirected_show_p ||
+          dspnew->options.edges_arrowheads_show_p);
 }
