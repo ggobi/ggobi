@@ -32,6 +32,10 @@ pan_by_drag (splotd *sp, ggobid *gg)
   scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
   scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
 
+/*
+ * This section is a bit puzzling, because I don't know what
+ * would change this -- maybe resizing the plot window?
+*/
   scale_x /= 2;
   sp->iscale.x = (glong) ((gfloat) sp->max.x * scale_x);
   scale_y /= 2;
