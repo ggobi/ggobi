@@ -1023,7 +1023,7 @@ readPluginFile(const char * const fileName, GGobiInitInfo *info)
 {
   xmlDocPtr doc;
   xmlNodePtr node;
-  GGobiPluginInfo *plugin;
+  GGobiPluginInfo *plugin = NULL;
 
   doc = xmlParseFile(fileName); 
   if(doc == NULL) {
