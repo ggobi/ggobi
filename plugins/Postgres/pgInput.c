@@ -54,8 +54,6 @@ postgres_read(InputDescription *desc, ggobid *gg)
     info = initDBMSLoginInfo(NULL);
      /* We would read these values from a file. */
 
-    info->dataQuery = g_strdup("select  width1, width2, maxheadwidth  from flea;");
-
     info->desc = desc;
     info->read_input = read_postgres_data;
 

@@ -27,14 +27,14 @@ int processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg);
   @see postgres_read.
  */
 InputDescription *
-postgres_input_description(const char * const fileName, const char * const modeName, 
+mysql_input_description(const char * const fileName, const char * const modeName, 
                              ggobid *gg, GGobiInputPluginInfo *info)
 {
   InputDescription *desc;
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
   memset(desc, '\0', sizeof(InputDescription));
 
-  desc->fileName = g_strdup("Postgres table");
+  desc->fileName = g_strdup("MySQL table");
   desc->mode = unknown_data;
   desc->read_input = mysql_read;
 
@@ -55,8 +55,6 @@ mysql_read(InputDescription *desc, ggobid *gg)
     DBMSLoginInfo *info ;
     info = initDBMSLoginInfo(NULL);
      /* We would read these values from a file. */
-
-    info->dataQuery = g_strdup("select  width1, width2, maxheadwidth  from flea;");
 
     info->desc = desc;
     info->read_input = read_mysql_data;
