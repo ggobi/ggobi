@@ -19,15 +19,15 @@
 #include "GGobiAPI.h"
 
 #ifdef USE_XML
-static char *XMLSuffixes[] = {"xml", "xml.gz","xmlz"};
+static gchar *XMLSuffixes[] = {"xml", "xml.gz","xmlz"};
 #endif
 
 #ifdef SUPPORT_PLUGINS
 #include "plugin.h" 
 #endif
 
-char *ASCIISuffixes[]  = {"dat"};
-char *BinarySuffixes[] = {"bin"};
+gchar *ASCIISuffixes[]  = {"dat"};
+gchar *BinarySuffixes[] = {"bin"};
 
 
 #ifdef USE_XML
@@ -112,24 +112,29 @@ fileset_generate(const gchar *fileName, DataMode guess, ggobid *gg)
 
 #ifdef SUPPORT_PLUGINS
   if(guess == unknown_data && sessionOptions->data_type) {
-      GList *els = sessionOptions->info->inputPlugins;
-      if(els) {
-          int i, n;
-          n = g_list_length(els);
-	  for(i = 0; i < n; i++) {
-	      GGobiInputPluginInfo *plugin;
-	      plugin = g_list_nth_data(els, i);
-              if(plugin->modeName && strcmp(plugin->modeName, sessionOptions->data_type) == 0) {
-                  InputGetDescription f = (InputGetDescription) getPluginSymbol(plugin->getDescription, &plugin->details);
-                  InputDescription *desc;
-                  if(f) {
-		      desc = f(fileName, sessionOptions->data_type, gg, plugin);
-		      if(desc)
-			  return(desc);
-		  }
-	      }
-	  }
+    GList *els = sessionOptions->info->inputPlugins;
+    if(els) {
+      gint i, n;
+      n = g_list_length(els);
+      for(i = 0; i < n; i++) {
+        GGobiInputPluginInfo *plugin;
+        plugin = g_list_nth_data(els, i);
+        if(plugin->modeName &&
+           strcmp(plugin->modeName, sessionOptions->data_type) == 0)
+        {
+          InputGetDescription f;
+          f = (InputGetDescription) getPluginSymbol(plugin->getDescription,
+                                                    plugin->details);/*dfs*/
+                                                    /*&plugin->details);*/
+          if(f) {
+            InputDescription *desc;
+            desc = f(fileName, sessionOptions->data_type, gg, plugin);
+            if(desc)
+              return(desc);
+          }
+        }
       }
+    }
   }
 #endif
 
