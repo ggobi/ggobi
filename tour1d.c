@@ -256,6 +256,35 @@ tour1d_fade_vars_cb (GtkCheckMenuItem *w, guint action)
   gg->tour1d.fade_vars = !gg->tour1d.fade_vars;
 }
 
+/*-- called from the Options menu --*/
+void
+tour1d_all_vars_cb (GtkCheckMenuItem *w, guint action) 
+{
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+  displayd *dsp = gg->current_display; 
+  datad *d = dsp->d;
+  gint j;
+
+  gg->tour1d.all_vars = !gg->tour1d.all_vars;
+
+  if (gg->tour1d.all_vars)
+  {
+    for (j=0; j<d->ncols; j++)
+      dsp->t1d.subset_vars.els[j] = dsp->t1d.active_vars.els[j] = j;
+      dsp->t1d.subset_vars_p.els[j] = dsp->t1d.active_vars_p.els[j] = true;
+    dsp->t1d.get_new_target = true;
+    zero_tau(dsp->t1d.tau, 1);
+    varcircles_visibility_set (dsp, gg);
+
+    if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+      free_optimize0_p(&dsp->t1d_pp_op);
+      alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
+        1);
+      t1d_pp_reinit(gg);
+    }  
+  }
+}
+
 void tour1d_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
@@ -381,7 +410,6 @@ gboolean
 tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
-  gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
   splotd *sp = gg->current_splot;
   gboolean redraw = true;
 
@@ -399,28 +427,28 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobi
       gg->tour1d.fade_vars = false;
       tour1d_active_var_set (jvar, d, dsp, gg);
       gg->tour1d.fade_vars = fade;
+      if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+        free_optimize0_p(&dsp->t1d_pp_op);
+        alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
+          1);
+        t1d_pp_reinit(gg);
+      }
     }
 
   } else if (GTK_IS_DRAWING_AREA(w)) {
 
     /*-- any button --*/
-    if (d->vcirc_ui.jcursor == GDK_HAND2) {
+    if (d->vcirc_ui.jcursor == GDK_HAND2) { /* This part sets the manip var */
       tour1d_manip_var_set (jvar, mouse, gg);
       varcircles_cursor_set_default (d);
-
-    } else {
+    } else { /* This part sets active/not active var */
       tour1d_active_var_set (jvar, d, dsp, gg);
 
       if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
-        realloc_optimize0_p(&dsp->t1d_pp_op, dsp->t1d.nactive, 
-          dsp->t1d.active_vars);
-
+        free_optimize0_p(&dsp->t1d_pp_op);
+        alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
+          1);
         t1d_pp_reinit(gg);
-        label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
-        dsp->t1d_indx_min, dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count], 
-        dsp->t1d_indx_max);
-        gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
-
       }
       /* Reinits the vertical height for the ashes */
       sp->tour1d.initmax = true;
@@ -448,11 +476,11 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
   for (m=0; m < d->nrows_in_plot; m++)
   {
     i = d->rows_in_plot[m];
-    yy[i] = sp->planar[i].x = 0;
+    yy[m] = sp->planar[i].x = 0;
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      yy[i] += (gfloat)(dsp->t1d.F.vals[0][j]*world_data[i][j]);
+      yy[m] += (gfloat)(dsp->t1d.F.vals[0][j]*world_data[i][j]);
     }
   }
 
@@ -473,40 +501,42 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
   /*max = 2*mean;  * try letting the max for scaling depend on the mean */
   max = sp->tour1d.maxcnt;
   if (cpanel->t1d.vert) {
-    for (i=0; i<d->nrows_in_plot; i++) {
-      if (yy[i] < sp->tour1d.minscreenx) {
-         sp->tour1d.minscreenx = yy[i];
+    for (m=0; m<d->nrows_in_plot; m++) {
+      if (yy[m] < sp->tour1d.minscreenx) {
+         sp->tour1d.minscreenx = yy[m];
       }
-      else if (yy[i] > sp->tour1d.maxscreenx) {
-         sp->tour1d.maxscreenx = yy[i];
+      else if (yy[m] > sp->tour1d.maxscreenx) {
+         sp->tour1d.maxscreenx = yy[m];
       }
     }
-    for (i=0; i<d->nrows_in_plot; i++) {
+    for (m=0; m<d->nrows_in_plot; m++) {
+      i = d->rows_in_plot[m];
       sp->planar[i].x = (greal) (precis*(-1.0+2.0*
-        sp->p1d.spread_data.els[i]/max));
+        sp->p1d.spread_data.els[m]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
       /*      sp->planar[i].y = yy[i];*/
       sp->planar[i].y = (greal) (precis*(-1.0+2.0*
-        ((yy[i]-sp->tour1d.minscreenx)/
+        ((yy[m]-sp->tour1d.minscreenx)/
         (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));
     }
   }
   else {
-    for (i=0; i<d->nrows_in_plot; i++) {
-      if (yy[i] < sp->tour1d.minscreenx) {
-         sp->tour1d.minscreenx = yy[i];
+    for (m=0; m<d->nrows_in_plot; m++) {
+      if (yy[m] < sp->tour1d.minscreenx) {
+         sp->tour1d.minscreenx = yy[m];
       }
-      else if (yy[i] > sp->tour1d.maxscreenx) {
-         sp->tour1d.maxscreenx = yy[i];
+      else if (yy[m] > sp->tour1d.maxscreenx) {
+         sp->tour1d.maxscreenx = yy[m];
       }
     }
-    for (i=0; i<d->nrows_in_plot; i++) {
+    for (m=0; m<d->nrows_in_plot; m++) {
+      i = d->rows_in_plot[m];
       sp->planar[i].x = (greal) (precis*(-1.0+2.0*
-        ((yy[i]-sp->tour1d.minscreenx)/
+        ((yy[m]-sp->tour1d.minscreenx)/
         (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));
       /*      sp->planar[i].x = yy[i];*/
       sp->planar[i].y = (greal) (precis*(-1.0+2.0*
-        sp->p1d.spread_data.els[i]/max));
+        sp->p1d.spread_data.els[m]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
     }
   }

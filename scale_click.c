@@ -23,8 +23,9 @@ pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 
   if (pan_opt == P_OBLIQUE || pan_opt == P_HORIZ) {
     dx = (greal) (sp->mousepos.x - sp->max.x/2);
-    scale_x = (greal)
-      ((cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x);
+    /*    scale_x = (greal)
+	  ((cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x);*/
+    scale_x = (greal) sp->scale.x;
     scale_x /= 2;
     sp->iscale.x = (greal) sp->max.x * scale_x;
     sp->pmid.x -= (dx * precis / sp->iscale.x);
@@ -33,8 +34,9 @@ pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 
   if (pan_opt == P_OBLIQUE || pan_opt == P_VERT) {
     dy = (greal) (sp->mousepos.y - sp->max.y/2);
-    scale_y = (greal)
-      ((cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y);
+    /*    scale_y = (greal)
+	  ((cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y);*/
+    scale_y = (greal) sp->scale.y;
     scale_y /= 2;
     sp->iscale.y = (greal) sp->max.y * scale_y;
     sp->pmid.y += (dy * precis / sp->iscale.y);
@@ -45,8 +47,10 @@ void
 zoom_step (splotd *sp, gint zoom_opt, gint in_or_out, rectd *rect, ggobid* gg)
 {
   gint projection = projection_get (gg);
-  gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
-  gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;
+/*  gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
+    gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;*/
+  gfloat *scale_x = &sp->scale.x;
+  gfloat *scale_y = &sp->scale.y;
   gfloat scalefac_x = 1.0, scalefac_y = 1.0;
   icoords mid;
 

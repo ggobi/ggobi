@@ -30,10 +30,12 @@ pan_by_drag (splotd *sp, ggobid *gg)
   dx = (greal) (sp->mousepos.x - sp->mousepos_o.x);
   dy = (greal) (sp->mousepos.y - sp->mousepos_o.y);
 
-  scale_x = (greal)
+  /*  scale_x = (greal)
     ((cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x);
   scale_y = (greal)
-    ((cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y);
+  ((cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y);*/
+  scale_x = (greal) sp->scale.x;
+  scale_y = (greal) sp->scale.y;
 
 /*
  * This section is a bit puzzling, because I don't know what
@@ -58,8 +60,10 @@ void
 zoom_by_drag (splotd *sp, ggobid *gg)
 {
   gint projection = projection_get (gg);
-  gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
-  gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;
+  /*  gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
+      gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;*/
+  gfloat *scale_x = &sp->scale.x;
+  gfloat *scale_y = &sp->scale.y;
   gint npix = 5;  /*-- number of pixels from the crosshair required --*/
 
   icoords mid;

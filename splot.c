@@ -628,10 +628,14 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
      }
   }
 
-  scale_x = (greal) (cpanel->projection == TOUR2D) ?
+  /*  scale_x = (greal) (cpanel->projection == TOUR2D) ?
     sp->tour_scale.x : sp->scale.x;
   scale_y = (greal) (cpanel->projection == TOUR2D) ?
-    sp->tour_scale.y : sp->scale.y;
+  sp->tour_scale.y : sp->scale.y;*/
+  /* with the tour rescaling itself into the planar box limits,
+     this shouldn't be needed any more */
+  scale_x = sp->scale.x;
+  scale_y = sp->scale.y;
 
   /*
    * Calculate is, a scale factor.  Scale so as to use the entire
@@ -787,8 +791,10 @@ splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   gfloat scale_x, scale_y;
-  scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
-  scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
+  /*  scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
+      scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;*/
+  scale_x = sp->scale.x;
+  scale_y = sp->scale.y;
   scale_x /= 2;
   sp->iscale.x = (greal) sp->max.x * scale_x;
   scale_y /= 2;

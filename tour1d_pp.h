@@ -37,8 +37,8 @@ gint subd (array_f *pdata, void *param, gfloat *val);
 gint zero (gdouble *ptr, gint length);
 gint compute_groups (gint *group, gint *ngroup, gint *groups, gint nrows, 
   gfloat *gdata);
-gint alloc_discriminant_p (discriminant_param *dp, gfloat *gdata, gint nrows, 
-  gint ncols);
+gint alloc_discriminant_p (discriminant_param *dp, /* gfloat *gdata, */
+  gint nrows, gint ncols);
 gint free_discriminant_p (discriminant_param *dp);
 gint discriminant (array_f *pdata, void *param, gfloat *val);
 
@@ -57,7 +57,7 @@ gint cartvariance (array_f *pdata, void *param, gfloat *val);
 /*gfloat t1d_calc_indx(array_f, array_d, gint *, gint, gint,
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param);*/
-gfloat t1d_calc_indx(array_f, gint *, gint, gint,
+gfloat t1d_calc_indx(array_f, /* gint *, gint, gint,*/
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param);
 gboolean t1d_switch_index(gint, gint, ggobid *);

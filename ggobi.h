@@ -237,11 +237,13 @@ struct _ggobid {
   struct _Tour2d {
     gint idled;
     gboolean fade_vars;
+    gboolean all_vars;
   } tour2d;
 
   struct _Tour1d {
     gint idled;
     gboolean fade_vars;
+    gboolean all_vars;
   } tour1d;
 
   struct _TourCorr {

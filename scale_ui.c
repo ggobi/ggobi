@@ -43,9 +43,9 @@ scale_zoom_reset (ggobid *gg) {
   splotd *sp = gg->current_splot;
   displayd *dsp = (displayd *) sp->displayptr;
 
-  if (projection == TOUR2D)
+  /*  if (projection == TOUR2D)
     sp->tour_scale.x = sp->tour_scale.y = TOUR_SCALE_DEFAULT;
-  else
+    else*/
     sp->scale.x = sp->scale.y = SCALE_DEFAULT;
 
   splot_plane_to_screen (dsp, &dsp->cpanel, sp, gg);

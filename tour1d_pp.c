@@ -1,5 +1,5 @@
 /* tour1d_pp.c */
-/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke
+/* Copyright (C) 2001, 2002 Dianne Cook and Sigbert Klinke
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -285,7 +285,7 @@ gint compute_groups (gint *group, gint *ngroup, gint *groups,
   gint i, j, *groupval;
 
   /* initialize data */
-  groupval = malloc (nrows*sizeof(gint));
+  groupval = g_malloc (nrows*sizeof(gint));
 
   *groups = 0;
   for (i=0; i<nrows; i++)
@@ -309,17 +309,19 @@ gint compute_groups (gint *group, gint *ngroup, gint *groups,
     }
   }
 
+  g_free(groupval);
+
   return ((*groups==1) || (*groups==nrows));
 }
 
-gint alloc_discriminant_p (discriminant_param *dp, gfloat *gdata, 
+gint alloc_discriminant_p (discriminant_param *dp, /*gfloat *gdata, */
   gint nrows, gint ncols)
 {
   dp->group    = malloc (nrows*sizeof(gint));
   dp->ngroup   = malloc (nrows*sizeof(gint));
 
-  if (compute_groups (dp->group, dp->ngroup, &dp->groups, nrows, 
-    gdata)) return (1);
+  /*  if (compute_groups (dp->group, dp->ngroup, &dp->groups, nrows, 
+      gdata)) return (1);*/
 
   /* initialize temporary space */
   dp->cov      = malloc (ncols*ncols*sizeof(gfloat));
@@ -830,10 +832,12 @@ void t1d_optimz(gint optimz_on, gboolean *nt, gint *bm) {
   gboolean new_target = *nt;
   gint bas_meth = *bm;
 
-  if (optimz_on) 
+  if (optimz_on) {
     bas_meth = 1;
-  else
+  }
+  else {
     bas_meth = 0;
+  }
 
   new_target = true;
 
@@ -999,8 +1003,8 @@ projection.
 *********************************************************************/
 
 gfloat t1d_calc_indx (array_f pd, 
-                gint *rows, gint nrows, 
-                gint ncols,
+		      /*                gint *rows, gint nrows, 
+					gint ncols,*/
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param)
 { 
@@ -1061,20 +1065,25 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
 	      dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, pca, NULL);*/
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        d->rows_in_plot, d->nrows, d->ncols, pca, NULL);
+      /*        d->rows_in_plot, d->nrows, d->ncols, */
+        pca, NULL);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, pca, &cvp);
       break;
     case LDA: 
-      alloc_discriminant_p (&dp, gdata, nrows, pdim);
+      alloc_discriminant_p (&dp, /* gdata, */
+        nrows, pdim);
       /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
         dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 
         discriminant, &dp);*/
-      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        d->rows_in_plot, d->nrows, d->ncols, 
-        discriminant, &dp);
-      if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, discriminant, &dp);
+      if (!compute_groups (dp.group, dp.ngroup, &dp.groups, nrows, 
+			   gdata)) {
+        dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
+          /* d->rows_in_plot, d->nrows, d->ncols, */
+          discriminant, &dp);
+        if (basismeth == 1)
+          kout = optimize0 (&dsp->t1d_pp_op, discriminant, &dp);
+      }
       free_discriminant_p (&dp);
       break;
     case CART_GINI: 
@@ -1083,7 +1092,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
         dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols,
         cartgini, &cgp);*/
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        d->rows_in_plot, d->nrows, d->ncols,
+     /*  d->rows_in_plot, d->nrows, d->ncols,*/
         cartgini, &cgp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, cartgini, &cgp);

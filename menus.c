@@ -119,6 +119,10 @@ tour1d_menus_make (ggobid *gg) {
     GTK_SIGNAL_FUNC (tour1d_fade_vars_cb), NULL,
     gg->tour1d.fade_vars, gg);
 
+  CreateMenuCheck (gg->menus.options_menu, "Select all variables",
+    GTK_SIGNAL_FUNC (tour1d_all_vars_cb), NULL,
+    gg->tour1d.all_vars, gg);
+
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
 }
@@ -199,6 +203,10 @@ tour2d_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Fade variables on de-selection",
     GTK_SIGNAL_FUNC (tour2d_fade_vars_cb), NULL,
     gg->tour2d.fade_vars, gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Select all variables",
+    GTK_SIGNAL_FUNC (tour2d_all_vars_cb), NULL,
+    gg->tour2d.all_vars, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);

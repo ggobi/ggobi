@@ -435,7 +435,8 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       greal scale_x;
       greal dx = (greal) (event->x - display->drag_start.x);
       /*-- exactly as in pan_by_drag --*/
-      scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
+      /*      scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;*/
+      scale_x = sp->scale.x;
       scale_x /= 2;
       sp->iscale.x = (greal) sp->max.x * scale_x;
       sp->pmid.x -= (dx * precis / sp->iscale.x);
@@ -447,7 +448,8 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       greal dy = -1 * (greal) (event->y - display->drag_start.y);
 
       /*-- exactly as in pan_by_drag --*/
-      scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
+      /*      scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;*/
+      scale_y = sp->scale.y;
       scale_y /= 2;
       sp->iscale.y = (greal) sp->max.y * scale_y;
       sp->pmid.y -= (dy * precis / sp->iscale.y);
@@ -468,8 +470,9 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
       mid.x = sp->max.x / 2;
       scalefac.x = 1.0;
-      scale_x = (cpanel->projection == TOUR2D) ? &sp->tour_scale.x :
-                                                 &sp->scale.x;
+      /*      scale_x = (cpanel->projection == TOUR2D) ? &sp->tour_scale.x :
+	      &sp->scale.x;*/
+      scale_x = &sp->scale.x;
       if (ABS(event->x - mid.x) >= npix) {
         scalefac.x = (gfloat) (event->x - mid.x) /
                      (gfloat) (display->drag_start.x - mid.x);
@@ -487,8 +490,9 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
       mid.y = sp->max.y / 2;
       scalefac.y = 1.0;
-      scale_y = (cpanel->projection == TOUR2D) ? &sp->tour_scale.y :
-                                                 &sp->scale.y;
+      /*      scale_y = (cpanel->projection == TOUR2D) ? &sp->tour_scale.y :
+	      &sp->scale.y;*/
+      scale_y = &sp->scale.y;
       if (ABS(event->y - mid.y) >= npix) {
         scalefac.y = (gfloat) (event->y - mid.y) /
                      (gfloat) (display->drag_start.y - mid.y);

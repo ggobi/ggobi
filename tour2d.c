@@ -258,6 +258,15 @@ tour2d_fade_vars_cb (GtkCheckMenuItem *w, guint action)
   gg->tour2d.fade_vars = !gg->tour2d.fade_vars;
 }
 
+/*-- called from the Options menu --*/
+void
+tour2d_all_vars_cb (GtkCheckMenuItem *w, guint action) 
+{
+  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+
+  gg->tour2d.all_vars = !gg->tour2d.all_vars;
+}
+
 void tour2d_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
@@ -415,8 +424,9 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse,
       /* Check if pp indices are being calculated, if so re-allocate
          and re-initialize as necessary */
       if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
-        realloc_optimize0_p(&dsp->t2d_pp_op, dsp->t2d.nactive, 
-          dsp->t2d.active_vars);
+        free_optimize0_p(&dsp->t2d_pp_op);
+        alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
+          2);
         t2d_pp_reinit(gg);
       }
     }
