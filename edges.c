@@ -13,6 +13,9 @@
 #include "vars.h"
 #include "externs.h"
 
+/* Which include file should this be in? */
+void GGOBI(edge_menus_update)(ggobid *gg);
+
 /* --------------------------------------------------------------- */
 /*                   Dynamic allocation section                    */
 /* --------------------------------------------------------------- */
