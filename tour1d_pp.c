@@ -402,7 +402,7 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   /*  dsifa_ (dp->a, &lda, &n, dp->kpvt, &info);
       dsidi_ (dp->a, &lda, &n, dp->kpvt, detwb, inert, dp->work, &job);*/
   
-  *val = -detw[0]/detwb[0]*pow(10,detw[1]-detwb[1]);
+  /*  *val = -detw[0]/detwb[0]*pow(10,detw[1]-detwb[1]);*/
 
   printf ("Index=%f\n", *val);
 
