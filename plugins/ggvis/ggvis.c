@@ -344,7 +344,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
    * create this button after the varnotebook, because it's
    *   necessary to get hold of the notebook in the button callback
   */
-  btn = gtk_button_new_with_label ("Compute D");
+  btn = gtk_button_new_with_label ("Populate D");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Compute the new target distance matrix D.",
     NULL);
