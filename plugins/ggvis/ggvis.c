@@ -39,14 +39,6 @@ show_ggvis_window (GtkWidget *widget, PluginInstance *inst)
     return;
   }
 
-{
-  ggobid *gg = inst->gg;
-  displayd *display = gg->current_display;
-  datad *d = display->d;
-g_printerr ("show_ggvis_window\n");
-g_printerr (" display = %d d = %d\n", (gint)display, (gint)d);
-}
-
   if (inst->data == NULL) {
     GtkWidget *window;
     ggvisd *ggv = (ggvisd *) g_malloc (sizeof (ggvisd));
@@ -175,11 +167,6 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   if (d == NULL || e == NULL)
     return;
 
-g_printerr ("radial_cb\n");
-g_printerr (" display = %d d = %d\n",
-  (gint)gg->current_display, (gint)gg->current_display->d);
-g_printerr (" nrows %d ncols %d \n", d->nrows, d->ncols);
-
   initLayout (gg, ggv, d, e);
 
   /*-- initial default:  let the first node be the center node --*/
@@ -272,7 +259,7 @@ g_printerr ("through cmds\n");
   }
 }
 
-static void spring_cb (GtkButton *button, PluginInstance *inst)
+static void mds_spring_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   ggvisd *ggv = GGVisFromInst (inst);
@@ -303,17 +290,11 @@ g_printerr ("through spring_once (ten times)\n");
   displays_tailpipe (REDISPLAY_ALL, FULL, gg);
 }
 
+
 GtkWidget *
 create_ggvis_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
-{
-  ggobid *gg = inst->gg;
-  displayd *display = gg->current_display;
-  datad *d = display->d;
-g_printerr ("create_ggvis_window\n");
-g_printerr (" display = %d d = %d\n", (gint)display, (gint)d);
-}
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/
@@ -347,7 +328,7 @@ g_printerr (" display = %d d = %d\n", (gint)display, (gint)d);
 
   btn = gtk_button_new_with_label ("spring");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (spring_cb), inst);
+                      GTK_SIGNAL_FUNC (mds_spring_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
   label = gtk_label_new ("Network");
@@ -370,7 +351,6 @@ g_printerr (" display = %d d = %d\n", (gint)display, (gint)d);
   label = gtk_label_new ("Radial");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                             frame, label);
-
   /*-- --*/
 
   gtk_widget_show_all (window);
