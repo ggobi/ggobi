@@ -57,9 +57,9 @@ const gchar *const DataModeNames[num_data_modes] =
 void initSessionOptions();
 
 gchar *
-getOptValue(const char * const name, const char * const value)
+getOptValue(const gchar * const name, const gchar * const value)
 {
-    const char * ptr = (const char *) value;
+    const gchar * ptr = (const gchar *) value;
 
     if(ptr[0] != '-' || ptr[1] != '-')
 	return(NULL);
@@ -75,14 +75,14 @@ getOptValue(const char * const name, const char * const value)
     } else
 	ptr = NULL;
 
-    return(ptr);
+    return((gchar *)ptr);
 }
 
 gint
 parse_command_line (gint *argc, gchar **av, ggobid *gg)
 {
   gboolean stdin_p = false;
-  char *ptr;
+  gchar *ptr;
 
 /*
  * Now parse the command line.
@@ -301,6 +301,15 @@ ggobi_alloc()
   tmp->prev_viewmode = NULLMODE;
   tmp->projection = NULLMODE;
   tmp->prev_projection = NULLMODE;
+  /*-- --*/
+
+  /*-- initialize main window, tool windows to NULL --*/
+  tmp->main_window = NULL;
+  tmp->display_tree.window = NULL;
+  tmp->vartable_ui.window = NULL;
+  tmp->sphere_ui.window = NULL;
+  tmp->cluster_ui.window = NULL;
+  tmp->color_ui.symbol_window = NULL;
   /*-- --*/
 
   tmp->color_ui.margin = 10;
