@@ -1,8 +1,4 @@
-#if 1
 #include <libxml/parserInternals.h>
-#else
-#include <parserInternals.h>
-#endif
 
 /*
    This is a SAX based parser for reading a single input file

@@ -96,6 +96,7 @@ write_xml_description (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"<description>\n");
 /*XXX*/
+ fprintf(f, "This is XML created by GGobi\n");
 
  fprintf(f,"</description>\n");
 

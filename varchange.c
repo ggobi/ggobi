@@ -107,7 +107,11 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   if (nvals != d->nrows)
     return;
 
-  vartable_element_new (d);
+  /* Create a new element in the vartable list iff we need to. Otherwise use the one in the
+     current position. */
+  if(jvar >= g_slist_length(d->vartable))
+    vartable_element_new (d);
+
   vt = vartable_element_get (jvar, d);
   if (type == categorical)
     vartable_element_categorical_init (vt, nlevels, level_names,
