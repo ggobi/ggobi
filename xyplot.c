@@ -12,7 +12,7 @@
 #include "vars.h"
 #include "externs.h"
 
-enum redrawStyle
+RedrawStyle
 xyplot_activate (gint state, displayd *display, ggobid *gg)
 {
   GList *slist;

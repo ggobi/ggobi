@@ -39,8 +39,8 @@ The authors can be contacted at the following email addresses:
 #include "tour1d_pp.h"
 #include "tour_pp.h"
 
-char msg[1024];
-gfloat ppindx_mat[100]; /* needs to be global for easy
+static gchar msg[1024];
+static gfloat ppindx_mat[100]; /* needs to be global for easy
 				  initialization/clearing */
 static gint ppindx_count;
 static gfloat indx_min, indx_max;
@@ -704,7 +704,7 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
     hgt = dsp->t1d_ppda->allocation.height;
   gint j;
   static gboolean init = true;
-  const gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
+  gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
 
   if (init) {
     t1d_clear_ppda(gg);
@@ -720,9 +720,9 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
 
   if (indx_min == indx_max) indx_min *= 0.9999;
 
-  sprintf((const gchar *) label,"PP index: (%3.1f) %5.3f (%3.1f)",
+  g_strdup_printf (label,"PP index: (%3.1f) %5.3f (%3.1f)",
     indx_min, ppindx_mat[ppindx_count], indx_max);
-  gtk_label_set_text((const gchar *) dsp->t1d_pplabel,label);
+  gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
   if (ppindx_count == 0) 
@@ -741,6 +741,7 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
     t1d_ppdraw_all(wid, hgt, indx_min, indx_max, margin, gg);
   }
 
+  g_free (label);
 }
 
 /********************************************************************

@@ -23,8 +23,8 @@
 
 typedef struct {
 
- gint mode, prev_mode;
- gint projection;
+ PipelineMode mode, prev_mode;
+ PipelineMode projection;
 
  /*-- 1d plotting --*/
  struct _P1DCpanel {

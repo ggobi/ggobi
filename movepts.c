@@ -102,7 +102,7 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
   gboolean horiz, vert;
 
   horiz = gg->movepts.direction == horizontal || gg->movepts.direction == both;
-  vert = gg->movepts.direction == vert || gg->movepts.direction == both;
+  vert = gg->movepts.direction == vertical || gg->movepts.direction == both;
 
   if (horiz)
     sp->screen[id].x = x;

@@ -862,7 +862,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
               }
               if (k_prev == -1 || k_prev != i || n_prev == -1 || n_prev != n) {
                 gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
-                  ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
+                  (gint) ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
               }
               if (p_prev == -1 || p_prev != p) {  /* color */
                 gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[p]);
@@ -1061,7 +1061,7 @@ splot_pixmap1_to_window (splotd *sp, ggobid *gg) {
 /*------------------------------------------------------------------------*/
 
 void
-splot_redraw (splotd *sp, enum redrawStyle redraw_style, ggobid *gg) {
+splot_redraw (splotd *sp, RedrawStyle redraw_style, ggobid *gg) {
 
   /*-- sometimes the first draw happens before configure is called --*/
   if (sp == NULL || sp->da == NULL || sp->pixmap0 == NULL) {

@@ -32,7 +32,7 @@
 #define FORGETITAXIS_MIN -100.
 #define FORGETITAXIS_MAX 200.
 
-enum redrawStyle
+RedrawStyle
 p1d_activate (gint state, displayd *display, ggobid *gg)
 {
   GList *slist;

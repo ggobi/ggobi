@@ -119,7 +119,7 @@ struct _ggobid {
 /*----------------------- pipeline ---------------------------------*/
 
  PipelineMode mode, prev_mode;
- gint projection, prev_projection;
+ PipelineMode projection, prev_projection;
 
  struct _VarTableUI {
    GtkWidget *window;

@@ -596,8 +596,6 @@ build_color_vectors (datad *d, ggobid *gg)
         } else {  /* update the vectors for this point only */
           changed = update_color_vectors (j, changed,
             d->pts_under_brush.els, d, gg);
-if (changed)
-g_printerr ("j %d changed %d \n", j, changed);
 
           /*-- link by id --*/
           if (nd > 1) color_link_by_id (j, d, gg);

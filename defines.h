@@ -30,8 +30,6 @@
 #define off 0
 #define on 1
 
-enum redrawStyle {NONE, EXPOSE, QUICK, BINNED, FULL};
-
 #define HORIZONTAL 0
 #define VERTICAL   1
 

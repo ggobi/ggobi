@@ -36,9 +36,8 @@ The authors can be contacted at the following email addresses:
 #include "tour2d_pp.h"
 #include "tour_pp.h"
 
-char msg[1024];
-gfloat ppindx_mat[100]; /* needs to be global for easy
-				  initialization/clearing */
+static gfloat ppindx_mat[100]; /* needs to be global for easy
+				                  initialization/clearing */
 static gint ppindx_count;
 static gfloat indx_min, indx_max;
 
@@ -376,9 +375,9 @@ void t2d_ppdraw(gfloat pp_indx_val, ggobid *gg)
 
   if (indx_min == indx_max) indx_min *= 0.9999;
 
-  sprintf(label,"PP index: (%3.1f) %5.3f (%3.1f)",
+  g_strdup_printf (label,"PP index: (%3.1f) %5.3f (%3.1f)",
     indx_min, ppindx_mat[ppindx_count], indx_max);
-  gtk_label_set_text(dsp->t2d_pplabel,label);
+  gtk_label_set_text(GTK_LABEL(dsp->t2d_pplabel),label);
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
   if (ppindx_count == 0) 
@@ -397,6 +396,7 @@ void t2d_ppdraw(gfloat pp_indx_val, ggobid *gg)
     t2d_ppdraw_all(wid, hgt, indx_min, indx_max, margin, gg);
   }
 
+  g_free (label);
 }
 
 /********************************************************************

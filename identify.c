@@ -41,10 +41,10 @@ find_nearest_point (icoords *lcursor_pos, splotd *splot, datad *d, ggobid *gg)
 }
 
 /*-- still having trouble getting identify turned off properly --*/
-enum redrawStyle
+RedrawStyle
 identify_activate (gint state, displayd *display, ggobid *gg)
 {
-  enum redrawStyle redraw_style = NONE;
+  RedrawStyle redraw_style = NONE;
 
   if (state == off) {
     datad *d = display->d;

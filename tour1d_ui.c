@@ -29,6 +29,8 @@ cpanel_t1d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t1d_nASHes = 20;
   cpanel->t1d_nbins = 200;
   cpanel->t1d_vert = false;
+
+  cpanel->t1d_pp_indx = 0;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/

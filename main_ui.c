@@ -118,11 +118,11 @@ axes_show_cb (GtkCheckMenuItem *w, guint action)
 */
 
 
-gint
+PipelineMode
 mode_get (ggobid* gg) {
   return gg->mode;
 }
-gint
+PipelineMode
 projection_get (ggobid* gg) {
   return gg->projection;
 }
@@ -205,7 +205,7 @@ varpanel_reinit (ggobid *gg)
 }
 
 void 
-mode_set (gint m, ggobid *gg)
+mode_set (PipelineMode m, ggobid *gg)
 {
 /*
  * This could be called ui_mode_set or main_window_mode_set,
@@ -287,16 +287,16 @@ procs_activate (gboolean state, displayd *display, ggobid *gg)
   }
 }
 
-enum redrawStyle
+RedrawStyle
 mode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg) {
   displayd *display = (displayd *) sp->displayptr;
-  gint redraw_style = NONE;
+  RedrawStyle redraw_style = NONE;
 
   if (state == off) {
     switch (m) {
       case XYPLOT:
       {
-        extern enum redrawStyle xyplot_activate (gint, displayd *, ggobid *);
+        extern RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
         xyplot_activate (state, display, gg);
       }
       break;
@@ -305,7 +305,7 @@ mode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg) {
       break;
       case IDENT:
       {
-        extern enum redrawStyle identify_activate (gint, displayd *, ggobid *);
+        extern RedrawStyle identify_activate (gint, displayd *, ggobid *);
         redraw_style = identify_activate (state, display, gg);
       }
       break;
@@ -316,13 +316,13 @@ mode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg) {
     switch (m) {
       case P1PLOT:
       {
-        extern enum redrawStyle p1d_activate (gint, displayd *, ggobid *);
+        extern RedrawStyle p1d_activate (gint, displayd *, ggobid *);
         p1d_activate (state, display, gg);
       }
       break;
       case XYPLOT:
       {
-        extern enum redrawStyle xyplot_activate (gint, displayd *, ggobid *);
+        extern RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
         xyplot_activate (state, display, gg);
       }
       break;
@@ -358,7 +358,7 @@ void
 mode_set_cb (GtkWidget *widget, gint action)
 {
   ggobid *gg = GGobiFromWidget(widget,true);
-  GGOBI(full_mode_set)(action, gg);
+  GGOBI(full_mode_set)((PipelineMode) action, gg);
 }
 
 /*
@@ -405,20 +405,20 @@ projection_ok (gint m, displayd *display)
 gint
 GGOBI(full_mode_set)(gint action, ggobid *gg)
 {
-  gint prev_mode = gg->mode;
+  PipelineMode prev_mode = gg->mode;
 
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
     displayd *display = gg->current_display;
-    enum redrawStyle redraw_style = NONE;
+    RedrawStyle redraw_style = NONE;
 
     if (projection_ok (action, display)) {
       sp_event_handlers_toggle (sp, off);
       redraw_style = mode_activate (sp, gg->mode, off, gg);
       procs_activate (off, display, gg);
 
-      display->cpanel.mode = action;
-      mode_set (action, gg);  /* mode = action */
+      display->cpanel.mode = (PipelineMode) action;
+      mode_set (display->cpanel.mode, gg);  /* mode = action */
 
       sp_event_handlers_toggle (sp, on);
       mode_activate (sp, gg->mode, on, gg);
@@ -428,7 +428,7 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
        * work out which mode menus (Options, Reset, I/O) need
        * to be present, and add the needed callbacks.
       */
-      mode_submenus_update (prev_mode, action, gg);
+      mode_submenus_update (prev_mode, display->cpanel.mode, gg);
 
       /*-- redraw this display --*/
       display_tailpipe (display, gg);

@@ -115,8 +115,6 @@ void
 cpanel_xyplot_make (ggobid *gg) {
   GtkWidget *cycle_tgl, *chdir_btn, *cycle_sbar, *opt;
   displayd *display = gg->current_display;
-  cpaneld *cpanel;
-  if (display) cpanel = &display->cpanel;
   
   gg->control_panel[XYPLOT] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[XYPLOT]), 5);

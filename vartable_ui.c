@@ -722,7 +722,6 @@ vartable_open (ggobid *gg)
      "N NAs"};
   GSList *l;
   datad *d;
-  gint n;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
@@ -753,7 +752,6 @@ vartable_open (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vbox), gg->vartable_ui.notebook,
     true, true, 2);
 
-  n = 0;
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
 

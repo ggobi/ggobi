@@ -24,13 +24,13 @@
 
 void 
 cpanel_t2d_init (cpaneld *cpanel, ggobid *gg) {
-    cpanel->t2d_paused = false;
-    cpanel->t2d_local_scan = false;
-    cpanel->t2d_stepping = false;
-    cpanel->t2d_backtracking = false;
-    cpanel->t2d_step = TOURSTEP0;
-    cpanel->t2d_ls_dir = TOUR_LS_IN;
-    cpanel->t2d_path_len = 1.;
+  cpanel->t2d_paused = false;
+  cpanel->t2d_local_scan = false;
+  cpanel->t2d_stepping = false;
+  cpanel->t2d_backtracking = false;
+  cpanel->t2d_step = TOURSTEP0;
+  cpanel->t2d_ls_dir = TOUR_LS_IN;
+  cpanel->t2d_path_len = 1.;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/

@@ -106,13 +106,13 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
       for (l=display->splots; l; l=l->next) {
         s = (splotd *) l->data;
         if (s->p1dvar == -1) {
-          if (!array_contains (cols, ncols, sp->xyvars.x))
-            cols[ncols++] = sp->xyvars.x;
-          if (!array_contains (cols, ncols, sp->xyvars.y))
-            cols[ncols++] = sp->xyvars.y;
+          if (!array_contains (cols, ncols, s->xyvars.x))
+            cols[ncols++] = s->xyvars.x;
+          if (!array_contains (cols, ncols, s->xyvars.y))
+            cols[ncols++] = s->xyvars.y;
         } else {
-          if (!array_contains (cols, ncols, sp->p1dvar))
-            cols[ncols++] = sp->p1dvar;
+          if (!array_contains (cols, ncols, s->p1dvar))
+            cols[ncols++] = s->p1dvar;
         }
       }
     }
@@ -123,8 +123,8 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
       splotd *s;
       for (l=display->splots; l; l=l->next) {
         s = (splotd *) l->data;
-        if (!array_contains (cols, ncols, sp->p1dvar))
-          cols[ncols++] = sp->p1dvar;
+        if (!array_contains (cols, ncols, s->p1dvar))
+          cols[ncols++] = s->p1dvar;
       }
     }
     break;
@@ -134,8 +134,8 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
       splotd *s;
       for (l=display->splots; l; l=l->next) {
         s = (splotd *) l->data;
-        if (!array_contains (cols, ncols, sp->xyvars.y))
-          cols[ncols++] = sp->xyvars.y;
+        if (!array_contains (cols, ncols, s->xyvars.y))
+          cols[ncols++] = s->xyvars.y;
       }
     }
     break;

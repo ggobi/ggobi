@@ -537,7 +537,7 @@ mode_has_io_menu (gint mode)
 
 /*-- make the menu items once, and then show/hide them as necessary --*/
 void
-mode_submenus_initialize (gint mode, ggobid *gg)
+mode_submenus_initialize (PipelineMode mode, ggobid *gg)
 {
   gg->menus.options_item = NULL;
   gg->menus.reset_item = NULL;
@@ -545,7 +545,7 @@ mode_submenus_initialize (gint mode, ggobid *gg)
 }
 
 void
-mode_submenus_update (gint prev_mode, gint mode, ggobid *gg)
+mode_submenus_update (PipelineMode prev_mode, PipelineMode mode, ggobid *gg)
 {
   /*-- remove any previous submenus --*/
   if (mode_has_options_menu (prev_mode)) {

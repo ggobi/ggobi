@@ -61,7 +61,7 @@ displays_print (ggobid *gg) {
 /*-- replot all splots in display --*/
 /*-- type = EXPOSE, QUICK, BINNED, FULL --*/
 void
-display_plot (displayd *display, guint type, ggobid *gg) {
+display_plot (displayd *display, RedrawStyle type, ggobid *gg) {
   GList *slist;
   splotd *sp;
 
@@ -73,9 +73,9 @@ display_plot (displayd *display, guint type, ggobid *gg) {
   }
 }
 
-void
-display_plot_allbutone (displayd *display, splotd *splot, guint type,
-  ggobid *gg)
+static void
+display_plot_allbutone (displayd *display, splotd *splot,
+  RedrawStyle type, ggobid *gg)
 {
   GList *slist;
   splotd *sp;
@@ -293,6 +293,9 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   display->t2d_manip_var = -1;
   display->tc1_manip_var = -1;
   display->tc2_manip_var = -1;
+
+  display->t1d_pp_pixmap = NULL;
+  display->t2d_pp_pixmap = NULL;
 
   return (display);
 }
@@ -656,7 +659,7 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
  * replot all splots in display -- except splot, if present
 */
 void
-displays_plot (splotd *splot, gint type, ggobid *gg) {
+displays_plot (splotd *splot, RedrawStyle type, ggobid *gg) {
   GList *dlist;
   displayd *display;
 

@@ -22,7 +22,7 @@ typedef struct {
  GtkWidget *da;                 /* drawing_area */
  GdkPixmap *pixmap0, *pixmap1;  /* 2-stage drawing */
 
- enum redrawStyle redraw_style;
+ RedrawStyle redraw_style;
 
  /* Drawing area dimensions */
  icoords max;

@@ -239,11 +239,11 @@ brush_init (datad *d, ggobid *gg)
   brush_alloc (d, gg);
 }
 
-enum redrawStyle
+RedrawStyle
 brush_activate (gboolean state, displayd *display, ggobid *gg)
 {
   datad *d = display->d;
-  enum redrawStyle redraw_style = NONE;
+  RedrawStyle redraw_style = NONE;
 
   if (state)
     assign_points_to_bins (d, gg);
