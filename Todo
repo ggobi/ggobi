@@ -78,9 +78,16 @@ Rotation
 
 ! Erase/hiding/exclusion  (done; could use a redo button)
 !   fix up for api
+<<<<<<< Todo
+
+! closing the 'choose symbol' window dumps core
+! the brush isn't redrawing when a new color is selected
+! the axes aren't being initialized properly for cloned variables.
+=======
 
 ! closing the 'choose symbol' window dumps core
 ! the brush isn't redrawing when a new color is selected
 ! the axes aren't being initialized properly for cloned variables.
 
 ! reset zoom doesn't work  ; added
+>>>>>>> 1.21
