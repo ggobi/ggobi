@@ -41,10 +41,19 @@ void GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg);
 void GGOBI(data_release)(datad *, ggobid *gg);
 void GGOBI(vartable_free)(datad *, ggobid *gg);
 void GGOBI(vardatum_free)(vartabled *var, ggobid *gg);
-
+void GGOBI(setErrorHandlers)(FatalErrorHandler *err);
 #ifdef __cplusplus
 }
 #endif
+
+
+void
+GGOBI(setErrorHandlers)(FatalErrorHandler *err)
+{
+    if(!err)
+       return;
+    FatalError = err;
+}
 
 const gchar *
 GGOBI(getFileName) (ggobid *gg)
@@ -990,6 +999,12 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
     gtk_widget_destroy (gg->display_tree.window);
   if (gg->vartable_ui.window)
     gtk_widget_destroy (gg->vartable_ui.window);
+
+  if (gg->color_ui.symbol_window) 
+    gtk_widget_destroy (gg->color_ui.symbol_window);
+
+  if (gg->wvis.window) 
+    gtk_widget_destroy (gg->wvis.window);
 
   gg->close_pending = false;
   /* Now fix up the list of ggobi's */

@@ -75,6 +75,8 @@ const gchar *const DataModeNames[num_data_modes] =
   {"ASCII", "binary", "R/S data", "XML", "MySQL", "URL", "Unknown"};
 
 
+FatalErrorHandler FatalError = &exit;
+
 
 gchar *
 getOptValue(const gchar * const name, const gchar * const value)
@@ -372,7 +374,7 @@ ggobi_alloc(ggobid *tmp)
   }
   if (!tmp->activeColorScheme) {
     g_printerr ("failed to find color scheme\n");
-    exit(0);
+    (*FatalError)(0);
   } else colorscheme_init (tmp->activeColorScheme);
     /*
      * the number of colors in use will be tested against the
@@ -748,8 +750,9 @@ ValidateGGobiRef(ggobid *gg, gboolean fatal)
 
   g_printerr ("Incorrect reference to ggobid.\n");
 
- if (fatal)
-  exit(10);
+  if (fatal) {
+     (*FatalError)(10);
+  }
 
  return(NULL);
 }
@@ -767,7 +770,7 @@ ValidateDatadRef(datad *d, ggobid *gg, gboolean fatal)
   g_printerr("Incorrect reference to datad.\n");
 
  if (fatal)
-  exit(11);
+  (*FatalError)(11);
 
  return(NULL); 
 }
@@ -787,7 +790,7 @@ ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal)
   g_printerr("Incorrect reference to display.\n");
 
  if (fatal)
-  exit(11);
+  (*FatalError)(11);
 
  return(NULL); 
 }
