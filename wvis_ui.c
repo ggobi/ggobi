@@ -89,9 +89,13 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
     }
   }
 
-  /*-- listen for variable_added events on main_window --*/
+  /*-- listen for variable_added and _list_changed events on main_window --*/
+  /*-- ... list_changed would be adequate --*/
   gtk_signal_connect (GTK_OBJECT (gg->main_window),
-    "variable_added", GTK_SIGNAL_FUNC (variable_notebook_addvar_cb),
+    "variable_added", GTK_SIGNAL_FUNC (variable_notebook_varchange_cb),
+     GTK_OBJECT (notebook));
+  gtk_signal_connect (GTK_OBJECT (gg->main_window),
+    "variable_list_changed", GTK_SIGNAL_FUNC (variable_notebook_varchange_cb),
      GTK_OBJECT (notebook));
 
   /*-- listen for variable_added events on main_window --*/

@@ -93,12 +93,12 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
 
   if (vtype == ADDVAR_ROWNOS) {
     for (i=0; i<d->nrows; i++)
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (float) (i+1);
+      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) (i+1);
   } else if (vtype == ADDVAR_BGROUP) {
     clusters_set (d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][jvar] = d->tform.vals[i][jvar] =
-        (float) d->clusterid.els[i];
+        (gfloat) d->clusterid.els[i];
   }
   
   vt = vartable_element_get (jvar, d);
@@ -112,7 +112,6 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
   /*-- emit variable_added signal --*/
   gtk_signal_emit (GTK_OBJECT (gg->main_window),
                    GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, gg); 
-
 }
 
 /*
@@ -190,6 +189,7 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   for (k=0; k<ncols; k++) {
     n = cols[k];
     vt = vartable_element_get (n, d);
+
     /*-- emit variable_added signal --*/
     gtk_signal_emit (GTK_OBJECT (gg->main_window),
                      GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, gg); 
@@ -378,6 +378,7 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   GtkCListRow *row;
   gchar *varstr;
   gint irow;
+  vartabled *vt;
 
   /*-- don't allow all variables to be deleted --*/
   if (ncols >= d->ncols)
@@ -389,7 +390,7 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   */
   if ((j = plotted (cols, ncols, d, gg)) != -1) {
     gchar *message;
-    vartabled *vt = vartable_element_get (j, d);
+    vt = vartable_element_get (j, d);
     message = g_strdup_printf ("Deletion failed; the variable '%s' is currently plotted\n",
       vt->collab);
     quick_message (message, false);
@@ -403,6 +404,7 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
   for (j=0; j<ncols; j++) {
     vartable_element_remove (cols[j], d);
+    vt = vartable_element_get (cols[j], d);
   }
 
   /*-- delete rows from clist; no copying is called for --*/
@@ -450,6 +452,12 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   varcircles_layout_reset (d->ncols-ncols, d, gg);
 
   d->ncols -= ncols;
+
+  /*-- emit a single variable_list_changed signal when finished --*/
+  /*-- doesn't need to give a variable index any more, really --*/
+  vt = vartable_element_get (cols[d->ncols-1], d);
+  gtk_signal_emit (GTK_OBJECT (gg->main_window),
+                   GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], vt, gg); 
 
   /*-- run the first part of the pipeline  --*/
   tform_to_world (d, gg);
