@@ -48,6 +48,12 @@ typedef struct {
  lims lim_tform;     /*-- range of d->tform              --*/
 
  /*
+  * the limits to be put into the table: presently, this is
+  * lim_tform but it excludes any missing values.
+ */
+ lims lim_display;  
+
+ /*
   * If the user has supplied limits, lim_specified_p = true
   * and the limits are stored in lim_specified.{min,max}
  */

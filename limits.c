@@ -96,26 +96,30 @@ limits_raw_set_by_var (gint j, datad *d, ggobid *gg) {
 
     for (m=0; m<d->nrows_in_plot; m++) {
       i = d->rows_in_plot[m];
+/*
       if (d->nmissing > 0 && MISSING_P(i,j))
         ;
       else {
+*/
         if (d->raw.vals[i][j] < vt->lim_raw.min)
           vt->lim_raw.min = d->raw.vals[i][j];
         else if (d->raw.vals[i][j] > vt->lim_raw.max)
           vt->lim_raw.max = d->raw.vals[i][j];
-      }
+      /*}*/
     }
   } else {
 
     for (i=0; i<d->nrows; i++) {
+/*
       if (d->nmissing > 0 && MISSING_P(i,j))
         ;
       else {
+*/
         if (d->raw.vals[i][j] < vt->lim_raw.min)
           vt->lim_raw.min = d->raw.vals[i][j];
         else if (d->raw.vals[i][j] > vt->lim_raw.max)
           vt->lim_raw.max = d->raw.vals[i][j];
-      }
+      /*}*/
     }
   }
 }
@@ -136,20 +140,47 @@ limits_tform_set_by_var (gint j, datad *d, ggobid *gg)
   gfloat *x = (gfloat *) g_malloc (d->nrows * sizeof (gfloat));
   vartabled *vt = vartable_element_get (j, d);
 
+  /*-- initialize lim_tform --*/
   vt->lim_tform.min = d->tform.vals[d->rows_in_plot[0]][j];
   vt->lim_tform.max = d->tform.vals[d->rows_in_plot[0]][j];
+
+  /*-- initialize lim_display: make sure the initial values aren't missing --*/
+  if (gg->lims_use_visible) {
+    for (m=0; m<d->nrows_in_plot; m++) {
+      i = d->rows_in_plot[m];
+      if (d->nmissing == 0 || !MISSING_P(i,j)) {
+        vt->lim_display.min = d->tform.vals[d->rows_in_plot[i]][j];
+        vt->lim_display.max = d->tform.vals[d->rows_in_plot[i]][j];
+        break;
+      }
+    }
+  } else {
+    for (i=0; i<d->nrows; i++) {
+      if (d->nmissing == 0 || !MISSING_P(i,j)) {
+        vt->lim_display.min = d->tform.vals[d->rows_in_plot[i]][j];
+        vt->lim_display.max = d->tform.vals[d->rows_in_plot[i]][j];
+        break;
+      }
+    }
+  }
 
   if (gg->lims_use_visible) {
 
     for (m=0; m<d->nrows_in_plot; m++) {
       i = d->rows_in_plot[m];
+      if (d->tform.vals[i][j] < vt->lim_tform.min)
+        vt->lim_tform.min = d->tform.vals[i][j];
+      else if (d->tform.vals[i][j] > vt->lim_tform.max)
+        vt->lim_tform.max = d->tform.vals[i][j];
+
+      /*-- lim_display and stats: only use non-missing cases --*/
       if (d->nmissing > 0 && MISSING_P(i,j))
         ;
       else {
-        if (d->tform.vals[i][j] < vt->lim_tform.min)
-          vt->lim_tform.min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > vt->lim_tform.max)
-          vt->lim_tform.max = d->tform.vals[i][j];
+        if (d->tform.vals[i][j] < vt->lim_display.min)
+          vt->lim_display.min = d->tform.vals[i][j];
+        else if (d->tform.vals[i][j] > vt->lim_display.max)
+          vt->lim_display.max = d->tform.vals[i][j];
 
         sum += d->tform.vals[i][j];
         x[np] = d->tform.vals[i][j];
@@ -159,13 +190,18 @@ limits_tform_set_by_var (gint j, datad *d, ggobid *gg)
   } else {
 
     for (i=0; i<d->nrows; i++) {
+      if (d->tform.vals[i][j] < vt->lim_tform.min)
+        vt->lim_tform.min = d->tform.vals[i][j];
+      else if (d->tform.vals[i][j] > vt->lim_tform.max)
+        vt->lim_tform.max = d->tform.vals[i][j];
+
       if (d->nmissing > 0 && MISSING_P(i,j))
         ;
       else {
-        if (d->tform.vals[i][j] < vt->lim_tform.min)
-          vt->lim_tform.min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > vt->lim_tform.max)
-          vt->lim_tform.max = d->tform.vals[i][j];
+        if (d->tform.vals[i][j] < vt->lim_display.min)
+          vt->lim_display.min = d->tform.vals[i][j];
+        else if (d->tform.vals[i][j] > vt->lim_display.max)
+          vt->lim_display.max = d->tform.vals[i][j];
 
         sum += d->tform.vals[i][j];
         x[np] = d->tform.vals[i][j];

@@ -1,0 +1,40 @@
+I'm having a problem with the limits in the presence of missing
+values.  The two choices I have in the current design are
+unappealing:
+
+1.  Determine the limits including the missings when they're
+    shown.   This will cause the graphics to scale in a reasonable
+    way, but the limits shown in the table won't be the ones we want
+    to see.
+
+2.  Determine the limits excluding the missings at all times.
+    (This is what's happening now.)  The limits in the table look
+    right, but the graphics need to be rescaled to get the missings
+    into the plot.
+
+Other options:
+
+Do I somehow have to distinguish between scaling limits and
+display limits?  How does that interact with the fact that I
+already have five (columnwise) sets of limits: 
+  lim_raw, lim_tform, lim_specified, lim_specified_tform, lim
+
+I've always been keeping track of the overall missing limits
+in d->lim_missing.
+
+I'd better review the use of all these limits before doing
+anything.
+
+** The limits that are displayed in the table are definitely
+the transformed limits, and I think that makes sense.
+** The user-specified limits, though, are raw.
+
+I just added lim_display, which is the limit that will show up
+in the table.  Now lim_tform will conform to choice 1 above,
+and lim_display (together with the mean and median) to choice 2.
+
+There are still oddities in the way missings are handled.  If
+missings are represented as 0's, for instance, those are treated as
+real data values for some purposes but not for others.  If the
+variable is transformed and the missings are displayed, the 0's will
+also be transformed; that's probably not very sophisticated.
