@@ -22,7 +22,7 @@ cluster_symbol_show (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
   gint k = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget (w, true);
   icoords pos;
-  glyphv g;
+  glyphd g;
   datad *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
 
   /*-- fill in the background color --*/
@@ -293,16 +293,18 @@ static gboolean
 nclusters_changed (ggobid *gg)
 {
   datad *d;
-  gint k, nrows;
+  gint k, nrows = 0;
   GtkWidget *page;
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
 
   for (k=0; k<nd; k++) {
+    nrows = 0;
     page = gtk_notebook_get_nth_page (GTK_NOTEBOOK (gg->cluster_ui.notebook),
                                       k);
     d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
     nrows = GTK_TABLE (d->cluster_table)->nrows;
+
     if (nrows != d->nclusters+1) {  /*-- add one for the titles --*/
       changed = true;
       break;

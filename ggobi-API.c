@@ -533,7 +533,7 @@ gint
 GGOBI(getCaseGlyphType)(gint id, datad *d, ggobid *gg)
 {
   gint index = d->rows_in_plot[id];
-  return (d->glyph_now[index].type);
+  return (d->glyph_now.els[index].type);
 }
 
 gint *
@@ -553,7 +553,7 @@ GGOBI(getCaseGlyphSize)(gint id, datad *d, ggobid *gg)
 {
   gint index = d->rows_in_plot[id];
 
-  return (d->glyph_now[index].size);
+  return (d->glyph_now.els[index].size);
 }
 
 
@@ -561,9 +561,9 @@ void
 GGOBI(setCaseGlyph)(gint index, gint type, gint size, datad *d, ggobid *gg)
 {
   if (size > -1)
-    d->glyph[index].size = d->glyph_now[index].size = size;
+    d->glyph.els[index].size = d->glyph_now.els[index].size = size;
   if (type > -1)
-    d->glyph[index].type = d->glyph_now[index].type = type;
+    d->glyph.els[index].type = d->glyph_now.els[index].type = type;
 }
 
 void 

@@ -29,6 +29,7 @@ edges_alloc (gint nsegs, datad *d)
   d->edge.endpoints = (endpointsd *)
     g_realloc (d->edge.endpoints, nsegs * sizeof (endpointsd));
 
+  /*-- wrong: this is in d while the other is in e --*/
   vectorb_alloc (&d->edge.xed_by_brush,  nsegs);
 }
 
@@ -41,7 +42,32 @@ edges_free (datad *d, ggobid *gg)
 }
 
 /* --------------------------------------------------------------- */
-/*               End of dynamic allocation section                 */
+/*               Add and delete edges                              */
+/* --------------------------------------------------------------- */
+
+gboolean
+edge_add (gint a, gint b, datad *d, datad *e)
+{
+  /*-- check whether (a,b) exists before adding?  Not for the moment --*/
+  gint n = e->edge.n;
+  edges_alloc (e->edge.n+1, e);
+
+/*
+ * yi.  This means adding a record to e
+ * How many row-wise vectors have to grow by one?
+ * If it should have data values, what would we do?
+*/
+  /*pipeline_arrays_add_rows (e->edge.n, e);*/
+
+  e->edge.endpoints[n].a = d->rowid.idv.els[a];
+  e->edge.endpoints[n].b = d->rowid.idv.els[b];
+
+  return true;
+}
+
+
+/* --------------------------------------------------------------- */
+/*               Add an edgeset                                    */
 /* --------------------------------------------------------------- */
 
 gboolean

@@ -187,7 +187,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 
         if (draw_case && d->color_now.els[m] == current_color) {
           if (display->options.points_show_p)
-            draw_glyph (sp->pixmap0, &d->glyph_now[m], sp->screen, m, gg);
+            draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen, m, gg);
 
           /*-- whiskers: parallel coordinate and time series plots --*/
           if (display->displaytype == parcoords ||
@@ -305,7 +305,8 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
               if (!d->hidden_now.els[i] &&
                    d->color_now.els[i] == current_color)
               {
-                draw_glyph (sp->pixmap0, &d->glyph_now[i], sp->screen, i, gg);
+                draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
+                  sp->screen, i, gg);
 
                 /* parallel coordinate plot whiskers */
                 if (display->displaytype == parcoords) {
@@ -434,12 +435,15 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 /*               case highlighting for points (and edges?)                */
 /*------------------------------------------------------------------------*/
 
+/*-- add highlighting for parallel coordinates plot --*/
 static void
 splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   gint n;
   displayd *display = sp->displayptr;
   datad *d = display->d;
+
+  if (k < 0 || k >= d->nrows) return;
 
   if (display->options.whiskers_show_p) {
     gdk_gc_set_line_attributes (gg->plot_GC,
@@ -467,8 +471,11 @@ splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 static void
 splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
+  datad *d = sp->displayptr->d;
   gint diamond_dim = DIAMOND_DIM;
   GdkPoint diamond[5];
+
+  if (k < 0 || k >= d->nrows) return;
 
   diamond[0].x = diamond[4].x = sp->screen[k].x - diamond_dim;
   diamond[0].y = diamond[4].y = sp->screen[k].y;
@@ -483,6 +490,7 @@ splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gdk_draw_lines (drawable, gg->plot_GC, diamond, 5);
 }
 
+/*-- add the label to a case (with or without underlining) --*/
 static void
 splot_add_record_label (gboolean nearest, gint k, splotd *sp,
   GdkDrawable *drawable, ggobid *gg)
@@ -495,6 +503,8 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
   GtkStyle *style = gtk_widget_get_style (sp->da);
   gint diamond_dim = DIAMOND_DIM;
   gchar *lbl;
+
+  if (k < 0 || k >= d->nrows) return;
 
   /*-- add the label last so it will be in front of other markings --*/
   if (cpanel->identify_display_type == ID_CASE_LABEL)
@@ -585,16 +595,6 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
-
-/*--
-   unsatisfactory: use ids and work out whether we're talking
-   about display->d or display->e.  nearest has to be 
-   propagated for linking.  [don't quite understand this comment;
-   time will tell]
---*/
-  if (k >= d->nrows)
-    return;
 
   if (nearest) {
     if (dsp->displaytype == parcoords) {
@@ -637,6 +637,8 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
     if (k != -1)
       splot_add_diamond_cue (k, sp, drawable, gg);
 
+    /*-- when the button is up, we're choosing the starting point --*/
+
     if (gg->buttondown) {   /*-- button is down: choosing end point --*/
       if (k != -1 && k != gg->edgeedit.a) {
         gdk_draw_line (drawable, gg->plot_GC,
@@ -648,6 +650,7 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
           sp->mousepos.x, sp->mousepos.y);
       }
     }
+  } else if (cpanel->ee_deleting_p) {
   }
 }
 
@@ -661,9 +664,9 @@ splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 
   /*
      these are the cues added to
-       the nearest point                    in identification
-       the nearest point                    in moving points
-       the single point or pair of points   in edge editing
+       nearest point and sticky guys    in identification
+       nearest point                    in moving points
+       source, maybe dest and edge      in edge editing
   */
   if (mode == IDENT && d->nearest_point != -1)
     splot_add_identify_cues (sp, drawable, d->nearest_point, true, gg);

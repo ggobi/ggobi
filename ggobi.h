@@ -242,7 +242,7 @@ struct _ggobid {
 
 /*------------------------ brushing ----------------------------------*/
 
- glyphv glyph_id, glyph_0;
+ glyphd glyph_id, glyph_0;
 
  struct _Brush_UI {
    gboolean updateAlways_p;

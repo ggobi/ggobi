@@ -626,8 +626,8 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
    if (i < 0)
      data->defaults.glyphSize = value;
    else
-     d->glyph[i].size = d->glyph_now[i].size 
-             = d->glyph_prev[i].size = value;
+     d->glyph.els[i].size = d->glyph_now.els[i].size 
+             = d->glyph_prev.els[i].size = value;
   }
 
 
@@ -644,8 +644,8 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
     if(i < 0)
       data->defaults.glyphSize = value;
     else
-      d->glyph[i].type = d->glyph_now[i].type = 
-           d->glyph_prev[i].type = value;
+      d->glyph.els[i].type = d->glyph_now.els[i].type = 
+           d->glyph_prev.els[i].type = value;
   }
 
 
@@ -662,15 +662,15 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
           if(i < 0)
             data->defaults.glyphType = value;
           else
-            d->glyph[i].type = d->glyph_now[i].type =
-              d->glyph_prev[i].type = value;       
+            d->glyph.els[i].type = d->glyph_now.els[i].type =
+              d->glyph_prev.els[i].type = value;       
       } else {
         value = atoi(next);
         if(i < 0)
           data->defaults.glyphSize = value;
         else
-          d->glyph[i].size = d->glyph_now[i].size =
-            d->glyph_prev[i].size = value;     
+          d->glyph.els[i].size = d->glyph_now.els[i].size =
+            d->glyph_prev.els[i].size = value;     
       }
      j++;
      next = strtok(NULL, " ");

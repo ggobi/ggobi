@@ -93,12 +93,14 @@ glyph_link_by_id (gint k, datad *source_d, ggobid *gg)
         if (!d->hidden_now.els[i] && d->sampled.els[i]) {
           switch (cpanel->br_mode) {
             case BR_PERSISTENT:
-              d->glyph[i].size = d->glyph_now[i].size = source_d->glyph[k].size;
-              d->glyph[i].type = d->glyph_now[i].type = source_d->glyph[k].type;
+              d->glyph.els[i].size = d->glyph_now.els[i].size =
+                source_d->glyph.els[k].size;
+              d->glyph.els[i].type = d->glyph_now.els[i].type =
+                source_d->glyph.els[k].type;
             break;
             case BR_TRANSIENT:
-              d->glyph_now[i].size = source_d->glyph_now[k].size;
-              d->glyph_now[i].type = source_d->glyph_now[k].type;
+              d->glyph_now.els[i].size = source_d->glyph_now.els[k].size;
+              d->glyph_now.els[i].type = source_d->glyph_now.els[k].type;
             break;
           }
         }

@@ -89,12 +89,6 @@ typedef struct {
   GtkWidget *nh_lbl, *ns_lbl, *n_lbl;
 } clusteruid;
 
-/* glyph vectors */
-typedef struct {
-  gint type;
-  gint size;
-} glyphv;
-
 /* structure for binning the plot window */
 typedef struct {
   gulong *els;

@@ -292,8 +292,8 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
   skipit = true;
   /*-- if no glyph differs from the default, don't save glyphs --*/
   for (i=0; i<nr; i++) {
-    if (d->glyph_now[rowv[i]].type != gg->glyph_0.type ||
-        d->glyph_now[rowv[i]].size != gg->glyph_0.size)
+    if (d->glyph_now.els[rowv[i]].type != gg->glyph_0.type ||
+        d->glyph_now.els[rowv[i]].size != gg->glyph_0.size)
     {
       skipit = false;
       break;
@@ -540,7 +540,7 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
   } else {
 
     for (i=0; i<nr; i++) {
-      switch (d->glyph[i].type) {
+      switch (d->glyph.els[i].type) {
         case PLUS_GLYPH:
 /*          gstr = "+";*/
           gstr = "plus";
@@ -565,7 +565,7 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
           break;
       }
 
-      fprintf (fp, "%s %d\n", gstr, d->glyph[i].size);
+      fprintf (fp, "%s %d\n", gstr, d->glyph.els[i].size);
     }
     if (fclose (fp) == EOF)
       fprintf (stderr, "error in writing glyphs vector\n");

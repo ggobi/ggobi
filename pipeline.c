@@ -61,6 +61,7 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
   vectorb_alloc (&d->sampled, nr);
 }
 
+/*-- is this called anywhere?  I don't think so --*/
 void
 pipeline_arrays_add_rows (gint nrows, datad *d)
 /*
@@ -75,27 +76,24 @@ pipeline_arrays_add_rows (gint nrows, datad *d)
   arrayl_add_rows (&d->world, nrows);
   arrayl_add_rows (&d->jitdata, nrows);
 
+  /*-- alloc and initialize rows_in_plot and sampled --*/
   d->rows_in_plot = (gint *) g_realloc (d->rows_in_plot,
     nrows * sizeof (gint));
-
   vectorb_realloc (&d->sampled, nrows);
-
   k = d->nrows_in_plot;
   for (i=n; i<d->nrows; i++, k++) {
     d->rows_in_plot[k] = i;
     d->sampled.els[i] = true;
   }
-  d->nrows_in_plot = k;
+  d->nrows_in_plot = d->nrows;  /*-- show everything? --*/
 }
 
-/*-- reallocate tour arrays as needed here? --*/
 static void
 pipeline_arrays_check_dimensions (datad *d)
 {
-/*
- * I won't do this check for the raw array, because that
- * has to have been populated before the pipeline can be run.
-*/
+  if (d->raw.ncols < d->ncols)
+    arrayf_add_cols (&d->raw, d->ncols);
+
   if (d->tform.ncols < d->ncols)
     arrayf_add_cols (&d->tform, d->ncols);
   if (d->world.ncols < d->ncols)

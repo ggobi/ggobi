@@ -45,7 +45,7 @@ redraw_fg (GtkWidget *w, gint k, ggobid *gg) {
 static void
 find_selection_circle_pos (icoords *pos, ggobid *gg) {
   gint i;
-  glyphv g;
+  glyphd g;
   gint spacing = gg->color_ui.spacing;
   gint margin = gg->color_ui.margin;
 
@@ -91,7 +91,7 @@ find_selection_circle_pos (icoords *pos, ggobid *gg) {
 static void
 redraw_symbol_display (GtkWidget *w, ggobid *gg) {
   gint i;
-  glyphv g;
+  glyphd g;
   icoords pos;
   gint margin, spacing;
 
@@ -383,9 +383,10 @@ color_expose_accent (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 }
 
 static void
-choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
+choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
+{
 /*-- Reset glyph_id to the nearest glyph.  --*/
-  glyphv g;
+  glyphd g;
   gint i, dsq, nearest_dsq, type, size, rval = false;
   icoords pos, ev;
   splotd *sp = gg->current_splot;
@@ -394,10 +395,13 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   gint spacing = gg->color_ui.spacing;
   gint margin = gg->color_ui.margin;
 
-  for (i=0; i<d->nrows; i++) { 
-    d->glyph_prev[i].type = d->glyph[i].type;
-    d->glyph_prev[i].size = d->glyph[i].size;
+  vectorg_copy (&d->glyph, &d->glyph_prev);  /*-- from, to --*/
+/*
+  for (i=0; i<d->nrows; i++) {
+    d->glyph_prev.els[i].type = d->glyph.els[i].type;
+    d->glyph_prev.els[i].size = d->glyph.els[i].size;
   }
+*/
 
   ev.x = (gint) event->x;
   ev.y = (gint) event->y;

@@ -393,3 +393,82 @@ vectors_copy (vector_s *vecp_from, vector_s *vecp_to)
     g_printerr ("(vectors_copy) length of source = %d, of destination = %d\n",
       vecp_from->nels, vecp_to->nels);
 }
+
+/*-------------------------------------------------------------------------*/
+/*                     glyphd vector management                            */
+/*-------------------------------------------------------------------------*/
+
+void vectorg_init_null (vector_g *vecp)
+{
+  vecp->nels = 0;
+  vecp->els = (glyphd *) NULL;
+}
+
+void vectorg_free (vector_g *vecp)
+{
+  if (vecp->els == NULL)
+    g_free ((gpointer) vecp->els);
+  vecp->els = NULL;
+  vecp->nels = 0;
+}
+
+/*-- let's calling zeroing out a glyph setting it to POINT --*/
+void vectorg_zero (vector_g *vecp)
+{
+  gint i;
+  for (i=0; i<vecp->nels; i++) {
+    vecp->els[i].type = POINT_GLYPH;
+    vecp->els[i].size = 0;
+  }
+}
+
+void
+vectorg_alloc (vector_g *vecp, gint nels)
+{
+  if (vecp->els != NULL)
+    g_free (vecp->els);
+  vecp->els = NULL;
+
+  vecp->nels = nels;
+  if (nels > 0)
+    vecp->els = (glyphd *) g_malloc (nels * sizeof (glyphd));
+}
+
+void
+vectorg_realloc (vector_g *vecp, gint nels)
+{
+  if (nels > 0) {
+    if (vecp->els == NULL || vecp->nels == 0)
+      vecp->els = (glyphd *) g_malloc (nels * sizeof (glyphd));
+    else 
+      vecp->els = (glyphd *) g_realloc (vecp->els, nels * sizeof (glyphd));
+  } else {
+    if (vecp->els != NULL)
+      g_free (vecp->els);
+    vecp->els = NULL;
+  }
+
+  vecp->nels = nels;
+}
+
+void
+vectorg_alloc_zero (vector_g *vecp, gint nels)
+{
+  vectorg_alloc (vecp, nels);
+  vectorg_zero (vecp);
+}
+
+void
+vectorg_copy (vector_g *vecp_from, vector_g *vecp_to)
+{
+  gint i;
+
+  if (vecp_from->nels == vecp_to->nels)
+    for (i=0; i<vecp_from->nels; i++) {
+      vecp_to->els[i].type = vecp_from->els[i].type;
+      vecp_to->els[i].size = vecp_from->els[i].size;
+    }
+  else
+    g_printerr ("(vectorg_copy) length of source = %d, of destination = %d\n",
+      vecp_from->nels, vecp_to->nels);
+}

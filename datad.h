@@ -133,7 +133,7 @@ struct _datad {
 
  vector_s color, color_now, color_prev;
  vector_b hidden, hidden_now, hidden_prev;
- glyphv *glyph, *glyph_now, *glyph_prev;
+ vector_g glyph, glyph_now, glyph_prev;
 
 
 /*---------------------- identification ------------------------------*/

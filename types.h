@@ -16,6 +16,10 @@
 typedef enum {ascii_data, binary_data, Sprocess_data, xml_data, mysql_data, url_data, unknown_data, num_data_modes} DataMode;
 
 typedef struct {
+  gint type, size;
+} glyphd;
+
+typedef struct {
     glong x, y;
 } lcoords;
 typedef struct {
@@ -65,6 +69,10 @@ typedef struct {
   gboolean *els;
   guint nels;
 } vector_b;
+typedef struct {
+  glyphd *els;
+  guint nels;
+} vector_g;
 
 typedef struct {  /*-- used for obtaining ranks --*/
   gfloat f;

@@ -40,7 +40,7 @@ NewColor (glong red, glong green, glong blue) {
  * but it's neceessary for the small ones.
 */
 void
-draw_glyph (GdkDrawable *drawable, glyphv *gl, icoords *xypos, gint jpos, ggobid *gg)
+draw_glyph (GdkDrawable *drawable, glyphd *gl, icoords *xypos, gint jpos, ggobid *gg)
 {
   gushort size = gl->size + 1;
 

@@ -161,7 +161,7 @@ build_point (icoords *pos, gint nrow, GdkPoint * pointv, gint npt)
 }
 
 void
-build_glyph (glyphv *gl, icoords *xypos, gint jpos,
+build_glyph (glyphd *gl, icoords *xypos, gint jpos,
   GdkPoint *pointv,   gint *np,
   GdkSegment *segv,   gint *ns,
   rectd *openrectv,   gint *nr_open,
@@ -292,7 +292,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
 
     if (draw_case && d->color_now.els[m] == current_color) {
       if (display->options.points_show_p) {
-        build_glyph (&d->glyph_now[m], sp->screen, m,
+        build_glyph (&d->glyph_now.els[m], sp->screen, m,
           points, &npt,           segs, &nseg,
           open_rects, &nr_open,   filled_rects, &nr_filled,
           open_arcs, &nc_open,    filled_arcs, &nc_filled);
@@ -332,7 +332,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
         j = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
         if (!d->hidden_now.els[j] && d->color_now.els[j] == current_color) {
-          build_glyph (&d->glyph_now[j], sp->screen, j,
+          build_glyph (&d->glyph_now.els[j], sp->screen, j,
             points, &npt,           segs, &nseg,
             open_rects, &nr_open,   filled_rects, &nr_filled,
             open_arcs, &nc_open,    filled_arcs, &nc_filled);

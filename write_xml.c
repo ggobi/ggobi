@@ -180,10 +180,10 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
   fprintf(f, " glyphType=\"%d\"", d->glyph[i].type);
 */
  if (!xmlWriteInfo->useDefault ||
-    (xmlWriteInfo->defaultGlyphType != d->glyph[i].type))
+    (xmlWriteInfo->defaultGlyphType != d->glyph.els[i].type))
  {
   gtype_p = true;
-  switch (d->glyph[i].type) {
+  switch (d->glyph.els[i].type) {
     case PLUS_GLYPH:
       gtypestr = "plus";
       break;
@@ -211,14 +211,14 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
  }
 
  if (!xmlWriteInfo->useDefault ||
-     (xmlWriteInfo->defaultGlyphSize != d->glyph[i].size))
+     (xmlWriteInfo->defaultGlyphSize != d->glyph.els[i].size))
  {
    gsize_p = true;
    /*fprintf(f, " glyphSize=\"%d\"", d->glyph[i].size);*/
  }
 
  if (gtype_p || gsize_p)
-   fprintf (f, " glyph=\"%s %d\"", gtypestr, d->glyph[i].size);
+   fprintf (f, " glyph=\"%s %d\"", gtypestr, d->glyph.els[i].size);
 
 
  fprintf(f, ">\n");
@@ -311,8 +311,8 @@ updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info)
   n = GGOBI(nrecords)(d);
   for(i = 0 ; i < n ; i++) {
     colorCounts[d->color.els[i]]++;
-    glyphSizeCounts[d->glyph[i].size]++;
-    glyphTypeCounts[d->glyph[i].type]++;
+    glyphSizeCounts[d->glyph.els[i].size]++;
+    glyphTypeCounts[d->glyph.els[i].type]++;
   }
 
   count = -1;

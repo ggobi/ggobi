@@ -453,7 +453,7 @@ point_glyphs_read (InputDescription *desc, gboolean reinit,
   gboolean found = true;
   FILE *fp;
   gint gid;
-  glyphv glyph;
+  glyphd glyph;
   gboolean use_defaults = false;
 
   gchar *fileName;
@@ -545,10 +545,10 @@ point_glyphs_read (InputDescription *desc, gboolean reinit,
         break;
       }
 
-      d->glyph[i].type = d->glyph_now[i].type =
-        d->glyph_prev[i].type = glyph.type;
-      d->glyph[i].size = d->glyph_now[i].size =
-        d->glyph_prev[i].size = glyph.size;
+      d->glyph.els[i].type = d->glyph_now.els[i].type =
+        d->glyph_prev.els[i].type = glyph.type;
+      d->glyph.els[i].size = d->glyph_now.els[i].size =
+        d->glyph_prev.els[i].size = glyph.size;
 
       i++;  /* increment the array index */
       k++;  /* increment the file's row counter */

@@ -27,20 +27,17 @@
 void
 br_glyph_ids_free (datad *d, ggobid *gg)
 {
-  g_free (d->glyph);
-  g_free (d->glyph_now);
-  g_free (d->glyph_prev);
+  vectorg_free (&d->glyph);
+  vectorg_free (&d->glyph_now);
+  vectorg_free (&d->glyph_prev);
 }
 
 void
 br_glyph_ids_alloc (datad *d)
 {
-  d->glyph = (glyphv *) g_realloc (d->glyph,
-                                   d->nrows * sizeof (glyphv));
-  d->glyph_now = (glyphv *) g_realloc (d->glyph_now,
-                                       d->nrows * sizeof (glyphv));
-  d->glyph_prev = (glyphv *) g_realloc (d->glyph_prev,
-                                        d->nrows * sizeof (glyphv));
+  vectorg_alloc (&d->glyph, d->nrows);
+  vectorg_alloc (&d->glyph_now, d->nrows);
+  vectorg_alloc (&d->glyph_prev, d->nrows);
 }
 
 void
@@ -49,10 +46,10 @@ br_glyph_ids_init (datad *d, ggobid *gg)
   gint i;
 
   for (i=0; i<d->nrows; i++) {
-    d->glyph[i].type = d->glyph_now[i].type =
-      d->glyph_prev[i].type = gg->glyph_0.type;
-    d->glyph[i].size = d->glyph_now[i].size =
-      d->glyph_prev[i].size = gg->glyph_0.size;
+    d->glyph.els[i].type = d->glyph_now.els[i].type =
+      d->glyph_prev.els[i].type = gg->glyph_0.type;
+    d->glyph.els[i].size = d->glyph_now.els[i].size =
+      d->glyph_prev.els[i].size = gg->glyph_0.size;
   }
 }
 

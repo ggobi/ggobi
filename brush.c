@@ -27,15 +27,11 @@ static gboolean active_paint_edges (displayd *display, ggobid *gg);
 /*----------------------------------------------------------------------*/
 
 void
-find_glyph_type_and_size (gint gid, glyphv *glyph)
+find_glyph_type_and_size (gint gid, glyphd *glyph)
 {
-/*
-  glyph->type = ( (gid-1) / (gint) NGLYPHSIZES ) + 1 ;
-  glyph->size = ( (gid-1) % (gint) NGLYPHSIZES ) + 1 ;
-*/
 /*  gid ranges from 1:49, type from 0 to 6, size from 0 to 7
-for (i in 1:49) { cat (as.integer((i-1)/8), " ") + 1 }
-for (i in 1:49) { cat ((i-1) %% 8, " ") }
+  for (i in 1:49) { cat (as.integer((i-1)/8), " ") + 1 }
+  for (i in 1:49) { cat ((i-1) %% 8, " ") }
 */
   glyph->type = ( (gid-1) / (gint) NGLYPHSIZES ) + 1 ;
   glyph->size = ( (gid-1) % (gint) NGLYPHSIZES ) ;
@@ -97,12 +93,19 @@ brush_once (gboolean force, splotd *sp, ggobid *gg)
 void
 brush_prev_vectors_update (datad *d, ggobid *gg) {
   gint m, i;
+
+  if (d->color_prev.nels < d->nrows) {
+    vectors_realloc (&d->color_prev, d->nrows);
+    vectorb_realloc (&d->hidden_prev, d->nrows);
+    vectorg_realloc (&d->glyph_prev, d->nrows);
+  }
+
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];
     d->color_prev.els[i] = d->color.els[i];
     d->hidden_prev.els[i] = d->hidden.els[i];
-    d->glyph_prev[i].size = d->glyph[i].size;
-    d->glyph_prev[i].type = d->glyph[i].type;
+    d->glyph_prev.els[i].size = d->glyph.els[i].size;
+    d->glyph_prev.els[i].type = d->glyph.els[i].type;
   }
 }
 
@@ -113,8 +116,8 @@ brush_undo (splotd *sp, datad *d, ggobid *gg) {
     i = d->rows_in_plot[m];
     d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i];
     d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i];
-    d->glyph[i].type = d->glyph_now[i].type = d->glyph_prev[i].type;
-    d->glyph[i].size = d->glyph_now[i].size = d->glyph_prev[i].size;
+    d->glyph.els[i].type = d->glyph_now.els[i].type = d->glyph_prev.els[i].type;
+    d->glyph.els[i].size = d->glyph_now.els[i].size = d->glyph_prev.els[i].size;
   }
 }
 
@@ -141,8 +144,8 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
     for (m=0; m<d->nrows_in_plot; m++) {
       i = d->rows_in_plot[m];
       d->color_now.els[i] = d->color.els[i] ;
-      d->glyph_now[i].type = d->glyph[i].type;
-      d->glyph_now[i].size = d->glyph[i].size;
+      d->glyph_now.els[i].type = d->glyph.els[i].type;
+      d->glyph_now.els[i].size = d->glyph.els[i].size;
       d->hidden_now.els[i] = d->hidden.els[i];
     }
   }
@@ -417,17 +420,17 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   if (!changed) {
     if (hit_by_brush[i]) {
 
-      doit = (d->glyph_now[i].size != gg->glyph_id.size);
+      doit = (d->glyph_now.els[i].size != gg->glyph_id.size);
 
       /*-- ... and if not ignoring type --*/
       if (!doit && cpanel->br_target != BR_GSIZE) 
-        doit = doit || (d->glyph_now[i].type != gg->glyph_id.type);
+        doit = doit || (d->glyph_now.els[i].type != gg->glyph_id.type);
 
     } else {
 
-      doit = (d->glyph_now[i].size != d->glyph[i].size);
+      doit = (d->glyph_now.els[i].size != d->glyph.els[i].size);
       if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
-        doit = doit || (d->glyph_now[i].type != d->glyph[i].type);
+        doit = doit || (d->glyph_now.els[i].type != d->glyph.els[i].type);
     }
   }
 /* */
@@ -437,21 +440,21 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
       switch (cpanel->br_mode) {
 
         case BR_PERSISTENT:
-          d->glyph[i].size = d->glyph_now[i].size = gg->glyph_id.size;
+          d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
           if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
-            d->glyph[i].type = d->glyph_now[i].type = gg->glyph_id.type;
+            d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
         break;
 
         case BR_TRANSIENT:
-          d->glyph_now[i].size = gg->glyph_id.size;
+          d->glyph_now.els[i].size = gg->glyph_id.size;
           if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
-            d->glyph_now[i].type = gg->glyph_id.type;
+            d->glyph_now.els[i].type = gg->glyph_id.type;
         break;
       }
     } else {
-      d->glyph_now[i].size = d->glyph[i].size;
+      d->glyph_now.els[i].size = d->glyph.els[i].size;
       if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
-        d->glyph_now[i].type = d->glyph[i].type;
+        d->glyph_now.els[i].type = d->glyph.els[i].type;
     }
   }
 
