@@ -24,19 +24,19 @@ static void splot_nearest_edge_highlight (splotd *, gint, gboolean nearest, ggob
 
 static void splot_draw_tour_axes(splotd *, GdkDrawable *, ggobid *);
 
-/* colors_used now contains integers, 0:ncolors-1 */
-void
+gushort  /*-- returns the maximum color id --*/
 datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
   datad *d, ggobid *gg) 
 {
   gboolean new_color;
-  gint i, k, m;
-
-  *ncolors_used = 0;
+  gint i, k, m, n;
+  gushort colorid, maxcolorid = 0;
 
   if (d == NULL || d->nrows == 0)
-/**/return;
+/**/return -1;
           
+  n = 0;  /*-- *ncolors_used --*/
+
   /*
    * Loop once through d->color[], collecting the colors currently
    * in use into the colors_used[] vector.
@@ -47,7 +47,7 @@ datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
       new_color = false;
     } else {
       new_color = true;
-      for (k=0; k<*ncolors_used; k++) {
+      for (k=0; k<n; k++) {
         if (colors_used[k] == d->color_now.els[m]) {
           new_color = false;
           break;
@@ -55,8 +55,10 @@ datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
       }
     }
     if (new_color) {
-      colors_used[*ncolors_used] = d->color_now.els[m];
-      (*ncolors_used)++;
+      colorid = d->color_now.els[m];
+      colors_used[n] = colorid;
+      maxcolorid = MAX(colorid, maxcolorid);
+      (n)++;
     }
   }
 
@@ -65,19 +67,22 @@ datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
    * last in the list, so that it is drawn on top of
    * the pile of points.
   */
-  for (k=0; k<(*ncolors_used-1); k++) {
+  for (k=0; k<(n-1); k++) {
     if (colors_used[k] == gg->color_id) {
-      colors_used[k] = colors_used[*ncolors_used-1];
-      colors_used[*ncolors_used-1] = gg->color_id;
+      colors_used[k] = colors_used[n-1];
+      colors_used[n-1] = gg->color_id;
       break;
     }
   }
 
   /* insurance -- eg if using mono drawing on a color screen */
-  if (*ncolors_used == 0) {
-    *ncolors_used = 1;
+  if (n == 0) {
+    n = 1;
     colors_used[0] = d->color_now.els[0];
   }
+
+  *ncolors_used = n;
+  return (maxcolorid);
 }
 
 gboolean
@@ -177,6 +182,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   gboolean draw_case;
   gint dtype = display->displaytype;
   colorschemed *scheme = gg->activeColorScheme;
+  gushort maxcolorid;
 
   /*
    * since parcoords and tsplot each have their own weird way
@@ -219,8 +225,23 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   }
 
   if (!gg->mono_p && loop_over_points) {
-    datad_colors_used_get (&ncolors_used, colors_used, d, gg);
+    maxcolorid = datad_colors_used_get (&ncolors_used, colors_used, d, gg);
 
+    if (maxcolorid >= scheme->n) {
+      /* force a remapping even if the number of colors is too large */
+      if (ncolors_used > scheme->n)
+        quick_message ("The number of colors in use is greater than than\nthe number of colors in the current scheme.\nColors are being reassigned.",
+          false);
+      else
+        quick_message ("The largest color id in use is too large for\nthe number of colors in the current scheme.\nColors are being reassigned.",
+          false);
+
+      colors_remap (scheme, true, gg);
+      /* repeat to get the correct values */
+      datad_colors_used_get (&ncolors_used, colors_used, d, gg);
+    }
+
+      
     /*
      * Now loop through colors_used[], plotting the points of each
      * color.  This avoids the need to reset the foreground so often.

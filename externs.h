@@ -84,7 +84,7 @@ void       cluster_window_open (ggobid *);
 gboolean   collabels_read (InputDescription *desc, gboolean, datad *, ggobid *);
 void       collab_tform_update (gint j, datad *d, ggobid *gg);
 void       colorscheme_init (colorschemed *scheme);
-gboolean   colors_remap (colorschemed *scheme, ggobid *gg);
+gboolean   colors_remap (colorschemed *scheme, gboolean force, ggobid *gg);
 gchar*     computeTitle (gboolean, displayd *, ggobid *);
 void       copy_mat(gdouble **, gdouble **, gint, gint);
 void       cpanel_brush_init (cpaneld *, ggobid *);
@@ -132,7 +132,7 @@ GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, 
 GtkWidget* create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, GtkSignalFunc func, ggobid *);
 void       ctour_event_handlers_toggle (splotd *, gboolean);
 void       ctourpp_window_open (ggobid *);
-void       datad_colors_used_get (gint *ncolors_used, gushort *colors_used, datad *, ggobid *); 
+gushort    datad_colors_used_get (gint *ncolors_used, gushort *colors_used, datad *, ggobid *); 
 void       datad_free (datad *, ggobid *);
 datad*     datad_get_from_notebook (GtkWidget *notebook, ggobid *);
 displayd*  datad_init (datad *, ggobid *, gboolean);

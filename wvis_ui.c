@@ -671,15 +671,19 @@ selection_made_cb (GtkWidget *clist, gint row, gint column,
  * Find out whether it's possible to use the new scheme
  * without losing brushing information.  If so, go ahead
  * and change index values if that's required
+ *
+ * If force is true, remap even if the number of colors
+ * is too large.
 */
-gboolean colors_remap (colorschemed *scheme, ggobid *gg)
+/*-- move this to color.c --*/
+gboolean colors_remap (colorschemed *scheme, gboolean force, ggobid *gg)
 {
   gint i, k;
   gboolean all_colors_p[MAXNCOLORS];
   GSList *l;
   datad *d;
   gushort colors_used[MAXNCOLORS];
-  gint maxcolorindex, ncolors_used;
+  gint maxcolorid, ncolors_used;
   gboolean remap_ok = true;
 
   for (k=0; k<MAXNCOLORS; k++)
@@ -700,35 +704,51 @@ gboolean colors_remap (colorschemed *scheme, ggobid *gg)
       ncolors_used++;
 
   /*-- find the largest color index currently in use --*/
-  maxcolorindex = -1;
+  maxcolorid = -1;
   for (k=MAXNCOLORS-1; k>0; k--) {
     if (all_colors_p[k]) {
-      maxcolorindex = k;
+      maxcolorid = k;
       break;
     }
   }
 
-  if (maxcolorindex < scheme->n)
+  if (maxcolorid < scheme->n)
     /* no problem, go right ahead */
     ;
-  else if (ncolors_used > scheme->n) {
+  else if (!force && ncolors_used > scheme->n) {
+
     /* fatal: bail out with a warning */
-    quick_message ("The number of colors now in use is greater than than\nthe number of colors in the chosen color scheme.", false);
+    quick_message ("The number of colors now in use is greater than than\nthe number of colors in the chosen color scheme.",
+      false);
 
     remap_ok = false;   
-  } else if (maxcolorindex >= scheme->n && ncolors_used <= scheme->n) {
+
+  } else if (maxcolorid >= scheme->n) {
     /*-- build the vector that will be used to reset the current indices --*/
-    gint *newind = (gint *) g_malloc ((maxcolorindex+1) * sizeof (gint));
+    gint *newind = (gint *) g_malloc ((maxcolorid+1) * sizeof (gint));
     gint n = 0;
 
     /*
      * just map them into the first few colors for now.  later, might
      * want to spread the colors out.
     */
-    for (k=0; k<=maxcolorindex; k++) {
+    for (k=0; k<=maxcolorid; k++) {
       if (all_colors_p[k]) {
-        newind[k] = n;  /*-- n can not grow larger than maxcolorindex-1 --*/
-        n++;
+        newind[k] = n;  /*-- n can not grow larger than maxcolorid-1 --*/
+
+        /*
+         * do not let n grow beyond scheme->n - 1, even if it
+         * means that some clusters disappear.
+        */
+        /*n++;*/
+        /*
+         * try to achieve a decent spread of the color values,
+         * which is helpful in most color maps
+        */
+        n+= ((scheme->n+1)/ncolors_used);
+        /*-- make sure we haven't gone too far --*/
+        if (n >= scheme->n-1)  n = scheme->n-1;
+
       }
     }
 
@@ -763,7 +783,7 @@ static void scale_set_cb (GtkWidget *w, ggobid* gg)
     colorschemed *scheme = gg->wvis.scheme;
 
     /*-- if no current color index is too high, continue --*/
-    if (!colors_remap (scheme, gg))
+    if (!colors_remap (scheme, false, gg))
       return;
 
     gg->activeColorScheme = scheme;
