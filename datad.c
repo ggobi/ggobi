@@ -144,7 +144,8 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
     }
   }
 
-  varpanel_refresh (gg);
+  if (gg->current_display != NULL)
+    varpanel_refresh (gg->current_display, gg);
 
   gtk_signal_emit (GTK_OBJECT (gg->main_window),
     GGobiSignals[DATAD_ADDED_SIGNAL], d, gg); 
