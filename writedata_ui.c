@@ -86,11 +86,13 @@ static void linesp_set_cb (GtkWidget *w, gpointer cbd)
 }
 
 /*-- called when closed from the button --*/
+/*
 static void
 close_cb (GtkWidget *w) {
   gtk_widget_destroy (w);
   window = NULL;
 }
+*/
 /*-- called when closed from the window manager --*/
 static void delete_cb (GtkWidget *w, GdkEvent *event) {
   gtk_widget_destroy (window);

@@ -32,7 +32,7 @@ typedef struct {
 
 
 
-GSList *initFileTypeGroups();
+GSList *initFileTypeGroups(void);
 DataMode verifyDataMode(const char *fileName, DataMode mode, InputDescription *desc);
 DataMode guessDataMode(const char *fileName, InputDescription *desc);
 gboolean isXMLFile(const char *fileName, InputDescription *desc);

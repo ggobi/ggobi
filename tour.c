@@ -115,7 +115,7 @@ gboolean checkcolson(gfloat **ut, gint nc, gint nd) {
 
 /* checks columns of matrix are orthonormal */
 gboolean checkequiv(gfloat **u0, gfloat **u1, gint nc, gint nd) {
-  gint j, k;
+  gint j;
   gfloat tol = 0.0001;
   gboolean ok = true;
 

@@ -398,7 +398,6 @@ static void
 tsplot_rewhisker (splotd *sp, ggobid *gg) {
   gint i, k;
   displayd *display = (displayd *) sp->displayptr;
-  cpaneld *cpanel = (cpaneld *) &display->cpanel;
   datad *d = display->d;
   gboolean draw_whisker;
 

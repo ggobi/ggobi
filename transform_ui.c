@@ -15,10 +15,12 @@
 #include "vars.h"
 #include "externs.h"
 
+/*
 static void
 hide_cb (GtkWidget *w ) {
   gtk_widget_hide (w);
 }
+*/
 
 static gchar *stage0_lbl[] = {"No transformation",
                               "Raise minimum to 0",

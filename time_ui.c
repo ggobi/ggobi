@@ -65,8 +65,7 @@ static void varscale_cb (GtkWidget *w, gpointer cbd)
 
 void
 cpanel_tsplot_make (ggobid *gg) {
-  GtkWidget *vbox, *vb, *lbl, *sbar, *opt;
-  GtkObject *adj;
+  GtkWidget *vb, *lbl, *opt;
   
   gg->control_panel[TSPLOT] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[TSPLOT]), 5);

@@ -374,14 +374,12 @@ void
 varcircle_draw (gint jvar, datad *d, ggobid *gg)
 {
   gint r = VAR_CIRCLE_DIAM/2;
-  gint i;
   gint x,y;
   gboolean chosen = false;
   splotd *sp = gg->current_splot;
   displayd *display;
   cpaneld *cpanel;
   gint k, len;
-  gboolean xvar = false;
   GtkWidget *da = varcircles_get_nth (DA, jvar, d);
   GdkPixmap *da_pix;
 

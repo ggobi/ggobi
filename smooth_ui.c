@@ -46,10 +46,12 @@ width_cb (GtkAdjustment *adj, ggobid *gg) {
   g_printerr ("width %f\n", adj->value);
 }
 
+/*
 static void
 hide_cb (GtkWidget *w ) {
   gtk_widget_hide (w);
 }
+*/
 
 void
 smooth_window_open (ggobid *gg) {

@@ -39,7 +39,6 @@ cpanel_tour1d_set (cpaneld *cpanel, ggobid* gg)
   /*-- path len... --*/
 }
 
-static void tour1dadv_window_open (ggobid *gg);
 
 static void speed1d_set_cb (GtkAdjustment *adj, ggobid *gg) {
   extern void tour1d_speed_set (gint, ggobid *);
@@ -269,7 +268,7 @@ static void tour1dadv_window_open (ggobid *gg) {
     gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
     gtk_container_add (GTK_CONTAINER (window), notebook);
 
-/*-- vbox to be placed in the notebook page --*/
+    /*-- vbox to be placed in the notebook page --*/
     vbox = gtk_vbox_new (false, 2);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 4);
 

@@ -330,7 +330,7 @@ check_file_exists(const char *fileName)
 #endif
 
 GSList *
-initFileTypeGroups()
+initFileTypeGroups(void)
 {
   FileTypeGroups = g_slist_alloc();
 

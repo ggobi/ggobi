@@ -29,6 +29,7 @@ displayd *ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal);
 ggobid* ValidateGGobiRef (ggobid *gg, gboolean fatal);
 gboolean array_read (datad *, InputDescription *,  ggobid *);
 void arrayf_add_cols (array_f *, gint);
+void cpanel_tcorr_init (cpaneld *cpanel, ggobid *gg);
 void arrayf_add_rows (array_f *, gint);
 void arrayf_alloc (array_f *, gint, gint);
 void arrayf_alloc_zero (array_f *, gint, gint);
@@ -430,7 +431,7 @@ int ggobi_remove (ggobid *);
 
 
 void showInputDescription(InputDescription *desc, ggobid *gg);
-void initSessionOptions();
+void initSessionOptions(void);
 gint parse_command_line (gint *argc, gchar **av, ggobid *gg);
 #ifdef __cplusplus
 }
