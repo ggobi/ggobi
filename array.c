@@ -131,11 +131,13 @@ arrayf_delete_cols (array_f *arrp, gint nc, gint *cols)
   if (nc > 0 && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
-    for (k=0; k<nkeepers-1; k++) {
-      jto = keepers[k];
-      jfrom = keepers[k+1];
-      for (i=0; i<arrp->nrows; i++)
-        arrp->vals[i][jto] = arrp->vals[i][jto];
+    for (k=0; k<nkeepers; k++) {
+      jto = k;
+      jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
+      if (jto != jfrom) {
+        for (i=0; i<arrp->nrows; i++)
+          arrp->vals[i][jto] = arrp->vals[i][jto];
+      }
     }
 
     for (i=0; i<arrp->nrows; i++)

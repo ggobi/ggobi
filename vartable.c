@@ -157,14 +157,43 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
 void
 delete_vars (gint ncols, gint *cols, datad *d) 
 {
+  gint j, jfrom, jto;
   gint *keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
   gint nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
   g_printerr ("not yet implemented\n");
 
+  /*-- copy and reallocate the array of vartabled structures --*/
+  for (j=0; j<nkeepers; j++) {
+    jto = j;
+    jfrom = keepers[j];
+    vartable_free_var (jto, d);  /*-- free collab and collab_tform --*/
+    vartable_copy_var (jto, jfrom, d);
+  }
+  for (j=nkeepers; j<d->ncols; j++)
+    vartable_free_var (j, d);
+  vartable_realloc (nkeepers, d);
+
   /*-- delete rows from clist --*/
+  {
+    GList *l = g_list_last (GTK_CLIST (d->vartable_clist)->selection);
+    gint irow;
+    while (l) {
+      irow = GPOINTER_TO_INT (l->data);
+      gtk_clist_remove (GTK_CLIST (d->vartable_clist), irow);
+      l = l->prev;
+    }
+  }
+
   /*-- delete elements from d->vartable array --*/
 
   /*-- delete columns from pipeline arrays --*/
+/*
+  arrayf_delete_cols (&d->raw);
+  arrayf_delete_cols (&d->tform);
+  if (d->nmissing)
+    arrays_delete_cols (&d->missing);
+*/
+  /*-- reallocate the rest of the arrays and run the pipeline  --*/
 
   /*-- delete checkboxes --*/
   /*-- delete variable circles --*/
@@ -172,9 +201,6 @@ delete_vars (gint ncols, gint *cols, datad *d)
   /*-- d->ncols -= ncols; --*/
 
 /*
-        vartable_copy_var (j, k, d);
-        vartable_free_var (j);
-    vartable_realloc (ncols_new, d);
 */
 }
 
