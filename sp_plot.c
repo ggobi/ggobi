@@ -693,15 +693,24 @@ splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 /*                   line drawing routines                                */
 /*------------------------------------------------------------------------*/
 
+/*
+  In calling program:
+
+  guint *line_symbols_used[NGLYPHSIZES][NEDGETYPES][NCOLORS];
+
+  The fourth dimension of this array could be allocated:  it
+  could be used to contain the indices of the lines which belong
+  to each group.  Or, we leave it out and just use the table as
+  follows: for every non-zero cell, we have to loop once through
+  e->rows_in_plot[].
+*/
 
 void
 edges_draw (splotd *sp, ggobid *gg)
 {
-  gint j, k;
+  gint i, j, m;
+  gint k, n, p;
   gint a, b;
-  gushort current_color;
-  gushort colors_used[NCOLORS+2];
-  gint ncolors_used = 0;
   gboolean doit;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
@@ -709,6 +718,7 @@ edges_draw (splotd *sp, ggobid *gg)
   endpointsd *endpoints;
   gboolean edges_show_p, arrowheads_show_p;
   gint nels = d->rowid.idv.nels;
+  gint ltype, gtype;
 
   if (e == (datad *) NULL || e->edge.n == 0) {
 /**/return;
@@ -724,78 +734,158 @@ edges_draw (splotd *sp, ggobid *gg)
                        display->options.edges_arrowheads_show_p);
   if (!gg->mono_p && (edges_show_p || arrowheads_show_p)) {
 
-    splot_colors_used_get (sp, &ncolors_used, colors_used, e, gg);
+    gint symbols_used[NGLYPHSIZES][NEDGETYPES][NCOLORS];
+    gint nl = 0;
+    gint ncolors = MIN(NCOLORS, gg->ncolors);
+    gint k_prev = -1, n_prev = -1, p_prev = -1;
+
+    endpoints = e->edge.endpoints;
+
+    for (k=0; k<NGLYPHSIZES; k++)
+      for (n=0; n<NEDGETYPES; n++)
+        for (p=0; p<ncolors; p++)
+          symbols_used[k][n][p] = 0;
 
     /*
-     * Now loop through colors_used[], plotting the glyphs of each
-     * color in a group.
+     * Use e->color_now[] and e->glyph_now[] to work out which
+     * line symbols should be drawn
     */
-    endpoints = e->edge.endpoints;
-    for (k=0; k<ncolors_used; k++) {
-      gint nl = 0;
-      current_color = colors_used[k];
+    for (i=0; i<e->nrows_in_plot; i++) {
+      m = e->rows_in_plot[i];
+      if (!e->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
+        gtype = e->glyph_now.els[m].type;
+        if (gtype == FILLED_CIRCLE || gtype == FILLED_RECTANGLE)
+          ltype = SOLID;
+        else if (gtype == OPEN_CIRCLE || gtype == OPEN_RECTANGLE)
+          ltype = WIDE_DASH;
+        else ltype = NARROW_DASH;
 
-      for (j=0; j<e->edge.n; j++) {
-        if (e->hidden_now.els[j]) {
-          doit = false;
-        } else {
-          if (endpoints[j].a >= nels || endpoints[j].b >= nels) {
-            doit = false;
-            break;
-          }
-          a = d->rowid.idv.els[endpoints[j].a];
-          b = d->rowid.idv.els[endpoints[j].b];
+        symbols_used[e->glyph_now.els[m].size][ltype][e->color_now.els[m]]++;
+      }
+    }
 
-          doit = (!d->hidden_now.els[a] && !d->hidden_now.els[b]);
 
-        /* If not plotting imputed values, and one is missing, skip it */
+    for (k=0; k<NGLYPHSIZES; k++) {
+      for (n=0; n<NEDGETYPES; n++) {
+        for (p=0; p<ncolors; p++) {
+          if (symbols_used[k][n][p]) {
+
+            /*
+             * Now work through through symbols_used[], plotting the edges
+             * of each color and type in a group.
+            */
+            nl = 0;
+            doit = true;
+
+            for (j=0; j<e->edge.n; j++) {
+              if (e->hidden_now.els[j]) {
+                doit = false;
+              } else if (endpoints[j].a >= nels || endpoints[j].b >= nels) {
+                doit = false;
+              }
+
+              if (doit) {
+                a = d->rowid.idv.els[endpoints[j].a];
+                b = d->rowid.idv.els[endpoints[j].b];
+                doit = (!d->hidden_now.els[a] && !d->hidden_now.els[b]);
+
+                /* If not plotting imputed values, and one is
+                 * missing, skip it */
 /*
           if (!plot_imputed_values && plotted_var_missing(from, to, gg))
             doit = false;
 */
-        }
+              }
 
-        if (doit) {
-          if (e->color_now.els[j] == current_color) {
+              if (doit) {
+
+                gtype = e->glyph_now.els[j].type;
+                if (gtype == FILLED_CIRCLE || gtype == FILLED_RECTANGLE)
+                  ltype = SOLID;
+                else if (gtype == OPEN_CIRCLE || gtype == OPEN_RECTANGLE)
+                  ltype = WIDE_DASH;
+                else ltype = NARROW_DASH;
+
+                if (e->color_now.els[j] == p &&
+                    ltype == n &&
+                    e->glyph_now.els[j].size == k)
+                {
+
+                  if (edges_show_p) {
+                    sp->edges[nl].x1 = sp->screen[a].x;
+                    sp->edges[nl].y1 = sp->screen[a].y;
+                    sp->edges[nl].x2 = sp->screen[b].x;
+                    sp->edges[nl].y2 = sp->screen[b].y;
+                  }
+
+                  if (arrowheads_show_p) {
+                    /*
+                     * Add thick piece of the lines to suggest a
+                     * directional arrow
+                    */
+                    sp->arrowheads[nl].x1 =
+                      (gint) (.2*sp->screen[a].x + .8*sp->screen[b].x);
+                    sp->arrowheads[nl].y1 =
+                      (gint) (.2*sp->screen[a].y + .8*sp->screen[b].y);
+                    sp->arrowheads[nl].x2 = sp->screen[b].x;
+                    sp->arrowheads[nl].y2 = sp->screen[b].y;
+                  }
+                  nl++;
+                }
+              }
+            }  /*-- end of looping through edges --*/
 
             if (edges_show_p) {
-              sp->edges[nl].x1 = sp->screen[a].x;
-              sp->edges[nl].y1 = sp->screen[a].y;
-              sp->edges[nl].x2 = sp->screen[b].x;
-              sp->edges[nl].y2 = sp->screen[b].y;
+              gint lwidth = (k<3) ? 0 : (k-2)*2;
+              gchar dash_list[2];
+              gint ltype;
+
+              if (n_prev == -1 || n_prev != n) {  /* type */
+                switch (n) {
+                  case SOLID:
+                    ltype = GDK_LINE_SOLID;
+                  break;
+                  case WIDE_DASH:
+                    ltype = GDK_LINE_ON_OFF_DASH;
+                    dash_list[0] = 8;
+                    dash_list[1] = 2;
+                    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+                  break;
+                  case NARROW_DASH:
+                    ltype = GDK_LINE_ON_OFF_DASH;
+                    dash_list[0] = 4;
+                    dash_list[1] = 2;
+                    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+                  break;
+                }
+              }
+              if (k_prev == -1 || k_prev != i || n_prev == -1 || n_prev != n) {
+                gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
+                  ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
+              }
+              if (p_prev == -1 || p_prev != p) {  /* color */
+                gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[p]);
+              }
+
+              gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->edges, nl);
+
+              k_prev = k; n_prev = n; p_prev = p;
             }
 
             if (arrowheads_show_p) {
-              /*
-               * Add thick piece of the lines to suggest a directional arrow
-              */
-              sp->arrowheads[nl].x1 =
-                (gint) (.2*sp->screen[a].x + .8*sp->screen[b].x);
-              sp->arrowheads[nl].y1 =
-                (gint) (.2*sp->screen[a].y + .8*sp->screen[b].y);
-              sp->arrowheads[nl].x2 = sp->screen[b].x;
-              sp->arrowheads[nl].y2 = sp->screen[b].y;
+              gdk_gc_set_line_attributes (gg->plot_GC,
+                3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+              gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->arrowheads, nl);
+              gdk_gc_set_line_attributes (gg->plot_GC,
+                0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
             }
-            nl++;
-          }  /*-- end if ... == current_color --*/
+          }
         }
-      }
-      if (!gg->mono_p)
-        gdk_gc_set_foreground (gg->plot_GC,
-          &gg->color_table[current_color]);
-
-      if (edges_show_p)
-        gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->edges, nl);
-
-      if (arrowheads_show_p) {
-        gdk_gc_set_line_attributes (gg->plot_GC,
-          3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-        gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->arrowheads, nl);
-        gdk_gc_set_line_attributes (gg->plot_GC,
-          0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
       }
     }
   }
+  gdk_gc_set_line_attributes (gg->plot_GC,
+    0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 }
 
 void

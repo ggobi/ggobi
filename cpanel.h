@@ -48,7 +48,10 @@ typedef struct {
 
  /*-- brushing --*/
  gboolean brush_on_p;
- gint br_mode, br_scope, br_target;
+ gint br_mode;
+ /*gint br_scope, br_target;*/
+ gint br_point_targets, br_edge_targets;
+
 
  /*-- scaling --*/
  gint scale_style;       /* DRAG or CLICK */

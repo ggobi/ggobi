@@ -35,8 +35,8 @@ gboolean read_input(InputDescription *desc, ggobid *gg);
 void globals_init (ggobid *gg) {
   gg->glyph_id.type = gg->glyph_0.type = FILLED_CIRCLE;
   gg->glyph_id.size = gg->glyph_0.size = 3;
-  gg->color_id = 0;
-  gg->color_0 = 4;
+  gg->color_0 = 0;
+  gg->color_id = 1;
 
   gg->lims_use_visible = true;
   gg->buttondown = 0;  /*-- no button is pressed --*/

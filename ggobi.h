@@ -156,7 +156,7 @@ struct _ggobid {
 
  struct _Color_UI {
    GtkWidget *symbol_window;
-   GtkWidget *symbol_display;
+   GtkWidget *symbol_display, *line_display;
 
    GtkWidget *colorseldlg;
    GtkWidget *bg_da, *accent_da, *fg_da[NCOLORS], *current_da;

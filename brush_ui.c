@@ -41,9 +41,9 @@ static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)
   datad *d = display->d;
   datad *e = display->e;
 
-  if (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDE)
+  if (cpanel->br_point_targets)
     brush_undo (sp, d, gg);
-  if (cpanel->br_scope == BR_EDGES || cpanel->br_scope == BR_PANDE)
+  if (cpanel->br_edge_targets)
     brush_undo (sp, e, gg);
 
   /*-- when rows_in_plot changes ... --*/
@@ -58,6 +58,7 @@ static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)
   displays_plot (NULL, FULL, gg);
 }
 
+/*
 void
 brush_scope_set (gint br_scope, datad *d, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -66,7 +67,9 @@ brush_scope_set (gint br_scope, datad *d, ggobid *gg) {
   cpanel->br_scope = br_scope;
   splot_redraw (sp, QUICK, gg);  
 }
+*/
 
+/*
 static gchar *scope_lbl[] = {"Points", "Edges", "Points and edges"};
 static void brush_scope_set_cb (GtkWidget *w, gpointer cbd)
 {
@@ -74,15 +77,29 @@ static void brush_scope_set_cb (GtkWidget *w, gpointer cbd)
   datad *d = gg->current_display->d;
   brush_scope_set (GPOINTER_TO_INT (cbd), d, gg);
 }
+*/
 
-static gchar *cg_lbl[] =
-  {"Color and glyph", "Color only", "Glyph only", "Glyph size only", "Hide"};
-static void brush_cg_cb (GtkWidget *w, gpointer cbd)
+static gchar *point_targets_lbl[] =
+  {"Off", "Color and glyph", "Color only", "Glyph only", "Glyph size only", "Hide"};
+static void brush_point_targets_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->br_target = GPOINTER_TO_INT (cbd);
+  cpanel->br_point_targets = GPOINTER_TO_INT (cbd);
+  splot_redraw (gg->current_splot, QUICK, gg);
 }
+
+/*-- new, for edges --*/
+static gchar *edge_targets_lbl[] =
+  {"Off", "Color and line", "Color only", "Line only", "Line width only", "Hide"};
+static void brush_edge_targets_cb (GtkWidget *w, gpointer cbd)
+{
+  ggobid *gg = GGobiFromWidget(w, true);
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  cpanel->br_edge_targets = GPOINTER_TO_INT (cbd);
+  splot_redraw (gg->current_splot, QUICK, gg);
+}
+/*-- --*/
 
 static gchar *mode_lbl[] = {"Persistent", "Transient"};
 static void brush_mode_cb (GtkWidget *w, gpointer cbd)
@@ -122,11 +139,6 @@ brush_reset_cb (GtkWidget *w, gpointer cbd)
   brush_reset(gg, action);
 }
 
-/*
-  Now this is separated into a separate routine
- that can be called programmatically rather than just
- from the callback above (brush_reset_cb).
- */
 void
 brush_reset(ggobid *gg, gint action)
 {
@@ -322,7 +334,8 @@ brush_event_handlers_toggle (splotd *sp, gboolean state) {
 void
 cpanel_brush_make (ggobid *gg) {
   GtkWidget *btn;
-  GtkWidget *mode_option_menu, *scope_option_menu, *target_option_menu;
+  GtkWidget *mode_option_menu, *targets_option_menu;
+  GtkWidget *vb, *lbl;
   
   gg->control_panel[BRUSH] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[BRUSH]), 5);
@@ -338,7 +351,6 @@ cpanel_brush_make (ggobid *gg) {
 
 /*
  * make an option menu for setting the brushing mode
-*/
   scope_option_menu = gtk_option_menu_new ();
   gtk_widget_set_name (scope_option_menu, "BRUSH:scope_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), scope_option_menu,
@@ -348,23 +360,57 @@ cpanel_brush_make (ggobid *gg) {
   populate_option_menu (scope_option_menu, scope_lbl,
                         sizeof (scope_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) brush_scope_set_cb, gg);
+*/
   /*-- initial value: points only --*/
+/*
   gtk_option_menu_set_history (GTK_OPTION_MENU (scope_option_menu), 0); 
+*/
   
 /*
  * option menu for specifying whether to brush with color/glyph/both
 */
-  target_option_menu = gtk_option_menu_new ();
-  gtk_widget_set_name (target_option_menu, "BRUSH:target_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), target_option_menu,
-    "Brush with color and glyph, color, glyph, glyph size; or hide", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      target_option_menu, false, false, 0);
-  populate_option_menu (target_option_menu, cg_lbl,
-                        sizeof (cg_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) brush_cg_cb, gg);
+  vb = gtk_vbox_new (false, 0);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]), vb,
+    false, false, 0);
+
+  lbl = gtk_label_new ("Point brushing:");
+  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+  gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
+
+  targets_option_menu = gtk_option_menu_new ();
+  gtk_widget_set_name (targets_option_menu, "BRUSH:point_targets_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), targets_option_menu,
+    "Brushing points: what characteristics, if any, should respond?", NULL);
+  gtk_box_pack_start (GTK_BOX (vb),
+                      targets_option_menu, false, false, 0);
+  populate_option_menu (targets_option_menu, point_targets_lbl,
+                        sizeof (point_targets_lbl) / sizeof (gchar *),
+                        (GtkSignalFunc) brush_point_targets_cb, gg);
   /*-- initial value: both --*/
-  gtk_option_menu_set_history (GTK_OPTION_MENU (target_option_menu), 0);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (targets_option_menu), 1);
+
+
+/*-- new, for edges --*/
+  vb = gtk_vbox_new (false, 0);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]), vb,
+    false, false, 0);
+
+  lbl = gtk_label_new ("Edge brushing:");
+  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+  gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
+
+  targets_option_menu = gtk_option_menu_new ();
+  gtk_widget_set_name (targets_option_menu, "BRUSH:edge_targets_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), targets_option_menu,
+    "Brushing edges: what characteristics, if any, should respond?", NULL);
+  gtk_box_pack_start (GTK_BOX (vb),
+                      targets_option_menu, false, false, 0);
+  populate_option_menu (targets_option_menu, edge_targets_lbl,
+                        sizeof (edge_targets_lbl) / sizeof (gchar *),
+                        (GtkSignalFunc) brush_edge_targets_cb, gg);
+  /*-- initial value: off --*/
+  gtk_option_menu_set_history (GTK_OPTION_MENU (targets_option_menu), 0);
+
 
 /*
  * option menu for setting the brushing persistence
@@ -429,14 +475,17 @@ cpanel_brush_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->brush_on_p = true;
 
   cpanel->br_mode = BR_TRANSIENT;
-  cpanel->br_target = BR_CANDG;  /* color and glyph */
-  cpanel->br_scope = BR_POINTS;
+
+  /*-- point brushing on, edge brushing off --*/
+  cpanel->br_point_targets = BR_CANDG;
+  cpanel->br_edge_targets = BR_OFF;
 }
 
 void
 cpanel_brush_set (cpaneld *cpanel, ggobid *gg) {
   GtkWidget *btn;
-  GtkWidget *mode_option_menu, *scope_option_menu, *target_option_menu;
+  GtkWidget *mode_option_menu;
+  GtkWidget *edge_targets_option_menu, *point_targets_option_menu;
 
   btn = widget_find_by_name (gg->control_panel[BRUSH],
                              "BRUSH:brush_on_button");
@@ -444,17 +493,25 @@ cpanel_brush_set (cpaneld *cpanel, ggobid *gg) {
 
   mode_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
                                           "BRUSH:mode_option_menu");
+/*
   scope_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
                                           "BRUSH:scope_option_menu");
-  target_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
-                                          "BRUSH:target_option_menu");
+*/
+  point_targets_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
+    "BRUSH:point_targets_option_menu");
+  edge_targets_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
+    "BRUSH:edge_targets_option_menu");
 
   gtk_option_menu_set_history (GTK_OPTION_MENU (mode_option_menu),
                                cpanel->br_mode);
+/*
   gtk_option_menu_set_history (GTK_OPTION_MENU (scope_option_menu),
                                cpanel->br_scope);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (target_option_menu),
-                               cpanel->br_target);
+*/
+  gtk_option_menu_set_history (GTK_OPTION_MENU (point_targets_option_menu),
+                               cpanel->br_point_targets);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (edge_targets_option_menu),
+                               cpanel->br_edge_targets);
 }
 
 /*--------------------------------------------------------------------*/

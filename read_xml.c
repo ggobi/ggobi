@@ -979,12 +979,17 @@ setColorMap(const CHAR **attrs, XMLParserData *data)
    }
  }
 
+ /*
+  * This appends the colors, but I don't want to allow more than
+  * NCOLORS colors no matter what the user asks for, so I'll be
+  * ignoring some of the colors in the set.  -- dfs
+ */
  if(size > 0 || file) {
   ggobid *gg = data->gg;
   if(file) {
-    gg->ncolors +=  size;
+    gg->ncolors += size;
     gg->color_table = (GdkColor *)
-      g_realloc (gg->color_table , gg->ncolors * sizeof (GdkColor));
+      g_realloc (gg->color_table, gg->ncolors * sizeof (GdkColor));
     gg->colorNames = (gchar **)
       g_realloc (gg->colorNames, gg->ncolors * sizeof (gchar *));
     memset(gg->colorNames + (gg->ncolors-size), '\0', size*sizeof(gchar *));
@@ -1111,27 +1116,27 @@ xmlParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
  tmp1 = find_xml_file(fileName, tmp, data->gg);
 
  if(tmp1) {
-  ctx  = xmlCreateFileParserCtxt(tmp1);
+   ctx  = xmlCreateFileParserCtxt(tmp1);
 
-  if(ctx == NULL)
-   return(false);
+   if(ctx == NULL)
+     return(false);
 
-  ctx->userData = data;
-  ctx->sax = data->handlers;
-  data->reading_colormap_file_p = true;
+   ctx->userData = data;
+   ctx->sax = data->handlers;
+   data->reading_colormap_file_p = true;
 
-  xmlParseDocument(ctx);
+   xmlParseDocument(ctx);
 
-  ctx->sax = NULL;
-  xmlFreeParserCtxt(ctx);
+   ctx->sax = NULL;
+   xmlFreeParserCtxt(ctx);
 
-  data->reading_colormap_file_p = false;
+   data->reading_colormap_file_p = false;
 
-  addInputFile(data->input, tmp1);
-  g_free(tmp1);
+   addInputFile(data->input, tmp1);
+   g_free(tmp1);
  }
 
-  g_free(tmp);
+ g_free(tmp);
 
  return(size == data->gg->ncolors);
 }

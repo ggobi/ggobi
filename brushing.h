@@ -31,30 +31,28 @@
 
 #define NCOLORS 10
 
-
-/*
- * brushing
-*/
-/* br_scope */
-#define BR_POINTS 0
-#define BR_EDGES  1
-#define BR_PANDE  2  /* points and edges */
 /* br_mode */
 #define BR_PERSISTENT 0
 #define BR_TRANSIENT  1
-/* br_target */
-#define BR_CANDG 0  /* color and glyph */
-#define BR_COLOR 1
-#define BR_GLYPH 2  /*-- glyph type and size --*/
-#define BR_GSIZE 3  /*-- glyph size only --*/
-#define BR_HIDE  4
+/* br_point_targets and br_edge_targets */
+#define BR_OFF   0  /* don't respond */
+#define BR_CANDG 1  /* color and glyph (point or edge glyph) */
+#define BR_COLOR 2
+#define BR_GLYPH 3  /*-- glyph type and size --*/
+#define BR_GSIZE 4  /*-- glyph size only --*/
+#define BR_HIDE  5
 /* for binning the screen */
 #define BRUSH_NBINS  20
 #define BRUSH_MARGIN 10
 #define BINBLOCKSIZE 50
 /* */
 
-typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT,UNKNOWN_GLYPH} GlyphType;
+typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT, UNKNOWN_GLYPH} GlyphType;
+
+/*-- for edge brushing:  all sizes, 3 types for now --*/
+#define NEDGETYPES 3
+typedef enum {SOLID, WIDE_DASH, NARROW_DASH} EdgeType;
+/*-- --*/
 
 typedef enum { RESET_UNHIDE_POINTS, RESET_POINT_COLORS, RESET_GLYPHS, 
                RESET_UNHIDE_EDGES, RESET_EDGES, RESET_INIT_BRUSH} BrushReset;

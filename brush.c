@@ -78,11 +78,11 @@ brush_once (gboolean force, splotd *sp, ggobid *gg)
 /*
  * Now paint.
 */
-  if (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDE) {
+  if (cpanel->br_point_targets) {
     changed = active_paint_points (d, gg);
   }
 
-  if (cpanel->br_scope == BR_EDGES || cpanel->br_scope == BR_PANDE) {
+  if (cpanel->br_edge_targets) {
     if (e != NULL)
       changed = active_paint_edges (display, gg);
   }
@@ -135,10 +135,8 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
   datad *d = dsp->d;
   datad *e = dsp->e;
   cpaneld *cpanel = &dsp->cpanel;
-  gboolean point_painting_p =
-     (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDE);
-  gboolean edge_painting_p =
-     (cpanel->br_scope == BR_EDGES || cpanel->br_scope == BR_PANDE);
+  gboolean point_painting_p = (cpanel->br_point_targets != BR_OFF);
+  gboolean edge_painting_p = (cpanel->br_edge_targets != BR_OFF);
 
   if (point_painting_p) {
     for (m=0; m<d->nrows_in_plot; m++) {
@@ -340,10 +338,8 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
  * Use brush_pos to draw the brush.
 */
   cpaneld *cpanel = &gg->current_display->cpanel;
-  gboolean point_painting_p =
-     (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDE);
-  gboolean edge_painting_p =
-     (cpanel->br_scope == BR_EDGES || cpanel->br_scope == BR_PANDE);
+  gboolean point_painting_p = (cpanel->br_point_targets != BR_OFF);
+  gboolean edge_painting_p = (cpanel->br_edge_targets != BR_OFF);
 
   brush_coords *brush_pos = &sp->brush_pos;
   gint x1 = MIN (brush_pos->x1, brush_pos->x2);
@@ -423,13 +419,14 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
       doit = (d->glyph_now.els[i].size != gg->glyph_id.size);
 
       /*-- ... and if not ignoring type --*/
-      if (!doit && cpanel->br_target != BR_GSIZE) 
+      if (!doit && cpanel->br_point_targets != BR_GSIZE) 
         doit = doit || (d->glyph_now.els[i].type != gg->glyph_id.type);
 
     } else {
 
       doit = (d->glyph_now.els[i].size != d->glyph.els[i].size);
-      if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
+      /*-- ... if not ignoring type --*/
+      if (cpanel->br_point_targets != BR_GSIZE) 
         doit = doit || (d->glyph_now.els[i].type != d->glyph.els[i].type);
     }
   }
@@ -441,19 +438,22 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 
         case BR_PERSISTENT:
           d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
-          if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
+          /*-- ... if not ignoring type --*/
+          if (cpanel->br_point_targets != BR_GSIZE) 
             d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
         break;
 
         case BR_TRANSIENT:
           d->glyph_now.els[i].size = gg->glyph_id.size;
-          if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
+          /*-- ... if not ignoring type --*/
+          if (cpanel->br_point_targets != BR_GSIZE) 
             d->glyph_now.els[i].type = gg->glyph_id.type;
         break;
       }
     } else {
       d->glyph_now.els[i].size = d->glyph.els[i].size;
-      if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
+      /*-- ... if not ignoring type --*/
+      if (cpanel->br_point_targets != BR_GSIZE) 
         d->glyph_now.els[i].type = d->glyph.els[i].type;
     }
   }
@@ -578,12 +578,15 @@ build_color_vectors (datad *d, ggobid *gg)
 
         /* update the color vectors for every member of the row group */
         if (d->nrgroups > 0) {
+/*  Isn't this redundant?  If pts_under_brush is including the rgroup
+    information, then why does it need to be included again here?
           gp = d->rgroup_ids[k];
           for (n=0; n<d->rgroups[gp].nels; n++) {
             p = d->rgroups[gp].els[n];
             changed = update_color_vectors (p, changed,
               d->pts_under_brush.els, d, gg);
           }
+*/
         /* */
 
         } else {  /* update the vectors for this point only */
@@ -750,7 +753,7 @@ active_paint_points (datad *d, ggobid *gg)
   changed = false;
 
   if (cpanel->brush_on_p) {
-    switch (cpanel->br_target) {
+    switch (cpanel->br_point_targets) {
       case BR_CANDG:  /*-- color and glyph --*/
         if (build_color_vectors (d, gg)) changed = true;
         if (build_glyph_vectors (d, gg)) changed = true;
@@ -766,6 +769,9 @@ active_paint_points (datad *d, ggobid *gg)
       break;
       case BR_HIDE:  /*-- hidden --*/
         if (build_hidden_vectors (d, gg)) changed = true;
+      break;
+      case BR_OFF:
+        ;
       break;
     }
   }
@@ -835,6 +841,7 @@ build_edge_color_vectors (datad *e, ggobid *gg)
 {
   gint i, k;
   gboolean changed = false;
+  gint n, p, gp;
 
   if (e->nrgroups > 0) {
 
@@ -842,7 +849,6 @@ build_edge_color_vectors (datad *e, ggobid *gg)
 
     /* update the edge color vectors for every member of the edge group */
 /*
-      gint n, p, gp;
       gp = e->rgroup_ids[k];
       for (n=0; n<e->rgroups[gp].nels; n++) {
         p = e->rgroups[gp].els[n];
@@ -864,6 +870,20 @@ build_edge_color_vectors (datad *e, ggobid *gg)
   return (changed);
 }
 
+static gboolean
+build_edge_type_vectors (datad *e, ggobid *gg)
+{
+  gint i;
+  gboolean changed = false;
+
+  /*-- make no special accommodation for groups until I know I need it --*/
+  for (i=0; i<e->edge.n; i++) {
+    changed = update_glyph_vectors (i, changed, e->edge.xed_by_brush.els,
+      e, gg);
+  }
+
+  return (changed);
+}
 
 static gboolean
 build_edge_hidden_vectors (datad *e, ggobid *gg)
@@ -899,7 +919,7 @@ static gboolean
 active_paint_edges (displayd *display, ggobid *gg)
 {
   datad *e = display->e;
-  gint k;
+  gint k, n, gp, pt;
   gboolean changed;
   cpaneld *cpanel = &gg->current_display->cpanel;
 
@@ -915,17 +935,13 @@ active_paint_edges (displayd *display, ggobid *gg)
       e->edge.nxed_by_brush++ ;
       e->edge.xed_by_brush.els[k] = true;
 
-      /* brush other members of this edge group */
-      if (e->nrgroups > 0) {
-/*
-        gint p, gp;
-        gp = e->rgroup_ids[k];
-        if (gp < e->nrgroups) {
-          for (p=0; p<e->rgroups[gp].nels; p++) {
-              e->edge.xed_by_brush.els[e->rgroups[gp].els[p]] = 1;
+      if (e->nrgroups > 0) {  /*-- untested --*/
+        gp = e->rgroup_ids[pt];
+        if (gp < e->nrgroups) {  /* exclude points without an rgroup */
+          for (n=0; n<e->rgroups[gp].nels; n++) {
+              e->pts_under_brush.els[e->rgroups[gp].els[n]] = 1;
           }
         }
-*/
       }
       /* */
     }
@@ -933,15 +949,26 @@ active_paint_edges (displayd *display, ggobid *gg)
   changed = false;
 
   if (cpanel->brush_on_p) {
-    switch (cpanel->br_target) {
+    switch (cpanel->br_edge_targets) {
       case BR_CANDG:  /*-- color and glyph --*/
+        if (build_edge_type_vectors (e, gg)) changed = true;
+        if (build_edge_color_vectors (e, gg)) changed = true;
+      break;
       case BR_COLOR:  /*-- color --*/
-        if (build_edge_color_vectors (e, gg))
-          changed = true;
-        break;
+        if (build_edge_color_vectors (e, gg)) changed = true;
+      break;
       case BR_HIDE:  /*-- hidden --*/
         if (build_edge_hidden_vectors (e, gg)) changed = true;
-        break;
+      break;
+      case BR_GLYPH:  /*-- line width and line type --*/
+        if (build_edge_type_vectors (e, gg)) changed = true;
+      break;
+      case BR_GSIZE:  /*-- line width only --*/
+        if (build_edge_type_vectors (e, gg)) changed = true;
+      break;
+      case BR_OFF:
+        ;
+      break;
     }
   }
 
