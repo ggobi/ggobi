@@ -22,12 +22,9 @@ cpanel_scale_init (cpaneld *cpanel, ggobid *gg) {
 
 /*
  * Activated from the Reset menu in the main menubar
-
- Changed the user data type to gg as the "shift" string was
- not being used.
 */
 void
-reset_pan_cb (GtkWidget *w, ggobid *gg) {
+scale_pan_reset (ggobid *gg) {
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
@@ -39,7 +36,12 @@ reset_pan_cb (GtkWidget *w, ggobid *gg) {
   splot_redraw (sp, FULL, gg);
 }
 void
-reset_zoom_cb (GtkWidget *w, ggobid *gg) {
+pan_reset_cb (GtkWidget *w, ggobid *gg) {
+  scale_pan_reset (gg);
+}
+
+void
+scale_zoom_reset (ggobid *gg) {
   gint projection = projection_get (gg);
   splotd *sp = gg->current_splot;
   displayd *dsp = (displayd *) sp->displayptr;
@@ -53,16 +55,21 @@ reset_zoom_cb (GtkWidget *w, ggobid *gg) {
   ruler_ranges_set (dsp, sp, gg);
   splot_redraw (sp, FULL, gg);
 }
+void
+zoom_reset_cb (GtkWidget *w, ggobid *gg) {
+  scale_zoom_reset (gg);
+}
+
+/*--------------------------------------------------------------------*/
+/*           Resetting various state variables                        */
+/*--------------------------------------------------------------------*/
 
 void
-interaction_style_cb (GtkToggleButton *w, ggobid *gg) 
-{
+scale_interaction_style_set (gint style, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean click_p;
-/*
- * This is connected to the Drag button
-*/
-  cpanel->scale_style = (w->active) ? DRAG : CLICK;
+
+  cpanel->scale_style = style;  /*-- DRAG or CLICK --*/
   click_p = (cpanel->scale_style == CLICK);
 
 /*
@@ -75,42 +82,61 @@ interaction_style_cb (GtkToggleButton *w, ggobid *gg)
 
   splot_redraw (gg->current_splot, QUICK, gg);
 }
-
-static void clickoptions_cb (GtkToggleButton *w, ggobid *gg)
+void
+interaction_style_cb (GtkToggleButton *w, ggobid *gg) 
 {
+/*
+ * This is connected to the Drag button
+*/
+  gint scale_style = (w->active) ? DRAG : CLICK;
+  scale_interaction_style_set (scale_style, gg);
+}
+
+void scale_clickoptions_set (gint click_opt, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
-  cpanel->scale_click_opt = (w->active) ? PAN : ZOOM;
+  cpanel->scale_click_opt = click_opt;
   g_printerr ("in interaction_style_cb: %s\n",
     (cpanel->scale_click_opt == PAN) ? "PAN" : "ZOOM");
 
   splot_redraw (gg->current_splot, QUICK, gg);
 }
+static void clickoptions_cb (GtkToggleButton *w, ggobid *gg)
+{
+  gint scale_click_opt = (w->active) ? PAN : ZOOM;
+  scale_clickoptions_set (scale_click_opt, gg);
+}
 
-static gchar *panoptions_lbl[] = {"Oblique",
-                                  "Horiz only",
-                                  "Vert only"};
+static gchar *panoptions_lbl[] = {"Oblique", "Horiz only", "Vert only"};
+void panoptions_set (gint pan_opt, ggobid *gg) {
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  cpanel->scale_pan_opt = pan_opt;
+}
 static void panoptions_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
-  cpaneld *cpanel = &gg->current_display->cpanel;
+  gint pan_opt = GPOINTER_TO_INT (cbd);
+  g_printerr ("cbd: %s\n", panoptions_lbl[pan_opt]);
 
-  cpanel->scale_pan_opt = GPOINTER_TO_INT (cbd);
-  g_printerr ("cbd: %s\n", panoptions_lbl[cpanel->scale_pan_opt]);
+  panoptions_set (pan_opt, gg);
 }
 static gchar *zoomoptions_lbl[] = {"Oblique",
                                    "Fixed aspect",
                                    "Horiz only",
                                    "Vert only"};
+void zoomoptions_set (gint zoom_opt, ggobid *gg) {
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  cpanel->scale_zoom_opt = zoom_opt;
+
+  splot_redraw (gg->current_splot, QUICK, gg);
+}
 static void zoomoptions_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
-  cpaneld *cpanel = &gg->current_display->cpanel;
+  gint zoom_opt = GPOINTER_TO_INT (cbd);
+  zoomoptions_set (zoom_opt, gg);
 
-  cpanel->scale_zoom_opt = GPOINTER_TO_INT (cbd);
-
-  g_printerr ("cbd: %s\n", zoomoptions_lbl[cpanel->scale_zoom_opt]);
-  splot_redraw (gg->current_splot, QUICK, gg);
+  g_printerr ("cbd: %s\n", zoomoptions_lbl[zoom_opt]);
 }
 
 /*--------------------------------------------------------------------*/
@@ -280,13 +306,13 @@ scale_menus_make (ggobid *gg) {
 
   item = gtk_menu_item_new_with_label ("Reset pan");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (reset_pan_cb),
+                      GTK_SIGNAL_FUNC (pan_reset_cb),
                       (gpointer) gg);
   gtk_menu_append (GTK_MENU (gg->scale.scale_reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset zoom");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (reset_zoom_cb),
+                      GTK_SIGNAL_FUNC (zoom_reset_cb),
                       (gpointer) gg);
   gtk_menu_append (GTK_MENU (gg->scale.scale_reset_menu), item);
 
