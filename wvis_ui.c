@@ -603,65 +603,66 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     GtkStyle *style = gtk_widget_get_style (da);
 
     vt = vartable_element_get (selected_var, d);
-    min = vt->lim_tform.min;
-    max = vt->lim_tform.max;
+    if (vt) {
+      min = vt->lim_tform.min;
+      max = vt->lim_tform.max;
 
-    gdk_gc_set_foreground (gg->wvis.GC, &scheme->rgb_accent);
-    y = ymargin;
-    for (k=0; k<scheme->n-1; k++) {
+      gdk_gc_set_foreground (gg->wvis.GC, &scheme->rgb_accent);
+      y = ymargin;
+      for (k=0; k<scheme->n-1; k++) {
 
-      val = min + gg->wvis.pct[k] * (max - min);
-      str = g_strdup_printf ("%3.3g", val);
-      gdk_text_extents (
+        val = min + gg->wvis.pct[k] * (max - min);
+        str = g_strdup_printf ("%3.3g", val);
+        gdk_text_extents (
 #if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
+          gtk_style_get_font (style),
 #else
-        style->font,
+          style->font,
 #endif
-        str, strlen(str),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-      x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-      gdk_draw_string (pix,
+          str, strlen(str),
+          &lbearing, &rbearing, &width, &ascent, &descent);
+        x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
+        gdk_draw_string (pix,
 #if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
+          gtk_style_get_font (style),
 #else
-        style->font,
+          style->font,
 #endif
-        gg->wvis.GC,
-        x - width/2,
-        y - 2,
-        str);
-      g_free (str);
+          gg->wvis.GC,
+          x - width/2,
+          y - 2,
+          str);
+        g_free (str);
+      }
+
+      /*-- ... and the counts in the bottom margin --*/
+      for (k=0; k<scheme->n; k++) {
+        val = min + gg->wvis.pct[k] * (max - min);
+        str = g_strdup_printf ("%d", gg->wvis.n[k]);
+        gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+          gtk_style_get_font (style),
+#else
+          style->font,
+#endif
+          str, strlen(str),
+          &lbearing, &rbearing, &width, &ascent, &descent);
+        x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
+        diff = (k == 0) ? gg->wvis.pct[k] : gg->wvis.pct[k]-gg->wvis.pct[k-1]; 
+        x -= diff/2 * (w->allocation.width - 2*xmargin);
+        gdk_draw_string (pix,
+#if GTK_MAJOR_VERSION == 2
+          gtk_style_get_font (style),
+#else
+          style->font,
+#endif
+          gg->wvis.GC,
+          x - width/2,
+          (w->allocation.height - ymargin) + ascent + descent + 2,
+          str);
+        g_free (str);
+      }
     }
-
-    /*-- ... and the counts in the bottom margin --*/
-    for (k=0; k<scheme->n; k++) {
-      val = min + gg->wvis.pct[k] * (max - min);
-      str = g_strdup_printf ("%d", gg->wvis.n[k]);
-      gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        str, strlen(str),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-      x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-      diff = (k == 0) ? gg->wvis.pct[k] : gg->wvis.pct[k]-gg->wvis.pct[k-1]; 
-      x -= diff/2 * (w->allocation.width - 2*xmargin);
-      gdk_draw_string (pix,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->wvis.GC,
-        x - width/2,
-        (w->allocation.height - ymargin) + ascent + descent + 2,
-        str);
-      g_free (str);
-    }
-
   }
 
   gdk_draw_pixmap (w->window, gg->wvis.GC, pix,
