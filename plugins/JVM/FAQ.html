@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1></h1>
+
+<dl>
+  <dt>
+      When I run the JVM plugin, I often get crashses, etc.
+      In GDB, it runs for a couple of sessions and then
+      I get an error like
+<pre>
+Program received signal SIG32, Real-time event 32.
+0xf9600b8 in ?? ()
+</pre>
+      and I have to kill GDB. What's up?
+  <dd>
+    I think it is the fact that the JVM is threaded
+      and ggobi is not (yet).
+      As a result, the libraries they each depend on
+      are different and subtle confusion can arise
+      with resulting mayhem. In GDB, things are even
+      more complicated.
+      
+      
+</dl>
+
+
+
+<hr>
+<address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Mon Nov 19 16:02:34 EST 2001
+<!-- hhmts end -->
+</body> </html>
