@@ -45,29 +45,25 @@ static void reinit_cb (GtkWidget *w, ggobid *gg) {
 
 }
 
-static void pcaxes_cb (GtkToggleButton *button)
+static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg) 
 {
-  g_printerr ("pcaxes: %d\n", button->active);
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
+  cpanel->t1d_nASHes = (gint) ((gfloat) cpanel->t1d_nbins * (adj->value / 2.0));
+
+  display_tailpipe (gg->current_display, gg);
 }
 
-
-static void tour1dpp_cb (GtkWidget *w, ggobid *gg) 
+static void tour1d_vert_cb (GtkToggleButton *button, ggobid *gg)
 {
-  /*  g_printerr ("open projection pursuit panel\n");
-  tour1dpp_window_open (gg);*/
+  tour1d_vert (&gg->current_display->cpanel, button->active);
 }
 
-static void tour1dadv_cb (GtkWidget *w, ggobid *gg) {
-  g_printerr ("open advanced tour features panel\n");
-  /*  tour1dadv_window_open (gg);*/
-}
-
-static gchar *manip_lbl[] = {"Oblique", "Vert", "Horiz", "Radial",
-                             "Angular"};
-static void manip_cb (GtkWidget *w, gpointer cbd)
-{
-  gint indx = GPOINTER_TO_INT (cbd);
-  g_printerr ("cbd: %s\n", manip_lbl[indx]);
+void cpanel_t1d_init (cpaneld *cpanel, ggobid *gg) {
+  cpanel->t1d_nASHes = 20;
+  cpanel->t1d_nbins = 200;
+  cpanel->t1d_vert = false;
 }
 
 void
@@ -119,58 +115,44 @@ cpanel_tour1d_make (ggobid *gg) {
 
   gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]), box, false, false, 1);
 
-
 /*
- * manipulation option menu and label inside vbox
+ * ASH smoothness
 */
-
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]), vb,
+    false, false, 0);
 
-  lbl = gtk_label_new ("Manual manipulation:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
-  gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (vb), gtk_label_new ("ASH smoothness:"),
+    false, false, 0);
 
-  manip_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), manip_opt,
-    "Set the manual manipulation method", NULL);
-  gtk_box_pack_end (GTK_BOX (vb), manip_opt, false, false, 0);
-  populate_option_menu (manip_opt, manip_lbl,
-                        sizeof (manip_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) manip_cb, gg);
+  /*-- value, lower, upper, step --*/
+  gg->ash.smoothness_adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
+  gtk_signal_connect (GTK_OBJECT (gg->ash.smoothness_adj), "value_changed",
+                      GTK_SIGNAL_FUNC (t1d_ash_sm_cb), gg);
 
-/*
- * PC Axes toggle
-*/
-  tgl = gtk_check_button_new_with_label ("PC axes");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-    "Show principal component axes or plain variable axes", NULL);
-  gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                      GTK_SIGNAL_FUNC (pcaxes_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]),
-                      tgl, false, false, 1);
+  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.smoothness_adj));
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
+    "Adjust ASH smoothness", NULL);
+  gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
+  gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
+  gtk_scale_set_digits (GTK_SCALE (sbar), 2);
+
+  gtk_box_pack_start (GTK_BOX (vb), sbar,
+    false, false, 1);
 
 /*
- * projection pursuit button
+ * Box to hold 'vertical' button
 */
-  btn = gtk_button_new_with_label ("Projection pursuit ...");
+  box = gtk_hbox_new (true, 1);
+
+  btn = gtk_check_button_new_with_label ("Vertical");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Open panel for grand tour projection pursuit", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]),
-                      btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (tour1dpp_cb), gg);
+    "Change orientation of plot", NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+                     GTK_SIGNAL_FUNC (tour1d_vert_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-/*
- * advanced features button
-*/
-  btn = gtk_button_new_with_label ("Advanced features ...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Open panel for additional grand tour features", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]),
-                      btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (tour1dadv_cb), gg);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]), box, false, false, 1);
 
   gtk_widget_show_all (gg->control_panel[TOUR1D]);
 }

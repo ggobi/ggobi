@@ -78,17 +78,56 @@ void
 tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
   int i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
+  gfloat min, max, keepmin, keepmax;
+  gboolean firsttime = true;
+  gfloat precis = PRECISION1;
+  cpaneld *cpanel = &dsp->cpanel;
+  gfloat *yy;
+
+  if (sp == NULL)
+    return;
+
+  yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
 
   for (m=0; m<d->nrows_in_plot; m++)
   {
     i = d->rows_in_plot[m];
-    sp->planar[i].x = 0;
+    yy[i] = sp->planar[i].x = 0;
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      sp->planar[i].y += (gint)(dsp->u[0][j]*world_data[i][j]);
+      yy[i] += (gint)(dsp->u[0][j]*world_data[i][j]);
     }
   }
+  do_ash1d (yy, d->nrows_in_plot,
+       cpanel->t1d_nbins, cpanel->t1d_nASHes,
+       sp->p1d_data, &min, &max);
+  if (firsttime) {
+    keepmin = min;
+    keepmax = max;
+    firsttime = false;
+  }
+  else {
+    if (min < keepmin) keepmin = min;
+    if (max > keepmax) keepmax = max;
+  }
+  if (cpanel->t1d_vert) {
+    for (i=0; i<d->nrows_in_plot; i++) {
+      sp->planar[i].x = (glong) (precis*(-1.0+2.0*
+        (sp->p1d_data[i]-keepmin)/(max-keepmin)));
+      sp->planar[i].y = yy[i];
+    }
+  }
+  else {
+    for (i=0; i<d->nrows_in_plot; i++) {
+      sp->planar[i].x = yy[i];
+      sp->planar[i].y = (glong) (precis*(-1.0+2.0*
+        (sp->p1d_data[i]-keepmin)/(max-keepmin)));
+    }
+  }
+
+  g_free ((gpointer) yy);
+
 }
 
 void
@@ -104,10 +143,10 @@ tour1d_run(displayd *dsp, ggobid *gg)
   datad *d = dsp->d;
   gint i;
 
-  printf("u \n");
+  /*  printf("u \n");
   for (i=0; i<d->ncols; i++)
     printf("%f ",dsp->u[0][i]);
-  printf("\n");
+  printf("\n");*/
 
   if (!dsp->tour_get_new_target && !reached_target(dsp)) {
     increment_tour(dsp, 1);
@@ -190,6 +229,9 @@ void tour1d_reinit(ggobid *gg)
 
 }
 
-
+void tour1d_vert(cpaneld *cpanel, gboolean state)
+{
+  cpanel->t1d_vert = state;
+}
 
 

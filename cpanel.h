@@ -78,6 +78,12 @@ typedef struct {
  gint tour_ls_dir;
  gfloat tour_path_len;
 
+/*
+ * 1d tour
+*/
+ gint t1d_nbins, t1d_nASHes;
+ gboolean t1d_vert;
+
 } cpaneld;
 
 #endif

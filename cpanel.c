@@ -29,6 +29,7 @@ scatterplot_cpanel_init (cpaneld *cpanel, gint initial_mode, ggobid *gg) {
   cpanel_brush_init (cpanel, gg);
   cpanel_scale_init (cpanel, gg);
   cpanel_tour_init (cpanel, gg);  /*-- tour_init, or tour2d_init? --*/
+  cpanel_t1d_init (cpanel, gg);
 }
 
 void

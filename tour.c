@@ -411,18 +411,14 @@ void path(displayd *dsp, gint nd) {
   gint dI; /* dimension of intersection of base pair */
   gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
 
-/*
- * Di, I'm commenting these out for now -- dfs
-  printf("u0 \n");
-  for (i=0; i<d->ncols; i++)
+  /*  for (i=0; i<d->ncols; i++)
     printf("%f ",dsp->u0.vals[0][i]);
   printf("\n");
 
   printf("u1 \n");
   for (i=0; i<d->ncols; i++)
     printf("%f ",dsp->u1[0][i]);
-  printf("\n");
-*/
+  printf("\n");*/
 
   /* 2 is hard-wired because it relates to cos, sin
                          and nothing else. */
@@ -748,7 +744,7 @@ gt_basis (displayd *dsp, ggobid *gg, gint nd)
 */
 {
   datad *d = dsp->d;
-  gint j, k, check = 1;
+  gint j, k, check = 1, nvals = dsp->ntour_vars*nd;
   gdouble frunif[2];
   gdouble r, fac, frnorm[2];
 
@@ -765,26 +761,35 @@ gt_basis (displayd *dsp, ggobid *gg, gint nd)
       dsp->u1[k][j] = 0.0 ;
 
   if (dsp->ntour_vars > 2) {
-    for (j=0; j<dsp->ntour_vars; j++) {
-      for (k=0; k<nd/2; k++) {
-        while (check) {
-
-          rnorm2(&frunif[0], &frunif[1]);
-          r = frunif[0] * frunif[0] + frunif[1] * frunif[1];
+      for (j=0; j<nvals/2+1; j++) {
+          while (check) {
+ 
+            rnorm2(&frunif[0], &frunif[1]);
+            r = frunif[0] * frunif[0] + frunif[1] * frunif[1];
    
-          if (r < 1)
-          {
-            check = 0;
-            fac = sqrt(-2. * log(r) / r);
-            frnorm[0] = frunif[0] * fac;
-            frnorm[1] = frunif[1] * fac;
-          }
-        }
-        check = 1;
-        dsp->u1[2*k][dsp->tour_vars[j]] = (gfloat) frnorm[0];
-        dsp->u1[2*k+1][dsp->tour_vars[j]] = (gfloat) frnorm[1];
+            if (r < 1)
+            {
+              check = 0;
+              fac = sqrt(-2. * log(r) / r);
+              frnorm[0] = frunif[0] * fac;
+              frnorm[1] = frunif[1] * fac;
+            }
+	  }
+          check = 1;
+          if (nd == 1) {
+            if (2*j <= dsp->ntour_vars) {
+              dsp->u1[0][dsp->tour_vars[2*j]] = (gfloat) frnorm[0];
+              if (2*j+1 < dsp->ntour_vars) 
+                dsp->u1[0][dsp->tour_vars[2*j+1]] = (gfloat) frnorm[1];
+	    }
+	  }
+          else if (nd == 2) {
+            if (j <= dsp->ntour_vars) {
+              dsp->u1[0][dsp->tour_vars[j]] = (gfloat) frnorm[0];
+              dsp->u1[1][dsp->tour_vars[j]] = (gfloat) frnorm[1];
+	    }
+	  }
       }
-    }
     for (k=0; k<nd; k++)
       norm(dsp->u1[k], d->ncols);
 
