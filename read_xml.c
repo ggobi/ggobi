@@ -82,6 +82,11 @@ const gchar * const xmlDataTagNames[] = {
                                           "variable",
                                           "colormap",
                                           "color",
+/* New for handling categorical variables. */
+                                          "realvariable",
+                                          "categoricalvariable",
+                                          "levels",
+                                          "level",
                                           ""
                                          };
 
@@ -196,8 +201,18 @@ startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
      allocVariables (attrs, data);
    break;
    case VARIABLE:
-     newVariable (attrs, data);
+   case REAL_VARIABLE:
+   case CATEGORICAL_VARIABLE:
+     newVariable (attrs, data, name);
    break;
+
+   case CATEGORICAL_LEVELS:
+       categoricalLevels(attrs, data);
+     break;
+   case CATEGORICAL_LEVEL:
+       setLevelIndex(attrs, data);
+     break;
+
    case RECORDS: /* Used to be DATASET */
      setDatasetInfo(attrs, data);
    break;
@@ -219,14 +234,59 @@ startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
    case DATASET:
      setDataset(attrs, data);
    break;
+   
    default:
+       fprintf(stderr, "Unrecognized XML state\n"); fflush(stderr);    
    break;
  }
 }
 
+int
+setLevelIndex(const CHAR **attrs, XMLParserData *data)
+{
+    const char *tmp = getAttribute(attrs, "value");
 
-void 
-endXMLElement(void *user_data, const CHAR *name)
+    if (tmp != NULL) {
+	data->current_level = asInteger(tmp);
+    } else
+	data->current_level++;
+
+    return(data->current_level);
+}
+
+void
+categoricalLevels(const CHAR **attrs, XMLParserData *data)
+{
+    datad *d = getCurrentXMLData(data);
+    vartabled *el = &(d->vartable[data->current_variable]);
+
+    const char *tmp = getAttribute(attrs, "count");
+
+    if (tmp != NULL) {
+	el->nlevels = asInteger(tmp);
+        el->levels = g_array_new(false, false, sizeof(gchar *));       
+        g_array_set_size(el->levels, el->nlevels);
+    }
+
+    data->current_level = -1; /* We'll increment the first one. */
+
+    if(el->nlevels < 1) {
+	fprintf(stderr, "Levels for %s mis-specified\n", el->collab);fflush(stderr); 
+    }
+}
+
+void
+addLevel(XMLParserData *data, const char *c, int len)
+{
+    datad *d = getCurrentXMLData(data);
+    vartabled *el = &(d->vartable[data->current_variable]);
+    char *val = g_strdup(c);
+/*    g_array_append_val(el->levels, c); */
+    g_array_insert_val(el->levels, data->current_level, val);
+}
+
+
+void endXMLElement(void *user_data, const CHAR *name)
 {
  XMLParserData *data = (XMLParserData*)user_data;
  enum xmlDataState type = tagType(name, true);
@@ -236,6 +296,8 @@ endXMLElement(void *user_data, const CHAR *name)
      data->current_record++;
      break;
    case VARIABLE:
+   case REAL_VARIABLE:
+   case CATEGORICAL_VARIABLE:
      data->current_variable++;
      break;
    case COLOR:
@@ -247,6 +309,11 @@ endXMLElement(void *user_data, const CHAR *name)
         */
      if(data->reading_colormap_file_p == false)
        GGOBI(registerColorMap)(data->gg);
+   case CATEGORICAL_LEVELS:
+       break;
+   case CATEGORICAL_LEVEL:
+       data->current_level++;
+       break;
    default:
      data = NULL; /* just any code so we can stop.*/
      break;
@@ -337,10 +404,16 @@ Characters(void *user_data, const CHAR *ch, int len)
      setRecordValues (data, c, dlen);
    break;
    case VARIABLE:
+   case CATEGORICAL_VARIABLE:
+   case REAL_VARIABLE:
      setVariableName (data, c, dlen);
    break;
    case COLOR:
      setColorValue (data, c, dlen);
+     break;
+   case CATEGORICAL_LEVEL:
+       addLevel(data, (const char *) c, dlen);
+     break;
    default:
      break;
 
@@ -652,27 +725,32 @@ asNumber(const char *sval)
    from the specified attributes.
    This includes its name, transformation name, etc.
 
-    Called in response to a <variable> tag.
+   Called in response to a <variable>, <realvariable> or <categoricalvariable> tag.
  */
 
 gboolean
-newVariable(const CHAR **attrs, XMLParserData *data)
+newVariable(const CHAR **attrs, XMLParserData *data, const CHAR *tagName)
 {
   const gchar *tmp;
   datad *d = getCurrentXMLData(data);
 
+  data->variable_transform_name_as_attribute = false;
   tmp = getAttribute(attrs, "transformName");
   if (tmp) {
     data->variable_transform_name_as_attribute = true;
 
-    d->vartable[data->current_variable].collab_tform =  g_strdup(tmp);
+    d->vartable[data->current_variable].collab_tform = g_strdup(tmp);
   }
 
  tmp = getAttribute(attrs, "name");
  if(tmp != NULL) {
   d->vartable[data->current_variable].collab = g_strdup(tmp);
   if (data->variable_transform_name_as_attribute == false)
-    d->vartable[data->current_variable].collab_tform = g_strdup(tmp);
+      d->vartable[data->current_variable].collab_tform = g_strdup(tmp);
+ }
+
+ if(strcmp(tagName, "categoricalvariable") == 0) {
+     d->vartable[data->current_variable].categorical_p = true;
  }
 
   return (true);

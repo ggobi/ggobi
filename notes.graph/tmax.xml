@@ -1,3 +1,4 @@
+<?xml version="1.0">
 <ggobidata count="2">
 
 <data name="Customers" points="T" edges="F">
@@ -5,15 +6,15 @@
 
 </description>
 <variables count="3">
-  <realvariable><name>avgusage<name></realvariable>
-  <categoricalvariable> <name>fraudp<name>
+  <realvariable name="avgusage" />
+  <categoricalvariable name="fraudp">
     <levels count="3">
      <level value="0">low</level>
      <level value="1">medium</level>
      <level value="2">high</level>
     </levels>
   </categoricalvariable>
-  <categoricalvariable> <name>bizres<name>
+  <categoricalvariable name="bizres">
     <levels count="2">
      <level value="0">biz</level>
      <level value="1">res</level>
@@ -34,17 +35,17 @@
 <description>
 
 </description>
-<variables count="3">
-  <realvariable>nseconds</realvariable>
-  <realvariable>timeofday</realvariable>
-  <categoricalvariable> <name>type<name>
+<variables count="4">
+  <realvariable name="nseconds"> </realvariable>
+  <realvariable name="timeofday"> </realvariable>
+  <categoricalvariable name="type">
     <levels count="3">
      <level value="0">800</level>
      <level value="1">collect</level>
      <level value="2">other</level>
     </levels>
   </categoricalvariable>
-  <categoricalvariable> <name>fraudp<name>
+  <categoricalvariable name="fraudp">
     <levels count="3">
      <level value="0">low</level>
      <level value="1">medium</level>
@@ -57,7 +58,7 @@
 <record source="0" destination="2"> 42 4870  1 0 </record>
 <record source="2" destination="3"> 42 4880  1 2 </record>
 <record source="2" destination="3">  7 4890  1 1 </record>
-<record source="3" destination="4"> 17 4900 na 2 </record>
+<record source="3" destination="4"> 17 4900 999 2 </record>
 <record source="1" destination="4"> 12 5000  0 0 </record>
 <record source="1" destination="0"> 18 5100  1 2 </record>
 </records>

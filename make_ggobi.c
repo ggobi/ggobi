@@ -206,11 +206,13 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) {
   }
 
   /*-- now that we've read some data, set the mode --*/
-  d = (datad *) gg->d->data;
-  if (d != NULL) {
-    if (d->ncols > 0) {
-      gg->mode = (d->ncols == 1) ? P1PLOT : XYPLOT;
+  if(gg->d) {
+    d = (datad *) gg->d->data;
+    if (d != NULL) {
+      if (d->ncols > 0) {
+        gg->mode = (d->ncols == 1) ? P1PLOT : XYPLOT;
         gg->prev_mode = gg->projection = gg->prev_projection = gg->mode;
+      }
     }
   }
 

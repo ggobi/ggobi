@@ -10,7 +10,11 @@ enum xmlDataState {
   TOP = 0, 
   DATASET, DESCRIPTION,
   RECORD, RECORDS, VARIABLES, VARIABLE,
-  COLORMAP, COLOR, UNKNOWN};
+  COLORMAP, COLOR, 
+  REAL_VARIABLE, CATEGORICAL_VARIABLE,
+  CATEGORICAL_LEVELS, CATEGORICAL_LEVEL,
+  UNKNOWN};
+
 typedef enum xmlDataState XmlTagType;
 
 typedef struct {
@@ -28,6 +32,7 @@ typedef struct _XMLUserData {
   gint current_variable; /* Indexes the current variable. */
   gint current_record;   /* Indexes the record we are currently working on. */
   gint current_element;  /* Indexes the values within a record. */
+  gint current_level;    /* */
 
   gint current_color;    /* The index of the current element being processed in the colormap */
  
@@ -99,7 +104,7 @@ extern "C" {
 #endif
 
 enum xmlDataState tagType(const CHAR *name, gboolean endTag);
-gboolean newVariable(const CHAR **attrs, XMLParserData *data);
+gboolean newVariable(const CHAR **attrs, XMLParserData *data, const CHAR *tagName);
 gboolean newEdgeVariable(const CHAR **attrs, XMLParserData *data);
 gboolean setDatasetInfo(const CHAR **attrs, XMLParserData *data);
 gboolean setGeneralInfo (const CHAR **attrs, XMLParserData *data);
@@ -123,6 +128,13 @@ void initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg);
 
 gboolean setGlyph(const CHAR **attrs, XMLParserData *data, gint i);
 gboolean setColor(const CHAR **attrs, XMLParserData *data, gint i);
+
+
+
+void categoricalLevels(const CHAR **attrs, XMLParserData *data);
+int setLevelIndex(const CHAR **attrs, XMLParserData *data);
+void addLevel(XMLParserData *data, const char *c, int len);
+
 
 gint rowId(const gchar *tmp, XMLParserData *data);
 
