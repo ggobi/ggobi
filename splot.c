@@ -436,21 +436,17 @@ splot_edges_realloc (gint nedges_prev, splotd *sp, datad *e)
 {
   gint i;
 
-  if (nedges_prev == -1) {
-    if (sp->edges) g_free (sp->edges);
-    if (sp->arrowheads) g_free (sp->arrowheads);
-    nedges_prev = 0;
-  }
-
   sp->edges = (GdkSegment *) g_realloc ((gpointer) sp->edges,
     e->edge.n * sizeof (GdkSegment));
   sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
     e->edge.n * sizeof (GdkSegment));
 
   /*-- these aren't useful values, but they're finite --*/
-  for (i=nedges_prev; i<e->edge.n; i++) {
-    sp->edges[i].x1 = sp->edges[i].x2 = 0;
-    sp->arrowheads[i].x1 = sp->arrowheads[i].x2 = 0;
+  if (nedges_prev > 0) {
+    for (i=nedges_prev; i<e->edge.n; i++) {
+      sp->edges[i].x1 = sp->edges[i].x2 = 0;
+      sp->arrowheads[i].x1 = sp->arrowheads[i].x2 = 0;
+    }
   }
 }
 
