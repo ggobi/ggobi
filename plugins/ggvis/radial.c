@@ -9,8 +9,6 @@
 #include "plugin.h"
 #include "ggvis.h"
 
-void highlight_sticky_edges (GtkWidget *, gint, gint , datad *d, PluginInstance *inst);
-
 /*-- utility --*/
 
 static 
@@ -156,10 +154,9 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
     GList *l, *connectedNodes;
     noded *n, *n1;
 
-    /*-- here's a problem: if nrows != nrows_in_plot, this won't
-         do the right thing --*/
-    for (i=0; i<d->nrows; i++) {
-      n = &ggv->radial->nodes[i];
+    for (k=0; k<d->nrows_in_plot; k++) {  /*-- nrows_in_plot = nnodes --*/
+      n = &ggv->radial->nodes[k];
+      i = n->i;  /*-- index of nrows --*/
       x[i] = n->pos.x;
       y[i] = n->pos.y;
       depth[i] = (gdouble) n->nStepsToCenter;
@@ -171,6 +168,9 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
       nP = nC = nS = 0;
       for (l = connectedNodes; l; l = l->next) {
         n1 = (noded *) l->data;
+        if (n1->nStepsToCenter == -1)
+          continue;
+
         if (n1->nStepsToCenter == n->nStepsToCenter)
           nS++;
         else if (n1->nStepsToCenter < n->nStepsToCenter)
@@ -303,11 +303,12 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
   gint i, k, nn;
   noded *na, *nb;
   gint nnodes = d->nrows_in_plot;
-  gint nnodessq = nnodes * nnodes;
   gint nedges = e->edge.n;
   noded *nodes;
   endpointsd *endpoints = e->edge.endpoints;
   gint a, b;
+  gint nnodessq = nnodes * nnodes;
+
 
   if (ggv->radial != NULL) {
     nn = sizeof (ggv->radial->nodes) / sizeof (ggv->radial);
@@ -320,6 +321,7 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
 
   ggv->radial = (radiald *) g_malloc (sizeof (radiald));
   ggv->radial->nodes = (noded *) g_malloc (nnodes * sizeof (noded));
+  ggv->radial->nnodessq = nnodessq;
   nodes = ggv->radial->nodes;
 
   for (i = 0; i <nnodes; i++) {
@@ -331,7 +333,7 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
     ggv->radial->nodes[i].subtreeSize = 0;
     ggv->radial->nodes[i].nChildren = 0;
     ggv->radial->nodes[i].nStepsToCenter = nnodessq;
-    ggv->radial->nodes[i].i = i;
+    ggv->radial->nodes[i].i = k;
     ggv->radial->nodes[i].parentNode = NULL;
 
     if (nedges <= 1) {
@@ -416,7 +418,14 @@ setParentNodes (ggvisd *ggv, datad *d) {
   ggv->radial->nStepsToCenter = 0;
   for (i=0; i<d->nrows_in_plot; i++) {
     n = &ggv->radial->nodes[i];
-    if (n->nStepsToCenter > ggv->radial->nStepsToCenter) {
+    /*-- these guys have no path to the center; reset nSteps to -1 --*/
+    if (n->nStepsToCenter == ggv->radial->nnodessq) {
+      n->nStepsToCenter = -1;
+      /*-- there's no reason to draw these points; they're orphans --*/
+      d->hidden.els[ n->i ] = d->hidden_now.els[ n->i ] = true;
+    }
+
+    else if (n->nStepsToCenter > ggv->radial->nStepsToCenter) {
       ggv->radial->nStepsToCenter = n->nStepsToCenter;
     }
   }
@@ -430,9 +439,9 @@ void setNChildren (ggvisd *ggv, datad *d)
 
   for (i=0; i<d->nrows_in_plot; i++) {
     n = &ggv->radial->nodes[i];
-    if (n->parentNode != NULL) {
-      n->parentNode->nChildren++;
-    }
+    if (n->nStepsToCenter != -1)
+      if (n->parentNode != NULL)
+        n->parentNode->nChildren++;
   }
 
 /*-- debug --*/
@@ -481,6 +490,8 @@ setSubtreeSize (noded *n, ggvisd *ggv, datad *d) {
 
   for (l = children; l; l = l->next) {
     nchild = (noded *) l->data;
+    if (n->nStepsToCenter == -1)
+      continue;
 
     if (nchild->nChildren == 0)
       n->subtreeSize += 1;
@@ -503,9 +514,10 @@ setChildSubtreeSpans (noded *n, ggvisd *ggv, datad *d)
 
   for (l = children; l; l = l->next) {
     nchild = (noded *) l->data;
+    if (nchild->nStepsToCenter == -1)
+      continue;
 
     nchild->span = n->span * nchild->subtreeSize / n->subtreeSize;
-
     if (nchild->nChildren > 0) {
       setChildSubtreeSpans (nchild, ggv, d);
     }
@@ -543,6 +555,8 @@ setChildNodePositions (noded *n, ggvisd *ggv, datad *d)
   i = 0;
   for (l = children; l; l = l->next) {
     nchild = (noded *) l->data;
+    if (nchild->nStepsToCenter == -1)
+      continue;
 
     if (i == 0) {
       nchild->theta = theta;
