@@ -575,16 +575,17 @@ getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr do
 	plugin->interactive = (tmp[0] == 'T' || tmp[0] == 't');
     }
 
-    c = getXMLElement(node,"dll");
-    if(!c)
-	return;
-    ptr = c;
-    c = getXMLElement(c, "modeName");
+    c = getXMLElement(node, "modeName");
     if(c) {
       xmlChar *val = xmlNodeListGetString(doc, XML_CHILDREN(c), 1);      
       plugin->modeName = val;
     }
-    c = getXMLElement(ptr, "init");
+
+    c = getXMLElement(node,"dll");
+    if(!c)
+	return;
+
+    c = getXMLElement(c, "init");
     if(!c)
         return;
 

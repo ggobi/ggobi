@@ -94,8 +94,8 @@
  <inputPlugin name="postgres" interactive="true">
   <description>Reads data from a Postgres DBMS</description>
    <author>Duncan Temple Lang</author>
+   <modeName>postgres</modeName>
      <dll name="plugins/Postgres/Postgres"> 
-       <modeName>postgres</modeName>
        <init description="postgres_input_description" read="read_postgres" probe="isPostgresInput" />
      </dll>
  </inputPlugin>
@@ -103,8 +103,8 @@
  <inputPlugin name="mysql" interactive="true">
   <description>Reads data from a MySQL DBMS</description>
    <author>Duncan Temple Lang</author>
+   <modeName>mysql</modeName>
      <dll name="plugins/MySQL/MySQL"> 
-       <modeName>mysql</modeName>
        <init description="mysql_input_description"/>
      </dll>
  </inputPlugin>
@@ -112,8 +112,8 @@
  <inputPlugin name="testInput">
   <description>Generates random data via an input plugin</description>
    <author>Duncan Temple Lang</author>
+   <modeName>testInput</modeName>
      <dll name="plugins/TestInput/TestInput"> 
-       <modeName>testInput</modeName>
        <init description="test_input_description" />
      </dll>
  </inputPlugin>

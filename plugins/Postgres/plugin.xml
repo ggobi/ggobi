@@ -1,8 +1,8 @@
  <inputPlugin name="postgres">
   <description>Reads data from a Postgres DBMS</description>
-   <author>Duncan Temple Lang</author>
-     <dll name="plugins/Postgres/Postgres"> 
-       <modeName>postgres</modeName>
+  <author>Duncan Temple Lang</author>
+  <modeName>postgres</modeName>
+  <dll name="plugins/Postgres/Postgres"> 
        <init description="postgres_input_description" />
-     </dll>
+  </dll>
  </inputPlugin>

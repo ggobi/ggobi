@@ -1,8 +1,8 @@
  <inputPlugin name="testInput">
   <description>Generates random data via an input plugin</description>
-   <author>Duncan Temple Lang</author>
-     <dll name="plugins/TestInput/TestInput"> 
-       <modeName>testInput</modeName>
-       <init description="test_input_description" />
-     </dll>
+  <author>Duncan Temple Lang</author>
+  <modeName>testInput</modeName>
+  <dll name="plugins/TestInput/TestInput"> 
+      <init description="test_input_description" />
+  </dll>
  </inputPlugin>

@@ -1,8 +1,8 @@
  <inputPlugin name="mysql">
   <description>Reads data from a MySQL DBMS</description>
-   <author>Duncan Temple Lang</author>
-     <dll name="plugins/MySQL/MySQL"> 
-       <modeName>mysql</modeName>
+  <author>Duncan Temple Lang</author>
+  <modeName>mysql</modeName>
+  <dll name="plugins/MySQL/MySQL"> 
        <init description="mysql_input_description"/>
-     </dll>
+  </dll>
  </inputPlugin>
