@@ -26,6 +26,10 @@ Then do
    chgrp -R xgobi papers
    chmod -R g+w papers
 
+Note: For users to check out the new modules, if they are
+sub-directories of existing directories it may be necessary to "cvs
+release <module>" and then "cvs co <module>" to get the new directory
+structure.
 
 Creating the Windows Distribution
 =================================

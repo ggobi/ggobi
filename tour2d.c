@@ -755,16 +755,17 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
 
     dsp->t2d_no_dir_flag = false;
     if (dsp->t2d_manip_mode == MANIP_RADIAL)
-    {
+      { /* check if variable is currently visible in plot */
       if ((dsp->t2d.F.vals[0][dsp->t2d_manip_var]*
         dsp->t2d.F.vals[0][dsp->t2d_manip_var] +
         dsp->t2d.F.vals[1][dsp->t2d_manip_var]*
         dsp->t2d.F.vals[1][dsp->t2d_manip_var]) < tol)
-        dsp->t2d_no_dir_flag = true;
+        dsp->t2d_no_dir_flag = true; /* no */
       else
-      {
-        dsp->t2d_rx = dsp->t2d.F.vals[0][dsp->t2d_manip_var];
-        dsp->t2d_ry = dsp->t2d.F.vals[1][dsp->t2d_manip_var];
+	{ /* yes: set radial manip direction to be current direction
+             of contribution */
+        dsp->t2d_rx = (gfloat) dsp->t2d.F.vals[0][dsp->t2d_manip_var];
+        dsp->t2d_ry = (gfloat) dsp->t2d.F.vals[1][dsp->t2d_manip_var];
         dtmp1 = sqrt(dsp->t2d_rx*dsp->t2d_rx+dsp->t2d_ry*dsp->t2d_ry);
         dsp->t2d_rx /= dtmp1;
         dsp->t2d_ry /= dtmp1;
@@ -840,9 +841,9 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
             dsp->t2d_no_dir_flag = false;
           }
           distx = (dsp->t2d_rx*(dsp->t2d_pos1 - dsp->t2d_pos1_old) + 
-            dsp->t2d_ry*(dsp->t2d_pos2 - dsp->t2d_pos2_old))*dsp->t2d_rx;
+            dsp->t2d_ry*(dsp->t2d_pos2_old - dsp->t2d_pos2))*dsp->t2d_rx;
           disty = (dsp->t2d_rx*(dsp->t2d_pos1 - dsp->t2d_pos1_old) + 
-            dsp->t2d_ry*(dsp->t2d_pos2 - dsp->t2d_pos2_old))*dsp->t2d_ry;
+            dsp->t2d_ry*(dsp->t2d_pos2_old - dsp->t2d_pos2))*dsp->t2d_ry;
         }
         dtmp1 = (gdouble) (distx*distx+disty*disty);
         len_motion = (gfloat) sqrt(dtmp1);

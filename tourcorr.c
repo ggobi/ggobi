@@ -806,6 +806,11 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   extern void gram_schmidt(gdouble *, gdouble*, gint);
   extern gdouble calc_norm(gdouble *, gint);
 
+  /* need to turn off tour */
+  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused) {
+    tourcorr_func(CTOFF, gg->current_display, gg);
+  }
+
   dsp->tc1_phi = 0.;
   dsp->tc2_phi = 0.;
 
@@ -816,11 +821,6 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   /* initializes indicator for manip var being one of existing vars */
   dsp->tc1_manipvar_inc = false;
   dsp->tc2_manipvar_inc = false;
-
-  /* need to turn off tour */
-  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused) {
-    tourcorr_func(CTOFF, gg->current_display, gg);
-  }
 
   /* check if manip var is one of existing vars */
   /* n1vars, n2vars is the number of variables, excluding the
@@ -879,6 +879,7 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gfloat xcosphi=1., xsinphi=0., ycosphi=1., ysinphi=0.;
+  gfloat distx = 0., disty = 0.;
   gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
   gint actual_nxvars = dsp->tcorr1.nactive, actual_nyvars = dsp->tcorr2.nactive;
   gint j;
@@ -903,7 +904,6 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
     if (actual_nxvars > 0 || actual_nyvars > 0)
     {
-      gfloat distx = 0, disty = 0;
       if (dsp->tc_manip_mode == CMANIP_VERT)
       {
         distx = 0.;
@@ -1009,7 +1009,7 @@ tourcorr_manip_end(splotd *sp)
 
   arrayd_copy(&dsp->tcorr1.F, &dsp->tcorr1.Fa);
   /*  copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, d->ncols, 1);*/
-  arrayd_copy(&dsp->tcorr2.Fa, &dsp->tcorr2.F);
+  arrayd_copy(&dsp->tcorr2.F, &dsp->tcorr2.Fa);
   /*  copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->ncols, 1);*/
   dsp->tcorr1.get_new_target = true;
   dsp->tcorr2.get_new_target = true;
