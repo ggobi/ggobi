@@ -298,6 +298,7 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
       for (j=nvar; j<d->ncols; j++) {
         vt = vartable_element_get (j, d);
         vt->collab = g_strdup_printf ("Var %d", j+1);
+        vt->nickname = g_strdup_printf ("V%d", j+1);
       }
     }
   }
@@ -308,6 +309,7 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
         vt = vartable_element_get (j, d);
         vt->lim_specified_p = false;
         vt->collab = g_strdup_printf ("Var %d", j+1);
+        vt->nickname = g_strdup_printf ("V%d", j+1);
       }
     }
   }
