@@ -1,5 +1,6 @@
 #include "PerlPlugin.h"
 
+#include "GGStructSizes.c"
 
 SV * createPerlReferenceObject(gpointer ptr, const char *className);
 

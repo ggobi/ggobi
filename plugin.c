@@ -92,7 +92,7 @@ load_plugin_library(GGobiPluginDetails *plugin)
   fileName = plugin->dllName;
 
   if(!fileName || !fileName[0]) {
-    plugin->loaded = true;  
+    plugin->loaded = DL_UNLOADED;  
     return(NULL);
   }
 
@@ -116,21 +116,18 @@ load_plugin_library(GGobiPluginDetails *plugin)
   }
 
    handle = dynload->open(fileName, plugin);
-   if(!handle && sessionOptions->verbose != GGOBI_SILENT) {
+   if(!handle) {
+    if(sessionOptions->verbose != GGOBI_SILENT) {
      char buf[1000];
      dynload->getError(buf, plugin);
      fprintf(stderr, "error on loading plugin library %s: %s\n",
        plugin->dllName, buf);
      fflush(stderr);
+    }
+    plugin->loaded = DL_FAILED;
+   } else {
+    plugin->loaded = DL_LOADED;
    }
-
-   /* Set loaded to true even if we fail. This will cause us not to
-      try to load it again!
-      The code that is interested in whether it is actually loaded
-      and the symbols available should check the `library' handle
-      being non-NULL.
-    */
-   plugin->loaded = true;  /* (handle != NULL); */
 
    if(fileName != plugin->dllName)
      g_free(fileName);

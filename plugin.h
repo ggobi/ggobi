@@ -73,6 +73,15 @@ struct _GGobiPluginInfo {
 };
 
 
+#define GTK_TYPE_GGOBI_PLUGIN_INFO       (gtk_ggobi_plugin_info_get_type ())
+#define GTK_GGOBI_PLUGIN_INFO(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_INFO_PLUGIN, ))
+#define GTK_GGOBI_PLUGIN_INFO_CLASS(klass)	 (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_SPLOT, GGobiPluginInfoClass))
+#define GTK_IS_GGOBI_PLUGIN_INFO(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_PLUGIN_INFO))
+#define GTK_IS_GGOBI_PLUGIN_INFO_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_PLUGIN_INFO))
+
+GtkType gtk_ggobi_plugin_info_get_type(void);
+
+
 #ifdef USE_GNOME_XML
 #include <gnome-xml/tree.h>
 #else

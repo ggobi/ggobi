@@ -8,5 +8,5 @@ WriteMakefile(
     'VERSION_FROM' => 'GGobi/plugin.pm', 
     'LIBS'	=> [ "-L../../ -lggobi" ],   
     'DEFINE'	=> '-g',    
-    'INC'	=> '-I. -I../.. `gtk-config --cflags`',
+    'INC'	=> '-I. -I../.. `make cflags`',
 );

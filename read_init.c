@@ -739,7 +739,7 @@ loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin)
               plugin->dllName, buf);fflush(stderr);
     }
   }
-  return(false);
+  return(plugin->loaded == DL_LOADED);
 }
 
 gboolean 
@@ -851,7 +851,7 @@ getPluginLanguage(xmlNodePtr node, GGobiPluginInfo *plugin,
       }
     }
     if(done == false)
-      g_printerr("Problem processing language plugin processor.\n");
+      g_printerr("Problem processing `%s' language plugin processor.\n", langPlugin->details->name);
   } else
   done = true;
 

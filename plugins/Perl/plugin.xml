@@ -1,3 +1,4 @@
+<plugins>
 <plugin name="Perl" providesLanguage="Perl">
    <description>Loads the Perl interpreter engine for use by other plugins</description>
    <author>Duncan Temple Lang</author>
@@ -61,3 +62,4 @@
   </dll>
 </inputPlugin>
 
+</plugins>
