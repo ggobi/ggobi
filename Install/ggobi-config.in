@@ -9,7 +9,7 @@
 # --cflags
 # --version
 
-TOP=@TOP@
+TOP=@INSTALL_DIR@
 VERSION="@MAJOR_VERSION@.@MINOR_VERSION@-@PATCH_LEVEL@"
 
 GTK_CFLAGS=`@GTK_CONFIG@ --cflags`
@@ -19,9 +19,9 @@ XML_LIB_DIRS="@XML_LIB_DIRS@"
 XML_LIB_DIRS_PATH="@XML_LIB_DIRS_PATH@"
 
 
-CFLAGS="@SRC_CFLAGS@ ${GTK_CFLAGS} @XML_INC_DIRS@ @XML_CFLAG_DEFINES@ @DEFS@ @OTHER_CFLAGS@"
+CFLAGS="@INSTALL_SRC_CFLAGS@ ${GTK_CFLAGS} @XML_INC_DIRS@ @XML_CFLAG_DEFINES@ @DEFS@ @OTHER_CFLAGS@"
 
-LIBS="@SRC_LIBS@"
+LIBS="@INSTALL_SRC_LIBS@"
 
 
 usage="
@@ -68,6 +68,9 @@ case $1 in
    --help|-h)
        echo "$usage"
        exit 0;;
+   --home)
+       echo "$TOP"
+       shift ;;
    "*") echo "Unrecognized argument $1"
           shift ;;
 esac

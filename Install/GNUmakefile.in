@@ -36,14 +36,19 @@ bin/xmlConvert:
 
 include Plugins
 
+
 HEADER_FILES=$(wildcard include/*.h) 
 
 install: all bin/ggobi.bin ggobirc
+ifeq (${LOCAL_INSTALL},)
 	if test -n "${EMBED_LIB}" ; then  \
 	  $(INSTALL) -d $(libdir) ; \
 	  $(INSTALL) $(INSTALL_FLAGS) $(EMBED_LIB) $(libdir) ;\
+	  $(INSTALL) $(INSTALL_FLAGS) $(GTK_EXT) $(libdir) ;\
 	fi
-	-mkdir $(ggobi_install_home)
+	if ! test  -d $(ggobi_install_home) ; then \
+		mkdir $(ggobi_install_home) ; \
+	fi 
 	$(INSTALL) -d $(ggobi_install_home)/data
 	$(INSTALL) data/* $(ggobi_install_home)/data
 	$(INSTALL) ggobirc $(ggobi_install_home)/
@@ -63,6 +68,11 @@ install: all bin/ggobi.bin ggobirc
 #	for i in $(PLUGIN_DIRS) ; do \
 #	    cd plugins/$$i ; make install ggobi_install_home=$(ggobi_install_home) ; \
 #	done
+else
+	@echo ""
+	@echo "Local installation so no need to move files"
+	@echo ""
+endif
 
 
 ggobirc: Plugins

@@ -159,7 +159,7 @@ libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ:%.o=%.lo)
 	libtool -dynamic -o $@ $(OBJ:%.o=%.lo) `echo "$(LIBS)"|sed 's/-bexpall//'`
 
 ../bin/xmlConvert xmlConvert: xmlConvert.o libggobi.@SHLIB_EXT@
-	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS)
+	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS) 
 
 
 clean:

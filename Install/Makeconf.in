@@ -35,7 +35,9 @@ sysconfdir=@sysconfdir@
 includedir=@includedir@/ggobi
 bindir=@bindir@
 
-ggobi_install_home=${prefix}/ggobi
+ggobi_install_home=@GGOBI_INSTALL_HOME@
+
+LOCAL_INSTALL=@LOCAL_INSTALL@
 
 INSTALL=@INSTALL@
 

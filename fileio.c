@@ -144,25 +144,25 @@ fileset_generate(const gchar * fileName,
       n = g_list_length(els);
       for (i = 0; i < n; i++) {
         gboolean handlesFile = false;
-        GGobiPluginInfo *plugin;
+        GGobiPluginInfo *oplugin;
         GGobiInputPluginInfo *info;
-        plugin = g_list_nth_data(els, i);
-        info = plugin->info.i;
+        oplugin = g_list_nth_data(els, i);
+        info = oplugin->info.i;
 
          /* Use the probe only if the user has not given us a 
             specific format/plugin. */
 	if(isUnknownMode) {
           if(info->probe) 
-     	    handlesFile = info->probe(fileName, gg, plugin);
+     	    handlesFile = info->probe(fileName, gg, oplugin);
 	  else
             handlesFile = true;
 	}
 
         if ((isUnknownMode && handlesFile) 
-             || pluginSupportsInputMode(modeName, plugin)) 
+             || pluginSupportsInputMode(modeName, oplugin)) 
 	{
           InputDescription *desc;
-	  desc = callInputPluginGetDescription(fileName, modeName, plugin, gg);
+	  desc = callInputPluginGetDescription(fileName, modeName, oplugin, gg);
 	  if(desc)
   	     return(desc);
         }

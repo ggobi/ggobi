@@ -74,6 +74,8 @@ const gint ViewTypeIndices[] = {};
 
 FatalErrorHandler FatalError = &exit;
 
+static gchar *computeGGobiHome(char *str);
+
 
 gchar *
 getOptValue(const gchar * const name, const gchar * const value)
@@ -198,6 +200,9 @@ parse_command_line (gint *argc, gchar **av)
       sessionOptions->restoreFile = ptr;
     } else if((ptr = getOptValue("plugin", av[1]))) {
       sessionOptions->pluginFiles = g_slist_append(sessionOptions->pluginFiles, g_strdup(ptr));
+    } else if(strcmp(av[1], "-home") == 0 || strcmp(av[1], "--home") == 0) {
+      fprintf(stdout, "%s\n", computeGGobiHome(av[0]));fflush(stdout);
+      exit(0);
     }
   }
 
