@@ -136,16 +136,19 @@ scatterplot_display_edge_menu_update (displayd *display,
     /*-- build the menu --*/
     display->edge_menu = gtk_menu_new ();
 
-    /*-- when there's only one edge set, indicate that on the menu
-         with an inactive menu item naming the edge set --*/
+    /*
+       When there's only one edge set, indicate that on the menu
+       with a single menu item naming the edge set.  Let it behave
+       like the other menu items, too, turning on undirected
+       edges.  Selecting an edge set is required.
+    */
     if (ne == 1) {
       lbl = g_strdup_printf ("Select edge set (%s)", onlye->name);
       item = CreateMenuItem (display->edge_menu, lbl,
         NULL, NULL, NULL, gg->main_accel_group,
-        NULL, NULL, gg);
-/*
-      gtk_widget_set_sensitive (item, false);
-*/
+        GTK_SIGNAL_FUNC (edgeset_add_cb), onlye, gg);
+      gtk_object_set_data (GTK_OBJECT (item),
+        "display", GINT_TO_POINTER (display));
       g_free (lbl);
     }
 
