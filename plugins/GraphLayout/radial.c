@@ -452,11 +452,12 @@ void radial_center_set_cb (ggobid *gg, gint index,
 
   if (state == STICKY && index >= 0) {
     /*-- remove all sticky labels but the last one --*/
-    gint i, nsticky = g_slist_length (d->sticky_ids);
+    gint i, k, nsticky = g_slist_length (d->sticky_ids);
     for (i = 0; i<nsticky-1; i++) {
-      d->sticky_ids = g_slist_remove (d->sticky_ids,
-      g_slist_nth_data (d->sticky_ids, 0));
-        sticky_id_link_by_id (STICKY_REMOVE, 0, d, gg);
+      k = (gint) g_slist_nth_data (d->sticky_ids, 0);
+      d->sticky_ids = g_slist_remove (d->sticky_ids, 
+				      g_slist_nth_data (d->sticky_ids, 0));
+      sticky_id_link_by_id (STICKY_REMOVE, k, d, gg);
       gtk_signal_emit(GTK_OBJECT(gg),
         getGGobiSignal(STICKY_POINT_REMOVED_SIGNAL), 0,
         (gint) UNSTICKY, d);
