@@ -220,10 +220,18 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   /*-- run --*/
   btn = gtk_check_button_new_with_label ("Run MDS");
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (mds_run_cb), inst);
+
   btn = gtk_button_new_with_label ("Step");
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (mds_step_cb), inst);
+
   btn = gtk_button_new_with_label ("Reinit");
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (mds_reinit_cb), inst);
 
   /*-- stepsize --*/
   table = gtk_table_new (1, 2, false);
@@ -370,7 +378,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (vb), da, true, true, 2);
 
 
-  /*-- data power, weight power --*/
+  /*-- Data power, weight power --*/
   table = gtk_table_new (2, 2, false);
   gtk_container_set_border_width (GTK_CONTAINER (table), 2);
   gtk_box_pack_start (GTK_BOX (vb), table, false, false, 2);
@@ -387,7 +395,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   adj = gtk_adjustment_new (1.0, 0.0, 6.0, 0.1, 1.0, 1.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_power_cb), inst);
+    GTK_SIGNAL_FUNC (ggv_Dtarget_power_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));

@@ -21,25 +21,32 @@ typedef enum {LinkDist, VarValues} MDSDtargetSource;
 
 typedef struct {
 
-  array_d Dtarget;
-  array_d pos;
+  datad *dsrc;  /*-- original data values --*/
+  datad *dpos;  /*-- the new datad which contains the values in pos --*/
+  datad *e;     /*-- edge set, corresponds both to dsrc and dpos --*/
 
+  gboolean mds_running;
+  guint idle_id;
+  
+  array_d Dtarget;  /*-- D in the documentation; dist in the xgvis code --*/
+  array_d pos;
 
   GdkPixmap *stressplot_pix;
   GdkPixmap *histogram_pix;
 
-/* callbacks written */
   gint mds_dims;
   gdouble mds_stepsize;
-  gdouble mds_power;
-  gdouble mds_D_power;
-  gdouble mds_lnorm;
+
+  gdouble mds_Dtarget_power;
+
   gdouble mds_weight_power;
 
-/* callbacks not written */
+  gdouble mds_dist_power;
+  gdouble mds_lnorm;
+  gdouble mds_dist_power_over_lnorm;
+  gdouble mds_lnorm_over_dist_power;
+
   gdouble mds_isotonic_mix;
-  gdouble mds_D_power_over_lnorm;
-  gdouble mds_lnorm_over_D_power;
   gdouble mds_within_between;
   gdouble mds_rand_select_val;
   gdouble mds_rand_select_new;
@@ -80,6 +87,9 @@ typedef struct {
 
 void ggvis_init (ggvisd *);
 ggvisd* ggvisFromInst (PluginInstance *inst);
+void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst);
+void mds_step_cb (GtkToggleButton *btn, PluginInstance *inst);
+void mds_reinit_cb (GtkToggleButton *btn, PluginInstance *inst);
 
 void ggv_dsource_cb (GtkWidget *w, gpointer cbd);
 void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst);
@@ -95,10 +105,13 @@ void ggv_groups_cb (GtkWidget *w, PluginInstance *inst);
 void ggv_constrained_cb (GtkWidget *w, PluginInstance *inst);
 void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_stepsize_cb (GtkAdjustment *adj, PluginInstance *inst);
-void ggv_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst);
+void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_lnorm_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_weight_power_cb (GtkAdjustment *adj, PluginInstance *inst);
+
+void mds_func (gboolean, PluginInstance *);
+void mds_once (gboolean doit, ggvisd *ggv);
 
 #define GGVIS_H
 #endif

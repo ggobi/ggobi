@@ -9,6 +9,96 @@
 #include "defines.h"
 #include "ggvis.h"
 
+void
+ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
+{
+  gint i, j;
+  gint nc = 3;   /*-- default:  3d --*/
+  glong *rowids;
+  gchar **rownames, **colnames;
+  gdouble *values;
+  datad *dnew;
+  InputDescription *desc = NULL;
+  displayd *dspnew;
+  gboolean edges_displayed;
+
+  rowids = (glong *) g_malloc (dsrc->nrows * sizeof(glong));
+  for (i=0; i<dsrc->nrows; i++) {
+    rowids[i] = (glong) dsrc->rowid.id.els[i];
+  }
+
+  values = (gdouble *) g_malloc (dsrc->nrows * nc * sizeof(gdouble));
+  rownames = (gchar **) g_malloc (dsrc->nrows * sizeof(gchar *));
+  if (ggv->pos.nrows < dsrc->nrows) {
+    arrayd_alloc (&ggv->pos, dsrc->nrows, nc);
+    for (i=0; i<dsrc->nrows; i++) {
+      for (j=0; j<nc; j++) {
+        ggv->pos.vals[i][j] = values[i + j*dsrc->nrows] = randvalue();
+      }
+    }
+  } else if (ggv->pos.ncols < nc) {
+    gint nc_prev = ggv->pos.ncols;
+    arrayd_add_cols (&ggv->pos, nc);
+    for (i=0; i<dsrc->nrows; i++) {
+      for (j=nc_prev; j<nc; j++) {
+        ggv->pos.vals[i][j] = values[i + j*dsrc->nrows] = randvalue();
+      }
+    }
+  }
+
+  for (i=0; i<dsrc->nrows; i++)
+    rownames[i] = (gchar *) g_array_index (dsrc->rowlab, gchar *, i);
+
+  colnames = (gchar **) g_malloc (nc * sizeof(gchar *));
+  colnames[0] = "Pos1";
+  colnames[1] = "Pos2";
+  colnames[2] = "Pos3";
+  dnew = datad_create (dsrc->nrows, nc, gg);
+  dnew->name = g_strdup ("MDS");
+
+  GGOBI(setData) (values, rownames, colnames, dsrc->nrows, nc, dnew,
+    false, gg, rowids, desc);
+
+  /*-- copy the color and glyph vectors from d to dnew --*/
+  for (i=0; i<dsrc->nrows; i++) {
+    dnew->color.els[i] = dnew->color_now.els[i] = dnew->color_prev.els[i] =
+      dsrc->color.els[i];
+    dnew->glyph.els[i].type = dnew->glyph_now.els[i].type =
+      dnew->glyph_prev.els[i].type = dsrc->glyph.els[i].type;
+    dnew->glyph.els[i].size = dnew->glyph_now.els[i].size =
+      dnew->glyph_prev.els[i].size = dsrc->glyph.els[i].size;
+  }
+
+/*
+ * open a new scatterplot with the new data, and display edges
+ * as they're displayed in the current datad.
+*/
+  dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
+  setDisplayEdge (dspnew, e);
+  edges_displayed = display_copy_edge_options (dsp, dspnew);
+  if (!edges_displayed) {
+    GGOBI(setShowLines)(dspnew, true);
+/*
+    GtkWidget *item;
+    dspnew->options.edges_undirected_show_p = true;
+    item = widget_find_by_name (dspnew->edge_menu,
+            "DISPLAY MENU: show directed edges");
+    if (item)
+      gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
+        dspnew->options.edges_directed_show_p);
+*/
+  }
+
+  display_tailpipe (dspnew, FULL, gg);
+
+  ggv->dpos = dnew;
+
+  g_free(values);
+  g_free(colnames);
+  g_free(rownames);
+  g_free(rowids);
+}
+
 /*
  * Definition of D
 */
@@ -39,9 +129,6 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
     gtk_object_get_data (GTK_OBJECT(button), "notebook");
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
-  /*-- for the time being, obtain datad from the current display --*/
-  datad *d = gg->current_display->d;
-  datad *e = gg->current_display->e;
   GtkWidget *clist;
   gint i, j, selected_var;
   gdouble infinity;
@@ -50,7 +137,16 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
   gdouble d12;
   gdouble **Dvals;
   endpointsd *endpoints;
+  datad *d, *dsrc, *e;
+  displayd *dsp = gg->current_display;
 
+  /*
+   * this is awkward -- it allows dsrc to be initialized once
+   *   but never reset
+  */
+  if (!ggv->dsrc)
+    dsrc = ggv->dsrc = dsp->d;
+ 
 /*
 How big is this distance matrix?  if (ggv->complete_Dtarget), then
 it can be larger than e->edge.n.    Perhaps it should be of
@@ -60,33 +156,39 @@ aren't running ggvis on extremely large data, so maybe the
 large size of it isn't important.
 */
 
-  /*-- allocate --*/
-  arrayd_alloc (&ggv->Dtarget, d->nrows, d->nrows);
-  /*-- initalize --*/
-  infinity = (gdouble) (2 * d->nrows);
-  for (i=0; i<d->nrows; i++) {
-    for (j=0; j<d->nrows; j++)
+  /*-- allocate Dtarget --*/
+  arrayd_alloc (&ggv->Dtarget, dsrc->nrows, dsrc->nrows);
+  /*-- initalize Dtarget --*/
+  infinity = (gdouble) (2 * dsrc->nrows);
+  for (i=0; i<dsrc->nrows; i++) {
+    for (j=0; j<dsrc->nrows; j++)
       ggv->Dtarget.vals[i][j] = infinity;
     ggv->Dtarget.vals[i][i] = 0.0;
   }
 
+  ggv->e = gg->current_display->e;
   if (ggv->Dtarget_source == VarValues) {
     clist = get_clist_from_object (GTK_OBJECT (button));
     if (!clist) {
       quick_message ("I can't identify a set of edges", false);
       return;
     }
-    e = gtk_object_get_data (GTK_OBJECT(clist), "datad");
-    if (!e) {
+    ggv->e = gtk_object_get_data (GTK_OBJECT(clist), "datad");
+    if (!ggv->e) {
       quick_message ("I can't identify a set of edges", false);
       return;
     }
-    selected_var = get_one_selection_from_clist (clist, e);
+    selected_var = get_one_selection_from_clist (clist, ggv->e);
   }
-  if (!e) {
-    quick_message ("I can't identify a set of edges", false);
-    return;
+  if (!ggv->e) {
+    if (!edgeset_add (dsp)) {
+      quick_message ("Please specify an edge set", false);
+      return;
+    } else {
+      ggv->e = dsp->e;
+    }
   }
+  e = ggv->e;
 
   Dvals = ggv->Dtarget.vals;
   endpoints = e->edge.endpoints;
@@ -94,8 +196,8 @@ large size of it isn't important.
   /*-- populate --*/
   if (!ggv->complete_Dtarget) {
     for (i = 0; i < e->edge.n; i++) {
-      end1 = d->rowid.idv.els[endpoints[i].a];
-      end2 = d->rowid.idv.els[endpoints[i].b];
+      end1 = dsrc->rowid.idv.els[endpoints[i].a];
+      end2 = dsrc->rowid.idv.els[endpoints[i].b];
 /*
       end1 = edges_arrp->data[i][0]-1;
       end2 = edges_arrp->data[i][1]-1;
@@ -108,8 +210,8 @@ large size of it isn't important.
     while (changing) {
       changing = false;
       for (i = 0; i < e->edge.n; i++) {
-        end1 = d->rowid.idv.els[endpoints[i].a];
-        end2 = d->rowid.idv.els[endpoints[i].b];
+        end1 = dsrc->rowid.idv.els[endpoints[i].a];
+        end2 = dsrc->rowid.idv.els[endpoints[i].b];
 /*
         end1 = edges_arrp->data[i][0]-1;
         end2 = edges_arrp->data[i][1]-1;
@@ -132,10 +234,47 @@ large size of it isn't important.
       }    /* end1 and end2 */
     }    /* while changing. */
   }
+  ggv->ndistances = ggv->Dtarget.nrows * ggv->Dtarget.ncols;
+
+  ggv->mds_threshold_low = ggv->mds_threshold_high = ggv->Dtarget.vals[0][0];
+  for (i=0; i<ggv->Dtarget.nrows; i++) {
+    for (j=0; j<ggv->Dtarget.ncols; j++) {
+      ggv->mds_threshold_low = MIN (ggv->mds_threshold_low,
+                                    ggv->Dtarget.vals[i][j]);
+      ggv->mds_threshold_high = MAX (ggv->mds_threshold_high,
+                                    ggv->Dtarget.vals[i][j]);
+    }
+  }
 }
 
 
 /*-- --*/
+
+void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
+{
+  ggvisd *ggv = ggvisFromInst (inst);
+  ggobid *gg = inst->gg;
+  gboolean state = btn->active;
+
+  if (ggv->Dtarget.nrows == 0) {
+    quick_message ("I can't identify a distance matrix", false);
+    return;
+  }
+  if (!ggv->dpos) {
+    /*-- initialize, allocate and populate dpos --*/
+    ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, ggv, gg);
+  }
+
+  mds_func (state, inst);
+}
+
+void mds_step_cb (GtkToggleButton *btn, PluginInstance *inst)
+{
+}
+void mds_reinit_cb (GtkToggleButton *btn, PluginInstance *inst)
+{
+}
+
 
 void ggv_stepsize_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
@@ -150,17 +289,17 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
   ggv->mds_dims = (gint) (adj->value);
  g_printerr ("mds_dims = %d\n", ggv->mds_dims);
 }
-void ggv_power_cb (GtkAdjustment *adj, PluginInstance *inst)
+void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_power = adj->value;
- g_printerr ("mds_power = %f\n", ggv->mds_power);
+  ggv->mds_dist_power = adj->value;
+ g_printerr ("mds_dist_power = %f\n", ggv->mds_dist_power);
 }
-void ggv_D_power_cb (GtkAdjustment *adj, PluginInstance *inst)
+void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->mds_D_power = adj->value;
- g_printerr ("mds_D_power = %f\n", ggv->mds_D_power);
+  ggv->mds_Dtarget_power = adj->value;
+ g_printerr ("mds_Dtarget_power = %f\n", ggv->mds_Dtarget_power);
 }
 void ggv_lnorm_cb (GtkAdjustment *adj, PluginInstance *inst)
 {

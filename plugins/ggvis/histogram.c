@@ -12,7 +12,7 @@ gint
 ggv_histogram_configure_cb (GtkWidget *w, GdkEventExpose *event,
   PluginInstance *inst)
 {
-  ggobid *gg = inst->gg;
+  /*ggobid *gg = inst->gg;*/
   ggvisd *ggv = ggvisFromInst (inst);
   gboolean retval = true;
 
@@ -67,4 +67,8 @@ ggv_histogram_expose_cb (GtkWidget *w, GdkEventExpose *event,
                    w->allocation.height);
 
   return retval;
+}
+
+void update_histogram (ggvisd *ggv)
+{
 }

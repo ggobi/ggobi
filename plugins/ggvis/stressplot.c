@@ -68,3 +68,11 @@ ggv_stressplot_expose_cb (GtkWidget *w, GdkEventExpose *event,
 
   return retval;
 }
+
+void
+draw_stress (void)
+{
+}
+void add_stress_value (gdouble val, ggvisd *ggv)
+{
+}

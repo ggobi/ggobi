@@ -9,7 +9,16 @@
 #include "ggvis.h"
 
 void
-ggvis_init (ggvisd *ggv) {
+ggvis_init (ggvisd *ggv)
+{
+  /*-- initialize the datad pointers --*/
+  ggv->dsrc = NULL;
+  ggv->dpos = NULL;
+  ggv->e = NULL;
+
+  ggv->mds_running = false;
+  ggv->idle_id = 0;
+
   arrayd_init_null (&ggv->Dtarget);
   arrayd_init_null (&ggv->pos);
 
@@ -19,15 +28,15 @@ ggvis_init (ggvisd *ggv) {
   ggv->mds_dims = 3;
 
   ggv->mds_stepsize = 0.02;
-  ggv->mds_power = 1.0;
-  ggv->mds_D_power = 1.0;
+  ggv->mds_dist_power = 1.0;
+  ggv->mds_Dtarget_power = 1.0;
   ggv->mds_lnorm = 2.0;
-  ggv->mds_D_power_over_lnorm = 1.0;
+  ggv->mds_dist_power_over_lnorm = 1.0;
   ggv->mds_weight_power = 0.0;
 
   ggv->mds_isotonic_mix = 1.0;
-  ggv->mds_D_power_over_lnorm = 0.5;
-  ggv->mds_lnorm_over_D_power = 2.0;
+  ggv->mds_dist_power_over_lnorm = 0.5;
+  ggv->mds_lnorm_over_dist_power = 2.0;
   ggv->mds_within_between = 1.0;
   ggv->mds_rand_select_val = 1.0;
   ggv->mds_rand_select_new = false;
