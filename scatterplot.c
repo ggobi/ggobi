@@ -184,10 +184,10 @@ display_datad_added_cb (ggobid *gg, datad *d, void *win)
 {
   windowDisplayd *display =  GTK_GGOBI_WINDOW_DISPLAY(GTK_OBJECT(win));
 
-    /*-- this is all true even when the display is first opened --*/
+  /*-- this is all true even when the display is first opened --*/
   if (GTK_WIDGET_REALIZED (display->window)) {
-      scatterplot_display_edge_menu_update (GTK_GGOBI_DISPLAY(display), gg->app.sp_accel_group, 
-					    display_options_cb, gg);
+      scatterplot_display_edge_menu_update (GTK_GGOBI_DISPLAY(display),
+        gg->app.sp_accel_group, display_options_cb, gg);
   }
 }
 
@@ -208,13 +208,14 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
 displayd *
 scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, datad *d, ggobid *gg)
 {
+
   return(createScatterplot(missing_p, NULL, numVars, vars, d, gg));
 #if 00
   splotd *sp;
   displayd *display = NULL;
   if(numVars < 2)
      return(NULL);
-/*XX dislay needs to be non-null here. Need to get the order correct. Change scatterplot_new! */
+/*XXX display needs to be non-null here. Need to get the order correct. Change scatterplot_new! */
   sp = gtk_scatter_plot_new(NULL, 400, 400, gg);
   sp->xyvars.x = vars[0];
   sp->xyvars.y = vars[1];
@@ -268,21 +269,22 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
   /*-- Add the main menu bar --*/
   vbox = GTK_WIDGET(display); /* gtk_vbox_new (false, 1); */
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
+  gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+    vbox);
 
   gg->app.sp_accel_group = gtk_accel_group_new ();
   factory = get_main_menu (menu_items,
-			   sizeof (menu_items) / sizeof (menu_items[0]),
-			   gg->app.sp_accel_group, 
-			   GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
-			   &display->menubar,
-			   (gpointer) display);
+    sizeof (menu_items) / sizeof (menu_items[0]),
+    gg->app.sp_accel_group, 
+    GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
+    &display->menubar,
+    (gpointer) display);
 
   /*-- add a tooltip to the file menu --*/
   w = gtk_item_factory_get_widget (factory, "<main>/File");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-			gtk_menu_get_attach_widget (GTK_MENU(w)),
-			"File menu for this display", NULL);
+    gtk_menu_get_attach_widget (GTK_MENU(w)),
+    "File menu for this display", NULL);
 
   /*
    * After creating the menubar, and populating the file menu,
@@ -397,8 +399,13 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
   scatterplot_show_rulers (display, projection);
   ruler_ranges_set (true, display, sp, gg);
 
-  gtk_signal_connect (GTK_OBJECT(gg), "datad_added",
-		        (GtkSignalFunc) display_datad_added_cb, display);
+  /*
+   * Using the 'while_alive' version makes sure that this signal
+   * is disconnected when the display is freed, which wasn't
+   * always happening previously.
+  */
+  gtk_signal_connect_while_alive (GTK_OBJECT(gg), "datad_added",
+        (GtkSignalFunc) display_datad_added_cb, display, GTK_OBJECT(display));
 
   return display;
 }
@@ -471,7 +478,7 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       mid.x = sp->max.x / 2;
       scalefac.x = 1.0;
       /*      scale_x = (cpanel->projection == TOUR2D) ? &sp->tour_scale.x :
-	      &sp->scale.x;*/
+              &sp->scale.x;*/
       scale_x = &sp->scale.x;
       if (ABS(event->x - mid.x) >= npix) {
         scalefac.x = (gfloat) (event->x - mid.x) /
@@ -491,7 +498,7 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       mid.y = sp->max.y / 2;
       scalefac.y = 1.0;
       /*      scale_y = (cpanel->projection == TOUR2D) ? &sp->tour_scale.y :
-	      &sp->scale.y;*/
+              &sp->scale.y;*/
       scale_y = &sp->scale.y;
       if (ABS(event->y - mid.y) >= npix) {
         scalefac.y = (gfloat) (event->y - mid.y) /
