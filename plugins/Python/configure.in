@@ -11,7 +11,7 @@ AC_ARG_WITH(threads, [--with-threads  link against the thread libraries for a th
    fi
        )
 
-PY_CONFIG_DIR=${OMEGA_HOME}/Python/R/Install
+PY_CONFIG_DIR=Install
 
 AC_PATH_PROG(PYTHON, python)
 
