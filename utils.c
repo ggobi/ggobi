@@ -189,8 +189,8 @@ glyphNames (gchar **names) {
     {"plus", "x", "openrectangle",  "filledrectangle", "opencircle",
     "filledcircle", "point"};
   for (i=0; i < sizeof(gnames)/sizeof(gnames[0]); i++) 
-    names[i] = gnames[i];
-  return (7);
+    names[i] = (gchar *) gnames[i];
+  return (NGLYPHTYPES);
 }
 
 /* ---------------------------------------------------------------------*/
@@ -454,30 +454,6 @@ find_keepers (gint ncols_current, gint nc, gint *cols, gint *keepers)
 
   return nkeepers;
 }
-
-/*gint
-find_keepers (gint ncols_current, gint nc, gint *cols, gint *keepers)
-{
-  gint nkeepers;
-  gint j, k;
-
-  j = nkeepers = k = 0;
-  while (j < ncols_current) {
-    while (j < cols[k] && j < ncols_current) {
-      keepers[nkeepers++] = j++;
-    }
-    k++;
-    j++;
-  }
-
-  if (nkeepers != ncols_current - nc) {
-    g_printerr ("your logic is wrong! nc %d nc_to_delete %d ncols_to_keep = %d\n",
-      ncols_current, nc, nkeepers);
-    exit (1);
-  }
-
-  return nkeepers;
-}*/
 
 /*--- set the data_mode depending on the suffix of the filename --*/
 DataMode
