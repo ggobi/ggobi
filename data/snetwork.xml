@@ -4,6 +4,7 @@
 <ggobidata count="2">
 <data name="People">
 <description>
+An artificial social network of 140 people.
 </description>
 <variables count="2">
 <variable>A</variable>
@@ -436,7 +437,7 @@
 <description>
 </description>
 <variables count="2">
-<variable>weight</variable>
+<variable>n interactions</variable>
 <variable>center triangle</variable>
 </variables>
 <records
