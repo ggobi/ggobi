@@ -197,6 +197,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gint x = xmargin;
   gint y = ymargin;
   GdkPoint *points;
+  gfloat diff;
 /*
  * get the current d and the selected variable 
  *   in the clist in order to draw the labels
@@ -351,8 +352,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
       gdk_text_extents (style->font, str, strlen(str),
         &lbearing, &rbearing, &width, &ascent, &descent);
       x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-      x -= (gg->wvis.pct[k]-gg->wvis.pct[k-1])/2 *
-             (w->allocation.width - 2*xmargin);
+      diff = (k == 0) ? gg->wvis.pct[k] : gg->wvis.pct[k]-gg->wvis.pct[k-1]; 
+      x -= diff/2 * (w->allocation.width - 2*xmargin);
       gdk_draw_string (pix, style->font, gg->plot_GC,
         x - width/2,
         (w->allocation.height - ymargin) + ascent + descent + 2,
