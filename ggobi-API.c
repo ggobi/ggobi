@@ -975,7 +975,6 @@ gint
 GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update, 
   datad *d, ggobid *gg)
 {
-  gint which;
 
   if (d->ncols < 1) {
     gint i;
@@ -993,6 +992,7 @@ GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update,
 
     /*
      * I'm breaking this section for now, reworking cloning -- dfs
+    gint which;
     variable_clone (0, name, true, d, gg);
     which = d->ncols-1;
     GGOBI(setVariableValues)(which, vals, num, update, d, gg);
@@ -1035,8 +1035,14 @@ GGOBI(setVariableValues)(gint whichVar, gdouble *vals, gint num,
 void
 GGOBI(update_data)(datad *d, ggobid *gg)
 {
+/*
   vartable_stats_set (d, gg);
   vartable_lim_update (d, gg);
+*/
+  limits_set (true, true, d);  
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+
   tform_to_world (d, gg);
 }
 

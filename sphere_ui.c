@@ -99,7 +99,11 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
 
 
       /*-- these three lines replicated from transform.c --*/
-      vartable_lim_update (d, gg);
+      /*vartable_lim_update (d, gg);*/
+      limits_set (false, true, d);
+      vartable_limits_set (d);
+      vartable_stats_set (d);
+
       tform_to_world (d, gg);
       displays_tailpipe (REDISPLAY_PRESENT, gg);
     }

@@ -50,8 +50,13 @@ impute_cb (GtkWidget *w, ggobid *gg) {
   }
 
   if (redraw) {
-    if (gg->impute.rescale_p)
-      vartable_lim_update (d, gg);
+    if (gg->impute.rescale_p) {
+      /*vartable_lim_update (d, gg);*/
+      limits_set (true, true, d);  
+      vartable_limits_set (d);
+      vartable_stats_set (d);
+    }
+
     tform_to_world (d, gg);
     displays_tailpipe (REDISPLAY_ALL, gg);
   }

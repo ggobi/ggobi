@@ -118,8 +118,14 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
    * the first function could be needed if transformation has been
    * going on, because lim_tform could be out of step.
   */
+/*
   vartable_stats_set (d, gg);
   vartable_lim_update (d, gg);
+*/
+  limits_set (false, false, d);  
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+
   tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_ALL, gg);
 
@@ -206,8 +212,14 @@ void range_unset_cb (GtkWidget *w, ggobid *gg)
 
 
   /*-- these 4 lines the same as in dialog_range_set --*/
+/*
   vartable_stats_set (d, gg);
   vartable_lim_update (d, gg);
+*/
+  limits_set (false, false, d);  
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+
   tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_ALL, gg);
 }
@@ -260,8 +272,6 @@ selection_made (GtkWidget *cl, gint row, gint column,
   gtk_clist_get_text (GTK_CLIST (d->vartable_clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
   d->vartable[varno].selected = true;
-
-g_printerr ("var %d is selected\n", varno);
 
   return;
 }
@@ -489,10 +499,56 @@ vartable_open (ggobid *gg)
   gdk_window_raise (gg->vartable_ui.window->window);
 }
 
+/*-------------------------------------------------------------------------*/
+/*                 set values in the table                                 */
+/*-------------------------------------------------------------------------*/
+
+/*-- sets the name of the transformed variable --*/
 void
-vartable_tform_set (gint varno, datad *d, ggobid *gg) {
+vartable_collab_tform_set_by_var (gint j, datad *d)
+{
+  if (d->vartable_clist != NULL)
+    gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+      CLIST_TFORM, d->vartable[j].collab_tform);
+}
+
+/*-- sets the limits for a variable --*/
+void
+vartable_limits_set_by_var (gint j, datad *d)
+{
+  if (d->vartable_clist != NULL) {
+    gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+      CLIST_DATA_MIN,
+      g_strdup_printf ("%8.3f", d->vartable[j].lim_tform.min));
+    gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+      CLIST_DATA_MAX,
+      g_strdup_printf ("%8.3f", d->vartable[j].lim_tform.max));
+  }
+}
+void
+vartable_limits_set (datad *d) 
+{
+  gint j;
+  if (d->vartable_clist != NULL)
+    for (j=0; j<d->ncols; j++)
+    vartable_limits_set_by_var (j, d);
+}
+
+/*-- sets the mean, median for a variable --*/
+void
+vartable_stats_set_by_var (gint j, datad *d) {
+  if (d->vartable_clist != NULL) {
+    gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+      CLIST_MEAN, g_strdup_printf ("%8.3f", d->vartable[j].mean));
+    gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+      CLIST_MEDIAN, g_strdup_printf ("%8.3f", d->vartable[j].median));
+  }
+}
+void
+vartable_stats_set (datad *d) {
+  gint j;
 
   if (d->vartable_clist != NULL)
-    gtk_clist_set_text (GTK_CLIST (d->vartable_clist), varno,
-      CLIST_TFORM, d->vartable[varno].collab_tform);
+    for (j=0; j<d->ncols; j++)
+      vartable_stats_set_by_var (j, d);
 }

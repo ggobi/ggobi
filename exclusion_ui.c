@@ -91,7 +91,15 @@ exclude_cluster_cb (GtkToggleButton *btn, gpointer cbd)
   rows_in_plot_set (d, gg);
 
   /*-- should be exactly what happens in subset_apply --*/
-  vartable_lim_update (d, gg);  /*-- if rescaling, right? --*/
+  /*vartable_lim_update (d, gg);*/
+
+  /*-- seems to assume rescaling --*/
+  /*-- computes new limits, raw and tform --*/
+  limits_set (true, true, d);  
+  /*-- set the ranges and statistics in the variable stats table --*/
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+  
   tform_to_world (d, gg);
   displays_tailpipe (REDISPLAY_ALL, gg);
 /*  assign_points_to_bins ();*/

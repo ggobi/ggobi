@@ -8,6 +8,7 @@
     with AT&T, you have an infringing copy of this software and cannot use
     it without violating AT&T's intellectual property rights.
 */
+#include <stdlib.h>
 
 #include <gtk/gtk.h>
 #include "vars.h"
@@ -102,7 +103,9 @@ limits_raw_set (datad *d) {
 void
 limits_tform_set_by_var (gint j, datad *d)
 {
-  gint i, m;
+  gint i, m, np = 0;
+  gfloat sum = 0.0;
+  gfloat *x = (gfloat *) g_malloc (d->nrows * sizeof (gfloat));
 
   d->vartable[j].lim_tform.min = d->tform.vals[0][j];
   d->vartable[j].lim_tform.max = d->tform.vals[0][j];
@@ -116,8 +119,21 @@ limits_tform_set_by_var (gint j, datad *d)
         d->vartable[j].lim_tform.min = d->tform.vals[i][j];
       else if (d->tform.vals[i][j] > d->vartable[j].lim_tform.max)
         d->vartable[j].lim_tform.max = d->tform.vals[i][j];
+
+      sum += d->tform.vals[i][j];
+      x[np] = d->tform.vals[i][j];
+      np++;
     }
   }
+
+  d->vartable[j].mean = sum / np;
+
+  /*-- median: sort the temporary vector, and find its center --*/
+  qsort((void *) x, np, sizeof (gfloat), fcompare);
+  d->vartable[j].median = 
+    ((np % 2) != 0) ?  x[(np-1)/2] : (x[np/2-1] + x[np/2])/2. ;
+
+  g_free ((gpointer) x);
 }
 
 void
@@ -129,18 +145,21 @@ limits_tform_set (datad *d) {
   }
 }
 
-/*-- limits_set --*/  /*-- sets the limits used in scaling --*/
+
 void
-vartable_lim_update (datad *d, ggobid *gg)
+limits_set (gboolean do_raw, gboolean do_tform, datad *d)
 {
   gint j;
   gfloat min, max;
-  gboolean do_raw = true;
 
+  /*-- compute the limits for the raw data --*/
   if (do_raw)
     limits_raw_set (d);
-  limits_tform_set (d);
+  /*-- compute the limits for the transformed data --*/
+  if (do_tform)
+    limits_tform_set (d);
 
+  /*-- specify the limits used: from data or user specification --*/
   for (j=0; j<d->ncols; j++) {
 
     if (d->vartable[j].lim_specified_p) {

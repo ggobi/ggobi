@@ -154,9 +154,11 @@ vartable_stats_print (datad *d, ggobid *gg)
   }
 }
 
+/*-- obsolete --*/
 /*
  * Sets lim_raw from d->raw, and lim_tform from d->tform.
 */
+/*
 void
 vartable_stats_set (datad *d, ggobid *gg) 
 {
@@ -164,11 +166,11 @@ vartable_stats_set (datad *d, ggobid *gg)
   gfloat *sumv = (gfloat *) g_malloc0 (d->ncols * sizeof (gfloat));
   gfloat *x = (gfloat *) g_malloc (d->nrows * sizeof (gfloat));
 
-  /*
+  *
    * this could be done with less code, but this 
    * minimizes looping and function calls, and should
    * be as as fast as we can make it
-  */
+  *
 
   for (j=0; j<d->ncols; j++) {
     d->vartable[j].lim_raw.min = d->raw.vals[0][j];
@@ -202,7 +204,7 @@ vartable_stats_set (datad *d, ggobid *gg)
     }
     d->vartable[j].mean = sumv[j] / (gfloat) d->nrows;
 
-    /*-- median: sort the temporary vector, and find its center --*/
+    *-- median: sort the temporary vector, and find its center --*
     qsort((void *) x, np, sizeof (gfloat), fcompare);
     d->vartable[j].median = 
       ((np % 2) != 0) ?  x[(np-1)/2] : (x[np/2-1] + x[np/2])/2. ;
@@ -211,6 +213,7 @@ vartable_stats_set (datad *d, ggobid *gg)
   g_free ((gpointer) sumv);
   g_free ((gpointer) x);
 }
+*/
 
 /*-------------------------------------------------------------------------*/
 /*                   adding and deleting variables                         */
@@ -267,24 +270,6 @@ vartable_row_append (gint j, datad *d, ggobid *gg)
 
     for (k=0; k<NCOLS_CLIST; k++)
       g_free ((gpointer) row[k]);
-    g_free ((gpointer) row);
-  }
-}
-
-void
-vartable_row_update (gint j, datad *d, ggobid *gg)
-{
-  if (d->vartable_clist != NULL) {
-    gint k;
-    gchar **row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
-
-    vartable_row_assemble (j, row, d, gg);
-    gtk_clist_append ((GtkCList *) d->vartable_clist, row);
-
-    for (k=0; k<NCOLS_CLIST; k++) {
-      gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j, k, row[k]);
-      g_free ((gpointer) row[k]);
-    }
     g_free ((gpointer) row);
   }
 }

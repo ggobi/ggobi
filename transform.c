@@ -721,7 +721,7 @@ void tform_label_update (gint jcol, datad *d, ggobid *gg)
   varlabel_set (jcol, d, gg);
 
   /*-- update the variable statistics table --*/
-  vartable_tform_set (jcol, d, gg);
+  vartable_collab_tform_set_by_var (jcol, d);
 }
 
 /*---------------------------------------------------------------------*/
@@ -792,7 +792,11 @@ transform (gint stage, gint tform_type, gfloat param, datad *d, ggobid *gg)
 
   g_free ((gpointer) cols);
 
-  vartable_lim_update (d, gg);
+/*  vartable_lim_update (d, gg);*/
+  limits_set (false, true, d);  
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+
   tform_to_world (d, gg);
 
   /*
