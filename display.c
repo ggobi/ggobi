@@ -460,22 +460,22 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
   if(force == false && sessionOptions->info->allowCloseLastDisplay)
       force = true;
 
-  if (num_ggobis > 1 || force || g_list_length (gg->displays) > 1) {
+  if (num_ggobis > 1 || force || g_list_length (gg->displays) > 0) {
 
     /* These are probably mutually exclusive 
        and so we could use an else-if sequence
        but the results are catastrophic if we get it
        wrong so we play on the safe side of the fence.
      */
-  if(display->t2d.idled) {
+    if(display->t2d.idled) {
       tour2d_func(false, display, gg);
-  }
-  if(display->t1d.idled) {
+    }
+    if(display->t1d.idled) {
       tour1d_func(false, display, gg);
-  }
-  if(display->tcorr1.idled) {
+    }
+    if(display->tcorr1.idled) {
       tourcorr_func(false, display, gg);
-  }
+    }
 
 /*
  * If the current splot belongs to this display, turn off its
@@ -485,10 +485,10 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
   This was outside and before the conditional of being able to close
   this display.
 */
-  dsp = (displayd *) gg->current_splot->displayptr;
-  if (dsp == display) {
-     sp_event_handlers_toggle (gg->current_splot, off);
-  }
+    dsp = (displayd *) gg->current_splot->displayptr;
+    if (dsp == display) {
+      sp_event_handlers_toggle (gg->current_splot, off);
+    }
 
 
     /*-- If the display tree is active, remove the corresponding entry. --*/
