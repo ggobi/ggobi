@@ -54,6 +54,8 @@ datad_new(datad *d, ggobid *gg)
 
   vectori_init (&d->clusterids);
 
+  sphere_init (d);
+
   gg->d = g_slist_append (gg->d, d);
   return (d);
 }

@@ -40,7 +40,12 @@ void sphere_totvar_set (gfloat x, datad *d, ggobid* gg)
 
 static void
 deleteit (ggobid *gg) {
+  GSList *l;
+
   gtk_widget_hide (gg->sphere_ui.window);
+
+  for (l=gg->d; l; l=l->next)
+    sphere_free ((datad *) l->data);
 
   gdk_pixmap_unref (gg->sphere_ui.scree_pixmap);
   gtk_widget_destroy (gg->sphere_ui.window);
@@ -169,7 +174,7 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 
   CHECK_GG (gg);
 
-  eigenvals_get (evals, d, gg);
+  eigenvals_get (evals, d);
 
   /* clear the pixmap */
   gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
@@ -242,11 +247,11 @@ sphere_panel_open (ggobid *gg)
   GtkWidget *spinner;
   datad *d = gg->current_display->d;
 
-  spherevars_set (d, gg);
-/*
-  gint nvars;
-  nvars = nspherevars_get (d, gg);
-*/
+  /*
+   * this line may look redundant, but it's needed for the adjustment
+   * to be correctly initialized 
+  */
+  spherevars_set (d, gg); 
 
   if (gg->sphere_ui.window == NULL) {
     gg->sphere_ui.d = d;

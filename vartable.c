@@ -32,6 +32,17 @@ static gboolean vartable_update_cloned_var (gint, gint, datad *, ggobid *);
 /*                         utilities                                       */
 /*-------------------------------------------------------------------------*/
 
+gboolean
+array_contains (gint* arr, gint n, gint el)
+{
+  gint j;
+
+  for (j=0; j<n; j++)
+    if (arr[j] == el)
+      return true;
+  
+  return false;
+}
 
 gint
 selected_cols_get (gint *cols, datad *d, ggobid *gg)
@@ -84,12 +95,12 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
       for (l=display->splots; l; l=l->next) {
         s = (splotd *) l->data;
         if (s->p1dvar == -1) {
-          if (!array_contains (cols, sp->xyvars.x))
+          if (!array_contains (cols, ncols, sp->xyvars.x))
             cols[ncols++] = sp->xyvars.x;
-          if (!array_contains (cols, sp->xyvars.y))
+          if (!array_contains (cols, ncols, sp->xyvars.y))
             cols[ncols++] = sp->xyvars.y;
         } else {
-          if (!array_contains (cols, sp->p1dvar))
+          if (!array_contains (cols, ncols, sp->p1dvar))
             cols[ncols++] = sp->p1dvar;
         }
       }
@@ -101,7 +112,7 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
       splotd *s;
       for (l=display->splots; l; l=l->next) {
         s = (splotd *) l->data;
-        if (!array_contains (cols, sp->p1dvar))
+        if (!array_contains (cols, ncols, sp->p1dvar))
           cols[ncols++] = sp->p1dvar;
       }
     }
@@ -174,17 +185,6 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
   vartable_free_var (jfrom, d);
 }
 
-gboolean
-array_contains (gint* arr, gint n, gint el)
-{
-  gint j;
-
-  for (j=0; j<n; j++)
-    if (arr[j] == el)
-      return true;
-  
-  return false;
-}
 
 /*-- eliminate the ncol columns in cols --*/
 void

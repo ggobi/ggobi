@@ -14,6 +14,10 @@
 
 #include "externs.h"
 
+/*
+ * Made changes in vectorf and vectori, not in the rest
+*/
+
 
 /*-------------------------------------------------------------------------*/
 /*                    floating point vector management                     */
@@ -29,7 +33,8 @@ vectorf_init (vector_f *vecp)
 void
 vectorf_free (vector_f *vecp)
 {
-  g_free ((gpointer) vecp);
+ if (vecp->vals != NULL)
+    g_free ((gpointer) vecp->vals);
   vecp->nels = 0;
 }
 
@@ -42,22 +47,44 @@ vectorf_zero (vector_f *vecp)
     vecp->vals[i] = 0.0;
 }
 
-/* allocate or reallocate a floating point vector */
+/* allocate a floating point vector */
+void
+vectorf_alloc (vector_f *vecp, gint nels)
+{
+  if (vecp->vals != NULL)
+    g_free (vecp->vals);
+
+  vecp->nels = nels;
+  if (nels > 0)
+    vecp->vals = (gfloat *) g_malloc (nels * sizeof (gfloat));
+}
+
 void
 vectorf_realloc (vector_f *vecp, gint nels)
 {
-  vecp->vals = (gfloat *) g_realloc (vecp->vals, nels * sizeof (gfloat));
+  if (nels > 0) {
+    if (vecp->vals == NULL)
+      vecp->vals = (gfloat *) g_malloc (nels * sizeof (gfloat));
+    else 
+      vecp->vals = (gfloat *) g_realloc (vecp->vals, nels * sizeof (gfloat));
+  } else {
+    if (vecp->vals != NULL)
+      g_free (vecp->vals);
+  }
+
   vecp->nels = nels;
 }
 
-/* allocate or reallocate a floating point vector populated with 0 */
+/* allocate a floating point vector populated with 0 */
 void
-vectorf_realloc_zero (vector_f *vecp, gint nels)
+vectorf_alloc_zero (vector_f *vecp, gint nels)
 {
-  vecp->vals = (gfloat *) g_realloc (vecp->vals, nels * sizeof (gfloat));
-  vecp->nels = nels;
+  if (vecp->vals != NULL)
+    g_free (vecp->vals);
 
-  vectorf_zero (vecp);
+  vecp->nels = nels;
+  if (nels > 0)
+    vecp->vals = (gfloat *) g_malloc0 (nels * sizeof (gfloat));
 }
 
 void
@@ -68,6 +95,9 @@ vectorf_copy (vector_f *vecp_from, vector_f *vecp_to)
   if (vecp_from->nels == vecp_to->nels)
     for (i=0; i<vecp_from->nels; i++)
       vecp_to->vals[i] = vecp_from->vals[i];
+  else
+    g_printerr ("(vectorf_copy) length of source = %d, of destination = %d\n",
+      vecp_from->nels, vecp_to->nels);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -84,7 +114,8 @@ vectori_init (vector_i *vecp)
 void
 vectori_free (vector_i *vecp)
 {
-  g_free ((gpointer) vecp);
+  if (vecp->vals != NULL)
+    g_free ((gpointer) vecp->vals);
   vecp->nels = 0;
 }
 
@@ -97,22 +128,44 @@ vectori_zero (vector_i *vecp)
     vecp->vals[i] = 0;
 }
 
-/* allocate or reallocate an integer vector */
+/* allocate an integer vector */
+void
+vectori_alloc (vector_i *vecp, gint nels)
+{
+  if (vecp->vals != NULL)
+    g_free (vecp->vals);
+
+  vecp->nels = nels;
+  if (nels > 0)
+    vecp->vals = (gint *) g_malloc (nels * sizeof (gint));
+}
+
+/* allocate an integer vector; populate with 0 */
+void
+vectori_alloc_zero (vector_i *vecp, gint nels)
+{
+  if (vecp->vals != NULL)
+    g_free (vecp->vals);
+
+  vecp->nels = nels;
+  if (nels > 0)
+    vecp->vals = (gint *) g_malloc0 (nels * sizeof (gint));
+}
+
 void
 vectori_realloc (vector_i *vecp, gint nels)
 {
-  vecp->vals = (gint *) g_realloc (vecp->vals, nels * sizeof (gint));
-  vecp->nels = nels;
-}
+  if (nels > 0) {
+    if (vecp->vals == NULL)
+      vecp->vals = (gint *) g_malloc (nels * sizeof (gint));
+    else 
+      vecp->vals = (gint *) g_realloc (vecp->vals, nels * sizeof (gint));
+  } else {
+    if (vecp->vals != NULL)
+      g_free (vecp->vals);
+  }
 
-/* allocate or reallocate an integer vector; populate with 0 */
-void
-vectori_realloc_zero (vector_i *vecp, gint nels)
-{
-  vecp->vals = (gint *) g_realloc (vecp->vals, nels * sizeof (gint));
   vecp->nels = nels;
-
-  vectori_zero (vecp);
 }
 
 void
@@ -123,6 +176,9 @@ vectori_copy (vector_i *vecp_from, vector_i *vecp_to)
   if (vecp_from->nels == vecp_to->nels)
     for (i=0; i<vecp_from->nels; i++)
       vecp_to->vals[i] = vecp_from->vals[i];
+  else
+    g_printerr ("(vectori_copy) length of source = %d, of destination = %d\n",
+      vecp_from->nels, vecp_to->nels);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -137,7 +193,8 @@ void vectorb_init (vector_b *vecp)
 
 void vectorb_free (vector_b *vecp)
 {
-  g_free ((gpointer) vecp);
+  if (vecp->vals == NULL)
+    g_free ((gpointer) vecp->vals);
   vecp->nels = 0;
 }
 
@@ -150,15 +207,17 @@ void vectorb_zero (vector_b *vecp)
 
 void vectorb_realloc (vector_b *vecp, gint nels)
 {
-  vecp->vals = (gboolean *)
-    g_realloc (vecp->vals, nels * sizeof (gboolean));
+  if (vecp->vals == NULL)
+    vecp->vals = (gboolean *) g_malloc (nels * sizeof (gboolean));
+  else
+    vecp->vals = (gboolean *) g_realloc (vecp->vals, nels * sizeof (gboolean));
+
   vecp->nels = nels;
 }
 
 void vectorb_realloc_zero (vector_b *vecp, gint nels)
 {
-  vecp->vals = (gboolean *) g_realloc (vecp->vals, nels * sizeof (gboolean));
-  vecp->nels = nels;
+  vectorb_realloc (vecp, nels);
   vectorb_zero (vecp);
 }
 
@@ -168,6 +227,9 @@ void vectorb_copy (vector_b *vecp_from, vector_b *vecp_to)
   if (vecp_from->nels == vecp_to->nels)
     for (i=0; i<vecp_from->nels; i++)
       vecp_to->vals[i] = vecp_from->vals[i];
+  else
+    g_printerr ("(vectorb_copy) length of source = %d, of destination = %d\n",
+      vecp_from->nels, vecp_to->nels);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -182,7 +244,8 @@ void vectors_init (vector_s *vecp)
 
 void vectors_free (vector_s *vecp)
 {
-  g_free ((gpointer) vecp);
+  if (vecp->vals == NULL)
+    g_free ((gpointer) vecp->vals);
   vecp->nels = 0;
 }
 
@@ -195,15 +258,17 @@ void vectors_zero (vector_s *vecp)
 
 void vectors_realloc (vector_s *vecp, gint nels)
 {
-  vecp->vals = (gshort *)
-    g_realloc (vecp->vals, nels * sizeof (gshort));
+  if (vecp->vals == NULL)
+    vecp->vals = (gshort *) g_malloc (nels * sizeof (gshort));
+  else
+    vecp->vals = (gshort *) g_realloc (vecp->vals, nels * sizeof (gshort));
+
   vecp->nels = nels;
 }
 
 void vectors_realloc_zero (vector_s *vecp, gint nels)
 {
-  vecp->vals = (gshort *) g_realloc (vecp->vals, nels * sizeof (gshort));
-  vecp->nels = nels;
+  vectors_realloc (vecp, nels);
   vectors_zero (vecp);
 }
 
@@ -213,4 +278,7 @@ void vectors_copy (vector_s *vecp_from, vector_s *vecp_to)
   if (vecp_from->nels == vecp_to->nels)
     for (i=0; i<vecp_from->nels; i++)
       vecp_to->vals[i] = vecp_from->vals[i];
+  else
+    g_printerr ("(vectors_copy) length of source = %d, of destination = %d\n",
+      vecp_from->nels, vecp_to->nels);
 }

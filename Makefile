@@ -133,6 +133,7 @@ mt19937-1.o: mt19937-1.c
 	$(CC) $(CFLAGS) `gtk-config --cflags` -c $<
 
 efence: $(OB)
+	MALLOC_CHECK_=2
 	$(CC) $(OB) $(LDFLAGS) $(EFENCE_LIBS) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --cflags --libs`
 
 lib: libggobi.so

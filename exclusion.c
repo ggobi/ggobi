@@ -37,7 +37,7 @@ clusters_set (datad *d, ggobid *gg) {
    *  indicating its cluster membership
   */
   if (d->clusterids.nels != d->nrows) {
-    vectori_realloc_zero (&d->clusterids, d->nrows);
+    vectori_alloc_zero (&d->clusterids, d->nrows);
   }
 
   /*

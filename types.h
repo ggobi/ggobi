@@ -40,35 +40,35 @@ typedef struct {
 /*-- floating point: for gg.raw_data, tform1, tform2 --*/
 typedef struct {
   gfloat **vals;
-  gint nrows, ncols;
+  guint nrows, ncols;
 } array_f;
 /*-- short: for gg.missing --*/
 typedef struct {
   gshort **vals;
-  gint nrows, ncols;
+  guint nrows, ncols;
 } array_s;
 /*-- long: for gg.world, jitdata --*/
 typedef struct {
   glong **vals;
-  gint nrows, ncols;
+  guint nrows, ncols;
 } array_l;
 
 /*-- vectors --*/
 typedef struct {
   gfloat *vals;
-  glong nels;
+  guint nels;
 } vector_f;
 typedef struct {
   gint *vals;
-  gint nels;
+  guint nels;
 } vector_i;
 typedef struct {
   gshort *vals;
-  gint nels;
+  guint nels;
 } vector_s;
 typedef struct {
   gboolean *vals;
-  gint nels;
+  guint nels;
 } vector_b;
 
 typedef struct {  /*-- used for obtaining ranks --*/
