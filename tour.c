@@ -620,7 +620,7 @@ run_tour (displayd *dsp, ggobid *gg)
 */
   if (!dsp->tour_get_new_target && check_tour (dsp, cpanel)) {
     increment_tour (dsp, gg);
-    tour_draw_circles(d, gg);
+    tour_draw_circles (d, gg);
   }
 /*
  * Calculation of new path for various different modes.
@@ -633,7 +633,7 @@ run_tour (displayd *dsp, ggobid *gg)
         do_last_increment (dsp, cpanel, gg);
       determine_endbasis_and_path (dsp, cpanel, gg);
       dsp->tour_get_new_target = false;
-      tour_draw_circles(d, gg);
+      tour_draw_circles (d, gg);
   }
 }
 

@@ -600,8 +600,8 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
 	  }
           break;
         case TOUR2D:
-          x = (gint) (gg->current_display->u[0][jvar]*(float)r);
-          y = (gint) (gg->current_display->u[1][jvar]*(float)r);
+          x = (gint) (gg->current_display->u[0][jvar]*(gfloat)r);
+          y = (gint) (gg->current_display->u[1][jvar]*(gfloat)r);
           gdk_draw_line (vpixmap, gg->selvarfg_GC, r, r, r+x, r-y);
           chosen = true;
           break;
@@ -651,12 +651,13 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
                    VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
 }
 
-void tour_draw_circles(datad *d, ggobid *gg)
+void tour_draw_circles (datad *d, ggobid *gg)
 {
   gint j;
 
-  for (j=0; j<-d->ncols; j++)
-    varcircle_draw(j, d, gg);
+  for (j=0; j<d->ncols; j++) {
+    varcircle_draw (j, d, gg);
+  }
 }
 
 gboolean
