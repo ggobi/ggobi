@@ -311,8 +311,8 @@ void tour1d_step_cb(displayd *dsp, tour td, gint projdim, ggobid *gg,
 }
 #endif
 
-void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
-  /*  displayd *dsp = gg->current_display;*/
+void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg)
+{
   cpanel->t1d.paused = state;
 
   tour1d_func (!cpanel->t1d.paused, gg->current_display, gg);
@@ -321,12 +321,6 @@ void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
     /*-- whenever motion stops, we need a FULL redraw --*/
     display_tailpipe (gg->current_display, FULL, gg);
   }
-
-#ifdef TESTING_TOUR_STEP
-  /*  gtk_signal_connect (GTK_OBJECT(dsp), "tour_step",
-      tour1d_step_cb, dsp);*/
-#endif
-
 }
 
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
@@ -432,6 +426,13 @@ tour1d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   }
 
   dsp->t1d.get_new_target = true;
+
+  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+    free_optimize0_p(&dsp->t1d_pp_op);
+    alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive,
+      1);
+    t1d_pp_reinit(gg);
+  }
 }
 
 static void
@@ -587,9 +588,6 @@ tour1d_run(displayd *dsp, ggobid *gg)
   gboolean revert_random = false;
   gint pathprob = 0;
   gint i, nv;
-#ifdef TESTING_TOUR_STEP
-  GtkGGobiDisplayClass *klass;
-#endif
   extern void t1d_ppdraw_think(ggobid *);
 
   /* Controls interpolation steps */
@@ -722,10 +720,13 @@ g_printerr ("\n");*/
   }
  /*  tour_reproject(dsp, 2);*/
 #ifdef TESTING_TOUR_STEP
+{
+  GtkGGobiDisplayClass *klass;
   klass = GTK_GGOBI_DISPLAY_CLASS(GTK_OBJECT(dsp)->klass);
   gtk_signal_emit(GTK_OBJECT(dsp),
     klass->signals[TOUR_STEP_SIGNAL], dsp->t1d,
     (gint) 1, gg);
+}
 #endif
 
   display_tailpipe (dsp, FULL, gg);

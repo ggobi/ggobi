@@ -726,7 +726,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata, 
         holes_raw1, &hp);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t2d_pp_op, holes, &hp);
+        kout = optimize0 (&dsp->t2d_pp_op, holes_raw1, &hp);
       free_holes_p(&hp);
     break;
     case CENTRAL_MASS: 

@@ -436,6 +436,15 @@ tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
   }
 
   dsp->t2d.get_new_target = true;
+
+  /* Check if pp indices are being calculated, if so re-allocate
+     and re-initialize as necessary */
+  if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+    free_optimize0_p(&dsp->t2d_pp_op);
+    alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
+      2);
+    t2d_pp_reinit(gg);
+  }
 }
 
 static void
@@ -480,14 +489,6 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse,
       /*-- add or remove from set of active variables --*/
       tour2d_active_var_set (jvar, d, dsp, gg);
       /*    if (dsp->t2d.target_selection_method == TOUR_PP)*/
-      /* Check if pp indices are being calculated, if so re-allocate
-         and re-initialize as necessary */
-      if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
-        free_optimize0_p(&dsp->t2d_pp_op);
-        alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
-          2);
-        t2d_pp_reinit(gg);
-      }
     }
   }
 
