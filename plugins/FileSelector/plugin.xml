@@ -3,7 +3,7 @@
   browser. Currently expects XML format.</description>
   <author>Duncan Temple Lang</author>
   <modeName>fileselect</modeName>
-  <dll name="plugins/FileSelect/FileSelect"> 
+  <dll name="plugins/FileSelector/FileSelect"> 
        <init description="get_description"/>
   </dll>
  </inputPlugin>

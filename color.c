@@ -161,7 +161,7 @@ init_plot_GC (GdkWindow *w, ggobid *gg) {
   }
 #else
    gdk_color_black (gdk_colormap_get_system (), &black);
-   bwhite = &black;
+   bblack = &black;
 #endif
 
   gg->plot_GC = gdk_gc_new (w);
@@ -181,11 +181,17 @@ init_var_GCs (GtkWidget *w, ggobid *gg) {
   gdk_color_white (gdk_colormap_get_system (), &white);
   gdk_color_black (gdk_colormap_get_system (), &black);
 
+#ifdef USE_XML
   if(!sessionOptions->info->bgColor) {
     gdk_color_black (gdk_colormap_get_system (), &black);
     bblack = &black;
   } else
     bblack = sessionOptions->info->bgColor;
+#else
+   gdk_color_black (gdk_colormap_get_system (), &black);
+   bblack = &black;
+#endif
+
 /*
  * the unselected variable GCs: thin lines
 */

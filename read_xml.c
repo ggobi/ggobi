@@ -71,7 +71,7 @@
 
 void startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs);
 void endXMLElement(void *user_data, const xmlChar *name);
-void Characters(void *user_data, const xmlChar *ch, int len);
+void Characters(void *user_data, const xmlChar *ch, gint len);
 
 const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
 
@@ -442,10 +442,10 @@ tagType(const xmlChar *name, gboolean endTag)
    is passed can work with it more easily.
  */
 void 
-Characters(void *user_data, const xmlChar *ch, int len)
+Characters(void *user_data, const xmlChar *ch, gint len)
 {
- char *tmp = NULL;
- int dlen = len;
+ gchar *tmp = NULL;
+ gint dlen = len;
  const xmlChar *c;
  XMLParserData *data = (XMLParserData*)user_data;
 
@@ -454,7 +454,7 @@ Characters(void *user_data, const xmlChar *ch, int len)
   return;
 
  if(data->terminateStrings_p) {
-  tmp = (char *) g_malloc(sizeof(char)*(dlen+1));
+  tmp = (gchar *) g_malloc(sizeof(gchar)*(dlen+1));
 
   memcpy(tmp, c, dlen);
   memset(tmp+dlen, '\0', 1);
@@ -475,7 +475,7 @@ Characters(void *user_data, const xmlChar *ch, int len)
      setColorValue (data, c, dlen);
      break;
    case CATEGORICAL_LEVEL:
-     addLevel(data, (const char *) c, dlen);
+     addLevel(data, (const gchar *) c, dlen);
    break;
    default:
    break;
@@ -488,7 +488,7 @@ Characters(void *user_data, const xmlChar *ch, int len)
 }
 
 const xmlChar *
-skipWhiteSpace(const xmlChar *ch, int *len)
+skipWhiteSpace(const xmlChar *ch, gint *len)
 {
  const xmlChar *tmp = ch;
   while(*len >= 0) {
@@ -510,7 +510,7 @@ skipWhiteSpace(const xmlChar *ch, int *len)
 gboolean
 setGeneralInfo (const xmlChar **attrs, XMLParserData *data)
 {
-  const char *tmp = getAttribute(attrs, "count");
+  const gchar *tmp = getAttribute(attrs, "count");
 
   if (tmp != NULL) {
     data->expectedDatasetCount = strToInteger(tmp);
@@ -523,7 +523,7 @@ setGeneralInfo (const xmlChar **attrs, XMLParserData *data)
 gboolean
 setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
 {
-  const char *tmp = getAttribute(attrs, "count");
+  const gchar *tmp = getAttribute(attrs, "count");
   datad *d = getCurrentXMLData(data);
 
   if (tmp == NULL) {
@@ -588,11 +588,11 @@ strToInteger(const gchar *tmp)
 
 
 const gchar *
-getAttribute(const xmlChar **attrs, char *name)
+getAttribute(const xmlChar **attrs, gchar *name)
 {
  const xmlChar **tmp = attrs;
  while(tmp && tmp[0]) {
-  if(strcmp(name, (const char *)tmp[0]) == 0)
+  if(strcmp(name, (const gchar *)tmp[0]) == 0)
       return((const gchar *)tmp[1]);
    tmp += 2;
  }
@@ -611,9 +611,9 @@ newRecord(const xmlChar **attrs, XMLParserData *data)
 }
 
 gboolean
-setHidden(const xmlChar **attrs, XMLParserData *data, int i)
+setHidden(const xmlChar **attrs, XMLParserData *data, gint i)
 {
-  const char *tmp;
+  const gchar *tmp;
   datad *d = getCurrentXMLData(data);
 
   tmp = getAttribute(attrs, "hidden");
@@ -632,7 +632,7 @@ setHidden(const xmlChar **attrs, XMLParserData *data, int i)
 gboolean
 asLogical(const gchar *sval)
 {
- unsigned int i;
+ guint i;
  gboolean val = false;
  const gchar *const trues[] = {"T","true", "True","1"};
   for(i = 0; i < sizeof(trues)/sizeof(trues[0]); i++) {
@@ -644,7 +644,7 @@ asLogical(const gchar *sval)
 }
 
 gboolean
-setColor(const xmlChar **attrs, XMLParserData *data, int i)
+setColor(const xmlChar **attrs, XMLParserData *data, gint i)
 {
   const gchar *tmp;
   gint value = data->defaults.color;
@@ -795,7 +795,7 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
 /*
   Convert the specified string to a numeric value.
  */
-double
+gdouble
 asNumber(const char *sval)
 {
   return(atof(sval));
@@ -834,7 +834,7 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
  tmp = getAttribute(attrs, "min");
  tmp1 = getAttribute(attrs, "max");
  if(tmp && tmp1) {
-     double mn, mx;
+     gdouble mn, mx;
      mn = asNumber(tmp);
      mx = asNumber(tmp1);
      el->lim_specified.min = mn < mx ? mn : mx;
@@ -981,11 +981,11 @@ gchar *
 getFileDirectory(const gchar *filename)
 {
 
- char *tmp;
+ gchar *tmp;
   tmp =  strrchr(filename, G_DIR_SEPARATOR);
   if(tmp) {
-    int n = tmp - filename + 2;
-    tmp = (char*) g_malloc(n*sizeof(char));
+    gint n = tmp - filename + 2;
+    tmp = (gchar*) g_malloc(n*sizeof(gchar));
     memcpy(tmp, filename, n);
     tmp[n-1] = '\0';
   } else
@@ -1007,12 +1007,12 @@ getFileDirectory(const gchar *filename)
 gchar *
 find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
 {
-  int i;
+  gint i;
   gchar* name = NULL;
   FILE *f;
-  int dirlen = 0;
-  const char **suffixes = XMLSuffixes;
-  int nsuffixes = sizeof(suffixes)/sizeof(suffixes[0]);
+  gint dirlen = 0;
+  const gchar **suffixes = XMLSuffixes;
+  gint nsuffixes = sizeof(suffixes)/sizeof(suffixes[0]);
 
   if(dir)
     dirlen = strlen(dir);
@@ -1024,7 +1024,7 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
     dirlen = 0;
 
   for(i = 0; i < nsuffixes;i++) {
-    name = (char*) g_malloc(sizeof(char) *
+    name = (gchar*) g_malloc(sizeof(gchar) *
       (dirlen + strlen(filename)+strlen(suffixes[i]) + 2));
     sprintf(name,"%s/%s%s", dirlen ? dir : "", filename, suffixes[i]);
     if((f = fopen(name,"r")) != NULL) {
@@ -1057,7 +1057,7 @@ gboolean
 setColorMap(const xmlChar **attrs, XMLParserData *data)
 {
  const gchar *tmp, *file; 
- int size = 0;
+ gint size = 0;
  tmp = getAttribute(attrs, "size");
  file = getAttribute(attrs, "file");
 
@@ -1089,6 +1089,7 @@ setColorMap(const xmlChar **attrs, XMLParserData *data)
   ggobid *gg = data->gg;
   if(file) {
     gg->ncolors += size;
+    gg->ncolors = MIN (gg->ncolors, MAXNCOLORS);
     gg->color_table = (GdkColor *)
       g_realloc (gg->color_table, gg->ncolors * sizeof (GdkColor));
     gg->colorNames = (gchar **)
@@ -1096,6 +1097,7 @@ setColorMap(const xmlChar **attrs, XMLParserData *data)
     memset(gg->colorNames + (gg->ncolors-size), '\0', size*sizeof(gchar *));
   } else {
     gg->ncolors = size;
+    gg->ncolors = MIN (gg->ncolors, MAXNCOLORS);
     gg->color_table = (GdkColor *) g_malloc (size * sizeof (GdkColor));
     gg->colorNames = (gchar **) g_malloc (size * sizeof (gchar *));
     memset(gg->colorNames, '\0', size * sizeof (gchar *));
@@ -1110,10 +1112,10 @@ gboolean
 setColormapEntry(const xmlChar **attrs, XMLParserData *data)
 {
  const gchar * const names[] = {"r", "g", "b"};
- double vals[3] = {-1., -1. , -1.};
+ gdouble vals[3] = {-1., -1. , -1.};
  const gchar *tmp;
  gboolean ok = true;
- int which = data->current_color, i;
+ gint which = data->current_color, i;
  GdkColor *color;
  GdkColormap *cmap = gdk_colormap_get_system ();
 

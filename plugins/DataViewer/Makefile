@@ -6,8 +6,6 @@ ifndef GGOBI_HOME
  GGOBI_HOME=../..
 endif
 
-# -rpath or --rpath?  The compiler on fry accepts -rpath.
-
 include local.config
 -include $(GGOBI_HOME)/local.config
 

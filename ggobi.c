@@ -82,7 +82,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 #endif
     } else if (strcmp (av[1], "-v") == 0 || strcmp (av[1], "--validate") == 0) {
 #ifdef USE_XML
-      extern int xmlDoValidityCheckingDefaultValue;
+      extern gint xmlDoValidityCheckingDefaultValue;
       xmlDoValidityCheckingDefaultValue = 1;
 #else
       g_printerr("No xml support compiled for this version, ignoring %s\n", av[1]);
@@ -141,8 +141,8 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
       (*argc)--; av++;
     }
     else if(strcmp(av[1], "-datamode") == 0) {
-	sessionOptions->data_type = g_strdup(av[2]);
-	(*argc)--; av++;
+      sessionOptions->data_type = g_strdup(av[2]);
+      (*argc)--; av++;
     }
   }
 
@@ -163,7 +163,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 
 gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents);
 
-int 
+gint 
 main(gint argc, gchar *argv[])
 { 
  GGOBI(main)(argc, argv, true);
@@ -191,13 +191,16 @@ ggobi_remove_by_index (ggobid *gg, gint which)
 {
   GSList *l;
   datad *d;
-  int numDatasets, i;
+  gint numDatasets, i;
 
   /* Move all the entries after the one being removed
      down by one in the array to compact it.
    */
   if(which < num_ggobis -1) {
-     memcpy(all_ggobis + which, all_ggobis + which + 1, sizeof(ggobid*)*(num_ggobis-which-1));
+     memcpy(all_ggobis + which,
+            all_ggobis + which +
+            1,
+            sizeof(ggobid*)*(num_ggobis-which-1));
   }
   /* Now patch up the array so that it has the correct number of elements. */
   num_ggobis--;
@@ -232,9 +235,9 @@ ggobi_remove_by_index (ggobid *gg, gint which)
 gboolean
 DummyKeyTest(guint keyval, GtkWidget *w, GdkEventKey *event,  cpaneld *cpanel, splotd *sp, ggobid *gg, void *userData)
 {
- static int count = 0;
+  static gint count = 0;
   fprintf(stderr, "Key press event (count = %d): key = %d, data = %s\n", 
-                     count, (int)keyval, (char *)userData);
+                     count, (gint)keyval, (gchar *)userData);
   fflush(stderr);
 
   if(++count == 4) {
@@ -360,9 +363,11 @@ initSessionOptions()
 
   sessionOptions->showControlPanel = true;
 
+#ifdef USE_XML
   sessionOptions->info = (GGobiInitInfo*) g_malloc(sizeof(GGobiInitInfo));
   memset(sessionOptions->info, '\0', sizeof(GGobiInitInfo));
   sessionOptions->info->glyph.size = sessionOptions->info->glyph.type = -1;
+#endif
 }
 
 
@@ -454,7 +459,7 @@ ggobi_get(gint which)
 gint
 ggobi_getIndex(ggobid *gg)
 {
-  int i;
+  gint i;
   for(i = 0; i < num_ggobis ; i++) {
     if(all_ggobis[i] == gg)
       return(i);
@@ -464,7 +469,7 @@ ggobi_getIndex(ggobid *gg)
 }
 
 datad *
-GGobi_get_data(int which, const ggobid * const gg)
+GGobi_get_data(gint which, const ggobid * const gg)
 {
    datad *d;
    d = g_slist_nth_data(gg->d, which);
@@ -491,8 +496,8 @@ ggobid*
 ValidateGGobiRef(ggobid *gg, gboolean fatal)
 { 
  extern ggobid** all_ggobis;
- extern int num_ggobis;
-  int i;
+ extern gint num_ggobis;
+  gint i;
   for(i = 0; i < num_ggobis ; i++) {
    if(all_ggobis[i] == gg)
     return(gg);
@@ -509,7 +514,7 @@ ValidateGGobiRef(ggobid *gg, gboolean fatal)
 datad *
 ValidateDatadRef(datad *d, ggobid *gg, gboolean fatal)
 {
-  int i, n;
+  gint i, n;
   n = g_slist_length(gg->d);
   for(i = 0; i < n ; i++) {
    if(g_slist_nth_data(gg->d, i) == d)
@@ -529,7 +534,7 @@ ValidateDatadRef(datad *d, ggobid *gg, gboolean fatal)
 displayd *
 ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal)
 {
-  int i, n;
+  gint i, n;
   n = g_list_length(gg->displays);
   for(i = 0; i < n ; i++) {
    if(g_list_nth_data(gg->displays, i) == d)
@@ -573,7 +578,7 @@ process_initialization_files()
         sprintf(buf, "%s/.ggobirc", tmp);
         fileName = buf;
       } else {
-	char *v;
+        gchar *v;
         tmp = g_strdup(sessionOptions->cmdArgs[0]);
         v = strrchr(tmp, DIR_SEPARATOR);
         if(v) {

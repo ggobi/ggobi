@@ -104,6 +104,7 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
     (gpointer) gg, (gpointer) &rval);
 }
 
+#ifdef USE_XML
 static void
 colorscheme_add_to_menu (GtkWidget *menu, gchar *lbl, colorschemed *scheme,
   GtkSignalFunc func, gpointer ptr, ggobid *gg)
@@ -122,6 +123,7 @@ colorscheme_add_to_menu (GtkWidget *menu, gchar *lbl, colorschemed *scheme,
 
   gtk_widget_show (menuitem) ;
 }
+#endif
 
 
 /*-------------------------------------------------------------------------*/
@@ -504,6 +506,7 @@ selection_made_cb (GtkWidget *clist, gint row, gint column,
     gtk_widget_set_sensitive (btn, true);
 }
 
+#ifdef USE_XML
 static void scale_set_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
@@ -561,6 +564,7 @@ static void scale_set_cb (GtkWidget *w, ggobid* gg)
   symbol_window_redraw (gg);
   cluster_table_update (d, gg);
 }
+#endif
 
 static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 {
@@ -657,6 +661,7 @@ wvis_window_open (ggobid *gg) {
   GtkWidget *vbox, *hb;
   GtkWidget *notebook;
   GtkWidget *btn, *vb;
+#ifdef USE_XML
   /*-- for colorscales --*/
   GtkWidget *frame, *vbs, *opt, *menu;
   GList *l;
@@ -667,7 +672,7 @@ wvis_window_open (ggobid *gg) {
     "--- SPECTRAL ---",
     "--- QUALITATIVE ---"};
   gint n, ncolorscaletype_lbl = 4;
-  /* */
+#endif
 
   if (gg->d == NULL || g_slist_length (gg->d) == 0)
     return;
@@ -688,6 +693,7 @@ wvis_window_open (ggobid *gg) {
     notebook = create_variable_notebook (vbox, GTK_SELECTION_SINGLE,
       (GtkSignalFunc) selection_made_cb, gg);
 
+#ifdef USE_XML
   /*
    * section on choosing new colormap
   */
@@ -731,6 +737,7 @@ wvis_window_open (ggobid *gg) {
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (scale_set_cb), gg);
     gtk_widget_set_name (btn, "WVIS:setcolorscheme");
+#endif
   /**/
 
     /*-- colors, symbols --*/

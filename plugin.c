@@ -125,23 +125,23 @@ registerPlugins(ggobid *gg, GList *plugins)
     if(plugin->onCreate) {
       f = (OnCreate) getPluginSymbol(plugin->onCreate, &plugin->details);
       if(f) {
-	  inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
-          inst->data = NULL;
-          inst->info = plugin;
-          inst->active = true;
-	  ok = f(gg, plugin, inst);
-	  if(ok) {
-	      GGOBI_addPluginInstance(inst, gg);
-	  } else
-	      g_free(inst);
+        inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
+        inst->data = NULL;
+        inst->info = plugin;
+        inst->active = true;
+        ok = f(gg, plugin, inst);
+        if(ok) {
+          GGOBI_addPluginInstance(inst, gg);
+        } else
+          g_free(inst);
       }
     } else {
-	  inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
-          inst->data = NULL;
-          inst->info = plugin;
-          inst->gg = gg;
-          inst->active = true;
-          GGOBI_addPluginInstance(inst, gg);
+      inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
+      inst->data = NULL;
+      inst->info = plugin;
+      inst->gg = gg;
+      inst->active = true;
+      GGOBI_addPluginInstance(inst, gg);
     }
     el = el->next;
   }
@@ -252,7 +252,7 @@ isPluginActive(GGobiPluginInfo *info, ggobid *gg)
   while(el) { 
     plugin = (PluginInstance *) el->data;
     if(plugin->info == info)
-	return(true);
+      return(true);
     el = el->next;
   }
 
@@ -267,24 +267,24 @@ isPluginActive(GGobiPluginInfo *info, ggobid *gg)
 void
 addPlugins(GList *plugins, GtkWidget *list, ggobid *gg, GGobiPluginType type)
 {
- int n = g_list_length(plugins), i;
- GGobiPluginInfo *plugin;
- GGobiInputPluginInfo *iplugin;
+  gint n = g_list_length(plugins), i;
+  GGobiPluginInfo *plugin;
+  GGobiInputPluginInfo *iplugin;
 
- for(i = 0; i < n ; i++) {
-     switch(type) {
+  for(i = 0; i < n ; i++) {
+    switch(type) {
       case GENERAL_PLUGIN:
-	 plugin = (GGobiPluginInfo*) g_list_nth_data(plugins, i);
-	 addPlugin(plugin, list, gg);
-	 break;
-     case INPUT_PLUGIN:
-	 iplugin = (GGobiInputPluginInfo*) g_list_nth_data(plugins, i);
-	 addInputPlugin(iplugin, list, gg);
-	 break;
-     default:
-	 break;
-     }
- }
+       plugin = (GGobiPluginInfo*) g_list_nth_data(plugins, i);
+       addPlugin(plugin, list, gg);
+       break;
+       case INPUT_PLUGIN:
+         iplugin = (GGobiInputPluginInfo*) g_list_nth_data(plugins, i);
+         addInputPlugin(iplugin, list, gg);
+       break;
+       default:
+       break;
+    }
+  }
 }
 
 
@@ -349,29 +349,34 @@ closePlugins(ggobid *gg)
 GGobiInputPluginInfo *
 runInteractiveInputPlugin(ggobid *gg)
 {
-    GGobiInputPluginInfo* plugin = NULL;
-    GList *l = sessionOptions->info->inputPlugins;
+  GGobiInputPluginInfo* plugin = NULL;
+#ifdef USE_XML
+  GList *l = sessionOptions->info->inputPlugins;
 
-    for(; l; l = l->next) {
-	plugin =  (GGobiInputPluginInfo*) l->data;
-        if(plugin->interactive) {
-	    if(!sessionOptions->data_type || strcmp(sessionOptions->data_type, plugin->modeName) == 0) {
-		InputGetDescription f;
-		f = (InputGetDescription) getPluginSymbol(plugin->getDescription, &plugin->details);
-		if(f) {
-		    InputDescription *desc;
-		    desc = f(NULL, NULL, gg, plugin);
-		    if(desc && desc->read_input) {
-			gg->input = desc;
-			desc->read_input(desc, gg);
-			break;
-		    }
-		}
-	}
-	}
+  for(; l; l = l->next) {
+    plugin =  (GGobiInputPluginInfo*) l->data;
+    if(plugin->interactive) {
+      if(!sessionOptions->data_type ||
+         strcmp(sessionOptions->data_type, plugin->modeName) == 0)
+      {
+        InputGetDescription f;
+        f = (InputGetDescription) getPluginSymbol(plugin->getDescription,
+                                                  &plugin->details);
+        if(f) {
+          InputDescription *desc;
+          desc = f(NULL, NULL, gg, plugin);
+          if(desc && desc->read_input) {
+            gg->input = desc;
+            desc->read_input(desc, gg);
+            break;
+          }
+        }
+      }
     }
+  }
+#endif
 
-    return(plugin);
+  return(plugin);
 }
 
 
@@ -389,21 +394,21 @@ ggobi_dlopen(const char *name, GGobiPluginDetails *plugin)
 void
 ggobi_dlerror(char *buf, GGobiPluginDetails *plugin)
 {
-    LPVOID lpMsgBuf;
-	FormatMessage( 
-	    FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-	    FORMAT_MESSAGE_FROM_SYSTEM | 
-	    FORMAT_MESSAGE_IGNORE_INSERTS,
-	    NULL,
-	    GetLastError(),
-	    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-	    (LPTSTR) &lpMsgBuf,
-	    0,
-	    NULL 
-	    );
-	strcpy(buf, "Failure in LoadLibrary:  ");
-	strcat(buf, lpMsgBuf);
-	LocalFree(lpMsgBuf);
+  LPVOID lpMsgBuf;
+  FormatMessage( 
+      FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+      FORMAT_MESSAGE_FROM_SYSTEM | 
+      FORMAT_MESSAGE_IGNORE_INSERTS,
+      NULL,
+      GetLastError(),
+      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+      (LPTSTR) &lpMsgBuf,
+      0,
+      NULL 
+      );
+  strcpy(buf, "Failure in LoadLibrary:  ");
+  strcat(buf, lpMsgBuf);
+  LocalFree(lpMsgBuf);
 }
 
 int

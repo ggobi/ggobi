@@ -4,6 +4,7 @@
 #include <gtk/gtkdialog.h>
 
 #include <string.h>
+#include <stdio.h>
 
 
 #if 0
@@ -36,10 +37,11 @@ showPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, GGobiPrintHand
 GtkWidget *
 createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintDialogHandler print, void *userData)
 {
- char *title;
- GtkWidget *dialog;
- PrintInfo *data;
-  title = g_malloc((strlen("Print Options") + strlen((dpy ? " for display" : "")) + 1 )* sizeof(char));
+  gchar *title;
+  GtkWidget *dialog;
+  PrintInfo *data;
+  title = g_malloc((strlen("Print Options") +
+    strlen((dpy ? " for display" : "")) + 1 )* sizeof(gchar));
   sprintf(title, "%s%s", "Print Options", (dpy ? " for display" : ""));
 
 #ifdef USE_GNOME_DIALOGS
@@ -47,7 +49,6 @@ createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintDialogH
 #else
   dialog = gtk_dialog_new();
   gtk_window_set_title(GTK_WINDOW(dialog), title);
-
 #endif
 
   data = (PrintInfo *)g_malloc( 1 * sizeof(PrintInfo));
@@ -111,8 +112,10 @@ addDialogButtons(GtkWidget *dialog, PrintInfo *data)
   okay_button = gtk_button_new_with_label("Okay");
   cancel_button = gtk_button_new_with_label("Cancel");
   help_button = gtk_button_new_with_label("Help");
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), okay_button);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), cancel_button);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area),
+    okay_button);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area),
+    cancel_button);
 
 
       /* Now setup the action/signal handlers. */  
@@ -168,15 +171,15 @@ getDefaultPrintOptions(PrintOptions *opts)
  if(opts == NULL)
    opts = (PrintOptions *) g_malloc(sizeof(PrintOptions));
 
- opts->width = 480;
- opts->height = 400;
- opts->file = (OutputDescription *) g_malloc(sizeof(OutputDescription));
+  opts->width = 480;
+  opts->height = 400;
+  opts->file = (OutputDescription *) g_malloc(sizeof(OutputDescription));
   opts->file->fileName = g_strdup("foo.svg");
 
  
   gdk_color_white(gdk_colormap_get_system (), &white);
   gdk_color_black(gdk_colormap_get_system (), &black);
- opts->background = white;
- opts->foreground = black;
+  opts->background = white;
+  opts->foreground = black;
   return(opts);
 }
