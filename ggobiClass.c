@@ -251,6 +251,8 @@ void datad_instance_init(datad * d)
   /*-- linking by categorical variable --*/
   d->linkvar_vt = NULL;
 
+  memset(&d->vcbox_ui, '\0', sizeof(struct _Varpanel_cboxd));
+
   sphere_init(d);
 }
 
