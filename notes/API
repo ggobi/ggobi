@@ -6,15 +6,11 @@ void setView (gchar *)
 
 displayd setCurrentDisplay (gchar *)
 
+
 /*-- brushing --*/
 ! gfloat **getColorTable ()
 
-! void moveBrush (gint ulx, gint uly)
-! void sizeBrush (gint width, gint height)
-
 /* point colors */
-
-
 
 /* General boolean settings that can be set from menu items.
   e.g

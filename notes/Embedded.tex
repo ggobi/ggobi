@@ -216,6 +216,31 @@ Need to change dataset_init to make certain that there is only
 one display in the list when this is finished..
 
 
+
+\section{Accessing displays and plots}
+Rather than relying on user gestures to select windows/displays and
+plots within these and make these active, we provide a programmatic
+version of this selection mechanism.  The functions
+\SFunction{setActivePlot} and \SFunction{getActivePlot} can be used to
+set and query which display and plot within that are active.
+
+
+One can query what plots are currently in existence using the command
+\SFunction{ggobi.getDisplays}.  This returns a list with an element
+for each of the displays. Each description identifies the type of the
+plots the display contains and a list of all the sub-plots contained
+in the display. Each of these sub-descriptions identifies the
+variables involved.
+
+
+
+{\red Need to ensure that the display is updated correctly when
+we set the active plot.}
+
+
+\section{}
+
+
 \section{API Routines}
 
 \subsection{getData}

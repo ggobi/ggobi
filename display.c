@@ -126,17 +126,22 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display) {
 void
 display_new (gpointer cbd, guint action, GtkWidget *widget)
 {
-  displayd *display;
-  splotd *prev_splot = xg.current_splot;
+ display_create(action, &xg);
+}
 
-  if (xg.nrows == 0)  /*-- if used before we have data --*/
-    return;
+displayd *
+display_create(guint action, xgobid *xg)
+{
+  displayd *display;
+
+  if (xg->nrows == 0)  /*-- if used before we have data --*/
+    return(NULL);
 
   /*
    * Turn off event handlers, remove submenus, and redraw the
    * previous plot without a border.
   */
-  splot_set_current (xg.current_splot, off);
+  splot_set_current (xg->current_splot, off);
 
   switch (action) {
 
@@ -153,12 +158,12 @@ display_new (gpointer cbd, guint action, GtkWidget *widget)
       break;
 
     case 3:  /*-- scatterplot of missing values --*/
-      if (xg.nmissing)
+      if (xg->nmissing)
         display = scatterplot_new (true);
       break;
 
     case 4:  /*-- scatterplot matrix of missing values --*/
-      if (xg.nmissing)
+      if (xg->nmissing)
         display = scatmat_new (true);
       break;
 
@@ -166,29 +171,41 @@ display_new (gpointer cbd, guint action, GtkWidget *widget)
       break;
   }
 
+ display_add(display, xg);
+
+ return(display);
+}
+
+gint
+display_add(displayd *display, xgobid *xg)
+{
+  splotd *prev_splot = xg->current_splot;
   display_set_current (display);
-  xg.displays = g_list_append (xg.displays, (gpointer) display);
+  xg->displays = g_list_append (xg->displays, (gpointer) display);
 
 
     /* If the tree of displays is active, add this to it. */
-  display_add_tree(display, -1, xg.app.display_tree.tree);
+  display_add_tree(display, -1, xg->app.display_tree.tree);
 
-  xg.current_splot = (splotd *)
-    g_list_nth_data (xg.current_display->splots, 0);
-  splot_set_current (xg.current_splot, on);
+  xg->current_splot = (splotd *)
+    g_list_nth_data (xg->current_display->splots, 0);
+  splot_set_current (xg->current_splot, on);
 
   /*
    * The current display types start without signal handlers, but
    * I may need to add handlers later for some unforeseen display.
   */
-  mode_set (xg.current_display->cpanel.mode);  /* don't activate */
+  mode_set (xg->current_display->cpanel.mode);  /* don't activate */
 
   /*
    * Make sure the border for the previous plot is turned off
   */
   prev_splot->redraw_style = QUICK;
   gtk_widget_queue_draw (prev_splot->da);
+
+ return(g_list_length(xg->displays));
 }
+
 
 /*
  * Remove display from the linked list of displays.  Reset

@@ -458,7 +458,7 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Print",       NULL,     NULL,          0 },
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-  { "/File/Quit",    "<ctrl>Q",     gtk_main_quit, 0 },
+  { "/File/Quit",    "<ctrl>Q",     quit_ggobi, 0 },
 
   { "/_Window",                            NULL,   
     NULL,        0,    "<Branch>" },
@@ -522,6 +522,17 @@ static GtkItemFactoryEntry menu_items[] = {
                       NULL,         NULL, 0, NULL },
 };
 
+
+/*
+  Wrapper for gtk_main_quit so that we can override this in
+  other applications to avoid quitting when the user selects
+  the Quit button.
+ */
+void
+quit_ggobi(void)
+{
+ gtk_main_quit();
+}
 
 void make_ui () {
   GtkWidget *window;

@@ -74,6 +74,8 @@ extern void display_delete_cb (GtkWidget *, GdkEvent *, displayd *);
 extern void display_free_all (void);
 extern void display_free (displayd *, gboolean force);
 extern void display_new (gpointer cbd, guint action, GtkWidget *widget);
+extern displayd *display_create(guint action, xgobid *xg);
+extern gint display_add(displayd *display, xgobid *xg);
 extern void display_options_cb (GtkCheckMenuItem *w, guint action);
 extern void display_print_cb (displayd *d, guint, GtkWidget *);
 extern void display_set_current (displayd *);
@@ -238,4 +240,4 @@ extern void xy_reproject (splotd *, glong **);
 extern void zoom_by_drag (splotd *);
 extern void zoom_step (splotd *, gint, gint, rectd *);
 extern void dataset_init (xgobid *xg);
-
+extern void quit_ggobi(void);

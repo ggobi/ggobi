@@ -4,7 +4,7 @@
 
 
 void
-moveBrush (gint ulx, gint uly)  /*-- move brush and paint --*/
+XGOBI(moveBrush) (gint ulx, gint uly)  /*-- move brush and paint --*/
 {
   splotd *sp = xg.current_splot;
   displayd *display = (displayd *) sp->displayptr;
@@ -18,7 +18,7 @@ moveBrush (gint ulx, gint uly)  /*-- move brush and paint --*/
 }
 
 void
-sizeBrush (gint width, gint height)  /*-- resize brush without painting --*/
+XGOBI(sizeBrush) (gint width, gint height)  /*-- resize brush without painting --*/
 {
   splotd *sp = xg.current_splot;
 
