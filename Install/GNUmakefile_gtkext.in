@@ -13,7 +13,7 @@ SRC=\
   gtkexthruler.c \
   gtkextvruler.c \
   cokus.c \
-  mt19937-1.c
+  mt19937ar.c
 
 
 OBJ=$(SRC:%.c=%.o)
