@@ -91,22 +91,25 @@ gint main (gint argc, gchar *argv[])
  return (0);
 }
 
-int
-ggobi_remove(ggobid *gg)
+gint
+ggobi_remove (ggobid *gg)
 { 
-  int i;
-  for(i = 0; i < num_ggobis; i++) {
-    if(all_ggobis[i] == gg) {
-      return(ggobi_remove_by_index(gg, i));
+  gint i;
+  for (i = 0; i < num_ggobis; i++) {
+    if (all_ggobis[i] == gg) {
+      return (ggobi_remove_by_index (gg, i));
     }
   }
 
-  return(-1);
+  return (-1);
 }
 
-int
-ggobi_remove_by_index(ggobid *gg, int which)
+gint
+ggobi_remove_by_index (ggobid *gg, gint which)
 {
+  GSList *l;
+  datad *d;
+
   /* Move all the entries after the one being removed
      down by one in the array to compact it.
    */
@@ -116,13 +119,19 @@ ggobi_remove_by_index(ggobid *gg, int which)
   /* Now patch up the array so that it has the correct number of elements. */
   num_ggobis--;
   if(num_ggobis > 0)
-    all_ggobis = g_realloc(all_ggobis, sizeof(ggobid*) * num_ggobis);
+    all_ggobis = g_realloc (all_ggobis, sizeof(ggobid*) * num_ggobis);
   else
     all_ggobis = NULL;
 
-  g_free(gg);
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    gg->d = g_slist_remove (gg->d, d);
+    datad_free (d, gg);
+  }
 
-  return(which);
+  g_free (gg);
+
+  return (which);
 }
 
 ggobid*

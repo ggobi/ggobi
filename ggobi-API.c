@@ -120,6 +120,7 @@ GGOBI(destroyCurrentDisplay)(ggobid *gg)
   When this works, we will take the calls for the different stages 
   and put them in separate routines.
  */
+/*-- need two of these now, one to replace and one to append --*/
 void
 GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   gint nr, gint nc, datad *d, ggobid *gg)
@@ -169,16 +170,8 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
    }
   }
 
-  vgroups_sort (d, gg);
-  {
-    gint j;
-    for (j=0; j<d->ncols; j++)
-      d->vardata[j].groupid = d->vardata[j].groupid_ori;
-  }
-
-
-   /* Now recompute and display the top plot. */
-  if (dataset_init (d, gg, false) != NULL) {
+  /* Now recompute and display the top plot. */
+  if (datad_init (d, gg, false) != NULL) {
       /* Have to patch up the displays list since we removed
          every entry and that makes for meaningless entries.
        */

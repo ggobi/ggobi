@@ -39,91 +39,74 @@ void modes_init (datad *d, ggobid* gg) {
 }
 
 gboolean
-fileset_read_init (gchar *ldata_in, datad *d, ggobid *gg)
+fileset_read_init (gchar *ldata_in, ggobid *gg)
 {
-  gboolean ans = fileset_read (ldata_in, d, gg);
+  gboolean ans = fileset_read (ldata_in, gg);
   if (ans) {
-    dataset_init (d, gg, true);
+    GSList *l;
+    datad *d;
+    gboolean firstd = true;
+    for (l = gg->d; l; l = l->next) {
+      d = (datad *) l->data;
+      datad_init (d, gg, firstd);
+      firstd = false;
+    }
   }
 
   return (ans);
 } 
 
-displayd *
-dataset_init (datad *d, ggobid *gg, gboolean cleanup)
-{
-  displayd *display = NULL;
-
-  pipeline_init (d, gg);
-
-  if (cleanup)
-    display_free_all (gg);  /*-- destroy any existing displays --*/
-
-   /*-- initialize the first display --*/
-  display = scatterplot_new (false, NULL, d, gg);
-   /* Need to make certain this is the only one there.
-      See
-    */
-  gg->displays = g_list_append (gg->displays, (gpointer) display);
-  display_set_current (display, gg);
-  gg->current_splot = (splotd *)
-    g_list_nth_data (gg->current_display->splots, 0);
-
-  return (display);
-}
 
 gboolean
-fileset_read (gchar *ldata_in, datad *d, ggobid *gg)
+fileset_read (gchar *ldata_in, ggobid *gg)
 {
   gboolean ok = true;
   gg->filename = g_strdup (ldata_in);
   strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
 
-  /*
-   * the varpanel has to know how many circles and labels to destroy
-   * if new data is read in later
-  */
-  d->varpanel_ui.nvars = d->ncols;
-
   switch (gg->data_mode) {
-   case xml:
+    case xml:
 #ifdef USE_XML
-     ok = data_xml_read (gg->fname, d, gg);
+      ok = data_xml_read (gg->fname, gg);
 #endif
-     break;
-   case mysql:
+    break;
+    case mysql:
 #ifdef USE_MYSQL
-{
-  extern MySQLLoginInfo DefaultMySQLInfo;
-     getDefaultValuesFromFile(ldata_in);
-     ok = read_mysql_data(&DefaultMySQLInfo, FALSE, gg);
-}
+    {
+      extern MySQLLoginInfo DefaultMySQLInfo;
+      getDefaultValuesFromFile(ldata_in);
+      ok = read_mysql_data(&DefaultMySQLInfo, FALSE, gg);
+    }
 #endif
     break;
 
-   case binary:
-     break;
-   case Sprocess:
-     break;
+    case binary:
+    break;
 
-   case ascii:
-     array_read (d, gg);
-     d->nrows_in_plot = d->nrows;    /*-- for now --*/
-     d->nrgroups = 0;                /*-- for now --*/
+    case Sprocess:
+    break;
+
+    case ascii:
+    {
+      datad *d = datad_new (gg);
+      array_read (d, gg);
+      d->nrows_in_plot = d->nrows;    /*-- for now --*/
+      d->nrgroups = 0;                /*-- for now --*/
+       
+      missing_values_read (gg->fname, true, d, gg);
       
-     missing_values_read (gg->fname, true, d, gg);
+      collabels_read (gg->fname, true, d, gg);
+      rowlabels_read (gg->fname, true, d, gg);
+      vgroups_read (gg->fname, true, d, gg);
       
-     collabels_read (gg->fname, true, d, gg);
-     rowlabels_read (gg->fname, true, d, gg);
-     vgroups_read (gg->fname, true, d, gg);
-      
-     point_glyphs_read (gg->fname, true, d, gg);
-     point_colors_read (gg->fname, true, d, gg);
-     hidden_read (gg->fname, true, d, gg);
+      point_glyphs_read (gg->fname, true, d, gg);
+      point_colors_read (gg->fname, true, d, gg);
+      hidden_read (gg->fname, true, d, gg);
     
-     edges_read (gg->fname, true, d, gg);
-     line_colors_read (gg->fname, true, d, gg);
-     break;
+      edges_read (gg->fname, true, d, gg);
+      line_colors_read (gg->fname, true, d, gg);
+    }
+    break;
   }
 
   return ok;  /* need to check return codes of reading routines */
@@ -166,23 +149,18 @@ pipeline_init (datad *d, ggobid *gg)
 
 void
 make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
-  datad *d = (datad *) g_malloc (sizeof (datad));
-  gg->d = g_slist_append (gg->d, d);
+  gboolean init_data = false;
 
   /*-- some initializations --*/
   gg->displays = NULL;
   
-  d->nrows = d->ncols = 0;
-
   globals_init (gg); /*-- variables that don't depend on the data --*/
-  datad_init (d);
   color_table_init (gg);
   make_ui (gg);
 
   if (ldata_in != NULL) {
-    if (fileset_read (ldata_in, d, gg) > 0) {
-      dataset_init (d, gg, true);
-
+    if (fileset_read (ldata_in, gg) > 0) {
+      init_data = true;
     }
   } else {
 #ifdef USE_MYSQL
@@ -192,8 +170,18 @@ make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
 #endif
   }
 
+  if (init_data) {
+    GSList *l;
+    datad *d;
+    gboolean firstd = true;
+    for (l = gg->d; l; l = l->next) {
+      d = (datad *) l->data;
+      datad_init (d, gg, firstd);
+      firstd = false;
+    }
+  }
+
   if (processEvents) {
     gtk_main ();
   }
 }
-

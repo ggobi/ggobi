@@ -158,7 +158,6 @@ data_xml_read (const gchar *filename, ggobid *gg)
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
       ok &= (d->ncols > 0 && d->nrows > 0);
-      if (ok) datad_finalize (d, gg);
     }
   }
       
