@@ -607,6 +607,7 @@ void       vectori_delete_els (vector_i *vecp, gint nels, gint *els);
 void       vectori_free (vector_i *);
 void       vectori_init_null (vector_i *);
 void       vectori_realloc (vector_i *, gint);
+void       vectori_zero (vector_i *vecp);
 void       vectors_copy (vector_s *, vector_s *);
 void       vectors_free (vector_s *);
 void       vectors_init_null (vector_s *);
