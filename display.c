@@ -150,6 +150,27 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
   displayd *display = (displayd *)
     gtk_object_get_data (GTK_OBJECT (w), "display");
   gchar *title;
+  gint ne = 0;
+  datad *onlye = NULL;
+
+  /*-- count edge sets --*/
+  if (action == DOPT_EDGES_U || action == DOPT_EDGES_D ||
+      action == DOPT_EDGES_A)
+  {
+    gint k, nd = g_slist_length (gg->d);
+    datad *e;
+    if (display->d->rowIds) {
+      for (k=0; k<nd; k++) { 
+        e = (datad*) g_slist_nth_data (gg->d, k);
+        if (e->edge.n > 0) {
+          ne++;
+          onlye = e;  /* meaningful if there's only one */
+        }
+      }
+    }
+    if (ne != 1) onlye = NULL;
+  }
+  /*--  --*/
 
   switch (action) {
     case DOPT_POINTS:
@@ -172,14 +193,8 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
         display_edges_arrowheads_show (display, false);
       }
 
-/*XXX FIXME 
-  Leave this out, but that means the user has to select the dataset first and
-  then! If we put it in and there are two edgesets and the selected one is not valid,
-  we show the other one which was not asked for.
-  Want to test whether there is only one edgetset. But this is a heuristic. 
-
-      if (display->e == NULL) edgeset_add (display); 
-*/
+      if (display->e == NULL && ne == 1)
+        setDisplayEdge (display, onlye);   /* don't rebuild the menu */
       if (display->e != NULL) {
         title = computeTitle (false, gg->current_display, gg);
         if (title) {
@@ -198,7 +213,8 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
         display_edges_arrowheads_show (display, false);
       }
 
-      if (display->e == NULL) edgeset_add (display);
+      if (display->e == NULL && ne == 1)
+        setDisplayEdge (display, onlye);   /* don't rebuild the menu */
       if (display->e != NULL) {
         title = computeTitle (false, gg->current_display, gg);
         if (title) {
@@ -216,7 +232,8 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
         display_edges_undirected_show (display, false);
       }
 
-      if (display->e == NULL) edgeset_add (display);
+      if (display->e == NULL && ne == 1)
+        setDisplayEdge (display, onlye);   /* don't rebuild the menu */
       if (display->e != NULL) {
         title = computeTitle (false, gg->current_display, gg);
         if (title) {
