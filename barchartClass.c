@@ -19,6 +19,8 @@ static gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel,
 static void barchartDisplaySet(displayd * dpy, ggobid * gg);
 static void barchartDestroy(GtkObject *);
 static void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg);
+void barchart_clean_init(barchartSPlotd * sp);
+void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg);
 
 static gboolean barchart_build_symbol_vectors(datad * d, ggobid * gg);
 static void barchartVarpanelRefresh(displayd * display, splotd * sp,
@@ -151,8 +153,17 @@ static void barchartDestroy(GtkObject *obj)
 void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg)
 {
   barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+
   barchart_recalc_dimensions(sp, d, gg);
   barchart_recalc_group_dimensions(bsp, gg);
+}
+
+void barchartWorldToPlane (splotd *sp, datad *d, ggobid *gg)
+{
+  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+
+  barchart_clean_init(bsp);
+  barchart_recalc_counts(bsp, d, gg);
 }
 
 
@@ -345,7 +356,10 @@ void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass * klass)
       barchart_splot_add_plot_labels;
   klass->extendedSPlotClass.redraw = barchart_redraw;
 
+/*
   klass->extendedSPlotClass.world_to_plane = barchart_recalc_dimensions;
+*/
+  klass->extendedSPlotClass.world_to_plane = barchartWorldToPlane;
   klass->extendedSPlotClass.plane_to_screen = barchartPlaneToScreen;
 
   klass->extendedSPlotClass.active_paint_points =

@@ -771,7 +771,8 @@ void barchart_set_initials(barchartSPlotd * sp, datad * d)
         */
         if (checkLevelValue (vtx, missing_val) == -1) {
           add_level = true;
-          for (i=0, level=0; i<sp->bar->nbins, level<vtx->nlevels; i++) {
+          level = 0;
+          for (i=0; i<sp->bar->nbins; i++) {
             if (add_level &&
                 (gint) missing_val < vtx->level_values[level])
             {
@@ -787,8 +788,18 @@ void barchart_set_initials(barchartSPlotd * sp, datad * d)
         } else {
           for (i=0; i<vtx->nlevels; i++)
             sp->bar->bins[i].value = vtx->level_values[i];
-          sp->bar->nbins -= 1;  /*XXX Reallocate cbins down, or there'll be */
-                                /*  memory leaks */
+          sp->bar->nbins -= 1;
+
+          sp->bar->bins = (gbind *) g_realloc (sp->bar->bins,
+            sp->bar->nbins * sizeof(gbind));
+          sp->bar->bar_hit = (gboolean *) g_realloc(sp->bar->bar_hit,
+            (sp->bar->nbins + 2) * sizeof(gboolean));
+          sp->bar->old_bar_hit = (gboolean *) g_realloc(sp->bar->old_bar_hit,
+            (sp->bar->nbins + 2) * sizeof(gboolean));
+
+          g_free((gpointer) (sp->bar->cbins[ sp->bar->nbins ]));
+          sp->bar->cbins = (gbind **) g_realloc (sp->bar->cbins,
+            sp->bar->nbins * sizeof(gbind *));
         }
       } else {
         for (i=0; i<vtx->nlevels; i++)
@@ -912,7 +923,6 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
     sp->bar->high_bin = NULL;
     sp->bar->col_high_bin = NULL;
   }
-
 
   barchart_recalc_dimensions(GTK_GGOBI_SPLOT(sp), d, gg);
 }
