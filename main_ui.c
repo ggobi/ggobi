@@ -344,7 +344,7 @@ varpanel_highd (gint mode)
 gboolean
 varpanel_permits_circles_or_checkboxes (gint mode)
 {
-  return (mode > COTOUR);
+  return (mode > COTOUR && mode < SCATMAT);
 }
 /*
  * Use the widget state to figure out which is currently displayed.
