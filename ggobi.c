@@ -492,7 +492,7 @@ initSessionOptions()
   abusing the callback marshalling system a little.
  */
 gboolean
-ggobi_close (GtkObject *w, GdkEvent *ev, ggobid *gg)
+ggobi_close (ggobid *gg, GdkEvent *ev, GtkObject *w)
 {
   GGOBI(close)(gg, true);
   return(true);

@@ -579,13 +579,11 @@ display_free_all (ggobid *gg) {
      This is because when we remove the last entry, we get garbage,
      not a null value.
    */
-  for (dlist = gg->displays; count > 0 && dlist; dlist = dlist->next, count--)
+  for (dlist = gg->displays; count > 0 && dlist; count--)
   {
     gint nc;
     display = (displayd *) dlist->data;
     nc = display->d->ncols;
-    /*    display = (displayd *) dlist->data; */
-    display = (displayd*) g_list_nth_data (gg->displays,count-1);
     if (display == NULL)
       break;
 
@@ -604,6 +602,7 @@ display_free_all (ggobid *gg) {
         It will work now if there is more than one ggobi instance
         running.
       */
+    dlist = dlist->next;
     display_free (display, true, gg); 
   }
 }

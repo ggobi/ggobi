@@ -572,7 +572,7 @@ gboolean  tsplot_varsel (cpaneld *, splotd *, gint, gint, gint *, ggobid *);
 void      tsplot_whiskers_make (splotd *, displayd *, ggobid *);
 
 /* The new way of handling window closures, so that we don't just exit. */
-gboolean  ggobi_close (GtkObject *w, GdkEvent *ev, ggobid *gg);
+gboolean  ggobi_close (ggobid *gg, GdkEvent *ev, GtkObject *w);
 gint      ggobi_remove_by_index (ggobid *gg, gint which);
 gint      ggobi_remove (ggobid *);
 void      subset_init (datad *d, ggobid *gg);
