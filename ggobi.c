@@ -195,8 +195,7 @@ parse_command_line (gint *argc, gchar **av)
     }  else if((ptr = getOptValue("datamode", av[1]))) {
       sessionOptions->data_type = ptr;
     }  else if(strcmp(av[1], "--keepalive") == 0) {
-	sessionOptions->info->quitWithNoGGobi = false;
-	(*argc)--; av++;
+	sessionOptions->info->quitWithNoGGobi = !sessionOptions->info->quitWithNoGGobi;
     }
   }
 
