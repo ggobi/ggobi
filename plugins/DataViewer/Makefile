@@ -1,4 +1,6 @@
-DataViewer.so:
+PKG=DataViewer
+
+$(PKG).so:
 
 ifndef GGOBI_HOME
  GGOBI_HOME=../..
@@ -9,20 +11,32 @@ endif
 include local.config
 -include $(GGOBI_HOME)/local.config
 
-ifdef GTKEXTRA_CONFIG
- GTKEXTRA_INCLUDES=$(shell $(GTKEXTRA_CONFIG) --cflags)
- EXTRA_LIBS=$(shell $(GTKEXTRA_CONFIG) --libs)
+
+ifdef GTK_EXTRA_CONFIG
+ GTKEXTRA_INCLUDES=$(shell $(GTK_EXTRA_CONFIG) --cflags)
+ EXTRA_LIBS=$(shell $(GTK_EXTRA_CONFIG) --libs)
 else
  EXTRA_LIBS=$(GTKEXTRA_LIB_DIR:%=-L%) $(GTKEXTRA_LIB_DIR:%=-Xlinker -rpath -Xlinker %) -lgtkextra 
 endif
 
-OBJS=worksheet.o
+CFLAGS+=-g $(GTKEXTRA_INCLUDES) $(GNOME_SUPPORT_INCLUDE_DIR:%=-I%) -I$(GGOBI_HOME) $(shell $(GTK_CONFIG) --cflags)
 
-DataViewer.so: $(OBJS)
-	$(CC) -g -shared $(OBJS) -o $@ $(EXTRA_LIBS) -L$(GGOBI_HOME) -lggobi `gtk-config --libs` 
+GGOBI_LIB=-L$(GGOBI_HOME) -lggobi
 
-worksheet.o: worksheet.c
-	$(CC) -g $(GTKEXTRA_INCLUDES) -I$(GGOBI_HOME) $(CFLAGS) `gtk-config --cflags` -o $@ -c $<
+SRC=worksheet
+OBJS=$(SRC:%=%.o)
+
+$(PKG).so: $(OBJS)
+	$(CC) -shared $(OBJS) -o $@ $(GGOBI_LIB)  $(EXTRA_LIBS)  $(GTK_CONFIG --libs)
 
 clean:
-	rm -f *.o *.so
+	rm -f *.o 
+
+distClean: clean
+	rm config.cache config.log $(PKG).so
+
+local.config: configure local.config.in
+	./configure
+
+configure: configure.in
+	autoconf

@@ -144,6 +144,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
 	    g_printerr ("Can't allocate background color\n");
 	}
     }
+  }
 
   info->fgColor = NULL;  /*-- this needs to be initialized --*/
   el = getXMLElement(node, "foreground");
@@ -158,6 +159,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
 	    g_printerr ("Can't allocate foreground color\n");
 	}
     }
+  }
 
 
   el = getXMLElement(node, "glyph");

@@ -279,11 +279,8 @@ completeFileDesc(const gchar *fileName, InputDescription *desc)
       }
     }
     if(i == group->len) {
-      return(NULL);
-    }
-  }
 
-#if 0
+#if 1
   if(tmp) {
     desc->givenExtension = g_strdup(tmp+1);
     n = (tmp - fileName) + 1;
@@ -292,7 +289,11 @@ completeFileDesc(const gchar *fileName, InputDescription *desc)
   } else {
     desc->baseName = g_strdup(fileName);
   }
+#else
+      return(NULL);
 #endif
+    }
+  }
 
        /* Now compute the directory name. */
   if(desc->baseName) {
