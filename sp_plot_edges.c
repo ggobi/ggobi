@@ -107,6 +107,8 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
   GlyphType gtype;
   colorschemed *scheme = gg->activeColorScheme;
 
+/* g_printerr ("preparing to draw %s on %s\n", e->name, d->name); */
+
   if (e == (datad *) NULL || e->edge.n == 0) {
 /**/return;
   }
@@ -114,6 +116,8 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
   if (d->idTable == NULL) {  /*-- d has no record ids --*/
 /**/return;
   }
+
+/* g_printerr (" at 1; nedges %d\n", e->edge.n); */
 
   edges_show_p = (display->options.edges_directed_show_p ||
                   display->options.edges_undirected_show_p);
@@ -330,9 +334,16 @@ splot_add_edge_highlight_cue (splotd *sp, GdkDrawable *drawable, gint k,
     gdk_gc_set_foreground (gg->plot_GC,
       &scheme->rgb[ e->color_now.els[k] ]);
 
-    gdk_draw_line (drawable, gg->plot_GC,
-      sp->screen[a].x, sp->screen[a].y,
-      sp->screen[b].x, sp->screen[b].y);
+    if (endpoints[k].jpartner == -1) {
+      gdk_draw_line (drawable, gg->plot_GC,
+        sp->screen[a].x, sp->screen[a].y,
+        sp->screen[b].x, sp->screen[b].y);
+     } else {  /* thicken only half the line */
+      gdk_draw_line (drawable, gg->plot_GC,
+        sp->screen[a].x, sp->screen[a].y,
+	sp->screen[a].x + (sp->screen[b].x - sp->screen[a].x) / 2,
+        sp->screen[a].y + (sp->screen[b].y - sp->screen[a].y) / 2);
+    }
 
     gdk_gc_set_line_attributes (gg->plot_GC,
       0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
@@ -363,9 +374,8 @@ splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
      return;
   draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, endpoints, e);
 
-/*
- * Do we distinguish between nearest and sticky edge labels?
-*/
+  /*-- If the edge is bidirectional, use both labels --*/
+
   if (draw_edge) {
 
     /*-- add the label last so it will be in front of other markings --*/
