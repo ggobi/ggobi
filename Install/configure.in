@@ -414,10 +414,12 @@ dnl -DDIR_SEPARATOR=\"'/'\""
   fi
 fi
 
+if test -z "${with_R}" && test -d Rggobi ; then
+ with_R="yes"
+fi
 
 
-
-if test -n "${with_R}" && test "${with_R}" != "no" ; then
+if test -n "${with_R}" && test "${with_R}" != "no"  ; then
 
   if test -d Rggobi ; then
     WITH_R=1
