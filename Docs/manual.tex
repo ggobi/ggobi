@@ -1110,8 +1110,13 @@ can move it much more quickly across the plot.
 If {\bf Point brushing} is in any state but {\it Off}, the brush has a
 rectangular outline.  As the brush is moved across the points, any
 points contained by the brush are affected.  You may be changing the
-color, glyph shape, glyph size, or the visible state of the point,
-depending on the menu setting.
+color, glyph shape, glyph size, or the ``visible'' state of the point,
+depending on the menu setting.  The brushing style called ``Hide'' 
+deserves a few words: When it is selected, the brushed points are drawn
+in a kind of shadow color, very close to the background color.  The
+are de-emphasized but they provide context for the rest of the data.
+``Select'' does the opposite: de-emphasizing all the points that aren't
+brushed.
 
 Similarly, if {\bf Edge brushing} is in any state but {\it Off}, the
 brush includes a crosshair, and as the brush is moved in the window,
@@ -1243,7 +1248,7 @@ labels are
       supplied),
 \item a list of variables and variable values, where the variables are
       specified in the list widget above, or
-\item the record id (if none was supplied, the record number is used).
+\item the record id.
 \end{itemize}
 
 Identification in one window is instantly reflected in all linked windows.
@@ -1506,11 +1511,12 @@ variables yet.
 
 The {\bf Color \& glyph groups} tool displays a table.  Each unique
 symbol in the data (combination of color and glyph) occupies a row,
-and for each row there are three buttons:  {\bf H} hides all points
-drawn in the chosen symbol, {\bf S} shows them all, and {\bf C}
-(complement) hides what's shown and shows what's hidden.  The three
-remaining columns report the number of cases hidden, the number
-shown, and the sum.
+and for each row there are three buttons:  {\bf H} is a toggle button
+that ``hides'' or shows all points drawn in the chosen symbol.  The three
+remaining columns report the number of cases ``hidden,'' the number
+shown, and the sum.  The word ``hide'' is enclosed in quotation marks
+because ``hidden'' points are actually drawn in a color that's very
+close to the background color.
 
 Clicking on one of the little symbol displays will assign the
 currently selected color and/or glyph (depending on the state of the
@@ -1521,12 +1527,16 @@ likely that someone might do that by mistake, and unlikely that they
 would do it deliberately.  (That choice should be resolved by a
 dialog, probably, and an 'undo' button should be added.)
 
-The {\bf Update} button at the bottom of the window will reset the
-contents of the table in case it isn't responding to changes in the
-displays as you continue to brush.  The {\bf Rescale} button will cause
-the views to be redrawn as if any hidden points are no longer in the
-data:  that is, the points that are shown will be scaled to fill the
-viewing area of the plot.
+The {\bf Exclude hidden} button at the bottom of the window will exclude
+all hidden points from consideration in the displays:  the views will be
+scaled without those points, and they won't be drawn.  The {\bf Include
+hidden} button will bring those points back into the plot, and they'll
+be drawn in the shadow color as before.
+
+The {\bf Update} button updates the contents of the table in case it
+isn't responding properly to changes in the displays as you continue
+to brush.
+
 
 See \ref{NewVariable} to read how you can add a new variable to the
 existing data which serves as an indicator for these ``clusters.''
