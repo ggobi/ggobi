@@ -235,7 +235,7 @@ binning_permitted (displayd *display, ggobid *gg)
   return permitted;
 }
 
-void
+gboolean
 brush_once_and_redraw (gboolean binningp, splotd *sp, displayd *display,
   ggobid *gg) 
 {
@@ -265,9 +265,11 @@ brush_once_and_redraw (gboolean binningp, splotd *sp, displayd *display,
   } else {  /*-- we're not brushing, and we just need to redraw the brush --*/
     splot_redraw (sp, QUICK, gg);
   }
+
+  return(changed);
 }
 
-void
+gboolean
 brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   cpaneld *cpanel, splotd *sp, ggobid *gg)
 {
@@ -301,7 +303,7 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
     brush_pos->y2 = mouse->y ;
   }
 
-  brush_once_and_redraw (true, sp, display, gg);  /* binning permitted */
+  return(brush_once_and_redraw (true, sp, display, gg));  /* binning permitted */
 }
 
 

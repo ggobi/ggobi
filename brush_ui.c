@@ -318,7 +318,8 @@ motion_notify_cb(GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
   mousepos_get_motion(w, event, &button1_p, &button2_p, sp);
 
   if (button1_p || button2_p) {
-    brush_motion(&sp->mousepos, button1_p, button2_p, cpanel, sp, gg);
+    gboolean changed;
+    changed = brush_motion(&sp->mousepos, button1_p, button2_p, cpanel, sp, gg);
 
     /*XXX
       Like this to be emitted from the display. Or what about the splotd? 
@@ -333,8 +334,9 @@ motion_notify_cb(GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
     fflush(stderr);
 #endif
 /*XX is this the correct source object? */
-    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[BRUSH_MOTION_SIGNAL],
-      sp, event, sp->displayptr->d);
+    if(changed)
+      gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[BRUSH_MOTION_SIGNAL],
+         sp, event, sp->displayptr->d);
   }
   return true;
 }
