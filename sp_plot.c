@@ -149,6 +149,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   datad *d = display->d;
   gboolean draw_case;
   gint dtype = display->displaytype;
+  gint proj = projection_get (gg);
+
   /*
    * since parcoords and tsplot each have their own weird way
    * of drawing line segments, it's necessary to get the point
@@ -229,7 +231,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     if (dtype == scatterplot || dtype == scatmat)
       edges_draw (sp, sp->pixmap0, gg);
   }
-
+  if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
+    splot_draw_tour_axes(sp, sp->pixmap0, gg);
+  }
   return;
 }
 
@@ -248,6 +252,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   icoords *bin1 = &gg->plot.bin1;
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
+  gint proj = projection_get (gg);
 
   gushort current_color;
   gint ncolors_used;
@@ -344,6 +349,10 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 #endif
       }
     }
+  }
+
+  if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
+    splot_draw_tour_axes(sp, sp->pixmap0, gg);
   }
 
   return;
@@ -1031,8 +1040,6 @@ splot_draw_to_pixmap1 (splotd *sp, ggobid *gg)
     } else if (mode == SCALE) {
       scaling_visual_cues_draw (sp, sp->pixmap1, gg);
     }
-
-    splot_draw_tour_axes(sp, sp->pixmap1, gg);
   }
 }
 
@@ -1116,11 +1123,13 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   GtkStyle *style = gtk_widget_get_style (sp->da);
   datad *d = dsp->d;
   gfloat dst;
+  gchar *varlab;
 
   if (!dsp->options.axes_show_p)
     return;
   
   if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
+    gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
     switch (proj) {
       case TOUR1D:
         for (j=0; j<d->ncols; j++) {
@@ -1128,9 +1137,13 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             (gint) (dsp->t1d.u.vals[0][j]*
             (gfloat) sp->da->allocation.width/4);
           iy = sp->da->allocation.height - 10 - (d->ncols-1-j)*10;
+          gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
+            GDK_CAP_ROUND, GDK_JOIN_ROUND);
           gdk_draw_line(drawable, gg->plot_GC,
             sp->da->allocation.width/2,sp->da->allocation.height - 10 - 
             (d->ncols-1-j)*10, ix, iy);
+          gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
+            GDK_CAP_ROUND, GDK_JOIN_ROUND);
           gdk_draw_rectangle(drawable, gg->plot_GC, FALSE, 
             sp->da->allocation.width/2-sp->da->allocation.width/4,
             sp->da->allocation.height - 10*d->ncols-10,
@@ -1150,29 +1163,28 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           10, sp->da->allocation.height-sp->da->allocation.height/4-10,
           sp->da->allocation.width/4,sp->da->allocation.height/4,0,360*64);
         for (j=0; j<d->ncols; j++) {
-	  /*          ix = sp->da->allocation.width/2 + 
-            (gint) (dsp->t2d.u.vals[0][j]*
-            (gfloat) sp->da->allocation.width/3);
-          iy = sp->da->allocation.height - (sp->da->allocation.height/2 + 
-            (gint) (dsp->t2d.u.vals[1][j]*
-            (gfloat) sp->da->allocation.height/3));*/
           ix = sp->da->allocation.width/8 + 10 +
             (gint) (dsp->t2d.u.vals[0][j]*
             (gfloat) sp->da->allocation.width/8);
           iy = sp->da->allocation.height - 10 - (sp->da->allocation.height/8 + 
             (gint) (dsp->t2d.u.vals[1][j]*
             (gfloat) sp->da->allocation.height/8));
+          gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
+            GDK_CAP_ROUND, GDK_JOIN_ROUND);
           gdk_draw_line(drawable, gg->plot_GC,
             sp->da->allocation.width/8+10,
             sp->da->allocation.height-sp->da->allocation.height/8-10,
             ix, iy);
+          gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
+            GDK_CAP_ROUND, GDK_JOIN_ROUND);
           if (abs(ix - 10 - sp->da->allocation.width/8) > 5 ||
 	      abs(iy + 10 - (sp->da->allocation.height-
               sp->da->allocation.height/8)) > 5)
           {
+            varlab = g_strdup_printf("%d",j+1);
             gdk_text_extents (style->font, 
-              d->vartable[j].collab_tform,
-              strlen (d->vartable[j].collab_tform),
+              varlab,
+              strlen (varlab),
               &lbearing, &rbearing, &width, &ascent, &descent);
             ix = ix - 10 - sp->da->allocation.width/8;
             iy = iy - 
@@ -1185,9 +1197,17 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
                sp->da->allocation.height/8 + 
                (gint) ((gfloat) iy / dst *
                (gfloat) sp->da->allocation.height/8);
+            if (ix < sp->da->allocation.width/8+10)
+              ix -= width;
+            else
+              ix += width;
+            if (iy < sp->da->allocation.height-sp->da->allocation.height/8-10)
+              iy -= 3;
+            else
+              iy += (8);
             gdk_draw_string (drawable, style->font, gg->plot_GC,
               ix, iy,
-              d->vartable[j].collab_tform);
+              varlab);
 	  }
 	}     
         break;
@@ -1198,9 +1218,13 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             (gint) (dsp->tcorr1.u.vals[0][j]*
             (gfloat) sp->da->allocation.width/4);
           iy = sp->da->allocation.height - 10 - (d->ncols-1-j)*10;
+          gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
+            GDK_CAP_ROUND, GDK_JOIN_ROUND);
           gdk_draw_line(drawable, gg->plot_GC,
             sp->da->allocation.width/2,sp->da->allocation.height - 10 - 
             (d->ncols-1-j)*10, ix, iy);
+          gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
+            GDK_CAP_ROUND, GDK_JOIN_ROUND);
           gdk_draw_rectangle(drawable, gg->plot_GC, FALSE, 
             sp->da->allocation.width/2-sp->da->allocation.width/4,
             sp->da->allocation.height - 10*d->ncols-10,
@@ -1219,9 +1243,13 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           iy = sp->da->allocation.height - (sp->da->allocation.height/2 + 
             (gint) (dsp->tcorr2.u.vals[0][j]*
             (gfloat) sp->da->allocation.height/4));
+          gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
+            GDK_CAP_ROUND, GDK_JOIN_ROUND);
           gdk_draw_line(drawable, gg->plot_GC,
             10+j*10,sp->da->allocation.height/2,
             ix, iy);
+          gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
+            GDK_CAP_ROUND, GDK_JOIN_ROUND);
           gdk_draw_rectangle(drawable, gg->plot_GC, FALSE, 
             0, sp->da->allocation.height - 
             sp->da->allocation.height/2-sp->da->allocation.height/4,
