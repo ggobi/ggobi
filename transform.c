@@ -333,7 +333,7 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
           slim_tform.min = (gfloat) (dtmp - 1.0) / boxcoxparam;
           dtmp = pow ((gdouble) (*domain_adj)(slim.max, incr), boxcoxparam);
 #ifdef _WIN32
-          if (!_finite (dtmp)) /*[*/
+          if (!_finite (dtmp)) {
 #else
           if (!finite (dtmp)) {
 #endif
@@ -363,13 +363,13 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
           tform_ok = false;
         }
       }
+
       if (tform_ok) {  /*-- if all values are in the domain of log10 --*/
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot[i];
           d->tform.vals[m][jcol] = (gfloat)
             log10 ((gdouble) (*domain_adj)(d->raw.vals[m][jcol], incr));
         }
-
         /*-- apply the same transformation to the specified limits --*/
         if (d->vartable[jcol].lim_specified_p) {
           slim_tform.min = (gfloat)
