@@ -128,30 +128,6 @@ include_all_cb (GtkWidget *w, ggobid *gg) {
 }
 
 /*------------------------------------------------------------------*/
-/*     adjusting the increments for block and everyn subsetting     */
-/*------------------------------------------------------------------*/
-
-/*-- Set the increment for block_start --*/
-void set_start_incr_cb (GtkAdjustment *adj, GtkSpinButton *spin )
-{
-/*-- Set the spin widget's adjustment->step_increment to adj->value --*/
-  GtkAdjustment *adj_spin = gtk_spin_button_get_adjustment (spin);
-
-  adj_spin->step_increment = adj->value;
-  gtk_spin_button_set_adjustment (spin, adj_spin);
-}
-
-/*-- Set the increment for block_size --*/
-void set_block_incr_cb (GtkAdjustment *adj, GtkSpinButton *spin )
-{
-/*-- Set the spin widget's adjustment->step_increment to adj->value --*/
-  GtkAdjustment *adj_spin = gtk_spin_button_get_adjustment (spin);
-
-  adj_spin->step_increment = adj->value;
-  gtk_spin_button_set_adjustment (spin, adj_spin);
-}
-
-/*------------------------------------------------------------------*/
 
 void
 subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
@@ -160,7 +136,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
   GtkWidget *vbox, *frame, *hb, *vb, *button_hbox, *close_hbox;
   GtkWidget *label, *btn;
   datad *d;
-  gboolean firsttime = false;  /*-- first time for this d? --*/
 
   GtkWidget *swin, *clist;
   gchar *row[1];
@@ -173,33 +148,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
   else {
 
     d = gg->d->data;
-    gg->subset_ui.d = d;
-
-    /*
-     * if this particular datad object hasn't been the active one
-     * during subsetting, initialize all its GtkAdjustments.
-    */
-/*
-    if (d->subset.bstart_adj == NULL) {
-      gfloat fnr = (gfloat) d->nrows;
-      firsttime = true;
-
-      d->subset.bstart_adj = (GtkAdjustment *)
-        gtk_adjustment_new (1.0, 1.0, (fnr-2.0), 1.0, 5.0, 0.0);
-      d->subset.bsize_adj = (GtkAdjustment *)
-        gtk_adjustment_new (fnr/10.0, 1.0, fnr, 1.0, 5.0, 0.0);
-
-      d->subset.bstart_incr_adj = (GtkAdjustment *)
-        gtk_adjustment_new (1.0, 1.0, fnr, 1.0, 5.0, 0.0);
-      d->subset.bsize_incr_adj = (GtkAdjustment *)
-        gtk_adjustment_new (1.0, 1.0, fnr, 1.0, 5.0, 0.0);
-
-      d->subset.estart_adj = (GtkAdjustment *)
-        gtk_adjustment_new (1.0, 1.0, fnr-2.0, 1.0, 5.0, 0.0);
-      d->subset.estep_adj = (GtkAdjustment *)
-        gtk_adjustment_new (fnr/10.0, 1.0, fnr-1, 1.0, 5.0, 0.0);
-    }
-*/
 
     if (gg->subset_ui.window == NULL) {
     
@@ -318,45 +266,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_box_pack_start (GTK_BOX (vb), gg->subset_ui.bsize, false, false, 0);
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
 
-      /*-- Block subsetting: First case increment (bstart_incr) --*/
-      vb = gtk_vbox_new (false, 2);
-      label = gtk_label_new ("Set the increment:");
-      gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
-      gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
-
-      gg->subset_ui.bstart_incr =
-        gtk_spin_button_new (d->subset.bstart_incr_adj, 0, 0);
-      gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (gg->subset_ui.bstart_incr),
-                                false);
-      gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON
-                                         (gg->subset_ui.bstart_incr),
-                                       GTK_SHADOW_OUT);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset_ui.bstart_incr,
-        "Specify the increment for the arrows used to increment and decrement the first case, just above",
-        NULL);
-      gtk_box_pack_start (GTK_BOX (vb), gg->subset_ui.bstart_incr,
-                          false, false, 0);
-      gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,1,2);
-
-      /*-- Block subsetting: Blocksize increment (bsize_incr) --*/
-      vb = gtk_vbox_new (false, 2);
-      label = gtk_label_new ("Set the increment:");
-      gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
-      gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
-
-      gg->subset_ui.bsize_incr =
-        gtk_spin_button_new (d->subset.bsize_incr_adj, 0, 0);
-      gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (gg->subset_ui.bsize_incr),
-                                false);
-      gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON
-                                         (gg->subset_ui.bsize_incr),
-                                       GTK_SHADOW_OUT);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset_ui.bsize_incr,
-        "Specify the increment for the arrows used to increment and decrement the blocksize, just above",
-        NULL);
-      gtk_box_pack_start (GTK_BOX (vb), gg->subset_ui.bsize_incr,
-                          false, false, 0);
-      gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,1,2);
 
       label = gtk_label_new ("Block");
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
@@ -486,21 +395,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
     }  /*-- if window == NULL --*/
 
     /*
-     * if this particular datad object is being initialized, 
-     * add its callbacks.
-    */
-    if (firsttime) {
-      gtk_signal_connect (GTK_OBJECT (d->subset.bstart_incr_adj),
-                          "value_changed",
-                          GTK_SIGNAL_FUNC (set_start_incr_cb),
-                          (gpointer) gg->subset_ui.bstart);
-      gtk_signal_connect (GTK_OBJECT (d->subset.bsize_incr_adj),
-                          "value_changed",
-                          GTK_SIGNAL_FUNC (set_block_incr_cb),
-                          (gpointer) gg->subset_ui.bsize);
-    }
-
-    /*
      * In case this is a different d than was used the last time
      * the subset panel was opened, attach the right adjustments
      * to the spin_buttons.
@@ -510,11 +404,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
     gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bsize),
                                     d->subset.bsize_adj);
                                    
-    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bstart_incr),
-                                    d->subset.bstart_incr_adj);
-    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bsize_incr),
-                                    d->subset.bsize_incr_adj);
-
     gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.estart),
                                     d->subset.estart_adj);
     gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.estep),

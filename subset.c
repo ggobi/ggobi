@@ -25,10 +25,12 @@ subset_init (datad *d, ggobid *gg)
   d->subset.bsize_adj = (GtkAdjustment *)
     gtk_adjustment_new (fnr/10.0, 1.0, fnr, 1.0, 5.0, 0.0);
 
+/*
   d->subset.bstart_incr_adj = (GtkAdjustment *)
     gtk_adjustment_new (1.0, 1.0, fnr, 1.0, 5.0, 0.0);
   d->subset.bsize_incr_adj = (GtkAdjustment *)
     gtk_adjustment_new (1.0, 1.0, fnr, 1.0, 5.0, 0.0);
+*/
 
   d->subset.estart_adj = (GtkAdjustment *)
     gtk_adjustment_new (1.0, 1.0, fnr-2.0, 1.0, 5.0, 0.0);

@@ -140,8 +140,6 @@ struct _ggobid {
 
 /*----------------------- missing values ---------------------------*/
 
-/*---------------- deleting the hidden points; subsetting ----------*/
-
 /*--------------- clusters: hiding, excluding ----------------------*/
 
  struct _ClusterUI {
@@ -326,11 +324,7 @@ struct _ggobid {
    GtkWidget *random_entry, *nrows_entry, *rowlab_entry;
    /*-- spinners --*/
    GtkWidget *bstart, *bsize;
-   GtkWidget *bstart_incr, *bsize_incr;
    GtkWidget *estart, *estep;
-
-   /*-- a pointer to be compared with current_display->d --*/
-   datad *d;
  } subset_ui;
 
 /*---------------- brushing by weights -------------------------------*/
