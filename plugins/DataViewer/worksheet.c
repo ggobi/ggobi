@@ -35,6 +35,12 @@ void connect_to_existing_displays(ggobid *gg, GtkSheet *sheet);
 static GdkColor red = {-1, 65535, 0, 0};
 static GdkColor black;
 
+
+/**
+ Called when the plugin instance is created for a new ggobi instance.
+ This adds an entry to the Tools menu that the user can select to 
+ bring up the datasheet window.
+ */
 gboolean
 addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
@@ -44,6 +50,9 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   inst->data = NULL;
   inst->info = plugin;
 
+   /* These could be done in an onLoad routine rather than each time 
+      we create a new plugin instance of this type. No big deal at all.
+    */
   gdk_colormap_alloc_color(gdk_colormap_get_system(), &red, TRUE, TRUE);
   gdk_color_black(gdk_colormap_get_system(), &black);
 
@@ -68,6 +77,10 @@ static GtkItemFactoryEntry menu_items[] = {
 }
 
 
+/**
+  The callback for the menu item that brings up the datasheet  window
+  for the GGobi instance associated with the menu.
+ */
 void
 show_data_edit_window(PluginInstance *inst, GtkWidget *widget)
 {
@@ -86,6 +99,10 @@ show_data_edit_window(PluginInstance *inst, GtkWidget *widget)
 }
 
 
+/**
+ Create the top-level window displaying the different 
+ datasets in the ggobi instance.
+ */
 GtkWidget *
 create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
 {
@@ -118,6 +135,10 @@ create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
   return(window);
 }
 
+/**
+ Add an entry/page in the notebook for each of the datasets in the 
+ ggobi instance.
+ */
 void
 add_ggobi_sheets(ggobid *gg, GtkWidget *notebook)
 {
@@ -140,6 +161,12 @@ add_ggobi_sheets(ggobid *gg, GtkWidget *notebook)
   }
 }
 
+/**
+ Create a scrolled window containing a worksheet in which the 
+ contents of the data set are displayed. 
+ And arrange to be informed if a cell is changed by the user
+ or a new plot is created by ggobi. 
+ */
 GtkWidget*
 create_ggobi_sheet(datad *data, ggobid *gg)
 {
@@ -164,6 +191,10 @@ create_ggobi_sheet(datad *data, ggobid *gg)
   return(scrolled_window);
 }
 
+
+/** 
+  Register signal handlers for GGobi events on the particular splot.
+ */
 void
 connect_to_splot(splotd *sp, GtkSheet *sheet)
 {
@@ -276,7 +307,9 @@ void closeWindow(ggobid *gg, PluginInstance *inst)
 }
 
 /**
-
+  Assign a value, typically obtained from the spreadsheet,
+  to the associated dataset in GGobi and then update all the
+  affected GGobi plots.
  */
 void
 update_cell(gint row, gint column, double value, datad *data)
