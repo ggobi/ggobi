@@ -1,17 +1,3 @@
-We use Inno Setup (http://www.jrsoftware.org) by Jordan Russell to
-create a self-installing executable for ggobi.  This handles
-installing the relevant files (the executable and 3rd party DLLs),
-example data files, and adding ggobi to the user's Start->Programs
-menu and optionally creating an icon on their desktop.
-
-One uses the Inno Setup compiler to create the self-extracting and
-installing executable. To do this, you need to have version 2.0.9 (or
-higher) of Inno Setup installed. Then, run Inno Setup Compiler and
-open the file Install/ggobi.iss in the ggobi/ source.  To compile the
-installation information, you must have compiled ggobi.exe and have
-the necessary 3rd party DLLs available. I have put the latter in a
-single directory named libs/ on my machine.
-
 When the user downloads and runs this executable, they are presented
 with a sequence of dialog screens.
 
@@ -55,5 +41,12 @@ the appropriate page for changing the incorrect setting.
 Assuming all went well, the installation concludes with a page that
 announces success and also allows the user run ggobi.  If the checkbox
 'Launch ggobi' is checked when the user clicks on the Finish button
-(or hits return), ggobi will be executed. It will start in the 
+(or hits return), ggobi will be executed. This particular ggobi
+session will start with the flea data loaded.
 
+
+Uninstalling
+
+ To uninstall ggobi, select the uninstall option in the ggobi
+shortcuts that were created during the installation.  These are, by
+default, on the Start->Programs->ggobi menu.

@@ -14,3 +14,23 @@ make ADMIN=1 DOC_TEX_FILES=
 cd /tmp/Install/ggobi
 ./configure
 make (or gmake)
+
+
+
+
+
+Creating the Windows Distribution
+
+We use Inno Setup (http://www.jrsoftware.org) by Jordan Russell to
+create a self-installing executable for ggobi.  This handles
+installing the relevant files (the executable and 3rd party DLLs),
+example data files, and adding ggobi to the user's Start->Programs
+menu and optionally creating an icon on their desktop.
+
+One uses the Inno Setup compiler to create the self-extracting and
+installing executable. To do this, you need to have version 2.0.9 (or
+higher) of Inno Setup installed. Then, run Inno Setup Compiler and
+open the file Install/ggobi.iss in the ggobi/ source.  To compile the
+installation information, you must have compiled ggobi.exe and have
+the necessary 3rd party DLLs available. I have put the latter in a
+single directory named libs/ on my machine.
