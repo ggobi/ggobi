@@ -9,6 +9,12 @@
      <arg>openURL(<filename/>)</arg>
     </args>
   </browser>
+
+  <colorschemes file="/home/duncan/Projects/ggobi/notes/colorschemes.xml" />
+  <background>
+   <color><red>1</red><green>0</green><blue>0</blue></color>
+  </background>
+
 </preferences>
 
 <previousFiles count="4">
@@ -60,7 +66,14 @@ cvs
      <init onCreate="addToMenu"  onClose="closeWindow" />
    </dll>
  </plugin>
-
+<plugin name="Barplot Display Type" load="immediate"><!-- load may be on demand. -->
+   <description>Display barplot for a variable.</description>
+   <author>Heike Hoffman, Debbyg Swayne, Duncan Temple Lang</author>
+   <dll name="plugins/CategoricalPlots/CategoricalPlots.so">
+    <init onUpdateDisplayMenu="addBarplotMenuItems" />
+  </dll>
+</plugin>
+<!--
  <plugin name="test plugin" load="immediate">
    <description>Test of the plugin mechanism.</description>
      <author>Duncan Temple Lang</author>
@@ -68,6 +81,7 @@ cvs
       <init onCreate="init" onClose="close" onLoad="load" onUnload="unload" />
      </dll>
  </plugin>
+-->
 </plugins>
 
 </ggobirc>
