@@ -24,10 +24,10 @@
 
 void 
 cpanel_tcorr_init (cpaneld *cpanel, ggobid *gg) {
-    cpanel->tcorr1_paused = false;
-    cpanel->tcorr1_step = TOURSTEP0;
-    cpanel->tcorr2_paused = false;
-    cpanel->tcorr2_step = TOURSTEP0;
+  cpanel->tcorr1_paused = false;
+  cpanel->tcorr1_step = TOURSTEP0;
+  cpanel->tcorr2_paused = false;
+  cpanel->tcorr2_step = TOURSTEP0;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/
@@ -47,7 +47,9 @@ cpanel_tourcorr_set (cpaneld *cpanel, ggobid* gg)
   /*-- path len... --*/
 }
 
+#ifdef TOUR_PP_IMPLEMENTED
 static void ctouradv_window_open (void);
+#endif
 
 static void speedcorr_set_cb (GtkAdjustment *adj, ggobid *gg) {
   extern void tourcorr_speed_set (gint, ggobid *);
@@ -66,7 +68,6 @@ static void tourcorr_reinit_cb (GtkWidget *w, ggobid *gg) {
   extern void tourcorr_reinit(ggobid *);
 
   tourcorr_reinit(gg);
-
 }
 
 /*
@@ -249,7 +250,7 @@ The following are considered advanced features for now:
   history
 */
 
-/*
+#ifdef TOUR_PP_IMPLEMENTED
 static GtkWidget *window = NULL;
 static void
 ctouradv_window_open (void) {
@@ -277,7 +278,7 @@ ctouradv_window_open (void) {
 
   gtk_widget_show_all (window);
 }
-*/
+#endif
 
 /*----------------------------------------------------------------------*/
 /*                              I/O events                              */

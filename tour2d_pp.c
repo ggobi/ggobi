@@ -48,6 +48,7 @@ static gfloat indx_min, indx_max;
 #define EXPMINUS1 0.3678794411714423
 #define ONEMINUSEXPMINUS1 0.63212056
 
+/*
 static gfloat
 mean_fn(gfloat *x1, gint n, gint *rows_in_plot)
 {
@@ -63,6 +64,7 @@ mean_fn(gfloat *x1, gint n, gint *rows_in_plot)
 
   return(mean1);
 }
+*/
 
 static gfloat
 mean_fn2(gfloat *x1, gfloat *x2, gint n)
@@ -429,7 +431,8 @@ gfloat t2d_calc_indx (array_f data, array_f proj,
 { 
   gfloat indexval;
   array_f pdata;
-  int i, j, m, k;
+  gint i, j, m;
+  /* gint k; */
 
   arrayf_init_null (&pdata);
   arrayf_alloc_zero (&pdata, nrows, 2);
@@ -458,8 +461,9 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
   displayd *dsp = gg->current_display; 
   datad *d = dsp->d;
   holes_param hp;
-  gint kout, nrows = d->nrows_in_plot, pdim = 2;
+  gint kout, nrows = d->nrows_in_plot;
   gint i, j;
+  /* gint pdim = 2; */
 
   for (i=0; i<d->nrows_in_plot; i++)
     for (j=0; j<dsp->t2d.nvars; j++)

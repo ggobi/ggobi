@@ -109,12 +109,14 @@ t2d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
     &dsp->t2d.target_basis_method, dsp);
 }
 
+/*
 static void
 sphere_cb (GtkWidget  *w, ggobid *gg) {
   extern void sphere_panel_open(ggobid *);
 
   sphere_panel_open(gg);
 }
+*/
 
 gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","Skewness"};
 void t2d_pp_func_cb (GtkWidget *w, gpointer cbd)
