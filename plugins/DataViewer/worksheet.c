@@ -8,9 +8,6 @@
 #include "plugin.h"
 
 #include "gtkextra/gtksheet.h"
-#if 0
-#include "pixmaps.h"
-#endif
 
 #include <stdlib.h>
 #include "errno.h"
@@ -27,13 +24,16 @@ GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
 void update_cell(gint row, gint column, double value, datad *data);
 void cell_changed(GtkSheet *sheet, gint row, gint column, datad *data);
 
-void brush_change(GtkWidget *w, ggobid *gg, splotd *sp, GtkSheet *sheet);
+void brush_change(GtkWidget *w, ggobid *gg, splotd *sp, GdkEventMotion *ev, GtkSheet *sheet);
 void move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet);
 void monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkSheet *sheet);
 void identify_cell(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet);
-
+void color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col);
 
 void connect_to_existing_displays(ggobid *gg, GtkSheet *sheet);
+
+static GdkColor red = {-1, 65535, 0, 0};
+static GdkColor black;
 
 gboolean
 addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
@@ -43,6 +43,9 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 
   inst->data = NULL;
   inst->info = plugin;
+
+  gdk_colormap_alloc_color(gdk_colormap_get_system(), &red, TRUE, TRUE);
+  gdk_color_black(gdk_colormap_get_system(), &black);
 
   entry = GGobi_addToolsMenuItem ("Data grid ...", gg);
   gtk_signal_connect_object (GTK_OBJECT(entry), "activate",
@@ -158,6 +161,8 @@ create_ggobi_sheet(datad *data, ggobid *gg)
 
   connect_to_existing_displays(gg, GTK_SHEET(sheet));
 
+  color_row(GTK_SHEET(sheet), 2, 3, &red);
+
   return(scrolled_window);
 }
 
@@ -270,9 +275,6 @@ cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
 	fprintf(stderr, "Error in strtod: %d\n", errno);fflush(stderr);
 	return;
     }
-/*
-    fprintf(stderr, "[%s] Changed value of cell %d, %d to `%s' %f\n", data->name, row, column, val, value);fflush(stderr);
-*/
 
 #if 1
     update_cell(row, column, value, data);
@@ -315,8 +317,31 @@ move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, 
     }
 }
 
-void
-brush_change(GtkWidget *w, ggobid *gg, splotd *sp, GtkSheet *sheet)
-{
 
+void
+color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col)
+{
+    GtkSheetRange range;
+    range.row0 = row;
+    range.col0 = 0;
+    range.rowi = row+1;/* row or row+1*/
+    range.coli = ncols-1;
+
+    gtk_sheet_range_set_foreground(sheet, &range, col);
 }
+
+void
+brush_change(GtkWidget *w, ggobid *gg, splotd *sp, GdkEventMotion *ev, GtkSheet *sheet)
+{
+ datad *d = sp->displayptr->d;
+ int nr, i;
+      nr = d->npts_under_brush;
+      for(i = 0 ; i < d->nrows ; i++) {
+	  if(d->pts_under_brush.els[i]) {
+	      color_row(sheet, i, d->ncols, &red);
+	  } else
+	      color_row(sheet, i, d->ncols, &black);
+
+      }
+}
+
