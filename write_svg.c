@@ -33,9 +33,7 @@ void
 splot_write_svg (splotd *sp, ggobid *gg)
 {
   gint k;
-#ifndef _WIN32
   gint i, m;
-#endif
   gushort current_color;
   gint npoint_colors_used = 0;
   gushort point_colors_used[NCOLORS+2];

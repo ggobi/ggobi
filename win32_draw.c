@@ -264,9 +264,9 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
     m = d->rows_in_plot[i];
     draw_case = splot_plot_case (m, d, sp, display, gg);
 
-    if (draw_case && d->color_now[j] == current_color) {
+    if (draw_case && d->color_now[m] == current_color) {
       if (display->options.points_show_p) {
-        build_glyph (&d->glyph_now[j], sp->screen, j,
+        build_glyph (&d->glyph_now[m], sp->screen, m,
           points, &npt,           segs, &nseg,
           open_rects, &nr_open,   filled_rects, &nr_filled,
           open_arcs, &nc_open,    filled_arcs, &nc_filled);
@@ -274,7 +274,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
         if (display->displaytype == parcoords &&
             display->options.edges_show_p)
         {
-          build_whisker_segs (j, sp);
+          build_whisker_segs (m, sp);
           nwhisker_segs += 2;
         }
       }

@@ -318,6 +318,7 @@ mode_set (gint m, ggobid *gg) {
 
   gg->prev_mode = gg->mode;
 
+  varpanel_tooltips_set (gg);
   varpanel_refresh (gg);
 }
 

@@ -316,36 +316,10 @@ struct _ggobid {
  struct _Varpanel_ui {
    GtkWidget *varpanel;  /*-- a vbox --*/
    GtkWidget *scrolled_window;
-   GtkAccelGroup *varpanel_accel_group;
+   /*GtkAccelGroup *varpanel_accel_group;*/
+   GtkTooltips *tips;
  } varpanel_ui;
 
-/*----------------- variable selection menus -------------------------*/
-
- struct {
-  varseldatad vdata0, vdata1;
- } p1d_menu;
-
- struct {
-  varseldatad vdata0, vdata1;
- } parcoords_menu;
-
- struct {
-  varseldatad vdata0, vdata1;
- } xyplot_menu;
-
- struct {
-  varseldatad vdata0, vdata1, vdata2;
- } rotation_menu;
-
- struct {
-  varseldatad vdata0, vdata1, vdata2;
- } tour2d_menu;
-
- struct {
-  varseldatad vdata0, vdata1, vdata2, vdata3;
- } scatmat_menu;
-
-/*--------------------------------------------------------------------*/
 
 }; /*  ggobid; */
 

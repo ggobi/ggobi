@@ -89,333 +89,6 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 }
 
 /*-------------------------------------------------------------------------*/
-/*                     Variable menus                                      */
-/*-------------------------------------------------------------------------*/
-
-
-static void
-varsel_from_menu (GtkWidget *w, gpointer data)
-{
-  varseldatad *vdata = (varseldatad *) data;
-  ggobid *gg = vdata->gg;
-  displayd *display = gg->current_display;
-  datad *d = display->d;
-  cpaneld *cpanel = &display->cpanel;
-
-  /*-- I think the menu should be destroyed here. --*/
-  gtk_widget_destroy (w->parent);
-
-  varsel (cpanel, gg->current_splot, vdata->jvar, vdata->btn,
-    vdata->alt_mod, vdata->ctrl_mod, vdata->shift_mod, d, gg);
-}
-
-GtkWidget *
-p1d_menu_build (gint jvar, datad *d, ggobid *gg)
-{
-  GtkWidget *menu;
-
-  gg->p1d_menu.vdata0.sp = gg->p1d_menu.vdata1.sp = gg->current_splot;
-  gg->p1d_menu.vdata0.jvar = gg->p1d_menu.vdata1.jvar = jvar;
-  gg->p1d_menu.vdata0.alt_mod = gg->p1d_menu.vdata1.alt_mod = false;
-
-  gg->p1d_menu.vdata0.btn = 1;
-  gg->p1d_menu.vdata1.btn = 2;
-
-  menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
-
-  CreateMenuItem (menu, "Select X    L",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &(gg->p1d_menu.vdata0), gg);
-
-  CreateMenuItem (menu, "Select Y    M,R",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &(gg->p1d_menu.vdata1), gg);
-
-  return menu;
-}
-
-GtkWidget *
-xyplot_menu_build (gint jvar, datad *d, ggobid *gg)
-{
-  GtkWidget *menu;
-
-  gg->xyplot_menu.vdata0.sp = gg->xyplot_menu.vdata1.sp = gg->current_splot;
-  gg->xyplot_menu.vdata0.jvar = gg->xyplot_menu.vdata1.jvar = jvar;
-  gg->xyplot_menu.vdata0.alt_mod = gg->xyplot_menu.vdata1.alt_mod = false;
-
-  gg->xyplot_menu.vdata0.btn = 1;
-  gg->xyplot_menu.vdata1.btn = 2;
-
-  gg->xyplot_menu.vdata0.gg = gg;
-  gg->xyplot_menu.vdata1.gg = gg;
-
-  menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
-
-  CreateMenuItem (menu, "Select X    L",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->xyplot_menu.vdata0, gg);
-
-  CreateMenuItem (menu, "Select Y    M,R",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->xyplot_menu.vdata1, gg);
-
-  return menu;
-}
-
-GtkWidget *
-rotation_menu_build (gint jvar, datad *d, ggobid *gg)
-{
-  GtkWidget *menu;
-  
-  gg->rotation_menu.vdata0.sp = gg->rotation_menu.vdata1.sp =
-    gg->rotation_menu.vdata2.sp = gg->current_splot;
-  gg->rotation_menu.vdata0.jvar = gg->rotation_menu.vdata1.jvar =
-    gg->rotation_menu.vdata2.jvar = jvar;
-  gg->rotation_menu.vdata0.alt_mod = gg->rotation_menu.vdata1.alt_mod =
-    gg->rotation_menu.vdata2.alt_mod = false;
-
-  gg->rotation_menu.vdata0.btn = 1;
-  gg->rotation_menu.vdata1.btn = 2;
-  gg->rotation_menu.vdata2.btn = 3;
-
-  gg->rotation_menu.vdata2.gg = gg->rotation_menu.vdata1.gg =
-    gg->rotation_menu.vdata0.gg = gg;
-
-  menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
-
-  CreateMenuItem (menu, "Select X  L",
-    NULL, NULL, gg->varpanel_ui.varpanel,
-    gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu),
-    (gpointer) &gg->rotation_menu.vdata0, gg);
-  CreateMenuItem (menu, "Select Y  M",
-    NULL, NULL, gg->varpanel_ui.varpanel,
-    gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu),
-    (gpointer) &gg->rotation_menu.vdata1, gg);
-  CreateMenuItem (menu, "Select Z  R",
-    NULL, NULL, gg->varpanel_ui.varpanel,
-    gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu),
-    (gpointer) &gg->rotation_menu.vdata2, gg);
-
-  return menu;
-}
-
-GtkWidget *
-tour2d_menu_build (gint jvar, datad *d, ggobid *gg)
-{
-  GtkWidget *menu;
-
-  gg->tour2d_menu.vdata0.sp = gg->tour2d_menu.vdata1.sp =
-    gg->tour2d_menu.vdata2.sp = gg->current_splot;
-  gg->tour2d_menu.vdata0.jvar = gg->tour2d_menu.vdata1.jvar =
-    gg->tour2d_menu.vdata2.jvar = jvar;
-  gg->tour2d_menu.vdata0.alt_mod = gg->tour2d_menu.vdata1.alt_mod =
-    gg->tour2d_menu.vdata2.alt_mod = false;
-  gg->tour2d_menu.vdata0.shift_mod = gg->tour2d_menu.vdata2.shift_mod = false;
-  gg->tour2d_menu.vdata1.shift_mod = true;
-  gg->tour2d_menu.vdata0.ctrl_mod = gg->tour2d_menu.vdata1.ctrl_mod = false;
-  gg->tour2d_menu.vdata2.ctrl_mod = true;
-
-  gg->tour2d_menu.vdata2.gg = gg->tour2d_menu.vdata1.gg =  
-    gg->tour2d_menu.vdata0.gg = gg;
-
-  menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
-
-  CreateMenuItem (menu, "Tour   L,M",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->tour2d_menu.vdata0, gg);
-  CreateMenuItem (menu, "Manip  <Shift> L,M",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->tour2d_menu.vdata1, gg);
-  CreateMenuItem (menu, "Freeze <Ctrl> L,M",
-    NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu), (gpointer) &gg->tour2d_menu.vdata2, gg);
-
-  return menu;
-}
-
-/*
-  corr_tour_menu = gtk_menu_new ();
-  CreateMenuItem (corr_tour_menu, "Tour X    L",         NULL, NULL,
-    varpanel, varpanel_accel_group, NULL, NULL);
-  CreateMenuItem (corr_tour_menu, "Tour Y    M",         NULL, NULL,
-    varpanel, varpanel_accel_group, NULL, NULL);
-  CreateMenuItem (corr_tour_menu, "Manip X   <Shift> L", NULL, NULL,
-    varpanel, varpanel_accel_group, NULL, NULL);
-  CreateMenuItem (corr_tour_menu, "Manip Y   <Shift> M", NULL, NULL,
-    varpanel, varpanel_accel_group, NULL, NULL);
-  CreateMenuItem (corr_tour_menu, "Freeze X  <Ctrl> L",  NULL, NULL,
-    varpanel, varpanel_accel_group, NULL, NULL);
-  CreateMenuItem (corr_tour_menu, "Freeze Y  <Ctrl> M",  NULL, NULL,
-    varpanel, varpanel_accel_group, NULL, NULL);
-*/
-
-GtkWidget *
-parcoords_menu_build (gint jvar, datad *d, ggobid *gg)
-{
-  GtkWidget *menu;
-
-  gg->parcoords_menu.vdata0.sp = gg->parcoords_menu.vdata1.sp =
-    gg->current_splot;
-  gg->parcoords_menu.vdata0.jvar = gg->parcoords_menu.vdata1.jvar = jvar;
-  gg->parcoords_menu.vdata0.alt_mod = false;
-  gg->parcoords_menu.vdata1.alt_mod = true;
-
-  gg->parcoords_menu.vdata1.gg = gg->parcoords_menu.vdata0.gg = gg;
-
-  menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
-
-  CreateMenuItem (menu, "Select Y      M,R",
-    NULL, NULL, gg->varpanel_ui.varpanel,
-    gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu),
-    (gpointer) &gg->parcoords_menu.vdata0, gg);
-  CreateMenuItem (menu, "Delete Y <alt>M,R",
-    NULL, NULL, gg->varpanel_ui.varpanel,
-    gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu),
-    (gpointer) &gg->parcoords_menu.vdata1, gg);
-
-  return menu;
-}
-
-GtkWidget *
-scatmat_menu_build (gint jvar, datad *d, ggobid *gg)
-{
-  GtkWidget *menu;
-
-  gg->scatmat_menu.vdata0.sp =
-    gg->scatmat_menu.vdata1.sp =
-    gg->scatmat_menu.vdata2.sp =
-    gg->scatmat_menu.vdata3.sp =
-    gg->current_splot;
-  gg->scatmat_menu.vdata0.jvar =
-    gg->scatmat_menu.vdata1.jvar =
-    gg->scatmat_menu.vdata2.jvar =
-    gg->scatmat_menu.vdata3.jvar = jvar;
-  gg->scatmat_menu.vdata0.alt_mod = gg->scatmat_menu.vdata1.alt_mod = false;
-  gg->scatmat_menu.vdata2.alt_mod = gg->scatmat_menu.vdata3.alt_mod = 3;
-
-  gg->scatmat_menu.vdata0.btn = gg->scatmat_menu.vdata2.btn = 1;
-  gg->scatmat_menu.vdata1.btn = gg->scatmat_menu.vdata3.btn = 2;
-
-  gg->scatmat_menu.vdata3.gg =
-    gg->scatmat_menu.vdata2.gg =
-    gg->scatmat_menu.vdata1.gg =
-    gg->scatmat_menu.vdata0.gg = gg;
-
-  menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
-
-  CreateMenuItem (menu, "Select row  L",
-    NULL, NULL, gg->varpanel_ui.varpanel,
-    gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu),
-    (gpointer) &gg->scatmat_menu.vdata0, gg);
-  CreateMenuItem (menu, "Select col  M,R",
-    NULL, NULL, gg->varpanel_ui.varpanel,
-    gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu),
-    (gpointer) &gg->scatmat_menu.vdata1, gg);
-  CreateMenuItem (menu, "Delete row  <alt>L",
-    NULL, NULL, gg->varpanel_ui.varpanel,
-    gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC
-    (varsel_from_menu), (gpointer) &gg->scatmat_menu.vdata2, gg);
-  CreateMenuItem (menu, "Delete col  <alt>M,R",
-    NULL, NULL, gg->varpanel_ui.varpanel,
-    gg->varpanel_ui.varpanel_accel_group,
-    GTK_SIGNAL_FUNC (varsel_from_menu),
-    (gpointer) &gg->scatmat_menu.vdata3, gg);
-
-  return menu;
-}
-
-static gint
-popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd) 
-{
-  ggobid *gg = GGobiFromWidget(w, true);
-  displayd *display = gg->current_display;
-  cpaneld *cpanel;
-  gint jvar = GPOINTER_TO_INT (cbd);
-  GtkWidget *p1d_menu, *xyplot_menu;
-  GtkWidget *rotation_menu, *tour_menu;
-  GtkWidget *parcoords_menu, *scatmat_menu;
-  /*-- w  is the variable label --*/
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (w), "datad");
-
-  if (display == NULL)
-    return false;
-  if (display->d != d)  /*-- only select for the current plot --*/
-    return false;
-
-  cpanel = &display->cpanel;
-
-  if (event->type == GDK_BUTTON_PRESS) {
-    GdkEventButton *bevent = (GdkEventButton *) event;
-    if (bevent->button == 1) {
-      gint projection = projection_get (gg);
-
-      switch (display->displaytype) {
-
-        case scatterplot:
-          switch (projection) {
-            case P1PLOT:
-              p1d_menu = p1d_menu_build (jvar, d, gg);
-              gtk_menu_popup (GTK_MENU (p1d_menu), NULL, NULL,
-                position_popup_menu, NULL,
-                bevent->button, bevent->time);
-              break;
-            case XYPLOT:
-              xyplot_menu = xyplot_menu_build (jvar, d, gg);
-              gtk_menu_popup (GTK_MENU (xyplot_menu), NULL, NULL,
-                position_popup_menu, NULL,
-                bevent->button, bevent->time);
-              break;
-            case ROTATE:
-              rotation_menu = rotation_menu_build (jvar, d, gg);
-              gtk_menu_popup (GTK_MENU (rotation_menu), NULL, NULL,
-                position_popup_menu, NULL,
-                bevent->button, bevent->time);
-              break;
-            case TOUR2D:
-            case COTOUR:
-              tour_menu = tour2d_menu_build (jvar, d, gg);
-              gtk_menu_popup (GTK_MENU (tour_menu), NULL, NULL,
-                position_popup_menu, NULL,
-                bevent->button, bevent->time);
-              break;
-          }
-          break;
-
-        case scatmat:
-          scatmat_menu = scatmat_menu_build (jvar, d, gg);
-          gtk_menu_popup (GTK_MENU (scatmat_menu), NULL, NULL,
-                position_popup_menu, NULL,
-            bevent->button, bevent->time);
-          break;
-
-        case parcoords:
-          parcoords_menu = parcoords_menu_build (jvar, d, gg);
-          gtk_menu_popup (GTK_MENU (parcoords_menu), NULL, NULL,
-                position_popup_menu, NULL,
-            bevent->button, bevent->time);
-          break;
-      }
-      return true;
-    }
-  }
-  return false;
-}
-
-/*-------------------------------------------------------------------------*/
 /*                   variable cloning                                      */
 /*-------------------------------------------------------------------------*/
 
@@ -612,7 +285,11 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
 
   gg->selvarfg_GC = NULL;
 
+/*
   gg->varpanel_ui.varpanel_accel_group = gtk_accel_group_new ();
+*/
+  gg->varpanel_ui.tips = gtk_tooltips_new ();
+  
 
   /*-- create a scrolled window --*/
   gg->varpanel_ui.scrolled_window = gtk_scrolled_window_new (NULL, NULL);
@@ -717,3 +394,66 @@ GGOBI(selectScatterplotX) (gint jvar, ggobid *gg)
   }
 }
 
+/*-------------------------------------------------------------------------*/
+/*                    context-sensitive tooltips                           */
+/*-------------------------------------------------------------------------*/
+
+void
+varpanel_tooltips_set (ggobid *gg) 
+{
+  displayd *display = gg->current_display;
+  gint projection = projection_get (gg);
+  gint j, k;
+  gint nd = g_slist_length (gg->d);
+  datad *d;
+
+  /*-- for each datad --*/
+  for (k=0; k<nd; k++) {
+    d = (datad*) g_slist_nth_data (gg->d, k);
+    /*-- for each variable --*/
+    for (j=0; j<d->ncols; j++) {
+
+      switch (display->displaytype) {
+
+        case parcoords:
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+            d->varpanel_ui.checkbox[j],
+            "Click to add/replace/insert a variable, symmetrically; <alt>click to delete",
+            NULL);
+        break;
+
+        case scatmat:
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+            d->varpanel_ui.checkbox[j],
+            "Click to add/replace/insert a row&column, symmetrically; <alt>click to delete",
+            NULL);
+        break;
+
+        case scatterplot:
+          switch (projection) {
+            case P1PLOT:
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+                d->varpanel_ui.checkbox[j],
+                "Click left to plot horizontally, middle to plot vertically",
+                NULL);
+            break;
+            case XYPLOT:
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+                d->varpanel_ui.checkbox[j],
+                "Click left to select the horizontal variable, middle for vertical",
+                NULL);
+            break;
+            case TOUR2D:
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+                d->varpanel_ui.checkbox[j],
+                "Click to select a variable to be available for touring",
+                NULL);
+            break;
+            default:
+            break;
+        }
+        break;
+      }
+    }
+  }
+}

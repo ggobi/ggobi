@@ -13,6 +13,9 @@ extern datad *datad_new(datad *d, ggobid *gg);
 extern "C" {
 #endif
 
+extern void rotation_menus_make (ggobid *);
+extern void scale_menus_make (ggobid *);
+extern void varpanel_tooltips_set (ggobid *);
 extern datad * datad_get_from_notebook (GtkWidget *notebook, ggobid *);
 extern displayd * datad_init (datad *, ggobid *, gboolean);
 extern GtkWidget* CreateMenuCheck (displayd *, GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
@@ -219,14 +222,12 @@ extern void raw_to_tform_copy (void);
 extern void rejitter (datad *, ggobid *);
 extern void rnorm2 (gdouble *, gdouble *);
 extern void rotation_event_handlers_toggle (splotd *, gboolean);
-extern void rotation_menus_make (ggobid *);
 extern void rowlabels_alloc (datad *d, ggobid *) ;
 extern void rowlabels_free (datad *d, ggobid *);
 extern gboolean rowlabels_read (gchar *, gboolean, datad *, ggobid *);
 extern void rows_in_plot_set (datad *d, ggobid *);
 extern void ruler_ranges_set (displayd *, splotd *, ggobid *);
 extern void scale_event_handlers_toggle (splotd *, gboolean);
-extern void scale_menus_make (ggobid *);
 extern void scaling_visual_cues_draw (splotd *, ggobid *);
 extern void scatmat_cpanel_init (cpaneld *, ggobid *);
 extern void scatmat_main_menus_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
