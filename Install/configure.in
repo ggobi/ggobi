@@ -56,6 +56,12 @@ AC_ARG_WITH(ggvis,
 
 AC_ARG_WITH(plugins, [--with-plugins          Enable all the plugins (no)], ENABLE_ALL_PLUGINS=1)
 
+if test "$with_plugins" != "yes" && test "$with_plugins" != "y" &&  test "$with_plugins" != "no" && test "$with_plugins" != "n" ; then
+ PLUGIN_DIRS=$with_plugins
+ ENABLE_ALL_PLUGINS=0
+fi
+
+
 AC_ARG_WITH(R,     --with-R         Install the Rggobi package)
 AC_ARG_WITH(Python,--with-Python    Install the Pythonggobi module)
 AC_ARG_WITH(Perl,  --with-Perl      Install the Perlggobi module)
@@ -413,13 +419,13 @@ AC_DEFINE_UNQUOTED(PATCH_LEVEL, $PATCH_LEVEL)
 AC_CONFIG_HEADER(src/config.h)
 
 
-if test -n "${ENABLE_ALL_PLUGINS}" ; then
+if test -n "${ENABLE_ALL_PLUGINS}" && test ${ENABLE_ALL_PLUGINS} -gt 0 ; then
  MYSQL_PLUGIN=1
  POSTGRES_PLUGIN=1
  DATAVIEWER_PLUGIN=1
  FILESELECTOR_PLUGIN=1
  GGVIS_PLUGIN=1
- PLUGIN_DIRS="MySQL Postgres DataViewer FileSelect ggvis"
+ PLUGIN_DIRS="ImageLib MySQL Postgres DataViewer FileSelect ggvis Perl R JVM Help"
 fi
 
 if test -n "${PLUGIN_DIRS}" ; then
@@ -482,13 +488,17 @@ AC_SUBST(INSTALL_DIR)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate share/ggobirc local.config)
+AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate share/ggobirc local.config bin/plugin)
+
+
 
 cp src/config.h include/GGobiConfig.h
 
 dnl Ensure the resulting ggobi scripts executable.
 chmod +x bin/ggobi
 chmod +x bin/ggobi-config
+
+chmod +x bin/plugin
 
 if test -n "${PLUGIN_DIRS}" ; then
  echo "Enabling plugins"

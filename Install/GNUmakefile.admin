@@ -17,8 +17,9 @@ DIRS=\
    plugins share
 
 
-PLUGIN_DIRS=MySQL Postgres DataViewer FileSelector TestInput TestPlugin R ggvis
-# JVM
+PLUGIN_DIRS=ImageLib MySQL Postgres DataViewer FileSelector TestInput TestPlugin R ggvis JVM 
+#Help
+
 
 SHARE_FILES=Install/ggobirc.in
 
@@ -128,3 +129,6 @@ copyPlugins:
 	for f in $(PLUGIN_DIRS) ; do \
 	   $(MAKE) ADMIN=1 -C plugins/$$f createDist INSTALL_DIR=$(TMP_INSTALL_DIR)/plugins ; \
 	done
+	cp plugins/GNUmakefile.plugin $(TMP_INSTALL_DIR)/plugins
+	cp Install/plugin.in $(TMP_INSTALL_DIR)/bin
+	chmod +x  $(TMP_INSTALL_DIR)/bin/plugin.in

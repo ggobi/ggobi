@@ -36,11 +36,15 @@ install:
 	#cp bin/xmlConvert  bin/ggobi bin/ggobi.bin $(INSTALL_DIR)/bin
 	#cp lib/libggobi.so $(INSTALL_DIR)/lib
 
-Rggobi: lib/libggobi.so
+Rggobi: @EMBED_LIB@
 	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)
 
-Python: lib/libggobi.so
-	$(MAKE) -C Python
+Python: @EMBED_LIB@
+	@if test -d Python ; then \
+	   $(MAKE) -C Python ; \
+	else \
+	   echo "The python module is not present. Download it and reconfigure."
+	fi
 
 
 ifneq (${PLUGIN_DIRS},)
