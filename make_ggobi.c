@@ -171,6 +171,7 @@ pipeline_init (datad *d, ggobid *gg)
 void
 make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) {
   gboolean init_data = false;
+  datad *d;
 
   /*-- some initializations --*/
   gg->displays = NULL;
@@ -193,7 +194,6 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) {
 
   if (init_data) {
     GSList *l;
-    datad *d;
     gboolean firstd = true;
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
@@ -203,6 +203,15 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) {
 
     /*-- destroy and rebuild the menu every time data is read in --*/
     display_menu_build (gg);
+  }
+
+  /*-- now that we've read some data, set the mode --*/
+  d = (datad *) gg->d->data;
+  if (d != NULL) {
+    if (d->ncols > 0) {
+      gg->mode = (d->ncols == 1) ? P1PLOT : XYPLOT;
+        gg->prev_mode = gg->projection = gg->prev_projection = gg->mode;
+    }
   }
 
   if (processEvents) {

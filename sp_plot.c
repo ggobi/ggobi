@@ -771,10 +771,10 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
       case BRUSH:
         brush_draw_brush (sp, sp->pixmap1, d, gg);
         brush_draw_label (sp, sp->pixmap1, d, gg);
-        break;
+      break;
       case SCALE:
         scaling_visual_cues_draw (sp, sp->pixmap1, gg);
-        break;
+      break;
     }
   }
 }

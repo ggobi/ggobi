@@ -105,15 +105,17 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
     /* Need to make certain this is the only one there.
        See
     */
-    gg->displays = g_list_append (gg->displays, (gpointer) display);
-    display_set_current (display, gg);
-    gg->current_splot = (splotd *)
-      g_list_nth_data (gg->current_display->splots, 0);
 
-    /*-- turn on event handling in the very first plot --*/
-    /*-- ... but will it cause trouble for later plots?  ok so far --*/
-    sp_event_handlers_toggle (gg->current_splot, on);
+    if (display != NULL) {
+      gg->displays = g_list_append (gg->displays, (gpointer) display);
+      display_set_current (display, gg);
+      gg->current_splot = (splotd *)
+        g_list_nth_data (gg->current_display->splots, 0);
 
+      /*-- turn on event handling in the very first plot --*/
+      /*-- ... but will it cause trouble for later plots?  ok so far --*/
+      sp_event_handlers_toggle (gg->current_splot, on);
+    }
   }
 
   varpanel_refresh (gg);

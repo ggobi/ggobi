@@ -165,9 +165,9 @@ fileset_generate(const char *fileName, DataMode guess)
     case unknown_data:
       g_printerr("Cannot find a suitable file %s\n", fileName);
       return(NULL);
-      break;
+    break;
     default:
-      break;
+    break;
   }
 
   completeFileDesc(desc->fileName, desc);
@@ -224,15 +224,15 @@ completeFileDesc(const char *fileName, InputDescription *desc)
 DataMode
 verifyDataMode(const char *fileName, DataMode mode, InputDescription *desc)
 {
-  switch(mode) {
+  switch (mode) {
 #ifdef USE_XML
     case xml_data:
-    if(!isXMLFile(fileName, desc))
+      if(!isXMLFile(fileName, desc))
         mode = unknown_data;
      break;
 #endif
     case ascii_data:
-    if(!isASCIIFile(fileName))
+      if(!isASCIIFile(fileName))
         mode = unknown_data;
      break;
      default:        

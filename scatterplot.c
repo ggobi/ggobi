@@ -54,12 +54,12 @@ scatterplot_show_rulers (displayd *display, gint projection)
         scatterplot_show_vrule (display, false);
         scatterplot_show_hrule (display, true);
       }
-      break;
+    break;
 
     case XYPLOT:
       scatterplot_show_vrule (display, true);
       scatterplot_show_hrule (display, true);
-      break;
+    break;
 
     case TOUR2D:
 /*
@@ -73,7 +73,7 @@ scatterplot_show_rulers (displayd *display, gint projection)
     default:  /* in any other projection, no rulers */
       scatterplot_show_vrule (display, false);
       scatterplot_show_hrule (display, false);
-      break;
+    break;
   }
 }
 
@@ -158,7 +158,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
     GtkAccelGroup *accel_group, GtkSignalFunc func, GtkWidget *mbar,
     ggobid *gg);
 
-  if (d == NULL || d->ncols < 2)
+  if (d == NULL || d->ncols < 1)
     return (NULL);
 
   if (sp == NULL) {
@@ -174,9 +174,10 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
     display->options.axes_center_p = true; 
    */
 
-  scatterplot_cpanel_init (&display->cpanel, XYPLOT, gg);
+  scatterplot_cpanel_init (&display->cpanel,
+    (d->ncols >= 2) ? XYPLOT : P1PLOT, gg);
 
-  display_window_init (display, 3, gg);
+  display_window_init (display, 3, gg);  /*-- 3 = width = any small int --*/
 
 /*
  * Add the main menu bar
@@ -266,19 +267,10 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
                     (GtkAttachOptions) (GTK_EXPAND|GTK_SHRINK|GTK_FILL),
                     0, 0 );
 
-  gtk_widget_show (sp->da);
-  gtk_widget_show (display->hrule);
-  gtk_widget_show (display->vrule);
-  gtk_widget_show (table);
-
-  /*-- position the display toward the lower left of the main window --*/
-/*-- Turning this off; never places the window correctly anyway - dfs --*/
-/*
-  display_set_position (display, gg);
-*/
-
   gtk_widget_show_all (display->window);
   
+  /*-- hide any extraneous rulers --*/
+  scatterplot_show_rulers (display, projection_get (gg));
   ruler_ranges_set (display, sp, gg);
 
   return display;

@@ -184,18 +184,168 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 /*                 eliminate the ncol columns in cols                      */
 /*                          not currently used                             */
+/*                but note that it's called by sphering!                   */
 /*-------------------------------------------------------------------------*/
 
-void
+static gint
+plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
+{
+  gint j, k, projection;
+  GList *dlist, *l;
+  displayd *display;
+  splotd *sp;
+  gint jplotted = -1;
+
+  /*-- check each display for each variable --*/
+  for (dlist = gg->displays; dlist; dlist = dlist->next) {
+    display = (displayd *) dlist->data;
+    if (display->d != d)
+      continue;
+
+    if (jplotted >= 0)
+      break;
+
+    switch (display->displaytype) {
+      case scatterplot:
+        sp = (splotd *) display->splots->data;  /*-- only one splot --*/
+        projection = projection_get (gg);
+
+        switch (projection) {
+          case P1PLOT:
+            for (j=0; j<ncols; j++) {
+              if (sp->p1dvar == cols[j]) {
+                jplotted = sp->p1dvar;
+                return jplotted;
+              }
+            }
+          break;
+          case XYPLOT:
+            for (j=0; j<ncols; j++) {
+              if (sp->xyvars.x == cols[j]) {
+                jplotted = sp->xyvars.x;
+                return jplotted;
+              }
+              if (sp->xyvars.y == cols[j]) {
+                jplotted = sp->xyvars.y;
+                return jplotted;
+              }
+            }
+          break;
+          case TOUR1D:
+            for (j=0; j<ncols; j++) {
+              for (k=0; k<display->t1d.nvars; k++) {
+                if (display->t1d.vars.els[k] == cols[j]) {
+                  jplotted = display->t1d.vars.els[k];
+                  return jplotted;
+                }
+              }
+            }
+          break;
+          case TOUR2D:
+            for (j=0; j<ncols; j++) {
+              for (k=0; k<display->t2d.nvars; k++) {
+                if (display->t2d.vars.els[k] == cols[j]) {
+                  jplotted = display->t2d.vars.els[k];
+                  return jplotted;
+                }
+              }
+            }
+          break;
+          case COTOUR:
+            for (j=0; j<ncols; j++) {
+              for (k=0; k<display->tcorr1.nvars; k++) {
+                if (display->tcorr1.vars.els[k] == cols[j]) {
+                  jplotted = display->tcorr1.vars.els[k];
+                  return jplotted;
+                }
+              }
+              for (k=0; k<display->tcorr2.nvars; k++) {
+                if (display->tcorr2.vars.els[k] == cols[j]) {
+                  jplotted = display->tcorr2.vars.els[k];
+                  return jplotted;
+                }
+              }
+            }
+          break;
+        }
+      break;  /*-- end case scatterplot, with all its modes --*/
+
+      case scatmat:
+        for (l = display->splots; l; l = l->next) {
+          sp = (splotd *) l->data;
+
+          for (j=0; j<ncols; j++) {
+            if (sp->p1dvar == -1) {
+              if (sp->xyvars.x == cols[j]) {
+                jplotted = sp->xyvars.x;
+                return jplotted;
+              }
+              if (sp->xyvars.y == cols[j]) {
+                jplotted = sp->xyvars.y;
+                return jplotted;
+              }
+            } else if (sp->p1dvar == cols[j]) {
+              jplotted = sp->p1dvar;
+              return jplotted;
+            }
+          }
+        }
+      break;
+
+      case parcoords:
+        for (l = display->splots; l; l = l->next) {
+          sp = (splotd *) l->data;
+
+          for (j=0; j<ncols; j++) {
+            if (sp->xyvars.x == cols[j]) {
+              jplotted = sp->xyvars.x;
+              return jplotted;
+            }
+          }
+        }
+      break;
+
+      case tsplot:
+        for (l = display->splots; l; l = l->next) {
+          sp = (splotd *) l->data;
+
+          for (j=0; j<ncols; j++) {
+            if (sp->xyvars.x == cols[j]) {
+              jplotted = sp->xyvars.x;
+              return jplotted;
+            }
+            if (sp->xyvars.y == cols[j]) {
+              jplotted = sp->xyvars.y;
+              return jplotted;
+            }
+          }
+        }
+      break;
+    }
+  }
+
+  return jplotted;
+}
+
+gboolean
 delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg) 
 {
   gint j, jfrom, jto;
   gint *keepers, nkeepers;
-  gint n;
-  gint *vars;
-  GList *dlist;
-  displayd *display;
-  splotd *sp;
+
+  /*
+   * If one of the variables to be deleted is currently plotted,
+   * we won't proceed until the user cleans up.
+  */
+  if ((j = plotted (cols, ncols, d, gg)) != -1) {
+    gchar *message;
+    message = g_strdup_printf ("Deletion failed; the variable '%s' is currently plotted\n",
+      d->vartable[j].collab);
+    quick_message (message, false);
+    g_free (message);
+
+/**/return false;
+  }
 
   keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
   nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
@@ -266,93 +416,10 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   d->ncols -= ncols;
 
   /*-- run the pipeline  --*/
-  tform_to_world (d, gg);
-
-  /*-- clean up the plotted variables for each display type and mode --*/
-  for (dlist = gg->displays; dlist; dlist = dlist->next) {
-    display = (displayd *) dlist->data;
-
-    switch (display->displaytype) {
-      case scatterplot:
-        sp = (splotd *) display->splots->data;
-        /*-- make sure p1dvar is reasonable --*/
-        if (sp->p1dvar >= d->ncols-1)
-          sp->p1dvar = 0;
-
-        /*-- make sure xyvars are reasonable --*/
-        if (sp->xyvars.x >= d->ncols-1)
-          sp->xyvars.x = 0;
-        if (sp->xyvars.y >= d->ncols-1 || sp->xyvars.y == sp->xyvars.x)
-          sp->xyvars.y = 1;
-
-        /*-- make sure 2d tour_vars are reasonable --*/
-        n = 0;
-        vars = (gint *)
-          g_malloc (MIN (display->t2d.nvars, d->ncols) * sizeof (gint));
-        for (j=0; j<display->t2d.nvars; j++)
-          if (display->t2d.vars.els[j] < d->ncols-1)
-            vars[n++] = display->t2d.vars.els[j];
-
-        for (j=0; j<n; j++)
-          display->t2d.vars.els[j] = vars[j];
-        display->t2d.nvars = n;
-
-        g_free (vars);
-
-        /*-- make sure 1d tour_vars are reasonable --*/
-        n = 0;
-        vars = (gint *)
-          g_malloc (MIN (display->t1d.nvars, d->ncols) * sizeof (gint));
-        for (j=0; j<display->t1d.nvars; j++)
-          if (display->t1d.vars.els[j] < d->ncols-1)
-            vars[n++] = display->t1d.vars.els[j];
-
-        for (j=0; j<n; j++)
-          display->t1d.vars.els[j] = vars[j];
-        display->t1d.nvars = n;
-
-        g_free (vars);
-      break;
-
-        /*-- make sure corr tour_vars are reasonable --*/
-        n = 0;
-        vars = (gint *)
-          g_malloc (MIN (display->tcorr1.nvars, d->ncols) * sizeof (gint));
-        for (j=0; j<display->tcorr1.nvars; j++)
-          if (display->tcorr1.vars.els[j] < d->ncols-1)
-            vars[n++] = display->tcorr1.vars.els[j];
-
-        for (j=0; j<n; j++)
-          display->tcorr1.vars.els[j] = vars[j];
-        display->tcorr1.nvars = n;
-
-        g_free (vars);
-
-        n = 0;
-        vars = (gint *)
-          g_malloc (MIN (display->tcorr2.nvars, d->ncols) * sizeof (gint));
-        for (j=0; j<display->tcorr2.nvars; j++)
-          if (display->tcorr2.vars.els[j] < d->ncols-1)
-            vars[n++] = display->tcorr2.vars.els[j];
-
-        for (j=0; j<n; j++)
-          display->tcorr2.vars.els[j] = vars[j];
-        display->tcorr2.nvars = n;
-
-        g_free (vars);
-
-/*-- delete or replace variables in these two modes --*/
-      case scatmat:
-      break;
-
-      case parcoords:
-      break;
-
-      case tsplot:
-      break;
-    }
-  }
+  tform_to_world (d, gg);  /*-- I think not  --*/
 
   displays_tailpipe (REDISPLAY_ALL, gg);
+
+  return true;
 }
 

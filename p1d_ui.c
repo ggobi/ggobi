@@ -32,8 +32,6 @@ static void ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
-g_printerr ("value = %f\n", adj->value);
-
   /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
   cpanel->nASHes = (gint) ((gfloat) cpanel->nbins * (adj->value / 2.0));
 

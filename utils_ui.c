@@ -269,11 +269,13 @@ submenu_append (GtkWidget *item, GtkWidget * mbar) {
 }
 
 void
-submenu_destroy (GtkWidget *item) {
-
-  gtk_menu_item_remove_submenu (GTK_MENU_ITEM (item));
-  gtk_widget_hide (item);
-  gtk_widget_destroy (item);
+submenu_destroy (GtkWidget *item)
+{
+  if (item != NULL) {
+    gtk_menu_item_remove_submenu (GTK_MENU_ITEM (item));
+    gtk_widget_hide (item);
+    gtk_widget_destroy (item);
+  }
 }
 
 void

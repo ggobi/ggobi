@@ -14,8 +14,8 @@ extern "C" {
 #endif
 
 /* sort +1 */
-void reinit_transient_brushing (displayd *, ggobid *);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
+displayd * display_alloc_init (enum displaytyped, gboolean, datad *, ggobid *);
 ggobid * ggobi_get (gint);
 GtkWidget * widget_find_by_name (GtkWidget *, gchar *);
 displayd *ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal);
@@ -122,7 +122,7 @@ void ctourpp_window_open (ggobid *);
 void datad_free (datad *, ggobid *);
 datad* datad_get_from_notebook (GtkWidget *notebook, ggobid *);
 displayd* datad_init (datad *, ggobid *, gboolean);
-void delete_vars (gint *, gint, datad *, ggobid *);
+gint delete_vars (gint *, gint, datad *, ggobid *);
 gint display_add(displayd *display, ggobid *);
 void display_close_cb (displayd *d, guint, GtkWidget *);
 displayd* display_create (gint displaytype, gboolean missing_p, datad *, ggobid *);
@@ -248,6 +248,7 @@ gdouble randvalue (void);
 void range_unset (ggobid *gg);
 void raw_to_tform_copy (void);
 gboolean read_ascii_data(InputDescription *desc, ggobid *gg);
+void reinit_transient_brushing (displayd *, ggobid *);
 void rejitter (datad *, ggobid *);
 void rnorm2 (gdouble *, gdouble *);
 void rotation_event_handlers_toggle (splotd *, gboolean);
@@ -269,7 +270,9 @@ gboolean scatmat_varsel_simple (cpaneld *, splotd *, gint, gint *, ggobid *);
 void scatterplot_cpanel_init (cpaneld *, gint, ggobid *);
 void scatterplot_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 displayd* scatterplot_new (gboolean, splotd *sp, datad *d, ggobid *);
+void scatterplot_show_hrule (displayd *, gboolean show);
 void scatterplot_show_rulers (displayd *, gint);
+void scatterplot_show_vrule (displayd *, gboolean show);
 gboolean scree_mapped_p (ggobid *);
 void scree_plot_make (datad *, ggobid *);
 gint selected_cols_get (gint *, datad *d, ggobid *);
@@ -420,9 +423,6 @@ void xyplot_event_handlers_toggle (splotd *, gboolean);
 gboolean xyplot_varsel (splotd *, gint, gint *, gint);
 void zoom_by_drag (splotd *, ggobid *);
 void zoom_step (splotd *, gint, gint, rectd *, ggobid*);
-
-displayd * display_alloc_init (enum displaytyped, gboolean, datad *, ggobid *);
-
 /*tsplot functions*/
 extern void cpanel_tsplot_init (cpaneld *, ggobid *);
 extern void cpanel_tsplot_make (ggobid *);
@@ -434,8 +434,8 @@ extern gboolean tsplot_varsel (cpaneld *, splotd *, gint, gint, gint *,
                                ggobid *);
 /* The new way of handling window closures, so that we don't just exit. */
 void ggobi_close (GtkObject *w, ggobid *);
-int ggobi_remove_by_index (ggobid *gg, gint which);
-int ggobi_remove (ggobid *);
+gint ggobi_remove_by_index (ggobid *gg, gint which);
+gint ggobi_remove (ggobid *);
 
 
 void showInputDescription(InputDescription *desc, ggobid *gg);

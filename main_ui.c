@@ -251,6 +251,9 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case IDENT:
         identify_menus_make (gg);
       break;
+
+      case NULLMODE:
+      break;
     }
   }
 }
@@ -351,18 +354,22 @@ mode_set (gint m, ggobid *gg) {
   gg->mode = m;
   if (gg->mode != gg->prev_mode) {
 
-    /* Add a reference to the widget so it isn't destroyed */
-    gtk_widget_ref (gg->control_panel[gg->prev_mode]);
-    gtk_container_remove (GTK_CONTAINER (gg->mode_frame),
-                          gg->control_panel[gg->prev_mode]);
-  
-    gtk_frame_set_label (GTK_FRAME (gg->mode_frame), mode_name[gg->mode]);
-    gtk_container_add (GTK_CONTAINER (gg->mode_frame),
-      gg->control_panel[gg->mode]);
+    if (gg->prev_mode != NULLMODE) {
+      /* Add a reference to the widget so it isn't destroyed */
+      gtk_widget_ref (gg->control_panel[gg->prev_mode]);
+      gtk_container_remove (GTK_CONTAINER (gg->mode_frame),
+                            gg->control_panel[gg->prev_mode]);
+    }
 
-    /*-- avoid increasing the object's ref_count infinitely  --*/
-    if (GTK_OBJECT (gg->control_panel[gg->mode])->ref_count > 1)
-      gtk_widget_unref (gg->control_panel[gg->mode]);
+    if (gg->mode != NULLMODE) {
+      gtk_frame_set_label (GTK_FRAME (gg->mode_frame), mode_name[gg->mode]);
+      gtk_container_add (GTK_CONTAINER (gg->mode_frame),
+        gg->control_panel[gg->mode]);
+
+      /*-- avoid increasing the object's ref_count infinitely  --*/
+      if (GTK_OBJECT (gg->control_panel[gg->mode])->ref_count > 1)
+        gtk_widget_unref (gg->control_panel[gg->mode]);
+    }
 
     /* 
      * If moving between modes whose variable selection interface
@@ -417,35 +424,6 @@ procs_activate (gboolean state, displayd *display, ggobid *gg)
   }
 }
 
-/*
-    if (gg->mode == TOUR2D || prev_mode == TOUR2D) {
-      if (gg->mode == TOUR2D && prev_mode != TOUR2D) {
-        if (!display->cpanel.t2d_paused)
-          tour2d_func (on, display, gg);
-      } else if (prev_mode == TOUR2D && gg->mode != TOUR2D) {
-        tour2d_func (off, display, gg);
-      }
-    }
-
-    if (gg->mode == TOUR1D || prev_mode == TOUR1D) {
-      if (gg->mode == TOUR1D && prev_mode != TOUR1D) {
-        if (!display->cpanel.t1d_paused)
-          tour1d_func (on, display, gg);
-      } else if (prev_mode == TOUR1D && gg->mode != TOUR1D) {
-        tour1d_func (off, display, gg);
-      }
-    }
-
-    if (gg->mode == COTOUR || prev_mode == COTOUR) {
-      if (gg->mode == COTOUR && prev_mode != COTOUR) {
-        if (!display->cpanel.tcorr1_paused)
-          tourcorr_func (on, display, gg);
-      } else if (prev_mode == COTOUR && gg->mode != COTOUR) {
-        tourcorr_func (off, display, gg);
-      }
-    }
-*/
-
 void
 mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
   displayd *display = (displayd *) sp->displayptr;
@@ -460,6 +438,23 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
     }
   } else if (state == on) {
     switch (m) {
+/*
+      case P1PLOT:
+        p1plot_activate (state, display, gg);
+      break;
+      case XYPLOT:
+        xyplot_activate (state, display, gg);
+      break;
+      case TOUR1D:
+        tour1d_activate (state, display, gg);
+      break;
+      case TOUR2D:
+        tour2d_activate (state, display, gg);
+      break;
+      case COTOUR:
+        tourcorr_activate (state, display, gg);
+      break;
+*/
       case BRUSH:
         brush_activate (state, display, gg);
       break;
@@ -482,6 +477,47 @@ mode_set_cb (GtkWidget *widget, gint action)
   GGOBI(full_mode_set)(action, gg);
 }
 
+/*
+ * Verify that the number of variables is large enough before
+ * allowing the projection to be reset.
+*/
+gboolean
+projection_ok (gint m, displayd *display)
+{
+  gboolean ok = true;
+  datad *d = display->d;
+
+  /*-- if the mode is a projection-setting mode ... --*/
+  if (m <= COTOUR) {
+    switch (m) {
+      case COTOUR:
+        if (d->ncols < 4)
+          ok = false;
+      break;
+      case TOUR2D:
+        if (d->ncols < 3)
+          ok = false;
+      break;
+      case TOUR1D:
+        if (d->ncols < 3)
+          ok = false;
+      break;
+      case XYPLOT:
+        if (d->ncols < 2)
+          ok = false;
+      break;
+      case P1PLOT:
+        if (d->ncols < 1)
+          ok = false;
+      break;
+      default:
+      break;
+    }
+  }
+
+  return ok;
+}
+
 gint
 GGOBI(full_mode_set)(gint action, ggobid *gg)
 {
@@ -489,38 +525,35 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
     splotd *sp = gg->current_splot;
     displayd *display = gg->current_display;
 
-    sp_event_handlers_toggle (sp, off);
-    mode_activate (sp, gg->mode, off, gg);
-    mode_submenus_activate (sp, gg->mode, off, gg);
-    procs_activate (off, display, gg);
+    if (projection_ok (action, display)) {
+      sp_event_handlers_toggle (sp, off);
+      mode_activate (sp, gg->mode, off, gg);
+      mode_submenus_activate (sp, gg->mode, off, gg);
+      procs_activate (off, display, gg);
 
-    display->cpanel.mode = action;
-    mode_set (action, gg);  /* mode = action */
+      display->cpanel.mode = action;
+      mode_set (action, gg);  /* mode = action */
 
-    sp_event_handlers_toggle (sp, on);
-    mode_activate (sp, gg->mode, on, gg);
-    mode_submenus_activate (sp, gg->mode, on, gg);
-    procs_activate (on, display, gg);
+      sp_event_handlers_toggle (sp, on);
+      mode_activate (sp, gg->mode, on, gg);
+      mode_submenus_activate (sp, gg->mode, on, gg);
+      procs_activate (on, display, gg);
 
-    display_tailpipe (display, gg);
-    return (action);
-  } else
-    return(-1);
+      display_tailpipe (display, gg);
+/**/  return (action);
+    }
+  }
+
+  return(-1);
 }
 
 extern void display_write_svg (ggobid *);
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",            NULL,     NULL,             0, "<Branch>" },
-  { "/File/Read ...",   
+  { "/File/Open ...",
        NULL,    
        (GtkItemFactoryCallback) filename_get_r,  
        0 },
-/*
- *{ "/File/Save (extend file set) ...",   
- *     NULL,    
- *     filename_get,    
- *     1 },
-*/
   { "/File/Save ...",   
        NULL,    
        (GtkItemFactoryCallback) writeall_window_open,    
@@ -667,25 +700,25 @@ make_ui (ggobid *gg) {
  * Create a frame to hold the mode panels, set its label
  * and contents, using the default mode for the default display.
 */
-  gg->mode_frame = gtk_frame_new (mode_name[gg->mode]);
+  gg->mode_frame = gtk_frame_new ((gg->mode == NULLMODE) ? "" :
+    mode_name[gg->mode]);
 
   gtk_box_pack_start (GTK_BOX (hbox), gg->mode_frame, false, false, 3);
   gtk_container_set_border_width (GTK_CONTAINER (gg->mode_frame), 3);
   gtk_frame_set_shadow_type (GTK_FRAME (gg->mode_frame), GTK_SHADOW_IN);
 
   make_control_panels (gg);
-  gtk_container_add (GTK_CONTAINER (gg->mode_frame),
-                     gg->control_panel[gg->mode]);
+  if (gg->mode != NULLMODE)
+    gtk_container_add (GTK_CONTAINER (gg->mode_frame),
+                       gg->control_panel[gg->mode]);
 
   /*-- Variable selection panel --*/
   varpanel_make (hbox, gg);
 
   gtk_widget_show_all (hbox);
 
-{
-  extern void xyplot_menus_make (ggobid *);
-  xyplot_menus_make (gg);
-}
+  /*-- at this point, the mode could be NULLMODE, P1PLOT, or XYPLOT --*/
+  mode_submenus_activate (NULL, gg->mode, on, gg);
 
   gtk_widget_show_all (window);
 }

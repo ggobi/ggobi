@@ -71,7 +71,9 @@ extern const gint ViewTypeIndeces[3];
 #define REDISPLAY_PRESENT 2
 
 /* modes */
-#define NMODES 14
+#define NMODES 14  /*-- exclude NULLMODE --*/
+
+#define NULLMODE -1
 
 #define P1PLOT   0
 #define XYPLOT   1

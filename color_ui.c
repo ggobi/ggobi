@@ -267,12 +267,13 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
     /*
      * Connect to the "color_changed" signal, set the client-data
      * to the colorsel widget
+    */
     gtk_signal_connect (GTK_OBJECT (colorsel), "color_changed",
       (GtkSignalFunc) color_changed_cb, gg);
-    */
 
     /*
      * Connect up the buttons
+    */
     ok_button = colordlg->ok_button;
     cancel_button = colordlg->cancel_button;
     help_button = colordlg->help_button;
@@ -280,7 +281,6 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
                         (GtkSignalFunc) dlg_close_cb, gg);
     gtk_signal_connect (GTK_OBJECT (cancel_button), "clicked",
                         (GtkSignalFunc) dlg_close_cb, gg);
-    */
 
   } else {
 

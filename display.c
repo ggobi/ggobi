@@ -151,20 +151,23 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
     case DOPT_AXES:
       display->options.axes_show_p = w->active;
 
-      if (display->cpanel.projection == XYPLOT) {
-
-        if (display->displaytype == scatterplot) {
-          if (display->hrule != NULL)
-          {
-            if (w->active) {
-              gtk_widget_show (display->hrule);
-              gtk_widget_show (display->vrule);
+      if (display->displaytype == scatterplot) {
+        switch (display->cpanel.projection) {
+          case XYPLOT:
+            if (display->hrule != NULL) {
+              scatterplot_show_vrule (display, w->active);
+              scatterplot_show_hrule (display, w->active);
             }
-            else {
-              gtk_widget_hide (display->hrule);
-              gtk_widget_hide (display->vrule);
+          break;
+          case P1PLOT:
+            if (display->hrule != NULL) {
+              if (display->p1d_orientation == VERTICAL)
+                scatterplot_show_vrule (display, w->active);
+              else
+                scatterplot_show_hrule (display, w->active);
             }
-          }
+          default:
+          break;
         }
       }
       break;
@@ -459,19 +462,16 @@ display_set_current (displayd *new_display, ggobid *gg)
     switch (gg->current_display->displaytype) {
       case scatterplot:
         submenu_destroy (gg->mode_item);
-        break;
-
+      break;
       case scatmat:
         submenu_destroy (gg->mode_item);
-        break;
-
+      break;
       case parcoords:
         submenu_destroy (gg->mode_item);
-        break;
-
+      break;
       case tsplot:
         submenu_destroy (gg->mode_item);
-        break;
+      break;
     }
   }
 

@@ -222,10 +222,14 @@ ggobi_alloc()
   tmp->xyplot.cycle_axis = NOFIXED;
   tmp->firsttime = true;
   tmp->brush.firsttime = true;
-  tmp->mode = XYPLOT;
-  tmp->prev_mode = XYPLOT;
-  tmp->projection = XYPLOT;
-  tmp->prev_projection = XYPLOT;
+
+  /*-- initialize to NULLMODE and check for ncols later --*/
+  tmp->mode = NULLMODE;
+  tmp->prev_mode = NULLMODE;
+  tmp->projection = NULLMODE;
+  tmp->prev_projection = NULLMODE;
+  /*-- --*/
+
   tmp->color_ui.margin = 10;
   tmp->tour2d.idled = 0;
   tmp->tour1d.idled = 0;
@@ -267,7 +271,6 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 
   gg = ggobi_alloc();
 
-
   gg->mono_p = (vis->depth == 1 ||
                vis->type == GDK_VISUAL_STATIC_GRAY ||
                vis->type == GDK_VISUAL_GRAYSCALE);
@@ -286,7 +289,6 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   make_ggobi (sessionOptions, processEvents, gg);
 
   /* g_free (sessionOptions->data_in); */
-
 
   return (num_ggobis);
 }
