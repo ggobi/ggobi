@@ -133,7 +133,6 @@ scatterplot_display_edge_menu_update (displayd *display,
     if (ne > 1) {  /*-- add cascading menu --*/
       GtkWidget *submenu, *anchor;
       gchar *lbl;
-      extern void edgeset_add_cb (GtkWidget *w, datad *e);
 
       submenu = gtk_menu_new ();
       anchor = CreateMenuItem (display->edge_menu, "Select edge set",

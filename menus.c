@@ -69,9 +69,6 @@ xyplot_menus_make (ggobid *gg)
 void
 tour1d_menus_make (ggobid *gg) {
   /*GtkWidget *item;*/
-  extern void varcircles_layout_cb (GtkCheckMenuItem *w, guint action);
-  extern void tour1d_fade_vars_cb (GtkCheckMenuItem *w, guint action);
-  void tour1d_io_cb (GtkWidget *w, gpointer *cbd);
 
   /*-- I/O menu --*/
   /*  gg->menus.io_menu = gtk_menu_new ();
@@ -134,9 +131,6 @@ void
 tour2d_menus_make (ggobid *gg)
 {
   /*GtkWidget *item;*/
-  extern void varcircles_layout_cb (GtkCheckMenuItem *w, guint action);
-  extern void tour2d_fade_vars_cb (GtkCheckMenuItem *w, guint action);
-  void tour2d_io_cb (GtkWidget *w, gpointer *cbd);
 
   /*-- I/O menu --*/
   /*  gg->menus.io_menu = gtk_menu_new ();
@@ -200,9 +194,6 @@ void
 tourcorr_menus_make (ggobid *gg)
 {
   /*GtkWidget *item;*/
-  extern void varcircles_layout_cb (GtkCheckMenuItem *w, guint action);
-  extern void tourcorr_fade_vars_cb (GtkCheckMenuItem *w, guint action);
-  void tourcorr_io_cb (GtkWidget *w, gpointer *cbd);
 
   /*-- I/O menu --*/
   /*  gg->menus.io_menu = gtk_menu_new ();

@@ -7,7 +7,6 @@
 #include "vars.h"
 #include "externs.h"
 
-extern void sphere_variance_set (gfloat x, datad *, ggobid*);
 
 
 /*-------------------------------------------------------------------------*/
@@ -66,7 +65,6 @@ sphere_malloc (gint nc, datad *d, ggobid *gg)
 void
 variable_set_label (datad *d, gint j, gchar *lbl) 
 {
-  extern void varcircle_label_set (gint jvar, datad *d);
   vartabled *vt = vartable_element_get (j, d);
 
   vt->collab = g_strdup (lbl);
@@ -252,8 +250,6 @@ npcs_get (datad *d, ggobid *gg)
 
 void
 spherevars_set (ggobid *gg) {
-  extern void vars_stdized_send_event (datad *d, ggobid *gg);
-  extern void sphere_npcs_range_set (gint n, ggobid *gg);
   gint j, nvars, *vars;
   datad *d;
   GtkWidget *clist;

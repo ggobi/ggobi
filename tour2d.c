@@ -28,55 +28,62 @@
 #define T2DOFF false
 
 void
+display_tour2d_init_null (displayd *dsp, ggobid *gg)
+{
+  arrayd_init_null(&dsp->t2d.Fa);
+  arrayd_init_null(&dsp->t2d.Fz);
+  arrayd_init_null(&dsp->t2d.F);
+
+  arrayd_init_null(&dsp->t2d.Ga);
+  arrayd_init_null(&dsp->t2d.Gz);
+  arrayd_init_null(&dsp->t2d.G);
+
+  arrayd_init_null(&dsp->t2d.Va);
+  arrayd_init_null(&dsp->t2d.Vz);
+
+  arrayd_init_null(&dsp->t2d.tv);
+
+  vectori_init_null(&dsp->t2d.active_vars);
+  vectorf_init_null(&dsp->t2d.lambda);
+  vectorf_init_null(&dsp->t2d.tau);
+  vectorf_init_null(&dsp->t2d.tinc);
+
+  /* manipulation variables */
+  arrayd_init_null(&dsp->t2d_Rmat1);
+  arrayd_init_null(&dsp->t2d_Rmat2);
+  arrayd_init_null(&dsp->t2d_mvar_3dbasis);
+  arrayd_init_null(&dsp->t2d_manbasis);
+}
+
+void
 alloc_tour2d (displayd *dsp, ggobid *gg)
 {
   datad *d = dsp->d;
   gint nc = d->ncols;
 
   /* first index is the projection dimensions, second dimension is ncols */
-  arrayd_init_null(&dsp->t2d.Fa);
   arrayd_alloc(&dsp->t2d.Fa, 2, nc);
-
-  arrayd_init_null(&dsp->t2d.Fz);
   arrayd_alloc(&dsp->t2d.Fz, 2, nc);
-
-  arrayd_init_null(&dsp->t2d.F);
   arrayd_alloc(&dsp->t2d.F, 2, nc);
 
-  arrayd_init_null(&dsp->t2d.Ga);
   arrayd_alloc(&dsp->t2d.Ga, 2, nc);
-
-  arrayd_init_null(&dsp->t2d.Gz);
   arrayd_alloc(&dsp->t2d.Gz, 2, nc);
-
-  arrayd_init_null(&dsp->t2d.G);
   arrayd_alloc(&dsp->t2d.G, 2, nc);
 
-  arrayd_init_null(&dsp->t2d.Va);
   arrayd_alloc(&dsp->t2d.Va, 2, nc);
-  arrayd_init_null(&dsp->t2d.Vz);
   arrayd_alloc(&dsp->t2d.Vz, 2, nc);
 
-  arrayd_init_null(&dsp->t2d.tv);
   arrayd_alloc(&dsp->t2d.tv, 2, nc);
 
-  vectori_init_null(&dsp->t2d.active_vars);
   vectori_alloc(&dsp->t2d.active_vars, nc);
-  vectorf_init_null(&dsp->t2d.lambda);
   vectorf_alloc(&dsp->t2d.lambda, nc);
-  vectorf_init_null(&dsp->t2d.tau);
   vectorf_alloc(&dsp->t2d.tau, nc);
-  vectorf_init_null(&dsp->t2d.tinc);
   vectorf_alloc(&dsp->t2d.tinc, nc);
 
   /* manipulation variables */
-  arrayd_init_null(&dsp->t2d_Rmat1);
   arrayd_alloc(&dsp->t2d_Rmat1, 3, 3);
-  arrayd_init_null(&dsp->t2d_Rmat2);
   arrayd_alloc(&dsp->t2d_Rmat2, 3, 3);
-  arrayd_init_null(&dsp->t2d_mvar_3dbasis);
   arrayd_alloc(&dsp->t2d_mvar_3dbasis, 3, 3);
-  arrayd_init_null(&dsp->t2d_manbasis);
   arrayd_alloc(&dsp->t2d_manbasis, 3, nc);
 
 }
@@ -125,9 +132,13 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
     if (dsp->displaytype != scatterplot)
       continue;
 
+    /*
+     * because display_tour2d_init_null has been performed even if
+     * alloc_tour2d has not, Fa.ncols has been initialized.
+    */
     old_ncols = dsp->t2d.Fa.ncols;
 
-    if (old_ncols < 2 && nc >= 2) {
+    if (old_ncols < MIN_NVARS_FOR_TOUR2D && nc >= MIN_NVARS_FOR_TOUR2D) {
       display_tour2d_init(dsp, gg);
     }
 
@@ -206,6 +217,9 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint nc = d->ncols;
+
+  if (nc < MIN_NVARS_FOR_TOUR2D)
+    return;
 
   alloc_tour2d(dsp, gg);
  

@@ -101,7 +101,6 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   datad *d = gg->current_display->d;
   gboolean button1_p, button2_p;
   gint nd = g_slist_length (gg->d);
-  extern void identify_link_by_id (gint k, datad *source_d, ggobid *gg);
 
 /*
  * w = sp->da
@@ -160,7 +159,6 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = sp->displayptr;
   datad *d = display->d;
-  extern void sticky_id_toggle (datad *, ggobid *);
   sticky_id_toggle (d, gg);
 
   return true;

@@ -153,8 +153,6 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   GtkWidget *table, *vbox, *w;
   GtkItemFactory *factory;
   displayd *display;
-  extern void scatterplot_display_menus_make (displayd *display,
-    GtkAccelGroup *, GtkSignalFunc, ggobid *);
 
   if (d == NULL || d->ncols < 1)
     return (NULL);
@@ -212,14 +210,20 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   display->splots = g_list_append (display->splots, (gpointer) sp);
 
   /*-- Initialize tours if possible --*/
-  if (display->displaytype == scatterplot && d->ncols >= 2) {
-    display_tour2d_init(display, gg);
+  if (display->displaytype == scatterplot) {
+    display_tour1d_init_null (display, gg);
+    if (d->ncols >= MIN_NVARS_FOR_TOUR1D)
+      display_tour1d_init (display, gg);
   }
-  if (display->displaytype == scatterplot && d->ncols >= 1) {
-    display_tour1d_init(display, gg);
+  if (display->displaytype == scatterplot) {
+    display_tour2d_init_null (display, gg);
+    if (d->ncols >= MIN_NVARS_FOR_TOUR2D)
+      display_tour2d_init (display, gg);
   }
-  if (display->displaytype == scatterplot && d->ncols >= 4) {
-    display_tourcorr_init(display, gg);
+  if (display->displaytype == scatterplot) {
+    display_tourcorr_init_null (display, gg);
+    if (d->ncols >= MIN_NVARS_FOR_COTOUR)
+      display_tourcorr_init (display, gg);
   }
 
   table = gtk_table_new (3, 2, false);  /* rows, columns, homogeneous */

@@ -308,7 +308,6 @@ void
 make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) 
 {
   gboolean init_data = false;
-  extern void wvis_init (ggobid *gg);
 
   /*-- some initializations --*/
   gg->displays = NULL;

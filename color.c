@@ -27,14 +27,14 @@ colorscheme_init (colorschemed *scheme)
   gboolean writeable = false, best_match = true, *success;
 
   if (!scheme || scheme->n <= 0) {
-    g_printerr ("unable to init colorscheme\n");
+    g_printerr ("unable to init colorscheme: ncolors=%d\n", scheme->n);
     return;
   }
 
   success = (gboolean *) g_malloc (scheme->n * sizeof (gboolean));
 
-  if (scheme->rgb == NULL)
-    scheme->rgb = (GdkColor *) g_malloc (scheme->n * sizeof(GdkColor));
+  scheme->rgb = (GdkColor *) g_realloc (scheme->rgb,
+    scheme->n * sizeof(GdkColor));
 
   /* this may have already been done; is there harm in doing it again? */
   for (i=0; i<scheme->n; i++) {
@@ -114,6 +114,8 @@ default_scheme_init ()
   scheme->type = spectral;
   scheme->system = rgb;
   scheme->n = 7;
+  scheme->rgb = NULL;
+  scheme->criticalvalue = 0;  /*-- unused --*/
 
   /*-- fill in the color names --*/
   scheme->colorNames = g_array_new (false, false, sizeof (gchar *));

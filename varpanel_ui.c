@@ -223,7 +223,6 @@ void
 varpanel_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
   gint page_num, ggobid *gg)
 {
-  extern void varpanel_reinit (ggobid *gg);
   varpanel_reinit (gg);
 }
 

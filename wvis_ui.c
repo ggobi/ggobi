@@ -32,9 +32,6 @@ static void bin_counts_reset (gint jvar, datad *d, ggobid *gg);
 
 void selection_made_cb (GtkWidget *clist, gint row, gint column,
   GdkEventButton *event, ggobid *gg);
-extern void variable_notebook_addvar_cb (GtkWidget *notebook, ggobid *gg);
-extern void variable_notebook_subwindow_add (datad *d,
-  GtkSignalFunc func, GtkWidget *notebook, ggobid *gg);
 
 /*--------------------------------------------------------------------*/
 /*      Notebook containing the variable list for each datad          */
@@ -670,13 +667,12 @@ selection_made_cb (GtkWidget *clist, gint row, gint column,
     gtk_widget_set_sensitive (btn, true);
 }
 
-#ifdef USE_XML
 /*
  * Find out whether it's possible to use the new scheme
  * without losing brushing information.  If so, go ahead
  * and change index values if that's required
 */
-static gboolean colors_remap (colorschemed *scheme, ggobid *gg)
+gboolean colors_remap (colorschemed *scheme, ggobid *gg)
 {
   gint i, k;
   gboolean all_colors_p[MAXNCOLORS];
@@ -751,7 +747,6 @@ static gboolean colors_remap (colorschemed *scheme, ggobid *gg)
 
   return remap_ok;
 }
-#endif
 
 #ifdef USE_XML
 static void scale_set_cb (GtkWidget *w, ggobid* gg)

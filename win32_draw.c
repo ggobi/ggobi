@@ -21,11 +21,10 @@
 
 #ifdef WIN32
 
-extern void build_circle (icoords *, gint, arcd *, gint, gshort);
-extern void build_plus (icoords *, gint, GdkSegment *, gint, gshort);
-extern void build_rect (icoords *, gint, rectd *, gint, gshort);
-extern void build_x (icoords *, gint, GdkSegment *, gint, gshort);
-extern void init_plot_GC (GdkWindow *, ggobid *gg);
+static void build_circle (icoords *, gint, arcd *, gint, gshort);
+static void build_plus (icoords *, gint, GdkSegment *, gint, gshort);
+static void build_rect (icoords *, gint, rectd *, gint, gshort);
+static void build_x (icoords *, gint, GdkSegment *, gint, gshort);
 
 /*
  * I think I could eliminate a lot of copies if I made these

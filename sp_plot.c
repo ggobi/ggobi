@@ -24,11 +24,6 @@ static void splot_nearest_edge_highlight (splotd *, gint, gboolean nearest, ggob
 
 static void splot_draw_tour_axes(splotd *, GdkDrawable *, ggobid *);
 
-#ifdef WIN32
-extern void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
-extern void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
-#endif
-
 /* colors_used now contains integers, 0:ncolors-1 */
 void
 datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
@@ -534,7 +529,6 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   }
 #ifdef BARCHART_IMPLEMENTED
   else if (dtype == barchart) {
-    extern void barchart_splot_add_plot_labels (splotd *, GdkDrawable *, ggobid *);
 
     barchart_splot_add_plot_labels (sp, drawable, gg);
   }

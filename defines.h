@@ -162,6 +162,10 @@ typedef enum {NULLMODE = -1,
 #define VBOX_SPACING 5
 
 /*-- touring --*/
+#define MIN_NVARS_FOR_COTOUR 4
+#define MIN_NVARS_FOR_TOUR2D 2
+#define MIN_NVARS_FOR_TOUR1D 1
+
 #define TOURSTEP0 0.003
 #define TOUR_LS_IN 0
 #define TOUR_LS_OUT 1

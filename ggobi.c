@@ -370,9 +370,17 @@ ggobi_alloc()
       tmp->activeColorScheme = (colorschemed *)
         g_list_nth_data(tmp->colorSchemes, 0);
   }
-  colorscheme_init (tmp->activeColorScheme);
+  if (!tmp->activeColorScheme) {
+    g_printerr ("failed to find color scheme\n");
+    exit(0);
+  } else colorscheme_init (tmp->activeColorScheme);
+/*
+Something like this is required, but all the necessary vectors
+have not yet been created.
+  if (!colors_remap (tmp->activeColorScheme, tmp))
+    exit;
+*/
   
-
   totalNumGGobis++;
 
   all_ggobis = (ggobid **)
@@ -395,7 +403,6 @@ ggobi_alloc()
 gint 
 GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 {
-  extern void make_ggobi (GGobiOptions *, gboolean, ggobid *);
   GdkVisual *vis;
   ggobid *gg;
   initSessionOptions();

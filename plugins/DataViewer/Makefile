@@ -43,7 +43,7 @@ $(PKG).so: $(OBJS)
 clean:
 	rm -f *.o 
 
-distClean: clean
+distclean: clean
 	rm config.cache config.log $(PKG).so
 
 local.config: configure local.config.in

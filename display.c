@@ -183,7 +183,6 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
             sp_whiskers_make (sp, display, gg);
           }
         } else if (display->displaytype == tsplot) {
-          extern void tsplot_whiskers_make (splotd *, displayd *, ggobid *);
           GList *splist;
           splotd *sp;
           for (splist = display->splots; splist; splist = splist->next) {
@@ -551,18 +550,19 @@ display_free_all (ggobid *gg) {
    */
   for (dlist = gg->displays; count > 0 && dlist; dlist = dlist->next, count--)
   {
+    gint nc = display->d->ncols;
     /*    display = (displayd *) dlist->data; */
     display = (displayd*) g_list_nth_data (gg->displays,count-1);
     if (display == NULL)
       break;
 
-    if(display->d->ncols >= 1 && display->t1d.idled)
+    if(nc >= MIN_NVARS_FOR_TOUR1D && display->t1d.idled)
       gtk_idle_remove(display->t1d.idled);
-    if(display->d->ncols >= 2 && display->t2d.idled)
+    if(nc >= MIN_NVARS_FOR_TOUR2D && display->t2d.idled)
       gtk_idle_remove(display->t2d.idled);
-    if(display->d->ncols >= 4 && display->tcorr1.idled)
+    if(nc >= MIN_NVARS_FOR_COTOUR && display->tcorr1.idled)
       gtk_idle_remove(display->tcorr1.idled);
-    if(display->d->ncols >= 4 && display->tcorr2.idled)
+    if(nc >= MIN_NVARS_FOR_COTOUR && display->tcorr2.idled)
       gtk_idle_remove(display->tcorr2.idled);
 
 
@@ -579,8 +579,6 @@ void
 display_set_current (displayd *new_display, ggobid *gg) 
 {
   gchar *title;
-  extern void varpanel_show_page (displayd*, ggobid*);
-  extern void vartable_show_page (displayd*, ggobid*);
 
   if (new_display == NULL)
     return;

@@ -21,7 +21,6 @@
 static gboolean active_paint_points (datad *d, ggobid *gg);
 static gboolean active_paint_edges (displayd *display, ggobid *gg);
 static gboolean build_symbol_vectors (cpaneld *, datad *, ggobid *);
-extern gboolean build_symbol_vectors_by_var (cpaneld *, datad *, ggobid *);
 /* */
 
 /*----------------------------------------------------------------------*/
@@ -608,7 +607,6 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   icoords imin, imax;
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
-  extern void symbol_link_by_id (gint k, datad *source_d, ggobid *gg);
 
 #ifdef BARCHART_IMPLEMENTED
   splotd *sp = gg->current_splot;
@@ -686,7 +684,6 @@ active_paint_points (datad *d, ggobid *gg)
 #ifdef BARCHART_IMPLEMENTED
   displayd *display = (displayd *) sp->displayptr;
   if (display->displaytype == barchart) {
-    extern gboolean barchart_active_paint_points (splotd *sp, datad *d); 
     d->npts_under_brush = barchart_active_paint_points (sp, d);
 
   } else {
@@ -758,11 +755,6 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
   glong a = d->rowid.idv.els[endpoints[k].a];
   glong b = d->rowid.idv.els[endpoints[k].b];
 
-  extern gint lines_intersect (glong, glong, glong, glong, 
-    glong, glong, glong, glong);
-  extern gboolean isCrossed (gdouble, gdouble, gdouble, gdouble,
-    gdouble, gdouble, gdouble, gdouble);
-
   /*-- test for intersection with the vertical edge --*/
   intersect = lines_intersect (x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2,
     sp->screen[a].x, sp->screen[a].y,
@@ -797,7 +789,6 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
   gint i;
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
-  extern void symbol_link_by_id (gint k, datad *source_d, ggobid *gg);
 
 /*
  * I'm not doing any checking here to verify that the edges

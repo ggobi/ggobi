@@ -148,7 +148,6 @@ brush_reset(ggobid *gg, gint action)
   datad *d = display->d;
   datad *e = display->e;
   cpaneld *cpanel = &display->cpanel;
-  extern void cluster_table_labels_update (datad *d, ggobid *gg);
 
   switch (action) {
     case RESET_UNHIDE_POINTS:  /*-- un-hide all points --*/
@@ -250,7 +249,6 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromSPlot(sp);
   datad *d, *e;
-  extern void linking_method_set (displayd *, datad *, ggobid *);
 
   gg->current_splot = sp->displayptr->current_splot = sp;
   gg->current_display = sp->displayptr;

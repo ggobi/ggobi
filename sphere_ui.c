@@ -6,9 +6,6 @@
 #include "vars.h"
 #include "externs.h"
 
-extern void spherevars_set (ggobid *);
-extern void sphere_varcovar_set (datad *, ggobid *);
-extern void spherize_data (vector_i *svars, vector_i *pcvars, datad *, ggobid *);
 
 /*-------------------------------------------------------------------------*/
 
@@ -170,7 +167,6 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
     }
     else {
       /*-- set up the variables into which sphered data will be written --*/
-      extern void spherize_set_pcvars (datad *, ggobid *);
       spherize_set_pcvars (d, gg);
 
       /*

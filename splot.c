@@ -117,7 +117,6 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
   gboolean common_event = true;
   gint action = -1;
   displayd *display = (displayd *) sp->displayptr;
-  extern gboolean display_type_handles_action (displayd *, PipelineMode m);
 
 /*
  * I can't say this is the best way to handle this bug, but it
@@ -238,9 +237,6 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
   gint m = display->cpanel.viewmode;
 
-#ifdef BARCHART_IMPLEMENTED
-  extern void barchart_event_handlers_toggle (splotd *, gboolean state);
-#endif
   switch (m) {
     case P1PLOT:
       p1d_event_handlers_toggle (sp, state);
@@ -776,7 +772,6 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
     sp_whiskers_make (sp, display, gg);
   }
   else if (display->displaytype == tsplot) {
-    extern void tsplot_whiskers_make (splotd *, displayd *, ggobid *);
     tsplot_whiskers_make (sp, display, gg);
   }
 

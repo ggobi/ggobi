@@ -316,7 +316,6 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
     switch (m) {
       case XYPLOT:
       {
-        extern RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
         xyplot_activate (state, display, gg);
       }
       break;
@@ -325,7 +324,6 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       break;
       case IDENT:
       {
-        extern RedrawStyle identify_activate (gint, displayd *, ggobid *);
         redraw_style = identify_activate (state, display, gg);
       }
       break;
@@ -353,13 +351,11 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
     switch (m) {
       case P1PLOT:
       {
-        extern RedrawStyle p1d_activate (gint, displayd *, ggobid *);
         p1d_activate (state, display, gg);
       }
       break;
       case XYPLOT:
       {
-        extern RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
         xyplot_activate (state, display, gg);
       }
       break;
@@ -368,7 +364,6 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       break;
       case SCALE:
       {
-        extern void scale_click_init (splotd *sp, ggobid *gg);
         scale_click_init (sp, gg);
       }
       break;
@@ -499,7 +494,6 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
   return(-1);
 }
 
-extern void display_write_svg (ggobid *);
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",            NULL,     NULL,             0, "<Branch>" },
   { "/File/Open ...",

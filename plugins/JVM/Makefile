@@ -57,7 +57,7 @@ clean:
 	rm -f *.o 
 
 distClean: clean
-	rm configure config.cache config.log config.status ggobi.class $(PKG).so
+	rm -f configure config.cache config.log config.status ggobi.class $(PKG).so
 
 local.config: configure local.config.in
 	if test -r local.config ; then cp local.config local.config.bak ; fi

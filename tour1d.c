@@ -32,48 +32,55 @@
 #define T1DOFF false
 
 void
+display_tour1d_init_null (displayd *dsp, ggobid *gg)
+{
+  arrayd_init_null(&dsp->t1d.Fa);
+  arrayd_init_null(&dsp->t1d.Fz);
+  arrayd_init_null(&dsp->t1d.F);
+
+  arrayd_init_null(&dsp->t1d.Ga);
+  arrayd_init_null(&dsp->t1d.Gz);
+  arrayd_init_null(&dsp->t1d.G);
+
+  arrayd_init_null(&dsp->t1d.Va);
+  arrayd_init_null(&dsp->t1d.Vz);
+
+  arrayd_init_null(&dsp->t1d.tv);
+
+  vectori_init_null(&dsp->t1d.active_vars);
+  vectorf_init_null(&dsp->t1d.lambda);
+  vectorf_init_null(&dsp->t1d.tau);
+  vectorf_init_null(&dsp->t1d.tinc);
+
+  /* manipulation controls */
+  arrayd_init_null(&dsp->t1d_manbasis);
+}
+
+void
 alloc_tour1d (displayd *dsp, ggobid *gg)
 {
   datad *d = dsp->d;
   gint nc = d->ncols;
 
-  arrayd_init_null(&dsp->t1d.Fa);
   arrayd_alloc(&dsp->t1d.Fa, 1, nc);
-
-  arrayd_init_null(&dsp->t1d.Fz);
   arrayd_alloc(&dsp->t1d.Fz, 1, nc);
-
-  arrayd_init_null(&dsp->t1d.F);
   arrayd_alloc(&dsp->t1d.F, 1, nc);
 
-  arrayd_init_null(&dsp->t1d.Ga);
   arrayd_alloc(&dsp->t1d.Ga, 1, nc);
-
-  arrayd_init_null(&dsp->t1d.Gz);
   arrayd_alloc(&dsp->t1d.Gz, 1, nc);
-
-  arrayd_init_null(&dsp->t1d.G);
   arrayd_alloc(&dsp->t1d.G, 1, nc);
 
-  arrayd_init_null(&dsp->t1d.Va);
   arrayd_alloc(&dsp->t1d.Va, 1, nc);
-  arrayd_init_null(&dsp->t1d.Vz);
   arrayd_alloc(&dsp->t1d.Vz, 1, nc);
 
-  arrayd_init_null(&dsp->t1d.tv);
   arrayd_alloc(&dsp->t1d.tv, 1, nc);
 
-  vectori_init_null(&dsp->t1d.active_vars);
   vectori_alloc(&dsp->t1d.active_vars, nc);
-  vectorf_init_null(&dsp->t1d.lambda);
   vectorf_alloc(&dsp->t1d.lambda, nc);
-  vectorf_init_null(&dsp->t1d.tau);
   vectorf_alloc(&dsp->t1d.tau, nc);
-  vectorf_init_null(&dsp->t1d.tinc);
   vectorf_alloc(&dsp->t1d.tinc, nc);
 
   /* manipulation controls */
-  arrayd_init_null(&dsp->t1d_manbasis);
   arrayd_alloc(&dsp->t1d_manbasis, 2, nc);
 }
 
@@ -119,9 +126,13 @@ tour1d_realloc_up (gint nc, datad *d, ggobid *gg)
     if (dsp->displaytype != scatterplot)
       continue;
 
+    /*
+     * because display_tour1d_init_null has been performed even if
+     * alloc_tour1d has not, Fa.ncols has been initialized.
+    */
     old_ncols = dsp->t1d.Fa.ncols;
 
-    if (old_ncols < 1 && nc >= 1) {
+    if (old_ncols < MIN_NVARS_FOR_TOUR1D && nc >= MIN_NVARS_FOR_TOUR1D) {
       display_tour1d_init(dsp, gg);
     }
 

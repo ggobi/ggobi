@@ -23,89 +23,97 @@
 #define CTOFF false
 
 void
+display_tourcorr_init_null (displayd *dsp, ggobid *gg)
+{
+  arrayd_init_null(&dsp->tcorr1.Fa);
+  arrayd_init_null(&dsp->tcorr1.Fz);
+  arrayd_init_null(&dsp->tcorr1.F);
+
+  arrayd_init_null(&dsp->tcorr1.Ga);
+  arrayd_init_null(&dsp->tcorr1.Gz);
+  arrayd_init_null(&dsp->tcorr1.G);
+
+  arrayd_init_null(&dsp->tcorr1.Va);
+  arrayd_init_null(&dsp->tcorr1.Vz);
+
+  arrayd_init_null(&dsp->tcorr1.tv);
+
+  vectori_init_null(&dsp->tcorr1.active_vars);
+  vectorf_init_null(&dsp->tcorr1.lambda);
+  vectorf_init_null(&dsp->tcorr1.tau);
+  vectorf_init_null(&dsp->tcorr1.tinc);
+
+  /* manipulation controls */
+  arrayd_init_null(&dsp->tc1_manbasis);
+  arrayd_init_null(&dsp->tc2_manbasis);
+
+
+  arrayd_init_null(&dsp->tcorr2.Fa);
+  arrayd_init_null(&dsp->tcorr2.Fz);
+  arrayd_init_null(&dsp->tcorr2.F);
+
+  arrayd_init_null(&dsp->tcorr2.Ga);
+  arrayd_init_null(&dsp->tcorr2.Gz);
+  arrayd_init_null(&dsp->tcorr2.G);
+
+  arrayd_init_null(&dsp->tcorr2.Va);
+  arrayd_init_null(&dsp->tcorr2.Vz);
+
+  arrayd_init_null(&dsp->tcorr2.tv);
+
+  vectori_init_null(&dsp->tcorr2.active_vars);
+  vectorf_init_null(&dsp->tcorr2.lambda);
+  vectorf_init_null(&dsp->tcorr2.tau);
+  vectorf_init_null(&dsp->tcorr2.tinc);
+}
+
+void
 alloc_tourcorr (displayd *dsp, ggobid *gg)
 {
   datad *d = dsp->d;
   gint nc = d->ncols;
 
   /* first index is the projection dimensions, second dimension is ncols */
-  arrayd_init_null(&dsp->tcorr1.Fa);
   arrayd_alloc(&dsp->tcorr1.Fa, 1, nc);
-
-  arrayd_init_null(&dsp->tcorr1.Fz);
   arrayd_alloc(&dsp->tcorr1.Fz, 1, nc);
-
-  arrayd_init_null(&dsp->tcorr1.F);
   arrayd_alloc(&dsp->tcorr1.F, 1, nc);
 
-  arrayd_init_null(&dsp->tcorr1.Ga);
   arrayd_alloc(&dsp->tcorr1.Ga, 1, nc);
-
-  arrayd_init_null(&dsp->tcorr1.Gz);
   arrayd_alloc(&dsp->tcorr1.Gz, 1, nc);
-
-  arrayd_init_null(&dsp->tcorr1.G);
   arrayd_alloc(&dsp->tcorr1.G, 1, nc);
 
-  arrayd_init_null(&dsp->tcorr1.Va);
   arrayd_alloc(&dsp->tcorr1.Va, 1, nc);
-  arrayd_init_null(&dsp->tcorr1.Vz);
   arrayd_alloc(&dsp->tcorr1.Vz, 1, nc);
 
-  arrayd_init_null(&dsp->tcorr1.tv);
   arrayd_alloc(&dsp->tcorr1.tv, 1, nc);
 
-  vectori_init_null(&dsp->tcorr1.active_vars);
   vectori_alloc(&dsp->tcorr1.active_vars, nc);
-  vectorf_init_null(&dsp->tcorr1.lambda);
   vectorf_alloc(&dsp->tcorr1.lambda, nc);
-  vectorf_init_null(&dsp->tcorr1.tau);
   vectorf_alloc(&dsp->tcorr1.tau, nc);
-  vectorf_init_null(&dsp->tcorr1.tinc);
   vectorf_alloc(&dsp->tcorr1.tinc, nc);
 
   /* manipulation controls */
-  arrayd_init_null(&dsp->tc1_manbasis);
   arrayd_alloc(&dsp->tc1_manbasis, 2, nc);
-  arrayd_init_null(&dsp->tc2_manbasis);
   arrayd_alloc(&dsp->tc2_manbasis, 2, nc);
 
   /* first index is the projection dimensions, second dimension is ncols */
-  arrayd_init_null(&dsp->tcorr2.Fa);
   arrayd_alloc(&dsp->tcorr2.Fa, 1, nc);
-
-  arrayd_init_null(&dsp->tcorr2.Fz);
   arrayd_alloc(&dsp->tcorr2.Fz, 1, nc);
-
-  arrayd_init_null(&dsp->tcorr2.F);
   arrayd_alloc(&dsp->tcorr2.F, 1, nc);
 
-  arrayd_init_null(&dsp->tcorr2.Ga);
   arrayd_alloc(&dsp->tcorr2.Ga, 1, nc);
-
-  arrayd_init_null(&dsp->tcorr2.Gz);
   arrayd_alloc(&dsp->tcorr2.Gz, 1, nc);
-
-  arrayd_init_null(&dsp->tcorr2.G);
   arrayd_alloc(&dsp->tcorr2.G, 1, nc);
 
-  arrayd_init_null(&dsp->tcorr2.Va);
   arrayd_alloc(&dsp->tcorr2.Va, 1, nc);
-  arrayd_init_null(&dsp->tcorr2.Vz);
   arrayd_alloc(&dsp->tcorr2.Vz, 1, nc);
 
-  arrayd_init_null(&dsp->tcorr2.tv);
   arrayd_alloc(&dsp->tcorr2.tv, 1, nc);
 
-  vectori_init_null(&dsp->tcorr2.active_vars);
   vectori_alloc(&dsp->tcorr2.active_vars, nc);
-  vectorf_init_null(&dsp->tcorr2.lambda);
   vectorf_alloc(&dsp->tcorr2.lambda, nc);
-  vectorf_init_null(&dsp->tcorr2.tau);
   vectorf_alloc(&dsp->tcorr2.tau, nc);
-  vectorf_init_null(&dsp->tcorr2.tinc);
   vectorf_alloc(&dsp->tcorr2.tinc, nc);
-
 }
 
 /*-- eliminate the nc columns contained in *cols --*/
@@ -161,17 +169,18 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
   GList *l;
   gint old_ncols, i;
 
-  if (nc < 3)
-    return;
-
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->displaytype != scatterplot)
       continue;
 
+    /*
+     * because display_tourcorr_init_null has been performed even if
+     * alloc_tourcorr has not, Fa.ncols has been initialized.
+    */
     old_ncols = dsp->tcorr1.Fa.ncols;
 
-    if (old_ncols < 2 && nc >= 2) {
+    if (old_ncols < MIN_NVARS_FOR_COTOUR && nc >= MIN_NVARS_FOR_COTOUR) {
       display_tourcorr_init(dsp, gg);
     }
 
@@ -296,11 +305,11 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   cpaneld *cpanel = &dsp->cpanel;
   gint nc = d->ncols;
 
-  if (nc < 3)
+  if (nc < MIN_NVARS_FOR_COTOUR)
     return;
 
   alloc_tourcorr(dsp, gg);
- 
+
   /* Initialize first variable as the vertical and rest of the variables as
      the horizontal variables */
   dsp->tcorr1.nactive = 2;

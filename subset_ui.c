@@ -21,7 +21,6 @@
 #define SS_STICKY 3
 #define SS_ROWLAB 4
 
-extern void subset_init (datad *d, ggobid *gg);
 
 /*-- called when closed from the close button --*/
 static void close_btn_cb (GtkWidget *w, ggobid *gg) {
