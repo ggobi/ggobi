@@ -69,6 +69,7 @@ datad_new(datad *d, ggobid *gg)
   gg->d = g_slist_append (gg->d, d);
 
   d->nclusters = 0;
+  d->nearest_point = -1;
 
   return (d);
 }
