@@ -283,7 +283,7 @@ tour2dpp_window_open (ggobid *gg) {
 
   if (!vars_sphered) {
 
-    quick_message ("The selected variables have to be sphered first.", false);
+    quick_message ("The selected variables have to be sphered first. Use the Tools menu and select the sphering option.", false);
 
   } else {
 

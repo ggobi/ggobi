@@ -361,6 +361,9 @@ tour2d_manip_var_set (gint j, ggobid *gg)
 void
 tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
+  displayd *dsp = gg->current_display;
+  extern gint realloc_optimize0_p(optimize0_param *, gint, gint, gint);
+
 /*-- we don't care which button it is --*/
   if (d->vcirc_ui.jcursor == GDK_HAND2) {
     tour2d_manip_var_set (jvar, gg);
@@ -368,6 +371,9 @@ tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 
   } else {
     tour2dvar_set (jvar, gg);
+    /*    if (dsp->t2d.target_selection_method == 1)*/
+      realloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, 
+        dsp->t2d.nactive, 2);
   }
 }
 
@@ -947,7 +953,6 @@ void
 tour2d_manip_end(splotd *sp) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/

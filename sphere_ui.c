@@ -217,7 +217,7 @@ scree_restore_cb (GtkWidget *w, ggobid *gg)
 */
 
 /*
- * update the scree plot when the number or identify of the selected
+ * update the scree plot when the number or identity of the selected
  * variables has changed, or after the variables are transformed
 */
 static void
@@ -338,7 +338,8 @@ void scree_plot_make (ggobid *gg)
       "expose_event", (gpointer) gg, (gpointer) &rval);
     pca_diagnostics_set (d, gg);
   } else {
-     quick_message ("Variance-covariance is identity already!\n", false);
+     if (d->sphere.npcs > 0)
+       quick_message ("Variance-covariance is identity already!\n", false);
   }
 }
 

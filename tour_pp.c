@@ -77,6 +77,25 @@ gint free_optimize0_p (optimize0_param *op)
   return 0;
 }
 
+gint realloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, 
+  gint ndim)
+{
+  static gint old_ncols;
+
+  if (old_ncols < ncols) {
+    arrayf_add_rows(&op->proj_best, ncols);
+    /*  arrayf_init_null (&op->proj_best);
+        arrayf_alloc_zero (&op->proj_best, ncols, ndim);*/ /*nrows, ncols);*/
+    arrayf_add_cols(&op->data, ncols);
+    /*  arrayf_init_null (&op->data);
+        arrayf_alloc_zero (&op->data, nrows, ncols); */
+  }
+
+  old_ncols = ncols;
+
+  return 0;
+}
+
 gboolean iszero (array_f *data)
 { 
   gfloat sum = 0;
