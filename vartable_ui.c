@@ -26,6 +26,11 @@ static void hide_cb (GtkWidget *w, ggobid *gg)
 {
   gtk_widget_hide (gg->vartable_ui.window);
 }
+static void destroyit (ggobid *gg)
+{
+  gtk_widget_destroy (gg->vartable_ui.window);
+  gg->vartable_ui.window = NULL;
+}
 
 static void
 clone_vars_cb (GtkWidget *w, ggobid *gg)
@@ -379,164 +384,165 @@ vartable_open (ggobid *gg)
   GtkWidget *labelw;
   gint n;
 
-  if (gg->vartable_ui.window == NULL) {
-
-    gg->vartable_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_signal_connect (GTK_OBJECT (gg->vartable_ui.window),
-      "delete_event", GTK_SIGNAL_FUNC (delete_cb), gg);
-    gtk_window_set_title (GTK_WINDOW (gg->vartable_ui.window),
-      "Variable selection and statistics");
-
-    vbox = gtk_vbox_new (false, 5);
-    gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
-    gtk_container_add (GTK_CONTAINER (gg->vartable_ui.window), vbox);
-    gtk_widget_show (vbox);
-
-    /* Create a notebook, set the position of the tabs */
-    gg->vartable_ui.notebook = gtk_notebook_new ();
-    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->vartable_ui.notebook),
-      GTK_POS_TOP);
-    gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->vartable_ui.notebook),
-      g_slist_length (gg->d) > 1);
-    gtk_box_pack_start (GTK_BOX (vbox), gg->vartable_ui.notebook,
-      true, true, 2);
-
-    n = 0;
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-
-      /* Create a scrolled window to pack the CList widget into */
-      scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-        GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-
-      labelw = (g_slist_length (gg->d) > 1) ? gtk_label_new (d->name) : NULL;
-      gtk_notebook_append_page (GTK_NOTEBOOK (gg->vartable_ui.notebook),
-                                scrolled_window, labelw);
-
-      gtk_widget_show (scrolled_window);
-
-      d->vartable_clist = gtk_clist_new_with_titles (NCOLS_CLIST, titles);
-      gtk_clist_set_selection_mode (GTK_CLIST (d->vartable_clist),
-        GTK_SELECTION_EXTENDED);
-
-/*-- trying to add tooltips to the headers; it doesn't seem to work --*/
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-        gtk_clist_get_column_widget (
-          GTK_CLIST (d->vartable_clist), CLIST_USER_MIN),
-        "User specified minimum; untransformed", NULL);
-/*-- --*/
-
-      /*-- right justify all the numerical columns --*/
-      for (k=0; k<NCOLS_CLIST; k++)
-        gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
-          k, GTK_JUSTIFY_RIGHT);
-
-      /*-- make the first column invisible --*/
-      gtk_clist_set_column_visibility (GTK_CLIST (d->vartable_clist),
-        CLIST_VARNO, false);
-
-      /*-- set the column width automatically --*/
-      for (k=0; k<NCOLS_CLIST; k++)
-        gtk_clist_set_column_auto_resize (GTK_CLIST (d->vartable_clist),
-                                          k, true);
-
-      /*-- populate the table --*/
-      for (j=0 ; j<d->ncols ; j++)
-        vartable_row_append (j, d, gg);
-
-      /*-- track selections --*/
-      gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "select_row",
-                         GTK_SIGNAL_FUNC (selection_made),
-                         gg);
-      gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "unselect_row",
-                         GTK_SIGNAL_FUNC (deselection_made),
-                         gg);
-
-      /*-- re-sort when receiving a mouse click on a column header --*/
-      gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "click_column",
-                         GTK_SIGNAL_FUNC (sortbycolumn_cb),
-                         gg);
-
-      /* It isn't necessary to shadow the border, but it looks nice :) */
-      gtk_clist_set_shadow_type (GTK_CLIST (d->vartable_clist), GTK_SHADOW_OUT);
-
-      gtk_container_add (GTK_CONTAINER (scrolled_window), d->vartable_clist);
-      gtk_widget_show (d->vartable_clist);
-    }
-
-    /*-- 3 = COLUMN_INSET --*/
-    gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
-      d->vartable_clist->requisition.width + 3 +
-      GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
-      150);
-
-    hbox = gtk_hbox_new (true, 10);
-
-    /*-- set and unset ranges --*/
-    btn = gtk_button_new_with_label ("Set range ... ");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Set user min and max for the selected variable(s)", NULL);
-    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (range_set_cb), gg);
-
-
-    btn = gtk_button_new_with_label ("Unset range");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Unset user min and max for the selected variable(s)", NULL);
-    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (range_unset_cb), gg);
-    /*--  --*/
-
-    /*-- Make and clear selections --*/
-    btn = gtk_button_new_with_label ("Select all");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Select all variables", NULL);
-    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (select_all_cb), gg);
-
-    btn = gtk_button_new_with_label ("Clear selection");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Deselect all variables", NULL);
-    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (deselect_all_cb), gg);
-    /*-- --*/
-
-    /*-- Clone or delete selected variables --*/
-    btn = gtk_button_new_with_label ("Clone");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Clone selected variables", NULL);
-    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (clone_vars_cb), gg);
-
-    btn = gtk_button_new_with_label ("Delete");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Delete selected variables", NULL);
-    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (delete_vars_cb), gg);
-
-    /*-- until all the details are worked out, make this insensitive --*/
-    gtk_widget_set_sensitive (btn, false);
-    /*-- --*/
-
-    btn = gtk_button_new_with_label ("Close");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Close the window", NULL);
-    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (hide_cb), gg);
-
-    gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 1);
+  /*-- if new datad's have been added, the user has to reopen the window --*/
+  if (gg->vartable_ui.window != NULL) {
+    destroyit (gg);
   }
 
+  gg->vartable_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_signal_connect (GTK_OBJECT (gg->vartable_ui.window),
+    "delete_event", GTK_SIGNAL_FUNC (delete_cb), gg);
+  gtk_window_set_title (GTK_WINDOW (gg->vartable_ui.window),
+    "Variable selection and statistics");
+
+  vbox = gtk_vbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
+  gtk_container_add (GTK_CONTAINER (gg->vartable_ui.window), vbox);
+  gtk_widget_show (vbox);
+
+  /* Create a notebook, set the position of the tabs */
+  gg->vartable_ui.notebook = gtk_notebook_new ();
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->vartable_ui.notebook),
+    GTK_POS_TOP);
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->vartable_ui.notebook),
+    g_slist_length (gg->d) > 1);
+  gtk_box_pack_start (GTK_BOX (vbox), gg->vartable_ui.notebook,
+    true, true, 2);
+
+  n = 0;
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+
+    /* Create a scrolled window to pack the CList widget into */
+    scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+    labelw = (g_slist_length (gg->d) > 1) ? gtk_label_new (d->name) : NULL;
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->vartable_ui.notebook),
+                              scrolled_window, labelw);
+
+    gtk_widget_show (scrolled_window);
+
+    d->vartable_clist = gtk_clist_new_with_titles (NCOLS_CLIST, titles);
+    gtk_clist_set_selection_mode (GTK_CLIST (d->vartable_clist),
+      GTK_SELECTION_EXTENDED);
+
+/*-- trying to add tooltips to the headers; it doesn't seem to work --*/
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+      gtk_clist_get_column_widget (
+        GTK_CLIST (d->vartable_clist), CLIST_USER_MIN),
+      "User specified minimum; untransformed", NULL);
+/*-- --*/
+
+    /*-- right justify all the numerical columns --*/
+    for (k=0; k<NCOLS_CLIST; k++)
+      gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
+        k, GTK_JUSTIFY_RIGHT);
+
+    /*-- make the first column invisible --*/
+    gtk_clist_set_column_visibility (GTK_CLIST (d->vartable_clist),
+      CLIST_VARNO, false);
+
+    /*-- set the column width automatically --*/
+    for (k=0; k<NCOLS_CLIST; k++)
+      gtk_clist_set_column_auto_resize (GTK_CLIST (d->vartable_clist),
+                                        k, true);
+
+    /*-- populate the table --*/
+    for (j=0 ; j<d->ncols ; j++)
+      vartable_row_append (j, d, gg);
+
+    /*-- track selections --*/
+    gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "select_row",
+                       GTK_SIGNAL_FUNC (selection_made),
+                       gg);
+    gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "unselect_row",
+                       GTK_SIGNAL_FUNC (deselection_made),
+                       gg);
+
+    /*-- re-sort when receiving a mouse click on a column header --*/
+    gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "click_column",
+                       GTK_SIGNAL_FUNC (sortbycolumn_cb),
+                       gg);
+
+    /* It isn't necessary to shadow the border, but it looks nice :) */
+    gtk_clist_set_shadow_type (GTK_CLIST (d->vartable_clist), GTK_SHADOW_OUT);
+
+    gtk_container_add (GTK_CONTAINER (scrolled_window), d->vartable_clist);
+    gtk_widget_show (d->vartable_clist);
+  }
+
+  /*-- 3 = COLUMN_INSET --*/
+  gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
+    d->vartable_clist->requisition.width + 3 +
+    GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
+    150);
+
+  hbox = gtk_hbox_new (true, 10);
+
+  /*-- set and unset ranges --*/
+  btn = gtk_button_new_with_label ("Set range ... ");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Set user min and max for the selected variable(s)", NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (range_set_cb), gg);
+
+
+  btn = gtk_button_new_with_label ("Unset range");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Unset user min and max for the selected variable(s)", NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (range_unset_cb), gg);
+  /*--  --*/
+
+  /*-- Make and clear selections --*/
+  btn = gtk_button_new_with_label ("Select all");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Select all variables", NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (select_all_cb), gg);
+
+  btn = gtk_button_new_with_label ("Clear selection");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Deselect all variables", NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (deselect_all_cb), gg);
+  /*-- --*/
+
+  /*-- Clone or delete selected variables --*/
+  btn = gtk_button_new_with_label ("Clone");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Clone selected variables", NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (clone_vars_cb), gg);
+
+  btn = gtk_button_new_with_label ("Delete");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Delete selected variables", NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (delete_vars_cb), gg);
+
+  /*-- until all the details are worked out, make this insensitive --*/
+  gtk_widget_set_sensitive (btn, false);
+  /*-- --*/
+
+  btn = gtk_button_new_with_label ("Close");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Close the window", NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (hide_cb), gg);
+
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 1);
+
   gtk_widget_show_all (gg->vartable_ui.window);
-  gdk_window_raise (gg->vartable_ui.window->window);
 }
 
 /*-------------------------------------------------------------------------*/

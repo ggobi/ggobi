@@ -10,6 +10,7 @@ EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 # implemented or buggy functionality
 TOUR1D_IMPLEMENTED=0
 BINARY_IO_IMPLEMENTED=0
+INFERENCE_IMPLEMENTED=0
 
 include local.config
 

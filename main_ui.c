@@ -554,11 +554,13 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) sphere_panel_open,
        0,
        NULL },
+#ifdef INFERENCE_IMPLEMENTED
   { "/Tools/Inference ...", 
        NULL,        
        (GtkItemFactoryCallback) NULL,  /*-- inference_window_open --*/
        0,
        NULL },
+#endif
   { "/Tools/Variable jittering ...", 
        NULL,        
        (GtkItemFactoryCallback) jitter_window_open,   

@@ -162,7 +162,7 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
   g_free (str);
 }
 
-static void closeit (ggobid *gg) {
+static void destroyit (ggobid *gg) {
   gint n;
   GSList *l;
   datad *d;
@@ -203,12 +203,12 @@ static void reset_cb (GtkWidget *w, ggobid *gg) {
 
 /*-- called when closed from the close button --*/
 static void close_cb (GtkWidget *w, ggobid *gg) {
-  closeit (gg);
+  destroyit (gg);
 }
 
 /*-- called when closed from the window manager --*/
 static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
-  closeit (gg);
+  destroyit (gg);
 }
 
 void
@@ -222,7 +222,7 @@ exclusion_window_open (ggobid *gg) {
 
   /*-- if it isn't NULL, then destroy it and start afresh --*/
   if (gg->exclusion_ui.window != NULL) {
-    closeit (gg);
+    destroyit (gg);
   }
 
   gg->exclusion_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
