@@ -885,6 +885,7 @@ gboolean
 GGOBI(close)(ggobid *gg, gboolean closeWindow)
 {
   gboolean val = true;
+g_printerr ("close_pending %d  gg %d\n", gg->close_pending, (gint)gg);
   if (gg->close_pending)
     return (false);
 
@@ -897,6 +898,7 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
 
   display_free_all (gg);
 
+g_printerr ("closeWindow %d\n", closeWindow);
   if (closeWindow && gg->main_window)
     gtk_widget_destroy (gg->main_window);
 
