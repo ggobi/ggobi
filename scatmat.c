@@ -128,7 +128,7 @@ scatmat_new (gboolean missing_p,
 
   scatmat_cpanel_init (&display->cpanel, gg);
 
-  display_window_init (display, 5, gg);
+  display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 5, gg);
 
 /*
  * Add the main menu bar
