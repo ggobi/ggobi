@@ -341,7 +341,8 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
 /*
  * Use brush_pos to draw the brush.
 */
-  cpaneld *cpanel = &gg->current_display->cpanel;
+  displayd *display = sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
   gboolean point_painting_p = (cpanel->br_point_targets != BR_OFF);
   gboolean edge_painting_p = (cpanel->br_edge_targets != BR_OFF);
 
