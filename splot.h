@@ -1,4 +1,4 @@
-/*-- splot.h --*/
+/*-- splot.h: the variables required for each single plot --*/
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
@@ -81,10 +81,12 @@ typedef struct {
 */
  icoords xyvars;
 
+#ifdef ROTATION_IMPLEMENTED
 /*
  * rotation
 */
  struct {gint x, y, z;} spinvars;
+#endif
 
 } splotd;
 
