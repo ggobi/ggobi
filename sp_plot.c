@@ -206,7 +206,6 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   GtkWidget *da = sp->da;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
-  gboolean draw_case;
   gint dtype = display->displaytype;
   colorschemed *scheme = gg->activeColorScheme;
   gushort maxcolorid;
@@ -279,9 +278,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
-        draw_case = splot_plot_case (m, d, sp, display, gg);
-
-        if (draw_case && d->color_now.els[m] == current_color) {
+        if (d->color_now.els[m] == current_color &&
+            splot_plot_case (m, d, sp, display, gg))
+        {
           if (display->options.points_show_p) {
             draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen, m, gg);
           }
@@ -334,14 +333,6 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     }  /* deal with mono later */
   }
 
-/*
-moving this to the end of the routine that adds markup
-  cpaneld *cpanel = &display->cpanel;
-  gint proj = cpanel->projection;
-  if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
-    splot_draw_tour_axes(sp, sp->pixmap0, gg);
-  }
-*/
   return;
 }
 
@@ -445,8 +436,8 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
           for (iv=bin0->y; iv<=bin1->y; iv++) {
             for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
               i = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
-              if (!d->hidden_now.els[i] &&
-                   d->color_now.els[i] == current_color)
+              if (d->color_now.els[i] == current_color &&
+                  splot_plot_case (i, d, sp, display, gg))
               {
                 draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
                   sp->screen, i, gg);

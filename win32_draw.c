@@ -304,7 +304,6 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;
   gint nwhisker_segs = 0;
   gint nash_segs = 0;
-  gboolean draw_case;
   gint dtype = display->displaytype;
 
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
@@ -314,9 +313,14 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
 
   for (i=0; i<d->nrows_in_plot; i++) {
     m = d->rows_in_plot[i];
+/*
+  gboolean draw_case;
     draw_case = splot_plot_case (m, d, sp, display, gg);
-
     if (draw_case && d->color_now.els[m] == current_color) {
+*/
+    if (d->color_now.els[m] == current_color &&
+        splot_plot_case (m, d, sp, display, gg))
+    {
       if (display->options.points_show_p) {
         build_glyph (&d->glyph_now.els[m], sp->screen, m,
           points, &npt,           segs, &nseg,
@@ -363,7 +367,12 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
     for (iv=bin0->y; iv<=bin1->y; iv++) {
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
         j = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
+        if (d->color_now.els[j] == current_color &&
+            splot_plot_case (j, d, sp, display, gg))
+        {
+/*
         if (!d->hidden_now.els[j] && d->color_now.els[j] == current_color) {
+*/
           build_glyph (&d->glyph_now.els[j], sp->screen, j,
             points, &npt,           segs, &nseg,
             open_rects, &nr_open,   filled_rects, &nr_filled,
