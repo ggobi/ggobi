@@ -3,10 +3,14 @@
   Takes the current data in the specified ggobid structure
   and writes the XML file corresponding to this configuration.
   This can be used to convert the original data formats to XML, if
-  that is desired.
-  (More likely to be correct than writing a Perl script!)
+  that is desired.  (More likely to be correct than writing a Perl
+  script!)  Alas, it can't be relied upon for all file conversions,
+  because ggobi doesn't read all xgobi-style data files, with
+  .lines as a prominent example.  ggobi also doesn't read
+  xgobi-style .colors files.
  */
 #include <string.h>
+#include <strings.h>
 #include "writedata.h"
 
 
@@ -68,7 +72,6 @@ write_xml_dataset(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 gboolean
 write_xml_header (FILE *f, int numDatasets, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
-
  fprintf(f, "<?xml version=\"1.0\"?>");
  fprintf(f, "\n");
  fprintf(f, "<!DOCTYPE ggobidata SYSTEM \"ggobi.dtd\">");
