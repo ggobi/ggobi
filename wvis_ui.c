@@ -613,7 +613,7 @@ static gboolean colors_remap (colorschemed *scheme, ggobid *gg)
   gboolean remap_ok = true;
 
   for (k=0; k<MAXNCOLORS; k++)
-    all_colors_p[colors_used[k]] = false;
+    all_colors_p[k] = false;
 
   /*-- find out all the colors (indices) are currently in use --*/
   for (l = gg->d; l; l = l->next) {
@@ -631,7 +631,7 @@ static gboolean colors_remap (colorschemed *scheme, ggobid *gg)
 
   /*-- find the largest color index currently in use --*/
   maxcolorindex = -1;
-  for (k=MAXNCOLORS; k>0; k--) {
+  for (k=MAXNCOLORS-1; k>0; k--) {
     if (all_colors_p[k]) {
       maxcolorindex = k;
       break;
@@ -643,7 +643,8 @@ static gboolean colors_remap (colorschemed *scheme, ggobid *gg)
     ;
   else if (ncolors_used >= scheme->n) {
     /* fatal: bail out with a warning */
-    quick_message ("Sorry, ...", false);
+    quick_message ("The number of colors now in use is greater than than\nthe number of colors in the chosen color scheme.", false);
+
     remap_ok = false;   
   } else if (maxcolorindex >= scheme->n && ncolors_used < scheme->n) {
     /*-- build the vector that will be used to reset the current indices --*/
@@ -654,7 +655,7 @@ static gboolean colors_remap (colorschemed *scheme, ggobid *gg)
      * just map them into the first few colors for now.  later, might
      * want to spread the colors out.
     */
-    for (k=0; k<maxcolorindex; k++) {
+    for (k=0; k<=maxcolorindex; k++) {
       if (all_colors_p[k]) {
         newind[k] = n;  /*-- n can not grow larger than maxcolorindex-1 --*/
         n++;
@@ -683,9 +684,6 @@ static void scale_set_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint ncolors_used;
-  gushort colors_used[MAXNCOLORS+2];  /* why +2?  bg, accent? irrelevant? */
-  gint k;
   gboolean rval = false;
   extern void symbol_window_redraw (ggobid *);
 
@@ -699,22 +697,10 @@ static void scale_set_cb (GtkWidget *w, ggobid* gg)
     if (gg->wvis.scheme) {
       colorschemed *scheme = gg->wvis.scheme;
 
-/*
- * First of all, need to check all datad's, not just this one.
- * Second, only rule out a new color scheme if the number of
- * colors doesn't work.  As long as the number of colors is ok,
- * then reset the values of the colors according to some rule ...
- * which I must now devise.
-*/
-      datad_colors_used_get (&ncolors_used, colors_used, d, gg);
-      for (k=0; k<ncolors_used; k++) {
-        if (colors_used[k] >= scheme->n) {
-          quick_message ("Sorry, one of the colors to be reset has an index that is greater than\nthe number of colors in the current set.", false);
-          return;  /*-- for now, bail out rather than reassigning indices --*/
-        }
-      }
-
       /*-- if no current color index is too high, continue --*/
+      if (!colors_remap (scheme, gg))
+        return;
+
       g_free (gg->color_table);
 
       gg->ncolors = scheme->n;
