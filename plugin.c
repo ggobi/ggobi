@@ -120,8 +120,8 @@ load_plugin_library(GGobiPluginDetails *plugin)
     if(sessionOptions->verbose != GGOBI_SILENT) {
      char buf[1000];
      dynload->getError(buf, plugin);
-     fprintf(stderr, "error on loading plugin library %s: %s\n",
-       plugin->dllName, buf);
+     fprintf(stderr, "error on loading plugin library %s (%s): %s\n",
+       plugin->dllName, fileName, buf);
      fflush(stderr);
     }
     plugin->loaded = DL_FAILED;
@@ -177,6 +177,8 @@ registerPlugin(ggobid *gg, GGobiPluginInfo *plugin)
           GGOBI_addPluginInstance(inst, gg);
         } else
           g_free(inst);
+      } else {
+    fprintf(stderr, "can't locate routine %s\n", plugin->info.g->onCreate);fflush(stderr);
       }
     } else {
       inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
@@ -501,3 +503,25 @@ ggobi_dlerror(char *buf, GGobiPluginDetails *plugin)
 }
 
 #endif
+
+void
+checkDLL()
+{
+  HINSTANCE handle;
+  DLFUNC f;
+  char *fileName = "testDLL.dll";
+  fprintf(stderr, "Checking plugins on Windows\n");fflush(stderr);
+  handle = dynload->open(fileName, NULL);
+  if(!handle) {
+    fprintf(stderr, "Cannot load %s\n", fileName);
+    return;
+  }
+
+  f = (DLFUNC) dynload->resolve(handle, "testRun");
+  if(!f) {
+    fprintf(stderr, "Cannot find testRun routine\n");
+    return;
+  }
+
+  f();
+}
