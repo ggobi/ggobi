@@ -161,18 +161,7 @@ tsTreeLabel(splotd *sp, datad *d, ggobid *gg)
 void 
 timeSeriesSPlotClassInit(GtkGGobiBarChartSPlotClass *klass)
 {
-#if 0
-      /* barcharts need more attention than redrawing the brush */
-    klass->extendedSPlotClass.splot.redraw = FULL;
-
-    klass->extendedSPlotClass.identify_notify = barchart_identify_bars;
-    klass->extendedSPlotClass.add_markup_cues =  barchart_add_bar_cues;
-    klass->extendedSPlotClass.add_scaling_cues = barchart_scaling_visual_cues_draw;
-    klass->extendedSPlotClass.add_plot_labels = barchart_splot_add_plot_labels;
-    klass->extendedSPlotClass.redraw = barchart_redraw;
-
-    klass->extendedSPlotClass.active_paint_points = barchart_active_paint_points;
-#endif
+    klass->extendedSPlotClass.splot.redraw = QUICK;
     klass->extendedSPlotClass.tree_label = tsTreeLabel;
 
     klass->extendedSPlotClass.within_draw_to_binned = tsWithinDrawBinned;
@@ -194,6 +183,8 @@ timeSeriesSPlotClassInit(GtkGGobiBarChartSPlotClass *klass)
 void 
 timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass)
 {
+    klass->parent_class.binning_ok = false;
+
     klass->parent_class.treeLabel =  klass->parent_class.titleLabel = "Time Series";
     klass->parent_class.create = timeSeriesDisplayCreate;
     klass->parent_class.variable_select = tsplot_varsel;

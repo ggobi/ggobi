@@ -328,10 +328,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
    * points.
   */
   gboolean loop_over_points;
+
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
    loop_over_points = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->loop_over_points;
   } else
-   loop_over_points =  display->options.points_show_p || dtype == parcoords;
+   loop_over_points = display->options.points_show_p || dtype == parcoords;
 
   if (gg->plot_GC == NULL) {
     init_plot_GC (sp->pixmap0, gg);
@@ -466,7 +467,6 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 
   GtkGGobiExtendedSPlotClass *klass = NULL;
 
-
   if (gg->plot_GC == NULL)
     init_plot_GC (sp->pixmap0, gg);
 
@@ -561,10 +561,8 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
                       sp->whiskers[n].x1, sp->whiskers[n].y1,
                       sp->whiskers[n].x2, sp->whiskers[n].y2);
                   }
-                } else if(klass) { /* Handle the extended splot case. */
-  		  if(klass->within_draw_to_binned) {
+                } else if(klass && klass->within_draw_to_binned) {
  		      klass->within_draw_to_binned(sp, m, sp->pixmap0, gg->plot_GC);
-		  }
                 }
               }
             }
