@@ -324,6 +324,7 @@ struct _ggobid {
 
    gfloat *pct;
    gint npct;
+   gint *n;    /*-- number of points that will take on each color --*/
    gint nearest_color;
 
    gint motion_notify_id;

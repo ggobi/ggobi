@@ -20,6 +20,30 @@ static gint xmargin = 20;
 static gint ymargin = 20;
 
 static void
+bin_counts_reset (gint jvar, datad *d, ggobid *gg)
+{
+  gint i, k, m;
+  gfloat val;
+  gfloat min = d->vartable[jvar].lim_tform.min;
+  gfloat max = d->vartable[jvar].lim_tform.max;
+
+  for (k=0; k<gg->wvis.npct; k++)
+    gg->wvis.n[k] = 0;
+
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot[m];
+    for (k=0; k<gg->ncolors; k++) {
+      val = min + gg->wvis.pct[k] * (max - min);
+      if (d->tform.vals[i][jvar] <= val) {
+        gg->wvis.n[k]++;
+        break;
+      }
+    }
+  }
+}
+
+
+static void
 delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data)
 {
   gtk_widget_hide (w);
@@ -39,6 +63,11 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
 
   icoords *mousepos = &gg->wvis.mousepos;
   gint nearest_color = gg->wvis.nearest_color;
+  GtkWidget *clist = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(w), "clist");
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  GList *selection = GTK_CLIST (clist)->selection;
+  gint selected_var;
+  if (selection) selected_var = (gint) selection->data;
 
   gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
 
@@ -51,6 +80,10 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
         val <= gg->wvis.pct[nearest_color+1])
     {
       gg->wvis.pct[nearest_color] = val;
+
+      if (selected_var != -1)
+        bin_counts_reset (selected_var, d, gg);
+
       gtk_signal_emit_by_name (GTK_OBJECT (w), "expose_event",
         "expose_event",
         (gpointer) gg, (gpointer) &rval);
@@ -103,8 +136,10 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
-  gtk_signal_disconnect (GTK_OBJECT (w), gg->wvis.motion_notify_id);
-  gg->wvis.motion_notify_id = 0;
+  if (gg->wvis.motion_notify_id) {
+    gtk_signal_disconnect (GTK_OBJECT (w), gg->wvis.motion_notify_id);
+    gg->wvis.motion_notify_id = 0;
+  }
 
   return true;
 }
@@ -128,6 +163,7 @@ wvis_init (ggobid  *gg)
 {
   gg->wvis.window = NULL;
   gg->wvis.npct = 0;
+  gg->wvis.n = NULL;
   gg->wvis.nearest_color = -1;
   gg->wvis.motion_notify_id = 0;
   gg->wvis.mousepos.x = -1;
@@ -165,9 +201,12 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   if (gg->wvis.npct != gg->ncolors) {
     gg->wvis.npct = gg->ncolors;
     gg->wvis.pct = (gfloat *) g_realloc (gg->wvis.pct,
-      gg->wvis.npct * sizeof (gg->wvis.npct));
+                                         gg->wvis.npct * sizeof (gfloat));
+    gg->wvis.n = (gint *) g_realloc (gg->wvis.n,
+                                     gg->wvis.npct * sizeof (gint));
     for (k=0; k<gg->wvis.npct; k++) {
       gg->wvis.pct[k] = (gfloat) (k+1) /  (gfloat) gg->wvis.npct;
+      gg->wvis.n[k] = 0;
     }
   }
 
@@ -279,7 +318,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gdk_color_free (&gray3);
 */
 
-  /*-- add the variable limits in the margin --*/
+  /*-- add the variable limits in the top margin --*/
   if (d && selected_var != -1) {
     gfloat min = d->vartable[selected_var].lim_tform.min;
     gfloat max = d->vartable[selected_var].lim_tform.max;
@@ -291,6 +330,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
     y = ymargin;
     for (k=0; k<gg->ncolors-1; k++) {
+
       val = min + gg->wvis.pct[k] * (max - min);
       str = g_strdup_printf ("%3.3g", val);
       gdk_text_extents (style->font, str, strlen(str),
@@ -302,6 +342,23 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
         str);
       g_free (str);
     }
+
+    /*-- ... and the counts in the bottom margin --*/
+    for (k=0; k<gg->ncolors; k++) {
+      val = min + gg->wvis.pct[k] * (max - min);
+      str = g_strdup_printf ("%d", gg->wvis.n[k]);
+      gdk_text_extents (style->font, str, strlen(str),
+        &lbearing, &rbearing, &width, &ascent, &descent);
+      x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
+      x -= (gg->wvis.pct[k]-gg->wvis.pct[k-1])/2 *
+             (w->allocation.width - 2*xmargin);
+      gdk_draw_string (pix, style->font, gg->plot_GC,
+        x - width/2,
+        (w->allocation.height - ymargin) + ascent + descent + 2,
+        str);
+      g_free (str);
+    }
+
   }
 
   gdk_draw_pixmap (w->window, gg->plot_GC, pix,
@@ -337,16 +394,19 @@ static void wvis_setdata_cb (GtkWidget *w, datad *d)
 }
 
 void
-selection_made_cb (GtkWidget *cl, gint row, gint column,
+selection_made_cb (GtkWidget *clist, gint row, gint column,
   GdkEventButton *event, ggobid *gg)
 {
   gboolean rval = false;
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+
+  bin_counts_reset (row, d, gg);
+
   gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
     "expose_event",
     (gpointer) gg, (gpointer) &rval);
 }
 
-/*-- I need datad, the variable, and pct[] --*/
 static void scale_apply_cb (GtkButton *w, ggobid* gg)
 {
   GtkWidget *clist = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(w), "clist");
@@ -367,11 +427,12 @@ static void scale_apply_cb (GtkButton *w, ggobid* gg)
       for (k=0; k<gg->ncolors; k++) {
         val = min + gg->wvis.pct[k] * (max - min);
         if (d->tform.vals[i][selected_var] <= val) {
-          d->color_now.els[i] = k;
+          d->color.els[i] = d->color_now.els[i] = k;
           break;
         }
       }
     }
+    clusters_set (d, gg);
     displays_plot (NULL, FULL, gg);
   }
 }
@@ -438,7 +499,7 @@ wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
     swin = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
       GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_box_pack_start (GTK_BOX (vbox), swin, false, false, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), swin, true, true, 0);
 
     /*-- variable list --*/
     /*clist = gtk_clist_new (1);*/  /*-- created earlier --*/

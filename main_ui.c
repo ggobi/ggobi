@@ -513,7 +513,7 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) jitter_window_open,   
        0,
        NULL },
-  { "/Tools/Visual weighting ...", 
+  { "/Tools/Brush by variable ...", 
        NULL,        
        (GtkItemFactoryCallback) wvis_window_open,   
        0,
