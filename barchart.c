@@ -234,15 +234,20 @@ void barchart_recalc_group_counts (splotd *sp, datad *d, ggobid *gg) {
 /* count points in bins */
   for (i=0; i<d->nrows_in_plot; i++) {
     m = d->rows_in_plot[i];
+
+    /*-- skip missings?  --*/
+    if (d->nmissing > 0 && !d->missings_show_p && MISSING_P(m,sp->p1dvar))
+      continue;
+
     bin = sp->planar[m].x;
     if (( bin >= 0) && (bin < sp->bar->nbins)) {
-      sp->bar->cbins[bin][d->color_now.els[i]].count++;
+      sp->bar->cbins[bin][d->color_now.els[m]].count++;
     }
     if  (bin == -1) {
-      sp->bar->col_low_bin[d->color_now.els[i]].count++;
+      sp->bar->col_low_bin[d->color_now.els[m]].count++;
     }
     if (bin == sp->bar->nbins) {
-      sp->bar->col_high_bin[d->color_now.els[i]].count++;
+      sp->bar->col_high_bin[d->color_now.els[m]].count++;
     }
   }
 
@@ -650,6 +655,11 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
   if (vtx->categorical_p) {
     for (i=0; i<d->nrows_in_plot; i++) {
       m = d->rows_in_plot[i];
+
+      /*-- skip missings?  --*/
+      if (d->nmissing > 0 && !d->missings_show_p && MISSING_P(m,sp->p1dvar))
+        continue;
+
       bin = sp->bar->index_to_rank[i];
       if (( bin >= 0) && (bin < sp->bar->nbins)) {
         sp->bar->bins[bin].count++;
@@ -908,6 +918,11 @@ gboolean barchart_active_paint_points (splotd *sp, datad *d) {
     gint m;
     for (i=0; i<d->nrows_in_plot; i++) {
       m = d->rows_in_plot[i];
+
+      /*-- skip missings?  --*/
+      if (d->nmissing > 0 && !d->missings_show_p && MISSING_P(m,sp->p1dvar))
+        continue;
+
       d->pts_under_brush.els[m] = hits[sp->planar[i].x+1];
       if (hits[sp->planar[i].x+1]) d->npts_under_brush++;
     }
