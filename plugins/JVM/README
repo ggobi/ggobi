@@ -1,0 +1,11 @@
+This plugin provides support for the Java Virtual Machine within
+GGobi. It is a meta-plugin in the sense that input and regular plugins
+developed in Java can be run via this plugin.
+
+Bindings for programming Gtk from within Java
+are available from
+  http://java-gnome.sourceforge.net/
+
+Hopefully this will serve as an example for embedding the Python and
+Perl interpreters in GGobi in the same manner to allow plugins to be
+developed using those languages.
