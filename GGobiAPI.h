@@ -791,7 +791,7 @@ extern int GGobi_getNumGGobis();
 
  @return a reference to the datad object that is accessed by the 
  ggobid instance. This is not a copy.
- @see GGobi_data_get()
+ @see GGobi_data_get_by_name()
  */
 extern datad *GGobi_data_get(int which, const ggobid * const gg);
 
@@ -949,6 +949,12 @@ extern gboolean GGobi_setShowLines(gboolean val);
 
 
 
+/**
+ @group Plugins
+
+ */
+
+extern GtkWidget *GGobi_addDisplayMenuItem(ggobid *gg, const char *label);
 
 #ifdef __cplusplus
 }

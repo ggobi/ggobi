@@ -91,7 +91,8 @@ SRC=array.c ash1d.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937-1.c cokus.c \
  fileio.c plugin.c print.c \
- xlines.c 
+ xlines.c \
+ ui_utils.c
 
 OB=array.o ash1d.o \
  brush_api.o brush_bins.o brush.o brush_init.o brush_link.o brush_ui.o \
@@ -123,7 +124,8 @@ OB=array.o ash1d.o \
 \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  fileio.o plugin.o print.o \
- xlines.o 
+ xlines.o  \
+ ui_utils.o
 
 
 ifdef USE_XML
