@@ -56,11 +56,33 @@ const gchar *const DataModeNames[num_data_modes] =
 
 void initSessionOptions();
 
+gchar *
+getOptValue(const char * const name, const char * const value)
+{
+    const char * ptr = (const char *) value;
+
+    if(ptr[0] != '-' || ptr[1] != '-')
+	return(NULL);
+
+    if(strncmp(name, value + 2, strlen(name)) == 0) {
+        ptr = value + strlen(name) + 2;
+        if(ptr[0] != '=' || ptr[1] == '\0') {
+            g_printerr("--%s must be given a value in the form --%s=value\n", name, name);
+            fflush(stderr);          
+            ptr = NULL;
+	} else
+	    ptr = g_strdup(ptr+1);
+    } else
+	ptr = NULL;
+
+    return(ptr);
+}
+
 gint
 parse_command_line (gint *argc, gchar **av, ggobid *gg)
 {
   gboolean stdin_p = false;
-  
+  char *ptr;
 
 /*
  * Now parse the command line.
@@ -89,15 +111,13 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 #endif
    }
 
-   else if(strcmp(av[1], "-verbose") == 0) {
+   else if(strcmp(av[1], "-verbose") == 0 || strcmp(av[1], "-V") == 0) {
       sessionOptions->verbose = true;
    } 
- 
-#ifdef USE_MYSQL
+ #ifdef USE_MYSQL
     else if (strcmp (av[1], "-mysql") == 0) {
     }
 #endif
-
     /*
      * -:  look to stdin for the input data
     */
@@ -111,17 +131,25 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
     else if (strcmp (av[1], "-version") == 0) {
       g_printerr ("This version of GGobi is dated %s\n", GGOBI(getVersionDate()));
       exit (0);
-    }
-    else if (strcmp (av[1], "--version") == 0) {
+
+    } else if (strcmp (av[1], "--version") == 0) {
       g_printerr ("%s\n", GGOBI(getVersionString()));
       exit (0);
     } else if(strcmp(av[1], "-init") == 0) {
 #ifdef SUPPORT_INIT_FILES
       sessionOptions->initializationFile = g_strdup(av[2]);
-#else
+
       g_printerr ("-init not supported without XML\n");fflush(stderr);
 #endif
       (*argc)--; av++;
+    } else if((ptr = getOptValue("init", av[1]))) {
+#ifdef SUPPORT_INIT_FILES
+	    sessionOptions->initializationFile = ptr;
+#endif
+    } else if(strcmp(av[1], "-noinit") == 0) {
+#ifdef USE_XML
+      sessionOptions->initializationFile = g_strdup("");
+#endif
     } else if(strcmp(av[1],"-colorschemes") == 0) {
 #ifdef USE_XML
       sessionOptions->info->colorSchemeFile = av[2];
@@ -130,19 +158,24 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
       g_printerr ("-colorschemes not supported without XML\n"); fflush(stderr);
 #endif
       (*argc)--; av++;
-
-    }
- else if(strcmp(av[1],"-activeColorScheme") == 0) {
+    } else if((ptr = getOptValue("colorschemes", av[1]))) {
+#ifdef USE_XML
+       sessionOptions->info->colorSchemeFile = ptr;
+#else
+      g_printerr ("--colorschemes not supported without XML\n"); fflush(stderr);
+#endif
+    } else if(strcmp(av[1],"-activeColorScheme") == 0) {
 #ifdef USE_XML
       sessionOptions->activeColorScheme = g_strdup(av[2]);
 #else
       g_printerr ("-colorschemes not supported without XML\n"); fflush(stderr);
 #endif
       (*argc)--; av++;
-    }
-    else if(strcmp(av[1], "-datamode") == 0) {
+    }  else if(strcmp(av[1], "-datamode") == 0) {
       sessionOptions->data_type = g_strdup(av[2]);
       (*argc)--; av++;
+    }  else if((ptr = getOptValue("datamode", av[1]))) {
+	sessionOptions->data_type = ptr;
     }
   }
 
@@ -593,7 +626,7 @@ process_initialization_files()
       sessionOptions->initializationFile = g_strdup(fileName);
   }
      
-  if(fileName && canRead(fileName)) {
+  if(fileName && fileName[0] && canRead(fileName)) {
     info = read_init_file(fileName, sessionOptions->info);
     /* sessionOptions->info = info; */
   }
