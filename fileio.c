@@ -409,9 +409,8 @@ gboolean isASCIIFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *plugin
   if(!canRead(fileName)) {
      /* first test whether fileName already ends with .dat! */
      gchar buf[256];
-     gchar* suffix = ".dat";
      gint slen = strlen(fileName);
-     if (slen >= 4 && !strcmp(&fileName[slen-4], suffix)) {
+     if (slen >= 4 && strcmp(&fileName[slen-4], ".dat") != 0) {
        sprintf(buf, "%s.dat", fileName);
        return(isASCIIFile(buf, gg, plugin));
      } else {
