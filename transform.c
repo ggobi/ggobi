@@ -798,9 +798,9 @@ transform (gint stage, gint tform_type, gfloat param, datad *d, ggobid *gg)
 
   limits_set (false, true, d);  
   for (k=0; k<ncols; k++) {
-    vartable_limits_set_by_var (j, d);
-    vartable_stats_set_by_var (j, d);
-    tform_to_world_by_var (j, d, gg);
+    vartable_limits_set_by_var (k, d);
+    vartable_stats_set_by_var (k, d);
+    tform_to_world_by_var (k, d, gg);
   }
 
   /*
