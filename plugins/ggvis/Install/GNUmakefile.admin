@@ -4,7 +4,7 @@ endif
 
 DIR_NAME=ggvis
 
-#DOCS=
+DOCS=ggvis.pdf
 
 include $(GGOBI_HOME)/plugins/GNUmakefile.PluginAdmin
 
