@@ -420,20 +420,22 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Quit",    "<ctrl>Q",     quit_ggobi,  0 },
 
-  { "/_Window",                            NULL,   
-    NULL,        0,    "<Branch>" },
-  { "/Window/New scatterplot",                      "",
-    display_new, scatterplot },
-  { "/Window/New scatterplot matrix",               "",
-    display_new, scatmat },
-  { "/Window/New parallel coordinates plot",        "",
-    display_new, parcoords },
-  { "/Window/sep",     NULL,     NULL,          0, "<Separator>" },
-  { "/Window/MISSING VALUES PLOTS", NULL, NULL, 0, "" },
-  { "/Window/New scatterplot",        "",
-    display_new, 3 },
-  { "/Window/New scatterplot matrix", "",
-    display_new, 4 },
+/*
+ *{ "/_Window",                            NULL,   
+ *  NULL,        0,    "<Branch>" },
+ *{ "/Window/New scatterplot",                      "",
+ *  display_new, scatterplot },
+ *{ "/Window/New scatterplot matrix",               "",
+ *  display_new, scatmat },
+ *{ "/Window/New parallel coordinates plot",        "",
+ *  display_new, parcoords },
+ *{ "/Window/sep",     NULL,     NULL,          0, "<Separator>" },
+ *{ "/Window/MISSING VALUES PLOTS", NULL, NULL, 0, "" },
+ *{ "/Window/New scatterplot",        "",
+ *  display_new, 3 },
+ *{ "/Window/New scatterplot matrix", "",
+ *  display_new, 4 },
+*/
 
   { "/_Tools",        NULL,         NULL, 0, "<Branch>" },
   { "/Tools/Variable statistics ...", 
@@ -454,6 +456,10 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/Tools/Impute missing values ...", 
                       NULL,         impute_window_open,    0, NULL },
 
+/*
+ * this code in display.c actually corresponds to the "Window" menu,
+ * not this one, which is really just display options.
+*/
   { "/_Display",      NULL,         NULL, 0, "<Branch>" },
   { "/Display/Show tooltips",  
                       "<ctrl>t",    main_display_options_cb, 0, "<CheckItem>" },
@@ -493,6 +499,7 @@ quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
  gtk_main_quit();
 }
 
+extern void display_menu_init (ggobid *);
 void 
 make_ui (ggobid *gg) {
   GtkWidget *window;
@@ -527,6 +534,8 @@ make_ui (ggobid *gg) {
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
                  gg->main_accel_group, window,
                  &gg->main_menubar, (gpointer) gg);
+
+  display_menu_init (gg);
 
   gtk_box_pack_start (GTK_BOX (vbox), gg->main_menubar, false, true, 0);
 

@@ -167,22 +167,25 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   return (display);
 }
 
+/*
 void
 display_new (ggobid *gg, guint action, GtkWidget *widget)
 {
   display_create (action, gg);
 }
+*/
 
 displayd *
-display_create (guint action, ggobid *gg)
+display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
 {
   displayd *display;
   gint *selected_vars, nselected_vars = 0;
 
-  /*-- by default, use the 0th datad in the list --*/
-  datad *d = (datad *) g_slist_nth_data (gg->d, 0);
-
   if (d == NULL || d->nrows == 0)  /*-- if used before we have data --*/
+    return (NULL);
+
+  /*-- if trying to make a missing values plot without missing data --*/
+  if (missing_p && d->nmissing == 0) 
     return (NULL);
 
   /*-- find out what variable are selected in the var statistics panel --*/
@@ -195,14 +198,14 @@ display_create (guint action, ggobid *gg)
   */
   splot_set_current (gg->current_splot, off, gg);
 
-  switch (action) {
+  switch (displaytype) {
 
     case 0:
-      display = scatterplot_new (false, NULL, d, gg);
+      display = scatterplot_new (missing_p, NULL, d, gg);
       break;
 
     case 1:
-      display = scatmat_new (false,
+      display = scatmat_new (missing_p,
         nselected_vars, selected_vars, nselected_vars, selected_vars,
         d, gg);
       break;
@@ -217,19 +220,6 @@ display_create (guint action, ggobid *gg)
       /* vardialog_open (gg, "Select variables for plotting"); */
 
       display = parcoords_new (false, nselected_vars, selected_vars, d, gg);
-      break;
-
-    case 3:  /*-- scatterplot of missing values --*/
-      if (d->nmissing)
-        display = scatterplot_new (true, NULL, d, gg);
-
-      break;
-
-    case 4:  /*-- scatterplot matrix of missing values --*/
-      if (d->nmissing)
-        display = scatmat_new (true,
-          nselected_vars, selected_vars, nselected_vars, selected_vars,
-          d, gg);
       break;
 
     default:

@@ -99,7 +99,7 @@ extern void ctourpp_window_open (ggobid *);
 extern void datad_free (datad *, ggobid *);
 extern gint display_add(displayd *display, ggobid *);
 extern void display_close_cb (displayd *d, guint, GtkWidget *);
-extern displayd* display_create(guint action, ggobid *);
+extern displayd* display_create (gint displaytype, gboolean missing_p, datad *, ggobid *);
 extern void display_delete_cb (GtkWidget *, GdkEvent *, displayd *);
 extern void display_free (displayd *, gboolean force, ggobid *);
 extern void display_free_all (ggobid *);

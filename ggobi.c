@@ -208,9 +208,9 @@ ggobi_close(GtkObject *w, ggobid *gg)
 }
 
 
-/* Key for storing a reference to a ggobid instance
-   in a widget so that we can retrieve it within
-   a callback.
+/*
+   Key for storing a reference to a ggobid instance in a widget
+   so that we can retrieve it within a callback.
 */
 const gchar * const GGobiGTKey = "GGobi";
 

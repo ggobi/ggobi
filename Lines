@@ -74,4 +74,4 @@
 30292   7/11  added random number generator
 
 note: There are about 40.8K lines in xgobi,
-subtracting the rpc, xgvis and tour code.
+       subtracting the rpc, xgvis and tour code.

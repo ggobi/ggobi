@@ -22,7 +22,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  pipeline.c missing.c \
  scatterplot.c scatterplot_ui.c \
  splot.c sp_plot.c win32_draw.c \
- display.c \
+ display.c display_ui.c \
  p1d_ui.c p1d.c ash1d.c texture.c \
  xyplot_ui.c xyplot.c \
  rotate_ui.c \
@@ -51,7 +51,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  pipeline.o missing.o \
  scatterplot.o scatterplot_ui.o \
  splot.o sp_plot.o win32_draw.o \
- display.o \
+ display.o display_ui.o \
  p1d_ui.o p1d.o ash1d.o texture.o \
  xyplot_ui.o xyplot.o \
  rotate_ui.o \
