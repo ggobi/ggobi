@@ -1,0 +1,9 @@
+This plugin is a meta-plugin that provides the R engine within ggobi
+and this can be used to implement other plugins using the S
+programming language.  Using the RGtk and RGgobi packages, one can
+develop quite sophisticated facilities in GGobi using an interpreted
+language.
+
+This is similar in spirit to the Java Virtual Machine plugin.
+
+

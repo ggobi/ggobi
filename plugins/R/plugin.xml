@@ -1,0 +1,15 @@
+<plugin name="R">
+   <description>Loads the R engine for use by other plugins</description>
+   <author>Duncan Temple Lang</author>
+   <options>
+    <named>
+     <init>print(rnorm(10))</init>
+    </named>
+    <args>
+     <arg>--slave</arg>
+    </args>
+   </options>
+   <dll name="/home/duncan/Projects/ggobi/ggobi/plugins/R/Rplugin.so">
+    <init onLoad="loadR" />
+  </dll>
+</plugin>
