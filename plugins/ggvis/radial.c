@@ -33,6 +33,23 @@ GList * list_concat_uniq (GList *a, GList *b)
   return ab;
 }
 
+static 
+GList * list_subset_uniq (GList *full)
+{
+  GList *l, *uniq = NULL;
+/*
+ * If a list element is not already a member of the unique list,
+ * add it.
+*/
+
+  for (l = full; l; l = l->next) {
+    if (g_list_position (uniq, l) == -1)
+      uniq = g_list_append (uniq, l->data);
+  }
+
+  return uniq;
+}
+
 static
 void list_clear (GList *ab)
 {
@@ -53,7 +70,8 @@ hasPathToCenter (noded *n, noded *referringnode, datad *d, datad *e,
   noded *n1;
   ggvisd *ggv = GGVisFromInst (inst);
   noded *centerNode = ggv->radial->centerNode;
-  GList *l, *connectedEdges = list_concat_uniq (n->inEdges, n->outEdges);
+  /*GList *l, *connectedEdges = list_concat_uniq (n->inEdges, n->outEdges);*/
+  GList *l, *connectedEdges = list_subset_uniq (n->connectedEdges);
 
   for (l = connectedEdges; l; l = l->next) {
     k = GPOINTER_TO_INT (l->data);
@@ -144,10 +162,16 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
       x[i] = n->pos.x;
       y[i] = n->pos.y;
       depth[i] = (gdouble) n->nStepsToCenter;
+/*
       inDegree[i] = (gdouble) g_list_length (n->inEdges);
       outDegree[i] = (gdouble) g_list_length (n->outEdges);
+*/
+      inDegree[i] = (gdouble) n->inDegree;
+      outDegree[i] = (gdouble) n->outDegree;
 
-      connectedNodes = list_concat_uniq (n->srcNodes, n->destNodes);
+      /*connectedNodes = list_concat_uniq (n->srcNodes, n->destNodes);*/
+      connectedNodes = list_subset_uniq (n->connectedNodes);
+
       nP = nC = nS = 0;
       for (l = connectedNodes; l; l = l->next) {
         n1 = (noded *) l->data;
@@ -223,7 +247,10 @@ void highlight_sticky_edges (GtkWidget *w, gint index, gint state, datad *d,
 
   n = &ggv->radial->nodes[index];
 
+/*
   connectedNodes = list_concat_uniq (n->srcNodes, n->destNodes);
+*/
+  connectedNodes = list_subset_uniq (n->connectedNodes);
   connectedNodes = g_list_append (connectedNodes, n);
   for (l = connectedNodes; l; l = l->next) {
     n1 = (noded *) l->data;
@@ -236,7 +263,8 @@ void highlight_sticky_edges (GtkWidget *w, gint index, gint state, datad *d,
   }
   list_clear (connectedNodes);
 
-  connectedEdges = list_concat_uniq (n->inEdges, n->outEdges);
+  /*connectedEdges = list_concat_uniq (n->inEdges, n->outEdges);*/
+  connectedEdges = list_subset_uniq (n->connectedEdges);
   for (l = connectedEdges; l; l = l->next) {
     k = GPOINTER_TO_INT (l->data);
     if (k < 0 || k >= e->nrows)
@@ -292,10 +320,14 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
   if (ggv->radial != NULL) {
     nn = sizeof (ggv->radial->nodes) / sizeof (ggv->radial);
     for (i=0; i < nn; i++) {
+      g_list_free (ggv->radial->nodes[i].connectedEdges);
+      g_list_free (ggv->radial->nodes[i].connectedNodes);
+/*
       g_list_free (ggv->radial->nodes[i].inEdges);
       g_list_free (ggv->radial->nodes[i].outEdges);
       g_list_free (ggv->radial->nodes[i].srcNodes);
       g_list_free (ggv->radial->nodes[i].destNodes);
+*/
     }
     g_free (ggv->radial->nodes);
   }
@@ -306,10 +338,16 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
 
   for (i = 0; i <nnodes; i++) {
     k = d->rows_in_plot[i];  /* not used yet */
+    ggv->radial->nodes[i].connectedEdges = NULL;
+    ggv->radial->nodes[i].connectedNodes = NULL;
+    ggv->radial->nodes[i].inDegree = 0;
+    ggv->radial->nodes[i].outDegree = 0;
+/*
     ggv->radial->nodes[i].inEdges = NULL;
     ggv->radial->nodes[i].outEdges = NULL;
     ggv->radial->nodes[i].srcNodes = NULL;
     ggv->radial->nodes[i].destNodes = NULL;
+*/
     ggv->radial->nodes[i].subtreeSize = 0;
     ggv->radial->nodes[i].nChildren = 0;
     ggv->radial->nodes[i].nStepsToCenter = nnodessq;
@@ -342,12 +380,25 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
         nb = &ggv->radial->nodes[b];
 
         /*-- add i to outEdges for na, and to inEdges for nb --*/
+/*
         na->outEdges = g_list_append (na->outEdges, GINT_TO_POINTER (i));
         nb->inEdges = g_list_append (nb->inEdges, GINT_TO_POINTER (i));
+*/
+        nb->connectedNodes = g_list_append (nb->connectedNodes, na);
+        nb->connectedEdges = g_list_append (nb->connectedEdges,
+          GINT_TO_POINTER (i));
+        nb->inDegree++;
+
+        na->connectedNodes = g_list_append (na->connectedNodes, nb);
+        na->connectedEdges = g_list_append (na->connectedEdges,
+          GINT_TO_POINTER (i));
+        na->outDegree++;
 
         /*-- add b to destNodes for na, and a to srcNodes for nb --*/
+/*
         na->destNodes = g_list_append (na->destNodes, nb);
         nb->srcNodes = g_list_append (nb->srcNodes, na);
+*/
       }
     }
   }
@@ -358,7 +409,10 @@ setNStepsToCenter (noded *n, noded *prevNeighbor) {
   noded *n1;
   gint nsteps = n->nStepsToCenter + 1;
   GList *l;
+/*
   GList *connectedNodes = list_concat_uniq (n->srcNodes, n->destNodes);
+*/
+  GList *connectedNodes = list_subset_uniq (n->connectedNodes);
 
   /*-- source nodes: ie, the edge originates here --*/
   for (l = connectedNodes; l; l = l->next) {
@@ -432,7 +486,10 @@ static void
 childNodes (GList **children, noded *n) {
   GList *l;
   noded *n1;
+/*
   GList *connectedNodes = list_concat_uniq (n->srcNodes, n->destNodes);
+*/
+  GList *connectedNodes = list_subset_uniq (n->connectedNodes);
 
   for (l = connectedNodes; l; l = l->next) {
     n1 = (noded *) l->data;
