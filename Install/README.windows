@@ -105,11 +105,14 @@ DOWNLOAD_DIR=C:\users\aashish\projects\Win32\april09\GGobiLibs to the
 location where you have GGobiLibs folder )
 
 Copy the files developerConfigure.in, s_erf.c, ggobiMain.c, ggobi.def
-from the src_zip directory into ggobi/src.
+from the src_zip directory into ggobi/src. (These files are missing
+from the tar.gz, or ggobi.def is needed for Windows compilation to be
+able to call functions from dlls, but its is incomplete or missing
+from the tar.gz!)
 
 Copy all the dlls from src_zip/dlls to ggobi/src/.
 
-The final step is to type "make -f Makefile.win32.1.0-1-beta. 
+The final step is to type "make -f Makefile.win32.1.0-1-beta". 
 
 If you have trouble send email to ggobi-help@ggobi.org, complete with
 the error messages you got in the cygwin window. We'll aim to help as
