@@ -444,9 +444,10 @@ cpanel_scale_make (ggobid *gg) {
   gtk_container_add (GTK_CONTAINER (f), hbox);
 
   gg->scale.pan_radio = gtk_radio_button_new_with_label (NULL, "Pan");
+  gtk_widget_set_sensitive (gg->scale.pan_radio, false);
   GTK_TOGGLE_BUTTON (gg->scale.pan_radio)->active = true;
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->scale.pan_radio,
-    "Activate panning for click style interaction (use space bar)",
+    "Pan: Hit the space bar to pan. A vector drawn on the plot dictates direction and distance. Drag the mouse to control the vector, and keep it small.  To reset, use `Reset pan' under the main menubar",
     NULL);
   gtk_signal_connect (GTK_OBJECT (gg->scale.pan_radio), "toggled",
                       GTK_SIGNAL_FUNC (clickoptions_cb), gg);
@@ -454,8 +455,10 @@ cpanel_scale_make (ggobid *gg) {
 
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (gg->scale.pan_radio));
   gg->scale.zoom_radio = gtk_radio_button_new_with_label (group, "Zoom");
+  gtk_widget_set_sensitive (gg->scale.zoom_radio, false);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->scale.zoom_radio,
-    "Activate zooming for click style interaction (use i and o keys to zoom in and out)", NULL);
+    "Zoom: hit > to zoom in and < to zoom out. A rectangle drawn on the plot dictates the degree of zoom. Drag the mouse to control the rectangle, and keep it large. To reset, use `Reset zoom' under the main menubar",
+    NULL);
   gtk_box_pack_start (GTK_BOX (hbox), gg->scale.zoom_radio, TRUE, TRUE, 0);
 
 /*
