@@ -45,6 +45,10 @@ edges_free (datad *d, ggobid *gg)
 /*               Add and delete edges                              */
 /* --------------------------------------------------------------- */
 
+/**
+  Allocated space for another edge observation and set the
+  locations of the rows.
+ */
 gboolean
 edge_add (gint a, gint b, datad *d, datad *e)
 {
@@ -70,15 +74,40 @@ edge_add (gint a, gint b, datad *d, datad *e)
 /*               Add an edgeset                                    */
 /* --------------------------------------------------------------- */
 
+
+/**
+  This sets the data set as the source of the edge information
+  for all the plots withing the display.
+ */
+datad *
+setDisplayEdge(displayd *dpy, datad *e)
+{
+  GList *l;
+  datad *old;
+
+  dpy->e = e;
+  for (l=dpy->splots; l; l=l->next) {
+      splotd *sp;
+      sp = (splotd *) l->data;
+      splot_edges_realloc (sp, e, e->gg);
+  }
+  return(old);   
+}
+
+/**
+  This looks for the first dataset that can be used
+  as a source of edge information with the point dataset
+  associated with the given display.
+
+  @see setDisplayEdge.
+ */
 gboolean
 edgeset_add (displayd *display)
 {
   datad *d = display->d;
   datad *e;
   gint k;
-  GList *l;
   gboolean added = false;
-  splotd *sp;
   ggobid *gg = GGobiFromDisplay (display);
 
   if (gg->d != NULL) {
@@ -88,13 +117,7 @@ edgeset_add (displayd *display)
       for (k=0; k<nd; k++) { 
         e = (datad*) g_slist_nth_data (gg->d, k);
         if (e != d && e->edge.n > 0) {
-          display->e = e;
-
-          /*-- allocate sp->edges --*/
-          for (l=display->splots; l; l=l->next) {
-            sp = (splotd *) l->data;
-            splot_edges_realloc (sp, e, gg);
-          }
+          setDisplayEdge(display, e);
           added = true;
           break;
         }
@@ -104,21 +127,19 @@ edgeset_add (displayd *display)
   return added;
 }
 
+/**
+ Invoked when the user selected an item in the Edges menu 
+ on a scatterplot to control whether edges are displayed or not
+ on the plot.
+ */
 void
 edgeset_add_cb (GtkWidget *w, datad *e) {
   displayd *display = (displayd *) gtk_object_get_data (GTK_OBJECT (w),
     "display");
 
   ggobid *gg = GGobiFromWidget (w, true);
-  GList *l;
-  splotd *sp;
 
-  display->e = e;
-
-  for (l=display->splots; l; l=l->next) {
-    sp = (splotd *) l->data;
-    splot_edges_realloc (sp, e, gg);
-  }
+  setDisplayEdge(display, e);
 
   display_plot (display, FULL, gg);  /*- moving edge drawing */
 
