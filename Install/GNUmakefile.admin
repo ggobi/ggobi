@@ -72,7 +72,7 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
 	cp Install/bugTemplate.in $(TMP_INSTALL_DIR)/
 	cp VersionInfo $(TMP_INSTALL_DIR)/src
 	cp Makefile.win32 $(TMP_INSTALL_DIR)/src
-	cp $(DOC_FILES) $(TMP_INSTALL_DIR)/Docs
+	if test -n "${DOC_FILES}" ; then cp $(DOC_FILES) $(TMP_INSTALL_DIR)/Docs ; fi
 	cp $(DATA_FILES) $(TMP_INSTALL_DIR)/data
 	cp $(C_SRC_FILES) $(TMP_INSTALL_DIR)/src
 	cp $(C_HEADER_FILES:%=%.h) $(TMP_INSTALL_DIR)/include
