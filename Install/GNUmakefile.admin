@@ -61,8 +61,9 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
 	cp $(LICENSES:%=LICENSING/%) Install/INSTALL Install/README $(TMP_INSTALL_DIR)
 	cp Install/configure.in Install/configure  Install/Makeconf.in Install/GNUmakefile.in $(TMP_INSTALL_DIR)
 	cp Install/GNUmakefile_src.in $(TMP_INSTALL_DIR)/src/GNUmakefile.in
-	cp Install/setLD.bsh.in Install/setLD.csh.in $(TMP_INSTALL_DIR)/bin
+	cp Install/setLD.bsh.in Install/setLD.csh.in Install/ggobi-config.in $(TMP_INSTALL_DIR)/bin
 	cp Install/ggobi.in $(TMP_INSTALL_DIR)/bin
+	cp VersionInfo $(TMP_INSTALL_DIR)/src
 	cp Makefile.win32 $(TMP_INSTALL_DIR)/src
 	cp $(DOC_FILES) $(TMP_INSTALL_DIR)/Docs
 	cp $(DATA_FILES) $(TMP_INSTALL_DIR)/data

@@ -1,0 +1,45 @@
+#!/bin/sh
+
+#
+# This is intended to be the equivalent of gtk-config
+# to allow other packages/software that want to locate the
+# header/include files and libraries for a ggobi source
+#
+# --libs
+# --cflags
+# --version
+
+TOP=@TOP@
+VERSION="@MAJOR_VERSION@.@MINOR_VERSION@-@PATCH_LEVEL@"
+
+CFLAGS="@SRC_CFLAGS@"
+
+XML_LIB_DIRS="@XML_LIB_DIRS@"
+XML_LIB_DIRS_PATH="@XML_LIB_DIRS_PATH@"
+
+LIBS="@SRC_LIBS@"
+
+GTK_CFLAGS=`@GTK_CONFIG@ --cflags`
+GTK_LIBS=`@GTK_CONFIG@ --libs`
+
+case $1 in
+   "--v")
+          echo "${VERSION}"
+          shift ;;
+   "--cflags") 
+          echo "${CFLAGS}"
+          shift ;;
+   "--libs")
+        echo "${LIBS}"
+        shift ;;
+   "--xml-support")
+        echo "@SUPPORTS_XML@" ;;
+   "--xml-libs")
+         echo "${XML_LIB_DIRS}"
+         shift ;;
+   "--xml-path")
+         echo "${XML_LIB_DIRS_PATH}"
+         shift ;;
+   "*") echo "Unrecognized argument $1"
+          shift ;;
+esac

@@ -850,7 +850,7 @@ getFileDirectory(const gchar *filename)
 {
 
  char *tmp;
-  tmp =  strrchr(filename, DIR_SEPARATOR);
+  tmp =  strrchr(filename, G_DIR_SEPARATOR);
   if(tmp) {
     int n = tmp - filename + 2;
     tmp = (char*) g_malloc(n*sizeof(char));
@@ -888,7 +888,7 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
     /* If filename starts with a /, so it is an absolute name,
        then ignore the directory argument.
      */
-  if(filename[0] == DIR_SEPARATOR)
+  if(filename[0] == G_DIR_SEPARATOR)
     dirlen = 0;
 
   for(i = 0; i < nsuffixes;i++) {

@@ -11,8 +11,10 @@ dnl      Properties library from Omega.
 dnl This also determines where the gtk-config
 dnl executable is.
 
-
 AC_INIT(src/ggobi.c)
+
+
+. src/VersionInfo
 
 GGOBI_HOME=`pwd` 
 
@@ -196,6 +198,14 @@ AC_SUBST(USE_XML)
 AC_SUBST(XML_CFLAG_DEFINES)
 AC_SUBST(USE_MYSQL)
 
+if test -n "${USE_XML}" ; then
+  SUPPORTS_XML="yes"
+else
+  SUPPORTS_XML="no"
+fi
+
+AC_SUBST(SUPPORTS_XML)
+
 AC_SUBST(XML_SRC)
 AC_SUBST(MYSQL_SRC)
 
@@ -215,6 +225,19 @@ AC_SUBST(PACKAGES)
 AC_SUBST(R_PKG_DIR)
 AC_SUBST(R_BIN)
 
-AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi)
+AC_SUBST(MAJOR_VERSION)
+AC_SUBST(MINOR_VERSION)
+AC_SUBST(PATCH_LEVEL)
+
+AC_SUBST(GTK_CONFIG)
+
+SRC_CFLAGS="-I${TOP}/include"
+SRC_LIBS="-L${TOP}/lib -lggobi"
+AC_SUBST(SRC_CFLAGS)
+AC_SUBST(SRC_LIBS)
+
+
+AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config)
 
 chmod +x bin/ggobi
+chmod +x bin/ggobi-config
