@@ -728,10 +728,10 @@ wvis_window_open (ggobid *gg) {
 
     gtk_box_pack_start (GTK_BOX (vbs), opt, true, false, 1);
 
-    btn = gtk_button_new_with_label ("Set color scheme");
+    btn = gtk_button_new_with_label ("Apply color scheme to brushing colors");
     gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Make this the current color scheme in ggobi, preserving current groups",
+      "Make this the current color scheme for brushing in ggobi, preserving current groups.  If the number of groups is less than the highest index of a currently-used color, this won't work.",
       NULL);
     gtk_box_pack_start (GTK_BOX (vbs), btn, false, false, 0);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",

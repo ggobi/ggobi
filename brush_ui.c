@@ -389,7 +389,7 @@ cpanel_brush_make (ggobid *gg) {
   btn = gtk_check_button_new_with_label ("Brush on");
   gtk_widget_set_name (btn, "BRUSH:brush_on_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Make the brush active or inactive", NULL);
+    "Make the brush active or inactive.  Drag the left button to brush and the right or middle button  to resize the brush.", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
                      GTK_SIGNAL_FUNC (brush_on_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
