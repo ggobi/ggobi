@@ -31,7 +31,7 @@ static gchar *varpanel_names[] = {"xtoggle", "ytoggle", "ztoggle", "label"};
 
 
 /*-- return the hbox --*/
-static GtkWidget *
+GtkWidget *
 varpanel_container_get_nth (gint jvar, datad *d)
 {
   GtkWidget *w;

@@ -14,23 +14,25 @@ extern "C" {
 void       cpanel_t2d3_init (cpaneld *, ggobid *);
 void       cpanel_tour2d3_make (ggobid *);
 void       cpanel_tour2d3_set (cpaneld *, ggobid *);
-void       tour2d3_func (gboolean state, displayd *, ggobid *);
-void       tour2d3_menus_make (ggobid *);
-gboolean   tour2d3_varsel (GtkWidget *, gint jvar, gint button, datad *, ggobid *);
-void       tour2d3_projdata (splotd *, greal **world_data, datad *, ggobid *);
-void       tour2d3_speed_set (gint, ggobid *);
-void       tour2d3_pause (cpaneld *, gint, ggobid *);
-void       tour2d3_reinit (ggobid *);
-void       tour2d3_manip_end (splotd *);
-void       tour2d3_scramble (ggobid *);
-void       tour2d3_manip (gint, gint, splotd *, ggobid *);
-void       tour2d3_manip_init (gint, gint, splotd *);
-void       tour2d3_event_handlers_toggle (splotd *, gboolean state);
 void       display_tour2d3_init (displayd *, ggobid *);
 void       display_tour2d3_init_null (displayd *, ggobid *);
+void       tour2d3_event_handlers_toggle (splotd *, gboolean state);
+void       tour2d3_func (gboolean state, displayd *, ggobid *);
+void       tour2d3_manip (gint, gint, splotd *, ggobid *);
+void       tour2d3_manip_end (splotd *);
+void       tour2d3_manip_init (gint, gint, splotd *);
+void       tour2d3_menus_make (ggobid *);
+void       tour2d3_pause (cpaneld *, gint, ggobid *);
+void       tour2d3_projdata (splotd *, greal **world_data, datad *, ggobid *);
+void       tour2d3_realloc_up (gint nc, datad *d, ggobid *gg);
+void       tour2d3_reinit (ggobid *);
+void       tour2d3_scramble (ggobid *);
+void       tour2d3_speed_set (gint, ggobid *);
+gboolean   tour2d3_varsel (GtkWidget *, gint jvar, gint button, datad *, ggobid *);
 #endif
 
 /* sort +1 */
+GtkWidget* varpanel_widget_get_nth (gint jbutton, gint jvar, datad *d);
 void       showInputDescription(InputDescription *desc, ggobid *gg);
 void       initSessionOptions(void);
 gint       parse_command_line (gint *argc, gchar **av);
