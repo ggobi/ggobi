@@ -60,11 +60,7 @@ static void stage2_cb (GtkWidget *w, gpointer cbd)
   datad *d = gg->current_display->d;
   gint indx = GPOINTER_TO_INT (cbd);
 
-  if (indx == SPHERE) {
-    sphere_panel_open (gg);
-  } else {
-    transform (2, indx, -99, d, gg);
-  }
+  transform (2, indx, -99, d, gg);
 }
 
 static void tform_reset_cb (GtkWidget *w, ggobid *gg)
@@ -131,7 +127,7 @@ transform_window_open (ggobid *gg)
     gg->tform_ui.stage0_opt = gtk_option_menu_new ();
     gtk_container_set_border_width (GTK_CONTAINER (gg->tform_ui.stage0_opt), 4);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->tform_ui.stage0_opt,
-      "Stage 1: Adjust the domain of the variables",
+      "Stage 0: Adjust the domain of the variables",
       NULL);
     populate_option_menu (gg->tform_ui.stage0_opt, stage0_lbl,
                           sizeof (stage0_lbl) / sizeof (gchar *),
@@ -151,7 +147,7 @@ transform_window_open (ggobid *gg)
 
     gg->tform_ui.stage1_opt = gtk_option_menu_new ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->tform_ui.stage1_opt,
-      "Stage 2: Power transformations et al",
+      "Stage 1: Power transformations et al",
       NULL);
     populate_option_menu (gg->tform_ui.stage1_opt, stage1_lbl,
                           sizeof (stage1_lbl) / sizeof (gchar *),
@@ -179,7 +175,7 @@ transform_window_open (ggobid *gg)
 		                (gpointer) gg);
 
     /*
-     * Stage 2: Sorting and permutation
+     * Stage 2: Another standardization step
     */
     frame = gtk_frame_new ("Stage 2");
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
@@ -188,7 +184,7 @@ transform_window_open (ggobid *gg)
     gg->tform_ui.stage2_opt = gtk_option_menu_new ();
     gtk_container_set_border_width (GTK_CONTAINER (gg->tform_ui.stage2_opt), 4);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->tform_ui.stage2_opt,
-      "Stage 3: Permutation, sorting, and sphering", NULL);
+      "Stage 2: Standardization", NULL);
     populate_option_menu (gg->tform_ui.stage2_opt, stage2_lbl,
                           sizeof (stage2_lbl) / sizeof (gchar *),
                           (GtkSignalFunc) stage2_cb, gg);

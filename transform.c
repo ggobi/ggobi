@@ -600,13 +600,6 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
     case STANDARDIZE2:
       d->vartable[j].collab_tform = g_strdup_printf ("(%s-m)/s", lbl1);
       break;
-    case PERMUTE:
-      break;
-    case SORT:
-      break;
-    case SPHERE:
-      d->vartable[j].collab_tform = g_strdup_printf ("PC%d", j+1);
-      break;
   }
 
   g_free ((gpointer) lbl0);
@@ -623,9 +616,6 @@ void tform_label_update (gint jcol, datad *d, ggobid *gg)
 
   /*-- update the variable statistics table --*/
   vartable_tform_set (jcol, d, gg);
-
-  /*-- adjust the settings on the transformation panel --*/
-/*  transform_opt_menus_set_history (jcol, d, gg);*/
 }
 
 /*---------------------------------------------------------------------*/

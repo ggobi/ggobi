@@ -200,12 +200,9 @@ extern const gint ViewTypeIndeces[3];
 #define NORMSCORE    9
 #define ZSCORE      10
 
-#define N2TFORMS 3
+#define N2TFORMS 2
 #define NO_TFORM2    0
 #define STANDARDIZE2 1
-#define PERMUTE      2
-#define SORT         3
-#define SPHERE       4
 
 
 /*
