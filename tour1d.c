@@ -270,7 +270,7 @@ void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
 void 
 tour1dvar_set (gint jvar, ggobid *gg)
 {
-  gint j, jtmp, k;
+  gint j, k;
   gboolean active=false;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
@@ -312,6 +312,7 @@ tour1dvar_set (gint jvar, ggobid *gg)
       dsp->t1d.vars.els[0] = jvar;
     }
     else {
+      gint jtmp = dsp->t1d.nvars;
       for (j=0; j<dsp->t1d.nvars-1; j++) {
         if (jvar > dsp->t1d.vars.els[j] && jvar < dsp->t1d.vars.els[j+1]) {
           jtmp = j+1;

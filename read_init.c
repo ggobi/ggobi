@@ -60,7 +60,9 @@ read_init_file(const char *filename)
 
   getPreviousFiles(doc, info);
   getPreviousGGobiDisplays(doc, info);
+#if SUPPORT_PLUGINS
   getPlugins(doc, info);
+#endif
 
   xmlDoValidityCheckingDefaultValue = oldValiditySetting;
 
@@ -195,20 +197,23 @@ gint
 getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info)
 {
   xmlNode *node, *el;
-  GGobiDescription *desc;
+  GGobiDescription *desc = NULL;
   gint i;
   node = getXMLDocElement(doc, "ggobis"); 
   el = XML_CHILDREN(node);
   i = 0;
   while(el) {
     if(el->type != XML_TEXT_NODE && strcmp(el->name,"ggobi") == 0) {
-    /* Need to match these with the input source ids. */
+        /* Need to match these with the input source ids. */
       desc = info->descriptions + i;
       getPreviousDisplays(el, desc);
       i++;
     }
     el = el->next;
   }
+
+  if(!desc)
+    return(-1);
 
   return(g_list_length(desc->displays));
 }
@@ -292,6 +297,7 @@ getDisplayType(const xmlChar *type)
 
 /*****************************************************************/
 
+#if SUPPORT_PLUGINS
 /*
  Handle the plugins section, looping over each <plugin>
  tag and passing it processPlugin().
@@ -406,6 +412,8 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   return(plugin);
 }
 
+#endif /* end of SUPPORT_PLUGINS */
+
 gint resolveVariableName(const gchar *name, datad *d);
 
 displayd *
@@ -435,6 +443,8 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
       dpy = GGOBI(newTimeSeries)(vars, desc->numVars, data, gg);
     break;
     case unknown_display_type:
+    default:
+      dpy = NULL;
     break;
   }
 

@@ -387,7 +387,7 @@ void tourcorr_pause (cpaneld *cpanel, gboolean state, ggobid *gg)
 void 
 tourcorr_horvar_set (gint jvar, ggobid *gg)
 {
-  gint j, jtmp, k;
+  gint j, k;
   gboolean active=false;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
@@ -428,6 +428,7 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
       dsp->tcorr1.vars.els[0] = jvar;
     }
     else {
+      gint jtmp = dsp->tcorr1.nvars;
       for (j=0; j<dsp->tcorr1.nvars-1; j++) {
         if (jvar > dsp->tcorr1.vars.els[j] && jvar < 
           dsp->tcorr1.vars.els[j+1]) {
@@ -449,7 +450,7 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
 void 
 tourcorr_vervar_set (gint jvar, ggobid *gg)
 {
-  gint j, jtmp, k;
+  gint j, k;
   gboolean active=false;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
@@ -491,6 +492,7 @@ tourcorr_vervar_set (gint jvar, ggobid *gg)
       dsp->tcorr2.vars.els[0] = jvar;
     }
     else {
+      gint jtmp = dsp->tcorr2.nvars;
       for (j=0; j<dsp->tcorr2.nvars-1; j++) {
         if (jvar > dsp->tcorr2.vars.els[j] && jvar < dsp->tcorr2.vars.els[j+1])
         {
@@ -856,7 +858,6 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gfloat xcosphi=1., xsinphi=0., ycosphi=1., ysinphi=0.;
-  gfloat distx, disty;
   gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
   gint actual_nxvars = dsp->tcorr1.nvars, actual_nyvars = dsp->tcorr2.nvars;
   gint j;
@@ -881,6 +882,7 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
     if (actual_nxvars > 0 || actual_nyvars > 0)
     {
+      gfloat distx = 0, disty = 0;
       if (dsp->tc_manip_mode == CMANIP_VERT)
       {
         distx = 0.;

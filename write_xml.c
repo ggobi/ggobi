@@ -161,7 +161,7 @@ gboolean
 write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
-  gchar *gstr, *gtypestr;
+  gchar *gstr, *gtypestr = NULL;
   gboolean gsize_p = false, gtype_p = false;
 
   fprintf(f, "<record");
@@ -206,6 +206,9 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
       break;
     case POINT_GLYPH:
       gtypestr = ".";
+      break;
+    default:
+      gtypestr=NULL;
       break;
   }
 

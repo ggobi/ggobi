@@ -437,7 +437,7 @@ tagType(const xmlChar *name, gboolean endTag)
 void 
 Characters(void *user_data, const xmlChar *ch, int len)
 {
- char *tmp;
+ char *tmp = NULL;
  int dlen = len;
  const xmlChar *c;
  XMLParserData *data = (XMLParserData*)user_data;

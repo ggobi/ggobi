@@ -1,5 +1,7 @@
 #include "plugin.h"
+#ifndef WIN32
 #include <dlfcn.h>
+#endif
 
 #include <stdio.h>
 

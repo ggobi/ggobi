@@ -15,7 +15,8 @@ include local.config
 LOCAL_INCLUDES=../include
 # -g -ggdb
 CFLAGS= -O2 -ansi -Wall  -mno-cygwin -mpentium \
-         -fnative-struct -mwindows   $(INCLUDES:%=-I%)
+         -fnative-struct -mwindows   $(INCLUDES:%=-I%) \
+         -DWIN32=1
 
 
 SRC= ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
@@ -28,7 +29,7 @@ SRC= ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
  p1d_ui.c p1d.c ash1d.c texture.c \
  xyplot_ui.c xyplot.c \
  rotate_ui.c \
- tour2d_ui.c tour.c pp_ui.c \
+ tour2d.c tour2d_pp.c tour2d_ui.c tour.c tour_pp.o tour1d_pp_ui.o \
  ctour_ui.c cpp_ui.c \
  brush_ui.c brush.c brush_init.c brush_bins.c brush_api.c color_ui.c xlines.c \
  exclusion_ui.c exclusion.c \
@@ -45,7 +46,14 @@ SRC= ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
  display_tree.c \
  noop-checkbutton.c \
  ggobi-API.c  s_erf.c  \
- limits.c timeplot.c  edges.c
+ limits.c timeplot.c  edges.c \
+\
+ read_color.c read_init.c \
+ wvis_ui.c write_state.c \
+
+# plugin.c
+
+# pp_ui.c
 
 OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  menus.o splash.o \
@@ -58,7 +66,7 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  p1d_ui.o p1d.o ash1d.o texture.o \
  xyplot_ui.o xyplot.o \
  rotate_ui.o \
- tour2d_ui.o tour.o pp_ui.o \
+ tour2d.o tour2d_pp.o tour2d_ui.o tour.o tour_pp.o tour1d_pp_ui.o tour2d_pp_ui.o \
  brush_ui.o brush.o brush_init.o brush_bins.o brush_api.o color_ui.o xlines.o \
  exclusion_ui.o exclusion.o \
  scale_ui.o scale_drag.o scale_click.o scale_api.o \
@@ -76,7 +84,6 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  mt19937-1.o \
  write_svg.o \
  impute.o impute_ui.o \
- tour2d.o \
  noop-checkbutton.o \
  ggobi-API.o s_erf.o \
 \
@@ -85,7 +92,14 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  tour1d.o tour1d_pp.o print.o \
  tour1d_ui.o fileio.o tourcorr.o tourcorr_ui.o \
  brush_link.o time_ui.o record_id.o \
- eispack.o cokus.o
+ cokus.o \
+ read_color.o read_init.o \
+ wvis_ui.o write_state.o  \
+
+# plugin.o 
+
+# eispack.o
+# pp_ui.o
 
 ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c
@@ -93,9 +107,11 @@ ifdef USE_XML
  OB+= $(XML_OB)
 
    # User must specify XML_INC_DIRS
- CFLAGS+=  -DUSE_XML=1 $(XML_INC_DIRS:%=-I%)
+#-DSUPPORT_PLUGINS=1 
+ CFLAGS+=  -DUSE_XML=2 -DSUPPORT_INIT_FILES=1 $(XML_INC_DIRS:%=-I%)
    # User must specify XML_LIB_DIRS
- XML_LIBS= $(XML_LIB_DIRS:%=-L%) -lxml -lzlib -lwsock32
+# -lzlib (original) or -lz
+ XML_LIBS= $(XML_LIB_DIRS:%=-L%) -lxml2 -liconv -lz -lwsock32
 endif
 
 LIBBASE=ggobi
@@ -111,7 +127,7 @@ DEF=$(DLL:.dll=.def)
 LIBS= -L$(GDK_LIB_DIR) -L$(GTK_LIB_DIR) -L$(GLIB_LIB_DIR) -lgdk-1.3 -lgtk-1.3 -lglib-1.3 
 
 ggobi: $(OB)
-	$(CC) $(LIBS) $(OB) -o ggobi $(XML_LIBS) -lm 
+	$(CC) -o ggobi $(OB) $(LIBS) $(XML_LIBS) -lm 
                 
 
 dll: $(DLL)
