@@ -111,14 +111,15 @@ GGobi can then invoke this function with a pair of variable values and
 extract the values for the result.
 The following C code illustrates how this might work.
 \begin{verbatim}
- USER_OBJECT_ x, y, args;
+ USER_OBJECT_ x, y, call;
 
-  args = allocVector(VECSXP, 2);
+  call = allocVector(VECSXP, 3);
   PROTECT(args);
-  VECTOR_DATA(args)[0] = variableToRS(xindex);
-  VECTOR_DATA(args)[1] = variableToRS(yindex);
-
-  callUserFunction(RS_smootherFunction, args);
+  CAR(args) = RS_smootherFunction;
+  CAR(CDR(args)) =  RS_GGOBI(variableToRS)(xindex);
+  CAR(CDR(CDR(args))) =  RS_GGOBI(variableToRS)(xindex);
+ 
+  ans = eval(call, R_GlobalEnv);
 
   UNPROTECT(1);
 \end{verbatim}
