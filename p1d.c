@@ -115,7 +115,7 @@ p1d_reproject (splotd *sp, greal **world_data, datad *d, ggobid *gg)
 /*
  * Project the y variable down from the ncols-dimensional world_data[]
  * to the 2-dimensional array planar[]; get the x variable directly
- * from p1d_data[].
+ * from p1d.spread_data[].
 */
   gint i, m, jvar = 0;
   gfloat rdiff, ftmp;
@@ -149,8 +149,8 @@ p1d_reproject (splotd *sp, greal **world_data, datad *d, ggobid *gg)
     m = d->rows_in_plot.els[i];
 
     /*
-     * Use p1d_data[i] not [m] because p1d_data[] is populated
-     * only up to d->nrows_in_plot
+     * Use p1d.spread_data[i] not [m] because p1d.spread_data[] is
+     * populated only up to d->nrows_in_plot
     */
     ftmp = -1.0 + 2.0*(sp->p1d.spread_data.els[i] - sp->p1d.lim.min)/rdiff;
 
