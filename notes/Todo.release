@@ -1,10 +1,9 @@
 XML format
- a. Read in a set of colormaps  (Done)
-    Question: How should a user specify in an xml data file which
-       colormap to use?   (not yet tested by me -- dfs)  
- b. Read in scaling limits for a variable (Done)
- c. Handle <categoricalvariable> (Done)
- d. Does 'write_xml' handle all this information?  (Not missings)
+
+colormaps
+ Reconcile our current use of colorschemes with our previous
+   use of colormaps.  This is important both for the xml 
+   specification and for the API.
 
 manual
  Review and update to respond to recent changes in the design
@@ -20,14 +19,6 @@ web site
 Do we want a man page?
   One exists, but it's very sketchy.  It documents the ascii
   file format and points people to the documentation.
-
-Known bugs:
-  If a new datad is added, the transformation, jittering, and
-    brush_by_variable tools will not show it in their
-    notebooks of variable lists.  When a datad is added, perhaps
-    it should destroy those tool windows so they would be 
-    reinitialized the next time they're opened.  Or should they
-    each have a reinit button?
 
 GUI
   'delete variable' hasn't been implemented -- and probably won't
