@@ -93,6 +93,10 @@ typedef struct {
 
 /*-- vectors --*/
 typedef struct {
+  gdouble *els;
+  guint nels;
+} vector_d;
+typedef struct {
   gfloat *els;
   guint nels;
 } vector_f;

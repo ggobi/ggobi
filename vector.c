@@ -15,6 +15,116 @@
 #include "externs.h"
 
 /*-------------------------------------------------------------------------*/
+/*                        double vector management                         */
+/*-------------------------------------------------------------------------*/
+
+void
+vectord_init_null (vector_d *vecp)
+{
+  vecp->nels = 0;
+  vecp->els = (gdouble *) NULL;
+}
+
+void
+vectord_free (vector_d *vecp)
+{
+ if (vecp->els != NULL)
+    g_free ((gpointer) vecp->els);
+  vecp->els = NULL;
+  vecp->nels = 0;
+}
+
+/* Zero a vector of doubles. */
+void
+vectord_zero (vector_d *vecp)
+{
+  gint i;
+  for (i=0; i<vecp->nels; i++)
+    vecp->els[i] = 0.0;
+}
+
+/* allocate a vector of doubles */
+void
+vectord_alloc (vector_d *vecp, gint nels)
+{
+  if (vecp->els != NULL)
+    g_free (vecp->els);
+  vecp->els = NULL;
+
+  vecp->nels = nels;
+  if (nels > 0)
+    vecp->els = (gdouble *) g_malloc (nels * sizeof (gdouble));
+}
+
+void
+vectord_realloc (vector_d *vecp, gint nels)
+{
+  if (nels > 0) {
+    if (vecp->els == NULL || vecp->nels == 0)
+      vecp->els = (gdouble *) g_malloc (nels * sizeof (gdouble));
+    else 
+      vecp->els = (gdouble *) g_realloc (vecp->els, nels * sizeof (gdouble));
+  } else {
+    if (vecp->els != NULL)
+      g_free (vecp->els);
+    vecp->els = NULL;
+  }
+
+  vecp->nels = nels;
+}
+
+void
+vectord_delete_els (vector_d *vecp, gint nels, gint *els)
+{
+  gint k;
+  gint jto, jfrom;
+  gint *keepers = g_malloc ((vecp->nels - nels) * sizeof (gint));
+  gint nkeepers = find_keepers (vecp->nels, nels, els, keepers);
+
+  if (nels > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      jto = k;
+      jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
+      if (jto != jfrom)
+        vecp->els[jto] = vecp->els[jfrom];
+    }
+
+    vecp->els = (gdouble *) g_realloc (vecp->els,
+                                       nkeepers * sizeof (gdouble));
+    vecp->nels = nkeepers;
+  }
+  g_free (keepers);
+}
+
+/* allocate a vector of doubles populated with 0 */
+void
+vectord_alloc_zero (vector_d *vecp, gint nels)
+{
+  if (vecp->els != NULL)
+    g_free (vecp->els);
+  vecp->els = NULL;
+
+  vecp->nels = nels;
+  if (nels > 0)
+    vecp->els = (gdouble *) g_malloc0 (nels * sizeof (gdouble));
+}
+
+void
+vectord_copy (vector_d *vecp_from, vector_d *vecp_to)
+{
+  gint i;
+
+  if (vecp_from->nels == vecp_to->nels)
+    for (i=0; i<vecp_from->nels; i++)
+      vecp_to->els[i] = vecp_from->els[i];
+  else
+    g_printerr ("(vectord_copy) length of source = %d, of destination = %d\n",
+      vecp_from->nels, vecp_to->nels);
+}
+
+/*-------------------------------------------------------------------------*/
 /*                    floating point vector management                     */
 /*-------------------------------------------------------------------------*/
 
