@@ -6,6 +6,7 @@
 
 
 GGOBI_HOME=${GGOBI_HOME-@GGOBI_HOME@}
+export GGOBI_HOME
 
 GGOBI_CONFIG=${GGOBI_HOME}/bin/ggobi-config
 export GGOBI_CONFIG
