@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void gt_basis (array_f, gint, vector_i, gint, gint);
 void splot_cursor_set (gint jcursor, splotd *sp);
 gchar *datasetName (datad *d, ggobid *gg);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);

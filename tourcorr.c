@@ -562,7 +562,6 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
-  extern void gt_basis(array_f, gint, vector_i, gint, gint);
   extern void path(array_f, array_f, array_f, gint, gint, array_f, 
     array_f, array_f, vector_f, array_f, array_f,
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
@@ -733,11 +732,10 @@ void tourcorr_reinit(ggobid *gg)
 
 void tourcorr_scramble(ggobid *gg)
 {
-  int i, j;
+  gint j;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  gint nc = d->ncols;
-  extern void gt_basis(array_f, gint, vector_i, gint, gint);
+  /*gint i, nc = d->ncols;*/
 
   for (j=0; j<d->ncols; j++) {
     dsp->tcorr1.u.vals[0][j] = 0.;

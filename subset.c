@@ -162,7 +162,6 @@ gboolean
 subset_everyn (gint estart, gint estep, datad *d, ggobid *gg)
 {
   gint i;
-  /*gint top = (d->nrgroups > 0) ? d->nrgroups : d->nrows;*/
   gint top = d->nrows;
 
   gboolean doneit = false;

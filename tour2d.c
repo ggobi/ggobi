@@ -288,7 +288,6 @@ tour2dvar_set (gint jvar, ggobid *gg)
   gboolean active=false;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  extern void gt_basis(array_f, gint, vector_i, gint, gint);
 
   for (j=0; j<dsp->t2d.nvars; j++)
     if (jvar == dsp->t2d.vars.els[j])
@@ -391,7 +390,6 @@ tour2d_run(displayd *dsp, ggobid *gg)
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
-  extern void gt_basis(array_f, gint, vector_i, gint, gint);
   extern void path(array_f, array_f, array_f, gint, gint, array_f, 
     array_f, array_f, vector_f, array_f, array_f,
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
@@ -400,23 +398,25 @@ tour2d_run(displayd *dsp, ggobid *gg)
   extern void t2d_ppdraw(gfloat, ggobid *);
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  gint i, j, k, nv;
+  gint i, j, nv;
   static gint count = 0;
   gboolean revert_random = false;
   static gfloat oindxval = -999.0;
+/*
+  gint k;
   gboolean chosen;
   gfloat eps = .02;
+*/
 
 /* dfsdebug */
 {
-gfloat indxval;
-gboolean chosen, k;
-if (reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, 
+  gfloat indxval;
+  gboolean chosen, k;
+  gfloat eps = .02;
+  if (reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, 
          dsp->t2d.target_basis_method, &dsp->t2d.ppval, &indxval))
-{
-/*- print what values? theses are the arguments to tour_reproj
-   tinc, v v0 v1 u uuevec-*/
-
+  {
+/*
 g_printerr ("v: ");
 for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v.vals[0][i]);
 g_printerr ("\n    ");
@@ -446,28 +446,28 @@ for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.uvevec.vals[0][i]);
 g_printerr ("\n    ");
 for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.uvevec.vals[1][i]);
 g_printerr ("\n");
+*/
 
-for (i=0; i<d->ncols; i++) {
-  chosen = false;
-  for (k=0; k<dsp->t2d.nvars; k++) {
-    if (dsp->t2d.vars.els[k] == i) {
-      chosen = true;
-      break;
+    for (i=0; i<d->ncols; i++) {
+      chosen = false;
+      for (k=0; k<dsp->t2d.nvars; k++) {
+        if (dsp->t2d.vars.els[k] == i) {
+          chosen = true;
+          break;
+        }
+      }
+      if (!chosen) {
+        if (dsp->t2d.v.vals[0][i] < eps && dsp->t2d.v.vals[1][i] < eps)
+          dsp->t2d.v.vals[0][i] = dsp->t2d.v.vals[1][i] = 0.0;
+        if (dsp->t2d.v0.vals[0][i] < eps && dsp->t2d.v0.vals[1][i] < eps)
+          dsp->t2d.v0.vals[0][i] = dsp->t2d.v0.vals[1][i] = 0.0;
+        if (dsp->t2d.v1.vals[0][i] < eps && dsp->t2d.v1.vals[1][i] < eps)
+          dsp->t2d.v1.vals[0][i] = dsp->t2d.v1.vals[1][i] = 0.0;
+        if (dsp->t2d.u.vals[0][i] < eps && dsp->t2d.u.vals[1][i] < eps)
+          dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
+      }
     }
   }
-  if (!chosen) {
-    gfloat eps = .02;
-    if (dsp->t2d.v.vals[0][i] < eps && dsp->t2d.v.vals[1][i] < eps)
-      dsp->t2d.v.vals[0][i] = dsp->t2d.v.vals[1][i] = 0.0;
-    if (dsp->t2d.v0.vals[0][i] < eps && dsp->t2d.v0.vals[1][i] < eps)
-      dsp->t2d.v0.vals[0][i] = dsp->t2d.v0.vals[1][i] = 0.0;
-    if (dsp->t2d.v1.vals[0][i] < eps && dsp->t2d.v1.vals[1][i] < eps)
-      dsp->t2d.v1.vals[0][i] = dsp->t2d.v1.vals[1][i] = 0.0;
-    if (dsp->t2d.u.vals[0][i] < eps && dsp->t2d.u.vals[1][i] < eps)
-      dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
-  }
-}
-}
 }
 /* dfsdebug end */
 
@@ -700,7 +700,6 @@ void tour2d_scramble(ggobid *gg)
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
   gint nc = d->ncols;
-  extern void gt_basis(array_f, gint, vector_i, gint, gint);
 
   for (i=0; i<2; i++)
     for (j=0; j<nc; j++)
@@ -736,7 +735,6 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   gdouble dtmp1;
   extern void gram_schmidt(gfloat *, gfloat*, gint);
   extern gfloat calc_norm(gfloat *, gint);
-  extern void gt_basis(array_f, gint, vector_i, gint, gint);
   extern gfloat inner_prod(gfloat *, gfloat *, gint);
 
   /* need to turn off tour */
