@@ -13,6 +13,8 @@
 #include "vars.h"
 #include "externs.h"
 
+#include "parcoordsClass.h"
+
 #define WIDTH   150
 #define HEIGHT  300
 
@@ -144,7 +146,9 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
   gint width, screenwidth;
   gint height, screenheight;
 
-  display = display_alloc_init (parcoords, missing_p, d, gg);
+  display = gtk_type_new(GTK_TYPE_GGOBI_PARCOORDS_DISPLAY);
+  display_set_values(display, extended_display_type, d, gg);
+
   if (nvars == 0) {
     nplots = MIN (d->ncols, sessionOptions->info->numParCoordsVars);
     if(nplots < 0) {
@@ -222,8 +226,8 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
   }
   /*-- --*/
 
-  for (i=0; i<nplots; i++) {
-    sp = splot_new (display, width, height, gg);
+  for (i = 0; i < nplots; i++) {
+    sp = gtk_parcoords_splot_new(display, width, height, gg);
     sp->p1dvar = vars[i]; 
 
 /*
@@ -263,7 +267,7 @@ parcoords_var_selected (gint jvar, displayd *display)
 
 gboolean
 parcoords_varsel (cpaneld *cpanel, splotd *sp,
-  gint jvar, gint *jvar_prev, ggobid *gg)
+		  gint jvar, gint *jvar_prev, ggobid *gg)
 {
   gboolean redraw = true;
   gint nplots = g_list_length (gg->current_display->splots);
@@ -433,7 +437,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
     i = d->rows_in_plot[k];
     m = 2*i;
 
-    /*-- if it's the leftmost plot, don'r draw the left whisker --*/
+    /*-- if it's the leftmost plot, don't draw the left whisker --*/
     if (sp_prev == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/

@@ -174,18 +174,6 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
       }
     }
     break;
-    case parcoords:
-    {
-      GList *l;
-      splotd *s;
-      for (l=display->splots; l; l=l->next) {
-        s = (splotd *) l->data;
-        if (!array_contains (cols, ncols, s->p1dvar))
-          cols[ncols++] = s->p1dvar;
-      }
-    }
-    break;
-
 
     case unknown_display_type:
     default:

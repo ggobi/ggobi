@@ -458,8 +458,6 @@ getDisplayType(const xmlChar *type)
     val = scatterplot;
   else if(strcmp((char *)type, "scatmatrix") == 0)
     val = scatmat;
-  else if(strcmp((char *)type, "parcoords") == 0)
-    val = parcoords;
   else
     val = extended_display_type;
 
@@ -969,9 +967,12 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
     case scatterplot:
       dpy = GGOBI(newScatterplot)(vars[0], vars[1], data, gg);
     break;
+#if 0
+/*XX*/
     case parcoords:
       dpy = GGOBI(newParCoords)(vars, desc->numVars, data, gg);
     break;
+#endif
     case scatmat:
       dpy = GGOBI(newScatmat)(vars, vars, desc->numVars,
                               desc->numVars, data, gg);

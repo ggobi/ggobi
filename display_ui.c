@@ -148,6 +148,8 @@ display_menu_build (ggobid *gg)
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
     } 
 
+#ifdef BUILTIN_PARCOORDS
+/*XX*/
     if (nd == 1) {
       item = CreateMenuItem (gg->display_menu, "New parallel coordinates plot",
         NULL, NULL, gg->main_menubar, gg->main_accel_group,
@@ -183,7 +185,8 @@ display_menu_build (ggobid *gg)
       }
 
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
-    } 
+    }
+#endif 
 
  
 
@@ -230,13 +233,24 @@ extended_display_open_cb (GtkWidget *w, ExtendedDisplayCreateData *data)
   if(data->d->nrows == 0)
 	return;
 
-  if(!data->klass->create) {
+  splot_set_current (gg->current_splot, off, gg);   
+  if(data->klass->createWithVars) {
+    gint *selected_vars, nselected_vars = 0;
+
+     selected_vars = (gint *) g_malloc (data->d->ncols * sizeof (gint));
+     nselected_vars = selected_cols_get (selected_vars, data->d, gg);
+     dpy = data->klass->createWithVars(false, nselected_vars, selected_vars, data->d, gg);
+     g_free(selected_vars);
+  } else {
+     if(!data->klass->create) {
        /* How to get the name of the class from the class! GTK_OBJECT_CLASS(gtk_type_name(data->klass)->type) */
-     g_printerr("Real problems! An extended display (%s) without a create routine!\n",  "?");
+       g_printerr("Real problems! An extended display (%s) without a create routine!\n",  "?");
+       return;
+     }
+
+    dpy = data->klass->create(false, NULL, data->d, gg);
   }
 
-  splot_set_current (gg->current_splot, off, gg);   
-  dpy = data->klass->create(false, NULL, data->d, gg);
   display_add(dpy, gg);
   varpanel_refresh(dpy, gg);
 }

@@ -446,22 +446,10 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg)
     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
     if(klass->alloc_whiskers)
       sp->whiskers = klass->alloc_whiskers(sp, nr, d);
-  }
-#if 0
-/*XX*/
-  else if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-    sp->whiskers = klass->alloc_whiskers(display, sp, nr, d);
-  }
-#endif
- else {
+  } else {
     switch (display->displaytype) {
       case scatterplot:
       case scatmat:
-       break;
-      case parcoords:
-        sp->whiskers = (GdkSegment *) g_malloc (2 * nr * sizeof (GdkSegment));
        break;
       default:
       break;
@@ -490,9 +478,6 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
     case scatmat:
       if (sp->edges != NULL) g_free ((gpointer) sp->edges);
       if (sp->arrowheads != NULL) g_free ((gpointer) sp->arrowheads);
-    break;
-    case parcoords:
-      g_free ((gpointer) sp->whiskers);
     break;
     default:
     break;
@@ -664,10 +649,6 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
         p1d_reproject (sp, d->world.vals, d, gg);
     break;
 
-    case parcoords:
-      p1d_reproject (sp, d->world.vals, d, gg);
-    break;
-
     default:
     break;
    }
@@ -731,18 +712,22 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   if(klass) {
     klass->sub_plane_to_screen(sp, display, d, gg);
   } else {
-   switch (display->displaytype) {
-    case parcoords:
-      sp_whiskers_make (sp, display, gg);
-    break;
-    case scatterplot:
+/*XX convenience */
+   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+     GtkGGobiExtendedDisplayClass *k = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+     if(k->sub_plane_to_screen)
+       k->sub_plane_to_screen(sp, display, d, gg);
+   } else {
+    switch (display->displaytype) {
+     case scatterplot:
       ash_baseline_set (&sp->p1d.ash_baseline, sp);
       ash_baseline_set (&sp->tour1d.ash_baseline, sp);
-    break;
-    case scatmat:
-    case unknown_display_type:
-    default:
-    break;
+     break;
+     case scatmat:
+     case unknown_display_type:
+     default:
+     break;
+    }
    }
   }
 }

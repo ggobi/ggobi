@@ -222,11 +222,6 @@ binning_permitted (displayd *display, ggobid *gg)
   {
       permitted = false;
   /*-- if we're drawing whiskers --*/
-  } else if ((type == parcoords) &&
-             display->options.whiskers_show_p)
-  {
-      permitted = false;
-
   } else {  /*-- if we're drawing edges --*/
     if (e != NULL && e->edge.n > 0) {
       if (display->options.edges_undirected_show_p ||
@@ -280,8 +275,8 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   brush_coords *brush_pos = &sp->brush_pos;
 
   if (button1_p) {
-    if (display->displaytype == parcoords) {
 /*
+    if (display->displaytype == parcoords) {
       if (mouse->x > sp->da->allocation.width || mouse->x < 0) {
         gint indx = g_list_index (display->splots, sp);
         gint nplots = g_list_length (display->splots);
@@ -295,8 +290,8 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
           }
         }
       }
-*/
     }
+*/
 
     brush_set_pos (mouse->x, mouse->y, sp);
   }

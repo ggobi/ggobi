@@ -240,9 +240,6 @@ display_tree_label(displayd *display)
     case scatmat:
       val = "Scatterplot Matrix";
       break;
-    case parcoords:
-      val = "Parallel Coordinates";
-      break;
 
     case unknown_display_type:
       val = (gchar *) NULL;
@@ -323,12 +320,6 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,  datad *d, ggo
       n = strlen (vtx->collab) + strlen (vty->collab) + 5;
       buf = (gchar*) g_malloc (n * sizeof (gchar*));
       sprintf (buf, "%s v %s", vtx->collab, vty->collab);
-    break;
-    case parcoords:
-      vt = vartable_element_get (splot->p1dvar, d);
-      n = strlen (vt->collab);
-      buf = (gchar*) g_malloc(n * sizeof (gchar*));
-      sprintf(buf, "%s", vt->collab);
     break;
     case unknown_display_type:
     break;

@@ -137,10 +137,6 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 
    switch (display->displaytype) {
 
-    case parcoords:
-      redraw = parcoords_varsel (cpanel, sp, jvar, &jvar_prev, gg);
-    break;
-
     case scatmat:
       redraw = scatmat_varsel_simple (cpanel, sp, jvar, &jvar_prev, gg);
     break;
@@ -266,22 +262,6 @@ varpanel_refresh (displayd *display, ggobid *gg)
     } else {
 
      switch (display->displaytype) {
-
-       case parcoords:
-        for (j=0; j<d->ncols; j++) {
-          varpanel_toggle_set_active (VARSEL_X, j, false, d);
-          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-          varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-        }
-
-        l = display->splots;
-        while (l) {
-          j = ((splotd *) l->data)->p1dvar;
-          varpanel_toggle_set_active (VARSEL_X, j, true, d);
-          l = l->next;
-        }
-      break;
-
       case scatmat:
         for (j=0; j<d->ncols; j++) {
           varpanel_toggle_set_active (VARSEL_X, j, false, d);
@@ -569,15 +549,6 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
     } else {
 
      switch (display->displaytype) {
-
-      case parcoords:
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-          "Select to replace/insert/append a variable, or to delete it",
-          NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-          "Click to replace/insert/append a variable, or to delete it",
-          NULL);
-      break;
 
       case scatmat:
         gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,

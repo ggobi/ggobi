@@ -323,19 +323,6 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
         }
       break;
 
-      case parcoords:
-        for (l = display->splots; l; l = l->next) {
-          sp = (splotd *) l->data;
-
-          for (j=0; j<ncols; j++) {
-            if (sp->xyvars.x == cols[j]) {
-              jplotted = sp->xyvars.x;
-              return jplotted;
-            }
-          }
-        }
-      break;
-
       case unknown_display_type:
       default:
       break;

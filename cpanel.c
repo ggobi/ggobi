@@ -110,11 +110,6 @@ cpanel_set (displayd *display, ggobid *gg)
       cpanel_brush_set (cpanel, gg);
       cpanel_identify_set (cpanel, gg);
     break;
-    case parcoords:
-      cpanel_parcoords_set (cpanel, gg);
-      cpanel_brush_set (cpanel, gg);
-      cpanel_identify_set (cpanel, gg);
-    break;
     default:
       displaytype_known = false;
     return;

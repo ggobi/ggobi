@@ -188,9 +188,6 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
     case scatmat:
       add_xml_scatmat_variables(node, plots, dpy);
     break;
-    case parcoords:
-      add_xml_parcoords_variables(node, plots, dpy);
-    break;
     case unknown_display_type:
     default:
     break;
@@ -200,20 +197,7 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
  return(node);
 }
 
-/*
-  Write out the variables in a parallel coordinates plot
-  to the current node in the  XML tree.
- */
-void
-add_xml_parcoords_variables(xmlNodePtr node, GList *plots, displayd *dpy)
-{
-  splotd *plot;
-  while(plots) {
-    plot = (splotd *) plots->data;
-    XML_addVariable(node, plot->p1dvar, dpy->d);
-    plots = plots->next;
-  }
-}
+
 
 
 
@@ -279,8 +263,6 @@ getDisplayTypeName(displayd *dpy)
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
     /* Perhaps compute the name of the type and use that. 
      */
-    GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
-    /* val = klass->titleLabel; */
     val = gtk_type_name(GTK_OBJECT_TYPE(GTK_OBJECT(dpy)));
   } else {
   switch(dpy->displaytype) {
@@ -289,9 +271,6 @@ getDisplayTypeName(displayd *dpy)
     break;
     case scatmat:
       val = "scatmat";
-    break;
-    case parcoords:
-      val = "parcoords";
     break;
     default:
       val = "";

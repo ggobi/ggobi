@@ -194,7 +194,7 @@ typedef struct
     GtkGGobiWindowDisplayClass parent_class;
 
     gboolean binning_ok; /* see binning_permitted in brush.c */
-    gboolean (*binningPermitted)(displayd *dpy;)
+    gboolean (*binningPermitted)(displayd *dpy);
 
     gboolean allow_reorientation; /* see p1d_varsel for changing vertical/horizontal orientation */
     gboolean options_menu_p; /* whether this supports an option menu in the control panel. Default is yes! */
@@ -202,11 +202,11 @@ typedef struct
 
     gboolean loop_over_points; 	/* See splot_draw_to_pixmap0_unbinned. */
 
-    gchar * const treeLabel;
+    gchar * treeLabel;
     gchar * const (*tree_label)(displayd *dpy);
 
     gchar * titleLabel;
-    const gchar * const (*title_label)(displayd *dpy);
+    gchar * const (*title_label)(displayd *dpy);
 
     displayd *(*create)(gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
     displayd *(*createWithVars)(gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg);
@@ -245,8 +245,9 @@ typedef struct
 
     void (*add_plot_labels)(displayd *dpy, splotd *sp, GdkDrawable *, datad *, ggobid *);
 
-
 /* For splots */
+
+    void (*sub_plane_to_screen)(splotd *sp, displayd *dpy, datad *d, ggobid *gg);
 
 } GtkGGobiExtendedDisplayClass;
 

@@ -55,15 +55,25 @@ gint totalNumGGobis;
 
 #include "ggobiClass.h"
 
-const GtkTypeLoad typeLoaders[] = {gtk_ggobi_time_series_display_get_type,
+const GtkTypeLoad typeLoaders[] = {
+                               	   gtk_ggobi_par_coords_display_get_type,
+				   gtk_ggobi_time_series_display_get_type,
 #ifdef BARCHART_IMPLEMENTED
                                    gtk_ggobi_barchart_display_get_type
 #endif
                                   };
 
 const gchar * const ViewTypes[] =
-  {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
-const gint ViewTypeIndices[] = {scatterplot, scatmat, parcoords};           
+  {"Scatterplot", "Scatterplot Matrix", 
+#ifdef PARCOORDS_BUILTIN
+"Parallel Coordinates",
+#endif
+};
+const gint ViewTypeIndices[] = {scatterplot, scatmat, 
+#ifdef PARCOORDS_BUILTIN
+parcoords
+#endif
+};           
 const gchar *const DataModeNames[num_data_modes] =
   {"ASCII", "binary", "R/S data", "XML", "MySQL", "URL", "Unknown"};
 
@@ -488,7 +498,7 @@ processRestoreFile(const gchar * const fileName, ggobid *gg)
     return(false);
 
   node = xmlDocGetRootElement(doc);
-/* getXMLDocElement(doc, "ggobi");  */
+
   if(!node)
     return(false);
 

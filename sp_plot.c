@@ -146,11 +146,6 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
       }
     } else {
      switch (display->displaytype) {
-      case parcoords:
-        if (e->missing.vals[m][sp->p1dvar])
-          draw_edge = false;
-      break;
-
       case scatmat:
         if (sp->p1dvar != -1) {
           if (e->missing.vals[m][sp->p1dvar])
@@ -233,11 +228,6 @@ splot_plot_case (gint m, gboolean ignore_hidden, datad *d,
     } else {
 
     switch (display->displaytype) {
-      case parcoords:
-        if (d->missing.vals[m][sp->p1dvar])
-          draw_case = false;
-      break;
-
       case scatmat:
         if (sp->p1dvar != -1) {
           if (d->missing.vals[m][sp->p1dvar])
@@ -330,9 +320,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   gboolean loop_over_points;
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-   loop_over_points = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->loop_over_points;
+   loop_over_points = display->options.points_show_p || GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->loop_over_points;
   } else
-   loop_over_points = display->options.points_show_p || dtype == parcoords;
+   loop_over_points = display->options.points_show_p;
 
   if (gg->plot_GC == NULL) {
     init_plot_GC (sp->pixmap0, gg);
@@ -411,22 +401,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
                   sp->screen[m].x, sp->screen[m].y,
                   baseline->x, sp->screen[m].y);
             }
-/* */
-
           /*-- whiskers: parallel coordinate and time series plots --*/
-          } else if (dtype == parcoords) {
-            if (display->options.whiskers_show_p) {
-                n = 2*m;
-                gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                  sp->whiskers[n].x1, sp->whiskers[n].y1,
-                  sp->whiskers[n].x2, sp->whiskers[n].y2);
-                n++;
-                gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                  sp->whiskers[n].x1, sp->whiskers[n].y1,
-                  sp->whiskers[n].x2, sp->whiskers[n].y2);
-            }
           } else if(klass && klass->within_draw_to_unbinned) {
-		  klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+  	       klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
 	  }
         }
       }
@@ -546,22 +523,10 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
               if (d->color_now.els[i] == current_color &&
                   splot_plot_case (i, true, d, sp, display, gg))
               {
-                draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
-                  sp->screen, i, gg);
+                draw_glyph (sp->pixmap0, &d->glyph_now.els[i], sp->screen, i, gg);
 
                 /* parallel coordinate plot whiskers */
-                if (display->displaytype == parcoords) {
-                  if (display->options.whiskers_show_p) {
-                    n = 2*i;
-                    gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                      sp->whiskers[n].x1, sp->whiskers[n].y1,
-                      sp->whiskers[n].x2, sp->whiskers[n].y2);
-                    n++;
-                    gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                      sp->whiskers[n].x1, sp->whiskers[n].y1,
-                      sp->whiskers[n].x2, sp->whiskers[n].y2);
-                  }
-                } else if(klass && klass->within_draw_to_binned) {
+                if(klass && klass->within_draw_to_binned) {
  		      klass->within_draw_to_binned(sp, m, sp->pixmap0, gg->plot_GC);
                 }
               }
@@ -677,39 +642,6 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
         vt->collab_tform);
     }
 
-  } else if (dtype == parcoords) {
-
-    vt = vartable_element_get (sp->p1dvar, d);
-    gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font (style),
-#else
-      style->font,
-#endif
-      vt->collab_tform, strlen (vt->collab_tform),
-      &lbearing, &rbearing, &width, &ascent, &descent);
-
-    if (cpanel->parcoords_arrangement == ARRANGE_ROW)
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC,
-        /*-- if the label fits, center it; else, left justify --*/
-        (width <= sp->max.x) ?  sp->max.x/2 - width/2 : 0, 
-        sp->max.y - 5,
-        vt->collab_tform);
-     else
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC, 5, 5+ascent+descent, vt->collab_tform);
-
   }
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
@@ -732,39 +664,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 }
 
-/*------------------------------------------------------------------------*/
-/*               case highlighting for points (and edges?)                */
-/*------------------------------------------------------------------------*/
 
-/*-- add highlighting for parallel coordinates plot --*/
-static void
-splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
-{
-  gint n;
-  displayd *display = sp->displayptr;
-  datad *d = display->d;
-  colorschemed *scheme = gg->activeColorScheme;
-
-  if (k < 0 || k >= d->nrows) return;
-
-  if (display->options.whiskers_show_p) {
-    gdk_gc_set_line_attributes (gg->plot_GC,
-      3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ d->color_now.els[k] ]);
-
-    n = 2*k;
-    gdk_draw_line (drawable, gg->plot_GC,
-      sp->whiskers[n].x1, sp->whiskers[n].y1,
-      sp->whiskers[n].x2, sp->whiskers[n].y2);
-    n++;
-    gdk_draw_line (drawable, gg->plot_GC,
-      sp->whiskers[n].x1, sp->whiskers[n].y1,
-      sp->whiskers[n].x2, sp->whiskers[n].y2);
-
-    gdk_gc_set_line_attributes (gg->plot_GC,
-      0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-  }
-}
 
 #define DIAMOND_DIM 5
 
@@ -947,13 +847,19 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
 {
   displayd *dsp = (displayd *) sp->displayptr;
   colorschemed *scheme = gg->activeColorScheme;
+  gboolean useDefault = false;
 
   if (nearest) {
-    if (dsp->displaytype == parcoords) {
-      splot_add_whisker_cues (k, sp, drawable, gg);
-    } else {  /*-- for all displays other than the parcoords plot --*/
-      splot_add_diamond_cue (k, sp, drawable, gg);
+    if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+      GtkGGobiExtendedSPlotClass *klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+      if(klass->add_identify_cues)
+         klass->add_identify_cues(k, sp, drawable, gg);
+      else 
+         useDefault = true;
     }
+
+    if(useDefault)
+       splot_add_diamond_cue (k, sp, drawable, gg);
   }
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);

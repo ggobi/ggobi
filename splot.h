@@ -139,6 +139,7 @@ typedef struct
    void (*add_plot_labels)(splotd *, GdkDrawable *, ggobid *gg);
    void (*add_markup_cues)(splotd *, GdkDrawable *, ggobid *);
    void (*add_scaling_cues)(splotd *, GdkDrawable *, ggobid *);
+   void (*add_identify_cues)(gint k, splotd *, GdkDrawable *, ggobid *);
 
    gboolean (*redraw)(splotd *, datad *, ggobid *, gboolean binned);
 
@@ -164,6 +165,8 @@ typedef struct
 
    void (*within_draw_to_binned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
    void (*within_draw_to_unbinned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
+
+
 
 } GtkGGobiExtendedSPlotClass;
 

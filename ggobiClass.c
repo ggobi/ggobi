@@ -7,6 +7,7 @@
 #include "tsPlot.h"
 
 #include "barchartDisplay.h"
+#include "parcoordsClass.h"
 
 extern gint num_ggobis, totalNumGGobis;
 extern ggobid **all_ggobis;
@@ -563,6 +564,60 @@ gtk_ggobi_time_series_splot_get_type(void)
 	sizeof (timeSeriesSPlotd),
 	sizeof (GtkGGobiTimeSeriesSPlotClass),
 	(GtkClassInitFunc) timeSeriesSPlotClassInit,
+	(GtkObjectInitFunc) NULL,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_extended_splot_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
+
+/**************************************/
+
+GtkType
+gtk_ggobi_par_coords_display_get_type (void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiParCoordsDisplay",
+	sizeof (parcoordsDisplayd),
+	sizeof (GtkGGobiParCoordsDisplayClass),
+	(GtkClassInitFunc) parcoordsDisplayClassInit,
+	(GtkObjectInitFunc) parcoordsDisplayInit,
+	/* reserved_1 */ NULL,
+        /* reserved_2 */ NULL,
+        (GtkClassInitFunc) NULL,
+      };
+
+      data_type = gtk_type_unique (gtk_ggobi_extended_display_get_type (), &data_info);
+    }
+
+  return data_type;
+}
+
+
+GtkType 
+gtk_ggobi_par_coords_splot_get_type(void)
+{
+  static GtkType data_type = 0;
+
+  if (!data_type)
+    {
+      static const GtkTypeInfo data_info =
+      {
+	"GtkGGobiParCoordsSPlot",
+	sizeof (parcoordsSPlotd),
+	sizeof (GtkGGobiParCoordsSPlotClass),
+	(GtkClassInitFunc) parcoordsSPlotClassInit,
 	(GtkObjectInitFunc) NULL,
 	/* reserved_1 */ NULL,
         /* reserved_2 */ NULL,

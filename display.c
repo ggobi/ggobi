@@ -343,8 +343,6 @@ display_set_values(displayd *display, enum displaytyped type, datad *d, ggobid *
 
   if (type == scatterplot)
     display->p1d_orientation = HORIZONTAL;
-  else if (type == parcoords)
-    display->p1d_orientation = VERTICAL;
 
   /* Should copy in the contents of DefaultOptions to create
      an indepedently modifiable configuration copied from
@@ -407,18 +405,6 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
       display = scatmat_new (missing_p,
         nselected_vars, selected_vars, nselected_vars, selected_vars,
         d, gg);
-      break;
-
-    case parcoords:
-      /*
-       * testing a method to allow variables to be specified
-       * before plotting; this is redundant with the variable
-       * statistics panel, though, and also the ability to
-       * reorder variables would be awfully useful.
-      */
-      /* vardialog_open (gg, "Select variables for plotting"); */
-
-      display = parcoords_new (false, nselected_vars, selected_vars, d, gg);
       break;
 
     default:
@@ -650,11 +636,6 @@ display_set_current (displayd *new_display, ggobid *gg)
     switch (gg->current_display->displaytype) {
       case scatterplot:
       case scatmat:
-      case parcoords:
-        submenu_destroy (gg->viewmode_item);
-      break;
-      case unknown_display_type:
-       return;
       default:
       break;
     }
@@ -696,16 +677,6 @@ display_set_current (displayd *new_display, ggobid *gg)
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
                                    gg->app.scatmat_mode_menu); 
-        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
-      break;
-
-      case parcoords:
-        parcoords_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) viewmode_set_cb, gg, true);
-        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-                                   gg->parcoords.mode_menu); 
         submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
       break;
 
@@ -754,9 +725,6 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
 		  break;
 	  case scatmat:
 		  tmp = "scatterplot matrix ";
-		  break;
-	  case parcoords:
-		  tmp = "parallel coordinates display " ;
 		  break;
 	  default:
 		  break;
@@ -906,10 +874,7 @@ display_type_handles_action (displayd *display, PipelineMode viewmode)
   } else if (dtype == scatmat) {
     if (v == SCALE || v == BRUSH || v == IDENT || v == MOVEPTS || v == SCATMAT)
       handles = true;
-  } else if (dtype == parcoords) {
-    if (v == BRUSH || v == IDENT || v == PCPLOT)
-      handles = true;
-  }
+  } 
 
   return handles;
 }

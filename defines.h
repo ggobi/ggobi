@@ -41,7 +41,9 @@
 enum directiond {both, vertical, horizontal};
 
 enum displaytyped {scatterplot, scatmat, 
+#if 0
                    parcoords, 
+#endif
 		   extended_display_type,
                    unknown_display_type};
 

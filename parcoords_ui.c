@@ -79,19 +79,21 @@ static void varscale_cb (GtkWidget *w, gpointer cbd)
 /*                   Control panel section                            */
 /*--------------------------------------------------------------------*/
 
-void
-cpanel_parcoords_make (ggobid *gg) {
+GtkWidget *
+cpanel_parcoords_make (ggobid *gg) 
+{
   GtkWidget *vbox, *vb, *lbl, *sbar, *opt;
   GtkObject *adj;
-  
-  gg->control_panel[PCPLOT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[PCPLOT]), 5);
+  GtkWidget *panel;
+
+  panel = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel), 5);
 
 /*
  * arrangement of plots, row or column
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel), vb, false, false, 0);
 
   lbl = gtk_label_new ("Plot arrangement:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -111,7 +113,7 @@ cpanel_parcoords_make (ggobid *gg) {
  * option menu: selection mode
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel), vb, false, false, 0);
 
   lbl = gtk_label_new ("Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -130,7 +132,7 @@ cpanel_parcoords_make (ggobid *gg) {
  * option menu
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel), vb, false, false, 0);
 
   lbl = gtk_label_new ("Spreading method:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -150,7 +152,7 @@ cpanel_parcoords_make (ggobid *gg) {
  * ASH smoothness
 */
   vbox = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[PCPLOT]), vbox,
+  gtk_box_pack_start (GTK_BOX (panel), vbox,
     false, false, 0);
 
   lbl = gtk_label_new ("ASH smoothness:"),
@@ -214,7 +216,10 @@ cpanel_parcoords_make (ggobid *gg) {
                         (GtkSignalFunc) varscale_cb, gg);
 */
 
-  gtk_widget_show_all (gg->control_panel[PCPLOT]);
+  gtk_widget_show_all (panel);
+
+  gg->control_panel[PCPLOT] = panel;
+  return(panel);
 }
 
 
@@ -272,12 +277,11 @@ parcoords_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 /*-- there already exists parcoords_cpanel_init --*/
 
 void
-cpanel_parcoords_set (cpaneld *cpanel, ggobid *gg)
+cpanel_parcoords_set (cpaneld *cpanel, GtkWidget *panel, ggobid *gg)
 {
   GtkWidget *w;
 
-  w = widget_find_by_name (gg->control_panel[PCPLOT],
-                           "PCPLOT:sel_mode_option_menu");
+  w = widget_find_by_name (panel, "PCPLOT:sel_mode_option_menu");
 
   gtk_option_menu_set_history (GTK_OPTION_MENU(w),
                                cpanel->parcoords_selection_mode);

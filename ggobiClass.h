@@ -1,5 +1,6 @@
-GtkType gtk_ggobi_time_series_display_get_type (void);
-GtkType gtk_ggobi_barchart_display_get_type (void);
+#include "tsdisplay.h"
+#include "parcoordsClass.h"
+#include "barchartDisplay.h"
 
 
 void registerDisplayTypes(GtkTypeLoad *loaders, int n);
