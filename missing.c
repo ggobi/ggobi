@@ -110,8 +110,10 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
       rowidv_init (d);
     }
     rowids_alloc (dnew);
-    for (i=0; i<dnew->nrows; i++)
+    for (i=0; i<dnew->nrows; i++) {
       dnew->rowid.id.els[i] = d->rowid.id.els[i];
+    }
+    dnew->rowid.maxId = d->rowid.maxId;
     /*rowidv_init (dnew);*/  /* called in datad_init */
     /*-- --*/
     
@@ -133,12 +135,15 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
       /*-- categorical variable definitions --*/
       vtnew->vartype = categorical;
       vtnew->nlevels = 2;
-      vtnew->level_values = (int*) g_malloc(sizeof(int) * 2);
-      vtnew->level_names = (char **) g_malloc(sizeof(char *) * 2);
+      vtnew->level_values = (gint *) g_malloc(sizeof(gint) * 2);
+      vtnew->level_counts = (gint *) g_malloc(sizeof(gchar *) * 2);
+      vtnew->level_names = (gchar **) g_malloc(sizeof(gchar *) * 2);
       for (i=0; i<2; i++) {
         vtnew->level_values[i] = i;
         vtnew->level_names[i] = g_strdup(lnames[i]);
       }
+      vtnew->level_counts[0] = d->nrows - vt->nmissing;
+      vtnew->level_counts[1] = vt->nmissing;
 
       /*-- prepare to jitter, and set limits to [0,1] --*/
       vtnew->lim_specified_p = true;  /*-- user-specified limits --*/
