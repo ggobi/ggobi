@@ -18,14 +18,12 @@
 
 
 gboolean
-impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
+impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint *vars, datad *d, ggobid *gg)
 {
   gint i, j, k, m;
-  gfloat maxval, minval, range, val, impval;
-  gchar *val_str;
+  gfloat maxval, minval, range, impval;
   gboolean ok = true;
   vartabled *vt;
-  GtkWidget *w;
 
   if (d->missing.nrows == 0) {
     quick_message ("There are no missings.\n", false);
@@ -37,35 +35,6 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
 
   if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
     gdouble drand;
-
-    if (impute_type == IMP_ABOVE) {
-      w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_above");
-      val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
-    }  else if (impute_type == IMP_BELOW) {
-      w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_below");
-      val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
-    }
-
-    if (strlen (val_str) == 0) {
-      gchar *message = g_strdup_printf (
-        "You selected '%% over or under' but didn't specify a percentage.\n");
-      quick_message (message, false);
-      g_free (message);
-      ok = false;
-      return ok;
-    }
-
-    val = (gfloat) atof (val_str);
-    g_free (val_str);
-    if (val < 0 || val > 100) {
-      gchar *message = g_strdup_printf (
-        "You specified %f%%; please specify a percentage between 0 and 100.\n",
-        val);
-      quick_message (message, false);
-      g_free (message);
-      ok = false;
-      return ok;
-    }
 
     for (k=0; k<nvars; k++) {
       gdouble jmult;
@@ -97,25 +66,12 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
     }
   }
   else if (impute_type == IMP_FIXED) {
-    w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_val");
-    val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
-    if (strlen (val_str) == 0) {
-      quick_message (
-        "You've selected 'Specify' but haven't specified a value.\n",
-         false);
-      ok = false;
-      return ok;
-    }
-    else {
-      impval = (gfloat) atof (val_str);
-      g_free (val_str);
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot.els[i];
-        for (k=0; k<nvars; k++) {
-          j = vars[k];
-          if (d->missing.vals[m][j]) {
-            d->raw.vals[m][j] = d->tform.vals[m][j] = impval;
-          }
+    for (i=0; i<d->nrows_in_plot; i++) {
+      m = d->rows_in_plot.els[i];
+      for (k=0; k<nvars; k++) {
+        j = vars[k];
+        if (d->missing.vals[m][j]) {
+          d->raw.vals[m][j] = d->tform.vals[m][j] = val;
         }
       }
     }
@@ -172,9 +128,6 @@ impute_mean_or_median (gint type, gint nvars, gint *vars,
             }
           }
         }
-	/*         
-	g_printerr ("cluster %d np %d nmissing %d\n",
-	n, np, nmissing); */
         if (np && nmissing) {
           if (gg->impute.type == IMP_MEAN) {
             val = sum/(greal)np;
@@ -183,7 +136,6 @@ impute_mean_or_median (gint type, gint nvars, gint *vars,
             val = ((np % 2) != 0) ?  x[(np-1)/2] : (x[np/2-1] + x[np/2])/2. ;
           }
 
-          /*g_printerr ("type %d val %g\n", gg->impute.type, val);*/
           for (i=0; i<nmissing; i++)
 	    d->raw.vals[missv[i]][j] = d->tform.vals[missv[i]][j] = val;
         }

@@ -88,6 +88,64 @@ show_missings_cb (GtkToggleButton *button, ggobid *gg)
   displays_tailpipe (FULL, gg);
 }
 
+static gboolean
+impute_fixed_cb (ImputeType impute_type, gfloat *val, ggobid *gg)
+{
+  GtkWidget *w;
+  gchar *val_str;
+  gboolean ok = true;
+
+  if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
+    gdouble drand;
+
+    if (impute_type == IMP_ABOVE) {
+      w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_above");
+      val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
+    }  else if (impute_type == IMP_BELOW) {
+      w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_below");
+      val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
+    }
+
+    if (strlen (val_str) == 0) {
+      gchar *message = g_strdup_printf (
+        "You selected '%% over or under' but didn't specify a percentage.\n");
+      quick_message (message, false);
+      g_free (message);
+      ok = false;
+      return ok;
+    }
+
+    *val = (gfloat) atof (val_str);
+    g_free (val_str);
+    if (*val < 0 || *val > 100) {
+      gchar *message = g_strdup_printf (
+        "You specified %f%%; please specify a percentage between 0 and 100.\n",
+        *val);
+      quick_message (message, false);
+      g_free (message);
+      ok = false;
+      return ok;
+    }
+  }
+  else if (impute_type == IMP_FIXED) {
+    w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_val");
+    val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
+    if (strlen (val_str) == 0) {
+      quick_message (
+        "You've selected 'Specify' but haven't specified a value.\n",
+         false);
+      ok = false;
+      return ok;
+    }
+    else {
+      *val = (gfloat) atof (val_str);
+      g_free (val_str);
+    }
+  }
+
+  return ok;
+}
+
 static void
 impute_cb (GtkWidget *w, ggobid *gg) {
   gboolean redraw = true;
@@ -95,6 +153,7 @@ impute_cb (GtkWidget *w, ggobid *gg) {
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
+  gfloat val;
 
   switch (gg->impute.type) {
     case IMP_RANDOM:
@@ -103,7 +162,8 @@ impute_cb (GtkWidget *w, ggobid *gg) {
     case IMP_FIXED:
     case IMP_BELOW:
     case IMP_ABOVE:
-      redraw = impute_fixed (gg->impute.type, nvars, vars, d, gg);
+      if (impute_fixed_cb (gg->impute.type, &val, gg))
+        redraw = impute_fixed (gg->impute.type, val, nvars, vars, d, gg);
     break;
     case IMP_MEAN:
     case IMP_MEDIAN:
