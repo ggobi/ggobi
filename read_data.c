@@ -742,9 +742,10 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
 
    fileName = findAssociatedFile (desc, suffixes,
      sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
-   if (fileName == NULL)
+   if (fileName == NULL) {
      ok = false;
      return (false);
+   }
 
    if ( ( fp = fopen(fileName, "r") ) == NULL ) {
      g_free (fileName);
