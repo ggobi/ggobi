@@ -203,6 +203,103 @@ comp_cluster_cb (GtkToggleButton *btn, gpointer cbd)
 static gint
 cluster_symbol_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
 {
+  /*-- reset the glyph and color of this glyph to the current values --*/
+  gint n = GPOINTER_TO_INT (cbd);
+  ggobid *gg = GGobiFromWidget (w, true);
+  datad *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  gint k, m, i;
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  gboolean rval = false;
+  gint nclusters = symbol_table_populate (d);
+  gboolean proceed = true;
+  gint targets = cpanel->br_point_targets;
+/*
+  gint nclusters_after;
+  nclusters_after = symbol_table_populate (d);
+  if (nclusters_after != nclusters_before)
+    cluster_window_open (gg);
+*/
+
+/*
+ * Almost surely the user is not trying to collapse groups, so
+ * check whether there's another cluster with this color/glyph
+ * combination.  If there is, don't go ahead.  (Though we may
+ * want to add a dialog for this later.)
+*/
+  for (k=0; k<nclusters; k++) {
+    if (k != n) {
+      switch (targets) {
+      case BR_CANDG:
+        if (d->clusv[k].color == gg->color_id &&
+            d->clusv[k].glyphtype == gg->glyph_id.type &&
+            d->clusv[k].glyphsize == gg->glyph_id.size)
+        {
+          proceed = false;
+          break;
+        }
+      break;
+      case BR_COLOR:
+        if (d->clusv[k].color == gg->color_id) {
+          proceed = false;
+          break;
+        }
+      break;
+      case BR_GLYPH:
+        if (d->clusv[k].glyphtype == gg->glyph_id.type &&
+            d->clusv[k].glyphsize == gg->glyph_id.size)
+        {
+          proceed = false;
+          break;
+        }
+      break;
+      case BR_GSIZE:
+        if (d->clusv[k].glyphsize == gg->glyph_id.size) {
+          proceed = false;
+          break;
+        }
+      break;
+      }
+    }
+  }
+
+/*
+ * This is a bit paternalistic, no?  But it's probably ok for now.
+*/
+  if (!proceed) {
+    quick_message (
+      "You're about to reset the color and/or glyph for this cluster\nin such a way as to merge it with another cluster.  I bet\nthat's not what you intend, so I won't let you do it.\n", false);
+    return true;
+  }
+
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot[m];
+    if (d->clusterid.els[i] == n) {
+      if (targets == BR_CANDG || targets == BR_COLOR) {
+        d->color.els[i] = d->color_now.els[i] = gg->color_id;
+        /*-- this will be done multiple times, but who cares? --*/
+        d->clusv[n].color = gg->color_id;
+      }
+      if (targets == BR_CANDG || targets == BR_GLYPH) {
+        d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
+        d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
+        /*-- this will be done multiple times, but who cares? --*/
+        d->clusv[n].glyphtype = gg->glyph_id.type;
+        d->clusv[n].glyphsize = gg->glyph_id.size;
+      }
+      if (targets == BR_CANDG || targets == BR_GSIZE) {
+        d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
+        /*-- this will be done multiple times, but who cares? --*/
+        d->clusv[n].glyphsize = gg->glyph_id.size;
+      }
+    }
+  }
+
+  gtk_signal_emit_by_name (GTK_OBJECT (w), "expose_event",
+    (gpointer) gg, (gpointer) &rval);
+  clusters_set (d, gg);
+
+  displays_plot (NULL, FULL, gg);
+
   return false;
 }
 
@@ -405,8 +502,12 @@ cluster_window_open (ggobid *gg) {
 
     /*-- add the row of titles --*/
 
-    gtk_table_attach (GTK_TABLE (d->cluster_table),
-      gtk_label_new ("Symbol"),
+    ebox = gtk_event_box_new ();
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
+      "Click to change the color/glyph of all members of the selected cluster to the current brushing color/glyph", NULL);
+    lbl = gtk_label_new ("Symbol");
+    gtk_container_add (GTK_CONTAINER (ebox), lbl);
+    gtk_table_attach (GTK_TABLE (d->cluster_table), ebox,
       0, 1, 0, 1,  /*-- left, right, top, bottom --*/
       GTK_FILL, GTK_FILL, 5, 2);
 
