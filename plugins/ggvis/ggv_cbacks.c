@@ -245,17 +245,6 @@ void ggv_task_cb (GtkToggleButton *button, PluginInstance *inst)
   }
 }
 
-/*
- * Definition of D
-void ggv_dsource_cb (GtkWidget *w, gpointer cbd)
-{
-  PluginInstance *inst = (PluginInstance *)
-     gtk_object_get_data (GTK_OBJECT (w), "PluginInst");
-  ggvisd *ggv = ggvisFromInst (inst);
-
-  ggv->Dtarget_source = (MDSDtargetSource) GPOINTER_TO_INT (cbd);
-}
-*/
 void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
@@ -292,98 +281,6 @@ trans_dist_init_defaults (ggvisd *ggv)
     }
   }
 }
-
-void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
-{
-  ggvisd *ggv = ggvisFromInst (inst);
-  GtkWidget *clist;
-  gint selected_var = -1;
-  datad *dsrc;
-  GtkWidget *window, *entry;
-  gchar *lbl;
-
-
-  /* This was set in the first clist in the preceding tab */
-  if (ggv->dsrc == NULL || ggv->dsrc->rowIds == NULL) {
-    g_printerr ("node set not correctly specified\n");
-    return;
-  }
-  if (ggv->e == NULL || ggv->e->edge.n == 0) {
-    g_printerr ("edge set not correctly specified\n");
-    return;
-  }
-
-  dsrc = ggv->dsrc; 
- 
-  /*-- allocate Dtarget --*/
-  arrayd_alloc (&ggv->Dtarget, dsrc->nrows, dsrc->nrows);
-
-  if (ggv->mds_task == DissimAnalysis || ggv->Dtarget_source == VarValues) {
-    clist = get_clist_from_object (GTK_OBJECT (button));
-    if (!clist) {
-      quick_message ("I can't identify a set of edges", false);
-      return;
-    }
-    /*-- this is the edgeset for distance computations, not
-         necessarily the edgeset to be displayed (eg, morsecode) --*/
-/* can override the setting of the second clist in the preceding tab */
-    ggv->e = gtk_object_get_data (GTK_OBJECT(clist), "datad");
-    if (ggv->e == NULL) {
-      quick_message ("I can't identify a set of edges", false);
-      return;
-    }
-    selected_var = get_one_selection_from_clist (clist, ggv->e);
-    if (selected_var == -1) {
-      quick_message ("Please specify a variable", false);
-      return;
-    }
-  }
-
-/*
-  if (ggv->e == NULL) {
-    if (!edgeset_add (dsp)) {
-      quick_message ("Please specify an edge set", false);
-      return;
-    } else {
-      ggv->e = dsp->e;
-    }
-  }
-*/
-
-  if (dsrc->rowIds == NULL) {
-    g_printerr ("Make sure the current display is a plot of the nodes.\n");
-    g_printerr ("  Currently nodes: %s edges: %s\n", dsrc->name, ggv->e->name);
-    return;
-  }
-
-  /*-- initalize Dtarget --*/
-  ggv_init_Dtarget (selected_var, ggv);
-/*
-  infinity = (gdouble) (2 * dsrc->nrows);
-  for (i=0; i<dsrc->nrows; i++) {
-    for (j=0; j<dsrc->nrows; j++)
-      ggv->Dtarget.vals[i][j] = infinity;
-    ggv->Dtarget.vals[i][i] = 0.0;
-  }
-*/
-
-  ggv_compute_Dtarget (selected_var, ggv);
-
-  /*-- update the entry to let people know Dtarget has been computed --*/
-  window = (GtkWidget *) inst->data;
-  entry = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(window),
-    "DTARGET_ENTRY");
-  lbl = g_strdup_printf ("%d x %d", ggv->Dtarget.nrows, ggv->Dtarget.ncols);
-  gtk_entry_set_text (GTK_ENTRY (entry), lbl);
-  g_free (lbl);
-
-
-  trans_dist_init_defaults (ggv);
-  /*-- open display --*/
-  mds_open_display (inst);
-}
-
-/*-- --*/
 
 void
 mds_open_display (PluginInstance *inst)

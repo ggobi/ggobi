@@ -148,7 +148,6 @@ void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst);
 void ggv_edge_weights_cb (GtkToggleButton *button, PluginInstance *inst);
 void ggv_groups_cb (GtkToggleButton *button, gpointer cbd);
 void ggv_anchor_cb (GtkToggleButton *button, gpointer cbd);
-void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst);
 
 gint ggv_stressplot_configure_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
 gint ggv_stressplot_expose_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
