@@ -512,23 +512,11 @@ static gboolean processXMLPluginNode(xmlNodePtr el, GGobiInitInfo *info, xmlDocP
    return(ans);
 }
 
+
 int
-getPlugins(xmlDocPtr doc, GGobiInitInfo *info, gboolean single)
+processPluginNodes(xmlNode *el, GGobiInitInfo *info, xmlDocPtr doc)
 {
-  xmlNode *node, *el = NULL;
   int count = 0;
-
-  if(single) {
-    el = getXMLDocElement(doc, "plugin");
-    if(!el) {
-	el = getXMLDocElement(doc, "inputPlugin");
-    }
-  } else {
-    node = getXMLDocElement(doc, "plugins");
-    if(node)
-       el = XML_CHILDREN(node);
-  }
-
   if(el == NULL)  
       return(-1);
 
@@ -537,9 +525,38 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info, gboolean single)
           count++;
       el = el->next;
   }
-
   return(count);
 }
+
+int
+getPlugins(xmlDocPtr doc, GGobiInitInfo *info, gboolean single)
+{
+  xmlNode *node, *el = NULL;
+  int count = 0;
+
+  if(single) {
+     /* Call recursively with single = false to get the "plugins" element. 
+        If there are any, then return assuming that we have <plugins> <plugin> ...</plugins>.
+        We will ignore any <plugin> outside of this.
+      */
+    if((count = getPlugins(doc, info, false)) > -1)
+	return(count);
+
+    /* Now handle the stand-alone <plugin> elements. */  
+    el = getXMLDocElement(doc, "plugin");
+    count = processPluginNodes(el, info, doc);
+    el = getXMLDocElement(doc, "inputPlugin");
+    count += processPluginNodes(el, info, doc);
+  } else {
+    node = getXMLDocElement(doc, "plugins");
+    if(node)
+       el = XML_CHILDREN(node);
+  }
+
+  return(processPluginNodes(el, info, doc));
+}
+
+
 
 /*
   This handles the details of a <plugin> tag,
