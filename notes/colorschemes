@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
-<colormap name="Green, peach" ncolors="5" type="diverging" criticalvalue="2" system="rgb01">
+<colormap name="Green, peach" ncolors="5" type="diverging" criticalvalue="2"
+          system="rgb" system_min="0" system_max="1">
 <description>
   From Cindy Brewer, a diverging color scheme ranging
-  between dark green to peach
+  between dark green and peach
 </description>
 <foreground>
-  <color name="Dark Green"> 0.000 0.431 0.114 </color>
-  <color name="Light Green"> 0.302 0.675 0.451 </color>
-  <color name="Pale Green"> 0.702 0.863 0.765 </color> 
+  <color name="Dark Green">
+    <red>0.000</red> <green>0.431</green> <blue>0.114</blue>  </color>
+  <color name="Light Green"><red>0.302</red><green>0.675</green><blue>0.451</blue> </color>
+  <color name="Pale Green"><red>0.702</red><green>0.863</green><blue>0.765</blue> </color> 
   <color name="Pale Peach"> 1.000 1.000 0.800 </color>
   <color name="Peach"> 1.000 0.800 0.502 </color>
 </foreground> 
@@ -21,7 +23,8 @@
 
 
 <?xml version="1.0"?>
-<colormap name="Peach to Dark Red" ncolors="6" type="sequential" system="rgb01">
+<colormap name="Peach to Dark Red" ncolors="6" type="sequential"
+          system="rgb" system_min="0" system_max="1">
 <description>
   From Cindy Brewer, a sequential color scheme ranging
   from pale peach to very dark red
@@ -42,23 +45,28 @@
 </annotations>
 </colormap>
 
-I would picture reading these into the following structures
+I would picture reading these into structures
 something like this in ggobi, and appending the colorschemes
-to gg->colorschemes, of type GArray *.
+to gg->colorschemes, of type GList *.
 
 enum {diverging, sequential, spectral, categorical} colorscaletype;
-enum {rgb01, rgb0255, hsv, cmy, cmyk} colorsystem;
+enum {rgb, hsv, cmy, cmyk} colorsystem;
 typedef struct {
   gchar *name;
   gchar *description;
   colorscaletype type;
   colorsystem system;   /*-- system used in the xml description --*/
-
+  gfloat system_min, system_max;  /*-- min and max for system; relevant for rgb --*/
   gint criticalvalue;   /*-- if diverging, where's the center? --*/
   gint n;               /*-- n <= NCOLORS --*/
-  gfloat **rgb;         /*-- n x 3 --*/
-  gchar **colorNames;   /*-- in case we have them --*/
-  gfloat bg[3];         /*-- high-contrast background color, rgb --*/
-  gfloat accent[3];     /*-- high-contrast accent color, rgb --*/
+  gfloat **data;        /*-- the data in the colortable, in its original system and dimensions --*/
+  GdkColor *rgb;         /*-- the data converted to rgb, nx3 --*/
+  GArray *colorNames;   /*-- in case we have them --*/
+  gfloat *bg;           /*-- high-contrast background color, rgb --*/
+  GdkColor rgb_bg[3];     /*-- high-contrast background color, rgb --*/
+  gfloat *accent;       /*-- high-contrast accent color, rgb --*/
+  GdkColor rgb_accent[3]; /*-- high-contrast accent color, rgb --*/
 } colorschemed;
+
+
 
