@@ -167,10 +167,11 @@ static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
 }
 
 void
-exclusion_window_open (datad *d, ggobid *gg) {
+exclusion_window_open (ggobid *gg) {
 
   GtkWidget *vbox, *ebox, *btn;
   gint k;
+  datad *d = gg->current_display->d;
 
   if (exclusion_window == NULL) {
 

@@ -12,14 +12,6 @@
 extern void sgenrand (gulong);
 extern double genrand (void);
 
-#if defined (_WIN32)
-#include <sys/stat.h> 
-#else
-/* on linux, this sometimes insists on being spelled out */
-extern void srand48 (glong);
-extern double drand48 (void);
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,40 +27,21 @@ sqdist (gint x1, gint y1, gint x2, gint y2) {
 
 void
 init_random_seed () {
-#if defined (_WIN32)
-  srand ((gint) time ((glong *) 0));
-#elif defined (USE_RANDOM)
-  srandom ((gint) time ((glong *) 0));
-#elif defined (MERSENNETWISTER)
   sgenrand ((glong) time ((glong *) 0));
-#else
-  srand48 ((glong) time ((glong *) 0));
-#endif
 }
 
+
+/* returns a random number on [0.0,1.0] */
 gdouble
 randvalue (void) {
-  gdouble drand;
-
-#if defined (_WIN32)
-  gint rval = rand ();
-  drand = ((gdouble) rval / RAND_MAX);
-#elif defined (USE_RANDOM)
-  /* random () returns a value on [0, (2**31)-1], or [0, INT_MAX] */
-  glong lrand = (glong) random ();
-  drand = (gdouble) lrand / (gdouble) INT_MAX;
-#elif defined (MERSENNETWISTER)
-  drand = genrand ();
-#else
-  drand = drand48 ();    /* rrand on [0.0,1.0] */
-#endif
-
-  return drand;
+  return (genrand ());   
 }
 
+/*-- returns two random numbers on [-1,1] --*/
 void
 rnorm2 (gdouble *drand, gdouble *dsave) {
 
+/*
 #if defined (_WIN32)
   *drand = 2.0 * randvalue() - 1.0;
   *dsave = 2.0 * randvalue() - 1.0;
@@ -82,6 +55,9 @@ rnorm2 (gdouble *drand, gdouble *dsave) {
   *drand = 2.0 * drand48() - 1.0;
   *dsave = 2.0 * drand48() - 1.0;
 #endif
+*/
+  *drand = 2.0 * genrand () - 1.0;
+  *dsave = 2.0 * genrand () - 1.0;
 }
 
 gint

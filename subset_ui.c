@@ -114,13 +114,14 @@ void set_block_incr_cb (GtkAdjustment *adj, GtkSpinButton *spin )
  * and the value of d is reset?
 */
 void
-subset_window_open (datad *d, ggobid *gg) {
+subset_window_open (ggobid *gg) {
 
   GtkWidget *button, *t;
   GtkWidget *vbox, *frame, *hb, *vb;
   GtkWidget *label;
   GtkWidget *spinner, *start_spinner, *block_spinner;
   GtkAdjustment *adj;
+  datad *d = gg->current_display->d;
   gfloat fnr = (gfloat) d->nrows;
 
   if (d->nrows == 0)  /*-- if used before we have data --*/

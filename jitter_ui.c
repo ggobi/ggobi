@@ -69,12 +69,13 @@ vgroups_cb (GtkToggleButton *button, ggobid *gg)
 
 /*-- warning: should be independent of datad --*/
 void
-jitter_window_open (datad *d, ggobid *gg) {
+jitter_window_open (ggobid *gg) {
 
   GtkWidget *btn, *tgl, *lbl;
   GtkWidget *vbox, *vb;
   GtkWidget *sbar, *opt;
   GtkObject *adj;
+  datad *d = gg->current_display->d;
 
   if (d->nrows == 0)  /*-- if used before we have data --*/
     return;
