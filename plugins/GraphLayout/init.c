@@ -13,6 +13,7 @@ glayout_init (glayoutd *gl) {
   arrayd_init_null (&gl->dist);
   arrayd_init_null (&gl->pos);
 
+  gl->d = NULL;
   gl->e = NULL;
   gl->dsrc = NULL;
 

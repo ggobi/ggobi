@@ -157,7 +157,6 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
 {
   glong *visible;
   gint nvisible;
-  GtkWidget *w;
 /*-- to add variables --*/
   gint i, nP, nC, nS;
   gdouble *x, *y, *depth, *inDegree, *outDegree;
@@ -171,9 +170,10 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
   gdouble *values;
   gchar **rownames, **colnames, **rowids;
   displayd *dspnew;
-  gboolean edges_displayed;
   gboolean redisplay_all = false;  /* if points are hidden in this function */
   DisplayOptions *opts = NULL;
+  GtkWidget *w;
+
   if (e == NULL) {
     g_printerr ("Unable to proceed: no edge set is specified\n");
     return;
@@ -323,57 +323,28 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
   GGOBI_getSessionOptions()->info->createInitialScatterPlot = false;
   /*-- --*/
 
-  dnew = datad_create (nvisible, nc, gg);
-  dnew->name = g_strdup ("radial");
-  dnew->nickname = g_strdup ("rad");
-
-  GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
-    gg, rowids, false, desc);
-
-  /*-- copy the color and glyph vectors from d to dnew --*/
-  for (i=0; i<nvisible; i++) {
-    dnew->color.els[i] = dnew->color_now.els[i] = dnew->color_prev.els[i] =
-      d->color.els[visible[i]];
-    dnew->glyph.els[i].type = dnew->glyph_now.els[i].type =
-      dnew->glyph_prev.els[i].type = d->glyph.els[visible[i]].type;
-    dnew->glyph.els[i].size = dnew->glyph_now.els[i].size =
-      dnew->glyph_prev.els[i].size = d->glyph.els[visible[i]].size;
-  }
-
-/*
- * open a new scatterplot with the new data, and display edges
- * as they're displayed in the current datad.
-*/
-  opts = GGOBI(getDefaultDisplayOptions)();
-  opts->axes_show_p = false;
-  opts->edges_undirected_show_p = true;
-  dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
-  opts->axes_show_p = true;  /*-- restore it --*/
-  opts->edges_undirected_show_p = false;
-
-  setDisplayEdge (dspnew, e);
-
-  displays_tailpipe (FULL, gg);
-
-  g_free (values);
-  g_free (rownames);
-  g_free (colnames);
-/*
-  for (m=0; m<nvisible; m++)
-    g_free (rowids[m]);
-  g_free (rowids);
-*/
-  g_free (visible);
-
-/*-- overwrite new radial variables --*/
-/*
+  /*
+   * Determine whether to create a new datad or whether to
+   * re-use an existing datad.  For now, only re-use a datad
+   * and a display if current_display->d->nrows = nvisible
+   */
+  if (gl->radialNewData == false && gl->d != NULL &&
+      gl->d->nrows == nvisible && gl->d->ncols == 8)
+  {
     gint j;
+    datad *d = gl->d;
+
     j = GGOBI(getVariableIndex)("x", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = x[i];
     limits_set_by_var (j, true, true, d, gg);
 
     j = GGOBI(getVariableIndex)("y", d, gg);
+    for (i=0; i<d->nrows; i++)
+      d->raw.vals[i][j] = d->tform.vals[i][j] = y[i];
+    limits_set_by_var (j, true, true, d, gg);
+
+    j = GGOBI(getVariableIndex)("depth", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = y[i];
     limits_set_by_var (j, true, true, d, gg);
@@ -388,25 +359,74 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
       d->raw.vals[i][j] = d->tform.vals[i][j] = outDegree[i];
     limits_set_by_var (j, true, true, d, gg);
 
-    j = GGOBI(getVariableIndex)("nparents", d, gg);
+    j = GGOBI(getVariableIndex)("nParents", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = nParents[i];
     limits_set_by_var (j, true, true, d, gg);
 
-    j = GGOBI(getVariableIndex)("nchildren", d, gg);
+    j = GGOBI(getVariableIndex)("nChildren", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = nChildren[i];
     limits_set_by_var (j, true, true, d, gg);
 
-    j = GGOBI(getVariableIndex)("nsiblings", d, gg);
+    j = GGOBI(getVariableIndex)("nSiblings", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = nSiblings[i];
     limits_set_by_var (j, true, true, d, gg);
 
     tform_to_world (d, gg);
-    displays_tailpipe (FULL, gg);
   }
+  else {
+    gl->d = dnew = datad_create (nvisible, nc, gg);
+    dnew->name = g_strdup_printf ("rad:%s", 
+      (gchar *) g_array_index (d->rowlab, gchar *, gl->centerNodeIndex));
+    dnew->nickname = g_strdup ("rad");
+
+    GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
+		    gg, rowids, false, desc);
+
+    /*-- copy the color and glyph vectors from d to dnew --*/
+    for (i=0; i<nvisible; i++) {
+      dnew->color.els[i] = dnew->color_now.els[i] = dnew->color_prev.els[i] =
+	d->color.els[visible[i]];
+      dnew->glyph.els[i].type = dnew->glyph_now.els[i].type =
+	dnew->glyph_prev.els[i].type = d->glyph.els[visible[i]].type;
+      dnew->glyph.els[i].size = dnew->glyph_now.els[i].size =
+	dnew->glyph_prev.els[i].size = d->glyph.els[visible[i]].size;
+    }
+
+    /*
+     * open a new scatterplot with the new data, and display edges
+     * as they're displayed in the current datad.
+     */
+    opts = GGOBI(getDefaultDisplayOptions)();
+    opts->axes_show_p = false;
+    opts->edges_undirected_show_p = true;
+    dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
+    opts->axes_show_p = true;  /*-- restore it --*/
+    opts->edges_undirected_show_p = false;
+
+    setDisplayEdge (dspnew, e);
+  }
+
+  displays_tailpipe (FULL, gg);
+
+  /* enable the check button widget for choosing to re-use a datad and
+     displays */
+  if (gl && gl->window) {
+    w = widget_find_by_name (gl->window, "RADIAL:newdata");
+    gtk_widget_set_sensitive (w, true);
+  }
+
+  g_free (values);
+  g_free (rownames);
+  g_free (colnames);
+/*
+  for (m=0; m<nvisible; m++)
+    g_free (rowids[m]);
+  g_free (rowids);
 */
+  g_free (visible);
 
   g_free (x);
   g_free (y);
@@ -917,7 +937,7 @@ gint radial_auto_update_set (gboolean state, PluginInstance *inst)
   GtkWidget *w;
 
   if (gl) {
-    w = widget_find_by_name (gl->window, "RADIAL_AUTO_UPDATE");
+    w = widget_find_by_name (gl->window, "RADIAL:autoupdate");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), state);
     return 1;
   }
@@ -929,7 +949,7 @@ gint radial_new_data_set (gboolean state, PluginInstance *inst)
   GtkWidget *w;
 
   if (gl) {
-    w = widget_find_by_name (gl->window, "RADIAL_NEW_DATA");
+    w = widget_find_by_name (gl->window, "RADIAL:newdata");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), state);
     return 1;
   }

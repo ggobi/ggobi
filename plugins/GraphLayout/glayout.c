@@ -276,7 +276,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
     GTK_SIGNAL_FUNC (radial_auto_update_cb), (gpointer) inst);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
     gl->radialAutoUpdate);
-  gtk_widget_set_name (btn, "RADIAL_AUTO_UPDATE");
+  gtk_widget_set_name (btn, "RADIAL:autoupdate");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Automatically update the layout when a new sticky label is assigned, or wait until the apply button is pressed", 
     NULL);
@@ -285,13 +285,13 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   /*-- checkbox: create new datad and display: this has to
     be on and insensitive initially.  It should become sensitive
     after the first layout has been generated. --*/
-  btn = gtk_check_button_new_with_label("Create new data and display");
+  btn = gtk_check_button_new_with_label("Create new data and display when updating layout");
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
     GTK_SIGNAL_FUNC (radial_new_data_cb), (gpointer) inst);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
     gl->radialNewData);
   gtk_widget_set_sensitive (btn, false);
-  gtk_widget_set_name (btn, "RADIAL_NEW_DATAD");
+  gtk_widget_set_name (btn, "RADIAL:newdata");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Create new data and display when pressing the apply button, or re-use existing resources", 
     NULL);

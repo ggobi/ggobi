@@ -41,6 +41,7 @@ typedef enum {neato_shortest_path, neato_circuit_resistance} NeatoModel;
 typedef struct {
 
   datad *dsrc, *e;
+  datad *d;  /* the last datad created */
   GtkWidget *window;
 
   array_d dist;
