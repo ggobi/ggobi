@@ -24,6 +24,8 @@
 #include "vars.h"
 #include "externs.h"
 
+#include "tour_pp.h"
+
 #define T2DON true
 #define T2DOFF false
 

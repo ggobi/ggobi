@@ -28,6 +28,7 @@ extern gint _finite (gdouble);
 #include "vars.h"
 #include "externs.h"
 
+#include "tour_pp.h"
 #include "tour1d_pp.h"
 
 /* */
