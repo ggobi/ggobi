@@ -142,6 +142,11 @@ extern displayd *GGOBI(newScatmat)(gint *rows, gint *columns, gint nr, gint nc, 
 extern displayd *GGOBI(newParCoords)(gint *vars, gint num, datad *, ggobid *gg);
 extern displayd *createPlot(gint type, gchar **varnames);
 
+
+extern void
+GGOBI(setPlotRange)(double *x, double *y, int plotNum, displayd *display, gboolean pixels, ggobid *gg);
+
+
 /*-- point glyph types and sizes --*/
 extern gint *GGOBI(getGlyphTypes)(gint *n);
 extern const gchar **const GGOBI(getGlyphTypeNames)(gint *n);

@@ -1148,12 +1148,10 @@ GGOBI(getVariableIndex)(const gchar *name, datad *d, ggobid *gg)
 }
 
 void
-GGOBI(setPlotRange)(double *x, double *y, int displayNum, int plotNum, gboolean pixels, ggobid *gg)
+GGOBI(setPlotRange)(double *x, double *y, int plotNum, displayd *display, gboolean pixels, ggobid *gg)
 {
   splotd *sp;
-  displayd *display;
 
-  display = GGOBI(getDisplay)(displayNum, gg);
   sp = GGOBI(getPlot)(display, plotNum);
 
   if(pixels) {
