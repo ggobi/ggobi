@@ -1186,7 +1186,7 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
                (gint) ((gfloat) iy / dst *
                (gfloat) sp->da->allocation.height/8);
             gdk_draw_string (drawable, style->font, gg->plot_GC,
-              ix + 5, iy - 5,
+              ix, iy,
               d->vartable[j].collab_tform);
 	  }
 	}     
