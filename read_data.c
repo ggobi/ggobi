@@ -37,7 +37,7 @@ rowlabels_alloc () {
 }
 
 gboolean
-rowlabels_read (gchar *data_in, gboolean init)
+rowlabels_read (gchar *ldata_in, gboolean init)
 {
   gint i;
   static gchar *suffixes[] = {
@@ -51,8 +51,8 @@ rowlabels_read (gchar *data_in, gboolean init)
   if (init)
     rowlabels_alloc ();
 
-  if (data_in != NULL && data_in != "" && strcmp (data_in,"stdin") != 0)
-    if ((fp = open_xgobi_file_r (data_in, 3, suffixes, true)) != NULL)
+  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
+    if ((fp = open_xgobi_file_r (ldata_in, 3, suffixes, true)) != NULL)
       found = true;
 
   /*
@@ -113,7 +113,7 @@ rowlabels_read (gchar *data_in, gboolean init)
 /*------------------------------------------------------------------------*/
 
 gboolean
-collabels_read (gchar *data_in, gboolean init)
+collabels_read (gchar *ldata_in, gboolean init)
 {
   static gchar *suffixes[] = {
     ".col", ".column", ".collab", ".var"
@@ -126,8 +126,8 @@ collabels_read (gchar *data_in, gboolean init)
   /*
    * Check if variable label file exists, and open if so.
   */
-  if (data_in != NULL && data_in != "" && strcmp (data_in,"stdin") != 0)
-    if ((fp=open_xgobi_file_r (data_in, 4, suffixes, true)) != NULL)
+  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
+    if ((fp=open_xgobi_file_r (ldata_in, 4, suffixes, true)) != NULL)
       found = true;
 
   /*
@@ -191,7 +191,7 @@ collabels_read (gchar *data_in, gboolean init)
 /*------------------------------------------------------------------------*/
 
 gboolean
-vgroups_read (gchar *data_in, gboolean init)
+vgroups_read (gchar *ldata_in, gboolean init)
 /*
  * Read in the grouping numbers for joint scaling of variables
 */
@@ -201,8 +201,8 @@ vgroups_read (gchar *data_in, gboolean init)
   gboolean found = false;
   FILE *fp;
 
-  if (data_in != NULL && data_in != "" && strcmp (data_in, "stdin") != 0)
-    if ((fp = open_xgobi_file_r (data_in, 1, suffixes, true)) != NULL)
+  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
+    if ((fp = open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
   if (found) {
@@ -251,7 +251,7 @@ rgroups_free () {
 }
 
 gboolean
-rgroups_read (gchar *data_in, gboolean init)
+rgroups_read (gchar *ldata_in, gboolean init)
 /*
  * Read in the grouping numbers for joint scaling of variables
 */
@@ -266,8 +266,8 @@ rgroups_read (gchar *data_in, gboolean init)
 
   if (xg.nrgroups > 0) rgroups_free ();
 
-  if (data_in != NULL && data_in != "" && strcmp (data_in, "stdin") != 0)
-    if ((fp = open_xgobi_file_r (data_in, 1, suffixes, true)) != NULL)
+  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
+    if ((fp = open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
   
   if (!found) {
@@ -405,7 +405,7 @@ readGlyphErr (void) {
 /*------------------------------------------------------------------------*/
 
 gboolean
-point_glyphs_read (gchar *data_in, gboolean reinit)
+point_glyphs_read (gchar *ldata_in, gboolean reinit)
 {
   gboolean ok = true;
   gchar *suffixes[] = {".glyphs"};
@@ -419,8 +419,8 @@ point_glyphs_read (gchar *data_in, gboolean reinit)
   if (reinit)
     br_glyph_ids_alloc ();
 
-  if (data_in != NULL && data_in != "" && strcmp (data_in, "stdin") != 0)
-    if ((fp = open_xgobi_file_r (data_in, 1, suffixes, true)) != NULL)
+  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
+    if ((fp = open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
   if (!found && reinit)
@@ -529,7 +529,7 @@ point_glyphs_read (gchar *data_in, gboolean reinit)
 }
 
 gboolean
-point_colors_read (gchar *data_in, gboolean reinit)
+point_colors_read (gchar *ldata_in, gboolean reinit)
 {
   gboolean ok = false;
   gboolean found = false;
@@ -541,8 +541,8 @@ point_colors_read (gchar *data_in, gboolean reinit)
   if (reinit)
     br_color_ids_alloc ();
 
-  if (data_in != NULL && data_in != "" && strcmp (data_in, "stdin") != 0) {
-    if ( (fp = open_xgobi_file_r (data_in, 1, suffixes, true)) != NULL)
+  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0) {
+    if ( (fp = open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
     if (!found && reinit == true)
@@ -584,7 +584,7 @@ point_colors_read (gchar *data_in, gboolean reinit)
 /*------------------------------------------------------------------------*/
 
 gboolean
-line_colors_read (gchar *data_in, gboolean reinit)
+line_colors_read (gchar *ldata_in, gboolean reinit)
 {
   gint i, id, retval;
   gboolean ok = false;
@@ -598,8 +598,8 @@ line_colors_read (gchar *data_in, gboolean reinit)
     /*
      * Check if line colors file exists.
     */
-    if (data_in != NULL && data_in != "" && strcmp (data_in, "stdin") != 0) {
-      if ( (fp=open_xgobi_file_r (data_in, 1, suffixes, true)) != NULL)
+    if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0) {
+      if ( (fp=open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
           ok = true;
 
       if (!ok && reinit == true)
@@ -726,7 +726,7 @@ segments_read (gchar *rootname, gboolean startup)
 /*------------------------------------------------------------------------*/
 
 gboolean
-nlinkable_read (gchar *data_in, gboolean init)
+nlinkable_read (gchar *ldata_in, gboolean init)
 /*
  * Read in the number of rows to be linked.
 */
@@ -743,8 +743,8 @@ nlinkable_read (gchar *data_in, gboolean init)
   if (init)
     xg.nlinkable = xg.nrows;
 
-  if (data_in != NULL && data_in != "" && strcmp (data_in, "stdin") != 0)
-    if ( (fp=open_xgobi_file_r (data_in, 1, suffixes, true)) != NULL)
+  if (ldata_in != NULL && data_in != "" && strcmp (ldata_in, "stdin") != 0)
+    if ( (fp=open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
   
   if (found) {
@@ -774,7 +774,7 @@ nlinkable_read (gchar *data_in, gboolean init)
 /*------------------------------------------------------------------------*/
 
 gboolean
-erase_read (gchar *data_in, gboolean reinit)
+erase_read (gchar *ldata_in, gboolean reinit)
 /*
  * Read in the erase vector
 */
@@ -787,8 +787,8 @@ erase_read (gchar *data_in, gboolean reinit)
   if (reinit)
     erase_alloc ();
 
-  if (data_in != NULL && data_in != "" && strcmp (data_in,"stdin") != 0)
-    if ((fp=open_xgobi_file_r (data_in, 1, suffixes, true)) != NULL)
+  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
+    if ((fp=open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
   if (found) {
@@ -819,7 +819,7 @@ erase_read (gchar *data_in, gboolean reinit)
 
 
 void
-missing_values_read (gchar *data_in, gboolean init)
+missing_values_read (gchar *ldata_in, gboolean init)
 {
   gchar *suffixes[] = {".missing"};
   gint i, j, ok, itmp, row, col;
@@ -830,8 +830,8 @@ missing_values_read (gchar *data_in, gboolean init)
   if (xg.file_read_type != read_all)
     return;
 
-  if (data_in != NULL && data_in != "" && strcmp (data_in,"stdin") != 0)
-    if ((fp=open_xgobi_file_r (data_in, 1, suffixes, true)) != NULL)
+  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
+    if ((fp=open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
   if (found) {
@@ -851,7 +851,7 @@ missing_values_read (gchar *data_in, gboolean init)
       if (i==xg.nrows && j>0) ok = false;
 
       if (!ok) {
-        g_print ("Problem reading %s.missing", data_in);
+        g_print ("Problem reading %s.missing", ldata_in);
         g_print (" at row %d, column %d.\n", i, j);
         g_print ("Make sure dimensions of %s and %s.missing match\n",
           data_in, data_in);

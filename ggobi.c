@@ -10,7 +10,6 @@
 #include "externs.h"
 
 static gchar *version_date = "January 5, 2000";
-gchar *data_in;
 
 gint
 parse_command_line (gint *argc, gchar **av)

@@ -245,7 +245,7 @@ scale_event_handlers_toggle (splotd *sp, gboolean state) {
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-GtkWidget *scale_reset_menu;
+
 
 
 void

@@ -111,25 +111,20 @@ GGobi can then invoke this function with a pair of variable values and
 extract the values for the result.
 The following C code illustrates how this might work.
 \begin{verbatim}
- USER_OBJECT_ x, y, call;
+ USER_OBJECT_ x, y, call, tmp;
 
   call = allocVector(VECSXP, 3);
   PROTECT(args);
   CAR(args) = RS_smootherFunction;
   CAR(CDR(args)) =  RS_GGOBI(variableToRS)(xindex);
-  CAR(CDR(CDR(args))) =  RS_GGOBI(variableToRS)(xindex);
- 
+  CAR(CDR(CDR(args))) =  RS_GGOBI(variableToRS)(yindex);
+     tmp = NEW_NUMERIC(1);
+     NUMERIC_DATA(tmp)[0] = width;
+     CAR(CDR(CDR(CDR(e)))) =  tmp;
   ans = eval(call, R_GlobalEnv);
 
   UNPROTECT(1);
 \end{verbatim}
-
-
-
-In order to effect this, we define routines that mask the ones used in
-the regular stand-alone Ggobi.  When we link R.so with libGgobi.so, we
-arrange to have the routines we define in this package be invoked.
-
 
 The user can now register the function to use for smoothing, allowing
 them to control how it is performed. The only constraint is that it
@@ -138,11 +133,43 @@ vector of the same length as the inputs.
 
 
 
+On difficulty we face is how to arrange to have these routines called.
+One way is to them to be registered as functions to be called by
+GGobi. This would make the GGobi code more complicated and indirect.
+An alternative is to use the linking facilities to override or replace
+routines from GGobi with those in the R.so.  When we link R.so with
+libGgobi.so, we arrange to have the routines we define in this package
+be invoked.  For this to happen, we obviously must define methods with
+the same name. Also, they must have the same signature - parameter and
+return types. Then, we implement the body of the replacement
+routine in whatever manner we wish.
+
 
 
 Example for smoothing,identify, etc.
 
+
+The function that is registered can be a closure
+with its own ``local'' state.
+
 Closures for mutable state and local variables.
+
+
+
+\section{Multiple GGobi}
+Occassionally, it is useful to interact with two or more datasets
+simultaneously. Constrasting the same views with different data,
+comparing characteristics and working on different projects
+simultaneously are obvious contexts. The R-GGobi connection allows
+multiple ggobi ``devices'' to be created.  These are indexed by name
+and/or number and are similar to the regular graphics devices.
+
+
+The following command identifies
+the symbols that are static variables
+\begin{verbatim}
+ nm -A *.o | grep ' [a-tA-Z] ' | grep -v ' [UTtb] ' | grep -v '.*\.[0-9]*$'
+\end{verbatim}
 
 
 

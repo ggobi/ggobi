@@ -8,6 +8,8 @@
 #include <math.h>
 #include <gtk/gtk.h>
 
+#include "ggobi.h"
+
 extern gdouble randvalue (void);
 
 /*
@@ -20,7 +22,7 @@ extern gdouble randvalue (void);
 */
 
 gint myrnd (gint);
-gfloat *gy;
+
 
 gint
 psort (const void *arg1, const void *arg2)
@@ -29,9 +31,9 @@ psort (const void *arg1, const void *arg2)
   gint *x1 = (gint *) arg1;
   gint *x2 = (gint *) arg2;
 
-  if (gy[*x1] < gy[*x2])
+  if (xg.app._gy[*x1] < xg.app._gy[*x2])
     val = -1;
-  else if (gy[*x1] > gy[*x2])
+  else if (xg.app._gy[*x1] > xg.app._gy[*x2])
     val = 1;
 
   return (val);
@@ -177,13 +179,13 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
  * gy is needed solely for the psort routine:  psort is used by
  * qsort to put an index vector in the order that yy will assume.
 */
-  gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
+  xg.app._gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
   xx = (gfloat *) g_malloc (ny * sizeof (gfloat));
 
   for (i=0; i<ny; i++)
   {
     indx[i] = i;
-    gy[i] = yy[i];
+    xg.app._gy[i] = yy[i];
   }
 
   qsort ((void *) indx, (size_t) ny, sizeof (gint), psort);
@@ -223,7 +225,7 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
 
   if (stages<=1) {
     g_free ((gpointer) indx);
-    g_free ((gpointer) gy);
+    g_free ((gpointer) xg.app._gy);
     g_free ((gpointer) xx);
     return;
   }

@@ -13,7 +13,7 @@ gboolean active_paint_points ();
 
 static gulong npts_under_brush = 0;
 
-brush_coords brush_pos ;
+
   /* corner (x1, y1); corner where the cursor goes (x2,y2) */
 
 void

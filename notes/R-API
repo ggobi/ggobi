@@ -1,8 +1,4 @@
-I have added some implementations in ggobi-API.c
-Also, the GGobiAPI.h has prototypes for some of these.
-
-! gchar *getFileName ()
-! DataMode getDataMode()
+gchar *getFileName ()
 
 /*
  * data, but also row and column labels, lines, colors, blahblah
@@ -10,12 +6,8 @@ Also, the GGobiAPI.h has prototypes for some of these.
 */
 void setData ()
 
-/* Whether to get the transformed names or the regular ones. */
-! gchar **getVariableNames (bool transformed)
-/* */
-
-! void setVariableName (gint jvar, gchar *name)
-
+gchar *getVariableNames ()
+void setVariableName (gint jvar, gchar *name)
 
 gchar *getViewTypes ()
 gint getView ()
@@ -56,15 +48,14 @@ void setCaseName (gint pt, gchar *lbl)
 void newScatterplot (gint ix, gint iy, gchar *viewType)
 void newScatmat (gint *rows, gint *columns)
 void newParCoords (gint *vars)
-
-! void destroyCurrentDisplay ()
+void destroyCurrentDisplay ()
 
 gint *getPlottedVariables ()
 
 /* tour2d */
 ??
 
- /* variable groups */
+/* variable groups */
 
 gint *getVarGroups ()
 void setVarGroups (gint *group_id)

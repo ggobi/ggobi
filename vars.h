@@ -30,20 +30,5 @@
 #include "gtkextruler.h"
 #endif
 
-XGOBI_ xgobid xg;
 
-XGOBI_ GtkWidget *control_panel[NMODES];
 
-XGOBI_ GdkGC *plot_GC;
-XGOBI_ GdkGC *selvarfg_GC, *selvarbg_GC;     /* white background, thick lines */
-XGOBI_ GdkGC *unselvarfg_GC, *unselvarbg_GC; /* grey background, thin lines */
-
-XGOBI_ GList *displays;
-XGOBI_ displayd *current_display;
-
-/* The splot which has the mouse and keyboard focus */
-XGOBI_ splotd *current_splot; 
-
-XGOBI_ icoords mousepos, mousepos_o;
-
-XGOBI_ gboolean mono_p;

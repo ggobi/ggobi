@@ -155,7 +155,7 @@ display_new (gpointer cbd, guint action, GtkWidget *widget)
   displays = g_list_append (displays, (gpointer) display);
 
     /* If the tree of displays is active, add this to it. */
-  display_add_tree(display, -1, display_tree.tree);
+  display_add_tree(display, -1, xg.app.display_tree.tree);
 
   current_splot = (splotd *) g_list_nth_data (current_display->splots, 0);
   splot_set_current (current_splot, on);
@@ -198,7 +198,7 @@ display_free (displayd* display) {
     /* If the display tree is active, remove the corresponding
        entry.
      */
-    tree_display_entry_remove(display, display_tree.tree); 
+    tree_display_entry_remove(display, xg.app.display_tree.tree); 
 
     g_list_remove (displays, display);
 
@@ -237,14 +237,19 @@ display_free_all () {
 
 void
 display_set_current (displayd *new_display) {
-  extern GtkWidget *menubar;
-  extern GtkAccelGroup *main_accel_group;
 
   static GtkWidget *mode_item = NULL;
+
+  /*
+  extern GtkWidget *menubar;
+  extern GtkAccelGroup *main_accel_group;
+  */
+
+  /*
   extern GtkWidget *scatterplot_mode_menu;
   extern GtkWidget *scatmat_mode_menu;
   extern GtkWidget *parcoords_mode_menu;
-
+  */
   static gboolean firsttime = true;
 
   gtk_accel_group_unlock (main_accel_group);

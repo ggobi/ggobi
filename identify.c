@@ -6,7 +6,7 @@
 #include "externs.h"
 
 gint
-find_nearest_point (icoords *cursor_pos, splotd *sp)
+find_nearest_point (icoords *lcursor_pos, splotd *splot)
 {
 /*
  * Returns index of nearest un-erased point
@@ -19,8 +19,8 @@ find_nearest_point (icoords *cursor_pos, splotd *sp)
 
   for (i=0; i<xg.nrows_in_plot; i++) {
     if (!xg.erased_now[ k=xg.rows_in_plot[i] ]) {
-      xdist = sp->screen[k].x - cursor_pos->x;
-      ydist = sp->screen[k].y - cursor_pos->y;
+      xdist = splot->screen[k].x - lcursor_pos->x;
+      ydist = splot->screen[k].y - lcursor_pos->y;
       sqdist = xdist*xdist + ydist*ydist;
       if (sqdist < near) {
         near = sqdist;

@@ -8,7 +8,6 @@
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-GtkWidget *scatterplot_mode_menu;
 
 void
 scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func) {

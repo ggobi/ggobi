@@ -5,8 +5,7 @@
 #include "vars.h"
 #include "externs.h"
 
-GtkWidget *identify_link_menu;
-icoords cursor_pos;
+
 
 static void id_remove_labels_cb (GtkButton *button)
 {

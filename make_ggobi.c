@@ -38,9 +38,9 @@ void modes_init () {
 }
 
 gboolean
-fileset_read_init (gchar *data_in)
+fileset_read_init (gchar *ldata_in)
 {
-  gboolean ans = fileset_read (data_in);
+  gboolean ans = fileset_read (ldata_in);
   if (ans) {
     displayd *display;
 
@@ -58,9 +58,9 @@ fileset_read_init (gchar *data_in)
 
 
 gboolean
-fileset_read (gchar *data_in)
+fileset_read (gchar *ldata_in)
 {
-  xg.filename = g_strdup (data_in);
+  xg.filename = g_strdup (ldata_in);
   strip_suffixes ();  /*-- produces xg.fname, the root name --*/
 
   array_read ();
@@ -119,7 +119,7 @@ pipeline_init ()
 }
 
 void
-make_ggobi (gchar *data_in, gboolean processEvents) {
+make_ggobi (gchar *ldata_in, gboolean processEvents) {
   displayd *display;
 
   /*-- some initializations --*/
@@ -130,8 +130,8 @@ make_ggobi (gchar *data_in, gboolean processEvents) {
   color_table_init ();
   make_ui ();
 
-  if (data_in != NULL) {
-    if (fileset_read (data_in)) {
+  if (ldata_in != NULL) {
+    if (fileset_read (ldata_in)) {
       pipeline_init ();
 
       display_free_all ();  /*-- destroy any existing displays --*/

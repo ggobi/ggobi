@@ -27,7 +27,8 @@ SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c \
  utils_ui.c \
  subset_ui.c subset.c jitter_ui.c jitter.c smooth_ui.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
- display_tree.c
+ display_tree.c \
+ ggobi-API.c
 
 
 OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o utils.o array.o \
@@ -53,7 +54,8 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o utils.o array.o \
  utils_ui.o \
  subset_ui.o subset.o jitter_ui.o jitter.o smooth_ui.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
- display_tree.o
+ display_tree.o \
+ ggobi-API.o
 
 
 ggobi: $(OB)

@@ -1,3 +1,7 @@
+#ifndef TYPES_H
+#define TYPES_H
+
+#include <gtk/gtk.h>
 /* types.h */
 
 typedef struct {
@@ -121,3 +125,6 @@ typedef struct {
 } rgroupd;
 
 #define XGOBI_TYPES_H
+
+
+#endif

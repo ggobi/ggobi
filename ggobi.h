@@ -1,11 +1,91 @@
+#ifndef GGOBI_H
+#define GGOBI_H
+
+
 #ifndef DEFINES_H
 #include "defines.h"
 #endif
 
+#include "types.h"
+#include "display.h"
+#include "display_tree.h"
+
 typedef enum {ascii, Sprocess, binary} DataMode;
 typedef enum {read_all, read_block, draw_sample} FileReadType;
 
+
+struct _xgobid;
+
 typedef struct {
+
+ gchar *_data_in;
+ GtkWidget *_control_panel[NMODES];
+
+ GdkGC *_plot_GC;
+ GdkGC *_selvarfg_GC, *_selvarbg_GC;     /* white background, thick lines */
+ GdkGC *_unselvarfg_GC, *_unselvarbg_GC; /* grey background, thin lines */
+
+ struct _xgobid *_thisXg;
+ GList *_displays;
+ displayd *_current_display;
+
+ /* The splot which has the mouse and keyboard focus */
+ splotd *_current_splot; 
+
+ icoords _mousepos, _mousepos_o;
+
+ gboolean _mono_p;
+
+
+
+
+  /* main_ui */
+  GtkWidget *_menubar;
+  GtkAccelGroup *_main_accel_group;
+
+  /* brush_ui */
+  GtkWidget *_brush_reset_menu;
+  GtkWidget *_brush_link_menu;
+
+  /* brush */
+  brush_coords _brush_pos ;  
+
+  /* color_ui.c */
+  gint _spacing;
+
+  /* identify_ui.c */
+  GtkWidget *_identify_link_menu;
+  icoords _cursor_pos;
+
+  /* texture */
+  gfloat *_gy;
+
+  /* tour2d_ui */
+  GtkWidget *_tour2d_io_menu;
+
+  /* parcoords_ui */
+  GtkWidget *_parcoords_mode_menu;
+
+  /* scatmat_ui */
+  GtkWidget *_scatmat_mode_menu;
+
+  /* scatterplot_ui */
+  GtkWidget *_scatterplot_mode_menu;
+
+  /* display_tree */
+  DisplayTree display_tree;
+
+  /* rotate_ui */
+  GtkWidget *_rotation_io_menu;
+
+  /* scale_ui.c */
+  GtkWidget *_scale_reset_menu;
+
+} XGobiApp;
+
+
+
+typedef struct _xgobid {
 
 /************************** Data variables *************************/
 
@@ -156,8 +236,64 @@ typedef struct {
  gint pan_or_zoom;
 
 
+ XGobiApp app;
+
 } xgobid;
+
+
+
+
+
+#define data_in xg.app._data_in
+#define control_panel xg.app._control_panel
+#define plot_GC xg.app._plot_GC
+#define selvarfg_GC xg.app._selvarfg_GC
+#define selvarbg_GC xg.app._selvarbg_GC
+#define unselvarfg_GC xg.app._unselvarfg_GC
+#define unselvarbg_GC xg.app._unselvarbg_GC
+
+#define thisXg xg.app._thisXg
+#define displays xg.app._displays
+#define current_display xg.app._current_display
+
+#define current_splot xg.app._current_splot
+#define mousepos xg.app._mousepos
+#define mousepos_o xg.app._mousepos_o
+#define mono_p xg.app._mono_p
+
+
+#define menubar xg.app._menubar
+#define main_accel_group xg.app._main_accel_group
+
+#define brush_reset_menu xg.app._brush_reset_menu
+#define brush_link_menu xg.app._brush_link_menu
+
+#define brush_pos xg.app._brush_pos
+
+#define spacing xg.app._spacing
+
+#define identify_link_menu xg.app._identify_link_menu
+#define cursor_pos xg.app._cursor_pos
+
+#define gy             xg.app._gy
+#define tour2d_io_menu xg.app._tour2d_io_menu
+#define parcoords_mode_menu xg.app._parcoords_mode_menu
+
+#define scatmat_mode_menu xg.app._scatmat_mode_menu
+#define scatterplot_mode_menu xg.app._scatterplot_mode_menu
+
+#define rotation_io_menu xg.app._rotation_io_menu
+#define scale_reset_menu xg.app._scale_reset_menu
+
+
+
+XGOBI_ xgobid xg;
+
 
 #define XGOBI_H
 
+
+
+
+#endif
 

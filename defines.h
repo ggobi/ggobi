@@ -1,3 +1,7 @@
+#ifndef DEFINES_H
+#define DEFINES_H
+
+
 /* defines.h */
 
 #define XGOBI(a) XGobi_##a
@@ -225,3 +229,6 @@ enum displaytyped {scatterplot, scatmat, parcoords};
 
 #define EVENT_METHOD(i,x) GTK_WIDGET_CLASS(GTK_OBJECT(i)->klass)->x
 #define MISSING_P(i,j) (xg.missing.data[i][j] != 0)
+
+
+#endif /* End of conditional definition. */

@@ -8,7 +8,6 @@
 #include "vars.h"
 #include "externs.h"
 
-extern brush_coords brush_pos;  /* from brush.c */
 
 void
 assign_points_to_bins ()

@@ -10,8 +10,7 @@
 static gint mode = XYPLOT, prev_mode = XYPLOT;
 static gint projection = XYPLOT, prev_projection = XYPLOT;
 
-GtkWidget *menubar;
-GtkAccelGroup *main_accel_group;
+
 
 static GtkWidget *mode_frame;
 static char *mode_name[] = {
@@ -148,11 +147,12 @@ main_display_options_cb (gpointer data, guint action, GtkCheckMenuItem *w) {
 void
 mode_submenus_activate (splotd *sp, gint m, gboolean state)
 {
+  /*
   extern GtkWidget *scale_reset_menu;
   extern GtkWidget *brush_reset_menu, *brush_link_menu;
   extern GtkWidget *identify_link_menu;
   extern GtkWidget *rotation_io_menu, *tour2d_io_menu;
-
+  */
   static GtkWidget *reset_item = NULL;
   static GtkWidget *link_item = NULL;
   static GtkWidget *io_item = NULL;

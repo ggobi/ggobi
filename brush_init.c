@@ -8,7 +8,6 @@
 #include "externs.h"
 
 /* external variables */
-extern brush_coords brush_pos ;  /* from brush.c */
 
 /*-------------------------------------------------------------------------*/
 /*                      glyphs                                             */

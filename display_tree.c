@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
-#include "display_tree.h"
+#include "ggobi.h"
+/* #include "display_tree.h" */
 #include "externs.h"
 #include "vars.h"
 
@@ -15,7 +16,6 @@
  */
 
 
-DisplayTree display_tree;
 
 /*
   Create a window displaying a hierarchical
@@ -50,7 +50,7 @@ plot_tree_display()
     the entire contents of the tree and start rebuilding
     with the current model.
   */
- if(display_tree.tree == NULL) {
+ if(xg.app.display_tree.tree == NULL) {
   plot_tree_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(plot_tree_window), "GGobi Displays");
  } else {
@@ -62,7 +62,7 @@ plot_tree_display()
    This can attempt to remove the contents of the window,
    and allow them to be rebuilt so as to be consistent with the
    current display list.
-  tree = display_tree.tree;
+  tree = xg.display_tree.tree;
   gtk_container_remove(GTK_CONTAINER(gtk_widget_get_ancestor(plot_tree_window, GTK_TYPE_WINDOW)), tree);
   */
  }
@@ -86,8 +86,8 @@ plot_tree_display()
   gtk_signal_connect (GTK_OBJECT (plot_tree_window), "delete_event",
                       GTK_SIGNAL_FUNC (display_tree_delete_cb), NULL);
 
- display_tree.tree = tree;
- display_tree.numItems = numItems;
+ xg.app.display_tree.tree = tree;
+ xg.app.display_tree.numItems = numItems;
 
  return(GTK_TREE( tree ));
 }
@@ -123,8 +123,8 @@ gtk_signal_connect (GTK_OBJECT(item), "select",
 void
 display_tree_delete_cb(GtkWidget *w, GdkEvent *event, GtkWidget *display) 
 {
- display_tree.tree = NULL;
- display_tree.numItems = -1;
+ xg.app.display_tree.tree = NULL;
+ xg.app.display_tree.numItems = -1;
 }
 
 
@@ -275,7 +275,7 @@ void
 display_tree_display_child_select(GtkWidget *item, displayd *display)
 {
 
-  if(display_tree.tree == NULL) {
+  if(xg.app.display_tree.tree == NULL) {
     return;
   }
 
@@ -295,7 +295,7 @@ void
 display_tree_splot_child_select(GtkWidget *item, splotd *plot)
 {
 
-  if(display_tree.tree == NULL) {
+  if(xg.app.display_tree.tree == NULL) {
     return;
   }
 

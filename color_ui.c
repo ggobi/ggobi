@@ -12,7 +12,7 @@ static GtkWidget *colorseldlg = NULL;
 static GtkWidget *bg_da, *accent_da, *fg_da[NCOLORS], *current_da;
 
 static gint margin = 10;  /* between glyphs in the symbol_display */
-gint spacing;
+
 
 /*
  * Redraw one of the foreground color swatches

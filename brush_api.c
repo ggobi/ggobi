@@ -2,7 +2,6 @@
 #include "vars.h"
 #include "externs.h"
 
-extern brush_coords brush_pos;  /*-- from brush.c --*/
 
 void
 moveBrush (gint ulx, gint uly)  /*-- move brush and paint --*/

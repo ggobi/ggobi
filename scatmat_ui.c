@@ -67,8 +67,6 @@ cpanel_scatmat_make () {
 /*                       Resetting the main menubar                       */
 /*------------------------------------------------------------------------*/
 
-GtkWidget *scatmat_mode_menu;
-
 
 void
 scatmat_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func) {

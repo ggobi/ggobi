@@ -516,7 +516,7 @@ tour2d_event_handlers_toggle (splotd *sp, gboolean state) {
 /*                   Resetting the main menubar                         */
 /*----------------------------------------------------------------------*/
 
-GtkWidget *tour2d_io_menu;
+
 
 void
 tour2d_menus_make () {

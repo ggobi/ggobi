@@ -196,7 +196,7 @@ cpanel_parcoords_make () {
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-GtkWidget *parcoords_mode_menu;
+
 
 void
 parcoords_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func) {

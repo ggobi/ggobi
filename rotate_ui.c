@@ -130,7 +130,7 @@ rotation_event_handlers_toggle (splotd *sp, gboolean state)
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-GtkWidget *rotation_io_menu;
+
 
 void
 rotation_menus_make () {

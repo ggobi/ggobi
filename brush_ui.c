@@ -173,7 +173,7 @@ brush_event_handlers_toggle (splotd *sp, gboolean state) {
   }
 }
 
-GtkWidget *brush_reset_menu, *brush_link_menu;
+
 void
 brush_menus_make () {
   GtkWidget *item;
