@@ -30,6 +30,12 @@
 #include "colorscheme.h"
 #endif
 
+#ifdef WIN32
+#define DIR_SEPARATOR '\\'
+#else
+#define DIR_SEPARATOR '/'
+#endif
+
 static GGobiOptions sessionoptions;
 GGobiOptions *sessionOptions;
 
@@ -539,6 +545,7 @@ ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal)
     1) the -init command line option
     2) the GGOBIRC environment variable
     3) the $HOME/.ggobirc file.
+    4) ggobirc in the directory of the executable (argv[0]) 
  */
 void
 process_initialization_files()
@@ -559,6 +566,16 @@ process_initialization_files()
       if(tmp) {
         sprintf(buf, "%s/.ggobirc", tmp);
         fileName = buf;
+      } else {
+	char *v;
+        tmp = g_strdup(sessionOptions->cmdArgs[0]);
+        v = strrchr(tmp, DIR_SEPARATOR);
+        if(v) {
+	  v[1] = '\0';
+	}
+        sprintf(buf, "%sggobirc",tmp);
+        fileName = buf;
+        g_free(tmp);
       }
     }
     if(fileName)
