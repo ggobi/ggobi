@@ -310,17 +310,18 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
 {
   splotd *sp_prev = gg->current_splot;
   /*-- display and cpanel for outgoing current_splot --*/
-  displayd *display_prev = (displayd *) sp_prev->displayptr;
-  cpaneld *cpanel = &display_prev->cpanel;
+  displayd *display_prev = NULL;
+  cpaneld *cpanel = NULL;
   gint prev_mode = gg->mode;
 
   if (sp != sp_prev) {
+    if (sp_prev != NULL) {
+      splot_set_current (sp_prev, off, gg);
+      display_prev = (displayd *) sp_prev->displayptr;
+      cpanel = &display_prev->cpanel;
 
-   if (sp_prev != NULL) {
-    splot_set_current (sp_prev, off, gg);
-
-    if (gg->current_display != display)
-      display_set_current (display, gg);  /* old one off, new one on */
+      if (gg->current_display != display)
+        display_set_current (display, gg);  /* old one off, new one on */
     }
 
     gg->current_splot = sp;
@@ -336,6 +337,8 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
      *
      * otherwise, just redraw the borders of the two affected splots
     */
+    if (prev_mode == NULLMODE || cpanel == NULL)
+      displays_plot (NULL, FULL, gg);
     if (prev_mode == BRUSH && cpanel->br_mode == BR_TRANSIENT)
       displays_plot (NULL, FULL, gg);
     else if (prev_mode == IDENT)
