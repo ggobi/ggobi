@@ -145,11 +145,17 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   gboolean redisplay_all = false;  /* if points are hidden in this function */
 
   if (e == NULL) {
-    g_printerr ("Trouble:  no edge set is specified\n");
+    g_printerr ("Unable to proceed: no edge set is specified\n");
     return;
   }
-  if (!d->sampled.els[0] || d->hidden.els[0]) {
-    g_printerr ("Trouble: you've eliminated the center node.\n");
+
+  /*-- let the first node be the center node if it hasn't been set --*/
+  if (gl->centerNodeIndex == -1)
+    gl->centerNodeIndex = 0;
+  if (!d->sampled.els[gl->centerNodeIndex] ||
+       d->hidden.els[gl->centerNodeIndex])
+  {
+    g_printerr ("Unable to proceed: you've hidden the center node.\n");
     return;
   }
 
@@ -574,9 +580,6 @@ initRadialLayout (glong *visible, gint nvisible, ggobid *gg,
     }
   }
 
-  /*-- let the first node be the center node if it hasn't been set --*/
-  if (gl->centerNodeIndex == -1)
-    gl->centerNodeIndex = 0;
 
   gl->radial->centerNode = &gl->radial->nodes[gl->centerNodeIndex];
   gl->radial->centerNode->i = gl->centerNodeIndex;
