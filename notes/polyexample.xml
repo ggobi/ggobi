@@ -1,25 +1,27 @@
 <ggobidata count="2">
 
 <!--
-  In this example, the points that define the polygons do
-  exist as data points in ggobi.  This may be because we have
-  data on the nodes, or it may just be because we want to have
-  the points available for brushing.
+  There are three main elements in this file:
 
-  An id must be specified in the datad.
+  * one data element which defines the nodes of the polygon.
+    Since they live in a datad, they can be plotted and brushed
+    and so forth.  They must have ids.
 
-  How will the polygon viewer which variables from the data element
-  to use in constructing the polygons?  By default, it will use the
-  first two variables; it will be possible to choose other variables
-  or more variables.
+  * one polygon data element
 
-  Just for the heck of it, add a second datad consisting of
-  variables corresponding to each polygon.
+  * another data element, with covariates corresponding to 
+    each polygon.
+
+  How will the polygon viewer know which variables from the data
+  element to use in constructing the polygons?  By default, it will
+  use the first two variables; it will be possible to choose other
+  variables or more variables.
 
   A thought:  I wonder if this would allow us to explore Georgia
   Thompson's ranking data?  Perhaps we don't even need it, because we
-  could do everything useful with points and edges along, but it's
-  something to think about.
+  could do everything useful with points and edges along, but it
+  would allow us to have data on the polygons themselves, which 
+  we can't do otherwise.
 -->
 
 <data name="polygon nodes">
@@ -59,6 +61,8 @@
 
   Let's suppose we have no variables on the polygons, though
   we could have.
+
+  Notice that there are no polypoints.
 </description>
 
 <polygons>

@@ -1,34 +1,43 @@
 <ggobidata count="1">
 
 <!--
-  There are two main elements in this file: one regular ggobi data
-  element containing data corresponding to a set of polygons
-  element and one polygondata element.
+  There are two main elements in this file:
 
-  We think it makes sense to separate the data to be read
-  by the plugin from the data to be read by ggobi:  in
-  particular, the polygon definitions themselves.
+  * one polygondata element, which defines the polygons for the map.
+    It contains two main sub-elements:
+      * polypoints: the nodes for the polygons, each tagged with an id
+      * polygons: the polygons, referencing the polypoint ids
 
-  In some cases, the "polypoints" that are used to define the
-  polygons will be in here: in that case, the points will
-  not be sensitive to brushing and identification and can not
-  be plotted.  That makes sense for maps.
+    This element is read by the plugin and ignored by ggobi.
+
+  * one ggobi data element, containing data corresponding
+    to the polygons in the map.  This element is read by ggobi,
+    so it isn't read by the plugin.
+
+  There are two ways to define the nodes for polygons:  when they're
+  defined as they are here, in the polygon data element, the points
+  are not sensitive to brushing and identification and can not be
+  plotted.  That makes sense for maps.
 
   In other cases, the polydata element will not have any 
   points, and the polygons will be defined in terms of points
-  that exist in some ggobi data element.  (I'll put together
-  polyexample.xml to show what that might look like.)
+  that exist in some ggobi data element.  (see polyexample.xml)
 
-  These two cases may be represented by entirely different
-  plugins, come to think of it, but we can still come up with
-  a consistent way of defining them.
+  These two cases may in practice be represented by entirely
+  different plugins, come to think of it, but we can still come up
+  with a consistent way of defining them.
 
-  polypoints usually live in 2D, but they may occasionally
-  live in higher-dimensional spaces; in that sense, they may
-  need variables.  They must specify an id.
+  polypoints must always specify an id so they can be used to define
+  polygons.
+
+  polypoints usually live in 2D, but they may occasionally live in
+  higher-dimensional spaces.  We can use 'variables' or 'dimensions'
+  to describe the dimensions of that space.
 
   polygons may be nested, and because of that, they may need
-  more than one categorical variable.
+  more than one categorical variable:  eg, a polygon may exist
+  as a county by itself, or as one of a collection of counties
+  that make up a state.
 -->
 
 
@@ -39,10 +48,10 @@
 
 <!-- the points that will be used to define the polygons -->
 <polypoints>
-<dimensions count="2">
-  <dimension name="latitude" />
-  <dimension name="longitude" />
-</dimensions>
+<variables count="2">
+  <realvariable name="latitude" />
+  <realvariable name="longitude" />
+</variables>
 
 <records count="40000">
  <record id="0"> 2.5 4.7 </record>
@@ -77,7 +86,7 @@
   <polypts num="4"> <ppt>1</ppt>  <ppt>2</ppt> ... </polypts>
 </record>
 <record label="Lanai"> 0 0 
-  <polypts num="4"> <ppt>3</ppt>  <ppt>5</ppt> ... </polypts>
+  <polypts num="6"> <ppt>3</ppt>  <ppt>5</ppt> ... </polypts>
 </record>
 </records>
 
