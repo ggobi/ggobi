@@ -19,6 +19,30 @@
 static gint xmargin = 20;
 static gint ymargin = 20;
 
+/*------------- static utilities ------------------------------------------*/
+static GtkWidget *
+get_clist_from_widget (GtkWidget *w)
+{
+  /*-- find the current notebook page, then get the current clist --*/
+  GtkWidget *notebook = (GtkWidget *)
+    gtk_object_get_data (GTK_OBJECT(w), "notebook");
+  gint page = gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook));
+  GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
+  GtkWidget *clist = GTK_BIN (swin)->child;
+
+  return clist;
+}
+static gint
+get_selection_from_clist (GtkWidget *clist)
+{
+  GList *selection = GTK_CLIST (clist)->selection;
+  gint selected_var = -1;
+  if (selection) selected_var = (gint) selection->data;
+
+  return selected_var;
+}
+/*-------------------------------------------------------------------------*/
+
 static void
 bin_counts_reset (gint jvar, datad *d, ggobid *gg)
 {
@@ -90,13 +114,12 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
   gboolean rval = false;
   gfloat val;
 
+  GtkWidget *clist = get_clist_from_widget (w);
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint selected_var = get_selection_from_clist (clist);
+
   icoords *mousepos = &gg->wvis.mousepos;
   gint nearest_color = gg->wvis.nearest_color;
-  GtkWidget *clist = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(w), "clist");
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  GList *selection = GTK_CLIST (clist)->selection;
-  gint selected_var;
-  if (selection) selected_var = (gint) selection->data;
 
   gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
 
@@ -198,19 +221,14 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gint y = ymargin;
   GdkPoint *points;
   gfloat diff;
-/*
- * get the current d and the selected variable 
- *   in the clist in order to draw the labels
-*/
-  GtkWidget *clist = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(w), "clist");
+
+  GtkWidget *clist = get_clist_from_widget (w);
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  GList *selection = GTK_CLIST (clist)->selection;
-  gint selected_var = -1;
+  gint selected_var = get_selection_from_clist (clist);
 
   GtkWidget *da = gg->wvis.da;
   GdkPixmap *pix = gg->wvis.pix;
 
-  if (selection) selected_var = (gint) selection->data;
 
   if (gg->wvis.npct != gg->ncolors) {
     gg->wvis.npct = gg->ncolors;
@@ -370,6 +388,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 }
 
 /*-- update the contents of the clist --*/
+/*
 static void wvis_setdata_cb (GtkWidget *w, datad *d)
 {
   ggobid *gg = GGobiFromWidget(w, true);
@@ -394,6 +413,7 @@ static void wvis_setdata_cb (GtkWidget *w, datad *d)
     "expose_event",
     (gpointer) gg, (gpointer) &rval);
 }
+*/
 
 void
 selection_made_cb (GtkWidget *clist, gint row, gint column,
@@ -409,13 +429,11 @@ selection_made_cb (GtkWidget *clist, gint row, gint column,
     (gpointer) gg, (gpointer) &rval);
 }
 
-static void scale_apply_cb (GtkButton *w, ggobid* gg)
+static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 {
-  GtkWidget *clist = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(w), "clist");
+  GtkWidget *clist = get_clist_from_widget (w);
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  GList *selection = GTK_CLIST (clist)->selection;
-  gint selected_var = -1;
-  if (selection) selected_var = (gint) selection->data;
+  gint selected_var = get_selection_from_clist (clist);
 
   if (d && selected_var != -1) {
     gint i, m, k;
@@ -441,8 +459,9 @@ static void scale_apply_cb (GtkButton *w, ggobid* gg)
 
 void
 wvis_window_open (ggobid *gg) {
-  GtkWidget *opt, *vbox, *hbox, *hb, *menu, *menuitem;
-  GtkWidget *swin, *clist, *btn, *vb;
+  GtkWidget *vbox, *hb;
+  GtkWidget *notebook, *swin, *clist;
+  GtkWidget *btn, *vb;
   gint nd = g_slist_length (gg->d);
   gint j;
   GSList *l;
@@ -461,73 +480,37 @@ wvis_window_open (ggobid *gg) {
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 3);
     gtk_container_add (GTK_CONTAINER (gg->wvis.window), vbox);
 
-    /*-- defined here rather than later so that it can be used in the menu --*/
-    clist = gtk_clist_new (1);
-    /*-- --*/
+    /* Create a notebook, set the position of the tabs */
+    notebook = gtk_notebook_new ();
+    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
+    gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
+    gtk_box_pack_start (GTK_BOX (vbox), notebook, true, true, 2);
 
-    if (nd > 0) {
+    for (l = gg->d; l; l = l->next) {
+      d = (datad *) l->data;
 
-      /*-- option menu to specify the datad --*/
-      hbox = gtk_hbox_new (false, 0);
-      gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
-      hb = gtk_hbox_new (false, 0);
-      gtk_box_pack_start (GTK_BOX (hbox), hb, true, false, 0);
+      /* Create a scrolled window to pack the CList widget into */
+      swin = gtk_scrolled_window_new (NULL, NULL);
+      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
+        GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+      gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+                                swin, gtk_label_new (d->name));
+      gtk_widget_show (swin);
 
-      gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Dataset:"),
-        false, false, 2);
+      /* add the CList */
+      clist = gtk_clist_new (1);
+      gtk_clist_set_selection_mode (GTK_CLIST (clist), GTK_SELECTION_SINGLE);
+      gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
+      gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+                         GTK_SIGNAL_FUNC (selection_made_cb),
+                         gg);
 
-      opt = gtk_option_menu_new ();
-      gtk_widget_set_name (opt, "WEIGHTEDVIS:datad_option_menu");
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-        "Specify the dataset to use.",
-        NULL);
-
-      menu = gtk_menu_new ();
-      for (l = gg->d; l; l = l->next) {
-        d = (datad *) l->data;
-        menuitem = gtk_menu_item_new_with_label (d->name);
-        gtk_menu_append (GTK_MENU (menu), menuitem);
-        gtk_widget_show (menuitem) ;
-        gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-          GTK_SIGNAL_FUNC (wvis_setdata_cb), d);
-        GGobi_widget_set (menuitem, gg, true);
-        gtk_object_set_data (GTK_OBJECT (menuitem), "clist", clist);
+      for (j=0; j<d->ncols; j++) {
+        row[0] = g_strdup_printf (d->vartable[j].collab_tform);
+        gtk_clist_append (GTK_CLIST (clist), row);
       }
-      gtk_option_menu_set_menu (GTK_OPTION_MENU (opt), menu);
-      gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);
+      gtk_container_add (GTK_CONTAINER (swin), clist);
     }
-
-    /* Create a scrolled window to pack the CList widget into */
-    swin = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
-      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_box_pack_start (GTK_BOX (vbox), swin, true, true, 0);
-
-    /*-- variable list --*/
-    /*clist = gtk_clist_new (1);*/  /*-- created earlier --*/
-    gtk_clist_set_selection_mode (GTK_CLIST (clist), GTK_SELECTION_SINGLE);
-    gtk_object_set_data (GTK_OBJECT (clist), "datad", gg->d->data);
-    gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-                       GTK_SIGNAL_FUNC (selection_made_cb),
-                       gg);
-
-    /*-- populate with the all variables the first datad --*/
-    d = gg->d->data;
-    for (j=0; j<d->ncols; j++) {
-      row[0] = g_strdup_printf (d->vartable[j].collab_tform);
-      gtk_clist_append (GTK_CLIST (clist), row);
-    }
-    gtk_container_add (GTK_CONTAINER (swin), clist);
-
-
-    btn = gtk_button_new_with_label ("Update scale");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Update the scale of symbols", NULL);
-    gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
-/*
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (scale_update_cb), gg);
-*/
 
     /*-- colors, symbols --*/
     /*-- now we get fancy:  draw the scale, with glyphs and colors --*/
@@ -535,7 +518,7 @@ wvis_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vbox), vb, true, true, 0);
     gg->wvis.da = gtk_drawing_area_new ();
     gtk_drawing_area_size (GTK_DRAWING_AREA (gg->wvis.da), 400, 200);
-    gtk_object_set_data (GTK_OBJECT (gg->wvis.da), "clist", clist);
+    gtk_object_set_data (GTK_OBJECT (gg->wvis.da), "notebook", notebook);
     gtk_box_pack_start (GTK_BOX (vb), gg->wvis.da, true, true, 0);
 
     gtk_signal_connect (GTK_OBJECT (gg->wvis.da),
@@ -560,7 +543,7 @@ wvis_window_open (ggobid *gg) {
                | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
     btn = gtk_button_new_with_label ("Apply");
-    gtk_object_set_data (GTK_OBJECT (btn), "clist", clist);
+    gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Apply the color scale", NULL);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
