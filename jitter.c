@@ -110,7 +110,7 @@ void
 jitter_value_set (gfloat value, datad *d, ggobid *gg) {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
   gint j;
   vartabled *vt;
 

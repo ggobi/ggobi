@@ -45,7 +45,7 @@ datad_get_from_widget (GtkWidget *w, ggobid *gg)
     GtkWidget *clist = (GtkWidget *)
       gtk_object_get_data (GTK_OBJECT (w), "datad_clist");
     if (clist) {
-      gint kd = get_one_selection_from_clist (clist);  /* in utils_ui.c */
+      gint kd = get_one_selection_from_clist (clist, d);  /* in utils_ui.c */
       if (kd >= 0) d = (datad *) g_slist_nth_data (gg->d, kd);
     }
   }

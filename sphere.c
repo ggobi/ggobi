@@ -312,7 +312,7 @@ spherevars_set (ggobid *gg)
     if (clist == NULL) return;
     d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
     vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-    nvars = get_selections_from_clist (d->ncols, vars, clist);
+    nvars = get_selections_from_clist (d->ncols, vars, clist, d);
   }
 
   if (d->sphere.vars.els == NULL || d->sphere.vars.nels != nvars) {

@@ -302,7 +302,7 @@ void scale_set_default_values (GtkScale *scale)
 
 void
 variable_notebook_subwindow_add (datad *d,
-  GtkSignalFunc func, GtkWidget *notebook, ggobid *gg)
+  GtkSignalFunc func, GtkWidget *notebook, vartyped vtype, ggobid *gg)
 {
   GtkWidget *swin, *clist;
   gint j;
@@ -331,9 +331,14 @@ variable_notebook_subwindow_add (datad *d,
 
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get (j, d);
-    row[0] = g_strdup (vt->collab_tform);
-    gtk_clist_append (GTK_CLIST (clist), row);
-    g_free (row[0]);
+    if (vtype == all_vartypes ||
+        (vtype == categorical_only && vt->categorical_p) ||
+        (vtype == real_only && !vt->categorical_p))
+    {
+      row[0] = g_strdup (vt->collab_tform);
+      gtk_clist_append (GTK_CLIST (clist), row);
+      g_free (row[0]);
+    }
   }
 
   /*-- suggested by Gordon Deane; causes no change under linux --*/
@@ -349,7 +354,10 @@ static void
 variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
 {
   GtkSignalFunc func = NULL;
-  variable_notebook_subwindow_add (d, func, notebook, gg);
+  vartyped vtype;
+
+  vtype = (vartyped) gtk_object_get_data (GTK_OBJECT(notebook), "vartype");
+  variable_notebook_subwindow_add (d, func, notebook, vtype, gg);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_OBJECT(notebook)),
                               g_slist_length (gg->d) > 1);
 }
@@ -376,28 +384,38 @@ get_clist_from_object (GtkObject *obj)
   return clist;
 }
 gint  /*-- assumes GTK_SELECTION_SINGLE --*/
-get_one_selection_from_clist (GtkWidget *clist)
+get_one_selection_from_clist (GtkWidget *clist, datad *d)
 {
-  gint selected_var = -1;
+  gint jrow, selected_var = -1;
+  gchar *varname;
   if (clist) {
     GList *selection = GTK_CLIST (clist)->selection;
-    if (selection) selected_var = (gint) selection->data;
+    if (selection) {
+      jrow = (gint) selection->data;
+      gtk_clist_get_text (GTK_CLIST(clist), jrow, 0, &varname);
+      selected_var = vartable_index_get_by_name (varname, d);
+    }
   }
 
   return selected_var;
 }
 gint /*-- assumes multiple selection is possible --*/
-get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist)
+get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist,
+  datad *d)
 {
   gint nselected_vars = 0;
   GList *l;
-  gint j;
+  gint jrow, selected_var;
+  gchar *varname;
 
   for (l = GTK_CLIST (clist)->selection; l; l=l->next) {
-    j = GPOINTER_TO_INT (l->data);
-    if (j >= maxnvars)  break;
+    jrow = GPOINTER_TO_INT (l->data);
+    if (jrow >= maxnvars)  break;
 
-    vars[nselected_vars] = j;
+    gtk_clist_get_text (GTK_CLIST(clist), jrow, 0, &varname);
+    selected_var = vartable_index_get_by_name (varname, d);
+
+    vars[nselected_vars] = selected_var;
     nselected_vars++;
   }
 
@@ -452,6 +470,7 @@ CHECK_EVENT_SIGNATURE(variable_notebook_list_changed_cb, variable_list_changed_f
 
 GtkWidget *
 create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
+  vartyped vtype,
   GtkSignalFunc func, ggobid *gg)
 {
   GtkWidget *notebook;
@@ -465,11 +484,12 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
   gtk_object_set_data (GTK_OBJECT(notebook), "SELECTION", (gpointer) mode);
+  gtk_object_set_data (GTK_OBJECT(notebook), "vartype", (gpointer) vtype);
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (g_slist_length (d->vartable)) {
-      variable_notebook_subwindow_add (d, func, notebook, gg);
+      variable_notebook_subwindow_add (d, func, notebook, vtype, gg);
     }
   }
 

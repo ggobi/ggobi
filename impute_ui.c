@@ -58,7 +58,7 @@ impute_cb (GtkWidget *w, ggobid *gg) {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->impute.window));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
 
   impute_type = 
     gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->impute.notebook));
@@ -141,7 +141,7 @@ impute_window_open (ggobid *gg)
     
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vb,
-      GTK_SELECTION_EXTENDED,
+      GTK_SELECTION_EXTENDED, all_vartypes,
       (GtkSignalFunc) NULL, gg);
 
     /*-- Create a new notebook, place the position of the tabs --*/

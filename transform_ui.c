@@ -36,7 +36,7 @@ static void stage0_cb (GtkWidget *w, gpointer cbd)
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->tform_ui.window));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
 
   if (nvars) {
     transform (0, indx, -99., vars, nvars, d, gg);
@@ -59,7 +59,7 @@ stage1_cb (GtkWidget *w, gpointer cbd)
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->tform_ui.window));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
 
   if (nvars) {
     transform (1, indx, gg->tform_ui.boxcox_adj->value, vars, nvars, d, gg);
@@ -75,7 +75,7 @@ void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->tform_ui.window));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
   if (nvars) {
     transform (1, BOXCOX, adj->value, vars, nvars, d, gg);
     g_free (vars);
@@ -135,7 +135,7 @@ static void stage2_cb (GtkWidget *w, gpointer cbd)
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->tform_ui.window));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
   gint indx = GPOINTER_TO_INT (cbd);
 
   if (nvars) {
@@ -203,7 +203,7 @@ transform_window_open (ggobid *gg)
 
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox, GTK_SELECTION_EXTENDED,
-      (GtkSignalFunc) NULL, gg);
+      all_vartypes, (GtkSignalFunc) NULL, gg);
 
     /*
      * Stage 0: Domain adjustment

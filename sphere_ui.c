@@ -403,7 +403,7 @@ sphere_panel_open (ggobid *gg)
 
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox, GTK_SELECTION_EXTENDED,
-      (GtkSignalFunc) NULL, gg);
+      all_vartypes, (GtkSignalFunc) NULL, gg);
 
     /*-- use correlation matrix? --*/
     btn = gtk_check_button_new_with_label ("Use correlation matrix");

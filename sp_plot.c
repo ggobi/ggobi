@@ -532,7 +532,7 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
     GtkWidget *clist =
       get_clist_from_object (GTK_OBJECT (gg->control_panel[IDENT]));
     gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-    gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+    gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
     gint lval;
 
     for (j=0; j<nvars; j++) {

@@ -25,7 +25,7 @@ jitter_cb (GtkButton *w, ggobid *gg)
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
 
   if (nvars) {
     rejitter (vars, nvars, d, gg);
@@ -41,7 +41,7 @@ degree_cb (GtkAdjustment *adj, ggobid *gg) {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
 
   jitter_value_set (adj->value, d, gg);
   if (nvars) {
@@ -69,7 +69,7 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
 
   d->jitter.type = indx;
 
@@ -115,7 +115,7 @@ jitter_window_open (ggobid *gg) {
 
       /* Create a notebook, set the position of the tabs */
       notebook = create_variable_notebook (vbox, GTK_SELECTION_EXTENDED,
-        (GtkSignalFunc) NULL, gg);
+        all_vartypes, (GtkSignalFunc) NULL, gg);
 
       /*-- option menu --*/
       opt = gtk_option_menu_new ();

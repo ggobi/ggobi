@@ -62,7 +62,8 @@ wvis_variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
        * responds to "select_row" signal
       */
     }
-    variable_notebook_subwindow_add (d, func, GTK_WIDGET(notebook), gg);
+    variable_notebook_subwindow_add (d, func, GTK_WIDGET(notebook),
+      all_vartypes, gg);
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
                                 g_slist_length (gg->d) > 1);
   }
@@ -89,7 +90,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (g_slist_length (d->vartable)) {
-      variable_notebook_subwindow_add (d, func, notebook, gg);
+      variable_notebook_subwindow_add (d, func, notebook, all_vartypes, gg);
     }
   }
 
@@ -148,7 +149,7 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
   clist = get_clist_from_object (GTK_OBJECT (w));
   if(clist == NULL) {
       d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-      selected_var = get_one_selection_from_clist (clist);
+      selected_var = get_one_selection_from_clist (clist, d);
   } else {
       d = (datad *) g_slist_nth_data(gg->d, 0);
       selected_var = 0;
@@ -254,7 +255,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
 
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_one_selection_from_clist (clist);
+  gint selected_var = get_one_selection_from_clist (clist, d);
 
   icoords *mousepos = &gg->wvis.mousepos;
   gint color = gg->wvis.nearest_color;
@@ -340,7 +341,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_one_selection_from_clist (clist);
+  gint selected_var = get_one_selection_from_clist (clist, d);
 
   if (gg->wvis.motion_notify_id) {
     gtk_signal_disconnect (GTK_OBJECT (w), gg->wvis.motion_notify_id);
@@ -475,7 +476,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_one_selection_from_clist (clist);
+  gint selected_var = get_one_selection_from_clist (clist, d);
 
   GtkWidget *da = gg->wvis.da;
   GdkPixmap *pix = gg->wvis.pix;
@@ -813,7 +814,7 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint selected_var = get_one_selection_from_clist (clist);
+  gint selected_var = get_one_selection_from_clist (clist, d);
   vartabled *vt;
   colorschemed *scheme = (gg->wvis.scheme != NULL) ?
     gg->wvis.scheme : gg->activeColorScheme;

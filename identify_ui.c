@@ -239,7 +239,7 @@ cpanel_identify_make(ggobid *gg) {
 
   /*-- provide a variable list so that any variable can be the label --*/
   notebook = create_variable_notebook (gg->control_panel[IDENT],
-    GTK_SELECTION_EXTENDED, (GtkSignalFunc) NULL, gg);
+    GTK_SELECTION_EXTENDED, all_vartypes, (GtkSignalFunc) NULL, gg);
     /*-- this comes out with single selection; think about it --*/
     /*-- can make it a property of the notebook itself, actually --*/
   gtk_object_set_data (GTK_OBJECT (gg->control_panel[IDENT]),
