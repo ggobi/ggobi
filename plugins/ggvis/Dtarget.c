@@ -21,12 +21,12 @@ ggv_init_Dtarget (gint selected_var, ggvisd *ggv)
   /*-- initalize Dtarget --*/
   infinity = (gdouble) (2 * ggv->Dtarget.nrows);
   if (selected_var >= 0) {
-    for (i=0; i<e->edge.n; i++)
-      /*infinity = MAX (e->tform.vals[i][selected_var], infinity);*/
+    for (i=0; i<e->edge.n; i++) {
       if (e->tform.vals[i][selected_var] > infinity) {
         infinity = e->tform.vals[i][selected_var];
-         indx = i;
+        indx = i;
       }
+    }
   }
   g_printerr ("largest dissimilarity: %.3f\n", infinity);
   if (infinity > 100000) {
