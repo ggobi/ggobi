@@ -159,6 +159,7 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
     (gpointer) gg, (gpointer) &rval);
 }
 
+/*  The menu of colorschemes has been replaced by the tree.
 #ifdef USE_XML
 static void
 colorscheme_add_to_menu (GtkWidget *menu, gchar *lbl, colorschemed *scheme,
@@ -179,6 +180,7 @@ colorscheme_add_to_menu (GtkWidget *menu, gchar *lbl, colorschemed *scheme,
   gtk_widget_show (menuitem) ;
 }
 #endif
+*/
 
 
 /*-------------------------------------------------------------------------*/
@@ -220,7 +222,7 @@ static void
 record_colors_reset (gint selected_var, datad *d, ggobid *gg)
 {
   gint i, k, m;
-  vartabled *vt = vartable_element_get (selected_var, d);
+  vartabled *vt;
   gfloat min;
   gfloat max;
   gfloat val;
@@ -229,6 +231,7 @@ record_colors_reset (gint selected_var, datad *d, ggobid *gg)
   if(selected_var < 0)
       return;
 
+  vt = vartable_element_get (selected_var, d);
   scheme = gg->activeColorScheme;
 
   min = vt->lim_tform.min;
@@ -344,11 +347,11 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 
   *nearest_color = nearest;
 
-  if (*nearest_color != -1)
+  if (*nearest_color != -1) {
     gg->wvis.motion_notify_id = gtk_signal_connect (GTK_OBJECT (w),
-                                "motion_notify_event",
-                                (GtkSignalFunc) motion_notify_cb,
-                                (gpointer) gg);
+      "motion_notify_event", (GtkSignalFunc) motion_notify_cb, (gpointer) gg);
+  }
+
   return true;
 }
 
@@ -359,18 +362,15 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint selected_var = get_one_selection_from_clist (clist);
 
-  if(selected_var < 0) {
-        /* We might note the change or issue a warning that 
-           no variable is selected. */
-      return(0);
-  }
-  record_colors_reset (selected_var, d, gg);
-  clusters_set (d, gg);
-  displays_plot (NULL, FULL, gg);
-
   if (gg->wvis.motion_notify_id) {
     gtk_signal_disconnect (GTK_OBJECT (w), gg->wvis.motion_notify_id);
     gg->wvis.motion_notify_id = 0;
+  }
+
+  if (selected_var >= 0 && selected_var <= d->ncols) {
+    record_colors_reset (selected_var, d, gg);
+    clusters_set (d, gg);
+    displays_plot (NULL, FULL, gg);
   }
 
   return true;
@@ -1139,7 +1139,7 @@ createColorSchemeTree(gint numTypes, gchar *schemeTypes[], ggobid *gg,
 {
   GtkWidget *item;
   GtkWidget **trees, *top;
-  GtkWidget *tree;
+  /*GtkWidget *tree;*/
   gint n;
   GList *l;
   colorschemed *scheme;
