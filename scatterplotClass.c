@@ -722,11 +722,11 @@ void
 displaySet(displayd *dpy, ggobid *gg)
 {
   scatterplot_mode_menu_make (gg->main_accel_group,
-    (GtkSignalFunc) viewmode_set_cb, gg, true);
+			      (GtkSignalFunc) viewmode_set_cb, gg, true);
   gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-    gg->main_accel_group);
+				    gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-    gg->app.scatterplot_mode_menu); 
+			     gg->app.scatterplot_mode_menu); 
   submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
 }
 

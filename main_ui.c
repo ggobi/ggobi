@@ -110,11 +110,13 @@ cpanel_show_cb (GtkCheckMenuItem *w, guint action)
 
 
 PipelineMode
-viewmode_get (ggobid* gg) {
+viewmode_get (ggobid* gg) 
+{
   return gg->viewmode;
 }
 PipelineMode
-projection_get (ggobid* gg) {
+projection_get (ggobid* gg) 
+{
   return gg->projection;
 }
 

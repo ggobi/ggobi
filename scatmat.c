@@ -278,8 +278,7 @@ scatmat_var_selected (gint jvar, displayd *display)
 
 static splotd *
 scatmat_add_plot (gint xvar, gint yvar, gint col, gint row,
-  gint width, gint height,
-  displayd *display, ggobid *gg)
+		  gint width, gint height, displayd *display, ggobid *gg)
 {
   splotd *sp_new;
 
