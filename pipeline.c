@@ -38,7 +38,7 @@ pipeline_arrays_free (datad *d, ggobid *gg)
  * vectori_free (&d->rowid);
 */
 
-  g_free ((gpointer) d->rows_in_plot);
+  vectori_free (&d->rows_in_plot);
   vectorb_free (&d->sampled);
 }
 
@@ -57,48 +57,34 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
   arrayg_alloc (&d->world, nr, nc);
   arrayg_alloc_zero (&d->jitdata, nr, nc);
 
-  d->rows_in_plot = (gint *) g_malloc (nr * sizeof (gint));
+  vectori_alloc (&d->rows_in_plot, nr);
   vectorb_alloc (&d->sampled, nr);
-}
-
-/*-- is this called anywhere?  I don't think so --*/
-void
-pipeline_arrays_add_rows (gint nrows, datad *d)
-/*
- * Dynamically add rows -- assume d->nrows has already been increased.
-*/
-{
-  gint n = d->tform.nrows;
-  gint i, k;
-
-  arrayf_add_rows (&d->tform, nrows);
-
-  arrayg_add_rows (&d->world, nrows);
-  arrayg_add_rows (&d->jitdata, nrows);
-
-  /*-- alloc and initialize rows_in_plot and sampled --*/
-  d->rows_in_plot = (gint *) g_realloc (d->rows_in_plot,
-    nrows * sizeof (gint));
-  vectorb_realloc (&d->sampled, nrows);
-  k = d->nrows_in_plot;
-  for (i=n; i<d->nrows; i++, k++) {
-    d->rows_in_plot[k] = i;
-    d->sampled.els[i] = true;
-  }
-  d->nrows_in_plot = d->nrows;  /*-- show everything? --*/
 }
 
 static void
 pipeline_arrays_check_dimensions (datad *d)
 {
+  gint n;
+
+  /*-- d->raw --*/
   if (d->raw.ncols < d->ncols)
     arrayf_add_cols (&d->raw, d->ncols);
+  if (d->raw.nrows < d->nrows)
+    arrayf_add_rows (&d->raw, d->nrows);
 
+  /*-- d->tform --*/
   if (d->tform.ncols < d->ncols)
     arrayf_add_cols (&d->tform, d->ncols);
+  if (d->tform.nrows < d->nrows)
+    arrayf_add_rows (&d->tform, d->nrows);
+
+  /*-- d->world --*/
   if (d->world.ncols < d->ncols)
     arrayg_add_cols (&d->world, d->ncols);
+  if (d->world.nrows < d->nrows)
+    arrayg_add_rows (&d->world, d->nrows);
 
+  /*-- d->jitdata --*/
   if (d->jitdata.ncols < d->ncols) {
     gint i, j, nc = d->jitdata.ncols;
     arrayg_add_cols (&d->jitdata, d->ncols);
@@ -107,6 +93,19 @@ pipeline_arrays_check_dimensions (datad *d)
         d->jitdata.vals[i][j] = 0;
     }
   }
+  if (d->jitdata.nrows < d->nrows)
+    arrayg_add_rows (&d->jitdata, d->nrows);
+
+  /*-- d->sampled --*/
+  if ((n = d->sampled.nels) < d->nrows) {
+    gint i;
+    /*-- include any new rows in the sample -- add to rows_in_plot? --*/
+    vectorb_realloc (&d->sampled, d->nrows);
+    for (i=n; i<d->nrows; i++)
+      d->sampled.els[i] = true;
+  }
+
+  /*-- d->sampled --*/
 }
 
 /*-------------------------------------------------------------------------*/
@@ -144,7 +143,7 @@ median_largest_dist (gfloat **vals, gint *cols, gint ncols,
   for (n=0; n<ncols; n++) {
     j = cols[n];
     for (i=0; i<d->nrows_in_plot; i++) {
-      k = d->rows_in_plot[i];
+      k = d->rows_in_plot.els[i];
       x[n*d->nrows_in_plot + i] = vals[k][j];
     }
   }
@@ -160,7 +159,7 @@ median_largest_dist (gfloat **vals, gint *cols, gint ncols,
   for (i=0; i<d->nrows_in_plot; i++) {
     sumdist = 0.0;
     for (j=0; j<ncols; j++) {
-      dx = (gdouble) vals[d->rows_in_plot[i]][cols[j]] - dmedian;
+      dx = (gdouble) vals[d->rows_in_plot.els[i]][cols[j]] - dmedian;
       sumdist += (dx*dx);
     }
     if (sumdist > lgdist)
@@ -195,7 +194,7 @@ mean_largest_dist (gfloat **vals, gint *cols, gint ncols,
   sumxi = 0.0;
   for (j=0; j<ncols; j++) {
     for (i=0; i<d->nrows_in_plot; i++) {
-      dx = (gdouble) vals[d->rows_in_plot[i]][cols[j]];
+      dx = (gdouble) vals[d->rows_in_plot.els[i]][cols[j]];
       sumxi += dx;
     }
   }
@@ -209,7 +208,7 @@ mean_largest_dist (gfloat **vals, gint *cols, gint ncols,
   for (i=0; i<d->nrows_in_plot; i++) {
     sumdist = 0.0;
     for (j=0; j<ncols; j++) {
-      dx = (gdouble) vals[d->rows_in_plot[i]][cols[j]] - mean;
+      dx = (gdouble) vals[d->rows_in_plot.els[i]][cols[j]] - mean;
       sumdist += (dx*dx);
     }
     if (sumdist > lgdist)
@@ -244,7 +243,7 @@ tform_to_world_by_var (gint j, datad *d, ggobid *gg)
   range = max - min;
 
   for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
+    m = d->rows_in_plot.els[i];
     ftmp = -1.0 + 2.0*((greal)d->tform.vals[m][j] - min) / range;
     d->world.vals[m][j] = (greal) (precis * ftmp);
 
@@ -288,7 +287,7 @@ rows_in_plot_set (datad *d, ggobid *gg) {
 
   for (i=0; i<d->nrows; i++) {
     if (!d->hidden.els[i] && d->sampled.els[i]) {
-      d->rows_in_plot[d->nrows_in_plot++] = i;
+      d->rows_in_plot.els[d->nrows_in_plot++] = i;
     }
   }
 
