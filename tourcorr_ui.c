@@ -89,7 +89,7 @@ static void ctouradv_cb (GtkWidget *w, gpointer dummy) {
   #endif
 }
 
-static gchar *manip_lbl[] = {"Comb", "Vertical", "Horizontal", 
+static gchar *manip_lbl[] = {"Off", "Comb", "Vertical", "Horizontal", 
                              "EqualComb"};
 static void manip_cb (GtkWidget *w, gpointer cbd)
 {
@@ -330,16 +330,21 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+  ggobid *gg = GGobiFromWidget(w, true);
+  displayd *dsp = gg->current_display;
   extern void tourcorr_manip_init(gint, gint, splotd *);
   gboolean button1_p, button2_p;
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
-  sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+  if (dsp->tc_manip_mode != CMANIP_OFF) 
+  {
+    sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
                                       (GtkSignalFunc) motion_notify_cb,
                                       (gpointer) sp);
 
-  tourcorr_manip_init(sp->mousepos.x, sp->mousepos.y, sp);
+    tourcorr_manip_init(sp->mousepos.x, sp->mousepos.y, sp);
+  }
 
   return true;
 }

@@ -155,10 +155,11 @@ typedef enum {NULLMODE = -1,
 #define MANIP_RADIAL 4
 #define MANIP_ANGULAR 5
 
-#define CMANIP_COMB 0
-#define CMANIP_VERT 1
-#define CMANIP_HOR 2
-#define CMANIP_EQUAL 3
+#define CMANIP_OFF 0
+#define CMANIP_COMB 1
+#define CMANIP_VERT 2
+#define CMANIP_HOR 3
+#define CMANIP_EQUAL 4
 
 /*-- projection pursuit indices --*/
 /*#define NATURAL_HERMITE 0
