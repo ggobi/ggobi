@@ -106,19 +106,17 @@ InputDescription *fileset_generate(const gchar * fileName, DataMode guess,
       gint i, n;
       n = g_list_length(els);
       for (i = 0; i < n; i++) {
-        GGobiPluginInfo *plugin;
         GGobiInputPluginInfo *info;
-        plugin = g_list_nth_data(els, i);
-        info = plugin->info.i;
+        info = GTK_GGOBI_INPUT_PLUGIN_INFO(g_list_nth_data(els, i));
         if (info->modeName &&
             strcmp(info->modeName, sessionOptions->data_type) == 0) {
           InputGetDescription f;
           f = (InputGetDescription) getPluginSymbol(info->getDescription,
-                                                    plugin->details);
+                                                    &GTK_GGOBI_PLUGIN_DETAILS(info));
 
           if (f) {
             InputDescription *desc;
-            desc = f(fileName, sessionOptions->data_type, gg, plugin);
+            desc = f(fileName, sessionOptions->data_type, gg, GTK_GGOBI_GENERAL_PLUGIN_INFO(info));
             if (desc)
               return (desc);
           }

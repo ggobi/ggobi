@@ -29,10 +29,10 @@
 
 <!ELEMENT quickHelp (#PCDATA)>
 
-<!ELEMENT categoricalvariable (levels)>
+<!ELEMENT categoricalvariable (levels)?>
 
 <!ELEMENT records ( record )*>
-<!ELEMENT record  (#PCDATA|int|real|na)*>
+<!ELEMENT record  (#PCDATA|int|real|na|string)*>
 
 <!ELEMENT ggobidata ((brush)?, (activeColorScheme)?, (data)+)>
 
@@ -112,6 +112,7 @@
     missingValue  CDATA   #IMPLIED
     min           CDATA   #IMPLIED
     max           CDATA   #IMPLIED
+    levels        CDATA   "auto"
 >
 
 <!ATTLIST record
@@ -158,4 +159,5 @@
 
 <!ELEMENT real ( #PCDATA )>
 <!ELEMENT int ( #PCDATA )>
+<!ELEMENT string ( #PCDATA )>
 <!ELEMENT na EMPTY>

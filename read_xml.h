@@ -18,7 +18,7 @@ enum xmlDataState {
   CATEGORICAL_LEVELS, CATEGORICAL_LEVEL,
   COLORSCHEME,
   BRUSHSTYLE,
-  REAL, INT, NA,
+  REAL, INT, STRING, NA,
   QUICK_HELP,
 /* HELP, DESCRIPTION */
   UNKNOWN
@@ -98,6 +98,8 @@ typedef struct _XMLUserData {
   gchar **rowIds;
 
   gint recordLabelsVariable;
+
+  GHashTable **autoLevels;
 
   /* Reference to the handlers being used as callbacks.
      Need this so that we can re-specify it when creating

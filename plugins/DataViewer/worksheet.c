@@ -65,7 +65,7 @@ row_find_by_label (GtkWidget *w, GtkWidget *notebook)
   
   /*-- look for vname in the row labels --*/
   if (sheet) {
-    gint i, k;
+    gint i;
     gchar *str, *s;
     size_t l1 = (size_t) strlen(vname);
     gboolean gotit = false;
@@ -435,11 +435,17 @@ add_ggobi_data(datad *data, GtkWidget *w)
     /* */
 
     for(j = 0; j < data->ncols; j++) {
-      char buf[10];
+      char buf[40];
+      vartabled *vt;
+      vt = g_slist_nth_data(data->vartable, j);
       if(data->nmissing && data->missing.vals[i][j])
-        sprintf(buf, "<NA>");
-      else
-        sprintf(buf, "%.3g", raw[i][j]);
+           sprintf(buf, "<NA>");
+      else {
+         if(vt->categorical_p) 
+          sprintf(buf,"%s", vt->level_names[(int) raw[i][j]]);
+         else 
+          sprintf(buf, "%.3g", raw[i][j]);
+      }
       gtk_sheet_set_cell(sheet, i, j, GTK_JUSTIFY_RIGHT, buf);
     }
   }

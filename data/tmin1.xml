@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<ggobidata>
+<data name="Calls">
+<description>
+ This is a simple example for testing automatically
+ computed levels for a categorical variable using
+ the levels="auto" attribute for a categoricalvariable
+ element. It also uses the string element to identify these values.
+</description>
+<variables count="5">
+ <realvariable name="nseconds" />
+ <realvariable name="whatever" />
+ <categoricalvariable name="fraudp">
+   <levels count="3">
+     <level value="0"> low </level>
+     <level value="1"> medium </level>
+     <level value="2"> high </level>
+   </levels>
+ </categoricalvariable>
+ <categoricalvariable name="bizres">
+   <levels count="3">
+     <level value="0"> biz </level>
+     <level value="1"> res </level>
+     <level value="2"> unknown </level>
+   </levels>
+ </categoricalvariable>
+ <categoricalvariable name="name" levels="auto" />
+</variables>
+
+<records count="7">
+ <record source="0" destination="1"> 42 4870  0 0 <string>AB C</string></record>
+ <record source="0" destination="2"> 42 4880  0 1 <string>DEF</string> </record>
+ <record source="0" destination="3">  7 4890  1 2 <string>GHI</string> </record>
+ <record source="1" destination="5"> 12 5000  2 1 <string>J</string> </record>
+ <record source="1" destination="6"> 18 5100  2 2 <string>KLM</string> </record>
+ <record source="3" destination="7"> 12 5000  2 1 <string>NOP QRST</string> </record>
+ <record source="3" destination="8"><real>18</real>
+ <real>5200</real><int>2</int><int>2</int><string>Happy Birthday</string></record>
+</records>
+</data>
+</ggobidata>

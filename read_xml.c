@@ -79,6 +79,9 @@ void endXMLElement(void *user_data, const xmlChar *name);
 void Characters(void *user_data, const xmlChar *ch, gint len);
 void cumulateRecordData(XMLParserData *data, const xmlChar *ch, gint len);
 void setMissingValue(XMLParserData *data, datad *d, vartabled *vt);
+gint getAutoLevelIndex(const char * const label, XMLParserData *data, vartabled *el);
+static gboolean setRecordValue(const char *tmp, datad *d, XMLParserData *data);
+void resetRecordInfo(XMLParserData *data);
 
 const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
 
@@ -104,6 +107,7 @@ const gchar * const xmlDataTagNames[] = {
 /* data values */
   "real",
   "int",
+  "string",
   "na",
   "quickHelp",
   ""
@@ -247,6 +251,8 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
 
   data->recordString = NULL;
   data->recordStringLength = 0;
+
+  data->autoLevels = NULL;
 }
 
 void 
@@ -254,8 +260,6 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 {
   XMLParserData *data = (XMLParserData*)user_data;
   enum xmlDataState type = tagType(name, false);
-
-  data->state = type;
 
   switch (type) {
     case COLORSCHEME:
@@ -304,11 +308,13 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 
     case REAL:   
     case INT:   
+    case STRING:   
     case NA:  
         if(data->recordString) { 
           setRecordValues(data, data->recordString, data->recordStringLength);
-	  if(type != NA)
+	  if(type != NA && type != STRING)
             data->current_element++;
+	  resetRecordInfo(data);
 	}
        break;
     case QUICK_HELP:
@@ -317,6 +323,9 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
       fprintf(stderr, "Unrecognized XML state %s\n", name); fflush(stderr);    
     break;
   }
+
+  data->state = type;
+
 }
 
 void
@@ -476,7 +485,11 @@ void endXMLElement(void *user_data, const xmlChar *name)
     case REAL:
     case INT:
       setRecordValues(data, data->recordString, data->recordStringLength);
-      resetRecordInfo(data);
+    break;
+    case STRING:
+       /* This is the individual setRecordValue(), i.e. not with an 's' at the end.
+           */
+      setRecordValue(data->recordString, data->current_data, data);
     break;
     case VARIABLE:
     case REAL_VARIABLE:
@@ -588,6 +601,7 @@ Characters(void *user_data, const xmlChar *ch, gint len)
     case NA:
     case RECORD:
     case REAL:
+    case STRING:
     case INT:
         /* Now we call
             setRecordValues (data, c, dlen); 
@@ -947,20 +961,11 @@ setMissingValue(XMLParserData *data, datad *d, vartabled *vt)
   d->nmissing++;
 }
 
-/*
-  Read the values for this record from free-formatted text. The entries
-  are white-space delimited. They should not have quotes or anything
-  that needs to be escaped.
-*/
-gboolean
-setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
+static gboolean
+setRecordValue(const char *tmp, datad *d, XMLParserData *data)
 {
-  gdouble value;
-  const gchar *tmp = strtok((gchar*) line, " \t\n");
-  datad *d = getCurrentXMLData(data);
-  vartabled *vt = NULL;
-
-  while (tmp && (tmp < (gchar *) (line + len))) {
+   gdouble value;
+   vartabled *vt;
 
     /* If reading past the last column or row, stop */
     if (data->current_record >= d->raw.nrows ||
@@ -969,7 +974,7 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
       g_printerr ("Row %d (counting from 1) has too many elements\n",
         data->current_record+1);
       data->current_element = 0;
-      break;
+      return(false);
     }
 
     vt = vartable_element_get (data->current_element, d);
@@ -988,13 +993,24 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
     {
       setMissingValue(data, d, vt);
     } else {
+
       value = asNumber (tmp);
-      if(vt->categorical_p && checkLevelValue(vt, value) == false) {
-        ggobi_XML_error_handler(data, 
-          "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n", 
-          (int) data->current_record + 1, vt->collab,
-          data->current_data->name ? data->current_data->name : "");
+      
+      if(vt->categorical_p) {
+        if(data->autoLevels && data->autoLevels[data->current_element]) {
+  	    value = getAutoLevelIndex(tmp, data, vt);
+	} else if(checkLevelValue(vt, value) == false) {
+	    ggobi_XML_error_handler(data, 
+  		"incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n", 
+		 (int) data->current_record + 1, vt->collab,
+            data->current_data->name ? data->current_data->name : "");
+	}
+      } else if(data->state == STRING) {
+  	    ggobi_XML_error_handler(data, "<string> element for non categorical variable (%s) in record %d\n",
+                             vt->collab, (int) data->current_record + 1);
+	    value = 0;
       }
+
       d->raw.vals[data->current_record][data->current_element] = value;
     }
 
@@ -1026,6 +1042,27 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
       g_array_insert_val(d->rowlab, data->current_record, tmp1);
     }
 
+    return(true);
+}
+
+/*
+  Read the values for this record from free-formatted text. The entries
+  are white-space delimited. They should not have quotes or anything
+  that needs to be escaped.
+*/
+gboolean
+setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
+{
+  const gchar *tmp;
+  datad *d = getCurrentXMLData(data);
+  if(!line)
+     return(false);
+
+  tmp = strtok((gchar*) line, " \t\n");
+
+  while (tmp && (tmp < (gchar *) (line + len))) {
+    if(setRecordValue(tmp, d, data) == false)
+        return(false);
     data->current_element++;
     tmp = strtok (NULL, " \t\n");
   }
@@ -1112,6 +1149,17 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
 
   if (strcmp((const char *)tagName, "categoricalvariable") == 0) {
     el->categorical_p = true;
+
+      /* Mark this as being a variable for which we must compute the levels. */
+    if( (tmp = getAttribute(attrs, "levels")) && strcmp(tmp, "auto") == 0) {
+      if(data->autoLevels == NULL) {
+         data->autoLevels = (GHashTable **) g_malloc(sizeof(GHashTable*) * data->current_data->ncols);
+         memset(data->autoLevels, '\0', sizeof(gboolean) * data->current_data->ncols);
+      }
+       /* glib-2.0 provides a g_hash_table_new_full with which we can specify the `free' routine
+          for elements. This should simplify (slightly) releaseCurrentDataInfo(). */
+      data->autoLevels[data->current_variable] = g_hash_table_new(g_str_hash, g_str_equal);
+    }
   }
 
   return (true);
@@ -1530,6 +1578,34 @@ asciiParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
   return(false);
 }
 
+/* 
+  glib-2.0 defines this as a void routine, i.e. no return value.
+  glib-1.2 however expects a return value of type gboolean.
+ */
+static void
+freeLevelHashEntry(gpointer key, gpointer value, gpointer data)
+{
+  g_free(value);
+/*  return(true); */
+}
+
+static void
+releaseCurrentDataInfo(XMLParserData *parserData)
+{
+   if(parserData->current_data) 
+     return;
+
+   if(parserData->autoLevels) {
+      int i;
+      for(i = 0; i < parserData->current_data->ncols ; i++) {
+         if(parserData->autoLevels[i]) {
+ 	     g_hash_table_foreach(parserData->autoLevels[i], freeLevelHashEntry, NULL);
+  	     g_hash_table_destroy(parserData->autoLevels[i]); 
+	 }
+      }
+   }
+}
+
 
 gboolean
 setDataset(const xmlChar **attrs, XMLParserData *parserData) 
@@ -1538,7 +1614,8 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData)
   gchar *name;
   const gchar *tmp;
 
-/* Pre- gtk object way: data = datad_new(NULL, parserData->gg); */
+  releaseCurrentDataInfo(parserData);
+
   data = gtk_ggobi_data_new(parserData->gg);
 
   data->readXMLRecord = readXMLRecord;
@@ -1754,4 +1831,35 @@ setBrushStyle(const xmlChar ** attrs, XMLParserData * data)
   }
 
   return retval;
+}
+
+
+gint
+getAutoLevelIndex(const char * const label, XMLParserData *data, vartabled *el)
+{
+  GHashTable *tbl = data->autoLevels[data->current_element];
+  gpointer val;
+  gint index = -1;
+  val = g_hash_table_lookup(tbl, (gconstpointer) label);
+  if(!val) {
+     gint *itmp;
+     gint n =   el->nlevels + 1;
+     if(n == 1) {
+       el->level_values = (int *) g_malloc(sizeof(int) * n);
+       el->level_names = (gchar **) g_malloc(sizeof(gchar *) * n);
+     } else {
+       el->level_values = (int *) g_realloc(el->level_values, sizeof(int) * n);
+       el->level_names = (gchar **) g_realloc(el->level_names, sizeof(gchar *) * n);
+     }
+     el->level_values[n-1] = n-1;
+     el->level_names[n-1] = g_strdup(label);
+
+     itmp = (gint *) g_malloc(sizeof(gint));
+     *itmp = index = n - 1;
+     g_hash_table_insert(tbl, el->level_names[n-1], itmp);
+     el->nlevels++;
+  } else 
+     index = * ((gint *) val);
+
+  return(index);
 }

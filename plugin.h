@@ -9,13 +9,15 @@ typedef void * HINSTANCE;
 #include <windows.h>
 #endif
 
-typedef enum {GENERAL_PLUGIN, INPUT_PLUGIN} GGobiPluginType;
+typedef enum {GENERAL_PLUGIN, INPUT_PLUGIN, LANGUAGE_PLUGIN, INTERPRETED_PLUGIN} GGobiPluginType;
 
 typedef enum {DL_UNLOADED = 0, DL_LOADED, DL_FAILED} PluginLoadStatus;
 
 typedef void (*DLFUNC)();
 
 typedef struct {
+    GtkObject obj;
+
     char *name;
     char *dllName;
     HINSTANCE library;
@@ -34,20 +36,78 @@ typedef struct {
     GSList *args;
     GHashTable *namedArgs;
 
+
+    void *data;
+
 } GGobiPluginDetails;
 
 typedef struct {
+  GtkObjectClass objClass;
+} GGobiPluginDetailsClass;
+
+
+#define GTK_TYPE_GGOBI_PLUGIN_DETAILS       (gtk_ggobi_plugin_details_get_type ())
+#define GTK_GGOBI_PLUGIN_DETAILS(obj)	    (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_PLUGIN_DETAILS, GGobiPluginDetails))
+#define GTK_GGOBI_GENERAL_PLUGIN_INFO_CLASS(klass)	 (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_PLUGIN_DETAILS, GGobiPluginDetailsClass))
+#define GTK_IS_GGOBI_PLUGIN_DETAILS(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_PLUGIN_DETAILS))
+#define GTK_IS_GGOBI_PLUGIN_DETAILS_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_PLUGIN_DETAILS))
+
+GtkType gtk_ggobi_plugin_details_get_type(void);
+
+
+typedef struct {
+    GGobiPluginDetails details;
+
     char *onCreate; 
     char *onClose; 
 
     char *onUpdateDisplay; 
 } GGobiGeneralPluginInfo;
 
+typedef struct {
+  GGobiPluginDetailsClass detailsClass;
+} GGobiGeneralPluginInfoClass;
+
+
+#define GTK_TYPE_GGOBI_GENERAL_PLUGIN_INFO       (gtk_ggobi_general_plugin_info_get_type ())
+#define GTK_GGOBI_GENERAL_PLUGIN_INFO(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_GENERAL_PLUGIN_INFO, GGobiGeneralPluginInfo))
+#define GTK_GGOBI_GENERAL_PLUGIN_INFO_CLASS(klass)	 (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_GENERAL_PLUGIN_INFO, GGobiGeneralPluginInfoClass))
+#define GTK_IS_GGOBI_GENERAL_PLUGIN_INFO(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_GENERAL_PLUGIN_INFO))
+#define GTK_IS_GGOBI_GENERAL_PLUGIN_INFO_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_GENERAL_PLUGIN_INFO))
+
+GtkType gtk_ggobi_general_plugin_info_get_type(void);
+
+
+typedef struct {
+
+  GGobiGeneralPluginInfo plugin;
+  char *languageName;
+
+} GGobiLanguagePlugin;
+
+
+typedef struct {
+  GGobiGeneralPluginInfoClass pluginClass;
+} GGobiLanguagePluginInfoClass;
+
+
+typedef struct {
+  GGobiGeneralPluginInfo input;
+} GGobiInterpretedPluginInfo;
+
+typedef struct {
+  GGobiGeneralPluginInfoClass inputClass;
+} GGobiInterpretedPluginInfoClass;
+
+
+
 
 /*
   The two plugin types should share the common information.
  */
-struct   _GGobiInputPluginInfo {
+struct  _GGobiInputPluginInfo {
+    GGobiPluginDetails details;
+
     char *modeName;
     char *read_symbol_name;
     char *probe_symbol_name;
@@ -60,26 +120,29 @@ struct   _GGobiInputPluginInfo {
 
 };
 
-struct _GGobiPluginInfo {
+typedef struct {
+  GGobiPluginDetailsClass detailsClass;
+} GGobiInputPluginInfoClass;
 
-  GGobiPluginDetails *details;
-  GGobiPluginType type;
-  union {
-    GGobiGeneralPluginInfo *g;
-    GGobiInputPluginInfo   *i;
-  } info;
+#define GTK_TYPE_GGOBI_INPUT_PLUGIN_INFO       (gtk_ggobi_input_plugin_info_get_type ())
+#define GTK_GGOBI_INPUT_PLUGIN_INFO(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_INPUT_PLUGIN_INFO, GGobiInputPluginInfo))
+#define GTK_GGOBI_INPUT_PLUGIN_INFO_CLASS(klass)	 (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_INPUT_PLUGIN_INFO, GGobiInputPluginInfoClass))
+#define GTK_IS_GGOBI_INPUT_PLUGIN_INFO(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_INPUT_PLUGIN_INFO))
+#define GTK_IS_GGOBI_INPUT_PLUGIN_INFO_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_INPUT_PLUGIN_INFO))
 
-  void *data;
-};
+GtkType gtk_ggobi_input_plugin_info_get_type(void);
 
 
-#define GTK_TYPE_GGOBI_PLUGIN_INFO       (gtk_ggobi_plugin_info_get_type ())
-#define GTK_GGOBI_PLUGIN_INFO(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_INFO_PLUGIN, ))
-#define GTK_GGOBI_PLUGIN_INFO_CLASS(klass)	 (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_SPLOT, GGobiPluginInfoClass))
-#define GTK_IS_GGOBI_PLUGIN_INFO(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_PLUGIN_INFO))
-#define GTK_IS_GGOBI_PLUGIN_INFO_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_PLUGIN_INFO))
+typedef struct {
+  GGobiInputPluginInfo input;
+} GGobiInterpretedInputPluginInfo;
 
-GtkType gtk_ggobi_plugin_info_get_type(void);
+typedef struct {
+  GGobiInputPluginInfoClass inputClass;
+} GGobiInterpretedInputPluginInfoClass;
+
+
+
 
 
 #ifdef USE_GNOME_XML
