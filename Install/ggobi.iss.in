@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=ggobi
-AppVerName=ggobi_0.9-4
+AppVerName=ggobi_0.99-3
 AppPublisher=ggobi
 AppPublisherURL=http://www.ggobi.org
 AppSupportURL=http://www.ggobi.org
@@ -12,7 +12,7 @@ DefaultDirName={pf}\ggobi
 DefaultGroupName=ggobi
 AllowNoIcons=yes
 AlwaysCreateUninstallIcon=yes
-LicenseFile=C:\cygwin\home\duncan\Projects\ggobi\ggobi\LICENSING\license.txt
+LicenseFile=@GGOBI_HOME@LICENSING\license.txt
 ; uncomment the following line if you want your installation to run on NT 3.51 too.
 ; MinVersion=4,3.51
 
@@ -20,20 +20,20 @@ LicenseFile=C:\cygwin\home\duncan\Projects\ggobi\ggobi\LICENSING\license.txt
 Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "Additional icons:"; MinVersion: 4,4
 
 [Files]
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\ggobi.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\libs\*.*"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\data\*.*"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\notes\*.html"; DestDir: "{app}\Docs"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\Install\ggobi.ico"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@ggobi.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@libs\*.*"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@data\*.*"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@notes\*.html"; DestDir: "{app}\Docs"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@Install\ggobi.ico"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\notes\ggobirc"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\notes\colorschemes.xml"; DestDir: "{app}\share"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@notes\ggobirc"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@notes\colorschemes.xml"; DestDir: "{app}\share"; CopyMode: alwaysoverwrite
 
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\*.h"; DestDir: "{app}\include"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@*.h"; DestDir: "{app}\include"; CopyMode: alwaysoverwrite
 
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\libggobi.a"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\libggobi.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi\libggobi.def"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@libggobi.a"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@libggobi.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "@GGOBI_HOME@libggobi.def"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
 
 
 [INI]

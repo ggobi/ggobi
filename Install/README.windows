@@ -1,12 +1,18 @@
 To build ggobi for Windows, you will need the following.
 
+Install the compiler required to build R, i.e. the
+appropriate version of mingw.
+
+When installing cygwin, install the autoconf package.
+This is used to create the config.h
+
+
 Download glib-dev, gtk+-dev, libiconv-dev, and extralibs-dev.
 These are available from Tor Lillqvist's site at
-   http://user.sgic.fi/~tml/gimp/win32/downloads.html
+ http://www.gimp.org/~tml/gimp/win32/downloads.html
 (You do not need the gimp-dev file on this site.)
 
-
-
+gtk+-dev 1.3.0
 
 
 For running ggobi, you will need to ensure that all
@@ -42,5 +48,6 @@ a single directory (e.g. ~/libs/) and add that to my path.
 
 
 If you want support for reading XML, you will have to download libxml
-and zlib. These are currently available from
+and zlib. These come as part of Cygwin now.
+Previously, I use to fetch them from
    http://www.penguin.at0.net/~fredo/files/old/
