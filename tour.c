@@ -355,7 +355,7 @@ g_printerr ("\n");*/
 
       for (i=0; i<projdim; i++)
         for (j=0; j<projdim; j++)
-	Va.vals[i][j] = tv.vals[i][j];
+          Va.vals[i][j] = tv.vals[i][j];
 
       /*  Check span of <Fa,Fz>
        If dimension of the intersection is equal to dimension of proj,
@@ -391,8 +391,12 @@ g_printerr ("\n");*/
         for (i=0; i<projdim-1; i++) {
           for (j=i+1; j<projdim; j++)
             if (!gram_schmidt(Ga.vals[i], Ga.vals[j], datadim))
+#ifdef EXCEPTION_HANDLING
               g_printerr("");/*Ga[%d] equivalent to Ga[%d]\n",i,j);*/
-	}
+#else
+              ;
+#endif
+        }
         
         /* Rotate Fz to get Gz */
         for (i=0; i<datadim; i++)
@@ -409,20 +413,32 @@ g_printerr ("\n");*/
         for (i=0; i<projdim-1; i++) {
           for (j=i+1; j<projdim; j++)
             if (!gram_schmidt(Gz.vals[i], Gz.vals[j], datadim))
+#ifdef EXCEPTION_HANDLING
               g_printerr("");/*Gz[%d] equivalent to Gz[%d]\n",i,j);*/
-	}
+#else
+            ;
+#endif
+        }
 
         /* orthonormalize Gz on Ga to make a frame of rotation */
         for (i=0; i<projdim; i++)
           if (!gram_schmidt(Ga.vals[i], Gz.vals[i], datadim))
+#ifdef EXCEPTION_HANDLING
             g_printerr("");/*Ga[%d] equivalent to Gz[%d]\n",i,i);*/
+#else
+            ;
+#endif
         for (j=0; j<projdim; j++)
           norm(Gz.vals[j], datadim);
         for (i=0; i<projdim-1; i++) {
           for (j=i+1; j<projdim; j++)
             if (!gram_schmidt(Gz.vals[i], Gz.vals[j], datadim))
+#ifdef EXCEPTION_HANDLING
               g_printerr("");/*Gz[%d] equivalent to Gz[%d]\n",i,j);*/
-	}
+#else
+            ;
+#endif
+        }
 
       }
       /*      else { * Span not ok, cannot do interp path, so reinitialize *
@@ -431,7 +447,7 @@ g_printerr ("\n");*/
         for (i=0; i<projdim; i++)
           tau.els[i] = 0.0;
         * Need to clean this up - It seems this never occurs *
-	} Don't think this is needed */
+              } Don't think this is needed */
 
       /* Construct current basis*/
       for (i=0; i<projdim; i++)
@@ -460,7 +476,11 @@ g_printerr ("\n");*/
       for (k=0; k<projdim-1; k++)
         for (j=k+1; j<projdim; j++)
           if (!gram_schmidt(F.vals[k], F.vals[j], datadim))
+#ifdef EXCEPTION_HANDLING
             g_printerr("");/*F[%d] equivalent to F[%d]\n",k,j);*/
+#else
+            ;
+#endif
 
       /* Calculate Euclidean norm of principal angles.*/
       tmpd = 0.0;
@@ -469,11 +489,11 @@ g_printerr ("\n");*/
       dist_az = (gfloat)sqrt(tmpd);
 
       if (dist_az < 0.0001) {
-	/*        printf("returning before standardizing tau's\n");
+      /*        printf("returning before standardizing tau's\n");
         for (i=0; i<projdim; i++) 
           printf("tau %d %f ",i,tau.els[i]);
-	  printf("\n");*/
-	/*        zero_tau(tau, projdim);
+          printf("\n");*/
+      /*        zero_tau(tau, projdim);
         zero_tinc(tinc, projdim);
         zero_lambda(lambda, projdim);
         for (i=0; i<projdim; i++)
@@ -484,7 +504,7 @@ g_printerr ("\n");*/
             G.vals[i][j] = 0.0;
             Va.vals[i][j] = 0.0;
             Fz.vals[i][j] = 0.0;
-	    }
+          }
         dist_az = 0.0;
         tang = 0.0;
         *pdist_az = dist_az;
@@ -496,7 +516,7 @@ g_printerr ("\n");*/
       for (i=0; i<projdim; i++) {
         if (tau.els[i] > tol) {
           tau.els[i] /= dist_az;
-	}
+        }
         else 
           tau.els[i] = 0.0;
       }
@@ -561,7 +581,11 @@ void tour_reproject(vector_f tinc, array_d G, array_d Ga, array_d Gz,
   for (k=0; k<projdim; k++)
     for (j=k+1; j<projdim; j++)
       if (!gram_schmidt(F.vals[k], F.vals[j], datadim))
+#ifdef EXCEPTION_HANDLING
         g_printerr("");/*F[%d] equivalent to F[%d]\n",k,j);*/
+#else
+            ;
+#endif
 
   for (j=0; j<2; j++)
     g_free (ptinc[j]);
@@ -760,7 +784,11 @@ gt_basis (array_d Fz, gint nactive, vector_i active_vars,
       for (k=0; k<projdim-1; k++)
         for (j=k+1; j<projdim; j++)
           if (!gram_schmidt(Fz.vals[k], Fz.vals[j], datadim))
+#ifdef EXCEPTION_HANDLING
             g_printerr("");/*Fz[%d] equivalent to Fz[%d]\n",k,j);*/
+#else
+            ;
+#endif
     }
   }
   else /* if there is only one variable */

@@ -633,7 +633,7 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
 
 /* data relocation and make index */ 
 
-  zero(dp->x,n);
+  zero((gdouble *) dp->x,n);
   zero_int(dp->index,n);
 
   for (i=0; i<n; i++) {	
@@ -643,7 +643,7 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
 
   left=0;
   right=n-1;
-  sort_data(dp->x, dp->index,left,right) ;
+  sort_data((gdouble *) dp->x, dp->index,left,right) ;
 
  /* Calculate gini index */
 	

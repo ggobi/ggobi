@@ -646,9 +646,10 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
-  gint i, j, k;
+  gint j, k;
   gint n1vars = dsp->t2d.nactive;
-  gfloat ftmp, tol = 0.05; 
+  /*gfloat ftmp;*/
+  gfloat tol = 0.05; 
   gdouble dtmp1;
 
   /* need to turn off tour */
@@ -668,7 +669,11 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   norm(dsp->t2d.F.vals[1],d->ncols);
   if (!gram_schmidt(dsp->t2d.F.vals[0], dsp->t2d.F.vals[1],
     d->ncols))
+#ifdef EXCEPTION_HANDLING
     g_printerr("");/*t2d.F[0] equivalent to t2d.F[1]\n");*/
+#else
+      ;
+#endif
   
 
   dsp->t2d_manipvar_inc = false;
@@ -743,11 +748,11 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
        orthonormal and a new vector 1 was generated, it checks the o.n.
        of all 3 vectors again. */
     gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[1],
-		 d->ncols);
+      d->ncols);
     gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
-		 d->ncols);
+      d->ncols);
     gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
-		 d->ncols);
+      d->ncols);
 
     /*    ftmp = 0.0;
     while (ftmp < tol) {
@@ -760,10 +765,10 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
         d->ncols, (gint) 1);
       for (j=0; j<d->ncols; j++) 
         dsp->t2d_manbasis.vals[2][j] = dsp->t2d.tv.vals[0][j];
-	g_printerr("0 manbasis2: ");
+      g_printerr("0 manbasis2: ");
         for (i=0; i<3; i++)
           g_printerr("%f ",dsp->t2d_manbasis.vals[2][i]);
-	  g_printerr("\n");
+      g_printerr("\n");
       if (!gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
         d->ncols)) 
         g_printerr("t2d_manbasis[0] equivalent to t2d_manbasis[2]\n");
@@ -782,7 +787,7 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
         g_printerr("1 manbasis2: ");
         for (i=0; i<3; i++)
           g_printerr("%f ",dsp->t2d_manbasis.vals[2][i]);
-	  g_printerr("\n");
+        g_printerr("\n");
       ftmp = calc_norm (dsp->t2d_manbasis.vals[2], d->ncols);
     }
     else if (fabs(inner_prod(dsp->t2d_manbasis.vals[0],
@@ -1006,13 +1011,25 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
       norm(dsp->t2d_mvar_3dbasis.vals[2],3); /* this */
       if (!gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
         dsp->t2d_mvar_3dbasis.vals[1], 3))
+#ifdef EXCEPTION_HANDLING
         g_printerr("");/*t2d_mvar[0] equivalent to t2d_mvar[1]\n");*/
+#else
+        ;
+#endif
       if (!gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
         dsp->t2d_mvar_3dbasis.vals[2], 3))
-	g_printerr("");/*t2d_mvar[0] equivalent to t2d_mvar[2]\n");*/
+#ifdef EXCEPTION_HANDLING
+          g_printerr("");/*t2d_mvar[0] equivalent to t2d_mvar[2]\n");*/
+#else
+          ;
+#endif
       if (!gram_schmidt(dsp->t2d_mvar_3dbasis.vals[1], 
         dsp->t2d_mvar_3dbasis.vals[2], 3))
+#ifdef EXCEPTION_HANDLING
         g_printerr("");/*t2d_mvar[1] equivalent to t2d_mvar[2]\n");*/
+#else
+          ;
+#endif
 
       /* Generate the projection of the data corresponding to 
          the 3D rotation in the manip space. */
@@ -1068,7 +1085,11 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
       if (calc_norm(dsp->t2d.F.vals[1], d->ncols)>1.01) 
       g_printerr("1 F1 out of bounds\n");*/
       if (!gram_schmidt(dsp->t2d.F.vals[0], dsp->t2d.F.vals[1], d->ncols))
+#ifdef EXCEPTION_HANDLING
         g_printerr("");/*t2d.F[0] equivalent to t2d.F[2]\n");*/
+#else
+        ;
+#endif
 
       /*      if (calc_norm(dsp->t2d.F.vals[0], d->ncols)>1.0) 
 	g_printerr("F0 out of bounds\n");
