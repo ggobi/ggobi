@@ -771,4 +771,11 @@ extern double erfc(double x);
 gboolean read_xml(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 gboolean read_csv(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 gboolean read_ascii(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
+
+InputDescription *read_xml_input_description(const char * const fileName, const char * const modeName, 
+					     ggobid *gg, GGobiPluginInfo *info);
+InputDescription *read_csv_input_description(const char * const fileName, const char * const modeName, 
+					     ggobid *gg, GGobiPluginInfo *info);
+InputDescription *read_ascii_input_description(const char * const fileName, const char * const modeName, 
+					       ggobid *gg, GGobiPluginInfo *info);
 #endif

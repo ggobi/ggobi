@@ -182,8 +182,6 @@ getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
   }  else
      lib = plugin->library;
 
-  g_printerr("Using library %p\n", lib);
-
   return(dynload->resolve(lib, tmp));
 }
 
@@ -293,25 +291,14 @@ GGOBI_removePluginInstance(PluginInstance *inst, ggobid *gg)
 void addPlugins(GList *plugins, GtkWidget *list, ggobid *gg, GGobiPluginType);
 void addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg);
 
-/*
- We should move to an interface more like Gnumeric's plugin
- info list.
- */
 GtkWidget *
-showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
+createPluginList() 
 {
- GtkWidget *win, *main_vbox, *list;
    /* Number of entries here should be the same as in set_column_width below and 
       as the number of elements in addPlugin().
-    */
- static const gchar * const titles[] = {"Name", "Description", "Author", "Location", "Loaded", "Active"};
-
-  win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  main_vbox=gtk_vbox_new(FALSE,1);
-  gtk_container_set_border_width(GTK_CONTAINER(main_vbox),0); 
-  gtk_container_add(GTK_CONTAINER(win), main_vbox);
-  gtk_widget_show(main_vbox);
-
+   */
+  static const gchar * const titles[] = {"Name", "Description", "Author", "Location", "Loaded", "Active"};
+  GtkWidget *list;
   list = gtk_clist_new_with_titles(sizeof(titles)/sizeof(titles[0]), (gchar **) titles);
 
   gtk_clist_set_column_width(GTK_CLIST(list), 0, 100); 
@@ -321,17 +308,46 @@ showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
   gtk_clist_set_column_width(GTK_CLIST(list), 4,  50); 
   gtk_clist_set_column_width(GTK_CLIST(list), 5,  50); 
 
-  if(plugins)
-    addPlugins(plugins, list, gg, GENERAL_PLUGIN);
-  if(inputPlugins)
-    addPlugins(inputPlugins, list, gg, INPUT_PLUGIN);
+  return(list);
+}
 
-  gtk_box_pack_start(GTK_BOX(main_vbox), list, TRUE, TRUE, 0);
-  gtk_widget_show(list);
+/*
+ We should move to an interface more like Gnumeric's plugin
+ info list.
+ */
+GtkWidget *
+showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
+{
+ GtkWidget *win, *main_vbox, *list;
+
+  win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+  main_vbox = gtk_notebook_new();
+
+  gtk_container_set_border_width(GTK_CONTAINER(main_vbox),0); 
+  gtk_container_add(GTK_CONTAINER(win), main_vbox);
+  gtk_widget_show(main_vbox);
+
+
+  if(plugins) {
+    list = createPluginList();
+    addPlugins(plugins, list, gg, GENERAL_PLUGIN);
+    gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), list, gtk_label_new("General"));
+  }
+  if(inputPlugins) {
+    list = createPluginList();
+    addPlugins(inputPlugins, list, gg, INPUT_PLUGIN);
+    gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), list, gtk_label_new("Input Readers"));
+  }
+
+
+  gtk_widget_show_all(main_vbox);
   gtk_widget_show(win);
  
   return(win); 
 }
+
+
 
 /**
  Determine whether the specified plugin is active 
@@ -573,6 +589,7 @@ GGobiInputPluginInfo XMLInputPluginInfo = {
 	"read_xml_input_description",
 	false,
 	read_xml,
+	&read_xml_input_description,
 	isXMLFile,
 	xml_data
 };
@@ -592,6 +609,7 @@ GGobiInputPluginInfo CSVInputPluginInfo = {
 	"read_csv_input_description",
 	false,
 	read_csv,
+	read_csv_input_description,
 	isCSVFile,
 	csv_data
 };
@@ -613,9 +631,11 @@ GGobiInputPluginInfo ASCIIInputPluginInfo = {
 	"read_ascii_input_description",
 	false,
 	read_ascii,
+	read_ascii_input_description,
 	isASCIIFile,
 	ascii_data
 };
+
 
 GGobiPluginDetails ASCIIDetails = {
   "ASCII data reader",
@@ -631,6 +651,7 @@ GGobiPluginInfo  *
 createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *details)
 {
   GGobiPluginInfo  *plugin; 
+#ifdef WIN32
   static HINSTANCE ggobiLibrary = NULL;
  
   if(!details->dllName && !details->library) {
@@ -649,6 +670,7 @@ createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *detai
 
     details->library = ggobiLibrary;
   }
+#endif
 
   plugin = (GGobiPluginInfo *) malloc(sizeof(GGobiPluginInfo));
   memset(plugin, '\0', sizeof(GGobiPluginInfo));
@@ -660,6 +682,10 @@ createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *detai
   return(plugin);
 }
 
+/*
+  Register the basic, built-in "plugins", specifically
+  the input plugins for XML, CSV, ASCII data formats.
+*/
 void
 registerDefaultPlugins(GGobiInitInfo *info)
 {
@@ -695,6 +721,9 @@ getInputPluginSelections(ggobid *gg)
        return(els);
 }
 
+/*
+ Determine if the plugin handles this mode.
+ */
 gboolean
 inputPluginSupportsMode(GGobiPluginInfo *plugin, GGobiInputPluginInfo *info, const gchar *modeName)
 {

@@ -151,8 +151,11 @@ fileset_generate(const gchar * fileName,
              || inputPluginSupportsMode(plugin, info, modeName)) 
 	{
           InputGetDescription f;
-          f = (InputGetDescription) getPluginSymbol(info->getDescription,
-                                                    plugin->details);
+	  if(info->get_description_f)
+    	      f = info->get_description_f;
+	  else
+ 	      f = (InputGetDescription) getPluginSymbol(info->getDescription,
+							plugin->details);
 
           if (f) {
             InputDescription *desc;
