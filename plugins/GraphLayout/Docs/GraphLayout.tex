@@ -23,10 +23,12 @@ describes its use.  It can be expected to change and grow.
 \section{The data}
 
 First, you need some data.  The ascii format supported by ggobi is not
-adequate for the specification of edges, so you'll probably use an xml
-file with a minimum of two datasets:  a set of cases or nodes, and a set
-of edges.  The records in the node data must have
-\XMLAttribute{id}s:
+adequate for the specification of edges, so you'll either use an xml
+file or define the graph in R and feed it to ggobi using Rggobi.
+
+If you use an xml file, it will contain a minimum of two datasets: a
+set of cases or nodes, and a set of edges.  The records in the node
+data must have \XMLAttribute{id}s:
 
 \begin{verbatim}
 <record id="0"> ... </record>
@@ -88,7 +90,8 @@ scatterplots are linked across both nodes and edges.
 
 The radial layout \cite{Wills99} sets the first node in the dataset
 as the center node, and arranges the rest of the nodes in concentric
-circles around it.  The resulting layout is a tree arranged radially.
+circles around it.  The resulting layout is a tree arranged radially,
+with any extra edges added.
 If the underlying graph is not very tree-like, the layout can result
 in a great many edge crossings, and the layout doesn't do anything to
 minimize these crossings.
@@ -274,10 +277,8 @@ was used with xgobi, ggobi's predecessor.  GGvis can perform layouts in
 arbitrary dimensions, and the layouts it produces can also be tuned in
 several ways, by adjusting the many parameters of the MDS function.
 
-\section{Future work}
-
-A third plugin, not yet named, will allow manipulations of
-graphs, independent of the layout method used.
+In addition, there is a plugin (``GraphAction'') for manipulations
+that are specific to graphs.
 
 \bibliography{references}
 
