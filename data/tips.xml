@@ -9,18 +9,8 @@
   <integervariable name="OBS"/>
   <realvariable name="TOTBILL"/>
   <realvariable name="TIP"/>
-  <categoricalvariable name="SEX">
-   <levels count="2">
-    <level value="0"> male </level>
-    <level value="1"> female </level>
-   </levels>
-  </categoricalvariable>
-  <categoricalvariable name="SMOKER">
-   <levels count="2">
-    <level value="0"> no </level>
-    <level value="1"> yes </level>
-   </levels>
-  </categoricalvariable>
+  <categoricalvariable name="SEX" levels="auto" />
+  <categoricalvariable name="SMOKER" levels="auto" />
   <categoricalvariable name="DAY">
    <levels count="4">
     <level value="3"> thurs </level>
@@ -48,736 +38,736 @@
 </variables>
 <records count="244" glyph="fr 1" color="0">
 <record label="1">
-1 16.990 1.010 1 0 6 1 2
+1 16.99 1.01 <string>F</string> <string>no</string> 6 1 2
 </record>
 <record label="2">
-2 10.340 1.660 0 0 6 1 3
+2 10.34 1.66 <string>M</string> <string>no</string> 6 1 3
 </record>
 <record label="3">
-3 21.010 3.500 0 0 6 1 3
+3 21.01 3.50 <string>M</string> <string>no</string> 6 1 3
 </record>
 <record label="4">
-4 23.680 3.310 0 0 6 1 2
+4 23.68 3.31 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="5">
-5 24.590 3.610 1 0 6 1 4
+5 24.59 3.61 <string>F</string> <string>no</string> 6 1 4
 </record>
 <record label="6">
-6 25.290 4.710 0 0 6 1 4
+6 25.29 4.71 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="7">
-7 8.770 2 0 0 6 1 2
+7 8.77 2.00 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="8">
-8 26.880 3.120 0 0 6 1 4
+8 26.88 3.12 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="9">
-9 15.040 1.960 0 0 6 1 2
+9 15.04 1.96 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="10">
-10 14.780 3.230 0 0 6 1 2
+10 14.78 3.23 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="11">
-11 10.270 1.710 0 0 6 1 2
+11 10.27 1.71 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="12">
-12 35.260 5 1 0 6 1 4
+12 35.26 5.00 <string>F</string> <string>no</string> 6 1 4
 </record>
 <record label="13">
-13 15.420 1.570 0 0 6 1 2
+13 15.42 1.57 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="14">
-14 18.430 3 0 0 6 1 4
+14 18.43 3.00 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="15">
-15 14.830 3.020 1 0 6 1 2
+15 14.83 3.02 <string>F</string> <string>no</string> 6 1 2
 </record>
 <record label="16">
-16 21.580 3.920 0 0 6 1 2
+16 21.58 3.92 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="17">
-17 10.330 1.670 1 0 6 1 3
+17 10.33 1.67 <string>F</string> <string>no</string> 6 1 3
 </record>
 <record label="18">
-18 16.290 3.710 0 0 6 1 3
+18 16.29 3.71 <string>M</string> <string>no</string> 6 1 3
 </record>
 <record label="19">
-19 16.970 3.500 1 0 6 1 3
+19 16.97 3.50 <string>F</string> <string>no</string> 6 1 3
 </record>
 <record label="20">
-20 20.650 3.350 0 0 5 1 3
+20 20.65 3.35 <string>M</string> <string>no</string> 5 1 3
 </record>
 <record label="21">
-21 17.920 4.080 0 0 5 1 2
+21 17.92 4.08 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="22">
-22 20.290 2.750 1 0 5 1 2
+22 20.29 2.75 <string>F</string> <string>no</string> 5 1 2
 </record>
 <record label="23">
-23 15.770 2.230 1 0 5 1 2
+23 15.77 2.23 <string>F</string> <string>no</string> 5 1 2
 </record>
 <record label="24">
-24 39.420 7.580 0 0 5 1 4
+24 39.42 7.58 <string>M</string> <string>no</string> 5 1 4
 </record>
 <record label="25">
-25 19.820 3.180 0 0 5 1 2
+25 19.82 3.18 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="26">
-26 17.810 2.340 0 0 5 1 4
+26 17.81 2.34 <string>M</string> <string>no</string> 5 1 4
 </record>
 <record label="27">
-27 13.370 2 0 0 5 1 2
+27 13.37 2.00 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="28">
-28 12.690 2 0 0 5 1 2
+28 12.69 2.00 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="29">
-29 21.700 4.300 0 0 5 1 2
+29 21.70 4.30 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="30">
-30 19.650 3 1 0 5 1 2
+30 19.65 3.00 <string>F</string> <string>no</string> 5 1 2
 </record>
 <record label="31">
-31 9.550 1.450 0 0 5 1 2
+31 9.55 1.45 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="32">
-32 18.350 2.500 0 0 5 1 4
+32 18.35 2.50 <string>M</string> <string>no</string> 5 1 4
 </record>
 <record label="33">
-33 15.060 3 1 0 5 1 2
+33 15.06 3.00 <string>F</string> <string>no</string> 5 1 2
 </record>
 <record label="34">
-34 20.690 2.450 1 0 5 1 4
+34 20.69 2.45 <string>F</string> <string>no</string> 5 1 4
 </record>
 <record label="35">
-35 17.780 3.270 0 0 5 1 2
+35 17.78 3.27 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="36">
-36 24.060 3.600 0 0 5 1 3
+36 24.06 3.60 <string>M</string> <string>no</string> 5 1 3
 </record>
 <record label="37">
-37 16.310 2 0 0 5 1 3
+37 16.31 2.00 <string>M</string> <string>no</string> 5 1 3
 </record>
 <record label="38">
-38 16.930 3.070 1 0 5 1 3
+38 16.93 3.07 <string>F</string> <string>no</string> 5 1 3
 </record>
 <record label="39">
-39 18.690 2.310 0 0 5 1 3
+39 18.69 2.31 <string>M</string> <string>no</string> 5 1 3
 </record>
 <record label="40">
-40 31.270 5 0 0 5 1 3
+40 31.27 5.00 <string>M</string> <string>no</string> 5 1 3
 </record>
 <record label="41">
-41 16.040 2.240 0 0 5 1 3
+41 16.04 2.24 <string>M</string> <string>no</string> 5 1 3
 </record>
 <record label="42">
-42 17.460 2.540 0 0 6 1 2
+42 17.46 2.54 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="43">
-43 13.940 3.060 0 0 6 1 2
+43 13.94 3.06 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="44">
-44 9.680 1.320 0 0 6 1 2
+44 9.68 1.32 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="45">
-45 30.400 5.600 0 0 6 1 4
+45 30.40 5.60 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="46">
-46 18.290 3 0 0 6 1 2
+46 18.29 3.00 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="47">
-47 22.230 5 0 0 6 1 2
+47 22.23 5.00 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="48">
-48 32.400 6 0 0 6 1 4
+48 32.40 6.00 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="49">
-49 28.550 2.050 0 0 6 1 3
+49 28.55 2.05 <string>M</string> <string>no</string> 6 1 3
 </record>
 <record label="50">
-50 18.040 3 0 0 6 1 2
+50 18.04 3.00 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="51">
-51 12.540 2.500 0 0 6 1 2
+51 12.54 2.50 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="52">
-52 10.290 2.600 1 0 6 1 2
+52 10.29 2.60 <string>F</string> <string>no</string> 6 1 2
 </record>
 <record label="53">
-53 34.810 5.200 1 0 6 1 4
+53 34.81 5.20 <string>F</string> <string>no</string> 6 1 4
 </record>
 <record label="54">
-54 9.940 1.560 0 0 6 1 2
+54  9.94 1.56 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="55">
-55 25.560 4.340 0 0 6 1 4
+55 25.56 4.34 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="56">
-56 19.490 3.510 0 0 6 1 2
+56 19.49 3.51 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="57">
-57 38.010 3 0 1 5 1 4
+57 38.01 3.00 <string>M</string> <string>yes</string> 5 1 4
 </record>
 <record label="58">
-58 26.410 1.500 1 0 5 1 2
+58 26.41 1.50 <string>F</string> <string>no</string> 5 1 2
 </record>
 <record label="59">
-59 11.240 1.760 0 1 5 1 2
+59 11.24 1.76 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="60">
-60 48.270 6.730 0 0 5 1 4
+60 48.27 6.73 <string>M</string> <string>no</string> 5 1 4
 </record>
 <record label="61">
-61 20.290 3.210 0 1 5 1 2
+61 20.29 3.21 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="62">
-62 13.810 2 0 1 5 1 2
+62 13.81 2.00 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="63">
-63 11.020 1.980 0 1 5 1 2
+63 11.02 1.98 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="64">
-64 18.290 3.760 0 1 5 1 4
+64 18.29 3.76 <string>M</string> <string>yes</string> 5 1 4
 </record>
 <record label="65">
-65 17.590 2.640 0 0 5 1 3
+65 17.59 2.64 <string>M</string> <string>no</string> 5 1 3
 </record>
 <record label="66">
-66 20.080 3.150 0 0 5 1 3
+66 20.08 3.15 <string>M</string> <string>no</string> 5 1 3
 </record>
 <record label="67">
-67 16.450 2.470 1 0 5 1 2
+67 16.45 2.47 <string>F</string> <string>no</string> 5 1 2
 </record>
 <record label="68">
-68 3.070 1 1 1 5 1 1
+68  3.07 1.00 <string>F</string> <string>yes</string> 5 1 1
 </record>
 <record label="69">
-69 20.230 2.010 0 0 5 1 2
+69 20.23 2.01 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="70">
-70 15.010 2.090 0 1 5 1 2
+70 15.01 2.09 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="71">
-71 12.020 1.970 0 0 5 1 2
+71 12.02 1.97 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="72">
-72 17.070 3 1 0 5 1 3
+72 17.07 3.00 <string>F</string> <string>no</string> 5 1 3
 </record>
 <record label="73">
-73 26.860 3.140 1 1 5 1 2
+73 26.86 3.14 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="74">
-74 25.280 5 1 1 5 1 2
+74 25.28 5.00 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="75">
-75 14.730 2.200 1 0 5 1 2
+75 14.73 2.20 <string>F</string> <string>no</string> 5 1 2
 </record>
 <record label="76">
-76 10.510 1.250 0 0 5 1 2
+76 10.51 1.25 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="77">
-77 17.920 3.080 0 1 5 1 2
+77 17.92 3.08 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="78">
-78 27.200 4 0 0 3 0 4
+78 27.20 4.00 <string>M</string> <string>no</string> 3 0 4
 </record>
 <record label="79">
-79 22.760 3 0 0 3 0 2
+79 22.76 3.00 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="80">
-80 17.290 2.710 0 0 3 0 2
+80 17.29 2.71 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="81">
-81 19.440 3 0 1 3 0 2
+81 19.44 3.00 <string>M</string> <string>yes</string> 3 0 2
 </record>
 <record label="82">
-82 16.660 3.400 0 0 3 0 2
+82 16.66 3.40 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="83">
-83 10.070 1.830 1 0 3 0 1
+83 10.07 1.83 <string>F</string> <string>no</string> 3 0 1
 </record>
 <record label="84">
-84 32.680 5 0 1 3 0 2
+84 32.68 5.00 <string>M</string> <string>yes</string> 3 0 2
 </record>
 <record label="85">
-85 15.980 2.030 0 0 3 0 2
+85 15.98 2.03 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="86">
-86 34.830 5.170 1 0 3 0 4
+86 34.83 5.17 <string>F</string> <string>no</string> 3 0 4
 </record>
 <record label="87">
-87 13.030 2 0 0 3 0 2
+87 13.03 2.00 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="88">
-88 18.280 4 0 0 3 0 2
+88 18.28 4.00 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="89">
-89 24.710 5.850 0 0 3 0 2
+89 24.71 5.85 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="90">
-90 21.160 3 0 0 3 0 2
+90 21.16 3.00 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="91">
-91 28.970 3 0 1 4 1 2
+91 28.97 3.00 <string>M</string> <string>yes</string> 4 1 2
 </record>
 <record label="92">
-92 22.490 3.500 0 0 4 1 2
+92 22.49 3.50 <string>M</string> <string>no</string> 4 1 2
 </record>
 <record label="93">
-93 5.750 1 1 1 4 1 2
+93  5.75 1.00 <string>F</string> <string>yes</string> 4 1 2
 </record>
 <record label="94">
-94 16.320 4.300 1 1 4 1 2
+94 16.32 4.30 <string>F</string> <string>yes</string> 4 1 2
 </record>
 <record label="95">
-95 22.750 3.250 1 0 4 1 2
+95 22.75 3.25 <string>F</string> <string>no</string> 4 1 2
 </record>
 <record label="96">
-96 40.170 4.730 0 1 4 1 4
+96 40.17 4.73 <string>M</string> <string>yes</string> 4 1 4
 </record>
 <record label="97">
-97 27.280 4 0 1 4 1 2
+97 27.28 4.00 <string>M</string> <string>yes</string> 4 1 2
 </record>
 <record label="98">
-98 12.030 1.500 0 1 4 1 2
+98 12.03 1.50 <string>M</string> <string>yes</string> 4 1 2
 </record>
 <record label="99">
-99 21.010 3 0 1 4 1 2
+99 21.01 3.00 <string>M</string> <string>yes</string> 4 1 2
 </record>
 <record label="100">
-100 12.460 1.500 0 0 4 1 2
+100 12.46 1.50 <string>M</string> <string>no</string> 4 1 2
 </record>
 <record label="101">
-101 11.350 2.500 1 1 4 1 2
+101 11.35 2.50 <string>F</string> <string>yes</string> 4 1 2
 </record>
 <record label="102">
-102 15.380 3 1 1 4 1 2
+102 15.38 3.00 <string>F</string> <string>yes</string> 4 1 2
 </record>
 <record label="103">
-103 44.300 2.500 1 1 5 1 3
+103 44.30 2.50 <string>F</string> <string>yes</string> 5 1 3
 </record>
 <record label="104">
-104 22.420 3.480 1 1 5 1 2
+104 22.42 3.48 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="105">
-105 20.920 4.080 1 0 5 1 2
+105 20.92 4.08 <string>F</string> <string>no</string> 5 1 2
 </record>
 <record label="106">
-106 15.360 1.640 0 1 5 1 2
+106 15.36 1.64 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="107">
-107 20.490 4.060 0 1 5 1 2
+107 20.49 4.06 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="108">
-108 25.210 4.290 0 1 5 1 2
+108 25.21 4.29 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="109">
-109 18.240 3.760 0 0 5 1 2
+109 18.24 3.76 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="110">
-110 14.310 4 1 1 5 1 2
+110 14.31 4.00 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="111">
-111 14 3 0 0 5 1 2
+111 14.00 3.00 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="112">
-112 7.250 1 1 0 5 1 1
+112  7.25 1.00 <string>F</string> <string>no</string> 5 1 1
 </record>
 <record label="113">
-113 38.070 4 0 0 6 1 3
+113 38.07 4.00 <string>M</string> <string>no</string> 6 1 3
 </record>
 <record label="114">
-114 23.950 2.550 0 0 6 1 2
+114 23.95 2.55 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="115">
-115 25.710 4 1 0 6 1 3
+115 25.71 4.00 <string>F</string> <string>no</string> 6 1 3
 </record>
 <record label="116">
-116 17.310 3.500 1 0 6 1 2
+116 17.31 3.500 <string>F</string> <string>no</string> 6 1 2
 </record>
 <record label="117">
-117 29.930 5.070 0 0 6 1 4
+117 29.93 5.07 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="118">
-118 10.650 1.500 1 0 3 0 2
+118 10.65 1.50 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="119">
-119 12.430 1.800 1 0 3 0 2
+119 12.43 1.80 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="120">
-120 24.080 2.920 1 0 3 0 4
+120 24.08 2.92 <string>F</string> <string>no</string> 3 0 4
 </record>
 <record label="121">
-121 11.690 2.310 0 0 3 0 2
+121 11.69 2.31 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="122">
-122 13.420 1.680 1 0 3 0 2
+122 13.42 1.68 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="123">
-123 14.260 2.500 0 0 3 0 2
+123 14.26 2.50 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="124">
-124 15.950 2 0 0 3 0 2
+124 15.95 2.00 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="125">
-125 12.480 2.520 1 0 3 0 2
+125 12.48 2.52 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="126">
-126 29.800 4.200 1 0 3 0 6
+126 29.80 4.20 <string>F</string> <string>no</string> 3 0 6
 </record>
 <record label="127">
-127 8.520 1.480 0 0 3 0 2
+127  8.52 1.48 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="128">
-128 14.520 2 1 0 3 0 2
+128 14.52 2.00 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="129">
-129 11.380 2 1 0 3 0 2
+129 11.38 2.00 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="130">
-130 22.820 2.180 0 0 3 0 3
+130 22.82 2.18 <string>M</string> <string>no</string> 3 0 3
 </record>
 <record label="131">
-131 19.080 1.500 0 0 3 0 2
+131 19.08 1.50 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="132">
-132 20.270 2.830 1 0 3 0 2
+132 20.27 2.83 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="133">
-133 11.170 1.500 1 0 3 0 2
+133 11.17 1.50 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="134">
-134 12.260 2 1 0 3 0 2
+134 12.26 2.00 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="135">
-135 18.260 3.250 1 0 3 0 2
+135 18.26 3.25 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="136">
-136 8.510 1.250 1 0 3 0 2
+136  8.51 1.25 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="137">
-137 10.330 2 1 0 3 0 2
+137 10.33 2.00 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="138">
-138 14.150 2 1 0 3 0 2
+138 14.15 2.00 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="139">
-139 16 2 0 1 3 0 2
+139 16.00 2.00 <string>M</string> <string>yes</string> 3 0 2
 </record>
 <record label="140">
-140 13.160 2.750 1 0 3 0 2
+140 13.16 2.75 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="141">
-141 17.470 3.500 1 0 3 0 2
+141 17.47 3.50 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="142">
-142 34.300 6.700 0 0 3 0 6
+142 34.30 6.70 <string>M</string> <string>no</string> 3 0 6
 </record>
 <record label="143">
-143 41.190 5 0 0 3 0 5
+143 41.19 5.00 <string>M</string> <string>no</string> 3 0 5
 </record>
 <record label="144">
-144 27.050 5 1 0 3 0 6
+144 27.05 5.00 <string>F</string> <string>no</string> 3 0 6
 </record>
 <record label="145">
-145 16.430 2.300 1 0 3 0 2
+145 16.43 2.30 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="146">
-146 8.350 1.500 1 0 3 0 2
+146  8.35 1.50 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="147">
-147 18.640 1.360 1 0 3 0 3
+147 18.64 1.36 <string>F</string> <string>no</string> 3 0 3
 </record>
 <record label="148">
-148 11.870 1.630 1 0 3 0 2
+148 11.87 1.63 <string>F</string> <string>no</string> 3 0 2
 </record>
 <record label="149">
-149 9.780 1.730 0 0 3 0 2
+149  9.78 1.73 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="150">
-150 7.510 2 0 0 3 0 2
+150  7.51 2.00 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="151">
-151 14.070 2.500 0 0 6 1 2
+151 14.07 2.50 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="152">
-152 13.130 2 0 0 6 1 2
+152 13.13 2.00 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="153">
-153 17.260 2.740 0 0 6 1 3
+153 17.26 2.74 <string>M</string> <string>no</string> 6 1 3
 </record>
 <record label="154">
-154 24.550 2 0 0 6 1 4
+154 24.55 2.00 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="155">
-155 19.770 2 0 0 6 1 4
+155 19.77 2.00 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="156">
-156 29.850 5.140 1 0 6 1 5
+156 29.85 5.14 <string>F</string> <string>no</string> 6 1 5
 </record>
 <record label="157">
-157 48.170 5 0 0 6 1 6
+157 48.17 5.00 <string>M</string> <string>no</string> 6 1 6
 </record>
 <record label="158">
-158 25 3.750 1 0 6 1 4
+158 25.00 3.75 <string>F</string> <string>no</string> 6 1 4
 </record>
 <record label="159">
-159 13.390 2.610 1 0 6 1 2
+159 13.39 2.61 <string>F</string> <string>no</string> 6 1 2
 </record>
 <record label="160">
-160 16.490 2 0 0 6 1 4
+160 16.49 2.00 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="161">
-161 21.500 3.500 0 0 6 1 4
+161 21.50 3.50 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="162">
-162 12.660 2.500 0 0 6 1 2
+162 12.66 2.50 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="163">
-163 16.210 2 1 0 6 1 3
+163 16.21 2.00 <string>F</string> <string>no</string> 6 1 3
 </record>
 <record label="164">
-164 13.810 2 0 0 6 1 2
+164 13.81 2.00 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="165">
-165 17.510 3 1 1 6 1 2
+165 17.51 3.00 <string>F</string> <string>yes</string> 6 1 2
 </record>
 <record label="166">
-166 24.520 3.480 0 0 6 1 3
+166 24.52 3.48 <string>M</string> <string>no</string> 6 1 3
 </record>
 <record label="167">
-167 20.760 2.240 0 0 6 1 2
+167 20.76 2.24 <string>M</string> <string>no</string> 6 1 2
 </record>
 <record label="168">
-168 31.710 4.500 0 0 6 1 4
+168 31.71 4.50 <string>M</string> <string>no</string> 6 1 4
 </record>
 <record label="169">
-169 10.590 1.610 1 1 5 1 2
+169 10.59 1.61 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="170">
-170 10.630 2 1 1 5 1 2
+170 10.63 2.00 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="171">
-171 50.810 10 0 1 5 1 3
+171 50.81 10.00 <string>M</string> <string>yes</string> 5 1 3
 </record>
 <record label="172">
-172 15.810 3.160 0 1 5 1 2
+172 15.81 3.16 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="173">
-173 7.250 5.150 0 1 6 1 2
+173  7.25 5.15 <string>M</string> <string>yes</string> 6 1 2
 </record>
 <record label="174">
-174 31.850 3.180 0 1 6 1 2
+174 31.85 3.18 <string>M</string> <string>yes</string> 6 1 2
 </record>
 <record label="175">
-175 16.820 4 0 1 6 1 2
+175 16.82 4.00 <string>M</string> <string>yes</string> 6 1 2
 </record>
 <record label="176">
-176 32.900 3.110 0 1 6 1 2
+176 32.90 3.11 <string>M</string> <string>yes</string> 6 1 2
 </record>
 <record label="177">
-177 17.890 2 0 1 6 1 2
+177 17.89 2.00 <string>M</string> <string>yes</string> 6 1 2
 </record>
 <record label="178">
-178 14.480 2 0 1 6 1 2
+178 14.48 2.00 <string>M</string> <string>yes</string> 6 1 2
 </record>
 <record label="179">
-179 9.600 4 1 1 6 1 2
+179  9.60 4.00 <string>F</string> <string>yes</string> 6 1 2
 </record>
 <record label="180">
-180 34.630 3.550 0 1 6 1 2
+180 34.63 3.55 <string>M</string> <string>yes</string> 6 1 2
 </record>
 <record label="181">
-181 34.650 3.680 0 1 6 1 4
+181 34.65 3.68 <string>M</string> <string>yes</string> 6 1 4
 </record>
 <record label="182">
-182 23.330 5.650 0 1 6 1 2
+182 23.33 5.65 <string>M</string> <string>yes</string> 6 1 2
 </record>
 <record label="183">
-183 45.350 3.500 0 1 6 1 3
+183 45.35 3.50 <string>M</string> <string>yes</string> 6 1 3
 </record>
 <record label="184">
-184 23.170 6.500 0 1 6 1 4
+184 23.17 6.50 <string>M</string> <string>yes</string> 6 1 4
 </record>
 <record label="185">
-185 40.550 3 0 1 6 1 2
+185 40.55 3.00 <string>M</string> <string>yes</string> 6 1 2
 </record>
 <record label="186">
-186 20.690 5 0 0 6 1 5
+186 20.69 5.00 <string>M</string> <string>no</string> 6 1 5
 </record>
 <record label="187">
-187 20.900 3.500 1 1 6 1 3
+187 20.90 3.50 <string>F</string> <string>yes</string> 6 1 3
 </record>
 <record label="188">
-188 30.460 2 0 1 6 1 5
+188 30.46 2.00 <string>M</string> <string>yes</string> 6 1 5
 </record>
 <record label="189">
-189 18.150 3.500 1 1 6 1 3
+189 18.15 3.50 <string>F</string> <string>yes</string> 6 1 3
 </record>
 <record label="190">
-190 23.100 4 0 1 6 1 3
+190 23.10 4.00 <string>M</string> <string>yes</string> 6 1 3
 </record>
 <record label="191">
-191 15.690 1.500 0 1 6 1 2
+191 15.69 1.50 <string>M</string> <string>yes</string> 6 1 2
 </record>
 <record label="192">
-192 19.810 4.190 1 1 3 0 2
+192 19.81 4.19 <string>F</string> <string>yes</string> 3 0 2
 </record>
 <record label="193">
-193 28.440 2.560 0 1 3 0 2
+193 28.44 2.56 <string>M</string> <string>yes</string> 3 0 2
 </record>
 <record label="194">
-194 15.480 2.020 0 1 3 0 2
+194 15.48 2.02 <string>M</string> <string>yes</string> 3 0 2
 </record>
 <record label="195">
-195 16.580 4 0 1 3 0 2
+195 16.58 4.00 <string>M</string> <string>yes</string> 3 0 2
 </record>
 <record label="196">
-196 7.560 1.440 0 0 3 0 2
+196  7.56 1.44 <string>M</string> <string>no</string> 3 0 2
 </record>
 <record label="197">
-197 10.340 2 0 1 3 0 2
+197 10.34 2.00 <string>M</string> <string>yes</string> 3 0 2
 </record>
 <record label="198">
-198 43.110 5 1 1 3 0 4
+198 43.11 5.00 <string>F</string> <string>yes</string> 3 0 4
 </record>
 <record label="199">
-199 13 2 1 1 3 0 2
+199 13.00 2.00 <string>F</string> <string>yes</string> 3 0 2
 </record>
 <record label="200">
-200 13.510 2 0 1 3 0 2
+200 13.51 2.00 <string>M</string> <string>yes</string> 3 0 2
 </record>
 <record label="201">
-201 18.710 4 0 1 3 0 3
+201 18.71 4.00 <string>M</string> <string>yes</string> 3 0 3
 </record>
 <record label="202">
-202 12.740 2.010 1 1 3 0 2
+202 12.74 2.01 <string>F</string> <string>yes</string> 3 0 2
 </record>
 <record label="203">
-203 13 2 1 1 3 0 2
+203 13.00 2.00 <string>F</string> <string>yes</string> 3 0 2
 </record>
 <record label="204">
-204 16.400 2.500 1 1 3 0 2
+204 16.40 2.50 <string>F</string> <string>yes</string> 3 0 2
 </record>
 <record label="205">
-205 20.530 4 0 1 3 0 4
+205 20.53 4.00 <string>M</string> <string>yes</string> 3 0 4
 </record>
 <record label="206">
-206 16.470 3.230 1 1 3 0 3
+206 16.47 3.23 <string>F</string> <string>yes</string> 3 0 3
 </record>
 <record label="207">
-207 26.590 3.410 0 1 5 1 3
+207 26.59 3.41 <string>M</string> <string>yes</string> 5 1 3
 </record>
 <record label="208">
-208 38.730 3 0 1 5 1 4
+208 38.73 3.00 <string>M</string> <string>yes</string> 5 1 4
 </record>
 <record label="209">
-209 24.270 2.030 0 1 5 1 2
+209 24.27 2.03 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="210">
-210 12.760 2.230 1 1 5 1 2
+210 12.76 2.23 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="211">
-211 30.060 2 0 1 5 1 3
+211 30.06 2.00 <string>M</string> <string>yes</string> 5 1 3
 </record>
 <record label="212">
-212 25.890 5.160 0 1 5 1 4
+212 25.89 5.16 <string>M</string> <string>yes</string> 5 1 4
 </record>
 <record label="213">
-213 48.330 9 0 0 5 1 4
+213 48.33 9.00 <string>M</string> <string>no</string> 5 1 4
 </record>
 <record label="214">
-214 13.270 2.500 1 1 5 1 2
+214 13.27 2.50 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="215">
-215 28.170 6.500 1 1 5 1 3
+215 28.17 6.50 <string>F</string> <string>yes</string> 5 1 3
 </record>
 <record label="216">
-216 12.900 1.100 1 1 5 1 2
+216 12.90 1.10 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="217">
-217 28.150 3 0 1 5 1 5
+217 28.15 3.00 <string>M</string> <string>yes</string> 5 1 5
 </record>
 <record label="218">
-218 11.590 1.500 0 1 5 1 2
+218 11.59 1.50 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="219">
-219 7.740 1.440 0 1 5 1 2
+219  7.74 1.44 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="220">
-220 30.140 3.090 1 1 5 1 4
+220 30.14 3.09 <string>F</string> <string>yes</string> 5 1 4
 </record>
 <record label="221">
-221 12.160 2.200 0 1 4 0 2
+221 12.16 2.20 <string>M</string> <string>yes</string> 4 0 2
 </record>
 <record label="222">
-222 13.420 3.480 1 1 4 0 2
+222 13.42 3.48 <string>F</string> <string>yes</string> 4 0 2
 </record>
 <record label="223">
-223 8.580 1.920 0 1 4 0 1
+223  8.58 1.92 <string>M</string> <string>yes</string> 4 0 1
 </record>
 <record label="224">
-224 15.980 3 1 0 4 0 3
+224 15.98 3.00 <string>F</string> <string>no</string> 4 0 3
 </record>
 <record label="225">
-225 13.420 1.580 0 1 4 0 2
+225 13.42 1.58 <string>M</string> <string>yes</string> 4 0 2
 </record>
 <record label="226">
-226 16.270 2.500 1 1 4 0 2
+226 16.27 2.50 <string>F</string> <string>yes</string> 4 0 2
 </record>
 <record label="227">
-227 10.090 2 1 1 4 0 2
+227 10.09 2.00 <string>F</string> <string>yes</string> 4 0 2
 </record>
 <record label="228">
-228 20.450 3 0 0 5 1 4
+228 20.45 3.00 <string>M</string> <string>no</string> 5 1 4
 </record>
 <record label="229">
-229 13.280 2.720 0 0 5 1 2
+229 13.28 2.72 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="230">
-230 22.120 2.880 1 1 5 1 2
+230 22.12 2.88 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="231">
-231 24.010 2 0 1 5 1 4
+231 24.01 2.00 <string>M</string> <string>yes</string> 5 1 4
 </record>
 <record label="232">
-232 15.690 3 0 1 5 1 3
+232 15.69 3.00 <string>M</string> <string>yes</string> 5 1 3
 </record>
 <record label="233">
-233 11.610 3.390 0 0 5 1 2
+233 11.61 3.39 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="234">
-234 10.770 1.470 0 0 5 1 2
+234 10.77 1.47 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="235">
-235 15.530 3 0 1 5 1 2
+235 15.53 3.00 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="236">
-236 10.070 1.250 0 0 5 1 2
+236 10.07 1.25 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="237">
-237 12.600 1 0 1 5 1 2
+237 12.60 1.00 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="238">
-238 32.830 1.170 0 1 5 1 2
+238 32.83 1.17 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="239">
-239 35.830 4.670 1 0 5 1 3
+239 35.83 4.67 <string>F</string> <string>no</string> 5 1 3
 </record>
 <record label="240">
-240 29.030 5.920 0 0 5 1 3
+240 29.03 5.920 <string>M</string> <string>no</string> 5 1 3
 </record>
 <record label="241">
-241 27.180 2 1 1 5 1 2
+241 27.18 2.00 <string>F</string> <string>yes</string> 5 1 2
 </record>
 <record label="242">
-242 22.670 2 0 1 5 1 2
+242 22.67 2.00 <string>M</string> <string>yes</string> 5 1 2
 </record>
 <record label="243">
-243 17.820 1.750 0 0 5 1 2
+243 17.82 1.75 <string>M</string> <string>no</string> 5 1 2
 </record>
 <record label="244">
-244 18.780 3 1 0 3 1 2
+244 18.78 3.00 <string>F</string> <string>no</string> 3 1 2
 </record>
 </records>
 </data>
