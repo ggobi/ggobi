@@ -333,7 +333,6 @@ linking_method_set_cb (GtkWidget *cl, gint row, gint column,
 
   notebook = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(cl), "notebook");
 
-  
   cpanel->br.linkby_row = row;
   cpanel->br.linkby_page = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 
@@ -474,6 +473,9 @@ linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
 
   gtk_container_add (GTK_CONTAINER (swin), clist);
   gtk_widget_show_all (swin);
+
+  /* It appears that this has to follow 'show_all' to take effect */
+  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
 }
 
 GtkWidget *
