@@ -356,3 +356,25 @@ pt_screen_to_raw (icoords *screen, greal *raw,
 
   g_free (world);
 }
+
+/*
+
+void
+splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
+  gboolean horiz, gboolean vert)
+{ ...
+
+Just let the current planar value be 0 and then run the same code.
+
+  if (horiz) {
+    sp->screen[pt].x -= sp->max.x/2;
+
+    prev_planar.x = sp->planar[pt].x;
+    sp->planar[pt].x = (greal) sp->screen[pt].x * precis / sp->iscale.x ;
+    sp->planar[pt].x += (greal) sp->pmid.x;
+
+    eps->x = sp->planar[pt].x - prev_planar.x;
+  }
+
+
+*/
