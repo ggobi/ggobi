@@ -1152,12 +1152,10 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 
 
   if (sp->bar->low_pts_missing && sp->bar->bar_hit[0]) {
-    if (sp->bar->low_bin->count==1)
-      sprintf (string,"%ld point < %.2lf",sp->bar->low_bin->count,
+    sprintf (string,"%ld point%s < %.2lf",sp->bar->low_bin->count,
+               sp->bar->low_bin->count==1 ? "" : "s",
 	       sp->bar->breaks[0]+sp->bar->offset); 
-    else
-      sprintf (string,"%ld points < %.2lf",sp->bar->low_bin->count,
-	       sp->bar->breaks[0]+sp->bar->offset); 
+
     gdk_draw_rectangle  (drawable, gg->plot_GC, FALSE,
           sp->bar->low_bin->rect.x,sp->bar->low_bin->rect.y,
           sp->bar->low_bin->rect.width,sp->bar->low_bin->rect.height);
@@ -1167,13 +1165,19 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   } 
   for (i=1; i<nbins+1; i++) {
     if (sp->bar->bar_hit[i]) {
-      if (sp->bar->bins[i-1].count == 1)
-        sprintf (string,"%ld point in (%.2lf,%.2lf)",sp->bar->bins[i-1].count,
-	       sp->bar->breaks[i-1]+sp->bar->offset,sp->bar->breaks[i]+sp->bar->offset);
-      else
-        sprintf (string,"%ld points in (%.2lf,%.2lf)",sp->bar->bins[i-1].count,
-	       sp->bar->breaks[i-1]+sp->bar->offset,sp->bar->breaks[i]+sp->bar->offset);
-      gdk_draw_rectangle  (drawable, gg->plot_GC, FALSE,
+	if(sp->bar->is_histogram) {
+	    sprintf (string,"%ld point%s in (%.2lf,%.2lf)", sp->bar->bins[i-1].count,
+		     sp->bar->bins[i-1].count == 1 ? "" : "s",
+		     sp->bar->breaks[i-1]+sp->bar->offset, sp->bar->breaks[i]+sp->bar->offset);
+	} else {
+	    char *levelName;
+            vartabled *var;
+	    var = (vartabled *) g_slist_nth_data(sp->displayptr->d->vartable, sp->p1dvar);
+	    levelName = g_array_index(var->level_names, gchar *, i-1);
+	    sprintf(string,"%ld point%s for level %s", sp->bar->bins[i-1].count,
+		    sp->bar->bins[i-1].count == 1 ? "" : "s", levelName);
+	}
+      gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
           sp->bar->bins[i-1].rect.x,sp->bar->bins[i-1].rect.y,
           sp->bar->bins[i-1].rect.width,sp->bar->bins[i-1].rect.height);
       gdk_draw_string (drawable, style->font, gg->plot_GC,
@@ -1183,12 +1187,9 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   }
   
   if (sp->bar->high_pts_missing && sp->bar->bar_hit[nbins+1]) {
-    if (sp->bar->high_bin->count == 1)
-      sprintf (string,"%ld point > %.2lf",sp->bar->high_bin->count,
-		sp->bar->breaks[nbins]+sp->bar->offset);
-    else    
-      sprintf (string,"%ld points > %.2lf",sp->bar->high_bin->count, 
-		sp->bar->breaks[nbins]+sp->bar->offset);
+    sprintf (string,"%ld point%s > %.2lf",sp->bar->high_bin->count,
+             sp->bar->high_bin->count == 1 ? "" : "s",
+	     sp->bar->breaks[nbins]+sp->bar->offset);
 
     gdk_draw_rectangle  (drawable, gg->plot_GC, FALSE,
           sp->bar->high_bin->rect.x,sp->bar->high_bin->rect.y,
