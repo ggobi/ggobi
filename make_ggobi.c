@@ -51,15 +51,22 @@ void modes_init (datad *d, ggobid* gg) {
 gboolean
 fileset_read_init (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
 {
-  gboolean ans = fileset_read (ldata_in, data_mode, gg);
+  int howMany;
+  gboolean ans;
+  howMany = g_slist_length(gg->d);
+  ans = fileset_read (ldata_in, data_mode, gg);
   if (ans) {
     GSList *l;
     datad *d;
     gboolean firstd = true;
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-      datad_init (d, gg, firstd);
-      firstd = false;
+    int n, i;
+    /* Loop over the newly added datad elements
+       and update them.
+     */
+    n = g_slist_length(gg->d);
+    for(i= howMany; i < n; i++) {
+       d = (datad *) g_slist_nth_data(gg->d, i);
+       datad_init(d, gg,  (i + howMany) == 0);
     }
   }
 

@@ -101,8 +101,8 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
     gg->current_splot = (splotd *)
       g_list_nth_data (gg->current_display->splots, 0);
 
-    varpanel_refresh (gg);
   }
+    varpanel_refresh (gg);
 
   return (display);
 }
