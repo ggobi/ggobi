@@ -9,9 +9,9 @@
 
 </description>
 <variables count="3">
- <variable> avgusage </variable>
- <variable> fraudp </variable>
- <variable> bizres </variable>
+ <realvariable name="avgusage" />
+ <realvariable name="fraudp" />
+ <realvariable name="bizres" />
 </variables>
 <records  count="5">
  <record id="0">  8 0 0  </record>
@@ -28,10 +28,10 @@
 
 </description>
 <variables count="4">
- <variable> nseconds </variable>
- <variable> timeofday </variable>
- <variable> type </variable>
- <variable> fraudp </variable>
+ <realvariable name="nseconds" />
+ <realvariable name="timeofday" />
+ <realvariable name="type" />
+ <realvariable name="fraudp" />
 </variables>
 
 <records count="6">

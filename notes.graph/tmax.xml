@@ -1,7 +1,7 @@
 <?xml version="1.0">
 <ggobidata count="2">
 
-<data name="Customers" points="T" edges="F">
+<data name="Customers">
 <description>
 
 </description>
@@ -31,13 +31,13 @@
 
 </data>
 
-<data name="Calls" points="T" edges="T">
+<data name="Calls">
 <description>
 
 </description>
 <variables count="4">
-  <realvariable name="nseconds"> </realvariable>
-  <realvariable name="timeofday"> </realvariable>
+  <realvariable name="nseconds" />
+  <realvariable name="timeofday" />
   <categoricalvariable name="type">
     <levels count="3">
      <level value="0">800</level>

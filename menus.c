@@ -13,22 +13,6 @@
 #include "vars.h"
 #include "externs.h"
 
-/* bug from R
-
-ggobi(mtcars)
-open scatterplot  <- Options menu not being added
-switch to brushing
-
-Gtk-WARNING **: invalid cast from (NULL) pointer to `GtkMenuItem'
-
-Gtk-CRITICAL **: file gtkmenuitem.c: line 260 (gtk_menu_item_remove_submenu): assertion `menu_item != NULL' failed.
-
-Gtk-WARNING **: invalid cast from (NULL) pointer to `GtkMenuItem'
-
-Gtk-CRITICAL **: file gtkmenuitem.c: line 240 (gtk_menu_item_set_submenu): assertion `menu_item != NULL' failed.
-
-*/
-
 /*--------------------------------------------------------------------*/
 /*                   Plot1D: Options menu                             */
 /*--------------------------------------------------------------------*/
@@ -524,7 +508,7 @@ mode_has_options_menu (gint mode)
   return (mode == P1PLOT || mode == XYPLOT || mode == SCALE  ||
           mode == BRUSH  || mode == TOUR1D || mode == TOUR2D ||
           mode == COTOUR || mode == IDENT  || mode == MOVEPTS ||
-          mode == PCPLOT || mode == TSPLOT);
+          mode == SCATMAT || mode == PCPLOT || mode == TSPLOT);
 }
 
 gboolean
