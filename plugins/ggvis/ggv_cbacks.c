@@ -10,11 +10,6 @@
 #include "defines.h"
 #include "ggvis.h"
 
-#if 0
-/* Use getSessionOptions() */
-__declspec(dllimport) GGobiOptions *sessionOptions;
-#endif
-
 static void ggv_center_scale_pos_all (ggvisd *ggv);
 void mds_open_display (PluginInstance *inst);
 
