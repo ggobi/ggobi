@@ -504,6 +504,10 @@ static GtkItemFactoryEntry menu_items[] = {
 #endif
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
+  { "/File/Close",   
+       "<ctrl>Q",   
+       (GtkItemFactoryCallback) ggobi_close, 
+       0 },
   { "/File/Quit",   
        "<ctrl>Q",   
        (GtkItemFactoryCallback) quit_ggobi, 
@@ -638,9 +642,9 @@ make_ui (ggobid *gg) {
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
 
   gtk_signal_connect_object(GTK_OBJECT (window), "delete_event",
-                      GTK_SIGNAL_FUNC (ggobi_close), gg);
+                      GTK_SIGNAL_FUNC (ggobi_close), (gpointer) gg);
   gtk_signal_connect_object(GTK_OBJECT (window), "destroy_event",
-                      GTK_SIGNAL_FUNC (ggobi_close), gg);
+                      GTK_SIGNAL_FUNC (ggobi_close), (gpointer) gg);
 
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
@@ -821,7 +825,7 @@ create_ggobi(InputDescription *desc)
   }
 #endif
 
-  start_ggobi(gg, init_data, true);
+  start_ggobi(gg, init_data, sessionOptions->info->createInitialScatterPlot);
 
   return(gg);
 }

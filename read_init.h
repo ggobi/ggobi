@@ -42,6 +42,10 @@ typedef struct _GGobiInitInfo {
     GdkColor *bgColor;
     GdkColor *fgColor;
     glyphd    glyph;
+
+    gboolean createInitialScatterPlot;
+    gboolean allowCloseLastDisplay;
+    gboolean quitWithNoGGobi;
 } GGobiInitInfo;
 
 GGobiInitInfo *read_init_file(const char *filename, GGobiInitInfo *info);

@@ -416,12 +416,17 @@ initSessionOptions()
   sessionOptions->info = (GGobiInitInfo*) g_malloc(sizeof(GGobiInitInfo));
   memset(sessionOptions->info, '\0', sizeof(GGobiInitInfo));
   sessionOptions->info->glyph.size = sessionOptions->info->glyph.type = -1;
+  sessionOptions->info->createInitialScatterPlot = true;
+  sessionOptions->info->allowCloseLastDisplay = false;
 #endif
 }
 
 
 /*
   Called in response to a window being destroyed.
+  Be careful not to use the event or the object
+  as they are not guaranteed to be correct. We are 
+  abusing the callback marshalling system a little.
  */
 gboolean
 ggobi_close (ggobid *gg, GdkEvent *ev, GtkObject *w)

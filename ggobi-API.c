@@ -886,6 +886,7 @@ GGOBI(registerColorMap)(ggobid *gg)
 gboolean
 GGOBI(close)(ggobid *gg, gboolean closeWindow)
 {
+  gboolean val = true;
   if (gg->close_pending)
     return (false);
 
@@ -908,7 +909,13 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
 
   gg->close_pending = false;
   /* Now fix up the list of ggobi's */
-  return (ggobi_remove(gg) != -1);
+  val = ggobi_remove(gg) != -1;
+
+  if(GGobi_getNumGGobis() == 0 && sessionOptions->info->quitWithNoGGobi) {
+      gtk_exit(0);
+  }
+
+  return(val);
 }
 
 

@@ -324,7 +324,7 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
     registerPlugins(gg, sessionOptions->info->plugins);
 #endif
 
-  start_ggobi(gg, init_data, true);
+  start_ggobi(gg, init_data, sessionOptions->info->createInitialScatterPlot);
 
   if (processEvents) {
     gtk_main ();

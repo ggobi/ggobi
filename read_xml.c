@@ -802,6 +802,8 @@ asNumber(const char *sval)
 }
 
 
+
+
 /*
    Read the declaration of a variable, gathering its information
    from the specified attributes.

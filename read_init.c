@@ -34,6 +34,9 @@ DataMode getPreviousInput(xmlNode *node, InputDescription *input);
 DataMode getInputType(xmlNode *node);
 
 #ifdef SUPPORT_PLUGINS
+
+gboolean getLogicalPreference(xmlNodePtr node, const char *elName, gboolean defaultValue);
+
 void getPlugins(xmlDocPtr doc, GGobiInitInfo *info);
 GGobiPluginInfo *processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
 GGobiPluginInfo *processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
@@ -185,7 +188,32 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
     }
   }
 
+  info->createInitialScatterPlot = getLogicalPreference(node, "autoplot", true);
+   /* If we autoplot, then we will by default expect there to be at least one plot,
+      so our default value for allowNoDisplays is the negation of autoplot. */
+  info->allowCloseLastDisplay = getLogicalPreference(node, "allowNoDisplays", !info->createInitialScatterPlot);
+
+  info->quitWithNoGGobi = getLogicalPreference(node, "quitOnLastGGobi", info->allowCloseLastDisplay);
+
   return(0);
+}
+
+gboolean
+getLogicalPreference(xmlNodePtr node, const char *elName, gboolean defaultValue)
+{
+    xmlNodePtr el;
+    gboolean val = defaultValue;
+    el = getXMLElement(node, elName);
+    if(el) {
+	gchar *tmp;
+	    tmp = xmlGetProp(el, "on");
+	if(tmp) {
+	    val = asLogical(tmp);
+	} else {
+	    val = true;
+	}
+    }
+    return(val);
 }
 
 gint

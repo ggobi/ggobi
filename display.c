@@ -452,6 +452,8 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
   gint count;
   displayd *dsp;
 
+  if(force == false && sessionOptions->info->allowCloseLastDisplay)
+      force = true;
 
   if (num_ggobis > 1 || force || g_list_length (gg->displays) > 1) {
 

@@ -11,6 +11,70 @@ GGobi. It is organized in reverse order so that the most recent
 releases are We hope to keep it as up-to-date as possible, but we
 often forget.
 
+<h2>Version 0.9.6</h2>
+<dl>
+
+  <dt> Additions to the preferences specifiable in an
+       initialization file.
+      <br>
+     &lt;autoplot&gt;, &lt;allowNoDisplays&gt;,
+      and &lt;quitOnLastGGobi&gt;
+     Each has a <b>on</b> attribute
+      that can be a logical value
+      (TRUE, true, True, T, 1 or
+       FALSE, False, false, F, 0)
+      <dl>
+        <dt>&lt;autoplot on="true|false"&gt;
+        <dd> controls whether the initial scatterplot is
+            created and displayed for a newly created
+            GGobi instance with data.
+	<dt>&lt;allowNoDisplays&gt;
+	 <dd> controls whether one can close the last
+	     display for a GGobi instance and therefor
+	     have no plots displayed, but only the
+	     main GGobi window for that instance.
+	 <dt> &lt;quitOnLastGGobi&gt;
+	 <dd> controls whether closing the last remaining
+	     GGobi instance main window terminates the
+	     GGobi session.
+      </dl> 
+      
+  <dd>
+  <dt>Added an item `Close' to the File menu that closes the 
+    particular GGobi instance. 
+
+  <dd>Quit terminates the application.
+
+  <dt> Java meta-plugin that allows developers to create
+       plugins implemented in Java.
+  <dd> Examples in the <code>plugins/JVM</code> directory.
+
+  <dt> Extended facilities in the DataViewer plugin
+      to link point brushing, identification and movement
+      to the cells in the worksheets. Also changes
+       made in a cell are updated in the GGobi dataset and plots.
+  <dd>
+
+  <dt> GGobi plugin for Gnumeric allowing ggobi to be used
+      in spreadsheets.
+  <dd>
+
+  <dt> Database connectivity implemented via plugins for
+      Postgres and MySQL.
+  <dd>
+
+  <dt> Meta plugin using R that allows one to write plugins
+      for GGobi using the S language.
+  <dd>
+
+  <dt> Splash screen has version information.
+  <dd>
+
+  <dt> Thanks to John Plummer for detailed bug reports.
+  <dd>
+</dl>
+
+
 <h2>Version 0.9.5</h2>
 <dl>
 
@@ -65,6 +129,6 @@ often forget.
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Tue Nov 20 10:55:17 EST 2001
+Last modified: Thu Dec  6 19:49:04 EST 2001
 <!-- hhmts end -->
 </body> </html>
