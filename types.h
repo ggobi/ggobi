@@ -71,6 +71,11 @@ typedef struct {
   gint jpartner;
 
 } SymbolicEndpoints;
+typedef struct {
+  gchar *a;
+  gchar *b;
+  gint jcase;
+} SortableEndpoints;
 
 
 typedef struct {
