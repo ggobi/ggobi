@@ -91,6 +91,7 @@
      </dll>
 </plugin>
 
+
  <inputPlugin name="postgres" interactive="true">
   <description>Reads data from a Postgres DBMS</description>
    <author>Duncan Temple Lang</author>
@@ -107,6 +108,15 @@
      <dll name="plugins/MySQL/MySQL"> 
        <init description="mysql_input_description"/>
      </dll>
+ </inputPlugin>
+
+ <inputPlugin name="fileSelect" interactive="true">
+  <description>Prompts user to select a file from a directory browser</description>
+  <author>Duncan Temple Lang</author>
+  <modeName>fileselect</modeName>
+  <dll name="plugins/FileSelector/FileSelect"> 
+       <init description="get_description"/>
+  </dll>
  </inputPlugin>
 
  <inputPlugin name="testInput">
