@@ -319,7 +319,7 @@ void strip_suffixes (ggobid *);
 void submenu_append (GtkWidget *, GtkWidget *);
 void submenu_destroy (GtkWidget *);
 void submenu_insert (GtkWidget *, GtkWidget *, gint);
-GtkWidget* submenu_make (gchar *, gint, GtkAccelGroup *);
+GtkWidget* submenu_make (gchar *, guint, GtkAccelGroup *);
 void subset_apply (datad *, ggobid *);
 gboolean subset_block (gint, gint, datad *, ggobid *);
 gboolean subset_everyn (gint, gint, datad *, ggobid *);

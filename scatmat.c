@@ -140,7 +140,7 @@ scatmat_new (gboolean missing_p,
    * add the Options and Link menus another way
   */
   scatmat_display_menus_make (display, scatmat_accel_group,
-                               (GtkSignalFunc) display_options_cb, mbar, gg);
+                              (GtkSignalFunc) display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 /*

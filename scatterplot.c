@@ -178,9 +178,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
 
   display_window_init (display, 3, gg);  /*-- 3 = width = any small int --*/
 
-/*
- * Add the main menu bar
-*/
+  /*-- Add the main menu bar --*/
   vbox = gtk_vbox_new (false, 1);
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (display->window), vbox);
@@ -191,16 +189,14 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
                  (gpointer) display);
   /*
    * After creating the menubar, and populating the file menu,
-   * add the Options and Link menus another way
+   * add the other menus manually
   */
   scatterplot_display_menus_make (display, gg->app.sp_accel_group,
    (GtkSignalFunc) display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 
-  /*
-   * Initialize a single splot
-  */
+  /*-- Initialize a single splot --*/
   if (sp == NULL) {
     sp = splot_new (display, WIDTH, HEIGHT, gg);
   }
@@ -208,17 +204,13 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   display->splots = NULL;
   display->splots = g_list_append (display->splots, (gpointer) sp);
 
-  /* 
-   * Initialize tour
-   */
+  /*-- Initialize tours if possible --*/
   if (display->displaytype == scatterplot && d->ncols >= 2) {
     display_tour2d_init(display, gg);
   }
-
   if (display->displaytype == scatterplot && d->ncols >= 1) {
     display_tour1d_init(display, gg);
   }
-
   if (display->displaytype == scatterplot && d->ncols >= 4) {
     display_tourcorr_init(display, gg);
   }

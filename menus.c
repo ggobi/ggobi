@@ -20,10 +20,6 @@
 void
 p1dplot_menus_make (ggobid *gg)
 {
-/*
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
-*/
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -45,10 +41,6 @@ p1dplot_menus_make (ggobid *gg)
 void
 xyplot_menus_make (ggobid *gg)
 {
-/*
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
-*/
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
@@ -76,7 +68,6 @@ tour1d_menus_make (ggobid *gg) {
   /*-- I/O menu --*/
   gg->menus.io_menu = gtk_menu_new ();
 
-/*-- these could use CreateMenuItem --*/
   item = gtk_menu_item_new_with_label ("Save coefficients");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (tour1d_io_cb),
@@ -94,7 +85,6 @@ tour1d_menus_make (ggobid *gg) {
                       GTK_SIGNAL_FUNC (tour1d_io_cb),
                       (gpointer) "read_history");
   gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
-/*-- --*/
 
   gtk_widget_show_all (gg->menus.io_menu);
 

@@ -70,12 +70,10 @@ CreateMenuItem (GtkWidget *menu,
       gtk_widget_add_accelerator (menuitem, "activate", accel_group,
         szAccel[1], GDK_CONTROL_MASK,
         GTK_ACCEL_VISIBLE);
-/*      GTK_ACCEL_VISIBLE|GTK_ACCEL_LOCKED);*/
     } else {                  /* alt-keypress */
       gtk_widget_add_accelerator (menuitem, "activate", accel_group,
         szAccel[0], GDK_MOD1_MASK,
         GTK_ACCEL_VISIBLE);
-/*      GTK_ACCEL_VISIBLE|GTK_ACCEL_LOCKED);*/
     }
   }
 
@@ -230,16 +228,17 @@ populate_option_menu (GtkWidget *opt_menu, gchar **lbl, gint nitems,
 
 
 GtkWidget *
-submenu_make (gchar *lbl, gint key, GtkAccelGroup *accel_group) {
+submenu_make (gchar *lbl, guint key, GtkAccelGroup *accel_group) {
   GtkWidget *item;
   gint tmp_key;
 
-  /* This gets me the underline, but the accelerator doesn't work */
+  /* This gets me the underline, but the accelerator doesn't always work */
   item = gtk_menu_item_new_with_label (lbl);
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (item)->child), lbl);
 
+  /*-- V -> ViewMode works but O -> Options doesn't --*/
   gtk_widget_add_accelerator (item,
-    "activate_item", accel_group, key, GDK_MOD1_MASK, GTK_ACCEL_LOCKED);
+    "activate_item", accel_group, tmp_key, GDK_MOD1_MASK, GTK_ACCEL_LOCKED);
 
   gtk_widget_show (item);
   return item;
@@ -248,7 +247,7 @@ submenu_make (gchar *lbl, gint key, GtkAccelGroup *accel_group) {
 void
 submenu_insert (GtkWidget *item, GtkWidget * mbar, gint pos) {
 
-  if (pos == -1) {
+  if (pos == -1) {  /*-- append at the end? --*/
     GSList *children;
     children = (GSList *) gtk_container_children (GTK_CONTAINER (mbar));
     pos = g_slist_length (children) - 1;

@@ -18,8 +18,6 @@
 #include "display_tree.h"
 #include "read_init.h"
 
-#include "varseldata.h"
-
 #include "fileio.h"
 
 
@@ -77,7 +75,7 @@ typedef struct /*-- ggobi --*/ {
  GtkWidget *scatmat_mode_menu;
  GtkWidget *scatterplot_mode_menu;
  GtkWidget *rotation_io_menu;
- GtkAccelGroup *sp_accel_group;
+ GtkAccelGroup *sp_accel_group;  /*-- sp = scatterplot here --*/
 
 } GGobiApp;
 
@@ -230,7 +228,7 @@ struct _ggobid {
 /*-------------------- parallel coordinates --------------------------*/
 
  struct _Parcoords {
-   GtkAccelGroup *pc_accel_group;
+   GtkAccelGroup *accel_group;
    GtkWidget *arrangement_box;
    GtkWidget *mode_menu;
  } parcoords;
@@ -238,7 +236,7 @@ struct _ggobid {
 /*---------------------time series------------------------------------*/  
 
  struct _TSPLOT {
-   GtkAccelGroup *pc_accel_group;
+   GtkAccelGroup *accel_group;
    GtkWidget *arrangement_box;
    GtkWidget *mode_menu;
  } tsplot;

@@ -148,15 +148,15 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars,
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (display->window), vbox);
 
-  gg->tsplot.pc_accel_group = gtk_accel_group_new ();
+  gg->tsplot.accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-    gg->tsplot.pc_accel_group, display->window, &mbar, (gpointer) display);
+    gg->tsplot.accel_group, display->window, &mbar, (gpointer) display);
 
   /*
    * After creating the menubar, and populating the file menu,
    * add the Display Options and Link menus another way
   */
-  tsplot_display_menus_make (display, gg->tsplot.pc_accel_group,
+  tsplot_display_menus_make (display, gg->tsplot.accel_group,
                             (GtkSignalFunc) display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 

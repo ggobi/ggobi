@@ -16,6 +16,7 @@
 #define WIDTH   200
 #define HEIGHT  100
 
+/*-- the statics will have to be moved to one of the include files - dfs --*/
 static GtkWidget *window = NULL;
 static GtkWidget *control_frame;
 static GtkWidget *mbar;
