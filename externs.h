@@ -53,6 +53,7 @@ extern void brush_menus_make (ggobid *gg);
 extern void brush_motion (icoords *, gboolean, gboolean, cpaneld *, ggobid *gg);
 extern gboolean brush_once (gboolean force, ggobid *gg);
 extern void brush_options_cb (gpointer, guint, GtkCheckMenuItem *);
+extern void brush_pos_init (ggobid *);
 extern void brush_set_pos (gint, gint, ggobid *gg);
 extern void cluster_free (gint, ggobid *gg);
 extern void clusters_set (ggobid *gg);
