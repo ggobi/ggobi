@@ -147,7 +147,7 @@ colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
       d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
       selected_var = get_one_selection_from_clist (clist);
   } else {
-      d = (datad *) g_list_nth_data(gg->d, 0);
+      d = (datad *) g_slist_nth_data(gg->d, 0);
       selected_var = 0;
   }
   if (d && selected_var != -1) {
@@ -1152,9 +1152,10 @@ createColorSchemeTree(int numTypes, gchar *schemeTypes[], ggobid *gg, GtkWidget 
 	 gtk_widget_show(item);
 /*
   Have to read the names properly first.
+*/
 	 tree = createSchemeColorsTree(scheme);
 	 gtk_tree_item_set_subtree(GTK_TREE_ITEM(item), tree);      
-*/
+
      }
      gtk_widget_show_all(top);
 

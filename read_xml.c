@@ -78,6 +78,7 @@ void startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs
 void endXMLElement(void *user_data, const xmlChar *name);
 void Characters(void *user_data, const xmlChar *ch, gint len);
 void cumulateRecordData(XMLParserData *data, const xmlChar *ch, gint len);
+void setMissingValue(XMLParserData *data, datad *d, vartabled *vt);
 
 const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
 
@@ -97,6 +98,9 @@ const gchar * const xmlDataTagNames[] = {
                                           "levels",
                                           "level",
 					  "activeColorScheme",
+					  "real",
+					  "int",
+					  "na",
                                           ""
                                          };
 
@@ -287,9 +291,13 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     case DATASET:
       setDataset(attrs, data);
     break;
-   
+
+    case REAL:   
+    case INT:   
+    case NA:   
+	break;
     default:
-      fprintf(stderr, "Unrecognized XML state\n"); fflush(stderr);    
+      fprintf(stderr, "Unrecognized XML state %s\n", name); fflush(stderr);    
     break;
   }
 }
@@ -412,6 +420,15 @@ void endXMLElement(void *user_data, const xmlChar *name)
       data->current_record++;
       resetRecordInfo(data);
     break;
+    case NA:
+        setMissingValue(data, getCurrentXMLData(data), NULL);
+	data->current_element++; 
+	break;
+    case REAL:
+    case INT:
+      setRecordValues(data, data->recordString, data->recordStringLength);
+      resetRecordInfo(data);
+    break;
     case VARIABLE:
     case REAL_VARIABLE:
     case CATEGORICAL_VARIABLE:
@@ -517,6 +534,8 @@ Characters(void *user_data, const xmlChar *ch, gint len)
 
   switch(data->state) {
     case RECORD:
+    case REAL:
+    case INT:
         /* Now we call
             setRecordValues (data, c, dlen); 
            after gathering the entire string for the record so that we
@@ -854,6 +873,21 @@ xml_warning(const gchar *attribute, const gchar *value, const gchar *msg,
   g_printerr ("\t%s %s: value = %s\n",  attribute, msg, value);
 }
 
+void
+setMissingValue(XMLParserData *data, datad *d, vartabled *vt)
+{
+      if (d->nmissing == 0) {
+        arrays_alloc (&d->missing, d->nrows, d->ncols);
+        arrays_zero (&d->missing);
+      }
+      d->missing.vals[data->current_record][data->current_element] = 1;
+      if(vt == NULL)
+	  vt = vartable_element_get (data->current_element, d);
+      vt->nmissing++;
+      d->raw.vals[data->current_record][data->current_element] = 0;
+      d->nmissing++;
+
+}
 
 /*
   Read the values for this record from free-formatted text. The entries
@@ -892,15 +926,7 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
           (strcasecmp (tmp, "na") == 0 || strcmp (tmp, ".") == 0)) ||
         (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0))
     {
-      if (d->nmissing == 0) {
-        arrays_alloc (&d->missing, d->nrows, d->ncols);
-        arrays_zero (&d->missing);
-      }
-      d->missing.vals[data->current_record][data->current_element] = 1;
-      vt->nmissing++;
-      d->raw.vals[data->current_record][data->current_element] = 0;
-      d->nmissing++;
-
+	setMissingValue(data, d, vt);
     } else {
       value = asNumber (tmp);
       if(vt->categorical_p && checkLevelValue(vt, value) == false) {

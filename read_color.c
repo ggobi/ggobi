@@ -84,9 +84,9 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
   scheme->rgb_accent.pixel = -1;
 
   scheme->name = g_strdup((gchar *) xmlGetProp(root, (xmlChar *) "name"));
-  scheme->type = getColorSchemeType(xmlGetProp(root, (xmlChar *) "type"));
+  scheme->type =  getColorSchemeType(xmlGetProp(root, (xmlChar *) "type"));
   scheme->system = getColorSchemeSystem(xmlGetProp(root, (xmlChar *) "system"));
-  scheme->colorNames = g_array_new(true, true, sizeof(gchar*));
+  scheme->colorNames = g_array_new(false, false, sizeof(gchar *));
 
 /*
   scheme->system_min = 0.0;
@@ -189,17 +189,31 @@ getForegroundColors(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme)
   }
 }
 
+
 gint
 getForegroundColor(gint index, xmlNodePtr node, xmlDocPtr doc,
   colorschemed *scheme)
 {
     gint value;
     gchar *name;
+    xmlChar* ptr;
     value = getColor(node, doc, &(scheme->data[index]), &scheme->rgb[index]);
 
-    name = xmlGetProp(node, (xmlChar *) "name");
-/*    g_array_index(scheme->colorNames, (gchar *), value-1) =  name ? g_strdup(name) : NULL; */
-    g_array_append_val(scheme->colorNames, name ? g_strdup(name) : NULL);
+#if 0
+    ptr =  xmlGetProp(node, (xmlChar *) "name");
+    {
+      gchar *tmp;
+      tmp = name = (gchar *) g_malloc(sizeof(gchar) * (strlen(ptr) + 1));
+      while(ptr[0]) {
+	  *tmp++ = *ptr++;
+      }
+      tmp[0] = '\0';
+    }
+#else
+    name = g_strdup("Foo");
+#endif
+/*XXX*/    
+    g_array_append_val(scheme->colorNames, name);
 
     return(value);
 }

@@ -24,10 +24,10 @@
  </categoricalvariable>
 </variables>
 <records  count="8" color="4">
- <record id="0">  1   1 1 0  </record>
- <record id="1">  1.5 2 1 1  </record>
+ <record id="0"><real>1</real><real>1</real><int>1</int><int>0</int></record>
+ <record id="1"><real>1.5</real><real>2</real><int>1</int><int>1</int>  </record>
  <record id="2">  3.5 3 0 2  </record>
- <record id="3">  4   4 0 0  </record>
+ <record id="3">  <na/> 4 0 0  </record>
  <record id="5">  5   5 2 1  </record>
  <record id="6">  5.8  6 2 2  </record>
  <record id="7">  6.0  6 2 2  </record>
@@ -67,7 +67,7 @@
  <record source="1" destination="5"> 12 5000  2 1 </record>
  <record source="1" destination="6"> 18 5100  2 2 </record>
  <record source="3" destination="7"> 12 5000  2 1 </record>
- <record source="3" destination="8"> 18 5100  2 2 </record>
+ <record source="3" destination="8"><real>18</real> <real>5100</real><int>2</int><int>2</int></record>
 </records>
 </data>
   

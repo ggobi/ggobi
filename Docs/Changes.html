@@ -12,6 +12,31 @@ GGobi. It is organized in reverse order so that the most recent
 releases are We hope to keep it as up-to-date as possible, but we
 often forget.
 
+<h2>Version 0.99-1</h2>
+<dl>
+  <dt> Support for new XML data format in which values are specified by
+       a &lt;real&gt; or &lt;int&gt; element within a &lt;record&gt;.
+       Missing values are represented by the element &lt;na/&gt;.
+      
+  <dd> The old format in which the values are given as a simple string
+      within the version is also supported.
+
+  <dt> Specifying the active color scheme within a data file.
+
+  <dd> Support for specifying the colors cheme within a data file
+       to apply to the given GGobi instance using &lt;activecolorscheme&gt;.
+      One can use a <b>name</b> attribute to identify the scheme by name
+      from with the available schemes. Additionally one can use
+      <b>file</b> to specify the name of an XML file containing color schemes to be read
+      and added to those available to the GGobi instance.  This file
+      is read before the <b>name</b> is used to resolve the
+      colorscheme.
+
+      <br>
+      In the future, we will allow the color scheme to be in-lined
+      within the file.
+</dl>
+
 <h2>Version 0.99</h2>
 <dl>
   <dt> Perl language plugin allowing one to write
@@ -222,6 +247,6 @@ often forget.
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Thu Mar  7 09:54:56 EST 2002
+Last modified: Sat May 18 18:48:49 EDT 2002
 <!-- hhmts end -->
 </body> </html>
