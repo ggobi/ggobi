@@ -41,8 +41,10 @@ write_xml_stream (FILE *f, ggobid *gg, const gchar *filename, XmlWriteInfo *xmlW
 {
  gint numDatasets, i;
  datad *d;
-  numDatasets = g_slist_length(gg->d);
-  write_xml_header (f, -1, gg, xmlWriteInfo);
+ numDatasets = g_slist_length(gg->d);
+g_printerr ("numDatasets %d\n", numDatasets);
+
+ write_xml_header (f, -1, gg, xmlWriteInfo);
 
   for(i = 0; i < numDatasets; i++) {
     d = (datad *) g_slist_nth_data(gg->d, i);
@@ -58,13 +60,15 @@ write_xml_stream (FILE *f, ggobid *gg, const gchar *filename, XmlWriteInfo *xmlW
 gboolean
 write_xml_dataset(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
+  if (d->edge.n && !d->ncols) {
+    write_xml_edges(f, d, gg, xmlWriteInfo);
+  } else {
     write_dataset_header (f, d, gg, xmlWriteInfo);
     write_xml_description (f, gg, xmlWriteInfo);
     write_xml_variables (f, d, gg, xmlWriteInfo);
     write_xml_records (f, d, gg, xmlWriteInfo);
-    /*-- skip for now, because there's no need to write the default edges --*/
-    /*    write_xml_edges(f, d, gg);*/
     write_dataset_footer(f, gg, xmlWriteInfo);
+  }
 
   return(true);
 }
@@ -139,7 +143,9 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
     gint k;
     fprintf(f, "  <categoricalvariable name=\"%s\"",
       (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
-    fprintf(f, " nickname=\"%s\">\n", vt->nickname);
+    if (vt->nickname)
+      fprintf(f, " nickname=\"%s\"", vt->nickname);
+    fprintf(f, ">\n");
     fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
     for (k=0; k<vt->nlevels; k++) {
       fprintf(f, "      <level value=\"%d\"> %s </level>\n",
@@ -151,28 +157,35 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
   } else if (vt->vartype == real) {
     fprintf(f, "  <realvariable name=\"%s\"",
       (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
-    fprintf(f, " nickname=\"%s\" />", vt->nickname);
+    if (vt->nickname)
+      fprintf(f, " nickname=\"%s\"", vt->nickname);
+    fprintf(f, "/>");
   } else if (vt->vartype == integer) {
     fprintf(f, "  <integervariable name=\"%s\"",
       (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
-    fprintf(f, " nickname=\"%s\" />", vt->nickname);
+    if (vt->nickname)
+      fprintf(f, " nickname=\"%s\"", vt->nickname);
+    fprintf(f, "/>");
   } else if (vt->vartype == counter) {
     fprintf(f, "  <countervariable name=\"%s\"",
       (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
-    fprintf(f, " nickname=\"%s\" />", vt->nickname);
+    if (vt->nickname)
+      fprintf(f, " nickname=\"%s\"", vt->nickname);
+    fprintf(f, "/>");
   }
 
   return(true);
 }
 
+/*
 gboolean
 write_edge_record_p (gint i, datad *e, ggobid *gg)
 {
-/*
  * If e is an edge set, then
  * loop over all other datads and test their rowids to decide
  * whether this case should be drawn.  Use sampled and hidden.
-*/
+ * XXX  We can't really do this, because we don't know what 
+ *      edgeset may have been associated with what nodeset.
   gboolean save_case = true;
   datad *d;
   GSList *l;
@@ -180,8 +193,8 @@ write_edge_record_p (gint i, datad *e, ggobid *gg)
 
   if (e->edge.n == e->nrows) {
     for (l = gg->d; l; l=l->next) {
-      endpointsd *endpoints = resolveEdgePoints(e, d);
       d = (datad *) l->data;
+      endpointsd *endpoints = resolveEdgePoints(e, d);
       if (endpoints) {
         if (!edge_endpoints_get (i, &a, &b, d, endpoints, e) ||
             !d->sampled.els[a] || !d->sampled.els[b] ||
@@ -195,72 +208,64 @@ write_edge_record_p (gint i, datad *e, ggobid *gg)
   }
   return save_case;
 }
+*/
 
 gboolean
 write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
- gint i, m, n;
+  gint i, m, n;
 
+  /*-- figure out how many records we're about to save.  --*/
+  if (gg->save.row_ind == ALLROWS)
+    n = d->nrows;
+  else if (gg->save.row_ind == DISPLAYEDROWS)
+    n = d->nrows_in_plot;
 
- /*-- figure out how many records we're about to save.  --*/
- if (gg->save.row_ind == ALLROWS)
-   n = d->nrows;
- else if (gg->save.row_ind == DISPLAYEDROWS) {
-   n = 0;
-   for (i=0; i<d->nrows_in_plot; i++) {
-     if (!d->hidden.els[ d->rows_in_plot.els[i] ]) {
-       if (d->edge.n == d->nrows) {  /* ie, if this datad has edges? */
-         if (write_edge_record_p (i, d, gg))
-           n++;
-       } else {
-         n++;
-       }
-     }
-   }
- }
-
- fprintf(f, "<records ");
- fprintf(f, "count=\"%d\"", n);
- if(xmlWriteInfo->useDefault) {
+  fprintf(f, "<records ");
+  fprintf(f, "count=\"%d\"", n);
+  if(xmlWriteInfo->useDefault) {
 /*
    fprintf(f, " glyphSize=\"%s\"", xmlWriteInfo->defaultGlyphSizeName);
    fprintf(f, " glyphType=\"%s\"", xmlWriteInfo->defaultGlyphTypeName);
 */
-   fprintf(f, " glyph=\"%s %s\"",
-    xmlWriteInfo->defaultGlyphTypeName,
-    xmlWriteInfo->defaultGlyphSizeName);
-   fprintf(f, " color=\"%s\"", xmlWriteInfo->defaultColorName);
- }
+    fprintf(f, " glyph=\"%s %s\"",
+      xmlWriteInfo->defaultGlyphTypeName,
+      xmlWriteInfo->defaultGlyphSizeName);
+    fprintf(f, " color=\"%s\"", xmlWriteInfo->defaultColorName);
+  }
 
- if (d->nmissing > 0) {
-   if (gg->save.missing_ind == MISSINGSNA)
-     fprintf(f, " missingValue=\"%s\"", "na");
-   else if (gg->save.missing_ind == MISSINGSDOT)
-     fprintf(f, " missingValue=\"%s\"", ".");
-   /*-- otherwise write the "imputed" value --*/
- }
- fprintf(f, ">\n");
+  if (d->nmissing > 0) {
+    if (gg->save.missing_ind == MISSINGSNA)
+      fprintf(f, " missingValue=\"%s\"", "na");
+    else if (gg->save.missing_ind == MISSINGSDOT)
+      fprintf(f, " missingValue=\"%s\"", ".");
+    /*-- otherwise write the "imputed" value --*/
+  }
+  fprintf(f, ">\n");
 
 
- if (gg->save.row_ind == ALLROWS) {
-   for (i = 0; i < d->nrows; i++) {
-     write_xml_record (f, d, gg, i, xmlWriteInfo);
-     fprintf(f, "\n");
-   }
- } else {  /*-- if displaying visible rows only --*/
-   for (i=0; i<d->nrows_in_plot; i++) {
-     m = d->rows_in_plot.els[i];
-     if (!d->hidden.els[m]) {
-       if (write_xml_record (f, d, gg, m, xmlWriteInfo))
-         fprintf(f, "\n");
-     }
-   }
- }
+  if (gg->save.row_ind == ALLROWS) {
+    for (i = 0; i < d->nrows; i++) {
+      fprintf(f, "<record");
+      write_xml_record (f, d, gg, i, xmlWriteInfo);
+      fprintf(f, "\n</record>");
+    }
+  } else {  /*-- if displaying visible rows only --*/
+    for (i=0; i<d->nrows_in_plot; i++) {
+      m = d->rows_in_plot.els[i];
+      fprintf(f, "<record");
+      write_xml_record (f, d, gg, m, xmlWriteInfo);
+      fprintf(f, "\n</record>");
+    }
+  }
 
- fprintf(f, "</records>\n");
- return(true);
+  fprintf(f, "</records>\n");
+  return(true);
 }
 
+/*
+ * I want this to write <edge> records as well as <record> records.
+*/
 gboolean
 write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
   XmlWriteInfo *xmlWriteInfo)
@@ -268,52 +273,44 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
   gint j;
   gchar *gstr, *gtypestr = NULL;
 
-  /*-- we only need this test if we're not only saving visible cases --*/
-  if (d->edge.n == d->nrows && gg->save.row_ind == DISPLAYEDROWS) {
-    if (!write_edge_record_p (i, d, gg))
-      return false;
-  }
-
-  fprintf(f, "<record");
-
   /*-- ids if present --*/
   if (d->rowIds) {
     fprintf(f, " id=\"%s\"", d->rowIds[i]);
   }
 
   /*-- if the record is hidden, indicate that --*/
-  if (gg->save.row_ind == ALLROWS && d->hidden_now.els[i]) {
+  if (d->hidden_now.els[i]) {
     fprintf(f, " hidden=\"true\"");
   }
 
   /*-- edges if present and requested --*/
-  if (gg->save.edges_p && d->edge.n == d->nrows) {
+  if (gg->save.edges_p && d->edge.n && i <= d->edge.n) {
     fprintf(f, " source=\"%s\"", d->edge.sym_endpoints[i].a);
     fprintf(f, " destination=\"%s\"", d->edge.sym_endpoints[i].b);
   }
 
-  if(d->rowlab && d->rowlab->data
-       && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) {  
-     /*-- if the label contains an ampersand, write it as &amp; --*/
-     if (strchr (gstr, (gint) '&')) {
-       gchar *next = strtok (gstr, "&");
-       fprintf(f, " label=\"%s", next);
-       while (next) {
-         next = strtok(NULL, "&");
-         if (next)
-           fprintf(f, "&amp;%s", next);
-       }
-       fprintf(f, "\"");
-     } else {
-       fprintf(f, " label=\"%s\"", gstr);
-     }
+  if (d->rowlab && d->rowlab->data
+      && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) {  
+    /*-- if the label contains an ampersand, write it as &amp; --*/
+    if (strchr (gstr, (gint) '&')) {
+      gchar *next = strtok (gstr, "&");
+      fprintf(f, " label=\"%s", next);
+      while (next) {
+        next = strtok(NULL, "&");
+        if (next)
+          fprintf(f, "&amp;%s", next);
+      }
+      fprintf(f, "\"");
+    } else {
+      fprintf(f, " label=\"%s\"", gstr);
+    }
   }
 
- if (!xmlWriteInfo->useDefault ||
-     xmlWriteInfo->defaultColor != d->color.els[i])
- {
-   fprintf(f, " color=\"%d\"", d->color.els[i]);
- }
+  if (!xmlWriteInfo->useDefault ||
+      xmlWriteInfo->defaultColor != d->color.els[i])
+  {
+    fprintf(f, " color=\"%d\"", d->color.els[i]);
+  }
 
 /*
   fprintf(f, " glyphSize=\"%d\"", d->glyph[i].size);
@@ -398,43 +395,45 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
      g_free (cols);
    }
 
-  fprintf(f, "\n</record>");
-
  return (true);
 }
 
 gboolean
 write_xml_edges (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
- gint i;
- if (d->edge.n < 1)
-  return(true);
+  gint i;
+  if (d->edge.n < 1)
+    return(true);
 
- fprintf(f, "<edges count=%d>\n", d->edge.n);
- for(i = 0; i < d->edge.n; i++) {
-  write_xml_edge(f, d, gg, i, xmlWriteInfo);
-  fprintf(f, "\n");
- }
- fprintf(f, "/edges>\n");
+  fprintf(f, "<edges count=\"%d\" name=\"%s\">\n", d->edge.n, d->name);
+
+  for(i = 0; i < d->edge.n; i++) {
+    fprintf(f, "<edge");
+    write_xml_record (f, d, gg, i, xmlWriteInfo);
+    fprintf(f, "</edge>\n");
+  }
+  fprintf(f, "</edges>\n");
 
  return(true);
 }
 
+/*
 gboolean
 write_xml_edge(FILE *f, datad *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
 {
-  fprintf(f, "<edge ");
+  fprintf(f, " <edge ");
   fprintf(f, "source=\"%s\" destination=\"%s\"", d->edge.sym_endpoints[i].a
                                                , d->edge.sym_endpoints[i].b);
   fprintf(f, " />");
 
   return(true);
 }
+*/
 
 void
 writeFloat(FILE *f, double value)
 {
- fprintf(f, "%.3f", value);
+  fprintf(f, "%.3f", value);
 }
 
 gboolean
