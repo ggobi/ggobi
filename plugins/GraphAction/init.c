@@ -84,11 +84,12 @@ init_edge_vectors (gboolean reinit, PluginInstance *inst)
 
     /*a = d->rowid.idv.els[endpoints[i].a];*/
     /*b = d->rowid.idv.els[endpoints[i].b];*/
-    edge_endpoints_get (i, &a, &b, d, endpoints, e);
-
-    /*-- could use a,b to populate inNodeList, outNodeList --*/
-    inEdgeList[b] = g_list_append (inEdgeList[b], GINT_TO_POINTER (i));
-    outEdgeList[a] = g_list_append (outEdgeList[a], GINT_TO_POINTER (i));
+    if (edge_endpoints_get (i, &a, &b, d, endpoints, e)) {
+      if (a >= 0 && b >= 0) {
+        inEdgeList[b] = g_list_append (inEdgeList[b], GINT_TO_POINTER (i));
+        outEdgeList[a] = g_list_append (outEdgeList[a], GINT_TO_POINTER (i));
+      }
+    }
 /*
 g_printerr ("length of inEdgeList[%d] = %d\n",
 b, g_list_length(inEdgeList[b]));
