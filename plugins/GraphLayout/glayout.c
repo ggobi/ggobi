@@ -265,9 +265,38 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT(gg),
     "sticky_point_added", radial_center_set_cb, inst);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,
-    "To reset the center node, use sticky identification in ggobi", NULL);
+    "To reset the center node, use sticky identification in ggobi", 
+    NULL);
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
-  
+
+  /*-- checkbox: automatically update the center node when
+    responding to identify events --*/
+  btn = gtk_check_button_new_with_label("Automatically update layout when center node changes");  
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+    GTK_SIGNAL_FUNC (radial_auto_update_cb), (gpointer) inst);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
+    gl->radialAutoUpdate);
+  gtk_widget_set_name (btn, "RADIAL_AUTO_UPDATE");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "Automatically update the layout when a new sticky label is assigned, or wait until the apply button is pressed", 
+    NULL);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
+
+  /*-- checkbox: create new datad and display: this has to
+    be on and insensitive initially.  It should become sensitive
+    after the first layout has been generated. --*/
+  btn = gtk_check_button_new_with_label("Create new data and display");
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+    GTK_SIGNAL_FUNC (radial_new_data_cb), (gpointer) inst);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
+    gl->radialNewData);
+  gtk_widget_set_sensitive (btn, false);
+  gtk_widget_set_name (btn, "RADIAL_NEW_DATAD");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "Create new data and display when pressing the apply button, or re-use existing resources", 
+    NULL);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
+
   btn = gtk_button_new_with_label ("apply");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (radial_cb), inst);

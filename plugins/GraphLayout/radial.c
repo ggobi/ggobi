@@ -123,6 +123,20 @@ hasPathToCenter (noded *n, noded *referringnode, datad *d, datad *e,
 /*                   callbacks                                     */
 /*-----------------------------------------------------------------*/
 
+void radial_auto_update_cb (GtkToggleButton *btn, PluginInstance *inst)
+{
+  glayoutd *gl = glayoutFromInst (inst);
+
+  gl->radialAutoUpdate = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(btn));
+}
+
+void radial_new_data_cb (GtkToggleButton *btn, PluginInstance *inst)
+{
+  glayoutd *gl = glayoutFromInst (inst);
+
+  gl->radialNewData = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(btn));
+}
+
 
 void do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg);
 void 
@@ -138,13 +152,12 @@ radial_cb (GtkButton *button, PluginInstance *inst)
 }
 
 
-
-
 void 
 do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
 {
   glong *visible;
   gint nvisible;
+  GtkWidget *w;
 /*-- to add variables --*/
   gint i, nP, nC, nS;
   gdouble *x, *y, *depth, *inDegree, *outDegree;
@@ -176,7 +189,6 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
     return;
   }
 
-
 /*-- This may not belong here, but where exactly?  As soon as the
      panel is opened  --*/
 /*
@@ -188,11 +200,6 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
 
   visible = (glong *) g_malloc (d->nrows_in_plot * sizeof (glong));
   nvisible = visible_set (visible, d);
-/*
-  init = (gl->radial == NULL ||
-          d != gl->radial->d ||
-          d->nrows_in_plot != nvisible);
-*/
   initRadialLayout (visible, nvisible, gg, gl);
 
 /*
@@ -894,7 +901,7 @@ S_radial_cb(USER_OBJECT_ plugin, USER_OBJECT_ centerNode, USER_OBJECT_ data,
    gl->dsrc = d = (datad *) R_ExternalPtrAddr(data);
    gl->e = e = (datad *) R_ExternalPtrAddr(edges);
 
-   dsp =  (displayd *) R_ExternalPtrAddr(data);
+   dsp = (displayd *) R_ExternalPtrAddr(data);
 
    do_radial(gl, d, e, dsp, gg);
 
@@ -903,3 +910,29 @@ S_radial_cb(USER_OBJECT_ plugin, USER_OBJECT_ centerNode, USER_OBJECT_ data,
 }
 #endif
 
+/*-- API routines --*/
+gint radial_auto_update_set (gboolean state, PluginInstance *inst)
+{
+  glayoutd *gl = glayoutFromInst (inst);
+  GtkWidget *w;
+
+  if (gl) {
+    w = widget_find_by_name (gl->window, "RADIAL_AUTO_UPDATE");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), state);
+    return 1;
+  }
+  return 0;
+}
+gint radial_new_data_set (gboolean state, PluginInstance *inst)
+{
+  glayoutd *gl = glayoutFromInst (inst);
+  GtkWidget *w;
+
+  if (gl) {
+    w = widget_find_by_name (gl->window, "RADIAL_NEW_DATA");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), state);
+    return 1;
+  }
+  return 0;
+}
+/*  */

@@ -17,6 +17,8 @@ glayout_init (glayoutd *gl) {
   gl->dsrc = NULL;
 
   gl->centerNodeIndex = -1;
+  gl->radialAutoUpdate = false;
+  gl->radialNewData = true;
   gl->radial = NULL;
 
   gl->neato_dim = 2;

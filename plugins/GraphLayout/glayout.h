@@ -47,6 +47,8 @@ typedef struct {
   array_d pos;
 
   gint centerNodeIndex;
+  gboolean radialAutoUpdate;
+  gboolean radialNewData;
   radiald *radial;  /*-- data required for radial layout --*/
 
   gint neato_dim;
@@ -56,11 +58,13 @@ typedef struct {
 } glayoutd;
 
 
-/*----------------------------------------------------------------------*/
-/*                          functions                                   */
-/*----------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
+/*                        functions                                   */
+/*--------------------------------------------------------------------*/
 
 void radial_cb (GtkButton *button, PluginInstance *inst);
+void radial_new_data_cb (GtkToggleButton *, PluginInstance *);
+void radial_auto_update_cb (GtkToggleButton *, PluginInstance *);
 void glayout_init (glayoutd *);
 glayoutd* glayoutFromInst (PluginInstance *inst);
 void highlight_sticky_edges (ggobid *, gint, gint , datad *d, void *inst);
