@@ -140,6 +140,10 @@ struct _ggobid {
   GtkTooltips *tips;
   gboolean firsttime;
 
+  /* status bar in main console window */
+  void (*status_message_func) (gchar *, ggobid *);
+  gboolean statusbar_p;
+
   gboolean close_pending;
 #ifdef EXPLICIT_IDENTIFY_HANDLER 
   IdentifyHandler identify_handler;
