@@ -167,9 +167,9 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
   if (gtk_signal_lookup("clusters_changed", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[CLUSTERS_CHANGED_SIGNAL] = 
     gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), 
-      "clusters_changed", 
+      "clusters_changed",
       GTK_RUN_LAST | GTK_RUN_ACTION, 
-      gtk_marshal_NONE__INT_INT_POINTER, 
+      gtk_marshal_NONE__POINTER,
       GTK_TYPE_NONE, 1, 
       GTK_TYPE_GGOBI_DATA);  /* datad pointer */
   }
