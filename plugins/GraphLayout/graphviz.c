@@ -138,11 +138,16 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       agxset (graph, sym->index, "");
 
     graph_init(graph);
+/*
+  New:
+	g->u.ndim = late_int(g,agfindattr(g,"dim"),2,2);
+	Ndim = g->u.ndim = MIN(g->u.ndim,MAXDIM);
+*/
     graph->u.drawing->engine = NEATO;
     neato_init_node_edge(graph);
     nG = scan_graph(graph);
     if (Nop) {
-        initial_positions(graph, nG);
+      initial_positions(graph, nG);
     }
     else {
       char *p;
@@ -162,6 +167,9 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       node = agfindnode (graph, name);
       x[i] = (gdouble) node->u.pos[0];
       y[i] = (gdouble) node->u.pos[1];
+#ifdef DEBUG
+      g_printerr ("%f %f\n", x[i], y[i]);
+#endif
     }
 #ifdef DEBUG
     f = fopen ("test.out", "w");
