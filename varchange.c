@@ -121,6 +121,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
       level_values, level_counts);
   transform_values_init (jvar, d, gg);
 
+
   d->ncols += 1;
   addvar_pipeline_realloc (d, gg);
 
@@ -134,6 +135,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
     else
       d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
   }
+
   
   /*-- update the vartable struct --*/
   limits_set_by_var (jvar, true, true, d, gg);

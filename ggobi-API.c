@@ -162,6 +162,12 @@ GGobi_setMissingValueIdentifier(MissingValue_p f)
 
 const gchar * DefaultRowNames = NULL;
 
+const gchar **
+getDefaultRowNamesPtr()
+{
+  return(&DefaultRowNames);
+}
+
 void
 setRowNames(datad *d, gchar **rownames)
 {
@@ -198,6 +204,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   gchar *lbl;
   vartabled *vt;
 
+  fprintf(stderr, "[setData] %d %d\n", nr,nc);fflush(stderr);
   if(cleanup) {
       /* Release all the displays associated with this datad
          and then release all the GUI components and memory
@@ -1169,23 +1176,22 @@ gint
 GGOBI(addVariable)(gdouble *vals, gint num, gchar *name,
   gboolean update, datad *d, ggobid *gg)
 {
-
   if (d->ncols < 1) {
     gchar ** rnames = &DefaultRowNames;
     /* May want the final false here to be true as it causes the 
-       creation of a plot. Probably not, but just mention it here
-       so we don't forget.
-     */
-    GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg, NULL, false, d->input);
-  } else { 
-    if (num > d->nrows) {
+       creation of a plot. Probably not, but just mention it here so we don't forget.  */
+
+    GGOBI(setData)(NULL, rnames, &name, num, d->ncols, d, false, gg, NULL, false, d->input);
+    datad_init(d, gg, false);
+  } 
+
+  if (num > d->nrows) {
       num = d->nrows;
       /* Add a warning here. */
-    }
+  }
     newvar_add_with_values (vals, num, name,
       real, 0, NULL, NULL, NULL,
       d, gg);
-  }
 
   if (update)
     gdk_flush();
@@ -1206,11 +1212,6 @@ GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
   gboolean update, datad *d, ggobid *gg)
 {
   gint i;
-/*
-  int ans;
-  ans = GGOBI(addVariable)(vals, num, name, false, d, gg);
-*/
-
 
   if (d->ncols < 1) {
     gchar ** rnames = &DefaultRowNames; 

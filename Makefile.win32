@@ -170,14 +170,15 @@ ggobi.a: $(OB)
 
 
 ifdef NEW_DEFS
-$(DEF): $(OB)
 ifdef COMPUTE_DEFS
+$(DEF): $(OB)
 	echo EXPORTS > $@
 	nm $(OB) > tmp
 	sed -n '/^........ [T] _/s/^........ [T] _/ /p' tmp >> $@
 	cat exported-vars >> $@
 	rm tmp
 else
+$(DEF): ManualGGobi.def
 	cp ManualGGobi.def $@
 endif
 

@@ -32,6 +32,7 @@
 #include "colorscheme.h"
 
 #ifdef WIN32
+#include <windows.h>
 #define DIR_SEPARATOR '\\'
 #else
 #define DIR_SEPARATOR '/'
@@ -507,28 +508,32 @@ processRestoreFile(const gchar * const fileName, ggobid *gg)
 
 #ifdef WIN32
 gchar *
-getGGobHomeFromRegistry()
+getGGobiHomeFromRegistry()
 {
   HRESULT hr;
   gchar *tmp;
   char *key;
-  BYTE buf;
-  DWORD bufSize;
+  BYTE *buf;
+  DWORD bufSize, type;
+  HKEY lkey;
 
   key = "SOFTWARE\\GGobi";
 
   hr = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_ALL_ACCESS, &lkey);
-  if(hr != ERROR_SUCCESS)
-     return(NULL);
+  if(hr != ERROR_SUCCESS) {
+    fprintf(stderr, "GGobi not in registry: %s (%d)\n", key, (int) hr);fflush(stderr);
+    return(NULL);
+  }
 
-  RegQueryValyeEx(lkey, name, NULL, NULL, NULL, &bufSize);
-  buf = (BYTE) g_malloc(bufSize * sizeof(BYTE));
+  RegQueryValueEx(lkey, "Home", NULL, NULL, NULL, &bufSize);
+  buf = (BYTE*) g_malloc(bufSize * sizeof(BYTE));
 
-  RegQueryValyeEx(lkey, name, NULL, &type, buf, &bufSize);
+  RegQueryValueEx(lkey, "Home", NULL, &type, buf, &bufSize);
   RegCloseKey(lkey);
 
   if(type == REG_SZ) {
      tmp = (gchar*) buf;
+     fprintf(stderr, "Registry value of GGobi home: %s\n", tmp);
   }
 
   return(tmp);

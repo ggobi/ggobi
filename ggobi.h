@@ -531,7 +531,6 @@ void process_initialization_files();
 extern GGobiOptions *sessionOptions;
 
 #define EXTERN 
-#define GGOBI_EXPORT
 
   /* For Darwin sessionOptions can be in the data space (in dylib) only once.
      It is defined only if the GGOBI_C is set which should be the case only

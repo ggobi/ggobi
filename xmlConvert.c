@@ -16,9 +16,7 @@ main (gint argc, gchar *argv[])
   gchar *fileName;
   XmlWriteInfo info;
 
-  initSessionOptions();
-  sessionOptions->cmdArgs = argv;
-  sessionOptions->numArgs = argc;
+  initSessionOptions(argc, argv);
 
   gtk_init (&argc, &argv);
   gg = ggobi_alloc (gg);

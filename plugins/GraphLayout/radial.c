@@ -147,7 +147,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   displayd *dspnew;
   gboolean edges_displayed;
   gboolean redisplay_all = false;  /* if points are hidden in this function */
-
+  DisplayOptions *opts = NULL;
   if (e == NULL) {
     g_printerr ("Unable to proceed: no edge set is specified\n");
     return;
@@ -324,11 +324,12 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
  * open a new scatterplot with the new data, and display edges
  * as they're displayed in the current datad.
 */
-  DefaultDisplayOptions.axes_show_p = false;
-  DefaultDisplayOptions.edges_undirected_show_p = true;
+  opts = GGOBI(getDefaultDisplayOptions)();
+  opts->axes_show_p = false;
+  opts->edges_undirected_show_p = true;
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
-  DefaultDisplayOptions.axes_show_p = true;  /*-- restore it --*/
-  DefaultDisplayOptions.edges_undirected_show_p = false;
+  opts->axes_show_p = true;  /*-- restore it --*/
+  opts->edges_undirected_show_p = false;
 
   setDisplayEdge (dspnew, e);
 
