@@ -1,0 +1,19 @@
+TestInput.dll:
+
+ifndef GGOBI_HOME
+ GGOBI_HOME=../..
+endif
+
+OBJS=testInput.o
+
+include $(GGOBI_HOME)/local.config
+
+GGOBI_LIBS=-L${GGOBI_HOME} -lggobi
+
+TestInput.dll: $(OBJS)
+	$(CC) -shared -o $@ TestInput.def $(OBJS) ${GGOBI_LIBS} ${LIBS} ${XML_LIBS}
+
+testInput.o: testInput.c
+	$(CC) -g  -I$(GGOBI_HOME) -I$(GTK_DIR) -I$(GLIB_DIR) -I$(GTK_DIR)/gdk $(CFLAGS) -o $@ -c $<
+
+include $(GGOBI_HOME)/Makefile.win32
