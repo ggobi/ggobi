@@ -32,6 +32,14 @@ typedef struct {
   datad *d;
 } radiald;
 
+#ifdef GRAPHVIZ
+#include <render.h>
+typedef struct {
+  Agraph_t *graph;
+  datad *d;
+} graphvizd;
+#endif
+
 typedef struct {
 
 /*
@@ -91,6 +99,10 @@ typedef struct {
 
   radiald *radial;  /*-- data required for radial layout --*/
 
+#ifdef GRAPHVIZ
+  graphvizd *graphviz;  /*-- data required for dot and neato layouts --*/
+#endif
+
 } ggvisd;
 
 
@@ -99,7 +111,6 @@ typedef struct {
 /*----------------------------------------------------------------------*/
 
 void ggvis_init (ggvisd *);
-void initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e);
 void setParentNodes (ggvisd *ggv, datad *d);
 void setNChildren (ggvisd *ggv, datad *d);
 gint setSubtreeSize (noded *, ggvisd *, datad *);
@@ -109,6 +120,13 @@ void radial_cb (GtkButton *button, PluginInstance *inst);
 void highlight_edges_cb (GtkButton *button, PluginInstance *inst);
 ggvisd* GGVisFromInst (PluginInstance *inst);
 void highlight_sticky_edges (ggobid *, gint, gint , datad *d, void *inst);
+gint cmds (array_d *D, array_d *X);
+void spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos);
+
+#ifdef GRAPHVIZ
+void dot_layout_cb (GtkButton *button, PluginInstance *inst);
+void neato_layout_cb (GtkButton *button, PluginInstance *inst);
+#endif
 
 #define GGVIS_H
 #endif

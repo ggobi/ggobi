@@ -13,6 +13,8 @@
 #include "plugin.h"
 #include "ggvis.h"
 
+static void initRadialLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e);
+
 /*-- utility --*/
 
 static 
@@ -145,7 +147,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
     "sticky_point_removed", highlight_sticky_edges, inst);
 
   init = (ggv->radial == NULL || d->nrows != ggv->radial->d->nrows);
-  initLayout (gg, ggv, d, e);
+  initRadialLayout (gg, ggv, d, e);
 
   /*-- initial default:  let the first node be the center node --*/
   ggv->radial->centerNode = &ggv->radial->nodes[0];
@@ -373,8 +375,8 @@ void highlight_sticky_edges (ggobid *gg, gint index, gint state, datad *d,
 /*
  * Initialize a couple of values for each node.
 */
-void
-initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
+static void
+initRadialLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
   gint i, nn;
   noded *na, *nb;
   gint nnodes = d->nrows;

@@ -156,7 +156,7 @@ static void cmds_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   ggvisd *ggv = GGVisFromInst (inst);
-  gint i, m, nNodes, nEdges;
+  gint i, nNodes, nEdges;
 
   datad *d = gg->current_display->d;
   datad *e = gg->current_display->e;
@@ -259,7 +259,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
     GTK_POS_TOP);
   gtk_box_pack_start (GTK_BOX (main_vbox), notebook, false, false, 2);
 
-  /*-- network tab --*/
+  /*-- network tab: cmds --*/
   frame = gtk_frame_new ("Network layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
@@ -306,6 +306,32 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                             frame, label);
   /*-- --*/
+
+  /*-- graphviz tab: dot and neato --*/
+  frame = gtk_frame_new ("Graphviz layouts");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+
+  vbox = gtk_vbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
+  gtk_container_add (GTK_CONTAINER(frame), vbox);
+
+  btn = gtk_button_new_with_label ("dot");
+#ifdef GRAPHVIZ
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (dot_layout_cb), (gpointer) inst);
+#endif
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+
+  btn = gtk_button_new_with_label ("neato");
+#ifdef GRAPHVIZ
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (neato_layout_cb), (gpointer) inst);
+#endif
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+
+  label = gtk_label_new ("Graphviz");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+                            frame, label);
 
   gtk_widget_show_all (window);
 

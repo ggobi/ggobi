@@ -27,8 +27,8 @@ spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos)
 {
   gint nNodes = d->nrows;
   gint nEdges = e->edge.n;
-  gint dim0, dim1, iter, i, j, k, a, b;
-  gdouble **dv = dist->vals;
+  gint dim0, dim1, iter, i, j, a, b;
+  /*gdouble **dv = dist->vals;*/
   gdouble dx, dy, dst, xf, yf, f, el;
   endpointsd *endpoints = e->edge.endpoints;
 

@@ -22,12 +22,20 @@ endif
 GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
 #GGOBI_LIB=
 
-#CFLAGS+=-g $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags) $(XML_INC_DIRS:%=-I%)
 CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
 
+ifdef GRAPHVIZ
+ARCH=linux.i386
+GVINC=-I$(GVIZ)/include -I$(GVIZ_SRC) -I$(GVIZ_SRC)/dotneato/common
+GVLIB=-L$(GVIZ)/build/$(ARCH)/lib
 
-# used to comment out sections of code for incompletely
-# implemented or buggy functionality
+EXTLIB_INC=-I/usr/include/freetype2
+EXTLIB_LIB=-ljpeg -lpng -lfreetype -lz
+
+CFLAGS+= -DGRAPHVIZ=1 $(GVINC)
+LDFLAGS+=$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan -lgd -lcdt $(EXTLIB_LIB)
+endif
+
 ifdef BINARY_IO_IMPLEMENTED
   CFLAGS+= -DBINARY_IO_IMPLEMENTED=1
 endif
@@ -37,40 +45,19 @@ endif
 ifdef SMOOTH_IMPLEMENTED
   CFLAGS+= -DSMOOTH_IMPLEMENTED=1
 endif
-ifdef EDIT_EDGES_IMPLEMENTED
-  CFLAGS+= -DEDIT_EDGES_IMPLEMENTED=1
-endif
-ifdef PRINTING_IMPLEMENTED
-  CFLAGS+= -DPRINTING_IMPLEMENTED=1
-endif
 ifdef TS_EXTENSIONS_IMPLEMENTED
   CFLAGS+= -DTS_EXTENSIONS_IMPLEMENTED=1
-endif
-ifdef TOUR_PP_IMPLEMENTED
-  CFLAGS+= -TOUR_PP_IMPLEMENTED=1
-endif
-ifdef TOUR_ADV_IMPLEMENTED
-  CFLAGS+= -TOUR_ADV_IMPLEMENTED=1
-endif
-ifdef ROTATION_IMPLEMENTED
-  CFLAGS+= -DROTATION_IMPLEMENTED=1
-endif
-ifdef DATAD_ADDED_SIGNAL_IMPLEMENTED
-  CFLAGS+= -DDATAD_ADDED_SIGNAL_IMPLEMENTED
-endif
-ifdef COLORSCHEMES_IMPLEMENTED
-  CFLAGS+= -DCOLORSCHEMES_IMPLEMENTED
 endif
 ifdef BARCHART_IMPLEMENTED
   CFLAGS+= -DBARCHART_IMPLEMENTED
 endif
 
 HEADERS=ggvis defines
-SRC=ggvis init cmds spring radial
+SRC=ggvis init cmds spring radial graphviz
 OBJS=$(SRC:%=%.o)
 
 $(PKG).so: $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%)
+	$(CC) -shared -o $@ $(OBJS) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%) $(LDFLAGS)
 
 local.config:  configure
 	./configure

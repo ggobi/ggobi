@@ -1,1 +1,4 @@
 GTK_CONFIG=@GTK_CONFIG@
+
+GRAPHVIZ=/usr/local/lib/graphviz
+GRAPHVIZ_SRC=/usr/local/src/graphviz-1.8.5
