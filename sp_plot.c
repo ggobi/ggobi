@@ -512,19 +512,41 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
     {
       /*-- xyplot: right justify the label --*/
       vtx = vartable_element_get (sp->xyvars.x, d);
-      gdk_text_extents (style->font, 
+      gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
         vtx->collab_tform, strlen (vtx->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable, style->font, gg->plot_GC,
+      gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC,
         sp->max.x - width - 5,  /*-- right justify --*/
         sp->max.y - 5,
         vtx->collab_tform);
 
       vty = vartable_element_get (sp->xyvars.y, d);
-      gdk_text_extents (style->font, 
+      gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
         vty->collab_tform, strlen (vty->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable, style->font, gg->plot_GC,
+      gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC,
         5, 5 + ascent + descent,
         vty->collab_tform);
     }
@@ -534,10 +556,21 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
         (dtype == scatmat && sp->p1dvar != -1))
     {
       vt = vartable_element_get (sp->p1dvar, d);
-      gdk_text_extents (style->font,
+      gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
         vt->collab_tform, strlen (vt->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable, style->font, gg->plot_GC,
+      gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC,
         sp->max.x/2 - width/2,  /*-- center --*/
         sp->max.y - 5,
         vt->collab_tform);
@@ -546,10 +579,21 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   } else if (dtype == parcoords) {
 
     vt = vartable_element_get (sp->p1dvar, d);
-    gdk_text_extents (style->font,
+    gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
       vt->collab_tform, strlen (vt->collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (drawable, style->font, gg->plot_GC,
+    gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
+      gg->plot_GC,
       sp->max.x/2 - width/2,  /*-- center --*/
       sp->max.y - 5,
       vt->collab_tform);
@@ -559,19 +603,41 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
     GList *l = display->splots;
     if (l->data == sp) {
       vtx = vartable_element_get (sp->xyvars.x, d);
-      gdk_text_extents (style->font, 
+      gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
         vtx->collab_tform, strlen (vtx->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable, style->font, gg->plot_GC,
+      gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
         vtx->collab_tform);
     }
     vty = vartable_element_get (sp->xyvars.y, d);
-    gdk_text_extents (style->font, 
+    gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
       vty->collab_tform, strlen (vty->collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (drawable, style->font, gg->plot_GC,
+    gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
+      gg->plot_GC,
       5, 5 + ascent + descent,
       vty->collab_tform);
   }
@@ -758,12 +824,24 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
    * lbl can still be NULL here.
   */
   if (lbl) {
-    gdk_text_extents (style->font, lbl, strlen (lbl),
+    gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
+      lbl, strlen (lbl),
       &lbearing, &rbearing, &width, &ascent, &descent);
 
     /*-- underline the nearest point label?  --*/
     if (sp->screen[k].x <= sp->max.x/2) {
-      gdk_draw_string (drawable, style->font, gg->plot_GC,
+      gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC,
         sp->screen[k].x+diamond_dim,
         sp->screen[k].y-diamond_dim,
         lbl);
@@ -775,7 +853,13 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
           sp->screen[k].y-diamond_dim+1);
       
     } else {
-      gdk_draw_string (drawable, style->font, gg->plot_GC,
+      gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC,
         sp->screen[k].x - width - diamond_dim,
         sp->screen[k].y - diamond_dim,
         lbl);
@@ -789,7 +873,13 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
 
     /*-- display the label in the top center of the window as well --*/
     if (nearest) {
-      gdk_draw_string (drawable, style->font, gg->plot_GC,
+      gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC,
         (sp->max.x - width)/2,
         ascent + descent + 5,  /*-- the border is of width 3 --*/
         lbl);
@@ -1170,7 +1260,12 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
     if (nearest) {
       /*-- add the label last so it will be in front of other markings --*/
       lbl = (gchar *) g_array_index (e->rowlab, gchar *, k);
-      gdk_text_extents (style->font,
+      gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
         lbl, strlen (lbl),
         &lbearing, &rbearing, &width, &ascent, &descent);
 
@@ -1180,7 +1275,13 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
       yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y;
 
       /*-- underline the nearest point label?  --*/
-      gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
+      gdk_draw_string (sp->pixmap1,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC,
         xp, yp, lbl);
       if (nearest)
         gdk_draw_line (sp->pixmap1, gg->plot_GC,
@@ -1346,7 +1447,13 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
     switch (proj) {
       case TOUR1D:
         /*-- use string height to place the labels --*/
-        gdk_text_extents (style->font, "yA", strlen("yA"),
+        gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+          gtk_style_get_font (style),
+#else
+          style->font,
+#endif
+          "yA", strlen("yA"),
           &lbearing, &rbearing, &width, &ascent, &descent);
         textheight = ascent + descent;
 
@@ -1374,10 +1481,21 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 */
           if (ix != dawidth/2) {
             vt = vartable_element_get (j, d);
-            gdk_text_extents (style->font, 
+            gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+              gtk_style_get_font (style),
+#else
+              style->font,
+#endif
               vt->collab_tform, strlen (vt->collab_tform),
               &lbearing, &rbearing, &width, &ascent, &descent);
-            gdk_draw_string (drawable, style->font, gg->plot_GC,
+            gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+              gtk_style_get_font (style),
+#else
+              style->font,
+#endif
+              gg->plot_GC,
               (ix > dawidth/2) ? 3*dawidth/4 + 10 : dawidth/4 - width -10,
               iy, vt->collab_tform);
           }
@@ -1409,12 +1527,22 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             if (dsp->options.axes_label_p) {
               vt = vartable_element_get (j, d);
               g_snprintf(lbl,3,"%s",vt->collab_tform);
-              gdk_text_extents (style->font, 
+              gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+                gtk_style_get_font (style),
+#else
+                style->font,
+#endif
                 lbl, 3,
                 &lbearing, &rbearing, &width, &ascent, &descent);
 	        } else {
               varlab = g_strdup_printf("%d",j+1);
-              gdk_text_extents (style->font, 
+              gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+                gtk_style_get_font (style),
+#else
+                style->font,
+#endif
                 varlab, strlen (varlab),
                 &lbearing, &rbearing, &width, &ascent, &descent);
 	        }
@@ -1435,12 +1563,24 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             else
               iy += (textheight);
             if (dsp->options.axes_label_p) {
-              gdk_draw_string (drawable, style->font, gg->plot_GC,
+              gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+                gtk_style_get_font (style),
+#else
+                style->font,
+#endif
+                gg->plot_GC,
                 ix, iy,
                 lbl);
               /* note: don't free lbl */
             } else {
-              gdk_draw_string (drawable, style->font, gg->plot_GC,
+              gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+                gtk_style_get_font (style),
+#else
+                style->font,
+#endif
+                gg->plot_GC,
                 ix, iy,
                 varlab);
               g_free (varlab);
@@ -1456,7 +1596,13 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           break;
 
         /*-- use string height to place the labels --*/
-        gdk_text_extents (style->font, "yA", strlen("yA"),
+        gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+          gtk_style_get_font (style),
+#else
+          style->font,
+#endif
+          "yA", strlen("yA"),
           &lbearing, &rbearing, &width, &ascent, &descent);
         textheight = ascent + descent;
 
@@ -1493,10 +1639,21 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
-          gdk_text_extents (style->font, 
+          gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+            gtk_style_get_font (style),
+#else
+            style->font,
+#endif
             vt->collab_tform, strlen (vt->collab_tform),
             &lbearing, &rbearing, &width, &ascent, &descent);
-          gdk_draw_string (drawable, style->font, gg->plot_GC,
+          gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+            gtk_style_get_font (style),
+#else
+            style->font,
+#endif
+            gg->plot_GC,
             dawidth/2+dawidth/4+10,
             iy, vt->collab_tform);
   
