@@ -32,6 +32,8 @@ wvis_init (ggobid  *gg)
   gg->wvis.mousepos.y = -1;
   gg->wvis.pix = NULL;
 
+  gg->wvis.binning_method = EQUAL_WIDTH_BINS;
+
   gg->wvis.color_table = NULL;
   gg->wvis.scheme = NULL;
   gg->wvis.GC = NULL;

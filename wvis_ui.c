@@ -291,6 +291,66 @@ da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
   return false;
 }
 
+/*
+ * Set the bin boundaries (the values of wvis.pct[]) in one
+ * of two ways:  simply dividing the range of the data into
+ * ncolors equal-sized pieces, or attempting to set the regions
+ * such that they contain equal numbers of points.
+*/ 
+static void
+bin_boundaries_set (gint selected_var, datad *d, ggobid *gg)
+{
+  gint k;
+
+  if (gg->wvis.binning_method == EQUAL_WIDTH_BINS || selected_var == -1) {
+    /*
+     * These numbers are the upper boundaries of each interval.
+     * By default, they start at .1 and end at 1.0.
+    */
+    for (k=0; k<gg->wvis.npct; k++) {
+      gg->wvis.pct[k] = (gfloat) (k+1) /  (gfloat) gg->wvis.npct;
+      gg->wvis.n[k] = 0;
+    }
+  } else if (gg->wvis.binning_method == EQUAL_COUNT_BINS) {
+    gint i, m;
+    gfloat min, max, range, midpt;
+    vartabled *vt = vartable_element_get (selected_var, d);
+    gint ngroups = gg->wvis.npct;
+    gint groupsize = (gint) (d->nrows_in_plot / ngroups);
+    paird *pairs = (paird *) g_malloc (d->nrows_in_plot * sizeof (paird));
+    guint varno = g_slist_index (d->vartable, vt);
+
+    min = vt->lim_tform.min;
+    max = vt->lim_tform.max;
+    range = max - min;
+
+    /*-- sort the selected variable --*/
+    for (i=0; i<d->nrows_in_plot; i++) {
+      pairs[i].f = d->raw.vals[d->rows_in_plot[i]][varno];
+      pairs[i].indx = d->rows_in_plot[i];
+    }
+    qsort ((gchar *) pairs, d->nrows_in_plot, sizeof (paird), pcompare);
+
+    /*
+     * determine the boundaries that will result in equal-sized
+     * groups (as well as the data permits)
+    */
+    i = 0;
+    for (k=0; k<ngroups; k++) {
+      m = 0;
+      while (m < groupsize || i == 0 || pairs[i].f == pairs[i-1].f) {
+        m++;
+        i++;
+      }
+      midpt = pairs[i].f + (pairs[i+1].f - pairs[i].f) / 2;
+      gg->wvis.pct[k] = (midpt - min) / range;
+    }
+    gg->wvis.pct[ngroups-1] = 1.0;
+
+    g_free (pairs);
+  }
+}
+
 static void
 da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 {
@@ -333,10 +393,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
                                          gg->wvis.npct * sizeof (gfloat));
     gg->wvis.n = (gint *) g_realloc (gg->wvis.n,
                                      gg->wvis.npct * sizeof (gint));
-    for (k=0; k<gg->wvis.npct; k++) {
-      gg->wvis.pct[k] = (gfloat) (k+1) /  (gfloat) gg->wvis.npct;
-      gg->wvis.n[k] = 0;
-    }
+    bin_boundaries_set (selected_var, d, gg);
   }
 
   /*-- clear the pixmap --*/
