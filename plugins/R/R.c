@@ -470,24 +470,6 @@ mapHashTable(GHashTable *table)
 
 
 USER_OBJECT_
-RGGobi_getHelpMenu(USER_OBJECT_ sgg)
-{
- ggobid *gg = (ggobid *) R_ExternalPtrAddr(sgg);
- GtkItemFactory *factory;
- GtkWidget *help_menu = NULL;
-
- if(!gg) {
-     PROBLEM "Invalid ggobid object"
-     ERROR;
- }
-
-  factory = gtk_item_factory_from_path ("<main>");
-  help_menu = gtk_item_factory_get_widget (factory, "<main>/Help");   
-
-  return(R_createRef(help_menu, "GtkObject"));
-}
-
-USER_OBJECT_
 argsToCharacter(GSList *args)
 {
     USER_OBJECT_ ans;
@@ -507,4 +489,45 @@ argsToCharacter(GSList *args)
     }
 
     return(ans);
+}
+
+
+/********************************************************************************
+
+ These functions provide an interface between Rggobi, Rgtk and ggobi itself.
+ They are temporarily located here until we figure out the relationship between
+ the Rggobi and RGtk packages.
+
+********************************************************************************/
+
+/**
+  Get a reference to the Help menu in the menubar.
+ */
+USER_OBJECT_
+RGGobi_getHelpMenu(USER_OBJECT_ sgg)
+{
+ ggobid *gg = (ggobid *) R_ExternalPtrAddr(sgg);
+ GtkItemFactory *factory;
+ GtkWidget *help_menu = NULL;
+
+ if(!gg) {
+     PROBLEM "Invalid ggobid object"
+     ERROR;
+ }
+
+  factory = gtk_item_factory_from_path ("<main>");
+  help_menu = gtk_item_factory_get_widget (factory, "<main>/Help");   
+
+  return(R_createRef(help_menu, "GtkObject"));
+}
+
+/**
+  Get the window object (GtkWindow) associated with the given displayd
+  object.
+ */
+USER_OBJECT_
+RGGobi_getDisplayWindow(USER_OBJECT_ sdpy)
+{
+ displayd *dpy = (displayd *) (long) NUMERIC_POINTER(VECTOR_ELT(sdpy, 1))[0];
+ return(R_createRef(dpy->window, "GtkWidget"));
 }

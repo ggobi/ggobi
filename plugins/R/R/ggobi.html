@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1></h1>
+
+This is a very simple HTML file that contains a few embedded
+objects. The interesting thing is that they are
+live, dynamic GGobi displays.
+<p>
+<table border="1">
+<tr>
+ <th>
+     <OBJECT TYPE="app/x-R-generic" NAME="xyplot" WIDTH=300  HEIGHT=200>
+      <PARAM NAME="init"
+             value='
+                 gg <- getGGobi(1);
+                 dpy <- scatterplot.ggobi(1,2, .gobi = gg);
+                 w <- getDisplayWidget(dpy);
+                 w$Hide();
+                 box <- gtkVBox(TRUE, 1);
+                 gtkWidgetReparent(gtkChildren(w)[[1]],  box);
+                 box
+             '>
+      
+     </OBJECT>
+ </th>
+ <th>
+     <OBJECT TYPE="app/x-R-generic" NAME="xyplot" WIDTH=300  HEIGHT=200>
+      <PARAM NAME="init"
+             value='
+                 gg <- getGGobi(1);
+                 dpy <- scatmat.ggobi(c(1,2), .gobi = gg);
+                 w <- getDisplayWidget(dpy);
+                 w$Hide();
+                 box <- gtkVBox(TRUE, 1);
+                 gtkWidgetReparent(gtkChildren(w)[[1]],  box);
+                 box
+             '>
+      
+     </OBJECT>     
+ </th>          
+</tr>
+<tr>
+<th colspan=2>
+     <OBJECT TYPE="app/x-R-generic" NAME="xyplot" WIDTH=600  HEIGHT=200>
+      <PARAM NAME="init"
+             value='
+                 gg <- getGGobi(1);
+                 dpy <- parcoords.ggobi(c(1,2,3,4), .gobi = gg);
+                 w <- getDisplayWidget(dpy);
+                 w$Hide();
+                 box <- gtkVBox(TRUE, 1);
+                 gtkWidgetReparent(gtkChildren(w)[[1]],  box);
+                 box
+             '>
+      
+     </OBJECT>       
+</th>  
+</tr>  
+</table>
+
+
+The HTML ``code'' is relatively simple (if you understand
+the RGtk and Rggobi code!)
+<pre>
+&lt;table border="1"&gt;
+&lt;tr&gt;
+ &lt;th&gt;
+     &lt;OBJECT TYPE="app/x-R-generic" NAME="xyplot" WIDTH=300  HEIGHT=300&gt;
+      &lt;PARAM NAME="init"
+             value='
+                 gg &lt;- getGGobi(1);
+                 dpy &lt;- scatmat.ggobi(c(1,2), .gobi = gg);
+                 w &lt;- getDisplayWidget(dpy);
+                 w$Hide();
+                 box &lt;- gtkVBox(TRUE, 1);
+                 gtkWidgetReparent(gtkChildren(w)[[1]],  box);
+                 box
+             '&gt;
+      
+     &lt;/OBJECT&gt;
+ &lt;/th&gt;
+ &lt;th&gt;
+     &lt;OBJECT TYPE="app/x-R-generic" NAME="xyplot" WIDTH=300  HEIGHT=300&gt;
+      &lt;PARAM NAME="init"
+             value='
+                 gg &lt;- getGGobi(1);
+                 dpy &lt;- parcoords.ggobi(c(1,2,3,4), .gobi = gg);
+                 w &lt;- getDisplayWidget(dpy);
+                 w$Hide();
+                 box &lt;- gtkVBox(TRUE, 1);
+                 gtkWidgetReparent(gtkChildren(w)[[1]],  box);
+                 box
+             '&gt;
+      
+     &lt;/OBJECT&gt;     
+ &lt;/th&gt;          
+&lt;/tr&gt;  
+&lt;/table&gt;
+</pre>
+
+
+
+<hr>
+<address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Tue Dec 18 19:36:12 EST 2001
+<!-- hhmts end -->
+</body> </html>
+
+
+<OBJECT TYPE="app/x-R-generic" NAME="ggobi" HIDDEN>
+  <PARAM NAME="init"
+         VALUE='ggobi("/home/duncan/Projects/ggobi/ggobi/data/flea.xml");
+                NULL
+              '/>
+</OBJECT>
