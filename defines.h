@@ -97,12 +97,12 @@ enum displaytyped {scatterplot, scatmat, parcoords};
 /* br_mode */
 #define BR_PERSISTENT 0
 #define BR_TRANSIENT  1
-#define BR_UNDO       2
-/* br_cg */
+/* br_target */
 #define BR_CANDG 0  /* color and glyph */
 #define BR_COLOR 1
 #define BR_GLYPH 2  /*-- glyph type and size --*/
 #define BR_GSIZE 3  /*-- glyph size only --*/
+#define BR_ERASE 4
 /* for binning the screen */
 #define BRUSH_NBINS  20
 #define BRUSH_MARGIN 10

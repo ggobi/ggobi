@@ -67,7 +67,32 @@ brush_once (gboolean force)
 }
 
 void
-reinit_transient_brushing ()
+brush_prev_vectors_update (void) {
+  gint m, i;
+  for (m=0; m<xg.nrows_in_plot; m++) {
+    i = xg.rows_in_plot[m];
+    xg.color_prev[i] = xg.color_ids[i];
+    xg.erased_prev[i] = xg.erased[i];
+    xg.glyph_prev[i].size = xg.glyph_ids[i].size;
+    xg.glyph_prev[i].type = xg.glyph_ids[i].type;
+  }
+}
+
+void
+brush_undo (splotd *sp) {
+  gint m, i;
+  for (m=0; m<xg.nrows_in_plot; m++) {
+    i = xg.rows_in_plot[m];
+    xg.color_ids[i] = xg.color_now[i] = xg.color_prev[i];
+    xg.erased[i] = xg.erased_now[i] = xg.erased_prev[i];
+    xg.glyph_ids[i].type = xg.glyph_now[i].type = xg.glyph_prev[i].type;
+    xg.glyph_ids[i].size = xg.glyph_now[i].size = xg.glyph_prev[i].size;
+  }
+  splot_redraw (sp, FULL);
+}
+
+void
+reinit_transient_brushing (void)
 {
 /*
  * If a new variable is selected or a variable is transformed
@@ -77,14 +102,15 @@ reinit_transient_brushing ()
  * now underneath the brush.  For now, don't make the
  * same change for persistent or undo brushing.
 */
-  gint j, k;
+  gint i, m;
 
-  for (j=0; j<xg.nrows_in_plot; j++)
+  for (m=0; m<xg.nrows_in_plot; m++)
   {
-    k = xg.rows_in_plot[j];
-    xg.color_now[k] = xg.color_ids[k] ;
-    xg.glyph_now[k].type = xg.glyph_ids[k].type;
-    xg.glyph_now[k].size = xg.glyph_ids[k].size;
+    i = xg.rows_in_plot[m];
+    xg.color_now[i] = xg.color_ids[i] ;
+    xg.glyph_now[i].type = xg.glyph_ids[i].type;
+    xg.glyph_now[i].size = xg.glyph_ids[i].size;
+    xg.erased_now[i] = xg.erased[i];
   }
   (void) brush_once (false);
 }
@@ -169,6 +195,25 @@ under_brush (gint k)
 /*                      Dealing with the brush                          */
 /*----------------------------------------------------------------------*/
 
+static void
+brush_boundaries_set (cpaneld *cpanel,
+  icoords *obin0, icoords *obin1,
+  icoords *imin, icoords *imax)
+{
+  if (cpanel->br_mode == BR_TRANSIENT) {
+    imin->x = MIN (xg.bin0.x, obin0->x);
+    imin->y = MIN (xg.bin0.y, obin0->y);
+    imax->x = MAX (xg.bin1.x, obin1->x);
+    imax->y = MAX (xg.bin1.y, obin1->y);
+  }
+  else {
+    imin->x = xg.bin0.x;
+    imin->y = xg.bin0.y;
+    imax->x = xg.bin1.x;
+    imax->y = xg.bin1.y;
+  }
+}
+
 void
 brush_draw_label (splotd *sp) {
   gint lbearing, rbearing, width, ascent, descent;
@@ -250,6 +295,9 @@ brush_draw_brush (splotd *sp) {
   }
 }
 
+/*----------------------------------------------------------------------*/
+/*                      Glyph brushing                                  */
+/*----------------------------------------------------------------------*/
 
 static gboolean
 update_glyph_arrays (gint i, gboolean changed) {
@@ -259,66 +307,46 @@ update_glyph_arrays (gint i, gboolean changed) {
 /* setting the value of changed */
   if (!changed) {
     if (xg.under_new_brush[i]) {
-      switch (cpanel->br_mode) {
-        case BR_UNDO:
-          changed = changed || (xg.glyph_now[i].size != xg.glyph_prev[i].size);
-          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
-            changed = changed ||
-                      (xg.glyph_now[i].type != xg.glyph_prev[i].type);
-          break;
 
-        case BR_PERSISTENT:
-          changed = changed || (xg.glyph_now[i].size != xg.glyph_id.size);
-          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
-            changed = changed || (xg.glyph_now[i].type != xg.glyph_id.type);
-          break;
+      doit = (xg.glyph_now[i].size != xg.glyph_id.size);
+      if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
+        doit = doit || (xg.glyph_now[i].type != xg.glyph_id.type);
 
-        case BR_TRANSIENT:
-          changed = changed || (xg.glyph_now[i].size != xg.glyph_id.size);
-          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
-            changed = changed || (xg.glyph_now[i].type != xg.glyph_id.type);
-          break;
-      }
     } else {
-      changed = changed || (xg.glyph_now[i].size != xg.glyph_ids[i].size);
-      if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
-        changed = changed || (xg.glyph_now[i].type != xg.glyph_ids[i].type);
-    }
 
-    doit = changed;
+      doit = (xg.glyph_now[i].size != xg.glyph_ids[i].size);
+      if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
+        doit = doit || (xg.glyph_now[i].type != xg.glyph_ids[i].type);
+    }
   }
 /* */
 
   if (doit) {
     if (xg.under_new_brush[i]) {
       switch (cpanel->br_mode) {
-        case BR_UNDO:
-          xg.glyph_ids[i].size = xg.glyph_now[i].size = xg.glyph_prev[i].size;
-          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
-            xg.glyph_ids[i].type = xg.glyph_now[i].type = xg.glyph_prev[i].type;
-          break;
 
         case BR_PERSISTENT:
           xg.glyph_ids[i].size = xg.glyph_now[i].size = xg.glyph_id.size;
-          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+          if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
             xg.glyph_ids[i].type = xg.glyph_now[i].type = xg.glyph_id.type;
           break;
 
         case BR_TRANSIENT:
           xg.glyph_now[i].size = xg.glyph_id.size;
-          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+          if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
             xg.glyph_now[i].type = xg.glyph_id.type;
           break;
       }
     } else {
       xg.glyph_now[i].size = xg.glyph_ids[i].size;
-      if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+      if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
         xg.glyph_now[i].type = xg.glyph_ids[i].type;
     }
   }
 
   return (changed);
 }
+
 
 static gboolean
 build_glyph_vectors ()
@@ -330,18 +358,7 @@ build_glyph_vectors ()
   gboolean changed = false;
   cpaneld *cpanel = &current_display->cpanel;
 
-  if (cpanel->br_mode == BR_TRANSIENT) {
-    imin.x = MIN (xg.bin0.x, obin0.x);
-    imin.y = MIN (xg.bin0.y, obin0.y);
-    imax.x = MAX (xg.bin1.x, obin1.x);
-    imax.y = MAX (xg.bin1.y, obin1.y);
-  }
-  else {
-    imin.x = xg.bin0.x;
-    imin.y = xg.bin0.y;
-    imax.x = xg.bin1.x;
-    imax.y = xg.bin1.y;
-  }
+  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax);
 
   for (ih=imin.x; ih<=imax.x; ih++) {
     for (iv=imin.y; iv<=imax.y; iv++) {
@@ -378,42 +395,30 @@ build_glyph_vectors ()
   return (changed);
 }
 
+/*----------------------------------------------------------------------*/
+/*                      Color brushing                                  */
+/*----------------------------------------------------------------------*/
+
 static gboolean
 update_color_arrays (gint i, gboolean changed) {
   cpaneld *cpanel = &current_display->cpanel;
   gboolean doit = true;
 
-  /*
-   * First find out if this will result in a change; this in
-   * order to be able to return that information.
-  */
+/* setting the value of doit */
   if (!changed) {
-    if (xg.under_new_brush[i]) {
-      switch (cpanel->br_mode) {
-        case BR_UNDO:
-          changed = changed || (xg.color_now[i] != xg.color_prev[i]);
-          break;
-        default:
-          changed = changed || (xg.color_now[i] != xg.color_id);
-          break;
-      }
-    }
-    else changed = (xg.color_now[i] != xg.color_ids[i]);
-
-    doit = changed;
+    if (xg.under_new_brush[i])
+      doit = (xg.color_now[i] != xg.color_id);
+    else
+      doit = (xg.color_now[i] != xg.color_ids[i]);
   }
 /* */
 
-/*
- * If doit is false, it's guaranteed that there will be no change.
-*/
-
+  /*
+   * If doit is false, it's guaranteed that there will be no change.
+  */
   if (doit) {
     if (xg.under_new_brush[i]) {
       switch (cpanel->br_mode) {
-        case BR_UNDO:
-          xg.color_ids[i] = xg.color_now[i] = xg.color_prev[i];
-          break;
         case BR_PERSISTENT:
           xg.color_ids[i] = xg.color_now[i] = xg.color_id;
           break;
@@ -428,7 +433,7 @@ update_color_arrays (gint i, gboolean changed) {
 }
 
 static gboolean
-build_color_vectors ()
+build_color_vectors (void)
 {
   gint ih, iv, m, j, k, gp, n, p;
   static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
@@ -437,18 +442,7 @@ build_color_vectors ()
   gboolean changed = false;
   cpaneld *cpanel = &current_display->cpanel;
 
-  if (cpanel->br_mode == BR_TRANSIENT) {
-    imin.x = MIN (xg.bin0.x, obin0.x);
-    imin.y = MIN (xg.bin0.y, obin0.y);
-    imax.x = MAX (xg.bin1.x, obin1.x);
-    imax.y = MAX (xg.bin1.y, obin1.y);
-  }
-  else {
-    imin.x = xg.bin0.x;
-    imin.y = xg.bin0.y;
-    imax.x = xg.bin1.x;
-    imax.y = xg.bin1.y;
-  }
+  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax);
 
   for (ih=imin.x; ih<=imax.x; ih++) {
     for (iv=imin.y; iv<=imax.y; iv++) {
@@ -484,8 +478,95 @@ build_color_vectors ()
   return (changed);
 }
 
+/*----------------------------------------------------------------------*/
+/*                      Erase brushing                                  */
+/*----------------------------------------------------------------------*/
+
+static gboolean
+update_erase_arrays (gint i, gboolean changed) {
+  cpaneld *cpanel = &current_display->cpanel;
+  gboolean doit = true;
+
+  /*
+   * First find out if this will result in a change; this in
+   * order to be able to return that information.
+  */
+  if (!changed) {
+    if (xg.under_new_brush[i])
+      doit = (xg.erased_now[i] != true);
+    else
+      doit = (xg.erased_now[i] != xg.erased[i]);
+  }
+/* */
+
+/*
+ * If doit is false, it's guaranteed that there will be no change.
+*/
+
+  if (doit) {
+    if (xg.under_new_brush[i]) {
+      switch (cpanel->br_mode) {
+        case BR_PERSISTENT:
+          xg.erased[i] = xg.erased_now[i] = true;
+          break;
+        case BR_TRANSIENT:
+          xg.erased_now[i] = true;
+          break;
+      }
+    } else xg.erased_now[i] = xg.erased[i];
+  }
+
+  return (doit);
+}
+
+static gboolean
+build_erase_vectors (void)
+{
+  gint ih, iv, m, j, k, gp, n, p;
+  static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
+  static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
+  icoords imin, imax;
+  gboolean changed = false;
+  cpaneld *cpanel = &current_display->cpanel;
+
+  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax);
+
+  for (ih=imin.x; ih<=imax.x; ih++) {
+    for (iv=imin.y; iv<=imax.y; iv++) {
+      for (m=0; m<xg.br_binarray[ih][iv].nels; m++) {
+        j = xg.rows_in_plot[ k = xg.br_binarray[ih][iv].els[m] ] ;
+        /*
+         * k   raw index, based on nrows
+         * j   index based on nrows_in_plot
+        */
+        if (j < xg.nlinkable) {
+
+          if (xg.nrgroups > 0) {
+            /*-- update the erase arrays for every member of the row group --*/
+            gp = xg.rgroup_ids[k];
+            for (n=0; n<xg.rgroups[gp].nels; n++) {
+              p = xg.rgroups[gp].els[n];
+              changed = update_erase_arrays (p, changed);
+            }
+          /* */
+
+          } else {  /* update the arrays for this point only */
+            changed = update_erase_arrays (j, changed);
+          }
+        }
+      }
+    }
+    obin0.x = xg.bin0.x;
+    obin0.y = xg.bin0.y;
+    obin1.x = xg.bin1.x;
+    obin1.y = xg.bin1.y;
+  }
+
+  return (changed);
+}
+
 gboolean
-active_paint_points ()
+active_paint_points (void)
 {
   gint ih, iv, j, pt, k, gp;
   gboolean changed;
@@ -509,7 +590,8 @@ active_paint_points ()
         pt = xg.rows_in_plot[xg.br_binarray[ih][iv].els[j]];
 
         if (pt < xg.nlinkable) {
-          if (!xg.erased[pt] && under_brush (pt)) {
+/*          if (!xg.erased[pt] && under_brush (pt)) {*/
+          if (under_brush (pt)) {
 
             npts_under_brush++ ;
             xg.under_new_brush[pt] = 1;
@@ -519,8 +601,8 @@ active_paint_points ()
               gp = xg.rgroup_ids[pt];
               if (gp < xg.nrgroups) {  /* exclude points without an rgroup */
                 for (k=0; k<xg.rgroups[gp].nels; k++) {
-                  if (!xg.erased[ xg.rgroups[gp].els[k] ])
-                    xg.under_new_brush[ xg.rgroups[gp].els[k] ] = 1;
+/*                  if (!xg.erased[ xg.rgroups[gp].els[k] ])*/
+                    xg.under_new_brush[xg.rgroups[gp].els[k]] = 1;
                 }
               }
             }
@@ -535,17 +617,23 @@ active_paint_points ()
   changed = false;
 
   if (cpanel->brush_on_p) {
-    /*
-     * Now, using the under_new_brush[] vector that only contains un-erased
-     * points, build the color and glyph vectors.
-    */
-    if (cpanel->br_cg == BR_COLOR || cpanel->br_cg == BR_CANDG)
-      changed = build_color_vectors () || changed;
-
-    if (cpanel->br_cg == BR_GLYPH || cpanel->br_cg == BR_GSIZE ||
-        cpanel->br_cg == BR_CANDG)
-    {
-      changed = build_glyph_vectors () || changed;
+    switch (cpanel->br_target) {
+      case BR_CANDG:  /*-- color and glyph --*/
+        if (build_color_vectors ()) changed = true;
+        if (build_glyph_vectors ()) changed = true;
+        break;
+      case BR_COLOR:
+        if (build_color_vectors ()) changed = true;
+        break;
+      case BR_GLYPH:  /*-- glyph type and size --*/
+        if (build_glyph_vectors ()) changed = true;
+        break;
+      case BR_GSIZE:  /*-- glyph size only --*/
+        if (build_glyph_vectors ()) changed = true;
+        break;
+      case BR_ERASE:  /*-- erase --*/
+        if (build_erase_vectors ()) changed = true;
+        break;
     }
   }
 

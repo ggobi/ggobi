@@ -31,7 +31,7 @@ typedef struct {
  * brushing
 */
  gboolean brush_on_p;
- gint br_mode, br_scope, br_cg;
+ gint br_mode, br_scope, br_target;
 
 /*
  * line editing

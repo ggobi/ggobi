@@ -773,20 +773,6 @@ nlinkable_read (gchar *data_in, gboolean init)
 /*                          erasing                                       */
 /*------------------------------------------------------------------------*/
 
-void
-erase_alloc ()
-{
-  if (xg.erased != NULL)  g_free (xg.erased);
-  xg.erased = (gboolean *)  g_malloc (xg.nrows * sizeof (gboolean));
-}
-void
-erase_init ()
-{
-  gint j;
-
-  for (j=0; j<xg.nrows; j++)
-    xg.erased[j] = false;
-}
 gboolean
 erase_read (gchar *data_in, gboolean reinit)
 /*
@@ -810,7 +796,8 @@ erase_read (gchar *data_in, gboolean reinit)
     i = 0;
     while ((fscanf (fp, "%d", &itmp) != EOF) && (i < xg.nrows)) {
       if (xg.file_read_type == read_all || k == xg.file_rows_sampled[i]) {
-        xg.erased[i++] = (gboolean) itmp;
+        xg.erased[i] = xg.erased_now[i] = xg.erased_prev[i] = (gboolean) itmp;
+        i++;
       }
       k++;
     }

@@ -258,7 +258,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp)
 
   for (m=0; m<xg.nrows_in_plot; m++) {
     j = xg.rows_in_plot[m];
-    if (!xg.erased[j] && xg.color_now[j] == current_color) {
+    if (!xg.erased_now[j] && xg.color_now[j] == current_color) {
       if (display->points_show_p)
         build_glyph (&xg.glyph_now[j], sp->screen, j,
           points, &npt,           segs, &nseg,
@@ -293,7 +293,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
     for (iv=bin0->y; iv<=bin1->y; iv++) {
       for (m=0; m<xg.br_binarray[ih][iv].nels; m++) {
         j = xg.rows_in_plot[xg.br_binarray[ih][iv].els[m]];
-        if (!xg.erased[j] && xg.color_now[j] == current_color) {
+        if (!xg.erased_now[j] && xg.color_now[j] == current_color) {
           build_glyph (&xg.glyph_now[j], sp->screen, j,
             points, &npt,           segs, &nseg,
             open_rects, &nr_open,   filled_rects, &nr_filled,

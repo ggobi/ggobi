@@ -60,7 +60,6 @@ typedef struct {
  /* Hiding/excluding the erased points */
  cluster *clusv;
  int nclust;
- gboolean *erased;
  gboolean *included; /* it's too slow to get this from rows_in_plot */
 
  gulong *senddata;
@@ -114,6 +113,7 @@ typedef struct {
  /* point brushing */
  gboolean *under_new_brush;
  gushort *color_ids, *color_now, *color_prev;  /* 0:ncolors-1 */
+ gboolean *erased, *erased_now, *erased_prev;
  /* line brushing */
  gushort *xed_by_new_brush;
  gushort *line_color_ids, *line_color_now, *line_color_prev;  /* 0:ncolors-1 */

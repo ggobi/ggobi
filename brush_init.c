@@ -88,13 +88,25 @@ br_color_ids_init ()
 /*-------------------------------------------------------------------------*/
 
 void
-init_erase ()
+erase_alloc (void)
 {
-  int j;
+  if (xg.erased != NULL) g_free (xg.erased);
+  if (xg.erased_now != NULL) g_free (xg.erased_now);
+  if (xg.erased_prev != NULL) g_free (xg.erased_prev);
 
-  for (j=0; j<xg.nrows; j++)
-    xg.erased[j] = 0;
+  xg.erased = (gboolean *) g_malloc (xg.nrows * sizeof (gboolean));
+  xg.erased_now = (gboolean *) g_malloc (xg.nrows * sizeof (gboolean));
+  xg.erased_prev = (gboolean *) g_malloc (xg.nrows * sizeof (gboolean));
 }
+void
+erase_init (void)
+{
+  gint i;
+
+  for (i=0; i<xg.nrows; i++)
+    xg.erased[i] = xg.erased_now[i] = xg.erased_prev[i] = false;
+}
+
 
 /*-------------------------------------------------------------------------*/
 /*                           line color                                    */
@@ -221,7 +233,7 @@ void
 brush_init ()
 {
   static gboolean firsttime = true;
-  int i;
+  gint i, m;
 
   xg.glyph_id.type = xg.glyph_0.type = FILLED_CIRCLE;
   xg.glyph_id.size = xg.glyph_0.size = 3;
@@ -241,12 +253,6 @@ brush_init ()
     */
     xg.bin0.x = xg.bin1.x = BRUSH_NBINS;
     xg.bin0.y = xg.bin1.y = BRUSH_NBINS;
-
-    /*
-     * Initialize rows_in_plot to be all the data
-    */
-    for (i=0; i<xg.nrows_in_plot; i++)
-      xg.rows_in_plot[i] = i;
 
     brush_alloc ();
 

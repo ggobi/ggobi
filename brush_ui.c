@@ -20,6 +20,11 @@ static void brush_on_cb (GtkToggleButton *button)
   cpanel->brush_on_p = button->active;
 }
 
+static void brush_undo_cb (GtkToggleButton *button)
+{
+  brush_undo (current_splot);
+}
+
 static gchar *scope_lbl[] = {"Points", "Lines", "Points and lines"};
 static void brush_scope_cb (GtkWidget *w, gpointer cbd)
 {
@@ -28,14 +33,14 @@ static void brush_scope_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *cg_lbl[] =
-  {"Color and glyph", "Color only", "Glyph only", "Glyph size only"};
+  {"Color and glyph", "Color only", "Glyph only", "Glyph size only", "Erase"};
 static void brush_cg_cb (GtkWidget *w, gpointer cbd)
 {
   cpaneld *cpanel = &current_display->cpanel;
-  cpanel->br_cg = GPOINTER_TO_INT (cbd);
+  cpanel->br_target = GPOINTER_TO_INT (cbd);
 }
 
-static gchar *mode_lbl[] = {"Persistent", "Transient", "Undo"};
+static gchar *mode_lbl[] = {"Persistent", "Transient"};
 static void brush_mode_cb (GtkWidget *w, gpointer cbd)
 {
   cpaneld *cpanel = &current_display->cpanel;
@@ -105,6 +110,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   current_splot = sp;
   current_display = (displayd *) sp->displayptr;
   cpanel = &current_display->cpanel;
+
+  brush_prev_vectors_update ();
 
   mousepos_get_pressed (w, event, &button1_p, &button2_p);
 
@@ -278,7 +285,7 @@ cpanel_brush_make () {
 */
   cg_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), cg_opt,
-    "Brush with color and glyph, color only, or glyph only", NULL);
+    "Brush with color and glyph, color, glyph, glyph size; or erase", NULL);
   gtk_box_pack_start (GTK_BOX (control_panel[BRUSH]),
                       cg_opt, false, false, 0);
   populate_option_menu (cg_opt, cg_lbl,
@@ -291,13 +298,23 @@ cpanel_brush_make () {
 */
   mode_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), mode_opt,
-    "Persistent, transient or undo brushing", NULL);
+    "Persistent or transient brushing", NULL);
   gtk_box_pack_start (GTK_BOX (control_panel[BRUSH]),
                       mode_opt, false, false, 0);
   populate_option_menu (mode_opt, mode_lbl,
                         sizeof (mode_lbl) / sizeof (gchar *),
                         brush_mode_cb);
   gtk_option_menu_set_history (GTK_OPTION_MENU (mode_opt), 1);  /* transient */
+
+
+  btn = gtk_button_new_with_label ("Undo");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
+    "Undo the most recent brushing changes, from button down to button up",
+    NULL);
+  gtk_box_pack_start (GTK_BOX (control_panel[BRUSH]),
+                      btn, false, false, 0);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (brush_undo_cb), NULL);
 
 /*
  * button for opening symbol panel
@@ -334,7 +351,7 @@ cpanel_brush_init (cpaneld *cpanel) {
   cpanel->brush_on_p = true;
 
   cpanel->br_mode = BR_TRANSIENT;
-  cpanel->br_cg = BR_CANDG;  /* color and glyph */
+  cpanel->br_target = BR_CANDG;  /* color and glyph */
   cpanel->br_scope = BR_POINTS;
 }
 
@@ -347,6 +364,6 @@ cpanel_brush_set (cpaneld *cpanel) {
   gtk_option_menu_set_history (GTK_OPTION_MENU (scope_opt),
                                cpanel->br_scope);
   gtk_option_menu_set_history (GTK_OPTION_MENU (cg_opt),
-                               cpanel->br_cg);
+                               cpanel->br_target);
 }
 
