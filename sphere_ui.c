@@ -417,7 +417,7 @@ sphere_panel_open (ggobid *gg)
     gg->sphere_ui.stdized_entry = gtk_entry_new ();
     gtk_entry_set_editable (GTK_ENTRY (gg->sphere_ui.stdized_entry), false);*/
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Have all the selected variables been standardized?  (To standardize, use Variable transformation, Stage 2, then update the scree plot)",
+      "When this button is checked the correlation matrix is used to generate the PCs, otherwise the variance-covariance matrix is used",
       NULL);
     /*    gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.stdized_entry), "-");*/
     gtk_signal_connect (GTK_OBJECT (btn),
