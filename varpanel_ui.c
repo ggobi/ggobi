@@ -267,22 +267,7 @@ varpanel_refresh (displayd *display, ggobid *gg) {
   GList *l;
   datad *d = display->d;
 
-/*
-  gint nd = g_slist_length (gg->d);
-  gint k;
-  displayd *display = gg->current_display;
-  if (nd > 0 && sp != NULL) {
-*/
-
   if (sp != NULL && d != NULL) {
-
-/*
-    for (k=0; k<nd; k++) {
-      datad *d = (datad*) g_slist_nth_data (gg->d, k);
-      if (display->d != d)
-        ;
-      else {
-*/
 
     switch (display->displaytype) {
 
@@ -616,133 +601,124 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
   datad *d = display->d;
   GtkWidget *wx, *wy, *label;
 
-  /*-- for each datad --*/
-/*
-  gint k;
-  gint nd = g_slist_length (gg->d);
-  displayd *display = gg->current_display;
-  for (k=0; k<nd; k++) {
-    d = (datad*) g_slist_nth_data (gg->d, k);
-*/
-    /*-- for each variable --*/
-    for (j=0; j<d->ncols; j++) {
-      if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
-        break;
-      wy = varpanel_widget_get_nth (VARSEL_Y, j, d);
-      label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
-      
-      switch (display->displaytype) {
+  /*-- for each variable, current datad only --*/
+  for (j=0; j<d->ncols; j++) {
+    if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
+      break;
+    wy = varpanel_widget_get_nth (VARSEL_Y, j, d);
+    label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
+    
+    switch (display->displaytype) {
 
-        case parcoords:
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-            "Select to replace/insert/append a variable, or to delete it",
-            NULL);
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-            "Click to replace/insert/append a variable, or to delete it",
-            NULL);
-        break;
+      case parcoords:
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+          "Select to replace/insert/append a variable, or to delete it",
+          NULL);
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+          "Click to replace/insert/append a variable, or to delete it",
+          NULL);
+      break;
 
-        case scatmat:
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-            "Select to replace/insert/append a variable, or to delete it",
-            NULL);
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-            "Click to replace/insert/append a variable, or to delete it",
-            NULL);
-        break;
+      case scatmat:
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+          "Select to replace/insert/append a variable, or to delete it",
+          NULL);
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+          "Click to replace/insert/append a variable, or to delete it",
+          NULL);
+      break;
 
-        case tsplot:
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-            "Select to replace the horizontal (time) variable.",
-            NULL);
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-            "Select to replace/insert/append/delete a Y variable.",
-            NULL);
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-            "Click left to replace the horizontal (time) variable.  Click middle or right to replace/insert/append/delete a Y variable.",
-            NULL);
-        break;
+      case tsplot:
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+          "Select to replace the horizontal (time) variable.",
+          NULL);
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+          "Select to replace/insert/append/delete a Y variable.",
+          NULL);
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+          "Click left to replace the horizontal (time) variable.  Click middle or right to replace/insert/append/delete a Y variable.",
+          NULL);
+      break;
 
-        case scatterplot:
-          switch (projection) {
-            case P1PLOT:
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                "Select to plot",
-                NULL);
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                "Click left to plot horizontally, right or middle to plot vertically",
-                NULL);
-            break;
-            case XYPLOT:
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                "Press to select the horizontally plotted variable",
-                NULL);
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-                "Press to select the vertically plotted variable",
-                NULL);
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                "Click left to select the horizontal variable, middle for vertical",
-                NULL);
+      case scatterplot:
+        switch (projection) {
+          case P1PLOT:
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+              "Select to plot",
+              NULL);
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+              "Click left to plot horizontally, right or middle to plot vertically",
+              NULL);
+          break;
+          case XYPLOT:
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+              "Press to select the horizontally plotted variable",
+              NULL);
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+              "Press to select the vertically plotted variable",
+              NULL);
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+              "Click left to select the horizontal variable, middle for vertical",
+              NULL);
 
-            break;
-            case TOUR2D:
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                "Click to select a variable to be available for touring",
-                NULL);
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                "Click to select a variable to be available for touring",
-                NULL);
-            break;
-            case TOUR1D:
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                "Click to select a variable to be available for touring",
-                NULL);
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                "Click to select a variable to be available for touring",
-                NULL);
-            break;
-            case COTOUR:
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                "Click to select a variable to be toured horizontally",
-                NULL);
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-                "Click to select a variable to be toured vertically",
-                NULL);
-              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                "Click to select a variable to be available for touring",
-                NULL);
-            break;
-            /*-- to pacify compiler if we change these to an enum --*/
-            case ROTATE:
-            case SCALE:
-            case BRUSH:
-            case IDENT:
-            case EDGEED:
-            case MOVEPTS:
-            case SCATMAT:
-            case PCPLOT:
-            case TSPLOT:
+          break;
+          case TOUR2D:
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+              "Click to select a variable to be available for touring",
+              NULL);
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+              "Click to select a variable to be available for touring",
+              NULL);
+          break;
+          case TOUR1D:
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+              "Click to select a variable to be available for touring",
+              NULL);
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+              "Click to select a variable to be available for touring",
+              NULL);
+          break;
+          case COTOUR:
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+              "Click to select a variable to be toured horizontally",
+              NULL);
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+              "Click to select a variable to be toured vertically",
+              NULL);
+            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+              "Click to select a variable to be available for touring",
+              NULL);
+          break;
+          /*-- to pacify compiler if we change these to an enum --*/
+          case ROTATE:
+          case SCALE:
+          case BRUSH:
+          case IDENT:
+          case EDGEED:
+          case MOVEPTS:
+          case SCATMAT:
+          case PCPLOT:
+          case TSPLOT:
 #ifdef BARCHART_IMPLEMENTED
-            case BARCHART:
+          case BARCHART:
 #endif
-            break;
-        }
-        break;
-
-#ifdef BARCHART_IMPLEMENTED
-        case barchart:
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-            "Click to replace a variable",
-            NULL);
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-            "Click to replace a variable",
-            NULL);
-        break;
-#endif
-
-        case unknown_display_type:
-        break;
+          break;
       }
+      break;
+
+#ifdef BARCHART_IMPLEMENTED
+      case barchart:
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+          "Click to replace a variable",
+          NULL);
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+          "Click to replace a variable",
+          NULL);
+      break;
+#endif
+
+      case unknown_display_type:
+      break;
     }
-  /*}*/
+  }
 }
