@@ -124,6 +124,8 @@ write_ggobi_as_xml(ggobid *gg, const char *fileName, xmlDocPtr doc)
 }
 
 
+void add_brush_info(xmlNodePtr node, datad *d, ggobid *gg);
+
 /**
 
  */
@@ -149,7 +151,43 @@ create_ggobi_xml(ggobid *gg, xmlDocPtr doc)
    el = el->next;
  }
 
+ /* write out the brushing information. */
+ {
+   GSList *el;
+  for(el = gg->d; el; el = el->next) {
+   datad *d = (datad *)el->data;
+   if(d->npts_under_brush > 0) {
+      add_brush_info(XML_DOC_ROOT(doc), d, gg);
+      break;
+   }
+ }
+ }
+
  return(doc);
+}
+
+void
+add_brush_info(xmlNodePtr node, datad *d, ggobid *gg)
+{
+  char buf[10];
+  gint i;
+  xmlNodePtr brushNode;
+
+  if(d->npts_under_brush < 1)
+    return;
+
+  brushNode = xmlNewChild(node, NULL, "brush", NULL);
+  sprintf(buf, "%d", d->npts_under_brush);
+  xmlSetProp(brushNode, "count", buf);
+  xmlSetProp(brushNode, "datasetName", d->name);
+  for(i = 0; i < d->nrows;i++) {
+    if(d->pts_under_brush.els[i]) {
+      xmlNodePtr tmp;
+      tmp = xmlNewChild(brushNode, NULL, "int", NULL);
+      sprintf(buf, "%d", i);
+      xmlSetProp(tmp, "value", buf);
+    }
+  }
 }
 
 /*
@@ -160,20 +198,38 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
 {
   GList *plots;
   xmlNodePtr node;
+  gchar buf[20];
+  GtkArg arg;
+  gint i;
+  char *props[] = {"width", "height"};
 
     /* Create a display tag with attributes `type' and `data'
        specifying the type of the display and the name of the
        dataset in which the variables are to be found.
      */
+
   node = xmlNewChild(XML_DOC_ROOT(doc), NULL, "display", NULL);
   xmlSetProp(node, "type", getDisplayTypeName(dpy));
   xmlSetProp(node, "data", getDataName(dpy));
+  if(dpy->ggobi->current_display == dpy) {
+     xmlSetProp(node, "active",  "true");
+  }
 
+  /* write the width and height information so we can restore these.
+     Currently, the query only returns -1! */
+
+  for(i = 0; i < sizeof(props)/sizeof(props[0]); i++) {
+    arg.name = props[i];
+    gtk_object_arg_get(GTK_OBJECT(dpy), &arg, NULL);
+    sprintf(buf, "%d", arg.d.int_data);
+    xmlSetProp(node, props[i], buf);
+  }
 
   plots = dpy->splots;
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
     GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
     if(klass->xml_describe) {
+/*XX Need to be able to identify the active splotd. */
       klass->xml_describe(node, plots, dpy);
     } else {
       xmlSetProp(node, "unsupported", "true");
