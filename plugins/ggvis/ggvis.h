@@ -94,6 +94,7 @@ ggvisd* ggvisFromInst (PluginInstance *inst);
 void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst);
 void mds_step_cb (GtkToggleButton *btn, PluginInstance *inst);
 void mds_reinit_cb (GtkToggleButton *btn, PluginInstance *inst);
+void update_ggobi (ggvisd *ggv, ggobid *gg);
 
 void ggv_dsource_cb (GtkWidget *w, gpointer cbd);
 void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst);

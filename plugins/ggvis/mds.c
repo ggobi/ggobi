@@ -136,8 +136,8 @@ scale_pos (ggvisd *ggv)
   for (i=0; i<ggv->pos.nrows; i++)
     if (ggv->point_status.els[i] != EXCLUDED)
       for (k=0; k<ggv->mds_dims; k++)
-        pos[i][k] = (pos[i][k] - ggv->pos_mean.els[k]) /
-                    ggv->pos_scl + ggv->pos_mean.els[k];
+        pos[i][k] = (pos[i][k] - ggv->pos_mean.els[k]) / ggv->pos_scl +
+          ggv->pos_mean.els[k];
 }
 
 void
@@ -351,11 +351,12 @@ power_transform (ggvisd *ggv)
 
 /* for sorting in isotonic regression */
 static gdouble *tmpVector;
-static gint aIndex, bIndex;
-static gdouble aReal, bReal;
 /* */
 gint realCompare(const void* aPtr, const void* bPtr)
 {
+  gdouble aReal, bReal;
+  gint aIndex, bIndex;
+
   aIndex = *(gint*)aPtr;
   bIndex = *(gint*)bPtr;
   aReal = tmpVector[aIndex];
@@ -529,28 +530,30 @@ isotonic_transform (ggvisd *ggv)
 
 } /* end isotonic_transform() */
 
+void
+update_ggobi (ggvisd *ggv, ggobid *gg)
+{
+  gint i, j;
+
+  for (i=0; i<ggv->pos.nrows; i++)
+    for (j=0; j<ggv->pos.ncols; j++)
+      ggv->dpos->tform.vals[i][j] =
+        ggv->dpos->raw.vals[i][j] = ggv->pos.vals[i][j];
+
+  tform_to_world (ggv->dpos, gg);
+  displays_tailpipe (FULL, gg);
+}
+
 gint
 mds_idle_func (PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
-/*
- Will I need to get the state of the 'run mds' checkbutton?
-*/
   gboolean doit = ggv->mds_running;
 
   if (doit) {
-    gint i, j;
     mds_once (true, ggv);
-
-    /* -- data being cast here from double to float --*/
-    for (i=0; i<ggv->pos.nrows; i++)
-      for (j=0; j<ggv->pos.ncols; j++)
-        ggv->dpos->tform.vals[i][j] =
-          ggv->dpos->raw.vals[i][j] = ggv->pos.vals[i][j];
-
-    tform_to_world (ggv->dpos, gg);
-    displays_tailpipe (FULL, gg);
+    update_ggobi (ggv, gg);
   }
 
   return (doit);
@@ -666,8 +669,7 @@ mds_once (gboolean doit, ggvisd *ggv)
   /* allocate position and compute means */
   get_center (ggv);
 
-  /* --------------- collect and count active dissimilarities (j's
-     move i's) --------------- */
+  /*-- collect and count active dissimilarities (j's move i's) ------------*/
   ggv->num_active_dist = 0;
 
   /* i's are moved by j's */

@@ -10,6 +10,24 @@
 #include "defines.h"
 #include "ggvis.h"
 
+static void ggv_center_scale_pos_all (ggvisd *ggv);
+
+void
+ggv_scramble (ggvisd *ggv, ggobid *gg)
+{
+  gint i, j;
+/*
+ * Fill in all data with normal random values ...
+*/
+
+  for (i = 0; i < ggv->pos.nrows; i++)
+    for (j = 0; j < ggv->mds_dims; j++)
+      ggv->pos.vals[i][j] = randvalue();
+
+  ggv_center_scale_pos_all (ggv);
+  update_ggobi (ggv, gg);
+}
+
 void
 ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
 {
@@ -121,7 +139,7 @@ ggv_center_scale_pos_all (ggvisd *ggv)
   for(i=0; i<ggv->pos.nrows; i++)
     for(j=0; j<ggv->pos.ncols; j++)
       ggv->pos_scl += fabs(ggv->pos.vals[i][j] - ggv->pos_mean.els[j]);
-  ggv->pos_scl = ggv->pos_scl/ggv->pos.nrows/ggv->pos.ncols;
+  ggv->pos_scl = ggv->pos_scl/(gdouble)ggv->pos.nrows/(gdouble)ggv->pos.ncols;
 
   /* center & scale */
   for (i=0; i<ggv->pos.nrows; i++)
@@ -129,8 +147,7 @@ ggv_center_scale_pos_all (ggvisd *ggv)
       ggv->pos.vals[i][j] = (ggv->pos.vals[i][j] - ggv->pos_mean.els[j])/
                             ggv->pos_scl;
 
-  for(j=0; j<ggv->pos.ncols; j++)
-    ggv->pos_mean.els[j] = 0.;
+  vectord_zero (&ggv->pos_mean);
   ggv->pos_scl = 1.;
 }
 
@@ -161,14 +178,11 @@ void ggv_dsource_cb (GtkWidget *w, gpointer cbd)
   ggvisd *ggv = ggvisFromInst (inst);
 
   ggv->Dtarget_source = (MDSDtargetSource) GPOINTER_TO_INT (cbd);
-
- g_printerr ("dsource = %d\n", ggv->Dtarget_source);
 }
 void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggv->complete_Dtarget = button->active;
-g_printerr ("complete distances? %d\n", ggv->complete_Dtarget);
 }
 
 /*
@@ -177,8 +191,10 @@ g_printerr ("complete distances? %d\n", ggv->complete_Dtarget);
 */
 void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
 {
+/*
   GtkWidget *notebook = (GtkWidget *)
     gtk_object_get_data (GTK_OBJECT(button), "notebook");
+*/
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
   GtkWidget *clist;
@@ -189,7 +205,7 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
   gdouble d12;
   gdouble **Dvals;
   endpointsd *endpoints;
-  datad *d, *dsrc, *e;
+  datad *dsrc, *e;
   displayd *dsp = gg->current_display;
   GtkWidget *window, *entry;
   gchar *lbl;
@@ -261,6 +277,7 @@ large size of it isn't important.
     }
   } else {  /*-- complete Dtarget using a shortest path algorithm --*/
 
+    changing = true;
     while (changing) {
       changing = false;
       for (i = 0; i < e->edge.n; i++) {
@@ -273,7 +290,7 @@ large size of it isn't important.
         d12 = (ggv->Dtarget_source == VarValues) ?
           e->tform.vals[i][selected_var] : 1.0;
 
-        for (end3 = 0; end3 < d->nrows; end3++) {
+        for (end3 = 0; end3 < dsrc->nrows; end3++) {
           /* So we have a direct link from end1 to end2.  Can this be */
           /* used to shortcut a path from end1 to end3 or end2 to end3? */
           if (Dvals[end1][end3] > d12 + Dvals[end2][end3]) {
@@ -289,6 +306,21 @@ large size of it isn't important.
     }    /* while changing. */
   }
   ggv->ndistances = ggv->Dtarget.nrows * ggv->Dtarget.ncols;
+
+{
+  int i, j;
+  FILE *fp;
+  fp = fopen("foo", "w");
+
+  for (i = 0; i < ggv->Dtarget.nrows; i++) {
+    for (j = 0; j < ggv->Dtarget.ncols; j++) {
+      fprintf(fp, "%f ", ggv->Dtarget.vals[i][j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fflush(fp);
+}
+
 
   ggv->mds_threshold_low = ggv->mds_threshold_high = ggv->Dtarget.vals[0][0];
   for (i=0; i<ggv->Dtarget.nrows; i++) {
@@ -332,9 +364,19 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
 
 void mds_step_cb (GtkToggleButton *btn, PluginInstance *inst)
 {
+  ggvisd *ggv = ggvisFromInst (inst);
+  ggobid *gg = inst->gg;
+
+  mds_once (true, ggv);
+  update_ggobi (ggv, gg);
 }
 void mds_reinit_cb (GtkToggleButton *btn, PluginInstance *inst)
 {
+  ggvisd *ggv = ggvisFromInst (inst);
+  ggobid *gg = inst->gg;
+
+  ggv_scramble (ggv, gg);
+  update_ggobi (ggv, gg);
 }
 
 
