@@ -29,6 +29,7 @@ add_record_dialog_cancel (GtkWidget *w, ggobid *gg)
 
   gg->edgeedit.a = -1;
   gtk_widget_destroy (dialog);
+  edgeedit_event_handlers_toggle (gg->current_splot, true);
 }
 
 static void
@@ -54,7 +55,7 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
     id = gtk_editable_get_chars (GTK_EDITABLE (id_entry), 0, -1);
   }
 
-  if (cpanel->ee_adding_edges_p) {
+  if (cpanel->ee_mode == ADDING_EDGES) {
 
     /*-- Add the new edge to e --*/
 /*
@@ -67,9 +68,12 @@ e:
   if e has variables, variable values -- we don't have a clue what to use
 */
 
+/*
     edge_add (gg->edgeedit.a, d->nearest_point, label, id, d, e, gg);
+*/
+    record_add (cpanel->ee_mode, gg->edgeedit.a, d->nearest_point, label, id, NULL, d, e, gg);
 
-  } else if (cpanel->ee_adding_points_p) {
+  } else if (cpanel->ee_mode == ADDING_POINTS) {
 
     greal *raw = NULL;
     GList *list;
@@ -91,13 +95,14 @@ e:
         }
       }
     
-      record_add (-1, -1, label, id, raw, d, e, gg);
+      record_add (cpanel->ee_mode, -1, -1, label, id, raw, d, e, gg);
       g_free (raw);
     }
   }
 
   gg->edgeedit.a = -1;
   gtk_widget_destroy (dialog);
+  edgeedit_event_handlers_toggle (gg->current_splot, true);
 }
 
 static void
@@ -111,7 +116,9 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   gint row = 0;
   datad *dtarget;
 
-  if (cpanel->ee_adding_edges_p) dtarget = e;
+  edgeedit_event_handlers_toggle (gg->current_splot, false);
+
+  if (cpanel->ee_mode == ADDING_EDGES) dtarget = e;
   else dtarget = d;
 
   dialog = gtk_dialog_new ();
@@ -132,7 +139,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   g_free (lbl);
   row++;
 
-  if (cpanel->ee_adding_edges_p) {
+  if (cpanel->ee_mode == ADDING_EDGES) {
     w = gtk_label_new ("Edge source");
     gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
     gtk_table_attach (GTK_TABLE (table),
@@ -166,8 +173,8 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
     entry, 1, 2, row, row+1, table_opt, table_opt, 1, 1);
   row++;
 
-  if ((cpanel->ee_adding_points_p && d->idTable) ||
-      (cpanel->ee_adding_edges_p && e->idTable))
+  if ((cpanel->ee_mode == ADDING_POINTS && d->idTable) ||
+      (cpanel->ee_mode == ADDING_EDGES && e->idTable))
   {
     w = gtk_label_new ("Record id");
     gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
@@ -221,7 +228,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   /*-- cancel button --*/
   w = gtk_button_new_with_label ("Close");
   gtk_signal_connect (GTK_OBJECT (w), "clicked",
-    GTK_SIGNAL_FUNC (add_record_dialog_cancel), dsp);
+    GTK_SIGNAL_FUNC (add_record_dialog_cancel), gg);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
 
   gtk_widget_show_all (dialog);
@@ -239,13 +246,13 @@ static void add_edges_or_points_cb (GtkToggleButton *button, ggobid *gg)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
 
-  cpanel->ee_adding_edges_p = button->active;
-  cpanel->ee_adding_points_p = !button->active;
-
-  if (cpanel->ee_adding_points_p) {
-    splot_cursor_set (GDK_CROSSHAIR, gg->current_splot);
-  } else {
+  if (button->active) {
+    cpanel->ee_mode = ADDING_EDGES;
     splot_cursor_set ((gint)NULL, gg->current_splot);
+  }
+  else {
+    cpanel->ee_mode = ADDING_POINTS;
+    splot_cursor_set (GDK_CROSSHAIR, gg->current_splot);
   }
 }
 static void undo_last_cb (GtkToggleButton *button)
@@ -282,7 +289,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   gboolean button1_p, button2_p;
   gint k;
 
-  if (cpanel->ee_adding_edges_p) {
+  if (cpanel->ee_mode == ADDING_EDGES) {
     mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
     k = find_nearest_point (&sp->mousepos, sp, d, gg);
     d->nearest_point = k;
@@ -300,7 +307,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
     }
     d->nearest_point_prev = d->nearest_point;
 
-  } else if (cpanel->ee_adding_points_p) {
+  } else if (cpanel->ee_mode == ADDING_POINTS) {
     ;
   }
 
@@ -346,7 +353,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
    * If record indices are in use, use them; if not, initialize
    * indices for display->d.
   */
-  if (cpanel->ee_adding_edges_p) {
+  if (cpanel->ee_mode == ADDING_EDGES) {
 
     if (d->nearest_point >= 0 &&
         gg->edgeedit.a >= 0 &&
@@ -369,7 +376,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       add_record_dialog_open (d, e, display, gg);
     }
 
-  } else if (cpanel->ee_adding_points_p) {
+  } else if (cpanel->ee_mode == ADDING_POINTS) {
 
     if (d->rowIds == NULL) {
       /*-- Add rowids to d --*/
@@ -464,8 +471,7 @@ cpanel_edgeedit_make (ggobid *gg) {
 void
 cpanel_edgeedit_init (cpaneld *cpanel, ggobid *gg)
 {
-  cpanel->ee_adding_edges_p = true;
-  cpanel->ee_adding_points_p = false;
+  cpanel->ee_mode = ADDING_EDGES;
 }
 
 void
@@ -473,7 +479,7 @@ cpanel_edgeedit_set (cpaneld *cpanel, ggobid *gg) {
   GtkWidget *w;
 
   /*-- set the Drag or Click radio buttons --*/
-  if (cpanel->ee_adding_edges_p) {
+  if (cpanel->ee_mode == ADDING_EDGES) {
     w = widget_find_by_name (gg->control_panel[EDGEED],
                              "EDGEEDIT:add_edges_radio_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
@@ -493,7 +499,7 @@ edgeedit_activate (gboolean state, displayd *display, ggobid *gg)
   RedrawStyle redraw_style = QUICK;
 
   if (state) {
-    if (cpanel->ee_adding_points_p)
+    if (cpanel->ee_mode == ADDING_POINTS)
       splot_cursor_set (GDK_CROSSHAIR, gg->current_splot);
   }
   else

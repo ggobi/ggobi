@@ -18,8 +18,8 @@
 
 /*--------------------------------------------------------------------*/
 
-gboolean record_add (gint a, gint b, gchar *lbl, gchar *id, greal *raw,
-  datad * d, datad * e, ggobid *gg)
+gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
+  greal *raw, datad * d, datad * e, ggobid *gg)
 {
   gchar *s1, *s2;
   gint i, j;
@@ -27,21 +27,24 @@ gboolean record_add (gint a, gint b, gchar *lbl, gchar *id, greal *raw,
   splotd *sp;
   displayd *dsp;
   datad *dtarget = d;
-  gboolean edge_record_p = false;
 
   /*-- eventually check whether a->b already exists before adding --*/
-  if (a >= 0 && b >= 0 && a != b) {
-    dtarget = e;
-    edge_record_p = true;
+  if (mode == ADDING_EDGES) {
     g_assert (e->edge.n == e->nrows);
+    g_assert (a >= 0 && b >= 0 && a != b);
+
+    dtarget = e;
   }
 
   /*-- Make sure the id is unique --*/
   if (dtarget->idTable && id) {
-    gchar *stmp = g_strdup ((id)?id:g_strdup_printf ("%d", dtarget->nrows));
+    gchar *stmp;
+    if (id && strlen(id) > 0) stmp = g_strdup (id);
+    else stmp = g_strdup_printf ("%d", dtarget->nrows+1);
     for (i=0; i<dtarget->nrows; i++) {
       if (strcmp(stmp, dtarget->rowIds[i]) == 0) {
-        g_printerr ("Please supply an id that isn't already used\n");
+        g_printerr ("That id (%s) is already used (record %d)\n",
+          stmp, i);
         g_free (stmp);
         return false;
       }
@@ -57,13 +60,21 @@ gboolean record_add (gint a, gint b, gchar *lbl, gchar *id, greal *raw,
   dtarget->nrows += 1;
 
   /*-- add a row label --*/
-  if (!lbl) s1 = g_strdup_printf ("%d", dtarget->nrows);
-  rowlabel_add ((lbl)?lbl:s1, dtarget);  /*-- don't free s1 --*/
+  if (lbl && strlen(lbl) > 0) {
+    rowlabel_add (lbl, dtarget);
+  } else {
+    s1 = g_strdup_printf ("%d", dtarget->nrows);
+    rowlabel_add (s1, dtarget);
+  }
 
   /*-- if necessary, add an id --*/
   if (dtarget->idTable) {
-    if (!id) s2 = g_strdup_printf ("%d", dtarget->nrows);
-    datad_record_id_add ((id)?id:s2, dtarget);  /*-- don't free s2 --*/
+    if (id && strlen(id) > 0) {
+      datad_record_id_add (id, dtarget);
+    } else {
+      s2 = g_strdup_printf ("%d", dtarget->nrows);
+      datad_record_id_add (s2, dtarget);  /*-- don't free s2 --*/
+    }
   }
 
   pipeline_arrays_check_dimensions (dtarget);
@@ -80,6 +91,7 @@ gboolean record_add (gint a, gint b, gchar *lbl, gchar *id, greal *raw,
     arrays_add_rows (&dtarget->missing, dtarget->nrows);
 
   /*-- read in the data, push it through the first part of the pipeline --*/
+g_printerr ("%s has %d cols\n", dtarget->name, dtarget->ncols);
   if (dtarget->ncols) {
     for (j=0; j<dtarget->ncols; j++) {
       dtarget->raw.vals[dtarget->nrows-1][j] = 
@@ -88,7 +100,7 @@ gboolean record_add (gint a, gint b, gchar *lbl, gchar *id, greal *raw,
     }
   }
 
-  if (edge_record_p) {
+  if (mode == ADDING_EDGES) {
     edges_alloc(e->nrows, e);
     e->edge.sym_endpoints[dtarget->nrows-1].a = g_strdup (d->rowIds[a]);
     e->edge.sym_endpoints[dtarget->nrows-1].b = g_strdup (d->rowIds[b]);
@@ -123,7 +135,7 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
  * This will be handled with signals, where each splotd listens
  * for (maybe) point_added or edge_added events.
 */
-  if (edge_record_p) {
+  if (mode == ADDING_EDGES) {
     for (l=gg->displays; l; l=l->next) {
       dsp = (displayd *) l->data;
       if (dsp->e == e) {

@@ -345,7 +345,7 @@ gboolean   reached_target(gfloat, gfloat, gint, gfloat *, gfloat *);
 gboolean   read_ascii_data(InputDescription *desc, ggobid *gg);
 gint       realloc_optimize0_p(optimize0_param *, gint, vector_i);
 void       recenter_data (gint, datad *, ggobid *);
-gboolean record_add (gint a, gint b, gchar *lbl, gchar *id, greal *raw, datad * d, datad * e, ggobid *gg);
+gboolean record_add (eeMode, gint a, gint b, gchar *lbl, gchar *id, greal *raw, datad * d, datad * e, ggobid *gg);
 void       datad_record_id_add (gchar *ids, datad *d);
 void       reinit_transient_brushing (displayd *, ggobid *);
 void       rejitter (gint *, gint, datad *, ggobid *);
