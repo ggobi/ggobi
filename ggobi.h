@@ -186,7 +186,7 @@ struct _ggobid {
     GtkWidget *symbol_display, *line_display;
 
     GtkWidget *colorseldlg;
-    GtkWidget *bg_da, *accent_da, *fg_da[MAXNCOLORS], *current_da;
+    GtkWidget *bg_da, *accent_da, *hidden_da, *fg_da[MAXNCOLORS], *current_da;
 
     gint spacing;
     gint margin;                /* between glyphs in the symbol_display */
