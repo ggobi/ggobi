@@ -89,7 +89,7 @@ static void tour2dadv_cb (GtkWidget *w, ggobid *gg) {
   #endif
 }
 
-static gchar *manip_lbl[] = {"Oblique", "Vert", "Horiz", "Radial",
+static gchar *manip_lbl[] = {"Off", "Oblique", "Vert", "Horiz", "Radial",
                              "Angular"};
 static void manip_cb (GtkWidget *w, gpointer cbd)
 {
@@ -542,15 +542,20 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+  ggobid *gg = GGobiFromWidget(w, true);
+  displayd *dsp = gg->current_display;
   extern void tour2d_manip_init(gint, gint, splotd *);
   gboolean button1_p, button2_p;
 
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
-  sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+  if (dsp->t2d_manip_mode != MANIP_OFF) 
+  {
+    sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
                                       (GtkSignalFunc) motion_notify_cb,
                                       (gpointer) sp);
-  tour2d_manip_init(sp->mousepos.x, sp->mousepos.y, sp);
+    tour2d_manip_init(sp->mousepos.x, sp->mousepos.y, sp);
+  }
 
   return true;
 }
