@@ -649,6 +649,12 @@ dnl might do the same thing.
 INSTALLABLE_PLUGINS=""
  for p in ${PLUGIN_DIRS} ; do 
    echo
+
+   if ! test -d "plugins/$p" ; then
+    echo "No such plugin directory: plugins/$p"
+    continue
+   fi
+
    echo "Configuring plugin $p"
    
    if test -x plugins/$p/configure ; then
