@@ -947,7 +947,7 @@ extern gboolean GGobi_getShowLines();
 /**
   @ingroup Edges
  */
-extern gboolean GGobi_setShowLines(gboolean val);
+extern gboolean GGobi_setShowLines(displayd *dsp, gboolean val);
 
 /** @} */
 
