@@ -21,6 +21,11 @@
 
 #include "write_state.h"
 
+#ifdef SUPPORT_PLUGINS
+#include "plugin.h"
+#endif
+
+
 const char *const GGOBI(OpModeNames)[] = {
   "1D Plot",
   "XYPlot",
@@ -817,9 +822,8 @@ create_ggobi(InputDescription *desc)
 void
 show_plugin_list(void *garbage, gint action, GtkWidget *w)
 {
-  extern GtkWidget * showPluginInfo (GList *plugins, ggobid *gg);
   if(sessionOptions->info && sessionOptions->info)
-    showPluginInfo(sessionOptions->info->plugins, (ggobid*) garbage);
+    showPluginInfo(sessionOptions->info->plugins, sessionOptions->info->inputPlugins, (ggobid*) garbage);
 }
 #endif
 

@@ -73,6 +73,8 @@ static void
 cancel_clicked(GtkWidget *widget, DialogInput *data)
 {
     gtk_widget_destroy(data->w);
+    g_free(data->desc->fileName);
+    g_free(data->desc);
     g_free(data);
 }
 

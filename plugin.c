@@ -49,6 +49,9 @@ Dynload *dynload = &unixDynload;
 
 #endif 
 
+void addPluginDetails(GGobiPluginDetails *info, GtkWidget *list, ggobid *gg, gboolean active);
+void addInputPlugin(GGobiInputPluginInfo *info, GtkWidget *list, ggobid *gg);
+void addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg);
 
 gboolean
 canRead(const char * const fileName)
@@ -191,7 +194,7 @@ GGOBI_removePluginInstance(PluginInstance *inst, ggobid *gg)
 
  */
 
-void addPlugins(GList *plugins, GtkWidget *list, ggobid *gg);
+void addPlugins(GList *plugins, GtkWidget *list, ggobid *gg, GGobiPluginType);
 void addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg);
 
 /*
@@ -199,7 +202,7 @@ void addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg);
  info list.
  */
 GtkWidget *
-showPluginInfo(GList *plugins, ggobid *gg)
+showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
 {
  GtkWidget *win, *main_vbox, *list;
    /* Number of entries here should be the same as in set_column_width below and 
@@ -224,7 +227,10 @@ showPluginInfo(GList *plugins, ggobid *gg)
   gtk_clist_set_column_width(GTK_CLIST(list), 5,  50); 
 
   if(plugins)
-    addPlugins(plugins, list, gg);
+    addPlugins(plugins, list, gg, GENERAL_PLUGIN);
+  if(inputPlugins)
+    addPlugins(inputPlugins, list, gg, INPUT_PLUGIN);
+
   gtk_box_pack_start(GTK_BOX(main_vbox), list, TRUE, TRUE, 0);
   gtk_widget_show(list);
   gtk_widget_show(win);
@@ -259,14 +265,25 @@ isPluginActive(GGobiPluginInfo *info, ggobid *gg)
  @see addPlugin()
  */
 void
-addPlugins(GList *plugins, GtkWidget *list, ggobid *gg)
+addPlugins(GList *plugins, GtkWidget *list, ggobid *gg, GGobiPluginType type)
 {
  int n = g_list_length(plugins), i;
  GGobiPluginInfo *plugin;
+ GGobiInputPluginInfo *iplugin;
 
  for(i = 0; i < n ; i++) {
-   plugin = (GGobiPluginInfo*) g_list_nth_data(plugins, i);
-   addPlugin(plugin, list, gg);
+     switch(type) {
+      case GENERAL_PLUGIN:
+	 plugin = (GGobiPluginInfo*) g_list_nth_data(plugins, i);
+	 addPlugin(plugin, list, gg);
+	 break;
+     case INPUT_PLUGIN:
+	 iplugin = (GGobiInputPluginInfo*) g_list_nth_data(plugins, i);
+	 addInputPlugin(iplugin, list, gg);
+	 break;
+     default:
+	 break;
+     }
  }
 }
 
@@ -280,14 +297,26 @@ addPlugins(GList *plugins, GtkWidget *list, ggobid *gg)
 void
 addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg)
 {
+    addPluginDetails(&info->details, list, gg, isPluginActive(info, gg));
+}
+
+void
+addInputPlugin(GGobiInputPluginInfo *info, GtkWidget *list, ggobid *gg)
+{
+    addPluginDetails(&info->details, list, gg, true);
+}
+
+void
+addPluginDetails(GGobiPluginDetails *info, GtkWidget *list, ggobid *gg, gboolean active)
+{
   gchar **els = (gchar **) g_malloc(6*sizeof(gchar*));
-  els[0] = info->details.name;
-  els[1] = info->details.description;
-  els[2] = info->details.author;
-  els[3] = info->details.dllName;
-  els[4] = info->details.loaded ? "yes" : "no";
-  
-  els[5] = isPluginActive(info, gg) ? "yes" : "no";
+  els[0] = info->name;
+  els[1] = info->description;
+  els[2] = info->author;
+  els[3] = info->dllName;
+  els[4] = info->loaded ? "yes" : "no";
+
+  els[5] = active ? "yes" : "no";
 
   gtk_clist_append(GTK_CLIST(list), els);
 }

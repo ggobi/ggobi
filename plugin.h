@@ -9,6 +9,8 @@ typedef void * HINSTANCE;
 #include <windows.h>
 #endif
 
+typedef enum {GENERAL_PLUGIN, INPUT_PLUGIN} GGobiPluginType;
+
 typedef void (*DLFUNC)();
 
 typedef struct {
@@ -98,5 +100,5 @@ gboolean GGOBI_removePluginInstance(PluginInstance *inst, ggobid *gg);
 void closePlugins(ggobid *gg);
 
 GGobiInputPluginInfo *runInteractiveInputPlugin(ggobid *gg);
-
+GtkWidget *showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg);
 #endif

@@ -1,3 +1,12 @@
+showPluginInfo should color the input plugins differently.
+
+Should use separate tabs and a different display for the 
+different plugin types.
+
+Plugins are not registering themselves as being loaded even after they
+are loaded. Need to set the loaded flag when we indirectly call load
+library.
+
 
 If read xml file from a URL, then want to compute the relative files
 by filling out the InputDescription. See fileset_generate....
