@@ -54,116 +54,125 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
 {
   if (gtk_signal_lookup("datad_added", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[DATAD_ADDED_SIGNAL] =
-        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
-                                         "datad_added",
-                                         GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER,
-                                         GTK_TYPE_NONE, 1,
-                                         GTK_TYPE_GGOBI_DATA);
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
+        "datad_added",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER,
+        GTK_TYPE_NONE, 1,
+        GTK_TYPE_GGOBI_DATA);
   }
 
   if (gtk_signal_lookup("brush_motion", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[BRUSH_MOTION_SIGNAL] =
-        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
-                                         "brush_motion",
-                                         GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_POINTER_POINTER,
-                                         GTK_TYPE_NONE, 3,
-                                         GTK_TYPE_GGOBI_SPLOT,
-/* GdkEventMotion pointer */             GTK_TYPE_POINTER,
-                                         GTK_TYPE_GGOBI_DATA);
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
+        "brush_motion",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER_POINTER_POINTER,
+        GTK_TYPE_NONE, 3,
+        GTK_TYPE_GGOBI_SPLOT,
+        GTK_TYPE_POINTER, /* GdkEventMotion pointer */
+        GTK_TYPE_GGOBI_DATA);
   }
 
   if (gtk_signal_lookup("move_point", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[POINT_MOVE_SIGNAL] =
-        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
-                                         "move_point",
-                                         GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_INT_POINTER,
-                                         GTK_TYPE_NONE, 3,
-                                         GTK_TYPE_GGOBI_SPLOT,
-                                         GTK_TYPE_INT,
-                                         GTK_TYPE_GGOBI_DATA);
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
+        "move_point",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER_INT_POINTER,
+        GTK_TYPE_NONE, 3,
+        GTK_TYPE_GGOBI_SPLOT,
+        GTK_TYPE_INT,
+        GTK_TYPE_GGOBI_DATA);
   }
 
   if (gtk_signal_lookup("identify_point", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[IDENTIFY_POINT_SIGNAL] =
-        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
-                                         "identify_point",
-                                         GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_INT_POINTER,
-                                         GTK_TYPE_NONE, 3,
-                                         GTK_TYPE_GGOBI_SPLOT,
-                                         GTK_TYPE_INT,
-                                         GTK_TYPE_GGOBI_DATA);
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
+        "identify_point",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER_INT_POINTER,
+        GTK_TYPE_NONE, 3,
+        GTK_TYPE_GGOBI_SPLOT,
+        GTK_TYPE_INT,
+        GTK_TYPE_GGOBI_DATA);
   }
 
   /* This should be for a ggobi datad rather than a widget. Make that a
      GtkObject and give it a type. */
   if (gtk_signal_lookup("select_variable", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[VARIABLE_SELECTION_SIGNAL] =
-        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
-                                         "select_variable",
-                                         GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_INT_POINTER,
-                                         GTK_TYPE_NONE, 3, 
-                                         GTK_TYPE_GGOBI_DATA,
-					 GTK_TYPE_INT,
-                                         GTK_TYPE_GGOBI_SPLOT);
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
+        "select_variable",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER_INT_POINTER,
+        GTK_TYPE_NONE, 3, 
+        GTK_TYPE_GGOBI_DATA,
+        GTK_TYPE_INT,
+        GTK_TYPE_GGOBI_SPLOT);
   }
 
   if (gtk_signal_lookup("splot_new", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[SPLOT_NEW_SIGNAL] =
-        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
-                                         "splot_new",
-                                         GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER,
-                                         GTK_TYPE_NONE, 1,
-                                         GTK_TYPE_GGOBI_SPLOT);
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
+        "splot_new",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER,
+        GTK_TYPE_NONE, 1,
+        GTK_TYPE_GGOBI_SPLOT);
   }
 
   if (gtk_signal_lookup("variable_added", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[VARIABLE_ADDED_SIGNAL] =
-        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
-                                         "variable_added",
-                                         GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_INT_POINTER,
-                                         GTK_TYPE_NONE, 3,
-					 GTK_TYPE_POINTER,/*vartabled XX*/
-					 GTK_TYPE_INT,/*index variable*/
-                                         GTK_TYPE_GGOBI_DATA);
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
+        "variable_added",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER_INT_POINTER,
+        GTK_TYPE_NONE, 3,
+        GTK_TYPE_POINTER,/*vartabled XX*/
+        GTK_TYPE_INT,/*index variable*/
+        GTK_TYPE_GGOBI_DATA);
   }
 
   if (gtk_signal_lookup("variable_list_changed", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL] =
-        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
-                                         "variable_list_changed",
-                                         GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER,
-                                         GTK_TYPE_NONE, 1,
-                                         GTK_TYPE_GGOBI_DATA);
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
+        "variable_list_changed",
+        GTK_RUN_LAST | GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER,
+        GTK_TYPE_NONE, 1,
+        GTK_TYPE_GGOBI_DATA);
   }
 
   if (gtk_signal_lookup("sticky_point_added", GTK_TYPE_GGOBI) == 0) {
     GGobiSignals[STICKY_POINT_ADDED_SIGNAL] = 
-	    gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), 
-					     "sticky_point_added", 
-					     GTK_RUN_LAST | GTK_RUN_ACTION, 
-					     gtk_marshal_NONE__INT_INT_POINTER,
-					     GTK_TYPE_NONE, 3, 
-					     GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI_DATA); /* record index and datad pointer */
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), 
+        "sticky_point_added", 
+        GTK_RUN_LAST | GTK_RUN_ACTION, 
+        gtk_marshal_NONE__INT_INT_POINTER,
+        GTK_TYPE_NONE, 3, 
+        GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI_DATA); /* record index and datad pointer */
   }
 
   if (gtk_signal_lookup("sticky_point_removed", GTK_TYPE_GGOBI) == 0) {
-	  GGobiSignals[STICKY_POINT_REMOVED_SIGNAL] = 
-		  gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), 
-						   "sticky_point_removed", 
-						   GTK_RUN_LAST | GTK_RUN_ACTION, 
-						   gtk_marshal_NONE__INT_INT_POINTER, 
-						   GTK_TYPE_NONE, 3, 
-						   GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI_DATA);     /* record index and datad pointer */
+    GGobiSignals[STICKY_POINT_REMOVED_SIGNAL] = 
+    gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), 
+      "sticky_point_removed", 
+      GTK_RUN_LAST | GTK_RUN_ACTION, 
+      gtk_marshal_NONE__INT_INT_POINTER, 
+      GTK_TYPE_NONE, 3, 
+      GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_GGOBI_DATA);  /* record index and datad pointer */
   }
 
+  if (gtk_signal_lookup("clusters_changed", GTK_TYPE_GGOBI) == 0) {
+    GGobiSignals[CLUSTERS_CHANGED_SIGNAL] = 
+    gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), 
+      "clusters_changed", 
+      GTK_RUN_LAST | GTK_RUN_ACTION, 
+      gtk_marshal_NONE__INT_INT_POINTER, 
+      GTK_TYPE_NONE, 1, 
+      GTK_TYPE_GGOBI_DATA);  /* datad pointer */
+  }
 }
 
 /****************************/
@@ -173,7 +182,7 @@ void gtk_ggobi_data_class_init(GtkGGobiDataClass * klass)
 {
   if (gtk_signal_lookup("rows_in_plot_changed", GTK_TYPE_GGOBI_DATA) == 0) {
     klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL] = 
-	  gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI_DATA), 
+    gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI_DATA), 
         "rows_in_plot_changed",
         GTK_RUN_LAST | GTK_RUN_ACTION, 
         gtk_marshal_NONE__INT_INT_POINTER, 
@@ -577,21 +586,21 @@ gtk_ggobi_barchart_display_get_type (void)
 
   if (!data_type)
     {
-	    /* only register once. */
+      /* only register once. */
       static const GtkTypeInfo data_info =
       {
         "GtkGGobiBarChartDisplay", /* Name of the class */
         sizeof (barchartDisplayd),       /* size of the instance of this class. */
-	sizeof (GtkGGobiBarChartDisplayClass), /* size of the class definition itself, methods, etc.*/
-	(GtkClassInitFunc) barchartDisplayClassInit, /* routine to initialize the class, set the method pointers and constants */
-	(GtkObjectInitFunc) barchartDisplayInit, 
+  sizeof (GtkGGobiBarChartDisplayClass), /* size of the class definition itself, methods, etc.*/
+  (GtkClassInitFunc) barchartDisplayClassInit, /* routine to initialize the class, set the method pointers and constants */
+  (GtkObjectInitFunc) barchartDisplayInit, 
 /* very basic routine to initialize an instance of this class, 
    after it is allocated by the Gtk system using gtk_type_new(). 
    Typically we will have a higher level routine say, gtk_<myclass>_new_with...() 
    which will in turn call gtk_type_new() and then initializes the structure with
    its own arguments.
 */
-	/* reserved_1 */ NULL,
+  /* reserved_1 */ NULL,
         /* reserved_2 */ NULL,
         (GtkClassInitFunc) NULL,
       };
@@ -737,21 +746,21 @@ gtk_ggobi_scatter_splot_get_type(void)
   static GtkType data_type = 0;
 
   if (!data_type)
+  {
+    static const GtkTypeInfo data_info =
     {
-      static const GtkTypeInfo data_info =
-      {
-	"GtkGGobiScatterSPlot",
-	sizeof (scatterSPlotd),
-	sizeof (GtkGGobiScatterSPlotClass),
-	(GtkClassInitFunc) scatterSPlotClassInit,
-	(GtkObjectInitFunc) NULL,
-	/* reserved_1 */ NULL,
-        /* reserved_2 */ NULL,
-        (GtkClassInitFunc) NULL,
-      };
+      "GtkGGobiScatterSPlot",
+      sizeof (scatterSPlotd),
+      sizeof (GtkGGobiScatterSPlotClass),
+      (GtkClassInitFunc) scatterSPlotClassInit,
+      (GtkObjectInitFunc) NULL,
+      /* reserved_1 */ NULL,
+      /* reserved_2 */ NULL,
+      (GtkClassInitFunc) NULL,
+    };
 
-      data_type = gtk_type_unique (gtk_ggobi_extended_splot_get_type (), &data_info);
-    }
+    data_type = gtk_type_unique (gtk_ggobi_extended_splot_get_type (), &data_info);
+  }
 
   return data_type;
 }
@@ -764,27 +773,24 @@ gtk_ggobi_scatterplot_display_get_type (void)
   static GtkType data_type = 0;
 
   if (!data_type)
+  {
+    static const GtkTypeInfo data_info =
     {
-      static const GtkTypeInfo data_info =
-      {
-	"GtkGGobiScatterplotDisplay",
-	sizeof (scatterplotDisplayd),
-	sizeof (GtkGGobiScatterplotDisplayClass),
-	(GtkClassInitFunc) scatterplotDisplayClassInit,
-	(GtkObjectInitFunc) scatterplotDisplayInit,
-	/* reserved_1 */ NULL,
-        /* reserved_2 */ NULL,
-        (GtkClassInitFunc) NULL,
-      };
+      "GtkGGobiScatterplotDisplay",
+      sizeof (scatterplotDisplayd),
+      sizeof (GtkGGobiScatterplotDisplayClass),
+      (GtkClassInitFunc) scatterplotDisplayClassInit,
+      (GtkObjectInitFunc) scatterplotDisplayInit,
+      /* reserved_1 */ NULL,
+      /* reserved_2 */ NULL,
+      (GtkClassInitFunc) NULL,
+    };
 
-      data_type = gtk_type_unique (gtk_ggobi_extended_display_get_type (), &data_info);
-    }
+    data_type = gtk_type_unique (gtk_ggobi_extended_display_get_type (), &data_info);
+  }
 
   return data_type;
 }
-
-
-
 
 
 /******************************************/
@@ -795,21 +801,21 @@ gtk_ggobi_scatmat_splot_get_type(void)
   static GtkType data_type = 0;
 
   if (!data_type)
+  {
+    static const GtkTypeInfo data_info =
     {
-      static const GtkTypeInfo data_info =
-      {
-	"GtkGGobiScatmatSPlot",
-	sizeof (scatmatSPlotd),
-	sizeof (GtkGGobiScatmatSPlotClass),
-	(GtkClassInitFunc) scatmatSPlotClassInit,
-	(GtkObjectInitFunc) NULL,
-	/* reserved_1 */ NULL,
-        /* reserved_2 */ NULL,
-        (GtkClassInitFunc) NULL,
-      };
+      "GtkGGobiScatmatSPlot",
+      sizeof (scatmatSPlotd),
+      sizeof (GtkGGobiScatmatSPlotClass),
+      (GtkClassInitFunc) scatmatSPlotClassInit,
+      (GtkObjectInitFunc) NULL,
+      /* reserved_1 */ NULL,
+      /* reserved_2 */ NULL,
+      (GtkClassInitFunc) NULL,
+    };
 
-      data_type = gtk_type_unique (gtk_ggobi_extended_splot_get_type (), &data_info);
-    }
+    data_type = gtk_type_unique (gtk_ggobi_extended_splot_get_type (), &data_info);
+  }
 
   return data_type;
 }
@@ -820,21 +826,21 @@ gtk_ggobi_scatmat_display_get_type (void)
   static GtkType data_type = 0;
 
   if (!data_type)
+  {
+    static const GtkTypeInfo data_info =
     {
-      static const GtkTypeInfo data_info =
-      {
-	"GtkGGobiScatmatDisplay",
-	sizeof (scatmatDisplayd),
-	sizeof (GtkGGobiScatmatDisplayClass),
-	(GtkClassInitFunc) scatmatDisplayClassInit,
-	(GtkObjectInitFunc) NULL,
-	/* reserved_1 */ NULL,
-        /* reserved_2 */ NULL,
-        (GtkClassInitFunc) NULL,
-      };
+      "GtkGGobiScatmatDisplay",
+      sizeof (scatmatDisplayd),
+      sizeof (GtkGGobiScatmatDisplayClass),
+      (GtkClassInitFunc) scatmatDisplayClassInit,
+      (GtkObjectInitFunc) NULL,
+      /* reserved_1 */ NULL,
+      /* reserved_2 */ NULL,
+      (GtkClassInitFunc) NULL,
+    };
 
-      data_type = gtk_type_unique (gtk_ggobi_extended_display_get_type (), &data_info);
-    }
+    data_type = gtk_type_unique (gtk_ggobi_extended_display_get_type (), &data_info);
+  }
 
   return data_type;
 }

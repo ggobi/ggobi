@@ -13,6 +13,7 @@ typedef void (*ggev_variable_list_changed_f)(ggobid *, datad *, void*);
 typedef void (*ggev_sticky_point_added_f)(ggobid *, gint, gint, datad *, void*);
 typedef void (*ggev_sticky_point_removed_f)(ggobid *, gint, gint, datad *, void*);
 
+typedef void (*ggev_clusters_changed_f)(ggobid *, datad *, void *);
 
 #ifdef CHECK_EVENT_SIGNATURES
 #define CHECK_EVENT_SIGNATURE(x,y)  static ggev_#y __check##x##y = &x;

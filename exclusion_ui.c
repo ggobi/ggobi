@@ -68,8 +68,8 @@ cluster_symbol_show(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   /*-- fill in the background color --*/
   gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle(w->window, gg->plot_GC,
-                     true, 0, 0,
-                     w->allocation.width, w->allocation.height);
+    true, 0, 0,
+    w->allocation.width, w->allocation.height);
 
   /*-- draw the appropriate symbol in the appropriate color --*/
   gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb[d->clusv[k].color]);
@@ -230,12 +230,6 @@ cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   gboolean proceed = true;
   gint targets = cpanel->br_point_targets;
   gint nd = g_slist_length(gg->d);
-/*
-  gint nclusters_after;
-  nclusters_after = symbol_table_populate (d);
-  if (nclusters_after != nclusters_before)
-    cluster_window_open (gg);
-*/
 
 /*
  * Almost surely the user is not trying to collapse groups, so
@@ -337,7 +331,7 @@ cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   }
 
   gtk_signal_emit_by_name(GTK_OBJECT(w), "expose_event",
-                          (gpointer) gg, (gpointer) & rval);
+    (gpointer) gg, (gpointer) & rval);
 
   /* clusters_set reorders clusv, so it's bad news here */
   /*clusters_set (d, gg); */
@@ -351,73 +345,73 @@ void cluster_add(gint k, datad * d, ggobid * gg)
 {
   gchar *str;
   gint dawidth = 2 * NGLYPHSIZES + 1 + 10;
-                                        /*-- use margin = 5 --*/
 
   d->clusvui[k].da = gtk_drawing_area_new();
 #if GTK_MAJOR_VERSION == 2
   gtk_widget_set_double_buffered(d->clusvui[j].da, false);
 #endif
   gtk_drawing_area_size(GTK_DRAWING_AREA(d->clusvui[k].da),
-                        dawidth, dawidth);
+    dawidth, dawidth);
 
   gtk_widget_set_events(d->clusvui[k].da,
-                        GDK_EXPOSURE_MASK
-                        | GDK_ENTER_NOTIFY_MASK
-                        | GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);
+    GDK_EXPOSURE_MASK | GDK_ENTER_NOTIFY_MASK
+    | GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);
 
   gtk_signal_connect(GTK_OBJECT(d->clusvui[k].da), "expose_event",
-                     GTK_SIGNAL_FUNC(cluster_symbol_show),
-                     GINT_TO_POINTER(k));
+    GTK_SIGNAL_FUNC(cluster_symbol_show),
+    GINT_TO_POINTER(k));
   gtk_signal_connect(GTK_OBJECT(d->clusvui[k].da), "button_press_event",
-                     GTK_SIGNAL_FUNC(cluster_symbol_cb),
-                     GINT_TO_POINTER(k));
+    GTK_SIGNAL_FUNC(cluster_symbol_cb),
+    GINT_TO_POINTER(k));
   GGobi_widget_set(d->clusvui[k].da, gg, true);
-  gtk_table_attach(GTK_TABLE(d->cluster_table), d->clusvui[k].da, 0, 1, k + 1, k + 2, (GtkAttachOptions) 0, (GtkAttachOptions) 0, 5, 2);
-                                                      /*-- don't fill --*/
+  gtk_table_attach(GTK_TABLE(d->cluster_table), d->clusvui[k].da,
+    0, 1, k + 1, k + 2,
+    (GtkAttachOptions) 0, (GtkAttachOptions) 0, 5, 2);
+
 
   d->clusvui[k].h_btn = gtk_button_new_with_label("H");
   gtk_signal_connect(GTK_OBJECT(d->clusvui[k].h_btn), "clicked",
-                     GTK_SIGNAL_FUNC(hide_cluster_cb), GINT_TO_POINTER(k));
+    GTK_SIGNAL_FUNC(hide_cluster_cb), GINT_TO_POINTER(k));
   GGobi_widget_set(d->clusvui[k].h_btn, gg, true);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
-                   d->clusvui[k].h_btn,
-                   1, 2, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+    d->clusvui[k].h_btn,
+    1, 2, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
 
   d->clusvui[k].s_btn = gtk_button_new_with_label("S");
   gtk_signal_connect(GTK_OBJECT(d->clusvui[k].s_btn), "clicked",
                      GTK_SIGNAL_FUNC(show_cluster_cb), GINT_TO_POINTER(k));
   GGobi_widget_set(d->clusvui[k].s_btn, gg, true);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
-                   d->clusvui[k].s_btn,
-                   2, 3, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+    d->clusvui[k].s_btn,
+    2, 3, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
 
   d->clusvui[k].c_btn = gtk_button_new_with_label("C");
   gtk_signal_connect(GTK_OBJECT(d->clusvui[k].c_btn), "clicked",
                      GTK_SIGNAL_FUNC(comp_cluster_cb), GINT_TO_POINTER(k));
   GGobi_widget_set(d->clusvui[k].c_btn, gg, true);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
-                   d->clusvui[k].c_btn,
-                   3, 4, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+    d->clusvui[k].c_btn,
+    3, 4, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
 
   str = g_strdup_printf("%ld", d->clusv[k].nhidden);
   d->clusvui[k].nh_lbl = gtk_label_new(str);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
-                   d->clusvui[k].nh_lbl,
-                   4, 5, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+    d->clusvui[k].nh_lbl,
+    4, 5, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
   g_free(str);
 
   str = g_strdup_printf("%ld", d->clusv[k].nshown);
   d->clusvui[k].ns_lbl = gtk_label_new(str);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
-                   d->clusvui[k].ns_lbl,
-                   5, 6, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+    d->clusvui[k].ns_lbl,
+    5, 6, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
   g_free(str);
 
   str = g_strdup_printf("%ld", d->clusv[k].n);
   d->clusvui[k].n_lbl = gtk_label_new(str);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
-                   d->clusvui[k].n_lbl,
-                   6, 7, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
+    d->clusvui[k].n_lbl,
+    6, 7, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
   g_free(str);
 }
 
@@ -438,6 +432,7 @@ void cluster_free(gint k, datad * d, ggobid * gg)
 static void update_cb(GtkWidget * w, ggobid * gg)
 {
   cluster_window_open(gg);
+  /*-- and emit an event --*/
 }
 
 static gboolean nclusters_changed(ggobid * gg)
@@ -477,7 +472,7 @@ void cluster_table_update(datad * d, ggobid * gg)
     if (nclusters_changed(gg)) {   /*-- for any of the datad's --*/
       cluster_window_open(gg);
     } else {
-      cluster_table_labels_update(d, gg);       /*-- d, or all d's? --*//* do all */
+      cluster_table_labels_update(d, gg); /*-- d, or all d's? --*//* do all */
     }
   }
 }
@@ -513,9 +508,9 @@ void cluster_window_open(ggobid * gg)
       !GTK_WIDGET_REALIZED(gg->cluster_ui.window)) {
     gg->cluster_ui.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_signal_connect(GTK_OBJECT(gg->cluster_ui.window), "delete_event",
-                       GTK_SIGNAL_FUNC(close_wmgr_cb), (gpointer) gg);
+      GTK_SIGNAL_FUNC(close_wmgr_cb), (gpointer) gg);
     gtk_window_set_title(GTK_WINDOW(gg->cluster_ui.window),
-                         "color & glyph groups");
+      "color & glyph groups");
   }
 
   vbox = gtk_vbox_new(false, 5);
@@ -528,9 +523,9 @@ void cluster_window_open(ggobid * gg)
   /* Create a notebook, set the position of the tabs */
   gg->cluster_ui.notebook = gtk_notebook_new();
   gtk_notebook_set_tab_pos(GTK_NOTEBOOK(gg->cluster_ui.notebook),
-                           GTK_POS_TOP);
+    GTK_POS_TOP);
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(gg->cluster_ui.notebook),
-                             g_slist_length(gg->d) > 1);
+    g_slist_length(gg->d) > 1);
   gtk_container_add(GTK_CONTAINER(tebox), gg->cluster_ui.notebook);
 
   for (l = gg->d; l; l = l->next) {
@@ -540,95 +535,99 @@ void cluster_window_open(ggobid * gg)
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_object_set_data(GTK_OBJECT(scrolled_window), "datad", d);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
-                                   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(gg->cluster_ui.notebook),
-                             scrolled_window, gtk_label_new(d->name));
+      scrolled_window, gtk_label_new(d->name));
     gtk_widget_show(scrolled_window);
 
     d->cluster_table = gtk_table_new(d->nclusters + 1, 7, false);
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW
-                                          (scrolled_window),
-                                          d->cluster_table);
+      (scrolled_window), d->cluster_table);
 
     /*-- add the row of titles --*/
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-                         "Click to change the color/glyph of all members of the selected cluster to the current brushing color/glyph",
-                         NULL);
+      "Click to change the color/glyph of all members of the selected cluster to the current brushing color/glyph",
+      NULL);
     lbl = gtk_label_new("Symbol");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox, 0, 1, 0, 1,
-                   /*-- left, right, top, bottom --*/
-                     GTK_FILL, GTK_FILL, 5, 2);
+      /*-- left, right, top, bottom --*/
+      GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-                         "Hide all cases with the corresponding symbol",
-                         NULL);
+      "Hide all cases with the corresponding symbol",
+      NULL);
     lbl = gtk_label_new("Hide");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-                     1, 2, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+      1, 2, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-                         "Show all cases with the corresponding symbol",
-                         NULL);
+      "Show all cases with the corresponding symbol",
+      NULL);
     lbl = gtk_label_new("Show");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-                     2, 3, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+      2, 3, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-                         "Complement: Show/hide all cases with the corresponding symbol that are hidden/shown",
-                         NULL);
+      "Complement: Show/hide all cases with the corresponding symbol that are hidden/shown",
+      NULL);
     lbl = gtk_label_new("Comp");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-                     3, 4, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+      3, 4, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-                         "The number of hidden cases out of N with the corresponding symbol.",
-                         NULL);
+      "The number of hidden cases out of N with the corresponding symbol.",
+      NULL);
     lbl = gtk_label_new("Hidden");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-                     4, 5, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+      4, 5, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-                         "The number of visible cases out of N with the corresponding symbol.",
-                         NULL);
+      "The number of visible cases out of N with the corresponding symbol.",
+      NULL);
     lbl = gtk_label_new("Shown");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-                     5, 6, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+      5, 6, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new();
     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-                         "The number of cases with the corresponding symbol.  If sampling, the number of cases in the current subsample",
-                         NULL);
+      "The number of cases with the corresponding symbol.  If sampling, the number of cases in the current subsample",
+      NULL);
     lbl = gtk_label_new("N");
     gtk_container_add(GTK_CONTAINER(ebox), lbl);
     gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-                     6, 7, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
+      6, 7, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     d->clusvui = (clusteruid *)
-        g_realloc(d->clusvui, d->nclusters * sizeof(clusteruid));
+      g_realloc(d->clusvui, d->nclusters * sizeof(clusteruid));
     /*-- add the cluster rows, one by one --*/
     for (k = 0; k < d->nclusters; k++)
       cluster_add(k, d, gg);
+
+    /* This will become an event on the datad when we move to
+       Gtk objects (soon now!) */
+    /*-- this doesn't track cluster counts, just cluster identities --*/
+    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[CLUSTERS_CHANGED_SIGNAL], d);
   }
 
   /*-- listen for datad_added events on main_window --*/
   gtk_signal_connect(GTK_OBJECT(gg),
-                     "datad_added",
-                     GTK_SIGNAL_FUNC(exclusion_notebook_adddata_cb),
-                     GTK_OBJECT(gg->cluster_ui.notebook));
+    "datad_added",
+    GTK_SIGNAL_FUNC(exclusion_notebook_adddata_cb),
+    GTK_OBJECT(gg->cluster_ui.notebook));
 
   /*-- give the window an initial height --*/
   gtk_widget_set_usize(GTK_WIDGET(scrolled_window), -1, 150);
@@ -640,25 +639,25 @@ void cluster_window_open(ggobid * gg)
   /*-- Update button --*/
   btn = gtk_button_new_with_label("Update");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-                       "This table should stay up to date by itself, but this will reset it in case it doesn't do that.",
-                       NULL);
+    "This table should stay up to date by itself, but this will reset it in case it doesn't do that.",
+    NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-                     GTK_SIGNAL_FUNC(update_cb), (gpointer) gg);
+    GTK_SIGNAL_FUNC(update_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(hbox), btn, true, true, 0);
 
   /*-- Rescale button --*/
   btn = gtk_button_new_with_label("Rescale");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-                       "Reset the plotting limits; use to rescale in response to hiding (or showing) points.",
-                       NULL);
+    "Reset the plotting limits; use to rescale in response to hiding (or showing) points.",
+    NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-                     GTK_SIGNAL_FUNC(rescale_cb), (gpointer) gg);
+    GTK_SIGNAL_FUNC(rescale_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(hbox), btn, true, true, 0);
 
   /*-- Close button --*/
   btn = gtk_button_new_with_label("Close");
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-                     GTK_SIGNAL_FUNC(close_btn_cb), (gpointer) gg);
+    GTK_SIGNAL_FUNC(close_btn_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(hbox), btn, true, true, 0);
 
   gtk_widget_show_all(gg->cluster_ui.window);
