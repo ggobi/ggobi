@@ -5,7 +5,7 @@ endif
 
 DIR_NAME=JVM
 
-include $(GGOBI_HOME)/plugins/GNUmakefile.Plugin
+include $(GGOBI_HOME)/plugins/GNUmakefile.PluginAdmin
 
 JAVA_SRC=BulkPlugin CStruct  DummyPlugin InputPlugin RandomPlugin RecordWisePlugin TestPlugin \
          bar datad ggobi plugin
@@ -23,3 +23,4 @@ createDist:: $(JAVA_CODE) GGobi.jar
 	if test ! -d $(INSTALL_DIR)/$(DIR_NAME)/ggobi ; then mkdir $(INSTALL_DIR)/$(DIR_NAME)/ggobi ; fi
 	cp $(JAVA_CODE) $(INSTALL_DIR)/$(DIR_NAME)/ggobi
 	cp GGobi.jar $(INSTALL_DIR)/$(DIR_NAME)
+	cp vendor.class $(INSTALL_DIR)/$(DIR_NAME)
