@@ -24,7 +24,7 @@
 void
 splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
-  gint j, ix, iy;
+  gint j, k, ix, iy;
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->projection;
@@ -63,15 +63,16 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
           GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
-        for (j=0; j<d->ncols; j++) {
+        for (k=0; k<dsp->t1d.nsubset; k++) {
+          j = dsp->t1d.subset_vars.els[k];
           ix = dawidth/2 + (gint) (dsp->t1d.F.vals[0][j]*(gfloat) dawidth/4);
-          iy = daheight - 10 - (d->ncols-1-j)*textheight;
+          iy = daheight - 10 - (dsp->t1d.nsubset-1-k)*textheight;
           if (j == dsp->t1d_manip_var)
             gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
           else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
-            dawidth/2, daheight - 10 - (d->ncols-1-j)*textheight,
+            dawidth/2, daheight - 10 - (dsp->t1d.nsubset-1-k)*textheight,
             ix, iy);
 /*
  * An experiment:  add the labels only for those variables with
@@ -103,7 +104,8 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           dawidth/4, daheight/4, 0,360*64);
 
         /* draw the axes and labels */
-        for (j=0; j<d->ncols; j++) {
+        for (k=0; k<dsp->t2d3.nsubset; k++) {
+          j = dsp->t2d3.subset_vars.els[k];
           ix = dawidth/8 + axindent +
             (gint) (dsp->t2d3.F.vals[0][j]* (gfloat) dawidth/8);
           iy = daheight - axindent - (daheight/8 + 
@@ -156,14 +158,14 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           if (dsp->options.axes_values_p) {
             varval = g_strdup_printf ("%d:%4.3f,%4.3f",j+1,
               dsp->t2d3.F.vals[0][j],dsp->t2d3.F.vals[1][j]);
-            if (j == 0) {
+            if (k == 0) {
               splot_text_extents (varval, style, 
-                &lbearing, &rbearing, &width, &ascent, &descent);
+                &lbearing, &rbearing, &width2, &ascent, &descent);
               textheight2 = ascent+descent+5;
             }
 
             ix = dawidth - width2 - axindent;
-            iy = daheight - (d->ncols-j-1)*textheight2 - axindent;
+            iy = daheight - (dsp->t2d3.nsubset-k-1)*textheight2 - axindent;
             splot_draw_string (varval, ix, iy, style, drawable, gg);
             g_free (varval);
           }
@@ -180,7 +182,8 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           daheight/4, daheight/4, 0,360*64);
 
         /* draw the axes and labels */
-        for (j=0; j<d->ncols; j++) {
+        for (k=0; k<dsp->t2d.nsubset; k++) {
+          j = dsp->t2d.subset_vars.els[k];
           ix = daheight/8 + axindent +
             (gint) (dsp->t2d.F.vals[0][j]* (gfloat) daheight/8);
           iy = daheight - axindent - (daheight/8 + 
@@ -235,14 +238,14 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             varval = g_strdup_printf ("%d:%4.3f,%4.3f(%.2f)",j+1,
               dsp->t2d.F.vals[0][j],dsp->t2d.F.vals[1][j],
               vt->lim.max-vt->lim.min);
-            if (j == 0) {
+            if (k == 0) {
               splot_text_extents (varval, style, 
                 &lbearing, &rbearing, &width2, &ascent, &descent);
               textheight2 = ascent+descent+5;
             }
 
             ix = dawidth - width2 - axindent;
-            iy = daheight - (d->ncols-j-1)*textheight2 - axindent;
+            iy = daheight - (dsp->t2d.nsubset-k-1)*textheight2 - axindent;
             splot_draw_string (varval, ix, iy, style, drawable, gg);
             g_free (varval);
           }
