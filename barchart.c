@@ -511,8 +511,15 @@ void barchart_allocate_structure(barchartSPlotd * sp, datad * d)
     nbins = sp->bar->new_nbins;
   sp->bar->new_nbins = -1;
 
-  rawsp->p1d.lim.min = vtx->lim_raw.min;
-  rawsp->p1d.lim.max = vtx->lim_raw.max;
+/* This is ignoring variable transformation ... */
+  if (vtx->lim_specified_p) {
+    rawsp->p1d.lim.min = vtx->lim_specified.min;
+    rawsp->p1d.lim.max = vtx->lim_specified.max;
+  } else {
+    rawsp->p1d.lim.min = vtx->lim_raw.min;
+    rawsp->p1d.lim.max = vtx->lim_raw.max;
+  }
+
 
   if (sp->bar->nbins && nbins == sp->bar->nbins)
     return;                     /* nothing else to be done */
@@ -556,9 +563,14 @@ void barchart_init_categorical(barchartSPlotd * sp, datad * d)
     yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];
 
   mindist = barchart_sort_index(yy, d->nrows_in_plot, gg, sp);
-
   g_free((gpointer) yy);
-  maxheight = vtx->lim_raw.max - vtx->lim_raw.min;
+
+/* This is ignoring variable transformation ... */
+  if (vtx->lim_specified_p) {
+    maxheight = vtx->lim_specified.max - vtx->lim_specified.min;
+  } else {
+    maxheight = vtx->lim_raw.max - vtx->lim_raw.min;
+  }
   rawsp->scale.y = SCALE_DEFAULT * maxheight / (maxheight + mindist);
 }
 
@@ -1087,7 +1099,7 @@ barchart_sort_index(gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
 {
   gint i, *indx;
   gint rank;
-  gfloat mindist;
+  gfloat mindist = 0.0;
 
   indx = (gint *) g_malloc(ny * sizeof(gint));
 
