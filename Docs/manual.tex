@@ -1375,10 +1375,19 @@ variables yet.
 The {\bf Color \& glyph groups} tool displays a table.  Each unique
 symbol in the data (combination of color and glyph) occupies a row,
 and for each row there are three buttons:  {\bf H} hides all points
-drawn in the chosen symbol, {\bf S} shows them all, and {\bf C} 
-(complement) hides
-what's shown and shows what's hidden.  The three remaining columns
-report the number of cases hidden, the number shown, and the sum.
+drawn in the chosen symbol, {\bf S} shows them all, and {\bf C}
+(complement) hides what's shown and shows what's hidden.  The three
+remaining columns report the number of cases hidden, the number
+shown, and the sum.
+
+Clicking on one of the little symbol displays will assign the
+currently selected color and/or glyph (depending on the state of the
+Point Brushing menu on the Brush control panel) to all the points in
+the corresponding cluster.  If your selection would collapse two
+clusters into one, it will refuse to go ahead:  it seems highly
+likely that someone might do that by mistake, and unlikely that they
+would do it deliberately.  (That choice should be resolved by a
+dialog, probably, and an 'undo' button should be added.)
 
 The {\bf Update} button at the bottom of the window will reset the
 contents of the table in case it isn't responding to changes in the
