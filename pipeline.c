@@ -299,33 +299,39 @@ mean_largest_dist (gfloat **vals, gint *cols, gint ncols,
 }
 
 void
-tform_to_world (datad *d, ggobid *gg)
+tform_to_world_by_var (gint j, datad *d, ggobid *gg)
 {
-/*
- * Take tform[][], one column at a time, and generate
- * world_data[]
-*/
-  gint i, j, m;
+  gint i, m;
   gfloat max, min, range, ftmp;
   gfloat precis = PRECISION1;
 
-  pipeline_arrays_check_dimensions (d);  /*-- realloc if needed --*/
+  max = d->vartable[j].lim.max;
+  min = d->vartable[j].lim.min;
+  range = max - min;
 
-  for (j=0; j<d->ncols; j++) {
+  for (i=0; i<d->nrows_in_plot; i++) {
+    m = d->rows_in_plot[i];
+    ftmp = -1.0 + 2.0*(d->tform.vals[m][j] - min) / range;
+    d->world.vals[m][j] = (glong) (precis * ftmp);
 
-    max = d->vartable[j].lim.max;
-    min = d->vartable[j].lim.min;
-    range = max - min;
-
-    for (i=0; i<d->nrows_in_plot; i++) {
-      m = d->rows_in_plot[i];
-      ftmp = -1.0 + 2.0*(d->tform.vals[m][j] - min) / range;
-      d->world.vals[m][j] = (glong) (precis * ftmp);
-
-      /* Add in the jitter values */
-      d->world.vals[m][j] += d->jitdata.vals[m][j];
-    }
+    /* Add in the jitter values */
+    d->world.vals[m][j] += d->jitdata.vals[m][j];
   }
+}
+
+void
+tform_to_world (datad *d, ggobid *gg)
+{
+/*
+ * Take tform.vals[][], one column at a time, and generate
+ * world_data[]
+*/
+  gint j;
+
+  pipeline_arrays_check_dimensions (d);  /*-- realloc as necessary --*/
+
+  for (j=0; j<d->ncols; j++)
+    tform_to_world_by_var (j, d, gg);
 }
 
 /*-------------------------------------------------------------------------*/

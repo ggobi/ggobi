@@ -26,6 +26,13 @@ extern gfloat no_change (gfloat, gfloat);
 }
 #endif
 
+gboolean vartable_update_cloned_var (gint nc, gint jvar, datad *, ggobid *);
+
+
+/*-------------------------------------------------------------------------*/
+/*                         memory management                               */
+/*-------------------------------------------------------------------------*/
+
 void vartable_alloc (datad *d, ggobid *gg)
 {
   if (d->vartable != NULL)
@@ -40,6 +47,7 @@ void vartable_realloc (gint n, datad *d, ggobid *gg)
     n * sizeof (vartabled));
 }
 
+/*-------------------------------------------------------------------------*/
 
 void vartable_init (datad *d, ggobid *gg)
 {
@@ -230,18 +238,18 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   d->vartable[nc-1].nmissing = d->vartable[jvar].nmissing;
 
   if (update) {
-    updateAddedColumn (nc, jvar, d, gg);
+    vartable_update_cloned_var (nc, jvar, d, gg);
   }
 
   gtk_widget_show_all (gg->varpanel_ui.notebook);
 }
 
 gboolean
-updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
+vartable_update_cloned_var (gint nc, gint jvar, datad *d, ggobid *gg)
 {
   gint i;
+  gint *cols = g_malloc (1 * sizeof (gint));
 
-/*-- vartable --*/
   if (jvar > -1) {
     d->vartable[nc-1].mean = d->vartable[jvar].mean;
     d->vartable[nc-1].median = d->vartable[jvar].median;
@@ -254,23 +262,34 @@ updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
   } 
 
   transform_values_init (nc-1, d, gg);
-/*-- --*/
 
 /*-- pipeline --*/
 /*
   pipeline_arrays_add_column (jvar, d, gg);
 */
 
+  /*-- this replaces pipeline_arrays_add_column for now --*/
   arrayf_add_cols (&d->raw, nc);  /*-- adding exactly one column --*/
   arrayf_add_cols (&d->tform, nc);
   for (i=0; i<d->nrows; i++)
     d->raw.vals[i][nc-1] = d->tform.vals[i][nc-1] = d->raw.vals[i][jvar];
+  /*-- --*/
 
   missing_arrays_add_column (jvar, d, gg);
 
   d->ncols++;
-  tform_to_world (d, gg); /*-- need this only for the new variable --*/
+  tform_to_world_by_var (jvar, d, gg);
 
+  g_free (cols);
   return (true);
 }
 
+
+void clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
+{
+
+}
+void delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
+{
+
+}

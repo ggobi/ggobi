@@ -27,6 +27,29 @@ static void hide_cb (GtkWidget *w, ggobid *gg)
   gtk_widget_hide (gg->vartable_ui.window);
 }
 
+static void
+clone_vars_cb (GtkWidget *w, ggobid *gg)
+{
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint ncols = selected_cols_get (cols, d, gg);
+  extern void clone_vars (gint *, gint, datad *, ggobid *);
+
+  if (ncols > 0)
+    clone_vars (cols, ncols, d, gg);
+}
+static void
+delete_vars_cb (GtkWidget *w, ggobid *gg)
+{
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint ncols = selected_cols_get (cols, d, gg);
+  extern void delete_vars (gint *, gint, datad *, ggobid *);
+
+  if (ncols > 0)
+    delete_vars (cols, ncols, d, gg);
+}
+
 static GtkCList *
 vartable_clist_get (ggobid *gg) {
   GtkNotebook *nb = GTK_NOTEBOOK (gg->vartable_ui.notebook);
@@ -397,6 +420,7 @@ vartable_open (ggobid *gg)
 
     hbox = gtk_hbox_new (true, 10);
 
+    /*-- set and unset ranges --*/
     btn = gtk_button_new_with_label ("Set range ... ");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Set user min and max for the selected variable(s)", NULL);
@@ -411,7 +435,9 @@ vartable_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (range_unset_cb), gg);
+    /*--  --*/
 
+    /*-- Make and clear selections --*/
     btn = gtk_button_new_with_label ("Select all");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Select all variables", NULL);
@@ -425,6 +451,23 @@ vartable_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (deselect_all_cb), gg);
+    /*-- --*/
+
+    /*-- Clone or delete selected variables --*/
+    btn = gtk_button_new_with_label ("Clone");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Clone selected variables", NULL);
+    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                        GTK_SIGNAL_FUNC (clone_vars_cb), gg);
+
+    btn = gtk_button_new_with_label ("Delete");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Delete selected variables", NULL);
+    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                        GTK_SIGNAL_FUNC (delete_vars_cb), gg);
+    /*-- --*/
 
     btn = gtk_button_new_with_label ("Close");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
