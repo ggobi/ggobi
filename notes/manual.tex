@@ -727,9 +727,7 @@ active variable space. The projected data are displayed as an average
 shifted histogram, horizontally or vertically. The scrollbar at the
 top of the controls allows the speed of rotation to be adjusted. The
 pause checkbox stops and starts the tour. Reinit initializes the tour
-to the projection of the first active variable. A rudimentary guided
-tour is available from the projection pursuit control panel. Currently
-only the principal component index is implemented.
+to the projection of the first active variable. 
 
 Variables can be toggled into the tour by clicking on the variable
 circles. The active variable space is the subset of variables
@@ -746,6 +744,11 @@ coefficients of other active variables.
 The variable axes can be toggled on or off using the options menu at
 the top of the plot window.
 
+A rudimentary guided tour is available when the {\bf Projection
+Pursuit} button is selected. It is controlled through a separate
+pop-up projection pursuit window. Currently only the principal
+component index is implemented.
+
 \subsection{2D Tour}
 \label{slbl:2DTour}
 
@@ -754,9 +757,7 @@ active variable space. The projected data are displayed as a
 scatterplot. The scrollbar at the top of the controls allows the speed
 of rotation to be adjusted. The pause checkbox stops and starts the
 tour. Reinit initializes the tour to the projection of the first two
-active variables. A rudimentary guided tour is available from the
-projection pursuit control panel. Currently only the holes and central
-mass indices are implemented.
+active variables. 
 
 Variables can be toggled into the tour by clicking on the variable
 circles. The active variable space is the subset of variables
@@ -777,6 +778,15 @@ the plot window, keeping the length of the axis fixed.
 
 The variable axes can be toggled on or off using the options menu at
 the top of the plot window.
+
+A rudimentary guided tour is available from the projection pursuit
+control panel. Currently only the holes and central mass indices are
+implemented. Projection pursuit in the 2D tour requires the variables
+to be sphered ahead of time. So the user needs to first enter the {\bf
+Tools} menu and use the {\bf Sphering...} tool to clone sphered
+counterparts of the currently active variables. Once this is done then
+the {\bf Projection Pursuit} option can be chosen. This pops up a new
+window which provides an interface to guiding the tour.
 
 \subsection{2x1D Tour}
 \label{slbl:2x1DTour}
@@ -1232,8 +1242,6 @@ not specifically assigned an id to a case, then it doesn't have one.
 This is described in more detail in the XML documentation.
 
 \section{Edges}
-
-*** Debby, I'm not sure what you want to say here???
 
 \newpage
 \section{Differences from XGobi}
