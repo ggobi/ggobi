@@ -221,8 +221,8 @@ void datad_instance_init(datad * d)
   /*-- initialize arrays to NULL --*/
   arrayf_init_null(&d->raw);
   arrayf_init_null(&d->tform);
-  arrayl_init_null(&d->world);
-  arrayl_init_null(&d->jitdata);
+  arrayg_init_null(&d->world);
+  arrayg_init_null(&d->jitdata);
 
   arrays_init_null(&d->missing);
 

@@ -35,8 +35,8 @@ datad_new(datad *d, ggobid *gg)
   /*-- initialize arrays to NULL --*/
   arrayf_init_null (&d->raw);
   arrayf_init_null (&d->tform);
-  arrayl_init_null (&d->world);
-  arrayl_init_null (&d->jitdata);
+  arrayg_init_null (&d->world);
+  arrayg_init_null (&d->jitdata);
 
   arrays_init_null (&d->missing);
 

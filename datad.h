@@ -78,7 +78,7 @@ struct _datad {
   gboolean single_column; /*-- not handling single-column case now --*/
 
   array_f raw, tform;
-  array_l world, jitdata;
+  array_g world, jitdata;  /* convert these first; planar etc later */
 
  /*----------------------- missing values ---------------------------*/
 

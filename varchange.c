@@ -310,10 +310,10 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   if (d->nmissing)
     arrays_delete_cols (&d->missing, ncols, cols);
 
-  arrayl_delete_cols (&d->jitdata, ncols, cols);
+  arrayg_delete_cols (&d->jitdata, ncols, cols);
 
   /*-- reallocate the rest of the arrays --*/
-  arrayl_alloc (&d->world, d->nrows, nkeepers);
+  arrayg_alloc (&d->world, d->nrows, nkeepers);
 
   /*-- delete checkboxes --*/
   for (j=ncols-1; j>=0; j--) {
