@@ -21,44 +21,44 @@ set_tour1dvar(ggobid *gg, gint jvar)
   extern void init_basis(displayd *, ggobid *);
 
   for (j=0; j<dsp->ntour_vars; j++)
-    if (jvar == dsp->tour_vars[j])
+    if (jvar == dsp->tour_vars.vals[j])
       selected = true;
 
   /* deselect var if ntour_vars > 2 */
   if (selected) {
     if (dsp->ntour_vars > 2) {
       for (j=0; j<dsp->ntour_vars; j++) {
-        if (jvar == dsp->tour_vars[j]) 
+        if (jvar == dsp->tour_vars.vals[j]) 
           break;
       }
       if (j<dsp->ntour_vars-1) {
         for (k=j; k<dsp->ntour_vars-1; k++){
-          dsp->tour_vars[k] = dsp->tour_vars[k+1];
+          dsp->tour_vars.vals[k] = dsp->tour_vars.vals[k+1];
 	}
       }
       dsp->ntour_vars--;
     }
   }
   else { /* not selected, so add the variable */
-    if (jvar > dsp->tour_vars[dsp->ntour_vars-1]) {
-      dsp->tour_vars[dsp->ntour_vars] = jvar;
+    if (jvar > dsp->tour_vars.vals[dsp->ntour_vars-1]) {
+      dsp->tour_vars.vals[dsp->ntour_vars] = jvar;
     }
-    else if (jvar < dsp->tour_vars[0]) {
+    else if (jvar < dsp->tour_vars.vals[0]) {
       for (j=dsp->ntour_vars; j>0; j--) {
-          dsp->tour_vars[j] = dsp->tour_vars[j-1];
+          dsp->tour_vars.vals[j] = dsp->tour_vars.vals[j-1];
       }
-      dsp->tour_vars[0] = jvar;
+      dsp->tour_vars.vals[0] = jvar;
     }
     else {
       for (j=0; j<dsp->ntour_vars-1; j++) {
-        if (jvar > dsp->tour_vars[j] && jvar < dsp->tour_vars[j+1]) {
+        if (jvar > dsp->tour_vars.vals[j] && jvar < dsp->tour_vars.vals[j+1]) {
           jtmp = j+1;
           break;
 	}
       }
       for (j=dsp->ntour_vars-1;j>=jtmp; j--) 
-          dsp->tour_vars[j+1] = dsp->tour_vars[j];
-      dsp->tour_vars[jtmp] = jvar;
+          dsp->tour_vars.vals[j+1] = dsp->tour_vars.vals[j];
+      dsp->tour_vars.vals[jtmp] = jvar;
     }
     dsp->ntour_vars++;
   }
@@ -96,7 +96,7 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      yy[i] += (gint)(dsp->u[0][j]*world_data[i][j]);
+      yy[i] += (gint)(dsp->u.vals[0][j]*world_data[i][j]);
     }
   }
   do_ash1d (yy, d->nrows_in_plot,
@@ -155,7 +155,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
   else { /* do final clean-up and get new target */
     if (!dsp->tour_get_new_target)
       do_last_increment(dsp, (gint) 1);
-    copy_mat(dsp->u0.vals, dsp->u, d->ncols, 1);
+    copy_mat(dsp->u0.vals, dsp->u.vals, d->ncols, 1);
     tour_reproject(dsp, 1);
     gt_basis(dsp, gg, (gint) 1);
     path(dsp, (gint) 1);
@@ -219,10 +219,10 @@ void tour1d_reinit(ggobid *gg)
   for (i=0; i<1; i++) {
     for (j=0; j<dsp->ntour_vars; j++) {
       dsp->u0.vals[i][j] = 0.;
-      dsp->u[i][j] = 0.;
+      dsp->u.vals[i][j] = 0.;
     }
     dsp->u0.vals[i][i] = 1.;
-    dsp->u[i][i] = 1.;
+    dsp->u.vals[i][i] = 1.;
   }
 
   dsp->tour_get_new_target = true;

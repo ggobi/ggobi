@@ -69,11 +69,14 @@ struct _displayd {
 /*
  * Tour display
  */
-  gint ntour_vars, *tour_vars;
-  array_f u0;
-  gfloat **u1, **u, **uold, **v0, **v1, **v, **uvevec;
-  gfloat *lambda, *tau, *tinc, dv, delta;
-  gfloat **tv;
+  gint ntour_vars; 
+  vector_i tour_vars;
+  array_f u0, u1, u, uold, v0, v1, v, uvevec, tv;
+  vector_f lambda, tau, tinc;
+  /*  gfloat **u, **uold, **v0, **v1, **v, **uvevec;*/
+  /*  gfloat *lambda, *tau, *tinc,;*/
+  gfloat dv, delta;
+  /*  gfloat **tv;*/
   /*  gfloat ts[2], coss[2], sins[2];
   gint icoss[2], isins[2];*//* di - not sure i need this in the new code.*/
   gint tour_idled;

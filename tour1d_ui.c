@@ -209,7 +209,7 @@ static void go_cb (GtkButton *button, ggobid *gg)
   extern void tour1d_do_step(displayd *,ggobid *);
 
   g_printerr ("go\n");
-  g_printerr ("in go_cb %f \n",dsp->tau[0]);
+  g_printerr ("in go_cb %f \n",dsp->tau.vals[0]);
 
   tour1d_do_step (dsp, gg);
 }

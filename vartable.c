@@ -82,9 +82,13 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
           cols[ncols++] = sp->xyvars.x;
           cols[ncols++] = sp->xyvars.y;
         break;
-        case TOUR2D:
+        case TOUR1D:
           for (k=0; k<display->ntour_vars; k++)
-            cols[ncols++] = display->tour_vars[k];
+            cols[ncols++] = display->tour_vars.vals[k];
+        break;
+         case TOUR2D:
+          for (k=0; k<display->ntour_vars; k++)
+            cols[ncols++] = display->tour_vars.vals[k];
         break;
       }
     break;
@@ -274,11 +278,11 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
         vars = (gint *)
           g_malloc (MIN (display->ntour_vars, d->ncols) * sizeof (gint));
         for (j=0; j<display->ntour_vars; j++)
-          if (display->tour_vars[j] < d->ncols-1)
-            vars[n++] = display->tour_vars[j];
+          if (display->tour_vars.vals[j] < d->ncols-1)
+            vars[n++] = display->tour_vars.vals[j];
 
         for (j=0; j<n; j++)
-          display->tour_vars[j] = vars[j];
+          display->tour_vars.vals[j] = vars[j];
         display->ntour_vars = n;
 
         g_free (vars);
