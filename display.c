@@ -104,6 +104,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
   displayd *display = (displayd *)
     gtk_object_get_data (GTK_OBJECT (w), "display");
   GtkWidget *ww;
+  gchar *title;
 
   switch (action) {
     case DOPT_POINTS:
@@ -113,8 +114,13 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
     case DOPT_EDGES_U:  /*-- undirected: edges only --*/
       if (display->e == NULL) edgeset_add (display);
       if (display->e != NULL) {
-        display->options.edges_undirected_show_p = w->active;
+        title = computeTitle (false, gg->current_display, gg);
+        if (title) {
+          gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window), title);
+          g_free (title); 
+        }
 
+        display->options.edges_undirected_show_p = w->active;
         if (!w->active && display->options.edges_directed_show_p) { 
           ww = widget_find_by_name (display->edge_menu,
             "DISPLAY MENU: show directed edges");
@@ -129,6 +135,11 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
     case DOPT_EDGES_A:  /*-- arrowheads only --*/
       if (display->e == NULL) edgeset_add (display);
       if (display->e != NULL) {
+        title = computeTitle (false, gg->current_display, gg);
+        if (title) {
+          gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window), title);
+          g_free (title); 
+        }
         display->options.edges_arrowheads_show_p = w->active;
         gtk_object_set_data (GTK_OBJECT (w), "propagate",
           GINT_TO_POINTER(false));
@@ -146,8 +157,13 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
     case DOPT_EDGES_D:  /*-- directed: both edges and arrowheads --*/
       if (display->e == NULL) edgeset_add (display);
       if (display->e != NULL) {
-        display->options.edges_directed_show_p = w->active;
+        title = computeTitle (false, gg->current_display, gg);
+        if (title) {
+          gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window), title);
+          g_free (title); 
+        }
 
+        display->options.edges_directed_show_p = w->active;
         if (!w->active && display->options.edges_undirected_show_p) { 
           ww = widget_find_by_name (display->edge_menu,
             "DISPLAY MENU: show undirected edges");
@@ -607,7 +623,10 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
   }
 
   if (display->d->name != NULL) {
-    description = g_strdup(display->d->name);
+    if (display->e != NULL && display->e->name != NULL)
+      description = g_strdup_printf ("%s/%s",
+        display->d->name, display->e->name);
+    else description = g_strdup(display->d->name);
   } else {
     description = GGOBI (getDescription)(gg);
   }
