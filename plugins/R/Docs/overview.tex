@@ -1,0 +1,134 @@
+\documentclass{article}
+\usepackage{times}
+\usepackage{fullpage}
+
+\title{Implementing Plugins for GGobi with R}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+  We describe a mechanism by which one can create plugins for GGobi, a
+  direct manipulation data visualization system, using the S
+  programming language, and specifically the R environment.  
+  The ease of programming using S and the large collection of 
+  data analysis tools available in R make this a natural
+  environment for providing extensions for GGobi. This is
+  complimentary to the Java plugin mechanism also supported by GGobi
+  and the R-GGobi interface which allows GGobi to be embedded and 
+  programmatically controlled by R users.
+
+\end{abstract}
+
+ Plugins for GGobi provide a powerful mechanism for providing
+ functionality that is not directly in ggobi.
+ It allows one to add new ways to read data, save output from GGobi
+ and provide new run-time features and tools.
+ While one can develop plugins in C, the programming language 
+ used to develop GGobi,  it is often more convenient to use
+ a higher-level interpreted language such as R or Python.
+ This partly because one can typically develope code more
+ rapidly using these languages than with C.
+ More importantly however it is because of the range of existing
+ functionality related to data analysis in a language like R, Matlab
+ or Octave.
+
+
+\section{R Plugins for GGobi}
+There are two styles of plugins.  The most commonly used one involves
+supplying the R engine within GGobi a list of function objects that
+are invoked by GGobi when the plugin needs to react or provide
+information to GGobi.  The functions in the collection typically share
+a common state that is mutable, i.e. can change across calls to these
+functions.  This is achieved using R's closure mechanism.
+
+The second style of plugin involves providing an S object to the
+R-GGobi engine and then GGobi calls specific generic functions with
+that object as the primary argument.  The idea is that the developer
+of the plugin will provide specific methods for the class of the
+plugin object and, in this way, provides different functionality for
+different plugin types. The methods can use either the S3 or newer
+S4-style class mechanism.
+
+Both input plugins and regular plugins can be implemented in this
+setup. In this way, we can use R to create run-time, analysis
+functionality and also new facilities for reading data to populate a
+GGobi instance.
+
+One specifies a plugin using the usual XML \XMLTag{plugin} syntax in
+an initialization file for GGobi.  For an R plugin, one specifies a
+\XMLAttr{language} attribute with a value \verb+"R"+.  (One should
+declare the R (meta-) plugin itself before this.)  In addition to the
+usual \XMLTag{description} and \XMLTag{author} information, one
+provides values for the \XMLAttr{init} and \XMLAttr{create} attributes
+of the \XMLTag{plugin} tag.
+
+The \XMLAttr{init} attribute gives the name of an R script that is
+\SFunction{source}'d by the R interpreter and is equivalent to the
+\Croutine{onLoad} routine of other plugins.  This provides an
+opportunity to perform the necessary initializations for using this
+plugin class (not instance) such as loading libraries, defining
+functions and methods to create and use the plugin, etc.
+
+The \XMLAttr{create} attribute should be an S-language command that is
+(parsed and) evaluated and is expected to return the plugin object
+consisting of a collection of functions.
+
+A simple example is given in the following XML stanza.
+\begin{verbatim}
+<plugin name="Rtest" source="plugins/R/R/testPlugin.S" 
+                     command="ggobiTestPlugin()"
+                     language="R">
+ <description>Test of the R plugin mechanism.</description>
+  <author>Duncan Temple Lang</author>
+  <dependencies>
+     <dependency name="R"/>
+  </dependencies>
+</plugin>
+\end{verbatim}
+When this plugin is loaded by GGobi, we source the file
+\file{plugins/R/R/testPlugin.S}.  This defines a function named
+\SFuncion{ggobiTestPlugin} and this is the function that is called to
+create the plugin instance.
+
+The \SFunction{ggobiTestPlugin} function defines two functions within
+its body and returns them in a list.  The first element is the
+\SFunction{onClose} function which is called when the plugin is no
+longer needed (i.e. when it is deactivated by the user or the GGobi
+instance disappears).  The second function is
+\SFunction{onUpdateDisplay}, and is called by GGobi each time the
+display menu is recreated. Again, these functions
+are direct parallels of the C routines that are called for
+plugins implemented directly in C.
+
+We do not have an \SFunction{onCreate} as we do in C-level plugins.
+The reason for this is that the command in the \SFunction{create}
+attribute performs the same role, and it is in this
+command that one does any initialization of the S object.
+
+\SFunction{ggobiTestPlu
+
+
+We will change this format and make the meta-plugin understand it.
+
+
+\subsection{Plugins by Function Lists}
+
+
+
+\subsection{Plugins by Explicit Methods}
+
+
+\section{Input Plugins}
+
+\section{R Plugins using R GGobi}
+One can also control GGobi directly from the S language using the
+\SPackage{Rggobi} package.  In this case, R is in control and GGobi is
+treated as a library of functions.  However, running GGobi in this
+manner still allows for GGobi's plugins and even R plugins.
+Specifically, we can run R, start GGobi and GGobi can create plugins
+that are implemented in R.  This nesting does not cause any conceptual
+problems.
+
+
+\end{document}

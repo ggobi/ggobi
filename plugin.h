@@ -76,11 +76,18 @@ typedef struct {
 } PluginInstance;
 
 typedef struct _JavaRunTimeData JavaRunTimeData;
+typedef struct _RRunTimeData RRunTimeData;
 
 typedef struct {
    const char *className;
    JavaRunTimeData *runTime;
 } JavaInputPluginData;
+
+
+typedef struct {
+   const char *sourceFile;
+   const char *constructor;
+} RPluginData;
 
 
 typedef gboolean (*OnLoad)(gboolean initializing, GGobiPluginInfo *plugin);

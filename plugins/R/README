@@ -4,6 +4,6 @@ programming language.  Using the RGtk and RGgobi packages, one can
 develop quite sophisticated facilities in GGobi using an interpreted
 language.
 
-This is similar in spirit to the Java Virtual Machine plugin.
+This is similar in spirit to the Java Virtual Machine (JVM) plugin.
 
 

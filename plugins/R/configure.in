@@ -6,6 +6,17 @@ if test -z "$R_HOME" ; then
  R_HOME=`${R} RHOME`
 fi
 
+if test -z "$R_HOME" ; then
+  echo "Cannot find R"
+  exit 1;
+fi
+
+if test ! -r $R_HOME/bin/libR.so ; then
+ echo "R must be compiled as a library using --enable-R-shlib at configuration time for R"
+ echo "We cannot create the plugin without that so please re-install R."
+ exit 1;
+fi
+
 AC_SUBST(R_HOME)
 
 AC_PATH_PROG(GTK_CONFIG, gtk-config)

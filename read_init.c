@@ -726,6 +726,25 @@ fixJavaClassName(gchar *name)
   }
 }
 
+gboolean
+setLanguagePluginInfo(GGobiPluginDetails *details, const char *language, GGobiInitInfo *info)
+{
+    GGobiPluginInfo *tmp = getLanguagePlugin(info->plugins, language);
+    if(!tmp) {
+	return(false);
+    } else {
+	GGobiPluginDetails *jdetails = tmp->details;
+	details->dllName = g_strdup(jdetails->dllName);
+	details->library = jdetails->library;
+	details->loaded = 0;
+
+	/*    details->depends = g_slist_append(details->depends, tmp); */
+	details->depends = g_slist_append(details->depends,
+					  g_strdup(jdetails->name));
+    }
+    return(true);
+}
+
 void *
 getPluginLanguage(xmlNodePtr node,GGobiInputPluginInfo *iplugin, GGobiPluginType type, GGobiInitInfo *info)
 {
@@ -759,23 +778,40 @@ getPluginLanguage(xmlNodePtr node,GGobiInputPluginInfo *iplugin, GGobiPluginType
       value = data;
 
 
-      {
-        GGobiPluginInfo *tmp = getLanguagePlugin(info->plugins, "JVM");
-        if(!tmp) {
-        } else {
-          GGobiPluginDetails *jdetails = tmp->details;
-          details->dllName = g_strdup(jdetails->dllName);
-          details->library = jdetails->library;
-          details->loaded = 0; /* jdetails->loaded; */
+      setLanguagePluginInfo(details, "JVM", info);
+      details->onLoad = g_strdup("JavaLoadPlugin");
+      details->onUnload = g_strdup("JavaUnloadPlugin");
 
-          details->onLoad = g_strdup("JavaLoadPlugin");
-          details->onUnload = g_strdup("JavaUnloadPlugin");
-
-          /*    details->depends = g_slist_append(details->depends, tmp); */
-          details->depends = g_slist_append(details->depends,
-            g_strdup(jdetails->name));
-        }
+    } else {
+      RPluginData *data = (RPluginData *)g_malloc(sizeof(RPluginData));
+      memset(data, '\0',sizeof(RPluginData));
+      tmp = xmlGetProp(node, "init");
+      if(tmp) {
+	  data->sourceFile = g_strdup(tmp);
       }
+      tmp = xmlGetProp(node, "create");
+      if(tmp) {
+	  data->constructor = g_strdup(tmp);
+      }
+
+      value = (void *) data;
+      if(type == INPUT_PLUGIN) {
+        iplugin->data = data;
+        iplugin->getDescription = g_strdup("R_GetInputDescription");
+        details = iplugin->details;
+      } else {
+        GGobiPluginInfo *p = (GGobiPluginInfo *)iplugin;
+        p->data = data;
+        p->onCreate = g_strdup("RCreatePlugin");
+        p->onClose = g_strdup("RDestroyPlugin");
+        p->onUpdateDisplay = g_strdup("RUpdateDisplayMenu"); 
+
+	details = p->details;
+      }
+      value = data;
+      setLanguagePluginInfo(details, "R", info);
+      details->onLoad = g_strdup("RLoadPlugin");
+      details->onUnload = g_strdup("RUnloadPlugin");
     }
   }
 

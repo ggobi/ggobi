@@ -13,3 +13,13 @@
     <init onLoad="loadR" />
   </dll>
 </plugin>
+
+
+
+<plugin name="Rtest" command="ggobiTestPlugin()" source="plugins/R/R/testPlugin.S" language="R">
+ <description>Test of the R plugin mechanism.</description>
+  <author>Duncan Temple Lang</author>
+  <dependencies>
+     <dependency name="R" />
+  </dependencies>
+</plugin>
