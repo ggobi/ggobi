@@ -639,9 +639,9 @@ void * tour_thread (void *args)
 }
 */
 
-static int tour_idle = 0;
+static gint tour_idled = 0;  /*-- could be at display level --*/
 gint
-tour_idle_func (gpointer idled, ggobid *gg)
+tour_idle_func (ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
@@ -655,15 +655,14 @@ tour_idle_func (gpointer idled, ggobid *gg)
   return (doit);
 }
 
-void tour_func (gboolean state)
+void tour_func (gboolean state, ggobid *gg)
 {
-/*-- gtk_idle_add --*/
-  if (state)
-    tour_idle = gtk_idle_add_priority (G_PRIORITY_LOW,
-                                       (GtkFunction) tour_idle_func, NULL);
-  else {
-    gtk_idle_remove (tour_idle);
-    tour_idle = 0;
+  if (state) {
+    tour_idled = gtk_idle_add_priority (G_PRIORITY_LOW,
+                                       (GtkFunction) tour_idle_func, gg);
+  } else {
+    gtk_idle_remove (tour_idled);
+    tour_idled = 0;
   }
 
 /*

@@ -113,37 +113,50 @@ hidden_init (ggobid *gg)
 
 
 void
-br_line_color_ids_alloc (ggobid *gg)
+br_line_color_alloc (ggobid *gg)
 {
   gint ns = gg->nsegments; 
 
-  gg->line_color_ids = (gushort *) g_realloc ((gpointer) gg->line_color_ids,
+  gg->line_color = (gushort *) g_realloc ((gpointer) gg->line_color,
     ns * sizeof (gushort));
   gg->line_color_now = (gushort *) g_realloc ((gpointer) gg->line_color_now,
     ns * sizeof (gushort));
   gg->line_color_prev = (gushort *) g_realloc ((gpointer) gg->line_color_prev,
     ns * sizeof (gushort));
-  gg->xed_by_new_brush = (gushort *) g_realloc ((gpointer) gg->xed_by_new_brush,
+
+  gg->line_hidden = (gushort *) g_realloc ((gpointer) gg->line_hidden,
     ns * sizeof (gushort));
+  gg->line_hidden_now = (gushort *) g_realloc ((gpointer) gg->line_hidden_now,
+    ns * sizeof (gushort));
+  gg->line_hidden_prev = (gushort *) g_realloc ((gpointer) gg->line_hidden_prev,
+    ns * sizeof (gushort));
+
+  gg->xed_by_brush = (gboolean *) g_realloc ((gpointer) gg->xed_by_brush,
+    ns * sizeof (gboolean));
 }
 
 void
-br_line_color_ids_free (ggobid *gg)
+br_line_color_free (ggobid *gg)
 {
-  g_free ((gpointer) gg->line_color_ids);
+  g_free ((gpointer) gg->line_color);
   g_free ((gpointer) gg->line_color_now);
   g_free ((gpointer) gg->line_color_prev);
-  g_free ((gpointer) gg->xed_by_new_brush);
+  g_free ((gpointer) gg->line_hidden);
+  g_free ((gpointer) gg->line_hidden_now);
+  g_free ((gpointer) gg->line_hidden_prev);
+  g_free ((gpointer) gg->xed_by_brush);
 }
 
 void
-br_line_color_ids_init (ggobid *gg)
+br_line_color_init (ggobid *gg)
 {
   gint j;
 
   for (j=0; j<gg->nsegments; j++) {
-    gg->line_color_ids[j] = gg->line_color_now[j] = gg->line_color_prev[j] =
+    gg->line_color[j] = gg->line_color_now[j] = gg->line_color_prev[j] =
       gg->color_0;
+    gg->line_hidden[j] = gg->line_hidden_now[j] = gg->line_hidden_prev[j] =
+      false;
   }
 }
 
@@ -175,12 +188,12 @@ brush_alloc (ggobid *gg)
   gg->br_nbins = BRUSH_NBINS;
 
   gg->included = (gboolean *) g_realloc (gg->included, nr * sizeof (gboolean));
-  gg->under_new_brush = (gboolean *) g_realloc (gg->under_new_brush,
+  gg->pts_under_brush = (gboolean *) g_realloc (gg->pts_under_brush,
                                                nr * sizeof (gboolean));
 
   for (i=0; i<nr; i++) {
     gg->included[i] = true;
-    gg->under_new_brush[i] = false;
+    gg->pts_under_brush[i] = false;
   }
 
   /*
@@ -218,7 +231,7 @@ brush_free (ggobid *gg)
   br_glyph_ids_free (gg);
   br_color_ids_free (gg);
 
-  g_free ((gpointer) gg->under_new_brush);
+  g_free ((gpointer) gg->pts_under_brush);
 
   for (k=0; k<gg->br_nbins; k++) {
     for (j=0; j<gg->br_nbins; j++)

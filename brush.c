@@ -9,10 +9,8 @@
 
 /* */
 gboolean active_paint_points (ggobid *gg);
+gboolean active_paint_lines (ggobid *gg);
 /* */
-
-static gulong npts_under_brush = 0;
-
 
   /* corner (x1, y1); corner where the cursor goes (x2,y2) */
 
@@ -58,10 +56,9 @@ brush_once (gboolean force, ggobid *gg)
     changed = active_paint_points (gg);
   }
 
-/*
-  if (gg->is_line_painting)
-    active_paint_lines ();
-*/
+  if (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL) {
+    changed = active_paint_lines (gg);
+  }
 
   return (changed);
 }
@@ -101,16 +98,30 @@ reinit_transient_brushing (ggobid *gg)
  * are now underneath the brush.  For now, don't make the
  * same change for persistent brushing.
 */
-  gint i, m;
+  gint i, m, k;
+  displayd *dsp = gg->current_display;
+  cpaneld *cpanel = &dsp->cpanel;
+  gboolean point_painting_p =
+     (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDL);
+  gboolean line_painting_p =
+     (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL);
 
-  for (m=0; m<gg->nrows_in_plot; m++)
-  {
-    i = gg->rows_in_plot[m];
-    gg->color_now[i] = gg->color_ids[i] ;
-    gg->glyph_now[i].type = gg->glyph_ids[i].type;
-    gg->glyph_now[i].size = gg->glyph_ids[i].size;
-    gg->hidden_now[i] = gg->hidden[i];
+  if (point_painting_p) {
+    for (m=0; m<gg->nrows_in_plot; m++) {
+      i = gg->rows_in_plot[m];
+      gg->color_now[i] = gg->color_ids[i] ;
+      gg->glyph_now[i].type = gg->glyph_ids[i].type;
+      gg->glyph_now[i].size = gg->glyph_ids[i].size;
+      gg->hidden_now[i] = gg->hidden[i];
+    }
   }
+  if (line_painting_p) {
+    for (k=0; k<gg->nsegments; m++) {
+      gg->line_color_now[k] = gg->line_color_prev[k] = gg->line_color[k];
+      gg->line_hidden_now[k] = gg->line_hidden_prev[k] = gg->line_hidden[k];
+    }
+  }
+
   (void) brush_once (false, gg);
 }
 
@@ -121,10 +132,10 @@ brush_set_pos (gint x, gint y, ggobid *gg) {
   /*
    * (x2,y2) is the corner that's moving.
   */
- gg->app.brush_pos.x1 = x - xdist ;
- gg->app.brush_pos.x2 = x ;
- gg->app.brush_pos.y1 = y - ydist ;
- gg->app.brush_pos.y2 = y ;
+  gg->app.brush_pos.x1 = x - xdist ;
+  gg->app.brush_pos.x2 = x ;
+  gg->app.brush_pos.y1 = y - ydist ;
+  gg->app.brush_pos.y2 = y ;
 }
 
 
@@ -171,10 +182,10 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
 }
 
 
-gint
+gboolean
 under_brush (gint k, ggobid *gg)
 /*
- * Determine if point is under the brush.
+ * Determine whether point k is under the brush.
 */
 {
   splotd *sp = gg->current_splot;
@@ -218,8 +229,8 @@ brush_draw_label (splotd *sp, ggobid *gg) {
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
 
-  if (npts_under_brush > 0) {
-    gchar *str = g_strdup_printf ("%ld", npts_under_brush);
+  if (gg->npts_under_brush > 0) {
+    gchar *str = g_strdup_printf ("%d", gg->npts_under_brush);
     gdk_text_extents (style->font, 
       str, strlen (str),
       &lbearing, &rbearing, &width, &ascent, &descent);
@@ -252,9 +263,11 @@ brush_draw_brush (splotd *sp, ggobid *gg) {
         (gg->default_color_table[gg->color_id].blue != gg->bg_color.blue) ||
         (gg->default_color_table[gg->color_id].green != gg->bg_color.green))
     {
-      gdk_gc_set_foreground (gg->plot_GC, &gg->default_color_table[gg->color_id]);
+      gdk_gc_set_foreground (gg->plot_GC,
+                             &gg->default_color_table[gg->color_id]);
     } else {
-      gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+      gdk_gc_set_foreground (gg->plot_GC,
+                             &gg->accent_color);
     }
   }
 
@@ -299,13 +312,13 @@ brush_draw_brush (splotd *sp, ggobid *gg) {
 /*----------------------------------------------------------------------*/
 
 static gboolean
-update_glyph_arrays (gint i, gboolean changed, ggobid *gg) {
+update_glyph_vectors (gint i, gboolean changed, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
 
 /* setting the value of changed */
   if (!changed) {
-    if (gg->under_new_brush[i]) {
+    if (gg->pts_under_brush[i]) {
 
       doit = (gg->glyph_now[i].size != gg->glyph_id.size);
       if (cpanel->br_target != BR_GSIZE)  /*-- ... if not ignoring type --*/
@@ -321,7 +334,7 @@ update_glyph_arrays (gint i, gboolean changed, ggobid *gg) {
 /* */
 
   if (doit) {
-    if (gg->under_new_brush[i]) {
+    if (gg->pts_under_brush[i]) {
       switch (cpanel->br_mode) {
 
         case BR_PERSISTENT:
@@ -368,17 +381,17 @@ build_glyph_vectors (ggobid *gg)
         j = gg->rows_in_plot[ k = gg->br_binarray[ih][iv].els[m] ] ;
 
 
-        /* update the glyph arrays for every member of the row group */
+        /* update the glyph vectors for every member of the row group */
         if (gg->nrgroups > 0) {
           gp = gg->rgroup_ids[k];
           for (n=0; n<gg->rgroups[gp].nels; n++) {
             p = gg->rgroups[gp].els[n];
-            changed = update_glyph_arrays (p, changed, gg);
+            changed = update_glyph_vectors (p, changed, gg);
           }
         /* */
 
-        } else {  /* update the arrays for this point only */
-          changed = update_glyph_arrays (j, changed, gg);
+        } else {  /* update the vectors for this point only */
+          changed = update_glyph_vectors (j, changed, gg);
         }
       }
     }
@@ -397,13 +410,13 @@ build_glyph_vectors (ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 static gboolean
-update_color_arrays (gint i, gboolean changed, ggobid *gg) {
+update_color_vectors (gint i, gboolean changed, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
 
 /* setting the value of doit */
   if (!changed) {
-    if (gg->under_new_brush[i])
+    if (gg->pts_under_brush[i])
       doit = (gg->color_now[i] != gg->color_id);
     else
       doit = (gg->color_now[i] != gg->color_ids[i]);
@@ -414,7 +427,7 @@ update_color_arrays (gint i, gboolean changed, ggobid *gg) {
    * If doit is false, it's guaranteed that there will be no change.
   */
   if (doit) {
-    if (gg->under_new_brush[i]) {
+    if (gg->pts_under_brush[i]) {
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
           gg->color_ids[i] = gg->color_now[i] = gg->color_id;
@@ -451,17 +464,17 @@ build_color_vectors (ggobid *gg)
         */
 
 
-        /* update the color arrays for every member of the row group */
+        /* update the color vectors for every member of the row group */
         if (gg->nrgroups > 0) {
           gp = gg->rgroup_ids[k];
           for (n=0; n<gg->rgroups[gp].nels; n++) {
             p = gg->rgroups[gp].els[n];
-            changed = update_color_arrays (p, changed, gg);
+            changed = update_color_vectors (p, changed, gg);
           }
         /* */
 
-        } else {  /* update the arrays for this point only */
-          changed = update_color_arrays (j, changed, gg);
+        } else {  /* update the vectors for this point only */
+          changed = update_color_vectors (j, changed, gg);
         }
       }
     }
@@ -479,7 +492,7 @@ build_color_vectors (ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 static gboolean
-update_hidden_arrays (gint i, gboolean changed, ggobid *gg) {
+update_hidden_vectors (gint i, gboolean changed, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
 
@@ -488,7 +501,7 @@ update_hidden_arrays (gint i, gboolean changed, ggobid *gg) {
    * order to be able to return that information.
   */
   if (!changed) {
-    if (gg->under_new_brush[i])
+    if (gg->pts_under_brush[i])
       doit = (gg->hidden_now[i] != true);
     else
       doit = (gg->hidden_now[i] != gg->hidden[i]);
@@ -500,7 +513,7 @@ update_hidden_arrays (gint i, gboolean changed, ggobid *gg) {
 */
 
   if (doit) {
-    if (gg->under_new_brush[i]) {
+    if (gg->pts_under_brush[i]) {
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
           gg->hidden[i] = gg->hidden_now[i] = true;
@@ -537,16 +550,16 @@ build_hidden_vectors (ggobid *gg)
         */
 
         if (gg->nrgroups > 0) {
-          /*-- update the hidden arrays for every member of the row group --*/
+          /*-- update the hidden vectors for every member of the row group --*/
           gp = gg->rgroup_ids[k];
           for (n=0; n<gg->rgroups[gp].nels; n++) {
             p = gg->rgroups[gp].els[n];
-            changed = update_hidden_arrays (p, changed, gg);
+            changed = update_hidden_vectors (p, changed, gg);
           }
         /* */
 
-        } else {  /* update the arrays for this point only */
-          changed = update_hidden_arrays (j, changed, gg);
+        } else {  /* update the vectors for this point only */
+          changed = update_hidden_vectors (j, changed, gg);
         }
       }
     }
@@ -566,13 +579,13 @@ active_paint_points (ggobid *gg)
   gboolean changed;
   cpaneld *cpanel = &gg->current_display->cpanel;
 /*
- * Set under_new_brush[j] to 1 if point j is inside the rectangular brush.
+ * Set pts_under_brush[j] to 1 if point j is inside the rectangular brush.
 */
 
-  /* Zero out under_new_brush[] before looping */
-  npts_under_brush = 0;
+  /* Zero out pts_under_brush[] before looping */
+  gg->npts_under_brush = 0;
   for (j=0; j<gg->nrows_in_plot; j++)
-    gg->under_new_brush[gg->rows_in_plot[j]] = 0;
+    gg->pts_under_brush[gg->rows_in_plot[j]] = 0;
  
   /*
    * br_binarray[][] only represents the
@@ -586,15 +599,15 @@ active_paint_points (ggobid *gg)
 
         if (under_brush (pt, gg)) {
 
-          npts_under_brush++ ;
-          gg->under_new_brush[pt] = 1;
+          gg->npts_under_brush++ ;
+          gg->pts_under_brush[pt] = 1;
 
           /* brush other members of this row group */
           if (gg->nrgroups > 0) {
             gp = gg->rgroup_ids[pt];
             if (gp < gg->nrgroups) {  /* exclude points without an rgroup */
               for (k=0; k<gg->rgroups[gp].nels; k++) {
-                  gg->under_new_brush[gg->rgroups[gp].els[k]] = 1;
+                  gg->pts_under_brush[gg->rgroups[gp].els[k]] = 1;
               }
             }
           }
@@ -623,6 +636,221 @@ active_paint_points (ggobid *gg)
         break;
       case BR_HIDE:  /*-- hidden --*/
         if (build_hidden_vectors (gg)) changed = true;
+        break;
+    }
+  }
+
+  return (changed);
+}
+
+/*----------------------------------------------------------------------*/
+/*                      Line brushing                                   */
+/*----------------------------------------------------------------------*/
+
+void
+line_brush_prev_vectors_update (ggobid *gg) {
+  gint k;
+  for (k=0; k<gg->nsegments; k++) {
+    gg->line_color_prev[k] = gg->line_color[k];
+    gg->line_hidden_prev[k] = gg->line_hidden[k];
+  }
+}
+
+void
+line_brush_undo (splotd *sp, ggobid *gg) {
+  gint k;
+  for (k=0; k<gg->nsegments; k++) {
+    gg->line_color[k] = gg->line_color_now[k] = gg->line_color_prev[k];
+    gg->line_hidden[k] = gg->line_hidden_now[k] = gg->line_hidden_prev[k];
+  }
+  splot_redraw (sp, FULL, gg);
+}
+
+gint
+xed_by_brush (gint k, ggobid *gg)
+/*
+ * Determine whether line k intersects the brush
+*/
+{
+  splotd *sp = gg->current_splot;
+  gint pt;
+  gint x1 = MIN (gg->app.brush_pos.x1, gg->app.brush_pos.x2);
+  gint x2 = MAX (gg->app.brush_pos.x1, gg->app.brush_pos.x2);
+  gint y1 = MIN (gg->app.brush_pos.y1, gg->app.brush_pos.y2);
+  gint y2 = MAX (gg->app.brush_pos.y1, gg->app.brush_pos.y2);
+
+  pt = (sp->screen[k].x <= x2 && sp->screen[k].y <= y2 &&
+        sp->screen[k].x >= x1 && sp->screen[k].y >= y1) ? 1 : 0;
+  return (pt);
+}
+
+static gboolean
+update_line_color_vectors (gint k, gboolean changed, ggobid *gg) {
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  gboolean doit = true;
+
+/* setting the value of doit */
+  if (!changed) {
+    if (gg->xed_by_brush[k])
+      doit = (gg->line_color_now[k] != gg->color_id);
+    else
+      doit = (gg->line_color_now[k] != gg->line_color[k]);
+  }
+/* */
+
+  /*
+   * If doit is false, it's guaranteed that there will be no change.
+  */
+  if (doit) {
+    if (gg->xed_by_brush[k]) {
+      switch (cpanel->br_mode) {
+        case BR_PERSISTENT:
+          gg->line_color[k] = gg->line_color_now[k] = gg->color_id;
+          break;
+        case BR_TRANSIENT:
+          gg->line_color_now[k] = gg->color_id;
+          break;
+      }
+    } else gg->line_color_now[k] = gg->line_color[k];
+  }
+
+  return (doit);
+}
+
+static gboolean
+build_line_color_vectors (ggobid *gg)
+{
+  gint k;
+  gboolean changed = false;
+
+  for (k=0; k<gg->nsegments; k++) {
+
+    /* update the line color vectors for every member of the line group */
+    if (gg->nlgroups > 0) {
+/*
+      gint n, p, gp;
+      gp = gg->lgroup_ids[k];
+      for (n=0; n<gg->lgroups[gp].nels; n++) {
+        p = gg->lgroups[gp].els[n];
+        changed = update_line_color_vectors (p, changed, gg);
+      }
+*/
+    /* */
+
+    } else {  /* update the vectors for this point only */
+      changed = update_line_color_vectors (k, changed, gg);
+    }
+  }
+
+  return (changed);
+}
+
+static gboolean
+update_line_hidden_vectors (gint k, gboolean changed, ggobid *gg) {
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  gboolean doit = true;
+
+/* setting the value of doit */
+  if (!changed) {
+    if (gg->xed_by_brush[k])
+      doit = (gg->line_hidden_now[k] != true);
+    else
+      doit = (gg->line_hidden_now[k] != gg->line_hidden[k]);
+  }
+/* */
+
+  /*
+   * If doit is false, it's guaranteed that there will be no change.
+  */
+  if (doit) {
+    if (gg->xed_by_brush[k]) {
+      switch (cpanel->br_mode) {
+        case BR_PERSISTENT:
+          gg->line_hidden[k] = gg->line_hidden_now[k] = true;
+          break;
+        case BR_TRANSIENT:
+          gg->line_hidden_now[k] = true;
+          break;
+      }
+    } else gg->line_hidden_now[k] = gg->line_hidden[k];
+  }
+
+  return (doit);
+}
+
+static gboolean
+build_line_hidden_vectors (ggobid *gg)
+{
+  gint k;
+  gboolean changed = false;
+
+  for (k=0; k<gg->nsegments; k++) {
+
+    /* update the line hidden vectors for every member of the line group */
+    if (gg->nlgroups > 0) {
+/*
+      gint n, p, gp;
+      gp = gg->lgroup_ids[k];
+      for (n=0; n<gg->lgroups[gp].nels; n++) {
+        p = gg->lgroups[gp].els[n];
+        changed = update_line_hidden_vectors (p, changed, gg);
+      }
+*/
+    /* */
+
+    } else {  /* update the vectors for this point only */
+      changed = update_line_hidden_vectors (k, changed, gg);
+    }
+  }
+
+  return changed;
+}
+
+gboolean
+active_paint_lines (ggobid *gg)
+{
+  gint k;
+  gboolean changed;
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  /* Zero out xed_by_brush[] before looping */
+  gg->nxed_by_brush = 0;
+  for (k=0; k<gg->nsegments; k++)
+    gg->xed_by_brush[k] = false;
+ 
+  for (k=0; k<gg->nsegments; k++) {
+
+    if (xed_by_brush (k, gg)) {
+
+      gg->nxed_by_brush++ ;
+      gg->xed_by_brush[k] = true;
+
+      /* brush other members of this line group */
+      if (gg->nlgroups > 0) {
+/*
+        gint p, gp;
+        gp = gg->lgroup_ids[k];
+        if (gp < gg->nlgroups) {
+          for (p=0; p<gg->rgroups[gp].nels; p++) {
+              gg->xed_by_brush[gg->lgroups[gp].els[p]] = 1;
+          }
+        }
+*/
+      }
+      /* */
+    }
+  }
+
+  changed = false;
+
+  if (cpanel->brush_on_p) {
+    switch (cpanel->br_target) {
+      case BR_CANDG:  /*-- color and glyph --*/
+      case BR_COLOR:  /*-- color --*/
+        if (build_line_color_vectors (gg)) changed = true;
+        break;
+      case BR_HIDE:  /*-- hidden --*/
+        if (build_line_hidden_vectors (gg)) changed = true;
         break;
     }
   }

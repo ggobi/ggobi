@@ -175,14 +175,17 @@ struct _ggobid {
  GdkColor accent_color;      /* color for axes and labels */
  gushort color_id, color_0;  /* 0:ncolors-1 */
  /* point brushing */
- gboolean *under_new_brush;
+ gint npts_under_brush;
+ gboolean *pts_under_brush;
  gushort *color_ids, *color_now, *color_prev;  /* 0:ncolors-1 */
  glyphv glyph_id, glyph_0;
  glyphv *glyph_ids, *glyph_now, *glyph_prev;
  gboolean *hidden, *hidden_now, *hidden_prev;
  /* line brushing */
- gushort *xed_by_new_brush;
- gushort *line_color_ids, *line_color_now, *line_color_prev;  /* 0:ncolors-1 */
+ gint *nxed_by_brush;
+ gboolean *xed_by_brush;
+ gushort *line_color, *line_color_now, *line_color_prev;
+ gushort *line_hidden, *line_hidden_now, *line_hidden_prev;
  /* binning */
  gint br_nbins;
  bin_struct **br_binarray;

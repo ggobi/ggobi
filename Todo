@@ -2,8 +2,13 @@ Bugs:
 
   the axes aren't being initialized properly for cloned variables.
   reading from stdin in stopped working
+  scatterplot matrix:  ASH is vertical instead of horizontal
+                       replacement mode isn't working
+                       maybe its cpanel isn't initialized correctly?
+
 
 Scaling:
+  reset zoom doesn't work; reset pan is fine
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
   couple that with a thumbnail view that sits just below the scaling controls
 
@@ -18,7 +23,7 @@ Smoothing
 
 API code
 
-Line brushing
+Line brushing: code is in but not debugged
 
 Line editing
 Move points

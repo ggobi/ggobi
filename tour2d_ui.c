@@ -22,16 +22,16 @@ static void scale_set_default_values (GtkScale *scale )
   gtk_scale_set_draw_value (scale, false);
 }
 
-void tour2d_pause (cpaneld *cpanel, gboolean state) {
-  extern void tour_func (gboolean);
+void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
+  extern void tour_func (gboolean, ggobid *);
   cpanel->is_tour_paused = state;
 
-  tour_func (!cpanel->is_tour_paused);
+  tour_func (!cpanel->is_tour_paused, gg);
 }
 
 static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
-  tour2d_pause (&gg->current_display->cpanel, button->active);
+  tour2d_pause (&gg->current_display->cpanel, button->active, gg);
 }
 
 static void reinit_cb (GtkWidget *w) {

@@ -317,9 +317,6 @@ rgroups_read (gchar *ldata_in, gboolean init, ggobid *gg)
     }
     gg->nrgroups = 0;
   
-/*
- * For now, only assign linkable points to rgroups.
-*/
     /*
      * On this sweep, find out how many groups there are and how
      * many elements are in each group
@@ -381,11 +378,6 @@ rgroups_read (gchar *ldata_in, gboolean init, ggobid *gg)
   
     g_free ((gpointer) nels);
   }
-
-#ifdef LINKABLE
-  if (gg->nlinkable != gg->nrows)
-    g_printerr ("gg->nlinkable=%d gg->nrows=%d\n", gg->nlinkable, gg->nrows);
-#endif
 
   if (gg->nrgroups != 0)
     g_printerr ("gg.nrgroups=%ld\n", gg->nrgroups);
@@ -595,7 +587,7 @@ line_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
   gchar *suffixes[] = {".linecolors"};
 
   if (reinit)
-    br_line_color_ids_alloc (gg);
+    br_line_color_alloc (gg);
 
   if (!gg->mono_p) {
     /*
@@ -621,7 +613,7 @@ line_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
             break;
           }
 
-          gg->line_color_ids[i] = gg->line_color_now[i] =
+          gg->line_color[i] = gg->line_color_now[i] =
             gg->line_color_prev[i] = id;
           i++;
         }
@@ -631,7 +623,7 @@ line_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
   }
 
   if (!ok)
-    br_line_color_ids_init (gg);
+    br_line_color_init (gg);
 
   return (ok);
 }

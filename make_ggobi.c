@@ -85,9 +85,6 @@ fileset_read (gchar *ldata_in, ggobid *gg)
 
   array_read (gg);
   gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
-#ifdef LINKABLE
-  gg->nlinkable = gg->nrows;      /*-- for now --*/
-#endif
   gg->nrgroups = 0;              /*-- for now --*/
 
   missing_values_read (gg->fname, true, gg);

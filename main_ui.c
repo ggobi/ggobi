@@ -330,7 +330,7 @@ mode_set (gint m, ggobid *gg) {
 
 void
 mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
-  extern void tour_func (gboolean);
+  extern void tour_func (gboolean, ggobid *);
 
   if (state == off) {
 
@@ -345,7 +345,7 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
         break;
 
       case TOUR2D:
-        tour_func (off);
+        tour_func (off, gg);
         break;
 
       case SCALE:
@@ -367,7 +367,7 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
         break;
 
       case TOUR2D:
-        tour_func (on);
+        tour_func (on, gg);
         break;
 
       case SCALE:
@@ -550,7 +550,6 @@ void make_ui (ggobid *gg) {
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   GGobi_widget_set(window, gg, true);
-g_printerr ("TOPLEVEL: %d\n", (gint) window);
 
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
 
