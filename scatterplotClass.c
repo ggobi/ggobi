@@ -971,31 +971,31 @@ subPlaneToScreen(splotd *sp, displayd *dpy, datad *d, ggobid *gg)
 static void
 worldToPlane(splotd *sp, datad *d, ggobid *gg)
 {
-      cpaneld *cpanel = &(sp->displayptr->cpanel);
-      switch (cpanel->projection) {
-        case P1PLOT:
-          p1d_reproject (sp, d->world.vals, d, gg);
-        break;
+  cpaneld *cpanel = &(sp->displayptr->cpanel);
+  switch (cpanel->projection) {
+    case P1PLOT:
+      p1d_reproject (sp, d->world.vals, d, gg);
+    break;
 
-        case XYPLOT:
-          xy_reproject (sp, d->world.vals, d, gg);
-        break;
+    case XYPLOT:
+      xy_reproject (sp, d->world.vals, d, gg);
+    break;
 
-        case TOUR1D:
-          tour1d_projdata (sp, d->world.vals, d, gg);
-        break;
+    case TOUR1D:
+      tour1d_projdata (sp, d->world.vals, d, gg);
+    break;
 
-        case TOUR2D:
-          tour2d_projdata(sp, d->world.vals, d, gg);
-        break;
+    case TOUR2D:
+      tour2d_projdata(sp, d->world.vals, d, gg);
+    break;
 
-        case COTOUR:
-          tourcorr_projdata(sp, d->world.vals, d, gg);
-        break;
+    case COTOUR:
+      tourcorr_projdata(sp, d->world.vals, d, gg);
+    break;
 
-        default:
-        break;
-      }
+    default:
+    break;
+  }
 }
 
 static gboolean
