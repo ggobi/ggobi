@@ -118,10 +118,6 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
    * the first function could be needed if transformation has been
    * going on, because lim_tform could be out of step.
   */
-/*
-  vartable_stats_set (d, gg);
-  vartable_lim_update (d, gg);
-*/
   limits_set (false, false, d);  
   vartable_limits_set (d);
   vartable_stats_set (d);
@@ -142,8 +138,30 @@ void
 range_set_cb (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *frame, *vb, *hb, *okay_button;
-  GtkWidget *dialog = gtk_dialog_new ();
+  GtkWidget *dialog;
+  gint k;
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint ncols = selected_cols_get (cols, d, gg);
+  gboolean ok = true;
 
+  for (k=0; k<ncols; k++) {
+    if (d->vartable[cols[k]].tform0 != NO_TFORM0 ||
+        d->vartable[cols[k]].tform1 != NO_TFORM1 ||
+        d->vartable[cols[k]].tform2 != NO_TFORM2)
+    {
+      ok = false;
+      quick_message ("Sorry, can't set the range for a transformed variable\n",
+        false);
+      break;
+    }
+  }
+  g_free (cols);
+  if (!ok)
+/**/return;
+
+
+  dialog = gtk_dialog_new ();
   frame = gtk_frame_new ("Set range");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), frame);
@@ -483,6 +501,9 @@ vartable_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (delete_vars_cb), gg);
+
+    /*-- until all the details are worked out, make this insensitive --*/
+    gtk_widget_set_sensitive (btn, false);
     /*-- --*/
 
     btn = gtk_button_new_with_label ("Close");

@@ -3,54 +3,24 @@ Bugs:
   Set the brush to any region  (manually) and then reduce the
    size of the window.  Note that the brush size stays
    fixed and is not scaled and points enter the region but are
-   not "brushed"
+   not "brushed."  dfs -- haven't been able to replicate this.
 
   is adding and removing plots in scatmat still problematic?
+
+  reading in new data is broken
+
+In progress, needing design discussions:
+  should variable limits be disabled for transformed variables?
+  user limits need to be checked before transforming
+  deleting variables: how should plots behave?
+    
 
 API code needed:
   sticky labels
   imputation of missing values
+  setting variable ranges
 
-missings:
- I still want a show/hide missings button somewhere
-
-broken:
-  reading in new data
-
-datad work:
-output:
-*  the 'create file set' panel needs thought:  specify
-    datad to save if xml is not selected?
-
-various stuff not yet implemented:
-  1d, xy cycling  .... or run as a demo in R for now?
-  some window closings  (display tree, ...)
-  row groups are only partially implemented; line groups
-    will wait until we know what we want to do about lines.
-
-display_tree doesn't update itself when splots change
-
-when brushing or identifying in parcoords, use leave/enter events to
-  change the current_splot.
-
-sphere data into new variables instead of overwriting
-  the existing values -- that will test cloning!
-
-keep working on array and vector management
-
-color:  allow additional colormaps -- .cmap file
-  (DTL: This is supported in the XML.)
-  
-Scaling:
-  take advantage of the cleverness of the axes:  l to shift, m/r to scale
-  couple that with a thumbnail view that sits just below the scaling controls
-
-Use a set of decoration arrays (points and lines) instead of nlinkable
-
-Smoothing -- to take advantage of the R loess code
-  wait until we think about decoration?
-
-old-style I/O -- the biggest part is now in place.  extend
+I/O -- the biggest part is now in place.  extend
   user options to write_xml.  Add the ability to extend the
   current file set by one or more files.  (wait until the
   dtd has been redesigned to handle multiple datad objects)
@@ -59,9 +29,49 @@ old-style I/O -- the biggest part is now in place.  extend
   If all glyphs are the same, there's no need to write 
     a glyph description in each record
 
-In progress:  writing out plots as .svg files
+color:  allow additional colormaps -- .cmap file
+  (DTL: This is supported in the XML.)
+
+saving plots as .svg files
   work out how to do nested transformations for printing parcoords
     and scatmat plots
+
+Tour:
+  rulers
+  axes
+  put arrays and vectors into the standard routines that debby has developed.
+  tour data structure
+  why is there whip-spin?
+  tour API
+  PP
+  manual controls
+  1d tour
+  correlation tour
+  history controls
+
+sphere data into new variables instead of overwriting
+  the existing values -- that will test cloning!
+
+various stuff not yet implemented:
+  1d, xy cycling  .... or run as a demo in R for now?
+  I still want a show/hide missings button somewhere
+  some window closings  (display tree, ...)
+  "row groups" are only partially implemented; line groups
+    will wait until we know what we want to do about lines.
+
+display_tree doesn't update itself when splots change
+
+keep working on array and vector management
+
+when brushing or identifying in parcoords, use leave/enter events to
+  change the current_splot.
+  
+Scaling:
+  take advantage of the cleverness of the axes:  l to shift, m/r to scale
+  couple that with a thumbnail view that sits just below the scaling controls
+
+Smoothing -- to take advantage of the R loess code
+  wait until we think about decoration?
 
 Graphs
   Edges with data: a separate region of the variable selection panel
@@ -71,6 +81,7 @@ Graphs
     line editing
 
 Food for thought:
+  * Use a set of decoration arrays (points and lines) instead of nlinkable
   * Categorical data?  Better labelling, at least?
   * maps; data as polygons -- for summer 2001?
   * Do we need rotation any more?

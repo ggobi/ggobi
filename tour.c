@@ -411,6 +411,8 @@ void path(displayd *dsp, gint nd) {
   gint dI; /* dimension of intersection of base pair */
   gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
 
+/*
+ * Di, I'm commenting these out for now -- dfs
   printf("u0 \n");
   for (i=0; i<d->ncols; i++)
     printf("%f ",dsp->u0.vals[0][i]);
@@ -420,6 +422,7 @@ void path(displayd *dsp, gint nd) {
   for (i=0; i<d->ncols; i++)
     printf("%f ",dsp->u1[0][i]);
   printf("\n");
+*/
 
   /* 2 is hard-wired because it relates to cos, sin
                          and nothing else. */

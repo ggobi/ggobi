@@ -61,9 +61,13 @@ scatterplot_show_rulers (displayd *display, gint projection)
       break;
 
     case TOUR2D:
+/*
+ * Di, I'm commenting these out for now -- the error messages
+ * are distracting -- dfs.
       scatterplot_show_vrule (display, true);
       scatterplot_show_hrule (display, true);
       break;
+*/
 
     default:  /* in any other projection, no rulers */
       scatterplot_show_vrule (display, false);
