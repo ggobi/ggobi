@@ -528,6 +528,7 @@ cumulateRecordData(XMLParserData *data, const xmlChar *ch, gint len)
     data->recordString = (xmlChar *) g_realloc(data->recordString, (len + data->recordStringLength + 1)* sizeof(xmlChar));
     memcpy(data->recordString + data->recordStringLength, ch, len * sizeof(xmlChar));
     data->recordStringLength += len;
+    data->recordString[data->recordStringLength] = '\0';
 
     return;
 }
