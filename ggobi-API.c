@@ -121,6 +121,11 @@ extern void rowlabels_alloc(void);
 
    /* Now recompute and display the top plot. */
   dataset_init(&xg);
+
+  /* Have to patch up the displays list since we removed
+     every entry and that makes for meaningless entries.
+   */
+  xg.displays->next = NULL;
 }
 
 

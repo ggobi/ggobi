@@ -154,6 +154,8 @@ display_new (gpointer cbd, guint action, GtkWidget *widget)
   display_set_current (display);
   xg.displays = g_list_append (xg.displays, (gpointer) display);
 
+printf("Number of displays %d\n", g_list_length(xg.displays));fflush(stdout);
+
     /* If the tree of displays is active, add this to it. */
   display_add_tree(display, -1, xg.app.display_tree.tree);
 
