@@ -66,6 +66,13 @@ vartable_clist_get (ggobid *gg) {
 }
 
 static void
+dialog_range_cancel (GtkWidget *w, ggobid *gg) 
+{
+  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  gtk_widget_destroy (dialog);
+}
+
+static void
 dialog_range_set (GtkWidget *w, ggobid *gg) 
 {
   GtkWidget *dialog = gtk_widget_get_toplevel (w);
@@ -80,7 +87,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
 
   /*-- minimum --*/
   val_str = gtk_entry_get_text (GTK_ENTRY (gg->vartable_ui.umin));
-  if (strlen (val_str) > 0) {
+  if (val_str != NULL && strlen (val_str) > 0) {
     val = (gfloat) atof (val_str);
     for (k=0; k<ncols; k++) {
       j = cols[k];
@@ -92,12 +99,13 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       gtk_clist_set_text (clist, j, CLIST_USER_MIN,
         g_strdup_printf("%8.3f", val));
     }
-  } else
+  } else {
     gtk_clist_set_text (clist, j, CLIST_USER_MIN, g_strdup (""));
+  }
 
   /*-- maximum --*/
   val_str = gtk_entry_get_text (GTK_ENTRY (gg->vartable_ui.umax));
-  if (strlen (val_str) > 0) {
+  if (val_str != NULL && strlen (val_str) > 0) {
     val = (gfloat) atof (val_str);
     for (k=0; k<ncols; k++) {
       j = cols[k];
@@ -109,10 +117,14 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       gtk_clist_set_text (clist, j, CLIST_USER_MAX,
         g_strdup_printf("%8.3f", val));
     }
-  } else
+  } else {
     gtk_clist_set_text (clist, j, CLIST_USER_MAX, g_strdup (""));
+  }
 
-  d->vartable[j].lim_specified_p = min_p && max_p;  /*-- require both --*/
+  for (k=0; k<ncols; k++) {
+    j = cols[k];
+    d->vartable[j].lim_specified_p = min_p && max_p;  /*-- require both --*/
+  }
 
   /*
    * the first function could be needed if transformation has been
@@ -137,7 +149,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
 void
 range_set_cb (GtkWidget *w, ggobid *gg)
 {
-  GtkWidget *frame, *vb, *hb, *okay_button;
+  GtkWidget *frame, *vb, *hb, *okay_btn, *cancel_btn;
   GtkWidget *dialog;
   gint k;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
@@ -202,11 +214,18 @@ range_set_cb (GtkWidget *w, ggobid *gg)
   gtk_container_add (GTK_CONTAINER (vb), hb);
 
   /*-- buttons --*/
-  okay_button = gtk_button_new_with_label ("Okay");
-  gtk_signal_connect (GTK_OBJECT (okay_button), "clicked",
+  okay_btn = gtk_button_new_with_label ("Okay");
+  gtk_signal_connect (GTK_OBJECT (okay_btn), "clicked",
     GTK_SIGNAL_FUNC (dialog_range_set), gg);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
-    okay_button);
+    okay_btn);
+
+  /*-- buttons --*/
+  cancel_btn = gtk_button_new_with_label ("Cancel");
+  gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
+    GTK_SIGNAL_FUNC (dialog_range_cancel), gg);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
+    cancel_btn);
 
   gtk_widget_show_all (dialog);
 }
