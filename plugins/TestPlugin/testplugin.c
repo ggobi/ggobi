@@ -30,3 +30,11 @@ unload(gboolean initializing, GGobiPluginInfo *plugin)
     fprintf(stderr, "unloading the test plugin\n");fflush(stderr);
     return(true);
 }
+
+
+gboolean
+updateDisplay(ggobid *gg, PluginInstance *plugin)
+{
+    fprintf(stderr, "updating displays for the test plugin\n");fflush(stderr);
+    return(true);
+}

@@ -2,6 +2,7 @@
 <description>Test of the plugin mechanism.</description>
 <author>Duncan Temple Lang</author>
   <dll name="plugins/TestPlugin/TestPlugin">
-      <init onCreate="init" onClose="close" onLoad="load" onUnload="unload" />
+      <init onCreate="init" onClose="close" onLoad="load" 
+            onUnload="unload" onUpdateDisplayMenu="updateDisplay"/>
   </dll>
 </plugin>
