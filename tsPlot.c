@@ -187,6 +187,7 @@ timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass)
 
     klass->parent_class.treeLabel =  klass->parent_class.titleLabel = "Time Series";
     klass->parent_class.create = timeSeriesDisplayCreate;
+    klass->parent_class.createWithVars = tsplot_new;
     klass->parent_class.variable_select = tsplot_varsel;
     klass->parent_class.variable_plotted_p = tsplotIsVarPlotted;
     klass->parent_class.cpanel_set = tsplotCPanelSet;
