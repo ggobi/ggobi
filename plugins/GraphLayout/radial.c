@@ -14,8 +14,6 @@
 #include "glayout.h"
 
 static void initRadialLayout (glong *vis, gint nvis, ggobid *gg, glayoutd *gl, datad *d, datad *e);
-static void radial_highlight_sticky_edges (ggobid *gg, gint index, gint state,
-  datad *d, void *data);
 static gboolean setParentNodes (glayoutd *gl, datad *d);
 static void setNChildren (glayoutd *gl, datad *d);
 static gint setSubtreeSize (noded *, glayoutd *, datad *);
@@ -120,9 +118,6 @@ hasPathToCenter (noded *n, noded *referringnode, datad *d, datad *e,
 /*                   callbacks                                     */
 /*-----------------------------------------------------------------*/
 
-CHECK_EVENT_SIGNATURE(radial_highlight_sticky_edges, sticky_point_added_f)
-CHECK_EVENT_SIGNATURE(radial_highlight_sticky_edges, sticky_point_removed_f)
-
 void radial_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
@@ -130,7 +125,9 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   displayd *dsp = gg->current_display;
   datad *d = gg->current_display->d;
   datad *e = gg->current_display->e;
+/*
   gboolean init;
+*/
   glong *visible;
   gint nvisible;
 /*-- to add variables --*/
@@ -177,9 +174,11 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 
   visible = (glong *) g_malloc (d->nrows_in_plot * sizeof (glong));
   nvisible = visible_set (visible, d);
+/*
   init = (gl->radial == NULL ||
           d != gl->radial->d ||
           d->nrows_in_plot != nvisible);
+*/
   initRadialLayout (visible, nvisible, gg, gl, d, e);
 
 /*
@@ -427,6 +426,27 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   g_free (nSiblings);
 }
 
+void radial_center_set_cb (ggobid *gg, gint index,
+  gint state, datad *d, PluginInstance *inst)
+{
+  glayoutd *gl = glayoutFromInst (inst);
+
+  GtkWidget *entry = (GtkWidget *) gtk_object_get_data (inst->data,
+    "CENTERNODE");
+
+  if (state == STICKY) {
+    gtk_entry_set_text (GTK_ENTRY (entry),
+      (gchar *) g_array_index (d->rowlab, gchar *, index));
+    gl->centerNodeIndex = index;
+  }
+}
+
+#ifdef HIGHLIGHTSTICKY
+CHECK_EVENT_SIGNATURE(radial_highlight_sticky_edges, sticky_point_added_f)
+CHECK_EVENT_SIGNATURE(radial_highlight_sticky_edges, sticky_point_removed_f)
+
+static void radial_highlight_sticky_edges (ggobid *gg, gint index, gint state,
+  datad *d, void *data);
 void radial_highlight_sticky_edges (ggobid *gg, gint index, gint state,
   datad *d, void *data)
 {
@@ -491,6 +511,7 @@ void radial_highlight_sticky_edges (ggobid *gg, gint index, gint state,
 
   displays_plot (NULL, FULL, gg);
 }
+#endif
 
 /*-- highlighting code that isn't peculiar to radial layouts --*/
 void highlight_sticky_edges (ggobid *gg, gint index, gint state,
@@ -553,8 +574,11 @@ initRadialLayout (glong *visible, gint nvisible, ggobid *gg,
   }
 
   /*-- initial default:  let the first node be the center node --*/
-  gl->radial->centerNode = &gl->radial->nodes[0];
-  gl->radial->centerNode->i = 0;
+  if (gl->centerNodeIndex == -1)
+    gl->centerNodeIndex = 0;
+
+  gl->radial->centerNode = &gl->radial->nodes[gl->centerNodeIndex];
+  gl->radial->centerNode->i = gl->centerNodeIndex;
 
   /*-- initialize the linked lists of edges and nodes --*/
 

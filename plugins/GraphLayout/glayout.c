@@ -50,14 +50,14 @@ show_glayout_window (GtkWidget *widget, PluginInstance *inst)
     gtk_object_set_data (GTK_OBJECT (window), "glayoutd", gl);
     inst->data = window;  /*-- or this could be the glayout structure --*/
 
+#ifdef HIGHLIGHTSTICKY
 /*-- Can't do this here until I have an agnostic highlight function --*/
-/*
 void highlight_edges_cb (GtkButton *button, PluginInstance *inst);
   gtk_signal_connect (GTK_OBJECT(inst->gg),
     "sticky_point_added", highlight_sticky_edges, inst);
   gtk_signal_connect (GTK_OBJECT(inst->gg),
     "sticky_point_removed", highlight_sticky_edges, inst);
-*/
+#endif
 
 
   } else {
@@ -201,6 +201,8 @@ GtkWidget *
 create_glayout_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
+  GtkWidget *hb, *entry;
+  GtkTooltips *tips = gtk_tooltips_new ();
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/
@@ -251,6 +253,23 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
+  /*-- Label of the center node: passive display --*/
+  hb = gtk_hbox_new (false, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
+
+  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Center node"),
+    false, false, 2);
+  entry = gtk_entry_new ();
+  gtk_entry_set_editable (GTK_ENTRY (entry), false);
+  gtk_object_set_data (GTK_OBJECT(window), "CENTERNODE", entry);
+  gtk_entry_set_text (GTK_ENTRY (entry),
+    (gchar *) g_array_index (gg->current_display->d->rowlab, gchar *, 0));
+  gtk_signal_connect (GTK_OBJECT(gg),
+    "sticky_point_added", radial_center_set_cb, inst);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,
+    "To reset the center node, use sticky identification in ggobi", NULL);
+  gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
+  
   btn = gtk_button_new_with_label ("apply");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (radial_cb), inst);
@@ -282,6 +301,8 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 #ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+#else
+  gtk_widget_set_sensitive (btn, false);
 #endif
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
@@ -290,6 +311,8 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 #ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+#else
+  gtk_widget_set_sensitive (btn, false);
 #endif
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 

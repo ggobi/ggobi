@@ -44,6 +44,7 @@ typedef struct {
   array_d pos_orig;
   array_d pos;
 
+  gint centerNodeIndex;
   radiald *radial;  /*-- data required for radial layout --*/
 
 } glayoutd;
@@ -58,6 +59,8 @@ void glayout_init (glayoutd *);
 glayoutd* glayoutFromInst (PluginInstance *inst);
 void highlight_sticky_edges (ggobid *, gint, gint , datad *d, void *inst);
 gint visible_set (glong *visible, datad *d);
+
+void radial_center_set_cb (ggobid *gg, gint index, gint state, datad *d, PluginInstance *inst);
 
 #ifdef CMDS
 gint cmds (array_d *D, array_d *X);
