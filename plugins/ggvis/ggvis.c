@@ -189,7 +189,7 @@ g_printerr ("through cmds\n");
     gdouble *x = g_malloc0 (d->nrows * sizeof (gdouble));
     gchar *name;
 
-    for (k=0; k<3; k++) {
+    for (k=0; k<2; k++) {
       for (i=0; i<d->nrows; i++) {
         x[i] = ggv->pos.vals[i][k];
       }
@@ -208,6 +208,7 @@ static void mds_spring_cb (GtkButton *button, PluginInstance *inst)
   ggvisd *ggv = GGVisFromInst (inst);
   gint i, j, jvar;
   gchar *name;
+  gint ndims = 2;
 
   datad *d = gg->current_display->d;
   datad *e = gg->current_display->e;
@@ -215,10 +216,10 @@ static void mds_spring_cb (GtkButton *button, PluginInstance *inst)
     return;
 
 /*-- add a couple of rounds of spring therapy --*/
-  spring_once (3, d, e, &ggv->dist, &ggv->pos);
+  spring_once (ndims, d, e, &ggv->dist, &ggv->pos);
 g_printerr ("through spring_once (ten times)\n");
 
-  for (j=0; j<3; j++) {
+  for (j=0; j<ndims; j++) {
     name = g_strdup_printf ("Pos%d", j);
     jvar = vartable_index_get_by_name (name, d);
     g_free (name);
