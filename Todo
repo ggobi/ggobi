@@ -19,19 +19,20 @@ Colors:
 
   We want to be able to specify the activeColorScheme in the
   xml data file.
+    Done for name= and file= attributes.
+    Want also to be able to:
+       1) resolve file references relative to the data file being read;
+       2) can read <colormap> (or whatever they should be named) inlined within
+          the <activeColorScheme>.
 
   Fix the names and ids in the color map specification. Need to
   determine what is the relationship between these.
 
-  It should be possible to read in multiple colorscheme files,
-  so the user can read the system file and their own file.
-
   As the number of colorschemes increases, use a tree
   to represent them.  (Do this in gtk2 only?)
 
-  Work out our terminology -- is there a difference between
-  a colorscheme and a colormap?  If not, let's just use one
-  term.
+  Remove the colormap material from read_xml.c
+  
 
 
 --------- notes on colors ---------------------------------------
@@ -67,6 +68,9 @@ make_ggobi.c
   these files make mention of
     sessionOptions->info->bgColor
   and I don't think that has meaning now.
+
+  Yes it should change the appropriate element in the active color scheme.
+  May not want to support this?
 
 -----------------------------------------------------------------
 
@@ -354,3 +358,11 @@ Food for thought:
 
 ! Allow a 2-character nickname to be specified in the xml file
 !   along with the full variable name.
+
+! It should be possible to read in multiple colorscheme files,
+  so the user can read the system file and their own file.
+   Done.
+
+! Work out our terminology -- is there a difference between
+  a colorscheme and a colormap?  If not, let's just use one
+  term.

@@ -72,6 +72,8 @@
 /* Make unstatic/global if need arises. */
 static gboolean checkLevelValue(vartabled *vt, double value);
 
+void setColorScheme(const xmlChar **attrs, XMLParserData *data);
+
 void startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs);
 void endXMLElement(void *user_data, const xmlChar *name);
 void Characters(void *user_data, const xmlChar *ch, gint len);
@@ -94,6 +96,7 @@ const gchar * const xmlDataTagNames[] = {
                                           "categoricalvariable",
                                           "levels",
                                           "level",
+					  "activeColorScheme",
                                           ""
                                          };
 
@@ -112,6 +115,7 @@ ggobi_XML_warning_handler(void *data, const gchar *msg, ...)
 */
   fflush(stderr);  
 }
+
 void
 ggobi_XML_error_handler(void *data, const gchar *msg, ...)
 {
@@ -243,6 +247,9 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
   data->state = type;
 
   switch (type) {
+    case COLORSCHEME:
+	setColorScheme(attrs, data);
+	break;
     case VARIABLES:
       allocVariables (attrs, data);
     break;
@@ -287,6 +294,31 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
   }
 }
 
+void
+setColorScheme(const xmlChar **attrs, XMLParserData *data)
+{
+   const gchar *tmp;
+
+   tmp = getAttribute(attrs, "file");
+   if(tmp) {
+       /* process this file to append its color schemes into the global list. */
+       read_colorscheme(tmp, &(data->gg->colorSchemes));
+   }
+
+   tmp = getAttribute(attrs, "name");
+   if(tmp) {
+       /* resolve the color scheme by name */
+
+     colorschemed *scheme;
+      scheme = findColorSchemeByName(sessionOptions->colorSchemes, tmp);
+      if(scheme) {
+	  data->gg->activeColorScheme = scheme;
+	  colorscheme_init(scheme);
+      }
+   }
+   
+}
+
 gint
 setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 {
@@ -300,14 +332,15 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 /*-- dfs: placeholder for proper debugging --*/
   if (data->current_level >=  el->nlevels) {
 /*XXX Put in a more terminal error! */
-    g_printerr ("trouble: adding too many levels to %s\n", el->collab);
+    ggobi_XML_error_handler(data, "trouble: adding too many levels to %s\n", el->collab);
   }
 /* */
 
   itmp = data->current_level;
   if (tmp != NULL) {
     itmp = strToInteger (tmp);
-    if (itmp < 0) g_printerr ("trouble: levels must be >= 0\n");
+    if (itmp < 0) 
+	g_printerr ("trouble: levels must be >= 0\n");
   }
   el->level_values[data->current_level] = itmp;
  
@@ -870,8 +903,7 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
       value = asNumber (tmp);
       if(vt->categorical_p && checkLevelValue(vt, value) == false) {
             /* add the name of the variable and the record number to this message! */
-/*XXX */
-	  g_printerr("incorrect level in record %d, variable %s the XML input file\n", (int) data->current_record + 1, vt->collab);
+	 ggobi_XML_error_handler(data, "incorrect level in record %d, variable %s the XML input file\n", (int) data->current_record + 1, vt->collab);
       }
       d->raw.vals[data->current_record][data->current_element] = value;
     }

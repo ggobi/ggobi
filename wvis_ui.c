@@ -872,11 +872,13 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 }
 
 void
-wvis_window_open (ggobid *gg) {
+wvis_window_open (ggobid *gg) 
+{
   GtkWidget *vbox;
   GtkWidget *frame1, *vb1, *hb;
   GtkWidget *notebook;
   GtkWidget *btn, *vb, *opt;
+  int currentSelection = 0, i=0;
 
 #ifdef USE_XML
   /*-- for colorscales --*/
@@ -975,18 +977,26 @@ wvis_window_open (ggobid *gg) {
 
     colorscheme_add_to_menu (menu, "Default", NULL,
       (GtkSignalFunc) colorscheme_set_cb, notebook, gg);
-    for (n=0; n<ncolorscaletype_lbl; n++) {
+ 
+    
+    for (n=0; n<ncolorscaletype_lbl; n++, i++) {
       colorscheme_add_to_menu (menu, colorscaletype_lbl[n], NULL,
-        NULL, notebook, gg);
-      for (l = gg->colorSchemes; l; l = l->next) {
+			       NULL, notebook, gg);
+      for (l = gg->colorSchemes; l; l = l->next, i++) {
         scheme = (colorschemed *) l->data;
-        if (scheme->type == n)
+        if (scheme->type == n) {
           colorscheme_add_to_menu (menu, scheme->name, scheme,
             (GtkSignalFunc) colorscheme_set_cb, notebook, gg);
+	  if(strcmp(scheme->name, gg->activeColorScheme->name) == 0) {
+/*XX Fix this - off by some quantity because Debby didn't use trees. ! */
+	      currentSelection = i + 2;
+	  }
+	}
       }
     }
 
     gtk_option_menu_set_menu (GTK_OPTION_MENU (opt), menu);
+    gtk_option_menu_set_history(GTK_OPTION_MENU (opt), currentSelection);
 
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Choose a color scale", NULL);
