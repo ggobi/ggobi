@@ -18,20 +18,13 @@
 
 
 gboolean
-impute_fixed (gint impute_type, datad *d, ggobid *gg)
+impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
 {
   gint i, j, k, m;
   gfloat maxval, minval, range, val, impval;
   gchar *val_str;
-  gint *selected_cols;
-  gint nselected_cols = 0;
   gboolean ok = true;
   vartabled *vt;
-
-  selected_cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  nselected_cols = selected_cols_get (selected_cols, d, gg);
-  if (nselected_cols == 0)
-    nselected_cols = plotted_cols_get (selected_cols, d, gg);
 
   if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
 
@@ -63,8 +56,8 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
       return ok;
     }
 
-    for (k=0; k<nselected_cols; k++) {
-       j = selected_cols[k];
+    for (k=0; k<nvars; k++) {
+       j = vars[k];
        vt = vartable_element_get (j, d);
 
       /* First find the maximum and minimum values of the non-missing data */
@@ -110,8 +103,8 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
       g_free (val_str);
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
-        for (k=0; k<nselected_cols; k++) {
-          j = selected_cols[k];
+        for (k=0; k<nvars; k++) {
+          j = vars[k];
           if (d->missing.vals[m][j]) {
             d->raw.vals[m][j] = d->tform.vals[m][j] = impval;
           }
@@ -120,9 +113,6 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
     }
   }
 
-/*  update_imputation(gg);*/
-
-  g_free (selected_cols);
   return ok;
 }
 
@@ -155,12 +145,11 @@ impute_single (gint *missv, gint nmissing, gint *presv, gint npresent,
 }
 
 void
-impute_random (datad *d, ggobid *gg)
+impute_random (datad *d, gint nvars, gint *vars, ggobid *gg)
 {
 /* Perform single random imputation */
 
   gint i, j, k, n, m, npresent, *presv, nmissing, *missv;
-  gint *selected_cols, nselected_cols;
 
   if (d->nmissing == 0)
 /**/return;
@@ -168,20 +157,15 @@ impute_random (datad *d, ggobid *gg)
   presv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
   missv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
 
-  selected_cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  nselected_cols = selected_cols_get (selected_cols, d, gg);
-  if (nselected_cols == 0)
-    nselected_cols = plotted_cols_get (selected_cols, d, gg);
-
   if (gg->impute.bgroup_p && d->nclusters > 1) {
 
     /* Loop over the number of brushing groups */
     for (n=0; n<d->nclusters; n++) {
 
       /* Then loop over the number of columns */
-      for (m=0; m<nselected_cols; m++) {
+      for (m=0; m<nvars; m++) {
         npresent = nmissing = 0;
-        j = selected_cols[m];
+        j = vars[m];
 
         /*
          * And finally over the rows, including only those rows
@@ -204,9 +188,9 @@ impute_random (datad *d, ggobid *gg)
   }
 
   else {
-    for (m=0; m<nselected_cols; m++) {
+    for (m=0; m<nvars; m++) {
       npresent = nmissing = 0;
-      j = selected_cols[m];
+      j = vars[m];
       /*
        * Build the vector of indices of present values that can be used
        * to draw from.
@@ -224,10 +208,6 @@ impute_random (datad *d, ggobid *gg)
     }
   }
 
-  /* Handle transformations, run through pipeline, plot */
-/*  update_imputation (gg);*/
-
   g_free (presv);
   g_free (missv);
-  g_free (selected_cols);
 }

@@ -27,7 +27,8 @@ close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
 
 static void rescale_cb (GtkButton *button, ggobid *gg)
 {
-  datad *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->impute.window));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
 
   limits_set (true, true, d, gg);
   vartable_limits_set (d);
@@ -45,52 +46,46 @@ static void
 impute_cb (GtkWidget *w, ggobid *gg) {
   gint impute_type;
   gboolean redraw = true;
-  datad *d = gg->current_display->d;
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->impute.window));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
 
   impute_type = 
     gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->impute.notebook));
 
   switch (impute_type) {
     case IMP_RANDOM:
-      impute_random (d, gg);
-      break;
+      impute_random (d, nvars, vars, gg);
+    break;
     case IMP_FIXED:
     case IMP_BELOW:
     case IMP_ABOVE:
-      redraw = impute_fixed (impute_type, d, gg);
-      break;
+      redraw = impute_fixed (impute_type, nvars, vars, d, gg);
+    break;
   }
 
   if (redraw) {
     tform_to_world (d, gg);
     displays_tailpipe (REDISPLAY_ALL, FULL, gg);
   }
+
+  g_free (vars);
 }
 
 /*------------------------------------------------------------------*/
 
-static gchar *whichvars_lbl[] =
-  {"All variables", "Selected variables"};
-void whichvars_set (gint which, ggobid *gg) { gg->impute.whichvars = which; }
-static void whichvars_set_cb (GtkWidget *w, gpointer cbd)
-{
-  ggobid *gg = GGobiFromWidget (w, true);
-  whichvars_set (GPOINTER_TO_INT (cbd), gg);
-}
-
 void
 impute_window_open (ggobid *gg) {
 
-  GtkWidget *btn, *tgl, *opt;
+  GtkWidget *btn, *tgl;
   GtkWidget *vbox, *frame, *hb;
   GtkWidget *label;
-  datad *d;
+  GtkWidget *notebook;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
 /**/return;
-
-  d = gg->current_display->d;
 
   if (gg->impute.window == NULL) {
     
@@ -105,7 +100,12 @@ impute_window_open (ggobid *gg) {
     vbox = gtk_vbox_new (false, 2);
     gtk_container_add (GTK_CONTAINER (gg->impute.window), vbox);
 
+    /* Create a notebook, set the position of the tabs */
+    notebook = create_variable_notebook (vbox, GTK_SELECTION_EXTENDED,
+      (GtkSignalFunc) NULL, gg);
+
     /*-- option menu to specify variables --*/
+/*
     opt = gtk_option_menu_new ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "For which variables should imputation be performed?",
@@ -114,6 +114,7 @@ impute_window_open (ggobid *gg) {
       sizeof (whichvars_lbl) / sizeof (gchar *),
       (GtkSignalFunc) whichvars_set_cb, gg);
     gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 2);
+*/
     
     /*-- Create a new notebook, place the position of the tabs --*/
     gg->impute.notebook = gtk_notebook_new ();
@@ -233,7 +234,11 @@ impute_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 2);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (close_btn_cb), gg);
+
+    gtk_object_set_data (GTK_OBJECT (gg->impute.window),
+      "notebook", notebook);
+    gtk_widget_show_all (gg->impute.window);
   }
 
-  gtk_widget_show_all (gg->impute.window);
+  gdk_window_raise (gg->impute.window->window);
 }
