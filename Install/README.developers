@@ -57,3 +57,6 @@ Next, to get it to appear on the Web site, you can install the
 new version of the pages. To do this, from within the 
 checked out version of the Web/ module, type
   gmake
+
+(You may need to set GGOBI_SRC to the location of the src code, and
+hence the notes directory which contains pieces for the web site.)

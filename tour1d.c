@@ -108,10 +108,18 @@ tour1d_realloc_up (gint nc, datad *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
+  gint old_ncols, i;
+
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->displaytype != scatterplot)
       continue;
+
+    old_ncols = dsp->t1d.u0.ncols;
+
+    if (old_ncols < 1 && nc >= 1) {
+      display_tour1d_init(dsp, gg);
+    }
 
     if (dsp->d == d) {
       arrayf_add_cols (&dsp->t1d.u0, nc);
@@ -129,6 +137,22 @@ tour1d_realloc_up (gint nc, datad *d, ggobid *gg)
       vectorf_realloc (&dsp->t1d.tinc, nc);
 
       arrayf_add_cols (&dsp->t1d_manbasis, (gint) nc);
+
+      /* need to zero extra cols */
+      for (i=old_ncols; i<nc; i++) {
+        dsp->t1d.u0.vals[0][i] = dsp->t1d.u0.vals[1][i] = 0.0;
+        dsp->t1d.u1.vals[0][i] = dsp->t1d.u1.vals[1][i] = 0.0;
+        dsp->t1d.u.vals[0][i] = dsp->t1d.u.vals[1][i] = 0.0;
+        dsp->t1d.v0.vals[0][i] = dsp->t1d.v0.vals[1][i] = 0.0;
+        dsp->t1d.v1.vals[0][i] = dsp->t1d.v1.vals[1][i] = 0.0;
+        dsp->t1d.v.vals[0][i] = dsp->t1d.v.vals[1][i] = 0.0;
+        dsp->t1d.uvevec.vals[0][i] = dsp->t1d.uvevec.vals[1][i] = 0.0;
+        dsp->t1d.tv.vals[0][i] = dsp->t1d.tv.vals[1][i] = 0.0;
+        dsp->t1d.vars.els[i] = 0;
+        dsp->t1d.lambda.els[i] = 0.0;
+        dsp->t1d.tau.els[i] = 0.0;
+        dsp->t1d.tinc.els[i] = 0.0;
+      }
     }
   }
 }

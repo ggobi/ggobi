@@ -112,6 +112,7 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
   GList *l;
   gint old_ncols, i;
 
+  printf("%d\n", nc);
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->displaytype != scatterplot)
@@ -120,7 +121,7 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
     old_ncols = dsp->t2d.u0.ncols;
 
     if (old_ncols < 2 && nc >= 2) {
-      /* what? */
+      display_tour2d_init(dsp, gg);
     }
 
     if (dsp->d == d) {

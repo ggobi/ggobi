@@ -153,10 +153,18 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
+  gint old_ncols, i;
+
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->displaytype != scatterplot)
       continue;
+
+    old_ncols = dsp->tcorr1.u0.ncols;
+
+    if (old_ncols < 2 && nc >= 2) {
+      display_tourcorr_init(dsp, gg);
+    }
 
     if (dsp->d == d) {
       arrayf_add_cols (&dsp->tcorr1.u0, nc);
@@ -189,6 +197,35 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
       vectorf_realloc (&dsp->tcorr2.lambda, nc);
       vectorf_realloc (&dsp->tcorr2.tau, nc);
       vectorf_realloc (&dsp->tcorr2.tinc, nc);
+
+      /* need to zero extra cols */
+      for (i=old_ncols; i<nc; i++) {
+        dsp->tcorr1.u0.vals[0][i] = dsp->tcorr1.u0.vals[1][i] = 0.0;
+        dsp->tcorr1.u1.vals[0][i] = dsp->tcorr1.u1.vals[1][i] = 0.0;
+        dsp->tcorr1.u.vals[0][i] = dsp->tcorr1.u.vals[1][i] = 0.0;
+        dsp->tcorr1.v0.vals[0][i] = dsp->tcorr1.v0.vals[1][i] = 0.0;
+        dsp->tcorr1.v1.vals[0][i] = dsp->tcorr1.v1.vals[1][i] = 0.0;
+        dsp->tcorr1.v.vals[0][i] = dsp->tcorr1.v.vals[1][i] = 0.0;
+        dsp->tcorr1.uvevec.vals[0][i] = dsp->tcorr1.uvevec.vals[1][i] = 0.0;
+        dsp->tcorr1.tv.vals[0][i] = dsp->tcorr1.tv.vals[1][i] = 0.0;
+        dsp->tcorr1.vars.els[i] = 0;
+        dsp->tcorr1.lambda.els[i] = 0.0;
+        dsp->tcorr1.tau.els[i] = 0.0;
+        dsp->tcorr1.tinc.els[i] = 0.0;
+
+        dsp->tcorr1.u0.vals[0][i] = dsp->tcorr1.u0.vals[1][i] = 0.0;
+        dsp->tcorr1.u1.vals[0][i] = dsp->tcorr1.u1.vals[1][i] = 0.0;
+        dsp->tcorr1.u.vals[0][i] = dsp->tcorr1.u.vals[1][i] = 0.0;
+        dsp->tcorr1.v0.vals[0][i] = dsp->tcorr1.v0.vals[1][i] = 0.0;
+        dsp->tcorr1.v1.vals[0][i] = dsp->tcorr1.v1.vals[1][i] = 0.0;
+        dsp->tcorr1.v.vals[0][i] = dsp->tcorr1.v.vals[1][i] = 0.0;
+        dsp->tcorr1.uvevec.vals[0][i] = dsp->tcorr1.uvevec.vals[1][i] = 0.0;
+        dsp->tcorr1.tv.vals[0][i] = dsp->tcorr1.tv.vals[1][i] = 0.0;
+        dsp->tcorr1.vars.els[i] = 0;
+        dsp->tcorr1.lambda.els[i] = 0.0;
+        dsp->tcorr1.tau.els[i] = 0.0;
+        dsp->tcorr1.tinc.els[i] = 0.0;
+      }
     }
   }
 }
@@ -294,7 +331,7 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr2.get_new_target = true;
 
   /* manip */
-  dsp->t2d_manip_mode = CMANIP_COMB;
+  dsp->tc_manip_mode = CMANIP_COMB;
 
   /* pp */
   dsp->tcorr1.target_basis_method = 0;
