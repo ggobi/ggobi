@@ -24,20 +24,24 @@ void       show_data_edit_window(PluginInstance *inst, GtkWidget *widget);
 gboolean
 addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  GtkWidget *menu, *entry, *data_item;
+  GtkWidget *entry;
+  extern GtkWidget *GGobi_addToolsMenuItem (const char *label, ggobid *gg);
 
   inst->data = NULL;
   inst->info = plugin;
 
+/*
+  GtkWidget *menu, *data_item;
   menu = gtk_menu_new();
   entry = gtk_menu_item_new_with_label("View");
-
   gtk_menu_append (GTK_MENU (menu), entry);
+  gtk_widget_show(entry);
+*/
 
+  entry = GGobi_addToolsMenuItem ("Data grid ...", gg);
   gtk_signal_connect_object (GTK_OBJECT(entry), "activate",
                              GTK_SIGNAL_FUNC (show_data_edit_window),
                              (gpointer) inst);
-  gtk_widget_show(entry);
 
 /*
   data_item = gtk_menu_item_new_with_label("Data");
@@ -46,8 +50,11 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
     gg->main_accel_group, (guint) 'A',
     GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
 */
+
+/*
   data_item = submenu_make ("D_ata", 'A', gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (data_item), menu);
+*/
 
 
 /*
@@ -58,12 +65,15 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 
   gtk_menu_bar_append (GTK_MENU_BAR (gg->main_menubar), data_item);
 */
+
+/*
   {
     gint n;  
     GList *children = gtk_container_children(GTK_CONTAINER(gg->main_menubar));
     n = g_list_length(children);
     gtk_menu_bar_insert(GTK_MENU_BAR (gg->main_menubar), data_item, n-1);
   }
+*/
 
 
 #ifdef USE_FACTORY
