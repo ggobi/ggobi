@@ -8,6 +8,13 @@
 
 #include <math.h>
 
+
+#if USE_XML == 1
+#define XML_DOC_ROOT(doc) (doc)->root
+#else
+#define XML_DOC_ROOT(doc) (doc)->children
+#endif
+
 xmlNodePtr add_xml_display(displayd *dpy, xmlDocPtr doc);
 void add_xml_scatterplot_variables(xmlNodePtr node, GList *plots, displayd *dpy);
 void add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy);
@@ -56,7 +63,7 @@ create_ggobi_xml(ggobid *gg)
 
      /* Create the document */
  doc = xmlNewDoc("1.0");
- doc->children = xmlNewDocNode(doc, NULL, "ggobi", NULL);
+ XML_DOC_ROOT(doc) = xmlNewDocNode(doc, NULL, "ggobi", NULL);
 
  el = els;
  while(el) {
@@ -80,7 +87,7 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
        specifying the type of the display and the name of the
        dataset in which the variables are to be found.
      */
-  node = xmlNewChild(doc->children, NULL, "display", NULL);
+  node = xmlNewChild(XML_DOC_ROOT(doc), NULL, "display", NULL);
   xmlSetProp(node, "type", getDisplayTypeName(dpy));
   xmlSetProp(node, "data", getDataName(dpy));
 

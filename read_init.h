@@ -7,6 +7,12 @@
 #include "fileio.h"
 
 
+#if USE_XML == 1
+# define XML_CHILDREN(node) (node)->childs
+#else
+# define XML_CHILDREN(node) (node)->children
+#endif
+
 typedef struct {
     enum displaytyped type; /* the type of the plot. */
     int numVars;            /* the number of variables in the plot. */

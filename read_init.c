@@ -70,7 +70,7 @@ xmlNode *
 getXMLElement(const xmlDocPtr doc, const char *tagName)
 {
   xmlNode *node = xmlDocGetRootElement(doc);
-  node = node->children;
+  node = XML_CHILDREN(node);
   while(node) {
     if(strcmp(node->name, tagName) == 0) {
       return(node);
@@ -89,7 +89,7 @@ getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
   node = getXMLElement(doc, "previousFiles");
 
   n = 0;
-  el = node->children;
+  el = XML_CHILDREN(node);
   while(el) {
     if(el->type != XML_TEXT_NODE)
        n++;
@@ -99,7 +99,7 @@ getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
   info->descriptions = g_malloc(n*sizeof(GGobiDescription));
   info->numInputs = n;
 
-  el = node->children;
+  el = XML_CHILDREN(node);
   for(i = 0; el ; el = el->next) {
     if(el->type != XML_TEXT_NODE) {
    
@@ -184,7 +184,7 @@ getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info)
   GGobiDescription *desc;
   gint i;
   node = getXMLElement(doc, "ggobis"); 
-  el = node->children;
+  el = XML_CHILDREN(node);
   i = 0;
   while(el) {
     if(el->type != XML_TEXT_NODE && strcmp(el->name,"ggobi") == 0) {
@@ -202,7 +202,7 @@ getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info)
 gint
 getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc)
 {
-  xmlNodePtr el = node->children;
+  xmlNodePtr el = XML_CHILDREN(node);
   GGobiDisplayDescription *dpy;
   gint n = 0;
   desc->displays = NULL;
@@ -243,7 +243,7 @@ getDisplayDescription(xmlNodePtr node)
    return(dpy);
   }
 
-  el = node->children;
+  el = XML_CHILDREN(node);
   while(el) {
     if(el->type != XML_TEXT_NODE && strcmp(el->name, "variable") == 0) 
       dpy->numVars++;
@@ -251,7 +251,7 @@ getDisplayDescription(xmlNodePtr node)
   }
 
   dpy->varNames = (gchar **) g_malloc(dpy->numVars*sizeof(gchar*));
-  for(i = 0, el = node->children; i < dpy->numVars; el = el->next) {
+  for(i = 0, el = XML_CHILDREN(node); i < dpy->numVars; el = el->next) {
     if(el->type != XML_TEXT_NODE && strcmp(el->name, "variable") == 0) 
       dpy->varNames[i++] = g_strdup(xmlGetProp(el, "name"));
   }
@@ -296,7 +296,7 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
   if(node == NULL)  
       return;
 
-  el = node->children;
+  el = XML_CHILDREN(node);
   while(el) {
     if(el->type != XML_TEXT_NODE && strcmp(el->name, "plugin") == 0) {
       plugin = processPlugin(el, info, doc);
@@ -340,19 +340,19 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
     load = strcmp((char*)tmp, "immediate") == 0;
   }
 
-  el = node->children;
+  el = XML_CHILDREN(node);
   while(el) {
     if(el->type != XML_TEXT_NODE) {
       if(strcmp(el->name, "author") == 0) {
-        val = xmlNodeListGetString(doc, el->children, 1);
+        val = xmlNodeListGetString(doc, XML_CHILDREN(node), 1);
         plugin->author = g_strdup((char*) val);
       } else if(strcmp(el->name, "description") == 0) {
-        val = xmlNodeListGetString(doc, el->children, 1);
+        val = xmlNodeListGetString(doc, XML_CHILDREN(node), 1);
         plugin->description = g_strdup((char*) val);
       } else if(strcmp(el->name, "dll") == 0) {
         plugin->dllName = g_strdup((char*) xmlGetProp(el, "name"));
-        if(el->children) {
-          xmlNodePtr c = el->children;
+        if(XML_CHILDREN(el)) {
+          xmlNodePtr c = XML_CHILDREN(node);
           while(c) {
             if(el->type != XML_TEXT_NODE && strcmp(c->name, "init") == 0) {
                GET_PROP_VALUE(onLoad, "onLoad");
