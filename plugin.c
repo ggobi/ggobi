@@ -192,7 +192,7 @@ registerPlugins(ggobid *gg, GList *plugins)
 
   while(el) {
     plugin = (GGobiPluginInfo *) el->data;
-    ok = ok || registerPlugin(gg, plugin);
+    ok = registerPlugin(gg, plugin) || ok;
     el = el->next;
   }
 
