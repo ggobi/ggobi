@@ -204,8 +204,10 @@ splot_write_svg (splotd *sp, ggobid *gg)
   fclose (f);
   return;
 }
+
 void
-display_write_svg (ggobid *gg) {
-  /*-- for the moment, only deal with a single scatterplot --*/
-  splot_write_svg (gg->current_splot, gg);
+display_write_svg (ggobid *gg) 
+{
+    /*-- for the moment, only deal with a single scatterplot --*/
+ splot_write_svg (gg->current_splot, gg);
 }

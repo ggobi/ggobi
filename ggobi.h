@@ -20,6 +20,7 @@
 
 #include "fileio.h"
 
+
 /*
  These are hooks for other applications (e.g. R) to 
  facilitate callbacks at a higher level that GTK events/signals.
@@ -80,6 +81,8 @@ typedef struct /*-- ggobi --*/ {
  GtkAccelGroup *sp_accel_group;
 
 } GGobiApp;
+
+typedef struct _PrintOptions PrintOptions;
 
 struct _ggobid {
 
@@ -373,6 +376,8 @@ struct _ggobid {
 
  KeyEventHandler *NumberedKeyEventHandler;
 
+
+ PrintOptions *printOptions;
 }; /*  ggobid; */
 
 

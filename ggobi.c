@@ -236,6 +236,8 @@ ggobi_alloc()
   tmp->tour1d.idled = 0;
   tmp->tourcorr.idled = 0;
 
+  tmp->printOptions = NULL;
+
   totalNumGGobis++;
 
   all_ggobis = (ggobid **)

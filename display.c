@@ -20,6 +20,8 @@
 
 #include <string.h> /* for memset */
 
+#include "print.h"
+
 DisplayOptions DefaultDisplayOptions = {
                                          true,  /* points_show_p */
                                          false, /* edges_directed_show_p */
@@ -162,7 +164,15 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 }
 
 void
-display_print_cb (displayd *display, guint action, GtkWidget *w) {
+display_print_cb (displayd *display, guint action, GtkWidget *w) 
+{
+ ggobid *gg;
+
+ if(DefaultPrintHandler == NULL) {
+   DefaultPrintHandler = PrintAsSVG;
+ }
+
+ showPrintDialog(gg->printOptions, display, display->ggobi, DefaultPrintHandler, (void *) NULL);
 }
 
 /*-- Called when a plot window is closed from the menu --*/
