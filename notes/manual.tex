@@ -39,12 +39,12 @@
 
 \begin {document}
 
-\title {GGobi manual}
+\title {ggobi manual}
 \author{
 Deborah F. Swayne, AT\&T Labs -- Research \\
 Dianne Cook, Iowa State University \\
-Duncan Temple Lang, Lucent Bell Labs \\
-Andreas Buja, AT\&T Labs -- Research
+Andreas Buja, AT\&T Labs -- Research \\
+Duncan Temple Lang, Lucent Bell Labs
 }
 \date{January 2001}
 
@@ -53,17 +53,17 @@ Andreas Buja, AT\&T Labs -- Research
 
 \begin{abstract}
 
-GGobi is a data visualization system with state-of-the-art
+The ggobi software is a data visualization system with state-of-the-art
 interactive and dynamic methods for the manipulation of views of
 data.  It represents a big step in the evolution of XGobi, with
 multiple plotting windows, more flexible color management, XML file
 handling, and better portability to Windows.
 
-The biggest evolutionary step is that GGobi can be embedded in other
+The biggest evolutionary step is that ggobi can be embedded in other
 software and controlled using an API (application programming
 interface).  This design has been developed and tested in partnership
-with R.  When GGobi is used with R, the result is a full marriage
-between GGobi's direct manipulation graphical environment and R's
+with R.  When ggobi is used with R, the result is a full marriage
+between ggobi's direct manipulation graphical environment and R's
 familiar extensible environment for statistical data analysis.
 
 It has the same graphical functionality whether it is running
@@ -82,20 +82,21 @@ be examined.
 \section{Introduction}
 
 This paper gives an overview of the layout and functionality of ggobi,
-which is a major step in the evolution of XGobi.  Those of you who are
-quite familiar with XGobi might want to skip to section
-\ref{slbl:xgobi}.
+interactive graphical software for exploratory data analysis.  Readers
+who are familiar with xgobi will find much that is familiar in ggobi's
+design, and might want to skip directly to section \ref{slbl:xgobi}
+where key differences between the two tools are described.
 
-GGobi can be used for simple tasks with virtually no instruction.  All
-that a user needs is some cursory knowledge of the developments in
-interactive statistical graphics of the last 15 years, as well as a
-willingness to experiment using the sample data provided and the
-tooltips.
-
-Still, it may be more efficient to acquire up front a basic understanding of
+You will find that you can use ggobi for simple tasks with virtually
+no instruction.  All that a user needs is some cursory knowledge of
+the developments in interactive statistical graphics of the last 15
+years, as well as a willingness to experiment with the sample data
+provided guided by the tooltips.  In parallel with the hands-on learning
+process, it is probably useful to acquire a basic understanding of
 the overall layout and functionality of the system.  The greatest
 success is obtained by users who have gained experience with the
-system and combine it with creativity and data analytic sophistication.
+system and combine it with creativity and data analytic
+sophistication.
 
 We first describe the specifics of GGobi's layout and functionalities.
 Figure~1 shows a GGobi window, made using a version that was
@@ -107,7 +108,7 @@ available in early 2001.
 \centerline{[Figure 1 here]}
 
 \vspace{.15in} \centerline{ \parbox{6in}
-{Figure~1: Layout of a GGobi session.  The display window contains a
+{Figure~1: Layout of a ggobi session.  The display window contains a
 simple scatterplot.  Brushing has been used, and three different
 symbols are in use.
 }}
@@ -139,15 +140,14 @@ window.  The display types are
 If the data has missing values, a scatterplot or scatterplot matrix
 of the ``missingness'' information can be opened.
 
-The ``ViewMode'' button opens a menu for selecting from GGobi's
+The ``ViewMode'' button opens a menu for selecting from ggobi's
 inventory of interactive graphics operations: 
 \begin{itemize}
 \itemsep 0em
 \item 1-D dotplots and average shifted histograms,
 \item 2-D XY-plots, 
-\item 1-D grand tours,
-\item 2-D grand tours,
-\item axis scaling, 
+\item 1-D and 2-D tours, random or guided,
+\item axis scaling,
 \item brushing, 
 \item identification, 
 \item point motion.  
@@ -178,7 +178,7 @@ The division between ``ViewMode'' functions and ``Tools'' is somewhat
 arbitrary.  The ``ViewMode'' functions determine the mouse
 interactions in the display windows, while none of the ``Tools''
 does.  Furthermore, ``ViewMode'' functions populate the left hand
-control panel in the main GGobi window, while ``Tools'' create their
+control panel in the main ggobi window, while ``Tools'' create their
 own permanent control panels or views of the data in separate
 windows, as shown in figure~2.  For example, the variable selection
 and statistics ``Tool'' opens a table of data each variable, and the
@@ -209,17 +209,28 @@ As mentioned earlier, the main display types are
 
 \subsubsection{Current display, current plot}
 
-Since there are multiple displays, some of which contain
-multiple plots, the question arises:  Which plot in which
-display window corresponds to the control panel?  If you
-select the {\bf Brush} {\bf ViewMode}, how can you tell
-which plot is going to respond to brushing?
+Since there are multiple displays, some of which contain multiple
+plots, the question arises:  Which plot in which display window
+corresponds to the control panel?  If you select the {\bf Brush} {\bf
+ViewMode}, how can you tell which plot is going to respond to
+brushing?
 
-There is in ggobi a notion of the ``current display'' and
-the ``current plot.''
+There is in ggobi a notion of the ``current display'' and the
+``current plot.''  (We need both because some displays, like the
+scatterplot matrix, contain multiple plots.) The current plot is the
+one which is outlined with a thick white border; the current display
+is the one which contains the current plot.
+
+To reset the current plot and display, just click once (left, right
+or middle) in the plot you wish to address.  To understand the
+effects of this selection, open a few displays and set them in
+different ViewModes, then click on different plots and see what
+happens.  The white border should follow your actions, and the
+control panel should update so that its panels correspond to the
+current display type and ViewMode.
 
 \subsubsection{Missing data displays}
-
+\ref{slbl:MissingData}
 
 
 \subsection{Selecting variables for plotting}
@@ -244,6 +255,39 @@ the ``current plot.''
 \label{slbl:1DTour}
 \subsection{Scaling of axes}
 \label{slbl:Scaling}
+
+\subsubsection{Drag}
+
+For the default setting, Drag, the actions of the mouse can be
+described in terms of a camera:  you're operating a camera and
+looking at a projection of the data in the viewfinder.  When you use
+the left button, the camera is panning freely around, following the
+mouse exactly.  When you use the middle or right button, you're
+zooming the camera in and out.
+
+\subsubsection{Click: Pan or Zoom}
+
+When you select the ``Click'' interaction style, the camera metaphor
+becomes weaker, but your control of the panning and zooming becomes
+more precise.
+
+With ``Pan'' selected, the mouse controls the endpoint of a line
+segment which is anchored at the center of the plot (just where the
+center of the crosshair is in Drag style).  When you press the space
+bar, you'll cause the plot to pan so that the endpoint becomes the
+new center.  Repeated presses repeat the mostion in the same
+direction -- convenient for browsing time-dependent data, for
+instance.
+
+With ``Zoom'' selected, the visual guide changes again:  this time,
+the mouse controls a rectangle, and two keys are needed:  ``i'' to
+zoom in and ``o'' to zoom out.
+% working here: dfs
+
+
+
+\subsubsection{Pan and Zoom Options}
+
 \subsection{Linked brushing of points and lines}
 \label{slbl:Color}
 \subsection{Linked identification of points with labels}
@@ -270,24 +314,39 @@ the ``current plot.''
 \section{Differences from xgobi}
 \label{slbl:xgobi}
 
+In this section, we summarize the key differences between ggobi
+and xgobi for those readers who are already familiar with xgobi.
+
 \subsection {Multiple displays}
 
-If you're familiar with xgobi, the first thing you'll notice
-when you look at a ggobi display is that the plotting window
-has become separated from the control panels.  The main reason
-for that change is so that a ggobi process can have multiple
-display windows, as discussed in section
-\ref{slbl:GraphicalDisplays}.   That design change has had
-far-reaching effects.
+The first thing you'll notice when you look at a ggobi display is
+that the plotting window has become separated from the control
+panels.  The main reason for that change is so that a ggobi process
+can have multiple display windows, of the same type or of different
+types.  In addition to the basic scatterplot, ggobi currently has
+scatterplot matrices, parallel coordinates plots, and time series
+plots.  (See \ref{slbl:GraphicalDisplays} for more detail.)
+
+This design change has had far-reaching effects.
 
 First, user interactions available for the simple scatterplot display
-type can now be made available for each display, as long as their
-behavior can be unambiguously defined.  In xgobi, for instance, there
-is a parallel coordinates display, but it's not possible to brush
-it.
+can now be made available for other display types.  In xgobi, for
+instance, there is a parallel coordinates display, but it's not
+possible to brush it -- in ggobi, it is. 
 
-Second, since these multiple displays are linked by default, it's no
-longer necessary to link displays from different processes.
+Unfortunately, having multiple displays introduces a new source of
+ambiguity: you now have to tell ggobi which display, and which plot
+within a display, you want to address.  Do that by simply clicking
+inside the target plot.  ggobi will draw a thick white outline around
+that plot so that you can check which plot your actions will be
+addressing.  The ViewMode panel in the main ggobi window should
+always correspond to the state of the current display, too.  We need
+more user experience before we can tell whether this approach is
+satisfactory.
+
+The basis for linking has changed, too:  since all displays are
+linked by default, it's no longer necessary to run multiple processes
+in order to achieve linked displays.
 
 One of the most interesting implications of using multiple displays
 is that a ggobi process is no longer restricted to a single data
@@ -301,35 +360,39 @@ introduced below, and it's more fully described in section
 The rules and the interface for linking across data sets have not yet
 been defined.
 
-And last, a nice side effect is that it's now very simple to
-adjust the aspect ratio of a plot, something that's very awkward in
-xgobi.
+With multiple displays, too, we no longer have to launch a new
+process to open missing value plots -- the plots of 1's and 0's
+which represent the presence and absence of data in each cell.
+
+A convenient side effect of multiple displays is that, since each
+display now sits in a window of its own, it's now very simple to
+adjust the aspect ratio of a plot; this simple operation is very
+awkward in xgobi.
 
 \subsection {Data format}
 
-Before describing other changes in the visible design, you might
-also be curious about the changes in data format.  The xgobi
-format, in which a set of files with a common base name is used,
-is still supported, though file format may have changed ({\em .colors}),
-and some are no longer supported ({\em .bin} and {\em .vgroups}).
-(See section \ref{slbl:DataFormat} for details.)
+Before we describe other key changes in the visible design, we'll
+introduce the changes in data format.  The xgobi format, in which a
+set of files with a common base name is used, is still supported,
+though some file formats have changed ({\em .colors}), and some are
+no longer supported ({\em .bin} and {\em .vgroups}).  (See section
+\ref{slbl:DataFormat} for details.)
 
 The new format, in which all the data lives in one file, is written
 in XML.  XML, the Extensible Markup Language, is a widely used
-language for specifying structured documents and data to
-be viewed and exchanged on the web.  One advantage of XML is
-that XML files can be validated automatically, and it's also
-easy to extend the set of tags that's being used, adding more
-details and options to the ggobi data specification.
+language for specifying structured documents and data to be viewed
+and exchanged.  It was initially intended to be read by browsers, but
+it is also used to define documents that are read by other software.
+XML files can be validated automatically, and XML specifications can
+be easily extended, too, by adding to the set of tags in use.
 
-As ggobi grows and develops, it's the XML format that will
-definitely include all new features: it will become increasingly
-difficult to keep the old format up to date.  For instance, we
-will no longer support the ``.bin'' file used by xgobi, which
-can be used to store the data in a binary format.  Instead,
-the XML file will have a tag that can be used to give the
-name of a binary file to be read -- and the binary format we
-use will be portable.
+As ggobi grows and develops, we expect to favor the XML format:  it
+will become increasingly difficult to keep the old format up to
+date.  For instance, we will no longer support the ``.bin'' file used
+by xgobi, which can be used to store the data in a binary format.
+Instead, the XML file will have a tag that can be used to give the
+name of a binary file to be read -- and the binary format we use will
+be portable.
 
 A few XML data files are included in the sample ggobi data, and
 the details of their format is described in ??.
@@ -339,7 +402,7 @@ directly from a MySQL database, as described in section \ref{slbl:MySQL}.
 
 \subsection{Integration}
 
-Many of xgobi users are also users of the SPlus or R statistics
+Many xgobi users are also users of the SPlus or R statistics
 software, and have used the S function which launches an xgobi
 process viewing S data.  Once that launch occurred, the resulting
 process was utterly independent of its parent.  The xgobi authors
@@ -358,26 +421,32 @@ For more details, see section \ref{slbl:Integration}, or read
 
 \subsection {Variable selection}
 
-Among the other changes in the interface, the next one you'll
-probably notice is that selecting variables for plotting looks
-different for one and two-dimensional plots.  For those plots, ggobi
-uses checkboxes instead of variable circles, which require a lot of
-space and provide a lot of feedback that isn't necessary for simple
-orthogonal projections.  The user interface hasn't changed, though:
+There have been a few changes in variable selection.  The
+familiar variable circles are still used for high-dimensional
+view modes, but we've switched to a simple checkbox interface
+for plots where only one or two variables can be selected
+simultaneously.  In these plots, the rich feedback provided
+by the variable circles is not needed, and may just be confusing
+to novices.
+
+The basics of the user interface haven't changed, though:
 click with the left button to select a variable to be plotted
 horizontally and the middle (or right) button to plot vertically.
 
-There's a second panel for variable selection called the {\bf
-Variable selection and statistics table} which sits on the {\bf
-Tools} menu.  This table displays a handful of useful statistics for
-each variable, but it also plays an important role in variable
-selection.  Several of the tools, such as variable transformation and
-jittering, will operate on the plotted variables in the current
-display by default.  However, if any rows in this table are highlighted,
-then all selected variables will be affected. 
+\subsection {The variable selection and statistics table}
 
-This functionality together with the ability to specify limits
-for variables or groups of variables, replaced the {\em .vgroups}
+There's a second panel that has variable selection functions called
+the {\bf Variable selection and statistics table}; it's opened by
+selecting the first entry on the {\bf Tools} menu.  This table
+displays a handful of useful statistics for each variable, and it is
+also used to select variables -- not for plotting, but to be operated
+on by other tools.  Several of the tools, such as variable
+transformation and jittering, will operate on the plotted variables
+in the current display by default.  However, if any rows in this
+table are highlighted, then all selected variables will be affected.
+
+This table can also be used to specify limits for variables or groups
+of variables, and so we have dispensed with the {\em .vgroups}
 functionality in xgobi.
 
 Variable cloning is another new feature: it appears as a button
@@ -391,7 +460,9 @@ For more detail on this table, see section \ref{slbl:VarStats}.
 because ggobi has a much richer notion of color selection than
 xgobi.  Open the {\bf Choose Symbol} panel, and then double-click on
 any element of the color palette to bring up a color selection widget
-with access to the full color map.  See section \ref{slbl:Color}.
+with access to the full color map.  Notice that you can change the
+background color as well as any of the foreground colors.
+%See section \ref{slbl:Color}.
 
 {\bf Scale} has also changed -- the direct manipulation shifting and
 scaling methods work as they did in xgobi, though you now specify
