@@ -401,20 +401,14 @@ tform_to_world ()
 */
 
 void
-rows_in_plot_set (void) {
+rows_in_plot_set (ggobid *gg) {
   gint i;
 
-  gg.nrows_in_plot = 0;
-  gg.nlinkable_in_plot = 0;
+  gg->nrows_in_plot = 0;
 
-  for (i=0; i<gg.nrows; i++) {
-    if (i < gg.nlinkable) {
-      if (gg.included[i] && gg.sampled[i]) {
-        gg.rows_in_plot[gg.nrows_in_plot++] = i;
-        gg.nlinkable_in_plot++;
-      }
-    } else {  /*-- include all points past gg.nlinkable --*/
-      gg.rows_in_plot[gg.nrows_in_plot++] = i;
+  for (i=0; i<gg->nrows; i++) {
+    if (gg->included[i] && gg->sampled[i]) {
+      gg->rows_in_plot[gg->nrows_in_plot++] = i;
     }
   }
 }

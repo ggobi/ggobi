@@ -12,13 +12,13 @@
 #define SS_STICKY 3
 #define SS_ROWLAB 4
 
-extern void subset_include_all (void);
-extern void subset_apply (gboolean);
-extern gboolean subset_random (gint);
-extern gboolean subset_block (gint, gint);
-extern gboolean subset_everyn (gint, gint);
-extern gboolean subset_sticky (void);
-extern gboolean subset_rowlab (gchar *);
+extern void subset_include_all (ggobid *);
+extern void subset_apply (gboolean, ggobid *);
+extern gboolean subset_random (gint, ggobid *);
+extern gboolean subset_block (gint, gint, ggobid *);
+extern gboolean subset_everyn (gint, gint, ggobid *);
+extern gboolean subset_sticky (ggobid *gg);
+extern gboolean subset_rowlab (gchar *, ggobid *gg);
 
 static GtkWidget *window = NULL;
 static GtkWidget *ss_notebook;
@@ -42,7 +42,7 @@ static void rescalep_cb (GtkToggleButton *button)
 }
 
 static void
-subset_cb (GtkWidget *w) {
+subset_cb (GtkWidget *w, ggobid *gg) {
   gint subset_type;
   gint sample_size;
   gchar *sample_str, *rowlab;
@@ -57,36 +57,36 @@ subset_cb (GtkWidget *w) {
       sample_str = gtk_editable_get_chars (GTK_EDITABLE (ss_random_entry),
                                            0, -1);
       sample_size = atoi (sample_str);
-      redraw = subset_random (sample_size);
+      redraw = subset_random (sample_size, gg);
       break;
     case SS_BLOCK:
       ss_bstart = (gint) ss_bstart_adj->value;
       ss_bsize = (gint) ss_bsize_adj->value;
-      redraw = subset_block (ss_bstart-1, ss_bsize);
+      redraw = subset_block (ss_bstart-1, ss_bsize, gg);
       break;
     case SS_EVERYN:
       ss_estart = (gint) ss_estart_adj->value;
       ss_estep = (gint) ss_estep_adj->value;
-      redraw = subset_everyn (ss_estart-1, ss_estep);
+      redraw = subset_everyn (ss_estart-1, ss_estep, gg);
       break;
     case SS_STICKY:
-      redraw = subset_sticky ();
+      redraw = subset_sticky (gg);
       break;
     case SS_ROWLAB:
       rowlab = gtk_editable_get_chars (GTK_EDITABLE (ss_rowlab_entry), 0,-1);
-      redraw = subset_rowlab (rowlab);
+      redraw = subset_rowlab (rowlab, gg);
       break;
   }
 
   if (redraw)
-    subset_apply (rescale_p);
+    subset_apply (rescale_p, gg);
 }
 
 static void
-include_all_cb (GtkWidget *w ) {
-  subset_include_all ();
+include_all_cb (GtkWidget *w, ggobid *gg) {
+  subset_include_all (gg);
 
-  subset_apply (rescale_p);
+  subset_apply (rescale_p, gg);
 }
 
 /*------------------------------------------------------------------*/
@@ -350,7 +350,7 @@ subset_window_open (void) {
     gtk_signal_connect (GTK_OBJECT (button),
                         "clicked",
                         GTK_SIGNAL_FUNC (subset_cb),
-                        (gpointer) NULL);
+                        (gpointer) &gg);
     gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
 
     button = gtk_check_button_new_with_label ("Rescale");
@@ -366,7 +366,7 @@ subset_window_open (void) {
     gtk_signal_connect (GTK_OBJECT (button),
                         "clicked",
                         GTK_SIGNAL_FUNC (include_all_cb),
-                        (gpointer) NULL);
+                        (gpointer) &gg);
     gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
   }
 

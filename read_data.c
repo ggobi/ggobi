@@ -323,7 +323,7 @@ rgroups_read (gchar *ldata_in, gboolean init)
      * On this sweep, find out how many groups there are and how
      * many elements are in each group
     */
-    nr = (gg.nlinkable < gg.nrows) ? gg.nlinkable : gg.nrows;
+    nr = gg.nrows;
 
     for (i=0; i<nr; i++) {
       found_rg = false;
@@ -380,9 +380,6 @@ rgroups_read (gchar *ldata_in, gboolean init)
   
     g_free ((gpointer) nels);
   }
-
-  if (gg.nlinkable != gg.nrows)
-    g_printerr ("gg.nlinkable=%d gg.nrows=%d\n", gg.nlinkable, gg.nrows);
 
   if (gg.nrgroups != 0)
     g_printerr ("gg.nrgroups=%ld\n", gg.nrgroups);
@@ -719,54 +716,6 @@ segments_read (gchar *rootname, gboolean startup)
   if (fname != (gchar *) NULL)
     g_free ((gpointer) fname);
   return (ok);
-}
-
-/*------------------------------------------------------------------------*/
-/*                   the single integer nlinkable                         */
-/*------------------------------------------------------------------------*/
-
-gboolean
-nlinkable_read (gchar *ldata_in, gboolean init)
-/*
- * Read in the number of rows to be linked.
-*/
-{
-  gchar *suffixes[] = {".nlinkable"};
-  gint itmp;
-  gboolean found = false;
-  FILE *fp;
-
-  /*
-   * Initialize nlinkable to be all the rows; if not
-   * initializing, leave its value alone.
-  */
-  if (init)
-    gg.nlinkable = gg.nrows;
-
-  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
-    if ( (fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
-      found = true;
-  
-  if (found) {
-    fscanf (fp, "%d", &itmp);
-    if (itmp > 0 && itmp <= gg.nrows)
-      gg.nlinkable = itmp;
-    fclose (fp);
-  }
-
-  if (gg.nrows_in_plot == gg.nrows) gg.nlinkable_in_plot = gg.nlinkable;
-  else {
-    gint i;
-    gg.nlinkable_in_plot = 0;
-    for (i=0; i<gg.nlinkable; i++)
-      if (gg.included[i])
-        gg.nlinkable_in_plot++;
-  }
-
-  if (gg.nlinkable != gg.nrows)
-    g_printerr ("nlinkable = %d\n", gg.nlinkable);
-
-  return (found);
 }
 
 /*------------------------------------------------------------------------*/

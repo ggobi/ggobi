@@ -23,8 +23,8 @@ clusters_set (void) {
   gint nclust = 1;  /* There can never be 0 clusters */
 
   /*-- this is the groups variable and should become part of ggobi.h --*/
-  if (gg.clusterid.nels != gg.nlinkable) {
-    vectori_realloc_zero (&gg.clusterid, gg.nlinkable);
+  if (gg.clusterid.nels != gg.nrows) {
+    vectori_realloc_zero (&gg.clusterid, gg.nrows);
   }
 
   /*
@@ -33,7 +33,7 @@ clusters_set (void) {
   colors_used[0] = gg.color_ids[0];
   ncolors_used = 1;
   if (!gg.mono_p) {
-    for (i=0; i<gg.nlinkable; i++) {
+    for (i=0; i<gg.nrows; i++) {
       if (gg.sampled[i]) {  /*-- if in current sample (subset) --*/
         new_color = true;
         for (k=0; k<ncolors_used; k++) {
@@ -53,7 +53,7 @@ clusters_set (void) {
   glyphs_used[0].type = gg.glyph_ids[0].type;
   glyphs_used[0].size = gg.glyph_ids[0].size;
   nglyphs_used = 1;
-  for (i=0; i<gg.nlinkable; i++) {
+  for (i=0; i<gg.nrows; i++) {
     if (gg.sampled[i]) {  /*-- if in current sample (subset) --*/
       new_glyph = true;
       for (k=0; k<nglyphs_used; k++) {
@@ -88,7 +88,7 @@ clusters_set (void) {
       /*
        * Loop over all points, looking at glyph and color ids.
       */
-      for (i=0; i<gg.nlinkable; i++) {
+      for (i=0; i<gg.nrows; i++) {
         /*
          * If we find a pair ...
         */
@@ -130,7 +130,7 @@ clusters_set (void) {
    * If there are clusters, set the data in the groups column
   */
   for (n=0; n<nclust; n++) {
-    for (i=0; i<gg.nlinkable; i++) {
+    for (i=0; i<gg.nrows; i++) {
       if (gg.sampled[i]) {
         if (gg.glyph_ids[i].type == gg.clusv[n].glyphtype &&
             gg.glyph_ids[i].size == gg.clusv[n].glyphsize &&
@@ -150,7 +150,7 @@ clusters_set (void) {
    * membership.
   */
   if (nclust > 1) {
-    for (i=0; i<gg.nlinkable; i++) {
+    for (i=0; i<gg.nrows; i++) {
       if (gg.sampled[i]) {
         k = gg.clusterid.data[i];
 

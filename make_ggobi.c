@@ -72,7 +72,6 @@ fileset_read (gchar *ldata_in)
 
   array_read ();
   gg.nrows_in_plot = gg.nrows;  /*-- for now --*/
-  gg.nlinkable = gg.nrows;      /*-- for now --*/
   gg.nrgroups = 0;              /*-- for now --*/
 
   missing_values_read (gg.fname, true);

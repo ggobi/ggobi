@@ -79,21 +79,18 @@ missing_jitter_variable (gint jcol)
   gfloat frand, fworld, fjit;
 
   for (i=0; i<gg.nrows; i++) {
-    if ((m = gg.rows_in_plot[i]) >= gg.nlinkable)
-      break;
-    else {
+    m = gg.rows_in_plot[i];
 
-      frand = jitter_randval (gg.jitter_type) * precis;
+    frand = jitter_randval (gg.jitter_type) * precis;
 
-      if (gg.jitter_convex) {
-        fworld = (gfloat)
-          (gg.missing_world.data[m][jcol] - gg.missing_jitter.data[m][jcol]);
-        fjit = gg.missing_jitter_factor * (frand - fworld);
-      } else
-        fjit = gg.missing_jitter_factor * frand;
+    if (gg.jitter_convex) {
+      fworld = (gfloat)
+        (gg.missing_world.data[m][jcol] - gg.missing_jitter.data[m][jcol]);
+      fjit = gg.missing_jitter_factor * (frand - fworld);
+    } else
+      fjit = gg.missing_jitter_factor * frand;
 
-      gg.missing_jitter.data[m][jcol] = (glong) fjit;
-    }
+    gg.missing_jitter.data[m][jcol] = (glong) fjit;
   }
 }
 

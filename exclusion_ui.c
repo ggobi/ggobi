@@ -40,7 +40,7 @@ hide_cluster_cb (GtkToggleButton *btn, gpointer cbd)
 
   gg.clusv[k].hidden = btn->active;
 
-  for (i=0; i<gg.nlinkable; i++) {
+  for (i=0; i<gg.nrows; i++) {
     if (gg.sampled[i]) {
       if (gg.clusterid.data[i] == k) {
         gg.hidden[i] = gg.hidden_now[i] = btn->active;
@@ -60,7 +60,7 @@ exclude_cluster_cb (GtkToggleButton *btn, gpointer cbd)
 
   gg.clusv[k].included = !btn->active;
 
-  for (i=0; i<gg.nlinkable; i++) {
+  for (i=0; i<gg.nrows; i++) {
     if (gg.sampled[i])  {
       if (gg.clusterid.data[i] == k) {
         gg.included[i] = gg.included[i] = !btn->active;
@@ -68,7 +68,7 @@ exclude_cluster_cb (GtkToggleButton *btn, gpointer cbd)
     }
   }
 
-  rows_in_plot_set ();
+  rows_in_plot_set (&gg);
 
   /*-- should be exactly what happens in subset_apply --*/
   vardata_lim_update ();

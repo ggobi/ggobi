@@ -81,25 +81,23 @@ rejitter () {
   for (j=0; j<nselected_cols; j++) {
     k = selected_cols[j];
     for (i=0; i<gg.nrows_in_plot; i++) {
-      if ((m = gg.rows_in_plot[i]) >= gg.nlinkable)
-        break;
-      else {  /*-- jitter_one_value (m, k); --*/
+      m = gg.rows_in_plot[i];
+      /*-- jitter_one_value (m, k); --*/
 
-        frand = jitter_randval (gg.jitter_type) * precis;
+      frand = jitter_randval (gg.jitter_type) * precis;
 
-        /*
-         * The world.data used here is already jittered:
-         * subtract out the previous jittered value ...
-        */
-        if (gg.jitter_convex) {
-          fworld = (gfloat) (gg.world.data[m][k] - gg.jitter.data[m][k]);
-          fjit = gg.vardata[k].jitter_factor * (frand - fworld);
-        }
-        else
-          fjit = gg.vardata[k].jitter_factor * frand;
-
-        gg.jitter.data[m][k] = (glong) fjit;
+      /*
+       * The world.data used here is already jittered:
+       * subtract out the previous jittered value ...
+      */
+      if (gg.jitter_convex) {
+        fworld = (gfloat) (gg.world.data[m][k] - gg.jitter.data[m][k]);
+        fjit = gg.vardata[k].jitter_factor * (frand - fworld);
       }
+      else
+        fjit = gg.vardata[k].jitter_factor * frand;
+
+      gg.jitter.data[m][k] = (glong) fjit;
     }
   }
   tform_to_world ();

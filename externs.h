@@ -162,7 +162,7 @@ extern void rnorm2 (gdouble *, gdouble *);
 extern void rotation_event_handlers_toggle (splotd *, gboolean);
 extern void rotation_menus_make (void);
 extern gboolean rowlabels_read (gchar *, gboolean);
-extern void rows_in_plot_set (void);
+extern void rows_in_plot_set (ggobid *);
 extern void ruler_ranges_set (displayd *, splotd *);
 extern void scale_event_handlers_toggle (splotd *, gboolean);
 extern void scale_menus_make (void);

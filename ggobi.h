@@ -95,7 +95,6 @@ typedef struct _ggobid {
  glong *file_rows_sampled; /* of length file_sample_size */
 
  gint ncols, nrows;
- gint nlinkable, nlinkable_in_plot;
 
  array_f raw, tform1, tform2;
  array_l world, jitter;

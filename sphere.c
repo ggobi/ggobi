@@ -185,7 +185,6 @@ sphere_varcovar_set (void)
 {
   gint i, j, k, var;
   gfloat tmpf = 0.;
-/*  gint n = gg.nlinkable_in_plot;*/
   gint n = gg.nrows;
 
   for (k=0; k<nspherevars; k++) {

@@ -114,7 +114,6 @@ extern void rowlabels_alloc(void);
   gg.nrows = nr;
 
   gg.nrows_in_plot = gg.nrows;  /*-- for now --*/
-  gg.nlinkable = gg.nrows;      /*-- for now --*/
   gg.nrgroups = 0;              /*-- for now --*/
 
   gg.rows_in_plot = NULL;

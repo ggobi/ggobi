@@ -367,20 +367,17 @@ build_glyph_vectors ()
         */
         j = gg.rows_in_plot[ k = gg.br_binarray[ih][iv].els[m] ] ;
 
-        if (j < gg.nlinkable) {
-
-          /* update the glyph arrays for every member of the row group */
-          if (gg.nrgroups > 0) {
-            gp = gg.rgroup_ids[k];
-            for (n=0; n<gg.rgroups[gp].nels; n++) {
-              p = gg.rgroups[gp].els[n];
-              changed = update_glyph_arrays (p, changed);
-            }
-          /* */
-
-          } else {  /* update the arrays for this point only */
-            changed = update_glyph_arrays (j, changed);
+        /* update the glyph arrays for every member of the row group */
+        if (gg.nrgroups > 0) {
+          gp = gg.rgroup_ids[k];
+          for (n=0; n<gg.rgroups[gp].nels; n++) {
+            p = gg.rgroups[gp].els[n];
+            changed = update_glyph_arrays (p, changed);
           }
+        /* */
+
+        } else {  /* update the arrays for this point only */
+          changed = update_glyph_arrays (j, changed);
         }
       }
     }
@@ -451,20 +448,18 @@ build_color_vectors (void)
          * k   raw index, based on nrows
          * j   index based on nrows_in_plot
         */
-        if (j < gg.nlinkable) {
 
-          /* update the color arrays for every member of the row group */
-          if (gg.nrgroups > 0) {
-            gp = gg.rgroup_ids[k];
-            for (n=0; n<gg.rgroups[gp].nels; n++) {
-              p = gg.rgroups[gp].els[n];
-              changed = update_color_arrays (p, changed);
-            }
-          /* */
-
-          } else {  /* update the arrays for this point only */
-            changed = update_color_arrays (j, changed);
+        /* update the color arrays for every member of the row group */
+        if (gg.nrgroups > 0) {
+          gp = gg.rgroup_ids[k];
+          for (n=0; n<gg.rgroups[gp].nels; n++) {
+            p = gg.rgroups[gp].els[n];
+            changed = update_color_arrays (p, changed);
           }
+        /* */
+
+        } else {  /* update the arrays for this point only */
+          changed = update_color_arrays (j, changed);
         }
       }
     }
@@ -538,20 +533,18 @@ build_hidden_vectors (void)
          * k   raw index, based on nrows
          * j   index based on nrows_in_plot
         */
-        if (j < gg.nlinkable) {
 
-          if (gg.nrgroups > 0) {
-            /*-- update the hidden arrays for every member of the row group --*/
-            gp = gg.rgroup_ids[k];
-            for (n=0; n<gg.rgroups[gp].nels; n++) {
-              p = gg.rgroups[gp].els[n];
-              changed = update_hidden_arrays (p, changed);
-            }
-          /* */
-
-          } else {  /* update the arrays for this point only */
-            changed = update_hidden_arrays (j, changed);
+        if (gg.nrgroups > 0) {
+          /*-- update the hidden arrays for every member of the row group --*/
+          gp = gg.rgroup_ids[k];
+          for (n=0; n<gg.rgroups[gp].nels; n++) {
+            p = gg.rgroups[gp].els[n];
+            changed = update_hidden_arrays (p, changed);
           }
+        /* */
+
+        } else {  /* update the arrays for this point only */
+          changed = update_hidden_arrays (j, changed);
         }
       }
     }
@@ -588,26 +581,21 @@ active_paint_points (void)
       for (j=0; j<gg.br_binarray[ih][iv].nels; j++) {
         pt = gg.rows_in_plot[gg.br_binarray[ih][iv].els[j]];
 
-        if (pt < gg.nlinkable) {
-/*          if (!gg.hidden[pt] && under_brush (pt)) {*/
-          if (under_brush (pt)) {
+        if (under_brush (pt)) {
 
-            npts_under_brush++ ;
-            gg.under_new_brush[pt] = 1;
+          npts_under_brush++ ;
+          gg.under_new_brush[pt] = 1;
 
-            /* brush other members of this row group */
-            if (gg.nrgroups > 0) {
-              gp = gg.rgroup_ids[pt];
-              if (gp < gg.nrgroups) {  /* exclude points without an rgroup */
-                for (k=0; k<gg.rgroups[gp].nels; k++) {
-/*                  if (!gg.hidden[ gg.rgroups[gp].els[k] ])*/
-                    gg.under_new_brush[gg.rgroups[gp].els[k]] = 1;
-                }
+          /* brush other members of this row group */
+          if (gg.nrgroups > 0) {
+            gp = gg.rgroup_ids[pt];
+            if (gp < gg.nrgroups) {  /* exclude points without an rgroup */
+              for (k=0; k<gg.rgroups[gp].nels; k++) {
+                  gg.under_new_brush[gg.rgroups[gp].els[k]] = 1;
               }
             }
-            /* */
-
           }
+          /* */
         }
       }
     }
