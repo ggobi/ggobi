@@ -891,21 +891,25 @@ wvis_window_open (ggobid *gg)
   GtkWidget *frame1, *vb1, *hb;
   GtkWidget *notebook = NULL;
   GtkWidget *btn, *vb, *opt;
-  int currentSelection = 0, i=0;
 
 #ifdef USE_XML
   /*-- for colorscales --*/
   GtkWidget *hpane, *tr, *sw;
-  GtkWidget *frame2, *vbs, *menu;
+  GtkWidget *frame2, *vbs;
+/*
+  gint currentSelection = 0;
+  gint i=0;
+  GtkWidget *menu;
   GList *l;
   colorschemed *scheme;
+  gint n;
+  gint ncolorscaletype_lbl = sizeof(colorscaletype_lbl)/sizeof(colorscaletype_lbl[0]);
+*/
   static gchar *colorscaletype_lbl[UNKNOWN_COLOR_TYPE] = {
     "DIVERGING",
     "SEQUENTIAL",
     "SPECTRAL",
     "QUALITATIVE"};
-  gint n;
-  gint ncolorscaletype_lbl = sizeof(colorscaletype_lbl)/sizeof(colorscaletype_lbl[0]);
 #endif
   static gchar *const binning_method_lbl[] = {
     "Constant bin width",
@@ -1130,43 +1134,45 @@ GtkWidget *createSchemeColorsTree(colorschemed *scheme);
  
  */
 GtkWidget *
-createColorSchemeTree(int numTypes, gchar *schemeTypes[], ggobid *gg, GtkWidget *notebook)
+createColorSchemeTree(gint numTypes, gchar *schemeTypes[], ggobid *gg,
+  GtkWidget *notebook)
 {
-     GtkWidget *item;
-     GtkWidget **trees, *top, *tree;
-     int n;
-     GList *l;
-     colorschemed *scheme;
+  GtkWidget *item;
+  GtkWidget **trees, *top;
+  GtkWidget *tree;
+  gint n;
+  GList *l;
+  colorschemed *scheme;
 
-     top = gtk_tree_new();
-     trees = (GtkWidget **) g_malloc(sizeof(GtkTree*) * numTypes);
+  top = gtk_tree_new();
+  trees = (GtkWidget **) g_malloc(sizeof(GtkTree*) * numTypes);
 
-     for (n = 0; n < numTypes; n++) {
-	trees[n] = gtk_tree_new();
-        item = gtk_tree_item_new_with_label(schemeTypes[n]);
-        gtk_tree_append(GTK_TREE(top), item);
-        gtk_tree_item_set_subtree(GTK_TREE_ITEM(item), trees[n]);
-     }
+  for (n = 0; n < numTypes; n++) {
+    trees[n] = gtk_tree_new();
+    item = gtk_tree_item_new_with_label(schemeTypes[n]);
+    gtk_tree_append(GTK_TREE(top), item);
+    gtk_tree_item_set_subtree(GTK_TREE_ITEM(item), trees[n]);
+  }
 
-     for(l = gg->colorSchemes; l ; l = l->next) {
-	 scheme = (colorschemed *) l->data;
-	 item = gtk_tree_item_new_with_label(scheme->name);
-	 GGobi_widget_set(item, gg, true);
+  for(l = gg->colorSchemes; l ; l = l->next) {
+   scheme = (colorschemed *) l->data;
+   item = gtk_tree_item_new_with_label(scheme->name);
+   GGobi_widget_set(item, gg, true);
 
-	 gtk_object_set_data (GTK_OBJECT (item), "notebook", notebook);
-	 gtk_signal_connect(GTK_OBJECT(item), "select", (GtkSignalFunc) colorscheme_set_cb, scheme);
-	 gtk_tree_append(GTK_TREE(trees[scheme->type]), item);
-	 gtk_widget_show(item);
+   gtk_object_set_data (GTK_OBJECT (item), "notebook", notebook);
+   gtk_signal_connect(GTK_OBJECT(item), "select",
+     (GtkSignalFunc) colorscheme_set_cb, scheme);
+   gtk_tree_append(GTK_TREE(trees[scheme->type]), item);
+   gtk_widget_show(item);
 /*
   Have to read the names properly first.
+    tree = createSchemeColorsTree(scheme);
+    gtk_tree_item_set_subtree(GTK_TREE_ITEM(item), tree);      
 */
-	 tree = createSchemeColorsTree(scheme);
-	 gtk_tree_item_set_subtree(GTK_TREE_ITEM(item), tree);      
+  }
+  gtk_widget_show_all(top);
 
-     }
-     gtk_widget_show_all(top);
-
-     return(top);
+  return(top);
 }
 
 GtkWidget *
