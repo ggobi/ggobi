@@ -113,7 +113,7 @@ create_dspdesc_window(ggobid *gg, PluginInstance *inst)
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,
     "Type in the name of the file", NULL);
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
-  gtk_entry_set_text (GTK_ENTRY (entry), "ggdisplay.xml");
+  gtk_entry_set_text (GTK_ENTRY (entry), "ggdisplay.R");
 
   /* 'Do it' and 'Close' buttons */
   hb = gtk_hbox_new (false, 1);

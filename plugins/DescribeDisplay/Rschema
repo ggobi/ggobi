@@ -1,0 +1,61 @@
+
+list(
+  # display parameters
+  title = "",
+  displaytype = "",
+  colormap = list (
+    name="",
+    ncolors=,
+    type="",
+    system="rgb", 
+    backgroundColor = c(r,g,b),
+    hiddenColor = c(r,g,b),
+    accentColor = c(r,g,b),
+    foregroundColors = list ( c(r,g,b), ...)
+  ),
+  # brushingColor, like the color vectors, is an integer which
+  #   indexes into colormap$foregroundColors
+  brushingColor = ,
+  options = list(showPoints=, showHidden=, showMissing=,
+     showDirectedEdges=, showArrowheads=, showUndirectedEdges=)
+  nplots = ,
+
+  # list of plots
+  plots = list(
+    # A single plot
+    plot = list(
+      projection = "",
+      points = list(
+        ids = c(),
+        # x and y are tform for 2d plots, planar for tours;
+        # for 1dplots, one is the data (tform) and the other is
+        #     the 'spreadData'
+        x = c(), y = c(), 
+        hidden = c(), missing = c(),
+        color = c(), glyphtype = c(), glyphsize = c(), 
+      ),
+      edges = list(
+        # src and dest are integers which index into points${x,y}
+        src = c(), dest = c(), 
+        hidden = c(), missing = c(),
+        color = c(), linetype = c(), linewidth = c(),
+      ),
+      scale = c(x= , y= ),  # a float between 0 and 1
+      # limits are derived by converting the screen size into tform coords
+      #   and also into planar coordinates
+      tformLims = c(xmin=, xmax=, ymin=, ymax=),
+      planarLims = c(xmin=, xmax=, ymin=, ymax=),
+      stickylabels = list(list(index=, label=""),
+                          list(index=, label=""), ...)),
+      # the parameters corresponding to the current projection
+      p1dparams = list(label="", orientation=""),
+      xyparams = list(xlabel="", ylabel="",),
+      tour1d.params = list(label="", ),
+      tour2d.params = list(labels="", ),
+      tour3d.params = list(labels="", ),
+      tour2by1d.params = list(),
+    # Another plot ...
+    list( )
+  )
+)
+
