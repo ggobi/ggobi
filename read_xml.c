@@ -4,7 +4,6 @@
 #include <parserInternals.h>
 #endif
 
-
 /*
    This is a SAX based parser for reading a single input file
    formatted in XML for the DTD specified in ggobi.dtd.
@@ -60,6 +59,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <gtk/gtk.h>
 
 #include "read_xml.h"
@@ -842,7 +842,16 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
 
     vt = vartable_element_get (data->current_element, d);
 
-    if (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0) {
+    /*
+     * this is a missing value if 
+     *  1. the file does not specify a string and this string is either
+     *     "na", "NA", or ".", or
+     *  2. the file specifies a string for NA and this is that string
+    */
+    if ((data->NA_identifier == NULL &&
+          (strcasecmp (tmp, "na") == 0 || strcmp (tmp, ".") == 0)) ||
+        (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0))
+    {
       if (d->nmissing == 0) {
         arrays_alloc (&d->missing, d->nrows, d->ncols);
         arrays_zero (&d->missing);
