@@ -52,7 +52,7 @@ static void wvis_variable_notebook_adddata_cb (GtkObject *obj, datad *d,
   if (swin) {
     GtkWidget *clist;
     GtkSelectionMode mode = GTK_SELECTION_SINGLE;
-    GtkSignalFunc func = selection_made_cb;
+    GtkSignalFunc func = (GtkSignalFunc) selection_made_cb;
     clist = GTK_BIN (swin)->child;
     if (clist) {
       mode = GTK_CLIST(clist)->selection_mode;
@@ -618,10 +618,22 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
       val = min + gg->wvis.pct[k] * (max - min);
       str = g_strdup_printf ("%3.3g", val);
-      gdk_text_extents (style->font, str, strlen(str),
+      gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        str, strlen(str),
         &lbearing, &rbearing, &width, &ascent, &descent);
       x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-      gdk_draw_string (pix, style->font, gg->wvis.GC,
+      gdk_draw_string (pix,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->wvis.GC,
         x - width/2,
         y - 2,
         str);
@@ -632,12 +644,24 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     for (k=0; k<scheme->n; k++) {
       val = min + gg->wvis.pct[k] * (max - min);
       str = g_strdup_printf ("%d", gg->wvis.n[k]);
-      gdk_text_extents (style->font, str, strlen(str),
+      gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        str, strlen(str),
         &lbearing, &rbearing, &width, &ascent, &descent);
       x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
       diff = (k == 0) ? gg->wvis.pct[k] : gg->wvis.pct[k]-gg->wvis.pct[k-1]; 
       x -= diff/2 * (w->allocation.width - 2*xmargin);
-      gdk_draw_string (pix, style->font, gg->wvis.GC,
+      gdk_draw_string (pix,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->wvis.GC,
         x - width/2,
         (w->allocation.height - ymargin) + ascent + descent + 2,
         str);
@@ -950,7 +974,7 @@ wvis_window_open (ggobid *gg) {
     menu = gtk_menu_new ();
 
     colorscheme_add_to_menu (menu, "Default", NULL,
-      colorscheme_set_cb, notebook, gg);
+      (GtkSignalFunc) colorscheme_set_cb, notebook, gg);
     for (n=0; n<ncolorscaletype_lbl; n++) {
       colorscheme_add_to_menu (menu, colorscaletype_lbl[n], NULL,
         NULL, notebook, gg);
@@ -958,7 +982,7 @@ wvis_window_open (ggobid *gg) {
         scheme = (colorschemed *) l->data;
         if (scheme->type == n)
           colorscheme_add_to_menu (menu, scheme->name, scheme,
-            colorscheme_set_cb, notebook, gg);
+            (GtkSignalFunc) colorscheme_set_cb, notebook, gg);
       }
     }
 
