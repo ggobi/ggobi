@@ -158,6 +158,7 @@ typedef struct
    void (*add_markup_cues)(splotd *, GdkDrawable *, ggobid *);
    void (*add_scaling_cues)(splotd *, GdkDrawable *, ggobid *);
    void (*add_identify_cues)(gint k, splotd *, GdkDrawable *, ggobid *);
+   void (*add_identify_edge_cues)(gint k, splotd *, GdkDrawable *, ggobid *);
 
    gboolean (*redraw)(splotd *, datad *, ggobid *, gboolean binned);
 

@@ -25,6 +25,14 @@ static void display_cb (GtkWidget *w, gpointer cbd)
   displays_plot (NULL, QUICK, gg);
 }
 
+static void identify_target_cb (GtkWidget *w, gpointer cbd)
+{
+  ggobid *gg = GGobiFromWidget(w, true);
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  cpanel->identify_target_type = (enum idtargetd) GPOINTER_TO_INT (cbd);
+  displays_plot (NULL, QUICK, gg);
+}
+
 static void
 recenter_cb (GtkWidget *w, ggobid *gg)
 {
@@ -93,23 +101,6 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   return true;
 }
 
-void
-displays_add_point_cues (splotd *splot, gint k, ggobid *gg) {
-  GList *dlist, *slist;
-  displayd *display;
-  splotd *sp;
-
-  for (dlist = gg->displays; dlist; dlist = dlist->next) {
-    display = (displayd *) dlist->data;
-    for (slist = display->splots; slist; slist = slist->next) {
-      sp = (splotd *) slist->data;
-      if (sp != splot) {
-        splot_redraw (sp, QUICK, gg);
-      }
-    }
-  }
-}
-
 
 static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
@@ -119,6 +110,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   datad *d = gg->current_display->d;
   gboolean button1_p, button2_p;
   gint nd = g_slist_length (gg->d);
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  GGobiPointMoveEvent ev;
 
 /*
  * w = sp->da
@@ -141,33 +134,43 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
     }
   }
 
-  k = find_nearest_point (&sp->mousepos, sp, d, gg);
-  d->nearest_point = k;
+  if (cpanel->identify_target_type == identify_points) {
+    k = find_nearest_point (&sp->mousepos, sp, d, gg);
+    d->nearest_point = k;
 
-  /*-- link by id --*/
-  if (nd > 1) identify_link_by_id (k, d, gg);
-  /*-- --*/
+    /*-- link by id --*/
+    if (nd > 1) identify_link_by_id (k, d, gg);
+    /*-- --*/
 
-  if (k != d->nearest_point_prev) {
-    displays_plot (NULL, QUICK, gg);
+    if (k != d->nearest_point_prev) {
+      displays_plot (NULL, QUICK, gg);
 
 #ifdef EXPLICIT_IDENTIFY_HANDLER 
-    if (gg->identify_handler.handler) {
-      (gg->identify_handler.handler)(gg->identify_handler.user_data,
-        k, sp, w, gg);
-    }
+      if (gg->identify_handler.handler) {
+        (gg->identify_handler.handler)(gg->identify_handler.user_data,
+          k, sp, w, gg);
+      }
 #endif
 
-    {
-      GGobiPointMoveEvent ev;
       ev.d = d;
       ev.id = k;
       /* This will become an event on the datad when we move to
          Gtk objects (soon now!) */
       gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL],
         sp, k, d); 
+
+      if (k != d->nearest_point_prev) {
+        displays_plot (NULL, QUICK, gg);
+        d->nearest_point_prev = k;
+      }
     }
-    d->nearest_point_prev = k;
+  } else {
+    k = find_nearest_edge (sp, gg->current_display, gg);
+    d->nearest_edge = k;
+    if (d->nearest_edge != d->nearest_edge_prev) {
+      displays_plot (NULL, QUICK, gg);
+      d->nearest_edge_prev = k;
+    }
   }
 
   return true;  /* no need to propagate the event */
@@ -230,6 +233,10 @@ static gchar *display_lbl[] = {
   "Variable labels",
   "Record id",
   };
+static gchar *target_lbl[] = {
+  "Points",
+  "Edges",
+  };
 void
 cpanel_identify_make(ggobid *gg) {
   GtkWidget *btn, *opt;
@@ -282,6 +289,19 @@ cpanel_identify_make(ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
                       btn, false, false, 1);
 
+  /*-- option menu --*/
+  opt = gtk_option_menu_new ();
+  gtk_widget_set_name (opt, "IDENTIFY:target_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+    "Label points or edges",
+    NULL);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
+    opt, false, false, 0);
+  populate_option_menu (opt, target_lbl,
+    sizeof (target_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) identify_target_cb, "GGobi", gg);
+
+
   /*-- frame around button for resetting center --*/
   frame = gtk_frame_new ("Recenter data");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
@@ -326,5 +346,10 @@ cpanel_identify_set (cpaneld *cpanel, ggobid *gg)
                            "IDENTIFY:display_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU(w),
                                cpanel->identify_display_type);
+
+  w = widget_find_by_name (gg->control_panel[IDENT],
+                           "IDENTIFY:target_option_menu");
+  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+                               (gint) cpanel->identify_target_type);
 }
 

@@ -23,26 +23,25 @@ edgeedit_init (ggobid *gg)
 }
 
 gint
-find_nearest_line (splotd *sp, displayd *display, ggobid *gg)
+find_nearest_edge (splotd *sp, displayd *display, ggobid *gg)
 {
   gint sqdist, near, j, lineid, xdist;
-  gint from, to;
+  gint from, to, yd;
   icoords a, b, distab, distac, c;
   gfloat proj;
   gboolean doit;
   datad *e = display->e;
   datad *d = display->d;
-  endpointsd *endpoints;
   icoords *mpos = &sp->mousepos;
 
   lineid = -1;
-  if (e->edge.n > 0) {
-    xdist = sqdist = near = 1000 * 1000;
-    endpoints = e->edge.endpoints;
+  near = 20*20;  /* If nothing is close, don't show any label */
+
+  if (e && e->edge.n > 0) {
+    xdist = sqdist = 1000 * 1000;
     for (j=0; j<e->edge.n; j++) {
-      from = d->rowid.idv.els[endpoints[j].a];
-      to = d->rowid.idv.els[endpoints[j].b];
-      doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
+      doit = edge_endpoints_get (j, &from, &to, d, e->edge.endpoints);
+      doit = doit && (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
 
       if (doit) {
         a.x = sp->screen[from].x;
@@ -61,7 +60,7 @@ find_nearest_line (splotd *sp, displayd *display, ggobid *gg)
           if (BETWEEN(a.y, b.y, mpos->y))
             ;
           else {
-            int yd = MIN(abs(distac.y), abs(mpos->y - b.y));
+            yd = MIN(abs(distac.y), abs(mpos->y - b.y));
             sqdist += (yd * yd);
           }
           if (sqdist <= near) {
@@ -73,20 +72,20 @@ find_nearest_line (splotd *sp, displayd *display, ggobid *gg)
         /* horizontal lines */
         else if (distab.y == 0 && distab.x != 0) {
           sqdist = distac.y * distac.y ;
-          if (sqdist <= near && (int) fabs((float) distac.x) < xdist) {
+          if (sqdist <= near && (gint) fabs((gfloat) distac.x) < xdist) {
             near = sqdist;
-            xdist = (int) fabs((float) distac.x) ;
+            xdist = (gint) fabs((gfloat) distac.x) ;
             lineid = j;
           }
         }
 
         /* other lines */
         else if (distab.x != 0 && distab.y != 0) {
-          proj = ((float) ((distac.x * distab.x) + (distac.y * distab.y))) /
-                 ((float) ((distab.x * distab.x) + (distab.y * distab.y)));
+          proj = ((gfloat) ((distac.x * distab.x) + (distac.y * distab.y))) /
+                 ((gfloat) ((distab.x * distab.x) + (distab.y * distab.y)));
 
-          c.x = (int) (proj * (float) (b.x - a.x)) + a.x;
-          c.y = (int) (proj * (float) (b.y - a.y)) + a.y;
+          c.x = (gint) (proj * (gfloat) (b.x - a.x)) + a.x;
+          c.y = (gint) (proj * (gfloat) (b.y - a.y)) + a.y;
 
           if (BETWEEN(a.x, b.x, c.x) && BETWEEN(a.y, b.y, c.y)) {
             sqdist = (mpos->x - c.x) * (mpos->x - c.x) +

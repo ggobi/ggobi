@@ -155,6 +155,7 @@ struct _datad {
 
  /*-- used in identification, line editing, and point motion --*/
   gint nearest_point, nearest_point_prev;
+  gint nearest_edge, nearest_edge_prev;
   GSList *sticky_ids;
 
 /*-------------------- moving points ---------------------------------*/

@@ -40,9 +40,10 @@
 extern const gchar* const ViewTypes[NDISPLAYTYPES];
 extern const gint ViewTypeIndeces[NDISPLAYTYPES];
 
-
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};
+
+enum idtargetd {identify_points, identify_edges};
 
 /* display options */
 /*  When these change, update display.c and RSggobi/RSGGobi.c accordingly */

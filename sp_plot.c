@@ -18,72 +18,16 @@
 #include "externs.h"
 #include "colorscheme.h"
 
+extern void splot_draw_string (gchar *text, gint xpos, gint ypos,
+  GtkStyle *style, GdkDrawable *drawable, ggobid *gg);
+extern void splot_text_extents (gchar *text, GtkStyle *style,
+  gint *lbearing, gint *rbearing, gint *width, gint *ascent, gint *descent);
+
 static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
 static void edges_draw (splotd *, GdkDrawable *, ggobid *gg);
-void splot_nearest_edge_highlight (splotd *, gint, gboolean nearest, ggobid *);
 
 static void splot_draw_tour_axes(splotd *, GdkDrawable *, ggobid *);
 
-gushort  /*-- returns the maximum color id --*/
-datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
-  datad *d, ggobid *gg) 
-{
-  gboolean new_color;
-  gint i, k, m, n;
-  gushort colorid, maxcolorid = 0;
-
-  if (d == NULL || d->nrows == 0)
-/**/return -1;
-          
-  n = 0;  /*-- *ncolors_used --*/
-
-  /*
-   * Loop once through d->color[], collecting the colors currently
-   * in use into the colors_used[] vector.
-  */
-  for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
-    if (d->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
-      new_color = false;
-    } else {
-      new_color = true;
-      for (k=0; k<n; k++) {
-        if (colors_used[k] == d->color_now.els[m]) {
-          new_color = false;
-          break;
-        }
-      }
-    }
-    if (new_color) {
-      colorid = d->color_now.els[m];
-      colors_used[n] = colorid;
-      maxcolorid = MAX(colorid, maxcolorid);
-      (n)++;
-    }
-  }
-
-  /*
-   * Make sure that the current brushing color is
-   * last in the list, so that it is drawn on top of
-   * the pile of points.
-  */
-  for (k=0; k<(n-1); k++) {
-    if (colors_used[k] == gg->color_id) {
-      colors_used[k] = colors_used[n-1];
-      colors_used[n-1] = gg->color_id;
-      break;
-    }
-  }
-
-  /* insurance -- eg if using mono drawing on a color screen */
-  if (n == 0) {
-    n = 1;
-    colors_used[0] = d->color_now.els[0];
-  }
-
-  *ncolors_used = n;
-  return (maxcolorid);
-}
 
 static void
 splot_check_colors (gushort maxcolorid, gint *ncolors_used,
@@ -113,21 +57,18 @@ splot_check_colors (gushort maxcolorid, gint *ncolors_used,
 
 gboolean
 splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
-		 splotd *sp, displayd *display, ggobid *gg)
+  splotd *sp, displayd *display, ggobid *gg)
 {
+  gint a, b;
   gboolean draw_edge;
-  endpointsd *endpoints = e->edge.endpoints;
-  gint a = d->rowid.idv.els[endpoints[m].a];
-  gint b = d->rowid.idv.els[endpoints[m].b];
+
+  draw_edge = edge_endpoints_get (m, &a, &b, d, e->edge.endpoints);
 
   /*-- determine whether edge m should be plotted --*/
   /*-- usually checking sampled is redundant because we're looping
        over rows_in_plot, but maybe we're not always --*/
-  draw_edge = true;
 
-  if (a == -1 || b == -1)
-    draw_edge = false;
-  else if (!e->sampled.els[m])
+  if (!e->sampled.els[m])
     draw_edge = false;
   else if (ignore_hidden && e->hidden_now.els[m]) {
     draw_edge = false;
@@ -139,11 +80,11 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
   } else if (e->nmissing > 0 && !e->missings_show_p) {
-    if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+    if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
       GtkGGobiExtendedSPlotClass *klass;
       klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
-      if(klass->draw_edge_p) {
-         draw_edge = klass->draw_edge_p(sp, m, d, e, gg);
+      if (klass->draw_edge_p) {
+        draw_edge = klass->draw_edge_p(sp, m, d, e, gg);
       }
     }
   }
@@ -152,7 +93,7 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
 
 gboolean
 splot_plot_case (gint m, gboolean ignore_hidden, datad *d,
-		 splotd *sp, displayd *display, ggobid *gg)
+  splotd *sp, displayd *display, ggobid *gg)
 {
   gboolean draw_case;
 
@@ -204,7 +145,6 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 
   GtkGGobiExtendedSPlotClass *klass = NULL;
 
-
   /*
    * since parcoords and tsplot each have their own weird way
    * of drawing line segments, it's necessary to get the point
@@ -216,7 +156,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   GtkGGobiExtendedDisplayClass *displayKlass = NULL;
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-   displayKlass =  GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+   displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
    loop_over_points = display->options.points_show_p ||
                       displayKlass->loop_over_points;
   } else
@@ -229,7 +169,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   /* clear the pixmap */
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (sp->pixmap0, gg->plot_GC,
-                      TRUE, 0, 0,
+                      true, 0, 0,
                       da->allocation.width,
                       da->allocation.height);
 
@@ -265,8 +205,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
       if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
         klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
         f = klass->redraw;
-	if(f) {
-   	   f(sp, d, gg, false);
+        if(f) {
+          f(sp, d, gg, false);
         }
       }
 
@@ -280,9 +220,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
             draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen, m, gg);
           }
 
-	  if(klass && klass->within_draw_to_unbinned) {
-  	       klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
-	  }
+          if(klass && klass->within_draw_to_unbinned) {
+            klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+          }
         }
       }
      }
@@ -328,10 +268,10 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
     if(klass->redraw) {
-        displayd *display = (displayd *) sp->displayptr;
-       	datad *d = display->d;
-	if(klass->redraw(sp, d, gg, true))
-  	  return;
+      displayd *display = (displayd *) sp->displayptr;
+      datad *d = display->d;
+      if(klass->redraw(sp, d, gg, true))
+        return;
     }
   }
 
@@ -403,7 +343,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 
                 /* parallel coordinate plot whiskers */
                 if(klass && klass->within_draw_to_binned) {
- 		      klass->within_draw_to_binned(sp, m, sp->pixmap0, gg->plot_GC);
+                  klass->within_draw_to_binned(sp, m, sp->pixmap0, gg->plot_GC);
                 }
               }
             }
@@ -498,10 +438,7 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
   GdkDrawable *drawable, ggobid *gg)
 {
   displayd *dsp = sp->displayptr;
-  cpaneld *cpanel = &dsp->cpanel;
-  /*gint proj = cpanel->projection;*/
   datad *d = dsp->d;
-  gint j;
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
   gint diamond_dim = DIAMOND_DIM;
@@ -509,107 +446,23 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
 
   if (k < 0 || k >= d->nrows) return;
 
-/*
- * Should I put this stuff into a separate function and put
- * the function back into identify_ui.c ??  Probably.
- * Something like this:
-
-  lbl = identify_label_fetch (k, cpanel, d, gg);
-
-*/
-  
-
-  /*-- add the label last so it will be in front of other markings --*/
-  if (cpanel->identify_display_type == ID_RECORD_LABEL)
-    lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
-
-  else if (cpanel->identify_display_type == ID_RECORD_NO) {
-    lbl = g_strdup_printf ("%d", k);
-
-  }  else if (cpanel->identify_display_type == ID_RECORD_ID) {
-    if (d->rowIds && d->rowIds[k]) {
-      lbl = g_strdup_printf ("%s", d->rowIds[k]);
-    } else {
-      lbl = g_strdup_printf ("%d", d->rowid.id.els[k]);
-    }
-
-  /*-- if categorical, use level name ... --*/
-  } else if (cpanel->identify_display_type == ID_VAR_LABELS) {
-    vartabled *vt;
-    GtkWidget *clist =
-      get_clist_from_object (GTK_OBJECT (gg->control_panel[IDENT]));
-    gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-    gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
-    gint lval;
-
-    for (j=0; j<nvars; j++) {
-      vt = vartable_element_get (vars[j], d);
-      if (vt == NULL) continue;
-      if (vt->vartype == categorical) {
-        /*
-         * since the level values can be any arbitrary integers,
-         * it's necessary to dig out the level name using the list
-         * of level values.
-        */
-        gint n, ktmp;
-        gint kval = (gint) d->tform.vals[k][vars[j]];
-        lval = -1;
-        for (n=0; n<vt->nlevels; n++) {
-          ktmp = vt->level_values[n];
-          if (ktmp == kval) {
-            lval = n;
-            break;
-          }
-        }
-      }
-      if (lval == -1) {
-        g_printerr ("The levels for %s aren't specified correctly\n",
-          vt->collab);
-        return;
-      }
-
-      if (j == 0) {
-        lbl = (vt->vartype == categorical) ?
-          g_strdup_printf ("%s=%s",
-            vt->collab_tform, vt->level_names[lval]) :
-          g_strdup_printf ("%s=%g",
-            vt->collab_tform, d->tform.vals[k][vars[j]]);
-      } else {
-        lbl = (vt->vartype == categorical) ?
-          g_strdup_printf ("%s, %s=%s",
-            lbl, vt->collab_tform, vt->level_names[lval]) :
-          g_strdup_printf ("%s, %s=%g",
-            lbl, vt->collab_tform, d->tform.vals[k][vars[j]]);
-      }
-    }
-  }
+  lbl = identify_label_fetch (k, &dsp->cpanel, d, gg);
 
   /*
    * if displaying 'variable labels' and no variable is selected,
    * lbl can still be NULL here.
   */
   if (lbl) {
-    gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font (style),
-#else
-      style->font,
-#endif
-      lbl, strlen (lbl),
+    splot_text_extents (lbl, style, 
       &lbearing, &rbearing, &width, &ascent, &descent);
 
     /*-- underline the nearest point label?  --*/
     if (sp->screen[k].x <= sp->max.x/2) {
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC,
+      splot_draw_string (lbl,
         sp->screen[k].x+diamond_dim,
         sp->screen[k].y-diamond_dim,
-        lbl);
+        style, drawable, gg);
+
       if (nearest)
         gdk_draw_line (drawable, gg->plot_GC,
           sp->screen[k].x+diamond_dim,
@@ -618,16 +471,11 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
           sp->screen[k].y-diamond_dim+1);
       
     } else {
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC,
+      splot_draw_string (lbl,
         sp->screen[k].x - width - diamond_dim,
         sp->screen[k].y - diamond_dim,
-        lbl);
+        style, drawable, gg);
+
       if (nearest)
         gdk_draw_line (drawable, gg->plot_GC,
           sp->screen[k].x - width - diamond_dim,
@@ -638,24 +486,14 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
 
     /*-- display the label in the top center of the window as well --*/
     if (nearest) {
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC,
+      splot_draw_string (lbl,
         (sp->max.x - width)/2,
         ascent + descent + 5,  /*-- the border is of width 3 --*/
-        lbl);
+        style, drawable, gg);
     }
-
-
   }
-
 }
 
-/*-- add the nearest_point and sticky labels, plus a diamond for emphasis --*/
 void
 splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest, ggobid *gg)
@@ -664,16 +502,17 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
   gboolean useDefault = false;
 
   if (nearest) {
-    if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-      GtkGGobiExtendedSPlotClass *klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
-      if(klass->add_identify_cues)
-         klass->add_identify_cues(k, sp, drawable, gg);
+    if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+      GtkGGobiExtendedSPlotClass *klass;
+      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+      if (klass->add_identify_cues)
+        klass->add_identify_cues(k, sp, drawable, gg);
       else 
-         useDefault = true;
+        useDefault = true;
     }
 
-    if(useDefault)
-       splot_add_diamond_cue (k, sp, drawable, gg);
+    if (useDefault)
+      splot_add_diamond_cue (k, sp, drawable, gg);
   }
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
@@ -727,12 +566,13 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
 }
 
 static void
-splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
+splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   gint id;
   GSList *l;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   PipelineMode mode = viewmode_get (gg);
+  cpaneld *cpanel = &display->cpanel;
 
   /*
      these are the cues added to
@@ -741,8 +581,17 @@ splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
        source, maybe dest and edge      in edge editing
   */
 
-  if (mode == IDENT && d->nearest_point != -1)
-    splot_add_identify_cues (sp, drawable, d->nearest_point, true, gg);
+  if (mode == IDENT) {
+    if (cpanel->identify_target_type == identify_points &&
+        d->nearest_point != -1)
+    {
+      splot_add_identify_cues (sp, drawable, d->nearest_point, true, gg);
+    } else if (cpanel->identify_target_type == identify_edges &&
+               d->nearest_edge != -1)
+    {
+      splot_add_identify_edge_cues (sp, drawable, d->nearest_edge, true, gg);
+    }
+  }
   else if (mode == MOVEPTS)
      splot_add_movepts_cues (sp, drawable, d->nearest_point, true, gg);
   else if (mode == EDGEED)
@@ -819,7 +668,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       m = e->rows_in_plot[i];
       if (!e->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
       /* we don't want to do all these checks twice, do we? */
-      /*if (splot_plot_edge (m, true, d, e, sp, display, gg)) {*/
+      /*if (splot_plot_edge (m, true, d, e, sp, display, gg)) */
         gtype = e->glyph_now.els[m].type;
         if (gtype == FC || gtype == FR)
           ltype = SOLID;
@@ -851,14 +700,15 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
             for (j=0; j<e->edge.n; j++) {
               /*-- nels = d->rowid.idv.nels; this would be a bug --*/
+/*
               if (endpoints[j].a >= nels || endpoints[j].b >= nels)
                 continue;
+*/
 
               if (!splot_plot_edge (j, true, d, e, sp, display, gg))
                 continue;
 
-              a = d->rowid.idv.els[endpoints[j].a];
-              b = d->rowid.idv.els[endpoints[j].b];
+              edge_endpoints_get (j, &a, &b, d, e->edge.endpoints);
 
               gtype = e->glyph_now.els[j].type;
               if (gtype == FC || gtype == FR)
@@ -901,9 +751,13 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
                     sp->arrowheads[nl].x2 = sp->screen[b].x;
                     sp->arrowheads[nl].y2 = sp->screen[b].y;
                   } else {  /*-- draw the partner's arrowhead --*/
-                    gint jp = endpoints[j].jpartner;
-                    gint ja = d->rowid.idv.els[endpoints[jp].a];
-                    gint jb = d->rowid.idv.els[endpoints[jp].b];
+                    gint ja, jb, jp = endpoints[j].jpartner;
+/*
+ *                  gint ja = d->rowid.idv.els[endpoints[jp].a];
+ *                  gint jb = d->rowid.idv.els[endpoints[jp].b];
+*/
+                    edge_endpoints_get (jp, &ja, &jb, d, endpoints);
+
                     sp->arrowheads[nl].x1 =
                       (gint) (.2*sp->screen[ja].x + .8*sp->screen[jb].x);
                     sp->arrowheads[nl].y1 =
@@ -969,8 +823,17 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 }
 
+/*
+ * I may want to break this up so it looks like add_identify_cues
+
+need two new routines:
+  splot_add_edge_highlight_cue
+  splot_add_edge_label
+*/
 void
-splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) {
+splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
+  gboolean nearest, ggobid *gg)
+{
   displayd *dsp = (displayd *) sp->displayptr;
   datad *d = dsp->d;
   datad *e = dsp->e;
@@ -980,66 +843,72 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
   gint xp, yp;
   gboolean draw_edge;
   colorschemed *scheme = gg->activeColorScheme;
+  gboolean useDefault = false;
 
-  if (k >= e->edge.n)
-    return;
+  if (k >= e->edge.n) return;
 
   /*-- not yet using rowid.idv  -- huh? --*/
-  if (e->hidden_now.els[k])
-    return;
+  if (e->hidden_now.els[k]) return;
 
-  draw_edge = (dsp->options.edges_undirected_show_p ||
-               dsp->options.edges_directed_show_p);
+  if (nearest) {
+    if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+      GtkGGobiExtendedSPlotClass *klass;
+      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+      if(klass->add_identify_edge_cues)
+        klass->add_identify_edge_cues(k, sp, drawable, gg);
+      else 
+        useDefault = true;
+    }
+  }
 
-  /*-- draw a thickened line, and add a label if nearest==true --*/
-  if (draw_edge) {
-    endpointsd *endpoints = e->edge.endpoints;
-    gint a = d->rowid.idv.els[endpoints[k].a];
-    gint b = d->rowid.idv.els[endpoints[k].b];
+  if (useDefault) {
 
-    gdk_gc_set_line_attributes (gg->plot_GC,
-      3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC,
-      &scheme->rgb[ e->color_now.els[k] ]);
+    draw_edge = (dsp->options.edges_undirected_show_p ||
+                 dsp->options.edges_directed_show_p);
 
-    gdk_draw_line (sp->pixmap1, gg->plot_GC,
-      sp->screen[a].x, sp->screen[a].y,
-      sp->screen[b].x, sp->screen[b].y);
+    /*-- draw a thickened line, and add a label if nearest==true --*/
+    if (draw_edge) {
+      gint a, b;
+      draw_edge = edge_endpoints_get (k, &a, &b, d, e->edge.endpoints);
 
-    gdk_gc_set_line_attributes (gg->plot_GC,
-      0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+      gdk_gc_set_line_attributes (gg->plot_GC,
+        3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+      gdk_gc_set_foreground (gg->plot_GC,
+        &scheme->rgb[ e->color_now.els[k] ]);
 
-    if (nearest) {
-      /*-- add the label last so it will be in front of other markings --*/
-      lbl = (gchar *) g_array_index (e->rowlab, gchar *, k);
-      gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        lbl, strlen (lbl),
-        &lbearing, &rbearing, &width, &ascent, &descent);
+      gdk_draw_line (drawable, gg->plot_GC,
+        sp->screen[a].x, sp->screen[a].y,
+        sp->screen[b].x, sp->screen[b].y);
 
-      if (sp->screen[a].x > sp->screen[b].x) {gint itmp=b; b=a; a=itmp;}
-      xp = (sp->screen[b].x - sp->screen[a].x)/2 + sp->screen[a].x;
-      if (sp->screen[a].y > sp->screen[b].y) {gint itmp=b; b=a; a=itmp;}
-      yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y;
+      gdk_gc_set_line_attributes (gg->plot_GC,
+        0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
 
-      /*-- underline the nearest point label?  --*/
-      gdk_draw_string (sp->pixmap1,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC,
-        xp, yp, lbl);
-      if (nearest)
-        gdk_draw_line (sp->pixmap1, gg->plot_GC,
-          xp, yp+1,
-          xp+width, yp+1);
+      if (nearest) {
+        /*-- add the label last so it will be in front of other markings --*/
+        lbl = (gchar *) g_array_index (e->rowlab, gchar *, k);
+        splot_text_extents (lbl, style, 
+          &lbearing, &rbearing, &width, &ascent, &descent);
+
+        if (sp->screen[a].x > sp->screen[b].x) {gint itmp=b; b=a; a=itmp;}
+        xp = (sp->screen[b].x - sp->screen[a].x)/2 + sp->screen[a].x;
+        if (sp->screen[a].y > sp->screen[b].y) {gint itmp=b; b=a; a=itmp;}
+        yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y;
+
+        /*-- underline the nearest point label?  --*/
+        splot_draw_string (lbl, xp, yp, style, drawable, gg);
+
+        if (nearest)
+          gdk_draw_line (drawable, gg->plot_GC, xp, yp+1, xp+width, yp+1);
+
+        /*-- display the label in the top center of the window as well --*/
+        if (nearest) {
+          splot_draw_string (lbl,
+            (sp->max.x - width)/2,
+            ascent + descent + 5,  /*-- the border is of width 3 --*/
+            style, drawable, gg);
+        }
+      }
     }
   }
 }
@@ -1059,7 +928,7 @@ splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
     gdk_draw_rectangle (drawable, gg->plot_GC,
-      FALSE, 1, 1, sp->da->allocation.width-3, sp->da->allocation.height-3);
+      false, 1, 1, sp->da->allocation.width-3, sp->da->allocation.height-3);
 
     gdk_gc_set_line_attributes (gg->plot_GC,
       0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
@@ -1107,10 +976,12 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
         display->options.edges_directed_show_p)
     {
       if ((GTK_IS_GGOBI_EXTENDED_DISPLAY(display)  
-	    && GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->show_edges_p))
+        && GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->show_edges_p))
       {
         if (e->nearest_point != -1)
-          splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);
+          /*splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);*/
+          splot_add_identify_edge_cues (sp, drawable, e->nearest_point,
+            true, gg);
       }
     }
   }
@@ -1124,8 +995,8 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
    
   splot_add_plot_labels (sp, drawable, gg);  /*-- axis labels --*/
 
-  /*-- identify, move points, edge editing --*/
-  splot_add_point_cues (sp, drawable, gg);  
+  /*-- identify points or edges, move points, edge editing --*/
+  splot_add_record_cues (sp, drawable, gg);  
 
   if (sp == gg->current_splot)
     splot_draw_border (sp, drawable, gg);
@@ -1142,9 +1013,9 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
       if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
         void (*f)(splotd *, GdkDrawable*, ggobid*);
-	f =  GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->add_scaling_cues;
-	if(f)
-   	  f(sp, drawable, gg);
+        f =  GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->add_scaling_cues;
+        if(f)
+          f(sp, drawable, gg);
       }
     }
   }
@@ -1201,13 +1072,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
     switch (proj) {
       case TOUR1D:
         /*-- use string height to place the labels --*/
-        gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-          gtk_style_get_font (style),
-#else
-          style->font,
-#endif
-          "yA", strlen("yA"),
+        splot_text_extents ("yA", style, 
           &lbearing, &rbearing, &width, &ascent, &descent);
         textheight = ascent + descent;
 
@@ -1241,23 +1106,13 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             vt = vartable_element_get (j, d);
             varlab = g_strdup_printf("%s:%4.3f(%.2f)",vt->collab_tform,
               dsp->t1d.F.vals[0][j],vt->lim.max-vt->lim.min);
-            gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-              gtk_style_get_font (style),
-#else
-              style->font,
-#endif
-              varlab, strlen (varlab),
+            splot_text_extents (varlab, style, 
               &lbearing, &rbearing, &width, &ascent, &descent);
-            gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-              gtk_style_get_font (style),
-#else
-              style->font,
-#endif
-              gg->plot_GC,
+
+            splot_draw_string (varlab,
               (ix > dawidth/2) ? 3*dawidth/4 + 10 : dawidth/4 - width -10,
-              iy, varlab);
+              iy,
+              style, drawable, gg);
             g_free (varlab);
           }
         }     
@@ -1293,17 +1148,11 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             if (dsp->options.axes_label_p) {
               vt = vartable_element_get (j, d);
               varlab = g_strdup (vt->nickname);
-	        } else {
+            } else {
               varlab = g_strdup_printf ("%d",j+1);
-	        }
+            }
 
-            gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-              gtk_style_get_font (style),
-#else
-              style->font,
-#endif
-              varlab, strlen(varlab),
+            splot_text_extents (varlab, style, 
               &lbearing, &rbearing, &width, &ascent, &descent);
 
             textheight = ascent+descent;
@@ -1323,13 +1172,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             else
               iy += (textheight);
 
-            gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-              gtk_style_get_font (style),
-#else
-              style->font,
-#endif
-              gg->plot_GC, ix, iy, varlab);
+            splot_draw_string (varlab, ix, iy, style, drawable, gg);
             g_free (varlab);
           }
 
@@ -1338,27 +1181,14 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             varval = g_strdup_printf ("%d:%4.3f,%4.3f",j+1,
               dsp->t2d3.F.vals[0][j],dsp->t2d3.F.vals[1][j]);
             if (j == 0) {
-              gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-                gtk_style_get_font (style),
-#else
-                style->font,
-#endif
-                varval, strlen(varval),
-                &lbearing, &rbearing, &width2, &ascent, &descent);
+              splot_text_extents (varval, style, 
+                &lbearing, &rbearing, &width, &ascent, &descent);
               textheight2 = ascent+descent+5;
-	    }
+            }
 
             ix = dawidth - width2 - axindent;
             iy = daheight - (d->ncols-j-1)*textheight2 - axindent;
-            gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-              gtk_style_get_font (style),
-#else
-              style->font,
-#endif
-            gg->plot_GC, ix, iy, varval);
-
+            splot_draw_string (varval, ix, iy, style, drawable, gg);
             g_free (varval);
           }
         }
@@ -1395,17 +1225,11 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             if (dsp->options.axes_label_p) {
               vt = vartable_element_get (j, d);
               varlab = g_strdup (vt->nickname);
-	        } else {
+            } else {
               varlab = g_strdup_printf ("%d",j+1);
-	        }
+            }
 
-            gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-              gtk_style_get_font (style),
-#else
-              style->font,
-#endif
-              varlab, strlen(varlab),
+            splot_text_extents (varlab, style, 
               &lbearing, &rbearing, &width, &ascent, &descent);
 
             textheight = ascent+descent;
@@ -1425,15 +1249,9 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             else
               iy += (textheight);
 
-            gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-              gtk_style_get_font (style),
-#else
-              style->font,
-#endif
-            gg->plot_GC, ix, iy, varlab);
+            splot_draw_string (varlab, ix, iy, style, drawable, gg);
             g_free (varlab);
-	  }
+          }
 
           /* Drawing the axes values now */
           if (dsp->options.axes_values_p) {
@@ -1442,27 +1260,14 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
               dsp->t2d.F.vals[0][j],dsp->t2d.F.vals[1][j],
               vt->lim.max-vt->lim.min);
             if (j == 0) {
-              gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-                gtk_style_get_font (style),
-#else
-                style->font,
-#endif
-                varval, strlen(varval),
+              splot_text_extents (varval, style, 
                 &lbearing, &rbearing, &width2, &ascent, &descent);
               textheight2 = ascent+descent+5;
-	    }
+            }
 
             ix = dawidth - width2 - axindent;
             iy = daheight - (d->ncols-j-1)*textheight2 - axindent;
-            gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-              gtk_style_get_font (style),
-#else
-              style->font,
-#endif
-            gg->plot_GC, ix, iy, varval);
-
+            splot_draw_string (varval, ix, iy, style, drawable, gg);
             g_free (varval);
           }
 
@@ -1476,13 +1281,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           break;
 
         /*-- use string height to place the labels --*/
-        gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-          gtk_style_get_font (style),
-#else
-          style->font,
-#endif
-          "yA", strlen("yA"),
+        splot_text_extents ("yA", style, 
           &lbearing, &rbearing, &width, &ascent, &descent);
         textheight = ascent + descent;
 
@@ -1525,23 +1324,11 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
-          gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-            gtk_style_get_font (style),
-#else
-            style->font,
-#endif
-            varlab, strlen (varlab),
+          splot_text_extents (varlab, style, 
             &lbearing, &rbearing, &width, &ascent, &descent);
-          gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-            gtk_style_get_font (style),
-#else
-            style->font,
-#endif
-            gg->plot_GC,
-            dawidth/2+dawidth/4+10,
-            iy, varlab);
+
+          splot_draw_string (varlab, dawidth/2+dawidth/4+10, iy,
+            style, drawable, gg);
   
           /* vertical */
           ix = 10 + j*textheight;

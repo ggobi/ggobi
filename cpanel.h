@@ -67,6 +67,7 @@ typedef struct {
 
  /*-- identification --*/
  gint identify_display_type;
+ enum idtargetd identify_target_type;  /* points or edges */
 
  /*-- edge editing --*/
  gboolean ee_adding_p;
