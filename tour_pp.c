@@ -544,7 +544,7 @@ gint holes_raw(array_f *pdata, void *param, gfloat *val)
    int i, p, n,k,j;
    double *m,tmp,x1,x2;
    double *cov;
-   double det,acoefs;
+   double acoefs;
    p = pdata->ncols; n = pdata->nrows;
    cov = (double *) malloc(p*p*sizeof(double));
    m = (double *) malloc(p*sizeof(double));
@@ -597,7 +597,7 @@ gint central_mass_raw(array_f *pdata, void *param, gfloat *val)
    int i, p, n,k,j;
    double *m,tmp,x1,x2;
    double *cov;
-   double det,acoefs;
+   double acoefs;
    p = pdata->ncols; n = pdata->nrows;
    cov = (double *) malloc(p*p*sizeof(double));
    m = (double *) malloc(p*sizeof(double));
