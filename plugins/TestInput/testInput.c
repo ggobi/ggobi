@@ -36,9 +36,13 @@ generate_data(InputDescription *desc, ggobid *gg)
 	      vartabled *vt;
 	      tmp = g_strdup("abc");
 	      sprintf(tmp, "%c", 'A' + i);
+#if 1
+	      GGOBI(setVariableName)(j, g_strdup(tmp), false, d, gg);
+#else
 	      vt = vartable_element_get (j, d);
 	      vt->collab = g_strdup(tmp);
 	      vt->collab_tform = g_strdup(tmp);
+#endif
 	  }
 	  d->raw.vals[i][j] = 100.*((float)rand()/(float)RAND_MAX);
       }

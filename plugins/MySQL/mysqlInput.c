@@ -1,6 +1,6 @@
-#include "libpq-fe.h"
-#include "ggobi.h"
+#include <mysql.h>
 
+#include "ggobi.h"
 #include "GGobiAPI.h"
 
 #include "dbms_ui.h"
@@ -8,12 +8,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-gboolean postgres_read(InputDescription *desc, ggobid *gg);
-int read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
+gboolean mysql_read(InputDescription *desc, ggobid *gg);
+int read_mysql_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
 
-PGresult *query(const char * const query, PGconn *conn);
-int processResult(PGresult *result, ggobid *gg);
-PGconn* makeConnection(DBMSLoginInfo *info);
+
+void mysql_warning(const char *msg, MYSQL *conn, ggobid *gg);
+MYSQL* makeConnection(DBMSLoginInfo *login, ggobid *gg);
+MYSQL_RES *query(const char * const query, MYSQL *conn, ggobid *gg);
+int processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg);
 
 /**
   This creates and populates an InputDescription object
@@ -34,7 +36,7 @@ postgres_input_description(const char * const fileName, const char * const modeN
 
   desc->fileName = g_strdup("Postgres table");
   desc->mode = unknown_data;
-  desc->read_input = postgres_read;
+  desc->read_input = mysql_read;
 
   return(desc);
 }
@@ -48,7 +50,7 @@ postgres_input_description(const char * const fileName, const char * const modeN
  input routines in GGobi.
  */
 gboolean 
-postgres_read(InputDescription *desc, ggobid *gg)
+mysql_read(InputDescription *desc, ggobid *gg)
 {
     DBMSLoginInfo *info ;
     info = initDBMSLoginInfo(NULL);
@@ -57,32 +59,35 @@ postgres_read(InputDescription *desc, ggobid *gg)
     info->dataQuery = g_strdup("select  width1, width2, maxheadwidth  from flea;");
 
     info->desc = desc;
-    info->read_input = read_postgres_data;
+    info->read_input = read_mysql_data;
 
     GGOBI(get_dbms_login_info)(info, gg);
 
     return(false);
 }
 
+
+/******************************************************************/
+
 /**
  This is the routine that actually reads the data, using the inputs
  from the user gathered by the GUI into the `info' structure.
  */
 int
-read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
+read_mysql_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
 {
-    PGconn *conn;
-    PGresult *result;
+    MYSQL *conn;
+    MYSQL_RES *result;
 
-    conn = makeConnection(info);    
+    conn = makeConnection(info, gg);    
     if(!conn) {
 	return(-1);
     }
 
-    result = query(info->dataQuery, conn);
-    processResult(result, gg);
-    PQclear(result);
-    PQfinish(conn);
+    result = query(info->dataQuery, conn, gg);
+    processResult(result, conn, gg);
+    mysql_free_result(result);
+    mysql_close(conn);
     
     start_ggobi(gg, true, init);
  
@@ -90,49 +95,80 @@ read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
 }
 
 
-PGconn*
-makeConnection(DBMSLoginInfo *info)
+MYSQL*
+makeConnection(DBMSLoginInfo *login, ggobid *gg)
 {
-  PGconn *con;
-  char port[10];
-  if(info->port > 0) {
-      sprintf(port, "%d", info->port);
+  MYSQL *conn;
+
+  conn = mysql_init(NULL);
+
+  if(conn == NULL) {
+    mysql_warning("Can't initialize mysql!", conn, gg);
+    return(NULL);
   }
-  con = PQsetdbLogin(info->host, info->port > 0 ? port : NULL, NULL, NULL, info->dbname, info->user, info->password);
 
-  return(con);
+  conn = mysql_real_connect(conn, login->host, login->user, login->password,
+			     login->dbname, login->port, login->socket, login->flags
+                           );
+
+  if(conn == NULL) {
+    mysql_warning("Can't connect to mysql!", conn, gg);   
+    return(NULL);
+  }
+
+  return(conn);
 }
 
-PGresult *
-query(const char * const query, PGconn *conn)
+MYSQL_RES *
+query(const char * const query, MYSQL *conn, ggobid *gg)
 {
-    PGresult *result;
-    ExecStatusType status;
-    char *msg;
+  MYSQL_RES *res;
+  int status;
+  char *msg;
 
-    result = PQexec(conn, query);
+  status =  mysql_query(conn, query);
 
-    status = PQresultStatus(result);
-    msg = PQresultErrorMessage(result);
-    if(msg && msg[0]) {
-	fprintf(stderr, "Error from query %s: %s\n", query, msg);fflush(stderr);
-    }
-    return(result);
+  if( status || (res = mysql_store_result(conn)) == NULL ) {
+      mysql_warning(query, conn, gg);
+  }
+
+  return(res);
 }
+
+void
+mysql_warning(const char *msg, MYSQL *conn, ggobid *gg)
+{
+ char *errmsg = NULL; 
+ char *buf;
+ if(conn) {
+   errmsg = mysql_error(conn);
+   if(errmsg == NULL)
+     errmsg = ""; 
+ } else 
+   errmsg = "";
+
+  buf = (char *) g_malloc(sizeof(char) * (strlen(errmsg) + strlen(msg) + 2));
+  sprintf(buf, "%s %s", msg, errmsg);
+
+  quick_message(buf,true);
+  free(buf);
+}
+
 
 int
-processResult(PGresult *result, ggobid *gg)
+processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg)
 {
   int i, j;
   int nr, nc;
   datad *d;
 
-  nr = PQntuples(result);
-  nc = PQnfields(result);
+  nr =  mysql_num_rows(result);
+  nc = mysql_num_fields(result);
  
   d = datad_create(nr, nc, gg);
 
   for(i = 0; i < nr; i++) {
+      MYSQL_ROW row;
       float f;
       char *tmp;
       char *l;
@@ -141,24 +177,21 @@ processResult(PGresult *result, ggobid *gg)
       l = g_strdup(buf);
       g_array_append_val (d->rowlab, l);
 
-      for(j = 0; j < nc; j++) {
+      row = mysql_fetch_row(result);
+      if(row == NULL)
+	  break;
+ 
+     for(j = 0; j < nc; j++) {
 	  if(i == 0) {
-	  tmp = PQfname(result, j);
-#if 0
-	  vartabled *vt;
-	  vt = vartable_element_get (j, d);
-	  vt->collab = g_strdup(tmp);
-	  vt->collab_tform = g_strdup(tmp);
-#else
-	  GGOBI(setVariableName)(j, g_strdup(tmp), false, d, gg);
-#endif
+	      MYSQL_FIELD *field = mysql_fetch_field(result);
+	      GGOBI(setVariableName)(j, g_strdup(field->name), false, d, gg);
 	  }
 
-	  tmp  = PQgetvalue(result, i, j);
+	  tmp = row[j];
           if(tmp)
 	      f = atof(tmp);
 	  else
-	      f = 0;
+	      f = 0.;
 	  d->raw.vals[i][j] = f;
       }
   }

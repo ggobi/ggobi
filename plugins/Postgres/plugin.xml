@@ -3,6 +3,6 @@
    <author>Duncan Temple Lang</author>
      <dll name="plugins/Postgres/Postgres"> 
        <modeName>postgres</modeName>
-       <init description="postgres_input_description" read="read_postgres" probe="isPostgresInput" />
+       <init description="postgres_input_description" />
      </dll>
  </inputPlugin>
