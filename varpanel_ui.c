@@ -233,13 +233,6 @@ g_printerr ("selecting variable %d\n", jvar);
     ctrl_mod = ((bevent->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK);
 /* */
 
-/*
-    if (ctrl_mod) {
-      variable_clone (jvar, NULL, true, d, gg);
-      return (true);
-    }
-*/
-    
     /*-- general variable selection --*/
     varsel (cpanel, sp, jvar, button, alt_mod, ctrl_mod, shift_mod, d, gg);
     varpanel_refresh (gg);

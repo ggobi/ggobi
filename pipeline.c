@@ -198,6 +198,8 @@ tform_to_world_by_var (gint j, datad *d, ggobid *gg)
   gfloat max, min, range, ftmp;
   gfloat precis = PRECISION1;
 
+  pipeline_arrays_check_dimensions (d);  /*-- realloc as necessary --*/
+
   max = d->vartable[j].lim.max;
   min = d->vartable[j].lim.min;
   range = max - min;
@@ -220,8 +222,6 @@ tform_to_world (datad *d, ggobid *gg)
  * world_data[]
 */
   gint j;
-
-  pipeline_arrays_check_dimensions (d);  /*-- realloc as necessary --*/
 
   for (j=0; j<d->ncols; j++)
     tform_to_world_by_var (j, d, gg);
