@@ -60,18 +60,11 @@ static void scale_set_default_values (GtkScale *scale )
   gtk_scale_set_draw_value (scale, false);
 }
 
-static void tourcorr_pause (cpaneld *cpanel, gboolean state, ggobid *gg)
-{
-  cpanel->tcorr1_paused = state;
-  cpanel->tcorr2_paused = state;
-
-  tourcorr_func (!cpanel->tcorr1_paused, gg->current_display, gg);
-  tourcorr_func (!cpanel->tcorr2_paused, gg->current_display, gg);
-}
-
 static void tourcorr_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
-   tourcorr_pause (&gg->current_display->cpanel, button->active, gg);
+  extern void tourcorr_pause(cpaneld *, gboolean, ggobid *);
+
+  tourcorr_pause (&gg->current_display->cpanel, button->active, gg);
 }
 
 static void tourcorr_reinit_cb (GtkWidget *w, ggobid *gg) {
@@ -321,7 +314,6 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   extern void tourcorr_manip(gint, gint, splotd *, ggobid *);
   /*  extern void tourcorr_manip(gint, gint, splotd *);*/
-  g_printerr ("(ct_motion_notify_cb)\n");
 
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
@@ -345,7 +337,6 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
                                       (GtkSignalFunc) motion_notify_cb,
                                       (gpointer) sp);
 
-  printf("%d %d \n",sp->mousepos.x,sp->mousepos.y);
   tourcorr_manip_init(sp->mousepos.x, sp->mousepos.y, sp);
 
   return true;
@@ -359,11 +350,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
 
-  gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
-
   tourcorr_manip_end(sp);
-  if (sp->motion_id)
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
   return retval;
 }

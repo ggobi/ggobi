@@ -640,7 +640,18 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
       0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
   }
 
-
+  if (jvar == display->tc1_manip_var) {
+    gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+      5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 150*64, 60*64);
+    gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+      5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
+  }
+  if (jvar == display->tc2_manip_var) {
+    gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+      5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 60*64, 60*64);
+    gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+      5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 240*64, 60*64);
+  }
   /*
    * copy the pixmap to the window
   */

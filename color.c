@@ -173,4 +173,13 @@ init_var_GCs (GtkWidget *w, ggobid *gg) {
 
   gg->selvarbg_GC = gdk_gc_new (window);
   gdk_gc_set_foreground (gg->selvarbg_GC, &white);
+
+/*
+ * the manip variable GCs: thin purple lines
+*/
+  gg->manipvarfg_GC = gdk_gc_new (window);
+  gdk_gc_set_line_attributes (gg->manipvarfg_GC,
+    0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+  gdk_gc_set_foreground (gg->manipvarfg_GC, &gg->vcirc_manip_color);
+
 }

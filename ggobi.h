@@ -172,6 +172,7 @@ struct _ggobid {
  GdkGC *plot_GC;
  GdkGC *selvarfg_GC, *selvarbg_GC;     /* white background, thick lines */
  GdkGC *unselvarfg_GC, *unselvarbg_GC; /* grey background, thin lines */
+ GdkGC *manipvarfg_GC;              /* white background, thin purple line */
 
 /*--------------------------- jittering --------------------------------*/
 

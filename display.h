@@ -88,6 +88,7 @@ struct _displayd {
   gint tc1_pos_old, tc1_pos, tc2_pos_old, tc2_pos;
   gint tc_manip_mode;
   gboolean tc1_manipvar_inc, tc2_manipvar_inc;
+  gfloat tc1_phi, tc2_phi;
 
 /*
  * 2d tour

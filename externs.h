@@ -333,7 +333,6 @@ void tour1d_realloc_up (gint nc, datad *d, ggobid *gg);
 void tour1d_varsel (gint jvar, gint btn, datad *, ggobid *);
 void tour1d_vert (cpaneld *, gboolean);
 void tour1dpp_window_open (ggobid *);
-void tour1dpp_window_open (ggobid *);
 void tour2d_event_handlers_toggle (splotd *, gboolean);
 void tour2d_func (gboolean, displayd *, ggobid *);
 void tour2d_menus_make (ggobid *);

@@ -86,6 +86,12 @@ static void tour1d_vert_cb (GtkToggleButton *button, ggobid *gg)
   tour1d_vert (&gg->current_display->cpanel, button->active);
 }
 
+static void tour1dpp_cb (GtkWidget *w, ggobid *gg) 
+{
+  g_printerr ("open projection pursuit panel\n");
+  tour1dpp_window_open (gg);
+}
+
 void
 cpanel_tour1d_make (ggobid *gg) {
   GtkWidget *box, *btn, *sbar, *vb;
@@ -172,6 +178,18 @@ cpanel_tour1d_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]), box, false, false, 1);
+
+/*
+ * projection pursuit button
+*/
+  btn = gtk_button_new_with_label ("Projection pursuit ...");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Open panel for tour projection pursuit", NULL);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR1D]),
+                      btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (tour1dpp_cb), gg);
+
 
   gtk_widget_show_all (gg->control_panel[TOUR1D]);
 }

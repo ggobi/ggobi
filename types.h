@@ -72,7 +72,6 @@ typedef struct {  /*-- used for obtaining ranks --*/
 } paird;
 
 
-
 /*-- used to keep track of history in moving points --*/
 typedef struct {
   gint i, j;
@@ -89,7 +88,23 @@ typedef struct {
   gint idled;
   gboolean get_new_target;
   gint nsteps, stepcntr;
+  gint target_basis_method;
 } tour;
+
+/* Sigbert's code for pp */
+typedef struct
+{ gfloat temp_start, temp_end, cooling, heating, temp, index_best;
+  gint restart, maxproj, success;
+  array_f proj_best;
+  array_f data;
+} optimize0_param;
+
+typedef struct {
+  gint *group, *ngroup, groups; 
+  /* temporary space */
+  gfloat *variance, *mean, *ovmean;
+} discriminant_param;
+/* end Sigbert's code */
 
 /*
  * display options

@@ -209,6 +209,9 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
 
   dsp->t2d.idled = 0;
   dsp->t2d.get_new_target = true;
+
+  /* pp */
+  dsp->t2d.target_basis_method = 0;
 }
 
 void tour2d_speed_set(gint slidepos, ggobid *gg) {

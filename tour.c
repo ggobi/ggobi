@@ -75,6 +75,7 @@ inner_prod(gfloat *x1, gfloat *x2, gint n)
   return((gfloat)xip);
 }
 
+/* orthonormalizes vector 2 on vector */
 void
 gram_schmidt(gfloat *x1, gfloat *x2, gint n)
 {
@@ -199,7 +200,7 @@ gboolean matmult_uvt(gfloat **ut, gfloat **vt, gint ur, gint uc,
   return(ok);
 }
 
-/* copy matrix */
+/* copy matrix ot=out matrix, it=in matrix */
 void copy_mat(gfloat **ot, gfloat **it, gint nr, gint nc) {
   gint j, k;
 

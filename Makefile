@@ -15,7 +15,7 @@ CC = gcc
 LD=$(CXX)
 LD=$(CC)
 
-CFLAGS= -g -ansi -Wall -fpic -DHAVE_CONFIG_H
+CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
 CXXFLAGS=$(CFLAGS)
 
 ifdef TEST_KEYS
@@ -64,7 +64,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  p1d_ui.c p1d.c ash1d.c texture.c \
  xyplot_ui.c xyplot.c \
  rotate_ui.c \
- tour2d_ui.c tour2d.c tour.c pp_ui.c tour1d_ui.c tour1d.c  \
+ tour2d_ui.c tour2d.c tour.c pp_ui.c tour1d_ui.c tour1d.c tour1d_pp_ui.c tour1d_pp.c\
  tourcorr_ui.c tourcorr.c ppcorr_ui.c \
  brush_ui.c brush.c brush_init.c brush_bins.c brush_api.c color_ui.c xlines.c \
  exclusion_ui.c exclusion.c record_id.c \
@@ -99,7 +99,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  p1d_ui.o p1d.o ash1d.o texture.o \
  xyplot_ui.o xyplot.o \
  rotate_ui.o \
- tour2d_ui.o tour2d.o tour.o pp_ui.o tour1d_ui.o tour1d.o \
+ tour2d_ui.o tour2d.o tour.o pp_ui.o tour1d_ui.o tour1d.o tour1d_pp_ui.o tour1d_pp.o\
  tourcorr_ui.o tourcorr.o ppcorr_ui.o \
  brush_ui.o brush.o brush_init.o brush_bins.o brush_api.o color_ui.o xlines.o \
  exclusion_ui.o exclusion.o record_id.o \
