@@ -227,8 +227,9 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
       dsp->t1d.Gz.vals[i][dsp->t1d.active_vars.els[i]] = 1.0;
   }
 
-  dsp->t1d.dist_az = 1.0;
+  dsp->t1d.dist_az = 0.0;
   dsp->t1d.delta = cpanel->t1d_step*M_PI_2/10.0;
+  dsp->t1d.tang = 0.0;
   dsp->t1d.nsteps = 1; 
   dsp->t1d.stepcntr = 1;
 
@@ -256,10 +257,10 @@ tour1d_fade_vars_cb (GtkCheckMenuItem *w, guint action)
 void tour1d_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
-  extern void speed_set (gint, gfloat *, gfloat *, gfloat, gint *, gint *);
+  extern void speed_set (gint, gfloat *, gfloat *, gint *, gint *);
 
   cpanel->t1d_slidepos = slidepos;
-  speed_set(slidepos, &cpanel->t1d_step, &dsp->t1d.delta,  dsp->t1d.dist_az,
+  speed_set(slidepos, &cpanel->t1d_step, &dsp->t1d.delta, 
     &dsp->t1d.nsteps, &dsp->t1d.stepcntr);
 }
 
@@ -419,13 +420,13 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg)
 void
 tour1d_run(displayd *dsp, ggobid *gg)
 {
-  extern gboolean reached_target(gint, gint, gfloat, gint, gfloat *, gfloat *);
+  extern gboolean reached_target(gint, gint, gfloat, gfloat, gint, gfloat *, gfloat *);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gfloat *, gint);
-  extern void do_last_increment(vector_f, vector_f, gint);
+  extern void do_last_increment(vector_f, vector_f, gfloat, gint);
   extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
     array_d, array_d, vector_f, array_d, array_d, array_d,
-    vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
+    vector_f, vector_f, gint *, gint *, gfloat *, gfloat *, gfloat);
   extern void tour_reproject(vector_f, array_d, array_d, array_d, 
     array_d, array_d, gint, gint);
   extern void t1d_ppdraw(gfloat, ggobid *);
@@ -440,6 +441,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
 
   if (!dsp->t1d.get_new_target && 
       !reached_target(dsp->t1d.nsteps, dsp->t1d.stepcntr, dsp->t1d.tang,
+        dsp->t1d.dist_az, 
         dsp->t1d.target_selection_method,&dsp->t1d.ppval, &oindxval)) {
     increment_tour(dsp->t1d.tinc, dsp->t1d.tau, &dsp->t1d.nsteps, 
       &dsp->t1d.stepcntr, dsp->t1d.dist_az, dsp->t1d.delta, &dsp->t1d.tang, 
@@ -477,7 +479,8 @@ tour1d_run(displayd *dsp, ggobid *gg)
         t1d_ppdraw(dsp->t1d.ppval, gg);
       else
       {
-        do_last_increment(dsp->t1d.tinc, dsp->t1d.tau, (gint) 1);
+        do_last_increment(dsp->t1d.tinc, dsp->t1d.tau, 
+          dsp->t1d.dist_az, (gint) 1);
         tour_reproject(dsp->t1d.tinc, dsp->t1d.G, dsp->t1d.Ga, dsp->t1d.Gz,
           dsp->t1d.F, dsp->t1d.Va, d->ncols, (gint) 1);
       }
@@ -539,10 +542,9 @@ tour1d_run(displayd *dsp, ggobid *gg)
         dsp->t1d.Gz, dsp->t1d.G, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
 		      dsp->t1d.Vz,
         dsp->t1d.tau, dsp->t1d.tinc, &dsp->t1d.nsteps, &dsp->t1d.stepcntr, 
-        &dsp->t1d.dist_az, dsp->t1d.delta);
+        &dsp->t1d.dist_az, &dsp->t1d.tang, cpanel->t1d_step);
       dsp->t1d.get_new_target = false;
     }
-    dsp->t1d.tang = 0.0;
   }
   /*  tour_reproject(dsp, 2);*/
   display_tailpipe (dsp, FULL, gg);

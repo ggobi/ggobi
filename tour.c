@@ -8,6 +8,7 @@
 #endif
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "vars.h"
 #include "externs.h"
@@ -260,7 +261,7 @@ gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, array_d
   array_d Gz, array_d G, vector_f lambda, array_d tv, array_d Va, 
   array_d Vz,
   vector_f tau, vector_f tinc, gint *ns, gint *stcn, gfloat *pdist_az, 
-  gfloat delta) {
+  gfloat *ptang, gfloat step) {
 
   gint i, j, k, rank;
   gdouble tol = 0.0001;
@@ -273,6 +274,7 @@ gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, array_d
   array_d tmpvc;
 
   gfloat dist_az = *pdist_az;
+  gfloat tang = *ptang;
   gint nsteps = *ns;
   gint stepcntr = *stcn;
 
@@ -298,6 +300,7 @@ gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, array_d
   stepcntr = 1;
   nsteps = 1;
   dist_az = 0.0;
+  tang = 0.0;
   
   /* 2 is hard-wired because it relates to cos, sin
                          and nothing else. */
@@ -458,12 +461,23 @@ g_printerr ("\n");
           gram_schmidt(F.vals[k], F.vals[j], datadim);
 
       /* Calculate Euclidean norm of principal angles.*/
-      dist_az = 0.0;
+      tmpd = 0.0;
       for (i=0; i<projdim; i++)
-        dist_az += (tau.els[i]*tau.els[i]);
-      dist_az = (gfloat)sqrt((gdouble)dist_az);
-      *pdist_az = dist_az;
+        tmpd += ((gdouble)tau.els[i]*(gdouble)tau.els[i]);
+      dist_az = (gfloat)sqrt(tmpd);
 
+      if (dist_az < tol)
+        return(3);
+      
+      for (i=0; i<projdim; i++) {
+        if (tau.els[i] > tol)
+          tau.els[i] /= dist_az;
+        else 
+          tau.els[i] = 0.0;
+      }
+
+      *pdist_az = dist_az;
+      *ptang = tang;
       /* Reset increment counters.*/
       /*      nsteps = (gint) floor((gdouble)(dist_az/delta))+1;*/
       /*      for (i=1; i<projdim; i++) {
@@ -482,6 +496,7 @@ g_printerr ("\n");
     arrayd_copy(&Fa, &G);
 
     *pdist_az = dist_az;
+    *ptang = tang;
     *ns = nsteps;
     *stcn = stepcntr;
 
@@ -558,24 +573,23 @@ increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn,
   /*g_printerr("tinc ");   */
   /*  for (i=0; i<projdim; i++) 
       if (tinc.els[i] > tau.els[i]) {*/
-  if (tang >= 1.0)
+  if (tang >= dist_az)
       attheend = true;
       /*      nsteps = stepcntr;*/
   /*    }
 	printf("\n ");   */
 
   if (attheend) {
-    /* || nsteps == 1 || 
-       nsteps == stepcntr) {*/
     for (i=0; i<projdim; i++)
-      tinc.els[i] = tau.els[i];
+      tinc.els[i] = tau.els[i]*dist_az;
   }
   else {
     for (i=0; i<projdim; i++)
       tinc.els[i] = (tang*tau.els[i]);
     /*      tinc.els[i] += (delta*tau.els[i]/dist_az);*/
   }
-  /*  printf("%f %f %f %f \n ",tang, delta, tinc.els[0], tau.els[0]);   */
+  /*  printf("%f %f %f %f %f %f %f %d\n ",tang, delta, tinc.els[0], tinc.els[1], 
+      tau.els[0], tau.els[1], dist_az, (glong) time((glong *) 0));*/
 
   *ptang = tang;
   *ns = nsteps;
@@ -583,15 +597,17 @@ increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn,
 }
 
 gboolean
-reached_target(gint nsteps, gint stepcntr, gfloat tang, gint basmeth, 
+reached_target(gint nsteps, gint stepcntr, gfloat tang, gfloat dist_az, 
+  gint basmeth, 
   gfloat *indxval, gfloat *oindxval) 
 {
   gboolean arewethereyet = false;
 
   /*  if (nsteps == 1 || stepcntr == nsteps)*/
-  if (basmeth == 0) 
-    if (tang >= 1.0)
-    arewethereyet = true;
+  if (basmeth == 0) {
+    if (tang >= dist_az)
+      arewethereyet = true;
+  }
   else if (basmeth == 1) {
     if (*indxval < *oindxval)
     {
@@ -632,19 +648,20 @@ reached_target2(vector_f tinc, vector_f tau, gint basmeth,
 }
 
 void
-do_last_increment(vector_f tinc, vector_f tau, gint projdim)
+do_last_increment(vector_f tinc, vector_f tau, gfloat dist_az, gint projdim)
 {
   int j;
 
   for (j=0; j<projdim; j++)
-    tinc.els[j] = tau.els[j];
+    tinc.els[j] = tau.els[j]*dist_az;
 
 }
 
-void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dist_az, 
+void speed_set (gint slidepos, gfloat *st, gfloat *dlt,  
   gint *ns, gint *stcn) {
 
   gfloat fracpath;
+  gfloat tol = 0.0001;
 
   gfloat step = *st;
   gfloat delta = *dlt;
@@ -653,6 +670,7 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dist_az,
 
   if (slidepos < 5)
   {
+    step = 0.0;
     delta = 0.0;
     /*    step = 0.0;
     nsteps = 1;
@@ -665,13 +683,14 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dist_az,
      * scrollbar range.
     */
     if (slidepos < 50)
-      step = ((gfloat) slidepos - 5.) / 2000. ;
+      step = ((gfloat) slidepos - 5.) / 2000.;
     else if ((slidepos >= 50))/* && (slidepos < 90))*/
       step = (gfloat) pow((double)(slidepos-50)/100.,(gdouble)1.5) + 0.0225;
     /*    else
 	  step = (gfloat) sqrt((double)(slidepos-50)) + 0.1868;*/
 
-    delta = step/dist_az*M_PI_2/10.0;
+    delta = (step*M_PI_2)/(10.0);
+
     /*    if (nsteps > 1)
       fracpath = stepcntr/nsteps;
     else 

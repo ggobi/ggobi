@@ -239,7 +239,7 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
       dsp->t2d.Gz.vals[i][dsp->t2d.active_vars.els[i]] = 1.0;
   }
 
-  dsp->t2d.dist_az = 1.0;
+  dsp->t2d.dist_az = 0.0;
   dsp->t2d.delta = cpanel->t2d_step*M_PI_2/10.0;
   dsp->t2d.tang = 0.0;
   dsp->t2d.nsteps = 1; 
@@ -270,10 +270,10 @@ tour2d_fade_vars_cb (GtkCheckMenuItem *w, guint action)
 void tour2d_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
-  extern void speed_set (gint, gfloat *, gfloat *, gfloat, gint *, gint *);
+  extern void speed_set (gint, gfloat *, gfloat *, gint *, gint *);
 
   cpanel->t2d_slidepos = slidepos;
-  speed_set(slidepos, &cpanel->t2d_step, &dsp->t2d.delta,  dsp->t2d.dist_az,
+  speed_set(slidepos, &cpanel->t2d_step, &dsp->t2d.delta, 
     &dsp->t2d.nsteps, &dsp->t2d.stepcntr);
 }
 
@@ -428,14 +428,14 @@ void tour2d_scramble(ggobid *gg)
 void
 tour2d_run(displayd *dsp, ggobid *gg)
 {
-  extern gboolean reached_target(gint, gint, gfloat, gint, gfloat *, gfloat *);
+  extern gboolean reached_target(gint, gint, gfloat, gfloat, gint, gfloat *, gfloat *);
   extern gboolean reached_target2(vector_f, vector_f, gint, gfloat *, gfloat *, gint);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gfloat *, gint);
-  extern void do_last_increment(vector_f, vector_f, gint);
+  extern void do_last_increment(vector_f, vector_f, gfloat, gint);
   extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
     array_d, array_d, vector_f, array_d, array_d, array_d,
-    vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
+    vector_f, vector_f, gint *, gint *, gfloat *, gfloat *, gfloat);
   extern void tour_reproject(vector_f, array_d, array_d, array_d, 
     array_d, array_d, gint, gint);
   extern void t2d_ppdraw(gfloat, ggobid *);
@@ -454,6 +454,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
 
   if (!dsp->t2d.get_new_target && 
       !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, dsp->t2d.tang,
+       dsp->t2d.dist_az,
        dsp->t2d.target_selection_method, &dsp->t2d.ppval, &oindxval)) {
 
     increment_tour(dsp->t2d.tinc, dsp->t2d.tau, &dsp->t2d.nsteps, 
@@ -492,7 +493,8 @@ tour2d_run(displayd *dsp, ggobid *gg)
         t2d_ppdraw(dsp->t2d.ppval, gg);
       else
       {
-        do_last_increment(dsp->t2d.tinc, dsp->t2d.tau, (gint) 2);
+        do_last_increment(dsp->t2d.tinc, dsp->t2d.tau, 
+          dsp->t2d.dist_az, (gint) 2);
         tour_reproject(dsp->t2d.tinc, dsp->t2d.G, dsp->t2d.Ga, dsp->t2d.Gz,
           dsp->t2d.F, dsp->t2d.Va, d->ncols, (gint) 2);
       }
@@ -573,7 +575,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
         dsp->t2d.Gz, dsp->t2d.G, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.Va,
         dsp->t2d.Vz,
         dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 
-        &dsp->t2d.dist_az, dsp->t2d.delta);
+        &dsp->t2d.dist_az, &dsp->t2d.tang, cpanel->t2d_step);
       if (pathprob != 0) {
         if (pathprob == 1) {
           gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
@@ -593,7 +595,6 @@ tour2d_run(displayd *dsp, ggobid *gg)
       else 
         dsp->t2d.get_new_target = false;
     }
-    dsp->t2d.tang = 0.0;
   }
   
   display_tailpipe (dsp, FULL_1PIXMAP, gg);

@@ -337,8 +337,9 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
 
   dsp->tcorr2.F.vals[0][dsp->tcorr2.active_vars.els[0]] = 1.0;
 
-  dsp->tcorr1.dist_az = 1.0;
+  dsp->tcorr1.dist_az = 0.0;
   dsp->tcorr1.delta = cpanel->tcorr1_step*M_PI_2/10.0;
+  dsp->tcorr1.tang = 0.0;
   dsp->tcorr1.nsteps = 1; 
   dsp->tcorr1.stepcntr = 1;
 
@@ -346,8 +347,9 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr1.get_new_target = true;
 
   /* vertical */
-  dsp->tcorr2.dist_az = 1.0;
-  dsp->tcorr2.delta = cpanel->tcorr2_step*M_PI_2/10.0;
+  dsp->tcorr2.dist_az = 0.0;
+  dsp->tcorr2.delta = 0.0; /*cpanel->tcorr2_step*M_PI_2/10.0;*/
+  dsp->tcorr2.tang = 0.0;
   dsp->tcorr2.nsteps = 1; 
   dsp->tcorr2.stepcntr = 1;
 
@@ -377,13 +379,13 @@ tourcorr_fade_vars_cb (GtkCheckMenuItem *w, guint action)
 void tourcorr_speed_set(gint slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
-  extern void speed_set (gint, gfloat *, gfloat *, gfloat, gint *, gint *);
+  extern void speed_set (gint, gfloat *, gfloat *, gint *, gint *);
 
   speed_set(slidepos, &cpanel->tcorr1_step, &dsp->tcorr1.delta,  
-    dsp->tcorr1.dist_az, &dsp->tcorr1.nsteps, &dsp->tcorr1.stepcntr);
+    &dsp->tcorr1.nsteps, &dsp->tcorr1.stepcntr);
 
   speed_set(slidepos, &cpanel->tcorr2_step, &dsp->tcorr2.delta,  
-    dsp->tcorr2.dist_az, &dsp->tcorr2.nsteps, &dsp->tcorr2.stepcntr);
+    &dsp->tcorr2.nsteps, &dsp->tcorr2.stepcntr);
 
   cpanel->tc_slidepos = slidepos;
 }
@@ -580,13 +582,14 @@ void
 tourcorr_run(displayd *dsp, ggobid *gg)
 {
   datad *d = dsp->d;
-  extern gboolean reached_target(gint, gint, gfloat, gint, gfloat *, gfloat *);
+  cpaneld *cpanel = &dsp->cpanel;
+  extern gboolean reached_target(gint, gint, gfloat, gfloat, gint, gfloat *, gfloat *);
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gfloat *, gint);
-  extern void do_last_increment(vector_f, vector_f, gint);
+  extern void do_last_increment(vector_f, vector_f, gfloat, gint);
   extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
     array_d, array_d, vector_f, array_d, array_d, array_d,
-    vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
+    vector_f, vector_f, gint *, gint *, gfloat *, gfloat *, gfloat);
   extern void tour_reproject(vector_f, array_d, array_d, array_d, 
     array_d, array_d, gint, gint);
   /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
@@ -595,7 +598,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
 
   if (!dsp->tcorr1.get_new_target && 
       !reached_target(dsp->tcorr1.nsteps, dsp->tcorr1.stepcntr, 
-        dsp->tcorr1.tang, 0, 0, 0)) {
+        dsp->tcorr1.tang, dsp->tcorr1.dist_az, 0, 0, 0)) {
 
     increment_tour(dsp->tcorr1.tinc, dsp->tcorr1.tau, &dsp->tcorr1.nsteps, 
       &dsp->tcorr1.stepcntr, dsp->tcorr1.dist_az, dsp->tcorr1.delta, 
@@ -606,7 +609,8 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   }
   else { /* do final clean-up and get new target */
     if (!dsp->tcorr1.get_new_target) {
-      do_last_increment(dsp->tcorr1.tinc, dsp->tcorr1.tau, (gint) 1);
+      do_last_increment(dsp->tcorr1.tinc, dsp->tcorr1.tau, 
+        dsp->tcorr1.dist_az, (gint) 1);
       tour_reproject(dsp->tcorr1.tinc, dsp->tcorr1.G, dsp->tcorr1.Ga, 
         dsp->tcorr1.Gz, dsp->tcorr1.F, dsp->tcorr1.Va, d->ncols, (gint) 1);
       }
@@ -631,15 +635,15 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         dsp->tcorr1.tv, dsp->tcorr1.Va, dsp->tcorr1.Vz,
         dsp->tcorr1.tau, dsp->tcorr1.tinc, &dsp->tcorr1.nsteps, 
         &dsp->tcorr1.stepcntr, 
-        &dsp->tcorr1.dist_az, dsp->tcorr1.delta);
+        &dsp->tcorr1.dist_az, &dsp->tcorr1.tang, 
+        cpanel->tcorr1_step);
       dsp->tcorr1.get_new_target = false;
     }
-    dsp->tcorr1.tang = 0.0;
   }
 
   if (!dsp->tcorr2.get_new_target && 
       !reached_target(dsp->tcorr2.nsteps, dsp->tcorr2.stepcntr, 
-        dsp->tcorr2.tang, 0, 0, 0)) {
+        dsp->tcorr2.tang, dsp->tcorr2.dist_az, 0, 0, 0)) {
     increment_tour(dsp->tcorr2.tinc, dsp->tcorr2.tau, &dsp->tcorr2.nsteps, 
       &dsp->tcorr2.stepcntr, dsp->tcorr2.dist_az, dsp->tcorr2.delta, 
       &dsp->tcorr2.tang, (gint) 1);
@@ -649,7 +653,8 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   }
   else { /* do final clean-up and get new target */
     if (!dsp->tcorr2.get_new_target) {
-      do_last_increment(dsp->tcorr2.tinc, dsp->tcorr2.tau, (gint) 1);
+      do_last_increment(dsp->tcorr2.tinc, dsp->tcorr2.tau, 
+        dsp->tcorr2.dist_az, (gint) 1);
       tour_reproject(dsp->tcorr2.tinc, dsp->tcorr2.G, dsp->tcorr2.Ga, 
         dsp->tcorr2.Gz, dsp->tcorr2.F, dsp->tcorr2.Va, d->ncols, (gint) 1);
     }
@@ -671,10 +676,10 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         dsp->tcorr2.tv, dsp->tcorr2.Va,
 	   dsp->tcorr2.Vz,
         dsp->tcorr2.tau, dsp->tcorr2.tinc, &dsp->tcorr2.nsteps, 
-        &dsp->tcorr2.stepcntr, &dsp->tcorr2.dist_az, dsp->tcorr2.delta);
+        &dsp->tcorr2.stepcntr, &dsp->tcorr2.dist_az, 
+        &dsp->tcorr2.tang, cpanel->tcorr2_step);
       dsp->tcorr2.get_new_target = false;
     }
-    dsp->tcorr2.tang = 0.0;
   }
   
   display_tailpipe (dsp, FULL, gg);
