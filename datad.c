@@ -185,7 +185,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   return (display);
 }
 
-
+/* This initializes rowIds to row numbers if ids are not provided */
 void
 datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate)
 {
