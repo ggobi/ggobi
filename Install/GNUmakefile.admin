@@ -30,7 +30,7 @@ DATA_SRC_FILES=\
    roos.col roos.dat roos.doc roos.missing roos.row \
    flea.xml pigs.xml ratcns.xml sat.xml sleep.xml eies.xml buckyball.xml \
    stdColorMap.xml prim7.xml olive.col olive.dat olive.row olive.xml \
-   places.xml algal-bloom.xml \
+   places.xml algal-bloom.xml snetwork.xml \
    laser.col laser.dat laser.doc laser.xml \
    ggobi.dtd
 
