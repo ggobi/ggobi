@@ -92,6 +92,15 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
   colnames[0] = "Pos1";
   colnames[1] = "Pos2";
   colnames[2] = "Pos3";
+
+  /*
+   * In case there is no initial scatterplot because the datasets
+   * have no variables, we don't want creating a datad to trigger
+   * the initialization of this plot.   This takes care of it.
+  */
+  sessionOptions->info->createInitialScatterPlot = false;
+  /*-- --*/
+
   dnew = datad_create (dsrc->nrows, nc, gg);
   dnew->name = g_strdup ("MDS");
 
