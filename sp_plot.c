@@ -18,7 +18,6 @@
 #include "externs.h"
 #include "colorscheme.h"
 
-
 static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
 
 static void
@@ -124,7 +123,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
   if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
    displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-   loop_over_points = display->options.points_show_p ||
+   loop_over_points = display->options.points_show_p &&
                       displayKlass->loop_over_points;
   } else
    loop_over_points = display->options.points_show_p;
@@ -310,8 +309,9 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
       displayd *display = (displayd *) sp->displayptr;
       datad *d = display->d;
 /* XXX barcharts, for instance, don't know about this new approach yet */
-      if(klass->redraw(sp, d, gg, true))
+      if(klass->redraw(sp, d, gg, true)) {
         return;
+      }
     }
   }
 
