@@ -1,0 +1,7 @@
+<plugin name="Image" load="immediate">
+   <description>Saves a GGobi splot to a file.</description>
+   <author>Duncan Temple Lang</author>
+   <dll name="plugins/ImageLib/ImagePlugin.so">
+    <init onCreate="init_image_plugin" />
+  </dll>
+</plugin>

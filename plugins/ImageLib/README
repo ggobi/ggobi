@@ -1,0 +1,6 @@
+Use
+ gdk_imlib_create_image_from_drawable()
+to construct a data structure for use with Imlib
+from a GdkPixmap.
+Then we save this using
+   gdk_imlib_save_image();
