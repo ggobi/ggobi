@@ -2,7 +2,6 @@ ifdef ADMIN
  include Install/GNUmakefile.admin
 endif
 
-
 ggobi:
 
 EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
@@ -135,12 +134,12 @@ mt19937-1.o: mt19937-1.c
 dm: $(OB)
 	$(CC) `gtk-config --cflags` $(OB) -o ggobi `gtk-config --libs` -L$(DM) -ldmalloc
 
-lib: libGGobi.so
-libGGobi.so: $(OB)
+lib: libggobi.so
+libggobi.so: $(OB)
 	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --libs` $(DL_RESOLVE_PATH)
 
 clean: 
-	rm -f *.o ggobi libGGobi.so
+	rm -f *.o ggobi libggobi.so
 
 .c.o:
 	$(CC) -c -I. `gtk-config --cflags` $(CFLAGS) $*.c
@@ -170,8 +169,8 @@ local.config:
 
 
 ifdef USE_XML
-xmlConvert: xmlConvert.o libGGobi.so
-	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS:%=-L%) -L. -lGGobi $(DL_RESOLVE_PATH)
+xmlConvert: xmlConvert.o libggobi.so
+	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS:%=-L%) -L. -lggobi $(DL_RESOLVE_PATH)
 
 make_ggobi.o: read_xml.h
 endif
