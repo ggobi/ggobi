@@ -404,12 +404,14 @@ get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist)
 * number of variables; it just clears the list and then
 * rebuilds it.
 */
-void variable_notebook_addvar_cb (GtkWidget *notebook, ggobid *gg)
+/*void variable_notebook_addvar_cb (GtkWidget *notebook, ggobid *gg)*/
+void variable_notebook_addvar_cb (GtkObject *obj, vartabled *vt,
+  ggobid *gg, GtkWidget *notebook)
 {
   GtkWidget *swin, *clist;
 
   /*-- add one or more variables to this datad --*/
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  datad *d = (datad *) vt->d;
   gint kd = g_slist_index (gg->d, d);
 
   /*-- get the clist associated with this data; clear and rebuild --*/
@@ -452,7 +454,7 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   }
 
   /*-- listen for variable_added events on main_window --*/
-  gtk_signal_connect_object (GTK_OBJECT (gg->main_window),
+  gtk_signal_connect (GTK_OBJECT (gg->main_window),
     "variable_added", GTK_SIGNAL_FUNC (variable_notebook_addvar_cb),
      GTK_OBJECT (notebook));
 

@@ -153,6 +153,7 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 {
   gint i, k, n, jvar;
   gint d_ncols_prev = d->ncols;
+  vartabled *vt;
 
   addvar_vartable_expand (ncols, d, gg);
 
@@ -180,6 +181,14 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   }
 
   addvar_propagate (d_ncols_prev, ncols, d, gg);
+
+  for (k=0; k<ncols; k++) {
+    n = cols[k];
+    vt = vartable_element_get (n, d);
+    /*-- emit variable_added signal --*/
+    gtk_signal_emit (GTK_OBJECT (gg->main_window),
+                     GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, gg); 
+  }
 }
 
 
