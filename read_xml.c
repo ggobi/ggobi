@@ -160,6 +160,12 @@ read_xml_input_description(const char * const fileName, const char * const modeN
   memset(desc, '\0', sizeof(InputDescription));
 
   desc->fileName = g_strdup(fileName);
+  if(canRead(desc->fileName) == false) {
+     g_free(desc->fileName);
+     desc->fileName = g_malloc((strlen(fileName) + 5) * sizeof(gchar));
+     sprintf(desc->fileName, "%s.xml", fileName);
+  }
+
   desc->mode = isURL(fileName) ? url_data : xml_data;
   desc->desc_read_input = &read_xml;	
 

@@ -468,11 +468,21 @@ isXMLFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info)
   FILE *f;
   gint c;
   gchar *tmp;
+  gboolean status;
 
   if(isURL(fileName))
     return(true);
 
+
   tmp = strrchr(fileName, '.');
+
+  if(!tmp) {
+     gchar buf[256];
+     sprintf(buf, "%s.xml",fileName);
+     if(isXMLFile(buf, gg, info))
+        return(true);
+  }
+
   if (tmp && (strcmp(tmp, ".xmlz") == 0 || strcmp(tmp, ".gz") == 0)) {
 	  /* desc->canVerify = false; */
     return (true);

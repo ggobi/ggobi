@@ -1,3 +1,6 @@
+Provide a screen to provide information about the source of
+the data (e.g. filename, mode).
+
 Get rid of the hard coded arrays of mode names, display types, 
 etc. if they are now dynamically computed. (for extensibility)
   Get rid of the const's where not appropriate
