@@ -40,9 +40,10 @@ typedef struct {
 
  /*-- is this variable categorical? --*/
  vartyped vartype;
- /*gboolean categorical_p;*/
+ /*-- categorical_p --*/
  gint nlevels;
- int *level_values;
+ gint *level_values;
+ gint *level_counts;
  gchar **level_names;  /*-- strings --*/
 
  /*-- reference variable:  jref=-1 except for cloned or sphered variables --*/

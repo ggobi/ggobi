@@ -122,8 +122,8 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-       GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-       ncols = klass->plotted_vars_get(display, cols, d, gg);
+     GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+     ncols = klass->plotted_vars_get(display, cols, d, gg);
   }
 
   return ncols;
@@ -183,16 +183,22 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
 
   vt_to->vartype = vt_from->vartype;
   vt_to->nlevels = vt_from->nlevels;
-  if(vt_from->nlevels && vt_from->vartype == categorical) {
-      vt_to->level_values = (gint*) g_malloc(sizeof(gint) * vt_from->nlevels);
-      vt_to->level_names =  (gchar **) g_malloc(sizeof(gchar *) * vt_from->nlevels);
+  if (vt_from->nlevels && vt_from->vartype == categorical) {
+    vt_to->level_values = (gint*)
+      g_malloc(sizeof(gint) * vt_from->nlevels);
+    vt_to->level_counts = (gint*)
+      g_malloc(sizeof(gint) * vt_from->nlevels);
+    vt_to->level_names =  (gchar **)
+      g_malloc(sizeof(gchar *) * vt_from->nlevels);
   } else {
-      vt_to->level_values = NULL;
-      vt_to->level_names = NULL;
+    vt_to->level_values = NULL;
+    vt_to->level_counts = NULL;
+    vt_to->level_names = NULL;
   }
   for (k=0; k<vt_to->nlevels; k++) {
-      vt_to->level_values[k] = vt_from->level_values[k];
-      vt_to->level_names[k] = g_strdup(vt_from->level_names[k]);
+    vt_to->level_values[k] = vt_from->level_values[k];
+    vt_to->level_counts[k] = vt_from->level_counts[k];
+    vt_to->level_names[k] = g_strdup(vt_from->level_names[k]);
   }
 
   vt_to->mean = vt_from->mean;

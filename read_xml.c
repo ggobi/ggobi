@@ -329,10 +329,10 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     case NA:  
       if(data->recordString) { 
         setRecordValues(data, data->recordString, data->recordStringLength);
-	    if(type != NA && type != STRING)
+        if(type != NA && type != STRING)
           data->current_element++;
-	    resetRecordInfo(data);
-	  }
+        resetRecordInfo(data);
+      }
     break;
     case QUICK_HELP:
       break;
@@ -436,6 +436,7 @@ categoricalLevels(const xmlChar **attrs, XMLParserData *data)
 {
   datad *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
+  gint i;
 
   const gchar *tmp = getAttribute(attrs, "count");
 
@@ -443,9 +444,13 @@ categoricalLevels(const xmlChar **attrs, XMLParserData *data)
     el->nlevels = strToInteger(tmp);
     if(el->nlevels > 0) {
       el->level_values = (gint *) g_malloc(el->nlevels * sizeof(gint)); 
+      el->level_counts = (gint *) g_malloc(el->nlevels * sizeof(gint)); 
       el->level_names = (gchar **) g_malloc(el->nlevels * sizeof(gchar *)); 
+      for (i=0; i<el->nlevels; i++)
+        el->level_counts[i] = 0;
     } else {
       el->level_values = NULL;
+      el->level_counts = NULL;
       el->level_names  = NULL;
     }
   }
@@ -498,7 +503,7 @@ resolveEdgeIds(XMLParserData *parserData)
 void 
 resolveAllEdgeIds(XMLParserData *parserData)
 {
-	parserData;
+   parserData;
 }
 
 void endXMLElement(void *user_data, const xmlChar *name)
@@ -529,8 +534,8 @@ void endXMLElement(void *user_data, const xmlChar *name)
       setRecordValues(data, data->recordString, data->recordStringLength);
     break;
     case STRING:
-       /* This is the individual setRecordValue(), i.e. not with an 's' at the end.
-           */
+    /* This is the individual setRecordValue(), i.e. not with an 's' at the end.
+    */
       setRecordValue(data->recordString, data->current_data, data);
       data->current_element++;
     break;
@@ -1025,91 +1030,100 @@ setMissingValue(XMLParserData *data, datad *d, vartabled *vt)
 static gboolean
 setRecordValue(const char *tmp, datad *d, XMLParserData *data)
 {
-   gdouble value;
-   vartabled *vt;
+  gdouble value;
+  vartabled *vt;
 
-   if(data->counterVariableIndex > -1 && data->current_element == data->counterVariableIndex) {
-      d->raw.vals[data->current_record][data->current_element] = data->current_record + 1;      
-      data->current_element++;
-   }
+  if(data->counterVariableIndex > -1 &&
+     data->current_element == data->counterVariableIndex)
+  {
+    d->raw.vals[data->current_record][data->current_element] =
+      data->current_record + 1;      
+    data->current_element++;
+  }
 
-    /* If reading past the last column or row, stop */
-    if (data->current_record >= d->raw.nrows ||
-        data->current_element >= d->raw.ncols)
-    {
-      g_printerr ("Row %d (counting from 1) has too many elements\n",
-        data->current_record+1);
-      data->current_element = 0;
-      return(false);
-    }
+  /* If reading past the last column or row, stop */
+  if (data->current_record >= d->raw.nrows ||
+      data->current_element >= d->raw.ncols)
+  {
+     g_printerr ("Row %d (counting from 1) has too many elements\n",
+       data->current_record+1);
+     data->current_element = 0;
+     return(false);
+  }
 
-    vt = vartable_element_get (data->current_element, d);
+  vt = vartable_element_get (data->current_element, d);
 
-    /*
-     * this is a missing value if 
-     *  1. the file does not specify a string and this string is either
-     *     "na", "NA", or ".", or
-     *  2. the file specifies a string for NA and this is that string
-    */
-    if ((data->NA_identifier == NULL &&
-          (strcmp (tmp, "na") == 0 ||
-           strcmp (tmp, "NA") == 0 ||
-           strcmp (tmp, ".") == 0)) ||
-        (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0))
-    {
-      setMissingValue(data, d, vt);
-    } else {
+  /*
+   * this is a missing value if 
+   *  1. the file does not specify a string and this string is either
+   *     "na", "NA", or ".", or
+   *  2. the file specifies a string for NA and this is that string
+  */
+  if ((data->NA_identifier == NULL &&
+        (strcmp (tmp, "na") == 0 ||
+         strcmp (tmp, "NA") == 0 ||
+         strcmp (tmp, ".") == 0)) ||
+      (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0))
+  {
+    setMissingValue(data, d, vt);
+  } else {
 
-      value = asNumber (tmp);
-      
-      if(vt->vartype == categorical) {
-        if(data->autoLevels && data->autoLevels[data->current_element]) {
-  	    value = getAutoLevelIndex(tmp, data, vt);
-	} else if(checkLevelValue(vt, value) == false) {
-	    ggobi_XML_error_handler(data, 
-  		"incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n", 
-		 (int) data->current_record + 1, vt->collab,
-            data->current_data->name ? data->current_data->name : "");
-	}
-      } else if(data->state == STRING) {
-  	    ggobi_XML_error_handler(data, "<string> element for non categorical variable (%s) in record %d\n",
-                             vt->collab, (int) data->current_record + 1);
-	    value = 0;
-      }
-
-      d->raw.vals[data->current_record][data->current_element] = value;
-    }
-
-    /* If the dataset is using one of the variables as the row labels,
-       then resolve the name.
-     */
-    if(data->recordLabelsVariable == data->current_element) {
-      gchar *tmp1;
-      /* If this is a categorical, lookup the level id. */
-      gchar buf[100];
-      if(d->missing.vals &&
-         d->missing.vals[data->current_record][data->current_element])
-      {
-        /* sprintf(buf, "%s", "NA"); */
-        tmp1 = g_strdup("NA");
-      }
-      else {
-        if(vt && vt->vartype == categorical) {
-          /* To be correct, we need to match the level_values and find the
-             corresponding entry. */
-          tmp1 = (gchar *) GGobi_getLevelName(vt, value);
-          if(tmp1)
-            tmp1 = g_strdup(tmp1);
+    value = asNumber (tmp);
+    
+    if(vt->vartype == categorical) {
+      if(data->autoLevels && data->autoLevels[data->current_element]) {
+        value = getAutoLevelIndex(tmp, data, vt);
+      } else {
+        gint level = checkLevelValue(vt, value);
+        if (level == -1) {
+          ggobi_XML_error_handler(data, 
+           "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n", 
+           (int) data->current_record + 1, vt->collab,
+           data->current_data->name ? data->current_data->name : "");
         } else {
-          sprintf(buf, "%f", value);
-          tmp1 = g_strdup(buf);
+          vt->level_counts[level]++;
         }
       }
-      g_array_insert_val(d->rowlab, data->current_record, tmp1);
-      g_free (tmp1);
+    } else if(data->state == STRING) {
+      ggobi_XML_error_handler(data,
+        "<string> element for non categorical variable (%s) in record %d\n",
+        vt->collab, (int) data->current_record + 1);
+      value = 0;
     }
 
-    return(true);
+    d->raw.vals[data->current_record][data->current_element] = value;
+  }
+
+  /* If the dataset is using one of the variables as the row labels,
+     then resolve the name.
+   */
+  if(data->recordLabelsVariable == data->current_element) {
+    gchar *tmp1;
+    /* If this is a categorical, lookup the level id. */
+    gchar buf[100];
+    if(d->missing.vals &&
+       d->missing.vals[data->current_record][data->current_element])
+    {
+      /* sprintf(buf, "%s", "NA"); */
+      tmp1 = g_strdup("NA");
+    }
+    else {
+      if(vt && vt->vartype == categorical) {
+        /* To be correct, we need to match the level_values and find the
+           corresponding entry. */
+        tmp1 = (gchar *) GGobi_getLevelName(vt, value);
+        if(tmp1)
+          tmp1 = g_strdup(tmp1);
+      } else {
+        sprintf(buf, "%f", value);
+        tmp1 = g_strdup(buf);
+      }
+    }
+    g_array_insert_val(d->rowlab, data->current_record, tmp1);
+    g_free (tmp1);
+  }
+
+  return(true);
 }
 
 /*
@@ -1264,7 +1278,7 @@ allocVariables (const xmlChar **attrs, XMLParserData *data)
      in case there are datasets for which the input gives the count
      in the top-level tag.*/
   if(d->nrows > 0 && d->ncols > 0) {
-      arrayf_alloc (&d->raw, d->nrows, d->ncols);
+    arrayf_alloc (&d->raw, d->nrows, d->ncols);
       hidden_alloc (d);
   }
 
@@ -1661,9 +1675,9 @@ releaseCurrentDataInfo(XMLParserData *parserData)
          if(parserData->autoLevels[i]) {
                  /* don't free the keys (so pass NULL as third argument) 
                     since these are used in the level_names array.*/
- 	     g_hash_table_foreach(parserData->autoLevels[i], freeLevelHashEntry, NULL);
-  	     g_hash_table_destroy(parserData->autoLevels[i]); 
-	 }
+          g_hash_table_foreach(parserData->autoLevels[i], freeLevelHashEntry, NULL);
+           g_hash_table_destroy(parserData->autoLevels[i]); 
+     }
       }
       parserData->autoLevels = NULL;
    }
@@ -1774,18 +1788,19 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
     guint *ptr;
     int value;
     gchar *dupTmp;
-	    /* No need to check since this will either be the first and hence NULL or already created,
-               so can use an else for this condition. */
+    /* No need to check since this will either be the first and hence
+       NULL or already created, so can use an else for this condition. */
     if(data->usesStringIds) {
       if(data->idTable == NULL) {
         data->idTable = g_hash_table_new(g_str_hash, g_str_equal);
         d->idTable = data->idTable;
-	d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
-	memset(d->rowIds, '\0', sizeof(gchar *) * d->nrows);
+        d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
+        memset(d->rowIds, '\0', sizeof(gchar *) * d->nrows);
       } else {
         if(g_hash_table_lookup(data->idTable, tmp))
-           ggobi_XML_error_handler(data, "duplicated id in record %d of dataset %s\n", 
-                                     data->current_record + 1, data->current_data->name);
+           ggobi_XML_error_handler(data,
+             "duplicated id in record %d of dataset %s\n", 
+             data->current_record + 1, data->current_data->name);
       }
     } else if(d->rowid.id.nels == 0) {
       rowids_alloc (d);
@@ -1800,9 +1815,10 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
     } else {
       value = strToInteger (tmp);
       if(value < 0) {
-         ggobi_XML_error_handler(data, "negative value specified for `id' in record %d of dataset %s\n", 
-                                 (int) i+1, data->current_data->name);
-         value = 0;
+        ggobi_XML_error_handler(data,
+          "negative value specified for `id' in record %d of dataset %s\n", 
+          (int) i+1, data->current_data->name);
+        value = 0;
       }
       d->rowid.maxId = d->rowid.maxId > value ? d->rowid.maxId : value; 
       d->rowid.id.els[i] = value;
@@ -1826,7 +1842,8 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
      }
        
      data->edge_sources[data->current_record] = intern(data, tmp);
-     data->edge_dests[data->current_record] = intern(data, getAttribute(attrs, "destination"));
+     data->edge_dests[data->current_record] = intern(data,
+       getAttribute(attrs, "destination"));
    } else {
     start = strToInteger(tmp);
     tmp = getAttribute(attrs, "destination");   
@@ -1858,16 +1875,16 @@ intern(XMLParserData *data, const char * const el)
 }
 
 
-gboolean
+gint
 checkLevelValue(vartabled *vt, double value)
 {
-  int i;
+  gint i;
   for(i = 0; i < vt->nlevels; i++) {
     if(vt->level_values[i] == (int) value)
-      return(true);
+      return(i);
   }
 
-  return(false);
+  return(-1);
 }
 
 
@@ -1968,26 +1985,33 @@ getAutoLevelIndex(const char * const label, XMLParserData *data, vartabled *el)
   GHashTable *tbl = data->autoLevels[data->current_element];
   gpointer val;
   gint index = -1;
+  gint i;
   val = g_hash_table_lookup(tbl, (gconstpointer) label);
-  if(!val) {
-     gint *itmp;
-     gint n =   el->nlevels + 1;
-     if(n == 1) {
-       el->level_values = (int *) g_malloc(sizeof(int) * n);
-       el->level_names = (gchar **) g_malloc(sizeof(gchar *) * n);
-     } else {
-       el->level_values = (int *) g_realloc(el->level_values, sizeof(int) * n);
-       el->level_names = (gchar **) g_realloc(el->level_names, sizeof(gchar *) * n);
-     }
-     el->level_values[n-1] = n-1;
-     el->level_names[n-1] = g_strdup(label);
 
-     itmp = (gint *) g_malloc(sizeof(gint));
-     *itmp = index = n - 1;
-     g_hash_table_insert(tbl, el->level_names[n-1], itmp);
-     el->nlevels++;
+  if(!val) {
+    gint *itmp;
+    gint n =   el->nlevels + 1;
+    if(n == 1) {
+      el->level_values = (gint *) g_malloc(sizeof(gint) * n);
+      el->level_counts = (gint *) g_malloc(sizeof(gint) * n);
+      el->level_names = (gchar **) g_malloc(sizeof(gchar *) * n);
+      for (i=0; i<el->nlevels; i++)
+        el->level_counts[i] = 0;
+    } else {
+      el->level_values = (gint *) g_realloc(el->level_values, sizeof(gint) * n);
+      el->level_counts = (gint *) g_realloc(el->level_counts, sizeof(gint) * n);
+      el->level_names = (gchar **) g_realloc(el->level_names, sizeof(gchar *) * n);
+    }
+    el->level_counts[n-1] = 0;
+    el->level_values[n-1] = n-1;
+    el->level_names[n-1] = g_strdup(label);
+
+    itmp = (gint *) g_malloc(sizeof(gint));
+    *itmp = index = n - 1;
+    g_hash_table_insert(tbl, el->level_names[n-1], itmp);
+    el->nlevels++;
   } else 
-     index = * ((gint *) val);
+    index = * ((gint *) val);
 
   return(index);
 }
@@ -1998,9 +2022,9 @@ getAutoLevelIndex(const char * const label, XMLParserData *data, vartabled *el)
 static void
 getLabel(gpointer key, gpointer val, gchar **labels)
 {
- if(val) {
-   labels[*(guint *)val] = (gchar *) key;
- }
+  if(val) {
+    labels[*(guint *)val] = (gchar *) key;
+  }
 }
 
 gchar **
