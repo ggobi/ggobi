@@ -345,8 +345,8 @@ variable_notebook_subwindow_add (datad *d,
   gtk_widget_show_all (swin);
 }
 
-static void variable_notebook_adddata_cb (GtkObject *obj, datad *d,
-  ggobid *gg, GtkWidget *notebook)
+static void 
+variable_notebook_adddata_cb (ggobid *gg, datad *d, GtkWidget *notebook)
 {
   GtkSignalFunc func = NULL;
   variable_notebook_subwindow_add (d, func, notebook, gg);

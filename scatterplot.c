@@ -179,8 +179,7 @@ static GtkItemFactoryEntry menu_items[] = {
 
 
 static void 
-display_datad_added_cb (GtkObject *obj /*gg->main_window*/,
-			datad *d, ggobid *gg, GtkObject *win)
+display_datad_added_cb (ggobid *gg, datad *d, GtkObject *win)
 {
   windowDisplayd *display =  GTK_GGOBI_WINDOW_DISPLAY(win);
 

@@ -153,7 +153,7 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
     ev.id = id;
     ev.d = d;
     gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[POINT_MOVE_SIGNAL],
-		    sp, &ev, gg);
+		    sp, id, d);
   }
 }
 

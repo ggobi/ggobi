@@ -135,7 +135,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   }
 
   gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[VARIABLE_SELECTION_SIGNAL], 
-		   jvar, display->d, sp, gg);
+		   display->d, jvar, sp);
 
   /*-- overkill for scatmat: could redraw one row, one column --*/
   /*-- overkill for parcoords: need to redraw at most 3 plots --*/
