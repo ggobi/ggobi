@@ -1973,11 +1973,11 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
    const gchar *dest;
    dest = getAttribute(attrs, "destination");
    if(!dest) {
-      xml_warning("edge specification error", "", "source but no destination attribute for record.", data);
+      xml_warning("edge specification error:", tmp, "source but no destination attribute for record.", data);
       return(true);
    }
    if (strcmp (tmp, dest) == 0) {
-      xml_warning("edge specification error", "", "source is the same as destination for record.", data);
+      xml_warning("edge specification error:", tmp, "source is the same as destination for record.", data);
       return(true);
    }
 
