@@ -176,6 +176,7 @@ void       disconnect_motion_signal (splotd *sp);
 gint       display_add(displayd *display, ggobid *);
 displayd*  display_alloc_init (gboolean, datad *, ggobid *);
 void       display_close_cb (displayd *d, guint, GtkWidget *);
+void       display_copy_edge_options (displayd *dsp, displayd *dspnew);
 displayd*  display_create (gint displaytype, gboolean missing_p, datad *, ggobid *);
 void       display_delete_cb (GtkWidget *, GdkEvent *, displayd *);
 void       display_free (displayd *, gboolean force, ggobid *);

@@ -729,3 +729,34 @@ display_type_handles_action (displayd *display, PipelineMode viewmode)
 
   return handles;
 }
+
+void
+display_copy_edge_options (displayd *dsp, displayd *dspnew)
+{
+  GtkWidget *item;
+
+  dspnew->options.edges_undirected_show_p =
+    dsp->options.edges_undirected_show_p;
+  item = widget_find_by_name (dspnew->edge_menu,
+            "DISPLAY MENU: show undirected edges");
+  if (item) {
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
+      dspnew->options.edges_undirected_show_p);
+  }
+
+  dspnew->options.edges_directed_show_p =
+    dsp->options.edges_directed_show_p;
+  item = widget_find_by_name (dspnew->edge_menu,
+            "DISPLAY MENU: show directed edges");
+  if (item)
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
+      dspnew->options.edges_directed_show_p);
+
+  dspnew->options.edges_arrowheads_show_p =
+    dsp->options.edges_arrowheads_show_p;
+  item = widget_find_by_name (dspnew->edge_menu,
+            "DISPLAY MENU: show arrowheads");
+  if (item)
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
+      dspnew->options.edges_arrowheads_show_p);
+}
