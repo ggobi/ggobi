@@ -1,4 +1,4 @@
- <inputPlugin name="postgres">
+ <inputPlugin name="postgres" interactive="true">
   <description>Reads data from a Postgres DBMS</description>
   <author>Duncan Temple Lang</author>
   <modeName>postgres</modeName>
