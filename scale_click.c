@@ -18,7 +18,7 @@ pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 {
   greal dx, dy;
   greal scale_x, scale_y;
-  cpaneld *cpanel = &gg->current_display->cpanel;
+  /*cpaneld *cpanel = &gg->current_display->cpanel;*/
   greal precis = (greal) PRECISION1;
 
   if (pan_opt == P_OBLIQUE || pan_opt == P_HORIZ) {
@@ -46,9 +46,11 @@ pan_step (splotd *sp, gint pan_opt, ggobid *gg)
 void
 zoom_step (splotd *sp, gint zoom_opt, gint in_or_out, rectd *rect, ggobid* gg)
 {
+/*
   gint projection = projection_get (gg);
-/*  gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
-    gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;*/
+  gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
+  gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;
+*/
   gfloat *scale_x = &sp->scale.x;
   gfloat *scale_y = &sp->scale.y;
   gfloat scalefac_x = 1.0, scalefac_y = 1.0;
@@ -66,17 +68,17 @@ zoom_step (splotd *sp, gint zoom_opt, gint in_or_out, rectd *rect, ggobid* gg)
       scalefac_y = (in_or_out == ZOOM_IN) ?
         (gfloat) mid.y / (gfloat) (mid.y - rect->y) :
         (gfloat) (mid.y - rect->y) / (gfloat) mid.y;
-      break;
+    break;
     case Z_HORIZ:
       scalefac_x = (in_or_out == ZOOM_IN) ?
         (gfloat) mid.x / (gfloat) (mid.x - rect->x) :
         (gfloat) (mid.x - rect->x) / (gfloat) mid.x;
-      break;
+    break;
     case Z_VERT:
       scalefac_y = (in_or_out == ZOOM_IN) ?
         (gfloat) mid.y / (gfloat) (mid.y - rect->y) :
         (gfloat) (mid.y - rect->y) / (gfloat) mid.y;
-      break;
+    break;
   }
 
 /*-- Make sure that the scale doesn't get too small --*/

@@ -419,7 +419,7 @@ static void ruler_down_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   displayd *display = (displayd *) sp->displayptr;
-  cpaneld *cpanel = &display->cpanel;
+  /*cpaneld *cpanel = &display->cpanel;*/
   ggobid *gg = display->ggobi;
   gboolean button1_p, button2_p;
   gint direction = (w == display->hrule) ? HORIZONTAL : VERTICAL;

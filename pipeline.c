@@ -281,7 +281,6 @@ tform_to_world (datad *d, ggobid *gg)
 void
 rows_in_plot_set (datad *d, ggobid *gg) {
   gint i;
-  displayd *dsp = gg->current_display;
 
   d->nrows_in_plot = 0;
 

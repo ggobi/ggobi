@@ -49,7 +49,7 @@ splot_pan (splotd *sp, gint xstep, gint ystep, ggobid *gg)
 void
 splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *gg) {
   displayd *display = gg->current_display;
-  gint projection = projection_get (gg);
+  /*gint projection = projection_get (gg);*/
   icoords mid;
   /*  gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
       gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;*/

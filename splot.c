@@ -788,11 +788,13 @@ splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
  * Look through the movepts code and see if I'm inappropriately
  * resetting iscale somewhere.
 */
+  gfloat scale_x, scale_y;
+/*
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  gfloat scale_x, scale_y;
-  /*  scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
-      scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;*/
+  scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x;
+  scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y;
+*/
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
   scale_x /= 2;

@@ -39,7 +39,7 @@ pan_reset_cb (GtkWidget *w, ggobid *gg) {
 
 void
 scale_zoom_reset (ggobid *gg) {
-  gint projection = projection_get (gg);
+  /*gint projection = projection_get (gg);*/
   splotd *sp = gg->current_splot;
   displayd *dsp = (displayd *) sp->displayptr;
 
