@@ -226,7 +226,6 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
       dsp->t1d.Ga.vals[i][dsp->t1d.active_vars.els[i]] = 
       dsp->t1d.Gz.vals[i][dsp->t1d.active_vars.els[i]] = 1.0;
   }
-  /*  zero_tau(dsp, gg);*/
 
   dsp->t1d.dist_az = 1.0;
   dsp->t1d.delta = cpanel->t1d_step*M_PI_2/10.0;
