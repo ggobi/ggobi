@@ -5,3 +5,23 @@ XML_LIB_DIRS=@XML_LIB_DIRS@
 
 MYSQL_INC_DIRS=@MYSQL_INC_DIRS@
 MYSQL_LIB_DIRS=@MYSQL_LIB_DIRS@
+
+PIC_CFLAG=-fPIC
+SHLIB_LDFLAGS=-shared
+
+SRC=$(shell ls *.c)
+OBJ=$(SRC:%.c=%.o)
+
+CFLAGS= -I../include $(shell $(GTK_CONFIG) --cflags )
+
+LIBS=$(shell $(GTK_CONFIG) --libs)
+
+ggobi ../bin/ggobi: $(OBJ)
+	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+
+libggobi.so ../lib/libggobi.so: $(OBJ:%.o=%.lo)
+	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
+
+
+%.lo:	%.c
+	$(CC) $(PIC_CFLAG) $(CFLAGS) -o $@ -c $<

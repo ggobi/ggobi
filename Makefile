@@ -1,3 +1,8 @@
+ifdef ADMIN
+ include Install/GNUmakefile.admin
+endif
+
+
 ggobi:
 
 EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
@@ -19,7 +24,7 @@ SHARED_LD_FLAGS= -shared
 LDFLAGS=
 
 SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
- utils.c utils_ui.c utils_gdk.c array.c vector.c mt19937-1.c \
+ utils.c utils_ui.c utils_gdk.c array.c vector.c \
  read_array.c read_data.c io.c writedata_ui.c writedata.c write_svg.c \
  pipeline.c missing.c \
  scatterplot.c scatterplot_ui.c \
@@ -42,12 +47,15 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  transform_ui.c transform.c sphere_ui.c sphere.c svd.c \
  subset_ui.c subset.c jitter_ui.c jitter.c smooth_ui.c \
  impute_ui.c impute.c \
- gtkextruler.c gtkexthruler.c gtkextvruler.c \
  display_tree.c \
- ggobi-API.c 
+ ggobi-API.c \
+\
+ gtkextruler.c gtkexthruler.c gtkextvruler.c \
+ mt19937-1.c \
+
 
 OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
- utils.o utils_ui.o utils_gdk.o array.o vector.o mt19937-1.o \
+ utils.o utils_ui.o utils_gdk.o array.o vector.o \
  read_array.o read_data.o io.o writedata_ui.o writedata.o write_svg.o \
  pipeline.o missing.o \
  scatterplot.o scatterplot_ui.o \
@@ -70,9 +78,10 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  transform_ui.o transform.o sphere_ui.o sphere.o svd.o \
  subset_ui.o subset.o jitter_ui.o jitter.o smooth_ui.o \
  impute_ui.o impute.o \
- gtkextruler.o gtkexthruler.o gtkextvruler.o \
  display_tree.o \
- ggobi-API.o
+ ggobi-API.o \
+ gtkextruler.o gtkexthruler.o gtkextvruler.o \
+ mt19937-1.o  \
 
 
 # Needs to be \ for windows
@@ -192,6 +201,10 @@ tags:
 
 
 datad.o read_xml.o: datad.c datad.h
+
+
+../bin/ggobi: ggobi
+	cp ggobi $@
 
 # DO NOT DELETE
 
