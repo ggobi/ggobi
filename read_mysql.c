@@ -46,9 +46,10 @@ char *getMySQLLoginElement(int i, int *isCopy, MySQLLoginInfo *info);
   empty.
  */
 int
-read_mysql_data(MySQLLoginInfo *login, gint init, datad *d, ggobid *gg)
+read_mysql_data(MySQLLoginInfo *login, gint init, ggobid *gg)
 {
   MYSQL *conn;
+  datad *d;
 
   if(login->password == NULL) {
     /* The user hasn't specified a password.
@@ -72,21 +73,21 @@ read_mysql_data(MySQLLoginInfo *login, gint init, datad *d, ggobid *gg)
   }
 
     /* Execute the query specified by the user to get the data. */
-  if(GGOBI(get_mysql_data)(conn, login->dataQuery, d, gg) < 1) {
+  if((d = GGOBI(get_mysql_data)(conn, login->dataQuery, gg)) != NULL) {
     return(-1);
   }
 
-  segments_alloc (gg->nsegments, gg);
 
 /*
+  segments_alloc (gg->nsegments, gg);
  *if(gg->nsegments < 1)
  * segments_create(gg);
 */
 
 
     /* Now we have to read in the glyph and color data. */
-  if (init)
-    dataset_init (gg, d, true);
+  if (init && d)
+    datad_init (d, gg, true);
 
   return(1); /* everything was ok*/
 }
@@ -130,27 +131,32 @@ GGOBI(mysql_connect)(MySQLLoginInfo *login, ggobid *gg)
    using the connection and then reads the data and 
    puts it in the ggobid raw.data array.
  */
-int
-GGOBI(get_mysql_data)(MYSQL *conn, const char *query, datad *d, ggobid *gg)
+datad*
+GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
 {
   MYSQL_RES *res;
   int status;
+  datad *d = NULL;
 
   if(query == NULL || query[0] == '\0')
-    return(-1);
+    return(NULL);
 
     status =  mysql_query(conn, query);
 
        /* Call mysql_use_result() to get the entries row at a time. */
     if( (res = mysql_store_result(conn)) == NULL ) {
       GGOBI(mysql_warning)("Error from query", conn, gg);
-      return(-1);
+      return(NULL);
     }
 
-  gg->filename = g_strdup(query);
+  d = datad_new(NULL, gg);
+  d->input = fileset_generate(query, mysql_data);  
+  if(d->input) {
+    d->input->baseName = g_strdup(query);
+  }
   GGOBI(register_mysql_data)(conn, res, 1, gg);
 
-  return (d->nrows);
+  return (d);
 }
 
 /**
@@ -159,7 +165,7 @@ GGOBI(get_mysql_data)(MYSQL *conn, const char *query, datad *d, ggobid *gg)
  */
 int
 GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched,
-  datad *d, ggobid *gg)
+                            datad *d, ggobid *gg)
 {
   unsigned long i, rownum = 0;
   unsigned long nrows, ncols;
@@ -175,12 +181,12 @@ GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched,
     MYSQL_FIELD *field = mysql_fetch_field(res);
     d->vartable[i].collab = g_strdup(field->name);
     d->vartable[i].collab_tform = g_strdup(field->name);
-    d->vartable[i].groupid = d->vartable[i].groupid_ori = i;
+ //XXX    d->vartable[i].groupid = d->vartable[i].groupid_ori = i;
    }
 
     while((row = mysql_fetch_row(res)) != NULL) { 
       for(i = 0; i < ncols; i++) {
-        d->raw.data[rownum][i] = atof(row[i]);
+        d->raw.vals[rownum][i] = atof(row[i]);
       }
       rownum++;
     }
@@ -225,11 +231,11 @@ GGOBI(setDimensions)(gint nrow, gint ncol, datad *d, ggobid *gg)
   d->nrgroups = 0;              /*-- for now --*/
 
   rowlabels_alloc (d, gg);
-  br_glyph_ids_alloc (d, gg);
+  br_glyph_ids_alloc (d);
   br_glyph_ids_init (d, gg);
 
-  br_color_ids_alloc (d);
-  br_color_ids_init (d);
+  br_color_ids_alloc (d, gg);
+  br_color_ids_init (d, gg);
 
   d->ncols = ncol;
 
@@ -520,8 +526,6 @@ GGOBI(getMySQLGUIInfo)(GtkButton *button, MySQLGUIInput *guiInput)
    if(guiInput->textInput[i] == NULL)
      continue;
 
-   if (val)
-     g_free (val);
 /* val_str = gtk_entry_get_text(GTK_ENTRY(guiInput->textInput[i]));*/
 /* deprecated, replaced by the following */
    val = gtk_editable_get_chars(GTK_EDITABLE(guiInput->textInput[i]), 0, -1);
@@ -534,17 +538,16 @@ GGOBI(getMySQLGUIInfo)(GtkButton *button, MySQLGUIInput *guiInput)
      continue;
 
    setMySQLLoginElement((MySQLInfoElement) i, val, info);
-   g_free (val);
    val = NULL;
  }
 
   /* Only cancel if we read something. Otherwise,
      leave the display for the user to edit.
    */
-  if (read_mysql_data(info, TRUE, d, gg) > 0) {
+  if (read_mysql_data(info, TRUE, gg) > 0) {
    GGOBI(cancelMySQLGUI)(button, guiInput);
-   /* Can we free the info here. */
- }
+     /* Can we free the info here. */
+  }
 }
 
 /*

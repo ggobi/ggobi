@@ -44,11 +44,10 @@ extern "C" {
 
   int read_mysql_data(MySQLLoginInfo *login, int init, ggobid *gg);
   MYSQL *GGOBI(mysql_connect)(MySQLLoginInfo *login, ggobid *gg);
-  int  GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg);
+  datad*  GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg);
   void GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg);
   int GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched, ggobid *gg);
   MySQLGUIInput *GGOBI(get_mysql_login_info)(MySQLLoginInfo *info, ggobid *gg);
-
         /* This should go somewhere else. */
   void GGOBI(setDimensions)(int nrow, int ncol, ggobid *gg);
 
