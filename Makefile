@@ -81,7 +81,8 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
 \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937-1.c cokus.c \
- fileio.c
+ fileio.c \
+ print.c
 
 
 OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
@@ -112,8 +113,9 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  ggobi-API.o \
  timeplot.o time_ui.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
- mt19937-1.o cokus.o  \
- fileio.o
+ fileio.o \
+ print.o 
+
 
 ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c
@@ -141,6 +143,7 @@ ifdef USE_MYSQL
   LD=$(CXX)
 endif
 
+OB=mt19937-1.o cokus.o  
 
 ggobi: $(OB)
 	$(LD) $(OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
