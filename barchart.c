@@ -583,13 +583,24 @@ void barchart_splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *
   vartabled *vtx;
 
   vtx = vartable_element_get (sp->p1dvar, d);
-  gdk_text_extents (style->font,
-        vtx->collab_tform, strlen (vtx->collab_tform),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-  gdk_draw_string (drawable, style->font, gg->plot_GC,
-        sp->max.x - width - 5,  /*-- right justify --*/
-        sp->max.y - 5,
-        vtx->collab_tform);
+  gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+    gtk_style_get_font (style),
+#else
+    style->font,
+#endif
+    vtx->collab_tform, strlen (vtx->collab_tform),
+    &lbearing, &rbearing, &width, &ascent, &descent);
+  gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+    gtk_style_get_font (style),
+#else
+    style->font,
+#endif
+    gg->plot_GC,
+    sp->max.x - width - 5,  /*-- right justify --*/
+    sp->max.y - 5,
+    vtx->collab_tform);
  
 
   if (vtx->categorical_p) {
@@ -599,7 +610,13 @@ void barchart_splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *
       for (i=0; i < vtx->level_names->len; i++) {
         strcpy (catname, (gchar *) g_array_index(vtx->level_names,gchar *,i));
 
-        gdk_draw_string (drawable, style->font, gg->plot_GC,
+        gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+          gtk_style_get_font (style),
+#else
+          style->font,
+#endif
+          gg->plot_GC,
           sp->bar->bins[i].rect.x+2,
           sp->bar->bins[i].rect.y + sp->bar->bins[i].rect.height/2 + 2,
           catname);
@@ -1165,9 +1182,15 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
     gdk_draw_rectangle  (drawable, gg->plot_GC, FALSE,
           sp->bar->low_bin->rect.x,sp->bar->low_bin->rect.y,
           sp->bar->low_bin->rect.width,sp->bar->low_bin->rect.height);
-    gdk_draw_string (drawable, style->font, gg->plot_GC,
-	mousepos.x, mousepos.y,
-        string);     
+    gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
+      gg->plot_GC,
+	  mousepos.x, mousepos.y,
+      string);     
   } 
   for (i=1; i<nbins+1; i++) {
     if (sp->bar->bar_hit[i]) {
@@ -1186,9 +1209,13 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
       gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
           sp->bar->bins[i-1].rect.x,sp->bar->bins[i-1].rect.y,
           sp->bar->bins[i-1].rect.width,sp->bar->bins[i-1].rect.height);
-      gdk_draw_string (drawable, style->font, gg->plot_GC,
-	mousepos.x, mousepos.y,
-        string); 
+      gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC, mousepos.x, mousepos.y, string); 
     }
   }
   
@@ -1200,9 +1227,13 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
     gdk_draw_rectangle  (drawable, gg->plot_GC, FALSE,
           sp->bar->high_bin->rect.x,sp->bar->high_bin->rect.y,
           sp->bar->high_bin->rect.width,sp->bar->high_bin->rect.height);
-    gdk_draw_string (drawable, style->font, gg->plot_GC,
-	mousepos.x, mousepos.y,
-        string);     
+    gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
+      gg->plot_GC, mousepos.x, mousepos.y, string);     
  
   }
   
