@@ -25,6 +25,7 @@ static void reset_all_cb (GtkButton *button, ggobid *gg)
     d = (datad *) l->data;
 
     while (g_slist_length (d->movepts_history) > 0) {
+      /*-- yes, twice -- once for x motion, once for y motion --*/
       movepts_history_delete_last (d, gg);
       movepts_history_delete_last (d, gg);
     }
@@ -80,53 +81,65 @@ static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   ggobid *gg = GGobiFromSPlot (sp);
-  displayd *display;
-  datad *d;
+  displayd *display = sp->displayptr;
+  datad *d = display->d;
+  cpaneld *cpanel = &display->cpanel;
   gboolean button1_p, button2_p;
-  gboolean inwindow, wasinwindow, pointer_moved;
+  gboolean inwindow, wasinwindow;
 
-  gg->current_splot = sp;
-  display = (displayd *) sp->displayptr;
-  d = display->d;
+  gg->current_splot = sp;  /*-- just in case --*/
 
-  /*-- try defining wasinwindow before the new mousepos is calculated --*/
-  wasinwindow = mouseinwindow (sp);
+  /*
+   * allow point motion only for
+   *   scatterplots in xyplot mode
+   *   the splotd members of a scatmat that are xyplots.
+  */
+  if ((display->displaytype == scatterplot && cpanel->projection == XYPLOT) ||
+      (display->displaytype == scatmat && sp->p1dvar == -1))
+  {
 
-  /*-- get the mouse position and find out which buttons are pressed --*/
-  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
+    /*-- define wasinwindow before the new mousepos is calculated --*/
+    wasinwindow = mouseinwindow (sp);
+    /*-- get the mouse position and find out which buttons are pressed --*/
+    mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
+    inwindow = mouseinwindow (sp);
 
-  inwindow = mouseinwindow (sp);
+    if (gg->buttondown == 0) {
 
-  /*-- If the pointer is inside the plotting region ... --*/
-  if (inwindow) {
-    /*-- If the pointer has moved ...--*/
-    if ((sp->mousepos.x != sp->mousepos_o.x) ||
-        (sp->mousepos.y != sp->mousepos_o.y))
-    {
-      pointer_moved = true;
-      sp->mousepos_o.x = sp->mousepos.x;
-      sp->mousepos_o.y = sp->mousepos.y;
+      gint k = find_nearest_point (&sp->mousepos, sp, d, gg);
+      d->nearest_point = k;
+      if (k != d->nearest_point_prev) {
+        displays_plot (NULL, QUICK, gg);
+        d->nearest_point_prev = k;
+      }
+
+    } else {
+
+
+      /*-- If the pointer is inside the plotting region ... --*/
+      if (inwindow) {
+        /*-- ... and if the pointer has moved ...--*/
+        if ((sp->mousepos.x != sp->mousepos_o.x) ||
+            (sp->mousepos.y != sp->mousepos_o.y))
+        {
+          /*
+           * move the point: compute the data pipeline in reverse,
+           * (then run it forward again?) and draw the plot.
+          */
+          if (d->nearest_point != -1) {
+            move_pt (d->nearest_point, sp->mousepos.x, sp->mousepos.y,
+                     sp, d, gg);
+          }
+          sp->mousepos_o.x = sp->mousepos.x;
+          sp->mousepos_o.y = sp->mousepos.y;
+        }
+      } else {  /*-- if !inwindow --*/
+        if (wasinwindow) {
+          d->nearest_point = -1;
+          splot_redraw (sp, QUICK, gg);  
+        }
+      }
     }
-  }
-
-  if (pointer_moved) {
-    
-    /*
-     * If the left button is down, move the point: compute the
-     * data pipeline in reverse, (then run it forward again?) and
-     * draw the plot.
-    */
-    if (d->nearest_point != -1) {
-      move_pt (d->nearest_point,
-               sp->mousepos.x,
-               sp->mousepos.y,
-               sp, d, gg);
-    }
-  }
-
-  if (!inwindow && wasinwindow) {
-    d->nearest_point = -1;
-    splot_redraw (sp, QUICK, gg);  
   }
 
   return true;
@@ -140,9 +153,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   cpaneld *cpanel = &display->cpanel;
   ggobid *gg = GGobiFromSPlot (sp);
   datad *d = gg->current_display->d;
-  gint grab_ok;
   
-  gg->current_display = (displayd *) sp->displayptr;
+  gg->current_display = display;
   gg->current_splot = sp;
 
   /*
@@ -153,19 +165,12 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   if ((display->displaytype == scatterplot && cpanel->projection == XYPLOT) ||
       (display->displaytype == scatmat && sp->p1dvar == -1))
   {
-    sp->mousepos.x = (gint) event->x;
-    sp->mousepos.y = (gint) event->y;
-    grab_ok = gdk_pointer_grab (sp->da->window,
-      false,
-      (GdkEventMask) (GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK),
-      (GdkWindow *) NULL,
-      (GdkCursor *) NULL,
-      event->time);
-    sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                        "motion_notify_event",
-                                        (GtkSignalFunc) motion_notify_cb,
-                                        (gpointer) sp);
+/*
+    gboolean button1_p, button2_p;
+    mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
     d->nearest_point = find_nearest_point (&sp->mousepos, sp, d, gg);
+*/
+
     if (d->nearest_point != -1) {
       movepts_history_add (d->nearest_point, sp, d, gg);
 
@@ -203,30 +208,22 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   ggobid *gg = GGobiFromSPlot (sp);
-  datad *d = display->d;
 
-  gg->current_splot = sp;
+  gg->buttondown = 0;
 
   if (cpanel->projection == XYPLOT) {
-    sp->mousepos.x = (gint) event->x;
-    sp->mousepos.y = (gint) event->y;
-    gdk_pointer_ungrab (event->time);
-    if (sp->motion_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
-      sp->motion_id = 0;
-    }
+    gdk_pointer_ungrab (event->time);  /*-- grabbed in mousepos_get_pressed --*/
   }
 
-  d->nearest_point_prev = d->nearest_point;
-  d->nearest_point = -1;
-  displays_tailpipe (REDISPLAY_ALL, gg);
+  /*displays_tailpipe (REDISPLAY_ALL, gg);*/
+  displays_plot (NULL, QUICK, gg);
 
   return retval;
 }
 
 void
 movepts_event_handlers_toggle (splotd *sp, gboolean state) {
-  displayd *display = (displayd *) sp->displayptr;
+  displayd *display = sp->displayptr;
 
   if (state == on) {
     sp->key_press_id = gtk_signal_connect (GTK_OBJECT (display->window),
@@ -241,6 +238,10 @@ movepts_event_handlers_toggle (splotd *sp, gboolean state) {
                                          "button_release_event",
                                          (GtkSignalFunc) button_release_cb,
                                          (gpointer) sp);
+    sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+                                        "motion_notify_event",
+                                        (GtkSignalFunc) motion_notify_cb,
+                                        (gpointer) sp);
   } else {
     if (sp->key_press_id) {
       gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
@@ -253,6 +254,10 @@ movepts_event_handlers_toggle (splotd *sp, gboolean state) {
     if (sp->release_id) {
       gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
       sp->release_id = 0;
+    }
+    if (sp->motion_id) {
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+      sp->motion_id = 0;
     }
   }
 }

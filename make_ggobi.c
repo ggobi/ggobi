@@ -39,6 +39,7 @@ void globals_init (ggobid *gg) {
   gg->color_0 = 4;
 
   gg->lims_use_visible = true;
+  gg->buttondown = 0;  /*-- no button is pressed --*/
 
   gg->d = NULL;
 }

@@ -297,7 +297,6 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
     sp_event_handlers_toggle (sp, state);
 
     mode_activate (sp, cpanel->mode, state, gg);
-    /*mode_submenus_activate (sp, cpanel->mode, state, gg);*/
 
     /*
      * this is now the only place varpanel_refresh is called in
@@ -482,9 +481,10 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
 
   /*
    * Let it be possible to get a pointer to the splotd object 
-   * from the drawing area.
+   * from the drawing area; and to gg as well.
   */
   gtk_object_set_data (GTK_OBJECT (sp->da), "splotd", (gpointer) sp);
+  GGobi_widget_set (sp->da, gg, true);
 
 
   gtk_signal_connect (GTK_OBJECT (sp->da),

@@ -685,8 +685,9 @@ addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
      input = &(info->descriptions[i].input);
      if(input->fileName) {
        el = gtk_menu_item_new_with_label(input->fileName);
-       gtk_signal_connect(GTK_OBJECT(el), "activate", GTK_SIGNAL_FUNC(load_previous_file),
-                            info->descriptions + i);
+       gtk_signal_connect(GTK_OBJECT(el), "activate",
+                          GTK_SIGNAL_FUNC(load_previous_file),
+                          info->descriptions + i);
        GGobi_widget_set(el, gg, true);
        gtk_menu_insert(GTK_MENU(parent), el, 3 + i + 1);
      }

@@ -236,8 +236,7 @@ manip_select_cb (GtkWidget *w, GdkEvent *event, datad *d)
 static gint
 freeze_select_cb (GtkWidget *w, GdkEvent *event, datad *d)
 {
-g_printerr ("not yet implemented\n");
-  
+  g_printerr ("not yet implemented\n");
   return true;
 }
 

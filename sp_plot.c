@@ -596,7 +596,6 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
   if (k >= d->nrows)
     return;
 
-  /*-- draw a thickened line to highlight the current case --*/
   if (nearest) {
     if (dsp->displaytype == parcoords) {
       splot_add_whisker_cues (k, sp, drawable, gg);
@@ -610,6 +609,22 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
 }
 
 void
+splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
+  gint k, gboolean nearest, ggobid *gg)
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+
+  if (k >= d->nrows)
+    return;
+
+  splot_add_diamond_cue (k, sp, drawable, gg);
+  if (!gg->buttondown) { /*-- only add the label if the mouse is up --*/
+    splot_add_record_label (nearest, k, sp, drawable, gg);
+  }
+}
+
+void
 splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest, ggobid *gg)
 {
@@ -619,6 +634,7 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
   if (cpanel->ee_adding_p) {
     if (gg->edgeedit.a == -1) {  /*-- looking for starting point --*/
       splot_add_diamond_cue (k, sp, drawable, gg);
+      splot_add_record_label (nearest, k, sp, drawable, gg);
     }
   }
 }
@@ -631,13 +647,21 @@ splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   datad *d = display->d;
   gint mode = mode_get (gg);
 
-  if (d->nearest_point != -1) {
-    if (mode == IDENT || mode == MOVEPTS)
-      splot_add_identify_cues (sp, drawable, d->nearest_point, true, gg);
-    else if (mode == EDGEED)
-      splot_add_edgeedit_cues (sp, drawable, d->nearest_point, true, gg);
-  }
+  /*
+     these are the cues added to
+       the nearest point                    in identification
+       the nearest point                    in moving points
+       the single point or pair of points   in edge editing
+  */
+  if (mode == IDENT && d->nearest_point != -1)
+    splot_add_identify_cues (sp, drawable, d->nearest_point, true, gg);
+  else if (mode == MOVEPTS)
+     splot_add_movepts_cues (sp, drawable, d->nearest_point, true, gg);
+  else if (mode == EDGEED)
+    splot_add_edgeedit_cues (sp, drawable, d->nearest_point, true, gg);
+ 
 
+  /*-- and these are the sticky ids, added in all modes --*/
   if (d->sticky_ids != NULL &&
       g_slist_length (d->sticky_ids) > 0)
   {

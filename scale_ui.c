@@ -311,6 +311,9 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
+  ggobid *gg = GGobiFromSPlot (sp);
+
+  gg->buttondown = 0;
 
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
