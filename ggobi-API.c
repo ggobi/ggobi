@@ -86,20 +86,48 @@ GGOBI(setDataMode) (DataMode newMode, ggobid *gg)
   return(old);
 }
 
+#if 0
+/*XXX */
 const gchar * const 
 GGOBI(getDataModeDescription)(DataMode mode)
 {
-  extern const gchar * const DataModeNames[];
   return(DataModeNames[mode]);
 }
+#endif
 
-const gchar *const *
+
+/**
+ Caller should now free the return value, but not the elements of the
+ array.
+*/
+gchar *const *
 GGOBI(getDataModeNames)(int *n)
 {
-  extern const gchar * const DataModeNames[num_data_modes];
-  if(n)
-    *n = num_data_modes;
-  return(DataModeNames);
+   int ctr = 0, num, k, i;
+   GList *plugins;
+   gchar **ans;
+   GGobiPluginInfo *plugin;
+
+   plugins = sessionOptions->info->inputPlugins;
+   num = g_list_length(plugins);
+   for(i = 0; i < num ; i++) {
+      plugin = g_list_nth_data(plugins, i);  
+      ctr += plugin->info.i->numModeNames;
+   }
+
+   ans = (gchar **) g_malloc(sizeof(gchar *) * ctr);
+   ctr = 0;
+   for(i = 0; i < num ; i++) {
+      plugin = g_list_nth_data(plugins, i);  
+      for(k = 0; k < plugin->info.i->numModeNames; k++) {
+         ans[ctr++] = plugin->info.i->modeNames[k];
+      }
+   }
+
+   if(n)
+     *n = ctr;
+
+   return(ans);
 }
 
 
@@ -1206,8 +1234,9 @@ addVariableInternal(gdouble *vals, gint num, gchar *name,
       /* Add a warning here. */
     }
     newvar_add_with_values (vals, num, name,
-      categorical, numLevels, levels, values, counts,
-      d, gg);
+			    numLevels > 0 ? categorical : real, 
+			    numLevels, levels, values, counts,
+			    d, gg);
 
   if(update)
     gdk_flush();

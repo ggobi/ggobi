@@ -373,9 +373,12 @@ void showInputDescription(InputDescription * desc, ggobid * gg)
   fprintf(out, "\tFile name: %s  (extension: %s)\n",
           desc->fileName, desc->givenExtension);
   fprintf(out, "\tDirectory: %s\n", desc->dirName);
+#if 0
+/*XXX*/
   fprintf(out, "\tFormat: %s (%d), verified: %s\n",
           GGOBI(getDataModeDescription) (desc->mode), desc->mode,
           desc->canVerify ? "yes" : "no");
+#endif
 
   if (desc->extensions) {
     fprintf(out, "Auxillary files\n");

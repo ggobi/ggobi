@@ -1,7 +1,10 @@
 <inputPlugin name="ExcelReader" load="immediate" interactive="true">
    <description>input plugin for reading data from Excel using COM</description>
    <author>Duncan Temple Lang</author>
-   <modeNames><modeName>excel</modeName></modeNames>
+   <modeNames>
+     <modeName>excel</modeName>
+     <modeName>CSV</modeName>
+   </modeNames>
    <dll name="plugins/ExcelReader/ExcelReader">
     <init description="ExcelDataDescription" onLoad="onLoad"/>
    </dll>

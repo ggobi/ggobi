@@ -71,9 +71,6 @@ const gchar * const ViewTypes[] =
 };
 const gint ViewTypeIndices[] = {};
 
-const gchar *const DataModeNames[num_data_modes] =
-  {"ASCII", "binary", "R/S data", "XML", "MySQL", "URL", "Unknown"};
-
 
 FatalErrorHandler FatalError = &exit;
 
@@ -414,10 +411,14 @@ ggobiInit(int *argc, char **argv[])
     return;
 
   gtk_init (argc, argv);
+
+  initSessionOptions(*argc, *argv);
  
   GTK_TYPE_GGOBI;
   registerDisplayTypes((GtkTypeLoad *) typeLoaders,
 		       sizeof(typeLoaders)/sizeof(typeLoaders)[0]);
+
+  registerDefaultPlugins(sessionOptions->info);
 }
 
 
@@ -429,7 +430,6 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 {
   GdkVisual *vis;
   ggobid *gg;
-  initSessionOptions(argc, argv);
 
   ggobiInit(&argc, &argv);
 
@@ -440,9 +440,6 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 #ifdef SUPPORT_INIT_FILES
   process_initialization_files();
 #endif
-
-  registerDefaultPlugins(sessionOptions->info);
-
 
   if(sessionOptions->verbose == GGOBI_VERBOSE)
     g_printerr("progname = %s\n", g_get_prgname());

@@ -731,7 +731,7 @@ registerDefaultPlugins(GGobiInitInfo *info)
   info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 }
 
-const gchar DefaultUnknownInputModeName[] =  "unknown/guess";
+const gchar DefaultUnknownInputModeName[] =  "unknown";
 
 GList *
 getInputPluginSelections(ggobid *gg)

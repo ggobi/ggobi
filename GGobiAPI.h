@@ -879,7 +879,7 @@ extern void GGobi_update_data(datad *, ggobid *gg);
  input modes for data  sources. These include
  ASCII, XML, database, URL, etc.
  */
-const gchar *const * GGobi_getDataModeNames(int *n);
+gchar *const * GGobi_getDataModeNames(int *n);
 
 
 /** 

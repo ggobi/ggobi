@@ -1,3 +1,21 @@
+Getting the names of the data modes (getDataModeNames) now computes
+these from the plugins by querying them dynamically. The caller should
+free the resulting array of strings, but not the strings themselves.
+The return type of the routine no longer refers to a constant array.
+
+Added CSV to the DataModeNames since the enums and this list were out of synch.
+This should be removed very soon.
+
+Changed the order of initialization so that default plugins (input
+plugins) are done in ggobiInit() as is the initialization of the
+session options (initSessionOptions).
+
+Fixed the error in addVariableInternal which made all variables categorical.
+Switch on the number of levels.
+
+Moved from built-in data formats/modes to extensible plugins and a
+uniform framework. Each plugin lists its set of supported mode names.
+Implications for Rggobi.
 
 
 
