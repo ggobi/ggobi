@@ -47,11 +47,9 @@ const char *const GGOBI(OpModeNames)[] = {
 
   "Scatmat",
   "Parcoords",
-#ifdef EXTENDED_MODES
   "TSplot",
 #ifdef BARCHART_IMPLEMENTED
   "Barchart"
-#endif
 #endif
 };
 
