@@ -245,4 +245,6 @@ typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
 
 extern endpointsd *resolveEdgePoints(datad *e, datad *d);
 extern gboolean edge_add (gint, gint, datad *, datad *);
+extern void setOldEdgePartners (endpointsd *endpoints, gint n);
+
 #endif

@@ -245,6 +245,8 @@ computeResolvedEdgePoints(datad *e, datad *d)
     ans = &DegenerateEndpoints;
   }
 
+  setOldEdgePartners(ans, ctr);
+
   return(ans);
 }
 

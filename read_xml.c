@@ -290,7 +290,7 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
 
   data->autoLevels = NULL;
 
-  data->usesStringIds = true; /*XXX false; */
+  data->usesStringIds = true; /*XXX false; No longer need alpha in the XML file*/
 
   data->idNamesTable = NULL;
 }
@@ -551,32 +551,31 @@ edgesumcompare (const void *val1, const void *val2)
 
 /* Can go when we remove the old mechanism for edges via integer ids. */
 void 
-setOldEdgePartners (XMLParserData *parserData)
+setOldEdgePartners (endpointsd *endpoints, gint n)
 {
-  datad *d = getCurrentXMLData(parserData);
   gint i, k, sum;
 
-  if (d->edge.n) {
+  if (n) {
     /*-- sort the edges in the order of source + destination --*/
-    endpointsd *etmp = g_malloc (d->edge.n * sizeof(endpointsd));
-    for (i=0; i<d->edge.n; i++) {
-      etmp[i].a = d->edge.old_endpoints[i].a;
-      etmp[i].b = d->edge.old_endpoints[i].b;
+    endpointsd *etmp = g_malloc (n * sizeof(endpointsd));
+    for (i=0; i < n; i++) {
+      etmp[i].a = endpoints[i].a;
+      etmp[i].b = endpoints[i].b;
       etmp[i].jpartner = i;
     }
-    qsort ((gchar *) etmp, d->edge.n, sizeof (endpointsd), edgesumcompare);
+    qsort ((gchar *) etmp, n, sizeof (endpointsd), edgesumcompare);
 
     sum = 0;
-    for (i=0; i<d->edge.n-1; i++) {
+    for (i=0; i < n-1; i++) {
       if (etmp[i].a + etmp[i].b != sum) {
         sum = etmp[i].a + etmp[i].b;
         k = i+1;
-        while (k < d->edge.n) {
+        while (k < n) {
           if (etmp[k].a + etmp[k].b != sum)
             break;
           if (etmp[k].b == etmp[i].a && etmp[k].a == etmp[i].b) {
-            d->edge.old_endpoints[etmp[i].jpartner].jpartner = etmp[k].jpartner;
-            d->edge.old_endpoints[etmp[k].jpartner].jpartner = etmp[i].jpartner;
+            endpoints[etmp[i].jpartner].jpartner = etmp[k].jpartner;
+            endpoints[etmp[k].jpartner].jpartner = etmp[i].jpartner;
 /*
 g_printerr ("partners: a,b,j %d %d %d  a,b,j %d %d %d\n",
 d->edge.endpoints[i].a, d->edge.endpoints[i].b, d->edge.endpoints[i].jpartner,
@@ -600,7 +599,7 @@ setEdgePartners (XMLParserData *parserData)
   gint i, k, sum;
 
   if(d->edge.old_endpoints) {
-       setOldEdgePartners(parserData);
+       setOldEdgePartners(d->edge.old_endpoints, d->edge.n);
        return;
   }
 
