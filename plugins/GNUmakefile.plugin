@@ -17,7 +17,7 @@ include local.config
 ifdef LOCAL_BUILD
 
  GGOBI_CFLAGS=$(shell $(MAKE) --quiet -C $(GGOBI_HOME)/src cflags TOP=$(GGOBI_HOME))
- GGOBI_LIBS=$(shell $(MAKE) --quiet -C $(GGOBI_HOME)/src libs TOP=$(GGOBI_HOME))
+ GGOBI_LIB=$(shell $(MAKE) --quiet -C $(GGOBI_HOME)/src libs TOP=$(GGOBI_HOME))
 
 else
 
@@ -68,8 +68,8 @@ install:
 
 # Docs and support files, e.g. R, Python, Perl files.
 
-distclean: clean
-	rm config.cache config.log $(PKG).so
+distclean:: clean
+	-rm config.cache config.status config.log $(PKG).so
 
 clean:
 	rm -f *.o *.so

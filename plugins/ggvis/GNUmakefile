@@ -40,19 +40,13 @@ else
 $(PKG).so: $(OBJS)
 	$(CC) -shared -o $@ $(OBJS) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%) $(LDFLAGS)
 endif
-local.config:  configure
-	./configure
+
 
 tmp:
 	@echo "$(XML_LIBS)"
 	@echo "$(LIBS)"
-
-ifndef ADMIN
-configure: configure.in
-	autoconf
-endif
+	@echo "GGobi libs: $(GGOBI_LIB)"
 
 
-distclean: clean
-	-rm -f $(PKG).so local.config
-	-rm -f configure config.status config.cache config.log
+distclean::
+	-rm -f local.config
