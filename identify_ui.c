@@ -17,6 +17,12 @@
 #include "vars.h"
 #include "externs.h"
 
+static void display_cb (GtkWidget *w, gpointer cbd)
+{
+  ggobid *gg = GGobiFromWidget(w, true);
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  cpanel->identify_display_type = GPOINTER_TO_INT (cbd);
+}
 
 static void
 id_remove_labels_cb (GtkWidget *w, ggobid *gg)
@@ -190,16 +196,27 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
 /*                   Making the control panel                           */
 /*----------------------------------------------------------------------*/
 
+static gchar *display_lbl[] = {"Case label", "Point coords"};
 void
 cpanel_identify_make(ggobid *gg) {
   GtkWidget *btn;
+  GtkWidget *opt;
   
   gg->control_panel[IDENT] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER(gg->control_panel[IDENT]), 5);
 
-/*
- * button for removing all labels
-*/
+  /*-- option menu --*/
+  opt = gtk_option_menu_new ();
+  gtk_widget_set_name (opt, "IDENTIFY:display_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+    "Display either case label or coordinates of nearest point", NULL);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
+                      opt, false, false, 0);
+  populate_option_menu (opt, display_lbl,
+                        sizeof (display_lbl) / sizeof (gchar *),
+                        (GtkSignalFunc) display_cb, gg);
+
+ /*-- button for removing all labels --*/
   btn = gtk_button_new_with_label ("Remove labels");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
                         btn, "Remove all labels", NULL);
@@ -224,4 +241,25 @@ cpanel_identify_make(ggobid *gg) {
   gtk_widget_show_all (gg->control_panel[IDENT]);
 }
 
+
+/*--------------------------------------------------------------------*/
+/*                      Control panel section                         */
+/*--------------------------------------------------------------------*/
+
+void
+cpanel_identify_init (cpaneld *cpanel, ggobid *gg)
+{
+  cpanel->identify_display_type = ID_CASE_LABEL;
+}
+
+void
+cpanel_identify_set (cpaneld *cpanel, ggobid *gg)
+{
+  GtkWidget *w;
+
+  w = widget_find_by_name (gg->control_panel[IDENT],
+                           "IDENTIFY:display_option_menu");
+  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+                               cpanel->identify_display_type);
+}
 

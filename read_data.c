@@ -544,7 +544,7 @@ point_glyphs_read (InputDescription *desc, gboolean reinit,
         }
 
         glyph.size = gsize;
-        if (gsize < 1 || gsize > 8) {
+        if (gsize < 0 || gsize >= NGLYPHSIZES) {
           use_defaults = true;
           readGlyphErr ();
         }
@@ -582,12 +582,12 @@ GlyphType
 mapGlyphName (const gchar *gtype)
 {
   GlyphType type;
-  int i;
+  gint i;
 
   type = UNKNOWN_GLYPH;
   for (i = 0; i < sizeof (GlyphNames)/sizeof (GlyphNames[0]) - 1; i++) {
     if (strcmp(gtype, GlyphNames[i]) == 0) {
-     type = (GlyphType) (i+1);
+     type = (GlyphType) (i);
      break;
     }
   }

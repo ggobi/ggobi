@@ -36,11 +36,11 @@ void
 br_glyph_ids_alloc (datad *d)
 {
   d->glyph = (glyphv *) g_realloc (d->glyph,
-                                       d->nrows * sizeof (glyphv));
+                                   d->nrows * sizeof (glyphv));
   d->glyph_now = (glyphv *) g_realloc (d->glyph_now,
                                        d->nrows * sizeof (glyphv));
   d->glyph_prev = (glyphv *) g_realloc (d->glyph_prev,
-                                       d->nrows * sizeof (glyphv));
+                                        d->nrows * sizeof (glyphv));
 }
 
 void

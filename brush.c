@@ -29,8 +29,16 @@ static gboolean active_paint_edges (displayd *display, ggobid *gg);
 void
 find_glyph_type_and_size (gint gid, glyphv *glyph)
 {
+/*
   glyph->type = ( (gid-1) / (gint) NGLYPHSIZES ) + 1 ;
   glyph->size = ( (gid-1) % (gint) NGLYPHSIZES ) + 1 ;
+*/
+/*  gid ranges from 1:49, type from 0 to 6, size from 0 to 7
+for (i in 1:49) { cat (as.integer((i-1)/8), " ") + 1 }
+for (i in 1:49) { cat ((i-1) %% 8, " ") }
+*/
+  glyph->type = ( (gid-1) / (gint) NGLYPHSIZES ) + 1 ;
+  glyph->size = ( (gid-1) % (gint) NGLYPHSIZES ) ;
 }
 
 /*----------------------------------------------------------------------*/

@@ -619,7 +619,7 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
    value = strToInteger(tmp);
   }
 
-  if (value < 0 || value > NGLYPHSIZES) {
+  if (value < 0 || value >= NGLYPHSIZES) {
     if (tmp)
       xml_warning ("glyphSize", tmp, "Out of range", data);
   } else {
@@ -637,14 +637,14 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
    value = strToInteger(tmp);
   }
 
-  if(value < 0 || value > NGLYPHS) {
+  if(value < 0 || value >= NGLYPHTYPES) {
     if(tmp)
       xml_warning("glyphType", tmp, "Out of range", data);
   } else {
     if(i < 0)
       data->defaults.glyphSize = value;
     else
-     d->glyph[i].type = d->glyph_now[i].type = 
+      d->glyph[i].type = d->glyph_now[i].type = 
            d->glyph_prev[i].type = value;
   }
 

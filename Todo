@@ -85,6 +85,8 @@ Smoothing -- as a demo, at least, of the use of R
 Food for thought:
   * maps; data as polygons -- for summer 2001?
   * Do we need rotation at all?
+  * If we bin the screen hierarchically, the bins could be used
+    for edges as well as for points.
 
 ! it now works to start ggobi without an argument; a necessary step
 ! in the API preparation.

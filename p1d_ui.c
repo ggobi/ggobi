@@ -106,9 +106,7 @@ cpanel_p1dplot_make (ggobid *gg) {
   gg->control_panel[P1PLOT] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[P1PLOT]), 5);
 
-/*
- * option menu
-*/
+ /*-- option menu --*/
   gg->ash.type_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->ash.type_opt,
     "Display either textured dot plots or average shifted histograms", NULL);

@@ -438,6 +438,7 @@ splot_add_point_label (splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &dsp->cpanel;
   datad *d = dsp->d;
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
@@ -448,7 +449,8 @@ splot_add_point_label (splotd *sp, GdkDrawable *drawable,
 /*--
    unsatisfactory: use ids and work out whether we're talking
    about display->d or display->e.  nearest has to be 
-   propagated for linking.
+   propagated for linking.  [don't quite understand this comment;
+   time will tell]
 --*/
   if (k >= d->nrows)
     return;
@@ -492,7 +494,36 @@ splot_add_point_label (splotd *sp, GdkDrawable *drawable,
   }
 
   /*-- add the label last so it will be in front of other markings --*/
-  lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
+  if (cpanel->identify_display_type == ID_CASE_LABEL)
+    lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
+  else {
+    gint proj = projection_get (gg);
+    switch (proj) {
+      case P1PLOT:
+        lbl = g_strdup_printf ("%g", d->tform.vals[k][sp->p1dvar]);
+      break;
+      case XYPLOT:
+        lbl = g_strdup_printf ("%g, %g",
+          d->tform.vals[k][sp->xyvars.x], d->tform.vals[k][sp->xyvars.y]);
+      break;
+
+      case TOUR1D:
+      case TOUR2D:
+      case COTOUR:
+      {
+/*
+        icoords scr;
+        fcoords tf;
+        scr.x = sp->screen[k].x;
+        scr.y = sp->screen[k].y;
+        splot_screen_to_tform (cpanel, sp, &scr, &tf, gg);
+        lbl = g_strdup_printf ("%g, %g", tf.x, tf.y);
+*/
+        lbl = "?";
+      }
+      break;
+    }
+  }
   gdk_text_extents (style->font,  
     lbl, strlen (lbl),
     &lbearing, &rbearing, &width, &ascent, &descent);

@@ -502,7 +502,7 @@ GGOBI(getGlyphTypes)(int *n)
 const gchar **const
 GGOBI(getGlyphTypeNames)(gint *n)
 {
-  *n = UNKNOWN_GLYPH-1; /* -1 since we start at 1 */
+  *n = UNKNOWN_GLYPH; /* -1 since we start at 1; starting at 0 now */
   return ((const gchar **const) GlyphNames);
 }
 
@@ -511,7 +511,7 @@ gchar const*
 GGOBI(getGlyphTypeName)(gint type)
 {
   gchar const *ans;
-  ans = GlyphNames[type-1];
+  ans = GlyphNames[type];
 
   return (ans);
 }

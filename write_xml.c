@@ -136,8 +136,13 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
  fprintf(f, "<records\n");
  fprintf(f, " count=\"%d\"", d->nrows);
  if(xmlWriteInfo->useDefault) {
+/*
    fprintf(f, " glyphSize=\"%s\"", xmlWriteInfo->defaultGlyphSizeName);
    fprintf(f, " glyphType=\"%s\"", xmlWriteInfo->defaultGlyphTypeName);
+*/
+   fprintf(f, " glyph=\"%s %s\"",
+    xmlWriteInfo->defaultGlyphTypeName,
+    xmlWriteInfo->defaultGlyphSizeName);
    fprintf(f, " color=\"%s\"", xmlWriteInfo->defaultColorName);
  }
  fprintf(f, ">\n");
@@ -154,7 +159,9 @@ gboolean
 write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
-  gchar *gstr;
+  gchar *gstr, *gtypestr;
+  gboolean gsize_p = false, gtype_p = false;
+
   fprintf(f, "<record");
 
   if(d->rowlab && d->rowlab->data
@@ -162,45 +169,56 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
      fprintf(f, " label=\"%s\"", gstr);
   }
 
- if(!xmlWriteInfo->useDefault || xmlWriteInfo->defaultColor != d->color.els[i]) {
-  fprintf(f, " color=\"%d\"", d->color.els[i]);
+ if (!xmlWriteInfo->useDefault ||
+     xmlWriteInfo->defaultColor != d->color.els[i])
+ {
+   fprintf(f, " color=\"%d\"", d->color.els[i]);
  }
 
 /*
   fprintf(f, " glyphSize=\"%d\"", d->glyph[i].size);
   fprintf(f, " glyphType=\"%d\"", d->glyph[i].type);
 */
- if(!xmlWriteInfo->useDefault || (xmlWriteInfo->defaultGlyphType != d->glyph[i].type)) {
+ if (!xmlWriteInfo->useDefault ||
+    (xmlWriteInfo->defaultGlyphType != d->glyph[i].type))
+ {
+  gtype_p = true;
   switch (d->glyph[i].type) {
     case PLUS_GLYPH:
-      gstr = "plus";
+      gtypestr = "plus";
       break;
     case X_GLYPH:
-      gstr = "x";
+      gtypestr = "x";
       break;
     case OPEN_RECTANGLE:
-      gstr = "or";
+      gtypestr = "or";
       break;
     case FILLED_RECTANGLE:
-      gstr = "fr";
+      gtypestr = "fr";
       break;
     case OPEN_CIRCLE:
-      gstr = "oc";
+      gtypestr = "oc";
       break;
     case FILLED_CIRCLE:
-      gstr = "fc";
+      gtypestr = "fc";
       break;
     case POINT_GLYPH:
-      gstr = ".";
+      gtypestr = ".";
       break;
   }
 
-  fprintf(f, " glyphType=\"%s\"", gstr);
+  /*fprintf(f, " glyphType=\"%s\"", gtypestr);*/
  }
 
- if(!xmlWriteInfo->useDefault || (xmlWriteInfo->defaultGlyphSize != d->glyph[i].size)) {
-  fprintf(f, " glyphSize=\"%d\"", d->glyph[i].size);
+ if (!xmlWriteInfo->useDefault ||
+     (xmlWriteInfo->defaultGlyphSize != d->glyph[i].size))
+ {
+   gsize_p = true;
+   /*fprintf(f, " glyphSize=\"%d\"", d->glyph[i].size);*/
  }
+
+ if (gtype_p || gsize_p)
+   fprintf (f, " glyph=\"%s %d\"", gtypestr, d->glyph[i].size);
 
 
  fprintf(f, ">\n");
@@ -282,7 +300,8 @@ updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info)
 
   colorCounts = g_malloc(sizeof(gint) * gg->ncolors);
   glyphTypeCounts = g_malloc(sizeof(gint) * UNKNOWN_GLYPH);
-  numGlyphSizes = 7;
+  /*numGlyphSizes = 7;*/
+  numGlyphSizes = 8;  /*-- NGLYPHSIZES --*/
   glyphSizeCounts = g_malloc(sizeof(gint) * numGlyphSizes);
 
   memset(colorCounts, '\0', sizeof(gint) * gg->ncolors);

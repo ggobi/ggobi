@@ -222,6 +222,8 @@ typedef enum {NULLMODE = -1,
 #define STICKY_TOGGLE 0
 #define STICKY_ADD    1
 #define STICKY_REMOVE 2
+#define ID_CASE_LABEL 0
+#define ID_PT_COORDS  1
 
 
 /*

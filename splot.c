@@ -750,7 +750,7 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
         tfd->y = (ftmp + 1.0) * .5 * rdiff;
         tfd->y += min;
       }
-      break;
+    break;
 
     case XYPLOT:
       /* x */
@@ -780,20 +780,20 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
       ftmp = world.y / precis;
       tfd->y = (ftmp + 1.0) * .5 * rdiff;
       tfd->y += min;
-      break;
+    break;
 
 
     case TOUR2D:
-      break;
+    break;
 
     case TOUR1D:
-      break;
+    break;
 
     case COTOUR:
-      break;
+    break;
 
     default:
-      break;
+    break;
   }
 }
 

@@ -56,6 +56,9 @@ typedef struct {
  gint scale_pan_opt;     /* P_OBLIQUE, P_HORIZ, P_VERT */
  gint scale_zoom_opt;    /* Z_OBLIQUE, Z_ASPECT, Z_HORIZ, Z_VERT */
 
+ /*-- identification --*/
+ gint identify_display_type;
+
  /*-- edge editing --*/
  gboolean ee_adding_p;
  gboolean ee_deleting_p;

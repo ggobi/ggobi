@@ -100,6 +100,7 @@ void
 edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
+
   if (state == on) {
     sp->key_press_id = gtk_signal_connect (GTK_OBJECT (display->window),
                                            "key_press_event",
@@ -155,6 +156,7 @@ cpanel_edgeedit_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]), hb, false, false, 0);
 
   radio1 = gtk_radio_button_new_with_label (NULL, "Add");
+  gtk_widget_set_name (radio1, "EDGEEDIT:add_radio_button");
   GTK_TOGGLE_BUTTON (radio1)->active = true;
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
@@ -166,6 +168,7 @@ cpanel_edgeedit_make (ggobid *gg) {
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
 
   radio2 = gtk_radio_button_new_with_label (group, "Delete");
+  gtk_widget_set_name (radio2, "EDGEEDIT:delete_radio_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
     "Delete edges using the mouse", NULL);
   gtk_box_pack_start (GTK_BOX (hb), radio2, false, false, 0);
@@ -182,3 +185,31 @@ cpanel_edgeedit_make (ggobid *gg) {
 
   gtk_widget_show_all (gg->control_panel[EDGEED]);
 }
+
+/*--------------------------------------------------------------------*/
+/*                      Control panel section                         */
+/*--------------------------------------------------------------------*/
+
+void
+cpanel_edgeedit_init (cpaneld *cpanel, ggobid *gg) {
+
+  cpanel->ee_adding_p = true;
+  cpanel->ee_deleting_p = false;
+}
+
+void
+cpanel_edgeedit_set (cpaneld *cpanel, ggobid *gg) {
+  GtkWidget *w;
+
+  /*-- set the Drag or Click radio buttons --*/
+  if (cpanel->ee_adding_p) {
+    w = widget_find_by_name (gg->control_panel[EDGEED],
+                             "EDGEEDIT:add_radio_button");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
+  } else {
+    w = widget_find_by_name (gg->control_panel[EDGEED],
+                             "EDGEEDIT:delete_radio_button");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
+  }
+}
+

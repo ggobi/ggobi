@@ -43,9 +43,9 @@ symbol_table_populate (datad *d)
 
   /*-- loop over all data --*/
   for (i=0; i<d->nrows; i++) {
-    j = d->glyph[i].type;
-    k = d->glyph[i].size;
-    m = d->color.els[i];
+    j = d->glyph[i].type;   g_assert (j>=0 && j<NGLYPHTYPES);
+    k = d->glyph[i].size;   g_assert (k>=0 && k<NGLYPHSIZES);
+    m = d->color.els[i];    g_assert (m>=0 && m<NCOLORS);
     if (d->symbol_table[j][k][m].n == 0) nclusters++;
     d->symbol_table[j][k][m].n++;
     if (d->hidden.els[i])
@@ -75,10 +75,10 @@ clusters_set (datad *d, ggobid *gg) {
   for (j=0; j<NGLYPHTYPES; j++) {
     for (k=0; k<NGLYPHSIZES; k++) {
       for (m=0; m<NCOLORS; m++) {
-        if (d->symbol_table[j][k][m].n) {
-          d->clusv[n].glyphtype = j;
-          d->clusv[n].glyphsize = k;
-          d->clusv[n].color = m;
+        if (d->symbol_table[j][k][m].n > 0) {
+          d->clusv[n].glyphtype = j;  g_assert (j>=0 && j<NGLYPHTYPES);
+          d->clusv[n].glyphsize = k;  g_assert (k>=0 && k<NGLYPHSIZES);
+          d->clusv[n].color = m;      g_assert (m>=0 && m<NCOLORS);
           d->clusv[n].nhidden = d->symbol_table[j][k][m].nhidden;
           d->clusv[n].nshown = d->symbol_table[j][k][m].nshown;
           d->clusv[n].n = d->symbol_table[j][k][m].n;

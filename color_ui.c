@@ -148,7 +148,7 @@ redraw_symbol_display (GtkWidget *w, ggobid *gg) {
   
   if (!gg->mono_p) {
     icoords p;
-    /*-- NGLYPHSIZES is the size of the largest glyph --*/
+    /*-- 2*(NGLYPHSIZES+1) is the size of the largest glyph; draw_glyph() --*/
     gint radius = (3*NGLYPHSIZES)/2 + gg->color_ui.margin/2;
     find_selection_circle_pos (&p, gg);
 
