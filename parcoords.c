@@ -508,9 +508,11 @@ sp_whiskers_make (splotd *sp, displayd *display, ggobid *gg) {
     }
   }
 
-  if (sp_prev != NULL)
+  if (sp_prev != NULL) {
     sp_rewhisker (sp_prev_prev, sp_prev, sp, gg);
+  }
 
-  if (sp_next == NULL)
+  if (sp_next == NULL) {
     sp_rewhisker (sp_prev, sp, NULL, gg);
+  }
 }

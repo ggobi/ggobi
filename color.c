@@ -56,8 +56,7 @@ getColorTable (ggobid *gg)
 void
 color_table_init (ggobid *gg) {
   gint i;
-/*GdkColormap *cmap = gdk_colormap_get_system ();*/
-  GdkColormap *cmap = gdk_rgb_get_cmap ();
+  GdkColormap *cmap = gdk_colormap_get_system ();
   gboolean writeable = false, best_match = true, success[NCOLORS];
 
   gg->default_color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
@@ -97,7 +96,8 @@ color_table_init (ggobid *gg) {
   gg->bg_color.red   = (guint16) (bg_rgb[0]*65535.0);
   gg->bg_color.green = (guint16) (bg_rgb[1]*65535.0);
   gg->bg_color.blue  = (guint16) (bg_rgb[2]*65535.0);
-  gdk_colormap_alloc_color(cmap, &gg->bg_color, writeable, best_match);
+  if (!gdk_colormap_alloc_color(cmap, &gg->bg_color, writeable, best_match))
+    g_printerr ("failure allocating background color\n");
 
 /*
  * accent color:  that is, the color that's used for
@@ -106,7 +106,8 @@ color_table_init (ggobid *gg) {
   gg->accent_color.red   = (guint16) (accent_rgb[0]*65535.0);
   gg->accent_color.green = (guint16) (accent_rgb[1]*65535.0);
   gg->accent_color.blue  = (guint16) (accent_rgb[2]*65535.0);
-  gdk_colormap_alloc_color(cmap, &gg->accent_color, writeable, best_match);
+  if (!gdk_colormap_alloc_color(cmap, &gg->accent_color, writeable, best_match))
+    g_printerr ("failure allocating accent color\n");
 
 /*
  * colors that show up in the variable circle panel
@@ -121,20 +122,16 @@ color_table_init (ggobid *gg) {
   gg->vcirc_freeze_color.red   = (guint16) 0;
   gg->vcirc_freeze_color.green = (guint16) 64435;
   gg->vcirc_freeze_color.blue  = (guint16) 0;
-  gdk_colormap_alloc_color(cmap, &gg->vcirc_freeze_color,
-    writeable, best_match);
-
+  if (!gdk_colormap_alloc_color(cmap, &gg->vcirc_freeze_color,
+    writeable, best_match))
+      g_printerr ("trouble allocating vcirc_freeze_color\n");
 }
 
 void
 init_plot_GC (GdkWindow *w, ggobid *gg) {
   GdkColor white, black;
-/*
   gdk_color_white (gdk_colormap_get_system (), &white);
   gdk_color_black (gdk_colormap_get_system (), &black);
-*/
-  gdk_color_white (gdk_rgb_get_cmap (), &white);
-  gdk_color_black (gdk_rgb_get_cmap (), &black);
 
   gg->plot_GC = gdk_gc_new (w);
   gdk_gc_set_foreground (gg->plot_GC, &white);
@@ -150,12 +147,8 @@ init_var_GCs (GtkWidget *w, ggobid *gg) {
   GtkStyle *style = gtk_style_copy (gtk_widget_get_style (w));
   GdkColor white, black, bg;
 
-/*
   gdk_color_white (gdk_colormap_get_system (), &white);
   gdk_color_black (gdk_colormap_get_system (), &black);
-*/
-  gdk_color_white (gdk_rgb_get_cmap (), &white);
-  gdk_color_black (gdk_rgb_get_cmap (), &black);
 
 /*
  * the unselected variable GCs: thin lines

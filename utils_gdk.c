@@ -21,8 +21,7 @@ NewColor (glong red, glong green, glong blue) {
   c->green = green;
   c->blue = blue;
 
-/*  if (gdk_colormap_alloc_color(gdk_colormap_get_system (),*/
-  if (gdk_colormap_alloc_color(gdk_rgb_get_cmap (),
+  if (gdk_colormap_alloc_color(gdk_colormap_get_system (),
     c, writeable, best_match) == false)
   {
     g_printerr("Unable to allocate color\n");

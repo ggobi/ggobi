@@ -973,11 +973,8 @@ setColormapEntry(const CHAR **attrs, XMLParserData *data)
  const gchar *tmp;
  gboolean ok = true;
  int which = data->current_color, i;
-
  GdkColor *color;
-/*  GdkColormap *cmap = gdk_colormap_get_system ();*/
-  GdkColormap *cmap = gdk_rgb_get_cmap ();
-
+ GdkColormap *cmap = gdk_colormap_get_system ();
 
  tmp = getAttribute(attrs, "id");
 

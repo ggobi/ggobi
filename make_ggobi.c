@@ -33,16 +33,6 @@ void globals_init (ggobid *gg) {
   gg->glyph_id.size = gg->glyph_0.size = 3;
   gg->color_id = 0;
   gg->color_0 = 4;
-
-/*
-  vectors_init (&gg->line.color);
-  vectors_init (&gg->line.color_now);
-  vectors_init (&gg->line.color_prev);
-  vectorb_init (&gg->line.hidden);
-  vectorb_init (&gg->line.hidden_now);
-  vectorb_init (&gg->line.hidden_prev);
-  vectorb_init (&gg->line.xed_by_brush);
-*/
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/

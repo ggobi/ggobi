@@ -189,8 +189,7 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
 {
   gdouble color[3];
   GdkColor gdk_color;
-/*  GdkColormap *cmap = gdk_colormap_get_system ();*/
-  GdkColormap *cmap = gdk_rgb_get_cmap ();
+  GdkColormap *cmap = gdk_colormap_get_system ();
   splotd *sp = gg->current_splot;
   GtkWidget *wheel = GTK_COLOR_SELECTION (colorsel)->wheel_area;
 
@@ -251,6 +250,7 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
   GtkWidget *colorsel, *ok_button, *cancel_button, *help_button;
   gint i;
   gdouble color[3];
+  GtkColorSelectionDialog *colordlg;
 
   /* Check if we've received a button pressed event */
 
@@ -261,6 +261,7 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
     gg->color_ui.colorseldlg = gtk_color_selection_dialog_new ("Select color");
 
     /* Get the ColorSelection widget */
+    colordlg = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg);
     colorsel = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->colorsel;
 
     /*
@@ -273,9 +274,9 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
     /*
      * Connect up the buttons
     */
-    ok_button = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->ok_button;
-    cancel_button = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->cancel_button;
-    help_button = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->help_button;
+    ok_button = colordlg->ok_button;
+    cancel_button = colordlg->cancel_button;
+    help_button = colordlg->help_button;
     gtk_signal_connect (GTK_OBJECT (ok_button), "clicked",
                         (GtkSignalFunc) dlg_close_cb, gg);
     gtk_signal_connect (GTK_OBJECT (cancel_button), "clicked",
@@ -283,7 +284,7 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
 
   } else {
 
-    colorsel = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->colorsel;
+    colorsel = colordlg->colorsel;
 
     if (w == gg->color_ui.bg_da) {
       color[0] = (gdouble) gg->bg_color.red / 65535.0;
@@ -312,6 +313,32 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
   }
 
   /* Show the dialog */
+/*
+ * This is failing on my X terminal at the moment.  I can
+ * realize this widget, but I can't show it.  -- dfs
+*/
+  gtk_widget_realize (gg->color_ui.colorseldlg);
+/*
+{
+  GdkVisual *visual;
+
+  visual = gdk_visual_get_system ();
+  g_printerr ("system: type=%d depth=%d\n", visual->type, visual->depth);
+
+  visual = gdk_visual_get_best ();
+  g_printerr ("best: type=%d depth=%d\n", visual->type, visual->depth);
+
+  visual = gtk_widget_get_visual (gg->color_ui.colorseldlg);
+  g_printerr ("dialog: type=%d depth=%d\n", visual->type, visual->depth);
+
+  visual = gtk_widget_get_visual (gg->control_panel[0]);
+  g_printerr ("control_panel: type=%d depth=%d\n", visual->type, visual->depth);
+
+  visual = gdk_rgb_get_visual ();
+  g_printerr ("rgb: type=%d depth=%d\n", visual->type, visual->depth);
+}
+*/
+
   gtk_widget_show (gg->color_ui.colorseldlg);
 
   return handled;

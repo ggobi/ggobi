@@ -165,7 +165,7 @@ class datad {
  } vcbox_ui;
  struct _Varpanel_circd {
    GtkWidget *vbox;
-   GtkWidget *swin, *hbox;  /*-- children of vb --*/
+   GtkWidget *swin, *hbox;  /*-- children of vbox --*/
    GtkWidget *table;        /*-- sole child of swin --*/
    GtkWidget *manip_btn, *freeze_btn;  /*-- children of hbox --*/
 
@@ -180,20 +180,7 @@ class datad {
  } vcirc_ui;
 
  struct _Varpaneld {
-   GtkWidget *ebox;       /*-- child of the scrolled_window --*//*keep*/
-
-/*
-   GtkWidget *swin;
-   GtkWidget *vbox;
-   GSList *checkbox;
-
-   GtkWidget *table;
-   gint tnrows, tncols;
-   GSList *vb, *da, *label;
-   GSList *da_pix;
-   gint nvars;
-*/
-
+   GtkWidget *ebox;  /*-- child of the notebook --*/
  } varpanel_ui;
 
 /*-------------------- transformation --------------------------------*/

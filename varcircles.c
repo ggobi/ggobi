@@ -227,7 +227,7 @@ da_manip_expose_cb (GtkWidget *w, GdkEvent *event, datad *d)
 
   gdk_gc_set_foreground (gc, &gg->vcirc_manip_color);
   gdk_draw_rectangle (w->window, gc,
-                      true,  /* fill */
+                      true,
                       0, 0,
                       w->allocation.width, w->allocation.height);
 
@@ -244,7 +244,7 @@ da_freeze_expose_cb (GtkWidget *w, GdkEvent *event, datad *d)
 
   gdk_gc_set_foreground (gc, &gg->vcirc_freeze_color);
   gdk_draw_rectangle (w->window, gc,
-                      true,  /* fill */
+                      true,
                       0, 0,
                       w->allocation.width, w->allocation.height);
 
