@@ -32,10 +32,6 @@ typedef struct {
   noded *nodes;
 } radiald;
 
-#ifdef GRAPHVIZ
-#include <render.h>
-#endif
-
 typedef enum {neato_shortest_path, neato_circuit_resistance} NeatoModel;
 
 typedef struct {
