@@ -322,16 +322,20 @@ findColorSchemeByName(GList *schemes, const gchar *name)
   return(NULL);
 }
 
-ggobid*
-ggobi_alloc()
+ggobid* /*XXX should be void. Change when gtk-object setup settles. */
+ggobi_alloc(ggobid *tmp)
 {
- ggobid *tmp;
+  if(tmp == NULL) {
+      /* Should never happen in new GtkObject-based version. */
+      tmp = (ggobid*) g_malloc (sizeof (ggobid));
+      memset (tmp, '\0', sizeof (ggobid)); 
+  }
 
-  tmp = (ggobid*) g_malloc (sizeof (ggobid));
-
-  memset (tmp, '\0', sizeof (ggobid));
   tmp->firsttime = true;
   tmp->brush.firsttime = true;
+
+  tmp->d = NULL;
+  tmp->displays = NULL;
 
   /*-- initialize to NULLMODE and check for ncols later --*/
   tmp->viewmode = NULLMODE;
@@ -447,11 +451,11 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   }
   
 
-  gg = ggobi_alloc();
+  gg = gtk_type_new(GTK_TYPE_GGOBI); 
 
   gg->mono_p = (vis->depth == 1 ||
-               vis->type == GDK_VISUAL_STATIC_GRAY ||
-               vis->type == GDK_VISUAL_GRAYSCALE);
+		vis->type == GDK_VISUAL_STATIC_GRAY ||
+		vis->type == GDK_VISUAL_GRAYSCALE);
 
   make_ggobi (sessionOptions, processEvents, gg);
 

@@ -56,26 +56,32 @@ displays_print (ggobid *gg) {
 }
 */
 
-static void display_datad_added_cb (GtkObject *obj /*gg->main_window*/,
-  datad *d, ggobid *gg, GtkObject *win)
+static void 
+display_datad_added_cb (GtkObject *obj /*gg->main_window*/,
+			datad *d, ggobid *gg, GtkObject *win)
 {
-  displayd *dsp, *display = NULL;
+  windowDisplayd *display = NULL;
+
+#if 0
+  displayd *dsp;
   gint k;
   GList *l;
-
   for (l=gg->displays, k = 0; l; l=l->next, k++) {
-    dsp = (displayd *) l->data;
-    if (dsp->window == (GtkWidget *) win) {
+    windowDisplayd *wdsp = (windowDisplayd *) l->data;
+    if (wdsp->window == (GtkWidget *) win) {
       display = (displayd *) l->data;
       break;
     }
   }
+#else
+  display = (windowDisplayd*) win;
+#endif
 
   /*-- this is all true even when the display is first opened --*/
   if (GTK_WIDGET_REALIZED (display->window)) {
-    if (display->displaytype == scatterplot) {
-      scatterplot_display_edge_menu_update (display,
-        gg->app.sp_accel_group, display_options_cb, gg);
+    if (display->dpy.displaytype == scatterplot) {
+      scatterplot_display_edge_menu_update (GTK_GGOBI_DISPLAY(display), gg->app.sp_accel_group, 
+					    display_options_cb, gg);
     }
   }
   /*-- I'll need a scatmat_edge_menu_update, too, I think --*/
@@ -322,11 +328,21 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display)
 /*                   End callbacks                                      */
 /*----------------------------------------------------------------------*/
 
+
+/*XXX consolidate this and display_alloc_init(), i.e. remove the latter! */
+displayd *
+gtk_ggobi_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg)
+{
+  return(display_alloc_init(type, missing_p, d, gg));
+}
+
 displayd *
 display_alloc_init (enum displaytyped type, gboolean missing_p,
   datad *d, ggobid *gg)
 {
-  displayd *display = (displayd *) g_malloc (sizeof (displayd));
+  displayd *display;
+/*  display = (displayd *) g_malloc (sizeof (displayd)); */
+  display = gtk_type_new(GTK_TYPE_GGOBI_WINDOW_DISPLAY);
   display->displaytype = type; 
 
   if (type == scatterplot)
@@ -343,7 +359,6 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   display->ggobi = gg;
   display->d = d;
   display->e = NULL;
-  display->embeddedIn = NULL;
 
   /*-- for dragging in the rulers --*/
   display->drag_start.x = display->drag_start.y = 0;
@@ -436,8 +451,8 @@ display_add (displayd *display, ggobid *gg)
   splotd *prev_splot = gg->current_splot;
   PipelineMode prev_viewmode = viewmode_get (gg);
 
-  if (isEmbeddedDisplay(display) == false) {
-    GGobi_widget_set(display->window, gg, true);
+  if (GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
+    GGobi_widget_set(GTK_GGOBI_WINDOW_DISPLAY(display)->window, gg, true);
     if(g_list_length(display->splots))
           display_set_current (display, gg);  /*-- this may initialize the mode --*/
   }
@@ -550,13 +565,13 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
     }
 
     count = g_list_length (display->splots);
-    if (isEmbeddedDisplay (display) == false) {
+    if (GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
       for (l=display->splots; count > 0 && l; l=l->next, count--) {
         sp = (splotd *) l->data;
         splot_free (sp, display, gg);
       }
 
-     gtk_widget_destroy (display->window);
+     gtk_widget_destroy (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
     }
     g_free (display);
   } else
@@ -618,11 +633,11 @@ display_set_current (displayd *new_display, ggobid *gg)
   gtk_accel_group_unlock (gg->main_accel_group);
 
   if (gg->firsttime == false && gg->current_display &&
-      isEmbeddedDisplay (gg->current_display) == false)
+      GTK_IS_GGOBI_WINDOW_DISPLAY(gg->current_display))
   {
     title = computeTitle (false, gg->current_display, gg);
     if (title) {
-      gtk_window_set_title (GTK_WINDOW (gg->current_display->window), title);
+      gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window), title);
       g_free (title); 
     }
 
@@ -650,10 +665,10 @@ display_set_current (displayd *new_display, ggobid *gg)
     }
   }
 
-  if (isEmbeddedDisplay (new_display) == false) {
+  if (GTK_IS_GGOBI_WINDOW_DISPLAY(new_display)) {
     title = computeTitle (true, new_display, gg);
     if (title) {
-      gtk_window_set_title (GTK_WINDOW (new_display->window), title);   
+      gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(new_display)->window), title);   
       g_free (title); 
     }
 
@@ -872,7 +887,7 @@ displays_tailpipe (RedrawStyle type, ggobid *gg) {
 }
 
 void
-display_window_init (displayd *display, gint width, ggobid *gg)
+display_window_init (windowDisplayd *display, gint width, ggobid *gg)
 {
   display->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (display->window),
@@ -886,7 +901,7 @@ display_window_init (displayd *display, gint width, ggobid *gg)
   GGobi_widget_set (GTK_WIDGET (display->window), gg, true);
 
   gtk_signal_connect (GTK_OBJECT (gg->main_window), "datad_added",
-    (GtkSignalFunc) display_datad_added_cb, display->window);
+		        (GtkSignalFunc) display_datad_added_cb, display);
 }
 
 
@@ -894,8 +909,7 @@ gboolean
 isEmbeddedDisplay (displayd *dpy)
 {
   gboolean ans = false;
-  if (dpy->embeddedIn != NULL)
-    ans = true;
+  ans = (GTK_IS_GGOBI_WINDOW_DISPLAY(dpy) == false);
 
   return (ans);
 }

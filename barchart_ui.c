@@ -430,15 +430,17 @@ void
 barchart_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
 
+  if(!GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+      return;
+
   if (state == on) {
-    sp->key_press_id = gtk_signal_connect (GTK_OBJECT (display->window),
-                                           "key_press_event",
-                                           (GtkSignalFunc) key_press_cb,
-                                           (gpointer) sp);
+      sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+					     "key_press_event",
+					     (GtkSignalFunc) key_press_cb,
+					     (gpointer) sp);
 
   } else {
     disconnect_key_press_signal (sp);
-
   }
 }
 
@@ -448,22 +450,23 @@ barchart_scale_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
 
   if (state == on) {
-    sp->key_press_id = gtk_signal_connect (GTK_OBJECT (display->window),
-                                           "key_press_event",
-                                           (GtkSignalFunc) key_press_cb,
-                                           (gpointer) sp);
-    sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                       "button_press_event",
-                                       (GtkSignalFunc) button_press_cb,
-                                       (gpointer) sp);
-    sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                         "button_release_event",
-                                         (GtkSignalFunc) button_release_cb,
-                                         (gpointer) sp);
-    sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                      "motion_notify_event",
-                                      (GtkSignalFunc) mouse_motion_notify_cb,
-                                      (gpointer) sp);
+      if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+	  sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+						 "key_press_event",
+						 (GtkSignalFunc) key_press_cb,
+						 (gpointer) sp);
+      sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+					 "button_press_event",
+					 (GtkSignalFunc) button_press_cb,
+					 (gpointer) sp);
+      sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+					   "button_release_event",
+					   (GtkSignalFunc) button_release_cb,
+					   (gpointer) sp);
+      sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+					  "motion_notify_event",
+					  (GtkSignalFunc) mouse_motion_notify_cb,
+					  (gpointer) sp);
   } else {
     disconnect_key_press_signal (sp);
     disconnect_button_press_signal (sp);

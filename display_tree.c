@@ -441,7 +441,7 @@ display_tree_display_child_select(GtkWidget *item, displayd *display)
     }
   }
 
-  gtk_widget_show(display->window);  
+  gtk_widget_show(GTK_GGOBI_WINDOW_DISPLAY(display)->window);  
 }
 
 /*

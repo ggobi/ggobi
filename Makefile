@@ -116,7 +116,8 @@ SRC=array.c ash1d.c \
  mt19937ar.c cokus.c \
  fileio.c print.c \
  xlines.c \
- help.c
+ help.c \
+ ggobiClass.c
 
 OB=array.o ash1d.o \
  barchart.o barchart_ui.o \
@@ -149,7 +150,8 @@ OB=array.o ash1d.o \
 \
  fileio.o print.o \
  xlines.o \
- help.o
+ help.o \
+ ggobiClass.o
 
 ifdef GTK_2
  SRC+=marshal.c
@@ -312,7 +314,6 @@ datad.o read_xml.o: datad.c datad.h
 
 ../bin/ggobi: ggobi
 	cp ggobi $@
-
 
 cflags:
 	@echo "$(CFLAGS)"

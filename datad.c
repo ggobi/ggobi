@@ -18,13 +18,18 @@
 #include <string.h> /* for memset() declaration */
 
 
+
+
 datad *
 datad_new(datad *d, ggobid *gg)
 { 
-  if (d == NULL)
+  if (d == NULL) {
     d = (datad *) g_malloc (sizeof (datad));
+    memset(d, '\0', sizeof(datad));
+  }
 
-  memset(d, 0, sizeof(datad));
+  datad_instance_init(d);
+
   d->gg = gg;
 
   /*-- initialize arrays to NULL --*/

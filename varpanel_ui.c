@@ -121,7 +121,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   gboolean redraw = false;
   gint jvar_prev = -1;
 
-  if (display == NULL || !GTK_IS_WIDGET (display->window)) {
+  if (display == NULL || !GTK_IS_GGOBI_WINDOW_DISPLAY(display) || !GTK_IS_WIDGET (GTK_GGOBI_WINDOW_DISPLAY(display)->window)) {
     g_printerr ("Bug?  I see no active display\n");
     return ;
   }

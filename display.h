@@ -20,16 +20,39 @@
 
 struct _ggobid; 
 
+
+#define GTK_TYPE_GGOBI_DISPLAY	 (gtk_ggobi_display_get_type ())
+#define GTK_GGOBI_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_DISPLAY, displayd))
+#define GTK_GGOBI_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_DISPLAY, GtkGGobiDisplayClass))
+#define GTK_IS_GGOBI_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_DISPLAY))
+#define GTK_IS_GGOBI_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_DISPLAY))
+
+GtkType gtk_ggobi_display_get_type();
+displayd *gtk_ggobi_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+
+typedef struct _GtkGGobiDisplayClass
+{
+    GtkVBoxClass parent_class;
+
+} GtkGGobiDisplayClass;
+
+/**
+
+ */
 struct _displayd {
+  GtkVBox vbox;
 
 /*
  * Used by all displays
 */
- GtkWidget *window;
- cpaneld cpanel;
  enum displaytyped displaytype;
 
- struct _displayd *embeddedIn;
+
+   /*-- for scatterplots, where edge menus need to be rebuilt on the fly --*/
+ GtkWidget *menubar;
+ GtkWidget *edge_item, *edge_menu;
+
+ cpaneld cpanel;
 
  GList *splots;          /*-- doubly linked list of splots --*/
  splotd *current_splot;  /*-- multi-plot displays need this notion --*/
@@ -37,9 +60,6 @@ struct _displayd {
  datad *d;  /*-- pointer to a particular gg->d[] --*/
  datad *e;  /*-- pointer to a particular gg->d[] --*/
 
- /*-- for scatterplots, where edge menus need to be rebuilt on the fly --*/
- GtkWidget *menubar;
- GtkWidget *edge_item, *edge_menu;
  /*-- --*/
 
 /*
@@ -51,12 +71,10 @@ struct _displayd {
 
  DisplayOptions options;
 
-
 /*
  * For an individual scatterplot
 */
   fcoords drag_start;
-
 
 /*
  * Scatterplot matrix display
@@ -130,6 +148,28 @@ struct _displayd {
 
 };  /* displayd; */
 
+
+#define GTK_TYPE_GGOBI_WINDOW_DISPLAY	 (gtk_ggobi_window_display_get_type ())
+#define GTK_GGOBI_WINDOW_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_DISPLAY, windowDisplayd))
+#define GTK_GGOBI_WINDOW_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_WINDOW_DISPLAY, GtkGGobiWindowDisplayClass))
+#define GTK_IS_GGOBI_WINDOW_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_WINDOW_DISPLAY))
+#define GTK_IS_GGOBI_WINDOW_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_WINDOW_DISPLAY))
+
+GtkType gtk_ggobi_window_display_get_type();
+displayd *gtk_ggobi_window_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+
+typedef struct 
+{
+    GtkGGobiDisplayClass parent_class;
+
+} GtkGGobiWindowDisplayClass;
+
+
+typedef struct _windowDisplayd {
+ displayd dpy;
+
+ GtkWidget *window;
+} windowDisplayd;
 
 gboolean isEmbeddedDisplay(displayd *dpy);
 

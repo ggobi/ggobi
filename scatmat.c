@@ -100,9 +100,12 @@ scatmat_new (gboolean missing_p,
   gint scatmat_nrows, scatmat_ncols;
   splotd *sp;
   displayd *display;
+  windowDisplayd *wdpy;
   GtkAccelGroup *scatmat_accel_group;
 
   display = display_alloc_init (scatmat, missing_p, d, gg);
+  wdpy = GTK_GGOBI_WINDOW_DISPLAY(display);
+
   /* If the caller didn't specify the rows and columns, 
      use the default which is the number of variables
      in the dataset or the maximum number of columns
@@ -132,12 +135,12 @@ scatmat_new (gboolean missing_p,
 */
   vbox = gtk_vbox_new (FALSE, 1);
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  gtk_container_add (GTK_CONTAINER (display->window), vbox);
+  gtk_container_add (GTK_CONTAINER (wdpy->window), vbox);
 
   scatmat_accel_group = gtk_accel_group_new ();
   factory = get_main_menu (menu_items,
     sizeof (menu_items) / sizeof (menu_items[0]),
-    scatmat_accel_group, display->window, &mbar,
+    scatmat_accel_group, wdpy->window, &mbar,
     (gpointer) display);
 
   /*-- add a tooltip to the file menu --*/
@@ -210,9 +213,9 @@ scatmat_new (gboolean missing_p,
   gtk_widget_show (display->table);
 
   /*-- position the display toward the lower left of the main window --*/
-  display_set_position (display, gg);
+  display_set_position (wdpy, gg);
 
-  gtk_widget_show_all (display->window);
+  gtk_widget_show_all (wdpy->window);
 
   return display;
 }
@@ -571,19 +574,19 @@ createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gbool
   scatmat_cpanel_init (&display->cpanel, gg);
 
   if(useWindow) {
-    display_window_init (display, 5, gg);
+    display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 5, gg);
 
 
 /*
  * Add the main menu bar
 */
-  vbox = gtk_vbox_new (FALSE, 1);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  gtk_container_add (GTK_CONTAINER (display->window), vbox);
+    vbox = GTK_WIDGET(display); /*XX gtk_vbox_new (FALSE, 1); */
+    gtk_container_border_width (GTK_CONTAINER (vbox), 1);
+    gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
   scatmat_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 scatmat_accel_group, display->window, &mbar,
+                 scatmat_accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, &mbar,
                  (gpointer) display);
   /*
    * After creating the menubar, and populating the file menu,

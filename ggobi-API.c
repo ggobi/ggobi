@@ -1269,7 +1269,7 @@ GGOBI(setPlotRange)(double *x, double *y, int plotNum, displayd *display, gboole
 gboolean
 GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg)
 {
-  displayd *display;
+  windowDisplayd *display;
   gboolean ok = false;
   int start, end, i;
 
@@ -1282,7 +1282,9 @@ GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg)
   }
 
      for(i = start; i < end; i++) {
-      display = (displayd *) g_list_nth_data(gg->displays, i);
+      display = (windowDisplayd *) g_list_nth_data(gg->displays, i);
+      if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) == false)
+	  continue;
       if(raiseOrIcon) {
         if(up) 
           gdk_window_raise(display->window->window); 

@@ -1,0 +1,182 @@
+\documentclass{article}
+\input{WebMacros}
+\input{CMacros}
+\usepackage{fullpage}
+\usepackage{times}
+
+\title{Using Gtk types and ``classes'' for GGobi objects.}
+\author{Duncan Temple Lang}
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+  The extensible type system provided by Gtk can be used to give GGobi
+  a reasonable object-oriented framework on which we can build
+  extensions to the basic plot types, etc.  Additionally, by complying
+  with the Gtk type system, automatically generated bindings such as
+  pygtk, java-gnome, perlgtk and RGtk can more readily interface to
+  GGobi.  Also, dynamically reflected information about these types is
+  available which can be used by the end-user and development
+  environments.
+
+\end{abstract}
+
+
+
+
+
+
+\section{Older}
+
+We oultine the necessary modifications and the benefits introduced.
+
+By having a clean interface for a class of splots
+(and displays), we can have a well-defined interface
+for such things as 
+\begin{description}
+\item[description]
+\item[serialization]
+\item[construction]
+\end{description}
+
+It is relatively easy to introduce new plot types
+without having to add any extra code to the core code.
+
+For the constructors, how do we get the ggobid instance to the
+display, and the display to the new splot, etc?
+
+What we want to be able to do is introduce a new plot type, perhaps
+simply as a GtkType or perhaps we require slightly more in addition.
+Then, when a user asks for a sequence of these plots, it is easy to
+create them.
+
+Suppose we register a display type.  This puts an element into a
+table.  Then when we create the Display menu
+(\Croutine{display_menu_build}), we loop over those elements and add
+each to the menu.  We ask each element for a menu name.  At this
+point, we are good to go and the user can take control.
+
+Now, when the user selects this plot type, we are in
+\Croutine{display_open_cb}.  This looks for a property on the menu
+widget named \texttt{displayMetods} and that, if non-\CNull, gives a
+reference to the \CStruct{DisplayInterface} to use.  This defines the
+different methods for creating the display.  This is passed to
+\Croutine{display_create} which actually creates the display and its
+plots.  It invokes the method \Croutine{display_create_with_vars} and
+passes it the selected variables.  If this routine is not specified,
+but \Croutine{display_create} is, then the latter is called.  This
+allows the display to determine by itself which variables to plot.
+
+Both forms of the \Croutine{display_create} routine are expected to
+create the entire display window.  How they negotiate to create the
+appropriate plot types is their own business. They should attempt to
+use the existing infrastructure, when possible.
+
+
+Also we ask what mode the plot type for that display supports
+(i.e. Scale, Brush, Identify, Move Points) We can use a fixed
+collection of flags against which we OR the result.  Alternatively, we
+can ask the display type for a collection of mode names.
+Alternatively, we can ask the display to create the ViewMode menu.
+
+splot and display.  There is a mix between these that needs to be
+clearly defined and we would like to be able to avoid
+redundancy/duplication in display and plot type specification.
+
+
+\section{displayd}
+Basic idea is to remove the switch statements
+an call a single routine via a function pointer
+that is specific to the class of display.
+
+\Croutine{cpanel_set} (\file{cpanel.c}).
+Rather than having a switch statement, we would have
+a single line.
+\begin{verbatim}
+   display->cpanel_set(display, gg)
+\end{verbatim}
+
+Way to determine which variables should be included in a display
+for a given type. (\file{vartable.c})
+
+\Croutine{varsel} calls \Croutine{tsplot_varsel}, etc.  in
+\file{varpanel_ui.c}
+Also \Croutine{varpanel_refresh}.
+And \Croutine{varpanel_tooltips_set}.
+
+
+The routine \Croutine{plotted} (which seems to determine
+if a variable is currently being plotted in any of
+the displays associated with a given dataset).
+\file{varchange.c}
+Ok 
+
+display.c
+
+\Croutine{computeTitle}
+
+\Croutine{display_type_handles_action} determines whether the display
+type handles a particular view mode.
+
+\Croutine{splot_add_plot_labels} in \file{sp_plot.c}.
+
+
+\Croutine{splot_world_to_plane}
+
+\Croutine{splot_plane_to_screen}
+
+
+How to get the methods set for an \CStruct{splotd}.  Well, we can do
+this with a Gtk class.  When we create the splotd, we use an
+appropriate GtkType that sub-classes Gtk
+
+
+Computation of \CVariable{loop_over_points} in \Croutine{splot_draw_to_pixmap0_unbinned}
+in \file{sp_plot.c} for extension types.
+Ok.
+
+Remove the drawing of the line segments for tsplot in \Croutine{splot_draw_to_pixmap0_unbinned}
+in \file{sp_plot.c}.
+Ok.
+
+
+\CppMacro{DOPT_MISSINGS} in \Croutine{display_options_cb} in \file{display.c}
+Ok.
+
+Remove the menu creation in \Croutine{display_menu_build}
+Ok
+
+\Croutine{display_type_handles_action} in display.c
+ Ok.
+
+\Croutine{plotted} in varchange.c
+ Ok.
+
+tsplot case in varsel in \file{varpanel_ui.c}
+Ok
+
+\Croutine{varpanel_refresh}
+ Ok.
+
+\Croutine{varpanel_tooltips_set}
+ Ok
+
+vartable.c
+\Croutine{plotted_col_gets}
+ Ok;
+
+
+Facilities for reading about a plot type in other applications
+using reflectance. E.g. R
+
+In \file{read_init.c} we restore previously created displays.  Need a way to
+find the type. See createDisplayFromDescription and getDisplayType.
+
+
+
+\end{document}
+
+
+

@@ -516,16 +516,15 @@ splot_dimension_set (splotd* sp, gint width, gint height)
 
 splotd *
 splot_new (displayd *display, gint width, gint height, ggobid *gg) {
-  splotd *sp = (splotd *) g_malloc (sizeof (splotd));
+  splotd *sp;
+/*XXX  = (splotd *) g_malloc (sizeof (splotd)); */
+  sp = gtk_type_new(GTK_TYPE_GGOBI_SPLOT);
 
 /*
  * Initialize the widget portion of the splot object
 */
-  sp->da = gtk_drawing_area_new ();
-  sp->pixmap0 = NULL;
-  sp->pixmap1 = NULL;
-  sp->redraw_style = FULL;
-  /*sp->tour1d.firsttime = true;*//* Ensure that the 1D tour should be initialized. */
+/*XX  sp->da = gtk_drawing_area_new (); */
+
 
 #ifdef BARCHART_IMPLEMENTED
 /* initialize barchart data */
@@ -1029,18 +1028,21 @@ splot_reverse_pipeline (splotd *sp, gint ipt, lcoords *eps,
 void
 disconnect_key_press_signal (splotd *sp) {
   displayd *display = sp->displayptr;
-  if (sp->key_press_id) {
-    gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
+  if (sp->key_press_id && GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
+    gtk_signal_disconnect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window), sp->key_press_id);
     sp->key_press_id = 0;
   }
 }
+
 void
-disconnect_button_press_signal (splotd *sp) {
+disconnect_button_press_signal (splotd *sp) 
+{
   if (sp->press_id) {
     gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
     sp->press_id = 0;
   }
 }
+
 void
 disconnect_button_release_signal (splotd *sp) {
   if (sp->release_id) {

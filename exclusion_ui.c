@@ -329,7 +329,7 @@ cluster_add (gint k, datad *d, ggobid *gg) {
 
   d->clusvui[k].da = gtk_drawing_area_new ();
   gtk_drawing_area_size (GTK_DRAWING_AREA (d->clusvui[k].da),
-    dawidth, dawidth);
+			 dawidth, dawidth);
 
   gtk_widget_set_events (d->clusvui[k].da,
       GDK_EXPOSURE_MASK

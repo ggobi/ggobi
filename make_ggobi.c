@@ -331,15 +331,6 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
 
   tour_manip_colors_init (gg);
 
-/* eliminated in favor of activeColorScheme */
-/*
-*#ifdef USE_XML
-*  if(sessionOptions->info && sessionOptions->info->bgColor) {
-*      gg->bg_color = *(sessionOptions->info->bgColor);
-*  }
-*#endif
-*/
-
   wvis_init (gg);
   make_ui (gg);
 

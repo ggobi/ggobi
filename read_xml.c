@@ -1491,7 +1491,9 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData)
   gchar *name;
   const gchar *tmp;
 
-  data = datad_new(NULL, parserData->gg);
+/* Pre- gtk object way: data = datad_new(NULL, parserData->gg); */
+  data = gtk_ggobi_data_new(parserData->gg);
+
   data->readXMLRecord = readXMLRecord;
 
   tmp = getAttribute(attrs, (gchar *) "name");

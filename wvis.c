@@ -17,6 +17,9 @@
 #include "externs.h"
 
 
+/**
+ Initialize basic colorsf for this ggobid.
+ */
 void
 wvis_init (ggobid  *gg)
 {

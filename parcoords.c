@@ -118,7 +118,7 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   }
 
   /*-- position the display toward the lower left of the main window --*/
-  display_set_position (display, gg);
+  display_set_position (GTK_GGOBI_WINDOW_DISPLAY(display), gg);
 
   gtk_widget_show_all (gg->parcoords.arrangement_box);
 
@@ -158,19 +158,19 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
 
   parcoords_cpanel_init (&display->cpanel, gg);
 
-  display_window_init (display, 3, gg);
+  display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);
 
 /*
  * Add the main menu bar
 */
-  vbox = gtk_vbox_new (FALSE, 1);
+  vbox = GTK_WIDGET(display); /*XXX gtk_vbox_new (FALSE, 1); */
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  gtk_container_add (GTK_CONTAINER (display->window), vbox);
+  gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
   gg->parcoords.accel_group = gtk_accel_group_new ();
   factory = get_main_menu (menu_items,
     sizeof (menu_items) / sizeof (menu_items[0]),
-    gg->parcoords.accel_group, display->window, &mbar, (gpointer) display);
+    gg->parcoords.accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, &mbar, (gpointer) display);
 
   /*-- add a tooltip to the file menu --*/
   w = gtk_item_factory_get_widget (factory, "<main>/File");
@@ -239,7 +239,7 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
       sp->da, true, true, 0);
   }
 
-  gtk_widget_show_all (display->window);
+  gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
 
   return display;
 }
@@ -278,8 +278,9 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
   /* The index of gg.current_splot */
   gint sp_indx = g_list_index (display->splots, sp);
 
-  gtk_window_set_policy (GTK_WINDOW (display->window),
-        false, false, false);
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+      gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+			     false, false, false);
 
   splot_get_dimensions (sp, &width, &height);
 
@@ -409,8 +410,9 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
     }
   }
 
-  gtk_window_set_policy (GTK_WINDOW (display->window),
-    true, true, false);
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+      gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+			     true, true, false);
 
   return redraw;
 }

@@ -675,15 +675,16 @@ tour1d_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
 
   if (state == on) {
-    sp->key_press_id = gtk_signal_connect (GTK_OBJECT (display->window),
-                                           "key_press_event",
-                                           (GtkSignalFunc) key_press_cb,
-                                           (gpointer) sp);
-    sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+      if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+	  sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+						 "key_press_event",
+						 (GtkSignalFunc) key_press_cb,
+						 (gpointer) sp);
+      sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                        "button_press_event",
                                        (GtkSignalFunc) button_press_cb,
                                        (gpointer) sp);
-    sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+      sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                          "button_release_event",
                                          (GtkSignalFunc) button_release_cb,
                                          (gpointer) sp);

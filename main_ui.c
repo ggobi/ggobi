@@ -643,14 +643,14 @@ quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
 
 
 void 
-make_ui (ggobid *gg) {
+make_ui (ggobid *gg) 
+{
   GtkWidget *window;
   GtkWidget *hbox, *vbox;
 
   gg->tips = gtk_tooltips_new ();
 
-  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gg->main_window = window;
+  gg->main_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   GGobi_widget_set (window, gg, true);
 
 #ifdef TEST_GGOBI_EVENTS
@@ -682,9 +682,9 @@ make_ui (ggobid *gg) {
 
   gg->main_accel_group = gtk_accel_group_new ();
   gg->main_menu_factory = get_main_menu (menu_items,
-                            sizeof (menu_items) / sizeof (menu_items[0]),
-                            gg->main_accel_group, window,
-                            &gg->main_menubar, (gpointer) gg);
+					 sizeof (menu_items) / sizeof (menu_items[0]),
+					 gg->main_accel_group, window,
+					 &gg->main_menubar, (gpointer) gg);
 
 #ifdef SUPPORT_INIT_FILES
   if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
@@ -707,9 +707,8 @@ make_ui (ggobid *gg) {
  * Create a frame to hold the mode panels, set its label
  * and contents, using the default mode for the default display.
 */
-  gg->viewmode_frame = gtk_frame_new (
-    (gg->viewmode == NULLMODE) ? "" :
-      viewmode_name[gg->viewmode]);
+  gg->viewmode_frame = gtk_frame_new ((gg->viewmode == NULLMODE) 
+                                        ? "" : viewmode_name[gg->viewmode]);
 
   gtk_box_pack_start (GTK_BOX (hbox), gg->viewmode_frame, false, false, 3);
   gtk_container_set_border_width (GTK_CONTAINER (gg->viewmode_frame), 3);
@@ -832,7 +831,7 @@ create_ggobi(InputDescription *desc)
   gboolean init_data = true;
   ggobid *gg;
 
-  gg = ggobi_alloc();
+  gg = ggobi_alloc(NULL);
 
      /*-- some initializations --*/
   gg->displays = NULL;

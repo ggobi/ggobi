@@ -120,10 +120,11 @@ p1d_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
 
   if (state == on) {
-    sp->key_press_id = gtk_signal_connect (GTK_OBJECT (display->window),
-                                           "key_press_event",
-                                           (GtkSignalFunc) key_press_cb,
-                                           (gpointer) sp);
+      if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+	  sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+						 "key_press_event",
+						 (GtkSignalFunc) key_press_cb,
+						 (gpointer) sp);
   } else {
     disconnect_key_press_signal (sp);
   }

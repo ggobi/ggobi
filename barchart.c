@@ -83,16 +83,16 @@ barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
 
   barchart_cpanel_init (&display->cpanel, gg);
 
-  display_window_init (display, 3, gg);  /*-- 3 = width = any small int --*/
+  display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);  /*-- 3 = width = any small int --*/
 
   /*-- Add the main menu bar --*/
-  vbox = gtk_vbox_new (false, 1);
+  vbox = GTK_WIDGET(display); /*XXX gtk_vbox_new (false, 1); */
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  gtk_container_add (GTK_CONTAINER (display->window), vbox);
+  gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
   gg->app.sp_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 gg->app.sp_accel_group, display->window, &display->menubar,
+                 gg->app.sp_accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, &display->menubar,
                  (gpointer) display);
   /*
    * After creating the menubar, and populating the file menu,
@@ -168,7 +168,7 @@ barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
                     0, 0 );
 
 
-  gtk_widget_show_all (display->window);
+  gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
 
   /*-- hide any extraneous rulers --*/
 

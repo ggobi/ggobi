@@ -27,7 +27,26 @@ struct _ggobid;
 
 typedef struct _datad datad;
 
+#define GTK_TYPE_GGOBI_DATA	 (gtk_ggobi_data_get_type ())
+#define GTK_GGOBI_DATA(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_DATA, datad))
+#define GTK_GGOBI_DATA_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_DATA, GtkGGobiDataClass))
+#define GTK_IS_GGOBI_DATA(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_DATA))
+#define GTK_IS_GGOBI_DATA_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_DATA))
+
+GtkType gtk_ggobi_data_get_type(void);
+
+datad *gtk_ggobi_data_new(ggobid *gg);
+datad *gtk_ggobi_data_new_with_dimensions(int nr, int nc, ggobid *gg);
+
+typedef struct _GtkGGobiDataClass
+{
+    GtkObjectClass parent_class;
+
+} GtkGGobiDataClass;
+
 struct _datad {
+
+  GtkObject object;
 
   /* All the variables are left public since this the way they were in the
      C structure. Adding accessor routines and using those would be "good",
@@ -204,5 +223,5 @@ gint alloc_edgeIDs(datad *d);
 
 
 extern datad *datad_new (datad *, struct _ggobid *);
-
+void datad_instance_init(datad *d);
 #endif

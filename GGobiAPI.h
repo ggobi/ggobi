@@ -962,7 +962,7 @@ extern GtkWidget *GGobi_addDisplayMenuItem(const char *label, ggobid *gg);
 /**
  @group Creation
  */
-ggobid* ggobi_alloc();
+ggobid* ggobi_alloc(ggobid *tmp);
 
 /**
  */

@@ -17,7 +17,7 @@
 #endif
 
 void
-display_set_position (displayd *display, ggobid *gg)
+display_set_position (windowDisplayd *display, ggobid *gg)
 {
   gint x, y, width, height;
   gint posx, posy;
@@ -277,7 +277,7 @@ void
 display_menu_init (ggobid *gg)
 {
   gg->display_menu_item = submenu_make ("_Display", 'D',
-    gg->main_accel_group);
+					gg->main_accel_group);
 
   gtk_widget_show (gg->display_menu_item);
 

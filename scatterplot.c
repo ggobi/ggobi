@@ -175,7 +175,8 @@ static GtkItemFactoryEntry menu_items[] = {
 
 
 displayd *
-scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
+scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) 
+{
   GtkWidget *table, *vbox, *w;
   GtkItemFactory *factory;
   displayd *display;
@@ -199,17 +200,17 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   projection = (d->ncols >= 2) ? XYPLOT : P1PLOT;
   scatterplot_cpanel_init (&display->cpanel, projection, gg);
 
-  display_window_init (display, 3, gg);  /*-- 3 = width = any small int --*/
+  display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);  /*-- 3 = width = any small int --*/
 
   /*-- Add the main menu bar --*/
-  vbox = gtk_vbox_new (false, 1);
+  vbox = GTK_WIDGET(display); /* gtk_vbox_new (false, 1); */
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  gtk_container_add (GTK_CONTAINER (display->window), vbox);
+  gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
   gg->app.sp_accel_group = gtk_accel_group_new ();
   factory = get_main_menu (menu_items,
     sizeof (menu_items) / sizeof (menu_items[0]),
-    gg->app.sp_accel_group, display->window, &display->menubar,
+    gg->app.sp_accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, &display->menubar,
     (gpointer) display);
 
   /*-- add a tooltip to the file menu --*/
@@ -315,7 +316,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
                     (GtkAttachOptions) (GTK_EXPAND|GTK_SHRINK|GTK_FILL),
                     0, 0 );
 
-  gtk_widget_show_all (display->window);
+  gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
 
   /*-- hide any extraneous rulers --*/
   scatterplot_show_rulers (display, projection);

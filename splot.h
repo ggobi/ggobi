@@ -15,7 +15,23 @@
 
 typedef struct _displayd displayd;
 
+#define GTK_TYPE_GGOBI_SPLOT     (gtk_ggobi_splot_get_type ())
+#define GTK_GGOBI_SPLOT(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_SPLOT, splotd))
+#define GTK_GGOBI_SPLOT_CLASS(klass)	 (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_SPLOT, GtkGGobiSplotClass))
+#define GTK_IS_GGOBI_SPLOT(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_SPLOT))
+#define GTK_IS_GGOBI_SPLOT_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_SPLOT))
+
+GtkType gtk_ggobi_splot_get_type(void);
+
+typedef struct 
+{
+    GtkDrawingAreaClass parent_class;
+} GtkGGobiSPlotClass;
+
+
 typedef struct {
+
+ GtkDrawingArea canvas;
 
  displayd *displayptr;  /* a pointer to the enclosing display */
 

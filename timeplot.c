@@ -109,7 +109,7 @@ tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
  }
 
  /*-- position the display toward the lower left of the main window --*/
-  display_set_position (display, gg);
+  display_set_position (GTK_GGOBI_WINDOW_DISPLAY(display), gg);
 
   gtk_widget_show_all (gg->tsplot.arrangement_box);
 
@@ -145,19 +145,19 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars,
 
   tsplot_cpanel_init (&display->cpanel, gg);
 
-  display_window_init (display, 3, gg);
+  display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);
 
 /*
  * Add the main menu bar
 */
-  vbox = gtk_vbox_new (FALSE, 1);
+  vbox = GTK_WIDGET(display); /*XX gtk_vbox_new (FALSE, 1); */
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  gtk_container_add (GTK_CONTAINER (display->window), vbox);
+  gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
   gg->tsplot.accel_group = gtk_accel_group_new ();
   factory = get_main_menu (menu_items,
     sizeof (menu_items) / sizeof (menu_items[0]),
-    gg->tsplot.accel_group, display->window, &mbar, (gpointer) display);
+    gg->tsplot.accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, &mbar, (gpointer) display);
 
   /*-- add a tooltip to the file menu --*/
   w = gtk_item_factory_get_widget (factory, "<main>/File");
@@ -209,7 +209,7 @@ tsplot_new (gboolean missing_p, gint nvars, gint *vars,
       sp->da, true, true, 0);
   }
 
-  gtk_widget_show_all (display->window);
+  gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
 
   return display;
 }
@@ -248,8 +248,9 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
   /* The index of gg.current_splot */
   gint sp_indx = g_list_index (gg->current_display->splots, sp);
 
-  gtk_window_set_policy (GTK_WINDOW (gg->current_display->window),
-        false, false, false);
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(gg->current_display))
+      gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window),
+			     false, false, false);
 
   splot_get_dimensions (sp, &width, &height);
 
@@ -394,8 +395,11 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
       }
     }
   }
-  gtk_window_set_policy (GTK_WINDOW (display->window),
-    true, true, false);
+
+  if(GTK_IS_GGOBI_WINDOW_DISPLAY(gg->current_display))
+      gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window),
+			     true, true, false);
+
 
   return redraw;
 }

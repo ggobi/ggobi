@@ -83,12 +83,29 @@ typedef struct /*-- ggobi --*/ {
 
 typedef struct _PrintOptions PrintOptions;
 
+
+#define GTK_TYPE_GGOBI		 (gtk_ggobi_get_type ())
+#define GTK_GGOBI(obj)		 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI, ggobid))
+#define GTK_GGOBI_CLASS(klass)	 (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI, GtkGGobiClass))
+#define GTK_IS_GGOBI(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI))
+#define GTK_IS_GGOBI_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI))
+
+GtkType gtk_ggobi_get_type(void);
+
+typedef struct _GtkGGobiClass
+{
+    GtkObjectClass parent_class;
+} GtkGGobiClass;
+
+
 /**
   @defgroup ggobid the ggobid instance structure.
   @brief This is the top-level structure representing a 
   ggobi instance.
  */
 struct _ggobid {
+
+  GtkObject object;
 
     /** 
        A tree 
@@ -523,5 +540,10 @@ datad *setDisplayEdge(displayd *dpy, datad *e);
 gchar *getOptValue(const char * const name, const char * const value);
 const char *getCommandLineArgValue(const char *name);
 void showHelp();
+
+void globals_init (ggobid *gg);
+
+void gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject *object,  GtkSignalFunc func, gpointer func_data, GtkArg *args);
+
 #endif
 

@@ -38,7 +38,8 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 
 void
-ctourpp_window_open (ggobid *gg) {
+ctourpp_window_open (ggobid *gg) 
+{
   GtkWidget *hbox, *vbox, *vbc, *frame, *tgl, *entry;
   GtkWidget *da, *label, *hb;
 
