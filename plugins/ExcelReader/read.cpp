@@ -58,7 +58,7 @@ ExcelDataDescription(const char * const fileName, const char * const modeName,
  
   if(!fileName || !fileName[0]) {
     fprintf(stderr, "No file name specified for the ExcelReader plugin to read.\n"); fflush(stderr);
-    //    return(NULL);
+    return(NULL);
   }
 
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
@@ -150,7 +150,9 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), 0);
 
   call(s, L"Close", NULL, 0);
+#ifdef DEBUG_EXCEL_PLUGIN
   fprintf(stderr, "Closed() the sheet\n"); fflush(stderr);
+#endif
 
   cells->Release();
   sheet->Release();
@@ -164,15 +166,27 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   getProperty(sheets, L"Count", v = &vars[3]);
   int numSheets = V_I4(v);
 
+#ifdef DEBUG_EXCEL_PLUGIN
   fprintf(stderr, "Num sheets = %d\n", numSheets);fflush(stderr);
+#endif
 
   for(int i = 0; i < numSheets ; i++) {
     v = &vars[4];
     V_VT(v) = VT_I4;
     V_I4(v) = i+1;
+#ifdef DEBUG_EXCEL_PLUGIN
     fprintf(stderr, "Asking for Item %d\n", i);fflush(stderr);
+#endif
     sheet = call(sheets, L"Item", v, 1);
-    fprintf(stderr, "got it\n");fflush(stderr);
+#ifdef DEBUG_EXCEL_PLUGIN
+    fprintf(stderr, "got it %p\n",sheet);fflush(stderr);
+#endif
+    if(!sheet) {
+#ifdef DEBUG_EXCEL_PLUGIN
+      fprintf(stderr, "skipping %d\n", i);fflush(stderr);
+#endif
+      continue;
+    }
     loadSheet(sheet, gg, fileName);    
     sheet->Release();
   }
@@ -181,8 +195,15 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   call(s, L"Close", NULL, 0);
 #endif
 
+#ifdef DEBUG_EXCEL_PLUGIN
+  fprintf(stderr, "Releasing books\n");fflush(stderr);
+#endif
   books->Release();
   iface->Release();
+
+#ifdef DEBUG_EXCEL_PLUGIN
+  fprintf(stderr, "Closing down Excel\n");fflush(stderr);
+#endif
 }
 
 datad *
@@ -195,9 +216,19 @@ loadSheet(IDispatch *sheet, ggobid *gg, gchar *fileName)
     cells = V_DISPATCH(v);
   getProperty(cells, L"Value", v = &vars[1]);
 
+  if(!v || V_VT(v) == VT_NULL) {
+    fprintf(stderr, "Null value passed back for used range\n");fflush(stderr);
+    releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), true);
+    return(NULL);
+  }
   datad *d = createDataset(v, gg);
-  getProperty(sheet, L"Name", v = &vars[2]);
-  d->name = FromBstr(V_BSTR(v));
+  if(d) {
+#ifdef DEBUG_EXCEL_PLUGIN
+    fprintf(stderr, "Finished getting dataset\n");fflush(stderr);
+#endif
+    getProperty(sheet, L"Name", v = &vars[2]);
+    d->name = FromBstr(V_BSTR(v));
+  }
 
   releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), true);
   return(d);
@@ -300,9 +331,24 @@ createDataset(VARIANT *var, ggobid *gg)
 
   numDim = SafeArrayGetDim(arr); //  should be two - always!
 
+#ifdef DEBUG_EXCEL_PLUGIN
+  fprintf(stderr, "Num dimensions %d\n", (int) numDim);fflush(stderr);
+#endif
+
   for(i = 0; i < 2; i++) {
     SafeArrayGetLBound(arr, i+1, &dim[i][0]);
     SafeArrayGetUBound(arr, i+1, &dim[i][1]);
+  }
+
+#ifdef DEBUG_EXCEL_PLUGIN
+  fprintf(stderr, "Dimensions: %d %d %d %d\n", 
+	  (int) dim[0][0], (int) dim[0][1],
+	  (int) dim[1][0], (int) dim[1][1]);fflush(stderr);
+#endif
+
+  if(dim[0][0] == dim[0][1]) {
+    //    SafeArrayDestroyData(arr);
+    return(NULL);
   }
 
   indices[0] = dim[0][0];
@@ -327,10 +373,6 @@ createDataset(VARIANT *var, ggobid *gg)
 	d->raw.vals[ctr][col] = -1.0;
       } else
          d->raw.vals[ctr][col] = asReal(&value);
-
-      if(ctr == 7 && col == 1) {
-	fprintf(stderr, "(8,1): %d  %lf\n", V_VT(&value), d->raw.vals[ctr][col]); fflush(stderr);
-      }
 
       VariantClear(&value);
     }
