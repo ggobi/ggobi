@@ -160,7 +160,7 @@ arrays_zero (array_s *arrp)
   int i, j;
   for (i=0; i<arrp->nrows; i++) {
     for (j=0; j<arrp->ncols; j++) {
-      arrp->vals[i][j] = 0.0;
+      arrp->vals[i][j] = 0;
     }
   }
 }
@@ -268,7 +268,7 @@ arrayl_zero (array_l *arrp)
   int i, j;
   for (i=0; i<arrp->nrows; i++) {
     for (j=0; j<arrp->ncols; j++) {
-      arrp->vals[i][j] = 0.0;
+      arrp->vals[i][j] = 0;
     }
   }
 }
