@@ -182,6 +182,8 @@ getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
   }  else
      lib = plugin->library;
 
+  g_printerr("Using library %p\n", lib);
+
   return(dynload->resolve(lib, tmp));
 }
 
@@ -575,6 +577,13 @@ GGobiInputPluginInfo XMLInputPluginInfo = {
 	xml_data
 };
 
+GGobiPluginDetails XMLDetails = {
+  "XML reader",
+  NULL,
+  NULL,
+  "Reads XML URLs (http, ftp, local files or zipped local files)",
+  "GGobi core"
+};
 
 GGobiInputPluginInfo CSVInputPluginInfo = {
 	"csv",
@@ -585,6 +594,15 @@ GGobiInputPluginInfo CSVInputPluginInfo = {
 	read_csv,
 	isCSVFile,
 	csv_data
+};
+
+
+GGobiPluginDetails CSVDetails = {
+  "CSV reader",
+  NULL,
+  NULL,
+  "Reads Comma-separated data from local files",
+  "Dongshin Kim (Iowa State University) & GGobi core"
 };
 
 
@@ -599,17 +617,45 @@ GGobiInputPluginInfo ASCIIInputPluginInfo = {
 	ascii_data
 };
 
+GGobiPluginDetails ASCIIDetails = {
+  "ASCII data reader",
+  NULL,
+  NULL,
+  "Reads ASCII data in XGobi format of separate data, variable name, glyph, ... files",
+  "GGobi core"
+};
+
+
 
 GGobiPluginInfo  *
-createGGobiInputPluginInfo(GGobiInputPluginInfo *info)
+createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *details)
 {
   GGobiPluginInfo  *plugin; 
+  static HINSTANCE ggobiLibrary = NULL;
+ 
+  if(!details->dllName && !details->library) {
+    g_printerr("Using ggobi as library\n");
+    if(!ggobiLibrary) {
+      ggobiLibrary = ggobi_dlopen(sessionOptions->cmdArgs[0], details);
+      g_printerr("Loaded ggobi as library %p\n", ggobiLibrary);
+      if(!ggobiLibrary) {
+	char buf[1000];
+	g_printerr("Failed to load ggobi as library\n");
+	ggobi_dlerror(buf, plugin);
+	g_printerr(buf);
+      } else
+         g_printerr("Loaded ggobi as library\n");
+    }
+
+    details->library = ggobiLibrary;
+  }
+
   plugin = (GGobiPluginInfo *) malloc(sizeof(GGobiPluginInfo));
   memset(plugin, '\0', sizeof(GGobiPluginInfo));
 
   plugin->type = INPUT_PLUGIN;
   plugin->info.i = info;
-  plugin->details = NULL;
+  plugin->details = details;
 
   return(plugin);
 }
@@ -619,13 +665,13 @@ registerDefaultPlugins(GGobiInitInfo *info)
 {
   GGobiPluginInfo  *plugin; 
   
-  plugin = createGGobiInputPluginInfo(&XMLInputPluginInfo);
+  plugin = createGGobiInputPluginInfo(&XMLInputPluginInfo, &XMLDetails);
   info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 
-  plugin = createGGobiInputPluginInfo(&CSVInputPluginInfo);
+  plugin = createGGobiInputPluginInfo(&CSVInputPluginInfo, &CSVDetails);
   info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 
-  plugin = createGGobiInputPluginInfo(&ASCIIInputPluginInfo);
+  plugin = createGGobiInputPluginInfo(&ASCIIInputPluginInfo, &ASCIIDetails);
   info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 }
 
