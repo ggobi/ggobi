@@ -511,13 +511,17 @@ if test -n "${ENABLE_ALL_PLUGINS}" && test ${ENABLE_ALL_PLUGINS} -gt 0 ; then
  FILESELECTOR_PLUGIN=1
  GRAPHLAYOUT_PLUGIN=1
  GGVIS_PLUGIN=1
+
  PLUGIN_DIRS=""
- TMP=`cd plugins ; ls *`
+ TMP=`cd plugins ; ls`
  for i in ${TMP}; do
-   if test -d $i ; then
+   if test -d plugins/$i ; then
      PLUGIN_DIRS="${PLUGIN_DIRS} $i"
    fi
  done
+
+echo "Plugin directories: $PLUGIN_DIRS"
+
 # PLUGIN_DIRS="ImageLib MySQL Postgres DataViewer FileSelect GraphLayout ggvis Perl R JVM"
 fi
 
@@ -591,7 +595,6 @@ AC_SUBST(INSTALL_DIR)
  dnl script for the corresponding @variable@ in these files.
 AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate share/ggobirc local.config share/tools/plugin)
 
-
 cp src/config.h include/GGobiConfig.h
 
 dnl Ensure the resulting ggobi scripts executable.
@@ -618,12 +621,14 @@ dnl might do the same thing.
  done 
 fi
 
+AC_OUTPUT(Plugins)
+
 echo "*******************************"
 echo ""
 echo "GGobi"
-echo " Version:               $GGOBI_VERSION_STRING"
-echo "Installation directory: $INSTALL_DIR"
-echo "XML:                    version ${XML_VERSION}"
-echo "Plugins:                ${PLUGIN_DIRS}"
+echo " Version:                $GGOBI_VERSION_STRING"
+echo " Installation directory: $INSTALL_DIR"
+echo " XML:                    version ${XML_VERSION}"
+echo " Plugins:                ${PLUGIN_DIRS}"
 echo ""
 echo "*******************************"

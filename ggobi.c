@@ -547,28 +547,33 @@ computeGGobiHome(char *str)
   gchar *dir, *dirPtr, *tmp;
 
   tmp = getenv("GGOBI_HOME");
-  if(tmp && tmp[0]) {
-    return(g_strdup(tmp));
-  }
 
 #ifdef WIN32
-  tmp = getGGobiHomeFromRegistry(); 
-  if(tmp) 
-     return(tmp);
+  if(!tmp || !tmp[0]) 
+    tmp = getGGobiHomeFromRegistry(); 
 #endif
 
-  dir = str;
-  dirPtr = strrchr(dir, G_DIR_SEPARATOR);
+  if(!tmp) {
+    dir = str;
+    dirPtr = strrchr(dir, G_DIR_SEPARATOR);
 
-  if(!dirPtr) {
+    if(!dirPtr) {
      return(g_strdup(""));
+    }
+
+    tmp = (char *) g_malloc( ((dirPtr - dir) + 1)*sizeof(char));
+    strncpy(tmp, dir, dirPtr-dir + 1);
+    tmp[(dirPtr - dir) + 1] = '\0';
   }
 
-  tmp = (char *) g_malloc( ((dirPtr - dir) + 1)*sizeof(char));
-  strncpy(tmp, dir, dirPtr-dir + 1);
-  tmp[(dirPtr - dir) + 1] = '\0';
+  if(tmp[strlen(tmp)-1] == G_DIR_SEPARATOR)
+     dir = g_strdup(tmp);
+  else {
+     dir = (char *) g_malloc( (strlen(tmp) + 2)*sizeof(char));
+     sprintf(dir, "%s%c", tmp, G_DIR_SEPARATOR);
+  }
 
-  return(tmp);
+  return(dir);
 }
 
 void

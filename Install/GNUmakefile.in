@@ -58,6 +58,9 @@ Python: @EMBED_LIB@
 
 GGOBI_HOME=$(shell pwd)
 
+include Plugins
+
+
 ifneq (${PLUGIN_DIRS},)
 Plugins:  @EMBED_LIB@
 	if test -n "${PLUGIN_DIRS}" ; then \
