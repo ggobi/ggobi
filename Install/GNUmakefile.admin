@@ -20,7 +20,8 @@ DATA_SRC_FILES=\
    flea.col flea.colors flea.dat flea.doc flea.glyphs flea.row \
    roos.col roos.dat roos.doc roos.missing roos.row \
    flea.xml pigs.xml ratcns.xml sat.xml sleep.xml eies.xml buckyball.xml \
-   stdColorMap.xml \
+   stdColorMap.xml prim7.xml olive.col olive.dat olive.row olive.xml \
+   places.xml algal-bloom.xml \
    ggobi.dtd
 
 # Note that COI which provides an example of an XML file containing

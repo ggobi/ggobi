@@ -11,10 +11,10 @@ Checking installation:
 =====================
 
 make ADMIN=1 DOC_TEX_FILES=
-cd /tmp/Install/ggobi
+cd /tmp/ggobi/Install/ggobi
 ./configure
 make (or gmake)
-
+bin/ggobi data/flea
 
 Creating new modules on franz
 =============================
@@ -46,6 +46,10 @@ single directory named libs/ on my machine.
 Updating the Web Page
 =====================
 
+Update the GGOBI_SRC directory, so that the notes documents are
+updated. Then pdflatex the documentation files in the $GGOBI_SRC/notes
+directory because these will be loaded up from this directory.
+
 To checkout the CVS module,  use
    cvs co Web
 with the CVSROOT variable set to
@@ -60,3 +64,70 @@ checked out version of the Web/ module, type
 
 (You may need to set GGOBI_SRC to the location of the src code, and
 hence the notes directory which contains pieces for the web site.)
+
+Preparing a Release
+===================
+
+ssh franz.stat.wisc.edu
+
+alias R=/usr/bin/R
+export R_HOME=`R RHOME`
+export CVSROOT=/home/xgobi/CVSRoot
+export OMEGA_HOME=~omega/org/omegahat
+export TEXINPUTS=$TEXINPUTS:$OMEGA_HOME
+
+0. Make sure all three directories are up to date.
+
+  cd ggobi
+  cvs update -d -P
+  cd RSggobi
+  cvs update -d -P
+  cd Web
+  cvs update -d -P
+
+1. Do local testing
+     cd ggobi
+     make ADMIN=1 DOC_TEX_FILES=
+     cd /tmp/ggobi/Install/ggobi
+     ./configure  --with-xml=/usr/lib/libxml2
+         or, if that isn't working properly,
+     ./configure  --with-xml
+     make
+
+2. Build the tar file, from the ggobi directory, not the test directory.
+
+  make ADMIN=1 DOC_TEX_FILES= tar
+
+3. cd Web, make install
+
+R-GGobi Installation from cvs
+=============================
+
+build it from cvs
+
+  cd RSggobi
+  make ADMIN=1 DOC_FILES="" tar
+  (see Omegahat below)
+
+install it
+
+1. if it's a local install
+
+ R CMD INSTALL -l /usr/dfs/ggobi/R Rggobi_0.3-0.tar.gz
+ > library(Rggobi, lib.loc = ".")
+
+2. if it's in the R home
+
+ R CMD INSTALL Rggobi_0.3-0.tar.gz
+ > library(Rggobi)
+
+Omegahat include files:
+
+Pick up this file:
+  http://www.omegahat.org/download/OmegahatIncludes.tar.gz
+
+cd ~/omegahat  
+  Under this directory, there exists org/omegahat
+    and OMEGA_HOME=~/omegahat/org/omegahat
+tar xvf OmegahatIncludes.tar 
+
