@@ -164,6 +164,8 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
   if (edge_painting_p && e != NULL) {
     for (k=0; k<e->edge.n; k++) {
       e->color_now.els[k] = e->color.els[k];
+      e->glyph_now.els[k].type = e->glyph.els[k].type;
+      e->glyph_now.els[k].size = e->glyph.els[k].size;
       e->hidden_now.els[k] = e->hidden.els[k];
     }
   }
