@@ -176,7 +176,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   if (cpanel->projection == XYPLOT) {
     sp->mousepos.x = event->x;
     sp->mousepos.y = event->y;
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+    if (sp->motion_id)
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
   }
 
   return retval;
@@ -194,8 +195,10 @@ movepts_event_handlers_toggle (splotd *sp, gboolean state) {
                                          (GtkSignalFunc) button_release_cb,
                                          (gpointer) sp);
   } else {
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
+    if (sp->press_id)
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
+    if (sp->release_id)
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
   }
 }
 

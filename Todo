@@ -14,9 +14,11 @@ API code needed:
 various stuff not yet implemented: 
   1d, xy cycling  .... or leave it as a demo in R for now?
   some window closings  (display tree, ...)
-  row groups
-  moving points
-  the sphering transformation as it has been updated in xgobi
+  row groups are only partially implemented; line groups
+    will wait until we know what we want to do about lines.
+
+the sphering transformation has some bugs, and the interface
+ is still confusing
 
 when brushing or identifying in parcoords, use leave/enter events to
   change the current_splot.
@@ -37,7 +39,8 @@ Smoothing -- to take advantage of the R loess code
 
 old-style I/O -- the biggest part is now in place.  extend
   user options to write_xml.  Add the ability to extend the
-  current file set by one or more files.
+  current file set by one or more files.  (wait until the
+  dtd has been redesigned to handle multiple datad objects)
 
 Graphs
   Edges with data: a separate region of the variable selection panel
@@ -135,3 +138,5 @@ Food for thought:
 
 ! Window menu:  build it more permanently, and then rebuild it
 !   whenever the number (or contents) of the d's has changed.
+
+! moving points -- works in 2d plots
