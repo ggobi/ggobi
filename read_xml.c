@@ -532,20 +532,6 @@ resolveAllEdgeIds(XMLParserData *parserData)
 
 }
 
-/*-- used to find ranks --*/
-gint
-edgesumcompare (const void *val1, const void *val2)
-{
-  const endpointsd *etmp1 = (const endpointsd *) val1;
-  const endpointsd *etmp2 = (const endpointsd *) val2;
-
-  if (etmp1->a + etmp1->b < etmp2->a + etmp2->b)
-    return (-1);
-  if (etmp1->a + etmp1->b == etmp2->a + etmp2->b)
-    return (0);
-  return (1);
-}
-
 gint
 edgecompare (const void *val1, const void *val2)
 {
