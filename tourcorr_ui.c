@@ -69,25 +69,29 @@ static void tourcorr_reinit_cb (GtkWidget *w, ggobid *gg) {
 
 }
 
+/*
 static void syncaxes_cb (GtkToggleButton *button)
 {
   g_printerr ("syncaxes: %d\n", button->active);
 }
+*/
+/*
 static void
 hide_cb (GtkWidget *w ) {
   gtk_widget_hide (w);
 }
+*/
 
+#ifdef TOUR_PP_IMPLEMENTED
 static void ctourpp_cb (GtkWidget *w, ggobid *gg) {
-  #ifdef TOUR_PP_IMPLEMENTED
   ctourpp_window_open (gg);
-  #endif
 }
+#endif
+#ifdef TOUR_ADV_IMPLEMENTED
 static void ctouradv_cb (GtkWidget *w, gpointer dummy) {
-  #ifdef TOUR_ADV_IMPLEMENTED
   ctouradv_window_open ();
-  #endif
 }
+#endif
 
 static gchar *manip_lbl[] = {"Off", "Comb", "Vertical", "Horizontal", 
                              "EqualComb"};
@@ -98,6 +102,7 @@ static void manip_cb (GtkWidget *w, gpointer cbd)
 
   dsp->tc_manip_mode = GPOINTER_TO_INT (cbd);
 }
+/*
 static gchar *pathlen_lbl[] = {"1/10", "1/5", "1/4", "1/3", "1/2", "1",
                                "2", "10", "Infinite"};
 static void pathlen_cb (GtkWidget *w, gpointer cbd)
@@ -105,12 +110,14 @@ static void pathlen_cb (GtkWidget *w, gpointer cbd)
   gint indx = GPOINTER_TO_INT (cbd);
   g_printerr ("cbd: %s\n", pathlen_lbl[indx]);
 }
+*/
 
 void
 cpanel_ctour_make (ggobid *gg) {
-  GtkWidget *box, *tgl, *btn, *sbar, *vb, *lbl;
+  GtkWidget *box, *btn, *sbar, *vb, *lbl;
   GtkObject *adj;
-  GtkWidget *manip_opt, *pathlen_opt;
+  GtkWidget *manip_opt;
+  /* GtkWidget *pathlen_opt, *tgl; */
   
   gg->control_panel[COTOUR] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[COTOUR]), 5);
@@ -242,8 +249,8 @@ The following are considered advanced features for now:
   history
 */
 
+/*
 static GtkWidget *window = NULL;
-
 static void
 ctouradv_window_open (void) {
   GtkWidget *vbox, *btn, *frame;
@@ -258,12 +265,10 @@ ctouradv_window_open (void) {
     vbox = gtk_vbox_new (false, 2);
     gtk_container_add (GTK_CONTAINER (window), vbox);
     
-    /*-- tour history functions --*/
     frame = gtk_frame_new ("History");
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 0);
 
-    /*-- Close button --*/
     btn = gtk_button_new_with_label ("Close");
     gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
                    GTK_SIGNAL_FUNC (hide_cb), (GtkObject*) window);
@@ -272,6 +277,7 @@ ctouradv_window_open (void) {
 
   gtk_widget_show_all (window);
 }
+*/
 
 /*----------------------------------------------------------------------*/
 /*                              I/O events                              */

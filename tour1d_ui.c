@@ -81,21 +81,23 @@ static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg)
   display_tailpipe (gg->current_display, FULL, gg);
 }
 
+/*
 static void tour1d_vert_cb (GtkToggleButton *button, ggobid *gg)
 {
   tour1d_vert (&gg->current_display->cpanel, button->active);
 }
+*/
 
 static void tour1dpp_cb (GtkWidget *w, ggobid *gg) 
 {
   tour1dpp_window_open (gg);
 }
 
+#ifdef TOUR_ADV_IMPLEMENTED
 static void tour1dadv_cb (GtkWidget *w, ggobid *gg) {
-  #ifdef TOUR_ADV_IMPLEMENTED
   tour1dadv_window_open (gg);
-  #endif
 }
+#endif
 
 void
 cpanel_tour1d_make (ggobid *gg) {
@@ -174,7 +176,7 @@ cpanel_tour1d_make (ggobid *gg) {
 /*
  * Box to hold 'vertical' button
 */
-  #ifdef TOUR_ADV_IMPLEMENTED
+#ifdef TOUR_ADV_IMPLEMENTED
   box = gtk_hbox_new (true, 1);
 
   btn = gtk_check_button_new_with_label ("Vertical");
@@ -201,7 +203,7 @@ cpanel_tour1d_make (ggobid *gg) {
 /*
  * advanced features button
 */
-  #ifdef TOUR_ADV_IMPLEMENTED
+#ifdef TOUR_ADV_IMPLEMENTED
   btn = gtk_button_new_with_label ("Advanced features ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for additional grand tour features", NULL);
@@ -209,7 +211,7 @@ cpanel_tour1d_make (ggobid *gg) {
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (tour1dadv_cb), gg);
-  #endif
+#endif
 
 
   gtk_widget_show_all (gg->control_panel[TOUR1D]);
@@ -232,8 +234,8 @@ The following are considered advanced features for now:
   section tour
 */
 
-static GtkWidget *window = NULL;
 
+#ifdef TOUR_ADV_IMPLEMENTED
 static gchar *pathlen_lbl[] = {"1/10", "1/5", "1/4", "1/3", "1/2", "1",
                                "2", "10", "Infinite"};
 static void pathlen_cb (GtkWidget *w, gpointer cbd)
@@ -241,19 +243,25 @@ static void pathlen_cb (GtkWidget *w, gpointer cbd)
   gint indx = GPOINTER_TO_INT (cbd);
   g_printerr ("cbd: %s\n", pathlen_lbl[indx]);
 }
+#endif
 
+#ifdef TOUR_ADV_IMPLEMENTED
 static gchar *interp_lbl[] = {"Geodesic", "Householder", "Givens"};
 static void interp_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
   g_printerr ("cbd: %s\n", interp_lbl[indx]);
 }
+#endif
 
+#ifdef TOUR_ADV_IMPLEMENTED
 static void localscan_cb (GtkToggleButton *button)
 {
   g_printerr ("local scan: %d\n", button->active);
 }
+#endif
 
+#ifdef TOUR_ADV_IMPLEMENTED
 static void step_cb (GtkToggleButton *tgl, GtkWidget *btn)
 {
   g_printerr ("step: %d\n", tgl->active);
@@ -266,12 +274,16 @@ static void go_cb (GtkButton *button, ggobid *gg)
 
   tour1d_do_step (dsp, gg);
 }
+#endif
 
+#ifdef TOUR_ADV_IMPLEMENTED
 static void storebases_cb (GtkToggleButton *button)
 {
   g_printerr ("store bases: %d\n", button->active);
 }
+#endif
 
+#ifdef TOUR_ADV_IMPLEMENTED
 /* 
  * Section callbacks
 */
@@ -286,7 +298,10 @@ static void epsilon_cb (GtkAdjustment *adj, gpointer cbd) {
 static void hide_cb (GtkWidget *w ) {
   gtk_widget_hide (w);
 }
+#endif
 
+#ifdef TOUR_ADV_IMPLEMENTED
+static GtkWidget *window = NULL;
 static void tour1dadv_window_open (ggobid *gg) {
   GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
   GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;
@@ -493,6 +508,7 @@ static void tour1dadv_window_open (ggobid *gg) {
   gtk_widget_show_all (window);
 
 }
+#endif
 
 /*----------------------------------------------------------------------*/
 /*                              I/O events                              */
