@@ -38,4 +38,8 @@
 <edge source="node 6" destination="BS D" />
 </edges>
 
+<edges name="base station links" count="3">
+ <edge />
+</edges>
+
 </ggobidata>

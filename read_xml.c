@@ -259,6 +259,8 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->recordStringLength = 0;
 
   data->autoLevels = NULL;
+
+  data->usesStringIds = false;
 }
 
 void 
@@ -1726,27 +1728,26 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
     gchar *dupTmp;
 	    /* No need to check since this will either be the first and hence NULL or already created,
                so can use an else for this condition. */
-    if(data->idTable == NULL) {
+    if(data->usesStringIds) {
+      if(data->idTable == NULL) {
         data->idTable = g_hash_table_new(g_str_hash, g_str_equal);
-	if(data->usesStringIds) {
-   	    d->idTable = data->idTable;
-	    d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
-	    memset(d->rowIds, '\0', sizeof(gchar *) * d->nrows);
-	}
-    } else {
-       if(g_hash_table_lookup(data->idTable, tmp))
-         ggobi_XML_error_handler(data, "duplicated id in record %d of dataset %s\n", 
-                                   data->current_record + 1, data->current_data->name);
-    }
-
-    if (data->usesStringIds == false && d->rowid.id.nels == 0) {
+        d->idTable = data->idTable;
+	d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
+	memset(d->rowIds, '\0', sizeof(gchar *) * d->nrows);
+      } else {
+        if(g_hash_table_lookup(data->idTable, tmp))
+           ggobi_XML_error_handler(data, "duplicated id in record %d of dataset %s\n", 
+                                     data->current_record + 1, data->current_data->name);
+      }
+    } else if(d->rowid.id.nels == 0) {
       rowids_alloc (d);
     }
 
-    ptr = (guint *) g_malloc(sizeof(guint));
-    ptr[0] = i;
-    g_hash_table_insert(data->idTable, dupTmp = g_strdup(tmp), ptr);
+
     if(data->usesStringIds) {
+      ptr = (guint *) g_malloc(sizeof(guint));
+      ptr[0] = i;
+      g_hash_table_insert(data->idTable, dupTmp = g_strdup(tmp), ptr);
       d->rowIds[i] = dupTmp;
     } else {
       value = strToInteger (tmp);
