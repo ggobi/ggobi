@@ -1,5 +1,5 @@
 AUX_FILES=\
-   Makefile GNUmakefile Makevars 
+   Makefile GNUmakefile Makevars  README INSTALL
 
 createDist:: configure
 	if test -d $(INSTALL_DIR)/$(DIR_NAME) ; then rm -fr $(INSTALL_DIR)/$(DIR_NAME) ; fi
