@@ -765,7 +765,7 @@ projection.
 *********************************************************************/
 
 
-gfloat t1d_calc_indx (array_f data, array_f proj, 
+gfloat t1d_calc_indx (array_f data, array_d proj, 
                 gint *rows, gint nrows, 
                 gint ncols,
                 gint (*index) (array_f*, void*, gfloat*),
@@ -785,7 +785,7 @@ gfloat t1d_calc_indx (array_f data, array_f proj,
     pdata.vals[i][0] = 0.0;
     for (j=0; j<ncols; j++)
     { 
-      pdata.vals[i][0] += data.vals[i][j]*proj.vals[0][j];
+      pdata.vals[i][0] += data.vals[i][j]*(gfloat)proj.vals[0][j];
     }
   }
 
@@ -811,13 +811,13 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
   gdata  = malloc (nrows*sizeof(gfloat));
 
   for (i=0; i<d->nrows_in_plot; i++)
-    for (j=0; j<dsp->t1d.nvars; j++)
+    for (j=0; j<dsp->t1d.nactive; j++)
       dsp->t1d_pp_op.data.vals[i][j] = 
-        d->tform.vals[d->rows_in_plot[i]][dsp->t1d.vars.els[j]];
+        d->tform.vals[d->rows_in_plot[i]][dsp->t1d.active_vars.els[j]];
 
-  for (j=0; j<dsp->t1d.nvars; j++)
+  for (j=0; j<dsp->t1d.nactive; j++)
     dsp->t1d_pp_op.proj_best.vals[j][0] = 
-      dsp->t1d.u.vals[0][dsp->t1d.vars.els[j]];
+      dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]];
 
   if (d->clusterid.els==NULL) printf ("No cluster information found\n");
     for (i=0; i<nrows; i++)
@@ -832,14 +832,14 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
   { 
     case PCA: 
       dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.u, d->rows_in_plot, d->nrows, d->ncols, pca, NULL);
+        dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, pca, NULL);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, pca, &cvp);
       break;
     case LDA: 
       alloc_discriminant_p (&dp, gdata, nrows, pdim);
       dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.u, d->rows_in_plot, d->nrows, d->ncols, 
+        dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 
         discriminant, &dp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, discriminant, &dp);
@@ -848,7 +848,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
     case CART_GINI: 
       alloc_cartgini_p (&cgp, nrows, gdata);
       dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.u, d->rows_in_plot, d->nrows, d->ncols,
+        dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols,
         cartgini, &cgp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, cartgini, &cgp);
@@ -857,7 +857,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
     case CART_ENTROPY: 
       alloc_cartentropy_p (&cep, nrows, gdata);
       dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.u, d->rows_in_plot, d->nrows, d->ncols, 
+        dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 
         cartentropy, &cep);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &cep);
@@ -866,7 +866,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
     case CART_VAR: 
       alloc_cartvariance_p (&cvp, nrows, gdata);
       dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.u, d->rows_in_plot, d->nrows, d->ncols, 
+        dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 
         cartvariance, &cvp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &cep);
@@ -874,7 +874,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       break;
     case SUBD: 
       alloc_subd_p (&sp, nrows, pdim);
-      dsp->t1d.ppval  = t1d_calc_indx (d->tform, dsp->t1d.u, 
+      dsp->t1d.ppval  = t1d_calc_indx (d->tform, dsp->t1d.F, 
         d->rows_in_plot, d->nrows, d->ncols, subd, &sp);
       if (basismeth == 1)
         kout  = optimize0 (&dsp->t1d_pp_op, subd, &sp);

@@ -110,7 +110,7 @@ t1d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
   extern void t1d_optimz(gint, gboolean *, gint *);
   /*  extern void t1d_optimz(gint, ggobid *);*/
   t1d_optimz(w->active, &dsp->t1d.get_new_target, 
-    &dsp->t1d.target_basis_method);
+    &dsp->t1d.target_selection_method);
 }
 
 gchar *t1d_pp_func_lbl[] = {"PCA"};
@@ -418,8 +418,9 @@ tour1dpp_window_open (ggobid *gg) {
 */
   }
 
-  alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nvars, 1);
-  gtk_widget_show (dsp->t1d_window);
+  alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 1);
+
+  gtk_widget_show_all (dsp->t1d_window);
 }
 
 #undef SUBD           

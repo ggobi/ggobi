@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
-void gt_basis (array_f, gint, vector_i, gint, gint);
+void gt_basis (array_d, gint, vector_i, gint, gint);
 void splot_cursor_set (gint jcursor, splotd *sp);
 gchar *datasetName (datad *d, ggobid *gg);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
@@ -104,9 +104,9 @@ void brush_prev_vectors_update (datad *, ggobid *);
 void brush_reset(ggobid *gg, gint action);
 void brush_set_pos (gint, gint, splotd *);
 void brush_undo (splotd *, datad *, ggobid *);
-float calc_norm (gfloat *x, gint n);
+gdouble calc_norm (gdouble *x, gint n);
 void checkbox_delete_nth (gint jvar, datad *);
-gboolean checkequiv(gfloat **u0, gfloat **u1, gint nc, gint nd);
+gboolean checkequiv(gdouble **u0, gdouble **u1, gint nc, gint nd);
 void clone_vars (gint *cols, gint ncols, datad *, ggobid *);
 void cluster_free (gint, datad *, ggobid *);
 void cluster_window_open (ggobid *);
@@ -115,7 +115,7 @@ void collab_tform_update (gint j, datad *d, ggobid *gg);
 gboolean collabels_read (InputDescription *desc, gboolean, datad *, ggobid *);
 void color_table_init (ggobid *);
 gchar* computeTitle (gboolean, displayd *, ggobid *);
-void copy_mat(gfloat **, gfloat **, gint, gint);
+void copy_mat(gdouble **, gdouble **, gint, gint);
 void cpanel_brush_init (cpaneld *, ggobid *);
 void cpanel_brush_make (ggobid *);
 void cpanel_brush_set (cpaneld *, ggobid *);
@@ -191,7 +191,7 @@ void displays_plot (splotd *, RedrawStyle, ggobid *);
 void displays_tailpipe (gint, RedrawStyle, ggobid *);
 gint do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *, gfloat *);
 void draw_glyph (GdkDrawable *, glyphd *, icoords *, gint, ggobid *);
-gint dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v);
+gint dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
 void edgeedit_event_handlers_toggle (splotd *, gboolean);
 void edges_alloc (gint, datad *);
 void edges_create (datad *, ggobid *);

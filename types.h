@@ -96,15 +96,15 @@ typedef struct {
 
 /*-- tour elements --*/
 typedef struct {
-  gint nvars;
-  vector_i vars;
-  array_f u0, u1, u, uold, v0, v1, v, uvevec, tv;
+  gint datadim, projdim, nactive;
+  vector_i active_vars;
+  array_d Fa, Fz, F, Ga, Gz, G, Va, Vz, tv;
   vector_f lambda, tau, tinc;
-  gfloat dv, delta;
+  gfloat dist_az, delta;
+  gint target_selection_method;
   gint idled;
   gboolean get_new_target;
   gint nsteps, stepcntr;
-  gint target_basis_method;
   gint index; /* this is for counting planes passed */
   gfloat ppval; /* for projection pursuit */
 } tour;

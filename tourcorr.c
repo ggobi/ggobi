@@ -29,32 +29,34 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
   gint nc = d->ncols;
 
   /* first index is the projection dimensions, second dimension is ncols */
-  arrayf_init_null(&dsp->tcorr1.u0);
-  arrayf_alloc(&dsp->tcorr1.u0, 2, nc);
+  arrayd_init_null(&dsp->tcorr1.Fa);
+  arrayd_alloc(&dsp->tcorr1.Fa, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr1.u1);
-  arrayf_alloc(&dsp->tcorr1.u1, 2, nc);
+  arrayd_init_null(&dsp->tcorr1.Fz);
+  arrayd_alloc(&dsp->tcorr1.Fz, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr1.u);
-  arrayf_alloc(&dsp->tcorr1.u, 2, nc);
+  arrayd_init_null(&dsp->tcorr1.F);
+  arrayd_alloc(&dsp->tcorr1.F, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr1.v0);
-  arrayf_alloc(&dsp->tcorr1.v0, 2, nc);
+  arrayd_init_null(&dsp->tcorr1.Ga);
+  arrayd_alloc(&dsp->tcorr1.Ga, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr1.v1);
-  arrayf_alloc(&dsp->tcorr1.v1, 2, nc);
+  arrayd_init_null(&dsp->tcorr1.Gz);
+  arrayd_alloc(&dsp->tcorr1.Gz, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr1.v);
-  arrayf_alloc(&dsp->tcorr1.v, 2, nc);
+  arrayd_init_null(&dsp->tcorr1.G);
+  arrayd_alloc(&dsp->tcorr1.G, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr1.uvevec);
-  arrayf_alloc(&dsp->tcorr1.uvevec, 2, nc);
+  arrayd_init_null(&dsp->tcorr1.Va);
+  arrayd_alloc(&dsp->tcorr1.Va, 1, nc);
+  arrayd_init_null(&dsp->tcorr1.Vz);
+  arrayd_alloc(&dsp->tcorr1.Vz, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr1.tv);
-  arrayf_alloc(&dsp->tcorr1.tv, 2, nc);
+  arrayd_init_null(&dsp->tcorr1.tv);
+  arrayd_alloc(&dsp->tcorr1.tv, 1, nc);
 
-  vectori_init_null(&dsp->tcorr1.vars);
-  vectori_alloc(&dsp->tcorr1.vars, nc);
+  vectori_init_null(&dsp->tcorr1.active_vars);
+  vectori_alloc(&dsp->tcorr1.active_vars, nc);
   vectorf_init_null(&dsp->tcorr1.lambda);
   vectorf_alloc(&dsp->tcorr1.lambda, nc);
   vectorf_init_null(&dsp->tcorr1.tau);
@@ -63,38 +65,40 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
   vectorf_alloc(&dsp->tcorr1.tinc, nc);
 
   /* manipulation controls */
-  arrayf_init_null(&dsp->tc1_manbasis);
-  arrayf_alloc(&dsp->tc1_manbasis, 2, nc);
-  arrayf_init_null(&dsp->tc2_manbasis);
-  arrayf_alloc(&dsp->tc2_manbasis, 2, nc);
+  arrayd_init_null(&dsp->tc1_manbasis);
+  arrayd_alloc(&dsp->tc1_manbasis, 2, nc);
+  arrayd_init_null(&dsp->tc2_manbasis);
+  arrayd_alloc(&dsp->tc2_manbasis, 2, nc);
 
   /* first index is the projection dimensions, second dimension is ncols */
-  arrayf_init_null(&dsp->tcorr2.u0);
-  arrayf_alloc(&dsp->tcorr2.u0, 2, nc);
+  arrayd_init_null(&dsp->tcorr2.Fa);
+  arrayd_alloc(&dsp->tcorr2.Fa, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr2.u1);
-  arrayf_alloc(&dsp->tcorr2.u1, 2, nc);
+  arrayd_init_null(&dsp->tcorr2.Fz);
+  arrayd_alloc(&dsp->tcorr2.Fz, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr2.u);
-  arrayf_alloc(&dsp->tcorr2.u, 2, nc);
+  arrayd_init_null(&dsp->tcorr2.F);
+  arrayd_alloc(&dsp->tcorr2.F, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr2.v0);
-  arrayf_alloc(&dsp->tcorr2.v0, 2, nc);
+  arrayd_init_null(&dsp->tcorr2.Ga);
+  arrayd_alloc(&dsp->tcorr2.Ga, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr2.v1);
-  arrayf_alloc(&dsp->tcorr2.v1, 2, nc);
+  arrayd_init_null(&dsp->tcorr2.Gz);
+  arrayd_alloc(&dsp->tcorr2.Gz, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr2.v);
-  arrayf_alloc(&dsp->tcorr2.v, 2, nc);
+  arrayd_init_null(&dsp->tcorr2.G);
+  arrayd_alloc(&dsp->tcorr2.G, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr2.uvevec);
-  arrayf_alloc(&dsp->tcorr2.uvevec, 2, nc);
+  arrayd_init_null(&dsp->tcorr2.Va);
+  arrayd_alloc(&dsp->tcorr2.Va, 1, nc);
+  arrayd_init_null(&dsp->tcorr2.Vz);
+  arrayd_alloc(&dsp->tcorr2.Vz, 1, nc);
 
-  arrayf_init_null(&dsp->tcorr2.tv);
-  arrayf_alloc(&dsp->tcorr2.tv, 2, nc);
+  arrayd_init_null(&dsp->tcorr2.tv);
+  arrayd_alloc(&dsp->tcorr2.tv, 1, nc);
 
-  vectori_init_null(&dsp->tcorr2.vars);
-  vectori_alloc(&dsp->tcorr2.vars, nc);
+  vectori_init_null(&dsp->tcorr2.active_vars);
+  vectori_alloc(&dsp->tcorr2.active_vars, nc);
   vectorf_init_null(&dsp->tcorr2.lambda);
   vectorf_alloc(&dsp->tcorr2.lambda, nc);
   vectorf_init_null(&dsp->tcorr2.tau);
@@ -113,33 +117,35 @@ tourcorr_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->d == d) {
-      arrayf_delete_cols (&dsp->tcorr1.u0, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr1.u1, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr1.u, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr1.v0, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr1.v1, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr1.v, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr1.uvevec, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr1.tv, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Fa, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Fz, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr1.F, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Ga, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Gz, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr1.G, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Va, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Vz, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr1.tv, nc, cols);
 
-      vectori_delete_els (&dsp->tcorr1.vars, nc, cols);
+      vectori_delete_els (&dsp->tcorr1.active_vars, nc, cols);
       vectorf_delete_els (&dsp->tcorr1.lambda, nc, cols);
       vectorf_delete_els (&dsp->tcorr1.tau, nc, cols);
       vectorf_delete_els (&dsp->tcorr1.tinc, nc, cols);
 
-      arrayf_delete_cols (&dsp->tc1_manbasis, (gint) nc, cols);
-      arrayf_delete_cols (&dsp->tc2_manbasis, (gint) nc, cols);
+      arrayd_delete_cols (&dsp->tc1_manbasis, (gint) nc, cols);
+      arrayd_delete_cols (&dsp->tc2_manbasis, (gint) nc, cols);
 
-      arrayf_delete_cols (&dsp->tcorr2.u0, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr2.u1, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr2.u, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr2.v0, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr2.v1, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr2.v, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr2.uvevec, nc, cols);
-      arrayf_delete_cols (&dsp->tcorr2.tv, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Fa, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Fz, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr2.F, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Ga, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Gz, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr2.G, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Va, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Vz, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr2.tv, nc, cols);
 
-      vectori_delete_els (&dsp->tcorr2.vars, nc, cols);
+      vectori_delete_els (&dsp->tcorr2.active_vars, nc, cols);
       vectorf_delete_els (&dsp->tcorr2.lambda, nc, cols);
       vectorf_delete_els (&dsp->tcorr2.tau, nc, cols);
       vectorf_delete_els (&dsp->tcorr2.tinc, nc, cols);
@@ -160,71 +166,75 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
     if (dsp->displaytype != scatterplot)
       continue;
 
-    old_ncols = dsp->tcorr1.u0.ncols;
+    old_ncols = dsp->tcorr1.Fa.ncols;
 
     if (old_ncols < 2 && nc >= 2) {
       display_tourcorr_init(dsp, gg);
     }
 
     if (dsp->d == d) {
-      arrayf_add_cols (&dsp->tcorr1.u0, nc);
-      arrayf_add_cols (&dsp->tcorr1.u1, nc);
-      arrayf_add_cols (&dsp->tcorr1.u, nc);
-      arrayf_add_cols (&dsp->tcorr1.v0, nc);
-      arrayf_add_cols (&dsp->tcorr1.v1, nc);
-      arrayf_add_cols (&dsp->tcorr1.v, nc);
-      arrayf_add_cols (&dsp->tcorr1.uvevec, nc);
-      arrayf_add_cols (&dsp->tcorr1.tv, nc);
+      arrayd_add_cols (&dsp->tcorr1.Fa, nc);
+      arrayd_add_cols (&dsp->tcorr1.Fz, nc);
+      arrayd_add_cols (&dsp->tcorr1.F, nc);
+      arrayd_add_cols (&dsp->tcorr1.Ga, nc);
+      arrayd_add_cols (&dsp->tcorr1.Gz, nc);
+      arrayd_add_cols (&dsp->tcorr1.G, nc);
+      arrayd_add_cols (&dsp->tcorr1.Va, nc);
+      arrayd_add_cols (&dsp->tcorr1.Vz, nc);
+      arrayd_add_cols (&dsp->tcorr1.tv, nc);
 
-      vectori_realloc (&dsp->tcorr1.vars, nc);
+      vectori_realloc (&dsp->tcorr1.active_vars, nc);
       vectorf_realloc (&dsp->tcorr1.lambda, nc);
       vectorf_realloc (&dsp->tcorr1.tau, nc);
       vectorf_realloc (&dsp->tcorr1.tinc, nc);
 
-      arrayf_add_cols (&dsp->tc1_manbasis, (gint) nc);
-      arrayf_add_cols (&dsp->tc2_manbasis, (gint) nc);
+      arrayd_add_cols (&dsp->tc1_manbasis, (gint) nc);
+      arrayd_add_cols (&dsp->tc2_manbasis, (gint) nc);
 
-      arrayf_add_cols (&dsp->tcorr2.u0, nc);
-      arrayf_add_cols (&dsp->tcorr2.u1, nc);
-      arrayf_add_cols (&dsp->tcorr2.u, nc);
-      arrayf_add_cols (&dsp->tcorr2.v0, nc);
-      arrayf_add_cols (&dsp->tcorr2.v1, nc);
-      arrayf_add_cols (&dsp->tcorr2.v, nc);
-      arrayf_add_cols (&dsp->tcorr2.uvevec, nc);
-      arrayf_add_cols (&dsp->tcorr2.tv, nc);
+      arrayd_add_cols (&dsp->tcorr2.Fa, nc);
+      arrayd_add_cols (&dsp->tcorr2.Fz, nc);
+      arrayd_add_cols (&dsp->tcorr2.F, nc);
+      arrayd_add_cols (&dsp->tcorr2.Ga, nc);
+      arrayd_add_cols (&dsp->tcorr2.Gz, nc);
+      arrayd_add_cols (&dsp->tcorr2.G, nc);
+      arrayd_add_cols (&dsp->tcorr2.Va, nc);
+      arrayd_add_cols (&dsp->tcorr2.Vz, nc);
+      arrayd_add_cols (&dsp->tcorr2.tv, nc);
 
-      vectori_realloc (&dsp->tcorr2.vars, nc);
+      vectori_realloc (&dsp->tcorr2.active_vars, nc);
       vectorf_realloc (&dsp->tcorr2.lambda, nc);
       vectorf_realloc (&dsp->tcorr2.tau, nc);
       vectorf_realloc (&dsp->tcorr2.tinc, nc);
 
       /* need to zero extra cols */
       for (i=old_ncols; i<nc; i++) {
-        dsp->tcorr1.u0.vals[0][i] = dsp->tcorr1.u0.vals[1][i] = 0.0;
-        dsp->tcorr1.u1.vals[0][i] = dsp->tcorr1.u1.vals[1][i] = 0.0;
-        dsp->tcorr1.u.vals[0][i] = dsp->tcorr1.u.vals[1][i] = 0.0;
-        dsp->tcorr1.v0.vals[0][i] = dsp->tcorr1.v0.vals[1][i] = 0.0;
-        dsp->tcorr1.v1.vals[0][i] = dsp->tcorr1.v1.vals[1][i] = 0.0;
-        dsp->tcorr1.v.vals[0][i] = dsp->tcorr1.v.vals[1][i] = 0.0;
-        dsp->tcorr1.uvevec.vals[0][i] = dsp->tcorr1.uvevec.vals[1][i] = 0.0;
+        dsp->tcorr1.Fa.vals[0][i] = dsp->tcorr1.Fa.vals[1][i] = 0.0;
+        dsp->tcorr1.Fz.vals[0][i] = dsp->tcorr1.Fz.vals[1][i] = 0.0;
+        dsp->tcorr1.F.vals[0][i] = dsp->tcorr1.F.vals[1][i] = 0.0;
+        dsp->tcorr1.Ga.vals[0][i] = dsp->tcorr1.Ga.vals[1][i] = 0.0;
+        dsp->tcorr1.Gz.vals[0][i] = dsp->tcorr1.Gz.vals[1][i] = 0.0;
+        dsp->tcorr1.G.vals[0][i] = dsp->tcorr1.G.vals[1][i] = 0.0;
+        dsp->tcorr1.Va.vals[0][i] = dsp->tcorr1.Va.vals[1][i] = 0.0;
+        dsp->tcorr1.Vz.vals[0][i] = dsp->tcorr1.Vz.vals[1][i] = 0.0;
         dsp->tcorr1.tv.vals[0][i] = dsp->tcorr1.tv.vals[1][i] = 0.0;
-        dsp->tcorr1.vars.els[i] = 0;
+        dsp->tcorr1.active_vars.els[i] = 0;
         dsp->tcorr1.lambda.els[i] = 0.0;
         dsp->tcorr1.tau.els[i] = 0.0;
         dsp->tcorr1.tinc.els[i] = 0.0;
 
-        dsp->tcorr1.u0.vals[0][i] = dsp->tcorr1.u0.vals[1][i] = 0.0;
-        dsp->tcorr1.u1.vals[0][i] = dsp->tcorr1.u1.vals[1][i] = 0.0;
-        dsp->tcorr1.u.vals[0][i] = dsp->tcorr1.u.vals[1][i] = 0.0;
-        dsp->tcorr1.v0.vals[0][i] = dsp->tcorr1.v0.vals[1][i] = 0.0;
-        dsp->tcorr1.v1.vals[0][i] = dsp->tcorr1.v1.vals[1][i] = 0.0;
-        dsp->tcorr1.v.vals[0][i] = dsp->tcorr1.v.vals[1][i] = 0.0;
-        dsp->tcorr1.uvevec.vals[0][i] = dsp->tcorr1.uvevec.vals[1][i] = 0.0;
-        dsp->tcorr1.tv.vals[0][i] = dsp->tcorr1.tv.vals[1][i] = 0.0;
-        dsp->tcorr1.vars.els[i] = 0;
-        dsp->tcorr1.lambda.els[i] = 0.0;
-        dsp->tcorr1.tau.els[i] = 0.0;
-        dsp->tcorr1.tinc.els[i] = 0.0;
+        dsp->tcorr2.Fa.vals[0][i] = dsp->tcorr2.Fa.vals[1][i] = 0.0;
+        dsp->tcorr2.Fz.vals[0][i] = dsp->tcorr2.Fz.vals[1][i] = 0.0;
+        dsp->tcorr2.F.vals[0][i] = dsp->tcorr2.F.vals[1][i] = 0.0;
+        dsp->tcorr2.Ga.vals[0][i] = dsp->tcorr2.Ga.vals[1][i] = 0.0;
+        dsp->tcorr2.Gz.vals[0][i] = dsp->tcorr2.Gz.vals[1][i] = 0.0;
+        dsp->tcorr2.G.vals[0][i] = dsp->tcorr2.G.vals[1][i] = 0.0;
+        dsp->tcorr2.Va.vals[0][i] = dsp->tcorr2.Va.vals[1][i] = 0.0;
+        dsp->tcorr2.Vz.vals[0][i] = dsp->tcorr2.Vz.vals[1][i] = 0.0;
+        dsp->tcorr2.tv.vals[0][i] = dsp->tcorr2.tv.vals[1][i] = 0.0;
+        dsp->tcorr2.active_vars.els[i] = 0;
+        dsp->tcorr2.lambda.els[i] = 0.0;
+        dsp->tcorr2.tau.els[i] = 0.0;
+        dsp->tcorr2.tinc.els[i] = 0.0;
       }
     }
   }
@@ -237,40 +247,42 @@ free_tourcorr(displayd *dsp)
   /*  datad *d = dsp->d;*/
   /*  gint nc = d->ncols;*/
 
-  vectori_free(&dsp->tcorr1.vars);
+  vectori_free(&dsp->tcorr1.active_vars);
   vectorf_free(&dsp->tcorr1.lambda);
   vectorf_free(&dsp->tcorr1.tau);
   vectorf_free(&dsp->tcorr1.tinc);
 
-  arrayf_free(&dsp->tcorr1.u0, 0, 0);
-  arrayf_free(&dsp->tcorr1.u1, 0, 0);
-  arrayf_free(&dsp->tcorr1.u, 0, 0);
+  arrayd_free(&dsp->tcorr1.Fa, 0, 0);
+  arrayd_free(&dsp->tcorr1.Fz, 0, 0);
+  arrayd_free(&dsp->tcorr1.F, 0, 0);
 
-  arrayf_free(&dsp->tcorr1.v0, 0, 0);
-  arrayf_free(&dsp->tcorr1.v1, 0, 0);
-  arrayf_free(&dsp->tcorr1.v, 0, 0);
+  arrayd_free(&dsp->tcorr1.Ga, 0, 0);
+  arrayd_free(&dsp->tcorr1.Gz, 0, 0);
+  arrayd_free(&dsp->tcorr1.G, 0, 0);
 
-  arrayf_free(&dsp->tcorr1.uvevec, 0, 0);
-  arrayf_free(&dsp->tcorr1.tv, 0, 0);
+  arrayd_free(&dsp->tcorr1.Va, 0, 0);
+  arrayd_free(&dsp->tcorr1.Vz, 0, 0);
+  arrayd_free(&dsp->tcorr1.tv, 0, 0);
 
-  arrayf_free(&dsp->tc1_manbasis, 0, 0);
-  arrayf_free(&dsp->tc2_manbasis, 0, 0);
+  arrayd_free(&dsp->tc1_manbasis, 0, 0);
+  arrayd_free(&dsp->tc2_manbasis, 0, 0);
 
-  vectori_free(&dsp->tcorr2.vars);
+  vectori_free(&dsp->tcorr2.active_vars);
   vectorf_free(&dsp->tcorr2.lambda);
   vectorf_free(&dsp->tcorr2.tau);
   vectorf_free(&dsp->tcorr2.tinc);
 
-  arrayf_free(&dsp->tcorr2.u0, 0, 0);
-  arrayf_free(&dsp->tcorr2.u1, 0, 0);
-  arrayf_free(&dsp->tcorr2.u, 0, 0);
+  arrayd_free(&dsp->tcorr2.Fa, 0, 0);
+  arrayd_free(&dsp->tcorr2.Fz, 0, 0);
+  arrayd_free(&dsp->tcorr2.F, 0, 0);
 
-  arrayf_free(&dsp->tcorr2.v0, 0, 0);
-  arrayf_free(&dsp->tcorr2.v1, 0, 0);
-  arrayf_free(&dsp->tcorr2.v, 0, 0);
+  arrayd_free(&dsp->tcorr2.Ga, 0, 0);
+  arrayd_free(&dsp->tcorr2.Gz, 0, 0);
+  arrayd_free(&dsp->tcorr2.G, 0, 0);
 
-  arrayf_free(&dsp->tcorr2.uvevec, 0, 0);
-  arrayf_free(&dsp->tcorr2.tv, 0, 0);
+  arrayd_free(&dsp->tcorr2.Va, 0, 0);
+  arrayd_free(&dsp->tcorr2.Vz, 0, 0);
+  arrayd_free(&dsp->tcorr2.tv, 0, 0);
 
 }
 
@@ -285,41 +297,41 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
  
   /* Initialize first variable as the vertical and rest of the variables as
      the horizontal variables */
-  dsp->tcorr1.nvars = 2;
-  dsp->tcorr1.vars.els[0] = 0;
-  dsp->tcorr1.vars.els[1] = 1;
+  dsp->tcorr1.nactive = 2;
+  dsp->tcorr1.active_vars.els[0] = 0;
+  dsp->tcorr1.active_vars.els[1] = 1;
 
   if (nc < 8) {
-    dsp->tcorr2.nvars = nc-2;
+    dsp->tcorr2.nactive = nc-2;
     for (j=0; j<nc-2; j++)
-      dsp->tcorr2.vars.els[j] = j+2;
+      dsp->tcorr2.active_vars.els[j] = j+2;
   }
   else {
-    dsp->tcorr2.nvars = 3;
+    dsp->tcorr2.nactive = 3;
     for (j=0; j<3; j++)
-      dsp->tcorr2.vars.els[j] = j+2;
+      dsp->tcorr2.active_vars.els[j] = j+2;
     for (j=3; j<nc-2; j++)
-      dsp->tcorr2.vars.els[j] = 0;
+      dsp->tcorr2.active_vars.els[j] = 0;
   }
 
   /* declare starting vertical base as first variable */
   for (i=0; i<1; i++)
     for (j=0; j<nc; j++)
-      dsp->tcorr1.u0.vals[i][j] = dsp->tcorr1.u1.vals[i][j] = 
-        dsp->tcorr1.u.vals[i][j] = 
-        dsp->tcorr1.v0.vals[i][j] = dsp->tcorr1.v1.vals[i][j] = 0.0;
+      dsp->tcorr1.Fa.vals[i][j] = dsp->tcorr1.Fz.vals[i][j] = 
+        dsp->tcorr1.F.vals[i][j] = 
+        dsp->tcorr1.Ga.vals[i][j] = dsp->tcorr1.Gz.vals[i][j] = 0.0;
 
-  dsp->tcorr1.u.vals[0][dsp->tcorr1.vars.els[0]] = 1.0;
+  dsp->tcorr1.F.vals[0][dsp->tcorr1.active_vars.els[0]] = 1.0;
 
   for (i=0; i<1; i++)
     for (j=0; j<nc; j++)
-      dsp->tcorr2.u0.vals[i][j] = dsp->tcorr2.u1.vals[i][j] = 
-        dsp->tcorr2.u.vals[i][j] = 
-        dsp->tcorr2.v0.vals[i][j] = dsp->tcorr2.v1.vals[i][j] = 0.0;
+      dsp->tcorr2.Fa.vals[i][j] = dsp->tcorr2.Fz.vals[i][j] = 
+        dsp->tcorr2.F.vals[i][j] = 
+        dsp->tcorr2.Ga.vals[i][j] = dsp->tcorr2.Gz.vals[i][j] = 0.0;
 
-  dsp->tcorr2.u.vals[0][dsp->tcorr2.vars.els[0]] = 1.0;
+  dsp->tcorr2.F.vals[0][dsp->tcorr2.active_vars.els[0]] = 1.0;
 
-  dsp->tcorr1.dv = 1.0;
+  dsp->tcorr1.dist_az = 1.0;
   dsp->tcorr1.delta = cpanel->tcorr1_step*M_PI_2/10.0;
   dsp->tcorr1.nsteps = 1; 
   dsp->tcorr1.stepcntr = 1;
@@ -328,7 +340,7 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr1.get_new_target = true;
 
   /* vertical */
-  dsp->tcorr2.dv = 1.0;
+  dsp->tcorr2.dist_az = 1.0;
   dsp->tcorr2.delta = cpanel->tcorr2_step*M_PI_2/10.0;
   dsp->tcorr2.nsteps = 1; 
   dsp->tcorr2.stepcntr = 1;
@@ -338,12 +350,12 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
 
   /* manip */
   dsp->tc_manip_mode = CMANIP_OFF;
-  dsp->tc1_manip_var = dsp->tcorr1.vars.els[0];
-  dsp->tc2_manip_var = dsp->tcorr2.vars.els[0];
+  dsp->tc1_manip_var = dsp->tcorr1.active_vars.els[0];
+  dsp->tc2_manip_var = dsp->tcorr2.active_vars.els[0];
 
   /* pp */
-  dsp->tcorr1.target_basis_method = 0;
-  dsp->tcorr2.target_basis_method = 0;
+  dsp->tcorr1.target_selection_method = 0;
+  dsp->tcorr2.target_selection_method = 0;
   dsp->tcorr_axes = true;
 }
 
@@ -362,10 +374,10 @@ void tourcorr_speed_set(gint slidepos, ggobid *gg) {
   extern void speed_set (gint, gfloat *, gfloat *, gfloat, gint *, gint *);
 
   speed_set(slidepos, &cpanel->tcorr1_step, &dsp->tcorr1.delta,  
-    dsp->tcorr1.dv, &dsp->tcorr1.nsteps, &dsp->tcorr1.stepcntr);
+    dsp->tcorr1.dist_az, &dsp->tcorr1.nsteps, &dsp->tcorr1.stepcntr);
 
   speed_set(slidepos, &cpanel->tcorr2_step, &dsp->tcorr2.delta,  
-    dsp->tcorr2.dv, &dsp->tcorr2.nsteps, &dsp->tcorr2.stepcntr);
+    dsp->tcorr2.dist_az, &dsp->tcorr2.nsteps, &dsp->tcorr2.stepcntr);
 
   cpanel->tc_slidepos = slidepos;
 }
@@ -392,55 +404,56 @@ tourcorr_horvar_set (gint jvar, ggobid *gg)
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
 
-  for (j=0; j<dsp->tcorr1.nvars; j++)
-    if (jvar == dsp->tcorr1.vars.els[j])
+  for (j=0; j<dsp->tcorr1.nactive; j++)
+    if (jvar == dsp->tcorr1.active_vars.els[j])
       active = true;
 
-  /* deselect var if tcorr1.nvars > 1 */
+  /* deselect var if tcorr1.nactive > 1 */
   if (active) {
-    if (dsp->tcorr1.nvars > 1) {
-      for (j=0; j<dsp->tcorr1.nvars; j++) {
-        if (jvar == dsp->tcorr1.vars.els[j]) 
+    if (dsp->tcorr1.nactive > 1) {
+      for (j=0; j<dsp->tcorr1.nactive; j++) {
+        if (jvar == dsp->tcorr1.active_vars.els[j]) 
           break;
       }
-      if (j<dsp->tcorr1.nvars-1) {
-        for (k=j; k<dsp->tcorr1.nvars-1; k++){
-          dsp->tcorr1.vars.els[k] = dsp->tcorr1.vars.els[k+1];
+      if (j<dsp->tcorr1.nactive-1) {
+        for (k=j; k<dsp->tcorr1.nactive-1; k++){
+          dsp->tcorr1.active_vars.els[k] = dsp->tcorr1.active_vars.els[k+1];
         }
       }
-      dsp->tcorr1.nvars--;
+      dsp->tcorr1.nactive--;
       if (!gg->tourcorr.fade_vars) /* set current position without sel var */
       {
-        gt_basis(dsp->tcorr1.u0, dsp->tcorr1.nvars, dsp->tcorr1.vars, 
+        gt_basis(dsp->tcorr1.Fa, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
           d->ncols, (gint) 1);
-        copy_mat(dsp->tcorr1.u.vals, dsp->tcorr1.u0.vals, d->ncols, 1);
+        arrayd_copy(&dsp->tcorr1.Fa.vals, &dsp->tcorr1.F.vals);
+	/*        copy_mat(dsp->tcorr1.F.vals, dsp->tcorr1.Fa.vals, d->ncols, 1);*/
       }
     }
   }
   else { /* not active, so add the variable */
-    if (jvar > dsp->tcorr1.vars.els[dsp->tcorr1.nvars-1]) {
-      dsp->tcorr1.vars.els[dsp->tcorr1.nvars] = jvar;
+    if (jvar > dsp->tcorr1.active_vars.els[dsp->tcorr1.nactive-1]) {
+      dsp->tcorr1.active_vars.els[dsp->tcorr1.nactive] = jvar;
     }
-    else if (jvar < dsp->tcorr1.vars.els[0]) {
-      for (j=dsp->tcorr1.nvars; j>0; j--) {
-          dsp->tcorr1.vars.els[j] = dsp->tcorr1.vars.els[j-1];
+    else if (jvar < dsp->tcorr1.active_vars.els[0]) {
+      for (j=dsp->tcorr1.nactive; j>0; j--) {
+          dsp->tcorr1.active_vars.els[j] = dsp->tcorr1.active_vars.els[j-1];
       }
-      dsp->tcorr1.vars.els[0] = jvar;
+      dsp->tcorr1.active_vars.els[0] = jvar;
     }
     else {
-      gint jtmp = dsp->tcorr1.nvars;
-      for (j=0; j<dsp->tcorr1.nvars-1; j++) {
-        if (jvar > dsp->tcorr1.vars.els[j] && jvar < 
-          dsp->tcorr1.vars.els[j+1]) {
+      gint jtmp = dsp->tcorr1.nactive;
+      for (j=0; j<dsp->tcorr1.nactive-1; j++) {
+        if (jvar > dsp->tcorr1.active_vars.els[j] && jvar < 
+          dsp->tcorr1.active_vars.els[j+1]) {
           jtmp = j+1;
           break;
         }
       }
-      for (j=dsp->tcorr1.nvars-1;j>=jtmp; j--) 
-          dsp->tcorr1.vars.els[j+1] = dsp->tcorr1.vars.els[j];
-      dsp->tcorr1.vars.els[jtmp] = jvar;
+      for (j=dsp->tcorr1.nactive-1;j>=jtmp; j--) 
+          dsp->tcorr1.active_vars.els[j+1] = dsp->tcorr1.active_vars.els[j];
+      dsp->tcorr1.active_vars.els[jtmp] = jvar;
     }
-    dsp->tcorr1.nvars++;
+    dsp->tcorr1.nactive++;
   }
 
   dsp->tcorr1.get_new_target = true;
@@ -455,56 +468,57 @@ tourcorr_vervar_set (gint jvar, ggobid *gg)
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
 
-  for (j=0; j<dsp->tcorr2.nvars; j++)
-    if (jvar == dsp->tcorr2.vars.els[j])
+  for (j=0; j<dsp->tcorr2.nactive; j++)
+    if (jvar == dsp->tcorr2.active_vars.els[j])
       active = true;
 
-  /* deselect var if tcorr2.nvars > 1 */
+  /* deselect var if tcorr2.nactive > 1 */
   if (active) {
-    if (dsp->tcorr2.nvars > 1) {
-      for (j=0; j<dsp->tcorr2.nvars; j++) {
-        if (jvar == dsp->tcorr2.vars.els[j]) 
+    if (dsp->tcorr2.nactive > 1) {
+      for (j=0; j<dsp->tcorr2.nactive; j++) {
+        if (jvar == dsp->tcorr2.active_vars.els[j]) 
           break;
       }
-      if (j<dsp->tcorr2.nvars-1) {
-        for (k=j; k<dsp->tcorr2.nvars-1; k++){
-          dsp->tcorr2.vars.els[k] = dsp->tcorr2.vars.els[k+1];
+      if (j<dsp->tcorr2.nactive-1) {
+        for (k=j; k<dsp->tcorr2.nactive-1; k++){
+          dsp->tcorr2.active_vars.els[k] = dsp->tcorr2.active_vars.els[k+1];
         }
       }
-      dsp->tcorr2.nvars--;
+      dsp->tcorr2.nactive--;
 
       if (!gg->tourcorr.fade_vars) /* set current position without sel var */
       {
-        gt_basis(dsp->tcorr2.u0, dsp->tcorr2.nvars, dsp->tcorr2.vars, 
+        gt_basis(dsp->tcorr2.Fa, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
           d->ncols, (gint) 1);
-        copy_mat(dsp->tcorr2.u.vals, dsp->tcorr2.u0.vals, d->ncols, 1);
+        arrayd_copy(&dsp->tcorr2.Fa.vals, &dsp->tcorr2.F.vals);
+	/*        copy_mat(dsp->tcorr2.F.vals, dsp->tcorr2.Fa.vals, d->ncols, 1);*/
       }
     }
   }
   else { /* not active, so add the variable */
-    if (jvar > dsp->tcorr2.vars.els[dsp->tcorr2.nvars-1]) {
-      dsp->tcorr2.vars.els[dsp->tcorr2.nvars] = jvar;
+    if (jvar > dsp->tcorr2.active_vars.els[dsp->tcorr2.nactive-1]) {
+      dsp->tcorr2.active_vars.els[dsp->tcorr2.nactive] = jvar;
     }
-    else if (jvar < dsp->tcorr2.vars.els[0]) {
-      for (j=dsp->tcorr2.nvars; j>0; j--) {
-          dsp->tcorr2.vars.els[j] = dsp->tcorr2.vars.els[j-1];
+    else if (jvar < dsp->tcorr2.active_vars.els[0]) {
+      for (j=dsp->tcorr2.nactive; j>0; j--) {
+          dsp->tcorr2.active_vars.els[j] = dsp->tcorr2.active_vars.els[j-1];
       }
-      dsp->tcorr2.vars.els[0] = jvar;
+      dsp->tcorr2.active_vars.els[0] = jvar;
     }
     else {
-      gint jtmp = dsp->tcorr2.nvars;
-      for (j=0; j<dsp->tcorr2.nvars-1; j++) {
-        if (jvar > dsp->tcorr2.vars.els[j] && jvar < dsp->tcorr2.vars.els[j+1])
+      gint jtmp = dsp->tcorr2.nactive;
+      for (j=0; j<dsp->tcorr2.nactive-1; j++) {
+        if (jvar > dsp->tcorr2.active_vars.els[j] && jvar < dsp->tcorr2.active_vars.els[j+1])
         {
           jtmp = j+1;
           break;
         }
       }
-      for (j=dsp->tcorr2.nvars-1;j>=jtmp; j--) 
-          dsp->tcorr2.vars.els[j+1] = dsp->tcorr2.vars.els[j];
-      dsp->tcorr2.vars.els[jtmp] = jvar;
+      for (j=dsp->tcorr2.nactive-1;j>=jtmp; j--) 
+          dsp->tcorr2.active_vars.els[j+1] = dsp->tcorr2.active_vars.els[j];
+      dsp->tcorr2.active_vars.els[jtmp] = jvar;
     }
-    dsp->tcorr2.nvars++;
+    dsp->tcorr2.nactive++;
   }
 
   dsp->tcorr2.get_new_target = true;
@@ -550,8 +564,8 @@ tourcorr_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      sp->planar[i].x += (gint)(dsp->tcorr1.u.vals[0][j]*world_data[i][j]);
-      sp->planar[i].y += (gint)(dsp->tcorr2.u.vals[0][j]*world_data[i][j]);
+      sp->planar[i].x += (gint)(dsp->tcorr1.F.vals[0][j]*world_data[i][j]);
+      sp->planar[i].y += (gint)(dsp->tcorr2.F.vals[0][j]*world_data[i][j]);
     }
   }
 }
@@ -564,12 +578,12 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
-  extern gint path(array_f, array_f, array_f, gint, gint, array_f, 
-    array_f, array_f, vector_f, array_f, array_f,
+  extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
+    array_d, array_d, vector_f, array_d, array_d, array_d,
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
-  extern void tour_reproject(vector_f, array_f, array_f, array_f, 
-    array_f, array_f, gint, gint);
-  extern void copy_mat(gfloat **, gfloat **, gint, gint);
+  extern void tour_reproject(vector_f, array_d, array_d, array_d, 
+    array_d, array_d, gint, gint);
+  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
   gint i, nv;
   gint pathprob = 0;
 
@@ -577,37 +591,39 @@ tourcorr_run(displayd *dsp, ggobid *gg)
       !reached_target(dsp->tcorr1.nsteps, dsp->tcorr1.stepcntr, 0, 0, 0)) {
 
     increment_tour(dsp->tcorr1.tinc, dsp->tcorr1.tau, &dsp->tcorr1.nsteps, 
-      &dsp->tcorr1.stepcntr, dsp->tcorr1.dv, dsp->tcorr1.delta, (gint) 1);
+      &dsp->tcorr1.stepcntr, dsp->tcorr1.dist_az, dsp->tcorr1.delta, (gint) 1);
 
-    tour_reproject(dsp->tcorr1.tinc, dsp->tcorr1.v, dsp->tcorr1.v0, 
-      dsp->tcorr1.v1, dsp->tcorr1.u, dsp->tcorr1.uvevec, d->ncols, (gint) 1);
+    tour_reproject(dsp->tcorr1.tinc, dsp->tcorr1.G, dsp->tcorr1.Ga, 
+      dsp->tcorr1.Gz, dsp->tcorr1.F, dsp->tcorr1.Va, d->ncols, (gint) 1);
   }
   else { /* do final clean-up and get new target */
     if (!dsp->tcorr1.get_new_target) {
       do_last_increment(dsp->tcorr1.tinc, dsp->tcorr1.tau, (gint) 1);
-      tour_reproject(dsp->tcorr1.tinc, dsp->tcorr1.v, dsp->tcorr1.v0, 
-        dsp->tcorr1.v1, dsp->tcorr1.u, dsp->tcorr1.uvevec, d->ncols, (gint) 1);
+      tour_reproject(dsp->tcorr1.tinc, dsp->tcorr1.G, dsp->tcorr1.Ga, 
+        dsp->tcorr1.Gz, dsp->tcorr1.F, dsp->tcorr1.Va, d->ncols, (gint) 1);
       }
     
-    copy_mat(dsp->tcorr1.u0.vals, dsp->tcorr1.u.vals, d->ncols, 1);
+    arrayd_copy(&dsp->tcorr1.F.vals, &dsp->tcorr1.Fa.vals);
+    /*    copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, d->ncols, 1);*/
     nv = 0;
     for (i=0; i<d->ncols; i++) 
-      if (fabs(dsp->tcorr1.u0.vals[0][i]) > 0.01) {
+      if (fabs(dsp->tcorr1.Fa.vals[0][i]) > 0.01) {
         nv++;
       }
-    if (nv == 1 && dsp->tcorr1.nvars == 1) /* only generate new dir if num of
+    if (nv == 1 && dsp->tcorr1.nactive == 1) /* only generate new dir if num of
                                            active/used variables is > 1 */
       dsp->tcorr1.get_new_target = true;
     else {
-      gt_basis(dsp->tcorr1.u1, dsp->tcorr1.nvars, dsp->tcorr1.vars, d->ncols, 
+      gt_basis(dsp->tcorr1.Fz, dsp->tcorr1.nactive, 
+        dsp->tcorr1.active_vars, d->ncols, 
         (gint) 1);
-      pathprob = path(dsp->tcorr1.u0, dsp->tcorr1.u1, dsp->tcorr1.u, 
-       d->ncols, (gint) 1, 
-       dsp->tcorr1.v0, dsp->tcorr1.v1, dsp->tcorr1.v, dsp->tcorr1.lambda, 
-       dsp->tcorr1.tv, dsp->tcorr1.uvevec,
-       dsp->tcorr1.tau, dsp->tcorr1.tinc, &dsp->tcorr1.nsteps, 
-       &dsp->tcorr1.stepcntr, 
-       &dsp->tcorr1.dv, dsp->tcorr1.delta);
+      pathprob = path(dsp->tcorr1.Fa, dsp->tcorr1.Fz, dsp->tcorr1.F, 
+        d->ncols, (gint) 1, 
+        dsp->tcorr1.Ga, dsp->tcorr1.Gz, dsp->tcorr1.G, dsp->tcorr1.lambda, 
+        dsp->tcorr1.tv, dsp->tcorr1.Va, dsp->tcorr1.Vz,
+        dsp->tcorr1.tau, dsp->tcorr1.tinc, &dsp->tcorr1.nsteps, 
+        &dsp->tcorr1.stepcntr, 
+        &dsp->tcorr1.dist_az, dsp->tcorr1.delta);
       dsp->tcorr1.get_new_target = false;
     }
   }
@@ -615,34 +631,36 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   if (!dsp->tcorr2.get_new_target && 
       !reached_target(dsp->tcorr2.nsteps, dsp->tcorr2.stepcntr, 0, 0, 0)) {
     increment_tour(dsp->tcorr2.tinc, dsp->tcorr2.tau, &dsp->tcorr2.nsteps, 
-      &dsp->tcorr2.stepcntr, dsp->tcorr2.dv, dsp->tcorr2.delta, (gint) 1);
+      &dsp->tcorr2.stepcntr, dsp->tcorr2.dist_az, dsp->tcorr2.delta, (gint) 1);
 
-    tour_reproject(dsp->tcorr2.tinc, dsp->tcorr2.v, dsp->tcorr2.v0, 
-      dsp->tcorr2.v1, dsp->tcorr2.u, dsp->tcorr2.uvevec, d->ncols, (gint) 1);
+    tour_reproject(dsp->tcorr2.tinc, dsp->tcorr2.G, dsp->tcorr2.Ga, 
+      dsp->tcorr2.Gz, dsp->tcorr2.F, dsp->tcorr2.Va, d->ncols, (gint) 1);
   }
   else { /* do final clean-up and get new target */
     if (!dsp->tcorr2.get_new_target) {
       do_last_increment(dsp->tcorr2.tinc, dsp->tcorr2.tau, (gint) 1);
-      tour_reproject(dsp->tcorr2.tinc, dsp->tcorr2.v, dsp->tcorr2.v0, 
-        dsp->tcorr2.v1, dsp->tcorr2.u, dsp->tcorr2.uvevec, d->ncols, (gint) 1);
+      tour_reproject(dsp->tcorr2.tinc, dsp->tcorr2.G, dsp->tcorr2.Ga, 
+        dsp->tcorr2.Gz, dsp->tcorr2.F, dsp->tcorr2.Va, d->ncols, (gint) 1);
     }
-    copy_mat(dsp->tcorr2.u0.vals, dsp->tcorr2.u.vals, d->ncols, 1);
+    arrayd_copy(&dsp->tcorr2.F.vals, &dsp->tcorr2.Fa.vals);
+    /*    copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->ncols, 1);*/
     nv = 0;
     for (i=0; i<d->ncols; i++) 
-      if (fabs(dsp->tcorr2.u0.vals[0][i]) > 0.01) {
+      if (fabs(dsp->tcorr2.Fa.vals[0][i]) > 0.01) {
         nv++;
       }
-    if (nv == 1 && dsp->tcorr2.nvars == 1) /* only generate new dir if num of
+    if (nv == 1 && dsp->tcorr2.nactive == 1) /* only generate new dir if num of
                                            active/used variables is > 1 */
       dsp->tcorr2.get_new_target = true;
     else {
-      gt_basis(dsp->tcorr2.u1, dsp->tcorr2.nvars, dsp->tcorr2.vars, d->ncols, 
+      gt_basis(dsp->tcorr2.Fz, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, d->ncols, 
         (gint) 1);
-      path(dsp->tcorr2.u0, dsp->tcorr2.u1, dsp->tcorr2.u, d->ncols, (gint) 1, 
-        dsp->tcorr2.v0, dsp->tcorr2.v1, dsp->tcorr2.v, dsp->tcorr2.lambda, 
-        dsp->tcorr2.tv, dsp->tcorr2.uvevec,
+      path(dsp->tcorr2.Fa, dsp->tcorr2.Fz, dsp->tcorr2.F, d->ncols, (gint) 1, 
+        dsp->tcorr2.Ga, dsp->tcorr2.Gz, dsp->tcorr2.G, dsp->tcorr2.lambda, 
+        dsp->tcorr2.tv, dsp->tcorr2.Va,
+	   dsp->tcorr2.Vz,
         dsp->tcorr2.tau, dsp->tcorr2.tinc, &dsp->tcorr2.nsteps, 
-        &dsp->tcorr2.stepcntr, &dsp->tcorr2.dv, dsp->tcorr2.delta);
+        &dsp->tcorr2.stepcntr, &dsp->tcorr2.dist_az, dsp->tcorr2.delta);
       dsp->tcorr2.get_new_target = false;
     }
   }
@@ -697,22 +715,22 @@ void tourcorr_reinit(ggobid *gg)
   datad *d = dsp->d;
 
   for (j=0; j<d->ncols; j++) {
-    dsp->tcorr1.u.vals[0][j] = 0.;
-    dsp->tcorr1.u0.vals[0][j] = 0.;
+    dsp->tcorr1.F.vals[0][j] = 0.;
+    dsp->tcorr1.Fa.vals[0][j] = 0.;
   }
-  m = dsp->tcorr1.vars.els[0];
-  dsp->tcorr1.u.vals[0][m] = 1.;
-  dsp->tcorr1.u0.vals[0][m] = 1.;
+  m = dsp->tcorr1.active_vars.els[0];
+  dsp->tcorr1.F.vals[0][m] = 1.;
+  dsp->tcorr1.Fa.vals[0][m] = 1.;
 
   dsp->tcorr1.get_new_target = true;
 
   for (j=0; j<d->ncols; j++) {
-    dsp->tcorr2.u.vals[0][j] = 0.;
-    dsp->tcorr2.u0.vals[0][j] = 0.;
+    dsp->tcorr2.F.vals[0][j] = 0.;
+    dsp->tcorr2.Fa.vals[0][j] = 0.;
   }
-  m = dsp->tcorr2.vars.els[0];
-  dsp->tcorr2.u.vals[0][m] = 1.;
-  dsp->tcorr2.u0.vals[0][m] = 1.;
+  m = dsp->tcorr2.active_vars.els[0];
+  dsp->tcorr2.F.vals[0][m] = 1.;
+  dsp->tcorr2.Fa.vals[0][m] = 1.;
 
   dsp->tcorr2.get_new_target = true;
 
@@ -735,22 +753,24 @@ void tourcorr_scramble(ggobid *gg)
   /*gint i, nc = d->ncols;*/
 
   for (j=0; j<d->ncols; j++) {
-    dsp->tcorr1.u.vals[0][j] = 0.;
-    dsp->tcorr1.u0.vals[0][j] = 0.;
+    dsp->tcorr1.F.vals[0][j] = 0.;
+    dsp->tcorr1.Fa.vals[0][j] = 0.;
   }
 
   for (j=0; j<d->ncols; j++) {
-    dsp->tcorr2.u.vals[0][j] = 0.;
-    dsp->tcorr2.u0.vals[0][j] = 0.;
+    dsp->tcorr2.F.vals[0][j] = 0.;
+    dsp->tcorr2.Fa.vals[0][j] = 0.;
   }
 
-  gt_basis(dsp->tcorr1.u0, dsp->tcorr1.nvars, dsp->tcorr1.vars, 
+  gt_basis(dsp->tcorr1.Fa, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
     d->ncols, (gint) 1);
-  copy_mat(dsp->tcorr1.u.vals, dsp->tcorr1.u0.vals, d->ncols, 1);
+  arrayd_copy(&dsp->tcorr1.Fa.vals, &dsp->tcorr1.F.vals);
+  /*  copy_mat(dsp->tcorr1.F.vals, dsp->tcorr1.Fa.vals, d->ncols, 1);*/
 
-  gt_basis(dsp->tcorr2.u0, dsp->tcorr2.nvars, dsp->tcorr2.vars, 
+  gt_basis(dsp->tcorr2.Fa, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
     d->ncols, (gint) 1);
-  copy_mat(dsp->tcorr2.u.vals, dsp->tcorr2.u0.vals, d->ncols, 1);
+  arrayd_copy(&dsp->tcorr2.Fa.vals, &dsp->tcorr2.F.vals);
+  /*  copy_mat(dsp->tcorr2.F.vals, dsp->tcorr2.Fa.vals, d->ncols, 1);*/
 
   dsp->tcorr1.nsteps = 1; 
   dsp->tcorr1.stepcntr = 1;
@@ -774,11 +794,11 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   gint j;
-  gint n1vars = dsp->tcorr1.nvars, n2vars = dsp->tcorr2.nvars;
+  gint n1vars = dsp->tcorr1.nactive, n2vars = dsp->tcorr2.nactive;
   gfloat ftmp, tol = 0.01; 
   gboolean dontdoit = false;
-  extern void gram_schmidt(gfloat *, gfloat*, gint);
-  extern gfloat calc_norm(gfloat *, gint);
+  extern void gram_schmidt(gdouble *, gdouble*, gint);
+  extern gdouble calc_norm(gdouble *, gint);
 
   dsp->tc1_phi = 0.;
   dsp->tc2_phi = 0.;
@@ -799,13 +819,13 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   /* check if manip var is one of existing vars */
   /* n1vars, n2vars is the number of variables, excluding the
      manip var in hor and vert directions */
-  for (j=0; j<dsp->tcorr1.nvars; j++)
-    if (dsp->tcorr1.vars.els[j] == dsp->tc1_manip_var) {
+  for (j=0; j<dsp->tcorr1.nactive; j++)
+    if (dsp->tcorr1.active_vars.els[j] == dsp->tc1_manip_var) {
       dsp->tc1_manipvar_inc = true;
       n1vars--;
     }
-  for (j=0; j<dsp->tcorr2.nvars; j++)
-    if (dsp->tcorr2.vars.els[j] == dsp->tc2_manip_var) {
+  for (j=0; j<dsp->tcorr2.nactive; j++)
+    if (dsp->tcorr2.active_vars.els[j] == dsp->tc2_manip_var) {
       dsp->tc2_manipvar_inc = true;
       n2vars--;
     }
@@ -814,11 +834,11 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   /* 0 will be the remainder of the projection, and
      1 will be the indicator vector for the manip var */
   for (j=0; j<d->ncols; j++) {
-    dsp->tc1_manbasis.vals[0][j] = dsp->tcorr1.u.vals[0][j];
+    dsp->tc1_manbasis.vals[0][j] = dsp->tcorr1.F.vals[0][j];
     dsp->tc1_manbasis.vals[1][j] = 0.;
   }
   for (j=0; j<d->ncols; j++) {
-    dsp->tc2_manbasis.vals[0][j] = dsp->tcorr2.u.vals[0][j];
+    dsp->tc2_manbasis.vals[0][j] = dsp->tcorr2.F.vals[0][j];
     dsp->tc2_manbasis.vals[1][j] = 0.;
   }
   dsp->tc1_manbasis.vals[1][dsp->tc1_manip_var]=1.;
@@ -854,7 +874,7 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   cpaneld *cpanel = &dsp->cpanel;
   gfloat xcosphi=1., xsinphi=0., ycosphi=1., ysinphi=0.;
   gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
-  gint actual_nxvars = dsp->tcorr1.nvars, actual_nyvars = dsp->tcorr2.nvars;
+  gint actual_nxvars = dsp->tcorr1.nactive, actual_nyvars = dsp->tcorr2.nactive;
   gint j;
   gboolean offscreen = false;
 
@@ -864,9 +884,9 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     offscreen = true;
 
   if (dsp->tc1_manipvar_inc)
-    actual_nxvars = dsp->tcorr1.nvars-1;
+    actual_nxvars = dsp->tcorr1.nactive-1;
   if (dsp->tc2_manipvar_inc)
-    actual_nyvars = dsp->tcorr2.nvars-1;
+    actual_nyvars = dsp->tcorr2.nactive-1;
 
   if (!offscreen) {
     dsp->tc1_pos_old = dsp->tc1_pos;
@@ -943,14 +963,14 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     if (actual_nxvars > 0) 
     {
       for (j=0; j<d->ncols; j++)
-        dsp->tcorr1.u.vals[0][j] = xcosphi * dsp->tc1_manbasis.vals[0][j] + 
+        dsp->tcorr1.F.vals[0][j] = xcosphi * dsp->tc1_manbasis.vals[0][j] + 
          xsinphi * dsp->tc1_manbasis.vals[1][j];
     }
  
     if (actual_nyvars > 0)
     {
       for (j=0; j<d->ncols; j++)
-        dsp->tcorr2.u.vals[0][j] = ycosphi * dsp->tc2_manbasis.vals[0][j] + 
+        dsp->tcorr2.F.vals[0][j] = ycosphi * dsp->tc2_manbasis.vals[0][j] + 
          ysinphi * dsp->tc2_manbasis.vals[1][j];
     }
 
@@ -959,8 +979,10 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   }
   else {
     disconnect_motion_signal (sp);
-    copy_mat(dsp->tcorr1.u0.vals, dsp->tcorr1.u.vals, d->ncols, 1);
-    copy_mat(dsp->tcorr2.u0.vals, dsp->tcorr2.u.vals, d->ncols, 1);
+    arrayd_copy(&dsp->tcorr1.F.vals, &dsp->tcorr1.Fa.vals);
+    /*    copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, d->ncols, 1);*/
+    arrayd_copy(&dsp->tcorr2.F.vals, &dsp->tcorr2.Fa.vals);
+    /*    copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->ncols, 1);*/
     dsp->tcorr1.get_new_target = true;
     dsp->tcorr2.get_new_target = true;
     if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
@@ -975,12 +997,14 @@ tourcorr_manip_end(splotd *sp)
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
-  extern void copy_mat(gfloat **, gfloat **, gint, gint);
+  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
 
   disconnect_motion_signal (sp);
 
-  copy_mat(dsp->tcorr1.u0.vals, dsp->tcorr1.u.vals, d->ncols, 1);
-  copy_mat(dsp->tcorr2.u0.vals, dsp->tcorr2.u.vals, d->ncols, 1);
+  arrayd_copy(&dsp->tcorr1.F.vals, &dsp->tcorr1.Fa.vals);
+  /*  copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, d->ncols, 1);*/
+  arrayd_copy(&dsp->tcorr2.Fa.vals, &dsp->tcorr2.F.vals);
+  /*  copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->ncols, 1);*/
   dsp->tcorr1.get_new_target = true;
   dsp->tcorr2.get_new_target = true;
 

@@ -111,7 +111,7 @@ t2d_optimz_cb (GtkToggleButton  *w, ggobid *gg) {
   extern void t2d_optimz(gint, gboolean *, gint *, displayd *);
   /*  extern void t2d_optimz(gint, ggobid *);*/
   t2d_optimz(w->active, &dsp->t2d.get_new_target, 
-    &dsp->t2d.target_basis_method, dsp);
+    &dsp->t2d.target_selection_method, dsp);
 }
 
 /*
@@ -266,15 +266,15 @@ tour2dpp_window_open (ggobid *gg) {
 
   /* check if selected variables are sphered beforeing allowing window
      to popup */
-  if (dsp->t2d.nvars > d->sphere.pcvars.nels)
+  if (dsp->t2d.nactive > d->sphere.pcvars.nels)
     vars_sphered = false;
-  for (j=0; j<dsp->t2d.nvars; j++) 
+  for (j=0; j<dsp->t2d.nactive; j++) 
   {
     for (i=0; i<d->sphere.pcvars.nels; i++) 
-      if (dsp->t2d.vars.els[j] == d->sphere.pcvars.els[i])
+      if (dsp->t2d.active_vars.els[j] == d->sphere.pcvars.els[i])
         break;
     if ((i == d->sphere.pcvars.nels-1) && 
-       (dsp->t2d.vars.els[j] != d->sphere.pcvars.els[i]))
+       (dsp->t2d.active_vars.els[j] != d->sphere.pcvars.els[i]))
     {
       vars_sphered = false;
       break;
@@ -459,7 +459,8 @@ tour2dpp_window_open (ggobid *gg) {
 */
     }
 
-    alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nvars, 2);
+    alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 2);
+
     gtk_widget_show_all (dsp->t2d_window);
   }
 }

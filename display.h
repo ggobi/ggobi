@@ -80,7 +80,7 @@ struct _displayd {
 /*
  * Manipulation Vars
 */
-  array_f tc1_manbasis, tc2_manbasis, t1d_manbasis;
+  array_d tc1_manbasis, tc2_manbasis, t1d_manbasis;
   gint tc1_manip_var, tc2_manip_var, t1d_manip_var;
   gint tc1_pos_old, tc1_pos, tc2_pos_old, tc2_pos, t1d_pos_old, t1d_pos;
   gint tc_manip_mode;
@@ -90,9 +90,9 @@ struct _displayd {
   gint t2d_manip_var, t2d_manipvar_inc;
   gint t2d_pos1_old, t2d_pos1, t2d_pos2_old, t2d_pos2;
   gint t2d_manip_mode;
-  array_f t2d_Rmat1, t2d_Rmat2;
-  array_f t2d_manbasis;
-  array_f t2d_mvar_3dbasis;
+  array_d t2d_Rmat1, t2d_Rmat2;
+  array_d t2d_manbasis;
+  array_d t2d_mvar_3dbasis;
   gboolean t2d_no_dir_flag;
   gfloat t2d_rx, t2d_ry;
 
@@ -121,7 +121,7 @@ struct _displayd {
  GtkWidget *t1d_window, *t2d_window;
  GtkWidget *t1d_control_frame, *t2d_control_frame;
  GtkWidget *t1d_mbar, *t2d_mbar;
-  GtkAccelGroup *t1d_pp_accel_group, *t2d_pp_accel_group;
+ GtkAccelGroup *t1d_pp_accel_group, *t2d_pp_accel_group;
  optimize0_param t1d_pp_op, t2d_pp_op;
  gint t2d_pp_indx, t1d_pp_indx;
  gfloat t2d_ppindx_mat[100], t1d_ppindx_mat[100];

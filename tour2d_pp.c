@@ -268,9 +268,9 @@ void t2d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
   if (optimz_on) 
   {
     for (i=0; i<2; i++)
-      for (j=0; j<dsp->t2d.nvars; j++)
+      for (j=0; j<dsp->t2d.nactive; j++)
         dsp->t2d_pp_op.proj_best.vals[j][i] = 
-          dsp->t2d.u.vals[i][dsp->t2d.vars.els[j]];
+          dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
     dsp->t2d.ppval = dsp->t2d_indx_min;
     bas_meth = 1;
   }
@@ -418,7 +418,7 @@ projection.
 *********************************************************************/
 
 
-gfloat t2d_calc_indx (array_f data, array_f proj, 
+gfloat t2d_calc_indx (array_f data, array_d proj, 
                 gint *rows, gint nrows, 
                 gint ncols,
                 gint (*index) (array_f*, void*, gfloat*),
@@ -440,8 +440,8 @@ gfloat t2d_calc_indx (array_f data, array_f proj,
     pdata.vals[i][1] = 0.0;
     for (j=0; j<ncols; j++)
     { 
-      pdata.vals[i][0] += data.vals[i][j]*proj.vals[0][j];
-      pdata.vals[i][1] += data.vals[i][j]*proj.vals[1][j];
+      pdata.vals[i][0] += data.vals[i][j]*(gfloat)proj.vals[0][j];
+      pdata.vals[i][1] += data.vals[i][j]*(gfloat)proj.vals[1][j];
     }
   }
 
@@ -461,21 +461,21 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
   /* gint pdim = 2; */
 
   for (i=0; i<d->nrows_in_plot; i++)
-    for (j=0; j<dsp->t2d.nvars; j++)
+    for (j=0; j<dsp->t2d.nactive; j++)
       dsp->t2d_pp_op.data.vals[i][j] = 
-        d->tform.vals[d->rows_in_plot[i]][dsp->t2d.vars.els[j]];
+        d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[j]];
 
   for (i=0; i<2; i++)
-    for (j=0; j<dsp->t2d.nvars; j++)
+    for (j=0; j<dsp->t2d.nactive; j++)
       dsp->t2d_pp_op.proj_best.vals[j][i] = 
-        dsp->t2d.u.vals[i][dsp->t2d.vars.els[j]];
+        dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
 
   switch (indxtype)
   { 
     case HOLES: 
       alloc_holes_p (&hp, nrows);
       dsp->t2d.ppval = t2d_calc_indx (d->tform, 
-        dsp->t2d.u, d->rows_in_plot, d->nrows, d->ncols, holes, &hp);
+        dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, holes, &hp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, holes, &hp);
       free_holes_p(&hp);
@@ -483,7 +483,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
     case CENTRAL_MASS: 
       alloc_central_mass (&hp, nrows);
       dsp->t2d.ppval = t2d_calc_indx (d->tform, 
-        dsp->t2d.u, d->rows_in_plot, d->nrows, d->ncols, central_mass, &hp);
+        dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols, central_mass, &hp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, central_mass, &hp);
       free_central_mass(&hp);
@@ -491,7 +491,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
     case SKEWNESS: 
       /*      alloc_cartgini_p (&cgp, nrows, gdata);
       dsp->t2d.ppval = t2d_calc_indx (d->tform, 
-        dsp->t2d.u, d->rows_in_plot, d->nrows, d->ncols,
+        dsp->t2d.F, d->rows_in_plot, d->nrows, d->ncols,
         cartgini, &cgp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t2d_pp_op, cartgini, &cgp);

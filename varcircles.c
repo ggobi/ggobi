@@ -598,7 +598,7 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
     case  scatterplot:
       switch (cpanel->projection) {
         case TOUR1D:
-          x = (gint) (display->t1d.u.vals[0][jvar]*(gfloat)r);
+          x = (gint) (display->t1d.F.vals[0][jvar]*(gfloat)r);
           y = 0;
           gdk_draw_line (da_pix,
             gg->selvarfg_GC, r, r, r+x, r-y);
@@ -610,16 +610,16 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
               5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
           }
 
-          for (k=0; k<display->t1d.nvars; k++) {
-            if (display->t1d.vars.els[k] == jvar) {
+          for (k=0; k<display->t1d.nactive; k++) {
+            if (display->t1d.active_vars.els[k] == jvar) {
               chosen = true;
               break;
             }
           }
         break;
         case TOUR2D:
-          x = (gint) (display->t2d.u.vals[0][jvar]*(gfloat)r);
-          y = (gint) (display->t2d.u.vals[1][jvar]*(gfloat)r);
+          x = (gint) (display->t2d.F.vals[0][jvar]*(gfloat)r);
+          y = (gint) (display->t2d.F.vals[1][jvar]*(gfloat)r);
           gdk_draw_line (da_pix,
             gg->selvarfg_GC, r, r, r+x, r-y);
 
@@ -628,22 +628,22 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
               5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 0*64, 360*64);
           }
 
-          for (k=0; k<display->t2d.nvars; k++) {
-            if (display->t2d.vars.els[k] == jvar) {
+          for (k=0; k<display->t2d.nactive; k++) {
+            if (display->t2d.active_vars.els[k] == jvar) {
               chosen = true;
               break;
             }
           }
         break;
         case COTOUR:
-          /*          for (i=0; i<display->tcorr1.nvars; i++)
-            if (jvar == display->tcorr1.vars.els[i]) {
+          /*          for (i=0; i<display->tcorr1.nactive; i++)
+            if (jvar == display->tcorr1.active_vars.els[i]) {
               xvar = true;
               break;
             }*/
           /*          if (xvar) {*/
-          x = (gint) (display->tcorr1.u.vals[0][jvar]*(gfloat)r);
-          y = (gint) (display->tcorr2.u.vals[0][jvar]*(gfloat)r);
+          x = (gint) (display->tcorr1.F.vals[0][jvar]*(gfloat)r);
+          y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
           gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r+x, r-y);
 
           if (jvar == display->tc1_manip_var) {
@@ -659,14 +659,14 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
               5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 240*64, 60*64);
           }
 
-          for (k=0; k<display->tcorr1.nvars; k++) {
-            if (display->tcorr1.vars.els[k] == jvar) {
+          for (k=0; k<display->tcorr1.nactive; k++) {
+            if (display->tcorr1.active_vars.els[k] == jvar) {
               chosen = true;
               break;
             }
           }
-          for (k=0; k<display->tcorr2.nvars; k++) {
-            if (display->tcorr2.vars.els[k] == jvar) {
+          for (k=0; k<display->tcorr2.nactive; k++) {
+            if (display->tcorr2.active_vars.els[k] == jvar) {
               chosen = true;
               break;
             }
@@ -677,7 +677,7 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
           else {
 
             x = 0;
-            y = (gint) (display->tcorr2.u.vals[0][jvar]*(gfloat)r);
+            y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
             gdk_draw_line (da_pix,
               gg->selvarfg_GC, r, r, r+x, r-y);
 

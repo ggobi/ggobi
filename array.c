@@ -109,6 +109,53 @@ arrayd_add_rows (array_d *arrp, gint nr)
   }
 }
 
+/* append columns to a floating point array for a total of nc columns */
+void
+arrayd_add_cols (array_d *arrp, gint nc)
+{
+  gint i, j;
+
+  if (nc > arrp->ncols) {
+    for (i=0; i<arrp->nrows; i++) {
+      arrp->vals[i] = (gdouble *) g_realloc (arrp->vals[i],
+                                            nc * sizeof (gdouble));
+      /*-- initialize the new values to 0 --*/
+      for (j=arrp->ncols; j<nc; j++)
+        arrp->vals[i][j] = 0;
+    }
+    arrp->ncols = nc;
+  }
+}
+
+/*-- eliminate the nc columns contained in *cols --*/
+void
+arrayd_delete_cols (array_d *arrp, gint nc, gint *cols)
+{
+  gint i, k;
+  gint jto, jfrom;
+  gint *keepers = g_malloc ((arrp->ncols-nc) * sizeof (gint));
+  gint nkeepers = find_keepers (arrp->ncols, nc, cols, keepers);
+
+  if (nc > 0 && nkeepers > 0) {
+
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers; k++) {
+      jto = k;
+      jfrom = keepers[k];  /*-- jto has to be less than jfrom --*/
+      if (jto != jfrom) {
+        for (i=0; i<arrp->nrows; i++)
+          arrp->vals[i][jto] = arrp->vals[i][jfrom];
+      }
+    }
+
+    for (i=0; i<arrp->nrows; i++)
+      arrp->vals[i] = (gdouble *) g_realloc (arrp->vals[i],
+                                            nkeepers * sizeof (gdouble));
+    arrp->ncols = nkeepers;
+  }
+  g_free (keepers);
+}
+
 void
 arrayd_copy (array_d *arrp_from, array_d *arrp_to)
 {
@@ -122,7 +169,6 @@ arrayd_copy (array_d *arrp_from, array_d *arrp_to)
         arrp_to->vals[i][j] = arrp_from->vals[i][j];
   }
 }
-
 
 /*-------------------------------------------------------------------------*/
 /*                     floating point array management                     */

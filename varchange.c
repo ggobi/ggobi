@@ -235,9 +235,9 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
           break;
           case TOUR1D:
             for (j=0; j<ncols; j++) {
-              for (k=0; k<display->t1d.nvars; k++) {
-                if (display->t1d.vars.els[k] == cols[j]) {
-                  jplotted = display->t1d.vars.els[k];
+              for (k=0; k<display->t1d.nactive; k++) {
+                if (display->t1d.active_vars.els[k] == cols[j]) {
+                  jplotted = display->t1d.active_vars.els[k];
                   return jplotted;
                 }
               }
@@ -245,9 +245,9 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
           break;
           case TOUR2D:
             for (j=0; j<ncols; j++) {
-              for (k=0; k<display->t2d.nvars; k++) {
-                if (display->t2d.vars.els[k] == cols[j]) {
-                  jplotted = display->t2d.vars.els[k];
+              for (k=0; k<display->t2d.nactive; k++) {
+                if (display->t2d.active_vars.els[k] == cols[j]) {
+                  jplotted = display->t2d.active_vars.els[k];
                   return jplotted;
                 }
               }
@@ -255,15 +255,15 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
           break;
           case COTOUR:
             for (j=0; j<ncols; j++) {
-              for (k=0; k<display->tcorr1.nvars; k++) {
-                if (display->tcorr1.vars.els[k] == cols[j]) {
-                  jplotted = display->tcorr1.vars.els[k];
+              for (k=0; k<display->tcorr1.nactive; k++) {
+                if (display->tcorr1.active_vars.els[k] == cols[j]) {
+                  jplotted = display->tcorr1.active_vars.els[k];
                   return jplotted;
                 }
               }
-              for (k=0; k<display->tcorr2.nvars; k++) {
-                if (display->tcorr2.vars.els[k] == cols[j]) {
-                  jplotted = display->tcorr2.vars.els[k];
+              for (k=0; k<display->tcorr2.nactive; k++) {
+                if (display->tcorr2.active_vars.els[k] == cols[j]) {
+                  jplotted = display->tcorr2.active_vars.els[k];
                   return jplotted;
                 }
               }

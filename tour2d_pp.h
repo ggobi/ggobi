@@ -22,7 +22,7 @@ void alloc_holes_p (holes_param *hp, gint nrows);
 void free_holes_p (holes_param *hp);
 gint holes (array_f *pdata, void *param, gfloat *val);
 
-gfloat t2d_calc_indx(array_f, array_f, gint *, gint, gint,
+gfloat t2d_calc_indx(array_f, array_d, gint *, gint, gint,
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param);
 gboolean t2d_switch_index(gint, gint, ggobid *);

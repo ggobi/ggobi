@@ -134,18 +134,18 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
           cols[ncols++] = sp->xyvars.y;
         break;
         case TOUR1D:
-          for (k=0; k<display->t1d.nvars; k++)
-            cols[ncols++] = display->t1d.vars.els[k];
+          for (k=0; k<display->t1d.nactive; k++)
+            cols[ncols++] = display->t1d.active_vars.els[k];
         break;
          case TOUR2D:
-          for (k=0; k<display->t2d.nvars; k++)
-            cols[ncols++] = display->t2d.vars.els[k];
+          for (k=0; k<display->t2d.nactive; k++)
+            cols[ncols++] = display->t2d.active_vars.els[k];
         break;
         case COTOUR:
-          for (k=0; k<display->tcorr1.nvars; k++)
-            cols[ncols++] = display->tcorr1.vars.els[k];
-          for (k=0; k<display->tcorr2.nvars; k++)
-            cols[ncols++] = display->tcorr2.vars.els[k];
+          for (k=0; k<display->tcorr1.nactive; k++)
+            cols[ncols++] = display->tcorr1.active_vars.els[k];
+          for (k=0; k<display->tcorr2.nactive; k++)
+            cols[ncols++] = display->tcorr2.active_vars.els[k];
         break;
 
         case NULLMODE:

@@ -34,32 +34,34 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
   gint nc = d->ncols;
 
   /* first index is the projection dimensions, second dimension is ncols */
-  arrayf_init_null(&dsp->t2d.u0);
-  arrayf_alloc(&dsp->t2d.u0, 2, nc);
+  arrayd_init_null(&dsp->t2d.Fa);
+  arrayd_alloc(&dsp->t2d.Fa, 2, nc);
 
-  arrayf_init_null(&dsp->t2d.u1);
-  arrayf_alloc(&dsp->t2d.u1, 2, nc);
+  arrayd_init_null(&dsp->t2d.Fz);
+  arrayd_alloc(&dsp->t2d.Fz, 2, nc);
 
-  arrayf_init_null(&dsp->t2d.u);
-  arrayf_alloc(&dsp->t2d.u, 2, nc);
+  arrayd_init_null(&dsp->t2d.F);
+  arrayd_alloc(&dsp->t2d.F, 2, nc);
 
-  arrayf_init_null(&dsp->t2d.v0);
-  arrayf_alloc(&dsp->t2d.v0, 2, nc);
+  arrayd_init_null(&dsp->t2d.Ga);
+  arrayd_alloc(&dsp->t2d.Ga, 2, nc);
 
-  arrayf_init_null(&dsp->t2d.v1);
-  arrayf_alloc(&dsp->t2d.v1, 2, nc);
+  arrayd_init_null(&dsp->t2d.Gz);
+  arrayd_alloc(&dsp->t2d.Gz, 2, nc);
 
-  arrayf_init_null(&dsp->t2d.v);
-  arrayf_alloc(&dsp->t2d.v, 2, nc);
+  arrayd_init_null(&dsp->t2d.G);
+  arrayd_alloc(&dsp->t2d.G, 2, nc);
 
-  arrayf_init_null(&dsp->t2d.uvevec);
-  arrayf_alloc(&dsp->t2d.uvevec, 2, nc);
+  arrayd_init_null(&dsp->t2d.Va);
+  arrayd_alloc(&dsp->t2d.Va, 2, nc);
+  arrayd_init_null(&dsp->t2d.Vz);
+  arrayd_alloc(&dsp->t2d.Vz, 2, nc);
 
-  arrayf_init_null(&dsp->t2d.tv);
-  arrayf_alloc(&dsp->t2d.tv, 2, nc);
+  arrayd_init_null(&dsp->t2d.tv);
+  arrayd_alloc(&dsp->t2d.tv, 2, nc);
 
-  vectori_init_null(&dsp->t2d.vars);
-  vectori_alloc(&dsp->t2d.vars, nc);
+  vectori_init_null(&dsp->t2d.active_vars);
+  vectori_alloc(&dsp->t2d.active_vars, nc);
   vectorf_init_null(&dsp->t2d.lambda);
   vectorf_alloc(&dsp->t2d.lambda, nc);
   vectorf_init_null(&dsp->t2d.tau);
@@ -68,14 +70,14 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
   vectorf_alloc(&dsp->t2d.tinc, nc);
 
   /* manipulation variables */
-  arrayf_init_null(&dsp->t2d_Rmat1);
-  arrayf_alloc(&dsp->t2d_Rmat1, 3, 3);
-  arrayf_init_null(&dsp->t2d_Rmat2);
-  arrayf_alloc(&dsp->t2d_Rmat2, 3, 3);
-  arrayf_init_null(&dsp->t2d_mvar_3dbasis);
-  arrayf_alloc(&dsp->t2d_mvar_3dbasis, 3, 3);
-  arrayf_init_null(&dsp->t2d_manbasis);
-  arrayf_alloc(&dsp->t2d_manbasis, 3, nc);
+  arrayd_init_null(&dsp->t2d_Rmat1);
+  arrayd_alloc(&dsp->t2d_Rmat1, 3, 3);
+  arrayd_init_null(&dsp->t2d_Rmat2);
+  arrayd_alloc(&dsp->t2d_Rmat2, 3, 3);
+  arrayd_init_null(&dsp->t2d_mvar_3dbasis);
+  arrayd_alloc(&dsp->t2d_mvar_3dbasis, 3, 3);
+  arrayd_init_null(&dsp->t2d_manbasis);
+  arrayd_alloc(&dsp->t2d_manbasis, 3, nc);
 
 }
 
@@ -88,21 +90,22 @@ tour2d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->d == d) {
-      arrayf_delete_cols (&dsp->t2d.u0, nc, cols);
-      arrayf_delete_cols (&dsp->t2d.u1, nc, cols);
-      arrayf_delete_cols (&dsp->t2d.u, nc, cols);
-      arrayf_delete_cols (&dsp->t2d.v0, nc, cols);
-      arrayf_delete_cols (&dsp->t2d.v1, nc, cols);
-      arrayf_delete_cols (&dsp->t2d.v, nc, cols);
-      arrayf_delete_cols (&dsp->t2d.uvevec, nc, cols);
-      arrayf_delete_cols (&dsp->t2d.tv, nc, cols);
+      arrayd_delete_cols (&dsp->t2d.Fa, nc, cols);
+      arrayd_delete_cols (&dsp->t2d.Fz, nc, cols);
+      arrayd_delete_cols (&dsp->t2d.F, nc, cols);
+      arrayd_delete_cols (&dsp->t2d.Ga, nc, cols);
+      arrayd_delete_cols (&dsp->t2d.Gz, nc, cols);
+      arrayd_delete_cols (&dsp->t2d.G, nc, cols);
+      arrayd_delete_cols (&dsp->t2d.Va, nc, cols);
+      arrayd_delete_cols (&dsp->t2d.Vz, nc, cols);
+      arrayd_delete_cols (&dsp->t2d.tv, nc, cols);
 
-      vectori_delete_els (&dsp->t2d.vars, nc, cols);
+      vectori_delete_els (&dsp->t2d.active_vars, nc, cols);
       vectorf_delete_els (&dsp->t2d.lambda, nc, cols);
       vectorf_delete_els (&dsp->t2d.tau, nc, cols);
       vectorf_delete_els (&dsp->t2d.tinc, nc, cols);
 
-      arrayf_delete_cols (&dsp->t2d_manbasis, (gint) nc, cols);
+      arrayd_delete_cols (&dsp->t2d_manbasis, (gint) nc, cols);
     }
   }
 }
@@ -122,40 +125,42 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
     if (dsp->displaytype != scatterplot)
       continue;
 
-    old_ncols = dsp->t2d.u0.ncols;
+    old_ncols = dsp->t2d.Fa.ncols;
 
     if (old_ncols < 2 && nc >= 2) {
       display_tour2d_init(dsp, gg);
     }
 
     if (dsp->d == d) {
-      arrayf_add_cols (&dsp->t2d.u0, nc);
-      arrayf_add_cols (&dsp->t2d.u1, nc);
-      arrayf_add_cols (&dsp->t2d.u, nc);
-      arrayf_add_cols (&dsp->t2d.v0, nc);
-      arrayf_add_cols (&dsp->t2d.v1, nc);
-      arrayf_add_cols (&dsp->t2d.v, nc);
-      arrayf_add_cols (&dsp->t2d.uvevec, nc);
-      arrayf_add_cols (&dsp->t2d.tv, nc);
+      arrayd_add_cols (&dsp->t2d.Fa, nc);
+      arrayd_add_cols (&dsp->t2d.Fz, nc);
+      arrayd_add_cols (&dsp->t2d.F, nc);
+      arrayd_add_cols (&dsp->t2d.Ga, nc);
+      arrayd_add_cols (&dsp->t2d.Gz, nc);
+      arrayd_add_cols (&dsp->t2d.G, nc);
+      arrayd_add_cols (&dsp->t2d.Va, nc);
+      arrayd_add_cols (&dsp->t2d.Vz, nc);
+      arrayd_add_cols (&dsp->t2d.tv, nc);
 
-      vectori_realloc (&dsp->t2d.vars, nc);
+      vectori_realloc (&dsp->t2d.active_vars, nc);
       vectorf_realloc (&dsp->t2d.lambda, nc);
       vectorf_realloc (&dsp->t2d.tau, nc);
       vectorf_realloc (&dsp->t2d.tinc, nc);
 
-      arrayf_add_cols (&dsp->t2d_manbasis, (gint) nc);
+      arrayd_add_cols (&dsp->t2d_manbasis, (gint) nc);
 
       /* need to zero extra cols */
       for (i=old_ncols; i<nc; i++) {
-        dsp->t2d.u0.vals[0][i] = dsp->t2d.u0.vals[1][i] = 0.0;
-        dsp->t2d.u1.vals[0][i] = dsp->t2d.u1.vals[1][i] = 0.0;
-        dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
-        dsp->t2d.v0.vals[0][i] = dsp->t2d.v0.vals[1][i] = 0.0;
-        dsp->t2d.v1.vals[0][i] = dsp->t2d.v1.vals[1][i] = 0.0;
-        dsp->t2d.v.vals[0][i] = dsp->t2d.v.vals[1][i] = 0.0;
-        dsp->t2d.uvevec.vals[0][i] = dsp->t2d.uvevec.vals[1][i] = 0.0;
+        dsp->t2d.Fa.vals[0][i] = dsp->t2d.Fa.vals[1][i] = 0.0;
+        dsp->t2d.Fz.vals[0][i] = dsp->t2d.Fz.vals[1][i] = 0.0;
+        dsp->t2d.F.vals[0][i] = dsp->t2d.F.vals[1][i] = 0.0;
+        dsp->t2d.Ga.vals[0][i] = dsp->t2d.Ga.vals[1][i] = 0.0;
+        dsp->t2d.Gz.vals[0][i] = dsp->t2d.Gz.vals[1][i] = 0.0;
+        dsp->t2d.G.vals[0][i] = dsp->t2d.G.vals[1][i] = 0.0;
+        dsp->t2d.Va.vals[0][i] = dsp->t2d.Va.vals[1][i] = 0.0;
+        dsp->t2d.Vz.vals[0][i] = dsp->t2d.Vz.vals[1][i] = 0.0;
         dsp->t2d.tv.vals[0][i] = dsp->t2d.tv.vals[1][i] = 0.0;
-        dsp->t2d.vars.els[i] = 0;
+        dsp->t2d.active_vars.els[i] = 0;
         dsp->t2d.lambda.els[i] = 0.0;
         dsp->t2d.tau.els[i] = 0.0;
         dsp->t2d.tinc.els[i] = 0.0;
@@ -172,26 +177,27 @@ free_tour2d(displayd *dsp)
   /*  datad *d = dsp->d;*/
   /*  gint nc = d->ncols;*/
 
-  vectori_free(&dsp->t2d.vars);
+  vectori_free(&dsp->t2d.active_vars);
   vectorf_free(&dsp->t2d.lambda);
   vectorf_free(&dsp->t2d.tau);
   vectorf_free(&dsp->t2d.tinc);
 
-  arrayf_free(&dsp->t2d.u0, 0, 0);
-  arrayf_free(&dsp->t2d.u1, 0, 0);
-  arrayf_free(&dsp->t2d.u, 0, 0);
+  arrayd_free(&dsp->t2d.Fa, 0, 0);
+  arrayd_free(&dsp->t2d.Fz, 0, 0);
+  arrayd_free(&dsp->t2d.F, 0, 0);
 
-  arrayf_free(&dsp->t2d.v0, 0, 0);
-  arrayf_free(&dsp->t2d.v1, 0, 0);
-  arrayf_free(&dsp->t2d.v, 0, 0);
+  arrayd_free(&dsp->t2d.Ga, 0, 0);
+  arrayd_free(&dsp->t2d.Gz, 0, 0);
+  arrayd_free(&dsp->t2d.G, 0, 0);
 
-  arrayf_free(&dsp->t2d.uvevec, 0, 0);
-  arrayf_free(&dsp->t2d.tv, 0, 0);
+  arrayd_free(&dsp->t2d.Va, 0, 0);
+  arrayd_free(&dsp->t2d.Vz, 0, 0);
+  arrayd_free(&dsp->t2d.tv, 0, 0);
 
-  arrayf_free(&dsp->t2d_Rmat1, 0, 0);
-  arrayf_free(&dsp->t2d_Rmat2, 0, 0);
-  arrayf_free(&dsp->t2d_mvar_3dbasis, 0, 0);
-  arrayf_free(&dsp->t2d_manbasis, 0, 0);
+  arrayd_free(&dsp->t2d_Rmat1, 0, 0);
+  arrayd_free(&dsp->t2d_Rmat2, 0, 0);
+  arrayd_free(&dsp->t2d_mvar_3dbasis, 0, 0);
+  arrayd_free(&dsp->t2d_manbasis, 0, 0);
 }
 
 void 
@@ -205,35 +211,35 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
  
     /* Initialize starting subset of active variables */
   if (nc < 8) {
-    dsp->t2d.nvars = nc;
+    dsp->t2d.nactive = nc;
     for (j=0; j<nc; j++)
-      dsp->t2d.vars.els[j] = j;
+      dsp->t2d.active_vars.els[j] = j;
   }
   else {
-    dsp->t2d.nvars = 3;
+    dsp->t2d.nactive = 3;
     for (j=0; j<3; j++)
-      dsp->t2d.vars.els[j] = j;
+      dsp->t2d.active_vars.els[j] = j;
     for (j=3; j<nc; j++)
-      dsp->t2d.vars.els[j] = 0;
+      dsp->t2d.active_vars.els[j] = 0;
   }
 
   /* declare starting base as first p chosen variables */
   for (i=0; i<2; i++)
     for (j=0; j<nc; j++)
-      dsp->t2d.u0.vals[i][j] = dsp->t2d.u1.vals[i][j] = 
-        dsp->t2d.u.vals[i][j] = dsp->t2d.v0.vals[i][j] = 
-        dsp->t2d.v1.vals[i][j] = 0.0;
+      dsp->t2d.Fa.vals[i][j] = dsp->t2d.Fz.vals[i][j] = 
+        dsp->t2d.F.vals[i][j] = dsp->t2d.Ga.vals[i][j] = 
+        dsp->t2d.Gz.vals[i][j] = 0.0;
 
   for (i=0; i<2; i++)
   {
-    dsp->t2d.u1.vals[i][dsp->t2d.vars.els[i]] =
-      dsp->t2d.u0.vals[i][dsp->t2d.vars.els[i]] = 
-      dsp->t2d.u.vals[i][dsp->t2d.vars.els[i]] =
-      dsp->t2d.v0.vals[i][dsp->t2d.vars.els[i]] = 
-      dsp->t2d.v1.vals[i][dsp->t2d.vars.els[i]] = 1.0;
+    dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[i]] =
+      dsp->t2d.Fa.vals[i][dsp->t2d.active_vars.els[i]] = 
+      dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[i]] =
+      dsp->t2d.Ga.vals[i][dsp->t2d.active_vars.els[i]] = 
+      dsp->t2d.Gz.vals[i][dsp->t2d.active_vars.els[i]] = 1.0;
   }
 
-  dsp->t2d.dv = 1.0;
+  dsp->t2d.dist_az = 1.0;
   dsp->t2d.delta = cpanel->t2d_step*M_PI_2/10.0;
   dsp->t2d.nsteps = 1; 
   dsp->t2d.stepcntr = 1;
@@ -246,7 +252,7 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   dsp->t2d_manip_var = 0;
 
   /* pp */
-  dsp->t2d.target_basis_method = 0;
+  dsp->t2d.target_selection_method = 0;
   dsp->t2d_ppda = NULL;
   dsp->t2d_axes = true;
 }
@@ -266,7 +272,7 @@ void tour2d_speed_set(gint slidepos, ggobid *gg) {
   extern void speed_set (gint, gfloat *, gfloat *, gfloat, gint *, gint *);
 
   cpanel->t2d_slidepos = slidepos;
-  speed_set(slidepos, &cpanel->t2d_step, &dsp->t2d.delta,  dsp->t2d.dv,
+  speed_set(slidepos, &cpanel->t2d_step, &dsp->t2d.delta,  dsp->t2d.dist_az,
     &dsp->t2d.nsteps, &dsp->t2d.stepcntr);
 }
 
@@ -288,55 +294,57 @@ tour2dvar_set (gint jvar, ggobid *gg)
   gboolean active=false;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
+  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
 
-  for (j=0; j<dsp->t2d.nvars; j++)
-    if (jvar == dsp->t2d.vars.els[j])
+  for (j=0; j<dsp->t2d.nactive; j++)
+    if (jvar == dsp->t2d.active_vars.els[j])
       active = true;
 
-  /* deselect var if t2d.nvars > 2 */
+  /* deselect var if t2d.nactive > 2 */
   if (active) {
-    if (dsp->t2d.nvars > 2) {
-      for (j=0; j<dsp->t2d.nvars; j++) {
-        if (jvar == dsp->t2d.vars.els[j]) 
+    if (dsp->t2d.nactive > 2) {
+      for (j=0; j<dsp->t2d.nactive; j++) {
+        if (jvar == dsp->t2d.active_vars.els[j]) 
           break;
       }
-      if (j<dsp->t2d.nvars-1) {
-        for (k=j; k<dsp->t2d.nvars-1; k++) {
-          dsp->t2d.vars.els[k] = dsp->t2d.vars.els[k+1];
+      if (j<dsp->t2d.nactive-1) {
+        for (k=j; k<dsp->t2d.nactive-1; k++) {
+          dsp->t2d.active_vars.els[k] = dsp->t2d.active_vars.els[k+1];
         }
       }
-      dsp->t2d.nvars--;
+      dsp->t2d.nactive--;
  
       if (!gg->tour2d.fade_vars) /* set current position without sel var */
       {
-        gt_basis(dsp->t2d.u0, dsp->t2d.nvars, dsp->t2d.vars, 
+        gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
           d->ncols, (gint) 2);
-        copy_mat(dsp->t2d.u.vals, dsp->t2d.u0.vals, d->ncols, 2);
+        arrayd_copy(&dsp->t2d.Fa.vals, &dsp->t2d.F.vals);
+	/*        copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
       }
     }
   }
   else { /* not active, so add the variable */
-    if (jvar > dsp->t2d.vars.els[dsp->t2d.nvars-1]) {
-      dsp->t2d.vars.els[dsp->t2d.nvars] = jvar;
+    if (jvar > dsp->t2d.active_vars.els[dsp->t2d.nactive-1]) {
+      dsp->t2d.active_vars.els[dsp->t2d.nactive] = jvar;
     }
-    else if (jvar < dsp->t2d.vars.els[0]) {
-      for (j=dsp->t2d.nvars; j>0; j--) {
-          dsp->t2d.vars.els[j] = dsp->t2d.vars.els[j-1];
+    else if (jvar < dsp->t2d.active_vars.els[0]) {
+      for (j=dsp->t2d.nactive; j>0; j--) {
+          dsp->t2d.active_vars.els[j] = dsp->t2d.active_vars.els[j-1];
       }
-      dsp->t2d.vars.els[0] = jvar;
+      dsp->t2d.active_vars.els[0] = jvar;
     }
     else {
-      for (j=0; j<dsp->t2d.nvars-1; j++) {
-        if (jvar > dsp->t2d.vars.els[j] && jvar < dsp->t2d.vars.els[j+1]) {
+      for (j=0; j<dsp->t2d.nactive-1; j++) {
+        if (jvar > dsp->t2d.active_vars.els[j] && jvar < dsp->t2d.active_vars.els[j+1]) {
           jtmp = j+1;
           break;
         }
       }
-      for (j=dsp->t2d.nvars-1;j>=jtmp; j--) 
-          dsp->t2d.vars.els[j+1] = dsp->t2d.vars.els[j];
-      dsp->t2d.vars.els[jtmp] = jvar;
+      for (j=dsp->t2d.nactive-1;j>=jtmp; j--) 
+          dsp->t2d.active_vars.els[j+1] = dsp->t2d.active_vars.els[j];
+      dsp->t2d.active_vars.els[jtmp] = jvar;
     }
-    dsp->t2d.nvars++;
+    dsp->t2d.nactive++;
   }
 
   dsp->t2d.get_new_target = true;
@@ -375,10 +383,39 @@ tour2d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      sp->planar[i].x += (gint)(dsp->t2d.u.vals[0][j]*world_data[i][j]);
-      sp->planar[i].y += (gint)(dsp->t2d.u.vals[1][j]*world_data[i][j]);
+      sp->planar[i].x += (gint)(dsp->t2d.F.vals[0][j]*world_data[i][j]);
+      sp->planar[i].y += (gint)(dsp->t2d.F.vals[1][j]*world_data[i][j]);
     }
   }
+}
+
+void tour2d_scramble(ggobid *gg)
+{
+  int i, j;
+  displayd *dsp = gg->current_display;
+  datad *d = dsp->d;
+  gint nc = d->ncols;
+  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
+
+  for (i=0; i<2; i++)
+    for (j=0; j<nc; j++)
+      dsp->t2d.Fa.vals[i][j] = dsp->t2d.Fz.vals[i][j] = 
+        dsp->t2d.F.vals[i][j] = dsp->t2d.Ga.vals[i][j] = 
+        dsp->t2d.Gz.vals[i][j] = 0.0;
+
+  gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
+    d->ncols, (gint) 2);
+  arrayd_copy(&dsp->t2d.Fa.vals, &dsp->t2d.F.vals);
+  /*  copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
+
+  dsp->t2d.nsteps = 1; 
+  dsp->t2d.stepcntr = 1;
+
+  dsp->t2d.get_new_target = true;
+
+  display_tailpipe (dsp, FULL, gg);
+
+  varcircles_refresh (d, gg);
 }
 
 void
@@ -389,12 +426,14 @@ tour2d_run(displayd *dsp, ggobid *gg)
   extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
     gfloat, gint);
   extern void do_last_increment(vector_f, vector_f, gint);
-  extern gint path(array_f, array_f, array_f, gint, gint, array_f, 
-    array_f, array_f, vector_f, array_f, array_f,
+  extern gint path(array_d, array_d, array_d, gint, gint, array_d, 
+    array_d, array_d, vector_f, array_d, array_d, array_d,
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
-  extern void tour_reproject(vector_f, array_f, array_f, array_f, 
-    array_f, array_f, gint, gint);
+  extern void tour_reproject(vector_f, array_d, array_d, array_d, 
+    array_d, array_d, gint, gint);
   extern void t2d_ppdraw(gfloat, ggobid *);
+  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
+  extern gboolean checkequiv(gdouble **, gdouble **, gint, gint);
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint i, j, nv;
@@ -408,16 +447,12 @@ tour2d_run(displayd *dsp, ggobid *gg)
 
   if (!dsp->t2d.get_new_target && 
        !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, 
-       dsp->t2d.target_basis_method, &dsp->t2d.ppval, &oindxval)) {
-    /*      !reached_target2(dsp->t2d.tinc, dsp->t2d.tau, 
-	    dsp->t2d.target_basis_method, &dsp->t2d.ppval, &oindxval, (gint) 2)) {*/
+       dsp->t2d.target_selection_method, &dsp->t2d.ppval, &oindxval)) {
 
     increment_tour(dsp->t2d.tinc, dsp->t2d.tau, &dsp->t2d.nsteps, 
-      &dsp->t2d.stepcntr, dsp->t2d.dv, dsp->t2d.delta, (gint) 2);
-    tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1, 
-      dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
-
-    /*    printf("%f ",dsp->t2d.u.vals[0][0]);*/
+      &dsp->t2d.stepcntr, dsp->t2d.dist_az, dsp->t2d.delta, (gint) 2);
+    tour_reproject(dsp->t2d.tinc, dsp->t2d.G, dsp->t2d.Ga, dsp->t2d.Gz, 
+      dsp->t2d.F, dsp->t2d.Va, d->ncols, (gint) 2);
 
     /* plot pp indx */
     if (dsp->t2d_ppda != NULL) {
@@ -433,96 +468,82 @@ tour2d_run(displayd *dsp, ggobid *gg)
   }
   else { /* do final clean-up and get new target */
     if (dsp->t2d.get_new_target) {
-      if (dsp->t2d.target_basis_method == 1)
+      if (dsp->t2d.target_selection_method == 1)
       {
         dsp->t2d_pp_op.index_best = dsp->t2d.ppval;
         oindxval = dsp->t2d.ppval;
         for (i=0; i<2; i++)
-          for (j=0; j<dsp->t2d.nvars; j++)
+          for (j=0; j<dsp->t2d.nactive; j++)
             dsp->t2d_pp_op.proj_best.vals[j][i] = 
-              dsp->t2d.u.vals[i][dsp->t2d.vars.els[j]];
+              dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
       }
     }
     else 
     {
-      if (dsp->t2d.target_basis_method == 1)
+      if (dsp->t2d.target_selection_method == 1)
         t2d_ppdraw(dsp->t2d.ppval, gg);
       else
       {
         do_last_increment(dsp->t2d.tinc, dsp->t2d.tau, (gint) 2);
-        tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1,
-          dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
-
-	/*g_printerr ("u: ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u.vals[0][i]);
-g_printerr ("\n    ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u.vals[1][i]);
-g_printerr ("\n");
-
-g_printerr ("u1: ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u1.vals[0][i]);
-g_printerr ("\n    ");
-for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u1.vals[1][i]);
-g_printerr ("\n");
-
-g_printerr("%d %d %f\n", dsp->t2d.stepcntr, dsp->t2d.nsteps, dsp->t2d.dv);*/
+        tour_reproject(dsp->t2d.tinc, dsp->t2d.G, dsp->t2d.Ga, dsp->t2d.Gz,
+          dsp->t2d.F, dsp->t2d.Va, d->ncols, (gint) 2);
       }
     }
     nv = 0;
     for (i=0; i<d->ncols; i++) {
       chosen = false;
-      for (k=0; k<dsp->t2d.nvars; k++) {
-        if (dsp->t2d.vars.els[k] == i) {
+      for (k=0; k<dsp->t2d.nactive; k++) {
+        if (dsp->t2d.active_vars.els[k] == i) {
           chosen = true;
           break;
         }
       }
       if (!chosen) {
-        if (dsp->t2d.u.vals[0][i] < eps && dsp->t2d.u.vals[1][i] < eps)
-          dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
-        if (fabs(dsp->t2d.u.vals[0][i]) > eps || 
-          fabs(dsp->t2d.u.vals[1][i]) > eps) {
+        if (fabs(dsp->t2d.F.vals[0][i]) < eps && 
+          fabs(dsp->t2d.F.vals[1][i]) < eps)
+          dsp->t2d.F.vals[0][i] = dsp->t2d.F.vals[1][i] = 0.0;
+        if (fabs(dsp->t2d.F.vals[0][i]) > eps || 
+          fabs(dsp->t2d.F.vals[1][i]) > eps) {
           nv++;
 	}
       }
     }
-    copy_mat(dsp->t2d.u0.vals, dsp->t2d.u.vals, d->ncols, 2);
-    if (nv == 0 && dsp->t2d.nvars <= 2) /* only generate new dir if num of
+    arrayd_copy(&dsp->t2d.F.vals, &dsp->t2d.Fa.vals);
+    if (nv == 0 && dsp->t2d.nactive <= 2) /* only generate new dir if num of
                                            active/used variables is > 2 -
                                            this code allows for motion to
                                            continue while a variable is 
                                            fading out. */
       dsp->t2d.get_new_target = true;
     else {
-      if (dsp->t2d.target_basis_method == 0) {
-        gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
+      if (dsp->t2d.target_selection_method == 0) {
+        gt_basis(dsp->t2d.Fz, dsp->t2d.nactive, dsp->t2d.active_vars, 
           d->ncols, (gint) 2);
-	/*	g_printerr("GETTING NEW BASIS\n");*/
       }
-      else if (dsp->t2d.target_basis_method == 1) {
+      else if (dsp->t2d.target_selection_method == 1) {
         /* pp guided tour  */
         revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
-          dsp->t2d.target_basis_method, gg);
+          dsp->t2d.target_selection_method, gg);
 
         if (!revert_random) {
           for (i=0; i<2; i++)
-            for (j=0; j<dsp->t2d.nvars; j++)
-              dsp->t2d.u1.vals[i][dsp->t2d.vars.els[j]] = 
+            for (j=0; j<dsp->t2d.nactive; j++)
+              dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[j]] = 
                 dsp->t2d_pp_op.proj_best.vals[j][i];
 
           /* if the best projection is the same as the previous one, switch 
               to a random projection */
-          if (!checkequiv(dsp->t2d.u0.vals, dsp->t2d.u1.vals, d->ncols, 2)) 
+          if (!checkequiv(dsp->t2d.Fa.vals, dsp->t2d.Fz.vals, d->ncols, 2)) 
           {
             printf("Using random projection\n");
-            gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
+            gt_basis(dsp->t2d.Fz, dsp->t2d.nactive, dsp->t2d.active_vars, 
               d->ncols, (gint) 2);
             for (i=0; i<2; i++)
-              for (j=0; j<dsp->t2d.nvars; j++)
+              for (j=0; j<dsp->t2d.nactive; j++)
                 dsp->t2d_pp_op.proj_best.vals[j][i] = 
-                  dsp->t2d.u1.vals[i][dsp->t2d.vars.els[j]];
+                  dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[j]];
             revert_random = t2d_switch_index(cpanel->t2d_pp_indx, 
-              dsp->t2d.target_basis_method, gg);
+              dsp->t2d.target_selection_method, gg);
           }
           t2d_ppdraw(dsp->t2d.ppval, gg);
           count = 0;
@@ -534,29 +555,30 @@ g_printerr("%d %d %f\n", dsp->t2d.stepcntr, dsp->t2d.nsteps, dsp->t2d.dv);*/
         }
         else
         {
-          gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
+          gt_basis(dsp->t2d.Fz, dsp->t2d.nactive, dsp->t2d.active_vars, 
             d->ncols, (gint) 2);
         }
         
       }
-      pathprob = path(dsp->t2d.u0, dsp->t2d.u1, dsp->t2d.u, d->ncols, 
-        (gint) 2, dsp->t2d.v0,
-        dsp->t2d.v1, dsp->t2d.v, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.uvevec,
+      pathprob = path(dsp->t2d.Fa, dsp->t2d.Fz, dsp->t2d.F, d->ncols, 
+        (gint) 2, dsp->t2d.Ga,
+        dsp->t2d.Gz, dsp->t2d.G, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.Va,
+        dsp->t2d.Vz,
         dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 
-        &dsp->t2d.dv, dsp->t2d.delta);
+        &dsp->t2d.dist_az, dsp->t2d.delta);
       if (pathprob != 0) {
         if (pathprob == 1) {
-          gt_basis(dsp->t2d.u0, dsp->t2d.nvars, dsp->t2d.vars, 
+          gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
             d->ncols, (gint) 2);
-          copy_mat(dsp->t2d.u.vals, dsp->t2d.u0.vals, d->ncols, 2);
+          arrayd_copy(&dsp->t2d.Fa.vals, &dsp->t2d.F.vals);
+	  /*          copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
 	}
         else if (pathprob == 2) {
-          gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
+          gt_basis(dsp->t2d.Fz, dsp->t2d.nactive, dsp->t2d.active_vars, 
             d->ncols, (gint) 2);
 	}
         else if (pathprob == 3) {
-          gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, 
-            d->ncols, (gint) 2);
+          tour2d_scramble(gg);
 	}
         dsp->t2d.get_new_target = true;
       }
@@ -616,53 +638,26 @@ void tour2d_reinit(ggobid *gg)
 
   for (i=0; i<2; i++)
     for (j=0; j<nc; j++)
-      dsp->t2d.u0.vals[i][j] = dsp->t2d.u1.vals[i][j] = 
-        dsp->t2d.u.vals[i][j] = dsp->t2d.v0.vals[i][j] = 
-        dsp->t2d.v1.vals[i][j] = 0.0;
+      dsp->t2d.Fa.vals[i][j] = dsp->t2d.Fz.vals[i][j] = 
+        dsp->t2d.F.vals[i][j] = dsp->t2d.Ga.vals[i][j] = 
+        dsp->t2d.Gz.vals[i][j] = 0.0;
 
   for (i=0; i<2; i++)
   {
-    dsp->t2d.u1.vals[i][dsp->t2d.vars.els[i]] =
-      dsp->t2d.u0.vals[i][dsp->t2d.vars.els[i]] = 
-      dsp->t2d.u.vals[i][dsp->t2d.vars.els[i]] =
-      dsp->t2d.v0.vals[i][dsp->t2d.vars.els[i]] = 
-      dsp->t2d.v1.vals[i][dsp->t2d.vars.els[i]] = 1.0;
+    dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[i]] =
+      dsp->t2d.Fa.vals[i][dsp->t2d.active_vars.els[i]] = 
+      dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[i]] =
+      dsp->t2d.Ga.vals[i][dsp->t2d.active_vars.els[i]] = 
+      dsp->t2d.Gz.vals[i][dsp->t2d.active_vars.els[i]] = 1.0;
   }
   /*  for (i=0; i<2; i++) {
     for (j=0; j<d->ncols; j++) {
-      dsp->t2d.u0.vals[i][j] = 0.;
-      dsp->t2d.u.vals[i][j] = 0.;
+      dsp->t2d.Fa.vals[i][j] = 0.;
+      dsp->t2d.F.vals[i][j] = 0.;
     }
-    dsp->t2d.u0.vals[i][dsp->t2d.vars.els[i]] = 1.;
-    dsp->t2d.u.vals[i][dsp->t2d.vars.els[i]] = 1.;
+    dsp->t2d.Fa.vals[i][dsp->t2d.active_vars.els[i]] = 1.;
+    dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[i]] = 1.;
     }*/
-  dsp->t2d.nsteps = 1; 
-  dsp->t2d.stepcntr = 1;
-
-  dsp->t2d.get_new_target = true;
-
-  display_tailpipe (dsp, FULL, gg);
-
-  varcircles_refresh (d, gg);
-}
-
-void tour2d_scramble(ggobid *gg)
-{
-  int i, j;
-  displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
-  gint nc = d->ncols;
-
-  for (i=0; i<2; i++)
-    for (j=0; j<nc; j++)
-      dsp->t2d.u0.vals[i][j] = dsp->t2d.u1.vals[i][j] = 
-        dsp->t2d.u.vals[i][j] = dsp->t2d.v0.vals[i][j] = 
-        dsp->t2d.v1.vals[i][j] = 0.0;
-
-  gt_basis(dsp->t2d.u0, dsp->t2d.nvars, dsp->t2d.vars, 
-    d->ncols, (gint) 2);
-  copy_mat(dsp->t2d.u.vals, dsp->t2d.u0.vals, d->ncols, 2);
-
   dsp->t2d.nsteps = 1; 
   dsp->t2d.stepcntr = 1;
 
@@ -682,12 +677,12 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   gint j, k;
-  gint n1vars = dsp->t2d.nvars;
+  gint n1vars = dsp->t2d.nactive;
   gfloat ftmp, tol = 0.01; 
   gdouble dtmp1;
-  extern void gram_schmidt(gfloat *, gfloat*, gint);
-  extern gfloat calc_norm(gfloat *, gint);
-  extern gfloat inner_prod(gfloat *, gfloat *, gint);
+  extern void gram_schmidt(gdouble *, gdouble*, gint);
+  extern gdouble calc_norm(gdouble *, gint);
+  extern gdouble inner_prod(gdouble *, gdouble *, gint);
 
   /* need to turn off tour */
   if (!cpanel->t2d_paused)
@@ -699,8 +694,8 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   /* check if manip var is one of existing vars */
   /* n1vars, n2vars is the number of variables, excluding the
      manip var in hor and vert directions */
-  for (j=0; j<dsp->t2d.nvars; j++)
-    if (dsp->t2d.vars.els[j] == dsp->t2d_manip_var) {
+  for (j=0; j<dsp->t2d.nactive; j++)
+    if (dsp->t2d.active_vars.els[j] == dsp->t2d_manip_var) {
       dsp->t2d_manipvar_inc = true;
       n1vars--;
     }
@@ -715,8 +710,8 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
        2 will be the indicator vector for the manip var */
     for (j=0; j<d->ncols; j++) 
     {
-      dsp->t2d_manbasis.vals[0][j] = dsp->t2d.u.vals[0][j];
-      dsp->t2d_manbasis.vals[1][j] = dsp->t2d.u.vals[1][j];
+      dsp->t2d_manbasis.vals[0][j] = dsp->t2d.F.vals[0][j];
+      dsp->t2d_manbasis.vals[1][j] = dsp->t2d.F.vals[1][j];
       dsp->t2d_manbasis.vals[2][j] = 0.;
     }
     dsp->t2d_manbasis.vals[2][dsp->t2d_manip_var] = 1.;
@@ -741,7 +736,7 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
     }
 
     while (ftmp < tol) {
-        gt_basis(dsp->t2d.tv, dsp->t2d.nvars, dsp->t2d.vars, 
+        gt_basis(dsp->t2d.tv, dsp->t2d.nactive, dsp->t2d.active_vars, 
           d->ncols, (gint) 1);
         for (j=0; j<d->ncols; j++) 
           dsp->t2d_manbasis.vals[2][j] = dsp->t2d.tv.vals[0][j];
@@ -755,15 +750,15 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
     dsp->t2d_no_dir_flag = false;
     if (dsp->t2d_manip_mode == MANIP_RADIAL)
     {
-      if ((dsp->t2d.u.vals[0][dsp->t2d_manip_var]*
-        dsp->t2d.u.vals[0][dsp->t2d_manip_var] +
-        dsp->t2d.u.vals[1][dsp->t2d_manip_var]*
-        dsp->t2d.u.vals[1][dsp->t2d_manip_var]) < tol)
+      if ((dsp->t2d.F.vals[0][dsp->t2d_manip_var]*
+        dsp->t2d.F.vals[0][dsp->t2d_manip_var] +
+        dsp->t2d.F.vals[1][dsp->t2d_manip_var]*
+        dsp->t2d.F.vals[1][dsp->t2d_manip_var]) < tol)
         dsp->t2d_no_dir_flag = true;
       else
       {
-        dsp->t2d_rx = dsp->t2d.u.vals[0][dsp->t2d_manip_var];
-        dsp->t2d_ry = dsp->t2d.u.vals[1][dsp->t2d_manip_var];
+        dsp->t2d_rx = dsp->t2d.F.vals[0][dsp->t2d_manip_var];
+        dsp->t2d_ry = dsp->t2d.F.vals[1][dsp->t2d_manip_var];
         dtmp1 = sqrt(dsp->t2d_rx*dsp->t2d_rx+dsp->t2d_ry*dsp->t2d_ry);
         dsp->t2d_rx /= dtmp1;
         dsp->t2d_ry /= dtmp1;
@@ -778,7 +773,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   datad *d = dsp->d;
-  gint actual_nvars = dsp->t2d.nvars;
+  gint actual_nvars = dsp->t2d.nactive;
   gboolean offscreen = false;
   gfloat phi, cosphi, sinphi, ca, sa, cosm, cospsi, sinpsi;
   gfloat distx, disty, x1, x2, y1, y2;
@@ -787,8 +782,8 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   gdouble dtmp1, dtmp2;
   gfloat len_motion;
   gint i,j,k;
-  extern void gram_schmidt(gfloat *, gfloat*, gint);
-  extern void copy_mat(gfloat **, gfloat **, gint, gint);
+  extern void gram_schmidt(gdouble *, gdouble*, gint);
+  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
 
   /* check if off the plot window */
   if (p1 > sp->max.x || p1 < 0 ||
@@ -796,7 +791,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     offscreen = true;
 
   if (dsp->t2d_manipvar_inc)
-    actual_nvars = dsp->t2d.nvars-1;
+    actual_nvars = dsp->t2d.nactive-1;
 
   if (!offscreen) {
     dsp->t2d_pos1_old = dsp->t2d_pos1;
@@ -920,7 +915,8 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
               dsp->t2d_Rmat2.vals[k][j]);
           dsp->t2d_Rmat1.vals[i][j] = dtmp1;
         }
-      copy_mat(dsp->t2d_mvar_3dbasis.vals, dsp->t2d_Rmat1.vals, 3, 3);
+      arrayd_copy(&dsp->t2d_Rmat1.vals, &dsp->t2d_mvar_3dbasis.vals);
+      /*      copy_mat(dsp->t2d_mvar_3dbasis.vals, dsp->t2d_Rmat1.vals, 3, 3);*/
   
       gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
         dsp->t2d_mvar_3dbasis.vals[1], 3);
@@ -931,17 +927,18 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
       for (j=0; j<d->ncols; j++)
       {
-        dsp->t2d.u.vals[0][j] = 
+        dsp->t2d.F.vals[0][j] = 
           dsp->t2d_manbasis.vals[0][j]*dsp->t2d_mvar_3dbasis.vals[0][0] +
           dsp->t2d_manbasis.vals[1][j]*dsp->t2d_mvar_3dbasis.vals[0][1] +
           dsp->t2d_manbasis.vals[2][j]*dsp->t2d_mvar_3dbasis.vals[0][2];
-        dsp->t2d.u.vals[1][j] = 
+        dsp->t2d.F.vals[1][j] = 
           dsp->t2d_manbasis.vals[0][j]*dsp->t2d_mvar_3dbasis.vals[1][0] +
           dsp->t2d_manbasis.vals[1][j]*dsp->t2d_mvar_3dbasis.vals[1][1] +
           dsp->t2d_manbasis.vals[2][j]*dsp->t2d_mvar_3dbasis.vals[1][2];
       }
     }
     display_tailpipe (dsp, FULL, gg);
+    /*    display_tailpipe (dsp, FULL_1PIXMAP, gg);*/
     varcircles_refresh (d, gg);
   }
 }
@@ -953,11 +950,12 @@ tour2d_manip_end(splotd *sp)
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
-  extern void copy_mat(gfloat **, gfloat **, gint, gint);
+  /*  extern void copy_mat(gdouble **, gdouble **, gint, gint);*/
 
   disconnect_motion_signal (sp);
 
-  copy_mat(dsp->t2d.u0.vals, dsp->t2d.u.vals, d->ncols, 2);
+  arrayd_copy(&dsp->t2d.F.vals, &dsp->t2d.Fa.vals);
+  /*  copy_mat(dsp->t2d.Fa.vals, dsp->t2d.F.vals, d->ncols, 2);*/
   dsp->t2d.get_new_target = true;
 
   /* need to turn on tour? */

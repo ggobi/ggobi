@@ -13,74 +13,74 @@
 #include "externs.h"
 
 void
-zero_tau (vector_f tau, gint nd) {
+zero_tau (vector_f tau, gint projdim) {
 
   gint k;
 
-  for (k=0; k<nd; k++) 
+  for (k=0; k<projdim; k++) 
     tau.els[k] = 0.0;
 }
 
 void
-zero_tinc(vector_f tinc, gint nd) {
+zero_tinc(vector_f tinc, gint projdim) {
   gint k;
 
-  for (k=0; k<nd; k++) 
+  for (k=0; k<projdim; k++) 
     tinc.els[k] = 0.0;
 }
 
 void
-zero_lambda(vector_f lambda, gint nd) {
+zero_lambda(vector_f lambda, gint projdim) {
   gint k;
 
-  for (k=0; k<nd; k++) 
+  for (k=0; k<projdim; k++) 
     lambda.els[k] = 0.0;
 }
 
 void
-norm(gfloat *x, gint n)
+norm(gdouble *x, gint n)
 {
   gint j;
   gdouble xn = 0;
 
   for (j=0; j<n; j++)
-    xn = xn + (gdouble) (x[j]*x[j]);
+    xn = xn + (x[j]*x[j]);
   xn = sqrt(xn);
   for (j=0; j<n; j++)
-    x[j] = x[j]/(gfloat)xn;
+    x[j] = x[j]/xn;
 }
 
-gfloat
-calc_norm(gfloat *x, gint n)
+gdouble
+calc_norm(gdouble *x, gint n)
 {
   gint j;
   gdouble xn = 0;
 
   for (j=0; j<n; j++)
-    xn = xn + (gdouble)(x[j]*x[j]);
+    xn = xn + (x[j]*x[j]);
   xn = sqrt(xn);
 
-  return((gfloat)xn);
+  return(xn);
 }
 
-gfloat
-inner_prod(gfloat *x1, gfloat *x2, gint n)
+gdouble
+inner_prod(gdouble *x1, gdouble *x2, gint n)
 {
   gdouble xip;
   gint j;
 
   xip = 0.;
   for (j=0; j<n; j++)
-    xip = xip + (gdouble)x1[j]*(gdouble)x2[j];
-  return((gfloat)xip);
+    xip = xip + x1[j]*x2[j];
+  return(xip);
 }
 
 /* orthonormalizes vector 2 on vector */
 void
-gram_schmidt(gfloat *x1, gfloat *x2, gint n)
+gram_schmidt(gdouble *x1, gdouble *x2, gint n)
 {
   gint j;
-  gfloat ip;
+  gdouble ip;
 
   ip = inner_prod(x1, x2, n);
   for (j=0; j<n; j++)
@@ -90,21 +90,21 @@ gram_schmidt(gfloat *x1, gfloat *x2, gint n)
 }
 
 /* checks columns of matrix are orthonormal */
-gboolean checkcolson(gfloat **ut, gint nc, gint nd) {
+gboolean checkcolson(gdouble **ut, gint datadim, gint projdim) {
   gint j, k;
-  gfloat tol = 0.01;
-  gboolean ok = true;
+  gdouble tol = 0.01;
+  gboolean ok = true;/* true means cols are o.n. */
 
-  for (j=0; j<nd; j++) {
-    if (fabs(1.-calc_norm(ut[j], nc)) > tol) {
+  for (j=0; j<projdim; j++) {
+    if (fabs(1.-calc_norm(ut[j], datadim)) > tol) {
       ok = false;
       return(ok);
     }
   }
 
-  for (j=0; j<nd-1; j++) {
-    for (k=j+1; k<nd; k++) {
-      if (fabs(inner_prod(ut[j],ut[k],nc)) > tol) {
+  for (j=0; j<projdim-1; j++) {
+    for (k=j+1; k<projdim; k++) {
+      if (fabs(inner_prod(ut[j],ut[k],datadim)) > tol) {
         ok = false;
         return(ok);
       }
@@ -114,16 +114,18 @@ gboolean checkcolson(gfloat **ut, gint nc, gint nd) {
   return(ok);
 }
 
-/* checks columns of matrix are orthonormal */
-gboolean checkequiv(gfloat **u0, gfloat **u1, gint nc, gint nd) {
+gboolean checkequiv(gdouble **Fa, gdouble **Fz, gint datadim, gint projdim) {
   gint j;
-  gfloat tol = 0.0001;
+  gdouble ftmp, tol = 0.0001;
   gboolean ok = true; /* false = the two are the same */
 
-  for (j=0; j<nd; j++) {
-    if (fabs(1.-inner_prod(u0[j], u1[j], nc)) < tol) {
+  for (j=0; j<projdim; j++) {
+    ftmp = inner_prod(Fa[j], Fz[j], datadim);
+    /*    printf("checkequiv %f \n",ftmp);*/
+    /* if ftmp is close to zero it says the4 two vectors are close
+       to being identical */
+    if (fabs(1.-ftmp) < tol) {
       ok = false;
-      /*      printf("checkequiv %f \n",inner_prod(u0[j], u1[j], nc));*/
       return(ok);
     }
   }
@@ -132,8 +134,8 @@ gboolean checkequiv(gfloat **u0, gfloat **u1, gint nc, gint nd) {
 }
 
 /* matrix multiplication UV */
-gboolean matmult_uv(gfloat **ut, gfloat **vt, gint ur, gint uc, 
-  gint vr, gint vc, gfloat **ot) {
+gboolean matmult_uv(gdouble **ut, gdouble **vt, gint ur, gint uc, 
+  gint vr, gint vc, gdouble **ot) {
   gint i, j, k;
   gboolean ok = true;
 
@@ -146,7 +148,7 @@ gboolean matmult_uv(gfloat **ut, gfloat **vt, gint ur, gint uc,
     for (k=0; k<vc; k++) {
       ot[k][j] = 0.0;
       for (i=0; i<uc; i++) {
-        ot[k][j] += ut[i][j]*vt[k][i];
+        ot[k][j] += (ut[i][j]*vt[k][i]);
       }
     }
   }
@@ -155,8 +157,8 @@ gboolean matmult_uv(gfloat **ut, gfloat **vt, gint ur, gint uc,
 }
 
 /* matrix multiplication U'V */
-gboolean matmult_utv(gfloat **ut, gfloat **vt, gint ur, gint uc, 
-  gint vr, gint vc, gfloat **ot) {
+gboolean matmult_utv(gdouble **ut, gdouble **vt, gint ur, gint uc, 
+  gint vr, gint vc, gdouble **ot) {
   gint i, j, k;
   gboolean ok = true;
 
@@ -169,7 +171,7 @@ gboolean matmult_utv(gfloat **ut, gfloat **vt, gint ur, gint uc,
     for (k=0; k<vc; k++) {
       ot[k][j] = 0.0;
       for (i=0; i<ur; i++) {
-        ot[k][j] += ut[j][i]*vt[k][i];
+        ot[k][j] += (ut[j][i]*vt[k][i]);
       }
     }
   }
@@ -178,8 +180,8 @@ gboolean matmult_utv(gfloat **ut, gfloat **vt, gint ur, gint uc,
 }
 
 /* matrix multiplication UV */
-gboolean matmult_uvt(gfloat **ut, gfloat **vt, gint ur, gint uc, 
-  gint vr, gint vc, gfloat **ot) {
+gboolean matmult_uvt(gdouble **ut, gdouble **vt, gint ur, gint uc, 
+  gint vr, gint vc, gdouble **ot) {
   gint i, j, k;
   gboolean ok = true;
 
@@ -192,7 +194,7 @@ gboolean matmult_uvt(gfloat **ut, gfloat **vt, gint ur, gint uc,
     for (k=0; k<vr; k++) {
       ot[k][j] = 0.0;
       for (i=0; i<uc; i++) {
-        ot[k][j] += ut[i][j]*vt[i][k];
+        ot[k][j] += (ut[i][j]*vt[i][k]);
       }
     }
   }
@@ -201,23 +203,23 @@ gboolean matmult_uvt(gfloat **ut, gfloat **vt, gint ur, gint uc,
 }
 
 /* copy matrix ot=out matrix, it=in matrix */
-void copy_mat(gfloat **ot, gfloat **it, gint nr, gint nc) {
+void copy_mat(gdouble **ot, gdouble **it, gint nr, gint datadim) {
   gint j, k;
 
   for (j=0; j<nr; j++)
-    for (k=0; k<nc; k++)
+    for (k=0; k<datadim; k++)
       ot[k][j] = it[k][j];
 }
 
-/* orthonormalize x2 on x2, just by diagonals should be enough for this
+/* orthonormalize x2 on x1, just by diagonals should be enough for this
    tour code */
 void
-matgram_schmidt(gfloat **x1, gfloat **x2, gint nr, gint nc)
+matgram_schmidt(gdouble **x1, gdouble **x2, gint nr, gint datadim)
 {
   gint j, k;
-  gfloat ip;
+  gdouble ip;
 
-  for (j=0; j<nc; j++) {
+  for (j=0; j<datadim; j++) {
     norm(x1[j], nr);
     norm(x2[j], nr);
     ip = inner_prod(x1[j], x2[j], nr);
@@ -229,17 +231,17 @@ matgram_schmidt(gfloat **x1, gfloat **x2, gint nr, gint nc)
 }
 
 void
-eigen_clear (array_f v0, array_f v1, vector_f lambda, vector_f tau, 
-  vector_f tinc, gint nc)
+eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau, 
+  vector_f tinc, gint datadim)
 {
   /*  datad *d = dsp->d;
-  gint nc = d->ncols;*/
+  gint datadim = d->ncols;*/
   gint j, k;
 
-  for (j=0; j<nc; j++) {
-    for (k=0; k<nc; k++) {
-      v0.vals[j][k] = 0.;
-      v1.vals[j][k] = 0.;
+  for (j=0; j<datadim; j++) {
+    for (k=0; k<datadim; k++) {
+      Ga.vals[j][k] = 0.;
+      Gz.vals[j][k] = 0.;
     }
     lambda.els[j] = 0.;
     tau.els[j] = 0.;
@@ -248,161 +250,123 @@ eigen_clear (array_f v0, array_f v1, vector_f lambda, vector_f tau,
 
 }
 
-/* u0 = starting projection
- * u1 = target projection
- * u = interpolated projection
- * nc = num vars
- * nd = proj dim
+/* Fa = starting projection
+ * Fz = target projection
+ * F = interpolated projection
+ * datadim = num vars
+ * projdim = proj dim
  */
-gint path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
-  array_f v1, array_f v, vector_f lambda, array_f tv, array_f uvevec, 
-  vector_f tau, vector_f tinc, gint *ns, gint *stcn, gfloat *pdv, 
+gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, array_d Ga,
+  array_d Gz, array_d G, vector_f lambda, array_d tv, array_d Va, 
+  array_d Vz,
+  vector_f tau, vector_f tinc, gint *ns, gint *stcn, gfloat *pdist_az, 
   gfloat delta) {
 
   gint i, j, k, rank;
   gdouble tol = 0.0001;
   gdouble tmpd1 = 0.0, tmpd2 = 0.0, tmpd =0.0;
   gboolean doit = true;
-  paird *pairs = (paird *) g_malloc (nd * sizeof (paird));
-  gfloat *e = (gfloat *) g_malloc (nd * sizeof (gfloat));
+  paird *pairs = (paird *) g_malloc (projdim * sizeof (paird));
+  gfloat *e = (gfloat *) g_malloc (projdim * sizeof (gfloat));
   gint dI; /* dimension of intersection of base pair */
   gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
+  array_d tmpvc;
 
-  gfloat dv = *pdv;
+  gfloat dist_az = *pdist_az;
   gint nsteps = *ns;
   gint stepcntr = *stcn;
 
-  zero_tau(tau, nd);
-  zero_tinc(tinc, nd);
-  zero_lambda(lambda, nd);
-  for (i=0; i<nd; i++)
-    for (j=0; j<nc; j++)
+  /*  arrayd_init_null(&tmpvc);
+      arrayd_alloc(&tmpvc, projdim, datadim);*/
+
+  zero_tau(tau, projdim);
+  zero_tinc(tinc, projdim);
+  zero_lambda(lambda, projdim);
+  for (i=0; i<projdim; i++)
+    for (j=0; j<datadim; j++)
     {
-      v0.vals[i][j] = 0.0;
-      v1.vals[i][j] = 0.0;
-      v.vals[i][j] = 0.0;
-      uvevec.vals[i][j] = 0.0;
+      Ga.vals[i][j] = 0.0;
+      Gz.vals[i][j] = 0.0;
+      G.vals[i][j] = 0.0;
+      Va.vals[i][j] = 0.0;
     }
-  /*  copy_mat(u.vals, u0.vals, nc, nd);
-  copy_mat(v0.vals, u0.vals, nc, nd);
-  copy_mat(v1.vals, u1.vals, nc, nd);
-  copy_mat(uvevec.vals, u1.vals, nc, nd);
-  copy_mat(v.vals, u0.vals, nc, nd);*/
+  /*  copy_mat(F.vals, Fa.vals, datadim, projdim);
+  copy_mat(Ga.vals, Fa.vals, datadim, projdim);
+  copy_mat(Gz.vals, Fz.vals, datadim, projdim);
+  copy_mat(Va.vals, Fz.vals, datadim, projdim);
+  copy_mat(G.vals, Fa.vals, datadim, projdim);*/
   stepcntr = 1;
   nsteps = 1;
-  dv = 0.0;
+  dist_az = 0.0;
   
   /* 2 is hard-wired because it relates to cos, sin
                          and nothing else. */
   for (i=0; i<2; i++) 
-    ptinc[i] = (gfloat *) g_malloc (nd * sizeof (gfloat));
+    ptinc[i] = (gfloat *) g_malloc (projdim * sizeof (gfloat));
     
-  /* Check that u0 and u1 are both orthonormal. */
-  if (!checkcolson(u0.vals, nc, nd)) {
-    printf("Columns of u0 are not orthonormal: generating random u0\n");
-g_printerr ("u0: ");
-for (i=0; i<nc; i++) g_printerr ("%f ", u0.vals[0][i]);
+  /* Check that Fa and Fz are both orthonormal. */
+  if (!checkcolson(Fa.vals, datadim, projdim)) {
+    printf("Columns of Fa are not orthonormal: generating random Fa\n");
+g_printerr ("Fa: ");
+for (i=0; i<datadim; i++) g_printerr ("%f ", Fa.vals[0][i]);
 g_printerr ("\n    ");
-for (i=0; i<nc; i++) g_printerr ("%f ", u0.vals[1][i]);
+for (i=0; i<datadim; i++) g_printerr ("%f ", Fa.vals[1][i]);
 g_printerr ("\n");
     return(1);
     /*    doit = false;*/
   }
-  if (!checkcolson(u1.vals, nc, nd)) {
-    printf("Columns of u1 are not orthonormal: generating random u1\n");
+  if (!checkcolson(Fz.vals, datadim, projdim)) {
+    printf("Columns of Fz are not orthonormal: generating random Fz\n");
     return(2);
     /*    doit = false;*/
   }
 
-  /* Check that u0 and u1 are the same */
-  if (!checkequiv(u0.vals, u1.vals, nc, nd)) {
-    printf("u0 equiv u1: generating random u1\n");
+  /* Check that Fa and Fz are the same */
+  if (!checkequiv(Fa.vals, Fz.vals, datadim, projdim)) {
+    printf("Fa equiv Fz: generating random Fz\n");
     return(3);
     /*    doit = false;*/
   }
 
-  /* Do SVD of u0'u1: span(u0,u1).*/
+  /* Do SVD of Fa'Fz: span(Fa,Fz).*/
   if (doit) {
     
-    if (!matmult_utv(u0.vals, u1.vals, nc, nd, nc, nd, tv.vals))
+    if (!matmult_utv(Fa.vals, Fz.vals, datadim, projdim, datadim, 
+      projdim, tv.vals))
       printf("#cols != #rows in the two matrices");
       
-      dsvd(tv.vals, nd, nd, lambda.els, v1.vals);
+    /* tv comes in as a projdimxprojdim asymmetric matrix */
+      dsvd(tv.vals, projdim, projdim, lambda.els, Va.vals);
+      /* tv gets overwritten with the left-hand reduction, u,
+           which is then stored in Va,
+         Vz gets the right-hand reduction, v */
 
-      copy_mat(v0.vals, tv.vals, nd, nd);
+      /* dec: switched order of Va and Vz,
+         assuming Vz to be transpose, so forcing
+         a transpose of this matrix to be used. Also
+         it turns out that Va comes back as a transpose.
+         Very strange, but this is what it takes to 
+         get results consistent with R coding, and
+         that is clearly correct. */
 
-      /* we want eigenvalues in order from largest to smallest, ie
-         smallest angle to largest angle */
-      /* only do this if nd > 2 otherwise it is easy */
-      if (nd > 2) {
-        /*-- obtain ranks to use in sorting eigenvals and eigenvec --*/
-        for (i=0; i<nd; i++) {
-          pairs[i].f = (gfloat) lambda.els[i];
-          pairs[i].indx = i;
-        }
-        qsort ((gchar *) pairs, (size_t) lambda.els, sizeof (paird), pcompare);
+      for (i=0; i<projdim; i++)
+        for (j=0; j<projdim; j++)
+          Vz.vals[i][j] = tv.vals[j][i];
 
-       /*-- sort the eigenvalues and eigenvectors into temporary arrays --*/
-       for (i=0; i<nd; i++) {
-         k = (nd - i) - 1;  /*-- to reverse the order --*/
-         rank = pairs[i].indx;
-         e[k] = lambda.els[rank];
-         for (j=0; j<nd; j++)
-           tv.vals[j][k] = v0.vals[j][rank];
-       }
+      for (i=0; i<projdim; i++)
+        for (j=0; j<projdim; j++)
+          tv.vals[i][j] = Va.vals[j][i];
 
-       /*-- copy the sorted eigenvalues and eigenvectors back --*/
-       for (i=0; i<nd; i++) {
-         lambda.els[i] = e[i];
-         for (j=0; j<nd; j++)
-           v0.vals[j][i] = tv.vals[j][i];
-       }
-  
-       /* need to do v1 too */
-       for (i=0; i<nd; i++) {
-         k = (nd - i) - 1;  /*-- to reverse the order --*/
-         rank = pairs[i].indx;
-         for (j=0; j<nd; j++)
-           tv.vals[j][k] = v1.vals[j][rank];
-       }
-       for (i=0; i<nd; i++) {
-         for (j=0; j<nd; j++)
-           v1.vals[j][i] = tv.vals[j][i];
-       }
-     }
-     else if (nd == 2) {
-       if (lambda.els[1] > lambda.els[0]) {
-         e[0] = lambda.els[1];
-         lambda.els[1] = lambda.els[0];
-         lambda.els[0] = e[0];
-
-         for (j=0; j<nd; j++) {
-           tv.vals[j][1] = v0.vals[j][0];
-           v0.vals[j][0] = v0.vals[j][1];
-           v0.vals[j][1] = tv.vals[j][1];
-           tv.vals[j][1] = v1.vals[j][0];
-           v1.vals[j][0] = v1.vals[j][1];
-           v1.vals[j][1] = tv.vals[j][1];
-         }
-
-       }
-     }
-
-     /* copy the eigenvectors into a permanent structure. need this
-        for reprojection */
-     copy_mat(uvevec.vals, v0.vals, nd, nd);
-
-/*      SingularValueDecomposition svd = temp.svd();
-      Va = svd.getU();
-      Vz = svd.getV();
-      lambda = svd.getSingularValues();*/
-     /* Returns the sv's in order largest to smallest.*/
+      for (i=0; i<projdim; i++)
+        for (j=0; j<projdim; j++)
+	Va.vals[i][j] = tv.vals[i][j];
 
       /*  Check span of <Fa,Fz>
-       If dI=ndim we should stop here, and set Ft to be Fa but this is
+       If dimension of the intersection is equal to dimension of proj,
+       dI=ndim, we should stop here, and set Ft to be Fa but this is
        equivalent to setting the lambda's to be 1.0 at this stage.*/
       dI = 0;
-      for (i=0; i<nd; i++) {
+      for (i=0; i<projdim; i++) {
         if (lambda.els[i] > 1.0-tol) {
           dI++;
           lambda.els[i] = 1.0;
@@ -410,82 +374,99 @@ g_printerr ("\n");
       }
     
       /*  Compute principal angles */
-      for (i=0; i<nd; i++)
+      for (i=0; i<projdim; i++) {
         tau.els[i] = (gfloat) acos((gdouble) lambda.els[i]);
-      
-      /*  Calculate principal directions */
-      if (nd > dI) {
-        copy_mat(tv.vals, v0.vals, nc, nd);
-        if (!matmult_uv(u0.vals, tv.vals, nc, nd, nd, nd, v0.vals))
-          printf("Could not multiply u and v, cols!=rows \n");
-        copy_mat(tv.vals, v1.vals, nc, nd);
-        if (!matmult_uv(u1.vals, tv.vals, nc, nd, nd, nd, v1.vals))
-          printf("Could not multiply u and v, cols!=rows \n");
-        /*  Orthonormalize v1 on v0*/
-        matgram_schmidt(v0.vals, v1.vals, nc, nd);
-
       }
-      else {
-        copy_mat(v0.vals, u0.vals, nc, nd);
-        copy_mat(v1.vals, u0.vals, nc, nd);
-        for (i=0; i<nd; i++)
+
+      /*  Calculate principal directions */
+      if (projdim > dI) { /* Span is ok - proceed */
+        for (i=0; i<datadim; i++)
+          for (j=0; j<projdim; j++)
+            tv.vals[j][i] = 0.0;
+        arrayd_copy(&Va.vals, &tv.vals);
+
+        /* Rotate Fa to get Ga */
+        if (!matmult_uv(Fa.vals, tv.vals, datadim, projdim, projdim, 
+          projdim, Ga.vals))
+          printf("Could not multiply u and v, cols!=rows \n");
+        for (j=0; j<projdim; j++)
+          norm(Ga.vals[j], datadim);
+        for (i=0; i<projdim-1; i++) {
+          for (j=i+1; j<projdim; j++)
+            gram_schmidt(Ga.vals[i], Ga.vals[j], datadim);
+	}
+        
+        for (i=0; i<datadim; i++)
+          for (j=0; j<projdim; j++)
+            tv.vals[j][i] = 0.0;
+        arrayd_copy(&Vz.vals, &tv.vals);
+
+        if (!matmult_uv(Fz.vals, tv.vals, datadim, projdim, projdim, 
+          projdim, Gz.vals))
+            printf("Could not multiply u and v, cols!=rows \n");
+
+        for (j=0; j<projdim; j++)
+          norm(Gz.vals[j], datadim);
+        for (i=0; i<projdim-1; i++) {
+          for (j=i+1; j<projdim; j++)
+            gram_schmidt(Gz.vals[i], Gz.vals[j], datadim);
+	}
+
+        /* orthonormalize Gz on Ga to make a frame of rotation */
+        for (i=0; i<projdim; i++)
+          gram_schmidt(Ga.vals[i], Gz.vals[i], datadim);
+        for (j=0; j<projdim; j++)
+          norm(Gz.vals[j], datadim);
+        for (i=0; i<projdim-1; i++) {
+          for (j=i+1; j<projdim; j++)
+            gram_schmidt(Gz.vals[i], Gz.vals[j], datadim);
+	}
+      }
+      else { /* Span not ok, cannot do interp path, so reinitialize */
+        arrayd_copy(&Fa.vals, &Ga.vals);
+        arrayd_copy(&Fa.vals, &Gz.vals);
+        for (i=0; i<projdim; i++)
           tau.els[i] = 0.0;
       }
 
-      /* Check tau */
-      for (i=0; i<nd; i++) {
-        ptinc[0][i] = (gfloat) cos((gdouble) tau.els[i]);
-        ptinc[1][i] = (gfloat) sin((gdouble) tau.els[i]);
-      }
-
-      for (i=0; i<nd; i++) {
-        tmpd1 = ptinc[0][i];
-        tmpd2 = ptinc[1][i];
-        for (j=0; j<nc; j++) {
-          tmpd = v0.vals[i][j]*tmpd1 + v1.vals[i][j]*tmpd2;
-          v.vals[i][j] = tmpd;
-        }
-      }
-      /*      printf("\n%f %f\n",inner_prod(u1.vals[0],v.vals[0],nc),
-	      inner_prod(u1.vals[1],v.vals[1],nc));*/
-
       /* Construct current basis*/
-      for (i=0; i<nd; i++)
+      for (i=0; i<projdim; i++)
         tinc.els[i]=0.0;
-      for (i=0; i<nd; i++) {
+      for (i=0; i<projdim; i++) {
         ptinc[0][i] = (gfloat) cos((gdouble) tinc.els[i]);
         ptinc[1][i] = (gfloat) sin((gdouble) tinc.els[i]);
       }
 
-      for (i=0; i<nd; i++) {
+      for (i=0; i<projdim; i++) {
         tmpd1 = ptinc[0][i];
         tmpd2 = ptinc[1][i];
-        for (j=0; j<nc; j++) {
-          tmpd = v0.vals[i][j]*tmpd1 + v1.vals[i][j]*tmpd2;
-          v.vals[i][j] = tmpd;
+        for (j=0; j<datadim; j++) {
+          tmpd = Ga.vals[i][j]*tmpd1 + Gz.vals[i][j]*tmpd2;
+          G.vals[i][j] = tmpd;
         }
       }
 
-      matmult_uvt(v.vals, uvevec.vals, nc, nd, nd, nd, u.vals);
+      /* rotate in space of plane to match Fa basis */
+      matmult_uvt(G.vals, Va.vals, datadim, projdim, projdim, projdim, F.vals);
 
       /* orthonormal to correct round-off errors */
-      for (i=0; i<nd; i++)
-        norm(u.vals[i], nc); 
+      for (i=0; i<projdim; i++)
+        norm(F.vals[i], datadim); 
 
-      for (k=0; k<nd-1; k++)
-        for (j=k+1; j<nd; j++)
-          gram_schmidt(u.vals[k], u.vals[j], nc);
+      for (k=0; k<projdim-1; k++)
+        for (j=k+1; j<projdim; j++)
+          gram_schmidt(F.vals[k], F.vals[j], datadim);
 
       /* Calculate Euclidean norm of principal angles.*/
-      dv = 0.0;
-      for (i=0; i<nd; i++)
-        dv += (tau.els[i]*tau.els[i]);
-      dv = (gfloat)sqrt((gdouble)dv);
-      *pdv = dv;
+      dist_az = 0.0;
+      for (i=0; i<projdim; i++)
+        dist_az += (tau.els[i]*tau.els[i]);
+      dist_az = (gfloat)sqrt((gdouble)dist_az);
+      *pdist_az = dist_az;
 
       /* Reset increment counters.*/
-      nsteps = (gint) floor((gdouble)(dv/delta))+1;
-      /*      for (i=1; i<nd; i++) {
+      nsteps = (gint) floor((gdouble)(dist_az/delta))+1;
+      /*      for (i=1; i<projdim; i++) {
         if ((gint) floor((gdouble)(dG/delta)) < nsteps) 
           nsteps = (gint) floor((gdouble)(dG/delta));
       }*/
@@ -494,20 +475,13 @@ g_printerr ("\n");
       *stcn = stepcntr;
   }
   else {
-    /*    zero_tau(tau, nd);
-    zero_tinc(tau, nd);
-    zero_lambda(tau, nd);*/
-    copy_mat(u.vals, u0.vals, nc, nd);
-    copy_mat(v0.vals, u0.vals, nc, nd);
-    copy_mat(v1.vals, u1.vals, nc, nd);
-    copy_mat(uvevec.vals, u1.vals, nc, nd);
-    copy_mat(v.vals, u0.vals, nc, nd);
-    /*    stepcntr = 0;
-    nsteps = 0;
-    dv = 0.0;*/ /* i don't think i need this if i initialize all these
-                   at the start of the function - di */ /* i still need the
-                                                           copy_mat lines */
-    *pdv = dv;
+    arrayd_copy(&Fa.vals, &F.vals);
+    arrayd_copy(&Fa.vals, &Ga.vals);
+    arrayd_copy(&Fz.vals, &Gz.vals);
+    arrayd_copy(&Fz.vals, &Va.vals);
+    arrayd_copy(&Fa.vals, &G.vals);
+
+    *pdist_az = dist_az;
     *ns = nsteps;
     *stcn = stepcntr;
 
@@ -524,42 +498,40 @@ g_printerr ("\n");
 } /* path */
 
 /* Generate the interpolation frame. No preprojection is done */
-/*void tour_reproject(displayd *dsp, gint nd)*/
-void tour_reproject(vector_f tinc, array_f v, array_f v0, array_f v1, 
-  array_f u, array_f uvevec, gint nc, gint nd)
+void tour_reproject(vector_f tinc, array_d G, array_d Ga, array_d Gz, 
+  array_d F, array_d Va, gint datadim, gint projdim)
 {
-  /*  datad *d = dsp->d;
-  gint nc = d->ncols;*/
   gint i, j, k;
   gdouble tmpd1, tmpd2, tmpd;
   gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
 
   for (i=0; i<2; i++)
-    ptinc[i] = (gfloat *) g_malloc (nd * sizeof (gfloat));
+    ptinc[i] = (gfloat *) g_malloc (projdim * sizeof (gfloat));
 
-  for (i=0; i<nd; i++) {
+  for (i=0; i<projdim; i++) {
     ptinc[0][i] = (gfloat) cos((gdouble) tinc.els[i]);
     ptinc[1][i] = (gfloat) sin((gdouble) tinc.els[i]);
   }
 
-  for (i=0; i<nd; i++) {
+  for (i=0; i<projdim; i++) {
     tmpd1 = ptinc[0][i];
     tmpd2 = ptinc[1][i];
-    for (j=0; j<nc; j++) {
-      tmpd = v0.vals[i][j]*tmpd1 + v1.vals[i][j]*tmpd2;
-      v.vals[i][j] = tmpd;
+    for (j=0; j<datadim; j++) {
+      tmpd = Ga.vals[i][j]*tmpd1 + Gz.vals[i][j]*tmpd2;
+      G.vals[i][j] = tmpd;
     }
   }
 
-  matmult_uvt(v.vals, uvevec.vals, nc, nd, nd, nd, u.vals);
+  /* rotate in space of plane to match Fa basis */
+  matmult_uvt(G.vals, Va.vals, datadim, projdim, projdim, projdim, F.vals);
 
   /* orthonormalize to correct round-off errors */
-  for (i=0; i<nd; i++)
-    norm(u.vals[i], nc); 
+  for (i=0; i<projdim; i++)
+    norm(F.vals[i], datadim); 
 
-  for (k=0; k<nd-1; k++)
-    for (j=k+1; j<nd; j++)
-      gram_schmidt(u.vals[k], u.vals[j], nc);
+  for (k=0; k<projdim; k++)
+    for (j=k+1; j<projdim; j++)
+      gram_schmidt(F.vals[k], F.vals[j], datadim);
 
   for (j=0; j<2; j++)
     g_free (ptinc[j]);
@@ -570,7 +542,7 @@ void tour_reproject(vector_f tinc, array_f v, array_f v0, array_f v1,
 /* this routine increments the interpolation */
 void
 increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn, 
-  gfloat dv, gfloat delta, gint nd)
+  gfloat dist_az, gfloat delta, gint projdim)
 {
   int i;
   gboolean attheend = false;
@@ -580,13 +552,8 @@ increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn,
 
   stepcntr++;
 
-  /*  printf("tinc ");
-  for (i=0; i<nd; i++)
-    printf("%f ",tinc[i]);
-  printf("\n");*/
-
   /* Why do I need to do this? Di */
-  for (i=0; i<nd; i++) 
+  for (i=0; i<projdim; i++) 
     if (tinc.els[i] > tau.els[i]) {
       attheend = true;
       nsteps = stepcntr;
@@ -594,12 +561,12 @@ increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn,
 
   if (attheend || nsteps == 1 || 
       nsteps == stepcntr) {
-    for (i=0; i<nd; i++)
+    for (i=0; i<projdim; i++)
       tinc.els[i] = tau.els[i];
   }
   else {
-    for (i=0; i<nd; i++)
-      tinc.els[i] += delta*tau.els[i]/dv;
+    for (i=0; i<projdim; i++)
+      tinc.els[i] += (delta*tau.els[i]/dist_az);
   }
 
   *ns = nsteps;
@@ -629,7 +596,7 @@ reached_target(gint nsteps, gint stepcntr, gint basmeth,
 
 gboolean
 reached_target2(vector_f tinc, vector_f tau, gint basmeth, 
-  gfloat *indxval, gfloat *oindxval, gint nd) 
+  gfloat *indxval, gfloat *oindxval, gint projdim) 
 {
   gboolean arewethereyet = false;
   gfloat tol=0.01;
@@ -645,7 +612,7 @@ reached_target2(vector_f tinc, vector_f tau, gint basmeth,
       *oindxval = *indxval;
   }
   else {
-    for (i=0; i<nd; i++) 
+    for (i=0; i<projdim; i++) 
     if (fabs(tinc.els[i]-tau.els[i]) < tol) 
       arewethereyet = true;
   }
@@ -654,21 +621,18 @@ reached_target2(vector_f tinc, vector_f tau, gint basmeth,
 }
 
 void
-/*do_last_increment(displayd *dsp, gint nd)*/
-do_last_increment(vector_f tinc, vector_f tau, gint nd)
+do_last_increment(vector_f tinc, vector_f tau, gint projdim)
 {
   int j;
 
-  for (j=0; j<nd; j++)
+  for (j=0; j<projdim; j++)
     tinc.els[j] = tau.els[j];
 
 }
 
-void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dv, 
+void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dist_az, 
   gint *ns, gint *stcn) {
 
-  /*  displayd *dsp = gg->current_display; 
-  cpaneld *cpanel = &dsp->cpanel;*/
   gfloat fracpath;
 
   gfloat step = *st;
@@ -697,17 +661,15 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dv,
 	  step = (gfloat) sqrt((double)(slidepos-50)) + 0.1868;*/
 
     delta = step*M_PI_2/10.0;
-    if (nsteps > 0)
+    if (nsteps > 1)
       fracpath = stepcntr/nsteps;
     else 
       fracpath = 1.0;
 
-    nsteps = (gint) floor((gdouble)(dv/delta))+1;
+    nsteps = (gint) floor((gdouble)(dist_az/delta))+1;
     stepcntr = (gint) floor(fracpath*nsteps);
 
   }
-
-  /*    printf("slidepos: %d; nsteps: %d; stepcntr: %d; delta: %f; dv: %f\n",slidepos,nsteps,stepcntr, delta,dv);*/
 
   *st = step;
   *dlt = delta;
@@ -716,12 +678,13 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dv,
 }
 
 void
-gt_basis (array_f u1, gint nvars, vector_i vars, gint nc, gint nd)
+gt_basis (array_d Fz, gint nactive, vector_i active_vars, 
+  gint datadim, gint projdim)
 /*
  * Generate d random p dimensional vectors to form new ending basis
 */
 {
-  gint i, j, k, check = 1, nvals = nvars*nd, ntimes;
+  gint i, j, k, check = 1, nvals = nactive*projdim, ntimes;
   gdouble frunif[2];
   gdouble r, fac, frnorm[2];
   gboolean oddno;
@@ -740,14 +703,14 @@ gt_basis (array_f u1, gint nvars, vector_i vars, gint nc, gint nd)
  * "Numerical Recipes" p.202-3, for generating random normal variates .
 */
 
-  /* Zero out u1 before filling; this might fix a bug we are
+  /* Zero out Fz before filling; this might fix a bug we are
      encountering with returning from a receive tour.
   */
-  for (j=0; j<nc; j++)
-    for (k=0; k<nd; k++)
-      u1.vals[k][j] = 0.0 ;
+  for (j=0; j<datadim; j++)
+    for (k=0; k<projdim; k++)
+      Fz.vals[k][j] = 0.0 ;
 
-  if (nvars > nd) {
+  if (nactive > projdim) {
     for (j=0; j<ntimes; j++) {
       while (check) {
  
@@ -763,36 +726,36 @@ gt_basis (array_f u1, gint nvars, vector_i vars, gint nc, gint nd)
         }
       }
       check = 1;
-      if (nd == 1) {
+      if (projdim == 1) {
         if (oddno && j == ntimes-1) {
-          u1.vals[0][vars.els[2*j]] = (gfloat) frnorm[0];
+          Fz.vals[0][active_vars.els[2*j]] = frnorm[0];
         }
         else {
-          u1.vals[0][vars.els[2*j]] = (gfloat) frnorm[0];
-          u1.vals[0][vars.els[2*j+1]] = (gfloat) frnorm[1];
+          Fz.vals[0][active_vars.els[2*j]] = frnorm[0];
+          Fz.vals[0][active_vars.els[2*j+1]] = frnorm[1];
         }
       }
-      else if (nd == 2) {
-        u1.vals[0][vars.els[j]] = (gfloat) frnorm[0];
-        u1.vals[1][vars.els[j]] = (gfloat) frnorm[1];
+      else if (projdim == 2) {
+        Fz.vals[0][active_vars.els[j]] = frnorm[0];
+        Fz.vals[1][active_vars.els[j]] = frnorm[1];
       }
     }
-    for (k=0; k<nd; k++)
-      norm(u1.vals[k], nc);
+    for (k=0; k<projdim; k++)
+      norm(Fz.vals[k], datadim);
 
     /*
      * Orthogonalize the basis on the first using Gram-Schmidt
     */
-    if (nd > 1) {
-      for (k=0; k<nd-1; k++)
-        for (j=k+1; j<nd; j++)
-          gram_schmidt(u1.vals[k], u1.vals[j], nc);
+    if (projdim > 1) {
+      for (k=0; k<projdim-1; k++)
+        for (j=k+1; j<projdim; j++)
+          gram_schmidt(Fz.vals[k], Fz.vals[j], datadim);
     }
   }
   else /* if there is only one variable */
   {
-    for (i=0; i<nd; i++)
-      u1.vals[i][vars.els[i]] = 1.;
+    for (i=0; i<projdim; i++)
+      Fz.vals[i][active_vars.els[i]] = 1.;
   }
 
 }

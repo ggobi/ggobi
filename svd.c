@@ -24,7 +24,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-gint dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v);
+gint dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
 #ifdef __cplusplus
 }
 #endif
@@ -39,9 +39,8 @@ static gdouble PYTHAG (gdouble a, gdouble b)
   return(result);
 }
 
-
 gint
-dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v)
+dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v)
 {
   gint flag, i, its, j, jj, k, l, nm;
   gdouble c, f, h, s, x, y, z;
@@ -66,31 +65,31 @@ dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v)
     if (i < m)
     {
       for (k = i; k < m; k++)
-        scale += fabs ((gdouble)a[k][i]);
+        scale += fabs (a[k][i]);
       if (scale)
       {
         for (k = i; k < m; k++)
         {
-          a[k][i] = (gfloat)((gdouble)a[k][i]/scale);
-          s += ((gdouble)a[k][i] * (gdouble)a[k][i]);
+          a[k][i] = (a[k][i]/scale);
+          s += (a[k][i] * a[k][i]);
         }
-        f = (gdouble)a[i][i];
+        f = a[i][i];
         g = -SIGN(sqrt (s), f);
         h = f * g - s;
-        a[i][i] = (gfloat)(f - g);
+        a[i][i] = (f - g);
         if (i != n - 1)
         {
           for (j = l; j < n; j++)
           {
             for (s = 0.0, k = i; k < m; k++)
-              s += ((gdouble)a[k][i] * (gdouble)a[k][j]);
+              s += (a[k][i] * a[k][j]);
             f = s / h;
             for (k = i; k < m; k++)
-              a[k][j] += (gfloat)(f * (gdouble)a[k][i]);
+              a[k][j] += (f * a[k][i]);
           }
         }
         for (k = i; k < m; k++)
-          a[k][i] = (gfloat)((gdouble)a[k][i]*scale);
+          a[k][i] = (a[k][i]*scale);
       }
     }
     w[i] = (gfloat)(scale * g);
@@ -100,32 +99,32 @@ dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v)
     if (i < m && i != n - 1)
     {
       for (k = l; k < n; k++)
-        scale += fabs((gdouble)a[i][k]);
+        scale += fabs(a[i][k]);
       if (scale)
       {
         for (k = l; k < n; k++)
         {
-          a[i][k] = (gfloat)((gdouble)a[i][k]/scale);
-          s += ((gdouble)a[i][k] * (gdouble)a[i][k]);
+          a[i][k] = (a[i][k]/scale);
+          s += (a[i][k] * a[i][k]);
         }
-        f = (gdouble)a[i][l];
+        f = a[i][l];
         g = -SIGN(sqrt(s), f);
         h = f * g - s;
-        a[i][l] = (gfloat)(f - g);
+        a[i][l] = (f - g);
         for (k = l; k < n; k++)
-          rv1[k] = (gdouble)a[i][k] / h;
+          rv1[k] = a[i][k] / h;
         if (i != m - 1)
         {
           for (j = l; j < m; j++)
           {
             for (s = 0.0, k = l; k < n; k++)
-              s += ((gdouble)a[j][k] * (gdouble)a[i][k]);
+              s += (a[j][k] * a[i][k]);
             for (k = l; k < n; k++)
-              a[j][k] += (gfloat)(s * rv1[k]);
+              a[j][k] += (s * rv1[k]);
           }
         }
         for (k = l; k < n; k++)
-          a[i][k] = (gfloat)((gdouble)a[i][k]*scale);
+          a[i][k] = (a[i][k]*scale);
       }
     }
     anorm = MAX (anorm, (fabs ((gdouble)w[i]) + fabs(rv1[i])));
@@ -139,14 +138,14 @@ dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v)
       if (g)
       {
         for (j = l; j < n; j++)
-          v[j][i] = (gfloat)(((gdouble)a[i][j] / (gdouble)a[i][l]) / g);
+          v[j][i] = ((a[i][j] / a[i][l]) / g);
           /* double division to avoid underflow */
         for (j = l; j < n; j++)
         {
           for (s = 0.0, k = l; k < n; k++)
-            s += ((gdouble)a[i][k] * (gdouble)v[k][j]);
+            s += (a[i][k] * v[k][j]);
           for (k = l; k < n; k++)
-            v[k][j] += (gfloat)(s * (gdouble)v[k][i]);
+            v[k][j] += (s * v[k][i]);
         }
       }
       for (j = l; j < n; j++)
@@ -173,14 +172,14 @@ dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v)
         for (j = l; j < n; j++)
         {
           for (s = 0.0, k = l; k < m; k++)
-            s += ((gdouble)a[k][i] * (gdouble)a[k][j]);
-          f = (s / (gdouble)a[i][i]) * g;
+            s += (a[k][i] * a[k][j]);
+          f = (s / a[i][i]) * g;
           for (k = i; k < m; k++)
-            a[k][j] += (gfloat)(f * (gdouble)a[k][i]);
+            a[k][j] += (f * a[k][i]);
         }
       }
       for (j = i; j < m; j++)
-        a[j][i] = (gfloat)((gdouble)a[j][i]*g);
+        a[j][i] = (a[j][i]*g);
     }
     else
     {
@@ -224,10 +223,10 @@ dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v)
             s = (- f * h);
             for (j = 0; j < m; j++)
             {
-              y = (gdouble)a[j][nm];
-              z = (gdouble)a[j][i];
-              a[j][nm] = (gfloat)(y * c + z * s);
-              a[j][i] = (gfloat)(z * c - y * s);
+              y = a[j][nm];
+              z = a[j][i];
+              a[j][nm] = (y * c + z * s);
+              a[j][i] = (z * c - y * s);
             }
           }
         }
@@ -295,10 +294,10 @@ dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v)
         x = (c * y) - (s * g);
         for (jj = 0; jj < m; jj++)
         {
-          y = (gdouble)a[jj][j];
-          z = (gdouble)a[jj][i];
-          a[jj][j] = (gfloat)(y * c + z * s);
-          a[jj][i] = (gfloat)(z * c - y * s);
+          y = a[jj][j];
+          z = a[jj][i];
+          a[jj][j] = (y * c + z * s);
+          a[jj][i] = (z * c - y * s);
         }
       }
       rv1[l] = 0.0;
