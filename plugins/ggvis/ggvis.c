@@ -19,28 +19,15 @@ gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   GtkWidget *entry;
-
-  GtkItemFactory *factory;
-  GtkWidget *tool_menu;
+  extern GtkWidget *GGobi_addToolsMenuItem (const char *label, ggobid *gg);
 
   inst->data = NULL;
   inst->info = plugin;
 
-  entry = gtk_menu_item_new_with_label ("Graph Layout ...");
-  gtk_widget_show (entry);
+  entry = GGobi_addToolsMenuItem ("Graph layout ...", gg);
   gtk_signal_connect_object (GTK_OBJECT(entry), "activate",
                              GTK_SIGNAL_FUNC (show_ggvis_window),
                              (gpointer) inst);
-
-  factory = gtk_item_factory_from_path ("<main>");
-  tool_menu = gtk_item_factory_get_widget (factory, "<main>/Tools");
-
-  /* Add a separator */
-  CreateMenuItem (tool_menu, NULL,
-    "", "", NULL, NULL, NULL, NULL, gg);
-
-  gtk_menu_append (GTK_MENU (tool_menu), entry);
-
   return(true);
 }
 
