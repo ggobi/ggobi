@@ -4,8 +4,6 @@ Also, the GGobiAPI.h has prototypes for some of these.
 gint getView ()
 void setView (gchar *)
 
-displayd setCurrentDisplay (gchar *)
-
 
 /*-- brushing --*/
 ! gfloat **getColorTable ()
@@ -15,10 +13,6 @@ displayd setCurrentDisplay (gchar *)
 /* General boolean settings that can be set from menu items.
   e.g
 */
-
-gboolean getShowLines();
-gboolean setShowLines(gboolean);
-
 gboolean getShowGrid();
 gboolean setShowGrid(gboolean);
 
@@ -33,14 +27,6 @@ gboolean setShowGrid(gboolean);
  /* displays */
  /*  Stubs added for these, but not implemented yet. */
 
-void newScatterplot (gint ix, gint iy, gchar *viewType)
-void newScatmat (gint *rows, gint *columns)
-void newParCoords (gint *vars)
-/* Create a display (collection of one or more plots) of the specified type
-   (see displaytyped in defines.h)
-   using the identified variables.
- */
-displayd* createPlot(int type, char **varnames);
 
 
 gint *getPlottedVariables ()

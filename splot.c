@@ -261,6 +261,19 @@ splot_free (splotd *sp, displayd *display) {
   g_free ((gpointer) sp);
 }
 
+void
+splot_dimension_set(splotd* sp, gint width, gint height)
+{
+  sp->max.x = width;
+  sp->max.y = height;
+  sp->ishift.x = sp->max.x / 2;
+  sp->ishift.y = sp->max.y / 2;
+
+  if (sp->da != NULL && width != -1 && height != -1)
+    gtk_drawing_area_size (GTK_DRAWING_AREA (sp->da), width, height);
+
+}
+
 splotd *
 splot_new (displayd *display, gint width, gint height) {
   splotd *sp = (splotd *) g_malloc (sizeof (splotd));
@@ -271,11 +284,8 @@ splot_new (displayd *display, gint width, gint height) {
   sp->da = gtk_drawing_area_new ();
   sp->pixmap0 = NULL;
   sp->pixmap1 = NULL;
-
-  sp->max.x = width;
-  sp->max.y = height;
-  sp->ishift.x = sp->max.x / 2;
-  sp->ishift.y = sp->max.y / 2;
+  
+  splot_dimension_set(sp, width, height);
 
   /*
    * Let it be possible to get a pointer to the splotd object 
@@ -283,8 +293,6 @@ splot_new (displayd *display, gint width, gint height) {
   */
   gtk_object_set_data (GTK_OBJECT (sp->da), "splotd", (gpointer) sp);
 
-  if (width != -1 && height != -1)
-    gtk_drawing_area_size (GTK_DRAWING_AREA (sp->da), width, height);
 
   gtk_signal_connect (GTK_OBJECT (sp->da),
                       "expose_event",

@@ -55,7 +55,7 @@ dataset_init(ggobid *gg)
 
 
     /*-- initialize the first display --*/
-    display = scatterplot_new (false);
+    display = scatterplot_new (false, NULL);
     /* Need to make certain this is the only one there.
        See
      */
@@ -146,8 +146,9 @@ make_ggobi (gchar *ldata_in, gboolean processEvents) {
       display_free_all ();  /*-- destroy any existing displays --*/
 
       /*-- initialize the first display --*/
-      display = scatterplot_new (false);
+      display = scatterplot_new (false, NULL);
       gg.displays = g_list_append (gg.displays, (gpointer) display);
+
       display_set_current (display);
       gg.current_splot = (splotd *)
         g_list_nth_data (gg.current_display->splots, 0);

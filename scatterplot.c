@@ -168,21 +168,35 @@ scatterplot_display_menus_make (displayd *display,
 
 
 displayd *
-scatterplot_new (gboolean missing_p) {
-  GtkWidget *table, *vbox;
-  GtkWidget *mbar;
-  splotd *sp;
-
+display_alloc_init(enum displaytyped type, gboolean missing_p)
+{
   displayd *display = (displayd *) g_malloc (sizeof (displayd));
-  display->displaytype = scatterplot;
+  display->displaytype = type; 
   display->missing_p = missing_p;
 
   display->p1d_orientation = VERTICAL;
 
   display->options = DefaultDisplayOptions;
+
+return(display);
+}
+
+displayd *
+scatterplot_new (gboolean missing_p, splotd *sp) {
+  GtkWidget *table, *vbox;
+  GtkWidget *mbar;
+  displayd *display;
+
+  if(sp == NULL) {
+    display = display_alloc_init(scatterplot, missing_p);
+  } else {
+   display = (displayd*) sp->displayptr;
+  }
+
+
   /* Want to make certain this is true, and perhaps it may be different
      for other plot types and so not be set appropriately in DefaultOptions.
-      display->options.axes_center_p = true; 
+    display->options.axes_center_p = true; 
    */
 
   scatterplot_cpanel_init (&display->cpanel, XYPLOT);
@@ -217,7 +231,10 @@ scatterplot_new (gboolean missing_p) {
   /*
    * Initialize a single splot
   */
-  sp = splot_new (display, WIDTH, HEIGHT);
+  if(sp == NULL) {
+   sp = splot_new (display, WIDTH, HEIGHT);
+  }
+
   display->splots = NULL;
   display->splots = g_list_append (display->splots, (gpointer) sp);
 

@@ -128,25 +128,37 @@ parcoords_reset_arrangement (displayd *display, gint arrangement) {
 
 #define MAXNPCPLOTS 5
 displayd *
-parcoords_new (gboolean missing_p) {
+parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots) 
+{
   GtkWidget *vbox, *frame;
   GtkWidget *mbar;
   gint i;
   splotd *sp;
-  gint nplots = MIN (gg.ncols, MAXNPCPLOTS);
+  gint nplots;
+  displayd *display;
 
-  displayd *display = (displayd *) g_malloc (sizeof (displayd));
+  if(sub_plots == NULL) {
+     nplots = MIN (gg.ncols, MAXNPCPLOTS);
 
-  display->displaytype = parcoords;
-  display->missing_p = missing_p;
-  /* create a row of vertical plots by default */
-  display->p1d_orientation = VERTICAL;
+     display = (displayd *) g_malloc (sizeof (displayd));
+   
+     display->displaytype = parcoords;
+     display->missing_p = missing_p;
+    /* create a row of vertical plots by default */
+     display->p1d_orientation = VERTICAL;
+   
+    /* Copy in the contents of DefaultOptions to create
+       an indepedently modifiable configuration copied from
+       the current template.
+     */
+     display->options = DefaultDisplayOptions;
 
-  /* Copy in the contents of DefaultOptions to create
-     an indepedently modifiable configuration copied from
-     the current template.
-   */
-  display->options = DefaultDisplayOptions;
+
+  } else {
+     nplots = numSubPlots;
+     display = (displayd *) sub_plots[0]->displayptr;
+  }
+
 
   parcoords_cpanel_init (&display->cpanel);
 
@@ -197,11 +209,15 @@ parcoords_new (gboolean missing_p) {
   display->splots = NULL;
 
   for (i=0; i<nplots; i++) {
-    sp = splot_new (display, WIDTH, HEIGHT);
-    /*
-     * instead of maintaining a list, each plot knows its variable
-    */
-    sp->p1dvar = i; 
+    if(sub_plots == NULL) {
+      sp = splot_new (display, WIDTH, HEIGHT);
+       /*
+        * instead of maintaining a list, each plot knows its variable
+        */
+      sp->p1dvar = i; 
+    } else
+       sp = sub_plots[i];
+
     display->splots = g_list_append (display->splots, (gpointer) sp);
     gtk_box_pack_start (GTK_BOX (arrangement_box), sp->da, true, true, 0);
   }

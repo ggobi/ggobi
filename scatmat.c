@@ -83,23 +83,29 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
 
 
 displayd *
-scatmat_new (gboolean missing_p) {
+scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols) 
+{
   GtkWidget *vbox, *frame;
   GtkWidget *mbar;
-  gint i, j;
+  gint i, j, ctr;
   gint width, height;
   gint scr_width, scr_height;
   gint scatmat_nrows, scatmat_ncols;
   splotd *sp;
+  displayd *display;
 
-  displayd *display = (displayd *) g_malloc (sizeof (displayd));
-  display->displaytype = scatmat;
-  display->missing_p = missing_p;
+  if(sub_plots == NULL) {
+    display = (displayd *) g_malloc (sizeof (displayd));
+    display->displaytype = scatmat;
+    display->missing_p = missing_p;
 
-
-  display->options = DefaultDisplayOptions;
-
-  scatmat_nrows = scatmat_ncols = MIN (gg.ncols, MAXNVARS);
+    display->options = DefaultDisplayOptions;
+    scatmat_nrows = scatmat_ncols = MIN (gg.ncols, MAXNVARS);
+  } else { 
+    scatmat_nrows = numRows;
+    scatmat_ncols = numCols;
+    display = (displayd*) sub_plots[0]->displayptr;
+  }
 
   scatmat_cpanel_init (&display->cpanel);
 
@@ -157,14 +163,18 @@ scatmat_new (gboolean missing_p) {
   display->table = gtk_table_new (scatmat_ncols, scatmat_nrows, false);
   gtk_container_add (GTK_CONTAINER (frame), display->table);
   display->splots = NULL;
+  ctr = 0;
   for (i=0; i<scatmat_ncols; i++) {
-    for (j=0; j<scatmat_nrows; j++) {
-
-      sp = splot_new (display, width, height);
-
-      sp->xyvars.x = i; 
-      sp->xyvars.y = j; 
-      sp->p1dvar = (i == j) ? j : -1;
+    for (j=0; j<scatmat_nrows; j++, ctr++) {
+      if(sub_plots == NULL) {
+        sp = splot_new (display, width, height);
+        sp->xyvars.x = i; 
+        sp->xyvars.y = j; 
+        sp->p1dvar = (i == j) ? j : -1;
+      } else {
+        sp = sub_plots[ctr];
+        splot_dimension_set(sp, width, height);
+      }
 
       display->splots = g_list_append (display->splots, (gpointer) sp);
 

@@ -244,28 +244,66 @@ displayd *
 GGOBI(newScatterplot) (gint ix, gint iy)
 {
  displayd *display = NULL;
+ splotd* sp;
 
- display = display_create(0, &gg);
+ display = display_alloc_init(scatterplot, false);
+ sp = splot_new (display, 400, 400);
 
-return(display);
-}
+ sp->xyvars.x = ix;
+ sp->xyvars.y = iy;
 
-displayd *
-GGOBI(newScatmat) (gint *rows, gint *columns)
-{
- displayd *display = NULL;
-
- display = display_create(1, &gg);
+ display = scatterplot_new(false, sp);
+ display_add(display, &gg);
 
 return(display);
 }
 
 displayd *
-GGOBI(newParCoords)(gint *vars)
+GGOBI(newScatmat) (gint *rows, gint *columns, int nr, int nc)
 {
  displayd *display = NULL;
+ splotd **plots;
+ int i, j, ctr;
 
- display = display_create(2, &gg);
+  display = display_alloc_init(scatmat, false);
+  plots = (splotd**) g_malloc(sizeof(splotd*) * nr*nc);
+  ctr = 0;
+  for(i = 0 ; i < nr ; i++) {
+    for(j = 0 ; j < nc ; j++, ctr++) {
+      plots[ctr] = splot_new (display, 400, 400);
+      plots[ctr]->xyvars.x = rows[i];
+      plots[ctr]->xyvars.y = columns[j];
+      plots[ctr]->p1dvar = (rows[i] == columns[j]) ? rows[i] : -1;
+    }
+  }
+
+  display = scatmat_new(false, plots, nr, nc);
+  display_add(display, &gg);
+
+
+  g_free(plots);
+
+return(display);
+}
+
+displayd *
+GGOBI(newParCoords)(gint *vars, gint numVars)
+{
+ displayd *display = NULL;
+ splotd **plots;
+ int i;
+
+  display = display_alloc_init(parcoords, false);
+  plots = (splotd**) g_malloc(sizeof(splotd*) * numVars);
+  for(i = 0 ; i < numVars; i++) {
+    plots[i] = splot_new (display, 400, 400);
+    plots[i]->p1dvar = vars[i];
+  }
+
+  display = parcoords_new(false, plots, numVars);
+  display_add(display, &gg);
+
+  g_free(plots);
 
 return(display);
 }

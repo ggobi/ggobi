@@ -146,25 +146,26 @@ display_create(guint action, ggobid *gg)
   switch (action) {
 
     case 0:
-      display = scatterplot_new (false);
+      display = scatterplot_new (false, NULL);
       break;
 
     case 1:
-      display = scatmat_new (false);
+      display = scatmat_new (false, NULL, 0, 0);
       break;
 
     case 2:
-      display = parcoords_new (false);
+      display = parcoords_new (false, NULL, 0);
       break;
 
     case 3:  /*-- scatterplot of missing values --*/
       if (gg->nmissing)
-        display = scatterplot_new (true);
+        display = scatterplot_new (true, NULL);
+
       break;
 
     case 4:  /*-- scatterplot matrix of missing values --*/
       if (gg->nmissing)
-        display = scatmat_new (true);
+        display = scatmat_new (true, NULL, 0, 0);
       break;
 
     default:
