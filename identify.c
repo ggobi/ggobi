@@ -148,7 +148,6 @@ sticky_id_link_by_id (gint whattodo, gint k, datad *source_d, ggobid *gg)
   /*-- k is the row number in source_d --*/
 
   if (source_d->rowid.id.nels > 0) {
-g_printerr ("id = %d\n", id);
     id = source_d->rowid.id.els[k];
     if (id < 0)  /*-- this would indicate a bug --*/
       return;
@@ -168,7 +167,7 @@ g_printerr ("id = %d\n", id);
         if (g_slist_length (d->sticky_ids) > 0) {
           for (ll = d->sticky_ids; ll; ll = ll->next) {
             n = GPOINTER_TO_INT (ll->data);
-            if (n == i) {  /*-- the index of the id --*/
+            if (n == i) {  /*-- the row number of the id --*/
               i_in_list = true;
               ptr = ll->data;
               break;
