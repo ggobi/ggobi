@@ -243,6 +243,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   d = gg->current_display->d;
   e = gg->current_display->e;
 
+  /*-- set the value of the boolean gg->linkby_cv --*/
   linking_method_set (gg->current_display, d, gg);
 
   brush_prev_vectors_update (d, gg);

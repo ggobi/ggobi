@@ -20,6 +20,8 @@
 /* */
 static gboolean active_paint_points (datad *d, ggobid *gg);
 static gboolean active_paint_edges (displayd *display, ggobid *gg);
+static gboolean build_symbol_vectors (cpaneld *, datad *, ggobid *);
+extern gboolean build_symbol_vectors_by_var (cpaneld *, datad *, ggobid *);
 /* */
 
 /*----------------------------------------------------------------------*/
@@ -463,47 +465,6 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   return (doit);
 }
 
-
-static gboolean
-build_glyph_vectors (datad *d, ggobid *gg)
-{
-  gint ih, iv, m, j, k;
-  static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
-  static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
-  icoords imin, imax;
-  gboolean changed = false;
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  gint nd = g_slist_length (gg->d);
-  extern void glyph_link_by_id (gint k, datad *source_d, ggobid *gg);
-
-  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
-
-  for (ih=imin.x; ih<=imax.x; ih++) {
-    for (iv=imin.y; iv<=imax.y; iv++) {
-      for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
-        /*
-         * j is the row number; k is the index of rows_in_plot[]
-        */
-        j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
-
-        changed = update_glyph_vectors (j, changed,
-          d->pts_under_brush.els, d, gg);
-
-        /*-- link by id --*/
-        if (!gg->linkby_cv && nd > 1) glyph_link_by_id (j, d, gg);
-        /*-- --*/
-      }
-    }
-  }
-
-  obin0.x = d->brush.bin0.x;
-  obin0.y = d->brush.bin0.y;
-  obin1.x = d->brush.bin1.x;
-  obin1.y = d->brush.bin1.y;
-
-  return (changed);
-}
-
 /*----------------------------------------------------------------------*/
 /*                      Color brushing                                  */
 /*----------------------------------------------------------------------*/
@@ -514,7 +475,6 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
-
 
 /* setting the value of doit */
   if (!changed) {
@@ -545,47 +505,6 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   }
 
   return (doit);
-}
-
-static gboolean
-build_color_vectors (datad *d, ggobid *gg)
-{
-  gint ih, iv, m, j, k;
-  /* gint gp, n, p; */
-  static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
-  static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
-  icoords imin, imax;
-  gboolean changed = false;
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  gint nd = g_slist_length (gg->d);
-  extern void color_link_by_id (gint k, datad *source_d, ggobid *gg);
-
-  brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
-
-  for (ih=imin.x; ih<=imax.x; ih++) {
-    for (iv=imin.y; iv<=imax.y; iv++) {
-      for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
-        /*
-         * j is the row number; k is the index of rows_in_plot[]
-        */
-        j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
-
-        changed = update_color_vectors (j, changed,
-          d->pts_under_brush.els, d, gg);
-
-        /*-- link by id --*/
-        if (!gg->linkby_cv && nd > 1) color_link_by_id (j, d, gg);
-        /*-- --*/
-      }
-    }
-  }
-
-  obin0.x = d->brush.bin0.x;
-  obin0.y = d->brush.bin0.y;
-  obin1.x = d->brush.bin1.x;
-  obin1.y = d->brush.bin1.y;
-
-  return (changed);
 }
 
 /*----------------------------------------------------------------------*/
@@ -631,44 +550,74 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   return (doit);
 }
 
+/*----------------------------------------------------------------------*/
+/*         Handle all symbols in one loop through a bin                 */
+/*----------------------------------------------------------------------*/
+
 static gboolean
-build_hidden_vectors (datad *d, ggobid *gg)
+build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
 {
   gint ih, iv, m, j, k;
   static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   icoords imin, imax;
   gboolean changed = false;
-  cpaneld *cpanel = &gg->current_display->cpanel;
   gint nd = g_slist_length (gg->d);
-  extern void hidden_link_by_id (gint k, datad *source_d, ggobid *gg);
+  extern void symbol_link_by_id (gint k, datad *source_d, ggobid *gg);
 
   brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
   for (ih=imin.x; ih<=imax.x; ih++) {
     for (iv=imin.y; iv<=imax.y; iv++) {
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
-        j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
         /*
-         * k   raw index, based on nrows
-         * j   index based on nrows_in_plot
+         * j is the row number; k is the index of rows_in_plot[]
         */
-        changed = update_hidden_vectors (j, changed,
-          d->pts_under_brush.els, d, gg);
+        j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
+
+        switch (cpanel->br_point_targets) {
+          case BR_CANDG:  /*-- color and glyph --*/
+            changed = update_color_vectors (j, changed,
+              d->pts_under_brush.els, d, gg);
+            changed = update_glyph_vectors (j, changed,
+              d->pts_under_brush.els, d, gg);
+          break;
+          case BR_COLOR:
+            changed = update_color_vectors (j, changed,
+              d->pts_under_brush.els, d, gg);
+          break;
+          case BR_GLYPH:  /*-- glyph type and size --*/
+          case BR_GSIZE:  /*-- glyph size only --*/
+            changed = update_glyph_vectors (j, changed,
+              d->pts_under_brush.els, d, gg);
+          break;
+          case BR_HIDE:  /*-- hidden --*/
+            changed = update_hidden_vectors (j, changed,
+              d->pts_under_brush.els, d, gg);
+          break;
+          case BR_OFF:
+            ;
+          break;
+        }
 
         /*-- link by id --*/
-        if (!gg->linkby_cv && nd > 1) hidden_link_by_id (j, d, gg);
+        if (!gg->linkby_cv && nd > 1) symbol_link_by_id (j, d, gg);
         /*-- --*/
       }
     }
-    obin0.x = d->brush.bin0.x;
-    obin0.y = d->brush.bin0.y;
-    obin1.x = d->brush.bin1.x;
-    obin1.y = d->brush.bin1.y;
   }
+
+  obin0.x = d->brush.bin0.x;
+  obin0.y = d->brush.bin0.y;
+  obin1.x = d->brush.bin1.x;
+  obin1.y = d->brush.bin1.y;
 
   return (changed);
 }
+
+/*----------------------------------------------------------------------*/
+/*                   active_paint_points                                */
+/*----------------------------------------------------------------------*/
 
 /*
  * Set pts_under_brush[j] to 1 if point j is inside the rectangular brush.
@@ -716,84 +665,13 @@ active_paint_points (datad *d, ggobid *gg)
  * of changed by keeping track of pts_under_brush_prev?
 */
 
-  /*-- link by categorical variable --*/
-  if (gg->linkby_cv) {
-    gint i, m, level_value, level_value_max;
-    vector_b levelv;
-    gint jlinkby = g_slist_index (d->vartable, d->linkvar_vt);
-    /*-- for other datad's --*/
-    GSList *l;
-    GList *lv;
-    datad *dd;
-    vartabled *vtt;
-
-/*
- * I may not want to allocate and free this guy every time the
- * brush moves.
-*/
-    level_value_max = d->linkvar_vt->nlevels;
-    for (lv = d->linkvar_vt->level_values; lv; lv = lv->next) {
-      level_value = GPOINTER_TO_INT (lv->data);
-      if (level_value > level_value_max) level_value_max = level_value;
-    }
-    
-    vectorb_init_null (&levelv);
-    vectorb_alloc (&levelv, level_value_max+1);
-    vectorb_zero (&levelv);
-
-    /*-- find the levels which are among the points under the brush --*/
-    for (m=0; m<d->nrows_in_plot; m++) {
-      i = d->rows_in_plot[m];
-      if (d->pts_under_brush.els[i]) {
-        level_value = (gint) d->raw.vals[i][jlinkby];
-        levelv.els[level_value] = true;
-      }
-    }
-
-
-    /*-- first do this d --*/
-    brush_link_by_var (jlinkby, &levelv, cpanel, d, gg);
-
-    /*-- now for the rest of them --*/
-    for (l = gg->d; l; l = l->next) {
-      dd = l->data;
-      if (dd != d) {
-        vtt = vartable_element_get_by_name (d->linkvar_vt->collab, dd);
-        if (vtt != NULL) {
-          jlinkby = g_slist_index (dd->vartable, vtt);
-          brush_link_by_var (jlinkby, &levelv, cpanel, dd, gg);
-        }
-      }
-    }
-
-    vectorb_free (&levelv);
-    changed = true;
-  }
-
-  /*-- end of linking by categorical variable --*/
-  /*---------------------------------------------------------------------*/
-
   if (cpanel->brush_on_p) {
-    switch (cpanel->br_point_targets) {
-      case BR_CANDG:  /*-- color and glyph --*/
-        if (build_color_vectors (d, gg)) changed = true;
-        if (build_glyph_vectors (d, gg)) changed = true;
-      break;
-      case BR_COLOR:
-        if (build_color_vectors (d, gg)) changed = true;
-      break;
-      case BR_GLYPH:  /*-- glyph type and size --*/
-        if (build_glyph_vectors (d, gg)) changed = true;
-      break;
-      case BR_GSIZE:  /*-- glyph size only --*/
-        if (build_glyph_vectors (d, gg)) changed = true;
-      break;
-      case BR_HIDE:  /*-- hidden --*/
-        if (build_hidden_vectors (d, gg)) changed = true;
-      break;
-      case BR_OFF:
-        ;
-      break;
+    if (gg->linkby_cv) {
+      /*-- link by categorical variable --*/
+      changed = build_symbol_vectors_by_var (cpanel, d, gg);
+    } else {
+      /*-- link by id --*/
+      changed = build_symbol_vectors (cpanel, d, gg); 
     }
   }
 
@@ -947,3 +825,4 @@ active_paint_edges (displayd *display, ggobid *gg)
 
   return (changed);
 }
+

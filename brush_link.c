@@ -18,7 +18,7 @@
 /*----------------------------------------------------------------------*/
 
 void
-color_link_by_id (gint k, datad *source_d, ggobid *gg)
+symbol_link_by_id (gint k, datad *sd, ggobid *gg)  /*-- sd = source_d --*/
 {
   datad *d;
   GSList *l;
@@ -28,14 +28,14 @@ color_link_by_id (gint k, datad *source_d, ggobid *gg)
 
   /*-- k is the row number in source_d --*/
 
-  if (source_d->rowid.id.nels > 0) {
-    id = source_d->rowid.id.els[k];
+  if (sd->rowid.id.nels > 0) {
+    id = sd->rowid.id.els[k];
     if (id < 0)  /*-- this would indicate a bug --*/
       return;
 
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
-      if (d == source_d)
+      if (d == sd)
         continue;        /*-- skip the originating datad --*/
 
       /*-- if this id exists, it is in the range of d's ids ... --*/
@@ -46,106 +46,81 @@ color_link_by_id (gint k, datad *source_d, ggobid *gg)
           continue;
 
         /*-- if we get here, d has one case with the indicated id --*/
-        if (!d->hidden_now.els[i] && d->sampled.els[i]) {
-          switch (cpanel->br_mode) {
-            case BR_PERSISTENT:
-              d->color.els[i] = d->color_now.els[i] = source_d->color.els[k];
-            break;
-            case BR_TRANSIENT:
-              d->color_now.els[i] = source_d->color_now.els[k];
-            break;
-          }
-        }
-      }
-    }
-  }
-}
-
-void
-glyph_link_by_id (gint k, datad *source_d, ggobid *gg)
-{
-  datad *d;
-  GSList *l;
-  gint i, id;
-  /*-- this is the cpanel for the display being brushed --*/
-  cpaneld *cpanel = &gg->current_display->cpanel;
-
-  /*-- k is the row number in source_d --*/
-
-  if (source_d->rowid.id.nels > 0) {
-    id = source_d->rowid.id.els[k];
-    if (id < 0)  /*-- this would indicate a bug --*/
-      return;
-
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-      if (d == source_d)
-        continue;        /*-- skip the originating datad --*/
- 
-      /*-- if this id exists is in the range of d's ids ... --*/
-      if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
-        /*-- i is the row number, irrespective of rows_in_plot --*/
-        i = d->rowid.idv.els[id];
-        if (i < 0)  /*-- then no cases in d have this id --*/
-          continue;
-
-        /*-- if we get here, d has one case with the indicated id --*/
-        if (!d->hidden_now.els[i] && d->sampled.els[i]) {
-          switch (cpanel->br_mode) {
-            case BR_PERSISTENT:
-              d->glyph.els[i].size = d->glyph_now.els[i].size =
-                source_d->glyph.els[k].size;
-              d->glyph.els[i].type = d->glyph_now.els[i].type =
-                source_d->glyph.els[k].type;
-            break;
-            case BR_TRANSIENT:
-              d->glyph_now.els[i].size = source_d->glyph_now.els[k].size;
-              d->glyph_now.els[i].type = source_d->glyph_now.els[k].type;
-            break;
-          }
-        }
-      }
-    }
-  }
-}
-
-void
-hidden_link_by_id (gint k, datad *source_d, ggobid *gg)
-{
-  datad *d;
-  GSList *l;
-  gint i, id;
-  /*-- this is the cpanel for the display being brushed --*/
-  cpaneld *cpanel = &gg->current_display->cpanel;
-
-  /*-- k is the row number in source_d --*/
-
-  if (source_d->rowid.id.nels > 0) {
-    id = source_d->rowid.id.els[k];
-    if (id < 0)  /*-- this would indicate a bug --*/
-      return;
-
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-      if (d == source_d)
-        continue;        /*-- skip the originating datad --*/
- 
-      /*-- if this id exists is in the range of d's ids ... --*/
-      if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
-        /*-- i is the row number, irrespective of rows_in_plot --*/
-        i = d->rowid.idv.els[id];
-        if (i < 0)  /*-- then no cases in d have this id --*/
-          continue;
-
-        /*-- if we get here, d has one case with the indicated id --*/
-        /*-- in this routine alone we include the hidden guys --*/
         if (d->sampled.els[i]) {
           switch (cpanel->br_mode) {
+
+            /*-- if persistent, handle all target types --*/
             case BR_PERSISTENT:
-              d->hidden.els[i] = d->hidden_now.els[i] = source_d->hidden.els[k];
+              switch (cpanel->br_point_targets) {
+                case BR_CANDG:
+                  if (!d->hidden_now.els[i]) {
+                    d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
+                    d->glyph.els[i].size = d->glyph_now.els[i].size =
+                      sd->glyph.els[k].size;
+                    d->glyph.els[i].type = d->glyph_now.els[i].type =
+                      sd->glyph.els[k].type;
+                  }
+                break;
+                case BR_COLOR:
+                  if (!d->hidden_now.els[i])
+                    d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
+                break;
+                case BR_GLYPH:
+                  if (!d->hidden_now.els[i]) {
+                    d->glyph.els[i].size = d->glyph_now.els[i].size =
+                      sd->glyph.els[k].size;
+                    d->glyph.els[i].type = d->glyph_now.els[i].type =
+                      sd->glyph.els[k].type;
+                  }
+                break;
+                case BR_GSIZE: 
+                  if (!d->hidden_now.els[i]) {
+                    d->glyph.els[i].size = d->glyph_now.els[i].size =
+                      sd->glyph.els[k].size;
+                  }
+                break;
+                case BR_HIDE:
+                  d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
+                break;
+                case BR_OFF:
+                  ;
+                break;
+              }
             break;
+
+            /*-- if transient, handle all target types --*/
             case BR_TRANSIENT:
-              d->hidden_now.els[i] = source_d->hidden_now.els[k];
+              switch (cpanel->br_point_targets) {
+                case BR_CANDG:
+                  if (!d->hidden_now.els[i]) {
+                    d->color_now.els[i] = sd->color_now.els[k];
+                    d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
+                    d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
+                  }
+                break;
+                case BR_COLOR:
+                  if (!d->hidden_now.els[i])
+                    d->color_now.els[i] = sd->color_now.els[k];
+                break;
+                case BR_GLYPH:
+                  if (!d->hidden_now.els[i]) {
+                    d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
+                    d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
+                  }
+                break;
+                case BR_GSIZE: 
+                  if (!d->hidden_now.els[i]) {
+                    d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
+                  }
+                break;
+                case BR_HIDE:
+                  d->hidden_now.els[i] = sd->hidden_now.els[k];
+                break;
+                case BR_OFF:
+                  ;
+                break;
+              }
+
             break;
           }
         }
@@ -153,51 +128,10 @@ hidden_link_by_id (gint k, datad *source_d, ggobid *gg)
     }
   }
 }
-
 
 /*----------------------------------------------------------------------*/
 /*   Linking within and between datad's using a categorical variable    */
 /*----------------------------------------------------------------------*/
-
-/*
-void
-linkvar_arrays_init (vartabled *vt, datad *d, ggobid *gg)
-{
-  gint i, k;
-  gint link_index = g_slist_index (d->vartable, vt);
-  GArray *arr;
-  GSList *l;
-
-  *-- free any existing linkvar_arrays --*
-  if (d->linkvar_arrays != NULL) {
-    for (l=d->linkvar_arrays; l; l=l->next) {
-      g_array_free ((GArray *) l->data, false);
-    }
-    g_slist_free (d->linkvar_arrays);
-    d->linkvar_arrays = NULL;
-  }
-
-  * 
-   * initialize nlevels GArrays to contain
-   * the vector of indices for each level
-  *
-  for (k=0; k<vt->nlevels; k++) {
-    arr = g_array_new (false, false, sizeof(gint));
-    d->linkvar_arrays = g_slist_append (d->linkvar_arrays, arr);
-  }
-
-  *-- populate the GArrays, making one pass through the data --*
-  for (i=0; i<d->nrows; i++) {
-    for (k=0; k<vt->nlevels; k++) {
-      if (d->raw.vals[i][link_index] == vt->level_values[k]) {
-        g_array_append_val (g_slist_nth_data (d->linkvar_arrays, k), i);
-        break;
-      }
-    }
-  }
-}
-*/
-
 
 void
 linking_method_set (displayd *display, datad *d, ggobid *gg)
@@ -217,9 +151,15 @@ linking_method_set (displayd *display, datad *d, ggobid *gg)
         gg->linkby_cv = true;
         if (d->linkvar_vt == NULL || d->linkvar_vt != vt) {
           d->linkvar_vt = vt;
-          /*linkvar_arrays_init (vt, d, gg);*/
         }
       }
+    }
+    if (!gg->linkby_cv) {
+      gchar *message = g_strdup_printf (
+        "You have specified linking by categorical variable, but \n no categorical variable is selected for the current dataset.\n");
+      quick_message (message, false);
+      gdk_flush ();
+      g_free (message);
     }
   }
 }
@@ -320,4 +260,62 @@ brush_link_by_var (gint jlinkby, vector_b *levelv,
       }
     }
   }
+}
+
+gboolean
+build_symbol_vectors_by_var (cpaneld *cpanel, datad *d, ggobid *gg)
+{
+  gint i, m, level_value, level_value_max;
+  vector_b levelv;
+  gint jlinkby = g_slist_index (d->vartable, d->linkvar_vt);
+  /*-- for other datad's --*/
+  GSList *l;
+  GList *lv;
+  datad *dd;
+  vartabled *vtt;
+  gboolean changed = false;
+
+/*
+ * I may not want to allocate and free this guy every time the
+ * brush moves.
+*/
+  level_value_max = d->linkvar_vt->nlevels;
+  for (lv = d->linkvar_vt->level_values; lv; lv = lv->next) {
+    level_value = GPOINTER_TO_INT (lv->data);
+    if (level_value > level_value_max) level_value_max = level_value;
+  }
+    
+  vectorb_init_null (&levelv);
+  vectorb_alloc (&levelv, level_value_max+1);
+  vectorb_zero (&levelv);
+
+  /*-- find the levels which are among the points under the brush --*/
+  for (m=0; m<d->nrows_in_plot; m++) {
+    i = d->rows_in_plot[m];
+    if (d->pts_under_brush.els[i]) {
+      level_value = (gint) d->raw.vals[i][jlinkby];
+      levelv.els[level_value] = true;
+    }
+  }
+
+
+  /*-- first do this d --*/
+  brush_link_by_var (jlinkby, &levelv, cpanel, d, gg);
+
+  /*-- now for the rest of them --*/
+  for (l = gg->d; l; l = l->next) {
+    dd = l->data;
+    if (dd != d) {
+      vtt = vartable_element_get_by_name (d->linkvar_vt->collab, dd);
+      if (vtt != NULL) {
+        jlinkby = g_slist_index (dd->vartable, vtt);
+        brush_link_by_var (jlinkby, &levelv, cpanel, dd, gg);
+      }
+    }
+  }
+
+  vectorb_free (&levelv);
+
+  changed = true;
+  return (changed);
 }
