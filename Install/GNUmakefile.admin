@@ -35,9 +35,14 @@ LICENSES= LGPL.txt license.html license.txt minterms.html minterms.txt
 DOC_TEX_FILES=\
     DBMS Embedded RGGobi XML \
 
-DOC_FILES=$(DOC_TEX_FILES:%=notes/%.pdf) notes/ggobi.css notes/EmbeddingFAQ.html notes/plotLayout.html $(shell find notes -name '*.jpg')
+DOC_EXTENSION=pdf
 
-C_SRC_FILES=$(SRC) $(XML_SRC) xmlConvert.c
+DOC_FILES=$(DOC_TEX_FILES:%=notes/%.$(DOC_EXTENSION)) notes/ggobi.css notes/EmbeddingFAQ.html notes/plotLayout.html $(shell find notes -name '*.jpg')
+
+TOUR_SRC=cpp_ui.c
+# ctour_ui.c
+
+C_SRC_FILES=$(SRC) $(XML_SRC) xmlConvert.c $(TOUR_SRC)
 
 C_HEADER_FILES=\
   GGobiAPI cpanel datad defines display display_tree \
@@ -93,3 +98,7 @@ tar $(PKG_NAME).tar.gz: createDist
 
 %.pdf: %.tex
 	(cd $(@D) ; TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $(<F))
+
+notes/%.ps: notes/%.tex
+	$(MAKE) -C $(@D) $(@F)
+

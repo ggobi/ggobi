@@ -13,6 +13,12 @@ source. One is via CVS and the other is by downloading the
 ggobi.tar.gz source distribution. The next paragraphs describe how
 to create the <i>ggobi.tar.gz</i> file.
 
+<p>
+<font color="red">When we refer to the command <b>make</b>,
+this means the GNU version of make and may be installed on your
+computer as <b>gmake</b>.</font>
+<p>
+
 There are just a few simple steps in creating ggobi.tar.gz.
 <ol>
 <li> Change directory to the top-level ggobi/ directory as checked out
@@ -31,7 +37,7 @@ bug report about a particular distribution.
        gmake ADMIN=1 tar
 </pre>
 What this does is to create an entirely new directory structure in
-/tmp/Install/ggobi. This new directory containins the source and
+<i>/tmp/Install/ggobi</i>. This new directory containins the source and
 documentation files for building ggobi and puts them in the
 appropriate directory layout so that configure (the autoconf script)
 and GNUmakefiles work correctly.
@@ -53,7 +59,8 @@ Then, run the compile ggobi
 <pre>
   ./bin/ggobi data/flea    
 </pre>    
-    
+</ol>
+
 <h2>Removing or Adding a File</h2>
 
 If you add or remove a <i>.c</i> or <i>.h</i> file from the ggobi
@@ -77,9 +84,9 @@ which files to compile.  So you must edit the file
 the directory <i>/tmp/Install/ggobi/</i>) and edit the list of files
 specified there in the <b>SRC</b> variable.
     
-</ol>
 
-<h2>Removing files</h2>
+
+<h3>Committing Removed files</h3>
 
 Also, if you remove a file, please use the commands
 <pre>
@@ -90,12 +97,35 @@ This means that when others update, their working copies will have
 this file removed.  It is a way of notifying others about the change.
 
 
+<h2>PDF and the Distribution</h2>
+
+The plan is that the distribution contains the PDF versions of some of
+the files in the <i>notes/</i> directory.  To create this, you will
+need pdflatex which is not necessarily installed on all machines.
+Either we can change this and distribute Postscript versions
+created using regular <b>latex</b> and <b>dvips</b> or one person can
+be responsible for creating the actual public distribution.
+
+<p>
+To create the Postscript versions instead of the PDF ones,
+create the working distribution as
+<pre>
+ make ADMIN=1 DOC_EXTENSION=ps
+</pre>
+
+<p>
+Alternatively, to avoid including any of these documents,
+invoke make as
+<pre>
+ make ADMIN=1 DOC_TEX_FILES=
+</pre>
+which just sets DOC_TEX_FILES to an empty list.
 
 
 <hr>
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Fri Feb  9 05:10:29 EST 2001
+Last modified: Fri Feb  9 05:32:25 EST 2001
 <!-- hhmts end -->
 </body> </html>

@@ -20,8 +20,6 @@ SRC=\
     color.c \
     color_ui.c \
     cpanel.c \
-    cpp_ui.c \
-    ctour_ui.c \
     datad.c \
     display.c \
     display_tree.c \
@@ -99,7 +97,11 @@ SRC=\
     xlines.c \
     xyplot.c \
     xyplot_ui.c \
+    @TOUR_SRC@ \
+    @TIME_SERIES_SRC@ \
     @XML_SRC@ @MYSQL_SRC@
+
+
 
 ifdef USE_XML
  XML_INC_DIRS=$(foreach el,@XML_INC_DIRS@, -I$(el))
