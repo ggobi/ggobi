@@ -456,8 +456,7 @@ An artificial social network of 140 people.
    </levels>
  </categoricalvariable>
 </variables>
-<records
- count="205" glyph="fr 1" color="0">
+<records count="203" glyph="fr 1" color="0">
 <record source="Amanda" destination="Lancelot" >
 673.600 0
 </record>
@@ -956,9 +955,6 @@ An artificial social network of 140 people.
 <record source="Seton" destination="Caitlin" >
 46.600 0
 </record>
-<record source="Seton" destination="Festus" >
-34.000 0
-</record>
 <record source="Timon" destination="Festus" >
 28.800 0
 </record>
@@ -988,9 +984,6 @@ An artificial social network of 140 people.
 </record>
 <record source="Xavier" destination="Norman" >
 40.000 0
-</record>
-<record source="Xavier" destination="Katherine" >
-171.700 0
 </record>
 <record source="Xavier" destination="Stephen" >
 145.300 0
