@@ -22,7 +22,7 @@ endif
 
 R_LIBS=-L$(R_HOME)/bin -lR
 
-SRC=R
+SRC= R
 # REval
 OBJS=$(SRC:%=%.o)
 

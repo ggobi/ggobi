@@ -58,7 +58,9 @@ SaveImage(FileData *data, GtkWidget *widget)
     PluginInstance *inst = data->inst;
     char *fileName = "/tmp/foo.jpg";
     dpy = inst->gg->current_display;
-    win = dpy->window;
+
+
+    win = GTK_GGOBI_WINDOW_DISPLAY(dpy)->window;
     sp  = dpy->current_splot;
     gdk_imlib_init();
 

@@ -34,11 +34,11 @@ OBJS=$(SRC:%=%.o)
 $(PKG).so: $(OBJS)
 	$(CC) -shared -o $@ $(OBJS) $(GTK_EXTRA_LIB_DIR) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%)
 
-local.config:  configure
-	./configure
+#local.config:  configure
+#	./configure
 
-configure: configure.in
-	autoconf
+# configure: configure.in
+#	autoconf
 
 distclean: clean
 	-rm -f $(PKG).so local.config
