@@ -31,10 +31,15 @@ typedef struct {
    gint type;
    gint nbins, nASHes;
    gboolean ASH_add_lines_p;
+   /*-- cycling --*/
+   gboolean cycle_p;
+   gint cycle_dir;
+   guint32 cycle_delay;
  } p1d;
 
  /*-- xy plotting --*/
  struct _XYPlotCpanel {
+   /*-- cycling --*/
    gboolean cycle_p;
    gint cycle_axis;
    gint cycle_dir;

@@ -39,12 +39,22 @@ p1d_activate (gint state, displayd *display, ggobid *gg)
   splotd *sp;
   datad *d = display->d;
 
-  for (slist = display->splots; slist; slist = slist->next) {
-    sp = (splotd *) slist->data;
-    if (sp->p1dvar >= d->ncols)
-      sp->p1dvar = 0;
+  if (state) {
+    for (slist = display->splots; slist; slist = slist->next) {
+      sp = (splotd *) slist->data;
+      if (sp->p1dvar >= d->ncols)
+        sp->p1dvar = 0;
+    }
+    varpanel_refresh (gg);
+  } else {
+    /*
+     * Turn cycling off when leaving the mode, but don't worry
+     * for now about turning it on when re-entering.
+    */
+    GtkWidget *w = widget_find_by_name (gg->control_panel[P1PLOT], 
+                                        "P1PLOT:cycle_toggle");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), off);
   }
-  varpanel_refresh (gg);
 
   return NONE;
 }   
@@ -161,7 +171,10 @@ p1d_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
 #ifdef BARCHART_IMPLEMENTED
   if (display->displaytype != barchart)
 #endif
-  display->p1d_orientation = (button == 1) ? HORIZONTAL : VERTICAL;
+  /*-- if button == -1, don't change orientation. That protects
+       changes made during cycling --*/
+  if (button > 0) 
+    display->p1d_orientation = (button == 1) ? HORIZONTAL : VERTICAL;
 
   redraw = (orientation != display->p1d_orientation) || (jvar != sp->p1dvar);
 
@@ -203,5 +216,45 @@ p1d_ash_baseline_set (splotd *sp)
   iscr += (sp->max.x / 2);
 
   sp->ash_baseline.x = iscr;
-
 }
+
+/*--------------------------------------------------------------------*/
+/*                            Cycling                                 */
+/*--------------------------------------------------------------------*/
+
+
+gint
+p1dcycle_func (ggobid *gg)
+{
+  displayd *display = gg->current_display;
+  datad *d = gg->current_display->d;
+  splotd *sp = gg->current_splot;
+  cpaneld *cpanel = &display->cpanel;
+
+  gint varno, jvar_prev;
+
+  if (cpanel->p1d.cycle_dir == 1) {
+    varno = sp->p1dvar + 1;
+
+    if (varno == d->ncols) {
+      varno = 0;
+    }
+  } else {
+    varno = sp->p1dvar - 1;
+
+    if (varno < 0) {
+      varno = d->ncols-1;
+    }
+  }
+
+  if (varno != sp->p1dvar) {
+    jvar_prev = sp->p1dvar;
+    if (p1d_varsel (sp, varno, &jvar_prev, -1)) {
+      varpanel_refresh (gg);
+      display_tailpipe (display, FULL, gg);
+    }
+  }
+  
+  return true;
+}
+

@@ -191,10 +191,9 @@ struct _ggobid {
 /*---------------------- 1d plotting -----------------------------------*/
 
  struct _P1D {
-   GtkObject *cycle_speed_adj;
-   gboolean cycle_p;
+   /*-- cycling --*/
    gint cycle_id;
-   gint cycle_dir;
+   GtkAdjustment *cycle_delay_adj;
    /*-- texture --*/
    gfloat *gy;
  } p1d;
@@ -202,6 +201,7 @@ struct _ggobid {
 /*-------------------- 2d plotting -----------------------------------*/
 
  struct _XYPlot {
+   /*-- cycling --*/
    gint cycle_id;
    GtkAdjustment *cycle_delay_adj;
  } xyplot;

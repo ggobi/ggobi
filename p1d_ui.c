@@ -47,18 +47,53 @@ static void ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
     display_tailpipe (gg->current_display, FULL, gg);
 }
 
-static void cycle_cb (GtkToggleButton *button, ggobid* gg)
+/*--------------------------------------------------------------------*/
+/*                           Cycling                                  */
+/*--------------------------------------------------------------------*/
+
+void
+p1d_cycle_activate (gboolean state, cpaneld *cpanel, ggobid *gg)
 {
-  gg->p1d.cycle_p = button->active;
-}
-static void cycle_speed_cb (GtkAdjustment *adj, gpointer cbd) {
-  g_printerr ("%d\n", ((gint) adj->value));
+  if (state) {
+    gg->p1d.cycle_id = gtk_timeout_add (cpanel->p1d.cycle_delay,
+      (GtkFunction) p1dcycle_func, (gpointer) gg);
+    cpanel->p1d.cycle_p = true;
+  } else {
+    if (gg->p1d.cycle_id) {
+      gtk_timeout_remove (gg->p1d.cycle_id);
+      gg->p1d.cycle_id = 0;
+      cpanel->p1d.cycle_p = false;
+    }
+  }
 }
 
-static gint direction = FORWARD;
-static void chdir_cb (GtkButton *button)
+static void cycle_cb (GtkToggleButton *button, ggobid* gg)
 {
-  direction = -1 * direction;
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
+
+  cpanel->p1d.cycle_p = button->active;
+  p1d_cycle_activate (cpanel->p1d.cycle_p, cpanel, gg);
+}
+static void cycle_speed_cb (GtkAdjustment *adj, ggobid *gg)
+{
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
+
+  cpanel->p1d.cycle_delay = -1 * (guint32) adj->value;
+  if (cpanel->p1d.cycle_p) {
+    gtk_timeout_remove (gg->p1d.cycle_id);
+    gg->p1d.cycle_id = gtk_timeout_add (cpanel->p1d.cycle_delay,
+    (GtkFunction) p1dcycle_func, (gpointer) gg);
+  }
+}
+
+static void chdir_cb (GtkButton *button, ggobid *gg)
+{
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
+
+  cpanel->p1d.cycle_dir = -1 * cpanel->p1d.cycle_dir;
 }
 
 /*--------------------------------------------------------------------*/
@@ -98,7 +133,7 @@ p1d_event_handlers_toggle (splotd *sp, gboolean state) {
 
 void
 cpanel_p1dplot_make (ggobid *gg) {
-  GtkWidget *tgl, *btn, *vb, *opt;
+  GtkWidget *frame, *tgl, *btn, *vbox, *vb, *opt;
   GtkWidget *sbar;
   GtkObject *adj;
   
@@ -130,11 +165,11 @@ cpanel_p1dplot_make (ggobid *gg) {
     false, false, 0);
 
   /*-- ASH smoothness --*/
-  vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), vb,
+  vbox = gtk_vbox_new (false, 0);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), vbox,
     false, false, 0);
 
-  gtk_box_pack_start (GTK_BOX (vb), gtk_label_new ("ASH smoothness:"),
+  gtk_box_pack_start (GTK_BOX (vbox), gtk_label_new ("ASH smoothness:"),
     false, false, 0);
 
   /*-- value, lower, upper, step --*/
@@ -150,45 +185,52 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
   gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
-  gtk_box_pack_start (GTK_BOX (vb), sbar,
-    false, false, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), sbar, false, false, 1);
+
 /*
  * Cycling controls
 */
 
+  frame = gtk_frame_new ("Plot cycling");
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), frame,
+    false, false, 3);
+
+  vb = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 4);
+  gtk_container_add (GTK_CONTAINER (frame), vb);
+
   tgl = gtk_check_button_new_with_label ("Cycle");
+  gtk_widget_set_name (tgl, "P1PLOT:cycle_toggle");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
                         "Cycle through 1D plots", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                       GTK_SIGNAL_FUNC (cycle_cb), (gpointer) gg);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]),
-                      tgl, false, false, 1);
-  gtk_widget_set_sensitive (tgl, false);
+  gtk_box_pack_start (GTK_BOX (vb), tgl, false, false, 1);
+
 
   /* value, lower, upper, step_increment, page_increment, page_size */
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  gg->p1d.cycle_speed_adj = gtk_adjustment_new (1.0, 0.0, 100.0, 1.0, 1.0, 0.0);
-  gtk_signal_connect (GTK_OBJECT (gg->p1d.cycle_speed_adj), "value_changed",
+  gg->p1d.cycle_delay_adj = (GtkAdjustment *)
+    gtk_adjustment_new (-1.0 * 1000 /* cpanel->p1d.cycle_delay */,
+    -5000.0, -250.0, 100.0, 1000.0, 0.0);
+  gtk_signal_connect (GTK_OBJECT (gg->p1d.cycle_delay_adj), "value_changed",
                       GTK_SIGNAL_FUNC (cycle_speed_cb), gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->p1d.cycle_speed_adj));
+  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->p1d.cycle_delay_adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust cycling speed", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), sbar,
-    false, false, 1);
-  gtk_widget_set_sensitive (sbar, false);
+  gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 1);
 
   btn = gtk_button_new_with_label ("Change direction");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Change cycling direction", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]),
-                      btn, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (vb), btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), gg);
-  gtk_widget_set_sensitive (btn, false);
 
   gtk_widget_show_all (gg->control_panel[P1PLOT]);
 }
@@ -203,6 +245,11 @@ cpanel_p1d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->p1d.nASHes = 20;
   cpanel->p1d.nbins = 200;
   cpanel->p1d.ASH_add_lines_p = false;
+
+  /*-- cycling --*/
+  cpanel->p1d.cycle_dir = FORWARD;
+  cpanel->p1d.cycle_p = false;
+  cpanel->p1d.cycle_delay = 1000;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/
@@ -237,7 +284,11 @@ cpanel_p1d_set (cpaneld *cpanel, ggobid* gg)
 */
 
   /*-- Cycling on or off --*/
+  w = widget_find_by_name (gg->control_panel[P1PLOT], "P1PLOT:cycle_toggle");
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), cpanel->p1d.cycle_p);
+
   /*-- Cycling speed --*/
-  /*-- Cycling direction --*/
+  gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->p1d.cycle_delay_adj),
+    -1 * (gfloat) cpanel->p1d.cycle_delay);
 }
 

@@ -303,7 +303,7 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   displayd *display = (displayd *) g_malloc (sizeof (displayd));
   display->displaytype = type; 
 
-  display->p1d_orientation = VERTICAL;
+  display->p1d_orientation = HORIZONTAL;
 
   /* Copy in the contents of DefaultOptions to create
      an indepedently modifiable configuration copied from

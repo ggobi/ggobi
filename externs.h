@@ -6,12 +6,13 @@
 #include "defines.h"
 #endif
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* sort +1 */
+gint       xycycle_func (ggobid *gg);
+gint       p1dcycle_func (ggobid *gg);
 void       GGobi_widget_set (GtkWidget *, ggobid *gg, gboolean isWindow);
 void       arrayd_add_cols (array_d *, gint);
 void       arrayd_add_rows (array_d *, gint);
@@ -552,9 +553,13 @@ void cpanel_barchart_make (ggobid *gg);
 void cpanel_barchart_set (cpaneld *cpanel, ggobid *gg);
 #endif
 
-#ifdef WIN32
+/*
+ * In order to test the win32 drawing code, I need access
+ * to these functions.  -dfs
+*/
 void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
 void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
+#ifdef WIN32
 #endif
 
 void showInputDescription(InputDescription *desc, ggobid *gg);
