@@ -17,8 +17,8 @@
 #include "vars.h"
 #include "externs.h"
 
-#define WIDTH   400
-#define HEIGHT  400
+#define WIDTH   370
+#define HEIGHT  370
 
 void
 scatterplot_show_hrule (displayd *display, gboolean show) 
