@@ -1,3 +1,17 @@
+parcoords_new and tsplot_new become *_with_vars
+and the original versions  take an exta argument
+ - displayd.
+
+windowDisplayd has an field that allows the constructor to 
+specify that we don't want a window. The creation
+code then honors this and leaves the display to be managed
+by the creator.
+
+scatmat_new now takes a display argument and has changes to allow the
+lack of a window. Pass NULL for the display argument and it will
+create the basic display.
+
+
 Added --home as an argument for ggobi and ggobi-config to compute
 the location of the "installed" GGobi files.
 

@@ -22,46 +22,46 @@ Duncan Temple Lang}
 
 \begin{abstract}
   In this document, we describe some of the features of the R-GGobi
-  link. We illustrate some of the common uses and the different
+  link. We illustrate some of the {\em common} uses and the different
   functions to both query and modify the state of the GGobi.  This
   serves as a form of a tutorial.
+
+  More sophisticated things can be done with the link, including
+  programming customized GUIs containing linked GGobi plots,
+  writing new linking rules in S, and responding to GGobi events,
+  create GGobi plugins written in R.
 \end{abstract}
 
 \section{Getting Started}
-The first thing to do is create a ggobi instance.
-Each instance is associated with a particular dataset.
-There are two ways to create this.
-One specifies the name of the file to read
-and the other takes a data frame or matrix in R.
-The first takes a string, such as
+The first thing to do is create a ggobi instance.  Each ggobi instance
+is initially associated with a single dataset.  There are two ways to
+create this: one specifies the name of the file to read and the other
+takes a data frame or matrix in R.  The first takes a string, exactly as it
+would be passed to GGobi on the command line, such as
 \begin{verbatim}
  > ggobi("../data/flea")
 \end{verbatim}
-The second form passes the data frame as the first argument.
+The second form passes the data frame as the first argument:
 \begin{verbatim}
  > data(mtcars)
  > ggobi(mtcars)
 \end{verbatim}
-Both of these create ggobi in the same manner as the stand-alone
-application via the command line. 
-%  That claim isn't true.  Starting ggobi from a data frame does
-%  not initialize a display, but creating it with an external file
-%  does, just like the stand-alone application.   dfs
-One can pass a vector of strings as
-arguments which are processed as command line arguments.  When
-specifying the name of a file, one can specify whether this is XML,
-ASCII or binary.
+Both of these create the basic ggobi GUI in the same manner as the
+stand-alone application via the command line.  One can control how the
+GGobi instance is created by passing a vector of strings as arguments
+which are processed as command line arguments.  When specifying the
+name of a data file, one can also specify the mode of the data, e.g.
+whether this is XML, ASCII, binary, etc.
 
+We can create a GGobi instance with no data and then subsequently
+add one or more datasets to it.
 \begin{verbatim}
 > ggobi()
 > setData.ggobi(data.frame(a=rnorm(100), b=runif(100))
 \end{verbatim}
+We can add datasets to any GGobi instance, regardless of
+whether we started it with or without a dataset.
 
-We can create a ggobi instance with no data and set the data in a
-later command.
-\begin{verbatim}
- > ggobi()
-\end{verbatim}
 
 The opposite of creating a ggobi instance is closing its displays and
 removing it from the session.  This is done via
@@ -79,24 +79,59 @@ default instance.
 % removeVariable.ggobi()
 %\end{verbatim}
 
-At any point, the dataset can be augmented by adding variables.
+At any point, the dataset can be augmented by adding new variables,
+one at a time:
 \begin{verbatim}
- addVariable.ggobi()
+ addVariable.ggobi(1:32, name="foo")
+\end{verbatim}
+These will then appear in the GGobi main window
+and can be used as a regular variables in
+plots, etc.
+
+
+We should also note that we can have any number of GGobi instances in
+existance simultaneously, with the same or different datasets.
+\begin{verbatim}
+ g1 = ggobi(mtcars)
+ g2 = ggobi(ggobi.find.file(c("data", "flea.xml")))
 \end{verbatim}
 
-%   Is there a reason for this empty section header?   dfs
-% \section{}
+Almost all of the functions in the \SPackage{Rggobi} package take a
+GGobi instance as an argument.  (The exceptions are one that operate
+on the global level.)  By default, the last GGobi instance created is
+used as the target of the operation and one does not have to specify
+it.  If one wants to address a different GGobi, one can specify it via
+the \SArg{.gobi} parameter.
+We have introduced a more object-oriented syntax for
+invoking these \SFunction{foo.ggobi} functions.
+If we have a GGobi instance of as an S variable, say \SVariable{g},
+then we can invoke the function
+\SFunction{foo.ggobi} as \Scommand{g$foo()}.
+This takes care of expanding to \SFunction{foo.ggobi}
+and passing \SVariable{g} as the \SArg{.gobi} argument.
+For example, 
+\begin{verbatim}
+g1$addVariable(1:32, name = ""foo")
+\end{verbatim}
+is equivalent to the command
+\begin{verbatim}
+ addVariable.ggobi(1:32, name="foo", .gobi = g1)
+\end{verbatim}
+The idea is that we are changing the state of the underlying 
+GGobi instance.
+
+
 
 
 \section{System Values}
 The representation of points or observations within a plot is
-controlled by its glyph.  Each observation has its own glyph
-setting. This controls the type  and size of glyph.
-(In the near future, these may be indepdently settable across
-sub-plots.)
+controlled by its \textit{glyph}.  Each observation has its own glyph
+setting. This controls the type and size of glyph.
+% (In the near future, these may be indepdently settable across
+% sub-plots.)
 The possible values for the glyph type and size
 are fixed for a ggobi session.
-They can be queried via the functions
+This set of possible values can be queried via the functions
 \SFunction{getGlyphTypes.ggobi}
 and 
 \SFunction{getGlyphSizes.ggobi}
