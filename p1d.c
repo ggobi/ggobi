@@ -79,7 +79,7 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
       sp->p1d_lim.max = FORGETITAXIS_MAX ;
 
       textur (yy, sp->p1d_data.els, d->nrows_in_plot, option, del, stages, gg);
-      break;
+    break;
 
     case ASH:
       do_ash1d (yy, d->nrows_in_plot,
@@ -94,14 +94,14 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
       sp->p1d_lim.min = 0.0; 
       sp->p1d_lim.max = max;
       sp->p1d_mean = mean;
-      break;   
+    break;   
 
     case DOTPLOT:
       sp->p1d_lim.min = FORGETITAXIS_MIN ;
       sp->p1d_lim.max = FORGETITAXIS_MAX ;
       for (i=0; i<d->nrows_in_plot; i++)
         sp->p1d_data.els[i] = 50;  /*-- halfway between _MIN and _MAX --*/
-      break;   
+    break;   
   }
 }
 
@@ -125,8 +125,17 @@ p1d_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
   yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
   jvar = sp->p1dvar;
 
+  /*
+   * in order to have jittering in the direction of the variable
+   * instead of in the direction of the "spreading variable", we
+   * have to apply the ASH (in particular) after the jitter has
+   * been added in.  That is, we have to ASH the world data instead
+   * of the tform data.  By some unexpected miracle, all the scaling
+   * still works.
+  */
   for (i=0; i<d->nrows_in_plot; i++)
-    yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];
+    yy[i] = d->world.vals[d->rows_in_plot[i]][jvar];
+    /*yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];*/
 
   p1d_spread_var (display, yy, sp, d, gg);
 
@@ -147,20 +156,6 @@ p1d_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
     } else {
       sp->planar[m].x = world_data[m][jvar];
       sp->planar[m].y = (glong) (precis * ftmp);
-    }
-
-    /*
-     * Since we want the jitter perpendicular to the axis, subtract
-     * the jitter from the selected variable and add it to the
-     * jitter or spread variable.  Leave missings alone, since we
-     * probably want jitter in both directions.
-    */
-    if (display->p1d_orientation == VERTICAL) {
-      sp->planar[m].x += d->jitdata.vals[m][jvar];
-      sp->planar[m].y -= d->jitdata.vals[m][jvar];
-    } else {
-      sp->planar[m].x -= d->jitdata.vals[m][jvar];
-      sp->planar[m].y += d->jitdata.vals[m][jvar];
     }
   }
 
@@ -183,8 +178,6 @@ p1d_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint button)
     display->p1d_orientation = (button == 1) ? HORIZONTAL : VERTICAL;
 
   redraw = (orientation != display->p1d_orientation) || (jvar != sp->p1dvar);
-
-
 
   *jvar_prev = sp->p1dvar;
   sp->p1dvar = jvar;
