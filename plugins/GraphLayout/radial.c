@@ -13,7 +13,7 @@
 #include "plugin.h"
 #include "glayout.h"
 
-static void initRadialLayout (glong *vis, gint nvis, ggobid *gg, glayoutd *gl, datad *d, datad *e);
+static void initRadialLayout (glong *vis, gint nvis, ggobid *gg, glayoutd *gl);
 static gboolean setParentNodes (glayoutd *gl, datad *d);
 static void setNChildren (glayoutd *gl, datad *d);
 static gint setSubtreeSize (noded *, glayoutd *, datad *);
@@ -123,20 +123,14 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   ggobid *gg = inst->gg;
   glayoutd *gl = glayoutFromInst (inst);
   displayd *dsp = gg->current_display;
-  datad *d = gg->current_display->d;
-  datad *e = gg->current_display->e;
-/*
-  gboolean init;
-*/
+  datad *d = gl->dsrc;
+  datad *e = gl->e;
   glong *visible;
   gint nvisible;
 /*-- to add variables --*/
   gint i, nP, nC, nS;
   gdouble *x, *y, *depth, *inDegree, *outDegree;
   gdouble *nParents, *nChildren, *nSiblings;
-/*
-  gchar *name;
-*/
   GList *l, *connectedNodes;
   noded *n, *n1;
 /*-- to add the new datad --*/
@@ -151,11 +145,8 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   gboolean redisplay_all = false;  /* if points are hidden in this function */
 
   if (e == NULL) {
-    gboolean edges_present = edgeset_add (dsp);
-    if (!edges_present) {
-      quick_message ("Please specify an edge set", false);
-      return;
-    } else e = dsp->e;
+    g_printerr ("Trouble:  no edge set is specified\n");
+    return;
   }
   if (!d->sampled.els[0] || d->hidden.els[0]) {
     g_printerr ("Trouble: you've eliminated the center node.\n");
@@ -179,7 +170,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
           d != gl->radial->d ||
           d->nrows_in_plot != nvisible);
 */
-  initRadialLayout (visible, nvisible, gg, gl, d, e);
+  initRadialLayout (visible, nvisible, gg, gl);
 
 /*
  * As a result of this function, nvisible can change.
@@ -194,7 +185,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
     }
 
     nvisible = visible_set (visible, d);
-    initRadialLayout (visible, nvisible, gg, gl, d, e);
+    initRadialLayout (visible, nvisible, gg, gl);
   }
 
   setNChildren (gl, d);
@@ -294,6 +285,14 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   colnames[6] = "nChildren";
   colnames[7] = "nSiblings";
 
+  /*
+   * In case there is no initial scatterplot because the datasets
+   * have no variables, we don't want creating a datad to trigger
+   * the initialization of this plot.   This takes care of it.
+  */
+  sessionOptions->info->createInitialScatterPlot = false;
+  /*-- --*/
+
   dnew = datad_create (nvisible, nc, gg);
   dnew->name = g_strdup ("radial");
 
@@ -314,9 +313,11 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
  * open a new scatterplot with the new data, and display edges
  * as they're displayed in the current datad.
 */
+g_printerr ("createInitial? %d\n", sessionOptions->info->createInitialScatterPlot);
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
   setDisplayEdge (dspnew, e);
-  edges_displayed = display_copy_edge_options (dsp, dspnew);
+  if (dsp)
+    edges_displayed = display_copy_edge_options (dsp, dspnew);
   if (!edges_displayed) {
     GGOBI(setShowLines)(dspnew, true);
 /*
@@ -452,7 +453,7 @@ void radial_highlight_sticky_edges (ggobid *gg, gint index, gint state,
 {
   PluginInstance *inst = (PluginInstance *)data;
   glayoutd *gl = glayoutFromInst (inst);
-  datad *e = gg->current_display->e;
+  datad *e = gl->e;
   noded *n, *n1;
   GList *l, *connectedNodes, *connectedEdges;
   gint k;
@@ -526,8 +527,10 @@ void highlight_sticky_edges (ggobid *gg, gint index, gint state,
 */
 static void
 initRadialLayout (glong *visible, gint nvisible, ggobid *gg,
-  glayoutd *gl, datad *d, datad *e)
+  glayoutd *gl)
 {
+  datad *d = gl->dsrc;
+  datad *e = gl->e;
   gint i;
   noded *na, *nb;
   gint nedges = e->edge.n;
@@ -552,7 +555,6 @@ initRadialLayout (glong *visible, gint nvisible, ggobid *gg,
 
   gl->radial->nodes = (noded *) g_malloc (nvisible * sizeof (noded));
   gl->radial->nnodes = nvisible;
-  gl->radial->d = d;
 
   for (i = 0; i <nvisible; i++) {
     nodeindices[ visible[i] ] = i;
@@ -573,7 +575,7 @@ initRadialLayout (glong *visible, gint nvisible, ggobid *gg,
     }
   }
 
-  /*-- initial default:  let the first node be the center node --*/
+  /*-- let the first node be the center node if it hasn't been set --*/
   if (gl->centerNodeIndex == -1)
     gl->centerNodeIndex = 0;
 

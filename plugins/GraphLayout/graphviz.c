@@ -34,9 +34,10 @@ char *Info[] = {
 void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
+  glayoutd *gl = glayoutFromInst (inst);
   displayd *dsp = gg->current_display;
-  datad *d = gg->current_display->d;
-  datad *e = gg->current_display->e;
+  datad *d = gl->dsrc;
+  datad *e = gl->e;
   Agnode_t *node, *head, *tail;
   gchar *name;
   gint kind = AGRAPH;
@@ -59,10 +60,8 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   gboolean edges_displayed;
 
   if (e == NULL) {
-    if (!edgeset_add (dsp)) {
-      quick_message ("Please specify an edge set", false);
-      return;
-    } else e = dsp->e;
+    g_printerr ("Trouble:  no edge set is specified\n");
+    return;
   }
 
   visible = (glong *) g_malloc (d->nrows_in_plot * sizeof (glong));
@@ -211,6 +210,14 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   colnames[0] = "x";
   colnames[1] = "y";
 
+  /*
+   * In case there is no initial scatterplot because the datasets
+   * have no variables, we don't want creating a datad to trigger
+   * the initialization of this plot.   This takes care of it.
+  */
+  sessionOptions->info->createInitialScatterPlot = false;
+  /*-- --*/
+
   dnew = datad_create (nvisible, nc, gg);
   dnew->name = (layout_type == DOT_LAYOUT) ?
     g_strdup ("dot") : g_strdup ("neato");
@@ -234,7 +241,8 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 */
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
   setDisplayEdge (dspnew, e);
-  edges_displayed = display_copy_edge_options (dsp, dspnew);
+  if (dsp)
+    edges_displayed = display_copy_edge_options (dsp, dspnew);
   if (!edges_displayed) {
     GGOBI(setShowLines)(dspnew, true);
 /*
