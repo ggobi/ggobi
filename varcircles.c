@@ -59,12 +59,14 @@ varcircles_get_nth (gint which, gint jvar, datad *d) {
 */
 void
 varcircles_layout_init (datad *d, ggobid *gg) {
-  gint tncols, tnrows;
+  gint tncols = 0, tnrows = 0;
   gint NCOLS = 5;
 
-  tncols = MIN (NCOLS, d->ncols);
-  tnrows = d->ncols / tncols;
-  if (tnrows * tncols < d->ncols) tnrows++;
+  tncols = (d->ncols == 0) ? 0 : MIN (NCOLS, d->ncols);
+  if (tncols) {
+    tnrows = d->ncols / tncols;
+    if (tnrows * tncols < d->ncols) tnrows++;
+  }
 
   d->vcirc_ui.tncols = tncols;
   d->vcirc_ui.tnrows = tnrows;

@@ -109,11 +109,11 @@ data_xml_read (InputDescription *desc, ggobid *gg)
  gboolean ok = false;  
  gchar *name = g_strdup(desc->fileName); /* find_xml_file(desc->fileName, NULL, gg); */
 
-  if(name == NULL)
-    return(false);
+  if (name == NULL)
+    return (false);
 
- if(strcmp(name, desc->fileName) != 0) {
-   g_printerr("Different input file name and resolved file name. Please report.\n");
+  if (strcmp(name, desc->fileName) != 0) {
+    g_printerr("Different input file name and resolved file name. Please report.\n");
  }
 
   xmlParserHandler = (xmlSAXHandlerPtr) g_malloc(sizeof(xmlSAXHandler));
@@ -151,7 +151,8 @@ data_xml_read (InputDescription *desc, ggobid *gg)
     ok = true;
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
-      ok &= (d->ncols > 0 && d->nrows > 0);
+      /* ok &= (d->ncols > 0 && d->nrows > 0); */
+      ok &= (d->nrows > 0);   /*-- try allowing no columns --*/
     }
   }
       
