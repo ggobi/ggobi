@@ -178,14 +178,14 @@ brush_set_pos (gint x, gint y, splotd *sp) {
 }
 
 static gboolean
-binning_permitted (displayd *display)
+binning_permitted (displayd *display, ggobid *gg)
 {
   datad *d = display->d;
   datad *e = display->e;
   gboolean permitted = true;
   gint type = display->displaytype;
 
-  if (d->nrgroups > 0)
+  if (gg->linkby_cv)
     permitted = false;
 
   /*-- if we're drawing whiskers --*/
@@ -246,7 +246,7 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   if (cpanel->brush_on_p) {
     changed = brush_once (false, sp, gg);
 
-    if (!binning_permitted (display)) {
+    if (!binning_permitted (display, gg)) {
       splot_redraw (sp, FULL, gg);  
       if (gg->brush.updateAlways_p)
         displays_plot (sp, FULL, gg);  
@@ -467,7 +467,7 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 static gboolean
 build_glyph_vectors (datad *d, ggobid *gg)
 {
-  gint ih, iv, m, j, k, gp, n, p;
+  gint ih, iv, m, j, k;
   static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   icoords imin, imax;
@@ -486,24 +486,12 @@ build_glyph_vectors (datad *d, ggobid *gg)
         */
         j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
 
-        /* update the glyph vectors for every member of the row group */
-        if (d->nrgroups > 0) {
-          gp = d->rgroup_ids[k];
-          for (n=0; n<d->rgroups[gp].nels; n++) {
-            p = d->rgroups[gp].els[n];
-            changed = update_glyph_vectors (p, changed,
-              d->pts_under_brush.els, d, gg);
-          }
-        /* */
+        changed = update_glyph_vectors (j, changed,
+          d->pts_under_brush.els, d, gg);
 
-        } else {  /* update the vectors for this point only */
-          changed = update_glyph_vectors (j, changed,
-            d->pts_under_brush.els, d, gg);
-
-          /*-- link by id --*/
-          if (nd > 1) glyph_link_by_id (j, d, gg);
-          /*-- --*/
-        }
+        /*-- link by id --*/
+        if (!gg->linkby_cv && nd > 1) glyph_link_by_id (j, d, gg);
+        /*-- --*/
       }
     }
   }
@@ -582,27 +570,12 @@ build_color_vectors (datad *d, ggobid *gg)
         */
         j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
 
-        /* update the color vectors for every member of the row group */
-        if (d->nrgroups > 0) {
-/*  Isn't this redundant?  If pts_under_brush is including the rgroup
-    information, then why does it need to be included again here?
-          gp = d->rgroup_ids[k];
-          for (n=0; n<d->rgroups[gp].nels; n++) {
-            p = d->rgroups[gp].els[n];
-            changed = update_color_vectors (p, changed,
-              d->pts_under_brush.els, d, gg);
-          }
-*/
-        /* */
+        changed = update_color_vectors (j, changed,
+          d->pts_under_brush.els, d, gg);
 
-        } else {  /* update the vectors for this point only */
-          changed = update_color_vectors (j, changed,
-            d->pts_under_brush.els, d, gg);
-
-          /*-- link by id --*/
-          if (nd > 1) color_link_by_id (j, d, gg);
-          /*-- --*/
-        }
+        /*-- link by id --*/
+        if (!gg->linkby_cv && nd > 1) color_link_by_id (j, d, gg);
+        /*-- --*/
       }
     }
   }
@@ -661,7 +634,7 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 static gboolean
 build_hidden_vectors (datad *d, ggobid *gg)
 {
-  gint ih, iv, m, j, k, gp, n, p;
+  gint ih, iv, m, j, k;
   static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   icoords imin, imax;
@@ -680,25 +653,12 @@ build_hidden_vectors (datad *d, ggobid *gg)
          * k   raw index, based on nrows
          * j   index based on nrows_in_plot
         */
+        changed = update_hidden_vectors (j, changed,
+          d->pts_under_brush.els, d, gg);
 
-        if (d->nrgroups > 0) {
-          /*-- update the hidden vectors for every member of the row group --*/
-          gp = d->rgroup_ids[k];
-          for (n=0; n<d->rgroups[gp].nels; n++) {
-            p = d->rgroups[gp].els[n];
-            changed = update_hidden_vectors (p, changed,
-              d->pts_under_brush.els, d, gg);
-          }
-        /* */
-
-        } else {  /* update the vectors for this point only */
-          changed = update_hidden_vectors (j, changed,
-            d->pts_under_brush.els, d, gg);
-
-          /*-- link by id --*/
-          if (nd > 1) hidden_link_by_id (j, d, gg);
-          /*-- --*/
-        }
+        /*-- link by id --*/
+        if (!gg->linkby_cv && nd > 1) hidden_link_by_id (j, d, gg);
+        /*-- --*/
       }
     }
     obin0.x = d->brush.bin0.x;
@@ -710,16 +670,18 @@ build_hidden_vectors (datad *d, ggobid *gg)
   return (changed);
 }
 
-gboolean
-active_paint_points (datad *d, ggobid *gg)
-{
-  gint ih, iv, j, pt, k, gp;
-  gboolean changed;
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  splotd *sp = gg->current_splot;
 /*
  * Set pts_under_brush[j] to 1 if point j is inside the rectangular brush.
 */
+gboolean
+active_paint_points (datad *d, ggobid *gg)
+{
+  gint ih, iv, j, pt;
+  gboolean changed;
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  splotd *sp = gg->current_splot;
+  void brush_link_by_var (gint jlinkby, gboolean *levels, cpaneld *,
+    datad *, ggobid *);
 
   /* Zero out pts_under_brush[] before looping */
   d->npts_under_brush = 0;
@@ -727,8 +689,8 @@ active_paint_points (datad *d, ggobid *gg)
     d->pts_under_brush.els[d->rows_in_plot[j]] = 0;
  
   /*
-   * brush.binarray[][] only represents the
-   * rows in rows_in_plot[] so there's no need to test for that.
+   * d->brush.binarray[][] only represents the
+   * cases in rows_in_plot[] so there's no need to test for that.
   */
 
   for (ih=d->brush.bin0.x; ih<=d->brush.bin1.x; ih++) {
@@ -737,26 +699,57 @@ active_paint_points (datad *d, ggobid *gg)
         pt = d->rows_in_plot[d->brush.binarray[ih][iv].els[j]];
 
         if (under_brush (pt, sp)) {
-
-          d->npts_under_brush++ ;
+          d->npts_under_brush++ ;    /*-- this is just boolean, really **/
           d->pts_under_brush.els[pt] = 1;
-
-          if (d->nrgroups > 0) {
-            /* brush other members of this row group */
-            gp = d->rgroup_ids[pt];
-            if (gp < d->nrgroups) {  /* exclude points without an rgroup */
-              for (k=0; k<d->rgroups[gp].nels; k++) {
-                  d->pts_under_brush.els[d->rgroups[gp].els[k]] = 1;
-              }
-            }
-          }
-          /* */
         }
       }
     }
   }
 
   changed = false;
+
+  /*---------------------------------------------------------------------*/
+
+  /*-- link by categorical variable --*/
+  if (gg->linkby_cv) {
+    gint i, m, level;
+    gboolean *levels = g_malloc0 (d->linkvar_vt->nlevels * sizeof(gboolean));
+    gint jlinkby = g_slist_index (d->vartable, d->linkvar_vt);
+    /*-- for other datad's --*/
+    GSList *l;
+    datad *dd;
+    vartabled *vtt;
+
+    /*-- find the levels which are among the points under the brush --*/
+    for (m=0; m<d->nrows_in_plot; m++) {
+      i = d->rows_in_plot[m];
+      if (d->pts_under_brush.els[i]) {
+        level = (gint) d->raw.vals[i][jlinkby];
+        levels[level] = true;
+      }
+    }
+
+    /*-- first do this d --*/
+    brush_link_by_var (jlinkby, levels, cpanel, d, gg);
+
+    /*-- now for the rest of them --*/
+    for (l = gg->d; l; l = l->next) {
+      dd = l->data;
+      if (dd != d) {
+        vtt = vartable_element_get_by_name (d->linkvar_vt->collab, dd);
+        if (vtt != NULL) {
+          jlinkby = g_slist_index (dd->vartable, vtt);
+          brush_link_by_var (jlinkby, levels, cpanel, dd, gg);
+        }
+      }
+    }
+
+    g_free (levels);
+    changed = true;
+  }
+
+  /*-- end of linking by categorical variable --*/
+  /*---------------------------------------------------------------------*/
 
   if (cpanel->brush_on_p) {
     switch (cpanel->br_point_targets) {
@@ -845,32 +838,12 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
 static gboolean
 build_edge_color_vectors (datad *e, ggobid *gg)
 {
-  gint i, k;
+  gint i;
   gboolean changed = false;
-  /* gint gp, n, p; */
 
-  if (e->nrgroups > 0) {
-
-    for (k=0; k<e->nrgroups; k++) {
-
-    /* update the edge color vectors for every member of the edge group */
-/*
-      gp = e->rgroup_ids[k];
-      for (n=0; n<e->rgroups[gp].nels; n++) {
-        p = e->rgroups[gp].els[n];
-        changed = update_color_vectors (p, changed, e->edge.xed_by_brush.els,
-          d, gg);
-      }
-*/
-    /* */
-
-    }
-
-  } else {  /* update the vectors for this point only */
-    for (i=0; i<e->edge.n; i++) {
-      changed = update_color_vectors (i, changed, e->edge.xed_by_brush.els,
-        e, gg);
-    }
+  for (i=0; i<e->edge.n; i++) {
+    changed = update_color_vectors (i, changed,
+      e->edge.xed_by_brush.els, e, gg);
   }
 
   return (changed);
@@ -884,8 +857,8 @@ build_edge_type_vectors (datad *e, ggobid *gg)
 
   /*-- make no special accommodation for groups until I know I need it --*/
   for (i=0; i<e->edge.n; i++) {
-    changed = update_glyph_vectors (i, changed, e->edge.xed_by_brush.els,
-      e, gg);
+    changed = update_glyph_vectors (i, changed,
+      e->edge.xed_by_brush.els, e, gg);
   }
 
   return (changed);
@@ -898,24 +871,8 @@ build_edge_hidden_vectors (datad *e, ggobid *gg)
   gboolean changed = false;
 
   for (k=0; k<e->edge.n; k++) {
-
-    /* update the edge hidden vectors for every member of the edge group */
-    if (e->nrgroups > 0) {
-/*
-      gint n, p, gp;
-      gp = e->rgroup_ids[k];
-      for (n=0; n<e->rgroups[gp].nels; n++) {
-        p = e->rgroups[gp].els[n];
-        changed = update_hidden_vectors (p, changed, e->edge.xed_by_brush.els,
-          e, gg);
-      }
-*/
-    /* */
-
-    } else {  /* update the vectors for this point only */
-      changed = update_hidden_vectors (k, changed, e->edge.xed_by_brush.els,
-        e, gg);
-    }
+    changed = update_hidden_vectors (k, changed,
+      e->edge.xed_by_brush.els, e, gg);
   }
 
   return changed;
@@ -925,7 +882,7 @@ static gboolean
 active_paint_edges (displayd *display, ggobid *gg)
 {
   datad *e = display->e;
-  gint k, n, gp, pt;
+  gint k;
   gboolean changed;
   cpaneld *cpanel = &gg->current_display->cpanel;
 
@@ -935,21 +892,9 @@ active_paint_edges (displayd *display, ggobid *gg)
     e->edge.xed_by_brush.els[k] = false;
  
   for (k=0; k<e->edge.n; k++) {
-
     if (xed_by_brush (k, display, gg)) {
-
       e->edge.nxed_by_brush++ ;
       e->edge.xed_by_brush.els[k] = true;
-
-      if (e->nrgroups > 0) {  /*-- untested --*/
-        gp = e->rgroup_ids[pt];
-        if (gp < e->nrgroups) {  /* exclude points without an rgroup */
-          for (n=0; n<e->rgroups[gp].nels; n++) {
-              e->pts_under_brush.els[e->rgroups[gp].els[n]] = 1;
-          }
-        }
-      }
-      /* */
     }
   }
   changed = false;

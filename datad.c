@@ -44,6 +44,10 @@ datad_new(datad *d, ggobid *gg)
   rowids_init_null (d);
   vectorb_init_null (&d->edge.xed_by_brush);
 
+  /*-- linking by categorical variable --*/
+  d->linkvar_vt = NULL;
+  d->linkvar_arrays = NULL;
+
   sphere_init (d);
 
   jitter_vars_init (d, gg);

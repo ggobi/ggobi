@@ -675,13 +675,13 @@ void load_previous_file(GtkWidget *w, gpointer cbd);
 void
 addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
 {
-  int i;
+  gint i;
   GtkWidget *el;
   InputDescription *input;
   if(info) {
     for(i = 0 ; i < info->numInputs ; i++) {
      input = &(info->descriptions[i].input);
-     if(input->fileName) {
+     if(input && input->fileName) {
        el = gtk_menu_item_new_with_label(input->fileName);
        gtk_signal_connect(GTK_OBJECT(el), "activate",
                           GTK_SIGNAL_FUNC(load_previous_file),

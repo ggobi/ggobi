@@ -251,11 +251,6 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
   datad *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
 
-/*
-  if (tmp != NULL) {
-    data->current_level = strToInteger(tmp);
-  } else
-*/
   data->current_level++; /*-- current_level here ranges from 0 : nlevels-1 --*/
 
   if (tmp != NULL)
@@ -263,7 +258,6 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
   else
     el->level_values[data->current_level] = data->current_level;
    
-
   return(data->current_level);
 }
 
@@ -311,7 +305,7 @@ void endXMLElement(void *user_data, const xmlChar *name)
  switch(type) {
    case RECORD:
      data->current_record++;
-     break;
+   break;
    case VARIABLE:
    case REAL_VARIABLE:
    case CATEGORICAL_VARIABLE:
@@ -319,22 +313,22 @@ void endXMLElement(void *user_data, const xmlChar *name)
      break;
    case COLOR:
      data->current_color++;
-     break;
+   break;
    case COLORMAP:
        /* Only set this if we are reading from the main file 
           and not a secondary colormap file.
         */
      if(data->reading_colormap_file_p == false)
        GGOBI(registerColorMap)(data->gg);
+   break;
    case CATEGORICAL_LEVELS:
-       break;
+   break;
    case CATEGORICAL_LEVEL:
-       data->current_level++;
-       break;
+   break;
    default:
      data = NULL; /* just any code so we can stop.*/
-     break;
- }
+   break;
+  }
 }
 
 

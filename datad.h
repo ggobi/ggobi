@@ -59,10 +59,12 @@ struct _datad {
  } rowid;
  /*-- --*/
 
+ /*-- to support brushing by categorical variable --*/
+ vartabled *linkvar_vt;   /*-- the linking variable --*/
+ GSList *linkvar_arrays;  /*-- each element is a GArray * --*/
+ /*-- --*/
+
  gint ncols;
-/*
- vartabled *vartable;
-*/
  GSList *vartable;
  GtkWidget *vartable_clist;
  gboolean single_column;  /*-- not handling single-column case now --*/

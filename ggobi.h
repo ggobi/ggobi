@@ -142,8 +142,7 @@ struct _ggobid {
  
 /*---------------- brushing by categorical variable ----------------*/
 
-  gchar *linkvar_name;
-  GSList *linkvar_arrays;  /*-- each element is a GArray * --*/
+  gboolean linkby_cv;
 
 /*--------------------------------------------------------------------*/
 /*                         color                                      */

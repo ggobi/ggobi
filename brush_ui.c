@@ -233,12 +233,15 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromSPlot(sp);
   datad *d, *e;
+  extern void linking_method_set (displayd *, datad *, ggobid *);
 
   gg->current_splot = sp->displayptr->current_splot = sp;
   gg->current_display = sp->displayptr;
   cpanel = &gg->current_display->cpanel;
   d = gg->current_display->d;
   e = gg->current_display->e;
+
+  linking_method_set (gg->current_display, d, gg);
 
   brush_prev_vectors_update (d, gg);
   if (e != NULL)
