@@ -460,8 +460,10 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
        * Prepare to decrease the size of each plot: symmetry says
        * that some of these variables are redundant.
       */
-      col = (cpanel->scatmat_selection_mode == VAR_INSERT) ? spcol : spcol+1;
-      row = (cpanel->scatmat_selection_mode == VAR_INSERT) ? sprow : sprow+1;
+      col = (cpanel->scatmat_selection_mode == VAR_INSERT) ? spcol :
+                                                             scatmat_nvars;
+      row = (cpanel->scatmat_selection_mode == VAR_INSERT) ? sprow :
+                                                             scatmat_nvars;
 
       ratio = (gfloat) scatmat_nvars / (gfloat) (scatmat_nvars+1);
       width = (gint) (ratio * (gfloat) width);

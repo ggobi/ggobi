@@ -343,20 +343,18 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
         l = display->splots;
         sp_new = splot_new (display, width, height, gg);
         sp_new->xyvars.y = jvar;
-        /*sp_new->xyvars.x = (splotd *) l->data.xyvars.x;*/
 
         if (cpanel->tsplot_selection_mode == VAR_INSERT)
           display->splots = g_list_insert (display->splots,
                                            (gpointer) sp_new, sp_indx);
         else if (cpanel->tsplot_selection_mode == VAR_APPEND)
-          display->splots = g_list_insert (display->splots,
-            (gpointer) sp_new, MIN (sp_indx+1, nplots));
+          display->splots = g_list_append (display->splots,
+            (gpointer) sp_new);
 
         box = (sp->da)->parent;
         gtk_box_pack_end (GTK_BOX (box), sp_new->da, false, false, 0);
         gtk_widget_show (sp_new->da);
 
-        /*l = display->splots;*/
         while (l) {
           w = ((splotd *) l->data)->da;
           gtk_widget_ref (w);

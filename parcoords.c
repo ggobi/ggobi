@@ -368,8 +368,8 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         display->splots = g_list_insert (display->splots,
           (gpointer) sp_new, sp_indx);
       else if (cpanel->parcoords_selection_mode == VAR_APPEND)
-        display->splots = g_list_insert (display->splots,
-          (gpointer) sp_new, MIN (sp_indx+1, nplots));
+        display->splots = g_list_append (display->splots,
+          (gpointer) sp_new);
 
       box = (sp->da)->parent;
       gtk_box_pack_end (GTK_BOX (box), sp_new->da, false, false, 0);
