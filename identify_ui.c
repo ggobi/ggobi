@@ -241,8 +241,8 @@ void
 cpanel_identify_make(ggobid *gg) {
   GtkWidget *btn;
   
-  gg->control_panel[IDENT] = gtk_vbox_new(false, VBOX_SPACING);
-  gtk_container_set_border_width(GTK_CONTAINER(gg->control_panel[IDENT]), 5);
+  gg->control_panel[IDENT] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER(gg->control_panel[IDENT]), 5);
 
 /*
  * button for removing all labels
