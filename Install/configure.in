@@ -129,6 +129,7 @@ if test -n "${with_gtk2}" && test "${with_gtk2}" != "no" ; then
   GTK_CONFIG_LIBS='`${PKG_CONFIG} --libs gtk+-2.0`'
   AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal, , $PATH)
   GTK_2="yes"
+  GTK_VERSION=`$PKG_CONFIG --modversion gtk+-2.0`
 fi
 
 AC_SUBST(GTK_2)
@@ -143,6 +144,8 @@ if test -z "${PKG_CONFIG}" ; then
 
  GTK_CFLAGS="\$(shell \${GTK_CONFIG} --cflags)"
  GTK_LIBS="\$(shell \${GTK_CONFIG} --libs)"
+
+ GTK_VERSION=`$GTK_CONFIG --version`
 
  GTK_CONFIG_CFLAGS='`${GTK_CONFIG} --cflags`'
  GTK_CONFIG_LIBS='`${GTK_CONFIG} --libs`'
@@ -724,9 +727,10 @@ echo "*******************************"
 echo ""
 echo "GGobi"
 echo " Version:                $GGOBI_VERSION_STRING"
+echo " Building ggobi library: $enable_embed"
 echo " Installation directory: $INSTALL_DIR"
 echo " XML:                    version ${XML_VERSION}"
-echo " Gtk:                    version "
+echo " Gtk:                    version ${GTK_VERSION}"
 echo " Plugins:               ${PLUGIN_DIRS}"
 echo " Rggobi:                 ${WILL_BUILD_RGGOBI-no}" 
 echo ""
