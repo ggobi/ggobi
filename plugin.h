@@ -48,7 +48,11 @@ typedef struct {
   The two plugin types should share the common information.
  */
 struct   _GGobiInputPluginInfo {
-    char *modeName;
+#if 0
+    char *_modeName;
+#endif
+    char **modeNames;
+    guint numModeNames;
     char *read_symbol_name;
     char *probe_symbol_name;
     char *getDescription;
@@ -142,6 +146,6 @@ gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlug
 gboolean GGobi_checkPlugin(GGobiPluginDetails *plugin);
 gboolean setLanguagePluginInfo(GGobiPluginDetails *details, const char *language, GGobiInitInfo *info);
 
-gboolean inputPluginSupportsMode(GGobiPluginInfo *plugin, GGobiInputPluginInfo *info, const gchar *modeName);
+gboolean pluginSupportsInputMode(const gchar *modeName, GGobiPluginInfo *pluginInfo);
 
 #endif

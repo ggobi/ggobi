@@ -384,7 +384,15 @@ create_plugin_xml(GGobiPluginInfo *plugin,  xmlNodePtr doc)
     el = xmlNewChild(node, NULL, "author", plugin->details->author);
 
     if(plugin->type == INPUT_PLUGIN) {
-        xmlSetProp(node, "modeName", plugin->info.i->modeName);
+        gchar buf[10];
+	gint k;
+
+        el = xmlNewChild(node, NULL, "modeNames", NULL);
+	sprintf(buf, "%d", plugin->info.i->numModeNames);
+	xmlSetProp(el, "numNodes", buf);
+
+	for(k = 0; k < plugin->info.i->numModeNames; k++)
+   	   xmlNewChild(el, NULL, "modeName", plugin->info.i->modeNames[k]);
     }    
 
     el = xmlNewChild(node, NULL, "dll", NULL);

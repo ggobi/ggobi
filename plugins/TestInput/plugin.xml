@@ -1,7 +1,10 @@
 <inputPlugin name="testInput" interactive="true">
   <description>Generates random data via an input plugin</description>
   <author>Duncan Temple Lang</author>
-  <modeName>testInput</modeName>
+  
+  <modeNames>
+    <modeName>testInput</modeName>
+  </modeNames>
   <dll name="plugins/TestInput/TestInput"> 
       <init description="test_input_description" />
   </dll>

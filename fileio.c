@@ -148,7 +148,7 @@ fileset_generate(const gchar * fileName,
 	}
 
         if ((isUnknownMode && handlesFile) 
-             || inputPluginSupportsMode(plugin, info, modeName)) 
+             || pluginSupportsInputMode(modeName, plugin)) 
 	{
           InputGetDescription f;
 	  if(info->get_description_f)

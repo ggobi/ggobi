@@ -459,6 +459,23 @@ closePlugins(ggobid *gg)
   gg->pluginInstances = NULL;
 }
 
+
+
+/*
+ Determine if the plugin handles this mode.
+ */
+gboolean
+pluginSupportsInputMode(const gchar *modeName, GGobiPluginInfo *pluginInfo)
+{
+   int i;
+   for(i = 0; i < pluginInfo->info.i->numModeNames; i++) {
+     if(strcmp(modeName, pluginInfo->info.i->modeNames[i]) == 0)
+       return(true);
+   }
+
+   return(false);
+}
+
 GGobiPluginInfo *
 runInteractiveInputPlugin(ggobid *gg)
 {
@@ -469,7 +486,7 @@ runInteractiveInputPlugin(ggobid *gg)
     plugin =  (GGobiPluginInfo*) l->data;
     if(plugin->info.i->interactive) {
       if(!sessionOptions->data_type ||
-         strcmp(sessionOptions->data_type, plugin->info.i->modeName) == 0)
+	 pluginSupportsInputMode(sessionOptions->data_type, plugin))
       {
         InputGetDescription f;
         if(!loadPluginLibrary(plugin->details, plugin)) {
@@ -582,8 +599,10 @@ checkDLL()
 
 #include "externs.h"
 
+gchar *XMLModeNames[] = {"xml", "url"};
 GGobiInputPluginInfo XMLInputPluginInfo = {
-	"xml",
+	NULL,
+	0,
 	"",
 	"",
 	"read_xml_input_description",
@@ -602,8 +621,10 @@ GGobiPluginDetails XMLDetails = {
   "GGobi core"
 };
 
+gchar *CSVModeNames[] = {"csv"};
 GGobiInputPluginInfo CSVInputPluginInfo = {
-	"csv",
+	NULL,
+	0,
 	"",
 	"",
 	"read_csv_input_description",
@@ -623,9 +644,11 @@ GGobiPluginDetails CSVDetails = {
   "Dongshin Kim (Iowa State University) & GGobi core"
 };
 
+gchar *ASCIIModeNames[] = {"ascii"};
 
 GGobiInputPluginInfo ASCIIInputPluginInfo = {
-	"ascii",
+	NULL,
+	0,
 	"",
 	"",
 	"read_ascii_input_description",
@@ -648,7 +671,7 @@ GGobiPluginDetails ASCIIDetails = {
 
 
 GGobiPluginInfo  *
-createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *details)
+createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *details, gchar **modeNames, guint numModes)
 {
   GGobiPluginInfo  *plugin; 
 #ifdef WIN32
@@ -679,6 +702,14 @@ createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *detai
   plugin->info.i = info;
   plugin->details = details;
 
+  if(modeNames) {
+     guint i;
+     plugin->info.i->modeNames = (gchar**) malloc(sizeof(gchar*) * numModes);
+     plugin->info.i->numModeNames = numModes;
+     for(i = 0; i < numModes; i++)
+        plugin->info.i->modeNames[i] = g_strdup(modeNames[i]);
+  }
+
   return(plugin);
 }
 
@@ -691,13 +722,13 @@ registerDefaultPlugins(GGobiInitInfo *info)
 {
   GGobiPluginInfo  *plugin; 
   
-  plugin = createGGobiInputPluginInfo(&XMLInputPluginInfo, &XMLDetails);
+  plugin = createGGobiInputPluginInfo(&XMLInputPluginInfo, &XMLDetails, XMLModeNames, sizeof(XMLModeNames)/sizeof(XMLModeNames[0]));
   info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 
-  plugin = createGGobiInputPluginInfo(&CSVInputPluginInfo, &CSVDetails);
+  plugin = createGGobiInputPluginInfo(&CSVInputPluginInfo, &CSVDetails, CSVModeNames, sizeof(CSVModeNames)/sizeof(CSVModeNames[0]));
   info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 
-  plugin = createGGobiInputPluginInfo(&ASCIIInputPluginInfo, &ASCIIDetails);
+  plugin = createGGobiInputPluginInfo(&ASCIIInputPluginInfo, &ASCIIDetails, ASCIIModeNames, sizeof(ASCIIModeNames)/sizeof(ASCIIModeNames[0]));
   info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 }
 
@@ -708,26 +739,17 @@ getInputPluginSelections(ggobid *gg)
 {
        GList *els = NULL, *plugins;
        GGobiPluginInfo *plugin;
-       int i, n;
+       int i, n, k;
 
        els = g_list_append(els, DefaultUnknownInputModeName);
        plugins = sessionOptions->info->inputPlugins;
        n = g_list_length(plugins);
        for(i = 0; i < n; i++) {
 	   plugin = g_list_nth_data(plugins, i);
-	   els = g_list_append(els, plugin->info.i->modeName);
+	   for(k = 0; k < plugin->info.i->numModeNames; k++)
+  	       els = g_list_append(els, plugin->info.i->modeNames[k]);
        }
 
        return(els);
 }
 
-/*
- Determine if the plugin handles this mode.
- */
-gboolean
-inputPluginSupportsMode(GGobiPluginInfo *plugin, GGobiInputPluginInfo *info, const gchar *modeName)
-{
-  gboolean status;
-  status = modeName && (strcmp(info->modeName, modeName) == 0);
-  return(status);
-}

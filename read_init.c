@@ -959,8 +959,36 @@ getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin,
   c = getXMLElement(node, "modeName");
   if(c) {
     xmlChar *val = xmlNodeListGetString(doc, XML_CHILDREN(c), 1);      
-    plugin->modeName = (char *) val;
+    
+    plugin->modeNames = (char **) malloc(sizeof(char *));
+    plugin->modeNames[0] = g_strdup(val);
+  } else if((c = getXMLElement(node, "modeNames"))) {
+	  xmlNodePtr tmp;
+	  int ctr = 0;
+	  tmp = XML_CHILDREN(c);
+	  while(tmp) {
+	     if(strcmp((const char *) tmp->name, "modeName") == 0) {
+		     ctr++;
+	     }
+  	     tmp = tmp->next;
+          }
+	  if(ctr > 0) {
+	     plugin->modeNames = (char **) malloc(ctr * sizeof(char *));
+	     plugin->numModeNames = ctr;
+	     ctr = 0;
+	     tmp = XML_CHILDREN(c);
+  	     while(tmp) {
+	       if(strcmp((const char *) tmp->name, "modeName") == 0) {
+		  xmlChar *val = xmlNodeListGetString(doc, XML_CHILDREN(tmp), 1);
+  	          plugin->modeNames[ctr] = g_strdup(val);
+		  ctr++;
+	       }
+     	       tmp = tmp->next;
+             }
+	  }
   }
+
+
 
   c = getXMLElement(node,"dll");
   if(!c)
