@@ -4,6 +4,7 @@
 #include "GGobiAPI.h"
 
 #include <stdio.h>
+#include <math.h>
 
 #include "plugin.h"
 #include "defines.h"
@@ -99,6 +100,57 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, ggvisd *ggv, ggobid *gg)
   g_free(rowids);
 }
 
+static void
+ggv_center_scale_pos_all (ggvisd *ggv)
+{
+  gint i, j;
+
+  if (ggv->pos_mean.nels < ggv->mds_dims)
+    vectord_realloc (&ggv->pos_mean, ggv->mds_dims);
+  vectord_zero (&ggv->pos_mean);
+
+  /* find center */
+  for (j=0; j<ggv->pos.ncols; j++) {
+    for (i=0; i<ggv->pos.nrows; i++)
+      ggv->pos_mean.els[j] += ggv->pos.vals[i][j];
+    ggv->pos_mean.els[j] /= ggv->pos.nrows;
+  }
+
+  /* find scale */
+  ggv->pos_scl = 0.;
+  for(i=0; i<ggv->pos.nrows; i++)
+    for(j=0; j<ggv->pos.ncols; j++)
+      ggv->pos_scl += fabs(ggv->pos.vals[i][j] - ggv->pos_mean.els[j]);
+  ggv->pos_scl = ggv->pos_scl/ggv->pos.nrows/ggv->pos.ncols;
+
+  /* center & scale */
+  for (i=0; i<ggv->pos.nrows; i++)
+    for (j=0; j<ggv->mds_dims; j++)
+      ggv->pos.vals[i][j] = (ggv->pos.vals[i][j] - ggv->pos_mean.els[j])/
+                            ggv->pos_scl;
+
+  for(j=0; j<ggv->pos.ncols; j++)
+    ggv->pos_mean.els[j] = 0.;
+  ggv->pos_scl = 1.;
+}
+
+
+void
+ggv_pos_init (ggvisd *ggv)
+{
+  gint i, j, m;
+  datad *dpos = ggv->dpos;
+  gdouble **pos = ggv->pos.vals;
+
+  for (m=0; m<dpos->nrows_in_plot; m++) {
+    i = dpos->rows_in_plot[m];
+    for (j=0; j<dpos->ncols; j++) {
+      pos[i][j] = dpos->tform.vals[i][j] ;
+    }
+  }
+  ggv_center_scale_pos_all (ggv);
+}
+
 /*
  * Definition of D
 */
@@ -115,8 +167,8 @@ void ggv_dsource_cb (GtkWidget *w, gpointer cbd)
 void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggv->Dtarget_source = button->active;
-g_printerr ("complete distances? %d\n", ggv->Dtarget_source);
+  ggv->complete_Dtarget = button->active;
+g_printerr ("complete distances? %d\n", ggv->complete_Dtarget);
 }
 
 /*
@@ -139,6 +191,8 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
   endpointsd *endpoints;
   datad *d, *dsrc, *e;
   displayd *dsp = gg->current_display;
+  GtkWidget *window, *entry;
+  gchar *lbl;
 
   /*
    * this is awkward -- it allows dsrc to be initialized once
@@ -245,8 +299,15 @@ large size of it isn't important.
                                     ggv->Dtarget.vals[i][j]);
     }
   }
-}
 
+  /*-- update the entry to let people know Dtarget has been computed --*/
+  window = (GtkWidget *) inst->data;
+  entry = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(window),
+    "DTARGET_ENTRY");
+  lbl = g_strdup_printf ("%d x %d", ggv->Dtarget.nrows, ggv->Dtarget.ncols);
+  gtk_entry_set_text (GTK_ENTRY (entry), lbl);
+  g_free (lbl);
+}
 
 /*-- --*/
 
@@ -263,6 +324,7 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
   if (!ggv->dpos) {
     /*-- initialize, allocate and populate dpos --*/
     ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, ggv, gg);
+    ggv_pos_init (ggv);
   }
 
   mds_func (state, inst);

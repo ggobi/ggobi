@@ -123,13 +123,14 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *vbox_params;
   GtkWidget *notebook, *varnotebook, *opt;
-  GtkWidget *label, *frame, *btn, *vbox, *hbox, *vb, *hscale, *table;
+  GtkWidget *label, *frame, *btn, *vbox, *hbox, *vb, *hscale, *table, *hb;
   GtkObject *adj;
   gint top;
   GtkAccelGroup *ggv_accel_group;
   GtkWidget *menubar;
   GtkWidget *da;
   GtkTooltips *tips;
+  GtkWidget *entry;
 
   tips = gtk_tooltips_new ();
 
@@ -204,6 +205,17 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     GTK_SIGNAL_FUNC (ggv_compute_Dtarget_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
+  /*-- Report on D --*/
+  hb = gtk_hbox_new (false, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
+  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Dimension of D"),
+    false, false, 2);
+
+  entry = gtk_entry_new ();
+  gtk_object_set_data (GTK_OBJECT(window), "DTARGET_ENTRY", entry);
+  gtk_entry_set_editable (GTK_ENTRY (entry), false);
+  gtk_entry_set_text (GTK_ENTRY (entry), "(uninitialized)");
+  gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);
 
   label = gtk_label_new ("Definition of D");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);

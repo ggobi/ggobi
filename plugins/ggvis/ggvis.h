@@ -109,6 +109,7 @@ void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_lnorm_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_weight_power_cb (GtkAdjustment *adj, PluginInstance *inst);
+void ggv_center_scale_pos (ggvisd *ggv);
 
 void mds_func (gboolean, PluginInstance *);
 void mds_once (gboolean doit, ggvisd *ggv);

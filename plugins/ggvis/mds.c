@@ -140,7 +140,7 @@ scale_pos (ggvisd *ggv)
 }
 
 void
-center_scale_pos (ggvisd *ggv) 
+ggv_center_scale_pos (ggvisd *ggv) 
 {
   gint i, k;
   gdouble **pos = ggv->pos.vals;
@@ -224,7 +224,7 @@ set_weights (ggvisd *ggv)
           this_weight = pow(ggv->Dtarget.vals[i][j], ggv->mds_weight_power); 
           /* cap them */
           if (this_weight > 1E5)  this_weight = 1E5;
-          if (this_weight < 1E-5) this_weight = 1E-5;
+          else if (this_weight < 1E-5) this_weight = 1E-5;
           /* within-between weighting */
           if (SAMEGLYPH(ggv->dpos,i,j)) 
             this_weight *= (2. - ggv->mds_within_between);
@@ -598,7 +598,7 @@ mds_once (gboolean doit, ggvisd *ggv)
   static gdouble step_mag, gsum, psum, gfactor;
   static gdouble tmp;
 
-  datad *d = ggv->dpos;
+  datad *dpos = ggv->dpos;
 
   /* preparation for transformation */
   if (ggv->trans_dist.nels < ggv->ndistances) {
@@ -630,9 +630,9 @@ mds_once (gboolean doit, ggvisd *ggv)
   for (i=0; i<ggv->pos.nrows; i++) 
     ggv->point_status.els[i] = point_is_out;
   /* in */
-  for (i=0; i<d->nrows_in_plot; i++) { 
-    n = d->rows_in_plot[i]; 
-    if(!d->hidden_now.els[n])
+  for (i=0; i<dpos->nrows_in_plot; i++) { 
+    n = dpos->rows_in_plot[i]; 
+    if(!dpos->hidden_now.els[n])
       ggv->point_status.els[n] = point_is_in;
   }
   /* excluded points and anchors of either kind */  
@@ -642,13 +642,15 @@ mds_once (gboolean doit, ggvisd *ggv)
       if (xg->clusv[(int)GROUPID(i)].excluded == 1) 
         point_status[i] = point_is_out;
     if(anchor_group != NULL) {
-      if (mds_group_ind == anchorfixed || mds_group_ind == anchorscales)
-        for (i=0; i<ggv->pos.nrows; i++)
+      if (mds_group_ind == anchorfixed || mds_group_ind == anchorscales) {
+        for (i=0; i<ggv->pos.nrows; i++) {
           if (point_status[i] != point_is_out &&
               anchor_group[(int) xg->raw_data[(i)][xg->ncols-1]])
           {
             point_status[i] = point_is_anchor;
           }
+        }
+      }
     }
   }
 */
@@ -656,15 +658,16 @@ mds_once (gboolean doit, ggvisd *ggv)
 /*
   if (xg->is_point_moving && moving_point != -1) {
     if(move_type==0) {
-      point_status[moving_point] = point_is_dragged; }
-    else if(move_type==1) {
+      point_status[moving_point] = point_is_dragged;
+    } else if(move_type==1) {
       for (i=0; i<ggv->pos.nrows; i++)
         if (point_status[i] != point_is_out && SAMEGLYPH(d,i,moving_point)) 
-          point_status[i] = point_is_dragged; }
-    else if(move_type==2) {
+          point_status[i] = point_is_dragged;
+    } else if(move_type==2) {
       for (i=0; i<ggv->pos.nrows; i++)
         if (point_status[i] != point_is_out)
-          point_status[i] = point_is_dragged; }
+          point_status[i] = point_is_dragged;
+    }
   }
 */
 
@@ -712,8 +715,8 @@ mds_once (gboolean doit, ggvisd *ggv)
       if (ggv->weights.nels != 0 && ggv->weights.els[IJ] == 0.) continue;
 
       /* using groups */
-      if (ggv->mds_group_ind == within && !SAMEGLYPH(d,i,j)) continue;
-      if (ggv->mds_group_ind == between && SAMEGLYPH(d,i,j)) continue;
+      if (ggv->mds_group_ind == within && !SAMEGLYPH(dpos,i,j)) continue;
+      if (ggv->mds_group_ind == between && SAMEGLYPH(dpos,i,j)) continue;
 
       /*
        * if the target distance is within the thresholds
@@ -760,32 +763,25 @@ mds_once (gboolean doit, ggvisd *ggv)
   /* ------------ end collecting active dissimilarities ------------------ */
 
 
+g_printerr ("num_active_dist: %d\n", ggv->num_active_dist);
   /* ---------- for active dissimilarities, do some work ------------------ */ 
   if (ggv->num_active_dist > 0) {
-
-    /* ---- power transform for metric MDS and isotonic transform for
-            nonmetric*/
-    if (ggv->metric_nonmetric == metric) {
+    /*-- power transform for metric MDS; isotonic transform for nonmetric --*/
+    if (ggv->metric_nonmetric == metric)
       power_transform (ggv);
-    } else { /* NONMETRIC */
+    else
       isotonic_transform (ggv);
-    }
-
-    /* ----------- stress (always lags behind gradient by one step) ------- */
+    /*-- stress (always lags behind gradient by one step) --*/
     update_stress (ggv);
-
-  } /* if (num_active_dist > 0) { */
-    
-  /* ----------------------- end active dissimilarities ------------------- */
+  }
 
   /* --- for active dissimilarities, do the gradient push if asked for ----*/
   if (doit && ggv->num_active_dist > 0) {
 
-    /* all of the following need to be run thru rows_in_plot and
-        erase !!!!!!!!!!! */
+    /* all of the following need to be run thru rows_in_plot and erase ! */
 
     /* Zero out the gradient matrix. */
-    if (gradient_p) { 
+    if (gradient_p) {
       arrayd_free (&ggv->gradient, ggv->gradient.nrows, ggv->gradient.ncols);
       arrayd_alloc (&ggv->gradient, ggv->pos.nrows, ggv->pos.ncols);
       gradient_p = false;
@@ -795,13 +791,11 @@ mds_once (gboolean doit, ggvisd *ggv)
     /* ------------- gradient accumulation: j's push i's ----------- */
     for (i = 0; i < ggv->Dtarget.nrows; i++) {
       for (j = 0; j < ggv->Dtarget.ncols; j++) {
-
-        dist_trans  = ggv->trans_dist.els[IJ];             
-        if (dist_trans  ==  DBL_MAX) continue;
+        dist_trans  = ggv->trans_dist.els[IJ];
+        if (dist_trans  == DBL_MAX)
+          continue;
         dist_config = ggv->config_dist.els[IJ];
-        if (ggv->mds_weight_power == 0. &&
-            ggv->mds_within_between == 1.)
-        {
+        if (ggv->mds_weight_power == 0. && ggv->mds_within_between == 1.) {
           weight = 1.0;
         } else {
           weight = ggv->weights.els[IJ];
@@ -812,16 +806,15 @@ mds_once (gboolean doit, ggvisd *ggv)
           if (fabs(dist_config) < delta) dist_config = delta;
           /* scale independent version: */
           resid = (dist_trans - stress_dx / stress_xx * dist_config);
-          /**/
           /* scale dependent version: 
           resid = (dist_trans - dist_config);
           */
-          if (ggv->mds_lnorm != 2) { /* non-Euclidean Minkowski/Lebesgue metric */
+          if (ggv->mds_lnorm != 2) {
+            /* non-Euclidean Minkowski/Lebesgue metric */
             step_mag = weight * resid *
               pow (dist_config, 1 - ggv->mds_lnorm_over_dist_power);
             for (k = 0; k < ggv->mds_dims; k++) {
-              ggv->gradient.vals[i][k] += 
-                step_mag * 
+              ggv->gradient.vals[i][k] += step_mag * 
                 sig_pow(ggv->pos.vals[i][k]-ggv->pos.vals[j][k],
                   ggv->mds_lnorm-1.0);
             }
@@ -859,8 +852,8 @@ mds_once (gboolean doit, ggvisd *ggv)
           }
         }
 
-      } /* for (j = 0; j < dist.nrows; j++) { */
-    } /* for (i = 0; i < dist.nrows; i++) { */
+      } /* for (j = 0; j < dist.nrows; j++) */
+    } /* for (i = 0; i < dist.nrows; i++) */
     /* ------------- end gradient accumulation ----------- */   
 
     /* center the classical gradient */
@@ -906,12 +899,12 @@ mds_once (gboolean doit, ggvisd *ggv)
           ggv->pos.vals[i][k] += (gfactor * ggv->gradient.vals[i][k]);
       } else {
         for (k=0; k < ggv->mds_dims; k++) 
-          ggv->pos.vals[i][k] = d->raw.vals[i][k] ;
+          ggv->pos.vals[i][k] = dpos->tform.vals[i][k] ;
       }
     }
 
     /* experiment: normalize point cloud after using simplified gradient */
-    center_scale_pos (ggv);
+    ggv_center_scale_pos (ggv);
 
   } /*   if (doit && num_active_dist > 0) { */
 
@@ -922,14 +915,3 @@ mds_once (gboolean doit, ggvisd *ggv)
   }
 
 } /* end mds_once() */
-
-/* ---------------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
