@@ -98,6 +98,11 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
       g_printerr ("This version of GGobi is dated %s\n", version_date);
       exit (0);
     }
+    else if (strcmp (av[1], "--version") == 0) {
+      g_printerr ("%s\n", VERSION_STRING);
+      exit (0);
+    }
+
 
   }
 
