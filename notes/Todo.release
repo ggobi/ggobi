@@ -9,7 +9,6 @@ manual
  Review and update to respond to recent changes in the design
 
 test scripts, demos
- Test the missing values functionality  (the basics are now working)
  Make a directory for RSggobi scripts; baptize it with ratcns.S
 
 web site
@@ -35,7 +34,7 @@ Builds for different os:
 
 New release of gtk+
   Find out what it will take to make an initial port of
-     ggobi to gtk+2.0
+     ggobi to gtk+2.0  (dfs -- I'm working on it)
   
 Mailing Lists: 
 

@@ -1,6 +1,3 @@
-Have the read_xml process colorschemes (should be there already)
-and set the activeColorScheme of the ggobid to the appropriate one.
-
 Add warning messages to XML parser.
   E.g. reading incomplete or excess elements.
 
@@ -18,8 +15,19 @@ Plugins
 If read xml file from a URL, then want to compute the relative files
 by filling out the InputDescription. See fileset_generate....
 
-Fix the names and ids in the color map specification. Need to
-determine what is the relationship between these.
+Colors:
+  Fix the names and ids in the color map specification. Need to
+  determine what is the relationship between these.
+
+  It should be possible to read in multiple colorscheme files,
+  so the user can read the system file and their own file.
+
+  As the number of colorschemes increases, use a tree
+  to represent them.  (Do this in gtk2 only?)
+
+  Work out our terminology -- is there a difference between
+  a colorscheme and a colormap?  If not, let's just use one
+  term.
 
 Check the fileselection dialog for read (filesel_ok) to ensure that
 the correct data mode is passed.  Take it out of ggobi.
@@ -27,15 +35,20 @@ the correct data mode is passed.  Take it out of ggobi.
 Allow a variable transformation to be pre-specifed in
   the xml file.
 
+Allow a 2-character nickname to be specified in the xml file
+  along with the full variable name.
+
 Missings:
-  It should be possible in xml to acknowledge various
-    types of missingness: left censored, missing, etc.
+  We might want to support various levels of missingness: left
+    censored, missing, etc.  If we think of missingness as a
+    categorical variable, this becomes pretty natural.
 
 Reading in new data
   add an option:  add a new datad or replace an existing one
 
 In progress, needing design discussions:
-  Deleting variables: how should plots behave? (disabled for now)
+  Deleting variables: how should plots behave? (disabled for now,
+    except during sphering)
     [If plotted, give a warning; otherwise, proceed]
 Graphs
   line editing  <- depends on the ability to add a record
@@ -59,7 +72,8 @@ I/O -- the biggest part is now in place.  extend
 Variable manipulation table
   If a variable is categorical, show the mapping between its
     numerical values and its level names.  Another popup?
-    Wait for gtk2.0.
+    Maybe the variable table can be represented in a tree in
+    gtk2.0.
 
 saving plots as .svg files
   work out how to do nested transformations for printing parcoords
@@ -97,17 +111,18 @@ When brushing or identifying in parcoords, use leave/enter events to
   
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
-      shifting works, but not yet in the barchart; no scaling yet.
-  maybe couple that with a thumbnail view that sits just below the
-    scaling controls?
+      this now works, but not yet in the barchart
+  add a thumbnail view that sits just below the scaling controls?
+    (to help with the navigation within the plane)
 
 Smoothing -- as a demo, at least, of the use of R
 
 Food for thought:
-  * maps; data as polygons -- for summer 2001?
+  * maps; data as polygons -- for summer 2001?  Or will someone
+    else do this and link their tool to ggobi?
   * Do we need rotation at all?
   * If we bin the screen hierarchically, the bins could be used
-    for edges as well as for points.
+    for edges as well as for points.  (ie quad trees)
 
 ! it now works to start ggobi without an argument; a necessary step
 ! in the API preparation.
@@ -279,3 +294,7 @@ Food for thought:
 !      of some of the segments; this way, there's none.
 
 ! 1d cycling 
+
+! Have read_xml process colorschemes (should be there already)
+! and set the activeColorScheme of the ggobid to the appropriate one.
+
