@@ -43,7 +43,7 @@ GTK_LIBS=$(shell $(GTK_CONFIG) --libs)
 GTK_CFLAGS=$(shell $(GTK_CONFIG) --cflags)
 
 %.o: %.c
-	$(CC) -c $(PLUGIN_CFLAGS) $(CFLAGS) $(GTK_CFLAGS) $(GGOBI_CFLAGS) $<
+	$(CC) -c $(PIC_CFLAG) $(PLUGIN_CFLAGS) $(CFLAGS) $(GTK_CFLAGS) $(GGOBI_CFLAGS) $<
 
 %.so: $(OBJS)
 	$(CC) $(SO_LD_FLAGS) $(PLUGIN_LD_FLAGS) $(OBJS) -o $@ $(PLUGIN_LIBS) $(GGOBI_LIB) $(GTK_LIBS)
@@ -65,6 +65,7 @@ distclean: clean
 
 clean:
 	rm -f *.o *.so
+
 
 ifndef ADMIN
 local.config: local.config.in configure

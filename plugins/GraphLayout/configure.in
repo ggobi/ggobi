@@ -3,7 +3,7 @@ AC_INIT(glayout.c)
 AC_PATH_PROG(GTK_CONFIG, gtk-config)
 AC_SUBST(GTK_CONFIG)
 
-AC_PATH_PROG(DONEATO_CONFIG, dotneato-config)
+AC_PATH_PROG(DOTNEATO_CONFIG, dotneato-config)
 
 GRAPHVIZ=
 if test -n "${DOTNEATO_CONFIG}" ; then
