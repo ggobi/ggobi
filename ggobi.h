@@ -570,7 +570,7 @@ void gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject * object,
                                                    GtkArg * args);
 
 
-GSList *ExtendedDisplayTypes;
+extern GSList *ExtendedDisplayTypes;
 typedef GtkType(*GtkTypeLoad) (void);
 
 void ggobi_sleep(guint interval);
