@@ -298,6 +298,8 @@ projection_get (ggobid* gg) {
 void 
 mode_set (gint m, ggobid *gg) {
   displayd *display = gg->current_display;
+  GSList *l;
+  datad *d;
 
   gg->mode = m;
   if (gg->mode != gg->prev_mode) {
@@ -309,6 +311,33 @@ mode_set (gint m, ggobid *gg) {
     gtk_frame_set_label (GTK_FRAME (gg->mode_frame), mode_name[gg->mode]);
     gtk_container_add (GTK_CONTAINER (gg->mode_frame),
       gg->control_panel[gg->mode]);
+
+
+/*-- experimenting with the variable circles --*/
+    /*-- if coming into a 2dtour mode from p1d or xyplot ... --*/
+    if ((gg->mode == TOUR2D || gg->mode == COTOUR) &&
+        (gg->prev_mode != TOUR2D && gg->prev_mode != COTOUR))
+    {
+      for (l = gg->d; l; l = l->next) {
+        d = (datad *) l->data;
+        gtk_widget_ref (d->varpanel_ui.vbox);
+        gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
+                              d->varpanel_ui.vbox);
+        gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
+                           d->varpanel_ui.table);
+      }
+    } else if ((gg->mode != TOUR2D && gg->mode != COTOUR) &&
+               (gg->prev_mode == TOUR2D || gg->prev_mode == COTOUR))
+    {
+      for (l = gg->d; l; l = l->next) {
+        d = (datad *) l->data;
+        gtk_widget_ref (d->varpanel_ui.table);
+        gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
+                              d->varpanel_ui.table);
+        gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
+                           d->varpanel_ui.vbox);
+      }
+    }
   }
 
   /*
@@ -657,7 +686,6 @@ make_ui (ggobid *gg) {
 
   /*-- Variable selection panel --*/
   varpanel_make (hbox, gg);
-  /*varcircles_make (hbox, gg);*/
 
   gtk_widget_show_all (hbox);
 

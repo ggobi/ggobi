@@ -314,6 +314,7 @@ extern void transform2_values_set (gint, gint, datad *, ggobid *);
 extern void transform_values_init (gint j, datad *, ggobid *);
 extern void transform_variable (gint, gint, gfloat, gint, datad *, ggobid *);
 extern void transform_window_open (ggobid *);
+extern void varcircles_populate (datad *, ggobid *);
 extern void vardialog_open (ggobid *, gchar *title);
 extern void varlabel_set (gint, datad *, ggobid *);
 extern void varpanel_make (GtkWidget *, ggobid *);

@@ -132,7 +132,7 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
     updateAddedColumn (nc, jvar, d, gg);
   }
 
-  gtk_widget_show_all (gg->varpanel_ui.varpanel);
+  gtk_widget_show_all (gg->varpanel_ui.notebook);
 }
 
 gboolean
@@ -331,7 +331,6 @@ varpanel_checkbox_add (gint j, datad *d, ggobid *gg)
 void varpanel_populate (datad *d, ggobid *gg)
 {
   gint j;
-  GtkWidget *ebox, *scrolled_window;
   GtkWidget *labelw;
 
   /*-- we don't know the length of gg->d when the notebook is created --*/
@@ -339,25 +338,26 @@ void varpanel_populate (datad *d, ggobid *gg)
     g_slist_length (gg->d) > 1);
 
   /*-- create a scrolled window --*/
-  scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+  d->varpanel_ui.swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->varpanel_ui.swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
   labelw = (g_slist_length (gg->d) > 1) ? gtk_label_new (d->name) : NULL;
   gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                            scrolled_window, labelw);
+                            d->varpanel_ui.swin, labelw);
 
 
   /*-- add an ebox to the scrolled window: needed for tooltips? --*/
-  ebox = gtk_event_box_new ();
-  gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (scrolled_window),
-   ebox);
+  d->varpanel_ui.ebox = gtk_event_box_new ();
+  gtk_scrolled_window_add_with_viewport (
+    GTK_SCROLLED_WINDOW (d->varpanel_ui.swin),
+    d->varpanel_ui.ebox);
   
   /*-- add a vbox to the ebox --*/
   d->varpanel_ui.vbox = gtk_vbox_new (false, 0);
-  gtk_container_add (GTK_CONTAINER (ebox), d->varpanel_ui.vbox);
+  gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox), d->varpanel_ui.vbox);
 
-  gtk_widget_show_all (scrolled_window);
+  gtk_widget_show_all (d->varpanel_ui.swin);
   gdk_flush ();
 
   d->varpanel_ui.checkbox = (GtkWidget **)

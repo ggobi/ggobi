@@ -74,7 +74,8 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 {
   displayd *display = NULL;
 
-  varpanel_populate (d, gg);
+  varpanel_populate (d, gg);    /*-- checkboxes --*/
+  varcircles_populate (d, gg);  /*-- circles: build but don't show --*/
 
   pipeline_init (d, gg);
 

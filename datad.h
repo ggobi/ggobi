@@ -129,8 +129,22 @@ class datad {
 /*----------------- variable selection panel -------------------------*/
 
  struct _Varpaneld {
-   GtkWidget *vbox;        /*-- vbox inside a frame --*/
-   GtkWidget **checkbox;   /*-- single column of checkboxes --*/
+   GtkWidget *swin;          /*-- child of the notebook --*/
+   GtkWidget *ebox;          /*-- child of the scrolled_window --*/
+
+   /*-- widgets for the simplest modes: checkboxes --*/
+   GtkWidget *vbox;          /*-- child of the ebox --*/
+   GtkWidget **checkbox;     /*-- single column of checkboxes --*/
+
+   /*-- widgets for the richest modes: variable circles --*/
+   GtkWidget *table;    /*-- replaces the vbox for circles --*/
+   gint tnrows, tncols; /*-- table dimensions --*/
+   GtkWidget **da, **label;
+   GdkPixmap **da_pix;  /*-- backing pixmaps --*/
+
+   /*-- don't know if I need this, but it may be useful --*/
+   gint nvars;
+
  } varpanel_ui;
 
 /*-------------------- transformation --------------------------------*/

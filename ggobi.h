@@ -326,8 +326,6 @@ struct _ggobid {
 
  struct _Varpanel_ui {
    GtkWidget *notebook;
-   GtkWidget *varpanel;  /*-- a vbox --*/  /*-- can delete --*/
-   GtkWidget *scrolled_window;  /*-- can delete --*/
    /*GtkAccelGroup *varpanel_accel_group;*/
    GtkTooltips *tips;
  } varpanel_ui;
