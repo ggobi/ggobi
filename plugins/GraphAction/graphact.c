@@ -131,7 +131,7 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   GtkWidget *hbox, *swin, *clist;
   gchar *row[1];
   GSList *l;
-  graphactd *ga = graphactFromInst (inst);
+  graphactd *ga = graphactFromInst (inst); 
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/
@@ -326,12 +326,15 @@ void close_graphact_window(GtkWidget *w, PluginInstance *inst)
   inst->data = NULL;
 }
 
-void closeWindow(ggobid *gg, PluginInstance *inst)
+void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  if(inst->data) {
+  if (inst->data) {
+  graphactd *ga = graphactFromInst (inst); 
+    /* I don't remember what this line is for -- dfs
     gtk_signal_disconnect_by_func(GTK_OBJECT(inst->data),
       GTK_SIGNAL_FUNC (close_graphact_window), inst);
-    gtk_widget_destroy((GtkWidget*) inst->data);
+    */
+    gtk_widget_destroy (ga->window);
   }
 }
 

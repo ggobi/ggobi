@@ -402,12 +402,15 @@ void close_glayout_window(GtkWidget *w, PluginInstance *inst)
   inst->data = NULL;
 }
 
-void closeWindow(ggobid *gg, PluginInstance *inst)
+void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  if(inst->data) {
+  if (inst->data) {
+    glayoutd *gl = glayoutFromInst (inst);
+    /* I don't remember what this code is for -- dfs
     gtk_signal_disconnect_by_func(GTK_OBJECT(inst->data),
       GTK_SIGNAL_FUNC (close_glayout_window), inst);
-    gtk_widget_destroy((GtkWidget*) inst->data);
+    */
+    gtk_widget_destroy (gl->window);
   }
 }
 
