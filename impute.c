@@ -65,17 +65,9 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
        j = vars[k];
        vt = vartable_element_get (j, d);
 
-      /* First find the maximum and minimum values of the non-missing data */
-      maxval = vt->lim_raw.min;
-      maxval = vt->lim_raw.max;
-
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        if (!d->missing.vals[m][j]) {
-          if (d->raw.vals[m][j] > maxval) maxval = d->raw.vals[m][j];
-          if (d->raw.vals[m][j] < minval) minval = d->raw.vals[m][j];
-        }
-      }
+      /* Use find the limits of the non-missing data */
+      minval = vt->lim_display.min;
+      maxval = vt->lim_display.max;
       range = maxval - minval;
 
       /* Then fill it in */
