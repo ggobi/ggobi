@@ -880,6 +880,7 @@ S_radial_cb(USER_OBJECT_ plugin, USER_OBJECT_ centerNode, USER_OBJECT_ data,
 
    do_radial(gl, d, e, dsp, gg);
 
+     /* Return the new display. */
    return(NULL_USER_OBJECT);
 }
 #endif

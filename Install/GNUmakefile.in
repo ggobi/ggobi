@@ -40,7 +40,7 @@ HEADER_FILES=$(wildcard include/*.h)
 
 install: all bin/ggobi.bin ggobirc
 	if test -n "${EMBED_LIB}" ; then  \
-	  $(INSTALL) -d $(libdir)
+	  $(INSTALL) -d $(libdir) ; \
 	  $(INSTALL) $(INSTALL_FLAGS) $(EMBED_LIB) $(libdir) ;\
 	fi
 	-mkdir $(ggobi_install_home)

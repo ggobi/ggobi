@@ -150,11 +150,11 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
   displayd *display = (displayd *)
     gtk_object_get_data (GTK_OBJECT (w), "display");
 
-  set_display_option(action, display, gg);
+  set_display_option(w->active, action, display, gg);
 }
 
 void
-set_display_option(guint action, displayd *display, ggobid *gg)
+set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)
 {
   gchar *title;
   gint ne = 0;
@@ -181,7 +181,7 @@ set_display_option(guint action, displayd *display, ggobid *gg)
 
   switch (action) {
     case DOPT_POINTS:
-      display->options.points_show_p = w->active;
+      display->options.points_show_p = active;
       display_plot (display, FULL, gg);
     break;
 
@@ -194,8 +194,8 @@ set_display_option(guint action, displayd *display, ggobid *gg)
    have been correctly set, the problem vanishes!  -- dfs
 */
 
-      display->options.edges_undirected_show_p = w->active;
-      if (w->active) {
+      display->options.edges_undirected_show_p = active;
+      if (active) {
         display_edges_directed_show (display, false);
         display_edges_arrowheads_show (display, false);
       }
@@ -214,8 +214,8 @@ set_display_option(guint action, displayd *display, ggobid *gg)
     break;
     case DOPT_EDGES_D:  /*-- directed: both edges and arrowheads --*/
 
-      display->options.edges_directed_show_p = w->active;
-      if (w->active) {
+      display->options.edges_directed_show_p = active;
+      if (active) {
         display_edges_undirected_show (display, false);
         display_edges_arrowheads_show (display, false);
       }
@@ -233,8 +233,8 @@ set_display_option(guint action, displayd *display, ggobid *gg)
       display_plot (display, FULL, gg);
     break;
     case DOPT_EDGES_A:  /*-- arrowheads only --*/
-      display->options.edges_arrowheads_show_p = w->active;
-      if (w->active) {
+      display->options.edges_arrowheads_show_p = active;
+      if (active) {
         display_edges_directed_show (display, false);
         display_edges_undirected_show (display, false);
       }
@@ -254,7 +254,7 @@ set_display_option(guint action, displayd *display, ggobid *gg)
     break;
 
     case DOPT_WHISKERS:
-      display->options.whiskers_show_p = w->active;
+      display->options.whiskers_show_p = active;
       display_plot (display, FULL, gg);
     break;
 /*
@@ -284,35 +284,35 @@ set_display_option(guint action, displayd *display, ggobid *gg)
 */
 
     case DOPT_AXES:
-      display->options.axes_show_p = w->active;
+      display->options.axes_show_p = active;
 
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
         GtkGGobiExtendedDisplayClass *klass;
         klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
         if(klass->set_show_axes_option)
-          klass->set_show_axes_option(display, w->active);
+          klass->set_show_axes_option(display, active);
       }
     break;
 
     case DOPT_AXESLAB:
-      display->options.axes_label_p = w->active;
+      display->options.axes_label_p = active;
 
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
         GtkGGobiExtendedDisplayClass *klass;
         klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
         if(klass->set_show_axes_label_option)
-          klass->set_show_axes_label_option(display, w->active);
+          klass->set_show_axes_label_option(display, active);
       }      
     break;
 
     case DOPT_AXESVALS:
-      display->options.axes_values_p = w->active;
+      display->options.axes_values_p = active;
 
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
         GtkGGobiExtendedDisplayClass *klass;
         klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
         if(klass->set_show_axes_values_option)
-          klass->set_show_axes_values_option(display, w->active);
+          klass->set_show_axes_values_option(display, active);
       }
     break;
 
