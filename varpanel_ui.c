@@ -280,6 +280,7 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
   gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_X], xw);
   gtk_signal_connect (GTK_OBJECT (xw),
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+  gtk_widget_show (xw);
 
   yw = gtk_noop_toggle_button_new_with_label (" Y ");
   gtk_box_pack_start (GTK_BOX (box), yw, false, false, 2);
@@ -287,6 +288,7 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
   gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_Y], yw);
   gtk_signal_connect (GTK_OBJECT (yw),
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+  gtk_widget_show (yw);
 
   zw = gtk_noop_toggle_button_new_with_label (" Z ");
   gtk_box_pack_start (GTK_BOX (box), zw, false, false, 2);
@@ -294,6 +296,7 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
   gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_Z], zw);
   gtk_signal_connect (GTK_OBJECT (zw),
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+  /*-- hide this widget by default --*/
 
   /*-- the label is actually a button, with the old behavior --*/
   label = gtk_button_new_with_label (vt->collab_tform);
@@ -303,9 +306,10 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
   gtk_signal_connect (GTK_OBJECT (label),
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
   gtk_box_pack_start (GTK_BOX (box), label, false, false, 2);
+  gtk_widget_show (label);
 
   d->vcbox_ui.box = g_slist_append (d->vcbox_ui.box, box);
-  gtk_widget_show_all (box);
+  gtk_widget_show (box);
 }
 
 void
