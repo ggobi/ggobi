@@ -46,16 +46,19 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 {
   displayd *display = NULL;
   gint j;
-  
-  vgroups_sort (d, gg);
-  for (j=0; j<d->ncols; j++)
-    d->vardata[j].groupid = d->vardata[j].groupid_ori;
 
   /*
    * the varpanel has to know how many circles and labels to destroy
    * if new data is read in later
   */
   d->varpanel_ui.nvars = d->ncols;
+  vartable_layout_init (d, gg);
+  vartable_populate (d, gg);
+
+  
+  vgroups_sort (d, gg);
+  for (j=0; j<d->ncols; j++)
+    d->vardata[j].groupid = d->vardata[j].groupid_ori;
 
   pipeline_init (d, gg);
 

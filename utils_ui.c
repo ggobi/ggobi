@@ -26,51 +26,52 @@ GtkWidget *CreateMenuItem (GtkWidget *menu,
   GtkWidget *win_main, GtkAccelGroup *accel_group,
   GtkSignalFunc func, gpointer data, ggobid *gg)
 {
-    GtkWidget *menuitem;
+  GtkWidget *menuitem;
 
-    /* --- If there's a name, create the item and add the signal handler --- */
-    if (szName && strlen (szName)) {
-        menuitem = gtk_menu_item_new_with_label (szName);
-        gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-                    GTK_SIGNAL_FUNC (func), data);
+  /* --- If there's a name, create the item and add the signal handler --- */
+  if (szName && strlen (szName)) {
+    menuitem = gtk_menu_item_new_with_label (szName);
+    gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+                        GTK_SIGNAL_FUNC (func), data);
 
-   GGobi_widget_set(GTK_WIDGET(menuitem), gg,  true);
-    } else {
-        /* --- Create a separator --- */
-        menuitem = gtk_menu_item_new ();
-    }
+    GGobi_widget_set (GTK_WIDGET (menuitem), gg,  true);
 
-    /* --- Add menu item to the menu and show it. --- */
-    gtk_menu_append (GTK_MENU (menu), menuitem);
-    gtk_widget_show (menuitem);
+  } else {
+    /* --- Create a separator --- */
+    menuitem = gtk_menu_item_new ();
+  }
 
-    if (szName && szAccel && accel_group == NULL) {
+  /* --- Add menu item to the menu and show it. --- */
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
+  if (szName && szAccel && accel_group == NULL) {
 /*
-        accel_group = gtk_accel_group_new ();
-        gtk_accel_group_attach (accel_group, GTK_OBJECT (win_main));
+    accel_group = gtk_accel_group_new ();
+    gtk_accel_group_attach (accel_group, GTK_OBJECT (win_main));
 */
+  }
+
+  /* --- If there was an accelerator --- */
+  if (szAccel && accel_group) {
+    if (szAccel[0] == '^') {  /* control-keypress */
+      gtk_widget_add_accelerator (menuitem, "activate", accel_group,
+        szAccel[1], GDK_CONTROL_MASK,
+        GTK_ACCEL_VISIBLE);
+/*      GTK_ACCEL_VISIBLE|GTK_ACCEL_LOCKED);*/
+    } else {                  /* alt-keypress */
+      gtk_widget_add_accelerator (menuitem, "activate", accel_group,
+        szAccel[0], GDK_MOD1_MASK,
+        GTK_ACCEL_VISIBLE);
+/*      GTK_ACCEL_VISIBLE|GTK_ACCEL_LOCKED);*/
     }
+  }
 
-    /* --- If there was an accelerator --- */
-    if (szAccel && accel_group) {
-      if (szAccel[0] == '^') {  /* control-keypress */
-        gtk_widget_add_accelerator (menuitem, "activate", accel_group,
-          szAccel[1], GDK_CONTROL_MASK,
-          GTK_ACCEL_VISIBLE);
-/*          GTK_ACCEL_VISIBLE|GTK_ACCEL_LOCKED);*/
-      } else {                  /* alt-keypress */
-        gtk_widget_add_accelerator (menuitem, "activate", accel_group,
-          szAccel[0], GDK_MOD1_MASK,
-          GTK_ACCEL_VISIBLE);
-/*          GTK_ACCEL_VISIBLE|GTK_ACCEL_LOCKED);*/
-      }
-    }
+  /* --- If there was a tool tip --- */
+  if (szTip && strlen (szTip))
+      gtk_tooltips_set_tip (gg->tips, menuitem, szTip, NULL);
 
-    /* --- If there was a tool tip --- */
-    if (szTip && strlen (szTip))
-        gtk_tooltips_set_tip (gg->tips, menuitem, szTip, NULL);
-
-    return (menuitem);
+  return (menuitem);
 }
 
 /*

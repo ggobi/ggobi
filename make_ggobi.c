@@ -126,9 +126,11 @@ pipeline_init (datad *d, ggobid *gg)
 
   /*-- some initializations --*/
   modes_init (d, gg);
+/*
   varpanel_layout_init (d, gg);
   varpanel_clear (d, gg);
   varpanel_populate (d, gg);
+*/
 
   /*-- run the first half of the pipeline --*/
   arrayf_copy (&d->raw, &d->tform1);

@@ -89,13 +89,8 @@ varsel_from_menu (GtkWidget *w, gpointer data)
   datad *d = display->d;
   cpaneld *cpanel = &display->cpanel;
 
-/*-- shouldn't the menu be destroyed here? --*/
-  g_printerr ("is w a menu? %d\n", (GTK_IS_MENU(w)));
-  g_printerr ("is w a menuitem? %d\n", (GTK_IS_MENU_ITEM(w)));
-/*
-  g_printerr ("is w's ancestor a menu? %d\n",
-    (GTK_IS_MENU(gtk_widget_get_ancestor(w))));
-*/
+  /*-- I think the menu should be destroyed here. --*/
+  gtk_widget_destroy (w->parent);
 
   varsel (cpanel, gg->current_splot, vdata->jvar, vdata->btn,
     vdata->alt_mod, vdata->ctrl_mod, vdata->shift_mod, d, gg);
@@ -646,8 +641,36 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
 
 
 /*-------------------------------------------------------------------------*/
-/*                                                                         */
+/*                  initialize and populate the var panel                  */
 /*-------------------------------------------------------------------------*/
+
+/*-- build the scrolled window and vbox; the d-specific parts follow --*/
+void
+varpanel_make (GtkWidget *parent, ggobid *gg) {
+
+  gg->selvarfg_GC = NULL;
+
+  gg->varpanel_ui.varpanel_accel_group = gtk_accel_group_new ();
+
+  /*-- create a scrolled window --*/
+  gg->varpanel_ui.scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (
+    GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
+    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+  gtk_box_pack_start (GTK_BOX (parent),
+    gg->varpanel_ui.scrolled_window, true, true, 2);
+  gtk_widget_show (gg->varpanel_ui.scrolled_window);
+
+  /*-- create varpanel, a vbox, and add it to the scrolled window --*/
+  gg->varpanel_ui.varpanel = gtk_vbox_new (false, 10);
+  gtk_scrolled_window_add_with_viewport (
+    GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
+    gg->varpanel_ui.varpanel);
+/*  gtk_widget_show (gg->varpanel_ui.varpanel);*/
+
+  gtk_widget_show_all (gg->varpanel_ui.scrolled_window);
+}
+
 
 static void
 varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
@@ -670,14 +693,14 @@ varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
     "button_press_event",
     GTK_SIGNAL_FUNC (popup_varmenu), GINT_TO_POINTER (k));
 
-  GGobi_widget_set(GTK_WIDGET(d->varpanel_ui.label[k]), gg, true);
+  GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.label[k]), gg, true);
+
   /*
    * a drawing area to contain the variable circle
   */
-
   d->varpanel_ui.da[k] = gtk_drawing_area_new ();
   gtk_drawing_area_size (GTK_DRAWING_AREA (d->varpanel_ui.da[k]),
-    VAR_CIRCLE_DIAM+2, VAR_CIRCLE_DIAM+2);
+                         VAR_CIRCLE_DIAM+2, VAR_CIRCLE_DIAM+2);
   gtk_widget_set_events (d->varpanel_ui.da[k], GDK_EXPOSURE_MASK
              | GDK_ENTER_NOTIFY_MASK
              | GDK_LEAVE_NOTIFY_MASK
@@ -696,7 +719,7 @@ varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
 
   gtk_widget_show (d->varpanel_ui.da[k]);
   gtk_container_add (GTK_CONTAINER (vb), d->varpanel_ui.da[k]);
-  gtk_table_attach (GTK_TABLE (gg->varpanel_ui.varpanel), vb, j, j+1, i, i+1,
+  gtk_table_attach (GTK_TABLE (d->varpanel_ui.table), vb, j, j+1, i, i+1,
     GTK_FILL, GTK_FILL, 0, 0);
 }
 
@@ -715,9 +738,14 @@ varpanel_clear (datad *d, ggobid *gg) {
 }
 
 /*-- create a grid of buttons in the table --*/
-void varpanel_populate (datad *d, ggobid *gg)
+void vartable_populate (datad *d, ggobid *gg)
 {
   gint i, j, k;
+
+  d->varpanel_ui.table = gtk_table_new (d->varpanel_ui.vnrows,
+                                        d->varpanel_ui.vncols, true);
+  gtk_box_pack_start (GTK_BOX (gg->varpanel_ui.varpanel),
+                      d->varpanel_ui.table, true, true, 2);
 
   /*-- da and label are freed in varpanel_clear --*/
 
@@ -734,46 +762,8 @@ void varpanel_populate (datad *d, ggobid *gg)
       if (k == d->ncols) break;
     }
   }
-}
 
-void
-varpanel_make (GtkWidget *parent, ggobid *gg) {
-
-  gg->selvarfg_GC = NULL;
-
-  gg->varpanel_ui.varpanel_accel_group = gtk_accel_group_new ();
-
-  /* create a new scrolled window. */
-  gg->varpanel_ui.scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (
-    GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
-    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-  gtk_box_pack_start (GTK_BOX (parent),
-    gg->varpanel_ui.scrolled_window, true, true, 2);
-  gtk_widget_show (gg->varpanel_ui.scrolled_window);
-
-  /*-- create a vbox in the scrolled window --*/
-  gg->varpanel_ui.varpanel = gtk_vbox_new (false, 10);
-  gtk_scrolled_window_add_with_viewport (
-    GTK_SCROLLED_WINDOW (gg->varpanel_ui.scrolled_window),
-    gg->varpanel_ui.varpanel);
-  gtk_widget_show (gg->varpanel_ui.varpanel);
-
-
-  /*
-   * figure out how many rows and columns the table should have --
-   * actually, once it's done for the first one, then use the vncols
-   * value from the first table to set up the second table; not
-   * yet implemented.
-  varpanel_layout_init (d, gg);
-  d->varpanel_ui.table = gtk_table_new (d->varpanel_ui.vnrows,
-    d->varpanel_ui.vncols, true);
-  gtk_box_pack_start (GTK_BOX (gg->varpanel_ui.varpanel),
-    d->varpanel_ui.table, true, true, 2);
-  varpanel_populate (d, gg);
-  */
-
-  gtk_widget_show_all (gg->varpanel_ui.scrolled_window);
+  gtk_widget_show_all (d->varpanel_ui.table);
 }
 
 /*
@@ -781,7 +771,7 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
  * row-wise.
 */
 void
-varpanel_layout_init (datad *d, ggobid *gg) {
+vartable_layout_init (datad *d, ggobid *gg) {
 
   d->varpanel_ui.vnrows = (gint) sqrt ((gdouble) d->ncols);
   d->varpanel_ui.vncols = d->varpanel_ui.vnrows;
@@ -827,7 +817,7 @@ varpanel_size_init (gint cpanel_height, ggobid* gg)
 
 
 void
-varpanel_refresh (datad *d, ggobid *gg) {
+vartable_refresh (datad *d, ggobid *gg) {
   gint j;
 
   for (j=0; j<d->ncols; j++)

@@ -421,7 +421,7 @@ display_set_current (displayd *new_display, ggobid *gg)
   gg->current_display = new_display;
   cpanel_set (gg->current_display, gg);
 
-  varpanel_refresh (gg->current_display->d, gg);
+  vartable_refresh (gg->current_display->d, gg);
 
   gtk_accel_group_lock (gg->main_accel_group);
   gg->firsttime = false;
@@ -435,7 +435,7 @@ display_set_current (displayd *new_display, ggobid *gg)
 gchar *
 computeTitle (displayd *display, ggobid *gg)
 {
-  int n;
+  gint n;
   gchar *title = NULL, *tmp = NULL, *description;
 
   switch(display->displaytype) {
