@@ -208,7 +208,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     if (sp->p1dvar != -1) projection = P1PLOT;
   }
 
-  OPEN_NAMED_LIST(fp, "plot");
+  OPEN_LIST(fp);  /* plot; unlabelled */
 
   /* A scatterplot is both a display type and a plot type */
   fprintf (fp, "type='scatterplot'"); ADD_COMMA(fp);
@@ -600,9 +600,9 @@ describe_scatterplot_display (FILE *fp, ggobid *gg, displayd *display,
 {
   splotd *sp = (splotd *) display->splots->data;
 
-  OPEN_NAMED_LIST(fp, "plots");
-  fprintf (fp, "count = 1");
+  fprintf (fp, "nplots=1");
   ADD_COMMA(fp); ADD_CR(fp);
+  OPEN_NAMED_LIST(fp, "plots");
 
   describe_scatterplot_plot (fp, gg, display, sp, desc);
 
@@ -620,9 +620,9 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
 
   ncols = g_list_length (display->scatmat_cols);
 
+  fprintf (fp, "nplots=%d", ncols * ncols);
+  ADD_COMMA(fp); ADD_CR(fp);
   OPEN_NAMED_LIST(fp, "plots");
-  fprintf (fp, "count = %d", ncols * ncols);
-  ADD_COMMA(fp);
 
   /* This output relies on the idea that we'll use 
      par(mfcol=, mfrow=) to layout the plots in composite displays,
@@ -652,15 +652,38 @@ describe_parcoords_display (FILE *fp, ggobid *gg, displayd *display,
   gint ncols;
 
   ncols = g_list_length (display->splots);
-
+  fprintf (fp, "nplots=%d", ncols);
+  ADD_COMMA(fp); ADD_CR(fp);
   OPEN_NAMED_LIST(fp, "plots");
-  fprintf (fp, "count = %d", ncols);
-  ADD_COMMA(fp);
 
   /* We seem to be working through the plots row-wise, but I don't
   think that's something we can count on.  I hope we can make use of
   the axis labels to figure out which plot belongs where.  Otherwise,
   I'll have to add a position indicator to each plot. */
+
+  for (l = display->splots; l; l = l->next) {
+    sp = (splotd *) l->data;
+    describe_scatterplot_plot (fp, gg, display, sp, desc);
+    ADD_COMMA(fp);
+  }
+
+  CLOSE_LIST(fp);  /* plots */
+}
+
+
+void
+describe_time_series_display (FILE *fp, ggobid *gg, displayd *display, 
+		      dspdescd *desc)
+{
+  GList *l;
+  splotd *sp;
+  gint ncols;
+
+  ncols = g_list_length (display->splots);
+
+  fprintf (fp, "nplots=%d", ncols);
+  ADD_COMMA(fp); ADD_CR(fp);
+  OPEN_NAMED_LIST(fp, "plots");
 
   for (l = display->splots; l; l = l->next) {
     sp = (splotd *) l->data;
@@ -731,13 +754,18 @@ desc_write_cb (GtkWidget *btn, PluginInstance *inst)
     fprintf (fp, "type='parcoords',");
     fprintf (fp, "ncols = %d,", g_list_length (display->splots));
     describe_parcoords_display (fp, gg, display, desc);
-  /*
   } else if (GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display)) {
-    xmlSetProp (display_node, "type", "timeseries");
-    describe_time_series_display (gg, display, desc, display_node);
+    fprintf (fp, "type='timeseries',");
+    fprintf (fp, "ncols = %d,", g_list_length (display->splots));
+    describe_time_series_display (fp, gg, display, desc);
+  /*
   } else if (GTK_IS_GGOBI_BARCHART_DISPLAY(display)) {
-    xmlSetProp (display_node, "type", "barchart");
+    fprintf (fp, "type='barchart',");
+    -- is_histogram and is_spine are attributes of the plot, not the
+       display : sp->bar->is_histogram, etc.
     describe_barchart_display (gg, display, desc, display_node);
+    -- this will call describe_barchart_plot
+    -- other useful attributes: nbins, breaks
   */
   }
 
