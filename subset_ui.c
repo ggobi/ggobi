@@ -235,11 +235,10 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_clist_set_selection_mode (GTK_CLIST (clist),
         GTK_SELECTION_SINGLE);
       gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
-      gtk_signal_connect (GTK_OBJECT (clist),
-        "select_row", subset_datad_set_cb, gg);
-      gtk_signal_connect (GTK_OBJECT (gg->main_window),
-        "datad_added", subset_clist_datad_added_cb,
-        GTK_OBJECT (clist));
+      gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+        (GtkSignalFunc) subset_datad_set_cb, gg);
+      gtk_signal_connect (GTK_OBJECT (gg->main_window), "datad_added",
+        (GtkSignalFunc) subset_clist_datad_added_cb, GTK_OBJECT (clist));
       /*-- --*/
 
       for (l = gg->d; l; l = l->next) {
@@ -311,8 +310,14 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gg->subset_ui.bstart = gtk_spin_button_new (d->subset.bstart_adj, 0, 0);
 
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (gg->subset_ui.bstart), false);
+#if GTK_MAJOR_VERSION == 1
+/*
+ * The documentation suggests that this should still be present
+ * in gtk2, but it isn't there.
+*/
       gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (gg->subset_ui.bstart),
                                        GTK_SHADOW_OUT);
+#endif
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset_ui.bstart,
         "Specify the first row of the block", NULL);
       gtk_box_pack_start (GTK_BOX (vb), gg->subset_ui.bstart, false, false, 0);
@@ -326,8 +331,14 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
       gg->subset_ui.bsize = gtk_spin_button_new (d->subset.bsize_adj, 0, 0);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (gg->subset_ui.bsize), false);
+#if GTK_MAJOR_VERSION == 1
+/*
+ * The documentation suggests that this should still be present
+ * in gtk2, but it isn't there.
+*/
       gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (gg->subset_ui.bsize),
                                        GTK_SHADOW_OUT);
+#endif
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset_ui.bsize,
         "Specify the size of the block", NULL);
       gtk_box_pack_start (GTK_BOX (vb), gg->subset_ui.bsize, false, false, 0);
@@ -357,8 +368,14 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
       gg->subset_ui.estart = gtk_spin_button_new (d->subset.estart_adj, 0, 0);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (gg->subset_ui.estart), false);
+#if GTK_MAJOR_VERSION == 1
+/*
+ * The documentation suggests that this should still be present
+ * in gtk2, but it isn't there.
+*/
       gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (gg->subset_ui.estart),
                                        GTK_SHADOW_OUT);
+#endif
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset_ui.estart,
         "Specify the first row of the block", NULL);
       gtk_box_pack_start (GTK_BOX (vb), gg->subset_ui.estart, false, false, 0);
@@ -372,8 +389,14 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
       gg->subset_ui.estep = gtk_spin_button_new (d->subset.estep_adj, 0, 0);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (gg->subset_ui.estep), false);
+#if GTK_MAJOR_VERSION == 1
+/*
+ * The documentation suggests that this should still be present
+ * in gtk2, but it isn't there.
+*/
       gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (gg->subset_ui.estep),
                                        GTK_SHADOW_OUT);
+#endif
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->subset_ui.estep,
         "Specify the size of the block", NULL);
       gtk_box_pack_start (GTK_BOX (vb), gg->subset_ui.estep, false, false, 0);

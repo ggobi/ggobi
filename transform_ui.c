@@ -248,8 +248,14 @@ transform_window_open (ggobid *gg)
     spinner = gtk_spin_button_new (gg->tform_ui.boxcox_adj, 0, 3);
 
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
+#if GTK_MAJOR_VERSION == 1
+/*
+ * The documentation suggests that this should still be present
+ * in gtk2, but it isn't there.
+*/
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (spinner),
                                      GTK_SHADOW_OUT);
+#endif
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinner,
       "Set the Box-Cox power function parameter", NULL);
     gtk_box_pack_end (GTK_BOX (hb), spinner, true, true, 0);
@@ -259,7 +265,12 @@ transform_window_open (ggobid *gg)
 
     /*-- labels and entries for scaling limits --*/
     style = gtk_widget_get_style (spinner);
-    gdk_text_extents (style->font, 
+    gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
       "999999999", strlen ("999999999"),
       &lbearing, &rbearing, &width, &ascent, &descent);
 
