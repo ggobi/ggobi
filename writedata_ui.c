@@ -128,7 +128,8 @@ writeall_window_open (ggobid *gg) {
       "Save the data in XML or in a ggobi file set (data in ascii or binary",
       NULL);
     populate_option_menu (opt, format_lbl,
-      sizeof (format_lbl) / sizeof (gchar *), (GtkSignalFunc) format_set_cb, gg);
+      sizeof (format_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) format_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       XMLDATA);
     /*-- initialize variable to correspond to option menu --*/
@@ -147,7 +148,8 @@ writeall_window_open (ggobid *gg) {
       "Save raw or transformed data",
       NULL);
     populate_option_menu (opt, stage_lbl,
-      sizeof (stage_lbl) / sizeof (gchar *), (GtkSignalFunc) stage_set_cb, gg);
+      sizeof (stage_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) stage_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       TFORMDATA);
     /*-- initialize variable to correspond to option menu --*/
@@ -205,7 +207,8 @@ writeall_window_open (ggobid *gg) {
       "Specify which variables should be written out",
       NULL);
     populate_option_menu (opt, columndata_lbl,
-      sizeof (columndata_lbl) / sizeof (gchar *), (GtkSignalFunc) columnind_set_cb, gg);
+      sizeof (columndata_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) columnind_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       ALLCOLS);
     /*-- initialize variable to correspond to option menu --*/
@@ -244,7 +247,8 @@ writeall_window_open (ggobid *gg) {
       "Include line segments?",
       NULL);
     populate_option_menu (opt, edges_lbl,
-      sizeof (edges_lbl) / sizeof (gchar *), (GtkSignalFunc) edgesp_set_cb, gg);
+      sizeof (edges_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) edgesp_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       false);
     /*-- initialize variable to correspond to option menu --*/
