@@ -92,32 +92,43 @@ brush_reset_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   gint action = GPOINTER_TO_INT (cbd);
+  brush_reset(gg, action);
+}
+
+/*
+  Now this is separated into a separate routine
+ that can be called programmatically rather than just
+ from the callback above (brush_reset_cb).
+ */
+void
+brush_reset(ggobid *gg, gint action)
+{
   gint m, i, k;
   datad *d = gg->current_display->d;
 
   switch (action) {
-    case 0:  /*-- un-hide all points --*/
+    case RESET_UNHIDE_POINTS:  /*-- un-hide all points --*/
       for (m=0; m<d->nrows_in_plot; m++) {
         i = d->rows_in_plot[m];
         d->hidden.els[i] = d->hidden_now.els[i] = false;
       }
       displays_plot (NULL, FULL, gg);
       break;
-    case 1:  /*-- reset point colors -- to what? --*/
+    case RESET_POINT_COLORS:  /*-- reset point colors -- to what? --*/
       break;
-    case 2:  /*-- reset point glyphs -- to what? --*/
+    case RESET_GLYPHS:  /*-- reset point glyphs -- to what? --*/
       break;
 
-    case 3:  /*-- un-hide all lines --*/
+    case RESET_UNHIDE_LINES:  /*-- un-hide all lines --*/
       for (k=0; k<gg->nedges; k++) {
         gg->line.hidden_now.els[k] = gg->line.hidden.els[k] = false;
       }
       displays_plot (NULL, FULL, gg);
       break;
-    case 4:  /*-- reset line colors -- to what? --*/
+    case RESET_LINES:  /*-- reset line colors -- to what? --*/
       break;
 
-    case 5:  /*-- reset brush size --*/
+    case RESET_INIT_BRUSH:  /*-- reset brush size --*/
       brush_pos_init (d);
       splot_redraw (gg->current_splot, QUICK, gg);
       break;

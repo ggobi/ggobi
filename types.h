@@ -17,6 +17,9 @@
 typedef enum {ascii_data, binary_data, Sprocess_data, xml_data, mysql_data, unknown_data, num_data_modes} DataMode;
 typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT,UNKNOWN_GLYPH} GlyphType;
 
+typedef enum { RESET_UNHIDE_POINTS, RESET_POINT_COLORS, RESET_GLYPHS, 
+               RESET_UNHIDE_LINES, RESET_LINES, RESET_INIT_BRUSH} BrushReset;
+
 typedef struct {
     glong x, y;
 } lcoords;
