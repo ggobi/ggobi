@@ -165,7 +165,10 @@ typedef enum {NULLMODE = -1,
 #define TOURSTEP0 0.003
 #define TOUR_LS_IN 0
 #define TOUR_LS_OUT 1
+
+#ifndef M_PI_2
 #define M_PI_2  1.57079632679489661923
+#endif
 
 #define MANIP_OFF 0
 #define MANIP_OBLIQUE 1
