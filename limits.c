@@ -72,7 +72,7 @@ limits_adjust (gfloat *min, gfloat *max)
   }
 }
 
-void
+static void
 limits_raw_set_by_var (gint j, datad *d) {
   gint i, m;
 
@@ -92,7 +92,7 @@ limits_raw_set_by_var (gint j, datad *d) {
   }
 }
 
-void
+static void
 limits_raw_set (datad *d) {
   gint j;
 
@@ -100,7 +100,7 @@ limits_raw_set (datad *d) {
     limits_raw_set_by_var (j, d);
 }
 
-void
+static void
 limits_tform_set_by_var (gint j, datad *d)
 {
   gint i, m, np = 0;
@@ -136,7 +136,7 @@ limits_tform_set_by_var (gint j, datad *d)
   g_free ((gpointer) x);
 }
 
-void
+static void
 limits_tform_set (datad *d) {
   gint j;
 
