@@ -702,10 +702,12 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
               changed = update_hidden_vectors (j, changed,
                 d->pts_under_brush.els, d, gg);
             break;
+	    /*
             case br_select:
               changed = update_selected_vectors (j, changed,
                 d->pts_under_brush.els, d, gg);
             break;
+	    */
             case br_off:
               ;
             break;
@@ -775,8 +777,8 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
            * cases; otherwise it's ok (I think).
           */
           if (d->hidden_now.els[pt] &&
-            (cpanel->br_point_targets != br_hide &&
-            cpanel->br_point_targets != br_select))
+            (cpanel->br_point_targets != br_hide 
+	     /* && cpanel->br_point_targets != br_select */))
           {
               continue;
           }
@@ -893,10 +895,12 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
         changed = update_hidden_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
+      /* disabled
       case br_select:
         changed = update_selected_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
+      */
       case br_off:
         ;
       break;

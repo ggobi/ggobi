@@ -61,11 +61,9 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
 The select mode has some unpleasant behavior, basically because I'm
 just re-using the hidden vectors.  I have no desire to add another
 set of vectors, though, so I'll just turn it off for now.
-static gchar *point_targets_lbl[] =
-{ "Off", "Color and glyph", "Color only", "Glyph only", "Shadow", "Select"};
 */
 static gchar *point_targets_lbl[] =
-{ "Off", "Color and glyph", "Color only", "Glyph only", "Shadow"};
+{ "Off", "Color and glyph", "Color only", "Glyph only", "Shadow", /*"Select"*/};
 static void
 brush_point_targets_cb (GtkWidget * w, gpointer cbd)
 {
@@ -87,7 +85,8 @@ brush_point_targets_cb (GtkWidget * w, gpointer cbd)
    *
    * There's still a weird thing that can happen:  enter select
    * brushing and then leave it; all points remain hidden.  Hmm.
-  */
+  */ /* select brushing has been disabled */
+  /*
   if (cpanel->br_point_targets == br_select) {
     gint i, m;
     datad *d = gg->current_display->d;
@@ -100,13 +99,13 @@ brush_point_targets_cb (GtkWidget * w, gpointer cbd)
     }
     displays_plot (NULL, FULL, gg);
   }
-  /* */
+  */
 
 }
 
 static gchar *edge_targets_lbl[] =
-{ "Off", "Color and line", "Color only", "Line only", "Shadow", "Select"
-};
+  { "Off", "Color and line", "Color only", "Line only", "Shadow", 
+    /*"Select"*/};
 static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
@@ -123,7 +122,8 @@ static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
   /*
    * select brushing is a special case: hide all points
    * before starting to move the brush.
-  */
+  */  /* select brushing has been disabled */
+  /*
   if (cpanel->br_edge_targets == br_select) {
     gint i, m;
     datad *e = gg->current_display->e;
@@ -138,7 +138,7 @@ static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
       displays_plot (NULL, FULL, gg);
     }
   }
-  /* */
+  */
 
 
 }

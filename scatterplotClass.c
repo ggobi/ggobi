@@ -813,10 +813,10 @@ binningPermitted(displayd* dpy)
        cpanel->p1d.type == ASH &&
        cpanel->p1d.ASH_add_lines_p)
      return(false);
-
+  /*
   if (cpanel->br_point_targets == br_select)
      return(false);
-
+  */
   /*-- if we're drawing edges --*/
   if (e != NULL && e->edge.n > 0) {
     if (dpy->options.edges_undirected_show_p ||

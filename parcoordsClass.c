@@ -16,10 +16,10 @@ static gboolean
 parcoordsBinningPermitted(displayd *dpy)
 {
   cpaneld *cpanel = &dpy->cpanel;
-
+  /*
   if (cpanel->br_point_targets == br_select)
      return(false);
-
+  */
    return(!dpy->options.whiskers_show_p);
 }
 

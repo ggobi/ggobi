@@ -224,9 +224,11 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
           case br_hide:   /*-- hidden --*/
             d->hidden.els[i] = d->hidden_now.els[i] = true;
           break;
-          case br_select:   /*-- un-hidden --*/
+	  /*
+          case br_select:
             d->hidden.els[i] = d->hidden_now.els[i] = false;
           break;
+	  */
           default:
           break;
         }
@@ -248,9 +250,11 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
           case br_hide:   /*-- hidden --*/
             d->hidden_now.els[i] = true;
           break;
-          case br_select: /*-- un-hidden --*/
+	  /*
+          case br_select:
             d->hidden_now.els[i] = false;
           break;
+	  */
           default:
           break;
         }
@@ -275,9 +279,11 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
         case br_hide:   /*-- hidden --*/
           d->hidden_now.els[i] = d->hidden.els[i];
         break;
-        case br_select: /*-- un-hidden --*/
+	/* disabled
+        case br_select:
           d->hidden_now.els[i] = d->hidden.els[i];
         break;
+	*/
         default:
         break;
       }
