@@ -471,22 +471,42 @@ void
 varpanel_tooltips_set (displayd *display, ggobid *gg) 
 {
   gint j;
-  datad *d = display->d;
+  datad *d;
   GtkWidget *wx, *wy, *wz, *label;
 
-  /*-- for each variable, current datad only --*/
-  for (j=0; j<d->ncols; j++) {
-    if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
-      break;
+  if (display == NULL) {
+    d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+    if (d) {
+      for (j=0; j<d->ncols; j++) {
+        if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
+          break;
+        label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
 
-    wy = varpanel_widget_get_nth (VARSEL_Y, j, d);
-    wz = varpanel_widget_get_nth (VARSEL_Z, j, d);
-    label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+          "Unable to plot without a display",
+          NULL);
+        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+          "Unable to plot without a display",
+          NULL);
+      }
+    }
+  } else {
+    d = display->d;
+
+    /*-- for each variable, current datad only --*/
+    for (j=0; j<d->ncols; j++) {
+      if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
+        break;
+
+      wy = varpanel_widget_get_nth (VARSEL_Y, j, d);
+      wz = varpanel_widget_get_nth (VARSEL_Z, j, d);
+      label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
     
-    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-       GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-       if(klass->varpanel_tooltips_set)
-         klass->varpanel_tooltips_set(display, gg, wx, wy, wz, label);
+      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+         GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+         if(klass->varpanel_tooltips_set)
+           klass->varpanel_tooltips_set(display, gg, wx, wy, wz, label);
+      }
     }
   }
 }

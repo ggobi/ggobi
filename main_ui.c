@@ -261,10 +261,7 @@ viewmode_set (PipelineMode m, ggobid *gg)
 
   gg->prev_viewmode = gg->viewmode;
 
-  if (display) {  /*-- does this need to handle the null display argument? --*/
-    varpanel_tooltips_set (display, gg);
-  }
-
+  varpanel_tooltips_set (display, gg);
   varpanel_refresh (display, gg);
 }
 
