@@ -7,7 +7,6 @@ typedef enum {deflt, within, between, anchorscales, anchorfixed} MDSGroupInd;
 
 typedef struct _noded {
   gint i;
-  /*GList *edges;*/
   GList *inEdges, *outEdges; /*-- GINT_TO_POINTER --*/
   GList *srcNodes, *destNodes;  /*-- noded's --*/
 

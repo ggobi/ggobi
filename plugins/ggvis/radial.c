@@ -9,6 +9,8 @@
 #include "plugin.h"
 #include "ggvis.h"
 
+void highlight_sticky_edges (GtkWidget *, gint, gint , datad *d, PluginInstance *inst);
+
 /*-- utility --*/
 
 static 
@@ -31,6 +33,16 @@ GList * list_concat_uniq (GList *a, GList *b)
   return ab;
 }
 
+static
+void list_clear (GList *ab)
+{
+  GList *l;
+  
+  for (l = ab; l; l = l->next)
+    ab = g_list_remove_link (ab, l);
+  ab = NULL;
+}
+
 
 /*-----------------------------------------------------------------*/
 /*                   callbacks                                     */
@@ -45,6 +57,12 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 
   if (d == NULL || e == NULL)
     return;
+
+/*-- This may not belong here, but where exactly?  --*/
+  gtk_signal_connect (GTK_OBJECT(gg->main_window),
+    "sticky_point_added", highlight_sticky_edges, inst);
+  gtk_signal_connect (GTK_OBJECT(gg->main_window),
+    "sticky_point_removed", highlight_sticky_edges, inst);
 
   initLayout (gg, ggv, d, e);
 
@@ -96,14 +114,11 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
         else if (n1->nStepsToCenter > n->nStepsToCenter)
           nC++;
       }
-      for (l = connectedNodes; l; l = l->next)
-        connectedNodes = g_list_remove_link (connectedNodes, l);
-      connectedNodes = NULL;
+      list_clear (connectedNodes);
 
       nChildren[i] = (gdouble) nC;
       nParents[i] = (gdouble) nP;
       nSiblings[i] = (gdouble) nS;
-g_printerr ("%d %d %d\n", nC, nP, nS);
     }
 
     name = g_strdup_printf ("x");
@@ -148,6 +163,87 @@ g_printerr ("%d %d %d\n", nC, nP, nS);
   }
 }
 
+void highlight_sticky_edges (GtkWidget *w, gint index, gint state, datad *d,
+  PluginInstance *inst)
+{
+  ggobid *gg = inst->gg;
+  ggvisd *ggv = GGVisFromInst (inst);
+  datad *e = gg->current_display->e;
+  noded *n, *n1;
+  GList *l, *connectedNodes, *connectedEdges;
+  gint k;
+
+  /*-- Do I have to loop over displays, looking for the one(s) with
+       edges?  --*/
+  if (e == NULL) return;
+
+  n = &ggv->radial->nodes[index];
+
+  connectedNodes = list_concat_uniq (n->srcNodes, n->destNodes);
+  connectedNodes = g_list_append (connectedNodes, n);
+  for (l = connectedNodes; l; l = l->next) {
+    n1 = (noded *) l->data;
+    d->color.els[n1->i] = d->color_now.els[n1->i] = 
+      (state == STICKY) ? gg->color_id : gg->color_0;
+    d->glyph.els[n1->i].size = d->glyph_now.els[n1->i].size = 
+      (state == STICKY) ? gg->glyph_id.size : gg->glyph_0.size;
+    d->glyph.els[n1->i].type = d->glyph_now.els[n1->i].type = 
+      (state == STICKY) ? gg->glyph_id.type : gg->glyph_0.type;
+  }
+  list_clear (connectedNodes);
+
+  connectedEdges = list_concat_uniq (n->inEdges, n->outEdges);
+  for (l = connectedEdges; l; l = l->next) {
+    k = GPOINTER_TO_INT (l->data);
+    if (k < 0 || k > e->nrows)
+      break;
+
+    if (state == STICKY) {
+      e->color.els[k] = e->color_now.els[k] = gg->color_id;
+      e->glyph.els[k].size = e->glyph_now.els[k].size = gg->glyph_id.size;
+      e->glyph.els[k].type = e->glyph_now.els[k].type = gg->glyph_id.type;
+    } else {
+      gint a = d->rowid.idv.els[e->edge.endpoints[k].a];
+      gint b = d->rowid.idv.els[e->edge.endpoints[k].b];
+
+      if ((a == index &&
+           g_slist_index (d->sticky_ids, GINT_TO_POINTER(b)) != -1) ||
+          (b == index &&
+           g_slist_index (d->sticky_ids, GINT_TO_POINTER(a)) != -1))
+      {
+        /*
+         * if one of the nodes connected to node k has a sticky label,
+         * don't downweight the edge
+        */
+         ;
+      } else {
+        e->color.els[k] = e->color_now.els[k] = gg->color_0;
+        e->glyph.els[k].size = e->glyph_now.els[k].size = gg->glyph_0.size;
+        e->glyph.els[k].type = e->glyph_now.els[k].type = gg->glyph_0.type;
+      }
+    }
+  }
+  list_clear (connectedEdges);
+
+  displays_plot (NULL, FULL, gg);
+
+/*
+  n->inEdges
+  n->outEdges
+
+  if (state) {
+
+  } else {
+
+  }
+    if a == k || b == k
+      highlight the edge in e -- for starters
+    else unhighlight the edge
+*/
+
+}
+
+
 /*-- this should be in radial.c or radial_ui.c --*/
 void highlight_edges_cb (GtkButton *button, PluginInstance *inst)
 {
@@ -156,17 +252,6 @@ void highlight_edges_cb (GtkButton *button, PluginInstance *inst)
   datad *d = gg->current_display->d;
   datad *e = gg->current_display->e;
 
-/*
-for each sticky label index k in d
-  for each edge
-    if a == k || b == k
-      highlight the edge in e -- for starters
-    else unhighlight the edge
-
-in the long term, there could be a nicer way to do this:
-  let's add two events to ggobi: edge becomes sticky and
-  edge becomes unsticky
-*/
 }
 
 /*-----------------------------------------------------------------*/
@@ -201,7 +286,7 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
   nodes = ggv->radial->nodes;
 
   for (i = 0; i <nnodes; i++) {
-    k = d->rows_in_plot[i];
+    k = d->rows_in_plot[i];  /* not used yet */
     ggv->radial->nodes[i].inEdges = NULL;
     ggv->radial->nodes[i].outEdges = NULL;
     ggv->radial->nodes[i].srcNodes = NULL;
@@ -209,7 +294,7 @@ initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
     ggv->radial->nodes[i].subtreeSize = 0;
     ggv->radial->nodes[i].nChildren = 0;
     ggv->radial->nodes[i].nStepsToCenter = nnodessq;
-    ggv->radial->nodes[i].i = k;
+    ggv->radial->nodes[i].i = i;
     ggv->radial->nodes[i].parentNode = NULL;
 
     if (nedges <= 1) {
@@ -269,9 +354,7 @@ setNStepsToCenter (noded *n, noded *prevNeighbor) {
     }
   }
 
-  for (l = connectedNodes; l; l = l->next)
-    connectedNodes = g_list_remove_link (connectedNodes, l);
-  connectedNodes = NULL;
+  list_clear (connectedNodes);
 }
 
 
@@ -340,9 +423,7 @@ childNodes (GList **children, noded *n) {
         *children = g_list_append (*children, n1);
   }
 
-  for (l = connectedNodes; l; l = l->next)
-    connectedNodes = g_list_remove_link (connectedNodes, l);
-  connectedNodes = NULL;
+  list_clear (connectedNodes);
 }
 
 /*
