@@ -562,6 +562,8 @@ void gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject * object,
 extern GSList *ExtendedDisplayTypes;
 typedef GtkType(*GtkTypeLoad) (void);
 
+void ggobi_sleep(guint interval);
+
 #include "GGobiEvents.h"
 
 #endif

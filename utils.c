@@ -473,3 +473,17 @@ data_mode_set (gchar *filename)
      data_mode = ascii_data;
   return data_mode;
 }
+
+static gint
+GGobiSleepTimer(gpointer data)
+{
+   gtk_main_quit();
+   return(0);
+}
+
+void
+ggobi_sleep(guint interval)
+{
+  gtk_timeout_add(interval*1000, GGobiSleepTimer, NULL);
+  gtk_main();
+}
