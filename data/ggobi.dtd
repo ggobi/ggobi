@@ -41,11 +41,8 @@
 <!ELEMENT edgerecord  ( #PCDATA )>
 <!ENTITY % lineTypes " solid | dot | dash ">
 
-<!ELEMENT ggobidata (data)+>
+<!ELEMENT ggobidata (data)+, (activeColorScheme)*>
 
-<!-- Perhaps need a different tag that doesn't require variables.
-     algal-bloom has no variables in the Lines for Meas dataset.
-  -->
 <!ELEMENT data ((description)*, (colormap)?, (variables)*, records, (edges)*)>
 
 <!ELEMENT color ( #PCDATA) >
@@ -56,6 +53,11 @@
        g  CDATA     #IMPLIED
        b  CDATA     #IMPLIED
        range CDATA  #IMPLIED
+>
+
+<!ATTLIST activeColorScheme
+    name          NMTOKEN #IMPLIED
+    file          NMTOKEN #IMPLIED
 >
       
 <!ELEMENT colormap (color)+ >
