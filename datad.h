@@ -240,7 +240,13 @@ struct _datad {
 };
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern datad *datad_new(datad *, struct _ggobid *);
+#ifdef __cplusplus
+}
+#endif
 void datad_instance_init(datad * d);
 
 

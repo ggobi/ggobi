@@ -60,6 +60,12 @@ GGobiInitInfo *read_init_file(const gchar *filename, GGobiInitInfo *info);
 xmlNode *getXMLDocElement(const xmlDocPtr doc, const gchar *tagName);
 xmlNode *getXMLElement(const xmlNodePtr doc, const gchar *tagName);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 gint getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* end of GGOBI_READ_INIT_H */

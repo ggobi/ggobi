@@ -118,8 +118,25 @@ AC_PROG_CC
 LO_DIR=.
 
 c_rules_frag=.CRulesFrag
+SHLIB_EXT="so"
 
-if test "${GCC}" = "yes" ; then
+if test `uname` = "Darwin" ; then
+ echo "Darwin operating system detected."
+ PIC_CFLAG=-fno-common
+ OTHER_CFLAGS=-DDarwin
+# SHLIB_LDFLAGS="-dylib -flat_namespace -undefined suppress"
+ SHLIB_EXT="dylib"
+
+cat << \EOF > ${c_rules_frag}
+%.o: %.c
+	$(CC) $(CFLAGS) $(OTHER_CFLAGS) -c $< -o $@
+
+%.lo: %.c
+	$(CC) $(CFLAGS) $(OTHER_CFLAGS) $(PIC_CFLAG) -c $< -o $@
+
+EOF
+
+elif test "${GCC}" = "yes" ; then
  PIC_CFLAG=-fPIC
 # SHLIB_LDFLAGS=-shared
  LO_DIR=.
@@ -127,7 +144,7 @@ if test "${GCC}" = "yes" ; then
 
 cat << \EOF > ${c_rules_frag}
 %.o: %.c
-	$(CC) $(CFLAGS) $(OTHER_FLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(OTHER_CFLAGS) -c $< -o $@
 
 # Just copy the .o to .lo since the .o is position independent
 # and relocatable by default with gcc.
@@ -152,6 +169,10 @@ EOF
 
 fi
 
+AC_SUBST(SHLIB_EXT)
+
+dnl whether dlopen needs -ldl (such as on Darwin)
+AC_CHECK_LIB(dl, dlopen)
 
 dnl This will hopefully check whether the -shared flag works
 dnl to create a shared library or whether we should use -G.
@@ -170,8 +191,8 @@ if test -z "${SHLIB_LDFLAGS}" ; then
  LDFLAGS="${OLD_LDFLAGS}"
 fi
 
-
-
+dnl headers that are not present everywhere
+AC_CHECK_HEADERS([malloc.h values.h])
 
 AC_SUBST(OTHER_CFLAGS)
 AC_SUBST_FILE(c_rules_frag)
@@ -372,8 +393,8 @@ MV=mv
 
 
 if test "${enable_embed}" = "yes" ; then
-   EMBED="lib/libggobi.so"
-   EMBED_LIB="lib/libggobi.so"
+   EMBED="lib/libggobi.${SHLIB_EXT}"
+   EMBED_LIB="lib/libggobi.${SHLIB_EXT}"
 fi
 
 

@@ -45,7 +45,11 @@
 extern "C" {
 #endif
 
+#ifdef Darwin
+#define myrint rint
+#else
 extern gdouble myrint (gdouble); 
+#endif
 
 #ifdef __cplusplus
 }

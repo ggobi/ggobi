@@ -15,7 +15,7 @@
 #include <time.h>
 #include <math.h>
 
-#ifndef NO_VALUES_H
+#if !defined Darwin && !defined NO_VALUES_H
 #include <values.h>
 #endif
 

@@ -14,20 +14,20 @@ CUR_DIR=$(shell pwd)
 
 include Makeconf
 
-GTK_EXT=lib/libgtkext.so
+GTK_EXT=lib/libgtkext.@SHLIB_EXT@
 
 all: $(GTK_EXT) bin/ggobi.bin @EMBED@ $(UTILS) @PACKAGES@ Plugins
 
 .PHONY:	lib Rggobi Pythonggobi Perlggobi
 
-lib/libgtkext.so:
+lib/libgtkext.@SHLIB_EXT@:
 	$(MAKE) -C gtkext/src install
 
 ggobi bin/ggobi.bin: $(GTK_EXT)
 	$(MAKE) -C src ../bin/ggobi.bin
 
-lib/libggobi.so lib: $(GTK_EXT)
-	$(MAKE) -C src ../lib/libggobi.so
+lib/libggobi.@SHLIB_EXT@ lib: $(GTK_EXT)
+	$(MAKE) -C src ../lib/libggobi.@SHLIB_EXT@
 
 
 bin/xmlConvert:

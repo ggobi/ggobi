@@ -28,7 +28,9 @@ The authors can be contacted at the following email addresses:
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#ifndef Darwin
 #include <malloc.h>
+#endif
 
 #include "vars.h"
 #include "externs.h"

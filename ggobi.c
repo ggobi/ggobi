@@ -9,6 +9,7 @@
     it without violating AT&T's intellectual property rights.
 */
 #define GGOBIINTERN
+#define GGOBI_C
 
 #include <math.h>
 #include <stdlib.h>

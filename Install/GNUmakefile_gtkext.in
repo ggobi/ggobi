@@ -22,16 +22,22 @@ endif
 
 OBJ=$(SRC:%.c=%.o)
 
+all:
+	make libgtkext.@SHLIB_EXT@
+
 libgtkext.so: $(OBJ:%.o=%.lo)
 	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
 
-$(TOP)/lib/libgtkext.so: libgtkext.so
+libgtkext.dylib: $(OBJ:%.o=%.lo)
+	libtool -dynamic -o $@ $(OBJ:%.o=%.lo) -lSystem $(LIBS) `echo "$(GTK_LIBS)" | sed 's/-bexpall//'`
+
+$(TOP)/lib/libgtkext.@SHLIB_EXT@: libgtkext.@SHLIB_EXT@
 	$(MV) $^ $(@D)
 
-install: $(TOP)/lib/libgtkext.so
+install: $(TOP)/lib/libgtkext.@SHLIB_EXT@
   
 
 clean:
-	for f in $(OBJ) $(OBJ:%.o=%.lo) ; do \
+	for f in $(OBJ) $(OBJ:%.o=%.lo) libgtkext.so libgtkext.dylib ; do \
 	  if test -f $$f ; then rm $$f ; fi \
 	done

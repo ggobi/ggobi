@@ -13,3 +13,12 @@ if ("${OS}" == "IRIX64") then
    setenv LD_LIBRARYN32_PATH @GGOBI_ROOT@/lib:@XML_LIB_DIRS_PATH@
  endif
 endif
+
+if ("${OS}" == "Darwin") then
+ if(${?DYLD_LIBRARY_PATH}) 
+ then
+   setenv DYLD_LIBRARY_PATH @GGOBI_ROOT@/lib:@XML_LIB_DIRS_PATH@:${DYLD_LIBRARY_PATH}
+ else
+   setenv DYLD_LIBRARY_PATH @GGOBI_ROOT@/lib:@XML_LIB_DIRS_PATH@
+ endif
+endif

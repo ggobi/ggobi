@@ -21,7 +21,9 @@ extern gint _finite (gdouble);
 #endif
 
 #include <math.h>
+#ifndef Darwin
 #include <malloc.h>
+#endif
 #include <stdlib.h>
 #include <unistd.h>
 

@@ -138,16 +138,21 @@ OBJ=$(SRC:%.c=%.o)
 
 CFLAGS= @SRC_DEBUG@ -I../include -I../gtkext/include $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ @DEFS@
 
-LIBS=-L$(TOP)/lib $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS)
+LIBS=-L$(TOP)/lib $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS) @LIBS@
 
-ggobi $(TOP)/bin/ggobi.bin: $(OBJ)
-	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+ggobi $(TOP)/bin/ggobi.bin: $(OBJ) ggobiMain.o
+	$(CC) $(LDFLAGS) -o $@ $(OBJ) ggobiMain.o $(LIBS)
 
-lib libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
+lib:
+	make libggobi.@SHLIB_EXT@
+
+libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
 	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
 
+libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ:%.o=%.lo)
+	libtool -dynamic -o $@ $(OBJ:%.o=%.lo) `echo "$(LIBS)"|sed 's/-bexpall//'`
 
-../bin/xmlConvert xmlConvert: xmlConvert.o libggobi.so
+../bin/xmlConvert xmlConvert: xmlConvert.o libggobi.@SHLIB_EXT@
 	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS)
 
 
