@@ -16,10 +16,10 @@ display help on the console
 
 <arg name="s">
 <description>
-specifies the input mode as being S data, i.e. coming from an S process.
+specifies the input mode as being S (i.e. R or S-Plus) data, i.e. coming from an S process.
 </description>
 <quickHelp>
-use S as the data mode
+use S (R or S-Plus) as the data mode
 </quickHelp>
 </arg>
 

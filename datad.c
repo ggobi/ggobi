@@ -131,7 +131,9 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
     /*-- initialize the first display --*/
     if(sessionOptions->info->createInitialScatterPlot) {
-      display = scatterplot_new (false, NULL, d, gg);
+/*XX allow this to be specified as a gtk type name on the command line, initialization file, etc.
+  and invoke the corresponding create() method. */
+    display = scatterplot_new (false, NULL, d, gg);
         /* Need to make certain this is the only one there. */
 
       if (display != NULL) {

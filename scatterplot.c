@@ -200,11 +200,15 @@ gtk_scatter_plot_new(displayd *dpy, gint width, gint height, ggobid *gg)
 }
 
 displayd *
+createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg);
+
+displayd *
 scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, datad *d, ggobid *gg)
 {
+  return(createScatterplot(missing_p, NULL, numVars, vars, d, gg));
+#if 00
   splotd *sp;
   displayd *display = NULL;
-
   if(numVars < 2)
      return(NULL);
 /*XX dislay needs to be non-null here. Need to get the order correct. Change scatterplot_new! */
@@ -214,12 +218,20 @@ scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, datad *d
  
   display = scatterplot_new(missing_p, sp, d, gg); 
   sp->displayptr = display;
+  splot_alloc(sp, display, gg);
 
   return(display);
+#endif
 }
 
 displayd *
 scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) 
+{
+  return(createScatterplot(missing_p, sp, 0, NULL, d, gg));
+}
+
+displayd *
+createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg)
 {
   GtkWidget *table, *vbox, *w;
   GtkItemFactory *factory;
@@ -254,15 +266,17 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
 
   gg->app.sp_accel_group = gtk_accel_group_new ();
   factory = get_main_menu (menu_items,
-    sizeof (menu_items) / sizeof (menu_items[0]),
-    gg->app.sp_accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, &display->menubar,
-    (gpointer) display);
+			   sizeof (menu_items) / sizeof (menu_items[0]),
+			   gg->app.sp_accel_group, 
+			   GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
+			   &display->menubar,
+			   (gpointer) display);
 
   /*-- add a tooltip to the file menu --*/
   w = gtk_item_factory_get_widget (factory, "<main>/File");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    gtk_menu_get_attach_widget (GTK_MENU(w)),
-    "File menu for this display", NULL);
+			gtk_menu_get_attach_widget (GTK_MENU(w)),
+			"File menu for this display", NULL);
 
   /*
    * After creating the menubar, and populating the file menu,
@@ -276,6 +290,13 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
   /*-- Initialize a single splot --*/
   if (sp == NULL) {
     sp = gtk_scatter_plot_new (display, WIDTH, HEIGHT, gg);
+    if(numVars < 2 || vars == NULL) {
+      sp->xyvars.x = 0;
+      sp->xyvars.y = 1;
+    } else {
+      sp->xyvars.x = vars[0];
+      sp->xyvars.y = vars[1];
+    }
   }
 
   display->splots = NULL;

@@ -634,7 +634,6 @@ displayd*  display_create (gint displaytype, gboolean missing_p, datad *, ggobid
 GlyphType  mapGlyphName (const gchar *gtype);
 displayd*  parcoords_new (gboolean, gint, gint *, datad *, ggobid *);
 displayd*  scatmat_new (gboolean, gint, gint *, gint, gint *, datad *, ggobid *);
-displayd*  scatterplot_new (gboolean, splotd *sp, datad *d, ggobid *);
 RedrawStyle  viewmode_activate (splotd *, PipelineMode, gboolean, ggobid *);
 datad *    datad_new(datad *d, ggobid *gg);
 displayd * createDisplayFromDescription (ggobid *, GGobiDisplayDescription *desc);

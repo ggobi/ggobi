@@ -433,9 +433,12 @@ splot_edges_realloc (splotd *sp, datad *e, ggobid *gg)
 void
 splot_alloc (splotd *sp, displayd *display, ggobid *gg) 
 {
-  datad *d = display->d;
-  gint nr = d->nrows;
-
+  datad *d;
+  gint nr; 
+  if(!display)
+    return;
+  d = display->d;
+  nr = d->nrows;
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
   vectorf_init_null (&sp->p1d.spread_data);
