@@ -1,0 +1,20 @@
+reallocate when adding a row
+
+  brushing vectors
+  clusterid
+  bar->index_to_rank
+  rowIds
+
+  pipeline vectors and arrays, including
+     d->missing
+     jitdata
+     sp->screen, sp->planar, p1d.spread_data (splot_add_rows)
+     sp->edges, sp->arrowheads (splot_edges_realloc)
+     sp->whiskers (alloc_whiskers now uses g_realloc)
+
+  win32: already checking
+
+  projection pursuit:  all these depend on nrows_in_plot, so they
+  must get reallocated a lot already:
+     op->data, op->pdata
+     pp->group, pp->ngroup, pp->index, pp->nright, pp->x
