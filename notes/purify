@@ -1,0 +1,33 @@
+To build with purify, here's what I had to do on the SGI:
+
+It turns out that everything has to have been compiled with the same
+compiler -- glib, gtk, and ggobi.  That means that it's necessary to
+construct a separate tree for glib and gtk that have been compiled
+with cc, and build ggobi against those.
+
+Step 1: glib
+
+CC=/usr/bin/cc ./configure --prefix=/usr/dfs/cc 
+make install
+
+Step 2: gtk
+
+export GLIB_CONFIG=/usr/dfs/cc/bin/glib-config
+LD_LIBRARY_PATH=/usr/dfs/cc/lib:$LD_LIBRARY_PATH
+LD_LIBRARYN32_PATH=/usr/dfs/cc/lib:$LD_LIBRARYN32_PATH
+PATH=/usr/dfs/cc/bin:$PATH
+export CC=/usr/bin/cc
+./configure --prefix=/usr/dfs/cc
+make install
+
+Ste; 3: ggobi
+
+use the above settings and add this:
+
+export GTK_CONFIG=/usr/dfs/cc/bin/gtk-config
+
+I had to turn xml off, because that inserts /usr/common/include and
+/usr/common/lib into the search path when I'm trying to get them out
+(because that's where xml lives, but it's also where glib and gtk
+live).
+

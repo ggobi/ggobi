@@ -24,7 +24,7 @@
 #include "vars.h"
 #include "externs.h"
 
-#ifdef G_OS_WIN32
+#ifdef WIN32
 #include <float.h>
 extern gint _finite (gdouble);
 #endif
@@ -304,7 +304,7 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
           dtmp = (dtmp - 1.0) / boxcoxparam;
 
           /* If dtmp no good, return */
-#ifdef _WIN32
+#ifdef WIN32
           if (!_finite (dtmp)) {
 #else
           if (!finite (dtmp)) {
@@ -324,7 +324,7 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         /*-- apply the same transformation to the specified limits --*/
         if (d->vartable[jcol].lim_specified_p) {
           dtmp = pow ((gdouble) (*domain_adj)(slim.min, incr), boxcoxparam);
-#ifdef _WIN32
+#ifdef WIN32
           if (!_finite (dtmp)) {
 #else
           if (!finite (dtmp)) {
@@ -334,7 +334,7 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
           }
           slim_tform.min = (gfloat) (dtmp - 1.0) / boxcoxparam;
           dtmp = pow ((gdouble) (*domain_adj)(slim.max, incr), boxcoxparam);
-#ifdef _WIN32
+#ifdef WIN32
           if (!_finite (dtmp)) {
 #else
           if (!finite (dtmp)) {

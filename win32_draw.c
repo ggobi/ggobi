@@ -19,7 +19,7 @@
  * way to achieve adequate speed in Windows.
 */
 
-#ifdef _WIN32
+#ifdef WIN32
 
 extern void build_circle (icoords *, gint, arcd *, gint, gshort);
 extern void build_plus (icoords *, gint, GdkSegment *, gint, gshort);

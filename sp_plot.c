@@ -20,7 +20,7 @@
 static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
 static void edges_draw (splotd *, ggobid *gg);
 
-#ifdef _WIN32
+#ifdef WIN32
 extern void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
 extern void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
 #endif
@@ -133,7 +133,7 @@ void
 splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 {
   gint k;
-#ifndef _WIN32
+#ifndef WIN32
   gint i, m, n;
 #endif
   gushort current_color;
@@ -178,7 +178,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
       gdk_gc_set_foreground (gg->plot_GC,
         &gg->default_color_table[current_color]);
 
-#ifdef _WIN32
+#ifdef WIN32
       win32_draw_to_pixmap_unbinned (current_color, sp, gg);
 #else
       for (i=0; i<d->nrows_in_plot; i++) {
@@ -225,7 +225,7 @@ void
 splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 {
   icoords loc_clear0, loc_clear1;
-#ifndef _WIN32
+#ifndef WIN32
   gint ih, iv;
   gint i, m, n;
 #endif
@@ -296,7 +296,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
         gdk_gc_set_foreground (gg->plot_GC,
           &gg->default_color_table[current_color]);
 
-#ifdef _WIN32
+#ifdef WIN32
         win32_draw_to_pixmap_binned (bin0, bin1, current_color, sp, gg);
 #else
         for (ih=bin0->x; ih<=bin1->x; ih++) {

@@ -136,7 +136,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
       cx = hexcolor (&gg->default_color_table[current_color]);
 
 
-#ifdef _WIN32
+#ifdef WIN32
 #else
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];

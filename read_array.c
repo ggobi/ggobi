@@ -23,7 +23,7 @@
 
 static gboolean gotone = false;
 
-#ifndef _WIN32
+#ifndef WIN32
 static void
 stdin_empty (gint arg)
 {
@@ -373,7 +373,7 @@ array_read (datad *d, InputDescription *desc, ggobid *gg)
   if (strcmp ((gchar *) desc->fileName, "stdin") == 0) {
     fp = stdin;
 
-#ifndef _WIN32
+#ifndef WIN32
     /*
      * If reading from stdin, set an alarm.  If no data has 
      * been read after 3 seconds, print an error message and exit.

@@ -152,7 +152,7 @@ FILE *open_file_r (gchar *f, gchar *suffix)
 
   fname = g_strdup_printf ("%s%s", f, suffix);
 
-#ifndef _WIN32
+#ifndef WIN32
   if (access (fname, R_OK) == 0)
 #endif
     fp = fopen (fname, "r");

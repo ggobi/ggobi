@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifndef G_OS_WIN32 
+#ifndef WIN32 
 #include <unistd.h> 
 #include <sys/stat.h> 
 #else
@@ -57,7 +57,7 @@ fileset_generate(const char *fileName, DataMode guess)
 {
   InputDescription *desc = (InputDescription *)
     calloc(1, sizeof(InputDescription));
-#ifndef G_OS_WIN32
+#ifndef WIN32
   struct stat buf;
 #else
   gint ft=0;
@@ -71,7 +71,7 @@ fileset_generate(const char *fileName, DataMode guess)
 
   groups = FileTypeGroups;
 
-#ifndef G_OS_WIN32
+#ifndef WIN32
   if(stat(fileName, &buf) != 0) {
 #else
   if(access(fileName, ft) != 0) {
@@ -321,7 +321,7 @@ isASCIIFile(const char *fileName)
   return(true);
 }
 
-#ifdef G_OS_WIN32
+#ifdef WIN32
 gboolean
 check_file_exists(const char *fileName)
 {

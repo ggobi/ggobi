@@ -34,7 +34,10 @@ scatterplot_cpanel_init (cpaneld *cpanel, gint initial_mode, ggobid *gg) {
 
   cpanel_brush_init (cpanel, gg);
   cpanel_scale_init (cpanel, gg);
+#ifdef EDIT_EDGES_IMPLEMENTED
   cpanel_edgeedit_init (cpanel, gg);
+#endif
+  cpanel_identify_init (cpanel, gg);
 }
 
 void
@@ -94,7 +97,10 @@ cpanel_set (displayd *display, ggobid *gg) {
 #endif
       cpanel_brush_set (cpanel, gg);
       cpanel_scale_set (cpanel, gg);
+#ifdef EDIT_EDGES_IMPLEMENTED
       cpanel_edgeedit_set (cpanel, gg);
+#endif
+      cpanel_identify_set (cpanel, gg);
     break;
     case scatmat:
       cpanel_brush_set (cpanel, gg);

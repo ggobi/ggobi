@@ -6,6 +6,8 @@ CC=gcc
 DLLTOOL=dlltool
 DLLWRAP=dllwrap
 
+WIN32=1
+
 include local.config
 
   # if building from the CVS repository

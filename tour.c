@@ -284,11 +284,11 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
     
   /* Check that u0 and u1 are both orthonormal. */
   if (!checkcolson(u0.vals, nc, nd)) {
-    printf("Columns of u0 are not orthonormal");
+    printf("Columns of u0 are not orthonormal\n");
     doit = false;
   }
   if (!checkcolson(u1.vals, nc, nd)) {
-    printf("Columns of u1 are not orthonormal");
+    printf("Columns of u1 are not orthonormal\n");
     doit = false;
   }
 
