@@ -594,7 +594,7 @@ make_ui (ggobid *gg) {
                             gg->main_accel_group, window,
                             &gg->main_menubar, (gpointer) gg);
 
-#ifdef USE_XML
+#ifdef SUPPORT_INIT_FILES
   if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
    GtkWidget *w;
       w = gtk_item_factory_get_widget(gg->main_menu_factory, "/File");
