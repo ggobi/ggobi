@@ -32,7 +32,7 @@ and Ch. heikertingeri, and 6 measurements on each.
   <variable>aede2</variable>
   <variable>aede3</variable>
 </variables>
-<records count="74" color="2" glyph="fc 3" missingValue="NA">
+<records count="74" color="2" glyph="plus 3" missingValue="NA">
 <record label="Concinna" color="2">
 191 131 53 150 15 104
 </record>
