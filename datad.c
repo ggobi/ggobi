@@ -101,6 +101,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   varcircles_populate (d, gg);  /*-- circles: build but don't show --*/
 
   pipeline_init (d, gg);
+  clusters_set (d, gg);  /*-- find the clusters for data just read in --*/
 
   if (cleanup) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
@@ -120,7 +121,8 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
     sp_event_handlers_toggle (gg->current_splot, on);
 
   }
-    varpanel_refresh (gg);
+
+  varpanel_refresh (gg);
 
   return (display);
 }

@@ -187,7 +187,8 @@ collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
   gchar str[INITSTRSIZE];
 
 
-  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  fileName = findAssociatedFile(desc, suffixes,
+    sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
   if(fileName == NULL)
     found = false;
 
@@ -448,7 +449,8 @@ readGlyphErr (void) {
 /*------------------------------------------------------------------------*/
 
 gboolean
-point_glyphs_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
+point_glyphs_read (InputDescription *desc, gboolean reinit,
+  datad *d, ggobid *gg)
 {
   gboolean ok = true;
   static const gchar * const suffixes[] = {"glyphs"};
@@ -466,7 +468,8 @@ point_glyphs_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg
   if (reinit)
     br_glyph_ids_alloc (d);
 
-  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  fileName = findAssociatedFile(desc, suffixes,
+    sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
   if(fileName == NULL)
     found = false;
 
@@ -586,7 +589,8 @@ mapGlyphName (const gchar *gtype)
 }
 
 gboolean
-point_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
+point_colors_read (InputDescription *desc, gboolean reinit,
+  datad *d, ggobid *gg)
 {
   gboolean ok = false;
   gboolean found = true;
@@ -603,7 +607,8 @@ point_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg
     br_color_ids_alloc (d, gg);
 
 
-  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  fileName = findAssociatedFile(desc, suffixes,
+    sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
 
   if(fileName) {
     found = true;
@@ -846,7 +851,8 @@ hidden_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
   if (reinit)
     hidden_alloc (d);
 
-  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  fileName = findAssociatedFile(desc, suffixes,
+    sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
   if(fileName == NULL)
     found = false;
 
@@ -893,7 +899,8 @@ missing_values_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg
   gint whichSuffix;
   gchar *fileName;
 
-  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  fileName = findAssociatedFile(desc, suffixes,
+    sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
   if(fileName == NULL)
     return(false);
 
