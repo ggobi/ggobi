@@ -187,7 +187,7 @@ read_binary (FILE *fp)
 /*------------------------------------------------------------------*/
 
 void
-rawdata_alloc_block (gint nblocks) {
+rawdata_block_alloc (gint nblocks) {
 /*
  * Allocate space for nblocks*BLOCKSIZE rows
 */
@@ -210,6 +210,10 @@ find_data_start (FILE *fp)
   gint ch;
   gboolean morelines = true;
   gboolean comment_line = true;
+
+  /*-- Don't attempt to handle comments when the data is from stdin --*/
+  if (fp == stdin)
+/**/return true;
 
   while (comment_line) {
     /* skip white space */
@@ -324,42 +328,81 @@ seek_to_file_row (gint array_row, FILE *fp) {
   return ok;
 }
 
-void
-read_ascii (FILE *fp)
-{
-  gint ch;
-  gint i, jrows, nrows, jcols, fs;
-  gint nitems;
-  gint nblocks;
+gint
+row1_read (FILE *fp, gfloat *row1, gshort *row1_missing) {
+
+  gint j, ch;
+  gboolean found_row = true;
+  gint ncols = 0;
   gchar word[64];
 
-  xg.ncols = 0;
-  init_file_rows_sampled ();
+  /*-- Initialize --*/
+  for (j=0; j<MAXNCOLS; j++) {
+    row1_missing[j] = 0;
+    row1[j] = 0.0;
+  }
 
-/*
- * Read in the first row of the data file and calculate ncols.
-*/
-  while ( (ch = getc (fp)) != '\n') {
-    if (ch == '\t' || ch == ' ')
-      ;
-    else if (ungetc (ch, fp) == EOF || fscanf (fp, "%s", word) < 0 ) {
-      g_printerr ("read_ascii: error in reading first row of data\n");
-      fclose (fp);
-      exit (0);
+  /*-- Find the index of the first row of data that we're interested in. --*/
+  if (xg.file_read_type == read_all) {
+    if (!find_data_start (fp))
+      found_row = false;
 
-    } else {
+  } else {  /* if -only was used on the command line */
+    if (!seek_to_file_row (0, fp))
+      found_row = false;
+  }
 
-      xg.ncols++ ;
-      gotone = true;  /* suppress the alarm -- the file pointer is ok */
+  if (found_row) {  /*-- start reading the first line --*/
+    while ((ch = getc(fp)) != '\n') {
+  
+      if (ch == '\t' || ch == ' ')
+        ;
 
-      if (xg.ncols >= MAXNCOLS) {
-        g_printerr (
-          "This file has more than %d columns.  In order to read\n", MAXNCOLS);
-        g_printerr (" it in, increase MAXNCOLS in defines.h and recompile.\n");
+      else if (ungetc (ch, fp) == EOF || fscanf (fp, "%s", word) < 0 ) {
+        g_printerr ("error in reading first row of data\n");
+        fclose (fp);
         exit (0);
+
+      } else {
+
+        if (g_strcasecmp (word, "na") == 0 || strcmp (word, ".") == 0) {
+          xg.nmissing++;
+          row1_missing[ncols] = 1;
+
+        } else {
+          row1[ncols] = (gfloat) atof (word);
+        }
+
+        ncols++;
+        gotone = true;  /*-- suppress the alarm -- the file pointer is ok --*/
+
+        if (xg.ncols >= MAXNCOLS) {
+          g_printerr (
+            "This file has more than %d columns.  In order to read\n", MAXNCOLS);
+          g_printerr (" it in, increase MAXNCOLS in defines.h and recompile.\n");
+          exit (0);
+        }
       }
     }
   }
+
+  return ncols;
+}
+
+void
+read_ascii (FILE *fp)
+{
+  gint i, j, jrows, nrows, jcols, fs;
+  gint nitems;
+  gint nblocks;
+  gchar word[64];
+  gfloat row1[MAXNCOLS];
+  gshort row1_missing[MAXNCOLS];
+
+  init_file_rows_sampled ();
+
+  /*-- Read in the first row of the data and calculate ncols. --*/
+  xg.ncols = row1_read (fp, row1, row1_missing);
 
 /*
  * Once the number of columns is known, allocate vardata.
@@ -368,19 +411,15 @@ read_ascii (FILE *fp)
   vardata_init ();
 
 /*
- * Now start over.  Find the index of the first row of data that
- * we're interested in.
-*/
-  fseek (fp, 0L, SEEK_SET);  /*-- rewind --*/
-
-/*
  * If we're reading everything, allocate the first block.
  * If -only has been used, allocate the whole shebang.
 */
   if (xg.file_read_type == read_all) {
 
     xg.nrows = 0;
-    rawdata_alloc_block (1);
+    rawdata_block_alloc (1);
+    if (xg.nmissing > 0)
+      missing_block_alloc (1, BLOCKSIZE);
 
   } else {  /* -only has been used */
 
@@ -388,15 +427,28 @@ read_ascii (FILE *fp)
     xg.raw_data = (gfloat **) g_malloc (xg.nrows * sizeof (gfloat *));
     for (i=0; i<xg.nrows; i++)
       xg.raw_data[i] = (gfloat *) g_malloc (xg.ncols * sizeof (gfloat));
+
+    if (xg.nmissing > 0) {
+      xg.missing = (gshort **) g_malloc (xg.nrows * sizeof (gshort *));
+      for (i=0; i<xg.nrows; i++)
+        xg.missing[i] = (gshort *) g_malloc (xg.ncols * sizeof (gshort));
+    }
   }
 
-/*
- * Read data, reallocating as needed.  Determine nrows for the read_all case.
-*/
+/*-- copy the values in row1 to the main array --*/
+  for (j=0; j<xg.ncols; j++)
+    xg.raw_data[0][j] = row1[j];
+  if (xg.nmissing > 0) {
+    for (j=0; j<xg.ncols; j++)
+      xg.missing[0][j] = row1_missing[j];
+  }
+
+
+/*-- Read, reallocating as needed.  Determine nrows for the read_all case. --*/
   nblocks = 1;
-  nitems = 0;
-  jrows = 0;
-  nrows = 0;
+  nitems = xg.ncols;
+  jrows = 1;
+  nrows = 1;
   jcols = 0;
   while (true) {
     if (jcols == 0) {
@@ -412,9 +464,9 @@ read_ascii (FILE *fp)
 
     fs = fscanf (fp, "%s", word);
 
-    if (fs == EOF)
+    if (fs == EOF) {
       break;
-    else if (fs < 0) {
+    } else if (fs < 0) {
       g_printerr ("Problem with input data\n");
       fclose (fp);
       exit (0);
@@ -461,10 +513,9 @@ read_ascii (FILE *fp)
           if (nblocks%20 == 0)
             g_printerr ("reallocating; n > %d\n", nblocks*BLOCKSIZE);
 
-          rawdata_alloc_block (nblocks);
-          if (xg.nmissing > 0) {
+          rawdata_block_alloc (nblocks);
+          if (xg.nmissing > 0)
             missing_block_alloc (nblocks, BLOCKSIZE);
-          }
         }
 
       } else {  /* -only was used */
@@ -494,8 +545,7 @@ read_ascii (FILE *fp)
     g_printerr ("No data was read\n");
     exit (0);
   }
-  else  /*-- nitems ok --*/
-  {
+  else {  /*-- nitems ok --*/
     if (xg.file_read_type == read_all) {
       /*
        * One last free and realloc to make raw_data take up exactly
@@ -511,31 +561,6 @@ read_ascii (FILE *fp)
       if (xg.nmissing)
         xg.missing = (gshort **) g_realloc ((gpointer) xg.missing,
           xg.nrows * sizeof (gshort *));
-    }
-
-    /*
-     * If the data contains only one column, add a second,
-     * the numbers 1:nrows -- and let the added column be
-     * the first column?
-    */
-    xg.single_column = false;
-    if (xg.ncols == 1) {
-      xg.single_column = true;
-      xg.ncols = 2;
-      for (i=0; i<xg.nrows; i++) {
-        xg.raw_data[i] = (gfloat *) g_realloc (
-          (gpointer) xg.raw_data[i],
-          (guint) xg.ncols * sizeof (gfloat));
-        xg.raw_data[i][1] = xg.raw_data[i][0] ;
-        xg.raw_data[i][0] = (gfloat) (i+1) ;
-
-        /* And populate a column of missing values with 0s, if needed */
-        if (xg.nmissing > 0) {
-          xg.missing[i] = (gshort *) g_realloc (
-            (gpointer) xg.missing[i], (guint) xg.ncols * sizeof (gshort));
-          xg.missing[i][1] = 0 ;
-        }
-      }
     }
   }
 }

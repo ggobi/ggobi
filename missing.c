@@ -26,7 +26,7 @@ missing_block_alloc (gint nblocks, gint bsize)
   gulong nr = nblocks * bsize;
 
   if (nblocks == 1)
-    xg.missing = (gshort **) g_malloc0 (nr * sizeof (gshort *));
+    xg.missing = (gshort **) g_malloc (nr * sizeof (gshort *));
   else
     xg.missing = (gshort **) g_realloc ((gpointer) xg.missing,
       nr * sizeof (gshort *));

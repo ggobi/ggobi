@@ -12,9 +12,11 @@
 static gchar *version_date = "January 5, 2000";
 gchar *data_in;
 
-int
+gint
 parse_command_line (gint *argc, gchar **av)
 {
+  gboolean stdin_p = false;
+  
 
 /*
  * Now parse the command line.
@@ -26,6 +28,13 @@ parse_command_line (gint *argc, gchar **av)
     */
     if (strcmp (av[1], "-s") == 0)
       xg.data_mode = Sprocess;
+
+    /*
+     * -t:  accept input from stdin
+    */
+    else if (strcmp (av[1], "-t") == 0) {
+      stdin_p = true;
+    }
 
     /*
      * -std:  look for one of mmx (default), msd, or mmd
@@ -141,9 +150,10 @@ parse_command_line (gint *argc, gchar **av)
   }
   else /* if (xg.data_mode == ascii || xg.data_mode == binary) */
   {
-    data_in = (*argc == 0) ? g_strdup_printf ("stdin") :
-                             g_strdup_printf (av[0]);
-    g_printerr ("(main) data_in = %s\n", data_in);
+    if (*argc == 0)
+      data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
+    else
+      data_in = g_strdup_printf (av[0]);
   }
 
   return 1;
@@ -153,13 +163,13 @@ gint XGOBI(main)(gint argc, gchar *argv[]);
 
 gint main (gint argc, gchar *argv[])
 { 
- return(XGOBI(main)(argc, argv));
+ return (XGOBI(main)(argc, argv));
 }
 
   /* Available so that we can call this from R
      without any confusion between which main().
    */
-gint XGOBI(main)(gint argc, gchar *argv[])
+gint XGOBI (main)(gint argc, gchar *argv[])
 {
   extern void make_ggobi (gchar *);
   GdkVisual *vis;

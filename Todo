@@ -11,6 +11,7 @@ Scaling:
   couple that with a thumbnail that sits just below the scaling controls
 
 
+
 ! add "size only" to the list of color and glyph, color only, etc.
 
 ! Rename gtour_ui.c to tour2d_ui.c
