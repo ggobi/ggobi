@@ -35,6 +35,8 @@ AC_ARG_WITH(xml, --with-xml Enable reading and writing of XML datasets.,,with_xm
 LIBXML_VERSION="2.4.1"
 
 AC_ARG_WITH(mysql, --with-mysql Enable reading data from MySQL databases., USE_MYSQL=1)
+AC_ARG_WITH(postgres, --with-postgres Enable reading data from Postgres databases., USE_POSTGRES=1)
+
 AC_ARG_WITH(R,--with-R Install the Rggobi package)
 AC_ARG_WITH(Python,--with-Python Install the Pythonggobi module)
 AC_ARG_WITH(Perl,--with-Perl Install the Perlggobi module)
