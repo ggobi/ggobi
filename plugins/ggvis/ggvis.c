@@ -184,11 +184,10 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     NULL);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
-/*
- * This should include only edge sets.
-*/
+  /*-- include only edge sets.  --*/
   varnotebook = create_variable_notebook (hbox,
-    GTK_SELECTION_SINGLE, all_vartypes, (GtkSignalFunc) NULL, inst->gg);
+    GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
+    (GtkSignalFunc) NULL, inst->gg);
   gtk_object_set_data (GTK_OBJECT (window),
     "notebook", varnotebook);
 
@@ -256,11 +255,10 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   btn = gtk_check_button_new_with_label (" Copy selected vars ");
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
-/*
- * This should include only node sets.
-*/
+  /*-- exclude edge sets --*/
   varnotebook = create_variable_notebook (hbox,
-    GTK_SELECTION_EXTENDED, all_vartypes, (GtkSignalFunc) NULL, inst->gg);
+    GTK_SELECTION_EXTENDED, all_vartypes, no_edgesets,
+    (GtkSignalFunc) NULL, inst->gg);
   gtk_object_set_data (GTK_OBJECT (window),
     "notebook", varnotebook);
 
@@ -470,8 +468,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
-
-
 
   label = gtk_label_new ("Distance");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox_params, label);
