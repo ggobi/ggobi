@@ -837,12 +837,16 @@ entry_set_scheme_name (ggobid *gg)
                                 gg->activeColorScheme->name);
 }
 
+/* Can close the window via an event or in the ggobi_close routine.
+   The former (i.e. events) are more extensible and localized. */
 void
 close_wvis_window_cb(GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
 fprintf(stderr, "Closing the color scheme window\n");fflush(stderr);
+#if 0
    gtk_widget_destroy(gg->wvis.window);
    gg->wvis.window = NULL;
+#endif
 }
 
 void
@@ -881,10 +885,17 @@ wvis_window_open (ggobid *gg)
     gtk_signal_connect (GTK_OBJECT (gg->wvis.window),
       "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), gg);
 
+#if 1 /* Testing */
     gtk_signal_connect (GTK_OBJECT (gg->main_window),
                         "delete_event",
                         GTK_SIGNAL_FUNC (close_wvis_window_cb),
                         (gpointer) gg);
+
+    gtk_signal_connect (GTK_OBJECT (gg->main_window),
+                        "destroy",
+                        GTK_SIGNAL_FUNC (close_wvis_window_cb),
+                        (gpointer) gg);
+#endif
 
     hpane = gtk_hpaned_new();
     gtk_container_add (GTK_CONTAINER (gg->wvis.window), hpane);
