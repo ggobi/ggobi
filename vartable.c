@@ -254,6 +254,9 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
     vt_to->lim_raw.max =
     vt_to->lim_tform.max = vt_from->lim_tform.max;
 
+  vt_to->lim_display.min = vt_from->lim_display.min;
+  vt_to->lim_display.max = vt_from->lim_display.max;
+
   vt_to->nmissing = vt_from->nmissing;
   vt_to->lim_specified_p = vt_from->lim_specified_p;
 }
