@@ -666,7 +666,9 @@ static GtkItemFactoryEntry menu_items[] = {
 
   { "/_Help",                NULL, NULL, 0, "<LastBranch>" },
   { "/Help/About GGobi",
-       NULL, (GtkItemFactoryCallback) splash_show, NULL },
+       NULL,
+       (GtkItemFactoryCallback) splash_show,
+       0 },
   { "/Help/About help ...",  NULL, NULL, 0, NULL },
 };
 

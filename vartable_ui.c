@@ -676,6 +676,7 @@ vartable_row_assemble (gchar **row, datad *d, ggobid *gg)
 
   row[CLIST_VARNO] = g_strdup_printf ("%d", nrows);
   row[CLIST_VARNAME] = g_strdup ("");
+  row[CLIST_TYPE] = g_strdup ("");
   row[CLIST_TFORM] = g_strdup ("");
   row[CLIST_USER_MIN] = g_strdup ("");
   row[CLIST_USER_MAX] = g_strdup ("");
@@ -711,12 +712,14 @@ vartable_open (ggobid *gg)
   GtkWidget *vbox, *hbox, *hb, *btn;
   GtkWidget *scrolled_window;
   gchar *titles[NCOLS_CLIST] =
-    {"varno", "Variable",          /*-- varno will be an invisible column --*/
+    {"varno",          /*-- varno will be an invisible column --*/
+     "Variable",
+     "Cat?",           /*-- categorical variable? --*/
      "Transform",
      "Min (user)", "Max (user)",
      "Min (data)", "Max (data)",
      "Mean", "Median",
-     "N missing"};
+     "N NAs"};
   GSList *l;
   datad *d;
   gint n;
@@ -913,9 +916,17 @@ vartable_open (ggobid *gg)
 void
 vartable_collab_set_by_var (gint j, datad *d)
 {
-  if (d->vartable_clist != NULL)
+  gchar *ind;
+
+  if (d->vartable_clist != NULL) {
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
       CLIST_VARNAME, d->vartable[j].collab);
+    ind = (d->vartable[j].categorical_p) ? g_strdup ("y") :
+                                           g_strdup ("");
+    gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+      CLIST_TYPE, ind);
+    g_free (ind);
+  }
 }
 
 /*-- sets the name of the transformed variable --*/
