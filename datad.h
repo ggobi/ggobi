@@ -129,12 +129,6 @@ class datad {
 /*----------------- variable selection panel -------------------------*/
 
  struct _Varpaneld {
-/*
-   GtkWidget *table;
-   gint vnrows, vncols, nvars;
-   GtkWidget **da, **label;
-   GdkPixmap **da_pix;
-*/
    GtkWidget *vbox;        /*-- vbox inside a frame --*/
    GtkWidget **checkbox;   /*-- single column of checkboxes --*/
  } varpanel_ui;

@@ -108,18 +108,23 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
 {
   gint nc = d->ncols + 1;
   
+/*-- vartable_ui --*/
   /*-- set a view of the data values before adding the new label --*/
   vartable_row_append (d->ncols-1, d, gg);
+
+/*-- vartable --*/
   vartable_realloc (nc, d, gg);
   d->vartable[nc-1].collab =
-    g_strdup (newName && newName[0] ? newName : d->vartable[jvar].collab);
+    g_strdup ((newName && newName[0]) ? newName : d->vartable[jvar].collab);
   d->vartable[nc-1].collab_tform =
-    g_strdup (newName && newName[0] ? newName : d->vartable[jvar].collab);
+    g_strdup ((newName && newName[0]) ? newName : d->vartable[jvar].collab);
 
+/*-- varpanel_ui  --*/
   d->varpanel_ui.checkbox = (GtkWidget **)
     g_realloc (d->varpanel_ui.checkbox, nc * sizeof (GtkWidget *));
   varpanel_checkbox_add (nc-1, d, gg);
 
+/*-- vartable --*/
   /*-- now the rest of the variables --*/
   d->vartable[nc-1].jitter_factor = d->vartable[jvar].jitter_factor;
   d->vartable[nc-1].nmissing = d->vartable[jvar].nmissing;
@@ -131,11 +136,11 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   gtk_widget_show_all (gg->varpanel_ui.varpanel);
 }
 
-
 gboolean
 updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
 {
-  if(jvar > -1) {
+/*-- vartable --*/
+  if (jvar > -1) {
     d->vartable[nc-1].mean = d->vartable[jvar].mean;
     d->vartable[nc-1].median = d->vartable[jvar].median;
     d->vartable[nc-1].lim.min =
@@ -144,10 +149,12 @@ updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
     d->vartable[nc-1].lim.max =
       d->vartable[nc-1].lim_raw.max = d->vartable[nc-1].lim_tform.max = 
       d->vartable[jvar].lim_raw.max;
-   } 
+  } 
 
   transform_values_init (nc-1, d, gg);
+/*-- --*/
 
+/*-- pipeline --*/
   pipeline_arrays_add_column (jvar, d, gg);  /* reallocate and copy */
   missing_arrays_add_column (jvar, d, gg);
 
