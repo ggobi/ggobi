@@ -70,7 +70,7 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
                                          gtk_marshal_NONE__POINTER_POINTER_POINTER,
                                          GTK_TYPE_NONE, 3,
                                          GTK_TYPE_GGOBI_SPLOT,
-                                         GTK_TYPE_POINTER,
+/* GdkEventMotion pointer */             GTK_TYPE_POINTER,
                                          GTK_TYPE_GGOBI_DATA);
   }
 
@@ -127,10 +127,11 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
         gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
                                          "variable_added",
                                          GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_POINTER,
-                                         GTK_TYPE_NONE, 2,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER);
+                                         gtk_marshal_NONE__POINTER_INT_POINTER,
+                                         GTK_TYPE_NONE, 3,
+					 GTK_TYPE_POINTER,/*vartabled XX*/
+					 GTK_TYPE_INT,/*index variable*/
+                                         GTK_TYPE_GGOBI_DATA);
   }
 
   if (gtk_signal_lookup("variable_list_changed", GTK_TYPE_GGOBI) == 0) {
@@ -138,10 +139,9 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
         gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI),
                                          "variable_list_changed",
                                          GTK_RUN_LAST | GTK_RUN_ACTION,
-                                         gtk_marshal_NONE__POINTER_POINTER,
-                                         GTK_TYPE_NONE, 2,
-                                         GTK_TYPE_POINTER,
-                                         GTK_TYPE_POINTER);
+                                         gtk_marshal_NONE__POINTER,
+                                         GTK_TYPE_NONE, 1,
+                                         GTK_TYPE_GGOBI);
   }
 
   if (gtk_signal_lookup("sticky_point_added", GTK_TYPE_GGOBI) == 0) {
@@ -431,7 +431,9 @@ static void
 extendedSPlotClassInit(GtkGGobiExtendedSPlotClass * klass)
 {
   klass->tree_label = NULL;
+  klass->createWithVars = NULL;
 }
+
 
 GtkType gtk_ggobi_extended_splot_get_type(void)
 {

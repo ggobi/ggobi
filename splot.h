@@ -187,6 +187,9 @@ typedef struct
 
    gint (*plotted_vars_get)(splotd *sp, gint *vars, datad *d);
 
+
+   splotd * (*createWithVars)(displayd *dpy, gint *vars, gint nvars, gint width, gint height, ggobid *gg);
+
 } GtkGGobiExtendedSPlotClass;
 
 typedef struct 

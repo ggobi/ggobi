@@ -166,6 +166,31 @@ splotVariablesGet(splotd *sp, gint *cols, datad *d)
 	return(2);
 }
 
+/*
+XX Incomplete. Need to finish off the construction of splotd's directly
+ from command line language rather than as part of the displayd.
+*/
+splotd *
+tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, gint width, gint height, ggobid *gg)
+{
+   splotd *sp;
+   if(nvar < 1) {
+      g_printerr("not enough variables specified to create time series plot\n");
+      return(NULL);
+   }
+
+   sp = gtk_time_series_splot_new(display, width, height, gg);
+   if(nvar > 1) {
+      sp->xyvars.y = vars[1];
+      sp->xyvars.x = vars[0];
+   } else {
+      sp->xyvars.y = vars[0];
+      sp->xyvars.x = 0;
+   }
+
+   return(sp);
+}
+
 void 
 timeSeriesSPlotClassInit(GtkGGobiTimeSeriesSPlotClass *klass)
 {
@@ -186,6 +211,8 @@ timeSeriesSPlotClassInit(GtkGGobiTimeSeriesSPlotClass *klass)
     klass->extendedSPlotClass.world_to_plane = tsWorldToPlane;
 
     klass->extendedSPlotClass.plotted_vars_get = splotVariablesGet;
+
+    klass->extendedSPlotClass.createWithVars = tsplotCreateWithVars;
 }
 
 
