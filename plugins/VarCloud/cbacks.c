@@ -22,7 +22,7 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
 {
   vcld *vcl = vclFromInst (inst);
   ggobid *gg = inst->gg;
-  gint i, j, k;
+  gint i, j, k, ii, jj;
   gchar **colnames, **rownames, **recordids;
   gint npairs, n, nc = 4;
   static gchar *clab[] = {"D_ij", "diff_ij", "i", "j"};
@@ -35,11 +35,12 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   if (dsrc->nrows <= 1)
     return;
 
-  npairs = dsrc->nrows*(dsrc->nrows-1)/2;  /* lower triangle only */
-
+  /* lower triangle only */
+  npairs = dsrc->nrows_in_plot*(dsrc->nrows_in_plot-1)/2;  
+ 
   /* Step 1: if necessary, add record ids to the original datad */
   /*    Keep it simple: use row numbers */
-  datad_record_ids_set(vcl->dsrc, NULL, false);
+  datad_record_ids_set(dsrc, NULL, false);
 
   /* Step 2: if necessary, add an edge set for the complete graph.
       Call it 'allpairs'; it has no variables for now.
@@ -51,12 +52,14 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
 
   e = datad_create(npairs, 0, gg);
   e->name = g_strdup("all pairs");
-  rowlabels_alloc(e);  
+  rowlabels_alloc(e);
 
   k = 0;
-  for (i=0; i<vcl->dsrc->nrows-1; i++)
-    for (j=i+1; j<vcl->dsrc->nrows; j++) {
-      lbl = g_strdup_printf ("%d,%d", i, j);
+  for (i=0; i<dsrc->nrows_in_plot-1; i++)
+    for (j=i+1; j<dsrc->nrows_in_plot; j++) {
+      lbl = g_strdup_printf ("%d,%d", 
+        dsrc->rows_in_plot.els[i], 
+        dsrc->rows_in_plot.els[j]);
       recordids[k++] = lbl;
       g_array_append_val(e->rowlab, lbl);
     }
@@ -69,10 +72,12 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
      g_malloc(sizeof(SymbolicEndpoints) * e->edge.n);
 
   k = 0;
-  for (i=0; i<vcl->dsrc->nrows-1; i++) {
-    for (j=i+1; j<vcl->dsrc->nrows; j++) {
-      e->edge.sym_endpoints[k].a = vcl->dsrc->rowIds[i];
-      e->edge.sym_endpoints[k].b = vcl->dsrc->rowIds[j];
+  for (i=0; i<dsrc->nrows_in_plot-1; i++) {
+    for (j=i+1; j<dsrc->nrows_in_plot; j++) {
+      ii = dsrc->rows_in_plot.els[i];
+      jj = dsrc->rows_in_plot.els[j];
+      e->edge.sym_endpoints[k].a = dsrc->rowIds[ii];
+      e->edge.sym_endpoints[k].b = dsrc->rowIds[jj];
       e->edge.sym_endpoints[k].jpartner = -1;
       k++;
     }
@@ -100,26 +105,28 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
     colnames[j] = g_strdup (clab[j]);
 
   n = 0;
-  for (i = 0; i<dsrc->nrows-1; i++) {
-    for (j = i+1; j<dsrc->nrows; j++) {
+  for (i = 0; i<dsrc->nrows_in_plot-1; i++) {
+    for (j = i+1; j<dsrc->nrows_in_plot; j++) {
       if (n == npairs) {
         g_printerr ("too many distances: n %d nr %d\n", n, npairs);
         break;
       }
       /* Verify that each of these indices points to something real */
-      xci = dsrc->tform.vals[i][vcl->xcoord];
-      yci = dsrc->tform.vals[i][vcl->ycoord];
-      xcj = dsrc->tform.vals[j][vcl->xcoord];
-      ycj = dsrc->tform.vals[j][vcl->ycoord];
+      ii = dsrc->rows_in_plot.els[i];
+      jj = dsrc->rows_in_plot.els[j];
+      xci = dsrc->tform.vals[ii][vcl->xcoord];
+      yci = dsrc->tform.vals[ii][vcl->ycoord];
+      xcj = dsrc->tform.vals[jj][vcl->xcoord];
+      ycj = dsrc->tform.vals[jj][vcl->ycoord];
       values[n + 0*npairs] = sqrt((xci-xcj)*(xci-xcj) + (yci-ycj)*(yci-ycj));
-      values[n + 1*npairs] = sqrt(abs(dsrc->tform.vals[i][vcl->var1] - 
-                                      dsrc->tform.vals[j][vcl->var1]));
-      values[n + 2*npairs] = (gdouble) i;
-      values[n + 3*npairs] = (gdouble) j;
+      values[n + 1*npairs] = sqrt(abs(dsrc->tform.vals[ii][vcl->var1] - 
+                                      dsrc->tform.vals[jj][vcl->var1]));
+      values[n + 2*npairs] = (gdouble) ii;
+      values[n + 3*npairs] = (gdouble) jj;
 
       rownames[n] = g_strdup_printf ("%s,%s",
-        (gchar *) g_array_index (dsrc->rowlab, gchar *, i),
-        (gchar *) g_array_index (dsrc->rowlab, gchar *, j));
+        (gchar *) g_array_index (dsrc->rowlab, gchar *, ii),
+        (gchar *) g_array_index (dsrc->rowlab, gchar *, jj));
 
       n++;
     }
