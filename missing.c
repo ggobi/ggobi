@@ -153,14 +153,11 @@ missing_to_world (datad *d, ggobid *gg)
 }
 
 void
-missing_rejitter (datad *d, ggobid *gg) {
+missing_rejitter (gint *vars, gint nvars, datad *d, ggobid *gg) {
   gint j;
 
-/*
- * This rejitters <everything> which is perhaps excessive, no?
-*/
-  for (j=0; j<d->ncols; j++)
-    missing_jitter_variable (j, d, gg);
+  for (j=0; j<nvars; j++)
+    missing_jitter_variable (vars[j], d, gg);
 
   missing_to_world (d, gg);
 

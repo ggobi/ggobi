@@ -300,14 +300,16 @@ void scale_set_default_values (GtkScale *scale)
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-get_clist_from_widget (GtkWidget *w)
+get_clist_from_object (GtkObject *obj)
 {
+  GtkWidget *notebook, *swin, *clist;
+  gint page;
+
   /*-- find the current notebook page, then get the current clist --*/
-  GtkWidget *notebook = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT(w), "notebook");
-  gint page = gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook));
-  GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
-  GtkWidget *clist = GTK_BIN (swin)->child;
+  notebook = (GtkWidget *) gtk_object_get_data (obj, "notebook");
+  page = gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook));
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
+  clist = GTK_BIN (swin)->child;
 
   return clist;
 }

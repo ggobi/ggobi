@@ -97,7 +97,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
   gboolean rval = false;
   gfloat val;
 
-  GtkWidget *clist = get_clist_from_widget (w);
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint selected_var = get_one_selection_from_clist (clist);
 
@@ -205,7 +205,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   GdkPoint *points;
   gfloat diff;
 
-  GtkWidget *clist = get_clist_from_widget (w);
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint selected_var = get_one_selection_from_clist (clist);
 
@@ -386,7 +386,7 @@ selection_made_cb (GtkWidget *clist, gint row, gint column,
 
 static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 {
-  GtkWidget *clist = get_clist_from_widget (w);
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint selected_var = get_one_selection_from_clist (clist);
 

@@ -46,6 +46,8 @@ datad_new(datad *d, ggobid *gg)
 
   sphere_init (d);
 
+  jitter_vars_init (d, gg);
+
   gg->d = g_slist_append (gg->d, d);
   return (d);
 }

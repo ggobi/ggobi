@@ -71,20 +71,10 @@ jitter_randval (gint type)
 }
 
 void
-rejitter (datad *d, ggobid *gg) {
-  gint *selected_cols, nselected_cols = 0;
+rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
   gint i, j, k, m;
   gfloat frand, fworld, fjit;
   gfloat precis = (gfloat) PRECISION1;
-
-/*
- * First determine the variables to be jittered:
- * this depends on the selected variables
-*/
-  selected_cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  nselected_cols = selected_cols_get (selected_cols, d, gg);
-  if (nselected_cols == 0)
-    nselected_cols = plotted_cols_get (selected_cols, d, gg);
 
   for (j=0; j<nselected_cols; j++) {
     k = selected_cols[j];
@@ -112,8 +102,6 @@ rejitter (datad *d, ggobid *gg) {
   tform_to_world (d, gg);
   /*-- do not redisplay the missing values displays --*/
   displays_tailpipe (REDISPLAY_PRESENT, FULL, gg);
-
-  g_free ((gpointer) selected_cols);
 }
 
 

@@ -20,20 +20,17 @@ jitter_vars_init (datad *d, ggobid *gg) {
 }
 
 static void
-jitter_cb (GtkButton *button, ggobid *gg)
+jitter_cb (GtkButton *w, ggobid *gg)
 {
-  datad *d = gg->current_display->d;
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(w));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
 
-  /* 
-   * if datad has changed, refuse to do anything until the
-   * user has closed and reopened jitter_ui.window.
-  */
-  if (gg->jitter_ui.d != d) {
-    g_printerr ("Close and reopen this window, please\n");
-    return;
+  if (nvars) {
+    rejitter (vars, nvars, d, gg);
+    g_free (vars);
   }
-
-  rejitter (d, gg);
 }
 
 /*
@@ -41,24 +38,19 @@ jitter_cb (GtkButton *button, ggobid *gg)
 */
 static void
 degree_cb (GtkAdjustment *adj, ggobid *gg) {
-  datad *d = gg->current_display->d;
-
-  /* 
-   * if datad has changed, refuse to do anything until the
-   * user has closed and reopened jitter_ui.window.
-  */
-  if (gg->jitter_ui.d != d) {
-    g_printerr ("Close and reopen this window, please\n");
-    return;
-  }
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(adj));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
 
   if (gg->current_display->missing_p) {
     missing_jitter_value_set (adj->value, d, gg);
-    missing_rejitter (d, gg);
+    missing_rejitter (vars, nvars, d, gg);
   } else {
     jitter_value_set (adj->value, d, gg);
-    rejitter (d, gg);
+    if (nvars) rejitter (vars, nvars, d, gg);
   }
+  if (nvars) g_free (vars);
 }
 
 /*-- called when closed from the close button --*/
@@ -77,19 +69,17 @@ static void type_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget(w, true);
-  datad *d = gg->current_display->d;
-
-  /* 
-   * if datad has changed, refuse to do anything until the
-   * user has closed and reopened jitter_ui.window.
-  */
-  if (gg->jitter_ui.d != d) {
-    g_printerr ("Close and reopen this window, please\n");
-    return;
-  }
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars = get_selections_from_clist (d->ncols, vars, clist);
 
   d->jitter.type = indx;
-  rejitter (d, gg);
+
+  if (nvars) {
+     rejitter (vars, nvars, d, gg);
+     g_free (vars);
+  }
 }
 
 void
@@ -99,25 +89,13 @@ jitter_window_open (ggobid *gg) {
   GtkWidget *vbox, *vb, *hb;
   GtkWidget *sbar, *opt;
   GtkObject *adj;
-  datad *d;
+  GtkWidget *notebook;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
     return;
 
   else {
-
-    d = gg->current_display->d;
-
-    gg->jitter_ui.d = d;
-
-    /*
-     * if this particular datad object hasn't been active,
-     * initialize it.
-    */
-    if (d->jitter.jitfacv == NULL) {
-      jitter_vars_init (d, gg);
-    }
 
     if (gg->jitter_ui.window == NULL) {
 
@@ -131,6 +109,10 @@ jitter_window_open (ggobid *gg) {
       vbox = gtk_vbox_new (false, 2);
       gtk_container_add (GTK_CONTAINER (gg->jitter_ui.window), vbox);
 
+      /* Create a notebook, set the position of the tabs */
+      notebook = create_variable_notebook (vbox, GTK_SELECTION_EXTENDED,
+        (GtkSignalFunc) NULL, gg);
+
       /*-- vbox for label and rangewidget --*/
       vb = gtk_vbox_new (true, 2);
       gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 1);
@@ -140,6 +122,7 @@ jitter_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
       adj = gtk_adjustment_new (0.0, 0.0, 0.7, 0.01, .01, 0.0);
+      gtk_object_set_data (GTK_OBJECT (adj), "notebook", notebook);
       gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
                           GTK_SIGNAL_FUNC (degree_cb), (gpointer) gg);
 
@@ -156,6 +139,7 @@ jitter_window_open (ggobid *gg) {
       btn = gtk_button_new_with_label ("Jitter");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
         "Rejitter the data", NULL);
+      gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
       gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                          GTK_SIGNAL_FUNC (jitter_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
@@ -164,6 +148,7 @@ jitter_window_open (ggobid *gg) {
       opt = gtk_option_menu_new ();
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
         "The jittering is either distributed uniform or normal", NULL);
+      gtk_object_set_data (GTK_OBJECT (opt), "notebook", notebook);
       gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
       populate_option_menu (opt, type_lbl,
                             sizeof (type_lbl) / sizeof (gchar *),
@@ -180,6 +165,8 @@ jitter_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
     }
 
+    gtk_object_set_data (GTK_OBJECT (gg->jitter_ui.window),
+      "notebook", notebook);
     gtk_widget_show_all (gg->jitter_ui.window);
   }
 
