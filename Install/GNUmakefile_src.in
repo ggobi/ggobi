@@ -41,6 +41,7 @@ SRC=\
     jitter.c \
     jitter_ui.c \
     limits.c \
+    edges.c \
     lineedit.c \
     lineedit_ui.c \
     main_ui.c \
