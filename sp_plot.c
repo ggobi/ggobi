@@ -538,7 +538,6 @@ edges_draw (splotd *sp, ggobid *gg)
 {
   gint j, k;
   gint from, to;
-  gint nl;
   gushort current_color;
   gushort colors_used[NCOLORS+2];
   gint ncolors_used = 0;
@@ -547,7 +546,7 @@ edges_draw (splotd *sp, ggobid *gg)
   datad *d = display->d;
   datad *e = display->e;
 
-  if (e->edge.n == 0) {
+  if (e == (datad *) NULL || e->edge.n == 0) {
 /**/return;
   }
 
@@ -563,15 +562,15 @@ edges_draw (splotd *sp, ggobid *gg)
      * color in a group.
     */
     for (k=0; k<ncolors_used; k++) {
+      gint nl = 0;
       current_color = colors_used[k];
-      nl = 0;
 
       for (j=0; j<e->edge.n; j++) {
         if (e->hidden_now.els[j]) {
           doit = false;
         } else {
-          from = e->edge.endpoints[j].a - 1;
-          to = e->edge.endpoints[j].b - 1;
+          from = e->edge.endpoints[j].a;
+          to = e->edge.endpoints[j].b;
           doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
 
         /* If not plotting imputed values, and one is missing, skip it */
@@ -603,7 +602,7 @@ edges_draw (splotd *sp, ggobid *gg)
               sp->arrowheads[nl].y2 = sp->screen[to].y;
             }
             nl++;
-          }
+          }  /*-- end if ... == current_color --*/
         }
       }
       if (!gg->mono_p)

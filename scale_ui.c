@@ -442,7 +442,7 @@ cpanel_scale_make (ggobid *gg) {
   radio1 = gtk_radio_button_new_with_label (NULL, "Drag");
   GTK_TOGGLE_BUTTON (radio1)->active = TRUE;
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
-    "Drag left to pan, drag middle or right to zoom (most direct style)",
+    "Drag left to pan, drag middle or right to zoom (most direct style).\n(To reset, see Reset in main menubar)",
     NULL);
   gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
                       GTK_SIGNAL_FUNC (interaction_style_cb), gg);
@@ -451,7 +451,7 @@ cpanel_scale_make (ggobid *gg) {
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
   radio2 = gtk_radio_button_new_with_label (group, "Click");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
-    "Use mouse clicks and key presses to pan and zoom (useful for large data)",
+    "Use mouse clicks and key presses to pan and zoom (useful for large data).\n(To reset, see Reset in main menubar)",
     NULL);
   gtk_box_pack_start (GTK_BOX (hbox), radio2, TRUE, TRUE, 0);
 

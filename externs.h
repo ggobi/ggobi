@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void splot_edges_realloc (splotd *, datad *, ggobid *);
 void cpanel_show_cb (GtkCheckMenuItem *w, guint action);
 void tooltips_show_cb (GtkCheckMenuItem *w, guint action);
 gboolean checkequiv(gfloat **u0, gfloat **u1, gint nc, gint nd);

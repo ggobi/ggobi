@@ -72,7 +72,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  exclusion_ui.c exclusion.c record_id.c \
  scale_ui.c scale_drag.c scale_click.c scale_api.c \
  identify_ui.c identify.c \
- lineedit_ui.c lineedit.c \
+ edges.c lineedit_ui.c lineedit.c \
  movepts_ui.c movepts.c \
  parcoords_ui.c parcoords.c \
  scatmat_ui.c scatmat.c \
@@ -108,7 +108,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  exclusion_ui.o exclusion.o record_id.o \
  scale_ui.o scale_drag.o scale_click.o scale_api.o \
  identify_ui.o identify.o \
- lineedit_ui.o lineedit.o \
+ edges.o lineedit_ui.o lineedit.o \
  movepts_ui.o movepts.o \
  parcoords_ui.o parcoords.o \
  scatmat_ui.o scatmat.o \

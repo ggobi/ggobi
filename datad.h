@@ -197,7 +197,7 @@ class datad {
    gint n;
    endpointsd *endpoints;
 
-   gint *nxed_by_brush;
+   gint nxed_by_brush;
    vector_b xed_by_brush;
  } edge;
 

@@ -177,8 +177,8 @@ splot_write_svg (splotd *sp, ggobid *gg)
         if (e->hidden_now.els[j]) {
           doit = false;
         } else {
-          from = e->edge.endpoints[j].a - 1;
-          to = e->edge.endpoints[j].b - 1;
+          from = e->edge.endpoints[j].a;
+          to = e->edge.endpoints[j].b;
           doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
         }
         if (doit) {

@@ -296,6 +296,7 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
     cpaneld *cpanel = &display->cpanel;
 
     sp_event_handlers_toggle (sp, state);
+
     mode_activate (sp, cpanel->mode, state, gg);
     mode_submenus_activate (sp, cpanel->mode, state, gg);
 
@@ -369,10 +370,17 @@ splot_add_rows (gint nrows, splotd *sp)
 }
 
 void
+splot_edges_realloc (splotd *sp, datad *e, ggobid *gg) {
+  sp->edges = (GdkSegment *) g_realloc ((gpointer) sp->edges,
+    e->edge.n * sizeof (GdkSegment));
+  sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
+    e->edge.n * sizeof (GdkSegment));
+}
+
+void
 splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
   datad *d = display->d;
   gint nr = d->nrows;
-  gint nl = d->edge.n;
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
@@ -381,30 +389,16 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
 
   switch (display->displaytype) {
     case scatterplot:
-      sp->edges = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));
-      sp->arrowheads = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));
-      break;
     case scatmat:
-      sp->edges = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));
-      sp->arrowheads = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));
-      break;
+    break;
     case parcoords:
       sp->whiskers = (GdkSegment *) g_malloc (2 * nr * sizeof (GdkSegment));
-      break;
-   case tsplot:
+    break;
+    case tsplot:
       sp->whiskers = (GdkSegment *) g_malloc ((nr-1) * sizeof (GdkSegment));
-      break;
+    break;
   }
 }
-
-void
-splot_edges_realloc (splotd *sp, datad *d, ggobid *gg) {
-  sp->edges = (GdkSegment *) g_realloc ((gpointer) sp->edges,
-    d->edge.n * sizeof (GdkSegment));
-  sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
-    d->edge.n * sizeof (GdkSegment));
-}
-
 void
 splot_free (splotd *sp, displayd *display, ggobid *gg) {
 

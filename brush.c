@@ -134,7 +134,7 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
     }
   }
   if (edge_painting_p) {
-    for (k=0; k<e->edge.n; m++) {
+    for (k=0; k<e->edge.n; k++) {
       e->color_now.els[k] = e->color.els[k];
       e->hidden_now.els[k] = e->hidden.els[k];
     }
@@ -145,9 +145,6 @@ void
 brush_set_pos (gint x, gint y, splotd *sp) {
   brush_coords *brush = &sp->brush_pos;
   brush_coords *obrush = &sp->brush_pos_o;
-/*
-  brush_coords *brush_pos = &sp->brush_pos;
-*/
   gint xdist = brush->x2 - brush->x1 ;
   gint ydist = brush->y2 - brush->y1 ;
 
@@ -499,6 +496,7 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
 
+
 /* setting the value of doit */
   if (!changed) {
     if (hit_by_brush[i])
@@ -753,10 +751,10 @@ xed_by_brush (gint k, datad *e, ggobid *gg)
   glong y2 = sp->brush_pos.y2;
   endpointsd *endpoints = e->edge.endpoints;
 
-  glong ax = sp->screen[endpoints[k].a - 1].x;
-  glong ay = sp->screen[endpoints[k].a - 1].y;
-  glong bx = sp->screen[endpoints[k].b - 1].x;
-  glong by = sp->screen[endpoints[k].b - 1].y;
+  glong ax = sp->screen[endpoints[k].a].x;
+  glong ay = sp->screen[endpoints[k].a].y;
+  glong bx = sp->screen[endpoints[k].b].x;
+  glong by = sp->screen[endpoints[k].b].y;
 
   glong x, y;
   extern gint lines_intersect (glong, glong, glong, glong, 
@@ -777,13 +775,14 @@ xed_by_brush (gint k, datad *e, ggobid *gg)
 static gboolean
 build_edge_color_vectors (datad *e, ggobid *gg)
 {
-  gint k;
+  gint i, k;
   gboolean changed = false;
 
-  for (k=0; k<e->nrgroups; k++) {
+  if (e->nrgroups > 0) {
+
+    for (k=0; k<e->nrgroups; k++) {
 
     /* update the edge color vectors for every member of the edge group */
-    if (e->nrgroups > 0) {
 /*
       gint n, p, gp;
       gp = e->rgroup_ids[k];
@@ -795,8 +794,11 @@ build_edge_color_vectors (datad *e, ggobid *gg)
 */
     /* */
 
-    } else {  /* update the vectors for this point only */
-      changed = update_color_vectors (k, changed, e->edge.xed_by_brush.els,
+    }
+
+  } else {  /* update the vectors for this point only */
+    for (i=0; i<e->edge.n; i++) {
+      changed = update_color_vectors (i, changed, e->edge.xed_by_brush.els,
         e, gg);
     }
   }
@@ -869,17 +871,17 @@ active_paint_edges (datad *d, datad *e, ggobid *gg)
       /* */
     }
   }
-
   changed = false;
 
   if (cpanel->brush_on_p) {
     switch (cpanel->br_target) {
       case BR_CANDG:  /*-- color and glyph --*/
       case BR_COLOR:  /*-- color --*/
-        if (build_edge_color_vectors (d, gg)) changed = true;
+        if (build_edge_color_vectors (e, gg))
+          changed = true;
         break;
       case BR_HIDE:  /*-- hidden --*/
-        if (build_edge_hidden_vectors (d, gg)) changed = true;
+        if (build_edge_hidden_vectors (e, gg)) changed = true;
         break;
     }
   }
