@@ -353,25 +353,28 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
   for (i=0; i<d->nrows_in_plot; i++) {
     m = d->rows_in_plot.els[i];
 
-    if (d->color_now.els[m] == current_color &&
-        splot_plot_case (m, d, sp, display, gg) &&
-        (draw_hidden == d->hidden_now.els[m]))
-    {
-      if (display->options.points_show_p) {
-        build_glyph (&d->glyph_now.els[m], sp->screen, m,
-          sp->win32.points, &npt,           sp->win32.segs, &nseg,
-          sp->win32.open_rects, &nr_open,   sp->win32.filled_rects, &nr_filled,
-          sp->win32.open_arcs, &nc_open,    sp->win32.filled_arcs, &nc_filled);
+    if (splot_plot_case (m, d, sp, display, gg)) {
+      if ((draw_hidden && d->hidden_now.els[m]) ||  /*-- drawing hiddens --*/
+         (d->color_now.els[m] == current_color &&   /*-- drawing unhiddens --*/
+              !draw_hidden && !d->hidden_now.els[m]))
+      {
+        if (display->options.points_show_p) {
+          build_glyph (&d->glyph_now.els[m], sp->screen, m,
+            sp->win32.points, &npt,         sp->win32.segs, &nseg,
+            sp->win32.open_rects, &nr_open, sp->win32.filled_rects, &nr_filled,
+            sp->win32.open_arcs, &nc_open,  sp->win32.filled_arcs, &nc_filled);
 
-        if ((GTK_IS_GGOBI_PARCOORDS_DISPLAY(display) || GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display)) &&
-            display->options.whiskers_show_p)
-        {
-          build_whisker_segs (m, &nwhisker_segs, sp);
-        } else if (GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(display) &&
-                   projection_get(gg) == P1PLOT &&
-                   cpanel->p1d.type == ASH &&
-                   cpanel->p1d.ASH_add_lines_p) {
-          build_ash_segs (m, &nash_segs, sp);
+          if ((GTK_IS_GGOBI_PARCOORDS_DISPLAY(display) ||
+               GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display)) &&
+              display->options.whiskers_show_p)
+          {
+            build_whisker_segs (m, &nwhisker_segs, sp);
+          } else if (GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(display) &&
+                     projection_get(gg) == P1PLOT &&
+                     cpanel->p1d.type == ASH &&
+                     cpanel->p1d.ASH_add_lines_p) {
+            build_ash_segs (m, &nash_segs, sp);
+          }
         }
       }
     }

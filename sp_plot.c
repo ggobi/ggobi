@@ -161,7 +161,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
       if (!f) {
 #ifdef WIN32
-      win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
+        win32_draw_to_pixmap_unbinned (-1, sp, draw_hidden, gg);
 #else
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot.els[i];
