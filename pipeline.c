@@ -63,7 +63,7 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
   vectorb_alloc (&d->excluded, nr);
 }
 
-static void
+void
 pipeline_arrays_check_dimensions (datad *d)
 {
   gint n;
@@ -116,7 +116,7 @@ pipeline_arrays_check_dimensions (datad *d)
 
   /*-- d->rows_in_plot --*/
   if (d->rows_in_plot.nels < d->nrows)
-    arrayg_add_rows (&d->jitdata, d->nrows);
+    arrayg_add_rows (&d->rows_in_plot, d->nrows);
 }
 
 /*-------------------------------------------------------------------------*/
