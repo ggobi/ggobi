@@ -16,6 +16,19 @@ display_open_cb (GtkWidget *w, datad *d)
   display_create (display_type, missing_p, d, gg);
 }
 
+
+gchar *
+datasetName(datad *d, int which)
+{
+  gchar *lbl = (gchar *)NULL;
+   if(d->name && d->name[0])
+     lbl = g_strdup(d->name);
+   else
+     lbl = g_strdup_printf ("data matrix %d", which);
+
+ return(lbl);
+}
+
 void
 display_menu_build (ggobid *gg)
 {
@@ -48,11 +61,12 @@ display_menu_build (ggobid *gg)
         NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
 
       for (k=0; k<nd; k++) { 
-        lbl = g_strdup_printf ("data matrix %d", k);
+        datad *d = (datad*) g_slist_nth_data (gg->d, k);
+	lbl = datasetName(d, k);
         item = CreateMenuItem (submenu, lbl,
           NULL, NULL, gg->display_menu, gg->main_accel_group,
           GTK_SIGNAL_FUNC (display_open_cb),
-          g_slist_nth_data (gg->d, k), gg);
+          d, gg);
         gtk_object_set_data (GTK_OBJECT (item),
           "displaytype", GINT_TO_POINTER (scatterplot));
         gtk_object_set_data (GTK_OBJECT (item),
@@ -79,7 +93,8 @@ display_menu_build (ggobid *gg)
         NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
 
       for (k=0; k<nd; k++) { 
-        lbl = g_strdup_printf ("data matrix %d", k);
+        datad *d = (datad*) g_slist_nth_data (gg->d, k);
+	lbl = datasetName(d, k);
         item = CreateMenuItem (submenu, lbl,
           NULL, NULL, gg->display_menu, gg->main_accel_group,
           GTK_SIGNAL_FUNC (display_open_cb),
@@ -110,7 +125,8 @@ display_menu_build (ggobid *gg)
         NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
 
       for (k=0; k<nd; k++) { 
-        lbl = g_strdup_printf ("data matrix %d", k);
+        datad *d = (datad*) g_slist_nth_data (gg->d, k);
+	lbl = datasetName(d, k);
         item = CreateMenuItem (submenu, lbl,
           NULL, NULL, gg->display_menu, gg->main_accel_group,
           GTK_SIGNAL_FUNC (display_open_cb),
