@@ -196,146 +196,6 @@ varcircles_delete_nth (gint jvar, datad *d)
 }
 
 
-/*
- * This is unfortunately needed for now because no widgets have
- * been realized yet when this is first called.
- *
- * I'm not sure which layout should be first; this does it row-wise.
-*/
-void
-varcircles_layout_init (datad *d, ggobid *gg)
-{
-/*
-  gint tncols = 0, tnrows = 0;
-  gint NCOLS = 5;
-
-  tncols = (d->ncols == 0) ? 0 : MIN (NCOLS, d->ncols);
-  if (tncols) {
-    tnrows = d->ncols / tncols;
-    if (tnrows * tncols < d->ncols) tnrows++;
-  }
-
-  d->vcirc_ui.tncols = tncols;
-  d->vcirc_ui.tnrows = tnrows;
-*/
-  d->vcirc_ui.tncols = 1;
-  d->vcirc_ui.tnrows = d->ncols;
-}
-
-#ifdef CIRCLES_IN_TABLE
-void
-varcircles_layout_reset (gint ncols, datad *d, ggobid *gg)
-{
-  gint j;
-  GtkWidget *vb;
-  gint tnrows, tncols;
-  gint left_attach, top_attach;
-  GtkAdjustment *adj;
-
-  /*-- let's see if this works ---*/
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
-    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-
-  /*-- we need any old vb; loop in case the first vars were deleted --*/
-  vb = NULL;
-  j = 0;
-  while (vb == NULL && j < ncols)
-    vb = varcircles_get_nth (VB, j++, d);
-
-  if (gg->varpanel_ui.layoutByRow) {
-    gint vport_width, vb_width;
-
-    adj = gtk_scrolled_window_get_hadjustment (
-      GTK_SCROLLED_WINDOW (d->vcirc_ui.swin));
-    vport_width = adj->page_size;
-
-    /*
-     * if the varcircles have never been exposed, can't use page_size,
-     * so just keep adding rows
-    */
-    if (vport_width == 0) {
-      while (ncols > d->vcirc_ui.tncols * d->vcirc_ui.tnrows)
-        d->vcirc_ui.tnrows++;
-    } else {  /*-- fill the available space as best we can --*/
-      vb_width = vb->allocation.width;
-      if (vb_width < 5) vb_width = VAR_CIRCLE_DIAM;
-      tncols = MIN (vport_width / vb_width, ncols);
-      tnrows = ncols / tncols;
-      if (tnrows * tncols < ncols) tnrows++;
-      d->vcirc_ui.tncols = tncols;
-      d->vcirc_ui.tnrows = tnrows;
-    }
-
-  } else {
-    gint vport_height, vb_height;
-
-    adj = gtk_scrolled_window_get_vadjustment (
-      GTK_SCROLLED_WINDOW (d->vcirc_ui.swin));
-    vport_height = adj->page_size;
-
-    if (vport_height == 0) {
-      while (ncols > d->vcirc_ui.tncols * d->vcirc_ui.tnrows)
-        d->vcirc_ui.tncols++;
-    } else {
-      vb_height = vb->allocation.height;
-      if (vb_height < 5) vb_height = VAR_CIRCLE_DIAM;  /*-- a bit low ... --*/
-
-      tnrows = MIN (vport_height / vb_height, ncols);
-      tncols = ncols / tnrows;
-      if (tnrows * tnrows < ncols) tncols++;
-      d->vcirc_ui.tncols = tncols;
-      d->vcirc_ui.tnrows = tnrows;
-    }
-  }
-
-  for (j=0; j<ncols; j++) {
-    /*-- if they're in the container, ref and remove them --*/
-    vb = varcircles_get_nth (VB, j, d);
-    if (vb != NULL && vb->parent != NULL && vb->parent == d->vcirc_ui.table)
-    {
-      gtk_widget_ref (vb);
-      gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), vb);
-    }
-  }
-
-  gtk_table_resize (GTK_TABLE (d->vcirc_ui.table),
-                    d->vcirc_ui.tnrows, d->vcirc_ui.tncols);
-
-  left_attach = top_attach = 0;
-  for (j=0; j<ncols; j++) {
-    vb = varcircles_get_nth (VB, j, d);
-
-    /*-- attach the first one at 0,0 --*/
-    gtk_table_attach (GTK_TABLE (d->vcirc_ui.table),
-      vb,
-      left_attach, left_attach+1, top_attach, top_attach+1,
-      GTK_FILL, GTK_FILL, 0, 0);
-
-#if GTK_MAJOR_VERSION == 1
-      if (GTK_OBJECT (vb)->ref_count > 1)
-        gtk_widget_unref (vb);
-#else
-      if (G_OBJECT (vb)->ref_count > 1)
-        gtk_widget_unref (vb);
-#endif
-
-    if (gg->varpanel_ui.layoutByRow) {
-      left_attach++; 
-      if (left_attach == d->vcirc_ui.tncols) {
-        left_attach = 0;
-        top_attach++;
-      }
-    } else {
-      top_attach++; 
-      if (top_attach == d->vcirc_ui.tnrows) {
-        top_attach = 0;
-        left_attach++;
-      }
-    }
-  }
-}
-#endif
-
 void
 varcircle_label_set (gint j, datad *d)
 {
@@ -343,23 +203,6 @@ varcircle_label_set (gint j, datad *d)
   vartabled *vt = vartable_element_get (j, d);
   if (w != NULL)
     gtk_label_set_text (GTK_LABEL(w), vt->collab_tform);
-}
-
-/*-- called from the Options menu --*/
-void
-varcircles_layout_cb (GtkCheckMenuItem *w, guint action) 
-{
-/*
-  GSList *l;
-  datad *d;
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-
-  gg->varpanel_ui.layoutByRow = !gg->varpanel_ui.layoutByRow;
-  for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
-    varcircles_layout_reset (d->ncols, d, gg);
-  }
-*/
 }
 
 
@@ -432,6 +275,50 @@ da_freeze_expose_cb (GtkWidget *w, GdkEvent *event, datad *d)
 }
 #endif
 
+/*-- hide the circles interface --*/
+void
+varcircles_show (gboolean show, datad *d, displayd *display, ggobid *gg)
+{
+  if (show) {
+    /*
+     * Add the ebox for the table of variable circles/rectangles
+     * to the paned widget
+    */
+    if (display)
+      varcircles_visibility_set (display, gg);
+    gtk_paned_pack2 (GTK_PANED (d->varpanel_ui.hpane),
+      d->vcirc_ui.ebox, true, true);
+    gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 10);
+    gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 15);
+
+    /*-- update the reference count for the ebox --*/
+#if GTK_MAJOR_VERSION == 1
+    if (GTK_OBJECT (d->vcirc_ui.ebox)->ref_count > 1)
+#else
+    if (G_OBJECT (d->vcirc_ui.ebox)->ref_count > 1)
+#endif
+      gtk_widget_unref (d->vcirc_ui.ebox);
+
+  } else {
+    /*-- remove circles/rectangles --*/
+    gtk_widget_ref (d->vcirc_ui.ebox);
+    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.hpane),
+                                         d->vcirc_ui.ebox);
+    gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+    gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+    /*-- set the handle position all the way to the right --*/
+    gtk_paned_set_position (GTK_PANED(d->varpanel_ui.hpane), -1);
+
+
+    /*-- adjust the reference count --*/
+#if GTK_MAJOR_VERSION == 1
+    if (GTK_OBJECT (d->vcbox_ui.ebox)->ref_count > 1)
+#else
+    if (G_OBJECT (d->vcbox_ui.ebox)->ref_count > 1)
+#endif
+      gtk_widget_unref (d->vcbox_ui.ebox);
+  }
+}
 
 /*-- create the variable circles interface --*/
 void
@@ -440,9 +327,6 @@ varcircles_populate (datad *d, ggobid *gg)
   gint j;
   GtkWidget *vb, *da;
 
-#ifdef CIRCLES_IN_TABLE 
-  varcircles_layout_init (d, gg);
-#endif
   d->vcirc_ui.jcursor = (gint) NULL;  /*-- start with the default cursor --*/
   d->vcirc_ui.cursor = (gint) NULL;
 
@@ -570,11 +454,6 @@ varcircles_delete (gint nc, gint jvar, datad *d, ggobid *gg)
       gdk_pixmap_unref (pix);
     }
   }
-
-#ifdef CIRCLES_IN_TABLE
-  /*-- this may not be enough; time will tell --*/
-  varcircles_layout_reset (d->ncols, d, gg);
-#endif
 }
 
 /*-- this destroys them all -- it's not yet called anywhere --*/
@@ -697,12 +576,6 @@ static void
 varcircle_pack (GtkWidget *vb, datad *d)
 {
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.table), vb, false, false, 2);
-
-#ifdef CIRCLES_IN_TABLE
-  gtk_table_attach (GTK_TABLE (d->vcirc_ui.table),
-    vb, j, j+1, i, i+1,
-    GTK_FILL, GTK_FILL, 0, 0);
-#endif
 }
 
 void
@@ -844,10 +717,6 @@ varcircles_add (gint nc, datad *d, ggobid *gg)
     vb = varcircle_create (j, d, gg);
     /*varcircle_pack (vb, d);*/
   }
-
-#ifdef CIRCLES_IN_TABLE
-  varcircles_layout_reset (nc, d, gg);
-#endif
 
   gtk_widget_show_all (gg->varpanel_ui.notebook);
 }

@@ -341,9 +341,6 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   for (j=ncols-1; j>=0; j--) {
     varcircles_delete_nth (cols[j], d);
   }
-#ifdef CIRCLES_IN_TABLE
-  varcircles_layout_reset (d->ncols-ncols, d, gg);
-#endif
 
   d->ncols -= ncols;
 

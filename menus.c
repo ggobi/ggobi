@@ -111,10 +111,6 @@ tour1d_menus_make (ggobid *gg) {
   CreateMenuItem (gg->menus.options_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuCheck (gg->menus.options_menu, "Lay out variable circles by row",
-    GTK_SIGNAL_FUNC (varcircles_layout_cb), NULL,
-    gg->varpanel_ui.layoutByRow, gg);
-
   CreateMenuCheck (gg->menus.options_menu, "Fade variables on de-selection",
     GTK_SIGNAL_FUNC (tour1d_fade_vars_cb), NULL,
     gg->tour1d.fade_vars, gg);
@@ -261,10 +257,6 @@ tourcorr_menus_make (ggobid *gg)
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Lay out variable circles by row",
-    GTK_SIGNAL_FUNC (varcircles_layout_cb), NULL,
-    gg->varpanel_ui.layoutByRow, gg);
 
   CreateMenuCheck (gg->menus.options_menu, "Fade variables on de-selection",
     GTK_SIGNAL_FUNC (tourcorr_fade_vars_cb), NULL,
@@ -564,7 +556,8 @@ viewmode_submenus_initialize (PipelineMode mode, ggobid *gg)
 }
 
 void
-viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display, ggobid *gg)
+viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display,
+  ggobid *gg)
 {
   PipelineMode mode = viewmode_get (gg);
 

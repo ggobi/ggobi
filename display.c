@@ -463,8 +463,12 @@ display_free (displayd* display, gboolean force, ggobid *gg)
     gtk_object_destroy(GTK_OBJECT(display));
 #endif
 
-  } else
-    quick_message ("Sorry, you can't delete the only display\n", false);
+  }
+
+  /*-- If there are no longer any displays, set ggobi's mode to NULLMODE --*/
+  if (g_list_length (gg->displays) == 0) {
+    GGOBI(full_viewmode_set) (NULLMODE, gg);
+  }
 }
 
 void
@@ -521,9 +525,10 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   gtk_accel_group_unlock (gg->main_accel_group);
 
-    /* Cleanup the old display first. Reset its title to show it is no longer active.
-       Clean up the control panel of the elements provided by this old display,
-       in order to get ready for the elements provided by the new display. */
+  /* Clean up the old display first. Reset its title to show it is no
+     longer active.
+     Clean up the control panel of the elements provided by this old display,
+     in order to get ready for the elements provided by the new display. */
 
   if (gg->firsttime == false && gg->current_display &&
       GTK_IS_GGOBI_WINDOW_DISPLAY(gg->current_display))
@@ -534,21 +539,20 @@ display_set_current (displayd *new_display, ggobid *gg)
       g_free (title); 
     }
 
-       /* Now cleanup the different control panel menus associated with this display.
-          Specifically, this gets rid of the ViewMode menu.
-        */
+    /* Now clean up the different control panel menus associated with
+       this display.  Specifically, this gets rid of the ViewMode menu.
+     */
     if(GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display)) {
-       /* Allow the extended display to override the submenu_destroy call.
-          If it doesn't provide a method, then call submenu_destroy. */
+     /* Allow the extended display to override the submenu_destroy call.
+        If it doesn't provide a method, then call submenu_destroy. */
       void (*f)(displayd *dpy, GtkWidget *) =
         GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(gg->current_display)->klass)->display_unset;
       if(f)
         f(gg->current_display, gg->viewmode_item);
       else
         submenu_destroy (gg->viewmode_item); /* default if no method provided. */
+      }
     }
-  }
-
 
   /* Now do the setup for the new display.  */
   if (GTK_IS_GGOBI_WINDOW_DISPLAY(new_display)) {

@@ -149,12 +149,16 @@ varpanel_permits_circles_or_checkboxes (gint mode)
 static gboolean
 varpanel_shows_circles (datad *d)
 {
-  return GTK_WIDGET_REALIZED (d->vcirc_ui.ebox);
+  return (d != NULL &&
+          d->vcirc_ui.ebox != NULL &&
+          GTK_WIDGET_REALIZED (d->vcirc_ui.ebox));
 }
 static gboolean
 varpanel_shows_checkboxes (datad *d)
 {
-  return GTK_WIDGET_REALIZED (d->vcbox_ui.ebox);
+  return (d != NULL &&
+          d->vcbox_ui.ebox != NULL &&
+          GTK_WIDGET_REALIZED (d->vcbox_ui.ebox));
 }
 
 void
@@ -163,48 +167,24 @@ varpanel_reinit (ggobid *gg)
   datad *d;
   gboolean highd;
   displayd *display = gg->current_display;
-  if (display == NULL) return;
 
-  d = display->d;
-  highd = varpanel_highd (display);
+  if (display == NULL) {
+    if (g_slist_length (gg->d) > 0) {
+      d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+      /* if the circles are showing, hide them */
+      if (varpanel_shows_circles (d)) {
+        varcircles_show (false, d, display, gg);
+      }
+    }
+  } else {  /*-- if there is a display present --*/
+    d = display->d;
+    highd = varpanel_highd (display);
 
-  if (highd && varpanel_shows_checkboxes (d)) {
-    /*
-     * Add the ebox for the table of variable circles/rectangles
-     * to the paned widget
-    */
-    varcircles_visibility_set (display, gg);
-    gtk_paned_pack2 (GTK_PANED (d->varpanel_ui.hpane),
-      d->vcirc_ui.ebox, true, true);
-    gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 10);
-    gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 15);
-
-    /*-- update the reference count for the ebox --*/
-#if GTK_MAJOR_VERSION == 1
-    if (GTK_OBJECT (d->vcirc_ui.ebox)->ref_count > 1)
-#else
-    if (G_OBJECT (d->vcirc_ui.ebox)->ref_count > 1)
-#endif
-      gtk_widget_unref (d->vcirc_ui.ebox);
-
-  } else if (!highd && varpanel_shows_circles (d)) {
-    /*-- remove circles/rectangles --*/
-    gtk_widget_ref (d->vcirc_ui.ebox);
-    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.hpane),
-                                         d->vcirc_ui.ebox);
-    gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
-    gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
-    /*-- set the handle position all the way to the right --*/
-    gtk_paned_set_position (GTK_PANED(d->varpanel_ui.hpane), -1);
-
-
-    /*-- adjust the reference count --*/
-#if GTK_MAJOR_VERSION == 1
-    if (GTK_OBJECT (d->vcbox_ui.ebox)->ref_count > 1)
-#else
-    if (G_OBJECT (d->vcbox_ui.ebox)->ref_count > 1)
-#endif
-      gtk_widget_unref (d->vcbox_ui.ebox);
+    if (highd && varpanel_shows_checkboxes (d)) {
+      varcircles_show (true, d, display, gg);
+    } else if (!highd && varpanel_shows_circles (d)) {
+      varcircles_show (false, d, display, gg);
+    }
   }
 }
 
@@ -264,24 +244,27 @@ viewmode_set (PipelineMode m, ggobid *gg)
    * type is selected.  (For parcoords and scatmat plots, the
    * value of projection is irrelevant.)
   */
-   {
+  if (display) {
     GtkGGobiExtendedDisplayClass *klass;
     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
     if(klass->viewmode_set)
-        klass->viewmode_set(display, gg);
-   }
+       klass->viewmode_set(display, gg);
+  }
 
-   if (gg->viewmode != gg->prev_viewmode) {
+  if (gg->viewmode != gg->prev_viewmode) {
     /* 
      * If moving between modes whose variable selection interface
      * differs, swap in the correct display.
      */
-    varpanel_reinit (gg);
+     varpanel_reinit (gg);
   }
 
   gg->prev_viewmode = gg->viewmode;
 
-  varpanel_tooltips_set (display, gg);
+  if (display) {  /*-- does this need to handle the null display argument? --*/
+    varpanel_tooltips_set (display, gg);
+  }
+
   varpanel_refresh (display, gg);
 }
 
@@ -495,6 +478,14 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
 
 /**/  return (action);
     }
+  } else {  /* if there's no display */
+
+    viewmode_set (NULLMODE, gg);
+    /*-- need to remove console menus: Options, Reset, ... --*/
+    viewmode_submenus_update (prev_viewmode, NULL, gg);
+    submenu_destroy (gg->viewmode_item);
+
+/**/return (NULLMODE);
   }
 
   return(-1);

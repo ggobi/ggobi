@@ -525,9 +525,9 @@ void       varcircle_label_set (gint, datad *);
 void       varcircles_add (gint ncols, datad *, ggobid *);
 void       varcircles_cursor_set_default (datad *d);
 void       varcircles_delete_nth (gint j, datad *);
-void       varcircles_layout_cb (GtkCheckMenuItem *w, guint action);
 void       varcircles_populate (datad *, ggobid *);
 void       varcircles_refresh (datad *, ggobid *);
+void       varcircles_show (gboolean, datad *, displayd *, ggobid *);
 void       varcircles_visibility_set (displayd *display, ggobid *gg);
 void       vardialog_open (ggobid *, gchar *title);
 void       variable_clone (gint, const gchar *, gboolean, datad *, ggobid *);
@@ -661,10 +661,6 @@ void cpanel_barchart_set (cpaneld *cpanel, GtkWidget *panel, ggobid *gg);
 void barchart_scale_event_handlers_toggle(splotd *sp, gboolean state);
 
 displayd *barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, datad * d, ggobid * gg);
-#endif
-
-#ifdef CIRCLES_IN_TABLE
-void       varcircles_layout_reset (gint ncols, datad *, ggobid *);
 #endif
 
 

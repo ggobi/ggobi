@@ -194,11 +194,34 @@ void
 varpanel_refresh (displayd *display, ggobid *gg) 
 {
   splotd *sp = gg->current_splot;
-  datad *d = display->d;
+  datad *d;
 
-  if (sp != NULL && d != NULL) {
-    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-      GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->varpanel_refresh(display, sp, d);
+  if (display) {
+    d = display->d;
+
+    if (sp != NULL && d != NULL) {
+      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->varpanel_refresh(display, sp, d);
+      }
+    }
+  } else {
+    /*
+     * if there's no display, but I can get hold of a datad,
+     * use it to turn off all the buttons.
+    */
+    if (g_slist_length (gg->d) > 0) {
+      d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+      if (d) {
+        gint j;
+        for (j=0; j<d->ncols; j++) {
+          /*varpanel_widget_set_visible (VARSEL_X, j, false, d);*/
+          varpanel_toggle_set_active (VARSEL_X, j, false, d);
+          varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+          varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+          varpanel_widget_set_visible (VARSEL_Z, j, false, d);
+        }
+      }
     }
   }
 }
@@ -209,8 +232,13 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   displayd *display = gg->current_display;
-  cpaneld *cpanel = &display->cpanel;
   splotd *sp = gg->current_splot;
+  cpaneld *cpanel;
+
+  if (display == NULL)
+    return 0;
+
+  cpanel = &display->cpanel;
 
   if (d != display->d)
     return true;

@@ -757,13 +757,15 @@ scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidget *w, GdkEv
 static void
 viewmodeSet(displayd *display, ggobid *gg)
 {
-  if (gg->viewmode <= COTOUR)
-    display->cpanel.projection = gg->viewmode;
-  gg->projection = display->cpanel.projection;
+  if (display) {
+    if (gg->viewmode <= COTOUR)
+      display->cpanel.projection = gg->viewmode;
+    gg->projection = display->cpanel.projection;
 
-  if (gg->projection != gg->prev_projection) {
-    scatterplot_show_rulers (display, gg->projection);
-    gg->prev_projection = gg->projection;
+    if (gg->projection != gg->prev_projection) {
+      scatterplot_show_rulers (display, gg->projection);
+      gg->prev_projection = gg->projection;
+    }
   }
 }
 
@@ -852,21 +854,21 @@ void
 displaySet(displayd *dpy, ggobid *gg)
 {
   scatterplot_mode_menu_make (gg->main_accel_group,
-			      (GtkSignalFunc) viewmode_set_cb, gg, true);
+    (GtkSignalFunc) viewmode_set_cb, gg, true);
   gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-				    gg->main_accel_group);
+    gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-			     gg->app.scatterplot_mode_menu); 
+    gg->app.scatterplot_mode_menu); 
   submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
 }
 
 static gboolean
 handlesAction(displayd *dpy,  PipelineMode v)
 {
-    if (v != SCATMAT && v != PCPLOT)
-      return(true);
+  if (v != SCATMAT && v != PCPLOT)
+    return(true);
 
-    return(false);
+  return(false);
 }
 
 
