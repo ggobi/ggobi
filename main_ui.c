@@ -513,13 +513,11 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) jitter_window_open,   
        0,
        NULL },
-#ifdef WEIGHTEDVIS_IMPLEMENTED
   { "/Tools/Visual weighting ...", 
        NULL,        
        (GtkItemFactoryCallback) wvis_window_open,   
        0,
        NULL },
-#endif
 
   /*-- Tools that apply to cases --*/
   { "/Tools/sep",     NULL, NULL, 0, "<Separator>" },

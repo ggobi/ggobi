@@ -107,6 +107,7 @@ SRC=\
     write_svg.c \
     writedata.c \
     writedata_ui.c \
+	wvis_ui.c \
     xlines.c \
     xyplot.c \
     xyplot_ui.c \
