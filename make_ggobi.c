@@ -234,7 +234,7 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
 
   globals_init(gg);  /*-- variables that don't depend on the data --*/
 
-  tour_manip_colors_init(gg);
+  special_colors_init (gg);
 
   wvis_init(gg);
   make_ui(gg);

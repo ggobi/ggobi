@@ -176,3 +176,65 @@ mouseinwindow (splotd *sp) {
           0 < sp->mousepos.y && sp->mousepos.y < sp->max.y) ;
 
 }
+
+/*--------------------------------------------------------------------*/
+/*              Drawing 3D sliders                                    */
+/*--------------------------------------------------------------------*/
+
+/* (x,y) is the center of the rectangle */
+void
+draw_3drectangle (GdkDrawable *drawable, gint x, gint y,
+  gint width, gint height, ggobid *gg)
+{
+  GdkPoint points[7];
+  gint w = width/2;
+  gint h = height/2;
+
+  /*-- draw the rectangles --*/
+  gdk_gc_set_foreground (gg->wvis.GC, &gg->mediumgray);
+  gdk_draw_rectangle (drawable, gg->wvis.GC, TRUE, x-w, y-h, width, height);
+
+  /*-- draw the dark shadows --*/
+  gdk_gc_set_foreground (gg->wvis.GC, &gg->darkgray);
+  points [0].x = x - w;
+  points [0].y = y + h;
+  points [1].x = x + w;
+  points [1].y = y + h;
+  points [2].x = x + w;
+  points [2].y = y - h;
+
+  points [3].x = points[2].x - 1;
+  points [3].y = points[2].y + 1;
+  points [4].x = points[1].x - 1;
+  points [4].y = points[1].y - 1;
+  points [5].x = points[0].x + 1;
+  points [5].y = points[0].y - 1;
+
+  points [6].x = x - w;
+  points [6].y = y + h;
+  gdk_draw_polygon (drawable, gg->wvis.GC, TRUE, points, 7);
+  gdk_draw_line (drawable, gg->wvis.GC, x-1, y-(h-1), x-1, y+(h-2));
+
+  /*-- draw the light shadows --*/
+  gdk_gc_set_foreground (gg->wvis.GC, &gg->lightgray);
+  points [0].x = x - w;  /*-- lower left --*/
+  points [0].y = y + (h-1);
+  points [1].x = x - w;  /*-- upper left --*/
+  points [1].y = y - h;
+  points [2].x = x + (w-1);  /*-- upper right --*/
+  points [2].y = y - h;
+
+  points [3].x = points[2].x - 1;
+  points [3].y = points[2].y + 1;
+  points [4].x = points[1].x + 1;
+  points [4].y = points[1].y + 1;
+  points [5].x = points[0].x + 1;
+  points [5].y = points[0].y - 1;
+
+  points [6].x = points[0].x;
+  points [6].y = points[0].y;
+  gdk_draw_polygon (drawable, gg->wvis.GC, TRUE, points, 7);
+  gdk_draw_line (drawable, gg->wvis.GC, x, y-(h-1), x, y+(h-2));
+}
+
+

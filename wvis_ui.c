@@ -488,7 +488,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gint x0, x1, k, hgt;
   gint x = xmargin;
   gint y = ymargin;
-  GdkPoint *points;
+  /*GdkPoint *points;*/
   gfloat diff;
   vartabled *vt;
   colorschemed *scheme = (gg->wvis.scheme != NULL) ?
@@ -535,84 +535,19 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   /*-- draw the horizontal lines --*/
   x0 = xmargin; y = ymargin + 10;
   x1 = xmargin + (w->allocation.width - 2*xmargin) - 1;
-  gdk_gc_set_foreground (gg->wvis.GC, &gg->wvis.gray2);
+  gdk_gc_set_foreground (gg->wvis.GC, &gg->mediumgray);
   for (k=0; k<scheme->n-1; k++) {
     gdk_draw_line (pix, gg->wvis.GC, x0, y, x1, y);
     y += hgt;
   }
 
-  /*-- draw rectangles, 20 x 10 for the moment --*/
+  /*-- draw rectangles, 20 x 10 --*/
   y = ymargin + 10;
-  gdk_gc_set_foreground (gg->wvis.GC, &gg->wvis.gray2);
   for (k=0; k<scheme->n-1; k++) {
     x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-    gdk_draw_rectangle (pix, gg->wvis.GC,
-                        TRUE, x-10, y-5, 20, 10);
+    draw_3drectangle (pix, x, y, 20, 10, gg);
     y += hgt;
   }
-
-
-  /*-- draw the dark shadows --*/
-  y = ymargin + 10;
-  points = (GdkPoint *) g_malloc (7 * sizeof (GdkPoint));
-  gdk_gc_set_foreground (gg->wvis.GC, &gg->wvis.gray1);
-  for (k=0; k<scheme->n-1; k++) {
-    x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-
-    points [0].x = x - 10;
-    points [0].y = y + 5;
-    points [1].x = x + 10;
-    points [1].y = y + 5;
-    points [2].x = x + 10;
-    points [2].y = y - 5;
-
-    points [3].x = points[2].x - 1;
-    points [3].y = points[2].y + 1;
-    points [4].x = points[1].x - 1;
-    points [4].y = points[1].y - 1;
-    points [5].x = points[0].x + 1;
-    points [5].y = points[0].y - 1;
-
-    points [6].x = x - 10;
-    points [6].y = y + 5;
-    gdk_draw_polygon (pix, gg->wvis.GC,
-                      TRUE, points, 7);
-    gdk_draw_line (pix, gg->wvis.GC, x-1, y-4, x-1, y+3);
-
-    y += hgt;
-  }
-  g_free (points);
-
-  /*-- draw the light shadows --*/
-  y = ymargin + 10;
-  points = (GdkPoint *) g_malloc (7 * sizeof (GdkPoint));
-  gdk_gc_set_foreground (gg->wvis.GC, &gg->wvis.gray3);
-  for (k=0; k<scheme->n-1; k++) {
-    x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-
-    points [0].x = x - 10;  /*-- lower left --*/
-    points [0].y = y + 4;
-    points [1].x = x - 10;  /*-- upper left --*/
-    points [1].y = y - 5;
-    points [2].x = x + 9;  /*-- upper right --*/
-    points [2].y = y - 5;
-
-    points [3].x = points[2].x - 1;
-    points [3].y = points[2].y + 1;
-    points [4].x = points[1].x + 1;
-    points [4].y = points[1].y + 1;
-    points [5].x = points[0].x + 1;
-    points [5].y = points[0].y - 1;
-
-    points [6].x = points[0].x;
-    points [6].y = points[0].y;
-    gdk_draw_polygon (pix, gg->wvis.GC,
-                      TRUE, points, 7);
-    gdk_draw_line (pix, gg->wvis.GC, x, y-4, x, y+3);
-
-    y += hgt;
-  }
-  g_free (points);
 
   /*-- add the variable limits in the top margin --*/
   if (d && selected_var != -1) {

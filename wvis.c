@@ -23,9 +23,6 @@
 void
 wvis_init (ggobid  *gg)
 {
-  GdkColormap *cmap = gdk_colormap_get_system ();
-  gboolean writeable = false, best_match = true, success;
-
   gg->wvis.window = NULL;
   gg->wvis.npct = 0;
   gg->wvis.n = NULL;
@@ -40,17 +37,4 @@ wvis_init (ggobid  *gg)
 
   gg->wvis.scheme = NULL;
   gg->wvis.GC = NULL;
-
-  gg->wvis.gray1.red = gg->wvis.gray1.blue = gg->wvis.gray1.green =
-    (guint16) (.3*65535.0);
-  success = gdk_colormap_alloc_color (cmap, &gg->wvis.gray1, writeable,
-    best_match);
-  gg->wvis.gray2.red = gg->wvis.gray2.blue = gg->wvis.gray2.green =
-    (guint16) (.5*65535.0);
-  success = gdk_colormap_alloc_color (cmap, &gg->wvis.gray2, writeable,
-    best_match);
-  gg->wvis.gray3.red = gg->wvis.gray3.blue = gg->wvis.gray3.green =
-    (guint16) (.7*65535.0);
-  success = gdk_colormap_alloc_color (cmap, &gg->wvis.gray3, writeable,
-    best_match);
 }

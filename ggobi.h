@@ -176,6 +176,7 @@ struct _ggobid {
 /*                         color                                      */
 /*--------------------------------------------------------------------*/
 
+  GdkColor mediumgray, lightgray, darkgray;  /* for 3d rectangles */
   GdkColor vcirc_freeze_color, vcirc_manip_color;   /* for variable circles */
   gshort color_id, color_0;     /* 0:ncolors-1 */
   gboolean mono_p;
@@ -341,7 +342,7 @@ struct _ggobid {
   struct _WeightedVis {
     GtkWidget *window, *entry_preview, *entry_applied, *da;
     GdkPixmap *pix;
-    GdkColor gray1, gray2, gray3;
+    /*GdkColor gray1, gray2, gray3;*/
 
     colorschemed *scheme; /*-- current color scheme --*/
 

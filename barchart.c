@@ -1410,7 +1410,8 @@ button_draw_with_shadows(GdkPoint * region, GdkDrawable * drawable,
 {
   colorschemed *scheme = gg->activeColorScheme;
 
-  gdk_gc_set_foreground(gg->plot_GC, &gg->wvis.gray3);
+  /*gdk_gc_set_foreground(gg->plot_GC, &gg->wvis.gray3);*/
+  gdk_gc_set_foreground(gg->plot_GC, &gg->lightgray);
   gdk_draw_polygon(drawable, gg->plot_GC, TRUE, region, 3);
 
 /* dark shadows */

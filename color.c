@@ -206,9 +206,10 @@ guint **getColorTable(ggobid * gg)
 }
 
 
-/*-- initialize the tour manip colors --*/
-void tour_manip_colors_init(ggobid * gg)
+/*-- initialize the tour manip colors and the shades of gray --*/
+void special_colors_init(ggobid * gg)
 {
+  GdkColormap *cmap = gdk_colormap_get_system ();
   gboolean writeable = false, best_match = true;
 
 /*
@@ -217,18 +218,32 @@ void tour_manip_colors_init(ggobid * gg)
   gg->vcirc_manip_color.red = (guint16) 65535;
   gg->vcirc_manip_color.green = (guint16) 0;
   gg->vcirc_manip_color.blue = (guint16) 65535;
-  if (!gdk_colormap_alloc_color(gdk_colormap_get_system(),
-                                &gg->vcirc_manip_color, writeable,
+  if (!gdk_colormap_alloc_color(cmap, &gg->vcirc_manip_color, writeable,
                                 best_match))
     g_printerr("trouble allocating vcirc_manip_color\n");
 
   gg->vcirc_freeze_color.red = (guint16) 0;
   gg->vcirc_freeze_color.green = (guint16) 64435;
   gg->vcirc_freeze_color.blue = (guint16) 0;
-  if (!gdk_colormap_alloc_color(gdk_colormap_get_system(),
-                                &gg->vcirc_freeze_color, writeable,
+  if (!gdk_colormap_alloc_color(cmap, &gg->vcirc_freeze_color, writeable,
                                 best_match))
     g_printerr("trouble allocating vcirc_freeze_color\n");
+
+  gg->darkgray.red = gg->darkgray.blue = gg->darkgray.green =
+    (guint16) (.3*65535.0);
+  if (!gdk_colormap_alloc_color (cmap, &gg->darkgray, writeable, best_match))
+    g_printerr("trouble allocating dark gray\n");
+  gg->mediumgray.red = gg->mediumgray.blue = gg->mediumgray.green =
+    (guint16) (.5*65535.0);
+  if (!gdk_colormap_alloc_color (cmap, &gg->mediumgray, writeable, best_match))
+    g_printerr("trouble allocating medium gray\n");
+  gg->lightgray.red = gg->lightgray.blue = gg->lightgray.green =
+    (guint16) (.7*65535.0);
+  if (!gdk_colormap_alloc_color (cmap, &gg->lightgray, writeable, best_match))
+    g_printerr("trouble allocating light gray\n");
+
+
+
 }
 
 void init_plot_GC(GdkWindow * w, ggobid * gg)

@@ -4,7 +4,6 @@
  of xgobi and converts it to the XML format used by ggobi.
  */
 
-
 #include <gtk/gtk.h>
 #include "write_xml.h"
 
@@ -31,7 +30,7 @@ main (gint argc, gchar *argv[])
 
   gg->displays = NULL;
   globals_init (gg); /*-- variables that don't depend on the data --*/
-  tour_manip_colors_init (gg);  /*-- move to tour code --*/
+  special_colors_init(gg);
 
   fileset_read (fileName, gg);
 

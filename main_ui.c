@@ -841,7 +841,7 @@ create_ggobi(InputDescription *desc)
      /*-- some initializations --*/
   gg->displays = NULL;
   globals_init (gg);      /*-- variables that don't depend on the data --*/
-  tour_manip_colors_init (gg); /*-- move to the tour code --*/
+  special_colors_init (gg);
   make_ui (gg);
   gg->input = desc;
 
