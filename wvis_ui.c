@@ -208,20 +208,27 @@ static void
 record_colors_reset (gint selected_var, datad *d, ggobid *gg)
 {
   gint i, k, m;
+  gint nd = g_slist_length(gg->d);
   vartabled *vt;
-  gfloat min;
-  gfloat max;
-  gfloat val;
+  gfloat min, max, val;
   colorschemed *scheme;
 
-  if(selected_var < 0)
-      return;
+  if (selected_var < 0)
+    return;
 
+  /*
+   * If the user is moving the bar boundaries, but just messing
+   * about with a preview color scheme without having applied it,
+   * then we're not going to reset the colors.
+  */
+  if (gg->wvis.scheme != NULL && gg->wvis.scheme != gg->activeColorScheme)
+    return;
+  
   vt = vartable_element_get (selected_var, d);
-  scheme = gg->activeColorScheme;
-
   min = vt->lim_tform.min;
   max = vt->lim_tform.max;
+  scheme = gg->activeColorScheme;
+
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];
     for (k=0; k<scheme->n; k++) {
@@ -231,6 +238,8 @@ record_colors_reset (gint selected_var, datad *d, ggobid *gg)
         break;
       }
     }
+    if (nd > 1 && !gg->linkby_cv)
+      symbol_link_by_id (true, i, d, gg);  /*-- true = force persistent --*/
   }
 }
 
@@ -272,7 +281,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
           (gfloat) (w->allocation.width - 2*xmargin);
 
     /*-- don't allow it to cross its neighbors' boundaries --*/
-    if ((color == 0 && val <= gg->wvis.pct[color+1]) ||
+    if ((color == 0 && val <= gg->wvis.pct[color+1] && val >= 0) ||
         (color == gg->wvis.npct-1 && val >= gg->wvis.pct[color+1]) ||
         (val >= gg->wvis.pct[color-1] && val <= gg->wvis.pct[color+1]))
     {
@@ -823,38 +832,22 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint selected_var = get_one_selection_from_clist (clist, d);
-  vartabled *vt;
   colorschemed *scheme = (gg->wvis.scheme != NULL) ?
     gg->wvis.scheme : gg->activeColorScheme;
 
   if (d && selected_var != -1) {
-    gint i, m, k;
-    gfloat min, max;
-    gfloat val;
     gboolean rval = false;
 
     /*
      * If we've been using gg->wvis.scheme, set gg->activeColorScheme
      * to this scheme.
     */
-    if (gg->wvis.scheme)
+    if (gg->wvis.scheme) {
       gg->activeColorScheme = gg->wvis.scheme;
-
-    vt = vartable_element_get (selected_var, d);
-    min = vt->lim_tform.min;
-    max = vt->lim_tform.max;
-
-    for (m=0; m<d->nrows_in_plot; m++) {
-      i = d->rows_in_plot[m];
-
-      for (k=0; k<scheme->n; k++) {
-        val = min + gg->wvis.pct[k] * (max - min);
-        if (d->tform.vals[i][selected_var] <= val) {
-          d->color.els[i] = d->color_now.els[i] = k;
-          break;
-        }
-      }
+      entry_set_scheme_name (gg);
     }
+
+    record_colors_reset (selected_var, d, gg);
     clusters_set (d, gg);
 
     /*-- before calling displays_plot, reset brushing color if needed --*/

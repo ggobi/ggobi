@@ -701,7 +701,7 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
         }
 
         /*-- link by id --*/
-        if (!gg->linkby_cv && nd > 1) symbol_link_by_id (j, d, gg);
+        if (!gg->linkby_cv && nd > 1) symbol_link_by_id (false, j, d, gg);
         /*-- --*/
       }
     }
@@ -886,7 +886,7 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
     }
 
     /*-- link by id --*/
-    if (!gg->linkby_cv && nd > 1) symbol_link_by_id (i, e, gg);
+    if (!gg->linkby_cv && nd > 1) symbol_link_by_id (false, i, e, gg);
     /*-- --*/
   }
 

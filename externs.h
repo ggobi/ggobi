@@ -421,7 +421,7 @@ gboolean   subset_range (greal min, greal max, gint j, datad *d, ggobid *gg);
 gboolean   subset_rowlab (gchar *, datad *, ggobid *);
 gboolean   subset_sticky (datad *, ggobid *);
 void       subset_window_open (ggobid *, guint, GtkWidget *);
-void       symbol_link_by_id (gint k, datad *source_d, ggobid *gg);
+void       symbol_link_by_id (gboolean persistentp, gint k, datad *source_d, ggobid *gg);
 gint       symbol_table_populate (datad *d);
 void       symbol_window_redraw (ggobid *);
 void       t1d_clear_ppda (displayd *, ggobid *);

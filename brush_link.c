@@ -17,7 +17,7 @@
 /*                Linking to other datad's by id                        */
 /*----------------------------------------------------------------------*/
 
-void symbol_link_by_id(gint k, datad * sd, ggobid * gg)
+void symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
 {
 /*-- sd = source_d --*/
   datad *d;
@@ -28,9 +28,9 @@ void symbol_link_by_id(gint k, datad * sd, ggobid * gg)
 
   /*-- k is the row number in source_d --*/
 
-  if(sd->rowIds) {
+  if (sd->rowIds) {
     gpointer ptr = g_hash_table_lookup(sd->idTable, sd->rowIds[k]);
-    if(ptr)
+    if (ptr)
       id = * ((guint *)ptr);
   } else if (sd->rowid.id.nels > 0) 
     id = sd->rowid.id.els[k];
@@ -61,10 +61,8 @@ void symbol_link_by_id(gint k, datad * sd, ggobid * gg)
 
         /*-- if we get here, d has one case with the indicated id --*/
         if (d->sampled.els[i]) {
-          switch (cpanel->br_mode) {
 
-            /*-- if persistent, handle all target types --*/
-            case BR_PERSISTENT:
+          if (persistentp || cpanel->br_mode == BR_PERSISTENT) {
 
             /*
              * make it link for everything, no matter
@@ -73,25 +71,23 @@ void symbol_link_by_id(gint k, datad * sd, ggobid * gg)
              * gets messed up.
              */
 
-              if (!d->hidden_now.els[i]) {
-                d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
-                d->glyph.els[i].size = d->glyph_now.els[i].size =
-                  sd->glyph.els[k].size;
-                d->glyph.els[i].type = d->glyph_now.els[i].type =
-                  sd->glyph.els[k].type;
-              }
-              d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
-              break;
+            if (!d->hidden_now.els[i]) {
+              d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
+              d->glyph.els[i].size = d->glyph_now.els[i].size =
+                sd->glyph.els[k].size;
+              d->glyph.els[i].type = d->glyph_now.els[i].type =
+                sd->glyph.els[k].type;
+            }
+            d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
 
-            /*-- if transient, handle all target types --*/
-            case BR_TRANSIENT:
-              if (!d->hidden_now.els[i]) {
-                d->color_now.els[i] = sd->color_now.els[k];
-                d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
-                d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
-              }
-              d->hidden_now.els[i] = sd->hidden_now.els[k];
-            break;
+          } else if (cpanel->br_mode == BR_TRANSIENT) {
+
+            if (!d->hidden_now.els[i]) {
+              d->color_now.els[i] = sd->color_now.els[k];
+              d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
+              d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
+            }
+            d->hidden_now.els[i] = sd->hidden_now.els[k];
           }
         }
     }
