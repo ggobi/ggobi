@@ -1,17 +1,16 @@
 XML format
- a. Read in a set of colormaps  (dfs: build at least 2 examples)
+ a. Read in a set of colormaps  (in progress)
     Question: How should a user specify in an xml data file which
        colormap to use?)
- b. Read in scaling limits for a variable (dfs: pop them into the
-       variable manipulation table)
- c. Handle <categoricalvariable> (dfs: ditto)
- d. Does 'write_xml' handle all this information?
+ b. Read in scaling limits for a variable (Done)
+ c. Handle <categoricalvariable> (This is now being read correctly.)
+ d. Does 'write_xml' handle all this information?  (Not missings)
 
 manual
  Review and update to respond to recent changes in the design
 
 test scripts, demos
- Test the missing values functionality
+ Test the missing values functionality  (the basics are now working)
  Make a directory for RSggobi scripts; baptize it with ratcns.S
 
 web site
@@ -19,15 +18,20 @@ web site
  Review instructions to users
 
 Do we want a man page?
+  One exists, but it's very sketchy.  It documents the ascii
+  file format and points people to the documentation.
 
 Known bugs:
   If a new datad is added, the transformation, jittering, and
     brush_by_variable tools will not show it in their
-    notebooks of variable lists.
+    notebooks of variable lists.  When a datad is added, perhaps
+    it should destroy those tool windows so they would be 
+    reinitialized the next time they're opened.  Or should they
+    each have a reinit button?
 
 GUI
-  'delete variable' hasn't been implemented
-  Does the sphering tool need a notebook of variable lists?
+  'delete variable' hasn't been implemented -- and probably won't
+      be for a while.
 
 RSggobi
   Work out some setData issues: when adding new data, we want to
