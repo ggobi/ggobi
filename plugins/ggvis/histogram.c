@@ -504,14 +504,22 @@ ggv_Dtarget_histogram_update (ggvisd *ggv, ggobid *gg)
 
   /* Given that the grip has changed, reset the included bars */
 
+  /*
+   * Just moved this before the next loop instead of after it.  This
+   * routine sets the values of D->bars, which have to be correct before
+   * we figure out what's included. I don't see that it does any harm,
+   * but I should ask Andreas to test it.  dfs, 2 Feb 2004
+ */
+  histogram_make (ggv);
+
   for (k=0; k<D->nbins; k++) {
     if (D->bars[k].x >= D->lgrip_pos &&
-        D->bars[k].x + D->bars[k].width <= D->rgrip_pos)
+        D->bars[k].x + D->bars[k].width <= D->rgrip_pos) {
       D->bars_included.els[k] = true;
-    else
+    } else {
       D->bars_included.els[k] = false;
+    }
   }
 
-  histogram_make (ggv);
   histogram_draw (ggv, gg);
 }
