@@ -304,12 +304,15 @@ recenter_data (gint i, datad *d, ggobid *gg) {
 
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get (j, d);
-
-    x = (vt->lim_tform.max - vt->lim_tform.min)/2;
-
-    vt->lim_specified_p = true;
-    vt->lim_specified_tform.min = d->tform.vals[i][j] - x;
-    vt->lim_specified_tform.max = d->tform.vals[i][j] + x;
+    if (i >= 0) {
+      x = (vt->lim_tform.max - vt->lim_tform.min)/2;
+      vt->lim_specified_p = true;
+      vt->lim_specified_tform.min = d->tform.vals[i][j] - x;
+      vt->lim_specified_tform.max = d->tform.vals[i][j] + x;
+    } else {
+     /*-- if no point was specified, recenter using defaults --*/
+      vt->lim_specified_p = false;
+    }
   }
   limits_set (false, true, d, gg);
   vartable_limits_set (d);
