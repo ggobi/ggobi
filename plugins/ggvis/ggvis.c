@@ -69,7 +69,6 @@ static const gchar *const dsource_lbl[] = {"Unweighted", "D from variable"};
 static const gchar *const metric_lbl[] = {"Metric MDS", "Nonmetric MDS"};
 static const gchar *const kruskal_lbl[] = {"Kruskal", "Classic"};
 static const gchar *const groups_lbl[] = {
-  "Scale all",
   "Within groups",
   "Between groups",
   "Anchors scale",
@@ -678,12 +677,14 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
   btn = gtk_check_button_new_with_label ("Use brush groups");
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+    GTK_SIGNAL_FUNC (ggv_brush_groupsp_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
   opt = gtk_option_menu_new ();
   populate_option_menu (opt, (gchar**) groups_lbl,
     sizeof (groups_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) ggv_groups_cb, "PluginInst", inst);
+    (GtkSignalFunc) ggv_brush_groups_opt_cb, "PluginInst", inst);
   gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 2);
 
   label = gtk_label_new ("Groups");
@@ -781,6 +782,9 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   label = gtk_label_new ("Constraints");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                             frame, label);
+
+  gtk_signal_connect (GTK_OBJECT(gg),
+    "clusters_changed", clusters_changed_cb, inst);
 
   gtk_widget_show_all (window);
 }

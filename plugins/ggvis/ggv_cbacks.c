@@ -625,8 +625,19 @@ void ggv_kruskal_cb (GtkWidget *w, gpointer cbd)
 }
 
 
-void ggv_groups_cb (GtkWidget *w, PluginInstance *inst)
+void ggv_brush_groupsp_cb (GtkToggleButton *w, PluginInstance *inst)
 {
+  ggvisd *ggv = ggvisFromInst (inst);
+  ggv->mds_group_p = w->active;
+}
+void ggv_brush_groups_opt_cb (GtkWidget *w, gpointer cbd)
+{
+  PluginInstance *inst = (PluginInstance *)
+    gtk_object_get_data (GTK_OBJECT(w), "PluginInst");
+  ggvisd *ggv = ggvisFromInst (inst);
+
+  /* within, between, anchorscales, anchorfixed */
+  ggv->mds_group_ind = GPOINTER_TO_INT (cbd);
 }
 
 void

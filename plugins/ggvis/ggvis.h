@@ -23,7 +23,7 @@
 
 typedef int (*CompareFunc)(const void *, const void *);
 
-typedef enum {deflt, within, between, anchorscales, anchorfixed} MDSGroupInd;
+typedef enum {within, between, anchorscales, anchorfixed} MDSGroupInd;
 typedef enum {metric, nonmetric} MDSMetricInd;
 typedef enum {KruskalShepard, classic} MDSKSInd;
 typedef enum {LinkDist, VarValues} MDSDtargetSource;
@@ -105,7 +105,9 @@ typedef struct {
   MDSDtargetSource Dtarget_source;
   gboolean complete_Dtarget;
 
+  gboolean mds_group_p;
   MDSGroupInd mds_group_ind;
+  vector_b anchor_group;
 
 } ggvisd;
 
@@ -124,6 +126,8 @@ void update_ggobi (ggvisd *ggv, ggobid *gg);
 
 void ggv_dsource_cb (GtkWidget *w, gpointer cbd);
 void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst);
+void ggv_brush_groupsp_cb (GtkToggleButton *button, PluginInstance *inst);
+void ggv_brush_groups_opt_cb (GtkWidget *w, gpointer cbd);
 void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst);
 
 gint ggv_stressplot_configure_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
@@ -159,6 +163,8 @@ void ggv_init_Dtarget (gint, ggvisd *ggv);
 
 void mds_func (gboolean, PluginInstance *);
 void mds_once (gboolean doit, ggvisd *ggv, ggobid *gg);
+
+void clusters_changed_cb (ggobid *, datad *, void *);
 
 #define GGVIS_H
 #endif

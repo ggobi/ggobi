@@ -614,25 +614,30 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
     if(!dpos->hidden_now.els[n])
       ggv->point_status.els[n] = INCLUDED;
   }
+
+/*  I think this has been accounted for.
+    for (i=0; i<ggv->pos.nrows; i++) {
+      if (d->clusterid.nels > 0 &&
+          d->clusv[(int)GROUPID(i)].excluded == 1) 
+      {
+        ggv->point_status.els[i] = EXCLUDED;
+      }
+    }
+*/
   /* excluded points and anchors of either kind */  
-/*
-  if (d->ncols == d->ncols_used) {
-    for (i=0; i<ggv->pos.nrows; i++)
-      if (xg->clusv[(int)GROUPID(i)].excluded == 1) 
-        point_status[i] = EXCLUDED;
-    if(anchor_group != NULL) {
-      if (mds_group_ind == anchorfixed || mds_group_ind == anchorscales) {
-        for (i=0; i<ggv->pos.nrows; i++) {
-          if (point_status[i] != EXCLUDED &&
-              anchor_group[(int) xg->raw_data[(i)][xg->ncols-1]])
-          {
-            point_status[i] = ANCHOR;
-          }
-        }
+  if (ggv->mds_group_p && ggv->anchor_group.nels > 0 &&
+      (ggv->mds_group_ind == anchorfixed ||
+       ggv->mds_group_ind == anchorscales))
+  {
+    for (i=0; i<ggv->pos.nrows; i++) {
+      if (ggv->point_status.els[i] != EXCLUDED &&
+          ggv->anchor_group.els[dpos->clusterid.els[i]])  /* which d? */
+      {
+        ggv->point_status.els[i] = ANCHOR;
       }
     }
   }
-*/
+
   /* dragged by mouse */
   if (viewmode_get (gg) == MOVEPTS &&
       gg->buttondown &&
@@ -664,7 +669,8 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
 
     /* these points are not moved by the gradient */
     if (ggv->point_status.els[i] == EXCLUDED || 
-        (ggv->mds_group_ind == anchorfixed &&
+        (ggv->mds_group_p &&
+         ggv->mds_group_ind == anchorfixed &&
          ggv->point_status.els[i] == ANCHOR) ||
         ggv->point_status.els[i] == DRAGGED) 
     {
@@ -679,12 +685,15 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
 
       /* these points do not contribute to the gradient */
       if (ggv->point_status.els[j] == EXCLUDED) continue;
-      if ((ggv->mds_group_ind == anchorscales ||
-           ggv->mds_group_ind == anchorfixed) && 
-           ggv->point_status.els[j] != ANCHOR &&
-           ggv->point_status.els[j] != DRAGGED)
+
+      /*  using brush groups with an anchor group */
+      if (ggv->mds_group_p &&
+           (ggv->mds_group_ind == anchorscales ||
+            ggv->mds_group_ind == anchorfixed) && 
+          ggv->point_status.els[j] != ANCHOR &&
+          ggv->point_status.els[j] != DRAGGED)
       {
-            continue;
+        continue;
       }
 
       /* if the target distance is missing, skip */
@@ -694,8 +703,14 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
       if (ggv->weights.nels != 0 && ggv->weights.els[IJ] == 0.) continue;
 
       /* using groups */
-      if (ggv->mds_group_ind == within && !SAMEGLYPH(dpos,i,j)) continue;
-      if (ggv->mds_group_ind == between && SAMEGLYPH(dpos,i,j)) continue;
+      if (ggv->mds_group_p &&
+          ggv->mds_group_ind == within &&
+          !SAMEGLYPH(dpos,i,j))
+        continue;
+      if (ggv->mds_group_p &&
+          ggv->mds_group_ind == between &&
+          SAMEGLYPH(dpos,i,j))
+        continue;
 
       /*
        * if the target distance is within the thresholds
@@ -843,7 +858,8 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
         tmp = 0.;  n = 0;
         for (i=0; i<ggv->pos.nrows; i++) {
           if (ggv->point_status.els[i] == INCLUDED || 
-              (ggv->mds_group_ind == anchorscales &&
+              (ggv->mds_group_p &&
+               ggv->mds_group_ind == anchorscales &&
                ggv->point_status.els[i] == ANCHOR)) 
           {
             tmp += ggv->gradient.vals[i][k]; 
@@ -853,7 +869,8 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
         tmp /= n;
         for (i=0; i<ggv->pos.nrows; i++) {
           if (ggv->point_status.els[i] == INCLUDED || 
-              (ggv->mds_group_ind == anchorscales &&
+              (ggv->mds_group_p &&
+               ggv->mds_group_ind == anchorscales &&
                ggv->point_status.els[i] == ANCHOR)) 
           {
             ggv->gradient.vals[i][k] -= tmp;
@@ -867,7 +884,8 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
     gsum = psum = 0.0 ;
     for (i=0; i<ggv->pos.nrows; i++) {
       if (ggv->point_status.els[i] == INCLUDED || 
-          (ggv->mds_group_ind == anchorscales &&
+          (ggv->mds_group_p &&
+           ggv->mds_group_ind == anchorscales &&
            ggv->point_status.els[i] == ANCHOR)) 
       {
         gsum += L2_norm (ggv->gradient.vals[i], ggv);
