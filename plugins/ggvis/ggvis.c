@@ -48,6 +48,21 @@ static GtkItemFactoryEntry menu_items[] = {
        NULL,    
        (GtkItemFactoryCallback) create_shepard_data_cb,  
        0 },
+
+  { "/_Reset",        NULL,     NULL,             0, "<Branch>" },
+  { "/Reset/Reinit layout",
+       NULL,    
+       (GtkItemFactoryCallback) mds_reinit_cb,  
+       0 },
+  { "/Reset/Scramble layout",
+       NULL,
+       (GtkItemFactoryCallback) mds_scramble_cb,  
+       0 },
+  { "/Reset/Reset MDS parameters",
+       NULL,    
+       (GtkItemFactoryCallback) mds_reset_params_cb,  
+       0 },
+
   { "/_Help",         NULL,     NULL,             0, "<LastBranch>" },
   { "/Help/MDS Background",
        NULL,    
@@ -353,7 +368,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
 
   /*-- table --*/
-  table = gtk_table_new (1, 3, false);
+  table = gtk_table_new (1, 2, false);
   gtk_container_set_border_width (GTK_CONTAINER (table), 2);
   gtk_box_pack_start (GTK_BOX (vbox), table, false, false, 1);
 
@@ -383,14 +398,11 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "After specifying the MDS dimension, open the MDS scatterplot display",
     NULL);
-  gtk_table_attach (GTK_TABLE (table), btn, 2, 3, top, top+1,
-    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
-    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
-    1, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (mds_open_display_cb), inst);
 
-  hbox = gtk_hbox_new (true, 1);
+  hbox = gtk_hbox_new (false, 1);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
   /* Run, step, reinit and scramble in an hbox */
@@ -403,13 +415,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (mds_run_cb), inst);
 
-  btn = gtk_button_new_with_label ("Step");
-  gtk_widget_set_name (btn, "Step");
-  gtk_widget_set_sensitive (btn, false);
-  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (mds_step_cb), inst);
-
+/*
   btn = gtk_button_new_with_label ("Reinit");
   gtk_widget_set_name (btn, "Reinit");
   gtk_widget_set_sensitive (btn, false);
@@ -423,19 +429,27 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (mds_scramble_cb), inst);
+*/
 
   /*-- stepsize --*/
+/*
   table = gtk_table_new (1, 2, false);
   gtk_container_set_border_width (GTK_CONTAINER (table), 5);
   gtk_box_pack_start (GTK_BOX (vbox), table, false, false, 2);
+*/
 
   adj = gtk_adjustment_new (0.01, 0.0001, 0.2, 0.02, 0.2, 0.10);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_stepsize_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_widget_set_name (hscale, "stepsize_scale");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), hscale,
+    "Stepsize", NULL);
   gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_scale_set_digits (GTK_SCALE(hscale), 4);
+  gtk_box_pack_start (GTK_BOX (hbox), hscale, true, true, 2);
+/*
   gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, 0, 1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
@@ -447,6 +461,14 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
+*/
+
+  btn = gtk_button_new_with_label ("Step");
+  gtk_widget_set_name (btn, "Step");
+  gtk_widget_set_sensitive (btn, false);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (mds_step_cb), inst);
 
   label = gtk_label_new ("Run");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
@@ -513,6 +535,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- Metric vs Non-metric --*/
   metric_opt = gtk_option_menu_new ();
+  gtk_widget_set_name (metric_opt, "metric_opt");
   populate_option_menu (metric_opt, (gchar**) metric_lbl,
     sizeof (metric_lbl) / sizeof (gchar *),
     (GtkSignalFunc) ggv_metric_cb, "PluginInst", inst);
@@ -521,6 +544,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- Kruskal/Shepard vs Classic --*/
   opt = gtk_option_menu_new ();
+  gtk_widget_set_name (opt, "kruskalshepard_classic_opt");
   populate_option_menu (opt, (gchar**) kruskal_lbl,
     sizeof (kruskal_lbl) / sizeof (gchar *),
     (GtkSignalFunc) ggv_kruskal_cb, "PluginInst", inst);
@@ -605,6 +629,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     GTK_SIGNAL_FUNC (ggv_Dtarget_power_cb), inst);
 
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (Dtarget_adj));
+  gtk_widget_set_name (hscale, "Dtarget_power_scale");
   gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,
@@ -646,6 +671,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_weight_power_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_widget_set_name (hscale, "weight_power_scale");
   gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,
@@ -689,6 +715,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_dist_power_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_widget_set_name (hscale, "dist_power_scale");
   gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,
@@ -709,6 +736,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (ggv_lnorm_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_widget_set_name (hscale, "lnorm_scale");
   gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,

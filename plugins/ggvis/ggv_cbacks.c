@@ -385,10 +385,12 @@ void mds_open_display_cb (GtkWidget *btn, PluginInstance *inst)
   gtk_widget_set_sensitive (w, true);
   w = widget_find_by_name (window, "Step");
   gtk_widget_set_sensitive (w, true);
+/*
   w = widget_find_by_name (window, "Reinit");
   gtk_widget_set_sensitive (w, true);
   w = widget_find_by_name (window, "Scramble");
   gtk_widget_set_sensitive (w, true);
+*/
 }
 
 void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
@@ -417,7 +419,7 @@ void mds_step_cb (GtkWidget *btn, PluginInstance *inst)
   mds_once (true, ggv, gg);
   update_ggobi (ggv, gg);
 }
-void mds_reinit_cb (GtkWidget *btn, PluginInstance *inst)
+void mds_reinit_cb (PluginInstance *inst, guint action, GtkWidget *w)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
@@ -426,17 +428,26 @@ void mds_reinit_cb (GtkWidget *btn, PluginInstance *inst)
     quick_message ("I can't identify a distance matrix", false);
     return;
   }
+  if (ggv->pos.nrows == 0) {
+    quick_message ("First, open a display", false);
+    return;
+  }
 
   ggv_pos_reinit (ggv);
   update_ggobi (ggv, gg);
 }
-void mds_scramble_cb (GtkWidget *btn, PluginInstance *inst)
+/*void mds_scramble_cb (GtkWidget *btn, PluginInstance *inst)*/
+void mds_scramble_cb (PluginInstance *inst, guint action, GtkWidget *w)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
 
   if (ggv->Dtarget.nrows == 0) {
     quick_message ("I can't identify a distance matrix", false);
+    return;
+  }
+  if (ggv->pos.nrows == 0) {
+    quick_message ("First, open a display", false);
     return;
   }
 
@@ -444,6 +455,95 @@ void mds_scramble_cb (GtkWidget *btn, PluginInstance *inst)
   update_ggobi (ggv, gg);
 }
 
+void
+mds_reset_params_cb (PluginInstance *inst, guint action, GtkWidget *widget)
+{
+  ggvisd *ggv = ggvisFromInst (inst);
+  ggobid *gg = inst->gg;
+  GtkWidget *window, *w;
+  GtkAdjustment *adj;
+
+  window = (GtkWidget *) inst->data;
+
+/*
+ * I don't know if it's necessary to reset all these parameters.
+*/
+
+  ggv->KruskalShepard_classic = KruskalShepard;  /*-- an option menu --*/
+  w = widget_find_by_name (window, "kruskalshepard_classic_opt");
+  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+    (gint) ggv->KruskalShepard_classic);
+  
+  ggv->stepsize = 0.02;     /*-- reset a slider --*/
+  w = widget_find_by_name (window, "stepsize_scale");
+  adj = gtk_range_get_adjustment (GTK_RANGE(w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT(adj), ggv->stepsize);
+
+  ggv->dist_power = 1.0;    /*-- reset a slider --*/
+  w = widget_find_by_name (window, "dist_power_scale");
+  adj = gtk_range_get_adjustment (GTK_RANGE(w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT(adj), ggv->dist_power);
+
+/*
+ * an option menu, which has control over a slider behaves,
+ * because it determines which adjustment is attached to it.
+ * That's the Dtarget_power_scale.
+*/
+  ggv->metric_nonmetric = metric;
+  w = widget_find_by_name (window, "metric_opt");
+  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+    (gint) ggv->metric_nonmetric);
+{  /*-- make sure the appropriate adjustment is attached to the hscale --*/
+  GtkWidget *menu = gtk_option_menu_get_menu (GTK_OPTION_MENU(w));
+  GList *children = gtk_container_children (GTK_CONTAINER(menu));
+  GtkWidget *item = (GtkWidget *) children->data;  /*-- first one --*/
+  ggv_metric (item, 0);
+}
+
+/*
+   We don't reset the other adjustment that may be associated
+   with this scale, the isotonic_mix_adj.  See ggv_metric_cb.
+*/
+  ggv->Dtarget_power = 1.0;  /*-- reset a slider --*/
+  w = widget_find_by_name (window, "Dtarget_power_scale");
+  adj = gtk_range_get_adjustment (GTK_RANGE(w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT(adj), ggv->Dtarget_power);
+
+
+  ggv->lnorm = 2.0;
+  w = widget_find_by_name (window, "lnorm_scale");
+  adj = gtk_range_get_adjustment (GTK_RANGE(w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT(adj), ggv->lnorm);
+
+  ggv->weight_power = 0.0;
+  w = widget_find_by_name (window, "weight_power_scale");
+  adj = gtk_range_get_adjustment (GTK_RANGE(w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT(adj), ggv->weight_power);
+
+/*
+  ggv->isotonic_mix = 1.0;
+  ggv->within_between = 1.0;
+*/
+  ggv->rand_select_new = false;
+  ggv->rand_select_val = 1.0;  /* selection probability */
+  w = widget_find_by_name (window, "selection_prob_scale");
+  adj = gtk_range_get_adjustment (GTK_RANGE(w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT(adj), ggv->rand_select_val);
+
+  ggv->perturb_val = 1.0;
+  w = widget_find_by_name (window, "perturbation_scale");
+  adj = gtk_range_get_adjustment (GTK_RANGE(w));
+  gtk_adjustment_set_value (GTK_ADJUSTMENT(adj), ggv->perturb_val);
+
+  /*ggv->group_p = false;*/     /*-- toggle button --*/
+  /*ggv->group_ind = within;*/  /*-- option menu --*/
+
+  if (ggv->Dtarget.nrows == 0 || ggv->pos.nrows == 0) {
+    return;
+  }
+
+  update_ggobi (ggv, gg);
+}
 
 void ggv_stepsize_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
@@ -502,7 +602,7 @@ void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst)
   ggv->dist_power_over_lnorm = ggv->dist_power/ggv->lnorm;
 
   /*-- sanity check before execution --*/
-  if (ggv->Dtarget.nrows == 0)
+  if (ggv->Dtarget.nrows == 0 || ggv->pos.nrows == 0)
     return;
 
   mds_once (false, ggv, gg);
@@ -527,7 +627,7 @@ void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst)
   }
 
   /*-- sanity check before execution --*/
-  if (ggv->Dtarget.nrows == 0)
+  if (ggv->Dtarget.nrows == 0 || ggv->pos.nrows == 0)
     return;
 
   mds_once (false, ggv, gg);
@@ -544,7 +644,7 @@ void ggv_weight_power_cb (GtkAdjustment *adj, PluginInstance *inst)
   ggv->weight_power = adj->value;
 }
 
-void ggv_metric_cb (GtkWidget *w, gpointer cbd)
+void ggv_metric (GtkWidget *w, gint param)
 {
   PluginInstance *inst = (PluginInstance *)
     gtk_object_get_data (GTK_OBJECT(w), "PluginInst");
@@ -552,7 +652,7 @@ void ggv_metric_cb (GtkWidget *w, gpointer cbd)
   GtkWidget *label, *hscale;
   GtkAdjustment *Dtarget_adj, *isotonic_mix_adj;
 
-  ggv->metric_nonmetric = (MDSMetricInd) GPOINTER_TO_INT (cbd);
+  ggv->metric_nonmetric = (MDSMetricInd) param;
 
   label = gtk_object_get_data (GTK_OBJECT(w), "label");
   hscale = gtk_object_get_data (GTK_OBJECT(w), "hscale");
@@ -576,6 +676,13 @@ void ggv_metric_cb (GtkWidget *w, gpointer cbd)
       gtk_label_set_text (GTK_LABEL(label), "Isotonic(D) (%)");
     }
   }
+
+}
+
+void ggv_metric_cb (GtkWidget *w, gpointer cbd)
+{
+  gint param = (MDSMetricInd) GPOINTER_TO_INT (cbd);
+  ggv_metric (w, param);
 }
 void ggv_kruskal_cb (GtkWidget *w, gpointer cbd)
 {
@@ -618,7 +725,7 @@ ggv_perturb_btn_cb (GtkWidget *btn, PluginInstance *inst)
   ggobid *gg = inst->gg;
 
   /*-- sanity check before execution --*/
-  if (ggv->Dtarget.nrows == 0)
+  if (ggv->Dtarget.nrows == 0 || ggv->pos.nrows == 0)
     return;
 
   for (i = 0; i < ggv->pos.nrows; i++)
@@ -645,7 +752,7 @@ ggv_selection_prob_adj_cb (GtkAdjustment *adj, PluginInstance *inst)
   ggv->rand_select_val = adj->value;
 
   /*-- sanity check before execution --*/
-  if (ggv->Dtarget.nrows == 0)
+  if (ggv->Dtarget.nrows == 0 || ggv->pos.nrows == 0)
     return;
 
   mds_once (true, ggv, gg);
@@ -663,7 +770,7 @@ ggv_selection_prob_btn_cb (GtkWidget *btn, PluginInstance *inst)
   ggv->rand_select_new = true;
 
   /*-- sanity check before execution --*/
-  if (ggv->Dtarget.nrows == 0)
+  if (ggv->Dtarget.nrows == 0 || ggv->pos.nrows == 0)
     return;
 
   mds_once (true, ggv, gg);

@@ -43,7 +43,6 @@ ggvis_init (ggvisd *ggv)
   ggv->dist_power = 1.0;
   ggv->Dtarget_power = 1.0;
   ggv->lnorm = 2.0;
-  ggv->dist_power_over_lnorm = 1.0;
   ggv->weight_power = 0.0;
 
   ggv->isotonic_mix = 1.0;

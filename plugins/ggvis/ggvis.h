@@ -127,8 +127,9 @@ void ggvis_init (ggvisd *);
 ggvisd* ggvisFromInst (PluginInstance *inst);
 void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst);
 void mds_step_cb (GtkWidget *btn, PluginInstance *inst);
-void mds_reinit_cb (GtkWidget *btn, PluginInstance *inst);
-void mds_scramble_cb (GtkWidget *btn, PluginInstance *inst);
+void mds_reinit_cb (PluginInstance *inst, guint action, GtkWidget *w);
+void mds_scramble_cb (PluginInstance *inst, guint action, GtkWidget *w);
+void mds_reset_params_cb (PluginInstance *inst, guint action, GtkWidget *w);
 void update_ggobi (ggvisd *ggv, ggobid *gg);
 
 void ggv_dsource_cb (GtkWidget *w, gpointer cbd);
@@ -149,6 +150,7 @@ void ggv_histogram_button_release_cb (GtkWidget *w, GdkEventButton *evnt, Plugin
 void ggv_Dtarget_histogram_update (ggvisd *, ggobid *);
 
 void ggv_metric_cb (GtkWidget *w, gpointer cbd);
+void ggv_metric (GtkWidget *w, gint param);
 void ggv_kruskal_cb (GtkWidget *w, gpointer cbd);
 void ggv_groups_cb (GtkWidget *w, PluginInstance *inst);
 void ggv_constrained_cb (GtkWidget *w, gpointer cbd);
