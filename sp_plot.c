@@ -587,16 +587,27 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 #endif
       vt->collab_tform, strlen (vt->collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (drawable,
+
+    if (cpanel->parcoords_arrangement == ARRANGE_ROW)
+      gdk_draw_string (drawable,
 #if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font (style),
+        gtk_style_get_font (style),
 #else
-      style->font,
+        style->font,
 #endif
-      gg->plot_GC,
-      sp->max.x/2 - width/2,  /*-- center --*/
-      sp->max.y - 5,
-      vt->collab_tform);
+        gg->plot_GC,
+        /*-- if the label fits, center it; else, left justify --*/
+        (width <= sp->max.x) ?  sp->max.x/2 - width/2 : 0, 
+        sp->max.y - 5,
+        vt->collab_tform);
+     else
+      gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC, 5, 5+ascent+descent, vt->collab_tform);
 
   } else if (dtype == tsplot) {
 
