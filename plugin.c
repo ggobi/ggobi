@@ -53,7 +53,7 @@ Dynload *dynload = &unixDynload;
 gboolean
 canRead(const char * const fileName)
 {
-  gboolean val;
+  gboolean val = false;
 #ifndef WIN32
   struct stat buf;
   val = (stat(fileName, &buf) != 0);

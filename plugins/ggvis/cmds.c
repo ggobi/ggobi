@@ -287,7 +287,7 @@ information on output. Otherwise they are to be included.
     h=scale=0.0;
     if(l > 0) {
       for (k=0;k<=l;k++)
-      scale += fabs(a[i][k]);
+        scale += fabs(a[i][k]);
       if (scale == 0.0) /*  Skip transformation.  */
         e[i]=a[i][l];
       else {

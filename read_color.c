@@ -69,43 +69,43 @@ read_colorscheme(char *fileName, GList **list)
 colorschemed *
 process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
 {
- colorschemed *scheme;
- xmlNodePtr node;
- const xmlChar *tmp;
+  colorschemed *scheme;
+  xmlNodePtr node;
+  const xmlChar *tmp;
 
- scheme = (colorschemed*) g_malloc(sizeof(colorschemed));
+  scheme = (colorschemed*) g_malloc(sizeof(colorschemed));
 
- scheme->name = g_strdup(xmlGetProp(root, "name"));
- scheme->type = getColorSchemeType(xmlGetProp(root, "type"));
- scheme->system = getColorSchemeSystem(xmlGetProp(root, "system"));
+  scheme->name = g_strdup(xmlGetProp(root, "name"));
+  scheme->type = getColorSchemeType(xmlGetProp(root, "type"));
+  scheme->system = getColorSchemeSystem(xmlGetProp(root, "system"));
 
- tmp = xmlGetProp(root, "criticalvalue");
- if(tmp)
-     scheme->criticalvalue = (int) asNumber(tmp);
+  tmp = xmlGetProp(root, "criticalvalue");
+  if(tmp)
+    scheme->criticalvalue = (gint) asNumber(tmp);
 
- tmp = xmlGetProp(root, "ncolors");
- if(tmp)
-     scheme->n = (int) asNumber(tmp);
+  tmp = xmlGetProp(root, "ncolors");
+  if(tmp)
+    scheme->n = (gint) asNumber(tmp);
 
- node = getXMLElement(root, "description");
- scheme->description = g_strdup(xmlNodeListGetString(doc, XML_CHILDREN(node), 1));
+  node = getXMLElement(root, "description");
+  scheme->description = g_strdup(xmlNodeListGetString(doc,
+                                 XML_CHILDREN(node),
+                                 1));
 
- node = getXMLElement(root, "foreground");
- getForegroundColors(node, doc, scheme);
+  node = getXMLElement(root, "foreground");
+  getForegroundColors(node, doc, scheme);
 
+  node = getXMLElement(root, "background");
+  if(node)
+    node = getXMLElement(node, "color");
+  getBackgroundColor(node, doc, scheme);
 
- node = getXMLElement(root, "background");
- if(node)
-     node = getXMLElement(node, "color");
- getBackgroundColor(node, doc, scheme);
+  node = getXMLElement(root, "annotations");
+  if(node)
+    node = getXMLElement(node, "color");
+  getAnnotationColor(node, doc, scheme);
 
- node = getXMLElement(root, "annotations");
- if(node)
-     node = getXMLElement(node, "color");
- getAnnotationColor(node, doc, scheme);
-
-
- return(scheme);
+  return(scheme);
 }
 
 colorscaletype
@@ -169,13 +169,14 @@ getForegroundColors(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme)
   }
 }
 
-int
-getForegroundColor(int index, xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme)
+gint
+getForegroundColor(gint index, xmlNodePtr node, xmlDocPtr doc,
+  colorschemed *scheme)
 {
-    return(getColor(node, doc, &(scheme->data[index]), &scheme->rgb[index]));
+  return(getColor(node, doc, &(scheme->data[index]), &scheme->rgb[index]));
 }
 
-int
+gint
 getBackgroundColor(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme)
 {
   return(getColor(node, doc, &scheme->bg, &scheme->rgb_bg));
@@ -192,15 +193,15 @@ getAnnotationColor(xmlNodePtr node, xmlDocPtr doc, colorschemed *scheme)
   <color><element></element><element></element>....<element></element></color>
  Puts the actual values into original and fills in the RGB settings for `col'.
  */
-int 
-getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col)
+gint 
+getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col)
 {
   xmlNodePtr tmp;
-  int i = 0, numElements = 3; /* RGB only at present. */
-  float *vals;
-  float max = 65535;
+  gint i = 0, numElements = 3; /* RGB only at present. */
+  gfloat *vals;
+  gfloat max = 65535;
 
-  char *tmpVal;
+  gchar *tmpVal;
   tmpVal = xmlGetProp(node, "max");
   if(tmpVal) {
      max /= asNumber(tmpVal);
@@ -208,7 +209,7 @@ getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col)
 
   tmp = XML_CHILDREN(node);
 
-  vals = (float *) g_malloc(3 * sizeof(float));
+  vals = (gfloat *) g_malloc(3 * sizeof(gfloat));
   while(tmp) {
     xmlChar *val;
     if(tmp->type != XML_TEXT_NODE) {
@@ -221,12 +222,9 @@ getColor(xmlNodePtr node, xmlDocPtr doc, float **original, GdkColor *col)
   if(original)
     *original = vals;
 
-  col->red = vals[0];
-  col->green = vals[1];
-  col->blue = vals[2];
-
-/*  gdk_colormap_alloc_color(gdk_colormap_get_system (), col, true, true); */
-
+  col->red = (guint16) vals[0];
+  col->green = (guint16) vals[1];
+  col->blue = (guint16) vals[2];
 
   return(numElements);
 }

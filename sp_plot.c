@@ -93,10 +93,13 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
   draw_case = true;
   if (d->hidden_now.els[m]) {
     draw_case = false;
-  }
+/*
+ *} else if (d->color_now.els[m] >= gg->ncolors) {
+ *  draw_case = false;
+*/
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  else if (!display->options.missings_show_p && d->nmissing > 0) {
+  } else if (!display->options.missings_show_p && d->nmissing > 0) {
     switch (display->displaytype) {
       case parcoords:
         if (d->missing.vals[m][sp->p1dvar])
@@ -175,7 +178,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 #endif
   gushort current_color;
   gint ncolors_used;
-  gushort colors_used[NCOLORS+2];
+  gushort colors_used[NCOLORS+2];  /* treat as MAXNCOLORS */
   GtkWidget *da = sp->da;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;

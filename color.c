@@ -18,6 +18,7 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "colorscheme.h"
 
 static const gfloat default_rgb[NCOLORS][3] = {
   {0.73, 0.33, 0.83},
@@ -51,38 +52,33 @@ getColorTable (ggobid *gg)
   return (guint **) m;
 }
 
-
-/*-- initialize the color table and a bunch of other colors as well --*/
 void
-color_table_init (ggobid *gg) {
-  gint i;
-  GdkColormap *cmap = gdk_colormap_get_system ();
+color_table_init_from_default (GdkColor *color_table,
+  GdkColor *bg_color, GdkColor *accent_color)
+{
+  gint i, ncolors = NCOLORS;
   gboolean writeable = false, best_match = true, success[NCOLORS];
 
-  gg->color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
-
-  for (i=0; i<NCOLORS; i++) {
-    gg->color_table[i].red   = (guint16) (default_rgb[i][0]*65535.0);
-    gg->color_table[i].green = (guint16) (default_rgb[i][1]*65535.0);
-    gg->color_table[i].blue  = (guint16) (default_rgb[i][2]*65535.0);
+  for (i=0; i<ncolors; i++) {
+    color_table[i].red   = (guint16) (default_rgb[i][0]*65535.0);
+    color_table[i].green = (guint16) (default_rgb[i][1]*65535.0);
+    color_table[i].blue  = (guint16) (default_rgb[i][2]*65535.0);
   }
 
-  gdk_colormap_alloc_colors (cmap, gg->color_table, NCOLORS,
+  gdk_colormap_alloc_colors (gdk_colormap_get_system (), color_table, ncolors,
     writeable, best_match, success);
-
-  gg->ncolors = NCOLORS;  /* add foreground and background once I know them */
 
   /*
    * Success[i] should always be true, since I'm allowing best_match,
    * but this can't hurt.
   */
-  for (i=0; i<NCOLORS; i++) {
+  for (i=0; i<ncolors; i++) {
     if (!success[i]) {
-      gg->color_table[i].red =   (guint16) 65535;
-      gg->color_table[i].green = (guint16) 65535;
-      gg->color_table[i].blue =  (guint16) 65535;
-      if (gdk_colormap_alloc_color (cmap, &gg->color_table[i],
-        writeable, best_match) == false)
+      color_table[i].red =   (guint16) 65535;
+      color_table[i].green = (guint16) 65535;
+      color_table[i].blue =  (guint16) 65535;
+      if (gdk_colormap_alloc_color (gdk_colormap_get_system (),
+        &color_table[i], writeable, best_match) == false)
       {
         g_printerr("Unable to allocate colors, not even white!\n");
         exit(0);
@@ -93,21 +89,34 @@ color_table_init (ggobid *gg) {
 /*
  * background color
 */
-  gg->bg_color.red   = (guint16) (bg_rgb[0]*65535.0);
-  gg->bg_color.green = (guint16) (bg_rgb[1]*65535.0);
-  gg->bg_color.blue  = (guint16) (bg_rgb[2]*65535.0);
-  if (!gdk_colormap_alloc_color(cmap, &gg->bg_color, writeable, best_match))
-    g_printerr ("failure allocating background color\n");
+  bg_color->red   = (guint16) (bg_rgb[0]*65535.0);
+  bg_color->green = (guint16) (bg_rgb[1]*65535.0);
+  bg_color->blue  = (guint16) (bg_rgb[2]*65535.0);
+  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
+    bg_color, writeable, best_match))
+      g_printerr ("failure allocating background color\n");
 
 /*
  * accent color:  that is, the color that's used for
  * axes and labels, and not for brushing.
 */
-  gg->accent_color.red   = (guint16) (accent_rgb[0]*65535.0);
-  gg->accent_color.green = (guint16) (accent_rgb[1]*65535.0);
-  gg->accent_color.blue  = (guint16) (accent_rgb[2]*65535.0);
-  if (!gdk_colormap_alloc_color(cmap, &gg->accent_color, writeable, best_match))
-    g_printerr ("failure allocating accent color\n");
+  accent_color->red   = (guint16) (accent_rgb[0]*65535.0);
+  accent_color->green = (guint16) (accent_rgb[1]*65535.0);
+  accent_color->blue  = (guint16) (accent_rgb[2]*65535.0);
+  if (!gdk_colormap_alloc_color(gdk_colormap_get_system (),
+    accent_color, writeable, best_match))
+      g_printerr ("failure allocating accent color\n");
+}
+
+/*-- initialize the color table and a bunch of other colors as well --*/
+void
+color_table_init (ggobid *gg) {
+  gboolean writeable = false, best_match = true;
+
+  gg->color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
+  gg->ncolors = NCOLORS;
+  color_table_init_from_default (gg->color_table,
+    &gg->bg_color, &gg->accent_color);
 
 /*
  * colors that show up in the variable circle panel
@@ -115,15 +124,15 @@ color_table_init (ggobid *gg) {
   gg->vcirc_manip_color.red   = (guint16) 65535;
   gg->vcirc_manip_color.green = (guint16) 0;
   gg->vcirc_manip_color.blue  = (guint16) 65535;
-  if (!gdk_colormap_alloc_color (cmap, &gg->vcirc_manip_color,
-    writeable, best_match))
+  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
+    &gg->vcirc_manip_color, writeable, best_match))
       g_printerr ("trouble allocating vcirc_manip_color\n");
 
   gg->vcirc_freeze_color.red   = (guint16) 0;
   gg->vcirc_freeze_color.green = (guint16) 64435;
   gg->vcirc_freeze_color.blue  = (guint16) 0;
-  if (!gdk_colormap_alloc_color(cmap, &gg->vcirc_freeze_color,
-    writeable, best_match))
+  if (!gdk_colormap_alloc_color(gdk_colormap_get_system (),
+    &gg->vcirc_freeze_color, writeable, best_match))
       g_printerr ("trouble allocating vcirc_freeze_color\n");
 }
 
@@ -135,19 +144,19 @@ init_plot_GC (GdkWindow *w, ggobid *gg) {
      gdk_color_white (gdk_colormap_get_system (), &white);
      wwhite = &white;
   } else {
-      wwhite = sessionOptions->info->fgColor;
-      gg->accent_color = *wwhite;
+    wwhite = sessionOptions->info->fgColor;
+    gg->accent_color = *wwhite;
   }
 
   if(!sessionOptions->info || !sessionOptions->info->bgColor) {
-      gdk_color_black (gdk_colormap_get_system (), &black);
-      bblack = &black;
+    gdk_color_black (gdk_colormap_get_system (), &black);
+    bblack = &black;
   } else {
-      bblack = sessionOptions->info->bgColor;
+    bblack = sessionOptions->info->bgColor;
   }
 
   gg->plot_GC = gdk_gc_new (w);
-  gdk_gc_set_foreground (gg->plot_GC, &white);
+  gdk_gc_set_foreground (gg->plot_GC, wwhite);
   gdk_gc_set_background (gg->plot_GC, bblack);
   /* line_width, GdkLineStyle, GdkCapStyle, GdkJoinStyle */
   gdk_gc_set_line_attributes (gg->plot_GC,
@@ -164,10 +173,10 @@ init_var_GCs (GtkWidget *w, ggobid *gg) {
   gdk_color_black (gdk_colormap_get_system (), &black);
 
   if(!sessionOptions->info->bgColor) {
-      gdk_color_black (gdk_colormap_get_system (), &black);
-      bblack = &black;
+    gdk_color_black (gdk_colormap_get_system (), &black);
+    bblack = &black;
   } else
-      bblack = sessionOptions->info->bgColor;
+    bblack = sessionOptions->info->bgColor;
 /*
  * the unselected variable GCs: thin lines
 */
@@ -200,4 +209,68 @@ init_var_GCs (GtkWidget *w, ggobid *gg) {
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
   gdk_gc_set_foreground (gg->manipvarfg_GC, &gg->vcirc_manip_color);
 
+}
+
+/*-------------------------------------------------------------------*/
+/*             Using colorschemed objects                            */
+/*-------------------------------------------------------------------*/
+
+void
+color_table_init_from_scheme (colorschemed *scheme,
+  GdkColor *color_table, GdkColor *bg_color, GdkColor *accent_color)
+{
+  gint i, ncolors = scheme->n;
+  gboolean writeable = false, best_match = true, *success;
+
+  success = (gboolean *) g_malloc (ncolors * sizeof (gboolean));
+
+  for (i=0; i<ncolors; i++) {
+    color_table[i].red   = scheme->rgb[i].red;
+    color_table[i].green = scheme->rgb[i].green;
+    color_table[i].blue  = scheme->rgb[i].blue;
+  }
+
+  gdk_colormap_alloc_colors (gdk_colormap_get_system (), color_table, ncolors,
+    writeable, best_match, success);
+
+  /*
+   * Success[i] should always be true, since I'm allowing best_match,
+   * but this can't hurt.
+  */
+  for (i=0; i<ncolors; i++) {
+    if (!success[i]) {
+      color_table[i].red =   (guint16) 65535;
+      color_table[i].green = (guint16) 65535;
+      color_table[i].blue =  (guint16) 65535;
+      if (gdk_colormap_alloc_color (gdk_colormap_get_system (), &color_table[i],
+        writeable, best_match) == false)
+      {
+        g_printerr("Unable to allocate colors, not even white!\n");
+        exit(0);
+      }
+    }
+  }
+
+/*
+ * background color
+*/
+  bg_color->red   = (guint16) (scheme->rgb_bg.red);
+  bg_color->green = (guint16) (scheme->rgb_bg.green);
+  bg_color->blue  = (guint16) (scheme->rgb_bg.blue);
+  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
+    bg_color, writeable, best_match))
+      g_printerr ("failure allocating background color\n");
+
+/*
+ * accent color:  that is, the color that's used for
+ * axes and labels, and not for brushing.
+*/
+  accent_color->red   = (guint16) (scheme->rgb_accent.red);
+  accent_color->green = (guint16) (scheme->rgb_accent.green);
+  accent_color->blue  = (guint16) (scheme->rgb_accent.blue);
+  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
+    accent_color, writeable, best_match))
+      g_printerr ("failure allocating accent color\n");
+
+  g_free (success);
 }

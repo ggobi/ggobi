@@ -58,6 +58,9 @@ endif
 ifdef DATAD_NEW_SIGNAL_IMPLEMENTED
   CFLAGS+= -DDATAD_NEW_SIGNAL_IMPLEMENTED
 endif
+ifdef COLORSCHEMES_IMPLEMENTED
+  CFLAGS+= -DCOLORSCHEMES_IMPLEMENTED
+endif
 
 SHLIB_LDFLAGS= -shared
 SHARED_LD_FLAGS= -shared
@@ -87,7 +90,7 @@ SRC=array.c ash1d.c \
  transform.c transform_ui.c \
  utils.c utils_gdk.c utils_ui.c \
  varchange.c varcircles.c varpanel_ui.c vartable.c vartable_ui.c \
- vector.c wvis_ui.c win32_draw.c \
+ vector.c wvis.c wvis_ui.c win32_draw.c \
  writedata.c writedata_ui.c write_svg.c \
  xyplot.c xyplot_ui.c \
 \
@@ -120,7 +123,7 @@ OB=array.o ash1d.o \
  transform.o transform_ui.o \
  utils.o utils_gdk.o utils_ui.o \
  varchange.o varcircles.o varpanel_ui.o vartable.o vartable_ui.o \
- vector.o wvis_ui.o win32_draw.o \
+ vector.o wvis.o wvis_ui.o win32_draw.o \
  writedata.o writedata_ui.o write_svg.o \
  xyplot.o xyplot_ui.o \
 \

@@ -55,6 +55,7 @@ symbol_table_populate (datad *d)
       d->symbol_table[j][k][m].nshown++;
   }
 
+
   return nclusters;
 }
 

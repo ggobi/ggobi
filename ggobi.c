@@ -117,7 +117,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 #ifdef SUPPORT_INIT_FILES
       sessionOptions->initializationFile = g_strdup(av[2]);
 #else
-      fprintf(stderr, "-init not supported without XML\n");fflush(stderr);
+      g_printerr ("-init not supported without XML\n");fflush(stderr);
 #endif
       (*argc)--; av++;
     } else if(strcmp(av[1],"-colorschemes") == 0) {
@@ -125,8 +125,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
       sessionOptions->info->colorSchemeFile = av[2];
       /* read_colorscheme(av[2], &(sessionOptions->colorSchemes)); */
 #else
-      fprintf(stderr, "-colorschemes not supported without XML\n");
-      fflush(stderr);
+      g_printerr ("-colorschemes not supported without XML\n"); fflush(stderr);
 #endif
       (*argc)--; av++;
 
@@ -135,8 +134,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 #ifdef USE_XML
       sessionOptions->activeColorScheme = g_strdup(av[2]);
 #else
-      fprintf(stderr, "-colorschemes not supported without XML\n");
-      fflush(stderr);
+      g_printerr ("-colorschemes not supported without XML\n"); fflush(stderr);
 #endif
       (*argc)--; av++;
     }

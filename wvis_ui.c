@@ -9,6 +9,13 @@
     it without violating AT&T's intellectual property rights.
 */
 
+/*
+ * It is my understanding that I'm supposed to use gdk_colormap_free_colors
+ * to free anything I've allocated with gdk_colormap_alloc_color(s), but
+ * it just isn't working to free all the wvis.color_map colors.   
+ *    dfs, 10/30/2001
+*/
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -18,6 +25,101 @@
 
 static gint xmargin = 20;
 static gint ymargin = 20;
+
+static void bin_counts_reset (gint jvar, datad *d, ggobid *gg);
+
+extern void color_table_init_from_scheme (colorschemed *scheme,
+  GdkColor *color_table, GdkColor *bg_color, GdkColor *accent_color);
+extern void color_table_init_from_default (GdkColor *color_table,
+  GdkColor *bg_color, GdkColor *accent_color);
+
+
+/*-------------------------------------------------------------------*/
+/*             Using colorschemed objects                            */
+/*-------------------------------------------------------------------*/
+
+void
+colorscheme_set_cb (GtkWidget *w, colorschemed* scheme)
+{
+  ggobid *gg = GGobiFromWidget (GTK_WIDGET(w), true);
+  gboolean rval = false;
+
+/*
+ * gg->wvis sometimes has its own color_table.  If it's null, use
+ * gg->color_table; else use the local one.  Then only initialize
+ * the global one (gg->color_table) when Apply is clicked.
+*/
+  if (gg->wvis.color_table) {
+/*
+    gdk_colormap_free_colors (gdk_colormap_get_system(),
+      gg->wvis.color_table, gg->wvis.ncolors);
+*/
+    g_free (gg->wvis.color_table);
+/*
+    gdk_colormap_free_colors (gdk_colormap_get_system(),
+                              &gg->wvis.bg_color, 1);
+    gdk_colormap_free_colors (gdk_colormap_get_system(),
+                              &gg->wvis.accent_color, 1);
+*/
+    gg->wvis.color_table = NULL;
+    gg->wvis.scheme = NULL;
+  }
+
+  if (scheme) {
+    gg->wvis.scheme = scheme;
+    gg->wvis.ncolors = scheme->n;
+    gg->wvis.color_table = (GdkColor *)
+      g_malloc (scheme->n * sizeof (GdkColor));
+    color_table_init_from_scheme (scheme, gg->wvis.color_table,
+      &gg->wvis.bg_color, &gg->wvis.accent_color);
+  }
+  else {
+    gg->wvis.scheme = NULL;
+    gg->wvis.ncolors = NCOLORS;
+    gg->wvis.color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
+    color_table_init_from_default (gg->wvis.color_table,
+      &gg->wvis.bg_color, &gg->wvis.accent_color);
+  }
+
+/*-- delete this line once debugging is complete --*/
+  displays_plot (NULL, FULL, gg);
+
+  /*-- rebuild the drawing area in this window --*/
+  {
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  gint selected_var = get_one_selection_from_clist (clist);
+  if (d && selected_var != -1) {
+    gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
+      (gpointer) gg, (gpointer) &rval);
+    bin_counts_reset (selected_var, d, gg);
+  }
+  }
+  gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
+    (gpointer) gg, (gpointer) &rval);
+}
+
+static void
+colorscheme_add_to_menu (GtkWidget *menu, colorschemed *scheme,
+  gpointer ptr, ggobid *gg)
+{
+  GtkWidget *menuitem;
+
+  if (scheme) {
+    menuitem = gtk_menu_item_new_with_label (scheme->name);
+  } else {
+    menuitem = gtk_menu_item_new_with_label ("Default");
+  }
+
+  gtk_object_set_data (GTK_OBJECT (menuitem), "notebook", ptr);
+
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem) ;
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+    colorscheme_set_cb, scheme);
+  GGobi_widget_set (menuitem, gg, true);
+}
+
 
 /*-------------------------------------------------------------------------*/
 
@@ -29,13 +131,20 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
   vartabled *vt = vartable_element_get (jvar, d);
   gfloat min = vt->lim_tform.min;
   gfloat max = vt->lim_tform.max;
+  gint ncolors;
+
+  if (gg->wvis.color_table == NULL) {
+    ncolors = gg->ncolors;
+  } else {
+    ncolors = gg->wvis.ncolors;
+  }
 
   for (k=0; k<gg->wvis.npct; k++)
     gg->wvis.n[k] = 0;
 
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];
-    for (k=0; k<gg->ncolors; k++) {
+    for (k=0; k<ncolors; k++) {
       val = min + gg->wvis.pct[k] * (max - min);
       if (d->tform.vals[i][jvar] <= val) {
         gg->wvis.n[k]++;
@@ -45,34 +154,6 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
   }
 }
 
-void
-wvis_init (ggobid  *gg)
-{
-  GdkColormap *cmap = gdk_colormap_get_system ();
-  gboolean writeable = false, best_match = true, success;
-
-  gg->wvis.window = NULL;
-  gg->wvis.npct = 0;
-  gg->wvis.n = NULL;
-  gg->wvis.nearest_color = -1;
-  gg->wvis.motion_notify_id = 0;
-  gg->wvis.mousepos.x = -1;
-  gg->wvis.mousepos.y = -1;
-  gg->wvis.pix = NULL;
-
-  gg->wvis.gray1.red = gg->wvis.gray1.blue = gg->wvis.gray1.green =
-    (guint16) (.3*65535.0);
-  success = gdk_colormap_alloc_color (cmap, &gg->wvis.gray1, writeable,
-    best_match);
-  gg->wvis.gray2.red = gg->wvis.gray2.blue = gg->wvis.gray2.green =
-    (guint16) (.5*65535.0);
-  success = gdk_colormap_alloc_color (cmap, &gg->wvis.gray2, writeable,
-    best_match);
-  gg->wvis.gray3.red = gg->wvis.gray3.blue = gg->wvis.gray3.green =
-    (guint16) (.7*65535.0);
-  success = gdk_colormap_alloc_color (cmap, &gg->wvis.gray3, writeable,
-    best_match);
-}
 
 
 /*-- called when closed from the close button --*/
@@ -121,7 +202,6 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
         bin_counts_reset (selected_var, d, gg);
 
       gtk_signal_emit_by_name (GTK_OBJECT (w), "expose_event",
-        "expose_event",
         (gpointer) gg, (gpointer) &rval);
     }
   }
@@ -138,18 +218,29 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
   GdkModifierType state;
   icoords pos;
   gint k, x, y, nearest = -1, d;
-  gint hgt = (w->allocation.height - 2*ymargin) / (gg->ncolors - 1);
   gint dist = w->allocation.width*w->allocation.width +
               w->allocation.height*w->allocation.height;
+  gint ncolors;
+  GdkColor *color_table;
 
   gfloat *pct = gg->wvis.pct;
   gint *nearest_color = &gg->wvis.nearest_color;
+  gint hgt;
+
+  if (gg->wvis.color_table == NULL) {
+    ncolors = gg->ncolors;
+    color_table = gg->color_table;
+  } else {
+    ncolors = gg->wvis.ncolors;
+    color_table = gg->wvis.color_table;
+  }
+  hgt = (w->allocation.height - 2*ymargin) / (ncolors - 1);
 
   gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
 
   /*-- find nearest slider --*/
   y = ymargin + 10;
-  for (k=0; k<gg->ncolors-1; k++) {
+  for (k=0; k<ncolors-1; k++) {
     x = xmargin + pct[k] * (w->allocation.width - 2*xmargin);
     d = (pos.x-x)*(pos.x-x) + (pos.y-y)*(pos.y-y);
     if (d < 100 && d < dist) {
@@ -198,14 +289,14 @@ static void
 da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 {
   gint height = w->allocation.height - 2*ymargin;
-  gint hgt = height / (gg->ncolors - 1);
-  gint k;
-  gint x0, x1;
+  gint x0, x1, k, hgt;
   gint x = xmargin;
   gint y = ymargin;
   GdkPoint *points;
   gfloat diff;
   vartabled *vt;
+  gint ncolors;
+  GdkColor *color_table, *bg_color, *accent_color;
 
   GtkWidget *clist = get_clist_from_object (GTK_OBJECT (w));
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
@@ -214,9 +305,24 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   GtkWidget *da = gg->wvis.da;
   GdkPixmap *pix = gg->wvis.pix;
 
+  if (gg->wvis.GC == NULL)
+    gg->wvis.GC = gdk_gc_new (w->window);
 
-  if (gg->wvis.npct != gg->ncolors) {
-    gg->wvis.npct = gg->ncolors;
+  if (gg->wvis.color_table == NULL) {
+    ncolors = gg->ncolors;
+    color_table = gg->color_table;
+    bg_color = &gg->bg_color;
+    accent_color = &gg->accent_color;
+  } else {
+    ncolors = gg->wvis.ncolors;
+    color_table = gg->wvis.color_table;
+    bg_color = &gg->wvis.bg_color;
+    accent_color = &gg->wvis.accent_color;
+  }
+  hgt = height / (ncolors - 1);
+
+  if (gg->wvis.npct != ncolors) {
+    gg->wvis.npct = ncolors;
     gg->wvis.pct = (gfloat *) g_realloc (gg->wvis.pct,
                                          gg->wvis.npct * sizeof (gfloat));
     gg->wvis.n = (gint *) g_realloc (gg->wvis.n,
@@ -228,17 +334,17 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   }
 
   /*-- clear the pixmap --*/
-  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
-  gdk_draw_rectangle (pix, gg->plot_GC, TRUE,
+  gdk_gc_set_foreground (gg->wvis.GC, bg_color);
+  gdk_draw_rectangle (pix, gg->wvis.GC, TRUE,
                       0, 0, w->allocation.width, w->allocation.height);
 
 
   /*-- draw the color bars --*/
   x0 = xmargin;
-  for (k=0; k<gg->ncolors; k++) {
+  for (k=0; k<ncolors; k++) {
     x1 = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-    gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[k]);
-    gdk_draw_rectangle (pix, gg->plot_GC,
+    gdk_gc_set_foreground (gg->wvis.GC, &color_table[k]);
+    gdk_draw_rectangle (pix, gg->wvis.GC,
                         TRUE, x0, ymargin, x1 - x0, height);
     x0 = x1;
   }
@@ -246,18 +352,18 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   /*-- draw the horizontal lines --*/
   x0 = xmargin; y = ymargin + 10;
   x1 = xmargin + (w->allocation.width - 2*xmargin) - 1;
-  gdk_gc_set_foreground (gg->plot_GC, &gg->wvis.gray2);
-  for (k=0; k<gg->ncolors-1; k++) {
-    gdk_draw_line (pix, gg->plot_GC, x0, y, x1, y);
+  gdk_gc_set_foreground (gg->wvis.GC, &gg->wvis.gray2);
+  for (k=0; k<ncolors-1; k++) {
+    gdk_draw_line (pix, gg->wvis.GC, x0, y, x1, y);
     y += hgt;
   }
 
   /*-- draw rectangles, 20 x 10 for the moment --*/
   y = ymargin + 10;
-  gdk_gc_set_foreground (gg->plot_GC, &gg->wvis.gray2);
-  for (k=0; k<gg->ncolors-1; k++) {
+  gdk_gc_set_foreground (gg->wvis.GC, &gg->wvis.gray2);
+  for (k=0; k<ncolors-1; k++) {
     x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-    gdk_draw_rectangle (pix, gg->plot_GC,
+    gdk_draw_rectangle (pix, gg->wvis.GC,
                         TRUE, x-10, y-5, 20, 10);
     y += hgt;
   }
@@ -266,8 +372,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   /*-- draw the dark shadows --*/
   y = ymargin + 10;
   points = (GdkPoint *) g_malloc (7 * sizeof (GdkPoint));
-  gdk_gc_set_foreground (gg->plot_GC, &gg->wvis.gray1);
-  for (k=0; k<gg->ncolors-1; k++) {
+  gdk_gc_set_foreground (gg->wvis.GC, &gg->wvis.gray1);
+  for (k=0; k<ncolors-1; k++) {
     x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
 
     points [0].x = x - 10;
@@ -286,9 +392,9 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
     points [6].x = x - 10;
     points [6].y = y + 5;
-    gdk_draw_polygon (pix, gg->plot_GC,
+    gdk_draw_polygon (pix, gg->wvis.GC,
                       TRUE, points, 7);
-    gdk_draw_line (pix, gg->plot_GC, x-1, y-4, x-1, y+3);
+    gdk_draw_line (pix, gg->wvis.GC, x-1, y-4, x-1, y+3);
 
     y += hgt;
   }
@@ -296,8 +402,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   /*-- draw the light shadows --*/
   y = ymargin + 10;
   points = (GdkPoint *) g_malloc (7 * sizeof (GdkPoint));
-  gdk_gc_set_foreground (gg->plot_GC, &gg->wvis.gray3);
-  for (k=0; k<gg->ncolors-1; k++) {
+  gdk_gc_set_foreground (gg->wvis.GC, &gg->wvis.gray3);
+  for (k=0; k<ncolors-1; k++) {
     x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
 
     points [0].x = x - 10;  /*-- lower left --*/
@@ -316,9 +422,9 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
     points [6].x = points[0].x;
     points [6].y = points[0].y;
-    gdk_draw_polygon (pix, gg->plot_GC,
+    gdk_draw_polygon (pix, gg->wvis.GC,
                       TRUE, points, 7);
-    gdk_draw_line (pix, gg->plot_GC, x, y-4, x, y+3);
+    gdk_draw_line (pix, gg->wvis.GC, x, y-4, x, y+3);
 
     y += hgt;
   }
@@ -335,16 +441,16 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     min = vt->lim_tform.min;
     max = vt->lim_tform.max;
 
-    gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+    gdk_gc_set_foreground (gg->wvis.GC, accent_color);
     y = ymargin;
-    for (k=0; k<gg->ncolors-1; k++) {
+    for (k=0; k<ncolors-1; k++) {
 
       val = min + gg->wvis.pct[k] * (max - min);
       str = g_strdup_printf ("%3.3g", val);
       gdk_text_extents (style->font, str, strlen(str),
         &lbearing, &rbearing, &width, &ascent, &descent);
       x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-      gdk_draw_string (pix, style->font, gg->plot_GC,
+      gdk_draw_string (pix, style->font, gg->wvis.GC,
         x - width/2,
         y - 2,
         str);
@@ -352,7 +458,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     }
 
     /*-- ... and the counts in the bottom margin --*/
-    for (k=0; k<gg->ncolors; k++) {
+    for (k=0; k<ncolors; k++) {
       val = min + gg->wvis.pct[k] * (max - min);
       str = g_strdup_printf ("%d", gg->wvis.n[k]);
       gdk_text_extents (style->font, str, strlen(str),
@@ -360,7 +466,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
       x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
       diff = (k == 0) ? gg->wvis.pct[k] : gg->wvis.pct[k]-gg->wvis.pct[k-1]; 
       x -= diff/2 * (w->allocation.width - 2*xmargin);
-      gdk_draw_string (pix, style->font, gg->plot_GC,
+      gdk_draw_string (pix, style->font, gg->wvis.GC,
         x - width/2,
         (w->allocation.height - ymargin) + ascent + descent + 2,
         str);
@@ -369,7 +475,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
   }
 
-  gdk_draw_pixmap (w->window, gg->plot_GC, pix,
+  gdk_draw_pixmap (w->window, gg->wvis.GC, pix,
                    0, 0, 0, 0,
                    w->allocation.width,
                    w->allocation.height);
@@ -383,9 +489,7 @@ selection_made_cb (GtkWidget *clist, gint row, gint column,
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
 
   bin_counts_reset (row, d, gg);
-
   gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
-    "expose_event",
     (gpointer) gg, (gpointer) &rval);
 }
 
@@ -400,6 +504,46 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
     gint i, m, k;
     gfloat min, max;
     gfloat val;
+    gboolean rval = false;
+
+    /*
+     * If we've been using gg->wvis.color_table, init gg->color_table
+     * using the current scheme.  Then free wvis.color_table, since it
+     * is now redundant.
+    */
+    if (gg->wvis.color_table) {  /* ie, wvis.color_table != gg->color_table */
+      gdk_colormap_free_colors (gdk_colormap_get_system(),
+        gg->color_table, gg->ncolors);
+      g_free (gg->color_table);
+      gdk_colormap_free_colors (gdk_colormap_get_system(),
+                                &gg->bg_color, 1);
+      gdk_colormap_free_colors (gdk_colormap_get_system(),
+                                &gg->accent_color, 1);
+
+      if (gg->wvis.scheme) {
+        colorschemed *scheme = gg->wvis.scheme;
+        gg->ncolors = scheme->n;
+        gg->color_table = (GdkColor *) g_malloc (scheme->n * sizeof (GdkColor));
+        color_table_init_from_scheme (scheme, gg->color_table,
+          &gg->bg_color, &gg->accent_color);
+      } else {
+        gg->ncolors = NCOLORS;
+        gg->color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
+        color_table_init_from_default (gg->color_table,
+          &gg->bg_color, &gg->accent_color);
+      }
+
+      gdk_colormap_free_colors (gdk_colormap_get_system(),
+        gg->wvis.color_table, gg->wvis.ncolors);
+      g_free (gg->wvis.color_table);
+      gdk_colormap_free_colors (gdk_colormap_get_system(),
+                                &gg->wvis.bg_color, 1);
+      gdk_colormap_free_colors (gdk_colormap_get_system(),
+                                &gg->wvis.accent_color, 1);
+      gg->wvis.color_table = NULL;
+      gg->wvis.scheme = NULL;
+      gg->wvis.ncolors = 0;
+    }
 
     vt = vartable_element_get (selected_var, d);
     min = vt->lim_tform.min;
@@ -418,6 +562,10 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
     }
     clusters_set (d, gg);
     displays_plot (NULL, FULL, gg);
+
+    bin_counts_reset (selected_var, d, gg);
+    gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
+      (gpointer) gg, (gpointer) &rval);
   }
 }
 
@@ -426,6 +574,11 @@ wvis_window_open (ggobid *gg) {
   GtkWidget *vbox, *hb;
   GtkWidget *notebook;
   GtkWidget *btn, *vb;
+  /*-- for colorscales --*/
+  GtkWidget *frame, *opt, *menu;
+  GList *l;
+  colorschemed *scheme;
+  /* */
 
   if (gg->wvis.window == NULL) {
 
@@ -442,6 +595,37 @@ wvis_window_open (ggobid *gg) {
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox, GTK_SELECTION_SINGLE,
       (GtkSignalFunc) selection_made_cb, gg);
+
+  /*
+   * section on choosing new colormap
+  */
+    frame = gtk_frame_new ("Choose colormap");
+    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+    gtk_box_pack_start (GTK_BOX (vbox), frame, true, false, 1);
+
+    opt = gtk_option_menu_new ();
+    menu = gtk_menu_new ();
+
+    colorscheme_add_to_menu (menu, NULL, notebook, gg);
+    for (l = sessionOptions->colorSchemes; l; l = l->next) {
+      scheme = (colorschemed *) l->data;
+      colorscheme_add_to_menu (menu, scheme, notebook, gg);
+/*
+      menuitem = gtk_menu_item_new_with_label (scheme->name);
+      gtk_menu_append (GTK_MENU (menu), menuitem);
+      gtk_widget_show (menuitem) ;
+      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+        colorscheme_set_cb, scheme);
+      GGobi_widget_set (menuitem, gg, true);
+*/
+    }
+    gtk_option_menu_set_menu (GTK_OPTION_MENU (opt), menu);
+
+    gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+      "Choose a color scale", NULL);
+    gtk_container_add (GTK_CONTAINER (frame), opt);
+  /**/
 
     /*-- colors, symbols --*/
     /*-- now we get fancy:  draw the scale, with glyphs and colors --*/
@@ -498,3 +682,4 @@ wvis_window_open (ggobid *gg) {
   gtk_widget_show_all (gg->wvis.window);
   gdk_window_raise (gg->wvis.window->window);
 }
+

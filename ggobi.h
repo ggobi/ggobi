@@ -97,7 +97,6 @@ struct _ggobid {
 
  GGobiApp app;
 
-
  GSList *d; /* Datasets (datad elements) */ 
             /*-- first is default: cases, nodes; second might be edges --*/
 
@@ -328,6 +327,11 @@ struct _ggobid {
    GdkPixmap *pix;
    GdkColor gray1, gray2, gray3;
 
+   colorschemed *scheme;  /*-- current color scheme --*/
+   gint ncolors;    
+   GdkColor *color_table, bg_color, accent_color;
+   GdkGC *GC;
+
    gfloat *pct;
    gint npct;
    gint *n;    /*-- number of points that will take on each color --*/
@@ -335,7 +339,6 @@ struct _ggobid {
 
    gint motion_notify_id;
    icoords mousepos;
-
  } wvis;
 
 /*-------------------- scaling ---------------------------------------*/

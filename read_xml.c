@@ -98,7 +98,7 @@ const gchar * const xmlDataTagNames[] = {
 
 
 void
-ggobi_XML_warning_handler(void *data, const char *msg, ...)
+ggobi_XML_warning_handler(void *data, const gchar *msg, ...)
 {
     xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
     fprintf(stderr, "Warning from XML parsing [%d, %d]: %s", p->input->line, p->input->col, msg);
@@ -108,7 +108,7 @@ ggobi_XML_warning_handler(void *data, const char *msg, ...)
     fflush(stderr);  
 }
 void
-ggobi_XML_error_handler(void *data, const char *msg, ...)
+ggobi_XML_error_handler(void *data, const gchar *msg, ...)
 {
     xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
     fprintf(stderr, "Error in XML parsing [line %d, column %d]: %s", p->input->line, p->input->col, msg);
@@ -279,7 +279,7 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
  }
 }
 
-int
+gint
 setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 {
   const gchar *tmp = getAttribute(attrs, "value");
@@ -1138,7 +1138,7 @@ setColormapEntry(const xmlChar **attrs, XMLParserData *data)
  }
 
  for(i = 0; i < 3; i++) {
-  const gchar *tmp1 = getAttribute(attrs, (char *) names[i]);
+  const gchar *tmp1 = getAttribute(attrs, (gchar *) names[i]);
   if(tmp1) {
    vals[i] = asNumber(tmp1);
   } else {
@@ -1168,12 +1168,12 @@ setColormapEntry(const xmlChar **attrs, XMLParserData *data)
   An RGB value in simple text form.
  */
 gboolean
-setColorValue(XMLParserData *data, const xmlChar *line, int len)
+setColorValue(XMLParserData *data, const xmlChar *line, gint len)
 {
 
- double values[3] = {-1, -1, -1};
- int which = 0;
- const char *tmp = strtok((char*) line, " \t\n");
+ gdouble values[3] = {-1, -1, -1};
+ gint which = 0;
+ const gchar *tmp = strtok((gchar*) line, " \t\n");
 
  GdkColor *color = data->gg->color_table + data->current_color;
  
@@ -1190,9 +1190,8 @@ setColorValue(XMLParserData *data, const xmlChar *line, int len)
 
 
 
-
 void
-setColorValues(GdkColor *color, double *vals)
+setColorValues(GdkColor *color, gdouble *vals)
 {
    color->red = (guint16) (vals[0]*65535.0);
    color->green = (guint16) (vals[1]*65535.0);
@@ -1249,7 +1248,7 @@ xmlParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
  */
 
 gboolean
-asciiParseColorMap(const gchar *fileName, int size, XMLParserData *data)
+asciiParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
 {
 
  return(false);
@@ -1266,10 +1265,10 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData)
   data = datad_new(NULL, parserData->gg);
   data->readXMLRecord = readXMLRecord;
 
-  tmp = getAttribute(attrs, (char *) "name");
+  tmp = getAttribute(attrs, (gchar *) "name");
   if(tmp == NULL) {
     name = (gchar *) malloc(sizeof(gchar)*8);
-    sprintf(name, "data%d", (int) g_slist_length(parserData->gg->d));
+    sprintf(name, "data%d", (gint) g_slist_length(parserData->gg->d));
   } else
     name = g_strdup(tmp);
 
