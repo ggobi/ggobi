@@ -1098,8 +1098,9 @@ splot_add_point_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   {
     for (l = d->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
-      /*-- false = !nearest --*/
-      splot_add_identify_cues (sp, drawable, id, false, gg);
+      if (!d->hidden_now.els[id])
+        /*-- false = !nearest --*/
+        splot_add_identify_cues (sp, drawable, id, false, gg);
     }
   }
 }
