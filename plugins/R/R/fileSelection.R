@@ -1,7 +1,7 @@
 library(RGtk)
 
 fileSelectPlugin <-
-function(gg, plugin, dir = getwd())
+function(gg, plugin, namedArgs = list(), args = list(), dir = getwd())
 {
  dlg <- gtkFileSelection("GGobi file selection using R")
  dlg$Show() 

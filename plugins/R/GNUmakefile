@@ -1,3 +1,5 @@
+Rplugin.so:
+
 ifndef GGOBI_HOME
   GGOBI_HOME=../..
 endif

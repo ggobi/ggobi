@@ -204,6 +204,9 @@ RDestroyPlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
     USER_OBJECT_ obj, e;
     RRunTimeData *d = (RRunTimeData *) inst->data;
 
+    if(!d) 
+       return(true);
+
     obj = d->pluginObject;
     if(!isFunction(VECTOR_ELT(obj, 0))) {
 	return(false);

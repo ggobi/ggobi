@@ -1,9 +1,11 @@
 cat("Ok, in testPlugin.R\n")
 ggobiTestPlugin <-
-function(gg, inst)
+function(gg, inst, namedArgs, args)
 {
  print(gg)
  print(inst)
+ print(namedArgs)
+ print(args)
  onClose <- function() {
    cat("In onClose\n")
  }
