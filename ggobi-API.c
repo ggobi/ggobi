@@ -368,6 +368,8 @@ gint *
 getGlyphTypes(int *n)
 {
 
+
+ return(NULL);
 }
 
 
@@ -472,9 +474,9 @@ getCaseColors (gint *pts, gint howMany)
 
 
 void
-setObservationSegment(gint x, gint y)
+XGOBI(setObservationSegment)(gint x, gint y)
 {
-  if(isConnectedSegment(x, y) == false) {
+  if(XGOBI(isConnectedSegment)(x, y) == false) {
     segments_alloc(xg.nsegments+1);
     xg.segment_endpoints[xg.nsegments].a = x;
     xg.segment_endpoints[xg.nsegments].b = y;
@@ -484,7 +486,7 @@ setObservationSegment(gint x, gint y)
 
 
 gboolean 
-isConnectedSegment(gint a, gint b)
+XGOBI(isConnectedSegment)(gint a, gint b)
 {
   gint tmp, i;
 
@@ -508,4 +510,48 @@ isConnectedSegment(gint a, gint b)
 }
 
 
+gboolean 
+XGOBI(getShowLines)()
+{
+ return(false);
+}
 
+
+gboolean XGOBI(setShowLines)(gboolean val)
+{
+ return(XGOBI(getDefaultDisplayOptions)()->segments_directed_show_p);
+}
+
+DisplayOptions *
+XGOBI(getDefaultDisplayOptions)()
+{
+ return(&DefaultDisplayOptions);
+}
+
+
+displayd *
+XGOBI(getDisplay)(int which)
+{
+  displayd *display = NULL;
+
+  if(which < g_list_length(xg.displays))
+   display = (displayd *) g_list_nth_data(xg.displays, which);
+
+ return(display);
+}
+
+DisplayOptions *
+XGOBI(getDisplayOptions)(int displayNum)
+{
+ DisplayOptions *options = NULL;
+  if(displayNum < 0)
+   options =  XGOBI(getDefaultDisplayOptions)();
+  else {
+   displayd *display;
+    display = XGOBI(getDisplay)(displayNum);
+    if(display)
+      options = &(display->options);
+  }
+
+ return(options);
+}

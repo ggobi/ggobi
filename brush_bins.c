@@ -56,10 +56,10 @@ get_extended_brush_corners (icoords *bin0, icoords *bin1)
 {
   static brush_coords obrush;
   static gboolean initd = false;
-  gint x1 = MIN (brush_pos.x1, brush_pos.x2);
-  gint y1 = MIN (brush_pos.y1, brush_pos.y2);
-  gint x2 = MAX (brush_pos.x1, brush_pos.x2);
-  gint y2 = MAX (brush_pos.y1, brush_pos.y2);
+  gint x1 = MIN (xg.app.brush_pos.x1, xg.app.brush_pos.x2);
+  gint y1 = MIN (xg.app.brush_pos.y1, xg.app.brush_pos.y2);
+  gint x2 = MAX (xg.app.brush_pos.x1, xg.app.brush_pos.x2);
+  gint y2 = MAX (xg.app.brush_pos.y1, xg.app.brush_pos.y2);
   gint ox1, oy1, ox2, oy2;
 
   if (!initd)
@@ -99,10 +99,10 @@ get_extended_brush_corners (icoords *bin0, icoords *bin1)
     bin1->y = MIN (bin1->y, xg.br_nbins - 1);
   }
 
-  obrush.x1 = brush_pos.x1;
-  obrush.y1 = brush_pos.y1;
-  obrush.x2 = brush_pos.x2;
-  obrush.y2 = brush_pos.y2;
+  obrush.x1 = xg.app.brush_pos.x1;
+  obrush.y1 = xg.app.brush_pos.y1;
+  obrush.x2 = xg.app.brush_pos.x2;
+  obrush.y2 = xg.app.brush_pos.y2;
 }
 
 gboolean

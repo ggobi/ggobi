@@ -13,49 +13,49 @@ struct _xgobid;
 
 typedef struct {
 
- struct _xgobid *_thisXg;
+ struct _xgobid *thisXg;
 
   /* main_ui */
-  GtkWidget *_menubar;
-  GtkAccelGroup *_main_accel_group;
+  GtkWidget *menubar;
+  GtkAccelGroup *main_accel_group;
 
   /* brush_ui */
-  GtkWidget *_brush_reset_menu;
-  GtkWidget *_brush_link_menu;
+  GtkWidget *brush_reset_menu;
+  GtkWidget *brush_link_menu;
 
   /* brush */
-  brush_coords _brush_pos ;  
+  brush_coords brush_pos ;  
 
   /* color_ui.c */
-  gint _spacing;
+  gint spacing;
 
   /* identify_ui.c */
-  GtkWidget *_identify_link_menu;
-  icoords _cursor_pos;
+  GtkWidget *identify_link_menu;
+  icoords cursor_pos;
 
   /* texture */
-  gfloat *_gy;
+  gfloat *gy;
 
   /* tour2d_ui */
-  GtkWidget *_tour2d_io_menu;
+  GtkWidget *tour2d_io_menu;
 
   /* parcoords_ui */
-  GtkWidget *_parcoords_mode_menu;
+  GtkWidget *parcoords_mode_menu;
 
   /* scatmat_ui */
-  GtkWidget *_scatmat_mode_menu;
+  GtkWidget *scatmat_mode_menu;
 
   /* scatterplot_ui */
-  GtkWidget *_scatterplot_mode_menu;
+  GtkWidget *scatterplot_mode_menu;
 
   /* display_tree */
   DisplayTree display_tree;
 
   /* rotate_ui */
-  GtkWidget *_rotation_io_menu;
+  GtkWidget *rotation_io_menu;
 
   /* scale_ui.c */
-  GtkWidget *_scale_reset_menu;
+  GtkWidget *scale_reset_menu;
 
 } XGobiApp;
 
@@ -201,31 +201,6 @@ typedef struct _xgobid {
 
 } xgobid;
 
-
-#define thisXg xg.app._thisXg
-
-#define menubar xg.app._menubar
-#define main_accel_group xg.app._main_accel_group
-
-#define brush_reset_menu xg.app._brush_reset_menu
-#define brush_link_menu xg.app._brush_link_menu
-
-#define brush_pos xg.app._brush_pos
-
-#define spacing xg.app._spacing
-
-#define identify_link_menu xg.app._identify_link_menu
-#define cursor_pos xg.app._cursor_pos
-
-#define gy             xg.app._gy
-#define tour2d_io_menu xg.app._tour2d_io_menu
-#define parcoords_mode_menu xg.app._parcoords_mode_menu
-
-#define scatmat_mode_menu xg.app._scatmat_mode_menu
-#define scatterplot_mode_menu xg.app._scatterplot_mode_menu
-
-#define rotation_io_menu xg.app._rotation_io_menu
-#define scale_reset_menu xg.app._scale_reset_menu
 
 XGOBI_ xgobid xg;
 

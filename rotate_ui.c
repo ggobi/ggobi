@@ -139,27 +139,27 @@ rotation_menus_make () {
 /*
  * I/O menu
 */
-  rotation_io_menu = gtk_menu_new ();
+  xg.app.rotation_io_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Save coefficients");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (rotation_io_cb),
                       (gpointer) "write_coeffs");
-  gtk_menu_append (GTK_MENU (rotation_io_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.rotation_io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Save projection");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (rotation_io_cb),
                       (gpointer) "write_projection");
-  gtk_menu_append (GTK_MENU (rotation_io_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.rotation_io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Read projection");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (rotation_io_cb),
                       (gpointer) "read_projection");
-  gtk_menu_append (GTK_MENU (rotation_io_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.rotation_io_menu), item);
 
-  gtk_widget_show_all (rotation_io_menu);
+  gtk_widget_show_all (xg.app.rotation_io_menu);
 }
 
 /*--------------------------------------------------------------------*/

@@ -148,6 +148,18 @@ gint * getCaseColors (gint *pts, gint howMany);
 void setCaseColor(gint pt, gint colorIndex);
 void setCaseColors(gint *pts, gint howMany, gint colorindx);
 
-gboolean  isConnectedSegment(gint a, gint b);
+gboolean  XGOBI(isConnectedSegment)(gint a, gint b);
 void setObservationSegment(gint x, gint y);
-#endif
+
+
+gboolean XGOBI(getShowLines)();
+gboolean XGOBI(setShowLines)(gboolean val);
+
+DisplayOptions *XGOBI(getDefaultDisplayOptions)();
+
+displayd *XGOBI(getDisplay)(int which);
+
+DisplayOptions *XGOBI(getDisplayOptions)(int displayNum);
+
+#endif /* End of conditional inclusion of entire file.*/
+

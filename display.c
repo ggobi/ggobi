@@ -8,6 +8,21 @@
 
 #include "display_tree.h"
 
+
+DisplayOptions DefaultDisplayOptions = {
+                                         true,  /* points_show_p */
+                                         false, /* segements_directed_show_p */
+                                         false, /* segements_undirected_show_p */
+                                         true,  /* segements_show_p*/
+                                         true,  /* missings_show_p  */
+                                         false, /* gridlines_show_p */
+                                         true,  /* axes_show_p */
+                                         true,  /* axes_center_p */
+                                         true,  /* double_buffer_p */
+                                         true   /* link_p */
+                                       };
+
+
 /*----------------------------------------------------------------------*/
 /*               Drawing routines                                       */
 /*----------------------------------------------------------------------*/
@@ -36,24 +51,24 @@ display_options_cb (GtkCheckMenuItem *w, guint action) {
 
   switch (action) {
     case DOPT_POINTS:
-      display->points_show_p = w->active;
+      display->options.points_show_p = w->active;
       display_plot (display, FULL);
       break;
     case DOPT_SEGS_D:
-      display->segments_directed_show_p = w->active;
+      display->options.segments_directed_show_p = w->active;
       display_plot (display, QUICK);
       break;
     case DOPT_SEGS_U:
-      display->segments_undirected_show_p = w->active;
+      display->options.segments_undirected_show_p = w->active;
       display_plot (display, QUICK);
       break;
     case DOPT_SEGS:
-      display->segments_show_p = w->active;
+      display->options.segments_show_p = w->active;
       display_plot (display, FULL);
       break;
     case DOPT_MISSINGS:  /*-- only in scatmat and parcoords --*/
       if (!display->missing_p && xg.nmissing > 0) {
-        display->missings_show_p = w->active;
+        display->options.missings_show_p = w->active;
 
         if (display->displaytype == parcoords) {
           GList *splist;
@@ -68,19 +83,19 @@ display_options_cb (GtkCheckMenuItem *w, guint action) {
       }
       break;
     case DOPT_GRIDLINES:
-      display->gridlines_show_p = w->active;
+      display->options.gridlines_show_p = w->active;
       break;
     case DOPT_AXES:
-      display->axes_show_p = w->active;
+      display->options.axes_show_p = w->active;
       break;
     case DOPT_AXES_C:
-      display->axes_center_p = w->active;
+      display->options.axes_center_p = w->active;
       break;
     case DOPT_BUFFER:
-      display->double_buffer_p = w->active;
+      display->options.double_buffer_p = w->active;
       break;
     case DOPT_LINK:
-      display->link_p = w->active;
+      display->options.link_p = w->active;
       break;
     default:
       g_printerr ("no variable is associated with %d\n", action);
@@ -246,7 +261,7 @@ display_set_current (displayd *new_display) {
   if(new_display == NULL)
    return;
 
-  gtk_accel_group_unlock (main_accel_group);
+  gtk_accel_group_unlock (xg.app.main_accel_group);
 
   if (!firsttime) {
 
@@ -280,11 +295,11 @@ display_set_current (displayd *new_display) {
           "*** scatterplot display (missings) *** " :
           "*** scatterplot display ***"); 
 
-      scatterplot_main_menus_make (main_accel_group, mode_set_cb);
-      mode_item = submenu_make ("_View", 'V', main_accel_group);
+      scatterplot_main_menus_make (xg.app.main_accel_group, mode_set_cb);
+      mode_item = submenu_make ("_View", 'V', xg.app.main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (mode_item),
-                                 scatterplot_mode_menu); 
-      submenu_insert (mode_item, menubar, 2);
+                                 xg.app.scatterplot_mode_menu); 
+      submenu_insert (mode_item, xg.app.menubar, 2);
       break;
 
     case scatmat:
@@ -293,22 +308,22 @@ display_set_current (displayd *new_display) {
           "*** scatterplot matrix (missings) *** " :
           "*** scatterplot matrix ***"); 
 
-      scatmat_main_menus_make (main_accel_group, mode_set_cb);
-      mode_item = submenu_make ("_View", 'V', main_accel_group);
+      scatmat_main_menus_make (xg.app.main_accel_group, mode_set_cb);
+      mode_item = submenu_make ("_View", 'V', xg.app.main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (mode_item),
-                                 scatmat_mode_menu); 
-      submenu_insert (mode_item, menubar, 2);
+                                 xg.app.scatmat_mode_menu); 
+      submenu_insert (mode_item, xg.app.menubar, 2);
       break;
 
     case parcoords:
       gtk_window_set_title (GTK_WINDOW (new_display->window),
                             "*** parallel coordinates display ***");
 
-      parcoords_main_menus_make (main_accel_group, mode_set_cb);
-      mode_item = submenu_make ("_View", 'V', main_accel_group);
+      parcoords_main_menus_make (xg.app.main_accel_group, mode_set_cb);
+      mode_item = submenu_make ("_View", 'V', xg.app.main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (mode_item),
-                                 parcoords_mode_menu); 
-      submenu_insert (mode_item, menubar, 2);
+                                 xg.app.parcoords_mode_menu); 
+      submenu_insert (mode_item, xg.app.menubar, 2);
       break;
   }
 
@@ -317,7 +332,7 @@ display_set_current (displayd *new_display) {
 
   varpanel_refresh ();
 
-  gtk_accel_group_lock (main_accel_group);
+  gtk_accel_group_lock (xg.app.main_accel_group);
   firsttime = false;
 }
 

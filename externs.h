@@ -237,5 +237,5 @@ extern gboolean xyplot_varsel (splotd *, gint, gint *, gint);
 extern void xy_reproject (splotd *, glong **);
 extern void zoom_by_drag (splotd *);
 extern void zoom_step (splotd *, gint, gint, rectd *);
-
 extern void dataset_init (xgobid *xg);
+

@@ -154,8 +154,8 @@ br_line_color_ids_init ()
 void
 brush_pos_init ()
 {
-  brush_pos.x1 = brush_pos.y1 = 20;
-  brush_pos.x2 = brush_pos.y2 = 40;
+  xg.app.brush_pos.x1 = xg.app.brush_pos.y1 = 20;
+  xg.app.brush_pos.x2 = xg.app.brush_pos.y2 = 40;
 }
 
 /*----------------------------------------------------------------------*/

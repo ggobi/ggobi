@@ -204,23 +204,23 @@ parcoords_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func) {
 /*
  * I/O menu
 */
-  parcoords_mode_menu = gtk_menu_new ();
+  xg.app.parcoords_mode_menu = gtk_menu_new ();
 
-  CreateMenuItem (parcoords_mode_menu, "Parallel Coordinates",
+  CreateMenuItem (xg.app.parcoords_mode_menu, "Parallel Coordinates",
     "^c", "", NULL, accel_group, func, GINT_TO_POINTER (PCPLOT));
 
   /* Add a separator */
-  CreateMenuItem (parcoords_mode_menu, NULL,
+  CreateMenuItem (xg.app.parcoords_mode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL);
 
-  CreateMenuItem (parcoords_mode_menu, "Brush",
+  CreateMenuItem (xg.app.parcoords_mode_menu, "Brush",
     "^b", "", NULL, accel_group, func, GINT_TO_POINTER (BRUSH));
-  CreateMenuItem (parcoords_mode_menu, "Identify",
+  CreateMenuItem (xg.app.parcoords_mode_menu, "Identify",
     "^i", "", NULL, accel_group, func, GINT_TO_POINTER (IDENT));
-  CreateMenuItem (parcoords_mode_menu, "Move Points",
+  CreateMenuItem (xg.app.parcoords_mode_menu, "Move Points",
     "^m", "", NULL, accel_group, func, GINT_TO_POINTER (MOVEPTS));
 
-  gtk_widget_show (parcoords_mode_menu);
+  gtk_widget_show (xg.app.parcoords_mode_menu);
 }
 
 /*--------------------------------------------------------------------*/

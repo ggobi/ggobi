@@ -36,7 +36,7 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
    * Loop once through xg.color_now[], collecting the colors currently
    * in use into the colors_used[] vector.
   */
-  if (display->points_show_p) {
+  if (display->options.points_show_p) {
 
     if (!binned) {
       for (i=0; i<xg.nrows_in_plot; i++) {
@@ -152,7 +152,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp)
         if (xg.hidden_now[m])
           draw_case = false;
         /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-        else if (!display->missings_show_p && xg.nmissing > 0) {
+        else if (!display->options.missings_show_p && xg.nmissing > 0) {
           switch (display->displaytype) {
             case parcoords:
               if (xg.missing.data[m][sp->p1dvar])
@@ -176,12 +176,12 @@ splot_draw_to_pixmap0_unbinned (splotd *sp)
         }
 
         if (draw_case && xg.color_now[m] == current_color) {
-          if (display->points_show_p)
+          if (display->options.points_show_p)
             draw_glyph (sp->pixmap0, &xg.glyph_now[m], sp->screen, m);
 
           /*-- parallel coordinate plot whiskers --*/
           if (display->displaytype == parcoords) {
-            if (display->segments_show_p) {
+            if (display->options.segments_show_p) {
               n = 2*m;
               gdk_draw_line (sp->pixmap0, xg.plot_GC,
                 sp->whiskers[n].x1, sp->whiskers[n].y1,
@@ -254,7 +254,7 @@ splot_draw_to_pixmap0_binned (splotd *sp)
                       1 + loc_clear1.x - loc_clear0.x ,
                       1 + loc_clear1.y - loc_clear0.y);
 
-  if (display->points_show_p) {
+  if (display->options.points_show_p) {
     if (!xg.mono_p) {
 
       splot_point_colors_used_get (sp, &npoint_colors_used,
@@ -428,7 +428,7 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
   *ncolors_used = 1;
   colors_used[0] = xg.line_color_now[0];
 
-  if (display->segments_directed_show_p || display->segments_undirected_show_p)
+  if (display->options.segments_directed_show_p || display->options.segments_undirected_show_p)
   {
     for (i=0; i<xg.nsegments; i++) {
       new_color = true;
@@ -499,7 +499,7 @@ segments_draw (splotd *sp)
             sp->segments[nl].x2 = sp->screen[to].x;
             sp->segments[nl].y2 = sp->screen[to].y;
 
-            if (display->segments_directed_show_p) {
+            if (display->options.segments_directed_show_p) {
               /*
                * Add thick piece of the lines to suggest a directional arrow
               */
@@ -520,7 +520,7 @@ segments_draw (splotd *sp)
 
       gdk_draw_segments (sp->pixmap1, xg.plot_GC, sp->segments, nl);
 
-      if (display->segments_directed_show_p) {
+      if (display->options.segments_directed_show_p) {
         gdk_draw_segments (sp->pixmap1, xg.plot_GC, sp->arrowheads, nl);
       }
     }
@@ -550,7 +550,7 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned) {
                       1 + loc1.x - loc0.x ,
                       1 + loc1.y - loc0.y);
 
-  if (display->segments_directed_show_p || display->segments_undirected_show_p)
+  if (display->options.segments_directed_show_p || display->options.segments_undirected_show_p)
     if (display->displaytype == scatterplot || display->displaytype == scatmat)
       segments_draw (sp);
 

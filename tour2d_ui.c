@@ -526,27 +526,27 @@ tour2d_menus_make () {
 /*
  * I/O menu
 */
-  tour2d_io_menu = gtk_menu_new ();
+  xg.app.tour2d_io_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Save coefficients");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (tour2d_io_cb),
                       (gpointer) "write_coeffs");
-  gtk_menu_append (GTK_MENU (tour2d_io_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.tour2d_io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Save history");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (tour2d_io_cb),
                       (gpointer) "write_history");
-  gtk_menu_append (GTK_MENU (tour2d_io_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.tour2d_io_menu), item);
 
   item = gtk_menu_item_new_with_label ("Read history");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (tour2d_io_cb),
                       (gpointer) "read_history");
-  gtk_menu_append (GTK_MENU (tour2d_io_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.tour2d_io_menu), item);
 
-  gtk_widget_show_all (tour2d_io_menu);
+  gtk_widget_show_all (xg.app.tour2d_io_menu);
 }
 
 /*----------------------------------------------------------------------*/

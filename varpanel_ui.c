@@ -676,9 +676,6 @@ varpanel_layout_init () {
   }
 }
 
-#ifdef spacing
-#undef spacing
-#endif
 
 void
 varpanel_size_init (gint cpanel_height)

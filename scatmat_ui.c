@@ -74,24 +74,24 @@ scatmat_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func) {
 /*
  * I/O menu
 */
-  scatmat_mode_menu = gtk_menu_new ();
+  xg.app.scatmat_mode_menu = gtk_menu_new ();
 
-  CreateMenuItem (scatmat_mode_menu, "Scatterplot Matrix",
+  CreateMenuItem (xg.app.scatmat_mode_menu, "Scatterplot Matrix",
     "^x", "", NULL, accel_group, func, GINT_TO_POINTER (SCATMAT));
 
   /* Add a separator */
-  CreateMenuItem (scatmat_mode_menu, NULL,
+  CreateMenuItem (xg.app.scatmat_mode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL);
 
-  CreateMenuItem (scatmat_mode_menu, "Scale",
+  CreateMenuItem (xg.app.scatmat_mode_menu, "Scale",
     "^s", "", NULL, accel_group, func, GINT_TO_POINTER (SCALE));
-  CreateMenuItem (scatmat_mode_menu, "Brush",
+  CreateMenuItem (xg.app.scatmat_mode_menu, "Brush",
     "^b", "", NULL, accel_group, func, GINT_TO_POINTER (BRUSH));
-  CreateMenuItem (scatmat_mode_menu, "Identify",
+  CreateMenuItem (xg.app.scatmat_mode_menu, "Identify",
     "^i", "", NULL, accel_group, func, GINT_TO_POINTER (IDENT));
-  CreateMenuItem (scatmat_mode_menu, "Move Points",
+  CreateMenuItem (xg.app.scatmat_mode_menu, "Move Points",
     "^m", "", NULL, accel_group, func, GINT_TO_POINTER (MOVEPTS));
 
-  gtk_widget_show (scatmat_mode_menu);
+  gtk_widget_show (xg.app.scatmat_mode_menu);
 }
 

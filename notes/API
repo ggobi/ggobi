@@ -16,6 +16,17 @@ displayd setCurrentDisplay (gchar *)
 
 
 
+/* General boolean settings that can be set from menu items.
+  e.g
+*/
+
+gboolean getShowLines();
+gboolean setShowLines(gboolean);
+
+gboolean getShowGrid();
+gboolean setShowGrid(gboolean);
+
+
 /* Conections between points (i.e. lines) */
  ?
 

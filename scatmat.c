@@ -96,13 +96,8 @@ scatmat_new (gboolean missing_p) {
   display->displaytype = scatmat;
   display->missing_p = missing_p;
 
-  display->points_show_p = true;
-  display->segments_directed_show_p = false;
-  display->segments_undirected_show_p = false;
-  display->missings_show_p = true;
-  display->gridlines_show_p = false;
-  display->axes_show_p = true;
-  display->link_p = true;
+
+  display->options = DefaultDisplayOptions;
 
   scatmat_nrows = scatmat_ncols = MIN (xg.ncols, MAXNVARS);
 

@@ -31,10 +31,10 @@ brush_once (gboolean force)
  * bin0 is the bin which contains of the upper left corner of the
  * brush; bin1 is the one containing of the lower right corner.
 */
-  gint ulx = MIN (brush_pos.x1, brush_pos.x2);
-  gint uly = MIN (brush_pos.y1, brush_pos.y2);
-  gint lrx = MAX (brush_pos.x1, brush_pos.x2);
-  gint lry = MAX (brush_pos.y1, brush_pos.y2);
+  gint ulx = MIN (xg.app.brush_pos.x1, xg.app.brush_pos.x2);
+  gint uly = MIN (xg.app.brush_pos.y1, xg.app.brush_pos.y2);
+  gint lrx = MAX (xg.app.brush_pos.x1, xg.app.brush_pos.x2);
+  gint lry = MAX (xg.app.brush_pos.y1, xg.app.brush_pos.y2);
   gboolean changed = false;
   cpaneld *cpanel = &xg.current_display->cpanel;
 
@@ -117,15 +117,15 @@ reinit_transient_brushing (void)
 
 void
 brush_set_pos (gint x, gint y) {
-  gint xdist = brush_pos.x2 - brush_pos.x1 ;
-  gint ydist = brush_pos.y2 - brush_pos.y1 ;
+  gint xdist = xg.app.brush_pos.x2 - xg.app.brush_pos.x1 ;
+  gint ydist = xg.app.brush_pos.y2 - xg.app.brush_pos.y1 ;
   /*
    * (x2,y2) is the corner that's moving.
   */
-  brush_pos.x1 = x - xdist ;
-  brush_pos.x2 = x ;
-  brush_pos.y1 = y - ydist ;
-  brush_pos.y2 = y ;
+ xg.app.brush_pos.x1 = x - xdist ;
+ xg.app.brush_pos.x2 = x ;
+ xg.app.brush_pos.y1 = y - ydist ;
+ xg.app.brush_pos.y2 = y ;
 }
 
 
@@ -141,16 +141,16 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
     brush_set_pos (mouse->x, mouse->y);
 
   else if (button2_p) {
-    brush_pos.x2 = mouse->x ;
-    brush_pos.y2 = mouse->y ;
+    xg.app.brush_pos.x2 = mouse->x ;
+    xg.app.brush_pos.y2 = mouse->y ;
   }
 
 
   if (cpanel->brush_on_p) {
     changed = brush_once (false);
-    if (display->segments_undirected_show_p ||
-        display->segments_directed_show_p ||
-        display->segments_show_p ||
+    if (display->options.segments_undirected_show_p ||
+        display->options.segments_directed_show_p ||
+        display->options.segments_show_p ||
         xg.nrgroups > 0)      /*-- a full redraw is required --*/
     {
       splot_redraw (sp, FULL);
@@ -180,10 +180,10 @@ under_brush (gint k)
 {
   splotd *sp = xg.current_splot;
   gint pt;
-  gint x1 = MIN (brush_pos.x1, brush_pos.x2);
-  gint x2 = MAX (brush_pos.x1, brush_pos.x2);
-  gint y1 = MIN (brush_pos.y1, brush_pos.y2);
-  gint y2 = MAX (brush_pos.y1, brush_pos.y2);
+  gint x1 = MIN (xg.app.brush_pos.x1, xg.app.brush_pos.x2);
+  gint x2 = MAX (xg.app.brush_pos.x1, xg.app.brush_pos.x2);
+  gint y1 = MIN (xg.app.brush_pos.y1, xg.app.brush_pos.y2);
+  gint y2 = MAX (xg.app.brush_pos.y1, xg.app.brush_pos.y2);
 
   pt = (sp->screen[k].x <= x2 && sp->screen[k].y <= y2 &&
         sp->screen[k].x >= x1 && sp->screen[k].y >= y1) ? 1 : 0;
@@ -243,10 +243,10 @@ brush_draw_brush (splotd *sp) {
   gboolean line_painting_p =
      (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL);
 
-  gint x1 = MIN (brush_pos.x1, brush_pos.x2);
-  gint x2 = MAX (brush_pos.x1, brush_pos.x2);
-  gint y1 = MIN (brush_pos.y1, brush_pos.y2);
-  gint y2 = MAX (brush_pos.y1, brush_pos.y2);
+  gint x1 = MIN (xg.app.brush_pos.x1, xg.app.brush_pos.x2);
+  gint x2 = MAX (xg.app.brush_pos.x1, xg.app.brush_pos.x2);
+  gint y1 = MIN (xg.app.brush_pos.y1, xg.app.brush_pos.y2);
+  gint y2 = MAX (xg.app.brush_pos.y1, xg.app.brush_pos.y2);
 
   if (!xg.mono_p) {
     if ((xg.default_color_table[xg.color_id].red != xg.bg_color.red) ||
@@ -265,7 +265,7 @@ brush_draw_brush (splotd *sp) {
       x1, y1, (x2>x1)?(x2-x1):(x1-x2), (y2>y1)?(y2-y1):(y1-y2));
     /* Mark the corner to which the cursor will be attached */
     gdk_draw_rectangle (sp->pixmap1, xg.plot_GC, true,
-      brush_pos.x2-1, brush_pos.y2-1, 2, 2);
+      xg.app.brush_pos.x2-1, xg.app.brush_pos.y2-1, 2, 2);
 
     /*
      * highlight brush
@@ -276,7 +276,7 @@ brush_draw_brush (splotd *sp) {
 
       /* Mark the corner to which the cursor will be attached */
       gdk_draw_rectangle (sp->pixmap1, xg.plot_GC, true,
-        brush_pos.x2-2, brush_pos.y2-2, 4, 4);
+        xg.app.brush_pos.x2-2, xg.app.brush_pos.y2-2, 4, 4);
     }
   }
 

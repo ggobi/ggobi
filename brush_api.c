@@ -22,8 +22,8 @@ sizeBrush (gint width, gint height)  /*-- resize brush without painting --*/
 {
   splotd *sp = xg.current_splot;
 
-  brush_pos.x2 = brush_pos.x1 + width;
-  brush_pos.y2 = brush_pos.y1 + height;
+  xg.app.brush_pos.x2 = xg.app.brush_pos.x1 + width;
+  xg.app.brush_pos.y2 = xg.app.brush_pos.y1 + height;
 
   splot_redraw (sp, QUICK);  
 }

@@ -5,6 +5,11 @@
 
 /* defines.h */
 
+/* External/public routines in the API should use this 
+   to generate a suitable prefix for their name to avoid
+   name-space pollution and symbol conflicts.
+    (e.g. XGOBI(setData)
+*/
 #define XGOBI(a) XGobi_##a
 
 #define false 0

@@ -46,7 +46,7 @@ find_selection_circle_pos (icoords *pos) {
 
   if (xg.glyph_id.type == POINT_GLYPH) {
     pos->y = margin + 3/2;
-    pos->x = spacing/2;
+    pos->x = xg.app.spacing/2;
 
   } else {
 
@@ -54,28 +54,28 @@ find_selection_circle_pos (icoords *pos) {
     for (i=0; i<NGLYPHSIZES; i++) {
       g.size = i;
       pos->y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
-      pos->x = spacing + spacing/2;
+      pos->x = xg.app.spacing + xg.app.spacing/2;
 
       if (xg.glyph_id.type == PLUS_GLYPH && xg.glyph_id.size == g.size)
         break;
 
-      pos->x += spacing;
+      pos->x += xg.app.spacing;
       if (xg.glyph_id.type == X_GLYPH && xg.glyph_id.size == g.size)
         break;
 
-      pos->x += spacing;
+      pos->x += xg.app.spacing;
       if (xg.glyph_id.type == OPEN_RECTANGLE && xg.glyph_id.size == g.size)
         break;
 
-      pos->x += spacing;
+      pos->x += xg.app.spacing;
       if (xg.glyph_id.type == FILLED_RECTANGLE && xg.glyph_id.size == g.size)
         break;
 
-      pos->x += spacing;
+      pos->x += xg.app.spacing;
       if (xg.glyph_id.type == OPEN_CIRCLE && xg.glyph_id.size == g.size)
         break;
 
-      pos->x += spacing;
+      pos->x += xg.app.spacing;
       if (xg.glyph_id.type == FILLED_CIRCLE && xg.glyph_id.size == g.size)
         break;
     }
@@ -89,7 +89,7 @@ redraw_symbol_display (GtkWidget *w) {
   glyphv g;
   icoords pos;
 
-  spacing = w->allocation.width/NGLYPHTYPES;
+  xg.app.spacing = w->allocation.width/NGLYPHTYPES;
 
   if (xg.plot_GC == NULL)
     init_plot_GC (w->window);
@@ -104,35 +104,35 @@ redraw_symbol_display (GtkWidget *w) {
    *  ... this should no longer be true; it should be 2*width + 1
   */
   pos.y = margin + 3/2;
-  pos.x = spacing/2;
+  pos.x = xg.app.spacing/2;
   gdk_draw_point (w->window, xg.plot_GC, pos.x, pos.y);
 
   pos.y = 0;
   for (i=0; i<NGLYPHSIZES; i++) {
     g.size = i;
     pos.y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
-    pos.x = spacing + spacing/2;
+    pos.x = xg.app.spacing + xg.app.spacing/2;
 
     g.type = PLUS_GLYPH;
     draw_glyph (w->window, &g, &pos, 0);
 
-    pos.x += spacing;
+    pos.x += xg.app.spacing;
     g.type = X_GLYPH;
     draw_glyph (w->window, &g, &pos, 0);
 
-    pos.x += spacing;
+    pos.x += xg.app.spacing;
     g.type = OPEN_RECTANGLE;
     draw_glyph (w->window, &g, &pos, 0);
 
-    pos.x += spacing;
+    pos.x += xg.app.spacing;
     g.type = FILLED_RECTANGLE;
     draw_glyph (w->window, &g, &pos, 0);
 
-    pos.x += spacing;
+    pos.x += xg.app.spacing;
     g.type = OPEN_CIRCLE;
     draw_glyph (w->window, &g, &pos, 0);
 
-    pos.x += spacing;
+    pos.x += xg.app.spacing;
     g.type = FILLED_CIRCLE;
     draw_glyph (w->window, &g, &pos, 0);
   }
@@ -390,7 +390,7 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event) {
   ev.y = (gint) event->y;
 
   pos.y = margin + 3/2;
-  pos.x = spacing/2;
+  pos.x = xg.app.spacing/2;
   g.type = POINT_GLYPH;
   g.size = 1;
   nearest_dsq = dsq = sqdist (pos.x, pos.y, ev.x, ev.y);
@@ -400,38 +400,38 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event) {
   for (i=0; i<NGLYPHSIZES; i++) {
     g.size = i;
     pos.y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
-    pos.x = spacing + spacing/2;
+    pos.x = xg.app.spacing + xg.app.spacing/2;
 
     g.type = PLUS_GLYPH;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
-    pos.x += spacing;
+    pos.x += xg.app.spacing;
     g.type = X_GLYPH;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
-    pos.x += spacing;
+    pos.x += xg.app.spacing;
     g.type = OPEN_RECTANGLE;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
-    pos.x += spacing;
+    pos.x += xg.app.spacing;
     g.type = FILLED_RECTANGLE;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
-    pos.x += spacing;
+    pos.x += xg.app.spacing;
     g.type = OPEN_CIRCLE;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
-    pos.x += spacing;
+    pos.x += xg.app.spacing;
     g.type = FILLED_CIRCLE;
     dsq = sqdist (pos.x, pos.y, ev.x, ev.y);
     if (dsq < nearest_dsq) {

@@ -58,8 +58,8 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 */
 
   gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
-  gdk_window_get_pointer (w->window, &cursor_pos.x, &cursor_pos.y, NULL);
-  k = find_nearest_point (&cursor_pos, sp);
+  gdk_window_get_pointer (w->window, &xg.app.cursor_pos.x, &xg.app.cursor_pos.y, NULL);
+  k = find_nearest_point (&xg.app.cursor_pos, sp);
 
   if (k != prev_nearest) {
 
@@ -128,13 +128,13 @@ identify_menus_make () {
 /*
  * Link menu
 */
-  identify_link_menu = gtk_menu_new ();
+  xg.app.identify_link_menu = gtk_menu_new ();
 
   item = gtk_check_menu_item_new_with_label("Link identification");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (identify_link_cb),
                       (gpointer) NULL);
-  gtk_menu_append (GTK_MENU (identify_link_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.identify_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
   gtk_widget_show(item);
 }

@@ -179,14 +179,11 @@ scatterplot_new (gboolean missing_p) {
 
   display->p1d_orientation = VERTICAL;
 
-  display->points_show_p = true;
-  display->segments_directed_show_p = false;
-  display->segments_undirected_show_p = false;
-  display->missings_show_p = true;  /*-- irrelevant for scatterplot --*/
-  display->gridlines_show_p = false;
-  display->axes_show_p = true;
-  display->axes_center_p = true;
-  display->link_p = true;
+  display->options = DefaultDisplayOptions;
+  /* Want to make certain this is true, and perhaps it may be different
+     for other plot types and so not be set appropriately in DefaultOptions.
+      display->options.axes_center_p = true; 
+   */
 
   scatterplot_cpanel_init (&display->cpanel, XYPLOT);
 

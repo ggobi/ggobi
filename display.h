@@ -25,23 +25,7 @@ typedef struct {
 */
  GtkWidget *hrule, *vrule;
 
-/*
- * display options
-*/
-
- gboolean points_show_p;              /* scatterplot, scatmat, parcoords */
- gboolean segments_directed_show_p;   /* scatterplot, scatmat */
- gboolean segments_undirected_show_p; /* scatterplot, scatmat */
- gboolean segments_show_p;            /* parcoords */
- gboolean missings_show_p;            /* scatterplot, scatmat, parcoords */
-
- gboolean gridlines_show_p;           /* scatterplot, scatmat, parcoords */
- gboolean axes_show_p;                /* scatterplot, scatmat, parcoords */
- gboolean axes_center_p;              /* scatterplot */
-
- gboolean double_buffer_p;            /* parcoords */
-
- gboolean link_p;                     /* scatterplot, scatmat, parcoords */
+ DisplayOptions options;
 
 
 /*

@@ -255,21 +255,21 @@ scale_menus_make () {
 /*
  * Reset menu
 */
-  scale_reset_menu = gtk_menu_new ();
+  xg.app.scale_reset_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Reset pan");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (reset_pan_cb),
                       (gpointer) "shift");
-  gtk_menu_append (GTK_MENU (scale_reset_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.scale_reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset zoom");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (reset_zoom_cb),
                       (gpointer) "scale");
-  gtk_menu_append (GTK_MENU (scale_reset_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.scale_reset_menu), item);
 
-  gtk_widget_show_all (scale_reset_menu);
+  gtk_widget_show_all (xg.app.scale_reset_menu);
 }
 
 /*--------------------------------------------------------------------*/

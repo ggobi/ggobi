@@ -210,10 +210,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
       case ROTATE:
         rotation_menus_make ();
 
-        io_item = submenu_make ("_I/O", 'I', main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), rotation_io_menu); 
+        io_item = submenu_make ("_I/O", 'I', xg.app.main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), xg.app.rotation_io_menu); 
         if (firsttime_io) {
-          submenu_insert (io_item, menubar, -1);
+          submenu_insert (io_item, xg.app.menubar, -1);
           firsttime_io = false;
         }
         break;
@@ -221,10 +221,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
       case TOUR2D:
         tour2d_menus_make ();
 
-        io_item = submenu_make ("_I/O", 'I', main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), tour2d_io_menu); 
+        io_item = submenu_make ("_I/O", 'I', xg.app.main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), xg.app.tour2d_io_menu); 
         if (firsttime_io) {
-          submenu_insert (io_item, menubar, -1);
+          submenu_insert (io_item, xg.app.menubar, -1);
           firsttime_io = false;
         }
         break;
@@ -232,11 +232,11 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
       case SCALE :
         scale_menus_make ();
 
-        reset_item = submenu_make ("_Reset", 'R', main_accel_group);
+        reset_item = submenu_make ("_Reset", 'R', xg.app.main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (reset_item),
-                                   scale_reset_menu); 
+                                   xg.app.scale_reset_menu); 
         if (firsttime_reset) {
-          submenu_insert (reset_item, menubar, -1);
+          submenu_insert (reset_item, xg.app.menubar, -1);
           firsttime_reset = false;
         }
         break;
@@ -244,19 +244,19 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
       case BRUSH :
         brush_menus_make ();
 
-        reset_item = submenu_make ("_Reset", 'R', main_accel_group);
+        reset_item = submenu_make ("_Reset", 'R', xg.app.main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (reset_item),
-                                   brush_reset_menu); 
+                                   xg.app.brush_reset_menu); 
         if (firsttime_reset) {
-          submenu_insert (reset_item, menubar, -1);
+          submenu_insert (reset_item, xg.app.menubar, -1);
           firsttime_reset = false;
         }
 
-        link_item = submenu_make ("_Link", 'L', main_accel_group);
+        link_item = submenu_make ("_Link", 'L', xg.app.main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (link_item),
-                                   brush_link_menu); 
+                                   xg.app.brush_link_menu); 
         if (firsttime_link) {
-          submenu_insert (link_item, menubar, -1);
+          submenu_insert (link_item, xg.app.menubar, -1);
           firsttime_link = false;
         }
 
@@ -265,11 +265,11 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
       case IDENT:
         identify_menus_make ();
 
-        link_item = submenu_make ("_Link", 'L', main_accel_group);
+        link_item = submenu_make ("_Link", 'L', xg.app.main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (link_item),
-                                   identify_link_menu); 
+                                   xg.app.identify_link_menu); 
         if (firsttime_link) {
-          submenu_insert (link_item, menubar, -1);
+          submenu_insert (link_item, xg.app.menubar, -1);
           firsttime_link = false;
         }
         break;
@@ -549,18 +549,18 @@ void make_ui () {
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (window), vbox);
 
-  main_accel_group = gtk_accel_group_new ();
+  xg.app.main_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 main_accel_group, window, &menubar, (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (vbox), menubar, false, true, 0);
+                 xg.app.main_accel_group, window, &xg.app.menubar, (gpointer) NULL);
+  gtk_box_pack_start (GTK_BOX (vbox), xg.app.menubar, false, true, 0);
 
-  gtk_accel_group_lock (main_accel_group);
+  gtk_accel_group_lock (xg.app.main_accel_group);
 
 /*
  * Step through the option menu, setting the values of toggle items
  * as appropriate.
 */
-  items = gtk_container_children (GTK_CONTAINER (menubar));
+  items = gtk_container_children (GTK_CONTAINER (xg.app.menubar));
   while (items) {
     item = items->data;
     gtk_label_get (GTK_LABEL (GTK_MENU_ITEM (item)->item.bin.child ), &name);

@@ -142,13 +142,11 @@ parcoords_new (gboolean missing_p) {
   /* create a row of vertical plots by default */
   display->p1d_orientation = VERTICAL;
 
-  display->points_show_p = true;
-  display->segments_show_p = true;
-  display->missings_show_p = true;
-  display->gridlines_show_p = false;
-  display->axes_show_p = true;
-  display->double_buffer_p = true;
-  display->link_p = true;
+  /* Copy in the contents of DefaultOptions to create
+     an indepedently modifiable configuration copied from
+     the current template.
+   */
+  display->options = DefaultDisplayOptions;
 
   parcoords_cpanel_init (&display->cpanel);
 
@@ -380,7 +378,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
     if (sp_prev == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    else if (!display->missings_show_p &&
+    else if (!display->options.missings_show_p &&
           xg.nmissing > 0 &&
           (xg.missing.data[i][sp->p1dvar] ||
            xg.missing.data[i][sp_prev->p1dvar]))
@@ -425,7 +423,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
     if (sp_next == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    else if (!display->missings_show_p && xg.nmissing > 0 &&
+    else if (!display->options.missings_show_p && xg.nmissing > 0 &&
             (MISSING_P(i,sp->p1dvar) || MISSING_P(i,sp_next->p1dvar)))
     {
       draw_whisker = false;

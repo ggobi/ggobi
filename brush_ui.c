@@ -181,74 +181,74 @@ brush_menus_make () {
 /*
  * Reset menu
 */
-  brush_reset_menu = gtk_menu_new ();
+  xg.app.brush_reset_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Reset point colors");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "pointcolors");
-  gtk_menu_append (GTK_MENU (brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.brush_reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset brush size");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "brushsize");
-  gtk_menu_append (GTK_MENU (brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.brush_reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset linecolors");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "linecolors");
-  gtk_menu_append (GTK_MENU (brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.brush_reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset glyphs");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "glyphs");
-  gtk_menu_append (GTK_MENU (brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.brush_reset_menu), item);
 
-  gtk_widget_show_all (brush_reset_menu);
+  gtk_widget_show_all (xg.app.brush_reset_menu);
 
 /*
  * Link menu
 */
-  brush_link_menu = gtk_menu_new ();
+  xg.app.brush_link_menu = gtk_menu_new ();
 
   item = gtk_check_menu_item_new_with_label ("Link points <-> points");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "p2p");
-  gtk_menu_append (GTK_MENU (brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.brush_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   item = gtk_check_menu_item_new_with_label ("Link lines <-> lines");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "l2l");
-  gtk_menu_append (GTK_MENU (brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.brush_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   item = gtk_check_menu_item_new_with_label ("Link points <-> lines");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "p2l");
-  gtk_menu_append (GTK_MENU (brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.brush_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   item = gtk_check_menu_item_new_with_label ("Link color brushing");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "color");
-  gtk_menu_append (GTK_MENU (brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.brush_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
   item = gtk_check_menu_item_new_with_label ("Link glyph brushing");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "glyph");
-  gtk_menu_append (GTK_MENU (brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (xg.app.brush_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
-  gtk_widget_show_all (brush_link_menu);
+  gtk_widget_show_all (xg.app.brush_link_menu);
 }
 
 void
