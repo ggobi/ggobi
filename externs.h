@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void rowids_alloc (datad *, ggobid *);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 ggobid * ggobi_get (gint);
 GtkWidget * widget_find_by_name (GtkWidget *, gchar *);
@@ -145,7 +146,7 @@ void displays_tailpipe (gint, ggobid *);
 gint do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *, gfloat *);
 void draw_glyph (GdkDrawable *, glyphv *, icoords *, gint, ggobid *);
 gint dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v);
-void edges_alloc (gint, datad *, ggobid *);
+void edges_alloc (gint, datad *);
 void edges_create (datad *, ggobid *);
 void edges_create_defaults (datad *d, ggobid *gg);
 void edges_free (datad *, ggobid *);

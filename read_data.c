@@ -772,7 +772,7 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
     /*
      * Allocate space for <bsize> connecting lines.
     */
-    edges_alloc (bsize, d, gg);
+    edges_alloc (bsize, d);
     nblocks = 1;
     while (1)
     {
@@ -808,7 +808,7 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
            * Allocate space for <bsize> more connecting links.
           */
           nblocks++;
-          edges_alloc (nblocks*bsize, d, gg);
+          edges_alloc (nblocks*bsize, d);
           jlinks = 0;
         }
       }

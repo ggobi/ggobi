@@ -427,6 +427,7 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
   d->nrgroups = 0;              /*-- for now --*/
 
   rowlabels_alloc (d, data->gg);
+  rowids_alloc (d, data->gg);  /* dfs */
   br_glyph_ids_alloc (d);
   br_glyph_ids_init (d, data->gg);
 
@@ -445,8 +446,14 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
   data->current_variable = 0;
   data->current_element = 0;
 
+/*
+ * I have just realized that this is wrong.  EdgeData doesn't
+ * have edges!  It's linked to other data that <does> have
+ * edges.  What a gaffe.
+*/
   if(d->edgeData) {
-    alloc_edgeIDs(d);
+    /*alloc_edgeIDs(d);*/
+    edges_alloc (d->nrows, d);  /* dfs */
   }
 
 
@@ -1199,12 +1206,20 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
  
   tmp = getAttribute(attrs, "id");
   if(tmp) {
-    if(data->rowIds == NULL) {
+    if (data->rowIds == NULL) {
      data->rowIds = (gchar **) g_malloc(d->nrows * sizeof(gchar *));
      memset(data->rowIds, '\0', d->nrows);
     }
 
     data->rowIds[i] = g_strdup(tmp);
+    g_array_insert_val (d->rowid.name, data->current_record, stmp);
+  } else {
+
+    /* dfs */
+    /*-- I have to force a rowid if I'm going to use a GArray --*/
+    stmp = g_strdup_printf ("%d", i);
+    g_array_insert_val (d->rowid.name, data->current_record, stmp);
+
   }
 
   return(true);
@@ -1216,6 +1231,7 @@ readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data)
   const gchar *tmp;
   gint index = data->current_record;
   datad *d = getCurrentXMLData(data);
+  gint start, end;
 
   gboolean ans = readXMLRecord(attrs, data);
 
@@ -1227,7 +1243,7 @@ readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data)
     g_printerr (buf);
     exit(103);
   }
-  d->sourceID[index] = asInteger(tmp);
+  start = asInteger(tmp);
 
   tmp = getAttribute(attrs, "destination");   
   if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
@@ -1236,10 +1252,24 @@ readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data)
     g_printerr (buf);
     exit(103);
   }
-  d->destinationID[index] = asInteger(tmp);
+  end = asInteger(tmp);
+
+  if (start > end) {
+    d->edge_endpoints[index].a = end;
+    d->edge_endpoints[index].b = start;
+  } else {
+    d->edge_endpoints[index].a = start;
+    d->edge_endpoints[index].b = end;
+  }
+
+/*
+  d->sourceid.id.els[index] = asInteger(tmp);
+  d->destid.id.els[index] = asInteger(tmp);
+*/
   return(ans);
 }
 
+/*
 gint
 alloc_edgeIDs(datad *d)
 {
@@ -1250,6 +1280,7 @@ alloc_edgeIDs(datad *d)
   memset(d->destinationID, '\0', sz);
  return(d->nrows);
 }
+*/
 
 #else /* So using classes */
 gboolean

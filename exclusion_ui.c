@@ -335,6 +335,10 @@ cluster_window_open (ggobid *gg) {
   GSList *l;
   datad *d;
 
+  /*-- if used before we have data, bail out --*/
+  if (gg->d == NULL || g_slist_length (gg->d) == 0) 
+/**/return;
+
   /*-- if it isn't NULL, then destroy it and start afresh --*/
   if (gg->cluster_ui.window != NULL) {
     destroyit (false, gg);  /*-- don't kill the whole thing --*/

@@ -722,6 +722,10 @@ vartable_open (ggobid *gg)
   datad *d;
   gint n;
 
+  /*-- if used before we have data, bail out --*/
+  if (gg->d == NULL || g_slist_length (gg->d) == 0) 
+/**/return;
+
   /*-- if new datad's have been added, the user has to reopen the window --*/
   if (gg->vartable_ui.window != NULL) {
     destroyit (gg);

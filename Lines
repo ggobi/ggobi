@@ -115,6 +115,7 @@
 41174   4/17  Adding new variables
 41376   4/19  Renaming variables; various bug fixes
 41495   4/21  Added xyplot cycling; various bug fixes
+41894   4/26  Major redesign of hiding/exclusion/rescaling
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

@@ -146,13 +146,16 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
   GtkWidget *button, *t;
   GtkWidget *vbox, *frame, *hb, *vb;
   GtkWidget *label;
-  datad *d = gg->current_display->d;
+  datad *d;
   gboolean firsttime = false;  /*-- first time for this d? --*/
 
-  if (d == NULL)  /*-- if used before we have data --*/
+  /*-- if used before we have data, bail out --*/
+  if (gg->d == NULL || g_slist_length (gg->d) == 0) 
     return;
+
   else {
 
+    d = gg->current_display->d;
     gg->subset_ui.d = d;
 
     /*

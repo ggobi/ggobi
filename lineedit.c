@@ -23,7 +23,7 @@
 */
 
 void
-edges_alloc (gint nsegs, datad *d, ggobid *gg)
+edges_alloc (gint nsegs, datad *d)
 {
   d->edge_endpoints = (endpointsd *)
     g_realloc (d->edge_endpoints, nsegs * sizeof (endpointsd));

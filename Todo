@@ -24,6 +24,7 @@ Reading in new data
 
 In progress, needing design discussions:
   Deleting variables: how should plots behave? (disabled for now)
+    [If plotted, give a warning; otherwise, proceed]
   Should the variable stats table open by default when other tools open?
 
 various stuff not yet implemented:
@@ -32,6 +33,7 @@ various stuff not yet implemented:
   some window closings  (display tree ok; check others)
   "row groups" are only partially implemented
   1d, xy cycling  .... or run as a demo in R for now? (disabled for now)
+     (xy cycling implemented)
 
 Graphs
   Edges with data: a separate region of the variable selection panel

@@ -16,12 +16,11 @@
 #include "vars.h"
 #include "externs.h"
 
-/*
+/*-- catch the delete (close) event from the window manager --*/
 static void
-hide_cb (GtkWidget *w ) {
+close_window_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   gtk_widget_hide (w);
 }
-*/
 
 static gchar *stage0_lbl[] = {"No transformation",
                               "Raise minimum to 0",
@@ -137,10 +136,13 @@ transform_window_open (ggobid *gg)
   GtkWidget *lbl, *hbox;
   GtkWidget *vbox, *frame, *hb, *vb, *btn;
   GtkWidget *spinner;
-  datad *d = gg->current_display->d;
+  datad *d;
 
-  if (d == NULL || d->nrows == 0)  /*-- if used before we have data --*/
+  /*-- if used before we have data, bail out --*/
+  if (gg->d == NULL || g_slist_length (gg->d) == 0) 
     return;
+
+  d = gg->current_display->d;
 
   if (gg->tform_ui.window == NULL) {
     GtkStyle *style;
@@ -149,8 +151,12 @@ transform_window_open (ggobid *gg)
     gg->tform_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->tform_ui.window),
                           "transform variables");
-    
     gtk_container_set_border_width (GTK_CONTAINER (gg->tform_ui.window), 10);
+
+    gtk_signal_connect (GTK_OBJECT (gg->tform_ui.window),
+                        "delete_event",
+                        GTK_SIGNAL_FUNC (close_window_cb),
+                        (gpointer) gg);
 
 /*
  * Divide the window:  functions on the left, labels on the right
@@ -281,9 +287,9 @@ transform_window_open (ggobid *gg)
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (tform_reset_cb), gg);
 
-    gtk_widget_show_all (gg->tform_ui.window);
-  }
+  } 
 
+  gtk_widget_show_all (gg->tform_ui.window);
   gdk_window_raise (gg->tform_ui.window->window);
 }
 

@@ -344,12 +344,17 @@ sphere_panel_open (ggobid *gg)
   GtkWidget *frame0, *main_vbox, *vbox, *table, *frame, *hbox;
   GtkWidget *label;
   GtkWidget *spinner;
-  datad *d = gg->current_display->d;
+  datad *d;
   /*-- for the clist of sphered variables --*/
   GtkWidget *scrolled_window;
   gchar *titles[1] = {"sphered variables"};
   /*-- --*/
 
+  /*-- if used before we have data, bail out --*/
+  if (gg->d == NULL || g_slist_length (gg->d) == 0) 
+/**/return;
+
+  d = gg->current_display->d;
   spherevars_set (d, gg); 
 
   if (gg->sphere_ui.window == NULL) {

@@ -99,12 +99,15 @@ jitter_window_open (ggobid *gg) {
   GtkWidget *vbox, *vb;
   GtkWidget *sbar, *opt;
   GtkObject *adj;
-  datad *d = gg->current_display->d;
+  datad *d;
 
-  if (d == NULL)  /*-- if used when we have no data --*/
+  /*-- if used before we have data, bail out --*/
+  if (gg->d == NULL || g_slist_length (gg->d) == 0) 
     return;
 
   else {
+
+    d = gg->current_display->d;
 
     gg->jitter_ui.d = d;
 

@@ -57,9 +57,12 @@ class datad {
  GArray *rowlab;  /*-- allocates memory in chunks --*/
 
  /*-- row ids to support generalized linking --*/
-/*gchar *rowid_names;*/    /*-- all names, from 1:n; don't need to keep --*/
-/*GArray *rnames_uniq;*/   /*-- names after sorting and uniq-ing --*/
-/*vector_i rowid;*/        /*-- indices into rowid_names_uniq --*/
+ struct _RowID {
+   GArray *name;      /*-- all names, from 1:n; don't need to keep --*/
+   GArray *uniq;      /*-- names after sorting and uniq-ing --*/
+   vector_i id;       /*-- indices into rowid_names_uniq --*/
+ } rowid;
+ /*-- --*/
 
  gint ncols;
  vartabled *vartable;
@@ -217,7 +220,7 @@ class datad {
   virtual gboolean readXMLRecord(const CHAR **attrs, struct _XMLUserData *data);
 #endif
 
-#else
+#else /* if !USE_CLASSES */
 
       /* Instead of a method, use a function pointer which can be set
          for the different types.
@@ -227,11 +230,16 @@ class datad {
 #endif 
 
    gboolean edgeData;
-   guint *sourceID;
-   guint *destinationID;   
+   struct _SourceID {
+     vector_i id;
+   } sourceid;
+   struct _DestinationID {
+     vector_i id;
+   } destid;
+
    struct _datad *nodeData; 
 
-#endif /* end of USE_CLASSES */
+#endif /* end ifdef USE_CLASSES else */
 };
 
 #ifndef USE_CLASSES
@@ -246,8 +254,8 @@ extern datad *datad_new (datad *, struct _ggobid *);
 class EdgeDatad : public datad 
 {
  public:
-  EdgeDatad() : datad() { sourceID = NULL; 
-                          destinationID = NULL;
+  EdgeDatad() : datad() { sourceid.name = NULL; 
+                          destid.name = NULL;
                         }
 
   EdgeDatad(struct _ggobid *gg) : datad(gg) { 
@@ -261,8 +269,17 @@ class EdgeDatad : public datad
 #endif
 
  protected:
+   /*-- dfs -- I bet this isn't right --*/
+   struct _SourceID {
+     vector_i id;
+   } sourceid;
+   struct _DestinationID {
+     vector_i id;
+   } destid;
+/*
   int *sourceID;
   int *destinationID;
+*/
   datad *nodeData;
 };
 #endif

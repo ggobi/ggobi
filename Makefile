@@ -67,7 +67,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  tour2d_ui.c tour2d.c tour.c pp_ui.c tour1d_ui.c tour1d.c  \
  tourcorr_ui.c tourcorr.c ppcorr_ui.c \
  brush_ui.c brush.c brush_init.c brush_bins.c brush_api.c color_ui.c xlines.c \
- exclusion_ui.c exclusion.c \
+ exclusion_ui.c exclusion.c record_id.c \
  scale_ui.c scale_drag.c scale_click.c scale_api.c \
  identify_ui.c identify.c \
  lineedit_ui.c lineedit.c \
@@ -102,7 +102,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  tour2d_ui.o tour2d.o tour.o pp_ui.o tour1d_ui.o tour1d.o \
  tourcorr_ui.o tourcorr.o ppcorr_ui.o \
  brush_ui.o brush.o brush_init.o brush_bins.o brush_api.o color_ui.o xlines.o \
- exclusion_ui.o exclusion.o \
+ exclusion_ui.o exclusion.o record_id.o \
  scale_ui.o scale_drag.o scale_click.o scale_api.o \
  identify_ui.o identify.o \
  lineedit_ui.o lineedit.o \

@@ -35,6 +35,8 @@ void globals_init (ggobid *gg) {
   gg->color_0 = 4;
 
   gg->lims_use_visible = true;
+
+  gg->d = NULL;
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/

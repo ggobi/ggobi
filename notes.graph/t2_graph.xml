@@ -1,0 +1,61 @@
+<ggobidata count="2">
+
+<data name="COI Nodes">
+<description>
+
+Two linked datasets, A with data on nodes and B with data on edges.
+
+Some views of A will drawn with edges; that's unlikely for B.  The
+edges in A are linked to points in B.
+
+B is the graph complement of A, so it's mathematically meaningful
+link an edge in B to a point in A, but that is unlikely to be
+meaningful in terms of the data.
+
+</description>
+<variables count="2">
+  <variable>biz_in</variable>
+  <variable>biz_out</variable>
+</variables>
+<records  count="5">
+<record label="2012175830">  8 7  </record>
+<record label="2012914310"> 11 8  </record>
+<record label="2013868187">  7 9  </record>
+<record label="2014128020">  9 9  </record>
+<record label="2016011778">  8 10 </record>
+</records>
+
+<!--
+  in previous versions of this data, I have consistently
+  gotten this wrong, imagining that the edges would be
+  drawn in the second dataset.  However, they belong here.
+-->
+<edges count="4">
+<edge source="1" destination="2"> </edge>
+<edge source="2" destination="3"> </edge>
+<edge source="3" destination="4"> </edge>
+<edge source="2" destination="4"> </edge>
+</edges>
+
+</data>
+
+<data name="COI Edge Data" edges="T" nodeData="COI Nodes">
+<variables count="3">
+  <variable>time</variable>
+  <variable>dow</variable>
+  <variable>duration</variable>
+</variables>
+<!--
+  since in fact edges will not be drawn in plots of this
+  data, should be use edgeids to establish this linking
+  rather than specifying source and destination?
+-->
+<records count="4">
+<record source="1" destination="2"> 959837927 4 258 </record>
+<record source="2" destination="3"> 959838199 4 111 </record>
+<record source="3" destination="4"> 959838331 4  50 </record>
+<record source="2" destination="4"> 959838402 4  11 </record>
+</records>
+</data>
+</ggobidata>
+

@@ -183,8 +183,9 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, datad *d, ggobid *gg) {
 
         if (d->ncols >= MAXNCOLS) {
           g_printerr (
-            "This file has more than %d columns.  In order to read\n", MAXNCOLS);
-          g_printerr (" it in, increase MAXNCOLS in defines.h and recompile.\n");
+            "This file has more than %d columns.  In order to read\n",
+            MAXNCOLS);
+          g_printerr ("it in, increase MAXNCOLS in defines.h and recompile.\n");
           exit (0);
         }
       }
