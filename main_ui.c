@@ -184,7 +184,11 @@ varpanel_reinit (ggobid *gg)
     gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
                                         d->vcirc_ui.vbox);
     /*-- update the reference count for the vbox --*/
+#if GTK_MAJOR_VERSION == 1
     if (GTK_OBJECT (d->vcirc_ui.vbox)->ref_count > 1)
+#else
+    if (G_OBJECT (d->vcirc_ui.vbox)->ref_count > 1)
+#endif
       gtk_widget_unref (d->vcirc_ui.vbox);
 
   } else if (!highd && varpanel_shows_circles (d)) {
@@ -194,7 +198,11 @@ varpanel_reinit (ggobid *gg)
                                          d->vcirc_ui.vbox);
     gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
                                       d->vcbox_ui.swin);
+#if GTK_MAJOR_VERSION == 1
     if (GTK_OBJECT (d->vcbox_ui.swin)->ref_count > 1)
+#else
+    if (G_OBJECT (d->vcbox_ui.swin)->ref_count > 1)
+#endif
       gtk_widget_unref (d->vcbox_ui.swin);
   }
 }
@@ -229,7 +237,11 @@ viewmode_set (PipelineMode m, ggobid *gg)
         gg->control_panel[gg->viewmode]);
 
       /*-- avoid increasing the object's ref_count infinitely  --*/
+#if GTK_MAJOR_VERSION == 1
       if (GTK_OBJECT (gg->control_panel[gg->viewmode])->ref_count > 1)
+#else
+      if (G_OBJECT (gg->control_panel[gg->viewmode])->ref_count > 1)
+#endif
         gtk_widget_unref (gg->control_panel[gg->viewmode]);
     }
   }
