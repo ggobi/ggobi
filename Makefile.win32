@@ -11,6 +11,7 @@ WIN32=1
 
 INNO=C:\\Program\ Files\\Inno\ Setup\\Compil32.exe
 INNO=/cygdrive/c/Inno3/iscc.exe
+INNO=c:\\Inno3\\iscc.exe
 #INNO_FLAGS=/cc
 
 include local.config
@@ -287,7 +288,11 @@ ggobi.iss: Install/ggobi.iss
 	perl -p -e 's/\n/\r\n/;' ggobi.iss-temp > ggobi.iss
 	rm ggobi.iss-temp
 
-installer: libs ggobi.iss ggobi.exe libggobi.a libggobi.dll
+tmp/ggobirc: notes/ggobirc-windows
+	if test ! -d tmp ; then mkdir tmp ; fi
+	cp notes/ggobirc-windows tmp/ggobirc
+
+installer: tmp/ggobirc libs ggobi.iss ggobi.exe libggobi.a ggobi.dll
 	$(INNO) $(INNO_FLAGS) ggobi.iss
 	mv Output/setup.exe Output/ggobi.exe
 

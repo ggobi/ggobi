@@ -118,7 +118,7 @@ typedef struct {
 
 extern const Dynload *dynload;
 
-HINSTANCE load_plugin_library(GGobiPluginDetails *plugin);
+HINSTANCE load_plugin_library(GGobiPluginDetails *plugin, gboolean recurse);
 
 DLFUNC getPluginSymbol(const char *name, GGobiPluginDetails *plugin);
 

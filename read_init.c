@@ -749,7 +749,7 @@ loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin)
     }
   }
 
-  plugin->library = load_plugin_library(plugin);
+  plugin->library = load_plugin_library(plugin, true);
   plugin->loaded = plugin->library != NULL ? DL_LOADED : DL_FAILED;
 
   if(plugin->loaded == DL_LOADED && GGobi_checkPlugin(plugin) && plugin->onLoad) {

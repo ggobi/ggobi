@@ -84,8 +84,26 @@ GGobi_checkPlugin(GGobiPluginDetails *plugin)
  return(ok);
 }
 
+char *
+installed_file_name(char *name)
+{
+  char *tmp;
+  char *dirPtr, *dir;
+  dir = sessionOptions->cmdArgs[0];
+  dirPtr = strrchr(dir, '\\');
+
+  tmp = (char *) g_malloc( ((dirPtr - dir) + strlen(name)+ 3)*sizeof(char));
+  strncpy(tmp, dir, dirPtr-dir + 1);
+  tmp[(dirPtr - dir) + 1] = '\0';
+
+  strcpy(tmp + (dirPtr - dir) + 1, name);
+  tmp[(dirPtr - dir) + strlen(name)+2] = '\0';  
+
+  return(tmp);
+}
+
 HINSTANCE 
-load_plugin_library(GGobiPluginDetails *plugin)
+load_plugin_library(GGobiPluginDetails *plugin, gboolean recurse)
 {
   HINSTANCE handle;
   char *fileName;
@@ -102,6 +120,23 @@ load_plugin_library(GGobiPluginDetails *plugin)
     strcpy(fileName, plugin->dllName);
     strcpy(fileName+strlen(plugin->dllName), DLL_EXTENSION);
     fileName[strlen(plugin->dllName) + strlen(DLL_EXTENSION)] = '\0';
+  }
+
+  if(canRead(fileName) == false && recurse) {
+   char *tmp = plugin->dllName;  
+   if(fileName != plugin->dllName)
+     g_free(fileName);
+
+   plugin->dllName = installed_file_name(plugin->dllName);
+
+   handle = load_plugin_library(plugin, false);
+   if(!handle) {
+     free(plugin->dllName);
+     plugin->dllName = tmp;
+   } else {
+     free(tmp);
+   }
+   return(handle);
   }
 
   if(canRead(fileName) == false) {
@@ -145,7 +180,7 @@ getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
   sprintf(tmp, "%s", name);
 #endif
   if(plugin->library == NULL && plugin->loaded != DL_LOADED) {
-     plugin->library = load_plugin_library(plugin);   
+     plugin->library = load_plugin_library(plugin, true);   
   }
   return(dynload->resolve(plugin->library, tmp));
 }
