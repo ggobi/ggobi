@@ -291,3 +291,4 @@ position_popup_menu (GtkMenu *menu, gint *px, gint *py, gpointer data)
 
   *py += h;
 }
+

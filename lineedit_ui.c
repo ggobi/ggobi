@@ -94,8 +94,14 @@ lineedit_event_handlers_toggle (splotd *sp, gboolean state) {
                                          (GtkSignalFunc) button_release_cb,
                                          (gpointer) sp);
   } else {
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
+    if (sp->press_id) {
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
+      sp->press_id = 0;
+    }
+    if (sp->release_id) {
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
+      sp->release_id = 0;
+    }
   }
 }
 

@@ -177,3 +177,30 @@ limits_set (gboolean do_raw, gboolean do_tform, datad *d)
   }
 }
 
+void
+limits_set_by_var (gint j, gboolean do_raw, gboolean do_tform, datad *d)
+{
+  gfloat min, max;
+
+  /*-- compute the limits for the raw data --*/
+  if (do_raw)
+    limits_raw_set_by_var (j, d);
+  /*-- compute the limits for the transformed data --*/
+  if (do_tform)
+    limits_tform_set_by_var (j, d);
+
+  /*-- specify the limits used: from data or user specification --*/
+  if (d->vartable[j].lim_specified_p) {
+    min = d->vartable[j].lim_specified_tform.min;
+    max = d->vartable[j].lim_specified_tform.max;
+  } else {
+    min = d->vartable[j].lim_tform.min;
+    max = d->vartable[j].lim_tform.max;
+  }
+
+  limits_adjust (&min, &max);
+
+  d->vartable[j].lim.min = min;
+  d->vartable[j].lim.max = max;
+}
+

@@ -317,6 +317,56 @@ option_menu_index (GtkOptionMenu *optionmenu)
   return index;
 }
 
+/*--------------------------------------------------------------------*/
+/*--- Find a widget by name, starting from an enclosing container ----*/
+/*--------------------------------------------------------------------*/
+
+static gboolean 
+widget_name_p (GtkWidget *w, gchar *name)
+{
+  if (strcmp (gtk_widget_get_name (w), name) == 0) {
+    return true;
+  }
+  else return false;
+}
+
+/*
+ * parent must be a container: loop through its children, finding 
+ * a widget with the name 'name'
+*/
+GtkWidget *
+widget_find_by_name (GtkWidget *parent, gchar *name)
+{
+  GtkWidget *w, *namedw = NULL;
+  GList *children, *l;
+
+  if (widget_name_p (parent, name))
+    namedw = parent;
+
+  else {
+    if (GTK_CONTAINER(parent)) {
+      children = gtk_container_children (GTK_CONTAINER(parent));
+      for (l=children; l; l=l->next) {
+        if (GTK_IS_WIDGET(l->data)) {
+          w = GTK_WIDGET (l->data);
+          if (widget_name_p (w, name)) {
+            namedw = w;
+            break;
+          }
+          if (GTK_IS_CONTAINER (w)) {
+            namedw = widget_find_by_name (w, name);
+            if (namedw != NULL)
+              break;
+          }
+        }
+      }
+    }
+  }
+
+  return namedw;
+}
+
+/*--------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------*/
 /*                            Debugging                                  */

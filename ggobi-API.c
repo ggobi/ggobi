@@ -1027,8 +1027,9 @@ gint
 GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update, 
   datad *d, ggobid *gg)
 {
+  gint i;
+
   if (d->ncols < 1) {
-    gint i;
     gchar ** rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
     for (i = 0; i < num; i++) {
       rnames[i] = (gchar *) g_malloc (sizeof (gchar)*7);
@@ -1044,25 +1045,11 @@ GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update,
       g_free (rnames[i]);
     g_free (rnames);
   } else {
-    gint which = d->ncols-1;
-    gint *cols = (gint *) g_malloc (sizeof (gint));
-    gint ncols = 1;
     if (num > d->nrows) {
       num =  d->nrows;
       /* Add a warning here. */
     }
-
-    /*-- we have to first clone a variable and then
-         overwrite its name and variables.  --*/
-    cols[0] = 0;
-    clone_vars (cols, ncols, d, gg);
-    g_free (cols);
-/*
- *  variable_clone (0, name, true, d, gg);
-*/
-    which++;
-    GGOBI(setVariableName)(which, name, false, d, gg);
-    GGOBI(setVariableValues)(which, vals, num, update, d, gg);
+    newvar_add_with_values (vals, num, name, d, gg);
   }
 
   if (update)
@@ -1093,7 +1080,6 @@ GGOBI(setVariableValues)(gint whichVar, gdouble *vals, gint num,
   if(update) {
     GGOBI(update_data)(d, gg);
   }
-
 
   return(true);    
 }

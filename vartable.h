@@ -25,4 +25,8 @@
 #define CLIST_MEDIAN    8
 #define CLIST_NMISSING  9
 
+
+#define ADDVAR_ROWNOS   0
+#define ADDVAR_BGROUP   1
+
 #endif

@@ -95,6 +95,7 @@ deleteit (ggobid *gg) {
   gg->sphere_ui.condnum_entry = NULL;
   gg->sphere_ui.variance_entry = NULL;
   gg->sphere_ui.apply_btn = NULL;
+  gg->sphere_ui.npcs_adj = (GtkObject *) NULL;
 }
 
 void

@@ -278,7 +278,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 /*                  adding and deleting variables                          */
 /*-------------------------------------------------------------------------*/
 
-void
+static void
 varpanel_checkbox_add (gint j, datad *d, ggobid *gg) 
 {
   GtkWidget *w = gtk_noop_check_button_new_with_label (d->vartable[j].collab);
@@ -291,6 +291,18 @@ varpanel_checkbox_add (gint j, datad *d, ggobid *gg)
   d->vcbox_ui.checkbox = g_slist_append (d->vcbox_ui.checkbox, w);
   gtk_widget_show (w);
 }
+
+void
+varpanel_checkboxes_add (gint nc, datad *d, ggobid *gg) 
+{
+  gint j;
+  gint n = g_slist_length (d->vcbox_ui.checkbox);
+  
+  /*-- create the variable checkboxes --*/
+  for (j=n; j<nc; j++)
+    varpanel_checkbox_add (j, d, gg);
+}
+
 
 /*-- delete nc checkboxes, starting at jcol --*/
 void

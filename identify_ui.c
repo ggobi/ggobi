@@ -202,14 +202,22 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
                                         (GtkSignalFunc) motion_notify_cb,
                                         (gpointer) sp);
   } else {
-    if (sp->key_press_id)
+    if (sp->key_press_id) {
       gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
-    if (sp->press_id)
+      sp->key_press_id = 0;
+    }
+    if (sp->press_id) {
       gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
-    if (sp->release_id)
+      sp->press_id = 0;
+    }
+    if (sp->release_id) {
       gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
-    if (sp->motion_id)
+      sp->release_id = 0;
+    }
+    if (sp->motion_id) {
       gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+      sp->motion_id = 0;
+    }
   }
 
 }

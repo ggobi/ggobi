@@ -71,6 +71,10 @@ vartable_clist_get (ggobid *gg) {
   return ((GtkCList *) g_list_nth_data (swin_children, 0));
 }
 
+/*-------------------------------------------------------------------------*/
+/*--------------- Setting and clearing variable ranges --------------------*/
+/*-------------------------------------------------------------------------*/
+
 static void
 dialog_range_cancel (GtkWidget *w, ggobid *gg) 
 {
@@ -82,6 +86,7 @@ static void
 dialog_range_set (GtkWidget *w, ggobid *gg) 
 {
   GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  GtkWidget *umin_entry, *umax_entry;
   GtkCList *clist = vartable_clist_get (gg);
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
@@ -91,8 +96,19 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   gfloat min_val, max_val;
   gboolean min_p = false, max_p = false;
 
+  umin_entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "umin_entry");
+  if (umin_entry == NULL || !GTK_IS_ENTRY(umin_entry)) {
+    g_printerr ("found the wrong widget; bail out\n");
+    return;
+  } else g_printerr ("found the umin entry widget\n");
+  umax_entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "umax_entry");
+  if (umax_entry == NULL || !GTK_IS_ENTRY(umax_entry)) {
+    g_printerr ("found the wrong widget; bail out\n");
+    return;
+  } else g_printerr ("found the umax entry widget\n");
+
   /*-- minimum --*/
-  val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->vartable_ui.umin),
+  val_str = gtk_editable_get_chars (GTK_EDITABLE (umin_entry),
     0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
     min_val = (gfloat) atof (val_str);
@@ -101,7 +117,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   }
 
   /*-- maximum --*/
-  val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->vartable_ui.umax),
+  val_str = gtk_editable_get_chars (GTK_EDITABLE (umax_entry),
     0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
     g_free (val_str);
@@ -151,11 +167,11 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
  * and fetch the range for the selected variables in
  * dialog_range_set.
 */
-void
-range_set_cb (GtkWidget *w, ggobid *gg)
+static void
+open_range_set_dialog (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *frame, *vb, *hb, *okay_btn, *cancel_btn;
-  GtkWidget *dialog;
+  GtkWidget *dialog, *umin, *umax;
   gint k;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
@@ -191,14 +207,14 @@ range_set_cb (GtkWidget *w, ggobid *gg)
   gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Minimum: "),
     true, true, 2);
 
-  gg->vartable_ui.umin = gtk_entry_new ();
-  gtk_widget_set_usize (gg->vartable_ui.umin,
-                        gdk_string_width (gg->vartable_ui.umin->style->font,
+  umin = gtk_entry_new ();
+  gtk_widget_set_usize (umin,
+                        gdk_string_width (umin->style->font,
                         "0000000000"), -1);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->vartable_ui.umin,
+  gtk_widget_set_name (umin, "umin_entry");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), umin,
     "Range minimum for the selected variable(s)", NULL);
-  gtk_box_pack_start (GTK_BOX (hb), gg->vartable_ui.umin,
-    true, true, 2);
+  gtk_box_pack_start (GTK_BOX (hb), umin, true, true, 2);
 
   gtk_container_add (GTK_CONTAINER (vb), hb);
 
@@ -207,25 +223,25 @@ range_set_cb (GtkWidget *w, ggobid *gg)
   gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Maximum: "),
     true, true, 2);
 
-  gg->vartable_ui.umax = gtk_entry_new ();
-  gtk_widget_set_usize (gg->vartable_ui.umax,
-                        gdk_string_width (gg->vartable_ui.umax->style->font,
+  umax = gtk_entry_new ();
+  gtk_widget_set_usize (umax,
+                        gdk_string_width (umax->style->font,
                         "0000000000"), -1);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->vartable_ui.umax,
+  gtk_widget_set_name (umax, "umax_entry");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), umax,
     "Range minimum for the selected variable(s)", NULL);
-  gtk_box_pack_start (GTK_BOX (hb), gg->vartable_ui.umax,
-    true, true, 2);
+  gtk_box_pack_start (GTK_BOX (hb), umax, true, true, 2);
 
   gtk_container_add (GTK_CONTAINER (vb), hb);
 
-  /*-- buttons --*/
+  /*-- ok button --*/
   okay_btn = gtk_button_new_with_label ("Okay");
   gtk_signal_connect (GTK_OBJECT (okay_btn), "clicked",
     GTK_SIGNAL_FUNC (dialog_range_set), gg);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
     okay_btn);
 
-  /*-- buttons --*/
+  /*-- cancel button --*/
   cancel_btn = gtk_button_new_with_label ("Cancel");
   gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
     GTK_SIGNAL_FUNC (dialog_range_cancel), gg);
@@ -270,6 +286,115 @@ void range_unset_cb (GtkWidget *w, ggobid *gg)
 {
   range_unset (gg);
 }
+
+/*-------------------------------------------------------------------------*/
+/*------- Adding derived variables (other than cloning, for now) ----------*/
+/*-------------------------------------------------------------------------*/
+
+static void
+dialog_newvar_cancel (GtkWidget *w, ggobid *gg) 
+{
+  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  gtk_widget_destroy (dialog);
+}
+
+static void
+dialog_newvar_add (GtkWidget *w, ggobid *gg) 
+{
+  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  GtkWidget *entry, *radio_brush;
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  gint vtype;
+  gchar *vname;
+
+  /*-- retrieve the radio button for the brushing groups --*/
+  radio_brush = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "radio_brush");
+  if (radio_brush == NULL || !GTK_IS_RADIO_BUTTON(radio_brush)) {
+    g_printerr ("found the wrong widget; bail out\n");
+    return;
+  }
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (radio_brush)))
+    vtype = ADDVAR_BGROUP;
+  else
+    vtype = ADDVAR_ROWNOS;
+
+  /*-- retrieve the entry widget and variable name --*/
+  entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "newvar_entry");
+  if (entry == NULL || !GTK_IS_ENTRY(entry)) {
+    g_printerr ("found the wrong widget; bail out\n");
+    return;
+  }
+  vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
+  if (vname != NULL && strlen(vname) > 1) {
+    void newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg);
+    newvar_add (vtype, vname, d, gg);
+  }
+}
+
+static void
+open_newvar_dialog (GtkWidget *w, ggobid *gg)
+{
+  GtkWidget *dialog;
+  GtkWidget *frame, *vb, *hb, *okay_btn, *cancel_btn;
+  GtkWidget *radio1, *radio2, *entry;
+  GSList *radio_group;
+
+  dialog = gtk_dialog_new ();
+  gtk_window_set_title (GTK_WINDOW (dialog), "Add new variable");
+  frame = gtk_frame_new ("Variable values");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), frame,
+    false, false, 2);
+
+  /*-- make a vb to hold the radio buttons --*/
+  vb = gtk_vbox_new (false, 2);
+  gtk_container_add (GTK_CONTAINER (frame), vb);
+
+  radio1 = gtk_radio_button_new_with_label (NULL, "1:n");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
+    "Add a variable whose values run from 1 to the number of cases",
+    NULL);
+  gtk_box_pack_start (GTK_BOX (vb), radio1, false, false, 2);
+
+  radio_group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
+
+  radio2 = gtk_radio_button_new_with_label (radio_group, "Brushed groups");
+  gtk_widget_set_name (radio2, "radio_brush");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
+    "Add a variable whose values are based on the groups defined by brushing",
+    NULL);
+  gtk_box_pack_start (GTK_BOX (vb), radio2, false, false, 2);
+
+  /*-- label and entry --*/
+  hb = gtk_hbox_new (false, 2);
+  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Variable name: "),
+    true, true, 2);
+  entry = gtk_entry_new();
+  gtk_widget_set_name (entry, "newvar_entry");
+
+  gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
+
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), hb,
+    false, false, 2);
+
+  /*-- ok button --*/
+  okay_btn = gtk_button_new_with_label ("Okay");
+  gtk_signal_connect (GTK_OBJECT (okay_btn), "clicked",
+    GTK_SIGNAL_FUNC (dialog_newvar_add), gg);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
+    okay_btn);
+
+  /*-- cancel button --*/
+  cancel_btn = gtk_button_new_with_label ("Cancel");
+  gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
+    GTK_SIGNAL_FUNC (dialog_newvar_cancel), gg);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
+    cancel_btn);
+
+  gtk_widget_show_all (dialog);
+}
+
+/*-------------------------------------------------------------------------*/
 
 void select_all_cb (GtkWidget *w, ggobid *gg)
 {
@@ -371,6 +496,42 @@ void sortbycolumn_cb (GtkWidget *cl, gint column, ggobid *gg)
   return;
 }
 
+static void
+vartable_row_assemble (gchar **row, datad *d, ggobid *gg)
+{
+  /*-- the new row will be appended --*/
+  gint nrows = GTK_CLIST (d->vartable_clist)->rows;
+
+  row[CLIST_VARNO] = g_strdup_printf ("%d", nrows);
+  row[CLIST_VARNAME] = g_strdup ("");
+  row[CLIST_TFORM] = g_strdup ("");
+  row[CLIST_USER_MIN] = g_strdup ("");
+  row[CLIST_USER_MAX] = g_strdup ("");
+  row[CLIST_DATA_MIN] = g_strdup_printf ("%8.3f", 0.0);
+  row[CLIST_DATA_MAX] = g_strdup_printf ("%8.3f", 0.0);
+  row[CLIST_MEAN] = g_strdup_printf ("%8.3f", 0.0);
+  row[CLIST_MEDIAN] = g_strdup_printf ("%8.3f", 0.0);
+  row[CLIST_NMISSING] = g_strdup_printf ("%d", 0);
+}
+
+void
+vartable_row_append (datad *d, ggobid *gg)
+{
+  if (d->vartable_clist != NULL) {
+    gint k;
+    gchar **row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
+
+    vartable_row_assemble (row, d, gg);
+    gtk_clist_freeze (GTK_CLIST (d->vartable_clist));
+    gtk_clist_append ((GtkCList *) d->vartable_clist, row);
+    gtk_clist_thaw (GTK_CLIST (d->vartable_clist));
+
+    for (k=0; k<NCOLS_CLIST; k++)
+      g_free ((gpointer) row[k]);
+    g_free ((gpointer) row);
+  }
+}
+
 void
 vartable_open (ggobid *gg)
 {                                  
@@ -453,8 +614,11 @@ vartable_open (ggobid *gg)
                                         k, true);
 
     /*-- populate the table --*/
-    for (j=0 ; j<d->ncols ; j++)
-      vartable_row_append (j, d, gg);
+    for (j=0 ; j<d->ncols ; j++) {
+      vartable_row_append (d, gg);
+      vartable_cells_set_by_var (j, d);  /*-- then populate --*/
+    }
+    
 
     /*-- track selections --*/
     gtk_signal_connect (GTK_OBJECT (d->vartable_clist), "select_row",
@@ -490,7 +654,7 @@ vartable_open (ggobid *gg)
     "Set user min and max for the selected variable(s)", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (range_set_cb), gg);
+                      GTK_SIGNAL_FUNC (open_range_set_dialog), gg);
 
 
   btn = gtk_button_new_with_label ("Unset range");
@@ -525,14 +689,21 @@ vartable_open (ggobid *gg)
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (clone_vars_cb), gg);
 
+  /*-- New variable: index, derived from brushing, ... --*/
+  btn = gtk_button_new_with_label ("New ...");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Add a new variable", NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (open_newvar_dialog), gg);
+
   btn = gtk_button_new_with_label ("Delete");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Delete selected variables", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (delete_vars_cb), gg);
-
-  /*-- until all the details are worked out, make this insensitive --*/
+  /*-- until the details are worked out, make this insensitive --*/
   gtk_widget_set_sensitive (btn, false);
   /*-- --*/
 
@@ -565,9 +736,18 @@ vartable_collab_set_by_var (gint j, datad *d)
 void
 vartable_collab_tform_set_by_var (gint j, datad *d)
 {
-  if (d->vartable_clist != NULL)
-    gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-      CLIST_TFORM, d->vartable[j].collab_tform);
+  if (d->vartable_clist != NULL) {
+    if (d->vartable[j].tform0 == NO_TFORM0 &&
+        d->vartable[j].tform1 == NO_TFORM1 &&
+        d->vartable[j].tform2 == NO_TFORM2)
+    {
+      gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+        CLIST_TFORM, g_strdup(""));
+    } else {
+      gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+        CLIST_TFORM, d->vartable[j].collab_tform);
+    }
+  }
 }
 
 /*-- sets the limits for a variable --*/
@@ -609,4 +789,17 @@ vartable_stats_set (datad *d) {
   if (d->vartable_clist != NULL)
     for (j=0; j<d->ncols; j++)
       vartable_stats_set_by_var (j, d);
+}
+
+/*
+ * in one routine, populate every cell in a row -- all these
+ * functions call gtk_clist_set_text.
+*/
+void
+vartable_cells_set_by_var (gint j, datad *d) 
+{
+  vartable_stats_set_by_var (j, d);
+  vartable_limits_set_by_var (j, d);
+  vartable_collab_set_by_var (j, d);
+  vartable_collab_tform_set_by_var (j, d);
 }

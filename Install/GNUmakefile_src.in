@@ -93,6 +93,7 @@ SRC=\
     varpanel_ui.c \
     vartable.c \
     vartable_ui.c \
+    varchange.c \
     vector.c \
     win32_draw.c \
     write_svg.c \

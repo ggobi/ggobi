@@ -24,6 +24,26 @@ struct _PrintOptions {
   OutputDescription *file;
 
   /* Add more fields here to store other settings. */  
+/*
+Here's what we had in xgobi:
+  Postscript printer:
+Really the postscript printer command, eg lpr -Pserif
+
+  Background color: (a string)
+  Foreground color: (a string)
+  Color for white glyphs: (a string)
+The purpose of this was to let a plot with a dark background be
+printed with a light background, and then to allow white glyphs
+to be reset as dark glyphs.  I don't know how to do this now.
+Color names don't really make sense any more, since ggobi doesn't
+use color names, and they aren't portable to Windows, are they?
+Should people specify r,g,b?  Or should we bring up a color wheel
+to let them set the color?
+
+  Pointsize:
+
+Then we had two buttons: write to file, or send to printer
+*/
 
   GdkColor background;
   GdkColor foreground;

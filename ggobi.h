@@ -125,7 +125,6 @@ struct _ggobid {
  struct _VarTableUI {
    GtkWidget *window;
    GtkWidget *notebook;
-   GtkWidget *umin, *umax;   /*-- text entry widgets for setting ranges --*/
  } vartable_ui;
 
 /*----------------------- missing values ---------------------------*/

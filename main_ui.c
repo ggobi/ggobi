@@ -40,61 +40,6 @@ const char *const GGOBI(OpModeNames)[] = {
 
 static const char *const *mode_name = GGOBI(OpModeNames);
 
-/* w is gg->mode_frame */
-static gint
-size_allocate_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
-{
-  static gint height = 0;  /*-- this should be moved in ggobi.h, probably --*/
-
-  gint frame_height_req, frame_height, cpanel_height_req, hdiff;
-
-  frame_height_req = w->requisition.height;
-  frame_height = w->allocation.height;
-  cpanel_height_req = gg->control_panel[gg->mode]->requisition.height;
-  hdiff = frame_height_req - cpanel_height_req;
-
-/*
-g_printerr (
- "frame_height_req = %d, frame_height = %d, cpanel_height_req = %d\n",
-  frame_height_req, frame_height, cpanel_height_req);
-*/
-
-  if (cpanel_height_req > height) {
-    height = cpanel_height_req;
-/*    g_printerr (" new height = %d\n\n", height);*/
-    gtk_widget_set_usize (w, -1, height + hdiff);
-  } else {
-    ;
-/*    g_printerr (" don't change the height\n\n");*/
-  }
-
-
-/*
-  static gboolean initd = false;
-  if (!initd ) {
-
-    GtkWidget *largest_panel = gg->control_panel[COTOUR];
-    GtkWidget *mode_panel = gg->control_panel[gg->mode];
-
-    gtk_widget_ref (mode_panel);
-    gtk_container_remove (GTK_CONTAINER (gg->mode_frame), mode_panel);
-
-    gtk_container_add (GTK_CONTAINER (gg->mode_frame), largest_panel);
-    gtk_container_check_resize (GTK_CONTAINER (w));
-
-    gtk_widget_ref (largest_panel);
-    gtk_container_remove (GTK_CONTAINER (gg->mode_frame), largest_panel);
-    gtk_container_add (GTK_CONTAINER (gg->mode_frame), mode_panel);
-
-    gtk_widget_unref (mode_panel);
-
-    initd = true;
-  }
-*/
-
-  return false;
-}
-
 void
 make_control_panels (ggobid *gg) {
 
@@ -777,7 +722,7 @@ make_ui (ggobid *gg) {
 
   display_menu_init (gg);
 
-  gtk_box_pack_start (GTK_BOX (vbox), gg->main_menubar, false, true, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), gg->main_menubar, false, false, 0);
 
   gtk_accel_group_lock (gg->main_accel_group);
 
@@ -822,18 +767,13 @@ make_ui (ggobid *gg) {
 /* */
 
   hbox = gtk_hbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, true, true, 0);
 
 /*
  * Create a frame to hold the mode panels, set its label
  * and contents, using the default mode for the default display.
 */
   gg->mode_frame = gtk_frame_new (mode_name[gg->mode]);
-  /*-- this may keep the window from shrinking all the time --*/
-/*
- *gtk_container_set_resize_mode (GTK_CONTAINER (gg->mode_frame), 
- *                               GTK_RESIZE_IMMEDIATE);
-*/
 
   gtk_box_pack_start (GTK_BOX (hbox), gg->mode_frame, false, false, 3);
   gtk_container_set_border_width (GTK_CONTAINER (gg->mode_frame), 3);
@@ -847,15 +787,6 @@ make_ui (ggobid *gg) {
   varpanel_make (hbox, gg);
 
   gtk_widget_show_all (hbox);
-
-  /*
-   * to keep the mode_frame from shrinking when a smaller control
-   *   panel is used
-  */
-  gtk_signal_connect (GTK_OBJECT (gg->mode_frame),
-                      "size_allocate",
-                      (GtkSignalFunc) size_allocate_cb,
-                      (gpointer) gg);
 
   gtk_widget_show_all (window);
 }

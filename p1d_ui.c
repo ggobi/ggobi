@@ -87,8 +87,10 @@ p1d_event_handlers_toggle (splotd *sp, gboolean state) {
                                            (GtkSignalFunc) key_press_cb,
                                            (gpointer) sp);
   } else {
-    if (sp->key_press_id)
+    if (sp->key_press_id) {
       gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
+      sp->key_press_id = 0;
+    }
   }
 }
 
