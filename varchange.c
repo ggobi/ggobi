@@ -94,7 +94,7 @@ addvar_propagate (gint ncols_prev, gint ncols_added, datad *d, ggobid *gg)
  * groups, for example, or perhaps just the row numbers.
 */
 void
-newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
+newvar_add (NewVariableType vtype, gchar *vname, datad *d, ggobid *gg)
 {
   gint i;
   gint d_ncols_prev = d->ncols;
