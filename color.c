@@ -21,6 +21,23 @@ static gfloat default_rgb[NCOLORS][3] = {
 static gfloat bg_rgb[]     = {0, 0, 0};  /* -> bg_color */
 static gfloat accent_rgb[] = {1, 1, 1};  /* -> fg_color */
 
+/* API */
+static guint m[NCOLORS][3];
+guint **
+getColorTable ()
+{
+  gint k;
+
+  for (k=0; k<NCOLORS; k++) {
+    m[k][0] = xg.default_color_table[k].red;
+    m[k][1] = xg.default_color_table[k].green;
+    m[k][2] = xg.default_color_table[k].blue;
+  }
+
+  return (guint **) m;
+}
+
+
 void
 color_table_init () {
   gint i;

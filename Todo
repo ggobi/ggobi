@@ -11,6 +11,8 @@ Scaling:
   couple that with a thumbnail that sits just below the scaling controls
 
 
+! it now works to start ggobi without an argument; a necessary step
+! in the API preparation.
 
 ! add "size only" to the list of color and glyph, color only, etc.
 

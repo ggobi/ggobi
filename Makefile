@@ -15,7 +15,7 @@ SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c \
  rotate_ui.c \
  tour2d_ui.c pp_ui.c \
  ctour_ui.c cpp_ui.c \
- brush_ui.c brush.c brush_init.c brush_bins.c color_ui.c \
+ brush_ui.c brush.c brush_init.c brush_bins.c brush_api.c color_ui.c \
  scale_ui.c scale_drag.c scale_click.c \
  identify_ui.c identify.c \
  lineedit_ui.c lineedit.c \
@@ -41,7 +41,7 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o utils.o \
  rotate_ui.o \
  tour2d_ui.o pp_ui.o \
  ctour_ui.o cpp_ui.o \
- brush_ui.o brush.o brush_init.o brush_bins.o color_ui.o \
+ brush_ui.o brush.o brush_init.o brush_bins.o brush_api.o color_ui.o \
  scale_ui.o scale_drag.o scale_click.o \
  identify_ui.o identify.o \
  lineedit_ui.o lineedit.o \

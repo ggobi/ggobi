@@ -90,7 +90,6 @@ reinit_transient_brushing ()
 }
 
 
-/* ARGSUSED */
 void
 brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   cpaneld *cpanel)
