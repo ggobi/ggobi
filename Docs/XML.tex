@@ -325,19 +325,35 @@ specified simply:
 \end{verbatim}
 
 % 
-For categorical variables, it's also necessary to list their
-levels and specify the mapping between data value and level, because
-the data values in the \texttt{record} tag are numbers.  (These
+For categorical variables, some correspondance must be established
+between level values and data values, since the data values in
+\texttt{record} tag are numbers.  (These
 levels can also serve as a basis for linking records during brushing
-as described in \ref{LinkingRecords}.)
+as described in \ref{LinkingRecords}.)  The most explicit method
+for setting up this correspondance is to fully specify level values and
+names:
 \begin{verbatim}
-<categoricalvariable>
-  <name> fraudp </name>
+<categoricalvariable name="fraudp">
   <levels count="3">
     <level value="0">low</level>
     <level value="1">medium</level>
     <level value="2">high</level>
   </levels>
+</categoricalvariable>
+\end{verbatim}
+A convenient alternative when there are very many levels is to
+let ggobi assign them:
+\begin{verbatim}
+<categoricalvariable name="fraudp">
+  <levels count="3" />
+</categoricalvariable>
+\end{verbatim}
+By default, the level values in this case will be 1, 2, and 3, and
+the level names will be L1, L2 and L3.  If you want level values
+that begin at some number other than 1, specify the variable range: 
+\begin{verbatim}
+<categoricalvariable name="fraudp" min="0" max="2">
+  <levels count="3" />
 </categoricalvariable>
 \end{verbatim}
 
@@ -351,7 +367,7 @@ can be added, to be used for labelling variables in tight spaces:
 (By default, the nickname is the first two letters of a variable,
 and that isn't always enough to make distinctions.)
 
-Variable ranges can be specified in the same way:
+Variable ranges can be specified for real variables as well:
 
 \begin{verbatim}
 <realvariable name="Proportion"  min="0.0"  max="1.0" />

@@ -384,20 +384,24 @@ completeCategoricalLevels (XMLParserData *data)
 {
   datad *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
+  gint min = 1;
 
   if (data->current_level == -1) {
     gint k;
 
+    if (el->lim_specified_p)
+      min = (gint) el->lim_specified.min;
+
     /*-- Alert the user what we're about to do --*/
-    g_print ("Supplying default level values for \"%s\" ranging from 1:%d\n",
-      el->collab, el->nlevels);
+    g_print ("Supplying default level values for \"%s\" ranging from %d:%d\n",
+      el->collab, min, min+el->nlevels-1);
     for (k=0; k<el->nlevels; k++) {
-      el->level_values[k] = k+1;
+      el->level_values[k] = min + k;
 /* XXX
  * To be really correct, we should probably free any level_names
  * that may have been already created ...
 */
-      el->level_names[k] = g_strdup_printf ("L %d", k+1);
+      el->level_names[k] = g_strdup_printf ("L%d", k+1);
     }
   }
 }
