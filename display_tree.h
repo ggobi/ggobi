@@ -21,6 +21,8 @@ extern DisplayTree display_tree;
 GtkWidget *display_add_tree(displayd *display, gint entry, GtkWidget *tree, ggobid *gg);
 
 gchar *display_tree_label(displayd *display);
+
+/* For Gtk 2.4, need to set -DGTK_ENABLE_BROKEN as GtkTree will not be defined otherwise. */
 GtkTree *plot_tree_display(ggobid *gg);
 
 /*
