@@ -257,7 +257,19 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
                                      (gpointer) cpanel);
 
   brush_set_pos ((gint) sp->mousepos.x, (gint) sp->mousepos.y, sp);
-  brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, sp, gg);
+  /*
+   * We can't just use brush_motion() here, because we need to
+   * make certain that the current splot is redrawn without
+   * binning.  So we replicate a few lines of code from brush_motion()
+   * here and force a complete redraw of all displays.
+  */
+  if (cpanel->brush_on_p) {
+    brush_once (false, sp, gg);
+    displays_plot (NULL, FULL, gg);  
+  } else {
+    splot_redraw (sp, QUICK, gg);
+  }
+  /*--  --*/
 
   return retval;
 }
