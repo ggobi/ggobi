@@ -5,7 +5,7 @@ USE_MYSQL=1
 
 createDist:
 
-TMP_INSTALL_DIR=/tmp/Install/ggobi
+TMP_INSTALL_DIR=/tmp/ggobi/Install/ggobi
 
 include VersionInfo
 
