@@ -29,10 +29,6 @@ AC_ARG_WITH(R,--with-R Install the Rggobi package)
 AC_ARG_WITH(Python,--with-Python Install the Pythonggobi module)
 AC_ARG_WITH(Perl,--with-Perl Install the Perlggobi module)
 
-TOUR_SRC="tourcorr_ui.o tourcorr.o ppcorr_ui.o"
-TIME_SERIES_SRC="timeplot.c time_ui.c"
-
-
  dnl Check for gtk-config.
  dnl We are not going anywhere without that.
 
@@ -242,8 +238,6 @@ SRC_LIBS="-L${TOP}/lib -lggobi"
 AC_SUBST(SRC_CFLAGS)
 AC_SUBST(SRC_LIBS)
 
-AC_SUBST(TIME_SERIES_SRC)
-AC_SUBST(TOUR_SRC)
 
 AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config)
 
