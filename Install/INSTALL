@@ -15,9 +15,6 @@ Binaries and source code can be downloaded from
   Rggobi.tar.gz  file containing the necessary pieces to build the
                  link between R and ggobi
 
-There are also instructions on how to download code from the cvs
-archive, using anonymous cvs.
-
 Ways to build GGobi under linux or unix 
 =======================================
 

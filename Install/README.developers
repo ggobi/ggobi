@@ -38,7 +38,7 @@ bin/ggobi data/flea
 Creating new modules on franz
 =============================
 
-Logon to franz and change directory to 
+Logon to ssh www.ggobi.org and change directory to 
   ~xgobi/CVSRoot
 
 Then do 
