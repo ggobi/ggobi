@@ -289,9 +289,18 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr1.vars.els[0] = 0;
   dsp->tcorr1.vars.els[1] = 1;
 
-  dsp->tcorr2.nvars = nc-2;
-  for (j=0; j<nc-2; j++)
-    dsp->tcorr2.vars.els[j] = j+2;
+  if (nc < 8) {
+    dsp->tcorr2.nvars = nc-2;
+    for (j=0; j<nc-2; j++)
+      dsp->tcorr2.vars.els[j] = j+2;
+  }
+  else {
+    dsp->tcorr2.nvars = 3;
+    for (j=0; j<3; j++)
+      dsp->tcorr2.vars.els[j] = j+2;
+    for (j=3; j<nc-2; j++)
+      dsp->tcorr2.vars.els[j] = 0;
+  }
 
   /* declare starting vertical base as first variable */
   for (i=0; i<1; i++)

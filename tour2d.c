@@ -204,9 +204,18 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   alloc_tour2d(dsp, gg);
  
     /* Initialize starting subset of active variables */
-  dsp->t2d.nvars = nc;
-  for (j=0; j<nc; j++)
-    dsp->t2d.vars.els[j] = j;
+  if (nc < 8) {
+    dsp->t2d.nvars = nc;
+    for (j=0; j<nc; j++)
+      dsp->t2d.vars.els[j] = j;
+  }
+  else {
+    dsp->t2d.nvars = 3;
+    for (j=0; j<3; j++)
+      dsp->t2d.vars.els[j] = j;
+    for (j=3; j<nc; j++)
+      dsp->t2d.vars.els[j] = 0;
+  }
 
   /* declare starting base as first p chosen variables */
   for (i=0; i<2; i++)
@@ -539,15 +548,32 @@ void tour2d_reinit(ggobid *gg)
   int i, j;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
+  gint nc = d->ncols;
 
-  for (i=0; i<2; i++) {
+  for (i=0; i<2; i++)
+    for (j=0; j<nc; j++)
+      dsp->t2d.u0.vals[i][j] = dsp->t2d.u1.vals[i][j] = 
+        dsp->t2d.u.vals[i][j] = dsp->t2d.v0.vals[i][j] = 
+        dsp->t2d.v1.vals[i][j] = 0.0;
+
+  for (i=0; i<2; i++)
+  {
+    dsp->t2d.u1.vals[i][dsp->t2d.vars.els[i]] =
+      dsp->t2d.u0.vals[i][dsp->t2d.vars.els[i]] = 
+      dsp->t2d.u.vals[i][dsp->t2d.vars.els[i]] =
+      dsp->t2d.v0.vals[i][dsp->t2d.vars.els[i]] = 
+      dsp->t2d.v1.vals[i][dsp->t2d.vars.els[i]] = 1.0;
+  }
+  /*  for (i=0; i<2; i++) {
     for (j=0; j<d->ncols; j++) {
       dsp->t2d.u0.vals[i][j] = 0.;
       dsp->t2d.u.vals[i][j] = 0.;
     }
     dsp->t2d.u0.vals[i][dsp->t2d.vars.els[i]] = 1.;
     dsp->t2d.u.vals[i][dsp->t2d.vars.els[i]] = 1.;
-  }
+    }*/
+  dsp->t2d.nsteps = 1; 
+  dsp->t2d.stepcntr = 1;
 
   dsp->t2d.get_new_target = true;
 
@@ -571,6 +597,8 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   gboolean dontdoit = false;
   extern void gram_schmidt(gfloat *, gfloat*, gint);
   extern gfloat calc_norm(gfloat *, gint);
+  extern void gt_basis(array_f, gint, vector_i, gint, gint);
+  extern gfloat inner_prod(gfloat *, gfloat *, gint);
 
   /* need to turn off tour */
   if (!cpanel->t2d_paused)
@@ -587,6 +615,9 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
       dsp->t2d_manipvar_inc = true;
       n1vars--;
     }
+
+  /* here need to check if the manip var is wholly contained in u, and
+     if so do some check */
 
   if (n1vars > 1)
   {
@@ -608,13 +639,31 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
       dsp->t2d_mvar_3dbasis.vals[j][j] = 1.;
     }
 
-    gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
-      d->ncols);
-    gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
-      d->ncols);
-    ftmp = calc_norm (dsp->t2d_manbasis.vals[2], d->ncols);
-    if (ftmp < tol)
-      dontdoit = true;
+    if ((inner_prod(dsp->t2d_manbasis.vals[0],dsp->t2d_manbasis.vals[2],
+       d->ncols)>1.0-tol) || (inner_prod(dsp->t2d_manbasis.vals[1],
+       dsp->t2d_manbasis.vals[2],d->ncols)>1.0-tol))
+      ftmp = 0.0;
+    else {
+      gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
+        d->ncols);
+      gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
+        d->ncols);
+      ftmp = calc_norm (dsp->t2d_manbasis.vals[2], d->ncols);
+    }
+
+    while (ftmp < tol) {
+      /*      dontdoit = true;*/
+      printf("in fixit routine\n");
+        gt_basis(dsp->t2d.tv, dsp->t2d.nvars, dsp->t2d.vars, 
+          d->ncols, (gint) 1);
+        for (j=0; j<d->ncols; j++) 
+          dsp->t2d_manbasis.vals[2][j] = dsp->t2d.tv.vals[0][j];
+        gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
+          d->ncols);
+        gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
+          d->ncols);
+        ftmp = calc_norm (dsp->t2d_manbasis.vals[2], d->ncols);
+    }
 
     dsp->t2d_no_dir_flag = false;
     if (dsp->t2d_manip_mode == MANIP_RADIAL)
@@ -635,8 +684,8 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
     }
   }
 
-  if (dontdoit)
-    disconnect_motion_signal (sp);
+  /*  if (dontdoit)
+      disconnect_motion_signal (sp);*/
 }
 
 void
@@ -679,6 +728,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
         {
           distx = dsp->t2d_pos1 - dsp->t2d_pos1_old;
           disty = dsp->t2d_pos2 - dsp->t2d_pos2_old;
+          /* seems to go in the wrong direction - 90deg? */
         }
         else if (dsp->t2d_manip_mode == MANIP_VERT) 
         {

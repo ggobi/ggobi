@@ -635,10 +635,10 @@ void speed_set (gint slidepos, gfloat *st, gfloat *dlt, gfloat dv,
     */
     if (slidepos < 50)
       step = ((gfloat) slidepos - 5.) / 2000. ;
-    else if ((slidepos >= 50) && (slidepos < 90))
+    else if ((slidepos >= 50))/* && (slidepos < 90))*/
       step = (gfloat) pow((double)(slidepos-50)/100.,(gdouble)1.5) + 0.0225;
-    else
-      step = (gfloat) sqrt((double)(slidepos-50)) + 0.1868;
+    /*    else
+	  step = (gfloat) sqrt((double)(slidepos-50)) + 0.1868;*/
 
     delta = step*M_PI_2/10.0;
     if (nsteps > 0)

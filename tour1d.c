@@ -189,12 +189,20 @@ display_tour1d_init (displayd *dsp, ggobid *gg) {
   alloc_tour1d(dsp, gg);
  
     /* Initialize starting subset of active variables */
-  dsp->t1d.nvars = nc;
-  for (j=0; j<nc; j++)
-    dsp->t1d.vars.els[j] = j;
-  /*  dsp->t1d.vars.els[0] = 0;
-  dsp->t1d.vars.els[1] = 1;
-  dsp->t1d.vars.els[2] = 2;*/
+  if (nc < 8) {
+    dsp->t1d.nvars = nc;
+    for (j=0; j<nc; j++)
+      dsp->t1d.vars.els[j] = j;
+  }
+  else {
+    dsp->t1d.nvars = 3;
+    dsp->t1d.vars.els[0] = 0;
+    dsp->t1d.vars.els[1] = 1;
+    dsp->t1d.vars.els[2] = 2;
+    for (j=3; j<nc; j++)
+      dsp->t1d.vars.els[j] = 0;
+
+  }
 
   /* declare starting base as first p chosen variables */
   for (i=0; i<2; i++)
