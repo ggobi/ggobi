@@ -22,7 +22,8 @@ ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
-  cpanel->nASHes = (gint) ((gfloat) cpanel->nbins * (adj->value / 2.0));
+  cpanel->p1d.nASHes = (gint)
+    ((gfloat) cpanel->p1d.nbins * (adj->value / 2.0));
 
   display_tailpipe (gg->current_display, gg);
 }
@@ -45,7 +46,7 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel;
     cpanel = &gg->current_display->cpanel;
-  cpanel->p1d_type = GPOINTER_TO_INT (cbd);
+  cpanel->p1d.type = GPOINTER_TO_INT (cbd);
 
   display_tailpipe (gg->current_display, gg);
 }

@@ -20,19 +20,30 @@ xyplot_activate (gint state, displayd *display, ggobid *gg)
   datad *d = display->d;
   gboolean reset = false;
 
-  for (slist = display->splots; slist; slist = slist->next) {
-    sp = (splotd *) slist->data;
-    if (sp->xyvars.x >= d->ncols) {
-      reset = true;
-      sp->xyvars.x = (sp->xyvars.y == 0) ? 1 : 0;
+  if (state) {
+
+    for (slist = display->splots; slist; slist = slist->next) {
+      sp = (splotd *) slist->data;
+      if (sp->xyvars.x >= d->ncols) {
+        reset = true;
+        sp->xyvars.x = (sp->xyvars.y == 0) ? 1 : 0;
+      }
+      if (sp->xyvars.y >= d->ncols) {
+        reset = true;
+        sp->xyvars.y = (sp->xyvars.x == 0) ? 1 : 0;
+      }
     }
-    if (sp->xyvars.y >= d->ncols) {
-      reset = true;
-      sp->xyvars.y = (sp->xyvars.x == 0) ? 1 : 0;
-    }
+    if (reset)
+      varpanel_refresh (gg);
+  } else {
+    /*
+     * Turn cycling off when leaving the mode, but don't worry
+     * about turning it on when re-entering.
+    */
+    GtkWidget *w = widget_find_by_name (gg->control_panel[XYPLOT], 
+                                        "XYPLOT:cycle_toggle");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), off);
   }
-  if (reset)
-    varpanel_refresh (gg);
 
   return NONE;
 }   
@@ -93,9 +104,10 @@ xy_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
 void
 cycle_fixedx (splotd *sp, displayd *display, datad *d, ggobid *gg)
 {
+  cpaneld *cpanel = &display->cpanel;
   gint varno, jvar_prev;
 
-  if (gg->xyplot.cycle_dir == 1) {
+  if (cpanel->xyplot.cycle_dir == 1) {
     varno = sp->xyvars.y + 1;
 
     if (varno == sp->xyvars.x)
@@ -131,9 +143,10 @@ cycle_fixedx (splotd *sp, displayd *display, datad *d, ggobid *gg)
 void
 cycle_fixedy (splotd *sp, displayd *display, datad *d, ggobid *gg)
 {
+  cpaneld *cpanel = &display->cpanel;
   gint varno, jvar_prev;
 
-  if (gg->xyplot.cycle_dir == 1) {
+  if (cpanel->xyplot.cycle_dir == 1) {
     varno = sp->xyvars.x + 1;
 
     if (varno == sp->xyvars.y)
@@ -168,6 +181,7 @@ cycle_fixedy (splotd *sp, displayd *display, datad *d, ggobid *gg)
 void
 cycle_xy (splotd *sp, displayd *display, datad *d, ggobid *gg)
 {
+  cpaneld *cpanel = &display->cpanel;
   gint jx, jy;
   gint jvar_prev;
   gboolean redraw = false;
@@ -175,7 +189,7 @@ cycle_xy (splotd *sp, displayd *display, datad *d, ggobid *gg)
   jx = sp->xyvars.x;
   jy = sp->xyvars.y;
 
-  if (gg->xyplot.cycle_dir == 1) {
+  if (cpanel->xyplot.cycle_dir == 1) {
 
     if ((jx == d->ncols-1) ||
         (jx == d->ncols-2 && jy == d->ncols-1) )
@@ -231,8 +245,9 @@ xycycle_func (ggobid *gg)
   displayd *display = gg->current_display;
   datad *d = gg->current_display->d;
   splotd *sp = gg->current_splot;
+  cpaneld *cpanel = &display->cpanel;
   
-  switch (gg->xyplot.cycle_axis) {
+  switch (cpanel->xyplot.cycle_axis) {
     case XFIXED:
       cycle_fixedx (sp, display, d, gg);
     break;

@@ -225,9 +225,6 @@ ggobi_alloc()
   tmp = (ggobid*) g_malloc (sizeof (ggobid));
 
   memset (tmp, '\0', sizeof (ggobid));
-  tmp->xyplot.cycle_dir = FORWARD;
-  tmp->xyplot.cycle_p = false;
-  tmp->xyplot.cycle_axis = NOFIXED;
   tmp->firsttime = true;
   tmp->brush.firsttime = true;
 

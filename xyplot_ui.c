@@ -21,24 +21,37 @@ static const gchar *const fix_axis_lbl[] = {"No fixed axes", "Fix X", "Fix Y"};
 static void fix_axis_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
-  gg->xyplot.cycle_axis = GPOINTER_TO_INT (cbd);
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
+  
+  cpanel->xyplot.cycle_axis = GPOINTER_TO_INT (cbd);
 }
 
-static void cycle_cb (GtkToggleButton *button, ggobid *gg)
+void
+xyplot_cycle_activate (gboolean state, cpaneld *cpanel, ggobid *gg)
 {
   extern GtkFunction xycycle_func (ggobid *gg);
-  gg->xyplot.cycle_p = button->active;
-
-  if (gg->xyplot.cycle_p) {
-    gg->xyplot.cycle_id = gtk_timeout_add (gg->xyplot.cycle_delay,
+  if (state) {
+    gg->xyplot.cycle_id = gtk_timeout_add (cpanel->xyplot.cycle_delay,
       (GtkFunction) xycycle_func, (gpointer) gg);
-    gg->xyplot.cycle_p = true;
+    cpanel->xyplot.cycle_p = true;
   } else {
-    gtk_timeout_remove (gg->xyplot.cycle_id);
-    gg->xyplot.cycle_id = 0;
-    gg->xyplot.cycle_p = false;
+    if (gg->xyplot.cycle_id) {
+      gtk_timeout_remove (gg->xyplot.cycle_id);
+      gg->xyplot.cycle_id = 0;
+      cpanel->xyplot.cycle_p = false;
+    }
   }
 }
+static void cycle_cb (GtkToggleButton *button, ggobid *gg)
+{
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
+
+  cpanel->xyplot.cycle_p = button->active;
+  xyplot_cycle_activate (cpanel->xyplot.cycle_p, cpanel, gg);
+}
+
 static void scale_set_default_values (GtkScale *scale)
 {
   gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_CONTINUOUS);
@@ -47,18 +60,23 @@ static void scale_set_default_values (GtkScale *scale)
 
 static void cycle_speed_cb (GtkAdjustment *adj, ggobid *gg) {
   extern GtkFunction xycycle_func (ggobid *gg);
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
 
-  gg->xyplot.cycle_delay = -1 * (guint32) adj->value;
-  if (gg->xyplot.cycle_p) {
+  cpanel->xyplot.cycle_delay = -1 * (guint32) adj->value;
+  if (cpanel->xyplot.cycle_p) {
     gtk_timeout_remove (gg->xyplot.cycle_id);
-    gg->xyplot.cycle_id = gtk_timeout_add (gg->xyplot.cycle_delay,
+    gg->xyplot.cycle_id = gtk_timeout_add (cpanel->xyplot.cycle_delay,
     (GtkFunction) xycycle_func, (gpointer) gg);
   }
 }
 
 static void chdir_cb (GtkButton *button, ggobid* gg)
 {
-  gg->xyplot.cycle_dir = -1 * gg->xyplot.cycle_dir;
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
+
+  cpanel->xyplot.cycle_dir = -1 * cpanel->xyplot.cycle_dir;
 }
 
 /*--------------------------------------------------------------------*/
@@ -102,12 +120,15 @@ xyplot_event_handlers_toggle (splotd *sp, gboolean state) {
 void
 cpanel_xyplot_make (ggobid *gg) {
   GtkWidget *cycle_tgl, *chdir_btn, *cycle_sbar, *opt;
-  GtkObject *adj;
+  displayd *display = gg->current_display;
+  cpaneld *cpanel;
+  if (display) cpanel = &display->cpanel;
   
   gg->control_panel[XYPLOT] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[XYPLOT]), 5);
 
   cycle_tgl = gtk_check_button_new_with_label ("Cycle");
+  gtk_widget_set_name (cycle_tgl, "XYPLOT:cycle_toggle");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), cycle_tgl,
     "Cycle through pairwise plots", NULL);
   gtk_signal_connect (GTK_OBJECT (cycle_tgl), "toggled",
@@ -119,6 +140,7 @@ cpanel_xyplot_make (ggobid *gg) {
  * make an option menu
 */
   opt = gtk_option_menu_new ();
+  gtk_widget_set_name (opt, "XYPLOT:cycle_axis");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Fix one of the axes during plot cycling or let them both float", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]), opt,
@@ -131,13 +153,14 @@ cpanel_xyplot_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  gg->xyplot.cycle_delay = 1000;
-  adj = gtk_adjustment_new (-1.0 * gg->xyplot.cycle_delay,
+  gg->xyplot.cycle_delay_adj = (GtkAdjustment *)
+    gtk_adjustment_new (-1.0 * 1000 /* cpanel->xyplot.cycle_delay */,
     -5000.0, -250.0, 100.0, 1000.0, 0.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
+
+  gtk_signal_connect (GTK_OBJECT (gg->xyplot.cycle_delay_adj), "value_changed",
                       GTK_SIGNAL_FUNC (cycle_speed_cb), gg);
 
-  cycle_sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  cycle_sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->xyplot.cycle_delay_adj));
   scale_set_default_values (GTK_SCALE (cycle_sbar));
 
   gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]),
@@ -154,4 +177,41 @@ cpanel_xyplot_make (ggobid *gg) {
                       GTK_SIGNAL_FUNC (chdir_cb), gg);
 
   gtk_widget_show_all (gg->control_panel[XYPLOT]);
+}
+
+/*--------------------------------------------------------------------*/
+/*                      Control panel section                         */
+/*--------------------------------------------------------------------*/
+
+void
+cpanel_xyplot_init (cpaneld *cpanel, ggobid *gg)
+{
+  cpanel->xyplot.cycle_dir = FORWARD;
+  cpanel->xyplot.cycle_p = false;
+  cpanel->xyplot.cycle_axis = NOFIXED;
+  cpanel->xyplot.cycle_delay = 1000;
+}
+
+void
+cpanel_xyplot_set (cpaneld *cpanel, ggobid* gg)
+/*
+ * To handle the case where there are multiple scatterplots
+ * which may have different xyplot cycling options and parameters selected
+*/
+{
+  GtkWidget *w;
+
+  /*-- Cycling on or off --*/
+  w = widget_find_by_name (gg->control_panel[XYPLOT], 
+                           "XYPLOT:cycle_toggle");
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), cpanel->xyplot.cycle_p);
+
+  /*-- Cycling speed --*/
+  gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->xyplot.cycle_delay_adj),
+    -1 * (gfloat) cpanel->xyplot.cycle_delay);
+
+  /*-- Cycling axis --*/
+  w = widget_find_by_name (gg->control_panel[XYPLOT],
+                           "XYPLOT:cycle_axis");
+  gtk_option_menu_set_history (GTK_OPTION_MENU(w), cpanel->xyplot.cycle_axis);
 }

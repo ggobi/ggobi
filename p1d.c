@@ -63,7 +63,7 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
   gfloat min, max, mean;
   cpaneld *cpanel = &display->cpanel;
 
-  switch (cpanel->p1d_type) {
+  switch (cpanel->p1d.type) {
     case TEXTURE:
       sp->p1d_lim.min = FORGETITAXIS_MIN ;
       sp->p1d_lim.max = FORGETITAXIS_MAX ;
@@ -73,7 +73,7 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
 
     case ASH:
       do_ash1d (yy, d->nrows_in_plot,
-               cpanel->nbins, cpanel->nASHes,
+               cpanel->p1d.nbins, cpanel->p1d.nASHes,
                sp->p1d_data.els, &min, &max, &mean);
       sp->p1d_lim.min = min;
       sp->p1d_lim.max = max;

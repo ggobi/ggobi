@@ -17,6 +17,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void xyplot_cycle_activate (gboolean state, cpaneld *cpanel, ggobid *gg);
 void mode_set (gint, ggobid *);
 displayd *createDisplayFromDescription (ggobid *, GGobiDisplayDescription *desc);
 gint strToInteger (const gchar *tmp);
@@ -113,6 +114,7 @@ void cpanel_rotation_make (ggobid *);
 void cpanel_rotation_set (cpaneld *, ggobid *);
 void cpanel_scale_init (cpaneld *, ggobid *);
 void cpanel_scale_make (ggobid *);
+void cpanel_scale_set (cpaneld *, ggobid *);
 void cpanel_scatmat_init (cpaneld *, ggobid *);
 void cpanel_scatmat_make (ggobid *);
 void cpanel_set (displayd *, ggobid *);
@@ -124,6 +126,8 @@ void cpanel_tcorr_init (cpaneld *cpanel, ggobid *gg);
 void cpanel_tour1d_make (ggobid *);
 void cpanel_tour2d_make (ggobid *);
 void cpanel_xyplot_make (ggobid *);
+void cpanel_xyplot_init (cpaneld *, ggobid *);
+void cpanel_xyplot_set (cpaneld *, ggobid *);
 void ctour_event_handlers_toggle (splotd *, gboolean);
 void ctour_event_handlers_toggle (splotd *, gboolean);
 void ctourpp_window_open (ggobid *);

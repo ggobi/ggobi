@@ -514,7 +514,11 @@ mode_has_options_menu (gint mode)
   /*-- every mode has an options menu --*/
   return (mode == P1PLOT || mode == XYPLOT || mode == SCALE  ||
           mode == BRUSH  || mode == TOUR1D || mode == TOUR2D ||
-          mode == COTOUR || mode == IDENT  || mode == MOVEPTS ||
+          mode == COTOUR || mode == IDENT  ||
+#ifdef EDIT_EDGES_IMPLEMENTED
+          mode == EDGEED ||
+#endif
+          mode == MOVEPTS ||
           mode == SCATMAT || mode == PCPLOT || mode == TSPLOT);
 }
 

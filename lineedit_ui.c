@@ -26,18 +26,29 @@ static void addordelete_cb (GtkToggleButton *button)
 {
   g_printerr("active %d\n", button->active);
 }
-static void remove_edges_cb (GtkToggleButton *button)
+static void undo_last_cb (GtkToggleButton *button)
 {
-  g_printerr("move all edges\n");
-}
-static void include_missings_cb (GtkToggleButton *button)
-{
-  g_printerr("active %d\n", button->active);
+  g_printerr("undo last\n");
 }
 
 /*--------------------------------------------------------------------*/
 /*          Handling and mouse events in the plot window              */
 /*--------------------------------------------------------------------*/
+
+static gint
+key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
+{
+  ggobid *gg = GGobiFromSPlot(sp);
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  /*-- handle the keys for setting the mode and launching generic events --*/
+  if (splot_event_handled (w, event, cpanel, sp, gg))
+    return true;
+
+  /*-- insert mode-specific key presses (if any) here --*/
+
+  return true;
+}
 
 static gint
 motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
@@ -73,14 +84,27 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
 
-  gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+  if (sp->motion_id) {
+    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+    sp->motion_id = 0;
+  }
 
   return retval;
 }
 
+/*--------------------------------------------------------------------*/
+/*                 Add and remove event handlers                      */
+/*--------------------------------------------------------------------*/
+
 void
 edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
+  displayd *display = sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
   if (state == on) {
+    sp->key_press_id = gtk_signal_connect (GTK_OBJECT (display->window),
+                                           "key_press_event",
+                                           (GtkSignalFunc) key_press_cb,
+                                           (gpointer) sp);
     sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                        "button_press_event",
                                        (GtkSignalFunc) button_press_cb,
@@ -89,7 +113,18 @@ edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
                                          "button_release_event",
                                          (GtkSignalFunc) button_release_cb,
                                          (gpointer) sp);
+    if (cpanel->ee_adding_p) {
+      sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+                                          "motion_notify_event",
+                                          (GtkSignalFunc) motion_notify_cb,
+                                          (gpointer) sp);
+    }
+
   } else {
+    if (sp->key_press_id) {
+      gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
+      sp->key_press_id = 0;
+    }
     if (sp->press_id) {
       gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
       sp->press_id = 0;
@@ -97,6 +132,10 @@ edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
     if (sp->release_id) {
       gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
       sp->release_id = 0;
+    }
+    if (sp->motion_id) {
+      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+      sp->motion_id = 0;
     }
   }
 }
@@ -110,9 +149,7 @@ cpanel_edgeedit_make (ggobid *gg) {
   gg->control_panel[EDGEED] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[EDGEED]), 5);
 
-/*
- * Radio group in a box: add/delete buttons
-*/
+ /*-- Radio group in a box: add/delete buttons --*/
   hb = gtk_hbox_new (true, 1);
   gtk_container_set_border_width (GTK_CONTAINER (hb), 3);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]), hb, false, false, 0);
@@ -134,26 +171,14 @@ cpanel_edgeedit_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (hb), radio2, false, false, 0);
 
 
-/*
- * Remove edges button
-*/
-  btn = gtk_button_new_with_label ("Remove all edges");
+ /*-- Undo --*/
+  btn = gtk_button_new_with_label ("Undo");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Remove all edges", NULL);
+    "Undo last action", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (remove_edges_cb), NULL);
-/*
- * Including missings togle
-*/
-  btn = gtk_check_button_new_with_label ("Include missings");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Include missing values", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]),
-                      btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-                      GTK_SIGNAL_FUNC (include_missings_cb), NULL);
+                      GTK_SIGNAL_FUNC (undo_last_cb), NULL);
 
   gtk_widget_show_all (gg->control_panel[EDGEED]);
 }

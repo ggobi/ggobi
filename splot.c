@@ -148,8 +148,8 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
   case GDK_V:
     action = TSPLOT;
   break;
-  case GDK_e:
-  case GDK_E:
+  case GDK_a:
+  case GDK_A:
     action = SCATMAT;
   break;
 /* */
@@ -186,6 +186,12 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
   case GDK_I:
     action = IDENT;
   break;
+#ifdef EDIT_EDGES_IMPLEMENTED
+  case GDK_e:
+  case GDK_E:
+    action = EDGEED;
+  break;
+#endif
   case GDK_m:
   case GDK_M:
     action = MOVEPTS;

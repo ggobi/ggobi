@@ -26,57 +26,52 @@ typedef struct {
  gint mode, prev_mode;
  gint projection;
 
-/*
- * 1d plotting
-*/
- gint p1d_type;
- gint nbins, nASHes;
+ /*-- 1d plotting --*/
+ struct _P1DCpanel {
+   gint type;
+   gint nbins, nASHes;
+ } p1d;
 
+ /*-- xy plotting --*/
+ struct _XYPlotCpanel {
+   gboolean cycle_p;
+   gint cycle_axis;
+   gint cycle_dir;
+   guint32 cycle_delay;
+ } xyplot;
+
+ /*-- rotation --*/
 /*
- * rotation
-*/
  gint ro_type, ro_axis, ro_direction;
  gboolean ro_paused_p;
-
-/*
- * brushing
 */
+
+ /*-- brushing --*/
  gboolean brush_on_p;
  gint br_mode, br_scope, br_target;
 
-/*
- * scaling
-*/
-  gint scale_style;       /* DRAG or CLICK */
-  gint scale_click_opt;   /* PAN or ZOOM */
-  gint scale_pan_opt;     /* P_OBLIQUE, P_HORIZ, P_VERT */
-  gint scale_zoom_opt;    /* Z_OBLIQUE, Z_ASPECT, Z_HORIZ, Z_VERT */
+ /*-- scaling --*/
+ gint scale_style;       /* DRAG or CLICK */
+ gint scale_click_opt;   /* PAN or ZOOM */
+ gint scale_pan_opt;     /* P_OBLIQUE, P_HORIZ, P_VERT */
+ gint scale_zoom_opt;    /* Z_OBLIQUE, Z_ASPECT, Z_HORIZ, Z_VERT */
 
-/*
- * line editing
-*/
+ /*-- edge editing --*/
+ gboolean ee_adding_p;
+ gboolean ee_deleting_p;
 
-/*
- * parallel coordinates
-*/
+ /*-- parallel coordinates --*/
  gint parcoords_selection_mode;
  gint parcoords_arrangement;  /* arrange plots in a row or a column */
 
-/*
- * time series
-*/
-
+ /*-- time series --*/
  gint tsplot_selection_mode;
  gint tsplot_arrangement;  /* arrange plots in a row or column*/
 
-/*
- * scatterplot matrix
-*/
+ /*-- scatterplot matrix --*/
  gint scatmat_selection_mode;
 
-/*
- * 2d touring
-*/
+ /*-- 2d touring --*/
  gboolean t2d_paused;
  gboolean t2d_local_scan;
  gboolean t2d_stepping;
@@ -85,9 +80,7 @@ typedef struct {
  gint t2d_ls_dir;
  gfloat t2d_path_len;
 
-/*
- * 1d tour
-*/
+ /*-- 1d tour --*/
  gboolean t1d_paused;
  gfloat t1d_step; 
  gint t1d_nbins, t1d_nASHes;
@@ -95,21 +88,13 @@ typedef struct {
  gint t1d_pp_indx;
  gfloat t1d_pp_indxval;
 
-/*
- * corr tour
-*/
+ /*-- corr tour --*/
  gboolean tcorr1_paused;
  gfloat tcorr1_step; 
  gboolean tcorr2_paused;
  gfloat tcorr2_step; 
 
 /* tour variables are in display.h */
-
-/*
- * edge editing
-*/
- gboolean ee_adding_p;
- gboolean ee_deleting_p;
 
 } cpaneld;
 

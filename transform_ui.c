@@ -65,8 +65,10 @@ gfloat
 scale_get_a (ggobid *gg) {
   gchar *val_str;
   gfloat val = 0;  /*-- default value --*/
+  GtkWidget *entry_a;
+  entry_a = widget_find_by_name (gg->tform_ui.window, "TRANSFORM:entry_a");
 
-  val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->tform_ui.entry_a), 0, -1);
+  val_str = gtk_editable_get_chars (GTK_EDITABLE (entry_a), 0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
     val = (gfloat) atof (val_str);
     g_free (val_str);
@@ -78,8 +80,10 @@ gfloat
 scale_get_b (ggobid *gg) {
   gchar *val_str;
   gfloat val = 1;  /*-- default value --*/
+  GtkWidget *entry_b;
+  entry_b = widget_find_by_name (gg->tform_ui.window, "TRANSFORM:entry_b");
 
-  val_str = gtk_editable_get_chars (GTK_EDITABLE (gg->tform_ui.entry_b), 0, -1);
+  val_str = gtk_editable_get_chars (GTK_EDITABLE (entry_b), 0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
     val = (gfloat) atof (val_str);
     g_free (val_str);
@@ -132,7 +136,8 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
 void
 transform_window_open (ggobid *gg) 
 {
-
+  GtkWidget *stage0_option_menu, *stage1_option_menu, *stage2_option_menu;
+  GtkWidget *entry_a, *entry_b;
   GtkWidget *lbl, *hbox;
   GtkWidget *vbox, *frame, *hb, *vb, *btn;
   GtkWidget *spinner;
@@ -178,15 +183,16 @@ transform_window_open (ggobid *gg)
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, true, false, 1);
 
-    gg->tform_ui.stage0_opt = gtk_option_menu_new ();
-    gtk_container_set_border_width (GTK_CONTAINER (gg->tform_ui.stage0_opt), 4);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->tform_ui.stage0_opt,
+    stage0_option_menu = gtk_option_menu_new ();
+    gtk_widget_set_name (stage0_option_menu, "TRANSFORM:stage0_option_menu");
+    gtk_container_set_border_width (GTK_CONTAINER (stage0_option_menu), 4);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), stage0_option_menu,
       "Stage 0: Adjust the domain of the variables",
       NULL);
-    populate_option_menu (gg->tform_ui.stage0_opt, stage0_lbl,
+    populate_option_menu (stage0_option_menu, stage0_lbl,
                           sizeof (stage0_lbl) / sizeof (gchar *),
                           (GtkSignalFunc) stage0_cb, gg);
-    gtk_container_add (GTK_CONTAINER (frame), gg->tform_ui.stage0_opt);
+    gtk_container_add (GTK_CONTAINER (frame), stage0_option_menu);
 
     /*
      * Stage 1: Power transformations et al
@@ -199,14 +205,15 @@ transform_window_open (ggobid *gg)
     gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
     gtk_container_add (GTK_CONTAINER (frame), vb);
 
-    gg->tform_ui.stage1_opt = gtk_option_menu_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->tform_ui.stage1_opt,
+    stage1_option_menu = gtk_option_menu_new ();
+    gtk_widget_set_name (stage1_option_menu, "TRANSFORM:stage1_option_menu");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), stage1_option_menu,
       "Stage 1: Data-independent transformations, preserving user-defined limits",
       NULL);
-    populate_option_menu (gg->tform_ui.stage1_opt, stage1_lbl,
+    populate_option_menu (stage1_option_menu, stage1_lbl,
                           sizeof (stage1_lbl) / sizeof (gchar *),
                           (GtkSignalFunc) stage1_cb, gg);
-    gtk_box_pack_start (GTK_BOX (vb), gg->tform_ui.stage1_opt, true, false, 1);
+    gtk_box_pack_start (GTK_BOX (vb), stage1_option_menu, true, false, 1);
 
     /*-- label and spin button for Box-Cox parameter --*/
     hb = gtk_hbox_new (false, 2);
@@ -242,19 +249,21 @@ transform_window_open (ggobid *gg)
     gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
-    gg->tform_ui.entry_a = gtk_entry_new ();
-    gtk_entry_set_text (GTK_ENTRY (gg->tform_ui.entry_a), "0");
-    gtk_widget_set_usize (gg->tform_ui.entry_a, width, -1);
-    gtk_box_pack_start (GTK_BOX (hb), gg->tform_ui.entry_a, false, false, 0);
+    entry_a = gtk_entry_new ();
+    gtk_widget_set_name (entry_a, "TRANSFORM:entry_a");
+    gtk_entry_set_text (GTK_ENTRY (entry_a), "0");
+    gtk_widget_set_usize (entry_a, width, -1);
+    gtk_box_pack_start (GTK_BOX (hb), entry_a, false, false, 0);
 
     lbl = gtk_label_new ("b:");
     gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
-    gg->tform_ui.entry_b = gtk_entry_new ();
-    gtk_entry_set_text (GTK_ENTRY (gg->tform_ui.entry_b), "1");
-    gtk_widget_set_usize (gg->tform_ui.entry_b, width, -1);
-    gtk_box_pack_start (GTK_BOX (hb), gg->tform_ui.entry_b, false, false, 0);
+    entry_b = gtk_entry_new ();
+    gtk_widget_set_name (entry_a, "TRANSFORM:entry_b");
+    gtk_entry_set_text (GTK_ENTRY (entry_b), "1");
+    gtk_widget_set_usize (entry_b, width, -1);
+    gtk_box_pack_start (GTK_BOX (hb), entry_b, false, false, 0);
 
     /*
      * Stage 2: Another standardization step
@@ -263,15 +272,16 @@ transform_window_open (ggobid *gg)
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, true, false, 1);
 
-    gg->tform_ui.stage2_opt = gtk_option_menu_new ();
-    gtk_container_set_border_width (GTK_CONTAINER (gg->tform_ui.stage2_opt), 4);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->tform_ui.stage2_opt,
+    stage2_option_menu = gtk_option_menu_new ();
+    gtk_widget_set_name (stage2_option_menu, "TRANSFORM:stage2_option_menu");
+    gtk_container_set_border_width (GTK_CONTAINER (stage2_option_menu), 4);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), stage2_option_menu,
       "Stage 2: Data-dependent transformations, ignoring user-defined limits",
       NULL);
-    populate_option_menu (gg->tform_ui.stage2_opt, stage2_lbl,
+    populate_option_menu (stage2_option_menu, stage2_lbl,
                           sizeof (stage2_lbl) / sizeof (gchar *),
                           (GtkSignalFunc) stage2_cb, gg);
-    gtk_container_add (GTK_CONTAINER (frame), gg->tform_ui.stage2_opt);
+    gtk_container_add (GTK_CONTAINER (frame), stage2_option_menu);
 
     /*
      * A button or two
@@ -301,18 +311,30 @@ transform_window_open (ggobid *gg)
 void
 transform0_opt_menu_set_value (gint j, datad *d, ggobid *gg)
 {
-  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform_ui.stage0_opt),
+  GtkWidget *stage0_option_menu;
+
+  stage0_option_menu = widget_find_by_name (gg->tform_ui.window,
+                                            "TRANSFORM:stage0_option_menu");
+  gtk_option_menu_set_history (GTK_OPTION_MENU (stage0_option_menu),
     d->vartable[j].tform0);
 }
 void
 transform1_opt_menu_set_value (gint j, datad *d, ggobid *gg)
 {
-  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform_ui.stage1_opt),
+  GtkWidget *stage1_option_menu;
+
+  stage1_option_menu = widget_find_by_name (gg->tform_ui.window,
+                                            "TRANSFORM:stage1_option_menu");
+  gtk_option_menu_set_history (GTK_OPTION_MENU (stage1_option_menu),
     d->vartable[j].tform1);
 }
 void
 transform2_opt_menu_set_value (gint j, datad *d, ggobid *gg)
 {
-  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->tform_ui.stage2_opt),
+  GtkWidget *stage2_option_menu;
+
+  stage2_option_menu = widget_find_by_name (gg->tform_ui.window,
+                                            "TRANSFORM:stage2_option_menu");
+  gtk_option_menu_set_history (GTK_OPTION_MENU (stage2_option_menu),
     d->vartable[j].tform2);
 }

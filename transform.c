@@ -226,8 +226,9 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
   gboolean tform_ok = true;
   gdouble dtmp;
   lims slim, slim_tform;  /*-- specified limits --*/
-
-  gint tform1 = option_menu_index (GTK_OPTION_MENU (gg->tform_ui.stage1_opt));
+  GtkWidget *stage1_option_menu = widget_find_by_name (gg->tform_ui.window,
+                                            "TRANSFORM:stage1_option_menu");
+  gint tform1 = option_menu_index (GTK_OPTION_MENU (stage1_option_menu));
   gfloat boxcoxparam = gg->tform_ui.boxcox_adj->value;
   gfloat incr = d->vartable[jcol].domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = d->vartable[jcol].domain_adj;
@@ -504,7 +505,9 @@ transform2_apply (gint jcol, datad *d, ggobid *gg)
 {
   gint i, m;
   gboolean tform_ok = true;
-  gint tform2 = option_menu_index (GTK_OPTION_MENU (gg->tform_ui.stage2_opt));
+  GtkWidget *stage2_option_menu = widget_find_by_name (gg->tform_ui.window,
+                                            "TRANSFORM:stage2_option_menu");
+  gint tform2 = option_menu_index (GTK_OPTION_MENU (stage2_option_menu));
 
   switch (tform2)
   {

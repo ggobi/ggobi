@@ -205,11 +205,8 @@ struct _ggobid {
 /*-------------------- 2d plotting -----------------------------------*/
 
  struct _XYPlot {
-   gboolean cycle_p;
-   gint cycle_axis;
    gint cycle_id;
-   gint cycle_dir;
-   guint32 cycle_delay;
+   GtkAdjustment *cycle_delay_adj;
  } xyplot;
 
 /*---------------------- touring -------------------------------------*/
@@ -247,12 +244,7 @@ struct _ggobid {
  glyphv glyph_id, glyph_0;
 
  struct _Brush_UI {
-   GtkWidget *mode_opt;
-   GtkWidget *cg_opt;
-   GtkWidget *scope_opt;
-   GtkWidget *brush_on_btn;
    gboolean updateAlways_p;
-
    gboolean firsttime;
  } brush;
 
@@ -278,23 +270,16 @@ struct _ggobid {
 /*--------------------- submenu management ---------------------------*/
 
  struct _Mode_SubMenu {
-   GtkWidget *options_item;
-   GtkWidget *options_menu;
-
-   GtkWidget *reset_item;
-   GtkWidget *reset_menu;
-
-   GtkWidget *io_item;
-   GtkWidget *io_menu;
+   GtkWidget *options_item, *options_menu;
+   GtkWidget *reset_item, *reset_menu;
+   GtkWidget *io_item, *io_menu;
  } menus;
 
 /*-------------------- transformation --------------------------------*/
 
  struct _Transformation {
    GtkWidget *window;
-   GtkWidget *stage0_opt, *stage1_opt, *stage2_opt;
    GtkAdjustment *boxcox_adj;
-   GtkWidget *entry_a, *entry_b;
  } tform_ui;
 
  struct _Sphere {
@@ -330,8 +315,6 @@ struct _ggobid {
 /*-------------------- scaling ---------------------------------------*/
 
  struct _Scale {
-   /*-- widgets whose sensitivity needs to be turned on and off --*/
-   GtkWidget *pan_opt, *zoom_opt, *pan_radio, *zoom_radio;
    rectd click_rect;
  } scale;
 
@@ -365,7 +348,6 @@ struct _ggobid {
 
  KeyEventHandler *NumberedKeyEventHandler;
 
-
  PrintOptions *printOptions;
  GList *pluginInstances;
 
@@ -379,17 +361,14 @@ struct _ggobid {
 typedef struct {
 
   gboolean verbose;
-
   DataMode data_mode;
-
   gchar *data_in;
-
-  char **cmdArgs;
-  int numArgs;
+  gchar **cmdArgs;
+  gint numArgs;
 
 #ifdef USE_XML
   struct _GGobiInitInfo *info;
-  char *initializationFile;
+  gchar *initializationFile;
 #endif
 } GGobiOptions;
 

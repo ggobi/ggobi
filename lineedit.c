@@ -16,21 +16,32 @@
 #include "vars.h"
 #include "externs.h"
 
-/*-- see how values are copied between cpanel and the mode panel --*/
 void
-edge_edit_init (displayd *display, ggobid *gg)
+edgeedit_init (displayd *display, ggobid *gg)
 {
-  cpaneld *cpanel = &display->cpanel;
-/*
-  datad *d = display->d;
-  datad *e = display->e;
-  d->nearest_point = -1;
-  e->nearest_point = -1;
-*/
   gg->edgeedit.a = -1;  /*-- index of point where new edge begins --*/
+}
 
-  cpanel->ee_deleting_p = true;
-  cpanel->ee_adding_p = false;
+/*--------------------------------------------------------------------*/
+/*                      Control panel section                         */
+/*--------------------------------------------------------------------*/
+
+void
+cpanel_edgeedit_init (cpaneld *cpanel, ggobid *gg) {
+  cpanel->ee_adding_p = true;
+  cpanel->ee_deleting_p = false;
+}
+
+/*
+ * To handle the case where there are multiple scatterplots which
+ * may have different edgeedit options and parameters selected
+*/
+void
+cpanel_edgeedit_set (cpaneld *cpanel, ggobid *gg) {
+  /*-- set the radio buttons for adding/deleting edges --*/
+/*
+  GTK_TOGGLE_BUTTON (gg->edgeedit.brush_on_btn)->active = cpanel->brush_on_p;
+*/
 }
 
 gint

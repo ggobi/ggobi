@@ -23,7 +23,7 @@ static void type_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->p1d_type = GPOINTER_TO_INT (cbd);
+  cpanel->p1d.type = GPOINTER_TO_INT (cbd);
 
   display_tailpipe (gg->current_display, gg);
 }
@@ -33,9 +33,10 @@ static void ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
-  cpanel->nASHes = (gint) ((gfloat) cpanel->nbins * (adj->value / 2.0));
+  cpanel->p1d.nASHes = (gint)
+    ((gfloat) cpanel->p1d.nbins * (adj->value / 2.0));
 
-  if (cpanel->p1d_type == ASH)
+  if (cpanel->p1d.type == ASH)
     display_tailpipe (gg->current_display, gg);
 }
 
@@ -181,12 +182,15 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_widget_show_all (gg->control_panel[P1PLOT]);
 }
 
+/*--------------------------------------------------------------------*/
+/*                      Control panel section                         */
+/*--------------------------------------------------------------------*/
 
 /*-- for all plot modes, for now: it excludes the changing variable --*/
 void
 cpanel_p1d_init (cpaneld *cpanel, ggobid *gg) {
-  cpanel->nASHes = 20;
-  cpanel->nbins = 200;
+  cpanel->p1d.nASHes = 20;
+  cpanel->p1d.nbins = 200;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/
@@ -199,11 +203,11 @@ cpanel_p1d_set (cpaneld *cpanel, ggobid* gg)
 {
   /*-- Texturing or ASH --*/
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->ash.type_opt),
-                               cpanel->p1d_type);
+                               cpanel->p1d.type);
 
   /*-- ASH smoothness parameter --*/
   gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->ash.smoothness_adj),
-    2 * (gfloat) cpanel->nASHes / (gfloat) cpanel->nbins);
+    2 * (gfloat) cpanel->p1d.nASHes / (gfloat) cpanel->p1d.nbins);
 
   /*-- Cycling on or off --*/
   /*-- Cycling speed --*/

@@ -287,7 +287,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
 
 /*--------------------------------------------------------------------*/
-/*      Handling keyboard and mouse events in the plot window         */
+/*                 Add and remove event handlers                      */
 /*--------------------------------------------------------------------*/
 
 void
@@ -330,59 +330,64 @@ brush_event_handlers_toggle (splotd *sp, gboolean state) {
 void
 cpanel_brush_make (ggobid *gg) {
   GtkWidget *btn;
+  GtkWidget *mode_option_menu, *scope_option_menu, *target_option_menu;
   
   gg->control_panel[BRUSH] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[BRUSH]), 5);
 
-  gg->brush.brush_on_btn = gtk_check_button_new_with_label ("Brush on");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->brush.brush_on_btn,
+  btn = gtk_check_button_new_with_label ("Brush on");
+  gtk_widget_set_name (btn, "BRUSH:brush_on_button");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Make the brush active or inactive", NULL);
-  gtk_signal_connect (GTK_OBJECT (gg->brush.brush_on_btn), "toggled",
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
                      GTK_SIGNAL_FUNC (brush_on_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      gg->brush.brush_on_btn, false, false, 0);
+                      btn, false, false, 0);
 
 /*
  * make an option menu for setting the brushing mode
 */
-  gg->brush.scope_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->brush.scope_opt,
+  scope_option_menu = gtk_option_menu_new ();
+  gtk_widget_set_name (scope_option_menu, "BRUSH:scope_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), scope_option_menu,
     "Brush points only, edges only, or both points and edges", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      gg->brush.scope_opt, false, false, 0);
-  populate_option_menu (gg->brush.scope_opt, scope_lbl,
+                      scope_option_menu, false, false, 0);
+  populate_option_menu (scope_option_menu, scope_lbl,
                         sizeof (scope_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) brush_scope_set_cb, gg);
   /*-- initial value: points only --*/
-  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.scope_opt), 0); 
+  gtk_option_menu_set_history (GTK_OPTION_MENU (scope_option_menu), 0); 
   
 /*
  * option menu for specifying whether to brush with color/glyph/both
 */
-  gg->brush.cg_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->brush.cg_opt,
+  target_option_menu = gtk_option_menu_new ();
+  gtk_widget_set_name (target_option_menu, "BRUSH:target_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), target_option_menu,
     "Brush with color and glyph, color, glyph, glyph size; or hide", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      gg->brush.cg_opt, false, false, 0);
-  populate_option_menu (gg->brush.cg_opt, cg_lbl,
+                      target_option_menu, false, false, 0);
+  populate_option_menu (target_option_menu, cg_lbl,
                         sizeof (cg_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) brush_cg_cb, gg);
   /*-- initial value: both --*/
-  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.cg_opt), 0);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (target_option_menu), 0);
 
 /*
  * option menu for setting the brushing persistence
 */
-  gg->brush.mode_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->brush.mode_opt,
+  mode_option_menu = gtk_option_menu_new ();
+  gtk_widget_set_name (mode_option_menu, "BRUSH:mode_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), mode_option_menu,
     "Persistent or transient brushing", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      gg->brush.mode_opt, false, false, 0);
-  populate_option_menu (gg->brush.mode_opt, mode_lbl,
+                      mode_option_menu, false, false, 0);
+  populate_option_menu (mode_option_menu, mode_lbl,
                         sizeof (mode_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) brush_mode_cb, gg);
   /* initialize transient */
-  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.mode_opt), 1);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (mode_option_menu), 1);
 
 
   btn = gtk_button_new_with_label ("Undo");
@@ -438,13 +443,26 @@ cpanel_brush_init (cpaneld *cpanel, ggobid *gg) {
 
 void
 cpanel_brush_set (cpaneld *cpanel, ggobid *gg) {
-  GTK_TOGGLE_BUTTON (gg->brush.brush_on_btn)->active = cpanel->brush_on_p;
+  GtkWidget *btn;
+  GtkWidget *mode_option_menu, *scope_option_menu, *target_option_menu;
 
-  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.mode_opt),
+  btn = widget_find_by_name (gg->control_panel[BRUSH],
+                             "BRUSH:brush_on_button");
+  GTK_TOGGLE_BUTTON (btn)->active = cpanel->brush_on_p;
+
+  mode_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
+                                          "BRUSH:mode_option_menu");
+  scope_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
+                                          "BRUSH:scope_option_menu");
+  target_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
+                                          "BRUSH:target_option_menu");
+
+  gtk_option_menu_set_history (GTK_OPTION_MENU (mode_option_menu),
                                cpanel->br_mode);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.scope_opt),
+  gtk_option_menu_set_history (GTK_OPTION_MENU (scope_option_menu),
                                cpanel->br_scope);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.cg_opt),
+  gtk_option_menu_set_history (GTK_OPTION_MENU (target_option_menu),
                                cpanel->br_target);
 }
 
+/*--------------------------------------------------------------------*/

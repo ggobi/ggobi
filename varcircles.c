@@ -188,14 +188,12 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg)
 void
 varcircle_label_set (gint j, datad *d)
 {
-  GtkWidget *w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.label, j);
-
-  g_assert (w != NULL);
-
-  gtk_label_set_text (GTK_LABEL (GTK_BIN(w)->child), d->vartable[j].collab);
+  GtkWidget *w = varcircles_get_nth (LBL, j, d);
+  if (w != NULL)
+    gtk_label_set_text (GTK_LABEL(w), d->vartable[j].collab_tform);
 }
 
-/*-- called from the Options mennu --*/
+/*-- called from the Options menu --*/
 void
 varcircles_layout_cb (GtkCheckMenuItem *w, guint action) 
 {

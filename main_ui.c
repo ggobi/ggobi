@@ -288,12 +288,18 @@ procs_activate (gboolean state, displayd *display, ggobid *gg)
 }
 
 enum redrawStyle
-mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
+mode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg) {
   displayd *display = (displayd *) sp->displayptr;
   gint redraw_style = NONE;
 
   if (state == off) {
     switch (m) {
+      case XYPLOT:
+      {
+        extern enum redrawStyle xyplot_activate (gint, displayd *, ggobid *);
+        xyplot_activate (state, display, gg);
+      }
+      break;
       case BRUSH:
         redraw_style = brush_activate (state, display, gg);
       break;
