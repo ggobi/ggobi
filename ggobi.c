@@ -86,7 +86,7 @@ getOptValue(const gchar * const name, const gchar * const value)
 }
 
 gint
-parse_command_line (gint *argc, gchar **av, ggobid *gg)
+parse_command_line (gint *argc, gchar **av)
 {
   gboolean stdin_p = false;
   gchar *ptr;
@@ -193,7 +193,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
       sessionOptions->data_type = g_strdup(av[2]);
       (*argc)--; av++;
     }  else if((ptr = getOptValue("datamode", av[1]))) {
-	sessionOptions->data_type = ptr;
+      sessionOptions->data_type = ptr;
     }
   }
 
@@ -412,7 +412,7 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 
   vis = gdk_visual_get_system ();
 
-  parse_command_line (&argc, argv, gg);
+  parse_command_line (&argc, argv);
 
 
 #ifdef SUPPORT_INIT_FILES
