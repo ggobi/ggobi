@@ -35,7 +35,7 @@ addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 void
 show_graphact_window (GtkWidget *widget, PluginInstance *inst)
 {
-  GtkWidget *window;
+  graphactd *ga;
 
   if (g_slist_length(inst->gg->d) < 1) {
     g_printerr ("No datasets to show\n");
@@ -43,16 +43,17 @@ show_graphact_window (GtkWidget *widget, PluginInstance *inst)
   }
 
   if (inst->data == NULL) {
-    graphactd *ga = (graphactd *) g_malloc (sizeof (graphactd));
+    ga = (graphactd *) g_malloc (sizeof (graphactd));
 
     graphact_init (ga);
     inst->data = ga;
 
-    window = create_graphact_window (inst->gg, inst);
-    gtk_object_set_data (GTK_OBJECT (window), "graphactd", ga);
+    create_graphact_window (inst->gg, inst);
+    gtk_object_set_data (GTK_OBJECT (ga->window), "graphactd", ga);
 
   } else {
-    gtk_widget_show_now ((GtkWidget*) window);
+    ga = (graphactd *) inst->data;
+    gtk_widget_show_now ((GtkWidget*) ga->window);
   }
 }
 

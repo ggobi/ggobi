@@ -35,7 +35,7 @@ addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 void
 show_glayout_window (GtkWidget *widget, PluginInstance *inst)
 {
-  GtkWidget *window;
+  glayoutd *gl;
 
   if (g_slist_length(inst->gg->d) < 1) {
     g_printerr ("No datasets to show\n");
@@ -43,16 +43,18 @@ show_glayout_window (GtkWidget *widget, PluginInstance *inst)
   }
 
   if (inst->data == NULL) {
-    glayoutd *gl = (glayoutd *) g_malloc (sizeof (glayoutd));
+    gl = (glayoutd *) g_malloc (sizeof (glayoutd));
 
     glayout_init (gl);
     inst->data = gl;
 
-    window = create_glayout_window (inst->gg, inst);
-    gtk_object_set_data (GTK_OBJECT (window), "glayoutd", gl);
+    create_glayout_window (inst->gg, inst);
+    gtk_object_set_data (GTK_OBJECT (gl->window), "glayoutd", gl);
 
   } else {
-    gtk_widget_show_now ((GtkWidget*) window);
+    gl = (glayoutd *) inst->data;
+    if (window)
+      gtk_widget_show_now ((GtkWidget*) gl->window);
   }
 }
 
@@ -88,26 +90,45 @@ glayout_datad_set_cb (GtkWidget *cl, gint row, gint column,
   }
   /* Don't free either string; they're just pointers */
 }
-static void 
+static gint
 glayout_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
 {
   gchar *row[1];
-  GtkWidget *swin = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
-  gchar *clname = gtk_widget_get_name (GTK_WIDGET(clist));
+  GtkWidget *swin;
+  gchar *clname;
 
+  if (!GTK_IS_OBJECT (clist))
+    g_printerr ("(glayout_clist_datad_added_cb) clist is not an object\n");
+  if (!GTK_IS_WIDGET (clist))
+    g_printerr ("(glayout_clist_datad_added_cb) clist is not a widget\n");
+
+  swin = (GtkWidget *) gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
+  clname = gtk_widget_get_name (GTK_WIDGET(clist));
+  g_printerr ("clname = %s\n", clname);
+
+  /*
+   * This doesn't look right: a new datad can be only one of a
+   * node set and an edge set. ???
+   */
   if (strcmp (clname, "nodeset") == 0 && d->rowIds) {
+    g_printerr ("adding node set %s\n", d->name);
     row[0] = g_strdup (d->name);
     gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
     g_free (row[0]);
   }
-  if (strcmp (clname, "edgeset") == 0 && d->edge.n > 0) {
-    row[0] = g_strdup (d->name);
-    gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
-    g_free (row[0]);
+  if (strcmp (clname, "edgeset") == 0) {
+    g_printerr ("adding edge set %s\n", d->name);
+    if (d->edge.n > 0) {
+      g_printerr ("... with %d edges\n", d->edge.n);
+      row[0] = g_strdup (d->name);
+      gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
+      g_free (row[0]);
+    }
   }
 
   gtk_widget_show_all (swin);
+
+  return false;
 }
 
 static const gchar *const neato_model_lbl[] = {
@@ -390,6 +411,15 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
 
 void close_glayout_window(GtkWidget *w, PluginInstance *inst)
 {
+  /*
+  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
+    (GtkSignalFunc) glayout_clist_datad_added_cb, GTK_OBJECT (clist));
+  */
+  if (inst->data) {
+    glayoutd *gl = glayoutFromInst (inst);
+    gtk_widget_destroy (gl->window);
+  }
+
   inst->data = NULL;
 }
 
