@@ -219,13 +219,6 @@ scatterplot_display_menus_make (displayd *display,
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
-  if (!display->missing_p) {
-    item = CreateMenuCheck (options_menu, "Show missings",
-      func, GINT_TO_POINTER (DOPT_MISSINGS),
-      display->options.missings_show_p, gg);
-    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-  }
-
   /*-- Add a separator --*/
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 

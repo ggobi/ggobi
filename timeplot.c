@@ -45,13 +45,6 @@ tsplot_display_menus_make (displayd *display,
     func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
-  if (!display->missing_p) {
-    item = CreateMenuCheck (options_menu, "Show missings",
-      func, GINT_TO_POINTER (DOPT_MISSINGS),
-      display->options.missings_show_p, gg);
-    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-  }
-
   /* Add a separator */
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
@@ -423,8 +416,7 @@ tsplot_rewhisker (splotd *sp, ggobid *gg) {
     n = d->rows_in_plot[k+1];
     
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    if (!display->options.missings_show_p &&
-          d->nmissing > 0 &&
+    if (d->nmissing > 0 && !d->missings_show_p &&
           (d->missing.vals[i][sp->xyvars.x] || 
            d->missing.vals[i][sp->xyvars.y] ||
            d->missing.vals[n][sp->xyvars.x] || 

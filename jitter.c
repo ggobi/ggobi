@@ -102,8 +102,7 @@ rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
     }
   }
   tform_to_world (d, gg);
-  /*-- do not redisplay the missing values displays --*/
-  displays_tailpipe (REDISPLAY_PRESENT, FULL, gg);
+  displays_tailpipe (FULL, gg);
 }
 
 

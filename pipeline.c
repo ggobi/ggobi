@@ -300,22 +300,15 @@ void
 world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg)
 {
   gfloat precis = PRECISION1;
-  gfloat ftmp, max, min, rdiff;
+  gfloat ftmp, rdiff;
   gfloat x;
   vartabled *vt = vartable_element_get (j, d);
 
-  if (display->missing_p) {
-    max = d->missing_lim.max;
-    min = d->missing_lim.min;
-  } else {
-    max = vt->lim.max;
-    min = vt->lim.min;
-  }
-  rdiff = max - min;
+  rdiff = vt->lim.max - vt->lim.min;
 
   ftmp = d->world.vals[pt][j] / precis;
   x = (ftmp + 1.0) * .5 * rdiff;
-  x += min;
+  x += vt->lim.min;
 
   d->raw.vals[pt][j] = d->tform.vals[pt][j] = x;
 }

@@ -109,13 +109,8 @@ p1d_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
   yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
   jvar = sp->p1dvar;
 
-  if (display->missing_p) {
-    for (i=0; i<d->nrows_in_plot; i++)
-      yy[i] = (gfloat) d->missing.vals[d->rows_in_plot[i]][jvar];
-  } else {
-    for (i=0; i<d->nrows_in_plot; i++)
-      yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];
-  }
+  for (i=0; i<d->nrows_in_plot; i++)
+    yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];
 
   p1d_spread_var (display, yy, sp, d, gg);
 
@@ -144,14 +139,12 @@ p1d_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
      * jitter or spread variable.  Leave missings alone, since we
      * probably want jitter in both directions.
     */
-    if (!display->missing_p) {
-      if (display->p1d_orientation == VERTICAL) {
-        sp->planar[m].x += d->jitdata.vals[m][jvar];
-        sp->planar[m].y -= d->jitdata.vals[m][jvar];
-      } else {
-        sp->planar[m].x -= d->jitdata.vals[m][jvar];
-        sp->planar[m].y += d->jitdata.vals[m][jvar];
-      }
+    if (display->p1d_orientation == VERTICAL) {
+      sp->planar[m].x += d->jitdata.vals[m][jvar];
+      sp->planar[m].y -= d->jitdata.vals[m][jvar];
+    } else {
+      sp->planar[m].x -= d->jitdata.vals[m][jvar];
+      sp->planar[m].y += d->jitdata.vals[m][jvar];
     }
   }
 

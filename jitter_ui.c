@@ -43,14 +43,11 @@ degree_cb (GtkAdjustment *adj, ggobid *gg) {
   gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars = get_selections_from_clist (d->ncols, vars, clist);
 
-  if (gg->current_display->missing_p) {
-    missing_jitter_value_set (adj->value, d, gg);
-    missing_rejitter (vars, nvars, d, gg);
-  } else {
-    jitter_value_set (adj->value, d, gg);
-    if (nvars) rejitter (vars, nvars, d, gg);
+  jitter_value_set (adj->value, d, gg);
+  if (nvars) {
+    rejitter (vars, nvars, d, gg);
+    g_free (vars);
   }
-  if (nvars) g_free (vars);
 }
 
 /*-- called when closed from the close button --*/
@@ -100,6 +97,13 @@ jitter_window_open (ggobid *gg) {
     if (gg->jitter_ui.window == NULL) {
 
       gg->jitter_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+
+      /*-- suggested by Gordon Deane --*/
+      gtk_window_set_default_size(GTK_WINDOW(gg->jitter_ui.window), 200, 400);
+      /*-- 400 looks too big on the laptop, trying other numbers   --*/
+      gtk_window_set_default_size(GTK_WINDOW(gg->jitter_ui.window), 200, 250);
+      /*--                           --*/
+
       gtk_signal_connect (GTK_OBJECT (gg->jitter_ui.window), "delete_event",
                           GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) gg);
       gtk_window_set_title (GTK_WINDOW (gg->jitter_ui.window), "jitter data");

@@ -145,7 +145,7 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
 
   /* and now forward again, all the way ... */
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+  displays_tailpipe (FULL, gg);
 
   {
     /* Now notify anyone who is interested in this move. */

@@ -836,5 +836,5 @@ transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
    * are not currently displayed, but we're doing it anyway.
   */
   /*-- do not redisplay the missing values displays --*/
-  displays_tailpipe (REDISPLAY_PRESENT, FULL, gg);
+  displays_tailpipe (FULL, gg);
 }

@@ -75,7 +75,7 @@ subset_apply (datad *d, ggobid *gg) {
   }
 */
 
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);  /*-- points rebinned here --*/
+  displays_tailpipe (FULL, gg);  /*-- points rebinned here --*/
 }
 
 void

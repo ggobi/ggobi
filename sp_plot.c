@@ -91,7 +91,7 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
     draw_case = false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  } else if (!display->options.missings_show_p && d->nmissing > 0) {
+  } else if (d->nmissing > 0 && !d->missings_show_p) {
     switch (display->displaytype) {
       case parcoords:
         if (d->missing.vals[m][sp->p1dvar])

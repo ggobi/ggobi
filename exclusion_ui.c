@@ -111,7 +111,7 @@ static void rescale_cb (GtkWidget *w, ggobid *gg) {
   vartable_stats_set (d);
 
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);  /*-- points rebinned --*/
+  displays_tailpipe (FULL, gg);  /*-- points rebinned --*/
 }
 
 
@@ -168,7 +168,7 @@ show_cluster_cb (GtkToggleButton *btn, gpointer cbd)
    * the data about to be shown isn't on the current scale
   */
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg); /*-- points rebinned in here --*/
+  displays_tailpipe (FULL, gg); /*-- points rebinned in here --*/
 
   return false;
 }

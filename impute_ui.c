@@ -35,7 +35,7 @@ static void rescale_cb (GtkButton *button, ggobid *gg)
   vartable_stats_set (d);
 
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+  displays_tailpipe (FULL, gg);
 }
 static void group_cb (GtkToggleButton *button, ggobid *gg)
 {
@@ -67,7 +67,7 @@ impute_cb (GtkWidget *w, ggobid *gg) {
 
   if (redraw) {
     tform_to_world (d, gg);
-    displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+    displays_tailpipe (FULL, gg);
   }
 
   g_free (vars);
@@ -78,6 +78,7 @@ impute_cb (GtkWidget *w, ggobid *gg) {
 void
 impute_window_open (ggobid *gg)
 {
+  GtkWidget *frame0, *vb;
   GtkWidget *btn, *tgl, *notebook;
   GtkWidget *vbox, *frame, *hb;
   GtkWidget *label;
@@ -110,11 +111,18 @@ impute_window_open (ggobid *gg)
       NULL);
     gtk_box_pack_start (GTK_BOX (vbox), btn, true, true, 2);
 
-    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
-      false, true, 2);
+    /*-- add a frame to contain the "imputation" widgets --*/
+    frame0 = gtk_frame_new ("Assign values");
+    gtk_container_set_border_width (GTK_CONTAINER (frame0), 2);
+    gtk_box_pack_start (GTK_BOX (vbox), frame0, true, true, 2);
 
+    vb = gtk_vbox_new (false, 2);
+    /*-- this has the effect of setting an internal border inside the frame --*/
+    gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
+    gtk_container_add (GTK_CONTAINER (frame0), vb);
+    
     /* Create a notebook, set the position of the tabs */
-    notebook = create_variable_notebook (vbox,
+    notebook = create_variable_notebook (vb,
       GTK_SELECTION_EXTENDED,
       (GtkSignalFunc) NULL, gg);
 
@@ -122,7 +130,7 @@ impute_window_open (ggobid *gg)
     gg->impute.notebook = gtk_notebook_new ();
     gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->impute.notebook),
       GTK_POS_TOP);
-    gtk_box_pack_start (GTK_BOX (vbox), gg->impute.notebook,
+    gtk_box_pack_start (GTK_BOX (vb), gg->impute.notebook,
       false, false, 2);
     
 /*
@@ -183,7 +191,7 @@ impute_window_open (ggobid *gg)
       frame, label);
 
 /*
- * Fixed: some fixed value
+ * Fixed: percentage above the max
 */
     frame = gtk_frame_new ("Percentage above the maximum");
     gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
@@ -200,13 +208,10 @@ impute_window_open (ggobid *gg)
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->impute.notebook),
       frame, label);
 
-/* 
- * hbox to hold a few buttons
-*/
-    
+   /*-- hbox to hold a few buttons --*/
     hb = gtk_hbox_new (true, 2);
 
-    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
+    gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 2);
 
     btn = gtk_button_new_with_label ("Impute");
     gtk_signal_connect (GTK_OBJECT (btn),
@@ -225,8 +230,6 @@ impute_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
 
     /*-- add a close button --*/
-    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
-      false, true, 2);
     hb = gtk_hbox_new (false, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 

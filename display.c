@@ -28,10 +28,10 @@ DisplayOptions DefaultDisplayOptions = {
                                          false, /* edges_arrowheads_show_p */
                                          false, /* edges_directed_show_p */
                                          true,  /* whiskers_show_p*/
-                                         true,  /* missings_show_p  */
                                          true,  /* axes_show_p */
                                          false, /* axes_label_p */
 /* unused
+                                         true,  * missings_show_p  * 
                                          true,  * axes_center_p *
                                          true,  * double_buffer_p *
                                          true   * link_p *
@@ -102,7 +102,6 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
   displayd *display = (displayd *)
     gtk_object_get_data (GTK_OBJECT (w), "display");
-  datad *d = display->d;
   GtkWidget *ww;
 
   switch (action) {
@@ -171,7 +170,8 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
       display->options.whiskers_show_p = w->active;
       display_plot (display, FULL, gg);
     break;
-    case DOPT_MISSINGS:  /*-- in scatterplot, scatmat, parcoords, tsplot --*/
+/*
+    case DOPT_MISSINGS:
       if (!display->missing_p && d->nmissing > 0) {
         display->options.missings_show_p = w->active;
 
@@ -194,6 +194,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
         display_plot (display, FULL, gg);
       }
     break;
+*/
 
     case DOPT_AXES:
       display->options.axes_show_p = w->active;
@@ -301,7 +302,6 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
 {
   displayd *display = (displayd *) g_malloc (sizeof (displayd));
   display->displaytype = type; 
-  display->missing_p = missing_p;
 
   display->p1d_orientation = VERTICAL;
 
@@ -716,19 +716,15 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
   switch (display->displaytype) {
     case scatterplot:
       if (current_p)
-        tmp = display->missing_p ?   "*** scatterplot display (missings) *** " 
-                                  :   "*** scatterplot display ***";
+        tmp = "*** scatterplot display ***";
       else
-        tmp = display->missing_p ?   "scatterplot display (missings) " 
-                                  :   "scatterplot display ";
+        tmp = "scatterplot display ";
     break;
     case scatmat:
       if (current_p)
-        tmp = display->missing_p ?   "*** scatterplot matrix (missings) *** " 
-                                 :   "*** scatterplot matrix ***";
+        tmp = "*** scatterplot matrix ***";
       else
-        tmp = display->missing_p ?   "scatterplot matrix (missings) " 
-                                 :   "scatterplot matrix ";
+        tmp = "scatterplot matrix ";
     break;
     case parcoords:
       if (current_p)
@@ -783,9 +779,8 @@ displays_plot (splotd *splot, RedrawStyle type, ggobid *gg) {
   for (dlist = gg->displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
 
-    if (splot == NULL) {
+    if (splot == NULL)
       display_plot (display, type, gg);
-    }
     else
       display_plot_allbutone (display, splot, type, gg);
   }
@@ -834,21 +829,13 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg) {
 
 /*-- Reproject and plot all plots in all displays: modulo missingness --*/
 void
-displays_tailpipe (gint which, RedrawStyle type, ggobid *gg) {
+displays_tailpipe (RedrawStyle type, ggobid *gg) {
   GList *dlist;
   displayd *display;
-  gboolean redisplay = true;
 
   for (dlist = gg->displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
-
-    if (which != REDISPLAY_ALL) {
-      redisplay = ((which == REDISPLAY_MISSING && display->missing_p) ||
-                   (which == REDISPLAY_PRESENT && !display->missing_p));
-    }
-
-    if (redisplay)
-      display_tailpipe (display, type, gg);
+    display_tailpipe (display, type, gg);
   }
 }
 

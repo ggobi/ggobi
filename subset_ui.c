@@ -111,7 +111,7 @@ rescale_cb (GtkWidget *w, ggobid *gg)
     vartable_stats_set (d);
 
     tform_to_world (d, gg);
-    displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+    displays_tailpipe (FULL, gg);
   }
 }
 

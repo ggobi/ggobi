@@ -206,7 +206,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
     vartable_stats_set (d);
 
     tform_to_world (d, gg);
-    displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+    displays_tailpipe (FULL, gg);
   }
 
   g_free (cols);
@@ -227,7 +227,7 @@ static void rescale_cb (GtkWidget *w, ggobid *gg) {
   vartable_stats_set (d);
 
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+  displays_tailpipe (FULL, gg);
 }
 
 
@@ -396,7 +396,7 @@ void range_unset (ggobid *gg)
   vartable_stats_set (d);
 
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+  displays_tailpipe (FULL, gg);
 }
 
 

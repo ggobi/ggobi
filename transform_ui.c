@@ -158,7 +158,7 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
   vartable_stats_set (d);
 
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_PRESENT, FULL, gg);
+  displays_tailpipe (FULL, gg);
 }
 
 void

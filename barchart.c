@@ -492,19 +492,13 @@ void barchart_allocate_structure (splotd *sp, datad *d) {
 void barchart_init_categorical (splotd *sp, datad *d) {
     gfloat *yy;
     gint i,jvar = sp->p1dvar;
-    displayd *display = (displayd *) sp->displayptr;
     ggobid *gg = GGobiFromSPlot(sp);
     vartabled *vtx = vartable_element_get (sp->p1dvar, d);
     gfloat mindist, maxheight;
 
     yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
-    if (display->missing_p) {
-      for (i=0; i<d->nrows_in_plot; i++)
-        yy[i] = (gfloat) d->missing.vals[d->rows_in_plot[i]][jvar];
-    } else {
-      for (i=0; i<d->nrows_in_plot; i++)
-        yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];
-    }
+    for (i=0; i<d->nrows_in_plot; i++)
+      yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];
 
     mindist = barchart_sort_index (yy, d->nrows_in_plot, gg, sp);
 
@@ -646,7 +640,6 @@ void barchart_set_initials (splotd *sp, datad *d) {
 void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
   gfloat yy;
   gint i, bin, m;
-  displayd *display = (displayd *) sp->displayptr;
   vartabled *vtx = vartable_element_get (sp->p1dvar, d);
   
   if (!vtx->categorical_p) sp->scale.y = SCALE_DEFAULT;
@@ -667,21 +660,15 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
     gint index, rank = 0; 
 
     index = sp->bar->index_to_rank[rank];
-    if (display->missing_p) {
-      yy = (gfloat) d->missing.vals[index][sp->p1dvar];
-    } else {
-      yy = d->tform.vals[index][sp->p1dvar];
-    }
+    yy = d->tform.vals[index][sp->p1dvar];
 
-    while ((yy < sp->bar->breaks[0]+sp->bar->offset) && (rank < d->nrows_in_plot-1)) {
+    while ((yy < sp->bar->breaks[0]+sp->bar->offset) &&
+           (rank < d->nrows_in_plot-1))
+    {
       sp->planar[index].x = -1; 
       rank++;
       index = sp->bar->index_to_rank[rank];
-      if (display->missing_p) {
-        yy = (gfloat) d->missing.vals[index][sp->p1dvar];
-      } else {
-        yy = d->tform.vals[index][sp->p1dvar];
-      }
+      yy = d->tform.vals[index][sp->p1dvar];
     }
     if (rank > 0) {
       sp->bar->low_pts_missing = TRUE;
@@ -694,13 +681,12 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
     bin = 0;
     while (rank < d->nrows_in_plot) {
       index = sp->bar->index_to_rank[rank];
-      if (display->missing_p) {
-        yy = (gfloat) d->missing.vals[index][sp->p1dvar];
-      } else {
-        yy = d->tform.vals[index][sp->p1dvar];
-      }
-      while ((bin < sp->bar->nbins) && (sp->bar->breaks[bin+1]+sp->bar->offset < yy)) 
+      yy = d->tform.vals[index][sp->p1dvar];
+      while ((bin < sp->bar->nbins) &&
+             (sp->bar->breaks[bin+1]+sp->bar->offset < yy)) 
+      {
         bin++; 
+      }
 
       if (bin > sp->bar->nbins-1) {
 /* check whether the value is the maximum, if so, add it to the last bin - slight inconsistency with histograms */
@@ -710,8 +696,11 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
         } else  {
           if (sp->bar->high_pts_missing == FALSE) {
             sp->bar->high_pts_missing = TRUE; 
-            if (sp->bar->high_bin == NULL) sp->bar->high_bin = (bind *) g_malloc (sizeof(bind));
-            if (sp->bar->col_high_bin == NULL) sp->bar->col_high_bin = (bind *) g_malloc (sp->bar->ncolors *sizeof(bind));
+            if (sp->bar->high_bin == NULL)
+              sp->bar->high_bin = (bind *) g_malloc (sizeof(bind));
+            if (sp->bar->col_high_bin == NULL)
+              sp->bar->col_high_bin = (bind *)
+                g_malloc (sp->bar->ncolors *sizeof(bind));
             sp->bar->high_bin->count = 0; 
           }
           sp->bar->high_bin->count++;
@@ -1085,13 +1074,6 @@ barchart_display_menus_make (displayd *display,
   item = CreateMenuCheck (options_menu, "Show points",
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-
-  if (!display->missing_p) {
-    item = CreateMenuCheck (options_menu, "Show missings",
-      func, GINT_TO_POINTER (DOPT_MISSINGS),
-      display->options.missings_show_p, gg);
-    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-  }
 
   /*-- Add a separator --*/
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);

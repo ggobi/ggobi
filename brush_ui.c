@@ -160,7 +160,7 @@ brush_reset(ggobid *gg, gint action)
       cluster_table_labels_update (d, gg);
       rows_in_plot_set (d, gg);
       tform_to_world (d, gg);
-      displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+      displays_tailpipe (FULL, gg);
       /*-- --*/
       break;
 
@@ -174,7 +174,7 @@ brush_reset(ggobid *gg, gint action)
         cluster_table_labels_update (e, gg);
         rows_in_plot_set (e, gg);
         tform_to_world (e, gg);
-        displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+        displays_tailpipe (FULL, gg);
         /*-- --*/
       }
       break;
@@ -184,7 +184,7 @@ brush_reset(ggobid *gg, gint action)
 
       if (cpanel->br_mode == BR_TRANSIENT) {
         reinit_transient_brushing (display, gg);
-        displays_plot (REDISPLAY_ALL, FULL, gg);
+        displays_plot (NULL, FULL, gg);
       } else {
         splot_redraw (gg->current_splot, QUICK, gg);
       }

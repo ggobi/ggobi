@@ -34,8 +34,6 @@ datad_new(datad *d, ggobid *gg)
   arrayl_init_null (&d->jitdata);
 
   arrays_init_null (&d->missing);
-  arrayl_init_null (&d->missing_world);
-  arrayl_init_null (&d->missing_jitter);
 
   vectori_init_null (&d->clusterid);
 
@@ -66,6 +64,8 @@ datad_create(gint nr, gint nc, ggobid *gg)
   d->ncols = nc;
   d->nrows = nr;
 
+  d->missings_show_p = true;
+
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
   d->rows_in_plot = NULL;
@@ -93,10 +93,8 @@ datad_free (datad *d, ggobid *gg) {
   arrayf_free (&d->raw, 0, 0);
   pipeline_arrays_free (d, gg);
 
-  if (d->nmissing) {
+  if (d->nmissing)
     arrays_free (&d->missing, 0, 0);
-    missing_world_free (d, gg);
-  }
 
   g_free (d);
 }

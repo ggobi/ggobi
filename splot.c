@@ -632,33 +632,23 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
     case scatterplot:
       switch (cpanel->projection) {
         case P1PLOT:
-          p1d_reproject (sp,
-            (display->missing_p) ? d->missing_world.vals : d->world.vals,
-            d, gg);
+          p1d_reproject (sp, d->world.vals, d, gg);
         break;
 
         case XYPLOT:
-          xy_reproject (sp,
-            (display->missing_p) ? d->missing_world.vals : d->world.vals,
-            d, gg);
+          xy_reproject (sp, d->world.vals, d, gg);
         break;
 
         case TOUR1D:
-          tour1d_projdata (sp,
-            (display->missing_p) ? d->missing_world.vals : d->world.vals,
-            d, gg);
+          tour1d_projdata (sp, d->world.vals, d, gg);
         break;
 
         case TOUR2D:
-          tour2d_projdata(sp,
-            (display->missing_p) ? d->missing_world.vals : d->world.vals,
-            d, gg);
+          tour2d_projdata(sp, d->world.vals, d, gg);
         break;
 
         case COTOUR:
-          tourcorr_projdata(sp,
-            (display->missing_p) ? d->missing_world.vals : d->world.vals,
-            d, gg);
+          tourcorr_projdata(sp, d->world.vals, d, gg);
         break;
 
         case NULLMODE:
@@ -682,25 +672,17 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 
     case scatmat:
       if (sp->p1dvar == -1)
-        xy_reproject (sp,
-          (display->missing_p) ? d->missing_world.vals : d->world.vals,
-          d, gg);
+        xy_reproject (sp, d->world.vals, d, gg);
       else
-        p1d_reproject (sp,
-          (display->missing_p) ? d->missing_world.vals : d->world.vals,
-          d, gg);
+        p1d_reproject (sp, d->world.vals, d, gg);
     break;
 
     case parcoords:
-      p1d_reproject (sp,
-        (display->missing_p) ? d->missing_world.vals : d->world.vals,
-        d, gg);
+      p1d_reproject (sp, d->world.vals, d, gg);
     break;
 
     case tsplot:
-      xy_reproject (sp,
-        (display->missing_p) ? d->missing_world.vals : d->world.vals,
-        d, gg);
+      xy_reproject (sp, d->world.vals, d, gg);
     break;
 
 #ifdef BARCHART_IMPLEMENTED
@@ -826,14 +808,9 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
 
   switch (cpanel->projection) {
     case P1PLOT:
-      if (display->missing_p) {
-        max = d->missing_lim.max;
-        min = d->missing_lim.min;
-      } else {
-        vt = vartable_element_get (sp->p1dvar, d);
-        max = vt->lim.max;
-        min = vt->lim.min;
-      }
+      vt = vartable_element_get (sp->p1dvar, d);
+      max = vt->lim.max;
+      min = vt->lim.min;
       rdiff = max - min;
 
       if (display->p1d_orientation == HORIZONTAL) {
@@ -853,14 +830,9 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
 
     case XYPLOT:
       /* x */
-      if (display->missing_p) {
-        max = d->missing_lim.max;
-        min = d->missing_lim.min;
-      } else {
-        vtx = vartable_element_get (sp->xyvars.x, d);
-        max = vtx->lim.max;
-        min = vtx->lim.min;
-      }
+      vtx = vartable_element_get (sp->xyvars.x, d);
+      max = vtx->lim.max;
+      min = vtx->lim.min;
       rdiff = max - min;
       world.x = planar.x;
       ftmp = world.x / precis;
@@ -868,14 +840,9 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
       tfd->x += min;
 
       /* y */
-      if (display->missing_p) {
-        max = d->missing_lim.max;
-        min = d->missing_lim.min;
-      } else {
-        vty = vartable_element_get (sp->xyvars.y, d);
-        max = vty->lim.max;
-        min = vty->lim.min;
-      }
+      vty = vartable_element_get (sp->xyvars.y, d);
+      max = vty->lim.max;
+      min = vty->lim.min;
       rdiff = max - min;
       world.y = planar.y;
       ftmp = world.y / precis;

@@ -32,7 +32,7 @@ static void reset_all_cb (GtkButton *button, ggobid *gg)
     tform_to_world (d, gg);
   }
 
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+  displays_tailpipe (FULL, gg);
 }
 
 static void undo_last_cb (GtkButton *button, ggobid *gg)
@@ -43,7 +43,7 @@ static void undo_last_cb (GtkButton *button, ggobid *gg)
   movepts_history_delete_last (d, gg);
   movepts_history_delete_last (d, gg);
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+  displays_tailpipe (FULL, gg);
 }
 
 static void move_cluster_cb (GtkWidget *w, ggobid *gg)
