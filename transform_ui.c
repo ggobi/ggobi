@@ -40,6 +40,7 @@ static gchar *stage1_lbl[] = {"No transformation",
                               "Box-Cox",
                               "Log base 10",
                               "Inverse",
+                              "Absolute value",
                               "Scale to [a,b]",
                               };
 static void

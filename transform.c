@@ -222,7 +222,7 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
 {
   gint i, m, n;
   gfloat min, max, diff;
-  gfloat ref;
+  gfloat ref, ftmp;
   gboolean tform_ok = true;
   gdouble dtmp;
   lims slim, slim_tform;  /*-- specified limits --*/
@@ -420,6 +420,29 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
         }
       }
     break;
+
+    case ABSVALUE:
+      for (i=0; i<d->nrows_in_plot; i++) {
+        m = d->rows_in_plot[i];
+        ftmp = (*domain_adj)(d->raw.vals[m][jcol], incr);
+        d->tform.vals[m][jcol] = (ftmp >= 0 ? ftmp : -1 * ftmp);
+      }
+      /*-- apply the same transformation to the specified limits --*/
+      if (d->vartable[jcol].lim_specified_p) {
+        ftmp = (*domain_adj)(slim.min, incr);
+        slim_tform.min = (ftmp >= 0 ? ftmp : -1 * ftmp);
+
+        ftmp = (*domain_adj)(slim.max, incr);
+        slim_tform.max = (ftmp >= 0 ? ftmp : -1 * ftmp);
+
+        if (slim_tform.min > slim_tform.max) {
+          ftmp = slim_tform.min;
+          slim_tform.min = slim_tform.max;
+          slim_tform.max = ftmp;
+        }
+      }
+    break;
+
 
     case SCALE_AB:    /* Map onto [a,b] */
     {
@@ -673,6 +696,9 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
       break;
     case INVERSE:
       lbl1 = g_strdup_printf ("1/%s", lbl0);
+      break;
+    case ABSVALUE:
+      lbl1 = g_strdup_printf ("abs(%s)", lbl0);
       break;
     case SCALE_AB:
       lbl1 = g_strdup_printf ("%s [a,b]", lbl0);

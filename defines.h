@@ -213,7 +213,8 @@ extern const gint ViewTypeIndeces[3];
 #define BOXCOX       1
 #define LOG10        2
 #define INVERSE      3
-#define SCALE_AB     4
+#define ABSVALUE     4
+#define SCALE_AB     5
 
 #define N2TFORMS     8
 #define NO_TFORM2    0
