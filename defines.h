@@ -45,16 +45,17 @@ extern const gint ViewTypeIndeces[NDISPLAYTYPES];
 enum directiond {both, vertical, horizontal};
 
 /* display options */
+/*  When these change, update display.c and RSggobi/RSGGobi.c accordingly */
 #define DOPT_POINTS    0
-#define DOPT_EDGES_U   1
-#define DOPT_EDGES_A   2
-#define DOPT_EDGES_D   3
-#define DOPT_WHISKERS  4
-#define DOPT_GRIDLINES 5
-#define DOPT_AXES      6
-#define DOPT_AXESLAB   7
-#define DOPT_AXESVALS  8
+#define DOPT_AXES      1
+#define DOPT_AXESLAB   2
+#define DOPT_AXESVALS  3
+#define DOPT_EDGES_U   4
+#define DOPT_EDGES_A   5
+#define DOPT_EDGES_D   6
+#define DOPT_WHISKERS  7
 /* unused
+#define DOPT_GRIDLINES 5
 #define DOPT_MISSINGS  5
 #define DOPT_AXES_C    9
 #define DOPT_BUFFER   10
