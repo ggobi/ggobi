@@ -24,7 +24,9 @@
 <!ELEMENT edgerecord  ( #PCDATA )>
 <!ENTITY % lineTypes " solid | dot | dash ">
 
-<!ELEMENT ggobidata (description, (colormap)?, variables, records, (edges)*)>
+<!ELEMENT ggobidata (data)+>
+
+<!ELEMENT data (description, (colormap)?, variables, records, (edges)*)>
 
 <!ELEMENT color ( #PCDATA) >
 <!-- id is a number or either of "fg" and "bg" -->
@@ -46,7 +48,11 @@
          
 
 <!ATTLIST records
-     count CDATA  #REQUIRED
+   count CDATA  #REQUIRED
+   missingValue CDATA #IMPLIED
+   color        CDATA #IMPLIED
+   glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
+   glyphType ( %glyphTypes; )          #IMPLIED   
 >
 
 <!ATTLIST variable
@@ -94,10 +100,16 @@
 >   
 
 
-<!ATTLIST ggobidata
-   numRecords   CDATA #REQUIRED 
+<!ATTLIST data
+   name         CDATA #IMPLIED
+   count        CDATA #REQUIRED 
    missingValue CDATA #IMPLIED
-   color     CDATA                     #IMPLIED
+   color        CDATA #IMPLIED
    glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
    glyphType ( %glyphTypes; )          #IMPLIED   
 >
+
+<!ATTLIST ggobidata
+    COUNT  CDATA #IMPLIED
+>
+
