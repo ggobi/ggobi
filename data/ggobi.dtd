@@ -43,7 +43,10 @@
 
 <!ELEMENT ggobidata (data)+>
 
-<!ELEMENT data (description, (colormap)?, variables, records, (edges)*)>
+<!-- Perhaps need a different tag that doesn't require variables.
+     algal-bloom has no variables in the Lines for Meas dataset.
+  -->
+<!ELEMENT data ((description)*, (colormap)?, (variables)*, records, (edges)*)>
 
 <!ELEMENT color ( #PCDATA) >
 <!-- id is a number or either of "fg" and "bg" -->
@@ -68,6 +71,7 @@
    count CDATA  #REQUIRED
    missingValue CDATA #IMPLIED
    color        CDATA #IMPLIED
+   glyph        CDATA #IMPLIED
    glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
    glyphType ( %glyphTypes; )          #IMPLIED   
 >
@@ -88,13 +92,15 @@
 >
 
 <!ATTLIST realvariable
-    name          NMTOKEN #IMPLIED
-    transformName NMTOKEN #IMPLIED
+    name          CDATA   #IMPLIED
+    transformName CDATA   #IMPLIED
     missingValue  CDATA   #IMPLIED
     group         CDATA   #IMPLIED
     displayRange  CDATA   #IMPLIED
     displayMax    CDATA   #IMPLIED
     displayMin    CDATA   #IMPLIED
+    min CDATA #IMPLIED
+    max CDATA #IMPLIED
 >
 
 <!ATTLIST categoricalvariable
@@ -110,13 +116,16 @@
 
 
 <!ATTLIST record
-   label     NMTOKEN                   #REQUIRED
-   id        NMTOKEN                   #IMPLIED
+   label     CDATA                     #IMPLIED
+   id        CDATA                     #IMPLIED
    color     CDATA                     #IMPLIED
    glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
    glyphType ( %glyphTypes; )          #IMPLIED
    hidden    ( %Boolean; )             "FALSE"
    group     CDATA                     #IMPLIED
+
+   source      CDATA  #IMPLIED
+   destination CDATA  #IMPLIED
 >   
 
 <!ATTLIST edge
@@ -155,6 +164,6 @@
 >
 
 <!ATTLIST ggobidata
-    COUNT  CDATA #IMPLIED
+    count  CDATA #IMPLIED
 >
 
