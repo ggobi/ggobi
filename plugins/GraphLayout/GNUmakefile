@@ -39,12 +39,13 @@ ifdef GRAPHVIZ
 ifndef GRAPHVIZ_INCLUDES
    GRAPHVIZ_INCLUDES= $(shell $(DOTNEATO_CONFIG) --cflags)
 endif
+# For 1.16, I need this plugin_ld_flags piece.  For 1.12, I don't.
 ifndef GRAPHVIZ_LIBS
  GRAPHVIZ_LIBS= $(shell $(DOTNEATO_CONFIG) --ldflags) $(shell $(DOTNEATO_CONFIG) --libs)
 endif
  CFLAGS+=-Wno-unknown-pragmas
  CFLAGS+=-DGRAPHVIZ=1 $(GRAPHVIZ_INCLUDES)
- LDFLAGS+=$(GRAPHVIZ_LIBS)
+ PLUGIN_LD_FLAGS+=$(GRAPHVIZ_LIBS)
 endif
 
 ifdef WITH_R
