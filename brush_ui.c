@@ -22,7 +22,12 @@ static void brush_on_cb (GtkToggleButton *button, ggobid *gg)
 
 static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)
 {
-  brush_undo (gg->current_splot, gg);
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  if (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDL)
+    point_brush_undo (gg->current_splot, gg);
+  if (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL)
+    line_brush_undo (gg->current_splot, gg);
 }
 
 void
@@ -113,6 +118,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
   return true;
 }
 
+/*-- response to the mouse click event --*/
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
@@ -126,7 +132,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gg->current_display = (displayd *) sp->displayptr;
   cpanel = &gg->current_display->cpanel;
 
-  brush_prev_vectors_update (gg);
+  point_brush_prev_vectors_update (gg);
+  line_brush_prev_vectors_update (gg);
 
   mousepos_get_pressed (w, event, &button1_p, &button2_p, gg);
 

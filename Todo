@@ -7,7 +7,6 @@ Bugs:
                        maybe its cpanel isn't initialized correctly?
   the brush isn't redrawing when a new color is selected
   closing the 'choose symbol' window dumps core
-  line brushing:  hide doesn't work, nor does undo
 
 various stuff not yet implemented: 
   1d, xy cycling
@@ -84,7 +83,7 @@ Rotation
 !    I was using filename (with suffix) instead of fname (without)
 !    Do I need to keep filename for anything?
 
-! Line brushing: 95% finished
+! Line brushing
 
 ! Erase/hiding/exclusion  (done; could use a redo button)
 !   fix up for api

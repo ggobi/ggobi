@@ -64,7 +64,7 @@ brush_once (gboolean force, ggobid *gg)
 }
 
 void
-brush_prev_vectors_update (ggobid *gg) {
+point_brush_prev_vectors_update (ggobid *gg) {
   gint m, i;
   for (m=0; m<gg->nrows_in_plot; m++) {
     i = gg->rows_in_plot[m];
@@ -76,7 +76,7 @@ brush_prev_vectors_update (ggobid *gg) {
 }
 
 void
-brush_undo (splotd *sp, ggobid *gg) {
+point_brush_undo (splotd *sp, ggobid *gg) {
   gint m, i;
   for (m=0; m<gg->nrows_in_plot; m++) {
     i = gg->rows_in_plot[m];

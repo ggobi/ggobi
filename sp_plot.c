@@ -34,11 +34,15 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
     if (!binned) {
       for (i=0; i<gg->nrows_in_plot; i++) {
         m = gg->rows_in_plot[i];
-        new_color = true;
-        for (k=0; k<*ncolors_used; k++) {
-          if (colors_used[k] == gg->color_now[m]) {
-            new_color = false;
-            break;
+        if (gg->hidden_now[m]) {  /*-- if it's hidden, we don't care --*/
+          new_color = false;
+        } else {
+          new_color = true;
+          for (k=0; k<*ncolors_used; k++) {
+            if (colors_used[k] == gg->color_now[m]) {
+              new_color = false;
+              break;
+            }
           }
         }
         if (new_color) {
@@ -59,12 +63,15 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
         for (iv=gg->app.bin0.y; iv<=gg->app.bin1.y; iv++) {
           for (m=0; m<gg->br_binarray[ih][iv].nels; m++) {
             j = gg->rows_in_plot[gg->br_binarray[ih][iv].els[m]];
-
-            new_color = true;
-            for (k=0; k<*ncolors_used; k++) {
-              if (colors_used[k] == gg->color_now[j]) {
-                new_color = false;
-                break;
+            if (gg->hidden_now[j]) {  /*-- if it's hidden, we don't care --*/
+              new_color = false;
+            } else {
+              new_color = true;
+              for (k=0; k<*ncolors_used; k++) {
+                if (colors_used[k] == gg->color_now[j]) {
+                  new_color = false;
+                  break;
+                }
               }
             }
             if (new_color) {
@@ -424,14 +431,19 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
   *ncolors_used = 1;
   colors_used[0] = gg->line_color_now[0];
 
-  if (display->options.segments_directed_show_p || display->options.segments_undirected_show_p)
+  if (display->options.segments_directed_show_p ||
+      display->options.segments_undirected_show_p)
   {
     for (i=0; i<gg->nsegments; i++) {
-      new_color = true;
-      for (k=0; k<*ncolors_used; k++) {
-        if (colors_used[k] == gg->line_color_now[i]) {
-          new_color = false;
-          break;
+      if (gg->line_hidden_now[i])
+        new_color = false;
+      else {
+        new_color = true;
+        for (k=0; k<*ncolors_used; k++) {
+          if (colors_used[k] == gg->line_color_now[i]) {
+            new_color = false;
+            break;
+          }
         }
       }
       if (new_color) {
@@ -466,27 +478,28 @@ segments_draw (splotd *sp, ggobid *gg)
       nl = 0;
 
       for (j=0; j<gg->nsegments; j++) {
-        from = gg->segment_endpoints[j].a - 1;
-        to = gg->segment_endpoints[j].b - 1;
-        doit = true;
+        if (gg->line_hidden_now[j]) {
+          doit = false;
+        } else {
+          from = gg->segment_endpoints[j].a - 1;
+          to = gg->segment_endpoints[j].b - 1;
+          doit = (!gg->hidden_now[from] && !gg->hidden_now[to]);
 
         /* If not plotting imputed values, and one is missing, skip it */
 /*
-        if (!plot_imputed_values && plotted_var_missing(from, to, gg))
-          doit = false;
+          if (!plot_imputed_values && plotted_var_missing(from, to, gg))
+            doit = false;
 */
         /* If either from or to is not included, move on */
 /*
-        else if (gg->ncols == gg->ncols_used) {
-          if (!gg->clusv[(int)GROUPID(from)].included)
-            doit = False;
-          else if (!gg->clusv[(int)GROUPID(to)].included)
-            doit = False;
+          else if (gg->ncols == gg->ncols_used) {
+            if (!gg->clusv[(int)GROUPID(from)].included)
+              doit = False;
+            else if (!gg->clusv[(int)GROUPID(to)].included)
+              doit = False;
         }
 */
-        /* If either from or to is hidden, move on */
-        if (doit && (gg->hidden_now[from] || gg->hidden_now[to]))
-          doit = false;
+        }
 
         if (doit) {
           if (gg->line_color_now[j] == current_color) {
