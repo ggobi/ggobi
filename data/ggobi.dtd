@@ -15,7 +15,7 @@
 
 <!-- Allows the name to be the only entry -->
 <!ELEMENT variable ( #PCDATA )>
-<!ELEMENT realvariable ( #PCDATA )>
+<!ELEMENT realvariable ( (description)?,(quickHelp)?)>
 
 <!ELEMENT level (#PCDATA)>
 <!ATTLIST level
@@ -27,12 +27,15 @@
    count CDATA #REQUIRED
 >
 
+<!ELEMENT quickHelp (#PCDATA)>
+
 <!ELEMENT categoricalvariable (levels)>
 
 <!ELEMENT records ( record )*>
-<!ELEMENT record ANY >
+<!ELEMENT record  (#PCDATA|int|real|na)*>
 
 <!ELEMENT ggobidata ((brush)?, (activeColorScheme)?, (data)+)>
+
 
 <!-- I don't see how a datad can have a colormap -->
 <!ELEMENT data ((description)?, (colormap)?, (variables)?, records, (edges)?)>
@@ -85,7 +88,6 @@
 <!ATTLIST variable
     name          NMTOKEN #IMPLIED
     nickname      NMTOKEN #IMPLIED
-    quickHelp     CDATA   #IMPLIED
     transformName NMTOKEN #IMPLIED
     missingValue  CDATA   #IMPLIED
     min           CDATA   #IMPLIED

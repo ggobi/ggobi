@@ -2,6 +2,7 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata>
+<brush color="6" glyph="fc 3" />
 <data name="flea">
 <description source="ftp://...">
 This data is from a paper by A. A. Lubischew, "On the Use of
@@ -38,7 +39,6 @@ and Ch. heikertingeri, and 6 measurements on each.
     </levels>
   </categoricalvariable>
 </variables>
-<brush color="6" glyph="fc 3" />
 <records count="74" color="2" missingValue="NA">
 <record label="Concinna" color="2">
 191 131 53 150 15 104 1
