@@ -568,22 +568,42 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
 
   /* Allocate color */
   if (gdk_color_alloc (cmap, &gdk_color)) {
-
     if (gg->color_ui.current_da == gg->color_ui.bg_da) {
-      scheme->rgb_bg = gdk_color;
+
+      scheme->rgb_bg.pixel = gdk_color.pixel;
+      scheme->rgb_bg.red = gdk_color.red;
+      scheme->rgb_bg.green = gdk_color.green;
+      scheme->rgb_bg.blue = gdk_color.blue;
+
       redraw_bg (gg->color_ui.bg_da, gg);
     } else if (gg->color_ui.current_da == gg->color_ui.accent_da) {
-      scheme->rgb_accent = gdk_color;
+
+      scheme->rgb_accent.pixel = gdk_color.pixel;
+      scheme->rgb_accent.red = gdk_color.red;
+      scheme->rgb_accent.green = gdk_color.green;
+      scheme->rgb_accent.blue = gdk_color.blue;
+
       redraw_accent (gg->color_ui.accent_da, gg);
     } else if (gg->color_ui.current_da == gg->color_ui.hidden_da) {
-      scheme->rgb_hidden = gdk_color;
+
+      scheme->rgb_hidden.pixel = gdk_color.pixel;
+      scheme->rgb_hidden.red = gdk_color.red;
+      scheme->rgb_hidden.green = gdk_color.green;
+      scheme->rgb_hidden.blue = gdk_color.blue;
+
       redraw_hidden (gg->color_ui.hidden_da, gg);
     } else {
-      gg->activeColorScheme->rgb[gg->color_id] = gdk_color;
+
+      gg->activeColorScheme->rgb[gg->color_id].blue = gdk_color.pixel;
+      gg->activeColorScheme->rgb[gg->color_id].pixel = gdk_color.red;
+      gg->activeColorScheme->rgb[gg->color_id].red = gdk_color.green;
+      gg->activeColorScheme->rgb[gg->color_id].green = gdk_color.blue;
+
       redraw_fg (gg->color_ui.fg_da[gg->color_id], gg->color_id, gg);
     }
 
     redraw_symbol_display (gg->color_ui.symbol_display, gg);
+    redraw_line_display (gg->color_ui.line_display, gg);
 
     if (sp->da != NULL) {
       gboolean rval = false;
@@ -955,7 +975,7 @@ make_symbol_window (ggobid *gg) {
       PSIZE, PSIZE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
       gg->color_ui.bg_da,
-      "Double click to reset background color (Note: your color selection will have no visible effect unless you also reset the 'Value')",
+      "Double click to reset background color (Note: your color selection will have no visible effect unless the 'Value' is >>0; look to the right of the color wheel.)",
       NULL);
     gtk_widget_set_events (gg->color_ui.bg_da,
                            GDK_EXPOSURE_MASK
