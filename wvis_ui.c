@@ -42,9 +42,22 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
   }
 }
 
+void
+wvis_init (ggobid  *gg)
+{
+  gg->wvis.window = NULL;
+  gg->wvis.npct = 0;
+  gg->wvis.n = NULL;
+  gg->wvis.nearest_color = -1;
+  gg->wvis.motion_notify_id = 0;
+  gg->wvis.mousepos.x = -1;
+  gg->wvis.mousepos.y = -1;
+  gg->wvis.pix = NULL;
+}
+
 
 static void
-delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data)
+delete_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
   gtk_widget_hide (w);
 }
@@ -81,7 +94,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
     {
       gg->wvis.pct[nearest_color] = val;
 
-      if (selected_var != -1)
+      if (selected_var != -1 && selected_var < d->ncols)
         bin_counts_reset (selected_var, d, gg);
 
       gtk_signal_emit_by_name (GTK_OBJECT (w), "expose_event",
@@ -156,19 +169,6 @@ da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
   gtk_widget_queue_draw (w);
 
   return false;
-}
-
-void
-wvis_init (ggobid  *gg)
-{
-  gg->wvis.window = NULL;
-  gg->wvis.npct = 0;
-  gg->wvis.n = NULL;
-  gg->wvis.nearest_color = -1;
-  gg->wvis.motion_notify_id = 0;
-  gg->wvis.mousepos.x = -1;
-  gg->wvis.mousepos.y = -1;
-  gg->wvis.pix = NULL;
 }
 
 static void
@@ -438,7 +438,7 @@ static void scale_apply_cb (GtkButton *w, ggobid* gg)
 }
 
 void
-wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
+wvis_window_open (ggobid *gg) {
   GtkWidget *opt, *vbox, *hbox, *hb, *menu, *menuitem;
   GtkWidget *swin, *clist, *btn, *vb;
   gint nd = g_slist_length (gg->d);
@@ -453,7 +453,7 @@ wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
     gtk_window_set_title (GTK_WINDOW (gg->wvis.window),
       "brushing by weights");
     gtk_signal_connect (GTK_OBJECT (gg->wvis.window),
-      "delete_event", GTK_SIGNAL_FUNC (delete_cb), NULL);
+      "delete_event", GTK_SIGNAL_FUNC (delete_cb), gg);
 
     vbox = gtk_vbox_new (false, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 3);
@@ -565,8 +565,8 @@ wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (scale_apply_cb), gg);
 
-    gtk_widget_show_all (gg->wvis.window);
   }
 
+  gtk_widget_show_all (gg->wvis.window);
   gdk_window_raise (gg->wvis.window->window);
 }

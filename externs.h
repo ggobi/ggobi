@@ -441,7 +441,7 @@ void widget_initialize (GtkWidget *w, gboolean initd);
 gboolean widget_initialized (GtkWidget *w);
 void world_to_raw (gint, splotd *, datad *, ggobid *);
 void writeall_window_open (ggobid *);
-void wvis_window_open (ggobid *gg, guint action, GtkWidget *w);
+void wvis_window_open (ggobid *gg);
 void xy_reproject (splotd *, glong **, datad *, ggobid *);
 void xyplot_cycle_activate (gboolean state, cpaneld *cpanel, ggobid *gg);
 void xyplot_event_handlers_toggle (splotd *, gboolean);

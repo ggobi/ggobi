@@ -98,11 +98,15 @@ static void open_symbol_window_cb (GtkWidget *w, ggobid *gg)
   make_symbol_window (gg);
 }
 
-static void cluster_window_cb (GtkToggleButton *button, ggobid *gg)
+static void cluster_window_cb (GtkWidget *button, ggobid *gg)
 {
   cluster_window_open (gg);
 }
 
+static void wvis_window_cb (GtkWidget *button, ggobid *gg)
+{
+  wvis_window_open (gg);
+}
 
 /*
  * Callbacks for menus in the main menubar
@@ -427,14 +431,22 @@ cpanel_brush_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
                       btn, false, false, 1);
 
-/*
- * button for opening clusters table
-*/
-  btn = gtk_button_new_with_label ("Clusters ...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-                        btn,
-                        "Open panel for hiding or excluding brushed groups",
-                        NULL);
+/*-- button for opening 'brush by variable' panel --*/
+  btn = gtk_button_new_with_label ("Brush by variable ...");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Open tools panel for automatic brushing by variable",
+    NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (wvis_window_cb),
+                      (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
+                      btn, false, false, 1);
+
+/*-- button for opening clusters table --*/
+  btn = gtk_button_new_with_label ("Case clusters ...");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Open tools panel for hiding or excluding brushed groups",
+    NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (cluster_window_cb),
                       (gpointer) gg);
