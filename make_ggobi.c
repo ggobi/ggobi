@@ -111,7 +111,6 @@ fileset_read (gchar *ldata_in, ggobid *gg)
       
       collabels_read (gg->fname, true, d, gg);
       rowlabels_read (gg->fname, true, d, gg);
-      vgroups_read (gg->fname, true, d, gg);
       
       point_glyphs_read (gg->fname, true, d, gg);
       point_colors_read (gg->fname, true, d, gg);

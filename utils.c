@@ -331,56 +331,17 @@ print_attachments (ggobid *gg) {
 }
 
 gint
-get_vgroup_cols (gint k, gint *cols, datad *d, ggobid *gg) {
-/*
- * Return all columns in the same vgroup as k
-*/
-  gint j, ncols = 0;
-  gint groupno = d->vartable[k].groupid;
-
-  for (j=0; j<d->ncols; j++)
-    if (d->vartable[j].groupid == groupno)
-       cols[ncols++] = j;
-
-  return ncols;
-}
-
-gint
-selected_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg)
+selected_cols_get (gint *cols, datad *d, ggobid *gg)
 {
 /*
- * Figure out which columns are selected.  If (add_vgroups),
- * add any columns in the same vgroup as any of those selected
+ * Figure out which columns are selected.
 */
-  gint j, ncols = 0, k, n;
-  gint groupno;
-  gboolean included;
+  gint j, ncols = 0;
 
-  for (j=0; j<d->ncols; j++)
+  for (j=0; j<d->ncols; j++) 
     if (d->vartable[j].selected)
       cols[ncols++] = j;
 
-  if (add_vgroups) {
-    /*-- now add their fellow vgroup members --*/
-    for (j=0; j<d->ncols; j++) {
-      groupno = d->vartable[j].groupid;
-      /*-- look for j's fellow group members --*/
-      for (k=0; k<d->ncols; k++) {
-        if (k != j && d->vartable[k].groupid == groupno) {
-          /*-- if k is not already in cols, add it */
-          included = false;
-          for (n=0; n<ncols; n++) {
-            if (cols[n] == k) {
-              included = true;
-              break;
-            }
-          }
-          if (!included)
-            cols[ncols++] = k;
-        }
-      }
-    }
-  }
   return (ncols);
 }
 
@@ -393,7 +354,7 @@ selected_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg)
  * in a mysterious way.
 */
 gint
-plotted_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg) 
+plotted_cols_get (gint *cols, datad *d, ggobid *gg) 
 {
   gint mode = mode_get (gg);
   gint ncols = 0;

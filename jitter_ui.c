@@ -16,7 +16,6 @@
 void
 jitter_vars_init (datad *d, ggobid *gg) {
   d->jitter.type = UNIFORM;
-  d->jitter.vgroup = true;
   d->jitter.convex = true;
 }
 
@@ -93,27 +92,10 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   rejitter (d, gg);
 }
 
-static void
-vgroups_cb (GtkToggleButton *button, ggobid *gg)
-{
-  datad *d = gg->current_display->d;
-
-  /* 
-   * if datad has changed, refuse to do anything until the
-   * user has closed and reopened jitter_ui.window.
-  */
-  if (gg->jitter_ui.d != d) {
-    g_printerr ("Close and reopen this window, please\n");
-    return;
-  }
-
-  d->jitter.vgroup = button->active;
-}
-
 void
 jitter_window_open (ggobid *gg) {
 
-  GtkWidget *btn, *tgl, *lbl;
+  GtkWidget *btn, *lbl;
   GtkWidget *vbox, *vb;
   GtkWidget *sbar, *opt;
   GtkObject *adj;
@@ -183,16 +165,6 @@ jitter_window_open (ggobid *gg) {
       populate_option_menu (opt, type_lbl,
                             sizeof (type_lbl) / sizeof (gchar *),
                             (GtkSignalFunc) type_cb, gg);
-
-      /*-- Jitter vgroups toggle --*/
-      tgl = gtk_check_button_new_with_label ("Jitter vgroup");
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-        "Jitter each variable in the variable groups of this plot's selected variables",
-        NULL);
-      gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                         GTK_SIGNAL_FUNC (vgroups_cb), (gpointer) gg);
-      gtk_box_pack_start (GTK_BOX (vbox), tgl,
-        false, false, 3);
 
       /*-- Close button --*/
       btn = gtk_button_new_with_label ("Close");

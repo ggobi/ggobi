@@ -16,7 +16,18 @@
 #include "vars.h"
 #include "externs.h"
 
-#define NCOLS_CLIST 9
+#define NCOLS_CLIST 10
+
+#define CLIST_VARNO     0
+#define CLIST_VARNAME   1
+#define CLIST_TFORM     2
+#define CLIST_USER_MIN  3
+#define CLIST_USER_MAX  4
+#define CLIST_DATA_MIN  5
+#define CLIST_DATA_MAX  6
+#define CLIST_MEAN      7
+#define CLIST_MEDIAN    8
+#define CLIST_NMISSING  9
 
 static void delete_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
 {
@@ -36,6 +47,131 @@ vartable_clist_get (ggobid *gg) {
   /*-- each scrolled window has one child, a clist --*/
   GList *swin_children = gtk_container_children (GTK_CONTAINER (swin));
   return ((GtkCList *) g_list_nth_data (swin_children, 0));
+}
+
+static void
+dialog_range_set (GtkWidget *w, ggobid *gg) 
+{
+  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  GtkCList *clist = vartable_clist_get (gg);
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint ncols = selected_cols_get (cols, d, gg);
+  gint j, k;
+  gchar *val_str;
+  gfloat val;
+
+  /*-- minimum --*/
+  val_str = gtk_entry_get_text (GTK_ENTRY (gg->vartable_ui.umin));
+  if (strlen (val_str) > 0) {
+    val = (gfloat) atof (val_str);
+    for (k=0; k<ncols; k++) {
+      j = cols[k];
+
+      d->vartable[j].lim_specified_p = true;
+      d->vartable[j].lim_specified.min = val;
+
+      gtk_clist_set_text (clist, j, CLIST_USER_MIN,
+        g_strdup_printf("%8.3f", val));
+    }
+  }
+
+  /*-- maximum --*/
+  val_str = gtk_entry_get_text (GTK_ENTRY (gg->vartable_ui.umax));
+  if (strlen (val_str) > 0) {
+    val = (gfloat) atof (val_str);
+    for (k=0; k<ncols; k++) {
+      j = cols[k];
+
+      d->vartable[j].lim_specified_p = true;
+      d->vartable[j].lim_specified.max = val;
+
+      gtk_clist_set_text (clist, j, CLIST_USER_MAX,
+        g_strdup_printf("%8.3f", val));
+    }
+  }
+
+  g_free (cols);
+  gtk_widget_destroy (dialog);
+}
+
+/*
+ * open a dialog with two text entry widgets in it,
+ * and fetch the range for the selected variables in
+ * dialog_range_set.
+*/
+void
+range_set_cb (GtkWidget *w, ggobid *gg)
+{
+  GtkWidget *frame, *vb, *hb, *okay_button;
+
+  GtkWidget *dialog = gtk_dialog_new ();
+
+  frame = gtk_frame_new ("Set range");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), frame);
+
+  vb = gtk_vbox_new (true, 5);
+  gtk_container_add (GTK_CONTAINER (frame), vb);
+
+  /*-- make an hbox to hold a label and a text entry widget --*/
+  hb = gtk_hbox_new (true, 5);
+  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Minimum: "),
+    true, true, 2);
+
+  gg->vartable_ui.umin = gtk_entry_new ();
+  gtk_widget_set_usize (gg->vartable_ui.umin,
+                        gdk_string_width (gg->vartable_ui.umin->style->font,
+                        "0000000000"), -1);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->vartable_ui.umin,
+    "Range minimum for the selected variable(s)", NULL);
+  gtk_box_pack_start (GTK_BOX (hb), gg->vartable_ui.umin,
+    true, true, 2);
+
+  gtk_container_add (GTK_CONTAINER (vb), hb);
+
+  /*-- make another hbox --*/
+  hb = gtk_hbox_new (true, 5);
+  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Maximum: "),
+    true, true, 2);
+
+  gg->vartable_ui.umax = gtk_entry_new ();
+  gtk_widget_set_usize (gg->vartable_ui.umax,
+                        gdk_string_width (gg->vartable_ui.umax->style->font,
+                        "0000000000"), -1);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->vartable_ui.umax,
+    "Range minimum for the selected variable(s)", NULL);
+  gtk_box_pack_start (GTK_BOX (hb), gg->vartable_ui.umax,
+    true, true, 2);
+
+  gtk_container_add (GTK_CONTAINER (vb), hb);
+
+  /*-- buttons --*/
+  okay_button = gtk_button_new_with_label ("Okay");
+  gtk_signal_connect (GTK_OBJECT (okay_button), "clicked",
+    GTK_SIGNAL_FUNC (dialog_range_set), gg);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
+    okay_button);
+
+  gtk_widget_show_all (dialog);
+}
+
+void range_unset_cb (GtkWidget *w, ggobid *gg)
+{
+  GtkCList *clist = vartable_clist_get (gg);
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint ncols = selected_cols_get (cols, d, gg);
+  gint j, k;
+
+  for (k=0; k<ncols; k++) {
+    j = cols[k];
+    d->vartable[j].lim_specified_p = false;
+    /*-- then null out the two entries in the table --*/
+    gtk_clist_set_text (clist, j, CLIST_USER_MIN, g_strdup(""));
+    gtk_clist_set_text (clist, j, CLIST_USER_MAX, g_strdup(""));
+  }
+  g_free ((gchar *) cols);
 }
 
 void select_all_cb (GtkWidget *w, ggobid *gg)
@@ -149,23 +285,30 @@ vartable_row_append (gint j, datad *d, ggobid *gg)
     if (j == -1) {
       row[0] = g_strdup_printf ("%d", 0);
       row[1] = g_strdup ("");
-      row[2] = g_strdup_printf ("%d", 0);
-      row[3] = g_strdup ("");
+      row[2] = g_strdup ("");
+      row[3] = g_strdup_printf ("%8.3f", 0.0);
       row[4] = g_strdup_printf ("%8.3f", 0.0);
       row[5] = g_strdup_printf ("%8.3f", 0.0);
       row[6] = g_strdup_printf ("%8.3f", 0.0);
       row[7] = g_strdup_printf ("%8.3f", 0.0);
-      row[8] = g_strdup_printf ("%d", 0);
+      row[8] = g_strdup_printf ("%8.3f", 0.0);
+      row[9] = g_strdup_printf ("%d", 0);
     } else {
       row[0] = g_strdup_printf ("%d", j);
       row[1] = g_strdup (d->vartable[j].collab);
-      row[2] = g_strdup_printf ("%d", d->vartable[j].groupid);
-      row[3] = g_strdup ("");
-      row[4] = g_strdup_printf ("%8.3f", d->vartable[j].lim_raw.min);
-      row[5] = g_strdup_printf ("%8.3f", d->vartable[j].lim_raw.max);
-      row[6] = g_strdup_printf ("%8.3f", d->vartable[j].mean);
-      row[7] = g_strdup_printf ("%8.3f", d->vartable[j].median);
-      row[8] = g_strdup_printf ("%d", d->vartable[j].nmissing);
+      row[2] = g_strdup ("");
+      if (d->vartable[j].lim_specified_p) {
+        row[3] = g_strdup_printf ("%8.3f", d->vartable[j].lim_specified.min);
+        row[4] = g_strdup_printf ("%8.3f", d->vartable[j].lim_specified.max);
+      } else {
+        row[3] = g_strdup ("");
+        row[4] = g_strdup ("");
+      }
+      row[5] = g_strdup_printf ("%8.3f", d->vartable[j].lim_raw.min);
+      row[6] = g_strdup_printf ("%8.3f", d->vartable[j].lim_raw.max);
+      row[7] = g_strdup_printf ("%8.3f", d->vartable[j].mean);
+      row[8] = g_strdup_printf ("%8.3f", d->vartable[j].median);
+      row[9] = g_strdup_printf ("%d", d->vartable[j].nmissing);
     }
 
     gtk_clist_append ((GtkCList *) d->vartable_clist, row);
@@ -180,19 +323,19 @@ void
 vartable_open (ggobid *gg)
 {                                  
   gint j, k;
-  GtkWidget *vbox;
+  GtkWidget *vbox, *hbox, *btn;
   GtkWidget *scrolled_window;
   gchar *titles[NCOLS_CLIST] =
     {"varno", "Variable",          /*-- varno will be an invisible column --*/
-     "Group", "Transformation",
-     "Minimum", "Maximum",
+     "Transformation",
+     "Min (user)", "Max (user)",
+     "Min (data)", "Max (data)",
      "Mean", "Median",
      "N missing"};
   GSList *l;
   datad *d;
   GtkWidget *labelw;
   gint n;
-  GtkWidget *hbox, *btn;
 
   if (gg->vartable_ui.window == NULL) {
 
@@ -235,19 +378,10 @@ vartable_open (ggobid *gg)
       gtk_clist_set_selection_mode (GTK_CLIST (d->vartable_clist),
         GTK_SELECTION_MULTIPLE);
 
-      /*-- left justify all the numerical columns --*/
-      gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
-        2, GTK_JUSTIFY_RIGHT);
-      gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
-        4, GTK_JUSTIFY_RIGHT);
-      gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
-        5, GTK_JUSTIFY_RIGHT);
-      gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
-        6, GTK_JUSTIFY_RIGHT);
-      gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
-        7, GTK_JUSTIFY_RIGHT);
-      gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
-        8, GTK_JUSTIFY_RIGHT);
+      /*-- right justify all the numerical columns --*/
+      for (k=0; k<NCOLS_CLIST; k++)
+        gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist),
+          k, GTK_JUSTIFY_RIGHT);
 
       /*-- make the first column invisible --*/
       gtk_clist_set_column_visibility (GTK_CLIST (d->vartable_clist), 0, false);
@@ -289,6 +423,21 @@ vartable_open (ggobid *gg)
 
     hbox = gtk_hbox_new (true, 10);
 
+    btn = gtk_button_new_with_label ("Set range ... ");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Set user min and max for the selected variable(s)", NULL);
+    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                        GTK_SIGNAL_FUNC (range_set_cb), gg);
+
+
+    btn = gtk_button_new_with_label ("Unset range");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Unset user min and max for the selected variable(s)", NULL);
+    gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
+    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                        GTK_SIGNAL_FUNC (range_unset_cb), gg);
+
     btn = gtk_button_new_with_label ("Select all");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Select all variables", NULL);
@@ -322,5 +471,5 @@ vartable_tform_set (gint varno, datad *d, ggobid *gg) {
 
   if (d->vartable_clist != NULL)
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), varno,
-      3, d->vartable[varno].collab_tform);
+      2, d->vartable[varno].collab_tform);
 }

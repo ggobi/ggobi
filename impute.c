@@ -27,9 +27,9 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
   gboolean ok = true;
 
   selected_cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  nselected_cols = selected_cols_get (selected_cols, false, d, gg);
+  nselected_cols = selected_cols_get (selected_cols, d, gg);
   if (nselected_cols == 0)
-    nselected_cols = plotted_cols_get (selected_cols, false, d, gg);
+    nselected_cols = plotted_cols_get (selected_cols, d, gg);
 
   if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
 
@@ -40,7 +40,7 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
 
     if (strlen (val_str) == 0) {
       gchar *message = g_strdup_printf (
-      "You selected '%% over or under' but didn't specify a percentage.\n");
+        "You selected '%% over or under' but didn't specify a percentage.\n");
       quick_message (message, false);
       g_free (message);
       ok = false;
@@ -158,11 +158,11 @@ impute_random (datad *d, ggobid *gg)
   missv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
 
   selected_cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  nselected_cols = selected_cols_get (selected_cols, false, d, gg);
+  nselected_cols = selected_cols_get (selected_cols, d, gg);
   if (nselected_cols == 0)
-    nselected_cols = plotted_cols_get (selected_cols, false, d, gg);
+    nselected_cols = plotted_cols_get (selected_cols, d, gg);
 
-  if (gg->impute.vgroup_p && d->nclusters > 1) {
+  if (gg->impute.bgroup_p && d->nclusters > 1) {
 
     /* Loop over the number of brushing groups */
     for (n=0; n<d->nclusters; n++) {

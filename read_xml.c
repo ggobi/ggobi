@@ -702,7 +702,6 @@ asNumber(const char *sval)
 gboolean
 newVariable(const CHAR **attrs, XMLParserData *data)
 {
-  gint groupId = data->current_variable;
   const gchar *tmp;
   datad *d = getCurrentXMLData(data);
 
@@ -719,14 +718,6 @@ newVariable(const CHAR **attrs, XMLParserData *data)
   if (data->variable_transform_name_as_attribute == false)
     d->vartable[data->current_variable].collab_tform = g_strdup(tmp);
  }
-
-  tmp = getAttribute(attrs, "group");
-  if(tmp) {
-    groupId = asInteger(tmp);
-      /* Do we need to subtract 1 from this. */
-  }
-
-  d->vartable[data->current_variable].groupid_ori = groupId;
 
   return (true);
 }

@@ -99,7 +99,6 @@ class datad {
  struct _Jitterd {
    gfloat factor;
    gboolean type;
-   gboolean vgroup;
    gboolean convex;
    gfloat *jitfacv;
  } jitter;

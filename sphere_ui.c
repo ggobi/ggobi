@@ -73,7 +73,6 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
  * finally, sphere the number of principal components selected;
  * executed when the apply button is pressed
 */
-  gint j;
   datad *d = gg->current_display->d;
   gfloat firstpc = d->sphere.eigenval[0];
   gfloat lastpc = d->sphere.eigenval[d->sphere.npcs-1];

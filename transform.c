@@ -50,29 +50,12 @@ gfloat inv_raise_min_to_1 (gfloat x, gfloat incr) { return (x - incr - 1.0); }
 }
 #endif
 
-gint
-cols_in_group (gint *cols, gint varno, datad *d, ggobid *gg) 
-{
-/*
- * Figure out which columns are in the same vgroup as varno
-*/
-  gint j, ncols = 0;
-  gint groupno = d->vartable[varno].groupid;
-
-  for (j=0; j<d->ncols; j++) {
-    if (d->vartable[j].groupid == groupno)
-      cols[ncols++] = j;
-  }
-  return (ncols);
-}
-
-
 static void
 mean_stddev (gdouble *x, gfloat *mean, gfloat *stddev, gint j, 
   datad *d, ggobid *gg)
 /*
- * Find the minimum and maximum values of a column or variable
- * group scaling by mean and std_width standard deviations.
+ * Find the minimum and maximum values of a column 
+ * scaling by mean and std_width standard deviations.
  * Use the function pointer to domain_adj.
 */
 {
@@ -98,8 +81,8 @@ gfloat
 median (gfloat **data, gint jcol, datad *d, ggobid *gg)
 {
 /*
- * Find the minimum and maximum values of each column or variable
- * group scaling by median and largest distance
+ * Find the minimum and maximum values of each column,
+ * scaling by median and largest distance
 */
   gint i, m, np = d->nrows_in_plot;
   gfloat *x;
@@ -683,36 +666,18 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
 void
 transform (gint stage, gint tform_type, gfloat param, datad *d, ggobid *gg) 
 {
-  gint j, k, n;
-  gint ncols, nselected_cols;
-  gint *selected_cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint k;
+  gint ncols;
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  gboolean doit;
 
-  nselected_cols = selected_cols_get (selected_cols, false, d, gg);
-  if (nselected_cols == 0)
-    nselected_cols = plotted_cols_get (selected_cols, false, d, gg);
+  ncols = selected_cols_get (cols, d, gg);
+  if (ncols == 0)
+    ncols = plotted_cols_get (cols, d, gg);
 
-  /*-- loop over selected columns, getting vgroup members --*/
-  for (j=0; j<nselected_cols; j++) {
-    n = selected_cols[j];
-    doit = true;
-    ncols = get_vgroup_cols (n, cols, d, gg);
-    for (k=0; k<ncols; k++) {
-      if (cols[k] < n) {  /*-- depend on vgroups being sorted --*/
-        doit = false;  /*-- this vgroup has already been transformed --*/
-        break;
-      }
-    }
-
-    if (ncols && doit) {
-      for (k=0; k<ncols; k++)
-        transform_variable (stage, tform_type, param, cols[k], d, gg);
-    }
-  }
+  for (k=0; k<ncols; k++)
+    transform_variable (stage, tform_type, param, cols[k], d, gg);
 
   g_free ((gpointer) cols);
-  g_free ((gpointer) selected_cols);
 
   vartable_lim_update (d, gg);
   tform_to_world (d, gg);

@@ -26,7 +26,7 @@ static void rescalep_cb (GtkToggleButton *button, ggobid *gg)
 }
 static void group_cb (GtkToggleButton *button, ggobid *gg)
 {
-  gg->impute.vgroup_p = button->active;
+  gg->impute.bgroup_p = button->active;
 }
 
 static void

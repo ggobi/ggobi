@@ -76,13 +76,6 @@ read_mysql_data(MySQLLoginInfo *login, gint init, datad *d, ggobid *gg)
     return(-1);
   }
 
-  /* This should go into its own routine in the core ggobi. */
-  vgroups_sort (d, gg);
-  { gint j;
-    for (j=0; j<d->ncols; j++)
-      d->vartable[j].groupid = d->vartable[j].groupid_ori;
-  }
-
   segments_alloc (gg->nsegments, gg);
 
 /*

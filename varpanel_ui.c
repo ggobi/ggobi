@@ -122,8 +122,6 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   varpanel_checkbox_add (nc-1, d, gg);
 
   /*-- now the rest of the variables --*/
-  d->vartable[nc-1].groupid = d->vartable[nc-1].groupid_ori =
-    d->vartable[d->ncols-1].groupid + 1; 
   d->vartable[nc-1].jitter_factor = d->vartable[jvar].jitter_factor;
   d->vartable[nc-1].nmissing = d->vartable[jvar].nmissing;
 

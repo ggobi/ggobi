@@ -120,27 +120,17 @@ limits_adjust (gfloat *min, gfloat *max)
 void
 vartable_lim_raw_gp_set (datad *d, ggobid *gg)
 {
-  gint j, *cols, ncols;
+  gint j, *cols;
   gfloat min, max;
-  gint k;
-  gint nvgr = nvgroups (d, gg);
 
-  cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  for (k=0; k<nvgr; k++) {
-    ncols = 0;
-    for (j=0; j<d->ncols; j++) {
-      if (d->vartable[j].groupid == k)
-        cols[ncols++] = j;
-      else
-        cols[j] = j;
-    }
+  cols = (gint *) g_malloc (1 * sizeof (gint));
+  for (j=0; j<d->ncols; j++) {
+    cols[0] = j;
 
-    min_max (d->raw.vals, cols, ncols, &min, &max, d, gg);
+    min_max (d->raw.vals, cols, 1, &min, &max, d, gg);
     limits_adjust (&min, &max);
-    for (j=0; j<ncols; j++) {
-      d->vartable[cols[j]].lim_raw_gp.min = min;
-      d->vartable[cols[j]].lim_raw_gp.max = max;
-    }
+    d->vartable[j].lim_raw_gp.min = min;
+    d->vartable[j].lim_raw_gp.max = max;
   }
 
   g_free ((gpointer) cols);
@@ -149,25 +139,17 @@ vartable_lim_raw_gp_set (datad *d, ggobid *gg)
 void
 vartable_lim_tform_gp_set (datad *d, ggobid *gg)
 {
-  gint j, n, *cols, ncols;
+  gint j, *cols;
   gfloat min, max;
-  gint k;
-  gint nvgr = nvgroups (d, gg);
 
-  cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  for (k=0; k<nvgr; k++) {
-    ncols = 0;
-    for (j=0; j<d->ncols; j++) {
-      if (d->vartable[j].groupid == k)
-        cols[ncols++] = j;
-    }
+  cols = (gint *) g_malloc (1 * sizeof (gint));
+  for (j=0; j<d->ncols; j++) {
+    cols[0] = j;
 
-    min_max (d->tform.vals, cols, ncols, &min, &max, d, gg);
+    min_max (d->tform.vals, cols, 1, &min, &max, d, gg);
     limits_adjust (&min, &max);
-    for (n=0; n<ncols; n++) {
-      d->vartable[cols[n]].lim_tform_gp.min = min;
-      d->vartable[cols[n]].lim_tform_gp.max = max;
-    }
+    d->vartable[j].lim_tform_gp.min = min;
+    d->vartable[j].lim_tform_gp.max = max;
   }
 
   g_free ((gpointer) cols);
@@ -176,10 +158,9 @@ vartable_lim_tform_gp_set (datad *d, ggobid *gg)
 void
 vartable_lim_update (datad *d, ggobid *gg)
 {
-  gint j, k, n;
+  gint j;
   gfloat min, max;
-  gint *cols, ncols;
-  gint nvgr = nvgroups (d, gg);
+  gint *cols;
 
   /* 
    * First update the limits taken from the tform data. 
@@ -191,36 +172,30 @@ vartable_lim_update (datad *d, ggobid *gg)
    * the min and max for each variable group (and thus for each
    * column).
   */
-  cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  for (k=0; k<nvgr; k++) {
-    ncols = 0;
-    for (j=0; j<d->ncols; j++) {
-      if (d->vartable[j].groupid == k)
-        cols[ncols++] = j;
-    }
+  cols = (gint *) g_malloc (1 * sizeof (gint));
+  for (j=0; j<d->ncols; j++) {
+    cols[0] = j;
 
     switch (d->std_type)
     {
       case 0:
         /*-- isn't this already done? --*/
-/*      min_max (gg->tform, cols, ncols, &min, &max);*/
-        min = d->vartable[cols[0]].lim_tform_gp.min;
-        max = d->vartable[cols[0]].lim_tform_gp.max;
+/*      min_max (gg->tform, cols, 1, &min, &max);*/
+        min = d->vartable[j].lim_tform_gp.min;
+        max = d->vartable[j].lim_tform_gp.max;
         break;
       case 1:
-        mean_largest_dist (d->tform.vals, cols, ncols, &min, &max, d, gg);
+        mean_largest_dist (d->tform.vals, cols, 1, &min, &max, d, gg);
         break;
       case 2:
-        median_largest_dist (d->tform.vals, cols, ncols, &min, &max, d, gg);
+        median_largest_dist (d->tform.vals, cols, 1, &min, &max, d, gg);
         break;
     }
 
     limits_adjust (&min, &max);
 
-    for (n=0; n<ncols; n++) {
-      d->vartable[cols[n]].lim.min = min;
-      d->vartable[cols[n]].lim.max = max;
-    }
+    d->vartable[j].lim.min = min;
+    d->vartable[j].lim.max = max;
   }
   g_free ((gpointer) cols);
 }

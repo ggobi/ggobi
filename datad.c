@@ -75,13 +75,8 @@ displayd *
 datad_init (datad *d, ggobid *gg, gboolean cleanup)
 {
   displayd *display = NULL;
-  gint j;
 
   varpanel_populate (d, gg);
-
-  vgroups_sort (d, gg);
-  for (j=0; j<d->ncols; j++)
-    d->vartable[j].groupid = d->vartable[j].groupid_ori;
 
   pipeline_init (d, gg);
 

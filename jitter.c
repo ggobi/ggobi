@@ -79,13 +79,12 @@ rejitter (datad *d, ggobid *gg) {
 
 /*
  * First determine the variables to be jittered:
- * this depends first on the selected variables and
- * second on vgroups (if jitter_vgroup is True)
+ * this depends on the selected variables
 */
   selected_cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  nselected_cols = selected_cols_get (selected_cols, d->jitter.vgroup, d, gg);
+  nselected_cols = selected_cols_get (selected_cols, d, gg);
   if (nselected_cols == 0)
-    nselected_cols = plotted_cols_get (selected_cols, false, d, gg);
+    nselected_cols = plotted_cols_get (selected_cols, d, gg);
 
   for (j=0; j<nselected_cols; j++) {
     k = selected_cols[j];
@@ -125,10 +124,10 @@ void
 jitter_value_set (gfloat value, datad *d, ggobid *gg) {
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint j;
-  gint ncols = selected_cols_get (cols, d->jitter.vgroup, d, gg);
+  gint ncols = selected_cols_get (cols, d, gg);
 
   if (ncols == 0)
-    ncols = plotted_cols_get (cols, false, d, gg);
+    ncols = plotted_cols_get (cols, d, gg);
 
   for (j=0; j<ncols; j++)
     d->vartable[cols[j]].jitter_factor = value;

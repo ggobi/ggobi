@@ -69,68 +69,8 @@ void vartable_init (datad *d, ggobid *gg)
 
     d->vartable[j].collab = NULL;
     d->vartable[j].collab_tform = NULL;
-    d->vartable[j].groupid = 0;
   }
 }
-
-/*-------------------------------------------------------------------------*/
-/*                 variable groups                                         */
-/*-------------------------------------------------------------------------*/
-
-/*
- * This assumes that the values of variable group ids
- * are {0,1,2,...,nvgroups-1}
-*/
-gint
-nvgroups (datad *d, ggobid *gg)
-{
-  gint j, ngr = 0;
-
-  for (j=0; j<d->ncols; j++)
-    if (d->vartable[j].groupid > ngr)
-      ngr = d->vartable[j].groupid;
-
-  return (ngr+1);
-}
-
-void
-vgroups_sort (datad *d, ggobid *gg) 
-{
-  gint maxid, id, newid, j;
-  gboolean found;
-
-  /*
-   * Find maximum vgroup id.
-  */
-  maxid = 0;
-  for (j=0; j<d->ncols; j++) {
-    if (d->vartable[j].groupid > maxid)
-      maxid = d->vartable[j].groupid;
-  }
-
-  /*
-   * Find minimum vgroup id, set it to 0.  Find next, set it to 1; etc.
-  */
-  id = 0;
-  newid = -1;
-  while (id <= maxid) {
-    found = false;
-    for (j=0; j<d->ncols; j++) {
-      if (d->vartable[j].groupid == id) {
-        newid++;
-        found = true;
-        break;
-      }
-    }
-    if (found)
-      for (j=0; j<d->ncols; j++)
-        if (d->vartable[j].groupid == id)
-          d->vartable[j].groupid = newid;
-    id++;
-  }
-}
-
-
 
 /*-------------------------------------------------------------------------*/
 /*                 finding the statistics for the table                    */

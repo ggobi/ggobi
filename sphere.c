@@ -116,9 +116,9 @@ spherevars_set (datad *d, ggobid *gg) {
     sphere_malloc (d, gg);
   }
 
-  d->sphere.nvars = selected_cols_get (d->sphere.vars, false, d, gg);
+  d->sphere.nvars = selected_cols_get (d->sphere.vars, d, gg);
   if (d->sphere.nvars == 0)
-    d->sphere.nvars = plotted_cols_get (d->sphere.vars, false, d, gg);
+    d->sphere.nvars = plotted_cols_get (d->sphere.vars, d, gg);
 }
 
 /*-------------------------------------------------------------------------*/

@@ -86,6 +86,7 @@ struct _ggobid {
  struct _VarTableUI {
    GtkWidget *window;
    GtkWidget *notebook;
+   GtkWidget *umin, *umax;   /*-- text entry widgets for setting ranges --*/
  } vartable_ui;
 
 /*----------------------- missing values ---------------------------*/
@@ -301,7 +302,7 @@ struct _ggobid {
 /*-------------------- imputation ------------------------------------*/
 
  struct _Impute {
-   gboolean rescale_p, vgroup_p;
+   gboolean rescale_p, bgroup_p;
    gint whichvars;
    GtkWidget *window;
    GtkWidget *notebook;

@@ -100,9 +100,9 @@ set_colv (gint *colv, gchar *rootname, datad *d, ggobid *gg)
       break;
 
     case SELECTEDCOLS:
-      ncols = selected_cols_get (colv, false, d, gg);
+      ncols = selected_cols_get (colv, d, gg);
       if (ncols == 0)
-        ncols = plotted_cols_get (colv, false, d, gg);
+        ncols = plotted_cols_get (colv, d, gg);
       break;
     
 
@@ -172,7 +172,7 @@ strip_blanks (gchar *str)
 gboolean
 ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
 {
-  gint nr, nc, nvgr;
+  gint nr, nc;
   gint *rowv, *colv;
   gchar *fname;
   FILE *fp;
@@ -344,30 +344,6 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
     }
   }
 
-
-/* Save vgroups */
-  nvgr = nvgroups (d, gg);
-  if (nvgr != d->ncols) {
-    fname = g_strdup_printf ("%s.vgroups", rootname);
-    fp = fopen (fname, "w");
-    g_free (fname);
-
-    if (fp == NULL) {
-      gchar *message = g_strdup_printf (
-        "The file '%s.vgroups' can not be opened for writing\n", rootname);
-      quick_message (message, false);
-      g_free (message);
-      g_free ((gchar *) rowv);
-      g_free ((gchar *) colv);
-      return false;
-    } else {
-      for (j=0; j<nc; j++)
-        fprintf (fp, "%d ", d->vartable[colv[j]].groupid + 1);
-      fprintf (fp, "\n");
-      fclose (fp);
-    }
-  }
-
 /* Save rgroups */
   if (d->nrgroups > 0) {
     sprintf (fname, "%s.rgroups", rootname);
@@ -458,6 +434,9 @@ write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
   }
 }
 
+/*
+ * save limits if they exist
+*/
 gboolean
 save_collabels (gchar *rootname, gint *colv, gint nc, datad *d, ggobid *gg)
 {

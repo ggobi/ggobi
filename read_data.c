@@ -122,6 +122,11 @@ rowlabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
 /*                       column labels                                    */
 /*------------------------------------------------------------------------*/
 
+/*
+ * Change: we'll no longer support blanks in column names,
+ * because we want the option of adding meaningful 2nd and 3rd
+ * fields, which will contain min and max range values.
+*/
 gboolean
 collabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
 {
@@ -192,54 +197,6 @@ collabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
   for (j=0; j<d->ncols; j++) {
     d->vartable[j].collab_tform = g_strdup (d->vartable[j].collab);
   }
-
-  return (found);
-}
-
-/*------------------------------------------------------------------------*/
-/*                       variable groups                                  */
-/*------------------------------------------------------------------------*/
-
-gboolean
-vgroups_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
-/*
- * Read in the grouping numbers for joint scaling of variables
-*/
-{
-  gchar *suffixes[] = {".vgroups"};
-  gint itmp, i, j;
-  gboolean found = false;
-  FILE *fp;
-
-  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
-    if ((fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
-      found = true;
-
-  if (found) {
-    i = 0;
-    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < d->ncols))
-      d->vartable[i++].groupid_ori = itmp;
-
-    if (init && i < d->ncols) {
-      g_printerr (
-        "Number of variables and number of group types do not match.\n");
-      g_printerr ("Creating extra generic groups.\n");
-
-      for (j=i; j<d->ncols; j++)
-        d->vartable[j].groupid_ori = j;
-    }
-
-    vgroups_sort (d, gg);
-
-  } else {
-
-    if (init)
-      for (j=0; j<d->ncols; j++)
-        d->vartable[j].groupid_ori = j;
-  }
-
-  for (j=0; j<d->ncols; j++)
-    d->vartable[j].groupid = d->vartable[j].groupid_ori;
 
   return (found);
 }

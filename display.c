@@ -213,7 +213,7 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
 
   /*-- find out what variable are selected in the var statistics panel --*/
   selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
-  nselected_vars = selected_cols_get (selected_vars, false, d, gg);
+  nselected_vars = selected_cols_get (selected_vars, d, gg);
 
   /*
    * Turn off event handlers, remove submenus, and redraw the

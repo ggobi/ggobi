@@ -165,7 +165,6 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   hidden_alloc (d, gg);
 
   for (j = 0; j < nc ; j++) {
-   d->vartable[j].groupid_ori = j;
    d->vartable[j].collab = g_strdup(colnames[j]);
    d->vartable[j].collab_tform = g_strdup(colnames[j]);
    for (i = 0; i < nr ; i++) {

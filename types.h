@@ -79,7 +79,6 @@ typedef struct {  /*-- used for obtaining ranks --*/
 
 /* column-wise data that will appear in the variable table */
 typedef struct {
- gint groupid_ori, groupid;
  gchar *collab, *collab_tform;
  gint nmissing;
 
