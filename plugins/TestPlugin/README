@@ -1,0 +1,3 @@
+This is dummy or test plugin that we use for testing the plugin
+mechanism.  It merely prints messages for each of the plugin events:
+load, create, destroy and unload.
