@@ -316,7 +316,7 @@ update_cell(gint row, gint column, double value, datad *data)
 {
     data->raw.vals[row][column] = data->tform.vals[row][column] = value;
     tform_to_world (data, data->gg);
-    displays_tailpipe (REDISPLAY_ALL, FULL, data->gg); 
+    displays_tailpipe (FULL, data->gg); 
 }
 
 
