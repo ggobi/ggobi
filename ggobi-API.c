@@ -1721,3 +1721,10 @@ XXX  assert(which > -1 && which < MAX_GGOBI_SIGNALS);
   return(GGobiSignals[which]);
 }
 
+
+GSList *
+GGOBI(getExtendedDisplayTypes)()
+{
+  return(ExtendedDisplayTypes);
+}
+

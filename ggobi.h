@@ -583,6 +583,8 @@ extern "C" {
 void globals_init(ggobid * gg);
 
 guint getGGobiSignal(GGobiSignalType);
+
+GSList *GGOBI(getExtendedDisplayTypes)();
 #ifdef __cplusplus
 }
 #endif

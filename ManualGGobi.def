@@ -56,7 +56,85 @@ EXPORTS
  sticky_id_link_by_id
  GGobi_getVariableIndex
  limits_set_by_var
- GGobiSignals
  getGGobiSignal
 
- 
+ GGobi_getDisplay
+ gtk_ggobi_window_display_get_type
+ GGobi_getBrushSize
+ GGobi_setBrushSize
+ brush_reset
+ GGobi_getBrushLocation
+ GGobi_setBrushLocation
+ GGobi_setErrorHandlers
+ GGobi_setMissingValueIdentifier
+ ggobi_get
+ ggobiInit
+ GGobi_nrecords
+ GGobi_ncols
+ GGobi_getDataModeDescription
+ GGobi_getDataModeNames
+ fileset_read_init
+ display_menu_build
+ GGobi_getFileName
+ GGobi_getViewTypeIndices
+ GGobi_getViewTypes
+ GGobi_getCurrentDisplay
+ GGobi_setCurrentDisplay
+ GGobi_getDisplayOptions
+ GGobi_getCurrentPlotIndex 
+ rows_in_plot_set
+GGobi_setMode
+GGobi_getModeName
+GGobi_setBrushColor
+GGobi_getBrushColor
+GGobi_getBrushGlyph
+GGobi_setBrushGlyph
+GGobi_getColorName
+GGobi_setCaseHidden
+GGobi_getCaseHidden
+
+GGobi_getCaseGlyphSize
+GGobi_setCaseColor
+GGobi_getCaseColor
+GGobi_setCaseGlyph
+GGobi_getCaseGlyphType
+varpanel_populate
+GGobi_addCategoricalVariable
+GGobi_addVariable
+GGobi_getOpModeNames
+ValidateGGobiRef
+GGobi_setDataName
+pipeline_init
+rows_in_plot_set
+rowlabels_alloc
+edges_alloc
+edges_free
+edgeset_add
+unresolveAllEdgePoints
+displays_plot
+clusters_set
+GGobi_getNumGGobis
+GGobi_close
+GGobi_getGlyphTypeNames
+GGobi_getGlyphTypeName
+GGobi_getGlyphTypes
+GGobi_setPlotRange
+ggobi_getIndex
+GGobi_getDataMode
+GGobi_newParCoords
+GGobi_newScatmat
+gtk_ggobi_extended_display_get_type
+display_add
+display_free
+ValidateDatadRef
+ValidateDisplayRef
+GGobi_getCurrentDisplayType
+GGobi_getPlot
+GGobi_splot_set_current_full
+GGobi_getViewTypeName
+gtk_ggobi_extended_splot_get_type
+GGobi_getVariableNames
+GGobi_getCurrentDisplayIndex
+GGobi_getExtendedDisplayTypes
+
+GGobi_raiseWindow
