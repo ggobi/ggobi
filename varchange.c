@@ -92,13 +92,6 @@ addvar_propagate (gint ncols_prev, gint ncols_added, datad *d, ggobid *gg)
 }
 
 
-
-
-/*
- * The first argument is gdouble because this is only used from
- * the API; for now it's only called from R.  Possibly
- * it should live in ggobi-API.c
-*/
 void
 newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
 			vartyped type,

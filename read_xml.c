@@ -1570,6 +1570,7 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
  return(name);
 }
 
+/* I suspect this is unused -- dfs */
 /*
   This is reentrant.  
   First we check the size attribute. Then we check the
@@ -1629,6 +1630,7 @@ setColorMap(const xmlChar **attrs, XMLParserData *data)
   return(true);
 }
 
+/* this is certainly unused -- dfs */
 gboolean
 setColormapEntry(const xmlChar **attrs, XMLParserData *data)
 {
@@ -1763,10 +1765,6 @@ xmlParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
 
   g_free(tmp);
 
-/* doesn't use schemes */
-/*
-  return(size == data->gg->ncolors);
-*/
   return (size);
 }
 
