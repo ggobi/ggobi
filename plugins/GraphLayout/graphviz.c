@@ -366,7 +366,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
   colnames = (gchar **) g_malloc (nc * sizeof(gchar *));
   for (k=0; k<dim; k++)
-    colnames[k] = g_strdup_printf ("Pos%d\n", k);
+    colnames[k] = g_strdup_printf ("Pos%d", k);
 
   /*
    * In case there is no initial scatterplot because the datasets
