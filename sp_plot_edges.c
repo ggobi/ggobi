@@ -96,7 +96,7 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
   ggobid *gg)
 {
   gint i, j, m;
-  gint k, n, p;
+  gint k, n, p, pp;
   gint a, b;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
@@ -164,18 +164,25 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
     }
 
 
-/*
- * It would be nice to draw the edges using the current color and
- * glyph last, but it's not obvious how to set that up in this scheme.
- * I could skip them on the way through and then draw them at the end,
- * I think.
-*/
     if (draw_hidden)
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
 
     for (k=0; k<NGLYPHSIZES; k++) {
       for (n=0; n<NEDGETYPES; n++) {
-        for (p=0; p<ncolors; p++) {
+        for (pp=0; pp<ncolors+1; pp++) {
+          /* 
+           * This is a little trick to draw the edges using the
+           * current color last.  I skip over them the first time
+           * through, and pick them up at the end.  It shouldn't
+           * cost me anything, I don't think.  Should I do
+           * the same for glyphs?     -- dfs, 4/2004
+          */
+          if (pp < ncolors) {
+            if (pp == gg->color_id)
+              continue;
+            else p = pp;
+          } else p = gg->color_id;
+          
           if (symbols_used[k][n][p]) {
 
             /*
