@@ -131,8 +131,6 @@ enum displaytyped {scatterplot, scatmat, parcoords};
 #define PRECISION1 16384
 #define PRECISION2  8192
 
-#define EVENT_METHOD(i, x) GTK_WIDGET_CLASS(GTK_OBJECT(i)->klass)->x
-
 /*-- spacing for the control panels --*/
 #define VBOX_SPACING 5
 
@@ -216,3 +214,8 @@ enum displaytyped {scatterplot, scatmat, parcoords};
 #define Z_ASPECT  1
 #define Z_HORIZ   2
 #define Z_VERT    3
+
+/*-- macros --*/
+
+#define EVENT_METHOD(i,x) GTK_WIDGET_CLASS(GTK_OBJECT(i)->klass)->x
+#define MISSING_P(i,j) (xg.missing.data[i][j] != 0)

@@ -212,7 +212,6 @@ display_free (displayd* display) {
         sp->redraw_style = QUICK;
         gtk_widget_queue_draw (sp->da);
       }
-/*      splot_redraw (current_splot, QUICK);*/
     }
 
     for (l=display->splots; l; l=l->next) {
@@ -223,6 +222,17 @@ display_free (displayd* display) {
     g_free (display);
   } else
     quick_message ("Sorry, you can't delete the only display\n", false);
+}
+
+void
+display_free_all () {
+  GList *dlist;
+  displayd *display;
+
+  for (dlist = displays; dlist; dlist = dlist->next) {
+    display = (displayd *) dlist->data;
+    display_free (display);
+  }
 }
 
 void

@@ -72,11 +72,10 @@ read_binary (FILE *fp)
 
   xg.nrows = (xg.file_read_type == read_all) ?  nr : xg.file_sample_size;
 
-  xg.file_rows_sampled = (glong *) g_malloc (xg.nrows * sizeof (glong));
+  xg.file_rows_sampled = (glong *) g_realloc (xg.file_rows_sampled,
+                                              xg.nrows * sizeof (glong));
 
-  xg.raw_data = (gfloat **) g_malloc (xg.nrows * sizeof (gfloat *));
-  for (i=0; i<xg.nrows; i++)
-    xg.raw_data[i] = (gfloat *) g_malloc (xg.ncols * sizeof (gfloat));
+  arrayf_alloc (&xg.raw, xg.nrows, xg.ncols);
 
   if (xg.file_read_type == read_block) {
     fseek (fp,
@@ -88,20 +87,19 @@ read_binary (FILE *fp)
 
     for (i=0; i<xg.nrows; i++) {
       for (j=0; j<xg.ncols; j++) {
-        out = fread ((gchar *) &xg.raw_data[i][j], onesize, 1, fp);
+        out = fread ((gchar *) &xg.raw.data[i][j], onesize, 1, fp);
         if (out != 1) {
           g_printerr ("problem in reading the binary data file\n");
           fclose (fp);
           exit (0);
 
-        } else if (xg.raw_data[i][j] == FLT_MAX) {
-          xg.raw_data[i][j] = 0.0;
+        } else if (xg.raw.data[i][j] == FLT_MAX) {
+          xg.raw.data[i][j] = 0.0;
 
           /* Allocate the missing values array */
-          if (xg.nmissing == 0) {
-            missing_alloc (xg.nrows, xg.ncols);
-          }
-          xg.missing[i][j] = 1;
+          if (xg.nmissing == 0)
+            arrays_alloc (&xg.missing, xg.nrows, xg.ncols);
+          xg.missing.data[i][j] = 1;
           xg.vardata[j].nmissing++;
           xg.nmissing++;
         }
@@ -114,19 +112,18 @@ read_binary (FILE *fp)
     for (i=0, q=xg.file_start_row; i<xg.nrows; i++, q++) {
       xg.file_rows_sampled[i] = q;
       for (j=0; j<xg.ncols; j++) {
-        out = fread ((gchar *) &xg.raw_data[i][j], onesize, 1, fp);
+        out = fread ((gchar *) &xg.raw.data[i][j], onesize, 1, fp);
         if (out != 1) {
           g_printerr ("problem in reading the binary data file\n");
           fclose (fp);
           exit (0);
 
-        } else if (xg.raw_data[i][j] == FLT_MAX) {
-          xg.raw_data[i][j] = 0.0;
+        } else if (xg.raw.data[i][j] == FLT_MAX) {
+          xg.raw.data[i][j] = 0.0;
           /* Allocate the missing values array */
-          if (xg.nmissing == 0) {
-            missing_alloc (xg.nrows, xg.ncols);
-          }
-          xg.missing[i][j] = 1;
+          if (xg.nmissing == 0)
+            arrays_alloc (&xg.missing, xg.nrows, xg.ncols);
+          xg.missing.data[i][j] = 1;
           xg.vardata[j].nmissing++;
           xg.nmissing++;
         }
@@ -156,17 +153,17 @@ read_binary (FILE *fp)
             xg.file_rows_sampled[m] = t;
 
             for (j=0; j<xg.ncols; j++) {
-              out = fread ((gchar *) &xg.raw_data[i][j], onesize, 1, fp);
+              out = fread ((gchar *) &xg.raw.data[i][j], onesize, 1, fp);
               if (out != 1) {
                 g_printerr ("problem in reading the binary data file\n");
                 fclose (fp);
                 exit (0);
-              } else if (xg.raw_data[i][j] == FLT_MAX) {
-                xg.raw_data[i][j] = 0.0;
+              } else if (xg.raw.data[i][j] == FLT_MAX) {
+                xg.raw.data[i][j] = 0.0;
 
                 /*-- allocate the gshort missing values array --*/
-                missing_alloc (xg.nrows, xg.ncols);
-                xg.missing[i][j] = 1;
+                arrays_alloc_zero (&xg.missing, xg.nrows, xg.ncols);
+                xg.missing.data[i][j] = 1;
                 xg.vardata[j].nmissing++;
                 xg.nmissing++;
               }
@@ -186,23 +183,6 @@ read_binary (FILE *fp)
 /*          Reading ascii files                                     */
 /*------------------------------------------------------------------*/
 
-void
-rawdata_block_alloc (gint nblocks) {
-/*
- * Allocate space for nblocks*BLOCKSIZE rows
-*/
-  gint i;
-  gulong nr = nblocks * BLOCKSIZE;
-
-  if (nblocks == 1)
-    xg.raw_data = (gfloat **) g_malloc (nr * sizeof (gfloat *));
-  else
-    xg.raw_data = (gfloat **) g_realloc ((gpointer) xg.raw_data,
-      nr * sizeof (gfloat *));
-
-  for (i=BLOCKSIZE*(nblocks-1); i<BLOCKSIZE*nblocks; i++)
-    xg.raw_data[i] = (gfloat *) g_malloc (xg.ncols * sizeof (gfloat));
-}     
 
 gboolean
 find_data_start (FILE *fp)
@@ -269,7 +249,8 @@ init_file_rows_sampled () {
 
     case read_block:
       xg.nrows = xg.file_sample_size;
-      xg.file_rows_sampled = (gulong *) g_malloc (xg.nrows * sizeof (gulong));
+      xg.file_rows_sampled = (gulong *) g_realloc (xg.file_rows_sampled,
+                                                   xg.nrows * sizeof (gulong));
       for (i=0, k=xg.file_start_row; i<xg.nrows; i++, k++)
         xg.file_rows_sampled[i] = k;
       break;
@@ -277,8 +258,8 @@ init_file_rows_sampled () {
     case draw_sample:
 
       xg.nrows = xg.file_sample_size;
-      xg.file_rows_sampled = (glong *)
-        g_malloc ((gulong) xg.nrows * sizeof (gulong));
+      xg.file_rows_sampled = (gulong *) g_realloc (xg.file_rows_sampled,
+                                                   xg.nrows * sizeof (gulong));
 
       n = xg.nrows;
       if (n > 0 && n < xg.file_length) { 
@@ -392,7 +373,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing) {
 void
 read_ascii (FILE *fp)
 {
-  gint i, j, jrows, nrows, jcols, fs;
+  gint j, jrows, nrows, jcols, fs;
   gint nitems;
   gint nblocks;
   gchar word[64];
@@ -415,30 +396,24 @@ read_ascii (FILE *fp)
   if (xg.file_read_type == read_all) {
 
     xg.nrows = 0;
-    rawdata_block_alloc (1);
+    arrayf_alloc (&xg.raw, BLOCKSIZE, xg.ncols);
     if (xg.nmissing > 0)
-      missing_block_alloc (1, BLOCKSIZE);
+      arrays_alloc_zero (&xg.missing, BLOCKSIZE, xg.ncols);
 
   } else {  /* -only has been used */
 
     xg.nrows = xg.file_sample_size;
-    xg.raw_data = (gfloat **) g_malloc (xg.nrows * sizeof (gfloat *));
-    for (i=0; i<xg.nrows; i++)
-      xg.raw_data[i] = (gfloat *) g_malloc (xg.ncols * sizeof (gfloat));
-
-    if (xg.nmissing > 0) {
-      xg.missing = (gshort **) g_malloc (xg.nrows * sizeof (gshort *));
-      for (i=0; i<xg.nrows; i++)
-        xg.missing[i] = (gshort *) g_malloc (xg.ncols * sizeof (gshort));
-    }
+    arrayf_alloc (&xg.raw, xg.nrows, xg.ncols);
+    if (xg.nmissing > 0)
+      arrays_alloc_zero (&xg.missing, xg.nrows, xg.ncols);
   }
 
   /*-- copy the values in row1 to the main array --*/
   for (j=0; j<xg.ncols; j++)
-    xg.raw_data[0][j] = row1[j];
+    xg.raw.data[0][j] = row1[j];
   if (xg.nmissing > 0) {
     for (j=0; j<xg.ncols; j++)
-      xg.missing[0][j] = row1_missing[j];
+      xg.missing.data[0][j] = row1_missing[j];
   }
 
 
@@ -481,19 +456,19 @@ read_ascii (FILE *fp)
            * Initialize all previous values to 0.
           */
           if (xg.file_read_type == read_all) {
-            missing_block_alloc (nblocks, BLOCKSIZE);
+            arrays_alloc (&xg.missing, nblocks*BLOCKSIZE, xg.ncols);
           } else {
-            missing_alloc (xg.nrows, xg.ncols);
+            arrays_alloc (&xg.missing, xg.nrows, xg.ncols);
           }
         }
 
         xg.nmissing++;
         xg.vardata[jcols].nmissing++;
-        xg.missing[nrows][jcols] = 1;
-        xg.raw_data[nrows][jcols] = 0.0;
+        xg.missing.data[nrows][jcols] = 1;
+        xg.raw.data[nrows][jcols] = 0.0;
       }
       else {  /*-- not missing --*/
-        xg.raw_data[nrows][jcols] = (gfloat) atof (word);
+        xg.raw.data[nrows][jcols] = (gfloat) atof (word);
       }
 
       jcols++;
@@ -511,9 +486,9 @@ read_ascii (FILE *fp)
           if (nblocks%20 == 0)
             g_printerr ("reallocating; n > %d\n", nblocks*BLOCKSIZE);
 
-          rawdata_block_alloc (nblocks);
+          arrayf_add_rows (&xg.raw, nblocks*BLOCKSIZE);
           if (xg.nmissing > 0)
-            missing_block_alloc (nblocks, BLOCKSIZE);
+            arrays_add_rows (&xg.missing, nblocks*BLOCKSIZE);
         }
 
       } else {  /* -only was used */
@@ -544,19 +519,11 @@ read_ascii (FILE *fp)
   else {  /*-- nitems ok --*/
     if (xg.file_read_type == read_all) {
       /*
-       * One last free and realloc to make raw_data take up exactly
-       * the amount of space it needs.
+       * One last free and realloc to make these arrays take up exactly
+       * the amount of space they need.
       */
-      for (i=xg.nrows; i<BLOCKSIZE*nblocks; i++) {
-        g_free ((gpointer) xg.raw_data[i]);
-        if (xg.nmissing) g_free ((gpointer) xg.missing[i]);
-      }
-
-      xg.raw_data = (gfloat **) g_realloc ((gpointer) xg.raw_data,
-        xg.nrows * sizeof (gfloat *));
-      if (xg.nmissing)
-        xg.missing = (gshort **) g_realloc ((gpointer) xg.missing,
-          xg.nrows * sizeof (gshort *));
+      arrayf_free (&xg.raw, xg.nrows, xg.ncols);
+      arrays_free (&xg.missing, xg.nrows, xg.ncols);
     }
   }
 }

@@ -10,6 +10,20 @@ Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
   couple that with a thumbnail that sits just below the scaling controls
 
+Imputation of missing values
+
+Erase/hiding/exclusion
+
+Smoothing
+
+API code
+
+Line brushing
+Line editing
+Move points
+
+I/O
+
 
 ! it now works to start ggobi without an argument; a necessary step
 ! in the API preparation.

@@ -154,16 +154,19 @@ splot_draw_to_pixmap0_unbinned (splotd *sp)
         else if (!display->missings_show_p && xg.nmissing > 0) {
           switch (display->displaytype) {
             case parcoords:
-              if (xg.missing[m][sp->p1dvar])
+              if (xg.missing.data[m][sp->p1dvar])
                 draw_case = false;
               break;
             case scatmat:
               if (sp->p1dvar != -1) {
-                if (xg.missing[m][sp->p1dvar])
+                if (xg.missing.data[m][sp->p1dvar])
                   draw_case = false;
               } else {
-                if (xg.missing[m][sp->xyvars.x] || xg.missing[m][sp->xyvars.y])
+                if (xg.missing.data[m][sp->xyvars.x] ||
+                    xg.missing.data[m][sp->xyvars.y])
+                {
                   draw_case = false;
+                }
               }
               break;
             case scatterplot:

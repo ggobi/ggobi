@@ -73,7 +73,7 @@ rejitter () {
  * this depends first on the selected variables and
  * second on vgroups (if jitter_vgroup is True)
 */
-  selected_cols = (gint *) g_malloc (xg.ncols * sizeof (gint));
+  selected_cols = (gint *) g_realloc (selected_cols, xg.ncols * sizeof (gint));
   nselected_cols = selected_cols_get (selected_cols, xg.jitter_vgroup);
   if (nselected_cols == 0)
     nselected_cols = plotted_cols_get (selected_cols, false);
@@ -88,17 +88,17 @@ rejitter () {
         frand = jitter_randval (xg.jitter_type) * precis;
 
         /*
-         * The world_data used here is already jittered:
+         * The world.data used here is already jittered:
          * subtract out the previous jittered value ...
         */
         if (xg.jitter_convex) {
-          fworld = (gfloat) (xg.world_data[m][k] - xg.jitter_data[m][k]);
+          fworld = (gfloat) (xg.world.data[m][k] - xg.jitter.data[m][k]);
           fjit = xg.vardata[k].jitter_factor * (frand - fworld);
         }
         else
           fjit = xg.vardata[k].jitter_factor * frand;
 
-        xg.jitter_data[m][k] = (glong) fjit;
+        xg.jitter.data[m][k] = (glong) fjit;
       }
     }
   }

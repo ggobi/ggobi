@@ -463,7 +463,7 @@ address_check ()
 {
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %d nseg %d rowlab %s jitfac %f\n",
-    xg.data_mode, (gint) xg.world_data[0][0], xg.nsegments,
+    xg.data_mode, (gint) xg.world.data[0][0], xg.nsegments,
     xg.rowlab[0], xg.jitter_factor);
 
   return 1;

@@ -1,0 +1,62 @@
+gchar *getFileName ()
+
+/*
+ * data, but also row and column labels, lines, colors, blahblah
+ * how to do that from R?  Easier once we have xml i/o.
+*/
+void setData ()
+
+gchar *getVariableNames ()
+void setVariableName (gint jvar, gchar *name)
+
+gchar *getViewTypes ()
+gint getView ()
+void setView (gchar *)
+
+gchar *getCurrentDisplayType ()
+setCurrentDisplay (gchar *)
+
+/*-- brushing --*/
+! gfloat **getColorTable ()
+
+! void moveBrush (gint ulx, gint uly)
+! void sizeBrush (gint width, gint height)
+
+/* point colors */
+void setCaseColor (gint pt, gint colorindx)
+void setCaseColors (gint *pts, gint colorindx)
+gint getCaseColor (gint pt)
+gint *getCaseColors (gint *pts)
+
+/* point glyphs */
+void setCaseGlyph (gint pt, gint type, gint size)
+void setCaseGlyphs (gint *pts, gint type, gint size)
+gint getCaseGlyphType (gint pt)
+gint *getCaseGlyphTypes (gint *pts)
+gint getCaseGlyphSize (gint pt)
+gint *getCaseGlyphSizes (gint *pts)
+
+/* data */
+gfloat **getRawData
+gfloat **getTFormData
+
+/* identification */
+gchar **getCaseNames ()
+void setCaseName (gint pt, gchar *lbl)
+
+/* displays */
+void newScatterplot (gint ix, gint iy, gchar *viewType)
+void newScatmat (gint *rows, gint *columns)
+void newParCoords (gint *vars)
+void destroyCurrentDisplay ()
+
+gint *getPlottedVariables ()
+
+/* tour2d */
+??
+
+/* variable groups */
+
+gint *getVarGroups ()
+void setVarGroups (gint *group_id)
+

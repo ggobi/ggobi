@@ -350,10 +350,6 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp)
 */
 {
   displayd *display = (displayd *) sp->displayptr;
-/*
-  glong **world_data;
-  world_data = (display->missing_p) ? xg.missing_world_data : xg.world_data;
-*/
 
   switch (display->displaytype) {
 
@@ -361,12 +357,13 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp)
       switch (cpanel->projection) {
         case P1PLOT:
           p1d_reproject (sp,
-            (display->missing_p) ? xg.missing_world_data : xg.world_data);
+            (display->missing_p) ? xg.missing_world.data : xg.world.data);
           break;
 
         case XYPLOT:
+
           xy_reproject (sp,
-            (display->missing_p) ? xg.missing_world_data : xg.world_data);
+            (display->missing_p) ? xg.missing_world.data : xg.world.data);
           break;
       }
       break;
@@ -375,15 +372,15 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp)
 
       if (sp->p1dvar == -1)
         xy_reproject (sp,
-          (display->missing_p) ? xg.missing_world_data : xg.world_data);
+          (display->missing_p) ? xg.missing_world.data : xg.world.data);
       else
         p1d_reproject (sp,
-          (display->missing_p) ? xg.missing_world_data : xg.world_data);
+          (display->missing_p) ? xg.missing_world.data : xg.world.data);
       break;
 
     case parcoords:
       p1d_reproject (sp,
-        (display->missing_p) ? xg.missing_world_data : xg.world_data);
+        (display->missing_p) ? xg.missing_world.data : xg.world.data);
       break;
   }
 }
@@ -552,8 +549,8 @@ splot_plane_to_world (cpaneld *cpanel, splotd *sp, gint ipt, lcoords *eps)
 
   switch (cpanel->projection) {
     case XYPLOT:
-      xg.world_data[ipt][sp->xyvars.x] = sp->planar[ipt].x;
-      xg.world_data[ipt][sp->xyvars.y] = sp->planar[ipt].y;
+      xg.world.data[ipt][sp->xyvars.x] = sp->planar[ipt].x;
+      xg.world.data[ipt][sp->xyvars.y] = sp->planar[ipt].y;
       break;
 
     default:
@@ -564,7 +561,7 @@ splot_plane_to_world (cpaneld *cpanel, splotd *sp, gint ipt, lcoords *eps)
 
 void
 splot_reverse_pipeline (cpaneld *cpanel, splotd *sp, gint ipt,
-                     gboolean horiz, gboolean vert)
+                        gboolean horiz, gboolean vert)
 {
   lcoords eps;
 

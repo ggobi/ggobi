@@ -4,7 +4,7 @@ CC = gcc
 CFLAGS= -g -ansi -Wall -fpic
 SHARED_LD_FLAGS= -shared
 
-SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c \
+SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c \
  read_array.c read_data.c \
  pipeline.c missing.c \
  scatterplot.c scatterplot_ui.c \
@@ -30,7 +30,7 @@ SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c \
  display_tree.c
 
 
-OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o utils.o \
+OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o utils.o array.o \
  read_array.o read_data.o \
  display.o \
  pipeline.o missing.o \

@@ -28,20 +28,16 @@ typedef struct {
  glong *file_rows_sampled; /* of length file_sample_size */
 
 
- gfloat **raw_data;
- gfloat **tform1;
- gfloat **tform2;
- glong **world_data;
- glong **jitter_data;
+ array_f raw, tform1, tform2;
+ array_l world, jitter;
 
  fcoords scale0;
  fcoords tour_scale0;
 
 /* Missing values */
  gint nmissing;
- gshort **missing;
- glong **missing_jitter_data;
- glong **missing_world_data;
+ array_s missing;  /*-- array of shorts --*/
+ array_l missing_jitter, missing_world;
  gfloat missing_jitter_factor;
  lims missing_lim;  /*-- usually 0,1, but potentially wider --*/
 /* */

@@ -19,89 +19,33 @@
 /*--------------------------------------------------------------------*/
 
 void
-missing_block_alloc (gint nblocks, gint bsize)
-{  
-  /*-- Allocate missing for nblocks*BLOCKSIZE rows; called from read_array --*/
-  gint i;
-  gulong nr = nblocks * bsize;
-
-  if (nblocks == 1)
-    xg.missing = (gshort **) g_malloc (nr * sizeof (gshort *));
-  else
-    xg.missing = (gshort **) g_realloc ((gpointer) xg.missing,
-      nr * sizeof (gshort *));
-
-  for (i=bsize*(nblocks-1); i<bsize*nblocks; i++)
-    xg.missing[i] = (gshort *) g_malloc0 (xg.ncols * sizeof (gshort));
-}
-
-void
-missing_alloc (gint nr, gint nc)
+missing_world_free ()
 {
-  /*-- Allocate the missing values array; called from read_array --*/
-  gint i;
-
-  xg.missing = (gshort **) g_malloc (nr * sizeof (gshort *));
-  for (i=0; i<nr; i++) {
-    xg.missing[i] = (gshort *) g_malloc0 (nc * sizeof (gshort));
-  }
+  arrayl_free (&xg.missing_world, 0, 0);
+  arrayl_free (&xg.missing_jitter, 0, 0);
 }
 
 void
 missing_world_alloc ()
 {
-  gint i;
+  if (xg.missing_world.data != NULL) missing_world_free ();
 
-  xg.missing_world_data = (glong **) g_malloc (xg.nrows * sizeof (glong *));
-  xg.missing_jitter_data = (glong **) g_malloc (xg.nrows * sizeof (glong *));
-
-  for (i=0; i<xg.nrows; i++) {
-    xg.missing_world_data[i] = (glong *) g_malloc0 (xg.ncols * sizeof (glong));
-    xg.missing_jitter_data[i] = (glong *) g_malloc0 (xg.ncols * sizeof (glong));
-  }
+  arrayl_alloc (&xg.missing_world, xg.nrows, xg.ncols);
+  arrayl_alloc (&xg.missing_jitter, xg.nrows, xg.ncols);
 }
 
 void
 missing_arrays_add_column (gint jvar)
 {
-  gint nc = xg.ncols + 1, nr = xg.nrows;
-  gint i;
+  gint nc = xg.ncols + 1;
 
   if (xg.nmissing > 0) {
-    for (i=0; i<nr; i++) {
-      xg.missing[i] = (gshort *)
-        g_realloc ((gpointer) xg.missing[i], nc * sizeof (gshort));
-      xg.missing[i][nc-1] = xg.missing[i][jvar];
-
-      xg.missing_jitter_data[i] = (glong *)
-        g_realloc ((gpointer) xg.missing_jitter_data[i], nc * sizeof (glong));
-      xg.missing_jitter_data[i][nc-1] = xg.missing_jitter_data[i][jvar];
-
-      xg.missing_world_data[i] = (glong *)
-        g_realloc ((gpointer) xg.missing_world_data[i], nc * sizeof (glong));
-      xg.missing_world_data[i][nc-1] = xg.missing_world_data[i][jvar];
-    }
+    arrays_add_cols (&xg.missing, nc);
+    arrayl_add_cols (&xg.missing_jitter, nc);
+    arrayl_add_cols (&xg.missing_world, nc);
   }
 }
 
-void
-missing_free () 
-{
-  gint i;
-
-  if (xg.nmissing) {
-    for (i=0; i<xg.nrows; i++)
-      g_free ((gpointer) xg.missing[i]);
-    g_free ((gpointer) xg.missing);
-
-    for (i=0; i<xg.nrows; i++) {
-      g_free ((gpointer) xg.missing_world_data[i]);
-      g_free ((gpointer) xg.missing_jitter_data[i]);
-    }
-    g_free ((gpointer) xg.missing_world_data);
-    g_free ((gpointer) xg.missing_jitter_data);
-  }
-}
 
 /*------------------------------------------------------------------*/
 /*      Scaling and jittering missing value plots                   */
@@ -113,11 +57,11 @@ missing_lim_set ()
   gint i, j;
   gshort min, max;
 
-  min = max = xg.missing[0][0];
+  min = max = xg.missing.data[0][0];
   for (i=0; i<xg.nrows; i++) {
     for (j=0; j<xg.ncols; j++) {
-      if (xg.missing[i][j] < min) min = xg.missing[i][j];
-      if (xg.missing[i][j] > max) max = xg.missing[i][j];
+      if (xg.missing.data[i][j] < min) min = xg.missing.data[i][j];
+      if (xg.missing.data[i][j] > max) max = xg.missing.data[i][j];
     }
   }
   xg.missing_lim.min = (gfloat) min;
@@ -143,12 +87,12 @@ missing_jitter_variable (gint jcol)
 
       if (xg.jitter_convex) {
         fworld = (gfloat)
-          (xg.missing_world_data[m][jcol] - xg.missing_jitter_data[m][jcol]);
+          (xg.missing_world.data[m][jcol] - xg.missing_jitter.data[m][jcol]);
         fjit = xg.missing_jitter_factor * (frand - fworld);
       } else
         fjit = xg.missing_jitter_factor * frand;
 
-      xg.missing_jitter_data[m][jcol] = (glong) fjit;
+      xg.missing_jitter.data[m][jcol] = (glong) fjit;
     }
   }
 }
@@ -186,11 +130,11 @@ missing_to_world ()
   for (j=0; j<xg.ncols; j++) {
     for (i=0; i<xg.nrows_in_plot; i++) {
       m = xg.rows_in_plot[i];
-      ftmp = -1.0 + 2.0*(xg.missing[m][j] - min) / range;
-      xg.missing_world_data[m][j] = (glong) (precis * ftmp);
+      ftmp = -1.0 + 2.0*(xg.missing.data[m][j] - min) / range;
+      xg.missing_world.data[m][j] = (glong) (precis * ftmp);
 
       /* Add in the jitter values */
-      xg.missing_world_data[m][j] += xg.missing_jitter_data[m][j];
+      xg.missing_world.data[m][j] += xg.missing_jitter.data[m][j];
     }
   }
 }

@@ -8,6 +8,9 @@
 
 void vardata_alloc ()
 {
+  if (xg.vardata != NULL)
+    g_free ((gpointer) xg.vardata);
+
   xg.vardata = (vardatad *) g_malloc (xg.ncols * sizeof (vardatad));
 }
 
@@ -131,31 +134,31 @@ vardata_stats_set () {
   */
 
   for (j=0; j<xg.ncols; j++) {
-    xg.vardata[j].lim_raw.min = xg.raw_data[0][j];
-    xg.vardata[j].lim_raw.max = xg.raw_data[0][j];
-    xg.vardata[j].lim_tform.min = xg.tform2[0][j];
-    xg.vardata[j].lim_tform.max = xg.tform2[0][j];
+    xg.vardata[j].lim_raw.min = xg.raw.data[0][j];
+    xg.vardata[j].lim_raw.max = xg.raw.data[0][j];
+    xg.vardata[j].lim_tform.min = xg.tform2.data[0][j];
+    xg.vardata[j].lim_tform.max = xg.tform2.data[0][j];
   }
 
   for (j=0; j<xg.ncols; j++) {
     np = 0;
     for (i=0; i<xg.nrows; i++) {
-      if (xg.nmissing > 0 && xg.missing[i][j])
+      if (xg.nmissing > 0 && MISSING_P(i,j))
         ;
       else {
 
-        if (xg.raw_data[i][j] < xg.vardata[j].lim_raw.min)
-          xg.vardata[j].lim_raw.min = xg.raw_data[i][j];
-        else if (xg.raw_data[i][j] > xg.vardata[j].lim_raw.max)
-          xg.vardata[j].lim_raw.max = xg.raw_data[i][j];
+        if (xg.raw.data[i][j] < xg.vardata[j].lim_raw.min)
+          xg.vardata[j].lim_raw.min = xg.raw.data[i][j];
+        else if (xg.raw.data[i][j] > xg.vardata[j].lim_raw.max)
+          xg.vardata[j].lim_raw.max = xg.raw.data[i][j];
 
-        if (xg.tform2[i][j] < xg.vardata[j].lim_tform.min)
-          xg.vardata[j].lim_tform.min = xg.tform2[i][j];
-        else if (xg.tform2[i][j] > xg.vardata[j].lim_tform.max)
-          xg.vardata[j].lim_tform.max = xg.tform2[i][j];
+        if (xg.tform2.data[i][j] < xg.vardata[j].lim_tform.min)
+          xg.vardata[j].lim_tform.min = xg.tform2.data[i][j];
+        else if (xg.tform2.data[i][j] > xg.vardata[j].lim_tform.max)
+          xg.vardata[j].lim_tform.max = xg.tform2.data[i][j];
 
-        sumv[j] += xg.raw_data[i][j];
-        x[np] = xg.raw_data[i][j];
+        sumv[j] += xg.raw.data[i][j];
+        x[np] = xg.raw.data[i][j];
         np++;
       }
     }

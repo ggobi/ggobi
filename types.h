@@ -19,6 +19,23 @@ typedef struct {
     gint x1, y1, x2, y2;
 } brush_coords;
 
+/* for xg.raw_data, tform1, tform2 */
+typedef struct {
+  gfloat **data;
+  gint nrows, ncols;
+} array_f;
+/* for xg.missing */
+typedef struct {
+  gshort **data;
+  gint nrows, ncols;
+} array_s;
+/* for xg.missing */
+typedef struct {
+  glong **data;
+  gint nrows, ncols;
+} array_l;
+
+
 typedef struct {  /*-- used for obtaining ranks --*/
   gfloat f;
   gint indx;

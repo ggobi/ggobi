@@ -16,10 +16,21 @@
 /*                          row labels                                    */
 /*------------------------------------------------------------------------*/
 
+void rowlabels_free () {
+  gint i;
+
+  for (i=0; i<xg.nrows; i++)
+    g_free (xg.rowlab[i]);
+  g_free (xg.rowlab);
+}
+
+
 void
 rowlabels_alloc () {
   gint i;
 
+  if (xg.rowlab != NULL) rowlabels_free ();
+  
   xg.rowlab = (gchar **) g_malloc (xg.nrows * sizeof (gchar *));
   for (i=0; i<xg.nrows; i++)
     xg.rowlab[i] = (gchar *) g_malloc (ROWLABLEN * sizeof (gchar));
@@ -252,6 +263,8 @@ rgroups_read (gchar *data_in, gboolean init)
   FILE *fp;
   glong *nels;
   gint nr;
+
+  if (xg.nrgroups > 0) rgroups_free ();
 
   if (data_in != NULL && data_in != "" && strcmp (data_in, "stdin") != 0)
     if ((fp = open_xgobi_file_r (data_in, 1, suffixes, true)) != NULL)
@@ -652,8 +665,7 @@ segments_read (gchar *rootname, gboolean startup)
     /*
      * Allocate space for <bsize> connecting lines.
     */
-    xg.segment_endpoints = (endpointsd *)
-      g_malloc (bsize * sizeof (endpointsd));
+    segments_alloc (bsize);
     nblocks = 1;
     while (1)
     {
@@ -690,9 +702,7 @@ segments_read (gchar *rootname, gboolean startup)
            * Allocate space for <bsize> more connecting links.
           */
           nblocks++;
-          xg.segment_endpoints = (endpointsd *)
-            g_realloc ((gpointer) xg.segment_endpoints,
-            (nblocks*bsize) * sizeof (endpointsd));
+          segments_alloc (nblocks*bsize);
           jlinks = 0;
         }
       }
@@ -839,7 +849,7 @@ missing_values_read (gchar *data_in, gboolean init)
 
   if (found) {
     if (init || xg.nmissing == 0)
-      missing_alloc (xg.nrows, xg.ncols);
+      arrays_alloc (&xg.missing, xg.nrows, xg.ncols);
 
     for (j=0; j<xg.ncols; j++)
       xg.vardata[j].nmissing = 0;
@@ -862,7 +872,7 @@ missing_values_read (gchar *data_in, gboolean init)
         exit (1);
       }
 
-      xg.missing[row][col] = itmp;
+      xg.missing.data[row][col] = itmp;
       if (itmp != 0) {
         nmissing++;
         xg.vardata[col].nmissing++;
@@ -876,7 +886,7 @@ missing_values_read (gchar *data_in, gboolean init)
     }
     xg.nmissing = nmissing;
 
-    fclose(fp);
+    fclose (fp);
   }
 }
 

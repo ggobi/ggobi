@@ -14,6 +14,17 @@ void globals_init () {
   xg.glyph_id.type = xg.glyph_0.type = FILLED_CIRCLE;
   xg.glyph_id.size = xg.glyph_0.size = 3;
   xg.color_id = xg.color_0 = 0;
+
+  arrayf_init (&xg.raw);
+  arrayf_init (&xg.tform1);
+  arrayf_init (&xg.tform2);
+
+  arrayl_init (&xg.world);
+  arrayl_init (&xg.jitter);
+
+  arrays_init (&xg.missing);
+  arrayl_init (&xg.missing_world);
+  arrayl_init (&xg.missing_jitter);
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/
@@ -84,7 +95,9 @@ pipeline_init ()
   varpanel_populate ();
 
   /*-- run the first half of the pipeline --*/
-  raw_to_tform_copy ();
+  arrayf_copy (&xg.raw, &xg.tform1);
+  arrayf_copy (&xg.tform1, &xg.tform2);
+
   vardata_stats_set ();
 
   vardata_lim_raw_gp_set ();
@@ -114,6 +127,8 @@ g_printerr ("(make_ggobi) data_in = %s\n", data_in);
   if (data_in != NULL) {
     if (fileset_read (data_in)) {
       pipeline_init ();
+
+      display_free_all ();  /*-- destroy any existing displays --*/
 
       /*-- initialize the first display --*/
       display = scatterplot_new (false);

@@ -14,29 +14,37 @@ static void min_max (gfloat **, gint *, gint, gfloat *, gfloat *);
 /* ------------ Dynamic allocation, freeing section --------- */
 
 void
+pipeline_arrays_free ()
+/*
+ * Dynamically free arrays used in data pipeline.
+*/
+{
+  arrayf_free (&xg.tform1, 0, 0);
+  arrayf_free (&xg.tform2, 0, 0);
+
+  arrayl_free (&xg.world, 0, 0);
+  arrayl_free (&xg.jitter, 0, 0);
+
+  g_free ((gpointer) xg.rows_in_plot);
+}
+
+void
 pipeline_arrays_alloc ()
 /*
  * Dynamically allocate arrays.
 */
 {
   gint nc = xg.ncols, nr = xg.nrows;
-  register gint i;
 
-  xg.tform1 = (gfloat **) g_malloc (nr * sizeof (gfloat *));
-  xg.tform2 = (gfloat **) g_malloc (nr * sizeof (gfloat *));
-  for (i=0; i<nr; i++) {
-    xg.tform1[i] = (gfloat *) g_malloc0 (nc * sizeof (gfloat));
-    xg.tform2[i] = (gfloat *) g_malloc0 (nc * sizeof (gfloat));
-  }
+  if (xg.tform1.data != NULL) pipeline_arrays_free ();
 
-  xg.world_data = (glong **) g_malloc (nr * sizeof (glong *));
-  xg.jitter_data = (glong **) g_malloc (nr * sizeof (glong *));
-  for (i=0; i<nr; i++) {
-    xg.world_data[i] = (glong *) g_malloc (nc * sizeof (glong));
-    xg.jitter_data[i] = (glong *) g_malloc0 (nc * sizeof (glong));
-  }
+  arrayf_alloc (&xg.tform1, nr, nc);
+  arrayf_alloc (&xg.tform2, nr, nc);
 
-  xg.rows_in_plot = (gint *) g_malloc (xg.nrows * sizeof (gint));
+  arrayl_alloc (&xg.world, nr, nc);
+  arrayl_alloc_zero (&xg.jitter, nr, nc);
+
+  xg.rows_in_plot = (gint *) g_malloc (nr * sizeof (gint));
 }
 
 void
@@ -49,55 +57,24 @@ pipeline_arrays_add_column (gint jvar)
   gint nc = xg.ncols + 1, nr = xg.nrows;
   register gint i;
 
+  arrayf_add_cols (&xg.raw, nc);
+  arrayf_add_cols (&xg.tform1, nc);
+  arrayf_add_cols (&xg.tform2, nc);
+
+  arrayl_add_cols (&xg.world, nc);
+  arrayl_add_cols (&xg.jitter, nc);
+
   for (i=0; i<nr; i++) {
-    xg.raw_data[i] = (gfloat *) g_realloc ((gpointer) xg.raw_data[i],
-      nc * sizeof (gfloat));
-    xg.raw_data[i][nc-1] = xg.raw_data[i][jvar];
+    xg.raw.data[i][nc-1] = xg.raw.data[i][jvar];
 
-    xg.tform1[i] = (gfloat *) g_realloc ((gpointer) xg.tform1[i],
-      nc * sizeof (gfloat));
-    xg.tform1[i][nc-1] = xg.tform1[i][jvar];
+    xg.tform1.data[i][nc-1] = xg.tform1.data[i][jvar];
+    xg.tform2.data[i][nc-1] = xg.tform2.data[i][jvar];
 
-    xg.tform2[i] = (gfloat *) g_realloc ((gpointer) xg.tform2[i],
-      nc * sizeof (gfloat));
-    xg.tform2[i][nc-1] = xg.tform2[i][jvar];
-
-    xg.world_data[i] = (glong *) g_realloc ((gpointer) xg.world_data[i],
-      nc * sizeof (glong));
-    xg.world_data[i][nc-1] = xg.world_data[i][jvar];
-
-    xg.jitter_data[i] = (glong *) g_realloc ((gpointer) xg.jitter_data[i],
-      nc * sizeof (glong));
-    xg.jitter_data[i][nc-1] = xg.jitter_data[i][jvar];
+    xg.world.data[i][nc-1] = xg.world.data[i][jvar];
+    xg.jitter.data[i][nc-1] = xg.jitter.data[i][jvar];
   }
-
 }
 
-void
-pipeline_arrays_free ()
-/*
- * Dynamically free arrays used in data pipeline.
-*/
-{
-  gint i;
-
-  for (i=0; i<xg.nrows; i++)
-    g_free ((gpointer) xg.tform1[i]);
-  g_free ((gpointer) xg.tform1);
-  for (i=0; i<xg.nrows; i++)
-    g_free ((gpointer) xg.tform2[i]);
-  g_free ((gpointer) xg.tform2);
-
-  for (i=0; i<xg.nrows; i++)
-    g_free ((gpointer) xg.world_data[i]);
-  g_free ((gpointer) xg.world_data);
-
-  for (i=0; i<xg.nrows; i++)
-    g_free ((gpointer) xg.jitter_data[i]);
-  g_free ((gpointer) xg.jitter_data);
-
-  g_free ((gpointer) xg.rows_in_plot);
-}
 
 /*-------------------------------------------------------------------------*/
 /*               mucking about with the variable limits                    */
@@ -149,7 +126,7 @@ vardata_lim_raw_gp_set ()
         cols[ncols++] = j;
     }
 
-    min_max (xg.raw_data, cols, ncols, &min, &max);
+    min_max (xg.raw.data, cols, ncols, &min, &max);
     limits_adjust (&min, &max);
     for (j=0; j<ncols; j++) {
       xg.vardata[cols[j]].lim_raw_gp.min = min;
@@ -176,7 +153,7 @@ vardata_lim_tform_gp_set ()
         cols[ncols++] = j;
     }
 
-    min_max (xg.tform2, cols, ncols, &min, &max);
+    min_max (xg.tform2.data, cols, ncols, &min, &max);
     limits_adjust (&min, &max);
     for (n=0; n<ncols; n++) {
       xg.vardata[cols[n]].lim_tform_gp.min = min;
@@ -222,10 +199,10 @@ vardata_lim_update ()
         max = xg.vardata[cols[0]].lim_tform_gp.max;
         break;
       case 1:
-        mean_largest_dist (xg.tform2, cols, ncols, &min, &max);
+        mean_largest_dist (xg.tform2.data, cols, ncols, &min, &max);
         break;
       case 2:
-        median_largest_dist (xg.tform2, cols, ncols, &min, &max);
+        median_largest_dist (xg.tform2.data, cols, ncols, &min, &max);
         break;
     }
 
@@ -242,39 +219,6 @@ vardata_lim_update ()
 /*-------------------------------------------------------------------------*/
 /*                       pipeline                                          */
 /*-------------------------------------------------------------------------*/
-
-void
-raw_to_tform_copy ()
-{
-  gint i, j;
-
-  for (i=0; i<xg.nrows; i++)
-    for (j=0; j<xg.ncols; j++)
-      xg.tform1[i][j] = xg.tform2[i][j] = xg.raw_data[i][j];
-}
-
-void
-raw_to_tform1_copy ()
-{
-  gint i, j;
-
-  for (j=0; j<xg.ncols; j++) {
-    for (i=0; i<xg.nrows; i++)
-      xg.tform1[i][j] = xg.raw_data[i][j];
-  }
-}
-
-void
-tform1_to_tform2_copy ()
-{
-  gint i, j;
-
-  for (j=0; j<xg.ncols; j++) {
-    for (i=0; i<xg.nrows; i++) {
-      xg.tform2[i][j] = xg.tform1[i][j];
-    }
-  }
-}
 
 void
 min_max (gfloat **data, gint *cols, gint ncols, gfloat *min, gfloat *max)
@@ -432,12 +376,14 @@ tform_to_world ()
 
     for (i=0; i<xg.nrows_in_plot; i++) {
       m = xg.rows_in_plot[i];
-      ftmp = -1.0 + 2.0*(xg.tform2[m][j] - min) / range;
-      xg.world_data[m][j] = (glong) (precis * ftmp);
+      ftmp = -1.0 + 2.0*(xg.tform2.data[m][j] - min) / range;
+      xg.world.data[m][j] = (glong) (precis * ftmp);
 
       /* Add in the jitter values */
-      xg.world_data[m][j] += xg.jitter_data[m][j];
+      xg.world.data[m][j] += xg.jitter.data[m][j];
     }
   }
+
+
 }
 

@@ -8,7 +8,7 @@
 #include "externs.h"
 
 /*
- * note: world_data includes jitter_data
+ * note: world.data includes jitter.data
 */
 
 void
@@ -20,19 +20,19 @@ world_to_raw_by_var (gint pt, gint var)
   rdiff = xg.lim[var].max - xg.lim[var].min;
 
   /*
-   * The new world_data value is taken to include the
-   * value of jitter_data
+   * The new world.data value is taken to include the
+   * value of jitter.data
   */
-  ftmp = (gfloat)(xg.world_data[pt][var] - xg.jitter_data[pt][var]) / precis;
+  ftmp = (gfloat)(xg.world.data[pt][var] - xg.jitter.data[pt][var]) / precis;
 
-  xg.tform2[pt][var] = (ftmp + 1.0) * .5 * rdiff;
-  xg.tform2[pt][var] += xg.lim[var].min;
+  xg.tform2.data[pt][var] = (ftmp + 1.0) * .5 * rdiff;
+  xg.tform2.data[pt][var] += xg.lim[var].min;
 
   /*-- no transformations will be supported --*/
-  xg.tform1[pt][var] = xg.tform2[pt][var];
-  xg.tform1[pt][var] += xg.lim[var].min;
+  xg.tform1.data[pt][var] = xg.tform2.data[pt][var];
+  xg.tform1.data[pt][var] += xg.lim[var].min;
 
-  xg.raw_data[pt][var] = xg.tform2[pt][var];
+  xg.raw.data[pt][var] = xg.tform2.data[pt][var];
 }
 
 void

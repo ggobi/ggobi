@@ -192,15 +192,15 @@ sphere_varcovar_set (void)
     var = spherevars[k];
 
     for (i=0; i<n; i++)
-      tmpf += xg.tform1[xg.rows_in_plot[i]][var];
+      tmpf += xg.tform1.data[xg.rows_in_plot[i]][var];
     tform1_mean[var] = tmpf / ((gfloat)n);
 
     tmpf = 0.;
     for (i=0; i<xg.ncols; i++) {
       for (j=0; j<n; j++) {
         tmpf = tmpf +
-          (xg.tform1[xg.rows_in_plot[j]][var] - tform1_mean[var]) *
-          (xg.tform1[xg.rows_in_plot[j]][i] - tform1_mean[i]);
+          (xg.tform1.data[xg.rows_in_plot[j]][var] - tform1_mean[var]) *
+          (xg.tform1.data[xg.rows_in_plot[j]][i] - tform1_mean[i]);
       }
       tmpf /= ((gfloat)(n - 1));
       vc[var][i] = tmpf;
@@ -306,10 +306,10 @@ spherize_data (gint num_pcs, gint nsvars, gint *svars)
     for (j=0; j<num_pcs; j++) {
       tmpf = 0.;
       for (k=0; k<nsvars; k++) {
-        tmpf = tmpf +
-          eigenvec[k][j] * (xg.tform1[i][svars[k]] - tform1_mean[svars[k]]);
+        tmpf = tmpf + eigenvec[k][j] *
+          (xg.tform1.data[i][svars[k]] - tform1_mean[svars[k]]);
       }
-      xg.tform2[i][svars[j]] = tmpf / eigenval[j];
+      xg.tform2.data[i][svars[j]] = tmpf / eigenval[j];
     }
   }
 }

@@ -14,18 +14,10 @@
 */
 
 void
-segments_alloc ()
+segments_alloc (gint nsegs)
 {
   xg.segment_endpoints = (endpointsd *)
-    g_malloc (xg.nsegments * sizeof (endpointsd));
-}
-
-void
-segments_realloc ()
-{
-  xg.segment_endpoints = (endpointsd *)
-    g_realloc ((gpointer) xg.segment_endpoints,
-    xg.nsegments * sizeof (endpointsd));
+    g_realloc (xg.segment_endpoints, nsegs * sizeof (endpointsd));
 }
 
 void

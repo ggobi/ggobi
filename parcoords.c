@@ -374,8 +374,11 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     else if (!display->missings_show_p &&
           xg.nmissing > 0 &&
-          (xg.missing[i][sp->p1dvar] || xg.missing[i][sp_prev->p1dvar]))
+          (xg.missing.data[i][sp->p1dvar] ||
+           xg.missing.data[i][sp_prev->p1dvar]))
+    {
       draw_whisker = false;
+    }
     else
       draw_whisker = true;
 
@@ -398,10 +401,11 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
     if (sp_next == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    else if (!display->missings_show_p &&
-          xg.nmissing > 0 &&
-          (xg.missing[i][sp->p1dvar] || xg.missing[i][sp_next->p1dvar]))
+    else if (!display->missings_show_p && xg.nmissing > 0 &&
+            (MISSING_P(i,sp->p1dvar) || MISSING_P(i,sp_next->p1dvar)))
+    {
       draw_whisker = false;
+    }
     else
       draw_whisker = true;
 

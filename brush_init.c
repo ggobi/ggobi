@@ -17,19 +17,20 @@ extern brush_coords brush_pos ;  /* from brush.c */
 void
 br_glyph_ids_free ()
 {
-  if (xg.glyph_ids != NULL)  g_free (xg.glyph_ids);
-  if (xg.glyph_now != NULL)  g_free (xg.glyph_now);
-  if (xg.glyph_prev != NULL) g_free (xg.glyph_prev);
+  g_free (xg.glyph_ids);
+  g_free (xg.glyph_now);
+  g_free (xg.glyph_prev);
 }
 
 void
 br_glyph_ids_alloc ()
 {
-  br_glyph_ids_free ();
-
-  xg.glyph_ids = (glyphv *)  g_malloc (xg.nrows * sizeof (glyphv));
-  xg.glyph_now = (glyphv *)  g_malloc (xg.nrows * sizeof (glyphv));
-  xg.glyph_prev = (glyphv *) g_malloc (xg.nrows * sizeof (glyphv));
+  xg.glyph_ids = (glyphv *) g_realloc (xg.glyph_ids,
+                                       xg.nrows * sizeof (glyphv));
+  xg.glyph_now = (glyphv *) g_realloc (xg.glyph_now,
+                                       xg.nrows * sizeof (glyphv));
+  xg.glyph_prev = (glyphv *) g_realloc (xg.glyph_prev,
+                                       xg.nrows * sizeof (glyphv));
 }
 
 void
@@ -52,29 +53,34 @@ br_glyph_ids_init ()
 void
 br_color_ids_free ()
 {
-  if (xg.color_ids != NULL)  g_free (xg.color_ids);
-  if (xg.color_now != NULL)  g_free (xg.color_now);
-  if (xg.color_prev != NULL) g_free (xg.color_prev);
+  g_free (xg.color_ids);
+  g_free (xg.color_now);
+  g_free (xg.color_prev);
 }
 
 void
 br_color_ids_alloc ()
 {
-  br_color_ids_free ();
+  gint i;
 
-  xg.color_ids = (gushort *)  g_malloc0 (xg.nrows * sizeof (gushort));
-  xg.color_now = (gushort *)  g_malloc0 (xg.nrows * sizeof (gushort));
-  xg.color_prev = (gushort *) g_malloc0 (xg.nrows * sizeof (gushort));
+  xg.color_ids = (gushort *)  g_realloc (xg.color_ids,
+                                         xg.nrows * sizeof (gushort));
+  xg.color_now = (gushort *)  g_realloc (xg.color_now,
+                                         xg.nrows * sizeof (gushort));
+  xg.color_prev = (gushort *) g_realloc (xg.color_prev,
+                                         xg.nrows * sizeof (gushort));
+  for (i=0; i<xg.nrows; i++)
+    xg.color_ids[i] = xg.color_now[i] = xg.color_prev[i] = xg.color_0;
 }
 
 void
 br_color_ids_init ()
 {
-  gint j;
+  gint i;
 
   xg.color_id = xg.color_0;
-  for (j=0; j<xg.nrows; j++)
-    xg.color_ids[j] = xg.color_now[j] = xg.color_prev[j] = xg.color_0;
+  for (i=0; i<xg.nrows; i++)
+    xg.color_ids[i] = xg.color_now[i] = xg.color_prev[i] = xg.color_0;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -94,28 +100,20 @@ init_erase ()
 /*                           line color                                    */
 /*-------------------------------------------------------------------------*/
 
+
 void
 br_line_color_ids_alloc ()
 {
   gint ns = xg.nsegments; 
 
-  xg.line_color_ids = (gushort *) g_malloc (ns * sizeof (gushort));
-  xg.line_color_now = (gushort *) g_malloc (ns * sizeof (gushort));
-  xg.line_color_prev = (gushort *) g_malloc (ns * sizeof (gushort));
-  xg.xed_by_new_brush = (gushort *) g_malloc (ns * sizeof (gushort));
-}
-
-void
-br_line_color_ids_realloc ()
-{
   xg.line_color_ids = (gushort *) g_realloc ((gpointer) xg.line_color_ids,
-    xg.nsegments * sizeof (gushort));
+    ns * sizeof (gushort));
   xg.line_color_now = (gushort *) g_realloc ((gpointer) xg.line_color_now,
-    xg.nsegments * sizeof (gushort));
+    ns * sizeof (gushort));
   xg.line_color_prev = (gushort *) g_realloc ((gpointer) xg.line_color_prev,
-    xg.nsegments * sizeof (gushort));
+    ns * sizeof (gushort));
   xg.xed_by_new_brush = (gushort *) g_realloc ((gpointer) xg.xed_by_new_brush,
-    xg.nsegments * sizeof (gushort));
+    ns * sizeof (gushort));
 }
 
 void
@@ -160,31 +158,40 @@ brush_alloc ()
 */
 {
   guint nr = (guint) xg.nrows;
-  gint iv, ih;
+  gint i, iv, ih;
+  gboolean initd = false;
 
   xg.br_nbins = BRUSH_NBINS;
 
-  xg.excluded = (gboolean *) g_malloc0 (nr * sizeof (gboolean));
-  xg.under_new_brush = (gboolean *) g_malloc (nr * sizeof (gboolean));
+  xg.excluded = (gboolean *) g_realloc (xg.excluded,
+                                        nr * sizeof (gboolean));
+  xg.under_new_brush = (gboolean *) g_realloc (xg.under_new_brush,
+                                               nr * sizeof (gboolean));
+
+  for (i=0; i<nr; i++) 
+    xg.excluded[i] = xg.under_new_brush[i] = 0;
 
   /*
    * color_ids and glyph_ids and their kin were allocated when
    * the data was read in.
   */
 
-  /* binning the plot window */
-  xg.br_binarray = (bin_struct **)
-    g_malloc (xg.br_nbins * sizeof (bin_struct *));
-  for (ih=0; ih<xg.br_nbins; ih++) {
-    xg.br_binarray[ih] = (bin_struct *)
-      g_malloc (xg.br_nbins * sizeof (bin_struct));
+  if (!initd) {
+    /* binning the plot window; no need to realloc these */
+    xg.br_binarray = (bin_struct **)
+      g_malloc (xg.br_nbins * sizeof (bin_struct *));
+    for (ih=0; ih<xg.br_nbins; ih++) {
+      xg.br_binarray[ih] = (bin_struct *)
+        g_malloc (xg.br_nbins * sizeof (bin_struct));
 
-    for (iv=0; iv<xg.br_nbins; iv++) {
-      xg.br_binarray[ih][iv].nels = 0;
-      xg.br_binarray[ih][iv].nblocks = 1;
-      xg.br_binarray[ih][iv].els = (gulong *)
-        g_malloc (BINBLOCKSIZE * sizeof (gulong));
+      for (iv=0; iv<xg.br_nbins; iv++) {
+        xg.br_binarray[ih][iv].nels = 0;
+        xg.br_binarray[ih][iv].nblocks = 1;
+        xg.br_binarray[ih][iv].els = (gulong *)
+          g_malloc (BINBLOCKSIZE * sizeof (gulong));
+      }
     }
+    initd = true;
   }
 }
 
