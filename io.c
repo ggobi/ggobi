@@ -16,9 +16,10 @@
 #define WRITE_FILESET  2
 
 void
-filesel_ok (GtkWidget *w, datad *d, GtkFileSelection *fs)
+filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 {
   extern const gchar* const key_get (void);
+  datad *d = NULL; /* Need to set this somehow. */
   ggobid *gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), key_get());
   gchar *fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
   guint action = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (fs),
@@ -74,8 +75,9 @@ static void
 filename_get_configure (GtkWidget *fs, guint type, ggobid *gg) {
   extern const gchar* const key_get (void);
 
+  const gchar *key = key_get();
   gtk_object_set_data (GTK_OBJECT (fs), "action", GINT_TO_POINTER (type));
-  gtk_object_set_data (GTK_OBJECT (fs), key_get(), gg);
+  gtk_object_set_data (GTK_OBJECT (fs), key, gg);
 
   gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION (fs)->ok_button),
                       "clicked", GTK_SIGNAL_FUNC (filesel_ok), (gpointer) fs);

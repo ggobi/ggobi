@@ -33,7 +33,7 @@ main (gint argc, gchar *argv[])
   if(0) {
     tmpname = (gchar*) g_malloc(sizeof(gchar)*strlen(gg->fname)+5);
     sprintf (tmpname, "%s%s", gg->fname, ".tmp");
-    write_xml (tmpname, d, gg);
+    write_xml (tmpname, gg);
     g_free (tmpname);
   }
   else

@@ -21,6 +21,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
   gfloat ftmp;
+  gg = sp->displayptr->ggobi;
 
   /*
    * Somehow when a new splot is added to a table, the initial

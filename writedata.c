@@ -185,6 +185,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
     return false;
   }
 
+
 /* Step 1: verify that the rootname is writable */
 
   if ((fp = fopen (rootname, "w")) == NULL) {
@@ -196,6 +197,10 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
   } else {
     fclose (fp);
   }
+
+
+  if(d == NULL)
+    d = (datad *) g_slist_nth_data(gg->d, 0);
 
 /* Determine the rows to be saved */
   rowv = (gint *) g_malloc (d->nrows * sizeof (gint));
