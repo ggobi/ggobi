@@ -261,7 +261,8 @@ static GtkItemFactoryEntry menu_items[] = {
 void
 tour2dpp_window_open (ggobid *gg) {
   /*GtkWidget **btn, *label, *da, *entry;*/
-  GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar, *adj;
+  GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar;
+  GtkObject *adj;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
   gboolean vars_sphered = true;
