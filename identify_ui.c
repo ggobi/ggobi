@@ -31,8 +31,12 @@ id_remove_labels_cb (GtkWidget *w, ggobid *gg)
   datad *d = gg->current_display->d;
   g_slist_free (d->sticky_ids);
   d->sticky_ids = (GSList *) NULL;
+
+  gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[STICKY_REMOVE], -1, (gint) UNSTICKY, gg->current_display);
+
   displays_plot (NULL, QUICK, gg);
 }
+
 static void
 id_all_sticky_cb (GtkWidget *w, ggobid *gg)
 {
@@ -47,6 +51,8 @@ id_all_sticky_cb (GtkWidget *w, ggobid *gg)
     i = d->rows_in_plot[m];
     d->sticky_ids = g_slist_append (d->sticky_ids, GINT_TO_POINTER (i));
   }
+
+  gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[STICKY_ADD], -1, (gint) STICKY, gg->current_display);
   displays_plot (NULL, QUICK, gg);
 }
 
