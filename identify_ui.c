@@ -229,6 +229,7 @@ static gchar *display_lbl[] = {
   "Record label",
   "Record number",
   "Variable labels",
+  "Record id",
   };
 void
 cpanel_identify_make(ggobid *gg) {
