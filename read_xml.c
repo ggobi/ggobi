@@ -437,6 +437,8 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
   br_glyph_ids_alloc (d);
   br_glyph_ids_init (d, data->gg);
 
+  d->edge.n = 0;
+
   br_color_ids_alloc (d, data->gg);
   br_color_ids_init (d, data->gg);
 
