@@ -122,7 +122,7 @@ add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
 
   plot = (splotd *)plots->data;
   no = XML_addVariable(node, plot->xyvars.x, dpy->d);
-  xmlSetProp(no, "type", "time");
+  xmlSetProp(no, (xmlChar *) "type", (xmlChar *) "time");
   while(plots) {
     plot = (splotd *)plots->data;
     XML_addVariable(node, plot->xyvars.y, dpy->d);
