@@ -62,7 +62,6 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
     case WRITE_FILESET:
       switch (gg->save.format) {
       case XMLDATA:
-#ifdef USE_XML
          {
            XmlWriteInfo info;
 
@@ -77,7 +76,6 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
           write_xml ((const gchar *) filename, gg, &info);
           g_free (filename);
         }
-#endif
         break;
         case ASCIIDATA:
         {

@@ -20,9 +20,7 @@
 #include "externs.h"
 #include "display_tree.h"
 
-#ifdef USE_XML
 #include "write_state.h"
-#endif
 
 #ifdef SUPPORT_PLUGINS
 #include "plugin.h"
@@ -228,16 +226,17 @@ viewmode_set (PipelineMode m, ggobid *gg)
     }
 
     if (gg->viewmode != NULLMODE) {
-      gchar * const modeName = NULL;
+      gchar * modeName = NULL;
       GtkWidget *panel = NULL;
 
       if(gg->viewmode < EXTENDED_DISPLAY_MODE) {
-         modeName = viewmode_name[gg->viewmode];
-	 panel = gg->control_panel[gg->viewmode];
+        modeName = (gchar *) viewmode_name[gg->viewmode];
+        panel = gg->control_panel[gg->viewmode];
       } else {
-	 GtkGGobiExtendedDisplayClass *klass;
-         klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-         panel = klass->viewmode_control_box(display, gg->viewmode, &modeName, gg);
+        GtkGGobiExtendedDisplayClass *klass;
+        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+        panel = klass->viewmode_control_box(display, gg->viewmode,
+          &modeName, gg);
       }
 
       gtk_frame_set_label (GTK_FRAME (gg->viewmode_frame), modeName);
@@ -511,13 +510,11 @@ static GtkItemFactoryEntry menu_items[] = {
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
 
-#ifdef USE_XML
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Store session",   
        NULL,   
        (GtkItemFactoryCallback) store_session, 
        0 },
-#endif
 #ifdef PRINTING_IMPLEMENTED
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Print",
@@ -528,7 +525,7 @@ static GtkItemFactoryEntry menu_items[] = {
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Close",   
-       "<ctrl>Q",   
+       "<ctrl>C",   
        (GtkItemFactoryCallback) ggobi_close, 
        0 },
   { "/File/Quit",   
@@ -674,7 +671,7 @@ make_ui (ggobid *gg)
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
 
   gtk_signal_connect(GTK_OBJECT (window), "delete_event",
-                      GTK_SIGNAL_FUNC (ggobi_close), gg);	
+                      GTK_SIGNAL_FUNC (ggobi_close), gg);
   gtk_signal_connect(GTK_OBJECT (window), "destroy_event",
                       GTK_SIGNAL_FUNC (ggobi_close), gg); 
 
@@ -689,15 +686,15 @@ make_ui (ggobid *gg)
 
   gg->main_accel_group = gtk_accel_group_new ();
   gg->main_menu_factory = get_main_menu (menu_items,
-					 sizeof (menu_items) / sizeof (menu_items[0]),
-					 gg->main_accel_group, window,
-					 &gg->main_menubar, (gpointer) gg);
+    sizeof (menu_items) / sizeof (menu_items[0]),
+    gg->main_accel_group, window,
+    &gg->main_menubar, (gpointer) gg);
 
 #ifdef SUPPORT_INIT_FILES
   if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
-   GtkWidget *w;
-      w = gtk_item_factory_get_widget(gg->main_menu_factory, "/File");
-      addPreviousFilesMenu(w, sessionOptions->info, gg);
+    GtkWidget *w;
+    w = gtk_item_factory_get_widget(gg->main_menu_factory, "/File");
+    addPreviousFilesMenu(w, sessionOptions->info, gg);
   }
 #endif
 
@@ -769,16 +766,16 @@ addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
   InputDescription *input;
   if(info) {
     for(i = 0 ; i < info->numInputs ; i++) {
-     input = &(info->descriptions[i].input);
-     if(input && input->fileName) {
-       el = gtk_menu_item_new_with_label(input->fileName);
-       gtk_signal_connect(GTK_OBJECT(el), "activate",
-                          GTK_SIGNAL_FUNC(load_previous_file),
-                          info->descriptions + i);
-       GGobi_widget_set(el, gg, true);
-       gtk_menu_insert(GTK_MENU(parent), el, 3 + i + 1);
-     }
-   }
+      input = &(info->descriptions[i].input);
+      if(input && input->fileName) {
+        el = gtk_menu_item_new_with_label(input->fileName);
+        gtk_signal_connect(GTK_OBJECT(el), "activate",
+                           GTK_SIGNAL_FUNC(load_previous_file),
+                           info->descriptions + i);
+        GGobi_widget_set(el, gg, true);
+        gtk_menu_insert(GTK_MENU(parent), el, 3 + i + 1);
+      }
+    }
   }
 }
 
@@ -849,12 +846,10 @@ create_ggobi(InputDescription *desc)
 
   read_input(desc, gg);
 
-#ifdef USE_XML
   if(sessionOptions->info != NULL) {
     extern gboolean registerPlugins(ggobid *gg, GList *plugins);
     registerPlugins(gg, sessionOptions->info->plugins);
   }
-#endif
 
   start_ggobi(gg, init_data, sessionOptions->info->createInitialScatterPlot);
 
@@ -867,26 +862,27 @@ void
 show_plugin_list(void *garbage, gint action, GtkWidget *w)
 {
   if(sessionOptions->info && sessionOptions->info)
-    showPluginInfo(sessionOptions->info->plugins, sessionOptions->info->inputPlugins, (ggobid*) garbage);
+    showPluginInfo(sessionOptions->info->plugins,
+      sessionOptions->info->inputPlugins, (ggobid*) garbage);
 }
 #endif
 
 
-#ifdef USE_XML
 
 void
 store_session_in_file(GtkWidget *btn, GtkWidget *selector)
 {
- gchar *fileName;
- ggobid *gg;
- fileName = gtk_file_selection_get_filename(GTK_FILE_SELECTION(selector));
- if(fileName && fileName[0]) {
-     gg = gtk_object_get_data(GTK_OBJECT(selector), "ggobi");
-     write_ggobi_as_xml(gg, fileName, NULL);
-     gtk_widget_destroy(selector);
- } else {
-     quick_message("Pick a file", true);
- }
+  gchar *fileName;
+  ggobid *gg;
+
+  fileName = gtk_file_selection_get_filename(GTK_FILE_SELECTION(selector));
+  if(fileName && fileName[0]) {
+    gg = gtk_object_get_data(GTK_OBJECT(selector), "ggobi");
+    write_ggobi_as_xml(gg, fileName, NULL);
+    gtk_widget_destroy(selector);
+  } else {
+    quick_message("Pick a file", true);
+  }
 }
 
 void
@@ -894,26 +890,25 @@ store_session(ggobid *gg, gint action, GtkWidget *w)
 {
   GtkWidget *dlg;
   if(!sessionOptions->info->sessionFile) {
-      char buf[1000];
-      sprintf(buf,"%s%c%s", getenv("HOME"), G_DIR_SEPARATOR, ".ggobi-session");
-      dlg = gtk_file_selection_new("Save ggobi session");
-      gtk_object_set_data(GTK_OBJECT(dlg), "ggobi", (gpointer) gg);
-      gtk_file_selection_set_filename(GTK_FILE_SELECTION(dlg), buf);
-      gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->ok_button),
-			  "clicked", GTK_SIGNAL_FUNC (store_session_in_file), dlg);
+    char buf[1000];
+    sprintf(buf,"%s%c%s", getenv("HOME"), G_DIR_SEPARATOR, ".ggobi-session");
+    dlg = gtk_file_selection_new("Save ggobi session");
+    gtk_object_set_data(GTK_OBJECT(dlg), "ggobi", (gpointer) gg);
+    gtk_file_selection_set_filename(GTK_FILE_SELECTION(dlg), buf);
+    gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->ok_button),
+      "clicked", GTK_SIGNAL_FUNC (store_session_in_file), dlg);
 
-      gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->cancel_button),
-         "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-	     (gpointer) dlg);
+    gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->cancel_button),
+      "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
+      (gpointer) dlg);
 
-      gtk_widget_show(dlg);
+    gtk_widget_show(dlg);
   } else {
-      ggobi_write_session(sessionOptions->info->sessionFile);
-      /* write_ggobi_as_xml(gg, sessionOptions->info->sessionFile); */
+    ggobi_write_session(sessionOptions->info->sessionFile);
+    /* write_ggobi_as_xml(gg, sessionOptions->info->sessionFile); */
   }
 }
 
-#endif
 
 
 void
