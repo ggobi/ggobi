@@ -648,6 +648,11 @@ void endXMLElement(void *user_data, const xmlChar *name)
       data->current_record++;
     break;
     case RECORD:
+      /* This processes every element in the record, and it will
+	 become confused and complain if we don't feed d->ncols
+	 elements to it.  I believe it also handles the </record>
+         tag in the case where record elements have been individually
+         tagged, and it does that without confusion. */
       setRecordValues(data, data->recordString, data->recordStringLength);
       data->current_record++;
       resetRecordInfo(data);
@@ -658,11 +663,8 @@ void endXMLElement(void *user_data, const xmlChar *name)
     break;
     case REAL:
     case INTEGER:
-      setRecordValues(data, data->recordString, data->recordStringLength);
-    break;
     case STRING:
-    /* This is the individual setRecordValue(), i.e. not with an 's' at the end.
-    */
+    /* This is the individual setRecordValue(), i.e. with no 's' at the end. */
       setRecordValue((const char *) data->recordString, data->current_data, data);
       data->current_element++;
     break;
@@ -1294,7 +1296,6 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
      applyRandomUniforms(d, data);
      return(false);
   }
-
   tmp = strtok((gchar*) line, " \t\n");
 
   while (tmp && (tmp < (gchar *) (line + len))) {
@@ -1303,7 +1304,6 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
     data->current_element++;
     tmp = strtok (NULL, " \t\n");
   }
-
   if (data->current_element < d->ncols) {
     ggobi_XML_error_handler (data, "Not enough elements\n");
     /*
