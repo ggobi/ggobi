@@ -143,7 +143,7 @@ colorschemed *default_scheme_init()
   scheme->criticalvalue = 0;  /*-- unused --*/
 #endif
 
-  static gfloat data[9][3] = {
+  static gfloat data[][3] = {
     {1.0000, 1.0000, 0.2000},
     {0.8941, 0.1020, 0.1098},
     {0.2157, 0.4941, 0.7216},
@@ -152,9 +152,9 @@ colorschemed *default_scheme_init()
     {0.6510, 0.3373, 0.1569},
     {0.9686, 0.5059, 0.7490},
     {0.4980, 0.4980, 0.4980},
-    {0.5961, 0.3059, 0.6392},
+    {0.5961, 0.3059, 0.6392}
   };
-  static gchar *colorNames[9] = {
+  static gchar *colorNames[] = {
     "Yellow", "Orange", "Blue", "Green", "Orange", "Brown",
     "Pink", "Gray", "Purple"
   };
@@ -166,7 +166,7 @@ colorschemed *default_scheme_init()
   scheme->description = g_strdup("From Cindy Brewer, one of the schemes in the ColorBrewer software");
   scheme->type = qualitative;
   scheme->system = rgb;
-  scheme->n = 9;
+  scheme->n = sizeof(data)/sizeof(data[0]);
   scheme->rgb = NULL;
   scheme->criticalvalue = 0;  /*-- unused --*/
 
