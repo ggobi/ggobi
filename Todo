@@ -1,3 +1,6 @@
+ExcelReader is for windows only. Make certain
+we don't try to build this on Unix.
+
 Provide a screen to provide information about the source of
 the data (e.g. filename, mode). - now in the status bar.
 

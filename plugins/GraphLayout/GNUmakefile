@@ -65,13 +65,6 @@ $(PKG).so: $(OBJS)
 	$(CC) -shared -o $@ $(OBJS) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%) $(LDFLAGS)
 endif
 
-local.config:  configure
-	./configure
-
-ifndef ADMIN
-configure: configure.in
-	autoconf
-endif
 
 distclean::
 	-rm -f local.config

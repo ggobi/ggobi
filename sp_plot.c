@@ -723,8 +723,9 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     void (*f)(splotd *, GdkDrawable*, ggobid*);
     splotKlass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
     f = splotKlass->add_markup_cues;
-    if(f)
+    if(f) {
       f(sp, drawable, gg);
+    }
   }
    
   splot_add_plot_labels (sp, drawable, gg);  /*-- axis labels --*/
