@@ -20,7 +20,7 @@ main (gint argc, gchar *argv[])
   sessionOptions->numArgs = argc;
 
   gtk_init (&argc, &argv);
-  gg = ggobi_alloc ();
+  gg = ggobi_alloc (gg);
 
   /*parse_command_line(&argc, argv, gg);*/
   parse_command_line(&argc, argv);
