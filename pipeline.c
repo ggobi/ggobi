@@ -364,6 +364,8 @@ world_to_raw (gint pt, splotd *sp, datad *d, ggobid *gg)
           world_to_raw_by_var (pt, display->tcorr2.active_vars.els[j],
             display, d, gg);
       break;
+      default:
+      break;
     }
   } else if (dtype == scatmat && sp->p1dvar == -1) {
     world_to_raw_by_var (pt, sp->xyvars.x, display, d, gg);
