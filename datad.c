@@ -201,10 +201,6 @@ datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate)
      *index = i;
      g_hash_table_insert(d->idTable, tmp, index);
      d->rowIds[i] = tmp;     
-
-     g_free (index);
-     if (duplicate)
-       g_free (tmp);
   }
 }
 

@@ -173,7 +173,13 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
         display_edges_arrowheads_show (display, false);
       }
 
-      if (display->e == NULL) edgeset_add (display);
+/*XXX FIXME 
+  Leave this out, but that means the user has to select the dataset first and
+  then! If we put it in and there are two edgesets and the selected one is not valid,
+  we show the other one which was not asked for.
+  Want to test whether there is only one edgetset. But this is a heuristic. 
+*/
+      if (display->e == NULL) edgeset_add (display); 
       if (display->e != NULL) {
         title = computeTitle (false, gg->current_display, gg);
         if (title) {

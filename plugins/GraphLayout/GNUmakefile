@@ -27,7 +27,7 @@ GGOBI_LIB=
 ifdef GRAPHVIZ
 CFLAGS+=-Wno-unknown-pragmas
 CFLAGS+= -DGRAPHVIZ=1 $(GVINC:%=-I%)
-LDFLAGS+=-L$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan -lgd -lcdt -ltcldot
+LDFLAGS+=-L$(GVLIB) -ldotneato -lgraph
 endif
 
 HEADERS=glayout defines

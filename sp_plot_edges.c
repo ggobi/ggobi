@@ -31,6 +31,8 @@ splot_plot_edge (gint m, datad *d, datad *e,
   endpointsd *endpoints;
 
   endpoints = resolveEdgePoints(e, d);
+  if(!endpoints)
+    return(false);
   draw_edge = edge_endpoints_get (m, &a, &b, d, endpoints, e);
 
   if(!draw_edge)
@@ -69,7 +71,7 @@ splot_hidden_edge (gint m, datad *d, datad *e,
   endpointsd *endpoints;
 
   endpoints = resolveEdgePoints(e, d);
-  if (edge_endpoints_get (m, &a, &b, d, endpoints, e))
+  if (endpoints && edge_endpoints_get (m, &a, &b, d, endpoints, e))
     if (e->hidden_now.els[m] || d->hidden_now.els[a] || d->hidden_now.els[b])
       hiddenp = true;
   
@@ -127,6 +129,8 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
     g_assert (e->color.nels == e->nrows);
 
     endpoints = resolveEdgePoints(e, d);
+    if(!endpoints)
+      return;
 
     for (k=0; k<NGLYPHSIZES; k++)
       for (n=0; n<NEDGETYPES; n++)
@@ -312,6 +316,8 @@ splot_add_edge_highlight_cue (splotd *sp, GdkDrawable *drawable, gint k,
                         dsp->options.edges_directed_show_p);
 
   endpoints = resolveEdgePoints(e, d);
+  if(!endpoints)
+    return;
   draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, endpoints, e);
 
 /*
@@ -353,6 +359,8 @@ splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
                         dsp->options.edges_directed_show_p);
 
   endpoints = resolveEdgePoints(e, d);
+  if(!endpoints)
+     return;
   draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, endpoints, e);
 
 /*

@@ -205,7 +205,9 @@ find_nearest_edge (splotd *sp, displayd *display, ggobid *gg)
 
   if (e && e->edge.n > 0) {
     endpointsd *endpoints = resolveEdgePoints(e, d);
-
+    if(!endpoints)
+       return(-1);
+  
     xdist = sqdist = 1000 * 1000;
     for (j=0; j<e->edge.n; j++) {
       doit = edge_endpoints_get (j, &from, &to, d, endpoints, e);

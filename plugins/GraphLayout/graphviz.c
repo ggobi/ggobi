@@ -10,11 +10,7 @@
 #include "glayout.h"
 
 #ifdef GRAPHVIZ
-#include <render.h>
-#include <graph.h>
-#include <dotprocs.h>
-#include <neatoprocs.h>
-#include <adjust.h>
+#include <dotneato.h>
 
 #define DOT_LAYOUT   0
 #define NEATO_LAYOUT 1

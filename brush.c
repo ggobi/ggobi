@@ -828,7 +828,7 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
   endpointsd *endpoints;
   endpoints = resolveEdgePoints(e, d);
 
-  if (!edge_endpoints_get (k, &a, &b, d, endpoints, e))
+  if (!endpoints || !edge_endpoints_get (k, &a, &b, d, endpoints, e))
     return false;
 
   /*-- test for intersection with the vertical edge --*/

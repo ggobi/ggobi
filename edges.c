@@ -362,12 +362,15 @@ g_printerr ("   creating a new match\n");
     ans = computeResolvedEdgePoints(e, d);
     ptr = (DatadEndpoints *) g_malloc(sizeof(DatadEndpoints));
     ptr->data = d;
-    ptr->endpoints = (ans == &DegenerateEndpoints) ? NULL : ans;
+    ptr->endpoints = ans; /* (ans == &DegenerateEndpoints) ? NULL : ans; */
 /*
 g_printerr ("   %d %d\n", ptr->endpoints[0].a, ptr->endpoints[0].b);
 */
     e->edge.endpointList = g_list_append(e->edge.endpointList, ptr);
   }
+
+  if(ans == &DegenerateEndpoints)
+     return(NULL);
 
   return(ans);
 }

@@ -170,7 +170,8 @@ splot_write_svg (splotd *sp, ggobid *gg)
      * color.  This avoids the need to reset the foreground so often.
      * On the other hand, it requires more looping.
     */
-    for (k=0; k<ncolors_used; k++) {
+    if(endpoints) {
+     for (k=0; k<ncolors_used; k++) {
       current_color = colors_used[k];
       cx = hexcolor (&gg->activeColorScheme->rgb[current_color]);
       nl = 0;
@@ -197,6 +198,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
           }
         }
       }
+     }
     }
   }
 
