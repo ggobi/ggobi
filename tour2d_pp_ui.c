@@ -255,7 +255,6 @@ tour2dpp_window_open (ggobid *gg) {
   GtkWidget *hb, *opt;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
-  gint i, j;
   gboolean vars_sphered = true;
   /*-- to initialize the checkboxes in the menu --*/
   GtkItemFactory *factory;
@@ -265,6 +264,7 @@ tour2dpp_window_open (ggobid *gg) {
      to popup */
   /*  if (dsp->t2d.nactive > d->sphere.pcvars.nels)
     vars_sphered = false;
+  gint i, j;
   for (j=0; j<dsp->t2d.nactive; j++) 
   {
     for (i=0; i<d->sphere.pcvars.nels; i++) 
