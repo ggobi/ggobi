@@ -460,6 +460,65 @@ tourCorrRealloc(displayd *dsp, gint nc, datad *d)
 }
 
 static void
+tour2d3Realloc(displayd *dsp, gint nc, datad *d)
+{
+  gint old_ncols, i;
+  /*
+   * because display_tour2d_init_null has been performed even if
+   * alloc_tour2d has not, Fa.ncols has been initialized.
+  */
+  old_ncols = dsp->t2d3.Fa.ncols;
+
+  if (nc >= MIN_NVARS_FOR_TOUR2D3) {
+    if (old_ncols < MIN_NVARS_FOR_TOUR2D3)       
+      display_tour2d3_init(dsp, d->gg);
+
+    if (dsp->d == d) {
+      arrayd_add_cols (&dsp->t2d3.Fa, nc);
+      arrayd_add_cols (&dsp->t2d3.Fz, nc);
+      arrayd_add_cols (&dsp->t2d3.F, nc);
+      arrayd_add_cols (&dsp->t2d3.Ga, nc);
+      arrayd_add_cols (&dsp->t2d3.Gz, nc);
+      arrayd_add_cols (&dsp->t2d3.G, nc);
+      arrayd_add_cols (&dsp->t2d3.Va, nc);
+      arrayd_add_cols (&dsp->t2d3.Vz, nc);
+      arrayd_add_cols (&dsp->t2d3.tv, nc);
+
+      vectori_realloc (&dsp->t2d3.subset_vars, nc);
+      vectorb_realloc (&dsp->t2d3.subset_vars_p, nc);
+      vectori_realloc (&dsp->t2d3.active_vars, nc);
+      vectorb_realloc (&dsp->t2d3.active_vars_p, nc);
+
+      vectorf_realloc (&dsp->t2d3.lambda, nc);
+      vectorf_realloc (&dsp->t2d3.tau, nc);
+      vectorf_realloc (&dsp->t2d3.tinc, nc);
+
+      arrayd_add_cols (&dsp->t2d3_manbasis, (gint) nc);
+
+      /* need to zero extra cols */
+      for (i=old_ncols; i<nc; i++) {
+        dsp->t2d3.Fa.vals[0][i] = dsp->t2d3.Fa.vals[1][i] = 0.0;
+        dsp->t2d3.Fz.vals[0][i] = dsp->t2d3.Fz.vals[1][i] = 0.0;
+        dsp->t2d3.F.vals[0][i] = dsp->t2d3.F.vals[1][i] = 0.0;
+        dsp->t2d3.Ga.vals[0][i] = dsp->t2d3.Ga.vals[1][i] = 0.0;
+        dsp->t2d3.Gz.vals[0][i] = dsp->t2d3.Gz.vals[1][i] = 0.0;
+        dsp->t2d3.G.vals[0][i] = dsp->t2d3.G.vals[1][i] = 0.0;
+        dsp->t2d3.Va.vals[0][i] = dsp->t2d3.Va.vals[1][i] = 0.0;
+        dsp->t2d3.Vz.vals[0][i] = dsp->t2d3.Vz.vals[1][i] = 0.0;
+        dsp->t2d3.tv.vals[0][i] = dsp->t2d3.tv.vals[1][i] = 0.0;
+        dsp->t2d3.subset_vars.els[i] = 0;
+        dsp->t2d3.subset_vars_p.els[i] = false;
+        dsp->t2d3.active_vars.els[i] = 0;
+        dsp->t2d3.active_vars_p.els[i] = false;
+        dsp->t2d3.lambda.els[i] = 0.0;
+        dsp->t2d3.tau.els[i] = 0.0;
+        dsp->t2d3.tinc.els[i] = 0.0;
+      }
+    }
+  }
+}
+
+static void
 tour2dRealloc(displayd *dsp, gint nc, datad *d)
 {
   gint old_ncols, i;
@@ -1377,6 +1436,7 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
   klass->parent_class.move_points_button_cb = scatterplotMovePointsButtonCb;
 
   klass->parent_class.tour1d_realloc = tour1dRealloc;
+  klass->parent_class.tour2d3_realloc = tour2d3Realloc;
   klass->parent_class.tour2d_realloc = tour2dRealloc;
   klass->parent_class.tourcorr_realloc = tourCorrRealloc;
 
@@ -1390,9 +1450,6 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
 
   klass->parent_class.select_X = selectXVar;
   klass->parent_class.varcircle_draw = varcircleDraw;
-  klass->parent_class.tour1d_realloc = tour1dRealloc;
-  klass->parent_class.tour2d_realloc = tour2dRealloc;
-  klass->parent_class.tourcorr_realloc = tourCorrRealloc;
 }
 
 static gint

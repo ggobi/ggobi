@@ -25,7 +25,7 @@
 #include "vars.h"
 #include "externs.h"
 
-#define T2D3ON true
+#define T2D3ON  true
 #define T2D3OFF false
 
 void
@@ -1106,7 +1106,7 @@ tour2d3_manip_end(splotd *sp)
   }
 }
 
-#undef T23DON
-#undef T23DOFF
+#undef T2D3ON
+#undef T2D3OFF
 
 #endif
