@@ -18,8 +18,8 @@
 #include "externs.h"
 
 /* */
-static gboolean active_paint_points (datad *d, ggobid *gg);
-static gboolean active_paint_edges (displayd *display, ggobid *gg);
+static gboolean active_paint_points (splotd *, datad *d, ggobid *gg);
+static gboolean active_paint_edges (splotd *, datad *e, ggobid *gg);
 static gboolean build_symbol_vectors (cpaneld *, datad *, ggobid *);
 /* */
 
@@ -93,12 +93,12 @@ brush_once (gboolean force, splotd *sp, ggobid *gg)
  * Now paint.
 */
   if (cpanel->br_point_targets) {
-    changed = active_paint_points (d, gg);
+    changed = active_paint_points (sp, d, gg);
   }
 
   if (cpanel->br_edge_targets) {
     if (e != NULL)
-      changed = active_paint_edges (display, gg);
+      changed = active_paint_edges (sp, e, gg);
   }
 
   return (changed);
@@ -727,19 +727,18 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
  * Set pts_under_brush[j] to 1 if point j is inside the rectangular brush.
 */
 gboolean
-active_paint_points (datad *d, ggobid *gg)
+active_paint_points (splotd *sp, datad *d, ggobid *gg)
 {
   gint ih, iv, j, pt;
   gboolean changed;
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
-  gint (*f)(splotd *sp, datad *) = NULL;
+  cpaneld *cpanel = &display->cpanel;
+  gint (*f)(splotd *sp, datad *, ggobid *) = NULL;
 
   if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     f = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->active_paint_points;
     if(f)
-       d->npts_under_brush = f(sp, d);
+       d->npts_under_brush = f(sp, d, gg);
   }
 
   if (!f) {
@@ -902,12 +901,12 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
 }
 
 static gboolean
-active_paint_edges (displayd *display, ggobid *gg)
+active_paint_edges (splotd *sp, datad *e, ggobid *gg)
 {
-  datad *e = display->e;
   gint k;
   gboolean changed;
-  cpaneld *cpanel = &gg->current_display->cpanel;
+  displayd *display = sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
 
   /* Zero out xed_by_brush[] before looping */
   e->edge.nxed_by_brush = 0;

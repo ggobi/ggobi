@@ -184,7 +184,7 @@ typedef struct
             Handling each row can be done using a method for sub_plane_to_screen. */
    void (*plane_to_screen)(splotd *, datad *, ggobid *);
 
-   gint (*active_paint_points)(splotd *, datad *);
+   gint (*active_paint_points)(splotd *, datad *, ggobid *);
 
 
    GdkSegment *(*alloc_whiskers)(splotd *sp, gint nrows, datad *d);

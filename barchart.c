@@ -9,6 +9,8 @@
     it without violating AT&T's intellectual property rights.
 */
 
+/* not dealt with: missings, hiddens in overflow bins */
+
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -222,6 +224,7 @@ void barchart_clean_init(barchartSPlotd * sp)
 
   for (i = 0; i < sp->bar->nbins; i++) {
     sp->bar->bins[i].count = 0;
+    sp->bar->bins[i].nhidden = 0;
     for (j = 0; j < sp->bar->ncolors; j++) {
       sp->bar->cbins[i][j].count = 0;
       sp->bar->cbins[i][j].rect.width = 1;
@@ -247,9 +250,7 @@ static void
 barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 {
   gint i, j, m, bin;
-/* dfs */
   vartabled *vtx = vartable_element_get(GTK_GGOBI_SPLOT(sp)->p1dvar, d);
-/* --- */
 
   for (i = 0; i < sp->bar->nbins; i++)
     for (j = 0; j < sp->bar->ncolors; j++)
@@ -274,7 +275,7 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
         && MISSING_P(m, GTK_GGOBI_SPLOT(sp)->p1dvar))
       continue;
 
-    /*-- skip hiddens? --*/
+    /*-- skip hiddens?  here, yes. --*/
     if (d->hidden_now.els[m]) {
       continue;
     }
@@ -298,7 +299,6 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 }
 
 
-
 void barchart_recalc_group_dimensions(barchartSPlotd * sp, ggobid * gg)
 {
   gint colorwidth, i, j, xoffset;
@@ -306,7 +306,7 @@ void barchart_recalc_group_dimensions(barchartSPlotd * sp, ggobid * gg)
   for (i = 0; i < sp->bar->nbins; i++) {
     xoffset = sp->bar->bins[i].rect.x;
 
-/* first color in all bins is the current color */
+/* first all bins in the current color */
     j = gg->color_id;
     colorwidth = 1;
     if (sp->bar->bins[i].count > 0)
@@ -350,6 +350,11 @@ void barchart_recalc_group_dimensions(barchartSPlotd * sp, ggobid * gg)
 /* now eliminate rounding problems - last color in each bin gets adjusted */
   for (i = 0; i < sp->bar->nbins; i++) {
     gboolean stop = FALSE;
+
+    /*-- dfs:   don't do this if nmissing > 0; leave the shadow in place --*/
+    if (sp->bar->bins[i].nhidden)
+      continue;
+
     for (j = sp->bar->ncolors - 1; (j >= 0) && (!stop); j--)
       if (j != gg->color_id)
         if (sp->bar->cbins[i][j].count > 0)
@@ -432,7 +437,6 @@ void barchart_recalc_group_dimensions(barchartSPlotd * sp, ggobid * gg)
           rectangle_inset(&sp->bar->col_low_bin[j]);
         }
         xoffset += colorwidth;
-
       }
     }
   }
@@ -442,8 +446,8 @@ void barchart_recalc_group_dimensions(barchartSPlotd * sp, ggobid * gg)
 
 void rectangle_inset(gbind * bin)
 {
-/* works around the gdk convention, that the areas of filled and framed rectangles differ
-   by one pixel in each dimension */
+/* works around the gdk convention, that the areas of filled and
+   framed rectangles differ by one pixel in each dimension */
 
   bin->rect.height += 1;
   bin->rect.x += 1;
@@ -609,82 +613,87 @@ void barchart_init_categorical(barchartSPlotd * sp, datad * d)
 gboolean
 barchart_redraw(splotd * rawsp, datad * d, ggobid * gg, gboolean binned)
 {
-  gint i, j;
+  gint i, j, radius;
   colorschemed *scheme = gg->activeColorScheme;
   barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
+  gbind *bin;
 
 /* dfs */
-/*
-  In case we're passively responding to hide brushing, adding this
-  line works but is unappealing.  It recalculates the counts, and
-  then rescales using the max of the counts.  It would look quite
-  nice if the rescaling didn't occur, probably.  So it should scale
-  using the maximum counts if no cases were hidden, but then draw
-  using the count of visible cases.
-*/
   barchart_recalc_counts(sp, d, gg);
 /*-- --*/
 
   barchart_recalc_group_counts(sp, d, gg);
 
+/* dfs: if there are hiddens, draw the entire rectangle in the shadow color */
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+  for (i = 0; i < sp->bar->nbins; i++) {
+    bin = &sp->bar->bins[i];
+    if (bin->nhidden) {
+      gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
+        bin->rect.x, bin->rect.y, bin->rect.width, bin->rect.height+1);
+    }
+  }
+/* */
+
   for (j = 0; j < sp->bar->ncolors; j++) {
     gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb[j]);
 
     for (i = 0; i < sp->bar->nbins; i++) {
-      if (sp->bar->cbins[i][j].count > 0)
+      bin = &sp->bar->cbins[i][j];
+      if (bin->count > 0) {
         gdk_draw_rectangle(rawsp->pixmap0, gg->plot_GC, TRUE,
-                           sp->bar->cbins[i][j].rect.x,
-                           sp->bar->cbins[i][j].rect.y,
-                           sp->bar->cbins[i][j].rect.width,
-                           sp->bar->cbins[i][j].rect.height);
+          bin->rect.x, bin->rect.y, bin->rect.width, bin->rect.height);
+      }
     }
   }
 
 /* draw overflow bins if necessary */
   if (sp->bar->high_pts_missing) {
+    /*  start with the hiddens */
+    if (sp->bar->high_bin->nhidden) {
+      bin = sp->bar->high_bin;
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+      gdk_draw_rectangle(rawsp->pixmap0, gg->plot_GC, TRUE,
+        bin->rect.x, bin->rect.y, bin->rect.width, bin->rect.height+1);
+    }
     for (j = 0; j < sp->bar->ncolors; j++) {
       gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb[j]);
-
-      if (sp->bar->col_high_bin[j].count > 0) {
+      bin = &sp->bar->col_high_bin[j];
+      if (bin->count > 0)
         gdk_draw_rectangle(rawsp->pixmap0, gg->plot_GC, TRUE,
-                           sp->bar->col_high_bin[j].rect.x,
-                           sp->bar->col_high_bin[j].rect.y,
-                           sp->bar->col_high_bin[j].rect.width,
-                           sp->bar->col_high_bin[j].rect.height);
-      }
+          bin->rect.x, bin->rect.y, bin->rect.width, bin->rect.height);
     }
   }
   if (sp->bar->low_pts_missing) {
+    /*  start with the hiddens */
+    if (sp->bar->low_bin->nhidden) {
+      bin = sp->bar->low_bin;
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+      gdk_draw_rectangle(rawsp->pixmap0, gg->plot_GC, TRUE,
+        bin->rect.x, bin->rect.y, bin->rect.width, bin->rect.height+1);
+    }
     for (j = 0; j < sp->bar->ncolors; j++) {
       gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb[j]);
-
-      if (sp->bar->col_low_bin[j].count > 0) {
+      bin = &sp->bar->col_low_bin[j];
+      if (bin->count > 0)
         gdk_draw_rectangle(rawsp->pixmap0, gg->plot_GC, TRUE,
-                           sp->bar->col_low_bin[j].rect.x,
-                           sp->bar->col_low_bin[j].rect.y,
-                           sp->bar->col_low_bin[j].rect.width,
-                           sp->bar->col_low_bin[j].rect.height);
-      }
+          bin->rect.x, bin->rect.y, bin->rect.width, bin->rect.height);
     }
-
   }
-
 
 /* mark empty bins with a small circle */
   gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
   for (i = 0; i < sp->bar->nbins; i++) {
-    if (sp->bar->bins[i].count == 0) {
-      gint radius = sp->bar->bins[i].rect.height / 4;
+    bin = &sp->bar->bins[i];
+    if (bin->count == 0) {
+      radius = bin->rect.height / 4;
       gdk_draw_line(rawsp->pixmap0, gg->plot_GC,
-                    sp->bar->bins[i].rect.x, sp->bar->bins[i].rect.y,
-                    sp->bar->bins[i].rect.x,
-                    sp->bar->bins[i].rect.y +
-                    sp->bar->bins[i].rect.height);
+        bin->rect.x, bin->rect.y,
+        bin->rect.x, bin->rect.y + bin->rect.height);
       gdk_draw_arc(rawsp->pixmap0, gg->plot_GC, FALSE,
-                   sp->bar->bins[i].rect.x - radius / 2,
-                   sp->bar->bins[i].rect.y +
-                   sp->bar->bins[i].rect.height / 2 - radius / 2, radius,
-                   radius, 0, 64 * 360);
+        bin->rect.x - radius / 2,
+        bin->rect.y + bin->rect.height / 2 - radius / 2,
+        radius, radius, 0, 64 * 360);
     }
   }
 
@@ -856,8 +865,10 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 
   if (!vtx->vartype == categorical)
     rawsp->scale.y = SCALE_DEFAULT;
-  for (i = 0; i < sp->bar->nbins; i++)
+  for (i = 0; i < sp->bar->nbins; i++) {
     sp->bar->bins[i].count = 0;
+    sp->bar->bins[i].nhidden = 0;
+  }
 
   sp->bar->high_pts_missing = sp->bar->low_pts_missing = FALSE;
 
@@ -871,13 +882,11 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
           && MISSING_P(m, rawsp->p1dvar))
         continue;
 
-      /*-- skip hiddens? --*/
-      if (d->hidden_now.els[m])
-        continue;
-
       bin = sp->bar->index_to_rank[i];
       if ((bin >= 0) && (bin < sp->bar->nbins)) {
         sp->bar->bins[bin].count++;
+        if (d->hidden_now.els[m])
+          sp->bar->bins[bin].nhidden++;
       }
 /* dfs */
       rawsp->planar[m].x = (greal) sp->bar->bins[bin].value;
@@ -887,30 +896,24 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 #endif
     }
   } else {  /* all vartypes but categorical */
-    gint index, rank = 0;
+    gint index, m, rank = 0;
 
     index = sp->bar->index_to_rank[rank];
-    /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs */
-    yy = d->tform.vals[ d->rows_in_plot.els[index] ][rawsp->p1dvar];
+    m = d->rows_in_plot.els[index];
+    yy = d->tform.vals[m][rawsp->p1dvar];
 
     while ((yy < sp->bar->breaks[0] + sp->bar->offset) &&
-           (rank < d->nrows_in_plot - 1)) {
-
-      /*-- skip hiddens? --*/
-      if (d->hidden_now.els[ d->rows_in_plot.els[index] ]) {
-        rank++;
-        continue;
-      }
-
-      /*rawsp->planar[index].x = -1;*/ /* maybe not, dfs */
-      rawsp->planar[ d->rows_in_plot.els[index] ].x = -1;
+           (rank < d->nrows_in_plot - 1))
+    {
+      rawsp->planar[m].x = -1;
       rank++;
       index = sp->bar->index_to_rank[rank];
-      /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs */
-      yy = d->tform.vals[ d->rows_in_plot.els[index] ][rawsp->p1dvar];
+      m = d->rows_in_plot.els[index];
+      yy = d->tform.vals[m][rawsp->p1dvar];
     }
 
     if (rank > 0) {
+      gint k;
       sp->bar->low_pts_missing = TRUE;
       if (sp->bar->low_bin == NULL)
         sp->bar->low_bin = (gbind *) g_malloc(sizeof(gbind));
@@ -918,19 +921,22 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
         sp->bar->col_low_bin =
             (gbind *) g_malloc(sp->bar->ncolors * sizeof(gbind));
       sp->bar->low_bin->count = rank;
+      /*-- count the hiddens among the elements in low_bin --*/
+      sp->bar->low_bin->nhidden = 0;
+      for (k=0; k<rank; k++) {
+        index = sp->bar->index_to_rank[k];
+        m = d->rows_in_plot.els[index];
+        if (d->hidden_now.els[m])
+          sp->bar->low_bin->nhidden++;
+      }
     }
+
     bin = 0;
     while (rank < d->nrows_in_plot) {
       index = sp->bar->index_to_rank[rank];
-      /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs*/
+      m = d->rows_in_plot.els[index];
 
-      /*-- skip hiddens? --*/
-      if (d->hidden_now.els[ d->rows_in_plot.els[index] ]) {
-        rank++;
-        continue;
-      }
-
-      yy = d->tform.vals[ d->rows_in_plot.els[index] ][rawsp->p1dvar];
+      yy = d->tform.vals[m][rawsp->p1dvar];
       while ((bin < sp->bar->nbins) &&
              (sp->bar->breaks[bin + 1] + sp->bar->offset < yy)) {
         bin++;
@@ -942,6 +948,8 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
         if (yy == sp->bar->breaks[sp->bar->nbins] + sp->bar->offset) {
           bin--;
           sp->bar->bins[bin].count++;
+          if (d->hidden_now.els[m])
+            sp->bar->bins[bin].nhidden++;
         } else {
           if (sp->bar->high_pts_missing == FALSE) {
             sp->bar->high_pts_missing = TRUE;
@@ -952,14 +960,18 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
                   g_malloc(sp->bar->ncolors * sizeof(gbind));
             }
             sp->bar->high_bin->count = 0;
+            sp->bar->high_bin->nhidden = 0;
           }
           sp->bar->high_bin->count++;
+          if (d->hidden_now.els[m])
+            sp->bar->high_bin->nhidden++;
         }
       } else {
         sp->bar->bins[bin].count++;
+        if (d->hidden_now.els[m])
+          sp->bar->bins[bin].nhidden++;
       }
-      /*rawsp->planar[index].x = bin;*/ /* maybe not, dfs */
-      rawsp->planar[ d->rows_in_plot.els[index] ].x = bin;
+      rawsp->planar[m].x = bin;
       rank++;
     }
   }
@@ -993,6 +1005,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
   gint index;
   gint minwidth;
   gfloat rdiff, ftmp;
+  gbind *bin;
 
   GdkRectangle *rect;
   barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
@@ -1009,29 +1022,25 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
   rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
   index = 0;
   for (i = 0; i < sp->bar->nbins; i++) {
-    if (sp->bar->bins[i].count > maxbincount) {
-      maxbincount = sp->bar->bins[i].count;
+    bin = &sp->bar->bins[i];
+    if (bin->count > maxbincount) {
+      maxbincount = bin->count;
       maxbin = i;
     }
 
     sp->bar->bins[i].planar.x = -1;
     if (vtx->vartype == categorical) {
-/* dfs */
-      gfloat ftmp;
-      ftmp = -1.0 + 2.0*((greal)sp->bar->bins[i].value - rawsp->p1d.lim.min)
+      ftmp = -1.0 + 2.0*((greal)bin->value - rawsp->p1d.lim.min)
         / rdiff;
-      sp->bar->bins[i].planar.y = (greal) (PRECISION1 * ftmp);
-/* --- */
+      bin->planar.y = (greal) (PRECISION1 * ftmp);
 #ifdef PREV
-      index = sp->bar->bins[i].index;
+      index = bin->index;
       if (index >= 0)
-        sp->bar->bins[i].planar.y =
-          (glong) d->world.vals[index][rawsp->p1dvar];
+        bin->planar.y = (glong) d->world.vals[index][rawsp->p1dvar];
 #endif
     } else {
-      ftmp =
-          -1.0 + 2.0 * (sp->bar->breaks[i] - sp->bar->breaks[0]) / rdiff;
-      sp->bar->bins[i].planar.y = (glong) (precis * ftmp);
+      ftmp = -1.0 + 2.0 * (sp->bar->breaks[i] - sp->bar->breaks[0]) / rdiff;
+      bin->planar.y = (glong) (precis * ftmp);
     }
   }
   sp->bar->maxbincounts = maxbincount;
@@ -1039,6 +1048,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
   if (!sp->bar->is_spine) {
     greal precis = (greal) PRECISION1;
     greal gtmp;
+    gbind *binminus;
 
     scale_y /= 2;
 
@@ -1046,9 +1056,10 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
 
     minwidth = rawsp->max.y;
     for (i = 0; i < sp->bar->nbins; i++) {
-
+      bin = &sp->bar->bins[i];
       rect = &sp->bar->bins[i].rect;
-      gtmp = sp->bar->bins[i].planar.y - rawsp->pmid.y;
+
+      gtmp = bin->planar.y - rawsp->pmid.y;
       rect->y = (gint) (gtmp * rawsp->iscale.y / precis);
 
       rect->x = 10;
@@ -1056,45 +1067,41 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
       if (i == 0)
         minwidth = 2 * (rawsp->max.y - rect->y);
       if (i > 0) {
-        minwidth =
-            MIN(minwidth, sp->bar->bins[i - 1].rect.y - rect->y - 2);
-        sp->bar->bins[i - 1].rect.height =
-            sp->bar->bins[i - 1].rect.y - rect->y - 2;
+        binminus = &sp->bar->bins[i-1];
+        minwidth = MIN(minwidth, binminus->rect.y - rect->y - 2);
+        binminus->rect.height = binminus->rect.y - rect->y - 2;
       }
 
       rect->width = MAX(1, (gint) ((gfloat) (rawsp->max.x - 2 * rect->x)
-                                   * sp->bar->bins[i].count /
-                                   sp->bar->maxbincounts));
+        * bin->count / sp->bar->maxbincounts));
 
     }
     sp->bar->bins[sp->bar->nbins - 1].rect.height =
-        sp->bar->bins[sp->bar->nbins - 2].rect.y -
-        sp->bar->bins[sp->bar->nbins - 1].rect.y - 1;
+      sp->bar->bins[sp->bar->nbins - 2].rect.y -
+      sp->bar->bins[sp->bar->nbins - 1].rect.y - 1;
 
 /* set overflow bins to the left and right */
     if (sp->bar->low_pts_missing) {
-      sp->bar->low_bin->rect.height = minwidth;
-      sp->bar->low_bin->rect.x = 10;
-      sp->bar->low_bin->rect.width =
-          MAX(1,
-              (gint) ((gfloat)
-                      (rawsp->max.x - 2 * sp->bar->low_bin->rect.x)
-                      * sp->bar->low_bin->count / sp->bar->maxbincounts));
-      sp->bar->low_bin->rect.y = sp->bar->bins[0].rect.y + 2;
-    }
-    if (sp->bar->high_pts_missing) {
-      sp->bar->high_bin->rect.height = minwidth;
-      sp->bar->high_bin->rect.x = 10;
-      sp->bar->high_bin->rect.width =
-          MAX(1,
-              (gint) ((gfloat)
-                      (rawsp->max.x - 2 * sp->bar->high_bin->rect.x)
-                      * sp->bar->high_bin->count / sp->bar->maxbincounts));
-      i = sp->bar->nbins - 1;
-      sp->bar->high_bin->rect.y =
-          sp->bar->bins[i].rect.y - 2 * sp->bar->bins[i].rect.height - 1;
+      gbind *lbin = sp->bar->low_bin;
+      lbin->rect.height = minwidth;
+      lbin->rect.x = 10;
+      lbin->rect.width = MAX(1,
+        (gint) ((gfloat) (rawsp->max.x - 2 * lbin->rect.x)
+        * lbin->count / sp->bar->maxbincounts));
+      lbin->rect.y = sp->bar->bins[0].rect.y + 2;
     }
 
+    if (sp->bar->high_pts_missing) {
+      gbind *hbin = sp->bar->high_bin;
+      hbin->rect.height = minwidth;
+      hbin->rect.x = 10;
+      hbin->rect.width = MAX(1,
+        (gint) ((gfloat) (rawsp->max.x - 2 * hbin->rect.x)
+        * hbin->count / sp->bar->maxbincounts));
+      i = sp->bar->nbins - 1;
+      hbin->rect.y =
+        sp->bar->bins[i].rect.y - 2 * sp->bar->bins[i].rect.height - 1;
+    }
 
     minwidth = (gint) (0.9 * minwidth);
     for (i = 0; i < sp->bar->nbins; i++) {
@@ -1111,13 +1118,6 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
     gint maxheight;
     gint yoffset;
     gint n = d->nrows_in_plot;
-
-    /*-- ignore hiddens here? --*/
-/*
-    for (i=0; i<d->nrows_in_plot; i++)
-      if (d->hidden_now.els[d->rows_in_plot.els[i]])
-        n--;
-*/
 
     scale_y = SCALE_DEFAULT;
     maxheight = (rawsp->max.y - (sp->bar->nbins - 1) * bindist) * scale_y;
@@ -1161,7 +1161,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
   }
 }
 
-gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
+gboolean barchart_active_paint_points(splotd * rawsp, datad * d, ggobid *gg)
 {
   barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
   brush_coords *brush_pos = &rawsp->brush_pos;
@@ -1174,6 +1174,7 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
   gint y2 = MAX(brush_pos->y1, brush_pos->y2);
   gboolean *hits;
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
+  cpaneld *cpanel = &gg->current_display->cpanel;
 
   hits = (gboolean *) g_malloc((sp->bar->nbins + 2) * sizeof(gboolean));
 
@@ -1212,9 +1213,11 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
         && MISSING_P(m, rawsp->p1dvar))
       continue;
 
-    /*-- skip hiddens? --*/
-    if (d->hidden_now.els[m]) {
-      continue;
+    if (d->hidden_now.els[m] &&
+      (cpanel->br_point_targets != br_hide &&
+      cpanel->br_point_targets != br_select))
+    {
+        continue;
     }
 
     /*-- dfs -- this seems to assume that the values of planar begin at 0,
@@ -1398,10 +1401,7 @@ barchart_scaling_visual_cues_draw(splotd * rawsp, GdkDrawable * drawable,
     sp->bar->offset_rgn[2].y = y;
 
     button_draw_with_shadows(sp->bar->offset_rgn, drawable, gg);
-
-
   }
-
 }
 
 void
@@ -1525,7 +1525,7 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
   barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
   GtkStyle *style = gtk_widget_get_style(rawsp->da);
   gint i, nbins;
-  gchar string[100];
+  gchar *string;
   icoords mousepos = rawsp->mousepos;
   colorschemed *scheme = gg->activeColorScheme;
   PipelineMode mode = viewmode_get (gg);
@@ -1538,28 +1538,27 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
   nbins = sp->bar->nbins;
   gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
 
-
   if (sp->bar->low_pts_missing && sp->bar->bar_hit[0]) {
-    sprintf(string, "%ld point%s < %.2f", sp->bar->low_bin->count,
-            sp->bar->low_bin->count == 1 ? "" : "s",
-            sp->bar->breaks[0] + sp->bar->offset);
+    string = g_strdup_printf ("%ld point%s < %.2f", sp->bar->low_bin->count,
+      sp->bar->low_bin->count == 1 ? "" : "s",
+      sp->bar->breaks[0] + sp->bar->offset);
 
     gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
-                       sp->bar->low_bin->rect.x, sp->bar->low_bin->rect.y,
-                       sp->bar->low_bin->rect.width,
-                       sp->bar->low_bin->rect.height);
+      sp->bar->low_bin->rect.x, sp->bar->low_bin->rect.y,
+      sp->bar->low_bin->rect.width, sp->bar->low_bin->rect.height);
     gdk_draw_string(drawable,
 #if GTK_MAJOR_VERSION == 2
-                    gtk_style_get_font(style),
+      gtk_style_get_font(style),
 #else
-                    style->font,
+      style->font,
 #endif
-                    gg->plot_GC, mousepos.x, mousepos.y, string);
+      gg->plot_GC, mousepos.x, mousepos.y, string);
+    g_free(string);
   }
   for (i = 1; i < nbins + 1; i++) {
     if (sp->bar->bar_hit[i]) {
       if (sp->bar->is_histogram) {
-        sprintf(string, "%ld point%s in (%.2f,%.2f)",
+        string = g_strdup_printf ("%ld point%s in (%.2f,%.2f)",
                 sp->bar->bins[i - 1].count,
                 sp->bar->bins[i - 1].count == 1 ? "" : "s",
                 sp->bar->breaks[i - 1] + sp->bar->offset,
@@ -1567,20 +1566,19 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
       } else {
         gchar *levelName;
         vartabled *var;
-        var =
-            (vartabled *) g_slist_nth_data(rawsp->displayptr->d->vartable,
+        var = (vartabled *) g_slist_nth_data(rawsp->displayptr->d->vartable,
                                            rawsp->p1dvar);
 /* dfs */
         j = i-1;
         level = checkLevelValue (var, (gdouble) sp->bar->bins[j].value);
 
         if (level == -1) {
-          sprintf(string, "%ld point%s missing",
+          string = g_strdup_printf ("%ld point%s missing",
                 sp->bar->bins[j].count,
                 sp->bar->bins[j].count == 1 ? "" : "s");
         } else {
           levelName = var->level_names[level];
-          sprintf(string, "%ld point%s for level %s",
+          string = g_strdup_printf ("%ld point%s for level %s",
                 sp->bar->bins[j].count,
                 sp->bar->bins[j].count == 1 ? "" : "s", levelName);
         }
@@ -1593,40 +1591,36 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
 #endif
       }
       gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
-                         sp->bar->bins[i - 1].rect.x,
-                         sp->bar->bins[i - 1].rect.y,
-                         sp->bar->bins[i - 1].rect.width,
-                         sp->bar->bins[i - 1].rect.height);
+        sp->bar->bins[i - 1].rect.x, sp->bar->bins[i - 1].rect.y,
+        sp->bar->bins[i - 1].rect.width, sp->bar->bins[i - 1].rect.height);
       gdk_draw_string(drawable,
 #if GTK_MAJOR_VERSION == 2
-                      gtk_style_get_font(style),
+        gtk_style_get_font(style),
 #else
-                      style->font,
+        style->font,
 #endif
-                      gg->plot_GC, mousepos.x, mousepos.y, string);
+        gg->plot_GC, mousepos.x, mousepos.y, string);
+      g_free(string);
     }
   }
 
   if (sp->bar->high_pts_missing && sp->bar->bar_hit[nbins + 1]) {
-    sprintf(string, "%ld point%s > %.2f", sp->bar->high_bin->count,
+    string = g_strdup_printf ("%ld point%s > %.2f", sp->bar->high_bin->count,
             sp->bar->high_bin->count == 1 ? "" : "s",
             sp->bar->breaks[nbins] + sp->bar->offset);
 
     gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
-                       sp->bar->high_bin->rect.x,
-                       sp->bar->high_bin->rect.y,
-                       sp->bar->high_bin->rect.width,
-                       sp->bar->high_bin->rect.height);
+      sp->bar->high_bin->rect.x, sp->bar->high_bin->rect.y,
+      sp->bar->high_bin->rect.width, sp->bar->high_bin->rect.height);
     gdk_draw_string(drawable,
 #if GTK_MAJOR_VERSION == 2
-                    gtk_style_get_font(style),
+      gtk_style_get_font(style),
 #else
-                    style->font,
+      style->font,
 #endif
-                    gg->plot_GC, mousepos.x, mousepos.y, string);
-
+      gg->plot_GC, mousepos.x, mousepos.y, string);
+    g_free (string);
   }
-
 }
 
 splotd *gtk_barchart_splot_new(displayd * dpy, gint width, gint height,

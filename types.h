@@ -221,7 +221,7 @@ extern DisplayOptions DefaultDisplayOptions;
 /* bin struct for bins in Barcharts, histograms, ... */
 typedef struct
 {
-  glong count;
+  glong count, nhidden;  /* dfs: count includes nhidden */
   gint index;
   gint value;  /* dfs; restricting index to non-categorical variables */
   gcoords planar;
@@ -232,7 +232,6 @@ typedef struct
 /* structure for a barchart, in splotd only a pointer to this structure is made to save memory */
 typedef struct
 {
-
  gboolean is_histogram;  /* true if variable not categorical */
  gboolean is_spine;      /* false by default */
  gint nbins;

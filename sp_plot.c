@@ -162,13 +162,15 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         }
       }
 
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot.els[i];
-        if (d->hidden_now.els[m] && splot_plot_case (m, d, sp, display, gg)) {
-          draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
-            m, gg);
-          if (klass && klass->within_draw_to_unbinned)
-            klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+      if (!f) {
+        for (i=0; i<d->nrows_in_plot; i++) {
+          m = d->rows_in_plot.els[i];
+          if (d->hidden_now.els[m] && splot_plot_case (m, d, sp, display, gg)) {
+            draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
+              m, gg);
+            if (klass && klass->within_draw_to_unbinned)
+              klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+          }
         }
       }
 #endif

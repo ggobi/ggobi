@@ -666,7 +666,7 @@ void      subset_init (datad *d, ggobid *gg);
 
 
 void barchart_scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg);
-gboolean barchart_active_paint_points (splotd *sp, datad *d); 
+gboolean barchart_active_paint_points (splotd *sp, datad *, ggobid *); 
 void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg);
 void barchart_clean_init (barchartSPlotd *sp);
 void barchart_cpanel_init (cpaneld *, ggobid *);
