@@ -403,7 +403,8 @@ void
 ggobiInit(int *argc, char **argv[])
 {
   gtk_init (argc, argv);
-
+ 
+  GTK_TYPE_GGOBI;
   registerDisplayTypes((GtkTypeLoad *) typeLoaders,
 		       sizeof(typeLoaders)/sizeof(typeLoaders)[0]);
 }
@@ -760,3 +761,12 @@ process_initialization_files()
     /* sessionOptions->info = info; */
   }
 }
+
+
+/* This includes code that provides information about the 
+   sizes of the data structures in GGobi when it was compiled.
+*/
+
+#define GGOBI_MAIN 1
+#include "GGStructSizes.c"
+

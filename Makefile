@@ -353,6 +353,8 @@ else
 	 $(XSLT) share/XSL/CmdArgHelp.xsl Docs/commandArgs.xml > $@
 endif
 
+ggobi.o: GGStructSizes.c ggobi.c
+
 # Where is the output?
 apiDoc: Install/apiDocConfig
 	$(DOXYGEN) Install/apiDocConfig

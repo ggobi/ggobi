@@ -58,7 +58,8 @@ C_HEADER_FILES=\
   print \
   dbms dbms_ui \
   scatterplotClass \
-  scatmatClass parcoordsClass
+  scatmatClass parcoordsClass 
+
 
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)
@@ -95,7 +96,7 @@ endif
 	cp $(DATA_FILES) $(TMP_INSTALL_DIR)/data
 	cp notes/ggobirc $(TMP_INSTALL_DIR)/examples
 	cp $(C_SRC_FILES) CmdArgHelp.c $(TMP_INSTALL_DIR)/src
-	cp $(C_HEADER_FILES:%=%.h) $(TMP_INSTALL_DIR)/include
+	cp $(C_HEADER_FILES:%=%.h) GGStructSizes.c $(TMP_INSTALL_DIR)/include
 	cp $(LGPL_SRC) $(TMP_INSTALL_DIR)/gtkext/src
 	cp $(LGPL_HEADERS) $(TMP_INSTALL_DIR)/gtkext/include
 	cp Install/GNUmakefile_gtkext.in $(TMP_INSTALL_DIR)/gtkext/src/GNUmakefile.in
