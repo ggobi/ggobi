@@ -41,9 +41,21 @@ cpanel_tour2d_set (cpaneld *cpanel, ggobid* gg)
  * which may have different tour options and parameters selected
 */
 {
+  GtkWidget *w, *btn;
+  GtkObject *adj;
+  GtkWidget *pnl = gg->control_panel[TOUR2D];
+  displayd *dsp = gg->current_display;
+
   /*-- speed --*/
+  /*  adj = widget_find_by_name (pnl, "TOUR2D:speed_bar");
+  gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
+  -1 * (gfloat) cpanel->xyplot.cycle_delay);*/
   /*-- paused --*/
+  btn = widget_find_by_name (pnl, "TOUR2D:pause_button");
+  GTK_TOGGLE_BUTTON (btn)->active = cpanel->t2d_paused;
   /*-- manual manip --*/
+  w = widget_find_by_name (pnl, "TOUR2D:manip");
+  gtk_option_menu_set_history (GTK_OPTION_MENU (w), dsp->t2d_manip_mode);
   /*-- PC axes --*/
   /*-- backtracking --*/
   /*-- local scan --*/
@@ -168,6 +180,7 @@ cpanel_tour2d_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   manip_opt = gtk_option_menu_new ();
+  gtk_widget_set_name (manip_opt, "TOUR2D:manip");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), manip_opt,
     "Set the manual manipulation method", NULL);
   gtk_box_pack_end (GTK_BOX (vb), manip_opt, false, false, 0);
