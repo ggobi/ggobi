@@ -126,8 +126,10 @@ void
 brush_reset(ggobid *gg, gint action)
 {
   gint i, k;
-  datad *d = gg->current_display->d;
-  datad *e = gg->current_display->e;
+  displayd *display = gg->current_display;
+  datad *d = display->d;
+  datad *e = display->e;
+  cpaneld *cpanel = &display->cpanel;
   extern void cluster_table_labels_update (datad *d, ggobid *gg);
 
   switch (action) {
@@ -162,7 +164,13 @@ brush_reset(ggobid *gg, gint action)
 
     case RESET_INIT_BRUSH:  /*-- reset brush size --*/
       brush_pos_init (gg->current_splot);
-      splot_redraw (gg->current_splot, QUICK, gg);
+
+      if (cpanel->br_mode == BR_TRANSIENT) {
+        reinit_transient_brushing (display, gg);
+        displays_plot (REDISPLAY_ALL, FULL, gg);
+      } else {
+        splot_redraw (gg->current_splot, QUICK, gg);
+      }
       break;
 
     case RESET_POINT_COLORS:  /*-- reset point colors -- to what? --*/
