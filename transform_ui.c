@@ -68,7 +68,7 @@ static void stage2_cb (GtkWidget *w, gpointer cbd)
 }
 
 
-static void reset_tform_cb (GtkButton *button)
+static void tform_reset_cb (GtkButton *button)
 {
   g_printerr ("Remove all transformations\n");
 }
@@ -190,7 +190,7 @@ transform_window_open (ggobid *gg)
       "Set all transformation stages to 'no transformation' for the selected variables",
       NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (reset_tform_cb), NULL);
+                      GTK_SIGNAL_FUNC (tform_reset_cb), NULL);
 
     gtk_widget_show_all (window);
   }

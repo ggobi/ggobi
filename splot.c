@@ -265,7 +265,7 @@ splot_free (splotd *sp, displayd *display, ggobid *gg) {
 }
 
 void
-splot_dimension_set(splotd* sp, gint width, gint height)
+splot_dimension_set (splotd* sp, gint width, gint height)
 {
   sp->max.x = width;
   sp->max.y = height;

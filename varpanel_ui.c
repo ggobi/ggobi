@@ -341,39 +341,19 @@ variable_clone (gint jvar, ggobid *gg) {
   gint nc = gg->ncols + 1;
   gint i, j, k = 0;
 
-  pipeline_arrays_add_column (jvar, gg);  /* reallocate and copy */
-  missing_arrays_add_column (jvar, gg);
-
+  /*-- set a vew of the data values before building the new circle --*/
+  vartable_row_append (gg->ncols-1, gg);
   vardata_realloc (nc, gg);
-
   gg->vardata[nc-1].collab = g_strdup (gg->vardata[jvar].collab);
-  gg->vardata[nc-1].collab_tform = g_strdup (gg->vardata[jvar].collab_tform);
-
-  gg->vardata[nc-1].groupid = gg->vardata[nc-1].groupid_ori =
-    gg->vardata[gg->ncols].groupid + 1; 
-
-  gg->vardata[nc-1].mean = gg->vardata[jvar].mean;
-  gg->vardata[nc-1].median = gg->vardata[jvar].median;
-  gg->vardata[nc-1].lim_raw.min = gg->vardata[jvar].lim_raw.min;
-  gg->vardata[nc-1].lim_raw.max = gg->vardata[jvar].lim_raw.max;
-
-  gg->vardata[nc-1].tform1 = gg->vardata[jvar].tform1;
-  gg->vardata[nc-1].tform2 = gg->vardata[jvar].tform2;
-  gg->vardata[nc-1].domain_incr = gg->vardata[jvar].domain_incr;
-  gg->vardata[nc-1].param = gg->vardata[jvar].param;
-  gg->vardata[nc-1].domain_adj = gg->vardata[jvar].domain_adj;
-  gg->vardata[nc-1].inv_domain_adj = gg->vardata[jvar].inv_domain_adj;
-
-  gg->vardata[nc-1].jitter_factor = gg->vardata[jvar].jitter_factor;
-
+  gg->vardata[nc-1].collab_tform = g_strdup (gg->vardata[jvar].collab);
 
   /*
-   * Follow the algorithm by which the table
-   * has been populated
+   * Follow the algorithm by which the table has been populated
   */
   if (gg->varpanel_ui.vnrows*gg->varpanel_ui.vncols <= gg->ncols) {
     gg->varpanel_ui.vnrows++;
-    gtk_table_resize (GTK_TABLE (gg->varpanel_ui.varpanel), gg->varpanel_ui.vnrows, gg->varpanel_ui.vncols);
+    gtk_table_resize (GTK_TABLE (gg->varpanel_ui.varpanel),
+                      gg->varpanel_ui.vnrows, gg->varpanel_ui.vncols);
   }
 
   k = 0;
@@ -382,10 +362,10 @@ variable_clone (gint jvar, ggobid *gg) {
       if (k < gg->ncols)
         ;
       else {
-        gg->varpanel_ui.da = (GtkWidget **) g_realloc (gg->varpanel_ui.da,
-          (gg->ncols+1) * sizeof (GtkWidget *));
-        gg->varpanel_ui.varlabel = (GtkWidget **) g_realloc (gg->varpanel_ui.varlabel,
-          (gg->ncols+1) * sizeof (GtkWidget *));
+        gg->varpanel_ui.da = (GtkWidget **)
+          g_realloc (gg->varpanel_ui.da, nc * sizeof (GtkWidget *));
+        gg->varpanel_ui.varlabel = (GtkWidget **)
+          g_realloc (gg->varpanel_ui.varlabel, nc * sizeof (GtkWidget *));
         varcircle_add (i, j, k, gg);
       }
       k++;
@@ -393,10 +373,35 @@ variable_clone (gint jvar, ggobid *gg) {
     }
   }
 
-  gtk_widget_show_all (gg->varpanel_ui.varpanel);
-  gg->ncols++;
 
-  vartable_row_append (gg->ncols-1, gg);
+  /*-- now the rest of the variables --*/
+  gg->vardata[nc-1].groupid = gg->vardata[nc-1].groupid_ori =
+    gg->vardata[gg->ncols-1].groupid + 1; 
+
+  gg->vardata[nc-1].nmissing = gg->vardata[jvar].nmissing;
+
+  gg->vardata[nc-1].jitter_factor = gg->vardata[jvar].jitter_factor;
+
+  gg->vardata[nc-1].mean = gg->vardata[jvar].mean;
+  gg->vardata[nc-1].median = gg->vardata[jvar].median;
+  gg->vardata[nc-1].lim.min =
+    gg->vardata[nc-1].lim_raw.min = gg->vardata[nc-1].lim_raw_gp.min =
+    gg->vardata[nc-1].lim_tform.min = gg->vardata[nc-1].lim_tform_gp.min =
+    gg->vardata[jvar].lim_raw.min;
+  gg->vardata[nc-1].lim.max =
+    gg->vardata[nc-1].lim_raw.max = gg->vardata[nc-1].lim_raw_gp.max =
+    gg->vardata[nc-1].lim_tform.max = gg->vardata[nc-1].lim_tform_gp.max =
+    gg->vardata[jvar].lim_raw.max;
+
+  transform_values_init (nc-1, gg);
+
+  pipeline_arrays_add_column (jvar, gg);  /* reallocate and copy */
+  missing_arrays_add_column (jvar, gg);
+
+  gg->ncols++;
+  tform_to_world (gg); /*-- need this only for the new variable --*/
+
+  gtk_widget_show_all (gg->varpanel_ui.varpanel);
 }
 
 

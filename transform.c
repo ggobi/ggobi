@@ -136,21 +136,15 @@ qnorm (gdouble pr)
   else return (eta - term);
 }
 
-
-/*-- reset the transformation for all variables, not just selected ones --*/
 void
-reset_tform_all (ggobid *gg) 
+transform_values_init (gint j, ggobid *gg) 
 {
-  int j;
-
-  for (j=0; j<gg->ncols; j++) {
-    gg->vardata[j].tform1 = NO_TFORM1;
-    gg->vardata[j].tform2 = NO_TFORM2;
-    gg->vardata[j].domain_incr = 0.;
-    gg->vardata[j].param = 0.;
-    gg->vardata[j].domain_adj = no_change;
-    gg->vardata[j].inv_domain_adj = no_change;
-  }
+  gg->vardata[j].tform1 = NO_TFORM1;
+  gg->vardata[j].tform2 = NO_TFORM2;
+  gg->vardata[j].domain_incr = 0.;
+  gg->vardata[j].param = 0.;
+  gg->vardata[j].domain_adj = no_change;
+  gg->vardata[j].inv_domain_adj = no_change;
 }
 
 static void
@@ -649,7 +643,8 @@ void tform_label_update (gint jcol, ggobid *gg)
  * param is the box-cox exponent, only used in stage 1
 */
 void
-transform_variable (gint stage, gint tform_type, gfloat param, gint jcol, ggobid *gg)
+transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
+  ggobid *gg)
 {
   switch (stage) {
     case 0:

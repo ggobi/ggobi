@@ -67,14 +67,12 @@ pipeline_arrays_add_column (gint jvar, ggobid *gg)
   arrayl_add_cols (&gg->jitter, nc);
 
   for (i=0; i<nr; i++) {
-    gg->raw.data[i][nc-1] = gg->raw.data[i][jvar];
-
-    gg->tform1.data[i][nc-1] = gg->tform1.data[i][jvar];
-    gg->tform2.data[i][nc-1] = gg->tform2.data[i][jvar];
-
-    gg->world.data[i][nc-1] = gg->world.data[i][jvar];
-    gg->jitter.data[i][nc-1] = gg->jitter.data[i][jvar];
+    gg->raw.data[i][nc-1] = gg->tform1.data[i][nc-1] =
+      gg->tform2.data[i][nc-1] = gg->raw.data[i][jvar];  /*-- no tform --*/
+    gg->jitter.data[i][nc-1] = 0;  /*-- no jitter --*/
   }
+
+  /*-- world data is not populated --*/
 }
 
 
