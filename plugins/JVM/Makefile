@@ -64,8 +64,10 @@ local.config: configure local.config.in
 	if test -r local.config ; then cp local.config local.config.bak ; fi
 	./configure
 
+ifndef ADMIN
 configure: configure.in
 	autoconf
+endif
 
 
 ggobiAccess.o: ggobi_ggobi.h ggobi_datad.h

@@ -44,8 +44,11 @@ endif
 local.config:  configure
 	./configure
 
+ifndef ADMIN
 configure: configure.in
 	autoconf
+endif
+
 
 distclean: clean
 	-rm -f $(PKG).so local.config

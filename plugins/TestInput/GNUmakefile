@@ -28,10 +28,6 @@ TestInput.so: testInput.o
 local.config:  configure
 	./configure
 
-configure: configure.in
-	autoconf
-
-
 clean:
 	-rm testInput.o
 

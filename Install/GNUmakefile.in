@@ -56,13 +56,14 @@ Python: @EMBED_LIB@
 	   echo "The python module is not present. Download it and reconfigure."
 	fi
 
+GGOBI_HOME=$(shell pwd)
 
 ifneq (${PLUGIN_DIRS},)
 Plugins:  @EMBED_LIB@
 	if test -n "${PLUGIN_DIRS}" ; then \
 	  for f in $(PLUGIN_DIRS) ; do \
 	    echo "Building plugin $$f" ; \
-	      ./share/tools/plugin $$f ; \
+	    export GGOBI_HOME ; ./share/tools/plugin $$f ; \
 	  done \
 	fi 
 else

@@ -511,7 +511,14 @@ if test -n "${ENABLE_ALL_PLUGINS}" && test ${ENABLE_ALL_PLUGINS} -gt 0 ; then
  FILESELECTOR_PLUGIN=1
  GRAPHLAYOUT_PLUGIN=1
  GGVIS_PLUGIN=1
- PLUGIN_DIRS="ImageLib MySQL Postgres DataViewer FileSelect GraphLayout ggvis Perl R JVM Help"
+ PLUGIN_DIRS=""
+ TMP=`cd plugins ; ls *`
+ for i in ${TMP}; do
+   if test -d $i ; then
+     PLUGIN_DIRS="${PLUGIN_DIRS} $i"
+   fi
+ done
+# PLUGIN_DIRS="ImageLib MySQL Postgres DataViewer FileSelect GraphLayout ggvis Perl R JVM"
 fi
 
 if test -n "${PLUGIN_DIRS}" ; then
@@ -611,4 +618,12 @@ dnl might do the same thing.
  done 
 fi
 
+echo "*******************************"
+echo ""
+echo "GGobi"
+echo " Version:               $GGOBI_VERSION_STRING"
 echo "Installation directory: $INSTALL_DIR"
+echo "XML:                    version ${XML_VERSION}"
+echo "Plugins:                ${PLUGIN_DIRS}"
+echo ""
+echo "*******************************"

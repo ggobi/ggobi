@@ -12,9 +12,11 @@ endif
 
 ifdef ADMIN
  include Install/GNUmakefile.admin
+else
+include $(GGOBI_HOME)/plugins/GNUmakefile.plugin
 endif
 
-include $(GGOBI_HOME)/plugins/GNUmakefile.plugin
+
 
 ifdef GGOBI_CONFIG
  GGOBI_INCLUDE_DIR=$(shell $(GGOBI_CONFIG) --cflags)

@@ -1,17 +1,28 @@
 AUX_FILES=\
    Makefile GNUmakefile Makevars  README INSTALL
 
-createDist:: configure
+
+CONFIGURE_IN=$(wildcard configure.in)
+
+ifneq ($(CONFIGURE_IN),)
+CONFIGURE=configure
+
+configure: configure.in 
+	autoconf
+endif
+
+createDist:: $(CONFIGURE) $(DEPS)
 	if test -d $(INSTALL_DIR)/$(DIR_NAME) ; then rm -fr $(INSTALL_DIR)/$(DIR_NAME) ; fi
 	mkdir -p $(INSTALL_DIR)/$(DIR_NAME)
-	cp $(SRC:%=%.c) $(HEADER_FILES) configure configure.in local.config.in plugin.xml $(INSTALL_DIR)/$(DIR_NAME)
-	for i in $(AUX_FILES) $(AUX_FILES:%=%.in) ; do \
+	if test -n "${SRC}" ; then cp $(SRC:%=%.c) $(INSTALL_DIR)/$(DIR_NAME); fi
+	if test -n "$(HEADER_FILES)" ; then cp $(HEADER_FILES) $(INSTALL_DIR)/$(DIR_NAME); fi
+	if test ! -d $(INSTALL_DIR)/$(DIR_NAME)/Docs ; then mkdir $(INSTALL_DIR)/$(DIR_NAME)/Docs ; fi
+	if test -n "${DOCS}" ; then cp $(DOCS:%=Docs/%) $(INSTALL_DIR)/$(DIR_NAME)/Docs ; fi
+	for i in configure configure.in local.config.in plugin.xml $(AUX_FILES) $(AUX_FILES:%=%.in) ; do \
 	  if test -r $$i ; then cp $$i $(INSTALL_DIR)/$(DIR_NAME) ;  fi \
 	done
 
 
-configure: configure.in 
-	autoconf
 
 ifndef PDFLATEX
  PDFLATEX=pdflatex

@@ -45,5 +45,3 @@ clean:
 local.config: local.config.in configure
 	./configure
 
-configure: configure.in 
-	autoconf

@@ -540,10 +540,16 @@ getGGobiHomeFromRegistry()
 }
 #endif
 
+/*XXX Make certain there is a / at the end of the string. */
 static gchar *
 computeGGobiHome(char *str)
 {
   gchar *dir, *dirPtr, *tmp;
+
+  tmp = getenv("GGOBI_HOME");
+  if(tmp && tmp[0]) {
+    return(g_strdup(tmp));
+  }
 
 #ifdef WIN32
   tmp = getGGobiHomeFromRegistry(); 

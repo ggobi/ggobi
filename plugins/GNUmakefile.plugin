@@ -63,8 +63,10 @@ local.config: local.config.in configure
 	./configure
 endif
 
+ifndef ADMIN
 configure: configure.in
 	autoconf
+endif
 
 show:
 	@echo $(OBJS)

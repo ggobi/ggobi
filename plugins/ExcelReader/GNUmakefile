@@ -9,6 +9,12 @@ endif
 
 include $(GGOBI_HOME)/local.config
 
+ifdef ADMIN
+include Install/GNUmakefile.admin
+endif
+
+SRC=$(wildcard *.cpp)
+
 DEFINES=-DNO_PYCOM_IPROVIDECLASSINFO
 CXXFLAGS += -g $(DEFINES) -I$(GGOBI_HOME) $(INCLUDES:%=-I%) $(XML_INC_DIRS:%=-I%)
 

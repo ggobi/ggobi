@@ -47,8 +47,11 @@ tmp:
 	@echo "$(XML_LIBS)"
 	@echo "$(LIBS)"
 
+ifndef ADMIN
 configure: configure.in
 	autoconf
+endif
+
 
 distclean: clean
 	-rm -f $(PKG).so local.config
