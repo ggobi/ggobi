@@ -418,7 +418,7 @@ vartable_open (ggobid *gg)
 
       d->vartable_clist = gtk_clist_new_with_titles (NCOLS_CLIST, titles);
       gtk_clist_set_selection_mode (GTK_CLIST (d->vartable_clist),
-        GTK_SELECTION_MULTIPLE);
+        GTK_SELECTION_EXTENDED);
 
 /*-- trying to add tooltips to the headers; it doesn't seem to work --*/
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),

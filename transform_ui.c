@@ -35,7 +35,7 @@ static gchar *stage1_lbl[] = {"No transformation",
                               "Box-Cox",
                               "Log base 10",
                               "Inverse",
-                              "Scale to [0,1]",
+                              "Scale to [a,b]",
                               };
 static void
 stage1_cb (GtkWidget *w, gpointer cbd)
@@ -61,9 +61,8 @@ static gchar *stage2_lbl[] = {"No transformation",
                               "Sort",
                               "Rank",
                               "Normal score",
-                              "Z-score"
-                              "Discretize: 2 levels",
-                              "Scale to [0,1]",
+                              "Z-score",
+                              "Discretize: 2 levels"
                               };
 static void stage2_cb (GtkWidget *w, gpointer cbd)
 {

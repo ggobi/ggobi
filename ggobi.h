@@ -268,8 +268,8 @@ struct _ggobid {
  struct _Sphere {
    GtkWidget *window;
    GtkObject *npcs_adj;
-   GtkWidget *totvar_entry, *condnum_entry;
-   GtkWidget *reset_btn, *apply_btn, *close_btn;
+   GtkWidget *stdized_entry, *variance_entry, *condnum_entry;
+   GtkWidget *apply_btn, *restore_btn;
 
    GtkWidget *scree_da;
    GdkPixmap *scree_pixmap;

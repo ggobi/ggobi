@@ -29,7 +29,6 @@ varcircles_delete_nth (gint jvar, datad *d)
   if (w != NULL) {
     d->varpanel_ui.vb = g_slist_remove (d->varpanel_ui.vb, (gpointer) w);
     gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.table), w);
-g_printerr ("removed circle %d\n", jvar);
   }
 }
 

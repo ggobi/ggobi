@@ -152,10 +152,9 @@ class datad {
 
  /* sphering transformation */
  struct _Sphere_d {
-/* gint nvars;*/
-   vector_i vars; /*-- vars available for sphering --*/
-   gint npcs;         /*-- the first npcs vars of vars will be sphered --*/
-/* gint npcvars, */
+   vector_i vars;         /*-- vars available to be sphered --*/
+   vector_i vars_sphered; /*-- vars that have been sphered --*/
+   gint npcs;       /*-- the first npcs vars of vars will be sphered --*/
    vector_i pcvars; /*-- vars into which sphered data is written --*/
 
    vector_f eigenval;

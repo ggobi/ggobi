@@ -420,7 +420,7 @@ transform1_apply (gint jcol, datad *d, ggobid *gg)
       }
     break;
 
-    case SCALE01_1:    /* Map onto [0,1] */
+    case SCALE_AB:    /* Map onto [a,b] */
       /*-- Either use user-defined limits, or data min and max --*/
       if (d->vartable[jcol].lim_specified_p) {
         min = slim_tform.min;
@@ -623,29 +623,6 @@ transform2_apply (gint jcol, datad *d, ggobid *gg)
     }
     break;
 
-    case SCALE01_2:    /* Map onto [0,1] */
-    {
-      /* First find min and max; they get updated after transformations */
-      gfloat min, max, ref, diff;
-
-      min = max = d->tform.vals[0][jcol];
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        ref = d->tform.vals[m][jcol];
-        if (ref < min) min = ref;
-        if (ref > max) max = ref;
-      }
-
-      limits_adjust (&min, &max);
-      diff = max - min;
-
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
-        d->tform.vals[m][jcol] = (d->tform.vals[m][jcol] - min)/diff;
-      }
-    }
-    break;
-
     default:
       fprintf (stderr, "Unhandled switch-case in transform2_apply\n");
   }
@@ -687,8 +664,8 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
     case INVERSE:
       lbl1 = g_strdup_printf ("1/%s", lbl0);
       break;
-    case SCALE01_1:
-      lbl1 = g_strdup_printf ("%s [0,1]", lbl0);
+    case SCALE_AB:
+      lbl1 = g_strdup_printf ("%s [a,b]", lbl0);
       break;
   }
 
@@ -713,9 +690,6 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
       break;
     case DISCRETE2:
       d->vartable[j].collab_tform = g_strdup_printf ("%s:0,1", lbl1);
-      break;
-    case SCALE01_2:
-      d->vartable[j].collab_tform = g_strdup_printf ("%s [0,1]", lbl1);
       break;
   }
 

@@ -14,6 +14,7 @@ The labels are not being updated.
 When I go from 2 to 3 variables, I don't get a third variable
   in the table or the checkbox list.
 */
+extern void sphere_variance_set (gfloat x, datad *, ggobid*);
 
 
 /*-------------------------------------------------------------------------*/
@@ -125,7 +126,7 @@ void pca_diagnostics_set (datad *d, ggobid *gg) {
     ftmp2 += d->sphere.eigenval.vals[j];
 
   if (ftmp2 != 0)
-    sphere_totvar_set (ftmp1/ftmp2, d, gg);
+    sphere_variance_set (ftmp1/ftmp2, d, gg);
   if (lastpc != 0)
     sphere_condnum_set (firstpc/lastpc, gg);
 }
@@ -246,6 +247,11 @@ sphere_varcovar_set (datad *d, ggobid *gg)
     g_assert (var < d->ncols);
     g_assert (k < d->sphere.tform_mean.nels);
 
+/*
+ * This may not be necessary:  isn't this information
+ * stored in vartabled?  dfs ...  Yes, but Andreas thinks
+ * maybe it shouldn't be.
+*/
     tmpf = 0.;
     for (i=0; i<n; i++)
       tmpf += d->tform.vals[d->rows_in_plot[i]][var];
@@ -391,16 +397,6 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
 /*  executed when the sphere button is pressed and the scree plot opened   */
 /*-------------------------------------------------------------------------*/
 
-/*-- why is this?  until apply is clicked, they're not going to be
-     transformed, are they?
-void sphere_transform_set (datad *d, ggobid *gg) {
-  gint j;
-  for (j=0; j<d->sphere.vars.nels; j++)
-    transform2_values_set (SPHERE, d->sphere.vars[j], d, gg); 
-}
---*/
-
-
 gboolean
 pca_calc (datad *d, ggobid *gg) {
   gboolean svd_ok;
@@ -408,10 +404,6 @@ pca_calc (datad *d, ggobid *gg) {
   eigenvec_zero (d, gg);
   spherevars_set (d, gg);
 
-/*
- * I don't understand the reason for this, so I'm commenting it out -- dfs
-  sphere_transform_set (d, gg);
-*/
   sphere_varcovar_set (d, gg);
   
    /* If nspherevars > 1 use svd routine, otherwise just standardize */

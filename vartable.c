@@ -400,7 +400,9 @@ vartable_row_append (gint j, datad *d, ggobid *gg)
     gchar **row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
 
     vartable_row_assemble (j, row, d, gg);
+    gtk_clist_freeze (GTK_CLIST (d->vartable_clist));
     gtk_clist_append ((GtkCList *) d->vartable_clist, row);
+    gtk_clist_thaw (GTK_CLIST (d->vartable_clist));
 
     for (k=0; k<NCOLS_CLIST; k++)
       g_free ((gpointer) row[k]);

@@ -205,7 +205,7 @@ extern const gint ViewTypeIndeces[3];
 #define BOXCOX       1
 #define LOG10        2
 #define INVERSE      3
-#define SCALE01_1    4
+#define SCALE_AB     4
 
 #define N2TFORMS     8
 #define NO_TFORM2    0
@@ -215,7 +215,6 @@ extern const gint ViewTypeIndeces[3];
 #define NORMSCORE    4
 #define ZSCORE       5
 #define DISCRETE2    6
-#define SCALE01_2    7
 
 
 /*
