@@ -778,7 +778,7 @@ make_ui (ggobid *gg)
   /*-- status bar --*/
   entry = gtk_entry_new ();
   gtk_object_set_data (GTK_OBJECT(gg->main_window), "MAIN:STATUSBAR", entry);
-  gtk_box_pack_start (GTK_BOX (vbox), entry, true, true, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), entry, false, false, 0);
   /*--            --*/
 
   gtk_widget_show_all (hbox);
