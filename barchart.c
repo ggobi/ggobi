@@ -1152,7 +1152,7 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 
 
   if (sp->bar->low_pts_missing && sp->bar->bar_hit[0]) {
-    sprintf (string,"%ld point%s < %.2lf",sp->bar->low_bin->count,
+    sprintf (string,"%ld point%s < %.2f",sp->bar->low_bin->count,
                sp->bar->low_bin->count==1 ? "" : "s",
 	       sp->bar->breaks[0]+sp->bar->offset); 
 
@@ -1166,7 +1166,7 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   for (i=1; i<nbins+1; i++) {
     if (sp->bar->bar_hit[i]) {
 	if(sp->bar->is_histogram) {
-	    sprintf (string,"%ld point%s in (%.2lf,%.2lf)", sp->bar->bins[i-1].count,
+	    sprintf (string,"%ld point%s in (%.2f,%.2f)", sp->bar->bins[i-1].count,
 		     sp->bar->bins[i-1].count == 1 ? "" : "s",
 		     sp->bar->breaks[i-1]+sp->bar->offset, sp->bar->breaks[i]+sp->bar->offset);
 	} else {
@@ -1187,7 +1187,7 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   }
   
   if (sp->bar->high_pts_missing && sp->bar->bar_hit[nbins+1]) {
-    sprintf (string,"%ld point%s > %.2lf",sp->bar->high_bin->count,
+    sprintf (string,"%ld point%s > %.2f",sp->bar->high_bin->count,
              sp->bar->high_bin->count == 1 ? "" : "s",
 	     sp->bar->breaks[nbins]+sp->bar->offset);
 
