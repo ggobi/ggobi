@@ -20,6 +20,8 @@ subset_init (datad *d, ggobid *gg)
 {
   gfloat fnr = (gfloat) d->nrows;
 
+  d->subset.random_n = d->nrows;
+
   d->subset.bstart_adj = (GtkAdjustment *)
     gtk_adjustment_new (1.0, 1.0, (fnr-2.0), 1.0, 5.0, 0.0);
   d->subset.bsize_adj = (GtkAdjustment *)
@@ -119,29 +121,22 @@ subset_random (gint n, datad *d, ggobid *gg) {
 gboolean
 subset_block (gint bstart, gint bsize, datad *d, ggobid *gg)
 {
-  gint i, b_end;
-  gboolean doneit = false;
-  gint top = d->nrows;
-  top -= 1;
+  gint i, k;
+  gboolean subsetsize = 0;
 
-  b_end = bstart + bsize;
-  b_end = (b_end >= top) ? top : b_end;
-
-  if (b_end > 0 && b_end <= top &&
-      bstart >= 0 && bstart < top &&
-      bstart < b_end)
-  {
+  if (bstart >= 0 && bstart < d->nrows && bsize > 0) {
     subset_clear (d, gg);
 
-    for (i=bstart; i<b_end; i++) {
+    for (i=bstart, k=1; i<d->nrows && k<=bsize; i++, k++) {
       add_to_subset (i, d, gg);
+      subsetsize++;
     }
-
-    doneit = true;
   }
-  else quick_message ("The limits aren't correctly specified.", false);
+
+  if (subsetsize == 0)
+    quick_message ("The limits aren't correctly specified.", false);
  
-  return doneit;
+  return (subsetsize > 0);
 }
 
 gboolean
