@@ -30,6 +30,11 @@ char *Info[] = {
     DATE                  /* Build Date */
 };
 
+void neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst)
+{
+  glayoutd *gl = glayoutFromInst (inst);
+  gl->neato_dim = (gint) (adj->value);
+}
 
 void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 {
@@ -41,13 +46,13 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   Agnode_t *node, *head, *tail;
   gchar *name;
   gint kind = AGRAPH;
-  gint i;
+  gint i, k;
   gint a, b;
 #ifdef DEBUG
   FILE* f;
 #endif
   Agraph_t *graph;
-  gdouble *x, *y;
+  gdouble **pos;
   gint layout_type = DOT_LAYOUT;
 /*-- to add the new datad --*/
   gint m, nvisible, nc;
@@ -58,6 +63,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   glong *visible, *rowids;
   displayd *dspnew;
   gboolean edges_displayed;
+  gint dim;
 
   if (e == NULL) {
     g_printerr ("Trouble:  no edge set is specified\n");
@@ -105,8 +111,13 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       agedge(graph, tail, head);
   }
 
-  x = g_malloc0 (nvisible * sizeof (gdouble));
-  y = g_malloc0 (nvisible * sizeof (gdouble));
+  pos = (gdouble **) g_malloc0 (nvisible * sizeof (gdouble *));
+  if (layout_type == DOT_LAYOUT)
+    dim = 2;
+  else dim = gl->neato_dim;
+  for (i=0; i<nvisible; i++)
+    pos[i] = (gdouble *) g_malloc0 (dim * sizeof (gdouble));
+
   if (layout_type == DOT_LAYOUT) {
     graph_init(graph);
     graph->u.drawing->engine = DOT;
@@ -120,8 +131,8 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       m = visible[i];
       name = (gchar *) g_array_index (d->rowlab, gchar *, m);
       node = agfindnode (graph, name);
-      x[i] = (gdouble) node->u.coord.x;
-      y[i] = (gdouble) node->u.coord.y;
+      pos[i][0] = (gdouble) node->u.coord.x;
+      pos[i][1] = (gdouble) node->u.coord.y;
     }
     dot_cleanup (graph);
 
@@ -139,8 +150,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
     graph_init(graph);
 
-/* -- here's where I can have some fun -- */
-	graph->u.ndim = 2;
+	graph->u.ndim = gl->neato_dim;
 	Ndim = graph->u.ndim = MIN(graph->u.ndim,MAXDIM);
 
     graph->u.drawing->engine = NEATO;
@@ -165,11 +175,8 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       m = visible[i];
       name = (gchar *) g_array_index (d->rowlab, gchar *, m);
       node = agfindnode (graph, name);
-      x[i] = (gdouble) node->u.pos[0];
-      y[i] = (gdouble) node->u.pos[1];
-#ifdef DEBUG
-      g_printerr ("%f %f\n", x[i], y[i]);
-#endif
+      for (k=0; k<gl->neato_dim; k++)
+        pos[i][k] = (gdouble) node->u.pos[k];
     }
 #ifdef DEBUG
     f = fopen ("test.out", "w");
@@ -196,7 +203,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
  * of arrays, then copying to a matrix is probably unnecessary.
 */
 
-  nc = 2;
+  nc = dim;
 
   rowids = (glong *) g_malloc (nvisible * sizeof(glong));
   for (m=0; m<nvisible; m++) {
@@ -208,15 +215,15 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   rownames = (gchar **) g_malloc (nvisible * sizeof(gchar *));
   for (m=0; m<nvisible; m++) {
     i = visible[m];
-    values[m + 0*nvisible] = (gdouble) x[i];
-    values[m + 1*nvisible] = (gdouble) y[i];
+    for (k=0; k<dim; k++)
+      values[m + k*nvisible] = (gdouble) pos[i][k];
 
     rownames[m] = (gchar *) g_array_index (d->rowlab, gchar *, i);
   }
 
   colnames = (gchar **) g_malloc (nc * sizeof(gchar *));
-  colnames[0] = "x";
-  colnames[1] = "y";
+  for (k=0; k<dim; k++)
+    colnames[k] = g_strdup_printf ("Pos%d\n", k);
 
   /*
    * In case there is no initial scatterplot because the datasets
@@ -228,7 +235,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
   dnew = datad_create (nvisible, nc, gg);
   dnew->name = (layout_type == DOT_LAYOUT) ?
-    g_strdup ("dot") : g_strdup ("neato");
+    g_strdup ("dot") : g_strdup_printf ("neato %dd", gl->neato_dim);
 
   GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
     gg, rowids, desc);
@@ -274,8 +281,9 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     g_free (name);
 */
 
-  g_free (x);
-  g_free (y);
+  for (i=0; i<nvisible; i++)
+    g_free (pos[i]);
+  g_free (pos);
   agclose (graph);
 }
 

@@ -14,6 +14,7 @@ void       close_glayout_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_glayout_window(ggobid *gg, PluginInstance *inst);
 void       show_glayout_window (GtkWidget *widget, PluginInstance *inst);
 
+void       neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst);
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
@@ -159,7 +160,7 @@ GtkWidget *
 create_glayout_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
-  GtkWidget *hb, *entry;
+  GtkWidget *hb, *entry, *hscale;
   GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
   gchar *clist_titles[2] = {"node sets", "edge sets"};
@@ -168,6 +169,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   gchar *row[1];
   GSList *l;
   glayoutd *gl = glayoutFromInst (inst);
+  GtkObject *adj;
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/
@@ -320,6 +322,11 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 #endif
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
+
+  hbox = gtk_hbox_new (true, 10);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox), 2);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, true, true, 3);
+
   btn = gtk_button_new_with_label ("neato");
   gtk_widget_set_name (btn, "neato");
 #ifdef GRAPHVIZ
@@ -328,7 +335,25 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 #else
   gtk_widget_set_sensitive (btn, false);
 #endif
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 3);
+
+
+  /*-- neato scale --*/
+  adj = gtk_adjustment_new ((gfloat)gl->neato_dim, 2.0, 11.0, 1.0, 1.0, 1.0);
+  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
+    GTK_SIGNAL_FUNC (neato_dim_cb), inst);
+  hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
+
+  gtk_range_set_update_policy (GTK_RANGE (hscale), GTK_UPDATE_CONTINUOUS);
+  gtk_scale_set_digits (GTK_SCALE(hscale), 0);
+  gtk_scale_set_value_pos (GTK_SCALE(hscale), GTK_POS_BOTTOM);
+  gtk_scale_set_draw_value (GTK_SCALE(hscale), TRUE);
+
+  gtk_scale_set_digits (GTK_SCALE(hscale), 0);
+  gtk_box_pack_start (GTK_BOX (hbox), hscale, false, false, 3);
+  /*-- --*/
+
 
   label = gtk_label_new ("Graphviz");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),

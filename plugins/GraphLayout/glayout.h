@@ -41,13 +41,13 @@ typedef struct {
   datad *dsrc, *e;
   GtkWidget *window;
 
-  array_d dist_orig;
   array_d dist;
-  array_d pos_orig;
   array_d pos;
 
   gint centerNodeIndex;
   radiald *radial;  /*-- data required for radial layout --*/
+
+  gint neato_dim;
 
 } glayoutd;
 

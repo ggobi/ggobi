@@ -10,9 +10,7 @@
 void
 glayout_init (glayoutd *gl) {
 
-  arrayd_init_null (&gl->dist_orig);
   arrayd_init_null (&gl->dist);
-  arrayd_init_null (&gl->pos_orig);
   arrayd_init_null (&gl->pos);
 
   gl->e = NULL;
@@ -20,4 +18,6 @@ glayout_init (glayoutd *gl) {
 
   gl->centerNodeIndex = -1;
   gl->radial = NULL;
+
+  gl->neato_dim = 2;
 }
