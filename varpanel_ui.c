@@ -537,13 +537,18 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
   GList *l;
   splotd *s;
   splotd *sp = gg->current_splot;
-  displayd *display = (displayd *) sp->displayptr;
-  cpaneld *cpanel = &display->cpanel;
+  displayd *display;
+  cpaneld *cpanel;
 
-  if (gg->current_splot == NULL || jvar < 0 || jvar >= d->ncols)
+  if (sp == NULL || jvar < 0 || jvar >= d->ncols)
     return;  /*-- return --*/
-  if (display->d != d)
+
+  display = (displayd *) sp->displayptr;
+
+  if (display == NULL || display->d != d)
     return;  /*-- return --*/
+
+  cpanel = &display->cpanel;
 
   if (gg->selvarfg_GC == NULL) 
     init_var_GCs (d->varpanel_ui.da[jvar], gg);
@@ -892,9 +897,12 @@ void
 vartable_refresh (datad *d, ggobid *gg) {
   gint j;
 
-  for (j=0; j<d->ncols; j++)
-    if (GTK_WIDGET_REALIZED (d->varpanel_ui.da[j]))
-      gtk_widget_queue_draw (d->varpanel_ui.da[j]);
+  for (j=0; j<d->ncols; j++) {
+    if (GTK_WIDGET_REALIZED (d->varpanel_ui.da[j])) {
+      varcircle_draw (j, d, gg);
+    }
+  }
+/*      gtk_widget_queue_draw (d->varpanel_ui.da[j]);*/
 }
 
 void
@@ -904,7 +912,7 @@ varlabel_set (gint j, datad *d, ggobid *gg) {
 }
 
 /*-------------------------------------------------------------------------*/
-/*                          API                                            */
+/*                          API; not used                                  */
 /*-------------------------------------------------------------------------*/
 
 void
