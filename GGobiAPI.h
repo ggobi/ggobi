@@ -216,7 +216,7 @@ void GGOBI(setBrushLocation)(gint x, gint y, datad *, ggobid *gg);
 
 extern splotd *GGOBI(getSPlot)(gint which, displayd *display);
 
-extern const gchar * const* GGOBI(getModeNames)(int *);
+extern const gchar * const* GGOBI(getOpModeNames)(int *);
 extern gint GGOBI(getModeId)(const gchar *name);
 extern gint GGOBI(setMode)(const gchar *name, ggobid *gg);
 extern const gchar *GGOBI(getModeName)(gint which);

@@ -49,7 +49,7 @@ void modes_init (datad *d, ggobid* gg) {
 }
 
 gboolean
-fileset_read_init (gchar *ldata_in, DataMode data_mode, ggobid *gg)
+fileset_read_init (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
 {
   gboolean ans = fileset_read (ldata_in, data_mode, gg);
   if (ans) {
@@ -68,7 +68,7 @@ fileset_read_init (gchar *ldata_in, DataMode data_mode, ggobid *gg)
 
 
 gboolean
-fileset_read (gchar *ldata_in, DataMode data_mode, ggobid *gg)
+fileset_read (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
 {
   InputDescription *desc;
   gboolean ok = true;

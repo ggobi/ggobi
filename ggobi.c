@@ -35,7 +35,7 @@ gint totalNumGGobis;
 const gchar * const ViewTypes[] =
   {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
 const gint ViewTypeIndices[] = {scatterplot, scatmat, parcoords};           
-const gchar *const ModeNames[] =
+const gchar *const DataModeNames[] =
   {"ASCII", "binary", "R/S data", "XML", "MySQL", "Unknown"};
 
 
@@ -168,7 +168,7 @@ ggobi_remove_by_index (ggobid *gg, gint which)
       This isn't a problem in stand-alone as it never gets called.
    */
   numDatasets = g_slist_length (gg->d);
-  for (i=0,l = gg->d; l != NULL && i < numDatasets; i++, l = l->next) {
+  for (i=0,l = gg->d; l != NULL && i < numDatasets; i++, l = gg->d) {
     d = (datad *) l->data;
     datad_free (d, gg);
     gg->d = g_slist_remove (gg->d, d);
@@ -246,7 +246,7 @@ gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 
   make_ggobi (Options, processEvents, gg);
 
-  g_free (Options->data_in);
+  /* g_free (Options->data_in); */
 
   return (num_ggobis);
 }
@@ -338,7 +338,10 @@ ggobid *
 ggobi_get (gint which)
 {
  extern ggobid** all_ggobis;
- return (all_ggobis[which]);
+ if(which > -1 && which < num_ggobis)
+   return (all_ggobis[which]);
+ else
+   return(NULL);
 }
 
 gint

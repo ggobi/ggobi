@@ -12,8 +12,6 @@
 
 #define FILE_SEPARATOR '/'
 
-extern char **ModeNames;
-
 static char *XMLSuffixes[] = {"xml", "xml.gz","xmlz"};
 char *ASCIISuffixes[]  = {"dat"};
 char *BinarySuffixes[] = {"bin"};
@@ -42,7 +40,7 @@ GSList *FileTypeGroups = NULL;
 
 
 InputDescription*
-fileset_generate(char *fileName, DataMode guess)
+fileset_generate(const char *fileName, DataMode guess)
 {
  InputDescription *desc = (InputDescription *) calloc(1, sizeof(InputDescription));
  struct stat buf;

@@ -46,7 +46,7 @@ ExtensionList *getInputDescriptionGroup(DataMode mode);
 gboolean check_file_exists(const char *fileName);
 
 gboolean endsWith(const char *str, const char *what);
-InputDescription* fileset_generate(char *fileName, DataMode guess);
+InputDescription* fileset_generate(const char *fileName, DataMode guess);
 
 
 gchar * findAssociatedFile(InputDescription *desc, const gchar * const *suffixes, int numSuffixes, gint *which, gboolean isError);

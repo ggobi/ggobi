@@ -19,7 +19,7 @@
 #include "display_tree.h"
 
 
-const char *const GGOBI(ModeNames)[] = {
+const char *const GGOBI(OpModeNames)[] = {
   "1D Plot",
   "XYPlot",
   "Rotation",
@@ -36,7 +36,7 @@ const char *const GGOBI(ModeNames)[] = {
   "Parcoords",
 };
 
-const char *const *mode_name = GGOBI(ModeNames);
+static const char *const *mode_name = GGOBI(OpModeNames);
 
 /* w is the toplevel window */
 static gint
@@ -773,9 +773,9 @@ make_ui (ggobid *gg) {
 
 
 const gchar * const* 
-GGOBI(getModeNames)(int *n)
+GGOBI(getOpModeNames)(int *n)
 {
   /*  extern const gchar *const* GGOBI(ModeNames); */
-  *n = sizeof(GGOBI(ModeNames))/sizeof(GGOBI(ModeNames)[0]);
-  return (GGOBI(ModeNames));
+  *n = sizeof(GGOBI(OpModeNames))/sizeof(GGOBI(OpModeNames)[0]);
+  return (GGOBI(OpModeNames));
 }

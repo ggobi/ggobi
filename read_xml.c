@@ -879,7 +879,7 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
   gchar* name = NULL;
   FILE *f;
   int dirlen = 0;
-  char **suffixes = XMLSuffixes;
+  const char **suffixes = XMLSuffixes;
   int nsuffixes = sizeof(suffixes)/sizeof(suffixes[0]);
 
   if(dir)

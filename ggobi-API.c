@@ -77,8 +77,8 @@ GGOBI(setDataMode) (DataMode newMode, ggobid *gg)
 const gchar * const 
 GGOBI(getDataModeDescription)(DataMode mode)
 {
- extern const gchar * const ModeNames[];
- return(ModeNames[mode]);
+ extern const gchar * const DataModeNames[];
+ return(DataModeNames[mode]);
 }
 
 gchar **
@@ -967,7 +967,7 @@ gint
 GGOBI(getModeId)(const gchar *name)
 {
   gint n, i;
-  const gchar *const *names = GGOBI(getModeNames)(&n);
+  const gchar *const *names = GGOBI(getOpModeNames)(&n);
  
   for(i = 0; i < n; i++) {
     if(strcmp(names[i],name) == 0)
@@ -981,7 +981,7 @@ const gchar *
 GGOBI(getModeName)(int which)
 { 
   int n;
-  const gchar *const *names = GGOBI(getModeNames)(&n);
+  const gchar *const *names = GGOBI(getOpModeNames)(&n);
   return(names[which]);
 }
 
