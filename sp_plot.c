@@ -704,7 +704,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
     if (GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp)) {
       displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dsp)->klass);
-      draw_edge = displayKlass->show_edges_p;
+      draw_edge = displayKlass->supports_edges_p && displayKlass->show_edges_p;
     } else {
       draw_edge = dsp->options.edges_undirected_show_p ||
         dsp->options.edges_arrowheads_show_p ||

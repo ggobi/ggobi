@@ -515,6 +515,8 @@ static void extendedDisplayClassInit(GtkGGobiExtendedDisplayClass * klass)
 
   /* DFS noticed that if this is false, no display is drawn. */
   klass->loop_over_points = true;
+
+  klass->supports_edges_p = false;
 }
 
 

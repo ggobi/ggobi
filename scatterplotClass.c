@@ -792,7 +792,7 @@ gtk_scatterplot_new(datad *d, ggobid *gg)
 void
 scatterplotDisplayInit(scatterplotDisplayd *display)
 {
- GTK_GGOBI_DISPLAY(display)->p1d_orientation = HORIZONTAL;
+  GTK_GGOBI_DISPLAY(display)->p1d_orientation = HORIZONTAL;
 }
 
 
@@ -1387,6 +1387,7 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
 {
   klass->parent_class.createWithVars = scatterplot_new_with_vars;
   klass->parent_class.create = scatterplot_new;
+  klass->parent_class.supports_edges_p = true;
   klass->parent_class.show_edges_p = true;
   klass->parent_class.binningPermitted = binningPermitted;
 

@@ -227,6 +227,7 @@ typedef struct
 {
     GtkGGobiWindowDisplayClass parent_class;
 
+    gboolean supports_edges_p;  /* only true for scatterplots? */
     gboolean show_edges_p; /* used in splot_draw_to_pixmap0_unbinned by scatmat and scatterplot (only) */
 
     gboolean binning_ok; /* see binning_permitted in brush.c */
@@ -237,6 +238,7 @@ typedef struct
 
 
     gboolean loop_over_points; 	/* See splot_draw_to_pixmap0_unbinned. */
+
 
     gchar * treeLabel;
     gchar * const (*tree_label)(displayd *dpy);
