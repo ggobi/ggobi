@@ -9,7 +9,7 @@
 #include "ggvis.h"
 
 gint
-stressplot_configure_cb (GtkWidget *w, GdkEventExpose *event,
+ggv_stressplot_configure_cb (GtkWidget *w, GdkEventExpose *event,
   PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
@@ -35,7 +35,8 @@ stressplot_configure_cb (GtkWidget *w, GdkEventExpose *event,
 }
 
 gint
-stressplot_expose_cb (GtkWidget *w, GdkEventExpose *event, PluginInstance *inst)
+ggv_stressplot_expose_cb (GtkWidget *w, GdkEventExpose *event,
+  PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   colorschemed *scheme = gg->activeColorScheme;

@@ -9,7 +9,7 @@
 #include "ggvis.h"
 
 gint
-histogram_configure_cb (GtkWidget *w, GdkEventExpose *event,
+ggv_histogram_configure_cb (GtkWidget *w, GdkEventExpose *event,
   PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
@@ -35,7 +35,8 @@ histogram_configure_cb (GtkWidget *w, GdkEventExpose *event,
 }
 
 gint
-histogram_expose_cb (GtkWidget *w, GdkEventExpose *event, PluginInstance *inst)
+ggv_histogram_expose_cb (GtkWidget *w, GdkEventExpose *event,
+  PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   colorschemed *scheme = gg->activeColorScheme;
