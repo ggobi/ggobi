@@ -21,6 +21,10 @@
 #define HISTOGRAM_GRIP_WIDTH  20  /* should be even number */
 #define HISTOGRAM_BWIDTH       5
 
+/* used in mds.c, shepard.c, ggv_cbacks.c */
+#define IJ i*ggv->Dtarget.ncols+j 
+#define JI j*ggv->Dtarget.nrows+i
+
 typedef int (*CompareFunc)(const void *, const void *);
 
 typedef enum {within, between, anchorscales, anchorfixed} MDSGroupInd;
@@ -109,6 +113,9 @@ typedef struct {
   MDSGroupInd group_ind;
   vector_b anchor_group;
 
+  /*-- for Shepard plot --*/
+  gint shepard_iter;
+
 } ggvisd;
 
 
@@ -165,6 +172,7 @@ void mds_func (gboolean, PluginInstance *);
 void mds_once (gboolean doit, ggvisd *ggv, ggobid *gg);
 
 void clusters_changed_cb (ggobid *, datad *, void *);
+void create_shepard_data_cb (PluginInstance *inst, guint action, GtkWidget *w);
 
 #define GGVIS_H
 #endif

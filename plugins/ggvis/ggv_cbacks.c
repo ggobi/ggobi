@@ -264,12 +264,12 @@ void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst)
 static void
 trans_dist_init_defaults (ggvisd *ggv)
 {
-  gint i, j, IJ;;
+  gint i, j;
 
   vectord_realloc (&ggv->trans_dist, ggv->ndistances);
   for (i=0; i<ggv->Dtarget.nrows; i++) {
     for (j=0; j<ggv->Dtarget.nrows; j++) {
-      IJ = i*ggv->Dtarget.ncols+j;
+      /*IJ = i*ggv->Dtarget.ncols+j;*/
       if (ggv->KruskalShepard_classic == KruskalShepard) {
         ggv->trans_dist.els[IJ]  = ggv->Dtarget.vals[i][j];
       } else { /* CLASSIC */

@@ -34,9 +34,6 @@ extern void Myqsort(void* bot, int nmemb, int size, CompareFunc compar);
   d->glyph_now.els[(i)].size == d->glyph_now.els[(j)].size )
 #define SIGNUM(x) (((x) < 0.0) ? (-1.0) : (((x) > 0.0) ? (1.0) : (0.0)))
 
-#define IJ i*ggv->Dtarget.ncols+j 
-#define JI j*ggv->Dtarget.nrows+i
-
 #define IS_DRAGGED(i) (ggv->point_status.els[(i)] == DRAGGED)
 #define IS_INCLUDED(i) (ggv->point_status.els[(i)] == INCLUDED)
 #define IS_EXCLUDED(i) (ggv->point_status.els[(i)] == EXCLUDED)

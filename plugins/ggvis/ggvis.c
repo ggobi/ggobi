@@ -44,7 +44,7 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/_View",         NULL,     NULL,             0, "<Branch>" },
   { "/View/Shepard Plot",
        NULL,    
-       (GtkItemFactoryCallback) NULL,  
+       (GtkItemFactoryCallback) create_shepard_data_cb,  
        0 },
   { "/_Help",         NULL,     NULL,             0, "<LastBranch>" },
   { "/Help/MDS Background",

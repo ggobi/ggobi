@@ -84,5 +84,7 @@ ggvis_init (ggvisd *ggv)
   ggv->Dtarget_min = DBL_MIN;
   ggv->prev_nonmetric_active_dist = 0;
   /* */
+
+  ggv->shepard_iter = 0;
 }
 
