@@ -215,7 +215,7 @@ FILE *open_file_r (gchar *f, gchar *suffix)
   return fp;
 }
 
-FILE *open_xgobi_file_r (gchar *fname, gint nsuffixes, gchar **suffixes,
+FILE *open_ggobi_file_r (gchar *fname, gint nsuffixes, gchar **suffixes,
   gboolean optional)
 {
   FILE *fp = NULL;
@@ -350,7 +350,7 @@ print_attachments () {
   GtkTableChild *child;
 
   g_printerr ("attachments:\n");
-  for (l=(GTK_TABLE (xg.current_display->table))->children; l; l=l->next) {
+  for (l=(GTK_TABLE (gg.current_display->table))->children; l; l=l->next) {
     child = (GtkTableChild *) l->data;
     g_printerr (" %d %d, %d %d\n",
       child->left_attach, child->right_attach,
@@ -364,10 +364,10 @@ get_vgroup_cols (gint k, gint *cols) {
  * Return all columns in the same vgroup as k
 */
   gint j, ncols = 0;
-  gint groupno = xg.vardata[k].groupid;
+  gint groupno = gg.vardata[k].groupid;
 
-  for (j=0; j<xg.ncols; j++)
-    if (xg.vardata[j].groupid == groupno)
+  for (j=0; j<gg.ncols; j++)
+    if (gg.vardata[j].groupid == groupno)
        cols[ncols++] = j;
 
   return ncols;
@@ -384,17 +384,17 @@ selected_cols_get (gint *cols, gboolean add_vgroups)
   gint groupno;
   gboolean included;
 
-  for (j=0; j<xg.ncols; j++)
-    if (xg.vardata[j].selected)
+  for (j=0; j<gg.ncols; j++)
+    if (gg.vardata[j].selected)
       cols[ncols++] = j;
 
   if (add_vgroups) {
     /*-- now add their fellow vgroup members --*/
-    for (j=0; j<xg.ncols; j++) {
-      groupno = xg.vardata[j].groupid;
+    for (j=0; j<gg.ncols; j++) {
+      groupno = gg.vardata[j].groupid;
       /*-- look for j's fellow group members --*/
-      for (k=0; k<xg.ncols; k++) {
-        if (k != j && xg.vardata[k].groupid == groupno) {
+      for (k=0; k<gg.ncols; k++) {
+        if (k != j && gg.vardata[k].groupid == groupno) {
           /*-- if k is not already in cols, add it */
           included = false;
           for (n=0; n<ncols; n++) {
@@ -421,10 +421,10 @@ plotted_cols_get (gint *cols, gboolean add_vgroups)
 {
   gint mode = mode_get ();
   gint j, ncols;
-  splotd *sp = xg.current_splot;
+  splotd *sp = gg.current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
-  for (j=0; j<xg.ncols; j++) {
+  for (j=0; j<gg.ncols; j++) {
     /*-- if j is plotted in the current splot ... --*/
     switch (display->displaytype) {
       case scatterplot:
@@ -461,8 +461,8 @@ address_check ()
 {
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %d nseg %d rowlab %s jitfac %f\n",
-    xg.data_mode, (gint) xg.world.data[0][0], xg.nsegments,
-    xg.rowlab[0], xg.jitter_factor);
+    gg.data_mode, (gint) gg.world.data[0][0], gg.nsegments,
+    gg.rowlab[0], gg.jitter_factor);
 
   return 1;
 }

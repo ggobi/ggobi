@@ -38,8 +38,8 @@ size_allocate_cb (GtkWidget *w, GdkEvent *event)
   if (!initd ) {  /*-- only do this once --*/
 
     /*-- Use the largest control panel, which is currently COTOUR --*/
-    GtkWidget *largest_panel = xg.control_panel[COTOUR];
-    GtkWidget *mode_panel = xg.control_panel[mode];
+    GtkWidget *largest_panel = gg.control_panel[COTOUR];
+    GtkWidget *mode_panel = gg.control_panel[mode];
 
     /* remove the xyplot panel */
     gtk_widget_ref (mode_panel);
@@ -94,8 +94,8 @@ main_display_options_cb (gpointer data, guint action, GtkCheckMenuItem *w) {
   switch (action) {
 
     case 0:
-      if (w->active) gtk_tooltips_enable (xg.tips);
-      else gtk_tooltips_disable (xg.tips);
+      if (w->active) gtk_tooltips_enable (gg.tips);
+      else gtk_tooltips_disable (gg.tips);
       break;
 
     case 1:
@@ -106,8 +106,8 @@ main_display_options_cb (gpointer data, guint action, GtkCheckMenuItem *w) {
       break;
 
     case 2:
-      if (xg.current_display != NULL) {
-        displayd *display = xg.current_display;
+      if (gg.current_display != NULL) {
+        displayd *display = gg.current_display;
 
         if (display->displaytype == scatterplot) {
           if (display->hrule != NULL &&
@@ -210,10 +210,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
       case ROTATE:
         rotation_menus_make ();
 
-        io_item = submenu_make ("_I/O", 'I', xg.app.main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), xg.app.rotation_io_menu); 
+        io_item = submenu_make ("_I/O", 'I', gg.app.main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), gg.app.rotation_io_menu); 
         if (firsttime_io) {
-          submenu_insert (io_item, xg.app.menubar, -1);
+          submenu_insert (io_item, gg.app.menubar, -1);
           firsttime_io = false;
         }
         break;
@@ -221,10 +221,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
       case TOUR2D:
         tour2d_menus_make ();
 
-        io_item = submenu_make ("_I/O", 'I', xg.app.main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), xg.app.tour2d_io_menu); 
+        io_item = submenu_make ("_I/O", 'I', gg.app.main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), gg.app.tour2d_io_menu); 
         if (firsttime_io) {
-          submenu_insert (io_item, xg.app.menubar, -1);
+          submenu_insert (io_item, gg.app.menubar, -1);
           firsttime_io = false;
         }
         break;
@@ -232,11 +232,11 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
       case SCALE :
         scale_menus_make ();
 
-        reset_item = submenu_make ("_Reset", 'R', xg.app.main_accel_group);
+        reset_item = submenu_make ("_Reset", 'R', gg.app.main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (reset_item),
-                                   xg.app.scale_reset_menu); 
+                                   gg.app.scale_reset_menu); 
         if (firsttime_reset) {
-          submenu_insert (reset_item, xg.app.menubar, -1);
+          submenu_insert (reset_item, gg.app.menubar, -1);
           firsttime_reset = false;
         }
         break;
@@ -244,19 +244,19 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
       case BRUSH :
         brush_menus_make ();
 
-        reset_item = submenu_make ("_Reset", 'R', xg.app.main_accel_group);
+        reset_item = submenu_make ("_Reset", 'R', gg.app.main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (reset_item),
-                                   xg.app.brush_reset_menu); 
+                                   gg.app.brush_reset_menu); 
         if (firsttime_reset) {
-          submenu_insert (reset_item, xg.app.menubar, -1);
+          submenu_insert (reset_item, gg.app.menubar, -1);
           firsttime_reset = false;
         }
 
-        link_item = submenu_make ("_Link", 'L', xg.app.main_accel_group);
+        link_item = submenu_make ("_Link", 'L', gg.app.main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (link_item),
-                                   xg.app.brush_link_menu); 
+                                   gg.app.brush_link_menu); 
         if (firsttime_link) {
-          submenu_insert (link_item, xg.app.menubar, -1);
+          submenu_insert (link_item, gg.app.menubar, -1);
           firsttime_link = false;
         }
 
@@ -265,11 +265,11 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state)
       case IDENT:
         identify_menus_make ();
 
-        link_item = submenu_make ("_Link", 'L', xg.app.main_accel_group);
+        link_item = submenu_make ("_Link", 'L', gg.app.main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (link_item),
-                                   xg.app.identify_link_menu); 
+                                   gg.app.identify_link_menu); 
         if (firsttime_link) {
-          submenu_insert (link_item, xg.app.menubar, -1);
+          submenu_insert (link_item, gg.app.menubar, -1);
           firsttime_link = false;
         }
         break;
@@ -293,17 +293,17 @@ projection_get () {
 */
 void 
 mode_set (gint m) {
-  displayd *display = xg.current_display;
+  displayd *display = gg.current_display;
 
   mode = m;
   if (mode != prev_mode) {
     /* Add a reference to the widget so it isn't destroyed */
-    gtk_widget_ref (xg.control_panel[prev_mode]);
+    gtk_widget_ref (gg.control_panel[prev_mode]);
     gtk_container_remove (GTK_CONTAINER (mode_frame),
-                          xg.control_panel[prev_mode]);
+                          gg.control_panel[prev_mode]);
   
     gtk_frame_set_label (GTK_FRAME (mode_frame), mode_name[mode]);
-    gtk_container_add (GTK_CONTAINER (mode_frame), xg.control_panel[mode]);
+    gtk_container_add (GTK_CONTAINER (mode_frame), gg.control_panel[mode]);
   }
 
   /*
@@ -383,9 +383,9 @@ mode_activate (splotd *sp, gint m, gboolean state) {
 void
 mode_set_cb (gpointer cbd, guint action, GtkWidget *widget)
 {
-  if (xg.current_display != NULL && xg.current_splot != NULL) {
-    splotd *sp = xg.current_splot;
-    displayd *display = xg.current_display;
+  if (gg.current_display != NULL && gg.current_splot != NULL) {
+    splotd *sp = gg.current_splot;
+    displayd *display = gg.current_display;
 
     sp_event_handlers_toggle (sp, off);
     mode_activate (sp, mode, off);
@@ -516,7 +516,7 @@ static GtkItemFactoryEntry menu_items[] = {
 
 
   { "/_Help",         NULL,         NULL, 0, "<LastBranch>" },
-  { "/Help/About XGobi",  
+  { "/Help/About GGobi",  
                       NULL,         NULL, 0, NULL },
   { "/Help/About help ...",  
                       NULL,         NULL, 0, NULL },
@@ -541,7 +541,7 @@ void make_ui () {
   GtkWidget *item, *submenu;
   gchar *name;
 
-  xg.tips = gtk_tooltips_new ();
+  gg.tips = gtk_tooltips_new ();
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
@@ -560,18 +560,18 @@ void make_ui () {
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (window), vbox);
 
-  xg.app.main_accel_group = gtk_accel_group_new ();
+  gg.app.main_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 xg.app.main_accel_group, window, &xg.app.menubar, (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (vbox), xg.app.menubar, false, true, 0);
+                 gg.app.main_accel_group, window, &gg.app.menubar, (gpointer) NULL);
+  gtk_box_pack_start (GTK_BOX (vbox), gg.app.menubar, false, true, 0);
 
-  gtk_accel_group_lock (xg.app.main_accel_group);
+  gtk_accel_group_lock (gg.app.main_accel_group);
 
 /*
  * Step through the option menu, setting the values of toggle items
  * as appropriate.
 */
-  items = gtk_container_children (GTK_CONTAINER (xg.app.menubar));
+  items = gtk_container_children (GTK_CONTAINER (gg.app.menubar));
   while (items) {
     item = items->data;
     gtk_label_get (GTK_LABEL (GTK_MENU_ITEM (item)->item.bin.child ), &name);
@@ -614,7 +614,7 @@ void make_ui () {
   gtk_frame_set_shadow_type (GTK_FRAME (mode_frame), GTK_SHADOW_IN);
 
   make_control_panels ();
-  gtk_container_add (GTK_CONTAINER (mode_frame), xg.control_panel[mode]);
+  gtk_container_add (GTK_CONTAINER (mode_frame), gg.control_panel[mode]);
 
   /*-- Variable selection panel --*/
   make_varpanel (hbox);

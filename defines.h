@@ -8,9 +8,9 @@
 /* External/public routines in the API should use this 
    to generate a suitable prefix for their name to avoid
    name-space pollution and symbol conflicts.
-    (e.g. XGOBI(setData)
+    (e.g. GGOBI(setData)
 */
-#define XGOBI(a) XGobi_##a
+#define GGOBI(a) GGobi_##a
 
 #define false 0
 #define true 1
@@ -239,7 +239,7 @@ extern const gint ViewTypeIndeces[3];
 /*-- macros --*/
 
 #define EVENT_METHOD(i,x) GTK_WIDGET_CLASS(GTK_OBJECT(i)->klass)->x
-#define MISSING_P(i,j) (xg.missing.data[i][j] != 0)
+#define MISSING_P(i,j) (gg.missing.data[i][j] != 0)
 
 
 #endif /* End of conditional definition. */

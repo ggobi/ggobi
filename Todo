@@ -2,9 +2,7 @@ Bugs:
 
   the axes aren't being initialized properly for cloned variables.
   reading from stdin in stopped working
-
-Find out how to handle threads
-Find out how to use signals  (for keeping track of rows_in_plot?)
+  reading missings gives a core dump
 
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
@@ -12,7 +10,7 @@ Scaling:
 
 Imputation of missing values
 
-Erase/hiding/exclusion
+Erase/hiding/exclusion  (could use a redo button; no big deal)
 
 Smoothing
 

@@ -14,7 +14,7 @@ static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append"};
 static void selection_mode_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
-  cpaneld *cpanel = &xg.current_display->cpanel;
+  cpaneld *cpanel = &gg.current_display->cpanel;
 
   switch (indx) {
     case 0:
@@ -37,21 +37,21 @@ void
 cpanel_scatmat_make () {
   GtkWidget *vb, *lbl, *opt;
   
-  xg.control_panel[SCATMAT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[SCATMAT]), 5);
+  gg.control_panel[SCATMAT] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (gg.control_panel[SCATMAT]), 5);
 
 /*
  * option menu: selection mode
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[SCATMAT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[SCATMAT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
     "Selecting a variable either replaces the variable in the current plot (swapping if appropriate), inserts a new plot before the current plot, or appends a new plot after it",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
@@ -59,7 +59,7 @@ cpanel_scatmat_make () {
                         sizeof (selection_mode_lbl) / sizeof (gchar *),
                         selection_mode_cb);
 
-  gtk_widget_show_all (xg.control_panel[SCATMAT]);
+  gtk_widget_show_all (gg.control_panel[SCATMAT]);
 }
 
 
@@ -74,24 +74,24 @@ scatmat_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func) {
 /*
  * I/O menu
 */
-  xg.app.scatmat_mode_menu = gtk_menu_new ();
+  gg.app.scatmat_mode_menu = gtk_menu_new ();
 
-  CreateMenuItem (xg.app.scatmat_mode_menu, "Scatterplot Matrix",
+  CreateMenuItem (gg.app.scatmat_mode_menu, "Scatterplot Matrix",
     "^x", "", NULL, accel_group, func, GINT_TO_POINTER (SCATMAT));
 
   /* Add a separator */
-  CreateMenuItem (xg.app.scatmat_mode_menu, NULL,
+  CreateMenuItem (gg.app.scatmat_mode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL);
 
-  CreateMenuItem (xg.app.scatmat_mode_menu, "Scale",
+  CreateMenuItem (gg.app.scatmat_mode_menu, "Scale",
     "^s", "", NULL, accel_group, func, GINT_TO_POINTER (SCALE));
-  CreateMenuItem (xg.app.scatmat_mode_menu, "Brush",
+  CreateMenuItem (gg.app.scatmat_mode_menu, "Brush",
     "^b", "", NULL, accel_group, func, GINT_TO_POINTER (BRUSH));
-  CreateMenuItem (xg.app.scatmat_mode_menu, "Identify",
+  CreateMenuItem (gg.app.scatmat_mode_menu, "Identify",
     "^i", "", NULL, accel_group, func, GINT_TO_POINTER (IDENT));
-  CreateMenuItem (xg.app.scatmat_mode_menu, "Move Points",
+  CreateMenuItem (gg.app.scatmat_mode_menu, "Move Points",
     "^m", "", NULL, accel_group, func, GINT_TO_POINTER (MOVEPTS));
 
-  gtk_widget_show (xg.app.scatmat_mode_menu);
+  gtk_widget_show (gg.app.scatmat_mode_menu);
 }
 

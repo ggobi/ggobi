@@ -19,9 +19,9 @@
 void rowlabels_free () {
   gint i;
 
-  for (i=0; i<xg.nrows; i++)
-    g_free (xg.rowlab[i]);
-  g_free (xg.rowlab);
+  for (i=0; i<gg.nrows; i++)
+    g_free (gg.rowlab[i]);
+  g_free (gg.rowlab);
 }
 
 
@@ -29,11 +29,11 @@ void
 rowlabels_alloc () {
   gint i;
 
-  if (xg.rowlab != NULL) rowlabels_free ();
+  if (gg.rowlab != NULL) rowlabels_free ();
   
-  xg.rowlab = (gchar **) g_malloc (xg.nrows * sizeof (gchar *));
-  for (i=0; i<xg.nrows; i++)
-    xg.rowlab[i] = (gchar *) g_malloc (ROWLABLEN * sizeof (gchar));
+  gg.rowlab = (gchar **) g_malloc (gg.nrows * sizeof (gchar *));
+  for (i=0; i<gg.nrows; i++)
+    gg.rowlab[i] = (gchar *) g_malloc (ROWLABLEN * sizeof (gchar));
 }
 
 gboolean
@@ -52,7 +52,7 @@ rowlabels_read (gchar *ldata_in, gboolean init)
     rowlabels_alloc ();
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
-    if ((fp = open_xgobi_file_r (ldata_in, 3, suffixes, true)) != NULL)
+    if ((fp = open_ggobi_file_r (ldata_in, 3, suffixes, true)) != NULL)
       found = true;
 
   /*
@@ -65,7 +65,7 @@ rowlabels_read (gchar *ldata_in, gboolean init)
 
     k = 0;  /* k is the file row */
     while (fgets (initstr, INITSTRSIZE-1, fp) != NULL) {
-      if (xg.file_read_type == read_all || k == xg.file_rows_sampled[ncase])
+      if (gg.file_read_type == read_all || k == gg.file_rows_sampled[ncase])
       {
         len = MIN ((int) strlen (initstr), ROWLABLEN-1) ;
 
@@ -73,9 +73,9 @@ rowlabels_read (gchar *ldata_in, gboolean init)
         while (initstr[len-1] == ' ' || initstr[len-1] == '\n')
           len-- ;
         initstr[len] = '\0';
-        xg.rowlab[ncase] = g_strdup (initstr) ;
+        gg.rowlab[ncase] = g_strdup (initstr) ;
   
-        if (ncase++ >= xg.nrows)
+        if (ncase++ >= gg.nrows)
           break;
       }
       k++;  /* read the next row ... */
@@ -85,22 +85,22 @@ rowlabels_read (gchar *ldata_in, gboolean init)
      * If there aren't enough labels, use blank labels for
      * the remainder.
     */
-    if (init && ncase != xg.nrows) {
+    if (init && ncase != gg.nrows) {
       g_printerr ("number of labels = %d, number of rows = %d\n",
-        ncase, xg.nrows);
-      for (i=ncase; i<xg.nrows; i++)
-        xg.rowlab[i] = g_strdup (" ");
+        ncase, gg.nrows);
+      for (i=ncase; i<gg.nrows; i++)
+        gg.rowlab[i] = g_strdup (" ");
     }
   }
   else
   {
     if (init) {  /* apply defaults if initializing; else, do nothing */
 
-      for (i=0; i<xg.nrows; i++) {
-        if (xg.file_read_type == read_all)
-          xg.rowlab[i] = g_strdup_printf ("%d", i+1);
+      for (i=0; i<gg.nrows; i++) {
+        if (gg.file_read_type == read_all)
+          gg.rowlab[i] = g_strdup_printf ("%d", i+1);
         else
-          xg.rowlab[i] = g_strdup_printf ("%ld", xg.file_rows_sampled[i]+1);
+          gg.rowlab[i] = g_strdup_printf ("%ld", gg.file_rows_sampled[i]+1);
       }
     }
   }
@@ -127,7 +127,7 @@ collabels_read (gchar *ldata_in, gboolean init)
    * Check if variable label file exists, and open if so.
   */
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
-    if ((fp=open_xgobi_file_r (ldata_in, 4, suffixes, true)) != NULL)
+    if ((fp=open_ggobi_file_r (ldata_in, 4, suffixes, true)) != NULL)
       found = true;
 
   /*
@@ -146,25 +146,25 @@ collabels_read (gchar *ldata_in, gboolean init)
       while (initstr[len-1] == '\n' || initstr[len-1] == ' ')
         len-- ;
       initstr[len] = '\0';
-      xg.vardata[nvar].collab = g_strdup (initstr) ;
+      gg.vardata[nvar].collab = g_strdup (initstr) ;
 
-      if (nvar++ >= xg.ncols)
+      if (nvar++ >= gg.ncols)
         break;
     }
 
-    if (init && nvar != xg.ncols) {
+    if (init && nvar != gg.ncols) {
       g_printerr ("number of labels = %d, number of cols = %d\n",
-        nvar, xg.ncols);
+        nvar, gg.ncols);
 
-      if (xg.single_column) {
-        g_free (xg.vardata[1].collab);
-        xg.vardata[1].collab = g_strdup_printf ("%s", xg.vardata[0].collab);
-        g_free (xg.vardata[0].collab);
-        xg.vardata[0].collab = g_strdup ("Index");
+      if (gg.single_column) {
+        g_free (gg.vardata[1].collab);
+        gg.vardata[1].collab = g_strdup_printf ("%s", gg.vardata[0].collab);
+        g_free (gg.vardata[0].collab);
+        gg.vardata[0].collab = g_strdup ("Index");
 
       } else {
-        for (j=nvar; j<xg.ncols; j++) {
-          xg.vardata[j].collab = g_strdup_printf ("Var %d", j+1);
+        for (j=nvar; j<gg.ncols; j++) {
+          gg.vardata[j].collab = g_strdup_printf ("Var %d", j+1);
         }
       }
     }
@@ -172,15 +172,15 @@ collabels_read (gchar *ldata_in, gboolean init)
   else
   {
     if (init) {
-      for (j=0; j<xg.ncols; j++) {
-        xg.vardata[j].collab = g_strdup_printf ("Var %d", j+1);
+      for (j=0; j<gg.ncols; j++) {
+        gg.vardata[j].collab = g_strdup_printf ("Var %d", j+1);
       }
     }
   }
 
 
-  for (j=0; j<xg.ncols; j++) {
-    xg.vardata[j].collab_tform = g_strdup (xg.vardata[j].collab);
+  for (j=0; j<gg.ncols; j++) {
+    gg.vardata[j].collab_tform = g_strdup (gg.vardata[j].collab);
   }
 
   return (found);
@@ -202,21 +202,21 @@ vgroups_read (gchar *ldata_in, gboolean init)
   FILE *fp;
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
-    if ((fp = open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
+    if ((fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
   if (found) {
     i = 0;
-    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < xg.ncols))
-      xg.vardata[i++].groupid_ori = itmp;
+    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg.ncols))
+      gg.vardata[i++].groupid_ori = itmp;
 
-    if (init && i < xg.ncols) {
+    if (init && i < gg.ncols) {
       g_printerr (
         "Number of variables and number of group types do not match.\n");
       g_printerr ("Creating extra generic groups.\n");
 
-      for (j=i; j<xg.ncols; j++)
-        xg.vardata[j].groupid_ori = j;
+      for (j=i; j<gg.ncols; j++)
+        gg.vardata[j].groupid_ori = j;
     }
 
     vgroups_sort ();
@@ -224,12 +224,12 @@ vgroups_read (gchar *ldata_in, gboolean init)
   } else {
 
     if (init)
-      for (j=0; j<xg.ncols; j++)
-        xg.vardata[j].groupid_ori = j;
+      for (j=0; j<gg.ncols; j++)
+        gg.vardata[j].groupid_ori = j;
   }
 
-  for (j=0; j<xg.ncols; j++)
-    xg.vardata[j].groupid = xg.vardata[j].groupid_ori;
+  for (j=0; j<gg.ncols; j++)
+    gg.vardata[j].groupid = gg.vardata[j].groupid_ori;
 
   return (found);
 }
@@ -242,12 +242,12 @@ void
 rgroups_free () {
   gint i, j;
 
-  for (i=0; i<xg.nrgroups; i++)
-    for (j=0; j<xg.rgroups[i].nels; j++)
-      g_free ((gpointer) xg.rgroups[i].els);
+  for (i=0; i<gg.nrgroups; i++)
+    for (j=0; j<gg.rgroups[i].nels; j++)
+      g_free ((gpointer) gg.rgroups[i].els);
 
-  g_free ((gpointer) xg.rgroups);
-  g_free ((gpointer) xg.rgroup_ids);
+  g_free ((gpointer) gg.rgroups);
+  g_free ((gpointer) gg.rgroup_ids);
 }
 
 gboolean
@@ -264,14 +264,14 @@ rgroups_read (gchar *ldata_in, gboolean init)
   glong *nels;
   gint nr;
 
-  if (xg.nrgroups > 0) rgroups_free ();
+  if (gg.nrgroups > 0) rgroups_free ();
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
-    if ((fp = open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
+    if ((fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
   
   if (!found) {
-    xg.nrgroups = 0;
+    gg.nrgroups = 0;
   } else {
   
     /*
@@ -279,26 +279,26 @@ rgroups_read (gchar *ldata_in, gboolean init)
      * see if the rgroups structures should be freed.
     */
     if (!init)
-      if (xg.nrgroups > 0)
+      if (gg.nrgroups > 0)
         rgroups_free ();
   
     /* rgroup_ids starts by containing the values in the file */
-    xg.rgroup_ids = (glong *) g_malloc (xg.nrows * sizeof (glong));
-    nels = (glong *) g_malloc (xg.nrows * sizeof (glong));
+    gg.rgroup_ids = (glong *) g_malloc (gg.nrows * sizeof (glong));
+    nels = (glong *) g_malloc (gg.nrows * sizeof (glong));
      
     i = 0;
-    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < xg.nrows))
-      xg.rgroup_ids[i++] = itmp;
+    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg.nrows))
+      gg.rgroup_ids[i++] = itmp;
   
     /* check the number of group ids read -- should be nrows */
-    if (init && i < xg.nrows)
+    if (init && i < gg.nrows)
     {
       g_printerr (
         "Number of rows and number of row group types do not match.\n");
       g_printerr ("Creating extra generic groups.\n");
 
-      for (k=i; k<xg.nrows; k++)
-        xg.rgroup_ids[k] = k;
+      for (k=i; k<gg.nrows; k++)
+        gg.rgroup_ids[k] = k;
     }
   
     /*
@@ -306,15 +306,15 @@ rgroups_read (gchar *ldata_in, gboolean init)
      * nrows/10 elements in each group
     */
 
-    xg.rgroups = (rgroupd *) g_malloc (xg.nrows * sizeof (rgroupd));
-    for (i=0; i<xg.nrows; i++) {
-      nels[i] = xg.nrows/10;
-      xg.rgroups[i].els = (glong *)
+    gg.rgroups = (rgroupd *) g_malloc (gg.nrows * sizeof (rgroupd));
+    for (i=0; i<gg.nrows; i++) {
+      nels[i] = gg.nrows/10;
+      gg.rgroups[i].els = (glong *)
         g_malloc ((guint) nels[i] * sizeof (glong));
-      xg.rgroups[i].nels = 0;
-      xg.rgroups[i].included = true;
+      gg.rgroups[i].nels = 0;
+      gg.rgroups[i].included = true;
     }
-    xg.nrgroups = 0;
+    gg.nrgroups = 0;
   
 /*
  * For now, only assign linkable points to rgroups.
@@ -323,33 +323,33 @@ rgroups_read (gchar *ldata_in, gboolean init)
      * On this sweep, find out how many groups there are and how
      * many elements are in each group
     */
-    nr = (xg.nlinkable < xg.nrows) ? xg.nlinkable : xg.nrows;
+    nr = (gg.nlinkable < gg.nrows) ? gg.nlinkable : gg.nrows;
 
     for (i=0; i<nr; i++) {
       found_rg = false;
-      for (k=0; k<xg.nrgroups; k++) {
+      for (k=0; k<gg.nrgroups; k++) {
   
         /* if we've found this id before ... */
-        if (xg.rgroup_ids[i] == xg.rgroups[k].id) {
+        if (gg.rgroup_ids[i] == gg.rgroups[k].id) {
   
           /* Reallocate els[k] if necessary */
-          if (xg.rgroups[k].nels == nels[k]) {
+          if (gg.rgroups[k].nels == nels[k]) {
             nels[k] *= 2;
-            xg.rgroups[k].els = (glong *)
-              g_realloc ((gpointer) xg.rgroups[k].els,
+            gg.rgroups[k].els = (glong *)
+              g_realloc ((gpointer) gg.rgroups[k].els,
                 (nels[k] * sizeof (glong)));
           }
   
           /* Add the element, increment the element counter */
-          xg.rgroups[k].els[ xg.rgroups[k].nels ] = i;
-          xg.rgroups[k].nels++;
+          gg.rgroups[k].els[ gg.rgroups[k].nels ] = i;
+          gg.rgroups[k].nels++;
   
           /*
            * Now the value in rgroup_ids has to change so that
            * it can point to the correct member in the array of
            * rgroups structures
           */
-          xg.rgroup_ids[i] = k;
+          gg.rgroup_ids[i] = k;
   
           found_rg = true;
           break;
@@ -358,34 +358,34 @@ rgroups_read (gchar *ldata_in, gboolean init)
   
       /* If it's a new group id, add it */
       if (!found_rg) {
-        xg.rgroups[xg.nrgroups].id = xg.rgroup_ids[i]; /* from file */
-        xg.rgroups[xg.nrgroups].nels = 1;
-        xg.rgroups[xg.nrgroups].els[0] = i;
-        xg.rgroup_ids[i] = xg.nrgroups;  /* rgroup_ids reset to index */
-        xg.nrgroups++;
+        gg.rgroups[gg.nrgroups].id = gg.rgroup_ids[i]; /* from file */
+        gg.rgroups[gg.nrgroups].nels = 1;
+        gg.rgroups[gg.nrgroups].els[0] = i;
+        gg.rgroup_ids[i] = gg.nrgroups;  /* rgroup_ids reset to index */
+        gg.nrgroups++;
       }
     }
-    xg.nrgroups_in_plot = xg.nrgroups;
+    gg.nrgroups_in_plot = gg.nrgroups;
   
     /* Reallocate everything now that we know how many there are */
-    xg.rgroups = (rgroupd *) g_realloc ((gpointer) xg.rgroups,
-      (gulong) (xg.nrgroups * sizeof (rgroupd)));
+    gg.rgroups = (rgroupd *) g_realloc ((gpointer) gg.rgroups,
+      (gulong) (gg.nrgroups * sizeof (rgroupd)));
   
     /* Now reallocate the arrays within each rgroups structure */
-    for (k=0; k<xg.nrgroups; k++) {
-      xg.rgroups[k].els = (glong *)
-        g_realloc ((gpointer) xg.rgroups[k].els,
-          (gulong) (xg.rgroups[k].nels * sizeof (glong)));
+    for (k=0; k<gg.nrgroups; k++) {
+      gg.rgroups[k].els = (glong *)
+        g_realloc ((gpointer) gg.rgroups[k].els,
+          (gulong) (gg.rgroups[k].nels * sizeof (glong)));
     }
   
     g_free ((gpointer) nels);
   }
 
-  if (xg.nlinkable != xg.nrows)
-    g_printerr ("xg.nlinkable=%d xg.nrows=%d\n", xg.nlinkable, xg.nrows);
+  if (gg.nlinkable != gg.nrows)
+    g_printerr ("gg.nlinkable=%d gg.nrows=%d\n", gg.nlinkable, gg.nrows);
 
-  if (xg.nrgroups != 0)
-    g_printerr ("xg.nrgroups=%ld\n", xg.nrgroups);
+  if (gg.nrgroups != 0)
+    g_printerr ("gg.nrgroups=%ld\n", gg.nrgroups);
 
   return (found);
 }
@@ -420,7 +420,7 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit)
     br_glyph_ids_alloc ();
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
-    if ((fp = open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
+    if ((fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
   if (!found && reinit)
@@ -441,7 +441,7 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit)
 
     ungetc (c, fp);
     i = 0; k = 0;
-    while (i < xg.nrows) {  /* should there be a test on k as well? */
+    while (i < gg.nrows) {  /* should there be a test on k as well? */
 
       if (glyph_format == glyphNumber) {
         retval = fscanf (fp, "%d", &gid);
@@ -453,14 +453,14 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit)
       }
 
       if (retval <= 0) {
-        /* not using show_message () here; reading before xgobi startup */
+        /* not using show_message () here; reading before ggobi startup */
         g_printerr ("!Error in reading glyphs file; using defaults.\n");
         use_defaults = true;
         break;
       }
 
-      if (xg.file_read_type == read_all ||
-         (xg.file_rows_sampled != NULL && k == xg.file_rows_sampled[i]))
+      if (gg.file_read_type == read_all ||
+         (gg.file_rows_sampled != NULL && k == gg.file_rows_sampled[i]))
       {
         /*
          * If the input is a single number on a line
@@ -509,10 +509,10 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit)
           break;
         }
 
-        xg.glyph_ids[i].type = xg.glyph_now[i].type =
-          xg.glyph_prev[i].type = glyph.type;
-        xg.glyph_ids[i].size = xg.glyph_now[i].size =
-          xg.glyph_prev[i].size = glyph.size;
+        gg.glyph_ids[i].type = gg.glyph_now[i].type =
+          gg.glyph_prev[i].type = glyph.type;
+        gg.glyph_ids[i].size = gg.glyph_now[i].size =
+          gg.glyph_prev[i].size = glyph.size;
 
         i++;  /* increment the array index */
       }
@@ -542,7 +542,7 @@ point_colors_read (gchar *ldata_in, gboolean reinit)
     br_color_ids_alloc ();
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0) {
-    if ( (fp = open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
+    if ( (fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
     if (!found && reinit == true)
@@ -551,7 +551,7 @@ point_colors_read (gchar *ldata_in, gboolean reinit)
       ok = true;
 
       i = 0; k = 0;
-      while (i < xg.nrows) {  /* should there be a test on k as well? */
+      while (i < gg.nrows) {  /* should there be a test on k as well? */
 
         retval = fscanf (fp, "%d", &id);
         if (retval <= 0 || id < 0 || id >= NCOLORS) {
@@ -560,10 +560,10 @@ point_colors_read (gchar *ldata_in, gboolean reinit)
           break;
         }
 
-        if (xg.file_read_type == read_all ||
-           (xg.file_rows_sampled != NULL && k == xg.file_rows_sampled[i]))
+        if (gg.file_read_type == read_all ||
+           (gg.file_rows_sampled != NULL && k == gg.file_rows_sampled[i]))
         {
-          xg.color_ids[i] = xg.color_now[i] = xg.color_prev[i] = id;
+          gg.color_ids[i] = gg.color_now[i] = gg.color_prev[i] = id;
 
           i++;  /* increment the array index */
         }
@@ -594,12 +594,12 @@ line_colors_read (gchar *ldata_in, gboolean reinit)
   if (reinit)
     br_line_color_ids_alloc ();
 
-  if (!xg.mono_p) {
+  if (!gg.mono_p) {
     /*
      * Check if line colors file exists.
     */
     if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0) {
-      if ( (fp=open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
+      if ( (fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
           ok = true;
 
       if (!ok && reinit == true)
@@ -610,7 +610,7 @@ line_colors_read (gchar *ldata_in, gboolean reinit)
         */
 
         i = 0;
-        while (i < xg.nsegments) {
+        while (i < gg.nsegments) {
           retval = fscanf (fp, "%d", &id);
           if (retval <= 0 || id < 0 || id >= NCOLORS) {
             ok = false;
@@ -618,8 +618,8 @@ line_colors_read (gchar *ldata_in, gboolean reinit)
             break;
           }
 
-          xg.line_color_ids[i] = xg.line_color_now[i] =
-            xg.line_color_prev[i] = id;
+          gg.line_color_ids[i] = gg.line_color_now[i] =
+            gg.line_color_prev[i] = id;
           i++;
         }
         fclose(fp);
@@ -635,7 +635,7 @@ line_colors_read (gchar *ldata_in, gboolean reinit)
 
 gboolean
 segments_read (gchar *rootname, gboolean startup)
-  /* startup - Initializing xgobi? */
+  /* startup - Initializing ggobi? */
 {
   gint fs, nblocks, bsize = 500;
   gboolean ok = true;
@@ -651,7 +651,7 @@ segments_read (gchar *rootname, gboolean startup)
     fname = g_malloc (128 * sizeof (gchar));
     /* This is for the in-process case */
     if (rootname == (gchar *) NULL)
-      strcpy (fname, xg.filename);
+      strcpy (fname, gg.filename);
     /* This is for the startup case */
     else
       strcpy (fname, rootname);
@@ -661,7 +661,7 @@ segments_read (gchar *rootname, gboolean startup)
   if ((fp = fopen (fname, "r")) != NULL) {
     gint a, b;
 
-    xg.nsegments = 0;
+    gg.nsegments = 0;
     /*
      * Allocate space for <bsize> connecting lines.
     */
@@ -678,7 +678,7 @@ segments_read (gchar *rootname, gboolean startup)
         exit (1);
       }
 
-      if (a < 1 || b > xg.nrows) {
+      if (a < 1 || b > gg.nrows) {
         ok = false;
         g_printerr ("Entry in .lines file > number of rows or < 1\n");
         exit (1);
@@ -688,14 +688,14 @@ segments_read (gchar *rootname, gboolean startup)
          * Sort lines data such that a <= b
         */
         if (a <= b) {
-          xg.segment_endpoints[xg.nsegments].a = a;
-          xg.segment_endpoints[xg.nsegments].b = b;
+          gg.segment_endpoints[gg.nsegments].a = a;
+          gg.segment_endpoints[gg.nsegments].b = b;
         } else {
-          xg.segment_endpoints[xg.nsegments].a = b;
-          xg.segment_endpoints[xg.nsegments].b = a;
+          gg.segment_endpoints[gg.nsegments].a = b;
+          gg.segment_endpoints[gg.nsegments].b = a;
         }
 
-        (xg.nsegments)++;
+        (gg.nsegments)++;
         jlinks++;
         if (jlinks == bsize) {
           /*
@@ -741,30 +741,30 @@ nlinkable_read (gchar *ldata_in, gboolean init)
    * initializing, leave its value alone.
   */
   if (init)
-    xg.nlinkable = xg.nrows;
+    gg.nlinkable = gg.nrows;
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
-    if ( (fp=open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
+    if ( (fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
   
   if (found) {
     fscanf (fp, "%d", &itmp);
-    if (itmp > 0 && itmp <= xg.nrows)
-      xg.nlinkable = itmp;
+    if (itmp > 0 && itmp <= gg.nrows)
+      gg.nlinkable = itmp;
     fclose (fp);
   }
 
-  if (xg.nrows_in_plot == xg.nrows) xg.nlinkable_in_plot = xg.nlinkable;
+  if (gg.nrows_in_plot == gg.nrows) gg.nlinkable_in_plot = gg.nlinkable;
   else {
     gint i;
-    xg.nlinkable_in_plot = 0;
-    for (i=0; i<xg.nlinkable; i++)
-      if (xg.included[i])
-        xg.nlinkable_in_plot++;
+    gg.nlinkable_in_plot = 0;
+    for (i=0; i<gg.nlinkable; i++)
+      if (gg.included[i])
+        gg.nlinkable_in_plot++;
   }
 
-  if (xg.nlinkable != xg.nrows)
-    g_printerr ("nlinkable = %d\n", xg.nlinkable);
+  if (gg.nlinkable != gg.nrows)
+    g_printerr ("nlinkable = %d\n", gg.nlinkable);
 
   return (found);
 }
@@ -788,21 +788,21 @@ hidden_read (gchar *ldata_in, gboolean reinit)
     hidden_alloc ();
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
-    if ((fp=open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
+    if ((fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
   if (found) {
     gint k = 0;  /* k is the file row, used if file_read_type != read_all */
     i = 0;
-    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < xg.nrows)) {
-      if (xg.file_read_type == read_all || k == xg.file_rows_sampled[i]) {
-        xg.hidden[i] = xg.hidden_now[i] = xg.hidden_prev[i] = (gboolean) itmp;
+    while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg.nrows)) {
+      if (gg.file_read_type == read_all || k == gg.file_rows_sampled[i]) {
+        gg.hidden[i] = gg.hidden_now[i] = gg.hidden_prev[i] = (gboolean) itmp;
         i++;
       }
       k++;
     }
   
-    if (i < xg.nrows)
+    if (i < gg.nrows)
       g_printerr ("Problem in reading hide file; not enough rows\n");
 
   } else {
@@ -827,19 +827,19 @@ missing_values_read (gchar *ldata_in, gboolean init)
   FILE *fp;
   gboolean found = false;
 
-  if (xg.file_read_type != read_all)
+  if (gg.file_read_type != read_all)
     return;
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
-    if ((fp=open_xgobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
+    if ((fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
       found = true;
 
   if (found) {
-    if (init || xg.nmissing == 0)
-      arrays_alloc (&xg.missing, xg.nrows, xg.ncols);
+    if (init || gg.nmissing == 0)
+      arrays_alloc (&gg.missing, gg.nrows, gg.ncols);
 
-    for (j=0; j<xg.ncols; j++)
-      xg.vardata[j].nmissing = 0;
+    for (j=0; j<gg.ncols; j++)
+      gg.vardata[j].nmissing = 0;
 
     j = 0;
     i = 0;
@@ -847,8 +847,8 @@ missing_values_read (gchar *ldata_in, gboolean init)
       row = i;
       col = j;
       j++;
-      if (j==xg.ncols) { j=0; i++; }
-      if (i==xg.nrows && j>0) ok = false;
+      if (j==gg.ncols) { j=0; i++; }
+      if (i==gg.nrows && j>0) ok = false;
 
       if (!ok) {
         g_print ("Problem reading %s.missing", ldata_in);
@@ -859,19 +859,19 @@ missing_values_read (gchar *ldata_in, gboolean init)
         exit (1);
       }
 
-      xg.missing.data[row][col] = itmp;
+      gg.missing.data[row][col] = itmp;
       if (itmp != 0) {
         nmissing++;
-        xg.vardata[col].nmissing++;
+        gg.vardata[col].nmissing++;
       }
     }
 
-    if (xg.nmissing != 0 && xg.nmissing != nmissing) {
-      g_print ("I found %d missing values in your data file\n", xg.nmissing);
+    if (gg.nmissing != 0 && gg.nmissing != nmissing) {
+      g_print ("I found %d missing values in your data file\n", gg.nmissing);
       g_print (" but %d missing values in your .missing file.", nmissing);
       g_print ("I'll use the .missing results.\n");
     }
-    xg.nmissing = nmissing;
+    gg.nmissing = nmissing;
 
     fclose (fp);
   }

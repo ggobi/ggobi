@@ -133,7 +133,7 @@ parcoords_new (gboolean missing_p) {
   GtkWidget *mbar;
   gint i;
   splotd *sp;
-  gint nplots = MIN (xg.ncols, MAXNPCPLOTS);
+  gint nplots = MIN (gg.ncols, MAXNPCPLOTS);
 
   displayd *display = (displayd *) g_malloc (sizeof (displayd));
 
@@ -216,7 +216,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
   gint jvar, gint *jvar_prev, gboolean alt_mod)
 {
   gboolean redraw = true;
-  gint nplots = g_list_length (xg.current_display->splots);
+  gint nplots = g_list_length (gg.current_display->splots);
   gint k, width, height;
   gint jvar_indx, new_indx;
   GList *l;
@@ -224,14 +224,14 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
   GtkWidget *box, *w;
   gfloat ratio = 1.0;
 
-  /* The index of xg.current_splot */
-  gint sp_indx = g_list_index (xg.current_display->splots, sp);
+  /* The index of gg.current_splot */
+  gint sp_indx = g_list_index (gg.current_display->splots, sp);
 
   /* If jvar is one of the plotted variables, its corresponding plot */
   splotd *jvar_sp = NULL;
 
   k = 0;
-  l = xg.current_display->splots;
+  l = gg.current_display->splots;
   while (l) {
     s = (splotd *) l->data;
     if (s->p1dvar == jvar) {
@@ -243,7 +243,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
     k++;
   }
 
-  gtk_window_set_policy (GTK_WINDOW (xg.current_display->window),
+  gtk_window_set_policy (GTK_WINDOW (gg.current_display->window),
         false, false, false);
 
   splot_get_dimensions (sp, &width, &height);
@@ -257,7 +257,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
   if (alt_mod == true) {
     if (jvar_sp != NULL && nplots > 1) {
       /*-- Delete the plot from the list, and destroy it. --*/
-      xg.current_display->splots = g_list_remove (xg.current_display->splots,
+      gg.current_display->splots = g_list_remove (gg.current_display->splots,
                                                (gpointer) jvar_sp);
 
       /*-- keep the window from shrinking by growing all plots --*/
@@ -267,7 +267,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
       else
         height = (gint) (ratio * (gfloat) height);
 
-      l = xg.current_display->splots;
+      l = gg.current_display->splots;
       while (l) {
         w = ((splotd *) l->data)->da;
         gtk_widget_ref (w);
@@ -281,21 +281,21 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
 
       /*
        * If the plot being removed is the current plot, reset
-       * xg.current_splot.
+       * gg.current_splot.
       */
-      if (jvar_sp == xg.current_splot) {
+      if (jvar_sp == gg.current_splot) {
         sp_event_handlers_toggle (sp, off);
 
         new_indx = (jvar_indx == 0) ? 0 : MIN (nplots-1, jvar_indx);
-        xg.current_splot = (splotd *)
-          g_list_nth_data (xg.current_display->splots, new_indx);
+        gg.current_splot = (splotd *)
+          g_list_nth_data (gg.current_display->splots, new_indx);
         /* just for insurance, to handle the unforeseen */
-        if (xg.current_splot == NULL) 
-          xg.current_splot = (splotd *)
-            g_list_nth_data (xg.current_display->splots, 0);
+        if (gg.current_splot == NULL) 
+          gg.current_splot = (splotd *)
+            g_list_nth_data (gg.current_display->splots, 0);
       }
 
-      splot_free (jvar_sp, xg.current_display);
+      splot_free (jvar_sp, gg.current_display);
 
       nplots--;
 /*      redraw = false;*/
@@ -319,21 +319,21 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         height = (gint) (ratio * (gfloat) height);
       /* */
 
-      sp_new = splot_new (xg.current_display, width, height);
+      sp_new = splot_new (gg.current_display, width, height);
       sp_new->p1dvar = jvar; 
 
       if (cpanel->parcoords_selection_mode == VAR_INSERT)
-        xg.current_display->splots = g_list_insert (xg.current_display->splots,
+        gg.current_display->splots = g_list_insert (gg.current_display->splots,
           (gpointer) sp_new, sp_indx);
       else if (cpanel->parcoords_selection_mode == VAR_APPEND)
-        xg.current_display->splots = g_list_insert (xg.current_display->splots,
+        gg.current_display->splots = g_list_insert (gg.current_display->splots,
           (gpointer) sp_new, MIN (sp_indx+1, nplots));
 
       box = (sp->da)->parent;
       gtk_box_pack_end (GTK_BOX (box), sp_new->da, false, false, 0);
       gtk_widget_show (sp_new->da);
 
-      l = xg.current_display->splots;
+      l = gg.current_display->splots;
       while (l) {
         w = ((splotd *) l->data)->da;
         gtk_widget_ref (w);
@@ -348,12 +348,12 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
         l = l->next ;
       }
 
-      xg.current_splot = sp_new;
+      gg.current_splot = sp_new;
       redraw = true;
     }
   }
 
-  gtk_window_set_policy (GTK_WINDOW (xg.current_display->window),
+  gtk_window_set_policy (GTK_WINDOW (gg.current_display->window),
     true, true, false);
 
   return redraw;
@@ -370,8 +370,8 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
   cpaneld *cpanel = (cpaneld *) &display->cpanel;
   gboolean draw_whisker;
 
-  for (k=0; k<xg.nrows_in_plot; k++) {
-    i = xg.rows_in_plot[k];
+  for (k=0; k<gg.nrows_in_plot; k++) {
+    i = gg.rows_in_plot[k];
     m = 2*i;
 
     /*-- if it's the leftmost plot, don'r draw the left whisker --*/
@@ -379,9 +379,9 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     else if (!display->options.missings_show_p &&
-          xg.nmissing > 0 &&
-          (xg.missing.data[i][sp->p1dvar] ||
-           xg.missing.data[i][sp_prev->p1dvar]))
+          gg.nmissing > 0 &&
+          (gg.missing.data[i][sp->p1dvar] ||
+           gg.missing.data[i][sp_prev->p1dvar]))
     {
       draw_whisker = false;
     }
@@ -423,7 +423,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next) {
     if (sp_next == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    else if (!display->options.missings_show_p && xg.nmissing > 0 &&
+    else if (!display->options.missings_show_p && gg.nmissing > 0 &&
             (MISSING_P(i,sp->p1dvar) || MISSING_P(i,sp_next->p1dvar)))
     {
       draw_whisker = false;

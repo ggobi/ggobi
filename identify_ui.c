@@ -32,7 +32,7 @@ displays_add_point_labels (splotd *splot, gint k) {
   splotd *sp;
   GtkWidget *w;
 
-  for (dlist = xg.displays; dlist; dlist = dlist->next) {
+  for (dlist = gg.displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
     for (slist = display->splots; slist; slist = slist->next) {
       sp = (splotd *) slist->data;
@@ -57,9 +57,9 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
  * sp = gtk_object_get_data (GTK_OBJECT (w), "splotd"));
 */
 
-  gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
-  gdk_window_get_pointer (w->window, &xg.app.cursor_pos.x, &xg.app.cursor_pos.y, NULL);
-  k = find_nearest_point (&xg.app.cursor_pos, sp);
+  gdk_gc_set_foreground (gg.plot_GC, &gg.accent_color);
+  gdk_window_get_pointer (w->window, &gg.app.cursor_pos.x, &gg.app.cursor_pos.y, NULL);
+  k = find_nearest_point (&gg.app.cursor_pos, sp);
 
   if (k != prev_nearest) {
 
@@ -128,13 +128,13 @@ identify_menus_make () {
 /*
  * Link menu
 */
-  xg.app.identify_link_menu = gtk_menu_new ();
+  gg.app.identify_link_menu = gtk_menu_new ();
 
   item = gtk_check_menu_item_new_with_label("Link identification");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (identify_link_cb),
                       (gpointer) NULL);
-  gtk_menu_append (GTK_MENU (xg.app.identify_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg.app.identify_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
   gtk_widget_show(item);
 }
@@ -143,33 +143,33 @@ void
 cpanel_identify_make() {
   GtkWidget *btn;
   
-  xg.control_panel[IDENT] = gtk_vbox_new(false, VBOX_SPACING);
-  gtk_container_set_border_width(GTK_CONTAINER(xg.control_panel[IDENT]), 5);
+  gg.control_panel[IDENT] = gtk_vbox_new(false, VBOX_SPACING);
+  gtk_container_set_border_width(GTK_CONTAINER(gg.control_panel[IDENT]), 5);
 
 /*
  * button for removing all labels
 */
   btn = gtk_button_new_with_label ("Remove labels");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS(xg.tips),
+  gtk_tooltips_set_tip (GTK_TOOLTIPS(gg.tips),
                         btn, "Remove all labels", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (id_remove_labels_cb),
                       (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[IDENT]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[IDENT]),
                       btn, false, false, 1);
 
 /*
  * button for making all labels sticky
 */
   btn = gtk_button_new_with_label ("Make all sticky");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS(xg.tips),
+  gtk_tooltips_set_tip (GTK_TOOLTIPS(gg.tips),
                         btn, "Make all labels sticky, or persistent", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (id_all_sticky_cb),
                       (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[IDENT]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[IDENT]),
                       btn, false, false, 1);
 
-  gtk_widget_show_all (xg.control_panel[IDENT]);
+  gtk_widget_show_all (gg.control_panel[IDENT]);
 }
 

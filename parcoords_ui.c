@@ -18,25 +18,25 @@ static void arrangement_cb (GtkWidget *w, gpointer cbd)
   gint indx = GPOINTER_TO_INT (cbd);
   g_printerr ("cbd: %s\n", arrangement_lbl[indx]);
 
-  if (indx != xg.current_display->cpanel.parcoords_arrangement)
-    parcoords_reset_arrangement (xg.current_display, indx);
+  if (indx != gg.current_display->cpanel.parcoords_arrangement)
+    parcoords_reset_arrangement (gg.current_display, indx);
 
-  xg.current_display->cpanel.parcoords_arrangement = indx;
+  gg.current_display->cpanel.parcoords_arrangement = indx;
 }
 
 static gchar *type_lbl[] = {"Texturing", "ASH", "Dotplot"};
 static void type_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &xg.current_display->cpanel;
+  cpaneld *cpanel = &gg.current_display->cpanel;
   cpanel->p1d_type = GPOINTER_TO_INT (cbd);
 
-  display_tailpipe (xg.current_display);
+  display_tailpipe (gg.current_display);
 }
 
 static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append"};
 static void selection_mode_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &xg.current_display->cpanel;
+  cpaneld *cpanel = &gg.current_display->cpanel;
   cpanel->parcoords_selection_mode = GPOINTER_TO_INT (cbd);
 }
 
@@ -63,14 +63,14 @@ cpanel_parcoords_make () {
   GtkWidget *vbox, *vb, *lbl, *sbar, *opt;
   GtkObject *adj;
   
-  xg.control_panel[PCPLOT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[PCPLOT]), 5);
+  gg.control_panel[PCPLOT] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (gg.control_panel[PCPLOT]), 5);
 
 /*
  * arrangement of plots, row or column
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[PCPLOT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Plot arrangement:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -78,7 +78,7 @@ cpanel_parcoords_make () {
 
   opt = gtk_option_menu_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
     "When opening a new parallel coordinates display, arrange the 1d plots in a row or a column",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
@@ -89,14 +89,14 @@ cpanel_parcoords_make () {
  * option menu: selection mode
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[PCPLOT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
     "Selecting a variable either replaces the variable in the current plot (swapping if appropriate), inserts a new plot before the current plot, or appends a new plot after it",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
@@ -108,14 +108,14 @@ cpanel_parcoords_make () {
  * option menu
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[PCPLOT]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[PCPLOT]), vb, false, false, 0);
 
   lbl = gtk_label_new ("Spreading method:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
     "Display either textured dot plots or average shifted histograms", NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, type_lbl,
@@ -128,7 +128,7 @@ cpanel_parcoords_make () {
  * ASH smoothness
 */
   vbox = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[PCPLOT]), vbox,
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[PCPLOT]), vbox,
     false, false, 0);
 
   lbl = gtk_label_new ("ASH smoothness:"),
@@ -140,7 +140,7 @@ cpanel_parcoords_make () {
                       GTK_SIGNAL_FUNC (ash_smoothness_cb), NULL);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), sbar,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), sbar,
     "Adjust ASH smoothness", NULL);
   gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
@@ -161,7 +161,7 @@ cpanel_parcoords_make () {
 
   opt = gtk_option_menu_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
     "Show all visible cases, or show only labelled cases", NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, showcases_lbl,
@@ -180,7 +180,7 @@ cpanel_parcoords_make () {
 
   opt = gtk_option_menu_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
     "Scale variables (and variable groups) on a common scale, or independently",
      NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
@@ -188,7 +188,7 @@ cpanel_parcoords_make () {
                         sizeof (varscale_lbl) / sizeof (gchar *),
                         varscale_cb);
 
-  gtk_widget_show_all (xg.control_panel[PCPLOT]);
+  gtk_widget_show_all (gg.control_panel[PCPLOT]);
 }
 
 
@@ -204,23 +204,23 @@ parcoords_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func) {
 /*
  * I/O menu
 */
-  xg.app.parcoords_mode_menu = gtk_menu_new ();
+  gg.app.parcoords_mode_menu = gtk_menu_new ();
 
-  CreateMenuItem (xg.app.parcoords_mode_menu, "Parallel Coordinates",
+  CreateMenuItem (gg.app.parcoords_mode_menu, "Parallel Coordinates",
     "^c", "", NULL, accel_group, func, GINT_TO_POINTER (PCPLOT));
 
   /* Add a separator */
-  CreateMenuItem (xg.app.parcoords_mode_menu, NULL,
+  CreateMenuItem (gg.app.parcoords_mode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL);
 
-  CreateMenuItem (xg.app.parcoords_mode_menu, "Brush",
+  CreateMenuItem (gg.app.parcoords_mode_menu, "Brush",
     "^b", "", NULL, accel_group, func, GINT_TO_POINTER (BRUSH));
-  CreateMenuItem (xg.app.parcoords_mode_menu, "Identify",
+  CreateMenuItem (gg.app.parcoords_mode_menu, "Identify",
     "^i", "", NULL, accel_group, func, GINT_TO_POINTER (IDENT));
-  CreateMenuItem (xg.app.parcoords_mode_menu, "Move Points",
+  CreateMenuItem (gg.app.parcoords_mode_menu, "Move Points",
     "^m", "", NULL, accel_group, func, GINT_TO_POINTER (MOVEPTS));
 
-  gtk_widget_show (xg.app.parcoords_mode_menu);
+  gtk_widget_show (gg.app.parcoords_mode_menu);
 }
 
 /*--------------------------------------------------------------------*/

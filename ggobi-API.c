@@ -12,44 +12,44 @@
 
 void warning(const char *msg);
 
-void XGOBI(displays_release)(xgobid *xg);
-void XGOBI(display_release)(displayd *display, xgobid *xg);
-void XGOBI(splot_release)(splotd *sp, displayd *display, xgobid *xg);
-void XGOBI(data_release)(xgobid *xg);
-void XGOBI(vardata_free)(xgobid *xg);
-void XGOBI(vardatum_free)(vardatad *var, xgobid *xg);
+void GGOBI(displays_release)(ggobid *gg);
+void GGOBI(display_release)(displayd *display, ggobid *gg);
+void GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg);
+void GGOBI(data_release)(ggobid *gg);
+void GGOBI(vardata_free)(ggobid *gg);
+void GGOBI(vardatum_free)(vardatad *var, ggobid *gg);
 
 const gchar *
-XGOBI(getFileName) ()
+GGOBI(getFileName) ()
 {
-  return(xg.filename);
+  return(gg.filename);
 }
 
 
 DataMode
-XGOBI(getDataMode) ()
+GGOBI(getDataMode) ()
 {
-  return(xg.data_mode);
+  return(gg.data_mode);
 }
 
 const gchar * const 
-XGOBI(getDataModeDescription)(DataMode mode)
+GGOBI(getDataModeDescription)(DataMode mode)
 {
  extern const gchar * const ModeNames[];
  return(ModeNames[mode]);
 }
 
 gchar **
-XGOBI(getVariableNames)(int transformed)
+GGOBI(getVariableNames)(int transformed)
 {
   gchar **names;
-  int nc = xg.ncols, i;
+  int nc = gg.ncols, i;
   vardatad *form;
 
   names = (gchar**) g_malloc(sizeof(gchar*)*nc);
 
     for(i = 0; i < nc; i++) {
-      form = xg.vardata + i;
+      form = gg.vardata + i;
       names[i] = transformed ? form->collab_tform : form->collab;
     }
 
@@ -58,22 +58,22 @@ XGOBI(getVariableNames)(int transformed)
 
 
 void
-XGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed)
+GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed)
 {
  gchar *old;
 
  if(transformed)
-   old = xg.vardata[jvar].collab_tform;
+   old = gg.vardata[jvar].collab_tform;
  else
-   old = xg.vardata[jvar].collab;
+   old = gg.vardata[jvar].collab;
 
  if(old)
    g_free(old);
 
  if(transformed)
-   xg.vardata[jvar].collab_tform = g_strdup(name);
+   gg.vardata[jvar].collab_tform = g_strdup(name);
  else
-   xg.vardata[jvar].collab = g_strdup(name);
+   gg.vardata[jvar].collab = g_strdup(name);
 }
 
 
@@ -81,9 +81,9 @@ XGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed)
   Closes the specified display
  */
 void 
-XGOBI(destroyCurrentDisplay)()
+GGOBI(destroyCurrentDisplay)()
 {
-  display_free (xg.current_display, false);
+  display_free (gg.current_display, false);
 }
 
 /*
@@ -102,57 +102,57 @@ XGOBI(destroyCurrentDisplay)()
   and put them in separate routines.
  */
 void
-XGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int nc)
+GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int nc)
 {
 extern void rowlabels_alloc(void);
  int i, j;
 
-  XGOBI(displays_release)(&xg);
-  XGOBI(data_release)(&xg);
+  GGOBI(displays_release)(&gg);
+  GGOBI(data_release)(&gg);
 
-  xg.ncols = nc;
-  xg.nrows = nr;
+  gg.ncols = nc;
+  gg.nrows = nr;
 
-  xg.nrows_in_plot = xg.nrows;  /*-- for now --*/
-  xg.nlinkable = xg.nrows;      /*-- for now --*/
-  xg.nrgroups = 0;              /*-- for now --*/
+  gg.nrows_in_plot = gg.nrows;  /*-- for now --*/
+  gg.nlinkable = gg.nrows;      /*-- for now --*/
+  gg.nrgroups = 0;              /*-- for now --*/
 
-  xg.rows_in_plot = NULL;
+  gg.rows_in_plot = NULL;
 
-  arrayf_alloc(&xg.raw, nr, nc);
+  arrayf_alloc(&gg.raw, nr, nc);
 
   rowlabels_alloc();
-  /*  xg.rowlab = (gchar **) g_malloc(nr * sizeof(gchar*)); */
+  /*  gg.rowlab = (gchar **) g_malloc(nr * sizeof(gchar*)); */
 
   vardata_alloc();
   vardata_init();
 
   for(j = 0; j < nc ; j++) {
-   xg.vardata[j].collab = g_strdup(colnames[j]);
-   xg.vardata[j].collab_tform = g_strdup(colnames[j]);
+   gg.vardata[j].collab = g_strdup(colnames[j]);
+   gg.vardata[j].collab_tform = g_strdup(colnames[j]);
    for(i = 0; i < nr ; i++) {
      if(j == 0) {
-       xg.rowlab[i] = g_strdup(rownames[i]);
+       gg.rowlab[i] = g_strdup(rownames[i]);
      }
 
-     xg.raw.data[i][j] = values[i + j*nr];
+     gg.raw.data[i][j] = values[i + j*nr];
    }
   }
 
    /* Now recompute and display the top plot. */
-  dataset_init(&xg);
+  dataset_init(&gg);
 
   /* Have to patch up the displays list since we removed
      every entry and that makes for meaningless entries.
    */
-  xg.displays->next = NULL;
+  gg.displays->next = NULL;
 }
 
 
 /* These are all for freeing the currently held data. */
 
 void
-XGOBI(displays_release)(xgobid *xg)
+GGOBI(displays_release)(ggobid *gg)
 {
  GList *dlist;
  displayd *display;
@@ -166,57 +166,57 @@ XGOBI(displays_release)(xgobid *xg)
 
     We have to patch the list up afterwards.
   */
- int num = g_list_length(xg->displays);
+ int num = g_list_length(gg->displays);
 
- for(dlist = xg->displays; dlist != NULL; dlist = dlist->next, num--) {
+ for(dlist = gg->displays; dlist != NULL; dlist = dlist->next, num--) {
   if(num == 0)
    break;
   display = (displayd *) dlist->data;
-  /*  display_release(display, xg); */
+  /*  display_release(display, gg); */
   display_free(display, true);
  }
 }
 
 void
-XGOBI(display_release)(displayd *display, xgobid *xg)
+GGOBI(display_release)(displayd *display, ggobid *gg)
 {
    display_free(display, true);
 }
 
 
 void
-XGOBI(splot_release)(splotd *sp, displayd *display, xgobid *xg)
+GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg)
 {
  splot_free(sp, display);
 }
 
 /* Not in the API for the moment. A "protected" routine. */
 void
-XGOBI(data_release)(xgobid *xg)
+GGOBI(data_release)(ggobid *gg)
 {
  extern void rowlabels_free(void);
- if(xg->rowlab) {
+ if(gg->rowlab) {
     rowlabels_free();
-    xg->rowlab = NULL;
+    gg->rowlab = NULL;
  }
 
-  XGOBI(vardata_free)(xg);
+  GGOBI(vardata_free)(gg);
 }
 
 void
-XGOBI(vardata_free)(xgobid *xg)
+GGOBI(vardata_free)(ggobid *gg)
 {
  int i;
 
-  for(i = 0; i < xg->ncols ; i++) {
-    XGOBI(vardatum_free)(xg->vardata+i, xg);
+  for(i = 0; i < gg->ncols ; i++) {
+    GGOBI(vardatum_free)(gg->vardata+i, gg);
   }
-  g_free(xg->vardata);
-  xg->vardata = NULL;
+  g_free(gg->vardata);
+  gg->vardata = NULL;
 }
 
 void 
-XGOBI(vardatum_free)(vardatad *var, xgobid *xg)
+GGOBI(vardatum_free)(vardatad *var, ggobid *gg)
 {
  if(var->collab)
   g_free(var->collab);
@@ -226,14 +226,14 @@ XGOBI(vardatum_free)(vardatad *var, xgobid *xg)
 
 
 const gchar * const*
-XGOBI(getViewTypes)(int *n)
+GGOBI(getViewTypes)(int *n)
 {
  *n = NDISPLAYTYPES;
  return(ViewTypes);
 }
 
 const gint *
-XGOBI(getViewTypeIndeces)(int *n)
+GGOBI(getViewTypeIndeces)(int *n)
 {
  *n = NDISPLAYTYPES;
  return(ViewTypeIndeces);
@@ -241,37 +241,37 @@ XGOBI(getViewTypeIndeces)(int *n)
 
 
 displayd *
-XGOBI(newScatterplot) (gint ix, gint iy)
+GGOBI(newScatterplot) (gint ix, gint iy)
 {
  displayd *display = NULL;
 
- display = display_create(0, &xg);
+ display = display_create(0, &gg);
 
 return(display);
 }
 
 displayd *
-XGOBI(newScatmat) (gint *rows, gint *columns)
+GGOBI(newScatmat) (gint *rows, gint *columns)
 {
  displayd *display = NULL;
 
- display = display_create(1, &xg);
+ display = display_create(1, &gg);
 
 return(display);
 }
 
 displayd *
-XGOBI(newParCoords)(gint *vars)
+GGOBI(newParCoords)(gint *vars)
 {
  displayd *display = NULL;
 
- display = display_create(2, &xg);
+ display = display_create(2, &gg);
 
 return(display);
 }
 
 displayd* 
-XGOBI(createPlot)(int type, char **varnames)
+GGOBI(createPlot)(int type, char **varnames)
 {
  displayd *display = NULL;
  /*
@@ -284,17 +284,17 @@ XGOBI(createPlot)(int type, char **varnames)
 
 
 const gchar* 
-XGOBI(getCurrentDisplayType)(xgobid *xg)
+GGOBI(getCurrentDisplayType)(ggobid *gg)
 {
- return(XGOBI(getViewTypeName)(xg->current_display->displaytype));
+ return(GGOBI(getViewTypeName)(gg->current_display->displaytype));
 }
 
 const gchar *
-XGOBI(getViewTypeName)(enum displaytyped type)
+GGOBI(getViewTypeName)(enum displaytyped type)
 {
  int n, i;
- const gint *types = XGOBI(getViewTypeIndeces)(&n);
- const gchar * const *names = XGOBI(getViewTypes)(&n);
+ const gint *types = GGOBI(getViewTypeIndeces)(&n);
+ const gchar * const *names = GGOBI(getViewTypes)(&n);
 
  for(i = 0; i < n; i++) {
    if(types[i] == type) {
@@ -311,9 +311,9 @@ XGOBI(getViewTypeName)(enum displaytyped type)
   Don't touch this.
  */
 const gfloat** 
-XGOBI(getRawData)()
+GGOBI(getRawData)()
 {
- return((const gfloat**) xg.raw.data);
+ return((const gfloat**) gg.raw.data);
 }
 
 /*
@@ -321,9 +321,9 @@ XGOBI(getRawData)()
   Don't touch this.
  */
 const gfloat** 
-XGOBI(getTFormData)()
+GGOBI(getTFormData)()
 {
- return((const gfloat **)xg.tform2.data);
+ return((const gfloat **)gg.tform2.data);
 }
 
 
@@ -333,9 +333,9 @@ XGOBI(getTFormData)()
   Do not change this as it is not a copy.
  */
 const gchar **
-XGOBI(getCaseNames)()
+GGOBI(getCaseNames)()
 {
- return((const gchar **) xg.rowlab);
+ return((const gchar **) gg.rowlab);
 }
 
 /*
@@ -350,18 +350,18 @@ XGOBI(getCaseNames)()
  value, but the caller will have to free that pointer.
  */
 void
-XGOBI(setCaseName)(gint index, const gchar *label)
+GGOBI(setCaseName)(gint index, const gchar *label)
 {
   gchar *old;
-  if(index < 0 || index >= xg.nrows) {
+  if(index < 0 || index >= gg.nrows) {
     warning("Index is out of range of observations in setCaseName");
     return; 
   }
 
-  old = xg.rowlab[index];
+  old = gg.rowlab[index];
 
   g_free(old);
-  xg.rowlab[index] = (gchar *)label;
+  gg.rowlab[index] = (gchar *)label;
 }
 
 
@@ -375,7 +375,7 @@ warning(const char *msg)
 
 
 gint *
-XGOBI(getGlyphTypes)(int *n)
+GGOBI(getGlyphTypes)(int *n)
 {
 
 
@@ -384,7 +384,7 @@ XGOBI(getGlyphTypes)(int *n)
 
 
 gchar const*
-XGOBI(getGlyphTypeName)(int type)
+GGOBI(getGlyphTypeName)(int type)
 {
  gchar const *ans;
   ans = "Foo";
@@ -394,90 +394,90 @@ XGOBI(getGlyphTypeName)(int type)
 
 
 gint *
-XGOBI(getCaseGlyphTypes)(gint *ids, gint n)
+GGOBI(getCaseGlyphTypes)(gint *ids, gint n)
 {
  int i;
  gint *ans = (gint *) g_malloc(n * sizeof(int));
 
  for(i = 0; i < n ; i++)
-   ans[i] = XGOBI(getCaseGlyphType)(ids[i]);
+   ans[i] = GGOBI(getCaseGlyphType)(ids[i]);
 
  return(ids);
 }
 
 gint 
-XGOBI(getCaseGlyphType)(gint id)
+GGOBI(getCaseGlyphType)(gint id)
 {
- int index = xg.rows_in_plot[id];
-  return(xg.glyph_ids[index].type);
+ int index = gg.rows_in_plot[id];
+  return(gg.glyph_ids[index].type);
 }
 
 gint *
-XGOBI(getCaseGlyphSizes)(gint *ids, gint n)
+GGOBI(getCaseGlyphSizes)(gint *ids, gint n)
 {
  int i;
  gint *ans = (gint *) g_malloc(n * sizeof(int));
 
  for(i = 0; i < n ; i++)
-   ans[i] = XGOBI(getCaseGlyphSize)(ids[i]);
+   ans[i] = GGOBI(getCaseGlyphSize)(ids[i]);
 
  return(ids);
 }
 
 gint 
-XGOBI(getCaseGlyphSize)(gint id)
+GGOBI(getCaseGlyphSize)(gint id)
 {
- int index = xg.rows_in_plot[id];
+ int index = gg.rows_in_plot[id];
 
-  return(xg.glyph_ids[index].size);
+  return(gg.glyph_ids[index].size);
 }
 
 
 void 
-XGOBI(setCaseGlyph)(gint index, gint type, gint size)
+GGOBI(setCaseGlyph)(gint index, gint type, gint size)
 {
-  xg.glyph_ids[index].size = size;
-  xg.glyph_ids[index].type = type;
+  gg.glyph_ids[index].size = size;
+  gg.glyph_ids[index].type = type;
 }
 
 void 
-XGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size)
+GGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size)
 {
  int i;
  for(i = 0; i < n ; i++)
-   XGOBI(setCaseGlyph)(ids[i], type, size);
+   GGOBI(setCaseGlyph)(ids[i], type, size);
 }
 
 
 void 
-XGOBI(setCaseColor)(gint pt, gint colorIndex)
+GGOBI(setCaseColor)(gint pt, gint colorIndex)
 {
- xg.color_ids[pt] = xg.color_now[pt] = colorIndex;
+ gg.color_ids[pt] = gg.color_now[pt] = colorIndex;
 }
 
 void 
-XGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx)
+GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx)
 {
  int i;
  for(i = 0; i < howMany ; i++)
-   XGOBI(setCaseColor)(pts[i], colorindx);
+   GGOBI(setCaseColor)(pts[i], colorindx);
 }
 
 
 gint 
-XGOBI(getCaseColor) (gint pt)
+GGOBI(getCaseColor) (gint pt)
 {
-  return(xg.color_ids[pt]);
+  return(gg.color_ids[pt]);
 }
 
 gint *
-XGOBI(getCaseColors)(gint *pts, gint howMany)
+GGOBI(getCaseColors)(gint *pts, gint howMany)
 {
  int i;
  gint *ans = (gint*) g_malloc(howMany * sizeof(int));
 
  for(i = 0; i < howMany ; i++)
-  ans[i] = XGOBI(getCaseColor)(pts[i]);
+  ans[i] = GGOBI(getCaseColor)(pts[i]);
 
  return(ans);
 }
@@ -485,19 +485,19 @@ XGOBI(getCaseColors)(gint *pts, gint howMany)
 
 
 void
-XGOBI(setObservationSegment)(gint x, gint y)
+GGOBI(setObservationSegment)(gint x, gint y)
 {
-  if(XGOBI(isConnectedSegment)(x, y) == false) {
-    segments_alloc(xg.nsegments+1);
-    xg.segment_endpoints[xg.nsegments].a = x;
-    xg.segment_endpoints[xg.nsegments].b = y;
-    xg.nsegments++;
+  if(GGOBI(isConnectedSegment)(x, y) == false) {
+    segments_alloc(gg.nsegments+1);
+    gg.segment_endpoints[gg.nsegments].a = x;
+    gg.segment_endpoints[gg.nsegments].b = y;
+    gg.nsegments++;
   }
 }
 
 
 gboolean 
-XGOBI(isConnectedSegment)(gint a, gint b)
+GGOBI(isConnectedSegment)(gint a, gint b)
 {
   gint tmp, i;
 
@@ -507,12 +507,12 @@ XGOBI(isConnectedSegment)(gint a, gint b)
      b = tmp;
   }
 
-  for(i = 0; i < xg.nsegments ; i++) {
+  for(i = 0; i < gg.nsegments ; i++) {
     
-    if(xg.segment_endpoints[i].a == a && xg.segment_endpoints[i].b == b)
+    if(gg.segment_endpoints[i].a == a && gg.segment_endpoints[i].b == b)
        return(true);
 
-    if(xg.segment_endpoints[i].a > a) {
+    if(gg.segment_endpoints[i].a > a) {
       return(false);
     } 
   }
@@ -522,47 +522,47 @@ XGOBI(isConnectedSegment)(gint a, gint b)
 
 
 gboolean 
-XGOBI(getShowLines)()
+GGOBI(getShowLines)()
 {
- return(XGOBI(getDefaultDisplayOptions)()->segments_directed_show_p);
+ return(GGOBI(getDefaultDisplayOptions)()->segments_directed_show_p);
 }
 
 
-gboolean XGOBI(setShowLines)(gboolean val)
+gboolean GGOBI(setShowLines)(gboolean val)
 {
- gboolean old = XGOBI(getShowLines)();
- XGOBI(getDefaultDisplayOptions)()->segments_directed_show_p = val;
+ gboolean old = GGOBI(getShowLines)();
+ GGOBI(getDefaultDisplayOptions)()->segments_directed_show_p = val;
 
  return(old);
 }
 
 DisplayOptions *
-XGOBI(getDefaultDisplayOptions)()
+GGOBI(getDefaultDisplayOptions)()
 {
  return(&DefaultDisplayOptions);
 }
 
 
 displayd *
-XGOBI(getDisplay)(int which)
+GGOBI(getDisplay)(int which)
 {
   displayd *display = NULL;
 
-  if(which < g_list_length(xg.displays))
-   display = (displayd *) g_list_nth_data(xg.displays, which);
+  if(which < g_list_length(gg.displays))
+   display = (displayd *) g_list_nth_data(gg.displays, which);
 
  return(display);
 }
 
 DisplayOptions *
-XGOBI(getDisplayOptions)(int displayNum)
+GGOBI(getDisplayOptions)(int displayNum)
 {
  DisplayOptions *options = NULL;
   if(displayNum < 0)
-   options =  XGOBI(getDefaultDisplayOptions)();
+   options =  GGOBI(getDefaultDisplayOptions)();
   else {
    displayd *display;
-    display = XGOBI(getDisplay)(displayNum);
+    display = GGOBI(getDisplay)(displayNum);
     if(display)
       options = &(display->options);
   }
@@ -572,23 +572,23 @@ XGOBI(getDisplayOptions)(int displayNum)
 
 
 displayd *
-XGOBI(getCurrentDisplay)()
+GGOBI(getCurrentDisplay)()
 {
- return(xg.current_display);
+ return(gg.current_display);
 }
 
 gint
-XGOBI(getCurrentDisplayIndex)()
+GGOBI(getCurrentDisplayIndex)()
 {
- return(g_list_index(xg.displays, xg.current_display));
+ return(g_list_index(gg.displays, gg.current_display));
 }
 
 displayd *
-XGOBI(setCurrentDisplay)(int which)
+GGOBI(setCurrentDisplay)(int which)
 {
  displayd *d;
 
- d = XGOBI(getDisplay)(which);
+ d = GGOBI(getDisplay)(which);
 
  if(d != NULL)
    display_set_current(d);
@@ -598,7 +598,7 @@ XGOBI(setCurrentDisplay)(int which)
 
 
 splotd *
-XGOBI(getPlot)(displayd *display, int which)
+GGOBI(getPlot)(displayd *display, int which)
 {
   splotd *sp = (splotd *) g_list_nth_data(display->splots, which);
   return(sp);

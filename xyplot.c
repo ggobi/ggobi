@@ -42,8 +42,8 @@ xy_reproject (splotd *sp, glong **world_data)
   gint jx = sp->xyvars.x;
   gint jy = sp->xyvars.y;
 
-  for (i=0; i<xg.nrows; i++) {
-    m = xg.rows_in_plot[i];
+  for (i=0; i<gg.nrows; i++) {
+    m = gg.rows_in_plot[i];
 
     sp->planar[m].x = world_data[m][jx];  /*-- regular or missings --*/
     sp->planar[m].y = world_data[m][jy];

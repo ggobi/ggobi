@@ -16,19 +16,19 @@ static GtkWidget *brush_on_btn;
 
 static void brush_on_cb (GtkToggleButton *button)
 {
-  cpaneld *cpanel = &xg.current_display->cpanel;
+  cpaneld *cpanel = &gg.current_display->cpanel;
   cpanel->brush_on_p = button->active;
 }
 
 static void brush_undo_cb (GtkToggleButton *button)
 {
-  brush_undo (xg.current_splot);
+  brush_undo (gg.current_splot);
 }
 
 static gchar *scope_lbl[] = {"Points", "Lines", "Points and lines"};
 static void brush_scope_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &xg.current_display->cpanel;
+  cpaneld *cpanel = &gg.current_display->cpanel;
   cpanel->br_scope = GPOINTER_TO_INT (cbd);
 }
 
@@ -36,14 +36,14 @@ static gchar *cg_lbl[] =
   {"Color and glyph", "Color only", "Glyph only", "Glyph size only", "Hide"};
 static void brush_cg_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &xg.current_display->cpanel;
+  cpaneld *cpanel = &gg.current_display->cpanel;
   cpanel->br_target = GPOINTER_TO_INT (cbd);
 }
 
 static gchar *mode_lbl[] = {"Persistent", "Transient"};
 static void brush_mode_cb (GtkWidget *w, gpointer cbd)
 {
-  cpaneld *cpanel = &xg.current_display->cpanel;
+  cpaneld *cpanel = &gg.current_display->cpanel;
   cpanel->br_mode = GPOINTER_TO_INT (cbd);
 }
 
@@ -95,7 +95,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
   mousepos_get_motion (w, event, &button1_p, &button2_p);
 
   if (button1_p || button2_p)
-    brush_motion (&xg.mousepos, button1_p, button2_p, cpanel);
+    brush_motion (&gg.mousepos, button1_p, button2_p, cpanel);
 
   return true;
 }
@@ -107,9 +107,9 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean retval = true;
   gboolean button1_p, button2_p;
 
-  xg.current_splot = sp;
-  xg.current_display = (displayd *) sp->displayptr;
-  cpanel = &xg.current_display->cpanel;
+  gg.current_splot = sp;
+  gg.current_display = (displayd *) sp->displayptr;
+  cpanel = &gg.current_display->cpanel;
 
   brush_prev_vectors_update ();
 
@@ -122,7 +122,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   brush_set_pos (event->x, event->y);
 
-  brush_motion (&xg.mousepos, button1_p, button2_p, cpanel);
+  brush_motion (&gg.mousepos, button1_p, button2_p, cpanel);
 
   return retval;
 }
@@ -132,8 +132,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  xg.mousepos.x = event->x;
-  xg.mousepos.y = event->y;
+  gg.mousepos.x = event->x;
+  gg.mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -141,9 +141,9 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
    * We're redrawing everything on button release; we have no
    * way of knowing at this point whether things changed or
    * not, since that information is not accumulated.
-  if (xg.brush_on) {
-    if (xg.jump_brush || xg.is_line_painting) {
-      plot_once(xg);
+  if (gg.brush_on) {
+    if (gg.jump_brush || gg.is_line_painting) {
+      plot_once(gg);
     }
   }
   */
@@ -181,98 +181,98 @@ brush_menus_make () {
 /*
  * Reset menu
 */
-  xg.app.brush_reset_menu = gtk_menu_new ();
+  gg.app.brush_reset_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Reset point colors");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "pointcolors");
-  gtk_menu_append (GTK_MENU (xg.app.brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg.app.brush_reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset brush size");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "brushsize");
-  gtk_menu_append (GTK_MENU (xg.app.brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg.app.brush_reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset linecolors");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "linecolors");
-  gtk_menu_append (GTK_MENU (xg.app.brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg.app.brush_reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset glyphs");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "glyphs");
-  gtk_menu_append (GTK_MENU (xg.app.brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg.app.brush_reset_menu), item);
 
-  gtk_widget_show_all (xg.app.brush_reset_menu);
+  gtk_widget_show_all (gg.app.brush_reset_menu);
 
 /*
  * Link menu
 */
-  xg.app.brush_link_menu = gtk_menu_new ();
+  gg.app.brush_link_menu = gtk_menu_new ();
 
   item = gtk_check_menu_item_new_with_label ("Link points <-> points");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "p2p");
-  gtk_menu_append (GTK_MENU (xg.app.brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg.app.brush_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   item = gtk_check_menu_item_new_with_label ("Link lines <-> lines");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "l2l");
-  gtk_menu_append (GTK_MENU (xg.app.brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg.app.brush_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   item = gtk_check_menu_item_new_with_label ("Link points <-> lines");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "p2l");
-  gtk_menu_append (GTK_MENU (xg.app.brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg.app.brush_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   item = gtk_check_menu_item_new_with_label ("Link color brushing");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "color");
-  gtk_menu_append (GTK_MENU (xg.app.brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg.app.brush_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
   item = gtk_check_menu_item_new_with_label ("Link glyph brushing");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "glyph");
-  gtk_menu_append (GTK_MENU (xg.app.brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg.app.brush_link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
-  gtk_widget_show_all (xg.app.brush_link_menu);
+  gtk_widget_show_all (gg.app.brush_link_menu);
 }
 
 void
 cpanel_brush_make () {
   GtkWidget *btn;
   
-  xg.control_panel[BRUSH] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[BRUSH]), 5);
+  gg.control_panel[BRUSH] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (gg.control_panel[BRUSH]), 5);
 
   brush_on_btn = gtk_check_button_new_with_label ("Brush on");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), brush_on_btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), brush_on_btn,
     "Make the brush active or inactive", NULL);
   gtk_signal_connect (GTK_OBJECT (brush_on_btn), "toggled",
                      GTK_SIGNAL_FUNC (brush_on_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[BRUSH]),
                       brush_on_btn, false, false, 0);
 
 /*
  * make an option menu for setting the brushing mode
 */
   scope_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), scope_opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), scope_opt,
     "Brush points only, lines only, or both points and lines", NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[BRUSH]),
                       scope_opt, false, false, 0);
   populate_option_menu (scope_opt, scope_lbl,
                         sizeof (scope_lbl) / sizeof (gchar *),
@@ -284,9 +284,9 @@ cpanel_brush_make () {
  * option menu for specifying whether to brush with color/glyph/both
 */
   cg_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), cg_opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), cg_opt,
     "Brush with color and glyph, color, glyph, glyph size; or hide", NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[BRUSH]),
                       cg_opt, false, false, 0);
   populate_option_menu (cg_opt, cg_lbl,
                         sizeof (cg_lbl) / sizeof (gchar *),
@@ -297,9 +297,9 @@ cpanel_brush_make () {
  * option menu for setting the brushing persistence
 */
   mode_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), mode_opt,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), mode_opt,
     "Persistent or transient brushing", NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[BRUSH]),
                       mode_opt, false, false, 0);
   populate_option_menu (mode_opt, mode_lbl,
                         sizeof (mode_lbl) / sizeof (gchar *),
@@ -308,10 +308,10 @@ cpanel_brush_make () {
 
 
   btn = gtk_button_new_with_label ("Undo");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
     "Undo the most recent brushing changes, from button down to button up",
     NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[BRUSH]),
                       btn, false, false, 0);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (brush_undo_cb), NULL);
@@ -320,26 +320,26 @@ cpanel_brush_make () {
  * button for opening symbol panel
 */
   btn = gtk_button_new_with_label ("Choose symbol ...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
     "Open panel for choosing color and glyph", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (open_symbol_window_cb),
                       (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[BRUSH]),
                       btn, false, false, 1);
 
 /*
  * button for opening hide/exclude panel
 */
   btn = gtk_button_new_with_label ("Hide or exclude ...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips),
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips),
                         btn,
                         "Open panel for hiding or excluding brushed groups",
                         NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[BRUSH]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[BRUSH]),
                       btn, false, false, 1);
 
-  gtk_widget_show_all (xg.control_panel[BRUSH]);
+  gtk_widget_show_all (gg.control_panel[BRUSH]);
 }
 
 /*--------------------------------------------------------------------*/

@@ -4,9 +4,9 @@ CC = gcc
 CFLAGS= -g -ansi -Wall -fpic
 SHARED_LD_FLAGS= -shared
 
-DEPENDS_FLAG=-MM
+#DEPENDS_FLAG=-MM
 
-SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c \
+SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
  read_array.c read_data.c \
  pipeline.c missing.c \
  scatterplot.c scatterplot_ui.c \
@@ -32,7 +32,7 @@ SRC=ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c \
  display_tree.c \
  ggobi-API.c
 
-OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o \
+OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  utils_ui.o utils.o utils_gdk.o \
  read_array.o read_data.o \
  pipeline.o missing.o \
@@ -79,8 +79,9 @@ clean:
 
 
 
-depends: $(SRC)
-	$(CC) $(DEPENDS_FLAG) $(CFLAGS) -I. `gtk-config --cflags` $(SRC) > $@	
+# depends: $(SRC)
+# 	$(CC) $(DEPENDS_FLAG) $(CFLAGS) -I. `gtk-config --cflags` $(SRC) > $@	
 
 
-include .depends
+# include .depends
+# DO NOT DELETE

@@ -50,7 +50,7 @@ plot_tree_display()
     the entire contents of the tree and start rebuilding
     with the current model.
   */
- if(xg.app.display_tree.tree == NULL) {
+ if(gg.app.display_tree.tree == NULL) {
   plot_tree_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(plot_tree_window), "GGobi Displays");
  } else {
@@ -62,7 +62,7 @@ plot_tree_display()
    This can attempt to remove the contents of the window,
    and allow them to be rebuilt so as to be consistent with the
    current display list.
-  tree = xg.display_tree.tree;
+  tree = gg.display_tree.tree;
   gtk_container_remove(GTK_CONTAINER(gtk_widget_get_ancestor(plot_tree_window, GTK_TYPE_WINDOW)), tree);
   */
  }
@@ -70,7 +70,7 @@ plot_tree_display()
   tree = gtk_tree_new();
 
   numItems = 0;
-  for (dlist = xg.displays; dlist; dlist = dlist->next, numItems++) {
+  for (dlist = gg.displays; dlist; dlist = dlist->next, numItems++) {
     display = (displayd *) dlist->data;
     display_add_tree(display, numItems, tree);
   }
@@ -86,8 +86,8 @@ plot_tree_display()
   gtk_signal_connect (GTK_OBJECT (plot_tree_window), "delete_event",
                       GTK_SIGNAL_FUNC (display_tree_delete_cb), NULL);
 
- xg.app.display_tree.tree = tree;
- xg.app.display_tree.numItems = numItems;
+ gg.app.display_tree.tree = tree;
+ gg.app.display_tree.numItems = numItems;
 
  return(GTK_TREE( tree ));
 }
@@ -122,8 +122,8 @@ gtk_signal_connect (GTK_OBJECT(item), "select",
 void
 display_tree_delete_cb(GtkWidget *w, GdkEvent *event, GtkWidget *display) 
 {
- xg.app.display_tree.tree = NULL;
- xg.app.display_tree.numItems = -1;
+ gg.app.display_tree.tree = NULL;
+ gg.app.display_tree.numItems = -1;
 }
 
 
@@ -200,14 +200,14 @@ splot_tree_label(splotd *splot, int ctr, enum displaytyped type)
  switch(type) {
     case scatterplot:
     case scatmat:
-      n = strlen(xg.vardata[splot->xyvars.x].collab) + strlen(xg.vardata[splot->xyvars.y].collab) + 5;
+      n = strlen(gg.vardata[splot->xyvars.x].collab) + strlen(gg.vardata[splot->xyvars.y].collab) + 5;
       buf = (char*) malloc(n* sizeof(char*));
-      sprintf(buf, "%s v %s",xg.vardata[splot->xyvars.x].collab, xg.vardata[splot->xyvars.y].collab);
+      sprintf(buf, "%s v %s",gg.vardata[splot->xyvars.x].collab, gg.vardata[splot->xyvars.y].collab);
      break;
     case parcoords:
-      n = strlen(xg.vardata[splot->p1dvar].collab);
+      n = strlen(gg.vardata[splot->p1dvar].collab);
       buf = (char*) malloc(n* sizeof(char*));
-      sprintf(buf,"%s",xg.vardata[splot->p1dvar].collab);
+      sprintf(buf,"%s",gg.vardata[splot->p1dvar].collab);
      break;
  }
 
@@ -240,7 +240,7 @@ tree_display_entry_remove(displayd *display, GtkWidget *tree)
   if(tree == NULL)
     return(-1);
 
-  for (dlist = xg.displays; dlist; dlist = dlist->next, which++) {
+  for (dlist = gg.displays; dlist; dlist = dlist->next, which++) {
     tmp = (displayd *) dlist->data;
     if(tmp == display)
       return(tree_display_entry_remove_by_index(which, tree));
@@ -274,7 +274,7 @@ void
 display_tree_display_child_select(GtkWidget *item, displayd *display)
 {
 
-  if(xg.app.display_tree.tree == NULL) {
+  if(gg.app.display_tree.tree == NULL) {
     return;
   }
 
@@ -294,7 +294,7 @@ void
 display_tree_splot_child_select(GtkWidget *item, splotd *plot)
 {
 
-  if(xg.app.display_tree.tree == NULL) {
+  if(gg.app.display_tree.tree == NULL) {
     return;
   }
 

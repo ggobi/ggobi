@@ -73,32 +73,32 @@ rejitter () {
  * this depends first on the selected variables and
  * second on vgroups (if jitter_vgroup is True)
 */
-  selected_cols = (gint *) g_realloc (selected_cols, xg.ncols * sizeof (gint));
-  nselected_cols = selected_cols_get (selected_cols, xg.jitter_vgroup);
+  selected_cols = (gint *) g_realloc (selected_cols, gg.ncols * sizeof (gint));
+  nselected_cols = selected_cols_get (selected_cols, gg.jitter_vgroup);
   if (nselected_cols == 0)
     nselected_cols = plotted_cols_get (selected_cols, false);
 
   for (j=0; j<nselected_cols; j++) {
     k = selected_cols[j];
-    for (i=0; i<xg.nrows_in_plot; i++) {
-      if ((m = xg.rows_in_plot[i]) >= xg.nlinkable)
+    for (i=0; i<gg.nrows_in_plot; i++) {
+      if ((m = gg.rows_in_plot[i]) >= gg.nlinkable)
         break;
       else {  /*-- jitter_one_value (m, k); --*/
 
-        frand = jitter_randval (xg.jitter_type) * precis;
+        frand = jitter_randval (gg.jitter_type) * precis;
 
         /*
          * The world.data used here is already jittered:
          * subtract out the previous jittered value ...
         */
-        if (xg.jitter_convex) {
-          fworld = (gfloat) (xg.world.data[m][k] - xg.jitter.data[m][k]);
-          fjit = xg.vardata[k].jitter_factor * (frand - fworld);
+        if (gg.jitter_convex) {
+          fworld = (gfloat) (gg.world.data[m][k] - gg.jitter.data[m][k]);
+          fjit = gg.vardata[k].jitter_factor * (frand - fworld);
         }
         else
-          fjit = xg.vardata[k].jitter_factor * frand;
+          fjit = gg.vardata[k].jitter_factor * frand;
 
-        xg.jitter.data[m][k] = (glong) fjit;
+        gg.jitter.data[m][k] = (glong) fjit;
       }
     }
   }
@@ -120,12 +120,12 @@ rejitter () {
 */
 void
 jitter_value_set (gfloat value) {
-  gint *cols = (gint *) g_malloc (xg.ncols * sizeof (gint));
-  gint ncols = selected_cols_get (cols, xg.jitter_vgroup);
+  gint *cols = (gint *) g_malloc (gg.ncols * sizeof (gint));
+  gint ncols = selected_cols_get (cols, gg.jitter_vgroup);
   gint j;
 
   for (j=0; j<ncols; j++)
-    xg.vardata[cols[j]].jitter_factor = value;
+    gg.vardata[cols[j]].jitter_factor = value;
 
   g_free ((gpointer) cols);
 }

@@ -66,7 +66,7 @@ GtkWidget *CreateMenuItem (GtkWidget *menu,
 
     /* --- If there was a tool tip --- */
     if (szTip && strlen (szTip))
-        gtk_tooltips_set_tip (xg.tips, menuitem, szTip, NULL);
+        gtk_tooltips_set_tip (gg.tips, menuitem, szTip, NULL);
 
     return (menuitem);
 }

@@ -23,21 +23,32 @@ typedef struct {
     gint x1, y1, x2, y2;
 } brush_coords;
 
-/* for xg.raw_data, tform1, tform2 */
+/* for gg.raw_data, tform1, tform2 */
 typedef struct {
   gfloat **data;
   gint nrows, ncols;
 } array_f;
-/* for xg.missing */
+/* for gg.missing */
 typedef struct {
   gshort **data;
   gint nrows, ncols;
 } array_s;
-/* for xg.missing */
+/* for gg.missing */
 typedef struct {
   glong **data;
   gint nrows, ncols;
 } array_l;
+
+/*-- vectors --*/
+typedef struct {
+  gfloat *data;
+  gint nels;
+} vector_f;
+/*-- vectors --*/
+typedef struct {
+  gint *data;
+  gint nels;
+} vector_i;
 
 
 typedef struct {  /*-- used for obtaining ranks --*/
@@ -98,7 +109,7 @@ typedef struct {
   gint glyphtype, glyphsize;
   gshort color;
   gboolean hidden, included;
-  GtkWidget *da, *hide_tgl, *exclude_tgl;
+  GtkWidget *da, *lbl, *hide_tgl, *exclude_tgl;
 } clusterd;
 
 /* glyph vectors */

@@ -123,9 +123,9 @@ subset_window_open (void) {
   GtkWidget *label;
   GtkWidget *spinner, *start_spinner, *block_spinner;
   GtkAdjustment *adj;
-  gfloat fnr = (gfloat) xg.nrows;
+  gfloat fnr = (gfloat) gg.nrows;
 
-  if (xg.nrows == 0)  /*-- if used before we have data --*/
+  if (gg.nrows == 0)  /*-- if used before we have data --*/
     return;
 
   if (window == NULL) {
@@ -160,8 +160,8 @@ subset_window_open (void) {
     ss_random_entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (ss_random_entry), 8);
     gtk_entry_set_text (GTK_ENTRY (ss_random_entry),
-      g_strdup_printf ("%d", xg.nrows));
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), ss_random_entry,
+      g_strdup_printf ("%d", gg.nrows));
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), ss_random_entry,
       "Type in the desired sample size", NULL);
     gtk_box_pack_start (GTK_BOX (hb), ss_random_entry, true, true, 2);
 
@@ -192,7 +192,7 @@ subset_window_open (void) {
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (start_spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (start_spinner),
                                      GTK_SHADOW_OUT);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), start_spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), start_spinner,
       "Specify the first row of the block", NULL);
     gtk_box_pack_start (GTK_BOX (vb), start_spinner, false, false, 0);
     gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,0,1);
@@ -209,7 +209,7 @@ subset_window_open (void) {
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (block_spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (block_spinner),
                                      GTK_SHADOW_OUT);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), block_spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), block_spinner,
       "Specify the size of the block", NULL);
     gtk_box_pack_start (GTK_BOX (vb), block_spinner, false, false, 0);
     gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
@@ -226,7 +226,7 @@ subset_window_open (void) {
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (spinner),
                                      GTK_SHADOW_OUT);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), spinner,
       "Specify the size of the increment for the arrows used to increment and decrement the first case, just above", NULL);
     gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
 		      GTK_SIGNAL_FUNC (set_start_incr_cb),
@@ -246,7 +246,7 @@ subset_window_open (void) {
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (spinner),
                                      GTK_SHADOW_OUT);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), spinner,
       "Specify the size of the increment for the arrows used to increment and decrement the blocksize, just above", NULL);
     gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
 		                GTK_SIGNAL_FUNC (set_block_incr_cb),
@@ -280,7 +280,7 @@ subset_window_open (void) {
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (start_spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (start_spinner),
                                      GTK_SHADOW_OUT);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), start_spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), start_spinner,
       "Specify the first row of the block", NULL);
     gtk_box_pack_start (GTK_BOX (vb), start_spinner, false, false, 0);
     gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,0,1);
@@ -297,7 +297,7 @@ subset_window_open (void) {
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (block_spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (block_spinner),
                                      GTK_SHADOW_OUT);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), block_spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), block_spinner,
       "Specify the size of the block", NULL);
     gtk_box_pack_start (GTK_BOX (vb), block_spinner, false, false, 0);
     gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
@@ -328,7 +328,7 @@ subset_window_open (void) {
   
     ss_rowlab_entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (ss_rowlab_entry), 32);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), ss_rowlab_entry,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), ss_rowlab_entry,
       "Type in the label shared by the cases you want in the subset",
       NULL);
     gtk_box_pack_start (GTK_BOX (hb), ss_rowlab_entry, true, true, 2);
@@ -345,7 +345,7 @@ subset_window_open (void) {
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
 
     button = gtk_button_new_with_label ("Subset");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), spinner,
       "Draw a new subset and update all plots", NULL);
     gtk_signal_connect (GTK_OBJECT (button),
                         "clicked",
@@ -354,14 +354,14 @@ subset_window_open (void) {
     gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
 
     button = gtk_check_button_new_with_label ("Rescale");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), button,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), button,
                           "Rescale the data when drawing a new subset", NULL);
     gtk_signal_connect (GTK_OBJECT (button), "toggled",
                         GTK_SIGNAL_FUNC (rescalep_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
     
     button = gtk_button_new_with_label ("Include all");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), spinner,
       "Stop subsetting: include all cases and update all plots", NULL);
     gtk_signal_connect (GTK_OBJECT (button),
                         "clicked",

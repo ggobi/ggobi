@@ -19,14 +19,14 @@ pipeline_arrays_free ()
  * Dynamically free arrays used in data pipeline.
 */
 {
-  arrayf_free (&xg.tform1, 0, 0);
-  arrayf_free (&xg.tform2, 0, 0);
+  arrayf_free (&gg.tform1, 0, 0);
+  arrayf_free (&gg.tform2, 0, 0);
 
-  arrayl_free (&xg.world, 0, 0);
-  arrayl_free (&xg.jitter, 0, 0);
+  arrayl_free (&gg.world, 0, 0);
+  arrayl_free (&gg.jitter, 0, 0);
 
-  g_free ((gpointer) xg.rows_in_plot);
-  g_free ((gpointer) xg.sampled);
+  g_free ((gpointer) gg.rows_in_plot);
+  g_free ((gpointer) gg.sampled);
 }
 
 void
@@ -35,18 +35,18 @@ pipeline_arrays_alloc ()
  * Dynamically allocate arrays.
 */
 {
-  gint nc = xg.ncols, nr = xg.nrows;
+  gint nc = gg.ncols, nr = gg.nrows;
 
-  if (xg.tform1.data != NULL) pipeline_arrays_free ();
+  if (gg.tform1.data != NULL) pipeline_arrays_free ();
 
-  arrayf_alloc (&xg.tform1, nr, nc);
-  arrayf_alloc (&xg.tform2, nr, nc);
+  arrayf_alloc (&gg.tform1, nr, nc);
+  arrayf_alloc (&gg.tform2, nr, nc);
 
-  arrayl_alloc (&xg.world, nr, nc);
-  arrayl_alloc_zero (&xg.jitter, nr, nc);
+  arrayl_alloc (&gg.world, nr, nc);
+  arrayl_alloc_zero (&gg.jitter, nr, nc);
 
-  xg.rows_in_plot = (gint *) g_malloc (nr * sizeof (gint));
-  xg.sampled = (gboolean *) g_malloc (nr * sizeof (gboolean));
+  gg.rows_in_plot = (gint *) g_malloc (nr * sizeof (gint));
+  gg.sampled = (gboolean *) g_malloc (nr * sizeof (gboolean));
 }
 
 void
@@ -56,24 +56,24 @@ pipeline_arrays_add_column (gint jvar)
  * copy column jvar into the new column
 */
 {
-  gint nc = xg.ncols + 1, nr = xg.nrows;
+  gint nc = gg.ncols + 1, nr = gg.nrows;
   register gint i;
 
-  arrayf_add_cols (&xg.raw, nc);
-  arrayf_add_cols (&xg.tform1, nc);
-  arrayf_add_cols (&xg.tform2, nc);
+  arrayf_add_cols (&gg.raw, nc);
+  arrayf_add_cols (&gg.tform1, nc);
+  arrayf_add_cols (&gg.tform2, nc);
 
-  arrayl_add_cols (&xg.world, nc);
-  arrayl_add_cols (&xg.jitter, nc);
+  arrayl_add_cols (&gg.world, nc);
+  arrayl_add_cols (&gg.jitter, nc);
 
   for (i=0; i<nr; i++) {
-    xg.raw.data[i][nc-1] = xg.raw.data[i][jvar];
+    gg.raw.data[i][nc-1] = gg.raw.data[i][jvar];
 
-    xg.tform1.data[i][nc-1] = xg.tform1.data[i][jvar];
-    xg.tform2.data[i][nc-1] = xg.tform2.data[i][jvar];
+    gg.tform1.data[i][nc-1] = gg.tform1.data[i][jvar];
+    gg.tform2.data[i][nc-1] = gg.tform2.data[i][jvar];
 
-    xg.world.data[i][nc-1] = xg.world.data[i][jvar];
-    xg.jitter.data[i][nc-1] = xg.jitter.data[i][jvar];
+    gg.world.data[i][nc-1] = gg.world.data[i][jvar];
+    gg.jitter.data[i][nc-1] = gg.jitter.data[i][jvar];
   }
 }
 
@@ -120,21 +120,21 @@ vardata_lim_raw_gp_set ()
   gint k;
   gint nvgr = nvgroups ();
 
-  cols = (gint *) g_malloc (xg.ncols * sizeof (gint));
+  cols = (gint *) g_malloc (gg.ncols * sizeof (gint));
   for (k=0; k<nvgr; k++) {
     ncols = 0;
-    for (j=0; j<xg.ncols; j++) {
-      if (xg.vardata[j].groupid == k)
+    for (j=0; j<gg.ncols; j++) {
+      if (gg.vardata[j].groupid == k)
         cols[ncols++] = j;
       else
         cols[j] = j;
     }
 
-    min_max (xg.raw.data, cols, ncols, &min, &max);
+    min_max (gg.raw.data, cols, ncols, &min, &max);
     limits_adjust (&min, &max);
     for (j=0; j<ncols; j++) {
-      xg.vardata[cols[j]].lim_raw_gp.min = min;
-      xg.vardata[cols[j]].lim_raw_gp.max = max;
+      gg.vardata[cols[j]].lim_raw_gp.min = min;
+      gg.vardata[cols[j]].lim_raw_gp.max = max;
     }
   }
 
@@ -149,19 +149,19 @@ vardata_lim_tform_gp_set ()
   gint k;
   gint nvgr = nvgroups ();
 
-  cols = (gint *) g_malloc (xg.ncols * sizeof (gint));
+  cols = (gint *) g_malloc (gg.ncols * sizeof (gint));
   for (k=0; k<nvgr; k++) {
     ncols = 0;
-    for (j=0; j<xg.ncols; j++) {
-      if (xg.vardata[j].groupid == k)
+    for (j=0; j<gg.ncols; j++) {
+      if (gg.vardata[j].groupid == k)
         cols[ncols++] = j;
     }
 
-    min_max (xg.tform2.data, cols, ncols, &min, &max);
+    min_max (gg.tform2.data, cols, ncols, &min, &max);
     limits_adjust (&min, &max);
     for (n=0; n<ncols; n++) {
-      xg.vardata[cols[n]].lim_tform_gp.min = min;
-      xg.vardata[cols[n]].lim_tform_gp.max = max;
+      gg.vardata[cols[n]].lim_tform_gp.min = min;
+      gg.vardata[cols[n]].lim_tform_gp.max = max;
     }
   }
 
@@ -186,35 +186,35 @@ vardata_lim_update ()
    * the min and max for each variable group (and thus for each
    * column).
   */
-  cols = (gint *) g_malloc (xg.ncols * sizeof (gint));
+  cols = (gint *) g_malloc (gg.ncols * sizeof (gint));
   for (k=0; k<nvgr; k++) {
     ncols = 0;
-    for (j=0; j<xg.ncols; j++) {
-      if (xg.vardata[j].groupid == k)
+    for (j=0; j<gg.ncols; j++) {
+      if (gg.vardata[j].groupid == k)
         cols[ncols++] = j;
     }
 
-    switch (xg.std_type)
+    switch (gg.std_type)
     {
       case 0:
         /*-- isn't this already done? --*/
-/*      min_max (xg.tform2, cols, ncols, &min, &max);*/
-        min = xg.vardata[cols[0]].lim_tform_gp.min;
-        max = xg.vardata[cols[0]].lim_tform_gp.max;
+/*      min_max (gg.tform2, cols, ncols, &min, &max);*/
+        min = gg.vardata[cols[0]].lim_tform_gp.min;
+        max = gg.vardata[cols[0]].lim_tform_gp.max;
         break;
       case 1:
-        mean_largest_dist (xg.tform2.data, cols, ncols, &min, &max);
+        mean_largest_dist (gg.tform2.data, cols, ncols, &min, &max);
         break;
       case 2:
-        median_largest_dist (xg.tform2.data, cols, ncols, &min, &max);
+        median_largest_dist (gg.tform2.data, cols, ncols, &min, &max);
         break;
     }
 
     limits_adjust (&min, &max);
 
     for (n=0; n<ncols; n++) {
-      xg.vardata[cols[n]].lim.min = min;
-      xg.vardata[cols[n]].lim.max = max;
+      gg.vardata[cols[n]].lim.min = min;
+      gg.vardata[cols[n]].lim.max = max;
     }
   }
   g_free ((gpointer) cols);
@@ -235,12 +235,12 @@ min_max (gfloat **data, gint *cols, gint ncols, gfloat *min, gfloat *max)
 /*
  * Choose an initial value for *min and *max
 */
-  *min = *max = data[xg.rows_in_plot[0]][cols[0]];
+  *min = *max = data[gg.rows_in_plot[0]][cols[0]];
 
   for (n=0; n<ncols; n++) {
     j = cols[n];
-    for (i=0; i<xg.nrows_in_plot; i++) {
-      k = xg.rows_in_plot[i];
+    for (i=0; i<gg.nrows_in_plot; i++) {
+      k = gg.rows_in_plot[i];
       if (data[k][j] < *min)
         *min = data[k][j];
       else if (data[k][j] > *max)
@@ -276,13 +276,13 @@ median_largest_dist (gfloat **data, gint *cols, gint ncols,
   gdouble dmedian = 0;
   extern gint fcompare (const void *, const void *);
 
-  np = ncols * xg.nrows_in_plot;
+  np = ncols * gg.nrows_in_plot;
   x = (gfloat *) g_malloc (np * sizeof (gfloat));
   for (n=0; n<ncols; n++) {
     j = cols[n];
-    for (i=0; i<xg.nrows_in_plot; i++) {
-      k = xg.rows_in_plot[i];
-      x[n*xg.nrows_in_plot + i] = data[k][j];
+    for (i=0; i<gg.nrows_in_plot; i++) {
+      k = gg.rows_in_plot[i];
+      x[n*gg.nrows_in_plot + i] = data[k][j];
     }
   }
 
@@ -294,10 +294,10 @@ median_largest_dist (gfloat **data, gint *cols, gint ncols,
    * from the mean over all rows
   */
 
-  for (i=0; i<xg.nrows_in_plot; i++) {
+  for (i=0; i<gg.nrows_in_plot; i++) {
     sumdist = 0.0;
     for (j=0; j<ncols; j++) {
-      dx = (gdouble) data[xg.rows_in_plot[i]][cols[j]] - dmedian;
+      dx = (gdouble) data[gg.rows_in_plot[i]][cols[j]] - dmedian;
       sumdist += (dx*dx);
     }
     if (sumdist > lgdist)
@@ -331,22 +331,22 @@ mean_largest_dist (gfloat **data, gint *cols, gint ncols,
   */
   sumxi = 0.0;
   for (j=0; j<ncols; j++) {
-    for (i=0; i<xg.nrows_in_plot; i++) {
-      dx = (gdouble) data[xg.rows_in_plot[i]][cols[j]];
+    for (i=0; i<gg.nrows_in_plot; i++) {
+      dx = (gdouble) data[gg.rows_in_plot[i]][cols[j]];
       sumxi += dx;
     }
   }
-  mean = sumxi / (gdouble) xg.nrows_in_plot / (gdouble) ncols;
+  mean = sumxi / (gdouble) gg.nrows_in_plot / (gdouble) ncols;
 
   /*
    * Find the maximum of the sum of squared differences
    * from the mean over all rows
   */
 
-  for (i=0; i<xg.nrows_in_plot; i++) {
+  for (i=0; i<gg.nrows_in_plot; i++) {
     sumdist = 0.0;
     for (j=0; j<ncols; j++) {
-      dx = (gdouble) data[xg.rows_in_plot[i]][cols[j]] - mean;
+      dx = (gdouble) data[gg.rows_in_plot[i]][cols[j]] - mean;
       sumdist += (dx*dx);
     }
     if (sumdist > lgdist)
@@ -372,19 +372,19 @@ tform_to_world ()
   gfloat max, min, range, ftmp;
   gfloat precis = PRECISION1;
 
-  for (j=0; j<xg.ncols; j++) {
+  for (j=0; j<gg.ncols; j++) {
 
-    max = xg.vardata[j].lim.max;
-    min = xg.vardata[j].lim.min;
+    max = gg.vardata[j].lim.max;
+    min = gg.vardata[j].lim.min;
     range = max - min;
 
-    for (i=0; i<xg.nrows_in_plot; i++) {
-      m = xg.rows_in_plot[i];
-      ftmp = -1.0 + 2.0*(xg.tform2.data[m][j] - min) / range;
-      xg.world.data[m][j] = (glong) (precis * ftmp);
+    for (i=0; i<gg.nrows_in_plot; i++) {
+      m = gg.rows_in_plot[i];
+      ftmp = -1.0 + 2.0*(gg.tform2.data[m][j] - min) / range;
+      gg.world.data[m][j] = (glong) (precis * ftmp);
 
       /* Add in the jitter values */
-      xg.world.data[m][j] += xg.jitter.data[m][j];
+      gg.world.data[m][j] += gg.jitter.data[m][j];
     }
   }
 }
@@ -404,17 +404,17 @@ void
 rows_in_plot_set (void) {
   gint i;
 
-  xg.nrows_in_plot = 0;
-  xg.nlinkable_in_plot = 0;
+  gg.nrows_in_plot = 0;
+  gg.nlinkable_in_plot = 0;
 
-  for (i=0; i<xg.nrows; i++) {
-    if (i < xg.nlinkable) {
-      if (xg.included[i] && xg.sampled[i]) {
-        xg.rows_in_plot[xg.nrows_in_plot++] = i;
-        xg.nlinkable_in_plot++;
+  for (i=0; i<gg.nrows; i++) {
+    if (i < gg.nlinkable) {
+      if (gg.included[i] && gg.sampled[i]) {
+        gg.rows_in_plot[gg.nrows_in_plot++] = i;
+        gg.nlinkable_in_plot++;
       }
-    } else {  /*-- include all points past xg.nlinkable --*/
-      xg.rows_in_plot[xg.nrows_in_plot++] = i;
+    } else {  /*-- include all points past gg.nlinkable --*/
+      gg.rows_in_plot[gg.nrows_in_plot++] = i;
     }
   }
 }

@@ -8,9 +8,9 @@ static GtkWidget *window = NULL;
 
 void
 jitter_vars_init () {
-  xg.jitter_type = UNIFORM;
-  xg.jitter_vgroup = true;
-  xg.jitter_convex = true;
+  gg.jitter_type = UNIFORM;
+  gg.jitter_vgroup = true;
+  gg.jitter_convex = true;
 }
 
 static void
@@ -24,7 +24,7 @@ jitter_cb (GtkButton *button)
 */
 static void
 degree_cb (GtkAdjustment *adj, gpointer cbd) {
-  if (xg.current_display->missing_p) {
+  if (gg.current_display->missing_p) {
     missing_jitter_value_set (adj->value);
     missing_rejitter ();
   } else {
@@ -42,14 +42,14 @@ static gchar *type_lbl[] = {"Uniform", "Normal"};
 static void type_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
-  xg.jitter_type = indx;
+  gg.jitter_type = indx;
   rejitter ();
 }
 
 static void
 vgroups_cb (GtkToggleButton *button)
 {
-  xg.jitter_vgroup = button->active;
+  gg.jitter_vgroup = button->active;
 }
 
 void
@@ -60,7 +60,7 @@ jitter_window_open (void) {
   GtkWidget *sbar, *opt;
   GtkObject *adj;
 
-  if (xg.nrows == 0)  /*-- if used before we have data --*/
+  if (gg.nrows == 0)  /*-- if used before we have data --*/
     return;
 
   if (window == NULL) {
@@ -90,7 +90,7 @@ jitter_window_open (void) {
                         GTK_SIGNAL_FUNC (degree_cb), NULL);
 
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), sbar,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), sbar,
       "Set the degree of jitter", NULL);
     gtk_scale_set_draw_value (GTK_SCALE (sbar), false);
     gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
@@ -102,7 +102,7 @@ jitter_window_open (void) {
  * Rejitter button
 */
     btn = gtk_button_new_with_label ("Jitter");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
       "Rejitter the data", NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                        GTK_SIGNAL_FUNC (jitter_cb), (gpointer) NULL);
@@ -112,7 +112,7 @@ jitter_window_open (void) {
  * option menu
 */
     opt = gtk_option_menu_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), opt,
       "The jittering is either distributed uniform or normal", NULL);
     gtk_box_pack_start (GTK_BOX (vbox),
                         opt, false, false, 0);
@@ -124,7 +124,7 @@ jitter_window_open (void) {
  * Jitter vgroups toggle
 */
     tgl = gtk_check_button_new_with_label ("Jitter vgroup");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), tgl,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), tgl,
       "Jitter each variable in the variable groups of this plot's selected variables",
       NULL);
     gtk_signal_connect (GTK_OBJECT (tgl), "toggled",

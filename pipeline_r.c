@@ -17,22 +17,22 @@ world_to_raw_by_var (gint pt, gint var)
   gfloat precis = PRECISION1;
   gfloat ftmp, rdiff;
 
-  rdiff = xg.lim[var].max - xg.lim[var].min;
+  rdiff = gg.lim[var].max - gg.lim[var].min;
 
   /*
    * The new world.data value is taken to include the
    * value of jitter.data
   */
-  ftmp = (gfloat)(xg.world.data[pt][var] - xg.jitter.data[pt][var]) / precis;
+  ftmp = (gfloat)(gg.world.data[pt][var] - gg.jitter.data[pt][var]) / precis;
 
-  xg.tform2.data[pt][var] = (ftmp + 1.0) * .5 * rdiff;
-  xg.tform2.data[pt][var] += xg.lim[var].min;
+  gg.tform2.data[pt][var] = (ftmp + 1.0) * .5 * rdiff;
+  gg.tform2.data[pt][var] += gg.lim[var].min;
 
   /*-- no transformations will be supported --*/
-  xg.tform1.data[pt][var] = xg.tform2.data[pt][var];
-  xg.tform1.data[pt][var] += xg.lim[var].min;
+  gg.tform1.data[pt][var] = gg.tform2.data[pt][var];
+  gg.tform1.data[pt][var] += gg.lim[var].min;
 
-  xg.raw.data[pt][var] = xg.tform2.data[pt][var];
+  gg.raw.data[pt][var] = gg.tform2.data[pt][var];
 }
 
 void

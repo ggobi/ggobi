@@ -224,7 +224,7 @@ scatterplot_new (gboolean missing_p) {
   /* 
    * Initialize tour
    */
-  if (display->displaytype == scatterplot && xg.ncols > 2) 
+  if (display->displaytype == scatterplot && gg.ncols > 2) 
     display_tour_init(display);
 
   table = gtk_table_new (3, 2, false);  /* rows, columns, homogeneous */

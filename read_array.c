@@ -19,7 +19,7 @@ static void
 stdin_empty (gint arg)
 {
   if (!gotone) {
-    g_printerr ("xgobi requires a filename or some data from stdin\n");
+    g_printerr ("ggobi requires a filename or some data from stdin\n");
     exit (0);
   }
 }
@@ -41,16 +41,16 @@ strip_suffixes ()
   };
 
   for (i=0; i<nsuffixes; i++) {
-    nchars = strlen (xg.filename) - strlen (suffix[i]) ;
-    if (strcmp (suffix[i], (gchar *) &xg.filename[nchars]) == 0) {
-      xg.fname = g_strndup (xg.filename, nchars);
+    nchars = strlen (gg.filename) - strlen (suffix[i]) ;
+    if (strcmp (suffix[i], (gchar *) &gg.filename[nchars]) == 0) {
+      gg.fname = g_strndup (gg.filename, nchars);
       foundit = true;
       break;
     }
   }
 
   if (!foundit)
-    xg.fname = g_strdup (xg.filename);
+    gg.fname = g_strdup (gg.filename);
 }
 
 void
@@ -62,7 +62,7 @@ read_binary (FILE *fp)
 
   fread ((gchar *) &nr, sizeof (gint), 1, fp);
   fread ((gchar *) &nc, sizeof (gint), 1, fp);
-  xg.ncols = nc;
+  gg.ncols = nc;
 
   /*
    * As soon as the number of columns is known, allocate vardata.
@@ -70,102 +70,102 @@ read_binary (FILE *fp)
   vardata_alloc ();
   vardata_init ();
 
-  xg.nrows = (xg.file_read_type == read_all) ?  nr : xg.file_sample_size;
+  gg.nrows = (gg.file_read_type == read_all) ?  nr : gg.file_sample_size;
 
-  xg.file_rows_sampled = (glong *) g_realloc (xg.file_rows_sampled,
-                                              xg.nrows * sizeof (glong));
+  gg.file_rows_sampled = (glong *) g_realloc (gg.file_rows_sampled,
+                                              gg.nrows * sizeof (glong));
 
-  arrayf_alloc (&xg.raw, xg.nrows, xg.ncols);
+  arrayf_alloc (&gg.raw, gg.nrows, gg.ncols);
 
-  if (xg.file_read_type == read_block) {
+  if (gg.file_read_type == read_block) {
     fseek (fp,
-      (glong) (sizeof (glong) * 2 + onesize * (xg.file_start_row * xg.ncols)),
+      (glong) (sizeof (glong) * 2 + onesize * (gg.file_start_row * gg.ncols)),
       SEEK_SET);
   }
 
-  if (xg.file_read_type == read_all) {
+  if (gg.file_read_type == read_all) {
 
-    for (i=0; i<xg.nrows; i++) {
-      for (j=0; j<xg.ncols; j++) {
-        out = fread ((gchar *) &xg.raw.data[i][j], onesize, 1, fp);
+    for (i=0; i<gg.nrows; i++) {
+      for (j=0; j<gg.ncols; j++) {
+        out = fread ((gchar *) &gg.raw.data[i][j], onesize, 1, fp);
         if (out != 1) {
           g_printerr ("problem in reading the binary data file\n");
           fclose (fp);
           exit (0);
 
-        } else if (xg.raw.data[i][j] == FLT_MAX) {
-          xg.raw.data[i][j] = 0.0;
+        } else if (gg.raw.data[i][j] == FLT_MAX) {
+          gg.raw.data[i][j] = 0.0;
 
           /* Allocate the missing values array */
-          if (xg.nmissing == 0)
-            arrays_alloc (&xg.missing, xg.nrows, xg.ncols);
-          xg.missing.data[i][j] = 1;
-          xg.vardata[j].nmissing++;
-          xg.nmissing++;
+          if (gg.nmissing == 0)
+            arrays_alloc (&gg.missing, gg.nrows, gg.ncols);
+          gg.missing.data[i][j] = 1;
+          gg.vardata[j].nmissing++;
+          gg.nmissing++;
         }
       }
     }
 
-  } else if (xg.file_read_type == read_block) {
+  } else if (gg.file_read_type == read_block) {
     gint q;
 
-    for (i=0, q=xg.file_start_row; i<xg.nrows; i++, q++) {
-      xg.file_rows_sampled[i] = q;
-      for (j=0; j<xg.ncols; j++) {
-        out = fread ((gchar *) &xg.raw.data[i][j], onesize, 1, fp);
+    for (i=0, q=gg.file_start_row; i<gg.nrows; i++, q++) {
+      gg.file_rows_sampled[i] = q;
+      for (j=0; j<gg.ncols; j++) {
+        out = fread ((gchar *) &gg.raw.data[i][j], onesize, 1, fp);
         if (out != 1) {
           g_printerr ("problem in reading the binary data file\n");
           fclose (fp);
           exit (0);
 
-        } else if (xg.raw.data[i][j] == FLT_MAX) {
-          xg.raw.data[i][j] = 0.0;
+        } else if (gg.raw.data[i][j] == FLT_MAX) {
+          gg.raw.data[i][j] = 0.0;
           /* Allocate the missing values array */
-          if (xg.nmissing == 0)
-            arrays_alloc (&xg.missing, xg.nrows, xg.ncols);
-          xg.missing.data[i][j] = 1;
-          xg.vardata[j].nmissing++;
-          xg.nmissing++;
+          if (gg.nmissing == 0)
+            arrays_alloc (&gg.missing, gg.nrows, gg.ncols);
+          gg.missing.data[i][j] = 1;
+          gg.vardata[j].nmissing++;
+          gg.nmissing++;
         }
       }
     }
 
-  } else if (xg.file_read_type == draw_sample) {
+  } else if (gg.file_read_type == draw_sample) {
 
     gint t, m, n;
     gfloat rrand;
 
     /* This is the number of rows we will sample */
-    n = xg.nrows;
-    if (n > 0 && n < xg.file_length) {
+    n = gg.nrows;
+    if (n > 0 && n < gg.file_length) {
 
-      for (t=0, m=0; t<xg.file_length && m<n; t++) {
+      for (t=0, m=0; t<gg.file_length && m<n; t++) {
 
         rrand = (gfloat) randvalue ();
 
-        if ( ((gfloat)(xg.file_length - t) * rrand) < (gfloat)(n - m) )
+        if ( ((gfloat)(gg.file_length - t) * rrand) < (gfloat)(n - m) )
         {
           /* seek forward in the file to row to be read */
           if (fseek (fp,
-              (glong)(sizeof (glong)*2 + onesize * t * xg.ncols),
+              (glong)(sizeof (glong)*2 + onesize * t * gg.ncols),
               SEEK_SET) == 0)
           {
-            xg.file_rows_sampled[m] = t;
+            gg.file_rows_sampled[m] = t;
 
-            for (j=0; j<xg.ncols; j++) {
-              out = fread ((gchar *) &xg.raw.data[i][j], onesize, 1, fp);
+            for (j=0; j<gg.ncols; j++) {
+              out = fread ((gchar *) &gg.raw.data[i][j], onesize, 1, fp);
               if (out != 1) {
                 g_printerr ("problem in reading the binary data file\n");
                 fclose (fp);
                 exit (0);
-              } else if (xg.raw.data[i][j] == FLT_MAX) {
-                xg.raw.data[i][j] = 0.0;
+              } else if (gg.raw.data[i][j] == FLT_MAX) {
+                gg.raw.data[i][j] = 0.0;
 
                 /*-- allocate the gshort missing values array --*/
-                arrays_alloc_zero (&xg.missing, xg.nrows, xg.ncols);
-                xg.missing.data[i][j] = 1;
-                xg.vardata[j].nmissing++;
-                xg.nmissing++;
+                arrays_alloc_zero (&gg.missing, gg.nrows, gg.ncols);
+                gg.missing.data[i][j] = 1;
+                gg.vardata[j].nmissing++;
+                gg.nmissing++;
               }
             }
             m++;
@@ -242,39 +242,39 @@ init_file_rows_sampled () {
   gint i, k, t, m, n;
   gfloat rrand;
 
-  switch (xg.file_read_type) {
+  switch (gg.file_read_type) {
     case read_all:
-      xg.file_rows_sampled = NULL;
+      gg.file_rows_sampled = NULL;
       break;
 
     case read_block:
-      xg.nrows = xg.file_sample_size;
-      xg.file_rows_sampled = (gulong *) g_realloc (xg.file_rows_sampled,
-                                                   xg.nrows * sizeof (gulong));
-      for (i=0, k=xg.file_start_row; i<xg.nrows; i++, k++)
-        xg.file_rows_sampled[i] = k;
+      gg.nrows = gg.file_sample_size;
+      gg.file_rows_sampled = (gulong *) g_realloc (gg.file_rows_sampled,
+                                                   gg.nrows * sizeof (gulong));
+      for (i=0, k=gg.file_start_row; i<gg.nrows; i++, k++)
+        gg.file_rows_sampled[i] = k;
       break;
 
     case draw_sample:
 
-      xg.nrows = xg.file_sample_size;
-      xg.file_rows_sampled = (gulong *) g_realloc (xg.file_rows_sampled,
-                                                   xg.nrows * sizeof (gulong));
+      gg.nrows = gg.file_sample_size;
+      gg.file_rows_sampled = (gulong *) g_realloc (gg.file_rows_sampled,
+                                                   gg.nrows * sizeof (gulong));
 
-      n = xg.nrows;
-      if (n > 0 && n < xg.file_length) { 
-        for (t=0, m=0; t<xg.file_length && m<n; t++) {
+      n = gg.nrows;
+      if (n > 0 && n < gg.file_length) { 
+        for (t=0, m=0; t<gg.file_length && m<n; t++) {
 
           rrand = (gfloat) randvalue ();
-          if ( ((gfloat)(xg.file_length - t) * rrand) < (gfloat)(n - m) )
-            xg.file_rows_sampled[m++] = t;
+          if ( ((gfloat)(gg.file_length - t) * rrand) < (gfloat)(n - m) )
+            gg.file_rows_sampled[m++] = t;
         }
       }
       break;
 
     default:
-      g_printerr ("Impossible value for xg.file_read_type: %d\n",
-        xg.file_read_type);
+      g_printerr ("Impossible value for gg.file_read_type: %d\n",
+        gg.file_read_type);
   }
 }
 
@@ -284,12 +284,12 @@ seek_to_file_row (gint array_row, FILE *fp) {
   static gint prev_file_row = 0;
   gboolean ok = true;
 
-  if (array_row >= xg.file_sample_size) {
+  if (array_row >= gg.file_sample_size) {
     return false;
   }
 
   /* Identify the row number of the next file row we want. */
-  file_row = xg.file_rows_sampled[array_row];
+  file_row = gg.file_rows_sampled[array_row];
 
   for (i=prev_file_row; i<file_row; i++) {
     if (!find_data_start (fp)) {
@@ -324,7 +324,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing) {
   }
 
   /*-- Find the index of the first row of data that we're interested in. --*/
-  if (xg.file_read_type == read_all) {
+  if (gg.file_read_type == read_all) {
     if (!find_data_start (fp))
       found_row = false;
 
@@ -347,7 +347,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing) {
       } else {
 
         if (g_strcasecmp (word, "na") == 0 || strcmp (word, ".") == 0) {
-          xg.nmissing++;
+          gg.nmissing++;
           row1_missing[ncols] = 1;
 
         } else {
@@ -357,7 +357,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing) {
         ncols++;
         gotone = true;  /*-- suppress the alarm -- the file pointer is ok --*/
 
-        if (xg.ncols >= MAXNCOLS) {
+        if (gg.ncols >= MAXNCOLS) {
           g_printerr (
             "This file has more than %d columns.  In order to read\n", MAXNCOLS);
           g_printerr (" it in, increase MAXNCOLS in defines.h and recompile.\n");
@@ -383,7 +383,7 @@ read_ascii (FILE *fp)
   init_file_rows_sampled ();
 
   /*-- Read in the first row of the data and calculate ncols. --*/
-  xg.ncols = row1_read (fp, row1, row1_missing);
+  gg.ncols = row1_read (fp, row1, row1_missing);
 
   /*-- Once the number of columns is known, allocate vardata. --*/
   vardata_alloc ();
@@ -393,39 +393,39 @@ read_ascii (FILE *fp)
  * If we're reading everything, allocate the first block.
  * If -only has been used, allocate the whole shebang.
 */
-  if (xg.file_read_type == read_all) {
+  if (gg.file_read_type == read_all) {
 
-    xg.nrows = 0;
-    arrayf_alloc (&xg.raw, BLOCKSIZE, xg.ncols);
-    if (xg.nmissing > 0)
-      arrays_alloc_zero (&xg.missing, BLOCKSIZE, xg.ncols);
+    gg.nrows = 0;
+    arrayf_alloc (&gg.raw, BLOCKSIZE, gg.ncols);
+    if (gg.nmissing > 0)
+      arrays_alloc_zero (&gg.missing, BLOCKSIZE, gg.ncols);
 
   } else {  /* -only has been used */
 
-    xg.nrows = xg.file_sample_size;
-    arrayf_alloc (&xg.raw, xg.nrows, xg.ncols);
-    if (xg.nmissing > 0)
-      arrays_alloc_zero (&xg.missing, xg.nrows, xg.ncols);
+    gg.nrows = gg.file_sample_size;
+    arrayf_alloc (&gg.raw, gg.nrows, gg.ncols);
+    if (gg.nmissing > 0)
+      arrays_alloc_zero (&gg.missing, gg.nrows, gg.ncols);
   }
 
   /*-- copy the values in row1 to the main array --*/
-  for (j=0; j<xg.ncols; j++)
-    xg.raw.data[0][j] = row1[j];
-  if (xg.nmissing > 0) {
-    for (j=0; j<xg.ncols; j++)
-      xg.missing.data[0][j] = row1_missing[j];
+  for (j=0; j<gg.ncols; j++)
+    gg.raw.data[0][j] = row1[j];
+  if (gg.nmissing > 0) {
+    for (j=0; j<gg.ncols; j++)
+      gg.missing.data[0][j] = row1_missing[j];
   }
 
 
 /*-- Read, reallocating as needed.  Determine nrows for the read_all case. --*/
   nblocks = 1;
-  nitems = xg.ncols;
+  nitems = gg.ncols;
   jrows = 1;
   nrows = 1;
   jcols = 0;
   while (true) {
     if (jcols == 0) {
-      if (xg.file_read_type == read_all) {
+      if (gg.file_read_type == read_all) {
         if (!find_data_start (fp))
           break;
 
@@ -449,50 +449,50 @@ read_ascii (FILE *fp)
 
       if (g_strcasecmp (word, "na") == 0 || strcmp (word, ".") == 0) {
 
-        if (xg.nmissing == 0) {
+        if (gg.nmissing == 0) {
           /*
            * When the first "na" or "." has been encountered,
            * allocate space to contain the missing values matrix.
            * Initialize all previous values to 0.
           */
-          if (xg.file_read_type == read_all) {
-            arrays_alloc (&xg.missing, nblocks*BLOCKSIZE, xg.ncols);
+          if (gg.file_read_type == read_all) {
+            arrays_alloc (&gg.missing, nblocks*BLOCKSIZE, gg.ncols);
           } else {
-            arrays_alloc (&xg.missing, xg.nrows, xg.ncols);
+            arrays_alloc (&gg.missing, gg.nrows, gg.ncols);
           }
         }
 
-        xg.nmissing++;
-        xg.vardata[jcols].nmissing++;
-        xg.missing.data[nrows][jcols] = 1;
-        xg.raw.data[nrows][jcols] = 0.0;
+        gg.nmissing++;
+        gg.vardata[jcols].nmissing++;
+        gg.missing.data[nrows][jcols] = 1;
+        gg.raw.data[nrows][jcols] = 0.0;
       }
       else {  /*-- not missing --*/
-        xg.raw.data[nrows][jcols] = (gfloat) atof (word);
+        gg.raw.data[nrows][jcols] = (gfloat) atof (word);
       }
 
       jcols++;
-      if (jcols == xg.ncols)  /*-- we just completed a row --*/
+      if (jcols == gg.ncols)  /*-- we just completed a row --*/
       {
         jcols = 0;
         nrows++;
         jrows++;
       }
 
-      if (xg.file_read_type == read_all) {
+      if (gg.file_read_type == read_all) {
         if (jrows == BLOCKSIZE) {
           jrows = 0;
           nblocks++;
           if (nblocks%20 == 0)
             g_printerr ("reallocating; n > %d\n", nblocks*BLOCKSIZE);
 
-          arrayf_add_rows (&xg.raw, nblocks*BLOCKSIZE);
-          if (xg.nmissing > 0)
-            arrays_add_rows (&xg.missing, nblocks*BLOCKSIZE);
+          arrayf_add_rows (&gg.raw, nblocks*BLOCKSIZE);
+          if (gg.nmissing > 0)
+            arrays_add_rows (&gg.missing, nblocks*BLOCKSIZE);
         }
 
       } else {  /* -only was used */
-        if (nrows >= xg.nrows)
+        if (nrows >= gg.nrows)
           break;
       }
     }
@@ -502,28 +502,28 @@ read_ascii (FILE *fp)
   if (fclose (fp) == EOF)
     g_printerr ("read_ascii: error in fclose");
 
-  if (xg.file_read_type == read_all)
-    xg.nrows = nrows;
+  if (gg.file_read_type == read_all)
+    gg.nrows = nrows;
 
-  g_print ("size of data: %d x %d\n", xg.nrows, xg.ncols);
+  g_print ("size of data: %d x %d\n", gg.nrows, gg.ncols);
 
-  if (nitems != xg.nrows * xg.ncols) {
+  if (nitems != gg.nrows * gg.ncols) {
     g_printerr ("read_ascii: nrows*ncols != nitems read\n");
     g_printerr ("(nrows= %d, ncols= %d, nitems read= %d)\n",
-      xg.nrows, xg.ncols, nitems);
+      gg.nrows, gg.ncols, nitems);
     exit (0);
   } else if (nitems == 0) {
     g_printerr ("No data was read\n");
     exit (0);
   }
   else {  /*-- nitems ok --*/
-    if (xg.file_read_type == read_all) {
+    if (gg.file_read_type == read_all) {
       /*
        * One last free and realloc to make these arrays take up exactly
        * the amount of space they need.
       */
-      arrayf_free (&xg.raw, xg.nrows, xg.ncols);
-      arrays_free (&xg.missing, xg.nrows, xg.ncols);
+      arrayf_free (&gg.raw, gg.nrows, gg.ncols);
+      arrays_free (&gg.missing, gg.nrows, gg.ncols);
     }
   }
 }
@@ -542,7 +542,7 @@ array_read ()
  * Check file exists and open it - for stdin no open needs to be done
  * only assigning fp to be stdin.
 */
-  if (strcmp ((gchar *) xg.fname, "stdin") == 0) {
+  if (strcmp ((gchar *) gg.fname, "stdin") == 0) {
     fp = stdin;
 
 #ifndef _WIN32
@@ -562,7 +562,7 @@ array_read ()
      * Try fname.bin before fname, to see whether there is a binary
      * data file available.  If there is, call read_binary ().
     */
-    strcpy (fname, (gchar *) xg.fname);
+    strcpy (fname, (gchar *) gg.fname);
     strcat (fname, ".bin");
 
     if ((fp = fopen (fname, "rb")) != NULL)
@@ -573,7 +573,7 @@ array_read ()
     */
     else {
       static gchar *suffixes[] = {"", ".dat"};
-      if ( (fp=open_xgobi_file_r (xg.fname, 2, suffixes, false)) != NULL)
+      if ( (fp=open_ggobi_file_r (gg.fname, 2, suffixes, false)) != NULL)
         read_ascii (fp);
       else
         exit (1);

@@ -29,9 +29,9 @@ getColorTable ()
   gint k;
 
   for (k=0; k<NCOLORS; k++) {
-    m[k][0] = xg.default_color_table[k].red;
-    m[k][1] = xg.default_color_table[k].green;
-    m[k][2] = xg.default_color_table[k].blue;
+    m[k][0] = gg.default_color_table[k].red;
+    m[k][1] = gg.default_color_table[k].green;
+    m[k][2] = gg.default_color_table[k].blue;
   }
 
   return (guint **) m;
@@ -44,18 +44,18 @@ color_table_init () {
   GdkColormap *cmap = gdk_colormap_get_system ();
   gboolean writeable = false, best_match = true, success[NCOLORS];
 
-  xg.default_color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
+  gg.default_color_table = (GdkColor *) g_malloc (NCOLORS * sizeof (GdkColor));
 
   for (i=0; i<NCOLORS; i++) {
-    xg.default_color_table[i].red   = (guint16) (default_rgb[i][0]*65535.0);
-    xg.default_color_table[i].green = (guint16) (default_rgb[i][1]*65535.0);
-    xg.default_color_table[i].blue  = (guint16) (default_rgb[i][2]*65535.0);
+    gg.default_color_table[i].red   = (guint16) (default_rgb[i][0]*65535.0);
+    gg.default_color_table[i].green = (guint16) (default_rgb[i][1]*65535.0);
+    gg.default_color_table[i].blue  = (guint16) (default_rgb[i][2]*65535.0);
   }
 
-  gdk_colormap_alloc_colors (cmap, xg.default_color_table, NCOLORS,
+  gdk_colormap_alloc_colors (cmap, gg.default_color_table, NCOLORS,
     writeable, best_match, success);
 
-  xg.ncolors = NCOLORS;  /* add foreground and background once I know them */
+  gg.ncolors = NCOLORS;  /* add foreground and background once I know them */
 
   /*
    * Success[i] should always be true, since I'm allowing best_match,
@@ -63,10 +63,10 @@ color_table_init () {
   */
   for (i=0; i<NCOLORS; i++) {
     if (!success[i]) {
-      xg.default_color_table[i].red =   (guint16) 65535;
-      xg.default_color_table[i].green = (guint16) 65535;
-      xg.default_color_table[i].blue =  (guint16) 65535;
-      if (gdk_colormap_alloc_color (cmap, &xg.default_color_table[i],
+      gg.default_color_table[i].red =   (guint16) 65535;
+      gg.default_color_table[i].green = (guint16) 65535;
+      gg.default_color_table[i].blue =  (guint16) 65535;
+      if (gdk_colormap_alloc_color (cmap, &gg.default_color_table[i],
         writeable, best_match) == false)
       {
         g_printerr("Unable to allocate colors, not even white!\n");
@@ -78,19 +78,19 @@ color_table_init () {
 /*
  * background color
 */
-  xg.bg_color.red   = (guint16) (bg_rgb[0]*65535.0);
-  xg.bg_color.green = (guint16) (bg_rgb[1]*65535.0);
-  xg.bg_color.blue  = (guint16) (bg_rgb[2]*65535.0);
-  gdk_colormap_alloc_color(cmap, &xg.bg_color, writeable, best_match);
+  gg.bg_color.red   = (guint16) (bg_rgb[0]*65535.0);
+  gg.bg_color.green = (guint16) (bg_rgb[1]*65535.0);
+  gg.bg_color.blue  = (guint16) (bg_rgb[2]*65535.0);
+  gdk_colormap_alloc_color(cmap, &gg.bg_color, writeable, best_match);
 
 /*
  * accent color:  that is, the color that's used for
  * axes and labels, and not for brushing.
 */
-  xg.accent_color.red   = (guint16) (accent_rgb[0]*65535.0);
-  xg.accent_color.green = (guint16) (accent_rgb[1]*65535.0);
-  xg.accent_color.blue  = (guint16) (accent_rgb[2]*65535.0);
-  gdk_colormap_alloc_color(cmap, &xg.accent_color, writeable, best_match);
+  gg.accent_color.red   = (guint16) (accent_rgb[0]*65535.0);
+  gg.accent_color.green = (guint16) (accent_rgb[1]*65535.0);
+  gg.accent_color.blue  = (guint16) (accent_rgb[2]*65535.0);
+  gdk_colormap_alloc_color(cmap, &gg.accent_color, writeable, best_match);
 }
 
 void
@@ -99,11 +99,11 @@ init_plot_GC (GdkWindow *w) {
   gdk_color_white (gdk_colormap_get_system (), &white);
   gdk_color_black (gdk_colormap_get_system (), &black);
 
-  xg.plot_GC = gdk_gc_new (w);
-  gdk_gc_set_foreground (xg.plot_GC, &white);
-  gdk_gc_set_background (xg.plot_GC, &black);
+  gg.plot_GC = gdk_gc_new (w);
+  gdk_gc_set_foreground (gg.plot_GC, &white);
+  gdk_gc_set_background (gg.plot_GC, &black);
   /* line_width, GdkLineStyle, GdkCapStyle, GdkJoinStyle */
-  gdk_gc_set_line_attributes (xg.plot_GC,
+  gdk_gc_set_line_attributes (gg.plot_GC,
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 }
 
@@ -119,24 +119,24 @@ init_var_GCs (GtkWidget *w) {
 /*
  * the unselected variable GCs: thin lines
 */
-  xg.unselvarbg_GC = gdk_gc_new (window);
+  gg.unselvarbg_GC = gdk_gc_new (window);
   bg = style->bg[GTK_STATE_NORMAL];
-  gdk_gc_set_foreground (xg.unselvarbg_GC, &bg);
+  gdk_gc_set_foreground (gg.unselvarbg_GC, &bg);
 
-  xg.unselvarfg_GC = gdk_gc_new (window);
-  gdk_gc_set_line_attributes (xg.unselvarfg_GC,
+  gg.unselvarfg_GC = gdk_gc_new (window);
+  gdk_gc_set_line_attributes (gg.unselvarfg_GC,
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (xg.unselvarfg_GC, &black);
+  gdk_gc_set_foreground (gg.unselvarfg_GC, &black);
 
 
 /*
  * the selected variable GC: thick lines
 */
-  xg.selvarfg_GC = gdk_gc_new (window);
-  gdk_gc_set_line_attributes (xg.selvarfg_GC,
+  gg.selvarfg_GC = gdk_gc_new (window);
+  gdk_gc_set_line_attributes (gg.selvarfg_GC,
     2, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (xg.selvarfg_GC, &black);
+  gdk_gc_set_foreground (gg.selvarfg_GC, &black);
 
-  xg.selvarbg_GC = gdk_gc_new (window);
-  gdk_gc_set_foreground (xg.selvarbg_GC, &white);
+  gg.selvarbg_GC = gdk_gc_new (window);
+  gdk_gc_set_foreground (gg.selvarbg_GC, &white);
 }

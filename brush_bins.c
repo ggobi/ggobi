@@ -12,18 +12,18 @@
 void
 assign_points_to_bins ()
 {
-  splotd *sp = xg.current_splot;
+  splotd *sp = gg.current_splot;
   gint i, k, ih, iv;
 
   /*
    * Reset bin counts to zero -- but don't bother to free any space.
   */
-  for (ih=0; ih<xg.br_nbins; ih++)
-    for (iv=0; iv<xg.br_nbins; iv++)
-      xg.br_binarray[ih][iv].nels = 0;
+  for (ih=0; ih<gg.br_nbins; ih++)
+    for (iv=0; iv<gg.br_nbins; iv++)
+      gg.br_binarray[ih][iv].nels = 0;
 
-  for (k=0; k<xg.nrows_in_plot; k++) {
-    i = xg.rows_in_plot[k];
+  for (k=0; k<gg.nrows_in_plot; k++) {
+    i = gg.rows_in_plot[k];
 
     if (sp->screen[i].x >=0 && sp->screen[i].x <= sp->max.x &&
         sp->screen[i].y >=0 && sp->screen[i].y <= sp->max.y)
@@ -31,21 +31,21 @@ assign_points_to_bins ()
       if (point_in_which_bin (sp->screen[i].x, sp->screen[i].y, &ih, &iv))
       {
         /* See whether it's necessary to allocate more space for elements */
-        if (xg.br_binarray[ih][iv].nels == xg.br_binarray[ih][iv].nblocks *
+        if (gg.br_binarray[ih][iv].nels == gg.br_binarray[ih][iv].nblocks *
                                            BINBLOCKSIZE)
         {
-          xg.br_binarray[ih][iv].nblocks += 1;
-          xg.br_binarray[ih][iv].els = (gulong *)
-            g_realloc ((gpointer) xg.br_binarray[ih][iv].els,
-              xg.br_binarray[ih][iv].nblocks * BINBLOCKSIZE * sizeof (gulong));
+          gg.br_binarray[ih][iv].nblocks += 1;
+          gg.br_binarray[ih][iv].els = (gulong *)
+            g_realloc ((gpointer) gg.br_binarray[ih][iv].els,
+              gg.br_binarray[ih][iv].nblocks * BINBLOCKSIZE * sizeof (gulong));
         }
         /*
          * br_binarray contains the
          * index of rows_in_plot[] rather than the contents, so
          * here the assignment is k rather than i
         */
-        xg.br_binarray[ih][iv].els[xg.br_binarray[ih][iv].nels] = (gulong) k;
-        xg.br_binarray[ih][iv].nels += 1;
+        gg.br_binarray[ih][iv].els[gg.br_binarray[ih][iv].nels] = (gulong) k;
+        gg.br_binarray[ih][iv].nels += 1;
       }
     }
   }
@@ -56,10 +56,10 @@ get_extended_brush_corners (icoords *bin0, icoords *bin1)
 {
   static brush_coords obrush;
   static gboolean initd = false;
-  gint x1 = MIN (xg.app.brush_pos.x1, xg.app.brush_pos.x2);
-  gint y1 = MIN (xg.app.brush_pos.y1, xg.app.brush_pos.y2);
-  gint x2 = MAX (xg.app.brush_pos.x1, xg.app.brush_pos.x2);
-  gint y2 = MAX (xg.app.brush_pos.y1, xg.app.brush_pos.y2);
+  gint x1 = MIN (gg.app.brush_pos.x1, gg.app.brush_pos.x2);
+  gint y1 = MIN (gg.app.brush_pos.y1, gg.app.brush_pos.y2);
+  gint x2 = MAX (gg.app.brush_pos.x1, gg.app.brush_pos.x2);
+  gint y2 = MAX (gg.app.brush_pos.y1, gg.app.brush_pos.y2);
   gint ox1, oy1, ox2, oy2;
 
   if (!initd)
@@ -85,36 +85,36 @@ get_extended_brush_corners (icoords *bin0, icoords *bin1)
                            &bin0->x, &bin0->y) )
   {
     bin0->x = MAX (bin0->x, 0);
-    bin0->x = MIN (bin0->x, xg.br_nbins - 1);
+    bin0->x = MIN (bin0->x, gg.br_nbins - 1);
     bin0->y = MAX (bin0->y, 0);
-    bin0->y = MIN (bin0->y, xg.br_nbins - 1);
+    bin0->y = MIN (bin0->y, gg.br_nbins - 1);
   }
   if (!point_in_which_bin(MAX (x2, ox2) + 2*BRUSH_MARGIN,
                           MAX (y2, oy2) + 2*BRUSH_MARGIN,
                           &bin1->x, &bin1->y) )
   {
     bin1->x = MAX (bin1->x, 0);
-    bin1->x = MIN (bin1->x, xg.br_nbins - 1);
+    bin1->x = MIN (bin1->x, gg.br_nbins - 1);
     bin1->y = MAX (bin1->y, 0);
-    bin1->y = MIN (bin1->y, xg.br_nbins - 1);
+    bin1->y = MIN (bin1->y, gg.br_nbins - 1);
   }
 
-  obrush.x1 = xg.app.brush_pos.x1;
-  obrush.y1 = xg.app.brush_pos.y1;
-  obrush.x2 = xg.app.brush_pos.x2;
-  obrush.y2 = xg.app.brush_pos.y2;
+  obrush.x1 = gg.app.brush_pos.x1;
+  obrush.y1 = gg.app.brush_pos.y1;
+  obrush.x2 = gg.app.brush_pos.x2;
+  obrush.y2 = gg.app.brush_pos.y2;
 }
 
 gboolean
 point_in_which_bin (gint x, gint y, gint *ih, gint *iv)
 {
   gboolean inwindow = true;
-  splotd *sp = xg.current_splot;
+  splotd *sp = gg.current_splot;
 
-  *ih = (gint) ((gfloat) xg.br_nbins * (gfloat) x / (sp->max.x+1.0));
-  *iv = (gint) ((gfloat) xg.br_nbins * (gfloat) y / (sp->max.y+1.0));
+  *ih = (gint) ((gfloat) gg.br_nbins * (gfloat) x / (sp->max.x+1.0));
+  *iv = (gint) ((gfloat) gg.br_nbins * (gfloat) y / (sp->max.y+1.0));
 
-  if (*ih < 0 || *ih > xg.br_nbins - 1 || *iv < 0 || *iv > xg.br_nbins - 1)
+  if (*ih < 0 || *ih > gg.br_nbins - 1 || *iv < 0 || *iv > gg.br_nbins - 1)
     inwindow = false;
 
   return (inwindow);

@@ -163,16 +163,16 @@ static gint
 splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   displayd *display = (displayd *) sp->displayptr; 
-  splotd *sp_prev = xg.current_splot;
+  splotd *sp_prev = gg.current_splot;
 
   if (sp != sp_prev) {
 
     splot_set_current (sp_prev, off);
 
-    if (xg.current_display != display)
+    if (gg.current_display != display)
       display_set_current (display);  /* old one off, new one on */
 
-    xg.current_splot = sp;
+    gg.current_splot = sp;
 
     /* add border to current_splot */
     sp->redraw_style = QUICK;
@@ -194,8 +194,8 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
 void
 splot_alloc (splotd *sp, displayd *display) {
-  gint nr = xg.nrows;
-  gint nl = xg.nsegments;
+  gint nr = gg.nrows;
+  gint nl = gg.nsegments;
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
@@ -228,9 +228,9 @@ splot_alloc (splotd *sp, displayd *display) {
 void
 splot_segments_realloc (splotd *sp) {
   sp->segments = (GdkSegment *) g_realloc ((gpointer) sp->segments,
-    xg.nsegments * sizeof (GdkSegment));
+    gg.nsegments * sizeof (GdkSegment));
   sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
-    xg.nsegments * sizeof (GdkSegment));
+    gg.nsegments * sizeof (GdkSegment));
 }
 
 void
@@ -357,17 +357,17 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp)
       switch (cpanel->projection) {
         case P1PLOT:
           p1d_reproject (sp,
-            (display->missing_p) ? xg.missing_world.data : xg.world.data);
+            (display->missing_p) ? gg.missing_world.data : gg.world.data);
           break;
 
         case XYPLOT:
           xy_reproject (sp,
-            (display->missing_p) ? xg.missing_world.data : xg.world.data);
+            (display->missing_p) ? gg.missing_world.data : gg.world.data);
           break;
 
         case TOUR2D:
           tour_reproject (sp,
-            (display->missing_p) ? xg.missing_world.data : xg.world.data);
+            (display->missing_p) ? gg.missing_world.data : gg.world.data);
           break;
       }
       break;
@@ -376,15 +376,15 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp)
 
       if (sp->p1dvar == -1)
         xy_reproject (sp,
-          (display->missing_p) ? xg.missing_world.data : xg.world.data);
+          (display->missing_p) ? gg.missing_world.data : gg.world.data);
       else
         p1d_reproject (sp,
-          (display->missing_p) ? xg.missing_world.data : xg.world.data);
+          (display->missing_p) ? gg.missing_world.data : gg.world.data);
       break;
 
     case parcoords:
       p1d_reproject (sp,
-        (display->missing_p) ? xg.missing_world.data : xg.world.data);
+        (display->missing_p) ? gg.missing_world.data : gg.world.data);
       break;
   }
 }
@@ -416,8 +416,8 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp)
   /*
    * Calculate new coordinates.
   */
-  for (k=0; k<xg.nrows_in_plot; k++) {
-    i = xg.rows_in_plot[k];
+  for (k=0; k<gg.nrows_in_plot; k++) {
+    i = gg.rows_in_plot[k];
 
     /*-- scale from world to plot window --*/
     sp->screen[i].x = (gint) ((sp->planar[i].x * sp->iscale.x) >> EXP1);
@@ -468,11 +468,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr, fcoords *tfd)
   switch (cpanel->projection) {
     case P1PLOT:
       if (display->missing_p) {
-        max = xg.missing_lim.max;
-        min = xg.missing_lim.min;
+        max = gg.missing_lim.max;
+        min = gg.missing_lim.min;
       } else {
-        max = xg.vardata[sp->p1dvar].lim.max;
-        min = xg.vardata[sp->p1dvar].lim.min;
+        max = gg.vardata[sp->p1dvar].lim.max;
+        min = gg.vardata[sp->p1dvar].lim.min;
       }
       rdiff = max - min;
 
@@ -494,11 +494,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr, fcoords *tfd)
     case XYPLOT:
       /* x */
       if (display->missing_p) {
-        max = xg.missing_lim.max;
-        min = xg.missing_lim.min;
+        max = gg.missing_lim.max;
+        min = gg.missing_lim.min;
       } else {
-        max = xg.vardata[sp->xyvars.x].lim.max;
-        min = xg.vardata[sp->xyvars.x].lim.min;
+        max = gg.vardata[sp->xyvars.x].lim.max;
+        min = gg.vardata[sp->xyvars.x].lim.min;
       }
       rdiff = max - min;
       world.x = planar.x;
@@ -508,11 +508,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr, fcoords *tfd)
 
       /* y */
       if (display->missing_p) {
-        max = xg.missing_lim.max;
-        min = xg.missing_lim.min;
+        max = gg.missing_lim.max;
+        min = gg.missing_lim.min;
       } else {
-        max = xg.vardata[sp->xyvars.y].lim.max;
-        min = xg.vardata[sp->xyvars.y].lim.min;
+        max = gg.vardata[sp->xyvars.y].lim.max;
+        min = gg.vardata[sp->xyvars.y].lim.min;
       }
       rdiff = max - min;
       world.y = planar.y;
@@ -554,8 +554,8 @@ splot_plane_to_world (cpaneld *cpanel, splotd *sp, gint ipt, lcoords *eps)
 
   switch (cpanel->projection) {
     case XYPLOT:
-      xg.world.data[ipt][sp->xyvars.x] = sp->planar[ipt].x;
-      xg.world.data[ipt][sp->xyvars.y] = sp->planar[ipt].y;
+      gg.world.data[ipt][sp->xyvars.x] = sp->planar[ipt].x;
+      gg.world.data[ipt][sp->xyvars.y] = sp->planar[ipt].y;
       break;
 
     default:

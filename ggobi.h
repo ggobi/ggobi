@@ -9,11 +9,11 @@
 typedef enum {ascii, Sprocess, binary, xml} DataMode;
 typedef enum {read_all, read_block, draw_sample} FileReadType;
 
-struct _xgobid;
+struct _ggobid;
 
 typedef struct {
 
- struct _xgobid *thisXg;
+ struct _ggobid *thisGG;
 
   /* main_ui */
   GtkWidget *menubar;
@@ -57,9 +57,9 @@ typedef struct {
   /* scale_ui.c */
   GtkWidget *scale_reset_menu;
 
-} XGobiApp;
+} GGobiApp;
 
-typedef struct _xgobid {
+typedef struct _ggobid {
 
  gchar *data_in;
 
@@ -126,6 +126,7 @@ typedef struct _xgobid {
  /* Hiding/excluding the hidden points */
  clusterd *clusv;
  gint nclust;
+ vector_i clusterid;
  gboolean *included;
 
 
@@ -197,14 +198,14 @@ typedef struct _xgobid {
 */
  gint pan_or_zoom;
 
- XGobiApp app;
+ GGobiApp app;
 
-} xgobid;
+} ggobid;
 
 
-XGOBI_ xgobid xg;
+GGOBI_ ggobid gg;
 
-#define XGOBI_H
+#define GGOBI_H
 
 #endif
 

@@ -21,20 +21,20 @@ add_to_subset (gint i) {
   gint j, el;
   gboolean added = false;
 
-  if (xg.nrgroups > 0) {
-    if (xg.rgroups[i].included) {
+  if (gg.nrgroups > 0) {
+    if (gg.rgroups[i].included) {
       added = true;
-      xg.rgroups[i].sampled = true;
-      for (j=0; j<xg.rgroups[i].nels; j++) {
-        el = xg.rgroups[i].els[j];
-        xg.sampled[el] = true;
+      gg.rgroups[i].sampled = true;
+      for (j=0; j<gg.rgroups[i].nels; j++) {
+        el = gg.rgroups[i].els[j];
+        gg.sampled[el] = true;
       }
     }
 
   } else {
-    if (xg.included[i] == true) {
+    if (gg.included[i] == true) {
       added = true;
-      xg.sampled[i] = true;
+      gg.sampled[i] = true;
     }
   }
 
@@ -46,12 +46,12 @@ static void
 subset_clear () {
   gint i, rgid;
 
-  for (i=0; i<xg.nlinkable; i++)
-    xg.sampled[i] = false;
+  for (i=0; i<gg.nlinkable; i++)
+    gg.sampled[i] = false;
 
-  for (i=0; i<xg.nrgroups; i++) {
-    rgid = xg.rgroup_ids[i];
-    xg.rgroups[rgid].sampled = false;
+  for (i=0; i<gg.nrgroups; i++) {
+    rgid = gg.rgroup_ids[i];
+    gg.rgroups[rgid].sampled = false;
   }
 }
 
@@ -68,10 +68,10 @@ subset_apply (gboolean rescale_p) {
   tform_to_world ();
 
 /*
-  if (xg.is_pp) {
-    xg.recalc_max_min = True;
-    reset_pp_plot();
-    pp_index(xg,0,1);
+  if (gg.is_pp) {
+    gg.recalc_max_min = True;
+    reset_pp_plot ();
+    pp_index (gg, 0,1);
   }
 */
 
@@ -86,12 +86,12 @@ void
 subset_include_all () {
   gint i, rgid;
 
-  for (i=0; i<xg.nlinkable; i++)
-    xg.sampled[i] = true;
+  for (i=0; i<gg.nlinkable; i++)
+    gg.sampled[i] = true;
 
-  if (xg.nrgroups > 0) {
-    rgid = xg.rgroup_ids[i];
-    xg.rgroups[rgid].sampled = true;
+  if (gg.nrgroups > 0) {
+    rgid = gg.rgroup_ids[i];
+    gg.rgroups[rgid].sampled = true;
   }
 }
 
@@ -104,7 +104,7 @@ subset_random (gint n) {
   gint t, m;
   gboolean doneit = false;
   gfloat rrand;
-  gint top = (xg.nrgroups > 0) ? xg.nrgroups : xg.nlinkable;
+  gint top = (gg.nrgroups > 0) ? gg.nrgroups : gg.nlinkable;
 
   subset_clear ();
 
@@ -130,7 +130,7 @@ subset_block (gint bstart, gint bsize)
 {
   gint i, b_end;
   gboolean doneit = false;
-  gint top = (xg.nrgroups > 0) ? xg.nrgroups : xg.nlinkable;
+  gint top = (gg.nrgroups > 0) ? gg.nrgroups : gg.nlinkable;
   top -= 1;
 
   b_end = bstart + bsize;
@@ -157,7 +157,7 @@ gboolean
 subset_everyn (gint estart, gint estep)
 {
   gint i;
-  gint top = (xg.nrgroups > 0) ? xg.nrgroups : xg.nlinkable;
+  gint top = (gg.nrgroups > 0) ? gg.nrgroups : gg.nlinkable;
   gboolean doneit = false;
 
   top -= 1;
@@ -187,16 +187,16 @@ subset_sticky ()
 {
   gint id;
   GSList *l;
-  gint top = (xg.nrgroups > 0) ? xg.nrgroups : xg.nlinkable;
+  gint top = (gg.nrgroups > 0) ? gg.nrgroups : gg.nlinkable;
 
-  if (g_slist_length (xg.sticky_ids) > 0) {
+  if (g_slist_length (gg.sticky_ids) > 0) {
 
     subset_clear ();
 
-    for (l = xg.sticky_ids; l; l = l->next) {
+    for (l = gg.sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
       if (id < top)
-        add_to_subset ((xg.nrgroups > 0) ? xg.rgroup_ids[id] : id);
+        add_to_subset ((gg.nrgroups > 0) ? gg.rgroup_ids[id] : id);
     }
   }
 
@@ -207,13 +207,13 @@ gboolean
 subset_rowlab (gchar *rowlab)
 {
   gint i;
-  gint top = (xg.nrgroups > 0) ? xg.nrgroups : xg.nlinkable;
+  gint top = (gg.nrgroups > 0) ? gg.nrgroups : gg.nlinkable;
 
   subset_clear ();
 
   for (i=0; i<top; i++) {
-    if (!strcmp (xg.rowlab[i], rowlab)) {
-      add_to_subset ((xg.nrgroups > 0) ? xg.rgroup_ids[i] : i);
+    if (!strcmp (gg.rowlab[i], rowlab)) {
+      add_to_subset ((gg.nrgroups > 0) ? gg.rgroup_ids[i] : i);
     }
   }
 

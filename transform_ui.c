@@ -78,7 +78,7 @@ transform_window_open () {
   GtkWidget *vbox, *frame, *hb, *vb, *btn;
   GtkWidget *spinner;
 
-  if (xg.nrows == 0)  /*-- if used before we have data --*/
+  if (gg.nrows == 0)  /*-- if used before we have data --*/
     return;
 
   if (window == NULL) {
@@ -110,7 +110,7 @@ transform_window_open () {
 
     stage0_opt = gtk_option_menu_new ();
     gtk_container_set_border_width (GTK_CONTAINER (stage0_opt), 4);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), stage0_opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), stage0_opt,
       "Stage 1: Adjust the domain of the variables",
       NULL);
     populate_option_menu (stage0_opt, stage0_lbl,
@@ -130,7 +130,7 @@ transform_window_open () {
     gtk_container_add (GTK_CONTAINER (frame), vb);
 
     stage1_opt = gtk_option_menu_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), stage1_opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), stage1_opt,
       "Stage 2: Power transformations et al",
       NULL);
     populate_option_menu (stage1_opt, stage1_lbl,
@@ -151,7 +151,7 @@ transform_window_open () {
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (spinner),
                                      GTK_SHADOW_OUT);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), spinner,
       "Set the Box-Cox power function parameter", NULL);
     gtk_box_pack_end (GTK_BOX (hb), spinner, true, true, 0);
     gtk_signal_connect (GTK_OBJECT (boxcox_adj), "value_changed",
@@ -167,7 +167,7 @@ transform_window_open () {
 
     stage2_opt = gtk_option_menu_new ();
     gtk_container_set_border_width (GTK_CONTAINER (stage2_opt), 4);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), stage2_opt,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), stage2_opt,
       "Stage 3: Permutation, sorting, and sphering", NULL);
     populate_option_menu (stage2_opt, stage2_lbl,
                           sizeof (stage2_lbl) / sizeof (gchar *),
@@ -182,7 +182,7 @@ transform_window_open () {
 
     btn = gtk_button_new_with_label ("Reset all");
     gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 0);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
       "Set all transformation stages to 'no transformation' for the selected variables",
       NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
@@ -203,9 +203,9 @@ void
 transform_opt_menus_set_history (gint j)
 {
   gtk_option_menu_set_history (GTK_OPTION_MENU (stage0_opt),
-    xg.vardata[j].tform0);
+    gg.vardata[j].tform0);
   gtk_option_menu_set_history (GTK_OPTION_MENU (stage1_opt),
-    xg.vardata[j].tform1);
+    gg.vardata[j].tform1);
   gtk_option_menu_set_history (GTK_OPTION_MENU (stage2_opt),
-    xg.vardata[j].tform2);
+    gg.vardata[j].tform2);
 }

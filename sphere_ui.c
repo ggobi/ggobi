@@ -87,8 +87,8 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   gchar *tickmk;
   GtkStyle *style = gtk_widget_get_style (scree_da);
 
-  gint *sphvars = (gint *) g_malloc (xg.ncols * sizeof (gint));
-  gfloat *evals = (gfloat *) g_malloc (xg.ncols * sizeof (gfloat));
+  gint *sphvars = (gint *) g_malloc (gg.ncols * sizeof (gint));
+  gfloat *evals = (gfloat *) g_malloc (gg.ncols * sizeof (gfloat));
 
   gint nsphvars = spherevars_get (sphvars);
   eigenvals_get (evals);
@@ -97,32 +97,32 @@ for (j=0; j<nsphvars; j++)
 g_printerr ("(expose) sphvar %d eval %f\n", sphvars[j], evals[j]);
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (xg.plot_GC, &xg.bg_color);
-  gdk_draw_rectangle (scree_pixmap, xg.plot_GC,
+  gdk_gc_set_foreground (gg.plot_GC, &gg.bg_color);
+  gdk_draw_rectangle (scree_pixmap, gg.plot_GC,
                       true, 0, 0,
                       w->allocation.width,
                       w->allocation.height);
 
-  gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
-  gdk_draw_line (scree_pixmap, xg.plot_GC, 10, 90, 190, 90);
-  gdk_draw_line (scree_pixmap, xg.plot_GC, 10, 90, 10, 10);
+  gdk_gc_set_foreground (gg.plot_GC, &gg.accent_color);
+  gdk_draw_line (scree_pixmap, gg.plot_GC, 10, 90, 190, 90);
+  gdk_draw_line (scree_pixmap, gg.plot_GC, 10, 90, 10, 10);
 
   for (j=0; j<nsphvars; j++) {
     xpos = (gint) (180./(gfloat)(nsphvars-1)*j+10);
     ypos = (gint) (90. - evals[j]/evals[0]*80.);
 
     tickmk = g_strdup_printf ("%d", j+1);
-    gdk_draw_string (scree_pixmap, style->font, xg.plot_GC, xpos, 95, tickmk);
+    gdk_draw_string (scree_pixmap, style->font, gg.plot_GC, xpos, 95, tickmk);
     g_free (tickmk);
 
     if (j>0) 
-      gdk_draw_line (scree_pixmap, xg.plot_GC, xstrt, ystrt, xpos, ypos);
+      gdk_draw_line (scree_pixmap, gg.plot_GC, xstrt, ystrt, xpos, ypos);
 
     xstrt = xpos;
     ystrt = ypos;
   }
 
-  gdk_draw_pixmap (w->window, xg.plot_GC, scree_pixmap,
+  gdk_draw_pixmap (w->window, gg.plot_GC, scree_pixmap,
                    0, 0, 0, 0,
                    w->allocation.width,
                    w->allocation.height);
@@ -192,7 +192,7 @@ sphere_panel_open (void)
     
     /*-- the parameters of the adjustment should be reset each time --*/
     npcs_adj = (GtkAdjustment *)
-      gtk_adjustment_new ((gfloat) nvars, 1.0, (gfloat) xg.ncols,
+      gtk_adjustment_new ((gfloat) nvars, 1.0, (gfloat) gg.ncols,
                           1.0, 5.0, 0.0);
     gtk_signal_connect (GTK_OBJECT (npcs_adj), "value_changed",
 		                GTK_SIGNAL_FUNC (sphere_npcs_set_cb),
@@ -202,14 +202,14 @@ sphere_panel_open (void)
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (npcs_spinner), false);
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (npcs_spinner),
                                      GTK_SHADOW_OUT);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), npcs_spinner,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), npcs_spinner,
       "Specify the number of principal components",
       NULL);
     gtk_box_pack_start (GTK_BOX (hb), npcs_spinner, true, true, 0);
 
     sphere_apply_btn = gtk_button_new_with_label ("Apply");
     gtk_box_pack_start (GTK_BOX (hb), sphere_apply_btn, false, false, 0);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), sphere_apply_btn,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), sphere_apply_btn,
       "Perform principal components transformation for the first n variables",
       NULL);
     gtk_signal_connect (GTK_OBJECT (sphere_apply_btn), "clicked",
@@ -236,7 +236,7 @@ sphere_panel_open (void)
     totvar_entry = gtk_entry_new ();
     gtk_entry_set_editable (GTK_ENTRY (totvar_entry), false);
     gtk_entry_set_text (GTK_ENTRY (totvar_entry), "-");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), totvar_entry,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), totvar_entry,
       "The percentage of variance accounted for by the selected variables",
       NULL);
     gtk_box_pack_start (GTK_BOX (vb), totvar_entry, true, true, 2);
@@ -252,7 +252,7 @@ sphere_panel_open (void)
     condnum_entry = gtk_entry_new ();
     gtk_entry_set_editable (GTK_ENTRY (condnum_entry), false);
     gtk_entry_set_text (GTK_ENTRY (condnum_entry), "-");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), condnum_entry,
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), condnum_entry,
       "The condition number for the selected variables",
       NULL);
     gtk_box_pack_start (GTK_BOX (vb), condnum_entry, true, true, 2);

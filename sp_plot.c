@@ -33,23 +33,23 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
   *ncolors_used = 0;
           
   /*
-   * Loop once through xg.color_now[], collecting the colors currently
+   * Loop once through gg.color_now[], collecting the colors currently
    * in use into the colors_used[] vector.
   */
   if (display->options.points_show_p) {
 
     if (!binned) {
-      for (i=0; i<xg.nrows_in_plot; i++) {
-        m = xg.rows_in_plot[i];
+      for (i=0; i<gg.nrows_in_plot; i++) {
+        m = gg.rows_in_plot[i];
         new_color = true;
         for (k=0; k<*ncolors_used; k++) {
-          if (colors_used[k] == xg.color_now[m]) {
+          if (colors_used[k] == gg.color_now[m]) {
             new_color = false;
             break;
           }
         }
         if (new_color) {
-          colors_used[*ncolors_used] = xg.color_now[m];
+          colors_used[*ncolors_used] = gg.color_now[m];
           (*ncolors_used)++;
         }
       }
@@ -64,18 +64,18 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
 
       for (ih=bin0.x; ih<=bin1.x; ih++) {
         for (iv=bin0.y; iv<=bin1.y; iv++) {
-          for (m=0; m<xg.br_binarray[ih][iv].nels; m++) {
-            j = xg.rows_in_plot[xg.br_binarray[ih][iv].els[m]];
+          for (m=0; m<gg.br_binarray[ih][iv].nels; m++) {
+            j = gg.rows_in_plot[gg.br_binarray[ih][iv].els[m]];
 
             new_color = true;
             for (k=0; k<*ncolors_used; k++) {
-              if (colors_used[k] == xg.color_now[j]) {
+              if (colors_used[k] == gg.color_now[j]) {
                 new_color = false;
                 break;
               }
             }
             if (new_color) {
-              colors_used[*ncolors_used] = xg.color_now[j];
+              colors_used[*ncolors_used] = gg.color_now[j];
               (*ncolors_used)++;
             }
           }
@@ -88,9 +88,9 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
      * the pile of points.
     */
     for (k=0; k<(*ncolors_used-1); k++) {
-      if (colors_used[k] == xg.color_id) {
+      if (colors_used[k] == gg.color_id) {
         colors_used[k] = colors_used[*ncolors_used-1];
-        colors_used[*ncolors_used-1] = xg.color_id;
+        colors_used[*ncolors_used-1] = gg.color_id;
         break;
       }
     }
@@ -98,7 +98,7 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
     /* insurance -- eg if using mono drawing on a color screen */
     if (*ncolors_used == 0) {
       *ncolors_used = 1;
-      colors_used[0] = xg.color_now[0];
+      colors_used[0] = gg.color_now[0];
     }
   }
 }
@@ -117,17 +117,17 @@ splot_draw_to_pixmap0_unbinned (splotd *sp)
   displayd *display = (displayd *) sp->displayptr;
   gboolean draw_case;
 
-  if (xg.plot_GC == NULL)
+  if (gg.plot_GC == NULL)
     init_plot_GC (sp->pixmap0);
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (xg.plot_GC, &xg.bg_color);
-  gdk_draw_rectangle (sp->pixmap0, xg.plot_GC,
+  gdk_gc_set_foreground (gg.plot_GC, &gg.bg_color);
+  gdk_draw_rectangle (sp->pixmap0, gg.plot_GC,
                       TRUE, 0, 0,
                       da->allocation.width,
                       da->allocation.height);
 
-  if (!xg.mono_p) {
+  if (!gg.mono_p) {
     splot_point_colors_used_get (sp, &npoint_colors_used,
       point_colors_used, false);
 
@@ -138,56 +138,59 @@ splot_draw_to_pixmap0_unbinned (splotd *sp)
     */
     for (k=0; k<npoint_colors_used; k++) {
       current_color = point_colors_used[k];
-      gdk_gc_set_foreground (xg.plot_GC,
-        &xg.default_color_table[current_color]);
+      gdk_gc_set_foreground (gg.plot_GC,
+        &gg.default_color_table[current_color]);
 
 #ifdef _WIN32
       win32_draw_to_pixmap_unbinned (current_color, sp);
 #else
-      for (i=0; i<xg.nrows_in_plot; i++) {
-        m = xg.rows_in_plot[i];
-        draw_case = true;
+      for (i=0; i<gg.nrows_in_plot; i++) {
+        m = gg.rows_in_plot[i];
 
         /*-- determine whether case m should be plotted --*/
-        if (xg.hidden_now[m])
+        draw_case = true;
+        if (gg.hidden_now[m])
           draw_case = false;
+
         /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-        else if (!display->options.missings_show_p && xg.nmissing > 0) {
+        else if (!display->options.missings_show_p && gg.nmissing > 0) {
           switch (display->displaytype) {
             case parcoords:
-              if (xg.missing.data[m][sp->p1dvar])
+              if (gg.missing.data[m][sp->p1dvar])
                 draw_case = false;
               break;
+
             case scatmat:
               if (sp->p1dvar != -1) {
-                if (xg.missing.data[m][sp->p1dvar])
+                if (gg.missing.data[m][sp->p1dvar])
                   draw_case = false;
               } else {
-                if (xg.missing.data[m][sp->xyvars.x] ||
-                    xg.missing.data[m][sp->xyvars.y])
+                if (gg.missing.data[m][sp->xyvars.x] ||
+                    gg.missing.data[m][sp->xyvars.y])
                 {
                   draw_case = false;
                 }
               }
               break;
+
             case scatterplot:
               break;
-            }
+          }
         }
 
-        if (draw_case && xg.color_now[m] == current_color) {
+        if (draw_case && gg.color_now[m] == current_color) {
           if (display->options.points_show_p)
-            draw_glyph (sp->pixmap0, &xg.glyph_now[m], sp->screen, m);
+            draw_glyph (sp->pixmap0, &gg.glyph_now[m], sp->screen, m);
 
           /*-- parallel coordinate plot whiskers --*/
           if (display->displaytype == parcoords) {
             if (display->options.segments_show_p) {
               n = 2*m;
-              gdk_draw_line (sp->pixmap0, xg.plot_GC,
+              gdk_draw_line (sp->pixmap0, gg.plot_GC,
                 sp->whiskers[n].x1, sp->whiskers[n].y1,
                 sp->whiskers[n].x2, sp->whiskers[n].y2);
               n++;
-              gdk_draw_line (sp->pixmap0, xg.plot_GC,
+              gdk_draw_line (sp->pixmap0, gg.plot_GC,
                 sp->whiskers[n].x1, sp->whiskers[n].y1,
                 sp->whiskers[n].x2, sp->whiskers[n].y2);
             }
@@ -216,7 +219,7 @@ splot_draw_to_pixmap0_binned (splotd *sp)
   static gint npoint_colors_used = 0;
   static gushort point_colors_used[NCOLORS+2];
 
-  if (xg.plot_GC == NULL)
+  if (gg.plot_GC == NULL)
     init_plot_GC (sp->pixmap0);
 
 /*
@@ -230,12 +233,12 @@ splot_draw_to_pixmap0_binned (splotd *sp)
  * Determine locations of bin corners: upper left edge of loc0;
  * lower right edge of loc1.
 */
-  loc0.x = (gint) ((gfloat) bin0.x / (gfloat) xg.br_nbins * (sp->max.x+1.0));
-  loc0.y = (gint) ((gfloat) bin0.y / (gfloat) xg.br_nbins * (sp->max.y+1.0));
+  loc0.x = (gint) ((gfloat) bin0.x / (gfloat) gg.br_nbins * (sp->max.x+1.0));
+  loc0.y = (gint) ((gfloat) bin0.y / (gfloat) gg.br_nbins * (sp->max.y+1.0));
   loc1.x = (gint)
-    ((gfloat) (bin1.x+1) / (gfloat) xg.br_nbins * (sp->max.x+1.0));
+    ((gfloat) (bin1.x+1) / (gfloat) gg.br_nbins * (sp->max.x+1.0));
   loc1.y = (gint)
-    ((gfloat) (bin1.y+1) / (gfloat) xg.br_nbins * (sp->max.y+1.0));
+    ((gfloat) (bin1.y+1) / (gfloat) gg.br_nbins * (sp->max.y+1.0));
 
 /*
  * Clear an area a few pixels inside that region.  Watch out
@@ -243,19 +246,19 @@ splot_draw_to_pixmap0_binned (splotd *sp)
 */
   loc_clear0.x = (bin0.x == 0) ? 0 : loc0.x + BRUSH_MARGIN;
   loc_clear0.y = (bin0.y == 0) ? 0 : loc0.y + BRUSH_MARGIN;
-  loc_clear1.x = (bin1.x == xg.br_nbins-1) ? sp->max.x : loc1.x - BRUSH_MARGIN;
-  loc_clear1.y = (bin1.y == xg.br_nbins-1) ? sp->max.y : loc1.y - BRUSH_MARGIN;
+  loc_clear1.x = (bin1.x == gg.br_nbins-1) ? sp->max.x : loc1.x - BRUSH_MARGIN;
+  loc_clear1.y = (bin1.y == gg.br_nbins-1) ? sp->max.y : loc1.y - BRUSH_MARGIN;
 
 
-  gdk_gc_set_foreground (xg.plot_GC, &xg.bg_color);
-  gdk_draw_rectangle (sp->pixmap0, xg.plot_GC,
+  gdk_gc_set_foreground (gg.plot_GC, &gg.bg_color);
+  gdk_draw_rectangle (sp->pixmap0, gg.plot_GC,
                       true,  /* fill */
                       loc_clear0.x, loc_clear0.y,
                       1 + loc_clear1.x - loc_clear0.x ,
                       1 + loc_clear1.y - loc_clear0.y);
 
   if (display->options.points_show_p) {
-    if (!xg.mono_p) {
+    if (!gg.mono_p) {
 
       splot_point_colors_used_get (sp, &npoint_colors_used,
         point_colors_used, true);  /* true = binned */
@@ -266,27 +269,27 @@ splot_draw_to_pixmap0_binned (splotd *sp)
       */
       for (k=0; k<npoint_colors_used; k++) {
         current_color = point_colors_used[k];
-        gdk_gc_set_foreground (xg.plot_GC,
-          &xg.default_color_table[current_color]);
+        gdk_gc_set_foreground (gg.plot_GC,
+          &gg.default_color_table[current_color]);
 
 #ifdef _WIN32
         win32_draw_to_pixmap_binned (&bin0, &bin1, current_color, sp);
 #else
         for (ih=bin0.x; ih<=bin1.x; ih++) {
           for (iv=bin0.y; iv<=bin1.y; iv++) {
-            for (m=0; m<xg.br_binarray[ih][iv].nels; m++) {
-              i = xg.rows_in_plot[xg.br_binarray[ih][iv].els[m]];
-              if (!xg.hidden_now[i] && xg.color_now[i] == current_color) {
-                draw_glyph (sp->pixmap0, &xg.glyph_now[i], sp->screen, i);
+            for (m=0; m<gg.br_binarray[ih][iv].nels; m++) {
+              i = gg.rows_in_plot[gg.br_binarray[ih][iv].els[m]];
+              if (!gg.hidden_now[i] && gg.color_now[i] == current_color) {
+                draw_glyph (sp->pixmap0, &gg.glyph_now[i], sp->screen, i);
 
                 /* parallel coordinate plot whiskers */
                 if (display->displaytype == parcoords) {
                   n = 2*i;
-                  gdk_draw_line (sp->pixmap0, xg.plot_GC,
+                  gdk_draw_line (sp->pixmap0, gg.plot_GC,
                     sp->whiskers[n].x1, sp->whiskers[n].y1,
                     sp->whiskers[n].x2, sp->whiskers[n].y2);
                   n++;
-                  gdk_draw_line (sp->pixmap0, xg.plot_GC,
+                  gdk_draw_line (sp->pixmap0, gg.plot_GC,
                     sp->whiskers[n].x1, sp->whiskers[n].y1,
                     sp->whiskers[n].x2, sp->whiskers[n].y2);
                 }
@@ -321,7 +324,7 @@ splot_add_plot_labels (splotd *sp) {
   cpaneld *cpanel = &display->cpanel;
   gint dtype = display->displaytype;
 
-  gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
+  gdk_gc_set_foreground (gg.plot_GC, &gg.accent_color);
 
   if (dtype == scatterplot || dtype == scatmat) {
     if ((dtype == scatterplot && cpanel->projection == XYPLOT) ||
@@ -329,21 +332,21 @@ splot_add_plot_labels (splotd *sp) {
     {
 
       gdk_text_extents (style->font, 
-        xg.vardata[ sp->xyvars.x ].collab_tform,
-        strlen (xg.vardata[ sp->xyvars.x ].collab_tform),
+        gg.vardata[ sp->xyvars.x ].collab_tform,
+        strlen (gg.vardata[ sp->xyvars.x ].collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
+      gdk_draw_string (sp->pixmap1, style->font, gg.plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
-        xg.vardata[ sp->xyvars.x ].collab_tform);
+        gg.vardata[ sp->xyvars.x ].collab_tform);
 
       gdk_text_extents (style->font, 
-        xg.vardata[ sp->xyvars.y ].collab_tform,
-        strlen (xg.vardata[ sp->xyvars.y ].collab_tform),
+        gg.vardata[ sp->xyvars.y ].collab_tform,
+        strlen (gg.vardata[ sp->xyvars.y ].collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
+      gdk_draw_string (sp->pixmap1, style->font, gg.plot_GC,
         5, 5 + ascent + descent,
-        xg.vardata[ sp->xyvars.y ].collab_tform);
+        gg.vardata[ sp->xyvars.y ].collab_tform);
     }
 
     if ((dtype == scatterplot && cpanel->projection == P1PLOT) ||
@@ -351,25 +354,25 @@ splot_add_plot_labels (splotd *sp) {
     {
 
       gdk_text_extents (style->font,
-        xg.vardata[ sp->p1dvar ].collab_tform,
-        strlen (xg.vardata[ sp->p1dvar ].collab_tform),
+        gg.vardata[ sp->p1dvar ].collab_tform,
+        strlen (gg.vardata[ sp->p1dvar ].collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
+      gdk_draw_string (sp->pixmap1, style->font, gg.plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
-        xg.vardata[ sp->p1dvar ].collab_tform);
+        gg.vardata[ sp->p1dvar ].collab_tform);
     }
 
   } else if (dtype == parcoords) {
 
     gdk_text_extents (style->font,
-      xg.vardata[ sp->p1dvar ].collab_tform,
-      strlen (xg.vardata[ sp->p1dvar ].collab_tform),
+      gg.vardata[ sp->p1dvar ].collab_tform,
+      strlen (gg.vardata[ sp->p1dvar ].collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
+    gdk_draw_string (sp->pixmap1, style->font, gg.plot_GC,
       5,
       sp->max.y - 5,
-      xg.vardata[ sp->p1dvar ].collab_tform);
+      gg.vardata[ sp->p1dvar ].collab_tform);
 
   }
 }
@@ -380,30 +383,30 @@ splot_add_point_label (splotd *sp, gint k) {
   GtkStyle *style = gtk_widget_get_style (sp->da);
 
   gdk_text_extents (style->font,  
-    xg.rowlab[k], strlen (xg.rowlab[k]),
+    gg.rowlab[k], strlen (gg.rowlab[k]),
     &lbearing, &rbearing, &width, &ascent, &descent);
 
   if (sp->screen[k].x <= sp->max.x/2)
-    gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
-      sp->screen[k].x+2, sp->screen[k].y-2, xg.rowlab[k]);
+    gdk_draw_string (sp->pixmap1, style->font, gg.plot_GC,
+      sp->screen[k].x+2, sp->screen[k].y-2, gg.rowlab[k]);
   else
-    gdk_draw_string (sp->pixmap1, style->font, xg.plot_GC,
-      sp->screen[k].x - width - 2, sp->screen[k].y-2, xg.rowlab[k]);
+    gdk_draw_string (sp->pixmap1, style->font, gg.plot_GC,
+      sp->screen[k].x - width - 2, sp->screen[k].y-2, gg.rowlab[k]);
 }
 
 void
 splot_draw_border (splotd *sp) {
   if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
-    gdk_gc_set_foreground (xg.plot_GC, &xg.accent_color);
-    gdk_gc_set_line_attributes (xg.plot_GC,
+    gdk_gc_set_foreground (gg.plot_GC, &gg.accent_color);
+    gdk_gc_set_line_attributes (gg.plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
-    gdk_draw_rectangle (sp->pixmap1, xg.plot_GC,
+    gdk_draw_rectangle (sp->pixmap1, gg.plot_GC,
       FALSE, 1, 1, sp->da->allocation.width-3, sp->da->allocation.height-3);
-    gdk_draw_pixmap (sp->da->window, xg.plot_GC, sp->pixmap1,
+    gdk_draw_pixmap (sp->da->window, gg.plot_GC, sp->pixmap1,
       0, 0, 0, 0, sp->da->allocation.width, sp->da->allocation.height);
 
-    gdk_gc_set_line_attributes (xg.plot_GC,
+    gdk_gc_set_line_attributes (gg.plot_GC,
       0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
   }
 }
@@ -426,20 +429,20 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
    * currently in use into the line_colors_used[] vector.
   */
   *ncolors_used = 1;
-  colors_used[0] = xg.line_color_now[0];
+  colors_used[0] = gg.line_color_now[0];
 
   if (display->options.segments_directed_show_p || display->options.segments_undirected_show_p)
   {
-    for (i=0; i<xg.nsegments; i++) {
+    for (i=0; i<gg.nsegments; i++) {
       new_color = true;
       for (k=0; k<*ncolors_used; k++) {
-        if (colors_used[k] == xg.line_color_now[i]) {
+        if (colors_used[k] == gg.line_color_now[i]) {
           new_color = false;
           break;
         }
       }
       if (new_color) {
-        colors_used[*ncolors_used] = xg.line_color_now[i];
+        colors_used[*ncolors_used] = gg.line_color_now[i];
         (*ncolors_used)++;
       }
     }
@@ -458,7 +461,7 @@ segments_draw (splotd *sp)
   gboolean doit;
   displayd *display = (displayd *) sp->displayptr;
 
-  if (!xg.mono_p) {
+  if (!gg.mono_p) {
     splot_line_colors_used_get (sp, &nline_colors_used, line_colors_used);
 
     /*
@@ -469,31 +472,31 @@ segments_draw (splotd *sp)
       current_color = line_colors_used[k];
       nl = 0;
 
-      for (j=0; j<xg.nsegments; j++) {
-        from = xg.segment_endpoints[j].a - 1;
-        to = xg.segment_endpoints[j].b - 1;
+      for (j=0; j<gg.nsegments; j++) {
+        from = gg.segment_endpoints[j].a - 1;
+        to = gg.segment_endpoints[j].b - 1;
         doit = true;
 
         /* If not plotting imputed values, and one is missing, skip it */
 /*
-        if (!plot_imputed_values && plotted_var_missing(from, to, xg))
+        if (!plot_imputed_values && plotted_var_missing(from, to, gg))
           doit = false;
 */
         /* If either from or to is not included, move on */
 /*
-        else if (xg->ncols == xg->ncols_used) {
-          if (!xg->clusv[(int)GROUPID(from)].included)
+        else if (gg->ncols == gg->ncols_used) {
+          if (!gg->clusv[(int)GROUPID(from)].included)
             doit = False;
-          else if (!xg->clusv[(int)GROUPID(to)].included)
+          else if (!gg->clusv[(int)GROUPID(to)].included)
             doit = False;
         }
 */
         /* If either from or to is hidden, move on */
-        if (doit && (xg.hidden_now[from] || xg.hidden_now[to]))
+        if (doit && (gg.hidden_now[from] || gg.hidden_now[to]))
           doit = false;
 
         if (doit) {
-          if (xg.line_color_now[j] == current_color) {
+          if (gg.line_color_now[j] == current_color) {
             sp->segments[nl].x1 = sp->screen[from].x;
             sp->segments[nl].y1 = sp->screen[from].y;
             sp->segments[nl].x2 = sp->screen[to].x;
@@ -514,14 +517,14 @@ segments_draw (splotd *sp)
           }
         }
       }
-      if (!xg.mono_p)
-        gdk_gc_set_foreground (xg.plot_GC,
-          &xg.default_color_table[current_color]);
+      if (!gg.mono_p)
+        gdk_gc_set_foreground (gg.plot_GC,
+          &gg.default_color_table[current_color]);
 
-      gdk_draw_segments (sp->pixmap1, xg.plot_GC, sp->segments, nl);
+      gdk_draw_segments (sp->pixmap1, gg.plot_GC, sp->segments, nl);
 
       if (display->options.segments_directed_show_p) {
-        gdk_draw_segments (sp->pixmap1, xg.plot_GC, sp->arrowheads, nl);
+        gdk_draw_segments (sp->pixmap1, gg.plot_GC, sp->arrowheads, nl);
       }
     }
   }
@@ -538,22 +541,28 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned) {
   cpaneld *cpanel = &display->cpanel;
   gint mode = mode_get ();
 
-  if (!binned)
-    gdk_draw_pixmap (sp->pixmap1, xg.plot_GC, sp->pixmap0,
+  if (!binned) {
+    gdk_draw_pixmap (sp->pixmap1, gg.plot_GC, sp->pixmap0,
                      0, 0, 0, 0,
                      w->allocation.width,
                      w->allocation.height);
+  }
   else
-    gdk_draw_pixmap (sp->pixmap1, xg.plot_GC, sp->pixmap0,
+    gdk_draw_pixmap (sp->pixmap1, gg.plot_GC, sp->pixmap0,
                       loc0.x, loc0.y,
                       loc0.x, loc0.y,
                       1 + loc1.x - loc0.x ,
                       1 + loc1.y - loc0.y);
 
-  if (display->options.segments_directed_show_p || display->options.segments_undirected_show_p)
+  if (display->options.segments_directed_show_p ||
+      display->options.segments_undirected_show_p)
+  {
     if (display->displaytype == scatterplot || display->displaytype == scatmat)
-      segments_draw (sp);
-
+    {
+        segments_draw (sp);
+    }
+  }
+     
   if (cpanel->projection == XYPLOT ||
       cpanel->projection == P1PLOT ||
       cpanel->projection == PCPLOT ||
@@ -562,7 +571,7 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned) {
     splot_add_plot_labels (sp);
   }
 
-  if (sp == xg.current_splot) {
+  if (sp == gg.current_splot) {
     splot_draw_border (sp);
 
     switch (mode) {
@@ -581,7 +590,7 @@ void
 splot_pixmap1_to_window (splotd *sp) {
   GtkWidget *w = sp->da;
 
-  gdk_draw_pixmap (w->window, xg.plot_GC, sp->pixmap1,
+  gdk_draw_pixmap (w->window, gg.plot_GC, sp->pixmap1,
                    0, 0, 0, 0,
                    w->allocation.width,
                    w->allocation.height);

@@ -1,5 +1,5 @@
-#ifndef XGOBI_API_H
-#define XGOBI_API_H
+#ifndef GGOBI_API_H
+#define GGOBI_API_H
 
 
 #include <gtk/gtk.h>
@@ -21,13 +21,13 @@
   Returns 
   This is not a copy of the value used by ggobi.
  */
-const gchar *XGOBI(getFileName)();
+const gchar *GGOBI(getFileName)();
 /*
   Returns whether the data was read from a binary
   or ASCII file.
  */
-DataMode XGOBI(getDataMode)();
-const gchar * const XGOBI(getDataModeDescription)(DataMode mode);
+DataMode GGOBI(getDataMode)();
+const gchar * const GGOBI(getDataModeDescription)(DataMode mode);
 
 /*
  * data, but also row and column labels, lines, colors, blahblah
@@ -37,11 +37,11 @@ const gchar * const XGOBI(getDataModeDescription)(DataMode mode);
  * of doubles, arranged by column. Hence the double* for now.
  * A double array (double **) would be useful also.
 */
-void XGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int nc);
+void GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int nc);
 
 
 /* Whether to get the transformed names or the regular ones. */
-gchar **XGOBI(getVariableNames)(gboolean transformed);
+gchar **GGOBI(getVariableNames)(gboolean transformed);
 
 
 
@@ -49,27 +49,27 @@ gchar **XGOBI(getVariableNames)(gboolean transformed);
    Set the name of the jvar'th variable, either the regular
    name or that of the variable's tranformed counterpart.
  */
-void XGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed);
+void GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed);
 
 
-extern gint XGOBI (main)(gint argc, gchar *argv[], gboolean processEvents);
+extern gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents);
 
 /*
    Maps the name of a view type to its symbolic constant.
  */
-gint XGOBI(getViewTypeIndex) (gchar *viewType);
+gint GGOBI(getViewTypeIndex) (gchar *viewType);
 
 /*
   Converts a symbolic constant to the name of a view type.
   See getCurrentDisplay.
  */
-const gchar *XGOBI(getViewTypeName)(enum displaytyped type);
+const gchar *GGOBI(getViewTypeName)(enum displaytyped type);
 
 /*
   Returns a description of the type of the currently
   active display window.
  */
-const gchar *XGOBI(getCurrentDisplayType)();
+const gchar *GGOBI(getCurrentDisplayType)();
 
 
 /*
@@ -77,7 +77,7 @@ const gchar *XGOBI(getCurrentDisplayType)();
    view types.
    See  ViewTypes[] and ViewTypeIndeces[] in defines.h
  */
-const gchar * const *XGOBI(getViewTypes) (int *n);
+const gchar * const *GGOBI(getViewTypes) (int *n);
 /*
   Get the symblic constants associated identifying
   each plot type.
@@ -86,7 +86,7 @@ const gchar * const *XGOBI(getViewTypes) (int *n);
   See getViewTypes.
       ViewTypes[] and ViewTypeIndeces[] in defines.h
  */
-const gint  *XGOBI(getViewTypeIndeces)(int *n);
+const gint  *GGOBI(getViewTypeIndeces)(int *n);
 
 
 /*
@@ -94,14 +94,14 @@ const gint  *XGOBI(getViewTypeIndeces)(int *n);
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-const gfloat** XGOBI(getRawData)();
+const gfloat** GGOBI(getRawData)();
 
 /*
   Returns a pointer to the (second) transformation of the raw data.
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-const gfloat** XGOBI(getTFormData)();
+const gfloat** GGOBI(getTFormData)();
 
 
 /*
@@ -111,16 +111,16 @@ const gfloat** XGOBI(getTFormData)();
   argument of display_free, but this needs
   a little more finessing.
  */
-void XGOBI(destroyCurrentDisplay)();
+void GGOBI(destroyCurrentDisplay)();
 
 
  /*
     Returns a reference to the names of the observations
     used by GGobi to identify the rows in the data.
   */
-const gchar ** XGOBI(getCaseNames)();
+const gchar ** GGOBI(getCaseNames)();
 
-void XGOBI(setCaseName)(gint pt, const gchar *lbl);
+void GGOBI(setCaseName)(gint pt, const gchar *lbl);
 
 
 displayd *newScatterplot (gint ix, gint iy, gchar *viewType);
@@ -129,51 +129,49 @@ displayd *newParCoords (gint *vars);
 displayd *createPlot(int type, char **varnames);
 
 
+gint *GGOBI(getGlyphTypes)(int *n);
 
-gint *XGOBI(getGlyphTypes)(int *n);
+gint *GGOBI(getCaseGlyphTypes)(gint *, gint n);
+gint GGOBI(getCaseGlyphType)(gint id);
 
-gint *XGOBI(getCaseGlyphTypes)(gint *, gint n);
-gint XGOBI(getCaseGlyphType)(gint id);
-
-gint *XGOBI(getCaseGlyphSizes)(gint *, gint n);
-gint XGOBI(getCaseGlyphSize)(gint id);
-
-
-void XGOBI(setCaseGlyph) (gint pt, gint type, gint size);
-void XGOBI(setCaseGlyphs) (gint *pts, gint n, gint type, gint size);
+gint *GGOBI(getCaseGlyphSizes)(gint *, gint n);
+gint GGOBI(getCaseGlyphSize)(gint id);
 
 
-gint XGOBI(getCaseColor) (gint pt);
-gint * XGOBI(getCaseColors) (gint *pts, gint howMany);
-
-void XGOBI(setCaseColor)(gint pt, gint colorIndex);
-void XGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx);
-
-gboolean  XGOBI(isConnectedSegment)(gint a, gint b);
-void XGOBI(setObservationSegment)(gint x, gint y);
+void GGOBI(setCaseGlyph) (gint pt, gint type, gint size);
+void GGOBI(setCaseGlyphs) (gint *pts, gint n, gint type, gint size);
 
 
-gboolean XGOBI(getShowLines)();
-gboolean XGOBI(setShowLines)(gboolean val);
+gint GGOBI(getCaseColor) (gint pt);
+gint * GGOBI(getCaseColors) (gint *pts, gint howMany);
 
-DisplayOptions *XGOBI(getDefaultDisplayOptions)();
+void GGOBI(setCaseColor)(gint pt, gint colorIndex);
+void GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx);
 
-displayd *XGOBI(getDisplay)(int which);
+gboolean  GGOBI(isConnectedSegment)(gint a, gint b);
+void setObservationSegment(gint x, gint y);
 
-DisplayOptions *XGOBI(getDisplayOptions)(int displayNum);
+gboolean GGOBI(getShowLines)();
+gboolean GGOBI(setShowLines)(gboolean val);
+
+DisplayOptions *GGOBI(getDefaultDisplayOptions)();
+
+displayd *GGOBI(getDisplay)(int which);
+
+DisplayOptions *GGOBI(getDisplayOptions)(int displayNum);
 
 
-displayd * XGOBI(getCurrentDisplay)();
-gint XGOBI(getCurrentDisplayIndex)();
-/* gint XGOBI(getCurrentPlot)(displayd *display); */
+displayd * GGOBI(getCurrentDisplay)();
+gint GGOBI(getCurrentDisplayIndex)();
+/* gint GGOBI(getCurrentPlot)(displayd *display); */
 
-displayd *XGOBI(setCurrentDisplay)(int which);
+displayd *GGOBI(setCurrentDisplay)(int which);
 
-splotd *XGOBI(getPlot)(displayd *display, int which);
+splotd *GGOBI(getPlot)(displayd *display, int which);
 
 
-void XGOBI(moveBrush) (gint ulx, gint uly);
-void XGOBI(sizeBrush) (gint width, gint height);
+void GGOBI(moveBrush) (gint ulx, gint uly);
+void GGOBI(sizeBrush) (gint width, gint height);
 
 #endif /* End of conditional inclusion of entire file.*/
 

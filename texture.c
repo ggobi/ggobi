@@ -31,9 +31,9 @@ psort (const void *arg1, const void *arg2)
   gint *x1 = (gint *) arg1;
   gint *x2 = (gint *) arg2;
 
-  if (xg.app.gy[*x1] < xg.app.gy[*x2])
+  if (gg.app.gy[*x1] < gg.app.gy[*x2])
     val = -1;
-  else if (xg.app.gy[*x1] > xg.app.gy[*x2])
+  else if (gg.app.gy[*x1] > gg.app.gy[*x2])
     val = 1;
 
   return (val);
@@ -160,7 +160,7 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
 */
   gfloat lohnge, hihnge, delta;
   gfloat srnge, slo, shi;
-  gint nny, window, mid, g, h, gg, hh;
+  gint nny, window, mid, k, h, kk, hh;
   gint tmp5x5[25];
   gint tlarge[25], tsmall[25];
   gint i, ii;
@@ -179,13 +179,13 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
  * gy is needed solely for the psort routine:  psort is used by
  * qsort to put an index vector in the order that yy will assume.
 */
-  xg.app.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
+  gg.app.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
   xx = (gfloat *) g_malloc (ny * sizeof (gfloat));
 
   for (i=0; i<ny; i++)
   {
     indx[i] = i;
-    xg.app.gy[i] = yy[i];
+    gg.app.gy[i] = yy[i];
   }
 
   qsort ((void *) indx, (size_t) ny, sizeof (gint), psort);
@@ -225,7 +225,7 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
 
   if (stages<=1) {
     g_free ((gpointer) indx);
-    g_free ((gpointer) xg.app.gy);
+    g_free ((gpointer) gg.app.gy);
     g_free ((gpointer) xx);
     return;
   }
@@ -258,17 +258,17 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
   h    = mid;
   while (h-mid+window < ny)
   {
-     /*for(g = h; g-mid+window < ny; g = g+window)*/ /* bug */
-     for (g = h; g-mid+window < ny && g+window < ny; g = g+window)
-       if (yy[g+window] > yy[h] + 10.*delta)
+     /*for(k = h; k-mid+window < ny; k = k+window)*/ /* bug */
+     for (k = h; k-mid+window < ny && k+window < ny; k = k+window)
+       if (yy[k+window] > yy[h] + 10.*delta)
   	    break;
-    if (g-mid+window >= ny)
+    if (k-mid+window >= ny)
       break;
     hh = h - mid;
-    gg = g - h + window;
+    kk = k - h + window;
     slo = 5;
     shi = 0;
-    for (i=hh; i<hh+gg; i++)
+    for (i=hh; i<hh+kk; i++)
     {
       if (shft[i]<slo)
         slo = shft[i];
@@ -276,9 +276,9 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
         shi = shft[i];
     }
     srnge = shi - slo;
-    for (i=hh; i<gg; i++)
+    for (i=hh; i<kk; i++)
       shft[i] = 100 * (shft[i] - slo) / srnge;
-    h = g + window;
+    h = k + window;
   }
 
 
@@ -324,7 +324,7 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages)
     shft[i] = xx[i];
 
   g_free ((gpointer) indx);
-  g_free ((gpointer) xg.app.gy);
+  g_free ((gpointer) gg.app.gy);
   g_free ((gpointer) xx);
 
   return;

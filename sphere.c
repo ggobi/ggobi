@@ -7,7 +7,7 @@
 #include "vars.h"
 #include "externs.h"
 
-/*-- persistent, dimensioned using xg.ncols --*/
+/*-- persistent, dimensioned using gg.ncols --*/
 static gint nspherevars = 0;
 static gint *spherevars = NULL;
 static gint sphere_npcs = 0;
@@ -35,18 +35,18 @@ void
 sphere_malloc () {
   gint j;
 
-  spherevars = (gint *) g_malloc0 (xg.ncols * sizeof (gint));
-  eigenval = (gfloat *) g_malloc0 (xg.ncols * sizeof (gfloat));
+  spherevars = (gint *) g_malloc0 (gg.ncols * sizeof (gint));
+  eigenval = (gfloat *) g_malloc0 (gg.ncols * sizeof (gfloat));
 
-  eigenvec = (gfloat **) g_malloc (xg.ncols * sizeof (gfloat *));
-  for (j=0; j<xg.ncols; j++)
-    eigenvec[j] = (gfloat *) g_malloc0 (xg.ncols * sizeof (gfloat));
+  eigenvec = (gfloat **) g_malloc (gg.ncols * sizeof (gfloat *));
+  for (j=0; j<gg.ncols; j++)
+    eigenvec[j] = (gfloat *) g_malloc0 (gg.ncols * sizeof (gfloat));
 
-  vc = (gfloat **) g_malloc (xg.ncols * sizeof (gfloat *));
-  for (j=0; j<xg.ncols; j++)
-    vc[j] = (gfloat *) g_malloc0 (xg.ncols * sizeof (gfloat));
+  vc = (gfloat **) g_malloc (gg.ncols * sizeof (gfloat *));
+  for (j=0; j<gg.ncols; j++)
+    vc[j] = (gfloat *) g_malloc0 (gg.ncols * sizeof (gfloat));
 
-  tform1_mean = (gfloat *) g_malloc0 (xg.ncols * sizeof (gfloat));
+  tform1_mean = (gfloat *) g_malloc0 (gg.ncols * sizeof (gfloat));
 }
 
 void
@@ -56,11 +56,11 @@ sphere_free () {
   g_free ((gpointer) spherevars);
   g_free ((gpointer) eigenval);
 
-  for (j=0; j<xg.ncols; j++)
+  for (j=0; j<gg.ncols; j++)
     g_free ((gpointer) eigenvec[j]);
   g_free ((gpointer) eigenvec);
 
-  for (j=0; j<xg.ncols; j++)
+  for (j=0; j<gg.ncols; j++)
     g_free ((gpointer) vc[j]);
   g_free ((gpointer) vc);
 
@@ -155,7 +155,7 @@ eigenval_clear (void)
 {
   gint j;
 
-  for (j=0; j<xg.ncols; j++)
+  for (j=0; j<gg.ncols; j++)
     eigenval[j] = 0.;
 }
 
@@ -185,22 +185,22 @@ sphere_varcovar_set (void)
 {
   gint i, j, k, var;
   gfloat tmpf = 0.;
-/*  gint n = xg.nlinkable_in_plot;*/
-  gint n = xg.nrows;
+/*  gint n = gg.nlinkable_in_plot;*/
+  gint n = gg.nrows;
 
   for (k=0; k<nspherevars; k++) {
     var = spherevars[k];
 
     for (i=0; i<n; i++)
-      tmpf += xg.tform1.data[xg.rows_in_plot[i]][var];
+      tmpf += gg.tform1.data[gg.rows_in_plot[i]][var];
     tform1_mean[var] = tmpf / ((gfloat)n);
 
     tmpf = 0.;
-    for (i=0; i<xg.ncols; i++) {
+    for (i=0; i<gg.ncols; i++) {
       for (j=0; j<n; j++) {
         tmpf = tmpf +
-          (xg.tform1.data[xg.rows_in_plot[j]][var] - tform1_mean[var]) *
-          (xg.tform1.data[xg.rows_in_plot[j]][i] - tform1_mean[i]);
+          (gg.tform1.data[gg.rows_in_plot[j]][var] - tform1_mean[var]) *
+          (gg.tform1.data[gg.rows_in_plot[j]][i] - tform1_mean[i]);
       }
       tmpf /= ((gfloat)(n - 1));
       vc[var][i] = tmpf;
@@ -300,16 +300,16 @@ spherize_data (gint num_pcs, gint nsvars, gint *svars)
   gint i, j, k, m;
   gfloat tmpf;
 
-  for (m=0; m<xg.nrows_in_plot; m++) {
-    i = xg.rows_in_plot[m];
+  for (m=0; m<gg.nrows_in_plot; m++) {
+    i = gg.rows_in_plot[m];
 
     for (j=0; j<num_pcs; j++) {
       tmpf = 0.;
       for (k=0; k<nsvars; k++) {
         tmpf = tmpf + eigenvec[k][j] *
-          (xg.tform1.data[i][svars[k]] - tform1_mean[svars[k]]);
+          (gg.tform1.data[i][svars[k]] - tform1_mean[svars[k]]);
       }
-      xg.tform2.data[i][svars[j]] = tmpf / eigenval[j];
+      gg.tform2.data[i][svars[j]] = tmpf / eigenval[j];
     }
   }
 }

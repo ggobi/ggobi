@@ -43,11 +43,11 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  xg.current_splot = sp;
-  xg.current_display = (displayd *) sp->displayptr;
+  gg.current_splot = sp;
+  gg.current_display = (displayd *) sp->displayptr;
 
-  xg.mousepos.x = event->x;
-  xg.mousepos.y = event->y;
+  gg.mousepos.x = event->x;
+  gg.mousepos.y = event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -62,8 +62,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  xg.mousepos.x = event->x;
-  xg.mousepos.y = event->y;
+  gg.mousepos.x = event->x;
+  gg.mousepos.y = event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -93,20 +93,20 @@ cpanel_lineedit_make () {
   GtkWidget *hb, *radio1, *radio2;
   GSList *group;
   
-  xg.control_panel[LINEED] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (xg.control_panel[LINEED]), 5);
+  gg.control_panel[LINEED] = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (gg.control_panel[LINEED]), 5);
 
 /*
  * Radio group in a box: add/delete buttons
 */
   hb = gtk_hbox_new (true, 1);
   gtk_container_set_border_width (GTK_CONTAINER (hb), 3);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[LINEED]), hb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[LINEED]), hb, false, false, 0);
 
   radio1 = gtk_radio_button_new_with_label (NULL, "Add");
   GTK_TOGGLE_BUTTON (radio1)->active = true;
 
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), radio1,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), radio1,
     "Add new line segments using the mouse", NULL);
   gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
                       GTK_SIGNAL_FUNC (addordelete_cb), NULL);
@@ -115,7 +115,7 @@ cpanel_lineedit_make () {
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
 
   radio2 = gtk_radio_button_new_with_label (group, "Delete");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), radio2,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), radio2,
     "Delete line segments using the mouse", NULL);
   gtk_box_pack_start (GTK_BOX (hb), radio2, false, false, 0);
 
@@ -123,9 +123,9 @@ cpanel_lineedit_make () {
  * Show lines toggle
 */
   btn = gtk_check_button_new_with_label ("Show lines");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
     "Show connected lines", NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[LINEED]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[LINEED]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
                       GTK_SIGNAL_FUNC (show_lines_cb), NULL);
@@ -134,9 +134,9 @@ cpanel_lineedit_make () {
  * Remove lines button
 */
   btn = gtk_button_new_with_label ("Remove all lines");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
     "Remove all lines", NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[LINEED]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[LINEED]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (remove_lines_cb), NULL);
@@ -144,13 +144,13 @@ cpanel_lineedit_make () {
  * Including missings togle
 */
   btn = gtk_check_button_new_with_label ("Include missings");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg.tips), btn,
     "Include missing values", NULL);
-  gtk_box_pack_start (GTK_BOX (xg.control_panel[LINEED]),
+  gtk_box_pack_start (GTK_BOX (gg.control_panel[LINEED]),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
                       GTK_SIGNAL_FUNC (include_missings_cb), NULL);
 
-  gtk_widget_show_all (xg.control_panel[LINEED]);
+  gtk_widget_show_all (gg.control_panel[LINEED]);
 }
 

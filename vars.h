@@ -1,7 +1,7 @@
-#ifdef XGOBIINTERN
-#define XGOBI_
+#ifdef GGOBIINTERN
+#define GGOBI_
 #else
-#define XGOBI_ extern
+#define GGOBI_ extern
 #endif
 
 #include "defines.h"

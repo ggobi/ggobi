@@ -23,7 +23,7 @@ vartable_select_var (gint jvar, gboolean selected)
   gchar *varno_str;
 
   /*-- loop over the rows in the table, looking for jvar --*/
-  for (j=0; j<xg.ncols; j++) {
+  for (j=0; j<gg.ncols; j++) {
     if (clist != NULL) {
       gtk_clist_get_text (GTK_CLIST (clist), j, 0, &varno_str);
       varno = (gint) atoi (varno_str);
@@ -36,7 +36,7 @@ vartable_select_var (gint jvar, gboolean selected)
         else
           gtk_clist_unselect_row (GTK_CLIST (clist), jvar, 1);
       }
-      xg.vardata[jvar].selected = selected;
+      gg.vardata[jvar].selected = selected;
     }
   }
 }
@@ -49,8 +49,8 @@ vartable_unselect_all ()
   if (clist != NULL)
     gtk_clist_unselect_all (GTK_CLIST (clist));
 
-  for (j=0; j<xg.ncols; j++)
-    xg.vardata[j].selected = false;
+  for (j=0; j<gg.ncols; j++)
+    gg.vardata[j].selected = false;
 }
 
 void
@@ -62,7 +62,7 @@ selection_made (GtkWidget *cl, gint row, gint column,
 
   gtk_clist_get_text (GTK_CLIST (clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
-  xg.vardata[varno].selected = true;
+  gg.vardata[varno].selected = true;
 
   return;
 }
@@ -75,7 +75,7 @@ deselection_made (GtkWidget *cl, gint row, gint column,
 
   gtk_clist_get_text (GTK_CLIST (clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
-  xg.vardata[varno].selected = false;
+  gg.vardata[varno].selected = false;
   g_printerr ("deselected row= %d, varno= %d\n", row, varno);
 
   return;
@@ -121,14 +121,14 @@ vartable_row_append (gint j)
     row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
 
     row[0] = g_strdup_printf ("%d", j);
-    row[1] = g_strdup (xg.vardata[j].collab);
-    row[2] = g_strdup_printf ("%d", xg.vardata[j].groupid);
+    row[1] = g_strdup (gg.vardata[j].collab);
+    row[2] = g_strdup_printf ("%d", gg.vardata[j].groupid);
     row[3] = g_strdup ("");
-    row[4] = g_strdup_printf ("%8.3f", xg.vardata[j].lim_raw.min);
-    row[5] = g_strdup_printf ("%8.3f", xg.vardata[j].lim_raw.max);
-    row[6] = g_strdup_printf ("%8.3f", xg.vardata[j].mean);
-    row[7] = g_strdup_printf ("%8.3f", xg.vardata[j].median);
-    row[8] = g_strdup_printf ("%d", xg.vardata[j].nmissing);
+    row[4] = g_strdup_printf ("%8.3f", gg.vardata[j].lim_raw.min);
+    row[5] = g_strdup_printf ("%8.3f", gg.vardata[j].lim_raw.max);
+    row[6] = g_strdup_printf ("%8.3f", gg.vardata[j].mean);
+    row[7] = g_strdup_printf ("%8.3f", gg.vardata[j].median);
+    row[8] = g_strdup_printf ("%d", gg.vardata[j].nmissing);
 
     gtk_clist_append ((GtkCList *) clist, row);
 
@@ -197,7 +197,7 @@ vartable_open ()
       gtk_clist_set_column_auto_resize (GTK_CLIST (clist), k, true);
 
     /*-- populate the table --*/
-    for (j=0 ; j<xg.ncols ; j++)
+    for (j=0 ; j<gg.ncols ; j++)
       vartable_row_append (j);
 
     /*-- track selections --*/
@@ -237,5 +237,5 @@ vartable_tform_set (gint varno) {
 
   if (clist != NULL)
     gtk_clist_set_text (GTK_CLIST (clist), varno,
-      3, xg.vardata[varno].collab_tform);
+      3, gg.vardata[varno].collab_tform);
 }
