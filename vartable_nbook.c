@@ -149,17 +149,19 @@ vartable_rownum_from_varno (gint jvar, vartyped vartype, datad *d)
   gint rownum = 0;
   vartyped type = (vartype == categorical) ? categorical : real;
 
-  l = GTK_CLIST(d->vartable_clist[type])->row_list;
-  while (l) {
-    row = GTK_CLIST_ROW (l);
-    varstr = GTK_CELL_TEXT(row->cell[0])->text;  /* jvar is always first */
-    if (varstr != NULL && strlen (varstr) > 0) {
-      irow = atoi (varstr);
-      if (irow == jvar)
-        return rownum;
-      rownum++;
+  if (d->vartable_clist[type] != NULL) {
+    l = GTK_CLIST(d->vartable_clist[type])->row_list;
+    while (l) {
+      row = GTK_CLIST_ROW (l);
+      varstr = GTK_CELL_TEXT(row->cell[0])->text; /* 0th column for all types */
+      if (varstr != NULL && strlen (varstr) > 0) {
+        irow = atoi (varstr);
+        if (irow == jvar)
+          return rownum;
+        rownum++;
+      }
+      l = l->next;
     }
-    l = l->next;
   }
   return -1;
 }
