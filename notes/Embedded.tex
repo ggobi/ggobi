@@ -89,8 +89,57 @@ The makefile contains a rule for creating a shared library,
 
 
 \section{Calling R functions}
-Example for smoothing,
-identify, etc.
+While the embedded Ggobi in R allows R users to avail of functionality
+provided by Ggobi, the reverse direction is also feasible.  Ggobi can
+use R's capabilities to implement certain functionality. Additionally,
+we can allow users to specify interpreted R functions to be used for
+performing certain computations and to respond to certain events.
+We outline how this works in the paragraphs below.
+
+Consider the simple problem of taking two variables, X and Y, and
+computing a smoothed version of Y.  The inputs are the values of X and
+Y and the output is a vector of the same length as Y (and hence X)
+with the smoothed values.
+A simple R function to do this is
+\begin{verbatim}
+ function(x, y) {
+  predict(loess(y ~ x, data.frame(x=x, y = y)))
+ }
+\end{verbatim}
+
+GGobi can then invoke this function with a pair of variable values and
+extract the values for the result.
+The following C code illustrates how this might work.
+\begin{verbatim}
+ USER_OBJECT_ x, y, args;
+
+  args = allocVector(VECSXP, 2);
+  PROTECT(args);
+  VECTOR_DATA(args)[0] = variableToRS(xindex);
+  VECTOR_DATA(args)[1] = variableToRS(yindex);
+
+  callUserFunction(RS_smootherFunction, args);
+
+  UNPROTECT(1);
+\end{verbatim}
+
+
+
+In order to effect this, we define routines that mask the ones used in
+the regular stand-alone Ggobi.  When we link R.so with libGgobi.so, we
+arrange to have the routines we define in this package be invoked.
+
+
+The user can now register the function to use for smoothing, allowing
+them to control how it is performed. The only constraint is that it
+must be an argument that accepts 2 arguments and returns a numeric
+vector of the same length as the inputs.
+
+
+
+
+
+Example for smoothing,identify, etc.
 
 Closures for mutable state and local variables.
 
