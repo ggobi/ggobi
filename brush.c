@@ -448,7 +448,7 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
  * _color_ and _hidden_ cousins because we can't brush on line
  * type yet.
 */
-static gboolean
+gboolean
 update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   datad *d, ggobid *gg)
 {
@@ -600,6 +600,7 @@ static gboolean
 build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
 {
   gint ih, iv, m, j, k;
+  /*-- these look suspicious -- dfs --*/
   static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
   icoords imin, imax;
