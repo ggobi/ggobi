@@ -20,7 +20,7 @@
 /*--------------------------------------------------------------------*/
 
 gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
-  greal *raw, datad * d, datad * e, ggobid *gg)
+  gchar **vals, datad * d, datad * e, ggobid *gg)
 {
   gchar *s1, *s2;
   gint i, j;
@@ -28,6 +28,9 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
   splotd *sp;
   displayd *dsp;
   datad *dtarget = d;
+  greal *raw = NULL;
+  vartabled *vt;
+  gboolean found_missings = false;
 
   /*-- eventually check whether a->b already exists before adding --*/
   if (mode == ADDING_EDGES) {
@@ -51,6 +54,18 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
       }
     }
     g_free (stmp);
+  }
+
+  if (dtarget->ncols) {
+    raw = (greal *) g_malloc (dtarget->ncols * sizeof(greal));
+    for (j=0; j<dtarget->ncols; j++) {
+      if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
+        raw[j] = (greal) 0.0;  /*-- or what? --*/
+        found_missings = true;
+      } else {
+        raw[j] = (greal) atof (vals[j]);
+      }
+    }
   }
 
   /*-- Here's what the datad needs --*/
@@ -79,6 +94,10 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
   }
 
   pipeline_arrays_check_dimensions (dtarget);
+  /*
+   * Resetting rows_in_plot causes a rows_in_plot_changed
+   * signal to be emitted, and the tour responds to that.
+  */
   rows_in_plot_set (dtarget, gg);
 
   /*-- allocate and initialize brushing arrays --*/
@@ -88,11 +107,24 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
   vectorb_realloc (&dtarget->pts_under_brush, dtarget->nrows);
   clusters_set (dtarget, gg);
 
-  if (dtarget->nmissing)
-    arrays_add_rows (&dtarget->missing, dtarget->nrows);
+  if (found_missings) {
+    if (dtarget->nmissing == 0) {
+      arrays_alloc (&dtarget->missing, dtarget->nrows, dtarget->ncols);
+      arrays_zero (&dtarget->missing);
+    } else {
+      arrays_add_rows (&dtarget->missing, dtarget->nrows);
+    }
+    for (j=0; j<dtarget->ncols; j++) {
+      if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
+        dtarget->nmissing++;
+        dtarget->missing.vals[dtarget->nrows-1][j] = 1;
+        vt = vartable_element_get (j, dtarget);
+        vt->nmissing++;
+      }
+    }
+  }
 
   /*-- read in the data, push it through the first part of the pipeline --*/
-g_printerr ("%s has %d cols\n", dtarget->name, dtarget->ncols);
   if (dtarget->ncols) {
     for (j=0; j<dtarget->ncols; j++) {
       dtarget->raw.vals[dtarget->nrows-1][j] = 
@@ -172,9 +204,8 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
   }
 /*  */
 
-  displays_tailpipe (FULL, gg);
 
-  /*-- I don't yet know what I need to reallocate for the tour --*/
+  displays_tailpipe (FULL, gg);
 
   return true;
 }
@@ -394,10 +425,6 @@ pt_screen_to_raw (icoords *screen, greal *raw,
   pt_screen_to_plane (screen, &planar, sp);
   pt_plane_to_world (sp, &planar, world); 
 
-  /*
-   * These values aren't right yet, but maybe they're good enough to
-   * get me started.
-  */
   for (j=0; j<d->ncols; j++)
     pt_world_to_raw_by_var (j, world, raw, d);
 

@@ -39,6 +39,7 @@ add_record_dialog_cancel (GtkWidget *w, ggobid *gg)
 static void
 add_record_dialog_apply (GtkWidget *w, displayd *display) 
 {
+  gint j;
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
   datad *e = display->e;
@@ -46,7 +47,7 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
   GtkWidget *dialog = gtk_widget_get_toplevel (w);
   GtkWidget *label_entry, *id_entry;
   gchar *label = NULL, *id = NULL;
-  greal *raw = NULL;
+  gchar **vals = NULL;
   datad *dtarget;
 
   dtarget = (cpanel->ee_mode == ADDING_EDGES)?e:d;
@@ -58,14 +59,15 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
     GtkWidget *table = widget_find_by_name (GTK_DIALOG(dialog)->vbox,
       "EE:tablev");
 
-    raw = (greal *) g_malloc (d->ncols * sizeof(greal));
+    vals = (gchar **) g_malloc (d->ncols * sizeof(gchar *));
 
     for (list = GTK_TABLE(table)->children; list; list = list->next) {
       child = (GtkTableChild *) list->data;
       if (child->top_attach == 1) {
         entry = child->widget;
         lbl = gtk_editable_get_chars (GTK_EDITABLE(entry), 0, -1);
-        raw[child->left_attach] = (greal) atof (lbl);
+        /*raw[child->left_attach] = (greal) atof (lbl);*/
+        vals[child->left_attach] = g_strdup (lbl);
       }
     }
   }
@@ -86,14 +88,17 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
   if (cpanel->ee_mode == ADDING_EDGES) {
     /*-- Add the new edge to e --*/
     record_add (cpanel->ee_mode, gg->edgeedit.a, d->nearest_point,
-      label, id, raw, d, e, gg);
+      label, id, vals, d, e, gg);
 
   } else if (cpanel->ee_mode == ADDING_POINTS) {
-    record_add (cpanel->ee_mode, -1, -1, label, id, raw, d, e, gg);
+    record_add (cpanel->ee_mode, -1, -1, label, id, vals, d, e, gg);
   }
 
-  if (raw)
-    g_free (raw);
+  if (vals) {
+    for (j=0; j<d->ncols; j++)
+      g_free (vals[j]);
+    g_free (vals);
+  }
 
   gg->edgeedit.a = -1;
   gtk_widget_destroy (dialog);
@@ -163,6 +168,10 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   gtk_table_attach (GTK_TABLE (table),
     w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
   entry = gtk_entry_new ();
+  lbl = g_strdup_printf("%d", d->nrows+1);
+  gtk_entry_set_text (GTK_ENTRY(entry), lbl);
+  g_free (lbl);
+
   gtk_widget_set_name (entry, "EE:rowlabel");
   gtk_table_attach (GTK_TABLE (table),
     entry, 1, 2, row, row+1, table_opt, table_opt, 1, 1);
@@ -176,6 +185,9 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
     gtk_table_attach (GTK_TABLE (table),
       w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
     entry = gtk_entry_new ();
+    lbl = g_strdup_printf("%d", d->nrows);
+    gtk_entry_set_text (GTK_ENTRY(entry), lbl);
+    g_free (lbl);
     gtk_widget_set_name (entry, "EE:recordid");
     gtk_table_attach (GTK_TABLE (table),
       entry, 1, 2, row, row+1, table_opt, table_opt, 1, 1);
@@ -197,7 +209,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
       pt_screen_to_raw (&gg->current_splot->mousepos, raw,
         dtarget, gg->current_splot, gg);
     } else {
-      /*-- use the values for the last edge --*/
+      /*-- use the values for the last edge ... should use NAs --*/
       for (j=0; j<e->ncols; j++) {
         raw[j] = e->raw.vals[e->nrows-1][j];
       }
@@ -214,7 +226,10 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
         w, j, j+1, 0, 1, table_opt, table_opt, 1, 1);
 
       entry = gtk_entry_new ();
-      lbl = g_strdup_printf ("%g", raw[j]);
+      if (cpanel->ee_mode == ADDING_POINTS)
+        lbl = g_strdup_printf ("%g", raw[j]);
+      else
+        lbl = g_strdup ("NA");
       gtk_entry_set_text (GTK_ENTRY (entry), lbl);
       gtk_table_attach (GTK_TABLE (tablev),
         entry, j, j+1, 1, 2, table_opt, table_opt, 1, 1);
@@ -362,21 +377,12 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
         gg->edgeedit.a >= 0 &&
         d->nearest_point != gg->edgeedit.a)
     {
-      g_printerr ("add the edge from %d to %d\n",
-        gg->edgeedit.a, d->nearest_point);
-
       if (e == NULL) {
         /*-- Initialize a new edge set --*/
         g_printerr ("Not yet initializing a new edge set\n");
         gdk_pointer_ungrab (event->time);
         return false;
       }
-/*
-      if (e->ncols) {
-        g_printerr ("Not yet adding edges to datad's with variables\n");
-        return false;
-      }
-*/
 
       /*-- Open a dialog window to ask for label, rowId, data ... --*/
       add_record_dialog_open (d, e, display, gg);
