@@ -56,7 +56,7 @@ canRead(const char * const fileName)
   gboolean val;
 #ifndef WIN32
   struct stat buf;
-  val = (stat(fileName, &buf) != 0)
+  val = (stat(fileName, &buf) != 0);
 #else
   gint ft=0;
   val = (access(fileName, ft) != 0);
