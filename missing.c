@@ -164,3 +164,54 @@ missing_rejitter (gint *vars, gint nvars, datad *d, ggobid *gg) {
   /*-- redisplay only the missings displays --*/
   displays_tailpipe (REDISPLAY_MISSING, FULL, gg); 
 }
+
+#ifdef GENERATE_MISSINGS_DATAD
+/*
+ * For the datad currently selected in gg->impute.notebook,
+ * generate a new datad using d->missing.
+*/
+void missings_datad_cb (GtkWidget *w, ggobid *gg)
+{
+  GtkObject *obj = GTK_OBJECT(gg->impute.window);
+  GtkWidget *clist = get_clist_from_object (obj);
+  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+
+  if (d && d->nmissing > 0) {
+    GtkWidget *notebook;
+    datad *dnew;
+    gint i, j;
+    vartabled *vt, *vtnew;
+
+    notebook = (GtkWidget *) gtk_object_get_data (obj, "notebook");
+    dnew = datad_create (d->nrows, d->ncols, gg);
+    dnew->name = g_strdup_printf ("%s (missing)", d->name);
+
+    for (i=0; i<d->nrows; i++) {
+      for (j=0; j<d->ncols; j++) {
+        dnew->raw.vals[i][j] = (gfloat) d->missing.vals[i][j];
+      }
+    }
+    
+    vartable_alloc (dnew);
+    vartable_init (dnew);
+    for (j=0; j<dnew->ncols; j++) {
+      vt = vartable_element_get (j, d);
+      vtnew = vartable_element_get (j, dnew);
+      vtnew->collab = g_strdup (vt->collab);
+      vtnew->collab_tform = g_strdup (vtnew->collab);
+    }
+
+    rowlabels_alloc (dnew, gg);
+    for (i=0; i<d->nrows; i++) {
+      g_array_insert_val (dnew->rowlab, i,
+        (gchar *) g_array_index (d->rowlab, gchar *, i));
+    }
+
+    datad_init (dnew, gg, false);
+
+    /*-- this should be executed in response to any datad_added event --*/
+    display_menu_build (gg);
+  }
+
+}
+#endif

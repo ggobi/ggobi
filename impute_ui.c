@@ -76,18 +76,20 @@ impute_cb (GtkWidget *w, ggobid *gg) {
 /*------------------------------------------------------------------*/
 
 void
-impute_window_open (ggobid *gg) {
-
-  GtkWidget *btn, *tgl;
+impute_window_open (ggobid *gg)
+{
+  GtkWidget *btn, *tgl, *notebook;
   GtkWidget *vbox, *frame, *hb;
   GtkWidget *label;
-  GtkWidget *notebook;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
 /**/return;
 
   if (gg->impute.window == NULL) {
+#ifdef GENERATE_MISSINGS_DATAD
+extern void missings_datad_cb (GtkWidget *w, ggobid *gg);
+#endif
     
     gg->impute.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->impute.window),
@@ -100,8 +102,24 @@ impute_window_open (ggobid *gg) {
     vbox = gtk_vbox_new (false, 2);
     gtk_container_add (GTK_CONTAINER (gg->impute.window), vbox);
 
+/*-- experimenting with initiating a new datad for missings --*/
+#ifdef GENERATE_MISSINGS_DATAD
+
+    btn = gtk_button_new_with_label ("Add missings as new dataset");
+    gtk_signal_connect (GTK_OBJECT (btn),
+                        "clicked",
+                        GTK_SIGNAL_FUNC (missings_datad_cb),
+                        (gpointer) gg);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Generate a new dataset representing the missingness information",
+      NULL);
+    gtk_box_pack_start (GTK_BOX (vbox), btn, true, true, 2);
+
+#endif
+
     /* Create a notebook, set the position of the tabs */
-    notebook = create_variable_notebook (vbox, GTK_SELECTION_EXTENDED,
+    notebook = create_variable_notebook (vbox,
+      GTK_SELECTION_EXTENDED,
       (GtkSignalFunc) NULL, gg);
 
     /*-- option menu to specify variables --*/
