@@ -156,8 +156,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     display->displaytype == parcoords ||
     display->displaytype == tsplot;
 
-  if (gg->plot_GC == NULL)
+  if (gg->plot_GC == NULL) {
     init_plot_GC (sp->pixmap0, gg);
+  }
 
   /* clear the pixmap */
   gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
@@ -819,7 +820,7 @@ void
 splot_redraw (splotd *sp, enum redrawStyle redraw_style, ggobid *gg) {
 
   /*-- sometimes the first draw happens before configure is called --*/
-  if (sp->da == NULL || sp->pixmap0 == NULL) {
+  if (sp == NULL || sp->da == NULL || sp->pixmap0 == NULL) {
     return;
   }
 

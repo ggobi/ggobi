@@ -4,6 +4,7 @@ ifndef GGOBI_HOME
  GGOBI_HOME=../..
 endif
 
+# -rpath or --rpath?  My compiler accepts -rpath.
 
 EXTRA_LIBS=$(GTKEXTRA_LIB_DIR:%=-L%) $(GTKEXTRA_LIB_DIR:%=-Xlinker --rpath -Xlinker %) -lgtkextra
 

@@ -4,8 +4,6 @@ endif
 
 ggobi:
 
-#EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
-
 include local.config
 
 CC = gcc
@@ -93,8 +91,6 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c splash.c cpanel.c \
  fileio.c \
  print.c \
  plugin.c
-
-
 
 OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o splash.o cpanel.o \
  menus.o \

@@ -709,6 +709,17 @@ load_previous_file(GtkWidget *w, gpointer cbd)
     for (i = 0; i < n ; i++) {    
       dpy = (GGobiDisplayDescription*) g_list_nth_data(gdesc->displays, i);
       createDisplayFromDescription(gg, dpy);
+      /*
+       * This line is added to counteract something done in
+       * display_add:  if there's a previous splot, display_add
+       * kindly arranges for it to get a QUICK redraw just to
+       * eliminate the border.  The API, though, allows many
+       * plots to be added before anything is drawn.  As a
+       * result, if the first display is a parcoords plot, the
+       * first splot is copied from pixmap0 to pixmap1 before it
+       * has been drawn to pixmap1, resulting in garbage on the
+       * screen.
+      */
       gg->current_splot = NULL;
     }
   } 

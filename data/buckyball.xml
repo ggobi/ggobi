@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
+<ggobidata count="2">
+<data name="buckyball">
+<description>
+</description>
+<variables count="3">
+  <variable>v1</variable>
+  <variable>v2</variable>
+  <variable>v3</variable>
+</variables>
+<records count="60" color="2" glyph="plus 0">
+<record id="1"> -0.108022 2.389616 -2.593673 </record>
+<record id="2"> -1.232478 2.765126 -1.802246 </record>
+<record id="3"> -0.751701 3.377841 -0.613467 </record>
+<record id="4"> 0.671924 3.384590 -0.665701 </record>
+<record id="5"> 1.066695 2.778224 -1.884692 </record>
+<record id="6"> -2.975723 0.176517 1.933305 </record>
+<record id="7"> -3.453261 -0.435074 0.758800 </record>
+<record id="8"> -3.011595 -1.788106 0.739593 </record>
+<record id="9"> -2.251138 -2.005841 1.932052 </record>
+<record id="10"> -2.225179 -0.792532 2.668610 </record>
+<record id="11"> 3.131426 0.187348 1.668036 </record>
+<record id="12"> 2.436158 -0.788283 2.480008 </record>
+<record id="13"> 2.405963 -2.015362 1.724938 </record>
+<record id="14"> 3.061083 -1.789611 0.493145 </record>
+<record id="15"> 3.503849 -0.429040 0.482560 </record>
+<record id="16"> -0.131939 1.150449 -3.349970 </record>
+<record id="17"> -1.289658 0.308857 -3.298775 </record>
+<record id="18"> -0.848418 -1.052649 -3.307085 </record>
+<record id="19"> 0.583910 -1.046871 -3.365774 </record>
+<record id="20"> 1.033339 0.317287 -3.386985 </record>
+<record id="21"> 0.731139 -3.472222 0.614752 </record>
+<record id="22"> -0.687668 -3.471748 0.665525 </record>
+<record id="23"> -1.075166 -2.858685 1.890461 </record>
+<record id="24"> 0.104362 -2.475031 2.592667 </record>
+<record id="25"> 1.217345 -2.857368 1.804314 </record>
+<record id="26"> -2.439934 0.694554 -2.483608 </record>
+<record id="27"> -3.115184 -0.285093 -1.704905 </record>
+<record id="28"> -3.505883 0.324700 -0.481919 </record>
+<record id="29"> -3.068511 1.682535 -0.508266 </record>
+<record id="30"> -2.407917 1.907850 -1.747466 </record>
+<record id="31"> 0.791212 2.923079 1.789715 </record>
+<record id="32"> 1.444547 3.159690 0.539726 </record>
+<record id="33"> 2.671233 1.591056 1.681337 </record>
+<record id="34"> 2.605742 2.324577 0.497151 </record>
+<record id="35"> 1.558792 1.983222 2.466817 </record>
+<record id="36"> 0.651220 -3.018531 -1.845944 </record>
+<record id="37"> 1.337684 -2.047819 -2.621833 </record>
+<record id="38"> 1.404882 -3.248422 -0.655727 </record>
+<record id="39"> 2.558580 -2.412477 -0.718711 </record>
+<record id="40"> 2.520522 -1.674419 -1.913518 </record>
+<record id="41"> -2.663924 -1.670388 -1.712625 </record>
+<record id="42"> -1.540988 -2.044622 -2.510036 </record>
+<record id="43"> -0.798963 -3.019611 -1.785560 </record>
+<record id="44"> -1.459231 -3.244257 -0.550463 </record>
+<record id="45"> -2.610975 -2.409814 -0.507085 </record>
+<record id="46"> -0.600661 0.991026 3.343135 </record>
+<record id="47"> -1.009735 -0.397655 3.388172 </record>
+<record id="48"> 0.142193 -1.227663 3.347725 </record>
+<record id="49"> 0.850951 0.955020 3.301366 </record>
+<record id="50"> 1.349409 -0.412905 3.264122 </record>
+<record id="51"> -1.423823 3.147125 0.657111 </record>
+<record id="52"> -2.573165 2.306380 0.706583 </record>
+<record id="53"> -2.523919 1.564246 1.918381 </record>
+<record id="54"> -1.339441 1.943759 2.623628 </record>
+<record id="55"> -0.665066 2.924495 1.838100 </record>
+<record id="56"> 3.012250 1.698325 -0.738779 </record>
+<record id="57"> 3.458585 0.330149 -0.748281 </record>
+<record id="58"> 2.976355 -0.280454 -1.937521 </record>
+<record id="59"> 2.248435 0.708226 -2.654087 </record>
+<record id="60"> 2.259493 1.927785 -1.914609 </record>
+</records>
+</data>
+
+<data name="edges">
+<records count="90">
+<record source="59" destination="60" color="2"> </record>
+<record source="58" destination="59" color="2"> </record>
+<record source="57" destination="58" color="2"> </record>
+<record source="56" destination="57" color="2"> </record>
+<record source="56" destination="60" color="2"> </record>
+<record source="54" destination="55" color="2"> </record>
+<record source="53" destination="54" color="2"> </record>
+<record source="52" destination="53" color="2"> </record>
+<record source="51" destination="52" color="2"> </record>
+<record source="51" destination="55" color="2"> </record>
+<record source="49" destination="50" color="2"> </record>
+<record source="48" destination="50" color="2"> </record>
+<record source="47" destination="48" color="2"> </record>
+<record source="46" destination="54" color="4"> </record>
+<record source="46" destination="49" color="2"> </record>
+<record source="46" destination="47" color="2"> </record>
+<record source="44" destination="45" color="2"> </record>
+<record source="43" destination="44" color="2"> </record>
+<record source="42" destination="43" color="2"> </record>
+<record source="41" destination="42" color="2"> </record>
+<record source="41" destination="45" color="2"> </record>
+<record source="40" destination="58" color="4"> </record>
+<record source="39" destination="40" color="2"> </record>
+<record source="38" destination="39" color="2"> </record>
+<record source="37" destination="40" color="2"> </record>
+<record source="36" destination="43" color="4"> </record>
+<record source="36" destination="38" color="2"> </record>
+<record source="36" destination="37" color="2"> </record>
+<record source="35" destination="49" color="4"> </record>
+<record source="34" destination="56" color="4"> </record>
+<record source="33" destination="34" color="2"> </record>
+<record source="33" destination="35" color="2"> </record>
+<record source="32" destination="34" color="2"> </record>
+<record source="31" destination="55" color="4"> </record>
+<record source="31" destination="35" color="2"> </record>
+<record source="31" destination="32" color="2"> </record>
+<record source="29" destination="52" color="4"> </record>
+<record source="29" destination="30" color="2"> </record>
+<record source="28" destination="29" color="2"> </record>
+<record source="27" destination="41" color="4"> </record>
+<record source="27" destination="28" color="2"> </record>
+<record source="26" destination="30" color="2"> </record>
+<record source="26" destination="27" color="2"> </record>
+<record source="24" destination="48" color="4"> </record>
+<record source="24" destination="25" color="2"> </record>
+<record source="23" destination="24" color="2"> </record>
+<record source="22" destination="44" color="4"> </record>
+<record source="22" destination="23" color="2"> </record>
+<record source="21" destination="38" color="4"> </record>
+<record source="21" destination="25" color="2"> </record>
+<record source="21" destination="22" color="2"> </record>
+<record source="20" destination="59" color="4"> </record>
+<record source="19" destination="37" color="4"> </record>
+<record source="19" destination="20" color="2"> </record>
+<record source="18" destination="42" color="4"> </record>
+<record source="18" destination="19" color="2"> </record>
+<record source="17" destination="26" color="4"> </record>
+<record source="17" destination="18" color="2"> </record>
+<record source="16" destination="20" color="2"> </record>
+<record source="16" destination="17" color="2"> </record>
+<record source="15" destination="57" color="4"> </record>
+<record source="14" destination="39" color="4"> </record>
+<record source="14" destination="15" color="2"> </record>
+<record source="13" destination="25" color="4"> </record>
+<record source="13" destination="14" color="2"> </record>
+<record source="12" destination="50" color="4"> </record>
+<record source="12" destination="13" color="2"> </record>
+<record source="11" destination="33" color="4"> </record>
+<record source="11" destination="12" color="2"> </record>
+<record source="11" destination="15" color="2"> </record>
+<record source="10" destination="47" color="4"> </record>
+<record source="9" destination="23" color="4"> </record>
+<record source="9" destination="10" color="2"> </record>
+<record source="8" destination="45" color="4"> </record>
+<record source="8" destination="9" color="2"> </record>
+<record source="7" destination="28" color="4"> </record>
+<record source="7" destination="8" color="2"> </record>
+<record source="6" destination="53" color="4"> </record>
+<record source="6" destination="7" color="2"> </record>
+<record source="6" destination="10" color="2"> </record>
+<record source="5" destination="60" color="4"> </record>
+<record source="4" destination="32" color="4"> </record>
+<record source="4" destination="5" color="2"> </record>
+<record source="3" destination="51" color="4"> </record>
+<record source="3" destination="4" color="2"> </record>
+<record source="2" destination="30" color="4"> </record>
+<record source="2" destination="3" color="2"> </record>
+<record source="1" destination="16" color="4"> </record>
+<record source="1" destination="5" color="2"> </record>
+<record source="1" destination="2" color="2"> </record>
+</records>
+</data>
+</ggobidata>

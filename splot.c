@@ -38,8 +38,9 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
    * drawing_area has been properly sized.  Maybe I'm not executing
    * calls in the proper order?  This protects me in the meantime.
   */
-  if (w->allocation.width < 2 || w->allocation.height < 2)
+  if (w->allocation.width < 2 || w->allocation.height < 2) {
     return false;
+  }
 
   /*
    * This is not the best place to do this, perhaps, but it works
@@ -465,6 +466,7 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   sp->da = gtk_drawing_area_new ();
   sp->pixmap0 = NULL;
   sp->pixmap1 = NULL;
+  sp->redraw_style = FULL;
 
   brush_pos_init (sp);
   
