@@ -5,15 +5,16 @@
 <data name="prim7">
 <description>
 </description>
+
 <variables count="8">
-  <realvariable name="X1" nickname="X1" />
-  <realvariable name="X2" nickname="X2" />
-  <realvariable name="X3" nickname="X3" />
-  <realvariable name="X4" nickname="X4" />
-  <realvariable name="X5" nickname="X5" />
-  <realvariable name="X6" nickname="X6" />
-  <realvariable name="X7" nickname="X7" />
-  <realvariable name="Cluster" nickname="Cl" />
+ <realvariable name="X1"/>
+ <realvariable name="X2"/>
+ <realvariable name="X3"/>
+ <realvariable name="X4"/>
+ <realvariable name="X5"/>
+ <realvariable name="X6"/>
+ <realvariable name="X7"/>
+ <realvariable name="Cluster" />
 </variables>
 <records count="500" glyph="fc 3" color="6">
 <record id="1" label="0" color="4" glyph="oc 3">
