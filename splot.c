@@ -499,6 +499,7 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   sp->pixmap0 = NULL;
   sp->pixmap1 = NULL;
   sp->redraw_style = FULL;
+  sp->tour1d.firsttime = true; /* Ensure that the 1D tour should be initialized. */
 
   brush_pos_init (sp);
   

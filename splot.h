@@ -67,6 +67,15 @@ typedef struct {
  lims p1d_lim;      /* limits of the spreading data */
  gfloat p1d_mean;
 
+
+/*
+ * tour1d (variables used to record the state of the 1D tour for this plot)
+ */
+ struct _tour1d {
+   gint keepmin;
+   gint keepmax; /* Is this ever used */
+   gboolean firsttime;
+ } tour1d;
 /*
  * xyplot
 */

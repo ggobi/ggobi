@@ -353,11 +353,11 @@ tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 }
 
 void
-tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
+tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) 
+{
   int i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
-  gfloat min, max, mean, keepmin, keepmax;
-  gboolean firsttime = true;
+  gfloat min, max, mean;
   gfloat precis = PRECISION1;
   cpaneld *cpanel = &dsp->cpanel;
   gfloat *yy;
@@ -367,7 +367,7 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
 
   yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
 
-  for (m=0; m<d->nrows_in_plot; m++)
+  for (m=0; m < d->nrows_in_plot; m++)
   {
     i = d->rows_in_plot[m];
     yy[i] = sp->planar[i].x = 0;
@@ -378,23 +378,23 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
     }
   }
   do_ash1d (yy, d->nrows_in_plot,
-       cpanel->t1d_nbins, cpanel->t1d_nASHes,
-       sp->p1d_data.els, &min, &max, &mean);
-  if (firsttime) {
-    keepmin = min;
-    keepmax = max;
-    firsttime = false;
+            cpanel->t1d_nbins, cpanel->t1d_nASHes,
+            sp->p1d_data.els, &min, &max, &mean);
+  if (sp->tour1d.firsttime) {
+    sp->tour1d.keepmin = min;
+    sp->tour1d.keepmax = max;
+    sp->tour1d.firsttime = false;
   }
   else {
-    if (min < keepmin) keepmin = min;
-    if (max > keepmax) keepmax = max;
+    if (min < sp->tour1d.keepmin) sp->tour1d.keepmin = min;
+    if (max > sp->tour1d.keepmax) sp->tour1d.keepmax = max;
   }
 
   max = 2*mean;  /* try letting the max for scaling depend on the mean */
   if (cpanel->t1d_vert) {
     for (i=0; i<d->nrows_in_plot; i++) {
       sp->planar[i].x = (glong) (precis*(-1.0+2.0*
-        (sp->p1d_data.els[i]-keepmin)/(max-keepmin)));
+        (sp->p1d_data.els[i]-sp->tour1d.keepmin)/(max-sp->tour1d.keepmin)));
       sp->planar[i].y = yy[i];
     }
   }
@@ -402,12 +402,11 @@ tour1d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
     for (i=0; i<d->nrows_in_plot; i++) {
       sp->planar[i].x = yy[i];
       sp->planar[i].y = (glong) (precis*(-1.0+2.0*
-        (sp->p1d_data.els[i]-keepmin)/(max-keepmin)));
+        (sp->p1d_data.els[i]-sp->tour1d.keepmin)/(max-sp->tour1d.keepmin)));
     }
   }
 
   g_free ((gpointer) yy);
-
 }
 
 void

@@ -353,34 +353,94 @@ extern void GGobi_setPlotRange(double *x, double *y, int plotNum, displayd *disp
 
 /**
  @ingroup Glyphs
+ Retrieve the list of the internal codes used for 
+ representing the glyph types that GGobi understands.
+
+ @return an array of integers giving the enumerated values for the different
+  glyph types. The number of elements in the array
+  is contained in the value of the argument (n).
  */
 extern gint *GGobi_getGlyphTypes(gint *n);
+
 /**
+ Retrieve the list of the symbolic names associated
+ with the glyph types that GGobi understands.
+ The elements returned correspond to the elements returned
+ by GGobi_getGlyphTypes().
+ @return an array of strings. The number of elements in the array
+  is contained in the value of the argument (n).
  @ingroup Glyphs
  */
 extern const gchar **const GGobi_getGlyphTypeNames(gint *n);
+
 /**
+ Get the symbolic name of the glyph corresponding to the
+ internal constant that represents the glyph type.
+
+ @return a string giving the human readable name of the glyph type.
+
  @ingroup Glyphs
  */
 extern gchar const* GGobi_getGlyphTypeName(gint n);
 
 /**
+ Retrieve the current glyph types for one or more observations.
+ This returns the internal representation of the glyph type
+ which can be converted to a symbolic, human-readable name
+ using GGobi_getGlyphTypeName().
+
+ @return an array of length `n' whose i-th entry 
+  contains the current glyph type
+ for the observation identified by the i-th value in the argument
+ `which'
+ @see GGobi_getGlyphTypeName()
+ 
  @ingroup Glyphs
  */
-extern gint *GGobi_getCaseGlyphTypes(gint *, gint n, datad *, ggobid *gg);
-/**
- @ingroup Glyphs
- */
-extern gint GGobi_getCaseGlyphType(gint id, datad *, ggobid *gg);
+extern gint *GGobi_getCaseGlyphTypes(gint *which, gint n, datad *dataset, ggobid *gg);
 
 /**
+ Get the glyph type attribute for a single observation
+
+ @param id the index of the observation of interest
+ @param dataset the dataset within the GGobi instance in which to find the observation.
+ @param gg the GGobi instance in which to find the dataset.
+ @return the internal representation of a glyph, which is a symbolic constant.
+
+ @see GGobi_getGlyphTypeName()
  @ingroup Glyphs
  */
-extern gint *GGobi_getCaseGlyphSizes(gint *, gint n, datad *, ggobid *gg);
+extern gint GGobi_getCaseGlyphType(gint id, datad *dataset, ggobid *gg);
+
 /**
+ Get the glyph size attribute for a collection of observations.
+
+ @param which an array of the indeces of the observations of interest.
+ @param n the length of the array `which', and the length of the array that is returned.
+ @param dataset the dataset within the GGobi instance in which to find the observation.
+ @param gg the GGobi instance in which to find the dataset.
+ @return an array giving the size of the glyph for the specified observations.
+   The i-th element corresponds to the observation identified by the i-th element
+   of the array `which'.
+
+ @see GGobi_getGlyphTypeName()
  @ingroup Glyphs
  */
-extern gint GGobi_getCaseGlyphSize(gint id, datad *, ggobid *gg);
+extern gint *GGobi_getCaseGlyphSizes(gint *which, gint n, datad *dataset, ggobid *gg);
+
+/**
+ Get the glyph size attribute for a single observation
+
+ @param id the index of the observation of interest
+ @param dataset the dataset within the GGobi instance in which to find the observation.
+ @param gg the GGobi instance in which to find the dataset.
+ @return the size of the glyph for the given observation
+
+ @see GGobi_getGlyphTypeName()
+ @see GGobi_getGlyphTypeName()
+ @ingroup Glyphs
+ */
+extern gint GGobi_getCaseGlyphSize(gint id, datad *dataset, ggobid *gg);
 /**
  @ingroup Glyphs
  */
@@ -393,22 +453,62 @@ extern void GGobi_setCaseGlyphs(gint *pts, gint n, gint type, gint size, datad *
 /* point colors */
 
 /**
+ Get the color attribute of a single observation.
+ @param pt the index of the observation of interest.
+ @param dataset the dataset  in which to resolve the observation
+ @param gg the ggobi instance in which to find the dataset.
  @ingroup Glyphs
  */
-extern gint GGobi_getCaseColor(gint pt, datad *, ggobid *gg);
+extern gint GGobi_getCaseColor(gint pt, datad *dataset, ggobid *gg);
 /**
+ Query the color attribute of a collection of points.
+ @param pts an array giving the indices of the different observations whose color
+   attribute is to be queried.
+   
+ @param howMany the number of entries in the `pts' array.
+ @param dataset the dataset  in which to resolve the observation
+ @param gg the ggobi instance in which to find the dataset.
+ @return an array of the indices into the colormap of the points. The length of this
+  array is `howMany' and the i-th element corresponds to observation
+  identified by the i-th element of `pts'.
+ 
+ @see GGobi_getCaseColor()
+ @see GGobi_setCaseColor()
+ @see GGobi_setCaseColors()
  @ingroup Glyphs
  */
-extern gint * GGobi_getCaseColors(gint *pts, gint howMany, datad *, ggobid *gg);
+extern gint * GGobi_getCaseColors(gint *pts, gint howMany, datad *dataset, ggobid *gg);
 
 /**
+ Set the color (for each plot) for a single observation.
+ @param pt the index of the record/observation whose color is to be set.
+ @param colorIndex the index of the color in the current colormap to which
+  the observations color is to be set.
+ @param dataset the dataset  in which to resolve the observation
+ @param gg the ggobi instance in which to find the dataset.
+
+ @see GGobi_getCaseColor()
+ @see GGobi_setCaseColors()
  @ingroup Glyphs
  */
-extern void GGobi_setCaseColor(gint pt, gint colorIndex, datad *, ggobid *gg);
+extern void GGobi_setCaseColor(gint pt, gint colorIndex, datad *dataset, ggobid *gg);
+
 /**
+ Set the color (for each plot) for a collection of observations
+ to the same value.
+ @param pt an array of indeces of the records/observations whose color attribute are to be set.
+ @param n the number of elements in the `pts' array.
+ @param colorIndex the index of the color in the current colormap to which
+  the observations color is to be set.
+ @param dataset the dataset  in which to resolve the observation
+ @param gg the ggobi instance in which to find the dataset.
+
+ @see GGobi_setCaseColor()
+ @see GGobi_getCaseColor()
  @ingroup Glyphs
  */
-extern void GGobi_setCaseColors(gint *pts, gint n, gint color, datad *, ggobid *);
+extern void GGobi_setCaseColors(gint *pts, gint n, gint color, datad *dataset, ggobid *gg);
+
 
 /* point hidden state */
 
@@ -417,6 +517,7 @@ extern void GGobi_setCaseColors(gint *pts, gint n, gint color, datad *, ggobid *
 extern gboolean GGobi_getCaseHidden(gint pt, datad *, ggobid *gg);
 
 /**
+ 
  */
 extern gboolean * GGobi_getCaseHiddens(gint *pts, gint howMany, datad *, ggobid *gg);
 
