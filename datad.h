@@ -102,8 +102,8 @@ struct _datad {
 
  /*---------------- deleting the hidden points; subsetting ----------*/
 
-  gint *rows_in_plot;
-  gint nrows_in_plot;
+  vector_i rows_in_plot;  /*-- always of length d->nrows --*/
+  gint nrows_in_plot;     /*-- how many elements of rows_in_plot to use --*/
   vector_b sampled;
 
   struct _Subset {

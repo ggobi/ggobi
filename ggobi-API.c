@@ -196,9 +196,8 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   d->ncols = nc;
   d->nrows = nr;
 
+  vectori_init_null (&d->rows_in_plot);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
-
-  d->rows_in_plot = NULL;
 
   arrayf_alloc(&d->raw, nr, nc);
 
@@ -566,7 +565,7 @@ GGOBI(getCaseGlyphTypes)(gint *ids, gint n, datad *d, ggobid *gg)
 gint 
 GGOBI(getCaseGlyphType)(gint id, datad *d, ggobid *gg)
 {
-  gint index = d->rows_in_plot[id];
+  gint index = d->rows_in_plot.els[id];
   return (d->glyph_now.els[index].type);
 }
 
@@ -585,7 +584,7 @@ GGOBI(getCaseGlyphSizes)(gint *ids, gint n, datad *d, ggobid *gg)
 gint 
 GGOBI(getCaseGlyphSize)(gint id, datad *d, ggobid *gg)
 {
-  gint index = d->rows_in_plot[id];
+  gint index = d->rows_in_plot.els[id];
 
   return (d->glyph_now.els[index].size);
 }

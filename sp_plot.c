@@ -212,7 +212,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 
       if(!f) {
        for (i=0; i<d->nrows_in_plot; i++) {
-          m = d->rows_in_plot[i];
+          m = d->rows_in_plot.els[i];
           if (d->color_now.els[m] == current_color &&
             splot_plot_case (m, true, d, sp, display, gg))
         {
@@ -335,7 +335,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
         for (ih=bin0->x; ih<=bin1->x; ih++) {
           for (iv=bin0->y; iv<=bin1->y; iv++) {
             for (m=0; m<d->brush.binarray[ih][iv].nels ; m++) {
-              i = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
+              i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
               if (d->color_now.els[i] == current_color &&
                   splot_plot_case (i, true, d, sp, display, gg))
               {
@@ -677,7 +677,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
      * line symbols should be drawn
     */
     for (i=0; i<e->nrows_in_plot; i++) {
-      m = e->rows_in_plot[i];
+      m = e->rows_in_plot.els[i];
       if (!e->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
       /* we don't want to do all these checks twice, do we? */
       /*if (splot_plot_edge (m, true, d, e, sp, display, gg)) */

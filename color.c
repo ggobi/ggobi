@@ -334,7 +334,7 @@ datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
    * in use into the colors_used[] vector.
   */
   for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
+    m = d->rows_in_plot.els[i];
     if (d->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
       new_color = false;
     } else {

@@ -215,7 +215,7 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
  else if (gg->save.row_ind == DISPLAYEDROWS) {
    n = 0;
    for (i=0; i<d->nrows_in_plot; i++) {
-     if (!d->hidden.els[ d->rows_in_plot[i] ]) {
+     if (!d->hidden.els[ d->rows_in_plot.els[i] ]) {
        if (d->edge.n == d->nrows) {  /* ie, if this datad has edges? */
          if (write_edge_record_p (i, d, gg))
            n++;
@@ -256,7 +256,7 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
    }
  } else {  /*-- if displaying visible rows only --*/
    for (i=0; i<d->nrows_in_plot; i++) {
-     m = d->rows_in_plot[i];
+     m = d->rows_in_plot.els[i];
      if (!d->hidden.els[m]) {
        if (write_xml_record (f, d, gg, m, xmlWriteInfo))
          fprintf(f, "\n");

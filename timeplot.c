@@ -429,8 +429,8 @@ tsplot_rewhisker (splotd *sp, ggobid *gg)
   gboolean draw_whisker;
 
   for (k=0; k<(d->nrows_in_plot-1); k++) {
-    i = d->rows_in_plot[k];
-    n = d->rows_in_plot[k+1];
+    i = d->rows_in_plot.els[k];
+    n = d->rows_in_plot.els[k+1];
     
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     if (d->nmissing > 0 && !d->missings_show_p &&

@@ -90,7 +90,7 @@ xy_reproject (splotd *sp, greal **world_data, datad *d, ggobid *gg)
   gint jy = sp->xyvars.y;
 
   for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
+    m = d->rows_in_plot.els[i];
 
     sp->planar[m].x = world_data[m][jx];  /*-- regular or missings --*/
     sp->planar[m].y = world_data[m][jy];

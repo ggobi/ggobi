@@ -520,7 +520,7 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
 
   for (m=0; m < d->nrows_in_plot; m++)
   {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     yy[m] = sp->planar[i].x = 0;
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
@@ -555,7 +555,7 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
       }
     }
     for (m=0; m<d->nrows_in_plot; m++) {
-      i = d->rows_in_plot[m];
+      i = d->rows_in_plot.els[m];
       sp->planar[i].x = (greal) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[m]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
@@ -575,7 +575,7 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
       }
     }
     for (m=0; m<d->nrows_in_plot; m++) {
-      i = d->rows_in_plot[m];
+      i = d->rows_in_plot.els[m];
       sp->planar[i].x = (greal) (precis*(-1.0+2.0*
         ((yy[m]-sp->tour1d.minscreenx)/
         (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));

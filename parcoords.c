@@ -266,8 +266,8 @@ parcoords_var_selected (gint jvar, displayd *display)
 }
 
 gboolean
-parcoords_varsel (cpaneld *cpanel, splotd *sp,
-		  gint jvar, gint *jvar_prev, ggobid *gg)
+parcoords_varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev,
+  ggobid *gg)
 {
   gboolean redraw = true;
   gint nplots = g_list_length (gg->current_display->splots);
@@ -434,7 +434,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
   gboolean draw_whisker;
 
   for (k=0; k<d->nrows_in_plot; k++) {
-    i = d->rows_in_plot[k];
+    i = d->rows_in_plot.els[k];
     m = 2*i;
 
     /*-- if it's the leftmost plot, don't draw the left whisker --*/

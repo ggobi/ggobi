@@ -115,7 +115,7 @@ brush_prev_vectors_update (datad *d, ggobid *gg) {
   }
 
   for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     d->color_prev.els[i] = d->color.els[i];
     d->hidden_prev.els[i] = d->hidden.els[i];
     d->glyph_prev.els[i].size = d->glyph.els[i].size;
@@ -130,7 +130,7 @@ brush_undo (splotd *sp, datad *d, ggobid *gg) {
     return;
 
   for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i];
     d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i];
     d->glyph.els[i].type = d->glyph_now.els[i].type = d->glyph_prev.els[i].type;
@@ -157,7 +157,7 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
 
   if (point_painting_p) {
     for (m=0; m<d->nrows_in_plot; m++) {
-      i = d->rows_in_plot[m];
+      i = d->rows_in_plot.els[m];
       d->color_now.els[i] = d->color.els[i] ;
       d->glyph_now.els[i].type = d->glyph.els[i].type;
       d->glyph_now.els[i].size = d->glyph.els[i].size;
@@ -654,9 +654,9 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
     for (iv=imin.y; iv<=imax.y; iv++) {
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
         /*
-         * j is the row number; k is the index of rows_in_plot[]
+         * j is the row number; k is the index of rows_in_plot.els[]
         */
-        j = d->rows_in_plot[ k = d->brush.binarray[ih][iv].els[m] ] ;
+        j = d->rows_in_plot.els[ k = d->brush.binarray[ih][iv].els[m] ] ;
 
         switch (cpanel->br_point_targets) {
           case br_candg:  /*-- color and glyph --*/
@@ -728,17 +728,17 @@ active_paint_points (datad *d, ggobid *gg)
     /* Zero out pts_under_brush[] before looping */
     d->npts_under_brush = 0;
     for (j=0; j<d->nrows_in_plot; j++)
-      d->pts_under_brush.els[d->rows_in_plot[j]] = 0;
+      d->pts_under_brush.els[d->rows_in_plot.els[j]] = 0;
  
     /*
      * d->brush.binarray[][] only represents the
-     * cases in rows_in_plot[] so there's no need to test for that.
+     * cases in rows_in_plot.els[] so there's no need to test for that.
     */
 
     for (ih=d->brush.bin0.x; ih<=d->brush.bin1.x; ih++) {
       for (iv=d->brush.bin0.y; iv<=d->brush.bin1.y; iv++) {
         for (j=0; j<d->brush.binarray[ih][iv].nels; j++) {
-          pt = d->rows_in_plot[d->brush.binarray[ih][iv].els[j]];
+          pt = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[j]];
 
           /*
            * if a case is hidden, or it's missing and we aren't

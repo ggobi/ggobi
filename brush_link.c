@@ -153,7 +153,7 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
    * for this datad, loop once over all rows in plot 
    */
   for (m = 0; m < d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
 
     level_value = (gint) d->raw.vals[i][jlinkby];
 
@@ -278,7 +278,7 @@ build_symbol_vectors_by_var(cpaneld * cpanel, datad * d, ggobid * gg)
 
   /*-- find the levels which are among the points under the brush --*/
   for (m = 0; m < d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     if (d->pts_under_brush.els[i]) {
       level_value = (gint) d->raw.vals[i][jlinkby];
       levelv.els[level_value] = true;

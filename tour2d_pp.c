@@ -656,7 +656,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   for (i=0; i<d->nrows_in_plot; i++)
     for (j=0; j<dsp->t2d.nactive; j++)
       dsp->t2d_pp_op.data.vals[i][j] = 
-        d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[j]];
+        d->tform.vals[d->rows_in_plot.els[i]][dsp->t2d.active_vars.els[j]];
 
   /* Copy current projection into opt'n projection */
   for (i=0; i<2; i++)
@@ -667,11 +667,11 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   for (k=0; k<2; k++) 
     for (i=0; i<d->nrows_in_plot; i++) {
       dsp->t2d_pp_op.pdata.vals[i][k] = 
-          (d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[0]]*
+          (d->tform.vals[d->rows_in_plot.els[i]][dsp->t2d.active_vars.els[0]]*
           dsp->t2d_pp_op.proj_best.vals[k][0]);
       for (j=1; j<dsp->t2d.nactive; j++)
         dsp->t2d_pp_op.pdata.vals[i][k] += 
-          (d->tform.vals[d->rows_in_plot[i]][dsp->t2d.active_vars.els[j]]*
+          (d->tform.vals[d->rows_in_plot.els[i]][dsp->t2d.active_vars.els[j]]*
           dsp->t2d_pp_op.proj_best.vals[k][j]);
     }
 
@@ -680,7 +680,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   for (i=0; i<nrows; i++)
   { 
     if (d->clusterid.els!=NULL)
-      gdata[i] = d->clusterid.els[d->rows_in_plot[i]];
+      gdata[i] = d->clusterid.els[d->rows_in_plot.els[i]];
     else
       gdata[i] = 0;
   }

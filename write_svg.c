@@ -70,7 +70,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
   minpix.x = da->allocation.width;
   minpix.y = da->allocation.height;
   for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
+    m = d->rows_in_plot.els[i];
     draw_case = splot_plot_case (m, true, d, sp, display, gg);
     if (draw_case) {
       if (sp->screen[m].x > 0 && sp->screen[m].x < da->allocation.width) {
@@ -139,7 +139,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
 #ifdef WIN32
 #else
       for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
+        m = d->rows_in_plot.els[i];
         draw_case = splot_plot_case (m, true, d, sp, display, gg);
 
         if (draw_case && d->color_now.els[m] == current_color) {

@@ -401,7 +401,7 @@ sphere_varcovar_set (datad *d, ggobid *gg)
 */
     tmpf = 0.;
     for (i=0; i<n; i++)
-      tmpf += d->tform.vals[d->rows_in_plot[i]][var];
+      tmpf += d->tform.vals[d->rows_in_plot.els[i]][var];
     tform_mean[k] = tmpf / ((gfloat)n);
   }
 
@@ -409,7 +409,7 @@ sphere_varcovar_set (datad *d, ggobid *gg)
     for (j=0; j<d->sphere.vc.ncols; j++) {
       tmpf = 0.;
       for (m=0; m<n; m++) {
-        i = d->rows_in_plot[m];
+        i = d->rows_in_plot.els[m];
         tmpf = tmpf +
           (d->tform.vals[i][d->sphere.vars.els[k]] - tform_mean[k]) *
           (d->tform.vals[i][d->sphere.vars.els[j]] - tform_mean[j]);
@@ -539,7 +539,7 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
   gfloat *eigenval = d->sphere.eigenval.els;
 
   for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
 
     for (j=0; j<pcvars->nels; j++) {
       tmpf = 0.;

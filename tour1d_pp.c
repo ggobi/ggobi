@@ -755,7 +755,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   for (i=0; i<d->nrows_in_plot; i++)
     for (j=0; j<dsp->t1d.nactive; j++)
       dsp->t1d_pp_op.data.vals[i][j] = 
-        d->tform.vals[d->rows_in_plot[i]][dsp->t1d.active_vars.els[j]];
+        d->tform.vals[d->rows_in_plot.els[i]][dsp->t1d.active_vars.els[j]];
 
   for (j=0; j<dsp->t1d.nactive; j++)
     dsp->t1d_pp_op.proj_best.vals[0][j] = 
@@ -763,11 +763,11 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
 
   for (i=0; i<d->nrows_in_plot; i++) {
     dsp->t1d_pp_op.pdata.vals[i][0] = 
-        (d->tform.vals[d->rows_in_plot[i]][dsp->t1d.active_vars.els[0]]*
+        (d->tform.vals[d->rows_in_plot.els[i]][dsp->t1d.active_vars.els[0]]*
         dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[0]]);
     for (j=1; j<dsp->t1d.nactive; j++)
       dsp->t1d_pp_op.pdata.vals[i][0] += 
-        (d->tform.vals[d->rows_in_plot[i]][dsp->t1d.active_vars.els[j]]*
+        (d->tform.vals[d->rows_in_plot.els[i]][dsp->t1d.active_vars.els[j]]*
         dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]]);
   }
 
@@ -776,7 +776,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   for (i=0; i<nrows; i++)
   { 
     if (d->clusterid.els!=NULL)
-      gdata[i] = d->clusterid.els[d->rows_in_plot[i]];
+      gdata[i] = d->clusterid.els[d->rows_in_plot.els[i]];
     else
       gdata[i] = 0;
   }
@@ -832,7 +832,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       /*    case CART_VAR: 
       alloc_cartvariance_p (&cvp, nrows, gdata);
       dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 
+        dsp->t1d.F, d->rows_in_plot.els, d->nrows, d->ncols, 
         cartvariance, &cvp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &cep);
@@ -841,7 +841,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
     case SUBD: 
       alloc_subd_p (&sp, nrows, pdim);
       dsp->t1d.ppval  = t1d_calc_indx (d->tform, dsp->t1d.F, 
-        d->rows_in_plot, d->nrows, d->ncols, subd, &sp);
+        d->rows_in_plot.els, d->nrows, d->ncols, subd, &sp);
       if (basismeth == 1)
         kout  = optimize0 (&dsp->t1d_pp_op, subd, &sp);
       free_subd_p (&sp);

@@ -77,7 +77,7 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
         impval = minval - (val/100.) * range;
 
       for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
+        m = d->rows_in_plot.els[i];
         if (d->missing.vals[m][j]) {
           d->raw.vals[m][j] = d->tform.vals[m][j] = impval;
         }
@@ -99,7 +99,7 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
       impval = (gfloat) atof (val_str);
       g_free (val_str);
       for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot[i];
+        m = d->rows_in_plot.els[i];
         for (k=0; k<nvars; k++) {
           j = vars[k];
           if (d->missing.vals[m][j]) {
@@ -169,7 +169,7 @@ impute_random (datad *d, gint nvars, gint *vars, ggobid *gg)
          * which belong to the current cluster
         */
         for (i=0; i<d->nrows_in_plot; i++) {
-          k = d->rows_in_plot[i];
+          k = d->rows_in_plot.els[i];
           if (d->clusterid.els[k] == n) { 
             if (!d->hidden_now.els[k]) {   /* ignore erased values altogether */
               if (d->missing.vals[k][j])
@@ -193,7 +193,7 @@ impute_random (datad *d, gint nvars, gint *vars, ggobid *gg)
        * to draw from.
       */
       for (i=0; i<d->nrows_in_plot; i++) {
-        k = d->rows_in_plot[i];
+        k = d->rows_in_plot.els[i];
         if (!d->hidden_now.els[k]) {   /* ignore erased values altogether */
           if (d->missing.vals[k][j])
             missv[nmissing++] = k;

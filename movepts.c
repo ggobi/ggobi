@@ -122,7 +122,7 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
      * as the selected point.
     */
     for (i=0; i<d->nrows_in_plot; i++) {
-      k = d->rows_in_plot[i];
+      k = d->rows_in_plot.els[i];
       if (k == id)
         ;
       else {

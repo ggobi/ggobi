@@ -344,7 +344,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
     drawing_arrays_alloc (sp, d, gg);
 
   for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
+    m = d->rows_in_plot.els[i];
 
     if (d->color_now.els[m] == current_color &&
         splot_plot_case (m, true, d, sp, display, gg))
@@ -395,7 +395,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
   for (ih=bin0->x; ih<=bin1->x; ih++) {
     for (iv=bin0->y; iv<=bin1->y; iv++) {
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
-        j = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
+        j = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
         if (d->color_now.els[j] == current_color &&
             splot_plot_case (j, false, d, sp, display, gg))
         {

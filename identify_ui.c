@@ -87,7 +87,7 @@ id_all_sticky_cb (GtkWidget *w, ggobid *gg)
   d->sticky_ids = (GSList *) NULL;
 
   for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     d->sticky_ids = g_slist_append (d->sticky_ids, GINT_TO_POINTER (i));
   }
 

@@ -82,7 +82,7 @@ rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
     vt = vartable_element_get (k, d);
 
     for (i=0; i<d->nrows_in_plot; i++) {
-      m = d->rows_in_plot[i];
+      m = d->rows_in_plot.els[i];
       /*-- jitter_one_value (m, k); --*/
 
       frand = (greal) jitter_randval (d->jitter.type) * precis;

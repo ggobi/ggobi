@@ -525,7 +525,7 @@ tour2d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
   maxy = sp->tour2d.maxscreen;
   for (m=0; m<d->nrows_in_plot; m++)
   {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     sp->planar[i].x = 0;
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)

@@ -83,9 +83,8 @@ datad_create(gint nr, gint nc, ggobid *gg)
   d->ncols = nc;
   d->nrows = nr;
 
+  vectori_init_null (&d->rows_in_plot);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
-
-  d->rows_in_plot = NULL;
 
   arrayf_alloc(&d->raw, nr, nc);
 
@@ -99,7 +98,6 @@ datad_create(gint nr, gint nc, ggobid *gg)
 
   br_color_ids_alloc (d, gg);
   br_color_ids_init (d, gg);
-
 
   hidden_alloc (d);
 

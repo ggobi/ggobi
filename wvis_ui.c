@@ -198,7 +198,7 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
     gg->wvis.n[k] = 0;
 
   for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     for (k=0; k<scheme->n; k++) {
       val = min + gg->wvis.pct[k] * (max - min);
       if (d->tform.vals[i][jvar] <= val) {
@@ -236,7 +236,7 @@ record_colors_reset (gint selected_var, datad *d, ggobid *gg)
   scheme = gg->activeColorScheme;
 
   for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
+    i = d->rows_in_plot.els[m];
     for (k=0; k<scheme->n; k++) {
       val = min + gg->wvis.pct[k] * (max - min);
       if (d->tform.vals[i][selected_var] <= val) {
@@ -426,8 +426,8 @@ bin_boundaries_set (gint selected_var, datad *d, ggobid *gg)
 
     /*-- sort the selected variable --*/
     for (i=0; i<d->nrows_in_plot; i++) {
-      pairs[i].f = d->tform.vals[d->rows_in_plot[i]][varno];
-      pairs[i].indx = d->rows_in_plot[i];
+      pairs[i].f = d->tform.vals[d->rows_in_plot.els[i]][varno];
+      pairs[i].indx = d->rows_in_plot.els[i];
     }
     qsort ((gchar *) pairs, d->nrows_in_plot, sizeof (paird), pcompare);
 

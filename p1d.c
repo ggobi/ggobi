@@ -135,15 +135,15 @@ p1d_reproject (splotd *sp, greal **world_data, datad *d, ggobid *gg)
    * still works.
   */
   for (i=0; i<d->nrows_in_plot; i++)
-    yy[i] = d->world.vals[d->rows_in_plot[i]][jvar];
-    /*yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];*/
+    yy[i] = d->world.vals[d->rows_in_plot.els[i]][jvar];
+    /*yy[i] = d->tform.vals[d->rows_in_plot.els[i]][jvar];*/
 
   p1d_spread_var (display, yy, sp, d, gg);
 
   /* Then project it */
   rdiff = sp->p1d.lim.max - sp->p1d.lim.min;
   for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
+    m = d->rows_in_plot.els[i];
 
     /*
      * Use p1d_data[i] not [m] because p1d_data[] is populated

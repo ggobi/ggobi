@@ -32,7 +32,7 @@ assign_points_to_bins (datad *d, ggobid *gg)
       d->brush.binarray[ih][iv].nels = 0;
 
   for (k=0; k<d->nrows_in_plot; k++) {
-    i = d->rows_in_plot[k];
+    i = d->rows_in_plot.els[k];
 
     if (sp->screen[i].x >=0 && sp->screen[i].x <= sp->max.x &&
         sp->screen[i].y >=0 && sp->screen[i].y <= sp->max.y)

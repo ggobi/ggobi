@@ -267,7 +267,7 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 
 /* count points in bins */
   for (i = 0; i < d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
+    m = d->rows_in_plot.els[i];
 
     /*-- skip missings?  --*/
     if (d->nmissing > 0 && !d->missings_show_p
@@ -587,7 +587,7 @@ void barchart_init_categorical(barchartSPlotd * sp, datad * d)
   gfloat *yy;
   yy = (gfloat *) g_malloc(d->nrows_in_plot * sizeof(gfloat));
   for (i = 0; i < d->nrows_in_plot; i++)
-    yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];
+    yy[i] = d->tform.vals[d->rows_in_plot.els[i]][jvar];
   mindist = barchart_sort_index(yy, d->nrows_in_plot, gg, sp);
   g_free((gpointer) yy);
 
@@ -789,7 +789,7 @@ void barchart_set_initials(barchartSPlotd * sp, datad * d)
       gboolean add_level = false;
       if (vtx->nmissing) {
         for (i=0; i<d->nrows_in_plot; i++) {
-          if (MISSING_P(d->rows_in_plot[i], rawsp->p1dvar)) {
+          if (MISSING_P(d->rows_in_plot.els[i], rawsp->p1dvar)) {
             missing_val = d->tform.vals[i][rawsp->p1dvar];
             break;
           }
@@ -864,7 +864,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
   if (vtx->vartype == categorical) {
 
     for (i = 0; i < d->nrows_in_plot; i++) {
-      m = d->rows_in_plot[i];
+      m = d->rows_in_plot.els[i];
 
       /*-- skip missings?  --*/
       if (d->nmissing > 0 && !d->missings_show_p
@@ -891,23 +891,23 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 
     index = sp->bar->index_to_rank[rank];
     /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs */
-    yy = d->tform.vals[ d->rows_in_plot[index] ][rawsp->p1dvar];
+    yy = d->tform.vals[ d->rows_in_plot.els[index] ][rawsp->p1dvar];
 
     while ((yy < sp->bar->breaks[0] + sp->bar->offset) &&
            (rank < d->nrows_in_plot - 1)) {
 
       /*-- skip hiddens? --*/
-      if (d->hidden_now.els[ d->rows_in_plot[index] ]) {
+      if (d->hidden_now.els[ d->rows_in_plot.els[index] ]) {
         rank++;
         continue;
       }
 
       /*rawsp->planar[index].x = -1;*/ /* maybe not, dfs */
-      rawsp->planar[ d->rows_in_plot[index] ].x = -1;
+      rawsp->planar[ d->rows_in_plot.els[index] ].x = -1;
       rank++;
       index = sp->bar->index_to_rank[rank];
       /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs */
-      yy = d->tform.vals[ d->rows_in_plot[index] ][rawsp->p1dvar];
+      yy = d->tform.vals[ d->rows_in_plot.els[index] ][rawsp->p1dvar];
     }
 
     if (rank > 0) {
@@ -925,12 +925,12 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
       /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs*/
 
       /*-- skip hiddens? --*/
-      if (d->hidden_now.els[ d->rows_in_plot[index] ]) {
+      if (d->hidden_now.els[ d->rows_in_plot.els[index] ]) {
         rank++;
         continue;
       }
 
-      yy = d->tform.vals[ d->rows_in_plot[index] ][rawsp->p1dvar];
+      yy = d->tform.vals[ d->rows_in_plot.els[index] ][rawsp->p1dvar];
       while ((bin < sp->bar->nbins) &&
              (sp->bar->breaks[bin + 1] + sp->bar->offset < yy)) {
         bin++;
@@ -959,7 +959,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
         sp->bar->bins[bin].count++;
       }
       /*rawsp->planar[index].x = bin;*/ /* maybe not, dfs */
-      rawsp->planar[ d->rows_in_plot[index] ].x = bin;
+      rawsp->planar[ d->rows_in_plot.els[index] ].x = bin;
       rank++;
     }
   }
@@ -1115,7 +1115,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
     /*-- ignore hiddens here? --*/
 /*
     for (i=0; i<d->nrows_in_plot; i++)
-      if (d->hidden_now.els[d->rows_in_plot[i]])
+      if (d->hidden_now.els[d->rows_in_plot.els[i]])
         n--;
 */
 
@@ -1205,7 +1205,7 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
   d->npts_under_brush = 0;
 
   for (i = 0; i < d->nrows_in_plot; i++) {
-    m = d->rows_in_plot[i];
+    m = d->rows_in_plot.els[i];
 
     /*-- skip missings?  --*/
     if (d->nmissing > 0 && !d->missings_show_p

@@ -661,7 +661,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
    * Calculate new coordinates.
   */
   for (k=0; k<d->nrows_in_plot; k++) {
-    i = d->rows_in_plot[k];
+    i = d->rows_in_plot.els[k];
 
     /*-- scale from world to plot window --*/
     gtmp = sp->planar[i].x - sp->pmid.x;
