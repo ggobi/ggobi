@@ -20,12 +20,6 @@
 #define CENTRAL_MASS    1
 #define SKEWNESS        2
 
-/*-- the statics will have to be moved to one of the include files - dfs --*/
-static GtkWidget *window = NULL;
-static GtkWidget *control_frame;
-static GtkWidget *mbar;
-static GtkAccelGroup *pp_accel_group;
-
 /* terms in expansion, bandwidth */
 /*
 static GtkWidget *param_vb, *param_lbl, *param_scale;
@@ -40,15 +34,16 @@ hide_cb (GtkWidget *w) {
 
 static void
 options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
-  g_printerr ("action = %d\n", action);
-
+  ggobid *gg = GGobiFromWidget (w, true);
+  displayd *dsp = gg->current_display; 
+  
   switch (action) {
 
     case 0:
       if (w->active)
-        gtk_widget_hide (control_frame);
+        gtk_widget_hide (dsp->t2d_control_frame);
       else
-        gtk_widget_show (control_frame);
+        gtk_widget_show (dsp->t2d_control_frame);
       break;
 
     case 1:
@@ -272,27 +267,27 @@ tour2dpp_window_open (ggobid *gg) {
 
   if (vars_sphered)
   {
-    if (window == NULL) {
+    if (dsp->t2d_window == NULL) {
 
-      window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-      gtk_window_set_title (GTK_WINDOW (window), 
+      dsp->t2d_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+      gtk_window_set_title (GTK_WINDOW (dsp->t2d_window), 
         "projection pursuit - 2D");
-      gtk_signal_connect (GTK_OBJECT (window), "delete_event",
+      gtk_signal_connect (GTK_OBJECT (dsp->t2d_window), "delete_event",
                           GTK_SIGNAL_FUNC (hide_cb), (gpointer) NULL);
-      /*    gtk_window_set_policy (GTK_WINDOW (window), true, true, false);*/
-      gtk_container_set_border_width (GTK_CONTAINER (window), 10);
+      /*    gtk_window_set_policy (GTK_WINDOW (dsp->t2d_window), true, true, false);*/
+      gtk_container_set_border_width (GTK_CONTAINER (dsp->t2d_window), 10);
 
 /*
  * Add the main menu bar
 */
       vbox = gtk_vbox_new (FALSE, 1);
       gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-      gtk_container_add (GTK_CONTAINER (window), vbox);
+      gtk_container_add (GTK_CONTAINER (dsp->t2d_window), vbox);
 
-      pp_accel_group = gtk_accel_group_new ();
+      dsp->t2d_pp_accel_group = gtk_accel_group_new ();
       get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                   pp_accel_group, window, &mbar, (gpointer) NULL);
-      gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+                   dsp->t2d_pp_accel_group, dsp->t2d_window, &dsp->t2d_mbar, (gpointer) NULL);
+      gtk_box_pack_start (GTK_BOX (vbox), dsp->t2d_mbar, false, true, 0);
 
 /*
  * Divide the window:  controls on the left, plot on the right
@@ -304,15 +299,15 @@ tour2dpp_window_open (ggobid *gg) {
 /*
  * Controls
 */
-      control_frame = gtk_frame_new (NULL);
-      gtk_frame_set_shadow_type (GTK_FRAME (control_frame), GTK_SHADOW_IN);
-      gtk_container_set_border_width (GTK_CONTAINER (control_frame), 5);
+      dsp->t2d_control_frame = gtk_frame_new (NULL);
+      gtk_frame_set_shadow_type (GTK_FRAME (dsp->t2d_control_frame), GTK_SHADOW_IN);
+      gtk_container_set_border_width (GTK_CONTAINER (dsp->t2d_control_frame), 5);
       gtk_box_pack_start (GTK_BOX (hbox),
-                        control_frame, false, false, 1);
+                        dsp->t2d_control_frame, false, false, 1);
 
       vbc = gtk_vbox_new (false, 5);
       gtk_container_set_border_width (GTK_CONTAINER (vbc), 5);
-      gtk_container_add (GTK_CONTAINER (control_frame), vbc);
+      gtk_container_add (GTK_CONTAINER (dsp->t2d_control_frame), vbc);
 
 /*
  * Optimize toggle
@@ -433,7 +428,7 @@ tour2dpp_window_open (ggobid *gg) {
 
     alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nvars, 2);
 
-    gtk_widget_show_all (window);
+    gtk_widget_show_all (dsp->t2d_window);
   }
 }
 

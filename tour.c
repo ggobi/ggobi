@@ -252,14 +252,11 @@ eigen_clear (array_f v0, array_f v1, vector_f lambda, vector_f tau,
  * nc = num vars
  * nd = proj dim
  */
-/*void path(displayd *dsp, gint nd) {*/
 void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
   array_f v1, array_f v, vector_f lambda, array_f tv, array_f uvevec, 
   vector_f tau, vector_f tinc, gint *ns, gint *stcn, gfloat *pdv, 
   gfloat delta) {
 
-  /*  datad *d = dsp->d;
-  gint nc = d->ncols;*/
   gint i, j, k, rank;
   gdouble tol = 0.0001;
   gdouble tmpd1 = 0.0, tmpd2 = 0.0, tmpd =0.0;
@@ -276,11 +273,19 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
   zero_tau(tau, nd);
   zero_tinc(tinc, nd);
   zero_lambda(lambda, nd);
-  copy_mat(u.vals, u0.vals, nc, nd);
+  for (i=0; i<nd; i++)
+    for (j=0; j<nc; j++)
+    {
+      v0.vals[i][j] = 0.0;
+      v1.vals[i][j] = 0.0;
+      v.vals[i][j] = 0.0;
+      uvevec.vals[i][j] = 0.0;
+    }
+  /*  copy_mat(u.vals, u0.vals, nc, nd);
   copy_mat(v0.vals, u0.vals, nc, nd);
   copy_mat(v1.vals, u1.vals, nc, nd);
   copy_mat(uvevec.vals, u1.vals, nc, nd);
-  copy_mat(v.vals, u0.vals, nc, nd);
+  copy_mat(v.vals, u0.vals, nc, nd);*/
   stepcntr = 0;
   nsteps = 0;
   dv = 0.0;
@@ -463,16 +468,17 @@ void path(array_f u0, array_f u1, array_f u, gint nc, gint nd, array_f v0,
   else {
     /*    zero_tau(tau, nd);
     zero_tinc(tau, nd);
-    zero_lambda(tau, nd);
+    zero_lambda(tau, nd);*/
     copy_mat(u.vals, u0.vals, nc, nd);
     copy_mat(v0.vals, u0.vals, nc, nd);
     copy_mat(v1.vals, u1.vals, nc, nd);
     copy_mat(uvevec.vals, u1.vals, nc, nd);
     copy_mat(v.vals, u0.vals, nc, nd);
-    stepcntr = 0;
+    /*    stepcntr = 0;
     nsteps = 0;
     dv = 0.0;*/ /* i don't think i need this if i initialize all these
-                   at the start of the function - di */
+                   at the start of the function - di */ /* i still need the
+							   copy_mat lines */
     *pdv = dv;
     *ns = nsteps;
     *stcn = stepcntr;
@@ -534,7 +540,6 @@ void tour_reproject(vector_f tinc, array_f v, array_f v0, array_f v1,
 
 /* this routine increments the interpolation */
 void
-/*increment_tour(displayd *dsp, gint nd)*/
 increment_tour(vector_f tinc, vector_f tau, gint *ns, gint *stcn, 
   gfloat dv, gfloat delta, gint nd)
 {

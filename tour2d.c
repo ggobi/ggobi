@@ -475,7 +475,6 @@ tour2d_run(displayd *dsp, ggobid *gg)
     }
   }
   
-  /*display_tailpipe (dsp, FULL, gg);*/
   display_tailpipe (dsp, FULL_1PIXMAP, gg);
   varcircles_refresh (d, gg);
 }

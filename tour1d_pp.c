@@ -39,11 +39,7 @@ The authors can be contacted at the following email addresses:
 #include "tour1d_pp.h"
 #include "tour_pp.h"
 
-static gchar msg[1024];
-static gfloat ppindx_mat[100]; /* needs to be global for easy
-                                  initialization/clearing */
-static gint ppindx_count;
-static gfloat indx_min, indx_max;
+/*static gchar msg[1024];*/
 
 /*-- projection pursuit indices --*/
 #define PCA            0
@@ -53,13 +49,13 @@ static gfloat indx_min, indx_max;
 #define CART_VAR       4
 #define SUBD           5
 
-void print()
+/*void print()
 { FILE *f = fopen ("dump", "a");
   if (f)
   { fprintf (f, "%s\n", msg);
     fclose(f);
   }
-}
+}*/
 
 /********************************************************************
 
@@ -95,7 +91,7 @@ gint pca (array_f *pdata, void *param, gfloat *val)
       *val += pdata->vals[j][i]*pdata->vals[j][i];
   }
   *val /= (pdata->nrows-1);
-  sprintf (msg, "PCA-Index=%f", *val); print();
+  /*  sprintf (msg, "PCA-Index=%f", *val); print();*/
   return (0);
 }
 
@@ -658,22 +654,22 @@ void t1d_clear_pppixmap(ggobid *gg)
 
 void t1d_clear_ppda(ggobid *gg)
 {
+  displayd *dsp = gg->current_display;
   gint i;
 
   /* clear the ppindx matrix */
-  ppindx_count = 0;
-  indx_min=1000.;
-  indx_max=-1000.;
+  dsp->t1d_ppindx_count = 0;
+  dsp->t1d_indx_min=1000.;
+  dsp->t1d_indx_max=-1000.;
   for (i=0; i<100; i++) 
   {
-    ppindx_mat[i] = 0.0;
+    dsp->t1d_ppindx_mat[i] = 0.0;
   }
 
   t1d_clear_pppixmap(gg);
 }
 
-void t1d_ppdraw_all(gint wid, gint hgt, gfloat indx_min, gfloat indx_max, 
-  gint margin, ggobid *gg)
+void t1d_ppdraw_all(gint wid, gint hgt, gint margin, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   /*gint xpos, ypos, xstrt, ystrt;*/
@@ -682,14 +678,15 @@ void t1d_ppdraw_all(gint wid, gint hgt, gfloat indx_min, gfloat indx_max,
 
   t1d_clear_pppixmap(gg);
 
-  for (i=0; i<ppindx_count; i++) 
+  for (i=0; i<dsp->t1d_ppindx_count; i++) 
   {
     pptrace[i].x = margin+i*2;
-    pptrace[i].y = hgt-margin-(gint)((gfloat)((ppindx_mat[i]-indx_min)/
-      (gfloat) (indx_max-indx_min)) * (gfloat) (hgt - 2*margin));
+    pptrace[i].y = hgt-margin-(gint)((gfloat)((dsp->t1d_ppindx_mat[i]-
+      dsp->t1d_indx_min)/(gfloat) (dsp->t1d_indx_max-dsp->t1d_indx_min)) * 
+      (gfloat) (hgt - 2*margin));
   }
   gdk_draw_lines (dsp->t1d_pp_pixmap, gg->plot_GC,
-    pptrace, ppindx_count);
+    pptrace, dsp->t1d_ppindx_count);
 
   gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
     0, 0, 0, 0, wid, hgt);
@@ -712,34 +709,35 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
     init = false;
   }
 
-  ppindx_mat[ppindx_count] = pp_indx_val;
+  dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count] = pp_indx_val;
 
-  if (indx_min > pp_indx_val)
-      indx_min = pp_indx_val;
-  if (indx_max < pp_indx_val)
-    indx_max = pp_indx_val;
+  if (dsp->t1d_indx_min > pp_indx_val)
+      dsp->t1d_indx_min = pp_indx_val;
+  if (dsp->t1d_indx_max < pp_indx_val)
+    dsp->t1d_indx_max = pp_indx_val;
 
-  if (indx_min == indx_max) indx_min *= 0.9999;
+  if (dsp->t1d_indx_min == dsp->t1d_indx_max) dsp->t1d_indx_min *= 0.9999;
 
   g_strdup_printf (label,"PP index: (%3.1f) %5.3f (%3.1f)",
-    indx_min, ppindx_mat[ppindx_count], indx_max);
+    dsp->t1d_indx_min, dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count], 
+    dsp->t1d_indx_max);
   gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
-  if (ppindx_count == 0) 
+  if (dsp->t1d_ppindx_count == 0) 
   {
-    ppindx_count++;
+    dsp->t1d_ppindx_count++;
   }
-  else if (ppindx_count > 0 && ppindx_count < 80) {
-    t1d_ppdraw_all(wid, hgt, indx_min, indx_max, margin, gg);
-    ppindx_count++;
+  else if (dsp->t1d_ppindx_count > 0 && dsp->t1d_ppindx_count < 80) {
+    t1d_ppdraw_all(wid, hgt, margin, gg);
+    dsp->t1d_ppindx_count++;
   }
-  else if (ppindx_count >= 80) 
+  else if (dsp->t1d_ppindx_count >= 80) 
   {
     /* cycle values back into array */
-    for (j=0; j<=ppindx_count; j++)
-      ppindx_mat[j] = ppindx_mat[j+1];
-    t1d_ppdraw_all(wid, hgt, indx_min, indx_max, margin, gg);
+    for (j=0; j<=dsp->t1d_ppindx_count; j++)
+      dsp->t1d_ppindx_mat[j] = dsp->t1d_ppindx_mat[j+1];
+    t1d_ppdraw_all(wid, hgt, margin, gg);
   }
 
   g_free (label);

@@ -36,11 +36,6 @@ The authors can be contacted at the following email addresses:
 #include "tour2d_pp.h"
 #include "tour_pp.h"
 
-static gfloat ppindx_mat[100]; /* needs to be global for easy
-				                  initialization/clearing */
-static gint ppindx_count;
-static gfloat indx_min, indx_max;
-
 #define HOLES 0
 #define CENTRAL_MASS 1
 #define SKEWNESS 2
@@ -276,7 +271,7 @@ void t2d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
       for (j=0; j<dsp->t2d.nvars; j++)
         dsp->t2d_pp_op.proj_best.vals[j][i] = 
           dsp->t2d.u.vals[i][dsp->t2d.vars.els[j]];
-    dsp->t2d.ppval = indx_min;
+    dsp->t2d.ppval = dsp->t2d_indx_min;
     bas_meth = 1;
   }
   else
@@ -314,38 +309,38 @@ void t2d_clear_pppixmap(ggobid *gg)
 
 void t2d_clear_ppda(ggobid *gg)
 {
+  displayd *dsp = gg->current_display; 
   gint i;
 
   /* clear the ppindx matrix */
-  ppindx_count = 0;
-  indx_min=1000.;
-  indx_max=-1000.;
+  dsp->t2d_ppindx_count = 0;
+  dsp->t2d_indx_min=1000.;
+  dsp->t2d_indx_max=-1000.;
   for (i=0; i<100; i++) 
   {
-    ppindx_mat[i] = 0.0;
+    dsp->t2d_ppindx_mat[i] = 0.0;
   }
 
   t2d_clear_pppixmap(gg);
 }
 
-void t2d_ppdraw_all(gint wid, gint hgt, gfloat indx_min, gfloat indx_max, 
-  gint margin, ggobid *gg)
+void t2d_ppdraw_all(gint wid, gint hgt, gint margin, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
-  /*gint xpos, ypos, xstrt, ystrt;*/
   GdkPoint pptrace[100];
   gint i;
 
   t2d_clear_pppixmap(gg);
 
-  for (i=0; i<ppindx_count; i++) 
+  for (i=0; i<dsp->t2d_ppindx_count; i++) 
   {
     pptrace[i].x = margin+i*2;
-    pptrace[i].y = hgt-margin-(gint)((gfloat)((ppindx_mat[i]-indx_min)/
-      (gfloat) (indx_max-indx_min)) * (gfloat) (hgt - 2*margin));
+    pptrace[i].y = hgt-margin-(gint)((gfloat)((dsp->t2d_ppindx_mat[i]-
+      dsp->t2d_indx_min)/(gfloat) (dsp->t2d_indx_max-dsp->t2d_indx_min)) * 
+      (gfloat) (hgt - 2*margin));
   }
   gdk_draw_lines (dsp->t2d_pp_pixmap, gg->plot_GC,
-    pptrace, ppindx_count);
+    pptrace, dsp->t2d_ppindx_count);
 
   gdk_draw_pixmap (dsp->t2d_ppda->window, gg->plot_GC, dsp->t2d_pp_pixmap,
     0, 0, 0, 0, wid, hgt);
@@ -368,34 +363,34 @@ void t2d_ppdraw(gfloat pp_indx_val, ggobid *gg)
     init = false;
   }
 
-  ppindx_mat[ppindx_count] = pp_indx_val;
+  dsp->t2d_ppindx_mat[dsp->t2d_ppindx_count] = pp_indx_val;
 
-  if (indx_min > pp_indx_val)
-      indx_min = pp_indx_val;
-  if (indx_max < pp_indx_val)
-    indx_max = pp_indx_val;
+  if (dsp->t2d_indx_min > pp_indx_val)
+      dsp->t2d_indx_min = pp_indx_val;
+  if (dsp->t2d_indx_max < pp_indx_val)
+    dsp->t2d_indx_max = pp_indx_val;
 
-  if (indx_min == indx_max) indx_min *= 0.9999;
+  if (dsp->t2d_indx_min == dsp->t2d_indx_max) dsp->t2d_indx_min *= 0.9999;
 
   g_strdup_printf (label,"PP index: (%3.1f) %5.3f (%3.1f)",
-    indx_min, ppindx_mat[ppindx_count], indx_max);
+    dsp->t2d_indx_min, dsp->t2d_ppindx_mat[dsp->t2d_ppindx_count], dsp->t2d_indx_max);
   gtk_label_set_text(GTK_LABEL(dsp->t2d_pplabel),label);
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
-  if (ppindx_count == 0) 
+  if (dsp->t2d_ppindx_count == 0) 
   {
-    ppindx_count++;
+    dsp->t2d_ppindx_count++;
   }
-  else if (ppindx_count > 0 && ppindx_count < 80) {
-    t2d_ppdraw_all(wid, hgt, indx_min, indx_max, margin, gg);
-    ppindx_count++;
+  else if (dsp->t2d_ppindx_count > 0 && dsp->t2d_ppindx_count < 80) {
+    t2d_ppdraw_all(wid, hgt, margin, gg);
+    dsp->t2d_ppindx_count++;
   }
-  else if (ppindx_count >= 80) 
+  else if (dsp->t2d_ppindx_count >= 80) 
   {
     /* cycle values back into array */
-    for (j=0; j<=ppindx_count; j++)
-      ppindx_mat[j] = ppindx_mat[j+1];
-    t2d_ppdraw_all(wid, hgt, indx_min, indx_max, margin, gg);
+    for (j=0; j<=dsp->t2d_ppindx_count; j++)
+      dsp->t2d_ppindx_mat[j] = dsp->t2d_ppindx_mat[j+1];
+    t2d_ppdraw_all(wid, hgt, margin, gg);
   }
 
   g_free (label);
