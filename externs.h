@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void       newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg);
 void       missings_datad_cb (GtkWidget *w, ggobid *gg);
 gint       symbol_table_populate (datad *d);
 void       arrayd_add_cols (array_d *, gint);
@@ -557,7 +558,8 @@ void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
 
 void showInputDescription(InputDescription *desc, ggobid *gg);
 void initSessionOptions(void);
-gint parse_command_line (gint *argc, gchar **av, ggobid *gg);
+/*gint parse_command_line (gint *argc, gchar **av, ggobid *gg);*/
+gint parse_command_line (gint *argc, gchar **av);
 #ifdef __cplusplus
 }
 #endif
