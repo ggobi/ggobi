@@ -148,14 +148,16 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
 
 static void closeit (ggobid *gg) {
   gint n;
-/* loop over all d's? */
-  datad *d = datad_get_from_notebook (gg->exclusion_ui.notebook, gg);
+  GSList *l;
+  datad *d;
 
-  for (n=0; n<d->nclusters; n++)
-    cluster_free (n, d, gg);
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    for (n=0; n<d->nclusters; n++)
+      cluster_free (n, d, gg);
+  }
 
   gtk_widget_destroy (gg->exclusion_ui.window);
-
   gg->exclusion_ui.window = NULL;
 }
 
@@ -197,10 +199,9 @@ void
 exclusion_window_open (ggobid *gg) {
   GtkWidget *scrolled_window;
   GtkWidget *vbox, *ebox, *btn, *hbox;
-  gint k, n=0;
+  gint k;
   GSList *l;
   datad *d;
-  gchar *label;
   GtkWidget *labelw;
 
   /*-- if it isn't NULL, then destroy it and start afresh --*/
@@ -239,12 +240,7 @@ exclusion_window_open (ggobid *gg) {
       GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
     /*-- use datad->name once it's been defined --*/
-    labelw = NULL;
-    if (g_slist_length (gg->d) > 1) {
-      label = g_strdup_printf ("data %d\n", n++);
-      labelw = gtk_label_new (label);
-      g_free (label);
-    }
+    labelw = (g_slist_length (gg->d) > 1) ? gtk_label_new (d->name) : NULL;
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->exclusion_ui.notebook),
                               scrolled_window, labelw);
     gtk_widget_show (scrolled_window);

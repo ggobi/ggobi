@@ -182,7 +182,6 @@ vartable_open (ggobid *gg)
      "N missing"};
   GSList *l;
   datad *d;
-  gchar *label;
   GtkWidget *labelw;
   gint n;
   GtkWidget *hbox, *btn;
@@ -207,7 +206,7 @@ vartable_open (ggobid *gg)
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->vartable_ui.notebook),
       g_slist_length (gg->d) > 1);
     gtk_box_pack_start (GTK_BOX (vbox), gg->vartable_ui.notebook,
-      false, false, 2);
+      true, true, 2);
 
     n = 0;
     for (l = gg->d; l; l = l->next) {
@@ -218,13 +217,7 @@ vartable_open (ggobid *gg)
       gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
         GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-      /*-- use datad->name once it's been defined --*/
-      labelw = NULL;
-      if (g_slist_length (gg->d) > 1) {
-        label = datasetName(d, n++);
-        labelw = gtk_label_new (label);
-        g_free (label);
-      }
+      labelw = (g_slist_length (gg->d) > 1) ? gtk_label_new (d->name) : NULL;
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->vartable_ui.notebook),
                                 scrolled_window, labelw);
 
