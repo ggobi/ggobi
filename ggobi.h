@@ -83,8 +83,16 @@ typedef struct /*-- ggobi --*/ {
 
 typedef struct _PrintOptions PrintOptions;
 
+/**
+  @defgroup ggobid the ggobid instance structure.
+  @brief This is the top-level structure representing a 
+  ggobi instance.
+ */
 struct _ggobid {
 
+    /** 
+       
+     */
  DisplayTree display_tree;
  GList *displays;
  displayd *current_display;
@@ -389,21 +397,78 @@ struct _ggobid {
 #endif
 
 
+/**
+  @defgroup SessionOptions Session Options
+  @brief This is used to store store values from the
+   command line arguments which can be used in subsequent
+   code.
+ */
 typedef struct {
 
+  /**
+    @ingroup SessionOptions
+    Controls whether messages explaining what is being done internally
+    are displayed.
+    */
   gboolean verbose;
+
+    /**
+       @ingroup SessionOptions
+       The default format for the data being read.
+     */
   DataMode data_mode;
+
+  /**
+    @ingroup SessionOptions
+    The name of the data file containing the data.
+    */
   gchar *data_in;
+    /**
+       @ingroup SessionOptions
+       The command line arguments used to start ggobi.
+     */ 
   gchar **cmdArgs;
+    /**
+      @ingroup SessionOptions
+      The number of command line arguments used to start ggobi.
+     */
   gint numArgs;
 
+
+    /**
+       @ingroup SessionOptions
+       A logical value controlling whether the control window
+       of a ggobi instance is displayed. This can be used to hide
+       the control window when ggobi is embedded in other applications.
+     */
   gboolean showControlPanel;
 
 #ifdef USE_XML
+    /**
+      @ingroup SessionOptions
+      Data for the initialization settings.
+     */
   struct _GGobiInitInfo *info;
+    /**
+      @ingroup SessionOptions
+      The name of the initialization file from which to read any
+      session parameters not specified on the command line.
+     */
   gchar *initializationFile;
 
+    /**
+      @ingroup SessionOptions
+      The collection of color schemes read
+       available to ggobi, typically specified in the
+       initialization file.
+      
+     */
   GList *colorSchemes;
+    /**
+     @ingroup SessionOptions
+     The name of the active color scheme, indexing the 
+     list of colorSchemes.
+     */
   gchar *activeColorScheme;
 #endif
 } GGobiOptions;

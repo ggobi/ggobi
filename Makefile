@@ -276,6 +276,7 @@ print.o: print.c print.h
 %.d: %.c
 	$(CC) -M $(CFLAGS) -I. `gtk-config --cflags` $< > $@
 
+# Where is the output?
 apiDoc: Install/apiDocConfig
 	$(DOXYGEN) Install/apiDocConfig
 
