@@ -100,7 +100,9 @@ When brushing or identifying in parcoords, use leave/enter events to
   
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
-  couple that with a thumbnail view that sits just below the scaling controls
+      shifting works, but not yet in the barchart; no scaling yet.
+  maybe couple that with a thumbnail view that sits just below the
+    scaling controls?
 
 Smoothing -- as a demo, at least, of the use of R
 
