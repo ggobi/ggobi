@@ -10,6 +10,8 @@ extern "C" {
 #include "GGobiAPI.h"
 #include "plugin.h"
 
+#include "externs.h"
+
 displayd*  datad_init (datad *, ggobid *, gboolean);
 
 extern const gchar **getDefaultRowNamesPtr();
@@ -17,6 +19,9 @@ extern const gchar **getDefaultRowNamesPtr();
 InputDescription *ExcelDataDescription(const char * const fileName, const char * const modeName, ggobid *gg, GGobiPluginInfo *info);
 gboolean onLoad(gboolean initializing, GGobiPluginInfo *plugin);
 }
+
+
+gboolean isVTNumber(VARIANT *v);
 
 #define MY_V_DISPATCH(v)  V_DISPATCH(v)
 
@@ -310,12 +315,61 @@ asReal(VARIANT *v)
   return(V_R8(v));
 }
 
+/*XXX
+ Taken from read_xml.c. Merge back!
+*/
+void
+freeLevelHashEntry(gpointer key, gpointer value, gpointer data)
+{
+  g_free(value);
+  if(data)
+    g_free(key);
+/*  return(true); */
+}
+
+typedef struct {
+  int ctr;
+  vartabled *var;
+} HashElSet;
+
+void
+setLevel(gpointer key, gint *value, HashElSet *tmp)
+{
+  tmp->var->level_names[tmp->ctr] = g_strdup((gchar *) key);
+  tmp->var->level_values[tmp->ctr] = value[0];
+  tmp->var->level_counts[tmp->ctr] = value[1];
+  tmp->ctr++;
+}
+
+/* Take the elements in the hashtable and put them into 
+   the level fields of the vartabled object.
+*/
+void
+setLevels(vartabled *var, GHashTable *levels, int numLevels)
+{
+  int ctr = 0, n;
+  HashElSet tmp;
+  
+  tmp.ctr = 0;
+  tmp.var = var;
+
+  n = var->nlevels = numLevels;
+  var->level_values = (gint *) g_malloc(sizeof(gint) * n);
+  var->level_counts = (gint *) g_malloc(sizeof(gint) * n);
+  var->level_names = (gchar **) g_malloc(sizeof(gchar *) * n);
+  
+  g_hash_table_foreach(levels, (GHFunc) setLevel, &tmp);
+}
+
 datad *
 createDataset(VARIANT *var, ggobid *gg)
 {
   SAFEARRAY *arr;
   VARIANT value;
   gboolean hasColNames = true;
+  vartabled *variable;
+  GHashTable *levels = NULL;
+  int numLevels;
 
   if(V_ISBYREF(var))
     arr = *V_ARRAYREF(var);
@@ -362,7 +416,9 @@ createDataset(VARIANT *var, ggobid *gg)
 
   d = datad_create(nrow, ncol, gg);
 
+  /* Loop over columns. */
   for(j = dim[1][0], col = 0;  j <= dim[1][1]; j++, col++) {
+    variable = vartable_element_get (col, d);
     indices[1] =j;
     for(ctr = 0, i = dim[0][0] + 1; i <= dim[0][1]; i++, ctr++) {
       indices[0] =i;
@@ -371,10 +427,53 @@ createDataset(VARIANT *var, ggobid *gg)
 	/* This doesn't work. Instead we get a value of 0.00, not VT_VOID */
 	fprintf(stderr, "Missing value %d, %d\n", ctr+1, col+1);fflush(stderr);
 	d->raw.vals[ctr][col] = -1.0;
-      } else
-         d->raw.vals[ctr][col] = asReal(&value);
+      } else if(isVTNumber(&value)) {
+        d->raw.vals[ctr][col] = asReal(&value);
+      } else if(V_VT(&value) == VT_BSTR) {
+	gpointer ptr;
+	int *val;
+	gchar *str;
+
+        str = g_strdup(FromBstr(V_BSTR(&value)));
+
+	/* If first row of this column, set this to a categorical variable
+           and create a table in which to store the levels. We will use this
+           for the cells in this column and then put the unique elements into
+           the variable at the end. */
+	if(ctr == 0) {
+	  numLevels = 0;
+	  ptr = NULL;
+	  variable->vartype = categorical;
+	  levels = g_hash_table_new(g_str_hash, g_str_equal);
+	} else {
+	  /* Else, see if this level is already entered in the set of levels. */
+	  ptr = g_hash_table_lookup(levels, str);
+	}
+
+	/* If the value for the level is not in the set, add it.*/
+	if(!ptr) {
+	    val = (int*) malloc(sizeof(gint) * 2);
+	    numLevels++;
+	    val[0] = numLevels;
+	    val[1] = 0;
+	    g_hash_table_insert(levels, str, val);
+	} else
+	  val = (int *)ptr;
+
+	d->raw.vals[ctr][col] = val[0];
+	val[1]++;
+
+	//	fprintf(stderr, "Non number value %d %d\n", ctr+1, col+1);fflush(stderr);
+      }
 
       VariantClear(&value);
+    }
+
+    if(levels) {
+      setLevels(variable, levels, numLevels);
+      g_hash_table_foreach(levels, freeLevelHashEntry, NULL);
+      g_hash_table_destroy(levels);
+      levels = NULL;
     }
 
     gchar *varName = NULL;
@@ -396,6 +495,19 @@ createDataset(VARIANT *var, ggobid *gg)
  return(d);
 }
 
+
+gboolean
+isVTNumber(VARIANT *v)
+{
+  VARTYPE t = V_VT(v);
+
+  if(t == VT_I2 || t == VT_I4 || t == VT_R4 || t == VT_R8
+      || t == VT_UI1 || t == VT_UI2 || t == VT_UI4 || t == VT_I8
+        || t == VT_UI8 || t == VT_INT || t == VT_UINT || t == VT_DATE)
+    return(true);
+
+  return(false);
+}
 
 /* 
   Following taken from the Omegahat package RDCOMServer/src.
