@@ -43,13 +43,15 @@ saveDOMToFile(xmlDocPtr doc, const char *fileName)
     int status;
 
     xmlIndentTreeOutput = TRUE;
-    if(sessionOptions->info->compress > 0) {
+    if(sessionOptions->info->compress > 0 || USE_XML == 1) {
 	int compressionLevel;
 	compressionLevel = xmlGetDocCompressMode(doc);
 	xmlSetDocCompressMode(doc, sessionOptions->info->compress);
 	status = xmlSaveFile(fileName, doc);
 	xmlSetDocCompressMode(doc, compressionLevel);
-    } else {
+    }
+#if USE_XML==1
+    else {
 	xmlChar *mem;
 	int size;
 	FILE *f;
@@ -61,7 +63,7 @@ saveDOMToFile(xmlDocPtr doc, const char *fileName)
 	}
 	xmlFree(mem);
     }
-
+#endif
 
     if(status < 0) {
         char buf[1000];
