@@ -171,7 +171,7 @@ typedef struct {
 typedef struct
 { gfloat temp_start, temp_end, cooling, heating, temp, index_best;
   gint restart, maxproj, success;
-  array_f proj_best, data;
+  array_f proj_best, data, pdata;
 } optimize0_param; 
 /* end Sigbert's code */
 

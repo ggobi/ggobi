@@ -386,8 +386,8 @@ tour2d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
     /* Check if pp indices are being calculated, if so re-allocate
        and re-initialize as necessary */
     if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
-      realloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, 
-        dsp->t2d.nactive, 2);
+      realloc_optimize0_p(&dsp->t2d_pp_op, dsp->t2d.nactive, 
+        dsp->t2d.active_vars);
       t2d_pp_reinit(gg);
     }
   }
@@ -483,7 +483,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
         dsp->t2d.oppval = dsp->t2d.ppval;
         for (i=0; i<2; i++)
           for (j=0; j<dsp->t2d.nactive; j++)
-            dsp->t2d_pp_op.proj_best.vals[j][i] = 
+            dsp->t2d_pp_op.proj_best.vals[i][j] = 
               dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
       }
     }
@@ -541,7 +541,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
           for (i=0; i<2; i++)
             for (j=0; j<dsp->t2d.nactive; j++)
               dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[j]] = 
-                dsp->t2d_pp_op.proj_best.vals[j][i];
+                dsp->t2d_pp_op.proj_best.vals[i][j];
 
           /* if the best projection is the same as the previous one, switch 
               to a random projection */
@@ -552,7 +552,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
               d->ncols, (gint) 2);
             for (i=0; i<2; i++)
               for (j=0; j<dsp->t2d.nactive; j++)
-                dsp->t2d_pp_op.proj_best.vals[j][i] = 
+                dsp->t2d_pp_op.proj_best.vals[i][j] = 
                   dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[j]];
             revert_random = t2d_switch_index(cpanel->t2d.pp_indx, 
               dsp->t2d.target_selection_method, gg);

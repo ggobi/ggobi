@@ -241,7 +241,7 @@ void       quick_message (gchar *, gboolean);
 void       quit_ggobi(ggobid *gg, gint action, GtkWidget *w);
 void       range_unset (ggobid *gg);
 void       raw_to_tform_copy (void);
-gint       realloc_optimize0_p(optimize0_param *, gint, gint, gint);
+gint       realloc_optimize0_p(optimize0_param *, gint, vector_i);
 void       reinit_transient_brushing (displayd *, ggobid *);
 void       rejitter (gint *, gint, datad *, ggobid *);
 void       rnorm2 (gdouble *, gdouble *);

@@ -303,22 +303,22 @@ gint path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, array_d
     
   /* Check that Fa and Fz are both orthonormal. */
   if (!checkcolson(Fa.vals, datadim, projdim)) {
-g_printerr("Columns of Fa are not orthonormal: get new Fa\n");
+    /*g_printerr("Columns of Fa are not orthonormal: get new Fa\n");
 g_printerr ("Fa: ");
 for (i=0; i<datadim; i++) g_printerr ("%f ", Fa.vals[0][i]);
 g_printerr ("\n    ");
 for (i=0; i<datadim; i++) g_printerr ("%f ", Fa.vals[1][i]);
-g_printerr ("\n");
+g_printerr ("\n");*/
     return(1);
   }
   if (!checkcolson(Fz.vals, datadim, projdim)) {
-g_printerr("Columns of Fz are not orthonormal: generating new Fz\n");
+    /*g_printerr("Columns of Fz are not orthonormal: generating new Fz\n");*/
     return(2);
   }
 
   /* Check that Fa and Fz are the same */
   if (!checkequiv(Fa.vals, Fz.vals, datadim, projdim)) {
-g_printerr("Fa equiv Fz: generating random Fz\n");
+    /*g_printerr("Fa equiv Fz: generating random Fz\n");*/
     return(3);
   }
 

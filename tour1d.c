@@ -361,6 +361,7 @@ void
 tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
+  gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
 
 /*-- any button --*/
   if (d->vcirc_ui.jcursor == GDK_HAND2) {
@@ -371,9 +372,14 @@ tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
     tour1dvar_set (jvar, gg);
 
     if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
-      realloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, 
-        dsp->t1d.nactive, 1);
+      realloc_optimize0_p(&dsp->t1d_pp_op, dsp->t1d.nactive, 
+        dsp->t1d.active_vars);
+
       t1d_pp_reinit(gg);
+      label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
+      dsp->t1d_indx_min, dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count], 
+      dsp->t1d_indx_max);
+      gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
     }
   }
 }
@@ -478,7 +484,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
         dsp->t1d_pp_op.index_best = dsp->t1d.ppval;
         dsp->t1d.oppval = dsp->t1d.ppval;
         for (j=0; j<dsp->t1d.nactive; j++)
-          dsp->t1d_pp_op.proj_best.vals[j][0] = 
+          dsp->t1d_pp_op.proj_best.vals[0][j] = 
             dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]];
       }
     }
@@ -512,22 +518,25 @@ tour1d_run(displayd *dsp, ggobid *gg)
       else if (dsp->t1d.target_selection_method == 1) {
         /* pp guided tour  */
         /* get new target according to the selected pp index */
+        for (i=0; i<d->ncols; i++)
+          dsp->t1d.Fz.vals[0][i] = 0.0;
+
         revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
           dsp->t1d.target_selection_method, gg);
 
         if (!revert_random) {
           for (i=0; i<dsp->t1d.nactive; i++)
             dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[i]] = 
-              dsp->t1d_pp_op.proj_best.vals[i][0];
+              dsp->t1d_pp_op.proj_best.vals[0][i];
 
           /* if the best projection is the same as the previous one, switch 
               to a random projection */
           if (!checkequiv(dsp->t1d.Fa.vals, dsp->t1d.Fz.vals, d->ncols, 1)) {
-            g_printerr ("Using random projection\n");
+	    /*            g_printerr ("Using random projection\n");*/
             gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
               d->ncols, (gint) 1);
             for (j=0; j<dsp->t1d.nactive; j++)
-              dsp->t1d_pp_op.proj_best.vals[j][0] = 
+              dsp->t1d_pp_op.proj_best.vals[0][j] = 
                 dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[j]];
               /*              dsp->t1d.ppval = -999.0;*/
             revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
@@ -653,6 +662,9 @@ void tour1d_scramble(ggobid *gg)
   display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
+
+  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) 
+    t1d_pp_reinit(gg);
 }
 
 void tour1d_vert(cpaneld *cpanel, gboolean state)

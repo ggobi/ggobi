@@ -62,9 +62,12 @@ assume an error has occured during computation of the index.
 gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim)
 {
   arrayf_init_null (&op->proj_best);
-  arrayf_alloc_zero (&op->proj_best, ncols, ndim); /*nrows, ncols);*/
+  /*  arrayf_alloc_zero (&op->proj_best, ncols, ndim); *nrows, ncols);*/
+  arrayf_alloc_zero (&op->proj_best, ndim, ncols); /*nrows, ncols);*/
   arrayf_init_null (&op->data);
   arrayf_alloc_zero (&op->data, nrows, ncols); 
+  arrayf_init_null (&op->pdata);
+  arrayf_alloc_zero (&op->pdata, nrows, ndim); 
 
   return 0;
 }
@@ -73,25 +76,31 @@ gint free_optimize0_p (optimize0_param *op)
 { 
   arrayf_free (&op->proj_best, 0, 0);
   arrayf_free (&op->data, 0, 0);
+  arrayf_free(&op->pdata, 0, 0);
 
   return 0;
 }
 
-gint realloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, 
-  gint ndim)
+gint realloc_optimize0_p (optimize0_param *op, gint ncols, vector_i pcols)
 {
-  /*  static gint old_ncols;
+  gint i, ncolsdel;
+  gint *cols;/* = g_malloc (ncols*sizeof(gint));*/
 
-      if (old_ncols < ncols) {*/
-    arrayf_add_rows(&op->proj_best, ncols);
-    /*  arrayf_init_null (&op->proj_best);
-        arrayf_alloc_zero (&op->proj_best, ncols, ndim);*/ /*nrows, ncols);*/
+/* pdata doesn't need to be reallocated, since it doesn't depend on ncols */
+  if (op->proj_best.ncols < ncols) {
+    arrayf_add_cols(&op->proj_best, ncols);
     arrayf_add_cols(&op->data, ncols);
-    /*  arrayf_init_null (&op->data);
-        arrayf_alloc_zero (&op->data, nrows, ncols); */
-    /*  }
+  }
+  else {
+    ncolsdel = op->proj_best.ncols - ncols;
+    cols = g_malloc (ncolsdel*sizeof(gint));
+    for (i=0; i<ncolsdel; i++)
+      cols[i] = ncols-1-i;
 
-	old_ncols = ncols;*/
+    arrayf_delete_cols(&op->proj_best, ncolsdel, cols);
+    arrayf_delete_cols(&op->data, ncolsdel, cols);
+  }
+  g_free(cols);
 
   return 0;
 }
@@ -148,42 +157,55 @@ void normal_fill (array_f *data, gfloat delta, array_f *base)
 void orthonormal (array_f *proj)
 { 
   gint i, j, k;
-  gfloat *ip = malloc (proj->ncols*sizeof(gfloat)), norm;
+  gfloat *ip = g_malloc (proj->ncols*sizeof(gfloat)), norm;
 
-  for (i=0; i<proj->ncols; i++)
+  /* First norm vector p_i */
+  for (i=0; i<proj->nrows; i++)
+  { 
+    norm = 0.0;
+    for (k=0; k<proj->ncols; k++)
+      norm += (proj->vals[i][k]*proj->vals[i][k]);
+    norm = sqrt(norm);
+    for (k=0; k<proj->ncols; k++)
+      proj->vals[i][k] /= norm;
+  }
+
+  for (i=0; i<proj->nrows; i++)
   { /* Compute inner product between p_i and all p_j */
     for (j=0; j<i; j++)
     { ip[j] = 0;
-      for (k=0; k<proj->nrows; k++)
-        ip[j] += proj->vals[k][j]*proj->vals[k][i];
+      for (k=0; k<proj->ncols; k++)
+        ip[j] += proj->vals[j][k]*proj->vals[i][k];
     }
     /* Subtract now all vectors from p_i */
     for (j=0; j<i; j++)
-    { for (k=0; k<proj->nrows; k++)
-        proj->vals[k][i] -= ip[j]*proj->vals[k][j];
+    { for (k=0; k<proj->ncols; k++)
+        proj->vals[i][k] -= ip[j]*proj->vals[j][k];
     }
     /* Finally norm vector p_i */
     norm = 0.0;
-    for (k=0; k<proj->nrows; k++)
-      norm += (proj->vals[k][i]*proj->vals[k][i]);
+    for (k=0; k<proj->ncols; k++)
+      norm += (proj->vals[i][k]*proj->vals[i][k]);
     norm = sqrt(norm);
-    for (k=0; k<proj->nrows; k++)
-      proj->vals[k][i] /= norm;
+    for (k=0; k<proj->ncols; k++)
+      proj->vals[i][k] /= norm;
   }
+  g_free(ip);
 }
 
 gint optimize0 (optimize0_param *op,
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param)
 { gfloat index_work;
-  array_f proj_work, pdata, *proj;
+/*  array_f proj_work, pdata, *proj;*/
+  array_f proj_work, *proj;
   int i,j, m, k;
 
   proj = &(op->proj_best);
   arrayf_init_null (&proj_work);
   arrayf_alloc_zero (&proj_work, proj->nrows, proj->ncols);
-  arrayf_init_null (&pdata);
-  arrayf_alloc_zero (&pdata, op->data.nrows, proj->ncols);
+  /*  arrayf_init_null (&pdata);
+      arrayf_alloc_zero (&pdata, op->data.nrows, proj->ncols);*/
 
   op->temp_start     =  1;
   op->temp_end       =  0.001;
@@ -207,17 +229,17 @@ gint optimize0 (optimize0_param *op,
   /* calculate projected data */
   for (i=0; i<op->data.nrows; i++)
   { 
-    for (j=0; j<proj->ncols; j++)
+    for (j=0; j<proj->nrows; j++)
     { 
-      pdata.vals[i][j] = 0;
+      op->pdata.vals[i][j] = 0;
       for (m=0; m<op->data.ncols; m++)
-        pdata.vals[i][j] += op->data.vals[i][m]*proj->vals[m][j];
+        op->pdata.vals[i][j] += op->data.vals[i][m]*proj->vals[j][m];
     }
   }
   /* do index calculation, functions return -1 if a problem, which
      is then passed back through optimize0 to tour1d_run */
-  /*  if (index (&pdata, param, &op->index_best)) return(-1);*/
-  if (index (&pdata, param, &index_work)) return(-1);
+  /*  if (index (&op->pdata, param, &op->index_best)) return(-1);*/
+  if (index (&op->pdata, param, &index_work)) return(-1);
 
   /* fill proj_work */
   arrayf_copy (proj, &proj_work);
@@ -235,16 +257,16 @@ gint optimize0 (optimize0_param *op,
       /* calc projected data */
       for (i=0; i<op->data.nrows; i++)
       { 
-        for (j=0; j<proj->ncols; j++)
+        for (j=0; j<proj->nrows; j++)
         { 
-          pdata.vals[i][j] = 0;
+          op->pdata.vals[i][j] = 0;
           for (m=0; m<op->data.ncols; m++)
-            pdata.vals[i][j] += op->data.vals[i][m]*proj_work.vals[m][j];
+            op->pdata.vals[i][j] += op->data.vals[i][m]*proj_work.vals[j][m];
         }
       }
 
       /* Calculate pp index for current projection */       
-      if (index (&pdata, param, &index_work)) return(-1);
+      if (index (&op->pdata, param, &index_work)) return(-1);
 
       if (index_work > op->index_best)
       { /* sprintf (msg, "Success %f", index_work); print(); */

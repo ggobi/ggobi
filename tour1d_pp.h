@@ -54,7 +54,10 @@ gint alloc_cartvariance_p (cartvariance_param *dp, gint nrows, gfloat *gdata);
 gint free_cartvariance_p (cartvariance_param *dp);
 gint cartvariance (array_f *pdata, void *param, gfloat *val);
 
-gfloat t1d_calc_indx(array_f, array_d, gint *, gint, gint,
+/*gfloat t1d_calc_indx(array_f, array_d, gint *, gint, gint,
+                gint (*index) (array_f*, void*, gfloat*),
+                void *param);*/
+gfloat t1d_calc_indx(array_f, gint *, gint, gint,
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param);
 gboolean t1d_switch_index(gint, gint, ggobid *);

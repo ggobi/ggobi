@@ -150,7 +150,7 @@ arrayd_delete_cols (array_d *arrp, gint nc, gint *cols)
 
     for (i=0; i<arrp->nrows; i++)
       arrp->vals[i] = (gdouble *) g_realloc (arrp->vals[i],
-                                            nkeepers * sizeof (gdouble));
+                                      nkeepers * sizeof (gdouble));
     arrp->ncols = nkeepers;
   }
   g_free (keepers);

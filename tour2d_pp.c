@@ -269,7 +269,7 @@ void t2d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
   {
     for (i=0; i<2; i++)
       for (j=0; j<dsp->t2d.nactive; j++)
-        dsp->t2d_pp_op.proj_best.vals[j][i] = 
+        dsp->t2d_pp_op.proj_best.vals[i][j] = 
           dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
     dsp->t2d.ppval = dsp->t2d_indx_min;
     bas_meth = 1;
@@ -484,7 +484,7 @@ gboolean t2d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
 
   for (i=0; i<2; i++)
     for (j=0; j<dsp->t2d.nactive; j++)
-      dsp->t2d_pp_op.proj_best.vals[j][i] = 
+      dsp->t2d_pp_op.proj_best.vals[i][j] = 
         dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
 
   switch (indxtype)

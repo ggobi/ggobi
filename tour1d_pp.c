@@ -372,7 +372,7 @@ double ludcomp(double *a,int n)
       }
       if (pivot!=k) {
         det*=-1; 
-        printf("Change!!\n");
+	/*        printf("Change!!\n");*/
         for(j=k; j<n; j++) {       
           temp = a[k*n+j]; 
           a[k*n+j]=a[pivot*n+j]; 
@@ -392,7 +392,7 @@ double ludcomp(double *a,int n)
     }
     k = n-1;
     det *= a[(n-1)*n+(n-1)];
-    printf("det in ludecomp = %f\n",det);
+    /*    printf("det in ludecomp = %f\n",det);*/
     ier=0;
     return(det);
 }
@@ -477,7 +477,7 @@ gint discriminant (array_f *pdata, void *param, gfloat *val)
   det = ludcomp(dp->a,p); 
   *val = 1.0-*val/det;
 
-  printf ("Index=%f\n", *val);
+  /*  printf ("Index=%f\n", *val);*/
 
 /*  sprintf (msg, "index=%f\n", *val); print(); */
   return (0);
@@ -559,7 +559,7 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
   }
 
   *val *= -1;
-  printf ("Index=%f\n", *val);
+  /*  printf ("Index=%f\n", *val);*/
 /*  sprintf (msg, "Index=%f", *val);print();              */
 
   return(0);
@@ -790,43 +790,43 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
   gint j;
   static gboolean init = true;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
+  gboolean at_max = false;
 
   if (init) {
     t1d_clear_ppda(gg);
     init = false;
   }
 
-  dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count] = pp_indx_val;
+    dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count] = pp_indx_val;
 
-  if (dsp->t1d_indx_min > pp_indx_val)
+    if (dsp->t1d_indx_min > pp_indx_val)
       dsp->t1d_indx_min = pp_indx_val;
-  if (dsp->t1d_indx_max < pp_indx_val)
-    dsp->t1d_indx_max = pp_indx_val;
+    if (dsp->t1d_indx_max < pp_indx_val)
+      dsp->t1d_indx_max = pp_indx_val;
 
-  if (dsp->t1d_indx_min == dsp->t1d_indx_max) dsp->t1d_indx_min *= 0.9999;
+    if (dsp->t1d_indx_min == dsp->t1d_indx_max) dsp->t1d_indx_min *= 0.9999;
 
-  label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
-    dsp->t1d_indx_min, dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count], 
-    dsp->t1d_indx_max);
-  gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
-
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  if (dsp->t1d_ppindx_count == 0) 
-  {
-    dsp->t1d_ppindx_count++;
-  }
-  else if (dsp->t1d_ppindx_count > 0 && dsp->t1d_ppindx_count < 80) {
-    t1d_ppdraw_all(wid, hgt, margin, gg);
-    dsp->t1d_ppindx_count++;
-  }
-  else if (dsp->t1d_ppindx_count >= 80) 
-  {
-    /* cycle values back into array */
-    for (j=0; j<=dsp->t1d_ppindx_count; j++)
-      dsp->t1d_ppindx_mat[j] = dsp->t1d_ppindx_mat[j+1];
-    t1d_ppdraw_all(wid, hgt, margin, gg);
-  }
-
+    label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
+      dsp->t1d_indx_min, dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count], 
+      dsp->t1d_indx_max);
+    gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
+ 
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    if (dsp->t1d_ppindx_count == 0) 
+    {
+      dsp->t1d_ppindx_count++;
+    }
+    else if (dsp->t1d_ppindx_count > 0 && dsp->t1d_ppindx_count < 80) {
+      t1d_ppdraw_all(wid, hgt, margin, gg);
+      dsp->t1d_ppindx_count++;
+    }
+    else if (dsp->t1d_ppindx_count >= 80) 
+    {
+      /* cycle values back into array */
+      for (j=0; j<=dsp->t1d_ppindx_count; j++)
+        dsp->t1d_ppindx_mat[j] = dsp->t1d_ppindx_mat[j+1];
+      t1d_ppdraw_all(wid, hgt, margin, gg);
+    }
   g_free (label);
 }
 
@@ -834,6 +834,7 @@ void t1d_pp_reinit(ggobid *gg)
 {
   gint i, j;
   displayd *dsp = gg->current_display;
+  gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
 
   for (i=0; i<dsp->t1d_pp_op.proj_best.nrows; i++)
     for (j=0; j<dsp->t1d_pp_op.proj_best.ncols; j++)
@@ -841,6 +842,10 @@ void t1d_pp_reinit(ggobid *gg)
   dsp->t1d.ppval = -100.0;
   dsp->t1d.oppval = -999.0;
   dsp->t1d_pp_op.index_best = -100.0;
+  label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
+  dsp->t1d_indx_min, dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count], 
+  dsp->t1d_indx_max);
+  gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
 
   t1d_clear_ppda(gg);
 }
@@ -866,33 +871,16 @@ projection.
 
 *********************************************************************/
 
-
-gfloat t1d_calc_indx (array_f data, array_d proj, 
+gfloat t1d_calc_indx (array_f pd, 
                 gint *rows, gint nrows, 
                 gint ncols,
                 gint (*index) (array_f*, void*, gfloat*),
                 void *param)
 { 
   gfloat indexval;
-  array_f pdata;
-  gint i, j, m;
+  /*  gint i, j, m;*/
 
-  arrayf_init_null (&pdata);
-  arrayf_alloc_zero (&pdata, nrows, 1);
-
-  /* fill projected data array */
-  for (m=0; m<nrows; m++)
-  { 
-    i = rows[m];
-    pdata.vals[i][0] = 0.0;
-    for (j=0; j<ncols; j++)
-    { 
-      pdata.vals[i][0] += data.vals[i][j]*(gfloat)proj.vals[0][j];
-    }
-  }
-
-  index (&pdata, param, &indexval);
-  arrayf_free (&pdata, 0, 0);
+  index (&pd, param, &indexval);
 
   return(indexval);
 }
@@ -902,15 +890,15 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
   displayd *dsp = gg->current_display; 
   datad *d = dsp->d;
   gint kout, nrows = d->nrows_in_plot, pdim = 1;
-  subd_param sp; 
+  /*  subd_param sp; */
   discriminant_param dp;
-  cartgini_param cgp;
-  cartentropy_param cep;
+  /*  cartgini_param cgp;
+      cartentropy_param cep;*/
   cartvariance_param cvp;
   gfloat *gdata;
   gint i, j;
 
-  gdata  = malloc (nrows*sizeof(gfloat));
+  gdata  = g_malloc (nrows*sizeof(gfloat));
 
   for (i=0; i<d->nrows_in_plot; i++)
     for (j=0; j<dsp->t1d.nactive; j++)
@@ -918,36 +906,51 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
         d->tform.vals[d->rows_in_plot[i]][dsp->t1d.active_vars.els[j]];
 
   for (j=0; j<dsp->t1d.nactive; j++)
-    dsp->t1d_pp_op.proj_best.vals[j][0] = 
+    dsp->t1d_pp_op.proj_best.vals[0][j] = 
       dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]];
 
+  for (i=0; i<d->nrows_in_plot; i++) {
+    dsp->t1d_pp_op.pdata.vals[i][0] = 
+        (d->tform.vals[d->rows_in_plot[i]][dsp->t1d.active_vars.els[0]]*
+        dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[0]]);
+    for (j=1; j<dsp->t1d.nactive; j++)
+      dsp->t1d_pp_op.pdata.vals[i][0] += 
+        (d->tform.vals[d->rows_in_plot[i]][dsp->t1d.active_vars.els[j]]*
+        dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]]);
+  }
+
   if (d->clusterid.els==NULL) printf ("No cluster information found\n");
-    for (i=0; i<nrows; i++)
-    { 
-      if (d->clusterid.els!=NULL)
-        gdata[i] = d->clusterid.els[d->rows_in_plot[i]];
-      else
-        gdata[i] = 0;
-    }
+  for (i=0; i<nrows; i++)
+  { 
+    if (d->clusterid.els!=NULL)
+      gdata[i] = d->clusterid.els[d->rows_in_plot[i]];
+    else
+      gdata[i] = 0;
+  }
 
   switch (indxtype)
   { 
     case PCA: 
-      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, pca, NULL);
+      /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
+	      dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, pca, NULL);*/
+      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
+        d->rows_in_plot, d->nrows, d->ncols, pca, NULL);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, pca, &cvp);
       break;
     case LDA: 
       alloc_discriminant_p (&dp, gdata, nrows, pdim);
-      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
+      /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
         dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 
+        discriminant, &dp);*/
+      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
+        d->rows_in_plot, d->nrows, d->ncols, 
         discriminant, &dp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, discriminant, &dp);
       free_discriminant_p (&dp);
       break;
-    case CART_GINI: 
+      /*    case CART_GINI: 
       alloc_cartgini_p (&cgp, nrows, gdata);
       dsp->t1d.ppval = t1d_calc_indx (d->tform, 
         dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols,
@@ -981,13 +984,13 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
       if (basismeth == 1)
         kout  = optimize0 (&dsp->t1d_pp_op, subd, &sp);
       free_subd_p (&sp);
-      break;
+      break;*/
     default: 
-      free (gdata);
+      g_free (gdata);
       return(true);
       break;
   }
-  free (gdata);
+  g_free (gdata);
   return(false);
 }
 
