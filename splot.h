@@ -61,13 +61,10 @@ typedef struct {
 /*
  * tour
 */
- gint n_tourvars;  /*number of variables touring */
- gint *tourvars;   /*numbers of chosen variables */
 
 /*
  * correlation tour
 */
- gint n_corrvars_x, *corrvars_x, n_corrvars_y, *corrvars_y;
 
 /*
  * brushing

@@ -193,6 +193,7 @@ static void localscan_cb (GtkToggleButton *button)
 {
   g_printerr ("local scan: %d\n", button->active);
 }
+
 static void step_cb (GtkToggleButton *tgl, GtkWidget *btn)
 {
   g_printerr ("step: %d\n", tgl->active);
@@ -200,8 +201,14 @@ static void step_cb (GtkToggleButton *tgl, GtkWidget *btn)
 }
 static void go_cb (GtkButton *button)
 {
+  displayd *dsp = current_display; 
+
   g_printerr ("go\n");
+  g_printerr ("in go_cb %f \n",dsp->tau[0]);
+
+  tour_do_step (dsp);
 }
+
 static void storebases_cb (GtkToggleButton *button)
 {
   g_printerr ("store bases: %d\n", button->active);
@@ -217,15 +224,12 @@ static void section_cb (GtkToggleButton *button)
 static void epsilon_cb (GtkAdjustment *adj, gpointer cbd) {
   g_printerr ("epsilon %f\n", adj->value);
 }
-/*
-static void
-hide_cb (GtkWidget *w ) {
+
+static void hide_cb (GtkWidget *w ) {
   gtk_widget_hide (w);
 }
-*/
 
-static void
-open_tour2dadv_popup () {
+static void open_tour2dadv_popup () {
   GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
   GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;
   GtkObject *adj;
@@ -420,6 +424,12 @@ open_tour2dadv_popup () {
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
     gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
     gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 0);
+
+    /*-- Close button --*/
+    btn = gtk_button_new_with_label ("Close");
+    gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
+                   GTK_SIGNAL_FUNC (hide_cb), (gpointer) window);
+    gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);
   }
 
   gtk_widget_show_all (window);

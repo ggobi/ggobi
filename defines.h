@@ -134,6 +134,12 @@ enum displaytyped {scatterplot, scatmat, parcoords};
 /*-- spacing for the control panels --*/
 #define VBOX_SPACING 5
 
+/*-- touring --*/
+#define TOURSTEP0 0.003
+#define TOUR_LS_IN 0
+#define TOUR_LS_OUT 1
+#define M_PI_2  1.57079632679489661923
+
 /*-- projection pursuit indices --*/
 #define NATURAL_HERMITE 0
 #define HERMITE         1

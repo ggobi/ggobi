@@ -15,10 +15,10 @@ void globals_init () {
   xg.glyph_id.size = xg.glyph_0.size = 3;
   xg.color_id = xg.color_0 = 0;
 
+  /*-- initialize arrays to NULL --*/
   arrayf_init (&xg.raw);
   arrayf_init (&xg.tform1);
   arrayf_init (&xg.tform2);
-
   arrayl_init (&xg.world);
   arrayl_init (&xg.jitter);
 
@@ -33,22 +33,22 @@ void modes_init () {
 }
 
 gboolean
-fileset_read_init(gchar *data_in)
+fileset_read_init (gchar *data_in)
 {
- gboolean ans = fileset_read(data_in);
-  if(ans) {
-        displayd *display;
+  gboolean ans = fileset_read (data_in);
+  if (ans) {
+    displayd *display;
 
-        pipeline_init ();
+    pipeline_init ();
 
-        /*-- initialize the first display --*/
-        display = scatterplot_new (false);
-        displays = g_list_append (displays, (gpointer) display);
-        display_set_current (display);
-        current_splot = (splotd *) g_list_nth_data (current_display->splots, 0);
-  }
+    /*-- initialize the first display --*/
+    display = scatterplot_new (false);
+    displays = g_list_append (displays, (gpointer) display);
+    display_set_current (display);
+    current_splot = (splotd *) g_list_nth_data (current_display->splots, 0);
+ }
 
- return(ans);
+ return (ans);
 } 
 
 
@@ -114,7 +114,6 @@ pipeline_init ()
 void
 make_ggobi (gchar *data_in, gboolean processEvents) {
   displayd *display;
-g_printerr ("(make_ggobi) data_in = %s\n", data_in);
 
   /*-- some initializations --*/
   displays = NULL;
@@ -138,7 +137,7 @@ g_printerr ("(make_ggobi) data_in = %s\n", data_in);
     }
   }
 
- if(processEvents)
+ if (processEvents)
   gtk_main ();
 }
 

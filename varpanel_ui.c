@@ -52,6 +52,8 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
           case XYPLOT:
             redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
             break;
+          case TOUR2D:
+/*            tour2d_varsel (sp, jvar, &jvar_prev, btn);*/
           default:
             break;
       }
@@ -575,9 +577,7 @@ varcircle_add (gint i, gint j, gint k)
   gtk_widget_show (vb);
 
   varlabel[k] = gtk_button_new_with_label (xg.vardata[k].collab);
-/*
-  gtk_object_set_data (GTK_OBJECT (varlabel[k]), "index", GINT_TO_POINTER (k));
-*/
+
   gtk_widget_show (varlabel[k]);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips),
     varlabel[k], "Click left to select", NULL);

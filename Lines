@@ -39,12 +39,14 @@
 18610   4/20   handling "show missings" for scatmat/parcoords displays
 18731   4/20   making the variable menus work
 18790   4/21   using queue_draw in configure_cb, forcing it elsewhere
-19089   4/21   the basics of subsetting 
-19255   4/24   the basics of the sphering ui
-20508   5/2     sphering completed; can start ggobi w/o
-                file; 'glyph size only' brushing; adv tour in a notebook;
-                display_tree (Duncan) 
-20555   5/2     beginning to add API routines; starting with brushing
+19089   4/21   basics of subsetting 
+19255   4/24   basics of the sphering ui
+20508   5/2    sphering completed; can start ggobi w/o
+               file; 'glyph size only' brushing; adv tour in a notebook;
+               display_tree (Duncan) 
+20555   5/2    beginning to add API routines; starting with brushing
+20792   5/3    added array types and functions; R-ish things (Duncan)
+21516   5/3    basics of 2d touring (Di)
 
 my personal target:  about 40.8K lines?  That's the number of lines in
 xgobi, subtracting the rpc, xgvis and tour code.

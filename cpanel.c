@@ -18,6 +18,7 @@ scatterplot_cpanel_init (cpaneld *cpanel, gint initial_mode) {
 
   cpanel_rotation_init (cpanel);
   cpanel_brush_init (cpanel);
+  cpanel_tour_init (cpanel);  /*-- tour_init, or tour2d_init? --*/
 }
 
 void

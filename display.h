@@ -69,6 +69,21 @@ typedef struct {
 */
   gint p1d_orientation;
 
+/*
+ * Tour display
+ */
+  gint ntour_vars, *tour_vars;
+  gfloat **u0, **u1, **u, **uold, **v0, **v1;
+  gfloat *tau, *tinc, dv, delta;
+  gfloat **tv;
+  gfloat ts[2], coss[2], sins[2];
+  gint icoss[2], isins[2];
+
+/*
+ * Correlation Tour
+*/
+  gint ncorrvars_x, *corrvars_x, ncorrvars_y, *corrvars_y;
+
 } displayd;
 
 

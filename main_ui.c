@@ -397,11 +397,11 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
   gchar *fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
   guint action = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (fs),
                  "action"));
-g_printerr ("fname=%s, action=%d\n", fname, action);
 
   switch (action) {
     case 0:  /*-- input: read a new set of files --*/
       if (fileset_read_init(fname)) 
+        ;
       break;
     case 1:  /*-- output: extend the current file set --*/
       break;

@@ -361,8 +361,12 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp)
           break;
 
         case XYPLOT:
-
           xy_reproject (sp,
+            (display->missing_p) ? xg.missing_world.data : xg.world.data);
+          break;
+
+        case TOUR2D:
+          tour_reproject (sp,
             (display->missing_p) ? xg.missing_world.data : xg.world.data);
           break;
       }
@@ -447,7 +451,8 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr, fcoords *tfd)
   displayd *display = (displayd *) sp->displayptr;
 
   g_return_if_fail (cpanel->projection == XYPLOT ||
-                    cpanel->projection == P1PLOT);
+                    cpanel->projection == P1PLOT ||
+                    cpanel->projection == TOUR2D);
 
 /*
  * screen to plane 

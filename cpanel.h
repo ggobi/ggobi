@@ -47,6 +47,18 @@ typedef struct {
  * scatterplot matrix
 */
  gint scatmat_selection_mode;
+
+/*
+ * touring
+*/
+ gboolean is_tour_paused;
+ gboolean is_tour_local_scan;
+ gboolean is_tour_stepping;
+ gboolean is_tour_backtracking;
+ gfloat tour_step; 
+ gint tour_ls_dir;
+ gfloat tour_path_len;
+
 } cpaneld;
 
 #define CPANEL_H
