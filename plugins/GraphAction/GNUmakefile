@@ -11,10 +11,11 @@ endif
 -include local.config
 -include $(GGOBI_HOME)/local.config
 
+include ../GNUmakefile.plugin
+
 ifdef WIN32
  GGOBI_MAKEFILE=-f Makefile.win32
 endif
-
 
 ifdef GGOBI_CONFIG
  GGOBI_INCLUDE_DIR=$(shell $(GGOBI_CONFIG) --cflags)
@@ -25,9 +26,6 @@ else
  GGOBI_LIB=-L../.. -lggobi
  CFLAGS+=$(shell cd $(GGOBI_HOME) ; $(MAKE) cflags $(GGOBI_MAKEFILE)) $(GGOBI_INCLUDE_DIR)
 endif
-
-#GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
-#GGOBI_LIB=
 
 HEADERS=graphact
 SRC=graphact init ga_cbacks
@@ -41,14 +39,7 @@ $(PKG).dll: $(OBJS) $(PKG).def
 #	$(CC) -shared -o $@ $(OBJS) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%) $(LDFLAGS)
 endif
 
-local.config:  configure
-	./configure
-
-ifndef ADMIN
-configure: configure.in
-	autoconf
-endif
-
+$(PKG).so: $(OBJS)
 
 distclean::
 	-rm -f local.config
