@@ -151,6 +151,30 @@ implies one should not need to call it frequently.)  This can even
 implicitly create and register a handler instance.
 
 
+\section{Defining Handlers}
+The handler functions all have the same  call signature
+or in other words set of arguments that they are passed.
+There are four ($4$) arguments.
+\begin{description}
+\item[key] The first is an integer containing the key identifier.
+This is a value between $0$ and $9$.
+\item[plot] Currently this is \SNull. However, in the future it will
+  be a plot identifier corresponding to an internal 
+ \CStruct{splotd} object within the \CStruct{ggobi} instance.
+\item[ggobi] This is the S object representing the \CStruct{ggobid} 
+instance. It is an object of class \SClass{ggobi} and is the same
+type as returned by a \SFunction{ggobi} and can be passed
+as the value of the \SArg{.gobi} argument in most functions in this package.
+\item[event] An S object of class \SClass{GdkEventKey} which is simply
+  a numeric value containing the address of the event object.
+It is useless after the function call so do not assign it
+elsewhere. It is entirely local. It is supplied here so that
+interested parties can write C routines to access the different
+attributes of the event as they are needed. (We would be happy to consider
+integrating such accessors into the package.)
+\end{description}
+
+
 \section{Real Examples}
 
 Debby - this spot has your name written all over it ;-)
