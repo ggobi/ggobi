@@ -387,6 +387,70 @@ tour2d_run(displayd *dsp, ggobid *gg)
   gboolean revert_random = false;
   static gfloat oindxval = -999.0;
 
+/* dfsdebug */
+{
+gfloat indxval;
+gboolean chosen, k;
+if (reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, 
+         dsp->t2d.target_basis_method, &dsp->t2d.ppval, &indxval))
+{
+/*- print what values? theses are the arguments to tour_reproj
+   tinc, v v0 v1 u uuevec-*/
+
+g_printerr ("v: ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v.vals[0][i]);
+g_printerr ("\n    ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v.vals[1][i]);
+g_printerr ("\n");
+
+g_printerr ("v0: ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v0.vals[0][i]);
+g_printerr ("\n    ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v0.vals[1][i]);
+g_printerr ("\n");
+
+g_printerr ("v1: ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v1.vals[0][i]);
+g_printerr ("\n    ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.v1.vals[1][i]);
+g_printerr ("\n");
+
+g_printerr ("u: ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u.vals[0][i]);
+g_printerr ("\n    ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.u.vals[1][i]);
+g_printerr ("\n");
+
+g_printerr ("uvevec: ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.uvevec.vals[0][i]);
+g_printerr ("\n    ");
+for (i=0; i<d->ncols; i++) g_printerr ("%f ", dsp->t2d.uvevec.vals[1][i]);
+g_printerr ("\n");
+
+for (i=0; i<d->ncols; i++) {
+  chosen = false;
+  for (k=0; k<dsp->t2d.nvars; k++) {
+    if (dsp->t2d.vars.els[k] == i) {
+      chosen = true;
+      break;
+    }
+  }
+  if (!chosen) {
+    gfloat eps = .02;
+    if (dsp->t2d.v.vals[0][i] < eps && dsp->t2d.v.vals[1][i] < eps)
+      dsp->t2d.v.vals[0][i] = dsp->t2d.v.vals[1][i] = 0.0;
+    if (dsp->t2d.v0.vals[0][i] < eps && dsp->t2d.v0.vals[1][i] < eps)
+      dsp->t2d.v0.vals[0][i] = dsp->t2d.v0.vals[1][i] = 0.0;
+    if (dsp->t2d.v1.vals[0][i] < eps && dsp->t2d.v1.vals[1][i] < eps)
+      dsp->t2d.v1.vals[0][i] = dsp->t2d.v1.vals[1][i] = 0.0;
+    if (dsp->t2d.u.vals[0][i] < eps && dsp->t2d.u.vals[1][i] < eps)
+      dsp->t2d.u.vals[0][i] = dsp->t2d.u.vals[1][i] = 0.0;
+  }
+}
+}
+}
+/* dfsdebug end */
+
   if (!dsp->t2d.get_new_target && 
        !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr, 
          dsp->t2d.target_basis_method, &dsp->t2d.ppval, &oindxval)) {
