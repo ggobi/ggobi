@@ -689,6 +689,7 @@ make_ui (ggobid *gg)
 {
   GtkWidget *window;
   GtkWidget *hbox, *vbox, *entry;
+  GtkWidget *basement;
 
   gg->tips = gtk_tooltips_new ();
 
@@ -783,6 +784,12 @@ make_ui (ggobid *gg)
 
   gtk_widget_show_all (hbox);
 
+  /* -- do not map or show this widget -- */
+  basement = gtk_vbox_new(false, 0);
+  gtk_widget_set_name (basement, "BASEMENT");
+  gtk_box_pack_start (GTK_BOX (hbox), basement, false, false, 0);
+  /* -- do not map or show this widget -- */
+  
   /*-- at this point, the mode could be NULLMODE, P1PLOT, or XYPLOT --*/
   /*mode_submenus_activate (NULL, gg->viewmode, on, gg);*/
   {

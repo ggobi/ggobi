@@ -78,7 +78,6 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
             gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
             gtk_widget_show_all (box);
 #if GTK_MAJOR_VERSION == 1
-/*g_printerr ("ref_count: %d\n", GTK_OBJECT (box)->ref_count); */
             if (GTK_OBJECT (box)->ref_count > 1)
 #else
             if (G_OBJECT (box)->ref_count > 1)
@@ -232,7 +231,7 @@ manip_select_cb (GtkWidget *w, GdkEvent *event, datad *d)
 
   d->vcirc_ui.cursor = gdk_cursor_new (GDK_HAND2);
   gdk_window_set_cursor (window, d->vcirc_ui.cursor);
-  d->vcirc_ui.jcursor = (gint )GDK_HAND2;
+  d->vcirc_ui.jcursor = (gint)GDK_HAND2;
   
   return true;
 }
@@ -286,6 +285,9 @@ da_freeze_expose_cb (GtkWidget *w, GdkEvent *event, datad *d)
 void
 varcircles_show (gboolean show, datad *d, displayd *display, ggobid *gg)
 {
+  GtkWidget *basement = widget_find_by_name (gg->main_window, "BASEMENT");
+  GtkWidget *parent = (d->vcirc_ui.ebox)->parent;
+
   if (show) {
     /*
      * Add the ebox for the table of variable circles/rectangles
@@ -293,26 +295,36 @@ varcircles_show (gboolean show, datad *d, displayd *display, ggobid *gg)
     */
     if (display)
       varcircles_visibility_set (display, gg);
-    gtk_paned_pack2 (GTK_PANED (d->varpanel_ui.hpane),
-      d->vcirc_ui.ebox, true, true);
+
+    /* reparent the variable circles */
+    if (parent == basement) {
+      gtk_widget_ref (d->vcirc_ui.ebox);
+      gtk_container_remove (GTK_CONTAINER(basement), d->vcirc_ui.ebox);
+      gtk_paned_pack2 (GTK_PANED (d->varpanel_ui.hpane),
+        d->vcirc_ui.ebox, true, true);
+      gtk_widget_show (d->vcirc_ui.ebox);
+    } else if (parent == NULL) {
+      gtk_paned_pack2 (GTK_PANED (d->varpanel_ui.hpane),
+        d->vcirc_ui.ebox, true, true);
+    }
+
 #ifndef GTK_2_0
     gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 10);
 #endif
     gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 15);
 
-    /*-- update the reference count for the ebox --*/
-#if GTK_MAJOR_VERSION == 1
-    if (GTK_OBJECT (d->vcirc_ui.ebox)->ref_count > 1)
-#else
-    if (G_OBJECT (d->vcirc_ui.ebox)->ref_count > 1)
-#endif
-      gtk_widget_unref (d->vcirc_ui.ebox);
-
   } else {
     /*-- remove circles/rectangles --*/
-    gtk_widget_ref (d->vcirc_ui.ebox);
-    gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.hpane),
-                                         d->vcirc_ui.ebox);
+
+    if (parent == d->varpanel_ui.hpane) {
+      gtk_widget_hide (d->vcirc_ui.ebox);
+      gtk_widget_ref (d->vcirc_ui.ebox);
+      gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.hpane),
+                                           d->vcirc_ui.ebox);
+      gtk_box_pack_start (GTK_BOX(basement), d->vcirc_ui.ebox, false, false, 0);
+    }
+
+
 #ifndef GTK_2_0
     gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
 #endif
@@ -322,12 +334,14 @@ varcircles_show (gboolean show, datad *d, displayd *display, ggobid *gg)
 
 
     /*-- adjust the reference count --*/
+    /*
 #if GTK_MAJOR_VERSION == 1
     if (GTK_OBJECT (d->vcbox_ui.ebox)->ref_count > 1)
 #else
     if (G_OBJECT (d->vcbox_ui.ebox)->ref_count > 1)
 #endif
-      gtk_widget_unref (d->vcbox_ui.ebox);
+        gtk_widget_unref (d->vcbox_ui.ebox);
+    */
   }
 }
 
