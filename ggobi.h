@@ -91,7 +91,7 @@ typedef struct _PrintOptions PrintOptions;
 struct _ggobid {
 
     /** 
-       
+       A tree 
      */
  DisplayTree display_tree;
  GList *displays;
