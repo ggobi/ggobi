@@ -154,14 +154,6 @@ main_ui.o: write_xml.h
 read_xml.o: read_xml.h
 endif
 
-ifdef USE_MYSQL
- CFLAGS+= $(MYSQL_INCLUDE_DIRS:%=-I%) -DUSE_MYSQL=1 -Wall $(PROPERTIES_INCLUDE_DIR:%=-I%) 
- MYSQL_LIBS=-lProps -lmysqlclient $(MYSQL_LIB_DIRS:%=-L%) $(MYSQL_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %) $(PROPERTIES_LIB_DIR:%=$(DL_RESOLVE_FLAG) %) $(PROPERTIES_LIB_DIR:%=-L%)
- SRC+=read_mysql.c
- OB+=read_mysql.o
-  LD=$(CXX)
-endif
-
 OB+=mt19937-1.o cokus.o  
 
 ifdef USE_DBMS
@@ -250,20 +242,6 @@ dbms.c: dbms.h  ggobi.h
 ifdef USE_PROPERTIES
 dbms_ui.o: dbms_ui.c dbms_ui.h
 	$(CXX) `gtk-config --cflags` $(CFLAGS) -c $<
-endif
-
-
-ifdef USE_MYSQL
-read_mysql.o: read_mysql.c read_mysql.h
-	$(CXX) `gtk-config --cflags` $(CFLAGS) -c $<
-
-sql: read_mysql.o
-	$(CC) -o $@ read_mysql.o $(MYSQL_LIBS)
-
-sqldep:
-	$(CC) -M $(CFLAGS) read_mysql.c
-
-make_ggobi.o: read_mysql.h
 endif
 
 

@@ -9,6 +9,10 @@ endif
 include local.config
 -include $(GGOBI_HOME)/local.config
 
+ifdef ADMIN
+ include Install/GNUmakefile.admin
+endif
+
 
 ifdef GTK_EXTRA_CONFIG
  GTKEXTRA_INCLUDES=$(shell $(GTK_EXTRA_CONFIG) --cflags)

@@ -1,5 +1,9 @@
 PKG=FileSelect
 
+ifdef ADMIN
+ include Install/GNUmakefile.admin
+endif
+
 -include local.config
 
 GTK_EXTRA_INCLUDE_DIR=$(shell $(GTK_EXTRA_CONFIG) --cflags)

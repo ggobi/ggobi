@@ -1,16 +1,22 @@
 \documentclass{article}
+\usepackage{hyperref}
 \usepackage{comment}
 \input{pstricks}
 \input{WebMacros}
 \input{CMacros}
+\input{MakeMacros}
 \input{XMLMacros}
+
+\def\file#1{\href{#1}{\Escape{#1}}}
 
 \usepackage{times}
 \usepackage{fullpage}
 
+
 \title{Extending GGobi's Functionality with Plugins}
-\author{Duncan Temple Lang\\
-Debby Swayne}
+\author{\href{http://cm.bell-labs.com/stat/duncan}{Duncan Temple Lang}\\
+\href{http://www.research.att.com/~dfs}{Debby Swayne}
+}
 \begin{document}
 \maketitle
 \begin{abstract}
@@ -384,6 +390,49 @@ the plugin by providing a value for the \flag{-datamode} argument.
 \Croutine{fileset_generate} reads this value (stored in the session
 options) by looking through the known input formats.
 
+
+
+\section{Creating a Plugin}
+
+\subsection{Installation}
+
+First, create the usual files.
+\begin{table}[htbp]
+  \begin{center}
+    \leavevmode
+    \begin{tabular}{ll}
+\file{configure.in} & the autoconf script that
+attempts to determine the parametrs for this system.
+\\
+\file{local.config.in} & 
+a simple file that is included by \file{GNUmakefile}
+that defines the variables specific for this system. \\
+\file{GNUmakefile} &  the top of this should contain
+\vbox{
+\begin{verbatim}
+ifdef ADMIN
+ include Install/GNUmakefile.admin
+endif
+\end{verbatim}
+}\\
+C source &  List these as the value of the variable \MakeVariable{SRC} in 
+\file{GNUmakefile}. \\
+\dir{Install}/GNUmakefile.admin & 
+ copy this from an existing plugin and change the
+value of the \MakeVariable{DIR_NAME}
+variable.
+\\ 
+\file{plugin.xml} & \\
+    \end{tabular}
+    \caption{Basic files for a plugin}
+    \label{tab:pluginFiles}
+  \end{center}
+\end{table}
+
+
+To add a plugin to the distribution, one appends the name of the
+plugin directory to the definition of the variable
+\MakeVariable{PLUGIN_DIRS} in the \file{Install/GNUmakefile.admin}.
 
 
 

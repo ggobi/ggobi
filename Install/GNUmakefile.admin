@@ -1,7 +1,7 @@
 PKG_NAME=ggobi
 
 USE_XML=1
-USE_MYSQL=1
+USE_DBMS=1
 
 createDist:
 
@@ -13,8 +13,11 @@ PDFLATEX=pdflatex
 TAR=tar
 
 DIRS=\
-   src include lib bin Docs data gtkext/src gtkext/include examples
+   src include lib bin Docs data gtkext/src gtkext/include examples \
+   plugins
 
+
+PLUGIN_DIRS=MySQL Postgres DataViewer FileSelector TestInput TestPlugin 
 
 DATA_SRC_FILES=\
    flea.col flea.colors flea.dat flea.doc flea.glyphs flea.row \
@@ -36,13 +39,13 @@ DOC_TEX_FILES=\
 
 DOC_EXTENSION=pdf
 
-DOC_FILES=$(DOC_TEX_FILES:%=notes/%.$(DOC_EXTENSION)) notes/ggobi.css notes/EmbeddingFAQ.html notes/plotLayout.html $(shell find notes -name '*.jpg')
+DOC_FILES=$(DOC_TEX_FILES:%=Docs/%.$(DOC_EXTENSION)) Docs/ggobi.css Docs/EmbeddingFAQ.html Docs/plotLayout.html $(shell find notes -name '*.jpg')
 
 C_SRC_FILES=$(SRC) $(XML_SRC) xmlConvert.c 
 
 C_HEADER_FILES=\
   GGobiAPI brushing cpanel datad defines display display_tree \
-  externs ggobi noop-checkbutton read_mysql read_xml  \
+  externs ggobi noop-checkbutton read_xml  \
   splot types vars varseldata write_xml writedata vartable gtkext fileio \
   print tour1d_pp tour2d_pp tour_pp splash read_init write_state \
   plugin colorscheme \
@@ -83,6 +86,7 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
 	cp $(LGPL_SRC) $(TMP_INSTALL_DIR)/gtkext/src
 	cp $(LGPL_HEADERS) $(TMP_INSTALL_DIR)/gtkext/include
 	cp Install/GNUmakefile_gtkext.in $(TMP_INSTALL_DIR)/gtkext/src/GNUmakefile.in
+	$(MAKE) ADMIN=1 copyPlugins
 
 
 CUR_DIR=$(shell pwd)
@@ -113,3 +117,7 @@ $(XML_TAR_FILE) xmlTar: createDist
 notes/%.ps: notes/%.tex
 	$(MAKE) -C $(@D) $(@F)
 
+copyPlugins:
+	for f in $(PLUGIN_DIRS) ; do \
+	   $(MAKE) ADMIN=1 -C plugins/$$f createDist INSTALL_DIR=$(TMP_INSTALL_DIR)/plugins ; \
+	done

@@ -24,22 +24,30 @@ fi
 
 GGOBI_HOME=`pwd` 
 
-AC_ARG_ENABLE(embed, [--enable-embed Build the ggobi library for embedding in other applications (e.g. R)])
+AC_ARG_ENABLE(embed, [--enable-embed          Build the ggobi library for embedding in other applications (e.g. R)])
 
-AC_ARG_ENABLE(debug, [--enable-debug Compile with debugging symbols])
+AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
 
 
-AC_ARG_WITH(prefix, [--with-prefix Specify where the files are to be installed (default /usr/local/).],INSTALL_DIR=${with_prefix},INSTALL_DIR="/usr/local")
+AC_ARG_WITH(prefix, [--with-prefix          Specify where the files are to be installed (default /usr/local/).],INSTALL_DIR=${with_prefix},INSTALL_DIR="/usr/local")
 
-AC_ARG_WITH(xml, --with-xml Enable reading and writing of XML datasets.,,with_xml="yes")
+AC_ARG_WITH(xml, --with-xml          Enable reading and writing of XML datasets.,,with_xml="yes")
 LIBXML_VERSION="2.4.1"
 
-AC_ARG_WITH(mysql, --with-mysql Enable reading data from MySQL databases., USE_MYSQL=1)
-AC_ARG_WITH(postgres, --with-postgres Enable reading data from Postgres databases., USE_POSTGRES=1)
+AC_ARG_WITH(mysql, --with-mysql          Enable plugin for reading data from MySQL databases., 
+              MYSQL_PLUGIN=1; PLUGIN_DIRS="MySQL"; ENABLE_PLUGINS=1)
 
-AC_ARG_WITH(R,--with-R Install the Rggobi package)
-AC_ARG_WITH(Python,--with-Python Install the Pythonggobi module)
-AC_ARG_WITH(Perl,--with-Perl Install the Perlggobi module)
+AC_ARG_WITH(postgres, --with-postgres          Enable plugin reading data from Postgres databases., 
+             POSTGRES_PLUGIN=1; PLUGIN_DIRS="${PLUGIN_DIRS} Postgres"; ENABLE_PLUGINS=1)
+AC_ARG_WITH(dataviewer, --with-dataviewer          Enable plugin for viewig data in a datagrid., 
+              DATAVIEWER_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DataViewer"; ENABLE_PLUGINS=1)
+AC_ARG_WITH(fileselector,--with-fileselector          Enable GtkExtra file selector plugin, 
+              FILESELECTOR_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} FileSelector" ; ENABLE_PLUGINS=1)
+
+
+AC_ARG_WITH(R,--with-R          Install the Rggobi package)
+AC_ARG_WITH(Python,--with-Python          Install the Pythonggobi module)
+AC_ARG_WITH(Perl,--with-Perl          Install the Perlggobi module)
 
  dnl Check for gtk-config.
  dnl We are not going anywhere without that.
@@ -288,67 +296,6 @@ if test -n "${with_R}" && test "${with_R}" != "no" ; then
 fi
 
 
-
-if test -n "${USE_MYSQL}" ; then
-
- echo "with_mysql: ${with_mysql}"
-
- MYSQL_SRC=read_mysql.c
-
- if test -d ${with_mysql} ; then
-  MYSQL_INC_DIRS=$with_mysql
-  MYSQL_LIB_DIRS=$with_mysql
- fi
-
-   dnl Now find libmysqlclient
-  
- if test -z "${MYSQL_INC_DIRS}" ; then
-
-   ORIG_CPPFLAGS=$CPPFLAGS
-   for f in ${DEFAULT_INC_DIRS} ; do 
-     for ext in "/" "/mysql" ; do
-
-      CPPFLAGS="${ORIG_CPPFLAGS} -I$f$ext"
-echo "Checking $f$ext"
-       if test -f $f$ext/mysql.h ; then
-         MYSQL_INC_DIRS=$f$ext 
-       fi
-dnl      AC_CHECK_HEADER(mysql.h, MYSQL_INC_DIRS=$f$ext)
-
-      if test -n "${MYSQL_INC_DIRS}" ; then
-        echo "Found MYSQL include file(s): $MYSQL_INC_DIRS"
-        break
-      fi
-
-     done
-   done
-
- fi # end of test -z "${MYSQL_INC_DIRS}"
-
-
-
- if test -z "${MYSQL_LIB_DIRS}" ; then
-
-   ORIG_LIBS=$LIBS
-   LIBS="$LIBS -L/usr/lib"
-   AC_CHECK_LIB(xml,xmlCreateFileParserCtxt)
-   if test -z "${HAVE_LIBxml}" ; then
-    echo "Cannot find libxml"
-    exit 1;
-   else
-     echo "Using libmysql from ${LIBS}"
-   fi
-
- fi
-
-  USE_MYSQL="USE_MYSQL=1"
-  MYSQL_DEPENDS="lib/libProps.so"
-else
-  MYSQL_DEPENDS=""
-fi
-
-AC_SUBST(MYSQL_DEPENDS)
-
 TOP=`pwd`
 MV=mv
 
@@ -356,6 +303,7 @@ MV=mv
 if test "${enable_embed}" = "yes" ; then
    EMBED="lib/libggobi.so"
 fi
+
 
 
 dnl At this point, we have done most of the system-specific computations
@@ -430,6 +378,12 @@ AC_SUBST(OS_INFO)
 AC_SUBST(GGOBI_VERSION_STRING)
 AC_SUBST(GGOBI_RELEASE_DATE)
 
+
+if test -n "${PLUGIN_DIRS}" ; then
+ PLUGIN_DIRS="${PLUGIN_DIRS} TestPlugin"
+fi
+AC_SUBST(PLUGIN_DIRS)
+
  dnl These go into config.h as #define entries.
 AC_DEFINE_UNQUOTED(GGOBI_VERSION_STRING, "$GGOBI_VERSION_STRING")
 AC_DEFINE_UNQUOTED(GGOBI_RELEASE_DATE, "$GGOBI_RELEASE_DATE")
@@ -446,3 +400,20 @@ AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.
 dnl Ensure the resulting ggobi scripts executable.
 chmod +x bin/ggobi
 chmod +x bin/ggobi-config
+
+if test -n "${PLUGIN_DIRS}" ; then
+ echo "Enabling plugins"
+ export GGOBI_ROOT
+
+ for p in ${PLUGIN_DIRS} ; do 
+   echo
+   echo "Configuring plugin $p"
+   if test -x plugins/$p/configure ; then
+      (cd plugins/$p ; ./configure)
+   fi
+   echo "Configured plugin $p"
+   echo
+ done 
+fi
+
+

@@ -1,0 +1,8 @@
+ifndef GGOBI_HOME
+ GGOBI_HOME=../..
+endif
+
+DIR_NAME=MySQL
+
+include $(GGOBI_HOME)/plugins/GNUmakefile.Plugin
+

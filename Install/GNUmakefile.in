@@ -8,8 +8,11 @@ INSTALL=@INSTALL_DIR@
 XML_UTILS=@XML_UTILS@
 
 UTILS=$(XML_UTILS:%=bin/%)
+PLUGIN_DIRS=@PLUGIN_DIRS@
 
-all: lib/libgtkext.so bin/ggobi.bin @EMBED@ $(UTILS) @PACKAGES@
+CUR_DIR=$(shell pwd)
+
+all: lib/libgtkext.so bin/ggobi.bin @EMBED@ $(UTILS) @PACKAGES@ Plugins
 
 .PHONY:	lib Rggobi Pythonggobi Perlggobi
 
@@ -31,6 +34,14 @@ install:
 
 Rggobi: lib/libggobi.so
 	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)
+
+
+Plugins: 
+	if test -n "${PLUGIN_DIRS}" ; then \
+	  for f in $(PLUGIN_DIRS) ; do \
+	    $(MAKE) -C plugins/$$f GGOBI_CONFIG=$(CUR_DIR)/bin/ggobi-config ; \
+	  done \
+	fi 
 
 clean:
 	for f in src gtkext/src ; do \
