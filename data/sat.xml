@@ -1,22 +1,21 @@
 <?xml version="1.0"?>
-<!DOCTYPE xgobidata SYSTEM "xgobi.dtd">
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
-<ggobidata count="1">
-
+<ggobidata>
 <data name="SAT scores">
 <description>
 </description>
 <variables count="10">
-<variable>STATE</variable>
-<variable>SAT</variable>
-<variable>EXPEND</variable>
-<variable>PERPUPIL</variable>
-<variable>ENROLL</variable>
-<variable>TEACHERS</variable>
-<variable>RATIO</variable>
-<variable>SALARY</variable>
-<variable>ATTEND</variable>
-<variable>COMPUTER</variable>
+ <variable>STATE</variable>
+ <variable>SAT</variable>
+ <variable>EXPEND</variable>
+ <variable>PERPUPIL</variable>
+ <variable>ENROLL</variable>
+ <variable>TEACHERS</variable>
+ <variable>RATIO</variable>
+ <variable>SALARY</variable>
+ <variable>ATTEND</variable>
+ <variable>COMPUTER</variable>
 </variables>
 <records count="51">
 <record label="Alabama" color="0" glyph="fc 3">
@@ -173,4 +172,5 @@
 51.000 978.000 491930.000 5375.000 97793.000 6693.000 14.600 27685.000 91515.000 7566.000
 </record>
 </records>
+</data>
 </ggobidata>

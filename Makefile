@@ -79,7 +79,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
 
 # Needs to be \ for windows
 # Does glib/gtk have something for this
-CFLAGS+= -DDIR_SEPARATOR="'/'" -DMALLOC_CHECK_=2
+CFLAGS+= -DDIR_SEPARATOR="'/'"
 
 ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c
