@@ -455,12 +455,14 @@ void cluster_table_update(datad * d, ggobid * gg)
   }
 }
 
-static void exclusion_notebook_adddata_cb(GtkObject * obj, datad * d,
-                                          ggobid * gg,
-                                          GtkWidget * notebook)
+static void 
+exclusion_notebook_adddata_cb(ggobid *gg, datad * d, void* notebook)
 {
   cluster_table_update(d, gg);
 }
+
+CHECK_EVENT_SIGNATURE(exclusion_notebook_adddata_cb, datad_added_f)
+
 
 void cluster_window_open(ggobid * gg)
 {

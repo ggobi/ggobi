@@ -115,7 +115,7 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
 
   /*-- emit variable_added signal --*/
   gtk_signal_emit (GTK_OBJECT (gg),
-                   GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, d->ncols-1, gg); 
+                   GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, d->ncols-1, d); 
 }
 
 /*
@@ -153,7 +153,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
 
   /*-- emit variable_added signal --*/
   gtk_signal_emit (GTK_OBJECT (gg),
-                   GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, d->ncols -1, gg); 
+                   GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, d->ncols -1, d); 
 }
 
 void
@@ -196,7 +196,7 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
     /*-- emit variable_added signal. Is n the correct index? --*/
     gtk_signal_emit (GTK_OBJECT (gg),
-                     GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, n, gg); 
+                     GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, n, d); 
   }
 
   /*
@@ -342,7 +342,7 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   /*-- doesn't need to give a variable index any more, really --*/
   vt = vartable_element_get (cols[d->ncols-1], d);
   gtk_signal_emit (GTK_OBJECT (gg),
-                   GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], gg); 
+                   GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], d); 
 
   /*-- run the first part of the pipeline  --*/
   tform_to_world (d, gg);

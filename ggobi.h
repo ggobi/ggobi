@@ -553,4 +553,11 @@ void gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject * object,
 extern GSList *ExtendedDisplayTypes;
 typedef GtkType(*GtkTypeLoad) (void);
 
+
+#ifdef CHECK_EVENT_SIGNATURES
+#include "GGobiEvents.h"
+#else
+#define CHECK_EVENT_SIGNATURE(x,y) 
+#endif
+
 #endif

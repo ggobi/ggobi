@@ -174,8 +174,9 @@ include_all_cb (GtkWidget *w, ggobid *gg) {
   }
 }
 
-static void subset_clist_datad_added_cb (GtkObject *obj, datad *d,
-  ggobid *gg, GtkWidget *clist)
+
+static void 
+subset_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
 {
   gchar *row[1];
   GtkWidget *swin = (GtkWidget *)
@@ -183,11 +184,13 @@ static void subset_clist_datad_added_cb (GtkObject *obj, datad *d,
 
   subset_init (d, gg);
   row[0] = g_strdup (d->name);
-  gtk_clist_append (GTK_CLIST (clist), row);
+  gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
   g_free (row[0]);
 
   gtk_widget_show_all (swin);
 }
+
+CHECK_EVENT_SIGNATURE(subset_clist_datad_added_cb,datad_added_f)
 
 /*------------------------------------------------------------------*/
 

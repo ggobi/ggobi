@@ -28,6 +28,11 @@ test_brush_motion_cb(char *userData, ggobid *gg, splotd *sp, GdkEventMotion *ev,
     fprintf(stderr, "brush motion callback (gg) %p (sp) %p (ev) %p, (userData) %s\n", gg, sp, ev, userData);fflush(stderr);
 }
 
+CHECK_EVENT_SIGNATURE(test_brush_motion_cb, brush_motion_f)
+CHECK_EVENT_SIGNATURE(test_point_move_cb, move_point_f)
+CHECK_EVENT_SIGNATURE(test_new_plot_cb, splot_new_f)
+CHECK_EVENT_SIGNATURE(test_sticky_points, sticky_point_added_f)
+CHECK_EVENT_SIGNATURE(test_sticky_points, sticky_point_removed_f)
 /*
   use gtk_signal_connect_object()
  */
@@ -38,6 +43,8 @@ test_new_plot_cb(void *userData, splotd *sp, ggobid *gg, GtkWidget *srcWidget)
   gtk_signal_connect_object(GTK_OBJECT(sp->da), "brush_motion", test_brush_motion_cb, (gpointer)"My brushing");
   gtk_signal_connect_object(GTK_OBJECT(sp->da), "move_point", test_point_move_cb, (gpointer)"My moving");
 }
+
+CHECK_EVENT_SIGNATURE(test_variable_select, select_variable_f)
 
 /*
   use gtk_signal_connect() rather than ...._object().

@@ -108,7 +108,7 @@ void setNodePositions (ggvisd *, datad *);
 void radial_cb (GtkButton *button, PluginInstance *inst);
 void highlight_edges_cb (GtkButton *button, PluginInstance *inst);
 ggvisd* GGVisFromInst (PluginInstance *inst);
-void highlight_sticky_edges (GtkWidget *, gint, gint , datad *d, PluginInstance *inst);
+void highlight_sticky_edges (ggobid *, gint, gint , datad *d, void *inst);
 
 #define GGVIS_H
 #endif

@@ -346,11 +346,11 @@ variable_notebook_subwindow_add (datad *d,
 }
 
 static void 
-variable_notebook_adddata_cb (ggobid *gg, datad *d, GtkWidget *notebook)
+variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
 {
   GtkSignalFunc func = NULL;
   variable_notebook_subwindow_add (d, func, notebook, gg);
-  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_OBJECT(notebook)),
                               g_slist_length (gg->d) > 1);
 }
 
@@ -405,23 +405,24 @@ get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist)
 }
 /*-------------------------------------------------------------------------*/
 
+
 /*
 * Notice that this callback could be used to respond to any
 * change in the variable list, because it doesn't count the
 * number of variables; it just clears the list and then
 * rebuilds it.
 */
-void variable_notebook_varchange_cb (GtkObject *obj, vartabled *vt,
-  ggobid *gg, GtkWidget *notebook)
+void 
+variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which, datad *data, void *notebook)
 {
   GtkWidget *swin, *clist;
 
   /*-- add one or more variables to this datad --*/
-  datad *d = (datad *) datad_get_from_notebook (notebook, gg);
+  datad *d = (datad *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
   gint kd = g_slist_index (gg->d, d);
 
   /*-- get the clist associated with this data; clear and rebuild --*/
-  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), kd);
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (GTK_WIDGET(notebook)), kd);
   if (swin) {
     gint j;
     gchar *row[1];
@@ -437,6 +438,17 @@ void variable_notebook_varchange_cb (GtkObject *obj, vartabled *vt,
     }
   }
 }
+
+
+void 
+variable_notebook_list_changed_cb(ggobid *gg, datad *d, void *notebook)
+{
+  variable_notebook_varchange_cb(gg, NULL, -1, d, notebook);
+}
+
+CHECK_EVENT_SIGNATURE(variable_notebook_adddata_cb, datad_added_f)
+CHECK_EVENT_SIGNATURE(variable_notebook_varchange_cb, variable_added_f)
+CHECK_EVENT_SIGNATURE(variable_notebook_list_changed_cb, variable_list_changed_f)
 
 GtkWidget *
 create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 

@@ -321,6 +321,10 @@ create_ggobi_sheet(datad *data, ggobid *gg)
 }
 
 
+CHECK_EVENT_SIGNATURE(brush_change, brush_motion_f)
+CHECK_EVENT_SIGNATURE(move_point_value, move_point_f)
+CHECK_EVENT_SIGNATURE(identify_cell, identify_point_f)
+
 /** 
   Register signal handlers for GGobi events on the particular splot.
  */

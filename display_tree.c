@@ -18,10 +18,11 @@
  */
 
 static void
-update_display_tree_plots_by_variable(DisplayTree *tree, datad *d, gint whichVar, splotd *sp, ggobid *gg)
+update_display_tree_plots_by_variable(ggobid *gg, datad *d, gint whichVar, splotd *sp, void *dtree)
 {
     displayd *dpy = sp->displayptr;
     int i, n;
+    DisplayTree *tree = (DisplayTree *) dtree;
 
     GtkWidget *subTree;
     GList *kids;
@@ -65,6 +66,7 @@ update_display_tree_plots_by_variable(DisplayTree *tree, datad *d, gint whichVar
     }
 }
 
+CHECK_EVENT_SIGNATURE(update_display_tree_plots_by_variable, select_variable_f)
 
 /*
   Create a window displaying a hierarchical
@@ -104,10 +106,10 @@ plot_tree_display(ggobid *gg)
   gtk_window_set_title(GTK_WINDOW(plot_tree_window), "GGobi Displays");
   gtk_widget_set_usize(plot_tree_window, 250, 300);
 
-  gtk_signal_connect_object(GTK_OBJECT(gg),
-			    "select_variable",
-			    (GtkSignalFunc) update_display_tree_plots_by_variable,
-			    (gpointer) &gg->display_tree);
+  gtk_signal_connect(GTK_OBJECT(gg),
+		     "select_variable",
+		     (GtkSignalFunc) update_display_tree_plots_by_variable,
+	             (gpointer) &gg->display_tree);
 
  } else {
    g_printerr("The display tree is already visible. It should be correct!\n");

@@ -22,7 +22,9 @@ endif
 GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
 #GGOBI_LIB=
 
-CFLAGS+=-g $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags) $(XML_INC_DIRS:%=-I%)
+#CFLAGS+=-g $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags) $(XML_INC_DIRS:%=-I%)
+CFLAGS+=$(shell cd $(GGOBI_HOME) ; make cflags) $(GGOBI_INCLUDE_DIR)
+
 
 # used to comment out sections of code for incompletely
 # implemented or buggy functionality

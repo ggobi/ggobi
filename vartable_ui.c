@@ -48,13 +48,15 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
   g_free (cols);
 }
 
-static void vartable_notebook_adddata_cb (GtkObject *obj, datad *d,
-  ggobid *gg, GtkWidget *notebook)
+static void 
+vartable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
 {
   vartable_subwindow_init (d, gg);
-  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_WIDGET(notebook)),
     g_slist_length (gg->d) > 1);
 }
+CHECK_EVENT_SIGNATURE(vartable_notebook_adddata_cb, datad_added_f)
+
 
 /* not implemented
 static void
@@ -872,6 +874,8 @@ vartable_subwindow_init (datad *d, ggobid *gg)
     GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
     150);
 }
+
+
 
 void
 vartable_open (ggobid *gg)

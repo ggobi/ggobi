@@ -88,7 +88,7 @@ spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos)
         fx[a] -= xf;
         fy[a] -= yf;
       }
-      else {        // jitter overlapping points
+      else {        /* jitter overlapping points */
         gdouble FUZZ = .2;  /* Lee didn't specify this */
         xf += FUZZ*(randvalue() - .5);
         yf += FUZZ*(randvalue() - .5);
@@ -110,7 +110,7 @@ spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos)
           xf += (dx / dst);
           yf += (dy / dst);
         }
-        else {        // jitter
+        else {        /* jitter */
           gdouble FUZZ = .2;  /* Lee didn't specify this */
           xf += FUZZ*(randvalue() - .5);
           yf += FUZZ*(randvalue() - .5);

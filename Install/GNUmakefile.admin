@@ -58,7 +58,8 @@ C_HEADER_FILES=\
   print \
   dbms dbms_ui \
   scatterplotClass \
-  scatmatClass parcoordsClass 
+  scatmatClass parcoordsClass  \
+  GGobiEvents
 
 
 Install/configure: Install/configure.in

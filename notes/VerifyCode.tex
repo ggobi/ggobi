@@ -1,0 +1,28 @@
+\documentclass{article}
+
+\begin{document}
+
+\section{Event Callbacks}
+If one compiles with \CppMacro{CHECK_EVENT_SIGNATURES} defined as a
+pre-processor symbol (set \MakeVariable{DEFINES} in
+\file{local.config} to \texttt{-DCHECK_EVENT_SIGNATURES=1}),
+additional code is compiled that checks the different callback
+functions currently in use in GGobi for GGobi-generated (i.e. not Gtk
+widget generated) events.
+When one adds a callback, please add
+a line in the file scope to test the routine.
+\begin{verbatim}
+ CHECK_EVENT_SIGNATURE(myRoutine, event_name_f)
+\end{verbatim}
+For example 
+\begin{verbatim}
+CHECK_EVENT_SIGNATURE(exclusion_notebook_adddata_cb, datad_added_f)
+\end{verbatim}
+in \file{exclusion_ui.c} checks that the C routine
+\Croutine{exclusion_notebook_adddata_cb} is defined appropriately for
+the \texttt{datad_added} signals.  This should be done in plugins,
+etc.  and will give some warning when compiled with maximum warning
+levels on for the compiler (e.g -Wall in gcc).
+
+
+\end{document}

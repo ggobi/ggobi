@@ -141,7 +141,7 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
                                          GTK_RUN_LAST | GTK_RUN_ACTION,
                                          gtk_marshal_NONE__POINTER,
                                          GTK_TYPE_NONE, 1,
-                                         GTK_TYPE_GGOBI);
+                                         GTK_TYPE_GGOBI_DATA);
   }
 
   if (gtk_signal_lookup("sticky_point_added", GTK_TYPE_GGOBI) == 0) {

@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <math.h>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #include "plugin.h"
 #include "ggvis.h"
 
@@ -106,6 +110,9 @@ hasPathToCenter (noded *n, noded *referringnode, datad *d, datad *e,
 /*                   callbacks                                     */
 /*-----------------------------------------------------------------*/
 
+CHECK_EVENT_SIGNATURE(highlight_sticky_edges, sticky_point_added_f)
+CHECK_EVENT_SIGNATURE(highlight_sticky_edges, sticky_point_removed_f)
+
 void radial_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
@@ -114,7 +121,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   datad *e = gg->current_display->e;
   gboolean init;
 /*-- to add variables --*/
-  gint i, k, nP, nC, nS;
+  gint i, nP, nC, nS;
   gdouble *x, *y, *depth, *inDegree, *outDegree;
   gdouble *nParents, *nChildren, *nSiblings;
   gchar *name;
@@ -295,10 +302,10 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
   }
 }
 
-void highlight_sticky_edges (GtkWidget *w, gint index, gint state, datad *d,
-  PluginInstance *inst)
+void highlight_sticky_edges (ggobid *gg, gint index, gint state, datad *d,
+  void *data)
 {
-  ggobid *gg = inst->gg;
+  PluginInstance *inst = (PluginInstance *)data;
   ggvisd *ggv = GGVisFromInst (inst);
   datad *e = gg->current_display->e;
   noded *n, *n1;
@@ -368,7 +375,7 @@ void highlight_sticky_edges (GtkWidget *w, gint index, gint state, datad *d,
 */
 void
 initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e) {
-  gint i, k, nn;
+  gint i, nn;
   noded *na, *nb;
   gint nnodes = d->nrows;
   gint nedges = e->edge.n;
@@ -473,7 +480,7 @@ setParentNodes (ggvisd *ggv, datad *d) {
   centerNode->parentNode = NULL;
   setNStepsToCenter (centerNode, NULL, d);
 
-  // find the maximum number of steps from the center
+  /* find the maximum number of steps from the center */
   ggv->radial->nStepsToCenter = 0;
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot[m];
@@ -598,7 +605,7 @@ setSubtreeSpans (ggvisd *ggv, datad *d) {
 
 /*---------------------------------------------------------------------*/
 
-  // Set the node positions for the 2nd and later rings.
+/* Set the node positions for the 2nd and later rings. */
 static void
 setChildNodePositions (noded *n, ggvisd *ggv, datad *d)
 {
@@ -607,14 +614,14 @@ setChildNodePositions (noded *n, ggvisd *ggv, datad *d)
   gdouble theta;
   GList *l, *children = NULL;
 
-  // the initial value of theta is the angle of the boundary of the fan
+  /* the initial value of theta is the angle of the boundary of the fan */
   if (n->i == ggv->radial->centerNode->i) theta = 0;
   else if (n->nChildren == 1) theta = n->theta;
   else {
     theta = n->theta - n->span/2;
   }
 
-  // Build an array of the child nodes 
+  /* Build an array of the child nodes  */
   childNodes (&children, n);
 
   i = 0;
@@ -631,7 +638,7 @@ setChildNodePositions (noded *n, ggvisd *ggv, datad *d)
 
       if (nchild->span > 0)
         theta += nchild->span/2;
-      else  // if it's a leaf node
+      else  /* if it's a leaf node */
         theta += .5 * (n->span)/(gdouble)(n->subtreeSize-1);
 
       i++;
@@ -640,7 +647,7 @@ setChildNodePositions (noded *n, ggvisd *ggv, datad *d)
 
       if (nchild->span > 0)
         theta += nchild->span;
-      else  // if it's a leaf node
+      else  /* if it's a leaf node */
         theta += (n->span)/(gdouble)(n->subtreeSize-1);
     }
       
@@ -656,7 +663,7 @@ setChildNodePositions (noded *n, ggvisd *ggv, datad *d)
 void
 setNodePositions (ggvisd *ggv, datad *d) {
 
-  // Set the position of the center node
+  /* Set the position of the center node */
   ggv->radial->centerNode->pos.x = 0;
   ggv->radial->centerNode->pos.y = 0;
   ggv->radial->centerNode->theta = 0;

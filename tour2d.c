@@ -376,7 +376,6 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean changed = true;
-  splotd *sp = gg->current_splot;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
     /*

@@ -179,9 +179,9 @@ static GtkItemFactoryEntry menu_items[] = {
 
 
 static void 
-display_datad_added_cb (ggobid *gg, datad *d, GtkObject *win)
+display_datad_added_cb (ggobid *gg, datad *d, void *win)
 {
-  windowDisplayd *display =  GTK_GGOBI_WINDOW_DISPLAY(win);
+  windowDisplayd *display =  GTK_GGOBI_WINDOW_DISPLAY(GTK_OBJECT(win));
 
     /*-- this is all true even when the display is first opened --*/
   if (GTK_WIDGET_REALIZED (display->window)) {
@@ -189,6 +189,9 @@ display_datad_added_cb (ggobid *gg, datad *d, GtkObject *win)
 					    display_options_cb, gg);
   }
 }
+
+CHECK_EVENT_SIGNATURE(display_datad_added_cb, datad_added_f);
+
 
 splotd *
 gtk_scatter_plot_new(displayd *dpy, gint width, gint height, ggobid *gg)
@@ -228,6 +231,9 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
 {
   return(createScatterplot(missing_p, sp, 0, NULL, d, gg));
 }
+
+
+
 
 displayd *
 createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg)

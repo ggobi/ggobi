@@ -46,8 +46,8 @@ void selection_made_cb (GtkWidget *clist, gint row, gint column,
     GtkSignalFunc func = selection_made_cb;
 */
 
-static void wvis_variable_notebook_adddata_cb (GtkObject *obj, datad *d,
-  ggobid *gg, GtkWidget *notebook)
+static void 
+wvis_variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
 {
   GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0);
   if (swin) {
@@ -62,11 +62,14 @@ static void wvis_variable_notebook_adddata_cb (GtkObject *obj, datad *d,
        * responds to "select_row" signal
       */
     }
-    variable_notebook_subwindow_add (d, func, notebook, gg);
+    variable_notebook_subwindow_add (d, func, GTK_WIDGET(notebook), gg);
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
                                 g_slist_length (gg->d) > 1);
   }
 }
+
+CHECK_EVENT_SIGNATURE(wvis_variable_notebook_adddata_cb, datad_added_f)
+CHECK_EVENT_SIGNATURE(variable_notebook_list_changed_cb, variable_list_changed_f)
 
 GtkWidget *
 wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
@@ -96,7 +99,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
     "variable_added", GTK_SIGNAL_FUNC (variable_notebook_varchange_cb),
      GTK_OBJECT (notebook));
   gtk_signal_connect (GTK_OBJECT (gg),
-    "variable_list_changed", GTK_SIGNAL_FUNC (variable_notebook_varchange_cb),
+    "variable_list_changed", GTK_SIGNAL_FUNC (variable_notebook_list_changed_cb),
      GTK_OBJECT (notebook));
 
   /*-- listen for variable_added events on main_window --*/
