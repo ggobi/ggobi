@@ -40,7 +40,7 @@ generate_data(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 	      tmp = g_strdup("abc");
 	      sprintf(tmp, "%c", 'A' + j);
 #if 1
-	      GGOBI(setVariableName)(j, g_strdup(tmp), false, d, gg);
+	      GGOBI(setVariableName)(j, g_strdup(tmp), true, d, gg);
 #else
 	      vt = vartable_element_get (j, d);
 	      vt->collab = g_strdup(tmp);
@@ -50,6 +50,9 @@ generate_data(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 	  d->raw.vals[i][j] = 100.*((float)rand()/(float)RAND_MAX);
       }
   }
+
+  datad_init(d, gg, false);
+
   g_printerr("[starting ggobi %d %d]\n", nr, nc);
   start_ggobi(gg, true, true);
 
