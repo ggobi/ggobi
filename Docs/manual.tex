@@ -482,15 +482,26 @@ current display type and view mode.
 Each display type is briefly described here. 
 As mentioned earlier, there are presently four main display types:
 
-The {\bf scatterplot} display is a window containing a single
-scatterplot.  By default, it includes axes; they can be turned off
-using the Options menu in the main control window.  It has the
-largest number of view modes of any display, and each of the
-projection modes has its own rules for variable selection.  The
-variable selection interface for the 1DPlot and XYPlot modes is a
-column of checkboxes: clicking left on one of these selects a
-variable to be plotted horizontally, clicking middle or right selects
-a vertical variable.  The tour modes all use a set of labeled
+% scatterplot
+
+The {\bf scatterplot} display is a window containing a single scatterplot.
+By default, it includes axes; they can be turned off using the Options
+menu in the main control window.  It has the largest number of view
+modes of any display, and each of the projection modes has its own
+rules for variable selection.  The main variable selection interface
+for the XYPlot modes uses toggle buttons: clicking on the {\em X}
+button selects the variable to plot horizontally, and clicking on {\em
+Y} selects the variable to plot vertically.  (There's a less obvious
+variable selection interface as a shortcut: clicking left (right) on the
+variable label selects the {\em X} ({\em Y}) variable.)  The interface
+for the 1D plot is similar:  it only shows one column of toggle buttons,
+so clicking on {\em X} selects the variable to be plotted irrespective
+of the plot orientation.  (Using the variable label shortcut, you can
+change the plot orientation as you make a variable selection.)
+% column of checkboxes: clicking left on one of these selects a
+% variable to be plotted horizontally, clicking middle or right selects
+% a vertical variable. 
+The tour modes all use a set of labeled
 circles for variable selection, and they provide some feedback about
 current projection.  The variable selection behavior for the tour
 modes will be described in the section for each mode.
@@ -503,17 +514,23 @@ symmetric, and that constraint affects its variable selection behavior.
 \begin{itemize}
 \item Replace:  First select one of the ASH plots along the diagonal
   to tell ggobi uniquely which variable to replace, then click on
-  one of the checkboxes in the variable selection region.
+  one of the toggle buttons in the variable selection region.
 \item Insert:  First select one of the plots along the
   diagonal to tell ggobi uniquely where to insert the new plot,
-  then click on one of the variable checkboxes.  (GGobi will
+  then click on one of the buttons.  (GGobi will
   not add a variable that's already plotted.)
-\item Append:  Click on one of the variable checkboxes to append
+\item Append:  Click on one of the buttons to append
   a new plot after all other plots.  (GGobi will not add a variable
   that's already plotted.)
-\item Delete:  No plot selection is required; just click on the
+\item Delete:  No plot selection is required; just select the
   variable you want to delete.
 \end{itemize}
+
+For the scatterplot matrix display, the variable label ``shortcut''
+works, but it's simply redundant: that is, it makes no difference which
+button you press.
+
+% parallel coordinates
 
 The {\bf parallel coordinates} display contains a single parallel
 coordinates plot, which can be arranged horizontally or vertically.
@@ -534,44 +551,50 @@ The variable selection behavior works as follows:
 
 \begin{itemize}
 \item Replace:  First select one of the plots, then click on one
-  of the variable checkboxes to replace its plotted variable.
+  of the toggle buttons to replace its plotted variable.
 \item Insert:  First select one of the plots, then click on
-  one of the variable checkboxes to insert a new plot before
+  one of the toggle buttons to insert a new plot before
   the current plot.  (GGobi will not add a variable that's
   already plotted.)
-\item Append:  Click on one of the variable checkboxes to append
+\item Append:  Click on one of the toggle buttons to append
   a new plot after all other plots.  (GGobi will not add a variable
   that's already plotted.)
-\item Delete:  No plot selection is required; just click on the
+\item Delete:  No plot selection is required; just select the
   variable whose plot you want to delete.
 \end{itemize}
+
+For the parallel coordinates display, the variable label ``shortcut''
+works, but it's simply redundant: that is, it makes no difference which
+button you press.
+
+% time series
 
 The {\bf time series display} contains a row or column of 2-variable
 plots with a common axis, usually a time variable.  By default, the
 points are connected with line segments.  
 
-The time series display uses the checkbox variable selection interface,
-and the behavior of the checkboxes depends on the state of the
+The behavior of the toggle buttons and labels depends on the state of the
 {\bf Selection mode} option menu in the console.
 
 \begin{itemize}
 \item Replace: If you want to replace the horizontal (time) variable,
-  no plot selection is required; simply click left on the variable you
-  want to choose.  To replace a vertical variable, first select the
-  plot you want to change, and then click right or middle on the
-  variable you want.  (For now, ggobi won't let you use a variable
-  that's already plotted.)
+  no plot selection is required; simply click the {\em X} toggle
+  button for the variable you want.  To replace a vertical variable,
+  first select the plot you want to change, and then click the {\em
+  Y} toggle for the variable you want.  (For now, ggobi won't let you
+  plot the same variable twice.) 
 \item Insert:  Select a plot in the display, and then click
-  middle or right on a variable checkbox to add a new plot before
-  the current plot.  (This applies to vertically plotted
-  variables only.)
-\item Append:  Click on one of the variable checkboxes to append
+  on a the {\em Y} toggle to add a new plot before the current plot.
+\item Append:  Click on one of the {\em Y} toggles to append
   a new plot after all other plots.  (GGobi will not add a variable
   that's already plotted.)
-\item Delete: No plot selection is required; just click middle or
-  right on the variable checkbox for the variable you want to
-  delete.  (This applies to vertically plotted variables only.)
+\item Delete: No plot selection is required; just click the
+  {\em Y} toggle for the variable in the plot you want to delete.
 \end{itemize}
+
+The variable label shortcuts can be used in the Time Series display.
+In general, clicking left (right) corresponds to selecting the {\em X}
+({\em Y}) toggle button.
 
 \section{Data format}
 \label{slbl:DataFormat}
