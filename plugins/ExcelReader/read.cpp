@@ -38,6 +38,9 @@ datad *createDataset(VARIANT *var, ggobid *gg);
 
 gboolean readData(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 
+datad *loadSheet(IDispatch *sheet, ggobid *gg, gchar *fileName);
+
+
 gboolean
 onLoad(gboolean initializing, GGobiPluginInfo *plugin)
 {
@@ -77,10 +80,10 @@ readData(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 }
 
 void
-releaseVariants(VARIANT *vars, int n)
+releaseVariants(VARIANT *vars, int n, gboolean release)
 {
   for(int i = 0; i < n; i++) {
-    if(V_VT(&vars[i]) == VT_DISPATCH) {
+    if(release && V_VT(&vars[i]) == VT_DISPATCH) {
       V_DISPATCH(&vars[i])->Release();
     }
     VariantClear(&vars[i]);
@@ -134,18 +137,9 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   s = call(books, L"Open", v, 1);
 
 #if 0
-  if(s) {
-    s->Release();
-  }
-  VariantClear(v);
-  books->Release();
-  iface->Release();
-  releaseVariants(vars, sizeof(vars)/sizeof(vars[0]));
-  return;
-#endif
-
   getProperty(s, L"ActiveSheet", v = &vars[2]);
     sheet = V_DISPATCH(v);  
+
   getProperty(sheet, L"UsedRange", v = &vars[3]);
     cells = V_DISPATCH(v);
   getProperty(cells, L"Value", v = &vars[4]);
@@ -153,7 +147,7 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   datad *d = createDataset(v, gg);
   d->name = g_strdup(fileName);
 
-  releaseVariants(vars, sizeof(vars)/sizeof(vars[0]));
+  releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), 0);
 
   call(s, L"Close", NULL, 0);
   fprintf(stderr, "Closed() the sheet\n"); fflush(stderr);
@@ -161,9 +155,54 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   cells->Release();
   sheet->Release();
   s->Release();
+  releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), true);
+#else
+
+  getProperty(s, L"Sheets", v = &vars[2]);
+  IDispatch *sheets = V_DISPATCH(v); 
+  sheets->AddRef();
+  getProperty(sheets, L"Count", v = &vars[3]);
+  int numSheets = V_I4(v);
+
+  fprintf(stderr, "Num sheets = %d\n", numSheets);fflush(stderr);
+
+  for(int i = 0; i < numSheets ; i++) {
+    v = &vars[4];
+    V_VT(v) = VT_I4;
+    V_I4(v) = i+1;
+    fprintf(stderr, "Asking for Item %d\n", i);fflush(stderr);
+    sheet = call(sheets, L"Item", v, 1);
+    fprintf(stderr, "got it\n");fflush(stderr);
+    loadSheet(sheet, gg, fileName);    
+    sheet->Release();
+  }
+  sheets->Release();
+  releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), false);
+  call(s, L"Close", NULL, 0);
+#endif
+
   books->Release();
   iface->Release();
 }
+
+datad *
+loadSheet(IDispatch *sheet, ggobid *gg, gchar *fileName)
+{
+  VARIANT vars[3], *v;
+  IDispatch *cells;
+
+  getProperty(sheet, L"UsedRange", v = &vars[0]);
+    cells = V_DISPATCH(v);
+  getProperty(cells, L"Value", v = &vars[1]);
+
+  datad *d = createDataset(v, gg);
+  getProperty(sheet, L"Name", v = &vars[2]);
+  d->name = FromBstr(V_BSTR(v));
+
+  releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), true);
+  return(d);
+}
+
 
 IDispatch *
 getWorkbooks(IDispatch *iface)
@@ -216,7 +255,7 @@ call(IDispatch *iface, BSTR name, VARIANT *args, int numArgs)
 
  VariantInit(&v);
 
- hr = iface->Invoke(mid, IID_NULL, LOCALE_USER_DEFAULT, INVOKE_FUNC, &params, &v, NULL, NULL);
+ hr = iface->Invoke(mid, IID_NULL, LOCALE_USER_DEFAULT, INVOKE_FUNC | INVOKE_PROPERTYGET, &params, &v, NULL, NULL);
  if(FAILED(hr)) {
     COMError(hr);
  }

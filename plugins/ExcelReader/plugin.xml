@@ -135,22 +135,27 @@ Excel server and more code!
 
 <para/>
 
-Among the missing features are:
+There are several missing features.
 <itemizedList>
 <listitem>
-only handles numbers; not dates, strings, etc.
+Only handles numbers; not dates, strings, etc.
+One can add converters for these different VARIANT types
+and handle them appropriately without having
+to use COM.
 </listitem>
 <listitem>
-does not handle categorical variables at all.
+Does not handle categorical variables at all.
+This is quite feasible using some of the code from
+the XML parser. The computations are entirely local and do not involve COM.
 </listitem>
 <listitem>
-currently only reads the "active" worksheet, and not any others.
+No support for edges.
 </listitem>
 <listitem>
-no support for edges
+No support for colors, glyphs, etc.
 </listitem>
 <listitem>
-no support for additional command line arguments
+No support for additional command line arguments
 such as
  <itemizedList>
  <listitem> --headers=true to specify whether the first row gives the variable
@@ -164,7 +169,7 @@ such as
 to do on-the-fly subsetting.
  </listitem>
  </itemizedList>
- If one wants to do this, use a different
+If one wants to do this, use a different
 interface such as R, Python or Perl to  program these operations for DCOM.
 </listitem>
 </itemizedList>
