@@ -15,6 +15,8 @@ CUR_DIR=$(shell pwd)
 
 include Makeconf
 
+INSTALLED_LIB_NAMES=libggobi.@SHLIB_EXT@ libgtkext.@SHLIB_EXT@
+
 GTK_EXT=lib/libgtkext.@SHLIB_EXT@
 
 all: $(GTK_EXT) bin/ggobi.bin @EMBED_LIB@ $(UTILS) @PACKAGES@ buildPlugins
@@ -75,8 +77,11 @@ else
 endif
 
 
+# Need to strip the lib/ from the names
+# $(EMBED_LIB:%=$(libdir)/%) $(GTK_EXT:%=$(libdir)/%)
+# So use INSTALLED_LIB_NAMES. Need to synchronize these.
 uninstall:
-	$(RM) $(EMBED_LIB:%=$(libdir)/%) $(GTK_EXT:%=$(libdir)/%)
+	$(RM) $(INSTALLED_LIB_NAMES:%=$(libdir)/%)
 	$(RM) -fr $(ggobi_install_home)
 	$(RM) $(bindir)/ggobi-config
 	$(RM) $(bindir)/ggobi

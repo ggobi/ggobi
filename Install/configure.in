@@ -24,6 +24,8 @@ fi
 
 PLUGIN_DIRS=""
 
+OTHER_CFLAGS=-DHAVE_GGOBI_CONFIG_H
+
 
 AC_ARG_ENABLE(embed, [--enable-embed          Build the ggobi library for embedding in other applications (e.g. R) (yes)])
 
@@ -159,7 +161,7 @@ SHLIB_EXT="so"
 if test `uname` = "Darwin" ; then
  echo "Darwin operating system detected."
  PIC_CFLAG=-fno-common
- OTHER_CFLAGS=-DDarwin
+ OTHER_CFLAGS="${OTHER_CFLAGS} -DDarwin"
 # SHLIB_LDFLAGS="-dylib -flat_namespace -undefined suppress"
  SHLIB_EXT="dylib"
 
